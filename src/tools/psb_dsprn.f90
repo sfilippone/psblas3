@@ -24,12 +24,11 @@ Subroutine psb_dsprn(a, desc_a,info)
 
   !locals
   Integer             :: icontxt
-  Integer             :: nprow,npcol,me,mypcol,err,err_act
-  integer, parameter  :: ione=1, itwo=2,root=0
+  Integer             :: nprow,npcol,myrow,mycol,err,err_act
   logical, parameter  :: debug=.false.
-  integer :: int_err(5)
-  real(kind(1.d0)) :: real_err(5)
-  character(len=20)  :: name, ch_err
+  integer             :: int_err(5)
+  real(kind(1.d0))    :: real_err(5)
+  character(len=20)   :: name, ch_err
 
   info = 0
   err  = 0
@@ -38,9 +37,9 @@ Subroutine psb_dsprn(a, desc_a,info)
   call psb_erractionsave(err_act)
 
   icontxt = desc_a%matrix_data(psb_ctxt_)
-  call blacs_gridinfo(icontxt, nprow, npcol, me, mypcol)
+  call blacs_gridinfo(icontxt, nprow, npcol, myrow, mycol)
   if (debug) &
-       &write(*,*) 'starting spalloc ',icontxt,nprow,npcol,me
+       &write(*,*) 'starting spalloc ',icontxt,nprow,npcol,myrow
 
   !     ....verify blacs grid correctness..
   if (npcol.ne.1) then
@@ -49,32 +48,30 @@ Subroutine psb_dsprn(a, desc_a,info)
      goto 9999
   endif
 
-  if (debug) &
-       &write(*,*) 'got through igamx2d '
+  if (debug) write(*,*) 'got through igamx2d '
 
-
-  if (.not.is_asb_dec(desc_a%matrix_data(psb_dec_type_))) then
+  if (.not.psb_is_asb_dec(desc_a%matrix_data(psb_dec_type_))) then
      info=590     
      call psb_errpush(info,name)
      goto 9999
   endif
 
-  if (a%infoa(state_) == spmat_asb) then
+  if (a%infoa(psb_state_) == psb_spmat_asb_) then
 
      a%aspk(:) = 0.0
-     if (ibits(a%infoa(upd_),2,1)==1) then 
+     if (ibits(a%infoa(psb_upd_),2,1)==1) then 
         if(a%fida(1:3).eq.'JAD') then
-           a%ia1(a%infoa(upd_pnt_)+nnz_) = 0
+           a%ia1(a%infoa(psb_upd_pnt_)+psb_nnz_) = 0
         else
-           a%ia2(a%infoa(upd_pnt_)+nnz_) = 0
+           a%ia2(a%infoa(psb_upd_pnt_)+psb_nnz_) = 0
         endif
      endif
-     a%infoa(state_) = spmat_upd
-  else if (a%infoa(state_) == spmat_bld) then
+     a%infoa(psb_state_) = psb_spmat_upd_
+  else if (a%infoa(psb_state_) == psb_spmat_bld_) then
      ! in this case do nothing. this allows sprn to be called 
      ! right after allocate, with spins doing the right thing.
      ! hopefully :-)
-  else if (a%infoa(state_) == spmat_upd) then
+  else if (a%infoa(psb_state_) == psb_spmat_upd_) then
 
   else
      info=591     

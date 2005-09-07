@@ -43,8 +43,8 @@ subroutine psb_dscins(nz,ia,ja,desc_a,info,is,js)
 
   icontxt = desc_a%matrix_data(psb_ctxt_)
   dectype = desc_a%matrix_data(psb_dec_type_)
-  mglob   = desc_a%matrix_data(m_)
-  nglob   = desc_a%matrix_data(n_)
+  mglob   = desc_a%matrix_data(psb_m_)
+  nglob   = desc_a%matrix_data(psb_n_)
   nrow    = desc_a%matrix_data(psb_n_row_)
   ncol    = desc_a%matrix_data(psb_n_col_)
 
@@ -55,7 +55,7 @@ subroutine psb_dscins(nz,ia,ja,desc_a,info,is,js)
     call psb_errpush(info,name)
     goto 9999
   endif
-  if (.not.is_bld_dec(dectype)) then 
+  if (.not.psb_is_bld_dec(dectype)) then 
     info = 3110
     call psb_errpush(info,name)
     goto 9999

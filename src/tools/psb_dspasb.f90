@@ -15,7 +15,7 @@
 subroutine psb_dspasb(a,desc_a, info, afmt, up, dup)
 
   use psb_descriptor_type
-  use psb_dspmat_type
+  use psb_spmat_type
   use psb_serial_mod
   use psb_const_mod
   use psi_mod
@@ -42,11 +42,10 @@ subroutine psb_dspasb(a,desc_a, info, afmt, up, dup)
   type(psb_dspmat_type) ::  atemp
   real(kind(1.d0))      ::  real_err(5)
   integer               ::  ia1_size,ia2_size,aspk_size,m,i,err,&
-       & nprow,npcol,me,mypcol ,size_req,idup,n_col,iout, err_act
+       & nprow,npcol,myrow,mycol ,size_req,idup,n_col,iout, err_act
   integer               :: dscstate, spstate, nr,k,j, iupdup
   integer               :: icontxt,temp(2),isize(2),n_row
   character             :: iup
-  integer, parameter    :: ione=1
   logical, parameter    :: debug=.false., debugwrt=.false.
   character(len=20)     :: name, ch_err
 
@@ -61,7 +60,7 @@ subroutine psb_dspasb(a,desc_a, info, afmt, up, dup)
   n_col    = desc_a%matrix_data(psb_n_col_)
 
   ! check on BLACS grid 
-  call blacs_gridinfo(icontxt, nprow, npcol, me, mypcol)
+  call blacs_gridinfo(icontxt, nprow, npcol, myrow, mycol)
   if (nprow.eq.-1) then
      info = 2010
      call psb_errpush(info,name)
@@ -73,7 +72,7 @@ subroutine psb_dspasb(a,desc_a, info, afmt, up, dup)
      goto 9999
   endif
 
-  if (.not.is_asb_dec(dscstate)) then 
+  if (.not.psb_is_asb_dec(dscstate)) then 
      info = 600
      int_err(1) = dscstate
      call psb_errpush(info,name)
@@ -84,8 +83,8 @@ subroutine psb_dspasb(a,desc_a, info, afmt, up, dup)
 
   !check on errors encountered in psdspins
 
-  spstate = a%infoa(state_) 
-  if (spstate == SPMAT_BLD) then 
+  spstate = a%infoa(psb_state_) 
+  if (spstate == psb_spmat_bld_) then 
      !
      ! First case: we come from a fresh build. 
      ! 
@@ -126,8 +125,8 @@ subroutine psb_dspasb(a,desc_a, info, afmt, up, dup)
      iupdup = ieor(iupdup,idup)
 
 
-     a%infoa(upd_)=iupdup
-     if (debug) write(0,*)'in ASB',upd_,iupdup
+     a%infoa(psb_upd_)=iupdup
+     if (debug) write(0,*)'in ASB',psb_upd_,iupdup
 
      a%m = n_row
      a%k = n_col
@@ -150,7 +149,7 @@ subroutine psb_dspasb(a,desc_a, info, afmt, up, dup)
      ! work area requested must be fixed to
      ! No of Grid'd processes and NNZ+2
      !
-     size_req  = max(a%infoa(nnz_),1)+3
+     size_req  = max(a%infoa(psb_nnz_),1)+3
      if (debug) write(0,*) 'DCSDP : size_req 1:',size_req
      call psb_cest(a%fida, size_req, ia1_size, ia2_size, aspk_size, iup,info)
      if (info /= no_err) then    
@@ -172,7 +171,7 @@ subroutine psb_dspasb(a,desc_a, info, afmt, up, dup)
      a%pr(:)  = 0
 
      if (debugwrt) then
-        iout = 30+me
+        iout = 30+myrow
         open(iout)
         call psb_csprt(iout,atemp,head='Input mat')
         close(iout)
@@ -180,25 +179,25 @@ subroutine psb_dspasb(a,desc_a, info, afmt, up, dup)
 
      ! Do the real conversion into the requested storage formatmode
      ! result is put in A
-     call psb_csdp90(atemp,a,info,ifc=2)
+     call psb_csdp(atemp,a,info,ifc=2)
 
-     IF (debug) WRITE (*, *) me,'   ASB:  From DCSDP',info,' ',A%FIDA
+     IF (debug) WRITE (*, *) myrow,'   ASB:  From DCSDP',info,' ',A%FIDA
      if (info /= no_err) then    
         info=4010
-        ch_err='psb_csdp90'
+        ch_err='psb_csdp'
         call psb_errpush(info,name,a_err=ch_err)
         goto 9999
      endif
 
      if (debugwrt) then
-        iout = 60+me
+        iout = 60+myrow
         open(iout)
-        call csprt(iout,a,head='Output mat')
+        call psb_csprt(iout,a,head='Output mat')
         close(iout)
      endif
 
 
-  else if (spstate == SPMAT_UPD) then
+  else if (spstate == psb_spmat_upd_) then
      !
      ! Second  case: we come from an update loop.
      ! 
@@ -218,7 +217,7 @@ subroutine psb_dspasb(a,desc_a, info, afmt, up, dup)
         goto 9999
      endif
 
-     call psb_csdp90(atemp,a,info,check='R')
+     call psb_csdp(atemp,a,info,check='R')
      ! check on error retuned by dcsdp
      if (info /= no_err) then
         info = 4010
@@ -240,7 +239,7 @@ subroutine psb_dspasb(a,desc_a, info, afmt, up, dup)
      info = 600
      call psb_errpush(info,name)
      goto 9999
-     if (debug) write(0,*) 'Sparse matrix state:',spstate,spmat_bld,spmat_upd
+     if (debug) write(0,*) 'Sparse matrix state:',spstate,psb_spmat_bld_,psb_spmat_upd_
 
   endif
 

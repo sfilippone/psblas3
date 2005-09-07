@@ -35,7 +35,7 @@ subroutine psb_iins(m, n, x, ix, jx, blck, desc_a, info,&
   
   integer                :: icontxt,i,loc_row,glob_row,&
        & loc_cols,col,iblock, jblock, mglob
-  integer                :: nprow,npcol, me ,mypcol, int_err(5),err_act
+  integer                :: nprow,npcol, myrow ,mycol, int_err(5),err_act
   character(len=20)   :: name, ch_err
 
   info=0
@@ -52,7 +52,7 @@ subroutine psb_iins(m, n, x, ix, jx, blck, desc_a, info,&
   icontxt=desc_a%matrix_data(psb_ctxt_)
 
   ! check on blacs grid 
-  call blacs_gridinfo(icontxt, nprow, npcol, me, mypcol)
+  call blacs_gridinfo(icontxt, nprow, npcol, myrow, mycol)
   if (nprow.eq.-1) then
      info = 2010
      call psb_errpush(info,name)
@@ -95,7 +95,7 @@ subroutine psb_iins(m, n, x, ix, jx, blck, desc_a, info,&
      int_err(2) = jx
      call psb_errpush(info,name,int_err)
      goto 9999
-  else if (.not.is_ok_dec(desc_a%matrix_data(psb_dec_type_))) then
+  else if (.not.psb_is_ok_dec(desc_a%matrix_data(psb_dec_type_))) then
      info = 3110
      int_err(1) = desc_a%matrix_data(psb_dec_type_)
      call psb_errpush(info,name,int_err)
@@ -118,7 +118,7 @@ subroutine psb_iins(m, n, x, ix, jx, blck, desc_a, info,&
   endif
 
   loc_cols = desc_a%matrix_data(psb_n_col_)
-  mglob    = desc_a%matrix_data(m_)
+  mglob    = desc_a%matrix_data(psb_m_)
   if (present(iblck)) then
      iblock = iblck
   else
@@ -206,7 +206,7 @@ subroutine psb_iinsvm(m, x, ix, jx, blck, desc_a, info,&
   !locals.....
   integer                :: icontxt,i,loc_row,glob_row,&
        & loc_cols,iblock, jblock,mglob, err_act, int_err(5)
-  integer                :: nprow,npcol, me ,mypcol
+  integer                :: nprow,npcol, myrow ,mycol
   character(len=20)   :: name, ch_err
 
   info=0
@@ -215,7 +215,7 @@ subroutine psb_iinsvm(m, x, ix, jx, blck, desc_a, info,&
   
    
   loc_cols=desc_a%matrix_data(psb_n_col_)
-  mglob    = desc_a%matrix_data(m_)
+  mglob    = desc_a%matrix_data(psb_m_)
 
   if (present(iblck)) then
      iblock = iblck
@@ -291,7 +291,7 @@ subroutine psb_iinsvv(m, x, ix, blck, desc_a, info,&
   !locals.....
   integer                :: icontxt,i,loc_row,glob_row,k,&
        & loc_rows,loc_cols,col,iblock, jblock, mglob, err_act, int_err(5)
-  integer                :: nprow,npcol, me ,mypcol
+  integer                :: nprow,npcol, myrow ,mycol
   character(len=20)   :: name, ch_err
 
   info=0
@@ -306,7 +306,7 @@ subroutine psb_iinsvv(m, x, ix, blck, desc_a, info,&
   icontxt=desc_a%matrix_data(psb_ctxt_)
 
   ! check on blacs grid 
-  call blacs_gridinfo(icontxt, nprow, npcol, me, mypcol)
+  call blacs_gridinfo(icontxt, nprow, npcol, myrow, mycol)
   if (nprow.eq.-1) then
      info = 2010
      call psb_errpush(info,name)
@@ -337,7 +337,7 @@ subroutine psb_iinsvv(m, x, ix, blck, desc_a, info,&
      int_err(2) = ix
      call psb_errpush(info,name,int_err)
      goto 9999
-  else if (.not.is_ok_dec(desc_a%matrix_data(psb_dec_type_))) then
+  else if (.not.psb_is_ok_dec(desc_a%matrix_data(psb_dec_type_))) then
      info = 3110
      int_err(1) = desc_a%matrix_data(psb_dec_type_)
      call psb_errpush(info,name,int_err)
@@ -352,7 +352,7 @@ subroutine psb_iinsvv(m, x, ix, blck, desc_a, info,&
 
   loc_rows=desc_a%matrix_data(psb_n_row_)
   loc_cols=desc_a%matrix_data(psb_n_col_)
-  mglob    = desc_a%matrix_data(m_)
+  mglob    = desc_a%matrix_data(psb_m_)
 
   if (present(iblck)) then
      iblock = iblck

@@ -26,7 +26,6 @@ subroutine psb_dscasb(desc_a,info)
        & lovrlap,lhalo,nhalo,novrlap,max_size,max_halo,n_col,ldesc_halo,&
        & ldesc_ovrlap, dectype, err_act
   integer                       :: icontxt,temp(1),n_row
-  integer, parameter            :: ione=1, itwo=2
   logical, parameter            :: debug=.false., debugwrt=.false.
   character(len=20)             :: name,ch_err
 
@@ -54,7 +53,7 @@ subroutine psb_dscasb(desc_a,info)
     goto 9999
   endif
 
-  if (.not.is_ok_dec(dectype)) then 
+  if (.not.psb_is_ok_dec(dectype)) then 
     info = 600
     int_err(1) = dectype
     call psb_errpush(info,name)
@@ -63,7 +62,7 @@ subroutine psb_dscasb(desc_a,info)
 
   if (debug) write (0, *) '   Begin matrix assembly...'
 
-  if (is_bld_dec(dectype)) then 
+  if (psb_is_bld_dec(dectype)) then 
     if (debug) write(0,*) 'psb_dscasb: Checking rows insertion'
     ! check if all local row are inserted
     do i=1,desc_a%matrix_data(psb_n_col_)
@@ -105,7 +104,7 @@ subroutine psb_dscasb(desc_a,info)
 
     itemp(1) = max_size
     itemp(2) = max_halo
-    call igamx2d(icontxt, all, topdef, itwo, ione, itemp,&
+    call igamx2d(icontxt, psb_all_, psb_topdef_, itwo, ione, itemp,&
          & itwo,temp ,temp,-ione ,-ione,-ione)
     max_size = itemp(1) 
     max_halo = itemp(2) 
@@ -167,7 +166,7 @@ subroutine psb_dscasb(desc_a,info)
     end if
 
     ! Ok, register into MATRIX_DATA &  free temporary work areas
-    desc_a%matrix_data(psb_dec_type_) = desc_asb
+    desc_a%matrix_data(psb_dec_type_) = psb_desc_asb_
 
     deallocate(halo_index,ovrlap_index, stat=info)
     if (info /= 0) then
@@ -180,8 +179,8 @@ subroutine psb_dscasb(desc_a,info)
      info = 600
      call psb_errpush(info,name)
      goto 9999
-     if (debug) write(0,*) 'dectype 2 :',dectype,desc_bld,&
-          &desc_asb,desc_upd
+     if (debug) write(0,*) 'dectype 2 :',dectype,psb_desc_bld_,&
+          &psb_desc_asb_,psb_desc_upd_
   endif
 
   call psb_erractionrestore(err_act)

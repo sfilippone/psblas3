@@ -50,11 +50,11 @@ subroutine psb_loc_to_glob2(x,y,desc_a,info,iact)
           &  (x(i).le.zero)) then
         info=140
         int_err(1)=tmp
-        int_err(2)=desc_a%matrix_data(m_)
+        int_err(2)=desc_a%matrix_data(psb_n_col_)  
         exit
      else
         tmp=desc_a%loc_to_glob(x(i))
-        if((tmp.gt.zero).or.(tmp.le.desc_a%matrix_data(m_))) then
+        if((tmp.gt.zero).or.(tmp.le.desc_a%matrix_data(psb_m_))) then
            y(i)=tmp
         else
            info = 140
@@ -146,7 +146,7 @@ subroutine psb_loc_to_glob(x,desc_a,info,iact)
       exit
     else
       tmp=desc_a%loc_to_glob(x(i))
-      if((tmp.gt.zero).or.(tmp.le.desc_a%matrix_data(m_))) then
+      if((tmp.gt.zero).or.(tmp.le.desc_a%matrix_data(psb_m_))) then
         x(i)=tmp
       else
         info = 140

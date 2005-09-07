@@ -25,7 +25,7 @@ subroutine psb_dscall(m, n, parts, icontxt, desc_a, info)
   integer, intent(out)                :: info
 
   !locals
-  Integer             :: counter,i,j,nprow,npcol,me,mypcol,&
+  Integer             :: counter,i,j,nprow,npcol,myrow,mycol,&
        & loc_row,err,loc_col,nprocs,&
        & l_ov_ix,l_ov_el,idx, err_act, itmpov, k
   Integer             :: INT_ERR(5),TEMP(1),EXCH(2)
@@ -39,8 +39,8 @@ subroutine psb_dscall(m, n, parts, icontxt, desc_a, info)
   name = 'psb_dscall'
   call psb_erractionsave(err_act)
 
-  call blacs_gridinfo(icontxt, nprow, npcol, me, mypcol)
-  if (debug) write(*,*) 'psb_dscall: ',nprow,npcol,me,mypcol
+  call blacs_gridinfo(icontxt, nprow, npcol, myrow, mycol)
+  if (debug) write(*,*) 'psb_dscall: ',nprow,npcol,myrow,mycol
   !     ....verify blacs grid correctness..
   if (npcol /= 1) then
      info = 2030
@@ -71,12 +71,12 @@ subroutine psb_dscall(m, n, parts, icontxt, desc_a, info)
 
   if (debug) write(*,*) 'psb_dscall:  doing global checks'  
   !global check on m and n parameters
-  if (me.eq.root) then
+  if (myrow.eq.psb_root_) then
      exch(1)=m
      exch(2)=n
      call igebs2d(icontxt,psb_all_,psb_topdef_, itwo,ione, exch, itwo)
   else
-     call igebr2d(icontxt,psb_all_,psb_topdef_, itwo,ione, exch, itwo, root,&
+     call igebr2d(icontxt,psb_all_,psb_topdef_, itwo,ione, exch, itwo, psb_root_,&
           & 0)
      if (exch(1) /= m) then
         err=550
@@ -145,15 +145,15 @@ subroutine psb_dscall(m, n, parts, icontxt, desc_a, info)
         endif
         desc_a%glob_to_loc(i) = -(nprow+prc_v(1)+1)
         j=1
-!!$      do while ((j.le.nprocs).and.(prc_v(j).ne.me))
+!!$      do while ((j.le.nprocs).and.(prc_v(j).ne.myrow))
         do 
            if (j > nprocs) exit
-           if (prc_v(j) == me) exit
+           if (prc_v(j) == myrow) exit
            j=j+1
         enddo
         if (j.le.nprocs) then 
-           if (prc_v(j).eq.me) then
-              ! this point belongs to me
+           if (prc_v(j).eq.myrow) then
+              ! this point belongs to myrow
               counter=counter+1
               desc_a%glob_to_loc(i) = counter
               if (nprocs.gt.1)  then
@@ -222,7 +222,7 @@ subroutine psb_dscall(m, n, parts, icontxt, desc_a, info)
      ov_el(l_ov_el+2)  = nprocs
      l_ov_el           = l_ov_el+2
      do j=1, nprocs
-        if (temp_ovrlap(i+j) /= me) then
+        if (temp_ovrlap(i+j) /= myrow) then
            ov_idx(l_ov_ix+1) = temp_ovrlap(i+j)
            ov_idx(l_ov_ix+2) = 1
            ov_idx(l_ov_ix+3) = idx

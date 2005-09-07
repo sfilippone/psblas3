@@ -68,12 +68,12 @@ subroutine psb_dspcnv(a,b,desc_a,info)
   integer, intent(out)                :: info
   !....locals....
   integer                       ::  int_err(5)
-  integer,pointer      ::  ovrlap_elem(:),ovrlap_index(:)
+  integer,pointer               ::  ovrlap_elem(:),ovrlap_index(:)
   real(kind(1.d0))              ::  d(1)
   integer,pointer               ::  i_temp(:)
   real(kind(1.d0)),pointer      ::  work_dcsdp(:)
   integer                       ::  ia1_size,ia2_size,aspk_size,err_act&
-       & ,i,err,nprow,npcol,me,mypcol,n_col,l_dcsdp, iout, nrow
+       & ,i,err,nprow,npcol,myrow,mycol,n_col,l_dcsdp, iout, nrow
   integer                       ::  lwork_dcsdp,dectype
   integer                       ::  icontxt,temp(1),n_row
   character                     ::  check*1, trans*1, unitd*1
@@ -97,7 +97,7 @@ subroutine psb_dspcnv(a,b,desc_a,info)
   n_col   = desc_a%matrix_data(psb_n_col_)
 
   ! check on blacs grid 
-  call blacs_gridinfo(icontxt, nprow, npcol, me, mypcol)
+  call blacs_gridinfo(icontxt, nprow, npcol, myrow, mycol)
   if (nprow.eq.-1) then
      info = 2010
      call psb_errpush(info,name)
@@ -109,7 +109,7 @@ subroutine psb_dspcnv(a,b,desc_a,info)
      goto 9999
   endif
 
-  if (.not.is_ok_dec((dectype))) then
+  if (.not.psb_is_ok_dec((dectype))) then
      info = 600
      int_err(1) = dectype
      call psb_errpush(info,name,i_err=int_err)
@@ -207,7 +207,7 @@ subroutine psb_dspcnv(a,b,desc_a,info)
   endif
 
 
-  if (debug) write (0, *) me,name,'  from dcsdp ',&
+  if (debug) write (0, *) myrow,name,'  from dcsdp ',&
        &b%fida,' pl ', b%pl(:),'pr',b%pr(:)
 
   call psb_erractionrestore(err_act)

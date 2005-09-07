@@ -103,7 +103,7 @@ subroutine psb_dscdec(nloc, icontxt, desc_a, info)
 
   info=0
   err=0
-  name = 'psb_dscrep'
+  name = 'psb_dscdec'
 
   call blacs_gridinfo(icontxt, nprow, npcol, me, mypcol)
   if (debug) write(*,*) 'psb_dscall: ',nprow,npcol,me,mypcol
@@ -149,7 +149,7 @@ subroutine psb_dscdec(nloc, icontxt, desc_a, info)
 
   !count local rows number
   ! allocate work vector
-  allocate(desc_a%glob_to_loc(m),desc_a%matrix_data(mdata_size),&
+  allocate(desc_a%glob_to_loc(m),desc_a%matrix_data(psb_mdata_size_),&
        &   desc_a%loc_to_glob(nloc),desc_a%lprm(1),&
        &   desc_a%ovrlap_index(1),desc_a%ovrlap_elem(1),&
        &   desc_a%halo_index(1),desc_a%bnd_elem(1),stat=info)
@@ -187,13 +187,13 @@ subroutine psb_dscdec(nloc, icontxt, desc_a, info)
   desc_a%ovrlap_elem(:)  = -1
 
 
-  desc_a%matrix_data(m_)        = m
-  desc_a%matrix_data(n_)        = m
+  desc_a%matrix_data(psb_m_)        = m
+  desc_a%matrix_data(psb_n_)        = m
   desc_a%matrix_data(psb_n_row_)  = nloc
   desc_a%matrix_data(psb_n_col_)  = nloc
-  desc_a%matrix_data(psb_dec_type_) = desc_asb
+  desc_a%matrix_data(psb_dec_type_) = psb_desc_asb_
   desc_a%matrix_data(psb_ctxt_)     = icontxt
-  call blacs_get(icontxt,10,desc_a%matrix_data(mpi_c_))
+  call blacs_get(icontxt,10,desc_a%matrix_data(psb_mpi_c_))
 
   call psb_erractionrestore(err_act)
   return

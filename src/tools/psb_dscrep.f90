@@ -90,12 +90,11 @@ subroutine psb_dscrep(m, icontxt, desc_a, info)
   Type(psb_desc_type), intent(out)  :: desc_a
 
   !locals
-  Integer             :: counter,i,j,nprow,npcol,me,mypcol,&
+  Integer             :: counter,i,j,nprow,npcol,myrow,mycol,&
        & loc_row,err,loc_col,nprocs,n,itmpov, k,&
        & l_ov_ix,l_ov_el,idx, flag_, err_act
   Integer             :: INT_ERR(5),TEMP(1),EXCH(2)
   Real(Kind(1.d0))    :: REAL_ERR(5)
-  Integer, Parameter  :: IONE=1, ITWO=2,ROOT=0
   Integer, Pointer    :: temp_ovrlap(:), ov_idx(:),ov_el(:)
   logical, parameter  :: debug=.false.
   character(len=20)   :: name, ch_err
@@ -104,8 +103,8 @@ subroutine psb_dscrep(m, icontxt, desc_a, info)
   err=0
   name = 'psb_dscrep'
 
-  call blacs_gridinfo(icontxt, nprow, npcol, me, mypcol)
-  if (debug) write(*,*) 'psb_dscall: ',nprow,npcol,me,mypcol
+  call blacs_gridinfo(icontxt, nprow, npcol, myrow, mycol)
+  if (debug) write(*,*) 'psb_dscall: ',nprow,npcol,myrow,mycol
   !     ....verify blacs grid correctness..
   if (npcol /= 1) then
      info = 2030
@@ -133,12 +132,12 @@ subroutine psb_dscrep(m, icontxt, desc_a, info)
 
   if (debug) write(*,*) 'psb_dscall:  doing global checks'  
   !global check on m and n parameters
-  if (me.eq.root) then
+  if (myrow.eq.psb_root_) then
     exch(1)=m
     exch(2)=n
-    call igebs2d(icontxt,all,topdef, itwo,ione, exch, itwo)
+    call igebs2d(icontxt,psb_all_,psb_topdef_, itwo,ione, exch, itwo)
   else
-    call igebr2d(icontxt,all,topdef, itwo,ione, exch, itwo, root,&
+    call igebr2d(icontxt,psb_all_,psb_topdef_, itwo,ione, exch, itwo, psb_root_,&
          & 0)
     if (exch(1) /= m) then
       info=550
@@ -160,7 +159,7 @@ subroutine psb_dscrep(m, icontxt, desc_a, info)
 
   !count local rows number
   ! allocate work vector
-  allocate(desc_a%glob_to_loc(m),desc_a%matrix_data(mdata_size),&
+  allocate(desc_a%glob_to_loc(m),desc_a%matrix_data(psb_mdata_size_),&
        &   desc_a%loc_to_glob(m),desc_a%lprm(1),&
        &   desc_a%ovrlap_index(1),desc_a%ovrlap_elem(1),&
        &   desc_a%halo_index(1),desc_a%bnd_elem(1),stat=info)
@@ -183,13 +182,13 @@ subroutine psb_dscrep(m, icontxt, desc_a, info)
   desc_a%ovrlap_elem(:)  = -1
 
 
-  desc_a%matrix_data(m_)        = m
-  desc_a%matrix_data(n_)        = n
+  desc_a%matrix_data(psb_m_)        = m
+  desc_a%matrix_data(psb_n_)        = n
   desc_a%matrix_data(psb_n_row_)  = m
   desc_a%matrix_data(psb_n_col_)  = n
-  desc_a%matrix_data(psb_dec_type_) = desc_repl
+  desc_a%matrix_data(psb_dec_type_) = psb_desc_repl_
   desc_a%matrix_data(psb_ctxt_)     = icontxt
-  call blacs_get(icontxt,10,desc_a%matrix_data(mpi_c_))
+  call blacs_get(icontxt,10,desc_a%matrix_data(psb_mpi_c_))
 
   call psb_erractionrestore(err_act)
   return

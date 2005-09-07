@@ -18,7 +18,7 @@ subroutine psb_dspupdate(a, ia, ja, blck, desc_a,info,ix,jx,updflag)
 
   use psb_descriptor_type
   use psb_spmat_type
-  use psbserial_mod
+  use psb_serial_mod
   use psb_error_mod
   implicit none
 
@@ -56,7 +56,7 @@ subroutine psb_dspupdate(a, ia, ja, blck, desc_a,info,ix,jx,updflag)
        & k ,start_row,end_row,first_loc_row,n_row,j,int_err(5),&
        &locix,locjx,allocated_prcv, dectype, flag,err_act,err
   integer,pointer        :: prcv(:),gtl(:), ltg(:)
-  integer                :: nprow,npcol, me ,mypcol, lr, lc, nrow,ncol
+  integer                :: nprow,npcol, myrow ,mycol, lr, lc, nrow,ncol
   integer                ::  m,n, iupdflag
   integer,pointer        ::  iworkaux(:)    
   character(len=20)   :: name, ch_err
@@ -74,7 +74,7 @@ subroutine psb_dspupdate(a, ia, ja, blck, desc_a,info,ix,jx,updflag)
   if (present(updflag)) then
      iupdflag = updflag
   else
-     iupdflag = upd_glb
+     iupdflag = psb_upd_glb_
   endif
 
   if (present(jx)) then
@@ -85,7 +85,7 @@ subroutine psb_dspupdate(a, ia, ja, blck, desc_a,info,ix,jx,updflag)
   icontxt=desc_a%matrix_data(psb_ctxt_)
 
   ! check on blacs grid 
-  call blacs_gridinfo(icontxt, nprow, npcol, me, mypcol)
+  call blacs_gridinfo(icontxt, nprow, npcol, myrow, mycol)
   if (nprow.eq.-1) then
      info = 2010
      call psb_errpush(info,name)
@@ -103,7 +103,7 @@ subroutine psb_dspupdate(a, ia, ja, blck, desc_a,info,ix,jx,updflag)
   ncol = desc_a%matrix_data(psb_n_col_)
   dectype = desc_a%matrix_data(psb_dec_type_)
   ! check if a is already allocated (called psdalloc)
-  if (.not.is_upd_dec(dectype)) then
+  if (.not.psb_is_upd_dec(dectype)) then
      info = 290
      int_err(1) = dectype
      call psb_errpush(info,name,i_err=int_err)
@@ -122,7 +122,7 @@ subroutine psb_dspupdate(a, ia, ja, blck, desc_a,info,ix,jx,updflag)
   m = blck%m
   n = blck%k
 
-  if (iupdflag == upd_glb) then 
+  if (iupdflag == psb_upd_glb_) then 
 
      row = ia
      i   = 1
@@ -187,7 +187,7 @@ subroutine psb_dspupdate(a, ia, ja, blck, desc_a,info,ix,jx,updflag)
      endif
 
 
-  else if (iupdflag == upd_loc) then
+  else if (iupdflag == psb_upd_loc_) then
 
      ! insert blck submatrix
      call dcsupd(m,n,a%fida,a%descra,a%aspk,&

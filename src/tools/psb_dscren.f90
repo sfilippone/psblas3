@@ -28,10 +28,9 @@ subroutine psb_dscren(trans,iperm,desc_a,info)
   character, intent(in)                 :: trans
   integer, intent(out)                  :: info
   !....locals....
-  integer                       :: i,j,err,nprow,npcol,me,mypcol, n_col, kh, nh
+  integer                       :: i,j,err,nprow,npcol,myrow,mycol, n_col, kh, nh
   integer                       :: dectype
   integer                       :: icontxt,temp(1),n_row, int_err(5), err_act
-  integer, parameter            :: ione=1
   real(kind(1.d0))              :: time(10), mpi_wtime, real_err(6)
   external mpi_wtime
   logical, parameter            :: debug=.false.
@@ -49,7 +48,7 @@ subroutine psb_dscren(trans,iperm,desc_a,info)
   n_col = desc_a%matrix_data(psb_n_col_)
      
   ! check on blacs grid 
-  call blacs_gridinfo(icontxt, nprow, npcol, me, mypcol)
+  call blacs_gridinfo(icontxt, nprow, npcol, myrow, mycol)
   if (nprow.eq.-1) then
      info = 2010
      call psb_errpush(info,name)
@@ -61,7 +60,7 @@ subroutine psb_dscren(trans,iperm,desc_a,info)
      goto 9999
   endif
 
-  if (.not.is_asb_dec(dectype)) then 
+  if (.not.psb_is_asb_dec(dectype)) then 
     info = 600
     int_err(1) = dectype
      call psb_errpush(info,name,int_err)
@@ -110,7 +109,7 @@ subroutine psb_dscren(trans,iperm,desc_a,info)
       desc_a%glob_to_loc(desc_a%loc_to_glob(desc_a%lprm(i))) = i  
     enddo
     if (debug) write(0,*) 'spasb: renumbering loc_to_glob'
-    do i=1,desc_a%matrix_data(m_) 
+    do i=1,desc_a%matrix_data(psb_m_) 
       j = desc_a%glob_to_loc(i)
       if (j>0) then 
         desc_a%loc_to_glob(j) = i
@@ -159,18 +158,18 @@ subroutine psb_dscren(trans,iperm,desc_a,info)
     enddo
     if (debug) write(0,*) 'spasb: done renumbering'
     if (debug) then
-      write(60+me,*) 'n_row ',n_row,' n_col',n_col, ' trans: ',trans
+      write(60+myrow,*) 'n_row ',n_row,' n_col',n_col, ' trans: ',trans
       do i=1,n_col
-        write(60+me,*)i, ' lprm ', desc_a%lprm(i), ' iperm',iperm(i)
+        write(60+myrow,*)i, ' lprm ', desc_a%lprm(i), ' iperm',iperm(i)
       enddo
       i=1
       kh = desc_a%halo_index(i)
       do while (kh /= -1) 
-        write(60+me,*) i, kh 
+        write(60+myrow,*) i, kh 
         i = i+1
         kh = desc_a%halo_index(i)
       enddo
-      close(60+me)
+      close(60+myrow)
     end if
     
 !!$    iperm(1) = 0
@@ -183,7 +182,7 @@ subroutine psb_dscren(trans,iperm,desc_a,info)
   time(4) = mpi_wtime()
   time(4) = time(4) - time(3)
   if (debug) then 
-    call dgamx2d(icontxt, all, topdef, ione, ione, time(4),&
+    call dgamx2d(icontxt, psb_all_, psb_topdef_, ione, ione, time(4),&
          & ione,temp ,temp,-ione ,-ione,-ione)
 
     write (*, *) '         comm structs assembly: ', time(4)*1.d-3

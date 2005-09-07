@@ -24,7 +24,7 @@ subroutine psb_dscalv(m, v, icontxt, desc_a, info, flag)
   type(psb_desc_type), intent(out)  :: desc_a
 
   !locals
-  Integer             :: counter,i,j,nprow,npcol,me,mypcol,&
+  Integer             :: counter,i,j,nprow,npcol,myrow,mycol,&
        & loc_row,err,loc_col,nprocs,n,itmpov, k,&
        & l_ov_ix,l_ov_el,idx, flag_, err_act
   Integer             :: INT_ERR(5),TEMP(1),EXCH(2)
@@ -37,8 +37,8 @@ subroutine psb_dscalv(m, v, icontxt, desc_a, info, flag)
   err=0
   name = 'psb_dscalv'
 
-  call blacs_gridinfo(icontxt, nprow, npcol, me, mypcol)
-  if (debug) write(*,*) 'psb_dscall: ',nprow,npcol,me,mypcol
+  call blacs_gridinfo(icontxt, nprow, npcol, myrow, mycol)
+  if (debug) write(*,*) 'psb_dscall: ',nprow,npcol,myrow,mycol
   !     ....verify blacs grid correctness..
   if (npcol /= 1) then
      info = 2030
@@ -70,12 +70,12 @@ subroutine psb_dscalv(m, v, icontxt, desc_a, info, flag)
 
   if (debug) write(*,*) 'psb_dscall:  doing global checks'  
   !global check on m and n parameters
-  if (me.eq.root) then
+  if (myrow.eq.psb_root_) then
     exch(1)=m
     exch(2)=n
     call igebs2d(icontxt,psb_all_,psb_topdef_, itwo,ione, exch, itwo)
   else
-    call igebr2d(icontxt,psb_all_,psb_topdef_, itwo,ione, exch, itwo, root,&
+    call igebr2d(icontxt,psb_all_,psb_topdef_, itwo,ione, exch, itwo, psb_root_,&
          & 0)
     if (exch(1) /= m) then
       info=550
@@ -133,7 +133,7 @@ subroutine psb_dscalv(m, v, icontxt, desc_a, info, flag)
       exit
     end if
 
-    if ((v(i)-flag_) == me) then
+    if ((v(i)-flag_) == myrow) then
       ! this point belongs to me
       counter=counter+1
       desc_a%glob_to_loc(i) = counter
@@ -188,7 +188,7 @@ subroutine psb_dscalv(m, v, icontxt, desc_a, info, flag)
     ov_el(l_ov_el+2)  = nprocs
     l_ov_el           = l_ov_el+2
     do j=1, nprocs
-      if (temp_ovrlap(i+j) /= me) then
+      if (temp_ovrlap(i+j) /= myrow) then
         ov_idx(l_ov_ix+1) = temp_ovrlap(i+j)
         ov_idx(l_ov_ix+2) = 1
         ov_idx(l_ov_ix+3) = idx

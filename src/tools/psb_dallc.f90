@@ -1,3 +1,4 @@
+
 ! File: psb_dallc.f90
 !
 ! Function: psb_dalloc
@@ -87,13 +88,13 @@ subroutine psb_dalloc(m, n, x, desc_a, info, js)
     j=1
   endif
   !global check on m and n parameters
-  if (myrow.eq.root) then
+  if (myrow.eq.psb_root_) then
      exch(1)=m
      exch(2)=n
      exch(3)=j
      call igebs2d(icontxt,psb_all_,psb_topdef_, ithree,ione, exch, ithree)
   else
-     call igebr2d(icontxt,psb_all_,psb_topdef_, ithree,ione, exch, ithree, root, 0)
+     call igebr2d(icontxt,psb_all_,psb_topdef_, ithree,ione, exch, ithree, psb_root_, 0)
      if (exch(1).ne.m) then
 	info=550
 	int_err(1)=1
@@ -235,11 +236,11 @@ subroutine psb_dallocv(m, x, desc_a,info)
   endif
 
   !global check on m and n parameters
-  if (myrow.eq.root) then
+  if (myrow.eq.psb_root_) then
      exch(1) = m
      call igebs2d(icontxt,psb_all_,psb_topdef_, ione,ione, exch, ione)
   else
-     call igebr2d(icontxt,psb_all_,psb_topdef_, ione,ione, exch, ione, root, 0)
+     call igebr2d(icontxt,psb_all_,psb_topdef_, ione,ione, exch, ione, psb_root_, 0)
      if (exch(1) .ne. m) then
 	info = 550
 	int_err(1) = 1

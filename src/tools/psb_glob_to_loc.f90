@@ -18,7 +18,7 @@ subroutine psb_glob_to_loc2(x,y,desc_a,info,iact)
   implicit none
 
   !...parameters....
-  type(desc_type), intent(in) ::  desc_a
+  type(psb_desc_type), intent(in) ::  desc_a
   integer, intent(in)                ::  x(:)  
   integer, intent(out)               ::  y(:), info
   character, intent(in), optional    ::  iact
@@ -46,14 +46,14 @@ subroutine psb_glob_to_loc2(x,y,desc_a,info,iact)
 
   n=size(x)
   do i=1,n
-     if ((x(i).gt.desc_a%matrix_data(m_)).or.&
+     if ((x(i).gt.desc_a%matrix_data(psb_m_)).or.&
           &  (x(i).le.zero)) then
         if(act.eq.'I') then
-           y(i)=-3*desc_a%matrix_data(m_)
+           y(i)=-3*desc_a%matrix_data(psb_m_)
         else
            info=140
            int_err(1)=x(i)
-           int_err(2)=desc_a%matrix_data(m_)
+           int_err(2)=desc_a%matrix_data(psb_m_)
            exit
         end if
      else
@@ -120,7 +120,7 @@ subroutine psb_glob_to_loc(x,desc_a,info,iact)
   implicit none
 
   !...parameters....
-  type(desc_type), intent(in)        ::  desc_a
+  type(psb_desc_type), intent(in)        ::  desc_a
   integer, intent(inout)             ::  x(:)  
   integer, intent(out)               :: info
   character, intent(in), optional    ::  iact
@@ -146,14 +146,14 @@ subroutine psb_glob_to_loc(x,desc_a,info,iact)
   real_val = 0.d0
   n=size(x)
   do i=1,n
-     if ((x(i).gt.desc_a%matrix_data(m_)).or.&
+     if ((x(i).gt.desc_a%matrix_data(psb_m_)).or.&
           &  (x(i).le.zero)) then
         if(act.eq.'I') then
-           x(i)=-3*desc_a%matrix_data(m_)
+           x(i)=-3*desc_a%matrix_data(psb_m_)
         else
            info=140
            int_err(1)=x(i)
-           int_err(2)=desc_a%matrix_data(m_)
+           int_err(2)=desc_a%matrix_data(psb_m_)
            exit
         end if
      else

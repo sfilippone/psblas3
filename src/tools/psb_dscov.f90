@@ -128,10 +128,10 @@ Subroutine psb_dscov(a,desc_a,novr,desc_ov,info)
   ! LOVR= (NNZ/NROW)*N_HALO*N_OVR  This assumes that the local average 
   ! nonzeros per row is the same as the global. 
   !
-  call psb_spinfo(nztotreq,a,nztot,info)
+  call psb_spinfo(psb_nztotreq_,a,nztot,info)
   if (info.ne.0) then
      info=4010
-     ch_err='spinfo'
+     ch_err='psb_spinfo'
      call psb_errpush(info,name,a_err=ch_err)
      goto 9999
   end if
@@ -165,7 +165,7 @@ Subroutine psb_dscov(a,desc_a,novr,desc_ov,info)
   desc_ov%ovrlap_elem(:)    = -1
   desc_ov%halo_index(:)     = -1
   desc_ov%matrix_data(1:10) = desc_a%matrix_data(1:10)
-  desc_ov%matrix_data(psb_dec_type_) = desc_bld 
+  desc_ov%matrix_data(psb_dec_type_) = psb_desc_bld_ 
 
   Allocate(desc_ov%loc_to_glob(Size(desc_a%loc_to_glob)),&
        & desc_ov%glob_to_loc(Size(desc_a%glob_to_loc)))
@@ -186,7 +186,7 @@ Subroutine psb_dscov(a,desc_a,novr,desc_ov,info)
      call psb_errpush(info,name,a_err=ch_err)
      goto 9999
   end if
-  desc_ov%matrix_data(psb_dec_type_) = desc_asb
+  desc_ov%matrix_data(psb_dec_type_) = psb_desc_asb_
   If(debug)Write(0,*)'Done descasb',me,lworks,lworkr
   call blacs_barrier(icontxt,'All')
 !!$      ierr = MPE_Log_event( idsce, 0, "st DSCASB" )

@@ -12,7 +12,7 @@
 subroutine psb_dspalloc(a, desc_a, info, nnz)
 
   use psb_descriptor_type
-  use psb_dspmat_type
+  use psb_spmat_type
   use psb_serial_mod
   use psb_const_mod
   use psb_error_mod
@@ -26,7 +26,7 @@ subroutine psb_dspalloc(a, desc_a, info, nnz)
 
   !locals
   integer             :: icontxt, dectype
-  integer             :: nprow,npcol,me,mypcol,loc_row,&
+  integer             :: nprow,npcol,myrow,mycol,loc_row,&
        &  length_ia1,length_ia2,err,nprocs, err_act,m,n
   integer             :: int_err(5),temp(1)
   real(kind(1.d0))    :: real_err(5)
@@ -40,7 +40,7 @@ subroutine psb_dspalloc(a, desc_a, info, nnz)
 
   icontxt = desc_a%matrix_data(psb_ctxt_)
   dectype=desc_a%matrix_data(psb_dec_type_)
-  call blacs_gridinfo(icontxt, nprow, npcol, me, mypcol)
+  call blacs_gridinfo(icontxt, nprow, npcol, myrow, mycol)
 !     ....verify blacs grid correctness..
   if (nprow.eq.-1) then
      info = 2010
@@ -61,8 +61,8 @@ subroutine psb_dspalloc(a, desc_a, info, nnz)
 
   ! set fields in desc_a%matrix_data....
   loc_row = desc_a%matrix_data(psb_n_row_)
-  m       = desc_a%matrix_data(m_)
-  n       =  desc_a%matrix_data(n_)
+  m       = desc_a%matrix_data(psb_m_)
+  n       =  desc_a%matrix_data(psb_n_)
 
   !...allocate matrix data...
   if (present(nnz))then 
@@ -97,13 +97,13 @@ subroutine psb_dspalloc(a, desc_a, info, nnz)
   ! set infoa fields
   a%fida   = 'COO'
   a%descra = 'GUN'
-  a%infoa(nnz_)  = 0
-  a%infoa(srtd_) = 0
-  a%infoa(state_) = spmat_bld
+  a%infoa(psb_nnz_)  = 0
+  a%infoa(psb_srtd_) = 0
+  a%infoa(psb_state_) = psb_spmat_bld_
 
   if (debug) write(0,*) 'spall: ',  &
-       &desc_a%matrix_data(psb_dec_type_),desc_bld
-  desc_a%matrix_data(psb_dec_type_) = desc_bld
+       &desc_a%matrix_data(psb_dec_type_),psb_desc_bld_
+  desc_a%matrix_data(psb_dec_type_) = psb_desc_bld_
   return
   
   call psb_erractionrestore(err_act)

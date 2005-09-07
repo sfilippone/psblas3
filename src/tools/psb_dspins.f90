@@ -37,15 +37,15 @@ subroutine psb_dspins(nz,ia,ja,val,a,desc_a,info,is,js)
        & first_loc_row,nrow,j, err,locix,locjx,err_act,&
        & dectype,mglob, nnza,m,n, pnt_halo,ncol, nh, ip, spstate
   integer,pointer        :: tia1(:),tia2(:), temp(:)
-  integer                :: nprow,npcol, me ,mypcol, iflag, isize, irlc
+  integer                :: nprow,npcol, myrow ,mycol, iflag, isize, irlc
   logical, parameter     :: debug=.false.
   integer, parameter     :: relocsz=200
 
   interface psb_dscins
      subroutine psb_dscins(nz,ia,ja,desc_a,info,is,js)
-       use typedesc
+       use psb_descriptor_type
        implicit none
-       type(desc_type), intent(inout) ::  desc_a
+       type(psb_desc_type), intent(inout) ::  desc_a
        integer, intent(in)            ::  nz,ia(:),ja(:)
        integer, intent(out)           :: info
        integer, intent(in), optional  :: is,js
@@ -61,15 +61,15 @@ subroutine psb_dspins(nz,ia,ja,val,a,desc_a,info,is,js)
 
   icontxt = desc_a%matrix_data(psb_ctxt_)
   dectype = desc_a%matrix_data(psb_dec_type_)
-  mglob   = desc_a%matrix_data(m_)
+  mglob   = desc_a%matrix_data(psb_m_)
   ! check on blacs grid 
-  call blacs_gridinfo(icontxt, nprow, npcol, me, mypcol)
+  call blacs_gridinfo(icontxt, nprow, npcol, myrow, mycol)
   if (npcol.ne.1) then
      info = 2030
      call psb_errpush(info,name)
      goto 9999
   endif
-  if (.not.is_ok_dec(dectype)) then 
+  if (.not.psb_is_ok_dec(dectype)) then 
      info = 3110
      call psb_errpush(info,name)
      goto 9999
@@ -98,8 +98,8 @@ subroutine psb_dspins(nz,ia,ja,val,a,desc_a,info,is,js)
   end if
 
 
-  spstate = a%infoa(state_)
-  if (is_bld_dec(dectype)) then 
+  spstate = a%infoa(psb_state_)
+  if (psb_is_bld_dec(dectype)) then 
      call  psb_dscins(nz,ia,ja,desc_a,info)
      if (info /= 0) then
         info=4010
@@ -110,7 +110,7 @@ subroutine psb_dspins(nz,ia,ja,val,a,desc_a,info,is,js)
      nrow = desc_a%matrix_data(psb_n_row_)
      ncol = desc_a%matrix_data(psb_n_col_)
 
-     if (spstate == spmat_bld) then 
+     if (spstate == psb_spmat_bld_) then 
         call psb_coins(nz,ia,ja,val,a,desc_a%glob_to_loc,1,nrow,1,ncol,info)
         if (info /= 0) then
            info=4010
@@ -123,7 +123,7 @@ subroutine psb_dspins(nz,ia,ja,val,a,desc_a,info,is,js)
         call psb_errpush(info,name)
         goto 9999
      end if
-  else if (is_asb_dec(dectype)) then 
+  else if (psb_is_asb_dec(dectype)) then 
      nrow = desc_a%matrix_data(psb_n_row_)
      ncol = desc_a%matrix_data(psb_n_col_)
      call psb_coins(nz,ia,ja,val,a,desc_a%glob_to_loc,1,nrow,1,ncol,info)
