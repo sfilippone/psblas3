@@ -1,0 +1,6 @@
+	integer, parameter :: deadlock_check=0,local_mtrx_check=1
+	integer, parameter :: local_comm_check=2,consistency_check=3
+	integer, parameter :: global_check=4,order_communication=5
+	integer, parameter :: change_represent=6,loc_to_glob_check=7
+	integer, parameter :: convert_halo=1,convert_ovrlap=2
+	integer, parameter :: act_ret=0, act_abort=1, no_err=0

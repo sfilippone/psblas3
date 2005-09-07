@@ -1,0 +1,50 @@
+# Using XLF
+.mod=.mod
+.SUFFIXES: .f90 $(.mod)
+F90=xlf95 -qsuffix=f=f90
+FC=xlf
+F77=$(FC)
+FCOPT=-O3
+CC=xlc
+CCOPT=-O3 
+F90LINK=mpxlf90
+MPF90=mpxlf95 -qsuffix=f=f90
+FLINK=mpxlf77
+MPCC=mpxlc
+#
+#
+BLAS=-lessl  
+BLACS=-lmpiblacs -L$(HOME)/LIB
+#
+CDEFINES=-DNoChange
+AR=ar -cur
+RANLIB=ranlib
+
+TYPEMODS =  typesp$(.mod) typedesc$(.mod) typeprec$(.mod) realloc$(.mod)
+CONSTMODS = tools_const$(.mod)
+BLASMODS  = $(TYPEMODS) f90psblas$(.mod) f90comm$(.mod)
+METHDMODS = f90methd$(.mod)
+TOOLSMODS = $(CONSTMODS) psimod$(.mod) f90tools$(.mod) f90serial$(.mod) 
+PRECMODS  = f90prec$(.mod)
+F90MODS= $(BLASMODS) $(PRECMODS) $(METHDMODS) $(TOOLSMODS) f90sparse$(.mod)
+
+MODS=$(LIBDIR)/tools_const$(.mod) $(LIBDIR)/typesp$(.mod) $(LIBDIR)/realloc$(.mod) \
+  $(LIBDIR)/typedesc$(.mod)  $(LIBDIR)/typeprec$(.mod) $(LIBDIR)/parts.f90 \
+  $(LIBDIR)/f90serial$(.mod) $(LIBDIR)/f90comm$(.mod)
+
+
+
+.f.o:
+	$(FC) $(FCOPT) $(INCDIRS)  -c $<
+.c.o:
+	$(CC) $(CCOPT) $(INCDIRS) $(CDEFINES) -c $<
+.f$(.mod):
+	$(FC) $(FCOPT) $(INCDIRS) -c $<
+.f90$(.mod):
+	$(F90) $(FCOPT) $(INCDIRS) -c $<
+.f90.o:
+	$(F90) $(FCOPT) $(INCDIRS) -c $<
+
+
+
+

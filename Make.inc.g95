@@ -1,0 +1,54 @@
+# Using GNU gfortran (from GCC 3.5.0) 
+.mod=.mod
+.SUFFIXES: .f90 $(.mod)
+F90=/usr/local/g95-install/bin/g95
+FC=/usr/local/g95-install/bin/g95
+F77=$(FC)
+F90COPT=-O3 -ggdb -fbounds-check
+FCOPT=-O3 -ggdb -fbounds-check
+CC=gcc
+CCOPT=-O3  -ggdb
+F90LINK=/usr/local/mpich-g95/bin/mpif90 
+FLINK=mpif77
+MPF90=$(F90LINK)
+MPCC=/usr/local/mpich-g95/bin/mpicc
+#
+#
+BLAS=-lblas -L$(HOME)/LIB
+BLACS=-lmpiblacsg95 -L$(HOME)/LIB
+#
+CDEFINES=-DAddDouble_
+AR=ar -cur
+RANLIB=ranlib
+
+TYPEMODS =  typesp$(.mod) typedesc$(.mod) typeprec$(.mod) realloc$(.mod)
+CONSTMODS = tools_const$(.mod)
+BLASMODS  = $(TYPEMODS) f90psblas$(.mod) f90comm$(.mod)
+METHDMODS = f90methd$(.mod)
+TOOLSMODS = $(CONSTMODS) psimod$(.mod) f90tools$(.mod) f90serial$(.mod) string$(.mod)
+PRECMODS  = f90prec$(.mod)
+F90MODS= $(BLASMODS) $(PRECMODS) $(METHDMODS) $(TOOLSMODS) f90sparse$(.mod)
+
+MODS=$(LIBDIR)/tools_const$(.mod) $(LIBDIR)/typesp$(.mod) $(LIBDIR)/realloc$(.mod) \
+  $(LIBDIR)/typedesc$(.mod)  $(LIBDIR)/typeprec$(.mod) $(LIBDIR)/parts.f90 \
+  $(LIBDIR)/f90serial$(.mod) $(LIBDIR)/f90comm$(.mod) $(LIBDIR)/string$(.mod)
+
+
+
+# Under Linux/gmake there is a rule interpreting .mod as Modula source! 
+$(.mod).o:
+	
+.f.o:
+	$(FC) $(FCOPT) $(INCDIRS)  -c $<
+.c.o:
+	$(CC) $(CCOPT) $(INCDIRS) $(CDEFINES) -c $<
+.f$(.mod):
+	$(F90) $(FCOPT) $(INCDIRS) -c $<
+.f90$(.mod):
+	$(F90) $(F90COPT) $(INCDIRS) -c $<
+.f90.o:
+	$(F90) $(F90COPT) $(INCDIRS) -c $<
+
+
+
+

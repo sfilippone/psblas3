@@ -1,0 +1,16 @@
+1
+	nella f90_psdspmm si se work non è presente si alloca work1
+	con dimensione pari a:
+	
+	llwork= 2*desc_a%matrix_data(psb_n_col_)
+    	if (a%pr(1) /= 0) llwork = llwork + in * ik
+    	if (a%pl(1) /= 0) llwork = llwork + im * ik
+
+	però, poi, in psdspmm_.c si controlla semplicemente che la
+	dimensione di work si maggiore di desc_a%matrix_data(psb_n_row_).
+	perchè allocare un'area così grande?
+
+2
+	nella psdspmm_.c nella parte in cui la matrice è trasposta si
+	usa il puntatore xcopy e si passa desc_as%matrix_data(psb_n_row_)
+	anzichè lldx: perchè?

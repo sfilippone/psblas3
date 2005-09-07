@@ -1,0 +1,365 @@
+!!$ CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+!!$ C                                                                      C
+!!$ C  References:                                                         C
+!!$ C          [1] Duff, I., Marrone, M., Radicati, G., and Vittoli, C.    C
+!!$ C              Level 3 basic linear algebra subprograms for sparse     C
+!!$ C              matrices: a user level interface                        C
+!!$ C              ACM Trans. Math. Softw., 23(3), 379-401, 1997.          C
+!!$ C                                                                      C
+!!$ C                                                                      C
+!!$ C         [2]  S. Filippone, M. Colajanni                              C
+!!$ C              PSBLAS: A library for parallel linear algebra           C
+!!$ C              computation on sparse matrices                          C
+!!$ C              ACM Trans. on Math. Softw., 26(4), 527-550, Dec. 2000.  C
+!!$ C                                                                      C
+!!$ C         [3] M. Arioli, I. Duff, M. Ruiz                              C
+!!$ C             Stopping criteria for iterative solvers                  C
+!!$ C             SIAM J. Matrix Anal. Appl., Vol. 13, pp. 138-144, 1992   C
+!!$ C                                                                      C
+!!$ C                                                                      C
+!!$ C         [4] R. Barrett et al                                         C
+!!$ C             Templates for the solution of linear systems             C
+!!$ C             SIAM, 1993                                          
+!!$ C                                                                      C
+!!$ C                                                                      C
+!!$ CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+! File:  psb_dcgstab.f90
+!
+! Subroutine: psb_dcgstab
+!    This subroutine implements the CG Stabilized method.
+!
+! Parameters:
+!    a       -  type(<psb_dspmat_type>).     The sparse matrix containing A.
+!    prec    -  type(<psb_prec_type>).       The data structure containing the preconditioner.
+!    b       -  real,dimension(:).           The right hand side.
+!    x       -  real,dimension(:).           The vector of unknowns.
+!    eps     -  real.                        The error tolerance.
+!    desc_a  -  type(<psb_desc_type>).       The communication descriptor.
+!    info    -  integer.                     Eventually returns an error code.
+!    itmax   -  integer(optional).           The maximum number of iterations.
+!    iter    -  integer(optional).           The number of iterations performed.
+!    err     -  real(optional).              The error on return.
+!    itrace  -  integer(optional).           The unit to write messages onto.
+!    istop   -  integer(optional).           The stopping criterium.
+!
+Subroutine psb_dcgstab(a,prec,b,x,eps,desc_a,info,&
+     &itmax,iter,err,itrace, istop)
+  use psb_serial_mod
+  use psb_descriptor_type
+  use psb_prec_type
+  use psb_psblas_mod
+  use psb_tools_mod
+  use psb_const_mod
+  use psb_prec_mod
+  use psb_error_mod
+  Implicit None
+!!$  parameters 
+  Type(psb_dspmat_type), Intent(in)  :: a
+  Type(psb_dprec_type), Intent(in)   :: prec 
+  Type(psb_desc_type), Intent(in)    :: desc_a
+  Real(Kind(1.d0)), Intent(in)       :: b(:)
+  Real(Kind(1.d0)), Intent(inout)    :: x(:)
+  Real(Kind(1.d0)), Intent(in)       :: eps
+  integer, intent(out)               :: info
+  Integer, Optional, Intent(in)      :: itmax, itrace, istop
+  Integer, Optional, Intent(out)     :: iter
+  Real(Kind(1.d0)), Optional, Intent(out) :: err
+!!$   Local data
+  Real(Kind(1.d0)), Pointer  :: aux(:),wwrk(:,:)
+  Real(Kind(1.d0)), Pointer  :: q(:),&
+       & r(:), p(:), v(:), s(:), t(:), z(:), f(:)
+  Integer, Pointer           :: iperm(:), ipnull(:), ipsave(:)
+  Real(Kind(1.d0)) ::rerr
+  Integer       ::litmax, liter, naux, m, mglob, it,itrac,&
+       & nprows,npcols,me,mecol, n_row, n_col
+  Character     ::diagl, diagu
+  Logical, Parameter :: debug = .false.
+  Logical, Parameter :: exchange=.True., noexchange=.False., debug1 = .False.
+  Integer, Parameter :: ione=1
+  Integer, Parameter :: irmax = 8
+  Integer            :: itx, i, isvch, ich, icontxt, err_act, int_err(5)
+  Integer            :: listop
+  Logical            :: do_renum_left
+  Real(Kind(1.d0)), Parameter :: one=1.d0, zero=0.d0, epstol=1.d-35
+  Real(Kind(1.d0)) :: alpha, beta, rho, rho_old, rni, xni, bni, ani,& 
+       & sigma, omega, tau, rn0, bn2
+!!$  Integer   istpb, istpe, ifctb, ifcte, imerr, irank, icomm,immb,imme
+!!$  Integer mpe_log_get_event_number,mpe_Describe_state,mpe_log_event
+  character(len=20)             :: name,ch_err
+
+  info = 0
+  name = 'psb_dcgstab'
+  call psb_erractionsave(err_act)
+
+  If (debug) Write(*,*) 'Entering PSB_DCGSTAB',present(istop)
+  icontxt = desc_a%MATRIX_DATA(CTXT_)
+  CALL BLACS_GRIDINFO(icontxt,NPROWS,NPCOLS,ME,MECOL)
+  if (debug) write(*,*) 'PSB_DCGSTAB: From GRIDINFO',nprows,npcols,me
+
+  mglob = desc_a%matrix_data(m_)
+  n_row = desc_a%matrix_data(psb_n_row_)
+  n_col = desc_a%matrix_data(psb_n_col_)
+
+  If (Present(istop)) Then 
+    listop = istop 
+  Else
+    listop = 1
+  Endif
+!
+!  LISTOP = 1:  Normwise backward error, infinity norm 
+!  LISTOP = 2:  ||r||/||b||   norm 2 
+!
+
+  If ((prec%prec < min_prec_).Or.(prec%prec > max_prec_) ) Then
+     Write(0,*) 'PSB_CGSTAB: Invalid IPREC',prec%prec
+     info=5002
+     int_err(1)=prec%prec
+     err=info
+     call psb_errpush(info,name,i_err=int_err)
+     goto 9999
+  Endif
+  
+  if ((listop < 1 ).or.(listop > 2 ) ) then
+    write(0,*) 'psb_bicgstab: invalid istop',listop 
+    info=5001
+    int_err(1)=listop
+    err=info
+    call psb_errpush(info,name,i_err=int_err)
+    goto 9999
+  endif
+
+  naux=6*n_col 
+  allocate(aux(naux),stat=info)
+  call psb_alloc(mglob,8,wwrk,desc_a,info)
+  call psb_asb(wwrk,desc_a,info)  
+  if (info /= 0) then 
+     info=4011
+     call psb_errpush(info,name)
+     goto 9999
+  End If
+
+  Q => WWRK(:,1)
+  R => WWRK(:,2)
+  P => WWRK(:,3)
+  V => WWRK(:,4)
+  F => WWRK(:,5)
+  S => WWRK(:,6)
+  T => WWRK(:,7)
+  Z => WWRK(:,8)
+
+  If (Present(itmax)) Then 
+    litmax = itmax
+  Else
+    litmax = 1000
+  Endif
+
+  If (Present(itrace)) Then
+     itrac = itrace
+  Else
+     itrac = -1
+  End If
+  
+  diagl = 'U'
+  diagu = 'U'
+
+  ! Ensure global coherence for convergence checks.
+  Call blacs_get(icontxt,16,isvch)
+  ich = 1 
+  Call blacs_set(icontxt,16,ich)
+
+  itx   = 0
+
+  If (listop == 1) Then 
+    ani = psb_nrmi(a,desc_a,info)
+    bni = psb_amax(b,desc_a,info)
+  Else If (listop == 2) Then 
+    bn2 = psb_nrm2(b,desc_a,info)
+  Endif
+  if (info /= 0) Then 
+     info=4011
+     call psb_errpush(info,name)
+     goto 9999
+  End If
+
+  restart: Do 
+!!$   
+!!$   r0 = b-Ax0
+!!$ 
+    If (itx >= itmax) Exit restart  
+    it = 0      
+    Call psb_axpby(one,b,zero,r,desc_a,info)
+!!$    imerr = MPE_Log_event( immb, 0, "st SPMM" )
+    Call psb_spmm(-one,a,x,one,r,desc_a,info,work=aux)
+!!$    imerr = MPE_Log_event( imme, 0, "ed SPMM" )
+    Call psb_axpby(one,r,zero,q,desc_a,info)
+    if (info /= 0) Then 
+       info=4011
+       call psb_errpush(info,name)
+       goto 9999
+    End If
+    
+    rho = zero
+    If (debug) Write(*,*) 'On entry to AMAX: B: ',Size(b)
+    
+!
+!   Must always provide norm of R into RNI below for first check on 
+!   residual
+!
+    If (listop == 1) Then 
+      rni = psb_amax(r,desc_a,info)
+      xni = psb_amax(x,desc_a,info)
+    Else If (listop == 2) Then 
+      rni = psb_nrm2(r,desc_a,info)
+    Endif
+  if (info /= 0) Then 
+     info=4011
+     call psb_errpush(info,name)
+     goto 9999
+  End If
+
+    If (itx == 0) Then 
+      rn0 = rni
+    End If
+    If (rn0 == 0.d0 ) Then 
+      If (itrac /= -1) Then 
+        If (me == 0) Write(itrac,*) 'BiCGSTAB: ',itx,rn0
+      Endif
+      Exit restart
+    End If
+    
+    If (listop == 1) Then 
+      xni  = psb_amax(x,desc_a,info)
+      rerr =  rni/(ani*xni+bni)
+      If (itrac /= -1) Then 
+        If (me == 0) Write(itrac,'(a,i4,5(2x,es10.4))') 'bicgstab: ',itx,rerr,rni,bni,&
+             &xni,ani
+      Endif
+    Else  If (listop == 2) Then 
+      rerr = rni/bn2
+      If (itrac /= -1) Then 
+        If (me == 0) Write(itrac,'(a,i4,3(2x,es10.4))') 'bicgstab: ',itx,rerr,rni,bn2
+      Endif
+    Endif
+    if (info /= 0) Then 
+       info=4011
+       call psb_errpush(info,name)
+       goto 9999
+    End If
+
+    If (rerr<=eps) Then 
+      Exit restart
+    End If
+
+    iteration:  Do 
+      it   = it + 1
+      itx = itx + 1
+      If (debug) Write(*,*) 'Iteration: ',itx
+      rho_old = rho    
+      rho = psb_dot(q,r,desc_a,info)
+      If (rho==zero) Then
+         If (debug) Write(0,*) 'Bi-CGSTAB Itxation breakdown R',rho
+        Exit iteration
+      Endif
+
+      If (it==1) Then
+        Call psb_axpby(one,r,zero,p,desc_a,info)
+      Else
+        beta = (rho/rho_old)*(alpha/omega)
+        Call psb_axpby(-omega,v,one,p,desc_a,info)
+        Call psb_axpby(one,r,beta,p,desc_a,info)
+      End If
+
+      Call psb_prcaply(prec,p,f,desc_a,info,work=aux)
+
+      Call psb_spmm(one,a,f,zero,v,desc_a,info,&
+           & work=aux)
+      
+      sigma = psb_dot(q,v,desc_a,info)
+      If (sigma==zero) Then
+         If (debug) Write(0,*) 'Bi-CGSTAB Iteration breakdown S1', sigma
+         Exit iteration
+      Endif
+      
+      alpha = rho/sigma
+      Call psb_axpby(one,r,zero,s,desc_a,info)
+      Call psb_axpby(-alpha,v,one,s,desc_a,info)
+      
+      Call psb_prcaply(prec,s,z,desc_a,info,work=aux)
+
+      Call psb_spmm(one,a,z,zero,t,desc_a,info,&
+           & work=aux)
+      
+      sigma = psb_dot(t,t,desc_a,info)
+      If (sigma==zero) Then
+         If (debug) Write(0,*) 'BI-CGSTAB ITERATION BREAKDOWN S2', sigma
+        Exit iteration
+      Endif
+      
+      tau  = psb_dot(t,s,desc_a,info)
+      omega = tau/sigma
+      
+      If (omega==zero) Then
+         If (debug) Write(0,*) 'BI-CGSTAB ITERATION BREAKDOWN O',omega
+        Exit iteration
+      Endif
+
+      Call psb_axpby(alpha,f,one,x,desc_a,info)
+      Call psb_axpby(omega,z,one,x,desc_a,info)
+      Call psb_axpby(one,s,zero,r,desc_a,info)
+      Call psb_axpby(-omega,t,one,r,desc_a,info)
+      
+      If (listop == 1) Then 
+        rni = psb_amax(r,desc_a,info)
+        xni = psb_amax(x,desc_a,info)
+        rerr =  rni/(ani*xni+bni)
+        If (itrac /= -1) Then 
+          If (me == 0) Write(itrac,'(a,i4,5(2x,es10.4))') 'bicgstab: ',itx,rerr,rni,bni,&
+               &xni,ani
+        Endif
+
+      Else  If (listop == 2) Then 
+        rni = psb_nrm2(r,desc_a,info)
+        rerr = rni/bn2
+        If (itrac /= -1) Then 
+          If (me == 0) Write(itrac,'(a,i4,3(2x,es10.4)))') 'bicgstab: ',itx,rerr,rni,bn2
+        Endif
+      Endif
+      
+      If (rerr<=eps) Then 
+        Exit restart
+      End If
+      
+      If (itx.Ge.itmax) Exit restart
+    End Do iteration
+  End Do restart
+
+  If (Present(err)) err=rerr
+  If (Present(iter)) iter = itx
+  If (rerr>eps) Then
+    Write(0,*) 'BI-CGSTAB FAILED TO CONVERGE TO ',EPS,&
+         & ' IN ',ITX,' ITERATIONS  '
+  End If
+
+  Deallocate(aux)
+  Call psb_free(wwrk,desc_a,info)
+  ! restore external global coherence behaviour
+  Call blacs_set(icontxt,16,isvch)
+!!$  imerr = MPE_Log_event( istpe, 0, "ed CGSTAB" )
+  if(info/=0) then
+     call psb_errpush(info,name)
+     goto 9999
+  end if
+
+  call psb_erractionrestore(err_act)
+  return
+
+9999 continue
+  call psb_erractionrestore(err_act)
+  if (err_act.eq.act_abort) then
+     call psb_error()
+     return
+  end if
+  return
+
+End Subroutine psb_dcgstab
+

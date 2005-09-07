@@ -1,0 +1,5 @@
+        integer, parameter :: nohalo_=0, halo_=4
+        integer, parameter :: none_=0,sum_=1,avg_=2,square_root_=3
+        integer, parameter :: swap_send=1, swap_recv=2
+        integer, parameter :: swap_sync=4,swap_mpi=8
+	character, parameter :: all='A',topdef=' '

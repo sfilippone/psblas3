@@ -1,0 +1,11 @@
+7                      Number of entries below this
+BICGSTAB               Iterative method BICGSTAB CGS  BICG BICGSTABL
+ILU                    Preconditioner ILU DIAGSC NONE 
+SSR                    A Storage format CSR COO JAD 
+20                     Domain size (acutal sistem is this**3)
+1                      Stopping criterion
+080                    MAXIT
+00                     ITRACE
+02                     ML
+
+

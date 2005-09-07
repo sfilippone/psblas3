@@ -1,0 +1,14 @@
+
+12                  Number of inputs
+dwg961a.mtx         This (and others) from: http://math.nist.gov/MatrixMarket/     
+NONE
+BICGSTAB 
+NONE
+CSR
+2                   IPART: Partition method
+1                   ISTOPC
+15800                ITMAX
+6                   ITRACE
+2                   IPREC
+3                   ML
+1.D-12              EPS

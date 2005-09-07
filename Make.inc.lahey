@@ -1,0 +1,52 @@
+# Using Lahey F95
+.mod=.mod
+.SUFFIXES: .f90 $(.mod)
+F90=lf95
+FC=lf95
+F77=$(FC)
+FCOPT= -O 
+F90COPT= -O
+CC=gcc
+CCOPT=-O2 -g -ggdb -pg
+F90LINK=mpif90
+FLINK=mpif77
+#
+#
+BLAS=-lblas -L$(HOME)/LIB
+BLACS=-lmpiblacslh -L$(HOME)/LIB
+
+#
+CDEFINES=-DAdd_
+AR=ar -cur
+RANLIB=ranlib
+
+TYPEMODS =  typesp$(.mod) typedesc$(.mod) 
+CONSTMODS = tools_const$(.mod)
+BLASMODS  = $(TYPEMODS) f90psblas$(.mod)
+METHDMODS = f90methd$(.mod)
+TOOLSMODS = $(CONSTMODS)  f90tools$(.mod) 
+F90MODS= $(BLASMODS) $(METHDMODS) $(TOOLSMODS) f90sparse$(.mod)
+
+MODS=$(LIBDIR)/tools_const$(.mod) $(LIBDIR)/typesp$(.mod) \
+  $(LIBDIR)/typedesc$(.mod)  $(LIBDIR)/parts.f90
+
+
+
+
+# Under Linux/gmake there is a rule interpreting .mod as Modula source! 
+$(.mod).o:
+	
+.f.o:
+	$(FC) $(FCOPT) $(INCDIRS)  -c $<
+.c.o:
+	$(CC) $(CCOPT) $(INCDIRS) $(CDEFINES) -c $<
+.f$(.mod):
+	$(F90) $(FCOPT) $(INCDIRS) -c $< 
+.f90$(.mod):
+	$(F90) $(F90COPT) $(INCDIRS) -c $<
+.f90.o:
+	$(F90) $(F90COPT) $(INCDIRS) -c $<
+
+
+
+

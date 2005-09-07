@@ -1,0 +1,26 @@
+      	INTEGER MINJDROWS, MAXJDROWS
+	PARAMETER (MINJDROWS=4, MAXJDROWS=8)
+        DOUBLE PRECISION PERCENT
+	INTEGER          DBLEINT_
+        INTEGER          DCMPLXINT_
+C       ... This parameter represent sizeof(DOUBLE)/sizeof(INTEGER) ...
+        PARAMETER        (PERCENT=0.7,DBLEINT_=2)
+        PARAMETER        (DCMPLXINT_ = 4)
+	character     fidef*5
+        parameter     (fidef='CSR')
+	integer, parameter :: nnz_=1
+	integer, parameter :: del_bnd_=6, srtd_=7 
+        integer, parameter :: state_=8, upd_=9
+	integer, parameter :: upd_pnt_=10, ifasize_=10
+        integer, parameter :: spmat_null=0, spmat_bld=1
+        integer, parameter :: spmat_asb=2, spmat_upd=4
+        
+        integer    perm_update
+        parameter  (perm_update=98765)
+        integer    isrtdcoo
+        parameter  (isrtdcoo=98764)
+	integer   ireg_flgs
+        parameter (ireg_flgs=10)
+        integer ip2_,  iflag_, ipc_, ichk_, nnzt_, zero_
+        parameter (ip2_=0, iflag_=2, ichk_=3)
+        parameter ( nnzt_=4, zero_=5,ipc_=6)

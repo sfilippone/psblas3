@@ -1,0 +1,114 @@
+Changelog. A lot less detailed than usual, at least for past
+history. 
+
+2005/05/04: Now enabled SuperLU complete factorization as basis for AS. 
+
+2005/04/29: First version with decoupled 2-level.
+
+2005/04/06: Started work on decoupling the preconditioner aggregation
+	    for 2-level from the main factorization. 
+
+2005/03/30: First version of new DSC/SP allocate/insert/assembly
+	    routines.  
+2005/03/17: First version of RGMRES. To be refined. 
+
+2005/03/08: dSwapTran aligned with dSwapData. Taken out SwapOverlap.
+	    also moved onto iSwapX.
+
+2005/03/07: dSwapData rewritten to achieve: 1. better performance;
+	    2. more flexible functionality. It is now possible to
+	    avoid SwapOvrlap entirely, relying on just SwapData.
+	    SwapTran is still alive, since it reads the descriptors in
+	    "transpose" mode. Also, added work areas to preconditioner
+	    routine, to avoid excessive allocation in the halo/overlap
+	    exchange.
+
+2005/03/04: Had to put in a workaround for a gfortran bug:
+	    tolower/toupper cannot be functions. 
+
+2005/02/09: Explicit storage choice for the smoother. This seems
+            to be changing a little bit the actual preconditioner. 
+	    To be evaluated further.
+
+2005/02/08: Renamed F90_PSPREC to PSB_PRCAPLY and Preconditioner to   
+	    PSB_PRCBLD. Changed the way PRCAPLY decides what to do.
+	    Still needs a PSB_PRCSET to be called before PRCBLD.
+
+2005/01/28: Started moving functionalities to a SERIAL F90 layer. Also
+	    defined a new COMM layer, to enable implementing SPMM
+	    directly in F90.
+
+2005/01/20: Finally taken out a direct call to the F77 DCSDP from
+	    SPASB. 
+
+2005/01/18: After much work, we now have 2-level Additive Schwarz
+	    prototype implemented and working. We now start a major
+	    code cleanup that will take some time. Mainly we want to
+	    move a lot of the serial F77 functionality into  a new F95
+	    serial layer, to simplify the parallel F95 code. 
+
+2004/11/25: Following the introduction of Additive Shwarz and
+	    variants, we have now renamed DECOMP_ and friends as
+	    DESC_; this makes things more readable. Sooner or later
+	    we're going to merge this into mainline, but this version
+	    is still very much in a state of flux.
+
+2004/07/18: For use with gfortran we need to declare the pointer
+	    components  with NULL() initialization. This rules out
+	    VAST and PGI.
+
+2004/07/15: First development version with gfortran from the current 
+	    snapshot of gcc 3.5.0. 
+	    It is now possible in PSI_dSwapData to opt for
+	    SEND|RECEIVE|SYNC data exchange; plan is to extend to all
+	    data exchange functions, plus making it available as an
+	    option from the F90 level.
+  
+2004/07/06: Merged in a lot of stuff coming mainly from the ASM
+	    development; full merge will have to wait  a little more.
+	    Among other things:
+	    use of psimod
+	    new choice parms for overlap
+	    new data exchange for swapdata, to be extended.
+	    multicolumn CSMM.
+	    use psrealloc
+	    new format for marking a matrix as suitable for update. 
+	    
+
+2003/12/09: Changed DSALLOC and DSASB to make sure whenever a dense
+	    matrix is allocated it is also zeroed out. 
+
+2003/10/13: Added call to BLACS_SET in the solvers to ensure global
+	    heterogeneous coherence in the combine operations.
+
+2003/09/30: Added LOC_TO_GLOB and GLOB_TO_LOC support routines. 
+
+2003/09/30: Changed interface for smart update capabilities: choose
+	    with optional parameters in ASB routines. 
+
+2003/09/16: IFC 7.0 had a strange behaviour in the test programs:
+	    sometimes the declaration of PARTS dummy argument with an
+	    INTERFACE would not work, requiring an EXTERNAL
+	    declaration. The proper INTERFACE works now with 7.1.
+
+2003/03/10: Halo data exchange in F90_PSHALO can now be applied to
+	    integer data; create appropriate support routines. 
+
+2002/12/05: Initial version of Fileread sample programs.
+
+2002/11/19: Fixes for JAD preconditioner.
+
+2002/11/19: Methods for patterns: create a  descriptor without a
+	    matrix. 
+
+2001/11/16: Reviewed the interfaces: in the tools section we really
+	    need the POINTER attribute for dense vectors, but not in
+	    the computational routines; taking it  out allows more
+	    flexibility. 
+
+2001/09/16: Smart update capabilities.
+
+2001/03/16: Renumbering routines.
+
+2001/01/14: Added extensions to compute multiple DOTs and AMAXs at once;
+

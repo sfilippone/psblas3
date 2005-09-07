@@ -1,0 +1,143 @@
+This directory contains  the PSBLAS library, version 1.0
+The library is described in:
+S. Filippone, M. Colajanni
+PSBLAS: A library for parallel linear algebra computation on sparse matrices
+ACM Trans. on Math. Software, 26(4), Dec. 2000, pp. 527-550.
+
+PLATFORMS: 
+
+For the F77 compiler, we assume it supports DOUBLE COMPLEX and DO WHILE/ENDDO.
+Practically all compilers do nowadays.  
+The compilation process relies on the choice of an appropriate
+Make.inc file; we have tested with AIX XLF, Intel ifc/Linux, Lahey
+F95/Linux  and  Nag f95/Linux. If you succeed in compiling with other
+compiler/operating systems please let us know. 
+
+IBM SP2.
+The library has been tested on an IBM SP2 with XLC and XLF
+compilers, and a version of the BLACS based on MPI.
+The rather baroque setting 
+ F90=xlf90 -qsuffix=f=f90
+in Make.inc.rs6k takes care of the f90 extension. 
+WARNING: xlf 8.1 introduced a performance bug, whereas a Fortan 90
+code calling a  Fortan 77 code would incur spurious array copies;
+please make sure your system has the PTF xlf 8102 installed. 
+
+
+LINUX:
+
+There finally exist a GNU Fortran 95 implementation: we are using the
+development snapshots from GCC 3.5.0 since July 2004, and it appears
+to work. This is on its way to become the reference platform. 
+
+We compiled with egcs G77/GCC and mpich-1.2.0, 1.2.1,  1.2.2 and 1.2.4.
+With some versions of GCC, g77 chokes on SRC/SERIAL/dcsdp.f; this
+problem seems to have disappeared in recent GCC distributions. 
+
+
+
+Vast F90/Linux and PGI f90/Linux are now obsolete, in that we have a
+NULL() initialization for pointers that is outsied strict F90; they
+cannot be used any longer.
+For the PGI compilers, we used them in conjunction with gcc, NOT
+pgcc. Note that with pgi 3.6 we have horrible performance, due to
+spurious array copies when calling Fortran 77 codes from Fortran 90;
+this is fixed in version 4. 
+
+The Lahey version we got access to (6.0 and 6.1) seems to suffer from
+the same extra copies problem; this is most apparent in the matrix
+build process.  
+
+For the Intel compilers, we used ifc version 7.0 and 7.1; with version 6.0 
+you need to change the way modules are handled, but we recommend to migrate
+to the new version anyway. Moreover, with versions prior to 7.1, there
+is a strange error in pargen/ppde90: the compiler did not like the
+INTERFACE for the dummy argument subroutine PARTS, it wanted an
+EXTERNAL specification. Again, please move to 7.1.
+
+
+Testing of  NAG f95 versions is still incomplete.  
+
+
+
+DOCUMENTATION
+
+See userguidef90.ps. 
+Please consult the sample programs, especially TEST/pargen/ppde90.f90. 
+
+
+OTHER SOFTWARE CREDITS 
+
+We include our modified implementation of some of the Sparker (serial
+sparse BLAS)  material,  e.g. Jagged diagonal, plus a number of
+extensions of our own design. The original file spblas.f can be
+downloaded from matisa.cc.rl.ac.uk; of course any bugs in our
+implementation are our own to fix.  The main reference for the serial
+sparse BLAS is: 
+Duff, I., Marrone, M., Radicati, G., and Vittoli, C.
+Level 3 basic linear algebra subprograms for sparse matrices: a user 
+level interface
+ACM Trans. Math. Softw., 23(3), 379-401, 1997.
+
+We have had good results with  the METIS library, which can be
+obtained from
+http://www-users.cs.umn.edu/~karypis/metis/metis/main.html 
+
+
+
+NEW: 
+
+- Reviewed the interfaces: in the tools section we really need the
+  POINTER attribute for dense vectors, but not in the computational
+  routines; taking it  out allows more flexibility. Besides, this acts
+  as a workaround for a bug on Linux/VAST: as of version 
+  "vf90  Personal   V3.4N5" the DOT and NRM functions had to be
+  transformed into subroutines whenever the vectors had the POINTER
+  attribute; now both subroutine and function versions work.  
+
+- Added more methods: CGS, BiCGSTAB(L), BiCG
+
+- We now have a new Preconditioner F90 routine; diagonal scaling works
+  with COO, CSR and JAD; ILU works with JAD, but is more expensive in terms 
+  of memory space
+
+- We added some extensions to compute multiple DOTs and AMAXs at once;
+  they can be useful in solving vector equations (e.g. momentum
+  equation in fluid dynamics).   
+- Halo data exchange in F90_PSHALO can now be applied to integer data;
+
+- There is an update capability for cases where the same sparsity
+  pattern is reused (e.g.  multiple time steps over a discretization
+  mesh which maintains a constant topology) 
+
+- We added a test program to read and solve sparse matrices from files in
+  Matrix-Market format (for details see http://math.nist.gov/MatrixMarket/) 
+
+
+
+
+TODO:
+
+
+1. Extend the C/F77 interface for character data (some Fortran
+   compilers don't just pass a pointer and a hidden length!) 
+
+2. Provide more general factorizations. 
+
+
+
+
+The PSBLAS team. 
+
+
+Credits:
+Salvatore  Filippone
+Michele    Colajanni
+Alfredo    Buttari
+Fabio      Cerioni
+Stefano    Maiolatesi
+Dario      Pascucci
+
+
+
+

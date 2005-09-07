@@ -1,0 +1,19 @@
+BICGSTAB            iterative method to use
+CSR                 Matrix format
+1                   IPART: Partition method: 0: BLOCK  1: BLK2 2:GRAPH
+00800               ITMAX
+-1                  ITRACE
+2                   ISTOPC   1: NBE Infty   2: |r|2/|b|2
+0                   RENUM: 0: none 1: global indices (2: GPS band reduction)
+2                   NPRECS   0:none 1:diagsc 2:BJC 3:ASM 4:ASH 5:RAS 6:RASH
+5 8 2 7 8  7 8 0 1 2 5 3 4 5 6 7 0 1 2 3 4 5 6
+4 2                   Number of overlaps to try (only when iprec>2)
+0 1 2 4 
+1.D-6               EPS
+1                   Number of matrices
+kivap007.mtx        none 
+kivap001.mtx        none 
+kivap004.mtx        none 
+kivap009.mtx        none 
+try400.mtx          none 
+kp1st.mtx           none 

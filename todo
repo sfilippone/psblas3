@@ -1,0 +1,4 @@
+- riscrivere PSI_dSwapData in f90
+- riscrivere psimod in f90
+- cambiare tutte le interfacce alla notazione psb_
+- sistemare gestione errore in SERIAL/SPARKER

@@ -1,0 +1,158 @@
+! File:  psb_dipcoo2csr.f90 
+! Subroutine: 
+! Parameters:
+
+subroutine psb_dipcoo2csr(a,info,rwshr)
+  use psb_spmat_type
+  use psb_serial_mod, only : fixcoo
+  use psb_error_mod
+  implicit none
+
+  !....Parameters...
+  Type(psb_dspmat_type), intent(inout) :: A
+  Integer, intent(out)                 :: info
+  logical, optional                    :: rwshr
+
+  integer, pointer    :: iaux(:), itemp(:)
+  !locals
+  logical             :: rwshr_
+  Integer             :: nza, nr, i,j,irw, idl,err_act
+  Integer, Parameter  :: maxtry=8
+  logical, parameter  :: debug=.false.
+  character(len=20)                 :: name, ch_err
+
+  name='psb_ipcoo2csr'
+  info  = 0
+  call psb_erractionsave(err_act)
+
+  if(debug) write(0,*)'Inside ipcoo2csr',a%fida,a%m
+  if (a%fida /= 'COO') then 
+    write(0,*) 'ipcoo2csr Invalid input ',a%fida
+    info = -1
+    call psb_errpush(info,name)
+    goto 9999
+  end if
+  if (present(rwshr)) then 
+    rwshr_ = rwshr
+  else
+    rwshr_ = .false.
+  end if
+
+  call psb_fixcoo(a,info)
+  nr  = a%m 
+  nza = a%infoa(nnz_)
+  allocate(iaux(nr+1))
+  if(debug) write(0,*)'DIPCOO2CSR: out of fixcoo',nza,nr,size(a%ia2),size(iaux)
+
+  itemp => a%ia1
+  a%ia1 => a%ia2
+  a%ia2 => iaux
+
+  !
+  ! This routine can be used in two modes:
+  ! 1. Normal: just look at the row indices and trust them. This
+  !    implies putting in empty rows where needed. In this case you
+  !    can get in trouble if A%M < A%IA1(NZA)
+  ! 2. Shrink mode: disregard the actual value of the row indices,
+  !    just treat them as ident markers. In this case you can get in
+  !    trouble when the number of distinct row indices is greater 
+  !    than A%M
+  !
+  !
+
+  a%ia2(1) = 1
+
+  if (nza <= 0) then 
+    do i=1,nr
+      a%ia2(i+1) = a%ia2(i)
+    end do
+  else
+
+    if (rwshr_) then 
+      
+      
+      j = 1
+      i = 1
+      irw = itemp(j) 
+
+      do j=1, nza
+        if (itemp(j) /= irw) then 
+          a%ia2(i+1) = j
+          irw = itemp(j) 
+          i = i + 1
+          if (i>nr) then 
+            write(0,*) 'IPCOO2CSR: RWSHR=.true. : ',&
+             & i, nr,' Expect trouble!'
+            exit
+          end if
+        endif
+      enddo 
+!      write(0,*) 'Exit from loop',j,nza,i
+      do 
+        if (i>=nr+1) exit
+        a%ia2(i+1) = j
+        i = i + 1
+      end do
+
+    else
+      
+      if (nr < itemp(nza)) then 
+        write(0,*) 'IPCOO2CSR: RWSHR=.false. : ',&
+             &nr,itemp(nza),' Expect trouble!'
+      end if
+             
+
+      j = 1 
+      i = 1
+      irw = itemp(j) 
+
+      outer: do 
+        inner: do 
+          if (i >= irw) exit inner
+          if (i>nr) then 
+            write(0,*) 'Strange situation: i>nr ',i,nr,j,nza,irw,idl
+            exit outer
+          end if
+          a%ia2(i+1) = a%ia2(i) 
+          i = i + 1
+        end do inner
+        j = j + 1
+        if (j > nza) exit
+        if (itemp(j) /= irw) then 
+          a%ia2(i+1) = j
+          irw = itemp(j) 
+          i = i + 1
+        endif
+      enddo outer
+      !
+      ! Cleanup empty rows at the end
+      !
+      if (j /= (nza+1)) then 
+        write(0,*) 'IPCOO2CSR : Problem from loop :',j,nza
+      endif
+      do 
+        if (i>=nr+1) exit
+        a%ia2(i+1) = j
+        i = i + 1
+      end do
+
+    endif
+
+  end if
+
+!!$  write(0,*) 'IPcoo2csr end loop ',i,nr,a%ia2(nr+1),nza
+  a%fida='CSR'
+
+  deallocate(itemp)
+  call psb_erractionrestore(err_act)
+  return
+
+9999 continue
+  call psb_erractionrestore(err_act)
+  if (err_act.eq.act_abort) then
+     call psb_error()
+     return
+  end if
+  return
+
+end Subroutine psb_dipcoo2csr
