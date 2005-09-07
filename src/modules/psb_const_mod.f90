@@ -15,6 +15,7 @@ module psb_const_mod
   integer, parameter   :: psb_n_row_=4,                  psb_n_col_=5,psb_ctxt_=6
   integer, parameter   :: psb_loc_to_glob_=7,            psb_mpi_c_=9,psb_mdata_size_=10
   integer, parameter   :: psb_desc_asb_=3099,            psb_desc_bld_=psb_desc_asb_+1
+  integer, parameter   :: psb_desc_repl_=3199
   integer, parameter   :: psb_desc_upd_=psb_desc_bld_+1, psb_desc_upd_asb_=psb_desc_upd_+1
   integer, parameter   :: psb_upd_glb_=998,              psb_upd_loc_=997
   integer, parameter   :: psb_proc_id_=0,                psb_n_elem_recv_=1
@@ -24,8 +25,13 @@ module psb_const_mod
   integer, parameter   :: psb_nnz_=1
   integer, parameter   :: psb_no_comm_=-1
   integer, parameter   :: ione=1, done=1.d0,             izero=0, dzero=0.d0
-  integer, parameter   :: itwo=2, ithree=3,              root=0
+  integer, parameter   :: itwo=2, ithree=3,              psb_root_=0
   integer, parameter   :: psb_nztotreq_=1,               psb_nzrowreq_=2, psb_nzsizereq_=3
+  integer, parameter   :: psb_del_bnd_=6,                psb_srtd_=7 
+  integer, parameter   :: psb_state_=8,                  psb_upd_=9
+  integer, parameter   :: psb_upd_pnt_=10,               psb_ifasize_=10
+  integer, parameter   :: psb_spmat_null_=0,             psb_spmat_bld_=1
+  integer, parameter   :: psb_spmat_asb_=2,              psb_spmat_upd_=4
 
   real(kind(1.d0)), parameter :: psb_colrow_=0.33
 
