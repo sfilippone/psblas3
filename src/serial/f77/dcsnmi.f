@@ -73,10 +73,11 @@ C     .. Array Arguments ..
       INTEGER           IA1(*),IA2(*),INFOA(*)
       CHARACTER         DESCRA*11, FIDA*5
       DOUBLE PRECISION  A(*)
+C     .. Local Scalars..
+      INTEGER           ERR_ACT
 C     .. Local Array..
       INTEGER           INT_VAL(5)
       DOUBLE PRECISION  REAL_VAL(5)
-      CHARACTER*30      NAME, STRINGS(2)
 C     .. External Subroutines ..
       DOUBLE PRECISION  DCRNRMI, DJDNRMI, DCOONRMI
       EXTERNAL          DCRNRMI, DJDNRMI, DCOONRMI
@@ -103,7 +104,6 @@ C
       ELSE IF (TRANS.NE.'T' .AND. TRANS.NE.'N' .AND. TRANS.NE.'C') THEN
          IERROR = 40
          INT_VAL(1) = 1
-         STRINGS(1) = TRANS//'\0'
       ENDIF
 
 C

@@ -3,7 +3,7 @@
      *   LIAN2,AUX,LAUX,IERROR)
 
       IMPLICIT NONE
-      INCLUDE  'sparker.fh'
+      INCLUDE  'psb_const.fh'
 
 C
 C     .. Scalar Arguments ..
@@ -16,7 +16,7 @@ C     .. Array Arguments ..
       CHARACTER          DESCRA*11, DESCRN*11
 C     .. Local Scalars ..
       INTEGER            NNZ, K, ROW, J
-      INTEGER            ELEM
+      INTEGER            ELEM, ERR_ACT
       LOGICAL            SCALE
       INTEGER MAX_NNZERO
 c     .. Local Arrays ..

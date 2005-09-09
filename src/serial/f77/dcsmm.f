@@ -161,6 +161,8 @@ C
       SUBROUTINE DCSMM(TRANS,M,N,K,ALPHA,PL,FIDA,DESCRA,A,IA1,IA2,     
      &   INFOA,PR,B,LDB,BETA,C,LDC,WORK,LWORK,IERROR)
       IMPLICIT NONE
+      INCLUDE 'psb_const.fh'
+
 C     .. Scalar Arguments ..
       INTEGER           M,N,K,LDB,LDC,LWORK, IERROR
       CHARACTER         TRANS
@@ -170,17 +172,13 @@ C     .. Array Arguments ..
       CHARACTER         DESCRA*11, FIDA*5
       DOUBLE PRECISION  A(*),B(LDB,*),C(LDC,*),WORK(*)
 C     .. Local Scalars ..
-      INTEGER           LWORKM,  LWORKB, LWORKC, LWORKS, P
+      INTEGER           LWORKM,  LWORKB, LWORKC, LWORKS, P, ERR_ACT
       LOGICAL           LP, RP
 C     .. Local Array..
       INTEGER           INT_VAL(5)
       CHARACTER*20      NAME
       DOUBLE PRECISION  REAL_VAL(5)
       CHARACTER*30      STRINGS(2)
-C     .. Parameters ..
-      DOUBLE PRECISION  ZERO
-      INTEGER           IONE
-      PARAMETER         (ZERO=0.D0,IONE=1)
 C     .. External Subroutines ..
       EXTERNAL          DSWMM, DLPUPD, DSCAL, XERBLA
 C     .. Intrinsic Functions ..
@@ -271,9 +269,9 @@ C
 C        Both right and left permutation required
 C
         P=LWORKB+1
-        CALL DLPUPD(K,N,PR,B,LDB,ZERO,WORK,K)
+        CALL DLPUPD(K,N,PR,B,LDB,DZERO,WORK,K)
         CALL DSWMM(TRANS,M,N,K,ALPHA,FIDA,DESCRA,A,IA1,IA2,INFOA,     
-     &     WORK,K,ZERO,WORK(P),M,WORK(P+LWORKC),LWORKS,IERROR)
+     &     WORK,K,DZERO,WORK(P),M,WORK(P+LWORKC),LWORKS,IERROR)
         LWORKS = IDINT(WORK(P+LWORKC))
         IF(IERROR .NE. 0) THEN
            IERROR=4011
@@ -286,7 +284,7 @@ C
 C        Only right permutation required
 C
         P=LWORKB+1
-        CALL DLPUPD(K,N,PR,B,LDB,ZERO,WORK,K)
+        CALL DLPUPD(K,N,PR,B,LDB,DZERO,WORK,K)
         CALL DSWMM(TRANS,M,N,K,ALPHA,FIDA,DESCRA,A,IA1,IA2,INFOA,    
      &     WORK,K,BETA,C,LDC,WORK(P),LWORKS,IERROR)
         LWORKS = IDINT(WORK(P))
@@ -301,7 +299,7 @@ C        Only left permutation required
 C
         P=LWORKC+1
         CALL DSWMM(TRANS,M,N,K,ALPHA,FIDA,DESCRA,A,IA1,IA2,INFOA,    
-     &     B,LDB,ZERO,WORK,M,WORK(P),LWORKS,IERROR)
+     &     B,LDB,DZERO,WORK,M,WORK(P),LWORKS,IERROR)
         LWORKS = IDINT(WORK(P))
         IF(IERROR .NE. 0) THEN
            IERROR=4011

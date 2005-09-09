@@ -229,9 +229,9 @@ c$$$     +  i, i, -ione ,-ione,-ione)
 
       else
         
-        if (me.eq.root) then
+        if (me.eq.psb_root_) then
           do proc=0,np-1
-            if (proc.ne.root) then
+            if (proc.ne.psb_root_) then
               if (debug) write(0,*) 'receiving from: ',proc
 c              ...receive from proc length of its dependence list....
               call igerv2d(icontxt,1,1,length_dl(proc),1,
@@ -243,14 +243,14 @@ c              ...receive from proc its dependence list....
 
             endif
           enddo
-        else if (me.ne.root) then
+        else if (me.ne.psb_root_) then
 c        ...send to root dependence list length.....
-          if (debug) write(0,*) 'sending to: ',me,root
-          call igesd2d(icontxt,1,1,length_dl(me),1,root,mycol)
-          if (debug) write(0,*) 'sending to: ',me,root
+          if (debug) write(0,*) 'sending to: ',me,psb_root_
+          call igesd2d(icontxt,1,1,length_dl(me),1,psb_root_,mycol)
+          if (debug) write(0,*) 'sending to: ',me,psb_root_
 c        ...send to root dependence list....
           call igesd2d(icontxt,length_dl(me),1,dep_list(1,me),
-     +      length_dl(me),root,mycol)
+     +      length_dl(me),psb_root_,mycol)
 
         endif
       end if 

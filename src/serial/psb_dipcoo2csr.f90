@@ -4,7 +4,8 @@
 
 subroutine psb_dipcoo2csr(a,info,rwshr)
   use psb_spmat_type
-  use psb_serial_mod, only : fixcoo
+  use psb_const_mod
+  use psb_serial_mod, only : psb_fixcoo
   use psb_error_mod
   implicit none
 
@@ -40,7 +41,7 @@ subroutine psb_dipcoo2csr(a,info,rwshr)
 
   call psb_fixcoo(a,info)
   nr  = a%m 
-  nza = a%infoa(nnz_)
+  nza = a%infoa(psb_nnz_)
   allocate(iaux(nr+1))
   if(debug) write(0,*)'DIPCOO2CSR: out of fixcoo',nza,nr,size(a%ia2),size(iaux)
 

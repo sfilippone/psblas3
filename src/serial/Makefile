@@ -1,30 +1,45 @@
 include ../../Make.inc
 
-#FCOPT= $(FCOPT) 
-F90_PSDOBJS= dcsdp90.o dcssm90.o dcssm90v.o dfixcoo.o dipcoo2csr.o  dipcsr2coo.o\
-	  dcsprt90.o dspgtdiag.o dspinfo.o dspgtrow.o dspscal.o imsr.o imsrx.o \
-	  dsymbmm90.o dnumbmm90.o drwextd.o dtransp90.o smmp.o dcsmm90.o dcsmv90.o\
-	  dcsrws90.o psdneigh.o psbdcoins.o string_impl.o dcsnmi90.o
+
+FOBJS = psb_cest.o psb_dcoins.o psb_dcsdp.o psb_dcsmm.o psb_dcsmv.o \
+	psb_dcsnmi.o psb_dcsprt.o psb_dcsrws.o psb_dcssm.o psb_dcssv.o \
+	psb_dfixcoo.o psb_dipcoo2csr.o psb_dipcsr2coo.o psb_dneigh.o \
+	psb_dnumbmm.o psb_drwextd.o psb_dspgtdiag.o psb_dspgtrow.o \
+	psb_dspinfo.o psb_dspscal.o psb_dsymbmm.o psb_dtransp.o \
+	string_impl.o
 
 
-LIBDIR= ../../lib
-INCLUDES=-I$(LIBDIR) -I..
-LIBNAME=$(LIBDIR)/$(F90LIB)
-HERE=.
+INCDIRS = -I ../../lib -I .
 
-INCDIRS=-I. -I.. -I$(LIBDIR)
+lib: auxd cood csrd jadd f77d dpd lib1
 
-lib: $(F90_PSDOBJS) 
-	ar -cur $(LIBNAME) $(F90_PSDOBJS)
-	ranlib $(LIBNAME)
 
-#$(F90_PSDOBJS): $(MODS) 
+lib1:	$(FOBJS)
 
-.f.o:
-	$(F90) $(FCOPT) $(INCDIRS)  -c $<
 
-veryclean: clean
-	/bin/rm -f $(LIBNAME)
+auxd:
+	(cd aux; make lib)
 
-clean: 
-	/bin/rm -f $(F90_PSDOBJS) $(LOCAL_MODS)
+cood:
+	(cd coo; make lib)
+
+csrd:
+	(cd csr; make lib)
+
+jadd:
+	(cd jad; make lib)
+
+dpd:
+	(cd dp; make lib)
+
+f77d:
+	(cd f77; make lib)
+
+clean:
+	/bin/rm -f $(FOBJS)
+	(cd aux; make clean)
+	(cd coo; make clean)
+	(cd csr; make clean)
+	(cd jad; make clean)
+	(cd dp; make  clean)
+	(cd f77; make clean)

@@ -1,7 +1,7 @@
       SUBROUTINE PARTITION(M, WORK, IA, N_BLOCK)
       IMPLICIT NONE
 
-      INCLUDE 'sparker.fh'
+      INCLUDE 'psb_const.fh'
 
 C     ...Scalar arguments...
 
@@ -24,11 +24,11 @@ C     ...Local scalars...
       IA(1,1) = 1
 
       DO WHILE(.TRUE.) 
-        IF (N_ROWS.GT.MAXJDROWS) THEN
-          IA(1,BLOCK) = IA(1,BLOCK-1)+MAXJDROWS
-          N_ROWS = N_ROWS-MAXJDROWS
+        IF (N_ROWS.GT.PSB_MAXJDROWS_) THEN
+          IA(1,BLOCK) = IA(1,BLOCK-1)+PSB_MAXJDROWS_
+          N_ROWS = N_ROWS-PSB_MAXJDROWS_
           BLOCK = BLOCK+1
-        ELSE IF (N_ROWS.GE.MINJDROWS) THEN
+        ELSE IF (N_ROWS.GE.PSB_MINJDROWS_) THEN
           IA(1,BLOCK) = IA(1,BLOCK-1)+N_ROWS
           N_ROWS = 0
           BLOCK = BLOCK+1

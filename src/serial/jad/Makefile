@@ -1,4 +1,4 @@
-include ../../../../Make.inc
+include ../../../Make.inc
 #
 # The object files
 #
@@ -11,11 +11,10 @@ OBJS=$(FOBJS)
 #
 # Where the library should go, and how it is called. 
 # Note that we are regenerating most of libsparker.a on the fly. 
-#LIBDIR=../../LIB
+LIBDIR=../../../lib
 #LIBNAME=libsparker.a	
 LIBFILE=$(LIBDIR)/$(LIBNAME)
-SPARKERDIR=..
-INCDIRS=-I. -I$(SPARKERDIR) -I$(LIBDIR)
+INCDIRS=-I. -I$(LIBDIR)
 
 #
 # No change should be needed below 
@@ -24,10 +23,6 @@ INCDIRS=-I. -I$(SPARKERDIR) -I$(LIBDIR)
 default: lib
 
 lib: $(OBJS)
-	$(AR) $(LIBFILE) $(OBJS) 
-	$(RANLIB) $(LIBFILE)
-
-$(FOBJS): $(SPARKERDIR)/sparker.fh
 
 clean: cleanobjs
 

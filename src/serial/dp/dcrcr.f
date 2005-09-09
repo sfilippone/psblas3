@@ -144,7 +144,7 @@ C     .. Array Arguments ..
      *                 INFOA(*), INFON(*)
       CHARACTER        DESCRA*11, DESCRN*11
 C     .. Local Scalars ..
-      INTEGER          I, J
+      INTEGER          I, J, ERR_ACT
       LOGICAL          EXIT
 c     .. Local Arrays ..
       CHARACTER*20       NAME

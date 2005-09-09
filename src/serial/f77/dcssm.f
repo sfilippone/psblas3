@@ -175,7 +175,7 @@ C     .. Array Arguments ..
       INTEGER          IT1(*), IT2(*), INFOT(*), PL(*), PR(*)
       CHARACTER        DESCRT*11, FIDT*5
 C     .. Local Scalars ..
-      INTEGER          LWORKM, LWORKB, LWORKS, P
+      INTEGER          LWORKM, LWORKB, LWORKS, P, ERR_ACT
       DOUBLE PRECISION ZERO
       LOGICAL          LP, RP
 C     .. Local Array..

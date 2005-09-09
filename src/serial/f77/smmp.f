@@ -16,7 +16,7 @@ c=======================================================================
      *  ib, jb, diagb,
      *  ic, jc, diagc,
      *  index)
-      use realloc
+      use psb_realloc_mod
 c
       integer       ia(*), ja(*), diaga,
      *  ib(*), jb(*), diagb,
@@ -93,7 +93,7 @@ c
           else
             nze = max(ic(i+1), nint((dble(ic(i))*(dble(n)/i)))   )
           endif 
-          call psrealloc(nze,jc,info)
+          call psb_realloc(nze,jc,info)
         end if 
         do 40 j= ic(i),ic(i+1)-1
           if (diagc.eq.1 .and. istart.eq.i) then

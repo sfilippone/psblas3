@@ -2,7 +2,7 @@ C     ... Compute infinity norma for sparse matrix in CSR Format ...
       DOUBLE PRECISION FUNCTION DJADNR(TRANS,M,N,NG,A,KA,JA,IA,
      +  INFOA,IERROR)
       IMPLICIT NONE
-      INCLUDE  'sparker.fh'
+      INCLUDE  'psb_const.fh'
 C     .. Scalar Arguments ..
       INTEGER           M,N, IERROR, NG
       CHARACTER         TRANS
@@ -10,7 +10,7 @@ C     .. Array Arguments ..
       INTEGER           KA(*),JA(*),IA(3,*),INFOA(*)
       DOUBLE PRECISION  A(*)
 C     ... Local Array ..
-      DOUBLE PRECISION NRMI_BLOCK(MAXJDROWS)
+      DOUBLE PRECISION NRMI_BLOCK(PSB_MAXJDROWS_)
 C     ... Local Scalars ..
       DOUBLE PRECISION NRMI
       INTEGER I, K, IPG, NPG, IPX

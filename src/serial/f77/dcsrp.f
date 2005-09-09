@@ -92,6 +92,8 @@ C
 C     .. Scalar Arguments ..
       INTEGER          LWORK, M, N, IERROR
       CHARACTER        TRANS
+C     .. Local Scalars..
+      INTEGER          ERR_ACT
 C     .. Array Arguments ..
       DOUBLE PRECISION WORK(LWORK)
       INTEGER          IA1(*), IA2(*), INFOA(*), P(*), INT_VAL(5)

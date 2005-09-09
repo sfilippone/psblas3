@@ -2,14 +2,14 @@
      +   NZ, LARN, LIAN1, LIAN2, IERRV)
 
       IMPLICIT NONE
-      INCLUDE  'sparker.fh'
+      INCLUDE  'psb_const.fh'
 
 C
 C     .. Scalar Arguments ..
       INTEGER M,N,NG,LARN,LIAN1,LIAN2, NZ
 
 C     .. Array Arguments ..
-      INTEGER IA(3,*), RES(*), IA2(*), IERRV(*)
+      INTEGER IA(3,*), IA2(*), IERRV(*)
 
 C     Local scalars
       INTEGER NNZ, BLOCK, DIM_BLOCK, LIMIT
@@ -21,11 +21,11 @@ C     Local scalars
       
       NNZ = NZ
       
-      LIMIT = INT(DIM_BLOCK*PERCENT)
+      LIMIT = INT(DIM_BLOCK*PSB_PERCENT_)
       
       DO BLOCK = 1, NG
          DIM_BLOCK = IA(1,BLOCK+1)-IA(1,BLOCK)
-         LIMIT = INT(DIM_BLOCK*PERCENT)
+         LIMIT = INT(DIM_BLOCK*PSB_PERCENT_)
 
          NNZ = NNZ+(DIM_BLOCK-LIMIT)*MAX_NZ
       END DO

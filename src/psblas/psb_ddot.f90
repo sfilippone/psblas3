@@ -19,6 +19,7 @@
 !
 function psb_ddot(x, y,desc_a, info, jx, jy)  
   use psb_descriptor_type
+!  use psb_spsb_mod
   use psb_error_mod
   implicit none
 
@@ -26,23 +27,24 @@ function psb_ddot(x, y,desc_a, info, jx, jy)
   type(psb_desc_type), intent(in)  :: desc_a
   integer, intent(in), optional    :: jx, jy
   integer, intent(out)             :: info
-  real(kind(1.D0))                 :: f90_psddot
+  real(kind(1.D0))                 :: psb_ddot
 
   ! locals
-  integer                  :: int_err(5), icontxt, nprow, npcol, me, mycol,&
-       & err_act, n, iix, jjx, temp(2)
+  integer                  :: int_err(5), icontxt, nprow, npcol, myrow, mycol,&
+       & err_act, n, iix, jjx, temp(2), ix, ijx, iy, ijy, iiy, jjy, i, m, j, k
   real(kind(1.d0)),pointer :: tmpx(:)
   real(kind(1.D0))         :: dot_local
+  real(kind(1.d0))         :: ddot
   character(len=20)        :: name, ch_err
 
   name='psb_ddot'
   info=0
   call psb_erractionsave(err_act)
 
-  icontxt=desc_data(psb_ctxt_)
+  icontxt=desc_a%matrix_data(psb_ctxt_)
 
   ! check on blacs grid 
-  call blacs_gridinfo(icontxt, nprow, npcol, me, mypcol)
+  call blacs_gridinfo(icontxt, nprow, npcol, myrow, mycol)
   if (nprow == -ione) then
     info = 2010
     call psb_errpush(info,name)
@@ -74,11 +76,11 @@ function psb_ddot(x, y,desc_a, info, jx, jy)
      goto 9999
   end if
 
-  m = desc_a%matrix_data(m_)
+  m = desc_a%matrix_data(psb_m_)
 
   ! check vector correctness
-  call psb_chkvect(m,ione,size(x,1),ix,ijx,desc_data%matrix_data,info,iix,jjx)
-  call psb_chkvect(m,ione,size(y,1),iy,ijy,desc_data%matrix_data,info,iiy,jjy)
+  call psb_chkvect(m,ione,size(x,1),ix,ijx,desc_a%matrix_data,info,iix,jjx)
+  call psb_chkvect(m,ione,size(y,1),iy,ijy,desc_a%matrix_data,info,iiy,jjy)
   if(info.ne.0) then
      info=4010
      ch_err='psb_chkvect'
@@ -94,29 +96,29 @@ function psb_ddot(x, y,desc_a, info, jx, jy)
 
   if(m.ne.0) then
      if(desc_a%matrix_data(psb_n_row_).gt.0) then
-        dot = ddot(desc_a%matrix_data(psb_n_row_),&
+        dot_local = ddot(desc_a%matrix_data(psb_n_row_),&
              & x(iix,jjx),ione,y(iiy,jjy),ione)
-        ! adjust dot because overlapped elements are computed more than once
+        ! adjust dot_local because overlapped elements are computed more than once
         i=1
         do while (desc_a%ovrlap_elem(i).ne.-ione)
-           dot = dot -&
+           dot_local = dot_local -&
                 & (desc_a%ovrlap_elem(i+1)-1)/desc_a%ovrlap_elem(i+1)*&
-                & x(iix+desc_a%ovrlap_elem(i)-1,jjx)*
+                & x(iix+desc_a%ovrlap_elem(i)-1,jjx)*&
                 & y(iiy+desc_a%ovrlap_elem(i)-1,jjy)
            i = i+2
         end do
      else
-        dot=0.d0
+        dot_local=0.d0
      end if
   else
-     dot=0.d0
+     dot_local=0.d0
   end if
 
   ! compute global sum
-  call dgsum2d(icontxt, 'A', ' ', ione, ione, dot,&
+  call dgsum2d(icontxt, 'A', ' ', ione, ione, dot_local,&
        & ione, mone ,mycol)
   
-  psb_ddot = dot
+  psb_ddot = dot_local
 
   call psb_erractionrestore(err_act)
   return  
@@ -156,20 +158,21 @@ function psb_ddotv(x, y,desc_a, info)
   real(kind(1.D0))                 :: psb_ddotv
 
   ! locals
-  integer                  :: int_err(5), icontxt, nprow, npcol, me, mycol,&
-       & err_act, n, iix, jjx, temp(2)
+  integer                  :: int_err(5), icontxt, nprow, npcol, myrow, mycol,&
+       & err_act, n, iix, jjx, temp(2), ix, ijx, iy, ijy, iiy, jjy, i, m, j, k
   real(kind(1.d0)),pointer :: tmpx(:)
   real(kind(1.D0))         :: dot_local
+  real(kind(1.d0))         :: ddot
   character(len=20)        :: name, ch_err
 
   name='psb_ddot'
   info=0
   call psb_erractionsave(err_act)
 
-  icontxt=desc_data(psb_ctxt_)
+  icontxt=desc_a%matrix_data(psb_ctxt_)
 
   ! check on blacs grid 
-  call blacs_gridinfo(icontxt, nprow, npcol, me, mypcol)
+  call blacs_gridinfo(icontxt, nprow, npcol, myrow, mycol)
   if (nprow == -ione) then
     info = 2010
     call psb_errpush(info,name)
@@ -183,11 +186,11 @@ function psb_ddotv(x, y,desc_a, info)
 
   ix = ione
   iy = ione
-  m = desc_a%matrix_data(m_)
+  m = desc_a%matrix_data(psb_m_)
 
   ! check vector correctness
-  call psb_chkvect(m,ione,size(x,1),ix,ijx,desc_data%matrix_data,info,iix,jjx)
-  call psb_chkvect(m,ione,size(y,1),iy,ijy,desc_data%matrix_data,info,iiy,jjy)
+  call psb_chkvect(m,ione,size(x,1),ix,ijx,desc_a%matrix_data,info,iix,jjx)
+  call psb_chkvect(m,ione,size(y,1),iy,ijy,desc_a%matrix_data,info,iiy,jjy)
   if(info.ne.0) then
      info=4010
      ch_err='psb_chkvect'
@@ -203,29 +206,29 @@ function psb_ddotv(x, y,desc_a, info)
 
   if(m.ne.0) then
      if(desc_a%matrix_data(psb_n_row_).gt.0) then
-        dot = ddot(desc_a%matrix_data(psb_n_row_),&
+        dot_local = ddot(desc_a%matrix_data(psb_n_row_),&
              & x,ione,y,ione)
-        ! adjust dot because overlapped elements are computed more than once
+        ! adjust dot_local because overlapped elements are computed more than once
         i=1
         do while (desc_a%ovrlap_elem(i).ne.-ione)
-           dot = dot -&
+           dot_local = dot_local -&
                 & (desc_a%ovrlap_elem(i+1)-1)/desc_a%ovrlap_elem(i+1)*&
-                & x(desc_a%ovrlap_elem(i))*
+                & x(desc_a%ovrlap_elem(i))*&
                 & y(desc_a%ovrlap_elem(i))
            i = i+2
         end do
      else
-        dot=0.d0
+        dot_local=0.d0
      end if
   else
-     dot=0.d0
+     dot_local=0.d0
   end if
 
   ! compute global sum
-  call dgsum2d(icontxt, 'A', ' ', ione, ione, dot,&
+  call dgsum2d(icontxt, 'A', ' ', ione, ione, dot_local,&
        & ione, mone ,mycol)
   
-  psb_ddotv = dot
+  psb_ddotv = dot_local
 
   call psb_erractionrestore(err_act)
   return  
@@ -265,20 +268,21 @@ subroutine psb_ddotvs(res, x, y,desc_a, info)
   integer, intent(out)             :: info
 
   ! locals
-  integer                  :: int_err(5), icontxt, nprow, npcol, me, mycol,&
-       & err_act, n, iix, jjx, temp(2)
+  integer                  :: int_err(5), icontxt, nprow, npcol, myrow, mycol,&
+       & err_act, n, iix, jjx, temp(2), ix, ijx, iy, ijy, iiy, jjy, i, m, j, k
   real(kind(1.d0)),pointer :: tmpx(:)
   real(kind(1.D0))         :: dot_local
+  real(kind(1.d0))         :: ddot
   character(len=20)        :: name, ch_err
 
   name='psb_ddot'
   info=0
   call psb_erractionsave(err_act)
 
-  icontxt=desc_data(psb_ctxt_)
+  icontxt=desc_a%matrix_data(psb_ctxt_)
 
   ! check on blacs grid 
-  call blacs_gridinfo(icontxt, nprow, npcol, me, mypcol)
+  call blacs_gridinfo(icontxt, nprow, npcol, myrow, mycol)
   if (nprow == -ione) then
     info = 2010
     call psb_errpush(info,name)
@@ -292,11 +296,11 @@ subroutine psb_ddotvs(res, x, y,desc_a, info)
 
   ix = ione
   iy = ione
-  m = desc_a%matrix_data(m_)
+  m = desc_a%matrix_data(psb_m_)
 
   ! check vector correctness
-  call psb_chkvect(m,ione,size(x,1),ix,ijx,desc_data%matrix_data,info,iix,jjx)
-  call psb_chkvect(m,ione,size(y,1),iy,ijy,desc_data%matrix_data,info,iiy,jjy)
+  call psb_chkvect(m,ione,size(x,1),ix,ijx,desc_a%matrix_data,info,iix,jjx)
+  call psb_chkvect(m,ione,size(y,1),iy,ijy,desc_a%matrix_data,info,iiy,jjy)
   if(info.ne.0) then
      info=4010
      ch_err='psb_chkvect'
@@ -312,29 +316,29 @@ subroutine psb_ddotvs(res, x, y,desc_a, info)
 
   if(m.ne.0) then
      if(desc_a%matrix_data(psb_n_row_).gt.0) then
-        dot = ddot(desc_a%matrix_data(psb_n_row_),&
+        dot_local = ddot(desc_a%matrix_data(psb_n_row_),&
              & x,ione,y,ione)
-        ! adjust dot because overlapped elements are computed more than once
+        ! adjust dot_local because overlapped elements are computed more than once
         i=1
         do while (desc_a%ovrlap_elem(i).ne.-ione)
-           dot = dot -&
+           dot_local = dot_local -&
                 & (desc_a%ovrlap_elem(i+1)-1)/desc_a%ovrlap_elem(i+1)*&
-                & x(desc_a%ovrlap_elem(i))*
+                & x(desc_a%ovrlap_elem(i))*&
                 & y(desc_a%ovrlap_elem(i))
            i = i+2
         end do
      else
-        dot=0.d0
+        dot_local=0.d0
      end if
   else
-     dot=0.d0
+     dot_local=0.d0
   end if
 
   ! compute global sum
-  call dgsum2d(icontxt, 'A', ' ', ione, ione, dot,&
+  call dgsum2d(icontxt, 'A', ' ', ione, ione, dot_local,&
        & ione, mone ,mycol)
   
-  res = dot
+  res = dot_local
 
   call psb_erractionrestore(err_act)
   return  
@@ -347,7 +351,7 @@ subroutine psb_ddotvs(res, x, y,desc_a, info)
      return
   end if
   return
-end function psb_ddotvs
+end subroutine psb_ddotvs
 
 
 
@@ -379,20 +383,20 @@ subroutine psb_dmdots(res, x, y, desc_a, info)
   integer, intent(out)             :: info
 
   ! locals
-  integer                  :: int_err(5), icontxt, nprow, npcol, me, mycol,&
-       & err_act, n, iix, jjx, temp(2)
-  real(kind(1.d0)),pointer :: dot(:)
-  real(kind(1.D0))         :: dot_local
+  integer                  :: int_err(5), icontxt, nprow, npcol, myrow, mycol,&
+       & err_act, n, iix, jjx, temp(2), ix, ijx, iy, ijy, iiy, jjy, i, m, j, k
+  real(kind(1.d0)),pointer :: dot_local(:)
+  real(kind(1.d0))         :: ddot
   character(len=20)        :: name, ch_err
 
   name='psb_dmdots'
   info=0
   call psb_erractionsave(err_act)
 
-  icontxt=desc_data(psb_ctxt_)
+  icontxt=desc_a%matrix_data(psb_ctxt_)
 
   ! check on blacs grid 
-  call blacs_gridinfo(icontxt, nprow, npcol, me, mypcol)
+  call blacs_gridinfo(icontxt, nprow, npcol, myrow, mycol)
   if (nprow == -ione) then
     info = 2010
     call psb_errpush(info,name)
@@ -407,11 +411,11 @@ subroutine psb_dmdots(res, x, y, desc_a, info)
   ix = ione
   iy = ione
 
-  m = desc_a%matrix_data(m_)
+  m = desc_a%matrix_data(psb_m_)
 
   ! check vector correctness
-  call psb_chkvect(m,ione,size(x,1),ix,ijx,desc_data%matrix_data,info,iix,jjx)
-  call psb_chkvect(m,ione,size(y,1),iy,ijy,desc_data%matrix_data,info,iiy,jjy)
+  call psb_chkvect(m,ione,size(x,1),ix,ijx,desc_a%matrix_data,info,iix,jjx)
+  call psb_chkvect(m,ione,size(y,1),iy,ijy,desc_a%matrix_data,info,iiy,jjy)
   if(info.ne.0) then
      info=4010
      ch_err='psb_chkvect'
@@ -426,35 +430,35 @@ subroutine psb_dmdots(res, x, y, desc_a, info)
   end if
 
   k = min(size(x,2),size(y,2))
-  allocate(dot(k))
+  allocate(dot_local(k))
 
   if(m.ne.0) then
      if(desc_a%matrix_data(psb_n_row_).gt.0) then
         do j=1,k
-           dot(j) = ddot(desc_a%matrix_data(psb_n_row_),&
+           dot_local(j) = ddot(desc_a%matrix_data(psb_n_row_),&
                 & x(iix,jjx+j-1),ione,y(iiy,jjy+j-1),ione)
-           ! adjust dot because overlapped elements are computed more than once
+           ! adjust dot_local because overlapped elements are computed more than once
            i=1
            do while (desc_a%ovrlap_elem(i).ne.-ione)
-              dot(j) = dot(j) -&
+              dot_local(j) = dot_local(j) -&
                    & (desc_a%ovrlap_elem(i+1)-1)/desc_a%ovrlap_elem(i+1)*&
-                   & x(iix+desc_a%ovrlap_elem(i)-1,jjx+j-1)*
+                   & x(iix+desc_a%ovrlap_elem(i)-1,jjx+j-1)*&
                    & y(iiy+desc_a%ovrlap_elem(i)-1,jjy+j-1)
               i = i+2
            end do
         end do
      else
-        dot(:)=0.d0
+        dot_local(:)=0.d0
      end if
   else
-     dot(:)=0.d0
+     dot_local(:)=0.d0
   end if
 
   ! compute global sum
-  call dgsum2d(icontxt, 'A', ' ', ione, ione, dot,&
+  call dgsum2d(icontxt, 'A', ' ', ione, ione, dot_local,&
        & ione, mone ,mycol)
   
-  res(1:k) = dot(1:k)
+  res(1:k) = dot_local(1:k)
 
   call psb_erractionrestore(err_act)
   return  

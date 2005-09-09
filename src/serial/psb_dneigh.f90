@@ -5,6 +5,7 @@
 subroutine psb_dneigh(a,idx,neigh,n,info,lev)
 
   use psb_realloc_mod
+  use psb_const_mod
   use psb_spmat_type
   implicit none
 
@@ -18,7 +19,6 @@ subroutine psb_dneigh(a,idx,neigh,n,info,lev)
 
   integer :: level, dim, i, j, k, r, c, brow,&
        & elem_pt, ii, n1, col_idx, ne, err_act
-  integer, parameter  :: izero=0
   character(len=20)                 :: name, ch_err
 
   name='psb_dneigh'

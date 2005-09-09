@@ -85,23 +85,23 @@ subroutine psb_dcsprt(iout,a,iv,eirs,eics,head,ivr,ivc)
   else  if (a%fida=='COO') then 
 
     if (present(ivr).and..not.present(ivc)) then 
-      write(iout,*) a%m,a%k,a%infoa(nnz_)
-      do j=1,a%infoa(nnz_)
+      write(iout,*) a%m,a%k,a%infoa(psb_nnz_)
+      do j=1,a%infoa(psb_nnz_)
         write(iout,frmtr) ivr(a%ia1(j)),a%ia2(j),a%aspk(j)
       enddo
     else if (present(ivr).and.present(ivc)) then 
-      write(iout,*) a%m,a%k,a%infoa(nnz_)
-      do j=1,a%infoa(nnz_)
+      write(iout,*) a%m,a%k,a%infoa(psb_nnz_)
+      do j=1,a%infoa(psb_nnz_)
         write(iout,frmtr) ivr(a%ia1(j)),ivc(a%ia2(j)),a%aspk(j)
       enddo
     else if (.not.present(ivr).and.present(ivc)) then 
-      write(iout,*) a%m,a%k,a%infoa(nnz_)
-      do j=1,a%infoa(nnz_)
+      write(iout,*) a%m,a%k,a%infoa(psb_nnz_)
+      do j=1,a%infoa(psb_nnz_)
         write(iout,frmtr) a%ia1(j),ivc(a%ia2(j)),a%aspk(j)
       enddo
     else if (.not.present(ivr).and..not.present(ivc)) then 
-      write(iout,*) a%m,a%k,a%infoa(nnz_)
-      do j=1,a%infoa(nnz_)
+      write(iout,*) a%m,a%k,a%infoa(psb_nnz_)
+      do j=1,a%infoa(psb_nnz_)
         write(iout,frmtr) a%ia1(j),a%ia2(j),a%aspk(j)
       enddo
     endif

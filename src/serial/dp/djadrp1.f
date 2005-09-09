@@ -80,7 +80,7 @@ C     .. Array Arguments ..
       INTEGER          KA(*), JA(*), IA(3,*), P(*), IWORK(LWORK)
       CHARACTER        DESCRA*11
 C     .. Local Scalars ..
-      INTEGER          I, K, IPG
+      INTEGER          I, K, IPG, ERR_ACT
 C     .. Intrinsic Functions ..
       INTRINSIC         DBLE
       LOGICAL DEBUG

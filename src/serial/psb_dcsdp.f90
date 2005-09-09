@@ -112,9 +112,9 @@ subroutine psb_dcsdp(a, b,info,ifc,check,trans,unitd)
       case ('CSR')
 
 
-        ia1_size=a%infoa(nnz_)
+        ia1_size=a%infoa(psb_nnz_)
         ia2_size=a%m+1
-        aspk_size=a%infoa(nnz_)
+        aspk_size=a%infoa(psb_nnz_)
         call psb_spreall(b,ia1_size,ia2_size,aspk_size,info)
 
         call dcrcr(trans_, a%m, a%k, unitd_, d, a%descra, a%aspk,&
@@ -280,12 +280,12 @@ subroutine psb_dcsdp(a, b,info,ifc,check,trans,unitd)
 
   else if (check_=='R') then
     !...Regenerating matrix    
-    if (b%infoa(state_) /= spmat_upd) then 
+    if (b%infoa(psb_state_) /= psb_spmat_upd_) then 
       info = 8888
       call psb_errpush(info,name)
       goto 9999
     endif
-    if (ibits(b%infoa(upd_),2,1).eq.0) then 
+    if (ibits(b%infoa(psb_upd_),2,1).eq.0) then 
        !
        !       Nothing to be done......
        !
@@ -296,19 +296,19 @@ subroutine psb_dcsdp(a, b,info,ifc,check,trans,unitd)
 
 
     if (b%fida(1:3)/='JAD') then
-      ip1   = b%infoa(upd_pnt_) 
-      ip2   = b%ia2(ip1+ip2_)
-      nnz   = b%ia2(ip1+nnz_)
-      iflag = b%ia2(ip1+iflag_)
-      ichk  = b%ia2(ip1+ichk_)
-      nnzt  = b%ia2(ip1+nnzt_)
+      ip1   = b%infoa(psb_upd_pnt_) 
+      ip2   = b%ia2(ip1+psb_ip2_)
+      nnz   = b%ia2(ip1+psb_nnz_)
+      iflag = b%ia2(ip1+psb_iflag_)
+      ichk  = b%ia2(ip1+psb_ichk_)
+      nnzt  = b%ia2(ip1+psb_nnzt_)
       if (debug) write(*,*) 'Regeneration start: ',&
-           &   b%infoa(upd_),perm_update,nnz,nnzt ,iflag,info
+           &   b%infoa(psb_upd_),psb_perm_update_,nnz,nnzt ,iflag,info
 
       if ((ichk/=nnzt+iflag).or.(nnz/=nnzt)) then               
         info = 8889
         write(*,*) 'Regeneration start error: ',&
-             &   b%infoa(upd_),perm_update,nnz,nnzt ,iflag,ichk                    
+             &   b%infoa(psb_upd_),psb_perm_update_,nnz,nnzt ,iflag,ichk                    
         call psb_errpush(info,name)
         goto 9999
       endif
@@ -330,22 +330,22 @@ subroutine psb_dcsdp(a, b,info,ifc,check,trans,unitd)
 
     else if (b%fida(1:3) == 'JAD') then
 
-      ip1   = b%infoa(upd_pnt_) 
-      ip2   = b%ia1(ip1+ip2_)
-      count = b%ia1(ip1+zero_)
-      ipc   = b%ia1(ip1+ipc_)
-      nnz   = b%ia1(ip1+nnz_)
-      iflag = b%ia1(ip1+iflag_)
-      ichk  = b%ia1(ip1+ichk_)
-      nnzt  = b%ia1(ip1+nnzt_)
+      ip1   = b%infoa(psb_upd_pnt_) 
+      ip2   = b%ia1(ip1+psb_ip2_)
+      count = b%ia1(ip1+psb_zero_)
+      ipc   = b%ia1(ip1+psb_ipc_)
+      nnz   = b%ia1(ip1+psb_nnz_)
+      iflag = b%ia1(ip1+psb_iflag_)
+      ichk  = b%ia1(ip1+psb_ichk_)
+      nnzt  = b%ia1(ip1+psb_nnzt_)
       if (debug) write(*,*) 'Regeneration start: ',&
-           &  b%infoa(upd_),perm_update,nnz,nnzt,count, &
+           &  b%infoa(psb_upd_),psb_perm_update_,nnz,nnzt,count, &
            &  iflag,info
 
       if ((ichk/=nnzt+iflag).or.(nnz/=nnzt)) then               
         info = 10
         write(*,*) 'Regeneration start error: ',&
-             &  b%infoa(upd_),perm_update,nnz,nnzt ,iflag,ichk     
+             &  b%infoa(psb_upd_),psb_perm_update_,nnz,nnzt ,iflag,ichk     
         call psb_errpush(info,name)
         goto 9999
       endif
@@ -372,7 +372,7 @@ subroutine psb_dcsdp(a, b,info,ifc,check,trans,unitd)
 
 
   end if
-  b%infoa(state_) = spmat_asb
+  b%infoa(psb_state_) = psb_spmat_asb_
   call psb_erractionrestore(err_act)
   return
   

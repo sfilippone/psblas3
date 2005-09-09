@@ -68,8 +68,10 @@ C     .. Array Arguments ..
       DOUBLE PRECISION  B(LDB,*), WORK(*)
       INTEGER           P(*)
 C     .. Local Scalars ..
-      INTEGER           I, J
+      INTEGER           I, J, ERR_ACT
       logical           istran,isnotran
+C     .. Local Arrays..
+      INTEGER           INT_VAL
 C     .. Intrinsic Functions ..
       INTRINSIC         DBLE
       logical     lsame

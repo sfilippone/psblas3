@@ -44,7 +44,7 @@ subroutine psb_dspgtdiag(a,d,info)
 
   else if (a%fida == 'COO') then 
 
-    do i=1,a%infoa(nnz_)
+    do i=1,a%infoa(psb_nnz_)
       j=a%ia1(i)
       if ((j==a%ia2(i)).and.(j <= min(a%k,a%m)) .and.(j>0)) then 
         d(j) = a%aspk(i)

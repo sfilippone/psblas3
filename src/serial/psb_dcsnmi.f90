@@ -36,11 +36,11 @@ real(kind(1.d0)) function psb_dcsnmi(a,info,trans)
      itrans='N'
   end if
 
-  dcsnmi90 = dcsnmi(itrans,a%m,a%k,a%fida,a%descra,a%aspk,a%ia1,a%ia2,a%infoa,info)
+  psb_dcsnmi = dcsnmi(itrans,a%m,a%k,a%fida,a%descra,a%aspk,a%ia1,a%ia2,a%infoa,info)
   if(info/=0) then
-     dcsnmi90 = -1
+     psb_dcsnmi = -1
      info=4010
-     ch_err='dcsnmi'
+     ch_err='psb_dcsnmi'
      call psb_errpush(info,name,a_err=ch_err)
      goto 9999
   end if

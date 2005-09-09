@@ -4,7 +4,7 @@
 
 subroutine psb_dtransp(a,b,c,fmt)
   use psb_spmat_type
-  use psb_serial_mod, only : ipcoo2csr, ipcsr2coo, fixcoo
+  use psb_serial_mod, only : psb_ipcoo2csr, psb_ipcsr2coo, psb_fixcoo
   implicit none
 
   type(psb_dspmat_type)      :: a,b

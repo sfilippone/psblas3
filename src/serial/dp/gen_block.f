@@ -1,7 +1,7 @@
       SUBROUTINE GEN_BLOCK(M,NG,IA,AUX)
       IMPLICIT NONE
 
-      INCLUDE 'sparker.fh'
+      INCLUDE 'psb_const.fh'
       INTEGER M, NG
       INTEGER IA(3,*), AUX(*)
 
@@ -13,9 +13,9 @@
       AUX(1) = 1
       
       DO WHILE(.TRUE.)
-        IF (N_ROWS.GT.MAXJDROWS) THEN
-          AUX(BLOCK) = AUX(BLOCK-1)+MAXJDROWS
-          N_ROWS = N_ROWS-MAXJDROWS
+        IF (N_ROWS.GT.PSB_MAXJDROWS_) THEN
+          AUX(BLOCK) = AUX(BLOCK-1)+PSB_MAXJDROWS_
+          N_ROWS = N_ROWS-PSB_MAXJDROWS_
           BLOCK = BLOCK+1
         ELSE IF (N_ROWS.GT.0) THEN
           AUX(BLOCK) = AUX(BLOCK-1)+N_ROWS

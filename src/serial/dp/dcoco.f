@@ -1,250 +1,250 @@
-C     Covert matrix from COO format to COO Format
-C
-      SUBROUTINE DCOCO(TRANS,M,N,UNITD,D,DESCRA,AR,IA1,IA2,INFO,
-     *  P1,DESCRN,ARN,IA1N,IA2N,INFON,P2,LARN,LIA1N,
-     *  LIA2N,AUX,LAUX,IERROR)
+c     covert matrix from COO format to COO format
+c
+      subroutine dcoco(trans,m,n,unitd,d,descra,ar,ia1,ia2,info,
+     *  p1,descrn,arn,ia1n,ia2n,infon,p2,larn,lia1n,
+     *  lia2n,aux,laux,ierror)
 
-      IMPLICIT NONE
-      INCLUDE  'sparker.fh'
+      implicit none
+      include  'psb_const.fh'
 
-C     .. Scalar Arguments ..
-      INTEGER            LARN, LAUX, LIA1N, LIA2N, 
-     +  M, N, IERROR
-      CHARACTER          TRANS,UNITD
-C     .. Array Arguments ..
-      DOUBLE PRECISION   AR(*), ARN(*), D(*)
-      INTEGER            AUX(0:LAUX-1)
-      INTEGER            IA1(*), IA2(*), INFO(*), IA1N(*), IA2N(*),
-     *  INFON(*), P1(*), P2(*)
-      CHARACTER          DESCRA*11, DESCRN*11
-C     .. Local Scalars ..
-      INTEGER            IPX, IP1, IP2, CHECK_FLAG
-      INTEGER            NNZ, K, I, J, NZL, IRET
-      INTEGER            ELEM_IN, ELEM_OUT
-      LOGICAL            SCALE
-      INTEGER MAX_NNZERO
+c     .. scalar arguments ..
+      integer            larn, laux, lia1n, lia2n, 
+     +  m, n, ierror
+      character          trans,unitd
+c     .. array arguments ..
+      double precision   ar(*), arn(*), d(*)
+      integer            aux(0:laux-1)
+      integer            ia1(*), ia2(*), info(*), ia1n(*), ia2n(*),
+     *  infon(*), p1(*), p2(*)
+      character          descra*11, descrn*11
+c     .. local scalars ..
+      integer            ipx, ip1, ip2, check_flag, err_act
+      integer            nnz, k, i, j, nzl, iret
+      integer            elem_in, elem_out
+      logical            scale
+      integer max_nnzero
       logical     debug
       parameter   (debug=.false.)
-c     .. Local Arrays ..
-      CHARACTER*20       NAME
-      INTEGER            INT_VAL(5)
-C
-C     ...Common variables...
-C     This flag describe the action to do
+c     .. local arrays ..
+      character*20       name
+      integer            int_val(5)
+c
+c     ...common variables...
+c     this flag describe the action to do
       
-C     .. External Subroutines ..
-      EXTERNAL           MAX_NNZERO
-C     .. Executable Statements ..
-C
+c     .. external subroutines ..
+      external           max_nnzero
+c     .. executable statements ..
+c
 
-      NAME = 'DCOCO\0'
-      IERROR = 0
-      CALL FCPSB_ERRACTIONSAVE(ERR_ACT)
+      name = 'dcoco\0'
+      ierror = 0
+      call fcpsb_erractionsave(err_act)
 
-      CHECK_FLAG=IBITS(info(upd_),1,2)
-      IF (TRANS.EQ.'N') THEN
-        SCALE  = (UNITD.EQ.'L') ! meaningless
-        P1(1) = 0
-        P2(1) = 0
+      check_flag=ibits(info(psb_upd_),1,2)
+      if (trans.eq.'N') then
+        scale  = (unitd.eq.'L') ! meaningless
+        p1(1) = 0
+        p2(1) = 0
 
-        NNZ = INFO(nnz_)
+        nnz = info(psb_nnz_)
         if (debug) then 
-          write(*,*) 'On entry to DCOCO: NNZ LAUX ',
+          write(*,*) 'on entry to dcoco: nnz laux ',
      +      nnz,laux,larn,lia1n,lia2n
         endif
-        IF (LAUX.LT.NNZ+2) THEN
-          IERROR = 60
-          INT_VAL(1) = 22
-          INT_VAL(2) = NNZ+2
-          INT_VAL(3) = LAUX
-        ELSE IF (LARN.LT.NNZ) THEN
-          IERROR = 60
-          INT_VAL(1) = 18
-          INT_VAL(2) = NNZ+2
-          INT_VAL(3) = LAUX
-        ELSE IF (LIA1N.LT.NNZ) THEN
-          IERROR = 60
-          INT_VAL(1) = 19
-          INT_VAL(2) = NNZ+2
-          INT_VAL(3) = LAUX
-        ELSE IF (LIA2N.LT.M+1) THEN
-          IERROR = 60
-          INT_VAL(1) = 20
-          INT_VAL(2) = NNZ+2
-          INT_VAL(3) = LAUX
-        ENDIF
+        if (laux.lt.nnz+2) then
+          ierror = 60
+          int_val(1) = 22
+          int_val(2) = nnz+2
+          int_val(3) = laux
+        else if (larn.lt.nnz) then
+          ierror = 60
+          int_val(1) = 18
+          int_val(2) = nnz+2
+          int_val(3) = laux
+        else if (lia1n.lt.nnz) then
+          ierror = 60
+          int_val(1) = 19
+          int_val(2) = nnz+2
+          int_val(3) = laux
+        else if (lia2n.lt.m+1) then
+          ierror = 60
+          int_val(1) = 20
+          int_val(2) = nnz+2
+          int_val(3) = laux
+        endif
         
-C
-C     Error handling
-C
-        IF(IERROR.NE.0) THEN
-           CALL FCPSB_ERRPUSH(IERROR,NAME,INT_VAL)
-           GOTO 9999
-        END IF
+c
+c     error handling
+c
+        if(ierror.ne.0) then
+           call fcpsb_errpush(ierror,name,int_val)
+           goto 9999
+        end if
 
-        IF (DESCRA(1:1).EQ.'G') THEN
-C
-C     Sort COO data structure
-C     
-          if (debug) write(*,*)'First sort',nnz
+        if (descra(1:1).eq.'G') then
+c
+c     sort COO data structure
+c     
+          if (debug) write(*,*)'first sort',nnz
           do k=1, nnz
             arn(k)  = ar(k)
             ia1n(k) = ia1(k)
             ia2n(k) = ia2(k)
           enddo
           
-          if (debug) write(*,*)'Second sort'            
+          if (debug) write(*,*)'second sort'            
 
-          if ((lia2n.ge.(2*nnz+ireg_flgs+1))
+          if ((lia2n.ge.(2*nnz+psb_ireg_flgs_+1))
      +      .and.(laux.ge.2*(2+nnz))) then 
-C     
-C     Prepare for smart regeneration
+c     
+c     prepare for smart regeneration
 c     
             ipx = nnz+3            
             do i=1, nnz
               aux(ipx+i-1) = i
             enddo
-            ip1              = nnz+2
-            infon(upd_pnt_)  = ip1
-            ip2              = ip1+ireg_flgs
-            ia2n(ip1+ip2_)   = ip2
-            ia2n(ip1+iflag_) = check_flag
-            ia2n(ip1+nnzt_)  = nnz
-            ia2n(ip1+nnz_)   = 0
-            ia2n(ip1+ichk_)  = nnz+check_flag
-            if (debug) write(0,*) 'Build check :',ia2n(ip1+nnzt_) 
+            ip1                  = nnz+2
+            infon(psb_upd_pnt_)  = ip1
+            ip2                  = ip1+psb_ireg_flgs_
+            ia2n(ip1+psb_ip2_)   = ip2
+            ia2n(ip1+psb_iflag_) = check_flag
+            ia2n(ip1+psb_nnzt_)  = nnz
+            ia2n(ip1+psb_nnz_)   = 0
+            ia2n(ip1+psb_ichk_)  = nnz+check_flag
+            if (debug) write(0,*) 'build check :',ia2n(ip1+psb_nnzt_) 
             
-C     .... Order with key IA1N ...
-            CALL MRGSRT(NNZ,IA1N,AUX,IRET)
-            IF (IRET.EQ.0) CALL REORDVN3(NNZ,ARN,IA1N,IA2N,AUX(IPX),AUX)
-C     .... Order with key IA2N ...
+c     .... order with key ia1n ...
+            call mrgsrt(nnz,ia1n,aux,iret)
+            if (iret.eq.0) call reordvn3(nnz,arn,ia1n,ia2n,aux(ipx),aux)
+c     .... order with key ia2n ...
             
-            I    = 1
-            J    = I
-            DO WHILE (I.LE.NNZ)
-              DO WHILE ((IA1N(J).EQ.IA1N(I)).AND.
-     +          (J.LE.NNZ))
-                J = J+1
-              ENDDO
-              NZL = J - I
-              CALL MRGSRT(NZL,IA2N(I),AUX,IRET)
-              IF (IRET.EQ.0) CALL REORDVN3(NZL,ARN(I),IA1N(I),IA2N(I),
-     +          AUX(IPX+I-1),AUX)
-              I = J
-            ENDDO
+            i    = 1
+            j    = i
+            do while (i.le.nnz)
+              do while ((ia1n(j).eq.ia1n(i)).and.
+     +          (j.le.nnz))
+                j = j+1
+              enddo
+              nzl = j - i
+              call mrgsrt(nzl,ia2n(i),aux,iret)
+              if (iret.eq.0) call reordvn3(nzl,arn(i),ia1n(i),ia2n(i),
+     +          aux(ipx+i-1),aux)
+              i = j
+            enddo
             
             ia2n(ip2+aux(ipx+1-1)-1) = 1
 
-C     ... Construct final COO  Representation...
-            ELEM_OUT = 1
-C     ... Insert remaining element ...
-            DO ELEM_IN  = 2, NNZ
-              IF ((IA1N(ELEM_IN).EQ.IA1N(ELEM_OUT)).AND.
-     +          (IA2N(ELEM_IN).EQ.IA2N(ELEM_OUT))) THEN 
-                IF (CHECK_FLAG.EQ.1) THEN
-C     ... Error, there are duplicated elements ...
-                  IERROR = 130
-                  CALL FCPSB_ERRPUSH(IERROR,NAME,INT_VAL)
-                  GOTO 9999
-                ELSE IF (CHECK_FLAG.EQ.2) THEN
-C     ... Insert only the first duplicated element ...
+c     ... construct final COO  representation...
+            elem_out = 1
+c     ... insert remaining element ...
+            do elem_in  = 2, nnz
+              if ((ia1n(elem_in).eq.ia1n(elem_out)).and.
+     +          (ia2n(elem_in).eq.ia2n(elem_out))) then 
+                if (check_flag.eq.1) then
+c     ... error, there are duplicated elements ...
+                  ierror = 130
+                  call fcpsb_errpush(ierror,name,int_val)
+                  goto 9999
+                else if (check_flag.eq.2) then
+c     ... insert only the first duplicated element ...
                   ia2n(ip2+aux(ipx+elem_in-1)-1) = elem_out
-                ELSE IF (CHECK_FLAG.EQ.3) THEN
-C     ... Sum the duplicated element ...
-                  ARN(ELEM_OUT) = ARN(ELEM_OUT) + ARN(ELEM_IN)
+                else if (check_flag.eq.3) then
+c     ... sum the duplicated element ...
+                  arn(elem_out) = arn(elem_out) + arn(elem_in)
                   ia2n(ip2+aux(ipx+elem_in-1)-1) = elem_out
-                END IF
-              ELSE
-                ELEM_OUT = ELEM_OUT + 1
-                ARN(ELEM_OUT)  = ARN(ELEM_IN)
+                end if
+              else
+                elem_out = elem_out + 1
+                arn(elem_out)  = arn(elem_in)
                 ia2n(ip2+aux(ipx+elem_in-1)-1) = elem_out
-                IA1N(ELEM_OUT) = IA1N(ELEM_IN)
-                IA2N(ELEM_OUT) = IA2N(ELEM_IN)
-              ENDIF
-            ENDDO
+                ia1n(elem_out) = ia1n(elem_in)
+                ia2n(elem_out) = ia2n(elem_in)
+              endif
+            enddo
             
-          ELSE
+          else
             
-C     .... Order with key IA1N ...
-            CALL MRGSRT(NNZ,IA1N,AUX,IRET)
-            IF (IRET.EQ.0) CALL REORDVN(NNZ,ARN,IA1N,IA2N,AUX)
-C     .... Order with key IA2N ...
+c     .... order with key ia1n ...
+            call mrgsrt(nnz,ia1n,aux,iret)
+            if (iret.eq.0) call reordvn(nnz,arn,ia1n,ia2n,aux)
+c     .... order with key ia2n ...
             
-            I    = 1
-            J    = I
-            DO WHILE (I.LE.NNZ)
-              DO WHILE ((IA1N(J).EQ.IA1N(I)).AND.
-     +          (J.LE.NNZ))
-                J = J+1
-              ENDDO
-              NZL = J - I
-              CALL MRGSRT(NZL,IA2N(I),AUX,IRET)
-              IF (IRET.EQ.0) CALL REORDVN(NZL,ARN(I),IA1N(I),IA2N(I),
-     +          AUX)
-              I = J
-            ENDDO
-C     ... Construct final COO  Representation...
-            ELEM_OUT = 1
-C     ... Insert remaining element ...
-            DO ELEM_IN  = 2, NNZ
-              IF ((IA1N(ELEM_IN).EQ.IA1N(ELEM_OUT)).AND.
-     +          (IA2N(ELEM_IN).EQ.IA2N(ELEM_OUT))) THEN 
-                IF (CHECK_FLAG.EQ.1) THEN
-C     ... Error, there are duplicated elements ...
-                  IERROR = 130
-                  CALL FCPSB_ERRPUSH(IERROR,NAME,INT_VAL)
-                  GOTO 9999
-                ELSE IF (CHECK_FLAG.EQ.2) THEN
-C     ... Insert only the first duplicated element ...
-                ELSE IF (CHECK_FLAG.EQ.3) THEN
-C     ... Sum the duplicated element ...
-                  ARN(ELEM_OUT) = ARN(ELEM_OUT) + ARN(ELEM_IN)
-                END IF
-              ELSE
-                ELEM_OUT = ELEM_OUT + 1
-                ARN(ELEM_OUT)  = ARN(ELEM_IN)
-                IA1N(ELEM_OUT) = IA1N(ELEM_IN)
-                IA2N(ELEM_OUT) = IA2N(ELEM_IN)
-              ENDIF
-            ENDDO
-          ENDIF
-          INFON(nnz_)  = ELEM_OUT
-          infon(srtd_) = isrtdcoo
+            i    = 1
+            j    = i
+            do while (i.le.nnz)
+              do while ((ia1n(j).eq.ia1n(i)).and.
+     +          (j.le.nnz))
+                j = j+1
+              enddo
+              nzl = j - i
+              call mrgsrt(nzl,ia2n(i),aux,iret)
+              if (iret.eq.0) call reordvn(nzl,arn(i),ia1n(i),ia2n(i),
+     +          aux)
+              i = j
+            enddo
+c     ... construct final COO  representation...
+            elem_out = 1
+c     ... insert remaining element ...
+            do elem_in  = 2, nnz
+              if ((ia1n(elem_in).eq.ia1n(elem_out)).and.
+     +          (ia2n(elem_in).eq.ia2n(elem_out))) then 
+                if (check_flag.eq.1) then
+c     ... error, there are duplicated elements ...
+                  ierror = 130
+                  call fcpsb_errpush(ierror,name,int_val)
+                  goto 9999
+                else if (check_flag.eq.2) then
+c     ... insert only the first duplicated element ...
+                else if (check_flag.eq.3) then
+c     ... sum the duplicated element ...
+                  arn(elem_out) = arn(elem_out) + arn(elem_in)
+                end if
+              else
+                elem_out = elem_out + 1
+                arn(elem_out)  = arn(elem_in)
+                ia1n(elem_out) = ia1n(elem_in)
+                ia2n(elem_out) = ia2n(elem_in)
+              endif
+            enddo
+          endif
+          infon(psb_nnz_)  = elem_out
+          infon(psb_srtd_) = psb_isrtdcoo_
           
-          if (debug) write(*,*)'Done Rebuild COO',infon(1)
+          if (debug) write(*,*)'done rebuild COO',infon(1)
           
-        ELSE IF (DESCRA(1:1).EQ.'S' .AND. DESCRA(2:2).EQ.'U') THEN
+        else if (descra(1:1).eq.'S' .and. descra(2:2).eq.'U') then
 
-          DO 20 K = 1, M
-            P2(K) = K
- 20       CONTINUE
+          do 20 k = 1, m
+            p2(k) = k
+ 20       continue
 
-        ELSE IF (DESCRA(1:1).EQ.'T' .AND. DESCRA(2:2).EQ.'U') THEN
+        else if (descra(1:1).eq.'T' .and. descra(2:2).eq.'U') then
 
-        ELSE IF (DESCRA(1:1).EQ.'T' .AND. DESCRA(2:2).EQ.'L') THEN
+        else if (descra(1:1).eq.'T' .and. descra(2:2).eq.'L') then
            
-        END IF
-C
-      ELSE IF (TRANS.NE.'N') THEN
-C
-C           TO DO
-C
-         IERROR = 3021
-         CALL FCPSB_ERRPUSH(IERROR,NAME,INT_VAL)
-         GOTO 9999
+        end if
+c
+      else if (trans.ne.'N') then
+c
+c           to do
+c
+         ierror = 3021
+         call fcpsb_errpush(ierror,name,int_val)
+         goto 9999
 
-      END IF
+      end if
 
-      CALL FCPSB_ERRACTIONRESTORE(ERR_ACT)
-      RETURN
+      call fcpsb_erractionrestore(err_act)
+      return
 
- 9999 CONTINUE
-      CALL FCPSB_ERRACTIONRESTORE(ERR_ACT)
+ 9999 continue
+      call fcpsb_erractionrestore(err_act)
 
-      IF ( ERR_ACT .NE. 0 ) THEN 
-         CALL FCPSB_SERROR()
-         RETURN
-      ENDIF
+      if ( err_act .ne. 0 ) then 
+         call fcpsb_serror()
+         return
+      endif
 
-      RETURN
-      END
+      return
+      end

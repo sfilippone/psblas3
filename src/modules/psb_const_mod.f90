@@ -24,7 +24,7 @@ module psb_const_mod
   integer, parameter   :: psb_ovrlp_elem_to_=2,          psb_ovrlp_elem_=0, psb_n_dom_ovr_=1
   integer, parameter   :: psb_nnz_=1
   integer, parameter   :: psb_no_comm_=-1
-  integer, parameter   :: ione=1, done=1.d0,             izero=0, dzero=0.d0
+  integer, parameter   :: ione=1, done=1.d0,             izero=0, dzero=0.d0,mone=-1
   integer, parameter   :: itwo=2, ithree=3,              psb_root_=0
   integer, parameter   :: psb_nztotreq_=1,               psb_nzrowreq_=2, psb_nzsizereq_=3
   integer, parameter   :: psb_del_bnd_=6,                psb_srtd_=7 
@@ -32,10 +32,17 @@ module psb_const_mod
   integer, parameter   :: psb_upd_pnt_=10,               psb_ifasize_=10
   integer, parameter   :: psb_spmat_null_=0,             psb_spmat_bld_=1
   integer, parameter   :: psb_spmat_asb_=2,              psb_spmat_upd_=4
+  integer, parameter   :: psb_ireg_flgs_=10,             psb_ip2_=0
+  integer, parameter   :: psb_iflag_=2,                  psb_ichk_=3
+  integer, parameter   :: psb_nnzt_=4,                   psb_zero_=5,psb_ipc_=6
+  integer, parameter   :: psb_perm_update_=98765,        psb_isrtdcoo_=98764
+  integer, parameter   :: psb_maxjdrows_=8,              psb_minjdrows_=4
+  integer, parameter   :: psb_dbleint_=2
 
-  real(kind(1.d0)), parameter :: psb_colrow_=0.33
+  real(kind(1.d0)), parameter :: psb_colrow_=0.33, psb_percent_=0.7
 
   character, parameter :: psb_all_='A',                  psb_topdef_=' '
+  character(len=5)     :: psb_fidef_='CSR'
     
 
                                               

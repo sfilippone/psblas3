@@ -8,7 +8,7 @@ COBJS = avltree.o
 
 MPFOBJS = psi_dswapdata.o psi_dswaptran.o psi_iswapdata.o \
 	psi_iswaptran.o psi_extrct_dl.o psi_desc_index.o
-INCDIRS = ../../lib .
+INCDIRS = -I ../../lib -I .
 
 lib: mpfobjs $(FOBJS) $(COBJS)
 

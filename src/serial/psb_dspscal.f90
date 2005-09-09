@@ -35,7 +35,7 @@ subroutine psb_dspscal(a,d,info)
 
   else if (a%fida == 'COO') then 
 
-     do i=1,a%infoa(nnz_)
+     do i=1,a%infoa(psb_nnz_)
         j=a%ia1(i)
         a%aspk(i) = a%aspk(i) * d(j)
      enddo

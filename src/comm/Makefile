@@ -4,7 +4,7 @@ OBJS = psb_dgather.o psb_dhalo.o psb_dovrl.o \
 	psb_ihalo.o
 
 MPFOBJS = psb_dscatter.o
-INCDIRS = ../../lib
+INCDIRS = -I ../../lib -I .
 
 lib: mpfobjs $(OBJS)
 

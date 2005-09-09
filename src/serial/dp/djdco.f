@@ -2,7 +2,7 @@
      *     IP1,DESCRN,ARN,IA1N,IA2N,INFON,IP2,LARN,LIA1N,
      *     LIA2N,AUX,LAUX,IERROR)      
       IMPLICIT NONE
-      INCLUDE  'sparker.fh'      
+      INCLUDE  'psb_const.fh'      
 C     
 C     .. Scalar Arguments ..
       INTEGER            LARN, LAUX, LIA1N, LIA2N, M, N, IERROR
@@ -14,7 +14,7 @@ C     .. Array Arguments ..
      *     IA2N(*), INFON(*), IP1(*), IP2(*)
       CHARACTER          DESCRA*11, DESCRN*11
 C     .. Local Scalars .. 
-      INTEGER            PIA, PJA, PNG
+      INTEGER            PIA, PJA, PNG, ERR_ACT
       logical     debug
       parameter   (debug=.false.)
 c     .. Local Arrays ..

@@ -4,6 +4,7 @@
 
 Subroutine psb_dfixcoo(A,INFO)
   use psb_spmat_type
+  use psb_const_mod
   implicit none
 
   !....Parameters...
@@ -24,7 +25,7 @@ Subroutine psb_dfixcoo(A,INFO)
     return
   end if
 
-  nza = a%infoa(nnz_)
+  nza = a%infoa(psb_nnz_)
   if (nza < 2) return
   
   allocate(iaux(nza+2),stat=info) 
@@ -64,8 +65,8 @@ Subroutine psb_dfixcoo(A,INFO)
       icl = a%ia2(i) 
     endif
   enddo
-  a%infoa(nnz_) = i    
-  a%infoa(srtd_) = isrtdcoo
+  a%infoa(psb_nnz_) = i    
+  a%infoa(psb_srtd_) = psb_isrtdcoo_
 
   if(debug) write(0,*)'FIXCOO: end second loop'
 

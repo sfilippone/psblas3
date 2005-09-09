@@ -12,7 +12,7 @@ C     Flag = 1: replace elements with new value;
 C     Flag = 2: sum block value to elements;
 C
       IMPLICIT NONE
-      include 'sparker.fh'
+      include 'psb_const.fh'
 C     .. Scalar Arguments ..
       INTEGER           IA, JA, IH, JH, M, N,
      +  IERROR, FLAG, LIWORK 
@@ -26,18 +26,18 @@ C     .. Local scalars ..
       INTEGER           J, NNZ, IP1, NNZI
 C     .. Local arrays ..
       IERROR = 0
-      IF (IBITS(INFOA(UPD_),2,1).EQ.1) THEN 
+      IF (IBITS(INFOA(PSB_UPD_),2,1).EQ.1) THEN 
 C
 C     Smart update capability
 C       
-        IP1 = INFOA(UPD_PNT_)
-        NNZ = IA1(IP1+NNZ_)
+        IP1 = INFOA(PSB_UPD_PNT_)
+        NNZ = IA1(IP1+PSB_NNZ_)
         NNZI = INFOH(1) 
         DO J = 1, NNZI
           NNZ = NNZ + 1 
           A(NNZ) = H(J)
         ENDDO
-        IA1(IP1+NNZ_) = NNZ
+        IA1(IP1+PSB_NNZ_) = NNZ
       ELSE 
         IERROR = 2
       ENDIF

@@ -9,9 +9,9 @@ F90=ifort
 FC=ifort
 CC=icc
 F77=$(FC)
-F90COPT=-g -CB -no_cpprt
-FCOPT=-g -CB -no_cpprt
-CCOPT=-g -CB -no_cpprt
+F90COPT= -check arg_temp_created
+FCOPT=-check arg_temp_created
+CCOPT=
 
 #######################  Section 2 #######################
 #  Define your linker and linker flags here              #
@@ -64,15 +64,15 @@ MODS=$(LIBDIR)/psb_tools_const$(.mod) $(LIBDIR)/psb_spmat_type$(.mod) $(LIBDIR)/
 $(.mod).o:
 	
 .f.o:
-	$(FC) $(FCOPT) -I $(INCDIRS)  -c $<
+	$(FC) $(FCOPT) $(INCDIRS)  -c $<
 .c.o:
-	$(CC) $(CCOPT) -I $(INCDIRS) $(CDEFINES) -c $<
+	$(CC) $(CCOPT) $(INCDIRS) $(CDEFINES) -c $<
 .f$(.mod):
-	$(F90) $(FCOPT) -I $(INCDIRS) -c $<
+	$(F90) $(FCOPT) $(INCDIRS) -c $<
 .f90$(.mod):
-	$(F90) $(F90COPT) -I $(INCDIRS) -c $<
+	$(F90) $(F90COPT) $(INCDIRS) -c $<
 .f90.o:
-	$(F90) $(F90COPT) -I $(INCDIRS) -c $<
+	$(F90) $(F90COPT) $(INCDIRS) -c $<
 
 
 

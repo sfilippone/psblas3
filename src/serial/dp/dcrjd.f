@@ -30,7 +30,7 @@ C     ARN,IAN1
 C     IAN2,INFON, IP1, IP2
 C   
       IMPLICIT NONE
-      INCLUDE  'sparker.fh'
+      INCLUDE  'psb_const.fh'
 
 C
 C     .. Scalar Arguments ..
@@ -44,7 +44,7 @@ C     .. Array Arguments ..
       CHARACTER          DESCRA*11, DESCRN*11
 C     .. Local Scalars ..
       INTEGER            IOFF, ISTROW, NJA, NZ, PIA,
-     +  PJA, PNG, K, MAX_NG, NG, IERROR, LJA, ERR_ACT
+     +  PJA, PNG, K, MAX_NG, NG, LJA, ERR_ACT
       LOGICAL            SCALE
       logical  debug
       parameter (debug=.false.)
@@ -52,7 +52,7 @@ C     .. Local Scalars ..
       INTEGER MAX_NNZERO
 c     .. Local Arrays ..
       CHARACTER*20       NAME
-      INTEGER            INT_VAL(5), IERRV(*)
+      INTEGER            INT_VAL(5), IERRV(5)
 
 C     .. External Subroutines ..
       EXTERNAL           DVTFG
@@ -89,15 +89,15 @@ C
 C
 C        CHECK ON DIMENSION OF IAN2 AND AUX
 C
-          MAX_NG = M/MINJDROWS+1
+          MAX_NG = M/PSB_MINJDROWS_+1
 
           IF ((PIA+3*(MAX_NG+1).GT.LIAN2).OR.(M+1 .GT. LAUX)) THEN
 C              ... If I haven't sufficent memory to compute NG in IAN2 ...
-            IF (M+1+3*(MAX_NG+1)/DBLEINT_+1.GT.LAUX) THEN
+            IF (M+1+3*(MAX_NG+1)/PSB_DBLEINT_+1.GT.LAUX) THEN
 C              ... If I haven't sufficent memory to compute NG in AUX ...
                IERROR = 60
                INT_VAL(1) = 22
-               INT_VAL(2) = M+1+3*(MAX_NG+1)/DBLEINT_+1
+               INT_VAL(2) = M+1+3*(MAX_NG+1)/PSB_DBLEINT_+1
                INT_VAL(3) = LAUX
                CALL FCPSB_ERRPUSH(IERROR,NAME,INT_VAL)
                GOTO 9999

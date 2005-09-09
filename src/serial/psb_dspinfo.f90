@@ -28,12 +28,12 @@ subroutine psb_dspinfo(ireq,a,ires,info,iaux)
   call psb_erractionsave(err_act)
 
 
-  if (ireq == nztotreq) then 
+  if (ireq == psb_nztotreq_) then 
      if (a%fida == 'CSR') then 
         nr   = a%m
         ires = a%ia2(nr+1)-1
      else if ((a%fida == 'COO').or.(a%fida == 'COI')) then 
-        ires = a%infoa(nnz_)
+        ires = a%infoa(psb_nnz_)
      else if (a%fida == 'JAD') then 
         ires=-1
         info=135
@@ -48,7 +48,7 @@ subroutine psb_dspinfo(ireq,a,ires,info,iaux)
         goto 9999
      end if
 
-  else if (ireq == nzrowreq) then 
+  else if (ireq == psb_nzrowreq_) then 
      if (.not.present(iaux)) then 
         write(0,*) 'Need IAUX when ireq=nzrowreq'
         ires=-1
@@ -59,10 +59,10 @@ subroutine psb_dspinfo(ireq,a,ires,info,iaux)
         ires = a%ia2(irw+1)-a%ia2(irw)
      else if ((a%fida == 'COO').or.(a%fida == 'COI')) then 
 
-        if (a%infoa(srtd_) == isrtdcoo) then 
+        if (a%infoa(psb_srtd_) == psb_isrtdcoo_) then 
 !!$      write(0,*) 'Gtrow_: srtd coo',irw
            ! In this case we can do a binary search. 
-           nz = a%infoa(nnz_)
+           nz = a%infoa(psb_nnz_)
            call ibsrch(ip,irw,nz,a%ia1)
            jp = ip
            ! expand [ip,jp] to contain all row entries.
@@ -85,10 +85,10 @@ subroutine psb_dspinfo(ireq,a,ires,info,iaux)
            end do
            ires = jp-ip
         else
-           ires = count(a%ia1(1:a%infoa(nnz_))==irw)
+           ires = count(a%ia1(1:a%infoa(psb_nnz_))==irw)
         endif
 !!$      ires = 0
-!!$      do i=1, a%infoa(nnz_) 
+!!$      do i=1, a%infoa(psb_nnz_) 
 !!$        if (a%ia1(i) == irw) ires = ires + 1
 !!$      enddo
      else if (a%fida == 'JAD') then 
@@ -105,13 +105,13 @@ subroutine psb_dspinfo(ireq,a,ires,info,iaux)
         goto 9999
      end if
 
-  else  if (ireq == nzsizereq) then 
+  else  if (ireq == psb_nzsizereq_) then 
      if (a%fida == 'CSR') then 
         ires = size(a%aspk)
      else if ((a%fida == 'COO').or.(a%fida == 'COI')) then 
         ires = size(a%aspk)
      else if (a%fida == 'JAD') then 
-        ires = a%infoa(nnz_)
+        ires = a%infoa(psb_nnz_)
      else
         ires=-1
         info=136

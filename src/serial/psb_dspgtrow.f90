@@ -57,7 +57,7 @@ subroutine psb_dspgtrow(irw,a,b,info,append,iren,lrw)
 
 
   if (append_) then 
-    nzb = b%infoa(nnz_)
+    nzb = b%infoa(psb_nnz_)
   else
     nzb = 0
     b%m = 0 
@@ -126,7 +126,7 @@ contains
     nr = lrw - irw + 1 
     nz = a%ia2(idx+nr) - a%ia2(idx)
     if (append) then 
-      nzb = b%infoa(nnz_)
+      nzb = b%infoa(psb_nnz_)
     else
       nzb = 0
     endif
@@ -159,7 +159,7 @@ contains
         end do
       enddo
     end if
-    b%infoa(nnz_) = nzb+nz
+    b%infoa(psb_nnz_) = nzb+nz
     if (a%pr(1) /= 0) then
       write(0,*) 'Feeling lazy today, Right Permutation will have to wait'
     endif
@@ -181,7 +181,7 @@ contains
     integer, pointer                      :: iren(:)
     integer                               :: lrw
 
-    nza = a%infoa(nnz_)
+    nza = a%infoa(psb_nnz_)
     if (a%pl(1) /= 0) then
       write(0,*) 'Fatal error in SPGTROW: do not feed a permuted mat so far!'
       idx = -1 
@@ -193,7 +193,7 @@ contains
       return
     end if
 
-    if (a%infoa(srtd_) == isrtdcoo) then 
+    if (a%infoa(psb_srtd_) == psb_isrtdcoo_) then 
 !!$      write(0,*) 'Gtrow_: srtd coo',irw
       ! In this case we can do a binary search. 
       do
@@ -274,7 +274,7 @@ contains
       
       if (associated(iren)) then 
         k = 0 
-        do i=1,a%infoa(nnz_)
+        do i=1,a%infoa(psb_nnz_)
           if ((a%ia1(i)>=irw).and.(a%ia1(i)<=lrw)) then 
             k = k + 1 
             if (k > nz) then
@@ -288,7 +288,7 @@ contains
         enddo
       else
         k = 0 
-        do i=1,a%infoa(nnz_)
+        do i=1,a%infoa(psb_nnz_)
           if ((a%ia1(i)>=irw).and.(a%ia1(i)<=lrw)) then 
             k = k + 1 
             if (k > nz) then
@@ -303,7 +303,7 @@ contains
       end if
     end if
 
-    b%infoa(nnz_) = nzb + k 
+    b%infoa(psb_nnz_) = nzb + k 
     b%m = b%m+lrw-irw+1
     b%k = max(b%k,a%k)
   end subroutine coo_dspgtrow

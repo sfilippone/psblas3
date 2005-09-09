@@ -2,7 +2,7 @@
      +     LARN,LKA,LJA,IPERM,WORK, LWORK, SIZE_REQ, IERROR)
 
       IMPLICIT NONE
-      INCLUDE  'sparker.fh'
+      INCLUDE  'psb_const.fh'
 
 C     ... Scalar arguments ...
       INTEGER          M, LWORK,N_BLOCKS,LARN,LKA,LJA,
@@ -16,7 +16,8 @@ C     ... Array arguments ...
       
 C     .... Local scalars ...
       INTEGER          I, J, BLOCK, ROW, COL, POINT_AR, POINT_JA, IP1,
-     +     IP2, IPX, NNZ, DIM_BLOCK, LIMIT, IPW,COUNT, IPC,CHECK_FLAG
+     +     IP2, IPX, NNZ, DIM_BLOCK, LIMIT, IPW,COUNT, IPC,CHECK_FLAG,
+     +     ERR_ACT
       LOGICAL          CSR
 c     .. Local Arrays ..
       CHARACTER*20       NAME
@@ -28,7 +29,7 @@ c     .. Local Arrays ..
 
       POINT_AR = 1
       POINT_JA = 0
-      CHECK_FLAG=IBITS(INFON(UPD_),1,2)
+      CHECK_FLAG=IBITS(INFON(PSB_UPD_),1,2)
 
       IF ((LARN.LT.POINT_AR).OR.(LKA.LT.POINT_AR)) THEN
          IERROR = 60
@@ -56,18 +57,18 @@ C     Prepare for smart regeneration
 C     
 
          IPW              = M + 2
-         IP1              = (LKA-IREG_FLGS-2)/2
-         IP2              = IP1+IREG_FLGS
+         IP1              = (LKA-PSB_IREG_FLGS_-2)/2
+         IP2              = IP1+PSB_IREG_FLGS_
          IPC              = IP2 + NNZ + 1
-         KA(IP1 + IPC_)   = IPC
-         KA(IP1+IP2_)     = IP2
-         INFON(UPD_PNT_)  = IP1
-         KA(IP1+IFLAG_)   = CHECK_FLAG
-         KA(IP1+NNZT_)    = NNZ
-         KA(IP1+NNZ_)     = 0
-         KA(IP1+ICHK_)    = NNZ+CHECK_FLAG
+         KA(IP1 + PSB_IPC_)   = IPC
+         KA(IP1+PSB_IP2_)     = IP2
+         INFON(PSB_UPD_PNT_)  = IP1
+         KA(IP1+PSB_IFLAG_)   = CHECK_FLAG
+         KA(IP1+PSB_NNZT_)    = NNZ
+         KA(IP1+PSB_NNZ_)     = 0
+         KA(IP1+PSB_ICHK_)    = NNZ+CHECK_FLAG
          I                = M+2
-         IPX              = IA2(I+IP2_)
+         IPX              = IA2(I+PSB_IP2_)
 
 C     Invert permutation for smart regeneration
 
@@ -81,12 +82,12 @@ C     Construct JAD matrix...
             COL = 1
             DIM_BLOCK = IA(1,BLOCK+1)-IA(1,BLOCK)
 c$$$  write(0,*) 'DGINDEX: BLOCK LOOP ',block,n_blocks,dim_block
-            if (dim_block .gt. maxjdrows) then 
+            if (dim_block .gt. PSB_MAXJDROWS_) then 
                write(0,*) 'Wrong value for dim_block',block,
      +              IA(1,BLOCK+1),IA(1,BLOCK)
                return
             endif
-            LIMIT = INT(DIM_BLOCK*PERCENT)
+            LIMIT = INT(DIM_BLOCK*PSB_PERCENT_)
             POINT_JA = POINT_JA+1
             IF (LJA.LT.POINT_JA) THEN
                IERROR = 60
@@ -244,7 +245,7 @@ c$$$  c      write(*,*)'inizio a ciclare sui blocchi'
          DO BLOCK = 1, N_BLOCKS
             COL = 1
             DIM_BLOCK = IA(1,BLOCK+1)-IA(1,BLOCK)
-            LIMIT = INT(DIM_BLOCK*PERCENT)
+            LIMIT = INT(DIM_BLOCK*PSB_PERCENT_)
             POINT_JA = POINT_JA+1
             IF (LJA.LT.POINT_JA) THEN
                IERROR = 60
@@ -386,7 +387,7 @@ C     ... For each nnzero elements belonging to current row ...
          
       ENDIF
       IA(2,N_BLOCKS+1) = POINT_JA
-      KA(IP1 + ZERO_) = COUNT
+      KA(IP1 + PSB_ZERO_) = COUNT
 
       IF(POINT_AR.GE.IP1) THEN
          SIZE_REQ=NNZ+COUNT

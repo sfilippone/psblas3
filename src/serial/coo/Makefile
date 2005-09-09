@@ -1,13 +1,10 @@
-include ../../../../Make.inc
+include ../../../Make.inc
 
 #
 # The object files
 #
+FOBJS =  dcooprt.o  dcoonrmi.o dcoomm.o dcoomv.o dcoosm.o dcoosv.o
 
-#FOBJS = dcsrck.o dcsrmm.o dcsrsm.o dsrmv.o dsrsv.o dcrnrmi.o dcrrs.o \
-#        dcrupdate.o dcooprt.o
-FOBJS =  dcooprt.o  dcoonrmi.o dcoomm.o dcoomv.o dcoosm.o dcoosv.o\
-	 zcoonrmi.o zcoomm.o zcoomv.o zcoosm.o zcoosv.o zcooprt.o
 
 #zcsrck.o zcrnrmi.o zcsrmm.o zsrmv.o zcsrsm.o zsrsv.o  
 
@@ -30,10 +27,6 @@ INCDIRS=-I. -I$(SPARKERDIR) -I$(LIBDIR)
 default: lib
 
 lib: $(OBJS)
-	$(AR) $(LIBFILE) $(OBJS) 
-	$(RANLIB) $(LIBFILE)
-
-$(OBJS): $(SPARKERDIR)/sparker.fh
 
 clean: cleanobjs
 

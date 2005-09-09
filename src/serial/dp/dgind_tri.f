@@ -2,7 +2,7 @@
      +     LARN,LKA,LJA,IPERM,WORK, LWORK, IERROR)
 
       IMPLICIT NONE
-      INCLUDE  'sparker.fh'
+      INCLUDE  'psb_const.fh'
 
 C     ... Scalar arguments ...
 
@@ -16,7 +16,7 @@ C     ... Array arguments ...
       
 C     .... Local scalars ...
       INTEGER          I, J, BLOCK, ROW, COL, POINT_AR, POINT_JA,
-     +     DIM_BLOCK, LIMIT
+     +     DIM_BLOCK, LIMIT, ERR_ACT
       LOGICAL          CSR
 c     .. Local Arrays ..
       CHARACTER*20       NAME
@@ -49,7 +49,7 @@ C     .... Invert Permutation Matrix...
       DO BLOCK = 1, N_BLOCKS
          COL = 1
          DIM_BLOCK = IA(1,BLOCK+1)-IA(1,BLOCK)
-         LIMIT = INT(DIM_BLOCK*PERCENT)
+         LIMIT = INT(DIM_BLOCK*PSB_PERCENT_)
          POINT_JA = POINT_JA+1
          IF (LJA.LT.POINT_JA) THEN
             IERROR = 60

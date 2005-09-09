@@ -12,6 +12,8 @@ C     .. Array Arguments ..
      +  GLOB_TO_LOC(*)
       CHARACTER         DESCRA*11,DESCRH*11, FIDA*5, FIDH*5
       DOUBLE PRECISION  A(*),H(*)    
+C     .. Local Scalars..
+      INTEGER          ERR_ACT
 C     .. Local Array..
       integer           int_val(5)
       double precision  real_val(5)

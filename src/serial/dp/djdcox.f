@@ -7,7 +7,7 @@ C
      *     LIA2N,AUX,LAUX,IERROR)
 
       IMPLICIT NONE
-      INCLUDE  'sparker.fh'
+      INCLUDE  'psb_const.fh'
 
 C     
 C     .. Scalar Arguments ..
@@ -21,7 +21,7 @@ C     .. Array Arguments ..
       CHARACTER          DESCRA*11, DESCRN*11
 C     .. Local Scalars .. 
       INTEGER            IPX, IPG, NNZ, K, ROW, 
-     *     I, J, NZL, IRET
+     *     I, J, NZL, IRET, ERR_ACT
       LOGICAL            SCALE
       logical     debug
       parameter   (debug=.false.)

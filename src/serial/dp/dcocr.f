@@ -6,7 +6,7 @@ C
      *  LIAN2,AUX,LAUX,IERROR)
 
       IMPLICIT NONE
-      INCLUDE  'sparker.fh'
+      INCLUDE  'psb_const.fh'
 
 C
 C     .. Scalar Arguments ..
@@ -21,7 +21,7 @@ C     .. Array Arguments ..
       CHARACTER          DESCRA*11, DESCRN*11
 C     .. Local Scalars ..
       INTEGER            NNZ, K, ROW, I, J, NZL, IRET
-      integer            ipx, ip1, ip2, CHECK_FLAG
+      integer            ipx, ip1, ip2, CHECK_FLAG, err_act
       INTEGER            ELEM, ELEM_CSR
       LOGICAL            SCALE
       INTEGER MAX_NNZERO
@@ -43,10 +43,10 @@ C
       IERROR = 0
       CALL FCPSB_ERRACTIONSAVE(ERR_ACT)
 
-      CHECK_FLAG=IBITS(INFO(UPD_),1,2)
+      CHECK_FLAG=IBITS(INFO(PSB_UPD_),1,2)
 c$$$      write(0,*) 'DCOCR FLAG ',info(upd_),check_flag
       IF (TRANS.EQ.'N') THEN
-        IERRV(1) = 0
+
         SCALE  = (UNITD.EQ.'L') ! meaningless
         P1(1) = 0
         P2(1) = 0
@@ -66,12 +66,12 @@ c$$$      write(0,*) 'DCOCR FLAG ',info(upd_),check_flag
           INT_VAL(1) = 18
           INT_VAL(2) = NNZ+2
           INT_VAL(3) = LAUX
-        ELSE IF (LIA1N.LT.NNZ) THEN
+        ELSE IF (LIAN1.LT.NNZ) THEN
           IERROR = 60
           INT_VAL(1) = 19
           INT_VAL(2) = NNZ+2
           INT_VAL(3) = LAUX
-        ELSE IF (LIA2N.LT.M+1) THEN
+        ELSE IF (LIAN2.LT.M+1) THEN
           IERROR = 60
           INT_VAL(1) = 20
           INT_VAL(2) = NNZ+2
@@ -96,7 +96,7 @@ c$$$            do k=1,nnz
 c$$$              write(*,*) k,ia(k),ja(k),ar(k)
 c$$$            enddo
 c$$$          endif
-          if ((lian2.ge.((m+1)+nnz+ireg_flgs+1))
+          if ((lian2.ge.((m+1)+nnz+psb_ireg_flgs_+1))
      +      .and.(laux.ge.2*(2+nnz))) then 
 C
 C       Prepare for smart regeneration
@@ -106,19 +106,19 @@ c
             do i=1, nnz
               aux(ipx+i-1) = i
             enddo
-            ip1              = m+2
-            infon(upd_pnt_)  = ip1
-            ip2              = ip1+ireg_flgs
-            ian2(ip1+ip2_)   = ip2
-            ian2(ip1+iflag_) = check_flag
-            ian2(ip1+nnzt_)  = nnz
-            ian2(ip1+nnz_)   = 0
-            ian2(ip1+ichk_)  = nnz+check_flag
+            ip1                  = m+2
+            infon(psb_upd_pnt_)  = ip1
+            ip2                  = ip1+psb_ireg_flgs_
+            ian2(ip1+psb_ip2_)   = ip2
+            ian2(ip1+psb_iflag_) = check_flag
+            ian2(ip1+psb_nnzt_)  = nnz
+            ian2(ip1+psb_nnz_)   = 0
+            ian2(ip1+psb_ichk_)  = nnz+check_flag
 
 c$$$             write(0,*)'DCOCR m,ip1,ip2,nnz',m,
 c$$$     +        ip1,ip2,nnz,ian2(ip1+nnzt_) 
 
-            if (debug) write(0,*) 'Build check :',ian2(ip1+nnzt_) 
+            if (debug) write(0,*) 'Build check :',ian2(ip1+psb_nnzt_) 
 C       .... Order with key IA ...
             CALL MRGSRT(NNZ,IA,AUX,IRET)
             IF (IRET.EQ.0) CALL REORDVN3(NNZ,AR,IA,JA,AUX(IPX),AUX)
@@ -151,10 +151,6 @@ c$$$     +          (J.LE.NNZ))
      +          AUX(IPX+I-1),AUX)
               I = J
             ENDDO
-
-
-
-
 
 C        ... Construct CSR Representation...
             ELEM = 1

@@ -99,6 +99,8 @@ C     .. Array Arguments ..
       DOUBLE PRECISION WORK(*)
       INTEGER          JA(*), IA(*), P(*)
       CHARACTER        DESCRA*11
+C     .. Local Scalars ..
+      INTEGER          ERR_ACT
 c     .. Local Arrays ..
       CHARACTER*20       NAME
       INTEGER            INT_VAL(5)

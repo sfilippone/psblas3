@@ -2,7 +2,7 @@
      +  INFOA,IA,JA,LATOT,LIA1TOT,LIA2TOT,
      +  DESCRH,H,IH1,IH2,INFOH,IH,JH,WORK,LWORK,IERRV)
       IMPLICIT NONE                                                      
-      INCLUDE  'sparker.fh'
+      INCLUDE  'psb_const.fh'
 C     .. Scalar Arguments ..                                             
       INTEGER          LWORK, M, N
       INTEGER          LATOT,LIA1TOT,LIA2TOT,IA,JA,IH,JH

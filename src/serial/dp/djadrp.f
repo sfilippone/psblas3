@@ -95,7 +95,7 @@ C     .. Array Arguments ..
       INTEGER          JA(*), IA(*), P(*)
       CHARACTER        DESCRA*11
 C     .. Local Scalars ..
-      INTEGER          PIA, PJA, PNG, IOFF
+      INTEGER          PIA, PJA, PNG, IOFF, ERR_ACT
 C     .. Intrinsic Functions ..
       INTRINSIC         DBLE
 c     .. Local Arrays ..

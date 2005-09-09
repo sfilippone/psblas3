@@ -4,6 +4,7 @@
 
 Subroutine psb_dipcsr2coo(a,info)
   use psb_spmat_type
+  use psb_const_mod
   use psb_error_mod
   implicit none
 
@@ -11,12 +12,12 @@ Subroutine psb_dipcsr2coo(a,info)
   Type(psb_dspmat_type), intent(inout) :: A
   Integer, intent(out)                 :: info
 
-  integer, pointer    :: iaux(:), itemp(:)
   !locals
   Integer             :: nza, nr
   integer             :: i,j,err_act
   logical, parameter  :: debug=.false.
-  character(len=20)                 :: name, ch_err
+  integer, pointer    :: iaux(:), itemp(:)
+  character(len=20)   :: name, ch_err
 
   name='psb_dipcsr2coo'
   info  = 0
@@ -47,8 +48,8 @@ Subroutine psb_dipcsr2coo(a,info)
   end do
   
   a%fida='COO'
-  a%infoa(nnz_) = nza
-  a%infoa(srtd_) = isrtdcoo
+  a%infoa(psb_nnz_) = nza
+  a%infoa(psb_srtd_) = psb_isrtdcoo_
   deallocate(itemp)
 
   call psb_erractionrestore(err_act)

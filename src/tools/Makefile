@@ -11,7 +11,7 @@ FOBJS = psb_dallc.o psb_dasb.o psb_dcsrp.o psb_descprt.o \
 
 MPFOBJS = psb_descasb.o psb_dcsrovr.o
 
-INCDIRS = ../../lib .
+INCDIRS = -I ../../lib -I .
 
 lib: mpfobjs $(FOBJS)
 

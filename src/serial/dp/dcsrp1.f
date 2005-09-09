@@ -87,7 +87,7 @@ C
       SUBROUTINE DCSRP1(TRANS,M,N,DESCRA,JA,IA,
      +   P,WORK,IWORK,LWORK,IERROR)
       IMPLICIT NONE
-      INCLUDE 'sparker.fh'
+      INCLUDE 'psb_const.fh'
 C     .. Scalar Arguments ..
       INTEGER          LWORK,M, N, IERROR
       CHARACTER        TRANS
@@ -96,7 +96,7 @@ C     .. Array Arguments ..
       INTEGER          JA(*), IA(*), P(*), IWORK(*)
       CHARACTER        DESCRA*11
 C     .. Local Scalars ..
-      INTEGER          I, J
+      INTEGER          I, J, ERR_ACT
 c     .. Local Arrays ..
       CHARACTER*20       NAME
       INTEGER            INT_VAL(5)
@@ -122,9 +122,9 @@ C        LWORK refers here to INTEGER IWORK (alias for WORK)
 C
          IF(LWORK.LT.M) THEN
           IERROR = 60
-          INT_VAL(1) = 18
-          INT_VAL(2) = NNZ+2
-          INT_VAL(3) = LAUX
+          INT_VAL(1) = 10
+          INT_VAL(2) = M
+          INT_VAL(3) = LWORK
           CALL FCPSB_ERRPUSH(IERROR,NAME,INT_VAL)
           GOTO 9999
          ENDIF
@@ -145,7 +145,7 @@ C
 C
 C        WORK(1) refers here to a value for a DOUBLE PRECISION WORK
 C
-         WORK(1) = DBLE((M+1)/DBLEINT_)
+         WORK(1) = DBLE((M+1)/PSB_DBLEINT_)
       ENDIF
 
       CALL FCPSB_ERRACTIONRESTORE(ERR_ACT)

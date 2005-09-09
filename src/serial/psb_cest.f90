@@ -1,6 +1,7 @@
 subroutine psb_cest(afmt, nnz, lia1, lia2, lar, up, info)
 
   use psb_error_mod
+  use psb_const_mod
   implicit none
 
   !     .. scalar arguments ..
@@ -11,11 +12,11 @@ subroutine psb_cest(afmt, nnz, lia1, lia2, lar, up, info)
   integer           ::  int_val(5), err_act
   character(len=20) ::  name
 
-  name = 'cest'      
+  name = 'psb_cest'      
   call psb_erractionsave(err_act)
 
   if (afmt.eq.'???') then 
-     afmt = fidef
+     afmt = psb_fidef_
   endif
 
   if (up.eq.'y') then
@@ -39,15 +40,15 @@ subroutine psb_cest(afmt, nnz, lia1, lia2, lar, up, info)
 
   else if (up.eq.'n') then
 
-     if (afmt.eq.'jad') then 
+     if (afmt.eq.'JAD') then 
         lia1 = nnz + nnz/5
         lia2 = nnz + nnz/5
         lar = nnz + nnz/5
-     else if (afmt.eq.'coo') then 
+     else if (afmt.eq.'COO') then 
         lia1 = nnz
         lia2 = nnz
         lar = nnz
-     else if(afmt.eq.'csr') then
+     else if(afmt.eq.'CSR') then
         lia1 = nnz
         lia2 = nnz
         lar = nnz
