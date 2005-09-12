@@ -27,9 +27,9 @@ function psb_dasum (x,desc_a, info, jx)
   real(kind(1.d0))                  :: psb_dasum
 
   ! locals
-  integer                  :: int_err(5), icontxt, nprow, npcol, me, mycol,&
-       & err_act, n, iix, jjx, temp(2)
-  real(kind(1.d0))         :: asum
+  integer                  :: int_err(5), icontxt, nprow, npcol, myrow, mycol,&
+       & err_act, n, iix, jjx, temp(2), ix, ijx, m, i
+  real(kind(1.d0))         :: asum, dasum
   real(kind(1.d0)),pointer :: tmpx(:)
   character(len=20)        :: name, ch_err
 
@@ -39,10 +39,10 @@ function psb_dasum (x,desc_a, info, jx)
 
   asum=0.d0
 
-  icontxt=desc_data(psb_ctxt_)
+  icontxt=desc_a%matrix_data(psb_ctxt_)
 
   ! check on blacs grid 
-  call blacs_gridinfo(icontxt, nprow, npcol, me, mypcol)
+  call blacs_gridinfo(icontxt, nprow, npcol, myrow, mycol)
   if (nprow == -1) then
     info = 2010
     call psb_errpush(info,name)
@@ -61,30 +61,27 @@ function psb_dasum (x,desc_a, info, jx)
      ijx = 1
   endif
 
-  m = desc_data(m_)
+  m = desc_a%matrix_data(psb_m_)
 
   ! check vector correctness
-  call psb_chkvect(m,1,size(x,1),ix,ijx,desc_data%matrix_data,info,iix,jjx)
+  call psb_chkvect(m,1,size(x,1),ix,ijx,desc_a%matrix_data,info,iix,jjx)
   if(info.ne.0) then
      info=4010
      ch_err='psb_chkvect'
      call psb_errpush(info,name,a_err=ch_err)
+     goto 9999
   end if
 
   if (iix.ne.1) then
      info=3040
      call psb_errpush(info,name)
+     goto 9999
   end if
-
-  err=info
-  call psb_errcomm(icontxt,err)
-  if(err.ne.0) goto 9999
 
   ! compute local max
   if ((m.ne.0)) then
-     if(desc_data(psb_n_row_).gt.0) then
-        tmpx => x(iix:,jjx)
-        asum=dasum(desc_data(n_row),tmpx,ione)
+     if(desc_a%matrix_data(psb_n_row_).gt.0) then
+        asum=dasum(desc_a%matrix_data(psb_n_row_)-iix+1,x(iix,jjx),ione)
 
         ! adjust asum because overlapped elements are computed more than once
         i=1
@@ -149,9 +146,9 @@ function psb_dasumv (x,desc_a, info)
   real(kind(1.d0))                  :: psb_dasumv
 
   ! locals
-  integer                  :: int_err(5), icontxt, nprow, npcol, me, mycol,&
-       & err_act, n, iix, jjx, temp(2)
-  real(kind(1.d0))         :: asum
+  integer                  :: int_err(5), icontxt, nprow, npcol, myrow, mycol,&
+       & err_act, n, iix, jjx, temp(2), jx, ix, ijx, m, i
+  real(kind(1.d0))         :: asum, dasum
   real(kind(1.d0)),pointer :: tmpx(:)
   character(len=20)        :: name, ch_err
 
@@ -159,13 +156,12 @@ function psb_dasumv (x,desc_a, info)
   info=0
   call psb_erractionsave(err_act)
 
-  locmax(:)=0.d0
   asum=0.d0
 
-  icontxt=desc_data(psb_ctxt_)
+  icontxt=desc_a%matrix_data(psb_ctxt_)
 
   ! check on blacs grid 
-  call blacs_gridinfo(icontxt, nprow, npcol, me, mypcol)
+  call blacs_gridinfo(icontxt, nprow, npcol, myrow, mycol)
   if (nprow == -1) then
     info = 2010
     call psb_errpush(info,name)
@@ -178,32 +174,29 @@ function psb_dasumv (x,desc_a, info)
   endif
   
   ix = 1
-  jx = 1
+  jx=1
 
-  m = desc_data(m_)
+  m = desc_a%matrix_data(psb_m_)
 
   ! check vector correctness
-  call psb_chkvect(m,1,size(x),ix,jx,desc_data%matrix_data,info,iix,jjx)
+  call psb_chkvect(m,1,size(x),ix,jx,desc_a%matrix_data,info,iix,jjx)
   if(info.ne.0) then
      info=4010
      ch_err='psb_chkvect'
      call psb_errpush(info,name,a_err=ch_err)
+     goto 9999
   end if
 
   if (iix.ne.1) then
      info=3040
      call psb_errpush(info,name)
+     goto 9999
   end if
-
-  err=info
-  call psb_errcomm(icontxt,err)
-  if(err.ne.0) goto 9999
 
   ! compute local max
   if ((m.ne.0)) then
-     if(desc_data(psb_n_row_).gt.0) then
-        tmpx => x(:)
-        asum=dasum(desc_data(n_row),tmpx,ione)
+     if(desc_a%matrix_data(psb_n_row_).gt.0) then
+        asum=dasum(desc_a%matrix_data(psb_n_row_),x,ione)
 
         ! adjust asum because overlapped elements are computed more than once
         i=1
@@ -228,7 +221,6 @@ function psb_dasumv (x,desc_a, info)
      asum=0.d0
   end if
   
-
   psb_dasumv=asum
 
   call psb_erractionrestore(err_act)
@@ -242,7 +234,7 @@ function psb_dasumv (x,desc_a, info)
      return
   end if
   return
-end function psb_dasum
+end function psb_dasumv
 
 
 ! Subroutine: psb_dasum vs
@@ -269,9 +261,9 @@ subroutine psb_dasumvs (res,x,desc_a, info)
   integer, intent(out)              :: info
 
   ! locals
-  integer                  :: int_err(5), icontxt, nprow, npcol, me, mycol,&
-       & err_act, n, iix, jjx, temp(2)
-  real(kind(1.d0))         :: asum
+  integer                  :: int_err(5), icontxt, nprow, npcol, myrow, mycol,&
+       & err_act, n, iix, jjx, temp(2), ix, jx, ijx, m, i
+  real(kind(1.d0))         :: asum, dasum
   real(kind(1.d0)),pointer :: tmpx(:)
   character(len=20)        :: name, ch_err
 
@@ -279,13 +271,12 @@ subroutine psb_dasumvs (res,x,desc_a, info)
   info=0
   call psb_erractionsave(err_act)
 
-  locmax(:)=0.d0
   asum=0.d0
 
-  icontxt=desc_data(psb_ctxt_)
+  icontxt=desc_a%matrix_data(psb_ctxt_)
 
   ! check on blacs grid 
-  call blacs_gridinfo(icontxt, nprow, npcol, me, mypcol)
+  call blacs_gridinfo(icontxt, nprow, npcol, myrow, mycol)
   if (nprow == -1) then
     info = 2010
     call psb_errpush(info,name)
@@ -300,30 +291,27 @@ subroutine psb_dasumvs (res,x,desc_a, info)
   ix = 1
   jx = 1
 
-  m = desc_data(m_)
+  m = desc_a%matrix_data(psb_m_)
 
   ! check vector correctness
-  call psb_chkvect(m,1,size(x),ix,jx,desc_data%matrix_data,info,iix,jjx)
+  call psb_chkvect(m,1,size(x),ix,jx,desc_a%matrix_data,info,iix,jjx)
   if(info.ne.0) then
      info=4010
      ch_err='psb_chkvect'
      call psb_errpush(info,name,a_err=ch_err)
+     goto 9999
   end if
 
   if (iix.ne.1) then
      info=3040
      call psb_errpush(info,name)
+     goto 9999
   end if
-
-  err=info
-  call psb_errcomm(icontxt,err)
-  if(err.ne.0) goto 9999
 
   ! compute local max
   if ((m.ne.0)) then
-     if(desc_data(psb_n_row_).gt.0) then
-        tmpx => x(:)
-        asum=dasum(desc_data(n_row),tmpx,ione)
+     if(desc_a%matrix_data(psb_n_row_).gt.0) then
+        asum=dasum(desc_a%matrix_data(psb_n_row_),x,ione)
 
         ! adjust asum because overlapped elements are computed more than once
         i=1
