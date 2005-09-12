@@ -28,6 +28,8 @@ INCDIRS=-I. -I$(LIBDIR)
 default: lib
 
 lib: $(OBJS)
+	$(AR) $(LIBDIR)/$(LIBNAME) $(OBJS)
+	$(RANLIB) $(LIBDIR)/$(LIBNAME)
 
 clean: cleanobjs
 

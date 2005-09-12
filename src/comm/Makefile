@@ -5,8 +5,11 @@ OBJS = psb_dgather.o psb_dhalo.o psb_dovrl.o \
 
 MPFOBJS = psb_dscatter.o
 INCDIRS = -I ../../lib -I .
+LIBDIR = ../../lib
 
 lib: mpfobjs $(OBJS)
+	$(AR) $(LIBDIR)/$(LIBNAME) $(MPFOBJS) $(OBJS)
+	$(RANLIB) $(LIBDIR)/$(LIBNAME)
 
 
 mpfobjs: 
@@ -15,3 +18,5 @@ mpfobjs:
 
 clean:
 	/bin/rm -f $(MPFOBJS) $(OBJS)
+
+veryclean: clean

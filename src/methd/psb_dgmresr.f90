@@ -106,7 +106,7 @@ Subroutine psb_dgmresr(a,prec,b,x,eps,desc_a,info,&
 
   If (debug) Write(0,*) 'psb_dgmres: from gridinfo',nprows,npcols,me
 
-  mglob = desc_a%matrix_data(m_)
+  mglob = desc_a%matrix_data(psb_m_)
   n_row = desc_a%matrix_data(psb_n_row_)
   n_col = desc_a%matrix_data(psb_n_col_)
 

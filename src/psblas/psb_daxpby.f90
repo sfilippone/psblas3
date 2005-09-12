@@ -32,8 +32,8 @@ subroutine  psb_daxpby(alpha, x, beta,y,desc_a,info, n, jx, jy)
   real(kind(1.D0)), intent(inout) :: y(:,:)
 
   ! locals
-  integer                  :: int_err(5), icontxt, nprow, npcol, me, mycol,&
-       & err_act, n, iix, jjx, temp(2)
+  integer                  :: int_err(5), icontxt, nprow, npcol, myrow, mycol,&
+       & err_act, iix, jjx, temp(2), ix, iy, ijx, ijy, m, iiy, in, jjy
   real(kind(1.d0)),pointer :: tmpx(:)
   character(len=20)        :: name, ch_err
 
@@ -41,10 +41,10 @@ subroutine  psb_daxpby(alpha, x, beta,y,desc_a,info, n, jx, jy)
   info=0
   call psb_erractionsave(err_act)
 
-  icontxt=desc_data(psb_ctxt_)
+  icontxt=desc_a%matrix_data(psb_ctxt_)
 
   ! check on blacs grid 
-  call blacs_gridinfo(icontxt, nprow, npcol, me, mypcol)
+  call blacs_gridinfo(icontxt, nprow, npcol, myrow, mycol)
   if (nprow == -ione) then
     info = 2010
     call psb_errpush(info,name)
@@ -87,11 +87,11 @@ subroutine  psb_daxpby(alpha, x, beta,y,desc_a,info, n, jx, jy)
      goto 9999
   end if
 
-  m = desc_data(m_)
+  m = desc_a%matrix_data(psb_m_)
 
   ! check vector correctness
-  call psb_chkvect(m,ione,size(x,1),ix,ijx,desc_data%matrix_data,info,iix,jjx)
-  call psb_chkvect(m,ione,size(y,1),iy,ijy,desc_data%matrix_data,info,iiy,jjy)
+  call psb_chkvect(m,ione,size(x,1),ix,ijx,desc_a%matrix_data,info,iix,jjx)
+  call psb_chkvect(m,ione,size(y,1),iy,ijy,desc_a%matrix_data,info,iiy,jjy)
   if(info.ne.0) then
      info=4010
      ch_err='psb_chkvect'
@@ -106,7 +106,7 @@ subroutine  psb_daxpby(alpha, x, beta,y,desc_a,info, n, jx, jy)
   end if
   
   if ((in.ne.0)) then
-     if(desc_data(psb_n_row_).gt.0) then
+     if(desc_a%matrix_data(psb_n_row_).gt.0) then
         call daxpby(desc_a%matrix_data(psb_n_col_),in,&
              & alpha,x(iix,jjx),size(x,1),beta,&
              & y(iiy,jjy),size(y,1),info)
@@ -156,18 +156,18 @@ subroutine  psb_psdaxpbyv(alpha, x, beta,y,desc_a,info)
   real(kind(1.D0)), intent(inout) :: y(:)
 
   ! locals
-  integer                  :: int_err(5), icontxt, nprow, npcol, me, mycol,&
-       & err_act, n, iix, jjx, temp(2)
+  integer                  :: int_err(5), icontxt, nprow, npcol, myrow, mycol,&
+       & err_act, n, iix, jjx, temp(2), ix, iy, ijx, m, iiy, in, jjy
   character(len=20)        :: name, ch_err
 
   name='psb_daxpby'
   info=0
   call psb_erractionsave(err_act)
 
-  icontxt=desc_data(psb_ctxt_)
+  icontxt=desc_a%matrix_data(psb_ctxt_)
 
   ! check on blacs grid 
-  call blacs_gridinfo(icontxt, nprow, npcol, me, mypcol)
+  call blacs_gridinfo(icontxt, nprow, npcol, myrow, mycol)
   if (nprow == -ione) then
     info = 2010
     call psb_errpush(info,name)
@@ -182,11 +182,11 @@ subroutine  psb_psdaxpbyv(alpha, x, beta,y,desc_a,info)
   ix = ione
   iy = ione
 
-  m = desc_data(m_)
+  m = desc_a%matrix_data(psb_m_)
 
   ! check vector correctness
-  call psb_chkvect(m,ione,size(x),ix,ione,desc_data%matrix_data,info,iix,jjx)
-  call psb_chkvect(m,ione,size(y),iy,ione,desc_data%matrix_data,info,iiy,jjy)
+  call psb_chkvect(m,ione,size(x),ix,ione,desc_a%matrix_data,info,iix,jjx)
+  call psb_chkvect(m,ione,size(y),iy,ione,desc_a%matrix_data,info,iiy,jjy)
   if(info.ne.0) then
      info=4010
      ch_err='psb_chkvect'
@@ -199,7 +199,7 @@ subroutine  psb_psdaxpbyv(alpha, x, beta,y,desc_a,info)
   end if
   
   if ((in.ne.0)) then
-     if(desc_data(psb_n_row_).gt.0) then
+     if(desc_a%matrix_data(psb_n_row_).gt.0) then
         call daxpby(desc_a%matrix_data(psb_n_col_),ione,&
              & alpha,x,size(x),beta,&
              & y,size(y),info)

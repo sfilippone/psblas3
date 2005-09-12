@@ -10,8 +10,11 @@ FOBJS = psb_cest.o psb_dcoins.o psb_dcsdp.o psb_dcsmm.o psb_dcsmv.o \
 
 
 INCDIRS = -I ../../lib -I .
+LIBDIR = ../../lib
 
 lib: auxd cood csrd jadd f77d dpd lib1
+	$(AR) $(LIBDIR)/$(LIBNAME) $(FOBJS)
+	$(RANLIB) $(LIBDIR)/$(LIBNAME)
 
 
 lib1:	$(FOBJS)
@@ -43,3 +46,12 @@ clean:
 	(cd jad; make clean)
 	(cd dp; make  clean)
 	(cd f77; make clean)
+
+veryclean:
+	/bin/rm -f $(FOBJS)
+	(cd aux; make veryclean)
+	(cd coo; make veryclean)
+	(cd csr; make veryclean)
+	(cd jad; make veryclean)
+	(cd dp; make  veryclean)
+	(cd f77; make veryclean)

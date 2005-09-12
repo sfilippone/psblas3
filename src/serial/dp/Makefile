@@ -29,6 +29,8 @@ INCDIRS=-I. -I$(LIBDIR)
 
 
 lib: $(FOBJS)
+	$(AR) $(LIBDIR)/$(LIBNAME) $(OBJS)
+	$(RANLIB) $(LIBDIR)/$(LIBNAME)
 
 clean: cleanobjs
 

@@ -1,7 +1,7 @@
 subroutine psb_dgenaggrmap(aggr_type,a,desc_a,nlaggr,ilaggr,info)
   use psb_spmat_type
   use psb_serial_mod
-  use psb_desc_type
+  use psb_descriptor_type
   use psb_error_mod
   implicit none
   integer, intent(in)               :: aggr_type

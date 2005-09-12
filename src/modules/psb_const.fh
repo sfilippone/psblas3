@@ -30,7 +30,7 @@
       integer, parameter :: psb_n_dom_ovr_=1
       integer, parameter :: psb_nnz_=1
       integer, parameter :: psb_no_comm_=-1
-      integer, parameter :: ione=1, done=1.d0, izero=0, dzero=0.d0
+      integer, parameter :: ione=1, izero=0
       integer, parameter :: itwo=2, ithree=3,mone=-1, psb_root_=0
       integer, parameter :: psb_nztotreq_=1, psb_nzrowreq_=2
       integer, parameter :: psb_nzsizereq_=3
@@ -48,6 +48,7 @@
       integer, parameter :: act_ret=0, act_abort=1, no_err=0
 
       real(kind(1.d0)), parameter :: psb_colrow_=0.33, psb_percent_=0.7
+      real(kind(1.d0)), parameter :: dzero=0.d0, done=1.d0
 
       character, parameter :: psb_all_='A',  psb_topdef_=' '
       character(len=5) :: psb_fidef_='CSR'

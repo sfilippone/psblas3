@@ -39,8 +39,8 @@ subroutine psb_dprecset(p,ptype,iv,rs,rv,info)
   case ('NONE','NOPREC') 
     p%baseprecv(1)%iprcparm(p_type_)     = noprec_
     p%baseprecv(1)%iprcparm(f_type_)     = f_none_
-    p%baseprecv(1)%iprcparm(restr_)      = none_
-    p%baseprecv(1)%iprcparm(prol_)       = none_
+    p%baseprecv(1)%iprcparm(restr_)      = psb_none_
+    p%baseprecv(1)%iprcparm(prol_)       = psb_none_
     p%baseprecv(1)%iprcparm(iren_)       = 0
     p%baseprecv(1)%iprcparm(n_ovr_)      = 0
     p%baseprecv(1)%iprcparm(jac_sweeps_) = 1
@@ -48,8 +48,8 @@ subroutine psb_dprecset(p,ptype,iv,rs,rv,info)
   case ('DIAG','DIAGSC')
     p%baseprecv(1)%iprcparm(p_type_)     = diagsc_
     p%baseprecv(1)%iprcparm(f_type_)     = f_none_
-    p%baseprecv(1)%iprcparm(restr_)      = none_
-    p%baseprecv(1)%iprcparm(prol_)       = none_
+    p%baseprecv(1)%iprcparm(restr_)      = psb_none_
+    p%baseprecv(1)%iprcparm(prol_)       = psb_none_
     p%baseprecv(1)%iprcparm(iren_)       = 0 
     p%baseprecv(1)%iprcparm(n_ovr_)      = 0
     p%baseprecv(1)%iprcparm(jac_sweeps_) = 1
@@ -57,8 +57,8 @@ subroutine psb_dprecset(p,ptype,iv,rs,rv,info)
   case ('BJA','ILU') 
     p%baseprecv(1)%iprcparm(p_type_)      = bja_
     p%baseprecv(1)%iprcparm(f_type_)      = f_ilu_n_
-    p%baseprecv(1)%iprcparm(restr_)       = none_
-    p%baseprecv(1)%iprcparm(prol_)        = none_
+    p%baseprecv(1)%iprcparm(restr_)       = psb_none_
+    p%baseprecv(1)%iprcparm(prol_)        = psb_none_
     p%baseprecv(1)%iprcparm(iren_)        = 0
     p%baseprecv(1)%iprcparm(n_ovr_)       = 0
     p%baseprecv(1)%iprcparm(ilu_fill_in_) = 0
@@ -68,8 +68,8 @@ subroutine psb_dprecset(p,ptype,iv,rs,rv,info)
     ! Defaults first 
     p%baseprecv(1)%iprcparm(p_type_)      = asm_
     p%baseprecv(1)%iprcparm(f_type_)      = f_ilu_n_
-    p%baseprecv(1)%iprcparm(restr_)       = halo_
-    p%baseprecv(1)%iprcparm(prol_)        = none_
+    p%baseprecv(1)%iprcparm(restr_)       = psb_halo_
+    p%baseprecv(1)%iprcparm(prol_)        = psb_none_
     p%baseprecv(1)%iprcparm(iren_)        = 0
     p%baseprecv(1)%iprcparm(n_ovr_)       = 1
     p%baseprecv(1)%iprcparm(ilu_fill_in_) = 0

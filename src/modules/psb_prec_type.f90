@@ -12,7 +12,7 @@ module psb_prec_type
        & asm_=3, ras_=5, ash_=4, rash_=6, ras2lv_=7, ras2lvm_=8,&
        & lv2mras_=9, lv2smth_=10, lv2lsm_=11, sl2sm_=12, superlu_=13,&
        & new_loc_smth_=14, new_glb_smth_=15, max_prec_=15
-  ! Multilevel stuff. 
+  ! Multilevel stuff.
   integer, parameter :: no_ml_=0, add_ml_prec_=1, mult_ml_prec_=2
   integer, parameter :: new_ml_prec_=3, max_ml_=new_ml_prec_
   integer, parameter :: pre_smooth_=1, post_smooth_=2, smooth_both_=3,&

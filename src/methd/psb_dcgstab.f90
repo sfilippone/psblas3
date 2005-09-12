@@ -71,7 +71,7 @@ Subroutine psb_dcgstab(a,prec,b,x,eps,desc_a,info,&
   Integer, Pointer           :: iperm(:), ipnull(:), ipsave(:)
   Real(Kind(1.d0)) ::rerr
   Integer       ::litmax, liter, naux, m, mglob, it,itrac,&
-       & nprows,npcols,me,mecol, n_row, n_col
+       & nprows,npcols,myrow,mycol, n_row, n_col
   Character     ::diagl, diagu
   Logical, Parameter :: debug = .false.
   Logical, Parameter :: exchange=.True., noexchange=.False., debug1 = .False.
@@ -92,11 +92,11 @@ Subroutine psb_dcgstab(a,prec,b,x,eps,desc_a,info,&
   call psb_erractionsave(err_act)
 
   If (debug) Write(*,*) 'Entering PSB_DCGSTAB',present(istop)
-  icontxt = desc_a%MATRIX_DATA(CTXT_)
-  CALL BLACS_GRIDINFO(icontxt,NPROWS,NPCOLS,ME,MECOL)
-  if (debug) write(*,*) 'PSB_DCGSTAB: From GRIDINFO',nprows,npcols,me
+  icontxt = desc_a%matrix_data(psb_ctxt_)
+  CALL blacs_gridinfo(icontxt,nprows,npcols,myrow,mycol)
+  if (debug) write(*,*) 'PSB_DCGSTAB: From GRIDINFO',nprows,npcols,myrow
 
-  mglob = desc_a%matrix_data(m_)
+  mglob = desc_a%matrix_data(psb_m_)
   n_row = desc_a%matrix_data(psb_n_row_)
   n_col = desc_a%matrix_data(psb_n_col_)
 
@@ -222,7 +222,7 @@ Subroutine psb_dcgstab(a,prec,b,x,eps,desc_a,info,&
     End If
     If (rn0 == 0.d0 ) Then 
       If (itrac /= -1) Then 
-        If (me == 0) Write(itrac,*) 'BiCGSTAB: ',itx,rn0
+        If (myrow == 0) Write(itrac,*) 'BiCGSTAB: ',itx,rn0
       Endif
       Exit restart
     End If
@@ -231,13 +231,13 @@ Subroutine psb_dcgstab(a,prec,b,x,eps,desc_a,info,&
       xni  = psb_amax(x,desc_a,info)
       rerr =  rni/(ani*xni+bni)
       If (itrac /= -1) Then 
-        If (me == 0) Write(itrac,'(a,i4,5(2x,es10.4))') 'bicgstab: ',itx,rerr,rni,bni,&
+        If (myrow == 0) Write(itrac,'(a,i4,5(2x,es10.4))') 'bicgstab: ',itx,rerr,rni,bni,&
              &xni,ani
       Endif
     Else  If (listop == 2) Then 
       rerr = rni/bn2
       If (itrac /= -1) Then 
-        If (me == 0) Write(itrac,'(a,i4,3(2x,es10.4))') 'bicgstab: ',itx,rerr,rni,bn2
+        If (myrow == 0) Write(itrac,'(a,i4,3(2x,es10.4))') 'bicgstab: ',itx,rerr,rni,bn2
       Endif
     Endif
     if (info /= 0) Then 
@@ -313,7 +313,7 @@ Subroutine psb_dcgstab(a,prec,b,x,eps,desc_a,info,&
         xni = psb_amax(x,desc_a,info)
         rerr =  rni/(ani*xni+bni)
         If (itrac /= -1) Then 
-          If (me == 0) Write(itrac,'(a,i4,5(2x,es10.4))') 'bicgstab: ',itx,rerr,rni,bni,&
+          If (myrow == 0) Write(itrac,'(a,i4,5(2x,es10.4))') 'bicgstab: ',itx,rerr,rni,bni,&
                &xni,ani
         Endif
 
@@ -321,7 +321,7 @@ Subroutine psb_dcgstab(a,prec,b,x,eps,desc_a,info,&
         rni = psb_nrm2(r,desc_a,info)
         rerr = rni/bn2
         If (itrac /= -1) Then 
-          If (me == 0) Write(itrac,'(a,i4,3(2x,es10.4)))') 'bicgstab: ',itx,rerr,rni,bn2
+          If (myrow == 0) Write(itrac,'(a,i4,3(2x,es10.4)))') 'bicgstab: ',itx,rerr,rni,bn2
         Endif
       Endif
       

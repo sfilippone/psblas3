@@ -18,7 +18,7 @@ subroutine psb_dprecaply(prec,x,y,desc_data,info,trans, work)
   ! Local variables
   character     ::trans_ 
   real(kind(1.d0)), pointer :: work_(:)
-  integer :: icontxt,nprow,npcol,me,mycol,err_act
+  integer :: icontxt,nprow,npcol,me,mycol,err_act, int_err(5)
   logical,parameter                 :: debug=.false., debugprt=.false.
   real(kind(1.d0)), parameter       :: one=1.d0, zero=0.d0
   external mpi_wtime
@@ -101,7 +101,7 @@ subroutine psb_dbaseprcaply(prec,x,beta,y,desc_data,trans,work,info)
   integer, intent(out)              :: info
 
   ! Local variables
-  integer :: n_row,n_col
+  integer :: n_row,n_col, int_err(5)
   real(kind(1.d0)), pointer :: ww(:), aux(:), tx(:),ty(:)
   character     ::diagl, diagu
   integer :: icontxt,nprow,npcol,me,mycol,i, isz, nrg, err_act
@@ -127,7 +127,7 @@ subroutine psb_dbaseprcaply(prec,x,beta,y,desc_data,trans,work,info)
   case default
      info=40
      int_err(1)=6
-     ch_err(2)=trans
+     ch_err(2:2)=trans
      goto 9999
   end select
 
@@ -164,7 +164,7 @@ subroutine psb_dbaseprcaply(prec,x,beta,y,desc_data,trans,work,info)
     call psb_bjacaply(prec,x,beta,y,desc_data,trans,work,info)
     if(info.ne.0) then
        info=4010
-       ch_err=psb_bjacaply
+       ch_err='psb_bjacaply'
        goto 9999
     end if
 
@@ -199,14 +199,14 @@ subroutine psb_dbaseprcaply(prec,x,beta,y,desc_data,trans,work,info)
     tx(1:desc_data%matrix_data(psb_n_row_)) = x(1:desc_data%matrix_data(psb_n_row_)) 
     tx(desc_data%matrix_data(psb_n_row_)+1:isz) = zero
 
-    if (prec%iprcparm(restr_)==halo_) then 
+    if (prec%iprcparm(restr_)==psb_halo_) then 
       call psb_halo(tx,prec%desc_data,info,work=aux)
       if(info /=0) then
          info=4010
          ch_err='psb_halo'
          goto 9999
       end if
-    else if (prec%iprcparm(restr_) /= none_) then 
+    else if (prec%iprcparm(restr_) /= psb_none_) then 
       write(0,*) 'Problem in PRCAPLY: Unknown value for restriction ',&
            &prec%iprcparm(restr_)
     end if
@@ -233,11 +233,11 @@ subroutine psb_dbaseprcaply(prec,x,beta,y,desc_data,trans,work,info)
 
     select case (prec%iprcparm(prol_)) 
 
-    case(none_) 
+    case(psb_none_) 
       ! Would work anyway, but since it's supposed to do nothing...
       ! call f90_psovrl(ty,prec%desc_data,update_type=prec%a_restrict)
 
-    case(sum_,avg_) 
+    case(psb_sum_,psb_avg_) 
       call psb_ovrl(ty,prec%desc_data,info,&
            & update_type=prec%iprcparm(prol_),work=aux)
       if(info /=0) then
@@ -284,7 +284,7 @@ subroutine psb_dbaseprcaply(prec,x,beta,y,desc_data,trans,work,info)
   return
 
 9999 continue
-  call psb_errpush(info,name,i_err=int_err=a_err=ch_err)
+  call psb_errpush(info,name,i_err=int_err,a_err=ch_err)
   call psb_erractionrestore(err_act)
   if (err_act.eq.act_abort) then
     call psb_error()
@@ -324,7 +324,7 @@ subroutine psb_dbjacaply(prec,x,beta,y,desc_data,trans,work,info)
   integer :: n_row,n_col
   real(kind(1.d0)), pointer :: ww(:), aux(:), tx(:),ty(:),tb(:)
   character     ::diagl, diagu
-  integer :: icontxt,nprow,npcol,me,mycol,i, isz, nrg, err_act
+  integer :: icontxt,nprow,npcol,me,mycol,i, isz, nrg, err_act, int_err(5)
   real(kind(1.d0)) :: t1, t2, t3, t4, t5, t6, t7, mpi_wtime
   logical,parameter                 :: debug=.false., debugprt=.false.
   real(kind(1.d0)), parameter       :: one=1.d0, zero=0.d0
@@ -374,18 +374,18 @@ subroutine psb_dbjacaply(prec,x,beta,y,desc_data,trans,work,info)
       case('N','n')
 
         call psb_spsm(one,prec%av(l_pr_),x,zero,ww,desc_data,info,&
-             & trans='N',unit=diagl,choice=none_,work=aux)
+             & trans='N',unit=diagl,choice=psb_none_,work=aux)
         ww(1:n_row) = ww(1:n_row)*prec%d(1:n_row)
         call psb_spsm(one,prec%av(u_pr_),ww,beta,y,desc_data,info,&
-             & trans='N',unit=diagu,choice=none_, work=aux)
+             & trans='N',unit=diagu,choice=psb_none_, work=aux)
         if(info /=0) goto 9999
 
       case('T','t','C','c')
         call psb_spsm(one,prec%av(u_pr_),x,zero,ww,desc_data,info,&
-             & trans=trans,unit=diagu,choice=none_, work=aux)
+             & trans=trans,unit=diagu,choice=psb_none_, work=aux)
         ww(1:n_row) = ww(1:n_row)*prec%d(1:n_row)
         call psb_spsm(one,prec%av(l_pr_),ww,beta,y,desc_data,info,&
-             & trans=trans,unit=diagl,choice=none_,work=aux)
+             & trans=trans,unit=diagl,choice=psb_none_,work=aux)
         if(info /=0) goto 9999
 
       end select
@@ -440,11 +440,11 @@ subroutine psb_dbjacaply(prec,x,beta,y,desc_data,trans,work,info)
         if(info /=0) goto 9999
         call psb_spsm(one,prec%av(l_pr_),ty,zero,ww,&
              & prec%desc_data,info,&
-             & trans='N',unit='U',choice=none_,work=aux)
+             & trans='N',unit='U',choice=psb_none_,work=aux)
         ww(1:n_row) = ww(1:n_row)*prec%d(1:n_row)
         call psb_spsm(one,prec%av(u_pr_),ww,zero,tx,&
              & prec%desc_data,info,&
-             & trans='N',unit='U',choice=none_,work=aux)
+             & trans='N',unit='U',choice=psb_none_,work=aux)
         if(info /=0) goto 9999
       end do
 
@@ -535,7 +535,7 @@ subroutine psb_dmlprcaply(baseprecv,x,beta,y,desc_data,trans,work,info)
   real(kind(1.d0)), allocatable :: tx(:),ty(:),t2l(:),w2l(:),&
        &   x2l(:),b2l(:),tz(:),tty(:)
   character     ::diagl, diagu
-  integer :: icontxt,nprow,npcol,me,mycol,i, isz, nrg,nr2l,err_act, iptype
+  integer :: icontxt,nprow,npcol,me,mycol,i, isz, nrg,nr2l,err_act, iptype, int_err(5)
   real(kind(1.d0)) :: omega
   real(kind(1.d0)) :: t1, t2, t3, t4, t5, t6, t7, mpi_wtime
   logical, parameter          :: debug=.false., debugprt=.false.
@@ -862,7 +862,7 @@ subroutine psb_dprec1(prec,x,desc_data,info,trans)
   use psb_error_mod
   implicit none
 
-  type(pab_desc_type),intent(in)    :: desc_data
+  type(psb_desc_type),intent(in)    :: desc_data
   type(psb_dprec_type), intent(in)  :: prec
   real(kind(0.d0)),intent(inout)    :: x(:)
   integer, intent(out)              :: info
@@ -873,7 +873,7 @@ subroutine psb_dprec1(prec,x,desc_data,info,trans)
 
   ! Local variables
   character     :: trans_
-  integer :: icontxt,nprow,npcol,me,mycol,i, isz, err_act
+  integer :: icontxt,nprow,npcol,me,mycol,i, isz, err_act, int_err(5)
   real(kind(1.d0)), pointer :: WW(:), w1(:)
   character(len=20)   :: name, ch_err
   name='psb_dprec1'

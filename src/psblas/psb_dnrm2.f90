@@ -25,9 +25,9 @@ function psb_dnrm2(x, desc_a, info, jx)
   real(kind(1.D0))                  :: psb_dnrm2
 
   ! locals
-  integer                  :: int_err(5), icontxt, nprow, npcol, me, mycol,&
-       & err_act, n, iix, jjx, temp(2), ndim
-  real(kind(1.d0))         :: nrm2
+  integer                  :: int_err(5), icontxt, nprow, npcol, myrow, mycol,&
+       & err_act, n, iix, jjx, temp(2), ndim, ix, ijx, i, m, id 
+  real(kind(1.d0))         :: nrm2, dnrm2, dd
   real(kind(1.d0)),pointer :: tmpx(:)
   external dcombnrm2
   character(len=20)        :: name, ch_err
@@ -36,10 +36,10 @@ function psb_dnrm2(x, desc_a, info, jx)
   info=0
   call psb_erractionsave(err_act)
 
-  icontxt=desc_data(psb_ctxt_)
+  icontxt=desc_a%matrix_data(psb_ctxt_)
 
   ! check on blacs grid 
-  call blacs_gridinfo(icontxt, nprow, npcol, me, mypcol)
+  call blacs_gridinfo(icontxt, nprow, npcol, myrow, mycol)
   if (nprow == -1) then
     info = 2010
     call psb_errpush(info,name)
@@ -58,9 +58,9 @@ function psb_dnrm2(x, desc_a, info, jx)
      ijx = 1
   endif
 
-  m = desc_data(m_)
+  m = desc_a%matrix_data(psb_m_)
 
-  call psb_chkvect(m,1,size(x,1),ix,ijx,desc_data%matrix_data,info,iix,jjx)
+  call psb_chkvect(m,1,size(x,1),ix,ijx,desc_a%matrix_data,info,iix,jjx)
   if(info.ne.0) then
      info=4010
      ch_err='psb_chkvect'
@@ -79,21 +79,21 @@ function psb_dnrm2(x, desc_a, info, jx)
         nrm2 = dnrm2( ndim, x(iix,jjx), ione )
         i=1
         do while (desc_a%ovrlap_elem(i) .ne. -1)
-           id = desc_a%ovrlap_elem(i+n_dom_ovr_)
+           id = desc_a%ovrlap_elem(i+psb_n_dom_ovr_)
            dd = dble(id-1)/dble(id)
            nrm2 = nrm2 * sqrt(&
-                &  one - dd * ( &
-                &  x(desc_a%ovrlap_elem(i+ovrlp_elem_), jjx) &
+                &  done - dd * ( &
+                &  x(desc_a%ovrlap_elem(i+psb_ovrlp_elem_), jjx) &
                 &  / nrm2 &
                 &  ) ** 2 &
                 &  ) 
            i = i+2
         end do
      else 	    
-        nrm2 = zero
+        nrm2 = dzero
      end if
   else 	    
-     nrm2 = zero
+     nrm2 = dzero
   end if
   
   call pdtreecomb(icontxt,'All',1,nrm2,-1,-1,dcombnrm2)
@@ -136,9 +136,9 @@ function psb_dnrm2v(x, desc_a, info)
   real(kind(1.D0))                  :: psb_dnrm2v
 
   ! locals
-  integer                  :: int_err(5), icontxt, nprow, npcol, me, mycol,&
-       & err_act, n, iix, jjx, temp(2), ndim
-  real(kind(1.d0))         :: nrm2
+  integer                  :: int_err(5), icontxt, nprow, npcol, myrow, mycol,&
+       & err_act, n, iix, jjx, temp(2), ndim, ix, jx, ijx, i, m, id 
+  real(kind(1.d0))         :: nrm2, dnrm2, dd
   real(kind(1.d0)),pointer :: tmpx(:)
   external dcombnrm2
   character(len=20)        :: name, ch_err
@@ -147,10 +147,10 @@ function psb_dnrm2v(x, desc_a, info)
   info=0
   call psb_erractionsave(err_act)
 
-  icontxt=desc_data(psb_ctxt_)
+  icontxt=desc_a%matrix_data(psb_ctxt_)
 
   ! check on blacs grid 
-  call blacs_gridinfo(icontxt, nprow, npcol, me, mypcol)
+  call blacs_gridinfo(icontxt, nprow, npcol, myrow, mycol)
   if (nprow == -1) then
     info = 2010
     call psb_errpush(info,name)
@@ -165,9 +165,9 @@ function psb_dnrm2v(x, desc_a, info)
   ix = 1
   jx=1
 
-  m = desc_data(m_)
+  m = desc_a%matrix_data(psb_m_)
 
-  call psb_chkvect(m,1,size(x),ix,jx,desc_data%matrix_data,info,iix,jjx)
+  call psb_chkvect(m,1,size(x),ix,jx,desc_a%matrix_data,info,iix,jjx)
   if(info.ne.0) then
      info=4010
      ch_err='psb_chkvect'
@@ -186,21 +186,21 @@ function psb_dnrm2v(x, desc_a, info)
         nrm2 = dnrm2( ndim, x, ione )
         i=1
         do while (desc_a%ovrlap_elem(i) .ne. -1)
-           id = desc_a%ovrlap_elem(i+n_dom_ovr_)
+           id = desc_a%ovrlap_elem(i+psb_n_dom_ovr_)
            dd = dble(id-1)/dble(id)
            nrm2 = nrm2 * sqrt(&
-                &  one - dd * ( &
-                &  x(desc_a%ovrlap_elem(i+ovrlp_elem_)) &
+                &  done - dd * ( &
+                &  x(desc_a%ovrlap_elem(i+psb_ovrlp_elem_)) &
                 &  / nrm2 &
                 &  ) ** 2 &
                 &  ) 
            i = i+2
         end do
      else 	    
-        nrm2 = zero
+        nrm2 = dzero
      end if
   else 	    
-     nrm2 = zero
+     nrm2 = dzero
   end if
   
   call pdtreecomb(icontxt,'All',1,nrm2,-1,-1,dcombnrm2)
@@ -245,9 +245,9 @@ subroutine psb_dnrm2vs(res, x, desc_a, info)
   integer, intent(out)              :: info
 
   ! locals
-  integer                  :: int_err(5), icontxt, nprow, npcol, me, mycol,&
-       & err_act, n, iix, jjx, temp(2), ndim
-  real(kind(1.d0))         :: nrm2
+  integer                  :: int_err(5), icontxt, nprow, npcol, myrow, mycol,&
+       & err_act, n, iix, jjx, temp(2), ndim, ix, jx, ijx, i, m, id 
+  real(kind(1.d0))         :: nrm2, dnrm2, dd
   real(kind(1.d0)),pointer :: tmpx(:)
   external dcombnrm2
   character(len=20)        :: name, ch_err
@@ -256,10 +256,10 @@ subroutine psb_dnrm2vs(res, x, desc_a, info)
   info=0
   call psb_erractionsave(err_act)
 
-  icontxt=desc_data(psb_ctxt_)
+  icontxt=desc_a%matrix_data(psb_ctxt_)
 
   ! check on blacs grid 
-  call blacs_gridinfo(icontxt, nprow, npcol, me, mypcol)
+  call blacs_gridinfo(icontxt, nprow, npcol, myrow, mycol)
   if (nprow == -1) then
     info = 2010
     call psb_errpush(info,name)
@@ -273,9 +273,9 @@ subroutine psb_dnrm2vs(res, x, desc_a, info)
   
   ix = 1
   jx = 1
-  m = desc_data(m_)
+  m = desc_a%matrix_data(psb_m_)
 
-  call psb_chkvect(m,1,size(x),ix,jx,desc_data%matrix_data,info,iix,jjx)
+  call psb_chkvect(m,1,size(x),ix,jx,desc_a%matrix_data,info,iix,jjx)
   if(info.ne.0) then
      info=4010
      ch_err='psb_chkvect'
@@ -294,21 +294,21 @@ subroutine psb_dnrm2vs(res, x, desc_a, info)
         nrm2 = dnrm2( ndim, x, ione )
         i=1
         do while (desc_a%ovrlap_elem(i) .ne. -1)
-           id = desc_a%ovrlap_elem(i+n_dom_ovr_)
+           id = desc_a%ovrlap_elem(i+psb_n_dom_ovr_)
            dd = dble(id-1)/dble(id)
            nrm2 = nrm2 * sqrt(&
-                &  one - dd * ( &
-                &  x(desc_a%ovrlap_elem(i+ovrlp_elem_)) &
+                &  done - dd * ( &
+                &  x(desc_a%ovrlap_elem(i+psb_ovrlp_elem_)) &
                 &  / nrm2 &
                 &  ) ** 2 &
                 &  ) 
            i = i+2
         end do
      else 	    
-        nrm2 = zero
+        nrm2 = dzero
      end if
   else 	    
-     nrm2 = zero
+     nrm2 = dzero
   end if
   
   call pdtreecomb(icontxt,'All',1,nrm2,-1,-1,dcombnrm2)

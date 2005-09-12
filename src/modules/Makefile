@@ -10,13 +10,19 @@ MODULES = psb_realloc_mod.o psb_string_mod.o psb_spmat_type.o \
 OBJS = error.o parts.o
 
 INCDIRS = -I ../../lib
+LIBDIR = ../../lib
 
 psb_realloc_mod.o : psb_error_mod.o 
 psb_spmat_type.o : psb_realloc_mod.o psb_const_mod.o
 
 lib: $(MODULES) $(OBJS)
+	$(AR) $(LIBDIR)/$(LIBNAME) $(MODULES) $(OBJS)
+	$(RANLIB) $(LIBDIR)/$(LIBNAME)
 	cp *$(.mod) ./psb_const.fh ../../lib
 
 
 clean:
 	/bin/rm -f $(MODULES) $(OBJS) *$(.mod)
+
+veryclean: clean
+

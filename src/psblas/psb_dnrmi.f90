@@ -19,21 +19,22 @@ function psb_dnrmi(a,desc_a,info)
   type(psb_dspmat_type), intent(in)   :: a
   integer, intent(out)                :: info
   type(psb_desc_type), intent(in)     :: desc_a
+  real(kind(1.d0))                    :: psb_dnrmi
 
   ! locals
-  integer                  :: int_err(5), icontxt, nprow, npcol, me, mycol,&
-       & err_act, n, iia, jja, ia, ja, temp(2)
-  real(kind(1.d0))         :: nrmi
+  integer                  :: int_err(5), icontxt, nprow, npcol, myrow, mycol,&
+       & err_act, n, iia, jja, ia, ja, temp(2), mdim, ndim, m
+  real(kind(1.d0))         :: nrmi, dcsnmi
   character(len=20)        :: name, ch_err
 
   name='psb_dnrmi'
   info=0
   call psb_erractionsave(err_act)
 
-  icontxt=desc_data(psb_ctxt_)
+  icontxt=desc_a%matrix_data(psb_ctxt_)
 
   ! check on blacs grid 
-  call blacs_gridinfo(icontxt, nprow, npcol, me, mypcol)
+  call blacs_gridinfo(icontxt, nprow, npcol, myrow, mycol)
   if (nprow == -1) then
     info = 2010
     call psb_errpush(info,name)
@@ -47,8 +48,8 @@ function psb_dnrmi(a,desc_a,info)
 
   ia = 1
   ja = 1
-  m = desc_a%matrix_data(m_)
-  n = desc_a%matrix_data(n_)
+  m = desc_a%matrix_data(psb_m_)
+  n = desc_a%matrix_data(psb_n_)
 
   call psb_chkmat(m,n,ia,ja,desc_a%matrix_data,info,iia,jja)
   if(info.ne.0) then
@@ -85,7 +86,7 @@ function psb_dnrmi(a,desc_a,info)
      nrmi = 0.d0
   end if
 
-  psb_nrmi = nrmi
+  psb_dnrmi = nrmi
 
   call psb_erractionrestore(err_act)
   return  

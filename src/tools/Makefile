@@ -12,8 +12,11 @@ FOBJS = psb_dallc.o psb_dasb.o psb_dcsrp.o psb_descprt.o \
 MPFOBJS = psb_descasb.o psb_dcsrovr.o
 
 INCDIRS = -I ../../lib -I .
+LIBDIR = ../../lib
 
 lib: mpfobjs $(FOBJS)
+	$(AR) $(LIBDIR)/$(LIBNAME) $(MPFOBJS) $(FOBJS)
+	$(RANLIB) $(LIBDIR)/$(LIBNAME)
 
 
 mpfobjs: 
@@ -22,3 +25,5 @@ mpfobjs:
 
 clean:
 	/bin/rm -f $(MPFOBJS) $(FOBJS)
+
+veryclean: clean

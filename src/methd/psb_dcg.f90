@@ -88,7 +88,7 @@ Subroutine psb_dcg(a,prec,b,x,eps,desc_a,info,&
   icontxt = desc_a%matrix_data(psb_ctxt_)
   call blacs_gridinfo(icontxt,nprows,npcols,me,mecol)
 
-  mglob = desc_a%matrix_data(m_)
+  mglob = desc_a%matrix_data(psb_m_)
   n_row = desc_a%matrix_data(psb_n_row_)
   n_col = desc_a%matrix_data(psb_n_col_)
 
@@ -201,7 +201,7 @@ Subroutine psb_dcg(a,prec,b,x,eps,desc_a,info,&
 !!$     CALL F90_PSHALO(Z,DECOMP_DATA)
     Call psb_prcaply(prec,r,z,desc_a,info,work=aux)
     rho_old = rho
-    rho     = f90_psdot(r,z,desc_a,info)
+    rho     = psb_dot(r,z,desc_a,info)
 
     if (it==1) then
       call psb_axpby(one,z,zero,p,desc_a,info)

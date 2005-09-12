@@ -17,6 +17,7 @@
 !*****************************************************************************
 subroutine psb_dcslu(a,desc_a,p,upd,info)
   use psb_serial_mod
+  use psb_const_mod
   use psb_prec_type
   use psb_descriptor_type
   use psb_spmat_type
@@ -44,9 +45,20 @@ subroutine psb_dcslu(a,desc_a,p,upd,info)
   external  mpi_wtime
   logical, parameter :: debugprt=.false., debug=.false., aggr_dump=.false.
   integer   istpb, istpe, ifctb, ifcte, err_act, irank, icomm, nztota, nztotb,&
-       & nztmp, nzl, ione, nnr, ir, mglob, mtype, n_row, nrow_a,n_col, nhalo,lovr
+       & nztmp, nzl, nnr, ir, mglob, mtype, n_row, nrow_a,n_col, nhalo,lovr
   integer ::icontxt,nprow,npcol,me,mycol
   character(len=20)      :: name, ch_err
+
+  interface
+     subroutine psb_dsplu(a,l,u,d,info,blck)
+       use psb_spmat_type
+       integer, intent(out)                ::     info
+       type(psb_dspmat_type),intent(in)    :: a
+       type(psb_dspmat_type),intent(inout) :: l,u
+       type(psb_dspmat_type),intent(in), optional, target :: blck
+       real(kind(1.d0)), intent(inout)     ::  d(:)
+     end subroutine psb_dsplu
+  end interface
 
   info=0
   name='psb_dcslu'
@@ -109,7 +121,7 @@ subroutine psb_dcslu(a,desc_a,p,upd,info)
      call psb_nullify_sp(p%av(k))
   end do
   nrow_a = desc_a%matrix_data(psb_n_row_)
-  call psb_spinfo(nztotreq,a,nztota,info)
+  call psb_spinfo(psb_nztotreq_,a,nztota,info)
   if(info/=0) then
      info=4010
      ch_err='psb_spinfo'
@@ -157,8 +169,8 @@ subroutine psb_dcslu(a,desc_a,p,upd,info)
      ! Here we allocate a full copy to hold local A and received BLK
      !
 
-     call psb_spinfo(nztotreq,a,nztota,info)
-     call psb_spinfo(nztotreq,blck,nztotb,info)
+     call psb_spinfo(psb_nztotreq_,a,nztota,info)
+     call psb_spinfo(psb_nztotreq_,blck,nztotb,info)
      call psb_spall(atmp,nztota+nztotb,info)
      if(info/=0) then
         info=4011
@@ -199,7 +211,7 @@ subroutine psb_dcslu(a,desc_a,p,upd,info)
         call psb_errpush(info,name,a_err=ch_err)
         goto 9999
      end if
-
+     
      call psb_spfree(atmp,info) 
      if(info/=0) then
         info=4010
@@ -309,7 +321,7 @@ contains
        atmp%descra = 'GUN'
 
        ! This is the renumbering coherent with global indices..
-       mglob = desc_a%matrix_data(m_)
+       mglob = desc_a%matrix_data(psb_m_)
        !
        !  Remember: we have switched IA1=COLS and IA2=ROWS
        !  Now identify the set of distinct local column indices
@@ -457,7 +469,7 @@ contains
        itmp(1:8) = 0
 !          write(0,*) me,' Renumbering: Calling Metis'
 !        call blacs_barrier(icontxt,'All')
-       ione = 1
+
 !          write(0,*) size(p%av(u_pr_)%pl),size(p%av(l_pr_)%pr)
        call  gps_reduction(atmp%m,atmp%ia2,atmp%ia1,p%perm,p%invperm,info)
        if(info/=0) then

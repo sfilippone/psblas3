@@ -9,8 +9,11 @@ COBJS = avltree.o
 MPFOBJS = psi_dswapdata.o psi_dswaptran.o psi_iswapdata.o \
 	psi_iswaptran.o psi_extrct_dl.o psi_desc_index.o
 INCDIRS = -I ../../lib -I .
+LIBDIR = ../../lib
 
 lib: mpfobjs $(FOBJS) $(COBJS)
+	$(AR) $(LIBDIR)/$(LIBNAME) $(MPFOBJS) $(FOBJS) $(COBJS)
+	$(RANLIB) $(LIBDIR)/$(LIBNAME)
 
 
 mpfobjs: 
@@ -19,3 +22,5 @@ mpfobjs:
 
 clean:
 	/bin/rm -f $(MPFOBJS) $(FOBJS) $(COBJS)
+
+veryclean: clean

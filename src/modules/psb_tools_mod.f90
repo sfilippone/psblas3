@@ -8,7 +8,7 @@ Module psb_tools_mod
        implicit none
        integer, intent(in)                   :: m,n
        real(kind(1.d0)), pointer             :: x(:,:)
-       type(psb_desc_type), intent(inout)    :: desc_a
+       type(psb_desc_type), intent(in)       :: desc_a
        integer                               :: info
        integer, optional, intent(in)         :: js
      end subroutine psb_dalloc
@@ -274,10 +274,6 @@ Module psb_tools_mod
        Type(psb_desc_type), intent(out)    :: desc_a
        integer, intent(out)                :: info
      end subroutine psb_dscall
-  end interface
-  
-
-  interface psb_scalv
      subroutine psb_dscalv(m, v, icontxt, desc_a, info, flag)
        use psb_descriptor_type
        Integer, intent(in)               :: m,icontxt, v(:)

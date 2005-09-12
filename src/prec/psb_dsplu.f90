@@ -5,7 +5,7 @@ subroutine psb_dsplu(a,l,u,d,info,blck)
   ! into L/D/U. 
   !
   !
-
+  use psb_spmat_type
   use psb_serial_mod
   use psb_tools_mod
   use psb_error_mod
@@ -22,7 +22,7 @@ subroutine psb_dsplu(a,l,u,d,info,blck)
   integer   ::  i, j, jj, k, kk, l1, l2, ll, low1, low2,m,ma,err_act
   real(kind(1.d0)), parameter ::  epstol=1.d-12
   
-  type(d_spmat), pointer  :: blck_
+  type(psb_dspmat_type), pointer  :: blck_
   character(len=20)   :: name, ch_err
   name='psb_dcsrlu'
   info = 0
@@ -104,7 +104,7 @@ contains
     real(kind(1.d0)), parameter ::  epstol=1.d-12
     integer, parameter :: nrb=16
     logical,parameter  :: debug=.false.
-    type(d_spmat) :: trw
+    type(psb_dspmat_type) :: trw
     character(len=20)   :: name, ch_err
 
     name='psb_dspluint'
@@ -170,7 +170,7 @@ contains
         end if
 
         do 
-          if (ktrw > trw%infoa(nnz_)) exit
+          if (ktrw > trw%infoa(psb_nnz_)) exit
           if (trw%ia1(ktrw) > i) exit
           k = trw%ia2(ktrw)
           ! write(0,*)'KKKKK',k
@@ -311,7 +311,7 @@ contains
         end if
         
         do 
-          if (ktrw > trw%infoa(nnz_)) exit
+          if (ktrw > trw%infoa(psb_nnz_)) exit
           if (trw%ia1(ktrw) > i) exit
           k = trw%ia2(ktrw)
           ! write(0,*)'KKKKK',k

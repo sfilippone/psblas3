@@ -95,7 +95,7 @@ subroutine psb_dbicg(a,prec,b,x,eps,desc_a,info,&
   call blacs_gridinfo(icontxt,nprows,npcols,me,mecol)
   if (debug) write(*,*) 'psb_dbicg: from gridinfo',nprows,npcols,me
 
-  mglob = desc_a%matrix_data(m_)
+  mglob = desc_a%matrix_data(psb_m_)
   n_row = desc_a%matrix_data(psb_n_row_)
   n_col = desc_a%matrix_data(psb_n_col_)
 

@@ -22,7 +22,7 @@ subroutine psb_dalloc(m, n, x, desc_a, info, js)
   !....parameters...
   integer, intent(in)                   :: m,n
   real(kind(1.d0)), pointer             :: x(:,:)
-  type(psb_desc_type), intent(inout)    :: desc_a
+  type(psb_desc_type), intent(in)       :: desc_a
   integer                               :: info
   integer, optional, intent(in)         :: js
 

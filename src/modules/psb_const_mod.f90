@@ -1,3 +1,4 @@
+
 module psb_const_mod
 
   integer, parameter   :: psb_nohalo_=0,                 psb_halo_=4
@@ -24,7 +25,7 @@ module psb_const_mod
   integer, parameter   :: psb_ovrlp_elem_to_=2,          psb_ovrlp_elem_=0, psb_n_dom_ovr_=1
   integer, parameter   :: psb_nnz_=1
   integer, parameter   :: psb_no_comm_=-1
-  integer, parameter   :: ione=1, done=1.d0,             izero=0, dzero=0.d0,mone=-1
+  integer, parameter   :: ione=1,izero=0,mone=-1
   integer, parameter   :: itwo=2, ithree=3,              psb_root_=0
   integer, parameter   :: psb_nztotreq_=1,               psb_nzrowreq_=2, psb_nzsizereq_=3
   integer, parameter   :: psb_del_bnd_=6,                psb_srtd_=7 
@@ -40,6 +41,7 @@ module psb_const_mod
   integer, parameter   :: psb_dbleint_=2
 
   real(kind(1.d0)), parameter :: psb_colrow_=0.33, psb_percent_=0.7
+  real(kind(1.d0)), parameter :: dzero=0.d0, done=1.d0
 
   character, parameter :: psb_all_='A',                  psb_topdef_=' '
   character(len=5)     :: psb_fidef_='CSR'

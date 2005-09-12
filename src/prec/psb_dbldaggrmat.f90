@@ -9,7 +9,7 @@ subroutine psb_dbldaggrmat(a,desc_a,p,info)
   implicit none
 
   type(psb_dspmat_type), intent(in), target :: a
-  type(psb_dbaseprec), intent(inout)        :: p
+  type(psb_dbase_prec), intent(inout)       :: p
   type(psb_desc_type), intent(in)           :: desc_a
   integer, intent(out)                      :: info
 
@@ -85,7 +85,7 @@ contains
     icontxt = desc_a%matrix_data(psb_ctxt_)
     call blacs_gridinfo(icontxt,nprows,npcols,myprow,mypcol)
     np = nprows*npcols
-    nglob = desc_a%matrix_data(m_)
+    nglob = desc_a%matrix_data(psb_m_)
     nrow  = desc_a%matrix_data(psb_n_row_)
     ncol  = desc_a%matrix_data(psb_n_col_)
 
@@ -113,7 +113,7 @@ contains
     end if
 
 
-    call psb_spinfo(nztotreq,a,nzt,info)
+    call psb_spinfo(psb_nztotreq_,a,nzt,info)
 
     if(info /= 0) then
       call psb_errpush(4010,name,a_err='spinfo')
@@ -126,7 +126,7 @@ contains
       goto 9999
     end if
 
-    b%infoa(upd_) = 6
+    b%infoa(psb_upd_) = 6
     b%fida = 'COO'
     b%m=a%m
     b%k=a%k
@@ -138,7 +138,7 @@ contains
         call psb_errpush(info,name,a_err=ch_err)
         goto 9999
       end if
-      call psb_spinfo(nztotreq,b,nzt,info)
+      call psb_spinfo(psb_nztotreq_,b,nzt,info)
       if(info /= 0) then
         info=4010
         ch_err='psb_spinfo'
@@ -163,14 +163,14 @@ contains
           goto 9999
         end if
 
-        call psb_spinfo(nztotreq,b,nzl,info)
+        call psb_spinfo(psb_nztotreq_,b,nzl,info)
         if(info /= 0) then
           call psb_errpush(4010,name,a_err='spinfo')
           goto 9999
         end if
         nzl = nzl - jl 
         tmp%fida  = 'COO'
-        tmp%infoa(nnz_) = nzl
+        tmp%infoa(psb_nnz_) = nzl
         tmp%aspk => b%aspk(jl+1:jl+nzl)
         tmp%ia1 => b%ia1(jl+1:jl+nzl)
         tmp%ia2 => b%ia2(jl+1:jl+nzl)
@@ -179,8 +179,8 @@ contains
           call psb_errpush(4010,name,a_err='psb_fixcoo')
           goto 9999
         end if
-        nzl = tmp%infoa(nnz_)
-        b%infoa(nnz_) = jl+nzl
+        nzl = tmp%infoa(psb_nnz_)
+        b%infoa(psb_nnz_) = jl+nzl
         jl = jl + nzl
       enddo
     end if
@@ -192,7 +192,7 @@ contains
       goto 9999
     end if
 
-    irs = b%infoa(nnz_)
+    irs = b%infoa(psb_nnz_)
     call psb_spreall(b,irs,info)
     if(info /= 0) then
       call psb_errpush(4010,name,a_err='spreall')
@@ -235,7 +235,7 @@ contains
 
       bg%m = ntaggr
       bg%k = ntaggr
-      bg%infoa(nnz_) = nzbg
+      bg%infoa(psb_nnz_) = nzbg
       bg%fida='COO'
       bg%descra='G'
       call psb_fixcoo(bg,info)
@@ -327,7 +327,7 @@ contains
 
 
     np    = nprows*npcols
-    nglob = desc_a%matrix_data(m_)
+    nglob = desc_a%matrix_data(psb_m_)
     nrow  = desc_a%matrix_data(psb_n_row_)
     ncol  = desc_a%matrix_data(psb_n_col_)
 
@@ -399,14 +399,14 @@ contains
         am4%ia1(i)  = i
         am4%ia2(i)  = p%mlia(i)  
       end do
-      am4%infoa(nnz_) = ncol
+      am4%infoa(psb_nnz_) = ncol
     else
       do i=1,nrow
         am4%aspk(i) = one
         am4%ia1(i)  = i
         am4%ia2(i)  = p%mlia(i)  
       end do
-      am4%infoa(nnz_) = nrow
+      am4%infoa(psb_nnz_) = nrow
     endif
     am4%fida='COO'
     am4%m=ncol
@@ -419,7 +419,7 @@ contains
 
 
     if (test_dump)  call &
-         & csprt(20+me,am4,head='% Operator Ptilde.',ivr=desc_a%loc_to_glob)
+         & psb_csprt(20+me,am4,head='% Operator Ptilde.',ivr=desc_a%loc_to_glob)
 
 
     call psb_ipcoo2csr(am4,info)
@@ -465,7 +465,7 @@ contains
 
         call dgamx2d(icontxt,'All',' ',1,1,anorm,1,itemp,jtemp,-1,-1,-1)     
       else
-        anorm = f90_psnrmi(am3,desc_a,info)
+        anorm = psb_nrmi(am3,desc_a,info)
       endif
       omega = 4.d0/(3.d0*anorm)
       p%dprcparm(smooth_omega_) = omega 
@@ -491,7 +491,7 @@ contains
         end do
       end do
     else  if (am3%fida=='COO') then 
-      do j=1,am3%infoa(nnz_) 
+      do j=1,am3%infoa(psb_nnz_) 
         if (am3%ia1(j) /= am3%ia2(j)) then 
           am3%aspk(j) = - omega*am3%aspk(j) 
         else
@@ -504,7 +504,7 @@ contains
       goto 9999
     end if
 
-    if (test_dump) call csprt(40+me,am3,head='% (I-wDA)',ivr=desc_a%loc_to_glob,&
+    if (test_dump) call psb_csprt(40+me,am3,head='% (I-wDA)',ivr=desc_a%loc_to_glob,&
          & ivc=desc_a%loc_to_glob)    
     !
     ! Symbmm90 does the allocation for its result.
@@ -564,7 +564,7 @@ contains
 
     if  (p%iprcparm(smth_kind_) == smth_omg_) then 
       call psb_transp(am1,am2,fmt='COO')
-      nzl = am2%infoa(nnz_)
+      nzl = am2%infoa(psb_nnz_)
       i=0
       !
       ! Now we have to fix this.  The only rows of B that are correct 
@@ -579,7 +579,7 @@ contains
         end if
       end do
 
-      am2%infoa(nnz_) = i
+      am2%infoa(psb_nnz_) = i
       call psb_ipcoo2csr(am2,info)
     else
       call psb_transp(am1,am2)
@@ -648,8 +648,8 @@ contains
 
         call psb_spclone(b,bg,info)
         if(info /= 0) goto 9999
-        nzbg = bg%infoa(nnz_) 
-        nzl =  bg%infoa(nnz_) 
+        nzbg = bg%infoa(psb_nnz_) 
+        nzl =  bg%infoa(psb_nnz_) 
 
         allocate(ivall(ntaggr))
 
@@ -723,7 +723,7 @@ contains
             p%av(ap_nd_)%ia2(k) = bg%ia2(i)
           endif
         enddo
-        p%av(ap_nd_)%infoa(nnz_) = k
+        p%av(ap_nd_)%infoa(psb_nnz_) = k
         call psb_ipcoo2csr(p%av(ap_nd_),info)
 
         if(info /= 0) then
@@ -741,7 +741,7 @@ contains
 
 
         if (np>1) then 
-          call psb_spinfo(nztotreq,am1,nzl,info)
+          call psb_spinfo(psb_nztotreq_,am1,nzl,info)
           call psb_glob_to_loc(am1%ia1(1:nzl),p%desc_data,info,'I')
           if(info /= 0) then
             call psb_errpush(4010,name,a_err='psb_glob_to_loc')
@@ -757,7 +757,7 @@ contains
             goto 9999
           end if
 
-          nzl = am2%infoa(nnz_) 
+          nzl = am2%infoa(psb_nnz_) 
           call psb_glob_to_loc(am2%ia1(1:nzl),p%desc_data,info,'I')
           if(info /= 0) then
             call psb_errpush(4010,name,a_err='psb_glob_to_loc')
@@ -776,7 +776,7 @@ contains
         !
         !
         nzbr(:) = 0
-        nzbr(myprow+1) = b%infoa(nnz_)
+        nzbr(myprow+1) = b%infoa(psb_nnz_)
 
         call psb_dscrep(ntaggr,icontxt,p%desc_data,info)
 
@@ -803,7 +803,7 @@ contains
 
         bg%m = ntaggr
         bg%k = ntaggr
-        bg%infoa(nnz_) = nzbg
+        bg%infoa(psb_nnz_) = nzbg
         bg%fida='COO'
         bg%descra='G'
         call psb_fixcoo(bg,info)
@@ -845,7 +845,7 @@ contains
         !
         !
         nzbr(:) = 0
-        nzbr(myprow+1) = b%infoa(nnz_)
+        nzbr(myprow+1) = b%infoa(psb_nnz_)
 
         call psb_dscrep(ntaggr,icontxt,p%desc_data,info)
 
@@ -879,7 +879,7 @@ contains
 
         bg%m = ntaggr
         bg%k = ntaggr
-        bg%infoa(nnz_) = nzbg
+        bg%infoa(psb_nnz_) = nzbg
         bg%fida='COO'
         bg%descra='G'
         call psb_fixcoo(bg,info)

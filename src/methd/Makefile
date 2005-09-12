@@ -1,18 +1,17 @@
 include ../../Make.inc
 
 
-LIBDIR=../../lib/
-LIBNAME=$(LIBDIR)/$(F90LIB)
+LIBDIR=../../lib
 
 HERE=.
-F90OBJS= f90_dcgstab.o f90_dcg.o f90_dcgs.o \
-	f90_dbicg.o f90_dcgstabl.o f90_zcgstab.o f90_dgmresr.o
+OBJS= psb_dcgstab.o psb_dcg.o psb_dcgs.o \
+	psb_dbicg.o psb_dcgstabl.o psb_dgmresr.o
 
 INCDIRS=-I. -I.. -I$(LIBDIR)
 
-lib:  $(F90OBJS) 
-	ar -cur $(LIBNAME)  $(F90OBJS) 
-	ranlib $(LIBNAME)
+lib:  $(OBJS) 
+	$(AR) $(LIBDIR)/$(LIBNAME) $(OBJS)
+	$(RANLIB) $(LIBDIR)/$(LIBNAME)
 
 #$(F90OBJS): $(MODS)  
 
@@ -22,3 +21,5 @@ veryclean: clean
 
 clean:
 	/bin/rm -f $(F90OBJS) $(LOCAL_MODS)
+
+veryclean: clean

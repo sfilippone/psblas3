@@ -99,8 +99,8 @@ module psb_comm_mod
      subroutine  psb_dgatherv(globx, locx, desc_a, info, iroot,&
           & iiglobx, iilocx)
        use psb_descriptor_type
-       real(kind(1.d0)), intent(in)    :: locx(:,:)
-       real(kind(1.d0)), intent(out)   :: globx(:,:)
+       real(kind(1.d0)), intent(in)    :: locx(:)
+       real(kind(1.d0)), intent(out)   :: globx(:)
        type(psb_desc_type), intent(in) :: desc_a
        integer, intent(out)            :: info
        integer, intent(in), optional   :: iroot, iiglobx, iilocx

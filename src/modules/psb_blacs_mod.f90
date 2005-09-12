@@ -1,4 +1,4 @@
-module f90blacs
+module psb_blacs_mod
   
   interface gebs2d
     module procedure igebs2ds, igebs2dv, igebs2dm,&
@@ -2732,4 +2732,4 @@ contains
   end subroutine zgamn2dm
   
 
-end module f90blacs
+end module psb_blacs_mod

@@ -44,7 +44,7 @@
 subroutine  psb_dspsm(alpha,a,x,beta,y,desc_a,info,&
      & trans, unitd, choice, d, k, jx, jy, work)   
 
-  use psb_dspmat_type
+  use psb_spmat_type
   use psb_serial_mod
   use psb_descriptor_type
   use psb_comm_mod
@@ -53,33 +53,37 @@ subroutine  psb_dspsm(alpha,a,x,beta,y,desc_a,info,&
   implicit none
 
   real(kind(1.D0)), intent(in)              :: alpha, beta
-  real(kind(1.d0)), intent(in)              :: x(:,:)
-  real(kind(1.d0)), intent(inout)           :: y(:,:)
+  real(kind(1.d0)), intent(in), target      :: x(:,:)
+  real(kind(1.d0)), intent(inout), target   :: y(:,:)
   type (psb_dspmat_type), intent(in)        :: a
   type(psb_desc_type), intent(in)           :: desc_a
   integer, intent(out)                      :: info
-  real(kind(1.d0)), intent(in), optional    :: d(:)
-  real(kind(1.d0)), intent(inout), optional :: work(:)
+  real(kind(1.d0)), intent(in), optional, target      :: d(:)
+  real(kind(1.d0)), optional, pointer       :: work(:)
   character, intent(in), optional           :: trans, unitd
   integer, intent(in), optional             :: choice
   integer, intent(in), optional             :: k, jx, jy
 
   ! locals
-  integer                  :: int_err(5), icontxt, nprow, npcol, me, mycol,&
-       & err_act, n, iix, jjx, ia, ja, iia, jja, temp(2), lldx,lldy, lchoice
+  integer                  :: int_err(5), icontxt, nprow, npcol, myrow, mycol,&
+       & err_act, n, iix, jjx, ia, ja, iia, jja, temp(2), lldx,lldy, lchoice,&
+       & ix, iy, ik, ijx, ijy, i, lld,&
+       & idoswap, m, nrow, ncol, liwork, llwork, iiy, jjy
+
   character                :: lunitd
   integer, parameter       :: nb=4
-  real(kind(1.d0)),pointer :: tmpx(:), xp(:,:), yp(:,:)
+  real(kind(1.d0)),pointer :: iwork(:), xp(:,:), yp(:,:), id(:)
+  character                :: itrans
   character(len=20)        :: name, ch_err
 
   name='psb_dspsm'
   info=0
   call psb_erractionsave(err_act)
 
-  icontxt=desc_data(psb_ctxt_)
+  icontxt=desc_a%matrix_data(psb_ctxt_)
 
   ! check on blacs grid 
-  call blacs_gridinfo(icontxt, nprow, npcol, me, mypcol)
+  call blacs_gridinfo(icontxt, nprow, npcol, myrow, mycol)
   if (nprow == -1) then
      info = 2010
      call psb_errpush(info,name)
@@ -119,7 +123,7 @@ subroutine  psb_dspsm(alpha,a,x,beta,y,desc_a,info,&
   if (present(choice)) then     
     lchoice = choice
   else
-    lchoice = AVG_
+    lchoice = psb_avg_
   endif
 
   if (present(unitd)) then     
@@ -144,7 +148,7 @@ subroutine  psb_dspsm(alpha,a,x,beta,y,desc_a,info,&
      itrans = 'N'
   endif
 
-  m    = desc_data(m_)
+  m    = desc_a%matrix_data(psb_m_)
   nrow = desc_a%matrix_data(psb_n_row_)
   ncol = desc_a%matrix_data(psb_n_col_)
   lldx = size(x,1)
@@ -194,8 +198,8 @@ subroutine  psb_dspsm(alpha,a,x,beta,y,desc_a,info,&
   ! checking for matrix correctness
   call psb_chkmat(m,m,ia,ja,desc_a%matrix_data,info,iia,jja)
   ! checking for vectors correctness
-  call psb_chkvect(m,ik,size(x,1),ix,ijx,desc_data%matrix_data,info,iix,jjx)
-  call psb_chkvect(m,ik,size(y,1),iy,ijy,desc_data%matrix_data,info,iiy,jjy)
+  call psb_chkvect(m,ik,size(x,1),ix,ijx,desc_a%matrix_data,info,iix,jjx)
+  call psb_chkvect(m,ik,size(y,1),iy,ijy,desc_a%matrix_data,info,iiy,jjy)
   if(info.ne.0) then
      info=4010
      ch_err='psb_chkvect/mat'
@@ -233,7 +237,7 @@ subroutine  psb_dspsm(alpha,a,x,beta,y,desc_a,info,&
   ! update overlap elements
   if(lchoice.gt.0) then
      yp => y(iiy:lldy,jjy:jjy+ik-1)
-     call psi_swapdata(ior(SWAP_SEND,SWAP_RECV),ik,&
+     call psi_swapdata(ior(psb_swap_send_,psb_swap_recv_),ik,&
           & done,yp,desc_a,iwork,info)
 !!$     call PSI_dSwapData(ior(SWAP_SEND,SWAP_RECV),ik,&
 !!$          & done,y,lldy,desc_a%matrix_data,desc_a%ovrlap_index,&
@@ -242,26 +246,26 @@ subroutine  psb_dspsm(alpha,a,x,beta,y,desc_a,info,&
      i=0
      ! switch on update type
      select case (lchoice)
-     case(SQUARE_ROOT_)
+     case(psb_square_root_)
         do while(desc_a%ovrlap_elem(i).ne.-ione)
-           y(desc_a%ovrlap_elem(i+ovrlp_elem_),:) =&
-                & y(desc_a%ovrlap_elem(i+ovrlp_elem_),:)/&
-                & sqrt(real(desc_a%ovrlap_elem(i+n_dom_ovr_)))
+           y(desc_a%ovrlap_elem(i+psb_ovrlp_elem_),:) =&
+                & y(desc_a%ovrlap_elem(i+psb_ovrlp_elem_),:)/&
+                & sqrt(real(desc_a%ovrlap_elem(i+psb_n_dom_ovr_)))
            i = i+2
         end do
-     case(AVG_)
+     case(psb_avg_)
         do while(desc_a%ovrlap_elem(i).ne.-ione)
-           y(desc_a%ovrlap_elem(i+ovrlp_elem_),:) =&
-                & y(desc_a%ovrlap_elem(i+ovrlp_elem_),:)/&
-                & real(desc_a%ovrlap_elem(i+n_dom_ovr_))
+           y(desc_a%ovrlap_elem(i+psb_ovrlp_elem_),:) =&
+                & y(desc_a%ovrlap_elem(i+psb_ovrlp_elem_),:)/&
+                & real(desc_a%ovrlap_elem(i+psb_n_dom_ovr_))
            i = i+2
         end do
-     case(SUM_)
+     case(psb_sum_)
         ! do nothing
      case default 
         ! wrong value for choice argument
         info = 70
-        int_err=(/10,lchoice/)
+        int_err=(/10,lchoice,0,0,0/)
         call psb_errpush(info,name,i_err=int_err)
         goto 9999
      end select
@@ -316,7 +320,7 @@ end subroutine psb_dspsm
 ! 
 subroutine  psb_dspsv(alpha,a,x,beta,y,desc_a,info,&
      & trans, unitd, choice, d, work)   
-  use psb_dspmat_type
+  use psb_spmat_type
   use psb_serial_mod
   use psb_descriptor_type
   use psb_comm_mod
@@ -324,32 +328,36 @@ subroutine  psb_dspsv(alpha,a,x,beta,y,desc_a,info,&
   use psb_error_mod
 
   real(kind(1.D0)), intent(in)              :: alpha, beta
-  real(kind(1.d0)), intent(in)              :: x(:)
-  real(kind(1.d0)), intent(inout)           :: y(:)
+  real(kind(1.d0)), intent(in), target      :: x(:)
+  real(kind(1.d0)), intent(inout), target   :: y(:)
   type(psb_dspmat_type), intent(in)         :: a
   type(psb_desc_type), intent(in)           :: desc_a
   integer, intent(out)                      :: info
-  real(kind(1.d0)), intent(in), optional    :: d(:)
-  real(kind(1.d0)), intent(inout), optional :: work(:)
+  real(kind(1.d0)), intent(in), optional, target    :: d(:)
+  real(kind(1.d0)), optional, pointer       :: work(:)
   character, intent(in), optional           :: trans, unitd
   integer, intent(in), optional             :: choice
 
   ! locals
-  integer                  :: int_err(5), icontxt, nprow, npcol, me, mycol,&
-       & err_act, n, iix, jjx, ia, ja, iia, jja, temp(2), lldx,lldy, lchoice
+  integer                  :: int_err(5), icontxt, nprow, npcol, myrow, mycol,&
+       & err_act, n, iix, jjx, ia, ja, iia, jja, temp(2), lldx,lldy, lchoice,&
+       & ix, iy, ik, ijx, ijy, i, lld,&
+       & idoswap, m, nrow, ncol, liwork, llwork, iiy, jjy
+
   character                :: lunitd
   integer, parameter       :: nb=4
-  real(kind(1.d0)),pointer :: tmpx(:), xp(:), yp(:)
+  real(kind(1.d0)),pointer :: iwork(:), xp(:), yp(:), id(:)
+  character                :: itrans
   character(len=20)        :: name, ch_err
 
   name='psb_dspsv'
   info=0
   call psb_erractionsave(err_act)
 
-  icontxt=desc_data(psb_ctxt_)
+  icontxt=desc_a%matrix_data(psb_ctxt_)
 
   ! check on blacs grid 
-  call blacs_gridinfo(icontxt, nprow, npcol, me, mypcol)
+  call blacs_gridinfo(icontxt, nprow, npcol, myrow, mycol)
   if (nprow == -1) then
      info = 2010
      call psb_errpush(info,name)
@@ -371,7 +379,7 @@ subroutine  psb_dspsv(alpha,a,x,beta,y,desc_a,info,&
   if (present(choice)) then     
     lchoice = choice
   else
-    lchoice = AVG_
+    lchoice = psb_avg_
   endif
 
   if (present(unitd)) then     
@@ -396,7 +404,7 @@ subroutine  psb_dspsv(alpha,a,x,beta,y,desc_a,info,&
      itrans = 'N'
   endif
 
-  m    = desc_data(m_)
+  m    = desc_a%matrix_data(psb_m_)
   nrow = desc_a%matrix_data(psb_n_row_)
   ncol = desc_a%matrix_data(psb_n_col_)
   lldx = size(x)
@@ -446,8 +454,8 @@ subroutine  psb_dspsv(alpha,a,x,beta,y,desc_a,info,&
   ! checking for matrix correctness
   call psb_chkmat(m,m,ia,ja,desc_a%matrix_data,info,iia,jja)
   ! checking for vectors correctness
-  call psb_chkvect(m,ik,size(x),ix,ijx,desc_data%matrix_data,info,iix,jjx)
-  call psb_chkvect(m,ik,size(y),iy,ijy,desc_data%matrix_data,info,iiy,jjy)
+  call psb_chkvect(m,ik,size(x),ix,ijx,desc_a%matrix_data,info,iix,jjx)
+  call psb_chkvect(m,ik,size(y),iy,ijy,desc_a%matrix_data,info,iiy,jjy)
   if(info.ne.0) then
      info=4010
      ch_err='psb_chkvect/mat'
@@ -485,7 +493,7 @@ subroutine  psb_dspsv(alpha,a,x,beta,y,desc_a,info,&
   ! update overlap elements
   if(lchoice.gt.0) then
      yp => y(iiy:lldy)
-     call psi_swapdata(ior(SWAP_SEND,SWAP_RECV),&
+     call psi_swapdata(ior(psb_swap_send_,psb_swap_recv_),&
           & done,yp,desc_a,iwork,info)
 !!$     call PSI_dSwapData(ior(SWAP_SEND,SWAP_RECV),ik,&
 !!$          & done,y,lldy,desc_a%matrix_data,desc_a%ovrlap_index,&
@@ -494,26 +502,26 @@ subroutine  psb_dspsv(alpha,a,x,beta,y,desc_a,info,&
      i=0
      ! switch on update type
      select case (lchoice)
-     case(SQUARE_ROOT_)
+     case(psb_square_root_)
         do while(desc_a%ovrlap_elem(i).ne.-ione)
-           y(desc_a%ovrlap_elem(i+ovrlp_elem_)) =&
-                & y(desc_a%ovrlap_elem(i+ovrlp_elem_))/&
-                & sqrt(real(desc_a%ovrlap_elem(i+n_dom_ovr_)))
+           y(desc_a%ovrlap_elem(i+psb_ovrlp_elem_)) =&
+                & y(desc_a%ovrlap_elem(i+psb_ovrlp_elem_))/&
+                & sqrt(real(desc_a%ovrlap_elem(i+psb_n_dom_ovr_)))
            i = i+2
         end do
-     case(AVG_)
+     case(psb_avg_)
         do while(desc_a%ovrlap_elem(i).ne.-ione)
-           y(desc_a%ovrlap_elem(i+ovrlp_elem_)) =&
-                & y(desc_a%ovrlap_elem(i+ovrlp_elem_))/&
-                & real(desc_a%ovrlap_elem(i+n_dom_ovr_))
+           y(desc_a%ovrlap_elem(i+psb_ovrlp_elem_)) =&
+                & y(desc_a%ovrlap_elem(i+psb_ovrlp_elem_))/&
+                & real(desc_a%ovrlap_elem(i+psb_n_dom_ovr_))
            i = i+2
         end do
-     case(SUM_)
+     case(psb_sum_)
         ! do nothing
      case default 
         ! wrong value for choice argument
         info = 70
-        int_err=(/10,lchoice/)
+        int_err=(/10,lchoice,0,0,0/)
         call psb_errpush(info,name,i_err=int_err)
         goto 9999
      end select

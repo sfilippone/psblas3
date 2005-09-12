@@ -1,4 +1,5 @@
 .mod=.mod
+.fh=.fh
 .SUFFIXES: .f90 $(.mod)
 
 
@@ -41,11 +42,7 @@ RANLIB=ranlib
 #  Do not edit this                                      #
 ##########################################################
 LIBDIR = lib
-PSBLASLIB = libpsblas.a
-TOOLSLIB = libpsbtools.a
-COMMLIB  = libpsbcomm.a
-METHDLIB = libpsbmethd.a
-PRECLIB  = libpsbprec.a
+LIBNAME = libpsblas.a
 
 TYPEMODS =  psb_spmat_type$(.mod) psb_desc_type$(.mod) psb_prec_type$(.mod) psb_realloc_mod$(.mod)
 CONSTMODS = psb_tools_const$(.mod)

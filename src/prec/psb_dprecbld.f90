@@ -4,9 +4,9 @@ subroutine psb_dprecbld(a,p,desc_a,info,upd)
   Use psb_spmat_type
   use psb_descriptor_type
   use psb_prec_type
+  use psb_comm_mod
   use psb_const_mod
   use psb_psblas_mod
-  Use psb_prec_mod
   use psb_error_mod
   Implicit None
 
@@ -37,10 +37,10 @@ subroutine psb_dprecbld(a,p,desc_a,info,upd)
   if (debug) write(0,*) 'Entering precbld',P%prec,desc_a%matrix_data(:)
   info = 0
   int_err(1) = 0
-  icontxt = desc_a%matrix_data(CTXT_)
+  icontxt = desc_a%matrix_data(psb_ctxt_)
   n_row   = desc_a%matrix_data(psb_n_row_)
   n_col   = desc_a%matrix_data(psb_n_col_)
-  mglob   = desc_a%matrix_data(m_)
+  mglob   = desc_a%matrix_data(psb_m_)
   if (debug) write(0,*) 'Preconditioner Blacs_gridinfo'
   call blacs_gridinfo(icontxt, nprow, npcol, me, mycol)
 
@@ -69,7 +69,7 @@ subroutine psb_dprecbld(a,p,desc_a,info,upd)
   call psb_nullify_desc(p%baseprecv(1)%desc_data)
 
   select case(p%baseprecv(1)%iprcparm(p_type_)) 
-  case (NOPREC_)
+  case (noprec_)
      ! Do nothing. 
 
 
@@ -126,7 +126,7 @@ subroutine psb_dprecbld(a,p,desc_a,info,upd)
 
      if (debug) then
         allocate(gd(mglob))       
-        call   psb_dgatherm(gd, p%baseprecv(1)%d, desc_a, info, iroot=iroot)
+        call   psb_dgather(gd, p%baseprecv(1)%d, desc_a, info, iroot=iroot)
         if(info /= 0) then
            info=4010
            ch_err='psb_dgatherm'
@@ -150,9 +150,9 @@ subroutine psb_dprecbld(a,p,desc_a,info,upd)
      call psb_check_def(p%baseprecv(1)%iprcparm(n_ovr_),'overlap',&
           &  0,is_legal_n_ovr)
      call psb_check_def(p%baseprecv(1)%iprcparm(restr_),'restriction',&
-          &  halo_,is_legal_restrict)
+          &  psb_halo_,is_legal_restrict)
      call psb_check_def(p%baseprecv(1)%iprcparm(prol_),'prolongator',&
-          &  none_,is_legal_prolong)
+          &  psb_none_,is_legal_prolong)
 
      if ((p%baseprecv(1)%iprcparm(iren_)<0).or.(p%baseprecv(1)%iprcparm(iren_)>2)) then 
         write(0,*) 'Bad PREC%IRENUM value, defaulting to 0', &
@@ -271,6 +271,22 @@ subroutine psb_splu_bld(a,desc_a,p,info)
   logical, parameter :: debug=.false.
   character(len=20)   :: name, ch_err
 
+  interface psb_csrsetup
+    Subroutine psb_dcsrsetup(ptype,novr,a,blk,desc_data,upd,desc_p,info,outfmt)
+      use psb_serial_mod
+      Use psb_descriptor_type
+      Use psb_prec_type
+      integer, intent(in)                  :: ptype,novr
+      Type(psb_dspmat_type), Intent(in)    ::  a
+      Type(psb_dspmat_type), Intent(inout) ::  blk
+      Type(psb_desc_type), Intent(inout)   :: desc_p
+      Type(psb_desc_type), Intent(in)      :: desc_data 
+      Character, Intent(in)                :: upd
+      integer, intent(out)                 :: info
+      character(len=5), optional           :: outfmt
+    end Subroutine psb_dcsrsetup
+ end interface
+
   info=0
   name='psb_splu_bld'
   call psb_erractionsave(err_act)
@@ -295,7 +311,7 @@ subroutine psb_splu_bld(a,desc_a,p,info)
      call psb_errpush(info,name,a_err=ch_err)
      goto 9999
   end if
-  nza = atmp%infoa(nnz_)
+  nza = atmp%infoa(psb_nnz_)
   if (Debug) then 
      write(0,*) me, 'SPLUBLD: Done csdp',info,nza,atmp%m,atmp%k
      call blacs_barrier(icontxt,'All')
@@ -309,7 +325,7 @@ subroutine psb_splu_bld(a,desc_a,p,info)
      goto 9999
   end if
 
-  nzb = blck%infoa(nnz_)
+  nzb = blck%infoa(psb_nnz_)
   if (Debug) then 
      write(0,*) me, 'SPLUBLD: Done csrsetup',info,nzb,blck%fida
      call blacs_barrier(icontxt,'All')
@@ -334,17 +350,17 @@ subroutine psb_splu_bld(a,desc_a,p,info)
         atmp%ia1(nza+j)  = blck%ia1(j)
         atmp%ia2(nza+j)  = blck%ia2(j)
      end do
-     atmp%infoa(nnz_) = nza+nzb
+     atmp%infoa(psb_nnz_) = nza+nzb
      atmp%m = atmp%m + blck%m
      atmp%k = max(a%k,blck%k)
   else
-     atmp%infoa(nnz_) = nza
+     atmp%infoa(psb_nnz_) = nza
      atmp%m = a%m 
      atmp%k = a%k
   endif
 
   i=0
-  do j=1, atmp%infoa(nnz_) 
+  do j=1, atmp%infoa(psb_nnz_) 
      if (atmp%ia2(j) <= atmp%m) then 
         i = i + 1
         atmp%aspk(i) = atmp%aspk(j)
@@ -352,7 +368,7 @@ subroutine psb_splu_bld(a,desc_a,p,info)
         atmp%ia2(i) = atmp%ia2(j)
      endif
   enddo
-  atmp%infoa(nnz_) = i
+  atmp%infoa(psb_nnz_) = i
 
 
   call psb_ipcoo2csr(atmp,info)
@@ -362,7 +378,7 @@ subroutine psb_splu_bld(a,desc_a,p,info)
      call psb_errpush(info,name,a_err=ch_err)
      goto 9999
   end if
-  call psb_spinfo(nztotreq,atmp,nzt,info)
+  call psb_spinfo(psb_nztotreq_,atmp,nzt,info)
   if(info /= 0) then
      info=4010
      ch_err='psb_spinfo'
@@ -471,7 +487,7 @@ subroutine psb_mlprec_bld(a,desc_a,p,info)
   end if
 
   nrg = p%av(ac_)%m
-  call psb_spinfo(nztotreq,p%av(ac_),nzg,info)
+  call psb_spinfo(psb_nztotreq_,p%av(ac_),nzg,info)
   call psb_ipcoo2csr(p%av(ac_),info)
   if(info /= 0) then
      info=4011
@@ -502,7 +518,7 @@ subroutine psb_mlprec_bld(a,desc_a,p,info)
         goto 9999
      end if
     k=0
-    do i=1,p%av(ac_)%infoa(nnz_)
+    do i=1,p%av(ac_)%infoa(psb_nnz_)
       if (p%av(ac_)%ia2(i) <= p%av(ac_)%m) then 
         k = k + 1
         p%av(ac_)%aspk(k) = p%av(ac_)%aspk(i)
@@ -510,9 +526,9 @@ subroutine psb_mlprec_bld(a,desc_a,p,info)
         p%av(ac_)%ia2(k) = p%av(ac_)%ia2(i)
       end if
     end do
-    p%av(ac_)%infoa(nnz_) = k
+    p%av(ac_)%infoa(psb_nnz_) = k
     call psb_ipcoo2csr(p%av(ac_),info)
-    call psb_spinfo(nztotreq,p%av(ac_),nzg,info)
+    call psb_spinfo(psb_nztotreq_,p%av(ac_),nzg,info)
     call fort_slu_factor(nrg,nzg,&
          & p%av(ac_)%aspk,p%av(ac_)%ia2,p%av(ac_)%ia1,p%iprcparm(slu_ptr_),info)
      if(info /= 0) then

@@ -74,7 +74,7 @@ Subroutine psb_dcsrsetup(ptype,novr,a,blk,desc_data,upd,desc_p,info,outfmt)
       goto 9999
     end if
     blk%fida        = 'COO'
-    blk%infoa(nnz_) = 0
+    blk%infoa(psb_nnz_) = 0
 
     If (upd == 'F') Then
       call psb_dsccpy(desc_p,desc_data,info)
@@ -115,7 +115,7 @@ Subroutine psb_dcsrsetup(ptype,novr,a,blk,desc_data,upd,desc_p,info,outfmt)
         goto 9999
       end if
       blk%fida='COO'
-      blk%infoa(nnz_)=0
+      blk%infoa(psb_nnz_)=0
       if (debug) write(0,*) 'Calling desccpy'
       if (upd == 'F') then 
         call psb_dsccpy(desc_p,desc_data,info)
@@ -166,7 +166,7 @@ Subroutine psb_dcsrsetup(ptype,novr,a,blk,desc_data,upd,desc_p,info,outfmt)
     n_row = desc_p%matrix_data(psb_n_row_)
     t2 = mpi_wtime()
 
-    if (debug) write(0,*) 'Before dcsrovr ',blk%fida,blk%m,nnz_,blk%infoa(nnz_)
+    if (debug) write(0,*) 'Before dcsrovr ',blk%fida,blk%m,psb_nnz_,blk%infoa(psb_nnz_)
 !!$    ierr = MPE_Log_event( iovrb, 0, "st OVR" )
 !!$    blk%m = n_row-nrow_a
 !!$    blk%k = n_row
@@ -187,7 +187,7 @@ Subroutine psb_dcsrsetup(ptype,novr,a,blk,desc_data,upd,desc_p,info,outfmt)
       goto 9999
     end if
 
-    if (debug) write(0,*) 'After psb_dcsrovr ',blk%fida,blk%m,nnz_,blk%infoa(nnz_)
+    if (debug) write(0,*) 'After psb_dcsrovr ',blk%fida,blk%m,psb_nnz_,blk%infoa(psb_nnz_)
 !!$    ierr = MPE_Log_event( iovre, 0, "ed OVR" )
 
     t3 = mpi_wtime()
