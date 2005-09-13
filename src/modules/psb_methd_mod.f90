@@ -38,7 +38,7 @@ Module psb_methd_mod
      end subroutine psb_dbicg
   end interface
 
-  interface ppsb_bicgstab
+  interface psb_bicgstab
      subroutine psb_dcgstab(a,prec,b,x,eps,&
 	  & desc_a,info,itmax,iter,err,itrace,istop)
        use psb_serial_mod

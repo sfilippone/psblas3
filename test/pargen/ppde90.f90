@@ -39,8 +39,8 @@
 !   u(x,y) = rhs(x,y)
 !
 program pde90
-  use f90sparse
-  use errormod
+  use psb_sparse_mod
+  use psb_error_mod
   implicit none
 
   interface 
@@ -56,7 +56,6 @@ program pde90
   integer      :: idim, iret
 
   ! miscellaneous 
-  integer, parameter   :: izero=0, ione=1
   character, parameter :: order='r'
   integer              :: iargc,convert_descr,dim, check_descr
   real(kind(1.d0)), parameter :: dzero = 0.d0, one = 1.d0
@@ -64,10 +63,10 @@ program pde90
   external  mpi_wtime
 
   ! sparse matrix and preconditioner
-  type(d_spmat) :: a,  l, u, h
-  type(d_prec) :: pre
+  type(psb_dspmat_type) :: a,  l, u, h
+  type(psb_dprec_type)  :: pre
   ! descriptor
-  type(desc_type)    :: desc_a, desc_a_out
+  type(psb_desc_type)   :: desc_a, desc_a_out
   ! dense matrices
   real(kind(1.d0)), pointer :: b(:), x(:), d(:),ld(:)
   integer, pointer :: work(:)
@@ -190,13 +189,13 @@ program pde90
   t1 = mpi_wtime()  
   eps   = 1.d-9
   if (cmethd.eq.'BICGSTAB') then 
-    call  f90_bicgstab(a,pre,b,x,eps,desc_a,info,& 
+    call  psb_bicgstab(a,pre,b,x,eps,desc_a,info,& 
          & itmax,iter,err,itrace)     
   else  if (cmethd.eq.'CGS') then 
-    call  f90_cgs(a,pre,b,x,eps,desc_a,info,& 
+    call  psb_cgs(a,pre,b,x,eps,desc_a,info,& 
          & itmax,iter,err,itrace)     
   else if (cmethd.eq.'BICGSTABL') then 
-    call  f90_bicgstabl(a,pre,b,x,eps,desc_a,info,& 
+    call  psb_bicgstabl(a,pre,b,x,eps,desc_a,info,& 
          & itmax,iter,err,itrace,ml)     
   else
     write(0,*) 'unknown method ',cmethd
@@ -224,10 +223,10 @@ program pde90
   !  
   !  cleanup storage and exit
   !
-  call f90_psdsfree(b,desc_a,info)
-  call f90_psdsfree(x,desc_a,info)
-  call f90_psspfree(a,desc_a,info)
-  call f90_psdscfree(desc_a,info)
+  call psb_free(b,desc_a,info)
+  call psb_free(x,desc_a,info)
+  call psb_spfree(a,desc_a,info)
+  call psb_dscfree(desc_a,info)
   if(info.ne.0) then
      info=4010
      ch_err='free routine'
@@ -394,17 +393,17 @@ contains
     !  u(x,y,z)(2b1+2b2+2b3+a1+a2+a3)+u(x-1,y,z)(-b1-a1)+u(x,y-1,z)(-b2-a2)+
     !  + u(x,y,z-1)(-b3-a3)-u(x+1,y,z)b1-u(x,y+1,z)b2-u(x,y,z+1)b3
 
-    use typesp
-    use typedesc
-    use f90tools
-    use f90methd
+    use psb_spmat_type
+    use psb_descriptor_type
+    use psb_tools_mod
+    use psb_methd_mod
     implicit none
     integer                  :: idim
     integer, parameter       :: nbmax=10
     real(kind(1.d0)),pointer :: b(:),t(:)
-    type (desc_type)  :: desc_a
+    type(psb_desc_type)      :: desc_a
     integer                  :: icontxt, info
-    character              :: afmt*5
+    character                :: afmt*5
     interface 
       !   .....user passed subroutine.....
       subroutine parts(global_indx,n,np,pv,nv)
@@ -414,10 +413,10 @@ contains
         integer, intent(out) :: pv(*) 
       end subroutine parts
     end interface   ! local variables
-    type(d_spmat)            :: a
+    type(psb_dspmat_type)    :: a
     real(kind(1.d0))         :: zt(nbmax),glob_x,glob_y,glob_z
     integer                  :: m,n,nnz,glob_row,j
-    type (d_spmat)           :: row_mat
+    type(psb_dspmat_type)    :: row_mat
     integer                  :: x,y,z,counter,ia,i,indx_owner
     integer                  :: nprow,npcol,myprow,mypcol
     integer                  :: element
@@ -456,12 +455,12 @@ contains
     write(*,*) 'size: n ',n
     call psb_dscall(n,n,parts,icontxt,desc_a,info)
     write(*,*) 'allocating a : nnz',nnz
-    call f90_psspall(a,desc_a,info,nnz=nnz)
+    call psb_spalloc(a,desc_a,info,nnz=nnz)
     ! define  rhs from boundary conditions; also build initial guess 
     write(*,*) 'allocating b'
-    call f90_psdsall(n,b,desc_a,info)
+    call psb_alloc(n,b,desc_a,info)
     write(*,*) 'allocating t'
-    call f90_psdsall(n,t,desc_a,info)
+    call psb_alloc(n,t,desc_a,info)
     if(info.ne.0) then
        info=4010
        ch_err='allocation rout.'
@@ -633,10 +632,10 @@ contains
           else
             zt(1) = 0.d0
           endif
-          call f90_psdsins(1,b,ia,zt(1:1),desc_a,info)
+          call psb_ins(1,b,ia,zt(1:1),desc_a,info)
           if(info.ne.0) exit
           zt(1)=0.d0
-          call f90_psdsins(1,t,ia,zt(1:1),desc_a,info)
+          call psb_ins(1,t,ia,zt(1:1),desc_a,info)
           if(info.ne.0) exit
         end if
       end do
@@ -672,8 +671,8 @@ contains
     end if
     write(0,*) '   assembly  time',(t2-t1),' ',a%fida(1:4)
 
-    call f90_psdsasb(b,desc_a,info)
-    call f90_psdsasb(t,desc_a,info)
+    call psb_asb(b,desc_a,info)
+    call psb_asb(t,desc_a,info)
     if(info.ne.0) then
        info=4010
        ch_err='asb rout.'

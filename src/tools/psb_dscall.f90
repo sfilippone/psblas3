@@ -17,8 +17,8 @@ subroutine psb_dscall(m, n, parts, icontxt, desc_a, info)
   use psb_realloc_mod
   use psb_serial_mod
   use psb_const_mod
-  use psb_parts_mod
   implicit None
+  include 'parts.fh'
   !....Parameters...
   Integer, intent(in)                 :: M,N,ICONTXT
   Type(psb_desc_type), intent(out)    :: desc_a

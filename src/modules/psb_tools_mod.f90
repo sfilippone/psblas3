@@ -270,7 +270,8 @@ Module psb_tools_mod
   interface psb_dscall
      subroutine psb_dscall(m, n, parts, icontxt, desc_a, info)
        use psb_descriptor_type
-       Integer, intent(in)                 :: M,N,ICONTXT
+       include 'parts.fh'
+       Integer, intent(in)                 :: m,n,icontxt
        Type(psb_desc_type), intent(out)    :: desc_a
        integer, intent(out)                :: info
      end subroutine psb_dscall

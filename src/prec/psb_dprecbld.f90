@@ -470,7 +470,7 @@ subroutine psb_mlprec_bld(a,desc_a,p,info)
   ! changed in the future. Need to package nlaggr & mlia in a 
   ! private data structure? 
 
-  call psb_gen_aggrmap(p%iprcparm(aggr_alg_),a,desc_a,p%nlaggr,p%mlia,info)
+  call psb_genaggrmap(p%iprcparm(aggr_alg_),a,desc_a,p%nlaggr,p%mlia,info)
   if(info /= 0) then
      info=4010
      ch_err='psb_gen_aggrmap'

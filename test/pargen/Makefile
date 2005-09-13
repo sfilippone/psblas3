@@ -2,13 +2,8 @@ include ../../Make.inc
 #
 # Libraries used
 #
-LIBDIR=../../LIB/
+LIBDIR=../../lib/
 PSBLAS_LIB= -L$(LIBDIR) -lpsblas
-SPARKER_LIB= -L$(LIBDIR) -lsparker 
-ZSPARKER_LIB= -L$(LIBDIR) 
-BLAS90LIB=-L$(LIBDIR) -lpsblas90
-METHD90LIB=-L$(LIBDIR) 
-TOOLS90LIB=-L$(LIBDIR) 
 
 #
 # Compilers and such
@@ -31,10 +26,9 @@ ppde90log: ppde90log.o  part_block.o
 
 ppde90: ppde90.o  part_block.o 
 	$(F90LINK) $(LINKOPT) ppde90.o part_block.o  -o ppde90\
-	$(METHD90LIB) $(TOOLS90LIB) $(BLAS90LIB) \
-	$(PSBLAS_LIB) $(SPARKER_LIB) $(BLAS)\
-	 $(BLACS) 
+	$(PSBLAS_LIB) $(BLACS)
 	/bin/mv ppde90 $(EXEDIR)
+
 ppde90s: ppde90s.o  part_block.o 
 	$(F90LINK) $(LINKOPT) ppde90s.o part_block.o  -o ppde90s\
 	$(METHD90LIB) $(TOOLS90LIB) $(BLAS90LIB) \
@@ -67,7 +61,7 @@ clean:
 verycleanlib: 
 	(cd ../..; make veryclean)
 lib:
-	(cd ../../; make lib)
+	(cd ../../; make library)
 
 
 

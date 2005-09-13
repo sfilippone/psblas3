@@ -44,8 +44,8 @@ RANLIB=ranlib
 LIBDIR = lib
 LIBNAME = libpsblas.a
 
-TYPEMODS =  psb_spmat_type$(.mod) psb_desc_type$(.mod) psb_prec_type$(.mod) psb_realloc_mod$(.mod)
-CONSTMODS = psb_tools_const$(.mod)
+TYPEMODS =  psb_spmat_type$(.mod) psb_descriptor_type$(.mod) psb_prec_type$(.mod) psb_realloc_mod$(.mod)
+CONSTMODS = psb_const_mod$(.mod)
 BLASMODS  = $(TYPEMODS) psb_psblas_mod$(.mod) psb_comm_mod$(.mod)
 METHDMODS = psb_methd_mod$(.mod)
 TOOLSMODS = $(CONSTMODS) psi_mod$(.mod) psb_tools_mod$(.mod) psb_serial_mod$(.mod)
@@ -53,8 +53,8 @@ PRECMODS  = psb_prec_mod$(.mod)
 ERRORMODS = psb_error_mod$(.mod)
 F90MODS= $(BLASMODS) $(PRECMODS) $(METHDMODS) $(TOOLSMODS) $(ERRORMODS) string$(.mod)
 
-MODS=$(LIBDIR)/psb_tools_const$(.mod) $(LIBDIR)/psb_spmat_type$(.mod) $(LIBDIR)/psb_realloc_mod$(.mod) \
-  $(LIBDIR)/psb_desc_type$(.mod)  $(LIBDIR)/psb_prec_type$(.mod) $(LIBDIR)/parts.f90 \
+MODS=$(LIBDIR)/psb_const_mod$(.mod) $(LIBDIR)/psb_spmat_type$(.mod) $(LIBDIR)/psb_realloc_mod$(.mod) \
+  $(LIBDIR)/psb_descriptor_type$(.mod)  $(LIBDIR)/psb_prec_type$(.mod) $(LIBDIR)/parts.fh \
   $(LIBDIR)/psb_serial_mod$(.mod) $(LIBDIR)/psb_comm_mod$(.mod) $(LIBDIR)/psb_error_mod$(.mod)
 
 # Under Linux/gmake there is a rule interpreting .mod as Modula source! 
