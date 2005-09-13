@@ -633,7 +633,7 @@ Subroutine psb_descasb(n_ovr,desc_p,desc_a,a,&
   end if
 
   if (.false.) then
-     call descprt(70+myrow,desc_p,.false.)
+     call psb_descprt(70+myrow,desc_p,.false.)
   end if
 
   if (debug) write(0,*) myrow,'Done ConvertComm'

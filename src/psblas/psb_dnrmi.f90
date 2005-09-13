@@ -13,6 +13,7 @@
 function psb_dnrmi(a,desc_a,info)  
   use psb_descriptor_type
   use psb_serial_mod
+  use psb_check_mod
   use psb_error_mod
   implicit none
 

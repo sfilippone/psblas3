@@ -28,7 +28,7 @@ module psb_comm_mod
        type(psb_desc_type), intent(in)           :: desc_a
        integer, intent(out)                      :: info
        real(kind(1.d0)), intent(in), optional    :: alpha
-       real(kind(1.d0)), intent(inout), optional :: work(:)
+       real(kind(1.d0)), target, optional        :: work(:)
        integer, intent(in), optional             :: mode,jx,ik
        character, intent(in), optional           :: tran
      end subroutine psb_dhalom
@@ -38,7 +38,7 @@ module psb_comm_mod
        type(psb_desc_type), intent(in)           :: desc_a
        integer, intent(out)                      :: info
        real(kind(1.d0)), intent(in), optional    :: alpha
-       real(kind(1.d0)), intent(inout), optional :: work(:)
+       real(kind(1.d0)), target, optional :: work(:)
        integer, intent(in), optional             :: mode
        character, intent(in), optional           :: tran
      end subroutine psb_dhalov

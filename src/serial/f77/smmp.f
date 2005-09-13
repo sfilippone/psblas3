@@ -29,7 +29,7 @@ c       symbolic matrix multiply c=a*b
 c
 c$$$      write(0,*) 'SYMBMM: ',n,m,l,ib(m+1)-1,jb(ib(m+1)-1)
       if (size(ic) < n+1) then 
-        call psrealloc(n+1,ic,info)
+        call psb_realloc(n+1,ic,info)
       endif
       maxlmn = max(l,m,n)
       do 10 i=1,maxlmn

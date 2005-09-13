@@ -448,6 +448,32 @@ subroutine psb_mlprec_bld(a,desc_a,p,info)
 
   integer :: i, nrg, nzg, err_act,k
   character(len=20) :: name, ch_err
+  
+  interface psb_genaggrmap
+     subroutine psb_dgenaggrmap(aggr_type,a,desc_a,nlaggr,ilaggr,info)
+       use psb_spmat_type
+       use psb_descriptor_type
+       implicit none
+       integer, intent(in)               :: aggr_type
+       type(psb_dspmat_type), intent(in) :: a
+       type(psb_desc_type), intent(in)   :: desc_a
+       integer, pointer                  :: ilaggr(:),nlaggr(:)
+       integer, intent(out)              :: info
+     end subroutine psb_dgenaggrmap
+  end interface
+
+  interface psb_bldaggrmat
+     subroutine psb_dbldaggrmat(a,desc_a,p,info)
+       use psb_prec_type
+       use psb_descriptor_type
+       use psb_spmat_type
+       type(psb_dspmat_type), intent(in), target :: a
+       type(psb_dbase_prec), intent(inout)        :: p
+       type(psb_desc_type), intent(in)           :: desc_a
+       integer, intent(out)                      :: info
+     end subroutine psb_dbldaggrmat
+  end interface
+  
   name='psb_mlprec_bld'
   info=0
   call psb_erractionsave(err_act)
@@ -478,7 +504,7 @@ subroutine psb_mlprec_bld(a,desc_a,p,info)
      goto 9999
   end if
 
-  call psb_bld_aggrmat(a,desc_a,p,info)
+  call psb_bldaggrmat(a,desc_a,p,info)
   if(info /= 0) then
      info=4010
      ch_err='psb_bld_aggrmat'

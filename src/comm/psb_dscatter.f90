@@ -21,6 +21,7 @@ subroutine  psb_dscatterm(globx, locx, desc_a, info, iroot,&
      & iiglobx, ijglobx, iilocx,ijlocx,ik)
 
   use psb_descriptor_type
+  use psb_check_mod
   use psb_error_mod
   implicit none
   include 'mpif.h'
@@ -239,6 +240,7 @@ end subroutine psb_dscatterm
 !
 subroutine  psb_dscatterv(globx, locx, desc_a, info, iroot)
   use psb_descriptor_type
+  use psb_check_mod
   use psb_error_mod
   implicit none
   include 'mpif.h'

@@ -18,6 +18,8 @@ subroutine  psb_dhalom(x,desc_a,info,alpha,jx,ik,work,tran,mode)
   use psb_descriptor_type
   use psb_const_mod
   use psi_mod
+  use psb_check_mod
+  use psb_realloc_mod
   use psb_error_mod
   implicit none
 
@@ -25,7 +27,7 @@ subroutine  psb_dhalom(x,desc_a,info,alpha,jx,ik,work,tran,mode)
   type(psb_desc_type), intent(in)           :: desc_a
   integer, intent(out)                      :: info
   real(kind(1.d0)), intent(in), optional    :: alpha
-  real(kind(1.d0)), intent(inout), target, optional :: work(:)
+  real(kind(1.d0)), optional, target        :: work(:)
   integer, intent(in), optional             :: mode,jx,ik
   character, intent(in), optional           :: tran
 
@@ -116,22 +118,13 @@ subroutine  psb_dhalom(x,desc_a,info,alpha,jx,ik,work,tran,mode)
   end if
 
   liwork=ncol
-  if (present(work)) then     
-     if(size(work).lt.liwork) then
-        call psrealloc(liwork,work,info)
-        if(info.ne.0) then
-           info=4010
-           ch_err='psrealloc'
-           call psb_errpush(info,name,a_err=ch_err)
-           goto 9999
-        end if
-     end if
+  if (present(work).and.(size(work).ge.liwork)) then
      iwork => work
   else
-     call psrealloc(liwork,iwork,info)
+     call psb_realloc(liwork,iwork,info)
      if(info.ne.0) then
         info=4010
-        ch_err='psrealloc'
+        ch_err='psb_realloc'
         call psb_errpush(info,name,a_err=ch_err)
         goto 9999
      end if
@@ -146,7 +139,7 @@ subroutine  psb_dhalom(x,desc_a,info,alpha,jx,ik,work,tran,mode)
 !!$          & size(x,1),desc_a%matrix_data,&
 !!$          & desc_a%halo_index,iwork,liwork,info)
   else if((ltran.eq.'T').or.(ltran.eq.'H')) then
-     call spi_swaptran(imode,k,1.d0,xp,&
+     call psi_swaptran(imode,k,1.d0,xp,&
           &desc_a,iwork,info)
 !!$     call PSI_dSwapTran(imode,k,1.d0,x(1,jjx),&
 !!$          & size(x,1),desc_a%matrix_data,&
@@ -191,6 +184,8 @@ subroutine  psb_dhalov(x,desc_a,info,alpha,work,tran,mode)
   use psb_descriptor_type
   use psb_const_mod
   use psi_mod
+  use psb_check_mod
+  use psb_realloc_mod
   use psb_error_mod
   implicit none
 
@@ -198,7 +193,7 @@ subroutine  psb_dhalov(x,desc_a,info,alpha,work,tran,mode)
   type(psb_desc_type), intent(in)           :: desc_a
   integer, intent(out)                      :: info
   real(kind(1.d0)), intent(in), optional    :: alpha
-  real(kind(1.d0)), intent(inout), target, optional :: work(:)
+  real(kind(1.d0)), target, optional        :: work(:)
   integer, intent(in), optional             :: mode
   character, intent(in), optional           :: tran
 
@@ -271,27 +266,18 @@ subroutine  psb_dhalov(x,desc_a,info,alpha,work,tran,mode)
   end if
 
   liwork=ncol
-  if (present(work)) then     
-     if(size(work).lt.liwork) then
-        call psrealloc(liwork,work,info)
-        if(info.ne.0) then
-           info=4010
-           ch_err='psrealloc'
-           call psb_errpush(info,name,a_err=ch_err)
-           goto 9999
-        end if
-     end if
+  if (present(work).and.(size(work).ge.liwork)) then
      iwork => work
   else
-     call psrealloc(liwork,iwork,info)
+     call psb_realloc(liwork,iwork,info)
      if(info.ne.0) then
         info=4010
-        ch_err='psrealloc'
+        ch_err='psb_realloc'
         call psb_errpush(info,name,a_err=ch_err)
         goto 9999
      end if
   end if
-
+  
   ! exchange halo elements
   if(ltran.eq.'N') then
      call psi_swapdata(imode,0.d0,x(iix:size(x)),&

@@ -17,6 +17,7 @@ function psb_dasum (x,desc_a, info, jx)
 
   use psb_serial_mod
   use psb_descriptor_type
+  use psb_check_mod
   use psb_error_mod
   implicit none
 
@@ -137,6 +138,7 @@ function psb_dasumv (x,desc_a, info)
 
   use psb_serial_mod
   use psb_descriptor_type
+  use psb_check_mod
   use psb_error_mod
   implicit none
 
@@ -252,6 +254,7 @@ end function psb_dasumv
 subroutine psb_dasumvs (res,x,desc_a, info)
   use psb_serial_mod
   use psb_descriptor_type
+  use psb_check_mod
   use psb_error_mod
   implicit none
 

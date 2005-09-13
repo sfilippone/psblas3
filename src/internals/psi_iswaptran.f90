@@ -27,6 +27,44 @@ subroutine psi_iswaptranm(flag,n,beta,y,desc_a,work,info)
   integer, pointer, dimension(:) :: sndbuf, rcvbuf
   character(len=20)  :: name, ch_err
 
+  interface psi_gth
+     subroutine psi_dgthm(n,k,idx,x,y)
+       integer :: n, k, idx(:)
+       real(kind(1.d0)) :: x(:,:), y(:)
+     end subroutine psi_dgthm
+     subroutine psi_dgthv(n,idx,x,y)
+       integer :: n, idx(:)
+       real(kind(1.d0)) :: x(:), y(:)
+     end subroutine psi_dgthv
+     subroutine psi_igthm(n,k,idx,x,y)
+       integer :: n, k, idx(:)
+       integer :: x(:,:), y(:)
+     end subroutine psi_igthm
+     subroutine psi_igthv(n,idx,x,y)
+       integer :: n, idx(:)
+       integer :: x(:), y(:)
+     end subroutine psi_igthv
+  end interface
+
+  interface psi_sct
+     subroutine psi_dsctm(n,k,idx,x,beta,y)
+       integer :: n, k, idx(:)
+       real(kind(1.d0)) :: beta, x(:), y(:,:)
+     end subroutine psi_dsctm
+     subroutine psi_dsctv(n,idx,x,beta,y)
+       integer :: n, idx(:)
+       real(kind(1.d0)) :: beta, x(:), y(:)
+     end subroutine psi_dsctv
+     subroutine psi_isctm(n,k,idx,x,beta,y)
+       integer :: n, k, idx(:)
+       integer :: beta, x(:), y(:,:)
+     end subroutine psi_isctm
+     subroutine psi_isctv(n,idx,x,beta,y)
+       integer :: n, idx(:)
+       integer :: beta, x(:), y(:)
+     end subroutine psi_isctv
+  end interface
+
   info = 0
   name='psi_dswaptranm'
   call psb_erractionsave(err_act)
@@ -396,6 +434,44 @@ subroutine psi_iswaptranv(flag,beta,y,desc_a,work,info)
   logical :: swap_mpi, swap_sync, swap_send, swap_recv
   integer, pointer, dimension(:) :: sndbuf, rcvbuf
   character(len=20)  :: name, ch_err
+
+  interface psi_gth
+     subroutine psi_dgthm(n,k,idx,x,y)
+       integer :: n, k, idx(:)
+       real(kind(1.d0)) :: x(:,:), y(:)
+     end subroutine psi_dgthm
+     subroutine psi_dgthv(n,idx,x,y)
+       integer :: n, idx(:)
+       real(kind(1.d0)) :: x(:), y(:)
+     end subroutine psi_dgthv
+     subroutine psi_igthm(n,k,idx,x,y)
+       integer :: n, k, idx(:)
+       integer :: x(:,:), y(:)
+     end subroutine psi_igthm
+     subroutine psi_igthv(n,idx,x,y)
+       integer :: n, idx(:)
+       integer :: x(:), y(:)
+     end subroutine psi_igthv
+  end interface
+
+  interface psi_sct
+     subroutine psi_dsctm(n,k,idx,x,beta,y)
+       integer :: n, k, idx(:)
+       real(kind(1.d0)) :: beta, x(:), y(:,:)
+     end subroutine psi_dsctm
+     subroutine psi_dsctv(n,idx,x,beta,y)
+       integer :: n, idx(:)
+       real(kind(1.d0)) :: beta, x(:), y(:)
+     end subroutine psi_dsctv
+     subroutine psi_isctm(n,k,idx,x,beta,y)
+       integer :: n, k, idx(:)
+       integer :: beta, x(:), y(:,:)
+     end subroutine psi_isctm
+     subroutine psi_isctv(n,idx,x,beta,y)
+       integer :: n, idx(:)
+       integer :: beta, x(:), y(:)
+     end subroutine psi_isctv
+  end interface
 
   info = 0
   name='psi_dswaptranv'

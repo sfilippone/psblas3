@@ -45,7 +45,7 @@ subroutine psi_crea_ovr_elem(desc_overlap,ovr_elem)
            if (pnt_new_elem.gt.dim_ovr_elem) then
               dim=(3*size(ovr_elem))/2+2
               write(0,*) 'calling realloc crea_ovr_elem',dim
-              call psrealloc(dim,ovr_elem,info)
+              call psb_realloc(dim,ovr_elem,info)
            endif
         else
            !              ....this point already exist in ovr_elem list

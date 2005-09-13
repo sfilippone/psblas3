@@ -3,6 +3,7 @@ include ../../Make.inc
 #FCOPT=-O2
 OBJS= psb_ddot.o psb_damax.o psb_dasum.o psb_daxpby.o\
 	 psb_dnrm2.o psb_dnrmi.o psb_dspmm.o psb_dspsm.o\
+	pdtreecomb.o
 
 LIBDIR=../../lib
 HERE=.

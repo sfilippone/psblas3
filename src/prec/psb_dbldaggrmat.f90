@@ -513,8 +513,8 @@ contains
     ! Doing it this way means to consider diag(Ai)
     ! 
     !
-    call symbmm90(am3,am4,am1)
-    call numbmm90(am3,am4,am1)
+    call psb_symbmm(am3,am4,am1)
+    call psb_numbmm(am3,am4,am1)
 
 
     call psb_spfree(am4,info)
@@ -559,8 +559,8 @@ contains
     if (test_dump) &
          & call psb_csprt(60+me,am1,head='% (I-wDA)Pt',ivr=desc_a%loc_to_glob)    
 
-    call symbmm90(a,am1,am3)
-    call numbmm90(a,am1,am3)
+    call psb_symbmm(a,am1,am3)
+    call psb_numbmm(a,am1,am3)
 
     if  (p%iprcparm(smth_kind_) == smth_omg_) then 
       call psb_transp(am1,am2,fmt='COO')
@@ -613,8 +613,8 @@ contains
       end if
     endif
 
-    call symbmm90(am2,am3,b)
-    call numbmm90(am2,am3,b)
+    call psb_symbmm(am2,am3,b)
+    call psb_numbmm(am2,am3,b)
 
 !!$    if (aggr_dump) call csprt(50+me,am1,head='% Operator PTrans.')
     call psb_spfree(am3,info)
@@ -834,7 +834,7 @@ contains
         end if
         call psb_dscdec(naggr,icontxt,p%desc_data,info)
 
-        call spfree(b,info)
+        call psb_spfree(b,info)
         if(info /=  0) then
           call psb_errpush(4010,name,a_err='spfree')
           goto 9999

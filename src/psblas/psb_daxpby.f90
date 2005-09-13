@@ -21,6 +21,7 @@
 !
 subroutine  psb_daxpby(alpha, x, beta,y,desc_a,info, n, jx, jy)
   use psb_descriptor_type
+  use psb_check_mod
   use psb_error_mod
   implicit none                    
 
@@ -144,8 +145,9 @@ end subroutine psb_daxpby
 !    desc_a -  type(<psb_desc_type>).     The communication descriptor.
 !    info   -  integer.                   Eventually returns an error code.
 !
-subroutine  psb_psdaxpbyv(alpha, x, beta,y,desc_a,info)
+subroutine  psb_daxpbyv(alpha, x, beta,y,desc_a,info)
   use psb_descriptor_type
+  use psb_check_mod
   use psb_error_mod
   implicit none                    
 
@@ -217,4 +219,4 @@ subroutine  psb_psdaxpbyv(alpha, x, beta,y,desc_a,info)
      return
   end if
   return
-end subroutine psb_psdaxpbyv
+end subroutine psb_daxpbyv

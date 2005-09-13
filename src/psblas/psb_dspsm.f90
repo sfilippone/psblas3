@@ -49,6 +49,7 @@ subroutine  psb_dspsm(alpha,a,x,beta,y,desc_a,info,&
   use psb_descriptor_type
   use psb_comm_mod
   use psi_mod
+  use psb_check_mod
   use psb_error_mod
   implicit none
 
@@ -325,6 +326,7 @@ subroutine  psb_dspsv(alpha,a,x,beta,y,desc_a,info,&
   use psb_descriptor_type
   use psb_comm_mod
   use psi_mod
+  use psb_check_mod
   use psb_error_mod
 
   real(kind(1.D0)), intent(in)              :: alpha, beta

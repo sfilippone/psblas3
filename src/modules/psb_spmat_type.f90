@@ -231,19 +231,19 @@ contains
     endif
 
     if (ifc_ == 1) then 
-      call psrealloc(nnz,a%ia1,a%ia2,a%aspk,info)
+      call psb_realloc(nnz,a%ia1,a%ia2,a%aspk,info)
     else
-      call psrealloc(nnz,a%aspk,info)
+      call psb_realloc(nnz,a%aspk,info)
       if (info /= 0) return 
-      call psrealloc(nnz,a%ia2,info)
+      call psb_realloc(nnz,a%ia2,info)
       if (info /= 0) return 
-      call psrealloc(ifc*nnz+200,a%ia1,info)
+      call psb_realloc(ifc*nnz+200,a%ia1,info)
       if (info /= 0) return 
     end if
     if (info /= 0) return
-    call psrealloc(max(1,a%m),a%pl,info)
+    call psb_realloc(max(1,a%m),a%pl,info)
     if (info /= 0) return
-    call psrealloc(max(1,a%k),a%pr,info)
+    call psb_realloc(max(1,a%k),a%pr,info)
     if (info /= 0) return
     
     Return
@@ -261,15 +261,15 @@ contains
     logical, parameter  :: debug=.false.
 
     info  = 0
-    call psrealloc(nd,a%aspk,info)
+    call psb_realloc(nd,a%aspk,info)
     if (info /= 0) return 
-    call psrealloc(ni2,a%ia2,info)
+    call psb_realloc(ni2,a%ia2,info)
     if (info /= 0) return 
-    call psrealloc(ni1,a%ia1,info)
+    call psb_realloc(ni1,a%ia1,info)
     if (info /= 0) return
-    call psrealloc(max(1,a%m),a%pl,info)
+    call psb_realloc(max(1,a%m),a%pl,info)
     if (info /= 0) return
-    call psrealloc(max(1,a%k),a%pr,info)
+    call psb_realloc(max(1,a%k),a%pr,info)
     if (info /= 0) return
     
     Return

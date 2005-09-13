@@ -66,7 +66,7 @@ subroutine psi_crea_bnd_elem(desc_a,info)
 9999 continue
   call psb_erractionrestore(err_act)
   if (err_act.eq.act_abort) then
-     call psb_serror()
+     call psb_error()
      return
   end if
   return

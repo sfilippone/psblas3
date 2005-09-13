@@ -115,10 +115,10 @@ subroutine psi_desc_index(desc_data,index_in,dep_list,&
      !c$$$          write(0,*)  'potential error on desc_index :',
      !c$$$     +      length_dh, size(desc_index),ntot
      write(0,*) 'calling irealloc psi_desc_index ',ntot
-     call psrealloc(ntot,desc_index,info)
+     call psb_realloc(ntot,desc_index,info)
   endif
   if (info /= 0) then 
-     call psb_errpush(4010,name,a_err='psrealloc')
+     call psb_errpush(4010,name,a_err='psb_realloc')
      goto 9999
   end if
 
@@ -225,7 +225,7 @@ subroutine psi_desc_index(desc_data,index_in,dep_list,&
 9999 continue
   call psb_erractionrestore(err_act)
   if (err_act.eq.act_abort) then
-     call psb_serror(icontxt)
+     call psb_error(icontxt)
      return
   end if
   return

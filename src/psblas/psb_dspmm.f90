@@ -55,6 +55,7 @@ subroutine  psb_dspmm(alpha,a,x,beta,y,desc_a,info,&
   use psb_descriptor_type
   use psb_comm_mod
   use psi_mod
+  use psb_check_mod
   use psb_error_mod
   implicit none
 
@@ -368,6 +369,7 @@ subroutine  psb_dspmv(alpha,a,x,beta,y,desc_a,info,&
   use psb_descriptor_type
   use psb_comm_mod
   use psi_mod
+  use psb_check_mod
   use psb_error_mod
   implicit none
 

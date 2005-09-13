@@ -20,7 +20,7 @@ C     .. Local Arrays ..
 
       IF((ALPHA.NE.1.D0) .OR. (BETA.NE.0.D0))then
          IERROR=5
-         CALL PSB_ERRPUSH(IERROR,NAME,INT_VAL)
+         CALL FCPSB_ERRPUSH(IERROR,NAME,INT_VAL)
          GOTO 9999
       ENDIF
       UPLO = '?'
@@ -28,14 +28,14 @@ C     .. Local Arrays ..
       IF (DESCRA(1:1).EQ.'T' .AND. DESCRA(2:2).EQ.'L') UPLO = 'L'
       IF (UPLO.EQ.'?') THEN
          IERROR=5
-         CALL PSB_ERRPUSH(IERROR,NAME,INT_VAL)
+         CALL FCPSB_ERRPUSH(IERROR,NAME,INT_VAL)
          GOTO 9999
       END IF
       IF (DESCRA(3:3).EQ.'N') DIAG = 'N'
       IF (DESCRA(3:3).EQ.'U') DIAG = 'U'
       IF(UNITD.EQ.'B') THEN
          IERROR=5
-         CALL PSB_ERRPUSH(IERROR,NAME,INT_VAL)
+         CALL FCPSB_ERRPUSH(IERROR,NAME,INT_VAL)
          GOTO 9999
       ENDIF
       IF (UNITD.EQ.'R') THEN

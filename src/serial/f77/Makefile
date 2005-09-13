@@ -5,7 +5,8 @@ include ../../../Make.inc
 #
 FOBJS =  daxpby.o dcsmm.o dcsnmi.o dcsrp.o dcssm.o \
 	dcsupd.o dgelp.o dlpupd.o dswmm.o dswprt.o \
-	dswsm.o smmp.o ddot.o
+	dswsm.o smmp.o ddot.o dscal.o dcsrws.o idamax.o \
+	dnrm2.o dcopy.o
 
 
 #zcsrck.o zcrnrmi.o zcsrmm.o zsrmv.o zcsrsm.o zsrsv.o  

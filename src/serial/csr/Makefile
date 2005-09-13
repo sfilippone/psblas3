@@ -5,7 +5,8 @@ include ../../../Make.inc
 #
 
 FOBJS = dcsrck.o dcsrmm.o dcsrsm.o dcsrmv.o dcsrsv.o dcrnrmi.o  \
-        dcrcrupd.o dcocrupd.o dcsrprt.o dcsrmv4.o dcsrmv2.o dcsrmv3.o\
+        dcrcrupd.o dcocrupd.o dcsrprt.o dcsrmv4.o dcsrmv2.o dcsrmv3.o \
+	dcsrrws.o
 
 OBJS=$(FOBJS)
 

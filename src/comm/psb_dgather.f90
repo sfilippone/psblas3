@@ -19,6 +19,7 @@
 subroutine  psb_dgatherm(globx, locx, desc_a, info, iroot,&
      & iiglobx, ijglobx, iilocx,ijlocx,ik)
   use psb_descriptor_type
+  use psb_check_mod
   use psb_error_mod
   implicit none
 
@@ -192,6 +193,7 @@ end subroutine psb_dgatherm
 subroutine  psb_dgatherv(globx, locx, desc_a, info, iroot,&
      & iiglobx, iilocx)
   use psb_descriptor_type
+  use psb_check_mod
   use psb_error_mod
   implicit none
 

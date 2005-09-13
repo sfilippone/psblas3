@@ -16,10 +16,13 @@
 subroutine  psb_dovrlm(x,desc_a,info,jx,ik,work,choice,update_type)
   use psb_descriptor_type
   use psb_const_mod
+  use psi_mod
+  use psb_realloc_mod
+  use psb_check_mod
   use psb_error_mod
   implicit none
 
-  real(kind(1.d0)), intent(inout)           :: x(:,:)
+  real(kind(1.d0)), intent(inout), target   :: x(:,:)
   type(psb_desc_type), intent(in)           :: desc_a
   integer, intent(out)                      :: info
   real(kind(1.d0)), intent(inout), optional, target :: work(:)
@@ -30,7 +33,7 @@ subroutine  psb_dovrlm(x,desc_a,info,jx,ik,work,choice,update_type)
   integer                  :: int_err(5), icontxt, nprow, npcol, myrow, mycol,&
        & err_act, m, n, iix, jjx, temp(2), ix, ijx, nrow, ncol, k, maxk, iupdate,&
        & imode, err, liwork, i
-  real(kind(1.d0)),pointer :: iwork(:)
+  real(kind(1.d0)),pointer :: iwork(:), xp(:,:)
   logical                  :: ichoice
   character(len=20)        :: name, ch_err
 
@@ -109,22 +112,13 @@ subroutine  psb_dovrlm(x,desc_a,info,jx,ik,work,choice,update_type)
 
   ! check for presence/size of a work area
   liwork=ncol
-  if (present(work)) then     
-     if(size(work).lt.liwork) then
-        call psrealloc(liwork,work,info)
-        if(info.ne.0) then
-           info=4010
-           ch_err='psrealloc'
-           call psb_errpush(info,name,a_err=ch_err)
-           goto 9999
-        end if
-     end if
+  if (present(work).and.(size(work).ge.liwork)) then
      iwork => work
   else
-     call psrealloc(liwork,iwork,info)
+     call psb_realloc(liwork,iwork,info)
      if(info.ne.0) then
         info=4010
-        ch_err='psrealloc'
+        ch_err='psb_realloc'
         call psb_errpush(info,name,a_err=ch_err)
         goto 9999
      end if
@@ -132,13 +126,13 @@ subroutine  psb_dovrlm(x,desc_a,info,jx,ik,work,choice,update_type)
 
   ! exchange overlap elements
   if(ichoice) then
-     call PSI_dSwapData(imode,k,1.d0,x(1,jjx),&
-          & size(x,1),desc_a%matrix_data,&
-          & desc_a%halo_index,iwork,liwork,info)
+     xp => x(iix:size(x,1),jjx:jjx+k-1)
+     call psi_swapdata(imode,k,1.d0,xp,&
+          & desc_a,iwork,info)
   end if
 
   if(info.ne.0) then
-     call psb_errpush(4010,name,a_err='PSI_dSwapData')
+     call psb_errpush(4010,name,a_err='psi_swapdata')
      goto 9999
   end if
 
@@ -202,11 +196,14 @@ end subroutine psb_dovrlm
 !
 subroutine  psb_dovrlv(x,desc_a,info,work,choice,update_type)
   use psb_descriptor_type
+  use psi_mod
   use psb_const_mod
+  use psb_realloc_mod
+  use psb_check_mod
   use psb_error_mod
   implicit none
 
-  real(kind(1.d0)), intent(inout)           :: x(:)
+  real(kind(1.d0)), intent(inout), target   :: x(:)
   type(psb_desc_type), intent(in)           :: desc_a
   integer, intent(out)                      :: info
   real(kind(1.d0)), intent(inout), optional, target :: work(:)
@@ -264,7 +261,7 @@ subroutine  psb_dovrlv(x,desc_a,info,work,choice,update_type)
   imode = IOR(psb_swap_send_,psb_swap_recv_)
 
   ! check vector correctness
-  call psb_chkvect(m,1,x,1,ix,ijx,desc_a%matrix_data,info,iix,jjx)
+  call psb_chkvect(m,1,size(x),ix,ijx,desc_a%matrix_data,info,iix,jjx)
   if(info.ne.0) then
      info=4010
      ch_err='psb_chkvect'
@@ -282,22 +279,13 @@ subroutine  psb_dovrlv(x,desc_a,info,work,choice,update_type)
 
   ! check for presence/size of a work area
   liwork=ncol
-  if (present(work)) then     
-     if(size(work).lt.liwork) then
-        call psrealloc(liwork,work,info)
-        if(info.ne.0) then
-           info=4010
-           ch_err='psrealloc'
-           call psb_errpush(info,name,a_err=ch_err)
-           goto 9999
-        end if
-     end if
+  if (present(work).and.(size(work).ge.liwork)) then
      iwork => work
   else
-     call psrealloc(liwork,iwork,info)
+     call psb_realloc(liwork,iwork,info)
      if(info.ne.0) then
         info=4010
-        ch_err='psrealloc'
+        ch_err='psb_realloc'
         call psb_errpush(info,name,a_err=ch_err)
         goto 9999
      end if
@@ -305,13 +293,12 @@ subroutine  psb_dovrlv(x,desc_a,info,work,choice,update_type)
 
   ! exchange overlap elements
   if(ichoice) then
-     call PSI_dSwapData(imode,k,1.d0,x,&
-          & x,desc_a%matrix_data,&
-          & desc_a%halo_index,iwork,liwork,info)
+     call psi_swapdata(imode,1.d0,x(iix:size(x)),&
+          & desc_a,iwork,info)
   end if
 
   if(info.ne.0) then
-     call psb_errpush(4010,name,a_err='PSI_dSwapData')
+     call psb_errpush(4010,name,a_err='PSI_SwapData')
      goto 9999
   end if
 

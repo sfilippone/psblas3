@@ -1,0 +1,53 @@
+      SUBROUTINE DCOORWS(TRANS,M,N,DESCRA,A,IA1,IA2,
+     &   INFOA,ROWSUM,IERROR)
+      IMPLICIT NONE
+C     .. Scalar Arguments ..
+      INTEGER           M,N, IERROR
+      CHARACTER         TRANS
+C     .. Array Arguments ..
+      INTEGER           IA1(*),IA2(*),INFOA(*)
+      CHARACTER         DESCRA*11
+      DOUBLE PRECISION  A(*), ROWSUM(*)
+C     .. Local scalars ..
+      INTEGER I, J, NNZ, K
+      DOUBLE PRECISION  SUM
+      logical lsame
+      external lsame
+
+      NNZ = INFOA(1)
+      IF (lsame(TRANS,'N')) THEN
+        DO I=1, M 
+          ROWSUM(I) = 0.0D0
+        ENDDO
+        I    = 1
+        J    = I
+        DO WHILE (I.LE.NNZ)
+          
+          DO WHILE ((IA1(J).EQ.IA1(I)).AND.
+     +       (J.LE.NNZ))
+            J = J+1
+          ENDDO
+          
+          SUM = 0.0
+          DO K = I, J-1
+            SUM = SUM + ABS(A(K))
+          ENDDO        
+          ROWSUM(IA1(I)) = ROWSUM(IA1(I)) + SUM
+          I = J 
+        ENDDO
+        
+      ELSE IF (lsame(TRANS,'T').OR.lsame(TRANS,'C')) THEN
+        DO J = 1, N
+          ROWSUM(J) = 0.0D0
+        ENDDO
+        DO I = 1, NNZ
+          ROWSUM(IA2(I)) = ROWSUM(IA2(I)) + ABS(A(I))
+        ENDDO
+      ELSE
+        ierror = -1
+      ENDIF
+      RETURN
+      END
+
+
+

@@ -17,6 +17,7 @@ function psb_damax (x,desc_a, info, jx)
 
   use psb_serial_mod
   use psb_descriptor_type
+  use psb_check_mod
   use psb_error_mod
   implicit none
 
@@ -119,6 +120,7 @@ end function psb_damax
 function psb_damaxv (x,desc_a, info)
   use psb_serial_mod
   use psb_descriptor_type
+  use psb_check_mod
   use psb_error_mod
   implicit none
 
@@ -218,6 +220,7 @@ end function psb_damaxv
 subroutine psb_damaxvs (res,x,desc_a, info, jx)
   use psb_serial_mod
   use psb_descriptor_type
+  use psb_check_mod
   use psb_error_mod
   implicit none
 
@@ -321,6 +324,7 @@ end subroutine psb_damaxvs
 subroutine psb_dmamaxs (res,x,desc_a, info)
   use psb_serial_mod
   use psb_descriptor_type
+  use psb_check_mod
   use psb_error_mod
   implicit none
 

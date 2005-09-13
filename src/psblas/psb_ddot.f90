@@ -19,7 +19,7 @@
 !
 function psb_ddot(x, y,desc_a, info, jx, jy)  
   use psb_descriptor_type
-!  use psb_spsb_mod
+  use psb_check_mod
   use psb_error_mod
   implicit none
 
@@ -149,6 +149,7 @@ end function psb_ddot
 !
 function psb_ddotv(x, y,desc_a, info)  
   use psb_descriptor_type
+  use psb_check_mod
   use psb_error_mod
   implicit none
 
@@ -259,6 +260,7 @@ end function psb_ddotv
 !
 subroutine psb_ddotvs(res, x, y,desc_a, info)  
   use psb_descriptor_type
+  use psb_check_mod
   use psb_error_mod
   implicit none
 
@@ -374,6 +376,7 @@ end subroutine psb_ddotvs
 !
 subroutine psb_dmdots(res, x, y, desc_a, info)  
   use psb_descriptor_type
+  use psb_check_mod
   use psb_error_mod
   implicit none
 

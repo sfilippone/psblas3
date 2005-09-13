@@ -60,6 +60,22 @@ subroutine psb_dcslu(a,desc_a,p,upd,info)
      end subroutine psb_dsplu
   end interface
 
+  interface psb_csrsetup
+    Subroutine psb_dcsrsetup(ptype,novr,a,blk,desc_data,upd,desc_p,info,outfmt)
+      use psb_serial_mod
+      Use psb_descriptor_type
+      Use psb_prec_type
+      integer, intent(in)                  :: ptype,novr
+      Type(psb_dspmat_type), Intent(in)    ::  a
+      Type(psb_dspmat_type), Intent(inout) ::  blk
+      Type(psb_desc_type), Intent(inout)   :: desc_p
+      Type(psb_desc_type), Intent(in)      :: desc_data 
+      Character, Intent(in)                :: upd
+      integer, intent(out)                 :: info
+      character(len=5), optional           :: outfmt
+    end Subroutine psb_dcsrsetup
+ end interface
+
   info=0
   name='psb_dcslu'
   call psb_erractionsave(err_act)

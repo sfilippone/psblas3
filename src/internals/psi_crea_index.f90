@@ -81,7 +81,7 @@ subroutine psi_crea_index(desc_a,index_in,index_out,glob_idx,info)
 9999 continue
   call psb_erractionrestore(err_act)
   if (err_act.eq.act_abort) then
-     call psb_serror(icontxt)
+     call psb_error(icontxt)
      return
   end if
   return

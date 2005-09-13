@@ -165,7 +165,7 @@ C
              INT_VAL(2) = NZ
              INT_VAL(3) = LAUX
              LIAN1  = NZ
-             CALL PSB_ERRPUSH(IERROR,NAME,INT_VAL)
+             CALL FCPSB_ERRPUSH(IERROR,NAME,INT_VAL)
              GOTO 9999
           END IF
           IF (NZ .GT. LARN) THEN
@@ -174,7 +174,7 @@ C
              INT_VAL(2) = NZ
              INT_VAL(3) = LAUX
              LIAN1  = NZ
-             CALL PSB_ERRPUSH(IERROR,NAME,INT_VAL)
+             CALL FCPSB_ERRPUSH(IERROR,NAME,INT_VAL)
              GOTO 9999
           END IF
 

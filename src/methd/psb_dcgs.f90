@@ -307,7 +307,7 @@ Subroutine psb_dcgs(a,prec,b,x,eps,desc_a,info,&
   End If
 
   Deallocate(aux)
-  Call psb_dsfree(wwrk,desc_a,info)
+  Call psb_free(wwrk,desc_a,info)
   ! restore external global coherence behaviour
   Call blacs_set(icontxt,16,isvch)
 

@@ -91,7 +91,7 @@ subroutine psi_compute_size(desc_data,&
 9999 continue
   call psb_erractionrestore(err_act)
   if (err_act.eq.act_abort) then
-     call psb_serror(icontxt)
+     call psb_error(icontxt)
      return
   end if
   return

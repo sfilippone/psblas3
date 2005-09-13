@@ -8,12 +8,12 @@ subroutine psb_dprecaply(prec,x,y,desc_data,info,trans, work)
   use psb_error_mod
   implicit none
 
-  type(psb_desc_type),intent(in)    :: desc_data
-  type(psb_dprec_type), intent(in)  :: prec
-  real(kind(0.d0)),intent(inout)    :: x(:), y(:)
-  integer, intent(out)              :: info
-  character(len=1), optional        :: trans
-  real(kind(0.d0)),intent(inout), optional, target :: work(:)
+  type(psb_desc_type),intent(in)      :: desc_data
+  type(psb_dprec_type), intent(in)    :: prec
+  real(kind(0.d0)),intent(inout)      :: x(:), y(:)
+  integer, intent(out)                :: info
+  character(len=1), optional          :: trans
+  real(kind(0.d0)), optional, target  :: work(:)
 
   ! Local variables
   character     ::trans_ 
@@ -97,7 +97,7 @@ subroutine psb_dbaseprcaply(prec,x,beta,y,desc_data,trans,work,info)
   real(kind(0.d0)),intent(inout)    :: x(:), y(:)
   real(kind(0.d0)),intent(in)       :: beta
   character(len=1)                  :: trans
-  real(kind(0.d0)),intent(inout),target :: work(:)
+  real(kind(0.d0)),target           :: work(:)
   integer, intent(out)              :: info
 
   ! Local variables
@@ -161,7 +161,7 @@ subroutine psb_dbaseprcaply(prec,x,beta,y,desc_data,trans,work,info)
 
   case(bja_)
 
-    call psb_bjacaply(prec,x,beta,y,desc_data,trans,work,info)
+    call psb_dbjacaply(prec,x,beta,y,desc_data,trans,work,info)
     if(info.ne.0) then
        info=4010
        ch_err='psb_bjacaply'
@@ -220,7 +220,7 @@ subroutine psb_dbaseprcaply(prec,x,beta,y,desc_data,trans,work,info)
       end if
     endif
 
-    call psb_bjacaply(prec,tx,zero,ty,prec%desc_data,trans,aux,info)
+    call psb_dbjacaply(prec,tx,zero,ty,prec%desc_data,trans,aux,info)
 
     if (prec%iprcparm(iren_)>0) then 
       call psb_dgelp('N',n_row,1,prec%invperm,ty,isz,ww,isz,info)
@@ -317,7 +317,7 @@ subroutine psb_dbjacaply(prec,x,beta,y,desc_data,trans,work,info)
   real(kind(0.d0)),intent(inout)        :: x(:), y(:)
   real(kind(0.d0)),intent(in)           :: beta
   character(len=1)                      :: trans
-  real(kind(0.d0)),intent(inout),target :: work(:)
+  real(kind(0.d0)),target               :: work(:)
   integer, intent(out)                  :: info
 
   ! Local variables
@@ -526,7 +526,7 @@ subroutine psb_dmlprcaply(baseprecv,x,beta,y,desc_data,trans,work,info)
   real(kind(0.d0)),intent(in)       :: beta
   real(kind(0.d0)),intent(inout)    :: x(:), y(:)
   character                         :: trans
-  real(kind(0.d0)),intent(inout),target    :: work(:)
+  real(kind(0.d0)),target           :: work(:)
   integer, intent(out)              :: info
 
 
@@ -567,7 +567,7 @@ subroutine psb_dmlprcaply(baseprecv,x,beta,y,desc_data,trans,work,info)
     t1 = mpi_wtime()
     n_row=desc_data%matrix_data(psb_n_row_)
     n_col=desc_data%matrix_data(psb_n_col_)
-    call psb_baseprcaply(baseprecv(1),x,beta,y,desc_data,trans,work,info)
+    call psb_dbaseprcaply(baseprecv(1),x,beta,y,desc_data,trans,work,info)
     if(info /=0) goto 9999
 
     nr2l  = baseprecv(2)%desc_data%matrix_data(psb_n_col_)
@@ -616,7 +616,7 @@ subroutine psb_dmlprcaply(baseprecv,x,beta,y,desc_data,trans,work,info)
     endif
 
     w2l=t2l
-    call psb_baseprcaply(baseprecv(2),w2l,zero,t2l,baseprecv(2)%desc_data,'N',work,info)
+    call psb_dbaseprcaply(baseprecv(2),w2l,zero,t2l,baseprecv(2)%desc_data,'N',work,info)
 
 
     if (ismth  /= no_smth_) then 
@@ -706,7 +706,7 @@ subroutine psb_dmlprcaply(baseprecv,x,beta,y,desc_data,trans,work,info)
 
       t6 = mpi_wtime()
       w2l=t2l
-      call psb_baseprcaply(baseprecv(2),w2l,zero,t2l,baseprecv(2)%desc_data,'N',work,info)
+      call psb_dbaseprcaply(baseprecv(2),w2l,zero,t2l,baseprecv(2)%desc_data,'N',work,info)
       if(info /=0) goto 9999
 
       if (ismth  /= no_smth_) then 
@@ -730,7 +730,7 @@ subroutine psb_dmlprcaply(baseprecv,x,beta,y,desc_data,trans,work,info)
       call psb_spmm(-one,baseprecv(2)%aorig,ty,one,tx,desc_data,info,work=work)
       if(info /=0) goto 9999
 
-      call psb_baseprcaply(baseprecv(1),tx,one,ty,desc_data,trans,work,info)
+      call psb_dbaseprcaply(baseprecv(1),tx,one,ty,desc_data,trans,work,info)
       if(info /=0) goto 9999
 
       call psb_axpby(one,ty,beta,y,desc_data,info)
@@ -759,7 +759,7 @@ subroutine psb_dmlprcaply(baseprecv,x,beta,y,desc_data,trans,work,info)
       call psb_axpby(one,y,zero,ty,desc_data,info)
       if(info /=0) goto 9999
 
-      call psb_baseprcaply(baseprecv(1),x,zero,tty,desc_data,trans,work,info)
+      call psb_dbaseprcaply(baseprecv(1),x,zero,tty,desc_data,trans,work,info)
       if(info /=0) goto 9999
 
       call psb_spmm(-one,baseprecv(2)%aorig,tty,one,tx,desc_data,info,work=work)
@@ -796,7 +796,7 @@ subroutine psb_dmlprcaply(baseprecv,x,beta,y,desc_data,trans,work,info)
 
       t6 = mpi_wtime()
       w2l=t2l
-      call psb_baseprcaply(baseprecv(2),w2l,zero,t2l,baseprecv(2)%desc_data,'N',work,info)
+      call psb_dbaseprcaply(baseprecv(2),w2l,zero,t2l,baseprecv(2)%desc_data,'N',work,info)
       if(info /=0) goto 9999
 
       if (ismth  /= no_smth_) then 
@@ -852,7 +852,7 @@ subroutine psb_dmlprcaply(baseprecv,x,beta,y,desc_data,trans,work,info)
 end subroutine psb_dmlprcaply
 
 
-subroutine psb_dprec1(prec,x,desc_data,info,trans)
+subroutine psb_dprecaply1(prec,x,desc_data,info,trans)
 
   use psb_serial_mod
   use psb_descriptor_type
@@ -890,7 +890,7 @@ subroutine psb_dprec1(prec,x,desc_data,info,trans)
   end if
 
   allocate(ww(size(x)),w1(size(x)))
-  call psb_dprec(prec,x,ww,desc_data,info,trans_,w1)
+  call psb_dprecaply(prec,x,ww,desc_data,info,trans_,w1)
   if(info /=0) goto 9999
   x(:) = ww(:)
   deallocate(ww,W1)
@@ -906,5 +906,5 @@ subroutine psb_dprec1(prec,x,desc_data,info,trans)
      return
   end if
   return
-end subroutine psb_dprec1
+end subroutine psb_dprecaply1
 

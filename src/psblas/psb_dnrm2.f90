@@ -15,6 +15,7 @@
 !
 function psb_dnrm2(x, desc_a, info, jx)  
   use psb_descriptor_type
+  use psb_check_mod
   use psb_error_mod
   implicit none
 
@@ -127,6 +128,7 @@ end function psb_dnrm2
 !
 function psb_dnrm2v(x, desc_a, info)  
   use psb_descriptor_type
+  use psb_check_mod
   use psb_error_mod
   implicit none
 
@@ -236,6 +238,7 @@ end function psb_dnrm2v
 !
 subroutine psb_dnrm2vs(res, x, desc_a, info)
   use psb_descriptor_type
+  use psb_check_mod
   use psb_error_mod
   implicit none
 

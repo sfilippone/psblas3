@@ -18,6 +18,8 @@ subroutine  psb_ihalom(x,desc_a,info,alpha,jx,ik,work,tran,mode)
   use psb_descriptor_type
   use psb_const_mod
   use psi_mod
+  use psb_realloc_mod
+  use psb_check_mod
   use psb_error_mod
   implicit none
 
@@ -118,22 +120,13 @@ subroutine  psb_ihalom(x,desc_a,info,alpha,jx,ik,work,tran,mode)
 !!$  end if
 
   liwork=ncol
-  if (present(work)) then     
-     if(size(work).lt.liwork) then
-        call psrealloc(liwork,work,info)
-        if(info.ne.0) then
-           info=4010
-           ch_err='psrealloc'
-           call psb_errpush(info,name,a_err=ch_err)
-           goto 9999
-        end if
-     end if
+  if (present(work).and.(size(work).ge.liwork)) then
      iwork => work
   else
-     call psrealloc(liwork,iwork,info)
+     call psb_realloc(liwork,iwork,info)
      if(info.ne.0) then
         info=4010
-        ch_err='psrealloc'
+        ch_err='psb_realloc'
         call psb_errpush(info,name,a_err=ch_err)
         goto 9999
      end if
@@ -187,6 +180,8 @@ subroutine  psb_ihalov(x,desc_a,info,alpha,work,tran,mode)
   use psb_descriptor_type
   use psb_const_mod
   use psi_mod
+  use psb_realloc_mod
+  use psb_check_mod
   use psb_error_mod
   implicit none
 
@@ -267,22 +262,13 @@ subroutine  psb_ihalov(x,desc_a,info,alpha,work,tran,mode)
 !!$  end if
 
   liwork=ncol
-  if (present(work)) then     
-     if(size(work).lt.liwork) then
-        call psb_realloc(liwork,work,info)
-        if(info.ne.0) then
-           info=4010
-           ch_err='psb_realloc'
-           call psb_errpush(info,name,a_err=ch_err)
-           goto 9999
-        end if
-     end if
+  if (present(work).and.(size(work).ge.liwork)) then
      iwork => work
   else
-     call psrealloc(liwork,iwork,info)
+     call psb_realloc(liwork,iwork,info)
      if(info.ne.0) then
         info=4010
-        ch_err='psrealloc'
+        ch_err='psb_realloc'
         call psb_errpush(info,name,a_err=ch_err)
         goto 9999
      end if
