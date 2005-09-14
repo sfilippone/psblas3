@@ -188,7 +188,7 @@ C     .. Parameters ..
       LOGICAL           DEBUG
       PARAMETER         (DEBUG=.FALSE.)
 C     .. External Subroutines ..
-      EXTERNAL         DSWSM, DLPUPD, XERBLA
+      EXTERNAL         DSWSM, DLPUPD
 C     .. Intrinsic Functions ..
       INTRINSIC        DBLE, IDINT
 C     .. Executable Statements ..

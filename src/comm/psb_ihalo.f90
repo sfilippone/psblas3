@@ -1,3 +1,4 @@
+
 ! File:  psb_ihalo.f90
 !
 ! Subroutine: psb_ihalom
@@ -120,8 +121,18 @@ subroutine  psb_ihalom(x,desc_a,info,alpha,jx,ik,work,tran,mode)
 !!$  end if
 
   liwork=ncol
-  if (present(work).and.(size(work).ge.liwork)) then
-     iwork => work
+  if (present(work)) then
+     if(size(work).ge.liwork) then
+        iwork => work
+     else
+        call psb_realloc(liwork,iwork,info)
+        if(info.ne.0) then
+           info=4010
+           ch_err='psb_realloc'
+           call psb_errpush(info,name,a_err=ch_err)
+           goto 9999
+        end if
+     end if
   else
      call psb_realloc(liwork,iwork,info)
      if(info.ne.0) then
@@ -262,8 +273,18 @@ subroutine  psb_ihalov(x,desc_a,info,alpha,work,tran,mode)
 !!$  end if
 
   liwork=ncol
-  if (present(work).and.(size(work).ge.liwork)) then
-     iwork => work
+  if (present(work)) then
+     if(size(work).ge.liwork) then
+        iwork => work
+     else
+        call psb_realloc(liwork,iwork,info)
+        if(info.ne.0) then
+           info=4010
+           ch_err='psb_realloc'
+           call psb_errpush(info,name,a_err=ch_err)
+           goto 9999
+        end if
+     end if
   else
      call psb_realloc(liwork,iwork,info)
      if(info.ne.0) then

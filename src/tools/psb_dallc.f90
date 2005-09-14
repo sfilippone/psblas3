@@ -34,6 +34,7 @@ subroutine psb_dalloc(m, n, x, desc_a, info, js)
   integer, allocatable:: prc_v(:)
   character(len=20)   :: name, ch_err
 
+  name='psb_dallc'
   info=0
   err=0
   int_err(1)=0
@@ -193,6 +194,7 @@ subroutine psb_dallocv(m, x, desc_a,info)
   character(len=20)   :: name, ch_err
 
   info=0
+  name='psb_dallcv'
   call psb_erractionsave(err_act)
    
   icontxt=desc_a%matrix_data(psb_ctxt_)

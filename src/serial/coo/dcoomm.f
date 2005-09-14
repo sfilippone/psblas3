@@ -22,7 +22,7 @@ C     .. Local Scalars ..
 
 
 C     .. External Subroutines ..
-      EXTERNAL          DCOOMV, XSPERR
+      EXTERNAL          DCOOMV
 C     .. Executable Statements ..
 C
 C

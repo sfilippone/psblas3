@@ -8,7 +8,7 @@ subroutine psi_crea_index(desc_a,index_in,index_out,glob_idx,info)
   type(psb_desc_type), intent(in)  :: desc_a
   integer, intent(out)             :: info
   integer, intent(in)              :: index_in(:)
-  integer, intent(out)             :: index_out(:)
+  integer, pointer                 :: index_out(:)
   logical                          :: glob_idx
   
 !         ....local scalars...      
@@ -20,6 +20,32 @@ subroutine psi_crea_index(desc_a,index_in,index_out,glob_idx,info)
   integer,parameter    :: root=0,no_comm=-1
   logical,parameter    :: debug=.false.
   character(len=20)    :: name, ch_err
+
+  interface
+     subroutine psi_compute_size(desc_data,&
+          & index_in, dl_lda, info)
+       integer  :: info, dl_lda
+       integer  :: desc_data(:), index_in(:)
+     end subroutine psi_compute_size
+  end interface
+
+  interface
+     subroutine psi_sort_dl(dep_list,l_dep_list,np,info)
+       integer :: np,dep_list(:,:), l_dep_list(:), info
+     end subroutine psi_sort_dl
+  end interface
+
+  interface
+     subroutine psi_desc_index(desc_data,index_in,dep_list,&
+          & length_dl,loc_to_glob,glob_to_loc,desc_index,&
+          & isglob_in,info)
+       integer :: desc_data(:),index_in(:),dep_list(:)
+       integer :: loc_to_glob(:),glob_to_loc(:)
+       integer,pointer :: desc_index(:)
+       integer :: length_dl, info
+       logical :: isglob_in
+     end subroutine psi_desc_index
+  end interface
 
   info = 0
   name='psi_crea_index'
@@ -40,7 +66,7 @@ subroutine psi_crea_index(desc_a,index_in,index_out,glob_idx,info)
 
   ! allocate dependency list
   call psi_compute_size(desc_a%matrix_data, index_in, dl_lda, info)
-  allocate(dep_list(dl_lda,0:np-1),length_dl(0:np-1))
+  allocate(dep_list(max(1,dl_lda),0:np-1),length_dl(0:np-1))
   ! ...extract dependence list (ordered list of identifer process
   !    which every process must communcate with...
   if (debug) write(*,*) 'crea_halo: calling extract_dep_list'
@@ -70,9 +96,13 @@ subroutine psi_crea_index(desc_a,index_in,index_out,glob_idx,info)
   ! ...create desc_halo array.....
   if(debug) write(0,*)'in psi_crea_index calling psi_desc_index',&
        & size(index_out)
-  call psi_desc_index(desc_a%matrix_data,index_in,dep_list(1,me),&
+  call psi_desc_index(desc_a%matrix_data,index_in,dep_list(1:,me),&
        & length_dl(me),desc_a%loc_to_glob,desc_a%glob_to_loc,&
-       & index_out,glob_idx)
+       & index_out,glob_idx,info)
+  if(info.ne.0) then
+     call psb_errpush(4010,name,a_err='psi_desc_index')
+     goto 9999
+  end if
   
   deallocate(dep_list,length_dl)
   call psb_erractionrestore(err_act)

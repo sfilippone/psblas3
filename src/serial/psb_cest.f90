@@ -19,7 +19,7 @@ subroutine psb_cest(afmt, nnz, lia1, lia2, lar, up, info)
      afmt = psb_fidef_
   endif
 
-  if (up.eq.'y') then
+  if ((up.eq.'y').or.(up.eq.'Y')) then
      if (afmt.eq.'JAD') then 
         lia1 = 2*(nnz + nnz/5) +1000
         lia2 = 2*(nnz + nnz/5) +1000
@@ -38,7 +38,7 @@ subroutine psb_cest(afmt, nnz, lia1, lia2, lar, up, info)
         goto 9999
      endif
 
-  else if (up.eq.'n') then
+  else if ((up.eq.'n').or.(up.eq.'N')) then
 
      if (afmt.eq.'JAD') then 
         lia1 = nnz + nnz/5

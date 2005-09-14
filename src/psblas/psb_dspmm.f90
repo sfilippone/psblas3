@@ -419,6 +419,7 @@ subroutine  psb_dspmv(alpha,a,x,beta,y,desc_a,info,&
   iy = 1
   jy = 1
   ik = 1
+  ib = 1
 
   if (present(doswap)) then
      idoswap = doswap

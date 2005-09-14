@@ -112,8 +112,18 @@ subroutine  psb_dovrlm(x,desc_a,info,jx,ik,work,choice,update_type)
 
   ! check for presence/size of a work area
   liwork=ncol
-  if (present(work).and.(size(work).ge.liwork)) then
-     iwork => work
+  if (present(work)) then
+     if(size(work).ge.liwork) then
+        iwork => work
+     else
+        call psb_realloc(liwork,iwork,info)
+        if(info.ne.0) then
+           info=4010
+           ch_err='psb_realloc'
+           call psb_errpush(info,name,a_err=ch_err)
+           goto 9999
+        end if
+     end if
   else
      call psb_realloc(liwork,iwork,info)
      if(info.ne.0) then
@@ -279,8 +289,18 @@ subroutine  psb_dovrlv(x,desc_a,info,work,choice,update_type)
 
   ! check for presence/size of a work area
   liwork=ncol
-  if (present(work).and.(size(work).ge.liwork)) then
-     iwork => work
+  if (present(work)) then
+     if(size(work).ge.liwork) then
+        iwork => work
+     else
+        call psb_realloc(liwork,iwork,info)
+        if(info.ne.0) then
+           info=4010
+           ch_err='psb_realloc'
+           call psb_errpush(info,name,a_err=ch_err)
+           goto 9999
+        end if
+     end if
   else
      call psb_realloc(liwork,iwork,info)
      if(info.ne.0) then

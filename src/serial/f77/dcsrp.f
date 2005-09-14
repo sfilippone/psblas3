@@ -99,7 +99,7 @@ C     .. Array Arguments ..
       INTEGER          IA1(*), IA2(*), INFOA(*), P(*), INT_VAL(5)
       CHARACTER        DESCRA*11, FIDA*5
 C     .. External Subroutines ..
-      EXTERNAL          DCSRRP, XERBLA
+      EXTERNAL          DCSRRP
       logical          debug
       parameter        (debug=.false.)
 

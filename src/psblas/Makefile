@@ -21,6 +21,6 @@ veryclean: clean
 	/bin/rm -f $(LIBNAME)
 
 clean: 
-	/bin/rm -f $(F90_PSDOBJS) $(LOCAL_MODS)
+	/bin/rm -f $(OBJS) $(LOCAL_MODS)
 
 veryclean: clean

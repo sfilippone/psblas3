@@ -68,8 +68,6 @@ C     .. Array Arguments ..
       CHARACTER        DESCRA*11
 C     .. Local Scalars ..
       INTEGER          I, J, nrow, nind
-C     .. External Subroutines ..
-      EXTERNAL          XERBLA
 C
 C     .. Executable Statements ..
 C

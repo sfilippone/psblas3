@@ -11,7 +11,6 @@
       CHARACTER         DESCRA*11
       INTEGER           I, K, ERR_ACT
       CHARACTER         DIAG, UPLO
-      EXTERNAL          XERBLA
       INTRINSIC         DBLE, IDINT
       CHARACTER*20      NAME
 

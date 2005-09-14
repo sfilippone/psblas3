@@ -113,8 +113,8 @@ contains
   subroutine psb_errpush(err_c, r_name, i_err, a_err)
 
     integer, intent(in)              ::  err_c
-    character(len=20), intent(in)    ::  r_name
-    character(len=20), optional      ::  a_err
+    character(len=*), intent(in)     ::  r_name
+    character(len=*), optional       ::  a_err
     integer, optional                ::  i_err(5)
 
     type(psb_errstack_node), pointer     ::  new_node

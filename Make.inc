@@ -10,8 +10,8 @@ F90=ifort
 FC=ifort
 CC=icc
 F77=$(FC)
-F90COPT= -check arg_temp_created
-FCOPT=-check arg_temp_created
+F90COPT= -check all -g -CB -no_cpprt
+FCOPT=-check all -g -CB -no_cpprt
 CCOPT=
 
 #######################  Section 2 #######################

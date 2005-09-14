@@ -26,7 +26,7 @@ module psi_mod
        type(psb_desc_type), intent(in)  :: desc_a
        integer, intent(out)             :: info
        integer, intent(in)              :: index_in(:)
-       integer, intent(out)             :: index_out(:)
+       integer, pointer                 :: index_out(:)
        logical                          :: glob_idx
      end subroutine psi_crea_index
   end interface

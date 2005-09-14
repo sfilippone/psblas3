@@ -20,6 +20,6 @@ veryclean: clean
 	/bin/rm -f $(LIBNAME)
 
 clean:
-	/bin/rm -f $(F90OBJS) $(LOCAL_MODS)
+	/bin/rm -f $(OBJS) $(LOCAL_MODS)
 
 veryclean: clean

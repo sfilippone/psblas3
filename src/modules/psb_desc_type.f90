@@ -8,6 +8,7 @@
 
 module psb_descriptor_type
   use psb_const_mod
+  implicit none
 
   ! desc_type contains data for communications.
   type psb_desc_type
@@ -47,35 +48,35 @@ contains
   logical function psb_is_ok_dec(dectype)
     integer :: dectype
     
-    psb_is_ok_dec = ((dectype == desc_asb).or.(dectype == desc_bld).or.&
-         &(dectype == desc_upd).or.(dectype== desc_upd_asb))
+    psb_is_ok_dec = ((dectype == psb_desc_asb_).or.(dectype == psb_desc_bld_).or.&
+         &(dectype == psb_desc_upd_).or.(dectype== psb_desc_upd_asb_))
     
   end function psb_is_ok_dec
 
   logical function psb_is_bld_dec(dectype)
     integer :: dectype
 
-    psb_is_bld_dec = (dectype == desc_bld)
+    psb_is_bld_dec = (dectype == psb_desc_bld_)
   end function psb_is_bld_dec
 
   logical function psb_is_upd_dec(dectype)          
     integer :: dectype
 
-    psb_is_upd_dec = (dectype == desc_upd)
+    psb_is_upd_dec = (dectype == psb_desc_upd_)
 
   end function psb_is_upd_dec
 
   logical function psb_is_asb_upd_dec(dectype)
     integer :: dectype
 
-    psb_is_asb_upd_dec = (dectype == desc_upd_asb)
+    psb_is_asb_upd_dec = (dectype == psb_desc_upd_asb_)
 
   end function psb_is_asb_upd_dec
 
   logical function psb_is_asb_dec(dectype)
     integer :: dectype
 
-    psb_is_asb_dec = (dectype == desc_asb)
+    psb_is_asb_dec = (dectype == psb_desc_asb_)
 
   end function psb_is_asb_dec
 

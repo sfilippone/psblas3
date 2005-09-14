@@ -69,7 +69,7 @@ subroutine  psb_dhalom(x,desc_a,info,alpha,jx,ik,work,tran,mode)
   n = desc_a%matrix_data(psb_n_)
   nrow = desc_a%matrix_data(psb_n_row_)
   
-  maxk=size(x,2)-jx+1
+  maxk=size(x,2)-ijx+1
   
   if(present(ik)) then
      if(ik.gt.maxk) then
@@ -118,8 +118,18 @@ subroutine  psb_dhalom(x,desc_a,info,alpha,jx,ik,work,tran,mode)
   end if
 
   liwork=ncol
-  if (present(work).and.(size(work).ge.liwork)) then
-     iwork => work
+  if (present(work)) then
+     if(size(work).ge.liwork) then
+        iwork => work
+     else
+        call psb_realloc(liwork,iwork,info)
+        if(info.ne.0) then
+           info=4010
+           ch_err='psb_realloc'
+           call psb_errpush(info,name,a_err=ch_err)
+           goto 9999
+        end if
+     end if
   else
      call psb_realloc(liwork,iwork,info)
      if(info.ne.0) then
@@ -147,7 +157,8 @@ subroutine  psb_dhalom(x,desc_a,info,alpha,jx,ik,work,tran,mode)
   end if
 
   if(info.ne.0) then
-     call psb_errpush(4010,name,a_err='PSI_dSwap...')
+     ch_err='PSI_dSwap...'
+     call psb_errpush(4010,name,a_err=ch_err)
      goto 9999
   end if
 
@@ -266,8 +277,18 @@ subroutine  psb_dhalov(x,desc_a,info,alpha,work,tran,mode)
   end if
 
   liwork=ncol
-  if (present(work).and.(size(work).ge.liwork)) then
-     iwork => work
+  if (present(work)) then
+     if(size(work).ge.liwork) then
+        iwork => work
+     else
+        call psb_realloc(liwork,iwork,info)
+        if(info.ne.0) then
+           info=4010
+           ch_err='psb_realloc'
+           call psb_errpush(info,name,a_err=ch_err)
+           goto 9999
+        end if
+     end if
   else
      call psb_realloc(liwork,iwork,info)
      if(info.ne.0) then
@@ -288,7 +309,8 @@ subroutine  psb_dhalov(x,desc_a,info,alpha,work,tran,mode)
   end if
 
   if(info.ne.0) then
-     call psb_errpush(4010,name,a_err='PSI_dSwap...')
+     ch_err='PSI_dSwap...'
+     call psb_errpush(4010,name,a_err=ch_err)
      goto 9999
   end if
 

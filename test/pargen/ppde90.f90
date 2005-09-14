@@ -184,7 +184,7 @@ program pde90
   !
   ! iterative method parameters 
   !
-  write(*,*) 'calling iterative method', size(b),ml
+  write(*,*) 'calling iterative method', a%ia2(7999:8001)
   call blacs_barrier(icontxt,'ALL')
   t1 = mpi_wtime()  
   eps   = 1.d-9
@@ -454,12 +454,12 @@ contains
     nnz = ((n*9)/(nprow*npcol))
     write(*,*) 'size: n ',n
     call psb_dscall(n,n,parts,icontxt,desc_a,info)
-    write(*,*) 'allocating a : nnz',nnz
+    write(*,*) 'allocating a : nnz',nnz, info
     call psb_spalloc(a,desc_a,info,nnz=nnz)
     ! define  rhs from boundary conditions; also build initial guess 
-    write(*,*) 'allocating b'
+    write(*,*) 'allocating b', info
     call psb_alloc(n,b,desc_a,info)
-    write(*,*) 'allocating t'
+    write(*,*) 'allocating t', info
     call psb_alloc(n,t,desc_a,info)
     if(info.ne.0) then
        info=4010

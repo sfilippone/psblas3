@@ -23,6 +23,35 @@ subroutine psb_dprecaply(prec,x,y,desc_data,info,trans, work)
   real(kind(1.d0)), parameter       :: one=1.d0, zero=0.d0
   external mpi_wtime
   character(len=20)   :: name, ch_err
+
+  interface
+     subroutine psb_dbaseprcaply(prec,x,beta,y,desc_data,trans,work,info)
+       use psb_descriptor_type
+       use psb_prec_type
+       type(psb_desc_type),intent(in)    :: desc_data
+       type(psb_dbase_prec), intent(in)  :: prec
+       real(kind(0.d0)),intent(inout)    :: x(:), y(:)
+       real(kind(0.d0)),intent(in)       :: beta
+       character(len=1)                  :: trans
+       real(kind(0.d0)),target           :: work(:)
+       integer, intent(out)              :: info
+     end subroutine psb_dbaseprcaply
+  end interface
+
+  interface
+     subroutine psb_dmlprcaply(baseprecv,x,beta,y,desc_data,trans,work,info)
+       use psb_descriptor_type
+       use psb_prec_type
+       type(psb_desc_type),intent(in)    :: desc_data
+       type(psb_dbase_prec), intent(in)  :: baseprecv(:)
+       real(kind(0.d0)),intent(in)       :: beta
+       real(kind(0.d0)),intent(inout)    :: x(:), y(:)
+       character                         :: trans
+       real(kind(0.d0)),target           :: work(:)
+       integer, intent(out)              :: info
+     end subroutine psb_dmlprcaply
+  end interface
+  
   name='psb_dprecaply'
   info = 0
   call psb_erractionsave(err_act)
@@ -111,6 +140,20 @@ subroutine psb_dbaseprcaply(prec,x,beta,y,desc_data,trans,work,info)
   external mpi_wtime
   character(len=20)   :: name, ch_err
 
+  interface
+     subroutine psb_dbjacaply(prec,x,beta,y,desc_data,trans,work,info)
+       use psb_descriptor_type
+       use psb_prec_type
+       type(psb_desc_type), intent(in)       :: desc_data
+       type(psb_dbase_prec), intent(in)      :: prec
+       real(kind(0.d0)),intent(inout)        :: x(:), y(:)
+       real(kind(0.d0)),intent(in)           :: beta
+       character(len=1)                      :: trans
+       real(kind(0.d0)),target               :: work(:)
+       integer, intent(out)                  :: info
+     end subroutine psb_dbjacaply
+  end interface
+  
   name='psb_dbaseprcaply'
   info = 0
   call psb_erractionsave(err_act)
@@ -161,6 +204,7 @@ subroutine psb_dbaseprcaply(prec,x,beta,y,desc_data,trans,work,info)
 
   case(bja_)
 
+     write(0,*)'calling bja'
     call psb_dbjacaply(prec,x,beta,y,desc_data,trans,work,info)
     if(info.ne.0) then
        info=4010
@@ -330,6 +374,8 @@ subroutine psb_dbjacaply(prec,x,beta,y,desc_data,trans,work,info)
   real(kind(1.d0)), parameter       :: one=1.d0, zero=0.d0
   external mpi_wtime
   character(len=20)   :: name, ch_err
+  write(0,*)'inside bja'
+
   name='psb_dbjacaply'
   info = 0
   call psb_erractionsave(err_act)
@@ -543,6 +589,21 @@ subroutine psb_dmlprcaply(baseprecv,x,beta,y,desc_data,trans,work,info)
   integer      :: ismth
   external mpi_wtime
   character(len=20)   :: name, ch_err
+
+  interface
+     subroutine psb_dbaseprcaply(prec,x,beta,y,desc_data,trans,work,info)
+       use psb_descriptor_type
+       use psb_prec_type
+       type(psb_desc_type),intent(in)    :: desc_data
+       type(psb_dbase_prec), intent(in)  :: prec
+       real(kind(0.d0)),intent(inout)    :: x(:), y(:)
+       real(kind(0.d0)),intent(in)       :: beta
+       character(len=1)                  :: trans
+       real(kind(0.d0)),target           :: work(:)
+       integer, intent(out)              :: info
+     end subroutine psb_dbaseprcaply
+  end interface
+
   name='psb_dmlprcaply'
   info = 0
   call psb_erractionsave(err_act)

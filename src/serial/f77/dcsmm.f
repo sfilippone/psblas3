@@ -180,7 +180,7 @@ C     .. Local Array..
       DOUBLE PRECISION  REAL_VAL(5)
       CHARACTER*30      STRINGS(2)
 C     .. External Subroutines ..
-      EXTERNAL          DSWMM, DLPUPD, DSCAL, XERBLA
+      EXTERNAL          DSWMM, DLPUPD, DSCAL
 C     .. Intrinsic Functions ..
       INTRINSIC         DBLE, IDINT
       

@@ -3,7 +3,7 @@ subroutine psi_dl_check(dep_list,dl_lda,np,length_dl)
   use psb_const_mod
   implicit none
 
-  integer  :: np,dl_lda,length_dl(:)
+  integer  :: np,dl_lda,length_dl(0:np)
   integer  :: dep_list(dl_lda,0:np-1)
   ! locals
   integer  :: proc, proc2, i, j
