@@ -2,8 +2,8 @@ subroutine psi_dswapdatam(flag,n,beta,y,desc_a,work,info)
 
   use psb_error_mod
   use psb_descriptor_type
+  use mpi
   implicit none
-  include 'mpif.h'
 
   integer, intent(in)      :: flag, n
   integer, intent(out)     :: info
@@ -14,7 +14,7 @@ subroutine psi_dswapdatam(flag,n,beta,y,desc_a,work,info)
   ! locals
   integer  :: icontxt, nprow, npcol, myrow,&
        & mycol, point_to_proc, nesd, nerv,&
-       & proc_to_comm, p2ptag, icomm, p2pstat,&
+       & proc_to_comm, p2ptag, icomm, p2pstat(mpi_status_size),&
        & idxs, idxr, iret, errlen, ifcomm, rank,&
        & err_act, totxch, ixrec, i, lw, idx_pt,&
        & snd_pt, rcv_pt
@@ -103,6 +103,9 @@ subroutine psi_dswapdatam(flag,n,beta,y,desc_a,work,info)
   rvhd(:) = mpi_request_null
 
   ! prepare info for communications
+  call blacs_barrier(icontxt,'All')
+  write(0,'(i2," Entering 1-st cycle")')myrow
+  call blacs_barrier(icontxt,'All')
   proc_to_comm = h_idx(point_to_proc+psb_proc_id_)
   do while (proc_to_comm.ne.-1)
      if(proc_to_comm .ne. myrow) totxch = totxch+1
@@ -124,6 +127,9 @@ subroutine psi_dswapdatam(flag,n,beta,y,desc_a,work,info)
      proc_to_comm  = h_idx(point_to_proc+psb_proc_id_)
   end do
 
+  call blacs_barrier(icontxt,'All')
+  write(0,'(i2," out of 1-st cycle")')myrow
+  call blacs_barrier(icontxt,'All')
   if((idxr+idxs).lt.size(work)) then
      sndbuf => work(1:idxs)
      rcvbuf => work(idxs+1:idxs+idxr)
@@ -243,7 +249,9 @@ subroutine psi_dswapdatam(flag,n,beta,y,desc_a,work,info)
      end do
 
   else if (swap_send .and. swap_recv) then
-
+     call blacs_barrier(icontxt,'All')
+     write(0,'(i2," Inside snd/rcv")')myrow
+     call blacs_barrier(icontxt,'All')
      ! First I post all the non blocking receives
      point_to_proc = 1
      proc_to_comm  = h_idx(point_to_proc+psb_proc_id_)
@@ -413,8 +421,8 @@ subroutine psi_dswapdatav(flag,beta,y,desc_a,work,info)
 
   use psb_error_mod
   use psb_descriptor_type
+  use mpi
   implicit none
-  include 'mpif.h'
 
   integer, intent(in)      :: flag
   integer, intent(out)     :: info
@@ -425,7 +433,7 @@ subroutine psi_dswapdatav(flag,beta,y,desc_a,work,info)
   ! locals
   integer  :: icontxt, nprow, npcol, myrow,&
        & mycol, point_to_proc, nesd, nerv,&
-       & proc_to_comm, p2ptag, icomm, p2pstat,&
+       & proc_to_comm, p2ptag, icomm, p2pstat(mpi_status_size),&
        & idxs, idxr, iret, errlen, ifcomm, rank,&
        & err_act, totxch, ixrec, i, lw, idx_pt,&
        & snd_pt, rcv_pt, n
@@ -514,9 +522,6 @@ subroutine psi_dswapdatav(flag,beta,y,desc_a,work,info)
   point_to_proc = 1
   rvhd(:) = mpi_request_null
   n=1
-  call blacs_barrier(icontxt,'All')  ! to be removed
-  write(0,'(i2," Inside swapdatav ",10(i6,2x))')myrow,h_idx(1:10)
-  call blacs_barrier(icontxt,'All')  ! to be removed
 
   ! prepare info for communications
   proc_to_comm = h_idx(point_to_proc+psb_proc_id_)
@@ -659,11 +664,6 @@ subroutine psi_dswapdatav(flag,beta,y,desc_a,work,info)
      end do
 
   else if (swap_send .and. swap_recv) then
-
-     call blacs_barrier(icontxt,'All')  ! to be removed
-     write(0,'(i2," posting recv ",10(i6,2x))')myrow,h_idx(1:10)
-     call blacs_barrier(icontxt,'All')  ! to be removed
-
      ! First I post all the non blocking receives
      point_to_proc = 1
      proc_to_comm  = h_idx(point_to_proc+psb_proc_id_)
@@ -674,12 +674,10 @@ subroutine psi_dswapdatav(flag,beta,y,desc_a,work,info)
         if(proc_to_comm.ne.myrow) then
            p2ptag = krecvid(icontxt,proc_to_comm,myrow)
            rcv_pt = brvidx(proc_to_comm)
-           write(0,'(i2,"---Posting recv: ",5(i6,2x))')myrow,rcv_pt,proc_to_comm,rvsz(proc_to_comm),prcid(proc_to_comm),p2ptag
            call mpi_irecv(rcvbuf(rcv_pt),rvsz(proc_to_comm),&
                 & mpi_double_precision,prcid(proc_to_comm),&
                 & p2ptag, icomm,rvhd(proc_to_comm),iret)
            if(iret.ne.mpi_success) then
-              write(0,'(i2," ERROR 1",3(i6,2x))')myrow,iret,mpi_success
               int_err(1) = iret
               info=400
               call psb_errpush(info,name,i_err=int_err)
@@ -691,7 +689,6 @@ subroutine psi_dswapdatav(flag,beta,y,desc_a,work,info)
         proc_to_comm  = h_idx(point_to_proc+psb_proc_id_)
      end do
 
-     write(0,'(i2," posting snd ",10(i6,2x))')myrow,h_idx(1:10)
      ! Then I post all the blocking sends
      point_to_proc = 1
      proc_to_comm  = h_idx(point_to_proc+psb_proc_id_)
@@ -706,12 +703,10 @@ subroutine psi_dswapdatav(flag,beta,y,desc_a,work,info)
         
         if(proc_to_comm .ne. myrow) then
            p2ptag=ksendid(icontxt,proc_to_comm,myrow)
-           write(0,'(i2,"--Posting send: ",5(i6,2x))')myrow,snd_pt,proc_to_comm,sdsz(proc_to_comm),prcid(proc_to_comm),p2ptag
            call mpi_send(sndbuf(snd_pt),sdsz(proc_to_comm),&
                 & mpi_double_precision,prcid(proc_to_comm),&
                 & p2ptag,icomm,iret)
            if(iret.ne.mpi_success) then
-              write(0,'(i2," ERROR 2",3(i6,2x))')myrow,iret,mpi_success
               int_err(1) = iret
               info=400
               call psb_errpush(info,name,i_err=int_err)
@@ -722,17 +717,14 @@ subroutine psi_dswapdatav(flag,beta,y,desc_a,work,info)
         proc_to_comm  = h_idx(point_to_proc+psb_proc_id_)
      end do
 
-     write(0,'(i2," waiting ",10(i6,2x))')myrow,h_idx(1:10)
      do i=1, totxch
         call mpi_waitany(nprow,rvhd,ixrec,p2pstat,iret)
         if(iret.ne.mpi_success) then
-           write(0,'(i2," ERROR 3",3(i6,2x))')myrow,iret,mpi_success
            int_err(1) = iret
            info=400
            call psb_errpush(info,name,i_err=int_err)
            goto 9999
         end if
-
         if (ixrec .ne. mpi_undefined) then
            ixrec=ixrec-1  ! mpi_waitany returns an 1 to nprow index
            point_to_proc = ptp(ixrec)
@@ -745,7 +737,6 @@ subroutine psi_dswapdatav(flag,beta,y,desc_a,work,info)
            call psi_sct(nerv,h_idx(idx_pt:idx_pt+nerv-1),&
                 & sndbuf(snd_pt:snd_pt+nesd-1),beta,y)
         else
-           write(0,'(i2," ERROR 4",5(i6,2x))')myrow,iret,mpi_success,mpi_err_request,mpi_err_arg
            int_err(1) = ixrec
            info=400
            call psb_errpush(info,name,i_err=int_err)
@@ -753,7 +744,6 @@ subroutine psi_dswapdatav(flag,beta,y,desc_a,work,info)
         end if
      end do
      
-     write(0,'(i2," cleaning up ",10(i6,2x))')myrow,h_idx(1:10)
      point_to_proc = 1
      proc_to_comm  = h_idx(point_to_proc+psb_proc_id_)
      do while (proc_to_comm .ne. -1)
@@ -770,8 +760,6 @@ subroutine psi_dswapdatav(flag,beta,y,desc_a,work,info)
         point_to_proc = point_to_proc+nerv+nesd+3
         proc_to_comm  = h_idx(point_to_proc+psb_proc_id_)
      end do
-
-     write(0,'(i2," snd/rcv ",10(i6,2x))')myrow,h_idx(1:10)
 
 
   else if (swap_send) then
