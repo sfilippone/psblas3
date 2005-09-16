@@ -140,6 +140,7 @@ subroutine psb_dscasb(desc_a,info)
          & nhalo,lhalo,halo_index(lhalo)
     !.... convert comunication stuctures....
     ! first the halo index
+    
     call psi_crea_index(desc_a,halo_index,&
          & desc_a%halo_index,.false.,info)
     if(info.ne.0) then

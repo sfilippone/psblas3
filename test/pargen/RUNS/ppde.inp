@@ -5,7 +5,7 @@ CSR                    A Storage format CSR COO JAD
 20                     Domain size (acutal sistem is this**3)
 1                      Stopping criterion
 080                    MAXIT
--1                     ITRACE
+00                     ITRACE
 02                     ML
 
 

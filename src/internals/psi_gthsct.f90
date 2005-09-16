@@ -7,7 +7,6 @@ subroutine psi_dgthm(n,k,idx,x,y)
 
   ! Locals
   integer :: i, j, pt
-
   pt=0
   do j=1,k
      do i=1,n

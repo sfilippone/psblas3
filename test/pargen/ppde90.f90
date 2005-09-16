@@ -117,7 +117,7 @@ program pde90
      call psb_errpush(info,name,a_err=ch_err)
      goto 9999
   end if
-
+  goto 9999
   dim=size(a%aspk)
 
 !!$  allocate(h%aspk(dim),h%ia1(dim),h%ia2(dim),h%pl(size(a%pl)),&
@@ -452,14 +452,14 @@ contains
     m   = idim*idim*idim
     n   = m
     nnz = ((n*9)/(nprow*npcol))
-    write(*,*) 'size: n ',n
+    write(*,*) 'size: n ',n,myprow
     call psb_dscall(n,n,parts,icontxt,desc_a,info)
-    write(*,*) 'allocating a : nnz',nnz, info
+    write(*,*) 'allocating a. nnz:',nnz,myprow
     call psb_spalloc(a,desc_a,info,nnz=nnz)
     ! define  rhs from boundary conditions; also build initial guess 
-    write(*,*) 'allocating b', info
+    write(*,*) 'allocating b', info,myprow
     call psb_alloc(n,b,desc_a,info)
-    write(*,*) 'allocating t', info
+    write(*,*) 'allocating t', info,myprow
     call psb_alloc(n,t,desc_a,info)
     if(info.ne.0) then
        info=4010
@@ -474,7 +474,7 @@ contains
     ! 
     row_mat%descra(1:1) = 'G'
     row_mat%fida        = 'CSR'
-    write(*,*) 'allocating row_mat',20*nbmax
+!    write(*,*) 'allocating row_mat',20*nbmax
     allocate(row_mat%aspk(20*nbmax),row_mat%ia1(20*nbmax),&
          &row_mat%ia2(20*nbmax),prv(nprow),stat=info)
     if (info.ne.0 ) then 
@@ -656,8 +656,6 @@ contains
 
     deallocate(row_mat%aspk,row_mat%ia1,row_mat%ia2)
 
-    write(*,*) 'calling spasb'
-    call blacs_barrier(icontxt,'ALL')
     t1 = mpi_wtime()
     call psb_dscasb(desc_a,info)
     call psb_spasb(a,desc_a,info,dup=1,afmt=afmt)
@@ -672,7 +670,8 @@ contains
     write(0,*) '   assembly  time',(t2-t1),' ',a%fida(1:4)
 
     call psb_asb(b,desc_a,info)
-    call psb_asb(t,desc_a,info)
+    write(0,*)'Remeber This!!!!!!'
+!    call psb_asb(t,desc_a,info)
     if(info.ne.0) then
        info=4010
        ch_err='asb rout.'

@@ -39,7 +39,7 @@ subroutine psi_compute_size(desc_data,&
      goto 9999
   endif
 
-  np=npcol
+  np=nprow
   allocate(counter_dl(0:np-1),counter_recv(0:np-1))
   !     ..initialize counters...
   do i=0,np-1
@@ -51,6 +51,7 @@ subroutine psi_compute_size(desc_data,&
   i=1
   do while (index_in(i).ne.-1)
      proc=index_in(i)
+!     write(0,'(i2," index_in(i)  ",2i10)')myrow,proc,index_in(i+index_in(i+1)+2)
      if ((proc.gt.np-1).or.(proc.lt.0)) then
         info = 115
         int_err(1) = 11

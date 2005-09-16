@@ -204,7 +204,6 @@ subroutine psb_dbaseprcaply(prec,x,beta,y,desc_data,trans,work,info)
 
   case(bja_)
 
-     write(0,*)'calling bja'
     call psb_dbjacaply(prec,x,beta,y,desc_data,trans,work,info)
     if(info.ne.0) then
        info=4010
@@ -374,7 +373,6 @@ subroutine psb_dbjacaply(prec,x,beta,y,desc_data,trans,work,info)
   real(kind(1.d0)), parameter       :: one=1.d0, zero=0.d0
   external mpi_wtime
   character(len=20)   :: name, ch_err
-  write(0,*)'inside bja'
 
   name='psb_dbjacaply'
   info = 0
@@ -421,6 +419,7 @@ subroutine psb_dbjacaply(prec,x,beta,y,desc_data,trans,work,info)
 
         call psb_spsm(one,prec%av(l_pr_),x,zero,ww,desc_data,info,&
              & trans='N',unit=diagl,choice=psb_none_,work=aux)
+        if(info /=0) goto 9999
         ww(1:n_row) = ww(1:n_row)*prec%d(1:n_row)
         call psb_spsm(one,prec%av(u_pr_),ww,beta,y,desc_data,info,&
              & trans='N',unit=diagu,choice=psb_none_, work=aux)
@@ -429,6 +428,7 @@ subroutine psb_dbjacaply(prec,x,beta,y,desc_data,trans,work,info)
       case('T','t','C','c')
         call psb_spsm(one,prec%av(u_pr_),x,zero,ww,desc_data,info,&
              & trans=trans,unit=diagu,choice=psb_none_, work=aux)
+        if(info /=0) goto 9999
         ww(1:n_row) = ww(1:n_row)*prec%d(1:n_row)
         call psb_spsm(one,prec%av(l_pr_),ww,beta,y,desc_data,info,&
              & trans=trans,unit=diagl,choice=psb_none_,work=aux)
@@ -487,6 +487,7 @@ subroutine psb_dbjacaply(prec,x,beta,y,desc_data,trans,work,info)
         call psb_spsm(one,prec%av(l_pr_),ty,zero,ww,&
              & prec%desc_data,info,&
              & trans='N',unit='U',choice=psb_none_,work=aux)
+        if(info /=0) goto 9999
         ww(1:n_row) = ww(1:n_row)*prec%d(1:n_row)
         call psb_spsm(one,prec%av(u_pr_),ww,zero,tx,&
              & prec%desc_data,info,&

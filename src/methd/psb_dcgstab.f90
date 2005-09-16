@@ -188,9 +188,7 @@ Subroutine psb_dcgstab(a,prec,b,x,eps,desc_a,info,&
     If (itx >= itmax) Exit restart  
     it = 0      
     Call psb_axpby(one,b,zero,r,desc_a,info)
-!!$    imerr = MPE_Log_event( immb, 0, "st SPMM" )
     Call psb_spmm(-one,a,x,one,r,desc_a,info,work=aux)
-!!$    imerr = MPE_Log_event( imme, 0, "ed SPMM" )
     Call psb_axpby(one,r,zero,q,desc_a,info)
     if (info /= 0) Then 
        info=4011

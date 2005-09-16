@@ -168,7 +168,7 @@ C                         VAL, INDX, PNTR
 C        INFOT(*) not used
 C
          CALL  DCSRSM(TRANS,M,N,UNITD,D,ALPHA,DESCRT,T,IT1,          
-     &                IT2,B,LDB,BETA,C,LDC,WORK,LWORK)
+     &                IT2,B,LDB,BETA,C,LDC,WORK,LWORK,IERROR)
       ELSE IF (FIDT(1:3).EQ.'JAD') THEN
          
          CALL  DJADSM(TRANS,M,N,D,UNITD,0,ALPHA,DESCRT,T,IT1,IT2,

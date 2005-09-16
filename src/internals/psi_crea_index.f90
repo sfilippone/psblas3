@@ -71,6 +71,7 @@ subroutine psi_crea_index(desc_a,index_in,index_out,glob_idx,info)
   !    which every process must communcate with...
   if (debug) write(*,*) 'crea_halo: calling extract_dep_list'
   mode = 1
+
   call psi_extract_dep_list(desc_a%matrix_data,index_in,&
        & dep_list,length_dl,np,dl_lda,mode,info)
   if(info /= 0) then

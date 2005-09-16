@@ -117,7 +117,7 @@ subroutine  psb_dhalom(x,desc_a,info,alpha,jx,ik,work,tran,mode)
      end if
   end if
 
-  liwork=ncol
+  liwork=nrow
   if (present(work)) then
      if(size(work).ge.liwork) then
         iwork => work
@@ -276,7 +276,7 @@ subroutine  psb_dhalov(x,desc_a,info,alpha,work,tran,mode)
      end if
   end if
 
-  liwork=ncol
+  liwork=nrow
   if (present(work)) then
      if(size(work).ge.liwork) then
         iwork => work
@@ -298,7 +298,7 @@ subroutine  psb_dhalov(x,desc_a,info,alpha,work,tran,mode)
         goto 9999
      end if
   end if
-  
+
   ! exchange halo elements
   if(ltran.eq.'N') then
      call psi_swapdata(imode,0.d0,x(iix:size(x)),&

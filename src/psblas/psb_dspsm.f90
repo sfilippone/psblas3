@@ -343,7 +343,7 @@ subroutine  psb_dspsv(alpha,a,x,beta,y,desc_a,info,&
   ! locals
   integer                  :: int_err(5), icontxt, nprow, npcol, myrow, mycol,&
        & err_act, n, iix, jjx, ia, ja, iia, jja, temp(2), lldx,lldy, lchoice,&
-       & ix, iy, ik, ijx, ijy, i, lld,&
+       & ix, iy, ik, jx, jy, i, lld,&
        & idoswap, m, nrow, ncol, liwork, llwork, iiy, jjy
 
   character                :: lunitd
@@ -377,6 +377,8 @@ subroutine  psb_dspsv(alpha,a,x,beta,y,desc_a,info,&
   ix = 1
   iy = 1
   ik = 1
+  jx= 1
+  jy= 1
 
   if (present(choice)) then     
     lchoice = choice
@@ -456,8 +458,8 @@ subroutine  psb_dspsv(alpha,a,x,beta,y,desc_a,info,&
   ! checking for matrix correctness
   call psb_chkmat(m,m,ia,ja,desc_a%matrix_data,info,iia,jja)
   ! checking for vectors correctness
-  call psb_chkvect(m,ik,size(x),ix,ijx,desc_a%matrix_data,info,iix,jjx)
-  call psb_chkvect(m,ik,size(y),iy,ijy,desc_a%matrix_data,info,iiy,jjy)
+  call psb_chkvect(m,ik,size(x),ix,jx,desc_a%matrix_data,info,iix,jjx)
+  call psb_chkvect(m,ik,size(y),iy,jy,desc_a%matrix_data,info,iiy,jjy)
   if(info.ne.0) then
      info=4010
      ch_err='psb_chkvect/mat'
