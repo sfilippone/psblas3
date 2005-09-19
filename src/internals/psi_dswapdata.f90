@@ -8,7 +8,7 @@ subroutine psi_dswapdatam(flag,n,beta,y,desc_a,work,info)
   integer, intent(in)      :: flag, n
   integer, intent(out)     :: info
   real(kind(1.d0))         :: y(:,:), beta
-  real(kind(1.d0)), target ::work(:)
+  real(kind(1.d0)), target :: work(:)
   type(psb_desc_type)      :: desc_a
 
   ! locals
@@ -27,6 +27,10 @@ subroutine psi_dswapdatam(flag,n,beta,y,desc_a,work,info)
   character(len=20)  :: name, ch_err
 
   interface psi_gth
+     subroutine psi_dgthmm(n,k,idx,x,y,myrow,icontxt)
+       integer :: n, k, idx(:),myrow,icontxt
+       real(kind(1.d0)) :: x(:,:), y(:)
+     end subroutine psi_dgthmm
      subroutine psi_dgthm(n,k,idx,x,y)
        integer :: n, k, idx(:)
        real(kind(1.d0)) :: x(:,:), y(:)
@@ -91,7 +95,7 @@ subroutine psi_dswapdatam(flag,n,beta,y,desc_a,work,info)
      goto 9999
   end if
 
-  swap_mpi  = iand(flag,psb_swap_mpi_).ne.0
+  swap_mpi  = iand(flag,psb_swap_mpi_) .ne.0
   swap_sync = iand(flag,psb_swap_sync_).ne.0
   swap_send = iand(flag,psb_swap_send_).ne.0
   swap_recv = iand(flag,psb_swap_recv_).ne.0
@@ -103,9 +107,6 @@ subroutine psi_dswapdatam(flag,n,beta,y,desc_a,work,info)
   rvhd(:) = mpi_request_null
 
   ! prepare info for communications
-  call blacs_barrier(icontxt,'All')
-  write(0,'(i2," Entering 1-st cycle")')myrow
-  call blacs_barrier(icontxt,'All')
   proc_to_comm = h_idx(point_to_proc+psb_proc_id_)
   do while (proc_to_comm.ne.-1)
      if(proc_to_comm .ne. myrow) totxch = totxch+1
@@ -127,13 +128,11 @@ subroutine psi_dswapdatam(flag,n,beta,y,desc_a,work,info)
      proc_to_comm  = h_idx(point_to_proc+psb_proc_id_)
   end do
 
-  call blacs_barrier(icontxt,'All')
-  write(0,'(i2," out of 1-st cycle")')myrow
-  call blacs_barrier(icontxt,'All')
   if((idxr+idxs).lt.size(work)) then
      sndbuf => work(1:idxs)
      rcvbuf => work(idxs+1:idxs+idxr)
   else
+     write(0,'(i2," allocating",3(i6,2x))')myrow,idxs,idxr,size(work)
      allocate(sndbuf(idxs),rcvbuf(idxr), stat=info)
      if(info.ne.0) then
         call psb_errpush(4000,name)
@@ -153,6 +152,7 @@ subroutine psi_dswapdatam(flag,n,beta,y,desc_a,work,info)
         
         idx_pt = point_to_proc+nerv+psb_elem_send_
         snd_pt = bsdidx(proc_to_comm)
+        
         call psi_gth(nesd,n,h_idx(idx_pt:idx_pt+nesd-1),&
              & y,sndbuf(snd_pt:snd_pt+nesd*n-1))
 
@@ -249,9 +249,6 @@ subroutine psi_dswapdatam(flag,n,beta,y,desc_a,work,info)
      end do
 
   else if (swap_send .and. swap_recv) then
-     call blacs_barrier(icontxt,'All')
-     write(0,'(i2," Inside snd/rcv")')myrow
-     call blacs_barrier(icontxt,'All')
      ! First I post all the non blocking receives
      point_to_proc = 1
      proc_to_comm  = h_idx(point_to_proc+psb_proc_id_)

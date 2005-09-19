@@ -5,9 +5,9 @@ subroutine psi_desc_index(desc_data,index_in,dep_list,&
   use psb_realloc_mod
   use psb_error_mod
   use psb_const_mod
+  use mpi
   implicit none
 
-  include 'mpif.h'
   !c     ...array parameters.....
   integer         :: desc_data(:),index_in(:),dep_list(:)
   integer         :: loc_to_glob(:),glob_to_loc(:)

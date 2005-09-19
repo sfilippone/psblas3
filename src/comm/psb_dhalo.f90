@@ -272,7 +272,7 @@ subroutine  psb_dhalov(x,desc_a,info,alpha,work,tran,mode)
 
   if(present(alpha)) then
      if(alpha.ne.1.d0) then
-        call dscal(nrow,alpha,x,1)
+        call dscal(nrow,alpha,x,ione)
      end if
   end if
 

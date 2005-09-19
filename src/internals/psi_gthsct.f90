@@ -1,3 +1,23 @@
+subroutine psi_dgthmm(n,k,idx,x,y,myrow,icontxt)
+
+  implicit none
+
+  integer :: n, k, idx(:),myrow,icontxt
+  real(kind(1.d0)) :: x(:,:), y(:)
+
+  ! Locals
+  integer :: i, j, pt
+
+  pt=0
+  do j=1,k
+     do i=1,n
+        pt=pt+1
+        y(pt)=x(idx(i),j)
+     end do
+  end do
+
+end subroutine psi_dgthmm
+
 subroutine psi_dgthm(n,k,idx,x,y)
 
   implicit none
@@ -7,6 +27,8 @@ subroutine psi_dgthm(n,k,idx,x,y)
 
   ! Locals
   integer :: i, j, pt
+
+  write(0,'("Inside gth ",5(i6,2x))')n,k,size(idx),size(x),size(y)
   pt=0
   do j=1,k
      do i=1,n
@@ -14,6 +36,7 @@ subroutine psi_dgthm(n,k,idx,x,y)
         y(pt)=x(idx(i),j)
      end do
   end do
+  write(0,'("Leaving gth")')
 
 end subroutine psi_dgthm
 

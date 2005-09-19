@@ -125,7 +125,7 @@ contains
     ! Compute local indices for submatrix starting
     ! at global indices ix and jx
     if(present(iix)) iix=ix  ! (for our applications iix=ix))
-    if(present(jjx)) iix=ix  ! (for our applications jjx=jx))
+    if(present(jjx)) jjx=ix  ! (for our applications jjx=jx))
 
     call psb_erractionrestore(err_act)
     return  

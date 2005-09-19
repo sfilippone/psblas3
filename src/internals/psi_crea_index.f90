@@ -66,14 +66,14 @@ subroutine psi_crea_index(desc_a,index_in,index_out,glob_idx,info)
 
   ! allocate dependency list
   call psi_compute_size(desc_a%matrix_data, index_in, dl_lda, info)
-  allocate(dep_list(max(1,dl_lda),0:np-1),length_dl(0:np-1))
+  allocate(dep_list(max(1,dl_lda),0:np),length_dl(0:np))
   ! ...extract dependence list (ordered list of identifer process
   !    which every process must communcate with...
   if (debug) write(*,*) 'crea_halo: calling extract_dep_list'
   mode = 1
 
   call psi_extract_dep_list(desc_a%matrix_data,index_in,&
-       & dep_list,length_dl,np,dl_lda,mode,info)
+       & dep_list,length_dl,np,max(1,dl_lda),mode,info)
   if(info /= 0) then
      call psb_errpush(4010,name,a_err='extrct_dl')
      goto 9999
@@ -85,7 +85,7 @@ subroutine psi_crea_index(desc_a,index_in,index_out,glob_idx,info)
   if (debug) write(*,*) 'crea_halo: root sorting dep list'
 
   ! ....i must order communication in in halo
-  call psi_dl_check(dep_list,dl_lda,np,length_dl)
+  call psi_dl_check(dep_list,max(1,dl_lda),np,length_dl)
 
   ! ....now i can sort dependence list......
   call psi_sort_dl(dep_list,length_dl,np,info)

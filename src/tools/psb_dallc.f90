@@ -188,7 +188,7 @@ subroutine psb_dallocv(m, x, desc_a,info)
   !locals
   integer             :: nprow,npcol,myrow,mycol,err,n_col,n_row,dectype,i,err_act
   integer             :: icontxt
-  integer             :: int_err(5),temp(1),exch(2)
+  integer             :: int_err(5),temp(1),exch
   real(kind(1.d0))    :: real_err(5)
   logical, parameter  :: debug=.false. 
   character(len=20)   :: name, ch_err
@@ -239,11 +239,11 @@ subroutine psb_dallocv(m, x, desc_a,info)
 
   !global check on m and n parameters
   if (myrow.eq.psb_root_) then
-     exch(1) = m
+     exch = m
      call igebs2d(icontxt,psb_all_,psb_topdef_, ione,ione, exch, ione)
   else
      call igebr2d(icontxt,psb_all_,psb_topdef_, ione,ione, exch, ione, psb_root_, 0)
-     if (exch(1) .ne. m) then
+     if (exch .ne. m) then
 	info = 550
 	int_err(1) = 1
         call psb_errpush(info,name,int_err)

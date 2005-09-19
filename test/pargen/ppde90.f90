@@ -117,7 +117,7 @@ program pde90
      call psb_errpush(info,name,a_err=ch_err)
      goto 9999
   end if
-  goto 9999
+
   dim=size(a%aspk)
 
 !!$  allocate(h%aspk(dim),h%ia1(dim),h%ia2(dim),h%pl(size(a%pl)),&
@@ -670,8 +670,7 @@ contains
     write(0,*) '   assembly  time',(t2-t1),' ',a%fida(1:4)
 
     call psb_asb(b,desc_a,info)
-    write(0,*)'Remeber This!!!!!!'
-!    call psb_asb(t,desc_a,info)
+    call psb_asb(t,desc_a,info)
     if(info.ne.0) then
        info=4010
        ch_err='asb rout.'

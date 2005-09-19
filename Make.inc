@@ -10,8 +10,8 @@ F90=ifort
 FC=ifort
 CC=icc
 F77=$(FC)
-F90COPT= -check all -g -CB -no_cpprt
-FCOPT=-check all -g -CB -no_cpprt
+F90COPT= -check all -g -CB -no_cpprt -warn interfaces
+FCOPT=-check all -g -CB -no_cpprt -warn interfaces
 CCOPT=
 
 #######################  Section 2 #######################
