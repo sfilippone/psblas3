@@ -160,7 +160,7 @@ function psb_ddotv(x, y,desc_a, info)
 
   ! locals
   integer                  :: int_err(5), icontxt, nprow, npcol, myrow, mycol,&
-       & err_act, n, iix, jjx, temp(2), ix, ijx, iy, ijy, iiy, jjy, i, m, j, k
+       & err_act, n, iix, jjx, temp(2), ix, jx, iy, jy, iiy, jjy, i, m, j, k
   real(kind(1.d0)),pointer :: tmpx(:)
   real(kind(1.D0))         :: dot_local
   real(kind(1.d0))         :: ddot
@@ -187,11 +187,13 @@ function psb_ddotv(x, y,desc_a, info)
 
   ix = ione
   iy = ione
+  jx = ione
+  jy = ione
   m = desc_a%matrix_data(psb_m_)
 
   ! check vector correctness
-  call psb_chkvect(m,ione,size(x,1),ix,ijx,desc_a%matrix_data,info,iix,jjx)
-  call psb_chkvect(m,ione,size(y,1),iy,ijy,desc_a%matrix_data,info,iiy,jjy)
+  call psb_chkvect(m,ione,size(x,1),ix,jx,desc_a%matrix_data,info,iix,jjx)
+  call psb_chkvect(m,ione,size(y,1),iy,jy,desc_a%matrix_data,info,iiy,jjy)
   if(info.ne.0) then
      info=4010
      ch_err='psb_chkvect'

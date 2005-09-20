@@ -27,10 +27,6 @@ subroutine psi_dswapdatam(flag,n,beta,y,desc_a,work,info)
   character(len=20)  :: name, ch_err
 
   interface psi_gth
-     subroutine psi_dgthmm(n,k,idx,x,y,myrow,icontxt)
-       integer :: n, k, idx(:),myrow,icontxt
-       real(kind(1.d0)) :: x(:,:), y(:)
-     end subroutine psi_dgthmm
      subroutine psi_dgthm(n,k,idx,x,y)
        integer :: n, k, idx(:)
        real(kind(1.d0)) :: x(:,:), y(:)
@@ -304,7 +300,9 @@ subroutine psi_dswapdatam(flag,n,beta,y,desc_a,work,info)
      end do
 
      do i=1, totxch
+        write(0,'(i2," waiting")')myrow
         call mpi_waitany(nprow,rvhd,ixrec,p2pstat,iret)
+        write(0,'(i2," done")')myrow
         if(iret.ne.mpi_success) then
            int_err(1) = iret
            info=400

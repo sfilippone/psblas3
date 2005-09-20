@@ -175,6 +175,9 @@ Subroutine psb_dcgstab(a,prec,b,x,eps,desc_a,info,&
   Else If (listop == 2) Then 
     bn2 = psb_nrm2(b,desc_a,info)
   Endif
+  call blacs_barrier(icontxt,'All') ! to be removed
+  write(0,'(i2," ani bni bn2 ",3(f10.2,2x))')myrow,ani,bni,bn2
+  call blacs_barrier(icontxt,'All') ! to be removed
   if (info /= 0) Then 
      info=4011
      call psb_errpush(info,name)
@@ -187,9 +190,17 @@ Subroutine psb_dcgstab(a,prec,b,x,eps,desc_a,info,&
 !!$ 
     If (itx >= itmax) Exit restart  
     it = 0      
+    write(0,'(i2," b ",10(f10.2,2x))')myrow,b(1:10)
+    write(0,'(i2," r ",10(f10.2,2x))')myrow,r(1:10)
     Call psb_axpby(one,b,zero,r,desc_a,info)
+    write(0,'(i2," b ",10(f10.2,2x))')myrow,b(1:10)
+    write(0,'(i2," r ",10(f10.2,2x))')myrow,r(1:10)
     Call psb_spmm(-one,a,x,one,r,desc_a,info,work=aux)
+    write(0,'(i2," x ",10(f10.2,2x))')myrow,x(1:10)
+    write(0,'(i2," r ",10(f10.2,2x))')myrow,r(1:10)
     Call psb_axpby(one,r,zero,q,desc_a,info)
+    write(0,'(i2," q ",10(f10.2,2x))')myrow,q(1:10)
+    write(0,'(i2," r ",10(f10.2,2x))')myrow,r(1:10)
     if (info /= 0) Then 
        info=4011
        call psb_errpush(info,name)
@@ -209,11 +220,14 @@ Subroutine psb_dcgstab(a,prec,b,x,eps,desc_a,info,&
     Else If (listop == 2) Then 
       rni = psb_nrm2(r,desc_a,info)
     Endif
-  if (info /= 0) Then 
-     info=4011
-     call psb_errpush(info,name)
-     goto 9999
-  End If
+    call blacs_barrier(icontxt,'All') ! to be removed
+    write(0,'(i2," rni xni ",2(f10.2,2x))')myrow,rni,xni
+    call blacs_barrier(icontxt,'All') ! to be removed
+    if (info /= 0) Then 
+       info=4011
+       call psb_errpush(info,name)
+       goto 9999
+    End If
 
     If (itx == 0) Then 
       rn0 = rni
@@ -244,6 +258,7 @@ Subroutine psb_dcgstab(a,prec,b,x,eps,desc_a,info,&
        goto 9999
     End If
 
+    
     If (rerr<=eps) Then 
       Exit restart
     End If
@@ -254,6 +269,7 @@ Subroutine psb_dcgstab(a,prec,b,x,eps,desc_a,info,&
       If (debug) Write(*,*) 'Iteration: ',itx
       rho_old = rho    
       rho = psb_dot(q,r,desc_a,info)
+      write(0,'(i2," rho old ",2(f10.2,2x))')myrow,rho,rho_old
       If (rho==zero) Then
          If (debug) Write(0,*) 'Bi-CGSTAB Itxation breakdown R',rho
         Exit iteration
