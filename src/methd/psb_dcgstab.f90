@@ -77,7 +77,7 @@ Subroutine psb_dcgstab(a,prec,b,x,eps,desc_a,info,&
   Logical, Parameter :: exchange=.True., noexchange=.False., debug1 = .False.
   Integer, Parameter :: ione=1
   Integer, Parameter :: irmax = 8
-  Integer            :: itx, i, isvch, ich, icontxt, err_act, int_err(5)
+  Integer            :: itx, i, isvch, ich, icontxt, err_act, int_err(5),ii
   Integer            :: listop
   Logical            :: do_renum_left
   Real(Kind(1.d0)), Parameter :: one=1.d0, zero=0.d0, epstol=1.d-35
@@ -175,9 +175,6 @@ Subroutine psb_dcgstab(a,prec,b,x,eps,desc_a,info,&
   Else If (listop == 2) Then 
     bn2 = psb_nrm2(b,desc_a,info)
   Endif
-  call blacs_barrier(icontxt,'All') ! to be removed
-  write(0,'(i2," ani bni bn2 ",3(f10.2,2x))')myrow,ani,bni,bn2
-  call blacs_barrier(icontxt,'All') ! to be removed
   if (info /= 0) Then 
      info=4011
      call psb_errpush(info,name)
@@ -190,17 +187,9 @@ Subroutine psb_dcgstab(a,prec,b,x,eps,desc_a,info,&
 !!$ 
     If (itx >= itmax) Exit restart  
     it = 0      
-    write(0,'(i2," b ",10(f10.2,2x))')myrow,b(1:10)
-    write(0,'(i2," r ",10(f10.2,2x))')myrow,r(1:10)
     Call psb_axpby(one,b,zero,r,desc_a,info)
-    write(0,'(i2," b ",10(f10.2,2x))')myrow,b(1:10)
-    write(0,'(i2," r ",10(f10.2,2x))')myrow,r(1:10)
     Call psb_spmm(-one,a,x,one,r,desc_a,info,work=aux)
-    write(0,'(i2," x ",10(f10.2,2x))')myrow,x(1:10)
-    write(0,'(i2," r ",10(f10.2,2x))')myrow,r(1:10)
     Call psb_axpby(one,r,zero,q,desc_a,info)
-    write(0,'(i2," q ",10(f10.2,2x))')myrow,q(1:10)
-    write(0,'(i2," r ",10(f10.2,2x))')myrow,r(1:10)
     if (info /= 0) Then 
        info=4011
        call psb_errpush(info,name)
@@ -220,9 +209,6 @@ Subroutine psb_dcgstab(a,prec,b,x,eps,desc_a,info,&
     Else If (listop == 2) Then 
       rni = psb_nrm2(r,desc_a,info)
     Endif
-    call blacs_barrier(icontxt,'All') ! to be removed
-    write(0,'(i2," rni xni ",2(f10.2,2x))')myrow,rni,xni
-    call blacs_barrier(icontxt,'All') ! to be removed
     if (info /= 0) Then 
        info=4011
        call psb_errpush(info,name)
@@ -269,7 +255,9 @@ Subroutine psb_dcgstab(a,prec,b,x,eps,desc_a,info,&
       If (debug) Write(*,*) 'Iteration: ',itx
       rho_old = rho    
       rho = psb_dot(q,r,desc_a,info)
-      write(0,'(i2," rho old ",2(f10.2,2x))')myrow,rho,rho_old
+!!$    call blacs_barrier(icontxt,'All') ! to be removed
+!!$      write(0,'(i2," rho old ",2(f,2x))')myrow,rho,rho_old
+!!$    call blacs_barrier(icontxt,'All') ! to be removed
       If (rho==zero) Then
          If (debug) Write(0,*) 'Bi-CGSTAB Itxation breakdown R',rho
         Exit iteration
@@ -287,7 +275,7 @@ Subroutine psb_dcgstab(a,prec,b,x,eps,desc_a,info,&
 
       Call psb_spmm(one,a,f,zero,v,desc_a,info,&
            & work=aux)
-      
+
       sigma = psb_dot(q,v,desc_a,info)
       If (sigma==zero) Then
          If (debug) Write(0,*) 'Bi-CGSTAB Iteration breakdown S1', sigma
@@ -296,12 +284,29 @@ Subroutine psb_dcgstab(a,prec,b,x,eps,desc_a,info,&
       
       alpha = rho/sigma
       Call psb_axpby(one,r,zero,s,desc_a,info)
+      if(info.ne.0) then
+         call psb_errpush(4010,name,a_err='psb_axpby')
+         goto 9999
+      end if
       Call psb_axpby(-alpha,v,one,s,desc_a,info)
+      if(info.ne.0) then
+         call psb_errpush(4010,name,a_err='psb_axpby')
+         goto 9999
+      end if
       
       Call psb_prcaply(prec,s,z,desc_a,info,work=aux)
+      if(info.ne.0) then
+         call psb_errpush(4010,name,a_err='psb_prcaply')
+         goto 9999
+      end if
 
       Call psb_spmm(one,a,z,zero,t,desc_a,info,&
            & work=aux)
+
+      if(info.ne.0) then
+         call psb_errpush(4010,name,a_err='psb_spmm')
+         goto 9999
+      end if
       
       sigma = psb_dot(t,t,desc_a,info)
       If (sigma==zero) Then

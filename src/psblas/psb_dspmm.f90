@@ -368,6 +368,7 @@ subroutine  psb_dspmv(alpha,a,x,beta,y,desc_a,info,&
   use psb_serial_mod
   use psb_descriptor_type
   use psb_comm_mod
+  use psb_const_mod
   use psi_mod
   use psb_check_mod
   use psb_error_mod
@@ -526,7 +527,6 @@ subroutine  psb_dspmv(alpha,a,x,beta,y,desc_a,info,&
           & a%descra,a%aspk,a%ia1,a%ia2,a%infoa,a%pl,&
           & x(iix),lldx,beta,y(iiy),lldy,&
           & iwork,liwork,info)
-
      if(info.ne.0) then
         info = 4011
         call psb_errpush(info,name)

@@ -22,6 +22,7 @@
 subroutine  psb_daxpby(alpha, x, beta,y,desc_a,info, n, jx, jy)
   use psb_descriptor_type
   use psb_check_mod
+  use psb_const_mod
   use psb_error_mod
   implicit none                    
 
@@ -147,6 +148,7 @@ end subroutine psb_daxpby
 !
 subroutine  psb_daxpbyv(alpha, x, beta,y,desc_a,info)
   use psb_descriptor_type
+  use psb_const_mod
   use psb_check_mod
   use psb_error_mod
   implicit none                    
@@ -200,8 +202,6 @@ subroutine  psb_daxpbyv(alpha, x, beta,y,desc_a,info)
      call psb_errpush(info,name)
   end if
   
-  write(0,'(i2," before daxpby",2(i6,2x),2(f10.2,2x))')myrow,desc_a%matrix_data(psb_n_row_),&
-       & desc_a%matrix_data(psb_n_col_),alpha,beta
   if(desc_a%matrix_data(psb_n_row_).gt.0) then
      call daxpby(desc_a%matrix_data(psb_n_col_),ione,&
           & alpha,x,size(x),beta,&

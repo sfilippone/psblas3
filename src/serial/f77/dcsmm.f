@@ -175,7 +175,7 @@ C     .. Local Scalars ..
       INTEGER           LWORKM,  LWORKB, LWORKC, LWORKS, P, ERR_ACT
       LOGICAL           LP, RP
 C     .. Local Array..
-      INTEGER           INT_VAL(5)
+      INTEGER           INT_VAL(5),iunit
       CHARACTER*20      NAME
       DOUBLE PRECISION  REAL_VAL(5)
       CHARACTER*30      STRINGS(2)

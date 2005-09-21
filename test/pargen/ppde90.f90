@@ -217,7 +217,7 @@ program pde90
      write(6,*) 'time per iteration : ',t2/iter
      write(6,*) 'number of iterations : ',iter
      write(6,*) 'error on exit : ',err
-     write(6,*) 'info  on exit : ',ierr
+     write(6,*) 'info  on exit : ',info
   end if
 
   !  

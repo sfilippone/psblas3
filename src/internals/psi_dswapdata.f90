@@ -128,7 +128,6 @@ subroutine psi_dswapdatam(flag,n,beta,y,desc_a,work,info)
      sndbuf => work(1:idxs)
      rcvbuf => work(idxs+1:idxs+idxr)
   else
-     write(0,'(i2," allocating",3(i6,2x))')myrow,idxs,idxr,size(work)
      allocate(sndbuf(idxs),rcvbuf(idxr), stat=info)
      if(info.ne.0) then
         call psb_errpush(4000,name)
@@ -300,9 +299,7 @@ subroutine psi_dswapdatam(flag,n,beta,y,desc_a,work,info)
      end do
 
      do i=1, totxch
-        write(0,'(i2," waiting")')myrow
         call mpi_waitany(nprow,rvhd,ixrec,p2pstat,iret)
-        write(0,'(i2," done")')myrow
         if(iret.ne.mpi_success) then
            int_err(1) = iret
            info=400
@@ -497,6 +494,7 @@ subroutine psi_dswapdatav(flag,beta,y,desc_a,work,info)
   endif
 
   call blacs_get(icontxt,10,icomm)
+
 
   allocate(sdsz(0:nprow-1), rvsz(0:nprow-1), bsdidx(0:nprow-1),&
        & brvidx(0:nprow-1), rvhd(0:nprow-1), prcid(0:nprow-1),&
@@ -728,9 +726,9 @@ subroutine psi_dswapdatav(flag,beta,y,desc_a,work,info)
            nesd = h_idx(point_to_proc+nerv+psb_n_elem_send_)
 
            idx_pt = point_to_proc+psb_elem_recv_
-           snd_pt = bsdidx(proc_to_comm)
+           rcv_pt = brvidx(proc_to_comm)
            call psi_sct(nerv,h_idx(idx_pt:idx_pt+nerv-1),&
-                & sndbuf(snd_pt:snd_pt+nesd-1),beta,y)
+                & rcvbuf(rcv_pt:rcv_pt+nerv-1),beta,y)
         else
            int_err(1) = ixrec
            info=400
