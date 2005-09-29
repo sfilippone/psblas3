@@ -144,7 +144,7 @@ subroutine  psb_dhalom(x,desc_a,info,alpha,jx,ik,work,tran,mode)
   xp => x(iix:size(x,1),jjx:jjx+k-1)
   if(ltran.eq.'N') then
      call psi_swapdata(imode,k,0.d0,xp,&
-          & desc_a,iwork,info)
+          & desc_a,iwork,info,data=psb_comm_halo_)
 !!$     call PSI_dSwapData(imode,k,0.d0,x(1,jjx),&
 !!$          & size(x,1),desc_a%matrix_data,&
 !!$          & desc_a%halo_index,iwork,liwork,info)
@@ -302,7 +302,7 @@ subroutine  psb_dhalov(x,desc_a,info,alpha,work,tran,mode)
   ! exchange halo elements
   if(ltran.eq.'N') then
      call psi_swapdata(imode,0.d0,x(iix:size(x)),&
-          & desc_a,iwork,info)
+          & desc_a,iwork,info,data=psb_comm_halo_)
   else if((ltran.eq.'T').or.(ltran.eq.'H')) then
      call psi_swaptran(imode,1.d0,x(iix:size(x)),&
           & desc_a,iwork,info)

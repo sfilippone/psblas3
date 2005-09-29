@@ -25,7 +25,7 @@ subroutine  psb_dovrlm(x,desc_a,info,jx,ik,work,choice,update_type)
   real(kind(1.d0)), intent(inout), target   :: x(:,:)
   type(psb_desc_type), intent(in)           :: desc_a
   integer, intent(out)                      :: info
-  real(kind(1.d0)), intent(inout), optional, target :: work(:)
+  real(kind(1.d0)), optional, target        :: work(:)
   logical, intent(in), optional             :: choice
   integer, intent(in), optional             :: update_type,jx,ik
 
@@ -68,7 +68,7 @@ subroutine  psb_dovrlm(x,desc_a,info,jx,ik,work,choice,update_type)
   nrow = desc_a%matrix_data(psb_n_row_)
   ncol = desc_a%matrix_data(psb_n_col_)
 
-  maxk=size(x,2)-jx+1
+  maxk=size(x,2)-ijx+1
 
   if(present(ik)) then
      if(ik.gt.maxk) then
@@ -138,7 +138,7 @@ subroutine  psb_dovrlm(x,desc_a,info,jx,ik,work,choice,update_type)
   if(ichoice) then
      xp => x(iix:size(x,1),jjx:jjx+k-1)
      call psi_swapdata(imode,k,1.d0,xp,&
-          & desc_a,iwork,info)
+          & desc_a,iwork,info,data=psb_comm_ovr_)
   end if
 
   if(info.ne.0) then
@@ -216,7 +216,7 @@ subroutine  psb_dovrlv(x,desc_a,info,work,choice,update_type)
   real(kind(1.d0)), intent(inout), target   :: x(:)
   type(psb_desc_type), intent(in)           :: desc_a
   integer, intent(out)                      :: info
-  real(kind(1.d0)), intent(inout), optional, target :: work(:)
+  real(kind(1.d0)), optional, target        :: work(:)
   logical, intent(in), optional             :: choice
   integer, intent(in), optional             :: update_type
 
@@ -314,7 +314,7 @@ subroutine  psb_dovrlv(x,desc_a,info,work,choice,update_type)
   ! exchange overlap elements
   if(ichoice) then
      call psi_swapdata(imode,1.d0,x(iix:size(x)),&
-          & desc_a,iwork,info)
+          & desc_a,iwork,info,data=psb_comm_ovr_)
   end if
 
   if(info.ne.0) then
