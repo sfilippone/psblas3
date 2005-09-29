@@ -153,7 +153,7 @@ C
 C                                                                        
 C                                                                        
          CALL  DCOOMM(TRANS,M,N,K,ALPHA,DESCRA,A,IA1,
-     +    IA2,INFOA,B,LDB,BETA,C,LDC,WORK)                         
+     +    IA2,INFOA,B,LDB,BETA,C,LDC,WORK,LWORK,IERROR)
       ELSE
 C
 C     This data structure not yet considered

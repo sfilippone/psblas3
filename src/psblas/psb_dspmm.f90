@@ -448,16 +448,19 @@ subroutine  psb_dspmv(alpha,a,x,beta,y,desc_a,info,&
   n    = desc_a%matrix_data(psb_n_)
   nrow = desc_a%matrix_data(psb_n_row_)
   ncol = desc_a%matrix_data(psb_n_col_)
-  lldx = size(x,1)
-  lldy = size(y,1)
+  lldx = size(x)
+  lldy = size(y)
 
   ! check for presence/size of a work area
   liwork= 2*ncol
-  if (a%pr(1) /= 0) llwork = liwork + n * ik
-  if (a%pl(1) /= 0) llwork = liwork + m * ik
-  if (present(work)) then     
-     if(size(work).lt.liwork) then
-        call psb_realloc(liwork,work,info)
+  if (a%pr(1) /= 0) liwork = liwork + n * ik
+  if (a%pl(1) /= 0) liwork = liwork + m * ik
+  if (present(work)) then
+     if(size(work).ge.liwork) then
+        iwork => work
+        liwork=size(work)
+     else
+        call psb_realloc(liwork,iwork,info)
         if(info.ne.0) then
            info=4010
            ch_err='psb_realloc'
@@ -465,7 +468,6 @@ subroutine  psb_dspmv(alpha,a,x,beta,y,desc_a,info,&
            goto 9999
         end if
      end if
-     iwork => work
   else
      call psb_realloc(liwork,iwork,info)
      if(info.ne.0) then
@@ -516,15 +518,12 @@ subroutine  psb_dspmv(alpha,a,x,beta,y,desc_a,info,&
         x(nrow:ncol)=0.d0
      else
         call psi_swapdata(ior(psb_swap_send_,psb_swap_recv_),&
-             & dzero,x,desc_a,iwork,info)
-!!$        call PSI_dSwapData(ior(SWAP_SEND,SWAP_RECV),1,&
-!!$             & dzero,x(iix,jjx),lldx,desc_a%matrix_data,&
-!!$             & desc_a%halo_index,iwork,liwork,info)
+             & dzero,x,desc_a,iwork,info,data=psb_comm_halo_)
      end if
 
      !  local Matrix-vector product
-     call dcsmm(itrans,nrow,ib,ncol,alpha,a%pr,a%fida,&
-          & a%descra,a%aspk,a%ia1,a%ia2,a%infoa,a%pl,&
+     call dcsmm(itrans,nrow,ib,ncol,alpha,a%pl,a%fida,&
+          & a%descra,a%aspk,a%ia1,a%ia2,a%infoa,a%pr,&
           & x(iix),lldx,beta,y(iiy),lldy,&
           & iwork,liwork,info)
      if(info.ne.0) then
@@ -585,9 +584,6 @@ subroutine  psb_dspmv(alpha,a,x,beta,y,desc_a,info,&
      if(idoswap.gt.0)&
           & call psi_swaptran(ior(psb_swap_send_,psb_swap_recv_),&
           & done,yp,desc_a,iwork,info)
-!!$          & call PSI_dSwapTran(ior(SWAP_SEND,SWAP_RECV),&
-!!$          & ik,done,y(iiy,jjy),lldy,desc_a%matrix_data,&
-!!$          & desc_a%halo_index),iwork,liwork,info
      if(info.ne.0) then
         info = 4010
         ch_err='PSI_dSwapTran'

@@ -1,5 +1,6 @@
-
+! File: ppde90.f90
 !
+! Program: ppde90
 ! This sample program shows how to build and solve a sparse linear
 !
 ! The program  solves a linear system based on the partial differential
@@ -7,7 +8,8 @@
 !
 ! 
 !
-!     the equation generated is:
+! The equation generated is
+!
 !   b1 d d (u)  b2  d d (u)    a1 d (u))  a2 d (u)))   
 ! -   ------   -    ------  +    ----- +  ------     + a3 u = 0
 !      dx dx         dy dy         dx        dy        
@@ -41,6 +43,7 @@
 program pde90
   use psb_sparse_mod
   use psb_error_mod
+  use psb_prec_mod
   implicit none
 
   interface 
@@ -75,7 +78,7 @@ program pde90
   
   ! solver parameters
   integer            :: iter, itmax,ierr,itrace, methd,iprec, istopc,&
-       & iparm(20), ml
+       & iparm(20), ml, novr
   real(kind(1.d0))   :: err, eps, rparm(20)
    
   ! other variables
@@ -101,7 +104,7 @@ program pde90
   !
   !  get parameters
   !
-  call get_parms(icontxt,cmethd,prec,afmt,idim,istopc,itmax,itrace,ml)
+  call get_parms(icontxt,cmethd,iprec,novr,afmt,idim,istopc,itmax,itrace,ml)
   
   !
   !  allocate and fill in the coefficient matrix, rhs and initial guess 
@@ -120,50 +123,30 @@ program pde90
 
   dim=size(a%aspk)
 
-!!$  allocate(h%aspk(dim),h%ia1(dim),h%ia2(dim),h%pl(size(a%pl)),&
-!!$       & h%pl(size(a%pl)),d(size(a%pl)),&
-!!$       & desc_a_out%matrix_data(size(desc_a%matrix_data)),&
-!!$       & desc_a_out%halo_index(size(desc_a%halo_index)),&
-!!$       & desc_a_out%ovrlap_index(size(desc_a%ovrlap_index)),&
-!!$       & desc_a_out%ovrlap_elem(size(desc_a%ovrlap_elem)),&
-!!$       & desc_a_out%loc_to_glob(size(desc_a%loc_to_glob)),&
-!!$       & desc_a_out%glob_to_loc(size(desc_a%glob_to_loc)), work(1024))
-!!$  check_descr=15
-!  work(5)=9
-!!$  write(0,*)'calling verify'
-!!$  call f90_psverify(d,a,desc_a,check_descr,convert_descr,h,&
-!!$       & desc_a_out,work)
-!!$  write(0,*)'verify done',convert_descr
-
-!  deallocate(work)
-
   call dgamx2d(icontxt,'a',' ',ione, ione,t2,ione,t1,t1,-1,-1,-1)
-  if (iam.eq.0) write(6,*) 'matrix creation time : ',t2
+  if (iam.eq.0) write(*,'("Overall matrix creation time : ",es10.4)')t2
+  if (iam.eq.0) write(*,'(" ")')
 
   !
   !  prepare the preconditioner.
   !  
-  write(0,*)'precondizionatore=',prec
-  select case (prec)     
-  case ('ILU')
-     iprec = 2
-     ptype='bja'
-     call psb_precset(pre,ptype)
-  case ('DIAGSC')
-     iprec = 1
-     ptype='diagsc'
-     call psb_precset(pre,ptype)
-  case ('NONE')
-     iprec = 0
-     ptype='noprec'
-     call psb_precset(pre,ptype)
-  case default
-     info=5003
-     ch_err(1:3)=prec(1:3)
-     call psb_errpush(info,name,a_err=ch_err)
-     goto 9999
+  if(iam.eq.psb_root_) write(0,'("Setting preconditioner to : ",a)')pr_to_str(iprec)
+  select case(iprec)
+  case(noprec_)
+    call psb_precset(pre,'noprec')
+  case(diagsc_)             
+    call psb_precset(pre,'diagsc')
+  case(bja_)             
+    call psb_precset(pre,'ilu')
+  case(asm_)             
+    call psb_precset(pre,'asm',iv=(/novr,halo_,sum_/))
+  case(ash_)             
+    call psb_precset(pre,'asm',iv=(/novr,nohalo_,sum_/))
+  case(ras_)             
+    call psb_precset(pre,'asm',iv=(/novr,halo_,none_/))
+  case(rash_)             
+    call psb_precset(pre,'asm',iv=(/novr,nohalo_,none_/))
   end select
-  write(0,*)'preconditioner set'
 
   call blacs_barrier(icontxt,'ALL')
   t1 = mpi_wtime()
@@ -179,12 +162,13 @@ program pde90
   
   call dgamx2d(icontxt,'a',' ',ione, ione,tprec,ione,t1,t1,-1,-1,-1)
   
-  if (iam.eq.0) write(6,*) 'preconditioner time : ',tprec
+  if (iam.eq.0) write(*,'("Preconditioner time : ",es10.4)')tprec
+  if (iam.eq.0) write(*,'(" ")')
 
   !
   ! iterative method parameters 
   !
-  write(*,*) 'calling iterative method', a%ia2(7999:8001)
+  if(iam.eq.psb_root_) write(*,'("Calling iterative method ",a)')cmethd
   call blacs_barrier(icontxt,'ALL')
   t1 = mpi_wtime()  
   eps   = 1.d-9
@@ -213,11 +197,12 @@ program pde90
   call dgamx2d(icontxt,'a',' ',ione, ione,t2,ione,t1,t1,-1,-1,-1)
 
   if (iam.eq.0) then
-     write(6,*) 'time to solve matrix : ',t2
-     write(6,*) 'time per iteration : ',t2/iter
-     write(6,*) 'number of iterations : ',iter
-     write(6,*) 'error on exit : ',err
-     write(6,*) 'info  on exit : ',info
+     write(*,'(" ")')
+     write(*,'("Time to solve matrix : ",es10.4)')t2
+     write(*,'("Time per iteration   : ",es10.4)')t2/iter
+     write(*,'("Number of iterations : ",i)')iter
+     write(*,'("Error on exit        : ",es10.4)')err
+     write(*,'("Info  on exit        : ",i)')info
   end if
 
   !  
@@ -250,10 +235,10 @@ contains
   !
   ! get iteration parameters from the command line
   !
-  subroutine  get_parms(icontxt,cmethd,prec,afmt,idim,istopc,itmax,itrace,ml)
+  subroutine  get_parms(icontxt,cmethd,iprec,novr,afmt,idim,istopc,itmax,itrace,ml)
     integer      :: icontxt
-    character    :: cmethd*10, prec*10, afmt*5
-    integer      :: idim, iret, istopc,itmax,itrace,ml
+    character    :: cmethd*10, afmt*5
+    integer      :: idim, iret, istopc,itmax,itrace,ml, iprec, novr
     character*40 :: charbuf
     integer      :: iargc, nprow, npcol, myprow, mypcol
     external     iargc
@@ -265,7 +250,8 @@ contains
        read(*,*) ip
        if (ip.ge.3) then
           read(*,*) cmethd
-          read(*,*) prec
+          read(*,*) iprec
+          read(*,*) novr
           read(*,*) afmt
          
         ! convert strings in array
@@ -275,11 +261,11 @@ contains
         ! broadcast parameters to all processors
           call igebs2d(icontxt,'ALL',' ',10,1,intbuf,10)
         
-          do i = 1, len(prec)
-             intbuf(i) = iachar(prec(i:i))
-          end do
         ! broadcast parameters to all processors
-          call igebs2d(icontxt,'ALL',' ',10,1,intbuf,10)
+          call igebs2d(icontxt,'ALL',' ',1,1,iprec,10)
+
+        ! broadcast parameters to all processors
+          call igebs2d(icontxt,'ALL',' ',1,1,novr,10)
         
           do i = 1, len(afmt)
              intbuf(i) = iachar(afmt(i:i))
@@ -317,11 +303,14 @@ contains
           intbuf(5) = ml
           call igebs2d(icontxt,'ALL',' ',5,1,intbuf,5)
 
-          write(6,*)'solving matrix: ell1'      
-          write(6,*)'on  grid',idim,'x',idim,'x',idim
-          write(6,*)' with block data distribution, np=',np,&
-               & ' preconditioner=',prec,&
-               & ' iterative methd=',cmethd      
+          write(*,'("Solving matrix       : ell1")')      
+          write(*,'("Grid dimensions      : ",i4,"x",i4,"x",i4)')idim,idim,idim
+          write(*,'("Number of processors : ",i)')nprow
+          write(*,'("Data distribution    : BLOCK")')
+          write(*,'("Preconditioner       : ",a)')pr_to_str(iprec)
+          if(iprec.gt.2) write(*,'("Overlapping levels   : ",i)')novr
+          write(*,'("Iterative method     : ",a)')cmethd
+          write(*,'(" ")')
        else
         ! wrong number of parameter, print an error message and exit
           call pr_usage(0)      
@@ -334,10 +323,11 @@ contains
        do i = 1, 10
           cmethd(i:i) = achar(intbuf(i))
        end do
-       call igebr2d(icontxt,'ALL',' ',10,1,intbuf,10,0,0)
-       do i = 1, 10
-          prec(i:i) = achar(intbuf(i))
-       end do
+
+       call igebr2d(icontxt,'ALL',' ',1,1,iprec,10,0,0)
+
+       call igebr2d(icontxt,'ALL',' ',1,1,novr,10,0,0)
+
        call igebr2d(icontxt,'ALL',' ',10,1,intbuf,10,0,0)
        do i = 1, 5
           afmt(i:i) = achar(intbuf(i))
@@ -429,7 +419,7 @@ contains
     ! deltat discretization time
     real(kind(1.d0))         :: deltah
     real(kind(1.d0)),parameter   :: rhs=0.d0,one=1.d0,zero=0.d0
-    real(kind(1.d0))   :: mpi_wtime, t1, t2, t3, tins
+    real(kind(1.d0))   :: mpi_wtime, t1, t2, t3, tins, tasb
     real(kind(1.d0))   :: a1, a2, a3, a4, b1, b2, b3 
     external            mpi_wtime,a1, a2, a3, a4, b1, b2, b3
     integer            :: nb, ir1, ir2, ipr, err_act
@@ -452,14 +442,12 @@ contains
     m   = idim*idim*idim
     n   = m
     nnz = ((n*9)/(nprow*npcol))
-    write(*,*) 'size: n ',n,myprow
+    if(myprow.eq.psb_root_) write(0,'("Generating Matrix (size=",i,")...")')n
+
     call psb_dscall(n,n,parts,icontxt,desc_a,info)
-    write(*,*) 'allocating a. nnz:',nnz,myprow
     call psb_spalloc(a,desc_a,info,nnz=nnz)
     ! define  rhs from boundary conditions; also build initial guess 
-    write(*,*) 'allocating b', info,myprow
     call psb_alloc(n,b,desc_a,info)
-    write(*,*) 'allocating t', info,myprow
     call psb_alloc(n,t,desc_a,info)
     if(info.ne.0) then
        info=4010
@@ -642,7 +630,7 @@ contains
     end do
 
     call blacs_barrier(icontxt,'ALL')    
-    t2 = mpi_wtime()
+    t2 = mpi_wtime()-t1
 
     if(info.ne.0) then
        info=4010
@@ -651,23 +639,30 @@ contains
        goto 9999
     end if
 
-    write(*,*) '   pspins  time',tins
-    write(*,*) '   insert time',(t2-t1)
-
     deallocate(row_mat%aspk,row_mat%ia1,row_mat%ia2)
 
     t1 = mpi_wtime()
     call psb_dscasb(desc_a,info)
     call psb_spasb(a,desc_a,info,dup=1,afmt=afmt)
     call blacs_barrier(icontxt,'ALL')
-    t2 = mpi_wtime()
+    tasb = mpi_wtime()-t1
     if(info.ne.0) then
        info=4010
        ch_err='asb rout.'
        call psb_errpush(info,name,a_err=ch_err)
        goto 9999
     end if
-    write(0,*) '   assembly  time',(t2-t1),' ',a%fida(1:4)
+
+    call dgamx2d(icontxt,'a',' ',ione, ione,t2,ione,t1,t1,-1,-1,-1)
+    call dgamx2d(icontxt,'a',' ',ione, ione,tins,ione,t1,t1,-1,-1,-1)
+    call dgamx2d(icontxt,'a',' ',ione, ione,tasb,ione,t1,t1,-1,-1,-1)
+
+    if(myprow.eq.psb_root_) then
+       write(*,'("The matrix has been generated and assembeld in ",a3," format.")')a%fida(1:3)
+       write(*,'("-pspins time   : ",es10.4)')tins
+       write(*,'("-insert time   : ",es10.4)')t2
+       write(*,'("-assembly time : ",es10.4)')tasb
+    end if
 
     call psb_asb(b,desc_a,info)
     call psb_asb(t,desc_a,info)
@@ -677,10 +672,6 @@ contains
        call psb_errpush(info,name,a_err=ch_err)
        goto 9999
     end if
-
-    if (myprow.eq.0) then
-      write(0,*) '   end create_matrix'
-    endif
 
     call psb_erractionrestore(err_act)
     return

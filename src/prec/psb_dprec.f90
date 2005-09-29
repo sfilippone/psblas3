@@ -243,7 +243,7 @@ subroutine psb_dbaseprcaply(prec,x,beta,y,desc_data,trans,work,info)
     tx(desc_data%matrix_data(psb_n_row_)+1:isz) = zero
 
     if (prec%iprcparm(restr_)==psb_halo_) then 
-      call psb_halo(tx,prec%desc_data,info,work=aux)
+       call psb_halo(tx,prec%desc_data,info,work=aux)
       if(info /=0) then
          info=4010
          ch_err='psb_halo'
@@ -281,9 +281,9 @@ subroutine psb_dbaseprcaply(prec,x,beta,y,desc_data,trans,work,info)
       ! call f90_psovrl(ty,prec%desc_data,update_type=prec%a_restrict)
 
     case(psb_sum_,psb_avg_) 
-      call psb_ovrl(ty,prec%desc_data,info,&
-           & update_type=prec%iprcparm(prol_),work=aux)
-      if(info /=0) then
+       call psb_ovrl(ty,prec%desc_data,info,&
+            & update_type=prec%iprcparm(prol_),work=aux)
+       if(info /=0) then
          info=4010
          ch_err='psb_ovrl'
          goto 9999

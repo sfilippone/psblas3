@@ -1,4 +1,4 @@
-subroutine psi_dswapdatam(flag,n,beta,y,desc_a,work,info)
+subroutine psi_dswapdatam(flag,n,beta,y,desc_a,work,info,data)
 
   use psb_error_mod
   use psb_descriptor_type
@@ -10,6 +10,7 @@ subroutine psi_dswapdatam(flag,n,beta,y,desc_a,work,info)
   real(kind(1.d0))         :: y(:,:), beta
   real(kind(1.d0)), target :: work(:)
   type(psb_desc_type)      :: desc_a
+  integer, optional        :: data
 
   ! locals
   integer  :: icontxt, nprow, npcol, myrow,&
@@ -20,7 +21,7 @@ subroutine psi_dswapdatam(flag,n,beta,y,desc_a,work,info)
        & snd_pt, rcv_pt
   integer  :: blacs_pnum, krecvid, ksendid
   integer, pointer, dimension(:) :: bsdidx, brvidx,&
-       & sdsz, rvsz, prcid, ptp, rvhd, h_idx
+       & sdsz, rvsz, prcid, ptp, rvhd, d_idx
   integer :: int_err(5)
   logical :: swap_mpi, swap_sync, swap_send, swap_recv
   real(kind(1.d0)), pointer, dimension(:) :: sndbuf, rcvbuf
@@ -95,7 +96,19 @@ subroutine psi_dswapdatam(flag,n,beta,y,desc_a,work,info)
   swap_sync = iand(flag,psb_swap_sync_).ne.0
   swap_send = iand(flag,psb_swap_send_).ne.0
   swap_recv = iand(flag,psb_swap_recv_).ne.0
-  h_idx => desc_a%halo_index
+
+  if(present(data)) then
+     if(data.eq.psb_comm_halo_) then
+        d_idx => desc_a%halo_index
+     else if(data.eq.psb_comm_ovr_) then
+        d_idx => desc_a%ovrlap_index
+     else
+        d_idx => desc_a%halo_index
+     end if
+  else
+     d_idx => desc_a%halo_index
+  end if
+
   idxs = 1
   idxr = 1
   totxch = 0
@@ -103,11 +116,11 @@ subroutine psi_dswapdatam(flag,n,beta,y,desc_a,work,info)
   rvhd(:) = mpi_request_null
 
   ! prepare info for communications
-  proc_to_comm = h_idx(point_to_proc+psb_proc_id_)
+  proc_to_comm = d_idx(point_to_proc+psb_proc_id_)
   do while (proc_to_comm.ne.-1)
      if(proc_to_comm .ne. myrow) totxch = totxch+1
-     nerv = h_idx(point_to_proc+psb_n_elem_recv_)
-     nesd = h_idx(point_to_proc+nerv+psb_n_elem_send_)
+     nerv = d_idx(point_to_proc+psb_n_elem_recv_)
+     nesd = d_idx(point_to_proc+nerv+psb_n_elem_send_)
 
      prcid(proc_to_comm) = blacs_pnum(icontxt,proc_to_comm,mycol)
      ptp(proc_to_comm)   = point_to_proc
@@ -121,7 +134,7 @@ subroutine psi_dswapdatam(flag,n,beta,y,desc_a,work,info)
      idxs                 = idxs+sdsz(proc_to_comm)
 
      point_to_proc = point_to_proc+nerv+nesd+3
-     proc_to_comm  = h_idx(point_to_proc+psb_proc_id_)
+     proc_to_comm  = d_idx(point_to_proc+psb_proc_id_)
   end do
 
   if((idxr+idxs).lt.size(work)) then
@@ -140,19 +153,19 @@ subroutine psi_dswapdatam(flag,n,beta,y,desc_a,work,info)
      
      ! gather elements into sendbuffer for swapping
      point_to_proc = 1
-     proc_to_comm  = h_idx(point_to_proc+psb_proc_id_)
+     proc_to_comm  = d_idx(point_to_proc+psb_proc_id_)
      do while (proc_to_comm .ne. -1)
-        nerv = h_idx(point_to_proc+psb_n_elem_recv_)
-        nesd = h_idx(point_to_proc+nerv+psb_n_elem_send_)
+        nerv = d_idx(point_to_proc+psb_n_elem_recv_)
+        nesd = d_idx(point_to_proc+nerv+psb_n_elem_send_)
         
         idx_pt = point_to_proc+nerv+psb_elem_send_
         snd_pt = bsdidx(proc_to_comm)
         
-        call psi_gth(nesd,n,h_idx(idx_pt:idx_pt+nesd-1),&
+        call psi_gth(nesd,n,d_idx(idx_pt:idx_pt+nesd-1),&
              & y,sndbuf(snd_pt:snd_pt+nesd*n-1))
 
         point_to_proc = point_to_proc+nerv+nesd+3
-        proc_to_comm  = h_idx(point_to_proc+psb_proc_id_)
+        proc_to_comm  = d_idx(point_to_proc+psb_proc_id_)
      end do
 
      ! swap elements using mpi_alltoallv
@@ -168,32 +181,32 @@ subroutine psi_dswapdatam(flag,n,beta,y,desc_a,work,info)
 
      ! scatter elements from receivebuffer after swapping
      point_to_proc = 1
-     proc_to_comm  = h_idx(point_to_proc+psb_proc_id_)
+     proc_to_comm  = d_idx(point_to_proc+psb_proc_id_)
      do while (proc_to_comm .ne. -1)
-        nerv = h_idx(point_to_proc+psb_n_elem_recv_)
-        nesd = h_idx(point_to_proc+nerv+psb_n_elem_send_)
+        nerv = d_idx(point_to_proc+psb_n_elem_recv_)
+        nesd = d_idx(point_to_proc+nerv+psb_n_elem_send_)
         
         idx_pt = point_to_proc+psb_elem_recv_
         rcv_pt = brvidx(proc_to_comm)
-        call psi_sct(nerv,n,h_idx(idx_pt:idx_pt+nerv-1),&
+        call psi_sct(nerv,n,d_idx(idx_pt:idx_pt+nerv-1),&
              & rcvbuf(rcv_pt:rcv_pt+n*nerv-1),beta,y)
 
         point_to_proc = point_to_proc+nerv+nesd+3
-        proc_to_comm  = h_idx(point_to_proc+psb_proc_id_)
+        proc_to_comm  = d_idx(point_to_proc+psb_proc_id_)
      end do
 
   else if (swap_sync) then
 
      point_to_proc = 1
-     proc_to_comm  = h_idx(point_to_proc+psb_proc_id_)
+     proc_to_comm  = d_idx(point_to_proc+psb_proc_id_)
      do while (proc_to_comm .ne. -1)
-        nerv = h_idx(point_to_proc+psb_n_elem_recv_)
-        nesd = h_idx(point_to_proc+nerv+psb_n_elem_send_)
+        nerv = d_idx(point_to_proc+psb_n_elem_recv_)
+        nesd = d_idx(point_to_proc+nerv+psb_n_elem_send_)
         if (proc_to_comm .lt. myrow) then
            ! First I send
            idx_pt = point_to_proc+nerv+psb_elem_send_
            snd_pt = bsdidx(proc_to_comm)
-           call psi_gth(nesd,n,h_idx(idx_pt:idx_pt+nesd-1),&
+           call psi_gth(nesd,n,d_idx(idx_pt:idx_pt+nesd-1),&
                 & y,sndbuf(snd_pt:snd_pt+nesd*n-1))
            call dgesd2d(icontxt,nesd,n,sndbuf(snd_pt),nesd,proc_to_comm,0)
            ! Then I receive
@@ -206,50 +219,50 @@ subroutine psi_dswapdatam(flag,n,beta,y,desc_a,work,info)
            ! Then I send
            idx_pt = point_to_proc+nerv+psb_elem_send_
            snd_pt = bsdidx(proc_to_comm)
-           call psi_gth(nesd,n,h_idx(idx_pt:idx_pt+nesd-1),&
+           call psi_gth(nesd,n,d_idx(idx_pt:idx_pt+nesd-1),&
                 & y,sndbuf(snd_pt:snd_pt+nesd*n-1))
            call dgesd2d(icontxt,nesd,n,sndbuf(snd_pt),nesd,proc_to_comm,0)
         else if (proc_to_comm .eq. myrow) then
            ! I send to myself
            idx_pt = point_to_proc+nerv+psb_elem_send_
            snd_pt = bsdidx(proc_to_comm)
-           call psi_gth(nesd,n,h_idx(idx_pt:idx_pt+nesd-1),&
+           call psi_gth(nesd,n,d_idx(idx_pt:idx_pt+nesd-1),&
                 & y,sndbuf(snd_pt:snd_pt+nesd*n-1))
         end if
 
         point_to_proc = point_to_proc+nerv+nesd+3
-        proc_to_comm  = h_idx(point_to_proc+psb_proc_id_)
+        proc_to_comm  = d_idx(point_to_proc+psb_proc_id_)
      end do
 
      point_to_proc = 1
-     proc_to_comm  = h_idx(point_to_proc+psb_proc_id_)
+     proc_to_comm  = d_idx(point_to_proc+psb_proc_id_)
      do while (proc_to_comm .ne. -1)
-        nerv = h_idx(point_to_proc+psb_n_elem_recv_)
-        nesd = h_idx(point_to_proc+nerv+psb_n_elem_send_)
+        nerv = d_idx(point_to_proc+psb_n_elem_recv_)
+        nesd = d_idx(point_to_proc+nerv+psb_n_elem_send_)
 
         if(proc_to_comm.ne.myrow) then
            idx_pt = point_to_proc+psb_elem_recv_
            rcv_pt = brvidx(proc_to_comm)
-           call psi_sct(nerv,n,h_idx(idx_pt:idx_pt+nerv-1),&
+           call psi_sct(nerv,n,d_idx(idx_pt:idx_pt+nerv-1),&
                 & rcvbuf(rcv_pt:rcv_pt+n*nerv-1),beta,y)
         else
            idx_pt = point_to_proc+psb_elem_recv_
            snd_pt = bsdidx(proc_to_comm)
-           call psi_sct(nerv,n,h_idx(idx_pt:idx_pt+nerv-1),&
+           call psi_sct(nerv,n,d_idx(idx_pt:idx_pt+nerv-1),&
                 & sndbuf(snd_pt:snd_pt+n*nesd-1),beta,y)
         end if
 
         point_to_proc = point_to_proc+nerv+nesd+3
-        proc_to_comm  = h_idx(point_to_proc+psb_proc_id_)
+        proc_to_comm  = d_idx(point_to_proc+psb_proc_id_)
      end do
 
   else if (swap_send .and. swap_recv) then
      ! First I post all the non blocking receives
      point_to_proc = 1
-     proc_to_comm  = h_idx(point_to_proc+psb_proc_id_)
+     proc_to_comm  = d_idx(point_to_proc+psb_proc_id_)
      do while (proc_to_comm .ne. -1)
-        nerv = h_idx(point_to_proc+psb_n_elem_recv_)
-        nesd = h_idx(point_to_proc+nerv+psb_n_elem_send_)
+        nerv = d_idx(point_to_proc+psb_n_elem_recv_)
+        nesd = d_idx(point_to_proc+nerv+psb_n_elem_send_)
 
         if(proc_to_comm.ne.myrow) then
            p2ptag = krecvid(icontxt,proc_to_comm,myrow)
@@ -266,20 +279,20 @@ subroutine psi_dswapdatam(flag,n,beta,y,desc_a,work,info)
         end if
 
         point_to_proc = point_to_proc+nerv+nesd+3
-        proc_to_comm  = h_idx(point_to_proc+psb_proc_id_)
+        proc_to_comm  = d_idx(point_to_proc+psb_proc_id_)
      end do
 
      ! Then I post all the blocking sends
      point_to_proc = 1
-     proc_to_comm  = h_idx(point_to_proc+psb_proc_id_)
+     proc_to_comm  = d_idx(point_to_proc+psb_proc_id_)
      do while (proc_to_comm .ne. -1)
-        nerv = h_idx(point_to_proc+psb_n_elem_recv_)
-        nesd = h_idx(point_to_proc+nerv+psb_n_elem_send_)
+        nerv = d_idx(point_to_proc+psb_n_elem_recv_)
+        nesd = d_idx(point_to_proc+nerv+psb_n_elem_send_)
         
         idx_pt = point_to_proc+nerv+psb_elem_send_
         snd_pt = bsdidx(proc_to_comm)
         
-        call psi_gth(nesd,n,h_idx(idx_pt:idx_pt+nesd-1),&
+        call psi_gth(nesd,n,d_idx(idx_pt:idx_pt+nesd-1),&
              & y,sndbuf(snd_pt:snd_pt+nesd*n-1))
         
         if(proc_to_comm .ne. myrow) then
@@ -295,7 +308,7 @@ subroutine psi_dswapdatam(flag,n,beta,y,desc_a,work,info)
            end if
         end if
         point_to_proc = point_to_proc+nerv+nesd+3
-        proc_to_comm  = h_idx(point_to_proc+psb_proc_id_)
+        proc_to_comm  = d_idx(point_to_proc+psb_proc_id_)
      end do
 
      do i=1, totxch
@@ -310,13 +323,13 @@ subroutine psi_dswapdatam(flag,n,beta,y,desc_a,work,info)
         if (ixrec .ne. mpi_undefined) then
            ixrec=ixrec-1  ! mpi_waitany returns an 1 to nprow index
            point_to_proc = ptp(ixrec)
-           proc_to_comm  = h_idx(point_to_proc+psb_proc_id_)
-           nerv = h_idx(point_to_proc+psb_n_elem_recv_)
-           nesd = h_idx(point_to_proc+nerv+psb_n_elem_send_)
+           proc_to_comm  = d_idx(point_to_proc+psb_proc_id_)
+           nerv = d_idx(point_to_proc+psb_n_elem_recv_)
+           nesd = d_idx(point_to_proc+nerv+psb_n_elem_send_)
 
            idx_pt = point_to_proc+psb_elem_recv_
            rcv_pt = brvidx(proc_to_comm)
-           call psi_sct(nerv,n,h_idx(idx_pt:idx_pt+nerv-1),&
+           call psi_sct(nerv,n,d_idx(idx_pt:idx_pt+nerv-1),&
                 & rcvbuf(rcv_pt:rcv_pt+n*nerv-1),beta,y)
         else
            int_err(1) = ixrec
@@ -327,20 +340,20 @@ subroutine psi_dswapdatam(flag,n,beta,y,desc_a,work,info)
      end do
      
      point_to_proc = 1
-     proc_to_comm  = h_idx(point_to_proc+psb_proc_id_)
+     proc_to_comm  = d_idx(point_to_proc+psb_proc_id_)
      do while (proc_to_comm .ne. -1)
-        nerv = h_idx(point_to_proc+psb_n_elem_recv_)
-        nesd = h_idx(point_to_proc+nerv+psb_n_elem_send_)
+        nerv = d_idx(point_to_proc+psb_n_elem_recv_)
+        nesd = d_idx(point_to_proc+nerv+psb_n_elem_send_)
         
         if(proc_to_comm .eq. myrow) then
            idx_pt = point_to_proc+psb_elem_recv_
            snd_pt = bsdidx(proc_to_comm)
-           call psi_sct(nerv,n,h_idx(idx_pt:idx_pt+nerv-1),&
+           call psi_sct(nerv,n,d_idx(idx_pt:idx_pt+nerv-1),&
                 & sndbuf(snd_pt:snd_pt+n*nesd-1),beta,y)
         end if
 
         point_to_proc = point_to_proc+nerv+nesd+3
-        proc_to_comm  = h_idx(point_to_proc+psb_proc_id_)
+        proc_to_comm  = d_idx(point_to_proc+psb_proc_id_)
      end do
 
 
@@ -348,45 +361,45 @@ subroutine psi_dswapdatam(flag,n,beta,y,desc_a,work,info)
   else if (swap_send) then
 
      point_to_proc = 1
-     proc_to_comm  = h_idx(point_to_proc+psb_proc_id_)
+     proc_to_comm  = d_idx(point_to_proc+psb_proc_id_)
      do while (proc_to_comm .ne. -1)
-        nerv = h_idx(point_to_proc+psb_n_elem_recv_)
-        nesd = h_idx(point_to_proc+nerv+psb_n_elem_send_)
+        nerv = d_idx(point_to_proc+psb_n_elem_recv_)
+        nesd = d_idx(point_to_proc+nerv+psb_n_elem_send_)
 
         idx_pt = point_to_proc+nerv+psb_elem_send_
         snd_pt = bsdidx(proc_to_comm)
-        call psi_gth(nesd,n,h_idx(idx_pt:idx_pt+nesd-1),&
+        call psi_gth(nesd,n,d_idx(idx_pt:idx_pt+nesd-1),&
                 & y,sndbuf(snd_pt:snd_pt+nesd*n-1))
         call dgesd2d(icontxt,nesd,n,sndbuf(snd_pt),nesd,proc_to_comm,0)
         
         point_to_proc = point_to_proc+nerv+nesd+3
-        proc_to_comm  = h_idx(point_to_proc+psb_proc_id_)
+        proc_to_comm  = d_idx(point_to_proc+psb_proc_id_)
      end do
 
   else if (swap_recv) then
 
      point_to_proc = 1
-     proc_to_comm  = h_idx(point_to_proc+psb_proc_id_)
+     proc_to_comm  = d_idx(point_to_proc+psb_proc_id_)
      do while (proc_to_comm .ne. -1)
-        nerv = h_idx(point_to_proc+psb_n_elem_recv_)
-        nesd = h_idx(point_to_proc+nerv+psb_n_elem_send_)
+        nerv = d_idx(point_to_proc+psb_n_elem_recv_)
+        nesd = d_idx(point_to_proc+nerv+psb_n_elem_send_)
 
         if(proc_to_comm.ne.myrow) then
            rcv_pt = brvidx(proc_to_comm)
            call dgerv2d(icontxt,nerv,n,rcvbuf(rcv_pt),nerv,proc_to_comm,0)
            idx_pt = point_to_proc+psb_elem_recv_
            rcv_pt = brvidx(proc_to_comm)
-           call psi_sct(nerv,n,h_idx(idx_pt:idx_pt+nerv-1),&
+           call psi_sct(nerv,n,d_idx(idx_pt:idx_pt+nerv-1),&
                 & rcvbuf(rcv_pt:rcv_pt+n*nerv-1),beta,y)
         else
            idx_pt = point_to_proc+psb_elem_recv_
            snd_pt = bsdidx(proc_to_comm)
-           call psi_sct(nerv,n,h_idx(idx_pt:idx_pt+nerv-1),&
+           call psi_sct(nerv,n,d_idx(idx_pt:idx_pt+nerv-1),&
                 & sndbuf(snd_pt:snd_pt+n*nesd-1),beta,y)
         end if
 
         point_to_proc = point_to_proc+nerv+nesd+3
-        proc_to_comm  = h_idx(point_to_proc+psb_proc_id_)
+        proc_to_comm  = d_idx(point_to_proc+psb_proc_id_)
      end do
 
   end if
@@ -404,12 +417,7 @@ subroutine psi_dswapdatam(flag,n,beta,y,desc_a,work,info)
 end subroutine psi_dswapdatam
 
 
-
-
-
-
-
-subroutine psi_dswapdatav(flag,beta,y,desc_a,work,info)
+subroutine psi_dswapdatav(flag,beta,y,desc_a,work,info,data)
 
   use psb_error_mod
   use psb_descriptor_type
@@ -421,6 +429,7 @@ subroutine psi_dswapdatav(flag,beta,y,desc_a,work,info)
   real(kind(1.d0))         :: y(:), beta
   real(kind(1.d0)), target :: work(:)
   type(psb_desc_type)      :: desc_a
+  integer, optional        :: data
 
   ! locals
   integer  :: icontxt, nprow, npcol, myrow,&
@@ -431,7 +440,7 @@ subroutine psi_dswapdatav(flag,beta,y,desc_a,work,info)
        & snd_pt, rcv_pt, n
 
   integer, pointer, dimension(:) :: bsdidx, brvidx,&
-       & sdsz, rvsz, prcid, ptp, rvhd, h_idx
+       & sdsz, rvsz, prcid, ptp, rvhd, d_idx
   integer  :: blacs_pnum, krecvid, ksendid
   integer :: int_err(5)
   logical :: swap_mpi, swap_sync, swap_send, swap_recv
@@ -508,7 +517,19 @@ subroutine psi_dswapdatav(flag,beta,y,desc_a,work,info)
   swap_sync = iand(flag,psb_swap_sync_).ne.0
   swap_send = iand(flag,psb_swap_send_).ne.0
   swap_recv = iand(flag,psb_swap_recv_).ne.0
-  h_idx => desc_a%halo_index
+
+  if(present(data)) then
+     if(data.eq.psb_comm_halo_) then
+        d_idx => desc_a%halo_index
+     else if(data.eq.psb_comm_ovr_) then
+        d_idx => desc_a%ovrlap_index
+     else
+        d_idx => desc_a%halo_index
+     end if
+  else
+     d_idx => desc_a%halo_index
+  end if
+
   idxs = 1
   idxr = 1
   totxch = 0
@@ -517,11 +538,11 @@ subroutine psi_dswapdatav(flag,beta,y,desc_a,work,info)
   n=1
 
   ! prepare info for communications
-  proc_to_comm = h_idx(point_to_proc+psb_proc_id_)
+  proc_to_comm = d_idx(point_to_proc+psb_proc_id_)
   do while (proc_to_comm.ne.-1)
      if(proc_to_comm .ne. myrow) totxch = totxch+1
-     nerv = h_idx(point_to_proc+psb_n_elem_recv_)
-     nesd = h_idx(point_to_proc+nerv+psb_n_elem_send_)
+     nerv = d_idx(point_to_proc+psb_n_elem_recv_)
+     nesd = d_idx(point_to_proc+nerv+psb_n_elem_send_)
 
      prcid(proc_to_comm) = blacs_pnum(icontxt,proc_to_comm,mycol)
      ptp(proc_to_comm)   = point_to_proc
@@ -535,7 +556,7 @@ subroutine psi_dswapdatav(flag,beta,y,desc_a,work,info)
      idxs                 = idxs+sdsz(proc_to_comm)
 
      point_to_proc = point_to_proc+nerv+nesd+3
-     proc_to_comm  = h_idx(point_to_proc+psb_proc_id_)
+     proc_to_comm  = d_idx(point_to_proc+psb_proc_id_)
   end do
 
   if((idxr+idxs).lt.size(work)) then
@@ -554,18 +575,18 @@ subroutine psi_dswapdatav(flag,beta,y,desc_a,work,info)
      
      ! gather elements into sendbuffer for swapping
      point_to_proc = 1
-     proc_to_comm  = h_idx(point_to_proc+psb_proc_id_)
+     proc_to_comm  = d_idx(point_to_proc+psb_proc_id_)
      do while (proc_to_comm .ne. -1)
-        nerv = h_idx(point_to_proc+psb_n_elem_recv_)
-        nesd = h_idx(point_to_proc+nerv+psb_n_elem_send_)
+        nerv = d_idx(point_to_proc+psb_n_elem_recv_)
+        nesd = d_idx(point_to_proc+nerv+psb_n_elem_send_)
         
         idx_pt = point_to_proc+nerv+psb_elem_send_
         snd_pt = bsdidx(proc_to_comm)
-        call psi_gth(nesd,h_idx(idx_pt:idx_pt+nesd-1),&
+        call psi_gth(nesd,d_idx(idx_pt:idx_pt+nesd-1),&
              & y,sndbuf(snd_pt:snd_pt+nesd-1))
 
         point_to_proc = point_to_proc+nerv+nesd+3
-        proc_to_comm  = h_idx(point_to_proc+psb_proc_id_)
+        proc_to_comm  = d_idx(point_to_proc+psb_proc_id_)
      end do
 
      ! swap elements using mpi_alltoallv
@@ -581,32 +602,32 @@ subroutine psi_dswapdatav(flag,beta,y,desc_a,work,info)
 
      ! scatter elements from receivebuffer after swapping
      point_to_proc = 1
-     proc_to_comm  = h_idx(point_to_proc+psb_proc_id_)
+     proc_to_comm  = d_idx(point_to_proc+psb_proc_id_)
      do while (proc_to_comm .ne. -1)
-        nerv = h_idx(point_to_proc+psb_n_elem_recv_)
-        nesd = h_idx(point_to_proc+nerv+psb_n_elem_send_)
+        nerv = d_idx(point_to_proc+psb_n_elem_recv_)
+        nesd = d_idx(point_to_proc+nerv+psb_n_elem_send_)
         
         idx_pt = point_to_proc+psb_elem_recv_
         rcv_pt = brvidx(proc_to_comm)
-        call psi_sct(nerv,h_idx(idx_pt:idx_pt+nerv-1),&
+        call psi_sct(nerv,d_idx(idx_pt:idx_pt+nerv-1),&
              & rcvbuf(rcv_pt:rcv_pt+nerv-1),beta,y)
 
         point_to_proc = point_to_proc+nerv+nesd+3
-        proc_to_comm  = h_idx(point_to_proc+psb_proc_id_)
+        proc_to_comm  = d_idx(point_to_proc+psb_proc_id_)
      end do
 
   else if (swap_sync) then
 
      point_to_proc = 1
-     proc_to_comm  = h_idx(point_to_proc+psb_proc_id_)
+     proc_to_comm  = d_idx(point_to_proc+psb_proc_id_)
      do while (proc_to_comm .ne. -1)
-        nerv = h_idx(point_to_proc+psb_n_elem_recv_)
-        nesd = h_idx(point_to_proc+nerv+psb_n_elem_send_)
+        nerv = d_idx(point_to_proc+psb_n_elem_recv_)
+        nesd = d_idx(point_to_proc+nerv+psb_n_elem_send_)
         if (proc_to_comm .lt. myrow) then
            ! First I send
            idx_pt = point_to_proc+nerv+psb_elem_send_
            snd_pt = bsdidx(proc_to_comm)
-           call psi_gth(nesd,h_idx(idx_pt:idx_pt+nesd-1),&
+           call psi_gth(nesd,d_idx(idx_pt:idx_pt+nesd-1),&
                 & y,sndbuf(snd_pt:snd_pt+nesd-1))
            call dgesd2d(icontxt,nesd,1,sndbuf(snd_pt),nesd,proc_to_comm,0)
            ! Then I receive
@@ -619,50 +640,50 @@ subroutine psi_dswapdatav(flag,beta,y,desc_a,work,info)
            ! Then I send
            idx_pt = point_to_proc+nerv+psb_elem_send_
            snd_pt = bsdidx(proc_to_comm)
-           call psi_gth(nesd,h_idx(idx_pt:idx_pt+nesd-1),&
+           call psi_gth(nesd,d_idx(idx_pt:idx_pt+nesd-1),&
                 & y,sndbuf(snd_pt:snd_pt+nesd-1))
            call dgesd2d(icontxt,nesd,1,sndbuf(snd_pt),nesd,proc_to_comm,0)
         else if (proc_to_comm .eq. myrow) then
            ! I send to myself
            idx_pt = point_to_proc+nerv+psb_elem_send_
            snd_pt = bsdidx(proc_to_comm)
-           call psi_gth(nesd,h_idx(idx_pt:idx_pt+nesd-1),&
+           call psi_gth(nesd,d_idx(idx_pt:idx_pt+nesd-1),&
                 & y,sndbuf(snd_pt:snd_pt+nesd-1))
         end if
 
         point_to_proc = point_to_proc+nerv+nesd+3
-        proc_to_comm  = h_idx(point_to_proc+psb_proc_id_)
+        proc_to_comm  = d_idx(point_to_proc+psb_proc_id_)
      end do
 
      point_to_proc = 1
-     proc_to_comm  = h_idx(point_to_proc+psb_proc_id_)
+     proc_to_comm  = d_idx(point_to_proc+psb_proc_id_)
      do while (proc_to_comm .ne. -1)
-        nerv = h_idx(point_to_proc+psb_n_elem_recv_)
-        nesd = h_idx(point_to_proc+nerv+psb_n_elem_send_)
+        nerv = d_idx(point_to_proc+psb_n_elem_recv_)
+        nesd = d_idx(point_to_proc+nerv+psb_n_elem_send_)
 
         if(proc_to_comm.ne.myrow) then
            idx_pt = point_to_proc+psb_elem_recv_
            rcv_pt = brvidx(proc_to_comm)
-           call psi_sct(nerv,h_idx(idx_pt:idx_pt+nerv-1),&
+           call psi_sct(nerv,d_idx(idx_pt:idx_pt+nerv-1),&
                 & rcvbuf(rcv_pt:rcv_pt+nerv-1),beta,y)
         else
            idx_pt = point_to_proc+psb_elem_recv_
            snd_pt = bsdidx(proc_to_comm)
-           call psi_sct(nerv,h_idx(idx_pt:idx_pt+nerv-1),&
+           call psi_sct(nerv,d_idx(idx_pt:idx_pt+nerv-1),&
                 & sndbuf(snd_pt:snd_pt+nesd-1),beta,y)
         end if
 
         point_to_proc = point_to_proc+nerv+nesd+3
-        proc_to_comm  = h_idx(point_to_proc+psb_proc_id_)
+        proc_to_comm  = d_idx(point_to_proc+psb_proc_id_)
      end do
 
   else if (swap_send .and. swap_recv) then
      ! First I post all the non blocking receives
      point_to_proc = 1
-     proc_to_comm  = h_idx(point_to_proc+psb_proc_id_)
+     proc_to_comm  = d_idx(point_to_proc+psb_proc_id_)
      do while (proc_to_comm .ne. -1)
-        nerv = h_idx(point_to_proc+psb_n_elem_recv_)
-        nesd = h_idx(point_to_proc+nerv+psb_n_elem_send_)
+        nerv = d_idx(point_to_proc+psb_n_elem_recv_)
+        nesd = d_idx(point_to_proc+nerv+psb_n_elem_send_)
 
         if(proc_to_comm.ne.myrow) then
            p2ptag = krecvid(icontxt,proc_to_comm,myrow)
@@ -679,19 +700,19 @@ subroutine psi_dswapdatav(flag,beta,y,desc_a,work,info)
         end if
 
         point_to_proc = point_to_proc+nerv+nesd+3
-        proc_to_comm  = h_idx(point_to_proc+psb_proc_id_)
+        proc_to_comm  = d_idx(point_to_proc+psb_proc_id_)
      end do
 
      ! Then I post all the blocking sends
      point_to_proc = 1
-     proc_to_comm  = h_idx(point_to_proc+psb_proc_id_)
+     proc_to_comm  = d_idx(point_to_proc+psb_proc_id_)
      do while (proc_to_comm .ne. -1)
-        nerv = h_idx(point_to_proc+psb_n_elem_recv_)
-        nesd = h_idx(point_to_proc+nerv+psb_n_elem_send_)
+        nerv = d_idx(point_to_proc+psb_n_elem_recv_)
+        nesd = d_idx(point_to_proc+nerv+psb_n_elem_send_)
         
         idx_pt = point_to_proc+nerv+psb_elem_send_
         snd_pt = bsdidx(proc_to_comm)
-        call psi_gth(nesd,h_idx(idx_pt:idx_pt+nesd-1),&
+        call psi_gth(nesd,d_idx(idx_pt:idx_pt+nesd-1),&
              & y,sndbuf(snd_pt:snd_pt+nesd-1))
         
         if(proc_to_comm .ne. myrow) then
@@ -707,7 +728,7 @@ subroutine psi_dswapdatav(flag,beta,y,desc_a,work,info)
            end if
         end if
         point_to_proc = point_to_proc+nerv+nesd+3
-        proc_to_comm  = h_idx(point_to_proc+psb_proc_id_)
+        proc_to_comm  = d_idx(point_to_proc+psb_proc_id_)
      end do
 
      do i=1, totxch
@@ -721,13 +742,13 @@ subroutine psi_dswapdatav(flag,beta,y,desc_a,work,info)
         if (ixrec .ne. mpi_undefined) then
            ixrec=ixrec-1  ! mpi_waitany returns an 1 to nprow index
            point_to_proc = ptp(ixrec)
-           proc_to_comm  = h_idx(point_to_proc+psb_proc_id_)
-           nerv = h_idx(point_to_proc+psb_n_elem_recv_)
-           nesd = h_idx(point_to_proc+nerv+psb_n_elem_send_)
+           proc_to_comm  = d_idx(point_to_proc+psb_proc_id_)
+           nerv = d_idx(point_to_proc+psb_n_elem_recv_)
+           nesd = d_idx(point_to_proc+nerv+psb_n_elem_send_)
 
            idx_pt = point_to_proc+psb_elem_recv_
            rcv_pt = brvidx(proc_to_comm)
-           call psi_sct(nerv,h_idx(idx_pt:idx_pt+nerv-1),&
+           call psi_sct(nerv,d_idx(idx_pt:idx_pt+nerv-1),&
                 & rcvbuf(rcv_pt:rcv_pt+nerv-1),beta,y)
         else
            int_err(1) = ixrec
@@ -738,65 +759,65 @@ subroutine psi_dswapdatav(flag,beta,y,desc_a,work,info)
      end do
      
      point_to_proc = 1
-     proc_to_comm  = h_idx(point_to_proc+psb_proc_id_)
+     proc_to_comm  = d_idx(point_to_proc+psb_proc_id_)
      do while (proc_to_comm .ne. -1)
-        nerv = h_idx(point_to_proc+psb_n_elem_recv_)
-        nesd = h_idx(point_to_proc+nerv+psb_n_elem_send_)
+        nerv = d_idx(point_to_proc+psb_n_elem_recv_)
+        nesd = d_idx(point_to_proc+nerv+psb_n_elem_send_)
         
         if(proc_to_comm .eq. myrow) then
            idx_pt = point_to_proc+psb_elem_recv_
            snd_pt = bsdidx(proc_to_comm)
-           call psi_sct(nerv,h_idx(idx_pt:idx_pt+nerv-1),&
+           call psi_sct(nerv,d_idx(idx_pt:idx_pt+nerv-1),&
                 & sndbuf(snd_pt:snd_pt+nesd-1),beta,y)
         end if
 
         point_to_proc = point_to_proc+nerv+nesd+3
-        proc_to_comm  = h_idx(point_to_proc+psb_proc_id_)
+        proc_to_comm  = d_idx(point_to_proc+psb_proc_id_)
      end do
 
 
   else if (swap_send) then
 
      point_to_proc = 1
-     proc_to_comm  = h_idx(point_to_proc+psb_proc_id_)
+     proc_to_comm  = d_idx(point_to_proc+psb_proc_id_)
      do while (proc_to_comm .ne. -1)
-        nerv = h_idx(point_to_proc+psb_n_elem_recv_)
-        nesd = h_idx(point_to_proc+nerv+psb_n_elem_send_)
+        nerv = d_idx(point_to_proc+psb_n_elem_recv_)
+        nesd = d_idx(point_to_proc+nerv+psb_n_elem_send_)
 
         idx_pt = point_to_proc+nerv+psb_elem_send_
         snd_pt = bsdidx(proc_to_comm)
-        call psi_gth(nesd,h_idx(idx_pt:idx_pt+nesd-1),&
+        call psi_gth(nesd,d_idx(idx_pt:idx_pt+nesd-1),&
                 & y,sndbuf(snd_pt:snd_pt+nesd-1))
         call dgesd2d(icontxt,nesd,1,sndbuf(snd_pt),nesd,proc_to_comm,0)
         
         point_to_proc = point_to_proc+nerv+nesd+3
-        proc_to_comm  = h_idx(point_to_proc+psb_proc_id_)
+        proc_to_comm  = d_idx(point_to_proc+psb_proc_id_)
      end do
 
   else if (swap_recv) then
 
      point_to_proc = 1
-     proc_to_comm  = h_idx(point_to_proc+psb_proc_id_)
+     proc_to_comm  = d_idx(point_to_proc+psb_proc_id_)
      do while (proc_to_comm .ne. -1)
-        nerv = h_idx(point_to_proc+psb_n_elem_recv_)
-        nesd = h_idx(point_to_proc+nerv+psb_n_elem_send_)
+        nerv = d_idx(point_to_proc+psb_n_elem_recv_)
+        nesd = d_idx(point_to_proc+nerv+psb_n_elem_send_)
 
         if(proc_to_comm.ne.myrow) then
            rcv_pt = brvidx(proc_to_comm)
            call dgerv2d(icontxt,nerv,1,rcvbuf(rcv_pt),nerv,proc_to_comm,0)
            idx_pt = point_to_proc+psb_elem_recv_
            rcv_pt = brvidx(proc_to_comm)
-           call psi_sct(nerv,h_idx(idx_pt:idx_pt+nerv-1),&
+           call psi_sct(nerv,d_idx(idx_pt:idx_pt+nerv-1),&
                 & rcvbuf(rcv_pt:rcv_pt+nerv-1),beta,y)
         else
            idx_pt = point_to_proc+psb_elem_recv_
            snd_pt = bsdidx(proc_to_comm)
-           call psi_sct(nerv,h_idx(idx_pt:idx_pt+nerv-1),&
+           call psi_sct(nerv,d_idx(idx_pt:idx_pt+nerv-1),&
                 & sndbuf(snd_pt:snd_pt+nesd-1),beta,y)
         end if
 
         point_to_proc = point_to_proc+nerv+nesd+3
-        proc_to_comm  = h_idx(point_to_proc+psb_proc_id_)
+        proc_to_comm  = d_idx(point_to_proc+psb_proc_id_)
      end do
 
   end if

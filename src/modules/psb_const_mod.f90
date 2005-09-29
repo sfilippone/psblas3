@@ -39,6 +39,7 @@ module psb_const_mod
   integer, parameter   :: psb_perm_update_=98765,        psb_isrtdcoo_=98764
   integer, parameter   :: psb_maxjdrows_=8,              psb_minjdrows_=4
   integer, parameter   :: psb_dbleint_=2
+  integer, parameter   :: psb_comm_halo_=0,              psb_comm_ovr_=1
 
   real(kind(1.d0)), parameter :: psb_colrow_=0.33, psb_percent_=0.7
   real(kind(1.d0)), parameter :: dzero=0.d0, done=1.d0

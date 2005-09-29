@@ -108,7 +108,7 @@ subroutine psb_dcslu(a,desc_a,p,upd,info)
   call psb_nullify_sp(blck)
   t1= mpi_wtime()
 
-  if(debug) write(0,*)me,': calling psb_csrsetup'
+  if(debug) write(0,*)me,': calling psb_csrsetup',p%iprcparm(p_type_),p%iprcparm(n_ovr_)
   call psb_csrsetup(p%iprcparm(p_type_),p%iprcparm(n_ovr_),a,&
        & blck,desc_a,upd,p%desc_data,info)
   if(info/=0) then

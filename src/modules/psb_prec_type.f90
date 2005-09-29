@@ -12,6 +12,10 @@ module psb_prec_type
        & asm_=3, ras_=5, ash_=4, rash_=6, ras2lv_=7, ras2lvm_=8,&
        & lv2mras_=9, lv2smth_=10, lv2lsm_=11, sl2sm_=12, superlu_=13,&
        & new_loc_smth_=14, new_glb_smth_=15, max_prec_=15
+  integer, parameter   :: nohalo_=0,                 halo_=4
+  integer, parameter   :: none_=0,                   sum_=1
+  integer, parameter   :: avg_=2,                    square_root_=3
+
   ! Multilevel stuff.
   integer, parameter :: no_ml_=0, add_ml_prec_=1, mult_ml_prec_=2
   integer, parameter :: new_ml_prec_=3, max_ml_=new_ml_prec_
@@ -369,5 +373,28 @@ contains
     
   end subroutine psb_nullify_baseprec
 
+  function pr_to_str(iprec)
+
+    integer, intent(in)  :: iprec
+    character(len=10)     :: pr_to_str
+    
+  select case(iprec)
+  case(noprec_)
+    pr_to_str='NOPREC'
+  case(diagsc_)         
+    pr_to_str='DIAGSC'
+  case(bja_)         
+    pr_to_str='BJA'
+  case(asm_)      
+    pr_to_str='ASM'
+  case(ash_)      
+    pr_to_str='ASM'
+  case(ras_)      
+    pr_to_str='ASM'
+  case(rash_)      
+    pr_to_str='ASM'
+  end select
+
+end function pr_to_str
 
 end module psb_prec_type

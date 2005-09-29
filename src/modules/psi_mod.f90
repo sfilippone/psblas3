@@ -57,19 +57,21 @@ module psi_mod
   end interface
 
   interface psi_swapdata
-     subroutine psi_dswapdatam(flag,n,beta,y,desc_a,work,info)
+     subroutine psi_dswapdatam(flag,n,beta,y,desc_a,work,info,data)
        use psb_descriptor_type
        integer, intent(in)  :: flag, n
        integer, intent(out) :: info
        real(kind(1.d0))     :: y(:,:), beta, work(:)
        type(psb_desc_type)  :: desc_a
+       integer, optional    :: data
      end subroutine psi_dswapdatam
-     subroutine psi_dswapdatav(flag,beta,y,desc_a,work,info)
+     subroutine psi_dswapdatav(flag,beta,y,desc_a,work,info,data)
        use psb_descriptor_type
        integer, intent(in)  :: flag
        integer, intent(out) :: info
        real(kind(1.d0))     :: y(:), beta, work(:)
        type(psb_desc_type)  :: desc_a
+       integer, optional    :: data
      end subroutine psi_dswapdatav
      subroutine psi_iswapdatam(flag,n,beta,y,desc_a,work,info)
        use psb_descriptor_type

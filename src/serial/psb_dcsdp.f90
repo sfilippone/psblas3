@@ -266,7 +266,7 @@ subroutine psb_dcsdp(a, b,info,ifc,check,trans,unitd)
       case ('COO')
 
         call dcoco(trans_, a%m, a%k, unitd_, d, a%descra, a%aspk,&
-             & a%ia2, a%ia1, a%infoa, b%pl, b%descra, b%aspk, b%ia1,&
+             & a%ia1, a%ia2, a%infoa, b%pl, b%descra, b%aspk, b%ia1,&
              & b%ia2, b%infoa, b%pr, size(b%aspk), size(b%ia1),&
              & size(b%ia2), work, 2*size(work), info)
         if (info/=0) then

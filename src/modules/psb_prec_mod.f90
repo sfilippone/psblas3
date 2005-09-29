@@ -48,7 +48,7 @@ end interface
       use psb_prec_type
       implicit none
       type(psb_dprec_type), intent(inout)    :: prec
-      character(len=10), intent(in)          :: ptype
+      character(len=*), intent(in)           :: ptype
       integer, optional, intent(in)          :: iv(:)
       real(kind(1.d0)), optional, intent(in) :: rs
       real(kind(1.d0)), optional, intent(in) :: rv(:)

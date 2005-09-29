@@ -41,9 +41,9 @@ Subroutine psb_dfixcoo(A,INFO)
       if (j > nza) exit
     enddo
     nzl = j - i
-    call mrgsrt(nzl,a%ia2(i:i+nzl-1),iaux,iret)
+    call mrgsrt(nzl,a%ia2(i),iaux,iret)
     if (iret.eq.0) &
-         & call reordvn(nzl,a%aspk(i:i+nzl-1),a%ia1(i:i+nzl-1),a%ia2(i:i+nzl-1),iaux)
+         & call reordvn(nzl,a%aspk(i),a%ia1(i),a%ia2(i),iaux)
     i = j
   enddo
 
