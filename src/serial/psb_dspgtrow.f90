@@ -300,10 +300,11 @@ contains
             b%ia2(nzb+k)  = (a%ia2(i))
           endif
         enddo
+        nzb=nzb+k
       end if
     end if
 
-    b%infoa(psb_nnz_) = nzb + k 
+    b%infoa(psb_nnz_) = nzb
     b%m = b%m+lrw-irw+1
     b%k = max(b%k,a%k)
   end subroutine coo_dspgtrow

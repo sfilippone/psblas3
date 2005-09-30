@@ -126,7 +126,6 @@ program pde90
   call dgamx2d(icontxt,'a',' ',ione, ione,t2,ione,t1,t1,-1,-1,-1)
   if (iam.eq.0) write(*,'("Overall matrix creation time : ",es10.4)')t2
   if (iam.eq.0) write(*,'(" ")')
-
   !
   !  prepare the preconditioner.
   !  

@@ -170,10 +170,10 @@ contains
         end if
 
         do 
+!           write(0,*)'++++',trw%infoa(psb_nnz_),size(trw%ia1),ktrw,k,i
           if (ktrw > trw%infoa(psb_nnz_)) exit
           if (trw%ia1(ktrw) > i) exit
           k = trw%ia2(ktrw)
-          ! write(0,*)'KKKKK',k
           if ((k < i).and.(k >= 1)) then
             l1 = l1 + 1
             laspk(l1) = trw%aspk(ktrw)
