@@ -123,7 +123,7 @@ C
  10       CONTINUE
 
           IP2(1) = 0
-c$$$          write(0,*) 'Calling DGBLOCK first'
+
           CALL DGBLOCK(M,IA2,IP1,IAN2(PIA),IAN2(PNG), AUX, LAUX*2)
           
           PJA = PIA + 3*(IAN2(PNG)+1)
@@ -138,7 +138,6 @@ C
           ENDIF
 
           LJA = LIAN2-PJA
-c$$$          write(0,*) 'Into DGINDEX: ',lja,pja,lian2
           CALL DGINDEX(M,IAN2(PNG),AR,IA1,IA2,ARN,IAN1,IAN2(PIA), 
      +         IAN2(PJA), INFON, LARN,LIAN1,
      +         LJA,IP1, AUX, LAUX*2, SIZE_REQ,IERROR)

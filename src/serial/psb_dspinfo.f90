@@ -20,7 +20,8 @@ subroutine psb_dspinfo(ireq,a,ires,info,iaux)
   integer, intent(out)              :: ires, info
   integer, intent(in), optional     :: iaux
 
-  integer :: i,j,k,ip,jp,nr,irw,nz, err_act
+  integer :: i,j,k,ip,jp,nr,irw,nz, err_act, row, ipx, pia, pja, rb,idx
+  integer, pointer :: ia1(:), ia2(:), ia3(:), ja(:)
   character(len=20)                 :: name, ch_err
 
   name='psb_dspinfo'
@@ -29,17 +30,14 @@ subroutine psb_dspinfo(ireq,a,ires,info,iaux)
 
 
   if (ireq == psb_nztotreq_) then 
+     ! The number of nonzeroes
      if (a%fida == 'CSR') then 
         nr   = a%m
         ires = a%ia2(nr+1)-1
      else if ((a%fida == 'COO').or.(a%fida == 'COI')) then 
         ires = a%infoa(psb_nnz_)
      else if (a%fida == 'JAD') then 
-        ires=-1
-        info=135
-        ch_err=a%fida(1:3)
-        call psb_errpush(info,name,a_err=ch_err)
-        goto 9999
+        ires = a%infoa(psb_nnz_)
      else
         ires=-1
         info=136
@@ -49,6 +47,7 @@ subroutine psb_dspinfo(ireq,a,ires,info,iaux)
      end if
 
   else if (ireq == psb_nzrowreq_) then 
+     ! The number of nonzeroes in row iaux
      if (.not.present(iaux)) then 
         write(0,*) 'Need IAUX when ireq=nzrowreq'
         ires=-1
@@ -92,11 +91,35 @@ subroutine psb_dspinfo(ireq,a,ires,info,iaux)
 !!$        if (a%ia1(i) == irw) ires = ires + 1
 !!$      enddo
      else if (a%fida == 'JAD') then 
-        ires=-1
-        info=135
-        ch_err=a%fida(1:3)
-        call psb_errpush(info,name,a_err=ch_err)
-        goto 9999
+        pia = a%ia2(2) ! points to the beginning of ia(3,png)
+        pja = a%ia2(3) ! points to the beginning of ja(:)
+        ja  => a%ia2(pja:)             ! the array containing the pointers to ka and aspk
+        ia1 => a%ia2(pia:pja-1:3)      ! the array containing the first row index of each block
+        ia2 => a%ia2(pia+1:pja-1:3)    ! the array containing a pointer to the pos. in ja to the first jad column
+        ia3 => a%ia2(pia+2:pja-1:3)    ! the array containing a pointer to the pos. in ja to the first csr column
+
+        idx=a%pl(irw)
+        j=0
+        nz=0
+        blkfnd: do
+           j=j+1
+           if(ia1(j).eq.idx) then
+              nz=nz+ia3(j)-ia2(j)
+              ipx = ia1(j)         ! the first row index of the block
+              rb  = idx-ipx        ! the row offset within the block
+              row = ia3(j)+rb
+              nz  = nz+ja(row+1)-ja(row)
+              exit blkfnd
+           else if(ia1(j).gt.idx) then
+              nz=nz+ia3(j-1)-ia2(j-1)
+              ipx = ia1(j-1)         ! the first row index of the block
+              rb  = idx-ipx          ! the row offset within the block
+              row = ia3(j-1)+rb
+              nz  = nz+ja(row+1)-ja(row)
+              exit blkfnd
+           end if
+        end do blkfnd
+        ires=nz
      else
         ires=-1
         info=136

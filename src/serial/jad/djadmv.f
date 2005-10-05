@@ -96,8 +96,6 @@ c
         K   = IA(2,IPG)
         NPG = JA(K+1)-JA(K)
 
-c$$$         WRITE(0,*)NPG
-
         IF (NPG.EQ.4) THEN
           IPX = IA(1,IPG)                                                 
           Y0  = ZERO
