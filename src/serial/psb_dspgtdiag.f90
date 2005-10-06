@@ -21,7 +21,21 @@ subroutine psb_dspgtdiag(a,d,info)
   real(kind(1.d0)), intent(inout)       :: d(:) 
   integer, intent(out)                  :: info
 
-  integer :: i,j,k,nr, nz, err_act
+  interface psb_spgtrow
+     subroutine psb_dspgtrow(irw,a,b,info,append,iren,lrw)
+       use psb_spmat_type
+       type(psb_dspmat_type), intent(in) :: a
+       integer, intent(in)       :: irw
+       type(psb_dspmat_type), intent(inout)    :: b
+       logical, intent(in), optional :: append
+       integer, intent(in), target, optional :: iren(:)
+       integer, intent(in), optional :: lrw
+       integer, intent(out)  :: info
+     end subroutine psb_dspgtrow
+  end interface
+
+  type(psb_dspmat_type)     :: tmpa
+  integer :: i,j,k,nr, nz, err_act, ii, rng, irb, nrb
   character(len=20)                 :: name, ch_err
 
   name='psb_dspgtdiag'
@@ -52,10 +66,27 @@ subroutine psb_dspgtdiag(a,d,info)
     enddo
     
  else if (a%fida == 'JAD') then 
-    info=135
-    ch_err=a%fida(1:3)
-    call psb_errpush(info,name,a_err=ch_err)
-    goto 9999
+
+    rng=min(a%m,a%k)
+    do i=1, rng, nrb
+       irb=min(i+nrb-1,rng)
+       call psb_spgtrow(i,a,tmpa,info,lrw=irb)
+       if(info.ne.0) then
+          info=4010
+          ch_err='psb_spgtrow'
+          call psb_errpush(info,name,a_err=ch_err)
+          goto 9999
+       end if
+
+       do ii=1,tmpa%infoa(psb_nnz_)
+          j=tmpa%ia1(ii)
+          if ((j==tmpa%ia2(ii)).and.(j <= rng) .and.(j>0)) then 
+             d(j) = tmpa%aspk(ii)
+          endif
+       enddo
+       
+    end do
+
  end if
 
  call psb_erractionrestore(err_act)

@@ -232,14 +232,13 @@ contains
     end if
 
     if (a%infoa(psb_srtd_) == psb_isrtdcoo_) then 
-!!$      write(0,*) 'Gtrow_: srtd coo',irw
       ! In this case we can do a binary search. 
       do
         call ibsrch(ip,irw,nza,a%ia1)
         if (ip /= -1) exit
         irw = irw + 1
         if (irw > lrw) then
-          write(0,*) 'Warning : did not find any rows. Is this an error?'
+          write(0,*) 'Warning : did not find any rows. Is this an error? ',irw,lrw,idx
           exit
         end if
       end do
