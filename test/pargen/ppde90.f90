@@ -56,7 +56,7 @@ program pde90
   end interface
   ! input parameters
   character :: cmethd*10, prec*10, afmt*5
-  integer      :: idim, iret
+  integer      :: idim, iret, igsmth, matop
 
   ! miscellaneous 
   character, parameter :: order='r'
@@ -121,32 +121,44 @@ program pde90
      goto 9999
   end if
 
-  dim=size(a%aspk)
-
   call dgamx2d(icontxt,'a',' ',ione, ione,t2,ione,t1,t1,-1,-1,-1)
   if (iam.eq.0) write(*,'("Overall matrix creation time : ",es10.4)')t2
   if (iam.eq.0) write(*,'(" ")')
   !
   !  prepare the preconditioner.
   !  
+  matop=1
+  igsmth=-1
   if(iam.eq.psb_root_) write(0,'("Setting preconditioner to : ",a)')pr_to_str(iprec)
   select case(iprec)
   case(noprec_)
-    call psb_precset(pre,'noprec')
+     call psb_precset(pre,'noprec')
   case(diagsc_)             
-    call psb_precset(pre,'diagsc')
+     call psb_precset(pre,'diagsc')
   case(bja_)             
-    call psb_precset(pre,'ilu')
+     call psb_precset(pre,'ilu')
   case(asm_)             
-    call psb_precset(pre,'asm',iv=(/novr,halo_,sum_/))
+     call psb_precset(pre,'asm',iv=(/novr,halo_,sum_/))
   case(ash_)             
-    call psb_precset(pre,'asm',iv=(/novr,nohalo_,sum_/))
+     call psb_precset(pre,'asm',iv=(/novr,nohalo_,sum_/))
   case(ras_)             
-    call psb_precset(pre,'asm',iv=(/novr,halo_,none_/))
+     call psb_precset(pre,'asm',iv=(/novr,halo_,none_/))
   case(rash_)             
-    call psb_precset(pre,'asm',iv=(/novr,nohalo_,none_/))
+     call psb_precset(pre,'asm',iv=(/novr,nohalo_,none_/))
+  case(ras2lv_) 
+     ptype='asm'
+     call psb_precset(pre,ptype,iv=(/novr,halo_,none_/))
+     ptype='ml'
+     call psb_precset(pre,ptype,&
+          &iv=(/add_ml_prec_,glb_aggr_,pre_smooth_,igsmth,matop/),rs=0.d0)
+  case(ras2lvm_) 
+     ptype='asm'
+     call psb_precset(pre,ptype,iv=(/novr,halo_,none_/))
+     ptype='ml'
+     call psb_precset(pre,ptype,&
+          & iv=(/mult_ml_prec_,glb_aggr_,pre_smooth_,igsmth,matop/),rs=0.d0)
   end select
-
+  
   call blacs_barrier(icontxt,'ALL')
   t1 = mpi_wtime()
   call psb_precbld(a,pre,desc_a,info)!,'f')
