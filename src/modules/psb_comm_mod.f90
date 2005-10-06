@@ -86,7 +86,7 @@ module psb_comm_mod
      end subroutine psb_dscatterv
   end interface
 
-  interface psb_dgather
+  interface psb_gather
      subroutine  psb_dgatherm(globx, locx, desc_a, info, iroot,&
           & iiglobx, ijglobx, iilocx,ijlocx,ik)
        use psb_descriptor_type

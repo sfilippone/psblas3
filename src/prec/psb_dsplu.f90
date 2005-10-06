@@ -170,7 +170,6 @@ contains
         end if
 
         do 
-!           write(0,*)'++++',trw%infoa(psb_nnz_),size(trw%ia1),ktrw,k,i
           if (ktrw > trw%infoa(psb_nnz_)) exit
           if (trw%ia1(ktrw) > i) exit
           k = trw%ia2(ktrw)

@@ -70,7 +70,7 @@ subroutine  psb_ihalom(x,desc_a,info,alpha,jx,ik,work,tran,mode)
   n = desc_a%matrix_data(psb_n_)
   nrow = desc_a%matrix_data(psb_n_row_)
   
-  maxk=size(x,2)-jx+1
+  maxk=size(x,2)-ijx+1
   
   if(present(ik)) then
      if(ik.gt.maxk) then
@@ -237,7 +237,9 @@ subroutine  psb_ihalov(x,desc_a,info,alpha,work,tran,mode)
   m = desc_a%matrix_data(psb_m_)
   n = desc_a%matrix_data(psb_n_)
   nrow = desc_a%matrix_data(psb_n_row_)
+!  ncol = desc_a%matrix_data(psb_n_col_)
   
+
   if (present(tran)) then     
      ltran = tran
   else

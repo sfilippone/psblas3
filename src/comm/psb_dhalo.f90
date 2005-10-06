@@ -216,7 +216,7 @@ subroutine  psb_dhalov(x,desc_a,info,alpha,work,tran,mode)
   character                :: ltran
   character(len=20)        :: name, ch_err
 
-  name='psb_dhalom'
+  name='psb_dhalov'
   info=0
   call psb_erractionsave(err_act)
 

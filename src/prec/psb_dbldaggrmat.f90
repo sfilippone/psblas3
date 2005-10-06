@@ -26,7 +26,7 @@ subroutine psb_dbldaggrmat(a,desc_a,p,info)
   select case (p%iprcparm(smth_kind_))
   case (no_smth_) 
 
-    call raw_aggregate(info)
+     call raw_aggregate(info)
 
     if(info /= 0) then
       call psb_errpush(4010,name,a_err='raw_aggregate')
@@ -289,6 +289,7 @@ contains
 
   subroutine smooth_aggregate(info)
     use psb_serial_mod
+    use psb_comm_mod
     use psb_tools_mod
     use psb_error_mod
     implicit none 

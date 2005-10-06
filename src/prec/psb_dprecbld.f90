@@ -16,6 +16,18 @@ subroutine psb_dprecbld(a,p,desc_a,info,upd)
   type(psb_desc_type), intent(in)            :: desc_a
   character, intent(in), optional            :: upd
 
+  interface psb_cslu
+     subroutine psb_dcslu(a,desc_data,p,upd,info)
+       use psb_serial_mod
+       use psb_descriptor_type
+       use psb_prec_type
+       integer, intent(out) :: info
+       type(psb_dspmat_type), intent(in), target :: a
+       type(psb_desc_type),intent(in)            :: desc_data
+       type(psb_dbase_prec), intent(inout)       :: p
+       character, intent(in)                     :: upd
+     end subroutine psb_dcslu
+  end interface
 
   ! Local scalars
   Integer      :: err, nnzero, n_row, n_col,I,j,icontxt,&
@@ -113,7 +125,7 @@ subroutine psb_dprecbld(a,p,desc_a,info,upd)
            call psb_errpush(info,name)
            goto 9999
         end if
-        call  psb_dgelp('n',n_row,1,a%Pl,p%baseprecv(1)%d,n_col,WORK,n_row,info)
+        call  psb_dgelp('n',a%Pl,p%baseprecv(1)%d,desc_a,info)
         if(info /= 0) then
            info=4010
            ch_err='psb_dgelp'
@@ -126,7 +138,7 @@ subroutine psb_dprecbld(a,p,desc_a,info,upd)
 
      if (debug) then
         allocate(gd(mglob))       
-        call   psb_dgather(gd, p%baseprecv(1)%d, desc_a, info, iroot=iroot)
+        call  psb_gather(gd, p%baseprecv(1)%d, desc_a, info, iroot=iroot)
         if(info /= 0) then
            info=4010
            ch_err='psb_dgatherm'
@@ -166,7 +178,7 @@ subroutine psb_dprecbld(a,p,desc_a,info,upd)
      select case(p%baseprecv(1)%iprcparm(f_type_))
 
      case(f_ilu_n_,f_ilu_e_) 
-        call psb_dcslu(a,desc_a,p%baseprecv(1),iupd,info)
+        call psb_cslu(a,desc_a,p%baseprecv(1),iupd,info)
         if(debug) write(0,*)me,': out of psb_dcslu'
         if(info /= 0) then
            info=4010
@@ -449,6 +461,17 @@ subroutine psb_mlprec_bld(a,desc_a,p,info)
   integer :: i, nrg, nzg, err_act,k
   character(len=20) :: name, ch_err
   
+  interface psb_splu
+     subroutine psb_dsplu(a,l,u,d,info,blck)
+       use psb_spmat_type
+       integer, intent(out)                ::     info
+       type(psb_dspmat_type),intent(in)    :: a
+       type(psb_dspmat_type),intent(inout) :: l,u
+       type(psb_dspmat_type),intent(in), optional, target :: blck
+       real(kind(1.d0)), intent(inout)     ::  d(:)
+     end subroutine psb_dsplu
+  end interface
+
   interface psb_genaggrmap
      subroutine psb_dgenaggrmap(aggr_type,a,desc_a,nlaggr,ilaggr,info)
        use psb_spmat_type
@@ -527,7 +550,7 @@ subroutine psb_mlprec_bld(a,desc_a,p,info)
   case(f_ilu_n_,f_ilu_e_) 
      call psb_spreall(p%av(l_pr_),nzg,info)
      call psb_spreall(p%av(u_pr_),nzg,info)
-     call psb_dsplu(p%av(ac_),p%av(l_pr_),p%av(u_pr_),p%d,info)
+     call psb_splu(p%av(ac_),p%av(l_pr_),p%av(u_pr_),p%d,info)
      if(info /= 0) then
         info=4011
         call psb_errpush(info,name)
