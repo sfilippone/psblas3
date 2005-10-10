@@ -123,7 +123,7 @@ CONTAINS
         PREC(I:I) = ACHAR(INPARMS(I))
       END DO
       CALL IGEBR2D(ICONTXT,'A',' ',20,1,INPARMS,20,0,0)
-      DO I = 1, 20
+      DO I = 1, LEN(AFMT)
         AFMT(I:I) = ACHAR(INPARMS(I))
       END DO
       

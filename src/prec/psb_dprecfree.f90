@@ -50,7 +50,7 @@ subroutine psb_dprecfree(p,info)
 
   if (associated(p%baseprecv)) then 
     do i=1,size(p%baseprecv) 
-      call psb_baseprecfree(p%baseprecv(i),info)
+      call psb_base_precfree(p%baseprecv(i),info)
     end do
     deallocate(p%baseprecv)
     p%baseprecv => null()

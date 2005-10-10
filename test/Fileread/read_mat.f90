@@ -43,11 +43,11 @@ module read_mat
 contains
 
   subroutine readmat (filename, a, ictxt, inroot)
-    use typesp
+    use psb_spmat_type
     use mmio
     implicit none
     integer                               :: ictxt
-    type(d_spmat)                         :: a
+    type(psb_dspmat_type)                 :: a
     character(len=*)                      :: filename
     integer, optional                     :: inroot
     integer, parameter          :: infile = 2
@@ -72,17 +72,20 @@ contains
 
   end subroutine readmat
 
-  subroutine zreadmat (filename, a, ictxt, inroot)
-    use typesp
-    use mmio
+
+  subroutine read_rhs (filename, b, ictxt, inroot,&
+       & indwork, iniwork)   
     implicit none
     integer                               :: ictxt
-    type(z_spmat)                         :: a
     character                             :: filename*(*)
     integer, optional                     :: inroot
-    integer, parameter          :: infile = 2
-    integer                     :: info, root, nprow, npcol, myprow, mypcol
-
+    real(kind(1.0d0)), pointer, optional  :: indwork(:)
+    integer, pointer, optional            :: iniwork(:)   ! local variables
+    integer, parameter   :: infile = 2
+    integer              :: nrow, ncol, i,root, nprow, npcol, myprow, mypcol, ircode, j
+    character            :: mmheader*15, fmt*15, object*10, type*10, sym*15,&
+         & line*1024
+    real(kind(1.0d0)), pointer  :: b(:,:)
     if (present(inroot)) then
       root = inroot
     else
@@ -90,138 +93,47 @@ contains
     end if
     call blacs_gridinfo(ictxt, nprow, npcol, myprow, mypcol)    
     if (myprow == root) then
-      write(*, *) 'start read_matrix'      ! open input file
-      call mm_mat_read(a,info,infile,filename)
-      if (info /= 0) then 
-        write(0,*) 'Error return from MM_MAT_READ ',info
-        call blacs_abort(ictxt, 1)   ! Unexpected End of File
-      endif
+      write(*, *) 'start read_rhs'      ! open input file
+      open(infile,file=filename, status='old', err=901, action="read")
+      read(infile,fmt=*, end=902) mmheader, object, fmt, type, sym
+      write(0,*)'obj fmt',object, fmt
+      if ( (object .ne. 'matrix').or.(fmt.ne.'array')) then
+        write(0,*) 'read_rhs: input file type not yet supported'
+        call blacs_abort(ictxt, 1)
+      end if
+
+      do 
+         read(infile,fmt='(a)') line
+         if (line(1:1) /= '%')  exit
+      end do
+
+      read(line,fmt=*)nrow,ncol
+      
+      call lowerc(type,1,10)
+      call lowerc(sym,1,15)
+      if ((type == 'real').and.(sym == 'general')) then
+        allocate(b(nrow,ncol),stat = ircode)
+        if (ircode /= 0)   goto 993
+        read(infile,fmt=*,end=902) ((b(i,j), i=1,nrow),j=1,ncol)
+           
+      else
+        write(0,*) 'read_rhs: rhs type not yet supported'
+        call blacs_abort(ictxt, 1)
+      end if      ! read right hand sides
+      write(*,*) 'end read_rhs'
     end if 
     return 
-
-  end subroutine zreadmat
-
-
-  SUBROUTINE READ_RHS (FILENAME, B, ICTXT, INROOT,&
-       & INDWORK, INIWORK)   
-    IMPLICIT NONE
-    INTEGER                               :: ICTXT
-    CHARACTER                             :: FILENAME*(*)
-    INTEGER, OPTIONAL                     :: INROOT
-    REAL(KIND(1.0D0)), POINTER, OPTIONAL  :: INDWORK(:)
-    INTEGER, POINTER, OPTIONAL            :: INIWORK(:)   ! Local Variables
-    INTEGER, PARAMETER   :: INFILE = 2
-    INTEGER              :: NROW, NCOL, I,ROOT, NPROW, NPCOL, MYPROW, MYPCOL, IRCODE, J
-    CHARACTER            :: MMHEADER*15, FMT*15, OBJECT*10, TYPE*10, SYM*15,&
-         & LINE*1024
-    REAL(KIND(1.0D0)), POINTER  :: B(:,:)
-    IF (PRESENT(INROOT)) THEN
-      ROOT = INROOT
-    ELSE
-      ROOT = 0
-    END IF
-    CALL BLACS_GRIDINFO(ICTXT, NPROW, NPCOL, MYPROW, MYPCOL)    
-    IF (MYPROW == ROOT) THEN
-      WRITE(*, *) 'Start read_rhs'      ! Open Input File
-      OPEN(INFILE,FILE=FILENAME, STATUS='OLD', ERR=901, ACTION="READ")
-      READ(INFILE,FMT=*, END=902) MMHEADER, OBJECT, FMT, TYPE, SYM
-      write(0,*)'obj fmt',object, fmt
-      IF ( (OBJECT .NE. 'matrix').OR.(FMT.NE.'array')) THEN
-        WRITE(0,*) 'READ_RHS: input file type not yet supported'
-        CALL BLACS_ABORT(ICTXT, 1)
-      END IF
-
-      do 
-         read(infile,fmt='(a)') line
-         if (line(1:1) /= '%')  exit
-      end do
-
-      READ(LINE,FMT=*)NROW,NCOL
-      
-      CALL LOWERC(TYPE,1,10)
-      CALL LOWERC(SYM,1,15)
-      IF ((TYPE == 'real').AND.(SYM == 'general')) THEN
-        ALLOCATE(B(NROW,NCOL),STAT = IRCODE)
-        IF (IRCODE /= 0)   GOTO 993
-        READ(INFILE,FMT=*,END=902) ((B(I,J), I=1,NROW),J=1,NCOL)
-           
-      ELSE
-        WRITE(0,*) 'READ_RHS: RHS type not yet supported'
-        CALL BLACS_ABORT(ICTXT, 1)
-      END IF      ! Read Right Hand Sides
-      WRITE(*,*) 'End READ_RHS'
-    END IF 
-    RETURN 
-    ! Open failed
-901 WRITE(0,*) 'READ_RHS: Could not open file ',&
-         & INFILE,' for input'
-    CALL BLACS_ABORT(ICTXT, 1)   ! Unexpected End of File
-902 WRITE(0,*) 'READ_RHS: Unexpected end of file ',INFILE,&
+    ! open failed
+901 write(0,*) 'read_rhs: could not open file ',&
+         & infile,' for input'
+    call blacs_abort(ictxt, 1)   ! unexpected end of file
+902 write(0,*) 'read_rhs: unexpected end of file ',infile,&
          & ' during input'
-    CALL BLACS_ABORT(ICTXT, 1)   ! Allocation Failed
-993 WRITE(0,*) 'READ_RHS: Memory allocation failure'
-    CALL BLACS_ABORT(ICTXT, 1)
-  END SUBROUTINE READ_RHS
-
-
-  SUBROUTINE ZREAD_RHS(FILENAME, B, ICTXT, INROOT)
-    IMPLICIT NONE
-    INTEGER                               :: ICTXT
-    CHARACTER                             :: FILENAME*(*)
-    INTEGER, OPTIONAL                     :: INROOT
-    INTEGER, PARAMETER          :: INFILE = 2
-    INTEGER                     :: NROW, NCOL, I,ROOT, NPROW, NPCOL, MYPROW, MYPCOL, IRCODE, J
-    CHARACTER                   :: MMHEADER*15, FMT*15, OBJECT*10, TYPE*10, SYM*15,&
-         & LINE*1024
-    COMPLEX(KIND(1.0D0)), POINTER  :: B(:,:)
-    IF (PRESENT(INROOT)) THEN
-      ROOT = INROOT
-    ELSE
-      ROOT = 0
-    END IF
-    CALL BLACS_GRIDINFO(ICTXT, NPROW, NPCOL, MYPROW, MYPCOL)    
-    IF (MYPROW == ROOT) THEN
-      WRITE(*, *) 'Start read_rhs'      ! Open Input File
-      OPEN(INFILE,FILE=FILENAME, STATUS='OLD', ERR=901, ACTION="READ")
-      READ(INFILE,FMT=*, END=902) MMHEADER, OBJECT, FMT, TYPE, SYM
-      write(0,*)'obj fmt',object, fmt
-      IF ( (OBJECT .NE. 'matrix').OR.(FMT.NE.'array')) THEN
-        WRITE(0,*) 'READ_RHS: input file type not yet supported'
-        CALL BLACS_ABORT(ICTXT, 1)
-      END IF
-
-      do 
-         read(infile,fmt='(a)') line
-         if (line(1:1) /= '%')  exit
-      end do
-
-      READ(LINE,FMT=*)NROW,NCOL
-
-      CALL LOWERC(TYPE,1,10)
-      CALL LOWERC(SYM,1,15)
-      IF ((TYPE == 'complex').AND.(SYM == 'general')) THEN
-        ALLOCATE(B(NROW,NCOL),STAT = IRCODE)
-        IF (IRCODE /= 0)   GOTO 993
-        READ(INFILE,FMT=*,END=902) ((B(I,J), I=1,NROW),J=1,NCOL)
-           
-      ELSE
-        WRITE(0,*) 'READ_RHS: RHS type not yet supported'
-        CALL BLACS_ABORT(ICTXT, 1)
-      END IF      ! Read Right Hand Sides
-      WRITE(*,*) 'End READ_RHS'
-    END IF 
-    RETURN 
-    ! Open failed
-901 WRITE(0,*) 'READ_RHS: Could not open file ',&
-         & INFILE,' for input'
-    CALL BLACS_ABORT(ICTXT, 1)   ! Unexpected End of File
-902 WRITE(0,*) 'READ_RHS: Unexpected end of file ',INFILE,&
-         & ' during input'
-    CALL BLACS_ABORT(ICTXT, 1)   ! Allocation Failed
-993 WRITE(0,*) 'READ_RHS: Memory allocation failure'
-    CALL BLACS_ABORT(ICTXT, 1)
-  END SUBROUTINE ZREAD_RHS
+    call blacs_abort(ictxt, 1)   ! allocation failed
+993 write(0,*) 'read_rhs: memory allocation failure'
+    call blacs_abort(ictxt, 1)
+  end subroutine read_rhs
 
 
 
-END MODULE READ_MAT
+end module read_mat

@@ -391,11 +391,11 @@ Module psb_tools_mod
        type(psb_dspmat_type), intent(inout)       ::a
        integer, intent(out)        :: info
      end subroutine psb_dspfree
-     subroutine psb_dspfrees(a,info)
-       use psb_spmat_type
-       type(psb_dspmat_type), intent(inout)       ::a
-       integer, intent(out)        :: info
-     end subroutine psb_dspfrees
+!!$     subroutine psb_dspfrees(a,info)
+!!$       use psb_spmat_type
+!!$       type(psb_dspmat_type), intent(inout)       ::a
+!!$       integer, intent(out)        :: info
+!!$     end subroutine psb_dspfrees
   end interface
 
 

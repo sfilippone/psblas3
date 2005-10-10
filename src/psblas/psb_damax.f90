@@ -217,7 +217,7 @@ end function psb_damaxv
 !    info   -  integer.                   Eventually returns an error code.
 !    jx     -  integer(optional).         The column offset.
 !
-subroutine psb_damaxvs (res,x,desc_a, info, jx)
+subroutine psb_damaxvs (res,x,desc_a, info)
   use psb_serial_mod
   use psb_descriptor_type
   use psb_check_mod
@@ -227,14 +227,12 @@ subroutine psb_damaxvs (res,x,desc_a, info, jx)
   real(kind(1.d0)), intent(in)      :: x(:)
   type(psb_desc_type), intent(in)   :: desc_a
   integer, intent(out)              :: info
-  integer, optional, intent(in)     :: jx
   real(kind(1.D0)), intent(out)     :: res
 
   ! locals
   integer                  :: int_err(5), icontxt, nprow, npcol, myrow, mycol,&
        & err_act, n, iix, jjx, temp(2), ix, ijx, m, imax, idamax
   real(kind(1.d0))         :: locmax(2), amax
-  real(kind(1.d0)),pointer :: tmpx(:)
   character(len=20)        :: name, ch_err
 
   name='psb_damaxvs'
@@ -258,13 +256,9 @@ subroutine psb_damaxvs (res,x,desc_a, info, jx)
     call psb_errpush(info,name)
     goto 9999
   endif
-  
+
   ix = 1
-  if (present(jx)) then
-     ijx = jx
-  else
-     ijx = 1
-  endif
+  ijx=1
 
   m = desc_a%matrix_data(psb_m_)
 
@@ -285,7 +279,7 @@ subroutine psb_damaxvs (res,x,desc_a, info, jx)
   ! compute local max
   if ((desc_a%matrix_data(psb_n_row_).gt.0).and.(m.ne.0)) then
      imax=idamax(desc_a%matrix_data(psb_n_row_)-iix+1,x(iix),1)
-     amax=abs(tmpx(iix+imax-1))
+     amax=abs(x(iix+imax-1))
   end if
   
   ! compute global max
@@ -321,7 +315,7 @@ end subroutine psb_damaxvs
 !    desc_a -  type(<psb_desc_type>).     The communication descriptor.
 !    info   -  integer.                   Eventually returns an error code.
 !
-subroutine psb_dmamaxs (res,x,desc_a, info)
+subroutine psb_dmamaxs (res,x,desc_a, info,jx)
   use psb_serial_mod
   use psb_descriptor_type
   use psb_check_mod
@@ -331,11 +325,12 @@ subroutine psb_dmamaxs (res,x,desc_a, info)
   real(kind(1.d0)), intent(in)      :: x(:,:)
   type(psb_desc_type), intent(in)   :: desc_a
   integer, intent(out)              :: info
+  integer, optional, intent(in)     :: jx
   real(kind(1.d0)), intent(out) :: res(:)
 
   ! locals
   integer                  :: int_err(5), icontxt, nprow, npcol, myrow, mycol,&
-       & err_act, n, iix, jjx, ix, jx, temp(2), ijx, m, imax, i, k, idamax
+       & err_act, n, iix, jjx, ix, temp(2), ijx, m, imax, i, k, idamax
   real(kind(1.d0))         :: locmax(2), amax
   real(kind(1.d0)),pointer :: tmpx(:)
   character(len=20)        :: name, ch_err
@@ -363,12 +358,16 @@ subroutine psb_dmamaxs (res,x,desc_a, info)
   endif
   
   ix = 1
-  jx = 1
+  if (present(jx)) then
+     ijx = jx
+  else
+     ijx = 1
+  endif
 
   m = desc_a%matrix_data(psb_m_)
   k  = min(size(x,2),size(res,1))
 
-  call psb_chkvect(m,1,size(x,1),ix,jx,desc_a%matrix_data,info,iix,jjx)
+  call psb_chkvect(m,1,size(x,1),ix,ijx,desc_a%matrix_data,info,iix,jjx)
   if(info.ne.0) then
      info=4010
      ch_err='psb_chkvect'

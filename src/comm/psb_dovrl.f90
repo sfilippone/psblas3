@@ -173,7 +173,8 @@ subroutine  psb_dovrlm(x,desc_a,info,jx,ik,work,choice,update_type)
      goto 9999
   end select
 
-
+  if(.not.present(work)) deallocate(iwork)
+  nullify(iwork)
 
   call psb_erractionrestore(err_act)
   return  
@@ -349,8 +350,9 @@ subroutine  psb_dovrlv(x,desc_a,info,work,choice,update_type)
      goto 9999
   end select
 
-
-
+  if(.not.present(work)) deallocate(iwork)
+  nullify(iwork)
+  
   call psb_erractionrestore(err_act)
   return  
 

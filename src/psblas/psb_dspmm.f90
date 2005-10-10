@@ -322,6 +322,7 @@ subroutine  psb_dspmm(alpha,a,x,beta,y,desc_a,info,&
   end if
 
   if(.not.present(work)) deallocate(iwork)
+  nullify(iwork)
 
   call psb_erractionrestore(err_act)
   return  
@@ -455,6 +456,7 @@ subroutine  psb_dspmv(alpha,a,x,beta,y,desc_a,info,&
   liwork= 2*ncol
   if (a%pr(1) /= 0) liwork = liwork + n * ik
   if (a%pl(1) /= 0) liwork = liwork + m * ik
+!  write(0,*)'---->>>',work(1)
   if (present(work)) then
      if(size(work).ge.liwork) then
         iwork => work
@@ -593,7 +595,10 @@ subroutine  psb_dspmv(alpha,a,x,beta,y,desc_a,info,&
 
   end if
 
-  if(.not.present(work)) deallocate(iwork)
+  if(.not.present(work)) then
+     deallocate(iwork)
+  end if
+  nullify(iwork)
 
   call psb_erractionrestore(err_act)
   return  

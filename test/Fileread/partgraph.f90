@@ -104,7 +104,6 @@ CONTAINS
   
 
   SUBROUTINE BUILD_GRPPART(N,FIDA,IA1,IA2,NPARTS)
-    USE TYPESP
     INTEGER       :: NPARTS
     INTEGER       :: IA1(:), IA2(:)
     INTEGER       :: N, I, IB, II,numflag,nedc,wgflag

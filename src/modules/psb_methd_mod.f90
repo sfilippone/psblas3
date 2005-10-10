@@ -19,7 +19,7 @@ Module psb_methd_mod
      end subroutine psb_dcg
   end interface
 
-  interface spb_bicg
+  interface psb_bicg
      subroutine psb_dbicg(a,prec,b,x,eps,&
 	  & desc_a,info,itmax,iter,err,itrace,istop)
        use psb_serial_mod

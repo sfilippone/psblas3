@@ -243,7 +243,7 @@ subroutine  psb_dgatherv(globx, locx, desc_a, info, iroot,&
      root = -1
   end if
   if (root==-1) then
-     iiroot=0
+     root=0
   endif
 
   jglobx=1
@@ -268,10 +268,10 @@ subroutine  psb_dgatherv(globx, locx, desc_a, info, iroot,&
   
   k = 1
 
-  if (myrow == iiroot) then
+  if (myrow == root) then
      call igebs2d(icontxt, 'all', ' ', 1, 1, k, 1)
   else
-     call igebr2d(icontxt, 'all', ' ', 1, 1, k, 1, iiroot, 0)
+     call igebr2d(icontxt, 'all', ' ', 1, 1, k, 1, root, 0)
   end if
 
   !  there should be a global check on k here!!!
@@ -298,7 +298,7 @@ subroutine  psb_dgatherv(globx, locx, desc_a, info, iroot,&
      globx(idx) = locx(i)
   end do
   ! adjust overlapped elements
-  i=0
+  i=1
   do while (desc_a%ovrlap_elem(i).ne.-1)
      idx=desc_a%ovrlap_elem(i+psb_ovrlp_elem_)
      idx=desc_a%loc_to_glob(idx)

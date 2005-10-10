@@ -162,6 +162,9 @@ subroutine  psb_dhalom(x,desc_a,info,alpha,jx,ik,work,tran,mode)
      goto 9999
   end if
 
+  if(.not.present(work)) deallocate(iwork)
+  nullify(iwork)
+
   call psb_erractionrestore(err_act)
   return  
 
@@ -313,6 +316,9 @@ subroutine  psb_dhalov(x,desc_a,info,alpha,work,tran,mode)
      call psb_errpush(4010,name,a_err=ch_err)
      goto 9999
   end if
+
+  if(.not.present(work)) deallocate(iwork)
+  nullify(iwork)
 
   call psb_erractionrestore(err_act)
   return  

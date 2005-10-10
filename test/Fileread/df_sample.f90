@@ -1,211 +1,211 @@
-PROGRAM DF_SAMPLE
-  USE F90SPARSE
-  USE MAT_DIST
-  USE READ_MAT
-  USE PARTGRAPH
-  USE GETP
-  IMPLICIT NONE
+program df_sample
+  use psb_all_mod
+  use mat_dist
+  use read_mat
+  use partgraph
+  use getp
+  implicit none
 
-  ! Input parameters
-  CHARACTER*20 :: CMETHD, PREC, MTRX_FILE, RHS_FILE
-  CHARACTER*80 :: CHARBUF
+  ! input parameters
+  character*20 :: cmethd, prec, mtrx_file, rhs_file
+  character*80 :: charbuf
 
-  DOUBLE PRECISION DDOT
-  EXTERNAL DDOT
-  INTERFACE 
+  interface 
     !   .....user passed subroutine.....
-    SUBROUTINE PART_BLOCK(GLOBAL_INDX,N,NP,PV,NV)
-      IMPLICIT NONE
-      INTEGER, INTENT(IN)  :: GLOBAL_INDX, N, NP
-      INTEGER, INTENT(OUT) :: NV
-      INTEGER, INTENT(OUT) :: PV(*) 
-    END SUBROUTINE PART_BLOCK
-  END INTERFACE   ! Local variables
-  INTERFACE 
+    subroutine part_block(global_indx,n,np,pv,nv)
+      implicit none
+      integer, intent(in)  :: global_indx, n, np
+      integer, intent(out) :: nv
+      integer, intent(out) :: pv(*) 
+    end subroutine part_block
+  end interface   ! local variables
+  interface 
     !   .....user passed subroutine.....
-    SUBROUTINE PART_BLK2(GLOBAL_INDX,N,NP,PV,NV)
-      IMPLICIT NONE
-      INTEGER, INTENT(IN)  :: GLOBAL_INDX, N, NP
-      INTEGER, INTENT(OUT) :: NV
-      INTEGER, INTENT(OUT) :: PV(*) 
-    END SUBROUTINE PART_BLK2
-  END INTERFACE   ! Local variables
+    subroutine part_blk2(global_indx,n,np,pv,nv)
+      implicit none
+      integer, intent(in)  :: global_indx, n, np
+      integer, intent(out) :: nv
+      integer, intent(out) :: pv(*) 
+    end subroutine part_blk2
+  end interface   ! local variables
 
 
-  INTEGER, PARAMETER    :: IZERO=0, IONE=1
-  CHARACTER, PARAMETER  :: ORDER='R'
-  REAL(KIND(1.D0)), POINTER, SAVE :: B_COL(:), X_COL(:), R_COL(:), &
-       & B_COL_GLOB(:), X_COL_GLOB(:), R_COL_GLOB(:), B_GLOB(:,:), &
-       &Z(:), Q(:),Z1(:)  
-  INTEGER              :: IARGC, CHECK_DESCR, CONVERT_DESCR
-  Real(Kind(1.d0)), Parameter :: Dzero = 0.d0, One = 1.d0
-  Real(Kind(1.d0)) :: MPI_WTIME, T1, T2, TPREC, R_AMAX, B_AMAX,bb(1,1),&
-       &lambda,scale,resmx,resmxp
-  integer :: nrhs, nrow, nx1, nx2, n_row, dim,iread
+  character, parameter  :: order='r'
+  real(kind(1.d0)), pointer, save :: b_col(:), x_col(:), r_col(:), &
+       & b_col_glob(:), x_col_glob(:), r_col_glob(:)
+
+  integer              :: iargc
+  real(kind(1.d0)) :: mpi_wtime, t1, t2, tprec, r_amax, b_amax,bb(1,1),&
+       &scale,resmx,resmxp
+  integer :: nrhs, nrow, n_row, dim, nv
   logical :: amroot
-  External IARGC, MPI_WTIME
-  integer bsze,overlap
-  common/part/bsze,overlap
-  INTEGER, POINTER :: WORK(:)
-  ! Sparse Matrices
-  TYPE(D_SPMAT) :: A, AUX_A, H
-  TYPE(D_PREC) :: PRE
-!!$  TYPE(D_PRECN) :: APRC
-  ! Dense Matrices
-  REAL(KIND(1.D0)), POINTER ::  AUX_B(:,:) , AUX1(:), AUX2(:), VDIAG(:), &
-       &  AUX_G(:,:), AUX_X(:,:), D(:)
+  integer, pointer :: ivg(:), ipv(:)
 
-  ! Communications data structure
-  TYPE(desc_type)    :: DESC_A, DESC_A_OUT
+  external iargc, mpi_wtime
 
-  ! BLACS parameters
-  INTEGER            :: NPROW, NPCOL, ICTXT, IAM, NP, MYPROW, MYPCOL
+  ! sparse matrices
+  type(psb_dspmat_type) :: a, aux_a
+  type(psb_dprec_type)  :: pre
 
-  ! Solver paramters
-  INTEGER            :: ITER, ITMAX, IERR, ITRACE, IRCODE, IPART,&
-       & METHD, ISTOPC, ML, iprec, novr
-  integer, pointer :: ierrv(:)
+  ! dense matrices
+  real(kind(1.d0)), pointer ::  aux_b(:,:), vdiag(:), d(:)
+
+
+  ! communications data structure
+  type(psb_desc_type):: desc_a, desc_a_out
+
+  ! blacs parameters
+  integer            :: nprow, npcol, ictxt, iam, np, myprow, mypcol
+
+  ! solver paramters
+  integer            :: iter, itmax, ierr, itrace, ircode, ipart,&
+       & methd, istopc, ml, iprec, novr
+
   character(len=5)   :: afmt
-  REAL(KIND(1.D0))   :: ERR, EPS
-  integer   iparm(20)
-  real(kind(1.d0)) rparm(20)
+  character(len=20)  :: name
+  real(kind(1.d0))   :: err, eps
+  integer   :: iparm(20)
 
-  ! Other variables
-  INTEGER            :: I,INFO,J
-  INTEGER            :: INTERNAL, M,II,NNZERO
+  ! other variables
+  integer            :: i,info,j
+  integer            :: internal, m,ii,nnzero
 
-  ! common area
-  INTEGER M_PROBLEM, NPROC
+  integer            :: m_problem, nproc
   
 
-  allocate(ierrv(6))
-  ! Initialize BLACS
-  CALL BLACS_PINFO(IAM, NP)
-  CALL BLACS_GET(IZERO, IZERO, ICTXT)
+  ! initialize blacs
+  call blacs_pinfo(iam, np)
+  call blacs_get(izero, izero, ictxt)
 
-  ! Rectangular Grid,  Np x 1
+  ! rectangular grid,  np x 1
 
-  CALL BLACS_GRIDINIT(ICTXT, ORDER, NP, IONE)
-  CALL BLACS_GRIDINFO(ICTXT, NPROW, NPCOL, MYPROW, MYPCOL)
-  AMROOT = (MYPROW==0).AND.(MYPCOL==0)
+  call blacs_gridinit(ictxt, order, np, ione)
+  call blacs_gridinfo(ictxt, nprow, npcol, myprow, mypcol)
+  amroot = (myprow==0).and.(mypcol==0)
 
+  name='df_sample'
+  info=0
   !
-  !  Get parameters
+  !  get parameters
   !
-  CALL GET_PARMS(ICTXT,MTRX_FILE,RHS_FILE,CMETHD,PREC,&
-       & IPART,AFMT,ISTOPC,ITMAX,ITRACE,novr,iprec,EPS)
+  call get_parms(ictxt,mtrx_file,rhs_file,cmethd,prec,&
+       & ipart,afmt,istopc,itmax,itrace,novr,iprec,eps)
 
-  CALL BLACS_BARRIER(ICTXT,'A')
-  T1 = MPI_WTIME()  
-  ! Read the input matrix to be processed and (possibly) the RHS 
-  NRHS = 1
-  NPROC = NPROW 
+  call blacs_barrier(ictxt,'a')
+  t1 = mpi_wtime()  
+  ! read the input matrix to be processed and (possibly) the rhs 
+  nrhs = 1
+  nproc = nprow 
 
-  IF (AMROOT) THEN
-    NULLIFY(AUX_B)
-    CALL READMAT(MTRX_FILE, AUX_A, ICTXT)
+  if (amroot) then
+    nullify(aux_b)
+    call readmat(mtrx_file, aux_a, ictxt)
 
-    M_PROBLEM = AUX_A%M
-    CALL IGEBS2D(ICTXT,'A',' ',1,1,M_PROBLEM,1)
+    m_problem = aux_a%m
+    call igebs2d(ictxt,'a',' ',1,1,m_problem,1)
 
-    IF(RHS_FILE /= 'NONE') THEN
-       !  Reading an RHS
-       CALL READ_RHS(RHS_FILE,AUX_B,ICTXT)
-    END IF
+    if(rhs_file /= 'NONE') then
+       !  reading an rhs
+       call read_rhs(rhs_file,aux_b,ictxt)
+    end if
 
-    IF (ASSOCIATED(AUX_B).and.SIZE(AUX_B,1)==M_PROBLEM) THEN
-      ! If any RHS were present, broadcast the first one
-      write(0,*) 'Ok, got an RHS ',aux_b(m_problem,1)
-      B_COL_GLOB =>AUX_B(:,1)
-    ELSE
-      write(0,*) 'Inventing an RHS '
-      ALLOCATE(AUX_B(M_PROBLEM,1), STAT=IRCODE)
-      IF (IRCODE /= 0) THEN
-        WRITE(0,*) 'Memory allocation failure in DF_SAMPLE'
-        CALL BLACS_ABORT(ICTXT,-1)
-        STOP
-      ENDIF
-      B_COL_GLOB =>AUX_B(:,1)
-      DO I=1, M_PROBLEM
-!!$        B_COL_GLOB(I) = REAL(I)*2.0/REAL(M_PROBLEM)        
-        B_COL_GLOB(I) = 1.D0
-      ENDDO      
-    ENDIF
-    CALL DGEBS2D(ICTXT,'A',' ',M_PROBLEM,1,B_COL_GLOB,M_PROBLEM) 
-  ELSE
-    CALL IGEBR2D(ICTXT,'A',' ',1,1,M_PROBLEM,1,0,0)
-    WRITE(0,*) 'Receiving AUX_B'
-    ALLOCATE(AUX_B(M_PROBLEM,1), STAT=IRCODE)
-    IF (IRCODE /= 0) THEN
-      WRITE(0,*) 'Memory allocation failure in DF_SAMPLE'
-      CALL BLACS_ABORT(ICTXT,-1)
-      STOP
-    ENDIF
-    B_COL_GLOB =>AUX_B(:,1)
-    CALL DGEBR2D(ICTXT,'A',' ',M_PROBLEM,1,B_COL_GLOB,M_PROBLEM,0,0) 
-  END IF
+    if (associated(aux_b).and.size(aux_b,1)==m_problem) then
+      ! if any rhs were present, broadcast the first one
+      write(0,'("Ok, got an rhs ")')
+      b_col_glob =>aux_b(:,1)
+    else
+      write(0,'("Generating an rhs ")')
+      allocate(aux_b(m_problem,1), stat=ircode)
+      if (ircode /= 0) then
+         call psb_errpush(4000,name)
+         goto 9999
+      endif
 
-  ! Switch over different partition types
-  IF (IPART.EQ.0) THEN 
-    CALL BLACS_BARRIER(ICTXT,'A')
-    WRITE(6,*) 'Partition type: BLOCK'
-    CALL MATDIST(AUX_A, A, PART_BLOCK, ICTXT, &
-         & DESC_A,B_COL_GLOB,B_COL,fmt=afmt)
-  ELSE  IF (IPART.EQ.1) THEN 
-    CALL BLACS_BARRIER(ICTXT,'A')
-    WRITE(6,*) 'Partition type: BLK2'
-    CALL MATDIST(AUX_A, A, PART_BLK2, ICTXT, &
-         & DESC_A,B_COL_GLOB,B_COL,fmt=afmt)
-  ELSE IF (IPART.EQ.2) THEN 
-    WRITE(0,*) 'Partition type: GRAPH'
-    IF (AMROOT) THEN 
-!!$      WRITE(0,*) 'Call BUILD',size(aux_a%ia1),size(aux_a%ia2),np
-      WRITE(0,*) 'Build type: GRAPH ',aux_a%fida,&
-           &aux_a%m
-      CALL BUILD_GRPPART(AUX_A%M,AUX_A%FIDA,AUX_A%IA1,AUX_A%IA2,NP)
-    ENDIF
-    CALL BLACS_BARRIER(ICTXT,'A')
-!!$    WRITE(0,*) myprow,'Done BUILD_GRPPART'
-    CALL DISTR_GRPPART(0,0,ICTXT)
-!!$    WRITE(0,*) myprow,'Done DISTR_GRPPART'
-    CALL MATDIST(AUX_A, A, PART_GRAPH, ICTXT, &
-         & DESC_A,B_COL_GLOB,B_COL)
-  ELSE 
-    WRITE(6,*) 'Partition type: BLOCK'
-    CALL MATDIST(AUX_A, A, PART_BLOCK, ICTXT, &
-         & DESC_A,B_COL_GLOB,B_COL,fmt=afmt)
-  END IF
+      b_col_glob => aux_b(:,1)
+      do i=1, m_problem
+         b_col_glob(i) = 1.d0
+      enddo      
+    endif
+    call dgebs2d(ictxt,'a',' ',m_problem,1,b_col_glob,m_problem) 
+  else
+    call igebr2d(ictxt,'a',' ',1,1,m_problem,1,0,0)
+    allocate(aux_b(m_problem,1), stat=ircode)
+    if (ircode /= 0) then
+       call psb_errpush(4000,name)
+       goto 9999
+    endif
+    b_col_glob =>aux_b(:,1)
+    call dgebr2d(ictxt,'a',' ',m_problem,1,b_col_glob,m_problem,0,0) 
+  end if
+
+  ! switch over different partition types
+  if (ipart.eq.0) then 
+     call blacs_barrier(ictxt,'a')
+     write(6,'("Partition type: block")')
+     allocate(ivg(m_problem),ipv(np))
+     do i=1,m_problem
+        call part_block(i,m_problem,np,ipv,nv)
+        ivg(i) = ipv(1)
+     enddo
+     call matdist(aux_a, a, ivg, ictxt, &
+          & desc_a,b_col_glob,b_col,info,fmt=afmt)
+  else  if (ipart.eq.1) then 
+    call blacs_barrier(ictxt,'a')
+    write(6,'("Partition type: blk2")')
+    allocate(ivg(m_problem),ipv(np))
+    do i=1,m_problem
+       call part_blk2(i,m_problem,np,ipv,nv)
+       ivg(i) = ipv(1)
+    enddo
+    call matdist(aux_a, a, ivg, ictxt, &
+         & desc_a,b_col_glob,b_col,info,fmt=afmt)
+  else if (ipart.eq.2) then 
+    write(6,'("Partition type: graph")')
+    if (amroot) then 
+      write(0,'("Build type: graph")')
+      call build_grppart(aux_a%m,aux_a%fida,aux_a%ia1,aux_a%ia2,np)
+    endif
+    call blacs_barrier(ictxt,'a')
+    call distr_grppart(0,0,ictxt)
+    call getv_grppart(ivg)
+    call matdist(aux_a, a, ivg, ictxt, &
+         & desc_a,b_col_glob,b_col,info,fmt=afmt)
+  else 
+    write(6,'("Partition type: block")')
+    call matdist(aux_a, a, part_block, ictxt, &
+         & desc_a,b_col_glob,b_col,info,fmt=afmt)
+  end if
   
-  CALL F90_PSDSALL(M_PROBLEM,X_COL,IERRV,DESC_A)
-  X_COL(:) =0.0
-  CALL F90_PSDSASB(X_COL,IERRV,DESC_A)
-  CALL F90_PSDSALL(M_PROBLEM,R_COL,IERRV,DESC_A)
-  R_COL(:) =0.0
-  CALL F90_PSDSASB(R_COL,IERRV,DESC_A)
-  T2 = MPI_WTIME() - T1
+  call psb_alloc(m_problem,x_col,desc_a,info)
+  x_col(:) =0.0
+  call psb_asb(x_col,desc_a,info)
+  call psb_alloc(m_problem,r_col,desc_a,info)
+  r_col(:) =0.0
+  call psb_asb(r_col,desc_a,info)
+  t2 = mpi_wtime() - t1
   
   
-  CALL DGAMX2D(ICTXT, 'A', ' ', IONE, IONE, T2, IONE,&
-       & T1, T1, -1, -1, -1)
+  call dgamx2d(ictxt, 'a', ' ', ione, ione, t2, ione,&
+       & t1, t1, -1, -1, -1)
   
-  IF (AMROOT) THEN
-     WRITE(6,*) 'Time to Read and Partition Matrix : ',T2
-  END IF
+  if (amroot) then
+     write(6,'("Time to read and partition matrix : ",es10.4)')t2
+  end if
   
   !
-  !  Prepare the preconditioning matrix. Note the availability
+  !  prepare the preconditioning matrix. note the availability
   !  of optional parameters
   !
 
-  IF (AMROOT) WRITE(6,*) 'Preconditioner : "',PREC(1:6),'"  ',iprec
+  if (amroot) write(6,'("Preconditioner : ",a)')prec(1:6)
   
-  ! Zero initial guess.
+  ! zero initial guess.
   select case(iprec)
   case(noprec_)
     call psb_precset(pre,'noprec')
   case(diagsc_)             
     call psb_precset(pre,'diagsc')
-  case(ilu_)             
+  case(bja_)             
     call psb_precset(pre,'ilu')
   case(asm_)             
     call psb_precset(pre,'asm',iv=(/novr,halo_,sum_/))
@@ -217,84 +217,80 @@ PROGRAM DF_SAMPLE
     call psb_precset(pre,'asm',iv=(/novr,nohalo_,none_/))
   end select
 
+  ! building the preconditioner
+  t1 = mpi_wtime()
+  call psb_precbld(a,pre,desc_a,info)
+  tprec = mpi_wtime()-t1
+  
+  
+  call dgamx2d(ictxt,'a',' ',ione, ione,tprec,ione,t1,t1,-1,-1,-1)
+  
+  write(6,'("Preconditioner time: ",es10.4)')tprec
+  if (info /= 0) then
+    write(0,*) 'error in preconditioner :',info
+    call blacs_abort(ictxt,-1)
+    stop
+  end if
+  
+  iparm = 0
+  call blacs_barrier(ictxt,'all')
+  t1 = mpi_wtime()
+  if (cmethd.eq.'BICGSTAB') then
+    call  psb_bicgstab(a,pre,b_col,x_col,eps,desc_a,info,& 
+       & itmax,iter,err,itrace,istop=istopc)     
+  else if (cmethd.eq.'BICG') then
+    call  psb_bicg(a,pre,b_col,x_col,eps,desc_a,info,& 
+       & itmax,iter,err,itrace)     
+  else if (cmethd.eq.'CGS') then
+    call  psb_cgs(a,pre,b_col,x_col,eps,desc_a,info,& 
+       & itmax,iter,err,itrace)     
+  else if (cmethd.eq.'BICGSTABL') then
+    call  psb_bicgstabl(a,pre,b_col,x_col,eps,desc_a,info,& 
+       & itmax,iter,err,ierr,itrace,ml)     
+  endif
+  call blacs_barrier(ictxt,'all')
+  t2 = mpi_wtime() - t1
+  write(0,*)'Calling gamx2d'
+  call dgamx2d(ictxt,'a',' ',ione, ione,t2,ione,t1,t1,-1,-1,-1)
+  write(0,*)'Calling axpby'
+  call psb_axpby(1.d0,b_col,0.d0,r_col,desc_a,info)
+  write(0,*)'Calling spmm'
+  call psb_spmm(-1.d0,a,x_col,1.d0,r_col,desc_a,info)
+  write(0,*)'Calling nrm2'
+  call psb_nrm2(resmx,r_col,desc_a,info)
+  write(0,*)'Calling amax'
+  call psb_amax(resmxp,r_col,desc_a,info)
 
-  T1 = MPI_WTIME()
-
-  CALL psb_precbld(A,PRE,DESC_A,INFO)!,'F')
-  TPREC = MPI_WTIME()-T1
-  
-  
-  CALL DGAMX2D(ICTXT,'A',' ',IONE, IONE,TPREC,IONE,T1,T1,-1,-1,-1)
-  
-  WRITE(0,*) 'Preconditioner Time :',TPREC,' ',&
-       &prec,pre%prec
-  IF (INFO /= 0) THEN
-    WRITE(0,*) 'Error in preconditioner :',INFO
-    CALL BLACS_ABORT(ICTXT,-1)
-    STOP
-  END IF
-  
-  IPARM = 0
-  RPARM = 0.D0   
-  CALL BLACS_BARRIER(ICTXT,'All')
-  T1 = MPI_WTIME()
-  IF (CMETHD.EQ.'BICGSTAB') Then
-    CALL  F90_BICGSTAB(A,PRE,B_COL,X_COL,EPS,DESC_A,& 
-       & ITMAX,ITER,ERR,IERR,ITRACE,istop=istopc)     
-!!$  ELSE IF (CMETHD.EQ.'BICG') Then
-!!$    CALL  F90_BICG(A,IPREC,L,U,VDIAG,B_COL,X_COL,EPS,DESC_A,& 
-!!$       & ITMAX,ITER,ERR,IERR,ITRACE)     
-!!$  ELSE IF (CMETHD.EQ.'CGS') Then
-!!$    CALL  F90_CGS(A,IPREC,L,U,VDIAG,B_COL,X_COL,EPS,DESC_A,& 
-!!$       & ITMAX,ITER,ERR,IERR,ITRACE)     
-!!$  ELSE IF (CMETHD.EQ.'BICGSTABL') Then
-!!$    CALL  F90_BICGSTABL(A,IPREC,L,U,VDIAG,B_COL,X_COL,EPS,DESC_A,& 
-!!$       & ITMAX,ITER,ERR,IERR,ITRACE,ML)     
-  ENDIF
-  CALL BLACS_BARRIER(ICTXT,'All')
-  T2 = MPI_WTIME() - T1
-  CALL DGAMX2D(ICTXT,'A',' ',IONE, IONE,T2,IONE,T1,T1,-1,-1,-1)
-  call f90_psaxpby(1.d0,b_col,0.d0,r_col,desc_A)
-  call f90_psspmm(-1.d0,a,x_col,1.d0,r_col,desc_a)
-  call f90_nrm2(resmx,r_col,desc_a)
-!!$  where (b_col /= 0.d0)
-!!$    r_col = r_col/b_col
-!!$  end where
-  call f90_amax(resmxp,r_col,desc_a)
-
-!!$  ITER=IPARM(5)
-!!$  ERR = RPARM(2)
+!!$  iter=iparm(5)
+!!$  err = rparm(2)
   if (amroot) then 
-    call prec_descr(6,pre)
-    call csprt(60+myprow,a)
-!!$    write(6,*) 'Number of iterations : ',iter
-!!$    WRITE(6,*) 'Error on exit        : ',ERR
-    write(6,*) 'Matrix: ',mtrx_file
-    write(6,*) 'Computed solution on ',NPROW,' processors.'
-    write(6,*) 'Iterations to convergence: ',iter
-    write(6,*) 'Error indicator on exit:',err
-    write(6,*) 'Time to Buil Prec.   : ',TPREC
-    write(6,*) 'Time to Solve Matrix : ',T2
-    WRITE(6,*) 'Time per iteration   : ',T2/(ITER)
-    write(6,*) 'Total Time           : ',T2+TPREC
-    write(6,*) 'Residual norm 2   = ',resmx
-    write(6,*) 'Residual norm inf = ',resmxp
-  END IF
+!    call psb_prec_descr(6,pre)
+    write(6,'("Matrix: ",a)')mtrx_file
+    write(6,'("Computed solution on ",i4," processors")')nprow
+    write(6,'("Iterations to convergence: ",i)')iter
+    write(6,'("Error indicator on exit: ",f7.2)')err
+    write(6,'("Time to buil prec.   : ",es10.4)')tprec
+    write(6,'("Time to solve matrix : ",es10.4)')t2
+    write(6,'("Time per iteration   : ",es10.4)')t2/(iter)
+    write(6,'("Total time           : ",es10.4)')t2+tprec
+    write(6,'("Residual norm 2   = ",f7.2)')resmx
+    write(6,'("Residual norm inf = ",f7.2)')resmxp
+  end if
 
   allocate(x_col_glob(m_problem),r_col_glob(m_problem),stat=ierr)
   if (ierr.ne.0) then 
-    write(0,*) 'Allocation error: no data collection'
+    write(0,*) 'allocation error: no data collection'
   else
-    call f90_psdgatherm(x_col_glob,x_col,desc_a,iroot=0)
-    call f90_psdgatherm(r_col_glob,r_col,desc_a,iroot=0)
+    call psb_gather(x_col_glob,x_col,desc_a,info,iroot=0)
+    call psb_gather(r_col_glob,r_col,desc_a,info,iroot=0)
     if (amroot) then
-      write(0,*) 'Saving X on file'
-      write(20,*) 'Matrix: ',mtrx_file
-      write(20,*) 'Computed solution on ',NPROW,' processors.'
-      write(20,*) 'Iterations to convergence: ',iter
-      write(20,*) 'Error indicator (infinity norm) on exit:', &
-           & ' ||r||/(||A||||x||+||b||) = ',err
-      write(20,*) 'Max residual = ',resmx, resmxp
+      write(0,*) 'Saving x on file'
+      write(20,*) 'matrix: ',mtrx_file
+      write(20,*) 'computed solution on ',nprow,' processors.'
+      write(20,*) 'iterations to convergence: ',iter
+      write(20,*) 'error indicator (infinity norm) on exit:', &
+           & ' ||r||/(||a||||x||+||b||) = ',err
+      write(20,*) 'max residual = ',resmx, resmxp
       do i=1,m_problem
         write(20,998) i,x_col_glob(i),r_col_glob(i),b_col_glob(i)
       enddo
@@ -304,15 +300,25 @@ PROGRAM DF_SAMPLE
 993 format(i6,4(1x,e12.6))
 
   
-  CALL F90_PSDSFREE(B_COL, DESC_A)
-  CALL F90_PSDSFREE(X_COL, DESC_A)
-  CALL F90_PSSPFREE(A, DESC_A)
-  CALL psb_precfree(PRE,info)
-  CALL F90_PSDSCFREE(DESC_A,info)
-  CALL BLACS_GRIDEXIT(ICTXT)
-  CALL BLACS_EXIT(0)
+  call psb_free(b_col, desc_a,info)
+  call psb_free(x_col, desc_a,info)
+  call psb_spfree(a, desc_a,info)
+  call psb_precfree(pre,info)
+  call psb_dscfree(desc_a,info)
+
+9999 continue
+  if(info /= 0) then
+     call psb_error(ictxt)
+     call blacs_gridexit(ictxt)
+     call blacs_exit(0)
+  else
+     call blacs_gridexit(ictxt)
+     call blacs_exit(0)
+  end if
+
+  stop
   
-END PROGRAM DF_SAMPLE
+end program df_sample
   
 
 
