@@ -120,7 +120,7 @@ c
      *  ib(*), jb(*), diagb,
      *  ic(*), jc(*), diagc 
 c
-      real(kind(1.d0))          a(*), b(*), c(*), temp(*)
+      real(kind(1.d0))          a(*), b(*), c(*), temp(*),ajj
 c
 c       numeric matrix multiply c=a*b
 c
