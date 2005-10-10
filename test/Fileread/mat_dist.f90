@@ -603,11 +603,6 @@ contains
        goto 9999
     endif
 
-    if (myprow == root) then
-       write (*, fmt = *) 'start matdist v',root, size(iwork),&
-            &nrow, ncol, nnzero,nrhs
-    endif
-
     call psb_dscall(nrow,v,icontxt,desc_a,info)
     if(info/=0) then
        info=4010
@@ -785,9 +780,11 @@ contains
        goto 9999
     end if
 
+    call psb_asb(b,desc_a,info)
+
     if (myprow == root) then 
-       write(*,*) 'descriptor assembly: ',t1-t0
-       write(*,*) 'sparse matrix assembly: ',t3-t2
+       write(*,'("Descriptor assembly   : ",es10.4)')t1-t0
+       write(*,'("Sparse matrix assembly: ",es10.4)')t3-t2
     end if
 
     if(info/=0)then
@@ -805,7 +802,6 @@ contains
     end if
 
     deallocate(iwork)   
-    if (myprow == root) write (*, fmt = *) 'end matdist v'     
 
     call psb_erractionrestore(err_act)
     return

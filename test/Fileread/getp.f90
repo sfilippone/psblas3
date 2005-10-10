@@ -8,10 +8,10 @@ CONTAINS
   ! Get iteration parameters from the command line
   !
   SUBROUTINE  GET_PARMS(ICONTXT,MTRX_FILE,RHS_FILE,CMETHD,PREC,IPART,&
-       & AFMT,ISTOPC,ITMAX,ITRACE,ML,IPREC,EPS)
+       & AFMT,ISTOPC,ITMAX,ITRACE,NOVR,IPREC,EPS)
     integer      :: icontxt
     Character*20 :: CMETHD, PREC, MTRX_FILE, RHS_FILE
-    Integer      :: IRET, ISTOPC,ITMAX,ITRACE,IPART,IPREC,ML
+    Integer      :: IRET, ISTOPC,ITMAX,ITRACE,IPART,IPREC,NOVR
     Character*40 :: CHARBUF
     real(kind(1.d0)) :: eps
     character    :: afmt*5
@@ -78,9 +78,9 @@ CONTAINS
           IPREC=0
         ENDIF
         IF (IP.GE.10) THEN
-          READ(*,*) ML
+          READ(*,*) NOVR
         ELSE
-          ML  = 1
+          NOVR  = 1
         ENDIF
         IF (IP.GE.11) THEN
           READ(*,*) EPS
@@ -94,13 +94,17 @@ CONTAINS
         INPARMS(3) = ITMAX
         INPARMS(4) = ITRACE
         INPARMS(5) = IPREC
-        INPARMS(6) = ML
+        INPARMS(6) = NOVR
         CALL IGEBS2D(ICONTXT,'ALL',' ',6,1,INPARMS,6)
         CALL DGEBS2D(ICONTXT,'ALL',' ',1,1,EPS,1)
 
-        WRITE(6,*)'Solving matrix:  ',mtrx_file
-        WRITE(6,*)' with BLOCK data distribution, NP=',NPROW,&
-             & ' Preconditioner=',PREC
+          write(*,'("Solving matrix       : ",a)')mtrx_file      
+          write(*,'("Number of processors : ",i)')nprow
+          write(*,'("Data distribution    : ",i2)')ipart
+          write(*,'("Preconditioner       : ",i)')iprec
+          if(iprec.gt.2) write(*,'("Overlapping levels   : ",i)')novr
+          write(*,'("Iterative method     : ",a)')cmethd
+          write(*,'(" ")')
       else
         CALL PR_USAGE(0)
         CALL BLACS_ABORT(ICONTXT,-1)
@@ -134,7 +138,7 @@ CONTAINS
       ITMAX  =  INPARMS(3) 
       ITRACE =  INPARMS(4) 
       IPREC  =  INPARMS(5) 
-      ML     =  INPARMS(6) 
+      NOVR     =  INPARMS(6) 
       CALL DGEBR2D(ICONTXT,'A',' ',1,1,EPS,1,0,0)     
     END IF
     

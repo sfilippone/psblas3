@@ -139,7 +139,7 @@ CONTAINS
         wgflag   = 0
         call METIS_PartGraphRecursive(n,ia2,ia1,idummy,jdummy,&
              & wgflag,numflag,nparts,iopt,nedc,graph_vect)
-        write(0,*)'Edge cut from Metis ',nedc
+!        write(0,*)'Edge cut from Metis ',nedc
         DO I=1, N
           GRAPH_VECT(I) = GRAPH_VECT(I) - 1
         ENDDO

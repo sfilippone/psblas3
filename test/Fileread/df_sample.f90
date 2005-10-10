@@ -59,7 +59,7 @@ program df_sample
 
   ! solver paramters
   integer            :: iter, itmax, ierr, itrace, ircode, ipart,&
-       & methd, istopc, ml, iprec, novr
+       & methd, istopc, ml, iprec, novr, igsmth, matop
 
   character(len=5)   :: afmt
   character(len=20)  :: name
@@ -85,6 +85,8 @@ program df_sample
 
   name='df_sample'
   info=0
+  call psb_set_errverbosity(2)
+  call psb_set_erraction(0)
   !
   !  get parameters
   !
@@ -114,7 +116,8 @@ program df_sample
       write(0,'("Ok, got an rhs ")')
       b_col_glob =>aux_b(:,1)
     else
-      write(0,'("Generating an rhs ")')
+      write(*,'("Generating an rhs...")')
+      write(*,'(" ")')
       allocate(aux_b(m_problem,1), stat=ircode)
       if (ircode /= 0) then
          call psb_errpush(4000,name)
@@ -141,7 +144,7 @@ program df_sample
   ! switch over different partition types
   if (ipart.eq.0) then 
      call blacs_barrier(ictxt,'a')
-     write(6,'("Partition type: block")')
+     if (amroot) write(*,'("Partition type: block")')
      allocate(ivg(m_problem),ipv(np))
      do i=1,m_problem
         call part_block(i,m_problem,np,ipv,nv)
@@ -151,7 +154,7 @@ program df_sample
           & desc_a,b_col_glob,b_col,info,fmt=afmt)
   else  if (ipart.eq.1) then 
     call blacs_barrier(ictxt,'a')
-    write(6,'("Partition type: blk2")')
+    if (amroot) write(*,'("Partition type: blk2")')
     allocate(ivg(m_problem),ipv(np))
     do i=1,m_problem
        call part_blk2(i,m_problem,np,ipv,nv)
@@ -160,9 +163,10 @@ program df_sample
     call matdist(aux_a, a, ivg, ictxt, &
          & desc_a,b_col_glob,b_col,info,fmt=afmt)
   else if (ipart.eq.2) then 
-    write(6,'("Partition type: graph")')
     if (amroot) then 
-      write(0,'("Build type: graph")')
+       write(*,'("Partition type: graph")')
+       write(*,'(" ")')
+!      write(0,'("Build type: graph")')
       call build_grppart(aux_a%m,aux_a%fida,aux_a%ia1,aux_a%ia2,np)
     endif
     call blacs_barrier(ictxt,'a')
@@ -171,7 +175,7 @@ program df_sample
     call matdist(aux_a, a, ivg, ictxt, &
          & desc_a,b_col_glob,b_col,info,fmt=afmt)
   else 
-    write(6,'("Partition type: block")')
+    if (amroot) write(*,'("Partition type: block")')
     call matdist(aux_a, a, part_block, ictxt, &
          & desc_a,b_col_glob,b_col,info,fmt=afmt)
   end if
@@ -189,7 +193,9 @@ program df_sample
        & t1, t1, -1, -1, -1)
   
   if (amroot) then
-     write(6,'("Time to read and partition matrix : ",es10.4)')t2
+     write(*,'(" ")')
+     write(*,'("Time to read and partition matrix : ",es10.4)')t2
+     write(*,'(" ")')
   end if
   
   !
@@ -197,9 +203,11 @@ program df_sample
   !  of optional parameters
   !
 
-  if (amroot) write(6,'("Preconditioner : ",a)')prec(1:6)
+  if (amroot) write(*,'("Preconditioner : ",a)')prec(1:6)
   
   ! zero initial guess.
+  matop=1
+  igsmth=-1
   select case(iprec)
   case(noprec_)
     call psb_precset(pre,'noprec')
@@ -215,23 +223,36 @@ program df_sample
     call psb_precset(pre,'asm',iv=(/novr,halo_,none_/))
   case(rash_)             
     call psb_precset(pre,'asm',iv=(/novr,nohalo_,none_/))
+  case(ras2lv_) 
+     call psb_precset(pre,'asm',iv=(/novr,halo_,none_/))
+     call psb_precset(pre,'ml',&
+          &iv=(/add_ml_prec_,loc_aggr_,no_smth_,mat_repl_,&
+          &    pre_smooth_,igsmth/),rs=0.d0)
+!!$     call psb_precset(pre,'ml',&
+!!$          &iv=(/add_ml_prec_,glb_aggr_,pre_smooth_,igsmth,matop/),rs=0.d0)
+  case(ras2lvm_) 
+     call psb_precset(pre,'asm',iv=(/novr,halo_,none_/))
+     call psb_precset(pre,'ml',&
+          & iv=(/mult_ml_prec_,glb_aggr_,pre_smooth_,igsmth,matop/),rs=0.d0)
   end select
 
   ! building the preconditioner
   t1 = mpi_wtime()
   call psb_precbld(a,pre,desc_a,info)
   tprec = mpi_wtime()-t1
+  if (info /= 0) then
+     call psb_errpush(4010,name,a_err='psb_precbld')
+     goto 9999
+  end if
   
   
   call dgamx2d(ictxt,'a',' ',ione, ione,tprec,ione,t1,t1,-1,-1,-1)
   
-  write(6,'("Preconditioner time: ",es10.4)')tprec
-  if (info /= 0) then
-    write(0,*) 'error in preconditioner :',info
-    call blacs_abort(ictxt,-1)
-    stop
+  if(amroot) then
+     write(*,'("Preconditioner time: ",es10.4)')tprec
+     write(*,'(" ")')
   end if
-  
+
   iparm = 0
   call blacs_barrier(ictxt,'all')
   t1 = mpi_wtime()
@@ -250,31 +271,26 @@ program df_sample
   endif
   call blacs_barrier(ictxt,'all')
   t2 = mpi_wtime() - t1
-  write(0,*)'Calling gamx2d'
   call dgamx2d(ictxt,'a',' ',ione, ione,t2,ione,t1,t1,-1,-1,-1)
-  write(0,*)'Calling axpby'
   call psb_axpby(1.d0,b_col,0.d0,r_col,desc_a,info)
-  write(0,*)'Calling spmm'
   call psb_spmm(-1.d0,a,x_col,1.d0,r_col,desc_a,info)
-  write(0,*)'Calling nrm2'
   call psb_nrm2(resmx,r_col,desc_a,info)
-  write(0,*)'Calling amax'
   call psb_amax(resmxp,r_col,desc_a,info)
 
 !!$  iter=iparm(5)
 !!$  err = rparm(2)
   if (amroot) then 
 !    call psb_prec_descr(6,pre)
-    write(6,'("Matrix: ",a)')mtrx_file
-    write(6,'("Computed solution on ",i4," processors")')nprow
-    write(6,'("Iterations to convergence: ",i)')iter
-    write(6,'("Error indicator on exit: ",f7.2)')err
-    write(6,'("Time to buil prec.   : ",es10.4)')tprec
-    write(6,'("Time to solve matrix : ",es10.4)')t2
-    write(6,'("Time per iteration   : ",es10.4)')t2/(iter)
-    write(6,'("Total time           : ",es10.4)')t2+tprec
-    write(6,'("Residual norm 2   = ",f7.2)')resmx
-    write(6,'("Residual norm inf = ",f7.2)')resmxp
+    write(*,'("Matrix: ",a)')mtrx_file
+    write(*,'("Computed solution on ",i4," processors")')nprow
+    write(*,'("Iterations to convergence: ",i)')iter
+    write(*,'("Error indicator on exit: ",f7.2)')err
+    write(*,'("Time to buil prec.   : ",es10.4)')tprec
+    write(*,'("Time to solve matrix : ",es10.4)')t2
+    write(*,'("Time per iteration   : ",es10.4)')t2/(iter)
+    write(*,'("Total time           : ",es10.4)')t2+tprec
+    write(*,'("Residual norm 2   = ",es10.4)')resmx
+    write(*,'("Residual norm inf = ",es10.4)')resmxp
   end if
 
   allocate(x_col_glob(m_problem),r_col_glob(m_problem),stat=ierr)
@@ -284,7 +300,8 @@ program df_sample
     call psb_gather(x_col_glob,x_col,desc_a,info,iroot=0)
     call psb_gather(r_col_glob,r_col,desc_a,info,iroot=0)
     if (amroot) then
-      write(0,*) 'Saving x on file'
+      write(0,'(" ")')
+      write(0,'("Saving x on file")')
       write(20,*) 'matrix: ',mtrx_file
       write(20,*) 'computed solution on ',nprow,' processors.'
       write(20,*) 'iterations to convergence: ',iter

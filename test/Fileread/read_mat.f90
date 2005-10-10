@@ -60,9 +60,8 @@ contains
     end if
     call blacs_gridinfo(ictxt, nprow, npcol, myprow, mypcol)    
     if (myprow == root) then
-      write(*, *) 'start read_matrix'      ! open input file
+      write(*, '("Reading matrix...")')      ! open input file
       call mm_mat_read(a,info,infile,filename)
-      write(*, *) 'end read_matrix'
       if (info /= 0) then 
         write(0,*) 'Error return from MM_MAT_READ ',info
         call blacs_abort(ictxt, 1)   ! Unexpected End of File
@@ -93,7 +92,7 @@ contains
     end if
     call blacs_gridinfo(ictxt, nprow, npcol, myprow, mypcol)    
     if (myprow == root) then
-      write(*, *) 'start read_rhs'      ! open input file
+      write(*, '("Reading rhs...")')      ! open input file
       open(infile,file=filename, status='old', err=901, action="read")
       read(infile,fmt=*, end=902) mmheader, object, fmt, type, sym
       write(0,*)'obj fmt',object, fmt

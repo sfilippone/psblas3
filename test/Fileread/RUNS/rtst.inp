@@ -4,10 +4,10 @@ NONE
 BICGSTAB 
 ILU                 !!!! Actually, it's IPREC below. Should take this line out.
 CSR
-0                   IPART: Partition method
-2                   ISTOPC
+2                   IPART: Partition method
+1                   ISTOPC
 00800               ITMAX
-6                   ITRACE
-2                   IPREC       0:NONE  1:DIAGSC  2:ILU  3: AS 4: RAS 5,6: variants
+-1                  ITRACE
+7                   IPREC       0:NONE  1:DIAGSC  2:ILU  3: AS 4: RAS 5,6: variants
 1                   ML
 1.d-6               EPS

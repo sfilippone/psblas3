@@ -169,6 +169,7 @@ function psb_dnrm2v(x, desc_a, info)
 
   m = desc_a%matrix_data(psb_m_)
 
+
   call psb_chkvect(m,1,size(x),ix,jx,desc_a%matrix_data,info,iix,jjx)
   if(info.ne.0) then
      info=4010

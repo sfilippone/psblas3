@@ -375,7 +375,7 @@ Subroutine psb_dcgstab(a,prec,b,x,eps,desc_a,info,&
 9999 continue
   call psb_erractionrestore(err_act)
   if (err_act.eq.act_abort) then
-     call psb_error()
+     call psb_error(icontxt)
      return
   end if
   return
