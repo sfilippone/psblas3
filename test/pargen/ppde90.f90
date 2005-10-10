@@ -121,6 +121,8 @@ program pde90
      goto 9999
   end if
 
+  call psb_csprt(30,a)
+
   call dgamx2d(icontxt,'a',' ',ione, ione,t2,ione,t1,t1,-1,-1,-1)
   if (iam.eq.0) write(*,'("Overall matrix creation time : ",es10.4)')t2
   if (iam.eq.0) write(*,'(" ")')
@@ -150,7 +152,10 @@ program pde90
      call psb_precset(pre,ptype,iv=(/novr,halo_,none_/))
      ptype='ml'
      call psb_precset(pre,ptype,&
-          &iv=(/add_ml_prec_,glb_aggr_,pre_smooth_,igsmth,matop/),rs=0.d0)
+          &iv=(/add_ml_prec_,loc_aggr_,no_smth_,mat_repl_,&
+          &    pre_smooth_,igsmth/),rs=0.d0)
+!!$     call psb_precset(pre,ptype,&
+!!$          &iv=(/add_ml_prec_,glb_aggr_,pre_smooth_,igsmth,matop/),rs=0.d0)
   case(ras2lvm_) 
      ptype='asm'
      call psb_precset(pre,ptype,iv=(/novr,halo_,none_/))
@@ -489,14 +494,14 @@ contains
     ! loop over rows belonging to current process in a block
     ! distribution.
 
-    row_mat%ia2(1)=1    
+!    row_mat%ia2(1)=1    
     do glob_row = 1, n
       call parts(glob_row,n,nprow,prv,nv)
       do inv = 1, nv
         indx_owner = prv(inv)
         if (indx_owner == myprow) then
           ! local matrix pointer 
-          element=0
+          element=1
           ! compute gridpoint coordinates
           if (mod(glob_row,(idim*idim)).eq.0) then
             x = glob_row/(idim*idim)
@@ -515,122 +520,122 @@ contains
           glob_z=z*deltah
 
           ! check on boundary points 
-          if (x.eq.1) then
-            element=element+1
-            row_mat%aspk(element)=one
-            row_mat%ia2(element)=(x-1)*idim*idim+(y-1)*idim+(z)
-            row_mat%ia1(element)=glob_row
-          else if (y.eq.1) then
-            element=element+1
-            row_mat%aspk(element)=one
-            row_mat%ia2(element)=(x-1)*idim*idim+(y-1)*idim+(z)
-            row_mat%ia1(element)=glob_row
-          else if (z.eq.1) then
-            element=element+1
-            row_mat%aspk(element)=one
-            row_mat%ia2(element)=(x-1)*idim*idim+(y-1)*idim+(z)
-            row_mat%ia1(element)=glob_row
-          else if (x.eq.idim) then
-            element=element+1
-            row_mat%aspk(element)=one
-            row_mat%ia2(element)=(x-1)*idim*idim+(y-1)*idim+(z)
-            row_mat%ia1(element)=glob_row
-          else if (y.eq.idim) then
-            element=element+1
-            row_mat%aspk(element)=one
-            row_mat%ia2(element)=(x-1)*idim*idim+(y-1)*idim+(z)
-            row_mat%ia1(element)=glob_row
-          else if (z.eq.idim) then
-            element=element+1
-            row_mat%aspk(element)=one
-            row_mat%ia2(element)=(x-1)*idim*idim+(y-1)*idim+(z)
-            row_mat%ia1(element)=glob_row
+          zt(1) = 0.d0
+          ! internal point: build discretization
+          !   
+          !  term depending on   (x-1,y,z)
+          !
+          if (x==1) then 
+             row_mat%aspk(element)=-b1(glob_x,glob_y,glob_z)&
+                  & -a1(glob_x,glob_y,glob_z)
+             row_mat%aspk(element) = row_mat%aspk(element)/(deltah*&
+                  & deltah)
+             zt(1) = exp(-glob_y**2-glob_z**2)*(-row_mat%aspk(element))
           else
-            ! internal point: build discretization
-            !   
-            !  term depending on   (x-1,y,z)
-            !
-            element=element+1
-            row_mat%aspk(element)=-b1(glob_x,glob_y,glob_z)&
-                 & -a1(glob_x,glob_y,glob_z)
-            row_mat%aspk(element) = row_mat%aspk(element)/(deltah*&
-                 & deltah)
-            row_mat%ia2(element)=(x-2)*idim*idim+(y-1)*idim+(z)
-            row_mat%ia1(element)=glob_row
-            !  term depending on     (x,y-1,z)
-            element=element+1
-            row_mat%aspk(element)=-b2(glob_x,glob_y,glob_z)&
-                 & -a2(glob_x,glob_y,glob_z)
-            row_mat%aspk(element) = row_mat%aspk(element)/(deltah*&
-                 & deltah)
-            row_mat%ia2(element)=(x-1)*idim*idim+(y-2)*idim+(z)
-            row_mat%ia1(element)=glob_row
-            !  term depending on     (x,y,z-1)
-            element=element+1
-            row_mat%aspk(element)=-b3(glob_x,glob_y,glob_z)&
-                 & -a3(glob_x,glob_y,glob_z)
-            row_mat%aspk(element) = row_mat%aspk(element)/(deltah*&
-                 & deltah)
-            row_mat%ia2(element)=(x-1)*idim*idim+(y-1)*idim+(z-1)
-            row_mat%ia1(element)=glob_row
-            !  term depending on     (x,y,z)
-            element=element+1
-            row_mat%aspk(element)=2*b1(glob_x,glob_y,glob_z)&
-                 & +2*b2(glob_x,glob_y,glob_z)&
-                 & +2*b3(glob_x,glob_y,glob_z)&
-                 & +a1(glob_x,glob_y,glob_z)&
-                 & +a2(glob_x,glob_y,glob_z)&
-                 & +a3(glob_x,glob_y,glob_z)
-            row_mat%aspk(element) = row_mat%aspk(element)/(deltah*&
-                 & deltah)
-            row_mat%ia2(element)=(x-1)*idim*idim+(y-1)*idim+(z)
-            row_mat%ia1(element)=glob_row
-            !  term depending on     (x,y,z+1)
-            element=element+1                  
-            row_mat%aspk(element)=-b1(glob_x,glob_y,glob_z)
-            row_mat%aspk(element) = row_mat%aspk(element)/(deltah*&
-                 & deltah)
-            row_mat%ia2(element)=(x-1)*idim*idim+(y-1)*idim+(z+1)
-            row_mat%ia1(element)=glob_row
-            !  term depending on     (x,y+1,z)
-            element=element+1
-            row_mat%aspk(element)=-b2(glob_x,glob_y,glob_z)
-            row_mat%aspk(element) = row_mat%aspk(element)/(deltah*&
-                 & deltah)
-            row_mat%ia2(element)=(x-1)*idim*idim+(y)*idim+(z)
-            row_mat%ia1(element)=glob_row
-            !  term depending on     (x+1,y,z)
-            element=element+1
-            row_mat%aspk(element)=-b3(glob_x,glob_y,glob_z)
-            row_mat%aspk(element) = row_mat%aspk(element)/(deltah*&
-                 & deltah)
-            row_mat%ia2(element)=(x)*idim*idim+(y-1)*idim+(z)
-            row_mat%ia1(element)=glob_row
+             row_mat%aspk(element)=-b1(glob_x,glob_y,glob_z)&
+                  & -a1(glob_x,glob_y,glob_z)
+             row_mat%aspk(element) = row_mat%aspk(element)/(deltah*&
+                  & deltah)
+             row_mat%ia2(element)=(x-2)*idim*idim+(y-1)*idim+(z)
+             element=element+1
+          endif
+          !  term depending on     (x,y-1,z)
+          if (y==1) then 
+             row_mat%aspk(element)=-b2(glob_x,glob_y,glob_z)&
+                  & -a2(glob_x,glob_y,glob_z)
+             row_mat%aspk(element) = row_mat%aspk(element)/(deltah*&
+                  & deltah)
+             zt(1) = exp(-glob_y**2-glob_z**2)*exp(-glob_x)*(-row_mat%aspk(element))  
+          else
+             row_mat%aspk(element)=-b2(glob_x,glob_y,glob_z)&
+                  & -a2(glob_x,glob_y,glob_z)
+             row_mat%aspk(element) = row_mat%aspk(element)/(deltah*&
+                  & deltah)
+             row_mat%ia2(element)=(x-1)*idim*idim+(y-2)*idim+(z)
+             element=element+1
+          endif
+          !  term depending on     (x,y,z-1)
+          if (z==1) then 
+             row_mat%aspk(element)=-b3(glob_x,glob_y,glob_z)&
+                  & -a3(glob_x,glob_y,glob_z)
+             row_mat%aspk(element) = row_mat%aspk(element)/(deltah*&
+                  & deltah)
+             zt(1) = exp(-glob_y**2-glob_z**2)*exp(-glob_x)*(-row_mat%aspk(element))  
+          else
+             row_mat%aspk(element)=-b3(glob_x,glob_y,glob_z)&
+                  & -a3(glob_x,glob_y,glob_z)
+             row_mat%aspk(element) = row_mat%aspk(element)/(deltah*&
+                  & deltah)
+             row_mat%ia2(element)=(x-1)*idim*idim+(y-1)*idim+(z-1)
+             element=element+1
+          endif
+          !  term depending on     (x,y,z)
+          row_mat%aspk(element)=2*b1(glob_x,glob_y,glob_z)&
+               & +2*b2(glob_x,glob_y,glob_z)&
+               & +2*b3(glob_x,glob_y,glob_z)&
+               & +a1(glob_x,glob_y,glob_z)&
+               & +a2(glob_x,glob_y,glob_z)&
+               & +a3(glob_x,glob_y,glob_z)
+          row_mat%aspk(element) = row_mat%aspk(element)/(deltah*&
+               & deltah)
+          row_mat%ia2(element)=(x-1)*idim*idim+(y-1)*idim+(z)
+          element=element+1                  
+          !  term depending on     (x,y,z+1)
+          if (z==idim) then 
+             row_mat%aspk(element)=-b1(glob_x,glob_y,glob_z)
+             row_mat%aspk(element) = row_mat%aspk(element)/(deltah*&
+                  & deltah)
+             zt(1) = exp(-glob_y**2-glob_z**2)*exp(-glob_x)*(-row_mat%aspk(element))  
+          else
+             row_mat%aspk(element)=-b1(glob_x,glob_y,glob_z)
+             row_mat%aspk(element) = row_mat%aspk(element)/(deltah*&
+                  & deltah)
+             row_mat%ia2(element)=(x-1)*idim*idim+(y-1)*idim+(z+1)
+             element=element+1
+          endif
+          !  term depending on     (x,y+1,z)
+          if (y==idim) then 
+             row_mat%aspk(element)=-b2(glob_x,glob_y,glob_z)
+             row_mat%aspk(element) = row_mat%aspk(element)/(deltah*&
+                  & deltah)
+             zt(1) = exp(-glob_y**2-glob_z**2)*exp(-glob_x)*(-row_mat%aspk(element))  
+          else
+             row_mat%aspk(element)=-b2(glob_x,glob_y,glob_z)
+             row_mat%aspk(element) = row_mat%aspk(element)/(deltah*&
+                  & deltah)
+             row_mat%ia2(element)=(x-1)*idim*idim+(y)*idim+(z)
+             element=element+1
+          endif
+          !  term depending on     (x+1,y,z)
+          if (x<idim) then 
+             row_mat%aspk(element)=-b3(glob_x,glob_y,glob_z)
+             row_mat%aspk(element) = row_mat%aspk(element)/(deltah*&
+                  & deltah)
+             row_mat%ia2(element)=(x)*idim*idim+(y-1)*idim+(z)
+             element=element+1
           endif
           row_mat%m=1
           row_mat%k=n
-          !          row_mat%ia2(2)=element       
-          ! ia== global row index
+          row_mat%ia1(1:element-1)=glob_row
           ia=glob_row
-!!$             ia=(x-1)*idim*idim+(y-1)*idim+(z)
-!!$        write(0,*) 'inserting row ',ia,' on proc',myprow
+
           t3 = mpi_wtime()
-          call psb_spins(element,row_mat%ia1,row_mat%ia2,row_mat%aspk,a,desc_a,info)
+          call psb_spins(element-1,row_mat%ia1,row_mat%ia2,row_mat%aspk,a,desc_a,info)
           if(info.ne.0) exit
           tins = tins + (mpi_wtime()-t3)
           ! build rhs  
-          if (x==1) then     
-            glob_y=(y-idim/2)*deltah
-            glob_z=(z-idim/2)*deltah        
-            zt(1) = exp(-glob_y**2-glob_z**2)
-          else if ((y==1).or.(y==idim).or.(z==1).or.(z==idim)) then 
-            glob_x=3*(x-1)*deltah
-            glob_y=(y-idim/2)*deltah
-            glob_z=(z-idim/2)*deltah        
-            zt(1) = exp(-glob_y**2-glob_z**2)*exp(-glob_x)
-          else
-            zt(1) = 0.d0
-          endif
+!!$          if (x==1) then     
+!!$            glob_y=(y-idim/2)*deltah
+!!$            glob_z=(z-idim/2)*deltah        
+!!$            zt(1) = exp(-glob_y**2-glob_z**2)
+!!$          else if ((y==1).or.(y==idim).or.(z==1).or.(z==idim)) then 
+!!$            glob_x=3*(x-1)*deltah
+!!$            glob_y=(y-idim/2)*deltah
+!!$            glob_z=(z-idim/2)*deltah        
+!!$            zt(1) = exp(-glob_y**2-glob_z**2)*exp(-glob_x)
+!!$          else
+!!$            zt(1) = 0.d0
+!!$          endif
           call psb_ins(1,b,ia,zt(1:1),desc_a,info)
           if(info.ne.0) exit
           zt(1)=0.d0
