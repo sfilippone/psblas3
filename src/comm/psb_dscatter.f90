@@ -23,8 +23,8 @@ subroutine  psb_dscatterm(globx, locx, desc_a, info, iroot,&
   use psb_descriptor_type
   use psb_check_mod
   use psb_error_mod
+  use mpi
   implicit none
-  include 'mpif.h'
 
   real(kind(1.d0)), intent(out)    :: locx(:,:)
   real(kind(1.d0)), intent(in)     :: globx(:,:)
@@ -183,7 +183,7 @@ subroutine  psb_dscatterm(globx, locx, desc_a, info, iroot,&
   end if
      
   call mpi_gatherv(desc_a%loc_to_glob,nrow,&
-       & mpi_integer,l_t_g_all,sum(all_dim),&
+       & mpi_integer,l_t_g_all,all_dim,&
        & displ,mpi_integer,rootrank,icomm,info)
 
   
@@ -200,7 +200,7 @@ subroutine  psb_dscatterm(globx, locx, desc_a, info, iroot,&
      end if
      
      ! scatter !!!
-     call mpi_scatterv(scatterv,sum(all_dim),displ,&
+     call mpi_scatterv(scatterv,all_dim,displ,&
           & mpi_double_precision,locx(1,jlocx+c-1),nrow,&
           & mpi_double_precision,rootrank,icomm,info)
 
@@ -242,8 +242,8 @@ subroutine  psb_dscatterv(globx, locx, desc_a, info, iroot)
   use psb_descriptor_type
   use psb_check_mod
   use psb_error_mod
+  use mpi
   implicit none
-  include 'mpif.h'
 
   real(kind(1.d0)), intent(out)    :: locx(:)
   real(kind(1.d0)), intent(in)     :: globx(:)
@@ -354,7 +354,7 @@ subroutine  psb_dscatterv(globx, locx, desc_a, info, iroot)
   end if
      
   call mpi_gatherv(desc_a%loc_to_glob,nrow,&
-       & mpi_integer,l_t_g_all,sum(all_dim),&
+       & mpi_integer,l_t_g_all,all_dim,&
        & displ,mpi_integer,rootrank,icomm,info)
 
   ! prepare vector to scatter
@@ -368,7 +368,7 @@ subroutine  psb_dscatterv(globx, locx, desc_a, info, iroot)
      end do
   end if
 
-  call mpi_scatterv(scatterv,sum(all_dim),displ,&
+  call mpi_scatterv(scatterv,all_dim,displ,&
        & mpi_double_precision,locx,nrow,&
        & mpi_double_precision,rootrank,icomm,info)
 
