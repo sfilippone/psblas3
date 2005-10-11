@@ -121,8 +121,6 @@ program pde90
      goto 9999
   end if
 
-  call psb_csprt(30,a)
-
   call dgamx2d(icontxt,'a',' ',ione, ione,t2,ione,t1,t1,-1,-1,-1)
   if (iam.eq.0) write(*,'("Overall matrix creation time : ",es10.4)')t2
   if (iam.eq.0) write(*,'(" ")')

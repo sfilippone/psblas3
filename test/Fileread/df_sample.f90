@@ -30,47 +30,44 @@ program df_sample
   end interface   ! local variables
 
 
-  character, parameter  :: order='r'
+  ! sparse matrices
+  type(psb_dspmat_type) :: a, aux_a
+
+  ! preconditioner data
+  type(psb_dprec_type)  :: pre
+  integer               :: igsmth, matop, novr
+
+  ! dense matrices
+  real(kind(1.d0)), pointer       ::  aux_b(:,:), d(:)
   real(kind(1.d0)), pointer, save :: b_col(:), x_col(:), r_col(:), &
        & b_col_glob(:), x_col_glob(:), r_col_glob(:)
 
-  integer              :: iargc
-  real(kind(1.d0)) :: mpi_wtime, t1, t2, tprec, r_amax, b_amax,bb(1,1),&
-       &scale,resmx,resmxp
-  integer :: nrhs, nrow, n_row, dim, nv
-  logical :: amroot
-  integer, pointer :: ivg(:), ipv(:)
-
-  external iargc, mpi_wtime
-
-  ! sparse matrices
-  type(psb_dspmat_type) :: a, aux_a
-  type(psb_dprec_type)  :: pre
-
-  ! dense matrices
-  real(kind(1.d0)), pointer ::  aux_b(:,:), vdiag(:), d(:)
-
-
   ! communications data structure
-  type(psb_desc_type):: desc_a, desc_a_out
+  type(psb_desc_type):: desc_a
 
-  ! blacs parameters
-  integer            :: nprow, npcol, ictxt, iam, np, myprow, mypcol
+  ! blacs variables
+  integer               :: nprow, npcol, ictxt, iam, np, myprow, mypcol
+  character, parameter  :: order='r'
+  logical               :: amroot
 
   ! solver paramters
   integer            :: iter, itmax, ierr, itrace, ircode, ipart,&
-       & methd, istopc, ml, iprec, novr, igsmth, matop
+       & methd, istopc, iprec, ml
+  real(kind(1.d0))   :: err, eps
 
   character(len=5)   :: afmt
   character(len=20)  :: name
-  real(kind(1.d0))   :: err, eps
   integer   :: iparm(20)
 
   ! other variables
-  integer            :: i,info,j
+  integer            :: i,info,j,m_problem, nproc
   integer            :: internal, m,ii,nnzero
+  real(kind(1.d0)) :: mpi_wtime, t1, t2, tprec, r_amax, b_amax,&
+       &scale,resmx,resmxp
+  integer :: nrhs, nrow, n_row, dim, nv
+  integer, pointer :: ivg(:), ipv(:)
 
-  integer            :: m_problem, nproc
+  external mpi_wtime
   
 
   ! initialize blacs
@@ -228,8 +225,6 @@ program df_sample
      call psb_precset(pre,'ml',&
           &iv=(/add_ml_prec_,loc_aggr_,no_smth_,mat_repl_,&
           &    pre_smooth_,igsmth/),rs=0.d0)
-!!$     call psb_precset(pre,'ml',&
-!!$          &iv=(/add_ml_prec_,glb_aggr_,pre_smooth_,igsmth,matop/),rs=0.d0)
   case(ras2lvm_) 
      call psb_precset(pre,'asm',iv=(/novr,halo_,none_/))
      call psb_precset(pre,'ml',&
