@@ -16,6 +16,7 @@ subroutine psi_crea_ovr_elem(desc_overlap,ovr_elem)
 
   logical, parameter :: usetree=.true.
 
+  dim_ovr_elem=size(ovr_elem)
   i=1
   pnt_new_elem=1
   if (usetree)   call initpairsearchtree(info)
@@ -43,9 +44,9 @@ subroutine psi_crea_ovr_elem(desc_overlap,ovr_elem)
 
            !              ...check if overflow element_d array......
            if (pnt_new_elem.gt.dim_ovr_elem) then
-              dim=(3*size(ovr_elem))/2+2
+              dim_ovr_elem=(3*size(ovr_elem))/2+2
               write(0,*) 'calling realloc crea_ovr_elem',dim
-              call psb_realloc(dim,ovr_elem,info)
+              call psb_realloc(dim_ovr_elem,ovr_elem,info)
            endif
         else
            !              ....this point already exist in ovr_elem list
