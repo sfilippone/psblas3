@@ -627,8 +627,8 @@ subroutine psb_dmlprcaply(baseprecv,x,beta,y,desc_data,trans,work,info)
     !  Additive multilevel
     !
     t1 = mpi_wtime()
-    n_row=desc_data%matrix_data(psb_n_row_)
-    n_col=desc_data%matrix_data(psb_n_col_)
+    n_row = desc_data%matrix_data(psb_n_row_)
+    n_col = baseprecv(1)%desc_data%matrix_data(psb_n_col_)
     call psb_dbaseprcaply(baseprecv(1),x,beta,y,desc_data,trans,work,info)
     if(info /=0) goto 9999
 
@@ -717,7 +717,7 @@ subroutine psb_dmlprcaply(baseprecv,x,beta,y,desc_data,trans,work,info)
 
       t1    = mpi_wtime()
       n_row = desc_data%matrix_data(psb_n_row_)
-      n_col = desc_data%matrix_data(psb_n_col_)
+      n_col = baseprecv(1)%desc_data%matrix_data(psb_n_col_)
       nr2l  = baseprecv(2)%desc_data%matrix_data(psb_n_col_)
       nrg   = baseprecv(2)%desc_data%matrix_data(psb_n_row_)
       allocate(t2l(nr2l),w2l(nr2l),tx(n_col),ty(n_col))
@@ -805,8 +805,8 @@ subroutine psb_dmlprcaply(baseprecv,x,beta,y,desc_data,trans,work,info)
     case(pre_smooth_)
 
       t1 = mpi_wtime()
-      n_row=desc_data%matrix_data(psb_n_row_)
-      n_col=desc_data%matrix_data(psb_n_col_)
+      n_row = desc_data%matrix_data(psb_n_row_)
+      n_col = baseprecv(1)%desc_data%matrix_data(psb_n_col_)
       nr2l  = baseprecv(2)%desc_data%matrix_data(psb_n_col_)
       nrg   = baseprecv(2)%desc_data%matrix_data(psb_n_row_)
       allocate(t2l(nr2l),w2l(nr2l),tx(n_col),ty(n_col),tty(n_col))
