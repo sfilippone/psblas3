@@ -11,7 +11,7 @@ subroutine psb_dprecbld(a,p,desc_a,info,upd)
   Implicit None
 
   integer, intent(out)                       :: info
-  type(psb_dspmat_type), intent(in), target  :: a
+  type(psb_dspmat_type), target              :: a
   type(psb_dprec_type),intent(inout)         :: p
   type(psb_desc_type), intent(in)            :: desc_a
   character, intent(in), optional            :: upd
@@ -125,7 +125,7 @@ subroutine psb_dprecbld(a,p,desc_a,info,upd)
            call psb_errpush(info,name)
            goto 9999
         end if
-        call  psb_dgelp('n',a%Pl,p%baseprecv(1)%d,desc_a,info)
+        call  psb_gelp('n',a%pl,p%baseprecv(1)%d,desc_a,info)
         if(info /= 0) then
            info=4010
            ch_err='psb_dgelp'
@@ -239,13 +239,16 @@ subroutine psb_dprecbld(a,p,desc_a,info,upd)
     call psb_check_def(p%baseprecv(2)%iprcparm(jac_sweeps_),'Jacobi sweeps',&
          & 1,is_legal_jac_sweeps)
 
-     call psb_mlprec_bld(a,desc_a,p%baseprecv(2),info)
-     if(info /= 0) then
-        info=4010
-        ch_err='psb_mlprec_bld'
-        call psb_errpush(info,name,a_err=ch_err)
-        goto 9999
-     end if
+    call blacs_barrier(icontxt,'All') ! to be removed
+    write(0,'(i2," Calling mlprecbld")')me
+    call blacs_barrier(icontxt,'All') ! to be removed
+    call psb_mlprec_bld(a,desc_a,p%baseprecv(2),info)
+    if(info /= 0) then
+       info=4010
+       ch_err='psb_mlprec_bld'
+       call psb_errpush(info,name,a_err=ch_err)
+       goto 9999
+    end if
 
   endif
 
@@ -496,6 +499,8 @@ subroutine psb_mlprec_bld(a,desc_a,p,info)
        integer, intent(out)                      :: info
      end subroutine psb_dbldaggrmat
   end interface
+
+  integer :: icontxt, nprow, npcol, me, mycol
   
   name='psb_mlprec_bld'
   info=0

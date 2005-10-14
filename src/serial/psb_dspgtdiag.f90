@@ -68,6 +68,8 @@ subroutine psb_dspgtdiag(a,d,info)
  else if (a%fida == 'JAD') then 
 
     rng=min(a%m,a%k)
+    nrb=16
+    write(0,*)'in spgtdiag'
     do i=1, rng, nrb
        irb=min(i+nrb-1,rng)
        call psb_spgtrow(i,a,tmpa,info,lrw=irb)
@@ -86,6 +88,7 @@ subroutine psb_dspgtdiag(a,d,info)
        enddo
        
     end do
+    write(0,*)'leaving spgtdiag'
 
  end if
 

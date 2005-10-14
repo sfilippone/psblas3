@@ -104,6 +104,7 @@ CONTAINS
           write(*,'("Preconditioner       : ",i)')iprec
           if(iprec.gt.2) write(*,'("Overlapping levels   : ",i)')novr
           write(*,'("Iterative method     : ",a)')cmethd
+          write(*,'("Storage format       : ",a3)')afmt(1:3)
           write(*,'(" ")')
       else
         CALL PR_USAGE(0)

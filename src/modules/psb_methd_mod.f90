@@ -63,7 +63,6 @@ Module psb_methd_mod
       use psb_serial_mod
       use psb_descriptor_type
       Use psb_prec_type
-!!$  parameters 
       Type(psb_dspmat_type), Intent(in)  :: a
       Type(psb_desc_type), Intent(in)    :: desc_a
       type(psb_dprec_type), intent(in)   :: prec

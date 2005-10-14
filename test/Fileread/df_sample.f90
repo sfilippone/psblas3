@@ -64,8 +64,8 @@ program df_sample
   integer            :: internal, m,ii,nnzero
   real(kind(1.d0)) :: mpi_wtime, t1, t2, tprec, r_amax, b_amax,&
        &scale,resmx,resmxp
-  integer :: nrhs, nrow, n_row, dim, nv
-  integer, pointer :: ivg(:), ipv(:)
+  integer :: nrhs, nrow, n_row, dim, nv, ne
+  integer, pointer :: ivg(:), ipv(:), neigh(:)
 
   external mpi_wtime
   
@@ -260,6 +260,9 @@ program df_sample
   else if (cmethd.eq.'CGS') then
     call  psb_cgs(a,pre,b_col,x_col,eps,desc_a,info,& 
        & itmax,iter,err,itrace)     
+  else if (cmethd.eq.'CG') then
+    call  psb_cg(a,pre,b_col,x_col,eps,desc_a,info,& 
+       & itmax,iter,err,itrace)     
   else if (cmethd.eq.'BICGSTABL') then
     call  psb_bicgstabl(a,pre,b_col,x_col,eps,desc_a,info,& 
        & itmax,iter,err,ierr,itrace,ml)     
@@ -297,12 +300,12 @@ program df_sample
     if (amroot) then
       write(0,'(" ")')
       write(0,'("Saving x on file")')
-      write(20,*) 'matrix: ',mtrx_file
-      write(20,*) 'computed solution on ',nprow,' processors.'
-      write(20,*) 'iterations to convergence: ',iter
-      write(20,*) 'error indicator (infinity norm) on exit:', &
-           & ' ||r||/(||a||||x||+||b||) = ',err
-      write(20,*) 'max residual = ',resmx, resmxp
+!!$      write(20,*) 'matrix: ',mtrx_file
+!!$      write(20,*) 'computed solution on ',nprow,' processors.'
+!!$      write(20,*) 'iterations to convergence: ',iter
+!!$      write(20,*) 'error indicator (infinity norm) on exit:', &
+!!$           & ' ||r||/(||a||||x||+||b||) = ',err
+!!$      write(20,*) 'max residual = ',resmx, resmxp
       do i=1,m_problem
         write(20,998) i,x_col_glob(i),r_col_glob(i),b_col_glob(i)
       enddo

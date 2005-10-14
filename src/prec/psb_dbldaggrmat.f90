@@ -185,7 +185,6 @@ contains
       enddo
     end if
 
-
     call psb_fixcoo(b,info)
     if(info /= 0) then
       call psb_errpush(4010,name,a_err='fixcoo')

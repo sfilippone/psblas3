@@ -149,7 +149,6 @@ contains
         a%ia1(1:nzr)  = ia2_loc(1:nzr)
         tmp(1:nzr)    = ia1_loc(1:nzr)
       else
-        write(0,*) 'After DESYM: ',nzr,ia2_loc(1:10)
         do i=1,nzr
           a%aspk(i) = as_loc(i)
           a%ia1(i)  = ia2_loc(i)

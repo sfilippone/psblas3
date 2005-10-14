@@ -229,5 +229,22 @@ module psb_psblas_mod
      end subroutine psb_dspsv
   end interface
 
-  
+
+  interface psb_gelp
+     subroutine psb_dgelp(trans,iperm,x,desc_a,info)
+       use psb_descriptor_type
+       type(psb_desc_type), intent(in)      ::  desc_a
+       real(kind(1.d0)), intent(inout)      ::  x(:,:)
+       integer, intent(inout)               ::  iperm(:),info
+       character, intent(in)                ::  trans
+     end subroutine psb_dgelp
+     subroutine psb_dgelpv(trans,iperm,x,desc_a,info)
+       use psb_descriptor_type
+       type(psb_desc_type), intent(in)      ::  desc_a
+       real(kind(1.d0)), intent(inout)      ::  x(:)
+       integer, intent(inout)               ::  iperm(:),info
+       character, intent(in)                ::  trans
+     end subroutine psb_dgelpv
+  end interface
+     
 end module psb_psblas_mod

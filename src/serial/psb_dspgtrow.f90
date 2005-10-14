@@ -429,21 +429,38 @@ contains
           rb  = indices(i)-ipx       ! the row offset within the block
           npg = ja(k_pt+1)-ja(k_pt)  ! the number of rows in the block
 
-          do  col = ia2(blk), ia3(blk)-1 
-             k=k+1
-             b%aspk(nzb+k) = a%aspk(ja(col)+rb)
-             b%ia1(nzb+k)  = irw+i-1
-             b%ia2(nzb+k)  = ka(ja(col)+rb)
-          end do
-
+          if(associated(iren))then
+             do  col = ia2(blk), ia3(blk)-1 
+                k=k+1
+                b%aspk(nzb+k) = a%aspk(ja(col)+rb)
+                b%ia1(nzb+k)  = iren(irw+i-1)
+                b%ia2(nzb+k)  = iren(ka(ja(col)+rb))
+             end do
+          else
+             do  col = ia2(blk), ia3(blk)-1 
+                k=k+1
+                b%aspk(nzb+k) = a%aspk(ja(col)+rb)
+                b%ia1(nzb+k)  = irw+i-1
+                b%ia2(nzb+k)  = ka(ja(col)+rb)
+             end do
+          end if
           ! extract second part of the row from the csr tail
           row=ia3(blk)+rb
-          do j=ja(row), ja(row+1)-1
-             k=k+1
-             b%aspk(nzb+k) = a%aspk(j)
-             b%ia1(nzb+k)  = irw+i-1
-             b%ia2(nzb+k)  = ka(j)
-          end do
+          if(associated(iren))then
+             do j=ja(row), ja(row+1)-1
+                k=k+1
+                b%aspk(nzb+k) = a%aspk(j)
+                b%ia1(nzb+k)  = iren(irw+i-1)
+                b%ia2(nzb+k)  = iren(ka(j))
+             end do
+          else
+             do j=ja(row), ja(row+1)-1
+                k=k+1
+                b%aspk(nzb+k) = a%aspk(j)
+                b%ia1(nzb+k)  = irw+i-1
+                b%ia2(nzb+k)  = ka(j)
+             end do
+          end if
        end do
 
        b%infoa(psb_nnz_) = nzb+k
