@@ -1,31 +1,3 @@
-<<<<<<< variant A
-  /home/buttari/NUMERICAL/psblas-2.0/src/prec:
-  total used in directory 1000 available 4183416
-  drwxr-xr-x  2 buttari users   4096 Oct 14 11:26 CVS
-  -rw-r--r--  1 buttari users   9723 Sep  7 11:16 fort_slu_impl.c
-  -rw-r--r--  1 buttari users   3616 Oct 13 17:19 fort_slu_impl.o
-  -rw-r--r--  1 buttari users  20777 Sep  7 11:16 gps.f
-  -rw-r--r--  1 buttari users  47396 Oct 13 17:19 gps.o
-  -rw-r--r--  1 buttari users    623 Sep 12 17:38 Makefile
-  -rw-r--r--  1 buttari users  23481 Oct 13 20:40 psb_dbldaggrmat.f90
-  -rw-r--r--  1 buttari users 158084 Oct 13 20:40 psb_dbldaggrmat.o
-  -rw-r--r--  1 buttari users  19821 Sep 27 11:35 psb_dcslu.f90
-  -rw-r--r--  1 buttari users 109004 Oct 13 17:19 psb_dcslu.o
-  -rw-r--r--  1 buttari users   6503 Sep 12 14:28 psb_dcsrsetup.f90
-  -rw-r--r--  1 buttari users  15096 Oct 13 17:19 psb_dcsrsetup.o
-  -rw-r--r--  1 buttari users   6868 Oct 14 10:38 psb_dgenaggrmap.f90
-  -rw-r--r--  1 buttari users  37432 Oct 14 10:39 psb_dgenaggrmap.o
-  -rw-r--r--  1 buttari users  17221 Oct 14 10:38 psb_dprecbld.f90
-  -rw-r--r--  1 buttari users 111376 Oct 14 10:39 psb_dprecbld.o
-  -rw-r--r--  1 buttari users  27689 Oct 13 12:40 psb_dprec.f90
-  -rw-r--r--  1 buttari users   1669 Oct  7 16:25 psb_dprecfree.f90
-  -rw-r--r--  1 buttari users   5632 Oct 13 17:19 psb_dprecfree.o
-  -rw-r--r--  1 buttari users 200168 Oct 13 17:19 psb_dprec.o
-  -rw-r--r--  1 buttari users   5353 Sep 30 14:29 psb_dprecset.f90
-  -rw-r--r--  1 buttari users  72964 Oct 13 17:19 psb_dprecset.o
-  -rw-r--r--  1 buttari users  11328 Oct  5 17:28 psb_dsplu.f90
-  -rw-r--r--  1 buttari users  44108 Oct 13 17:19 psb_dsplu.o
->>>>>>> variant B
 subroutine psb_dprecaply(prec,x,y,desc_data,info,trans, work)
 
   use psb_serial_mod
@@ -1970,5 +1942,3 @@ subroutine psb_dprecaply1(prec,x,desc_data,info,trans)
   end if
   return
 end subroutine psb_dprecaply1
-
-======= end
