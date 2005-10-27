@@ -143,9 +143,8 @@ Subroutine psb_dcsrsetup(ptype,novr,a,blk,desc_data,upd,desc_p,info,outfmt)
 !!$
 
     Call blacs_gridinfo(icontxt,nprow,npcol,me,mycol)
-    If(debug)Write(0,*)'BEGIN dcsrsetup',me,upd
+    If(debug)Write(0,*)'BEGIN dcsrsetup',me,upd,novr
     t1 = mpi_wtime()
-
 
     If (upd == 'F') Then
       !

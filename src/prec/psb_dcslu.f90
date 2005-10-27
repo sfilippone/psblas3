@@ -45,7 +45,7 @@ subroutine psb_dcslu(a,desc_a,p,upd,info)
   external  mpi_wtime
   logical, parameter :: debugprt=.false., debug=.false., aggr_dump=.false.
   integer   istpb, istpe, ifctb, ifcte, err_act, irank, icomm, nztota, nztotb,&
-       & nztmp, nzl, nnr, ir, mglob, mtype, n_row, nrow_a,n_col, nhalo,lovr
+       & nztmp, nzl, nnr, ir, mglob, mtype, n_row, nrow_a,n_col, nhalo,lovr, ind, iind, pi,nr,ns
   integer ::icontxt,nprow,npcol,me,mycol
   character(len=20)      :: name, ch_err
 
@@ -176,8 +176,6 @@ subroutine psb_dcslu(a,desc_a,p,upd,info)
      call blacs_barrier(icontxt,'All')
   endif
 
-!  if (me==0) write(0,*) 'setup time',t2-t1, blck%fida, p%iprcparm(p_type_),blck%m,upd
-!    write(0,'(i3,1x,a,4(1x,g14.5))') me,' setup time',t2-t1
 
   if (p%iprcparm(iren_) > 0) then 
 
@@ -208,6 +206,7 @@ subroutine psb_dcslu(a,desc_a,p,upd,info)
 
      t3 = mpi_wtime()
      if (debugprt) then 
+        call blacs_barrier(icontxt,'All')
         open(40+me) 
         call psb_csprt(40+me,atmp,head='% Local matrix')
         close(40+me)
@@ -239,12 +238,12 @@ subroutine psb_dcslu(a,desc_a,p,upd,info)
 
   else if (p%iprcparm(iren_) == 0) then
      t3 = mpi_wtime()
-!    ierr = MPE_Log_event( ifctb, 0, "st SIMPLE" )
      ! This is where we have mo renumbering, thus no need 
      ! for ATMP
 
      if (debugprt) then 
         open(40+me)
+        call blacs_barrier(icontxt,'All')
         call psb_csprt(40+me,a,iv=p%desc_data%loc_to_glob,&
              &    head='% Local matrix')
         if (p%iprcparm(p_type_)==asm_) then 
@@ -253,8 +252,6 @@ subroutine psb_dcslu(a,desc_a,p,upd,info)
         endif
         close(40+me)
      endif
-
-
 
      t5= mpi_wtime()
      if (debug) write(0,*) me,' Going for dsplu'

@@ -239,9 +239,6 @@ subroutine psb_dprecbld(a,p,desc_a,info,upd)
     call psb_check_def(p%baseprecv(2)%iprcparm(jac_sweeps_),'Jacobi sweeps',&
          & 1,is_legal_jac_sweeps)
 
-    call blacs_barrier(icontxt,'All') ! to be removed
-    write(0,'(i2," Calling mlprecbld")')me
-    call blacs_barrier(icontxt,'All') ! to be removed
     call psb_mlprec_bld(a,desc_a,p%baseprecv(2),info)
     if(info /= 0) then
        info=4010
