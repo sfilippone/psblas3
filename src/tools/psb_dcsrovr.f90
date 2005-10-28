@@ -21,7 +21,7 @@ Subroutine psb_dcsrovr(a,desc_a,blk,info,rwcnv,clcnv,outfmt)
   use psb_descriptor_type
   Use psb_prec_type
   use psb_realloc_mod
-  use psb_tools_mod, only : psb_glob_to_loc, psb_loc_to_glob
+  use psb_tools_mod, only : psb_glob_to_loc, psb_loc_to_glob, psb_spfree
   use psb_error_mod
 
   Implicit None
@@ -48,6 +48,7 @@ Subroutine psb_dcsrovr(a,desc_a,blk,info,rwcnv,clcnv,outfmt)
   real(kind(1.d0)) :: t1,t2,t3,t4,t5,t6,t7,t8,t9
   character(len=20)   :: name, ch_err
 
+  if(psb_get_errstatus().ne.0) return 
   info=0
   name='psb_dcsrovr'
   call psb_erractionsave(err_act)

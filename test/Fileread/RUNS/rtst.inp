@@ -1,13 +1,13 @@
 11                  Number of inputs
-bcsstk35.mtx      This (and others) from: http://math.nist.gov/MatrixMarket/ 
+kivap001.mtx      This (and others) from: http://math.nist.gov/MatrixMarket/ 
 NONE
-CGS        
+BICGSTAB   
 ILU                 !!!! Actually, it's IPREC below. Should take this line out.
 CSR
-2                   IPART: Partition method
+1                   IPART: Partition method
 1                   ISTOPC
 00800               ITMAX
 6                   ITRACE
-7                   IPREC       0:NONE  1:DIAGSC  2:ILU  3: AS 4: RAS 5,6: variants
+4                   IPREC       0:NONE  1:DIAGSC  2:ILU  3: AS 4: RAS 5,6: variants
 1                   ML
-1.d-6               EPS
+1.d-7               EPS

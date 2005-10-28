@@ -38,6 +38,7 @@ subroutine psb_iins(m, n, x, ix, jx, blck, desc_a, info,&
   integer                :: nprow,npcol, myrow ,mycol, int_err(5),err_act
   character(len=20)   :: name, ch_err
 
+  if(psb_get_errstatus().ne.0) return 
   info=0
   call psb_erractionsave(err_act)
   name = 'psb_iins'
@@ -209,6 +210,7 @@ subroutine psb_iinsvm(m, x, ix, jx, blck, desc_a, info,&
   integer                :: nprow,npcol, myrow ,mycol
   character(len=20)   :: name, ch_err
 
+  if(psb_get_errstatus().ne.0) return 
   info=0
   name = 'psb_iinsvm'
   call psb_erractionsave(err_act)
@@ -294,6 +296,7 @@ subroutine psb_iinsvv(m, x, ix, blck, desc_a, info,&
   integer                :: nprow,npcol, myrow ,mycol
   character(len=20)   :: name, ch_err
 
+  if(psb_get_errstatus().ne.0) return 
   info=0
   name = 'psb_iinsvv'
   call psb_erractionsave(err_act)

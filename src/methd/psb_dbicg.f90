@@ -77,7 +77,6 @@ subroutine psb_dbicg(a,prec,b,x,eps,desc_a,info,&
   character     ::diagl, diagu
   logical, parameter :: debug = .false.
   logical, parameter :: exchange=.true., noexchange=.false.  
-  integer, parameter :: ione=1
   integer, parameter :: irmax = 8
   integer            :: itx, i, isvch, ich, icontxt
   logical            :: do_renum_left

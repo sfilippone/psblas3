@@ -255,8 +255,7 @@ subroutine psb_dbaseprcaply(prec,x,beta,y,desc_data,trans,work,info)
     end if
 
     if (prec%iprcparm(iren_)>0) then 
-!!$      call psb_dgelp('N',n_row,1,prec%perm,tx,isz,ww,isz,info)
-      info = -1
+      call dgelp('N',n_row,1,prec%perm,tx,isz,ww,isz,info)
       if(info /=0) then
          info=4010
          ch_err='psb_dgelp'
@@ -267,8 +266,7 @@ subroutine psb_dbaseprcaply(prec,x,beta,y,desc_data,trans,work,info)
     call psb_dbjacaply(prec,tx,zero,ty,prec%desc_data,trans,aux,info)
 
     if (prec%iprcparm(iren_)>0) then 
-!!$      call psb_dgelp('N',n_row,1,prec%invperm,ty,isz,ww,isz,info)
-      info = -1 
+      call dgelp('N',n_row,1,prec%invperm,ty,isz,ww,isz,info)
       if(info /=0) then
          info=4010
          ch_err='psb_dgelp'

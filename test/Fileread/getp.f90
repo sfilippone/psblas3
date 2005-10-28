@@ -98,12 +98,12 @@ CONTAINS
         CALL IGEBS2D(ICONTXT,'ALL',' ',6,1,INPARMS,6)
         CALL DGEBS2D(ICONTXT,'ALL',' ',1,1,EPS,1)
 
-          write(*,'("Solving matrix       : ",a)')mtrx_file      
-          write(*,'("Number of processors : ",i)')nprow
+          write(*,'("Solving matrix       : ",a20)')mtrx_file      
+          write(*,'("Number of processors : ",i3)')nprow
           write(*,'("Data distribution    : ",i2)')ipart
-          write(*,'("Preconditioner       : ",i)')iprec
-          if(iprec.gt.2) write(*,'("Overlapping levels   : ",i)')novr
-          write(*,'("Iterative method     : ",a)')cmethd
+          write(*,'("Preconditioner       : ",i2)')iprec
+          if(iprec.gt.2) write(*,'("Overlapping levels   : ",i2)')novr
+          write(*,'("Iterative method     : ",a20)')cmethd
           write(*,'("Storage format       : ",a3)')afmt(1:3)
           write(*,'(" ")')
       else

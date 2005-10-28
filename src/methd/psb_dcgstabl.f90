@@ -83,7 +83,6 @@ Subroutine psb_dcgstabl(a,prec,b,x,eps,desc_a,info,&
        & nprows,npcols,me,mecol, n_row, n_col, nl, err_act
   Character     ::diagl, diagu
   Logical, Parameter :: exchange=.True., noexchange=.False.  
-  Integer, Parameter :: ione=1
   Integer, Parameter :: irmax = 8
   Integer            :: itx, i, isvch, ich, icontxt,listop,j, int_err(5)
   Logical            :: do_renum_left

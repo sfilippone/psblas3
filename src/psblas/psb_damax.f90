@@ -35,6 +35,7 @@ function psb_damax (x,desc_a, info, jx)
   character(len=20)        :: name, ch_err
 
   name='psb_damax'
+  if(psb_get_errstatus().ne.0) return 
   info=0
   call psb_erractionsave(err_act)
 
@@ -137,6 +138,7 @@ function psb_damaxv (x,desc_a, info)
   character(len=20)        :: name, ch_err
 
   name='psb_damaxv'
+  if(psb_get_errstatus().ne.0) return 
   info=0
   call psb_erractionsave(err_act)
 
@@ -236,6 +238,7 @@ subroutine psb_damaxvs (res,x,desc_a, info)
   character(len=20)        :: name, ch_err
 
   name='psb_damaxvs'
+  if(psb_get_errstatus().ne.0) return 
   info=0
   call psb_erractionsave(err_act)
 
@@ -336,6 +339,7 @@ subroutine psb_dmamaxs (res,x,desc_a, info,jx)
   character(len=20)        :: name, ch_err
 
   name='psb_dmamaxs'
+  if(psb_get_errstatus().ne.0) return 
   info=0
   call psb_erractionsave(err_act)
 

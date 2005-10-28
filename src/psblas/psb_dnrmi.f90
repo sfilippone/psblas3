@@ -29,6 +29,7 @@ function psb_dnrmi(a,desc_a,info)
   character(len=20)        :: name, ch_err
 
   name='psb_dnrmi'
+  if(psb_get_errstatus().ne.0) return 
   info=0
   call psb_erractionsave(err_act)
 

@@ -28,7 +28,6 @@ subroutine psb_dgelp(trans,iperm,x,desc_a,info)
   real(kind(1.d0)),pointer ::  dtemp(:)
   integer                  :: int_err(5), i1sz, i2sz, dectype, i, err_act
   character(len=20)         :: itrans
-  integer, parameter  :: ione=1
   real(kind(1.d0)),parameter    :: one=1
   logical, parameter :: debug=.false.
 
@@ -53,6 +52,7 @@ subroutine psb_dgelp(trans,iperm,x,desc_a,info)
   character(len=20)   :: name, ch_err
   name = 'psb_dgelp'
 
+  if(psb_get_errstatus().ne.0) return 
   info=0
   call psb_erractionsave(err_act)
 
@@ -148,7 +148,6 @@ subroutine psb_dgelpv(trans,iperm,x,desc_a,info)
   real(kind(1.d0)),pointer ::  dtemp(:)
   double precision :: real_err(5)
   character :: itrans
-  integer, parameter  :: ione=1  
   real(kind(1.d0)),parameter    :: one=1
   logical, parameter :: debug=.false.
 
@@ -173,6 +172,7 @@ subroutine psb_dgelpv(trans,iperm,x,desc_a,info)
   character(len=20)   :: name, ch_err
   name = 'psb_dgelpv'
 
+  if(psb_get_errstatus().ne.0) return 
   info=0
   call psb_erractionsave(err_act)
 

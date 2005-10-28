@@ -35,6 +35,7 @@ subroutine psb_dalloc(m, n, x, desc_a, info, js)
   character(len=20)   :: name, ch_err
 
   name='psb_dallc'
+  if(psb_get_errstatus().ne.0) return 
   info=0
   err=0
   int_err(1)=0
@@ -193,6 +194,7 @@ subroutine psb_dallocv(m, x, desc_a,info)
   logical, parameter  :: debug=.false. 
   character(len=20)   :: name, ch_err
 
+  if(psb_get_errstatus().ne.0) return 
   info=0
   name='psb_dallcv'
   call psb_erractionsave(err_act)

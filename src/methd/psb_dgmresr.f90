@@ -85,7 +85,6 @@ Subroutine psb_dgmresr(a,prec,b,x,eps,desc_a,info,&
        & nprows,npcols,me,mecol, n_row, n_col, nl, int_err(5)
   Character     ::diagl, diagu
   Logical, Parameter :: exchange=.True., noexchange=.False.  
-  Integer, Parameter :: ione=1
   Integer, Parameter :: irmax = 8
   Integer            :: itx, i, isvch, ich, icontxt,listop, err_act
   Logical            :: do_renum_left,inner_stop

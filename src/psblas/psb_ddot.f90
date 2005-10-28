@@ -38,6 +38,7 @@ function psb_ddot(x, y,desc_a, info, jx, jy)
   character(len=20)        :: name, ch_err
 
   name='psb_ddot'
+  if(psb_get_errstatus().ne.0) return 
   info=0
   call psb_erractionsave(err_act)
 
@@ -167,6 +168,7 @@ function psb_ddotv(x, y,desc_a, info)
   character(len=20)        :: name, ch_err
 
   name='psb_ddot'
+  if(psb_get_errstatus().ne.0) return 
   info=0
   call psb_erractionsave(err_act)
 
@@ -280,6 +282,7 @@ subroutine psb_ddotvs(res, x, y,desc_a, info)
   character(len=20)        :: name, ch_err
 
   name='psb_ddot'
+  if(psb_get_errstatus().ne.0) return 
   info=0
   call psb_erractionsave(err_act)
 
@@ -395,6 +398,7 @@ subroutine psb_dmdots(res, x, y, desc_a, info)
   character(len=20)        :: name, ch_err
 
   name='psb_dmdots'
+  if(psb_get_errstatus().ne.0) return 
   info=0
   call psb_erractionsave(err_act)
 

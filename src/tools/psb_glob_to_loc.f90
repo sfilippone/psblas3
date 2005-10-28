@@ -31,6 +31,7 @@ subroutine psb_glob_to_loc2(x,y,desc_a,info,iact)
   integer, parameter                 ::  zero=0
   character(len=20)   :: name, char_err
 
+  if(psb_get_errstatus().ne.0) return 
   info=0
   name = 'glob_to_loc'
   call psb_erractionsave(err_act)
@@ -133,6 +134,7 @@ subroutine psb_glob_to_loc(x,desc_a,info,iact)
   integer, parameter                 ::  zero=0
   character(len=20)   :: name, char_err
 
+  if(psb_get_errstatus().ne.0) return 
   info=0
   name = 'glob_to_loc'
   call psb_erractionsave(err_act)

@@ -24,11 +24,10 @@ subroutine psb_iasb(x, desc_a, info)
   integer, pointer ::  itemp(:,:)
   integer :: int_err(5), i1sz, i2sz, dectype, i
   real(kind(1.d0)) :: real_err(5)
-  integer, parameter  :: ione=1
-  real(kind(1.d0)),parameter    :: one=1
   logical, parameter :: debug=.false.
   character(len=20)   :: name, char_err
 
+  if(psb_get_errstatus().ne.0) return 
   info=0
   name='psb_iasb'
   call psb_erractionsave(err_act)
@@ -76,7 +75,7 @@ subroutine psb_iasb(x, desc_a, info)
   endif
   
   ! ..update halo elements..
-  call psb_halo(x,desc_a,info,alpha=one)
+  call psb_halo(x,desc_a,info,alpha=done)
 
   call psb_erractionrestore(err_act)
   return
@@ -117,11 +116,10 @@ subroutine psb_iasbv(x, desc_a, info)
   integer :: int_err(5), i1sz,nrow,ncol, dectype, i
   integer, pointer ::  itemp(:)
   real(kind(1.d0)) :: real_err(5)
-  integer, parameter  :: ione=1  
-  real(kind(1.d0)),parameter    :: one=1
   logical, parameter :: debug=.false.
   character(len=20)   :: name, ch_err
 
+  if(psb_get_errstatus().ne.0) return 
   info=0
   call psb_erractionsave(err_act)
   name = 'psb_iasbv'
@@ -162,7 +160,7 @@ subroutine psb_iasbv(x, desc_a, info)
   endif  
   
   ! ..update halo elements..
-  call psb_halo(x,desc_a,info,alpha=one)
+  call psb_halo(x,desc_a,info,alpha=done)
 
   call psb_erractionrestore(err_act)
   return

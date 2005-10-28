@@ -66,6 +66,7 @@ subroutine psb_dcsrp(trans,iperm,a, desc_a, info)
   n_row = desc_a%matrix_data(psb_n_row_)
   n_col = desc_a%matrix_data(psb_n_col_)
      
+  if(psb_get_errstatus().ne.0) return 
   info=0
   call psb_erractionsave(err_act)
   name = 'psd_csrp'
@@ -84,7 +85,7 @@ subroutine psb_dcsrp(trans,iperm,a, desc_a, info)
   endif
 
 
-  if (.not.is_asb_dec(dectype)) then 
+  if (.not.psb_is_asb_dec(dectype)) then 
     info = 600
     int_err(1) = dectype
     call psb_errpush(info,name,int_err)

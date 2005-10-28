@@ -36,6 +36,7 @@ subroutine psb_dscren(trans,iperm,desc_a,info)
   logical, parameter            :: debug=.false.
   character(len=20)             :: name, char_err
 
+  if(psb_get_errstatus().ne.0) return 
   info=0
   call psb_erractionsave(err_act)
   name = 'psb_dcren'

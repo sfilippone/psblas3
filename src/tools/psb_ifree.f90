@@ -24,9 +24,9 @@ subroutine psb_ifree(x, desc_a, info)
   integer             :: temp(1)
   real(kind(1.d0))    :: real_err(5)
   integer             :: icontxt,nprow,npcol,me,mypcol,err_act
-  integer,parameter   :: ione=1
   character(len=20)   :: name, ch_err
 
+  if(psb_get_errstatus().ne.0) return 
   info=0
   call psb_erractionsave(err_act)
   name = 'psb_ifree'
@@ -104,9 +104,9 @@ subroutine psb_ifreev(x, desc_a,info)
   integer             :: temp(1)
   real(kind(1.d0))    :: real_err(5)
   integer             :: icontxt,nprow,npcol,me,mypcol,err_act
-  integer,parameter   :: ione=1
   character(len=20)   :: name, ch_err
 
+  if(psb_get_errstatus().ne.0) return 
   info=0
   call psb_erractionsave(err_act)
   name = 'psb_ifreev'

@@ -76,7 +76,6 @@ Subroutine psb_dcg(a,prec,b,x,eps,desc_a,info,&
        & nprows,npcols,me,mecol, n_col, isvch, ich, icontxt, n_row,err_act, int_err(5)
   character          ::diagl, diagu
   logical, parameter :: exchange=.true., noexchange=.false.  
-  integer, parameter :: ione=1
   real(kind(1.d0)), parameter :: one=1.d0, zero=0.d0, epstol=1.d-35
   character(len=20)             :: name,ch_err
 

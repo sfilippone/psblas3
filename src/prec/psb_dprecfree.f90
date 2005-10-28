@@ -17,9 +17,9 @@ subroutine psb_dprecfree(p,info)
   integer             :: temp(1), me
   real(kind(1.d0))    :: real_err(5)
   integer             :: icontxt,err_act,i
-  integer,parameter   :: ione=1
   character(len=20)   :: name, ch_err
 
+  if(psb_get_errstatus().ne.0) return 
   info=0
   name = 'psdprecfree'
   call psb_erractionsave(err_act)

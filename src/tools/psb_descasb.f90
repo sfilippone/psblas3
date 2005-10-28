@@ -22,7 +22,7 @@ Subroutine psb_descasb(n_ovr,desc_p,desc_a,a,&
   use psb_serial_mod
   Use psi_mod
   use psb_realloc_mod
-  use psb_tools_mod, only : psb_descprt
+  use psb_tools_mod, only : psb_descprt, psb_spfree
   use psb_error_mod
   use psb_const_mod
   Implicit None
@@ -57,6 +57,7 @@ Subroutine psb_descasb(n_ovr,desc_p,desc_a,a,&
   real(kind(1.d0)) :: t1,t2,t3,t4,t5,t6,t7, tl, tch
   character(len=20)   :: name, ch_err
 
+  if(psb_get_errstatus().ne.0) return 
   info=0
   name='psb_descasb'
   call psb_erractionsave(err_act)
@@ -622,7 +623,8 @@ Subroutine psb_descasb(n_ovr,desc_p,desc_a,a,&
   end if
 
   ! Ok, register into MATRIX_DATA &  free temporary work areas
-  desc_a%matrix_data(psb_dec_type_) = psb_desc_asb_
+  write(0,*)'!!! verify this !!!'
+  desc_p%matrix_data(psb_dec_type_) = psb_desc_asb_
 
   allocate(desc_p%lprm(1))
   desc_p%lprm(1) = 0

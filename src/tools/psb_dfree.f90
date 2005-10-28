@@ -22,10 +22,10 @@ subroutine psb_dfree(x, desc_a, info)
   !...locals....
   integer             :: int_err(5)
   integer             :: icontxt,nprow,npcol,me,mypcol,err, err_act
-  integer,parameter   :: ione=1
   character(len=20)   :: name
 
 
+  if(psb_get_errstatus().ne.0) return 
   info=0
   call psb_erractionsave(err_act)
   name='psb_dfree'
@@ -107,10 +107,10 @@ subroutine psb_dfreev(x, desc_a, info)
   !...locals....
   integer             :: int_err(5)
   integer             :: icontxt,nprow,npcol,me,mypcol,err, err_act
-  integer,parameter   :: ione=1
   character(len=20)   :: name
 
 
+  if(psb_get_errstatus().ne.0) return 
   info=0
   call psb_erractionsave(err_act)
   name='psb_dfreev'

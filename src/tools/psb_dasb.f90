@@ -24,11 +24,11 @@ subroutine psb_dasb(x, desc_a, info)
   real(kind(1.d0)),pointer ::  dtemp(:,:)
   integer :: int_err(5), i1sz, i2sz, dectype, i,j
   double precision :: real_err(5)
-  integer, parameter  :: ione=1
   real(kind(1.d0)),parameter    :: one=1
   logical, parameter :: debug=.false.
   character(len=20)   :: name, ch_err
 
+  if(psb_get_errstatus().ne.0) return 
   info=0
   name='psb_dasb'
   call psb_erractionsave(err_act)
@@ -140,7 +140,6 @@ subroutine psb_dasbv(x, desc_a, info)
   integer :: int_err(5), i1sz,nrow,ncol, dectype, i, err_act
   real(kind(1.d0)),pointer ::  dtemp(:)
   double precision :: real_err(5)
-  integer, parameter  :: ione=1  
   real(kind(1.d0)),parameter    :: one=1
   logical, parameter :: debug=.false.
   character(len=20)             :: name,ch_err

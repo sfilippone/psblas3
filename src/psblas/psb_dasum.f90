@@ -35,6 +35,7 @@ function psb_dasum (x,desc_a, info, jx)
   character(len=20)        :: name, ch_err
 
   name='psb_dasum'
+  if(psb_get_errstatus().ne.0) return 
   info=0
   call psb_erractionsave(err_act)
 
@@ -155,6 +156,7 @@ function psb_dasumv (x,desc_a, info)
   character(len=20)        :: name, ch_err
 
   name='psb_dasumv'
+  if(psb_get_errstatus().ne.0) return 
   info=0
   call psb_erractionsave(err_act)
 
@@ -271,6 +273,7 @@ subroutine psb_dasumvs (res,x,desc_a, info)
   character(len=20)        :: name, ch_err
 
   name='psb_dasumvs'
+  if(psb_get_errstatus().ne.0) return 
   info=0
   call psb_erractionsave(err_act)
 

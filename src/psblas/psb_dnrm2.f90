@@ -34,6 +34,7 @@ function psb_dnrm2(x, desc_a, info, jx)
   character(len=20)        :: name, ch_err
 
   name='psb_dnrm2'
+  if(psb_get_errstatus().ne.0) return 
   info=0
   call psb_erractionsave(err_act)
 
@@ -146,6 +147,7 @@ function psb_dnrm2v(x, desc_a, info)
   character(len=20)        :: name, ch_err
 
   name='psb_dnrm2v'
+  if(psb_get_errstatus().ne.0) return 
   info=0
   call psb_erractionsave(err_act)
 
@@ -257,6 +259,7 @@ subroutine psb_dnrm2vs(res, x, desc_a, info)
   character(len=20)        :: name, ch_err
 
   name='psb_dnrm2'
+  if(psb_get_errstatus().ne.0) return 
   info=0
   call psb_erractionsave(err_act)
 

@@ -14,6 +14,7 @@ subroutine psi_sort_dl(dep_list,l_dep_list,np,info)
   character(len=20)        :: name, ch_err
   
   name='psi_sort_dl'
+  if(psb_get_errstatus().ne.0) return 
   info=0
   call psb_erractionsave(err_act)
   

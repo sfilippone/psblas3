@@ -30,6 +30,7 @@ subroutine psb_chkglobvect( m, n, lldx, ix, jx, desc_dec, info)
   integer           :: err_act, int_err(5)
   character(len=20) :: name, ch_err
 
+  if(psb_get_errstatus().ne.0) return 
   info=0
   name='psb_chkglobvect'
   call psb_erractionsave(err_act)

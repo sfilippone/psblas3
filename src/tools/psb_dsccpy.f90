@@ -27,10 +27,10 @@ subroutine psb_dsccpy(desc_out, desc_a, info)
        & icontxt, isz, dectype, err_act, err
   integer             :: int_err(5),temp(1)
   real(kind(1.d0))    :: real_err(5)
-  integer, parameter  :: ione=1, itwo=2,root=0
   logical, parameter  :: debug=.false.
   character(len=20)   :: name, char_err
 
+  if(psb_get_errstatus().ne.0) return 
   info=0
   call psb_erractionsave(err_act)
   name = 'psb_dsccpy'

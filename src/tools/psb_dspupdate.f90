@@ -61,6 +61,7 @@ subroutine psb_dspupdate(a, ia, ja, blck, desc_a,info,ix,jx,updflag)
   integer,pointer        ::  iworkaux(:)    
   character(len=20)   :: name, ch_err
 
+  if(psb_get_errstatus().ne.0) return 
   info=0
   name='psb_dspupdate'
   call psb_erractionsave(err_act)

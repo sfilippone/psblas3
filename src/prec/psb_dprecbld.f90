@@ -4,6 +4,7 @@ subroutine psb_dprecbld(a,p,desc_a,info,upd)
   Use psb_spmat_type
   use psb_descriptor_type
   use psb_prec_type
+  use psb_tools_mod
   use psb_comm_mod
   use psb_const_mod
   use psb_psblas_mod
@@ -70,6 +71,7 @@ subroutine psb_dprecbld(a,p,desc_a,info,upd)
   integer,parameter  :: iroot=0,iout=60,ilout=40
   character(len=20)   :: name, ch_err
 
+  if(psb_get_errstatus().ne.0) return 
   info=0
   err=0
   call psb_erractionsave(err_act)
@@ -307,6 +309,7 @@ subroutine psb_splu_bld(a,desc_a,p,info)
   use psb_serial_mod
   use psb_descriptor_type
   use psb_prec_type
+  use psb_tools_mod
   use psb_const_mod
   implicit none 
 
@@ -339,6 +342,7 @@ subroutine psb_splu_bld(a,desc_a,p,info)
     end Subroutine psb_dcsrsetup
  end interface
 
+  if(psb_get_errstatus().ne.0) return 
   info=0
   name='psb_splu_bld'
   call psb_erractionsave(err_act)
@@ -663,6 +667,7 @@ end subroutine psb_umf_bld
 subroutine psb_mlprec_bld(a,desc_a,p,info)
 
   use psb_serial_mod
+  use psb_tools_mod
   use psb_descriptor_type
   use psb_prec_type
   use psb_const_mod
@@ -716,6 +721,7 @@ subroutine psb_mlprec_bld(a,desc_a,p,info)
   integer :: icontxt, nprow, npcol, me, mycol
   
   name='psb_mlprec_bld'
+  if(psb_get_errstatus().ne.0) return 
   info=0
   call psb_erractionsave(err_act)
 

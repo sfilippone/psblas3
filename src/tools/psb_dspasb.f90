@@ -31,6 +31,21 @@ subroutine psb_dspasb(a,desc_a, info, afmt, up, dup)
      end subroutine psb_cest
   end interface
 
+  interface psb_spfree
+     subroutine psb_dspfree(a, desc_a,info)
+       use psb_descriptor_type
+       use psb_spmat_type
+       type(psb_desc_type), intent(in) :: desc_a
+       type(psb_dspmat_type), intent(inout)       ::a
+       integer, intent(out)        :: info
+     end subroutine psb_dspfree
+     subroutine psb_dspfrees(a,info)
+       use psb_spmat_type
+       type(psb_dspmat_type), intent(inout)       ::a
+       integer, intent(out)        :: info
+     end subroutine psb_dspfrees
+  end interface
+
   !...Parameters....
   type(psb_dspmat_type), intent (inout)   :: a
   type(psb_desc_type), intent(in)         :: desc_a

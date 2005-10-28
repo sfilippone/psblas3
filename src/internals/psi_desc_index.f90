@@ -17,7 +17,6 @@ subroutine psi_desc_index(desc_data,index_in,dep_list,&
   !c     ....local scalars...        
   integer :: j,me,np,npcol,mycol,i,proc,dim
   !c     ...parameters...
-  integer, parameter :: ione=1
   integer :: icontxt
   integer :: no_comm,err
   parameter (no_comm=-1)

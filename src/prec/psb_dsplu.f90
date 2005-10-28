@@ -108,7 +108,8 @@ contains
     character(len=20)   :: name, ch_err
 
     name='psb_dspluint'
-    info=0
+    if(psb_get_errstatus().ne.0) return 
+  info=0
     call psb_erractionsave(err_act)
 
     trw%m=0

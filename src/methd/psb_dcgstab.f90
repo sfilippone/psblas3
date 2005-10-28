@@ -75,7 +75,6 @@ Subroutine psb_dcgstab(a,prec,b,x,eps,desc_a,info,&
   Character     ::diagl, diagu
   Logical, Parameter :: debug = .false.
   Logical, Parameter :: exchange=.True., noexchange=.False., debug1 = .False.
-  Integer, Parameter :: ione=1
   Integer, Parameter :: irmax = 8
   Integer            :: itx, i, isvch, ich, icontxt, err_act, int_err(5),ii
   Integer            :: listop

@@ -20,6 +20,7 @@ subroutine psb_dgenaggrmap(aggr_type,a,desc_a,nlaggr,ilaggr,info)
   integer, parameter :: one=1, two=2
   character(len=20)   :: name, ch_err
 
+  if(psb_get_errstatus().ne.0) return 
   info=0
   name = 'psb_bldaggrmat'
   call psb_erractionsave(err_act)

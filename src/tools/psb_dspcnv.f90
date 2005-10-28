@@ -77,13 +77,13 @@ subroutine psb_dspcnv(a,b,desc_a,info)
   integer                       ::  lwork_dcsdp,dectype
   integer                       ::  icontxt,temp(1),n_row
   character                     ::  check*1, trans*1, unitd*1
-  integer, parameter            ::  ione=1
 
   real(kind(1.d0))              :: time(10), mpi_wtime
   external mpi_wtime
   logical, parameter :: debug=.false.
   character(len=20)   :: name, ch_err
 
+  if(psb_get_errstatus().ne.0) return 
   info=0
   name = 'psb_dspcnv'
   call psb_erractionsave(err_act)

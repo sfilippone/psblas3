@@ -95,12 +95,12 @@ subroutine psb_dscdec(nloc, icontxt, desc_a, info)
        & l_ov_ix,l_ov_el,idx, flag_, err_act,m, ip
   Integer              :: INT_ERR(5),TEMP(1),EXCH(2)
   Real(Kind(1.d0))     :: REAL_ERR(5)
-  Integer, Parameter   :: IONE=1, ITWO=2,ROOT=0
   Integer, Pointer     :: temp_ovrlap(:), ov_idx(:), ov_el(:)
   integer, allocatable :: nlv(:)
   logical, parameter   :: debug=.false.
   character(len=20)    :: name, ch_err
 
+  if(psb_get_errstatus().ne.0) return 
   info=0
   err=0
   name = 'psb_dscdec'

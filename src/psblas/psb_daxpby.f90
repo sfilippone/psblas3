@@ -40,6 +40,7 @@ subroutine  psb_daxpby(alpha, x, beta,y,desc_a,info, n, jx, jy)
   character(len=20)        :: name, ch_err
 
   name='psb_daxpby'
+  if(psb_get_errstatus().ne.0) return 
   info=0
   call psb_erractionsave(err_act)
 
@@ -165,6 +166,7 @@ subroutine  psb_daxpbyv(alpha, x, beta,y,desc_a,info)
   character(len=20)        :: name, ch_err
 
   name='psb_daxpby'
+  if(psb_get_errstatus().ne.0) return 
   info=0
   call psb_erractionsave(err_act)
 

@@ -40,6 +40,7 @@ subroutine psb_dins(m, n, x, ix, jx, blck, desc_a, info,&
   character              :: temp_descra*11,temp_fida*5
   character(len=20)   :: name, char_err
 
+  if(psb_get_errstatus().ne.0) return 
   info=0
   call psb_erractionsave(err_act)
   name = 'psb_dins'
@@ -210,6 +211,7 @@ subroutine psb_dinsvm(m, x, ix, jx, blck, desc_a,info,&
   integer                :: nprow,npcol, me ,mypcol, iblock
   character(len=20)   :: name, char_err
 
+  if(psb_get_errstatus().ne.0) return 
   info=0
   call psb_erractionsave(err_act)
   name = 'psb_dinsvm'
@@ -365,6 +367,7 @@ subroutine psb_dinsvv(m, x, ix, blck, desc_a, info,&
   integer                :: nprow,npcol, me ,mypcol
   character(len=20)   :: name, char_err
 
+  if(psb_get_errstatus().ne.0) return 
   info=0
   call psb_erractionsave(err_act)
   name = 'psb_dinsvv'

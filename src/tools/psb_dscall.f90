@@ -34,6 +34,7 @@ subroutine psb_dscall(m, n, parts, icontxt, desc_a, info)
   logical, parameter  :: debug=.false.
   character(len=20)   :: name, char_err
 
+  if(psb_get_errstatus().ne.0) return 
   info=0
   err=0
   name = 'psb_dscall'

@@ -80,6 +80,7 @@ subroutine  psb_dspmm(alpha,a,x,beta,y,desc_a,info,&
   character(len=20)        :: name, ch_err
 
   name='psb_dspmm'
+  if(psb_get_errstatus().ne.0) return 
   info=0
   call psb_erractionsave(err_act)
 
@@ -396,6 +397,7 @@ subroutine  psb_dspmv(alpha,a,x,beta,y,desc_a,info,&
   character(len=20)        :: name, ch_err
 
   name='psb_dspmv'
+  if(psb_get_errstatus().ne.0) return 
   info=0
   call psb_erractionsave(err_act)
 

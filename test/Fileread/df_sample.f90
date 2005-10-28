@@ -81,6 +81,7 @@ program df_sample
   amroot = (myprow==0).and.(mypcol==0)
 
   name='df_sample'
+  if(psb_get_errstatus().ne.0) return 
   info=0
   call psb_set_errverbosity(2)
   call psb_set_erraction(0)
@@ -194,7 +195,7 @@ program df_sample
      write(*,'("Time to read and partition matrix : ",es10.4)')t2
      write(*,'(" ")')
   end if
-  
+
   !
   !  prepare the preconditioning matrix. note the availability
   !  of optional parameters
@@ -272,8 +273,8 @@ program df_sample
   call dgamx2d(ictxt,'a',' ',ione, ione,t2,ione,t1,t1,-1,-1,-1)
   call psb_axpby(1.d0,b_col,0.d0,r_col,desc_a,info)
   call psb_spmm(-1.d0,a,x_col,1.d0,r_col,desc_a,info)
-  call psb_nrm2(resmx,r_col,desc_a,info)
-  call psb_amax(resmxp,r_col,desc_a,info)
+  call psb_nrm2s(resmx,r_col,desc_a,info)
+  call psb_amaxs(resmxp,r_col,desc_a,info)
 
 !!$  iter=iparm(5)
 !!$  err = rparm(2)
@@ -281,7 +282,7 @@ program df_sample
 !    call psb_prec_descr(6,pre)
     write(*,'("Matrix: ",a)')mtrx_file
     write(*,'("Computed solution on ",i4," processors")')nprow
-    write(*,'("Iterations to convergence: ",i)')iter
+    write(*,'("Iterations to convergence: ",i6)')iter
     write(*,'("Error indicator on exit: ",f7.2)')err
     write(*,'("Time to buil prec.   : ",es10.4)')tprec
     write(*,'("Time to solve matrix : ",es10.4)')t2

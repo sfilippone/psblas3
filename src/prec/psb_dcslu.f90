@@ -76,6 +76,7 @@ subroutine psb_dcslu(a,desc_a,p,upd,info)
     end Subroutine psb_dcsrsetup
  end interface
 
+  if(psb_get_errstatus().ne.0) return 
   info=0
   name='psb_dcslu'
   call psb_erractionsave(err_act)
@@ -317,7 +318,8 @@ contains
     integer, intent(out)   :: info
     character(len=20)      :: name, ch_err
 
-    info=0
+    if(psb_get_errstatus().ne.0) return 
+  info=0
     name='apply_renum'
     call psb_erractionsave(err_act)
 
@@ -615,7 +617,8 @@ contains
 
     character(len=20)      :: name, ch_err
 
-    info=0
+    if(psb_get_errstatus().ne.0) return 
+  info=0
     name='gps_reduction'
     call psb_erractionsave(err_act)
 

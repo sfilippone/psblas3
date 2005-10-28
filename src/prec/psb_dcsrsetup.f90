@@ -48,6 +48,7 @@ Subroutine psb_dcsrsetup(ptype,novr,a,blk,desc_data,upd,desc_p,info,outfmt)
   Logical,Parameter :: debug=.false., debugprt=.false.
   character(len=20) :: name, ch_err
   name='psb_dcsrsetup'
+  if(psb_get_errstatus().ne.0) return 
   info=0
   call psb_erractionsave(err_act)
 

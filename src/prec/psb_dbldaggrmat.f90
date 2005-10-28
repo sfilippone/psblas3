@@ -17,6 +17,7 @@ subroutine psb_dbldaggrmat(a,desc_a,p,info)
   integer ::icontxt,nprow,npcol,me,mycol, err_act
   character(len=20) :: name, ch_err
   name='psb_dbldaggrmat'
+  if(psb_get_errstatus().ne.0) return 
   info=0
   call psb_erractionsave(err_act)
 
@@ -77,7 +78,8 @@ contains
          & naggr, np, myprow, mypcol, nprows, npcols,nzt,irs,jl,nzl,nlr,&
          & icomm,naggrm1, mtype, i, j, err_act
     name='raw_aggregate'
-    info=0
+    if(psb_get_errstatus().ne.0) return 
+  info=0
     call psb_erractionsave(err_act)
 
     bg => p%av(ac_)
@@ -314,7 +316,8 @@ contains
 
 
     name='smooth_aggregate'
-    info=0
+    if(psb_get_errstatus().ne.0) return 
+  info=0
     call psb_erractionsave(err_act)
 
     icontxt = desc_a%matrix_data(psb_ctxt_)

@@ -33,6 +33,7 @@ subroutine psb_dscalv(m, v, icontxt, desc_a, info, flag)
   logical, parameter  :: debug=.false.
   character(len=20)   :: name, ch_err
 
+  if(psb_get_errstatus().ne.0) return 
   info=0
   err=0
   name = 'psb_dscalv'
