@@ -11,7 +11,8 @@ module psb_prec_type
   integer, parameter :: min_prec_=0, noprec_=0, diagsc_=1, bja_=2,&
        & asm_=3, ras_=5, ash_=4, rash_=6, ras2lv_=7, ras2lvm_=8,&
        & lv2mras_=9, lv2smth_=10, lv2lsm_=11, sl2sm_=12, superlu_=13,&
-       & new_loc_smth_=14, new_glb_smth_=15, max_prec_=15
+       & new_loc_smth_=14, new_glb_smth_=15, ag2lsm_=16,&
+       & msy2l_=18, msy2g_=19, max_prec_=19
   integer, parameter   :: nohalo_=0,                 halo_=4
   integer, parameter   :: none_=0,                   sum_=1
   integer, parameter   :: avg_=2,                    square_root_=3
@@ -35,12 +36,13 @@ module psb_prec_type
   integer, parameter :: ilu_fill_in_=8, jac_sweeps_=9, ml_type_=10
   integer, parameter :: smth_pos_=11, aggr_alg_=12, smth_kind_=13
   integer, parameter :: om_choice_=14, glb_smth_=15, coarse_mat_=16
+  integer, parameter :: umf_symptr_=17, umf_numptr_=18
   integer, parameter :: ifpsz=20
   ! Entries in dprcparm: ILU(E) epsilon, smoother omega
   integer, parameter :: fact_eps_=1, smooth_omega_=2
   integer, parameter :: dfpsz=4
   ! Factorization types: none, ILU(N), ILU(E), SuperLU
-  integer, parameter :: f_none_=0,f_ilu_n_=1, f_ilu_e_=2,f_slu_=3
+  integer, parameter :: f_none_=0,f_ilu_n_=1,f_ilu_e_=2,f_slu_=3,f_umf_=4
   ! Fields for sparse matrices ensembles: 
   integer, parameter :: l_pr_=1, u_pr_=2, bp_ilu_avsz=2
   integer, parameter :: ap_nd_=3, ac_=4, sm_pr_t_=5, sm_pr_=6
@@ -69,7 +71,8 @@ module psb_prec_type
 
   
   character(len=15), parameter, private :: &
-       &  smooth_names(1:2)=(/'Pre-smoothing ','Post-smoothing'/)
+       &  smooth_names(1:3)=(/'Pre-smoothing ','Post-smoothing',&
+       & 'Smooth both   '/)
   character(len=15), parameter, private :: &
        &  smooth_kinds(0:2)=(/'No  smoother  ','Omega smoother',&
        &           'Bizr. smoother'/)
@@ -86,8 +89,8 @@ module psb_prec_type
        &  ml_names(0:3)=(/'None          ','Additive      ','Multiplicative',&
        & 'New ML        '/)
   character(len=15), parameter, private :: &
-       &  fact_names(0:3)=(/'None          ','ILU(n)        ',&
-       &  'ILU(eps)      ','Sparse LU     '/)
+       &  fact_names(0:4)=(/'None          ','ILU(n)        ',&
+       &  'ILU(eps)      ','Sparse SuperLU','UMFPACK Sp. LU'/)
 
   interface psb_base_precfree
     module procedure psb_dbase_precfree
@@ -358,6 +361,10 @@ contains
     if (associated(p%iprcparm)) then 
       if (p%iprcparm(f_type_)==f_slu_) then 
         call fort_slu_free(p%iprcparm(slu_ptr_),info)
+      end if
+      if (p%iprcparm(f_type_)==f_umf_) then 
+        call fort_umf_free(p%iprcparm(umf_symptr_),&
+             & p%iprcparm(umf_numptr_),info)
       end if
       deallocate(p%iprcparm,stat=info)
     end if

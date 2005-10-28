@@ -62,10 +62,11 @@ module psb_serial_mod
   end interface
 
   interface psb_fixcoo
-     subroutine psb_dfixcoo(a,info)
+     subroutine psb_dfixcoo(a,info,idir)
        use psb_spmat_type
        type(psb_dspmat_type), intent(inout) :: a
        integer, intent(out)         :: info
+       integer, intent(in), optional :: idir
      end subroutine psb_dfixcoo
   end interface
 
@@ -76,6 +77,15 @@ module psb_serial_mod
        integer, intent(out)         :: info
        logical, optional :: rwshr
      end subroutine psb_dipcoo2csr
+  end interface
+
+  interface psb_ipcoo2csc
+     subroutine psb_dipcoo2csc(a,info,clshr)
+       use psb_spmat_type
+       type(psb_dspmat_type), intent(inout) :: a
+       integer, intent(out)         :: info
+       logical, optional :: clshr
+     end subroutine psb_dipcoo2csc
   end interface
 
   interface psb_ipcsr2coo

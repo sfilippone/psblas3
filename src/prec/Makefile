@@ -9,7 +9,7 @@ F90OBJS= psb_dcsrsetup.o psb_dprec.o \
 	psb_dgenaggrmap.o  psb_dsplu.o $(MPFOBJS) 
 #dcoocp.o dcoocpadd.o dcoofact.o dcoolu.o dcooluadd.o\
 
-COBJS=fort_slu_impl.o
+COBJS=fort_slu_impl.o fort_umf_impl.o
 INCDIRS=-I. -I.. -I$(LIBDIR) 
 
 OBJS=$(F90OBJS) $(COBJS)

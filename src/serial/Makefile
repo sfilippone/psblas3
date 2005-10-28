@@ -6,7 +6,7 @@ FOBJS = psb_cest.o psb_dcoins.o psb_dcsdp.o psb_dcsmm.o psb_dcsmv.o \
 	psb_dfixcoo.o psb_dipcoo2csr.o psb_dipcsr2coo.o psb_dneigh.o \
 	psb_dnumbmm.o psb_drwextd.o psb_dspgtdiag.o psb_dspgtrow.o \
 	psb_dspinfo.o psb_dspscal.o psb_dsymbmm.o psb_dtransp.o \
-	string_impl.o
+	string_impl.o psb_dipcoo2csc.o 
 
 
 INCDIRS = -I ../../lib -I .

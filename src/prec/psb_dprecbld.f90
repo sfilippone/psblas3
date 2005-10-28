@@ -29,6 +29,35 @@ subroutine psb_dprecbld(a,p,desc_a,info,upd)
      end subroutine psb_dcslu
   end interface
 
+  interface 
+    subroutine psb_splu_bld(a,desc_a,p,info)
+      use psb_serial_mod
+      use psb_descriptor_type
+      use psb_prec_type
+      use psb_const_mod
+      implicit none 
+      
+      type(psb_dspmat_type), intent(in)   :: a
+      type(psb_desc_type), intent(in)     :: desc_a
+      type(psb_dbase_prec), intent(inout) :: p
+      integer, intent(out)                :: info
+    end subroutine psb_splu_bld
+  end interface
+  interface 
+    subroutine psb_umf_bld(a,desc_a,p,info)
+      use psb_serial_mod
+      use psb_descriptor_type
+      use psb_prec_type
+      use psb_const_mod
+      implicit none 
+      
+      type(psb_dspmat_type), intent(in)   :: a
+      type(psb_desc_type), intent(in)     :: desc_a
+      type(psb_dbase_prec), intent(inout) :: p
+      integer, intent(out)                :: info
+    end subroutine psb_umf_bld
+  end interface
+
   ! Local scalars
   Integer      :: err, nnzero, n_row, n_col,I,j,icontxt,&
        & me,mycol,nprow,npcol,mglob,lw, mtype, nrg, nzg, err_act
@@ -194,6 +223,17 @@ subroutine psb_dprecbld(a,p,desc_a,info,upd)
         if(info /= 0) then
            info=4010
            ch_err='splu_bld'
+           call psb_errpush(info,name,a_err=ch_err)
+           goto 9999
+        end if
+
+     case(f_umf_)
+        p%baseprecv(1)%av => null()
+        if(debug) write(0,*)me,': calling umf_bld'
+        call psb_umf_bld(a,desc_a,p%baseprecv(1),info)
+        if(info /= 0) then
+           info=4010
+           ch_err='umf_bld'
            call psb_errpush(info,name,a_err=ch_err)
            goto 9999
         end if
@@ -416,9 +456,7 @@ subroutine psb_splu_bld(a,desc_a,p,info)
      write(0,*) me, 'SPLUBLD: Done slu_Factor',info,p%iprcparm(slu_ptr_)
      call blacs_barrier(icontxt,'All')
   endif
-  if (info /= 0) then 
-     write(0,*) 'From fort_slu_factor: ',info
-  endif
+
   call psb_spfree(blck,info)
   call psb_spfree(atmp,info)
   if(info /= 0) then
@@ -440,6 +478,184 @@ subroutine psb_splu_bld(a,desc_a,p,info)
   return
 
 end subroutine psb_splu_bld
+
+
+
+subroutine psb_umf_bld(a,desc_a,p,info)
+  use psb_serial_mod
+  use psb_descriptor_type
+  use psb_prec_type
+  use psb_const_mod
+  implicit none 
+
+  type(psb_dspmat_type), intent(in)   :: a
+  type(psb_desc_type), intent(in)     :: desc_a
+  type(psb_dbase_prec), intent(inout) :: p
+  integer, intent(out)                :: info
+
+
+  type(psb_dspmat_type)    :: blck, atmp
+  character(len=5)         :: fmt
+  character                :: upd='F'
+  integer                  :: i,j,nza,nzb,nzt,icontxt, me,mycol,nprow,npcol,err_act
+  logical, parameter :: debug=.false.
+  character(len=20)   :: name, ch_err
+
+  interface psb_csrsetup
+    Subroutine psb_dcsrsetup(ptype,novr,a,blk,desc_data,upd,desc_p,info,outfmt)
+      use psb_serial_mod
+      Use psb_descriptor_type
+      Use psb_prec_type
+      integer, intent(in)                  :: ptype,novr
+      Type(psb_dspmat_type), Intent(in)    ::  a
+      Type(psb_dspmat_type), Intent(inout) ::  blk
+      Type(psb_desc_type), Intent(inout)   :: desc_p
+      Type(psb_desc_type), Intent(in)      :: desc_data 
+      Character, Intent(in)                :: upd
+      integer, intent(out)                 :: info
+      character(len=5), optional           :: outfmt
+    end Subroutine psb_dcsrsetup
+ end interface
+
+  info=0
+  name='psb_umf_bld'
+  call psb_erractionsave(err_act)
+
+  icontxt = desc_A%matrix_data(psb_ctxt_)
+  call blacs_gridinfo(icontxt, nprow, npcol, me, mycol)
+
+
+  fmt = 'COO'
+  call psb_nullify_sp(blck)    
+  call psb_nullify_sp(atmp)    
+  atmp%fida='COO'
+  if (Debug) then 
+     write(0,*) me, 'UMFBLD: Calling  csdp'
+     call blacs_barrier(icontxt,'All')
+  endif
+
+  call psb_dcsdp(a,atmp,info)
+  if(info /= 0) then
+     info=4010
+     ch_err='psb_dcsdp'
+     call psb_errpush(info,name,a_err=ch_err)
+     goto 9999
+  end if
+  nza = atmp%infoa(psb_nnz_)
+  if (Debug) then 
+     write(0,*) me, 'UMFBLD: Done csdp',info,nza,atmp%m,atmp%k
+     call blacs_barrier(icontxt,'All')
+  endif
+  call psb_csrsetup(p%iprcparm(p_type_),p%iprcparm(n_ovr_),a,&
+       & blck,desc_a,upd,p%desc_data,info,outfmt=fmt)  
+  if(info /= 0) then
+     info=4010
+     ch_err='psb_csrsetup'
+     call psb_errpush(info,name,a_err=ch_err)
+     goto 9999
+  end if
+
+  nzb = blck%infoa(psb_nnz_)
+  if (Debug) then 
+     write(0,*) me, 'UMFBLD: Done csrsetup',info,nzb,blck%fida
+     call blacs_barrier(icontxt,'All')
+  endif
+  if (nzb > 0 ) then 
+     if (size(atmp%aspk)<nza+nzb) then 
+        call psb_spreall(atmp,nza+nzb,info)
+        if(info /= 0) then
+           info=4010
+           ch_err='psb_spreall'
+           call psb_errpush(info,name,a_err=ch_err)
+           goto 9999
+        end if
+     endif
+     if (Debug) then 
+        write(0,*) me, 'UMFBLD: Done realloc',info,nza+nzb,atmp%fida
+        call blacs_barrier(icontxt,'All')
+     endif
+
+     do j=1,nzb
+        atmp%aspk(nza+j) = blck%aspk(j)
+        atmp%ia1(nza+j)  = blck%ia1(j)
+        atmp%ia2(nza+j)  = blck%ia2(j)
+     end do
+     atmp%infoa(psb_nnz_) = nza+nzb
+     atmp%m = atmp%m + blck%m
+     atmp%k = max(a%k,blck%k)
+  else
+     atmp%infoa(psb_nnz_) = nza
+     atmp%m = a%m 
+     atmp%k = a%k
+  endif
+
+  i=0
+  do j=1, atmp%infoa(psb_nnz_) 
+     if (atmp%ia2(j) <= atmp%m) then 
+        i = i + 1
+        atmp%aspk(i) = atmp%aspk(j)
+        atmp%ia1(i) = atmp%ia1(j)
+        atmp%ia2(i) = atmp%ia2(j)
+     endif
+  enddo
+  atmp%infoa(psb_nnz_) = i
+
+
+  call psb_ipcoo2csc(atmp,info)
+  if(info /= 0) then
+     info=4010
+     ch_err='psb_ipcoo2csc'
+     call psb_errpush(info,name,a_err=ch_err)
+     goto 9999
+  end if
+  call psb_spinfo(psb_nztotreq_,atmp,nzt,info)
+  if(info /= 0) then
+     info=4010
+     ch_err='psb_spinfo'
+     call psb_errpush(info,name,a_err=ch_err)
+     goto 9999
+  end if
+  if (Debug) then 
+     write(0,*) me,'Calling fort_slu_factor ',nzt,atmp%m,&
+          & atmp%k,p%desc_data%matrix_data(psb_n_row_)
+     call blacs_barrier(icontxt,'All')
+  endif
+
+  call fort_umf_factor(atmp%m,nzt,&
+       & atmp%aspk,atmp%ia2,atmp%ia1,&
+       & p%iprcparm(umf_symptr_),p%iprcparm(umf_numptr_),info)
+  if(info /= 0) then
+     info=4010
+     ch_err='fort_umf_fact'
+     call psb_errpush(info,name,a_err=ch_err)
+     goto 9999
+  end if
+
+  if (Debug) then 
+     write(0,*) me, 'UMFBLD: Done umf_Factor',info,p%iprcparm(umf_numptr_)
+     call blacs_barrier(icontxt,'All')
+  endif
+  call psb_spfree(blck,info)
+  call psb_spfree(atmp,info)
+  if(info /= 0) then
+     info=4010
+     ch_err='psb_spfree'
+     call psb_errpush(info,name,a_err=ch_err)
+     goto 9999
+  end if
+
+  call psb_erractionrestore(err_act)
+  return
+
+9999 continue
+  call psb_erractionrestore(err_act)
+  if (err_act.eq.act_abort) then
+     call psb_error()
+     return
+  end if
+  return
+
+end subroutine psb_umf_bld
 
 
 

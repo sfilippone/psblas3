@@ -255,7 +255,8 @@ subroutine psb_dbaseprcaply(prec,x,beta,y,desc_data,trans,work,info)
     end if
 
     if (prec%iprcparm(iren_)>0) then 
-      call psb_dgelp('N',n_row,1,prec%perm,tx,isz,ww,isz,info)
+!!$      call psb_dgelp('N',n_row,1,prec%perm,tx,isz,ww,isz,info)
+      info = -1
       if(info /=0) then
          info=4010
          ch_err='psb_dgelp'
@@ -266,7 +267,8 @@ subroutine psb_dbaseprcaply(prec,x,beta,y,desc_data,trans,work,info)
     call psb_dbjacaply(prec,tx,zero,ty,prec%desc_data,trans,aux,info)
 
     if (prec%iprcparm(iren_)>0) then 
-      call psb_dgelp('N',n_row,1,prec%invperm,ty,isz,ww,isz,info)
+!!$      call psb_dgelp('N',n_row,1,prec%invperm,ty,isz,ww,isz,info)
+      info = -1 
       if(info /=0) then
          info=4010
          ch_err='psb_dgelp'
@@ -458,6 +460,27 @@ subroutine psb_dbjacaply(prec,x,beta,y,desc_data,trans,work,info)
       else 
         y(1:n_row) = ww(1:n_row) + beta*y(1:n_row) 
       endif
+    case (f_umf_) 
+
+
+      select case(trans)
+      case('N','n')
+        call fort_umf_solve(0,n_row,ww,x,n_row,prec%iprcparm(umf_numptr_),info)
+      case('T','t','C','c')
+        call fort_umf_solve(1,n_row,ww,x,n_row,prec%iprcparm(umf_numptr_),info)
+      end select
+
+      if(info /=0) goto 9999
+
+      if (beta == 0.d0) then 
+        y(1:n_row) = ww(1:n_row)
+      else if (beta==1.d0) then 
+        y(1:n_row) = ww(1:n_row) + y(1:n_row) 
+      else if (beta==-1.d0) then 
+        y(1:n_row) = ww(1:n_row) - y(1:n_row) 
+      else 
+        y(1:n_row) = ww(1:n_row) + beta*y(1:n_row) 
+      endif
 
     case default
       write(0,*) 'Unknown factorization type in bjac_prcaply',prec%iprcparm(f_type_)
@@ -507,6 +530,20 @@ subroutine psb_dbjacaply(prec,x,beta,y,desc_data,trans,work,info)
         if(info /=0) goto 9999
         tx(1:n_row) = ty(1:n_row)        
       end do
+    case(f_umf_) 
+      do i=1, prec%iprcparm(jac_sweeps_) 
+        !   X(k+1) = M^-1*(b-N*X(k))
+        ty(1:n_row) = x(1:n_row)
+        call psb_spmm(-one,prec%av(ap_nd_),tx,one,ty,&
+             &   prec%desc_data,info,work=aux)
+        if(info /=0) goto 9999
+
+        call fort_umf_solve(0,n_row,ww,ty,n_row,&
+             & prec%iprcparm(umf_numptr_),info)
+        if(info /=0) goto 9999
+        tx(1:n_row) = ww(1:n_row)        
+      end do
+
     end select
     
     if (beta == 0.d0) then 
