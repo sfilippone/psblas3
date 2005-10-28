@@ -41,6 +41,7 @@ subroutine  psb_ihalom(x,desc_a,info,alpha,jx,ik,work,tran,mode)
   character(len=20)        :: name, ch_err
 
   name='psb_ihalom'
+  if(psb_get_errstatus().ne.0) return 
   info=0
   call psb_erractionsave(err_act)
 
@@ -216,6 +217,7 @@ subroutine  psb_ihalov(x,desc_a,info,alpha,work,tran,mode)
   character(len=20)        :: name, ch_err
 
   name='psb_ihalov'
+  if(psb_get_errstatus().ne.0) return 
   info=0
   call psb_erractionsave(err_act)
 

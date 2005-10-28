@@ -46,6 +46,7 @@ subroutine  psb_dscatterm(globx, locx, desc_a, info, iroot,&
   character(len=20)        :: name, ch_err
 
   name='psb_scatterm'
+  if(psb_get_errstatus().ne.0) return 
   info=0
   call psb_erractionsave(err_act)
 
@@ -264,6 +265,7 @@ subroutine  psb_dscatterv(globx, locx, desc_a, info, iroot)
   character(len=20)        :: name, ch_err
 
   name='psb_scatterv'
+  if(psb_get_errstatus().ne.0) return 
   info=0
   call psb_erractionsave(err_act)
 

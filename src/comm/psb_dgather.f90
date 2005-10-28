@@ -39,6 +39,7 @@ subroutine  psb_dgatherm(globx, locx, desc_a, info, iroot,&
   character(len=20)        :: name, ch_err
 
   name='psb_dgatherm'
+  if(psb_get_errstatus().ne.0) return 
   info=0
   call psb_erractionsave(err_act)
 
@@ -213,6 +214,7 @@ subroutine  psb_dgatherv(globx, locx, desc_a, info, iroot,&
   character(len=20)        :: name, ch_err
 
   name='psb_dgatherv'
+  if(psb_get_errstatus().ne.0) return 
   info=0
   call psb_erractionsave(err_act)
 

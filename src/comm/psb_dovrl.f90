@@ -38,6 +38,7 @@ subroutine  psb_dovrlm(x,desc_a,info,jx,ik,work,choice,update_type)
   character(len=20)        :: name, ch_err
 
   name='psb_dovrlm'
+  if(psb_get_errstatus().ne.0) return 
   info=0
   call psb_erractionsave(err_act)
 
@@ -230,6 +231,7 @@ subroutine  psb_dovrlv(x,desc_a,info,work,choice,update_type)
   character(len=20)        :: name, ch_err
 
   name='psb_dovrlv'
+  if(psb_get_errstatus().ne.0) return 
   info=0
   call psb_erractionsave(err_act)
 
