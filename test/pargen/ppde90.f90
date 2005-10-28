@@ -61,7 +61,7 @@ program pde90
   ! miscellaneous 
   character, parameter :: order='r'
   integer              :: iargc,convert_descr,dim, check_descr
-  real(kind(1.d0)), parameter :: dzero = 0.d0, one = 1.d0
+  real(kind(1.d0)), parameter :: one = 1.d0
   real(kind(1.d0)) :: mpi_wtime, t1, t2, tprec, tsolve, t3, t4 
   external  mpi_wtime
 
@@ -214,9 +214,9 @@ program pde90
      write(*,'(" ")')
      write(*,'("Time to solve matrix : ",es10.4)')t2
      write(*,'("Time per iteration   : ",es10.4)')t2/iter
-     write(*,'("Number of iterations : ",i)')iter
+     write(*,'("Number of iterations : ",i0)')iter
      write(*,'("Error on exit        : ",es10.4)')err
-     write(*,'("Info  on exit        : ",i)')info
+     write(*,'("Info  on exit        : ",i0)')info
   end if
 
   !  
@@ -319,10 +319,10 @@ contains
 
           write(*,'("Solving matrix       : ell1")')      
           write(*,'("Grid dimensions      : ",i4,"x",i4,"x",i4)')idim,idim,idim
-          write(*,'("Number of processors : ",i)')nprow
+          write(*,'("Number of processors : ",i0)')nprow
           write(*,'("Data distribution    : BLOCK")')
           write(*,'("Preconditioner       : ",a)')pr_to_str(iprec)
-          if(iprec.gt.2) write(*,'("Overlapping levels   : ",i)')novr
+          if(iprec.gt.2) write(*,'("Overlapping levels   : ",i0)')novr
           write(*,'("Iterative method     : ",a)')cmethd
           write(*,'(" ")')
        else
@@ -456,7 +456,7 @@ contains
     m   = idim*idim*idim
     n   = m
     nnz = ((n*9)/(nprow*npcol))
-    if(myprow.eq.psb_root_) write(0,'("Generating Matrix (size=",i,")...")')n
+    if(myprow.eq.psb_root_) write(0,'("Generating Matrix (size=",i0x,")...")')n
 
     call psb_dscall(n,n,parts,icontxt,desc_a,info)
     call psb_spalloc(a,desc_a,info,nnz=nnz)

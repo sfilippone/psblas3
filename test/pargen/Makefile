@@ -15,11 +15,11 @@ INCDIRS=-I$(LIBDIR)
 EXEDIR=./RUNS
 
 
-LINKOPT=$(F90COPT)
+LINKOPT=$(F90COPT) 
 
 ppde90: ppde90.o  part_block.o 
 	$(F90LINK) $(LINKOPT) ppde90.o part_block.o  -o ppde90\
-	$(PSBLAS_LIB) $(BLACS)
+	$(PSBLAS_LIB) $(BLACS) $(SLU) $(UMF) $(BLAS)
 	/bin/mv ppde90 $(EXEDIR)
 
 ppde90.o: $(MODS)
