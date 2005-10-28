@@ -1,5 +1,5 @@
-This directory contains  the PSBLAS library, version 1.0
-The library is described in:
+This directory contains  the PSBLAS library, version 2.0
+Version 1.0 of the library is described in:
 S. Filippone, M. Colajanni
 PSBLAS: A library for parallel linear algebra computation on sparse matrices
 ACM Trans. on Math. Software, 26(4), Dec. 2000, pp. 527-550.
