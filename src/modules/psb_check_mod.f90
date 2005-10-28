@@ -50,7 +50,8 @@ contains
     integer           :: err_act, int_err(5)
     character(len=20) :: name, ch_err
 
-    info=0
+    if(psb_get_errstatus().ne.0) return 
+  info=0
     name='psb_chkvect'
     call psb_erractionsave(err_act)
 
@@ -173,7 +174,8 @@ contains
     integer           :: err_act, int_err(5)
     character(len=20) :: name, ch_err
 
-    info=0
+    if(psb_get_errstatus().ne.0) return 
+  info=0
     name='psb_chkglobvect'
     call psb_erractionsave(err_act)
 
@@ -295,7 +297,8 @@ contains
     integer           :: err_act, int_err(5)
     character(len=20) :: name, ch_err
 
-    info=0
+    if(psb_get_errstatus().ne.0) return 
+  info=0
     name='psb_chkmat'
     call psb_erractionsave(err_act)
 

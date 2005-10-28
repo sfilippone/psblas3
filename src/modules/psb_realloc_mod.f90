@@ -31,7 +31,8 @@ Contains
     name='psb_dreallocate1i'
     call psb_erractionsave(err_act)
 
-    info=0
+    if(psb_get_errstatus().ne.0) return 
+  info=0
     if (associated(rrax)) then 
        dim=size(rrax)
        If (dim /= len) Then
@@ -252,7 +253,8 @@ Contains
     name='psb_dreallocate2i'
     call psb_erractionsave(err_act)
 
-    info=0
+    if(psb_get_errstatus().ne.0) return 
+  info=0
     call psb_dreallocate1i(len,rrax,info,pad=pad)
     if (info /= 0) then
        err=4000
@@ -346,7 +348,8 @@ Contains
     name='psb_dreallocate1it'
     call psb_erractionsave(err_act)
 
-    info=0
+    if(psb_get_errstatus().ne.0) return 
+  info=0
     if (associated(rrax)) then 
        dim=size(rrax)
        If (dim /= len) Then

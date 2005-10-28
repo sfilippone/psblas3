@@ -42,9 +42,9 @@ module psb_spmat_type
     module procedure psb_dspallocate, psb_dspall3, psb_dspallmk, psb_dspallmknz
   end interface
 
-  interface psb_spfree
-    module procedure psb_dspfree
-  end interface
+!   interface psb_spfree
+!     module procedure psb_dspfree
+!   end interface
 
   interface psb_spreinit
     module procedure psb_dspreinit
@@ -317,24 +317,24 @@ contains
   End Subroutine psb_dspclone
 
 
-  subroutine psb_dspfree(a,info)
-    implicit none
-    !....Parameters...
-    Type(psb_dspmat_type), intent(inout)  :: A
-    Integer, intent(out)        :: info
+!   subroutine psb_dspfree(a,info)
+!     implicit none
+!     !....Parameters...
+!     Type(psb_dspmat_type), intent(inout)  :: A
+!     Integer, intent(out)        :: info
 
-    !locals
-    logical, parameter  :: debug=.false.
+!     !locals
+!     logical, parameter  :: debug=.false.
 
-    INFO  = 0
+!     INFO  = 0
 
-    deallocate(a%aspk,a%ia1,a%ia2,a%pr,a%pl,STAT=INFO)
+!     deallocate(a%aspk,a%ia1,a%ia2,a%pr,a%pl,STAT=INFO)
     
-    call psb_nullify_sp(a)
+!     call psb_nullify_sp(a)
 
-    Return
+!     Return
 
-  End Subroutine psb_dspfree
+!   End Subroutine psb_dspfree
 
 
 end module psb_spmat_type

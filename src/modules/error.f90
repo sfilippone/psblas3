@@ -51,15 +51,15 @@ end subroutine FCpsb_perror
 
 
 
-subroutine FCpsb_get_errstatus(s)
+function FCpsb_get_errstatus()
   use psb_error_mod
   implicit none
 
-  integer, intent(out)   :: s
+  integer :: FCpsb_get_errstatus
 
-  call psb_get_errstatus(s)
+  FCpsb_get_errstatus = psb_get_errstatus()
 
-end subroutine FCpsb_get_errstatus
+end function FCpsb_get_errstatus
 
 
 

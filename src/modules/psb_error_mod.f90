@@ -102,10 +102,10 @@ contains
 
 
   ! checks the status of the error condition
-  subroutine psb_get_errstatus(s)
-    integer, intent(out) :: s
-    s=error_status
-  end subroutine psb_get_errstatus
+  function psb_get_errstatus()
+    integer :: psb_get_errstatus
+    psb_get_errstatus=error_status
+  end function psb_get_errstatus
 
 
 
