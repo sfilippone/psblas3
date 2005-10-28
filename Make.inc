@@ -6,21 +6,21 @@
 #######################  Section 1 #######################
 #  Define your compilers and compiler flags here         #
 ##########################################################
-F90=ifort
-FC=ifort
-CC=icc
+F90=${IFC8}/bin/ifort
+FC=${IFC8}/bin/ifort
 F77=$(FC)
-F90COPT= -check all -g -CB -no_cpprt -warn interfaces
-FCOPT=-check all -g -CB -no_cpprt -warn interfaces
-CCOPT=
+CC=gcc
+F90COPT= -O3 
+FCOPT=-O3 
+CCOPT=-O3
 
 #######################  Section 2 #######################
 #  Define your linker and linker flags here              #
 ##########################################################
-F90LINK=/usr/local/mpich-intel/bin/mpif90 -g -CB -no_cpprt
-FLINK=mpif77 -g -CB -no_cpprt
-MPF90=/usr/local/mpich-intel/bin/mpif90 -g -CB -no_cpprt
-MPCC=/usr/local/mpich-intel/bin/mpicc -g -CB -no_cpprt
+F90LINK=/usr/local/mpich-ifc80/bin/mpif90 -g -CB -no_cpprt
+FLINK=/usr/local/mpich-ifc80/mpif77 -g -CB -no_cpprt
+MPF90=/usr/local/mpich-ifc80/bin/mpif90 -g -CB -no_cpprt
+MPCC=/usr/local/mpich-ifc80/bin/mpicc -g -CB -no_cpprt
 
 #######################  Section 3 #######################
 #  Specify paths to libraries                            #
@@ -32,7 +32,16 @@ BLACS=-lmpiblacs-intel -L$(HOME)/NUMERICAL/LIB
 #######################  Section 4 #######################
 #  Other useful tools&defines                            #
 ##########################################################
-CDEFINES=-DAdd_
+SLUDIR=/usr/local/SuperLU_3.0
+SLU=-lslu_lx_ifc8 -L$(SLUDIR)
+SLUDEF=-DHave_SLU_ -I$(SLUDIR)
+
+UMFDIR=$(HOME)/LIB/Umfpack_gcc41
+UMF=-lumfpack -lamd -L$(UMFDIR)
+UMFDEF=-DHave_UMF_ -I$(UMFDIR)
+
+CDEFINES=-DAdd_ $(SLUDEF) $(UMFDEF)
+
 AR=ar -cur
 RANLIB=ranlib
 
