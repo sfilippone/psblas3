@@ -489,6 +489,7 @@ subroutine psb_umf_bld(a,desc_a,p,info)
   use psb_serial_mod
   use psb_descriptor_type
   use psb_prec_type
+  use psb_tools_mod
   use psb_const_mod
   implicit none 
 
