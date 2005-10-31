@@ -1,47 +1,70 @@
-# Using GNU gfortran (from GCC 3.5.0) 
 .mod=.mod
+.fh=.fh
 .SUFFIXES: .f90 $(.mod)
+
+
+#######################  Section 1 #######################
+#  Define your compilers and compiler flags here         #
+##########################################################
 F90=/usr/local/gfortran/bin/gfortran
 FC=/usr/local/gfortran/bin/gfortran
 F77=$(FC)
-F90COPT=-O3 -ffast-math -march=pentium4 -msse2 -mfpmath=sse 
-FCOPT=-O3 -ffast-math -march=pentium4 -msse2 -mfpmath=sse
 CC=/usr/local/gfortran/bin/gcc
+F90COPT= -O3  -ffast-math -march=pentium4 -msse2 -mfpmath=sse 
+FCOPT=-O3  -ffast-math -march=pentium4 -msse2 -mfpmath=sse 
 CCOPT=-O3 -ffast-math -march=pentium4 -msse2 -mfpmath=sse 
+
+#######################  Section 2 #######################
+#  Define your linker and linker flags here              #
+##########################################################
 F90LINK=/usr/local/mpich-gfortran/bin/mpif90 
-FLINK=mpif77
-MPF90=$(F90LINK)
-MPCC=/usr/local/mpich-gfortran/bin/mpicc
-#
-#
-BLAS=-lblas -L$(HOME)/LIB
+FLINK=/usr/local/mpich-gfortran/mpif77 
+MPF90=/usr/local/mpich-gfortran/bin/mpif90 
+MPCC=/usr/local/mpich-gfortran/bin/mpicc 
+
+#######################  Section 3 #######################
+#  Specify paths to libraries                            #
+##########################################################
+BLAS=-lblas-gcc41 -L$(HOME)/LIB
 BLACS=-lmpiblacs-gfortran -L$(HOME)/LIB
-#
-# Comment these, and uncomment SLUDEF below if you don't want SuperLU.
+
+
+#######################  Section 4 #######################
+#  Other useful tools&defines                            #
+##########################################################
 SLUDIR=/usr/local/SuperLU_3.0
 SLU=-lslu_lx_gfort -L$(SLUDIR)
 SLUDEF=-DHave_SLU_ -I$(SLUDIR)
-# SLUDEF= 
-CDEFINES=-DAdd_ $(SLUDEF)
+
+UMFDIR=$(HOME)/LIB/Umfpack_gcc41
+UMF=-lumfpack -lamd -L$(UMFDIR)
+UMFDEF=-DHave_UMF_ -I$(UMFDIR)
+
+CDEFINES=-DAdd_ $(SLUDEF) $(UMFDEF)
 
 AR=ar -cur
 RANLIB=ranlib
 
-TYPEMODS =  typesp$(.mod) typedesc$(.mod) typeprec$(.mod) realloc$(.mod)
-CONSTMODS = tools_const$(.mod)
-BLASMODS  = $(TYPEMODS) f90psblas$(.mod) f90comm$(.mod)
-METHDMODS = f90methd$(.mod)
-TOOLSMODS = $(CONSTMODS) psimod$(.mod) f90tools$(.mod) f90serial$(.mod) string$(.mod)
-PRECMODS  = f90prec$(.mod)
-ERRORMODS = errormod$(.mod)
-F90MODS= $(BLASMODS) $(PRECMODS) $(METHDMODS) $(TOOLSMODS) f90sparse$(.mod) $(ERRORMODS)
-
-MODS=$(LIBDIR)/tools_const$(.mod) $(LIBDIR)/typesp$(.mod) $(LIBDIR)/realloc$(.mod) \
-  $(LIBDIR)/typedesc$(.mod)  $(LIBDIR)/typeprec$(.mod) $(LIBDIR)/parts.f90 \
-  $(LIBDIR)/f90serial$(.mod) $(LIBDIR)/f90comm$(.mod) $(LIBDIR)/string$(.mod)\
-  $(LIBDIR)/errormod$(.mod) 
 
 
+#######################  Section 5 #######################
+#  Do not edit this                                      #
+##########################################################
+LIBDIR = lib
+LIBNAME = libpsblas.a
+
+TYPEMODS =  psb_spmat_type$(.mod) psb_descriptor_type$(.mod) psb_prec_type$(.mod) psb_realloc_mod$(.mod)
+CONSTMODS = psb_const_mod$(.mod)
+BLASMODS  = $(TYPEMODS) psb_psblas_mod$(.mod) psb_comm_mod$(.mod)
+METHDMODS = psb_methd_mod$(.mod)
+TOOLSMODS = $(CONSTMODS) psi_mod$(.mod) psb_tools_mod$(.mod) psb_serial_mod$(.mod)
+PRECMODS  = psb_prec_mod$(.mod)
+ERRORMODS = psb_error_mod$(.mod)
+F90MODS= $(BLASMODS) $(PRECMODS) $(METHDMODS) $(TOOLSMODS) $(ERRORMODS) string$(.mod)
+
+MODS=$(LIBDIR)/psb_const_mod$(.mod) $(LIBDIR)/psb_spmat_type$(.mod) $(LIBDIR)/psb_realloc_mod$(.mod) \
+  $(LIBDIR)/psb_descriptor_type$(.mod)  $(LIBDIR)/psb_prec_type$(.mod) $(LIBDIR)/parts.fh \
+  $(LIBDIR)/psb_serial_mod$(.mod) $(LIBDIR)/psb_comm_mod$(.mod) $(LIBDIR)/psb_error_mod$(.mod)
 
 # Under Linux/gmake there is a rule interpreting .mod as Modula source! 
 $(.mod).o:
