@@ -623,7 +623,6 @@ Subroutine psb_descasb(n_ovr,desc_p,desc_a,a,&
   end if
 
   ! Ok, register into MATRIX_DATA &  free temporary work areas
-  write(0,*)'!!! verify this !!!'
   desc_p%matrix_data(psb_dec_type_) = psb_desc_asb_
 
   allocate(desc_p%lprm(1))

@@ -87,6 +87,7 @@ program pde90
   character(len=10)  :: ptype
   character(len=20)  :: name,ch_err
  
+  if(psb_get_errstatus().ne.0) return 
   info=0
   name='pde90'
   call psb_set_errverbosity(2)
@@ -152,8 +153,6 @@ program pde90
      call psb_precset(pre,ptype,&
           &iv=(/add_ml_prec_,loc_aggr_,no_smth_,mat_repl_,&
           &    pre_smooth_,igsmth/),rs=0.d0)
-!!$     call psb_precset(pre,ptype,&
-!!$          &iv=(/add_ml_prec_,glb_aggr_,pre_smooth_,igsmth,matop/),rs=0.d0)
   case(ras2lvm_) 
      ptype='asm'
      call psb_precset(pre,ptype,iv=(/novr,halo_,none_/))
@@ -164,7 +163,7 @@ program pde90
   
   call blacs_barrier(icontxt,'ALL')
   t1 = mpi_wtime()
-  call psb_precbld(a,pre,desc_a,info)!,'f')
+  call psb_precbld(a,pre,desc_a,info)
   if(info.ne.0) then
      info=4010
      ch_err='psb_precbld'
@@ -191,6 +190,9 @@ program pde90
          & itmax,iter,err,itrace)     
   else  if (cmethd.eq.'CGS') then 
     call  psb_cgs(a,pre,b,x,eps,desc_a,info,& 
+         & itmax,iter,err,itrace)     
+  else  if (cmethd.eq.'CG') then 
+    call  psb_cg(a,pre,b,x,eps,desc_a,info,& 
          & itmax,iter,err,itrace)     
   else if (cmethd.eq.'BICGSTABL') then 
     call  psb_bicgstabl(a,pre,b,x,eps,desc_a,info,& 
