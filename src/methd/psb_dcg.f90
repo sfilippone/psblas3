@@ -72,7 +72,7 @@ Subroutine psb_dcg(a,prec,b,x,eps,desc_a,info,&
   real(kind(1.d0))    ::rerr
   real(kind(1.d0))    ::alpha, beta, rho, rho_old, rni, xni, bni, ani,bn2,& 
        & sigma
-  integer         :: litmax, liter, listop, naux, m, mglob, it, itrac,&
+  integer         :: litmax, liter, listop, naux, m, mglob, it, itx, itrac,&
        & nprows,npcols,me,mecol, n_col, isvch, ich, icontxt, n_row,err_act, int_err(5)
   character          ::diagl, diagu
   logical, parameter :: exchange=.true., noexchange=.false.  
@@ -122,9 +122,9 @@ Subroutine psb_dcg(a,prec,b,x,eps,desc_a,info,&
   call psb_dalloc(mglob,5,wwrk,desc_a,info)
   call psb_asb(wwrk,desc_a,info)  
   if (info.ne.0) then 
-     info=4011
-     call psb_errpush(info,name)
-     goto 9999
+    info=4011
+    call psb_errpush(info,name)
+    goto 9999
   end if
 
   p  => wwrk(:,1)
@@ -154,32 +154,37 @@ Subroutine psb_dcg(a,prec,b,x,eps,desc_a,info,&
   ich = 1 
   call blacs_set(icontxt,16,ich)
 
+  restart: do 
 !!$   
 !!$    r0 = b-Ax0
 !!$   
-  call psb_axpby(one,b,zero,r,desc_a,info)
-  call psb_spmm(-one,a,x,one,r,desc_a,info,work=aux)
-  if (info.ne.0) then 
-     info=4011
-     call psb_errpush(info,name)
-     goto 9999
-  end if
+    if (itx>= litmax) exit restart 
+    it = 0
+    call psb_axpby(one,b,zero,r,desc_a,info)
+    call psb_spmm(-one,a,x,one,r,desc_a,info,work=aux)
+    if (info.ne.0) then 
+      info=4011
+      call psb_errpush(info,name)
+      goto 9999
+    end if
 
-  rho = zero
-  if (listop == 1) then 
-    ani = psb_nrmi(a,desc_a,info)
-    bni = psb_amax(b,desc_a,info)
-  else if (listop == 2) then 
-    bn2 = psb_nrm2(b,desc_a,info)
-  endif
-  if (info.ne.0) then 
-     info=4011
-     call psb_errpush(info,name)
-     goto 9999
-  end if
+    rho = zero
+    if (listop == 1) then 
+      ani = psb_nrmi(a,desc_a,info)
+      bni = psb_amax(b,desc_a,info)
+    else if (listop == 2) then 
+      bn2 = psb_nrm2(b,desc_a,info)
+    endif
+    if (info.ne.0) then 
+      info=4011
+      call psb_errpush(info,name)
+      goto 9999
+    end if
 
 
-  iteration:  do it = 1, itmax
+    iteration:  do 
+      it   = it + 1
+      itx = itx + 1
 
 !!$ 
 !!$  solve mz = r
@@ -198,62 +203,61 @@ Subroutine psb_dcg(a,prec,b,x,eps,desc_a,info,&
 !!$     CALL F90_PSOVRL(Z,DECOMP_DATA,&
 !!$	  & UPDATE_TYPE=SQUARE_ROOT_)
 !!$     CALL F90_PSHALO(Z,DECOMP_DATA)
-    Call psb_prcaply(prec,r,z,desc_a,info,work=aux)
-    rho_old = rho
-    rho     = psb_dot(r,z,desc_a,info)
+      Call psb_prcaply(prec,r,z,desc_a,info,work=aux)
+      rho_old = rho
+      rho     = psb_dot(r,z,desc_a,info)
 
-    if (it==1) then
-      call psb_axpby(one,z,zero,p,desc_a,info)
-   else
-      if (rho_old==zero) then
+      if (it==1) then
+        call psb_axpby(one,z,zero,p,desc_a,info)
+      else
+        if (rho_old==zero) then
+          write(0,*) 'CG Iteration breakdown'
+          exit iteration
+        endif
+        beta = rho/rho_old
+        call psb_axpby(one,z,beta,p,desc_a,info)
+      end if
+
+      call psb_spmm(one,a,p,zero,q,desc_a,info,work=aux)
+      sigma = psb_dot(p,q,desc_a,info)
+      if (sigma==zero) then
         write(0,*) 'CG Iteration breakdown'
         exit iteration
       endif
-      beta = rho/rho_old
-      call psb_axpby(one,z,beta,p,desc_a,info)
-    end if
 
-    call psb_spmm(one,a,p,zero,q,desc_a,info,work=aux)
-    sigma = psb_dot(p,q,desc_a,info)
-    if (sigma==zero) then
-      write(0,*) 'CG Iteration breakdown'
-      exit iteration
-    endif
-
-    alpha = rho/sigma
-    call psb_axpby(alpha,p,one,x,desc_a,info)
-    call psb_axpby(-alpha,q,one,r,desc_a,info)
+      alpha = rho/sigma
+      call psb_axpby(alpha,p,one,x,desc_a,info)
+      call psb_axpby(-alpha,q,one,r,desc_a,info)
 
 
-    if (listop == 1) Then 
-      rni = psb_amax(r,desc_a,info)
-      xni = psb_amax(x,desc_a,info)
-      rerr =  rni/(ani*xni+bni)
-      If (itrac /= -1) Then 
-        If (me.Eq.0) Write(itrac,'(a,i4,5(2x,es10.4))') 'cg: ',it,rerr,rni,bni,&
-             &xni,ani
+      if (listop == 1) Then 
+        rni = psb_amax(r,desc_a,info)
+        xni = psb_amax(x,desc_a,info)
+        rerr =  rni/(ani*xni+bni)
+        If (itrac /= -1) Then 
+          If (me.Eq.0) Write(itrac,'(a,i4,5(2x,es10.4))') 'cg: ',itx,rerr,rni,bni,&
+               &xni,ani
+        Endif
+
+      Else  If (listop == 2) Then 
+
+        rni = psb_nrm2(r,desc_a,info)
+        rerr = rni/bn2
+        If (itrac /= -1) Then 
+          If (me.Eq.0) Write(itrac,'(a,i4,3(2x,es10.4)))') 'cg: ',itx,rerr,rni,bn2
+        Endif
       Endif
-
-    Else  If (listop == 2) Then 
-
-      rni = psb_nrm2(r,desc_a,info)
-      rerr = rni/bn2
-      If (itrac /= -1) Then 
-        If (me.Eq.0) Write(itrac,'(a,i4,3(2x,es10.4)))') 'cg: ',it,rerr,rni,bn2
-      Endif
-    Endif
-
-    if (rerr<=eps) then 
-      exit iteration
-    end if
-  end do iteration
+      if (rerr<=eps) exit restart
+      if (itx>= litmax) exit restart 
+    end do iteration
+  end do restart
 
   if (present(err)) err=rerr
-  if (present(iter)) iter = it
+  if (present(iter)) iter = itx
   if (rerr>eps) then
     write(0,*) 'CG Failed to converge to ',eps,&
          & ' in ',litmax,' iterations '
-    info=it
+    info=itx
   end if
 
   deallocate(aux)
@@ -262,18 +266,18 @@ Subroutine psb_dcg(a,prec,b,x,eps,desc_a,info,&
   call blacs_set(icontxt,16,isvch)
 
   if (info.ne.0) then 
-     call psb_errpush(info,name)
-     goto 9999
+    call psb_errpush(info,name)
+    goto 9999
   end if
-  
+
   call psb_erractionrestore(err_act)
   return
 
 9999 continue
   call psb_erractionrestore(err_act)
   if (err_act.eq.act_abort) then
-     call psb_error()
-     return
+    call psb_error()
+    return
   end if
   return
 
