@@ -235,7 +235,7 @@ Subroutine psb_dgmresr(a,prec,b,x,eps,desc_a,info,&
       Exit restart
     End If
      
-    If (itx.Ge.itmax) Exit restart  
+    If (itx.Ge.litmax) Exit restart  
 
     v(:,1) = v(:,1) * scal
 

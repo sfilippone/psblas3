@@ -186,7 +186,7 @@ subroutine psb_dbicg(a,prec,b,x,eps,desc_a,info,&
 !!$   
 !!$   r0 = b-ax0
 !!$ 
-    if (itx.ge.itmax) exit restart  
+    if (itx.ge.litmax) exit restart  
     it = 0      
     call psb_axpby(one,b,zero,r,desc_a,info)
     call psb_spmm(-one,a,x,one,r,desc_a,info,work=aux)
@@ -301,7 +301,7 @@ subroutine psb_dbicg(a,prec,b,x,eps,desc_a,info,&
       if (rerr<=eps) then 
         exit restart
       end if
-      if (itx.ge.itmax) exit restart
+      if (itx.ge.litmax) exit restart
     end do iteration
   end do restart
 

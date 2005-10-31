@@ -182,7 +182,7 @@ Subroutine psb_dcgs(a,prec,b,x,eps,desc_a,info,&
 !!$
 !!$   r0 = b-ax0
 !!$ 
-    If (itx.Ge.itmax) Exit restart  
+    If (itx.Ge.litmax) Exit restart  
     it = 0      
     Call psb_axpby(one,b,zero,r,desc_a,info)
     Call psb_spmm(-one,a,x,one,r,desc_a,info,work=aux)
@@ -294,7 +294,7 @@ Subroutine psb_dcgs(a,prec,b,x,eps,desc_a,info,&
       If (rerr<=eps) Then 
         Exit restart
       End If
-      If (itx.Ge.itmax) Exit restart
+      If (itx.Ge.litmax) Exit restart
     End Do iteration
   End Do restart
 
