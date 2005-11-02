@@ -155,7 +155,7 @@ contains
             write(iout,*) 'Fill level :',p%baseprecv(2)%iprcparm(ilu_fill_in_)
           case(f_ilu_e_)         
             write(iout,*) 'Fill threshold :',p%baseprecv(2)%dprcparm(fact_eps_)
-          case(f_slu_)         
+          case(f_slu_,f_umf_)         
           case default
             write(iout,*) 'Should never get here!'
           end select
