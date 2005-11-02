@@ -79,6 +79,7 @@ Subroutine psb_dfixcoo(A,INFO,idir)
     a%infoa(psb_srtd_) = psb_isrtdcoo_
 
     if(debug) write(0,*)'FIXCOO: end second loop'
+
   case(1) !  Col major order
 
     call mrgsrt(nza,a%ia2,iaux,iret)

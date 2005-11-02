@@ -627,7 +627,7 @@ subroutine psb_umf_bld(a,desc_a,p,info)
   endif
 
   call fort_umf_factor(atmp%m,nzt,&
-       & atmp%aspk,atmp%ia2,atmp%ia1,&
+       & atmp%aspk,atmp%ia1,atmp%ia2,&
        & p%iprcparm(umf_symptr_),p%iprcparm(umf_numptr_),info)
   if(info /= 0) then
      info=4010
@@ -805,6 +805,36 @@ subroutine psb_mlprec_bld(a,desc_a,p,info)
     call psb_spinfo(psb_nztotreq_,p%av(ac_),nzg,info)
     call fort_slu_factor(nrg,nzg,&
          & p%av(ac_)%aspk,p%av(ac_)%ia2,p%av(ac_)%ia1,p%iprcparm(slu_ptr_),info)
+     if(info /= 0) then
+        info=4011
+        call psb_errpush(info,name)
+        goto 9999
+     end if
+
+  case(f_umf_) 
+    call psb_spall(0,0,p%av(l_pr_),1,info)
+    call psb_spall(0,0,p%av(u_pr_),1,info)
+    call psb_ipcsr2coo(p%av(ac_),info)
+     if(info /= 0) then
+        info=4011
+        call psb_errpush(info,name)
+        goto 9999
+     end if
+    k=0
+    do i=1,p%av(ac_)%infoa(psb_nnz_)
+      if (p%av(ac_)%ia2(i) <= p%av(ac_)%m) then 
+        k = k + 1
+        p%av(ac_)%aspk(k) = p%av(ac_)%aspk(i)
+        p%av(ac_)%ia1(k) = p%av(ac_)%ia1(i)
+        p%av(ac_)%ia2(k) = p%av(ac_)%ia2(i)
+      end if
+    end do
+    p%av(ac_)%infoa(psb_nnz_) = k
+    call psb_ipcoo2csc(p%av(ac_),info)
+    call psb_spinfo(psb_nztotreq_,p%av(ac_),nzg,info)
+    call fort_umf_factor(nrg,nzg,&
+         & p%av(ac_)%aspk,p%av(ac_)%ia1,p%av(ac_)%ia2,&
+         & p%iprcparm(umf_symptr_),p%iprcparm(umf_numptr_),info)
      if(info /= 0) then
         info=4011
         call psb_errpush(info,name)

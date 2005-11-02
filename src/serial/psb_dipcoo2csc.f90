@@ -45,8 +45,7 @@ subroutine psb_dipcoo2csc(a,info,clshr)
   allocate(iaux(nc+1))
   if(debug) write(0,*)'DIPCOO2CSC: out of fixcoo',nza,nc,size(a%ia2),size(iaux)
 
-  itemp => a%ia1
-  a%ia1 => a%ia2
+  itemp => a%ia2
   a%ia2 => iaux
 
   !
@@ -120,19 +119,24 @@ subroutine psb_dipcoo2csc(a,info,clshr)
         j = j + 1
         if (j > nza) exit
         if (itemp(j) /= icl) then 
+          if (i>nc) then 
+            write(0,*) 'Strange situation in coo2csc: ',i,nc,size(a%ia2),&
+                 & nza,j,itemp(j)
+          end if
           a%ia2(i+1) = j
           icl = itemp(j) 
           i = i + 1
         endif
+        if (i>nc) exit
       enddo outer
       !
       ! Cleanup empty cols at the end
       !
       if (j /= (nza+1)) then 
-        write(0,*) 'IPCOO2CSC : Problem from loop :',j,nza
+        write(0,*) 'IPCOO2CSC : Problem from loop :',j,nza,itemp(j)
       endif
       do 
-        if (i>=nc+1) exit
+        if (i>nc) exit
         a%ia2(i+1) = j
         i = i + 1
       end do

@@ -124,6 +124,7 @@ subroutine psb_dipcoo2csr(a,info,rwshr)
           irw = itemp(j) 
           i = i + 1
         endif
+        if (i>nr) exit
       enddo outer
       !
       ! Cleanup empty rows at the end
@@ -132,7 +133,7 @@ subroutine psb_dipcoo2csr(a,info,rwshr)
         write(0,*) 'IPCOO2CSR : Problem from loop :',j,nza
       endif
       do 
-        if (i>=nr+1) exit
+        if (i>nr) exit
         a%ia2(i+1) = j
         i = i + 1
       end do

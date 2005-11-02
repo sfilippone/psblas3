@@ -20,7 +20,7 @@ subroutine psb_dspinfo(ireq,a,ires,info,iaux)
   integer, intent(out)              :: ires, info
   integer, intent(in), optional     :: iaux
 
-  integer :: i,j,k,ip,jp,nr,irw,nz, err_act, row, ipx, pia, pja, rb,idx
+  integer :: i,j,k,ip,jp,nr,irw,nz, err_act, row, ipx, pia, pja, rb,idx, nc
   integer, pointer :: ia1(:), ia2(:), ia3(:), ja(:)
   character(len=20)                 :: name, ch_err
 
@@ -38,7 +38,10 @@ subroutine psb_dspinfo(ireq,a,ires,info,iaux)
         ires = a%infoa(psb_nnz_)
      else if (a%fida == 'JAD') then 
         ires = a%infoa(psb_nnz_)
-     else
+     else if (a%fida == 'CSC') then 
+        nc   = a%k
+        ires = a%ia2(nc+1)-1
+      else
         ires=-1
         info=136
         ch_err=a%fida(1:3)
