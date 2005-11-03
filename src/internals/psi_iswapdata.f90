@@ -1,4 +1,4 @@
-subroutine psi_dswapdatam(flag,n,beta,y,desc_a,work,info,data)
+subroutine psi_iswapdatam(flag,n,beta,y,desc_a,work,info,data)
 
   use psb_error_mod
   use psb_descriptor_type
@@ -447,10 +447,10 @@ subroutine psi_dswapdatam(flag,n,beta,y,desc_a,work,info,data)
      return
   end if
   return
-end subroutine psi_dswapdatam
+end subroutine psi_iswapdatam
 
 
-subroutine psi_dswapdatav(flag,beta,y,desc_a,work,info,data)
+subroutine psi_iswapdatav(flag,beta,y,desc_a,work,info,data)
 
   use psb_error_mod
   use psb_descriptor_type
@@ -901,4 +901,4 @@ subroutine psi_dswapdatav(flag,beta,y,desc_a,work,info,data)
      return
   end if
   return
-end subroutine psi_dswapdatav
+end subroutine psi_iswapdatav
