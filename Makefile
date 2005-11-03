@@ -4,7 +4,7 @@ library:
 	( [ -d lib ] || mkdir lib)
 	(cd src; make lib)
 	@echo "====================================="
-	@echo "Compilation Succesfull."
+	@echo "Compilation Successful."
 	@echo "You can now link to ./lib/libpsblas.a"
 
 clean: 
