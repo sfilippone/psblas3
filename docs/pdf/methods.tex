@@ -1,0 +1,482 @@
+\section{Iterative Methods}
+\label{sec:methods}
+
+In this chapter we provide routines for preconditioners and iterative
+methods. Their
+interfaces are defined in the module \verb|psb_methd_mod|
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+%      CG
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subroutine{psb\_cg \label{cg}}{CG Iterative Method}
+
+This subroutine implements the CG method with restarting. The
+stopping criterion is the normwise backward error, in the infinity
+norm, i.e. the iteration is stopped when 
+\[ \frac{\|r\|}{(\|A\|\|x\|+\|b\|)} < eps \]
+or
+\[ \frac{\|r_i\|}{\|b\|_2} < eps \]
+according to the value passed through the  istop argument (see later).
+
+
+\syntax{call psb\_cgs}{a,prec,b,x,eps,desc\_a,info,itmax,iter,err,itrace,istop}
+
+\begin{description}
+\item[\bf On Entry]
+\item[a] the local portion of global sparse matrix
+$A$. \\
+Scope: {\bf local} \\
+Type: {\bf required}\\
+Specified as: a structured data type specified in \S~\ref{sec:datastruct}.
+\item[prec] The data structure containing the preconditioner.\\
+Scope: {\bf local} \\
+Type: {\bf required}\\
+Specified as: a structured data type specified in \S~\ref{sec:datastruct}.
+\item[b] The RHS vector. \\
+Scope: {\bf local} \\
+Type: {\bf required}\\
+Specified as: a rank one array.
+\item[x] The initial guess. \\
+Scope: {\bf local} \\
+Type: {\bf required}\\
+Specified as: a rank one array.
+\item[eps] The stopping tolerance. \\
+Scope: {\bf global} \\
+Type: {\bf required}\\
+Specified as: a real number. 
+\item[desc\_a] contains data structures for communications.\\
+Scope: {\bf local} \\
+Type: {\bf required}\\
+Specified as: a structured data type specified in \S~\ref{sec:datastruct}.
+\item[itmax]  The maximum number of iterations to perform.\\
+Scope: {\bf global} \\
+Type: {\bf optional}\\
+Default: $itmax = 1000$.\\
+Specified as: an integer variable $itmax \ge 1$.
+\item[itrace]  A tracing parameter.\\
+Scope: {\bf global} \\
+Type: {\bf optional}\\
+\item[istop]  An integer specifying the stopping criterion.\\
+Scope: {\bf global} \\
+Type: {\bf optional}\\
+
+\item[\bf On Return] 
+\item[x] The computed solution. \\
+Scope: {\bf local} \\
+Type: {\bf required}\\
+Specified as: a rank one array.
+\item[iter]  The number of iterations performed.\\
+Scope: {\bf global} \\
+Type: {\bf optional}\\
+Returned  as: an integer variable.
+\item[err]  The error estimate on exit.\\
+Scope: {\bf global} \\
+Type: {\bf optional}\\
+Returned  as: a real number.
+\item[info]  An error code.\\
+Scope: {\bf global} \\
+Type: {\bf optional}\\
+Returned  as: an integer variable.
+\end{description}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+%      CGS
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subroutine{psb\_cgs \label{cgs}}{CGS Iterative Method}
+
+This subroutine implements the CGS method with restarting. The
+stopping criterion is the normwise backward error, in the infinity
+norm, i.e. the iteration is stopped when 
+\[ \frac{\|r\|}{(\|A\|\|x\|+\|b\|)} < eps \]
+or
+\[ \frac{\|r_i\|}{\|b\|_2} < eps \]
+according to the value passed through the  istop argument (see later).
+
+
+\syntax{call psb\_cgs}{a,prec,b,x,eps,desc\_a,info,itmax,iter,err,itrace,istop}
+
+\begin{description}
+\item[\bf On Entry]
+\item[a] the local portion of global sparse matrix
+$A$. \\
+Scope: {\bf local} \\
+Type: {\bf required}\\
+Specified as: a structured data type specified in \S~\ref{sec:datastruct}.
+\item[prec] The data structure containing the preconditioner.\\
+Scope: {\bf local} \\
+Type: {\bf required}\\
+Specified as: a structured data type specified in \S~\ref{sec:datastruct}.
+\item[b] The RHS vector. \\
+Scope: {\bf local} \\
+Type: {\bf required}\\
+Specified as: a rank one array.
+\item[x] The initial guess. \\
+Scope: {\bf local} \\
+Type: {\bf required}\\
+Specified as: a rank one array.
+\item[eps] The stopping tolerance. \\
+Scope: {\bf global} \\
+Type: {\bf required}\\
+Specified as: a real number. 
+\item[desc\_a] contains data structures for communications.\\
+Scope: {\bf local} \\
+Type: {\bf required}\\
+Specified as: a structured data type specified in \S~\ref{sec:datastruct}.
+\item[itmax]  The maximum number of iterations to perform.\\
+Scope: {\bf global} \\
+Type: {\bf optional}\\
+Default: $itmax = 1000$.\\
+Specified as: an integer variable $itmax \ge 1$.
+\item[itrace]  A tracing parameter.\\
+Scope: {\bf global} \\
+Type: {\bf optional}\\
+\item[istop]  An integer specifying the stopping criterion.\\
+Scope: {\bf global} \\
+Type: {\bf optional}\\
+
+\item[\bf On Return] 
+\item[x] The computed solution. \\
+Scope: {\bf local} \\
+Type: {\bf required}\\
+Specified as: a rank one array.
+\item[iter]  The number of iterations performed.\\
+Scope: {\bf global} \\
+Type: {\bf optional}\\
+Returned  as: an integer variable.
+\item[err]  The error estimate on exit.\\
+Scope: {\bf global} \\
+Type: {\bf optional}\\
+Returned  as: a real number.
+\item[info]  An error code.\\
+Scope: {\bf global} \\
+Type: {\bf optional}\\
+Returned  as: an integer variable.
+\end{description}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+%      BiCG
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subroutine{psb\_bicg \label{bicg}}{BiCG Iterative Method}
+
+This subroutine implements the BiCG method with restarting. The
+stopping criterion is the normwise backward error, in the infinity
+norm, i.e. the iteration is stopped when 
+\[ \frac{\|r\|}{(\|A\|\|x\|+\|b\|)} < eps \]
+or
+\[ \frac{\|r_i\|}{\|b\|_2} < eps \]
+according to the value passed through the  istop argument (see later).
+
+
+\syntax{call psb\_bicg}{a,prec,b,x,eps,desc\_a,info,itmax,iter,err,itrace,istop}
+
+\begin{description}
+\item[\bf On Entry]
+\item[a] the local portion of global sparse matrix
+$A$. \\
+Scope: {\bf local} \\
+Type: {\bf required}\\
+Specified as: a structured data type specified in \S~\ref{sec:datastruct}.
+\item[prec] The data structure containing the preconditioner.\\
+Scope: {\bf local} \\
+Type: {\bf required}\\
+Specified as: a structured data type specified in \S~\ref{sec:datastruct}.
+\item[b] The RHS vector. \\
+Scope: {\bf local} \\
+Type: {\bf required}\\
+Specified as: a rank one array.
+\item[x] The initial guess. \\
+Scope: {\bf local} \\
+Type: {\bf required}\\
+Specified as: a rank one array.
+\item[eps] The stopping tolerance. \\
+Scope: {\bf global} \\
+Type: {\bf required}\\
+Specified as: a real number. 
+\item[desc\_a] contains data structures for communications.\\
+Scope: {\bf local} \\
+Type: {\bf required}\\
+Specified as: a structured data type specified in \S~\ref{sec:datastruct}.
+\item[itmax]  The maximum number of iterations to perform.\\
+Scope: {\bf global} \\
+Type: {\bf optional}\\
+Default: $itmax = 1000$.\\
+Specified as: an integer variable $itmax \ge 1$.
+\item[itrace]  A tracing parameter.\\
+Scope: {\bf global} \\
+Type: {\bf optional}\\
+\item[istop]  An integer specifying the stopping criterion.\\
+Scope: {\bf global} \\
+Type: {\bf optional}\\
+
+\item[\bf On Return] 
+\item[x] The computed solution. \\
+Scope: {\bf local} \\
+Type: {\bf required}\\
+Specified as: a rank one array.
+\item[iter]  The number of iterations performed.\\
+Scope: {\bf global} \\
+Type: {\bf optional}\\
+Returned  as: an integer variable.
+\item[err]  The error estimate on exit.\\
+Scope: {\bf global} \\
+Type: {\bf optional}\\
+Returned  as: a real number.
+\item[info]  An error code.\\
+Scope: {\bf global} \\
+Type: {\bf optional}\\
+Returned  as: an integer variable.
+\end{description}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+%      BiCGSTAB
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subroutine{psb\_bicgstab \label{bicgstab}}{BiCGSTAB Iterative Method}
+
+This subroutine implements the BiCGSTAB method with restarting. The
+stopping criterion is the normwise backward error, in the infinity
+norm, i.e. the iteration is stopped when 
+\[ \frac{\|r\|}{(\|A\|\|x\|+\|b\|)} < eps \]
+or
+\[ \frac{\|r_i\|}{\|b\|_2} < eps \]
+according to the value passed through the  istop argument (see later).
+
+
+\syntax{call psb\_bicgstab}{a,prec,b,x,eps,desc\_a,info,itmax,iter,err,itrace,istop}
+
+\begin{description}
+\item[\bf On Entry]
+\item[a] the local portion of global sparse matrix
+$A$. \\
+Scope: {\bf local} \\
+Type: {\bf required}\\
+Specified as: a structured data type specified in \S~\ref{sec:datastruct}.
+\item[prec] The data structure containing the preconditioner.\\
+Scope: {\bf local} \\
+Type: {\bf required}\\
+Specified as: a structured data type specified in \S~\ref{sec:datastruct}.
+\item[b] The RHS vector. \\
+Scope: {\bf local} \\
+Type: {\bf required}\\
+Specified as: a rank one array.
+\item[x] The initial guess. \\
+Scope: {\bf local} \\
+Type: {\bf required}\\
+Specified as: a rank one array.
+\item[eps] The stopping tolerance. \\
+Scope: {\bf global} \\
+Type: {\bf required}\\
+Specified as: a real number. 
+\item[desc\_a] contains data structures for communications.\\
+Scope: {\bf local} \\
+Type: {\bf required}\\
+Specified as: a structured data type specified in \S~\ref{sec:datastruct}.
+\item[itmax]  The maximum number of iterations to perform.\\
+Scope: {\bf global} \\
+Type: {\bf optional}\\
+Default: $itmax = 1000$.\\
+Specified as: an integer variable $itmax \ge 1$.
+\item[itrace]  A tracing parameter.\\
+Scope: {\bf global} \\
+Type: {\bf optional}\\
+\item[istop]  An integer specifying the stopping criterion.\\
+Scope: {\bf global} \\
+Type: {\bf optional}\\
+
+\item[\bf On Return] 
+\item[x] The computed solution. \\
+Scope: {\bf local} \\
+Type: {\bf required}\\
+Specified as: a rank one array.
+\item[iter]  The number of iterations performed.\\
+Scope: {\bf global} \\
+Type: {\bf optional}\\
+Returned  as: an integer variable.
+\item[err]  The error estimate on exit.\\
+Scope: {\bf global} \\
+Type: {\bf optional}\\
+Returned  as: a real number.
+\item[info]  An error code.\\
+Scope: {\bf global} \\
+Type: {\bf optional}\\
+Returned  as: an integer variable.
+\end{description}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+%      BiCGSTAB(L)
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subroutine{psb\_bicgstabl \label{bicgstabl}}{BiCGSTAB-$l$ Iterative Method}
+
+This subroutine implements the BiCGSTAB-$l$ method with restarting. The
+stopping criterion is the normwise backward error, in the infinity
+norm, i.e. the iteration is stopped when 
+\[ \frac{\|r\|}{(\|A\|\|x\|+\|b\|)} < eps \]
+or
+\[ \frac{\|r_i\|}{\|b\|_2} < eps \]
+according to the value passed through the  istop argument (see later).
+
+
+\syntax{call psb\_bicgstab}{a,prec,b,x,eps,desc\_a,info,itmax,iter,err,itrace,irst,istop}
+
+\begin{description}
+\item[\bf On Entry]
+\item[a] the local portion of global sparse matrix
+$A$. \\
+Scope: {\bf local} \\
+Type: {\bf required}\\
+Specified as: a structured data type specified in \S~\ref{sec:datastruct}.
+\item[prec] The data structure containing the preconditioner.\\
+Scope: {\bf local} \\
+Type: {\bf required}\\
+Specified as: a structured data type specified in \S~\ref{sec:datastruct}.
+\item[b] The RHS vector. \\
+Scope: {\bf local} \\
+Type: {\bf required}\\
+Specified as: a rank one array.
+\item[x] The initial guess. \\
+Scope: {\bf local} \\
+Type: {\bf required}\\
+Specified as: a rank one array.
+\item[eps] The stopping tolerance. \\
+Scope: {\bf global} \\
+Type: {\bf required}\\
+Specified as: a real number. 
+\item[desc\_a] contains data structures for communications.\\
+Scope: {\bf local} \\
+Type: {\bf required}\\
+Specified as: a structured data type specified in \S~\ref{sec:datastruct}.
+\item[itmax]  The maximum number of iterations to perform.\\
+Scope: {\bf global} \\
+Type: {\bf optional}\\
+Default: $itmax = 1000$.\\
+Specified as: an integer variable $itmax \ge 1$.
+\item[itrace]  A tracing parameter.\\
+Scope: {\bf global} \\
+Type: {\bf optional}\\
+\item[irst]  An integer specifying the restarting iteration.\\
+Scope: {\bf global} \\
+Type: {\bf optional}\\
+\item[istop]  An integer specifying the stopping criterion.\\
+Scope: {\bf global} \\
+Type: {\bf optional}\\
+
+\item[\bf On Return] 
+\item[x] The computed solution. \\
+Scope: {\bf local} \\
+Type: {\bf required}\\
+Specified as: a rank one array.
+\item[iter]  The number of iterations performed.\\
+Scope: {\bf global} \\
+Type: {\bf optional}\\
+Returned  as: an integer variable.
+\item[err]  The error estimate on exit.\\
+Scope: {\bf global} \\
+Type: {\bf optional}\\
+Returned  as: a real number.
+\item[info]  An error code.\\
+Scope: {\bf global} \\
+Type: {\bf optional}\\
+Returned  as: an integer variable.
+\end{description}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+%      GMRES
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subroutine{psb\_gmres \label{gmres}}{GMRES Iterative Method}
+
+This subroutine implements the GMRES method with restarting. The
+stopping criterion is the normwise backward error, in the infinity
+norm, i.e. the iteration is stopped when 
+\[ \frac{\|r\|}{(\|A\|\|x\|+\|b\|)} < eps \]
+or
+\[ \frac{\|r_i\|}{\|b\|_2} < eps \]
+according to the value passed through the  istop argument (see later).
+
+
+\syntax{call psb\_gmres}{a,prec,b,x,eps,desc\_a,info,itmax,iter,err,itrace,irst,istop}
+
+\begin{description}
+\item[\bf On Entry]
+\item[a] the local portion of global sparse matrix
+$A$. \\
+Scope: {\bf local} \\
+Type: {\bf required}\\
+Specified as: a structured data type specified in \S~\ref{sec:datastruct}.
+\item[prec] The data structure containing the preconditioner.\\
+Scope: {\bf local} \\
+Type: {\bf required}\\
+Specified as: a structured data type specified in \S~\ref{sec:datastruct}.
+\item[b] The RHS vector. \\
+Scope: {\bf local} \\
+Type: {\bf required}\\
+Specified as: a rank one array.
+\item[x] The initial guess. \\
+Scope: {\bf local} \\
+Type: {\bf required}\\
+Specified as: a rank one array.
+\item[eps] The stopping tolerance. \\
+Scope: {\bf global} \\
+Type: {\bf required}\\
+Specified as: a real number. 
+\item[desc\_a] contains data structures for communications.\\
+Scope: {\bf local} \\
+Type: {\bf required}\\
+Specified as: a structured data type specified in \S~\ref{sec:datastruct}.
+\item[itmax]  The maximum number of iterations to perform.\\
+Scope: {\bf global} \\
+Type: {\bf optional}\\
+Default: $itmax = 1000$.\\
+Specified as: an integer variable $itmax \ge 1$.
+\item[itrace]  A tracing parameter.\\
+Scope: {\bf global} \\
+Type: {\bf optional}\\
+\item[irst]  An integer specifying the restart iteration.\\
+Scope: {\bf global} \\
+Type: {\bf optional}\\
+\item[istop]  An integer specifying the stopping criterion.\\
+Scope: {\bf global} \\
+Type: {\bf optional}\\
+
+\item[\bf On Return] 
+\item[x] The computed solution. \\
+Scope: {\bf local} \\
+Type: {\bf required}\\
+Specified as: a rank one array.
+\item[iter]  The number of iterations performed.\\
+Scope: {\bf global} \\
+Type: {\bf optional}\\
+Returned  as: an integer variable.
+\item[err]  The error estimate on exit.\\
+Scope: {\bf global} \\
+Type: {\bf optional}\\
+Returned  as: a real number.
+\item[info]  An error code.\\
+Scope: {\bf global} \\
+Type: {\bf optional}\\
+Returned  as: an integer variable.
+\end{description}
+
+
+
+
+
+%%% Local Variables: 
+%%% mode: latex
+%%% TeX-master: "userguide"
+%%% End: 

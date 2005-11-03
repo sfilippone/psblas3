@@ -1,14 +1,46 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Contents: The title page
+% $Id$
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\ifx\pdfoutput\undefined % We're not running pdftex
+\else
+\pdfbookmark{Title Page}{title}
+\fi
+\newlength{\centeroffset}
+\setlength{\centeroffset}{-0.5\oddsidemargin}
+\addtolength{\centeroffset}{0.5\evensidemargin}
+%\addtolength{\textwidth}{-\centeroffset}
 \thispagestyle{empty}
-\vspace{5cm}
+\vspace*{\stretch{1}}
+\noindent\hspace*{\centeroffset}\makebox[0pt][l]{\begin{minipage}{\textwidth}
+\flushright
+{\Huge\bfseries PSBLAS-2.0 User's guide
+}
+\noindent\rule[-1ex]{\textwidth}{5pt}\\[2.5ex]
+\hfill\emph{\Large A reference guide for the Parallel Sparse BLAS library}
+\end{minipage}}
 
-\begin{center}
-{\Large PSBLAS V. 2.0}\\
-Userguide
-\vspace{5cm}
-Alfredo Buttari
-Salvatore Filippone
+\vspace{\stretch{1}}
+\noindent\hspace*{\centeroffset}\makebox[0pt][l]{\begin{minipage}{\textwidth}
+\flushright
+{\bfseries 
+by Salvatore Filippone\\[1.5ex]
+and Alfredo Buttari\\[3ex]} 
+``Tor Vergata'' University of Rome.
+\today
+\end{minipage}}
 
-%%% Local Variables: 
-%%% mode: latex
-%%% TeX-master: "userguide"
-%%% End: 
+%\addtolength{\textwidth}{\centeroffset}
+\vspace{\stretch{2}}
+
+\endinput
+
+%
+
+% Local Variables:
+% TeX-master: "userguide"
+% mode: latex
+% mode: flyspell
+% End:
+

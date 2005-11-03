@@ -1,0 +1,451 @@
+\section{Data management and initialization routines}
+%
+%%   psb_alloc %%
+%
+\subroutine{psb\_alloc}{Allocates a dense matrix}
+
+\syntax{call psb\_alloc}{m, n, x, desc\_a, info, js}
+\syntax*{call psb\_alloc}{m, n, x, desc\_a, info}
+
+\begin{description}
+\item[\bf On Entry]
+\item[m] The number of rows of the dense matrix to be allocated.\\
+Scope: {\bf local} \\
+Type: {\bf required}\\
+\item[n] The number of columns of the dense matrix to be allocated.\\
+Scope: {\bf local} \\
+Type: {\bf required}\\
+\item[desc\_a] The communication descriptor.\\
+Scope: {\bf local} \\
+Type: {\bf required}\\
+\item[js] The starting column.\\
+Scope: {\bf local} \\
+Type: {\bf optional}\\
+\end{description}
+
+\begin{description}
+\item[\bf On Return]
+\item[x] The dense matrix to be allocated.
+Scope: {\bf local} \\
+Type: {\bf required}\\
+\item[info] Error code.
+Scope: {\bf local} \\
+Type: {\bf required}\\
+\end{description}
+
+%
+%%   psb_asb %%
+%
+\subroutine{psb\_asb}{Assembly a dense matrix}
+
+\syntax{call psb\_asb}{x, desc\_a, info}
+
+\begin{description}
+\item[\bf On Entry]
+\item[desc\_a] The communication descriptor.\\
+Scope: {\bf local} \\
+Type: {\bf required}\\
+\end{description}
+
+\begin{description}
+\item[\bf On Return]
+\item[x] The dense matrix to be assembled.
+Scope: {\bf local} \\
+Type: {\bf required}\\
+\item[info] Error code.
+Scope: {\bf local} \\
+Type: {\bf required}\\
+\end{description}
+
+
+%
+%%   psb_csrp %%
+%
+\subroutine{psb\_csrp}{Applies a right permutation to a sparse matrix}
+
+\syntax{call psb\_csrp}{trans, iperm, a, desc\_a, info}
+
+\begin{description}
+\item[\bf On Entry]
+\item[arg]
+\end{description}
+
+\begin{description}
+\item[\bf On Return]
+\item[arg]
+\end{description}
+
+
+%
+%%   psb_descprt %%
+%
+\subroutine{psb\_descprt}{Prints a descriptor}
+
+\syntax{call psb\_descprt}{iout, desc\_p, glob, short}
+
+\begin{description}
+\item[\bf On Entry]
+\item[arg]
+\end{description}
+
+\begin{description}
+\item[\bf On Return]
+\item[arg]
+\end{description}
+
+
+%
+%%   psb_free %%
+%
+\subroutine{psb\_free}{Frees a dense matrix}
+
+\syntax{call psb\_free}{x, desc\_a, info}
+
+\begin{description}
+\item[\bf On Entry]
+\item[arg]
+\end{description}
+
+\begin{description}
+\item[\bf On Return]
+\item[arg]
+\end{description}
+
+
+%
+%%   psb_gelp %%
+%
+\subroutine{psb\_gelp}{Applies a left permutation to a dense matrix}
+
+\syntax{call psb\_gelp}{trans, iperm, x, desc\_a, info}
+
+\begin{description}
+\item[\bf On Entry]
+\item[arg]
+\end{description}
+
+\begin{description}
+\item[\bf On Return]
+\item[arg] 
+\end{description}
+
+%
+%%   psb_ins %%
+%
+\subroutine{psb\_ins}{Insert a submatrix into a dense matrix}
+
+\syntax{call psb\_ins}{m, n, x, ix, jx, blck, desc\_a, info, iblck, jblck}
+\syntax*{call psb\_ins}{m, x, ix, jx, blck, desc\_a, info, iblck}
+\syntax*{call psb\_ins}{m, x, ix, jx, blck, desc\_a, info, iblck, insflag}
+
+\begin{description}
+\item[\bf On Entry]
+\item[arg]
+\end{description}
+
+\begin{description}
+\item[\bf On Return]
+\item[arg] 
+\end{description}
+
+
+%
+%%   psb_dscall %%
+%
+\subroutine{psb\_dscall}{Allocates a communication descriptor}
+
+\syntax{call psb\_dscall}{m, n, parts, icontxt, desc\_a, info, flag}
+\syntax*{call psb\_dscall}{m, v, icontxt, desc\_a, info, flag}
+
+\begin{description}
+\item[\bf On Entry]
+\item[arg]
+\end{description}
+
+\begin{description}
+\item[\bf On Return]
+\item[arg] 
+\end{description}
+
+
+%
+%%   psb_dscasb %%
+%
+\subroutine{psb\_dscasb}{Communication descriptor assembly routine}
+
+\syntax{call psb\_dscasb}{desc\_a, info}
+
+\begin{description}
+\item[\bf On Entry]
+\item[arg]
+\end{description}
+
+\begin{description}
+\item[\bf On Return]
+\item[arg] 
+\end{description}
+
+
+
+%
+%%   psb_dsccpy %%
+%
+\subroutine{psb\_dsccpy}{Copies a communication descriptor}
+
+\syntax{call }{}
+\syntax*{call }{}
+
+\begin{description}
+\item[\bf On Entry]
+\item[arg]
+\end{description}
+
+\begin{description}
+\item[\bf On Return]
+\item[arg] 
+\end{description}
+
+
+%
+%%   psb_dscfree %%
+%
+\subroutine{psb\_dscfree}{Frees a communication descriptor}
+
+\syntax{call }{}
+\syntax*{call }{}
+
+\begin{description}
+\item[\bf On Entry]
+\item[arg]
+\end{description}
+
+\begin{description}
+\item[\bf On Return]
+\item[arg] 
+\end{description}
+
+
+
+%
+%%   psb_dscins %%
+%
+\subroutine{psb\_dscins}{Comunnication descriptor insert routine}
+
+\syntax{call }{}
+\syntax*{call }{}
+
+\begin{description}
+\item[\bf On Entry]
+\item[arg]
+\end{description}
+
+\begin{description}
+\item[\bf On Return]
+\item[arg] 
+\end{description}
+
+
+
+%
+%%   psb_dscren %%
+%
+\subroutine{psb\_dscren}{Applies a renumeration to a communication descriptor}
+
+\syntax{call }{}
+\syntax*{call }{}
+
+\begin{description}
+\item[\bf On Entry]
+\item[arg]
+\end{description}
+
+\begin{description}
+\item[\bf On Return]
+\item[arg] 
+\end{description}
+
+
+
+%
+%%   psb_spalloc %%
+%
+\subroutine{psb\_spalloc}{Allocates a sparse matrix}
+
+\syntax{call }{}
+\syntax*{call }{}
+
+\begin{description}
+\item[\bf On Entry]
+\item[arg]
+\end{description}
+
+\begin{description}
+\item[\bf On Return]
+\item[arg] 
+\end{description}
+
+
+
+%
+%%   psb_spasb %%
+%
+\subroutine{psb\_spasb}{Sparse matrix assembly routine}
+
+\syntax{call }{}
+\syntax*{call }{}
+
+\begin{description}
+\item[\bf On Entry]
+\item[arg]
+\end{description}
+
+\begin{description}
+\item[\bf On Return]
+\item[arg] 
+\end{description}
+
+
+
+%
+%%   psb_spcnv %%
+%
+\subroutine{psb\_spcnv}{Converts a sparse matrix storage format}
+
+\syntax{call }{}
+\syntax*{call }{}
+
+\begin{description}
+\item[\bf On Entry]
+\item[arg]
+\end{description}
+
+\begin{description}
+\item[\bf On Return]
+\item[arg] 
+\end{description}
+
+
+
+%
+%%   psb_spfree %%
+%
+\subroutine{psb\_spfree}{Frees a sparse matrix}
+
+\syntax{call }{}
+\syntax*{call }{}
+
+\begin{description}
+\item[\bf On Entry]
+\item[arg]
+\end{description}
+
+\begin{description}
+\item[\bf On Return]
+\item[arg] 
+\end{description}
+
+
+
+%
+%%   psb_spins %%
+%
+\subroutine{psb\_spins}{Sparse matrix insertion routine}
+
+\syntax{call }{}
+\syntax*{call }{}
+
+\begin{description}
+\item[\bf On Entry]
+\item[arg]
+\end{description}
+
+\begin{description}
+\item[\bf On Return]
+\item[arg] 
+\end{description}
+
+
+
+%
+%%   psb_sprn %%
+%
+\subroutine{psb\_sprn}{???}
+
+\syntax{call }{}
+\syntax*{call }{}
+
+\begin{description}
+\item[\bf On Entry]
+\item[arg]
+\end{description}
+
+\begin{description}
+\item[\bf On Return]
+\item[arg] 
+\end{description}
+
+
+
+%
+%%   psb_spupdate %%
+%
+\subroutine{psb\_spupdate}{???}
+
+\syntax{call }{}
+\syntax*{call }{}
+
+\begin{description}
+\item[\bf On Entry]
+\item[arg]
+\end{description}
+
+\begin{description}
+\item[\bf On Return]
+\item[arg] 
+\end{description}
+
+
+
+%
+%%   psb_glob_to_loc %%
+%
+\subroutine{psb\_glob\_to\_loc}{Global to local indices convertion}
+
+\syntax{call }{}
+\syntax*{call }{}
+
+\begin{description}
+\item[\bf On Entry]
+\item[arg]
+\end{description}
+
+\begin{description}
+\item[\bf On Return]
+\item[arg] 
+\end{description}
+
+
+
+%
+%%   psb_loc_to_glob %%
+%
+\subroutine{psb\_loc\_to\_glob}{Local to global indices conversion}
+
+\syntax{call }{}
+\syntax*{call }{}
+
+\begin{description}
+\item[\bf On Entry]
+\item[arg]
+\end{description}
+
+\begin{description}
+\item[\bf On Return]
+\item[arg] 
+\end{description}
+
+
+%%% Local Variables: 
+%%% mode: latex
+%%% TeX-master: "userguide"
+%%% End: 

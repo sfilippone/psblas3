@@ -1,8 +1,8 @@
-\documentclass[12pt,a4paper,twoside]{report}
+\documentclass[12pt,a4paper,twoside]{article}
 \usepackage{pstricks}
 \usepackage{amsfonts}
-\usepackage{minitoc}
-\setcounter{minitocdepth}{2}
+% \usepackage{minitoc}
+% \setcounter{minitocdepth}{2}
 \usepackage[bookmarks=true, 
             bookmarksnumbered=true, 
             bookmarksopen=false, 
@@ -16,8 +16,8 @@
 \newtheorem{theorem}{Theorem}
 \newtheorem{corollary}{Corollary}
 
-\newboolean{mtc}
-\setboolean{mtc}{true}
+%\newboolean{mtc}
+%\setboolean{mtc}{true}
 
 \pdfoutput=1
 \relax
@@ -30,98 +30,64 @@
   /Producer ($Id$)
 }
 \pdfcatalog{          %-- Catalog dictionary of PDF output.
-  %/PageMode
-  %/UseNone
-  %/UseOutlines
-  %/UseThumbs
-  %/FullScreen
   /URI (http://ce.uniroma2.it/psblas)
 } 
-%openaction goto page 1 {/Fit}
 
+\newcounter{subroutine}[subsection]
+\newcounter{example}[subroutine]
+\newcommand{\subroutine}[2]{\clearpage%
+\stepcounter{subroutine}%
+      \section*{\flushleft #1---#2 \endflushleft}%
+      \addcontentsline{toc}{subsection}{#1}%
+      \markright{#1}}%
+\newcommand{\examplename}{Example}
+\newcommand{\syntaxname}{Syntax}
+\makeatletter
+\def\syntax{\@ifstar{\@ssyntax}{\@syntax}}%
+\def\@syntax{\section*{\syntaxname}%
+     \@ssyntax}%
+\def\@ssyntax#1#2{%
+   \setbox\@tempboxa\hbox{#1\ {\em $($#2$)$}}%
+   \ifdim \wd\@tempboxa >\hsize
+        \setbox\@tempboxa\hbox{\em $($#2$)$}
+	\ifdim\wd\@tempboxa >\hsize
+          \begin{flushright}#1\ \em$($#2$)$\end{flushright}%
+	\else
+         \hbox to\hsize{#1\hfil}%
+         \hbox to\hsize{\hfil\box\@tempboxa}%
+        \fi
+     \else
+       \hbox to\hsize{\hfil\box\@tempboxa\hfil}%
+   \fi\par\vskip\baselineskip}
+\makeatother
+\newcommand{\example}{\stepcounter{example}%
+\section*{\examplename~\theexample}}
 
-%\usepackage{ucs}
-%\usepackage[utf8x]{inputenc}
-
-%\addtolength{\hoffset}{-0.5cm}
-%\addtolength{\textwidth}{1.5cm}
-
-\title{Parallel Sparse BLAS V. 2.0: user's guide}
-\author{
-Alfredo Buttari\thanks{
-%Computer Science Engineering Dept.
-Tor Vergata University, Rome, Italy},
-Salvatore Filippone\addtocounter{footnote}{-1}\footnotemark
-}
-\date{\today}
-
+\newcommand{\precdata}{\hyperlink{precdata}{\tt psb\_prec\_data}}
 
 \begin{document}
-\maketitle
-\ifthenelse{\boolean{mtc}}{\dominitoc}{}
- \newcommand{\ns}{\normalsize}
- \newcommand{\fs}{\footnotesize}
- \newcommand{\sz}{\scriptsize}
- \newcommand{\sm}{\small}
- \newcommand{\doublespace}{\addtolength{\baselineskip}{.5\baselineskip}}
- \newcommand{\und}{\underline}
- \newcommand{\bi}{\begin{itemize}}
- \newcommand{\ei}{\end{itemize}}
-
- \newcommand{\ls}[1]
-    {\dimen0=\fontdimen6\the\font
-     \lineskip=#1\dimen0
-     \advance\lineskip.5\fontdimen5\the\font
-     \advance\lineskip-\dimen0
-     \lineskiplimit=.9\lineskip
-     \baselineskip=\lineskip
-     \advance\baselineskip\dimen0
-     \normallineskip\lineskip
-     \normallineskiplimit\lineskiplimit
-     \normalbaselineskip\baselineskip
-     \ignorespaces}
-
- \newcommand{\thls}{\ls{1.35}}
- \newcommand{\tabls}{\ls{1.2}}
-
-% \begingroup
-%   \renewcommand*{\thepage}{Title}
-%   \include{committee}
-% \endgroup 
-
-% \begingroup
-%   \renewcommand*{\thepage}{ack}
-%   \include{ack}
-% \endgroup 
+\include{title}
 
 \begingroup
   \renewcommand*{\thepage}{toc}
   \pagenumbering{roman}   % Roman numbering
   \setcounter{page}{1}    % Abstract start on page ii
-  \thls
   \tableofcontents
 \endgroup  
-
-%\listoffigures
-%\listoftables
 
 \newpage
 
 \pagenumbering{arabic}  % Arabic numbering
 \setcounter{page}{1}    % Chapters start on page 1
 
-% HEADER and FOOTER 
-\pagestyle{headings}
-
-\renewcommand{\chaptermark}[1]%
-  {\markboth{\ #1 \hspace{0.3cm}Chapter \thechapter}{}} 
-\renewcommand{\sectionmark}[1]%
-  {\markright{Section \thesection.\ \hspace{0.3cm}#1}}
-
-
-
-
-
+\precdata
+\include{intro}
+\include{datastruct}
+\include{psbrout}
+\include{commrout}
+\include{toolsrout}
+\include{methods}
+\include{precs}
 
 \end{document}
 %%% Local Variables: 

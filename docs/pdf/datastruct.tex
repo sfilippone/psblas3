@@ -1,0 +1,195 @@
+\section{Data Structures}
+\label{sec:datastruct}
+%\ifthenelse{\boolean{mtc}}{\minitoc}{}
+
+In this chapter are illustrated data structures used for definition of
+routines interfaces. This include data structure for sparse matrix,
+communication descriptor and preconditioner. These data structures are used for
+calling PSBLAS routines in Fortran~90 language and will be used to next
+chapters containing these callings. Their definitions are included in
+the modules \verb|psb_spmat_type|, \verb|psb_descriptor_type| and \verb|psb_prec_type|. 
+
+\subsection{Sparse Matrix data structure}
+\label{sec:spmat}
+Contains all information about local portion of the sparse matrix and
+its storage mode. Many of this fields are set in fully-transparent
+mode by PSBLAS-TOOLS routines when inserting a new sparse matrix, user
+must set only fields which describe matrix storage mode (see
+\S~\ref{psb_spall}). \\
+Fields contained in Sparse matrix structures are:
+\begin{description}
+\item[{\bf aspk}] Contains values of the local distributed sparse
+matrix.\\
+Specified as: a pointer to an array of rank one of type corresponding
+to matrix entries type .
+\item[{\bf ia1}] Holds integer information on distributed sparse
+matrix. Actual information will depend on data format used.\\
+Specified as: a pointer to an integer array of rank one.
+\item[{\bf ia2}] Holds integer information on distributed sparse
+matrix. Actual information will depend on data format used.\\
+Specified as: a pointer to an integer array of rank one.
+\item[{\bf infoa}] On entry can hold auxiliary information on distributed sparse
+matrix.  Actual information will depend on data format used.\\
+Specified as: integer array of length 10.
+\item[{\bf fida}] Defines the format of the distributed sparse matrix.\\
+Specified as: a string of length 5
+\item[{\bf descra}] Describe the characteristic of the distributed sparse matrix.\\
+Specified as: array of character of length 9.
+\item[{\bf pl}] Specifies the local row permutation of distributed sparse
+matrix. If pl(1) is equal to 0, then there isn't row permutation.\\
+Specified as: pointer to integer array of dimension equal to number of local row (matrix\_data[psb\_n\_row\_\hbox{]})
+\item[{\bf pr}] Specifies the local column permutation of distributed sparse
+matrix. If PR(1) is equal to 0, then there isn't columnm permutation.\\
+Specified as: pointer to integer array of dimension equal to number of
+local row (matrix\_data[psb\_n\_col\_\hbox{]})
+\item[{\bf m}] Number of rows; if row indices are stored explicitly,
+as in Coordinate Storage, should be greater than or equal to the
+maximum row index actually present in the sparse matrix.
+Specified as: integer variable.
+\item[{\bf k}] Number of columns; if column indices are stored explicitly,
+as in Coordinate Storage or Compressed Sparse Rows, should be greater
+than or equal to the maximum column  index actually present in the sparse matrix.
+Specified as: integer variable.
+\end{description}
+Values assumed by this fields are compatible with ref. 1 (see \S~\ref{chap:appendix}).\\
+FORTRAN95 interface for distributed sparse matrices containing double precision
+real entries is defined as follows:
+\begin{verbatim}
+type d_spmat
+     integer     :: m, k
+     character*5 :: fida
+     character*1 :: descra(9)
+     integer     :: infoa(10)
+     real(kind(1.d0)), pointer :: aspk(:)
+     integer, pointer :: ia1(:), ia2(:)
+     integer, pointer :: pl(:), pr(:)
+end type d_spmat	
+\end{verbatim}
+The following two cases are used in the data insertion routines: 
+\begin{description}
+\item[fida=``CSR''] Compressed storage rows. In this case the
+following should hold: 
+\begin{enumerate}
+\item \verb|ia2(i)| contains the index of the first element of row
+\verb|i|; the last element of the sparse matrix is thus stored at
+index $ia2(m+1)-1$. It should contain \verb|m+1| entries in
+nondecreasing order (strictly increasing, if there are no empty rows).
+\item \verb|ia1(j)| contains the column index and \verb|aspk(j)|
+contains the corresponding coefficient value, for all $ia2(1) \le j
+\le ia2(m+1)-1$.
+\end{enumerate}
+\item[fida=``COO''] Coordinate storage. In this case the following
+should hold: 
+\begin{enumerate}
+\item \verb|infoa(1)| contains the number of nonzero elements in the
+matrix; 
+\item For all $1 \le j \le infoa(1)$, the coefficient, row index and
+column index are stored into \verb|apsk(j)|, \verb|ia1(j)| and
+\verb|ia2(j)| respectively. 
+\end{enumerate}
+\end{description}
+
+
+\subsubsection{Sparse Matrix storage formats}
+
+\subsection{Descriptor data structure}
+\label{sec:desc}
+All the general matrix informations and elements to be
+exchanged among processes are stored within a data structure of the type $psb_desc_type$. 
+Every structure of this type is associated to a sparse matrix, it
+contains data about general matrix informations and elements to be
+exchanged among processes.  \\ 
+It is not necessary for the user to
+know the internal structure of $psb_desc_type$, it is set in
+fully-transparent mode by PSBLAS-TOOLS routines when inserting a new
+sparse matrix, however the definition of the descriptor is the
+following.  
+\begin{description}
+\item[{\bf matrix\_data}] includes general information about matrix and
+BLACS grid. More precisely:
+\begin{description}
+\item[matrix\_data[psb\_dec\_type\_\hbox{]}] Identifies the decomposition type
+(global); the actual values are internally defined, so they should
+never be accessed directly.
+\item[matrix\_data[psb\_ctxt\_\hbox{]}] Communication context as returned by the
+BLACS (global).
+\item[matrix\_data[psb\_m\_\hbox{]}] Total number of equations (global).
+\item[matrix\_data[psb\_n\_\hbox{]}] Total number of variables (global).
+\item[matrix\_data[psb\_n\_row\_\hbox{]}] Number of grid variables owned by the
+current process (local); equivalent to the number of local rows in the
+sparse coefficient matrix.
+\item[matrix\_data[psb\_n\_col\_\hbox{]}] Total number of grid variables read by the
+current process (local); equivalent to the number of local columns in
+the sparse coefficient matrix. They include the halo.
+\end{description}
+Specified as: a pointer to integer array of dimension 10.
+\item[{\bf halo\_index}] A list of the halo and boundary elements for
+the current process to be exchanged with other processes; for each
+processes with which it is necessary to communicate:
+\begin{enumerate}
+\item Process identifier;
+\item Number of points to be received;
+\item Indices of points to be received;
+\item Number of points to be sent;
+\item Indices of points to be sent;
+\end{enumerate}
+The list may contain an arbitrary number of groups; its end is marked
+by a -1.\\
+Specified as: a pointer to an integer array of rank one.
+\item [{\bf ovrlap\_index}] A list of the overlap elements for the
+current process, organized in groups like the previous vector:
+\begin{enumerate}
+\item Process identifier;
+\item Number of points to be received;
+\item Indices of points to be received;
+\item Number of points to be sent;
+\item Indices of points to be sent;
+\end{enumerate}
+The list may contain an arbitrary number of groups; its end is marked
+by a -1.\\
+Specified as: a pointer to an integer array  of rank one.
+\item [{\bf ovrlap\_index}] For all overlap points belonging to th
+ecurrent process:
+\begin{enumerate}
+\item  Overlap point index;
+\item  Number of processes sharing that overlap points;
+\end{enumerate}
+The list may contain an arbitrary number of groups; its end is marked
+by a -1.\\
+Specified as: a pointer to an integer array of rank one.
+\item[{\bf loc\_to\_glob}] each element $i$ of this array contains
+global identifier of the local variable $i$.\\
+Specified as: a pointer to an integer array of rank one.
+\item[{\bf glob\_to\_loc}]  if global variable $i$ is read by current
+process then element $i$ contains local index correpondent to global variable $i$;
+else element $i$ contains -1 (NULL) value.\\
+Specified as: a pointer to an integer array of rank one.
+\end{description}
+FORTRAN90 interface for $decomp\_data$ structures is therefore defined
+as follows:
+\begin{verbatim}
+ type decomp_data_type
+     integer, pointer :: matrix_data(:)
+     integer, pointer :: halo_index(:)
+     integer, pointer :: ovrlap_elem(:)
+     integer, pointer :: ovrlap_index(:)
+     integer, pointer :: loc_to_glob(:)
+     integer, pointer :: glob_to_loc (:)
+  end type decomp_data_type
+\end{verbatim}
+
+\subsection{Preconditioner data structure}
+\label{sec:prec}
+\hypertarget{precdata}{ciao finocchio}
+
+
+
+\subsection{Building and assembling data structures}
+
+
+
+
+%%% Local Variables: 
+%%% mode: latex
+%%% TeX-master: "userguide"
+%%% End: 
