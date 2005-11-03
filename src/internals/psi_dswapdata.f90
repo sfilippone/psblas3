@@ -828,12 +828,12 @@ subroutine psi_dswapdatav(flag,beta,y,desc_a,work,info,data)
           end if
           idx_pt = point_to_proc+psb_elem_recv_
           rcv_pt = brvidx(proc_to_comm)
-          call psi_sct(nerv,n,d_idx(idx_pt:idx_pt+nerv-1),&
+          call psi_sct(nerv,d_idx(idx_pt:idx_pt+nerv-1),&
                & rcvbuf(rcv_pt:rcv_pt+n*nerv-1),beta,y)
         else
           idx_pt = point_to_proc+psb_elem_recv_
           snd_pt = bsdidx(proc_to_comm)
-          call psi_sct(nerv,n,d_idx(idx_pt:idx_pt+nerv-1),&
+          call psi_sct(nerv,d_idx(idx_pt:idx_pt+nerv-1),&
                & sndbuf(snd_pt:snd_pt+n*nesd-1),beta,y)
 
         end if
