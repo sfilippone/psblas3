@@ -921,6 +921,96 @@ subroutine psb_dmlprcaply(baseprecv,x,beta,y,desc_data,trans,work,info)
       deallocate(t2l,w2l,tx,ty,tty)
 
 
+    case(smooth_both_)
+
+      t1 = mpi_wtime()
+      n_row = desc_data%matrix_data(psb_n_row_)
+      n_col = baseprecv(1)%desc_data%matrix_data(psb_n_col_)
+      nr2l  = baseprecv(2)%desc_data%matrix_data(psb_n_col_)
+      nrg   = baseprecv(2)%desc_data%matrix_data(psb_n_row_)
+      allocate(t2l(nr2l),w2l(nr2l),tx(n_col),ty(n_col),tty(n_col))
+      t2l(:) = zero
+      w2l(:) = zero
+      tx(:)  = zero
+      ty(:)  = zero
+      tty(:) = zero
+
+      !
+      ! Need temp copies to handle Y<- betaY + K^-1 X
+      ! One of the temp copies is not strictly needed when beta==zero
+      !
+      call psb_axpby(one,x,zero,tx,desc_data,info)
+      call psb_axpby(one,y,zero,ty,desc_data,info)
+      if(info /=0) goto 9999
+
+      call psb_dbaseprcaply(baseprecv(1),tx,zero,tty,desc_data,trans,work,info)
+      if(info /=0) goto 9999
+
+      call psb_spmm(-one,baseprecv(2)%aorig,tty,one,tx,desc_data,info,work=work)
+      if(info /=0) goto 9999
+
+      if (ismth  /= no_smth_) then 
+        if (baseprecv(2)%iprcparm(glb_smth_) >0) then 
+          call psb_halo(tx,baseprecv(1)%desc_data,info,work=work) 
+          if(info /=0) goto 9999
+        else
+          tx(desc_data%matrix_data(psb_n_row_)+1:max(n_row,n_col)) = zero
+        end if
+
+        call psb_csmm(one,baseprecv(2)%av(sm_pr_t_),tx,zero,t2l,info)
+        if(info /=0) goto 9999
+      else
+        !
+        ! Raw  aggregation, may take shortcuts
+        !
+        do i=1,desc_data%matrix_data(psb_n_row_)
+          t2l(baseprecv(2)%mlia(i)) = t2l(baseprecv(2)%mlia(i)) + tx(i)
+        end do
+      end if
+
+
+      if (baseprecv(2)%iprcparm(coarse_mat_)==mat_repl_) Then 
+        call gsum2d(icontxt,'All',t2l(1:nrg))
+      else if (baseprecv(2)%iprcparm(coarse_mat_) /= mat_distr_) Then 
+        write(0,*) 'Unknown value for baseprecv(2)%iprcparm(coarse_mat_) ',&
+             & baseprecv(2)%iprcparm(coarse_mat_)
+      endif
+
+
+      t6 = mpi_wtime()
+      w2l=t2l
+      call psb_dbaseprcaply(baseprecv(2),w2l,zero,t2l,baseprecv(2)%desc_data,'N',work,info)
+      if(info /=0) goto 9999
+
+      if (ismth  /= no_smth_) then 
+
+        if (ismth == smth_omg_) &
+             & call psb_halo(t2l,baseprecv(2)%desc_data,info,work=work) 
+        call psb_csmm(one,baseprecv(2)%av(sm_pr_),t2l,zero,ty,info)
+        if(info /=0) goto 9999
+
+        call psb_axpby(one,ty,one,tty,desc_data,info)
+        if(info /=0) goto 9999
+
+        deallocate(tz)
+      else
+
+        do i=1, desc_data%matrix_data(psb_n_row_)
+          tty(i) = tty(i) + t2l(baseprecv(2)%mlia(i))
+        enddo
+
+      end if
+      
+      call psb_axpby(one,x,zero,tx,desc_data,info)
+      if(info /=0) goto 9999
+
+      call psb_spmm(-one,baseprecv(2)%aorig,tty,one,tx,desc_data,info,work=work)
+      if(info /=0) goto 9999
+      call psb_dbaseprcaply(baseprecv(1),tx,one,tty,desc_data,'N',work,info)
+
+
+      call psb_axpby(one,tty,beta,y,desc_data,info)
+      
 
 
     case default
