@@ -992,7 +992,6 @@ subroutine psb_dmlprcaply(baseprecv,x,beta,y,desc_data,trans,work,info)
         call psb_axpby(one,ty,one,tty,desc_data,info)
         if(info /=0) goto 9999
 
-        deallocate(tz)
       else
 
         do i=1, desc_data%matrix_data(psb_n_row_)
@@ -1011,6 +1010,7 @@ subroutine psb_dmlprcaply(baseprecv,x,beta,y,desc_data,trans,work,info)
 
       call psb_axpby(one,tty,beta,y,desc_data,info)
       
+      deallocate(t2l,w2l,tx,ty,tty)
 
 
     case default
