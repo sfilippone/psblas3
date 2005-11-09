@@ -1,6 +1,6 @@
 include Make.inc
 
-library:
+lib:
 	( [ -d lib ] || mkdir lib)
 	(cd src; make lib)
 	@echo "====================================="
@@ -14,3 +14,4 @@ veryclean:
 	(cd src; make veryclean)
 	(cd lib; /bin/rm -f *.a *$(.mod) *$(.fh))
 
+.PHONY: lib

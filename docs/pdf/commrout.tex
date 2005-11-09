@@ -46,8 +46,7 @@ Table~\ref{tab:f90halo}.
 \item[desc\_a] contains data structures for communications.\\
 Scope: {\bf local} \\
 Type: {\bf required}\\
-Specified as: a structured data type specified in
-\S~\ref{sec:datastruct}.
+Specified as: a structured data of type \descdata.
 \item[alpha] the scalar $\alpha$.\\
 Scope: {\bf global} \\
 Type: {\bf optional} \\
@@ -121,9 +120,8 @@ Table~\ref{tab:f90ovrl}.
 \item[desc\_a] contains data structures for communications.\\
 Scope: {\bf local} \\
 Type: {\bf required}\\
-Specified as: a structured data type specified in
-\S~\ref{sec:datastruct}.
-item[choice] specify if exchange overlap elements.
+Specified as: a structured data of type \descdata.
+\item[choice] specify if exchange overlap elements.
 \begin{description}
 \item[choice = .true.] exchange overlap elements, i.e. apply operator
 $P^{T}$;
@@ -232,7 +230,7 @@ indicated in Table~\ref{tab:gather}.
 \item[desc\_a] contains data structures for communications.\\
 Scope: {\bf local} \\
 Type: {\bf required}\\
-Specified as: a structured data type specified in \S~\ref{sec:datastruct}.
+Specified as: a structured data of type \descdata.
 \item[root]  The process that holds the global copy. If $root=-1$ all
   the processes will have a copy of the global vector.\\
 Scope: {\bf global} \\
@@ -322,7 +320,7 @@ Specified as: a rank one or two array.
 \item[desc\_a] contains data structures for communications.\\
 Scope: {\bf local} \\
 Type: {\bf required}\\
-Specified as: a structured data type specified in \S~\ref{sec:datastruct}.
+Specified as: a structured data of type \descdata.
 \item[root]  The process that holds the global copy. If $root=-1$ all
   the processes have a copy of the global vector.\\
 Scope: {\bf global} \\

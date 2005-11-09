@@ -5,32 +5,37 @@
 \subroutine{psb\_alloc}{Allocates a dense matrix}
 
 \syntax{call psb\_alloc}{m, n, x, desc\_a, info, js}
-\syntax*{call psb\_alloc}{m, n, x, desc\_a, info}
 
 \begin{description}
 \item[\bf On Entry]
 \item[m] The number of rows of the dense matrix to be allocated.\\
 Scope: {\bf local} \\
 Type: {\bf required}\\
+Specified as: Integer scalar.
 \item[n] The number of columns of the dense matrix to be allocated.\\
 Scope: {\bf local} \\
 Type: {\bf required}\\
+Specified as: Integer scalar.
 \item[desc\_a] The communication descriptor.\\
 Scope: {\bf local} \\
 Type: {\bf required}\\
+Specified as: a variable of type \descdata.\\
 \item[js] The starting column.\\
 Scope: {\bf local} \\
 Type: {\bf optional}\\
+Specified as: Integer scalar.
 \end{description}
 
 \begin{description}
 \item[\bf On Return]
-\item[x] The dense matrix to be allocated.
+\item[x] The dense matrix to be allocated.\\
 Scope: {\bf local} \\
 Type: {\bf required}\\
+Specified as: a one or two dimensional array.\\
 \item[info] Error code.
 Scope: {\bf local} \\
 Type: {\bf required}\\
+Specified as: Integer scalar.
 \end{description}
 
 %
@@ -45,16 +50,19 @@ Type: {\bf required}\\
 \item[desc\_a] The communication descriptor.\\
 Scope: {\bf local} \\
 Type: {\bf required}\\
+Specified as: a variable of type \descdata.\\
 \end{description}
 
 \begin{description}
 \item[\bf On Return]
-\item[x] The dense matrix to be assembled.
+\item[x] The dense matrix to be assembled.\\
 Scope: {\bf local} \\
 Type: {\bf required}\\
-\item[info] Error code.
+Specified as: a one or two dimensional array.\\
+\item[info] Error code.\\
 Scope: {\bf local} \\
 Type: {\bf required}\\
+Specified as: Integer scalar.\\
 \end{description}
 
 
@@ -67,12 +75,30 @@ Type: {\bf required}\\
 
 \begin{description}
 \item[\bf On Entry]
-\item[arg]
+\item[trans] A character that specifies whether to permute $A$  or $A^T$.\\
+Scope: {\bf local} \\
+Type: {\bf required}\\
+Specified as: a single character with value 'N' for $A$ or 'T' for $A^T$.\\
+\item[iperm] An integer array containing permutation information.\\
+Scope: {\bf local} \\
+Type: {\bf required}\\
+Specified as: an integer one-dimensional array.\\
+\item[a] The sparse matrix to be permuted.\\
+Scope: {\bf local} \\
+Type: {\bf required}\\
+Specified as: a \spdata variable.\\
+\item[desc\_a] The communication descriptor of type \descdata.\\
+Scope: {\bf local} \\
+Type: {\bf required}\\
+Specified as: a variable of type \descdata.\\
 \end{description}
 
 \begin{description}
 \item[\bf On Return]
-\item[arg]
+\item[info] Error code.\\
+Scope: {\bf local} \\
+Type: {\bf required}\\
+Specified as: Integer scalar.\\
 \end{description}
 
 
@@ -81,16 +107,25 @@ Type: {\bf required}\\
 %
 \subroutine{psb\_descprt}{Prints a descriptor}
 
-\syntax{call psb\_descprt}{iout, desc\_p, glob, short}
+\syntax{call psb\_descprt}{iout, desc\_a, glob, short}
 
 \begin{description}
 \item[\bf On Entry]
-\item[arg]
+\item[iout] An integer that defines the output unit.
+Scope: {\bf local} \\
+Type: {\bf required}\\
+Specified as: Integer scalar.\\
+\item[desc\_a] The communication descriptor of type \descdata that
+  must be printed.\\
+Scope: {\bf local} \\
+Type: {\bf required}\\
+Specified as: a variable of type \descdata.\\
 \end{description}
 
 \begin{description}
 \item[\bf On Return]
-\item[arg]
+\item[glob] ??????
+\item[short] ??????
 \end{description}
 
 
@@ -103,12 +138,23 @@ Type: {\bf required}\\
 
 \begin{description}
 \item[\bf On Entry]
-\item[arg]
+\item[x] The dense matrix to
+  be freed.\\
+Scope: {\bf local} \\
+Type: {\bf required}\\
+Specified as: a one or two dimensional array.
+\item[desc\_a] The communication descriptor.\\
+Scope: {\bf local} \\
+Type: {\bf required}\\
+Specified as: a variable of type \descdata.\\
 \end{description}
 
 \begin{description}
 \item[\bf On Return]
-\item[arg]
+\item[info] Error code.\\
+Scope: {\bf local} \\
+Type: {\bf required}\\
+Specified as: Integer scalar.\\
 \end{description}
 
 
@@ -121,31 +167,80 @@ Type: {\bf required}\\
 
 \begin{description}
 \item[\bf On Entry]
-\item[arg]
+\item[trans] A character that specifies whether to permute $A$  or $A^T$.\\
+Scope: {\bf local} \\
+Type: {\bf required}\\
+Specified as: a single character with value 'N' for $A$ or 'T' for $A^T$.\\
+\item[iperm] An integer array containing permutation information.\\
+Scope: {\bf local} \\
+Type: {\bf required}\\
+Specified as: an integer one-dimensional array.\\
+\item[x] The dense matrix to be permuted.\\
+Scope: {\bf local} \\
+Type: {\bf required}\\
+Specified as: a one or two dimensional array.\\
+\item[desc\_a] The communication descriptor.\\
+Scope: {\bf local} \\
+Type: {\bf required}\\
+Specified as: a variable of type \descdata.\\
 \end{description}
 
 \begin{description}
 \item[\bf On Return]
-\item[arg] 
+\item[info] Error code.\\
+Scope: {\bf local} \\
+Type: {\bf required}\\
+Specified as: Integer scalar.\\
 \end{description}
 
 %
-%%   psb_ins %%
+%%   psb_spins %%
 %
-\subroutine{psb\_ins}{Insert a submatrix into a dense matrix}
+\subroutine{psb\_spins}{Insert a cloud of elements into a sparse matrix}
 
-\syntax{call psb\_ins}{m, n, x, ix, jx, blck, desc\_a, info, iblck, jblck}
-\syntax*{call psb\_ins}{m, x, ix, jx, blck, desc\_a, info, iblck}
-\syntax*{call psb\_ins}{m, x, ix, jx, blck, desc\_a, info, iblck, insflag}
+\syntax{call psb\_spins}{nz, ia, ja, val, a, desc\_a, info, is, js}
 
 \begin{description}
 \item[\bf On Entry]
-\item[arg]
+\item[nz] the number of elements to be inserted.\\
+Scope:{\bf local}.\\
+Type:{\bf required}.\\
+Specified as: an integer scalar.
+\item[ia] the row indices of the elements to be inserted.\\
+Scope:{\bf local}.\\
+Type:{\bf required}.\\
+Specified as: an integer array of size $nz$.
+\item[ja] the column indices of the elements to be inserted.\\
+Scope:{\bf local}.\\
+Type:{\bf required}.\\
+Specified as: an integer array of size $nz$.
+\item[val] the elements to be inserted.\\
+Scope:{\bf local}.\\
+Type:{\bf required}.\\
+Specified as: an array of size $nz$.
+\item[desc\_a] The communication descriptor.\\
+Scope: {\bf local}. \\
+Type: {\bf required}.\\
+Specified as: a variable of type \descdata.\\
+\item[is] the starting row on matrix $a$.\\
+Scope:{\bf local}.\\
+Type:{\bf optional}.\\
+Specified as: an integer vaule.
+\item[js] the starting column on matrix $a$.\\
+Scope:{\bf local}.\\
+Type:{\bf optional}\\
+Specified as: an integer value
 \end{description}
 
 \begin{description}
 \item[\bf On Return]
-\item[arg] 
+\item[a] the matrix into which elements will be inserted.\\
+Scope:{\bf local}\\
+Type:{\bf required}\\
+Specified as: a structured data of type \spdata.
+\item[info] Error code.\\
+Scope: {\bf local} \\
+Type: {\bf required}\\
 \end{description}
 
 
@@ -154,17 +249,39 @@ Type: {\bf required}\\
 %
 \subroutine{psb\_dscall}{Allocates a communication descriptor}
 
-\syntax{call psb\_dscall}{m, n, parts, icontxt, desc\_a, info, flag}
+\syntax{call psb\_dscall}{m, n, parts, icontxt, desc\_a, info}
 \syntax*{call psb\_dscall}{m, v, icontxt, desc\_a, info, flag}
 
 \begin{description}
 \item[\bf On Entry]
-\item[arg]
+\item[m] the number of rows of the problem.\\
+Scope:{\bf global}.\\
+Type:{\bf required}.\\
+Specified as: an integer value.
+\item[n] the number of columns of the problem.\\
+Scope:{\bf global}.\\
+Type:{\bf required}.\\
+Specified as: an integer value.
+\item[parts] the subroutine that defines the partitioning scheme.\\
+Scope:{\bf global}.\\
+Type:{\bf required}.\\
+Specified as: a subroutine as described in ???
+\item[icontxt] the communication context.\\
+Scope:{\bf global}.\\
+Type:{\bf required}.\\
+Specified as: an integer value.
 \end{description}
 
 \begin{description}
 \item[\bf On Return]
-\item[arg] 
+\item[desc\_a] the communication descriptor.\\
+Scope:{\bf local}.\\
+Type:{\bf required}.\\
+Specified as: a structured data of type \descdata.
+\item[info] Error code.
+Scope: {\bf local} \\
+Type: {\bf required}\\
+Specified as: an integer variable.\\
 \end{description}
 
 
@@ -177,11 +294,18 @@ Type: {\bf required}\\
 
 \begin{description}
 \item[\bf On Entry]
-\item[arg]
+\item[desc\_a] the communication descriptor.\\
+Scope:{\bf local}.\\
+Type:{\bf required}.\\
+Specified as: a structured data of type \descdata.
 \end{description}
 
 \begin{description}
 \item[\bf On Return]
+\item[info] Error code.
+Scope: {\bf local} \\
+Type: {\bf required}\\
+Specified as: an integer variable.
 \item[arg] 
 \end{description}
 
@@ -192,17 +316,27 @@ Type: {\bf required}\\
 %
 \subroutine{psb\_dsccpy}{Copies a communication descriptor}
 
-\syntax{call }{}
-\syntax*{call }{}
+\syntax{call psb\_dsccpy}{desc\_out, desc\_a, info}
 
 \begin{description}
 \item[\bf On Entry]
-\item[arg]
+\item[desc\_a] the communication descriptor.\\
+Scope:{\bf local}.\\
+Type:{\bf required}.\\
+Specified as: a structured data of type \descdata.
+
 \end{description}
 
 \begin{description}
 \item[\bf On Return]
-\item[arg] 
+\item[desc\_out] the communication descriptor copy.\\
+Scope:{\bf local}.\\
+Type:{\bf required}.\\
+Specified as: a structured data of type \descdata.
+\item[info] Error code.
+Scope: {\bf local} \\
+Type: {\bf required}\\
+Specified as: an integer variable.\\
 \end{description}
 
 
@@ -211,19 +345,23 @@ Type: {\bf required}\\
 %
 \subroutine{psb\_dscfree}{Frees a communication descriptor}
 
-\syntax{call }{}
-\syntax*{call }{}
+\syntax{call psb\_dscfree}{desc\_a, info}
 
 \begin{description}
 \item[\bf On Entry]
-\item[arg]
+\item[desc\_a] the communication descriptor to be freed.\\
+Scope:{\bf local}.\\
+Type:{\bf required}.\\
+Specified as: a structured data of type \descdata.
 \end{description}
 
 \begin{description}
 \item[\bf On Return]
-\item[arg] 
+\item[info] Error code.
+Scope: {\bf local} \\
+Type: {\bf required}\\
+Specified as: an integer variable.
 \end{description}
-
 
 
 %
@@ -231,17 +369,42 @@ Type: {\bf required}\\
 %
 \subroutine{psb\_dscins}{Comunnication descriptor insert routine}
 
-\syntax{call }{}
-\syntax*{call }{}
+\syntax{call psb\_dscins}{nz, ia, ja, desc\_a, info, is, js}
 
 \begin{description}
 \item[\bf On Entry]
-\item[arg]
+\item[nz] the number of points being inserted.\\
+Scope: {\bf local}.\\
+Type: {\bf required}.\\
+Specified as: an integer value.
+\item[ia] the row indices of the points being inserted.\\
+Scope: {\bf local}.\\
+Type: {\bf required}.\\
+Specified as: an integer array of length $nz$.
+\item[ja] the column indices of the points being inserted.\\
+Scope: {\bf local}.\\
+Type: {\bf required}.\\
+Specified as: an integer array of length $nz$.
+\item[is] the row offset.\\
+Scope:{\bf local}.\\
+Type:{\bf optional}.\\
+Specified as: an integer value.
+\item[js] the column offset.\\
+Scope: {\bf local}.\\
+Type: {\bf optional}.\\
+Specified as: an integer value.
 \end{description}
 
 \begin{description}
 \item[\bf On Return]
-\item[arg] 
+\item[desc\_a] the communication descriptor to be freed.\\
+Scope:{\bf local}.\\
+Type:{\bf required}.\\
+Specified as: a structured data of type \descdata.
+\item[info] Error code.
+Scope: {\bf local} \\
+Type: {\bf required}\\
+Specified as: an integer variable.
 \end{description}
 
 
@@ -251,17 +414,30 @@ Type: {\bf required}\\
 %
 \subroutine{psb\_dscren}{Applies a renumeration to a communication descriptor}
 
-\syntax{call }{}
-\syntax*{call }{}
+\syntax{call psb\_dscren}{trans, iperm, desc\_a, info}
 
 \begin{description}
 \item[\bf On Entry]
-\item[arg]
+\item[trans] A character that specifies whether to permute $A$  or $A^T$.\\
+Scope: {\bf local} \\
+Type: {\bf required}\\
+Specified as: a single character with value 'N' for $A$ or 'T' for $A^T$.\\
+\item[iperm] An integer array containing permutation information.\\
+Scope: {\bf local} \\
+Type: {\bf required}\\
+Specified as: an integer one-dimensional array.\\
+\item[desc\_a] the communication descriptor.\\
+Scope:{\bf local}.\\
+Type:{\bf required}.\\
+Specified as: a structured data of type \descdata.
 \end{description}
 
 \begin{description}
 \item[\bf On Return]
-\item[arg] 
+\item[info] Error code.
+Scope: {\bf local} \\
+Type: {\bf required}\\
+Specified as: an integer variable.
 \end{description}
 
 
@@ -271,17 +447,30 @@ Type: {\bf required}\\
 %
 \subroutine{psb\_spalloc}{Allocates a sparse matrix}
 
-\syntax{call }{}
-\syntax*{call }{}
+\syntax{call psb\_spalloc}{a, desc\_a, info, nnz}
 
 \begin{description}
 \item[\bf On Entry]
-\item[arg]
+\item[desc\_a] the communication descriptor.\\
+Scope:{\bf local}.\\
+Type:{\bf required}.\\
+Specified as: a structured data of type \descdata.
+\item[nnz] the number of nonzeroes in the matrix.\\
+Scope: {\bf global}.\\
+Type: {\bf optional}.\\
+Specified as: an integer value.
 \end{description}
 
 \begin{description}
 \item[\bf On Return]
-\item[arg] 
+\item[a] the matrix to be allocated.\\
+Scope:{\bf local}\\
+Type:{\bf required}\\
+Specified as: a structured data of type \spdata.
+\item[info] Error code.
+Scope: {\bf local} \\
+Type: {\bf required}\\
+Specified as: an integer variable.
 \end{description}
 
 
@@ -291,17 +480,38 @@ Type: {\bf required}\\
 %
 \subroutine{psb\_spasb}{Sparse matrix assembly routine}
 
-\syntax{call }{}
-\syntax*{call }{}
+\syntax{call psb\_spasb}{a, desc\_a, info, afmt, up, dup}
 
 \begin{description}
 \item[\bf On Entry]
-\item[arg]
+\item[desc\_a] the communication descriptor.\\
+Scope:{\bf local}.\\
+Type:{\bf required}.\\
+Specified as: a structured data of type \descdata.
+\item[afmt] the storage format for the sparse matrix.\\
+Scope: {\bf global}.\\
+Type: {\bf optional}.\\
+Specified as: an array of characters. If not specified 'CSR' will be assumed.
+\item[up] ???.\\
+Scope: {\bf global}.\\
+Type: {\bf optional}.\\
+Specified as: .
+\item[dup] ???.\\
+Scope: {\bf global}.\\
+Type: {\bf optional}.\\
+Specified as: 
 \end{description}
 
 \begin{description}
 \item[\bf On Return]
-\item[arg] 
+\item[a] the matrix to be assembled.\\
+Scope:{\bf local}\\
+Type:{\bf required}\\
+Specified as: a structured data of type \spdata.
+\item[info] Error code.
+Scope: {\bf local} \\
+Type: {\bf required}\\
+Specified as: an integer variable.
 \end{description}
 
 
@@ -311,17 +521,30 @@ Type: {\bf required}\\
 %
 \subroutine{psb\_spcnv}{Converts a sparse matrix storage format}
 
-\syntax{call }{}
-\syntax*{call }{}
+\syntax{call psb\_spcnv}{a, b, desc\_a, info}
 
 \begin{description}
 \item[\bf On Entry]
-\item[arg]
+\item[a] the matrix to be converted.\\
+Scope:{\bf local}\\
+Type:{\bf required}\\
+Specified as: a structured data of type \spdata.
+\item[desc\_a] the communication descriptor.\\
+Scope:{\bf local}.\\
+Type:{\bf required}.\\
+Specified as: a structured data of type \descdata.
 \end{description}
 
 \begin{description}
 \item[\bf On Return]
-\item[arg] 
+\item[b] the converted matrix.\\
+Scope:{\bf local}\\
+Type:{\bf required}\\
+Specified as: a structured data of type \spdata.
+\item[info] Error code.
+Scope: {\bf local} \\
+Type: {\bf required}\\
+Specified as: an integer variable.
 \end{description}
 
 
@@ -331,37 +554,83 @@ Type: {\bf required}\\
 %
 \subroutine{psb\_spfree}{Frees a sparse matrix}
 
-\syntax{call }{}
-\syntax*{call }{}
+\syntax{call psb\_spfree}{a, desc\_a, info}
 
 \begin{description}
 \item[\bf On Entry]
-\item[arg]
+\item[a] the matrix to be freed.\\
+Scope:{\bf local}\\
+Type:{\bf required}\\
+Specified as: a structured data of type \spdata.
+\item[desc\_a] the communication descriptor.\\
+Scope:{\bf local}.\\
+Type:{\bf required}.\\
+Specified as: a structured data of type \descdata.
 \end{description}
 
 \begin{description}
 \item[\bf On Return]
-\item[arg] 
+\item[info] Error code.
+Scope: {\bf local} \\
+Type: {\bf required}\\
+Specified as: an integer variable.
 \end{description}
 
 
 
 %
-%%   psb_spins %%
+%%   psb_ins %%
 %
-\subroutine{psb\_spins}{Sparse matrix insertion routine}
+\subroutine{psb\_ins}{Sparse matrix insertion routine}
 
-\syntax{call }{}
-\syntax*{call }{}
+\syntax{call psb\_ins}{m, n, x, ix, jx, blck, desc\_a, info, iblck, jblck}
 
 \begin{description}
 \item[\bf On Entry]
-\item[arg]
+\item[m] rows number of submatrix belonging to blck to be inserted..\\
+Scope:{\bf local}.\\
+Type:{\bf required}.\\
+Specified as: an integer value.
+\item[n] columns number of submatrix belonging to blck to be inserted.\\
+Scope:{\bf local}.\\
+Type:{\bf required}.\\
+Specified as: an integer value.
+\item[ix] x global-row corresponding to position at which blck submatrix must be inserted.\\
+Scope:{\bf local}.\\
+Type:{\bf required}.\\
+Specified as: an integer value.
+\item[jx] x global-col corresponding to position at which blck submatrix must be inserted.\\
+Scope:{\bf local}.\\
+Type:{\bf required}.\\
+Specified as: an integer value.
+\item[blck] the dense submatrix to be inserted.\\
+Scope:{\bf local}.\\
+Type:{\bf required}.\\
+Specified as: a one or two dimensional array.
+\item[desc\_a] the communication descriptor.\\
+Scope:{\bf local}.\\
+Type:{\bf required}.\\
+Specified as: a structured data of type \descdata.
+\item[iblck] first row of submatrix belonging to blck to be inserted.\\
+Scope:{\bf local}.\\
+Type:{\bf required}.\\
+Specified as: an integer value.
+\item[jblck] first column of submatrix belonging to blck to be inserted.\\
+Scope:{\bf local}.\\
+Type:{\bf required}.\\
+Specified as: an integer value.
 \end{description}
 
 \begin{description}
 \item[\bf On Return]
-\item[arg] 
+\item[x] the output dense matrix.\\
+Scope: {\bf local} \\
+Type: {\bf required}\\
+Specified as: a one or two dimensional array.\\
+\item[info] Error code.
+Scope: {\bf local} \\
+Type: {\bf required}\\
+Specified as: an integer variable.
 \end{description}
 
 
@@ -369,39 +638,43 @@ Type: {\bf required}\\
 %
 %%   psb_sprn %%
 %
-\subroutine{psb\_sprn}{???}
+\subroutine{psb\_sprn}{Reinit sparse matrix structure for psblas routines.}
 
-\syntax{call }{}
-\syntax*{call }{}
+\syntax{call psb\_sprn}{a, decsc\_a, info}
 
 \begin{description}
 \item[\bf On Entry]
-\item[arg]
+\item[a] the matrix to be reinitialized.\\
+Scope:{\bf local}\\
+Type:{\bf required}\\
+Specified as: a structured data of type \spdata.
+\item[desc\_a] the communication descriptor.\\
+Scope:{\bf local}.\\
+Type:{\bf required}.\\
+Specified as: a structured data of type \descdata.
 \end{description}
 
 \begin{description}
 \item[\bf On Return]
-\item[arg] 
+\item[info] Error code.
+Scope: {\bf local} \\
+Type: {\bf required}\\
+Specified as: an integer variable.
 \end{description}
-
-
 
 %
 %%   psb_spupdate %%
 %
-\subroutine{psb\_spupdate}{???}
+\subroutine{psb\_spupdate}{Updates a sparse matrix.}
 
-\syntax{call }{}
-\syntax*{call }{}
+\syntax{call psb\_spupdate}{a, ia, ja, blck, desc\_a, info, ix, jx, updflag}
 
 \begin{description}
 \item[\bf On Entry]
-\item[arg]
 \end{description}
 
 \begin{description}
 \item[\bf On Return]
-\item[arg] 
 \end{description}
 
 
@@ -411,17 +684,42 @@ Type: {\bf required}\\
 %
 \subroutine{psb\_glob\_to\_loc}{Global to local indices convertion}
 
-\syntax{call }{}
-\syntax*{call }{}
+\syntax{call psb\_glob\_to\_loc}{x, y, desc\_a, info, iact}
+\syntax*{call psb\_glob\_to\_loc}{x, desc\_a, info, iact}
 
 \begin{description}
 \item[\bf On Entry]
-\item[arg]
+\item[x] An integer vector of indices to be converted.\\
+Scope: {\bf local} \\
+Type: {\bf required}\\
+Specified as: a rank one integer array.\\
+\item[desc\_a] the communication descriptor.\\
+Scope:{\bf local}.\\
+Type:{\bf required}.\\
+Specified as: a structured data of type \descdata.
+\item[iact] specifies action to be taken in case of range errors. 
+Scope: {\bf global} \\
+Type: {\bf optional}\\
+Specified as: a character variable  \verb|E|, \verb|W| or \verb|A|. 
 \end{description}
 
 \begin{description}
 \item[\bf On Return]
-\item[arg] 
+\item[x] If $y$ is not present,
+  then $x$ is overwritten with the translated integer indices. 
+Scope: {\bf global} \\
+Type: {\bf required}\\
+Specified as: a rank one integer array.
+\item[y] If $y$ is not present,
+  then $y$ is overwritten with the translated integer indices, and $x$
+  is left unchanged. 
+Scope: {\bf global} \\
+Type: {\bf optional}\\
+Specified as: a rank one integer array.
+\item[info] Error code.
+Scope: {\bf local} \\
+Type: {\bf required}\\
+Specified as: an integer variable.
 \end{description}
 
 
@@ -431,19 +729,43 @@ Type: {\bf required}\\
 %
 \subroutine{psb\_loc\_to\_glob}{Local to global indices conversion}
 
-\syntax{call }{}
-\syntax*{call }{}
+\syntax{call psb\_loc\_to\_glob}{x, y, desc\_a, info, iact}
+\syntax*{call psb\_loc\_to\_glob}{x, desc\_a, info, iact}
 
 \begin{description}
 \item[\bf On Entry]
-\item[arg]
+\item[x] An integer vector of indices to be converted.\\
+Scope: {\bf local} \\
+Type: {\bf required}\\
+Specified as: a rank one integer array.\\
+\item[desc\_a] the communication descriptor.\\
+Scope:{\bf local}.\\
+Type:{\bf required}.\\
+Specified as: a structured data of type \descdata.
+\item[iact] specifies action to be taken in case of range errors. 
+Scope: {\bf global} \\
+Type: {\bf optional}\\
+Specified as: a character variable  \verb|E|, \verb|W| or \verb|A|. 
 \end{description}
 
 \begin{description}
 \item[\bf On Return]
-\item[arg] 
+\item[x] If $y$ is not present,
+  then $x$ is overwritten with the translated integer indices. 
+Scope: {\bf global} \\
+Type: {\bf required}\\
+Specified as: a rank one integer array.
+\item[y] If $y$ is not present,
+  then $y$ is overwritten with the translated integer indices, and $x$
+  is left unchanged. 
+Scope: {\bf global} \\
+Type: {\bf optional}\\
+Specified as: a rank one integer array.
+\item[info] Error code.
+Scope: {\bf local} \\
+Type: {\bf required}\\
+Specified as: an integer variable.
 \end{description}
-
 
 %%% Local Variables: 
 %%% mode: latex

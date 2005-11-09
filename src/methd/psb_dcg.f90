@@ -186,23 +186,6 @@ Subroutine psb_dcg(a,prec,b,x,eps,desc_a,info,&
       it   = it + 1
       itx = itx + 1
 
-!!$ 
-!!$  solve mz = r
-!!$  Note: the overlapped preconditioner (if overlap is non empty)
-!!$  is non-symmetric:   M^{-1} = \Lambda P^T K^{-1} P  
-!!$  For CG we use instead
-!!$       M^{-1} = \sqrt{\Lambda} P^T K^{-1} P \sqrt{\Lambda}
-!!$ Keep track of the old symmetrized stuf, might come in useful.
-!!$     CALL F90_PSAXPBY(ONE,R,ZERO,Z,DECOMP_DATA)
-!!$     CALL F90_PSOVRL(Z,DECOMP_DATA,&
-!!$	  & UPDATE_TYPE=SQUARE_ROOT_,CHOICE=NOEXCHANGE)     
-!!$     CALL F90_PSSPSM(ONE,L,Z,ZERO,W,DECOMP_DATA,&
-!!$	  & TRANS='N',UNIT=DIAGL,CHOICE=NONE_,WORK=AUX)
-!!$     CALL F90_PSSPSM(ONE,U,W,ZERO,Z,DECOMP_DATA,&
-!!$  	  & TRANS='N',UNIT=DIAGU,CHOICE=NONE_,DIAG=VDIAG,WORK=AUX)     
-!!$     CALL F90_PSOVRL(Z,DECOMP_DATA,&
-!!$	  & UPDATE_TYPE=SQUARE_ROOT_)
-!!$     CALL F90_PSHALO(Z,DECOMP_DATA)
       Call psb_prcaply(prec,r,z,desc_a,info,work=aux)
       rho_old = rho
       rho     = psb_dot(r,z,desc_a,info)

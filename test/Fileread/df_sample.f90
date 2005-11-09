@@ -81,7 +81,7 @@ program df_sample
   amroot = (myprow==0).and.(mypcol==0)
 
   name='df_sample'
-  if(psb_get_errstatus().ne.0) return 
+  if(psb_get_errstatus().ne.0) goto 9999
   info=0
   call psb_set_errverbosity(2)
   call psb_set_erraction(0)

@@ -5,7 +5,7 @@
 ! 
 ! Parameters: 
 !    x        - integer, dimension(:).    Array containing the indices to be translated.
-!    y        - integer, dimension(:).    Array containing the indices to be translated.
+!    y        - integer, dimension(:).    Array containing the translated indices.
 !    desc_a   - type(<psb_desc_type>).    The communication descriptor.        
 !    info     - integer.                  Eventually returns an error code.
 !    iact     - integer(optional).        A character defining the behaviour of this subroutine when is found an index not belonging to the calling process

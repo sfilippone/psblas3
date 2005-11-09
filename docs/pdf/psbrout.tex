@@ -62,7 +62,7 @@ indicated in Table~\ref{tab:f90axpby}.  The rank of $y$ must be the same of $x$.
 \item[desc\_a] contains data structures for communications.\\
 Scope: {\bf local} \\
 Type: {\bf required}\\
-Specified as: a structured data type specified in \S~\ref{sec:datastruct}.
+Specified as: a structured data of type \descdata.
 \item[n] number of columns in dense submatrices $x$ and $y$.\\
 Scope: {\bf global} \\
 Type: {\bf optional}; can only be present if $x$ and $y$ are of rank 2.\\
@@ -156,8 +156,7 @@ Table~\ref{tab:f90dot}. The rank of $y$ must be the same of $x$.
 \item[desc\_a] contains data structures for communications.\\
 Scope: {\bf local} \\
 Type: {\bf required}\\
-Specified as: a structured data type specified in
-\S~\ref{sec:datastruct}.
+Specified as: a structured data of type \descdata.
 \item[jx]  the column index of global dense matrix $x$,
 identifying the column of subvector $x$.\\
 Scope: {\bf global} \\
@@ -230,7 +229,7 @@ Table~\ref{tab:f90mdot}. The rank of $y$ must be the same of $x$.
 \item[desc\_a] contains data structures for communications.\\
 Scope: {\bf local} \\
 Type: {\bf required}\\
-Specified as: a structured data type specified in Sec.~\ref{sec:datastruct}.
+Specified as: a structured data of type \descdata.
 \item[\bf On Return] 
 \item[res] is the dot product of subvectors $x$ and $y$.\\
 Scope: {\bf global} \\
@@ -295,8 +294,7 @@ Table~\ref{tab:f90amax}.
 \item[desc\_a] contains data structures for communications.\\
 Scope: {\bf local} \\
 Type: {\bf required}\\
-Specified as: a structured data type specified in
-\S~\ref{sec:datastruct}.
+Specified as: a structured data of type \descdata.
 \item[jx]  the column index of global dense matrix $x$,
 identifying the column of subvector $x$.\\
 Scope: {\bf global} \\
@@ -353,7 +351,7 @@ Table~\ref{tab:f90mamax}.
 \item[desc\_a] contains data structures for communications.\\
 Scope: {\bf local} \\
 Type: {\bf required}\\
-Specified as: a structured data type specified in Sec.~\ref{sec:datastruct}.
+Specified as: a structured data of type \descdata.
 \item[\bf On Return] 
 \item[res] is the infinity norm of the columns of $x$.\\
 Scope: {\bf global} \\
@@ -416,8 +414,7 @@ Table~\ref{tab:f90asum}.
 \item[desc\_a] contains data structures for communications.\\
 Scope: {\bf local} \\
 Type: {\bf required}\\
-Specified as: a structured data type specified in
-\S~\ref{sec:datastruct}.
+Specified as: a structured data of type \descdata.
 \item[jx]  the column index of global dense matrix $x$,
 identifying the column of subvector $x$.\\
 Scope: {\bf global} \\
@@ -486,8 +483,7 @@ Table~\ref{tab:f90nrm2}.
 \item[desc\_a] contains data structures for communications.\\
 Scope: {\bf local} \\
 Type: {\bf required}\\
-Specified as: a structured data type specified in
-\S~\ref{sec:datastruct}.
+Specified as: a structured data of type \descdata.
 \item[jx]  the column index of global dense matrix $x$,
 identifying the column of subvector $x$.\\
 Scope: {\bf global} \\
@@ -546,13 +542,11 @@ Long Precision Complex & psb\_nrmi \\
 $A$. \\   
 Scope: {\bf local} \\
 Type: {\bf required}\\
-Specified as: a structured data type specified in
-\S~\ref{sec:datastruct}.
+Specified as: a structured data of type \spdata.
 \item[desc\_a] contains data structures for communications.\\
 Scope: {\bf local} \\
 Type: {\bf required}\\
-Specified as: a structured data type specified in
-\S~\ref{sec:datastruct}.
+Specified as: a structured data of type \descdata.
 \item[\bf On Return] 
 \item[Function value] is the infinity-norm of sparse submatrix $A$.\\
 Scope: {\bf global} \\
@@ -626,8 +620,7 @@ Table~\ref{tab:f90spmm}.
 $A$. \\ 
 Scope: {\bf local} \\
 Type: {\bf required}\\
-Specified as: a structured data type specified in
-\S~\ref{sec:datastruct}.
+Specified as: a structured data of type \spdata.
 \item[x] the local portion of global dense matrix
 $x$. This subroutine computes the location of the first element of
 local subarray used, based on $jx$ and the field $matrix\_data$ of $desc\_a$ . \\
@@ -651,8 +644,7 @@ Table~\ref{tab:f90spmm}. The rank of $y$ must be the same of $x$.
 \item[desc\_a] contains data structures for communications.\\
 Scope: {\bf local} \\
 Type: {\bf required}\\
-Specified as: a structured data type specified in
-\S~\ref{sec:datastruct}.
+Specified as: a structured data of type \descdata.
 \item[trans] indicate what kind of operation to perform.
 \begin{description}
 \item[trans = N] the operation is specified by equation \ref{eq:f90spmm_no_tra}
@@ -791,8 +783,7 @@ Table~\ref{tab:f90spsm}. The rank of $y$ must be the same of $x$.
 \item[desc\_a] contains data structures for communications.\\
 Scope: {\bf local} \\
 Type: {\bf required}\\
-Specified as: a structured data type specified in
-\S~\ref{sec:datastruct}.
+Specified as: a structured data of type \descdata.
 \item[trans] specify with {\em unitd} the operation to perform.
 \begin{description}
 \item[trans = 'N'] the operation is with no transposed matrix

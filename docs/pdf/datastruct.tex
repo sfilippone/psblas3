@@ -11,7 +11,8 @@ the modules \verb|psb_spmat_type|, \verb|psb_descriptor_type| and \verb|psb_prec
 
 \subsection{Sparse Matrix data structure}
 \label{sec:spmat}
-Contains all information about local portion of the sparse matrix and
+The \hypertarget{spdata}{{\tt psb\_spmat\_type}} data structure
+contains all information about local portion of the sparse matrix and   
 its storage mode. Many of this fields are set in fully-transparent
 mode by PSBLAS-TOOLS routines when inserting a new sparse matrix, user
 must set only fields which describe matrix storage mode (see
@@ -95,7 +96,8 @@ column index are stored into \verb|apsk(j)|, \verb|ia1(j)| and
 \subsection{Descriptor data structure}
 \label{sec:desc}
 All the general matrix informations and elements to be
-exchanged among processes are stored within a data structure of the type $psb_desc_type$. 
+exchanged among processes are stored within a data structure of the
+type \hypertarget{descdata}{{\tt psb\_desc\_type}}. 
 Every structure of this type is associated to a sparse matrix, it
 contains data about general matrix informations and elements to be
 exchanged among processes.  \\ 
@@ -180,7 +182,7 @@ as follows:
 
 \subsection{Preconditioner data structure}
 \label{sec:prec}
-\hypertarget{precdata}{ciao finocchio}
+\hypertarget{precdata}{}
 
 
 
