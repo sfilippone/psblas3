@@ -87,7 +87,7 @@ program pde90
   character(len=10)  :: ptype
   character(len=20)  :: name,ch_err
  
-  if(psb_get_errstatus().ne.0) return 
+  if(psb_get_errstatus().ne.0) goto 9999
   info=0
   name='pde90'
   call psb_set_errverbosity(2)
