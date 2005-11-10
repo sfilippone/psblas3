@@ -66,9 +66,9 @@ type d_spmat
      integer, pointer :: pl(:), pr(:)
 end type d_spmat	
 \end{verbatim}
-The following two cases are used in the data insertion routines: 
+The following two cases are among the most commonly used: 
 \begin{description}
-\item[fida=``CSR''] Compressed storage rows. In this case the
+\item[fida=``CSR''] Compressed storage by rows. In this case the
 following should hold: 
 \begin{enumerate}
 \item \verb|ia2(i)| contains the index of the first element of row
