@@ -20,9 +20,6 @@ subroutine psb_dprecset(p,ptype,iv,rs,rv,info)
 
   if (.not.associated(p%baseprecv)) then 
     allocate(p%baseprecv(1),stat=err)
-!!$    if (associated(p%baseprec%iprcparm)) then 
-!!$      write(0,*) 'precset: should not get here!'
-!!$    endif
     call psb_nullify_baseprec(p%baseprecv(1))
   endif
 
@@ -33,9 +30,7 @@ subroutine psb_dprecset(p,ptype,iv,rs,rv,info)
     endif
   end if
 
-  call touppers(ptype,typeup)
-  select case (typeup)
-!!$  select case(toupper(ptype))
+  select case(toupper(ptype))
   case ('NONE','NOPREC') 
     p%baseprecv(1)%iprcparm(p_type_)     = noprec_
     p%baseprecv(1)%iprcparm(f_type_)     = f_none_
