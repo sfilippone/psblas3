@@ -213,110 +213,125 @@ subroutine psb_dbaseprcaply(prec,x,beta,y,desc_data,trans,work,info)
 
   case(asm_,ras_,ash_,rash_)
 
-    ! Note: currently trans is unused.
-    n_row=prec%desc_data%matrix_data(psb_n_row_)
-    n_col=prec%desc_data%matrix_data(psb_n_col_)
-
-    isz=max(n_row,N_COL)
-    if ((6*isz) <= size(work)) then 
-      ww => work(1:isz)
-      tx => work(isz+1:2*isz)
-      ty => work(2*isz+1:3*isz)
-      aux => work(3*isz+1:)
-    else if ((4*isz) <= size(work)) then 
-      aux => work(1:)
-      allocate(ww(isz),tx(isz),ty(isz))
-    else if ((3*isz) <= size(work)) then 
-      ww => work(1:isz)
-      tx => work(isz+1:2*isz)
-      ty => work(2*isz+1:3*isz)
-      allocate(aux(4*isz))
-    else 
-      allocate(ww(isz),tx(isz),ty(isz),&
-           &aux(4*isz))
-    endif
-
-    if (debug) write(0,*)' vdiag: ',prec%d(:)
-    if (debug) write(0,*) 'Bi-CGSTAB with Additive Schwarz prec' 
-
-    tx(1:desc_data%matrix_data(psb_n_row_)) = x(1:desc_data%matrix_data(psb_n_row_)) 
-    tx(desc_data%matrix_data(psb_n_row_)+1:isz) = zero
-
-    if (prec%iprcparm(restr_)==psb_halo_) then 
-       call psb_halo(tx,prec%desc_data,info,work=aux)
-      if(info /=0) then
-         info=4010
-         ch_err='psb_halo'
-         goto 9999
+    if (prec%iprcparm(n_ovr_)==0) then 
+      ! shortcut: this fixes performance for RAS(0) == BJA
+      call psb_dbjacaply(prec,x,beta,y,desc_data,trans,work,info)
+      if(info.ne.0) then
+        info=4010
+        ch_err='psb_bjacaply'
+        goto 9999
       end if
-    else if (prec%iprcparm(restr_) /= psb_none_) then 
-      write(0,*) 'Problem in PRCAPLY: Unknown value for restriction ',&
-           &prec%iprcparm(restr_)
+
+    else
+      ! Note: currently trans is unused.
+      n_row=prec%desc_data%matrix_data(psb_n_row_)
+      n_col=prec%desc_data%matrix_data(psb_n_col_)
+
+      isz=max(n_row,N_COL)
+      if ((6*isz) <= size(work)) then 
+        ww => work(1:isz)
+        tx => work(isz+1:2*isz)
+        ty => work(2*isz+1:3*isz)
+        aux => work(3*isz+1:)
+      else if ((4*isz) <= size(work)) then 
+        aux => work(1:)
+        allocate(ww(isz),tx(isz),ty(isz))
+      else if ((3*isz) <= size(work)) then 
+        ww => work(1:isz)
+        tx => work(isz+1:2*isz)
+        ty => work(2*isz+1:3*isz)
+        allocate(aux(4*isz))
+      else 
+        allocate(ww(isz),tx(isz),ty(isz),&
+             &aux(4*isz))
+      endif
+
+      if (debug) write(0,*)' vdiag: ',prec%d(:)
+      if (debug) write(0,*) 'Bi-CGSTAB with Additive Schwarz prec' 
+
+      tx(1:desc_data%matrix_data(psb_n_row_)) = x(1:desc_data%matrix_data(psb_n_row_)) 
+      tx(desc_data%matrix_data(psb_n_row_)+1:isz) = zero
+
+      if (prec%iprcparm(restr_)==psb_halo_) then 
+        call psb_halo(tx,prec%desc_data,info,work=aux)
+        if(info /=0) then
+          info=4010
+          ch_err='psb_halo'
+          goto 9999
+        end if
+      else if (prec%iprcparm(restr_) /= psb_none_) then 
+        write(0,*) 'Problem in PRCAPLY: Unknown value for restriction ',&
+             &prec%iprcparm(restr_)
+      end if
+
+      if (prec%iprcparm(iren_)>0) then 
+        call dgelp('N',n_row,1,prec%perm,tx,isz,ww,isz,info)
+        if(info /=0) then
+          info=4010
+          ch_err='psb_dgelp'
+          goto 9999
+        end if
+      endif
+
+      call psb_dbjacaply(prec,tx,zero,ty,prec%desc_data,trans,aux,info)
+      if(info.ne.0) then
+        info=4010
+        ch_err='psb_bjacaply'
+        goto 9999
+      end if
+
+      if (prec%iprcparm(iren_)>0) then 
+        call dgelp('N',n_row,1,prec%invperm,ty,isz,ww,isz,info)
+        if(info /=0) then
+          info=4010
+          ch_err='psb_dgelp'
+          goto 9999
+        end if
+      endif
+
+      select case (prec%iprcparm(prol_)) 
+
+      case(psb_none_) 
+        ! Would work anyway, but since it's supposed to do nothing...
+        ! call f90_psovrl(ty,prec%desc_data,update_type=prec%a_restrict)
+
+      case(psb_sum_,psb_avg_) 
+        call psb_ovrl(ty,prec%desc_data,info,&
+             & update_type=prec%iprcparm(prol_),work=aux)
+        if(info /=0) then
+          info=4010
+          ch_err='psb_ovrl'
+          goto 9999
+        end if
+
+      case default
+        write(0,*) 'Problem in PRCAPLY: Unknown value for prolongation ',&
+             & prec%iprcparm(prol_)
+      end select
+
+      if (beta == zero)  then 
+        y(1:desc_data%matrix_data(psb_n_row_)) = ty(1:desc_data%matrix_data(psb_n_row_)) 
+      else if (beta == one) then 
+        y(1:desc_data%matrix_data(psb_n_row_)) = y(1:desc_data%matrix_data(psb_n_row_)) + &
+             & ty(1:desc_data%matrix_data(psb_n_row_)) 
+      else if (beta == -one) then 
+        y(1:desc_data%matrix_data(psb_n_row_)) = -y(1:desc_data%matrix_data(psb_n_row_)) + &
+             & ty(1:desc_data%matrix_data(psb_n_row_)) 
+      else 
+        y(1:desc_data%matrix_data(psb_n_row_)) = beta*y(1:desc_data%matrix_data(psb_n_row_)) + &
+             & ty(1:desc_data%matrix_data(psb_n_row_)) 
+      end if
+
+
+      if ((6*isz) <= size(work)) then 
+      else if ((4*isz) <= size(work)) then 
+        deallocate(ww,tx,ty)
+      else if ((3*isz) <= size(work)) then 
+        deallocate(aux)
+      else 
+        deallocate(ww,aux,tx,ty)
+      endif
     end if
-
-    if (prec%iprcparm(iren_)>0) then 
-      call dgelp('N',n_row,1,prec%perm,tx,isz,ww,isz,info)
-      if(info /=0) then
-         info=4010
-         ch_err='psb_dgelp'
-         goto 9999
-      end if
-    endif
-
-    call psb_dbjacaply(prec,tx,zero,ty,prec%desc_data,trans,aux,info)
-
-    if (prec%iprcparm(iren_)>0) then 
-      call dgelp('N',n_row,1,prec%invperm,ty,isz,ww,isz,info)
-      if(info /=0) then
-         info=4010
-         ch_err='psb_dgelp'
-         goto 9999
-      end if
-    endif
-
-    select case (prec%iprcparm(prol_)) 
-
-    case(psb_none_) 
-      ! Would work anyway, but since it's supposed to do nothing...
-      ! call f90_psovrl(ty,prec%desc_data,update_type=prec%a_restrict)
-
-    case(psb_sum_,psb_avg_) 
-       call psb_ovrl(ty,prec%desc_data,info,&
-            & update_type=prec%iprcparm(prol_),work=aux)
-       if(info /=0) then
-         info=4010
-         ch_err='psb_ovrl'
-         goto 9999
-      end if
-
-    case default
-      write(0,*) 'Problem in PRCAPLY: Unknown value for prolongation ',&
-           & prec%iprcparm(prol_)
-    end select
-
-    if (beta == zero)  then 
-      y(1:desc_data%matrix_data(psb_n_row_)) = ty(1:desc_data%matrix_data(psb_n_row_)) 
-    else if (beta == one) then 
-      y(1:desc_data%matrix_data(psb_n_row_)) = y(1:desc_data%matrix_data(psb_n_row_)) + &
-           & ty(1:desc_data%matrix_data(psb_n_row_)) 
-    else if (beta == -one) then 
-      y(1:desc_data%matrix_data(psb_n_row_)) = -y(1:desc_data%matrix_data(psb_n_row_)) + &
-           & ty(1:desc_data%matrix_data(psb_n_row_)) 
-    else 
-      y(1:desc_data%matrix_data(psb_n_row_)) = beta*y(1:desc_data%matrix_data(psb_n_row_)) + &
-           & ty(1:desc_data%matrix_data(psb_n_row_)) 
-    end if
-
-
-    if ((6*isz) <= size(work)) then 
-    else if ((4*isz) <= size(work)) then 
-      deallocate(ww,tx,ty)
-    else if ((3*isz) <= size(work)) then 
-      deallocate(aux)
-    else 
-      deallocate(ww,aux,tx,ty)
-    endif
-
   case default
     write(0,*) 'Invalid PRE%PREC ',prec%iprcparm(p_type_),':',&
          & min_prec_,noprec_,diagsc_,bja_,&
