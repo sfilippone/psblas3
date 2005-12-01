@@ -72,18 +72,6 @@ Subroutine psb_descasb(n_ovr,desc_p,desc_a,a,&
   tch = 0.0
   t4 = 0.0
   call blacs_get(icontxt,10,icomm )
-!!$  call MPI_Comm_rank(icomm,irank,ierr)
-!!$  idscb  = mpe_log_get_event_number()
-!!$  idsce  = mpe_log_get_event_number()
-!!$  iovrb  = mpe_log_get_event_number()
-!!$  iovre  = mpe_log_get_event_number()
-!!$  icrhb  = mpe_log_get_event_number()
-!!$  icrhe  = mpe_log_get_event_number()
-!!$  if (irank==0) then 
-!!$    info = mpe_describe_state(idscb,idsce,"DSCLOOP ","gold")
-!!$    info = mpe_describe_state(icrhb,icrhe,"CRTHAL ","turquoise3")
-!!$    info = mpe_describe_state(iovrb,iovre,"CNVRTC ","red4")
-!!$  endif
 
   mglob = desc_a%matrix_data(psb_m_)
   m     = desc_a%matrix_data(psb_n_row_)
@@ -117,8 +105,6 @@ Subroutine psb_descasb(n_ovr,desc_p,desc_a,a,&
   tot_recv              = 0
   counter_h             = 1
   counter_o             = 1
-!!$  write(0,*) 'Before ',tmp_ovr_idx(1:10)
-!!$  ierr = MPE_Log_event( idscb, 0, "st DSCLP " )
 
   ! See comment in main loop below.
   call InitPairSearchTree(info)
@@ -552,6 +538,7 @@ Subroutine psb_descasb(n_ovr,desc_p,desc_a,a,&
 !!$      ierr = MPE_Log_event( icrhb, 0, "st CRTHAL" )
         if (debug) write(0,*) myrow,'Checktmp_o_i 1',tmp_ovr_idx(1:10)
         if (debug) write(0,*) myrow,'Calling Crea_Halo'
+        
         call psi_crea_index(desc_p,t_halo_in,t_halo_out,.false.,info)
 !!$        Call psi_crea_halo(desc_p%matrix_data,t_halo_in,&
 !!$             & np,t_halo_out,Size(t_halo_out),dep_list,&

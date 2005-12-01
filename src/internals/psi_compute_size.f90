@@ -51,7 +51,6 @@ subroutine psi_compute_size(desc_data,&
   i=1
   do while (index_in(i).ne.-1)
      proc=index_in(i)
-!     write(0,'(i2," index_in(i)  ",2i10)')myrow,proc,index_in(i+index_in(i+1)+2)
      if ((proc.gt.np-1).or.(proc.lt.0)) then
         info = 115
         int_err(1) = 11

@@ -132,16 +132,6 @@ Subroutine psb_dcsrsetup(ptype,novr,a,blk,desc_data,upd,desc_p,info,outfmt)
     endif
 
     call blacs_get(icontxt,10,icomm )
-!!$    call MPI_Comm_rank(icomm,irank,ierr)
-!!$    idscb  = mpe_log_get_event_number()
-!!$    idsce  = mpe_log_get_event_number()
-!!$    iovrb  = mpe_log_get_event_number()
-!!$    iovre  = mpe_log_get_event_number()
-!!$    if (irank==0) then 
-!!$      info = mpe_describe_state(idscb,idsce,"DSCASB ","NavyBlue")
-!!$      info = mpe_describe_state(iovrb,iovre,"DSCOVR ","DeepPink")
-!!$    endif
-!!$
 
     Call blacs_gridinfo(icontxt,nprow,npcol,me,mycol)
     If(debug)Write(0,*)'BEGIN dcsrsetup',me,upd,novr
@@ -151,13 +141,13 @@ Subroutine psb_dcsrsetup(ptype,novr,a,blk,desc_data,upd,desc_p,info,outfmt)
       !
       !  Build the  auiliary descriptor',desc_p%matrix_data(psb_n_row_)
       ! 
-      call psb_dscov(a,desc_data,novr,desc_p,info)
-      if(info /= 0) then
-        info=4010
-        ch_err='psb_dscov'
-        call psb_errpush(info,name,a_err=ch_err)
-        goto 9999
-      end if
+       call psb_dscov(a,desc_data,novr,desc_p,info)
+       if(info /= 0) then
+          info=4010
+          ch_err='psb_dscov'
+          call psb_errpush(info,name,a_err=ch_err)
+          goto 9999
+       end if
     Endif
 
     if(debug) write(0,*) me,' From dscov _:',desc_p%matrix_data(psb_n_row_),desc_p%matrix_data(psb_n_col_)

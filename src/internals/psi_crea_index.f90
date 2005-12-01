@@ -14,7 +14,7 @@ subroutine psi_crea_index(desc_a,index_in,index_out,glob_idx,info)
 !         ....local scalars...      
   integer    :: me,npcol,mycol,nprow,i,j,k,&
        & mode, int_err(5), err, err_act, np,&
-       & dl_lda, icontxt
+       & dl_lda, icontxt, proc, nerv, nesd
 !         ...parameters...
   integer, pointer     :: dep_list(:,:), length_dl(:)
   integer,parameter    :: root=0,no_comm=-1
@@ -33,6 +33,13 @@ subroutine psi_crea_index(desc_a,index_in,index_out,glob_idx,info)
      subroutine psi_sort_dl(dep_list,l_dep_list,np,info)
        integer :: np,dep_list(:,:), l_dep_list(:), info
      end subroutine psi_sort_dl
+  end interface
+
+  interface
+     subroutine psi_dl_check(dep_list,dl_lda,np,length_dl)
+       integer  :: np,dl_lda,length_dl(0:np)
+       integer  :: dep_list(dl_lda,0:np)
+     end subroutine psi_dl_check
   end interface
 
   interface
@@ -66,6 +73,7 @@ subroutine psi_crea_index(desc_a,index_in,index_out,glob_idx,info)
 
   ! allocate dependency list
   call psi_compute_size(desc_a%matrix_data, index_in, dl_lda, info)
+!  dl_lda=dl_lda+3
   allocate(dep_list(max(1,dl_lda),0:np),length_dl(0:np))
   ! ...extract dependence list (ordered list of identifer process
   !    which every process must communcate with...
@@ -100,6 +108,7 @@ subroutine psi_crea_index(desc_a,index_in,index_out,glob_idx,info)
   call psi_desc_index(desc_a%matrix_data,index_in,dep_list(1:,me),&
        & length_dl(me),desc_a%loc_to_glob,desc_a%glob_to_loc,&
        & index_out,glob_idx,info)
+
   if(info.ne.0) then
      call psb_errpush(4010,name,a_err='psi_desc_index')
      goto 9999

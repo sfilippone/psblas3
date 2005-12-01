@@ -51,15 +51,15 @@ module psb_prec_type
 
   type psb_dbase_prec
 
-    type(psb_dspmat_type), pointer :: av(:) => null()
+    type(psb_dspmat_type), pointer :: av(:) => null() !
     real(kind(1.d0)), pointer      :: d(:)  => null()
-    type(psb_desc_type), pointer   :: desc_data => null()
-    integer, pointer               :: iprcparm(:) => null()
-    real(kind(1.d0)), pointer      :: dprcparm(:) => null()
+    type(psb_desc_type), pointer   :: desc_data => null() !
+    integer, pointer               :: iprcparm(:) => null() !
+    real(kind(1.d0)), pointer      :: dprcparm(:) => null() !
     integer, pointer               :: perm(:)  => null(), invperm(:) => null()
-    integer, pointer               :: mlia(:)  => null(), nlaggr(:)  => null()
-    type(psb_dspmat_type), pointer :: aorig    => null()
-    real(kind(1.d0)), pointer      :: dorig(:) => null()
+    integer, pointer               :: mlia(:)  => null(), nlaggr(:)  => null() !
+    type(psb_dspmat_type), pointer :: aorig    => null() !
+    real(kind(1.d0)), pointer      :: dorig(:) => null() !
     
  end type psb_dbase_prec
   
@@ -347,7 +347,6 @@ contains
     endif
     if (associated(p%dorig)) then 
       deallocate(p%dorig,stat=info)
-      nullify(p%dorig) 
     endif
 
     if (associated(p%mlia)) then 
@@ -356,6 +355,14 @@ contains
 
     if (associated(p%nlaggr)) then 
       deallocate(p%nlaggr,stat=info)
+    endif
+
+    if (associated(p%perm)) then 
+      deallocate(p%perm,stat=info)
+    endif
+
+    if (associated(p%invperm)) then 
+      deallocate(p%invperm,stat=info)
     endif
 
     if (associated(p%iprcparm)) then 

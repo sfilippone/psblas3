@@ -146,8 +146,7 @@ Subroutine psb_dcg(a,prec,b,x,eps,desc_a,info,&
     itrac = -1
   end if
 
-!!$  DIAGL  = 'U'
-!!$  DIAGU  = 'R'
+  itx=0
 
   ! Ensure global coherence for convergence checks.
   call blacs_get(icontxt,16,isvch)

@@ -139,6 +139,7 @@ c           ..if number of element to be exchanged !=0
               info = 3999
               goto 998
             endif
+!            if((me.eq.1).and.(proc.eq.3))write(0,*)'found 3'
             if (mode.eq.1) then
 c              ...search if already exist proc 
 c                 in dep_list(*,me)...  
@@ -254,6 +255,7 @@ c        ...send to root dependence list....
 
         endif
       end if 
+
       return
 
  9999 continue

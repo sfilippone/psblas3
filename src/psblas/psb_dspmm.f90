@@ -154,8 +154,8 @@ subroutine  psb_dspmm(alpha,a,x,beta,y,desc_a,info,&
 
   ! check for presence/size of a work area
   liwork= 2*ncol
-  if (a%pr(1) /= 0) llwork = liwork + n * ik
-  if (a%pl(1) /= 0) llwork = llwork + m * ik
+  if (a%pr(1) /= 0) liwork = liwork + n * ik
+  if (a%pl(1) /= 0) liwork = liwork + m * ik
   if (present(work)) then     
      if(size(work).lt.liwork) then
         call psb_realloc(liwork,work,info)

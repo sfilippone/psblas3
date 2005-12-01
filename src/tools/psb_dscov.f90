@@ -179,7 +179,7 @@ Subroutine psb_dscov(a,desc_a,novr,desc_ov,info)
   ! The real work goes on in here....
   !
   Call psb_descasb(novr,desc_ov,desc_a,a,&
-       & l_tmp_halo,l_tmp_ovr_idx,lworks,lworkr,info)
+       & l_tmp_halo,l_tmp_ovr_idx,lworks,lworkr,info) 
   if (info.ne.0) then
      info=4010
      ch_err='psb_descasb'

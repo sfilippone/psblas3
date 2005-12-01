@@ -169,7 +169,8 @@ subroutine psb_dscasb(desc_a,info)
     ! Ok, register into MATRIX_DATA &  free temporary work areas
     desc_a%matrix_data(psb_dec_type_) = psb_desc_asb_
 
-    deallocate(halo_index,ovrlap_index, stat=info)
+    deallocate(ovrlap_index, stat=info)
+    deallocate(halo_index, stat=info)
     if (info /= 0) then
        info =4000
        call psb_errpush(info,name)
