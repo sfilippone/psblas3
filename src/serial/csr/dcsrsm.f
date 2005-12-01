@@ -17,16 +17,12 @@ C     .. Local Arrays ..
       NAME = 'DCSRSM\0'
       IERROR = 0
       CALL FCPSB_ERRACTIONSAVE(ERR_ACT)
-
-      IF((ALPHA.NE.1.D0) .OR. (BETA.NE.0.D0))then
-         IERROR=5
-         CALL FCPSB_ERRPUSH(IERROR,NAME,INT_VAL)
-         GOTO 9999
-      ENDIF
+      int_Val(1)=0
       UPLO = '?'
       IF (DESCRA(1:1).EQ.'T' .AND. DESCRA(2:2).EQ.'U') UPLO = 'U'
       IF (DESCRA(1:1).EQ.'T' .AND. DESCRA(2:2).EQ.'L') UPLO = 'L'
       IF (UPLO.EQ.'?') THEN
+         int_val(1) = 7
          IERROR=5
          CALL FCPSB_ERRPUSH(IERROR,NAME,INT_VAL)
          GOTO 9999
@@ -35,6 +31,7 @@ C     .. Local Arrays ..
       IF (DESCRA(3:3).EQ.'U') DIAG = 'U'
       IF(UNITD.EQ.'B') THEN
          IERROR=5
+         int_val(1) = 4
          CALL FCPSB_ERRPUSH(IERROR,NAME,INT_VAL)
          GOTO 9999
       ENDIF
@@ -45,10 +42,25 @@ C     .. Local Arrays ..
    20       CONTINUE
    40    CONTINUE
       END IF
+      if ((alpha.ne.1.d0) .or.(beta .ne.0.0d0)) then 
+        if (lwork .lt. m) then           
+          int_val(1) = 17
+          IERROR=5
+          CALL FCPSB_ERRPUSH(IERROR,NAME,INT_VAL)
+          GOTO 9999
+        END IF
+        DO I = 1, N
+          CALL DCSRSV(UPLO,TRANST,DIAG,M,A,JA,IA,B(1,I),work)
+          do k=1,m
+            c(k,i) = beta*c(k,i) + alpha*work(k)
+          enddo
+        enddo        
 
-      DO 60 I = 1, N
-         CALL DCSRSV(UPLO,TRANST,DIAG,M,A,JA,IA,B(1,I),C(1,I))
-   60 CONTINUE
+      else
+        DO 60 I = 1, N
+          CALL DCSRSV(UPLO,TRANST,DIAG,M,A,JA,IA,B(1,I),C(1,I))
+ 60     CONTINUE
+      endif
       IF(IERROR.NE.0) THEN
          INT_VAL(1)=IERROR
          CALL FCPSB_ERRPUSH(4012,NAME,INT_VAL)
