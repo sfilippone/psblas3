@@ -72,8 +72,9 @@ subroutine psi_crea_index(desc_a,index_in,index_out,glob_idx,info)
   endif
 
   ! allocate dependency list
-  call psi_compute_size(desc_a%matrix_data, index_in, dl_lda, info)
+!  call psi_compute_size(desc_a%matrix_data, index_in, dl_lda, info)
 !  dl_lda=dl_lda+3
+  dl_lda=np+1
   allocate(dep_list(max(1,dl_lda),0:np),length_dl(0:np))
   ! ...extract dependence list (ordered list of identifer process
   !    which every process must communcate with...
