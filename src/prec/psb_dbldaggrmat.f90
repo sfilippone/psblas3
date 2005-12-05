@@ -382,11 +382,19 @@ contains
       goto 9999
     end if
 
-    where (p%dorig /= zero) 
-      p%dorig = one / p%dorig
-    elsewhere
-      p%dorig = one
-    end where
+    do i=1,size(p%dorig)
+       if (p%dorig(i) /= zero) then
+          p%dorig(i) = one / p%dorig(i)
+       else
+          p%dorig(i) = one
+       end if
+    end do
+
+!     where (p%dorig /= zero) 
+!       p%dorig = one / p%dorig
+!     elsewhere
+!       p%dorig = one
+!     end where
 
 
     ! 1. Allocate Ptilde in sparse matrix form 
