@@ -24,7 +24,7 @@ subroutine psi_dswaptranm(flag,n,beta,y,desc_a,work,info,data)
        & sdsz, rvsz, prcid, ptp, rvhd, d_idx
   integer :: int_err(5)
   integer  :: blacs_pnum, krecvid, ksendid
-  logical :: swap_mpi, swap_sync, swap_send, swap_recv
+  logical :: swap_mpi, swap_sync, swap_send, swap_recv, all
   integer, pointer, dimension(:) :: sndbuf, rcvbuf
   character(len=20)  :: name, ch_err
 
@@ -141,12 +141,14 @@ subroutine psi_dswaptranm(flag,n,beta,y,desc_a,work,info,data)
   if((idxr+idxs).lt.size(work)) then
      sndbuf => work(1:idxs)
      rcvbuf => work(idxs+1:idxs+idxr)
+     all=.false.
   else
      allocate(sndbuf(idxs),rcvbuf(idxr), stat=info)
      if(info.ne.0) then
         call psb_errpush(4000,name)
         goto 9999
      end if
+     all=.true.
   end if
 
   ! Case SWAP_MPI
@@ -437,6 +439,15 @@ subroutine psi_dswaptranm(flag,n,beta,y,desc_a,work,info,data)
 
   end if
 
+  deallocate(sdsz,rvsz,bsdidx,&
+       & brvidx,rvhd,prcid,&
+       & ptp,stat=info)
+  if(all) deallocate(sndbuf,rcvbuf,stat=info)
+  if(info.ne.0) then
+    call psb_errpush(4000,name)
+    goto 9999
+  end if
+
   call psb_erractionrestore(err_act)
   return
 
@@ -481,7 +492,7 @@ subroutine psi_dswaptranv(flag,beta,y,desc_a,work,info,data)
        & sdsz, rvsz, prcid, ptp, rvhd, d_idx
   integer :: int_err(5)
   integer  :: blacs_pnum, krecvid, ksendid
-  logical :: swap_mpi, swap_sync, swap_send, swap_recv
+  logical :: swap_mpi, swap_sync, swap_send, swap_recv, all
   integer, pointer, dimension(:) :: sndbuf, rcvbuf
   character(len=20)  :: name, ch_err
 
@@ -599,12 +610,14 @@ subroutine psi_dswaptranv(flag,beta,y,desc_a,work,info,data)
   if((idxr+idxs).lt.size(work)) then
      sndbuf => work(1:idxs)
      rcvbuf => work(idxs+1:idxs+idxr)
+     all=.false.
   else
      allocate(sndbuf(idxs),rcvbuf(idxr), stat=info)
      if(info.ne.0) then
         call psb_errpush(4000,name)
         goto 9999
      end if
+     all=.true.
   end if
 
   ! Case SWAP_MPI
@@ -893,6 +906,15 @@ subroutine psi_dswaptranv(flag,beta,y,desc_a,work,info,data)
         proc_to_comm  = d_idx(point_to_proc+psb_proc_id_)
      end do
 
+  end if
+
+  deallocate(sdsz,rvsz,bsdidx,&
+       & brvidx,rvhd,prcid,&
+       & ptp,stat=info)
+  if(all) deallocate(sndbuf,rcvbuf,stat=info)
+  if(info.ne.0) then
+    call psb_errpush(4000,name)
+    goto 9999
   end if
 
   call psb_erractionrestore(err_act)
