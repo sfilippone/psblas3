@@ -41,8 +41,8 @@ Subroutine psb_dfixcoo(A,INFO,idir)
 
   case(0) !  Row major order
 
-    call mrgsrt(nza,a%ia1,iaux,iret)
-    if (iret.eq.0) call reordvn(nza,a%aspk,a%ia1,a%ia2,iaux)
+    call mrgsrt(nza,a%ia1(1),iaux(1),iret)
+    if (iret.eq.0) call reordvn(nza,a%aspk(1),a%ia1(1),a%ia2(1),iaux(1))
     i    = 1
     j    = i
     do while (i.le.nza)
@@ -51,9 +51,9 @@ Subroutine psb_dfixcoo(A,INFO,idir)
         if (j > nza) exit
       enddo
       nzl = j - i
-      call mrgsrt(nzl,a%ia2(i),iaux,iret)
+      call mrgsrt(nzl,a%ia2(i),iaux(1),iret)
       if (iret.eq.0) &
-           & call reordvn(nzl,a%aspk(i),a%ia1(i),a%ia2(i),iaux)
+           & call reordvn(nzl,a%aspk(i),a%ia1(i),a%ia2(i),iaux(1))
       i = j
     enddo
 
@@ -82,8 +82,8 @@ Subroutine psb_dfixcoo(A,INFO,idir)
 
   case(1) !  Col major order
 
-    call mrgsrt(nza,a%ia2,iaux,iret)
-    if (iret.eq.0) call reordvn(nza,a%aspk,a%ia1,a%ia2,iaux)
+    call mrgsrt(nza,a%ia2(1),iaux(1),iret)
+    if (iret.eq.0) call reordvn(nza,a%aspk(1),a%ia1(1),a%ia2(1),iaux(1))
     i    = 1
     j    = i
     do while (i.le.nza)
@@ -92,9 +92,9 @@ Subroutine psb_dfixcoo(A,INFO,idir)
         if (j > nza) exit
       enddo
       nzl = j - i
-      call mrgsrt(nzl,a%ia1(i:i+nzl-1),iaux,iret)
+      call mrgsrt(nzl,a%ia1(i),iaux(1),iret)
       if (iret.eq.0) &
-           & call reordvn(nzl,a%aspk(i:i+nzl-1),a%ia1(i:i+nzl-1),a%ia2(i:i+nzl-1),iaux)
+           & call reordvn(nzl,a%aspk(i),a%ia1(i),a%ia2(i),iaux(1))
       i = j
     enddo
 

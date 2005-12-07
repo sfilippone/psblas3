@@ -31,7 +31,7 @@
     indx(k) = k
   enddo
 
-  call mrgsrt(n,x,iaux,iret)
+  call mrgsrt(n,x(1),iaux(1),iret)
   
   if (iret /= 1) then 
     lp = iaux(0)
