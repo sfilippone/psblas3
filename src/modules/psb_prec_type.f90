@@ -103,6 +103,10 @@ module psb_prec_type
     module procedure psb_file_prec_descr
   end interface
 
+  interface psb_prec_short_descr
+    module procedure psb_prec_short_descr
+  end interface
+  
 contains
 
   subroutine psb_file_prec_descr(iout,p)
@@ -171,6 +175,74 @@ contains
     endif
 
   end subroutine psb_file_prec_descr
+
+  function  psb_prec_short_descr(p)
+    type(psb_dprec_type), intent(in) :: p
+    character(len=20) :: psb_prec_short_descr
+    psb_prec_short_descr = ' '
+!!$    write(iout,*) 'Preconditioner description'
+!!$    if (associated(p%baseprecv)) then 
+!!$      if (size(p%baseprecv)>=1) then 
+!!$        write(iout,*) 'Base preconditioner'
+!!$        select case(p%baseprecv(1)%iprcparm(p_type_))
+!!$        case(noprec_)
+!!$          write(iout,*) 'No preconditioning'
+!!$        case(diagsc_)
+!!$          write(iout,*) 'Diagonal scaling'
+!!$        case(bja_)
+!!$          write(iout,*) 'Block Jacobi with: ',&
+!!$               &  fact_names(p%baseprecv(1)%iprcparm(f_type_))
+!!$        case(asm_,ras_,ash_,rash_)
+!!$          write(iout,*) 'Additive Schwarz with: ',&
+!!$               &  fact_names(p%baseprecv(1)%iprcparm(f_type_))
+!!$          write(iout,*) 'Overlap:',&
+!!$               &  p%baseprecv(1)%iprcparm(n_ovr_)
+!!$          write(iout,*) 'Restriction: ',&
+!!$               &  restrict_names(p%baseprecv(1)%iprcparm(restr_))
+!!$          write(iout,*) 'Prolongation: ',&
+!!$               &  prolong_names(p%baseprecv(1)%iprcparm(prol_))
+!!$        end select
+!!$      end if
+!!$      if (size(p%baseprecv)>=2) then 
+!!$        if (.not.associated(p%baseprecv(2)%iprcparm)) then 
+!!$          write(iout,*) 'Inconsistent MLPREC part!'
+!!$          return
+!!$        endif
+!!$        write(iout,*) 'Multilevel: ',ml_names(p%baseprecv(2)%iprcparm(ml_type_))
+!!$        if (p%baseprecv(2)%iprcparm(ml_type_)>no_ml_) then 
+!!$          write(iout,*) 'Multilevel aggregation: ', &
+!!$               &   aggr_names(p%baseprecv(2)%iprcparm(aggr_alg_))
+!!$          write(iout,*) 'Smoother:               ', &
+!!$               &  smooth_kinds(p%baseprecv(2)%iprcparm(smth_kind_))
+!!$          write(iout,*) 'Smoothing omega: ', p%baseprecv(2)%dprcparm(smooth_omega_)
+!!$          write(iout,*) 'Smoothing position: ',&
+!!$               & smooth_names(p%baseprecv(2)%iprcparm(smth_pos_))
+!!$          write(iout,*) 'Coarse matrix: ',&
+!!$               & matrix_names(p%baseprecv(2)%iprcparm(coarse_mat_))
+!!$          write(iout,*) 'Factorization type: ',&
+!!$               & fact_names(p%baseprecv(2)%iprcparm(f_type_))
+!!$          select case(p%baseprecv(2)%iprcparm(f_type_))
+!!$          case(f_ilu_n_)      
+!!$            write(iout,*) 'Fill level :',p%baseprecv(2)%iprcparm(ilu_fill_in_)
+!!$          case(f_ilu_e_)         
+!!$            write(iout,*) 'Fill threshold :',p%baseprecv(2)%dprcparm(fact_eps_)
+!!$          case(f_slu_,f_umf_)         
+!!$          case default
+!!$            write(iout,*) 'Should never get here!'
+!!$          end select
+!!$          write(iout,*) 'Number of Jacobi sweeps: ', &
+!!$               &   (p%baseprecv(2)%iprcparm(jac_sweeps_))
+!!$
+!!$        end if
+!!$      end if
+!!$
+!!$    else
+!!$      write(iout,*) 'No Base preconditioner available, something is wrong!'
+!!$      return
+!!$    endif
+
+  end function psb_prec_short_descr
+
 
   function is_legal_base_prec(ip)
     integer, intent(in) :: ip
@@ -391,24 +463,24 @@ contains
 
     integer, intent(in)  :: iprec
     character(len=10)     :: pr_to_str
-    
-  select case(iprec)
-  case(noprec_)
-    pr_to_str='NOPREC'
-  case(diagsc_)         
-    pr_to_str='DIAGSC'
-  case(bja_)         
-    pr_to_str='BJA'
-  case(asm_)      
-    pr_to_str='ASM'
-  case(ash_)      
-    pr_to_str='ASM'
-  case(ras_)      
-    pr_to_str='ASM'
-  case(rash_)      
-    pr_to_str='ASM'
-  end select
 
-end function pr_to_str
+    select case(iprec)
+    case(noprec_)
+      pr_to_str='NOPREC'
+    case(diagsc_)         
+      pr_to_str='DIAGSC'
+    case(bja_)         
+      pr_to_str='BJA'
+    case(asm_)      
+      pr_to_str='ASM'
+    case(ash_)      
+      pr_to_str='ASM'
+    case(ras_)      
+      pr_to_str='ASM'
+    case(rash_)      
+      pr_to_str='ASM'
+    end select
+
+  end function pr_to_str
 
 end module psb_prec_type

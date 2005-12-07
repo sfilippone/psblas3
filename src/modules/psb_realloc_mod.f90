@@ -2,15 +2,15 @@ module psb_realloc_mod
   implicit none
 
   Interface psb_realloc
-     module procedure psb_dreallocate1i
-     module procedure psb_dreallocate2i
-     module procedure psb_dreallocate2i1d
-     module procedure psb_dreallocate1d
-     module procedure psb_dreallocated2
+    module procedure psb_dreallocate1i
+    module procedure psb_dreallocate2i
+    module procedure psb_dreallocate2i1d
+    module procedure psb_dreallocate1d
+    module procedure psb_dreallocated2
   end Interface
 
   Interface psb_realloc1it
-     module procedure  psb_dreallocate1it
+    module procedure  psb_dreallocate1it
   end Interface
 
 Contains
@@ -32,45 +32,45 @@ Contains
     call psb_erractionsave(err_act)
 
     if(psb_get_errstatus().ne.0) return 
-  info=0
+    info=0
     if (associated(rrax)) then 
-       dim=size(rrax)
-       If (dim /= len) Then
-          Allocate(tmp(len),stat=info)
-          if (info /= 0) then
-             err=4000
-             call psb_errpush(err,name)
-             goto 9999
-          end if
-!!$        write(0,*) 'IA: copying ',len,dim
-          if (.true.) then 
-             do i=1, min(len,dim)
-                tmp(i)=rrax(i)
-             end do
-          else
-             tmp(1:min(len,dim))=rrax(1:min(len,dim))
-          end if
-!!$        write(0,*) 'IA: copying done'
-          Deallocate(rrax,stat=info)
-          if (info /= 0) then
-             err=4000
-             call psb_errpush(err,name)
-             goto 9999
-          end if
-          rrax=>tmp
-       End If
-    else
-!!$      write(0,*) 'IA: allocating ',len
-       allocate(rrax(len),stat=info)
-       if (info /= 0) then
+      dim=size(rrax)
+      If (dim /= len) Then
+        Allocate(tmp(len),stat=info)
+        if (info /= 0) then
           err=4000
           call psb_errpush(err,name)
           goto 9999
-       end if
+        end if
+!!$        write(0,*) 'IA: copying ',len,dim
+        if (.true.) then 
+          do i=1, min(len,dim)
+            tmp(i)=rrax(i)
+          end do
+        else
+          tmp(1:min(len,dim))=rrax(1:min(len,dim))
+        end if
+!!$        write(0,*) 'IA: copying done'
+        Deallocate(rrax,stat=info)
+        if (info /= 0) then
+          err=4000
+          call psb_errpush(err,name)
+          goto 9999
+        end if
+        rrax=>tmp
+      End If
+    else
+!!$      write(0,*) 'IA: allocating ',len
+      allocate(rrax(len),stat=info)
+      if (info /= 0) then
+        err=4000
+        call psb_errpush(err,name)
+        goto 9999
+      end if
     endif
     if (present(pad)) then 
 !!$      write(0,*) 'IA: padding'
-       rrax(dim+1:len) = pad
+      rrax(dim+1:len) = pad
     endif
 
     call psb_erractionrestore(err_act)
@@ -80,9 +80,9 @@ Contains
     call psb_erractionrestore(err_act)
 
     if (err_act.eq.act_ret) then
-       return
+      return
     else
-       call psb_error()
+      call psb_error()
     end if
     return
 
@@ -111,44 +111,44 @@ Contains
     call psb_erractionsave(err_act)
 
     if (associated(rrax)) then 
-       dim=size(rrax)
+      dim=size(rrax)
 
-       If (dim /= len) Then
-          Allocate(tmp(len),stat=info)
-          if (info /= 0) then
-             err=4000
-             call psb_errpush(err,name)
-             goto 9999
-          end if
-          m = min(dim,len)
-!!$        write(0,*) 'DA: copying ',min(len,dim)
-          if (.true.) then 
-             do i=1,m
-                tmp(i) = rrax(i)
-             end do
-          else
-             tmp(1:m) = rrax(1:m)
-          end if
-!!$        write(0,*) 'DA: copying done ',m
-          Deallocate(rrax,stat=info)
-          if (info /= 0) then
-             err=4000
-             call psb_errpush(err,name)
-             goto 9999
-          end if
-          rrax=>tmp
-       End If
-    else
-       dim = 0
-       Allocate(rrax(len),stat=info)
-       if (info /= 0) then
+      If (dim /= len) Then
+        Allocate(tmp(len),stat=info)
+        if (info /= 0) then
           err=4000
           call psb_errpush(err,name)
           goto 9999
-       end if
+        end if
+        m = min(dim,len)
+!!$        write(0,*) 'DA: copying ',min(len,dim)
+        if (.true.) then 
+          do i=1,m
+            tmp(i) = rrax(i)
+          end do
+        else
+          tmp(1:m) = rrax(1:m)
+        end if
+!!$        write(0,*) 'DA: copying done ',m
+        Deallocate(rrax,stat=info)
+        if (info /= 0) then
+          err=4000
+          call psb_errpush(err,name)
+          goto 9999
+        end if
+        rrax=>tmp
+      End If
+    else
+      dim = 0
+      Allocate(rrax(len),stat=info)
+      if (info /= 0) then
+        err=4000
+        call psb_errpush(err,name)
+        goto 9999
+      end if
     endif
     if (present(pad)) then 
-       rrax(dim+1:len) = pad
+      rrax(dim+1:len) = pad
     endif
     call psb_erractionrestore(err_act)
     return
@@ -157,9 +157,9 @@ Contains
     call psb_erractionrestore(err_act)
 
     if (err_act.eq.act_ret) then
-       return
+      return
     else
-       call psb_error()
+      call psb_error()
     end if
     return
 
@@ -184,44 +184,44 @@ Contains
     call psb_erractionsave(err_act)
 
     if (associated(rrax)) then 
-       dim=size(rrax,1)
+      dim=size(rrax,1)
 
-       If (dim /= len1) Then
-          Allocate(tmp(len1,len2),stat=info)
-          if (info /= 0) then
-             err=4000
-             call psb_errpush(err,name)
-             goto 9999
-          end if
-          m = min(dim,len1)
-!!$        write(0,*) 'DA: copying ',min(len,dim)
-          if (.true.) then 
-             do i=1,m
-                tmp(i,:) = rrax(i,:)
-             end do
-          else
-             tmp(1:m,:) = rrax(1:m,:)
-          end if
-!!$        write(0,*) 'DA: copying done ',m
-          Deallocate(rrax,stat=info)
-          if (info /= 0) then
-             err=4000
-             call psb_errpush(err,name)
-             goto 9999
-          end if
-          rrax=>tmp
-       End If
-    else
-       dim = 0
-       Allocate(rrax(len1,len2),stat=info)
-       if (info /= 0) then
+      If (dim /= len1) Then
+        Allocate(tmp(len1,len2),stat=info)
+        if (info /= 0) then
           err=4000
           call psb_errpush(err,name)
           goto 9999
-       end if
+        end if
+        m = min(dim,len1)
+!!$        write(0,*) 'DA: copying ',min(len,dim)
+        if (.true.) then 
+          do i=1,m
+            tmp(i,:) = rrax(i,:)
+          end do
+        else
+          tmp(1:m,:) = rrax(1:m,:)
+        end if
+!!$        write(0,*) 'DA: copying done ',m
+        Deallocate(rrax,stat=info)
+        if (info /= 0) then
+          err=4000
+          call psb_errpush(err,name)
+          goto 9999
+        end if
+        rrax=>tmp
+      End If
+    else
+      dim = 0
+      Allocate(rrax(len1,len2),stat=info)
+      if (info /= 0) then
+        err=4000
+        call psb_errpush(err,name)
+        goto 9999
+      end if
     endif
     if (present(pad)) then 
-       rrax(dim+1:len1,:) = pad
+      rrax(dim+1:len1,:) = pad
     endif
     call psb_erractionrestore(err_act)
     return
@@ -230,9 +230,9 @@ Contains
     call psb_erractionrestore(err_act)
 
     if (err_act.eq.act_ret) then
-       return
+      return
     else
-       call psb_error()
+      call psb_error()
     end if
     return
 
@@ -254,18 +254,18 @@ Contains
     call psb_erractionsave(err_act)
 
     if(psb_get_errstatus().ne.0) return 
-  info=0
+    info=0
     call psb_dreallocate1i(len,rrax,info,pad=pad)
     if (info /= 0) then
-       err=4000
-       call psb_errpush(err,name)
-       goto 9999
+      err=4000
+      call psb_errpush(err,name)
+      goto 9999
     end if
     call psb_dreallocate1i(len,y,info,pad=pad)
     if (info /= 0) then
-       err=4000
-       call psb_errpush(err,name)
-       goto 9999
+      err=4000
+      call psb_errpush(err,name)
+      goto 9999
     end if
     call psb_erractionrestore(err_act)
     return
@@ -274,9 +274,9 @@ Contains
     call psb_erractionrestore(err_act)
 
     if (err_act.eq.act_ret) then
-       return
+      return
     else
-       call psb_error()
+      call psb_error()
     end if
     return
 
@@ -302,21 +302,21 @@ Contains
     info = 0
     call psb_dreallocate1i(len,rrax,info)
     if (info /= 0) then
-       err=4000
-       call psb_errpush(err,name)
-       goto 9999
+      err=4000
+      call psb_errpush(err,name)
+      goto 9999
     end if
     call psb_dreallocate1i(len,y,info)
     if (info /= 0) then
-       err=4000
-       call psb_errpush(err,name)
-       goto 9999
+      err=4000
+      call psb_errpush(err,name)
+      goto 9999
     end if
     call psb_dreallocate1d(len,z,info)
     if (info /= 0) then
-       err=4000
-       call psb_errpush(err,name)
-       goto 9999
+      err=4000
+      call psb_errpush(err,name)
+      goto 9999
     end if
     call psb_erractionrestore(err_act)
     return
@@ -325,9 +325,9 @@ Contains
     call psb_erractionrestore(err_act)
 
     if (err_act.eq.act_ret) then
-       return
+      return
     else
-       call psb_error()
+      call psb_error()
     end if
     return
   End Subroutine psb_dreallocate2i1d
@@ -349,38 +349,38 @@ Contains
     call psb_erractionsave(err_act)
 
     if(psb_get_errstatus().ne.0) return 
-  info=0
+    info=0
     if (associated(rrax)) then 
-       dim=size(rrax)
-       If (dim /= len) Then
-          Allocate(tmp(len),stat=info)
-          if (info /= 0) then
-             err=4000
-             call psb_errpush(err,name)
-             goto 9999
-          end if
-!!$        write(0,*) 'IA: copying ',min(len,dim)
-          tmp(1:min(len,dim))=rrax(1:min(len,dim))
-!!$        write(0,*) 'IA: copying done'
-          Deallocate(rrax,stat=info)
-          if (info /= 0) then
-             err=4000
-             call psb_errpush(err,name)
-             goto 9999
-          end if
-          rrax=>tmp
-       End If
-    else
-       allocate(rrax(len),stat=info)
-       if (info /= 0) then
+      dim=size(rrax)
+      If (dim /= len) Then
+        Allocate(tmp(len),stat=info)
+        if (info /= 0) then
           err=4000
           call psb_errpush(err,name)
           goto 9999
-       end if
+        end if
+!!$        write(0,*) 'IA: copying ',min(len,dim)
+        tmp(1:min(len,dim))=rrax(1:min(len,dim))
+!!$        write(0,*) 'IA: copying done'
+        Deallocate(rrax,stat=info)
+        if (info /= 0) then
+          err=4000
+          call psb_errpush(err,name)
+          goto 9999
+        end if
+        rrax=>tmp
+      End If
+    else
+      allocate(rrax(len),stat=info)
+      if (info /= 0) then
+        err=4000
+        call psb_errpush(err,name)
+        goto 9999
+      end if
     endif
     if (present(pad)) then 
 !!$      write(0,*) 'IA: padding'
-       rrax(dim+1:len) = pad
+      rrax(dim+1:len) = pad
     endif
     call psb_erractionrestore(err_act)
     return
@@ -389,9 +389,9 @@ Contains
     call psb_erractionrestore(err_act)
 
     if (err_act.eq.act_ret) then
-       return
+      return
     else
-       call psb_error()
+      call psb_error()
     end if
     return
 
