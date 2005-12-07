@@ -16,7 +16,7 @@ subroutine psb_dneigh(a,idx,neigh,n,info,lev)
   integer, pointer                  :: neigh(:) ! the neighbours
   integer, optional                 :: lev ! level of neighbours to find
 
-  integer, pointer :: tmpn(:)
+  integer, pointer  :: tmpn(:)
   integer :: level, dim, i, j, k, r, c, brow,&
        & elem_pt, ii, n1, col_idx, ne, err_act, nn, nidx
   character(len=20)                 :: name, ch_err
@@ -52,6 +52,7 @@ subroutine psb_dneigh(a,idx,neigh,n,info,lev)
            n=n+nn
         end if
      end do
+     deallocate(tmpn)
   end if
   
   call psb_erractionrestore(err_act)
@@ -127,64 +128,64 @@ contains
 
 
   subroutine coo_dneigh1l(a,idx,neigh,n)
-    
+
     use psb_realloc_mod
     use psb_const_mod
     use psb_spmat_type
     implicit none
-    
-    
+
+
     type(psb_dspmat_type), intent(in) :: a   ! the sparse matrix
     integer, intent(in)               :: idx ! the index whose neighbours we want to find
     integer, intent(out)              :: n   ! the number of neighbours and the info
     integer, pointer                  :: neigh(:) ! the neighbours
-    
+
     integer :: dim, i, iidx, ip, nza
 
     if(a%pl(1).ne.0) then
-       iidx=a%pl(idx)
+      iidx=a%pl(idx)
     else
-       iidx=idx
+      iidx=idx
     end if
 
     nza=a%infoa(psb_nnz_)
 
     if (a%infoa(psb_srtd_) == psb_isrtdcoo_) then 
-       call ibsrch(ip,iidx,nza,a%ia1)
-       if (ip /= -1) then 
-          ! bring ip backward to the beginning of the row
-          do 
-             if (ip < 2) exit
-             if (a%ia1(ip-1) == iidx) then  
-                ip = ip -1 
-             else 
-                exit
-             end if
-          end do
-       end if
-       
-       dim=0
-       do
-          if(a%ia1(ip).eq.iidx) then
-             dim=dim+1
-             if(dim.gt.size(neigh)) call psb_realloc(dim*3/2,neigh,info)
-             neigh(dim)=a%ia2(ip)
-             ip=ip+1
-          else
-             exit
+      call ibsrch(ip,iidx,nza,a%ia1)
+      if (ip /= -1) then 
+        ! bring ip backward to the beginning of the row
+        do 
+          if (ip < 2) exit
+          if (a%ia1(ip-1) == iidx) then  
+            ip = ip -1 
+          else 
+            exit
           end if
-       end do
+        end do
+      end if
+
+      dim=0
+      do
+        if(a%ia1(ip).eq.iidx) then
+          dim=dim+1
+          if(dim.gt.size(neigh)) call psb_realloc(dim*3/2,neigh,info)
+          neigh(dim)=a%ia2(ip)
+          ip=ip+1
+        else
+          exit
+        end if
+      end do
 
     else
 
-       dim=0
-       do i=1,nza
-          if(a%ia1(i).eq.iidx) then
-             dim=dim+1
-             if(dim.gt.size(neigh)) call psb_realloc(dim*3/2,neigh,info)
-             neigh(dim)=a%ia2(ip)
-          end if
-       end do
+      dim=0
+      do i=1,nza
+        if(a%ia1(i).eq.iidx) then
+          dim=dim+1
+          if(dim.gt.size(neigh)) call psb_realloc(dim*3/2,neigh,info)
+          neigh(dim)=a%ia2(ip)
+        end if
+      end do
     end if
 
     n=dim
