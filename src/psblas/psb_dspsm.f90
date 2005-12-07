@@ -274,6 +274,7 @@ subroutine  psb_dspsm(alpha,a,x,beta,y,desc_a,info,&
   end if
 
   if(.not.present(work)) deallocate(iwork)
+  if(.not.present(d)) deallocate(id)
 
   call psb_erractionrestore(err_act)
   return  
@@ -534,6 +535,7 @@ subroutine  psb_dspsv(alpha,a,x,beta,y,desc_a,info,&
   end if
 
   if(.not.present(work)) deallocate(iwork)
+  if(.not.present(d)) deallocate(id)
 
   call psb_erractionrestore(err_act)
   return  
