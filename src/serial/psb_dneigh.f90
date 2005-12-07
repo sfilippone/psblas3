@@ -43,6 +43,7 @@ subroutine psb_dneigh(a,idx,neigh,n,info,lev)
   if(level.eq.2) then
      n1=n
      allocate(tmpn(max(10,2*n)))
+     if (size(neigh)<n*n1) call psb_realloc(n*n1,neigh,info)
      do i=1,n1
         nidx=neigh(i)
         if((nidx.ne.idx).and.(nidx.gt.0).and.(nidx.le.a%m)) then
