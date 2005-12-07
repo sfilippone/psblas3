@@ -306,7 +306,7 @@ Contains
       call psb_errpush(err,name)
       goto 9999
     end if
-    call psb_dreallocate1i(len,y,info)
+    call psb_dreallocate1i(len,y,info)    
     if (info /= 0) then
       err=4000
       call psb_errpush(err,name)
