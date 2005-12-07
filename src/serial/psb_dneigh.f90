@@ -41,8 +41,8 @@ subroutine psb_dneigh(a,idx,neigh,n,info,lev)
   call psb_dneigh1l(a,idx,neigh,n)
   
   if(level.eq.2) then
-     allocate(tmpn(1))
      n1=n
+     allocate(tmpn(max(10,2*n)))
      do i=1,n1
         nidx=neigh(i)
         if((nidx.ne.idx).and.(nidx.gt.0).and.(nidx.le.a%m)) then
