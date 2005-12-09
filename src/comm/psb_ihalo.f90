@@ -121,7 +121,7 @@ subroutine  psb_ihalom(x,desc_a,info,alpha,jx,ik,work,tran,mode)
 !!$     end if
 !!$  end if
 
-  liwork=ncol
+  liwork=nrow
   if (present(work)) then
      if(size(work).ge.liwork) then
         iwork => work
@@ -279,7 +279,7 @@ subroutine  psb_ihalov(x,desc_a,info,alpha,work,tran,mode)
 !!$     end if
 !!$  end if
 
-  liwork=ncol
+  liwork=nrow
   if (present(work)) then
      if(size(work).ge.liwork) then
         iwork => work
