@@ -34,25 +34,33 @@ Contains
     if(psb_get_errstatus().ne.0) return 
     info=0
     if (associated(rrax)) then 
-      dim=size(rrax)
-      If (dim /= len) Then
-        Allocate(tmp(len),stat=info)
-        if (info /= 0) then
-          err=4000
-          call psb_errpush(err,name)
-          goto 9999
-        end if
-!!$        write(0,*) 'IA: copying ',len,dim
-        if (.true.) then 
-          do i=1, min(len,dim)
-            tmp(i)=rrax(i)
-          end do
-        else
-          tmp(1:min(len,dim))=rrax(1:min(len,dim))
-        end if
-!!$        write(0,*) 'IA: copying done'
-        Deallocate(rrax,stat=info)
-        if (info /= 0) then
+<<<<<<< psb_realloc_mod.f90
+       dim=size(rrax)
+       If (dim /= len) Then
+          Allocate(tmp(len),stat=info)
+          if (info /= 0) then
+             err=4000
+             call psb_errpush(err,name)
+             goto 9999
+          end if
+          if (.true.) then 
+             do i=1, min(len,dim)
+                tmp(i)=rrax(i)
+             end do
+          else
+             tmp(1:min(len,dim))=rrax(1:min(len,dim))
+          end if
+          Deallocate(rrax,stat=info)
+          if (info /= 0) then
+             err=4000
+             call psb_errpush(err,name)
+             goto 9999
+          end if
+          rrax=>tmp
+       End If
+    else
+       allocate(rrax(len),stat=info)
+       if (info /= 0) then
           err=4000
           call psb_errpush(err,name)
           goto 9999
@@ -69,7 +77,6 @@ Contains
       end if
     endif
     if (present(pad)) then 
-!!$      write(0,*) 'IA: padding'
       rrax(dim+1:len) = pad
     endif
 
