@@ -211,6 +211,8 @@ subroutine psb_dspasb(a,desc_a, info, afmt, up, dup)
         close(iout)
      endif
 
+     call psb_spfree(atemp,info)
+
 
   else if (spstate == psb_spmat_upd_) then
      !
