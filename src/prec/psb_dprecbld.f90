@@ -31,7 +31,7 @@ subroutine psb_dprecbld(a,p,desc_a,info,upd)
   end interface
 
   interface 
-    subroutine psb_splu_bld(a,desc_a,p,info)
+    subroutine psb_superlu_bld(a,desc_a,p,info)
       use psb_serial_mod
       use psb_descriptor_type
       use psb_prec_type
@@ -42,7 +42,7 @@ subroutine psb_dprecbld(a,p,desc_a,info,upd)
       type(psb_desc_type), intent(in)     :: desc_a
       type(psb_dbase_prec), intent(inout) :: p
       integer, intent(out)                :: info
-    end subroutine psb_splu_bld
+    end subroutine psb_superlu_bld
   end interface
   interface 
     subroutine psb_umf_bld(a,desc_a,p,info)
@@ -107,7 +107,8 @@ subroutine psb_dprecbld(a,p,desc_a,info,upd)
   ! ALso should define symbolic names for the preconditioners. 
   !
 
-  call psb_check_def(p%baseprecv(1)%iprcparm(p_type_),'base_prec',diagsc_,is_legal_base_prec)
+  call psb_check_def(p%baseprecv(1)%iprcparm(p_type_),'base_prec',&
+       &  diagsc_,is_legal_base_prec)
   allocate(p%baseprecv(1)%desc_data)
   call psb_nullify_desc(p%baseprecv(1)%desc_data)
 
@@ -220,11 +221,11 @@ subroutine psb_dprecbld(a,p,desc_a,info,upd)
 
      case(f_slu_)
         p%baseprecv(1)%av => null()
-        if(debug) write(0,*)me,': calling splu_bld'
-        call psb_splu_bld(a,desc_a,p%baseprecv(1),info)
+        if(debug) write(0,*)me,': calling superlu_bld'
+        call psb_superlu_bld(a,desc_a,p%baseprecv(1),info)
         if(info /= 0) then
            info=4010
-           ch_err='splu_bld'
+           ch_err='superlu_bld'
            call psb_errpush(info,name,a_err=ch_err)
            goto 9999
         end if
@@ -305,7 +306,7 @@ subroutine psb_dprecbld(a,p,desc_a,info,upd)
 end subroutine psb_dprecbld
 
 
-subroutine psb_splu_bld(a,desc_a,p,info)
+subroutine psb_superlu_bld(a,desc_a,p,info)
   use psb_serial_mod
   use psb_descriptor_type
   use psb_prec_type
@@ -344,7 +345,7 @@ subroutine psb_splu_bld(a,desc_a,p,info)
 
   if(psb_get_errstatus().ne.0) return 
   info=0
-  name='psb_splu_bld'
+  name='psb_superlu_bld'
   call psb_erractionsave(err_act)
 
   icontxt = desc_A%matrix_data(psb_ctxt_)
@@ -481,7 +482,7 @@ subroutine psb_splu_bld(a,desc_a,p,info)
   end if
   return
 
-end subroutine psb_splu_bld
+end subroutine psb_superlu_bld
 
 
 
@@ -783,8 +784,8 @@ subroutine psb_mlprec_bld(a,desc_a,p,info)
      end if
 
   case(f_slu_) 
-    call psb_spall(0,0,p%av(l_pr_),1,info)
-    call psb_spall(0,0,p%av(u_pr_),1,info)
+!!$    call psb_spall(0,0,p%av(l_pr_),1,info)
+!!$    call psb_spall(0,0,p%av(u_pr_),1,info)
     call psb_ipcsr2coo(p%av(ac_),info)
      if(info /= 0) then
         info=4011
@@ -812,8 +813,8 @@ subroutine psb_mlprec_bld(a,desc_a,p,info)
      end if
 
   case(f_umf_) 
-    call psb_spall(0,0,p%av(l_pr_),1,info)
-    call psb_spall(0,0,p%av(u_pr_),1,info)
+!!$    call psb_spall(0,0,p%av(l_pr_),1,info)
+!!$    call psb_spall(0,0,p%av(u_pr_),1,info)
     call psb_ipcsr2coo(p%av(ac_),info)
      if(info /= 0) then
         info=4011
