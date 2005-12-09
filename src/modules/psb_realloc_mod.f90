@@ -34,7 +34,6 @@ Contains
     if(psb_get_errstatus().ne.0) return 
     info=0
     if (associated(rrax)) then 
-<<<<<<< psb_realloc_mod.f90
        dim=size(rrax)
        If (dim /= len) Then
           Allocate(tmp(len),stat=info)
@@ -50,7 +49,7 @@ Contains
           else
              tmp(1:min(len,dim))=rrax(1:min(len,dim))
           end if
-          Deallocate(rrax,stat=info)
+          deallocate(rrax,stat=info)
           if (info /= 0) then
              err=4000
              call psb_errpush(err,name)
@@ -66,14 +65,6 @@ Contains
           goto 9999
         end if
         rrax=>tmp
-      End If
-    else
-!!$      write(0,*) 'IA: allocating ',len
-      allocate(rrax(len),stat=info)
-      if (info /= 0) then
-        err=4000
-        call psb_errpush(err,name)
-        goto 9999
       end if
     endif
     if (present(pad)) then 
