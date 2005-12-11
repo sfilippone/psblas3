@@ -121,32 +121,32 @@ subroutine psb_dspfrees(a, info)
 
   !...deallocate a....
 
-  if ((info.eq.0).and.(.not.associated(a%pr))) info=2951
-  if (info.eq.0) then
+!  if ((info.eq.0).and.(.not.associated(a%pr))) info=2951
+  if ((info.eq.0).and.(associated(a%pr))) then
      !deallocate pr field
      deallocate(a%pr,stat=info)
      if (info.ne.0) info=2045
   end if
-  if ((info.eq.0).and.(.not.associated(a%pl))) info=2952
+!  if ((info.eq.0).and.(.not.associated(a%pl))) info=2952
   !deallocate pl  field
-  if (info.eq.0) then 
+  if ((info.eq.0).and.(associated(a%pl))) then 
      deallocate(a%pl,stat=info)
      if (info.ne.0) info=2046
   end if
-  if ((info.eq.0).and.(.not.associated(a%ia2))) info=2953
-  if (info.eq.0) then
+!  if ((info.eq.0).and.(.not.associated(a%ia2))) info=2953
+  if ((info.eq.0).and.(associated(a%ia2))) then
      !deallocate ia2 field
      deallocate(a%ia2,stat=info)
      if (info.ne.0) info=2047
   end if
-  if ((info.eq.0).and.(.not.associated(a%ia1))) info=2954
-  if (info.eq.0) then
+!  if ((info.eq.0).and.(.not.associated(a%ia1))) info=2954
+  if ((info.eq.0).and.(associated(a%ia1))) then
      !deallocate ia1  field
      deallocate(a%ia1,stat=info)
      if (info.ne.0) info=2048
   endif
-  if ((info.eq.0).and.(.not.associated(a%aspk))) info=2955
-  if (info.eq.0) then
+!  if ((info.eq.0).and.(.not.associated(a%aspk))) info=2955
+  if ((info.eq.0).and.(associated(a%aspk))) then
      !deallocate aspk field
      deallocate(a%aspk,stat=info)
      if (info.ne.0) info=2049

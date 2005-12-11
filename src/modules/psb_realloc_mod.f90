@@ -56,16 +56,14 @@ Contains
              goto 9999
           end if
           rrax=>tmp
-       End If
+       end if
     else
        allocate(rrax(len),stat=info)
        if (info /= 0) then
           err=4000
           call psb_errpush(err,name)
           goto 9999
-        end if
-        rrax=>tmp
-      end if
+       end if
     endif
     if (present(pad)) then 
       rrax(dim+1:len) = pad
