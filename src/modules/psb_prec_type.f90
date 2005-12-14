@@ -152,6 +152,8 @@ contains
                & smooth_names(p%baseprecv(2)%iprcparm(smth_pos_))
           write(iout,*) 'Coarse matrix: ',&
                & matrix_names(p%baseprecv(2)%iprcparm(coarse_mat_))
+          write(iout,*) 'Aggregation sizes: ', &
+               &  sum( p%baseprecv(2)%nlaggr(:)),' : ',p%baseprecv(2)%nlaggr(:)
           write(iout,*) 'Factorization type: ',&
                & fact_names(p%baseprecv(2)%iprcparm(f_type_))
           select case(p%baseprecv(2)%iprcparm(f_type_))
