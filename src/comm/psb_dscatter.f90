@@ -171,7 +171,13 @@ subroutine  psb_dscatterm(globx, locx, desc_a, info, iroot,&
   end if
 
   ! root has to gather size information
-  allocate(displ(nprow),all_dim(nprow))
+  allocate(displ(nprow),all_dim(nprow),stat=info)
+  if(info.ne.0) then
+     info=4010
+     ch_err='Allocate'
+     call psb_errpush(info,name,a_err=ch_err)
+     goto 9999
+  end if
   call mpi_gather(nrow,1,mpi_integer,all_dim,&
        & nprow,mpi_integer,rootrank,icomm,info)
   
@@ -180,7 +186,14 @@ subroutine  psb_dscatterm(globx, locx, desc_a, info, iroot,&
 
   ! root has to gather loc_glob from each process
   if(myrow.eq.root) then
-     allocate(l_t_g_all(sum(all_dim)),scatterv(sum(all_dim)))
+     allocate(l_t_g_all(sum(all_dim)),scatterv(sum(all_dim)),stat=info)
+     if(info.ne.0) then
+       info=4010
+       ch_err='Allocate'
+       call psb_errpush(info,name,a_err=ch_err)
+       goto 9999
+     end if
+
   end if
      
   call mpi_gatherv(desc_a%loc_to_glob,nrow,&

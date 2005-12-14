@@ -222,7 +222,8 @@ c$$$     +  i, i, -ione ,-ione,-ione)
       if (.true.) then 
         call igsum2d(icontxt,'all',' ',np+1,1,length_dl,np+1,-1,-1)
         call blacs_get(icontxt,10,icomm )
-        allocate(itmp(dl_lda))
+        allocate(itmp(dl_lda),stat=info)
+        if (info /= 0) goto 9999
         itmp(1:dl_lda) = dep_list(1:dl_lda,me)
         call mpi_allgather(itmp,dl_lda,mpi_integer,
      +    dep_list,dl_lda,mpi_integer,icomm,info)

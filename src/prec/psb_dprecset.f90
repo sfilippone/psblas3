@@ -1,3 +1,4 @@
+
 subroutine psb_dprecset(p,ptype,iv,rs,rv,info)
 
   use psb_serial_mod
@@ -30,7 +31,7 @@ subroutine psb_dprecset(p,ptype,iv,rs,rv,info)
     endif
   end if
 
-  select case(toupper(ptype))
+  select case(toupper(ptype(1:len_trim(ptype))))
   case ('NONE','NOPREC') 
     p%baseprecv(1)%iprcparm(p_type_)     = noprec_
     p%baseprecv(1)%iprcparm(f_type_)     = f_none_
@@ -85,7 +86,10 @@ subroutine psb_dprecset(p,ptype,iv,rs,rv,info)
     select case (size(p%baseprecv)) 
     case(1)
       ! Reallocate
-      allocate(bpv(2))
+      allocate(bpv(2),stat=err)
+      if (err/=0) then 
+        write(0,*)'Precset Memory Failure 2l:1',err
+      endif
       bpv(1) = p%baseprecv(1)
       call psb_nullify_baseprec(bpv(2))
       deallocate(p%baseprecv)

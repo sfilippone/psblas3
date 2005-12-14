@@ -250,6 +250,11 @@ subroutine psb_dscall(m, n, parts, icontxt, desc_a, info)
   loc_col=int((psb_colrow_+1.d0)*loc_row)+1  
   allocate(desc_a%loc_to_glob(loc_col),&
        &desc_a%lprm(1),stat=info)  
+  if (info /= 0) then 
+    call psb_errpush(4010,name,a_err='Allocate')
+    goto 9999      
+  end if
+
   call psb_realloc(1, desc_a%lprm, info)
   call psb_realloc(loc_col, desc_a%loc_to_glob, info)
   if (info /= no_err) then

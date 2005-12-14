@@ -68,7 +68,12 @@ subroutine psb_dprecaply(prec,x,y,desc_data,info,trans, work)
   if (present(work)) then 
     work_ => work
   else
-    allocate(work_(4*desc_data%matrix_data(psb_n_col_)))
+    allocate(work_(4*desc_data%matrix_data(psb_n_col_)),stat=info)
+    if (info /= 0) then 
+      call psb_errpush(4010,name,a_err='Allocate')
+      goto 9999      
+    end if
+
   end if
 
   if (.not.(associated(prec%baseprecv))) then 
@@ -235,15 +240,29 @@ subroutine psb_dbaseprcaply(prec,x,beta,y,desc_data,trans,work,info)
         aux => work(3*isz+1:)
       else if ((4*isz) <= size(work)) then 
         aux => work(1:)
-        allocate(ww(isz),tx(isz),ty(isz))
+        allocate(ww(isz),tx(isz),ty(isz),stat=info)
+        if (info /= 0) then 
+          call psb_errpush(4010,name,a_err='Allocate')
+          goto 9999      
+        end if
       else if ((3*isz) <= size(work)) then 
         ww => work(1:isz)
         tx => work(isz+1:2*isz)
         ty => work(2*isz+1:3*isz)
-        allocate(aux(4*isz))
+        allocate(aux(4*isz),stat=info)
+        if (info /= 0) then 
+          call psb_errpush(4010,name,a_err='Allocate')
+          goto 9999      
+        end if
+
       else 
         allocate(ww(isz),tx(isz),ty(isz),&
-             &aux(4*isz))
+             &aux(4*isz),stat=info)
+        if (info /= 0) then 
+          call psb_errpush(4010,name,a_err='Allocate')
+          goto 9999      
+        end if
+
       endif
 
       if (debug) write(0,*)' vdiag: ',prec%d(:)
@@ -416,10 +435,19 @@ subroutine psb_dbjacaply(prec,x,beta,y,desc_data,trans,work,info)
     if ((4*n_col+n_col) <= size(work)) then 
       aux => work(n_col+1:)
     else
-      allocate(aux(4*n_col))
+      allocate(aux(4*n_col),stat=info)
+      if (info /= 0) then 
+        call psb_errpush(4010,name,a_err='Allocate')
+        goto 9999      
+      end if
+      
     endif
   else
-    allocate(ww(n_col),aux(4*n_col))
+    allocate(ww(n_col),aux(4*n_col),stat=info)
+    if (info /= 0) then 
+      call psb_errpush(4010,name,a_err='Allocate')
+      goto 9999      
+    end if
   endif
 
 
@@ -509,7 +537,12 @@ subroutine psb_dbjacaply(prec,x,beta,y,desc_data,trans,work,info)
       goto 9999
     endif
 
-    allocate(tx(n_col),ty(n_col))
+    allocate(tx(n_col),ty(n_col),stat=info)
+    if (info /= 0) then 
+      call psb_errpush(4010,name,a_err='Allocate')
+      goto 9999      
+    end if
+
     tx = zero
     ty = zero
     select case(prec%iprcparm(f_type_)) 
@@ -684,7 +717,12 @@ subroutine psb_dmlprcaply(baseprecv,x,beta,y,desc_data,trans,work,info)
 
     nr2l  = baseprecv(2)%desc_data%matrix_data(psb_n_col_)
     nrg   = baseprecv(2)%desc_data%matrix_data(psb_n_row_)
-    allocate(t2l(nr2l),w2l(nr2l))
+    allocate(t2l(nr2l),w2l(nr2l),stat=info)
+    if (info /= 0) then 
+      call psb_errpush(4010,name,a_err='Allocate')
+      goto 9999      
+    end if
+
     t2l(:) = zero
     w2l(:) = zero
 
@@ -693,7 +731,12 @@ subroutine psb_dmlprcaply(baseprecv,x,beta,y,desc_data,trans,work,info)
       ! Smoothed aggregation
       !
       allocate(tx(max(n_row,n_col)),ty(max(n_row,n_col)),&
-           & tz(max(n_row,n_col)))
+           & tz(max(n_row,n_col)),stat=info)
+      if (info /= 0) then 
+        call psb_errpush(4010,name,a_err='Allocate')
+        goto 9999      
+      end if
+
       tx(1:desc_data%matrix_data(psb_n_row_)) = x(1:desc_data%matrix_data(psb_n_row_)) 
       tx(desc_data%matrix_data(psb_n_row_)+1:max(n_row,n_col)) = zero
       ty(desc_data%matrix_data(psb_n_row_)+1:max(n_row,n_col)) = zero
@@ -770,7 +813,12 @@ subroutine psb_dmlprcaply(baseprecv,x,beta,y,desc_data,trans,work,info)
       n_col = baseprecv(1)%desc_data%matrix_data(psb_n_col_)
       nr2l  = baseprecv(2)%desc_data%matrix_data(psb_n_col_)
       nrg   = baseprecv(2)%desc_data%matrix_data(psb_n_row_)
-      allocate(t2l(nr2l),w2l(nr2l),tx(n_col),ty(n_col))
+      allocate(t2l(nr2l),w2l(nr2l),tx(n_col),ty(n_col),stat=info)
+      if (info /= 0) then 
+        call psb_errpush(4010,name,a_err='Allocate')
+        goto 9999      
+      end if
+
       t2l(:) = zero
       w2l(:) = zero
 
@@ -788,7 +836,12 @@ subroutine psb_dmlprcaply(baseprecv,x,beta,y,desc_data,trans,work,info)
         !
         ! Smoothed aggregation
         !
-        allocate(tz(max(n_row,n_col)))
+        allocate(tz(max(n_row,n_col)),stat=info)
+        if (info /= 0) then 
+          call psb_errpush(4010,name,a_err='Allocate')
+          goto 9999      
+        end if
+
 
         if (baseprecv(2)%iprcparm(glb_smth_) >0) then 
           call psb_halo(tx,desc_data,info,work=work) 
@@ -859,7 +912,12 @@ subroutine psb_dmlprcaply(baseprecv,x,beta,y,desc_data,trans,work,info)
       n_col = baseprecv(1)%desc_data%matrix_data(psb_n_col_)
       nr2l  = baseprecv(2)%desc_data%matrix_data(psb_n_col_)
       nrg   = baseprecv(2)%desc_data%matrix_data(psb_n_row_)
-      allocate(t2l(nr2l),w2l(nr2l),tx(n_col),ty(n_col),tty(n_col))
+      allocate(t2l(nr2l),w2l(nr2l),tx(n_col),ty(n_col),tty(n_col),stat=info)
+      if (info /= 0) then 
+        call psb_errpush(4010,name,a_err='Allocate')
+        goto 9999      
+      end if
+
       t2l(:) = zero
       w2l(:) = zero
 
@@ -878,7 +936,12 @@ subroutine psb_dmlprcaply(baseprecv,x,beta,y,desc_data,trans,work,info)
       if(info /=0) goto 9999
 
       if (ismth  /= no_smth_) then 
-        allocate(tz(max(n_row,n_col)))
+        allocate(tz(max(n_row,n_col)),stat=info)
+        if (info /= 0) then 
+          call psb_errpush(4010,name,a_err='Allocate')
+          goto 9999      
+        end if
+
 
         if (baseprecv(2)%iprcparm(glb_smth_) >0) then 
           call psb_halo(tx,desc_data,info,work=work) 
@@ -943,7 +1006,12 @@ subroutine psb_dmlprcaply(baseprecv,x,beta,y,desc_data,trans,work,info)
       n_col = baseprecv(1)%desc_data%matrix_data(psb_n_col_)
       nr2l  = baseprecv(2)%desc_data%matrix_data(psb_n_col_)
       nrg   = baseprecv(2)%desc_data%matrix_data(psb_n_row_)
-      allocate(t2l(nr2l),w2l(nr2l),tx(n_col),ty(n_col),tty(n_col))
+      allocate(t2l(nr2l),w2l(nr2l),tx(n_col),ty(n_col),tty(n_col),stat=info)
+      if (info /= 0) then 
+        call psb_errpush(4010,name,a_err='Allocate')
+        goto 9999      
+      end if
+
       t2l(:) = zero
       w2l(:) = zero
       tx(:)  = zero
@@ -1091,7 +1159,12 @@ subroutine psb_dprecaply1(prec,x,desc_data,info,trans)
     trans_='N'
   end if
 
-  allocate(ww(size(x)),w1(size(x)))
+  allocate(ww(size(x)),w1(size(x)),stat=info)
+  if (info /= 0) then 
+    call psb_errpush(4010,name,a_err='Allocate')
+    goto 9999      
+  end if
+
   call psb_dprecaply(prec,x,ww,desc_data,info,trans_,w1)
   if(info /=0) goto 9999
   x(:) = ww(:)

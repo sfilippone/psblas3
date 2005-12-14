@@ -15,7 +15,7 @@ subroutine psi_compute_size(desc_data,&
   !     ...local array...
   integer  :: exch(2)
   integer  :: int_err(5)
-  integer, pointer :: counter_recv(:), counter_dl(:)
+  integer, allocatable :: counter_recv(:), counter_dl(:)
 
   !     ...parameters
   logical, parameter :: debug=.false.
@@ -40,7 +40,12 @@ subroutine psi_compute_size(desc_data,&
   endif
 
   np=nprow
-  allocate(counter_dl(0:np-1),counter_recv(0:np-1))
+  allocate(counter_dl(0:np-1),counter_recv(0:np-1),stat=info)
+  if (info /= 0) then 
+    call psb_errpush(4010,name,a_err='Allocate')
+    goto 9999      
+  end if
+
   !     ..initialize counters...
   do i=0,np-1
      counter_recv(i)=0

@@ -132,7 +132,11 @@ subroutine psb_dcslu(a,desc_a,p,upd,info)
   endif
 
   if (.not.associated(p%av)) then 
-     allocate(p%av(bp_ilu_avsz))
+     allocate(p%av(bp_ilu_avsz),stat=info)
+     if (info /= 0) then 
+       call psb_errpush(4010,name,a_err='Allocate')
+       goto 9999      
+     end if
   endif
   do k=1,size(p%av)
      call psb_nullify_sp(p%av(k))
@@ -169,6 +173,11 @@ subroutine psb_dcslu(a,desc_a,p,upd,info)
   endif
   if (.not.associated(p%d)) then 
      allocate(p%d(n_row),stat=info)
+     if (info /= 0) then 
+       call psb_errpush(4010,name,a_err='Allocate')
+       goto 9999      
+     end if
+
   endif
 
 
@@ -319,7 +328,7 @@ contains
     character(len=20)      :: name, ch_err
 
     if(psb_get_errstatus().ne.0) return 
-  info=0
+    info=0
     name='apply_renum'
     call psb_erractionsave(err_act)
 
@@ -343,7 +352,12 @@ contains
        !
 
        nnr = p%desc_data%matrix_data(psb_n_row_)
-       allocate(p%perm(nnr),p%invperm(nnr),itmp2(nnr))
+       allocate(p%perm(nnr),p%invperm(nnr),itmp2(nnr),stat=info)
+       if (info /= 0) then 
+         call psb_errpush(4010,name,a_err='Allocate')
+         goto 9999      
+       end if
+
        do k=1,nnr
           itmp2(k) = p%desc_data%loc_to_glob(k)
        enddo
@@ -359,8 +373,12 @@ contains
 
        ! Build  ATMP with new numbering. 
 
-       allocate(itmp(max(8,atmp%m+2,nztmp+2)),rtmp(atmp%m))
-
+       allocate(itmp(max(8,atmp%m+2,nztmp+2)),rtmp(atmp%m),stat=info)
+       if (info /= 0) then 
+         call psb_errpush(4010,name,a_err='Allocate')
+         goto 9999      
+       end if
+       
        j = 1
        atmp%ia2(1) = 1
        do i=1, atmp%m
@@ -480,7 +498,12 @@ contains
           goto 9999
        end if
 
-       allocate(itmp(max(8,atmp%m+2,nztmp+2)))
+       allocate(itmp(max(8,atmp%m+2,nztmp+2)),stat=info)
+       if (info /= 0) then 
+         call psb_errpush(4010,name,a_err='Allocate')
+         goto 9999      
+       end if
+
        itmp(1:8) = 0
 !          write(0,*) me,' Renumbering: Calling Metis'
 !        call blacs_barrier(icontxt,'All')
@@ -512,7 +535,11 @@ contains
 
        ! Build  ATMP with new numbering. 
 
-       allocate(itmp2(max(8,atmp%m+2,nztmp+2)),rtmp(atmp%m))
+       allocate(itmp2(max(8,atmp%m+2,nztmp+2)),rtmp(atmp%m),stat=info)
+       if (info /= 0) then 
+         call psb_errpush(4010,name,a_err='Allocate')
+         goto 9999      
+       end if
 
        j = 1
        atmp%ia2(1) = 1

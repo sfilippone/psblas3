@@ -317,7 +317,7 @@ contains
 
     name='smooth_aggregate'
     if(psb_get_errstatus().ne.0) return 
-  info=0
+    info=0
     call psb_erractionsave(err_act)
 
     icontxt = desc_a%matrix_data(psb_ctxt_)
@@ -338,6 +338,10 @@ contains
     ntaggr = sum(p%nlaggr)
 
     allocate(nzbr(np), idisp(np),stat=info)
+    if (info /= 0) then 
+      call psb_errpush(4010,name,a_err='Allocate')
+      goto 9999      
+    end if
 
 
     naggrm1 = sum(p%nlaggr(1:myprow))
@@ -371,9 +375,10 @@ contains
     ! nrow: local rows. 
     ! 
     allocate(p%dorig(nrow),stat=info)
-    if (info/=0) then 
-      write(0,*) 'Error from allocation',info
-    endif
+    if (info /= 0) then 
+      call psb_errpush(4010,name,a_err='Allocate')
+      goto 9999      
+    end if
 
     ! Get diagonal D
     call psb_spgtdiag(a,p%dorig,info)
@@ -662,7 +667,11 @@ contains
         nzbg = bg%infoa(psb_nnz_) 
         nzl =  bg%infoa(psb_nnz_) 
 
-        allocate(ivall(ntaggr))
+        allocate(ivall(ntaggr),stat=info)
+        if (info /= 0) then 
+          call psb_errpush(4010,name,a_err='Allocate')
+          goto 9999      
+        end if
 
         i = 1
         do ip=1,nprows

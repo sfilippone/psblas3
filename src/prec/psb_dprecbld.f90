@@ -109,7 +109,12 @@ subroutine psb_dprecbld(a,p,desc_a,info,upd)
 
   call psb_check_def(p%baseprecv(1)%iprcparm(p_type_),'base_prec',&
        &  diagsc_,is_legal_base_prec)
-  allocate(p%baseprecv(1)%desc_data)
+  allocate(p%baseprecv(1)%desc_data,stat=info)
+  if (info /= 0) then 
+    call psb_errpush(4010,name,a_err='Allocate')
+    goto 9999      
+  end if
+
   call psb_nullify_desc(p%baseprecv(1)%desc_data)
 
   select case(p%baseprecv(1)%iprcparm(p_type_)) 
@@ -169,7 +174,12 @@ subroutine psb_dprecbld(a,p,desc_a,info,upd)
      endif
 
      if (debug) then
-        allocate(gd(mglob))       
+        allocate(gd(mglob),stat=info)       
+        if (info /= 0) then 
+          call psb_errpush(4010,name,a_err='Allocate')
+          goto 9999      
+        end if
+
         call  psb_gather(gd, p%baseprecv(1)%d, desc_a, info, iroot=iroot)
         if(info /= 0) then
            info=4010
@@ -269,7 +279,12 @@ subroutine psb_dprecbld(a,p,desc_a,info,upd)
          &   pre_smooth_,is_legal_ml_smooth_pos)
     call psb_check_def(p%baseprecv(2)%iprcparm(f_type_),'fact',f_ilu_n_,is_legal_ml_fact)
 
-    allocate(p%baseprecv(2)%desc_data)
+    allocate(p%baseprecv(2)%desc_data,stat=info)
+    if (info /= 0) then 
+      call psb_errpush(4010,name,a_err='Allocate')
+      goto 9999      
+    end if
+
     call psb_nullify_desc(p%baseprecv(2)%desc_data)
 
     select case(p%baseprecv(2)%iprcparm(f_type_))
@@ -728,8 +743,12 @@ subroutine psb_mlprec_bld(a,desc_a,p,info)
   call psb_erractionsave(err_act)
 
   p%aorig => a
-  allocate(p%av(smth_avsz))
-
+  allocate(p%av(smth_avsz),stat=info)
+  if (info /= 0) then 
+    call psb_errpush(4010,name,a_err='Allocate')
+    goto 9999      
+  end if
+  
   do i=1, smth_avsz
      call psb_nullify_sp(p%av(i))
      call psb_spall(0,0,p%av(i),1,info)
@@ -770,7 +789,11 @@ subroutine psb_mlprec_bld(a,desc_a,p,info)
      goto 9999
   end if
 
-  allocate(p%d(nrg)) 
+  allocate(p%d(nrg),stat=info) 
+  if (info /= 0) then 
+    call psb_errpush(4010,name,a_err='Allocate')
+    goto 9999      
+  end if
 
   select case(p%iprcparm(f_type_)) 
   case(f_ilu_n_,f_ilu_e_) 

@@ -83,7 +83,11 @@ Subroutine psb_descasb(n_ovr,desc_p,desc_a,a,&
   lwork=5*(5*np+2)*np+10
   Allocate(works(lworks),workr(lworkr),t_halo_in(3*Size(desc_p%halo_index)),&
        & t_halo_out(Size(desc_p%halo_index)), work(lwork),&
-       & length_dl(np+1),dep_list(dl_lda*np),temp(lworkr))
+       & length_dl(np+1),dep_list(dl_lda*np),temp(lworkr),stat=info)
+  if (info /= 0) then 
+    call psb_errpush(4010,name,a_err='Allocate')
+    goto 9999      
+  end if
 
 
   call psb_spall(blk,max(lworks,lworkr),info)
@@ -97,7 +101,12 @@ Subroutine psb_descasb(n_ovr,desc_p,desc_a,a,&
   blk%fida='COO'
   halo => desc_a%halo_index
 
-  Allocate(tmp_ovr_idx(l_tmp_ovr_idx),tmp_halo(l_tmp_halo))
+  Allocate(tmp_ovr_idx(l_tmp_ovr_idx),tmp_halo(l_tmp_halo),stat=info)
+  if (info /= 0) then 
+    call psb_errpush(4010,name,a_err='Allocate')
+    goto 9999      
+  end if
+
   desc_p%ovrlap_elem(:) = -1
   tmp_ovr_idx(:)        = -1
   tmp_halo(:)           = -1

@@ -77,7 +77,12 @@ subroutine psi_crea_index(desc_a,index_in,index_out,glob_idx,info)
   ! the number of processors becomes very high
   dl_lda=np+1
 
-  allocate(dep_list(max(1,dl_lda),0:np),length_dl(0:np))
+  allocate(dep_list(max(1,dl_lda),0:np),length_dl(0:np),stat=info)
+  if (info /= 0) then 
+    call psb_errpush(4010,name,a_err='Allocate')
+    goto 9999      
+  end if
+
   ! ...extract dependence list (ordered list of identifer process
   !    which every process must communcate with...
   if (debug) write(*,*) 'crea_halo: calling extract_dep_list'

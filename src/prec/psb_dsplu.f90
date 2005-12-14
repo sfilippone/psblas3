@@ -33,7 +33,12 @@ subroutine psb_dsplu(a,l,u,d,info,blck)
   if (present(blck)) then 
     blck_ => blck
   else
-    allocate(blck_) 
+    allocate(blck_,stat=info) 
+    if (info /= 0) then 
+      call psb_errpush(4010,name,a_err='Allocate')
+      goto 9999      
+    end if
+
     call psb_nullify_sp(blck_)  ! Why do we need this? Who knows.... 
     call psb_spall(0,0,blck_,1,info)
     if(info.ne.0) then

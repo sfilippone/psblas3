@@ -42,7 +42,12 @@ subroutine psb_dipcoo2csr(a,info,rwshr)
   call psb_fixcoo(a,info)
   nr  = a%m 
   nza = a%infoa(psb_nnz_)
-  allocate(iaux(nr+1))
+  allocate(iaux(nr+1),stat=info)
+  if (info /= 0) then 
+    call psb_errpush(4010,name,a_err='Allocate')
+    goto 9999      
+  end if
+
   if(debug) write(0,*)'DIPCOO2CSR: out of fixcoo',nza,nr,size(a%ia2),size(iaux)
 
   itemp => a%ia1
