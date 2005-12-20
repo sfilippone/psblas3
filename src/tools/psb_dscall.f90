@@ -254,15 +254,6 @@ subroutine psb_dscall(m, n, parts, icontxt, desc_a, info)
     goto 9999      
   end if
 
-  call psb_realloc(1, desc_a%lprm, info)
-  call psb_realloc(loc_col, desc_a%loc_to_glob, info)
-  if (info /= no_err) then
-     info=2025
-     char_err='psb_realloc'
-     call psb_errpush(err,name,a_err=char_err)
-     Goto 9999
-  end if
-
   ! set LOC_TO_GLOB array to all "-1" values
   desc_a%lprm(1) = 0
   desc_a%loc_to_glob(:) = -1
