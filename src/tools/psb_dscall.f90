@@ -202,8 +202,7 @@ subroutine psb_dscall(m, n, parts, icontxt, desc_a, info)
   l_ov_el = l_ov_el+3
 
   if (debug) write(*,*) 'PSB_DSCALL: Ov len',l_ov_ix,l_ov_el
-  call psb_realloc(l_ov_ix,ov_idx,info)
-  call psb_realloc(l_ov_el,ov_el,info)
+  allocate(ov_idx(l_ov_ix),ov_el(l_ov_el), stat=info)
   if (info /= no_err) then
      info=4010
      char_err='psb_realloc'
