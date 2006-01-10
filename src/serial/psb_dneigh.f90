@@ -70,31 +70,6 @@ subroutine psb_dneigh(a,idx,neigh,n,info,lev)
      
 contains
 
-  subroutine psb_dneigh1l(a,idx,neigh,n)
-    
-    use psb_realloc_mod
-    use psb_const_mod
-    use psb_spmat_type
-    implicit none
-    
-    
-    type(psb_dspmat_type), intent(in) :: a   ! the sparse matrix
-    integer, intent(in)               :: idx ! the index whose neighbours we want to find
-    integer, intent(out)              :: n   ! the number of neighbours and the info
-    integer, pointer                  :: neigh(:) ! the neighbours
-
-
-    select case(a%fida(1:3))
-    case('CSR')
-       call csr_dneigh1l(a,idx,neigh,n)
-    case('COO')
-       call coo_dneigh1l(a,idx,neigh,n)
-    case('JAD')
-       call jad_dneigh1l(a,idx,neigh,n)
-    end select
-
-  end subroutine psb_dneigh1l
-
   subroutine csr_dneigh1l(a,idx,neigh,n)
     
     use psb_realloc_mod
@@ -279,6 +254,32 @@ contains
     n=k
 
   end subroutine jad_dneigh1l
+
+  subroutine psb_dneigh1l(a,idx,neigh,n)
+    
+    use psb_realloc_mod
+    use psb_const_mod
+    use psb_spmat_type
+    use psb_string_mod
+    implicit none
+    
+    
+    type(psb_dspmat_type), intent(in) :: a   ! the sparse matrix
+    integer, intent(in)               :: idx ! the index whose neighbours we want to find
+    integer, intent(out)              :: n   ! the number of neighbours and the info
+    integer, pointer                  :: neigh(:) ! the neighbours
+
+
+    select case(toupper(a%fida(1:3)))
+    case('CSR')
+       call csr_dneigh1l(a,idx,neigh,n)
+    case('COO')
+       call coo_dneigh1l(a,idx,neigh,n)
+    case('JAD')
+       call jad_dneigh1l(a,idx,neigh,n)
+    end select
+
+  end subroutine psb_dneigh1l
 
 end subroutine psb_dneigh
   
