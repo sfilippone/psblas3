@@ -32,11 +32,12 @@ module psb_prec_type
   ! number of overlap layers, pointer to SuperLU factors, 
   ! levels of fill in for ILU(N), 
   integer, parameter :: p_type_=1, f_type_=2, restr_=3, prol_=4
-  integer, parameter :: iren_=5, n_ovr_=6, slu_ptr_=7
+  integer, parameter :: iren_=5, n_ovr_=6
   integer, parameter :: ilu_fill_in_=8, jac_sweeps_=9, ml_type_=10
   integer, parameter :: smth_pos_=11, aggr_alg_=12, smth_kind_=13
   integer, parameter :: om_choice_=14, glb_smth_=15, coarse_mat_=16
-  integer, parameter :: umf_symptr_=17, umf_numptr_=18
+  !! 2 ints for 64 bit versions
+  integer, parameter :: slu_ptr_=17, umf_symptr_=17, umf_numptr_=19
   integer, parameter :: ifpsz=20
   ! Entries in dprcparm: ILU(E) epsilon, smoother omega
   integer, parameter :: fact_eps_=1, smooth_omega_=2
