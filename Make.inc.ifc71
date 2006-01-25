@@ -1,39 +1,69 @@
-# Using Intel  Fortran compiler  version 7.0
 .mod=.mod
+.fh=.fh
 .SUFFIXES: .f90 $(.mod)
-F90=${IFC7}/bin/ifc
-FC=${IFC7}/bin/ifc
+
+
+#######################  Section 1 #######################
+#  Define your compilers and compiler flags here         #
+##########################################################
+F90=/opt/intel/compiler70/ia32/bin/ifc
+FC=/opt/intel/compiler70/ia32/bin/ifc
 F77=$(FC)
 F90COPT=-O3
-FCOPT=-O3
+FCOPT=-O3 
 CC=gcc
 CCOPT=-O3
+
+#######################  Section 2 #######################
+#  Define your linker and linker flags here              #
+##########################################################
 F90LINK=/usr/local/mpich-ifc71/bin/mpif90 
-FLINK=mpif77
+FLINK=/usr/local/mpich-ifc71/mpif77 
 MPF90=/usr/local/mpich-ifc71/bin/mpif90 
-MPCC=/usr/local/mpich-ifc71/bin/mpicc
-#
-#
-BLAS=-lblas -L$(HOME)/LIB
+MPCC=/usr/local/mpich-ifc71/bin/mpicc 
+
+#######################  Section 3 #######################
+#  Specify paths to libraries                            #
+##########################################################
+BLAS=-lblasintel -L$(HOME)/LIB
 BLACS=-lmpiblacsifc71 -L$(HOME)/LIB
-SLU=-lslu_lx_ifc8
-#
-CDEFINES=-DAdd_
+
+
+#######################  Section 4 #######################
+#  Other useful tools&defines                            #
+##########################################################
+SLUDIR=/usr/local/SuperLU_3.0
+SLU=-lslu_lx_ifc8 -L$(SLUDIR)
+SLUDEF=-DHave_SLU_ -I$(SLUDIR)
+
+UMFDIR=$(HOME)/LIB/Umfpack_gcc41
+UMF=-lumfpack -lamd -L$(UMFDIR)
+UMFDEF=-DHave_UMF_ -I$(UMFDIR)
+
+CDEFINES=-DAdd_ $(SLUDEF) $(UMFDEF)
+
 AR=ar -cur
 RANLIB=ranlib
 
-TYPEMODS =  TYPESP$(.mod) TYPEDESC$(.mod) TYPEPREC$(.mod) REALLOC$(.mod)
-CONSTMODS = TOOLS_CONST$(.mod)
-BLASMODS  = $(TYPEMODS) F90PSBLAS$(.mod) F90COMM$(.mod)
-METHDMODS = F90METHD$(.mod)
-TOOLSMODS = $(CONSTMODS) PSIMOD$(.mod)  F90TOOLS$(.mod) F90SERIAL$(.mod) STRING$(.mod)
-PRECMODS  = F90PREC$(.mod)
-F90MODS= $(BLASMODS) $(PRECMODS) $(METHDMODS) $(TOOLSMODS) F90SPARSE$(.mod)
-
-MODS=$(LIBDIR)/TOOLS_CONST$(.mod) $(LIBDIR)/TYPESP$(.mod)  $(LIBDIR)/REALLOC$(.mod) \
-  $(LIBDIR)/TYPEDESC$(.mod)  $(LIBDIR)/parts.f90 $(LIBDIR)/STRING$(.mod)
 
 
+#######################  Section 5 #######################
+#  Do not edit this                                      #
+##########################################################
+LIBDIR = lib
+LIBNAME = libpsblas.a
+TYPEMODS =  PSB_SPMAT_TYPE$(.mod) PSB_DESCRIPTOR_TYPE$(.mod) PSB_PREC_TYPE$(.mod) PSB_REALLOC_MOD$(.mod)
+CONSTMODS = PSB_CONST_MOD$(.mod)
+BLASMODS  = $(TYPEMODS) PSB_PSBLAS_MOD$(.mod) PSB_COMM_MOD$(.mod)
+METHDMODS = PSB_METHD_MOD$(.mod)
+TOOLSMODS = $(CONSTMODS) PSI_MOD$(.mod) PSB_TOOLS_MOD$(.mod) PSB_SERIAL_MOD$(.mod)
+PRECMODS  = PSB_PREC_MOD$(.mod)
+ERRORMODS = PSB_ERROR_MOD$(.mod)
+F90MODS= $(BLASMODS) $(PRECMODS) $(METHDMODS) $(TOOLSMODS) $(ERRORMODS) STRING$(.mod)
+
+MODS=$(LIBDIR)/PSB_CONST_MOD$(.mod) $(LIBDIR)/PSB_SPMAT_TYPE$(.mod) $(LIBDIR)/PSB_REALLOC_MOD$(.mod) \
+  $(LIBDIR)/PSB_DESCRIPTOR_TYPE$(.mod)  $(LIBDIR)/PSB_PREC_TYPE$(.mod) $(LIBDIR)/parts.fh \
+  $(LIBDIR)/PSB_SERIAL_MOD$(.mod) $(LIBDIR)/PSB_COMM_MOD$(.mod) $(LIBDIR)/PSB_ERROR_MOD$(.mod)
 
 # Under Linux/gmake there is a rule interpreting .mod as Modula source! 
 $(.mod).o:

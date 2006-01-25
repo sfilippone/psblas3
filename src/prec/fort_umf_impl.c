@@ -57,8 +57,11 @@ Availability:
 #include "umfpack.h"
 #endif
 
+#ifdef LargeFptr
+typedef long long fptr;  /* 64-bit*/
+#else
 typedef int fptr;  /* 32-bit by default */
-
+#endif
 
 void
 fort_umf_factor_(int *n, int *nnz,
@@ -162,7 +165,7 @@ fort_umf_solve_(int *itrans, int *n,
   }
 
   *info = umfpack_di_solve(trans,NULL,NULL,NULL,
-			   x,b,*numptr,Control,Info);
+			   x,b,(void *) *numptr,Control,Info);
   
 #else
     fprintf(stderr," UMF Not Configured, fix make.inc and recompile\n");
@@ -193,8 +196,8 @@ fort_umf_free_(
  */
 #ifdef Have_UMF_ 
   void *Symbolic, *Numeric ;
-  Symbolic = *symptr;
-  Numeric  = *numptr;
+  Symbolic = (void *) *symptr;
+  Numeric  = (void *) *numptr;
   
   umfpack_di_free_numeric(&Numeric);
   umfpack_di_free_symbolic(&Symbolic);

@@ -54,7 +54,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define HANDLE_SIZE  8
 /* kind of integer to hold a pointer.  Use int.
    This might need to be changed on 64-bit systems. */
+#ifdef LargeFptr
+typedef long long fptr;  /* 32-bit by default */
+#else
 typedef int fptr;  /* 32-bit by default */
+#endif
 
 typedef struct {
     SuperMatrix *L;

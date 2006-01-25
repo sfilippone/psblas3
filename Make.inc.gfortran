@@ -1,4 +1,4 @@
-.mod=.mod
+ù.mod=.mod
 .fh=.fh
 .SUFFIXES: .f90 $(.mod)
 
@@ -40,6 +40,7 @@ UMFDIR=$(HOME)/LIB/Umfpack_gcc41
 UMF=-lumfpack -lamd -L$(UMFDIR)
 UMFDEF=-DHave_UMF_ -I$(UMFDIR)
 
+#  Add -DLargeFptr for 64-bit addresses
 CDEFINES=-DAdd_ $(SLUDEF) $(UMFDEF)
 
 AR=ar -cur
