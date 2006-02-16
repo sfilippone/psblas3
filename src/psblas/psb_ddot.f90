@@ -306,8 +306,8 @@ subroutine psb_ddotvs(res, x, y,desc_a, info)
   m = desc_a%matrix_data(psb_m_)
 
   ! check vector correctness
-  call psb_chkvect(m,ione,size(x,1),ix,ijx,desc_a%matrix_data,info,iix,jjx)
-  call psb_chkvect(m,ione,size(y,1),iy,ijy,desc_a%matrix_data,info,iiy,jjy)
+  call psb_chkvect(m,ione,size(x,1),ix,ix,desc_a%matrix_data,info,iix,jjx)
+  call psb_chkvect(m,ione,size(y,1),iy,iy,desc_a%matrix_data,info,iiy,jjy)
   if(info.ne.0) then
      info=4010
      ch_err='psb_chkvect'
@@ -423,8 +423,14 @@ subroutine psb_dmdots(res, x, y, desc_a, info)
   m = desc_a%matrix_data(psb_m_)
 
   ! check vector correctness
-  call psb_chkvect(m,ione,size(x,1),ix,ijx,desc_a%matrix_data,info,iix,jjx)
-  call psb_chkvect(m,ione,size(y,1),iy,ijy,desc_a%matrix_data,info,iiy,jjy)
+  call psb_chkvect(m,ione,size(x,1),ix,ix,desc_a%matrix_data,info,iix,jjx)
+  if(info.ne.0) then
+     info=4010
+     ch_err='psb_chkvect'
+     call psb_errpush(info,name,a_err=ch_err)
+     goto 9999
+  end if
+  call psb_chkvect(m,ione,size(y,1),iy,iy,desc_a%matrix_data,info,iiy,jjy)
   if(info.ne.0) then
      info=4010
      ch_err='psb_chkvect'
@@ -432,7 +438,7 @@ subroutine psb_dmdots(res, x, y, desc_a, info)
      goto 9999
   end if
 
-  if ((iix.ne.ione).or.(iiy.ne.ione)) then
+  if ((ix.ne.ione).or.(iy.ne.ione)) then
      info=3040
      call psb_errpush(info,name)
      goto 9999
@@ -445,14 +451,14 @@ subroutine psb_dmdots(res, x, y, desc_a, info)
      if(desc_a%matrix_data(psb_n_row_).gt.0) then
         do j=1,k
            dot_local(j) = ddot(desc_a%matrix_data(psb_n_row_),&
-                & x(iix,jjx+j-1),ione,y(iiy,jjy+j-1),ione)
+                & x(1,j),ione,y(1,j),ione)
            ! adjust dot_local because overlapped elements are computed more than once
            i=1
            do while (desc_a%ovrlap_elem(i).ne.-ione)
               dot_local(j) = dot_local(j) -&
                    & (desc_a%ovrlap_elem(i+1)-1)/desc_a%ovrlap_elem(i+1)*&
-                   & x(iix+desc_a%ovrlap_elem(i)-1,jjx+j-1)*&
-                   & y(iiy+desc_a%ovrlap_elem(i)-1,jjy+j-1)
+                   & x(desc_a%ovrlap_elem(i)-1,j)*&
+                   & y(desc_a%ovrlap_elem(i)-1,j)
               i = i+2
            end do
         end do
