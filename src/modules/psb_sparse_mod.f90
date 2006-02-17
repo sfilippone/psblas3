@@ -1,4 +1,5 @@
 module psb_sparse_mod
+  use psb_blacs_mod
   use psb_descriptor_type
   use psb_prec_type
   use psb_serial_mod

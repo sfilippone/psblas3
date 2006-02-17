@@ -110,6 +110,7 @@ contains
     integer, parameter :: nrb=16
     logical,parameter  :: debug=.false.
     type(psb_dspmat_type) :: trw
+    integer             :: int_err(5) 
     character(len=20)   :: name, ch_err
 
     name='psb_dspluint'
@@ -264,7 +265,9 @@ contains
         !     Pivot too small: unstable factorization
         !     
         info = 2
-        call psb_errpush(info,name)
+        int_err(1) = i
+        write(ch_err,'(g20.10)'),dia
+        call psb_errpush(info,name,i_err=int_err,a_err=ch_err)
         goto 9999
       else
         dia = 1.d0/dia
@@ -401,8 +404,10 @@ contains
         !
         !     Pivot too small: unstable factorization
         !     
+        int_err(1) = i
+        write(ch_err,'(g20.10)'),dia
         info = 2
-        call psb_errpush(info,name)
+        call psb_errpush(info,name,i_err=int_err,a_err=ch_err)
         goto 9999
       else
         dia = 1.d0/dia

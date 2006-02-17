@@ -35,10 +35,10 @@ module psb_error_mod
   end type psb_errstack
 
 
-  type(psb_errstack)  :: error_stack                       !  the PSBLAS-2.0 error stack
-  integer             :: error_status=0                    !  the error status (maybe not here)
-  integer             :: verbosity_level=1                 !  the verbosity level (maybe not here)
-  integer             :: err_action=1
+  type(psb_errstack),save  :: error_stack                       !  the PSBLAS-2.0 error stack
+  integer,save             :: error_status=0                    !  the error status (maybe not here)
+  integer,save             :: verbosity_level=1                 !  the verbosity level (maybe not here)
+  integer,save             :: err_action=1
 
 contains
 
@@ -252,7 +252,7 @@ contains
     case(:0)
        write (0,'("error on calling sperror. err_c must be greater than 0")')
     case(2)
-       write (0,'("pivot too small")')
+       write (0,'("pivot too small: ",i0,1x,a)')i_e_d(1),a_e_d
     case(3)
        write (0,'("Invalid number of ovr:",i0)')i_e_d(1)
     case(5)
