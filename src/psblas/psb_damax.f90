@@ -14,7 +14,7 @@
 !    jx     -  integer(optional).         The column offset.
 !
 function psb_damax (x,desc_a, info, jx)
-
+  use psb_blacs_mod 
   use psb_serial_mod
   use psb_descriptor_type
   use psb_check_mod
@@ -119,6 +119,7 @@ end function psb_damax
 !    info   -  integer.                   Eventually returns an error code.
 !
 function psb_damaxv (x,desc_a, info)
+  use psb_blacs_mod
   use psb_serial_mod
   use psb_descriptor_type
   use psb_check_mod
@@ -186,8 +187,7 @@ function psb_damaxv (x,desc_a, info)
   end if
   
   ! compute global max
-  call dgamx2d(icontxt, 'A', ' ', ione, ione, amax, ione,&
-           &temp ,temp,-ione ,-ione,-ione)
+  call gamx2d(icontxt, 'A', amax)
 
   psb_damaxv=amax
 
@@ -220,6 +220,7 @@ end function psb_damaxv
 !    jx     -  integer(optional).         The column offset.
 !
 subroutine psb_damaxvs (res,x,desc_a, info)
+  use psb_blacs_mod
   use psb_serial_mod
   use psb_descriptor_type
   use psb_check_mod
@@ -286,8 +287,7 @@ subroutine psb_damaxvs (res,x,desc_a, info)
   end if
   
   ! compute global max
-  call dgamx2d(icontxt, 'A', ' ', ione, ione, amax, ione,&
-           &temp ,temp,-ione ,-ione,-ione)
+  call gamx2d(icontxt, 'A', amax)
 
   res = amax
 
@@ -319,6 +319,7 @@ end subroutine psb_damaxvs
 !    info   -  integer.                   Eventually returns an error code.
 !
 subroutine psb_dmamaxs (res,x,desc_a, info,jx)
+  use psb_blacs_mod
   use psb_serial_mod
   use psb_descriptor_type
   use psb_check_mod
@@ -339,7 +340,7 @@ subroutine psb_dmamaxs (res,x,desc_a, info,jx)
   character(len=20)        :: name, ch_err
 
   name='psb_dmamaxs'
-  if(psb_get_errstatus().ne.0) return 
+  if (psb_get_errstatus().ne.0) return 
   info=0
   call psb_erractionsave(err_act)
 
@@ -388,14 +389,13 @@ subroutine psb_dmamaxs (res,x,desc_a, info,jx)
   ! compute local max
   if ((desc_a%matrix_data(psb_n_row_).gt.0).and.(m.ne.0)) then
      do i=1,k
-        imax=idamax(desc_a%matrix_data(psb_n_row_)-iix+1,x(iix,jjx),1)
+        imax=idamax(desc_a%matrix_data(psb_n_row_)-iix+1,x(iix,jjx+i-1),1)
         res(i)=abs(x(iix+imax-1,jjx+i-1))
      end do
   end if
   
   ! compute global max
-  call dgamx2d(icontxt, 'A', ' ', ione, ione, amax, ione,&
-           &temp ,temp,-ione ,-ione,-ione)
+  call gamx2d(icontxt, 'A', res(1:k))
 
   call psb_erractionrestore(err_act)
   return  
