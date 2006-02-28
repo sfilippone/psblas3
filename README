@@ -1,5 +1,36 @@
-This directory contains  the PSBLAS library, version 2.0
-Version 1.0 of the library is described in:
+ *
+ *             Parallel Sparse BLAS  v2.0
+ *   (C) Copyright 2006 Salvatore Filippone    University of Rome Tor Vergata
+ *                      Alfredo Buttari
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ *   1. Redistributions of source code must retain the above copyright
+ *      notice, this list of conditions and the following disclaimer.
+ *   2. Redistributions in binary form must reproduce the above copyright
+ *      notice, this list of conditions, and the following disclaimer in the
+ *      documentation and/or other materials provided with the distribution.
+ *   3. The name of the PSBLAS group or the names of its contributors may
+ *      not be used to endorse or promote products derived from this
+ *      software without specific written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+ * ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
+ * TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+ * PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE PSBLAS GROUP OR ITS CONTRIBUTORS
+ * BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
+ *
+ * 
+
+This directory contains  the PSBLAS library, version 2.0.
+The version 1.0 of the library is described in:
 S. Filippone, M. Colajanni
 PSBLAS: A library for parallel linear algebra computation on sparse matrices
 ACM Trans. on Math. Software, 26(4), Dec. 2000, pp. 527-550.
@@ -27,8 +58,9 @@ please make sure your system has the PTF xlf 8102 installed.
 LINUX:
 
 There finally exist a GNU Fortran 95 implementation: we are using the
-development snapshots from GCC 3.5.0 since July 2004, and it appears
-to work. This is on its way to become the reference platform. 
+development snapshots from GCC 3.5.0, later 4.1 and 4.2  since July
+2004, and it appears  to work. This is on its way to become the
+reference platform.  
 
 We compiled with egcs G77/GCC and mpich-1.2.0, 1.2.1,  1.2.2 and 1.2.4.
 With some versions of GCC, g77 chokes on SRC/SERIAL/dcsdp.f; this
@@ -83,6 +115,8 @@ We have had good results with  the METIS library, which can be
 obtained from
 http://www-users.cs.umn.edu/~karypis/metis/metis/main.html 
 
+We include interfaces to: SuperLU 3.0 and UMFPACK 4.4. 
+
 
 
 NEW: 
@@ -130,10 +164,17 @@ TODO:
 The PSBLAS team. 
 
 
-Credits:
+
+
+Credits for version 2.0:
+Salvatore  Filippone
+Alfredo    Buttari
+Pasqua     D'Ambra
+Daniela    Di Serafino
+
+Credits for version 1.0:
 Salvatore  Filippone
 Michele    Colajanni
-Alfredo    Buttari
 Fabio      Cerioni
 Stefano    Maiolatesi
 Dario      Pascucci
