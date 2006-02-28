@@ -1,3 +1,38 @@
+!!$ 
+!!$ 
+!!$              MPcube: Multilevel Parallel Preconditioners Package 
+!!$                      for 
+!!$              Parallel Sparse BLAS  v2.0
+!!$    (C) Copyright 2006 Salvatore Filippone    University of Rome Tor Vergata
+!!$                       Alfredo Buttari        University of Rome Tor Vergata
+!!$                       Daniela Di Serafino    II University of Naples
+!!$                       Pasqua D'Ambra         ICAR-CNR                      
+!!$ 
+!!$  Redistribution and use in source and binary forms, with or without
+!!$  modification, are permitted provided that the following conditions
+!!$  are met:
+!!$    1. Redistributions of source code must retain the above copyright
+!!$       notice, this list of conditions and the following disclaimer.
+!!$    2. Redistributions in binary form must reproduce the above copyright
+!!$       notice, this list of conditions, and the following disclaimer in the
+!!$       documentation and/or other materials provided with the distribution.
+!!$    3. The name of the MPCUBE group or the names of its contributors may
+!!$       not be used to endorse or promote products derived from this
+!!$       software without specific written permission.
+!!$ 
+!!$  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+!!$  ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
+!!$  TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+!!$  PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE MPCUBE GROUP OR ITS CONTRIBUTORS
+!!$  BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+!!$  CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+!!$  SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+!!$  INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+!!$  CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+!!$  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+!!$  POSSIBILITY OF SUCH DAMAGE.
+!!$ 
+!!$  
 subroutine psb_dsplu(a,l,u,d,info,blck)
   
   !
@@ -115,7 +150,7 @@ contains
 
     name='psb_dspluint'
     if(psb_get_errstatus().ne.0) return 
-  info=0
+    info=0
     call psb_erractionsave(err_act)
 
     trw%m=0
@@ -123,10 +158,10 @@ contains
     if(debug) write(0,*)'LUINT Allocating TRW'
     call psb_spall(trw,1,info)
     if(info.ne.0) then
-       info=4010
-       ch_err='psb_spall'
-       call psb_errpush(info,name,a_err=ch_err)
-       goto 9999
+      info=4010
+      ch_err='psb_spall'
+      call psb_errpush(info,name,a_err=ch_err)
+      goto 9999
     end if
     if(debug) write(0,*)'LUINT Done  Allocating TRW'
     lia2(1) = 1
@@ -168,10 +203,10 @@ contains
           irb = min(ma-i+1,nrb)
           call psb_spgtrow(i,a,trw,info,lrw=i+irb-1)
           if(info.ne.0) then
-             info=4010
-             ch_err='psb_spgtrow'
-             call psb_errpush(info,name,a_err=ch_err)
-             goto 9999
+            info=4010
+            ch_err='psb_spgtrow'
+            call psb_errpush(info,name,a_err=ch_err)
+            goto 9999
           end if
           ktrw=1
         end if
@@ -307,17 +342,17 @@ contains
       else
 
         if ((mod((i-ma),nrb) == 1).or.(nrb==1)) then 
-           irb = min(m-i+1,nrb)
-           call psb_spgtrow(i-ma,b,trw,info,lrw=i-ma+irb-1)
-           if(info.ne.0) then
-              info=4010
-              ch_err='psb_spgtrow'
-              call psb_errpush(info,name,a_err=ch_err)
-              goto 9999
-           end if
-           ktrw=1
+          irb = min(m-i+1,nrb)
+          call psb_spgtrow(i-ma,b,trw,info,lrw=i-ma+irb-1)
+          if(info.ne.0) then
+            info=4010
+            ch_err='psb_spgtrow'
+            call psb_errpush(info,name,a_err=ch_err)
+            goto 9999
+          end if
+          ktrw=1
         end if
-        
+
         do 
           if (ktrw > trw%infoa(psb_nnz_)) exit
           if (trw%ia1(ktrw) > i) exit
@@ -421,22 +456,22 @@ contains
 
     call psb_spfree(trw,info)
     if(info.ne.0) then
-       info=4010
-       ch_err='psb_spfree'
-       call psb_errpush(info,name,a_err=ch_err)
-       goto 9999
+      info=4010
+      ch_err='psb_spfree'
+      call psb_errpush(info,name,a_err=ch_err)
+      goto 9999
     end if
     if(debug) write(0,*)'Leaving dcsrlu'
 
-  call psb_erractionrestore(err_act)
-  return
+    call psb_erractionrestore(err_act)
+    return
 
 9999 continue
-  call psb_erractionrestore(err_act)
-  if (err_act.eq.act_abort) then
-     call psb_error()
-     return
-  end if
-  return
-end subroutine psb_dspluint
+    call psb_erractionrestore(err_act)
+    if (err_act.eq.act_abort) then
+      call psb_error()
+      return
+    end if
+    return
+  end subroutine psb_dspluint
 end subroutine psb_dsplu
