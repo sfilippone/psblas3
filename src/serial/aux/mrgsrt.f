@@ -152,14 +152,14 @@ C  what order was already in the input data; negative links
 C  mark the end of the sublists
       L(0) = 1
       T = N + 1
-      DO 100 P = 1,N - 1
+      DO  P = 1,N - 1
         IF (K(P).LE.K(P+1)) THEN
           L(P) = P + 1
         ELSE
           L(T) = - (P+1)
           T = P
         END IF
- 100  CONTINUE
+      END DO
       L(T) = 0
       L(N) = 0
 C See if the input was already sorted
