@@ -1,4 +1,4 @@
-ù.mod=.mod
+.mod=.mod
 .fh=.fh
 .SUFFIXES: .f90 $(.mod)
 
