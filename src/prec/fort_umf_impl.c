@@ -112,15 +112,6 @@ fort_umf_factor_(int *n, int *nnz,
 		 int *info)
 
 {
-/* 
- * This routine can be called from Fortran.
- *  performs LU decomposition.
- *
- * f_factors (input/output) fptr* 
- *      On  output contains the pointer pointing to
- *       the structure of the factored matrices.
- *
- */
  
 #ifdef Have_UMF_
   double Info [UMFPACK_INFO], Control [UMFPACK_CONTROL];
@@ -176,11 +167,6 @@ fort_umf_solve_(int *itrans, int *n,
 		 int *info)
 
 {
-/* 
- * This routine can be called from Fortran.
- *      performs triangular solve
- *
- */
 #ifdef Have_UMF_ 
   double Info [UMFPACK_INFO], Control [UMFPACK_CONTROL];
   void *Symbolic, *Numeric ;
@@ -223,12 +209,6 @@ fort_umf_free_(
 		 int *info)
 
 {
-/* 
- * This routine can be called from Fortran.
- *
- *      free all storage in the end
- *
- */
 #ifdef Have_UMF_ 
   void *Symbolic, *Numeric ;
   Symbolic = (void *) *symptr;

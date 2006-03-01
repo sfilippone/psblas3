@@ -35,7 +35,7 @@
  */
 /* This file is an interface to the SuperLU routines for sparse
    factorization.  It was obtaned by modifying the
-   c_fortran_dgssv.c file from the source distribution;
+   c_fortran_dgssv.c file from the SuperLU source distribution;
    original copyright terms reproduced below. 
    
    PSBLAS v 2.0, rc1,  May 03, 2005  */ 
