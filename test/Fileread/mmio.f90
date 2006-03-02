@@ -29,7 +29,7 @@
 !!$ 
 !!$  
 module mmio
-  use psb_spmat_type
+  use psb_sparse_mod
   public mm_mat_read, mm_mat_write
   interface mm_mat_read
     module procedure dmm_mat_read
@@ -42,7 +42,7 @@ module mmio
 contains
 
   subroutine dmm_mat_read(a, iret, iunit, filename)   
-    use psb_spmat_type
+    use psb_sparse_mod
     implicit none
     type(psb_dspmat_type), intent(out)  :: a
     integer, intent(out)        :: iret
@@ -222,7 +222,7 @@ contains
 
 
   subroutine dmm_mat_write(a,mtitle,iret,eiout,filename)
-    use psb_spmat_type
+    use psb_sparse_mod
     implicit none
     type(psb_dspmat_type), intent(in)  :: a
     integer, intent(out)        :: iret

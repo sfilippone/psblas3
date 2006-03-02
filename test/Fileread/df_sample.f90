@@ -29,7 +29,7 @@
 !!$ 
 !!$  
 program df_sample
-  use psb_all_mod
+  use psb_sparse_mod
   use mat_dist
   use read_mat
   use partgraph

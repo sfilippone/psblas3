@@ -94,7 +94,7 @@ contains
     !     on entry: specifies processor holding a_glob. default: 0
     !     on exit : unchanged.
     !
-    use psb_all_mod
+    use psb_sparse_mod
     implicit none
 
     ! parameters
@@ -553,7 +553,7 @@ contains
     !     on entry: specifies processor holding a_glob. default: 0
     !     on exit : unchanged.
     !
-    use psb_all_mod
+    use psb_sparse_mod
     implicit none   ! parameters
     type(psb_dspmat_type)      :: a_glob
     real(kind(1.d0)), pointer  :: b_glob(:)

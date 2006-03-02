@@ -72,8 +72,6 @@
 !
 program pde90
   use psb_sparse_mod
-  use psb_error_mod
-  use psb_prec_mod
   implicit none
 
   interface 
@@ -429,10 +427,7 @@ contains
     !  u(x,y,z)(2b1+2b2+2b3+a1+a2+a3)+u(x-1,y,z)(-b1-a1)+u(x,y-1,z)(-b2-a2)+
     !  + u(x,y,z-1)(-b3-a3)-u(x+1,y,z)b1-u(x,y+1,z)b2-u(x,y,z+1)b3
 
-    use psb_spmat_type
-    use psb_descriptor_type
-    use psb_tools_mod
-    use psb_methd_mod
+    use psb_sparse_mod
     implicit none
     integer                  :: idim
     integer, parameter       :: nbmax=10
