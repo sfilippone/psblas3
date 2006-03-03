@@ -74,6 +74,12 @@ Level 3 basic linear algebra subprograms for sparse matrices: a user
 level interface
 ACM Trans. Math. Softw., 23(3), 379-401, 1997.
 
+In the multilevel preconditioners we use SMMP by Randolph E. Bank and
+Craig C. Douglas  na.bank@na-net.ornl.gov and
+na.cdouglas@na-net.ornl.gov;  we interfaced it with dynamic memory
+allocation from Fortran 95. 
+
+
 We have had good results with  the METIS library, which can be
 obtained from
 http://www-users.cs.umn.edu/~karypis/metis/metis/main.html 
