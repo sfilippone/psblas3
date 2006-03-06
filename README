@@ -76,18 +76,29 @@ ACM Trans. Math. Softw., 23(3), 379-401, 1997.
 
 In the multilevel preconditioners we use SMMP by Randolph E. Bank and
 Craig C. Douglas  na.bank@na-net.ornl.gov and
-na.cdouglas@na-net.ornl.gov;  we interfaced it with dynamic memory
-allocation from Fortran 95. 
+na.cdouglas@na-net.ornl.gov;  we wrapped  it in a Fortran 95 interface
+with dynamic memory allocation. 
 
+To compile and run our software you will need 
 
-We have had good results with  the METIS library, which can be
-obtained from
-http://www-users.cs.umn.edu/~karypis/metis/metis/main.html 
+1. A working version of MPI
+2. The MPI version of the BLACS  from
+   http://www.netlib.org/blacs/index.html
+3. A version of the BLAS; if you don't have a specific version for
+   your platform you may try ATLAS available from
+   http://math-atlas.sourceforge.net/ 
 
-We include interfaces to:
---  SuperLU 3.0        http://crd.lbl.gov/~xiaoye/SuperLU/
---  UMFPACK 4.4        http://www.cise.ufl.edu/research/sparse/umfpack/ 
+4. We have had good results with  the METIS library, from 
+   http://www-users.cs.umn.edu/~karypis/metis/metis/main.html 
+   This is not necessary to compile our library, but the test program
+   in test/Fileread assumes you have it installed.  
 
+5. For our preconditioners we include interfaces to the following
+   software  packages:
+   --  SuperLU 3.0        http://crd.lbl.gov/~xiaoye/SuperLU/
+   --  UMFPACK 4.4        http://www.cise.ufl.edu/research/sparse/umfpack/ 
+   These are optional, you only need to install them if you actually
+   want to use them 
 
 
 

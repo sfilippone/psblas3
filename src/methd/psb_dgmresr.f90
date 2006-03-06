@@ -189,10 +189,10 @@ Subroutine psb_dgmresr(a,prec,b,x,eps,desc_a,info,&
      goto 9999
   End If
 
-  Call psb_dsall(mglob,nl+1,v,desc_a,info)
-  Call psb_dsall(mglob,w,desc_a,info)
-  Call psb_dsasb(v,desc_a,info)  
-  Call psb_dsasb(w,desc_a,info)  
+  Call psb_alloc(mglob,nl+1,v,desc_a,info)
+  Call psb_alloc(mglob,w,desc_a,info)
+  Call psb_asb(v,desc_a,info)  
+  Call psb_asb(w,desc_a,info)  
   if (info.ne.0) Then 
      info=4011 
      call psb_errpush(info,name)
