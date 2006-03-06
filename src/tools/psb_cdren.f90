@@ -28,9 +28,9 @@
 !!$  POSSIBILITY OF SUCH DAMAGE.
 !!$ 
 !!$  
-! File: psb_dscren.f90
+! File: psb_cdren.f90
 !
-! Subroutine: psb_dscren
+! Subroutine: psb_cdren
 !    Updates a communication descriptor according to a renumbering scheme.
 ! 
 ! Parameters: 
@@ -39,7 +39,7 @@
 !    desc_a   - type(<psb_desc_type>).         The communication descriptor to be updated.
 !    info     - integer.                       Eventually returns an error code.
 !
-subroutine psb_dscren(trans,iperm,desc_a,info)
+subroutine psb_cdren(trans,iperm,desc_a,info)
   use psb_descriptor_type
   use psb_const_mod
   use psb_error_mod
@@ -232,4 +232,4 @@ subroutine psb_dscren(trans,iperm,desc_a,info)
   end if
   return
 
-end subroutine psb_dscren
+end subroutine psb_cdren

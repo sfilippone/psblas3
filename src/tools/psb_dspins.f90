@@ -71,15 +71,15 @@ subroutine psb_dspins(nz,ia,ja,val,a,desc_a,info,is,js)
   logical, parameter     :: debug=.false.
   integer, parameter     :: relocsz=200
 
-  interface psb_dscins
-     subroutine psb_dscins(nz,ia,ja,desc_a,info,is,js)
+  interface psb_cdins
+     subroutine psb_cdins(nz,ia,ja,desc_a,info,is,js)
        use psb_descriptor_type
        implicit none
        type(psb_desc_type), intent(inout) ::  desc_a
        integer, intent(in)            ::  nz,ia(:),ja(:)
        integer, intent(out)           :: info
        integer, intent(in), optional  :: is,js
-     end subroutine psb_dscins
+     end subroutine psb_cdins
   end interface
 
   character(len=20)  :: name, ch_err
@@ -130,10 +130,10 @@ subroutine psb_dspins(nz,ia,ja,val,a,desc_a,info,is,js)
 
   spstate = a%infoa(psb_state_)
   if (psb_is_bld_dec(dectype)) then 
-     call  psb_dscins(nz,ia,ja,desc_a,info)
+     call  psb_cdins(nz,ia,ja,desc_a,info)
      if (info /= 0) then
         info=4010
-        ch_err='psb_dscins'
+        ch_err='psb_cdins'
         call psb_errpush(info,name,a_err=ch_err)
         goto 9999
      end if

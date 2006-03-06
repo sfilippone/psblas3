@@ -28,15 +28,15 @@
 !!$  POSSIBILITY OF SUCH DAMAGE.
 !!$ 
 !!$  
-! File: psb_dscasb.f90
+! File: psb_cdasb.f90
 !
-! Subroutine: psb_dscasb
+! Subroutine: psb_cdasb
 !   Assembly the psblas communications descriptor.
 ! 
 ! Parameters: 
 !    desc_a  - type(<psb_desc_type>).         The communication descriptor.
 !    info    - integer.                       Eventually returns an error code.
-subroutine psb_dscasb(desc_a,info)
+subroutine psb_cdasb(desc_a,info)
   use psb_descriptor_type
   use psb_serial_mod
   use psb_const_mod
@@ -61,7 +61,7 @@ subroutine psb_dscasb(desc_a,info)
 
   info = 0
   int_err(1) = 0
-  name = 'psb_dscasb'
+  name = 'psb_cdasb'
 
   call psb_erractionsave(err_act)
 
@@ -93,7 +93,7 @@ subroutine psb_dscasb(desc_a,info)
   if (debug) write (0, *) '   Begin matrix assembly...'
 
   if (psb_is_bld_dec(dectype)) then 
-    if (debug) write(0,*) 'psb_dscasb: Checking rows insertion'
+    if (debug) write(0,*) 'psb_cdasb: Checking rows insertion'
     ! check if all local row are inserted
     do i=1,desc_a%matrix_data(psb_n_col_)
       if (desc_a%loc_to_glob(i) < 0) then
@@ -166,7 +166,7 @@ subroutine psb_dscasb(desc_a,info)
     
     
       
-    if (debug) write(0,*) 'psb_dscasb: converting indexes',&
+    if (debug) write(0,*) 'psb_cdasb: converting indexes',&
          & nhalo,lhalo,halo_index(lhalo)
     !.... convert comunication stuctures....
     ! first the halo index
@@ -228,4 +228,4 @@ subroutine psb_dscasb(desc_a,info)
   end if
   return
   
-end subroutine psb_dscasb
+end subroutine psb_cdasb

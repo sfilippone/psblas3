@@ -28,9 +28,9 @@
 !!$  POSSIBILITY OF SUCH DAMAGE.
 !!$ 
 !!$  
-! File: psb_dscins.f90
+! File: psb_cdins.f90
 !
-! Subroutine: psb_dscins
+! Subroutine: psb_cdins
 !   Takes as input a cloud of points and updates the descriptor accordingly.
 ! 
 ! Parameters: 
@@ -41,7 +41,7 @@
 !    info     - integer.                       Eventually returns an error code.
 !    is       - integer(optional).             The row offset.
 !    js       - integer(optional).             The column offset.
-subroutine psb_dscins(nz,ia,ja,desc_a,info,is,js)
+subroutine psb_cdins(nz,ia,ja,desc_a,info,is,js)
 
   use psb_descriptor_type
   use psb_serial_mod
@@ -68,7 +68,7 @@ subroutine psb_dscins(nz,ia,ja,desc_a,info,is,js)
   character(len=20)             :: name,ch_err
 
   info = 0
-  name = 'psb_dscins'
+  name = 'psb_cdins'
   call psb_erractionsave(err_act)
 
   icontxt = desc_a%matrix_data(psb_ctxt_)
@@ -187,5 +187,5 @@ subroutine psb_dscins(nz,ia,ja,desc_a,info,is,js)
   end if
   return
 
-end subroutine psb_dscins
+end subroutine psb_cdins
 

@@ -425,11 +425,11 @@ contains
 
        call blacs_barrier(icontxt,'all')
        t0 = mpi_wtime()
-       call psb_dscasb(desc_a,info)     
+       call psb_cdasb(desc_a,info)     
        t1 = mpi_wtime()
        if(info/=0)then
           info=4010
-          ch_err='psb_dscasb'
+          ch_err='psb_cdasb'
           call psb_errpush(info,name,a_err=ch_err)
           goto 9999
        end if
@@ -790,11 +790,11 @@ contains
     endif
     call blacs_barrier(icontxt,'all')
     t0 = mpi_wtime()
-    call psb_dscasb(desc_a,info)     
+    call psb_cdasb(desc_a,info)     
     t1 = mpi_wtime()
     if(info/=0)then
        info=4010
-       ch_err='psb_dscasb'
+       ch_err='psb_cdasb'
        call psb_errpush(info,name,a_err=ch_err)
        goto 9999
     end if

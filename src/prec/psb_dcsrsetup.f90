@@ -113,10 +113,10 @@ Subroutine psb_dcsrsetup(ptype,novr,a,blk,desc_data,upd,desc_p,info,outfmt)
     blk%infoa(psb_nnz_) = 0
 
     If (upd == 'F') Then
-      call psb_dsccpy(desc_p,desc_data,info)
+      call psb_cdcpy(desc_p,desc_data,info)
       if(info /= 0) then
         info=4010
-        ch_err='psb_dsccpy'
+        ch_err='psb_cdcpy'
         call psb_errpush(info,name,a_err=ch_err)
         goto 9999
       end if
@@ -154,10 +154,10 @@ Subroutine psb_dcsrsetup(ptype,novr,a,blk,desc_data,upd,desc_p,info,outfmt)
       blk%infoa(psb_nnz_)=0
       if (debug) write(0,*) 'Calling desccpy'
       if (upd == 'F') then 
-        call psb_dsccpy(desc_p,desc_data,info)
+        call psb_cdcpy(desc_p,desc_data,info)
         if(info /= 0) then
           info=4010
-          ch_err='psb_dsccpy'
+          ch_err='psb_cdcpy'
           call psb_errpush(info,name,a_err=ch_err)
           goto 9999
         end if

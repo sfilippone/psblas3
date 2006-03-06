@@ -722,15 +722,15 @@ contains
         end if
 
 
-        call psb_dscins(nzl,bg%ia1,bg%ia2,p%desc_data,info)
+        call psb_cdins(nzl,bg%ia1,bg%ia2,p%desc_data,info)
         if(info /= 0) then
-          call psb_errpush(4010,name,a_err='psb_dscins')
+          call psb_errpush(4010,name,a_err='psb_cdins')
           goto 9999
         end if
 
-        call psb_dscasb(p%desc_data,info)
+        call psb_cdasb(p%desc_data,info)
         if(info /= 0) then
-          call psb_errpush(4010,name,a_err='psb_dscasb')
+          call psb_errpush(4010,name,a_err='psb_cdasb')
           goto 9999
         end if
 

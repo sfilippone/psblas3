@@ -603,7 +603,7 @@ Subroutine psb_cdovrbld(n_ovr,desc_p,desc_a,a,&
   End Do
   t1 = mpi_wtime()
   call FreePairSearchTree()
-!!$  ierr = MPE_Log_event( idsce, 0, "st DSCASB" )
+!!$  ierr = MPE_Log_event( idsce, 0, "st CDASB" )
   desc_p%matrix_data(psb_m_)=desc_a%matrix_data(psb_m_)
   desc_p%matrix_data(psb_n_)=desc_a%matrix_data(psb_n_)
 
@@ -618,7 +618,7 @@ Subroutine psb_cdovrbld(n_ovr,desc_p,desc_a,a,&
   !
 
   if (debug) then
-     write(0,*) 'psb_dscasb: converting indexes'
+     write(0,*) 'psb_cdasb: converting indexes'
      call blacs_barrier(icontxt,'All')
   end if
   !.... convert comunication stuctures....

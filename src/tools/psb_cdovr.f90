@@ -64,13 +64,13 @@ Subroutine psb_cdovr(a,desc_a,novr,desc_ov,info)
   integer   idscb,idsce,iovrb,iovre, ierr, irank, icomm, err_act
 !!$  integer mpe_log_get_event_number,mpe_Describe_state,mpe_log_event
 
-  interface psb_psdsccpy
-     subroutine psb_dsccpy(desc_out,desc_a,info)
+  interface psb_cdcpy
+     subroutine psb_cdcpy(desc_out,desc_a,info)
        use psb_descriptor_type
        type(psb_desc_type), intent(out) :: desc_out
        type(psb_desc_type), intent(in)  :: desc_a
        integer, intent(out)             :: info
-     end subroutine psb_dsccpy
+     end subroutine psb_cdcpy
   end interface
 
   interface psb_cdovrbld
@@ -125,10 +125,10 @@ Subroutine psb_cdovr(a,desc_a,novr,desc_ov,info)
     ! Just copy the input.  
     !
     if (debug) write(0,*) 'Calling desccpy'
-    call psb_dsccpy(desc_ov,desc_a,info)
+    call psb_cdcpy(desc_ov,desc_a,info)
     if (info.ne.0) then
        info=4010
-       ch_err='psb_dsccpy'
+       ch_err='psb_cdcpy'
        call psb_errpush(info,name,a_err=ch_err)
        goto 9999
     end if
@@ -143,7 +143,7 @@ Subroutine psb_cdovr(a,desc_a,novr,desc_ov,info)
 !!$    iovrb  = mpe_log_get_event_number()
 !!$    iovre  = mpe_log_get_event_number()
 !!$    if (irank==0) then 
-!!$      info = mpe_describe_state(idscb,idsce,"DSCASB ","NavyBlue")
+!!$      info = mpe_describe_state(idscb,idsce,"CDASB ","NavyBlue")
 !!$      info = mpe_describe_state(iovrb,iovre,"CDOVRR ","DeepPink")
 !!$    endif
   If(debug)Write(0,*)'BEGIN cdovr',me,nhalo
@@ -152,7 +152,7 @@ Subroutine psb_cdovr(a,desc_a,novr,desc_ov,info)
 
 
 
-!!$      ierr = MPE_Log_event( idscb, 0, "st DSCASB" )
+!!$      ierr = MPE_Log_event( idscb, 0, "st CDASB" )
   !
   ! Ok, since we are only estimating, do it as follows: 
   ! LOVR= (NNZ/NROW)*N_HALO*N_OVR  This assumes that the local average 
@@ -219,7 +219,7 @@ Subroutine psb_cdovr(a,desc_a,novr,desc_ov,info)
   desc_ov%matrix_data(psb_dec_type_) = psb_desc_asb_
   If(debug)Write(0,*)'Done cdovrbld',me,lworks,lworkr
   call blacs_barrier(icontxt,'All')
-!!$      ierr = MPE_Log_event( idsce, 0, "st DSCASB" )
+!!$      ierr = MPE_Log_event( idsce, 0, "st CDASB" )
 
   call psb_erractionrestore(err_act)
   return

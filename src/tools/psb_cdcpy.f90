@@ -28,16 +28,16 @@
 !!$  POSSIBILITY OF SUCH DAMAGE.
 !!$ 
 !!$  
-! File: psb_dsccpy.f90
+! File: psb_cdcpy.f90
 !
-! Subroutine: psb_dsccpy
+! Subroutine: psb_cdcpy
 !   Produces a clone of a descriptor.
 ! 
 ! Parameters: 
 !    desc_out - type(<psb_desc_type>).         The output communication descriptor.
 !    desc_a   - type(<psb_desc_type>).         The communication descriptor to be cloned.
 !    info     - integer.                       Eventually returns an error code.
-subroutine psb_dsccpy(desc_out, desc_a, info)
+subroutine psb_cdcpy(desc_out, desc_a, info)
 
   use psb_descriptor_type
   use psb_serial_mod
@@ -63,7 +63,7 @@ subroutine psb_dsccpy(desc_out, desc_a, info)
   if(psb_get_errstatus().ne.0) return 
   info=0
   call psb_erractionsave(err_act)
-  name = 'psb_dsccpy'
+  name = 'psb_cdcpy'
 
   icontxt=desc_a%matrix_data(psb_ctxt_)
   
@@ -86,7 +86,7 @@ subroutine psb_dsccpy(desc_out, desc_a, info)
      isz = size(desc_a%matrix_data)
      !    allocate(desc_out%matrix_data(isz),stat=info)
      call psb_realloc(isz,desc_out%matrix_data,info)
-     if(debug) write(0,*) 'dsccpy: m_data',isz,':',desc_a%matrix_data(:)
+     if(debug) write(0,*) 'cdcpy: m_data',isz,':',desc_a%matrix_data(:)
      if (info.ne.0) then     
         info=4010
         char_err='psb_realloc'
@@ -101,7 +101,7 @@ subroutine psb_dsccpy(desc_out, desc_a, info)
      isz = size(desc_a%halo_index)
      !    allocate(desc_out%matrix_data(isz),stat=info)
      call psb_realloc(isz,desc_out%halo_index,info)
-     if(debug) write(0,*) 'dsccpy: h_idx',isz,':',desc_a%halo_index(:)
+     if(debug) write(0,*) 'cdcpy: h_idx',isz,':',desc_a%halo_index(:)
      if (info.ne.0) then     
         info=4010
         char_err='psb_realloc'
@@ -117,7 +117,7 @@ subroutine psb_dsccpy(desc_out, desc_a, info)
      isz = size(desc_a%bnd_elem)
      !    allocate(desc_out%matrix_data(isz),stat=info)
      call psb_realloc(isz,desc_out%bnd_elem,info)
-     if(debug) write(0,*) 'dsccpy: bnd_elem',isz,':',desc_a%bnd_elem(:)
+     if(debug) write(0,*) 'cdcpy: bnd_elem',isz,':',desc_a%bnd_elem(:)
      if (info.ne.0) then     
         info=4010
         char_err='psb_realloc'
@@ -133,7 +133,7 @@ subroutine psb_dsccpy(desc_out, desc_a, info)
      isz = size(desc_a%ovrlap_elem)
      !    allocate(desc_out%matrix_data(isz),stat=info)
      call psb_realloc(isz,desc_out%ovrlap_elem,info)
-     if(debug) write(0,*) 'dsccpy: ovrlap_elem',isz,':',desc_a%ovrlap_elem(:)
+     if(debug) write(0,*) 'cdcpy: ovrlap_elem',isz,':',desc_a%ovrlap_elem(:)
      if (info.ne.0) then     
         info=4010
         char_err='psrealloc'
@@ -148,7 +148,7 @@ subroutine psb_dsccpy(desc_out, desc_a, info)
      isz = size(desc_a%ovrlap_index)
      !    allocate(desc_out%matrix_data(isz),stat=info)
      call psb_realloc(isz,desc_out%ovrlap_index,info)
-     if(debug) write(0,*) 'dsccpy: ovrlap_index',isz,':',desc_a%ovrlap_index(:)
+     if(debug) write(0,*) 'cdcpy: ovrlap_index',isz,':',desc_a%ovrlap_index(:)
      if (info.ne.0) then     
         info=4010
         char_err='psrealloc'
@@ -164,7 +164,7 @@ subroutine psb_dsccpy(desc_out, desc_a, info)
      isz = size(desc_a%loc_to_glob)
      !    allocate(desc_out%matrix_data(isz),stat=info)
      call psb_realloc(isz,desc_out%loc_to_glob,info)
-     if(debug) write(0,*) 'dsccpy: loc_to_glob',isz,':',desc_a%loc_to_glob(:)
+     if(debug) write(0,*) 'cdcpy: loc_to_glob',isz,':',desc_a%loc_to_glob(:)
      if (info.ne.0) then     
         info=4010
         char_err='psrealloc'
@@ -179,7 +179,7 @@ subroutine psb_dsccpy(desc_out, desc_a, info)
      isz = size(desc_a%glob_to_loc)
      !    allocate(desc_out%matrix_data(isz),stat=info)
      call psb_realloc(isz,desc_out%glob_to_loc,info)
-     if(debug) write(0,*) 'dsccpy: glob_to_loc',isz,':',desc_a%glob_to_loc(:)
+     if(debug) write(0,*) 'cdcpy: glob_to_loc',isz,':',desc_a%glob_to_loc(:)
      if (info.ne.0) then     
         info=4010
         char_err='psrealloc'
@@ -194,7 +194,7 @@ subroutine psb_dsccpy(desc_out, desc_a, info)
      isz = size(desc_a%lprm)
      !    allocate(desc_out%matrix_data(isz),stat=info)
      call psb_realloc(isz,desc_out%lprm,info)
-     if(debug) write(0,*) 'dsccpy: lprm',isz,':',desc_a%lprm(:)
+     if(debug) write(0,*) 'cdcpy: lprm',isz,':',desc_a%lprm(:)
      if (info.ne.0) then     
         info=4010
         char_err='psb_realloc'
@@ -209,7 +209,7 @@ subroutine psb_dsccpy(desc_out, desc_a, info)
      isz = size(desc_a%idx_space)
      !    allocate(desc_out%matrix_data(isz),stat=info)
      call psb_realloc(isz,desc_out%idx_space,info)
-     if(debug) write(0,*) 'dsccpy: idx_space',isz,':',desc_a%idx_space(:)
+     if(debug) write(0,*) 'cdcpy: idx_space',isz,':',desc_a%idx_space(:)
      if (info.ne.0) then     
         info=4010
         char_err='psb_realloc'
@@ -233,4 +233,4 @@ subroutine psb_dsccpy(desc_out, desc_a, info)
   end if
   return
 
-end subroutine psb_dsccpy
+end subroutine psb_cdcpy
