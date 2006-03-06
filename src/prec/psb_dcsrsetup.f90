@@ -40,7 +40,7 @@
 !*       Block Jacobi.                                                       *
 !*    2. Retrieves the remote matrix pieces.                                 *
 !*                                                                           *
-!*    All of 1. is done under f90_dscov, which is independent of CSR, and    *
+!*    All of 1. is done under psb_cdovr, which is independent of CSR, and    *
 !*    has been placed in the TOOLS directory because it might be used for    *
 !*    building a descriptor for an extended stencil in a PDE solver without  *
 !*    necessarily applying AS precond.                                       *
@@ -116,7 +116,7 @@ Subroutine psb_dcsrsetup(ptype,novr,a,blk,desc_data,upd,desc_p,info,outfmt)
       call psb_dsccpy(desc_p,desc_data,info)
       if(info /= 0) then
         info=4010
-        ch_err='psb_ddsccpy'
+        ch_err='psb_dsccpy'
         call psb_errpush(info,name,a_err=ch_err)
         goto 9999
       end if
@@ -176,16 +176,16 @@ Subroutine psb_dcsrsetup(ptype,novr,a,blk,desc_data,upd,desc_p,info,outfmt)
       !
       !  Build the  auiliary descriptor',desc_p%matrix_data(psb_n_row_)
       ! 
-       call psb_cdovr(a,desc_data,novr,desc_p,info)
-       if(info /= 0) then
-          info=4010
-          ch_err='psb_cdovr'
-          call psb_errpush(info,name,a_err=ch_err)
-          goto 9999
-       end if
+      call psb_cdovr(a,desc_data,novr,desc_p,info)
+      if(info /= 0) then
+        info=4010
+        ch_err='psb_cdovr'
+        call psb_errpush(info,name,a_err=ch_err)
+        goto 9999
+      end if
     Endif
 
-    if(debug) write(0,*) me,' From dscov _:',desc_p%matrix_data(psb_n_row_),desc_p%matrix_data(psb_n_col_)
+    if(debug) write(0,*) me,' From cdovr _:',desc_p%matrix_data(psb_n_row_),desc_p%matrix_data(psb_n_col_)
 
 
     n_row = desc_p%matrix_data(psb_n_row_)
