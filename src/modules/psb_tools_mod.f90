@@ -126,8 +126,8 @@ Module psb_tools_mod
   end interface
 
 
-  interface psb_descasb
-     Subroutine psb_descasb(n_ovr,desc_p,desc_a,a,&
+  interface psb_cdovrbld
+     Subroutine psb_cdovrbld(n_ovr,desc_p,desc_a,a,&
           &       l_tmp_halo,l_tmp_ovr_idx,lworks,lworkr,info)
        use psb_descriptor_type
        use psb_spmat_type
@@ -138,7 +138,7 @@ Module psb_tools_mod
        Integer, Intent(in)               :: l_tmp_halo,l_tmp_ovr_idx
        Integer, Intent(inout)            :: lworks, lworkr
        integer, intent(out)              :: info
-     end Subroutine psb_descasb
+     end Subroutine psb_cdovrbld
   end interface
 
 

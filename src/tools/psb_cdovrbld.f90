@@ -28,9 +28,9 @@
 !!$  POSSIBILITY OF SUCH DAMAGE.
 !!$ 
 !!$  
-! File: psb_descasb.f90
+! File: psb_cdovrbld.f90
 !
-! Subroutine: psb_descasb
+! Subroutine: psb_cdovrbld
 !     This routine takes a matrix A with its descriptor, and builds the  
 !     auxiliary descriptor corresponding to the number of overlap levels 
 !     specified on input. This is the actual worker horse.....           
@@ -46,7 +46,7 @@
 !    lworkr        - integer.                Input estimate for allocation sizes.
 !    lworks        - integer.                Input estimate for allocation sizes.
 !    info          - integer.                Eventually returns an error code
-Subroutine psb_descasb(n_ovr,desc_p,desc_a,a,&
+Subroutine psb_cdovrbld(n_ovr,desc_p,desc_a,a,&
      &       l_tmp_halo,l_tmp_ovr_idx,lworks,lworkr,info)
   use psb_descriptor_type
   use psb_serial_mod
@@ -89,10 +89,10 @@ Subroutine psb_descasb(n_ovr,desc_p,desc_a,a,&
 
   if(psb_get_errstatus().ne.0) return 
   info=0
-  name='psb_descasb'
+  name='psb_cdovrbld'
   call psb_erractionsave(err_act)
 
-  If(debug) Write(0,*)'descasb begin'
+  If(debug) Write(0,*)'cdovrbld begin'
   icontxt = desc_a%matrix_data(psb_ctxt_)
 !!$  call blacs_barrier(icontxt,'All')
   Call blacs_gridinfo(icontxt,np,npcol,myrow,mycol)
@@ -107,7 +107,7 @@ Subroutine psb_descasb(n_ovr,desc_p,desc_a,a,&
   m     = desc_a%matrix_data(psb_n_row_)
   n_row = desc_a%matrix_data(psb_n_row_)
   n_col = desc_a%matrix_data(psb_n_col_)
-  if (debug) write(0,*) myrow,' On entry to DESCASB n_col:',n_col
+  if (debug) write(0,*) myrow,' On entry to CDOVRBLD n_col:',n_col
 
   dl_lda=np*5
   lwork=5*(5*np+2)*np+10
@@ -208,7 +208,7 @@ Subroutine psb_descasb(n_ovr,desc_p,desc_a,a,&
            goto 9999
         end If
         tot_recv=tot_recv+n_elem_recv
-        if (debug) write(0,*) myrow,' DESCASB tot_recv:',proc,n_elem_recv,tot_recv
+        if (debug) write(0,*) myrow,' CDOVRBLD tot_recv:',proc,n_elem_recv,tot_recv
         !
         ! While running through the column indices exchanged with other procs
         ! we have to keep track of which elements actually are overlap and halo 
@@ -312,7 +312,7 @@ Subroutine psb_descasb(n_ovr,desc_p,desc_a,a,&
                  counter_e  = counter_e + 2
               End If
            else
-              write(0,*) myrow, 'Descasb From SearchInsKeyVal: ',info
+              write(0,*) myrow, 'Cdovrbld From SearchInsKeyVal: ',info
            endif
         Enddo
         if (debug) write(0,*) myrow,'Checktmp_o_i Loop Mid1',tmp_ovr_idx(1:10)
@@ -369,7 +369,7 @@ Subroutine psb_descasb(n_ovr,desc_p,desc_a,a,&
                  counter_e  = counter_e + 2
               End If
            else
-              write(0,*) myrow,'Descasb From SearchInsKeyVal: ',info
+              write(0,*) myrow,'Cdovrbld From SearchInsKeyVal: ',info
            endif
 
            !
@@ -457,7 +457,7 @@ Subroutine psb_descasb(n_ovr,desc_p,desc_a,a,&
         counter   = counter+n_elem_send+3
         if (debug) write(0,*) myrow,'Checktmp_o_i Loop End',tmp_ovr_idx(1:10)
      Enddo
-     if (debug) write(0,*)myrow,'End phase 1 DESCASB', m, n_col, tot_recv
+     if (debug) write(0,*)myrow,'End phase 1 CDOVRBLD', m, n_col, tot_recv
 
      if (i_ovr < n_ovr) then
         ! 
@@ -513,7 +513,7 @@ Subroutine psb_descasb(n_ovr,desc_p,desc_a,a,&
         Do i=1,iszr
            idx=workr(i)
            if (idx <1) then 
-              write(0,*) myrow,'Error in DESCASB ',idx,i,iszr
+              write(0,*) myrow,'Error in CDOVRBLD ',idx,i,iszr
 !!$          write(0,*) myrow, ' WORKR :',workr(1:iszr)
            else  If (desc_p%glob_to_loc(idx) < -np) Then
               !
@@ -541,10 +541,10 @@ Subroutine psb_descasb(n_ovr,desc_p,desc_a,a,&
               t_halo_in(counter_t+1)=1
               t_halo_in(counter_t+2)=n_col
               counter_t=counter_t+3
-              if (debug) write(0,*) myrow,' DESCASB: Added into t_halo_in from recv',&
+              if (debug) write(0,*) myrow,' CDOVRBLD: Added into t_halo_in from recv',&
                    &proc_id,n_col,idx
            else if (desc_p%glob_to_loc(idx) < 0) Then
-              if (debug) write(0,*) myrow,'Wrong input to descasb??',&
+              if (debug) write(0,*) myrow,'Wrong input to cdovrbld??',&
                    &idx,desc_p%glob_to_loc(idx)
            End If
         End Do
@@ -688,4 +688,4 @@ Subroutine psb_descasb(n_ovr,desc_p,desc_a,a,&
   end if
   return
 
-End Subroutine psb_descasb
+End Subroutine psb_cdovrbld

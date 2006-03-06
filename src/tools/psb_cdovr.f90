@@ -34,7 +34,7 @@
 !    This routine takes a matrix A with its descriptor, and builds the 
 !    auxiliary descriptor corresponding to the number of overlap levels
 !    specified on input. It really is just a size estimation/allocation
-!    front end for <psb_descasb>.
+!    front end for <psb_cdovrbld>.
 ! 
 ! Parameters: 
 !    a        - type(<psb_dspmat_type>).       The input sparse matrix.
@@ -73,8 +73,8 @@ Subroutine psb_cdovr(a,desc_a,novr,desc_ov,info)
      end subroutine psb_dsccpy
   end interface
 
-  interface psb_descasb
-     subroutine psb_descasb(n_ovr,desc_p,desc_a,a,l_tmp_halo,&
+  interface psb_cdovrbld
+     subroutine psb_cdovrbld(n_ovr,desc_p,desc_a,a,l_tmp_halo,&
           & l_tmp_ovr_idx,lworks,lworkr,info)
        use psb_prec_type
        use psb_spmat_type
@@ -85,7 +85,7 @@ Subroutine psb_cdovr(a,desc_a,novr,desc_ov,info)
        integer, intent(in)                  :: l_tmp_halo,l_tmp_ovr_idx
        integer, intent(inout)               :: lworks, lworkr
        integer, intent(out)                 :: info
-     end subroutine psb_descasb
+     end subroutine psb_cdovrbld
   end interface
 
 
@@ -202,22 +202,22 @@ Subroutine psb_cdovr(a,desc_a,novr,desc_ov,info)
 
   desc_ov%loc_to_glob(:) = desc_a%loc_to_glob(:)
   desc_ov%glob_to_loc(:) = desc_a%glob_to_loc(:)
-  If(debug)Write(0,*)'Start descasb',me,lworks,lworkr
+  If(debug)Write(0,*)'Start cdovrbld',me,lworks,lworkr
   call blacs_barrier(icontxt,'All')
   
   !
   ! The real work goes on in here....
   !
-  Call psb_descasb(novr,desc_ov,desc_a,a,&
+  Call psb_cdovrbld(novr,desc_ov,desc_a,a,&
        & l_tmp_halo,l_tmp_ovr_idx,lworks,lworkr,info) 
   if (info.ne.0) then
      info=4010
-     ch_err='psb_descasb'
+     ch_err='psb_cdovrbld'
      call psb_errpush(info,name,a_err=ch_err)
      goto 9999
   end if
   desc_ov%matrix_data(psb_dec_type_) = psb_desc_asb_
-  If(debug)Write(0,*)'Done descasb',me,lworks,lworkr
+  If(debug)Write(0,*)'Done cdovrbld',me,lworks,lworkr
   call blacs_barrier(icontxt,'All')
 !!$      ierr = MPE_Log_event( idsce, 0, "st DSCASB" )
 
