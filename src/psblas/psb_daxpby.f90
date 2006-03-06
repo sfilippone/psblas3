@@ -224,6 +224,7 @@ subroutine  psb_daxpbyv(alpha, x, beta,y,desc_a,info)
   integer                  :: int_err(5), icontxt, nprow, npcol, myrow, mycol,&
        & err_act, n, iix, jjx, temp(2), ix, iy, ijx, m, iiy, in, jjy
   character(len=20)        :: name, ch_err
+  logical, parameter :: debug=.true.
 
   name='psb_daxpby'
   if(psb_get_errstatus().ne.0) return 
@@ -249,14 +250,21 @@ subroutine  psb_daxpbyv(alpha, x, beta,y,desc_a,info)
   iy = ione
 
   m = desc_a%matrix_data(psb_m_)
-
+  
   ! check vector correctness
   call psb_chkvect(m,ione,size(x),ix,ione,desc_a%matrix_data,info,iix,jjx)
+  if(info.ne.0) then
+     info=4010
+     ch_err='psb_chkvect 1'
+     call psb_errpush(info,name,a_err=ch_err)
+     goto 9999
+  end if
   call psb_chkvect(m,ione,size(y),iy,ione,desc_a%matrix_data,info,iiy,jjy)
   if(info.ne.0) then
      info=4010
-     ch_err='psb_chkvect'
+     ch_err='psb_chkvect 2'
      call psb_errpush(info,name,a_err=ch_err)
+     goto 9999
   end if
 
   if ((iix.ne.ione).or.(iiy.ne.ione)) then

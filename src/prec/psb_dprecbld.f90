@@ -925,7 +925,8 @@ subroutine psb_mlprec_bld(a,desc_a,p,info)
   call psb_ipcoo2csr(p%av(ac_),info)
   if(info /= 0) then
      info=4011
-     call psb_errpush(info,name)
+     ch_err='psb_ipcoo2csr'
+     call psb_errpush(info,name,a_err=ch_err)
      goto 9999
   end if
 
@@ -942,7 +943,8 @@ subroutine psb_mlprec_bld(a,desc_a,p,info)
      call psb_splu(p%av(ac_),p%av(l_pr_),p%av(u_pr_),p%d,info)
      if(info /= 0) then
         info=4011
-        call psb_errpush(info,name)
+        ch_err='psb_splu'
+        call psb_errpush(info,name,a_err=ch_err)
         goto 9999
      end if
 
@@ -952,7 +954,8 @@ subroutine psb_mlprec_bld(a,desc_a,p,info)
     call psb_ipcsr2coo(p%av(ac_),info)
      if(info /= 0) then
         info=4011
-        call psb_errpush(info,name)
+        ch_err='psb_ipcsr2coo'
+        call psb_errpush(info,name,a_err=ch_err)
         goto 9999
      end if
     k=0
@@ -971,7 +974,8 @@ subroutine psb_mlprec_bld(a,desc_a,p,info)
          & p%av(ac_)%aspk,p%av(ac_)%ia2,p%av(ac_)%ia1,p%iprcparm(slu_ptr_),info)
      if(info /= 0) then
         info=4011
-        call psb_errpush(info,name)
+        ch_err='psb_fort_slu_factor'
+        call psb_errpush(info,name,a_err=ch_err)
         goto 9999
      end if
 
@@ -981,7 +985,8 @@ subroutine psb_mlprec_bld(a,desc_a,p,info)
     call psb_ipcsr2coo(p%av(ac_),info)
      if(info /= 0) then
         info=4011
-        call psb_errpush(info,name)
+        ch_err='psb_ipcsr2coo'
+        call psb_errpush(info,name,a_err=ch_err)
         goto 9999
      end if
     k=0
@@ -1001,7 +1006,8 @@ subroutine psb_mlprec_bld(a,desc_a,p,info)
          & p%iprcparm(umf_symptr_),p%iprcparm(umf_numptr_),info)
      if(info /= 0) then
         info=4011
-        call psb_errpush(info,name)
+        ch_err='psb_fort_umf_factor'
+        call psb_errpush(info,name,a_err=ch_err)
         goto 9999
      end if
 

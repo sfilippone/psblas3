@@ -115,6 +115,7 @@ subroutine psb_dprecaply(prec,x,y,desc_data,info,trans, work)
     write(0,*) 'Inconsistent preconditioner: neither SMTH nor BASE?'      
   end if
   if (size(prec%baseprecv) >1) then 
+    if (debug) write(0,*) 'Into mlprcaply',size(x),size(y)
     call psb_dmlprcaply(prec%baseprecv,x,zero,y,desc_data,trans_,work_,info)
     if(info /= 0) then
       call psb_errpush(4010,name,a_err='psb_dmlprcaply')
@@ -335,7 +336,7 @@ subroutine psb_dbaseprcaply(prec,x,beta,y,desc_data,trans,work,info)
 
       endif
 
-      if (debug) write(0,*)' vdiag: ',prec%d(:)
+      if (debugprt) write(0,*)' vdiag: ',prec%d(:)
       if (debug) write(0,*) 'Bi-CGSTAB with Additive Schwarz prec' 
 
       tx(1:desc_data%matrix_data(psb_n_row_)) = x(1:desc_data%matrix_data(psb_n_row_)) 
@@ -631,7 +632,7 @@ subroutine psb_dbjacaply(prec,x,beta,y,desc_data,trans,work,info)
     case default
       write(0,*) 'Unknown factorization type in bjac_prcaply',prec%iprcparm(f_type_)
     end select
-    if (debug) write(0,*)' Y: ',y(:)
+    if (debugprt) write(0,*)' Y: ',y(:)
 
   else if (prec%iprcparm(jac_sweeps_) > 1) then 
 
@@ -933,7 +934,7 @@ subroutine psb_dmlprcaply(baseprecv,x,beta,y,desc_data,trans,work,info)
 
     end if
 
-    if (debug) write(0,*)' Y2: ',Y(:)
+    if (debugprt) write(0,*)' Y2: ',Y(:)
 
     deallocate(t2l,w2l)
 
@@ -968,10 +969,13 @@ subroutine psb_dmlprcaply(baseprecv,x,beta,y,desc_data,trans,work,info)
       !
 
       if (debug) write(0,*)' mult_ml_apply  omega ',omega
-      if (debug) write(0,*)' mult_ml_apply  X: ',X(:)
+      if (debugprt) write(0,*)' mult_ml_apply  X: ',X(:)
       call psb_axpby(one,x,zero,tx,desc_data,info)
-      if(info /=0) goto 9999
-
+      if(info /=0) then 
+        if (debug) write(0,*)' From axpby1 ',size(x),size(tx),n_row,n_col,nr2l,nrg
+        call psb_errpush(4010,name,a_err='axpby post_smooth 1')
+        goto 9999
+      endif
       if (ismth  /= no_smth_) then 
         !
         ! Smoothed aggregation
@@ -1315,6 +1319,21 @@ subroutine psb_dprecaply1(prec,x,desc_data,info,trans)
   logical,parameter                 :: debug=.false., debugprt=.false.
   real(kind(1.d0)), parameter       :: one=1.d0, zero=0.d0
 
+  interface 
+    subroutine psb_dprecaply(prec,x,y,desc_data,info,trans, work)
+      
+      use psb_descriptor_type
+      use psb_prec_type
+      implicit none
+      
+      type(psb_desc_type),intent(in)      :: desc_data
+      type(psb_dprec_type), intent(in)    :: prec
+      real(kind(0.d0)),intent(inout)      :: x(:), y(:)
+      integer, intent(out)                :: info
+      character(len=1), optional          :: trans
+      real(kind(0.d0)), optional, target  :: work(:)
+    end subroutine psb_dprecaply
+  end interface
 
   ! Local variables
   character     :: trans_
@@ -1339,8 +1358,8 @@ subroutine psb_dprecaply1(prec,x,desc_data,info,trans)
     call psb_errpush(4010,name,a_err='Allocate')
     goto 9999      
   end if
-
-  call psb_dprecaply(prec,x,ww,desc_data,info,trans_,w1)
+  if (debug) write(0,*) 'Prcaply1 Size(x) ',size(x), size(ww),size(w1)
+  call psb_dprecaply(prec,x,ww,desc_data,info,trans_,work=w1)
   if(info /=0) goto 9999
   x(:) = ww(:)
   deallocate(ww,W1)

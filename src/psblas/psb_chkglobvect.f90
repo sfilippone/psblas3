@@ -99,28 +99,28 @@ subroutine psb_chkglobvect( m, n, lldx, ix, jx, desc_dec, info)
      int_err(3) = 6
      int_err(4) = psb_n_col_
      int_err(5) = desc_dec(psb_n_col_)
-  else if (desc_dec(n_).lt.m) then
+  else if (desc_dec(psb_n_).lt.m) then
      info=60
      int_err(1) = 1
      int_err(2) = m
      int_err(3) = 6
-     int_err(4) = n_
-     int_err(5) = desc_dec(n_)
-  else if (desc_dec(n_).lt.ix) then
+     int_err(4) = psb_n_
+     int_err(5) = desc_dec(psb_n_)
+  else if (desc_dec(psb_n_).lt.ix) then
      info=60
      int_err(1) = 4
      int_err(2) = ix
      int_err(3) = 6
-     int_err(4) = n_
-     int_err(5) = desc_dec(n_)
-  else if (desc_dec(m_).lt.jx) then
+     int_err(4) = psb_n_
+     int_err(5) = desc_dec(psb_n_)
+  else if (desc_dec(psb_m_).lt.jx) then
      info=60
      int_err(1) = 5
      int_err(2) = jx
      int_err(3) = 6
-     int_err(4) = m_
-     int_err(5) = desc_dec(m_)
-  else if (desc_dec(n_).lt.(ix+m-1)) then
+     int_err(4) = psb_m_
+     int_err(5) = desc_dec(psb_m_)
+  else if (desc_dec(psb_n_).lt.(ix+m-1)) then
      info=80
      int_err(1) = 1
      int_err(2) = m

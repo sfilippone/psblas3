@@ -198,7 +198,8 @@ Subroutine psb_dgmresr(a,prec,b,x,eps,desc_a,info,&
      call psb_errpush(info,name)
      goto 9999
   End If
-
+  if (debug) write(0,*) 'Size of V,W ',size(v),size(v,1),&
+       &size(w),size(w,1), size(v(:,1))
   ! ensure global coherence for convergence checks.
   Call blacs_get(icontxt,16,isvch)
   ich = 1 
@@ -226,6 +227,11 @@ Subroutine psb_dgmresr(a,prec,b,x,eps,desc_a,info,&
     If (debug) Write(0,*) 'restart: ',itx,it
     it = 0      
     Call psb_axpby(one,b,zero,v(:,1),desc_a,info)
+    if (info.ne.0) Then 
+       info=4011 
+       call psb_errpush(info,name)
+       goto 9999
+    End If
     Call psb_spmm(-one,a,x,one,v(:,1),desc_a,info,work=aux)
     
     call psb_prcaply(prec,v(:,1),desc_a,info)

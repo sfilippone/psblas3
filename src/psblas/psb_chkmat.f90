@@ -96,41 +96,41 @@ subroutine psb_chkmat( m, n, ia, ja, desc_dec, info, iia, jja)
      int_err(1) = 6
      int_err(2) = psb_n_row_ 
      int_err(3) = desc_dec(psb_n_row_)
-  else if (desc_dec(m_).lt.m) then
+  else if (desc_dec(psb_m_).lt.m) then
      info=60
      int_err(1) = 1
      int_err(2) = m
      int_err(3) = 5
-     int_err(4) = m_
-     int_err(5) = desc_dec(m_)
-  else if (desc_dec(m_).lt.m) then
+     int_err(4) = psb_m_
+     int_err(5) = desc_dec(psb_m_)
+  else if (desc_dec(psb_n_).lt.m) then
      info=60
      int_err(1) = 2
      int_err(2) = n
      int_err(3) = 5
-     int_err(4) = n_
-     int_err(5) = desc_dec(n_)
-  else if (desc_dec(m_).lt.ia) then
+     int_err(4) = psb_n_
+     int_err(5) = desc_dec(psb_n_)
+  else if (desc_dec(psb_m_).lt.ia) then
      info=60
      int_err(1) = 3 
      int_err(2) = ia
      int_err(3) = 5
-     int_err(4) = m_
-     int_err(5) = desc_dec(m_)
-  else if (desc_dec(n_).lt.ja) then
+     int_err(4) = psb_m_
+     int_err(5) = desc_dec(psb_m_)
+  else if (desc_dec(psb_n_).lt.ja) then
      info=60
      int_err(1) = 4 
      int_err(2) = ja
      int_err(3) = 5
-     int_err(4) = n_
-     int_err(5) = desc_dec(n_)
-  else if (desc_dec(m_).lt.(ia+m-1)) then
+     int_err(4) = psb_n_
+     int_err(5) = desc_dec(psb_n_)
+  else if (desc_dec(psb_m_).lt.(ia+m-1)) then
      info=80
      int_err(1) = 1
      int_err(2) = m
      int_err(3) = 3
      int_err(4) = ia
-  else if (desc_dec(n_).lt.(ja+n-1)) then
+  else if (desc_dec(psb_n_).lt.(ja+n-1)) then
      info=80
      int_err(1) = 2
      int_err(2) = n
