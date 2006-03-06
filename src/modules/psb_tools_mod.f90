@@ -354,8 +354,8 @@ Module psb_tools_mod
   end interface
 
 
-  interface psb_dscov
-     Subroutine psb_dscov(a,desc_a,novr,desc_ov,info)
+  interface psb_cdovr
+     Subroutine psb_cdovr(a,desc_a,novr,desc_ov,info)
        use psb_descriptor_type
        Use psb_spmat_type
        integer, intent(in)                :: novr
@@ -363,7 +363,7 @@ Module psb_tools_mod
        Type(psb_desc_type), Intent(in)    :: desc_a
        Type(psb_desc_type), Intent(inout) :: desc_ov
        integer, intent(out)               :: info
-     end Subroutine psb_dscov
+     end Subroutine psb_cdovr
   end interface
        
        

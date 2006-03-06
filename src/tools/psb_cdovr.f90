@@ -28,9 +28,9 @@
 !!$  POSSIBILITY OF SUCH DAMAGE.
 !!$ 
 !!$  
-! File: psb_dscov.f90
+! File: psb_cdovr.f90
 !
-! Subroutine: psb_dscov
+! Subroutine: psb_cdovr
 !    This routine takes a matrix A with its descriptor, and builds the 
 !    auxiliary descriptor corresponding to the number of overlap levels
 !    specified on input. It really is just a size estimation/allocation
@@ -43,7 +43,7 @@
 !    desc_ov  - type(<psb_desc_type>).         The auxiliary output communication descriptor.
 !    info     - integer.                       Eventually returns an error code.
 !
-Subroutine psb_dscov(a,desc_a,novr,desc_ov,info)
+Subroutine psb_cdovr(a,desc_a,novr,desc_ov,info)
 
   use psb_serial_mod
   use psb_descriptor_type
@@ -97,7 +97,7 @@ Subroutine psb_dscov(a,desc_a,novr,desc_ov,info)
   Logical,Parameter :: debug=.false.
   character(len=20)                 :: name, ch_err
 
-  name='psb_dscov'
+  name='psb_cdovr'
   info  = 0
   call psb_erractionsave(err_act)
 
@@ -105,13 +105,13 @@ Subroutine psb_dscov(a,desc_a,novr,desc_ov,info)
 
   Call blacs_gridinfo(icontxt,nprow,npcol,me,mycol)
 
-  If(debug) Write(0,*)'in psb_dscov',novr
+  If(debug) Write(0,*)'in psb_cdovr',novr
 
   m=desc_a%matrix_data(psb_n_row_)
   nnzero=Size(a%aspk)
   n_col=desc_a%matrix_data(psb_n_col_)
   nhalo = n_col-m
-  If(debug) Write(0,*)'IN DSCOV1',novr ,m,nnzero,n_col
+  If(debug) Write(0,*)'IN CDOVR1',novr ,m,nnzero,n_col
   if (novr<0) then
      info=10
      int_err(1)=1
@@ -144,9 +144,9 @@ Subroutine psb_dscov(a,desc_a,novr,desc_ov,info)
 !!$    iovre  = mpe_log_get_event_number()
 !!$    if (irank==0) then 
 !!$      info = mpe_describe_state(idscb,idsce,"DSCASB ","NavyBlue")
-!!$      info = mpe_describe_state(iovrb,iovre,"DSCOVR ","DeepPink")
+!!$      info = mpe_describe_state(iovrb,iovre,"CDOVRR ","DeepPink")
 !!$    endif
-  If(debug)Write(0,*)'BEGIN dscov',me,nhalo
+  If(debug)Write(0,*)'BEGIN cdovr',me,nhalo
 !!$  call blacs_barrier(icontxt,'All')
   t1 = mpi_wtime()
 
@@ -232,5 +232,5 @@ Subroutine psb_dscov(a,desc_a,novr,desc_ov,info)
   end if
   Return
 
-End Subroutine psb_dscov
+End Subroutine psb_cdovr
 
