@@ -191,28 +191,28 @@ Subroutine psb_dcsrsetup(ptype,novr,a,blk,desc_data,upd,desc_p,info,outfmt)
     n_row = desc_p%matrix_data(psb_n_row_)
     t2 = mpi_wtime()
 
-    if (debug) write(0,*) 'Before dcsrovr ',blk%fida,blk%m,psb_nnz_,blk%infoa(psb_nnz_)
+    if (debug) write(0,*) 'Before spovr ',blk%fida,blk%m,psb_nnz_,blk%infoa(psb_nnz_)
 !!$    ierr = MPE_Log_event( iovrb, 0, "st OVR" )
 !!$    blk%m = n_row-nrow_a
 !!$    blk%k = n_row
 
     if (present(outfmt)) then 
-      if(debug) write(0,*) me,': Calling CSROVR with ',size(blk%ia2)
-      Call psb_csrovr(a,desc_p,blk,info,outfmt=outfmt)
+      if(debug) write(0,*) me,': Calling SPOVR with ',size(blk%ia2)
+      Call psb_spovr(a,desc_p,blk,info,outfmt=outfmt)
     else
-      if(debug) write(0,*) me,': Calling CSROVR with ',size(blk%ia2)
-      Call psb_csrovr(a,desc_p,blk,info)
+      if(debug) write(0,*) me,': Calling SPOVR with ',size(blk%ia2)
+      Call psb_spovr(a,desc_p,blk,info)
     end if
 
 
     if(info /= 0) then
       info=4010
-      ch_err='psb_csrovr'
+      ch_err='psb_spovr'
       call psb_errpush(info,name,a_err=ch_err)
       goto 9999
     end if
 
-    if (debug) write(0,*) 'After psb_dcsrovr ',blk%fida,blk%m,psb_nnz_,blk%infoa(psb_nnz_)
+    if (debug) write(0,*) 'After psb_spovr ',blk%fida,blk%m,psb_nnz_,blk%infoa(psb_nnz_)
 !!$    ierr = MPE_Log_event( iovre, 0, "ed OVR" )
 
     t3 = mpi_wtime()

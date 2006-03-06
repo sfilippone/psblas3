@@ -579,10 +579,10 @@ contains
       ! Now we have to gather the halo of am1, and add it to itself
       ! to multiply it by A,
       !
-      call psb_csrovr(am1,desc_a,am4,info,clcnv=.false.)
+      call psb_spovr(am1,desc_a,am4,info,clcnv=.false.)
 
       if(info /= 0) then
-        call psb_errpush(4010,name,a_err='psb_csrovr')
+        call psb_errpush(4010,name,a_err='psb_spovr')
         goto 9999
       end if
 
@@ -638,10 +638,10 @@ contains
 
     if  (p%iprcparm(smth_kind_) == smth_omg_) then 
       ! am2 = ((i-wDA)Ptilde)^T
-      call psb_csrovr(am3,desc_a,am4,info,clcnv=.false.)
+      call psb_spovr(am3,desc_a,am4,info,clcnv=.false.)
 
       if(info /= 0) then
-        call psb_errpush(4010,name,a_err='psb_csrovr')
+        call psb_errpush(4010,name,a_err='psb_spovr')
         goto 9999
       end if
       call psb_rwextd(ncol,am3,info,b=am4)      

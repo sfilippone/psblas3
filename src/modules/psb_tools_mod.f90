@@ -100,8 +100,8 @@ Module psb_tools_mod
      end subroutine psb_iasbv
   end interface
 
-  interface psb_csrovr
-     Subroutine psb_dcsrovr(a,desc_a,blk,info,rwcnv,clcnv,outfmt)
+  interface psb_spovr
+     Subroutine psb_dspovr(a,desc_a,blk,info,rwcnv,clcnv,outfmt)
        use psb_descriptor_type
        use psb_spmat_type
        Type(psb_dspmat_type),Intent(in)    :: a
@@ -110,7 +110,7 @@ Module psb_tools_mod
        integer, intent(out)                :: info
        logical, optional, intent(in)       :: rwcnv,clcnv
        character(len=5), optional          :: outfmt 
-     end Subroutine psb_dcsrovr
+     end Subroutine psb_dspovr
   end interface
 
 
