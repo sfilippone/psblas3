@@ -284,19 +284,6 @@ Module psb_tools_mod
   end interface
 
 
-
-  interface psb_ptins
-     subroutine psb_dptins(ia,ja,blck,desc_a,info)
-       use psb_descriptor_type
-       use psb_spmat_type
-       implicit none
-       type(psb_desc_type), intent(inout)    ::  desc_a
-       integer, intent(in)                   ::  ia,ja
-       type(psb_dspmat_type), intent(in)             ::  blck
-       integer,intent(out)                   ::  info
-     end subroutine psb_dptins
-  end interface
-
   interface psb_cdall
      subroutine psb_cdall(m, n, parts, icontxt, desc_a, info)
        use psb_descriptor_type
@@ -315,23 +302,23 @@ Module psb_tools_mod
   end interface
   
 
-  interface psb_dscasb
-     subroutine psb_dscasb(desc_a,info)
+  interface psb_cdasb
+     subroutine psb_cdasb(desc_a,info)
        use psb_descriptor_type
        Type(psb_desc_type), intent(inout) :: desc_a
        integer, intent(out)               :: info
-     end subroutine psb_dscasb
+     end subroutine psb_cdasb
   end interface
 
 
 
-  interface psb_dsccpy
-     subroutine psb_dsccpy(desc_out, desc_a, info)
+  interface psb_cdcpy
+     subroutine psb_cdcpy(desc_out, desc_a, info)
        use psb_descriptor_type
        type(psb_desc_type), intent(out) :: desc_out
        type(psb_desc_type), intent(in)  :: desc_a
        integer, intent(out)             :: info
-     end subroutine psb_dsccpy
+     end subroutine psb_cdcpy
   end interface
   
  
@@ -343,14 +330,14 @@ Module psb_tools_mod
      end subroutine psb_cdfree
   end interface
   
-  interface psb_dscins
-     subroutine psb_dscins(nz,ia,ja,desc_a,info,is,js)
+  interface psb_cdins
+     subroutine psb_cdins(nz,ia,ja,desc_a,info,is,js)
        use psb_descriptor_type
        type(psb_desc_type), intent(inout) :: desc_a
        Integer, intent(in)                :: nz,IA(:),JA(:)
        integer, intent(out)               :: info
        integer, intent(in), optional      :: is,js
-     end subroutine psb_dscins
+     end subroutine psb_cdins
   end interface
 
 
@@ -367,14 +354,14 @@ Module psb_tools_mod
   end interface
        
        
-  interface psb_dscren
-     subroutine psb_dscren(trans,iperm,desc_a,info)
+  interface psb_cdren
+     subroutine psb_cdren(trans,iperm,desc_a,info)
        use psb_descriptor_type
        type(psb_desc_type), intent(inout)    ::  desc_a
        integer, intent(inout)                ::  iperm(:)
        character, intent(in)                 :: trans
        integer, intent(out)                  :: info
-     end subroutine psb_dscren
+     end subroutine psb_cdren
   end interface
   
   interface psb_spalloc
@@ -488,15 +475,6 @@ Module psb_tools_mod
        integer, intent(out)               ::  info
        character, intent(in), optional    ::  iact
      end subroutine psb_loc_to_glob
-  end interface
-
-
-  interface psb_ptasb
-     subroutine psb_ptasb(desc_a,info)
-       use psb_descriptor_type
-       type(psb_desc_type), intent(inout) :: desc_a
-       integer,intent(out)                :: info
-     end subroutine psb_ptasb
   end interface
 
 
