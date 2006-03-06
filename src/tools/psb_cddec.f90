@@ -28,7 +28,7 @@
 !!$  POSSIBILITY OF SUCH DAMAGE.
 !!$ 
 !!$  
-subroutine psb_dscdec(nloc, icontxt, desc_a, info)
+subroutine psb_cddec(nloc, icontxt, desc_a, info)
 
   !  Purpose
   !  =======
@@ -127,10 +127,10 @@ subroutine psb_dscdec(nloc, icontxt, desc_a, info)
   if(psb_get_errstatus().ne.0) return 
   info=0
   err=0
-  name = 'psb_dscdec'
+  name = 'psb_cddec'
 
   call blacs_gridinfo(icontxt, nprow, npcol, me, mypcol)
-  if (debug) write(*,*) 'psb_dscall: ',nprow,npcol,me,mypcol
+  if (debug) write(*,*) 'psb_cdalll: ',nprow,npcol,me,mypcol
   !     ....verify blacs grid correctness..
   if (npcol /= 1) then
      info = 2030
@@ -156,7 +156,7 @@ subroutine psb_dscdec(nloc, icontxt, desc_a, info)
      goto 9999
   end if
 
-  if (debug) write(*,*) 'psb_dscall:  doing global checks'  
+  if (debug) write(*,*) 'psb_cdall:  doing global checks'  
   !global check on m and n parameters
 
   allocate(nlv(0:nprow-1))
@@ -230,4 +230,4 @@ subroutine psb_dscdec(nloc, icontxt, desc_a, info)
   end if
   return
   
-end subroutine psb_dscdec
+end subroutine psb_cddec

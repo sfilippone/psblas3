@@ -439,7 +439,7 @@ contains
     end if
     if (associated(p%desc_data)) then 
       if (associated(p%desc_data%matrix_data))  then 
-        call psb_dscfree(p%desc_data,info)
+        call psb_cdfree(p%desc_data,info)
       end if
       deallocate(p%desc_data)
     endif

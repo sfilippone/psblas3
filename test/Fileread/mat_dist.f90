@@ -187,15 +187,15 @@ contains
             &nrow, ncol, nnzero,nrhs
     endif
     if (newt) then 
-       call psb_dscall(nrow,nrow,parts,icontxt,desc_a,info)
+       call psb_cdall(nrow,nrow,parts,icontxt,desc_a,info)
        if(info/=0) then
           info=4010
-          ch_err='psb_dscall'
+          ch_err='psb_cdall'
           call psb_errpush(info,name,a_err=ch_err)
           goto 9999
        end if
     else
-       call psb_dscall(nrow,nrow,parts,icontxt,desc_a,info)
+       call psb_cdall(nrow,nrow,parts,icontxt,desc_a,info)
        if(info/=0) then
           info=4010
           ch_err='psb_psdscall'
@@ -633,10 +633,10 @@ contains
        goto 9999
     endif
 
-    call psb_dscall(nrow,v,icontxt,desc_a,info)
+    call psb_cdall(nrow,v,icontxt,desc_a,info)
     if(info/=0) then
        info=4010
-       ch_err='psb_dscall'
+       ch_err='psb_cdall'
        call psb_errpush(info,name,a_err=ch_err)
        goto 9999
     end if

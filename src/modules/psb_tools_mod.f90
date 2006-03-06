@@ -297,21 +297,21 @@ Module psb_tools_mod
      end subroutine psb_dptins
   end interface
 
-  interface psb_dscall
-     subroutine psb_dscall(m, n, parts, icontxt, desc_a, info)
+  interface psb_cdall
+     subroutine psb_cdall(m, n, parts, icontxt, desc_a, info)
        use psb_descriptor_type
        include 'parts.fh'
        Integer, intent(in)                 :: m,n,icontxt
        Type(psb_desc_type), intent(out)    :: desc_a
        integer, intent(out)                :: info
-     end subroutine psb_dscall
-     subroutine psb_dscalv(m, v, icontxt, desc_a, info, flag)
+     end subroutine psb_cdall
+     subroutine psb_cdalv(m, v, icontxt, desc_a, info, flag)
        use psb_descriptor_type
        Integer, intent(in)               :: m,icontxt, v(:)
        integer, intent(in), optional     :: flag
        integer, intent(out)              :: info
        Type(psb_desc_type), intent(out)  :: desc_a
-     end subroutine psb_dscalv
+     end subroutine psb_cdalv
   end interface
   
 
@@ -335,12 +335,12 @@ Module psb_tools_mod
   end interface
   
  
-  interface psb_dscfree
-     subroutine psb_dscfree(desc_a,info)
+  interface psb_cdfree
+     subroutine psb_cdfree(desc_a,info)
        use psb_descriptor_type
        type(psb_desc_type), intent(inout) :: desc_a
        integer, intent(out)               :: info
-     end subroutine psb_dscfree
+     end subroutine psb_cdfree
   end interface
   
   interface psb_dscins
@@ -500,22 +500,22 @@ Module psb_tools_mod
   end interface
 
 
-  interface psb_dscrep
-     subroutine psb_dscrep(m, icontxt, desc_a,info)
+  interface psb_cdrep
+     subroutine psb_cdrep(m, icontxt, desc_a,info)
        use psb_descriptor_type
        Integer, intent(in)               :: m,icontxt
        Type(psb_desc_type), intent(out)  :: desc_a
        integer, intent(out)              :: info
-     end subroutine psb_dscrep
+     end subroutine psb_cdrep
   end interface
 
-  interface psb_dscdec
-     subroutine psb_dscdec(nloc, icontxt, desc_a,info)
+  interface psb_cddec
+     subroutine psb_cddec(nloc, icontxt, desc_a,info)
        use psb_descriptor_type
        Integer, intent(in)               :: nloc,icontxt
        Type(psb_desc_type), intent(out)  :: desc_a
        integer, intent(out)              :: info
-     end subroutine psb_dscdec
+     end subroutine psb_cddec
   end interface
 
 

@@ -24,7 +24,7 @@ read_mat.o: mmio.o
 
 df_sample: $(DFOBJS)
 	$(F90LINK) $(LINKOPT) $(DFOBJS) -o df_sample\
-	$(PSBLAS_LIB) $(METIS_LIB) $(BLACS)
+	$(PSBLAS_LIB) $(METIS_LIB) $(BLACS) $(SLU) $(UMF) $(BLAS)
 	/bin/mv df_sample $(EXEDIR) 
 
 

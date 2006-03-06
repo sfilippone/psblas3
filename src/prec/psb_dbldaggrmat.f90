@@ -239,7 +239,7 @@ contains
 
     if (p%iprcparm(coarse_mat_) == mat_repl_) then 
 
-      call psb_dscrep(ntaggr,icontxt,p%desc_data,info)
+      call psb_cdrep(ntaggr,icontxt,p%desc_data,info)
 
       nzbr(:) = 0
       nzbr(myprow+1) = irs
@@ -288,7 +288,7 @@ contains
 
     else if (p%iprcparm(coarse_mat_) == mat_distr_) then 
 
-      call psb_dscdec(naggr,icontxt,p%desc_data,info)
+      call psb_cddec(naggr,icontxt,p%desc_data,info)
       call psb_spclone(b,bg,info)
       if(info /= 0) then
         call psb_errpush(4010,name,a_err='spclone')
@@ -715,9 +715,9 @@ contains
             i = i + 1
           end do
         end do
-        call psb_dscall(ntaggr,ivall,icontxt,p%desc_data,info,flag=1)
+        call psb_cdall(ntaggr,ivall,icontxt,p%desc_data,info,flag=1)
         if(info /= 0) then
-          call psb_errpush(4010,name,a_err='psb_dscall')
+          call psb_errpush(4010,name,a_err='psb_cdall')
           goto 9999
         end if
 
@@ -833,7 +833,7 @@ contains
         nzbr(:) = 0
         nzbr(myprow+1) = b%infoa(psb_nnz_)
 
-        call psb_dscrep(ntaggr,icontxt,p%desc_data,info)
+        call psb_cdrep(ntaggr,icontxt,p%desc_data,info)
 
         call igsum2d(icontxt,'All',' ',np,1,nzbr,np,-1,-1)
         nzbg = sum(nzbr)
@@ -887,7 +887,7 @@ contains
           call psb_errpush(4010,name,a_err='spclone')
           goto 9999
         end if
-        call psb_dscdec(naggr,icontxt,p%desc_data,info)
+        call psb_cddec(naggr,icontxt,p%desc_data,info)
 
         call psb_spfree(b,info)
         if(info /=  0) then
@@ -902,7 +902,7 @@ contains
         nzbr(:) = 0
         nzbr(myprow+1) = b%infoa(psb_nnz_)
 
-        call psb_dscrep(ntaggr,icontxt,p%desc_data,info)
+        call psb_cdrep(ntaggr,icontxt,p%desc_data,info)
 
 
         call igsum2d(icontxt,'All',' ',np,1,nzbr,np,-1,-1)

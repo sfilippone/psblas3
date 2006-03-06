@@ -28,7 +28,7 @@
 !!$  POSSIBILITY OF SUCH DAMAGE.
 !!$ 
 !!$  
-subroutine psb_dscrep(m, icontxt, desc_a, info)
+subroutine psb_cdrep(m, icontxt, desc_a, info)
 
   !  Purpose
   !  =======
@@ -126,10 +126,10 @@ subroutine psb_dscrep(m, icontxt, desc_a, info)
   if(psb_get_errstatus().ne.0) return 
   info=0
   err=0
-  name = 'psb_dscrep'
+  name = 'psb_cdrep'
 
   call blacs_gridinfo(icontxt, nprow, npcol, myrow, mycol)
-  if (debug) write(*,*) 'psb_dscall: ',nprow,npcol,myrow,mycol
+  if (debug) write(*,*) 'psb_cdrep: ',nprow,npcol,myrow,mycol
   !     ....verify blacs grid correctness..
   if (npcol /= 1) then
      info = 2030
@@ -226,4 +226,4 @@ subroutine psb_dscrep(m, icontxt, desc_a, info)
   end if
   return
 
-end subroutine psb_dscrep
+end subroutine psb_cdrep

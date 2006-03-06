@@ -255,7 +255,7 @@ program pde90
   call psb_free(b,desc_a,info)
   call psb_free(x,desc_a,info)
   call psb_spfree(a,desc_a,info)
-  call psb_dscfree(desc_a,info)
+  call psb_cdfree(desc_a,info)
   if(info.ne.0) then
      info=4010
      ch_err='free routine'
@@ -485,7 +485,7 @@ contains
     nnz = ((n*9)/(nprow*npcol))
     if(myprow.eq.psb_root_) write(0,'("Generating Matrix (size=",i0x,")...")')n
 
-    call psb_dscall(n,n,parts,icontxt,desc_a,info)
+    call psb_cdall(n,n,parts,icontxt,desc_a,info)
     call psb_spalloc(a,desc_a,info,nnz=nnz)
     ! define  rhs from boundary conditions; also build initial guess 
     call psb_alloc(n,b,desc_a,info)

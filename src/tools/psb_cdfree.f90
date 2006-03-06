@@ -28,15 +28,15 @@
 !!$  POSSIBILITY OF SUCH DAMAGE.
 !!$ 
 !!$  
-! File: psb_dscfree.f90
+! File: psb_cdfree.f90
 !
-! Subroutine: psb_dscfree
+! Subroutine: psb_cdfree
 !   Frees a descriptor data structure.
 ! 
 ! Parameters: 
 !    desc_a   - type(<psb_desc_type>).         The communication descriptor to be freed.
 !    info     - integer.                       Eventually returns an error code.
-subroutine psb_dscfree(desc_a,info)
+subroutine psb_cdfree(desc_a,info)
   !...free descriptor structure...
   use psb_descriptor_type
   use psb_const_mod
@@ -55,7 +55,7 @@ subroutine psb_dscfree(desc_a,info)
   if(psb_get_errstatus().ne.0) return 
   info=0
   call psb_erractionsave(err_act)
-  name = 'psb_dscfree'
+  name = 'psb_cdfree'
 
 
   if (.not.associated(desc_a%matrix_data)) then
@@ -181,4 +181,4 @@ subroutine psb_dscfree(desc_a,info)
   end if
   return
 
-end subroutine psb_dscfree
+end subroutine psb_cdfree

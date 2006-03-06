@@ -350,7 +350,7 @@ program df_sample
   call psb_free(x_col, desc_a,info)
   call psb_spfree(a, desc_a,info)
   call psb_precfree(pre,info)
-  call psb_dscfree(desc_a,info)
+  call psb_cdfree(desc_a,info)
 
 9999 continue
   if(info /= 0) then

@@ -28,9 +28,9 @@
 !!$  POSSIBILITY OF SUCH DAMAGE.
 !!$ 
 !!$  
-! File: psb_dscall.f90
+! File: psb_cdall.f90
 !
-! Subroutine: psb_dscall
+! Subroutine: psb_cdall
 !    Allocate descriptor
 !    and checks correctness of PARTS subroutine
 ! 
@@ -41,7 +41,7 @@
 !    icontxt - integer.                       The communication context.
 !    desc_a  - type(<psb_desc_type>).         The communication descriptor.
 !    info    - integer.                       Eventually returns an error code
-subroutine psb_dscall(m, n, parts, icontxt, desc_a, info)
+subroutine psb_cdall(m, n, parts, icontxt, desc_a, info)
   use psb_error_mod
   use psb_descriptor_type
   use psb_realloc_mod
@@ -67,11 +67,11 @@ subroutine psb_dscall(m, n, parts, icontxt, desc_a, info)
   if(psb_get_errstatus().ne.0) return 
   info=0
   err=0
-  name = 'psb_dscall'
+  name = 'psb_cdall'
   call psb_erractionsave(err_act)
 
   call blacs_gridinfo(icontxt, nprow, npcol, myrow, mycol)
-  if (debug) write(*,*) 'psb_dscall: ',nprow,npcol,myrow,mycol
+  if (debug) write(*,*) 'psb_cdall: ',nprow,npcol,myrow,mycol
   !     ....verify blacs grid correctness..
   if (npcol /= 1) then
      info = 2030
@@ -100,7 +100,7 @@ subroutine psb_dscall(m, n, parts, icontxt, desc_a, info)
   endif
 
 
-  if (debug) write(*,*) 'psb_dscall:  doing global checks'  
+  if (debug) write(*,*) 'psb_cdall:  doing global checks'  
   !global check on m and n parameters
   if (myrow.eq.psb_root_) then
      exch(1)=m
@@ -137,7 +137,7 @@ subroutine psb_dscall(m, n, parts, icontxt, desc_a, info)
   endif
 
 
-  if (debug) write(*,*) 'PSB_DSCALL:  starting main loop' ,info
+  if (debug) write(*,*) 'PSB_CDALL:  starting main loop' ,info
   counter = 0
   itmpov  = 0
   temp_ovrlap(:) = -1
@@ -210,10 +210,10 @@ subroutine psb_dscall(m, n, parts, icontxt, desc_a, info)
 
   loc_row=counter
   ! check on parts function
-  if (debug) write(*,*) 'PSB_DSCALL:  End main loop:' ,loc_row,itmpov,info
+  if (debug) write(*,*) 'PSB_CDALL:  End main loop:' ,loc_row,itmpov,info
 
 
-  if (debug) write(*,*) 'PSB_DSCALL:  error check:' ,err
+  if (debug) write(*,*) 'PSB_CDALL:  error check:' ,err
 
   l_ov_ix=0
   l_ov_el=0
@@ -231,7 +231,7 @@ subroutine psb_dscall(m, n, parts, icontxt, desc_a, info)
   l_ov_ix = l_ov_ix+3  
   l_ov_el = l_ov_el+3
 
-  if (debug) write(*,*) 'PSB_DSCALL: Ov len',l_ov_ix,l_ov_el
+  if (debug) write(*,*) 'PSB_CDALL: Ov len',l_ov_ix,l_ov_el
   allocate(ov_idx(l_ov_ix),ov_el(l_ov_el), stat=info)
   if (info /= no_err) then
      info=4010
@@ -295,7 +295,7 @@ subroutine psb_dscall(m, n, parts, icontxt, desc_a, info)
   enddo
   nullify(desc_a%bnd_elem,desc_a%halo_index)
 
-!!$  if (debug) write(*,*) 'PSB_DSCALL:  Last bits in desc_a', loc_row,k
+!!$  if (debug) write(*,*) 'PSB_CDALL:  Last bits in desc_a', loc_row,k
   ! set fields in desc_a%MATRIX_DATA....
   desc_a%matrix_data(psb_n_row_)  = loc_row
   desc_a%matrix_data(psb_n_col_)  = loc_row
@@ -328,4 +328,4 @@ subroutine psb_dscall(m, n, parts, icontxt, desc_a, info)
   end if
   return
 
-end subroutine psb_dscall
+end subroutine psb_cdall
