@@ -6,10 +6,10 @@ FOBJS = psb_dallc.o psb_dasb.o psb_dcsrp.o psb_cdprt.o \
 	psb_dscdec.o psb_dscfree.o psb_dscins.o psb_cdovr.o \
 	psb_dscren.o psb_dscrep.o psb_dspalloc.o psb_dspasb.o \
 	psb_dspcnv.o psb_dspfree.o psb_dspins.o psb_dsprn.o \
-	psb_dspupdate.o psb_glob_to_loc.o psb_ialloc.o psb_iasb.o \
+	psb_glob_to_loc.o psb_ialloc.o psb_iasb.o \
 	psb_ifree.o psb_iins.o psb_loc_to_glob.o
 
-MPFOBJS = psb_cdovrbld.o psb_dcsrovr.o
+MPFOBJS = psb_cdovrbld.o psb_dspovr.o
 
 INCDIRS = -I ../../lib -I .
 LIBDIR = ../../lib

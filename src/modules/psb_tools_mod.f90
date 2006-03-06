@@ -454,20 +454,6 @@ Module psb_tools_mod
   end interface
 
 
-  interface psb_spupdate
-     subroutine psb_dspupdate(a, ia, ja, blck, desc_a,info,ix,jx,updflag)
-       use psb_descriptor_type
-       use psb_spmat_type
-       type(psb_desc_type), intent(in)      ::  desc_a
-       type(psb_dspmat_type), intent(inout) ::  a
-       integer, intent(in)                  ::  ia,ja
-       type(psb_dspmat_type), intent(in)    ::  blck
-       integer, intent(out)                 ::  info
-       integer, optional, intent(in)        ::  ix,jx
-       integer, optional, intent(in)        ::  updflag
-     end subroutine psb_dspupdate
-  end interface
-
   interface psb_glob_to_loc
      subroutine psb_glob_to_loc2(x,y,desc_a,info,iact)
        use psb_descriptor_type
