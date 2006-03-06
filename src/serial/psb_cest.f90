@@ -63,8 +63,8 @@ subroutine psb_cest(afmt, nnz, lia1, lia2, lar, up, info)
         lia2 = 2*nnz + 1000
         lar = nnz
      else
-        info = 3012
-        call psb_errpush(info,name)
+        info = 136
+        call psb_errpush(info,name,a_err=afmt)
         goto 9999
      endif
 
@@ -83,8 +83,8 @@ subroutine psb_cest(afmt, nnz, lia1, lia2, lar, up, info)
         lia2 = nnz
         lar = nnz
      else
-        info = 3012
-        call psb_errpush(info,name)
+        info = 136
+        call psb_errpush(info,name,a_err=afmt)
         goto 9999
      endif
 
