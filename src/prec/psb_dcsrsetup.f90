@@ -176,10 +176,10 @@ Subroutine psb_dcsrsetup(ptype,novr,a,blk,desc_data,upd,desc_p,info,outfmt)
       !
       !  Build the  auiliary descriptor',desc_p%matrix_data(psb_n_row_)
       ! 
-       call psb_dscov(a,desc_data,novr,desc_p,info)
+       call psb_cdovr(a,desc_data,novr,desc_p,info)
        if(info /= 0) then
           info=4010
-          ch_err='psb_dscov'
+          ch_err='psb_cdovr'
           call psb_errpush(info,name,a_err=ch_err)
           goto 9999
        end if
