@@ -142,15 +142,15 @@ Module psb_tools_mod
   end interface
 
 
-  interface psb_descprt
-     subroutine psb_descprt(iout,desc_p,glob,short)
+  interface psb_cdprt
+     subroutine psb_cdprt(iout,desc_p,glob,short)
        use psb_const_mod
        use psb_descriptor_type
        implicit none 
        type(psb_desc_type), intent(in)    :: desc_p
        integer, intent(in)                :: iout
        logical, intent(in), optional      :: glob,short
-     end subroutine psb_descprt
+     end subroutine psb_cdprt
   end interface
 
 
