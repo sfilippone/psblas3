@@ -66,13 +66,15 @@ module psb_prec_type
   integer, parameter :: ilu_fill_in_=8, jac_sweeps_=9, ml_type_=10
   integer, parameter :: smth_pos_=11, aggr_alg_=12, smth_kind_=13
   integer, parameter :: om_choice_=14, glb_smth_=15, coarse_mat_=16
+  !Renumbering. SEE BELOW
+  integer, parameter :: renum_none_=0, renum_glb_=1, renum_gps_=2
   !! 2 ints for 64 bit versions
   integer, parameter :: slu_ptr_=17, umf_symptr_=17, umf_numptr_=19
   integer, parameter :: ifpsz=20
   ! Entries in dprcparm: ILU(E) epsilon, smoother omega
   integer, parameter :: fact_eps_=1, smooth_omega_=2
   integer, parameter :: dfpsz=4
-  ! Factorization types: none, ILU(N), ILU(E), SuperLU
+  ! Factorization types: none, ILU(N), ILU(E), SuperLU, UMFPACK
   integer, parameter :: f_none_=0,f_ilu_n_=1,f_ilu_e_=2,f_slu_=3,f_umf_=4
   ! Fields for sparse matrices ensembles: 
   integer, parameter :: l_pr_=1, u_pr_=2, bp_ilu_avsz=2
@@ -291,6 +293,13 @@ contains
     is_legal_n_ovr = (ip >=0) 
     return
   end function is_legal_n_ovr
+  function is_legal_renum(ip)
+    integer, intent(in) :: ip
+    logical             :: is_legal_renum
+    ! For the time being we are disabling renumbering options. 
+    is_legal_renum = (ip ==0) 
+    return
+  end function is_legal_renum
   function is_legal_jac_sweeps(ip)
     integer, intent(in) :: ip
     logical             :: is_legal_jac_sweeps

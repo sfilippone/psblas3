@@ -50,7 +50,7 @@
 !*                                                                           *
 !*                                                                           *
 !*****************************************************************************
-Subroutine psb_dcsrsetup(ptype,novr,a,blk,desc_data,upd,desc_p,info,outfmt)
+Subroutine psb_dasmatbld(ptype,novr,a,blk,desc_data,upd,desc_p,info,outfmt)
 
   use psb_serial_mod
   use psb_descriptor_type
@@ -82,12 +82,12 @@ Subroutine psb_dcsrsetup(ptype,novr,a,blk,desc_data,upd,desc_p,info,outfmt)
        &  tot_recv, ircode, n_row, nztot,nhalo, nrow_a,err_act
   Logical,Parameter :: debug=.false., debugprt=.false.
   character(len=20) :: name, ch_err
-  name='psb_dcsrsetup'
+  name='psb_dasmatbld'
   if(psb_get_errstatus().ne.0) return 
   info=0
   call psb_erractionsave(err_act)
 
-  If(debug) Write(0,*)'IN DCSRSETUP  ', upd
+  If(debug) Write(0,*)'IN DASMATBLD  ', upd
   icontxt=desc_data%matrix_data(psb_ctxt_)
   tot_recv=0
 
@@ -161,7 +161,7 @@ Subroutine psb_dcsrsetup(ptype,novr,a,blk,desc_data,upd,desc_p,info,outfmt)
           call psb_errpush(info,name,a_err=ch_err)
           goto 9999
         end if
-        if (debug) write(0,*) 'Early return from dcsrsetup: P>=3 N_OVR=0'
+        if (debug) write(0,*) 'Early return from asmatbld: P>=3 N_OVR=0'
       endif
       return
     endif
@@ -169,7 +169,7 @@ Subroutine psb_dcsrsetup(ptype,novr,a,blk,desc_data,upd,desc_p,info,outfmt)
     call blacs_get(icontxt,10,icomm )
 
     Call blacs_gridinfo(icontxt,nprow,npcol,me,mycol)
-    If(debug)Write(0,*)'BEGIN dcsrsetup',me,upd,novr
+    If(debug)Write(0,*)'BEGIN dasmatbld',me,upd,novr
     t1 = mpi_wtime()
 
     If (upd == 'F') Then
@@ -236,5 +236,5 @@ Subroutine psb_dcsrsetup(ptype,novr,a,blk,desc_data,upd,desc_p,info,outfmt)
   end if
   Return
 
-End Subroutine psb_dcsrsetup
+End Subroutine psb_dasmatbld
 

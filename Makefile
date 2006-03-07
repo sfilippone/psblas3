@@ -10,8 +10,9 @@ lib:
 clean: 
 	(cd src; make clean)
 
-veryclean: 
-	(cd src; make veryclean)
+cleanlib:
 	(cd lib; /bin/rm -f *.a *$(.mod) *$(.fh))
+veryclean: cleanlib
+	(cd src; make veryclean)
 
 .PHONY: lib

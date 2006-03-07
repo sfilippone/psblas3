@@ -111,8 +111,8 @@ end interface
      end subroutine psb_dcslu
   end interface
 
-  interface psb_csrsetup
-    Subroutine psb_dcsrsetup(ptype,novr,a,blk,desc_data,upd,desc_p,info,outfmt)
+  interface psb_asmatbld
+    Subroutine psb_dasmatbld(ptype,novr,a,blk,desc_data,upd,desc_p,info,outfmt)
       use psb_serial_mod
       Use psb_descriptor_type
       Use psb_prec_type
@@ -124,7 +124,7 @@ end interface
       Character, Intent(in)                :: upd
       integer, intent(out)                 :: info
       character(len=5), optional           :: outfmt
-    end Subroutine psb_dcsrsetup
+    end Subroutine psb_dasmatbld
  end interface
 
   interface psb_prcaply
