@@ -5,7 +5,7 @@
 %      DENSE MATRIX SUM
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subroutine{psb\_axpby}{General Dense Matrix Sum}
+\subroutine{psb\_geaxpby}{General Dense Matrix Sum}
 
 This subroutine is an interface to the computational kernel for
 dense matrix sum:
@@ -16,8 +16,8 @@ where:
 \item[$y$] represents the global dense submatrix $y_{:, jy:jy+n-1}$
 \end{description}
 
-\syntax{call psb\_axpby}{alpha, x, beta, y, desc\_a, info}
-\syntax*{call psb\_axpby}{alpha, x, beta, y, desc\_a, info, n, jx, jy}
+\syntax{call psb\_geaxpby}{alpha, x, beta, y, desc\_a, info}
+\syntax*{call psb\_geaxpby}{alpha, x, beta, y, desc\_a, info, n, jx, jy}
 
 %( calculating y <- alpha*x+beta*y )
 \begin{table}[h]
@@ -103,7 +103,7 @@ An integer value that contains an error code.
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\subroutine{psb\_dot}{Dot Product}
+\subroutine{psb\_gedot}{Dot Product}
 
 This function computes dot product between two vectors $x$ and
 $y$.\\
@@ -118,17 +118,17 @@ where:
 \item[$y$] represents the global subvector $y_{:,jy}$
 \end{description}
 
-\syntax{psb\_dot}{x, y, desc\_a, info}
-\syntax*{psb\_dot}{x, y, desc\_a, info, jx, jy}
+\syntax{psb\_gedot}{x, y, desc\_a, info}
+\syntax*{psb\_gedot}{x, y, desc\_a, info, jx, jy}
 \begin{table}[h]
 \begin{center}
 \begin{tabular}{ll}
 \hline
 $dot$, $x$, $y$ & {\bf Function}\\
 \hline
-Single Precision Real & psb\_dot\\
-Long Precision Real & psb\_dot \\
-Long Precision Complex & psb\_dot \\	
+Single Precision Real & psb\_gedot\\
+Long Precision Real & psb\_gedot \\
+Long Precision Complex & psb\_gedot \\	
 \hline
 \end{tabular}
 \end{center}
@@ -184,7 +184,7 @@ An integer value that contains an error code.
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\subroutine{psb\_dot}{Generalized Dot Product}
+\subroutine{psb\_gedot}{Generalized Dot Product}
 
 This subroutine computes a series of  dot products among the columns of
 two dense matrices  $x$ and $y$: 
@@ -194,16 +194,16 @@ usual convention applies, i.e. the conjugate transpose of $x$ is
 used. If $x$ and $y$ are of rank one, then $res$ is a scalar, else it
 is a rank one array. 
 
-\syntax{psb\_dot}{res, x, y, desc\_a, info}
+\syntax{psb\_gedot}{res, x, y, desc\_a, info}
 \begin{table}[h]
 \begin{center}
 \begin{tabular}{ll}
 \hline
 $res$, $x$, $y$ & {\bf Subroutine}\\
 \hline
-Single Precision Real & psb\_dot\\
-Long Precision Real & psb\_dot \\
-Long Precision Complex & psb\_dot \\	
+Single Precision Real & psb\_gedot\\
+Long Precision Real & psb\_gedot \\
+Long Precision Complex & psb\_gedot \\	
 \hline
 \end{tabular}
 \end{center}
@@ -248,7 +248,7 @@ An integer value that contains an error code.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
-\subroutine{psb\_amax}{Infinity-Norm of Vector}    
+\subroutine{psb\_geamax}{Infinity-Norm of Vector}    
 
 This function computes 
  the infinity-norm of a vector $x$.\\
@@ -262,8 +262,8 @@ where:
 \item[$x$] represents the global subvector $x_{:,jx}$
 \end{description}
 
-\syntax{psb\_amax}{x, desc\_a, info}
-\syntax*{psb\_amax}{x, desc\_a, info, jx}
+\syntax{psb\_geamax}{x, desc\_a, info}
+\syntax*{psb\_geamax}{x, desc\_a, info, jx}
 
 \begin{table}[h]
 \begin{center}
@@ -271,9 +271,9 @@ where:
 \hline
 $amax$ & $x$ & {\bf Function}\\
 \hline
-Single Precision Real&Single Precision Real & psb\_amax\\
-Long Precision Real&Long Precision Real & psb\_amax \\
-Long Precision Real&Long Precision Complex & psb\_zamax \\
+Single Precision Real&Single Precision Real & psb\_geamax\\
+Long Precision Real&Long Precision Real & psb\_geamax \\
+Long Precision Real&Long Precision Complex & psb\_zgeamax \\
 \hline
 \end{tabular}
 \end{center}
@@ -317,22 +317,22 @@ An integer value that contains an error code.
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\subroutine{psb\_amax}{Generalized Infinity Norm}
+\subroutine{psb\_geamax}{Generalized Infinity Norm}
 
 This subroutine computes a series of  infinity norms on the columns of
 a  dense matrix  $x$: 
 \[ res(i) \leftarrow \max_k |x(k,i)| \]
 
-\syntax{psb\_amax}{res, x, desc\_a, info}
+\syntax{psb\_geamax}{res, x, desc\_a, info}
 \begin{table}[h]
 \begin{center}
 \begin{tabular}{lll}
 \hline
 $res$&  $x$& {\bf Subroutine}\\
 \hline
-Single Precision Real  &Single Precision Real  & psb\_amax\\
-Long Precision Real    &Long Precision Real    & psb\_amax\\
-Long Precision Real &Long Precision Complex & psb\_amax\\	
+Single Precision Real  &Single Precision Real  & psb\_geamax\\
+Long Precision Real    &Long Precision Real    & psb\_geamax\\
+Long Precision Real &Long Precision Complex & psb\_geamax\\	
 \hline
 \end{tabular}
 \end{center}
@@ -370,7 +370,7 @@ An integer value that contains an error code.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
-\subroutine{psb\_asum}{1-Norm of Vector}    
+\subroutine{psb\_geasum}{1-Norm of Vector}    
 
 This function computes the 1-norm of a vector $x$.\\
 If $x$ is double precision real or single precision real vector
@@ -383,8 +383,8 @@ where:
 \item[$x$] represents the global subvector $x_{:,jx}$
 \end{description}
 
-\syntax{psb\_asum}{x, desc\_a, info}
-\syntax*{psb\_asum}{x, desc\_a, info, jx}
+\syntax{psb\_geasum}{x, desc\_a, info}
+\syntax*{psb\_geasum}{x, desc\_a, info, jx}
 
 \begin{table}[h]
 \begin{center}
@@ -392,9 +392,9 @@ where:
 \hline
 $dot$, $x$, $y$ & {\bf Function}\\
 \hline
-Single Precision Real & psb\_asum\\
-Long Precision Real & psb\_asum \\
-Long Precision Complex & psb\_asum \\	
+Single Precision Real & psb\_geasum\\
+Long Precision Real & psb\_geasum \\
+Long Precision Complex & psb\_geasum \\	
 \hline
 \end{tabular}
 \end{center}
@@ -440,7 +440,7 @@ An integer value that contains an error code.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
-\subroutine {psb\_nrm2}{2-Norm of Vector}    
+\subroutine {psb\_genrm2}{2-Norm of Vector}    
 
 This function computes the 2-norm of a vector $x$.\\
 If $x$ is double precision real or single precision real vector
@@ -459,17 +459,17 @@ where:
 \hline
 $nrm2$, $x$ & {\bf Function}\\
 \hline
-Single Precision Real & psb\_nrm2\\
-Long Precision Real & psb\_nrm2 \\
-Long Precision Complex & psb\_nrm2 \\
+Single Precision Real & psb\_genrm2\\
+Long Precision Real & psb\_genrm2 \\
+Long Precision Complex & psb\_genrm2 \\
 \hline
 \end{tabular}
 \end{center}
 \caption{Data types\label{tab:f90nrm2}}
 \end{table}
 
-\syntax{psb\_nrm2}{x, desc\_a, info}
-\syntax*{psb\_nrm2}{x, desc\_a, info, jx}
+\syntax{psb\_genrm2}{x, desc\_a, info}
+\syntax*{psb\_genrm2}{x, desc\_a, info, jx}
 \begin{description}
 \item[\bf On Entry]
 \item[x] the local portion of global dense matrix
@@ -509,7 +509,7 @@ An integer value that contains an error code.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
-\subroutine{psb\_nrmi}{Infinity Norm of Sparse Matrix}    
+\subroutine{psb\_spnrmi}{Infinity Norm of Sparse Matrix}    
 
 This function computes the infinity-norm of a matrix $A$:\\
 
@@ -525,16 +525,16 @@ where:
 \hline
 $nrmi$, $A$ & {\bf Function}\\
 \hline
-Single Precision Real & psb\_nrmi\\
-Long Precision Real & psb\_nrmi \\
-Long Precision Complex & psb\_nrmi \\
+Single Precision Real & psb\_spnrmi\\
+Long Precision Real & psb\_spnrmi \\
+Long Precision Complex & psb\_spnrmi \\
 \hline
 \end{tabular}
 \end{center}
 \caption{Data types\label{tab:f90nrmi}}
 \end{table}
 
-\syntax{psb\_nrmi}{A, desc\_a, info}
+\syntax{psb\_spnrmi}{A, desc\_a, info}
 
 \begin{description}
 \item[\bf On Entry]

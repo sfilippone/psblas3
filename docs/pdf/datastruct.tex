@@ -54,18 +54,29 @@ Specified as: integer variable.
 \end{description}
 Values assumed by this fields are compatible with ref. 1 (see \S~\ref{chap:appendix}).\\
 FORTRAN95 interface for distributed sparse matrices containing double precision
-real entries is defined as follows:
+real entries is defined as in figure~\ref{fig:spmattype}.
+\begin{figure}[h!]
+  \begin{Sbox}
+    \begin{minipage}[tl]{0.85\textwidth}
 \begin{verbatim}
-type d_spmat
-     integer     :: m, k
-     character*5 :: fida
-     character*1 :: descra(9)
-     integer     :: infoa(10)
-     real(kind(1.d0)), pointer :: aspk(:)
-     integer, pointer :: ia1(:), ia2(:)
-     integer, pointer :: pl(:), pr(:)
-end type d_spmat	
+type psb_dspmat_type
+   integer     :: m, k
+   character   :: fida(5)
+   character   :: descra(10)
+   integer     :: infoa(10)
+   real(kind(1.d0)), pointer :: aspk(:)
+   integer, pointer :: ia1(:), ia2(:), pr(:), pl(:)
+end type psb_dspmat_type
 \end{verbatim}
+    \end{minipage}
+  \end{Sbox}
+  \setlength{\fboxsep}{8pt}
+  \begin{center}
+    \fbox{\TheSbox}
+  \end{center}
+  \caption{\label{fig:spmattype}The PSBLAS defined data type that contains a sparse matrix.}
+\end{figure}
+
 The following two cases are among the most commonly used: 
 \begin{description}
 \item[fida=``CSR''] Compressed storage by rows. In this case the
@@ -91,8 +102,6 @@ column index are stored into \verb|apsk(j)|, \verb|ia1(j)| and
 \end{description}
 
 
-\subsubsection{Sparse Matrix storage formats}
-
 \subsection{Descriptor data structure}
 \label{sec:desc}
 All the general matrix informations and elements to be
@@ -102,7 +111,7 @@ Every structure of this type is associated to a sparse matrix, it
 contains data about general matrix informations and elements to be
 exchanged among processes.  \\ 
 It is not necessary for the user to
-know the internal structure of $psb_desc_type$, it is set in
+know the internal structure of \verb|psb_desc_type|, it is set in
 fully-transparent mode by PSBLAS-TOOLS routines when inserting a new
 sparse matrix, however the definition of the descriptor is the
 following.  
@@ -167,26 +176,89 @@ process then element $i$ contains local index correpondent to global variable $i
 else element $i$ contains -1 (NULL) value.\\
 Specified as: a pointer to an integer array of rank one.
 \end{description}
-FORTRAN90 interface for $decomp\_data$ structures is therefore defined
+FORTRAN95 interface for \verb|psb_desc_type| structures is therefore defined
 as follows:
-\begin{verbatim}
- type decomp_data_type
-     integer, pointer :: matrix_data(:)
-     integer, pointer :: halo_index(:)
-     integer, pointer :: ovrlap_elem(:)
-     integer, pointer :: ovrlap_index(:)
-     integer, pointer :: loc_to_glob(:)
-     integer, pointer :: glob_to_loc (:)
-  end type decomp_data_type
+\begin{figure}[h!]
+  \begin{Sbox}
+    \begin{minipage}[tl]{0.9\textwidth}
+\begin{verbatim} 
+type psb_desc_type 
+   integer, pointer :: matrix_data(:), halo_index(:)
+   integer, pointer :: overlap_elem(:), overlap_index(:)
+   integer, pointer :: loc_to_glob(:), glob_to_loc(:)
+end type psb_desc_type 
 \end{verbatim}
+    \end{minipage}
+  \end{Sbox}
+  \setlength{\fboxsep}{8pt}
+  \begin{center}
+    \fbox{\TheSbox}
+  \end{center}
+  \caption{\label{fig:desctype}The PSBLAS defined data type that
+    contains the communication descriptor.}
+\end{figure}
 
 \subsection{Preconditioner data structure}
 \label{sec:prec}
-\hypertarget{precdata}{}
+PSBLAS-2.0 offers the possibility to use many different types of
+preconditioning schemes. Besides the simple well known preconditioners
+like Diagonal Scaling or Block Jacobi (with ILU(0) incomplete
+factorization) also more complex preconditioning methods are
+implemented like the Additive Schwarz and Two-Level ones. A
+preconditioner is held in the \hypertarget{precdata}{{\tt psb\_prec\_type}} data structure
+which depends on the \verb|psb_base_prec| reported in
+figure~\ref{fig:prectype}. The \verb|psb_base_prec| 
+data type may contain a simple preconditioning matrix with the
+associated communication descriptor which may be different than the
+system communication descriptor in the case of parallel
+preconditioners like the Additive Schwarz one. Then the
+\verb|psb_prec_type| may contain more than one preconditioning matrix
+like in the case of Two-Level (in general Multi-Level) preconditioners.
+The user can choose the type of preconditioner to be used by means of
+the \verb|psb_precset| subroutine; once the type of preconditioning
+method is specified, along with all the parameters that characterize
+it, the preconditioner data structure can be built using the
+\verb|psb_precbuild| subroutine.
+This data structure wants to be flexible enough to easily allow the
+implementation of new kind of preconditioners. The values contained in
+the \verb|iprcparm| and \verb|dprcparm| define tha type of
+preconditioner along with all the parameters related to it; thus,
+\verb|iprcparm| and \verb|dprcparm| define how the other records have
+to be interpreted.
+\begin{figure}[h!]
+  \small
+  \begin{Sbox}
+    \begin{minipage}[tl]{0.9\textwidth}
+\begin{verbatim}
+  type psb_base_prec
 
-
-
-\subsection{Building and assembling data structures}
+    type(psb_spmat_type), pointer  :: av(:) => null()
+    real(kind(1.d0)), pointer      :: d(:)  => null()
+    type(psb_desc_type), pointer   :: desc_data => null()
+    integer, pointer               :: iprcparm(:) => null()
+    real(kind(1.d0)), pointer      :: dprcparm(:) => null()
+    integer, pointer               :: perm(:)  => null()
+    integer, pointer               :: mlia(:)  => null()
+    integer, pointer               :: invperm(:) => null()
+    integer, pointer               :: nlaggr(:)  => null()
+    type(psb_spmat_type), pointer  :: aorig    => null()
+    real(kind(1.d0)), pointer      :: dorig(:) => null()
+    
+ end type psb_base_prec
+  
+  type psb_prec_type
+    type(psb_base_prec), pointer  :: baseprecv(:) => null()
+    integer                       :: prec, base_prec
+ end type psb_prec_type
+\end{verbatim}
+    \end{minipage}
+  \end{Sbox}
+  \setlength{\fboxsep}{8pt}
+  \begin{center}
+    \fbox{\TheSbox}
+  \end{center}
+  \caption{\label{fig:prectype}The PSBLAS defined data type that contains a preconditioner.}
+\end{figure}
 
 
 

@@ -1,5 +1,6 @@
 \documentclass[12pt,a4paper,twoside]{article}
 \usepackage{pstricks}
+\usepackage{fancybox}
 \usepackage{amsfonts}
 % \usepackage{minitoc}
 % \setcounter{minitocdepth}{2}
@@ -63,9 +64,9 @@
 \newcommand{\example}{\stepcounter{example}%
 \section*{\examplename~\theexample}}
 
-\newcommand{\precdata}{\hyperlink{precdata}{{\tt psb\_prec\_data}}}
-\newcommand{\descdata}{\hyperlink{descdata}{{\tt psb\_desc\_data}}}
-\newcommand{\spdata}{\hyperlink{spdata}{{\tt psb\_spmat\_data}}}
+\newcommand{\precdata}{\hyperlink{precdata}{{\tt psb\_prec\_type}}}
+\newcommand{\descdata}{\hyperlink{descdata}{{\tt psb\_desc\_type}}}
+\newcommand{\spdata}{\hyperlink{spdata}{{\tt psb\_spmat\_type}}}
 
 \begin{document}
 \include{title}
@@ -82,7 +83,6 @@
 \pagenumbering{arabic}  % Arabic numbering
 \setcounter{page}{1}    % Chapters start on page 1
 
-\precdata
 \include{intro}
 \include{datastruct}
 \include{psbrout}
