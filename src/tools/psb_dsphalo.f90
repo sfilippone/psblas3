@@ -28,7 +28,7 @@
 !!$  POSSIBILITY OF SUCH DAMAGE.
 !!$ 
 !!$  
-! File: psb_dspovr.f90
+! File: psb_dsphalo.f90
 !
 !*****************************************************************************
 !*                                                                           *
@@ -45,7 +45,7 @@
 !*                                                                           *
 !*                                                                           *
 !*****************************************************************************
-Subroutine psb_dspovr(a,desc_a,blk,info,rwcnv,clcnv,outfmt)
+Subroutine psb_dsphalo(a,desc_a,blk,info,rwcnv,clcnv,outfmt)
 
   use psb_serial_mod
   use psb_descriptor_type
@@ -80,10 +80,10 @@ Subroutine psb_dspovr(a,desc_a,blk,info,rwcnv,clcnv,outfmt)
 
   if(psb_get_errstatus().ne.0) return 
   info=0
-  name='psb_dspovr'
+  name='psb_dsphalo'
   call psb_erractionsave(err_act)
 
-  if(debug) write(0,*)'Inside DSPOVR'
+  if(debug) write(0,*)'Inside DSPHALO'
   if (present(rwcnv)) then 
     rwcnv_ = rwcnv
   else
@@ -114,7 +114,7 @@ Subroutine psb_dspovr(a,desc_a,blk,info,rwcnv,clcnv,outfmt)
      goto 9999
   end if
 
-  If (debug) Write(0,*)'dspovr',me
+  If (debug) Write(0,*)'dsphalo',me
 
 
   l1  = 0
@@ -185,7 +185,7 @@ Subroutine psb_dspovr(a,desc_a,blk,info,rwcnv,clcnv,outfmt)
 
   iszr=sum(rvsz)
   call psb_spreall(blk,max(iszr,1),info)
-  if(debug)  write(0,*)me,'SPOVR Sizes:',size(blk%ia1),size(blk%ia2)
+  if(debug)  write(0,*)me,'SPHALO Sizes:',size(blk%ia1),size(blk%ia2)
   if (info /= 0) then
      info=4010
      ch_err='psb_spreall'
@@ -237,7 +237,7 @@ Subroutine psb_dspovr(a,desc_a,blk,info,rwcnv,clcnv,outfmt)
     counter   = counter+n_el_send+3
   Enddo
   nz = tmp%infoa(psb_nnz_)
-!!$  call csprt(20+me,tmp,head='% SPOVR border SEND .')
+!!$  call csprt(20+me,tmp,head='% SPHALO border SEND .')
 !!$  close(20+me)
 
   if (rwcnv_) call psb_loc_to_glob(tmp%ia1(1:nz),desc_a,info,iact='I')
@@ -248,7 +248,7 @@ Subroutine psb_dspovr(a,desc_a,blk,info,rwcnv,clcnv,outfmt)
      call psb_errpush(info,name,a_err=ch_err)
      goto 9999
   end if
-!!$  call csprt(30+me,tmp,head='% SPOVR border SEND .')
+!!$  call csprt(30+me,tmp,head='% SPHALO border SEND .')
 !!$  close(30+me)
 
 
@@ -296,7 +296,7 @@ Subroutine psb_dspovr(a,desc_a,blk,info,rwcnv,clcnv,outfmt)
   blk%fida='COO'
   blk%infoa(psb_nnz_)=l1
 !!$  open(50+me)
-!!$  call csprt(50+me,blk,head='% SPOVR border .')
+!!$  call csprt(50+me,blk,head='% SPHALO border .')
 !!$  close(50+me)
   t4 = mpi_wtime()
 
@@ -305,7 +305,7 @@ Subroutine psb_dspovr(a,desc_a,blk,info,rwcnv,clcnv,outfmt)
   !
   ! Combined sort & conversion to CSR. 
   !
-  if(debug) write(0,*) me,'Calling ipcoo2csr from dspovr ',blk%m,blk%k,l1,blk%ia2(2)
+  if(debug) write(0,*) me,'Calling ipcoo2csr from dsphalo ',blk%m,blk%k,l1,blk%ia2(2)
 
   select case(outfmt_)
   case ('CSR') 
@@ -319,15 +319,15 @@ Subroutine psb_dspovr(a,desc_a,blk,info,rwcnv,clcnv,outfmt)
  case('COO')
     ! Do nothing! 
   case default
-    write(0,*) 'Error in DSPOVR : invalid outfmt "',outfmt_,'"'
+    write(0,*) 'Error in DSPHALO : invalid outfmt "',outfmt_,'"'
   end select
   t5 = mpi_wtime()
 
 
 
-!!$  write(0,'(i3,1x,a,4(1x,i14))') me,'DSPOVR sizes:',iszr,iszs
-!!$  write(0,'(i3,1x,a,4(1x,g14.5))') me,'DSPOVR timings:',t6-t2,t7-t6,t8-t7,t3-t8
-!!$  write(0,'(i3,1x,a,4(1x,g14.5))') me,'DSPOVR timings:',t2-t1,t3-t2,t4-t3,t5-t4
+!!$  write(0,'(i3,1x,a,4(1x,i14))') me,'DSPHALO sizes:',iszr,iszs
+!!$  write(0,'(i3,1x,a,4(1x,g14.5))') me,'DSPHALO timings:',t6-t2,t7-t6,t8-t7,t3-t8
+!!$  write(0,'(i3,1x,a,4(1x,g14.5))') me,'DSPHALO timings:',t2-t1,t3-t2,t4-t3,t5-t4
 
   Deallocate(sdid,brvindx,rvid,bsdindx,rvsz,sdsz,stat=info)
 
@@ -350,4 +350,4 @@ Subroutine psb_dspovr(a,desc_a,blk,info,rwcnv,clcnv,outfmt)
   end if
   return
 
-End Subroutine psb_dspovr
+End Subroutine psb_dsphalo

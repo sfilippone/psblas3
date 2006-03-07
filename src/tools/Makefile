@@ -9,7 +9,7 @@ FOBJS = psb_dallc.o psb_dasb.o psb_dcsrp.o psb_cdprt.o \
 	psb_glob_to_loc.o psb_ialloc.o psb_iasb.o \
 	psb_ifree.o psb_iins.o psb_loc_to_glob.o
 
-MPFOBJS = psb_cdovrbld.o psb_dspovr.o
+MPFOBJS = psb_cdovrbld.o psb_dsphalo.o
 
 INCDIRS = -I ../../lib -I .
 LIBDIR = ../../lib
