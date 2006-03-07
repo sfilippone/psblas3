@@ -481,10 +481,10 @@ contains
 
     if (associated(p%iprcparm)) then 
       if (p%iprcparm(f_type_)==f_slu_) then 
-        call fort_slu_free(p%iprcparm(slu_ptr_),info)
+        call psb_slu_free(p%iprcparm(slu_ptr_),info)
       end if
       if (p%iprcparm(f_type_)==f_umf_) then 
-        call fort_umf_free(p%iprcparm(umf_symptr_),&
+        call psb_umf_free(p%iprcparm(umf_symptr_),&
              & p%iprcparm(umf_numptr_),info)
       end if
       deallocate(p%iprcparm,stat=info)

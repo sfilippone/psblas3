@@ -591,9 +591,9 @@ subroutine psb_dbjacaply(prec,x,beta,y,desc_data,trans,work,info)
 
       select case(trans)
       case('N','n')
-        call fort_slu_solve(0,n_row,1,ww,n_row,prec%iprcparm(slu_ptr_),info)
+        call psb_slu_solve(0,n_row,1,ww,n_row,prec%iprcparm(slu_ptr_),info)
       case('T','t','C','c')
-        call fort_slu_solve(1,n_row,1,ww,n_row,prec%iprcparm(slu_ptr_),info)
+        call psb_slu_solve(1,n_row,1,ww,n_row,prec%iprcparm(slu_ptr_),info)
       end select
 
       if(info /=0) goto 9999
@@ -612,9 +612,9 @@ subroutine psb_dbjacaply(prec,x,beta,y,desc_data,trans,work,info)
 
       select case(trans)
       case('N','n')
-        call fort_umf_solve(0,n_row,ww,x,n_row,prec%iprcparm(umf_numptr_),info)
+        call psb_umf_solve(0,n_row,ww,x,n_row,prec%iprcparm(umf_numptr_),info)
       case('T','t','C','c')
-        call fort_umf_solve(1,n_row,ww,x,n_row,prec%iprcparm(umf_numptr_),info)
+        call psb_umf_solve(1,n_row,ww,x,n_row,prec%iprcparm(umf_numptr_),info)
       end select
 
       if(info /=0) goto 9999
@@ -678,7 +678,7 @@ subroutine psb_dbjacaply(prec,x,beta,y,desc_data,trans,work,info)
              &   prec%desc_data,info,work=aux)
         if(info /=0) goto 9999
 
-        call fort_slu_solve(0,n_row,1,ty,n_row,prec%iprcparm(slu_ptr_),info)
+        call psb_slu_solve(0,n_row,1,ty,n_row,prec%iprcparm(slu_ptr_),info)
         if(info /=0) goto 9999
         tx(1:n_row) = ty(1:n_row)        
       end do
@@ -690,7 +690,7 @@ subroutine psb_dbjacaply(prec,x,beta,y,desc_data,trans,work,info)
              &   prec%desc_data,info,work=aux)
         if(info /=0) goto 9999
 
-        call fort_umf_solve(0,n_row,ww,ty,n_row,&
+        call psb_umf_solve(0,n_row,ww,ty,n_row,&
              & prec%iprcparm(umf_numptr_),info)
         if(info /=0) goto 9999
         tx(1:n_row) = ww(1:n_row)        

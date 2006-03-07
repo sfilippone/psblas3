@@ -71,19 +71,19 @@ Availability:
 
 
 #ifdef Add_
-#define fort_umf_factor_ fort_umf_factor_
-#define fort_umf_solve_  fort_umf_solve_
-#define fort_umf_free_   fort_umf_free_
+#define psb_umf_factor_ psb_umf_factor_
+#define psb_umf_solve_  psb_umf_solve_
+#define psb_umf_free_   psb_umf_free_
 #endif
 #ifdef AddDouble_
-#define fort_umf_factor_ fort_umf_factor__
-#define fort_umf_solve_  fort_umf_solve__
-#define fort_umf_free_   fort_umf_free__
+#define psb_umf_factor_ psb_umf_factor__
+#define psb_umf_solve_  psb_umf_solve__
+#define psb_umf_free_   psb_umf_free__
 #endif
 #ifdef NoChange
-#define fort_umf_factor_ fort_umf_factor
-#define fort_umf_solve_  fort_umf_solve
-#define fort_umf_free_   fort_umf_free
+#define psb_umf_factor_ psb_umf_factor
+#define psb_umf_solve_  psb_umf_solve
+#define psb_umf_free_   psb_umf_free
 #endif
 
 
@@ -99,7 +99,7 @@ typedef int fptr;  /* 32-bit by default */
 #endif
 
 void
-fort_umf_factor_(int *n, int *nnz,
+psb_umf_factor_(int *n, int *nnz,
                  double *values, int *rowind, int *colptr,
 #ifdef Have_UMF_		 
 		 fptr *symptr, 
@@ -156,7 +156,7 @@ fort_umf_factor_(int *n, int *nnz,
 
 
 void
-fort_umf_solve_(int *itrans, int *n,  
+psb_umf_solve_(int *itrans, int *n,  
                  double *x,  double *b, int *ldb,
 #ifdef Have_UMF_		 
 		 fptr *numptr, 
@@ -197,7 +197,7 @@ fort_umf_solve_(int *itrans, int *n,
 
 
 void
-fort_umf_free_(
+psb_umf_free_(
 #ifdef Have_UMF_		 
 		 fptr *symptr, 
 		 fptr *numptr, 

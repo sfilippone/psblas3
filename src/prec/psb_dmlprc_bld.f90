@@ -51,15 +51,15 @@ subroutine psb_dmlprc_bld(a,desc_a,p,info)
   integer :: i, nrg, nzg, err_act,k
   character(len=20) :: name, ch_err
   
-  interface psb_ilu_bld
-     subroutine psb_dilu_bld(a,l,u,d,info,blck)
+  interface psb_ilu_fct
+     subroutine psb_dilu_fct(a,l,u,d,info,blck)
        use psb_spmat_type
        integer, intent(out)                ::     info
        type(psb_dspmat_type),intent(in)    :: a
        type(psb_dspmat_type),intent(inout) :: l,u
        type(psb_dspmat_type),intent(in), optional, target :: blck
        real(kind(1.d0)), intent(inout)     ::  d(:)
-     end subroutine psb_dilu_bld
+     end subroutine psb_dilu_fct
   end interface
 
   interface psb_genaggrmap
@@ -152,10 +152,10 @@ subroutine psb_dmlprc_bld(a,desc_a,p,info)
   case(f_ilu_n_,f_ilu_e_) 
      call psb_spreall(p%av(l_pr_),nzg,info)
      call psb_spreall(p%av(u_pr_),nzg,info)
-     call psb_ilu_bld(p%av(ac_),p%av(l_pr_),p%av(u_pr_),p%d,info)
+     call psb_ilu_fct(p%av(ac_),p%av(l_pr_),p%av(u_pr_),p%d,info)
      if(info /= 0) then
         info=4011
-        ch_err='psb_ilu_bld'
+        ch_err='psb_ilu_fct'
         call psb_errpush(info,name,a_err=ch_err)
         goto 9999
      end if
@@ -182,11 +182,11 @@ subroutine psb_dmlprc_bld(a,desc_a,p,info)
     p%av(ac_)%infoa(psb_nnz_) = k
     call psb_ipcoo2csr(p%av(ac_),info)
     call psb_spinfo(psb_nztotreq_,p%av(ac_),nzg,info)
-    call fort_slu_factor(nrg,nzg,&
+    call psb_slu_factor(nrg,nzg,&
          & p%av(ac_)%aspk,p%av(ac_)%ia2,p%av(ac_)%ia1,p%iprcparm(slu_ptr_),info)
      if(info /= 0) then
         info=4011
-        ch_err='psb_fort_slu_factor'
+        ch_err='psb_slu_factor'
         call psb_errpush(info,name,a_err=ch_err)
         goto 9999
      end if
@@ -213,12 +213,12 @@ subroutine psb_dmlprc_bld(a,desc_a,p,info)
     p%av(ac_)%infoa(psb_nnz_) = k
     call psb_ipcoo2csc(p%av(ac_),info)
     call psb_spinfo(psb_nztotreq_,p%av(ac_),nzg,info)
-    call fort_umf_factor(nrg,nzg,&
+    call psb_umf_factor(nrg,nzg,&
          & p%av(ac_)%aspk,p%av(ac_)%ia1,p%av(ac_)%ia2,&
          & p%iprcparm(umf_symptr_),p%iprcparm(umf_numptr_),info)
      if(info /= 0) then
         info=4011
-        ch_err='psb_fort_umf_factor'
+        ch_err='psb_umf_factor'
         call psb_errpush(info,name,a_err=ch_err)
         goto 9999
      end if

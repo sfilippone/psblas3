@@ -52,8 +52,8 @@ subroutine psb_dprecbld(a,p,desc_a,info,upd)
   type(psb_desc_type), intent(in)            :: desc_a
   character, intent(in), optional            :: upd
 
-  interface psb_cslu
-    subroutine psb_dcslu(a,desc_data,p,upd,info)
+  interface psb_ilu_bld
+    subroutine psb_dilu_bld(a,desc_data,p,upd,info)
       use psb_serial_mod
       use psb_descriptor_type
       use psb_prec_type
@@ -62,7 +62,7 @@ subroutine psb_dprecbld(a,p,desc_a,info,upd)
       type(psb_desc_type),intent(in)            :: desc_data
       type(psb_dbase_prec), intent(inout)       :: p
       character, intent(in)                     :: upd
-    end subroutine psb_dcslu
+    end subroutine psb_dilu_bld
   end interface
 
   interface psb_slu_bld
@@ -261,17 +261,17 @@ subroutine psb_dprecbld(a,p,desc_a,info,upd)
     call psb_check_def(p%baseprecv(1)%iprcparm(iren_),'renumbering',&
          &  renum_none_,is_legal_renum)
 
-    if (debug) write(0,*)me, ': Calling PSB_DCSLU'
+    if (debug) write(0,*)me, ': Calling PSB_ILU_BLD'
 
 
     select case(p%baseprecv(1)%iprcparm(f_type_))
 
     case(f_ilu_n_,f_ilu_e_) 
-      call psb_cslu(a,desc_a,p%baseprecv(1),iupd,info)
-      if(debug) write(0,*)me,': out of psb_dcslu'
+      call psb_ilu_bld(a,desc_a,p%baseprecv(1),iupd,info)
+      if(debug) write(0,*)me,': out of psb_ilu_bld'
       if(info /= 0) then
         info=4010
-        ch_err='psb_dcslu'
+        ch_err='psb_ilu_bld'
         call psb_errpush(info,name,a_err=ch_err)
         goto 9999
       end if

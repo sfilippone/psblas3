@@ -95,7 +95,7 @@ subroutine psb_dumf_bld(a,desc_a,p,info)
      call psb_errpush(info,name,a_err=ch_err)
      goto 9999
   end if
-  nza = atmp%infoa(psb_nnz_)
+  call psb_spinfo(psb_nztotreq_,atmp,nza,info)
   if (Debug) then 
      write(0,*) me, 'UMFBLD: Done csdp',info,nza,atmp%m,atmp%k
      call blacs_barrier(icontxt,'All')
@@ -109,7 +109,7 @@ subroutine psb_dumf_bld(a,desc_a,p,info)
      goto 9999
   end if
 
-  nzb = blck%infoa(psb_nnz_)
+  call psb_spinfo(psb_nztotreq_,blck,nzb,info)
   if (Debug) then 
      write(0,*) me, 'UMFBLD: Done asmatbld',info,nzb,blck%fida
      call blacs_barrier(icontxt,'All')
@@ -170,17 +170,17 @@ subroutine psb_dumf_bld(a,desc_a,p,info)
      goto 9999
   end if
   if (Debug) then 
-     write(0,*) me,'Calling fort_slu_factor ',nzt,atmp%m,&
+     write(0,*) me,'Calling psb_umf_factor ',nzt,atmp%m,&
           & atmp%k,p%desc_data%matrix_data(psb_n_row_)
      call blacs_barrier(icontxt,'All')
   endif
 
-  call fort_umf_factor(atmp%m,nzt,&
+  call psb_umf_factor(atmp%m,nzt,&
        & atmp%aspk,atmp%ia1,atmp%ia2,&
        & p%iprcparm(umf_symptr_),p%iprcparm(umf_numptr_),info)
   if(info /= 0) then
      info=4010
-     ch_err='fort_umf_fact'
+     ch_err='psb_umf_fact'
      call psb_errpush(info,name,a_err=ch_err)
      goto 9999
   end if

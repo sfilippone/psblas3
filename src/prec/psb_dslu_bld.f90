@@ -170,16 +170,16 @@ subroutine psb_dslu_bld(a,desc_a,p,info)
      goto 9999
   end if
   if (Debug) then 
-     write(0,*) me,'Calling fort_slu_factor ',nzt,atmp%m,&
+     write(0,*) me,'Calling psb_slu_factor ',nzt,atmp%m,&
           & atmp%k,p%desc_data%matrix_data(psb_n_row_)
      call blacs_barrier(icontxt,'All')
   endif
 
-  call fort_slu_factor(atmp%m,nzt,&
+  call psb_slu_factor(atmp%m,nzt,&
        & atmp%aspk,atmp%ia2,atmp%ia1,p%iprcparm(slu_ptr_),info)
   if(info /= 0) then
      info=4010
-     ch_err='fort_slu_fact'
+     ch_err='psb_slu_fact'
      call psb_errpush(info,name,a_err=ch_err)
      goto 9999
   end if

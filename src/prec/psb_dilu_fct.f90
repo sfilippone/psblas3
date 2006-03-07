@@ -33,7 +33,7 @@
 !!$  POSSIBILITY OF SUCH DAMAGE.
 !!$ 
 !!$  
-subroutine psb_dilu_bld(a,l,u,d,info,blck)
+subroutine psb_dilu_fct(a,l,u,d,info,blck)
   
   !
   ! This routine copies and factors "on the fly" from A and BLCK
@@ -86,11 +86,11 @@ subroutine psb_dilu_bld(a,l,u,d,info,blck)
     blck_%m=0
   endif
 
-  call psb_dilu_bldint(m,a%m,a,blck_%m,blck_,&
+  call psb_dilu_fctint(m,a%m,a,blck_%m,blck_,&
        & d,l%aspk,l%ia1,l%ia2,u%aspk,u%ia1,u%ia2,l1,l2,info)
   if(info.ne.0) then
      info=4010
-     ch_err='psb_dilu_bldint'
+     ch_err='psb_dilu_fctint'
      call psb_errpush(info,name,a_err=ch_err)
      goto 9999
   end if
@@ -130,7 +130,7 @@ subroutine psb_dilu_bld(a,l,u,d,info,blck)
   return
 
 contains
-  subroutine psb_dilu_bldint(m,ma,a,mb,b,&
+  subroutine psb_dilu_fctint(m,ma,a,mb,b,&
        & d,laspk,lia1,lia2,uaspk,uia1,uia2,l1,l2,info)
     implicit none 
 
@@ -148,7 +148,7 @@ contains
     integer             :: int_err(5) 
     character(len=20)   :: name, ch_err
 
-    name='psb_dilu_bldint'
+    name='psb_dilu_fctint'
     if(psb_get_errstatus().ne.0) return 
     info=0
     call psb_erractionsave(err_act)
@@ -461,7 +461,7 @@ contains
       call psb_errpush(info,name,a_err=ch_err)
       goto 9999
     end if
-    if(debug) write(0,*)'Leaving dcsrlu'
+    if(debug) write(0,*)'Leaving ilu_fct'
 
     call psb_erractionrestore(err_act)
     return
@@ -473,5 +473,5 @@ contains
       return
     end if
     return
-  end subroutine psb_dilu_bldint
-end subroutine psb_dilu_bld
+  end subroutine psb_dilu_fctint
+end subroutine psb_dilu_fct

@@ -111,26 +111,26 @@ typedef struct {
 
 
 #ifdef Add_
-#define fort_slu_factor_ fort_slu_factor_
-#define fort_slu_solve_  fort_slu_solve_
-#define fort_slu_free_   fort_slu_free_
+#define psb_slu_factor_ psb_slu_factor_
+#define psb_slu_solve_  psb_slu_solve_
+#define psb_slu_free_   psb_slu_free_
 #endif
 #ifdef AddDouble_
-#define fort_slu_factor_ fort_slu_factor__
-#define fort_slu_solve_  fort_slu_solve__
-#define fort_slu_free_   fort_slu_free__
+#define psb_slu_factor_ psb_slu_factor__
+#define psb_slu_solve_  psb_slu_solve__
+#define psb_slu_free_   psb_slu_free__
 #endif
 #ifdef NoChange
-#define fort_slu_factor_ fort_slu_factor
-#define fort_slu_solve_  fort_slu_solve
-#define fort_slu_free_   fort_slu_free
+#define psb_slu_factor_ psb_slu_factor
+#define psb_slu_solve_  psb_slu_solve
+#define psb_slu_free_   psb_slu_free
 #endif
 
 
 
 
 void
-fort_slu_factor_(int *n, int *nnz,
+psb_slu_factor_(int *n, int *nnz,
                  double *values, int *rowind, int *colptr,
 #ifdef Have_SLU_		 
 		 fptr *f_factors, /* a handle containing the address
@@ -254,7 +254,7 @@ fort_slu_factor_(int *n, int *nnz,
 
 
 void
-fort_slu_solve_(int *itrans, int *n, int *nrhs, 
+psb_slu_solve_(int *itrans, int *n, int *nrhs, 
                  double *b, int *ldb,
 #ifdef Have_SLU_		 
 		 fptr *f_factors, /* a handle containing the address
@@ -320,7 +320,7 @@ fort_slu_solve_(int *itrans, int *n, int *nrhs,
 
 
 void
-fort_slu_free_(
+psb_slu_free_(
 #ifdef Have_SLU_		 
  fptr *f_factors, /* a handle containing the address
 				     pointing to the factored matrices */
