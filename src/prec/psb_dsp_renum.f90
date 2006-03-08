@@ -45,10 +45,10 @@ subroutine psb_dsp_renum(a,desc_a,blck,p,atmp,info)
   implicit none
 
   !     .. array Arguments ..                                                     
-  type(psb_dspmat_type), intent(in)    :: a,blck
-  type(psb_dspmat_type), intent(inout) :: atmp
-  type(psb_dbase_prec), intent(inout)  :: p
-  type(psb_desc_type), intent(in)      :: desc_a
+  type(psb_dspmat_type), intent(in)      :: a,blck
+  type(psb_dspmat_type), intent(inout)   :: atmp
+  type(psb_dbaseprc_type), intent(inout) :: p
+  type(psb_desc_type), intent(in)        :: desc_a
   integer, intent(out)   :: info
 
 

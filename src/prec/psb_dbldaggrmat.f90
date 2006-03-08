@@ -44,7 +44,7 @@ subroutine psb_dbldaggrmat(a,desc_a,ac,p,desc_p,info)
   implicit none
 
   type(psb_dspmat_type), intent(in), target  :: a
-  type(psb_dbase_prec), intent(inout)        :: p
+  type(psb_dbaseprc_type), intent(inout)     :: p
   type(psb_dspmat_type), intent(out), target :: ac
   type(psb_desc_type), intent(in)            :: desc_a
   type(psb_desc_type), intent(inout)         :: desc_p

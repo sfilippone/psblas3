@@ -270,8 +270,8 @@ subroutine psb_dbicg(a,prec,b,x,eps,desc_a,info,&
       itx = itx + 1
       if (debug) write(*,*) 'iteration: ',itx
 
-      call psb_prcaply(prec,r,z,desc_a,info,work=aux)
-      call psb_prcaply(prec,rt,zt,desc_a,info,trans='t',work=aux)
+      call psb_prc_aply(prec,r,z,desc_a,info,work=aux)
+      call psb_prc_aply(prec,rt,zt,desc_a,info,trans='t',work=aux)
 
       rho_old = rho    
       rho = psb_dot(rt,z,desc_a,info)

@@ -37,7 +37,7 @@ module psb_prec_type
 
   use psb_spmat_type
   use psb_descriptor_type
-  
+
   integer, parameter :: min_prec_=0, noprec_=0, diagsc_=1, bja_=2,&
        & asm_=3, ras_=5, ash_=4, rash_=6, ras2lv_=7, ras2lvm_=8,&
        & lv2mras_=9, lv2smth_=10, lv2lsm_=11, sl2sm_=12, superlu_=13,&
@@ -82,7 +82,7 @@ module psb_prec_type
   integer, parameter :: smth_avsz=6, max_avsz=smth_avsz 
 
 
-  type psb_dbase_prec
+  type psb_dbaseprc_type
 
     type(psb_dspmat_type), pointer :: av(:) => null() !
     real(kind(1.d0)), pointer      :: d(:)  => null()
@@ -93,16 +93,16 @@ module psb_prec_type
     integer, pointer               :: mlia(:)  => null(), nlaggr(:)  => null() !
     type(psb_dspmat_type), pointer :: aorig    => null() !
     real(kind(1.d0)), pointer      :: dorig(:) => null() !
-    
- end type psb_dbase_prec
-  
+
+  end type psb_dbaseprc_type
+
   type psb_dprec_type
-    type(psb_dbase_prec), pointer :: baseprecv(:) => null()
+    type(psb_dbaseprc_type), pointer :: baseprecv(:) => null()
     ! contain type of preconditioning to be performed
     integer                       :: prec, base_prec
- end type psb_dprec_type
+  end type psb_dprec_type
 
-  
+
   character(len=15), parameter, private :: &
        &  smooth_names(1:3)=(/'Pre-smoothing ','Post-smoothing',&
        & 'Smooth both   '/)
@@ -139,7 +139,7 @@ module psb_prec_type
   interface psb_prec_short_descr
     module procedure psb_prec_short_descr
   end interface
-  
+
 contains
 
   subroutine psb_file_prec_descr(iout,p)
@@ -282,14 +282,14 @@ contains
   function is_legal_base_prec(ip)
     integer, intent(in) :: ip
     logical             :: is_legal_base_prec
-    
+
     is_legal_base_prec = ((ip>=noprec_).and.(ip<=rash_))
     return
   end function is_legal_base_prec
   function is_legal_n_ovr(ip)
     integer, intent(in) :: ip
     logical             :: is_legal_n_ovr
-    
+
     is_legal_n_ovr = (ip >=0) 
     return
   end function is_legal_n_ovr
@@ -303,89 +303,89 @@ contains
   function is_legal_jac_sweeps(ip)
     integer, intent(in) :: ip
     logical             :: is_legal_jac_sweeps
-    
+
     is_legal_jac_sweeps = (ip >= 1) 
     return
   end function is_legal_jac_sweeps
   function is_legal_prolong(ip)
     integer, intent(in) :: ip
     logical             :: is_legal_prolong
-    
+
     is_legal_prolong = ((ip>=none_).and.(ip<=square_root_))
     return
   end function is_legal_prolong
   function is_legal_restrict(ip)
     integer, intent(in) :: ip
     logical             :: is_legal_restrict
-    
+
     is_legal_restrict = ((ip==nohalo_).or.(ip==halo_))
     return
   end function is_legal_restrict
   function is_legal_ml_type(ip)
     integer, intent(in) :: ip
     logical             :: is_legal_ml_type
-    
+
     is_legal_ml_type = ((ip>=no_ml_).and.(ip<=max_ml_))
     return
   end function is_legal_ml_type
   function is_legal_ml_aggr_kind(ip)
     integer, intent(in) :: ip
     logical             :: is_legal_ml_aggr_kind
-    
+
     is_legal_ml_aggr_kind = ((ip>=loc_aggr_).and.(ip<=max_aggr_))
     return
   end function is_legal_ml_aggr_kind
   function is_legal_ml_smooth_pos(ip)
     integer, intent(in) :: ip
     logical             :: is_legal_ml_smooth_pos
-    
+
     is_legal_ml_smooth_pos = ((ip>=pre_smooth_).and.(ip<=max_smooth_))
     return
   end function is_legal_ml_smooth_pos
   function is_legal_ml_smth_kind(ip)
     integer, intent(in) :: ip
     logical             :: is_legal_ml_smth_kind
-    
+
     is_legal_ml_smth_kind = ((ip>=no_smth_).and.(ip<=smth_biz_))
     return
   end function is_legal_ml_smth_kind
   function is_legal_ml_coarse_mat(ip)
     integer, intent(in) :: ip
     logical             :: is_legal_ml_coarse_mat
-    
+
     is_legal_ml_coarse_mat = ((ip>=mat_distr_).and.(ip<=mat_repl_))
     return
   end function is_legal_ml_coarse_mat
   function is_legal_ml_fact(ip)
     integer, intent(in) :: ip
     logical             :: is_legal_ml_fact
-    
+
     is_legal_ml_fact = ((ip>=f_ilu_n_).and.(ip<=f_umf_))
     return
   end function is_legal_ml_fact
   function is_legal_ml_lev(ip)
     integer, intent(in) :: ip
     logical             :: is_legal_ml_lev
-    
+
     is_legal_ml_lev = (ip>=0)
     return
   end function is_legal_ml_lev
   function is_legal_omega(ip)
     real(kind(1.d0)), intent(in) :: ip
     logical             :: is_legal_omega
-    
+
     is_legal_omega = ((ip>=0.0d0).and.(ip<=2.0d0))
     return
   end function is_legal_omega
   function is_legal_ml_eps(ip)
     real(kind(1.d0)), intent(in) :: ip
     logical             :: is_legal_ml_eps
-    
+
     is_legal_ml_eps = (ip>=0.0d0)
     return
   end function is_legal_ml_eps
 
-  
+
   subroutine psb_icheck_def(ip,name,id,is_legal)
     integer, intent(inout) :: ip
     integer, intent(in)    :: id
@@ -424,7 +424,7 @@ contains
     use psb_serial_mod
     use psb_descriptor_type
     use psb_tools_mod
-    type(psb_dbase_prec), intent(inout) :: p
+    type(psb_dbaseprc_type), intent(inout) :: p
     integer, intent(out)                :: info
     integer :: i
 
@@ -454,7 +454,7 @@ contains
     endif
     if (associated(p%dprcparm)) then 
       deallocate(p%dprcparm,stat=info)
-    end if    
+    end if
     if (associated(p%aorig)) then 
       ! This is a pointer to something else, must not free it here. 
       nullify(p%aorig) 
@@ -494,11 +494,11 @@ contains
 
   subroutine psb_nullify_baseprec(p)
     use psb_descriptor_type
-    type(psb_dbase_prec), intent(inout) :: p
-    
+    type(psb_dbaseprc_type), intent(inout) :: p
+
     nullify(p%av,p%d,p%iprcparm,p%dprcparm,p%perm,p%invperm,p%mlia,&
          & p%nlaggr,p%aorig,p%dorig,p%desc_data)
-    
+
   end subroutine psb_nullify_baseprec
 
   function pr_to_str(iprec)

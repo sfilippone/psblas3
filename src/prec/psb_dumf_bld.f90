@@ -42,10 +42,10 @@ subroutine psb_dumf_bld(a,desc_a,p,info)
   use psb_const_mod
   implicit none 
 
-  type(psb_dspmat_type), intent(in)   :: a
-  type(psb_desc_type), intent(in)     :: desc_a
-  type(psb_dbase_prec), intent(inout) :: p
-  integer, intent(out)                :: info
+  type(psb_dspmat_type), intent(in)      :: a
+  type(psb_desc_type), intent(in)        :: desc_a
+  type(psb_dbaseprc_type), intent(inout) :: p
+  integer, intent(out)                   :: info
 
 
   type(psb_dspmat_type)    :: blck, atmp

@@ -33,7 +33,7 @@
 !!$  POSSIBILITY OF SUCH DAMAGE.
 !!$ 
 !!$  
-subroutine psb_dprecaply(prec,x,y,desc_data,info,trans, work)
+subroutine psb_dprc_aply(prec,x,y,desc_data,info,trans, work)
 
   use psb_serial_mod
   use psb_descriptor_type
@@ -59,35 +59,35 @@ subroutine psb_dprecaply(prec,x,y,desc_data,info,trans, work)
   external mpi_wtime
   character(len=20)   :: name, ch_err
 
-  interface
-     subroutine psb_dbaseprcaply(prec,x,beta,y,desc_data,trans,work,info)
+  interface psb_baseprc_aply
+     subroutine psb_dbaseprc_aply(prec,x,beta,y,desc_data,trans,work,info)
        use psb_descriptor_type
        use psb_prec_type
-       type(psb_desc_type),intent(in)    :: desc_data
-       type(psb_dbase_prec), intent(in)  :: prec
-       real(kind(0.d0)),intent(inout)    :: x(:), y(:)
-       real(kind(0.d0)),intent(in)       :: beta
-       character(len=1)                  :: trans
-       real(kind(0.d0)),target           :: work(:)
-       integer, intent(out)              :: info
-     end subroutine psb_dbaseprcaply
+       type(psb_desc_type),intent(in)      :: desc_data
+       type(psb_dbaseprc_type), intent(in) :: prec
+       real(kind(0.d0)),intent(inout)      :: x(:), y(:)
+       real(kind(0.d0)),intent(in)         :: beta
+       character(len=1)                    :: trans
+       real(kind(0.d0)),target             :: work(:)
+       integer, intent(out)                :: info
+     end subroutine psb_dbaseprc_aply
   end interface
 
-  interface
-     subroutine psb_dmlprcaply(baseprecv,x,beta,y,desc_data,trans,work,info)
+  interface psb_mlprc_aply
+     subroutine psb_dmlprc_aply(baseprecv,x,beta,y,desc_data,trans,work,info)
        use psb_descriptor_type
        use psb_prec_type
-       type(psb_desc_type),intent(in)    :: desc_data
-       type(psb_dbase_prec), intent(in)  :: baseprecv(:)
-       real(kind(0.d0)),intent(in)       :: beta
-       real(kind(0.d0)),intent(inout)    :: x(:), y(:)
-       character                         :: trans
-       real(kind(0.d0)),target           :: work(:)
-       integer, intent(out)              :: info
-     end subroutine psb_dmlprcaply
+       type(psb_desc_type),intent(in)      :: desc_data
+       type(psb_dbaseprc_type), intent(in) :: baseprecv(:)
+       real(kind(0.d0)),intent(in)         :: beta
+       real(kind(0.d0)),intent(inout)      :: x(:), y(:)
+       character                           :: trans
+       real(kind(0.d0)),target             :: work(:)
+       integer, intent(out)                :: info
+     end subroutine psb_dmlprc_aply
   end interface
   
-  name='psb_dprecaply'
+  name='psb_dprc_aply'
   info = 0
   call psb_erractionsave(err_act)
 
@@ -115,15 +115,15 @@ subroutine psb_dprecaply(prec,x,y,desc_data,info,trans, work)
     write(0,*) 'Inconsistent preconditioner: neither SMTH nor BASE?'      
   end if
   if (size(prec%baseprecv) >1) then 
-    if (debug) write(0,*) 'Into mlprcaply',size(x),size(y)
-    call psb_dmlprcaply(prec%baseprecv,x,zero,y,desc_data,trans_,work_,info)
+    if (debug) write(0,*) 'Into mlprc_aply',size(x),size(y)
+    call psb_mlprc_aply(prec%baseprecv,x,zero,y,desc_data,trans_,work_,info)
     if(info /= 0) then
-      call psb_errpush(4010,name,a_err='psb_dmlprcaply')
+      call psb_errpush(4010,name,a_err='psb_dmlprc_aply')
       goto 9999
     end if
 
   else  if (size(prec%baseprecv) == 1) then 
-    call psb_dbaseprcaply(prec%baseprecv(1),x,zero,y,desc_data,trans_, work_,info)
+    call psb_baseprc_aply(prec%baseprecv(1),x,zero,y,desc_data,trans_, work_,info)
   else 
     write(0,*) 'Inconsistent preconditioner: size of baseprecv???' 
   endif
@@ -144,7 +144,7 @@ subroutine psb_dprecaply(prec,x,y,desc_data,info,trans, work)
   end if
   return
 
-end subroutine psb_dprecaply
+end subroutine psb_dprc_aply
 
 
 !!$ 
@@ -183,7 +183,7 @@ end subroutine psb_dprecaply
 !!$ 
 !!$  
 
-subroutine psb_dbaseprcaply(prec,x,beta,y,desc_data,trans,work,info)
+subroutine psb_dbaseprc_aply(prec,x,beta,y,desc_data,trans,work,info)
   !
   !  Compute   Y <-  beta*Y + K^-1 X 
   !  where K is a a basic preconditioner stored in prec
@@ -197,13 +197,13 @@ subroutine psb_dbaseprcaply(prec,x,beta,y,desc_data,trans,work,info)
   use psb_error_mod
   implicit none 
 
-  type(psb_desc_type),intent(in)    :: desc_data
-  type(psb_dbase_prec), intent(in)  :: prec
-  real(kind(0.d0)),intent(inout)    :: x(:), y(:)
-  real(kind(0.d0)),intent(in)       :: beta
-  character(len=1)                  :: trans
-  real(kind(0.d0)),target           :: work(:)
-  integer, intent(out)              :: info
+  type(psb_desc_type),intent(in)      :: desc_data
+  type(psb_dbaseprc_type), intent(in) :: prec
+  real(kind(0.d0)),intent(inout)      :: x(:), y(:)
+  real(kind(0.d0)),intent(in)         :: beta
+  character(len=1)                    :: trans
+  real(kind(0.d0)),target             :: work(:)
+  integer, intent(out)                :: info
 
   ! Local variables
   integer :: n_row,n_col, int_err(5)
@@ -216,21 +216,21 @@ subroutine psb_dbaseprcaply(prec,x,beta,y,desc_data,trans,work,info)
   external mpi_wtime
   character(len=20)   :: name, ch_err
 
-  interface
-     subroutine psb_dbjacaply(prec,x,beta,y,desc_data,trans,work,info)
+  interface psb_bjac_aply
+     subroutine psb_dbjac_aply(prec,x,beta,y,desc_data,trans,work,info)
        use psb_descriptor_type
        use psb_prec_type
        type(psb_desc_type), intent(in)       :: desc_data
-       type(psb_dbase_prec), intent(in)      :: prec
+       type(psb_dbaseprc_type), intent(in)   :: prec
        real(kind(0.d0)),intent(inout)        :: x(:), y(:)
        real(kind(0.d0)),intent(in)           :: beta
        character(len=1)                      :: trans
        real(kind(0.d0)),target               :: work(:)
        integer, intent(out)                  :: info
-     end subroutine psb_dbjacaply
+     end subroutine psb_dbjac_aply
   end interface
   
-  name='psb_dbaseprcaply'
+  name='psb_dbaseprc_aply'
   info = 0
   call psb_erractionsave(err_act)
 
@@ -280,10 +280,10 @@ subroutine psb_dbaseprcaply(prec,x,beta,y,desc_data,trans,work,info)
 
   case(bja_)
 
-    call psb_dbjacaply(prec,x,beta,y,desc_data,trans,work,info)
+    call psb_bjac_aply(prec,x,beta,y,desc_data,trans,work,info)
     if(info.ne.0) then
        info=4010
-       ch_err='psb_bjacaply'
+       ch_err='psb_bjac_aply'
        goto 9999
     end if
 
@@ -291,7 +291,7 @@ subroutine psb_dbaseprcaply(prec,x,beta,y,desc_data,trans,work,info)
 
     if (prec%iprcparm(n_ovr_)==0) then 
       ! shortcut: this fixes performance for RAS(0) == BJA
-      call psb_dbjacaply(prec,x,beta,y,desc_data,trans,work,info)
+      call psb_bjac_aply(prec,x,beta,y,desc_data,trans,work,info)
       if(info.ne.0) then
         info=4010
         ch_err='psb_bjacaply'
@@ -350,7 +350,7 @@ subroutine psb_dbaseprcaply(prec,x,beta,y,desc_data,trans,work,info)
           goto 9999
         end if
       else if (prec%iprcparm(restr_) /= psb_none_) then 
-        write(0,*) 'Problem in PRCAPLY: Unknown value for restriction ',&
+        write(0,*) 'Problem in PRC_APLY: Unknown value for restriction ',&
              &prec%iprcparm(restr_)
       end if
 
@@ -363,10 +363,10 @@ subroutine psb_dbaseprcaply(prec,x,beta,y,desc_data,trans,work,info)
         end if
       endif
 
-      call psb_dbjacaply(prec,tx,zero,ty,prec%desc_data,trans,aux,info)
+      call psb_bjac_aply(prec,tx,zero,ty,prec%desc_data,trans,aux,info)
       if(info.ne.0) then
         info=4010
-        ch_err='psb_bjacaply'
+        ch_err='psb_bjac_aply'
         goto 9999
       end if
 
@@ -395,7 +395,7 @@ subroutine psb_dbaseprcaply(prec,x,beta,y,desc_data,trans,work,info)
         end if
 
       case default
-        write(0,*) 'Problem in PRCAPLY: Unknown value for prolongation ',&
+        write(0,*) 'Problem in PRC_APLY: Unknown value for prolongation ',&
              & prec%iprcparm(prol_)
       end select
 
@@ -440,7 +440,7 @@ subroutine psb_dbaseprcaply(prec,x,beta,y,desc_data,trans,work,info)
   end if
   return
 
-end subroutine psb_dbaseprcaply
+end subroutine psb_dbaseprc_aply
 
 
 
@@ -479,7 +479,7 @@ end subroutine psb_dbaseprcaply
 !!$  POSSIBILITY OF SUCH DAMAGE.
 !!$ 
 !!$  
-subroutine psb_dbjacaply(prec,x,beta,y,desc_data,trans,work,info)
+subroutine psb_dbjac_aply(prec,x,beta,y,desc_data,trans,work,info)
   !
   !  Compute   Y <-  beta*Y + K^-1 X 
   !  where K is a a Block Jacobi  preconditioner stored in prec
@@ -496,7 +496,7 @@ subroutine psb_dbjacaply(prec,x,beta,y,desc_data,trans,work,info)
   implicit none 
 
   type(psb_desc_type), intent(in)       :: desc_data
-  type(psb_dbase_prec), intent(in)      :: prec
+  type(psb_dbaseprc_type), intent(in)   :: prec
   real(kind(0.d0)),intent(inout)        :: x(:), y(:)
   real(kind(0.d0)),intent(in)           :: beta
   character(len=1)                      :: trans
@@ -514,7 +514,7 @@ subroutine psb_dbjacaply(prec,x,beta,y,desc_data,trans,work,info)
   external mpi_wtime
   character(len=20)   :: name, ch_err
 
-  name='psb_dbjacaply'
+  name='psb_bjac_aply'
   info = 0
   call psb_erractionsave(err_act)
 
@@ -630,7 +630,7 @@ subroutine psb_dbjacaply(prec,x,beta,y,desc_data,trans,work,info)
       endif
 
     case default
-      write(0,*) 'Unknown factorization type in bjac_prcaply',prec%iprcparm(f_type_)
+      write(0,*) 'Unknown factorization type in bjac_aply',prec%iprcparm(f_type_)
     end select
     if (debugprt) write(0,*)' Y: ',y(:)
 
@@ -739,7 +739,7 @@ subroutine psb_dbjacaply(prec,x,beta,y,desc_data,trans,work,info)
   end if
   return
 
-end subroutine psb_dbjacaply
+end subroutine psb_dbjac_aply
 
 
 !!$ 
@@ -777,7 +777,7 @@ end subroutine psb_dbjacaply
 !!$  POSSIBILITY OF SUCH DAMAGE.
 !!$ 
 !!$  
-subroutine psb_dmlprcaply(baseprecv,x,beta,y,desc_data,trans,work,info)
+subroutine psb_dmlprc_aply(baseprecv,x,beta,y,desc_data,trans,work,info)
   !
   !  Compute   Y <-  beta*Y + K^-1 X 
   !  where K is a multilevel (actually 2-level) preconditioner stored in prec
@@ -792,13 +792,13 @@ subroutine psb_dmlprcaply(baseprecv,x,beta,y,desc_data,trans,work,info)
   use psb_error_mod
   implicit none
 
-  type(psb_desc_type),intent(in)    :: desc_data
-  type(psb_dbase_prec), intent(in)  :: baseprecv(:)
-  real(kind(0.d0)),intent(in)       :: beta
-  real(kind(0.d0)),intent(inout)    :: x(:), y(:)
-  character                         :: trans
-  real(kind(0.d0)),target           :: work(:)
-  integer, intent(out)              :: info
+  type(psb_desc_type),intent(in)      :: desc_data
+  type(psb_dbaseprc_type), intent(in) :: baseprecv(:)
+  real(kind(0.d0)),intent(in)         :: beta
+  real(kind(0.d0)),intent(inout)      :: x(:), y(:)
+  character                           :: trans
+  real(kind(0.d0)),target             :: work(:)
+  integer, intent(out)                :: info
 
 
   ! Local variables
@@ -815,21 +815,21 @@ subroutine psb_dmlprcaply(baseprecv,x,beta,y,desc_data,trans,work,info)
   external mpi_wtime
   character(len=20)   :: name, ch_err
 
-  interface
-     subroutine psb_dbaseprcaply(prec,x,beta,y,desc_data,trans,work,info)
+  interface psb_baseprc_aply
+     subroutine psb_dbaseprc_aply(prec,x,beta,y,desc_data,trans,work,info)
        use psb_descriptor_type
        use psb_prec_type
-       type(psb_desc_type),intent(in)    :: desc_data
-       type(psb_dbase_prec), intent(in)  :: prec
-       real(kind(0.d0)),intent(inout)    :: x(:), y(:)
-       real(kind(0.d0)),intent(in)       :: beta
-       character(len=1)                  :: trans
-       real(kind(0.d0)),target           :: work(:)
-       integer, intent(out)              :: info
-     end subroutine psb_dbaseprcaply
+       type(psb_desc_type),intent(in)      :: desc_data
+       type(psb_dbaseprc_type), intent(in) :: prec
+       real(kind(0.d0)),intent(inout)      :: x(:), y(:)
+       real(kind(0.d0)),intent(in)         :: beta
+       character(len=1)                    :: trans
+       real(kind(0.d0)),target             :: work(:)
+       integer, intent(out)                :: info
+     end subroutine psb_dbaseprc_aply
   end interface
 
-  name='psb_dmlprcaply'
+  name='psb_dmlprc_aply'
   info = 0
   call psb_erractionsave(err_act)
 
@@ -843,7 +843,7 @@ subroutine psb_dmlprcaply(baseprecv,x,beta,y,desc_data,trans,work,info)
   select case(baseprecv(2)%iprcparm(ml_type_)) 
   case(no_ml_) 
     ! Should not really get here.
-    write(0,*) 'Smooth preconditioner with no multilevel in MLPRCAPLY????' 
+    write(0,*) 'Smooth preconditioner with no multilevel in MLPRC_APLY????' 
 
   case(add_ml_prec_)
 
@@ -853,7 +853,7 @@ subroutine psb_dmlprcaply(baseprecv,x,beta,y,desc_data,trans,work,info)
     t1 = mpi_wtime()
     n_row = desc_data%matrix_data(psb_n_row_)
     n_col = baseprecv(1)%desc_data%matrix_data(psb_n_col_)
-    call psb_dbaseprcaply(baseprecv(1),x,beta,y,desc_data,trans,work,info)
+    call psb_baseprc_aply(baseprecv(1),x,beta,y,desc_data,trans,work,info)
     if(info /=0) goto 9999
 
     nr2l  = baseprecv(2)%desc_data%matrix_data(psb_n_col_)
@@ -912,7 +912,8 @@ subroutine psb_dmlprcaply(baseprecv,x,beta,y,desc_data,trans,work,info)
     endif
 
     w2l=t2l
-    call psb_dbaseprcaply(baseprecv(2),w2l,zero,t2l,baseprecv(2)%desc_data,'N',work,info)
+    call psb_baseprc_aply(baseprecv(2),w2l,zero,t2l,baseprecv(2)%desc_data,&
+         & 'N',work,info)
 
 
     if (ismth  /= no_smth_) then 
@@ -1015,7 +1016,8 @@ subroutine psb_dmlprcaply(baseprecv,x,beta,y,desc_data,trans,work,info)
 
       t6 = mpi_wtime()
       w2l=t2l
-      call psb_dbaseprcaply(baseprecv(2),w2l,zero,t2l,baseprecv(2)%desc_data,'N',work,info)
+      call psb_baseprc_aply(baseprecv(2),w2l,zero,t2l,baseprecv(2)%desc_data,&
+           &'N',work,info)
       if(info /=0) goto 9999
 
       if (ismth  /= no_smth_) then 
@@ -1039,7 +1041,8 @@ subroutine psb_dmlprcaply(baseprecv,x,beta,y,desc_data,trans,work,info)
       call psb_spmm(-one,baseprecv(2)%aorig,ty,one,tx,desc_data,info,work=work)
       if(info /=0) goto 9999
 
-      call psb_dbaseprcaply(baseprecv(1),tx,one,ty,desc_data,trans,work,info)
+      call psb_baseprc_aply(baseprecv(1),tx,one,ty,desc_data,trans,&
+           & work,info)
       if(info /=0) goto 9999
 
       call psb_axpby(one,ty,beta,y,desc_data,info)
@@ -1073,7 +1076,8 @@ subroutine psb_dmlprcaply(baseprecv,x,beta,y,desc_data,trans,work,info)
       call psb_axpby(one,y,zero,ty,desc_data,info)
       if(info /=0) goto 9999
 
-      call psb_dbaseprcaply(baseprecv(1),x,zero,tty,desc_data,trans,work,info)
+      call psb_baseprc_aply(baseprecv(1),x,zero,tty,desc_data,&
+           &  trans,work,info)
       if(info /=0) goto 9999
 
       call psb_spmm(-one,baseprecv(2)%aorig,tty,one,tx,desc_data,info,work=work)
@@ -1115,7 +1119,8 @@ subroutine psb_dmlprcaply(baseprecv,x,beta,y,desc_data,trans,work,info)
 
       t6 = mpi_wtime()
       w2l=t2l
-      call psb_dbaseprcaply(baseprecv(2),w2l,zero,t2l,baseprecv(2)%desc_data,'N',work,info)
+      call psb_baseprc_aply(baseprecv(2),w2l,zero,t2l,baseprecv(2)%desc_data,&
+           &  'N',work,info)
       if(info /=0) goto 9999
 
       if (ismth  /= no_smth_) then 
@@ -1170,7 +1175,7 @@ subroutine psb_dmlprcaply(baseprecv,x,beta,y,desc_data,trans,work,info)
       call psb_axpby(one,y,zero,ty,desc_data,info)
       if(info /=0) goto 9999
 
-      call psb_dbaseprcaply(baseprecv(1),tx,zero,tty,desc_data,trans,work,info)
+      call psb_baseprc_aply(baseprecv(1),tx,zero,tty,desc_data,trans,work,info)
       if(info /=0) goto 9999
 
       call psb_spmm(-one,baseprecv(2)%aorig,tty,one,tx,desc_data,info,work=work)
@@ -1206,7 +1211,8 @@ subroutine psb_dmlprcaply(baseprecv,x,beta,y,desc_data,trans,work,info)
 
       t6 = mpi_wtime()
       w2l=t2l
-      call psb_dbaseprcaply(baseprecv(2),w2l,zero,t2l,baseprecv(2)%desc_data,'N',work,info)
+      call psb_baseprc_aply(baseprecv(2),w2l,zero,t2l,baseprecv(2)%desc_data,&
+           &  'N',work,info)
       if(info /=0) goto 9999
 
       if (ismth  /= no_smth_) then 
@@ -1232,7 +1238,7 @@ subroutine psb_dmlprcaply(baseprecv,x,beta,y,desc_data,trans,work,info)
 
       call psb_spmm(-one,baseprecv(2)%aorig,tty,one,tx,desc_data,info,work=work)
       if(info /=0) goto 9999
-      call psb_dbaseprcaply(baseprecv(1),tx,one,tty,desc_data,'N',work,info)
+      call psb_baseprc_aply(baseprecv(1),tx,one,tty,desc_data,'N',work,info)
 
 
       call psb_axpby(one,tty,beta,y,desc_data,info)
@@ -1247,7 +1253,7 @@ subroutine psb_dmlprcaply(baseprecv,x,beta,y,desc_data,trans,work,info)
     end select
 
   case default
-    write(0,*) me, 'Wrong mltype into PRCAPLY ',&
+    write(0,*) me, 'Wrong mltype into PRC_APLY ',&
          & baseprecv(2)%iprcparm(ml_type_)
   end select
 
@@ -1263,7 +1269,7 @@ subroutine psb_dmlprcaply(baseprecv,x,beta,y,desc_data,trans,work,info)
   end if
   return
 
-end subroutine psb_dmlprcaply
+end subroutine psb_dmlprc_aply
 
 !!$ 
 !!$ 
@@ -1301,7 +1307,7 @@ end subroutine psb_dmlprcaply
 !!$ 
 !!$  
 
-subroutine psb_dprecaply1(prec,x,desc_data,info,trans)
+subroutine psb_dprc_aply1(prec,x,desc_data,info,trans)
 
   use psb_serial_mod
   use psb_descriptor_type
@@ -1320,7 +1326,7 @@ subroutine psb_dprecaply1(prec,x,desc_data,info,trans)
   real(kind(1.d0)), parameter       :: one=1.d0, zero=0.d0
 
   interface 
-    subroutine psb_dprecaply(prec,x,y,desc_data,info,trans, work)
+    subroutine psb_dprc_aply(prec,x,y,desc_data,info,trans, work)
       
       use psb_descriptor_type
       use psb_prec_type
@@ -1332,7 +1338,7 @@ subroutine psb_dprecaply1(prec,x,desc_data,info,trans)
       integer, intent(out)                :: info
       character(len=1), optional          :: trans
       real(kind(0.d0)), optional, target  :: work(:)
-    end subroutine psb_dprecaply
+    end subroutine psb_dprc_aply
   end interface
 
   ! Local variables
@@ -1358,8 +1364,8 @@ subroutine psb_dprecaply1(prec,x,desc_data,info,trans)
     call psb_errpush(4010,name,a_err='Allocate')
     goto 9999      
   end if
-  if (debug) write(0,*) 'Prcaply1 Size(x) ',size(x), size(ww),size(w1)
-  call psb_dprecaply(prec,x,ww,desc_data,info,trans_,work=w1)
+  if (debug) write(0,*) 'Prc_aply1 Size(x) ',size(x), size(ww),size(w1)
+  call psb_dprc_aply(prec,x,ww,desc_data,info,trans_,work=w1)
   if(info /=0) goto 9999
   x(:) = ww(:)
   deallocate(ww,W1)
@@ -1375,4 +1381,4 @@ subroutine psb_dprecaply1(prec,x,desc_data,info,trans)
      return
   end if
   return
-end subroutine psb_dprecaply1
+end subroutine psb_dprc_aply1

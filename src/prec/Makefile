@@ -7,7 +7,7 @@ MPFOBJS=psb_dilu_bld.o psb_dbldaggrmat.o
 F90OBJS=psb_dasmatbld.o psb_dslu_bld.o psb_dumf_bld.o psb_dilu_fct.o\
 	psb_dmlprc_bld.o psb_dsp_renum.o\
 	psb_dprec.o psb_dprecbld.o gps.o psb_dprecfree.o psb_dprecset.o \
-	psb_dgenaggrmap.o $(MPFOBJS) 
+	psb_dbaseprc_bld.o psb_dgenaggrmap.o $(MPFOBJS) 
 
 COBJS=psb_slu_impl.o psb_umf_impl.o
 INCDIRS=-I. -I.. -I$(LIBDIR) 

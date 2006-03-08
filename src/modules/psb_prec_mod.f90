@@ -40,7 +40,7 @@ module psb_prec_mod
        type(psb_dspmat_type), intent(in), target  :: a
        type(psb_desc_type), intent(in)            :: desc_a
        type(psb_dspmat_type), intent(out), target :: ac
-       type(psb_dbase_prec), intent(inout)        :: p
+       type(psb_dbaseprc_type), intent(inout)     :: p
        type(psb_desc_type), intent(inout)         :: desc_p
        integer, intent(out)                       :: info
      end subroutine psb_dbldaggrmat
@@ -100,19 +100,6 @@ end interface
      end subroutine psb_dprecfree
   end interface
 
-  interface psb_cslu
-     subroutine psb_dcslu(a,desc_data,p,upd,info)
-       use psb_serial_mod
-       use psb_descriptor_type
-       use psb_prec_type
-       integer, intent(out) :: info
-       type(psb_dspmat_type), intent(in), target :: a
-       type(psb_desc_type),intent(in)            :: desc_data
-       type(psb_dbase_prec), intent(inout)       :: p
-       character, intent(in)                     :: upd
-     end subroutine psb_dcslu
-  end interface
-
   interface psb_asmatbld
     Subroutine psb_dasmatbld(ptype,novr,a,blk,desc_data,upd,desc_p,info,outfmt)
       use psb_serial_mod
@@ -129,8 +116,8 @@ end interface
     end Subroutine psb_dasmatbld
  end interface
 
-  interface psb_prcaply
-     subroutine psb_dprecaply(prec,x,y,desc_data,info,trans,work)
+  interface psb_prc_aply
+     subroutine psb_dprc_aply(prec,x,y,desc_data,info,trans,work)
        use psb_serial_mod
        use psb_descriptor_type
        use psb_prec_type
@@ -140,8 +127,8 @@ end interface
        integer, intent(out)              :: info
        character(len=1), optional        :: trans
        real(kind(0.d0)),intent(inout), optional, target :: work(:)
-     end subroutine psb_dprecaply
-     subroutine psb_dprecaply1(prec,x,desc_data,info,trans)
+     end subroutine psb_dprc_aply
+     subroutine psb_dprc_aply1(prec,x,desc_data,info,trans)
        use psb_serial_mod
        use psb_descriptor_type
        use psb_prec_type
@@ -150,7 +137,7 @@ end interface
        real(kind(0.d0)),intent(inout)    :: x(:)
        integer, intent(out)              :: info
        character(len=1), optional        :: trans
-     end subroutine psb_dprecaply1
+     end subroutine psb_dprc_aply1
   end interface
 
 

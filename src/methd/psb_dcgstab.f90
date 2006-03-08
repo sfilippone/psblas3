@@ -300,7 +300,7 @@ Subroutine psb_dcgstab(a,prec,b,x,eps,desc_a,info,&
         Call psb_axpby(one,r,beta,p,desc_a,info)
       End If
 
-      Call psb_prcaply(prec,p,f,desc_a,info,work=aux)
+      Call psb_prc_aply(prec,p,f,desc_a,info,work=aux)
 
       Call psb_spmm(one,a,f,zero,v,desc_a,info,&
            & work=aux)
@@ -323,9 +323,9 @@ Subroutine psb_dcgstab(a,prec,b,x,eps,desc_a,info,&
          goto 9999
       end if
       
-      Call psb_prcaply(prec,s,z,desc_a,info,work=aux)
+      Call psb_prc_aply(prec,s,z,desc_a,info,work=aux)
       if(info.ne.0) then
-         call psb_errpush(4010,name,a_err='psb_prcaply')
+         call psb_errpush(4010,name,a_err='psb_prc_aply')
          goto 9999
       end if
 

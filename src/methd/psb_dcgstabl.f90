@@ -237,7 +237,7 @@ Subroutine psb_dcgstabl(a,prec,b,x,eps,desc_a,info,&
     Call psb_axpby(one,b,zero,r,desc_a,info)
     Call psb_spmm(-one,a,x,one,r,desc_a,info,work=aux)
     
-    call psb_prcaply(prec,r,desc_a,info)
+    call psb_prc_aply(prec,r,desc_a,info)
 
     Call psb_axpby(one,r,zero,rt0,desc_a,info)
     Call psb_axpby(one,r,zero,rh(:,0),desc_a,info)
@@ -301,7 +301,7 @@ Subroutine psb_dcgstabl(a,prec,b,x,eps,desc_a,info,&
         If (debug) Write(0,*) 'bicg part:  ',rh(1,0),beta
         Call psb_spmm(one,a,uh(:,j),zero,uh(:,j+1),desc_a,info,work=aux)
 
-        call psb_prcaply(prec,uh(:,j+1),desc_a,info)
+        call psb_prc_aply(prec,uh(:,j+1),desc_a,info)
 
         gamma(j) = psb_dot(uh(:,j+1),rt0,desc_a,info)
         If (gamma(j)==zero) Then
@@ -315,7 +315,7 @@ Subroutine psb_dcgstabl(a,prec,b,x,eps,desc_a,info,&
         Call psb_axpby(alpha,uh(:,0),one,x,desc_a,info)
         Call psb_spmm(one,a,rh(:,j),zero,rh(:,j+1),desc_a,info,work=aux)
 
-        call psb_prcaply(prec,rh(:,j+1),desc_a,info)
+        call psb_prc_aply(prec,rh(:,j+1),desc_a,info)
                 
       Enddo
       

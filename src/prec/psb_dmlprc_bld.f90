@@ -45,7 +45,7 @@ subroutine psb_dmlprc_bld(a,desc_a,p,info)
 
   type(psb_dspmat_type), intent(in), target :: a
   type(psb_desc_type), intent(in)           :: desc_a
-  type(psb_dbase_prec), intent(inout)       :: p
+  type(psb_dbaseprc_type), intent(inout)    :: p
   integer, intent(out)                      :: info
 
   type(psb_desc_type), pointer              :: desc_p
@@ -55,15 +55,17 @@ subroutine psb_dmlprc_bld(a,desc_a,p,info)
   logical, parameter :: debug=.false.
   type(psb_dspmat_type)                     :: ac
 
-  interface psb_ilu_fct
-    subroutine psb_dilu_fct(a,l,u,d,info,blck)
-      use psb_spmat_type
-      integer, intent(out)                ::     info
-      type(psb_dspmat_type),intent(in)    :: a
-      type(psb_dspmat_type),intent(inout) :: l,u
-      type(psb_dspmat_type),intent(in), optional, target :: blck
-      real(kind(1.d0)), intent(inout)     ::  d(:)
-    end subroutine psb_dilu_fct
+  interface psb_baseprc_bld
+    subroutine psb_dbaseprc_bld(a,desc_a,p,info,upd)
+      Use psb_spmat_type
+      use psb_descriptor_type
+      use psb_prec_type
+      type(psb_dspmat_type), target              :: a
+      type(psb_desc_type), intent(in)            :: desc_a
+      type(psb_dbaseprc_type),intent(inout)      :: p
+      integer, intent(out)                       :: info
+      character, intent(in), optional            :: upd
+    end subroutine psb_dbaseprc_bld
   end interface
 
   interface psb_genaggrmap
@@ -85,55 +87,12 @@ subroutine psb_dmlprc_bld(a,desc_a,p,info)
       use psb_descriptor_type
       use psb_spmat_type
       type(psb_dspmat_type), intent(in), target :: a
-      type(psb_dbase_prec), intent(inout)       :: p
+      type(psb_dbaseprc_type), intent(inout)    :: p
       type(psb_dspmat_type), intent(out),target :: ac
       type(psb_desc_type), intent(in)           :: desc_a
       type(psb_desc_type), intent(inout)        :: desc_p
       integer, intent(out)                      :: info
     end subroutine psb_dbldaggrmat
-  end interface
-
-  interface psb_ilu_bld
-    subroutine psb_dilu_bld(a,desc_data,p,upd,info)
-      use psb_serial_mod
-      use psb_descriptor_type
-      use psb_prec_type
-      integer, intent(out) :: info
-      type(psb_dspmat_type), intent(in), target :: a
-      type(psb_desc_type),intent(in)            :: desc_data
-      type(psb_dbase_prec), intent(inout)       :: p
-      character, intent(in)                     :: upd
-    end subroutine psb_dilu_bld
-  end interface
-
-  interface psb_slu_bld
-    subroutine psb_dslu_bld(a,desc_a,p,info)
-      use psb_serial_mod
-      use psb_descriptor_type
-      use psb_prec_type
-      use psb_const_mod
-      implicit none 
-
-      type(psb_dspmat_type), intent(in)   :: a
-      type(psb_desc_type), intent(in)     :: desc_a
-      type(psb_dbase_prec), intent(inout) :: p
-      integer, intent(out)                :: info
-    end subroutine psb_dslu_bld
-  end interface
-
-  interface psb_umf_bld
-    subroutine psb_dumf_bld(a,desc_a,p,info)
-      use psb_serial_mod
-      use psb_descriptor_type
-      use psb_prec_type
-      use psb_const_mod
-      implicit none 
-
-      type(psb_dspmat_type), intent(in)   :: a
-      type(psb_desc_type), intent(in)     :: desc_a
-      type(psb_dbase_prec), intent(inout) :: p
-      integer, intent(out)                :: info
-    end subroutine psb_dumf_bld
   end interface
 
   integer :: icontxt, nprow, npcol, me, mycol
@@ -143,6 +102,37 @@ subroutine psb_dmlprc_bld(a,desc_a,p,info)
   info=0
   call psb_erractionsave(err_act)
   call psb_nullify_sp(ac)
+
+
+  if (.not.associated(p%iprcparm)) then 
+    info = 2222
+    call psb_errpush(info,name)
+    goto 9999
+  endif
+  call psb_check_def(p%iprcparm(ml_type_),'Multilevel type',&
+       &   mult_ml_prec_,is_legal_ml_type)
+  call psb_check_def(p%iprcparm(aggr_alg_),'aggregation',&
+       &   loc_aggr_,is_legal_ml_aggr_kind)
+  call psb_check_def(p%iprcparm(smth_kind_),'Smoother kind',&
+       &   smth_omg_,is_legal_ml_smth_kind)
+  call psb_check_def(p%iprcparm(coarse_mat_),'Coarse matrix',&
+       &   mat_distr_,is_legal_ml_coarse_mat)
+  call psb_check_def(p%iprcparm(smth_pos_),'smooth_pos',&
+       &   pre_smooth_,is_legal_ml_smooth_pos)
+
+
+  nullify(p%desc_data)
+  select case(p%iprcparm(f_type_))
+  case(f_ilu_n_)      
+    call psb_check_def(p%iprcparm(ilu_fill_in_),'Level',0,is_legal_ml_lev)
+  case(f_ilu_e_)                 
+    call psb_check_def(p%dprcparm(fact_eps_),'Eps',0.0d0,is_legal_ml_eps)
+  end select
+  call psb_check_def(p%dprcparm(smooth_omega_),'omega',0.0d0,is_legal_omega)
+  call psb_check_def(p%iprcparm(jac_sweeps_),'Jacobi sweeps',&
+       & 1,is_legal_jac_sweeps)
+
+
 
   p%aorig => a
 
@@ -180,41 +170,9 @@ subroutine psb_dmlprc_bld(a,desc_a,p,info)
   end if
   if (debug) write(0,*) 'Out from bldaggrmat',desc_p%matrix_data(:)
 
-  allocate(p%desc_data)
 
-  select case(p%iprcparm(f_type_)) 
 
-  case(f_ilu_n_,f_ilu_e_) 
-    call psb_ilu_bld(ac,desc_p,p,'F',info)
-    if(debug) write(0,*)me,': out of psb_ilu_bld'
-    if(info /= 0) then
-      info=4010
-      ch_err='psb_ilu_bld'
-      call psb_errpush(info,name,a_err=ch_err)
-      goto 9999
-    end if
-
-  case(f_slu_) 
-    call psb_slu_bld(ac,desc_p,p,info)
-    if(debug) write(0,*)me,': out of psb_slu_bld'
-    if(info /= 0) then
-      info=4010
-      ch_err='psb_slu_bld'
-      call psb_errpush(info,name,a_err=ch_err)
-      goto 9999
-    end if
-
-  case(f_umf_) 
-    call psb_umf_bld(ac,desc_p,p,info)
-    if(debug) write(0,*)me,': out of psb_umf_bld'
-    if(info /= 0) then
-      info=4010
-      ch_err='psb_umf_bld'
-      call psb_errpush(info,name,a_err=ch_err)
-      goto 9999
-    end if
-
-  end select
+  call psb_baseprc_bld(ac,desc_p,p,info)
 
   !
   ! We have used a separate ac because:

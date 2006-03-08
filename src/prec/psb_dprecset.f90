@@ -48,7 +48,7 @@ subroutine psb_dprecset(p,ptype,iv,rs,rv,info)
   real(kind(1.d0)), optional, intent(in) :: rv(:)
   integer, optional, intent(out)         :: info
 
-  type(psb_dbase_prec), pointer          :: bpv(:)=>null()
+  type(psb_dbaseprc_type), pointer       :: bpv(:)=>null()
   character(len=len(ptype))              :: typeup
   integer                                :: isz, err
 

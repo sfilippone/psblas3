@@ -63,7 +63,7 @@ subroutine psb_dilu_bld(a,desc_a,p,upd,info)
   integer, intent(out)                      :: info
   !     .. array Arguments ..                                                     
   type(psb_dspmat_type), intent(in), target :: a
-  type(psb_dbase_prec), intent(inout)       :: p
+  type(psb_dbaseprc_type), intent(inout)    :: p
   type(psb_desc_type), intent(in)           :: desc_a
   character, intent(in)                     :: upd
 
@@ -118,10 +118,10 @@ subroutine psb_dilu_bld(a,desc_a,p,upd,info)
       implicit none
 
       !     .. array Arguments ..                                                     
-      type(psb_dspmat_type), intent(in)    :: a,blck
-      type(psb_dspmat_type), intent(inout) :: atmp
-      type(psb_dbase_prec), intent(inout)  :: p
-      type(psb_desc_type), intent(in)      :: desc_a
+      type(psb_dspmat_type), intent(in)      :: a,blck
+      type(psb_dspmat_type), intent(inout)   :: atmp
+      type(psb_dbaseprc_type), intent(inout) :: p
+      type(psb_desc_type), intent(in)        :: desc_a
       integer, intent(out)   :: info
     end subroutine psb_dsp_renum
   end interface
