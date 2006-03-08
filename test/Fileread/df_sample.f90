@@ -264,7 +264,7 @@ program df_sample
 
   ! building the preconditioner
   t1 = mpi_wtime()
-  call psb_precbld(a,pre,desc_a,info)
+  call psb_precbld(a,desc_a,pre,info)
   tprec = mpi_wtime()-t1
   if (info /= 0) then
      call psb_errpush(4010,name,a_err='psb_precbld')

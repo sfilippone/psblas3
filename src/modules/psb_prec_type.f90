@@ -79,7 +79,7 @@ module psb_prec_type
   ! Fields for sparse matrices ensembles: 
   integer, parameter :: l_pr_=1, u_pr_=2, bp_ilu_avsz=2
   integer, parameter :: ap_nd_=3, ac_=4, sm_pr_t_=5, sm_pr_=6
-  integer, parameter :: smth_avsz=6 
+  integer, parameter :: smth_avsz=6, max_avsz=smth_avsz 
 
 
   type psb_dbase_prec

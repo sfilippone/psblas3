@@ -33,7 +33,7 @@
 !!$  POSSIBILITY OF SUCH DAMAGE.
 !!$ 
 !!$  
-subroutine psb_dprecbld(a,p,desc_a,info,upd)
+subroutine psb_dprecbld(a,desc_a,p,info,upd)
 
   use psb_serial_mod
   Use psb_spmat_type
@@ -46,10 +46,10 @@ subroutine psb_dprecbld(a,p,desc_a,info,upd)
   use psb_error_mod
   Implicit None
 
-  integer, intent(out)                       :: info
   type(psb_dspmat_type), target              :: a
-  type(psb_dprec_type),intent(inout)         :: p
   type(psb_desc_type), intent(in)            :: desc_a
+  type(psb_dprec_type),intent(inout)         :: p
+  integer, intent(out)                       :: info
   character, intent(in), optional            :: upd
 
   interface psb_ilu_bld
@@ -264,7 +264,8 @@ subroutine psb_dprecbld(a,p,desc_a,info,upd)
     if (debug) write(0,*)me, ': Calling PSB_ILU_BLD'
 
 
-    allocate(p%baseprecv(1)%av(bp_ilu_avsz),stat=info)
+!!$    allocate(p%baseprecv(1)%av(bp_ilu_avsz),stat=info)
+    allocate(p%baseprecv(1)%av(max_avsz),stat=info)
     do k=1,size(p%baseprecv(1)%av)
       call psb_nullify_sp(p%baseprecv(1)%av(k))
     end do
@@ -321,6 +322,8 @@ subroutine psb_dprecbld(a,p,desc_a,info,upd)
       call psb_errpush(info,name)
       goto 9999
     endif
+    call psb_check_def(p%baseprecv(2)%iprcparm(ml_type_),'Multilevel type',&
+         &   mult_ml_prec_,is_legal_ml_type)
     call psb_check_def(p%baseprecv(2)%iprcparm(aggr_alg_),'aggregation',&
          &   loc_aggr_,is_legal_ml_aggr_kind)
     call psb_check_def(p%baseprecv(2)%iprcparm(smth_kind_),'Smoother kind',&
@@ -331,13 +334,7 @@ subroutine psb_dprecbld(a,p,desc_a,info,upd)
          &   pre_smooth_,is_legal_ml_smooth_pos)
     call psb_check_def(p%baseprecv(2)%iprcparm(f_type_),'fact',f_ilu_n_,is_legal_ml_fact)
 
-!!$    allocate(p%baseprecv(2)%desc_data,stat=info)
-!!$    if (info /= 0) then 
-!!$      call psb_errpush(4010,name,a_err='Allocate')
-!!$      goto 9999      
-!!$    end if
-!!$
-!!$    call psb_nullify_desc(p%baseprecv(2)%desc_data)
+
     nullify(p%baseprecv(2)%desc_data)
     select case(p%baseprecv(2)%iprcparm(f_type_))
     case(f_ilu_n_)      

@@ -61,14 +61,14 @@ interface psb_genaggrmap
 end interface
 
   interface psb_precbld
-    subroutine psb_dprecbld(a,prec,desc_a,ierr,upd)
+    subroutine psb_dprecbld(a,desc_a,prec,info,upd)
       use psb_descriptor_type
       use psb_prec_type
       implicit none
-      integer, intent(out)                       :: ierr
       type(psb_dspmat_type), intent(in), target  :: a
-      type(psb_dprec_type), intent(inout)        :: prec
       type(psb_desc_type), intent(in)            :: desc_a
+      type(psb_dprec_type), intent(inout)        :: prec
+      integer, intent(out)                       :: info
       character, intent(in),optional             :: upd
     end subroutine psb_dprecbld
   end interface

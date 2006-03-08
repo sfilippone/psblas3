@@ -191,7 +191,7 @@ program pde90
   
   call blacs_barrier(icontxt,'ALL')
   t1 = mpi_wtime()
-  call psb_precbld(a,pre,desc_a,info)
+  call psb_precbld(a,desc_a,pre,info)
   if(info.ne.0) then
      info=4010
      ch_err='psb_precbld'

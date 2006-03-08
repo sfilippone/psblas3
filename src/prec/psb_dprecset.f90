@@ -68,6 +68,7 @@ subroutine psb_dprecset(p,ptype,iv,rs,rv,info)
 
   select case(toupper(ptype(1:len_trim(ptype))))
   case ('NONE','NOPREC') 
+    p%baseprecv(1)%iprcparm(:)           = 0
     p%baseprecv(1)%iprcparm(p_type_)     = noprec_
     p%baseprecv(1)%iprcparm(f_type_)     = f_none_
     p%baseprecv(1)%iprcparm(restr_)      = psb_none_
@@ -77,6 +78,7 @@ subroutine psb_dprecset(p,ptype,iv,rs,rv,info)
     p%baseprecv(1)%iprcparm(jac_sweeps_) = 1
 
   case ('DIAG','DIAGSC')
+    p%baseprecv(1)%iprcparm(:)           = 0
     p%baseprecv(1)%iprcparm(p_type_)     = diagsc_
     p%baseprecv(1)%iprcparm(f_type_)     = f_none_
     p%baseprecv(1)%iprcparm(restr_)      = psb_none_
@@ -86,6 +88,7 @@ subroutine psb_dprecset(p,ptype,iv,rs,rv,info)
     p%baseprecv(1)%iprcparm(jac_sweeps_) = 1
 
   case ('BJA','ILU') 
+    p%baseprecv(1)%iprcparm(:)            = 0
     p%baseprecv(1)%iprcparm(p_type_)      = bja_
     p%baseprecv(1)%iprcparm(f_type_)      = f_ilu_n_
     p%baseprecv(1)%iprcparm(restr_)       = psb_none_
@@ -96,6 +99,7 @@ subroutine psb_dprecset(p,ptype,iv,rs,rv,info)
     p%baseprecv(1)%iprcparm(jac_sweeps_)  = 1
 
   case ('ASM','AS')
+    p%baseprecv(1)%iprcparm(:)            = 0
     ! Defaults first 
     p%baseprecv(1)%iprcparm(p_type_)      = asm_
     p%baseprecv(1)%iprcparm(f_type_)      = f_ilu_n_
@@ -148,7 +152,7 @@ subroutine psb_dprecset(p,ptype,iv,rs,rv,info)
       write(0,*)'Precset Memory Failure 2l:3',err
     endif
 
-
+    p%baseprecv(2)%iprcparm(:)             = 0
 
     p%baseprecv(2)%iprcparm(p_type_)       = bja_
     p%baseprecv(2)%iprcparm(restr_)        = psb_none_
