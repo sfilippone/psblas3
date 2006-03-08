@@ -113,7 +113,7 @@ Subroutine psb_dasmatbld(ptype,novr,a,blk,desc_data,upd,desc_p,info,outfmt)
     blk%infoa(psb_nnz_) = 0
 
     If (upd == 'F') Then
-      call psb_cdcpy(desc_p,desc_data,info)
+      call psb_cdcpy(desc_data,desc_p,info)
       if(info /= 0) then
         info=4010
         ch_err='psb_cdcpy'
@@ -154,7 +154,7 @@ Subroutine psb_dasmatbld(ptype,novr,a,blk,desc_data,upd,desc_p,info,outfmt)
       blk%infoa(psb_nnz_)=0
       if (debug) write(0,*) 'Calling desccpy'
       if (upd == 'F') then 
-        call psb_cdcpy(desc_p,desc_data,info)
+        call psb_cdcpy(desc_data,desc_p,info)
         if(info /= 0) then
           info=4010
           ch_err='psb_cdcpy'

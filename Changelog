@@ -1,6 +1,14 @@
 Changelog. A lot less detailed than usual, at least for past
 history. 
 
+2006/03/01: Complete restructure of PREC section. 
+
+2006/02/01: New naming scheme.
+
+2006/01/01: New multilevel preconditioning wih smoothed aggregation.
+
+2005/09   : Now enabled UMFPACK complete factorization as basis for AS. 
+
 2005/05/04: Now enabled SuperLU complete factorization as basis for AS. 
 
 2005/04/29: First version with decoupled 2-level.

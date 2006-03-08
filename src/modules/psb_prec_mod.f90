@@ -33,14 +33,16 @@ module psb_prec_mod
   use psb_prec_type
 
   interface psb_bldaggrmat
-     subroutine psb_dbldaggrmat(a,desc_a,p,info)
+     subroutine psb_dbldaggrmat(a,desc_a,ac,p,desc_p,info)
        use psb_prec_type
        use psb_descriptor_type
        use psb_spmat_type
-       type(psb_dspmat_type), intent(in), target :: a
+       type(psb_dspmat_type), intent(in), target  :: a
+       type(psb_desc_type), intent(in)            :: desc_a
+       type(psb_dspmat_type), intent(out), target :: ac
        type(psb_dbase_prec), intent(inout)        :: p
-       type(psb_desc_type), intent(in)           :: desc_a
-       integer, intent(out)                      :: info
+       type(psb_desc_type), intent(inout)         :: desc_p
+       integer, intent(out)                       :: info
      end subroutine psb_dbldaggrmat
   end interface
   

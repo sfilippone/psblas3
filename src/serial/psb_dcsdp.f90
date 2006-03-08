@@ -105,7 +105,7 @@ subroutine psb_dcsdp(a, b,info,ifc,check,trans,unitd)
     info=2040
     call psb_errpush(info,name)
     goto 9999
- end if
+  end if
   if (ifc_<1) then 
     write(0,*) 'dcsdp90 Error: invalid ifc ',ifc_
     info = -4
@@ -117,10 +117,10 @@ subroutine psb_dcsdp(a, b,info,ifc,check,trans,unitd)
     if(a%fida(1:3)=='CSR') then
       call dcsrck(trans,a%m,a%k,a%descra,a%aspk,a%ia1,a%ia2,work,size(work),info)
       if(info /= 0) then
-         info=4010
-         ch_err='dcsrck'
-         call psb_errpush(info,name,a_err=ch_err)
-         goto 9999
+        info=4010
+        ch_err='dcsrck'
+        call psb_errpush(info,name,a_err=ch_err)
+        goto 9999
       end if
 
     else
@@ -154,16 +154,20 @@ subroutine psb_dcsdp(a, b,info,ifc,check,trans,unitd)
 
 
         if (info/=0) then
-           info=4010
-           ch_err='dcrcr'
-           call psb_errpush(info,name,a_err=ch_err)
-           goto 9999
+          info=4010
+          ch_err='dcrcr'
+          call psb_errpush(info,name,a_err=ch_err)
+          goto 9999
         end if
 
       case ('JAD')
 
         !...converting to JAD
         !...output matrix may not be big enough
+        ia1_size=a%infoa(psb_nnz_)
+        ia2_size=a%m+1
+        aspk_size=a%infoa(psb_nnz_)
+        call psb_spreall(b,ia1_size,ia2_size,aspk_size,info)
         do
 
           call dcrjd(trans_, a%m, a%k, unitd_, d, a%descra, a%aspk,&
@@ -174,7 +178,7 @@ subroutine psb_dcsdp(a, b,info,ifc,check,trans,unitd)
             call psb_errpush(4010,name,a_err='dcrjd')
             goto 9999
           endif
-          
+
           ntry = ntry + 1
           if (debug) then 
             write(0,*) 'On out from dcrjad ',nzr,info
@@ -202,7 +206,7 @@ subroutine psb_dcsdp(a, b,info,ifc,check,trans,unitd)
         end if
 
       case ('COO')
-        
+
         aspk_size=max(size(a%aspk),a%ia2(a%m+1))
         call psb_spreall(b,aspk_size,info)
 !!$        write(0,*) 'From DCSDP90:',b%fida,size(b%aspk),info
@@ -212,8 +216,8 @@ subroutine psb_dcsdp(a, b,info,ifc,check,trans,unitd)
              & size(b%ia2), work, size(work), info)
 
         if (info/=0) then
-           call psb_errpush(4010,name,a_err='dcrco')
-           goto 9999
+          call psb_errpush(4010,name,a_err='dcrco')
+          goto 9999
         end if
 
       end select
@@ -224,18 +228,20 @@ subroutine psb_dcsdp(a, b,info,ifc,check,trans,unitd)
 
       case ('CSR')
 
+        aspk_size=max(size(a%aspk),a%ia2(a%m+1))
+        call psb_spreall(b,aspk_size,info)
         call dcocr(trans_, a%m, a%k, unitd_, d, a%descra, a%aspk,&
              & a%ia2, a%ia1, a%infoa, b%pl, b%descra, b%aspk, b%ia1,&
              & b%ia2, b%infoa, b%pr, size(b%aspk), size(b%ia1),&
              & size(b%ia2), work, 2*size(work), info)
 
         if (info/=0) then
-           call psb_errpush(4010,name,a_err='dcocr')
-           goto 9999
+          call psb_errpush(4010,name,a_err='dcocr')
+          goto 9999
         end if
 
       case ('JAD')
-        
+
         call psb_spall(temp_a, size(b%ia1),size(b%ia2),size(b%aspk),info)
         if (info /= 0) then
           info=2040
@@ -252,10 +258,10 @@ subroutine psb_dcsdp(a, b,info,ifc,check,trans,unitd)
              & temp_a%aspk, temp_a%ia1, temp_a%ia2, temp_a%infoa, temp_a%pr, &
              & size(temp_a%aspk), size(temp_a%ia1),&
              & size(temp_a%ia2), work, 2*size(work), info)
-        
+
         if (info/=0) then
-           call psb_errpush(4010,name,a_err='dcocr')
-           goto 9999
+          call psb_errpush(4010,name,a_err='dcocr')
+          goto 9999
         end if
 
         do
@@ -265,8 +271,8 @@ subroutine psb_dcsdp(a, b,info,ifc,check,trans,unitd)
                & size(b%aspk), size(b%ia1),&
                & size(b%ia2), work, size(work), nzr, info)
           if (info/=0) then
-             call psb_errpush(4010,name,a_err='dcrjd')
-             goto 9999
+            call psb_errpush(4010,name,a_err='dcrjd')
+            goto 9999
           end if
 
           ntry = ntry + 1
@@ -295,13 +301,15 @@ subroutine psb_dcsdp(a, b,info,ifc,check,trans,unitd)
 
       case ('COO')
 
+        aspk_size=max(size(a%aspk),a%ia2(a%m+1))
+        call psb_spreall(b,aspk_size,info)
         call dcoco(trans_, a%m, a%k, unitd_, d, a%descra, a%aspk,&
              & a%ia1, a%ia2, a%infoa, b%pl, b%descra, b%aspk, b%ia1,&
              & b%ia2, b%infoa, b%pr, size(b%aspk), size(b%ia1),&
              & size(b%ia2), work, 2*size(work), info)
         if (info/=0) then
-           call psb_errpush(4010,name,a_err='dcoco')
-           goto 9999
+          call psb_errpush(4010,name,a_err='dcoco')
+          goto 9999
         end if
 
       end select
@@ -316,12 +324,12 @@ subroutine psb_dcsdp(a, b,info,ifc,check,trans,unitd)
       goto 9999
     endif
     if (ibits(b%infoa(psb_upd_),2,1).eq.0) then 
-       !
-       !       Nothing to be done......
-       !
-       info = 8888
-       call psb_errpush(info,name)
-       goto 9999
+      !
+      !       Nothing to be done......
+      !
+      info = 8888
+      call psb_errpush(info,name)
+      goto 9999
     endif
 
 
@@ -405,12 +413,12 @@ subroutine psb_dcsdp(a, b,info,ifc,check,trans,unitd)
   b%infoa(psb_state_) = psb_spmat_asb_
   call psb_erractionrestore(err_act)
   return
-  
+
 9999 continue
   call psb_erractionrestore(err_act)
   if (err_act.eq.act_abort) then
-     call psb_error()
-     return
+    call psb_error()
+    return
   end if
   return
 

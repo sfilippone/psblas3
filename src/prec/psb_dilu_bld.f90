@@ -173,24 +173,14 @@ subroutine psb_dilu_bld(a,desc_a,p,upd,info)
 
   if (associated(p%av)) then 
     if (size(p%av) < bp_ilu_avsz) then 
-      do k=1,size(p%av)
-        call psb_spfree(p%av(k),info)
-      end do
-      deallocate(p%av)
-      p%av => null()
+      call psb_errpush(4010,name,a_err='Insufficient av size')
+      goto 9999      
     endif
+  else
+    call psb_errpush(4010,name,a_err='AV not associated')
+    goto 9999      
   endif
 
-  if (.not.associated(p%av)) then 
-    allocate(p%av(bp_ilu_avsz),stat=info)
-    if (info /= 0) then 
-      call psb_errpush(4010,name,a_err='Allocate')
-      goto 9999      
-    end if
-  endif
-  do k=1,size(p%av)
-    call psb_nullify_sp(p%av(k))
-  end do
   nrow_a = desc_a%matrix_data(psb_n_row_)
   call psb_spinfo(psb_nztotreq_,a,nztota,info)
   if(info/=0) then

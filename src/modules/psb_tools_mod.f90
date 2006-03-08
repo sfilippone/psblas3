@@ -313,12 +313,21 @@ Module psb_tools_mod
 
 
   interface psb_cdcpy
-     subroutine psb_cdcpy(desc_out, desc_a, info)
+     subroutine psb_cdcpy(desc_in, desc_out, info)
        use psb_descriptor_type
+       type(psb_desc_type), intent(in)  :: desc_in
        type(psb_desc_type), intent(out) :: desc_out
-       type(psb_desc_type), intent(in)  :: desc_a
        integer, intent(out)             :: info
      end subroutine psb_cdcpy
+  end interface
+
+  interface psb_cdtransfer
+     subroutine psb_cdtransfer(desc_in, desc_out, info)
+       use psb_descriptor_type
+       type(psb_desc_type), intent(inout) :: desc_in
+       type(psb_desc_type), intent(out)   :: desc_out
+       integer, intent(out)               :: info
+     end subroutine psb_cdtransfer
   end interface
   
  

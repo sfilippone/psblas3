@@ -64,6 +64,10 @@ module psb_spmat_type
     module procedure psb_dspclone
   end interface
 
+  interface psb_sp_transfer
+    module procedure psb_dsp_transfer
+  end interface
+
   interface psb_spreall
     module procedure psb_dspreallocate, psb_dspreall3
   end interface
@@ -345,6 +349,57 @@ contains
     Return
 
   End Subroutine psb_dspclone
+
+
+  ! This is done with pointer assignments, but it 
+  ! will be feasible with MOVE_ALLOC when we move 
+  ! to ALLOCATABLE components. 
+  subroutine psb_dsp_transfer(a, b,info)
+    implicit none
+    !....Parameters...
+    Type(psb_dspmat_type), intent(inout)  :: A
+    Type(psb_dspmat_type), intent(inout)  :: B
+    Integer, intent(out)                  :: info
+
+    !locals
+    Integer             :: nza,nz1, nz2, nzl, nzr
+    logical, parameter  :: debug=.false.
+
+    INFO  = 0
+
+    if (associated(b%pr)) then  
+      deallocate(b%pr,stat=info)
+    end if
+
+    if (associated(b%pl)) then 
+      deallocate(b%pl,stat=info)
+    end if
+    if (associated(b%ia2)) then
+      deallocate(b%ia2,stat=info)
+    end if
+    if (associated(b%ia1))  then
+      deallocate(b%ia1,stat=info)
+    endif
+    if (associated(b%aspk))  then
+      deallocate(b%aspk,stat=info)
+    endif
+
+    b%aspk  => a%aspk
+    b%ia1   => a%ia1
+    b%ia2   => a%ia2
+    b%pl    => a%pl
+    b%pr    => a%pr    
+    b%infoa(:) = a%infoa(:)
+    b%fida     = a%fida
+    b%descra   = a%descra
+    b%m        = a%m
+    b%k        = a%k
+
+    call psb_nullify_sp(a)
+
+    Return
+
+  End Subroutine psb_dsp_transfer
 
 
 !   subroutine psb_dspfree(a,info)

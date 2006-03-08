@@ -111,7 +111,7 @@ subroutine psb_dprecbld(a,p,desc_a,info,upd)
   end interface
 
   ! Local scalars
-  Integer      :: err, nnzero, n_row, n_col,I,j,icontxt,&
+  Integer      :: err, nnzero, n_row, n_col,I,j,k,icontxt,&
        & me,mycol,nprow,npcol,mglob,lw, mtype, nrg, nzg, err_act
   real(kind(1.d0))         :: temp, real_err(5)
   real(kind(1.d0)),pointer :: gd(:), work(:)
@@ -264,6 +264,12 @@ subroutine psb_dprecbld(a,p,desc_a,info,upd)
     if (debug) write(0,*)me, ': Calling PSB_ILU_BLD'
 
 
+    allocate(p%baseprecv(1)%av(bp_ilu_avsz),stat=info)
+    do k=1,size(p%baseprecv(1)%av)
+      call psb_nullify_sp(p%baseprecv(1)%av(k))
+    end do
+
+
     select case(p%baseprecv(1)%iprcparm(f_type_))
 
     case(f_ilu_n_,f_ilu_e_) 
@@ -277,7 +283,7 @@ subroutine psb_dprecbld(a,p,desc_a,info,upd)
       end if
 
     case(f_slu_)
-      p%baseprecv(1)%av => null()
+
       if(debug) write(0,*)me,': calling slu_bld'
       call psb_slu_bld(a,desc_a,p%baseprecv(1),info)
       if(info /= 0) then
@@ -288,7 +294,6 @@ subroutine psb_dprecbld(a,p,desc_a,info,upd)
       end if
 
     case(f_umf_)
-      p%baseprecv(1)%av => null()
       if(debug) write(0,*)me,': calling umf_bld'
       call psb_umf_bld(a,desc_a,p%baseprecv(1),info)
       if(info /= 0) then
@@ -326,14 +331,14 @@ subroutine psb_dprecbld(a,p,desc_a,info,upd)
          &   pre_smooth_,is_legal_ml_smooth_pos)
     call psb_check_def(p%baseprecv(2)%iprcparm(f_type_),'fact',f_ilu_n_,is_legal_ml_fact)
 
-    allocate(p%baseprecv(2)%desc_data,stat=info)
-    if (info /= 0) then 
-      call psb_errpush(4010,name,a_err='Allocate')
-      goto 9999      
-    end if
-
-    call psb_nullify_desc(p%baseprecv(2)%desc_data)
-
+!!$    allocate(p%baseprecv(2)%desc_data,stat=info)
+!!$    if (info /= 0) then 
+!!$      call psb_errpush(4010,name,a_err='Allocate')
+!!$      goto 9999      
+!!$    end if
+!!$
+!!$    call psb_nullify_desc(p%baseprecv(2)%desc_data)
+    nullify(p%baseprecv(2)%desc_data)
     select case(p%baseprecv(2)%iprcparm(f_type_))
     case(f_ilu_n_)      
       call psb_check_def(p%baseprecv(2)%iprcparm(ilu_fill_in_),'Level',0,is_legal_ml_lev)

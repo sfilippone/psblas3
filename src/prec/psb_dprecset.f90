@@ -151,6 +151,10 @@ subroutine psb_dprecset(p,ptype,iv,rs,rv,info)
 
 
     p%baseprecv(2)%iprcparm(p_type_)       = bja_
+    p%baseprecv(2)%iprcparm(restr_)        = psb_none_
+    p%baseprecv(2)%iprcparm(prol_)         = psb_none_
+    p%baseprecv(2)%iprcparm(iren_)         = 0
+    p%baseprecv(2)%iprcparm(n_ovr_)        = 0
     p%baseprecv(2)%iprcparm(ml_type_)      = mult_ml_prec_
     p%baseprecv(2)%iprcparm(aggr_alg_)     = loc_aggr_
     p%baseprecv(2)%iprcparm(smth_kind_)    = smth_omg_

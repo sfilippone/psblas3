@@ -65,10 +65,10 @@ Subroutine psb_cdovr(a,desc_a,novr,desc_ov,info)
 !!$  integer mpe_log_get_event_number,mpe_Describe_state,mpe_log_event
 
   interface psb_cdcpy
-     subroutine psb_cdcpy(desc_out,desc_a,info)
+     subroutine psb_cdcpy(desc_in,desc_out,info)
        use psb_descriptor_type
+       type(psb_desc_type), intent(in)  :: desc_in
        type(psb_desc_type), intent(out) :: desc_out
-       type(psb_desc_type), intent(in)  :: desc_a
        integer, intent(out)             :: info
      end subroutine psb_cdcpy
   end interface
@@ -125,7 +125,7 @@ Subroutine psb_cdovr(a,desc_a,novr,desc_ov,info)
     ! Just copy the input.  
     !
     if (debug) write(0,*) 'Calling desccpy'
-    call psb_cdcpy(desc_ov,desc_a,info)
+    call psb_cdcpy(desc_a,desc_ov,info)
     if (info.ne.0) then
        info=4010
        ch_err='psb_cdcpy'

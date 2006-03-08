@@ -33,7 +33,7 @@
 !!$  POSSIBILITY OF SUCH DAMAGE.
 !!$ 
 !!$  
-subroutine psb_dbldaggrmat(a,desc_a,p,info)
+subroutine psb_dbldaggrmat(a,desc_a,ac,p,desc_p,info)
   use psb_serial_mod
   use psb_prec_type
   use psb_descriptor_type
@@ -43,10 +43,12 @@ subroutine psb_dbldaggrmat(a,desc_a,p,info)
   use psb_error_mod
   implicit none
 
-  type(psb_dspmat_type), intent(in), target :: a
-  type(psb_dbase_prec), intent(inout)       :: p
-  type(psb_desc_type), intent(in)           :: desc_a
-  integer, intent(out)                      :: info
+  type(psb_dspmat_type), intent(in), target  :: a
+  type(psb_dbase_prec), intent(inout)        :: p
+  type(psb_dspmat_type), intent(out), target :: ac
+  type(psb_desc_type), intent(in)            :: desc_a
+  type(psb_desc_type), intent(inout)         :: desc_p
+  integer, intent(out)                       :: info
 
   logical, parameter :: aggr_dump=.false.
   integer ::icontxt,nprow,npcol,me,mycol, err_act
@@ -68,7 +70,7 @@ subroutine psb_dbldaggrmat(a,desc_a,p,info)
       call psb_errpush(4010,name,a_err='raw_aggregate')
       goto 9999
     end if
-    if (aggr_dump) call psb_csprt(90+me,p%av(ac_),head='% Raw aggregate.')
+    if (aggr_dump) call psb_csprt(90+me,ac,head='% Raw aggregate.')
 
   case(smth_omg_,smth_biz_) 
 
@@ -114,10 +116,10 @@ contains
          & icomm,naggrm1, mtype, i, j, err_act
     name='raw_aggregate'
     if(psb_get_errstatus().ne.0) return 
-  info=0
+    info=0
     call psb_erractionsave(err_act)
 
-    bg => p%av(ac_)
+    bg => ac
 
     icontxt = desc_a%matrix_data(psb_ctxt_)
     call blacs_gridinfo(icontxt,nprows,npcols,myprow,mypcol)
@@ -239,7 +241,7 @@ contains
 
     if (p%iprcparm(coarse_mat_) == mat_repl_) then 
 
-      call psb_cdrep(ntaggr,icontxt,p%desc_data,info)
+      call psb_cdrep(ntaggr,icontxt,desc_p,info)
 
       nzbr(:) = 0
       nzbr(myprow+1) = irs
@@ -288,7 +290,7 @@ contains
 
     else if (p%iprcparm(coarse_mat_) == mat_distr_) then 
 
-      call psb_cddec(naggr,icontxt,p%desc_data,info)
+      call psb_cddec(naggr,icontxt,desc_p,info)
       call psb_spclone(b,bg,info)
       if(info /= 0) then
         call psb_errpush(4010,name,a_err='spclone')
@@ -358,7 +360,7 @@ contains
     icontxt = desc_a%matrix_data(psb_ctxt_)
     call blacs_gridinfo(icontxt,nprows,npcols,myprow,mypcol)
 
-    bg => p%av(ac_)
+    bg => ac
 
     am2 => p%av(sm_pr_t_)
     am1 => p%av(sm_pr_)
@@ -715,20 +717,20 @@ contains
             i = i + 1
           end do
         end do
-        call psb_cdall(ntaggr,ivall,icontxt,p%desc_data,info,flag=1)
+        call psb_cdall(ntaggr,ivall,icontxt,desc_p,info,flag=1)
         if(info /= 0) then
           call psb_errpush(4010,name,a_err='psb_cdall')
           goto 9999
         end if
 
 
-        call psb_cdins(nzl,bg%ia1,bg%ia2,p%desc_data,info)
+        call psb_cdins(nzl,bg%ia1,bg%ia2,desc_p,info)
         if(info /= 0) then
           call psb_errpush(4010,name,a_err='psb_cdins')
           goto 9999
         end if
 
-        call psb_cdasb(p%desc_data,info)
+        call psb_cdasb(desc_p,info)
         if(info /= 0) then
           call psb_errpush(4010,name,a_err='psb_cdasb')
           goto 9999
@@ -736,23 +738,25 @@ contains
 
 
 
-        call psb_glob_to_loc(bg%ia1(1:nzl),p%desc_data,info,iact='I')
+        call psb_glob_to_loc(bg%ia1(1:nzl),desc_p,info,iact='I')
         if(info /= 0) then
           call psb_errpush(4010,name,a_err='psglob_to_loc')
           goto 9999
         end if
 
 
-        call psb_glob_to_loc(bg%ia2(1:nzl),p%desc_data,info,iact='I')
+        call psb_glob_to_loc(bg%ia2(1:nzl),desc_p,info,iact='I')
         if(info /= 0) then
           call psb_errpush(4010,name,a_err='psglob_to_loc')
           goto 9999
         end if
 
 
-        bg%m=p%desc_data%matrix_data(psb_n_row_)
-        bg%k=p%desc_data%matrix_data(psb_n_col_)
-
+        bg%m=desc_p%matrix_data(psb_n_row_)
+        bg%k=desc_p%matrix_data(psb_n_col_)
+        bg%fida='COO'
+        bg%descra='G'
+       
         call psb_spfree(b,info)
         if(info /= 0) then
           call psb_errpush(4010,name,a_err='psb_spfree')
@@ -797,13 +801,13 @@ contains
 
         if (np>1) then 
           call psb_spinfo(psb_nztotreq_,am1,nzl,info)
-          call psb_glob_to_loc(am1%ia1(1:nzl),p%desc_data,info,'I')
+          call psb_glob_to_loc(am1%ia1(1:nzl),desc_p,info,'I')
           if(info /= 0) then
             call psb_errpush(4010,name,a_err='psb_glob_to_loc')
             goto 9999
           end if
         endif
-        am1%k=p%desc_data%matrix_data(psb_n_col_)
+        am1%k=desc_p%matrix_data(psb_n_col_)
 
         if (np>1) then 
           call psb_ipcsr2coo(am2,info)
@@ -813,7 +817,7 @@ contains
           end if
 
           nzl = am2%infoa(psb_nnz_) 
-          call psb_glob_to_loc(am2%ia1(1:nzl),p%desc_data,info,'I')
+          call psb_glob_to_loc(am2%ia1(1:nzl),desc_p,info,'I')
           if(info /= 0) then
             call psb_errpush(4010,name,a_err='psb_glob_to_loc')
             goto 9999
@@ -825,7 +829,7 @@ contains
             goto 9999
           end if
         end if
-        am2%m=p%desc_data%matrix_data(psb_n_col_)
+        am2%m=desc_p%matrix_data(psb_n_col_)
 
       case(mat_repl_) 
         !
@@ -833,7 +837,7 @@ contains
         nzbr(:) = 0
         nzbr(myprow+1) = b%infoa(psb_nnz_)
 
-        call psb_cdrep(ntaggr,icontxt,p%desc_data,info)
+        call psb_cdrep(ntaggr,icontxt,desc_p,info)
 
         call igsum2d(icontxt,'All',' ',np,1,nzbr,np,-1,-1)
         nzbg = sum(nzbr)
@@ -887,7 +891,7 @@ contains
           call psb_errpush(4010,name,a_err='spclone')
           goto 9999
         end if
-        call psb_cddec(naggr,icontxt,p%desc_data,info)
+        call psb_cddec(naggr,icontxt,desc_p,info)
 
         call psb_spfree(b,info)
         if(info /=  0) then
@@ -902,7 +906,7 @@ contains
         nzbr(:) = 0
         nzbr(myprow+1) = b%infoa(psb_nnz_)
 
-        call psb_cdrep(ntaggr,icontxt,p%desc_data,info)
+        call psb_cdrep(ntaggr,icontxt,desc_p,info)
 
 
         call igsum2d(icontxt,'All',' ',np,1,nzbr,np,-1,-1)
