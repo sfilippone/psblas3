@@ -116,10 +116,10 @@ subroutine psb_dumf_bld(a,desc_a,p,info)
   endif
   if (nzb > 0 ) then 
      if (size(atmp%aspk)<nza+nzb) then 
-        call psb_spreall(atmp,nza+nzb,info)
+        call psb_sp_reall(atmp,nza+nzb,info)
         if(info /= 0) then
            info=4010
-           ch_err='psb_spreall'
+           ch_err='psb_sp_reall'
            call psb_errpush(info,name,a_err=ch_err)
            goto 9999
         end if

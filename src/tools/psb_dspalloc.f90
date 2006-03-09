@@ -113,10 +113,10 @@ subroutine psb_dspalloc(a, desc_a, info, nnz)
   if (debug) write(*,*) 'allocating size:',length_ia1
 
   !....allocate aspk, ia1, ia2.....
-  call psb_spall(loc_row,loc_row,a,length_ia1,info)
+  call psb_sp_all(loc_row,loc_row,a,length_ia1,info)
   if(info.ne.0) then
      info=4010
-     ch_err='spreall'
+     ch_err='sp_all'
      call psb_errpush(info,name,int_err)
      goto 9999
   end if

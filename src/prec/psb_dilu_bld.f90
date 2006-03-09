@@ -197,11 +197,11 @@ subroutine psb_dilu_bld(a,desc_a,p,upd,info)
   p%av(l_pr_)%k  = n_row
   p%av(u_pr_)%m  = n_row
   p%av(u_pr_)%k  = n_row
-  call psb_spall(n_row,n_row,p%av(l_pr_),nztota+lovr,info)
-  call psb_spall(n_row,n_row,p%av(u_pr_),nztota+lovr,info)
+  call psb_sp_all(n_row,n_row,p%av(l_pr_),nztota+lovr,info)
+  call psb_sp_all(n_row,n_row,p%av(u_pr_),nztota+lovr,info)
   if(info/=0) then
     info=4010
-    ch_err='psb_spall'
+    ch_err='psb_sp_all'
     call psb_errpush(info,name,a_err=ch_err)
     goto 9999
   end if
@@ -235,7 +235,7 @@ subroutine psb_dilu_bld(a,desc_a,p,upd,info)
 
     call psb_spinfo(psb_nztotreq_,a,nztota,info)
     call psb_spinfo(psb_nztotreq_,blck,nztotb,info)
-    call psb_spall(atmp,nztota+nztotb,info)
+    call psb_sp_all(atmp,nztota+nztotb,info)
     if(info/=0) then
       info=4011
       call psb_errpush(info,name)

@@ -109,13 +109,13 @@ contains
     character(len=5), optional :: fmt
     interface 
 
-       !   .....user passed subroutine.....
-       subroutine parts(global_indx,n,np,pv,nv)
-         implicit none
-         integer, intent(in)  :: global_indx, n, np
-         integer, intent(out) :: nv
-         integer, intent(out) :: pv(*) 
-       end subroutine parts
+      !   .....user passed subroutine.....
+      subroutine parts(global_indx,n,np,pv,nv)
+        implicit none
+        integer, intent(in)  :: global_indx, n, np
+        integer, intent(out) :: nv
+        integer, intent(out) :: pv(*) 
+      end subroutine parts
     end interface
 
     ! local variables
@@ -139,95 +139,95 @@ contains
 
     ! executable statements    
     if (present(inroot)) then
-       root = inroot
+      root = inroot
     else
-       root = 0
+      root = 0
     end if
     call blacs_gridinfo(icontxt, nprow, npcol, myprow, mypcol)     
     if (myprow == root) then
-       ! extract information from a_glob
-       if (a_glob%fida.ne. 'CSR') then
-          info=135
-          ch_err='CSR'
-          call psb_errpush(info,name,a_err=ch_err)
-          goto 9999
-       endif
-       nrow = a_glob%m
-       ncol = a_glob%k
-       if (nrow /= ncol) then
-          write(0,*) 'a rectangular matrix ? ',nrow,ncol
-          info=-1
-          call psb_errpush(info,name)
-          goto 9999
-       endif
-       nnzero = size(a_glob%aspk)
-       nrhs   = 1
-       ! broadcast informations to other processors
-       call igebs2d(icontxt, 'a', ' ', 1, 1, nrow, 1)
-       call igebs2d(icontxt, 'a', ' ', 1, 1, ncol, 1)
-       call igebs2d(icontxt, 'a', ' ', 1, 1, nnzero, 1)
-       call igebs2d(icontxt, 'a', ' ', 1, 1, nrhs, 1)
+      ! extract information from a_glob
+      if (a_glob%fida.ne. 'CSR') then
+        info=135
+        ch_err='CSR'
+        call psb_errpush(info,name,a_err=ch_err)
+        goto 9999
+      endif
+      nrow = a_glob%m
+      ncol = a_glob%k
+      if (nrow /= ncol) then
+        write(0,*) 'a rectangular matrix ? ',nrow,ncol
+        info=-1
+        call psb_errpush(info,name)
+        goto 9999
+      endif
+      nnzero = size(a_glob%aspk)
+      nrhs   = 1
+      ! broadcast informations to other processors
+      call gebs2d(icontxt, 'a', nrow)
+      call gebs2d(icontxt, 'a', ncol)
+      call gebs2d(icontxt, 'a', nnzero)
+      call gebs2d(icontxt, 'a', nrhs)
     else !(myprow /= root)
-       ! receive informations
-       call igebr2d(icontxt, 'a', ' ', 1, 1, nrow, 1, root, 0)
-       call igebr2d(icontxt, 'a', ' ', 1, 1, ncol, 1, root, 0)
-       call igebr2d(icontxt, 'a', ' ', 1, 1, nnzero, 1, root, 0)
-       call igebr2d(icontxt, 'a', ' ', 1, 1, nrhs, 1, root, 0)
+      ! receive informations
+      call gebr2d(icontxt, 'a', nrow)
+      call gebr2d(icontxt, 'a', ncol)
+      call gebr2d(icontxt, 'a', nnzero)
+      call gebr2d(icontxt, 'a', nrhs)
     end if   ! allocate integer work area
     liwork = max(nprow, nrow + ncol)
     allocate(iwork(liwork), stat = info)
     if (info /= 0) then
-       info=2025
-       int_err(1)=liwork
-       call psb_errpush(info,name,i_err=int_err)
-       goto 9999
+      info=2025
+      int_err(1)=liwork
+      call psb_errpush(info,name,i_err=int_err)
+      goto 9999
     endif
     if (myprow == root) then
-       write (*, fmt = *) 'start matdist',root, size(iwork),&
-            &nrow, ncol, nnzero,nrhs
+      write (*, fmt = *) 'start matdist',root, size(iwork),&
+           &nrow, ncol, nnzero,nrhs
     endif
     if (newt) then 
-       call psb_cdall(nrow,nrow,parts,icontxt,desc_a,info)
-       if(info/=0) then
-          info=4010
-          ch_err='psb_cdall'
-          call psb_errpush(info,name,a_err=ch_err)
-          goto 9999
-       end if
+      call psb_cdall(nrow,nrow,parts,icontxt,desc_a,info)
+      if(info/=0) then
+        info=4010
+        ch_err='psb_cdall'
+        call psb_errpush(info,name,a_err=ch_err)
+        goto 9999
+      end if
     else
-       call psb_cdall(nrow,nrow,parts,icontxt,desc_a,info)
-       if(info/=0) then
-          info=4010
-          ch_err='psb_psdscall'
-          call psb_errpush(info,name,a_err=ch_err)
-          goto 9999
-       end if
+      call psb_cdall(nrow,nrow,parts,icontxt,desc_a,info)
+      if(info/=0) then
+        info=4010
+        ch_err='psb_psdscall'
+        call psb_errpush(info,name,a_err=ch_err)
+        goto 9999
+      end if
     endif
-    call psb_spalloc(a,desc_a,info,nnz=nnzero/nprow)
+    call psb_spall(a,desc_a,info,nnz=nnzero/nprow)
     if(info/=0) then
-       info=4010
-       ch_err='psb_psspall'
-       call psb_errpush(info,name,a_err=ch_err)
-       goto 9999
+      info=4010
+      ch_err='psb_psspall'
+      call psb_errpush(info,name,a_err=ch_err)
+      goto 9999
     end if
-    call psb_alloc(nrow,b,desc_a,info)   
+    call psb_geall(nrow,b,desc_a,info)   
     if(info/=0) then
-       info=4010
-       ch_err='psb_psdsall'
-       call psb_errpush(info,name,a_err=ch_err)
-       goto 9999
+      info=4010
+      ch_err='psb_psdsall'
+      call psb_errpush(info,name,a_err=ch_err)
+      goto 9999
     end if
     isize = max(3*nb,ncol)
 
 
     blck%m = nb
     blck%k = ncol
-    call psb_spall(blck,nb*ncol,info)
+    call psb_sp_all(blck,nb*ncol,info)
     if(info/=0) then
-       info=4010
-       ch_err='spall'
-       call psb_errpush(info,name,a_err=ch_err)
-       goto 9999
+      info=4010
+      ch_err='spall'
+      call psb_errpush(info,name,a_err=ch_err)
+      goto 9999
     end if
 
     blck%fida = 'CSR'
@@ -235,247 +235,247 @@ contains
 
     do while (i_count.le.nrow)
 
-       call parts(i_count,nrow,nprow,iwork, length_row)
+      call parts(i_count,nrow,nprow,iwork, length_row)
 
-       if (length_row.eq.1) then 
-          j_count = i_count 
-          iproc   = iwork(1) 
-          do 
-             j_count = j_count + 1 
-             if (j_count-i_count >= nb) exit
-             if (j_count > nrow) exit
-             call parts(j_count,nrow,nprow,iwork, length_row)
-             if (length_row /= 1 ) exit
-             if (iwork(1) /= iproc ) exit
-          end do
+      if (length_row.eq.1) then 
+        j_count = i_count 
+        iproc   = iwork(1) 
+        do 
+          j_count = j_count + 1 
+          if (j_count-i_count >= nb) exit
+          if (j_count > nrow) exit
+          call parts(j_count,nrow,nprow,iwork, length_row)
+          if (length_row /= 1 ) exit
+          if (iwork(1) /= iproc ) exit
+        end do
 
-          ! now we should insert rows i_count..j_count-1
-          nnr = j_count - i_count
+        ! now we should insert rows i_count..j_count-1
+        nnr = j_count - i_count
 
-          if (myprow == root) then
+        if (myprow == root) then
 
-             do j = i_count, j_count
-                blck%ia2(j-i_count+1) = a_glob%ia2(j) - &
-                     & a_glob%ia2(i_count) + 1
-             enddo
+          do j = i_count, j_count
+            blck%ia2(j-i_count+1) = a_glob%ia2(j) - &
+                 & a_glob%ia2(i_count) + 1
+          enddo
 
-             k = a_glob%ia2(i_count)
-             do j = k, a_glob%ia2(j_count)-1
-                blck%aspk(j-k+1) = a_glob%aspk(j)
-                blck%ia1(j-k+1) = a_glob%ia1(j)
-             enddo
+          k = a_glob%ia2(i_count)
+          do j = k, a_glob%ia2(j_count)-1
+            blck%aspk(j-k+1) = a_glob%aspk(j)
+            blck%ia1(j-k+1) = a_glob%ia1(j)
+          enddo
 
-             ll     = blck%ia2(nnr+1) - 1
-             blck%m = nnr
-             blck%k = nrow
-             if (iproc == myprow) then
-                call psb_spins(ll,blck%ia1,blck%ia2,blck%aspk,a,desc_a,info)
-                if(info/=0) then
-                   info=4010
-                   ch_err='psb_spins'
-                   call psb_errpush(info,name,a_err=ch_err)
-                   goto 9999
-                end if
-                call psb_ins(nnr,b,i_count,b_glob(i_count:j_count-1),&
-                     &desc_a,info)
-                if(info/=0) then
-                   info=4010
-                   ch_err='psb_ins'
-                   call psb_errpush(info,name,a_err=ch_err)
-                   goto 9999
-                end if
-             else
-                call igesd2d(icontxt,1,1,nnr,1,iproc,0)
-                call igesd2d(icontxt,1,1,ll,1,iproc,0)
-                call igesd2d(icontxt,nnr+1,1,blck%ia2,nnr+1,iproc,0)
-                call igesd2d(icontxt,ll,1,blck%ia1,ll,iproc,0)
-                call dgesd2d(icontxt,ll,1,blck%aspk,ll,iproc,0)
-                call dgesd2d(icontxt,nnr,1,b_glob(i_count:j_count-1),nnr,iproc,0)
-                call igerv2d(icontxt,1,1,ll,1,iproc,0)
-             endif
-          else if (myprow /= root) then
-
-             if (iproc == myprow) then
-                call igerv2d(icontxt,1,1,nnr,1,root,0)
-                call igerv2d(icontxt,1,1,ll,1,root,0)
-                if (ll > size(blck%ia1)) then 
-                   write(0,*) myprow,'need to reallocate ',ll
-                   call psb_spreall(blck,ll,info)
-                   if(info/=0) then
-                      info=4010
-                      ch_err='psb_spreall'
-                      call psb_errpush(info,name,a_err=ch_err)
-                      goto 9999
-                   end if
-
-                endif
-                call igerv2d(icontxt,ll,1,blck%ia1,ll,root,0)
-                call igerv2d(icontxt,nnr+1,1,blck%ia2,nnr+1,root,0)
-                call dgerv2d(icontxt,ll,1,blck%aspk,ll,root,0)
-                call dgerv2d(icontxt,nnr,1,b_glob(i_count:i_count+nnr-1),nnr,root,0)
-                call igesd2d(icontxt,1,1,ll,1,root,0)
-                blck%m = nnr
-                blck%k = nrow
-                blck%infoa(psb_nnz_) = ll
-                call psb_spins(ll,blck%ia1,blck%ia2,blck%aspk,a,desc_a,info)
-                if(info/=0) then
-                   info=4010
-                   ch_err='psspins'
-                   call psb_errpush(info,name,a_err=ch_err)
-                   goto 9999
-                end if
-                call psb_ins(nnr,b,i_count,b_glob(i_count:i_count+nnr-1),&
-                     &desc_a,info)
-                if(info/=0) then
-                   info=4010
-                   ch_err='psdsins'
-                   call psb_errpush(info,name,a_err=ch_err)
-                   goto 9999
-                end if
-             endif
+          ll     = blck%ia2(nnr+1) - 1
+          blck%m = nnr
+          blck%k = nrow
+          if (iproc == myprow) then
+            call psb_spins(ll,blck%ia1,blck%ia2,blck%aspk,a,desc_a,info)
+            if(info/=0) then
+              info=4010
+              ch_err='psb_spins'
+              call psb_errpush(info,name,a_err=ch_err)
+              goto 9999
+            end if
+            call psb_geins(nnr,b,i_count,b_glob(i_count:j_count-1),&
+                 &desc_a,info)
+            if(info/=0) then
+              info=4010
+              ch_err='psb_ins'
+              call psb_errpush(info,name,a_err=ch_err)
+              goto 9999
+            end if
+          else
+            call igesd2d(icontxt,1,1,nnr,1,iproc,0)
+            call igesd2d(icontxt,1,1,ll,1,iproc,0)
+            call igesd2d(icontxt,nnr+1,1,blck%ia2,nnr+1,iproc,0)
+            call igesd2d(icontxt,ll,1,blck%ia1,ll,iproc,0)
+            call dgesd2d(icontxt,ll,1,blck%aspk,ll,iproc,0)
+            call dgesd2d(icontxt,nnr,1,b_glob(i_count:j_count-1),nnr,iproc,0)
+            call igerv2d(icontxt,1,1,ll,1,iproc,0)
           endif
+        else if (myprow /= root) then
 
-          i_count = j_count
+          if (iproc == myprow) then
+            call igerv2d(icontxt,1,1,nnr,1,root,0)
+            call igerv2d(icontxt,1,1,ll,1,root,0)
+            if (ll > size(blck%ia1)) then 
+              write(0,*) myprow,'need to reallocate ',ll
+              call psb_sp_reall(blck,ll,info)
+              if(info/=0) then
+                info=4010
+                ch_err='psb_sp_reall'
+                call psb_errpush(info,name,a_err=ch_err)
+                goto 9999
+              end if
 
-       else
-          write(0,*) myprow,'unexpected turn'
-          ! here processors are counted 1..nprow
-          do j_count = 1, length_row
-             k_count = iwork(j_count)
-             if (myprow == root) then
-                blck%ia2(1) = 1
-                blck%ia2(2) = 1
-                do j = a_glob%ia2(i_count), a_glob%ia2(i_count+1)-1
-                   blck%aspk(blck%ia2(2)) = a_glob%aspk(j)
-                   blck%ia1(blck%ia2(2)) = a_glob%ia1(j)
-                   blck%ia2(2) =blck%ia2(2) + 1
-                enddo
-                ll = blck%ia2(2) - 1
-                if (k_count == myprow) then
-                   blck%infoa(1) = ll
-                   blck%infoa(2) = ll
-                   blck%infoa(3) = 2
-                   blck%infoa(4) = 1
-                   blck%infoa(5) = 1
-                   blck%infoa(6) = 1
-                   blck%m = 1
-                   blck%k = nrow
+            endif
+            call igerv2d(icontxt,ll,1,blck%ia1,ll,root,0)
+            call igerv2d(icontxt,nnr+1,1,blck%ia2,nnr+1,root,0)
+            call dgerv2d(icontxt,ll,1,blck%aspk,ll,root,0)
+            call dgerv2d(icontxt,nnr,1,b_glob(i_count:i_count+nnr-1),nnr,root,0)
+            call igesd2d(icontxt,1,1,ll,1,root,0)
+            blck%m = nnr
+            blck%k = nrow
+            blck%infoa(psb_nnz_) = ll
+            call psb_spins(ll,blck%ia1,blck%ia2,blck%aspk,a,desc_a,info)
+            if(info/=0) then
+              info=4010
+              ch_err='psspins'
+              call psb_errpush(info,name,a_err=ch_err)
+              goto 9999
+            end if
+            call psb_geins(nnr,b,i_count,b_glob(i_count:i_count+nnr-1),&
+                 &desc_a,info)
+            if(info/=0) then
+              info=4010
+              ch_err='psdsins'
+              call psb_errpush(info,name,a_err=ch_err)
+              goto 9999
+            end if
+          endif
+        endif
 
-                   call psb_spins(ll,blck%ia1,blck%ia2,blck%aspk,a,desc_a,info)
-                   if(info/=0) then
-                      info=4010
-                      ch_err='psspins'
-                      call psb_errpush(info,name,a_err=ch_err)
-                      goto 9999
-                   end if
-                   call psb_ins(1,b,i_count,b_glob(i_count:i_count),&
-                        &desc_a,info)
-                   if(info/=0) then
-                      info=4010
-                      ch_err='psdsins'
-                      call psb_errpush(info,name,a_err=ch_err)
-                      goto 9999
-                   end if
-                else
-                   call igesd2d(icontxt,1,1,ll,1,k_count,0)
-                   call igesd2d(icontxt,ll,1,blck%ia1,ll,k_count,0)
-                   call dgesd2d(icontxt,ll,1,blck%aspk,ll,k_count,0)
-                   call dgesd2d(icontxt,1,1,b_glob(i_count),1,k_count,0)
-                   call igerv2d(icontxt,1,1,ll,1,k_count,0)
-                endif
-             else if (myprow /= root) then
-                if (k_count == myprow) then
-                   call igerv2d(icontxt,1,1,ll,1,root,0)
-                   blck%ia2(1) = 1
-                   blck%ia2(2) = ll+1
-                   call igerv2d(icontxt,ll,1,blck%ia1,ll,root,0)
-                   call dgerv2d(icontxt,ll,1,blck%aspk,ll,root,0)
-                   call dgerv2d(icontxt,1,1,b_glob(i_count),1,root,0)
-                   call igesd2d(icontxt,1,1,ll,1,root,0)
-                   blck%m = 1
-                   blck%k = nrow          
-                   call psb_spins(ll,blck%ia1,blck%ia2,blck%aspk,a,desc_a,info)
-                   if(info/=0) then
-                      info=4010
-                      ch_err='psspins'
-                      call psb_errpush(info,name,a_err=ch_err)
-                      goto 9999
-                   end if
-                   call psb_ins(1,b,i_count,b_glob(i_count:i_count),&
-                        &desc_a,info)
-                   if(info/=0) then
-                      info=4010
-                      ch_err='psdsins'
-                      call psb_errpush(info,name,a_err=ch_err)
-                      goto 9999
-                   end if
-                endif
-             endif
-          end do
-          i_count = i_count + 1
-       endif
+        i_count = j_count
+
+      else
+        write(0,*) myprow,'unexpected turn'
+        ! here processors are counted 1..nprow
+        do j_count = 1, length_row
+          k_count = iwork(j_count)
+          if (myprow == root) then
+            blck%ia2(1) = 1
+            blck%ia2(2) = 1
+            do j = a_glob%ia2(i_count), a_glob%ia2(i_count+1)-1
+              blck%aspk(blck%ia2(2)) = a_glob%aspk(j)
+              blck%ia1(blck%ia2(2)) = a_glob%ia1(j)
+              blck%ia2(2) =blck%ia2(2) + 1
+            enddo
+            ll = blck%ia2(2) - 1
+            if (k_count == myprow) then
+              blck%infoa(1) = ll
+              blck%infoa(2) = ll
+              blck%infoa(3) = 2
+              blck%infoa(4) = 1
+              blck%infoa(5) = 1
+              blck%infoa(6) = 1
+              blck%m = 1
+              blck%k = nrow
+
+              call psb_spins(ll,blck%ia1,blck%ia2,blck%aspk,a,desc_a,info)
+              if(info/=0) then
+                info=4010
+                ch_err='psspins'
+                call psb_errpush(info,name,a_err=ch_err)
+                goto 9999
+              end if
+              call psb_geins(1,b,i_count,b_glob(i_count:i_count),&
+                   &desc_a,info)
+              if(info/=0) then
+                info=4010
+                ch_err='psdsins'
+                call psb_errpush(info,name,a_err=ch_err)
+                goto 9999
+              end if
+            else
+              call igesd2d(icontxt,1,1,ll,1,k_count,0)
+              call igesd2d(icontxt,ll,1,blck%ia1,ll,k_count,0)
+              call dgesd2d(icontxt,ll,1,blck%aspk,ll,k_count,0)
+              call dgesd2d(icontxt,1,1,b_glob(i_count),1,k_count,0)
+              call igerv2d(icontxt,1,1,ll,1,k_count,0)
+            endif
+          else if (myprow /= root) then
+            if (k_count == myprow) then
+              call igerv2d(icontxt,1,1,ll,1,root,0)
+              blck%ia2(1) = 1
+              blck%ia2(2) = ll+1
+              call igerv2d(icontxt,ll,1,blck%ia1,ll,root,0)
+              call dgerv2d(icontxt,ll,1,blck%aspk,ll,root,0)
+              call dgerv2d(icontxt,1,1,b_glob(i_count),1,root,0)
+              call igesd2d(icontxt,1,1,ll,1,root,0)
+              blck%m = 1
+              blck%k = nrow          
+              call psb_spins(ll,blck%ia1,blck%ia2,blck%aspk,a,desc_a,info)
+              if(info/=0) then
+                info=4010
+                ch_err='psspins'
+                call psb_errpush(info,name,a_err=ch_err)
+                goto 9999
+              end if
+              call psb_geins(1,b,i_count,b_glob(i_count:i_count),&
+                   &desc_a,info)
+              if(info/=0) then
+                info=4010
+                ch_err='psdsins'
+                call psb_errpush(info,name,a_err=ch_err)
+                goto 9999
+              end if
+            endif
+          endif
+        end do
+        i_count = i_count + 1
+      endif
     end do
 
     if (present(fmt)) then 
-       afmt=fmt
+      afmt=fmt
     else
-       afmt = 'CSR'
+      afmt = 'CSR'
     endif
     if (newt) then 
 
-       call blacs_barrier(icontxt,'all')
-       t0 = mpi_wtime()
-       call psb_cdasb(desc_a,info)     
-       t1 = mpi_wtime()
-       if(info/=0)then
-          info=4010
-          ch_err='psb_cdasb'
-          call psb_errpush(info,name,a_err=ch_err)
-          goto 9999
-       end if
+      call blacs_barrier(icontxt,'all')
+      t0 = mpi_wtime()
+      call psb_cdasb(desc_a,info)     
+      t1 = mpi_wtime()
+      if(info/=0)then
+        info=4010
+        ch_err='psb_cdasb'
+        call psb_errpush(info,name,a_err=ch_err)
+        goto 9999
+      end if
 
-       call blacs_barrier(icontxt,'all')
-       t2 = mpi_wtime()
-       call psb_spasb(a,desc_a,info,dup=1,afmt=afmt)     
-       t3 = mpi_wtime()
-       if(info/=0)then
-          info=4010
-          ch_err='psb_spasb'
-          call psb_errpush(info,name,a_err=ch_err)
-          goto 9999
-       end if
+      call blacs_barrier(icontxt,'all')
+      t2 = mpi_wtime()
+      call psb_spasb(a,desc_a,info,dup=1,afmt=afmt)     
+      t3 = mpi_wtime()
+      if(info/=0)then
+        info=4010
+        ch_err='psb_spasb'
+        call psb_errpush(info,name,a_err=ch_err)
+        goto 9999
+      end if
 
 
-       if (myprow == root) then 
-          write(*,*) 'descriptor assembly: ',t1-t0
-          write(*,*) 'sparse matrix assembly: ',t3-t2
-       end if
+      if (myprow == root) then 
+        write(*,*) 'descriptor assembly: ',t1-t0
+        write(*,*) 'sparse matrix assembly: ',t3-t2
+      end if
 
 
     else
-       call psb_spasb(a,desc_a,info,afmt=afmt,dup=1)     
-       if(info/=0)then
-          info=4010
-          ch_err='psspasb'
-          call psb_errpush(info,name,a_err=ch_err)
-          goto 9999
-       end if
+      call psb_spasb(a,desc_a,info,afmt=afmt,dup=1)     
+      if(info/=0)then
+        info=4010
+        ch_err='psspasb'
+        call psb_errpush(info,name,a_err=ch_err)
+        goto 9999
+      end if
     endif
 
 
-    call psb_asb(b,desc_a,info)     
+    call psb_geasb(b,desc_a,info)     
     if(info/=0)then
-       info=4010
-       ch_err='psdsasb'
-       call psb_errpush(info,name,a_err=ch_err)
-       goto 9999
+      info=4010
+      ch_err='psdsasb'
+      call psb_errpush(info,name,a_err=ch_err)
+      goto 9999
     end if
     call psb_spfree(blck,info)
     if(info/=0)then
-       info=4010
-       ch_err='spfree'
-       call psb_errpush(info,name,a_err=ch_err)
-       goto 9999
+      info=4010
+      ch_err='spfree'
+      call psb_errpush(info,name,a_err=ch_err)
+      goto 9999
     end if
 
     deallocate(iwork)   
@@ -487,8 +487,8 @@ contains
 9999 continue
     call psb_erractionrestore(err_act)
     if (err_act.eq.act_abort) then
-       call psb_error(icontxt)
-       return
+      call psb_error(icontxt)
+      return
     end if
     return
 
@@ -641,14 +641,14 @@ contains
        goto 9999
     end if
 
-    call psb_spalloc(a,desc_a,info,nnz=((nnzero+nprow-1)/nprow))
+    call psb_spall(a,desc_a,info,nnz=((nnzero+nprow-1)/nprow))
     if(info/=0) then
        info=4010
        ch_err='psb_psspall'
        call psb_errpush(info,name,a_err=ch_err)
        goto 9999
     end if
-    call psb_alloc(nrow,b,desc_a,info)   
+    call psb_geall(nrow,b,desc_a,info)   
     if(info/=0) then
        info=4010
        ch_err='psb_psdsall'
@@ -660,7 +660,7 @@ contains
 
     blck%m = nb
     blck%k = ncol
-    call psb_spall(blck,nb*ncol,info)
+    call psb_sp_all(blck,nb*ncol,info)
     if(info/=0) then
        info=4010
        ch_err='spall'
@@ -689,7 +689,7 @@ contains
        if (myprow == root) then
           ll = a_glob%ia2(j_count)-a_glob%ia2(i_count)
           if (ll > size(blck%aspk)) then 
-             call psb_spreall(blck,ll,info)
+             call psb_sp_reall(blck,ll,info)
              if(info/=0) then
                 info=4010
                 ch_err='spreall'
@@ -719,7 +719,7 @@ contains
                 goto 9999
              end if
 
-             call psb_ins(nnr,b,i_count,b_glob(i_count:j_count-1),&
+             call psb_geins(nnr,b,i_count,b_glob(i_count:j_count-1),&
                   &desc_a,info)
              if(info/=0) then
                 info=4010
@@ -743,7 +743,7 @@ contains
              call igerv2d(icontxt,1,1,ll,1,root,0)
              if (ll > size(blck%aspk)) then 
                 write(0,*) myprow,'need to reallocate ',ll
-                call psb_spreall(blck,ll,info)
+                call psb_sp_reall(blck,ll,info)
                 if(info/=0) then
                    info=4010
                    ch_err='spreall'
@@ -810,7 +810,7 @@ contains
        goto 9999
     end if
 
-    call psb_asb(b,desc_a,info)
+    call psb_geasb(b,desc_a,info)
 
     if (myprow == root) then 
        write(*,'("Descriptor assembly   : ",es10.4)')t1-t0

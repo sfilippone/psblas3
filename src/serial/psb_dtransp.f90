@@ -56,7 +56,7 @@ subroutine psb_dtransp(a,b,c,fmt)
     fmt_='CSR'
   endif
   if (associated(b%aspk)) call psb_spfree(b,info)
-  call psb_spclone(a,b,info)
+  call psb_sp_clone(a,b,info)
   
   if (b%fida=='CSR') then 
     call psb_ipcsr2coo(b,info)

@@ -132,7 +132,7 @@ program df_sample
     call readmat(mtrx_file, aux_a, ictxt)
 
     m_problem = aux_a%m
-    call igebs2d(ictxt,'a',' ',1,1,m_problem,1)
+    call gebs2d(ictxt,'a',m_problem)
 
     if(rhs_file /= 'NONE') then
        !  reading an rhs
@@ -157,16 +157,16 @@ program df_sample
          b_col_glob(i) = 1.d0
       enddo      
     endif
-    call dgebs2d(ictxt,'a',' ',m_problem,1,b_col_glob,m_problem) 
+    call gebs2d(ictxt,'a',b_col_glob(1:m_problem))
   else
-    call igebr2d(ictxt,'a',' ',1,1,m_problem,1,0,0)
+    call gebr2d(ictxt,'a',m_problem)
     allocate(aux_b(m_problem,1), stat=ircode)
     if (ircode /= 0) then
        call psb_errpush(4000,name)
        goto 9999
     endif
     b_col_glob =>aux_b(:,1)
-    call dgebr2d(ictxt,'a',' ',m_problem,1,b_col_glob,m_problem,0,0) 
+    call gebr2d(ictxt,'a',b_col_glob(1:m_problem)) 
   end if
 
   ! switch over different partition types
@@ -208,17 +208,16 @@ program df_sample
          & desc_a,b_col_glob,b_col,info,fmt=afmt)
   end if
   
-  call psb_alloc(m_problem,x_col,desc_a,info)
+  call psb_geall(m_problem,x_col,desc_a,info)
   x_col(:) =0.0
-  call psb_asb(x_col,desc_a,info)
-  call psb_alloc(m_problem,r_col,desc_a,info)
+  call psb_geasb(x_col,desc_a,info)
+  call psb_geall(m_problem,r_col,desc_a,info)
   r_col(:) =0.0
-  call psb_asb(r_col,desc_a,info)
+  call psb_geasb(r_col,desc_a,info)
   t2 = mpi_wtime() - t1
   
   
-  call dgamx2d(ictxt, 'a', ' ', ione, ione, t2, ione,&
-       & t1, t1, -1, -1, -1)
+  call gamx2d(ictxt, 'a', t2)
   
   if (amroot) then
      write(*,'(" ")')
@@ -272,7 +271,7 @@ program df_sample
   end if
   
   
-  call dgamx2d(ictxt,'a',' ',ione, ione,tprec,ione,t1,t1,-1,-1,-1)
+  call gamx2d(ictxt,'a',tprec)
   
   if(amroot) then
      write(*,'("Preconditioner time: ",es10.4)')tprec
@@ -300,11 +299,11 @@ program df_sample
   endif
   call blacs_barrier(ictxt,'all')
   t2 = mpi_wtime() - t1
-  call dgamx2d(ictxt,'a',' ',ione, ione,t2,ione,t1,t1,-1,-1,-1)
-  call psb_axpby(1.d0,b_col,0.d0,r_col,desc_a,info)
+  call gamx2d(ictxt,'a',t2)
+  call psb_geaxpby(1.d0,b_col,0.d0,r_col,desc_a,info)
   call psb_spmm(-1.d0,a,x_col,1.d0,r_col,desc_a,info)
-  call psb_nrm2s(resmx,r_col,desc_a,info)
-  call psb_amaxs(resmxp,r_col,desc_a,info)
+  call psb_genrm2s(resmx,r_col,desc_a,info)
+  call psb_geamaxs(resmxp,r_col,desc_a,info)
 
 !!$  iter=iparm(5)
 !!$  err = rparm(2)
@@ -346,8 +345,8 @@ program df_sample
 993 format(i6,4(1x,e12.6))
 
   
-  call psb_free(b_col, desc_a,info)
-  call psb_free(x_col, desc_a,info)
+  call psb_gefree(b_col, desc_a,info)
+  call psb_gefree(x_col, desc_a,info)
   call psb_spfree(a, desc_a,info)
   call psb_precfree(pre,info)
   call psb_cdfree(desc_a,info)

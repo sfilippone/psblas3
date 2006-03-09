@@ -69,7 +69,6 @@ subroutine  psb_dscatterm(globx, locx, desc_a, info, iroot,&
        & err_act, m, n, iix, jjx, temp(2), i, j, idx, nrow, iiroot, iglobx, jglobx,&
        & ilocx, jlocx, lda_locx, lda_globx, lock, globk, icomm, k, maxk, root, ilx,&
        & jlx, myrank, rootrank, c, pos
-  real(kind(1.d0))         :: locmax(2), amax
   real(kind(1.d0)),pointer :: scatterv(:)
   integer, pointer         :: displ(:), l_t_g_all(:), all_dim(:)
   integer                  :: blacs_pnum
@@ -331,7 +330,6 @@ subroutine  psb_dscatterv(globx, locx, desc_a, info, iroot)
        & err_act, m, n, iix, jjx, temp(2), i, j, idx, nrow, iiroot, iglobx, jglobx,&
        & ilocx, jlocx, lda_locx, lda_globx, lock, globk, root, k, maxk, icomm, myrank,&
        & rootrank, c, pos, ilx, jlx
-  real(kind(1.d0))         :: locmax(2), amax
   real(kind(1.d0)),pointer :: scatterv(:)
   integer, pointer         :: displ(:), l_t_g_all(:), all_dim(:)
   integer                  :: blacs_pnum

@@ -176,10 +176,10 @@ subroutine psb_dspasb(a,desc_a, info, afmt, up, dup)
      a%m = n_row
      a%k = n_col
 
-     call psb_spclone(a,atemp,info)
+     call psb_sp_clone(a,atemp,info)
      if(info /= no_err) then
         info=4010
-        ch_err='psb_spclone'
+        ch_err='psb_sp_clone'
         call psb_errpush(info,name,a_err=ch_err)
         goto 9999
         ! convert to user requested format after the temp copy
@@ -204,10 +204,10 @@ subroutine psb_dspasb(a,desc_a, info, afmt, up, dup)
         goto 9999
      endif
 
-     call psb_spreall(a,ia1_size,ia2_size,aspk_size,info)
+     call psb_sp_reall(a,ia1_size,ia2_size,aspk_size,info)
      if (info /= no_err) then    
         info=4010
-        ch_err='psb_spreall'
+        ch_err='psb_sp_reall'
         call psb_errpush(info,name,a_err=ch_err)
         goto 9999
      endif
@@ -253,13 +253,13 @@ subroutine psb_dspasb(a,desc_a, info, afmt, up, dup)
      ! Right now, almost nothing to be done, but this 
      ! may change in the future
      ! as we revise the implementation of the update routine. 
-     call psb_spall(atemp,1,info)
+     call psb_sp_all(atemp,1,info)
      atemp%m=a%m
      atemp%k=a%k
      ! check on allocation
      if (info /= no_err) then    
         info=4010
-        ch_err='psb_spall'
+        ch_err='psb_sp_all'
         call psb_errpush(info,name,a_err=ch_err)
         goto 9999
      endif

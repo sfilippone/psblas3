@@ -159,8 +159,8 @@ Subroutine psb_dcgstab(a,prec,b,x,eps,desc_a,info,&
 
   naux=6*n_col 
   allocate(aux(naux),stat=info)
-  call psb_alloc(mglob,8,wwrk,desc_a,info)
-  call psb_asb(wwrk,desc_a,info)  
+  call psb_geall(mglob,8,wwrk,desc_a,info)
+  call psb_geasb(wwrk,desc_a,info)  
   if (info /= 0) then 
      info=4011
      call psb_errpush(info,name)
@@ -199,10 +199,10 @@ Subroutine psb_dcgstab(a,prec,b,x,eps,desc_a,info,&
   itx   = 0
 
   If (listop == 1) Then 
-    ani = psb_nrmi(a,desc_a,info)
-    bni = psb_amax(b,desc_a,info)
+    ani = psb_spnrmi(a,desc_a,info)
+    bni = psb_geamax(b,desc_a,info)
   Else If (listop == 2) Then 
-    bn2 = psb_nrm2(b,desc_a,info)
+    bn2 = psb_genrm2(b,desc_a,info)
   Endif
   if (info /= 0) Then 
      info=4011
@@ -216,9 +216,9 @@ Subroutine psb_dcgstab(a,prec,b,x,eps,desc_a,info,&
 !!$ 
     If (itx >= litmax) Exit restart  
     it = 0      
-    Call psb_axpby(one,b,zero,r,desc_a,info)
+    Call psb_geaxpby(one,b,zero,r,desc_a,info)
     Call psb_spmm(-one,a,x,one,r,desc_a,info,work=aux)
-    Call psb_axpby(one,r,zero,q,desc_a,info)
+    Call psb_geaxpby(one,r,zero,q,desc_a,info)
     if (info /= 0) Then 
        info=4011
        call psb_errpush(info,name)
@@ -233,10 +233,10 @@ Subroutine psb_dcgstab(a,prec,b,x,eps,desc_a,info,&
 !   residual
 !
     If (listop == 1) Then 
-      rni = psb_amax(r,desc_a,info)
-      xni = psb_amax(x,desc_a,info)
+      rni = psb_geamax(r,desc_a,info)
+      xni = psb_geamax(x,desc_a,info)
     Else If (listop == 2) Then 
-      rni = psb_nrm2(r,desc_a,info)
+      rni = psb_genrm2(r,desc_a,info)
     Endif
     if (info /= 0) Then 
        info=4011
@@ -255,7 +255,7 @@ Subroutine psb_dcgstab(a,prec,b,x,eps,desc_a,info,&
     End If
     
     If (listop == 1) Then 
-      xni  = psb_amax(x,desc_a,info)
+      xni  = psb_geamax(x,desc_a,info)
       rerr =  rni/(ani*xni+bni)
       If (itrac /= -1) Then 
         If (myrow == 0) Write(itrac,'(a,i4,5(2x,es10.4))') 'bicgstab: ',itx,rerr,rni,bni,&
@@ -283,7 +283,7 @@ Subroutine psb_dcgstab(a,prec,b,x,eps,desc_a,info,&
       itx = itx + 1
       If (debug) Write(*,*) 'Iteration: ',itx
       rho_old = rho    
-      rho = psb_dot(q,r,desc_a,info)
+      rho = psb_gedot(q,r,desc_a,info)
 !!$    call blacs_barrier(icontxt,'All') ! to be removed
 !!$      write(0,'(i2," rho old ",2(f,2x))')myrow,rho,rho_old
 !!$    call blacs_barrier(icontxt,'All') ! to be removed
@@ -293,11 +293,11 @@ Subroutine psb_dcgstab(a,prec,b,x,eps,desc_a,info,&
       Endif
 
       If (it==1) Then
-        Call psb_axpby(one,r,zero,p,desc_a,info)
+        Call psb_geaxpby(one,r,zero,p,desc_a,info)
       Else
         beta = (rho/rho_old)*(alpha/omega)
-        Call psb_axpby(-omega,v,one,p,desc_a,info)
-        Call psb_axpby(one,r,beta,p,desc_a,info)
+        Call psb_geaxpby(-omega,v,one,p,desc_a,info)
+        Call psb_geaxpby(one,r,beta,p,desc_a,info)
       End If
 
       Call psb_prc_aply(prec,p,f,desc_a,info,work=aux)
@@ -305,21 +305,21 @@ Subroutine psb_dcgstab(a,prec,b,x,eps,desc_a,info,&
       Call psb_spmm(one,a,f,zero,v,desc_a,info,&
            & work=aux)
 
-      sigma = psb_dot(q,v,desc_a,info)
+      sigma = psb_gedot(q,v,desc_a,info)
       If (sigma==zero) Then
          If (debug) Write(0,*) 'Bi-CGSTAB Iteration breakdown S1', sigma
          Exit iteration
       Endif
       
       alpha = rho/sigma
-      Call psb_axpby(one,r,zero,s,desc_a,info)
+      Call psb_geaxpby(one,r,zero,s,desc_a,info)
       if(info.ne.0) then
-         call psb_errpush(4010,name,a_err='psb_axpby')
+         call psb_errpush(4010,name,a_err='psb_geaxpby')
          goto 9999
       end if
-      Call psb_axpby(-alpha,v,one,s,desc_a,info)
+      Call psb_geaxpby(-alpha,v,one,s,desc_a,info)
       if(info.ne.0) then
-         call psb_errpush(4010,name,a_err='psb_axpby')
+         call psb_errpush(4010,name,a_err='psb_geaxpby')
          goto 9999
       end if
       
@@ -337,13 +337,13 @@ Subroutine psb_dcgstab(a,prec,b,x,eps,desc_a,info,&
          goto 9999
       end if
       
-      sigma = psb_dot(t,t,desc_a,info)
+      sigma = psb_gedot(t,t,desc_a,info)
       If (sigma==zero) Then
          If (debug) Write(0,*) 'BI-CGSTAB ITERATION BREAKDOWN S2', sigma
         Exit iteration
       Endif
       
-      tau  = psb_dot(t,s,desc_a,info)
+      tau  = psb_gedot(t,s,desc_a,info)
       omega = tau/sigma
       
       If (omega==zero) Then
@@ -351,25 +351,26 @@ Subroutine psb_dcgstab(a,prec,b,x,eps,desc_a,info,&
         Exit iteration
       Endif
 
-      Call psb_axpby(alpha,f,one,x,desc_a,info)
-      Call psb_axpby(omega,z,one,x,desc_a,info)
-      Call psb_axpby(one,s,zero,r,desc_a,info)
-      Call psb_axpby(-omega,t,one,r,desc_a,info)
+      Call psb_geaxpby(alpha,f,one,x,desc_a,info)
+      Call psb_geaxpby(omega,z,one,x,desc_a,info)
+      Call psb_geaxpby(one,s,zero,r,desc_a,info)
+      Call psb_geaxpby(-omega,t,one,r,desc_a,info)
       
       If (listop == 1) Then 
-        rni = psb_amax(r,desc_a,info)
-        xni = psb_amax(x,desc_a,info)
+        rni = psb_geamax(r,desc_a,info)
+        xni = psb_geamax(x,desc_a,info)
         rerr =  rni/(ani*xni+bni)
         If (itrac /= -1) Then 
-          If (myrow == 0) Write(itrac,'(a,i4,5(2x,es10.4))') 'bicgstab: ',itx,rerr,rni,bni,&
-               &xni,ani
+          If (myrow == 0) Write(itrac,'(a,i4,5(2x,es10.4))') &
+               & 'bicgstab: ',itx,rerr,rni,bni,xni,ani
         Endif
 
       Else  If (listop == 2) Then 
-        rni = psb_nrm2(r,desc_a,info)
+        rni = psb_genrm2(r,desc_a,info)
         rerr = rni/bn2
         If (itrac /= -1) Then 
-          If (myrow == 0) Write(itrac,'(a,i4,3(2x,es10.4)))') 'bicgstab: ',itx,rerr,rni,bn2
+          If (myrow == 0) Write(itrac,'(a,i4,3(2x,es10.4)))') &
+               & 'bicgstab: ',itx,rerr,rni,bn2
         Endif
       Endif
       
@@ -389,7 +390,7 @@ Subroutine psb_dcgstab(a,prec,b,x,eps,desc_a,info,&
   End If
 
   Deallocate(aux)
-  Call psb_free(wwrk,desc_a,info)
+  Call psb_gefree(wwrk,desc_a,info)
   ! restore external global coherence behaviour
   Call blacs_set(icontxt,16,isvch)
 !!$  imerr = MPE_Log_event( istpe, 0, "ed CGSTAB" )

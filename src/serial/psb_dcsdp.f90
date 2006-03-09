@@ -145,7 +145,7 @@ subroutine psb_dcsdp(a, b,info,ifc,check,trans,unitd)
         ia1_size=a%infoa(psb_nnz_)
         ia2_size=a%m+1
         aspk_size=a%infoa(psb_nnz_)
-        call psb_spreall(b,ia1_size,ia2_size,aspk_size,info)
+        call psb_sp_reall(b,ia1_size,ia2_size,aspk_size,info)
 
         call dcrcr(trans_, a%m, a%k, unitd_, d, a%descra, a%aspk,&
              & a%ia1, a%ia2, a%infoa, b%pl, b%descra, b%aspk, b%ia1,&
@@ -167,7 +167,7 @@ subroutine psb_dcsdp(a, b,info,ifc,check,trans,unitd)
         ia1_size=a%infoa(psb_nnz_)
         ia2_size=a%m+1
         aspk_size=a%infoa(psb_nnz_)
-        call psb_spreall(b,ia1_size,ia2_size,aspk_size,info)
+        call psb_sp_reall(b,ia1_size,ia2_size,aspk_size,info)
         do
 
           call dcrjd(trans_, a%m, a%k, unitd_, d, a%descra, a%aspk,&
@@ -191,7 +191,7 @@ subroutine psb_dcsdp(a, b,info,ifc,check,trans,unitd)
             goto 9999
           endif
 
-          call psb_spreall(b,nzr,info,ifc=ifc_)
+          call psb_sp_reall(b,nzr,info,ifc=ifc_)
           if (info /= 0) then
             info=2040
             call psb_errpush(info,name)
@@ -208,7 +208,7 @@ subroutine psb_dcsdp(a, b,info,ifc,check,trans,unitd)
       case ('COO')
 
         aspk_size=max(size(a%aspk),a%ia2(a%m+1))
-        call psb_spreall(b,aspk_size,info)
+        call psb_sp_reall(b,aspk_size,info)
 !!$        write(0,*) 'From DCSDP90:',b%fida,size(b%aspk),info
         call dcrco(trans_, a%m, a%k, unitd_, d, a%descra, a%aspk,&
              & a%ia1, a%ia2, a%infoa, b%pl, b%descra, b%aspk, b%ia1,&
@@ -229,7 +229,7 @@ subroutine psb_dcsdp(a, b,info,ifc,check,trans,unitd)
       case ('CSR')
 
         aspk_size=max(size(a%aspk),a%ia2(a%m+1))
-        call psb_spreall(b,aspk_size,info)
+        call psb_sp_reall(b,aspk_size,info)
         call dcocr(trans_, a%m, a%k, unitd_, d, a%descra, a%aspk,&
              & a%ia2, a%ia1, a%infoa, b%pl, b%descra, b%aspk, b%ia1,&
              & b%ia2, b%infoa, b%pr, size(b%aspk), size(b%ia1),&
@@ -242,7 +242,7 @@ subroutine psb_dcsdp(a, b,info,ifc,check,trans,unitd)
 
       case ('JAD')
 
-        call psb_spall(temp_a, size(b%ia1),size(b%ia2),size(b%aspk),info)
+        call psb_sp_all(temp_a, size(b%ia1),size(b%ia2),size(b%aspk),info)
         if (info /= 0) then
           info=2040
           call psb_errpush(info,name)
@@ -288,7 +288,7 @@ subroutine psb_dcsdp(a, b,info,ifc,check,trans,unitd)
             goto 9999
           endif
 
-          call psb_spreall(b,nzr,info,ifc=ifc_)
+          call psb_sp_reall(b,nzr,info,ifc=ifc_)
           if (info /= 0) then
             info=2040
             call psb_errpush(info,name)
@@ -302,7 +302,7 @@ subroutine psb_dcsdp(a, b,info,ifc,check,trans,unitd)
       case ('COO')
 
         aspk_size=max(size(a%aspk),a%ia2(a%m+1))
-        call psb_spreall(b,aspk_size,info)
+        call psb_sp_reall(b,aspk_size,info)
         call dcoco(trans_, a%m, a%k, unitd_, d, a%descra, a%aspk,&
              & a%ia1, a%ia2, a%infoa, b%pl, b%descra, b%aspk, b%ia1,&
              & b%ia2, b%infoa, b%pr, size(b%aspk), size(b%ia1),&

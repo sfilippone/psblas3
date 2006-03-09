@@ -180,7 +180,7 @@ subroutine psb_dmlprc_aply(baseprecv,x,beta,y,desc_data,trans,work,info)
       ! 
       ! Finally add back into Y. 
       ! 
-      call psb_axpby(one,ty,one,y,desc_data,info)
+      call psb_geaxpby(one,ty,one,y,desc_data,info)
       if(info /=0) goto 9999
       deallocate(tx,ty,tz)
 
@@ -228,7 +228,7 @@ subroutine psb_dmlprc_aply(baseprecv,x,beta,y,desc_data,trans,work,info)
 
       if (debug) write(0,*)' mult_ml_apply  omega ',omega
       if (debugprt) write(0,*)' mult_ml_apply  X: ',X(:)
-      call psb_axpby(one,x,zero,tx,desc_data,info)
+      call psb_geaxpby(one,x,zero,tx,desc_data,info)
       if(info /=0) then 
         if (debug) write(0,*)' From axpby1 ',size(x),size(tx),n_row,n_col,nr2l,nrg
         call psb_errpush(4010,name,a_err='axpby post_smooth 1')
@@ -302,7 +302,7 @@ subroutine psb_dmlprc_aply(baseprecv,x,beta,y,desc_data,trans,work,info)
            & work,info)
       if(info /=0) goto 9999
 
-      call psb_axpby(one,ty,beta,y,desc_data,info)
+      call psb_geaxpby(one,ty,beta,y,desc_data,info)
       if(info /=0) goto 9999
 
       deallocate(tx,ty)
@@ -329,8 +329,8 @@ subroutine psb_dmlprc_aply(baseprecv,x,beta,y,desc_data,trans,work,info)
       ! Need temp copies to handle Y<- betaY + K^-1 X
       ! One of the temp copies is not strictly needed when beta==zero
       !
-      call psb_axpby(one,x,zero,tx,desc_data,info)
-      call psb_axpby(one,y,zero,ty,desc_data,info)
+      call psb_geaxpby(one,x,zero,tx,desc_data,info)
+      call psb_geaxpby(one,y,zero,ty,desc_data,info)
       if(info /=0) goto 9999
 
       call psb_baseprc_aply(baseprecv(1),x,zero,tty,desc_data,&
@@ -387,7 +387,7 @@ subroutine psb_dmlprc_aply(baseprecv,x,beta,y,desc_data,trans,work,info)
         call psb_csmm(one,baseprecv(2)%av(sm_pr_),t2l,zero,ty,info)
         if(info /=0) goto 9999
 
-        call psb_axpby(one,ty,one,tty,desc_data,info)
+        call psb_geaxpby(one,ty,one,tty,desc_data,info)
         if(info /=0) goto 9999
 
         deallocate(tz)
@@ -399,7 +399,7 @@ subroutine psb_dmlprc_aply(baseprecv,x,beta,y,desc_data,trans,work,info)
 
       end if
 
-      call psb_axpby(one,tty,beta,y,desc_data,info)
+      call psb_geaxpby(one,tty,beta,y,desc_data,info)
       if(info /=0) goto 9999
 
       deallocate(t2l,w2l,tx,ty,tty)
@@ -428,8 +428,8 @@ subroutine psb_dmlprc_aply(baseprecv,x,beta,y,desc_data,trans,work,info)
       ! Need temp copies to handle Y<- betaY + K^-1 X
       ! One of the temp copies is not strictly needed when beta==zero
       !
-      call psb_axpby(one,x,zero,tx,desc_data,info)
-      call psb_axpby(one,y,zero,ty,desc_data,info)
+      call psb_geaxpby(one,x,zero,tx,desc_data,info)
+      call psb_geaxpby(one,y,zero,ty,desc_data,info)
       if(info /=0) goto 9999
 
       call psb_baseprc_aply(baseprecv(1),tx,zero,tty,desc_data,trans,work,info)
@@ -479,7 +479,7 @@ subroutine psb_dmlprc_aply(baseprecv,x,beta,y,desc_data,trans,work,info)
         call psb_csmm(one,baseprecv(2)%av(sm_pr_),t2l,zero,ty,info)
         if(info /=0) goto 9999
 
-        call psb_axpby(one,ty,one,tty,desc_data,info)
+        call psb_geaxpby(one,ty,one,tty,desc_data,info)
         if(info /=0) goto 9999
 
       else
@@ -490,7 +490,7 @@ subroutine psb_dmlprc_aply(baseprecv,x,beta,y,desc_data,trans,work,info)
 
       end if
       
-      call psb_axpby(one,x,zero,tx,desc_data,info)
+      call psb_geaxpby(one,x,zero,tx,desc_data,info)
       if(info /=0) goto 9999
 
       call psb_spmm(-one,baseprecv(2)%aorig,tty,one,tx,desc_data,info,work=work)
@@ -498,7 +498,7 @@ subroutine psb_dmlprc_aply(baseprecv,x,beta,y,desc_data,trans,work,info)
       call psb_baseprc_aply(baseprecv(1),tx,one,tty,desc_data,'N',work,info)
 
 
-      call psb_axpby(one,tty,beta,y,desc_data,info)
+      call psb_geaxpby(one,tty,beta,y,desc_data,info)
       
       deallocate(t2l,w2l,tx,ty,tty)
 

@@ -60,7 +60,7 @@ module psb_spmat_type
     module procedure psb_nullify_dsp
   end interface
 
-  interface psb_spclone
+  interface psb_sp_clone
     module procedure psb_dspclone
   end interface
 
@@ -68,11 +68,11 @@ module psb_spmat_type
     module procedure psb_dsp_transfer
   end interface
 
-  interface psb_spreall
+  interface psb_sp_reall
     module procedure psb_dspreallocate, psb_dspreall3
   end interface
 
-  interface psb_spall
+  interface psb_sp_all
     module procedure psb_dspallocate, psb_dspall3, psb_dspallmk, psb_dspallmknz
   end interface
 
@@ -80,7 +80,7 @@ module psb_spmat_type
 !     module procedure psb_dspfree
 !   end interface
 
-  interface psb_spreinit
+  interface psb_sp_reinit
     module procedure psb_dspreinit
   end interface
 
@@ -129,7 +129,7 @@ contains
       return
     Endif
     if (debug) write(0,*) 'SPALL : NNZ ',nnz,a%m,a%k
-    call psb_spreall(a,nnz,info)
+    call psb_sp_reall(a,nnz,info)
 
     a%pl(1)=0
     a%pr(1)=0
@@ -161,7 +161,7 @@ contains
     if (debug) write(0,*) 'SPALL : NNZ ',nnz,a%m,a%k
     a%m=max(0,m)
     a%k=max(0,k)
-    call psb_spreall(a,nnz,info)
+    call psb_sp_reall(a,nnz,info)
 
     a%pl(1)=0
     a%pr(1)=0
@@ -193,7 +193,7 @@ contains
     if (debug) write(0,*) 'spall : nnz ',nnz,a%m,a%k
     a%m=max(0,m)
     a%k=max(0,k)
-    call psb_spreall(a,nnz,info)
+    call psb_sp_reall(a,nnz,info)
 
     a%pl(1)=0
     a%pr(1)=0
@@ -219,7 +219,7 @@ contains
 
     info  = 0
     
-    call psb_spreall(a, ni1,ni2,nd,info)
+    call psb_sp_reall(a, ni1,ni2,nd,info)
     
     a%pl(1)=0
     a%pr(1)=0

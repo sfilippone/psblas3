@@ -120,10 +120,10 @@ Subroutine psb_cdovrbld(n_ovr,desc_p,desc_a,a,&
   end if
 
 
-  call psb_spall(blk,max(lworks,lworkr),info)
+  call psb_sp_all(blk,max(lworks,lworkr),info)
   if (info.ne.0) then
      info=4010
-     ch_err='psb_spall'
+     ch_err='psb_sp_all'
      call psb_errpush(info,name,a_err=ch_err)
      goto 9999
   end if
@@ -399,10 +399,10 @@ Subroutine psb_cdovrbld(n_ovr,desc_p,desc_a,a,&
               If((n_elem) > size(blk%ia2)) Then
                  isz = max((3*size(blk%ia2))/2,(n_elem))
                  if (debug) write(0,*) myrow,'Realloc blk',isz
-                 call psb_spreall(blk,isz,info)
+                 call psb_sp_reall(blk,isz,info)
                  if (info.ne.0) then
                     info=4010
-                    ch_err='psb_spreall'
+                    ch_err='psb_sp_reall'
                     call psb_errpush(info,name,a_err=ch_err)
                     goto 9999
                  end if

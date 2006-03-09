@@ -75,10 +75,10 @@ subroutine psb_dilu_fct(a,l,u,d,info,blck)
     end if
 
     call psb_nullify_sp(blck_)  ! Why do we need this? Who knows.... 
-    call psb_spall(0,0,blck_,1,info)
+    call psb_sp_all(0,0,blck_,1,info)
     if(info.ne.0) then
        info=4010
-       ch_err='psb_spall'
+       ch_err='psb_sp_all'
        call psb_errpush(info,name,a_err=ch_err)
        goto 9999
     end if
@@ -156,10 +156,10 @@ contains
     trw%m=0
     trw%k=0
     if(debug) write(0,*)'LUINT Allocating TRW'
-    call psb_spall(trw,1,info)
+    call psb_sp_all(trw,1,info)
     if(info.ne.0) then
       info=4010
-      ch_err='psb_spall'
+      ch_err='psb_sp_all'
       call psb_errpush(info,name,a_err=ch_err)
       goto 9999
     end if

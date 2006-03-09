@@ -31,7 +31,7 @@
 module psb_psblas_mod
   use psb_comm_mod
 
-  interface psb_dot
+  interface psb_gedot
     function psb_ddotv(x, y, desc_a,info) 
       use psb_descriptor_type
       real(kind(1.d0))                   :: psb_ddotv
@@ -49,7 +49,7 @@ module psb_psblas_mod
     end function psb_ddot
  end interface
   
-  interface psb_dots
+  interface psb_gedots
     subroutine  psb_ddotvs(res,x, y, desc_a, info) 
       use psb_descriptor_type
       real(kind(1.d0)), intent(out)      :: res
@@ -66,7 +66,7 @@ module psb_psblas_mod
     end subroutine psb_dmdots
   end interface
 
-  interface psb_axpby
+  interface psb_geaxpby
      subroutine psb_daxpbyv(alpha, x, beta, y,&
 	  & desc_a, info)
        use psb_descriptor_type
@@ -88,7 +88,7 @@ module psb_psblas_mod
      end subroutine psb_daxpby
   end interface
 
-  interface psb_amax
+  interface psb_geamax
      function psb_damax(x, desc_a, info, jx)
        use psb_descriptor_type
        real(kind(1.d0))   psb_damax
@@ -106,7 +106,7 @@ module psb_psblas_mod
      end function psb_damaxv
   end interface
 
-  interface psb_amaxs
+  interface psb_geamaxs
      subroutine  psb_damaxvs(res,x,desc_a,info)
        use psb_descriptor_type
        real(kind(1.d0)), intent (out)      :: res
@@ -124,7 +124,7 @@ module psb_psblas_mod
      end subroutine psb_dmamax
   end interface
 
-  interface psb_asum
+  interface psb_geasum
      function psb_dasum(x, desc_a, info, jx)
        use psb_descriptor_type
        real(kind(1.d0))   psb_dasum
@@ -142,7 +142,7 @@ module psb_psblas_mod
      end function psb_dasumv
    end interface
 
-  interface psb_asums
+  interface psb_geasums
      subroutine  psb_dasumvs(res,x,desc_a,info)
        use psb_descriptor_type
        real(kind(1.d0)), intent (out)      :: res
@@ -160,7 +160,7 @@ module psb_psblas_mod
   end interface
 
 
-  interface psb_nrm2
+  interface psb_genrm2
      function psb_dnrm2(x, desc_a, info, jx)
        use psb_descriptor_type
        real(kind(1.d0))   psb_dnrm2
@@ -178,7 +178,7 @@ module psb_psblas_mod
      end function psb_dnrm2v
   end interface
 
-  interface psb_nrm2s
+  interface psb_genrm2s
      subroutine  psb_dnrm2vs(res,x,desc_a,info)
        use psb_descriptor_type
        real(kind(1.d0)), intent (out)      :: res
@@ -189,7 +189,7 @@ module psb_psblas_mod
   end interface
   
 
-  interface psb_nrmi
+  interface psb_spnrmi
      function psb_dnrmi(a, desc_a,info)
        use psb_serial_mod
        use psb_descriptor_type

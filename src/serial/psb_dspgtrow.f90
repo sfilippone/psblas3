@@ -156,7 +156,7 @@ contains
        end do
 
        if (min(size(b%ia1),size(b%ia2),size(b%aspk)) < nzb+nz) then 
-          call psb_spreall(b,nzb+nz,iret)
+          call psb_sp_reall(b,nzb+nz,iret)
        endif
 
        k=0
@@ -197,7 +197,7 @@ contains
        nz = a%ia2(idx+nr) - a%ia2(idx)
 
        if (min(size(b%ia1),size(b%ia2),size(b%aspk)) < nzb+nz) then 
-          call psb_spreall(b,nzb+nz,iret)
+          call psb_sp_reall(b,nzb+nz,iret)
        endif
        b%fida='COO'
 
@@ -311,7 +311,7 @@ contains
         ! Now do the copy.
         nz = jp - ip +1 
         if (size(b%ia1) < nzb+nz) then 
-          call psb_spreall(b,nzb+nz,iret)
+          call psb_sp_reall(b,nzb+nz,iret)
         endif
         b%fida='COO'        
         if (associated(iren)) then 
@@ -336,7 +336,7 @@ contains
       nz = (nza*(lrw-irw+1))/max(a%m,1)
       
       if (size(b%ia1) < nzb+nz) then 
-        call psb_spreall(b,nzb+nz,iret)
+        call psb_sp_reall(b,nzb+nz,iret)
       endif
       
       if (associated(iren)) then 
@@ -346,7 +346,7 @@ contains
             k = k + 1 
             if (k > nz) then
               nz = k 
-              call psb_spreall(b,nzb+nz,iret)
+              call psb_sp_reall(b,nzb+nz,iret)
             end if
             b%aspk(nzb+k) = a%aspk(i)
             b%ia1(nzb+k)  = iren(a%ia1(i))
@@ -360,7 +360,7 @@ contains
             k = k + 1 
             if (k > nz) then
               nz = k 
-              call psb_spreall(b,nzb+nz,iret)
+              call psb_sp_reall(b,nzb+nz,iret)
             end if
             b%aspk(nzb+k) = a%aspk(i)
             b%ia1(nzb+k)  = (a%ia1(i))
@@ -443,7 +443,7 @@ contains
        end do
        
        if (size(b%ia1) < nzb+nz) then 
-          call psb_spreall(b,nzb+nz,iret)
+          call psb_sp_reall(b,nzb+nz,iret)
        endif
 
        k=0

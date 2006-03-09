@@ -54,7 +54,7 @@ subroutine psb_dsymbmm(a,b,c)
   endif
   allocate(itemp(max(a%m,a%k,b%m,b%k)),stat=info)    
   nze = max(a%m+1,2*a%m)
-  call psb_spreall(c,nze,info)
+  call psb_sp_reall(c,nze,info)
 !!$  write(0,*) 'SYMBMM90 ',size(c%pl),size(c%pr)
   call symbmm(a%m,a%k,b%k,a%ia2,a%ia1,0,&
        & b%ia2,b%ia1,0,&

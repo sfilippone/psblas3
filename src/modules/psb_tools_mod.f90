@@ -31,7 +31,7 @@
 Module psb_tools_mod
   use psb_const_mod
 
-  interface  psb_alloc
+  interface  psb_geall
      ! 2-D double precision version
      subroutine psb_dalloc(m, n, x, desc_a, info, js)
        use psb_descriptor_type
@@ -69,7 +69,7 @@ Module psb_tools_mod
   end interface
 
 
-  interface psb_asb
+  interface psb_geasb
      ! 2-D double precision version
      subroutine psb_dasb(x, desc_a, info)
        use psb_descriptor_type
@@ -154,7 +154,7 @@ Module psb_tools_mod
   end interface
 
 
-  interface psb_free
+  interface psb_gefree
      ! 2-D double precision version
      subroutine psb_dfree(x, desc_a, info)
        use psb_descriptor_type
@@ -206,7 +206,7 @@ Module psb_tools_mod
   end interface
 
 
-  interface psb_ins
+  interface psb_geins
      ! 2-D double precision version
      subroutine psb_dins(m, n, x, ix, jx, blck, desc_a, info,&
           & iblck, jblck)
@@ -373,7 +373,7 @@ Module psb_tools_mod
      end subroutine psb_cdren
   end interface
   
-  interface psb_spalloc
+  interface psb_spall
      subroutine psb_dspalloc(a, desc_a, info, nnz)
        use psb_descriptor_type
        use psb_spmat_type

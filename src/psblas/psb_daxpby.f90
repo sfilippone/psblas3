@@ -69,7 +69,7 @@ subroutine  psb_daxpby(alpha, x, beta,y,desc_a,info, n, jx, jy)
   real(kind(1.d0)),pointer :: tmpx(:)
   character(len=20)        :: name, ch_err
 
-  name='psb_daxpby'
+  name='psb_dgeaxpby'
   if(psb_get_errstatus().ne.0) return 
   info=0
   call psb_erractionsave(err_act)
@@ -194,7 +194,7 @@ end subroutine psb_daxpby
 !!$ 
 !!$  
 !
-! Subroutine: psb_daxpbyv
+! Subroutine: psb_dgeaxpbyv
 !    Adds one distributed matrix to another,
 !
 !    Y := beta * Y + alpha * X
@@ -226,7 +226,7 @@ subroutine  psb_daxpbyv(alpha, x, beta,y,desc_a,info)
   character(len=20)        :: name, ch_err
   logical, parameter :: debug=.true.
 
-  name='psb_daxpby'
+  name='psb_dgeaxpby'
   if(psb_get_errstatus().ne.0) return 
   info=0
   call psb_erractionsave(err_act)

@@ -162,8 +162,8 @@ subroutine psb_dbicg(a,prec,b,x,eps,desc_a,info,&
   naux=4*n_col 
 
   allocate(aux(naux),stat=info)
-  call psb_dalloc(mglob,9,wwrk,desc_a,info)
-  call psb_asb(wwrk,desc_a,info)  
+  call psb_geall(mglob,9,wwrk,desc_a,info)
+  call psb_geasb(wwrk,desc_a,info)  
   if(info.ne.0) then
      info=4011
      ch_err='psb_asb'
@@ -199,10 +199,10 @@ subroutine psb_dbicg(a,prec,b,x,eps,desc_a,info,&
   itx   = 0
   
   if (listop == 1) then 
-     ani = psb_nrmi(a,desc_a,info)
-     bni = psb_amax(b,desc_a,info)
+     ani = psb_spnrmi(a,desc_a,info)
+     bni = psb_geamax(b,desc_a,info)
   else if (listop == 2) then 
-     bn2 = psb_nrm2(b,desc_a,info)
+     bn2 = psb_genrm2(b,desc_a,info)
   endif
  
   if(info.ne.0) then
@@ -218,9 +218,9 @@ subroutine psb_dbicg(a,prec,b,x,eps,desc_a,info,&
 !!$ 
     if (itx.ge.litmax) exit restart  
     it = 0      
-    call psb_axpby(one,b,zero,r,desc_a,info)
+    call psb_geaxpby(one,b,zero,r,desc_a,info)
     call psb_spmm(-one,a,x,one,r,desc_a,info,work=aux)
-    call psb_axpby(one,r,zero,rt,desc_a,info)
+    call psb_geaxpby(one,r,zero,rt,desc_a,info)
     if(info.ne.0) then
        info=4011
        call psb_errpush(info,name)
@@ -230,10 +230,10 @@ subroutine psb_dbicg(a,prec,b,x,eps,desc_a,info,&
     rho = zero
     if (debug) write(*,*) 'on entry to amax: b: ',size(b)
     if (listop == 1) then 
-      rni = psb_amax(r,desc_a,info)
-      xni = psb_amax(x,desc_a,info)
+      rni = psb_geamax(r,desc_a,info)
+      xni = psb_geamax(x,desc_a,info)
     else if (listop == 2) then 
-      rni = psb_nrm2(r,desc_a,info)
+      rni = psb_genrm2(r,desc_a,info)
     endif
     if(info.ne.0) then
        info=4011
@@ -242,7 +242,7 @@ subroutine psb_dbicg(a,prec,b,x,eps,desc_a,info,&
     end if
 
     if (listop == 1) then 
-      xni  = psb_amax(x,desc_a,info)
+      xni  = psb_geamax(x,desc_a,info)
       rerr =  rni/(ani*xni+bni)
       if (itrac /= -1) then 
         if (me.eq.0) write(itrac,'(a,i4,5(2x,es10.4))') 'bicg: ',itx,rerr,rni,bni,&
@@ -274,19 +274,19 @@ subroutine psb_dbicg(a,prec,b,x,eps,desc_a,info,&
       call psb_prc_aply(prec,rt,zt,desc_a,info,trans='t',work=aux)
 
       rho_old = rho    
-      rho = psb_dot(rt,z,desc_a,info)
+      rho = psb_gedot(rt,z,desc_a,info)
       if (rho==zero) then
         if (debug) write(0,*) 'bicg itxation breakdown r',rho
         exit iteration
       endif
 
       if (it==1) then
-        call psb_axpby(one,z,zero,p,desc_a,info)
-        call psb_axpby(one,zt,zero,pt,desc_a,info)
+        call psb_geaxpby(one,z,zero,p,desc_a,info)
+        call psb_geaxpby(one,zt,zero,pt,desc_a,info)
       else
         beta = (rho/rho_old)
-        call psb_axpby(one,z,beta,p,desc_a,info)
-        call psb_axpby(one,zt,beta,pt,desc_a,info)
+        call psb_geaxpby(one,z,beta,p,desc_a,info)
+        call psb_geaxpby(one,zt,beta,pt,desc_a,info)
       end if
 
       call psb_spmm(one,a,p,zero,q,desc_a,info,&
@@ -294,7 +294,7 @@ subroutine psb_dbicg(a,prec,b,x,eps,desc_a,info,&
       call psb_spmm(one,a,pt,zero,qt,desc_a,info,&
            & work=aux,trans='t')
 
-      sigma = psb_dot(pt,q,desc_a,info)
+      sigma = psb_gedot(pt,q,desc_a,info)
       if (sigma==zero) then
         if (debug) write(0,*) 'cgs iteration breakdown s1', sigma
         exit iteration
@@ -303,20 +303,20 @@ subroutine psb_dbicg(a,prec,b,x,eps,desc_a,info,&
       alpha = rho/sigma
 
 
-      call psb_axpby(alpha,p,one,x,desc_a,info)
-      call psb_axpby(-alpha,q,one,r,desc_a,info)
-      call psb_axpby(-alpha,qt,one,rt,desc_a,info)
+      call psb_geaxpby(alpha,p,one,x,desc_a,info)
+      call psb_geaxpby(-alpha,q,one,r,desc_a,info)
+      call psb_geaxpby(-alpha,qt,one,rt,desc_a,info)
 
 
       if (listop == 1) then 
-        rni = psb_amax(r,desc_a,info)
-        xni = psb_amax(x,desc_a,info)
+        rni = psb_geamax(r,desc_a,info)
+        xni = psb_geamax(x,desc_a,info)
       else if (listop == 2) then 
-        rni = psb_nrm2(r,desc_a,info)
+        rni = psb_genrm2(r,desc_a,info)
       endif
 
       if (listop == 1) then 
-        xni  = psb_amax(x,desc_a,info)
+        xni  = psb_geamax(x,desc_a,info)
         rerr =  rni/(ani*xni+bni)
         if (itrac /= -1) then 
           if (me.eq.0) write(itrac,'(a,i4,5(2x,es10.4))') 'bicg: ',itx,rerr,rni,bni,&
@@ -344,7 +344,7 @@ subroutine psb_dbicg(a,prec,b,x,eps,desc_a,info,&
 
 
   deallocate(aux)
-  call psb_free(wwrk,desc_a,info)
+  call psb_gefree(wwrk,desc_a,info)
   ! restore external global coherence behaviour
   call blacs_set(icontxt,16,isvch)
 

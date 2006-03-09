@@ -108,10 +108,10 @@ subroutine psb_dcoins(nz,ia,ja,val,a,gtl,imin,imax,jmin,jmax,info)
      endif
 
      if ((nza+nz)>isza) then 
-        call psb_spreall(a,nza+nz,info)
+        call psb_sp_reall(a,nza+nz,info)
         if(info.ne.izero) then
            info=4010
-           ch_err='psb_spreall'
+           ch_err='psb_sp_reall'
            call psb_errpush(info,name,a_err=ch_err)
            goto 9999
         endif

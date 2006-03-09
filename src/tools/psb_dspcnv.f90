@@ -164,7 +164,7 @@ subroutine psb_dspcnv(a,b,desc_a,info)
 
   b%m=nrow
   b%k=n_col
-  call psb_spall(b,ia1_size,ia2_size,aspk_size,info)
+  call psb_sp_all(b,ia1_size,ia2_size,aspk_size,info)
   allocate(work_dcsdp(l_dcsdp),stat=info)
   if (info.ne.0) then
      info=2025
@@ -193,7 +193,7 @@ subroutine psb_dspcnv(a,b,desc_a,info)
 
   if(info.ne.no_err) then
      info=4010
-     ch_err='spclone'
+     ch_err='dcsdp'
      call psb_errpush(info, name, a_err=ch_err)
      goto 9999
   end if

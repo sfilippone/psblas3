@@ -184,12 +184,12 @@ Subroutine psb_dcgstabl(a,prec,b,x,eps,desc_a,info,&
      call psb_errpush(info,name)
      goto 9999
   End If
-  Call psb_alloc(mglob,10,wwrk,desc_a,info)
-  Call psb_alloc(mglob,nl+1,uh,desc_a,info,js=0)
-  Call psb_alloc(mglob,nl+1,rh,desc_a,info,js=0)
-  Call psb_asb(wwrk,desc_a,info)  
-  Call psb_asb(uh,desc_a,info)  
-  Call psb_asb(rh,desc_a,info)  
+  Call psb_geall(mglob,10,wwrk,desc_a,info)
+  Call psb_geall(mglob,nl+1,uh,desc_a,info,js=0)
+  Call psb_geall(mglob,nl+1,rh,desc_a,info,js=0)
+  Call psb_geasb(wwrk,desc_a,info)  
+  Call psb_geasb(uh,desc_a,info)  
+  Call psb_geasb(rh,desc_a,info)  
   if (info.ne.0) Then 
      info=4011 
      call psb_errpush(info,name)
@@ -213,10 +213,10 @@ Subroutine psb_dcgstabl(a,prec,b,x,eps,desc_a,info,&
   Call blacs_set(icontxt,16,ich)
 
   if (listop == 1) then 
-    ani = psb_nrmi(a,desc_a,info)
-    bni = psb_amax(b,desc_a,info)
+    ani = psb_spnrmi(a,desc_a,info)
+    bni = psb_geamax(b,desc_a,info)
   else if (listop == 2) then 
-    bn2 = psb_nrm2(b,desc_a,info)
+    bn2 = psb_genrm2(b,desc_a,info)
   endif
   if (info.ne.0) Then 
      info=4011 
@@ -234,14 +234,14 @@ Subroutine psb_dcgstabl(a,prec,b,x,eps,desc_a,info,&
     If (debug) Write(0,*) 'restart: ',itx,it
     If (itx.Ge.litmax) Exit restart  
     it = 0      
-    Call psb_axpby(one,b,zero,r,desc_a,info)
+    Call psb_geaxpby(one,b,zero,r,desc_a,info)
     Call psb_spmm(-one,a,x,one,r,desc_a,info,work=aux)
     
     call psb_prc_aply(prec,r,desc_a,info)
 
-    Call psb_axpby(one,r,zero,rt0,desc_a,info)
-    Call psb_axpby(one,r,zero,rh(:,0),desc_a,info)
-    Call psb_axpby(zero,r,zero,uh(:,0),desc_a,info)
+    Call psb_geaxpby(one,r,zero,rt0,desc_a,info)
+    Call psb_geaxpby(one,r,zero,rh(:,0),desc_a,info)
+    Call psb_geaxpby(zero,r,zero,uh(:,0),desc_a,info)
     if (info.ne.0) Then 
        info=4011 
        call psb_errpush(info,name)
@@ -255,15 +255,15 @@ Subroutine psb_dcgstabl(a,prec,b,x,eps,desc_a,info,&
     If (debug) Write(0,*) 'on entry to amax: b: ',Size(b)
 
     if (listop == 1) then 
-      rni = psb_amax(r,desc_a,info)
-      xni = psb_amax(x,desc_a,info)
+      rni = psb_geamax(r,desc_a,info)
+      xni = psb_geamax(x,desc_a,info)
       rerr =  rni/(ani*xni+bni)
       if (itrac /= -1) then 
           If (me == 0) Write(itrac,'(a,i4,5(2x,es10.4))') 'bicgstab(l): ',&
                & itx,rerr,rni,bni,xni,ani
       endif
     else if (listop == 2) then 
-      rni = psb_nrm2(r,desc_a,info)
+      rni = psb_genrm2(r,desc_a,info)
       rerr = rni/bn2
       if (itrac /= -1) then  
         If (me == 0) Write(itrac,'(a,i4,3(2x,es10.4))') 'bicgstab(l): ',&
@@ -289,7 +289,7 @@ Subroutine psb_dcgstabl(a,prec,b,x,eps,desc_a,info,&
       Do j = 0, nl -1 
         If (debug) Write(0,*) 'bicg part:  ',j, nl
         rho_old = rho
-        rho = psb_dot(rh(:,j),rt0,desc_a,info)
+        rho = psb_gedot(rh(:,j),rt0,desc_a,info)
         If (rho==zero) Then
           If (debug) Write(0,*) 'bi-cgstab iteration breakdown r',rho
           Exit iteration
@@ -297,13 +297,13 @@ Subroutine psb_dcgstabl(a,prec,b,x,eps,desc_a,info,&
         beta = alpha*rho/rho_old 
         If (debug) Write(0,*) 'bicg part:  ',alpha,beta,rho,rho_old
         rho_old = rho
-        Call psb_axpby(one,rh(:,0:j),-beta,uh(:,0:j),desc_a,info)
+        Call psb_geaxpby(one,rh(:,0:j),-beta,uh(:,0:j),desc_a,info)
         If (debug) Write(0,*) 'bicg part:  ',rh(1,0),beta
         Call psb_spmm(one,a,uh(:,j),zero,uh(:,j+1),desc_a,info,work=aux)
 
         call psb_prc_aply(prec,uh(:,j+1),desc_a,info)
 
-        gamma(j) = psb_dot(uh(:,j+1),rt0,desc_a,info)
+        gamma(j) = psb_gedot(uh(:,j+1),rt0,desc_a,info)
         If (gamma(j)==zero) Then
           If (debug) Write(0,*) 'bi-cgstab iteration breakdown s2',gamma(j)
           Exit iteration
@@ -311,8 +311,8 @@ Subroutine psb_dcgstabl(a,prec,b,x,eps,desc_a,info,&
         alpha = rho/gamma(j)
         If (debug) Write(0,*) 'bicg part: alpha=r/g ',alpha,rho,gamma(j)
 
-        Call psb_axpby(-alpha,uh(:,1:j+1),one,rh(:,0:j),desc_a,info)        
-        Call psb_axpby(alpha,uh(:,0),one,x,desc_a,info)
+        Call psb_geaxpby(-alpha,uh(:,1:j+1),one,rh(:,0:j),desc_a,info)        
+        Call psb_geaxpby(alpha,uh(:,0),one,x,desc_a,info)
         Call psb_spmm(one,a,rh(:,j),zero,rh(:,j+1),desc_a,info,work=aux)
 
         call psb_prc_aply(prec,rh(:,j+1),desc_a,info)
@@ -322,13 +322,13 @@ Subroutine psb_dcgstabl(a,prec,b,x,eps,desc_a,info,&
       Do j=1, nl 
         If (debug) Write(0,*) 'mod g-s part:  ',j, nl,rh(1,0)
         Do i=1, j-1 
-          taum(i,j) = psb_dot(rh(:,i),rh(:,j),desc_a,info)
+          taum(i,j) = psb_gedot(rh(:,i),rh(:,j),desc_a,info)
           taum(i,j) = taum(i,j)/sigma(i) 
-          Call psb_axpby(-taum(i,j),rh(:,i),one,rh(:,j),desc_a,info)        
+          Call psb_geaxpby(-taum(i,j),rh(:,i),one,rh(:,j),desc_a,info)        
         Enddo        
         If (debug) Write(0,*) 'mod g-s part:  dot prod '
-        sigma(j)  = psb_dot(rh(:,j),rh(:,j),desc_a,info)
-        gamma1(j) = psb_dot(rh(:,0),rh(:,j),desc_a,info)
+        sigma(j)  = psb_gedot(rh(:,j),rh(:,j),desc_a,info)
+        gamma1(j) = psb_gedot(rh(:,0),rh(:,j),desc_a,info)
         If (debug) Write(0,*) 'mod g-s part: gamma1 ', &
              &gamma1(j), sigma(j)
         gamma1(j) = gamma1(j)/sigma(j)
@@ -353,19 +353,19 @@ Subroutine psb_dcgstabl(a,prec,b,x,eps,desc_a,info,&
       Enddo
       If (debug) Write(0,*) 'second solve: ', gamma(:)
       
-      Call psb_axpby(gamma(1),rh(:,0),one,x,desc_a,info)        
-      Call psb_axpby(-gamma1(nl),rh(:,nl),one,rh(:,0),desc_a,info)        
-      Call psb_axpby(-gamma(nl),uh(:,nl),one,uh(:,0),desc_a,info)        
+      Call psb_geaxpby(gamma(1),rh(:,0),one,x,desc_a,info)        
+      Call psb_geaxpby(-gamma1(nl),rh(:,nl),one,rh(:,0),desc_a,info)        
+      Call psb_geaxpby(-gamma(nl),uh(:,nl),one,uh(:,0),desc_a,info)        
 
       Do j=1, nl-1
-        Call psb_axpby(-gamma(j),uh(:,j),one,uh(:,0),desc_a,info)        
-        Call psb_axpby(gamma2(j),rh(:,j),one,x,desc_a,info)        
-        Call psb_axpby(-gamma1(j),rh(:,j),one,rh(:,0),desc_a,info)        
+        Call psb_geaxpby(-gamma(j),uh(:,j),one,uh(:,0),desc_a,info)        
+        Call psb_geaxpby(gamma2(j),rh(:,j),one,x,desc_a,info)        
+        Call psb_geaxpby(-gamma1(j),rh(:,j),one,rh(:,0),desc_a,info)        
       Enddo
       
       if (listop == 1) then 
-        rni = psb_amax(rh(:,0),desc_a,info)
-        xni = psb_amax(x,desc_a,info)
+        rni = psb_geamax(rh(:,0),desc_a,info)
+        xni = psb_geamax(x,desc_a,info)
         rerr =  rni/(ani*xni+bni)
         if (itrac /= -1) then 
           If (me == 0) Write(itrac,'(a,i4,5(2x,es10.4))') 'bicgstab(l): ',&
@@ -374,7 +374,7 @@ Subroutine psb_dcgstabl(a,prec,b,x,eps,desc_a,info,&
 
       else  if (listop == 2) then 
 
-        rni = psb_nrm2(rh(:,0),desc_a,info)
+        rni = psb_genrm2(rh(:,0),desc_a,info)
         rerr = rni/bn2
         if (itrac /= -1) then 
           If (me == 0) Write(itrac,'(a,i4,3(2x,es10.4))') 'bicgstab(l): ',&
@@ -398,9 +398,9 @@ Subroutine psb_dcgstabl(a,prec,b,x,eps,desc_a,info,&
   End If
 
   Deallocate(aux)
-  Call psb_free(wwrk,desc_a,info)
-  Call psb_free(uh,desc_a,info)
-  Call psb_free(rh,desc_a,info)
+  Call psb_gefree(wwrk,desc_a,info)
+  Call psb_gefree(uh,desc_a,info)
+  Call psb_gefree(rh,desc_a,info)
   ! restore external global coherence behaviour
   Call blacs_set(icontxt,16,isvch)
 

@@ -184,17 +184,17 @@ Subroutine psb_dsphalo(a,desc_a,blk,info,rwcnv,clcnv,outfmt)
   Enddo
 
   iszr=sum(rvsz)
-  call psb_spreall(blk,max(iszr,1),info)
+  call psb_sp_reall(blk,max(iszr,1),info)
   if(debug)  write(0,*)me,'SPHALO Sizes:',size(blk%ia1),size(blk%ia2)
   if (info /= 0) then
      info=4010
-     ch_err='psb_spreall'
+     ch_err='psb_sp_reall'
      call psb_errpush(info,name,a_err=ch_err)
      goto 9999
   end if
   mat_recv = iszr
   iszs=sum(sdsz)
-  call psb_spall(0,0,tmp,max(iszs,1),info)
+  call psb_sp_all(0,0,tmp,max(iszs,1),info)
   tmp%fida='COO'
   
   t2 = mpi_wtime()
@@ -203,7 +203,7 @@ Subroutine psb_dsphalo(a,desc_a,blk,info,rwcnv,clcnv,outfmt)
   ipx = 1
   counter=1
   idx = 0
-  call psb_spreinit(tmp)
+  call psb_sp_reinit(tmp)
   Do 
     proc=desc_a%halo_index(counter)
     if (proc == -1) exit 

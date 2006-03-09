@@ -48,7 +48,7 @@ subroutine psb_dalloc(m, n, x, desc_a, info, js)
   use psb_error_mod
 
   implicit none
-  
+
   !....parameters...
   integer, intent(in)                   :: m,n
   real(kind(1.d0)), pointer             :: x(:,:)
@@ -70,50 +70,50 @@ subroutine psb_dalloc(m, n, x, desc_a, info, js)
   err=0
   int_err(1)=0
   call psb_erractionsave(err_act)
-  
+
   icontxt=desc_a%matrix_data(psb_ctxt_)
-  
+
   call blacs_gridinfo(icontxt, nprow, npcol, myrow, mycol)
   !     ....verify blacs grid correctness..
   if (nprow.eq.-1) then
-     info = 2010
-     call psb_errpush(info,name)
-     goto 9999
+    info = 2010
+    call psb_errpush(info,name)
+    goto 9999
   else if (npcol.ne.1) then
-     info = 2030
-     int_err(1) = npcol
-     call psb_errpush(info,name,int_err)
-     goto 9999
+    info = 2030
+    int_err(1) = npcol
+    call psb_errpush(info,name,int_err)
+    goto 9999
   endif
-  
+
   dectype=desc_a%matrix_data(psb_dec_type_)
   !... check m and n parameters....
   if (m.lt.0) then
-     info = 10
-     int_err(1) = 1
-     int_err(2) = m
-     call psb_errpush(info,name,int_err)
-     goto 9999
+    info = 10
+    int_err(1) = 1
+    int_err(2) = m
+    call psb_errpush(info,name,int_err)
+    goto 9999
   else if (n.lt.0) then
-     info = 10
-     int_err(1) = 2
-     int_err(2) = n
-     call psb_errpush(info,name,int_err)
+    info = 10
+    int_err(1) = 2
+    int_err(2) = n
+    call psb_errpush(info,name,int_err)
   else if (.not.psb_is_ok_dec(dectype)) then 
-     info = 3110
-     call psb_errpush(info,name)
-     goto 9999
+    info = 3110
+    call psb_errpush(info,name)
+    goto 9999
   else if (m.ne.desc_a%matrix_data(psb_n_)) then
-     info = 300
-     int_err(1) = 1
-     int_err(2) = m
-     int_err(3) = 4
-     int_err(4) = psb_n_
-     int_err(5) = desc_a%matrix_data(psb_n_)
-     call psb_errpush(info,name,int_err)
-     goto 9999
+    info = 300
+    int_err(1) = 1
+    int_err(2) = m
+    int_err(3) = 4
+    int_err(4) = psb_n_
+    int_err(5) = desc_a%matrix_data(psb_n_)
+    call psb_errpush(info,name,int_err)
+    goto 9999
   endif
-  
+
   if (present(js)) then 
     j=js
   else
@@ -121,71 +121,69 @@ subroutine psb_dalloc(m, n, x, desc_a, info, js)
   endif
   !global check on m and n parameters
   if (myrow.eq.psb_root_) then
-     exch(1)=m
-     exch(2)=n
-     exch(3)=j
-     call igebs2d(icontxt,psb_all_,psb_topdef_, ithree,ione, exch, ithree)
+    exch(1)=m
+    exch(2)=n
+    exch(3)=j
+    call igebs2d(icontxt,psb_all_,psb_topdef_, ithree,ione, exch, ithree)
   else
-     call igebr2d(icontxt,psb_all_,psb_topdef_, ithree,ione, exch, ithree, psb_root_, 0)
-     if (exch(1).ne.m) then
-	info=550
-	int_err(1)=1
-        call psb_errpush(info,name,int_err)
-        goto 9999
-     else if (exch(2).ne.n) then
-	info=550
-	int_err(1)=2
-        call psb_errpush(info,name,int_err)
-        goto 9999
-     else if (exch(3).ne.j) then
-	info=550
-	int_err(1)=3
-        call psb_errpush(info,name,int_err)
-        goto 9999
-     endif
+    call igebr2d(icontxt,psb_all_,psb_topdef_, ithree,ione, exch, ithree, psb_root_, 0)
+    if (exch(1).ne.m) then
+      info=550
+      int_err(1)=1
+      call psb_errpush(info,name,int_err)
+      goto 9999
+    else if (exch(2).ne.n) then
+      info=550
+      int_err(1)=2
+      call psb_errpush(info,name,int_err)
+      goto 9999
+    else if (exch(3).ne.j) then
+      info=550
+      int_err(1)=3
+      call psb_errpush(info,name,int_err)
+      goto 9999
+    endif
   endif
 
   !....allocate x .....
   if (psb_is_asb_dec(dectype).or.psb_is_upd_dec(dectype)) then
-     n_col = max(1,desc_a%matrix_data(psb_n_col_))
-     allocate(x(n_col,j:j+n-1),stat=info)
-!     call sprealloc(n_col,j:j+n-1,x,info)
+    n_col = max(1,desc_a%matrix_data(psb_n_col_))
+    allocate(x(n_col,j:j+n-1),stat=info)
     if (info.ne.0) then
-        info=4010
-        ch_err='psb_sprealloc'
-        call psb_errpush(info,name,a_err=ch_err)
-        goto 9999
-     endif
-     do jj=j,j+n-1
-       do i=1,n_col
-         x(i,j) = 0.0d0
-       end do
-     end do
+      info=4010
+      ch_err='allocate'
+      call psb_errpush(info,name,a_err=ch_err)
+      goto 9999
+    endif
+    do jj=j,j+n-1
+      do i=1,n_col
+        x(i,j) = 0.0d0
+      end do
+    end do
   else if (psb_is_bld_dec(dectype)) then
-     n_row = max(1,desc_a%matrix_data(psb_n_row_))
-     allocate(x(n_row,j:j+n-1),stat=info)
-!     call sprealloc(n_row,j:j+n-1,x,info)
-     if (info.ne.0) then
-        info=4010
-        ch_err='psb_sprealloc'
-        call psb_errpush(info,name,a_err=ch_err)
-        goto 9999
-     endif
-     do jj=j,j+n-1
-       do i=1,n_row
-         x(i,j) = 0.0d0
-       end do
-     end do
+    n_row = max(1,desc_a%matrix_data(psb_n_row_))
+    allocate(x(n_row,j:j+n-1),stat=info)
+    if (info.ne.0) then
+      info=4010
+      ch_err='allocate'
+      call psb_errpush(info,name,a_err=ch_err)
+      goto 9999
+    endif
+    do jj=j,j+n-1
+      do i=1,n_row
+        x(i,j) = 0.0d0
+      end do
+    end do
   endif
 
   call psb_erractionrestore(err_act)
   return
-  
+
 9999 continue
   call psb_erractionrestore(err_act)
   if (err_act.eq.act_abort) then
-     call psb_error(icontxt)
-     return
+    call psb_error(icontxt)
+    return
   end if
   return
 
@@ -238,7 +236,7 @@ subroutine psb_dallocv(m, x, desc_a,info)
   use psb_error_mod
 
   implicit none
-  
+
   !....parameters...
   integer, intent(in)            :: m
   real(kind(1.d0)), pointer      :: x(:)
@@ -257,97 +255,97 @@ subroutine psb_dallocv(m, x, desc_a,info)
   info=0
   name='psb_dallcv'
   call psb_erractionsave(err_act)
-   
+
   icontxt=desc_a%matrix_data(psb_ctxt_)
-  
+
   call blacs_gridinfo(icontxt, nprow, npcol, myrow, mycol)
   !     ....verify blacs grid correctness..
   if (nprow.eq.-1) then
-     info = 2010
-     call psb_errpush(info,name)
-     goto 9999
+    info = 2010
+    call psb_errpush(info,name)
+    goto 9999
   else if (npcol.ne.1) then
-     info = 2030
-     int_err(1) = npcol
-     call psb_errpush(info,name,int_err)
-     goto 9999
+    info = 2030
+    int_err(1) = npcol
+    call psb_errpush(info,name,int_err)
+    goto 9999
   endif
-  
+
   dectype=desc_a%matrix_data(psb_dec_type_)
   if (debug) write(0,*) 'dall: dectype',dectype
   if (debug) write(0,*) 'dall: is_ok? dectype',psb_is_ok_dec(dectype)
   !... check m and n parameters....
   if (m.lt.0) then
-     info = 10
-     int_err(1) = 1
-     int_err(2) = m
-     call psb_errpush(info,name,int_err)
-     goto 9999
+    info = 10
+    int_err(1) = 1
+    int_err(2) = m
+    call psb_errpush(info,name,int_err)
+    goto 9999
   else if (.not.psb_is_ok_dec(dectype)) then 
-     info = 3110
-     call psb_errpush(info,name)
-     goto 9999
+    info = 3110
+    call psb_errpush(info,name)
+    goto 9999
   else if (m.ne.desc_a%matrix_data(psb_n_)) then
-     info = 300
-     int_err(1) = 1
-     int_err(2) = m
-     int_err(3) = 4
-     int_err(4) = psb_n_
-     int_err(5) = desc_a%matrix_data(psb_n_)
-     call psb_errpush(info,name,int_err)
-     goto 9999
+    info = 300
+    int_err(1) = 1
+    int_err(2) = m
+    int_err(3) = 4
+    int_err(4) = psb_n_
+    int_err(5) = desc_a%matrix_data(psb_n_)
+    call psb_errpush(info,name,int_err)
+    goto 9999
   endif
 
   !global check on m and n parameters
   if (myrow.eq.psb_root_) then
-     exch = m
-     call igebs2d(icontxt,psb_all_,psb_topdef_, ione,ione, exch, ione)
+    exch = m
+    call igebs2d(icontxt,psb_all_,psb_topdef_, ione,ione, exch, ione)
   else
-     call igebr2d(icontxt,psb_all_,psb_topdef_, ione,ione, exch, ione, psb_root_, 0)
-     if (exch .ne. m) then
-	info = 550
-	int_err(1) = 1
-        call psb_errpush(info,name,int_err)
-        goto 9999
-     endif
+    call igebr2d(icontxt,psb_all_,psb_topdef_, ione,ione, exch, ione, psb_root_, 0)
+    if (exch .ne. m) then
+      info = 550
+      int_err(1) = 1
+      call psb_errpush(info,name,int_err)
+      goto 9999
+    endif
   endif
 
   !....allocate x .....
   if (psb_is_asb_dec(dectype).or.psb_is_upd_dec(dectype)) then
-     n_col = max(1,desc_a%matrix_data(psb_n_col_))
-     call psb_realloc(n_col,x,info)
-     if (info.ne.0) then
-        info=4010
-        ch_err='psb_realloc'
-        call psb_errpush(info,name,a_err=ch_err)
-        goto 9999
-     endif
-     do i=1,n_col
-       x(i) = 0.0d0
-     end do
+    n_col = max(1,desc_a%matrix_data(psb_n_col_))
+    call psb_realloc(n_col,x,info)
+    if (info.ne.0) then
+      info=4010
+      ch_err='psb_realloc'
+      call psb_errpush(info,name,a_err=ch_err)
+      goto 9999
+    endif
+    do i=1,n_col
+      x(i) = 0.0d0
+    end do
 
   else if (psb_is_bld_dec(dectype)) then
-     n_row = max(1,desc_a%matrix_data(psb_n_row_))
-     call psb_realloc(n_row,x,info)
-     if (info.ne.0) then
-        info=4010
-        ch_err='psb_realloc'
-        call psb_errpush(info,name,a_err=ch_err)
-        goto 9999
-     endif
-     do i=1,n_row
-       x(i) = 0.0d0
-     end do
+    n_row = max(1,desc_a%matrix_data(psb_n_row_))
+    call psb_realloc(n_row,x,info)
+    if (info.ne.0) then
+      info=4010
+      ch_err='psb_realloc'
+      call psb_errpush(info,name,a_err=ch_err)
+      goto 9999
+    endif
+    do i=1,n_row
+      x(i) = 0.0d0
+    end do
   endif
 
   call psb_erractionrestore(err_act)
   return
-  
+
 9999 continue
   call psb_erractionrestore(err_act)
   if (err_act.eq.act_abort) then
-     call psb_error(icontxt)
-     return
+    call psb_error(icontxt)
+    return
   end if
   return
 

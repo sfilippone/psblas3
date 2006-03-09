@@ -150,7 +150,7 @@ program pde90
      goto 9999
   end if
 
-  call dgamx2d(icontxt,'a',' ',ione, ione,t2,ione,t1,t1,-1,-1,-1)
+  call gamx2d(icontxt,'a',t2)
   if (iam.eq.0) write(*,'("Overall matrix creation time : ",es10.4)')t2
   if (iam.eq.0) write(*,'(" ")')
   !
@@ -201,7 +201,7 @@ program pde90
 
   tprec = mpi_wtime()-t1
   
-  call dgamx2d(icontxt,'a',' ',ione, ione,tprec,ione,t1,t1,-1,-1,-1)
+  call gamx2d(icontxt,'a',tprec)
   
   if (iam.eq.0) write(*,'("Preconditioner time : ",es10.4)')tprec
   if (iam.eq.0) write(*,'(" ")')
@@ -238,7 +238,7 @@ program pde90
   
   call blacs_barrier(icontxt,'ALL')
   t2 = mpi_wtime() - t1
-  call dgamx2d(icontxt,'a',' ',ione, ione,t2,ione,t1,t1,-1,-1,-1)
+  call gamx2d(icontxt,'a',t2)
 
   if (iam.eq.0) then
      write(*,'(" ")')
@@ -252,9 +252,10 @@ program pde90
   !  
   !  cleanup storage and exit
   !
-  call psb_free(b,desc_a,info)
-  call psb_free(x,desc_a,info)
+  call psb_gefree(b,desc_a,info)
+  call psb_gefree(x,desc_a,info)
   call psb_spfree(a,desc_a,info)
+  call psb_precfree(pre,info)
   call psb_cdfree(desc_a,info)
   if(info.ne.0) then
      info=4010
@@ -486,10 +487,10 @@ contains
     if(myprow.eq.psb_root_) write(0,'("Generating Matrix (size=",i0x,")...")')n
 
     call psb_cdall(n,n,parts,icontxt,desc_a,info)
-    call psb_spalloc(a,desc_a,info,nnz=nnz)
+    call psb_spall(a,desc_a,info,nnz=nnz)
     ! define  rhs from boundary conditions; also build initial guess 
-    call psb_alloc(n,b,desc_a,info)
-    call psb_alloc(n,t,desc_a,info)
+    call psb_geall(n,b,desc_a,info)
+    call psb_geall(n,t,desc_a,info)
     if(info.ne.0) then
        info=4010
        ch_err='allocation rout.'
@@ -661,10 +662,10 @@ contains
 !!$          else
 !!$            zt(1) = 0.d0
 !!$          endif
-          call psb_ins(1,b,ia,zt(1:1),desc_a,info)
+          call psb_geins(1,b,ia,zt(1:1),desc_a,info)
           if(info.ne.0) exit
           zt(1)=0.d0
-          call psb_ins(1,t,ia,zt(1:1),desc_a,info)
+          call psb_geins(1,t,ia,zt(1:1),desc_a,info)
           if(info.ne.0) exit
         end if
       end do
@@ -694,9 +695,9 @@ contains
        goto 9999
     end if
 
-    call dgamx2d(icontxt,'a',' ',ione, ione,t2,ione,t1,t1,-1,-1,-1)
-    call dgamx2d(icontxt,'a',' ',ione, ione,tins,ione,t1,t1,-1,-1,-1)
-    call dgamx2d(icontxt,'a',' ',ione, ione,tasb,ione,t1,t1,-1,-1,-1)
+    call gamx2d(icontxt,'a',t2)
+    call gamx2d(icontxt,'a',tins)
+    call gamx2d(icontxt,'a',tasb)
 
     if(myprow.eq.psb_root_) then
        write(*,'("The matrix has been generated and assembeld in ",a3," format.")')a%fida(1:3)
@@ -705,8 +706,8 @@ contains
        write(*,'("-assembly time : ",es10.4)')tasb
     end if
 
-    call psb_asb(b,desc_a,info)
-    call psb_asb(t,desc_a,info)
+    call psb_geasb(b,desc_a,info)
+    call psb_geasb(t,desc_a,info)
     if(info.ne.0) then
        info=4010
        ch_err='asb rout.'

@@ -102,10 +102,10 @@ Subroutine psb_dasmatbld(ptype,novr,a,blk,desc_data,upd,desc_p,info,outfmt)
     ! Block Jacobi. Copy the descriptor, just in case we want to
     ! do the renumbering. 
     !
-    call psb_spall(0,0,blk,1,info)
+    call psb_sp_all(0,0,blk,1,info)
     if(info /= 0) then
       info=4010
-      ch_err='psb_spall'
+      ch_err='psb_sp_all'
       call psb_errpush(info,name,a_err=ch_err)
       goto 9999
     end if
@@ -143,10 +143,10 @@ Subroutine psb_dasmatbld(ptype,novr,a,blk,desc_data,upd,desc_p,info,outfmt)
       !
       ! This is really just Block Jacobi.....
       !
-      call psb_spall(0,0,blk,1,info)
+      call psb_sp_all(0,0,blk,1,info)
       if(info /= 0) then
         info=4010
-        ch_err='psb_spall'
+        ch_err='psb_sp_all'
         call psb_errpush(info,name,a_err=ch_err)
         goto 9999
       end if

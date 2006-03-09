@@ -159,7 +159,7 @@ contains
       goto 9999
     end if
 
-    call psb_spall(b,nzt,info)
+    call psb_sp_all(b,nzt,info)
     if(info /= 0) then
       call psb_errpush(4010,name,a_err='spall')
       goto 9999
@@ -231,7 +231,7 @@ contains
     end if
 
     irs = b%infoa(psb_nnz_)
-    call psb_spreall(b,irs,info)
+    call psb_sp_reall(b,irs,info)
     if(info /= 0) then
       call psb_errpush(4010,name,a_err='spreall')
       goto 9999
@@ -247,7 +247,7 @@ contains
       nzbr(myprow+1) = irs
       call igsum2d(icontxt,'All',' ',np,1,nzbr,np,-1,-1)
       nzbg = sum(nzbr)
-      call psb_spall(ntaggr,ntaggr,bg,nzbg,info)
+      call psb_sp_all(ntaggr,ntaggr,bg,nzbg,info)
       if(info /= 0) then
         call psb_errpush(4010,name,a_err='spall')
         goto 9999
@@ -291,7 +291,7 @@ contains
     else if (p%iprcparm(coarse_mat_) == mat_distr_) then 
 
       call psb_cddec(naggr,icontxt,desc_p,info)
-      call psb_spclone(b,bg,info)
+      call psb_sp_clone(b,bg,info)
       if(info /= 0) then
         call psb_errpush(4010,name,a_err='spclone')
         goto 9999
@@ -425,22 +425,22 @@ contains
     end if
 
     do i=1,size(p%dorig)
-       if (p%dorig(i) /= zero) then
-          p%dorig(i) = one / p%dorig(i)
-       else
-          p%dorig(i) = one
-       end if
+      if (p%dorig(i) /= zero) then
+        p%dorig(i) = one / p%dorig(i)
+      else
+        p%dorig(i) = one
+      end if
     end do
 
-!     where (p%dorig /= zero) 
-!       p%dorig = one / p%dorig
-!     elsewhere
-!       p%dorig = one
-!     end where
+    !     where (p%dorig /= zero) 
+    !       p%dorig = one / p%dorig
+    !     elsewhere
+    !       p%dorig = one
+    !     end where
 
 
     ! 1. Allocate Ptilde in sparse matrix form 
-    call psb_spall(am4,ncol,info)
+    call psb_sp_all(am4,ncol,info)
     if(info /= 0) then
       call psb_errpush(4010,name,a_err='spall')
       goto 9999
@@ -481,7 +481,7 @@ contains
       goto 9999
     end if
 
-    call psb_spclone(a,am3,info)
+    call psb_sp_clone(a,am3,info)
     if(info /= 0) then
       call psb_errpush(4010,name,a_err='spclone')
       goto 9999
@@ -518,7 +518,7 @@ contains
 
         call dgamx2d(icontxt,'All',' ',1,1,anorm,1,itemp,jtemp,-1,-1,-1)     
       else
-        anorm = psb_nrmi(am3,desc_a,info)
+        anorm = psb_spnrmi(am3,desc_a,info)
       endif
       omega = 4.d0/(3.d0*anorm)
       p%dprcparm(smooth_omega_) = omega 
@@ -699,7 +699,7 @@ contains
 
       case(mat_distr_) 
 
-        call psb_spclone(b,bg,info)
+        call psb_sp_clone(b,bg,info)
         if(info /= 0) goto 9999
         nzbg = bg%infoa(psb_nnz_) 
         nzl =  bg%infoa(psb_nnz_) 
@@ -756,7 +756,7 @@ contains
         bg%k=desc_p%matrix_data(psb_n_col_)
         bg%fida='COO'
         bg%descra='G'
-       
+
         call psb_spfree(b,info)
         if(info /= 0) then
           call psb_errpush(4010,name,a_err='psb_spfree')
@@ -767,9 +767,9 @@ contains
         deallocate(ivall,nzbr,idisp)
 
         ! Split BG=M+N  N off-diagonal part
-        call psb_spall(bg%m,bg%k,p%av(ap_nd_),nzl,info)
+        call psb_sp_all(bg%m,bg%k,p%av(ap_nd_),nzl,info)
         if(info /= 0) then
-          call psb_errpush(4010,name,a_err='psb_spall')
+          call psb_errpush(4010,name,a_err='psb_sp_all')
           goto 9999
         end if
 
@@ -841,7 +841,7 @@ contains
 
         call igsum2d(icontxt,'All',' ',np,1,nzbr,np,-1,-1)
         nzbg = sum(nzbr)
-        call psb_spall(ntaggr,ntaggr,bg,nzbg,info)
+        call psb_sp_all(ntaggr,ntaggr,bg,nzbg,info)
         if(info /= 0) goto 9999
 
 
@@ -886,7 +886,7 @@ contains
 
       case(mat_distr_) 
 
-        call psb_spclone(b,bg,info)
+        call psb_sp_clone(b,bg,info)
         if(info /= 0) then
           call psb_errpush(4010,name,a_err='spclone')
           goto 9999
@@ -911,9 +911,9 @@ contains
 
         call igsum2d(icontxt,'All',' ',np,1,nzbr,np,-1,-1)
         nzbg = sum(nzbr)
-        call psb_spall(ntaggr,ntaggr,bg,nzbg,info)
+        call psb_sp_all(ntaggr,ntaggr,bg,nzbg,info)
         if(info /= 0) then
-          call psb_errpush(4010,name,a_err='psb_spall')
+          call psb_errpush(4010,name,a_err='psb_sp_all')
           goto 9999
         end if
 

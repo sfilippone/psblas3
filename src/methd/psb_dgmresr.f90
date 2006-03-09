@@ -189,10 +189,10 @@ Subroutine psb_dgmresr(a,prec,b,x,eps,desc_a,info,&
      goto 9999
   End If
 
-  Call psb_alloc(mglob,nl+1,v,desc_a,info)
-  Call psb_alloc(mglob,w,desc_a,info)
-  Call psb_asb(v,desc_a,info)  
-  Call psb_asb(w,desc_a,info)  
+  Call psb_geall(mglob,nl+1,v,desc_a,info)
+  Call psb_geall(mglob,w,desc_a,info)
+  Call psb_geasb(v,desc_a,info)  
+  Call psb_geasb(w,desc_a,info)  
   if (info.ne.0) Then 
      info=4011 
      call psb_errpush(info,name)
@@ -206,10 +206,10 @@ Subroutine psb_dgmresr(a,prec,b,x,eps,desc_a,info,&
   Call blacs_set(icontxt,16,ich)
 
   if (listop == 1) then 
-    ani = psb_nrmi(a,desc_a,info)
-    bni = psb_amax(b,desc_a,info)
+    ani = psb_spnrmi(a,desc_a,info)
+    bni = psb_geamax(b,desc_a,info)
   else if (listop == 2) then 
-    bn2 = psb_nrm2(b,desc_a,info)
+    bn2 = psb_genrm2(b,desc_a,info)
   endif
   if (info.ne.0) Then 
      info=4011 
@@ -226,7 +226,7 @@ Subroutine psb_dgmresr(a,prec,b,x,eps,desc_a,info,&
 !!$ 
     If (debug) Write(0,*) 'restart: ',itx,it
     it = 0      
-    Call psb_axpby(one,b,zero,v(:,1),desc_a,info)
+    Call psb_geaxpby(one,b,zero,v(:,1),desc_a,info)
     if (info.ne.0) Then 
        info=4011 
        call psb_errpush(info,name)
@@ -235,7 +235,7 @@ Subroutine psb_dgmresr(a,prec,b,x,eps,desc_a,info,&
     Call psb_spmm(-one,a,x,one,v(:,1),desc_a,info,work=aux)
     
     call psb_prc_aply(prec,v(:,1),desc_a,info)
-    rs(1) = psb_nrm2(v(:,1),desc_a,info)
+    rs(1) = psb_genrm2(v(:,1),desc_a,info)
     if (info.ne.0) Then 
        info=4011 
        call psb_errpush(info,name)
@@ -246,15 +246,15 @@ Subroutine psb_dgmresr(a,prec,b,x,eps,desc_a,info,&
     If (debug) Write(0,*) 'on entry to amax: b: ',Size(b),rs(1),scal
 
     if (listop == 1) then 
-      rni = psb_amax(v(:,1),desc_a,info)
-      xni = psb_amax(x,desc_a,info)
+      rni = psb_geamax(v(:,1),desc_a,info)
+      xni = psb_geamax(x,desc_a,info)
       rerr =  rni/(ani*xni+bni)
       if (itrac /= -1) then 
           If (me == 0) Write(itrac,'(a,i4,5(2x,es10.4))') 'gmresr(l): ',&
                & itx,rerr,rni,bni,xni,ani
       endif
     else if (listop == 2) then 
-      rni = psb_nrm2(v(:,1),desc_a,info)
+      rni = psb_genrm2(v(:,1),desc_a,info)
       rerr = rni/bn2
       if (itrac /= -1) then  
         If (me == 0) Write(itrac,'(a,i4,3(2x,es10.4))') 'gmresr(l): ',&
@@ -282,12 +282,12 @@ Subroutine psb_dgmresr(a,prec,b,x,eps,desc_a,info,&
       call psb_prc_aply(prec,w,desc_a,info)
 
       do k = 1, i
-        h(k,i) = psb_dot(v(:,k),w,desc_a,info)
-        call psb_axpby(-h(k,i),v(:,k),one,w,desc_a,info)
+        h(k,i) = psb_gedot(v(:,k),w,desc_a,info)
+        call psb_geaxpby(-h(k,i),v(:,k),one,w,desc_a,info)
       end do
-      h(i+1,i) = psb_nrm2(w,desc_a,info)
+      h(i+1,i) = psb_genrm2(w,desc_a,info)
       scal=one/h(i+1,i)
-      call psb_axpby(scal,w,zero,v(:,i+1),desc_a,info)
+      call psb_geaxpby(scal,w,zero,v(:,i+1),desc_a,info)
       do k=2,i
         rr(k-1,i) =  c(k-1)*h(k-1,i) + s(k-1)*h(k,i)
         rr(k,i)   = -s(k-1)*h(k-1,i) + c(k-1)*h(k,i)
@@ -304,7 +304,7 @@ Subroutine psb_dgmresr(a,prec,b,x,eps,desc_a,info,&
             
       if (listop == 1) then 
         rni = abs(rs(i+1))
-        xni = psb_amax(x,desc_a,info)
+        xni = psb_geamax(x,desc_a,info)
         rerr =  rni/(ani*xni+bni)
         if (itrac /= -1) then 
           If (me == 0) Write(itrac,'(a,i4,5(2x,es10.4))') 'gmresr(l): ',&
@@ -323,7 +323,7 @@ Subroutine psb_dgmresr(a,prec,b,x,eps,desc_a,info,&
         call dtrsm('l','u','n','n',i,1,one,rr,size(rr,1),rs,nl)
         if (debug) write(0,*) 'Rebuild x-> RS:',rs(21:nl)
         do k=1, i
-          call psb_axpby(rs(k),v(:,k),one,x,desc_a,info)
+          call psb_geaxpby(rs(k),v(:,k),one,x,desc_a,info)
         end do
         exit restart
       end if
@@ -333,7 +333,7 @@ Subroutine psb_dgmresr(a,prec,b,x,eps,desc_a,info,&
     call dtrsm('l','u','n','n',nl,1,one,rr,size(rr,1),rs,nl)
     if (debug) write(0,*) 'Rebuild x-> RS:',rs(21:nl)
     do k=1, nl
-      call psb_axpby(rs(k),v(:,k),one,x,desc_a,info)
+      call psb_geaxpby(rs(k),v(:,k),one,x,desc_a,info)
     end do
      
   End Do restart
@@ -347,8 +347,8 @@ Subroutine psb_dgmresr(a,prec,b,x,eps,desc_a,info,&
 
 
   Deallocate(aux,h,c,s,rs,rr, stat=info)
-  Call psb_free(v,desc_a,info)
-  Call psb_free(w,desc_a,info)
+  Call psb_gefree(v,desc_a,info)
+  Call psb_gefree(w,desc_a,info)
   ! restore external global coherence behaviour
   Call blacs_set(icontxt,16,isvch)
 

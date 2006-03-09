@@ -170,7 +170,7 @@ contains
       call desym(nrow, a%aspk, a%ia2, a%ia1, as_loc, ia2_loc,&
            & ia1_loc, iwork, nnzero, nzr)     
       
-      call psb_spreall(a,nzr,ircode)
+      call psb_sp_reall(a,nzr,ircode)
       if (ircode /= 0)   goto 993
       allocate(tmp(nzr),stat=ircode)
       if (ircode /= 0)   goto 993
