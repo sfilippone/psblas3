@@ -189,11 +189,11 @@ subroutine psb_dslu_bld(a,desc_a,p,info)
      call blacs_barrier(icontxt,'All')
   endif
 
-  call psb_spfree(blck,info)
-  call psb_spfree(atmp,info)
+  call psb_sp_free(blck,info)
+  call psb_sp_free(atmp,info)
   if(info /= 0) then
      info=4010
-     ch_err='psb_spfree'
+     ch_err='psb_sp_free'
      call psb_errpush(info,name,a_err=ch_err)
      goto 9999
   end if

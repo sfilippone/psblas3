@@ -37,8 +37,8 @@ module psb_spmat_type
   use psb_error_mod
   use psb_realloc_mod
   use psb_const_mod
-! Typedef: psb_dspmat_type
-!    Contains a sparse matrix
+  ! Typedef: psb_dspmat_type
+  !    Contains a sparse matrix
   type psb_dspmat_type
     ! Rows & columns 
     integer     :: m, k
@@ -54,8 +54,8 @@ module psb_spmat_type
     integer, pointer :: ia1(:)=>null(), ia2(:)=>null()
     ! Permutations matrix
     integer, pointer :: pl(:)=>null(), pr(:)=>null()
- end type psb_dspmat_type
-  
+  end type psb_dspmat_type
+
   interface psb_nullify_sp
     module procedure psb_nullify_dsp
   end interface
@@ -76,9 +76,9 @@ module psb_spmat_type
     module procedure psb_dspallocate, psb_dspall3, psb_dspallmk, psb_dspallmknz
   end interface
 
-!   interface psb_spfree
-!     module procedure psb_dspfree
-!   end interface
+  interface psb_sp_free
+    module procedure psb_dsp_free
+  end interface
 
   interface psb_sp_reinit
     module procedure psb_dspreinit
@@ -89,7 +89,7 @@ contains
   subroutine psb_nullify_dsp(mat)
     implicit none
     type(psb_dspmat_type), intent(inout) :: mat
-    
+
     nullify(mat%aspk,mat%ia1,mat%ia2,mat%pl,mat%pr)
     mat%m=0
     mat%k=0
@@ -147,7 +147,7 @@ contains
   Subroutine psb_dspallmk(m,k,a,info)
     implicit none
     !....Parameters...
-    
+
     Type(psb_dspmat_type), intent(inout) :: A
     Integer, intent(in)          :: m,k
     Integer, intent(out)         :: info
@@ -177,7 +177,7 @@ contains
   Subroutine psb_dspallmknz(m,k,a, nnz,info)
     implicit none
     !....parameters...
-    
+
     type(psb_dspmat_type), intent(inout) :: a
     integer, intent(in)                  :: m,k,nnz
     integer, intent(out)                 :: info
@@ -206,7 +206,7 @@ contains
 
   end subroutine psb_dspallmknz
 
-  
+
   subroutine psb_dspall3(a, ni1,ni2,nd,info)
     implicit none
     !....Parameters...
@@ -218,9 +218,9 @@ contains
     logical, parameter  :: debug=.false.
 
     info  = 0
-    
+
     call psb_sp_reall(a, ni1,ni2,nd,info)
-    
+
     a%pl(1)=0
     a%pr(1)=0
     ! set INFOA fields
@@ -279,7 +279,7 @@ contains
     if (info /= 0) return
     call psb_realloc(max(1,a%k),a%pr,info)
     if (info /= 0) return
-    
+
     Return
 
   End Subroutine psb_dspreallocate
@@ -305,12 +305,12 @@ contains
     if (info /= 0) return
     call psb_realloc(max(1,a%k),a%pr,info)
     if (info /= 0) return
-    
+
     Return
 
   End Subroutine psb_dspreall3
-  
- 
+
+
   subroutine psb_dspclone(a, b,info)
     implicit none
     !....Parameters...
@@ -345,7 +345,7 @@ contains
     b%descra   = a%descra
     b%m        = a%m
     b%k        = a%k
-    
+
     Return
 
   End Subroutine psb_dspclone
@@ -402,24 +402,34 @@ contains
   End Subroutine psb_dsp_transfer
 
 
-!   subroutine psb_dspfree(a,info)
-!     implicit none
-!     !....Parameters...
-!     Type(psb_dspmat_type), intent(inout)  :: A
-!     Integer, intent(out)        :: info
+  subroutine psb_dsp_free(a,info)
+    implicit none
+    !....Parameters...
+    Type(psb_dspmat_type), intent(inout)  :: A
+    Integer, intent(out)        :: info
+    !locals
+    logical, parameter  :: debug=.false.
 
-!     !locals
-!     logical, parameter  :: debug=.false.
+    info  = 0
 
-!     INFO  = 0
-
-!     deallocate(a%aspk,a%ia1,a%ia2,a%pr,a%pl,STAT=INFO)
-    
-!     call psb_nullify_sp(a)
-
-!     Return
-
-!   End Subroutine psb_dspfree
+    if (associated(a%aspk)) then
+      deallocate(a%aspk,STAT=INFO)
+    endif
+    if ((info == 0) .and. associated(a%ia1)) then
+      deallocate(a%ia1,STAT=INFO)
+    endif
+    if ((info == 0) .and. associated(a%ia2)) then
+      deallocate(a%ia2,STAT=INFO)
+    endif
+    if ((info == 0) .and. associated(a%pr)) then
+      deallocate(a%pr,STAT=INFO)
+    endif
+    if ((info == 0) .and. associated(a%pl)) then
+      deallocate(a%pl,STAT=INFO)
+    endif
+    call psb_nullify_sp(a)
+    Return
+  End Subroutine psb_dsp_free
 
 
 end module psb_spmat_type

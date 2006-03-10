@@ -436,7 +436,7 @@ contains
 
     if (associated(p%av))  then 
       do i=1,size(p%av) 
-        call psb_spfree(p%av(i),info)
+        call psb_sp_free(p%av(i),info)
         if (info /= 0) then 
           ! Actually, we don't care here about this.
           ! Just let it go.

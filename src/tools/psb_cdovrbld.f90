@@ -52,7 +52,7 @@ Subroutine psb_cdovrbld(n_ovr,desc_p,desc_a,a,&
   use psb_serial_mod
   Use psi_mod
   use psb_realloc_mod
-  use psb_tools_mod, only : psb_cdprt, psb_spfree
+  use psb_tools_mod, only : psb_cdprt
   use psb_error_mod
   use psb_const_mod
   Implicit None
@@ -668,10 +668,10 @@ Subroutine psb_cdovrbld(n_ovr,desc_p,desc_a,a,&
   Deallocate(works,workr,t_halo_in,t_halo_out,work,&
        & length_dl,dep_list,tmp_ovr_idx,tmp_halo,&
        & brvindx,rvsz,sdsz,bsdindx,temp,stat=info)
-  call psb_spfree(blk,info)
+  call psb_sp_free(blk,info)
   if (info.ne.0) then
      info=4010
-     ch_err='spfree'
+     ch_err='sp_free'
      call psb_errpush(info,name,a_err=ch_err)
      goto 9999
   end if

@@ -55,7 +55,7 @@ subroutine psb_dtransp(a,b,c,fmt)
   else 
     fmt_='CSR'
   endif
-  if (associated(b%aspk)) call psb_spfree(b,info)
+  if (associated(b%aspk)) call psb_sp_free(b,info)
   call psb_sp_clone(a,b,info)
   
   if (b%fida=='CSR') then 

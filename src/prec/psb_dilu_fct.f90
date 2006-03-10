@@ -108,10 +108,10 @@ subroutine psb_dilu_fct(a,l,u,d,info,blck)
   if (present(blck)) then 
     blck_ => null() 
   else
-    call psb_spfree(blck_,info)
+    call psb_sp_free(blck_,info)
     if(info.ne.0) then
        info=4010
-       ch_err='psb_spfree'
+       ch_err='psb_sp_free'
        call psb_errpush(info,name,a_err=ch_err)
        goto 9999
     end if
@@ -454,10 +454,10 @@ contains
       enddo
     enddo
 
-    call psb_spfree(trw,info)
+    call psb_sp_free(trw,info)
     if(info.ne.0) then
       info=4010
-      ch_err='psb_spfree'
+      ch_err='psb_sp_free'
       call psb_errpush(info,name,a_err=ch_err)
       goto 9999
     end if

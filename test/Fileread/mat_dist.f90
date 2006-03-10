@@ -470,10 +470,10 @@ contains
       call psb_errpush(info,name,a_err=ch_err)
       goto 9999
     end if
-    call psb_spfree(blck,info)
+    call psb_sp_free(blck,info)
     if(info/=0)then
       info=4010
-      ch_err='spfree'
+      ch_err='sp_free'
       call psb_errpush(info,name,a_err=ch_err)
       goto 9999
     end if
@@ -823,10 +823,10 @@ contains
        call psb_errpush(info,name,a_err=ch_err)
        goto 9999
     end if
-    call psb_spfree(blck,info)
+    call psb_sp_free(blck,info)
     if(info/=0)then
        info=4010
-       ch_err='spfree'
+       ch_err='sp_free'
        call psb_errpush(info,name,a_err=ch_err)
        goto 9999
     end if

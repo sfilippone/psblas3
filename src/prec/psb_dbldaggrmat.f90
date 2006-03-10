@@ -282,9 +282,9 @@ contains
         goto 9999
       end if
 
-      call psb_spfree(b,info)
+      call psb_sp_free(b,info)
       if(info /= 0) then
-        call psb_errpush(4010,name,a_err='spfree')
+        call psb_errpush(4010,name,a_err='sp_free')
         goto 9999
       end if
 
@@ -296,9 +296,9 @@ contains
         call psb_errpush(4010,name,a_err='spclone')
         goto 9999
       end if
-      call psb_spfree(b,info)
+      call psb_sp_free(b,info)
       if(info /= 0) then
-        call psb_errpush(4010,name,a_err='spfree')
+        call psb_errpush(4010,name,a_err='sp_free')
         goto 9999
       end if
 
@@ -570,9 +570,9 @@ contains
     call psb_numbmm(am3,am4,am1)
 
 
-    call psb_spfree(am4,info)
+    call psb_sp_free(am4,info)
     if(info /= 0) then
-      call psb_errpush(4010,name,a_err='spfree')
+      call psb_errpush(4010,name,a_err='sp_free')
       goto 9999
     end if
 
@@ -594,9 +594,9 @@ contains
         goto 9999
       end if
 
-      call psb_spfree(am4,info)
+      call psb_sp_free(am4,info)
       if(info /= 0) then
-        call psb_errpush(4010,name,a_err='psb_spfree')
+        call psb_errpush(4010,name,a_err='psb_sp_free')
         goto 9999
       end if
 
@@ -651,9 +651,9 @@ contains
         call psb_errpush(4010,name,a_err='psb_rwextd')
         goto 9999
       end if
-      call psb_spfree(am4,info)
+      call psb_sp_free(am4,info)
       if(info /= 0) then
-        call psb_errpush(4010,name,a_err='psb_spfree')
+        call psb_errpush(4010,name,a_err='psb_sp_free')
         goto 9999
       end if
 
@@ -670,9 +670,9 @@ contains
     call psb_numbmm(am2,am3,b)
 
 !!$    if (aggr_dump) call csprt(50+me,am1,head='% Operator PTrans.')
-    call psb_spfree(am3,info)
+    call psb_sp_free(am3,info)
     if(info /= 0) then
-      call psb_errpush(4010,name,a_err='psb_spfree')
+      call psb_errpush(4010,name,a_err='psb_sp_free')
       goto 9999
     end if
 
@@ -757,9 +757,9 @@ contains
         bg%fida='COO'
         bg%descra='G'
 
-        call psb_spfree(b,info)
+        call psb_sp_free(b,info)
         if(info /= 0) then
-          call psb_errpush(4010,name,a_err='psb_spfree')
+          call psb_errpush(4010,name,a_err='psb_sp_free')
           goto 9999
         end if
 
@@ -867,7 +867,7 @@ contains
         bg%descra='G'
         call psb_fixcoo(bg,info)
         if(info /= 0) goto 9999
-        call psb_spfree(b,info)
+        call psb_sp_free(b,info)
         if(info /= 0) goto 9999
         if (me==0) then 
           if (test_dump) call psb_csprt(80+me,bg,head='% Smoothed aggregate AC.')    
@@ -893,9 +893,9 @@ contains
         end if
         call psb_cddec(naggr,icontxt,desc_p,info)
 
-        call psb_spfree(b,info)
+        call psb_sp_free(b,info)
         if(info /=  0) then
-          call psb_errpush(4010,name,a_err='spfree')
+          call psb_errpush(4010,name,a_err='sp_free')
           goto 9999
         end if
 
@@ -946,9 +946,9 @@ contains
           call psb_errpush(4010,name,a_err='psb_fixcoo')
           goto 9999
         end if
-        call psb_spfree(b,info)
+        call psb_sp_free(b,info)
         if(info /= 0) then
-          call psb_errpush(4010,name,a_err='psb_spfree')
+          call psb_errpush(4010,name,a_err='psb_sp_free')
           goto 9999
         end if
 

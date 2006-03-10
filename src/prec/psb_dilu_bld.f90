@@ -277,10 +277,10 @@ subroutine psb_dilu_bld(a,desc_a,p,upd,info)
       goto 9999
     end if
 
-    call psb_spfree(atmp,info) 
+    call psb_sp_free(atmp,info) 
     if(info/=0) then
       info=4010
-      ch_err='psb_spfree'
+      ch_err='psb_sp_free'
       call psb_errpush(info,name,a_err=ch_err)
       goto 9999
     end if
@@ -339,10 +339,10 @@ subroutine psb_dilu_bld(a,desc_a,p,upd,info)
   !    write(0,'(i3,1x,a,3(1x,g18.9))') me,'renum/factor time',t3-t2,t6-t5
   !    if (me==0) write(0,'(a,3(1x,g18.9))') 'renum/factor time',t3-t2,t6-t5
 
-  call psb_spfree(blck,info)
+  call psb_sp_free(blck,info)
   if(info/=0) then
     info=4010
-    ch_err='psb_spfree'
+    ch_err='psb_sp_free'
     call psb_errpush(info,name,a_err=ch_err)
     goto 9999
   end if

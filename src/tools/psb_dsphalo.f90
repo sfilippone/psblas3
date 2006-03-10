@@ -51,7 +51,7 @@ Subroutine psb_dsphalo(a,desc_a,blk,info,rwcnv,clcnv,outfmt)
   use psb_descriptor_type
   Use psb_prec_type
   use psb_realloc_mod
-  use psb_tools_mod, only : psb_glob_to_loc, psb_loc_to_glob, psb_spfree
+  use psb_tools_mod, only : psb_glob_to_loc, psb_loc_to_glob
   use psb_error_mod
 
   Implicit None
@@ -331,10 +331,10 @@ Subroutine psb_dsphalo(a,desc_a,blk,info,rwcnv,clcnv,outfmt)
 
   Deallocate(sdid,brvindx,rvid,bsdindx,rvsz,sdsz,stat=info)
 
-  call psb_spfree(tmp,info)
+  call psb_sp_free(tmp,info)
   if (info /= 0) then
      info=4010
-     ch_err='psb_spfree'
+     ch_err='psb_sp_free'
      call psb_errpush(info,name,a_err=ch_err)
      goto 9999
   end if
