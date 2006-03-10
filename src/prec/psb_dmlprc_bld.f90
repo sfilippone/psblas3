@@ -136,14 +136,6 @@ subroutine psb_dmlprc_bld(a,desc_a,p,info)
 
   p%aorig => a
 
-  allocate(p%av(max_avsz),stat=info)
-  if (info /= 0) then 
-    call psb_errpush(4010,name,a_err='Allocate')
-    goto 9999      
-  end if
-  do i=1, size(p%av)
-    call psb_nullify_sp(p%av(i))
-  end do
   nullify(p%d) 
 
 
