@@ -61,28 +61,6 @@ subroutine psb_dprecfree(p,info)
 
   me=-1
 
-!!$  if (associated(p%baseprec)) then 
-!!$    call base_precfree(p%baseprec,info)
-!!$        if (info /= 0) then
-!!$           info=4010
-!!$           ch_err='base_precfree'
-!!$           call psb_errpush(info,name,a_err=ch_err)
-!!$           goto 9999
-!!$        end if
-!!$    deallocate(p%baseprec,stat=info)
-!!$    nullify(p%baseprec) 
-!!$  endif
-!!$
-!!$  if (associated(p%mlprec)) then 
-!!$    ! Check this !!!!! 
-!!$    call base_precfree(p%mlprec,info)
-!!$    if (info /= 0) then
-!!$      write(0,*) 'From Base_precfree',info
-!!$    end if
-!!$    deallocate(p%mlprec,stat=info)
-!!$    nullify(p%mlprec) 
-!!$  endif
-
   if (associated(p%baseprecv)) then 
     do i=1,size(p%baseprecv) 
       call psb_base_precfree(p%baseprecv(i),info)
