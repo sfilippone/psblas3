@@ -1,6 +1,148 @@
 \section{Preconditioner routines}
 \label{sec:precs}
 
+% \section{Preconditioners}
+\label{sec:psprecs}
+Preconditioning is somehow regarded as ``black magic''. This is due to
+the fact that theory doesn't provide a reliable support in the choice
+of a preconditioner. It is clear that the influence of a
+preconditioning technique on the convergence behavior of an iterative
+method mostly depends on the characteristics of the system matrix and
+of the method itself. Anyway it is not possible a priori to say that
+one preconditioner is algebrically better than another and this perfectly explains
+the importance of providing a wide range of preconditioners techniques
+so that the user can find by itself which one is more suitable for his
+problem. Moreover, there are some other issues to consider when
+choosing a preconditioner such as balancing the overhead of building
+the preconditioner with the reduction in the number of
+iterations. PSBLAS contains the implementation of many preconditioning
+techniques some of which are very flexible thanks to the presence of
+many parameters that is possible to adjust to fit the user's needs:
+\begin{itemize}
+\item Diagonal Scaling
+\item Block Jacobi with ILU(0) factorization
+\item Additive Schwarz with the Restricted Additive Schwarz and
+  Additive Schwarz with Harmonic extensions (see
+  chapter~\ref{sec:pprec})
+\item Two-Level Additive Schwarz; this is actually a family of
+  preconditioners since there is the possibility to choose between
+  many variants as explained in chapter~\ref{sec:mlprec}
+\end{itemize}
+
+
+
+\subroutine{psb\_precset}{Sets the precodntioner type}
+
+\syntax{call psb\_precset}{prec, ptype, iv, rs, rv, ierr}
+
+\begin{description}
+\item[\bf On Entry]
+\item[prec] 
+Scope: {\bf global} \\
+Type: {\bf required}\\
+Specified as: e pronditioner data structure \precdata.
+\item[ptype] the type of preconditioner. 
+Scope: {\bf global} \\
+Type: {\bf required}\\
+Specified as: a string.
+\item[iv] integer parameters for the precondtioner. 
+Scope: {\bf global} \\
+Type: {\bf required}\\
+Specified as: an integer array.
+\item[rs] 
+Scope: {\bf } \\
+Type: {\bf }\\
+Specified as: .
+\item[rv] 
+Scope: {\bf } \\
+Type: {\bf }\\
+Specified as: .
+\item[ierr] 
+Scope: {\bf } \\
+Type: {\bf }\\
+Specified as: .
+\end{description}
+
+
+
+
+\subroutine{psb\_precbld}{Builds a preconditioner}
+
+\syntax{call psb\_precbld}{a, desc\_a, prec, info, upd}
+
+\begin{description}
+\item[\bf On Entry]
+\item[a] the system sparse matrix.
+Scope: {\bf global} \\
+Type: {\bf required}\\
+Specified as: a sparse matrix data structure \spdata.
+\item[desc\_a] the problem communication descriptor. 
+Scope: {\bf global} \\
+Type: {\bf required}\\
+Specified as: a communication descriptor data structure \descdata.
+\item[upd] 
+Scope: {\bf global} \\
+Type: {\bf optional}\\
+Specified as: a character.
+\end{description}
+
+\begin{description}
+\item[\bf On Return]
+\item[prec] the precodntioner.\\
+Scope: {\bf global} \\
+Type: {\bf required}\\
+Specified as: a precondtioner data structure \precdata\\
+\item[info] the return error code.\\
+Scope: {\bf local} \\
+Type: {\bf required}\\
+Specified as: an integer.\\
+\end{description}
+
+
+
+\subroutine{psb\_precaply}{Preconditioner application routine}
+
+\syntax{call psb\_precaply}{prec,x,y,desc\_a,info,trans,work}
+\syntax{call psb\_precaply}{prec,x,desc\_a,info,trans}
+
+\begin{description}
+\item[\bf On Entry]
+\item[prec] the preconditioner.
+Scope: {\bf global} \\
+Type: {\bf required}\\
+Specified as: a preconditioner data structure \precdata.
+\item[x] the source vector.
+Scope: {\bf global} \\
+Type: {\bf require}\\
+Specified as: a double precision array.
+\item[desc\_a] the problem communication descriptor.
+Scope: {\bf global} \\
+Type: {\bf required}\\
+Specified as: a communication data structure \descdata.
+\item[trans] 
+Scope: {\bf } \\
+Type: {\bf optional}\\
+Specified as: a character.
+\item[work] an optional work space
+Scope: {\bf local} \\
+Type: {\bf optional}\\
+Specified as: a double precision array.
+\end{description}
+
+\begin{description}
+\item[\bf On Return]
+\item[y] the destination vector.
+Scope: {\bf global} \\
+Type: {\bf required}\\
+Specified as: a double precision array.
+\item[info] the return error code.\\
+Scope: {\bf local} \\
+Type: {\bf required}\\
+Specified as: an integer.\\
+\end{description}
+
+
+
 %%% Local Variables: 
 %%% mode: latex
 %%% TeX-master: "userguide"
