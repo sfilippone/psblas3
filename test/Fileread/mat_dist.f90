@@ -766,7 +766,7 @@ contains
                 call psb_errpush(info,name,a_err=ch_err)
                 goto 9999
              end if
-             call psb_ins(nnr,b,i_count,b_glob(i_count:i_count+nnr-1),&
+             call psb_geins(nnr,b,i_count,b_glob(i_count:i_count+nnr-1),&
                   &desc_a,info)
              if(info/=0) then
                 info=4010
