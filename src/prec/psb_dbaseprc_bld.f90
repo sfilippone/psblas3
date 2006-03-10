@@ -52,6 +52,19 @@ subroutine psb_dbaseprc_bld(a,desc_a,p,info,upd)
   integer, intent(out)                    :: info
   character, intent(in), optional         :: upd
 
+  interface psb_diagsc_bld
+    subroutine psb_ddiagsc_bld(a,desc_data,p,upd,info)
+      use psb_serial_mod
+      use psb_descriptor_type
+      use psb_prec_type
+      integer, intent(out) :: info
+      type(psb_dspmat_type), intent(in), target :: a
+      type(psb_desc_type),intent(in)            :: desc_data
+      type(psb_dbaseprc_type), intent(inout)    :: p
+      character, intent(in)                     :: upd
+    end subroutine psb_ddiagsc_bld
+  end interface
+
   interface psb_ilu_bld
     subroutine psb_dilu_bld(a,desc_data,p,upd,info)
       use psb_serial_mod
@@ -158,79 +171,14 @@ subroutine psb_dbaseprc_bld(a,desc_a,p,info,upd)
 
   case (diagsc_)
 
-    if (debug) write(0,*) 'Precond: Diagonal scaling'
-    ! diagonal scaling
-
-    call psb_realloc(n_col,p%d,info)
-    if (info /= 0) then
-      call psb_errpush(4010,name,a_err='psb_realloc')
-      goto 9999
-    end if
-
-    call psb_csrws(p%d,a,info,trans='N')
+    call psb_diagsc_bld(a,desc_a,p,iupd,info)
+    if(debug) write(0,*)me,': out of psb_diagsc_bld'
     if(info /= 0) then
       info=4010
-      ch_err='psb_csrws'
+      ch_err='psb_diagsc_bld'
       call psb_errpush(info,name,a_err=ch_err)
       goto 9999
     end if
-
-    if (debug) write(ilout+me,*) 'VDIAG ',n_row
-    do i=1,n_row
-      if (p%d(i).eq.0.0d0) then
-        p%d(i)=1.d0
-      else
-        p%d(i) =  1.d0/p%d(i)
-      endif
-
-      if (debug) write(ilout+me,*) i,desc_a%loc_to_glob(i), p%d(i)
-      if (p%d(i).lt.0.d0) then
-        write(0,*) me,'Negative RWS? ',i,p%d(i)
-      endif
-    end do
-    if (a%pl(1) /= 0) then
-      allocate(work(n_row),stat=info)
-      if (info /= 0) then
-        info=4000
-        call psb_errpush(info,name)
-        goto 9999
-      end if
-      call  psb_gelp('n',a%pl,p%d,desc_a,info)
-      if(info /= 0) then
-        info=4010
-        ch_err='psb_dgelp'
-        call psb_errpush(info,name,a_err=ch_err)
-        goto 9999
-      end if
-
-      deallocate(work)
-    endif
-
-    if (debug) then
-      allocate(gd(mglob),stat=info)       
-      if (info /= 0) then 
-        call psb_errpush(4010,name,a_err='Allocate')
-        goto 9999      
-      end if
-
-      call  psb_gather(gd, p%d, desc_a, info, iroot=iroot)
-      if(info /= 0) then
-        info=4010
-        ch_err='psb_dgatherm'
-        call psb_errpush(info,name,a_err=ch_err)
-        goto 9999
-      end if
-
-      if (me.eq.iroot) then
-        write(iout+nprow,*) 'VDIAG CHECK ',mglob
-        do i=1,mglob
-          write(iout+nprow,*) i,gd(i)
-        enddo
-      endif
-      deallocate(gd)
-    endif
-    if (debug) write(*,*) 'Preconditioner DIAG computed OK'
-
 
   case (bja_,asm_)
 
