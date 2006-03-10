@@ -3,9 +3,9 @@
 %
 %%   psb_alloc %%
 %
-\subroutine{psb\_alloc}{Allocates a dense matrix}
+\subroutine{psb\_geall}{Allocates a dense matrix}
 
-\syntax{call psb\_alloc}{m, n, x, desc\_a, info, js}
+\syntax{call psb\_geall}{m, n, x, desc\_a, info, js}
 
 \begin{description}
 \item[\bf On Entry]
@@ -42,9 +42,9 @@ Specified as: Integer scalar.
 %
 %%   psb_asb %%
 %
-\subroutine{psb\_asb}{Assembly a dense matrix}
+\subroutine{psb\_geasb}{Assembly a dense matrix}
 
-\syntax{call psb\_asb}{x, desc\_a, info}
+\syntax{call psb\_geasb}{x, desc\_a, info}
 
 \begin{description}
 \item[\bf On Entry]
@@ -106,9 +106,9 @@ Specified as: Integer scalar.\\
 %
 %%   psb_descprt %%
 %
-\subroutine{psb\_descprt}{Prints a descriptor}
+\subroutine{psb\_cdprt}{Prints a descriptor}
 
-\syntax{call psb\_descprt}{iout, desc\_a, glob, short}
+\syntax{call psb\_cdprt}{iout, desc\_a, glob, short}
 
 \begin{description}
 \item[\bf On Entry]
@@ -133,9 +133,9 @@ Specified as: a variable of type \descdata.\\
 %
 %%   psb_free %%
 %
-\subroutine{psb\_free}{Frees a dense matrix}
+\subroutine{psb\_gefree}{Frees a dense matrix}
 
-\syntax{call psb\_free}{x, desc\_a, info}
+\syntax{call psb\_gefree}{x, desc\_a, info}
 
 \begin{description}
 \item[\bf On Entry]
@@ -246,12 +246,12 @@ Type: {\bf required}\\
 
 
 %
-%%   psb_dscall %%
+%%   psb_cdall %%
 %
-\subroutine{psb\_dscall}{Allocates a communication descriptor}
+\subroutine{psb\_cdall}{Allocates a communication descriptor}
 
-\syntax{call psb\_dscall}{m, n, parts, icontxt, desc\_a, info}
-\syntax*{call psb\_dscall}{m, v, icontxt, desc\_a, info, flag}
+\syntax{call psb\_cdall}{m, n, parts, icontxt, desc\_a, info}
+\syntax*{call psb\_cdall}{m, v, icontxt, desc\_a, info, flag}
 
 \begin{description}
 \item[\bf On Entry]
@@ -287,11 +287,11 @@ Specified as: an integer variable.\\
 
 
 %
-%%   psb_dscasb %%
+%%   psb_cdasb %%
 %
-\subroutine{psb\_dscasb}{Communication descriptor assembly routine}
+\subroutine{psb\_cdasb}{Communication descriptor assembly routine}
 
-\syntax{call psb\_dscasb}{desc\_a, info}
+\syntax{call psb\_cdasb}{desc\_a, info}
 
 \begin{description}
 \item[\bf On Entry]
@@ -313,11 +313,11 @@ Specified as: an integer variable.
 
 
 %
-%%   psb_dsccpy %%
+%%   psb_cdcpy %%
 %
-\subroutine{psb\_dsccpy}{Copies a communication descriptor}
+\subroutine{psb\_cdcpy}{Copies a communication descriptor}
 
-\syntax{call psb\_dsccpy}{desc\_out, desc\_a, info}
+\syntax{call psb\_cdcpy}{desc\_out, desc\_a, info}
 
 \begin{description}
 \item[\bf On Entry]
@@ -342,11 +342,11 @@ Specified as: an integer variable.\\
 
 
 %
-%%   psb_dscfree %%
+%%   psb_cdfree %%
 %
-\subroutine{psb\_dscfree}{Frees a communication descriptor}
+\subroutine{psb\_cdfree}{Frees a communication descriptor}
 
-\syntax{call psb\_dscfree}{desc\_a, info}
+\syntax{call psb\_cdfree}{desc\_a, info}
 
 \begin{description}
 \item[\bf On Entry]
@@ -366,11 +366,11 @@ Specified as: an integer variable.
 
 
 %
-%%   psb_dscins %%
+%%   psb_cdins %%
 %
-\subroutine{psb\_dscins}{Comunnication descriptor insert routine}
+\subroutine{psb\_cdins}{Comunnication descriptor insert routine}
 
-\syntax{call psb\_dscins}{nz, ia, ja, desc\_a, info, is, js}
+\syntax{call psb\_cdins}{nz, ia, ja, desc\_a, info, is, js}
 
 \begin{description}
 \item[\bf On Entry]
@@ -411,11 +411,11 @@ Specified as: an integer variable.
 
 
 %
-%%   psb_dscren %%
+%%   psb_cdren %%
 %
-\subroutine{psb\_dscren}{Applies a renumeration to a communication descriptor}
+\subroutine{psb\_cdren}{Applies a renumeration to a communication descriptor}
 
-\syntax{call psb\_dscren}{trans, iperm, desc\_a, info}
+\syntax{call psb\_cdren}{trans, iperm, desc\_a, info}
 
 \begin{description}
 \item[\bf On Entry]
@@ -446,9 +446,9 @@ Specified as: an integer variable.
 %
 %%   psb_spalloc %%
 %
-\subroutine{psb\_spalloc}{Allocates a sparse matrix}
+\subroutine{psb\_spall}{Allocates a sparse matrix}
 
-\syntax{call psb\_spalloc}{a, desc\_a, info, nnz}
+\syntax{call psb\_spall}{a, desc\_a, info, nnz}
 
 \begin{description}
 \item[\bf On Entry]
@@ -582,9 +582,9 @@ Specified as: an integer variable.
 %
 %%   psb_ins %%
 %
-\subroutine{psb\_ins}{Sparse matrix insertion routine}
+\subroutine{psb\_geins}{Dense matrix insertion routine}
 
-\syntax{call psb\_ins}{m, n, x, ix, jx, blck, desc\_a, info, iblck, jblck}
+\syntax{call psb\_geins}{m, n, x, ix, jx, blck, desc\_a, info, iblck, jblck}
 
 \begin{description}
 \item[\bf On Entry]
