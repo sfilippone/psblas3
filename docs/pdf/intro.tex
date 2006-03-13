@@ -67,9 +67,8 @@ library~\cite{scalapack}.  The layered structure of the PSBLAS library
 is shown in figure~\ref{fig:psblas} ; lower layers of the library
 indicate an encapsulation relationship with upper layers. The ongoing
 discussion focuses on the Fortran~95 layer immediately below the
-application layer; two examples of iterative solvers built through the
-PSBLAS routines, will be also given in Section~\ref{sec:itmethd}.  The
-serial parts of the computation on each process are executed through
+application layer.
+The serial parts of the computation on each process are executed through
 calls to the serial sparse BLAS subroutines. In a similar way, the
 inter-process message exchanges are implemented through the Basic
 Linear Algebra Communication Subroutines (BLACS) library~\cite{BLACS}
@@ -114,11 +113,11 @@ internally defined in the PSBLAS software package:
 \item all the subroutine names follow the rule \verb|psb_xxname| where
   \verb|xx| can be either:
   \begin{itemize}
-  \item \verb|ds|: the routine is related to dense data, 
+  \item \verb|ge|: the routine is related to dense data, 
   \item \verb|sp|: the routine is related to sparse data, 
   \item \verb|cd|: the routine is related to communication descriptor (see~\ref{sec:datastruct}).
   \end{itemize}
-  For example the \verb|psb_dsins|, \verb|psb_spins| and
+  For example the \verb|psb_geins|, \verb|psb_spins| and
   \verb|psb_cdins| perform the same action (see~\ref{sec:toolsrout}) on
   dense matrices, sparse matrices and communication descriptors
   respectively.

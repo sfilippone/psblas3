@@ -3,30 +3,17 @@
 
 % \section{Preconditioners}
 \label{sec:psprecs}
-Preconditioning is somehow regarded as ``black magic''. This is due to
-the fact that theory doesn't provide a reliable support in the choice
-of a preconditioner. It is clear that the influence of a
-preconditioning technique on the convergence behavior of an iterative
-method mostly depends on the characteristics of the system matrix and
-of the method itself. Anyway it is not possible a priori to say that
-one preconditioner is algebrically better than another and this perfectly explains
-the importance of providing a wide range of preconditioners techniques
-so that the user can find by itself which one is more suitable for his
-problem. Moreover, there are some other issues to consider when
-choosing a preconditioner such as balancing the overhead of building
-the preconditioner with the reduction in the number of
-iterations. PSBLAS contains the implementation of many preconditioning
+PSBLAS contains the implementation of many preconditioning
 techniques some of which are very flexible thanks to the presence of
 many parameters that is possible to adjust to fit the user's needs:
 \begin{itemize}
 \item Diagonal Scaling
 \item Block Jacobi with ILU(0) factorization
 \item Additive Schwarz with the Restricted Additive Schwarz and
-  Additive Schwarz with Harmonic extensions (see
-  chapter~\ref{sec:pprec})
+  Additive Schwarz with Harmonic extensions;
 \item Two-Level Additive Schwarz; this is actually a family of
   preconditioners since there is the possibility to choose between
-  many variants as explained in chapter~\ref{sec:mlprec}
+  many variants.
 \end{itemize}
 
 

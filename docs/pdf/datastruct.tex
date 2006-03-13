@@ -15,8 +15,7 @@ The \hypertarget{spdata}{{\tt psb\_spmat\_type}} data structure
 contains all information about local portion of the sparse matrix and   
 its storage mode. Many of this fields are set in fully-transparent
 mode by PSBLAS-TOOLS routines when inserting a new sparse matrix, user
-must set only fields which describe matrix storage mode (see
-\S~\ref{psb_spall}). \\
+must set only fields which describe matrix storage mode. \\
 Fields contained in Sparse matrix structures are:
 \begin{description}
 \item[{\bf aspk}] Contains values of the local distributed sparse
@@ -52,7 +51,6 @@ as in Coordinate Storage or Compressed Sparse Rows, should be greater
 than or equal to the maximum column  index actually present in the sparse matrix.
 Specified as: integer variable.
 \end{description}
-Values assumed by this fields are compatible with ref. 1 (see \S~\ref{chap:appendix}).\\
 FORTRAN95 interface for distributed sparse matrices containing double precision
 real entries is defined as in figure~\ref{fig:spmattype}.
 \begin{figure}[h!]
