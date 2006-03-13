@@ -1,13 +1,12 @@
 This directory contains  the PSBLAS library, version 2.0.
-The version 1.0 of the library is described in:
+
+The version 1.0 of the library was described in:
 S. Filippone, M. Colajanni
 PSBLAS: A library for parallel linear algebra computation on sparse matrices
 ACM Trans. on Math. Software, 26(4), Dec. 2000, pp. 527-550.
 
 PLATFORMS: 
 
-For the F77 compiler, we assume it supports DOUBLE COMPLEX and DO WHILE/ENDDO.
-Practically all compilers do nowadays.  
 The compilation process relies on the choice of an appropriate
 Make.inc file; we have tested with AIX XLF, Intel ifc/Linux, Lahey
 F95/Linux,  Nag f95/Linux, GNU Fortran/Linux. If you succeed in compiling with 
@@ -51,13 +50,11 @@ INTERFACE for the dummy argument subroutine PARTS, it wanted an
 EXTERNAL specification. Again, please move to 7.1.
 
 
-Testing of  NAG f95 versions is still incomplete.  
-
 
 
 DOCUMENTATION
 
-See userguidef90.ps. 
+See userguide.pdf 
 Please consult the sample programs, especially TEST/pargen/ppde90.f90. 
 
 
