@@ -10,9 +10,9 @@ F90=/usr/local/gfortran/bin/gfortran
 FC=/usr/local/gfortran/bin/gfortran
 F77=$(FC)
 CC=/usr/local/gfortran/bin/gcc
-F90COPT= -O3  -ffast-math -march=pentium4 -msse2 -mfpmath=sse 
-FCOPT=-O3  -ffast-math -march=pentium4 -msse2 -mfpmath=sse 
-CCOPT=-O3 -ffast-math -march=pentium4 -msse2 -mfpmath=sse 
+F90COPT= -O3  -ffast-math -march=pentium4 
+FCOPT=-O3  -ffast-math -march=pentium4 
+CCOPT=-O3 -ffast-math -march=pentium4 
 
 #######################  Section 2 #######################
 #  Define your linker and linker flags here              #

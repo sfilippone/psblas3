@@ -1,5 +1,11 @@
 This directory contains  the PSBLAS library, version 2.0.
 
+
+Release Candidate 1: For the time being, even if the docs say that we
+have both real and complex, we only have real data. When we have
+complex data it will be declared RC2 or V2.0. 
+
+
 The version 1.0 of the library was described in:
 S. Filippone, M. Colajanni
 PSBLAS: A library for parallel linear algebra computation on sparse matrices
