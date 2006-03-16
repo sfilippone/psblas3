@@ -54,10 +54,11 @@ subroutine psb_dspasb(a,desc_a, info, afmt, up, dup)
   implicit none
 
   interface psb_cest
-     subroutine psb_cest(afmt, nnz, lia1, lia2, lar, up, info)
-       integer, intent(in) ::  nnz 
+     subroutine psb_cest(afmt, m,n,nnz, lia1, lia2, lar, up, info)
+       integer, intent(in) ::  m,n,nnz 
        integer, intent(out) :: lia1, lia2, lar, info
-       character, intent(in) :: afmt*5, up
+       character, intent(inout) :: afmt*5
+       character, intent(in) :: up
      end subroutine psb_cest
   end interface
 
@@ -179,26 +180,28 @@ subroutine psb_dspasb(a,desc_a, info, afmt, up, dup)
      ! work area requested must be fixed to
      ! No of Grid'd processes and NNZ+2
      !
-     size_req  = max(a%infoa(psb_nnz_),1)+3
-     if (debug) write(0,*) 'DCSDP : size_req 1:',size_req
-     call psb_cest(a%fida, size_req, ia1_size, ia2_size, aspk_size, iup,info)
-     if (info /= no_err) then    
-        info=4010
-        ch_err='psb_cest'
-        call psb_errpush(info,name,a_err=ch_err)
-        goto 9999
-     endif
-
-     call psb_sp_reall(a,ia1_size,ia2_size,aspk_size,info)
-     if (info /= no_err) then    
-        info=4010
-        ch_err='psb_sp_reall'
-        call psb_errpush(info,name,a_err=ch_err)
-        goto 9999
-     endif
-
-     a%pl(:)  = 0
-     a%pr(:)  = 0
+!!$     size_req  = max(a%infoa(psb_nnz_),1)+3
+!!$     if (debug) write(0,*) 'DCSDP : size_req 1:',size_req
+!!$     call psb_cest(a%fida, n_row,n_col,size_req,&
+!!$          & ia1_size, ia2_size, aspk_size, iup,info)
+!!$     write(0,*) 'ESTIMATE : ',ia1_size,ia2_size,aspk_Size,iup
+!!$     if (info /= no_err) then    
+!!$        info=4010
+!!$        ch_err='psb_cest'
+!!$        call psb_errpush(info,name,a_err=ch_err)
+!!$        goto 9999
+!!$     endif
+!!$
+!!$     call psb_sp_reall(a,ia1_size,ia2_size,aspk_size,info)
+!!$     if (info /= no_err) then    
+!!$        info=4010
+!!$        ch_err='psb_sp_reall'
+!!$        call psb_errpush(info,name,a_err=ch_err)
+!!$        goto 9999
+!!$     endif
+!!$
+!!$     a%pl(:)  = 0
+!!$     a%pr(:)  = 0
 
      if (debugwrt) then
         iout = 30+myrow

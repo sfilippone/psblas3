@@ -61,13 +61,31 @@ subroutine psb_dcsdp(a, b,info,ifc,check,trans,unitd)
   real(kind(1.d0)), allocatable :: work(:)
   type(psb_dspmat_type)         :: temp_a
   Integer                       :: nzr, ntry, ifc_,ierror, ia1_size,&
-       & ia2_size, aspk_size
+       & ia2_size, aspk_size,size_req,n_row,n_col,iup
   integer                       :: ip1, ip2, nnz, iflag, ichk, nnzt,&
        & ipc, i, count, err_act, ierrv(5)
-  character                     :: check_,trans_,unitd_
+  character                     :: check_,trans_,unitd_, up
   Integer, Parameter            :: maxtry=8
   logical, parameter            :: debug=.false.
   character(len=20)             :: name, ch_err
+  interface psb_cest
+     subroutine psb_cest(afmt, m,n,nnz, lia1, lia2, lar, up, info)
+       integer, intent(in) ::  m,n,nnz 
+       integer, intent(out) :: lia1, lia2, lar, info
+       character, intent(inout) :: afmt*5
+       character, intent(in) :: up
+     end subroutine psb_cest
+  end interface
+
+  interface psb_spinfo
+    subroutine psb_dspinfo(ireq,a,ires,info,iaux)
+      use psb_spmat_type
+      type(psb_dspmat_type), intent(in) :: a
+      integer, intent(in)               :: ireq
+      integer, intent(out)              :: ires, info
+      integer, intent(in), optional     :: iaux
+    end subroutine psb_dspinfo
+  end interface
 
   name='psb_dcsdp'
   info  = 0
@@ -133,6 +151,45 @@ subroutine psb_dcsdp(a, b,info,ifc,check,trans,unitd)
     !  ...matrix conversion...
     b%m=a%m
     b%k=a%k
+    call psb_spinfo(psb_nztotreq_,a,size_req,info)
+    if (debug) write(0,*) 'DCSDP : size_req 1:',size_req
+    !! PULL IUP FROM INFOA FIELD
+    iup = iand(b%infoa(psb_upd_),4) 
+    if (iup > 0) then 
+      up = 'Y'
+    else
+      up = 'N'
+    endif
+    n_row=b%m 
+    n_col=b%k
+    call psb_cest(b%fida, n_row,n_col,size_req,&
+         & ia1_size, ia2_size, aspk_size, up,info)
+
+!!$    write(0,*) 'ESTIMATE : ',ia1_size,ia2_size,aspk_Size,iup
+    if (info /= no_err) then    
+      info=4010
+      ch_err='psb_cest'
+      call psb_errpush(info,name,a_err=ch_err)
+      goto 9999
+    endif
+    if ((size(b%aspk)  < aspk_size) .or.&
+         &(size(b%ia1) < ia1_size) .or.&
+         &(size(b%ia2) < ia2_size) .or.&
+         &(size(b%pl)  < b%m) .or.&
+         &(size(b%pr) < b%k )) then 
+      call psb_sp_reall(b,ia1_size,ia2_size,aspk_size,info)
+    endif
+    if (info /= no_err) then    
+      info=4010
+      ch_err='psb_sp_reall'
+      call psb_errpush(info,name,a_err=ch_err)
+      goto 9999
+    endif
+    
+    b%pl(:)  = 0
+    b%pr(:)  = 0
+    
+
     select case (a%fida(1:3))
 
     case ('CSR')
@@ -141,11 +198,11 @@ subroutine psb_dcsdp(a, b,info,ifc,check,trans,unitd)
 
       case ('CSR')
 
-
-        ia1_size=a%infoa(psb_nnz_)
-        ia2_size=a%m+1
-        aspk_size=a%infoa(psb_nnz_)
-        call psb_sp_reall(b,ia1_size,ia2_size,aspk_size,info)
+!!$
+!!$        ia1_size=a%infoa(psb_nnz_)
+!!$        ia2_size=a%m+1
+!!$        aspk_size=a%infoa(psb_nnz_)
+!!$        call psb_sp_reall(b,ia1_size,ia2_size,aspk_size,info)
 
         call dcrcr(trans_, a%m, a%k, unitd_, d, a%descra, a%aspk,&
              & a%ia1, a%ia2, a%infoa, b%pl, b%descra, b%aspk, b%ia1,&
@@ -164,10 +221,10 @@ subroutine psb_dcsdp(a, b,info,ifc,check,trans,unitd)
 
         !...converting to JAD
         !...output matrix may not be big enough
-        ia1_size=a%infoa(psb_nnz_)
-        ia2_size=a%m+1
-        aspk_size=a%infoa(psb_nnz_)
-        call psb_sp_reall(b,ia1_size,ia2_size,aspk_size,info)
+!!$        ia1_size=a%infoa(psb_nnz_)
+!!$        ia2_size=a%m+1
+!!$        aspk_size=a%infoa(psb_nnz_)
+!!$        call psb_sp_reall(b,ia1_size,ia2_size,aspk_size,info)
         do
 
           call dcrjd(trans_, a%m, a%k, unitd_, d, a%descra, a%aspk,&
@@ -207,8 +264,8 @@ subroutine psb_dcsdp(a, b,info,ifc,check,trans,unitd)
 
       case ('COO')
 
-        aspk_size=max(size(a%aspk),a%ia2(a%m+1))
-        call psb_sp_reall(b,aspk_size,info)
+!!$        aspk_size=max(size(a%aspk),a%ia2(a%m+1))
+!!$        call psb_sp_reall(b,aspk_size,info)
 !!$        write(0,*) 'From DCSDP90:',b%fida,size(b%aspk),info
         call dcrco(trans_, a%m, a%k, unitd_, d, a%descra, a%aspk,&
              & a%ia1, a%ia2, a%infoa, b%pl, b%descra, b%aspk, b%ia1,&
@@ -228,8 +285,8 @@ subroutine psb_dcsdp(a, b,info,ifc,check,trans,unitd)
 
       case ('CSR')
 
-        aspk_size=max(size(a%aspk),a%ia2(a%m+1))
-        call psb_sp_reall(b,aspk_size,info)
+!!$        aspk_size=max(size(a%aspk),a%ia2(a%m+1))
+!!$        call psb_sp_reall(b,aspk_size,info)
         call dcocr(trans_, a%m, a%k, unitd_, d, a%descra, a%aspk,&
              & a%ia2, a%ia1, a%infoa, b%pl, b%descra, b%aspk, b%ia1,&
              & b%ia2, b%infoa, b%pr, size(b%aspk), size(b%ia1),&
@@ -301,8 +358,8 @@ subroutine psb_dcsdp(a, b,info,ifc,check,trans,unitd)
 
       case ('COO')
 
-        aspk_size=max(size(a%aspk),a%ia2(a%m+1))
-        call psb_sp_reall(b,aspk_size,info)
+!!$        aspk_size=max(size(a%aspk),a%ia2(a%m+1))
+!!$        call psb_sp_reall(b,aspk_size,info)
         call dcoco(trans_, a%m, a%k, unitd_, d, a%descra, a%aspk,&
              & a%ia1, a%ia2, a%infoa, b%pl, b%descra, b%aspk, b%ia1,&
              & b%ia2, b%infoa, b%pr, size(b%aspk), size(b%ia1),&

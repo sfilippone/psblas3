@@ -149,11 +149,11 @@ subroutine psb_dcoins(nz,ia,ja,val,a,gtl,imin,imax,jmin,jmax,info)
            call psb_errpush(info,name,a_err=ch_err)
            goto 9999
         endif
-!!$      if (debug) then 
-!!$        if ((nza - a%ia2(ip1+nnz_)) /= nz) then 
-!!$          write(0,*) 'PSB_COINS: update discarded items '
-!!$        end if
-!!$      end if
+      if (debug) then 
+        if ((nza - a%ia2(ip1+psb_nnz_)) /= nz) then 
+          write(0,*) 'PSB_COINS: update discarded items '
+        end if
+      end if
 
         a%ia2(ip1+psb_nnz_) = nza
      else 

@@ -41,7 +41,7 @@ C
 C
 C     .. Scalar Arguments ..
       INTEGER            LARN, LAUX, LAUX2, LIAN1, LIAN2, M, 
-     +     N, IUPDUP, IERROR
+     +  N, IUPDUP, IERROR
       CHARACTER          TRANS,UNITD
 C     .. Array Arguments ..
       DOUBLE PRECISION   AR(*), ARN(*), D(*)
@@ -74,7 +74,7 @@ C
       CALL FCPSB_ERRACTIONSAVE(ERR_ACT)
 
       CHECK_FLAG=IBITS(INFO(PSB_UPD_),1,2)
-c$$$      write(0,*) 'DCOCR FLAG ',info(upd_),check_flag
+c$$$      write(0,*) 'DCOCR FLAG ',info(psb_upd_),check_flag
       IF (TRANS.EQ.'N') THEN
 
         SCALE  = (UNITD.EQ.'L') ! meaningless
@@ -112,8 +112,8 @@ C
 C     Error handling
 C
         IF(IERROR.NE.0) THEN
-           CALL FCPSB_ERRPUSH(IERROR,NAME,INT_VAL)
-           GOTO 9999
+          CALL FCPSB_ERRPUSH(IERROR,NAME,INT_VAL)
+          GOTO 9999
         END IF
 
         IF (DESCRA(1:1).EQ.'G') THEN
@@ -126,12 +126,15 @@ c$$$            do k=1,nnz
 c$$$              write(*,*) k,ia(k),ja(k),ar(k)
 c$$$            enddo
 c$$$          endif
+c$$$          write(0,*) 'DCOCR Sizes ',lian2,((m+1)+nnz+psb_ireg_flgs_+1),
+c$$$     +      m+1,nnz,psb_ireg_flgs_,
+c$$$     +      laux,2*(2+nnz)
           if ((lian2.ge.((m+1)+nnz+psb_ireg_flgs_+1))
      +      .and.(laux.ge.2*(2+nnz))) then 
 C
 C       Prepare for smart regeneration
 c             
-
+            
             ipx = nnz+3            
             do i=1, nnz
               aux(ipx+i-1) = i
@@ -145,7 +148,10 @@ c
             ian2(ip1+psb_nnz_)   = 0
             ian2(ip1+psb_ichk_)  = nnz+check_flag
 
-c$$$             write(0,*)'DCOCR m,ip1,ip2,nnz',m,
+c$$$            write(0,*)'DCOCR Check: ',ip2,ian2(ip1+psb_iflag_),
+c$$$     +        ian2(ip1+psb_nnzt_), ian2(ip1+psb_nnz_),
+c$$$     +        ian2(ip1+psb_ichk_)
+
 c$$$     +        ip1,ip2,nnz,ian2(ip1+nnzt_) 
 
             if (debug) write(0,*) 'Build check :',ian2(ip1+psb_nnzt_) 
@@ -153,12 +159,12 @@ C       .... Order with key IA ...
             CALL MRGSRT(NNZ,IA,AUX,IRET)
             IF (IRET.EQ.0) CALL REORDVN3(NNZ,AR,IA,JA,AUX(IPX),AUX)
             if (debug) then 
-               do i=1, nnz-1
-                  if (ia(i).gt.ia(i+1)) then 
-                     write(0,*) 'Sorting error:',i,ia(i),ia(i+1)
-                  endif
-               enddo
-               write(0,*) 'nnz :',m,nnz,ia(nnz),ja(nnz)
+              do i=1, nnz-1
+                if (ia(i).gt.ia(i+1)) then 
+                  write(0,*) 'Sorting error:',i,ia(i),ia(i+1)
+                endif
+              enddo
+              write(0,*) 'nnz :',m,nnz,ia(nnz),ja(nnz)
             endif
 
 C       .... Order with key IA2N ...
@@ -217,9 +223,9 @@ C                 ... Insert other element of row ...
                 ELSE
                   IF (CHECK_FLAG.EQ.1) THEN
 C                    ... Error, there are duplicated elements ...
-                     IERROR = 130
-                     CALL FCPSB_ERRPUSH(IERROR,NAME,INT_VAL)
-                     GOTO 9999
+                    IERROR = 130
+                    CALL FCPSB_ERRPUSH(IERROR,NAME,INT_VAL)
+                    GOTO 9999
                   ELSE IF (CHECK_FLAG.EQ.2) THEN
 C                    ... Insert only the last duplicated element ...
                     ARN(ELEM_CSR-1) = AR(ELEM)
@@ -227,7 +233,7 @@ C                    ... Insert only the last duplicated element ...
                   ELSE IF (CHECK_FLAG.EQ.3) THEN 
 C                    ... Sum the duplicated element ...
                     ARN(ELEM_CSR-1) = ARN(ELEM_CSR-1) + AR(ELEM)
-                  ian2(ip2+aux(ipx+elem-1)-1) = elem_csr-1
+                    ian2(ip2+aux(ipx+elem-1)-1) = elem_csr-1
                   END IF
                 ENDIF
                 ELEM = ELEM + 1
@@ -235,6 +241,7 @@ C                    ... Sum the duplicated element ...
               IAN2(ROW+1) = ELEM_CSR
             ENDDO
           ELSE
+c$$$            write(0,*) 'Going for ELSE !!!?'
 C       .... Order with key IA ...
             CALL MRGSRT(NNZ,IA,AUX,IRET)
             IF (IRET.EQ.0) CALL REORDVN(NNZ,AR,IA,JA,AUX)
@@ -291,19 +298,19 @@ C                 ... Insert other element of row ...
                 ELSE
                   IF (CHECK_FLAG.EQ.1) THEN
 C     ... Error, there are duplicated elements ...
-                     IERROR = 130
-                     CALL FCPSB_ERRPUSH(IERROR,NAME,INT_VAL)
-                     GOTO 9999
+                    IERROR = 130
+                    CALL FCPSB_ERRPUSH(IERROR,NAME,INT_VAL)
+                    GOTO 9999
                   ELSE IF (CHECK_FLAG.EQ.2) THEN
 C                    ... Insert only the last duplicated element ...
                     ARN(ELEM_CSR-1) = AR(ELEM)
                     if (debug) write(0,*) 'Duplicated overwrite',
-     +                 elem_csr-1,elem
+     +                elem_csr-1,elem
                   ELSE IF (CHECK_FLAG.EQ.3) THEN 
 C                    ... Sum the duplicated element ...
                     ARN(ELEM_CSR-1) = ARN(ELEM_CSR-1) + AR(ELEM)
                     if (debug) write(0,*) 'Duplicated add',
-     +                 elem_csr-1,elem
+     +                elem_csr-1,elem
                   END IF
                 ENDIF
                 ELEM = ELEM + 1
@@ -313,11 +320,11 @@ C                    ... Sum the duplicated element ...
           ENDIF
 
           if (debug) write(0,*)'Done Rebuild CSR',
-     +       ian2(m+1),ia(elem)
+     +      ian2(m+1),ia(elem)
           if (debug) then 
-             do i=ian2(m+1), nnz
-                write(0,*) 'Overflow check :',ia(i),ja(i),ar(i)
-             enddo
+            do i=ian2(m+1), nnz
+              write(0,*) 'Overflow check :',ia(i),ja(i),ar(i)
+            enddo
           endif
 
         ELSE IF (DESCRA(1:1).EQ.'S' .AND. DESCRA(2:2).EQ.'U') THEN
@@ -329,197 +336,197 @@ C                    ... Sum the duplicated element ...
         ELSE IF (DESCRA(1:1).EQ.'T' .AND. DESCRA(2:2).EQ.'U') THEN
 
 C       .... Order with key IA ...
-            CALL MRGSRT(NNZ,IA,AUX,IRET)
-            IF (IRET.EQ.0) CALL REORDVN(NNZ,AR,IA,JA,AUX)
+          CALL MRGSRT(NNZ,IA,AUX,IRET)
+          IF (IRET.EQ.0) CALL REORDVN(NNZ,AR,IA,JA,AUX)
 C       .... Order with key IA2N ...
-            I    = 1
-            J    = I
+          I    = 1
+          J    = I
 c$$$            DO WHILE (I.LE.NNZ)
 c$$$              DO WHILE ((IA(J).EQ.IA(I)).AND.
 c$$$     +          (J.LE.NNZ))
-            DO 
-              if (I>NNZ) exit
-              DO
-                if (j>nnz) exit
-                if (ia(j) /= ia(i)) exit
-                J = J+1
-              ENDDO
-              NZL = J - I
-              CALL MRGSRT(NZL,JA(I),AUX,IRET)
-              IF (IRET.EQ.0) CALL REORDVN(NZL,AR(I),IA(I),JA(I),AUX)
-              I = J
+          DO 
+            if (I>NNZ) exit
+            DO
+              if (j>nnz) exit
+              if (ia(j) /= ia(i)) exit
+              J = J+1
             ENDDO
+            NZL = J - I
+            CALL MRGSRT(NZL,JA(I),AUX,IRET)
+            IF (IRET.EQ.0) CALL REORDVN(NZL,AR(I),IA(I),JA(I),AUX)
+            I = J
+          ENDDO
 
 
 C        ... Construct CSR Representation...
-            ELEM = 1
-            ELEM_CSR = 1
+          ELEM = 1
+          ELEM_CSR = 1
 C        ... Insert first element ...
-            DO ROW = 1, IA(1)
-              IAN2(ROW) = 1
-            ENDDO
-            if (debug) write(0,*)'Rebuild CSR',ia(1),elem_csr
-            IF(JA(ELEM).GT.IA(ELEM)) THEN
-               IAN1(ELEM_CSR) = JA(ELEM)
-               ARN(ELEM_CSR) = AR(ELEM)
-               ELEM_CSR = ELEM_CSR+1
-            ENDIF
+          DO ROW = 1, IA(1)
+            IAN2(ROW) = 1
+          ENDDO
+          if (debug) write(0,*)'Rebuild CSR',ia(1),elem_csr
+          IF(JA(ELEM).GT.IA(ELEM)) THEN
+            IAN1(ELEM_CSR) = JA(ELEM)
+            ARN(ELEM_CSR) = AR(ELEM)
+            ELEM_CSR = ELEM_CSR+1
+          ENDIF
 
-            ELEM = ELEM+1
+          ELEM = ELEM+1
 
 C        ... Insert remaining element ...
-            DO ROW = IA(1), M
+          DO ROW = IA(1), M
 c$$$  if (debug) write(*,*)'CSR Loop:',row,m,elem_csr
 c$$$              DO WHILE ((IA(ELEM).EQ.ROW).AND.(ELEM.LE.NNZ))
-              DO 
-                if (elem > nnz) exit
-                if (ia(elem) /= row) exit
-                  IF (IA(ELEM).NE.IA(ELEM-1)) THEN
+            DO 
+              if (elem > nnz) exit
+              if (ia(elem) /= row) exit
+              IF (IA(ELEM).NE.IA(ELEM-1)) THEN
 C     ... Insert first element of a row ...
-                     IF(JA(ELEM).GT.IA(ELEM)) THEN                   
-                        IAN1(ELEM_CSR) = JA(ELEM)
-                        ARN(ELEM_CSR) = AR(ELEM)
-                        ELEM_CSR = ELEM_CSR+1
-                     ENDIF
-                  ELSE IF (JA(ELEM).NE.JA(ELEM-1)) THEN
+                IF(JA(ELEM).GT.IA(ELEM)) THEN                   
+                  IAN1(ELEM_CSR) = JA(ELEM)
+                  ARN(ELEM_CSR) = AR(ELEM)
+                  ELEM_CSR = ELEM_CSR+1
+                ENDIF
+              ELSE IF (JA(ELEM).NE.JA(ELEM-1)) THEN
 C     ... Insert other element of row ...
-                     IF(JA(ELEM).GT.IA(ELEM)) THEN                   
-                        IAN1(ELEM_CSR) = JA(ELEM)
-                        ARN(ELEM_CSR) = AR(ELEM)
-                        ELEM_CSR = ELEM_CSR+1
-                     ENDIF
-                  ELSE
-                     IF (CHECK_FLAG.EQ.1) THEN
+                IF(JA(ELEM).GT.IA(ELEM)) THEN                   
+                  IAN1(ELEM_CSR) = JA(ELEM)
+                  ARN(ELEM_CSR) = AR(ELEM)
+                  ELEM_CSR = ELEM_CSR+1
+                ENDIF
+              ELSE
+                IF (CHECK_FLAG.EQ.1) THEN
 C     ... Error, there are duplicated elements ...
-                        IERROR = 130
-                        CALL FCPSB_ERRPUSH(IERROR,NAME,INT_VAL)
-                        GOTO 9999
-                     ELSE IF (CHECK_FLAG.EQ.2) THEN
+                  IERROR = 130
+                  CALL FCPSB_ERRPUSH(IERROR,NAME,INT_VAL)
+                  GOTO 9999
+                ELSE IF (CHECK_FLAG.EQ.2) THEN
 C     ... Insert only the last duplicated element ...
-                        IF(JA(ELEM).GT.IA(ELEM)) THEN                   
-                           ARN(ELEM_CSR-1) = AR(ELEM)
-                        ENDIF
-                        if (debug) write(0,*) 'Duplicated overwrite',
-     +                       elem_csr-1,elem
-                     ELSE IF (CHECK_FLAG.EQ.3) THEN 
-C     ... Sum the duplicated element ...
-                        IF(JA(ELEM).GT.IA(ELEM)) THEN                   
-                           ARN(ELEM_CSR-1) = ARN(ELEM_CSR-1) + AR(ELEM)
-                        ENDIF
-                        if (debug) write(0,*) 'Duplicated add',
-     +                       elem_csr-1,elem
-                     END IF
+                  IF(JA(ELEM).GT.IA(ELEM)) THEN                   
+                    ARN(ELEM_CSR-1) = AR(ELEM)
                   ENDIF
-                  ELEM = ELEM + 1
-               ENDDO
-               IAN2(ROW+1) = ELEM_CSR
+                  if (debug) write(0,*) 'Duplicated overwrite',
+     +              elem_csr-1,elem
+                ELSE IF (CHECK_FLAG.EQ.3) THEN 
+C     ... Sum the duplicated element ...
+                  IF(JA(ELEM).GT.IA(ELEM)) THEN                   
+                    ARN(ELEM_CSR-1) = ARN(ELEM_CSR-1) + AR(ELEM)
+                  ENDIF
+                  if (debug) write(0,*) 'Duplicated add',
+     +              elem_csr-1,elem
+                END IF
+              ENDIF
+              ELEM = ELEM + 1
             ENDDO
+            IAN2(ROW+1) = ELEM_CSR
+          ENDDO
 
-       
-            if (debug) write(0,*)'Done Rebuild CSR',
-     +           ian2(m+1),ia(elem)
-            if (debug) then 
-               do i=ian2(m+1), nnz
-                  write(0,*) 'Overflow check :',ia(i),ja(i),ar(i)
-               enddo
-            endif
-            
-            
-            
-         ELSE IF (DESCRA(1:1).EQ.'T' .AND. DESCRA(2:2).EQ.'L') THEN
+          
+          if (debug) write(0,*)'Done Rebuild CSR',
+     +      ian2(m+1),ia(elem)
+          if (debug) then 
+            do i=ian2(m+1), nnz
+              write(0,*) 'Overflow check :',ia(i),ja(i),ar(i)
+            enddo
+          endif
+          
+          
+          
+        ELSE IF (DESCRA(1:1).EQ.'T' .AND. DESCRA(2:2).EQ.'L') THEN
 
 C       .... Order with key IA ...
-            CALL MRGSRT(NNZ,IA,AUX,IRET)
-            IF (IRET.EQ.0) CALL REORDVN(NNZ,AR,IA,JA,AUX)
+          CALL MRGSRT(NNZ,IA,AUX,IRET)
+          IF (IRET.EQ.0) CALL REORDVN(NNZ,AR,IA,JA,AUX)
 C       .... Order with key IA2N ...
-            I    = 1
-            J    = I
+          I    = 1
+          J    = I
 c$$$            DO WHILE (I.LE.NNZ)
 c$$$              DO WHILE ((IA(J).EQ.IA(I)).AND.
 c$$$     +          (J.LE.NNZ))
-            DO 
-              if (I>NNZ) exit
-              DO
-                if (j>nnz) exit
-                if (ia(j) /= ia(i)) exit
-                J = J+1
-              ENDDO
-              NZL = J - I
-              CALL MRGSRT(NZL,JA(I),AUX,IRET)
-              IF (IRET.EQ.0) CALL REORDVN(NZL,AR(I),IA(I),JA(I),AUX)
-              I = J
+          DO 
+            if (I>NNZ) exit
+            DO
+              if (j>nnz) exit
+              if (ia(j) /= ia(i)) exit
+              J = J+1
             ENDDO
+            NZL = J - I
+            CALL MRGSRT(NZL,JA(I),AUX,IRET)
+            IF (IRET.EQ.0) CALL REORDVN(NZL,AR(I),IA(I),JA(I),AUX)
+            I = J
+          ENDDO
 
 C        ... Construct CSR Representation...
-            ELEM = 1
-            ELEM_CSR = 1
+          ELEM = 1
+          ELEM_CSR = 1
 C        ... Insert first element ...
-            DO ROW = 1, IA(1)
-              IAN2(ROW) = 1
-            ENDDO
-            if (debug) write(0,*)'Rebuild CSR',ia(1),elem_csr
-            IF(JA(ELEM).LT.IA(ELEM)) THEN                   
-               IAN1(ELEM_CSR) = JA(ELEM)
-               ARN(ELEM_CSR) = AR(ELEM)
-               ELEM_CSR = ELEM_CSR+1
-            ENDIF
-            ELEM = ELEM+1
-            
+          DO ROW = 1, IA(1)
+            IAN2(ROW) = 1
+          ENDDO
+          if (debug) write(0,*)'Rebuild CSR',ia(1),elem_csr
+          IF(JA(ELEM).LT.IA(ELEM)) THEN                   
+            IAN1(ELEM_CSR) = JA(ELEM)
+            ARN(ELEM_CSR) = AR(ELEM)
+            ELEM_CSR = ELEM_CSR+1
+          ENDIF
+          ELEM = ELEM+1
+          
 C     ... Insert remaining element ...
-            DO ROW = IA(1), M
+          DO ROW = IA(1), M
 c$$$              if (debug) write(*,*)'CSR Loop:',row,m,elem_csr
 c$$$              DO WHILE ((IA(ELEM).EQ.ROW).AND.(ELEM.LE.NNZ))
-              DO 
-                if (elem > nnz) exit
-                if (ia(elem) /= row) exit
-                IF (IA(ELEM).NE.IA(ELEM-1)) THEN
+            DO 
+              if (elem > nnz) exit
+              if (ia(elem) /= row) exit
+              IF (IA(ELEM).NE.IA(ELEM-1)) THEN
 C     ... Insert first element of a row ...
-                   IF(JA(ELEM).LT.IA(ELEM)) THEN                   
-                      IAN1(ELEM_CSR) = JA(ELEM)
-                      ARN(ELEM_CSR) = AR(ELEM)
-                      ELEM_CSR = ELEM_CSR+1
-                   ENDIF
-                ELSE IF (JA(ELEM).NE.JA(ELEM-1)) THEN
-C     ... Insert other element of row ...
-                   IF(JA(ELEM).LT.IA(ELEM)) THEN                               
-                      IAN1(ELEM_CSR) = JA(ELEM)
-                      ARN(ELEM_CSR) = AR(ELEM)
-                      ELEM_CSR = ELEM_CSR+1
-                   ENDIF
-                ELSE
-                   IF (CHECK_FLAG.EQ.1) THEN
-C                    ... Error, there are duplicated elements ...
-                      IERROR = 130
-                      CALL FCPSB_ERRPUSH(IERROR,NAME,INT_VAL)
-                      GOTO 9999
-                  ELSE IF (CHECK_FLAG.EQ.2) THEN
-C                    ... Insert only the last duplicated element ...
-                     IF(JA(ELEM).LT.IA(ELEM)) THEN                   
-                        ARN(ELEM_CSR-1) = AR(ELEM)
-                     ENDIF
-                     if (debug) write(0,*) 'Duplicated overwrite',
-     +                    elem_csr-1,elem
-                  ELSE IF (CHECK_FLAG.EQ.3) THEN 
-C                    ... Sum the duplicated element ...
-                     IF(JA(ELEM).LT.IA(ELEM)) THEN                   
-                        ARN(ELEM_CSR-1) = ARN(ELEM_CSR-1) + AR(ELEM)
-                     ENDIF
-                    if (debug) write(0,*) 'Duplicated add',
-     +                 elem_csr-1,elem
-                  END IF
+                IF(JA(ELEM).LT.IA(ELEM)) THEN                   
+                  IAN1(ELEM_CSR) = JA(ELEM)
+                  ARN(ELEM_CSR) = AR(ELEM)
+                  ELEM_CSR = ELEM_CSR+1
                 ENDIF
-                ELEM = ELEM + 1
-              ENDDO
-              IAN2(ROW+1) = ELEM_CSR
+              ELSE IF (JA(ELEM).NE.JA(ELEM-1)) THEN
+C     ... Insert other element of row ...
+                IF(JA(ELEM).LT.IA(ELEM)) THEN                               
+                  IAN1(ELEM_CSR) = JA(ELEM)
+                  ARN(ELEM_CSR) = AR(ELEM)
+                  ELEM_CSR = ELEM_CSR+1
+                ENDIF
+              ELSE
+                IF (CHECK_FLAG.EQ.1) THEN
+C                    ... Error, there are duplicated elements ...
+                  IERROR = 130
+                  CALL FCPSB_ERRPUSH(IERROR,NAME,INT_VAL)
+                  GOTO 9999
+                ELSE IF (CHECK_FLAG.EQ.2) THEN
+C                    ... Insert only the last duplicated element ...
+                  IF(JA(ELEM).LT.IA(ELEM)) THEN                   
+                    ARN(ELEM_CSR-1) = AR(ELEM)
+                  ENDIF
+                  if (debug) write(0,*) 'Duplicated overwrite',
+     +              elem_csr-1,elem
+                ELSE IF (CHECK_FLAG.EQ.3) THEN 
+C                    ... Sum the duplicated element ...
+                  IF(JA(ELEM).LT.IA(ELEM)) THEN                   
+                    ARN(ELEM_CSR-1) = ARN(ELEM_CSR-1) + AR(ELEM)
+                  ENDIF
+                  if (debug) write(0,*) 'Duplicated add',
+     +              elem_csr-1,elem
+                END IF
+              ENDIF
+              ELEM = ELEM + 1
             ENDDO
+            IAN2(ROW+1) = ELEM_CSR
+          ENDDO
 
 
           if (debug) write(0,*)'Done Rebuild CSR',
-     +       ian2(m+1),ia(elem)
+     +      ian2(m+1),ia(elem)
           if (debug) then 
-             do i=ian2(m+1), nnz
-                write(0,*) 'Overflow check :',ia(i),ja(i),ar(i)
-             enddo
+            do i=ian2(m+1), nnz
+              write(0,*) 'Overflow check :',ia(i),ja(i),ar(i)
+            enddo
           endif
 
 
@@ -529,9 +536,9 @@ C
 C
 C           TO DO
 C
-         IERROR = 3021
-         CALL FCPSB_ERRPUSH(IERROR,NAME,INT_VAL)
-         GOTO 9999
+        IERROR = 3021
+        CALL FCPSB_ERRPUSH(IERROR,NAME,INT_VAL)
+        GOTO 9999
 
       END IF
       INFON(1)=ELEM_CSR-1
@@ -543,8 +550,8 @@ C
       CALL FCPSB_ERRACTIONRESTORE(ERR_ACT)
 
       IF ( ERR_ACT .NE. 0 ) THEN 
-         CALL FCPSB_SERROR()
-         RETURN
+        CALL FCPSB_SERROR()
+        RETURN
       ENDIF
 
       RETURN

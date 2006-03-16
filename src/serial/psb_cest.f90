@@ -28,14 +28,14 @@
 !!$  POSSIBILITY OF SUCH DAMAGE.
 !!$ 
 !!$  
-subroutine psb_cest(afmt, nnz, lia1, lia2, lar, up, info)
+subroutine psb_cest(afmt, m,n,nnz, lia1, lia2, lar, up, info)
 
   use psb_error_mod
   use psb_const_mod
   implicit none
 
   !     .. scalar arguments ..
-  integer           ::  nnz, lia1, lia2, lar, info
+  integer           ::  m,n,nnz, lia1, lia2, lar, info
   character         ::  up
   !     .. array arguments..
   character(len=5)  ::  afmt
@@ -52,7 +52,7 @@ subroutine psb_cest(afmt, nnz, lia1, lia2, lar, up, info)
   if ((up.eq.'y').or.(up.eq.'Y')) then
      if (afmt.eq.'JAD') then 
         lia1 = 2*(nnz + nnz/5) +1000
-        lia2 = 2*(nnz + nnz/5) +1000
+        lia2 = 2*(nnz + nnz/5) +1000 +m
         lar = nnz + nnz/5
      else if (afmt.eq.'COO') then 
         lia1 = nnz
@@ -60,7 +60,7 @@ subroutine psb_cest(afmt, nnz, lia1, lia2, lar, up, info)
         lar = nnz
      else if(afmt.eq.'CSR') then
         lia1 = nnz
-        lia2 = 2*nnz + 1000
+        lia2 = 2*nnz + 1000 + m + 1
         lar = nnz
      else
         info = 136
