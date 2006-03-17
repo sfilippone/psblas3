@@ -62,7 +62,6 @@ function psb_ddot(x, y,desc_a, info, jx, jy)
   ! locals
   integer                  :: int_err(5), icontxt, nprow, npcol, myrow, mycol,&
        & err_act, n, iix, jjx, temp(2), ix, ijx, iy, ijy, iiy, jjy, i, m, j, k
-  real(kind(1.d0)),pointer :: tmpx(:)
   real(kind(1.D0))         :: dot_local
   real(kind(1.d0))         :: ddot
   character(len=20)        :: name, ch_err
@@ -222,7 +221,6 @@ function psb_ddotv(x, y,desc_a, info)
   ! locals
   integer                  :: int_err(5), icontxt, nprow, npcol, myrow, mycol,&
        & err_act, n, iix, jjx, temp(2), ix, jx, iy, jy, iiy, jjy, i, m, j, k
-  real(kind(1.d0)),pointer :: tmpx(:)
   real(kind(1.D0))         :: dot_local
   real(kind(1.d0))         :: ddot
   character(len=20)        :: name, ch_err
@@ -366,7 +364,6 @@ subroutine psb_ddotvs(res, x, y,desc_a, info)
   ! locals
   integer                  :: int_err(5), icontxt, nprow, npcol, myrow, mycol,&
        & err_act, n, iix, jjx, temp(2), ix, ijx, iy, ijy, iiy, jjy, i, m, j, k
-  real(kind(1.d0)),pointer :: tmpx(:)
   real(kind(1.D0))         :: dot_local
   real(kind(1.d0))         :: ddot
   character(len=20)        :: name, ch_err
@@ -513,7 +510,7 @@ subroutine psb_dmdots(res, x, y, desc_a, info)
   ! locals
   integer                  :: int_err(5), icontxt, nprow, npcol, myrow, mycol,&
        & err_act, n, iix, jjx, temp(2), ix, ijx, iy, ijy, iiy, jjy, i, m, j, k
-  real(kind(1.d0)),pointer :: dot_local(:)
+  real(kind(1.d0)),allocatable  :: dot_local(:)
   real(kind(1.d0))         :: ddot
   character(len=20)        :: name, ch_err
 
