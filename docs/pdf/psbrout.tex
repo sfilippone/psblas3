@@ -26,7 +26,6 @@ where:
 \hline
 $x$, $y$, $\alpha$, $\beta$ & {\bf Subroutine}\\
 \hline
-Single Precision Real & psb\_geaxpby \\
 Long Precision Real & psb\_geaxpby \\
 Long Precision Complex & psb\_geaxpby \\
 \hline
@@ -107,7 +106,7 @@ An integer value that contains an error code.
 
 This function computes dot product between two vectors $x$ and
 $y$.\\
-If $x$ and $y$ are double precision real or single precision real vectors
+If $x$ and $y$ are double precision real vectors
 computes dot-product as:
 \[dot \leftarrow x^T y\]
 Else if $x$ and $y$ are double precision complex vectors then computes dot-product as:
@@ -126,7 +125,6 @@ where:
 \hline
 $dot$, $x$, $y$ & {\bf Function}\\
 \hline
-Single Precision Real & psb\_gedot\\
 Long Precision Real & psb\_gedot \\
 Long Precision Complex & psb\_gedot \\	
 \hline
@@ -201,7 +199,6 @@ is a rank one array.
 \hline
 $res$, $x$, $y$ & {\bf Subroutine}\\
 \hline
-Single Precision Real & psb\_gedot\\
 Long Precision Real & psb\_gedot \\
 Long Precision Complex & psb\_gedot \\	
 \hline
@@ -252,10 +249,10 @@ An integer value that contains an error code.
 
 This function computes 
  the infinity-norm of a vector $x$.\\
-If $x$ is double precision real or single precision real vector
+If $x$ is a double precision real  vector
 computes infinity norm as:
 \[ amax \leftarrow \max_i |x_i|\]
-else if $x$ is double precision complex vector then computes infinity-norm  as:
+else if $x$ is a double precision complex vector then computes infinity-norm  as:
 \[ amax \leftarrow \max_i {(|re(x_i)| + |im(x_i)|)}\]
 where:
 \begin{description}
@@ -271,7 +268,6 @@ where:
 \hline
 $amax$ & $x$ & {\bf Function}\\
 \hline
-Single Precision Real&Single Precision Real & psb\_geamax\\
 Long Precision Real&Long Precision Real & psb\_geamax \\
 Long Precision Real&Long Precision Complex & psb\_geamax \\
 \hline
@@ -330,7 +326,6 @@ a  dense matrix  $x$:
 \hline
 $res$&  $x$& {\bf Subroutine}\\
 \hline
-Single Precision Real  &Single Precision Real  & psb\_geamax\\
 Long Precision Real    &Long Precision Real    & psb\_geamax\\
 Long Precision Real &Long Precision Complex & psb\_geamax\\	
 \hline
@@ -373,7 +368,7 @@ An integer value that contains an error code.
 \subroutine{psb\_geasum}{1-Norm of Vector}    
 
 This function computes the 1-norm of a vector $x$.\\
-If $x$ is double precision real or single precision real vector
+If $x$ is a double precision real vector
 computes 1-norm as:
 \[ asum \leftarrow  \|x_i\|\]
 else if $x$ ic double precision complex vector then computes 1-norm  as:
@@ -392,7 +387,6 @@ where:
 \hline
 $dot$, $x$, $y$ & {\bf Function}\\
 \hline
-Single Precision Real & psb\_geasum\\
 Long Precision Real & psb\_geasum \\
 Long Precision Complex & psb\_geasum \\	
 \hline
@@ -443,7 +437,7 @@ An integer value that contains an error code.
 \subroutine {psb\_genrm2}{2-Norm of Vector}    
 
 This function computes the 2-norm of a vector $x$.\\
-If $x$ is double precision real or single precision real vector
+If $x$ is a double precision real  vector
 computes 2-norm as:
 \[ nrm2 \leftarrow \sqrt{x^T x}\]
 else if $x$ is double precision complex vector then computes 2-norm  as:
@@ -459,7 +453,6 @@ where:
 \hline
 $nrm2$, $x$ & {\bf Function}\\
 \hline
-Single Precision Real & psb\_genrm2\\
 Long Precision Real & psb\_genrm2 \\
 Long Precision Complex & psb\_genrm2 \\
 \hline
@@ -525,7 +518,6 @@ where:
 \hline
 $nrmi$, $A$ & {\bf Function}\\
 \hline
-Single Precision Real & psb\_spnrmi\\
 Long Precision Real & psb\_spnrmi \\
 Long Precision Complex & psb\_spnrmi \\
 \hline
@@ -596,7 +588,6 @@ where:
 \hline
 $A$, $x$, $y$, $\alpha$, $\beta$ & {\bf Subroutine}\\
 \hline
-Single Precision Real & psb\_spmm\\
 Long Precision Real & psb\_spmm \\
 Long Precision Complex & psb\_spmm \\
 \hline
@@ -736,7 +727,6 @@ trans, unit, choice, diag, n, jx, jy, work}
 \hline
 $T$, $x$, $y$, $D$, $\alpha$, $\beta$ & {\bf Subroutine}\\
 \hline
-Single Precision Real & psb\_spsm\\
 Long Precision Real & psb\_spsm \\
 Long Precision Complex & psb\_spsm \\
 \hline
