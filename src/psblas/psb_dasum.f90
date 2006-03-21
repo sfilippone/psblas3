@@ -49,6 +49,7 @@ function psb_dasum (x,desc_a, info, jx)
   use psb_descriptor_type
   use psb_check_mod
   use psb_error_mod
+  use psb_blacs_mod
   implicit none
 
   real(kind(1.d0)), intent(in)      :: x(:,:)
@@ -61,7 +62,6 @@ function psb_dasum (x,desc_a, info, jx)
   integer                  :: int_err(5), icontxt, nprow, npcol, myrow, mycol,&
        & err_act, n, iix, jjx, temp(2), ix, ijx, m, i
   real(kind(1.d0))         :: asum, dasum
-  real(kind(1.d0)),pointer :: tmpx(:)
   character(len=20)        :: name, ch_err
 
   name='psb_dasum'
@@ -85,12 +85,12 @@ function psb_dasum (x,desc_a, info, jx)
     call psb_errpush(info,name)
     goto 9999
   endif
-  
+
   ix = 1
   if (present(jx)) then
-     ijx = jx
+    ijx = jx
   else
-     ijx = 1
+    ijx = 1
   endif
 
   m = desc_a%matrix_data(psb_m_)
@@ -98,46 +98,44 @@ function psb_dasum (x,desc_a, info, jx)
   ! check vector correctness
   call psb_chkvect(m,1,size(x,1),ix,ijx,desc_a%matrix_data,info,iix,jjx)
   if(info.ne.0) then
-     info=4010
-     ch_err='psb_chkvect'
-     call psb_errpush(info,name,a_err=ch_err)
-     goto 9999
+    info=4010
+    ch_err='psb_chkvect'
+    call psb_errpush(info,name,a_err=ch_err)
+    goto 9999
   end if
 
   if (iix.ne.1) then
-     info=3040
-     call psb_errpush(info,name)
-     goto 9999
+    info=3040
+    call psb_errpush(info,name)
+    goto 9999
   end if
 
   ! compute local max
   if ((m.ne.0)) then
-     if(desc_a%matrix_data(psb_n_row_).gt.0) then
-        asum=dasum(desc_a%matrix_data(psb_n_row_)-iix+1,x(iix,jjx),ione)
+    if(desc_a%matrix_data(psb_n_row_).gt.0) then
+      asum=dasum(desc_a%matrix_data(psb_n_row_)-iix+1,x(iix,jjx),ione)
 
-        ! adjust asum because overlapped elements are computed more than once
-        i=1
-        do while (desc_a%ovrlap_elem(i).ne.-ione)
-           asum = asum -&
-                & (desc_a%ovrlap_elem(i+1)-1)/desc_a%ovrlap_elem(i+1)*&
-                & tmpx(desc_a%ovrlap_elem(i))
-           i = i+2
-        end do
+      ! adjust asum because overlapped elements are computed more than once
+      i=1
+      do while (desc_a%ovrlap_elem(i).ne.-ione)
+        asum = asum -&
+             & (desc_a%ovrlap_elem(i+1)-1)/desc_a%ovrlap_elem(i+1)*&
+             & abs(x(desc_a%ovrlap_elem(i)-iix+1,jjx))
+        i = i+2
+      end do
 
-        ! compute global sum
-        call dgsum2d(icontxt, 'A', ' ', ione, ione, asum,&
-             & ione, mone ,mycol)
+      ! compute global sum
+      call gsum2d(icontxt, 'A', asum)
 
-     else
-        asum=0.d0
-        ! compute global sum
-        call dgsum2d(icontxt, 'A', ' ', ione, ione, asum,&
-             & ione, mone ,mycol)
-     end if
+    else
+      asum=0.d0
+      ! compute global sum
+      call gsum2d(icontxt, 'A', asum)
+    end if
   else
-     asum=0.d0
+    asum=0.d0
   end if
-  
+
 
   psb_dasum=asum
 
@@ -148,8 +146,8 @@ function psb_dasum (x,desc_a, info, jx)
   call psb_erractionrestore(err_act)
 
   if (err_act.eq.act_abort) then
-     call psb_error(icontxt)
-     return
+    call psb_error(icontxt)
+    return
   end if
   return
 end function psb_dasum
@@ -201,6 +199,7 @@ function psb_dasumv (x,desc_a, info)
   use psb_descriptor_type
   use psb_check_mod
   use psb_error_mod
+  use psb_blacs_mod
   implicit none
 
   real(kind(1.d0)), intent(in)      :: x(:)
@@ -212,7 +211,6 @@ function psb_dasumv (x,desc_a, info)
   integer                  :: int_err(5), icontxt, nprow, npcol, myrow, mycol,&
        & err_act, n, iix, jjx, temp(2), jx, ix, ijx, m, i
   real(kind(1.d0))         :: asum, dasum
-  real(kind(1.d0)),pointer :: tmpx(:)
   character(len=20)        :: name, ch_err
 
   name='psb_dasumv'
@@ -236,7 +234,7 @@ function psb_dasumv (x,desc_a, info)
     call psb_errpush(info,name)
     goto 9999
   endif
-  
+
   ix = 1
   jx=1
 
@@ -245,46 +243,44 @@ function psb_dasumv (x,desc_a, info)
   ! check vector correctness
   call psb_chkvect(m,1,size(x),ix,jx,desc_a%matrix_data,info,iix,jjx)
   if(info.ne.0) then
-     info=4010
-     ch_err='psb_chkvect'
-     call psb_errpush(info,name,a_err=ch_err)
-     goto 9999
+    info=4010
+    ch_err='psb_chkvect'
+    call psb_errpush(info,name,a_err=ch_err)
+    goto 9999
   end if
 
   if (iix.ne.1) then
-     info=3040
-     call psb_errpush(info,name)
-     goto 9999
+    info=3040
+    call psb_errpush(info,name)
+    goto 9999
   end if
 
   ! compute local max
   if ((m.ne.0)) then
-     if(desc_a%matrix_data(psb_n_row_).gt.0) then
-        asum=dasum(desc_a%matrix_data(psb_n_row_),x,ione)
+    if(desc_a%matrix_data(psb_n_row_).gt.0) then
+      asum=dasum(desc_a%matrix_data(psb_n_row_),x,ione)
 
-        ! adjust asum because overlapped elements are computed more than once
-        i=1
-        do while (desc_a%ovrlap_elem(i).ne.-ione)
-           asum = asum -&
-                & (desc_a%ovrlap_elem(i+1)-1)/desc_a%ovrlap_elem(i+1)*&
-                & tmpx(desc_a%ovrlap_elem(i))
-           i = i+2
-        end do
+      ! adjust asum because overlapped elements are computed more than once
+      i=1
+      do while (desc_a%ovrlap_elem(i).ne.-ione)
+        asum = asum -&
+             & (desc_a%ovrlap_elem(i+1)-1)/desc_a%ovrlap_elem(i+1)*&
+             & abs(x(desc_a%ovrlap_elem(i)))
+        i = i+2
+      end do
 
-        ! compute global sum
-        call dgsum2d(icontxt, 'A', ' ', ione, ione, asum,&
-             & ione, mone ,mycol)
+      ! compute global sum
+      call gsum2d(icontxt, 'A', asum)
 
-     else
-        asum=0.d0
-        ! compute global sum
-        call dgsum2d(icontxt, 'A', ' ', ione, ione, asum,&
-             & ione, mone ,mycol)
-     end if
+    else
+      asum=0.d0
+      ! compute global sum
+      call gsum2d(icontxt, 'A', asum)
+    end if
   else
-     asum=0.d0
+    asum=0.d0
   end if
-  
+
   psb_dasumv=asum
 
   call psb_erractionrestore(err_act)
@@ -294,8 +290,8 @@ function psb_dasumv (x,desc_a, info)
   call psb_erractionrestore(err_act)
 
   if (err_act.eq.act_abort) then
-     call psb_error(icontxt)
-     return
+    call psb_error(icontxt)
+    return
   end if
   return
 end function psb_dasumv
@@ -348,6 +344,7 @@ subroutine psb_dasumvs (res,x,desc_a, info)
   use psb_descriptor_type
   use psb_check_mod
   use psb_error_mod
+  use psb_blacs_mod
   implicit none
 
   real(kind(1.d0)), intent(in)      :: x(:)
@@ -359,7 +356,6 @@ subroutine psb_dasumvs (res,x,desc_a, info)
   integer                  :: int_err(5), icontxt, nprow, npcol, myrow, mycol,&
        & err_act, n, iix, jjx, temp(2), ix, jx, ijx, m, i
   real(kind(1.d0))         :: asum, dasum
-  real(kind(1.d0)),pointer :: tmpx(:)
   character(len=20)        :: name, ch_err
 
   name='psb_dasumvs'
@@ -383,7 +379,7 @@ subroutine psb_dasumvs (res,x,desc_a, info)
     call psb_errpush(info,name)
     goto 9999
   endif
-  
+
   ix = 1
   jx = 1
 
@@ -392,46 +388,44 @@ subroutine psb_dasumvs (res,x,desc_a, info)
   ! check vector correctness
   call psb_chkvect(m,1,size(x),ix,jx,desc_a%matrix_data,info,iix,jjx)
   if(info.ne.0) then
-     info=4010
-     ch_err='psb_chkvect'
-     call psb_errpush(info,name,a_err=ch_err)
-     goto 9999
+    info=4010
+    ch_err='psb_chkvect'
+    call psb_errpush(info,name,a_err=ch_err)
+    goto 9999
   end if
 
   if (iix.ne.1) then
-     info=3040
-     call psb_errpush(info,name)
-     goto 9999
+    info=3040
+    call psb_errpush(info,name)
+    goto 9999
   end if
 
   ! compute local max
   if ((m.ne.0)) then
-     if(desc_a%matrix_data(psb_n_row_).gt.0) then
-        asum=dasum(desc_a%matrix_data(psb_n_row_),x,ione)
+    if(desc_a%matrix_data(psb_n_row_).gt.0) then
+      asum=dasum(desc_a%matrix_data(psb_n_row_),x,ione)
 
-        ! adjust asum because overlapped elements are computed more than once
-        i=1
-        do while (desc_a%ovrlap_elem(i).ne.-ione)
-           asum = asum -&
-                & (desc_a%ovrlap_elem(i+1)-1)/desc_a%ovrlap_elem(i+1)*&
-                & tmpx(desc_a%ovrlap_elem(i))
-           i = i+2
-        end do
+      ! adjust asum because overlapped elements are computed more than once
+      i=1
+      do while (desc_a%ovrlap_elem(i).ne.-ione)
+        asum = asum -&
+             & (desc_a%ovrlap_elem(i+1)-1)/desc_a%ovrlap_elem(i+1)*&
+             & abs(x(desc_a%ovrlap_elem(i)))
+        i = i+2
+      end do
 
-        ! compute global sum
-        call dgsum2d(icontxt, 'A', ' ', ione, ione, asum,&
-             & ione, mone ,mycol)
+      ! compute global sum
+      call gsum2d(icontxt, 'A',asum)
 
-     else
-        asum=0.d0
-        ! compute global sum
-        call dgsum2d(icontxt, 'A', ' ', ione, ione, asum,&
-             & ione, mone ,mycol)
-     end if
+    else
+      asum=0.d0
+      ! compute global sum
+      call gsum2d(icontxt, 'A', asum)
+    end if
   else
-     asum=0.d0
+    asum=0.d0
   end if
-  
+
 
   res = asum
 
@@ -442,8 +436,8 @@ subroutine psb_dasumvs (res,x,desc_a, info)
   call psb_erractionrestore(err_act)
 
   if (err_act.eq.act_abort) then
-     call psb_error(icontxt)
-     return
+    call psb_error(icontxt)
+    return
   end if
   return
 end subroutine psb_dasumvs

@@ -60,8 +60,7 @@ function psb_damax (x,desc_a, info, jx)
   ! locals
   integer                  :: int_err(5), icontxt, nprow, npcol, myrow, mycol,&
        & err_act, n, iix, jjx, temp(2), ix, ijx, m, i, k, imax, idamax
-  real(kind(1.d0))         :: locmax(2), amax
-  real(kind(1.d0)),pointer :: tmpx(:)
+  real(kind(1.d0))         :: amax
   character(len=20)        :: name, ch_err
 
   name='psb_damax'
@@ -69,7 +68,6 @@ function psb_damax (x,desc_a, info, jx)
   info=0
   call psb_erractionsave(err_act)
 
-  locmax(:)=0.d0
   amax=0.d0
 
   icontxt=desc_a%matrix_data(psb_ctxt_)
@@ -194,8 +192,7 @@ function psb_damaxv (x,desc_a, info)
   ! locals
   integer                  :: int_err(5), err, icontxt, nprow, npcol, myrow, mycol,&
        & err_act, n, iix, jjx, jx, temp(2), ix, ijx, m, imax, idamax
-  real(kind(1.d0))         :: locmax(2), amax
-  real(kind(1.d0)),pointer :: tmpx(:)
+  real(kind(1.d0))         :: amax
   character(len=20)        :: name, ch_err
 
   name='psb_damaxv'
@@ -203,7 +200,6 @@ function psb_damaxv (x,desc_a, info)
   info=0
   call psb_erractionsave(err_act)
 
-  locmax(:)=0.d0
   amax=0.d0
 
   icontxt=desc_a%matrix_data(psb_ctxt_)
@@ -325,7 +321,7 @@ subroutine psb_damaxvs (res,x,desc_a, info)
   ! locals
   integer                  :: int_err(5), icontxt, nprow, npcol, myrow, mycol,&
        & err_act, n, iix, jjx, temp(2), ix, ijx, m, imax, idamax
-  real(kind(1.d0))         :: locmax(2), amax
+  real(kind(1.d0))         :: amax
   character(len=20)        :: name, ch_err
 
   name='psb_damaxvs'
@@ -333,7 +329,6 @@ subroutine psb_damaxvs (res,x,desc_a, info)
   info=0
   call psb_erractionsave(err_act)
 
-  locmax(:)=0.d0
   amax=0.d0
 
   icontxt=desc_a%matrix_data(psb_ctxt_)
@@ -454,8 +449,7 @@ subroutine psb_dmamaxs (res,x,desc_a, info,jx)
   ! locals
   integer                  :: int_err(5), icontxt, nprow, npcol, myrow, mycol,&
        & err_act, n, iix, jjx, ix, temp(2), ijx, m, imax, i, k, idamax
-  real(kind(1.d0))         :: locmax(2), amax
-  real(kind(1.d0)),pointer :: tmpx(:)
+  real(kind(1.d0))         :: amax
   character(len=20)        :: name, ch_err
 
   name='psb_dmamaxs'
@@ -463,7 +457,6 @@ subroutine psb_dmamaxs (res,x,desc_a, info,jx)
   info=0
   call psb_erractionsave(err_act)
 
-  locmax(:)=0.d0
   amax=0.d0
 
   icontxt=desc_a%matrix_data(psb_ctxt_)
