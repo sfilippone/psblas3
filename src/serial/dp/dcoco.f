@@ -108,8 +108,8 @@ c
 c     error handling
 c
         if(ierror.ne.0) then
-           call fcpsb_errpush(ierror,name,int_val)
-           goto 9999
+          call fcpsb_errpush(ierror,name,int_val)
+          goto 9999
         end if
 
         if (descra(1:1).eq.'G') then
@@ -250,18 +250,25 @@ c     ... sum the duplicated element ...
  20       continue
 
         else if (descra(1:1).eq.'T' .and. descra(2:2).eq.'U') then
+          ierror = 3021
+          call fcpsb_errpush(ierror,name,int_val)
+          goto 9999
 
+          
         else if (descra(1:1).eq.'T' .and. descra(2:2).eq.'L') then
-           
+          ierror = 3021
+          call fcpsb_errpush(ierror,name,int_val)
+          goto 9999
+          
         end if
 c
       else if (trans.ne.'N') then
 c
 c           to do
 c
-         ierror = 3021
-         call fcpsb_errpush(ierror,name,int_val)
-         goto 9999
+        ierror = 3021
+        call fcpsb_errpush(ierror,name,int_val)
+        goto 9999
 
       end if
 
@@ -272,8 +279,8 @@ c
       call fcpsb_erractionrestore(err_act)
 
       if ( err_act .ne. 0 ) then 
-         call fcpsb_serror()
-         return
+        call fcpsb_serror()
+        return
       endif
 
       return

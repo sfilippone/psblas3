@@ -140,16 +140,4 @@ end interface
      end subroutine psb_dprc_aply1
   end interface
 
-
-  interface psb_splu
-     subroutine psb_dsplu(a,l,u,d,info,blck)
-       use psb_spmat_type
-       integer, intent(out)                ::     info
-       type(psb_dspmat_type),intent(in)    :: a
-       type(psb_dspmat_type),intent(inout) :: l,u
-       type(psb_dspmat_type),intent(in), optional, target :: blck
-       real(kind(1.d0)), intent(inout)     ::  d(:)
-     end subroutine psb_dsplu
-  end interface
-  
 end module psb_prec_mod

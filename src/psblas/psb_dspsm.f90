@@ -256,10 +256,10 @@ subroutine  psb_dspsm(alpha,a,x,beta,y,desc_a,info,&
   end if
 
   ! Perform local triangular system solve
-  call dcssm(itrans,nrow,ik,alpha,lunitd,id,a%pr,&
-       & a%fida,a%descra,a%aspk,a%ia1,a%ia2,a%infoa,&
-       & a%pl,x(iix,jjx),lldx,beta,y(iiy,jjy),lldy,&
-       & iwork,liwork,info)
+  xp => x(iix:lldx,jjx:jjx+ik-1)
+  yp => y(iiy:lldy,jjy:jjy+ik-1)
+  call psb_cssm(alpha,a,xp,beta,yp,info,unitd=lunitd,d=id,trans=itrans)
+
   if(info.ne.0) then
     info = 4010
     ch_err='dcssm'
@@ -269,12 +269,9 @@ subroutine  psb_dspsm(alpha,a,x,beta,y,desc_a,info,&
 
   ! update overlap elements
   if(lchoice.gt.0) then
-    yp => y(iiy:lldy,jjy:jjy+ik-1)
+
     call psi_swapdata(ior(psb_swap_send_,psb_swap_recv_),ik,&
          & done,yp,desc_a,iwork,info)
-!!$     call PSI_dSwapData(ior(SWAP_SEND,SWAP_RECV),ik,&
-!!$          & done,y,lldy,desc_a%matrix_data,desc_a%ovrlap_index,&
-!!$          & iwork,liwork,info)
 
     i=0
     ! switch on update type
@@ -547,10 +544,10 @@ subroutine  psb_dspsv(alpha,a,x,beta,y,desc_a,info,&
   end if
 
   ! Perform local triangular system solve
-  call dcssm(itrans,nrow,ik,alpha,lunitd,id,a%pr,&
-       & a%fida,a%descra,a%aspk,a%ia1,a%ia2,a%infoa,&
-       & a%pl,x,lldx,beta,y,lldy,&
-       & iwork,liwork,info)
+  xp => x(iix:lldx)
+  yp => y(iiy:lldy)
+  call psb_cssm(alpha,a,xp,beta,yp,info,unitd=lunitd,d=id,trans=itrans)
+
   if(info.ne.0) then
      info = 4010
      ch_err='dcssm'
@@ -560,12 +557,8 @@ subroutine  psb_dspsv(alpha,a,x,beta,y,desc_a,info,&
 
   ! update overlap elements
   if(lchoice.gt.0) then
-     yp => y(iiy:lldy)
      call psi_swapdata(ior(psb_swap_send_,psb_swap_recv_),&
           & done,yp,desc_a,iwork,info)
-!!$     call PSI_dSwapData(ior(SWAP_SEND,SWAP_RECV),ik,&
-!!$          & done,y,lldy,desc_a%matrix_data,desc_a%ovrlap_index,&
-!!$          & iwork,liwork,info)
 
      i=0
      ! switch on update type

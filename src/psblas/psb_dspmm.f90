@@ -207,7 +207,7 @@ subroutine  psb_dspmm(alpha,a,x,beta,y,desc_a,info,&
       goto 9999
     end if
   end if
-  iwork(1)=0.d0
+  iwork(1)=dzero
 
   ! checking for matrix correctness
   call psb_chkmat(m,n,ia,ja,desc_a%matrix_data,info,iia,jja)
@@ -245,16 +245,12 @@ subroutine  psb_dspmm(alpha,a,x,beta,y,desc_a,info,&
       goto 9999
     end if
 
-    if(idoswap.lt.0) x(nrow:ncol,1:ik)=0.d0
 
     ib1=min(nb,ik)
     xp => x(iix:lldx,jjx:jjx+ib1-1)
     if(idoswap.gt.0)&
          & call psi_swapdata(ior(psb_swap_send_,psb_swap_recv_),&
          & ib1,dzero,xp,desc_a,iwork,info)
-!!$          & call PSI_dSwapData(ior(SWAP_SEND,SWAP_RECV),ib1,&
-!!$          & dzero,x(iix,jjx),lldx,desc_a%matrix_data,&
-!!$          & desc_a%halo_index,iwork,liwork,info)
 
 
     blk: do i=1, ik, nb
@@ -264,24 +260,19 @@ subroutine  psb_dspmm(alpha,a,x,beta,y,desc_a,info,&
       if((ib1.gt.0).and.(idoswap.gt.0))&
            & call psi_swapdata(psb_swap_send_,ib1,&
            & dzero,xp,desc_a,iwork,info)
-!!$             & call PSI_dSwapData(SWAP_SEND,ib1,&
-!!$             & dzero,x(iix,jjx+i+ib-1),lldx,desc_a%matrix_data,&
-!!$             & desc_a%halo_index,iwork,liwork,info)
+
       if(info.ne.0) exit blk
 
       !  local Matrix-vector product
-      call dcsmm(itrans,nrow,ib,ncol,alpha,a%pr,a%fida,&
-           & a%descra,a%aspk,a%ia1,a%ia2,a%infoa,a%pl,&
-           & x(iix,jjx+i-1),lldx,beta,y(iiy,jjy+i-1),lldy,&
-           & iwork,liwork,info)
+      call psb_csmm(alpha,a,x(iix:lldx,jjx:jjx+ib-1),&
+           & beta,y(iiy:lldy,jjy:jjy+ib-1),info,trans=itrans)
+
       if(info.ne.0) exit blk
 
       if((ib1.gt.0).and.(idoswap.gt.0))&
            & call psi_swapdata(psb_swap_send_,ib1,&
            & dzero,xp,desc_a,iwork,info)
-!!$             & call PSI_dSwapData(SWAP_RECV,ib1,&
-!!$             & dzero,x(iix,jjx+i+ib-1),lldx,desc_a%matrix_data,&
-!!$             & desc_a%halo_index,iwork,liwork,info)
+
       if(info.ne.0) exit blk
     end do blk
 
@@ -323,27 +314,25 @@ subroutine  psb_dspmm(alpha,a,x,beta,y,desc_a,info,&
       goto 9999
     end if
 
-    if(idoswap.lt.0) y(nrow:ncol,1:ik)=0.d0
+    y(iiy+nrow+1-1:iiy+ncol,1:ik)=dzero
 
     !  local Matrix-vector product
-    call dcsmm(itrans,ncol,ik,nrow,alpha,a%pr,a%fida,&
-         & a%descra,a%aspk,a%ia1,a%ia2,a%infoa,a%pl,&
-         & x(iix,jjx),lldx,beta,y(iiy,jjy),lldy,&
-         & iwork,liwork,info)
+    
+    call psb_csmm(alpha,a,x(iix:lldx,jjx:jjx+ik-1),&
+         & beta,y(iiy:lldy,jjy:jjy+ik-1),info,trans=itrans)
+
     if(info.ne.0) then
       info = 4010
-      ch_err='dcsmm'
+      ch_err='csmm'
       call psb_errpush(info,name,a_err=ch_err)
       goto 9999
     end if
 
     yp => y(iiy:lldy,jjy:jjy+ik-1)
-    if(idoswap.gt.0)&
+    if (idoswap/=0)&
          & call psi_swaptran(ior(psb_swap_send_,psb_swap_recv_),&
          & ik,done,yp,desc_a,iwork,info)
-!!$          & call PSI_dSwapTran(ior(SWAP_SEND,SWAP_RECV),&
-!!$          & ik,done,y(iiy,jjy),lldy,desc_a%matrix_data,&
-!!$          & desc_a%halo_index,iwork,liwork,info)
+
     if(info.ne.0) then
       info = 4010
       ch_err='PSI_dSwapTran'
@@ -579,18 +568,16 @@ subroutine  psb_dspmv(alpha,a,x,beta,y,desc_a,info,&
         goto 9999
      end if
 
-     if(idoswap.lt.0) then
-        x(nrow:ncol)=0.d0
+     if (idoswap == 0) then
+        x(nrow+1:ncol)=dzero
      else
         call psi_swapdata(ior(psb_swap_send_,psb_swap_recv_),&
              & dzero,x,desc_a,iwork,info,data=psb_comm_halo_)
      end if
 
      !  local Matrix-vector product
-     call dcsmm(itrans,nrow,ib,ncol,alpha,a%pl,a%fida,&
-          & a%descra,a%aspk,a%ia1,a%ia2,a%infoa,a%pr,&
-          & x(iix),lldx,beta,y(iiy),lldy,&
-          & iwork,liwork,info)
+      call psb_csmm(alpha,a,x(iix:lldx),beta,y(iiy:lldy),info)
+
      if(info.ne.0) then
         info = 4011
         call psb_errpush(info,name)
@@ -630,15 +617,13 @@ subroutine  psb_dspmv(alpha,a,x,beta,y,desc_a,info,&
      end if
 
      xp => x(iix:lldx)
-     yp => x(iiy:lldy)
+     yp => y(iiy:lldy)
 
-     if(idoswap.lt.0) y(nrow:ncol)=0.d0
+     yp(nrow+1:ncol)=dzero
 
      !  local Matrix-vector product
-     call dcsmm(itrans,ncol,ik,nrow,alpha,a%pr,a%fida,&
-          & a%descra,a%aspk,a%ia1,a%ia2,a%infoa,a%pl,&
-          & x(iix),lldx,beta,y(iiy),lldy,&
-          & iwork,liwork,info)
+     call psb_csmm(alpha,a,xp,beta,yp,info,trans=itrans)
+
      if(info.ne.0) then
         info = 4010
         ch_err='dcsmm'
@@ -646,7 +631,7 @@ subroutine  psb_dspmv(alpha,a,x,beta,y,desc_a,info,&
         goto 9999
      end if
 
-     if(idoswap.gt.0)&
+     if(idoswap /= 0)&
           & call psi_swaptran(ior(psb_swap_send_,psb_swap_recv_),&
           & done,yp,desc_a,iwork,info)
      if(info.ne.0) then
