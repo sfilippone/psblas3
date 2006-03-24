@@ -802,14 +802,7 @@ contains
       call psb_errpush(info,name,a_err=ch_err)
       goto 9999
     end if
-    call psb_sp_free(blck,info)
-    if(info/=0)then
-      info=4010
-      ch_err='sp_free'
-      call psb_errpush(info,name,a_err=ch_err)
-      goto 9999
-    end if
-
+2
     deallocate(iwork)   
 
     call psb_erractionrestore(err_act)
