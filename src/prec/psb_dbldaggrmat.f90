@@ -327,6 +327,7 @@ contains
 
   subroutine smooth_aggregate(info)
     use psb_serial_mod
+    use psb_const_mod
     use psb_comm_mod
     use psb_tools_mod
     use psb_error_mod
@@ -348,7 +349,6 @@ contains
     logical, parameter :: test_dump=.false.
     integer, parameter :: ncmax=16
     real(kind(1.d0))   :: omega, anorm, tmp, dg
-    real(kind(1.d0)), parameter :: one=1.0d0, zero=0.0d0
     character(len=20) :: name, ch_err
 
 
@@ -425,17 +425,17 @@ contains
     end if
 
     do i=1,size(p%dorig)
-      if (p%dorig(i) /= zero) then
-        p%dorig(i) = one / p%dorig(i)
+      if (p%dorig(i) /= dzero) then
+        p%dorig(i) = done / p%dorig(i)
       else
-        p%dorig(i) = one
+        p%dorig(i) = done
       end if
     end do
 
-    !     where (p%dorig /= zero) 
-    !       p%dorig = one / p%dorig
+    !     where (p%dorig /= dzero) 
+    !       p%dorig = done / p%dorig
     !     elsewhere
-    !       p%dorig = one
+    !       p%dorig = done
     !     end where
 
 
@@ -448,14 +448,14 @@ contains
 
     if (ml_global_nmb) then 
       do i=1,ncol
-        am4%aspk(i) = one
+        am4%aspk(i) = done
         am4%ia1(i)  = i
         am4%ia2(i)  = p%mlia(i)  
       end do
       am4%infoa(psb_nnz_) = ncol
     else
       do i=1,nrow
-        am4%aspk(i) = one
+        am4%aspk(i) = done
         am4%ia1(i)  = i
         am4%ia2(i)  = p%mlia(i)  
       end do
@@ -502,9 +502,9 @@ contains
         ! 
         ! This only works with CSR.
         !
-        anorm = 0.d0
+        anorm = dzero
         do i=1,am3%m
-          tmp = 0.d0 
+          tmp = dzero
           do j=am3%ia2(i),am3%ia2(i+1)-1
             if (am3%ia1(j) <= am3%m) then 
               tmp = tmp + dabs(am3%aspk(j))
@@ -537,7 +537,7 @@ contains
       do i=1,am3%m
         do j=am3%ia2(i),am3%ia2(i+1)-1
           if (am3%ia1(j) == i) then 
-            am3%aspk(j) = one - omega*am3%aspk(j) 
+            am3%aspk(j) = done - omega*am3%aspk(j) 
           else
             am3%aspk(j) = - omega*am3%aspk(j) 
           end if
@@ -548,7 +548,7 @@ contains
         if (am3%ia1(j) /= am3%ia2(j)) then 
           am3%aspk(j) = - omega*am3%aspk(j) 
         else
-          am3%aspk(j) = one - omega*am3%aspk(j) 
+          am3%aspk(j) = done - omega*am3%aspk(j) 
         endif
       end do
     else

@@ -1,0 +1,540 @@
+!!$ 
+!!$              Parallel Sparse BLAS  v2.0
+!!$    (C) Copyright 2006 Salvatore Filippone    University of Rome Tor Vergata
+!!$                       Alfredo Buttari        University of Rome Tor Vergata
+!!$ 
+!!$  Redistribution and use in source and binary forms, with or without
+!!$  modification, are permitted provided that the following conditions
+!!$  are met:
+!!$    1. Redistributions of source code must retain the above copyright
+!!$       notice, this list of conditions and the following disclaimer.
+!!$    2. Redistributions in binary form must reproduce the above copyright
+!!$       notice, this list of conditions, and the following disclaimer in the
+!!$       documentation and/or other materials provided with the distribution.
+!!$    3. The name of the PSBLAS group or the names of its contributors may
+!!$       not be used to endorse or promote products derived from this
+!!$       software without specific written permission.
+!!$ 
+!!$  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+!!$  ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
+!!$  TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+!!$  PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE PSBLAS GROUP OR ITS CONTRIBUTORS
+!!$  BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+!!$  CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+!!$  SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+!!$  INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+!!$  CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+!!$  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+!!$  POSSIBILITY OF SUCH DAMAGE.
+!!$ 
+!!$  
+! File: psb_damax.f90
+!
+! Function: psb_damax
+!    Searches the absolute max of X.
+!
+!    normi := max(abs(sub(X)(i))  
+!
+!    where sub( X ) denotes X(1:N,JX:).
+!
+! Parameters:
+!    x      -  real,dimension(:,:).       The input vector.
+!    desc_a -  type(<psb_desc_type>).     The communication descriptor.
+!    info   -  integer.                   Eventually returns an error code.
+!    jx     -  integer(optional).         The column offset.
+!
+function psb_zamax (x,desc_a, info, jx)
+  use psb_blacs_mod 
+  use psb_serial_mod
+  use psb_descriptor_type
+  use psb_check_mod
+  use psb_error_mod
+  implicit none
+
+  complex(kind(1.d0)), intent(in)      :: x(:,:)
+  type(psb_desc_type), intent(in)   :: desc_a
+  integer, intent(out)              :: info
+  integer, optional, intent(in)     :: jx
+  real(kind(1.d0))                  :: psb_zamax
+
+  ! locals
+  integer                  :: int_err(5), icontxt, nprow, npcol, myrow, mycol,&
+       & err_act, n, iix, jjx, temp(2), ix, ijx, m, i, k, imax, izamax
+  real(kind(1.d0))         :: amax
+  character(len=20)        :: name, ch_err
+  double complex    ::         zdum
+  double precision  ::  cabs1
+  cabs1( zdum ) = abs( dble( zdum ) ) + abs( dimag( zdum ) )
+
+  name='psb_zamax'
+  if(psb_get_errstatus().ne.0) return 
+  info=0
+  call psb_erractionsave(err_act)
+
+  amax=0.d0
+
+  icontxt=desc_a%matrix_data(psb_ctxt_)
+
+  ! check on blacs grid 
+  call blacs_gridinfo(icontxt, nprow, npcol, myrow, mycol)
+  if (nprow == -1) then
+    info = 2010
+    call psb_errpush(info,name)
+    goto 9999 
+ else if (npcol /= 1) then
+    info = 2030
+    int_err(1) = npcol
+    call psb_errpush(info,name)
+    goto 9999
+  endif
+  
+  ix = 1
+  if (present(jx)) then
+     ijx = jx
+  else
+     ijx = 1
+  endif
+
+  m = desc_a%matrix_data(psb_m_)
+
+  call psb_chkvect(m,1,size(x,1),ix,ijx,desc_a%matrix_data,info,iix,jjx)
+  if(info.ne.0) then
+     info=4010
+     ch_err='psb_chkvect'
+     call psb_errpush(info,name,a_err=ch_err)
+     goto 9999
+  end if
+
+  if (iix.ne.1) then
+     info=3040
+     call psb_errpush(info,name)
+     goto 9999
+  end if
+
+  ! compute local max
+  if ((desc_a%matrix_data(psb_n_row_).gt.0).and.(m.ne.0)) then
+     imax=izamax(desc_a%matrix_data(psb_n_row_)-iix+1,x(iix,jjx),1)
+     amax=cabs1(x(iix+imax-1,jjx))
+  end if
+  
+  ! compute global max
+  call gamx2d(icontxt, 'A', amax)
+
+  psb_zamax=amax
+
+  call psb_erractionrestore(err_act)
+  return  
+
+9999 continue
+  call psb_erractionrestore(err_act)
+
+  if (err_act.eq.act_abort) then
+     call psb_error(icontxt)
+     return
+  end if
+  return
+end function psb_zamax
+
+
+
+
+!!$ 
+!!$              Parallel Sparse BLAS  v2.0
+!!$    (C) Copyright 2006 Salvatore Filippone    University of Rome Tor Vergata
+!!$                       Alfredo Buttari        University of Rome Tor Vergata
+!!$ 
+!!$  Redistribution and use in source and binary forms, with or without
+!!$  modification, are permitted provided that the following conditions
+!!$  are met:
+!!$    1. Redistributions of source code must retain the above copyright
+!!$       notice, this list of conditions and the following disclaimer.
+!!$    2. Redistributions in binary form must reproduce the above copyright
+!!$       notice, this list of conditions, and the following disclaimer in the
+!!$       documentation and/or other materials provided with the distribution.
+!!$    3. The name of the PSBLAS group or the names of its contributors may
+!!$       not be used to endorse or promote products derived from this
+!!$       software without specific written permission.
+!!$ 
+!!$  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+!!$  ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
+!!$  TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+!!$  PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE PSBLAS GROUP OR ITS CONTRIBUTORS
+!!$  BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+!!$  CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+!!$  SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+!!$  INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+!!$  CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+!!$  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+!!$  POSSIBILITY OF SUCH DAMAGE.
+!!$ 
+!!$  
+! Function: psb_zamaxv
+!    Searches the absolute max of X.
+!
+!    normi := max(abs(X(i))  
+!
+! Parameters:
+!    x      -  real,dimension(:).         The input vector.
+!    desc_a -  type(<psb_desc_type>).     The communication descriptor.
+!    info   -  integer.                   Eventually returns an error code.
+!
+function psb_zamaxv (x,desc_a, info)
+  use psb_blacs_mod
+  use psb_serial_mod
+  use psb_descriptor_type
+  use psb_check_mod
+  use psb_error_mod
+  implicit none
+
+  real(kind(1.d0)), intent(in)      :: x(:)
+  type(psb_desc_type), intent(in)   :: desc_a
+  integer, intent(out)              :: info
+  real(kind(1.d0))                  :: psb_zamaxv
+
+  ! locals
+  integer                  :: int_err(5), err, icontxt, nprow, npcol, myrow, mycol,&
+       & err_act, n, iix, jjx, jx, temp(2), ix, ijx, m, imax, izamax
+  real(kind(1.d0))         :: amax
+  complex(kind(1.d0))      :: cmax
+  character(len=20)        :: name, ch_err
+  double complex    ::         zdum
+  double precision  ::  cabs1
+  cabs1( zdum ) = abs( dble( zdum ) ) + abs( dimag( zdum ) )
+
+  name='psb_zamaxv'
+  if(psb_get_errstatus().ne.0) return 
+  info=0
+  call psb_erractionsave(err_act)
+
+  amax=0.d0
+
+  icontxt=desc_a%matrix_data(psb_ctxt_)
+
+  ! check on blacs grid 
+  call blacs_gridinfo(icontxt, nprow, npcol, myrow, mycol)
+  if (nprow == -1) then
+    info = 2010
+    call psb_errpush(info,name)
+    goto 9999
+  else if (npcol /= 1) then
+    info = 2030
+    int_err(1) = npcol
+    call psb_errpush(info,name)
+    goto 9999
+  endif
+  
+  ix = 1
+  jx = 1
+
+  m = desc_a%matrix_data(psb_m_)
+
+  call psb_chkvect(m,1,size(x,1),ix,jx,desc_a%matrix_data,info,iix,jjx)
+  if(info.ne.0) then
+     info=4010
+     ch_err='psb_chkvect'
+     call psb_errpush(info,name,a_err=ch_err)
+     goto 9999
+  end if
+
+  if (iix.ne.1) then
+     info=3040
+     call psb_errpush(info,name)
+     goto 9999
+  end if
+
+  ! compute local max
+  if ((desc_a%matrix_data(psb_n_row_).gt.0).and.(m.ne.0)) then
+     imax=izamax(desc_a%matrix_data(psb_n_row_)-iix+1,x(iix),1)
+     cmax=(x(iix+imax-1))
+     amax=cabs1(cmax)
+  end if
+  
+  ! compute global max
+  call gamx2d(icontxt, 'A', amax)
+
+  psb_zamaxv=amax
+
+  call psb_erractionrestore(err_act)
+  return  
+
+9999 continue
+  call psb_erractionrestore(err_act)
+
+  if (err_act.eq.act_abort) then
+     call psb_error(icontxt)
+     return
+  end if
+  return
+end function psb_zamaxv
+
+!!$ 
+!!$              Parallel Sparse BLAS  v2.0
+!!$    (C) Copyright 2006 Salvatore Filippone    University of Rome Tor Vergata
+!!$                       Alfredo Buttari        University of Rome Tor Vergata
+!!$ 
+!!$  Redistribution and use in source and binary forms, with or without
+!!$  modification, are permitted provided that the following conditions
+!!$  are met:
+!!$    1. Redistributions of source code must retain the above copyright
+!!$       notice, this list of conditions and the following disclaimer.
+!!$    2. Redistributions in binary form must reproduce the above copyright
+!!$       notice, this list of conditions, and the following disclaimer in the
+!!$       documentation and/or other materials provided with the distribution.
+!!$    3. The name of the PSBLAS group or the names of its contributors may
+!!$       not be used to endorse or promote products derived from this
+!!$       software without specific written permission.
+!!$ 
+!!$  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+!!$  ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
+!!$  TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+!!$  PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE PSBLAS GROUP OR ITS CONTRIBUTORS
+!!$  BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+!!$  CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+!!$  SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+!!$  INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+!!$  CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+!!$  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+!!$  POSSIBILITY OF SUCH DAMAGE.
+!!$ 
+!!$  
+!
+! Subroutine: psb_zamaxvs
+!    Searches the absolute max of X.
+!
+!    normi := max(abs(sub(X)(i))  
+!
+!    where sub( X ) denotes X(1:N,JX:).
+!
+! Parameters:
+!    res    -  real.                      The result.
+!    x      -  real,dimension(:,:).       The input vector.
+!    desc_a -  type(<psb_desc_type>).     The communication descriptor.
+!    info   -  integer.                   Eventually returns an error code.
+!    jx     -  integer(optional).         The column offset.
+!
+subroutine psb_zamaxvs (res,x,desc_a, info)
+  use psb_blacs_mod
+  use psb_serial_mod
+  use psb_descriptor_type
+  use psb_check_mod
+  use psb_error_mod
+  implicit none
+
+  real(kind(1.d0)), intent(in)      :: x(:)
+  type(psb_desc_type), intent(in)   :: desc_a
+  integer, intent(out)              :: info
+  real(kind(1.D0)), intent(out)     :: res
+
+  ! locals
+  integer                  :: int_err(5), icontxt, nprow, npcol, myrow, mycol,&
+       & err_act, n, iix, jjx, temp(2), ix, ijx, m, imax, izamax
+  real(kind(1.d0))         :: amax
+  character(len=20)        :: name, ch_err
+  complex(kind(1.d0))      :: cmax
+  double complex    ::         zdum
+  double precision  ::  cabs1
+  cabs1( zdum ) = abs( dble( zdum ) ) + abs( dimag( zdum ) )
+
+  name='psb_zamaxvs'
+  if(psb_get_errstatus().ne.0) return 
+  info=0
+  call psb_erractionsave(err_act)
+
+  amax=0.d0
+
+  icontxt=desc_a%matrix_data(psb_ctxt_)
+
+  ! check on blacs grid 
+  call blacs_gridinfo(icontxt, nprow, npcol, myrow, mycol)
+  if (nprow == -1) then
+    info = 2010
+    call psb_errpush(info,name)
+    goto 9999
+  else if (npcol /= 1) then
+    info = 2030
+    int_err(1) = npcol
+    call psb_errpush(info,name)
+    goto 9999
+  endif
+
+  ix = 1
+  ijx=1
+
+  m = desc_a%matrix_data(psb_m_)
+
+  call psb_chkvect(m,1,size(x,1),ix,ijx,desc_a%matrix_data,info,iix,jjx)
+  if(info.ne.0) then
+     info=4010
+     ch_err='psb_chkvect'
+     call psb_errpush(info,name,a_err=ch_err)
+     goto 9999
+  end if
+
+  if (iix.ne.1) then
+     info=3040
+     call psb_errpush(info,name)
+     goto 9999
+  end if
+
+  ! compute local max
+  if ((desc_a%matrix_data(psb_n_row_).gt.0).and.(m.ne.0)) then
+     imax=izamax(desc_a%matrix_data(psb_n_row_)-iix+1,x(iix),1)
+     cmax=(x(iix+imax-1))
+     amax=cabs1(cmax)
+  end if
+  
+  ! compute global max
+  call gamx2d(icontxt, 'A', amax)
+
+  res = amax
+
+  call psb_erractionrestore(err_act)
+  return  
+
+9999 continue
+  call psb_erractionrestore(err_act)
+
+  if (err_act.eq.act_abort) then
+     call psb_error(icontxt)
+     return
+  end if
+  return
+end subroutine psb_zamaxvs
+
+
+!!$ 
+!!$              Parallel Sparse BLAS  v2.0
+!!$    (C) Copyright 2006 Salvatore Filippone    University of Rome Tor Vergata
+!!$                       Alfredo Buttari        University of Rome Tor Vergata
+!!$ 
+!!$  Redistribution and use in source and binary forms, with or without
+!!$  modification, are permitted provided that the following conditions
+!!$  are met:
+!!$    1. Redistributions of source code must retain the above copyright
+!!$       notice, this list of conditions and the following disclaimer.
+!!$    2. Redistributions in binary form must reproduce the above copyright
+!!$       notice, this list of conditions, and the following disclaimer in the
+!!$       documentation and/or other materials provided with the distribution.
+!!$    3. The name of the PSBLAS group or the names of its contributors may
+!!$       not be used to endorse or promote products derived from this
+!!$       software without specific written permission.
+!!$ 
+!!$  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+!!$  ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
+!!$  TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+!!$  PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE PSBLAS GROUP OR ITS CONTRIBUTORS
+!!$  BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+!!$  CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+!!$  SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+!!$  INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+!!$  CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+!!$  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+!!$  POSSIBILITY OF SUCH DAMAGE.
+!!$ 
+!!$  
+!
+! Subroutine: psb_zmamaxs
+!    Searches the absolute max of X.
+!
+!    normi := max(abs(X(i))  
+!
+! Parameters:
+!    res    -  real.                      The result.
+!    x      -  real,dimension(:).         The input vector.
+!    desc_a -  type(<psb_desc_type>).     The communication descriptor.
+!    info   -  integer.                   Eventually returns an error code.
+!
+subroutine psb_zmamaxs (res,x,desc_a, info,jx)
+  use psb_blacs_mod
+  use psb_serial_mod
+  use psb_descriptor_type
+  use psb_check_mod
+  use psb_error_mod
+  implicit none
+
+  real(kind(1.d0)), intent(in)      :: x(:,:)
+  type(psb_desc_type), intent(in)   :: desc_a
+  integer, intent(out)              :: info
+  integer, optional, intent(in)     :: jx
+  real(kind(1.d0)), intent(out) :: res(:)
+
+  ! locals
+  integer                  :: int_err(5), icontxt, nprow, npcol, myrow, mycol,&
+       & err_act, n, iix, jjx, ix, temp(2), ijx, m, imax, i, k, izamax
+  real(kind(1.d0))         :: amax
+  character(len=20)        :: name, ch_err
+  complex(kind(1.d0))      :: cmax
+  double complex    ::         zdum
+  double precision  ::  cabs1
+  cabs1( zdum ) = abs( dble( zdum ) ) + abs( dimag( zdum ) )
+
+  name='psb_zmamaxs'
+  if (psb_get_errstatus().ne.0) return 
+  info=0
+  call psb_erractionsave(err_act)
+
+  amax=0.d0
+
+  icontxt=desc_a%matrix_data(psb_ctxt_)
+
+  ! check on blacs grid 
+  call blacs_gridinfo(icontxt, nprow, npcol, myrow, mycol)
+  if (nprow == -1) then
+    info = 2010
+    call psb_errpush(info,name)
+    goto 9999
+  else if (npcol /= 1) then
+    info = 2030
+    int_err(1) = npcol
+    call psb_errpush(info,name)
+    goto 9999
+  endif
+  
+  ix = 1
+  if (present(jx)) then
+     ijx = jx
+  else
+     ijx = 1
+  endif
+
+  m = desc_a%matrix_data(psb_m_)
+  k  = min(size(x,2),size(res,1))
+
+  call psb_chkvect(m,1,size(x,1),ix,ijx,desc_a%matrix_data,info,iix,jjx)
+  if(info.ne.0) then
+     info=4010
+     ch_err='psb_chkvect'
+     call psb_errpush(info,name,a_err=ch_err)
+     goto 9999
+  end if
+
+  if (iix.ne.1) then
+     info=3040
+     call psb_errpush(info,name)
+     goto 9999
+  end if
+
+  ! compute local max
+  if ((desc_a%matrix_data(psb_n_row_).gt.0).and.(m.ne.0)) then
+     do i=1,k
+        imax=izamax(desc_a%matrix_data(psb_n_row_)-iix+1,x(iix,jjx+i-1),1)
+        cmax=(x(iix+imax-1,jjx+i-1))
+        res(i)=cabs1(cmax)
+     end do
+  end if
+  
+  ! compute global max
+  call gamx2d(icontxt, 'A', res(1:k))
+
+  call psb_erractionrestore(err_act)
+  return  
+
+9999 continue
+  call psb_erractionrestore(err_act)
+
+  if (err_act.eq.act_abort) then
+     call psb_error(icontxt)
+     return
+  end if
+  return
+end subroutine psb_zmamaxs

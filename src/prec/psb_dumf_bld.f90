@@ -175,7 +175,7 @@ subroutine psb_dumf_bld(a,desc_a,p,info)
      call blacs_barrier(icontxt,'All')
   endif
 
-  call psb_umf_factor(atmp%m,nzt,&
+  call psb_dumf_factor(atmp%m,nzt,&
        & atmp%aspk,atmp%ia1,atmp%ia2,&
        & p%iprcparm(umf_symptr_),p%iprcparm(umf_numptr_),info)
   if(info /= 0) then

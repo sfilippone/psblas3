@@ -108,7 +108,6 @@ Subroutine psb_dcgs(a,prec,b,x,eps,desc_a,info,&
   Integer            :: itx, i, isvch, ich, icontxt
   Logical            :: do_renum_left
   Logical, Parameter :: debug = .false.
-  Real(Kind(1.d0)), Parameter :: one=1.d0, zero=0.d0, epstol=1.d-35
   Real(Kind(1.d0)) :: alpha, beta, rho, rho_old, rni, xni, bni, ani,bn2,& 
        & sigma, omega, tau 
   character(len=20)             :: name,ch_err
@@ -214,16 +213,16 @@ Subroutine psb_dcgs(a,prec,b,x,eps,desc_a,info,&
 !!$ 
     If (itx.Ge.litmax) Exit restart  
     it = 0      
-    Call psb_geaxpby(one,b,zero,r,desc_a,info)
-    Call psb_spmm(-one,a,x,one,r,desc_a,info,work=aux)
-    Call psb_geaxpby(one,r,zero,rt,desc_a,info)
+    Call psb_geaxpby(done,b,dzero,r,desc_a,info)
+    Call psb_spmm(-done,a,x,done,r,desc_a,info,work=aux)
+    Call psb_geaxpby(done,r,dzero,rt,desc_a,info)
     if(info/=0)then
        info=4011
        call psb_errpush(info,name)
        goto 9999
     end if
     
-    rho = zero
+    rho = dzero
     If (debug) Write(*,*) 'on entry to amax: b: ',Size(b)
 
     if (listop == 1) then 
@@ -257,49 +256,49 @@ Subroutine psb_dcgs(a,prec,b,x,eps,desc_a,info,&
       If (debug) Write(*,*) 'iteration: ',itx
       rho_old = rho    
       rho = psb_gedot(rt,r,desc_a,info)
-      If (rho==zero) Then
+      If (rho==dzero) Then
          If (debug) Write(0,*) 'cgs iteration breakdown r',rho
         Exit iteration
       Endif
 
       If (it==1) Then
-        Call psb_geaxpby(one,r,zero,uv,desc_a,info)
-        Call psb_geaxpby(one,r,zero,p,desc_a,info)
+        Call psb_geaxpby(done,r,dzero,uv,desc_a,info)
+        Call psb_geaxpby(done,r,dzero,p,desc_a,info)
       Else
         beta = (rho/rho_old)
-        Call psb_geaxpby(one,r,zero,uv,desc_a,info)
-        Call psb_geaxpby(beta,q,one,uv,desc_a,info)
-        Call psb_geaxpby(one,q,beta,p,desc_a,info)
-        Call psb_geaxpby(one,uv,beta,p,desc_a,info)
+        Call psb_geaxpby(done,r,dzero,uv,desc_a,info)
+        Call psb_geaxpby(beta,q,done,uv,desc_a,info)
+        Call psb_geaxpby(done,q,beta,p,desc_a,info)
+        Call psb_geaxpby(done,uv,beta,p,desc_a,info)
 
       End If
 
       Call psb_prc_aply(prec,p,f,desc_a,info,work=aux)
 
-      Call psb_spmm(one,a,f,zero,v,desc_a,info,&
+      Call psb_spmm(done,a,f,dzero,v,desc_a,info,&
            & work=aux)
 
       sigma = psb_gedot(rt,v,desc_a,info)
-      If (sigma==zero) Then
+      If (sigma==dzero) Then
          If (debug) Write(0,*) 'cgs iteration breakdown s1', sigma
          Exit iteration
       Endif
       
       alpha = rho/sigma
 
-      Call psb_geaxpby(one,uv,zero,q,desc_a,info)
-      Call psb_geaxpby(-alpha,v,one,q,desc_a,info)
-      Call psb_geaxpby(one,uv,zero,s,desc_a,info)
-      Call psb_geaxpby(one,q,one,s,desc_a,info)
+      Call psb_geaxpby(done,uv,dzero,q,desc_a,info)
+      Call psb_geaxpby(-alpha,v,done,q,desc_a,info)
+      Call psb_geaxpby(done,uv,dzero,s,desc_a,info)
+      Call psb_geaxpby(done,q,done,s,desc_a,info)
       
       Call psb_prc_aply(prec,s,z,desc_a,info,work=aux)
 
-      Call psb_geaxpby(alpha,z,one,x,desc_a,info)
+      Call psb_geaxpby(alpha,z,done,x,desc_a,info)
 
-      Call psb_spmm(one,a,z,zero,qt,desc_a,info,&
+      Call psb_spmm(done,a,z,dzero,qt,desc_a,info,&
            & work=aux)
       
-      Call psb_geaxpby(-alpha,qt,one,r,desc_a,info)
+      Call psb_geaxpby(-alpha,qt,done,r,desc_a,info)
       
      
       if (listop == 1) then 

@@ -88,7 +88,7 @@ Subroutine psb_dsprn(a, desc_a,info)
 
   if (a%infoa(psb_state_) == psb_spmat_asb_) then
 
-     a%aspk(:) = 0.0
+     a%aspk(:) = dzero
      if (ibits(a%infoa(psb_upd_),2,1)==1) then 
         if(a%fida(1:3).eq.'JAD') then
            a%ia1(a%infoa(psb_upd_pnt_)+psb_nnz_) = 0

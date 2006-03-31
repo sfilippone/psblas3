@@ -1,0 +1,18 @@
+Most of the subdirectories here contain material that was originally
+distributed through the serial sparse blas SPARKER project, plus a
+number of extensions of our own design. The original file spblas.f can
+be downloaded from matisa.cc.rl.ac.uk; of course any bugs in our 
+implementation are our own to fix.  
+
+The main reference for the serial
+sparse BLAS is: 
+Duff, I., Marrone, M., Radicati, G., and Vittoli, C.
+Level 3 basic linear algebra subprograms for sparse matrices: a user 
+level interface
+ACM Trans. Math. Softw., 23(3), 379-401, 1997.
+
+We also include  SMMP by Randolph E. Bank and
+Craig C. Douglas  na.bank@na-net.ornl.gov and
+na.cdouglas@na-net.ornl.gov;  we wrapped  it in a Fortran 95 interface
+with dynamic memory allocation. 
+

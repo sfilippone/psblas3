@@ -66,6 +66,24 @@ Module psb_tools_mod
        type(psb_desc_type), intent(in):: desc_a
        integer                        :: info
      end subroutine psb_iallocv
+     ! 2-D double precision version
+     subroutine psb_zalloc(m, n, x, desc_a, info, js)
+       use psb_descriptor_type
+       implicit none
+       integer, intent(in)                   :: m,n
+       complex(kind(1.d0)), pointer             :: x(:,:)
+       type(psb_desc_type), intent(in)       :: desc_a
+       integer                               :: info
+       integer, optional, intent(in)         :: js
+     end subroutine psb_zalloc
+     ! 1-D double precision version
+     subroutine psb_zallocv(m, x, desc_a,info)
+       use psb_descriptor_type
+       integer, intent(in)            :: m
+       complex(kind(1.d0)), pointer      :: x(:)
+       type(psb_desc_type), intent(in):: desc_a
+       integer                        :: info
+     end subroutine psb_zallocv
   end interface
 
 
@@ -98,7 +116,21 @@ Module psb_tools_mod
        integer, pointer   ::  x(:)
        integer, intent(out)        ::  info
      end subroutine psb_iasbv
-  end interface
+     ! 2-D double precision version
+     subroutine psb_zasb(x, desc_a, info)
+       use psb_descriptor_type
+       type(psb_desc_type), intent(in) ::  desc_a
+       complex(kind(1.d0)), pointer       ::  x(:,:)
+       integer, intent(out)            ::  info
+     end subroutine psb_zasb
+     ! 1-D double precision version
+     subroutine psb_zasbv(x, desc_a, info)
+       use psb_descriptor_type
+       type(psb_desc_type), intent(in) ::  desc_a
+       complex(kind(1.d0)), pointer   ::  x(:)
+       integer, intent(out)        ::  info
+     end subroutine psb_zasbv
+   end interface
 
   interface psb_sphalo
      Subroutine psb_dsphalo(a,desc_a,blk,info,rwcnv,clcnv,outfmt)
@@ -111,6 +143,16 @@ Module psb_tools_mod
        logical, optional, intent(in)       :: rwcnv,clcnv
        character(len=5), optional          :: outfmt 
      end Subroutine psb_dsphalo
+     Subroutine psb_zsphalo(a,desc_a,blk,info,rwcnv,clcnv,outfmt)
+       use psb_descriptor_type
+       use psb_spmat_type
+       Type(psb_zspmat_type),Intent(in)    :: a
+       Type(psb_zspmat_type),Intent(inout) :: blk
+       Type(psb_desc_type),Intent(in)      :: desc_a
+       integer, intent(out)                :: info
+       logical, optional, intent(in)       :: rwcnv,clcnv
+       character(len=5), optional          :: outfmt 
+     end Subroutine psb_zsphalo
   end interface
 
 
@@ -127,7 +169,7 @@ Module psb_tools_mod
 
 
   interface psb_cdovrbld
-     Subroutine psb_cdovrbld(n_ovr,desc_p,desc_a,a,&
+     Subroutine psb_dcdovrbld(n_ovr,desc_p,desc_a,a,&
           &       l_tmp_halo,l_tmp_ovr_idx,lworks,lworkr,info)
        use psb_descriptor_type
        use psb_spmat_type
@@ -138,7 +180,19 @@ Module psb_tools_mod
        Integer, Intent(in)               :: l_tmp_halo,l_tmp_ovr_idx
        Integer, Intent(inout)            :: lworks, lworkr
        integer, intent(out)              :: info
-     end Subroutine psb_cdovrbld
+     end Subroutine psb_dcdovrbld
+     Subroutine psb_zcdovrbld(n_ovr,desc_p,desc_a,a,&
+          &       l_tmp_halo,l_tmp_ovr_idx,lworks,lworkr,info)
+       use psb_descriptor_type
+       use psb_spmat_type
+       type(psb_zspmat_type),intent(in)  :: a
+       type(psb_desc_type),intent(in)    :: desc_a
+       type(psb_desc_type),intent(inout) :: desc_p
+       integer,intent(in)                :: n_ovr
+       Integer, Intent(in)               :: l_tmp_halo,l_tmp_ovr_idx
+       Integer, Intent(inout)            :: lworks, lworkr
+       integer, intent(out)              :: info
+     end Subroutine psb_zcdovrbld
   end interface
 
 
@@ -183,6 +237,20 @@ Module psb_tools_mod
        type(psb_desc_type), intent(in) :: desc_a
        integer                         :: info
      end subroutine psb_ifreev
+     ! 2-D double precision version
+     subroutine psb_zfree(x, desc_a, info)
+       use psb_descriptor_type
+       complex(kind(1.d0)),pointer        :: x(:,:)
+       type(psb_desc_type), intent(in) :: desc_a
+       integer                         :: info
+     end subroutine psb_zfree
+     ! 1-D double precision version
+     subroutine psb_zfreev(x, desc_a, info)
+       use psb_descriptor_type
+       complex(kind(1.d0)),pointer        :: x(:)
+       type(psb_desc_type), intent(in) :: desc_a
+       integer                         :: info
+     end subroutine psb_zfreev
   end interface
 
 
@@ -203,6 +271,22 @@ Module psb_tools_mod
        integer, intent(inout)             ::  iperm(:), info
        character, intent(in)              :: trans
      end subroutine psb_dgelpv
+     ! 2-D version
+     subroutine psb_zgelp(trans,iperm,x,desc_a,info)
+       use psb_descriptor_type
+       type(psb_desc_type), intent(in)      ::  desc_a
+       complex(kind(1.d0)), intent(inout)      ::  x(:,:)
+       integer, intent(inout)               ::  iperm(:),info
+       character, intent(in)                :: trans
+     end subroutine psb_zgelp
+     ! 1-D version
+     subroutine psb_zgelpv(trans,iperm,x,desc_a,info)
+       use psb_descriptor_type
+       type(psb_desc_type), intent(in) ::  desc_a
+       complex(kind(1.d0)), intent(inout)    ::  x(:)
+       integer, intent(inout)             ::  iperm(:), info
+       character, intent(in)              :: trans
+     end subroutine psb_zgelpv
   end interface
 
 
@@ -281,6 +365,43 @@ Module psb_tools_mod
        integer, optional, intent(in)      ::  iblck
        integer, optional, intent(in)      ::  insflag
      end subroutine psb_iinsvv
+     ! 2-D double precision version
+     subroutine psb_zins(m, n, x, ix, jx, blck, desc_a, info,&
+          & iblck, jblck)
+       use psb_descriptor_type
+       integer, intent(in)                ::  m,n
+       type(psb_desc_type), intent(in)    ::  desc_a
+       complex(kind(1.d0)),pointer        ::  x(:,:)
+       integer, intent(in)                ::  ix,jx
+       complex(kind(1.d0)), intent(in)    ::  blck(:,:)
+       integer,intent(out)                ::  info
+       integer, optional, intent(in)      ::  iblck,jblck
+     end subroutine psb_zins
+     ! 2-D double precision square version
+     subroutine psb_zinsvm(m, x, ix, jx, blck, desc_a,info,&
+          & iblck)
+       use psb_descriptor_type
+       integer, intent(in)                ::  m
+       type(psb_desc_type), intent(in)    ::  desc_a
+       complex(kind(1.d0)),pointer        ::  x(:,:)
+       integer, intent(in)                ::  ix,jx
+       complex(kind(1.d0)), intent(in)    ::  blck(:)
+       integer, intent(out)               ::  info
+       integer, optional, intent(in)      ::  iblck
+     end subroutine psb_zinsvm
+     ! 1-D double precision version
+     subroutine psb_zinsvv(m, x, ix, blck, desc_a, info,&
+          & iblck,insflag)
+       use psb_descriptor_type
+       integer, intent(in)                ::  m
+       type(psb_desc_type), intent(in)    ::  desc_a
+       complex(kind(1.d0)),pointer        ::  x(:)
+       integer, intent(in)                ::  ix
+       complex(kind(1.d0)), intent(in)    ::  blck(:)
+       integer, intent(out)               ::  info
+       integer, optional, intent(in)      ::  iblck
+       integer, optional, intent(in)      ::  insflag
+     end subroutine psb_zinsvv
   end interface
 
 
@@ -351,7 +472,7 @@ Module psb_tools_mod
 
 
   interface psb_cdovr
-     Subroutine psb_cdovr(a,desc_a,novr,desc_ov,info)
+     Subroutine psb_dcdovr(a,desc_a,novr,desc_ov,info)
        use psb_descriptor_type
        Use psb_spmat_type
        integer, intent(in)                :: novr
@@ -359,7 +480,16 @@ Module psb_tools_mod
        Type(psb_desc_type), Intent(in)    :: desc_a
        Type(psb_desc_type), Intent(inout) :: desc_ov
        integer, intent(out)               :: info
-     end Subroutine psb_cdovr
+     end Subroutine psb_dcdovr
+     Subroutine psb_zcdovr(a,desc_a,novr,desc_ov,info)
+       use psb_descriptor_type
+       Use psb_spmat_type
+       integer, intent(in)                :: novr
+       Type(psb_zspmat_type), Intent(in)  ::  a
+       Type(psb_desc_type), Intent(in)    :: desc_a
+       Type(psb_desc_type), Intent(inout) :: desc_ov
+       integer, intent(out)               :: info
+     end Subroutine psb_zcdovr
   end interface
        
        
@@ -382,6 +512,14 @@ Module psb_tools_mod
        integer, intent(out)               :: info
        integer, optional, intent(in)      :: nnz
      end subroutine psb_dspalloc
+     subroutine psb_zspalloc(a, desc_a, info, nnz)
+       use psb_descriptor_type
+       use psb_spmat_type
+       type(psb_desc_type), intent(inout) :: desc_a
+       type(psb_zspmat_type), intent(out) :: a
+       integer, intent(out)               :: info
+       integer, optional, intent(in)      :: nnz
+     end subroutine psb_zspalloc
   end interface
 
   interface psb_spasb
@@ -394,6 +532,15 @@ Module psb_tools_mod
        integer,optional, intent(in)            :: dup
        character, optional, intent(in)         :: afmt*5, up
      end subroutine psb_dspasb
+     subroutine psb_zspasb(a,desc_a, info, afmt, up, dup)
+       use psb_descriptor_type
+       use psb_spmat_type
+       type(psb_zspmat_type), intent (inout)   :: a
+       type(psb_desc_type), intent(in)         :: desc_a
+       integer, intent(out)                    :: info
+       integer,optional, intent(in)            :: dup
+       character, optional, intent(in)         :: afmt*5, up
+     end subroutine psb_zspasb
   end interface
 
 
@@ -406,6 +553,14 @@ Module psb_tools_mod
        type(psb_desc_type), intent(in)     :: desc_a
        integer, intent(out)                :: info
      end subroutine psb_dspcnv
+     subroutine psb_zspcnv(a,b,desc_a,info)
+       use psb_descriptor_type
+       use psb_spmat_type
+       type(psb_zspmat_type), intent(in)   :: a
+       type(psb_zspmat_type), intent(out)  :: b
+       type(psb_desc_type), intent(in)     :: desc_a
+       integer, intent(out)                :: info
+     end subroutine psb_zspcnv
   end interface
 
 
@@ -417,6 +572,13 @@ Module psb_tools_mod
        type(psb_dspmat_type), intent(inout)       ::a
        integer, intent(out)        :: info
      end subroutine psb_dspfree
+     subroutine psb_zspfree(a, desc_a,info)
+       use psb_descriptor_type
+       use psb_spmat_type
+       type(psb_desc_type), intent(in) :: desc_a
+       type(psb_zspmat_type), intent(inout)       ::a
+       integer, intent(out)        :: info
+     end subroutine psb_zspfree
   end interface
 
 
@@ -431,6 +593,16 @@ Module psb_tools_mod
        integer, intent(out)                 :: info
        integer, intent(in), optional        :: is,js
      end subroutine psb_dspins
+     subroutine psb_zspins(nz,ia,ja,val,a,desc_a,info,is,js)
+       use psb_descriptor_type
+       use psb_spmat_type
+       type(psb_desc_type), intent(inout)   :: desc_a
+       type(psb_zspmat_type), intent(inout) :: a
+       integer, intent(in)                  :: nz,ia(:),ja(:)
+       complex(kind(1.d0)), intent(in)      :: val(:)
+       integer, intent(out)                 :: info
+       integer, intent(in), optional        :: is,js
+     end subroutine psb_zspins
   end interface
 
 
@@ -442,6 +614,13 @@ Module psb_tools_mod
        type(psb_dspmat_type), intent(inout) :: a
        integer, intent(out)                 :: info
      end subroutine psb_dsprn
+     subroutine psb_zsprn(a, desc_a,info)
+       use psb_descriptor_type
+       use psb_spmat_type
+       type(psb_desc_type), intent(in)      :: desc_a
+       type(psb_zspmat_type), intent(inout) :: a
+       integer, intent(out)                 :: info
+     end subroutine psb_zsprn
   end interface
 
 

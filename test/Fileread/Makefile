@@ -14,11 +14,20 @@ METIS_LIB = -L$(HOME)/NUMERICAL/metis-4.0 -lmetis
 INCDIRS=-I$(LIBDIR)
 
 DFOBJS=partgraph.o part_block.o read_mat.o getp.o  \
-	  mmio.o mat_dist.o  df_sample.o lowerc.o   part_blk2.o
+	  mmio.o mat_dist.o  df_sample.o   part_blk2.o
+ZFOBJS=partgraph.o part_block.o read_mat.o getp.o  \
+	  mmio.o mat_dist.o  zf_sample.o   part_blk2.o
+IOOBJS= mmio.o hbio.o
+
+ZH2MOBJS=zhb2mm.o $(IOOBJS)
+DH2MOBJS=dhb2mm.o $(IOOBJS)
+DM2HOBJS=dmm2hb.o $(IOOBJS)
+ZM2HOBJS=zmm2hb.o $(IOOBJS)
+MMHBOBJS=zhb2mm.o dhb2mm.o dmm2hb.o zmm2hb.o
 
 EXEDIR=./RUNS
 
-all: df_sample
+all: df_sample zf_sample dhb2mm zhb2mm dmm2hb zmm2hb
 
 read_mat.o: mmio.o
 
@@ -26,30 +35,30 @@ df_sample: $(DFOBJS)
 	$(F90LINK) $(LINKOPT) $(DFOBJS) -o df_sample\
 	$(PSBLAS_LIB) $(METIS_LIB) $(BLACS) $(SLU) $(UMF) $(BLAS)
 	/bin/mv df_sample $(EXEDIR) 
+zf_sample: $(ZFOBJS)
+	$(F90LINK) $(LINKOPT) $(ZFOBJS) -o zf_sample\
+	$(PSBLAS_LIB) $(METIS_LIB) $(BLACS) $(SLU) $(UMF) $(BLAS)
+	/bin/mv zf_sample $(EXEDIR) 
 
-
-aggr.o: mmio.o
-aggr: aggr.o mmio.o
-	$(F90LINK) $(LINKOPT) aggr.o mmio.o -o aggr \
-	$(METHD90LIB) $(TOOLS90LIB) $(BLAS90LIB) $(METIS_LIB)\
-	$(PSBLAS_LIB) $(SPARKER_LIB) $(BLAS)\
-	 $(BLACS) 
-	/bin/mv aggr $(EXEDIR) 
+$(MMHBOBJS): $(IOOBJS)
+dhb2mm: $(DH2MOBJS)
+	$(MPF90) -o dhb2mm   $(DH2MOBJS) $(PSBLAS_LIB) $(BLACS)
+dmm2hb: $(DM2HOBJS)
+	$(MPF90) -o dmm2hb   $(DM2HOBJS) $(PSBLAS_LIB) $(BLACS)
+zhb2mm: $(ZH2MOBJS)
+	$(MPF90) -o zhb2mm   $(ZH2MOBJS) $(PSBLAS_LIB) $(BLACS)
+zmm2hb: $(ZM2HOBJS)
+	$(MPF90) -o zmm2hb   $(ZM2HOBJS) $(PSBLAS_LIB) $(BLACS)
 
 .f90.o:
 	$(MPF90) $(F90COPT) $(INCDIRS) -c $<
-#mmio.o: mmio.f90
-#	$(MPF90) -O0        $(INCDIRS) -c $<
-
-
-#$(DFLOBJS) $(ZFOBJS) $(DFOBJS):$(MODS)
 
 clean: 
-	/bin/rm -f $(FOBJS) ppde90.o  part_block.o $(DFOBJS) $(DFBOBJS) $(DFCOBJS) $(ZHOBJS) $(DAOBJS)\
-        *$(.mod) $(EXEDIR)/df_sample $(EXEDIR)/zf_sample $(EXEDIR)/df_comm $(EXEDIR)/df_samplelog $(EXEDIR)/df_bench
+	/bin/rm -f $(DFOBJS) $(ZFOBJS) $(IOOBJS) $(MMHBOBJS) \
+        *$(.mod) $(EXEDIR)/df_sample $(EXEDIR)/zf_sample 
 
 lib:
-	(cd ../../; make library)
+	(cd ../../; make lib)
 verycleanlib:
 	(cd ../../; make veryclean)
 

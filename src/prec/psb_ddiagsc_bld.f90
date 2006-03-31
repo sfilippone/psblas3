@@ -100,10 +100,10 @@ subroutine psb_ddiagsc_bld(a,desc_a,p,upd,info)
 
   if (debug) write(ilout+me,*) 'VDIAG ',n_row
   do i=1,n_row
-    if (p%d(i).eq.0.0d0) then
-      p%d(i)=1.d0
+    if (p%d(i).eq.dzero) then
+      p%d(i) = done
     else
-      p%d(i) =  1.d0/p%d(i)
+      p%d(i) = done/p%d(i)
     endif
 
     if (debug) write(ilout+me,*) i,desc_a%loc_to_glob(i), p%d(i)

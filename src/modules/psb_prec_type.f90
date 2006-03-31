@@ -102,6 +102,26 @@ module psb_prec_type
     integer                       :: prec, base_prec
   end type psb_dprec_type
 
+  type psb_zbaseprc_type
+
+    type(psb_zspmat_type), pointer :: av(:) => null() !
+    complex(kind(1.d0)), pointer      :: d(:)  => null()
+    type(psb_desc_type), pointer   :: desc_data => null() !
+    integer, pointer               :: iprcparm(:) => null() !
+    real(kind(1.d0)), pointer      :: dprcparm(:) => null() !
+    integer, pointer               :: perm(:)  => null(), invperm(:) => null()
+    integer, pointer               :: mlia(:)  => null(), nlaggr(:)  => null() !
+    type(psb_zspmat_type), pointer :: aorig    => null() !
+    complex(kind(1.d0)), pointer      :: dorig(:) => null() !
+
+  end type psb_zbaseprc_type
+
+  type psb_zprec_type
+    type(psb_zbaseprc_type), pointer :: baseprecv(:) => null()
+    ! contain type of preconditioning to be performed
+    integer                       :: prec, base_prec
+  end type psb_zprec_type
+
 
   character(len=15), parameter, private :: &
        &  smooth_names(1:3)=(/'Pre-smoothing ','Post-smoothing',&
@@ -126,18 +146,23 @@ module psb_prec_type
        &  'ILU(eps)      ','Sparse SuperLU','UMFPACK Sp. LU'/)
 
   interface psb_base_precfree
-    module procedure psb_dbase_precfree
+    module procedure psb_dbase_precfree, psb_zbase_precfree
   end interface
+
+  interface psb_nullify_baseprec
+    module procedure psb_nullify_dbaseprec, psb_nullify_zbaseprec
+  end interface
+
   interface psb_check_def
     module procedure psb_icheck_def, psb_dcheck_def
   end interface
 
   interface psb_prec_descr
-    module procedure psb_file_prec_descr
+    module procedure psb_file_prec_descr, psb_zfile_prec_descr
   end interface
 
   interface psb_prec_short_descr
-    module procedure psb_prec_short_descr
+    module procedure psb_prec_short_descr, psb_zprec_short_descr
   end interface
 
 contains
@@ -277,6 +302,145 @@ contains
 !!$    endif
 
   end function psb_prec_short_descr
+
+
+  subroutine psb_zfile_prec_descr(iout,p)
+    integer, intent(in)              :: iout
+    type(psb_zprec_type), intent(in) :: p
+
+    write(iout,*) 'Preconditioner description'
+    if (associated(p%baseprecv)) then 
+      if (size(p%baseprecv)>=1) then 
+        write(iout,*) 'Base preconditioner'
+        select case(p%baseprecv(1)%iprcparm(p_type_))
+        case(noprec_)
+          write(iout,*) 'No preconditioning'
+        case(diagsc_)
+          write(iout,*) 'Diagonal scaling'
+        case(bja_)
+          write(iout,*) 'Block Jacobi with: ',&
+               &  fact_names(p%baseprecv(1)%iprcparm(f_type_))
+        case(asm_,ras_,ash_,rash_)
+          write(iout,*) 'Additive Schwarz with: ',&
+               &  fact_names(p%baseprecv(1)%iprcparm(f_type_))
+          write(iout,*) 'Overlap:',&
+               &  p%baseprecv(1)%iprcparm(n_ovr_)
+          write(iout,*) 'Restriction: ',&
+               &  restrict_names(p%baseprecv(1)%iprcparm(restr_))
+          write(iout,*) 'Prolongation: ',&
+               &  prolong_names(p%baseprecv(1)%iprcparm(prol_))
+        end select
+      end if
+      if (size(p%baseprecv)>=2) then 
+        if (.not.associated(p%baseprecv(2)%iprcparm)) then 
+          write(iout,*) 'Inconsistent MLPREC part!'
+          return
+        endif
+        write(iout,*) 'Multilevel: ',ml_names(p%baseprecv(2)%iprcparm(ml_type_))
+        if (p%baseprecv(2)%iprcparm(ml_type_)>no_ml_) then 
+          write(iout,*) 'Multilevel aggregation: ', &
+               &   aggr_names(p%baseprecv(2)%iprcparm(aggr_alg_))
+          write(iout,*) 'Smoother:               ', &
+               &  smooth_kinds(p%baseprecv(2)%iprcparm(smth_kind_))
+          write(iout,*) 'Smoothing omega: ', p%baseprecv(2)%dprcparm(smooth_omega_)
+          write(iout,*) 'Smoothing position: ',&
+               & smooth_names(p%baseprecv(2)%iprcparm(smth_pos_))
+          write(iout,*) 'Coarse matrix: ',&
+               & matrix_names(p%baseprecv(2)%iprcparm(coarse_mat_))
+          write(iout,*) 'Aggregation sizes: ', &
+               &  sum( p%baseprecv(2)%nlaggr(:)),' : ',p%baseprecv(2)%nlaggr(:)
+          write(iout,*) 'Factorization type: ',&
+               & fact_names(p%baseprecv(2)%iprcparm(f_type_))
+          select case(p%baseprecv(2)%iprcparm(f_type_))
+          case(f_ilu_n_)      
+            write(iout,*) 'Fill level :',p%baseprecv(2)%iprcparm(ilu_fill_in_)
+          case(f_ilu_e_)         
+            write(iout,*) 'Fill threshold :',p%baseprecv(2)%dprcparm(fact_eps_)
+          case(f_slu_,f_umf_)         
+          case default
+            write(iout,*) 'Should never get here!'
+          end select
+          write(iout,*) 'Number of Jacobi sweeps: ', &
+               &   (p%baseprecv(2)%iprcparm(jac_sweeps_))
+
+        end if
+      end if
+
+    else
+      write(iout,*) 'No Base preconditioner available, something is wrong!'
+      return
+    endif
+
+  end subroutine psb_zfile_prec_descr
+
+  function  psb_zprec_short_descr(p)
+    type(psb_zprec_type), intent(in) :: p
+    character(len=20) :: psb_zprec_short_descr
+    psb_zprec_short_descr = ' '
+!!$    write(iout,*) 'Preconditioner description'
+!!$    if (associated(p%baseprecv)) then 
+!!$      if (size(p%baseprecv)>=1) then 
+!!$        write(iout,*) 'Base preconditioner'
+!!$        select case(p%baseprecv(1)%iprcparm(p_type_))
+!!$        case(noprec_)
+!!$          write(iout,*) 'No preconditioning'
+!!$        case(diagsc_)
+!!$          write(iout,*) 'Diagonal scaling'
+!!$        case(bja_)
+!!$          write(iout,*) 'Block Jacobi with: ',&
+!!$               &  fact_names(p%baseprecv(1)%iprcparm(f_type_))
+!!$        case(asm_,ras_,ash_,rash_)
+!!$          write(iout,*) 'Additive Schwarz with: ',&
+!!$               &  fact_names(p%baseprecv(1)%iprcparm(f_type_))
+!!$          write(iout,*) 'Overlap:',&
+!!$               &  p%baseprecv(1)%iprcparm(n_ovr_)
+!!$          write(iout,*) 'Restriction: ',&
+!!$               &  restrict_names(p%baseprecv(1)%iprcparm(restr_))
+!!$          write(iout,*) 'Prolongation: ',&
+!!$               &  prolong_names(p%baseprecv(1)%iprcparm(prol_))
+!!$        end select
+!!$      end if
+!!$      if (size(p%baseprecv)>=2) then 
+!!$        if (.not.associated(p%baseprecv(2)%iprcparm)) then 
+!!$          write(iout,*) 'Inconsistent MLPREC part!'
+!!$          return
+!!$        endif
+!!$        write(iout,*) 'Multilevel: ',ml_names(p%baseprecv(2)%iprcparm(ml_type_))
+!!$        if (p%baseprecv(2)%iprcparm(ml_type_)>no_ml_) then 
+!!$          write(iout,*) 'Multilevel aggregation: ', &
+!!$               &   aggr_names(p%baseprecv(2)%iprcparm(aggr_alg_))
+!!$          write(iout,*) 'Smoother:               ', &
+!!$               &  smooth_kinds(p%baseprecv(2)%iprcparm(smth_kind_))
+!!$          write(iout,*) 'Smoothing omega: ', p%baseprecv(2)%dprcparm(smooth_omega_)
+!!$          write(iout,*) 'Smoothing position: ',&
+!!$               & smooth_names(p%baseprecv(2)%iprcparm(smth_pos_))
+!!$          write(iout,*) 'Coarse matrix: ',&
+!!$               & matrix_names(p%baseprecv(2)%iprcparm(coarse_mat_))
+!!$          write(iout,*) 'Factorization type: ',&
+!!$               & fact_names(p%baseprecv(2)%iprcparm(f_type_))
+!!$          select case(p%baseprecv(2)%iprcparm(f_type_))
+!!$          case(f_ilu_n_)      
+!!$            write(iout,*) 'Fill level :',p%baseprecv(2)%iprcparm(ilu_fill_in_)
+!!$          case(f_ilu_e_)         
+!!$            write(iout,*) 'Fill threshold :',p%baseprecv(2)%dprcparm(fact_eps_)
+!!$          case(f_slu_,f_umf_)         
+!!$          case default
+!!$            write(iout,*) 'Should never get here!'
+!!$          end select
+!!$          write(iout,*) 'Number of Jacobi sweeps: ', &
+!!$               &   (p%baseprecv(2)%iprcparm(jac_sweeps_))
+!!$
+!!$        end if
+!!$      end if
+!!$
+!!$    else
+!!$      write(iout,*) 'No Base preconditioner available, something is wrong!'
+!!$      return
+!!$    endif
+
+  end function psb_zprec_short_descr
+
+
 
 
   function is_legal_base_prec(ip)
@@ -481,10 +645,10 @@ contains
 
     if (associated(p%iprcparm)) then 
       if (p%iprcparm(f_type_)==f_slu_) then 
-        call psb_slu_free(p%iprcparm(slu_ptr_),info)
+        call psb_dslu_free(p%iprcparm(slu_ptr_),info)
       end if
       if (p%iprcparm(f_type_)==f_umf_) then 
-        call psb_umf_free(p%iprcparm(umf_symptr_),&
+        call psb_dumf_free(p%iprcparm(umf_symptr_),&
              & p%iprcparm(umf_numptr_),info)
       end if
       deallocate(p%iprcparm,stat=info)
@@ -492,14 +656,96 @@ contains
     call psb_nullify_baseprec(p)
   end subroutine psb_dbase_precfree
 
-  subroutine psb_nullify_baseprec(p)
+  subroutine psb_nullify_dbaseprec(p)
     use psb_descriptor_type
     type(psb_dbaseprc_type), intent(inout) :: p
 
     nullify(p%av,p%d,p%iprcparm,p%dprcparm,p%perm,p%invperm,p%mlia,&
          & p%nlaggr,p%aorig,p%dorig,p%desc_data)
 
-  end subroutine psb_nullify_baseprec
+  end subroutine psb_nullify_dbaseprec
+
+  subroutine psb_zbase_precfree(p,info)
+    use psb_serial_mod
+    use psb_descriptor_type
+    use psb_tools_mod
+    type(psb_zbaseprc_type), intent(inout) :: p
+    integer, intent(out)                :: info
+    integer :: i
+
+    info = 0
+
+    if (associated(p%d)) then 
+      deallocate(p%d,stat=info)
+    end if
+
+    if (associated(p%av))  then 
+      do i=1,size(p%av) 
+        call psb_sp_free(p%av(i),info)
+        if (info /= 0) then 
+          ! Actually, we don't care here about this.
+          ! Just let it go.
+          ! return
+        end if
+      enddo
+      deallocate(p%av,stat=info)
+      p%av => null()
+    end if
+    if (associated(p%desc_data)) then 
+      if (associated(p%desc_data%matrix_data))  then 
+        call psb_cdfree(p%desc_data,info)
+      end if
+      deallocate(p%desc_data)
+    endif
+    if (associated(p%dprcparm)) then 
+      deallocate(p%dprcparm,stat=info)
+    end if
+    if (associated(p%aorig)) then 
+      ! This is a pointer to something else, must not free it here. 
+      nullify(p%aorig) 
+    endif
+    if (associated(p%dorig)) then 
+      deallocate(p%dorig,stat=info)
+    endif
+
+    if (associated(p%mlia)) then 
+      deallocate(p%mlia,stat=info)
+    endif
+
+    if (associated(p%nlaggr)) then 
+      deallocate(p%nlaggr,stat=info)
+    endif
+
+    if (associated(p%perm)) then 
+      deallocate(p%perm,stat=info)
+    endif
+
+    if (associated(p%invperm)) then 
+      deallocate(p%invperm,stat=info)
+    endif
+
+    if (associated(p%iprcparm)) then 
+      if (p%iprcparm(f_type_)==f_slu_) then 
+!!$        call psb_zslu_free(p%iprcparm(slu_ptr_),info)
+      end if
+      if (p%iprcparm(f_type_)==f_umf_) then 
+!!$        call psb_zumf_free(p%iprcparm(umf_symptr_),&
+!!$             & p%iprcparm(umf_numptr_),info)
+      end if
+      deallocate(p%iprcparm,stat=info)
+    end if
+    call psb_nullify_baseprec(p)
+  end subroutine psb_zbase_precfree
+
+  subroutine psb_nullify_zbaseprec(p)
+    use psb_descriptor_type
+    type(psb_zbaseprc_type), intent(inout) :: p
+
+    nullify(p%av,p%d,p%iprcparm,p%dprcparm,p%perm,p%invperm,p%mlia,&
+         & p%nlaggr,p%aorig,p%dorig,p%desc_data)
+
+  end subroutine psb_nullify_zbaseprec
+
 
   function pr_to_str(iprec)
 

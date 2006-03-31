@@ -119,6 +119,22 @@ module psi_mod
        type(psb_desc_type)  :: desc_a
        integer, optional    :: data
      end subroutine psi_iswapdatav
+     subroutine psi_zswapdatam(flag,n,beta,y,desc_a,work,info,data)
+       use psb_descriptor_type
+       integer, intent(in)  :: flag, n
+       integer, intent(out) :: info
+       complex(kind(1.d0))     :: y(:,:), beta, work(:)
+       type(psb_desc_type)  :: desc_a
+       integer, optional    :: data
+     end subroutine psi_zswapdatam
+     subroutine psi_zswapdatav(flag,beta,y,desc_a,work,info,data)
+       use psb_descriptor_type
+       integer, intent(in)  :: flag
+       integer, intent(out) :: info
+       complex(kind(1.d0))     :: y(:), beta, work(:)
+       type(psb_desc_type)  :: desc_a
+       integer, optional    :: data
+     end subroutine psi_zswapdatav
   end interface
 
 
@@ -151,7 +167,21 @@ module psi_mod
        integer              :: y(:), beta, work(:)
        type(psb_desc_type)  :: desc_a
      end subroutine psi_iswaptranv
-  end interface
+     subroutine psi_zswaptranm(flag,n,beta,y,desc_a,work,info)
+       use psb_descriptor_type
+       integer, intent(in)  :: flag, n
+       integer, intent(out) :: info
+       complex(kind(1.d0))     :: y(:,:), beta, work(:)
+       type(psb_desc_type)  :: desc_a
+     end subroutine psi_zswaptranm
+     subroutine psi_zswaptranv(flag,beta,y,desc_a,work,info)
+       use psb_descriptor_type
+       integer, intent(in)  :: flag
+       integer, intent(out) :: info
+       complex(kind(1.d0))     :: y(:), beta, work(:)
+       type(psb_desc_type)  :: desc_a
+     end subroutine psi_zswaptranv
+   end interface
 
 
   interface psi_gth
@@ -171,6 +201,14 @@ module psi_mod
        integer :: n, idx(:)
        integer :: x(:), y(:)
      end subroutine psi_igthv
+     subroutine psi_zgthm(n,k,idx,x,y)
+       integer :: n, k, idx(:)
+       complex(kind(1.d0)) :: x(:,:), y(:)
+     end subroutine psi_zgthm
+     subroutine psi_zgthv(n,idx,x,y)
+       integer :: n, idx(:)
+       complex(kind(1.d0)) :: x(:), y(:)
+     end subroutine psi_zgthv
   end interface
 
   interface psi_sct
@@ -190,6 +228,14 @@ module psi_mod
        integer :: n, idx(:)
        integer :: beta, x(:), y(:)
      end subroutine psi_isctv
+     subroutine psi_zsctm(n,k,idx,x,beta,y)
+       integer :: n, k, idx(:)
+       complex(kind(1.d0)) :: beta, x(:), y(:,:)
+     end subroutine psi_zsctm
+     subroutine psi_zsctv(n,idx,x,beta,y)
+       integer :: n, idx(:)
+       complex(kind(1.d0)) :: beta, x(:), y(:)
+     end subroutine psi_zsctv
   end interface
 
 end module psi_mod

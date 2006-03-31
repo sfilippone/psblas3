@@ -37,6 +37,9 @@ module psb_realloc_mod
     module procedure psb_dreallocate2i1d
     module procedure psb_dreallocate1d
     module procedure psb_dreallocated2
+    module procedure psb_dreallocate2i1z
+    module procedure psb_dreallocate1z
+    module procedure psb_dreallocatez2
   end Interface
 
   Interface psb_realloc1it
@@ -192,6 +195,79 @@ Contains
   End Subroutine psb_dreallocate1d
 
 
+  Subroutine psb_dreallocate1z(len,rrax,info,pad)
+    use psb_error_mod
+
+    ! ...Subroutine Arguments  
+    Integer,Intent(in) :: len
+    complex(kind(1.d0)),pointer :: rrax(:)
+    integer :: info
+    complex(kind(1.d0)), optional, intent(in) :: pad
+
+    ! ...Local Variables
+    complex(kind(1.d0)),Pointer :: tmp(:)
+    Integer :: dim,err_act,err,i, m
+    character(len=20)  :: name
+
+    name='psb_dreallocate1z'
+    call psb_erractionsave(err_act)
+
+    if (associated(rrax)) then 
+      dim=size(rrax)
+
+      If (dim /= len) Then
+        Allocate(tmp(len),stat=info)
+        if (info /= 0) then
+          err=4000
+          call psb_errpush(err,name)
+          goto 9999
+        end if
+        m = min(dim,len)
+!!$        write(0,*) 'DA: copying ',min(len,dim)
+        if (.true.) then 
+          do i=1,m
+            tmp(i) = rrax(i)
+          end do
+        else
+          tmp(1:m) = rrax(1:m)
+        end if
+!!$        write(0,*) 'DA: copying done ',m
+        Deallocate(rrax,stat=info)
+        if (info /= 0) then
+          err=4000
+          call psb_errpush(err,name)
+          goto 9999
+        end if
+        rrax=>tmp
+      End If
+    else
+      dim = 0
+      Allocate(rrax(len),stat=info)
+      if (info /= 0) then
+        err=4000
+        call psb_errpush(err,name)
+        goto 9999
+      end if
+    endif
+    if (present(pad)) then 
+      rrax(dim+1:len) = pad
+    endif
+    call psb_erractionrestore(err_act)
+    return
+
+9999 continue
+    call psb_erractionrestore(err_act)
+
+    if (err_act.eq.act_ret) then
+      return
+    else
+      call psb_error()
+    end if
+    return
+
+  End Subroutine psb_dreallocate1z
+
+
 
   Subroutine psb_dreallocated2(len1,len2,rrax,info,pad)
     use psb_error_mod
@@ -263,6 +339,77 @@ Contains
     return
 
   End Subroutine psb_dreallocated2
+
+  Subroutine psb_dreallocatez2(len1,len2,rrax,info,pad)
+    use psb_error_mod
+    ! ...Subroutine Arguments  
+    Integer,Intent(in) :: len1,len2
+    complex(kind(1.d0)),pointer :: rrax(:,:)
+    integer :: info
+    complex(kind(1.d0)), optional, intent(in) :: pad
+
+    ! ...Local Variables
+    complex(kind(1.d0)),Pointer :: tmp(:,:)
+    Integer :: dim,err_act,err,i, m
+    character(len=20)  :: name
+
+    name='psb_dreallocatez2'
+    call psb_erractionsave(err_act)
+
+    if (associated(rrax)) then 
+      dim=size(rrax,1)
+
+      If (dim /= len1) Then
+        Allocate(tmp(len1,len2),stat=info)
+        if (info /= 0) then
+          err=4000
+          call psb_errpush(err,name)
+          goto 9999
+        end if
+        m = min(dim,len1)
+!!$        write(0,*) 'DA: copying ',min(len,dim)
+        if (.true.) then 
+          do i=1,m
+            tmp(i,:) = rrax(i,:)
+          end do
+        else
+          tmp(1:m,:) = rrax(1:m,:)
+        end if
+!!$        write(0,*) 'DA: copying done ',m
+        Deallocate(rrax,stat=info)
+        if (info /= 0) then
+          err=4000
+          call psb_errpush(err,name)
+          goto 9999
+        end if
+        rrax=>tmp
+      End If
+    else
+      dim = 0
+      Allocate(rrax(len1,len2),stat=info)
+      if (info /= 0) then
+        err=4000
+        call psb_errpush(err,name)
+        goto 9999
+      end if
+    endif
+    if (present(pad)) then 
+      rrax(dim+1:len1,:) = pad
+    endif
+    call psb_erractionrestore(err_act)
+    return
+
+9999 continue
+    call psb_erractionrestore(err_act)
+
+    if (err_act.eq.act_ret) then
+      return
+    else
+      call psb_error()
+    end if
+    return
+
+  End Subroutine psb_dreallocatez2
 
 
   Subroutine psb_dreallocate2i(len,rrax,y,info,pad)
@@ -357,6 +504,55 @@ Contains
     end if
     return
   End Subroutine psb_dreallocate2i1d
+
+
+
+  Subroutine psb_dreallocate2i1z(len,rrax,y,z,info)
+    use psb_error_mod
+    ! ...Subroutine Arguments  
+    Integer,Intent(in) :: len
+    Integer,pointer :: rrax(:),y(:)
+    complex(Kind(1.d0)),pointer :: z(:)
+    integer :: info
+    character(len=20)  :: name
+    integer :: err_act, err
+
+    name='psb_dreallocate2i1d'
+    call psb_erractionsave(err_act)
+
+
+    info = 0
+    call psb_dreallocate1i(len,rrax,info)
+    if (info /= 0) then
+      err=4000
+      call psb_errpush(err,name)
+      goto 9999
+    end if
+    call psb_dreallocate1i(len,y,info)    
+    if (info /= 0) then
+      err=4000
+      call psb_errpush(err,name)
+      goto 9999
+    end if
+    call psb_dreallocate1z(len,z,info)
+    if (info /= 0) then
+      err=4000
+      call psb_errpush(err,name)
+      goto 9999
+    end if
+    call psb_erractionrestore(err_act)
+    return
+
+9999 continue
+    call psb_erractionrestore(err_act)
+
+    if (err_act.eq.act_ret) then
+      return
+    else
+      call psb_error()
+    end if
+    return
+  End Subroutine psb_dreallocate2i1z
 
 
   Subroutine psb_dreallocate1it(len,rrax,info,pad)

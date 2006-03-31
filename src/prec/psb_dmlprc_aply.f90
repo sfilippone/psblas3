@@ -67,7 +67,6 @@ subroutine psb_dmlprc_aply(baseprecv,x,beta,y,desc_data,trans,work,info)
   real(kind(1.d0)) :: omega
   real(kind(1.d0)) :: t1, t2, t3, t4, t5, t6, t7, mpi_wtime
   logical, parameter          :: debug=.false., debugprt=.false.
-  real(kind(1.d0)), parameter :: one=1.d0, zero=0.d0
   integer      :: ismth
   external mpi_wtime
   character(len=20)   :: name, ch_err
@@ -121,8 +120,8 @@ subroutine psb_dmlprc_aply(baseprecv,x,beta,y,desc_data,trans,work,info)
       goto 9999      
     end if
 
-    t2l(:) = zero
-    w2l(:) = zero
+    t2l(:) = dzero
+    w2l(:) = dzero
 
     if (ismth  /= no_smth_) then 
       !
@@ -136,19 +135,19 @@ subroutine psb_dmlprc_aply(baseprecv,x,beta,y,desc_data,trans,work,info)
       end if
 
       tx(1:desc_data%matrix_data(psb_n_row_)) = x(1:desc_data%matrix_data(psb_n_row_)) 
-      tx(desc_data%matrix_data(psb_n_row_)+1:max(n_row,n_col)) = zero
-      ty(desc_data%matrix_data(psb_n_row_)+1:max(n_row,n_col)) = zero
-      tz(desc_data%matrix_data(psb_n_row_)+1:max(n_row,n_col)) = zero
+      tx(desc_data%matrix_data(psb_n_row_)+1:max(n_row,n_col)) = dzero
+      ty(desc_data%matrix_data(psb_n_row_)+1:max(n_row,n_col)) = dzero
+      tz(desc_data%matrix_data(psb_n_row_)+1:max(n_row,n_col)) = dzero
 
 
       if (baseprecv(2)%iprcparm(glb_smth_) >0) then 
         call psb_halo(tx,desc_data,info,work=work) 
         if(info /=0) goto 9999
       else
-        tx(desc_data%matrix_data(psb_n_row_)+1:max(n_row,n_col)) = zero
+        tx(desc_data%matrix_data(psb_n_row_)+1:max(n_row,n_col)) = dzero
       end if
 
-      call psb_csmm(one,baseprecv(2)%av(sm_pr_t_),tx,zero,t2l,info)
+      call psb_csmm(done,baseprecv(2)%av(sm_pr_t_),tx,dzero,t2l,info)
       if(info /=0) goto 9999
 
     else
@@ -169,18 +168,18 @@ subroutine psb_dmlprc_aply(baseprecv,x,beta,y,desc_data,trans,work,info)
     endif
 
     w2l=t2l
-    call psb_baseprc_aply(baseprecv(2),w2l,zero,t2l,baseprecv(2)%desc_data,&
+    call psb_baseprc_aply(baseprecv(2),w2l,dzero,t2l,baseprecv(2)%desc_data,&
          & 'N',work,info)
 
 
     if (ismth  /= no_smth_) then 
 
-      call psb_csmm(one,baseprecv(2)%av(sm_pr_),t2l,zero,ty,info)
+      call psb_csmm(done,baseprecv(2)%av(sm_pr_),t2l,dzero,ty,info)
       if(info /=0) goto 9999
       ! 
       ! Finally add back into Y. 
       ! 
-      call psb_geaxpby(one,ty,one,y,desc_data,info)
+      call psb_geaxpby(done,ty,done,y,desc_data,info)
       if(info /=0) goto 9999
       deallocate(tx,ty,tz)
 
@@ -218,17 +217,17 @@ subroutine psb_dmlprc_aply(baseprecv,x,beta,y,desc_data,trans,work,info)
         goto 9999      
       end if
 
-      t2l(:) = zero
-      w2l(:) = zero
+      t2l(:) = dzero
+      w2l(:) = dzero
 
       !
       ! Need temp copies to handle Y<- betaY + K^-1 X
-      ! One of the temp copies is not strictly needed when beta==zero
+      ! One of the temp copies is not strictly needed when beta==dzero
       !
 
       if (debug) write(0,*)' mult_ml_apply  omega ',omega
       if (debugprt) write(0,*)' mult_ml_apply  X: ',X(:)
-      call psb_geaxpby(one,x,zero,tx,desc_data,info)
+      call psb_geaxpby(done,x,dzero,tx,desc_data,info)
       if(info /=0) then 
         if (debug) write(0,*)' From axpby1 ',size(x),size(tx),n_row,n_col,nr2l,nrg
         call psb_errpush(4010,name,a_err='axpby post_smooth 1')
@@ -249,10 +248,10 @@ subroutine psb_dmlprc_aply(baseprecv,x,beta,y,desc_data,trans,work,info)
           call psb_halo(tx,desc_data,info,work=work) 
           if(info /=0) goto 9999
         else
-          tx(desc_data%matrix_data(psb_n_row_)+1:max(n_row,n_col)) = zero
+          tx(desc_data%matrix_data(psb_n_row_)+1:max(n_row,n_col)) = dzero
         end if
 
-        call psb_csmm(one,baseprecv(2)%av(sm_pr_t_),tx,zero,t2l,info)
+        call psb_csmm(done,baseprecv(2)%av(sm_pr_t_),tx,dzero,t2l,info)
         if(info /=0) goto 9999
 
       else
@@ -273,21 +272,21 @@ subroutine psb_dmlprc_aply(baseprecv,x,beta,y,desc_data,trans,work,info)
 
       t6 = mpi_wtime()
       w2l=t2l
-      call psb_baseprc_aply(baseprecv(2),w2l,zero,t2l,baseprecv(2)%desc_data,&
+      call psb_baseprc_aply(baseprecv(2),w2l,dzero,t2l,baseprecv(2)%desc_data,&
            &'N',work,info)
       if(info /=0) goto 9999
 
       if (ismth  /= no_smth_) then 
         if (ismth == smth_omg_) &
              & call psb_halo(t2l,baseprecv(2)%desc_data,info,work=work) 
-        call psb_csmm(one,baseprecv(2)%av(sm_pr_),t2l,zero,ty,info)
+        call psb_csmm(done,baseprecv(2)%av(sm_pr_),t2l,dzero,ty,info)
         if(info /=0) goto 9999
         ! 
         ! Finally add back into Y. 
         ! 
         deallocate(tz)
       else
-        ty(:) = zero
+        ty(:) = dzero
         do i=1, desc_data%matrix_data(psb_n_row_)
           ty(i) = ty(i) + t2l(baseprecv(2)%mlia(i))
         enddo
@@ -295,14 +294,14 @@ subroutine psb_dmlprc_aply(baseprecv,x,beta,y,desc_data,trans,work,info)
       end if
       deallocate(t2l,w2l)
 
-      call psb_spmm(-one,baseprecv(2)%aorig,ty,one,tx,desc_data,info,work=work)
+      call psb_spmm(-done,baseprecv(2)%aorig,ty,done,tx,desc_data,info,work=work)
       if(info /=0) goto 9999
 
-      call psb_baseprc_aply(baseprecv(1),tx,one,ty,desc_data,trans,&
+      call psb_baseprc_aply(baseprecv(1),tx,done,ty,desc_data,trans,&
            & work,info)
       if(info /=0) goto 9999
 
-      call psb_geaxpby(one,ty,beta,y,desc_data,info)
+      call psb_geaxpby(done,ty,beta,y,desc_data,info)
       if(info /=0) goto 9999
 
       deallocate(tx,ty)
@@ -322,22 +321,22 @@ subroutine psb_dmlprc_aply(baseprecv,x,beta,y,desc_data,trans,work,info)
         goto 9999      
       end if
 
-      t2l(:) = zero
-      w2l(:) = zero
+      t2l(:) = dzero
+      w2l(:) = dzero
 
       !
       ! Need temp copies to handle Y<- betaY + K^-1 X
       ! One of the temp copies is not strictly needed when beta==zero
       !
-      call psb_geaxpby(one,x,zero,tx,desc_data,info)
-      call psb_geaxpby(one,y,zero,ty,desc_data,info)
+      call psb_geaxpby(done,x,dzero,tx,desc_data,info)
+      call psb_geaxpby(done,y,dzero,ty,desc_data,info)
       if(info /=0) goto 9999
 
-      call psb_baseprc_aply(baseprecv(1),x,zero,tty,desc_data,&
+      call psb_baseprc_aply(baseprecv(1),x,dzero,tty,desc_data,&
            &  trans,work,info)
       if(info /=0) goto 9999
 
-      call psb_spmm(-one,baseprecv(2)%aorig,tty,one,tx,desc_data,info,work=work)
+      call psb_spmm(-done,baseprecv(2)%aorig,tty,done,tx,desc_data,info,work=work)
       if(info /=0) goto 9999
 
       if (ismth  /= no_smth_) then 
@@ -352,10 +351,10 @@ subroutine psb_dmlprc_aply(baseprecv,x,beta,y,desc_data,trans,work,info)
           call psb_halo(tx,desc_data,info,work=work) 
           if(info /=0) goto 9999
         else
-          tx(desc_data%matrix_data(psb_n_row_)+1:max(n_row,n_col)) = zero
+          tx(desc_data%matrix_data(psb_n_row_)+1:max(n_row,n_col)) = dzero
         end if
 
-        call psb_csmm(one,baseprecv(2)%av(sm_pr_t_),tx,zero,t2l,info)
+        call psb_csmm(done,baseprecv(2)%av(sm_pr_t_),tx,dzero,t2l,info)
         if(info /=0) goto 9999
 
       else
@@ -376,7 +375,7 @@ subroutine psb_dmlprc_aply(baseprecv,x,beta,y,desc_data,trans,work,info)
 
       t6 = mpi_wtime()
       w2l=t2l
-      call psb_baseprc_aply(baseprecv(2),w2l,zero,t2l,baseprecv(2)%desc_data,&
+      call psb_baseprc_aply(baseprecv(2),w2l,dzero,t2l,baseprecv(2)%desc_data,&
            &  'N',work,info)
       if(info /=0) goto 9999
 
@@ -384,10 +383,10 @@ subroutine psb_dmlprc_aply(baseprecv,x,beta,y,desc_data,trans,work,info)
 
         if (ismth == smth_omg_) &
              & call psb_halo(t2l,baseprecv(2)%desc_data,info,work=work) 
-        call psb_csmm(one,baseprecv(2)%av(sm_pr_),t2l,zero,ty,info)
+        call psb_csmm(done,baseprecv(2)%av(sm_pr_),t2l,dzero,ty,info)
         if(info /=0) goto 9999
 
-        call psb_geaxpby(one,ty,one,tty,desc_data,info)
+        call psb_geaxpby(done,ty,done,tty,desc_data,info)
         if(info /=0) goto 9999
 
         deallocate(tz)
@@ -399,7 +398,7 @@ subroutine psb_dmlprc_aply(baseprecv,x,beta,y,desc_data,trans,work,info)
 
       end if
 
-      call psb_geaxpby(one,tty,beta,y,desc_data,info)
+      call psb_geaxpby(done,tty,beta,y,desc_data,info)
       if(info /=0) goto 9999
 
       deallocate(t2l,w2l,tx,ty,tty)
@@ -418,24 +417,24 @@ subroutine psb_dmlprc_aply(baseprecv,x,beta,y,desc_data,trans,work,info)
         goto 9999      
       end if
 
-      t2l(:) = zero
-      w2l(:) = zero
-      tx(:)  = zero
-      ty(:)  = zero
-      tty(:) = zero
+      t2l(:) = dzero
+      w2l(:) = dzero
+      tx(:)  = dzero
+      ty(:)  = dzero
+      tty(:) = dzero
 
       !
       ! Need temp copies to handle Y<- betaY + K^-1 X
       ! One of the temp copies is not strictly needed when beta==zero
       !
-      call psb_geaxpby(one,x,zero,tx,desc_data,info)
-      call psb_geaxpby(one,y,zero,ty,desc_data,info)
+      call psb_geaxpby(done,x,dzero,tx,desc_data,info)
+      call psb_geaxpby(done,y,dzero,ty,desc_data,info)
       if(info /=0) goto 9999
 
-      call psb_baseprc_aply(baseprecv(1),tx,zero,tty,desc_data,trans,work,info)
+      call psb_baseprc_aply(baseprecv(1),tx,dzero,tty,desc_data,trans,work,info)
       if(info /=0) goto 9999
 
-      call psb_spmm(-one,baseprecv(2)%aorig,tty,one,tx,desc_data,info,work=work)
+      call psb_spmm(-done,baseprecv(2)%aorig,tty,done,tx,desc_data,info,work=work)
       if(info /=0) goto 9999
 
       if (ismth  /= no_smth_) then 
@@ -443,10 +442,10 @@ subroutine psb_dmlprc_aply(baseprecv,x,beta,y,desc_data,trans,work,info)
           call psb_halo(tx,baseprecv(1)%desc_data,info,work=work) 
           if(info /=0) goto 9999
         else
-          tx(desc_data%matrix_data(psb_n_row_)+1:max(n_row,n_col)) = zero
+          tx(desc_data%matrix_data(psb_n_row_)+1:max(n_row,n_col)) = dzero
         end if
 
-        call psb_csmm(one,baseprecv(2)%av(sm_pr_t_),tx,zero,t2l,info)
+        call psb_csmm(done,baseprecv(2)%av(sm_pr_t_),tx,dzero,t2l,info)
         if(info /=0) goto 9999
       else
         !
@@ -468,7 +467,7 @@ subroutine psb_dmlprc_aply(baseprecv,x,beta,y,desc_data,trans,work,info)
 
       t6 = mpi_wtime()
       w2l=t2l
-      call psb_baseprc_aply(baseprecv(2),w2l,zero,t2l,baseprecv(2)%desc_data,&
+      call psb_baseprc_aply(baseprecv(2),w2l,dzero,t2l,baseprecv(2)%desc_data,&
            &  'N',work,info)
       if(info /=0) goto 9999
 
@@ -476,10 +475,10 @@ subroutine psb_dmlprc_aply(baseprecv,x,beta,y,desc_data,trans,work,info)
 
         if (ismth == smth_omg_) &
              & call psb_halo(t2l,baseprecv(2)%desc_data,info,work=work) 
-        call psb_csmm(one,baseprecv(2)%av(sm_pr_),t2l,zero,ty,info)
+        call psb_csmm(done,baseprecv(2)%av(sm_pr_),t2l,dzero,ty,info)
         if(info /=0) goto 9999
 
-        call psb_geaxpby(one,ty,one,tty,desc_data,info)
+        call psb_geaxpby(done,ty,done,tty,desc_data,info)
         if(info /=0) goto 9999
 
       else
@@ -490,15 +489,15 @@ subroutine psb_dmlprc_aply(baseprecv,x,beta,y,desc_data,trans,work,info)
 
       end if
       
-      call psb_geaxpby(one,x,zero,tx,desc_data,info)
+      call psb_geaxpby(done,x,dzero,tx,desc_data,info)
       if(info /=0) goto 9999
 
-      call psb_spmm(-one,baseprecv(2)%aorig,tty,one,tx,desc_data,info,work=work)
+      call psb_spmm(-done,baseprecv(2)%aorig,tty,done,tx,desc_data,info,work=work)
       if(info /=0) goto 9999
-      call psb_baseprc_aply(baseprecv(1),tx,one,tty,desc_data,'N',work,info)
+      call psb_baseprc_aply(baseprecv(1),tx,done,tty,desc_data,'N',work,info)
 
 
-      call psb_geaxpby(one,tty,beta,y,desc_data,info)
+      call psb_geaxpby(done,tty,beta,y,desc_data,info)
       
       deallocate(t2l,w2l,tx,ty,tty)
 

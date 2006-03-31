@@ -37,17 +37,17 @@ CONTAINS
   !
   ! Get iteration parameters from the command line
   !
-  SUBROUTINE  GET_PARMS(ICONTXT,MTRX_FILE,RHS_FILE,CMETHD,PREC,IPART,&
+  SUBROUTINE  GET_PARMS(ICONTXT,MTRX_FILE,RHS_FILE,CMETHD,IPART,&
        & AFMT,ISTOPC,ITMAX,ITRACE,NOVR,IPREC,EPS)
     integer      :: icontxt
-    Character*20 :: CMETHD, PREC, MTRX_FILE, RHS_FILE
+    Character*40 :: CMETHD, MTRX_FILE, RHS_FILE
     Integer      :: IRET, ISTOPC,ITMAX,ITRACE,IPART,IPREC,NOVR
     Character*40 :: CHARBUF
     real(kind(1.d0)) :: eps
     character    :: afmt*5
     INTEGER      :: IARGC, NPROW, NPCOL, MYPROW, MYPCOL
     EXTERNAL     IARGC
-    INTEGER      :: INPARMS(20), IP 
+    INTEGER      :: INPARMS(40), IP 
     
     CALL BLACS_GRIDINFO(ICONTXT, NPROW, NPCOL, MYPROW, MYPCOL)
     IF (MYPROW==0) THEN
@@ -57,7 +57,6 @@ CONTAINS
         READ(*,*) MTRX_FILE
         READ(*,*) RHS_FILE
         READ(*,*) CMETHD
-        READ(*,*) PREC
         READ(*,*) AFMT
 
         ! Convert strings in array
@@ -65,54 +64,48 @@ CONTAINS
           INPARMS(I) = IACHAR(MTRX_FILE(I:I))
         END DO
         ! Broadcast parameters to all processors
-        CALL IGEBS2D(ICONTXT,'ALL',' ',20,1,INPARMS,20)
+        CALL IGEBS2D(ICONTXT,'ALL',' ',40,1,INPARMS,40)
 
         ! Convert strings in array
         DO I = 1, LEN(CMETHD)
           INPARMS(I) = IACHAR(CMETHD(I:I))
         END DO
         ! Broadcast parameters to all processors
-        CALL IGEBS2D(ICONTXT,'ALL',' ',20,1,INPARMS,20)
-
-        DO I = 1, LEN(PREC)
-          INPARMS(I) = IACHAR(PREC(I:I))
-        END DO
-        ! Broadcast parameters to all processors
-        CALL IGEBS2D(ICONTXT,'ALL',' ',20,1,INPARMS,20)
+        CALL IGEBS2D(ICONTXT,'ALL',' ',40,1,INPARMS,40)
 
         DO I = 1, LEN(AFMT)
           INPARMS(I) = IACHAR(AFMT(I:I))
         END DO
         ! Broadcast parameters to all processors
-        CALL IGEBS2D(ICONTXT,'ALL',' ',20,1,INPARMS,20)
+        CALL IGEBS2D(ICONTXT,'ALL',' ',40,1,INPARMS,40)
 
         READ(*,*) IPART
-        IF (IP.GE.6) THEN
+        IF (IP.GE.5) THEN
           READ(*,*) ISTOPC
         ELSE
           ISTOPC=1        
         ENDIF
-        IF (IP.GE.7) THEN
+        IF (IP.GE.6) THEN
           READ(*,*) ITMAX
         ELSE
           ITMAX=500
         ENDIF
-        IF (IP.GE.8) THEN
+        IF (IP.GE.7) THEN
           READ(*,*) ITRACE
         ELSE
           ITRACE=-1
         ENDIF
-        IF (IP.GE.9) THEN
+        IF (IP.GE.8) THEN
           READ(*,*) IPREC
         ELSE
           IPREC=0
         ENDIF
-        IF (IP.GE.10) THEN
+        IF (IP.GE.9) THEN
           READ(*,*) NOVR
         ELSE
           NOVR  = 1
         ENDIF
-        IF (IP.GE.11) THEN
+        IF (IP.GE.10) THEN
           READ(*,*) EPS
         ELSE
           EPS=1.D-6
@@ -128,12 +121,12 @@ CONTAINS
         CALL IGEBS2D(ICONTXT,'ALL',' ',6,1,INPARMS,6)
         CALL DGEBS2D(ICONTXT,'ALL',' ',1,1,EPS,1)
 
-          write(*,'("Solving matrix       : ",a20)')mtrx_file      
+          write(*,'("Solving matrix       : ",a40)')mtrx_file      
           write(*,'("Number of processors : ",i3)')nprow
           write(*,'("Data distribution    : ",i2)')ipart
           write(*,'("Preconditioner       : ",i2)')iprec
           if(iprec.gt.2) write(*,'("Overlapping levels   : ",i2)')novr
-          write(*,'("Iterative method     : ",a20)')cmethd
+          write(*,'("Iterative method     : ",a40)')cmethd
           write(*,'("Storage format       : ",a3)')afmt(1:3)
           write(*,'(" ")')
       else
@@ -143,21 +136,17 @@ CONTAINS
       END IF
     ELSE
       ! Receive Parameters
-      CALL IGEBR2D(ICONTXT,'A',' ',20,1,INPARMS,20,0,0)
-      DO I = 1, 20
+      CALL IGEBR2D(ICONTXT,'A',' ',40,1,INPARMS,40,0,0)
+      DO I = 1, 40
         MTRX_FILE(I:I) = ACHAR(INPARMS(I))
       END DO
       
-      CALL IGEBR2D(ICONTXT,'A',' ',20,1,INPARMS,20,0,0)
-      DO I = 1, 20
+      CALL IGEBR2D(ICONTXT,'A',' ',40,1,INPARMS,40,0,0)
+      DO I = 1, 40
         CMETHD(I:I) = ACHAR(INPARMS(I))
       END DO
-      
-      CALL IGEBR2D(ICONTXT,'A',' ',20,1,INPARMS,20,0,0)
-      DO I = 1, 20
-        PREC(I:I) = ACHAR(INPARMS(I))
-      END DO
-      CALL IGEBR2D(ICONTXT,'A',' ',20,1,INPARMS,20,0,0)
+
+      CALL IGEBR2D(ICONTXT,'A',' ',40,1,INPARMS,40,0,0)
       DO I = 1, LEN(AFMT)
         AFMT(I:I) = ACHAR(INPARMS(I))
       END DO
@@ -182,7 +171,6 @@ CONTAINS
     WRITE(IOUT, *) ' Where:'
     WRITE(IOUT, *) '     mtrx_file      is stored in HB format'
     WRITE(IOUT, *) '     methd          may be: CGSTAB '
-    WRITE(IOUT, *) '     prec           may be: ILU DIAGSC NONE'
     WRITE(IOUT, *) '     ptype          Partition strategy default 0'
     WRITE(IOUT, *) '                    0: BLOCK partition '
     WRITE(IOUT, *) '     itmax          Max iterations [500]        '

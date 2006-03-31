@@ -64,7 +64,6 @@ subroutine psb_dbaseprc_aply(prec,x,beta,y,desc_data,trans,work,info)
   integer :: icontxt,nprow,npcol,me,mycol,i, isz, nrg, err_act
   real(kind(1.d0)) :: t1, t2, t3, t4, t5, t6, t7, mpi_wtime
   logical,parameter                 :: debug=.false., debugprt=.false.
-  real(kind(1.d0)), parameter       :: one=1.d0, zero=0.d0
   external mpi_wtime
   character(len=20)   :: name, ch_err
 
@@ -107,11 +106,11 @@ subroutine psb_dbaseprc_aply(prec,x,beta,y,desc_data,trans,work,info)
   case(noprec_)
 
     n_row=desc_data%matrix_data(psb_n_row_)
-    if (beta==zero) then 
+    if (beta==dzero) then 
       y(1:n_row) = x(1:n_row)
-    else if (beta==one) then 
+    else if (beta==done) then 
       y(1:n_row) = x(1:n_row) + y(1:n_row)
-    else if (beta==-one) then 
+    else if (beta==-done) then 
       y(1:n_row) = x(1:n_row) - y(1:n_row)
     else 
       y(1:n_row) = x(1:n_row) + beta*y(1:n_row)
@@ -120,11 +119,11 @@ subroutine psb_dbaseprc_aply(prec,x,beta,y,desc_data,trans,work,info)
   case(diagsc_)
 
     n_row=desc_data%matrix_data(psb_n_row_)
-    if (beta==zero) then 
+    if (beta==dzero) then 
       y(1:n_row) = x(1:n_row)*prec%d(1:n_row)
-    else if (beta==one) then 
+    else if (beta==done) then 
       y(1:n_row) = x(1:n_row)*prec%d(1:n_row) + y(1:n_row)
-    else if (beta==-one) then 
+    else if (beta==-done) then 
       y(1:n_row) = x(1:n_row)*prec%d(1:n_row) - y(1:n_row)
     else 
       y(1:n_row) = x(1:n_row)*prec%d(1:n_row) + beta*y(1:n_row)
@@ -192,7 +191,7 @@ subroutine psb_dbaseprc_aply(prec,x,beta,y,desc_data,trans,work,info)
       if (debug) write(0,*) 'Bi-CGSTAB with Additive Schwarz prec' 
 
       tx(1:desc_data%matrix_data(psb_n_row_)) = x(1:desc_data%matrix_data(psb_n_row_)) 
-      tx(desc_data%matrix_data(psb_n_row_)+1:isz) = zero
+      tx(desc_data%matrix_data(psb_n_row_)+1:isz) = dzero
 
       if (prec%iprcparm(restr_)==psb_halo_) then 
         call psb_halo(tx,prec%desc_data,info,work=aux)
@@ -215,7 +214,7 @@ subroutine psb_dbaseprc_aply(prec,x,beta,y,desc_data,trans,work,info)
         end if
       endif
 
-      call psb_bjac_aply(prec,tx,zero,ty,prec%desc_data,trans,aux,info)
+      call psb_bjac_aply(prec,tx,dzero,ty,prec%desc_data,trans,aux,info)
       if(info.ne.0) then
         info=4010
         ch_err='psb_bjac_aply'
@@ -251,12 +250,12 @@ subroutine psb_dbaseprc_aply(prec,x,beta,y,desc_data,trans,work,info)
              & prec%iprcparm(prol_)
       end select
 
-      if (beta == zero)  then 
+      if (beta == dzero)  then 
         y(1:desc_data%matrix_data(psb_n_row_)) = ty(1:desc_data%matrix_data(psb_n_row_)) 
-      else if (beta == one) then 
+      else if (beta == done) then 
         y(1:desc_data%matrix_data(psb_n_row_)) = y(1:desc_data%matrix_data(psb_n_row_)) + &
              & ty(1:desc_data%matrix_data(psb_n_row_)) 
-      else if (beta == -one) then 
+      else if (beta == -done) then 
         y(1:desc_data%matrix_data(psb_n_row_)) = -y(1:desc_data%matrix_data(psb_n_row_)) + &
              & ty(1:desc_data%matrix_data(psb_n_row_)) 
       else 

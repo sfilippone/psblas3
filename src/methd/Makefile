@@ -5,7 +5,8 @@ LIBDIR=../../lib
 
 HERE=.
 OBJS= psb_dcgstab.o psb_dcg.o psb_dcgs.o \
-	psb_dbicg.o psb_dcgstabl.o psb_dgmresr.o
+	psb_dbicg.o psb_dcgstabl.o psb_dgmresr.o\
+	psb_zcgstab.o psb_zcgs.o
 
 INCDIRS=-I. -I.. -I$(LIBDIR)
 

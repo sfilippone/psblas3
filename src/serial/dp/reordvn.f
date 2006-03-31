@@ -160,7 +160,7 @@ C        ... Swap of vectors IA2, IA1, AR ...
       IDX(KK) = LP
       LP      = LSWAP
       KK      = KK+1
-      GOTO 500
+      GOTO 500 
  800  CONTINUE
       return
       end

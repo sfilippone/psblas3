@@ -175,7 +175,7 @@ subroutine psb_dslu_bld(a,desc_a,p,info)
      call blacs_barrier(icontxt,'All')
   endif
 
-  call psb_slu_factor(atmp%m,nzt,&
+  call psb_dslu_factor(atmp%m,nzt,&
        & atmp%aspk,atmp%ia2,atmp%ia1,p%iprcparm(slu_ptr_),info)
   if(info /= 0) then
      info=4010

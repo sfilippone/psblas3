@@ -37,7 +37,7 @@ program df_sample
   implicit none
 
   ! input parameters
-  character*20 :: cmethd, prec, mtrx_file, rhs_file
+  character*40 :: cmethd, mtrx_file, rhs_file
   character*80 :: charbuf
 
   interface 
@@ -118,7 +118,7 @@ program df_sample
   !
   !  get parameters
   !
-  call get_parms(ictxt,mtrx_file,rhs_file,cmethd,prec,&
+  call get_parms(ictxt,mtrx_file,rhs_file,cmethd,&
        & ipart,afmt,istopc,itmax,itrace,novr,iprec,eps)
 
   call blacs_barrier(ictxt,'a')
@@ -230,8 +230,6 @@ program df_sample
   !  of optional parameters
   !
 
-  if (amroot) write(*,'("Preconditioner : ",a)')prec(1:6)
-  
   ! zero initial guess.
   matop=1
   igsmth=-1
@@ -250,15 +248,8 @@ program df_sample
     call psb_precset(pre,'asm',iv=(/novr,halo_,none_/))
   case(rash_)             
     call psb_precset(pre,'asm',iv=(/novr,nohalo_,none_/))
-  case(ras2lv_) 
-     call psb_precset(pre,'asm',iv=(/novr,halo_,none_/))
-     call psb_precset(pre,'ml',&
-          &iv=(/add_ml_prec_,loc_aggr_,no_smth_,mat_repl_,&
-          &    pre_smooth_,igsmth/),rs=0.d0)
-  case(ras2lvm_) 
-     call psb_precset(pre,'asm',iv=(/novr,halo_,none_/))
-     call psb_precset(pre,'ml',&
-          & iv=(/mult_ml_prec_,glb_aggr_,pre_smooth_,igsmth,matop/),rs=0.d0)
+  case default
+    call psb_precset(pre,'ilu')
   end select
 
   ! building the preconditioner
@@ -305,10 +296,8 @@ program df_sample
   call psb_genrm2s(resmx,r_col,desc_a,info)
   call psb_geamaxs(resmxp,r_col,desc_a,info)
 
-!!$  iter=iparm(5)
-!!$  err = rparm(2)
   if (amroot) then 
-!    call psb_prec_descr(6,pre)
+    call psb_prec_descr(6,pre)
     write(*,'("Matrix: ",a)')mtrx_file
     write(*,'("Computed solution on ",i4," processors")')nprow
     write(*,'("Iterations to convergence: ",i6)')iter
@@ -330,12 +319,12 @@ program df_sample
     if (amroot) then
       write(0,'(" ")')
       write(0,'("Saving x on file")')
-!!$      write(20,*) 'matrix: ',mtrx_file
-!!$      write(20,*) 'computed solution on ',nprow,' processors.'
-!!$      write(20,*) 'iterations to convergence: ',iter
-!!$      write(20,*) 'error indicator (infinity norm) on exit:', &
-!!$           & ' ||r||/(||a||||x||+||b||) = ',err
-!!$      write(20,*) 'max residual = ',resmx, resmxp
+      write(20,*) 'matrix: ',mtrx_file
+      write(20,*) 'computed solution on ',nprow,' processors.'
+      write(20,*) 'iterations to convergence: ',iter
+      write(20,*) 'error indicator (infinity norm) on exit:', &
+           & ' ||r||/(||a||||x||+||b||) = ',err
+      write(20,*) 'max residual = ',resmx, resmxp
       do i=1,m_problem
         write(20,998) i,x_col_glob(i),r_col_glob(i),b_col_glob(i)
       enddo

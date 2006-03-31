@@ -71,13 +71,15 @@ subroutine psb_dcsprt(iout,a,iv,eirs,eics,head,ivr,ivc)
   endif
 
   if (present(head)) then 
-    write(iout,'(a)') head 
+    write(iout,'(a)') '%%MatrixMarket matrix coordinate real general'
+    write(iout,'(a,a)') '% ',head 
+    write(iout,'(a)') '%'
   endif
 
   if (a%fida=='CSR') then 
 
     write(iout,*) a%m,a%k,a%ia2(a%m+1)-1
-    
+
     if (present(iv)) then 
       do i=1, a%m
         do j=a%ia2(i),a%ia2(i+1)-1

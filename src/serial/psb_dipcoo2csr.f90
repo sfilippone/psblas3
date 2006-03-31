@@ -37,6 +37,7 @@ subroutine psb_dipcoo2csr(a,info,rwshr)
   use psb_const_mod
   use psb_serial_mod, only : psb_fixcoo
   use psb_error_mod
+  use psb_string_mod
   implicit none
 
   !....Parameters...
@@ -57,7 +58,7 @@ subroutine psb_dipcoo2csr(a,info,rwshr)
   call psb_erractionsave(err_act)
 
   if(debug) write(0,*)'Inside ipcoo2csr',a%fida,a%m
-  if (a%fida /= 'COO') then 
+  if (toupper(a%fida) /= 'COO') then 
     write(0,*) 'ipcoo2csr Invalid input ',a%fida
     info = -1
     call psb_errpush(info,name)

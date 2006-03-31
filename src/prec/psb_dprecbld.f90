@@ -84,7 +84,6 @@ subroutine psb_dprecbld(a,desc_a,p,info,upd)
   Integer      :: err, nnzero, I,j,k,icontxt,&
        & me,mycol,nprow,npcol,lw, mtype, nrg, nzg, err_act
   real(kind(1.d0))         :: temp, real_err(5)
-  real(kind(1.d0)),pointer :: gd(:), work(:)
   integer      :: int_err(5)
   character    :: iupd
 

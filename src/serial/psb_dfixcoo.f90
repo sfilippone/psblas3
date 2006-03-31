@@ -35,6 +35,7 @@
 Subroutine psb_dfixcoo(A,INFO,idir)
   use psb_spmat_type
   use psb_const_mod
+  use psb_string_mod
   implicit none
 
   !....Parameters...
@@ -50,7 +51,7 @@ Subroutine psb_dfixcoo(A,INFO,idir)
 
   info  = 0
   if(debug) write(0,*)'fixcoo: ',size(a%ia1),size(a%ia2)
-  if (a%fida /= 'COO') then 
+  if (toupper(a%fida) /= 'COO') then 
     write(0,*) 'Fixcoo Invalid input ',a%fida
     info = -1
     return

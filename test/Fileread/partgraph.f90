@@ -167,9 +167,12 @@ CONTAINS
         iopt(1) = 0
         numflag  = 1
         wgflag   = 0
+!!$
+!!$        write(0,*)'CSR structure ', size(ia2),size(ia1),&
+!!$             & ia2(n+1),minval(ia1(1:ia2(n+1)-1)),maxval(ia1(1:ia2(n+1)-1))
         call METIS_PartGraphRecursive(n,ia2,ia1,idummy,jdummy,&
              & wgflag,numflag,nparts,iopt,nedc,graph_vect)
-!        write(0,*)'Edge cut from Metis ',nedc
+!!$        write(0,*)'Edge cut from Metis ',nedc
         DO I=1, N
           GRAPH_VECT(I) = GRAPH_VECT(I) - 1
         ENDDO

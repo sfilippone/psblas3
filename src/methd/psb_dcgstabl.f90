@@ -116,7 +116,6 @@ Subroutine psb_dcgstabl(a,prec,b,x,eps,desc_a,info,&
   Integer, Parameter :: irmax = 8
   Integer            :: itx, i, isvch, ich, icontxt,listop,j, int_err(5)
   Logical            :: do_renum_left
-  Real(Kind(1.d0)), Parameter :: one=1.d0, zero=0.d0, epstol=1.d-35
   Logical, Parameter :: debug = .False.
   Real(Kind(1.d0)) :: alpha, beta, rho, rho_old, rni, xni, bni, ani,bn2,& 
        & omega, tau 
@@ -234,23 +233,23 @@ Subroutine psb_dcgstabl(a,prec,b,x,eps,desc_a,info,&
     If (debug) Write(0,*) 'restart: ',itx,it
     If (itx.Ge.litmax) Exit restart  
     it = 0      
-    Call psb_geaxpby(one,b,zero,r,desc_a,info)
-    Call psb_spmm(-one,a,x,one,r,desc_a,info,work=aux)
+    Call psb_geaxpby(done,b,dzero,r,desc_a,info)
+    Call psb_spmm(-done,a,x,done,r,desc_a,info,work=aux)
     
     call psb_prc_aply(prec,r,desc_a,info)
 
-    Call psb_geaxpby(one,r,zero,rt0,desc_a,info)
-    Call psb_geaxpby(one,r,zero,rh(:,0),desc_a,info)
-    Call psb_geaxpby(zero,r,zero,uh(:,0),desc_a,info)
+    Call psb_geaxpby(done,r,dzero,rt0,desc_a,info)
+    Call psb_geaxpby(done,r,dzero,rh(:,0),desc_a,info)
+    Call psb_geaxpby(dzero,r,dzero,uh(:,0),desc_a,info)
     if (info.ne.0) Then 
        info=4011 
        call psb_errpush(info,name)
        goto 9999
     End If
    
-    rho   = one
-    alpha = zero
-    omega = one 
+    rho   = done
+    alpha = dzero
+    omega = done 
 
     If (debug) Write(0,*) 'on entry to amax: b: ',Size(b)
 
@@ -290,30 +289,30 @@ Subroutine psb_dcgstabl(a,prec,b,x,eps,desc_a,info,&
         If (debug) Write(0,*) 'bicg part:  ',j, nl
         rho_old = rho
         rho = psb_gedot(rh(:,j),rt0,desc_a,info)
-        If (rho==zero) Then
+        If (rho==dzero) Then
           If (debug) Write(0,*) 'bi-cgstab iteration breakdown r',rho
           Exit iteration
         Endif
         beta = alpha*rho/rho_old 
         If (debug) Write(0,*) 'bicg part:  ',alpha,beta,rho,rho_old
         rho_old = rho
-        Call psb_geaxpby(one,rh(:,0:j),-beta,uh(:,0:j),desc_a,info)
+        Call psb_geaxpby(done,rh(:,0:j),-beta,uh(:,0:j),desc_a,info)
         If (debug) Write(0,*) 'bicg part:  ',rh(1,0),beta
-        Call psb_spmm(one,a,uh(:,j),zero,uh(:,j+1),desc_a,info,work=aux)
+        Call psb_spmm(done,a,uh(:,j),dzero,uh(:,j+1),desc_a,info,work=aux)
 
         call psb_prc_aply(prec,uh(:,j+1),desc_a,info)
 
         gamma(j) = psb_gedot(uh(:,j+1),rt0,desc_a,info)
-        If (gamma(j)==zero) Then
+        If (gamma(j)==dzero) Then
           If (debug) Write(0,*) 'bi-cgstab iteration breakdown s2',gamma(j)
           Exit iteration
         Endif
         alpha = rho/gamma(j)
         If (debug) Write(0,*) 'bicg part: alpha=r/g ',alpha,rho,gamma(j)
 
-        Call psb_geaxpby(-alpha,uh(:,1:j+1),one,rh(:,0:j),desc_a,info)        
-        Call psb_geaxpby(alpha,uh(:,0),one,x,desc_a,info)
-        Call psb_spmm(one,a,rh(:,j),zero,rh(:,j+1),desc_a,info,work=aux)
+        Call psb_geaxpby(-alpha,uh(:,1:j+1),done,rh(:,0:j),desc_a,info)        
+        Call psb_geaxpby(alpha,uh(:,0),done,x,desc_a,info)
+        Call psb_spmm(done,a,rh(:,j),dzero,rh(:,j+1),desc_a,info,work=aux)
 
         call psb_prc_aply(prec,rh(:,j+1),desc_a,info)
                 
@@ -324,7 +323,7 @@ Subroutine psb_dcgstabl(a,prec,b,x,eps,desc_a,info,&
         Do i=1, j-1 
           taum(i,j) = psb_gedot(rh(:,i),rh(:,j),desc_a,info)
           taum(i,j) = taum(i,j)/sigma(i) 
-          Call psb_geaxpby(-taum(i,j),rh(:,i),one,rh(:,j),desc_a,info)        
+          Call psb_geaxpby(-taum(i,j),rh(:,i),done,rh(:,j),desc_a,info)        
         Enddo        
         If (debug) Write(0,*) 'mod g-s part:  dot prod '
         sigma(j)  = psb_gedot(rh(:,j),rh(:,j),desc_a,info)
@@ -353,14 +352,14 @@ Subroutine psb_dcgstabl(a,prec,b,x,eps,desc_a,info,&
       Enddo
       If (debug) Write(0,*) 'second solve: ', gamma(:)
       
-      Call psb_geaxpby(gamma(1),rh(:,0),one,x,desc_a,info)        
-      Call psb_geaxpby(-gamma1(nl),rh(:,nl),one,rh(:,0),desc_a,info)        
-      Call psb_geaxpby(-gamma(nl),uh(:,nl),one,uh(:,0),desc_a,info)        
+      Call psb_geaxpby(gamma(1),rh(:,0),done,x,desc_a,info)        
+      Call psb_geaxpby(-gamma1(nl),rh(:,nl),done,rh(:,0),desc_a,info)        
+      Call psb_geaxpby(-gamma(nl),uh(:,nl),done,uh(:,0),desc_a,info)        
 
       Do j=1, nl-1
-        Call psb_geaxpby(-gamma(j),uh(:,j),one,uh(:,0),desc_a,info)        
-        Call psb_geaxpby(gamma2(j),rh(:,j),one,x,desc_a,info)        
-        Call psb_geaxpby(-gamma1(j),rh(:,j),one,rh(:,0),desc_a,info)        
+        Call psb_geaxpby(-gamma(j),uh(:,j),done,uh(:,0),desc_a,info)        
+        Call psb_geaxpby(gamma2(j),rh(:,j),done,x,desc_a,info)        
+        Call psb_geaxpby(-gamma1(j),rh(:,j),done,rh(:,0),desc_a,info)        
       Enddo
       
       if (listop == 1) then 

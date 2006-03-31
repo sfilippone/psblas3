@@ -36,6 +36,7 @@ Subroutine psb_dipcsr2coo(a,info)
   use psb_spmat_type
   use psb_const_mod
   use psb_error_mod
+  use psb_string_mod
   implicit none
 
   !....Parameters...
@@ -53,7 +54,7 @@ Subroutine psb_dipcsr2coo(a,info)
   info  = 0
   call psb_erractionsave(err_act)
 
-  if (a%fida /= 'CSR') then 
+  if (toupper(a%fida) /= 'CSR') then 
     info = 5
     call psb_errpush(info,name)
     goto 9999

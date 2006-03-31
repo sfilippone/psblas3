@@ -106,7 +106,6 @@ Subroutine psb_dcg(a,prec,b,x,eps,desc_a,info,&
        & nprows,npcols,me,mecol, n_col, isvch, ich, icontxt, n_row,err_act, int_err(5)
   character          ::diagl, diagu
   logical, parameter :: exchange=.true., noexchange=.false.  
-  real(kind(1.d0)), parameter :: one=1.d0, zero=0.d0, epstol=1.d-35
   character(len=20)             :: name,ch_err
 
   info = 0
@@ -189,15 +188,15 @@ Subroutine psb_dcg(a,prec,b,x,eps,desc_a,info,&
 !!$   
     if (itx>= litmax) exit restart 
     it = 0
-    call psb_geaxpby(one,b,zero,r,desc_a,info)
-    call psb_spmm(-one,a,x,one,r,desc_a,info,work=aux)
+    call psb_geaxpby(done,b,dzero,r,desc_a,info)
+    call psb_spmm(-done,a,x,done,r,desc_a,info,work=aux)
     if (info.ne.0) then 
       info=4011
       call psb_errpush(info,name)
       goto 9999
     end if
 
-    rho = zero
+    rho = dzero
     if (listop == 1) then 
       ani = psb_spnrmi(a,desc_a,info)
       bni = psb_geamax(b,desc_a,info)
@@ -220,26 +219,26 @@ Subroutine psb_dcg(a,prec,b,x,eps,desc_a,info,&
       rho     = psb_gedot(r,z,desc_a,info)
 
       if (it==1) then
-        call psb_geaxpby(one,z,zero,p,desc_a,info)
+        call psb_geaxpby(done,z,dzero,p,desc_a,info)
       else
-        if (rho_old==zero) then
+        if (rho_old==dzero) then
           write(0,*) 'CG Iteration breakdown'
           exit iteration
         endif
         beta = rho/rho_old
-        call psb_geaxpby(one,z,beta,p,desc_a,info)
+        call psb_geaxpby(done,z,beta,p,desc_a,info)
       end if
 
-      call psb_spmm(one,a,p,zero,q,desc_a,info,work=aux)
+      call psb_spmm(done,a,p,dzero,q,desc_a,info,work=aux)
       sigma = psb_gedot(p,q,desc_a,info)
-      if (sigma==zero) then
+      if (sigma==dzero) then
         write(0,*) 'CG Iteration breakdown'
         exit iteration
       endif
 
       alpha = rho/sigma
-      call psb_geaxpby(alpha,p,one,x,desc_a,info)
-      call psb_geaxpby(-alpha,q,one,r,desc_a,info)
+      call psb_geaxpby(alpha,p,done,x,desc_a,info)
+      call psb_geaxpby(-alpha,q,done,r,desc_a,info)
 
 
       if (listop == 1) Then 

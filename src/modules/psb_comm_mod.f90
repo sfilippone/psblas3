@@ -49,6 +49,24 @@ module psb_comm_mod
        logical, intent(in), optional             :: choice
        integer, intent(in), optional             :: update_type
      end subroutine psb_dovrlv
+     subroutine  psb_zovrlm(x,desc_a,info,jx,ik,work,choice,update_type)
+       use psb_descriptor_type
+       complex(kind(1.d0)), intent(inout)           :: x(:,:)
+       type(psb_desc_type), intent(in)           :: desc_a
+       integer, intent(out)                      :: info
+       complex(kind(1.d0)), intent(inout), optional :: work(:)
+       logical, intent(in), optional             :: choice
+       integer, intent(in), optional             :: update_type,jx,ik
+     end subroutine psb_zovrlm
+     subroutine  psb_zovrlv(x,desc_a,info,work,choice,update_type)
+       use psb_descriptor_type
+       complex(kind(1.d0)), intent(inout)           :: x(:)
+       type(psb_desc_type), intent(in)           :: desc_a
+       integer, intent(out)                      :: info
+       complex(kind(1.d0)), intent(inout), optional :: work(:)
+       logical, intent(in), optional             :: choice
+       integer, intent(in), optional             :: update_type
+     end subroutine psb_zovrlv
   end interface
 
   interface psb_halo
@@ -92,6 +110,26 @@ module psb_comm_mod
        integer, intent(in), optional          :: mode
        character, intent(in), optional        :: tran
      end subroutine psb_ihalov
+     subroutine  psb_zhalom(x,desc_a,info,alpha,jx,ik,work,tran,mode)
+       use psb_descriptor_type
+       complex(kind(1.d0)), intent(inout)           :: x(:,:)
+       type(psb_desc_type), intent(in)           :: desc_a
+       integer, intent(out)                      :: info
+       complex(kind(1.d0)), intent(in), optional    :: alpha
+       complex(kind(1.d0)), target, optional        :: work(:)
+       integer, intent(in), optional             :: mode,jx,ik
+       character, intent(in), optional           :: tran
+     end subroutine psb_zhalom
+     subroutine  psb_zhalov(x,desc_a,info,alpha,work,tran,mode)
+       use psb_descriptor_type
+       complex(kind(1.d0)), intent(inout)           :: x(:)
+       type(psb_desc_type), intent(in)           :: desc_a
+       integer, intent(out)                      :: info
+       complex(kind(1.d0)), intent(in), optional    :: alpha
+       complex(kind(1.d0)), target, optional :: work(:)
+       integer, intent(in), optional             :: mode
+       character, intent(in), optional           :: tran
+     end subroutine psb_zhalov
   end interface
 
 
@@ -114,6 +152,24 @@ module psb_comm_mod
        integer, intent(out)             :: info
        integer, intent(in), optional    :: iroot
      end subroutine psb_dscatterv
+     subroutine  psb_zscatterm(globx, locx, desc_a, info, iroot,&
+          & iiglobx, ijglobx, iilocx,ijlocx,ik)
+       use psb_descriptor_type
+       complex(kind(1.d0)), intent(out)    :: locx(:,:)
+       complex(kind(1.d0)), intent(in)     :: globx(:,:)
+       type(psb_desc_type), intent(in)  :: desc_a
+       integer, intent(out)             :: info
+       integer, intent(in), optional    :: iroot,iiglobx,&
+            & ijglobx,iilocx,ijlocx,ik
+     end subroutine psb_zscatterm
+     subroutine  psb_zscatterv(globx, locx, desc_a, info, iroot)
+       use psb_descriptor_type
+       complex(kind(1.d0)), intent(out)    :: locx(:)
+       complex(kind(1.d0)), intent(in)     :: globx(:)
+       type(psb_desc_type), intent(in)  :: desc_a
+       integer, intent(out)             :: info
+       integer, intent(in), optional    :: iroot
+     end subroutine psb_zscatterv
   end interface
 
   interface psb_gather
@@ -135,6 +191,24 @@ module psb_comm_mod
        integer, intent(out)            :: info
        integer, intent(in), optional   :: iroot, iiglobx, iilocx
      end subroutine psb_dgatherv
+     subroutine  psb_zgatherm(globx, locx, desc_a, info, iroot,&
+          & iiglobx, ijglobx, iilocx,ijlocx,ik)
+       use psb_descriptor_type
+       complex(kind(1.d0)), intent(in)    :: locx(:,:)
+       complex(kind(1.d0)), intent(out)   :: globx(:,:)
+       type(psb_desc_type), intent(in) :: desc_a
+       integer, intent(out)            :: info
+       integer, intent(in), optional   :: iroot, iiglobx, ijglobx, iilocx, ijlocx, ik
+     end subroutine psb_zgatherm
+     subroutine  psb_zgatherv(globx, locx, desc_a, info, iroot,&
+          & iiglobx, iilocx)
+       use psb_descriptor_type
+       complex(kind(1.d0)), intent(in)    :: locx(:)
+       complex(kind(1.d0)), intent(out)   :: globx(:)
+       type(psb_desc_type), intent(in) :: desc_a
+       integer, intent(out)            :: info
+       integer, intent(in), optional   :: iroot, iiglobx, iilocx
+     end subroutine psb_zgatherv
   end interface
   
 end module psb_comm_mod

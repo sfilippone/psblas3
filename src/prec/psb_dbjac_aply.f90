@@ -65,7 +65,6 @@ subroutine psb_dbjac_aply(prec,x,beta,y,desc_data,trans,work,info)
   integer :: icontxt,nprow,npcol,me,mycol,i, isz, nrg, err_act, int_err(5)
   real(kind(1.d0)) :: t1, t2, t3, t4, t5, t6, t7, mpi_wtime
   logical,parameter                 :: debug=.false., debugprt=.false.
-  real(kind(1.d0)), parameter       :: one=1.d0, zero=0.d0
   external mpi_wtime
   character(len=20)   :: name, ch_err
 
@@ -121,20 +120,20 @@ subroutine psb_dbjac_aply(prec,x,beta,y,desc_data,trans,work,info)
       select case(trans)
       case('N','n')
 
-        call psb_spsm(one,prec%av(l_pr_),x,zero,ww,desc_data,info,&
+        call psb_spsm(done,prec%av(l_pr_),x,dzero,ww,desc_data,info,&
              & trans='N',unit=diagl,choice=psb_none_,work=aux)
         if(info /=0) goto 9999
         ww(1:n_row) = ww(1:n_row)*prec%d(1:n_row)
-        call psb_spsm(one,prec%av(u_pr_),ww,beta,y,desc_data,info,&
+        call psb_spsm(done,prec%av(u_pr_),ww,beta,y,desc_data,info,&
              & trans='N',unit=diagu,choice=psb_none_, work=aux)
         if(info /=0) goto 9999
 
       case('T','t','C','c')
-        call psb_spsm(one,prec%av(u_pr_),x,zero,ww,desc_data,info,&
+        call psb_spsm(done,prec%av(u_pr_),x,dzero,ww,desc_data,info,&
              & trans=trans,unit=diagu,choice=psb_none_, work=aux)
         if(info /=0) goto 9999
         ww(1:n_row) = ww(1:n_row)*prec%d(1:n_row)
-        call psb_spsm(one,prec%av(l_pr_),ww,beta,y,desc_data,info,&
+        call psb_spsm(done,prec%av(l_pr_),ww,beta,y,desc_data,info,&
              & trans=trans,unit=diagl,choice=psb_none_,work=aux)
         if(info /=0) goto 9999
 
@@ -146,18 +145,18 @@ subroutine psb_dbjac_aply(prec,x,beta,y,desc_data,trans,work,info)
 
       select case(trans)
       case('N','n')
-        call psb_slu_solve(0,n_row,1,ww,n_row,prec%iprcparm(slu_ptr_),info)
+        call psb_dslu_solve(0,n_row,1,ww,n_row,prec%iprcparm(slu_ptr_),info)
       case('T','t','C','c')
-        call psb_slu_solve(1,n_row,1,ww,n_row,prec%iprcparm(slu_ptr_),info)
+        call psb_dslu_solve(1,n_row,1,ww,n_row,prec%iprcparm(slu_ptr_),info)
       end select
 
       if(info /=0) goto 9999
 
-      if (beta == 0.d0) then 
+      if (beta == dzero) then 
         y(1:n_row) = ww(1:n_row)
-      else if (beta==1.d0) then 
+      else if (beta==done) then 
         y(1:n_row) = ww(1:n_row) + y(1:n_row) 
-      else if (beta==-1.d0) then 
+      else if (beta==-done) then 
         y(1:n_row) = ww(1:n_row) - y(1:n_row) 
       else 
         y(1:n_row) = ww(1:n_row) + beta*y(1:n_row) 
@@ -167,18 +166,18 @@ subroutine psb_dbjac_aply(prec,x,beta,y,desc_data,trans,work,info)
 
       select case(trans)
       case('N','n')
-        call psb_umf_solve(0,n_row,ww,x,n_row,prec%iprcparm(umf_numptr_),info)
+        call psb_dumf_solve(0,n_row,ww,x,n_row,prec%iprcparm(umf_numptr_),info)
       case('T','t','C','c')
-        call psb_umf_solve(1,n_row,ww,x,n_row,prec%iprcparm(umf_numptr_),info)
+        call psb_dumf_solve(1,n_row,ww,x,n_row,prec%iprcparm(umf_numptr_),info)
       end select
 
       if(info /=0) goto 9999
 
-      if (beta == 0.d0) then 
+      if (beta == dzero) then 
         y(1:n_row) = ww(1:n_row)
-      else if (beta==1.d0) then 
+      else if (beta==dzero) then 
         y(1:n_row) = ww(1:n_row) + y(1:n_row) 
-      else if (beta==-1.d0) then 
+      else if (beta==-dzero) then 
         y(1:n_row) = ww(1:n_row) - y(1:n_row) 
       else 
         y(1:n_row) = ww(1:n_row) + beta*y(1:n_row) 
@@ -204,22 +203,22 @@ subroutine psb_dbjac_aply(prec,x,beta,y,desc_data,trans,work,info)
       goto 9999      
     end if
 
-    tx = zero
-    ty = zero
+    tx = dzero
+    ty = dzero
     select case(prec%iprcparm(f_type_)) 
     case(f_ilu_n_,f_ilu_e_) 
       do i=1, prec%iprcparm(jac_sweeps_) 
         !   X(k+1) = M^-1*(b-N*X(k))
         ty(1:n_row) = x(1:n_row)
-        call psb_spmm(-one,prec%av(ap_nd_),tx,one,ty,&
+        call psb_spmm(-done,prec%av(ap_nd_),tx,done,ty,&
              &   prec%desc_data,info,work=aux)
         if(info /=0) goto 9999
-        call psb_spsm(one,prec%av(l_pr_),ty,zero,ww,&
+        call psb_spsm(done,prec%av(l_pr_),ty,dzero,ww,&
              & prec%desc_data,info,&
              & trans='N',unit='U',choice=psb_none_,work=aux)
         if(info /=0) goto 9999
         ww(1:n_row) = ww(1:n_row)*prec%d(1:n_row)
-        call psb_spsm(one,prec%av(u_pr_),ww,zero,tx,&
+        call psb_spsm(done,prec%av(u_pr_),ww,dzero,tx,&
              & prec%desc_data,info,&
              & trans='N',unit='U',choice=psb_none_,work=aux)
         if(info /=0) goto 9999
@@ -229,11 +228,11 @@ subroutine psb_dbjac_aply(prec,x,beta,y,desc_data,trans,work,info)
       do i=1, prec%iprcparm(jac_sweeps_) 
         !   X(k+1) = M^-1*(b-N*X(k))
         ty(1:n_row) = x(1:n_row)
-        call psb_spmm(-one,prec%av(ap_nd_),tx,one,ty,&
+        call psb_spmm(-done,prec%av(ap_nd_),tx,done,ty,&
              &   prec%desc_data,info,work=aux)
         if(info /=0) goto 9999
 
-        call psb_slu_solve(0,n_row,1,ty,n_row,prec%iprcparm(slu_ptr_),info)
+        call psb_dslu_solve(0,n_row,1,ty,n_row,prec%iprcparm(slu_ptr_),info)
         if(info /=0) goto 9999
         tx(1:n_row) = ty(1:n_row)        
       end do
@@ -241,11 +240,11 @@ subroutine psb_dbjac_aply(prec,x,beta,y,desc_data,trans,work,info)
       do i=1, prec%iprcparm(jac_sweeps_) 
         !   X(k+1) = M^-1*(b-N*X(k))
         ty(1:n_row) = x(1:n_row)
-        call psb_spmm(-one,prec%av(ap_nd_),tx,one,ty,&
+        call psb_spmm(-done,prec%av(ap_nd_),tx,done,ty,&
              &   prec%desc_data,info,work=aux)
         if(info /=0) goto 9999
 
-        call psb_umf_solve(0,n_row,ww,ty,n_row,&
+        call psb_dumf_solve(0,n_row,ww,ty,n_row,&
              & prec%iprcparm(umf_numptr_),info)
         if(info /=0) goto 9999
         tx(1:n_row) = ww(1:n_row)        
@@ -253,11 +252,11 @@ subroutine psb_dbjac_aply(prec,x,beta,y,desc_data,trans,work,info)
 
     end select
     
-    if (beta == 0.d0) then 
+    if (beta == dzero) then 
       y(1:n_row) = tx(1:n_row)
-    else if (beta==1.d0) then 
+    else if (beta==done) then 
       y(1:n_row) = tx(1:n_row) + y(1:n_row) 
-    else if (beta==-1.d0) then 
+    else if (beta==-done) then 
       y(1:n_row) = tx(1:n_row) - y(1:n_row) 
     else 
       y(1:n_row) = tx(1:n_row) + beta*y(1:n_row) 

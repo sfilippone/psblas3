@@ -41,6 +41,14 @@ module psb_serial_mod
        integer, intent(in), optional :: ifc
        character, intent(in), optional :: check,trans,unitd
      end subroutine psb_dcsdp
+     subroutine psb_zcsdp(a, b,info,ifc,check,trans,unitd)
+       use psb_spmat_type
+       type(psb_zspmat_type), intent(in)   :: a
+       type(psb_zspmat_type), intent(inout)  :: b
+       integer, intent(out)        :: info
+       integer, intent(in), optional :: ifc
+       character, intent(in), optional :: check,trans,unitd
+     end subroutine psb_zcsdp
   end interface
 
   interface psb_csrws
@@ -51,6 +59,13 @@ module psb_serial_mod
        integer :: info
        character, optional :: trans
      end subroutine psb_dcsrws
+     subroutine psb_zcsrws(rw,a,info,trans)
+       use psb_spmat_type
+       type(psb_zspmat_type) :: a
+       complex(kind(1.d0)), pointer  :: rw(:) 
+       integer :: info
+       character, optional :: trans
+     end subroutine psb_zcsrws
   end interface
 
 
@@ -72,6 +87,22 @@ module psb_serial_mod
        character, optional :: trans, unitd
        real(kind(1.d0)), optional, target :: d(:)
      end subroutine psb_dcssv
+     subroutine psb_zcssm(alpha,t,b,beta,c,info,trans,unitd,d)
+       use psb_spmat_type
+       type(psb_zspmat_type) :: t
+       complex(kind(1.d0)) :: alpha, beta, b(:,:), c(:,:)
+       integer :: info
+       character, optional :: trans, unitd
+       complex(kind(1.d0)), optional, target :: d(:)
+     end subroutine psb_zcssm
+     subroutine psb_zcssv(alpha,t,b,beta,c,info,trans,unitd,d)
+       use psb_spmat_type
+       type(psb_zspmat_type) :: t
+       complex(kind(1.d0)) :: alpha, beta, b(:), c(:)
+       integer :: info
+       character, optional :: trans, unitd
+       complex(kind(1.d0)), optional, target :: d(:)
+     end subroutine psb_zcssv
   end interface
 
   interface psb_csmm
@@ -89,6 +120,20 @@ module psb_serial_mod
        integer :: info
        character, optional :: trans
      end subroutine psb_dcsmm
+     subroutine psb_zcsmv(alpha,a,b,beta,c,info,trans)
+       use psb_spmat_type
+       type(psb_zspmat_type) :: a
+       complex(kind(1.d0)) :: alpha, beta, b(:), c(:)
+       integer :: info
+       character, optional :: trans
+     end subroutine psb_zcsmv
+     subroutine psb_zcsmm(alpha,a,b,beta,c,info,trans)
+       use psb_spmat_type
+       type(psb_zspmat_type) :: a
+       complex(kind(1.d0)) :: alpha, beta, b(:,:), c(:,:)
+       integer :: info
+       character, optional :: trans
+     end subroutine psb_zcsmm
   end interface
 
   interface psb_fixcoo
@@ -98,6 +143,12 @@ module psb_serial_mod
        integer, intent(out)         :: info
        integer, intent(in), optional :: idir
      end subroutine psb_dfixcoo
+     subroutine psb_zfixcoo(a,info,idir)
+       use psb_spmat_type
+       type(psb_zspmat_type), intent(inout) :: a
+       integer, intent(out)         :: info
+       integer, intent(in), optional :: idir
+     end subroutine psb_zfixcoo
   end interface
 
   interface psb_ipcoo2csr
@@ -107,6 +158,12 @@ module psb_serial_mod
        integer, intent(out)         :: info
        logical, optional :: rwshr
      end subroutine psb_dipcoo2csr
+     subroutine psb_zipcoo2csr(a,info,rwshr)
+       use psb_spmat_type
+       type(psb_zspmat_type), intent(inout) :: a
+       integer, intent(out)         :: info
+       logical, optional :: rwshr
+     end subroutine psb_zipcoo2csr
   end interface
 
   interface psb_ipcoo2csc
@@ -116,6 +173,12 @@ module psb_serial_mod
        integer, intent(out)         :: info
        logical, optional :: clshr
      end subroutine psb_dipcoo2csc
+     subroutine psb_zipcoo2csc(a,info,clshr)
+       use psb_spmat_type
+       type(psb_zspmat_type), intent(inout) :: a
+       integer, intent(out)         :: info
+       logical, optional :: clshr
+     end subroutine psb_zipcoo2csc
   end interface
 
   interface psb_ipcsr2coo
@@ -124,6 +187,11 @@ module psb_serial_mod
        type(psb_dspmat_type), intent(inout) :: a
        integer, intent(out)         :: info
      end subroutine psb_dipcsr2coo
+     subroutine psb_zipcsr2coo(a,info)
+       use psb_spmat_type
+       type(psb_zspmat_type), intent(inout) :: a
+       integer, intent(out)         :: info
+     end subroutine psb_zipcsr2coo
   end interface
 
   interface psb_csprt
@@ -136,6 +204,15 @@ module psb_serial_mod
        character(len=*), optional    :: head
        integer, intent(in), optional :: ivr(:),ivc(:)
      end subroutine psb_dcsprt
+     subroutine psb_zcsprt(iout,a,iv,irs,ics,head,ivr,ivc)
+       use psb_spmat_type
+       integer, intent(in)       :: iout
+       type(psb_zspmat_type), intent(in) :: a
+       integer, intent(in), optional :: iv(:)
+       integer, intent(in), optional :: irs,ics
+       character(len=*), optional    :: head
+       integer, intent(in), optional :: ivr(:),ivc(:)
+     end subroutine psb_zcsprt
   end interface
 
   interface psb_spgtdiag
@@ -145,6 +222,12 @@ module psb_serial_mod
        real(kind(1.d0)), intent(inout) :: d(:) 
        integer, intent(out)  :: info
      end subroutine psb_dspgtdiag
+     subroutine psb_zspgtdiag(a,d,info)
+       use psb_spmat_type
+       type(psb_zspmat_type), intent(in)     :: a
+       complex(kind(1.d0)), intent(inout) :: d(:) 
+       integer, intent(out)  :: info
+     end subroutine psb_zspgtdiag
   end interface
 
   interface psb_spscal
@@ -154,6 +237,12 @@ module psb_serial_mod
        real(kind(1.d0)), intent(in) :: d(:) 
        integer, intent(out)  :: info
      end subroutine psb_dspscal
+     subroutine psb_zspscal(a,d,info)
+       use psb_spmat_type
+       type(psb_zspmat_type), intent(inout) :: a
+       complex(kind(1.d0)), intent(in) :: d(:) 
+       integer, intent(out)  :: info
+     end subroutine psb_zspscal
   end interface
 
 
@@ -166,6 +255,14 @@ module psb_serial_mod
        integer, intent(out)  :: info
        integer, intent(in), optional :: iaux
      end subroutine psb_dspinfo
+     subroutine psb_zspinfo(ireq,a,ires,info,iaux)
+       use psb_spmat_type
+       type(psb_zspmat_type), intent(in) :: a
+       integer, intent(in)       :: ireq
+       integer, intent(out)      :: ires
+       integer, intent(out)  :: info
+       integer, intent(in), optional :: iaux
+     end subroutine psb_zspinfo
   end interface
 
   interface psb_spgtrow
@@ -179,6 +276,16 @@ module psb_serial_mod
        integer, intent(in), optional :: lrw
        integer, intent(out)  :: info
      end subroutine psb_dspgtrow
+     subroutine psb_zspgtrow(irw,a,b,info,append,iren,lrw)
+       use psb_spmat_type
+       type(psb_zspmat_type), intent(in) :: a
+       integer, intent(in)       :: irw
+       type(psb_zspmat_type), intent(inout)    :: b
+       logical, intent(in), optional :: append
+       integer, intent(in), target, optional :: iren(:)
+       integer, intent(in), optional :: lrw
+       integer, intent(out)  :: info
+     end subroutine psb_zspgtrow
   end interface
 
   interface psb_neigh
@@ -191,6 +298,15 @@ module psb_serial_mod
        integer, intent(out)  :: info
        integer, optional, intent(in) :: lev 
      end subroutine psb_dneigh
+     subroutine psb_zneigh(a,idx,neigh,n,info,lev)
+       use psb_spmat_type
+       type(psb_zspmat_type), intent(in) :: a   
+       integer, intent(in)       :: idx 
+       integer, intent(out)      :: n   
+       integer, pointer          :: neigh(:)
+       integer, intent(out)  :: info
+       integer, optional, intent(in) :: lev 
+     end subroutine psb_zneigh
   end interface
 
   interface psb_coins
@@ -202,6 +318,14 @@ module psb_serial_mod
        type(psb_dspmat_type), intent(inout) :: a
        integer, intent(out) :: info
      end subroutine psb_dcoins
+     subroutine psb_zcoins(nz,ia,ja,val,a,gtl,imin,imax,jmin,jmax,info)
+       use psb_spmat_type
+       integer, intent(in) :: nz, imin,imax,jmin,jmax
+       integer, intent(in) :: ia(:),ja(:),gtl(:)
+       complex(kind(1.d0)), intent(in) :: val(:)
+       type(psb_zspmat_type), intent(inout) :: a
+       integer, intent(out) :: info
+     end subroutine psb_zcoins
   end interface
 
 
@@ -210,6 +334,10 @@ module psb_serial_mod
        use psb_spmat_type
        type(psb_dspmat_type) :: a,b,c
      end subroutine psb_dsymbmm
+     subroutine psb_zsymbmm(a,b,c)
+       use psb_spmat_type
+       type(psb_zspmat_type) :: a,b,c
+     end subroutine psb_zsymbmm
   end interface
 
   interface psb_numbmm
@@ -217,6 +345,10 @@ module psb_serial_mod
        use psb_spmat_type
        type(psb_dspmat_type) :: a,b,c
      end subroutine psb_dnumbmm
+     subroutine psb_znumbmm(a,b,c)
+       use psb_spmat_type
+       type(psb_zspmat_type) :: a,b,c
+     end subroutine psb_znumbmm
   end interface
 
   interface psb_transp
@@ -226,6 +358,12 @@ module psb_serial_mod
        integer, optional :: c
        character(len=*), optional :: fmt
      end subroutine psb_dtransp
+     subroutine psb_ztransp(a,b,c,fmt)
+       use psb_spmat_type
+       type(psb_zspmat_type) :: a,b
+       integer, optional :: c
+       character(len=*), optional :: fmt
+     end subroutine psb_ztransp
   end interface
 
   interface psb_rwextd
@@ -236,6 +374,13 @@ module psb_serial_mod
        integer, intent(out)         :: info
        type(psb_dspmat_type), intent(in), optional  :: b
      end subroutine psb_drwextd
+     subroutine psb_zrwextd(nr,a,info,b)
+       use psb_spmat_type
+       integer, intent(in) :: nr
+       type(psb_zspmat_type), intent(inout) :: a
+       integer, intent(out)         :: info
+       type(psb_zspmat_type), intent(in), optional  :: b
+     end subroutine psb_zrwextd
   end interface
 
   interface psb_csnmi
@@ -245,6 +390,12 @@ module psb_serial_mod
        integer, intent(out)       :: info
        character, optional        :: trans
      end function psb_dcsnmi
+     real(kind(1.d0)) function psb_zcsnmi(a,info,trans)
+       use psb_spmat_type
+       type(psb_zspmat_type), intent(in)  :: a
+       integer, intent(out)       :: info
+       character, optional        :: trans
+     end function psb_zcsnmi
   end interface
 
 end module psb_serial_mod

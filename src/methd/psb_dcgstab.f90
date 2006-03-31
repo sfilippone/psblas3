@@ -109,7 +109,6 @@ Subroutine psb_dcgstab(a,prec,b,x,eps,desc_a,info,&
   Integer            :: itx, i, isvch, ich, icontxt, err_act, int_err(5),ii
   Integer            :: listop
   Logical            :: do_renum_left
-  Real(Kind(1.d0)), Parameter :: one=1.d0, zero=0.d0, epstol=1.d-35
   Real(Kind(1.d0)) :: alpha, beta, rho, rho_old, rni, xni, bni, ani,& 
        & sigma, omega, tau, rn0, bn2
 !!$  Integer   istpb, istpe, ifctb, ifcte, imerr, irank, icomm,immb,imme
@@ -216,16 +215,16 @@ Subroutine psb_dcgstab(a,prec,b,x,eps,desc_a,info,&
 !!$ 
     If (itx >= litmax) Exit restart  
     it = 0      
-    Call psb_geaxpby(one,b,zero,r,desc_a,info)
-    Call psb_spmm(-one,a,x,one,r,desc_a,info,work=aux)
-    Call psb_geaxpby(one,r,zero,q,desc_a,info)
+    Call psb_geaxpby(done,b,dzero,r,desc_a,info)
+    Call psb_spmm(-done,a,x,done,r,desc_a,info,work=aux)
+    Call psb_geaxpby(done,r,dzero,q,desc_a,info)
     if (info /= 0) Then 
        info=4011
        call psb_errpush(info,name)
        goto 9999
     End If
     
-    rho = zero
+    rho = dzero
     If (debug) Write(*,*) 'On entry to AMAX: B: ',Size(b)
     
 !
@@ -287,37 +286,37 @@ Subroutine psb_dcgstab(a,prec,b,x,eps,desc_a,info,&
 !!$    call blacs_barrier(icontxt,'All') ! to be removed
 !!$      write(0,'(i2," rho old ",2(f,2x))')myrow,rho,rho_old
 !!$    call blacs_barrier(icontxt,'All') ! to be removed
-      If (rho==zero) Then
+      If (rho==dzero) Then
          If (debug) Write(0,*) 'Bi-CGSTAB Itxation breakdown R',rho
         Exit iteration
       Endif
 
       If (it==1) Then
-        Call psb_geaxpby(one,r,zero,p,desc_a,info)
+        Call psb_geaxpby(done,r,dzero,p,desc_a,info)
       Else
         beta = (rho/rho_old)*(alpha/omega)
-        Call psb_geaxpby(-omega,v,one,p,desc_a,info)
-        Call psb_geaxpby(one,r,beta,p,desc_a,info)
+        Call psb_geaxpby(-omega,v,done,p,desc_a,info)
+        Call psb_geaxpby(done,r,beta,p,desc_a,info)
       End If
 
       Call psb_prc_aply(prec,p,f,desc_a,info,work=aux)
 
-      Call psb_spmm(one,a,f,zero,v,desc_a,info,&
+      Call psb_spmm(done,a,f,dzero,v,desc_a,info,&
            & work=aux)
 
       sigma = psb_gedot(q,v,desc_a,info)
-      If (sigma==zero) Then
+      If (sigma==dzero) Then
          If (debug) Write(0,*) 'Bi-CGSTAB Iteration breakdown S1', sigma
          Exit iteration
       Endif
       
       alpha = rho/sigma
-      Call psb_geaxpby(one,r,zero,s,desc_a,info)
+      Call psb_geaxpby(done,r,dzero,s,desc_a,info)
       if(info.ne.0) then
          call psb_errpush(4010,name,a_err='psb_geaxpby')
          goto 9999
       end if
-      Call psb_geaxpby(-alpha,v,one,s,desc_a,info)
+      Call psb_geaxpby(-alpha,v,done,s,desc_a,info)
       if(info.ne.0) then
          call psb_errpush(4010,name,a_err='psb_geaxpby')
          goto 9999
@@ -329,7 +328,7 @@ Subroutine psb_dcgstab(a,prec,b,x,eps,desc_a,info,&
          goto 9999
       end if
 
-      Call psb_spmm(one,a,z,zero,t,desc_a,info,&
+      Call psb_spmm(done,a,z,dzero,t,desc_a,info,&
            & work=aux)
 
       if(info.ne.0) then
@@ -338,7 +337,7 @@ Subroutine psb_dcgstab(a,prec,b,x,eps,desc_a,info,&
       end if
       
       sigma = psb_gedot(t,t,desc_a,info)
-      If (sigma==zero) Then
+      If (sigma==dzero) Then
          If (debug) Write(0,*) 'BI-CGSTAB ITERATION BREAKDOWN S2', sigma
         Exit iteration
       Endif
@@ -346,15 +345,15 @@ Subroutine psb_dcgstab(a,prec,b,x,eps,desc_a,info,&
       tau  = psb_gedot(t,s,desc_a,info)
       omega = tau/sigma
       
-      If (omega==zero) Then
+      If (omega==dzero) Then
          If (debug) Write(0,*) 'BI-CGSTAB ITERATION BREAKDOWN O',omega
         Exit iteration
       Endif
 
-      Call psb_geaxpby(alpha,f,one,x,desc_a,info)
-      Call psb_geaxpby(omega,z,one,x,desc_a,info)
-      Call psb_geaxpby(one,s,zero,r,desc_a,info)
-      Call psb_geaxpby(-omega,t,one,r,desc_a,info)
+      Call psb_geaxpby(alpha,f,done,x,desc_a,info)
+      Call psb_geaxpby(omega,z,done,x,desc_a,info)
+      Call psb_geaxpby(done,s,dzero,r,desc_a,info)
+      Call psb_geaxpby(-omega,t,done,r,desc_a,info)
       
       If (listop == 1) Then 
         rni = psb_geamax(r,desc_a,info)

@@ -80,6 +80,8 @@ C
 
       real(kind(1.d0)), parameter :: psb_colrow_=0.33, psb_percent_=0.7
       real(kind(1.d0)), parameter :: dzero=0.d0, done=1.d0
+      complex(kind(1.d0)), parameter :: zzero=(0.d0,0.0d0)
+      complex(kind(1.d0)), parameter :: zone=(1.d0,0.0d0)
 
       character, parameter :: psb_all_='A',  psb_topdef_=' '
       character(len=5) :: psb_fidef_='CSR'

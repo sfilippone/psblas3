@@ -41,6 +41,7 @@ subroutine psb_dspscal(a,d,info)
   use psb_spmat_type
   use psb_error_mod
   use psb_const_mod
+  use psb_string_mod
   implicit none
 
   type(psb_dspmat_type), intent(inout) :: a
@@ -54,33 +55,33 @@ subroutine psb_dspscal(a,d,info)
   info  = 0
   call psb_erractionsave(err_act)
 
+  select case(toupper(a%fida(1:3)))
+  case  ('CSR')
 
-  if (a%fida == 'CSR') then 
+    do i=1, a%m
+      do j=a%ia2(i),a%ia2(i+1)-1
+        a%aspk(j) = a%aspk(j) * d(i)
+      end do
+    end do
 
-     do i=1, a%m
-        do j=a%ia2(i),a%ia2(i+1)-1
-           a%aspk(j) = a%aspk(j) * d(i)
-        end do
-     end do
+  case ('COO') 
 
-  else if (a%fida == 'COO') then 
+    do i=1,a%infoa(psb_nnz_)
+      j=a%ia1(i)
+      a%aspk(i) = a%aspk(i) * d(j)
+    enddo
 
-     do i=1,a%infoa(psb_nnz_)
-        j=a%ia1(i)
-        a%aspk(i) = a%aspk(i) * d(j)
-     enddo
-
-  else if (a%fida == 'JAD') then 
-     info=135
-     ch_err=a%fida(1:3)
-     call psb_errpush(info,name,a_err=ch_err)
-     goto 9999
-  else
-     info=136
-     ch_err=a%fida(1:3)
-     call psb_errpush(info,name,a_err=ch_err)
-     goto 9999
-  end if
+  case ('JAD') 
+    info=135
+    ch_err=a%fida(1:3)
+    call psb_errpush(info,name,a_err=ch_err)
+    goto 9999
+  case default
+    info=136
+    ch_err=a%fida(1:3)
+    call psb_errpush(info,name,a_err=ch_err)
+    goto 9999
+  end select
 
   call psb_erractionrestore(err_act)
   return

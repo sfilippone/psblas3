@@ -126,9 +126,9 @@ subroutine psb_dmlprc_bld(a,desc_a,p,info)
   case(f_ilu_n_)      
     call psb_check_def(p%iprcparm(ilu_fill_in_),'Level',0,is_legal_ml_lev)
   case(f_ilu_e_)                 
-    call psb_check_def(p%dprcparm(fact_eps_),'Eps',0.0d0,is_legal_ml_eps)
+    call psb_check_def(p%dprcparm(fact_eps_),'Eps',dzero,is_legal_ml_eps)
   end select
-  call psb_check_def(p%dprcparm(smooth_omega_),'omega',0.0d0,is_legal_omega)
+  call psb_check_def(p%dprcparm(smooth_omega_),'omega',dzero,is_legal_omega)
   call psb_check_def(p%iprcparm(jac_sweeps_),'Jacobi sweeps',&
        & 1,is_legal_jac_sweeps)
 

@@ -51,11 +51,10 @@ subroutine psb_dprc_aply(prec,x,y,desc_data,info,trans, work)
   real(kind(0.d0)), optional, target  :: work(:)
 
   ! Local variables
-  character     ::trans_ 
+  character     :: trans_ 
   real(kind(1.d0)), pointer :: work_(:)
   integer :: icontxt,nprow,npcol,me,mycol,err_act, int_err(5)
   logical,parameter                 :: debug=.false., debugprt=.false.
-  real(kind(1.d0)), parameter       :: one=1.d0, zero=0.d0
   external mpi_wtime
   character(len=20)   :: name, ch_err
 
@@ -116,14 +115,14 @@ subroutine psb_dprc_aply(prec,x,y,desc_data,info,trans, work)
   end if
   if (size(prec%baseprecv) >1) then 
     if (debug) write(0,*) 'Into mlprc_aply',size(x),size(y)
-    call psb_mlprc_aply(prec%baseprecv,x,zero,y,desc_data,trans_,work_,info)
+    call psb_mlprc_aply(prec%baseprecv,x,dzero,y,desc_data,trans_,work_,info)
     if(info /= 0) then
       call psb_errpush(4010,name,a_err='psb_dmlprc_aply')
       goto 9999
     end if
 
   else  if (size(prec%baseprecv) == 1) then 
-    call psb_baseprc_aply(prec%baseprecv(1),x,zero,y,desc_data,trans_, work_,info)
+    call psb_baseprc_aply(prec%baseprecv(1),x,dzero,y,desc_data,trans_, work_,info)
   else 
     write(0,*) 'Inconsistent preconditioner: size of baseprecv???' 
   endif
@@ -200,7 +199,6 @@ subroutine psb_dprc_aply1(prec,x,desc_data,info,trans)
   integer, intent(out)              :: info
   character(len=1), optional        :: trans
   logical,parameter                 :: debug=.false., debugprt=.false.
-  real(kind(1.d0)), parameter       :: one=1.d0, zero=0.d0
 
   interface 
     subroutine psb_dprc_aply(prec,x,y,desc_data,info,trans, work)

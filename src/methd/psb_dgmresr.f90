@@ -118,7 +118,6 @@ Subroutine psb_dgmresr(a,prec,b,x,eps,desc_a,info,&
   Integer, Parameter :: irmax = 8
   Integer            :: itx, i, isvch, ich, icontxt,listop, err_act
   Logical            :: do_renum_left,inner_stop
-  Real(Kind(1.d0)), Parameter :: one=1.d0, zero=0.d0, epstol=1.d-35
   Logical, Parameter :: debug = .false.
   Real(Kind(1.d0)) :: alpha, beta, rho, rho_old, rni, xni, bni, ani,bn2,& 
        & omega, tau 
@@ -226,13 +225,13 @@ Subroutine psb_dgmresr(a,prec,b,x,eps,desc_a,info,&
 !!$ 
     If (debug) Write(0,*) 'restart: ',itx,it
     it = 0      
-    Call psb_geaxpby(one,b,zero,v(:,1),desc_a,info)
+    Call psb_geaxpby(done,b,dzero,v(:,1),desc_a,info)
     if (info.ne.0) Then 
        info=4011 
        call psb_errpush(info,name)
        goto 9999
     End If
-    Call psb_spmm(-one,a,x,one,v(:,1),desc_a,info,work=aux)
+    Call psb_spmm(-done,a,x,done,v(:,1),desc_a,info,work=aux)
     
     call psb_prc_aply(prec,v(:,1),desc_a,info)
     rs(1) = psb_genrm2(v(:,1),desc_a,info)
@@ -242,7 +241,7 @@ Subroutine psb_dgmresr(a,prec,b,x,eps,desc_a,info,&
        goto 9999
     End If
 
-    scal=one/rs(1)
+    scal=done/rs(1)
     If (debug) Write(0,*) 'on entry to amax: b: ',Size(b),rs(1),scal
 
     if (listop == 1) then 
@@ -278,16 +277,16 @@ Subroutine psb_dgmresr(a,prec,b,x,eps,desc_a,info,&
     inner:  Do i=1,nl
       itx  = itx + 1
 
-      Call psb_spmm(one,a,v(:,i),zero,w,desc_a,info,work=aux)
+      Call psb_spmm(done,a,v(:,i),dzero,w,desc_a,info,work=aux)
       call psb_prc_aply(prec,w,desc_a,info)
 
       do k = 1, i
         h(k,i) = psb_gedot(v(:,k),w,desc_a,info)
-        call psb_geaxpby(-h(k,i),v(:,k),one,w,desc_a,info)
+        call psb_geaxpby(-h(k,i),v(:,k),done,w,desc_a,info)
       end do
       h(i+1,i) = psb_genrm2(w,desc_a,info)
-      scal=one/h(i+1,i)
-      call psb_geaxpby(scal,w,zero,v(:,i+1),desc_a,info)
+      scal=done/h(i+1,i)
+      call psb_geaxpby(scal,w,dzero,v(:,i+1),desc_a,info)
       do k=2,i
         rr(k-1,i) =  c(k-1)*h(k-1,i) + s(k-1)*h(k,i)
         rr(k,i)   = -s(k-1)*h(k-1,i) + c(k-1)*h(k,i)
@@ -320,20 +319,20 @@ Subroutine psb_dgmresr(a,prec,b,x,eps,desc_a,info,&
       endif
 
       if (rerr < eps ) then 
-        call dtrsm('l','u','n','n',i,1,one,rr,size(rr,1),rs,nl)
+        call dtrsm('l','u','n','n',i,1,done,rr,size(rr,1),rs,nl)
         if (debug) write(0,*) 'Rebuild x-> RS:',rs(21:nl)
         do k=1, i
-          call psb_geaxpby(rs(k),v(:,k),one,x,desc_a,info)
+          call psb_geaxpby(rs(k),v(:,k),done,x,desc_a,info)
         end do
         exit restart
       end if
 
     end Do inner
     if (debug) write(0,*) 'Before DTRSM :',rs(1:nl)
-    call dtrsm('l','u','n','n',nl,1,one,rr,size(rr,1),rs,nl)
+    call dtrsm('l','u','n','n',nl,1,done,rr,size(rr,1),rs,nl)
     if (debug) write(0,*) 'Rebuild x-> RS:',rs(21:nl)
     do k=1, nl
-      call psb_geaxpby(rs(k),v(:,k),one,x,desc_a,info)
+      call psb_geaxpby(rs(k),v(:,k),done,x,desc_a,info)
     end do
      
   End Do restart

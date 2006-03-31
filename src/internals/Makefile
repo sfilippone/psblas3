@@ -7,7 +7,8 @@ FOBJS = psi_compute_size.o psi_crea_bnd_elem.o psi_crea_index.o \
 COBJS = avltree.o srcht.o
 
 MPFOBJS = psi_dswapdata.o psi_dswaptran.o psi_iswapdata.o \
-	psi_iswaptran.o psi_extrct_dl.o psi_desc_index.o
+	psi_iswaptran.o psi_extrct_dl.o psi_desc_index.o\
+	psi_zswapdata.o psi_zswaptran.o 
 INCDIRS = -I ../../lib -I .
 LIBDIR = ../../lib
 

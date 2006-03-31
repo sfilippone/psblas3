@@ -71,19 +71,19 @@ Availability:
 
 
 #ifdef Add_
-#define psb_umf_factor_ psb_umf_factor_
-#define psb_umf_solve_  psb_umf_solve_
-#define psb_umf_free_   psb_umf_free_
+#define psb_dumf_factor_ psb_dumf_factor_
+#define psb_dumf_solve_  psb_dumf_solve_
+#define psb_dumf_free_   psb_dumf_free_
 #endif
 #ifdef AddDouble_
-#define psb_umf_factor_ psb_umf_factor__
-#define psb_umf_solve_  psb_umf_solve__
-#define psb_umf_free_   psb_umf_free__
+#define psb_dumf_factor_ psb_dumf_factor__
+#define psb_dumf_solve_  psb_dumf_solve__
+#define psb_dumf_free_   psb_dumf_free__
 #endif
 #ifdef NoChange
-#define psb_umf_factor_ psb_umf_factor
-#define psb_umf_solve_  psb_umf_solve
-#define psb_umf_free_   psb_umf_free
+#define psb_dumf_factor_ psb_dumf_factor
+#define psb_dumf_solve_  psb_dumf_solve
+#define psb_dumf_free_   psb_dumf_free
 #endif
 
 
@@ -99,7 +99,7 @@ typedef int fptr;  /* 32-bit by default */
 #endif
 
 void
-psb_umf_factor_(int *n, int *nnz,
+psb_dumf_factor_(int *n, int *nnz,
                  double *values, int *rowind, int *colptr,
 #ifdef Have_UMF_		 
 		 fptr *symptr, 
@@ -156,7 +156,7 @@ psb_umf_factor_(int *n, int *nnz,
 
 
 void
-psb_umf_solve_(int *itrans, int *n,  
+psb_dumf_solve_(int *itrans, int *n,  
                  double *x,  double *b, int *ldb,
 #ifdef Have_UMF_		 
 		 fptr *numptr, 
@@ -197,7 +197,7 @@ psb_umf_solve_(int *itrans, int *n,
 
 
 void
-psb_umf_free_(
+psb_dumf_free_(
 #ifdef Have_UMF_		 
 		 fptr *symptr, 
 		 fptr *numptr, 

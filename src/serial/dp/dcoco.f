@@ -245,9 +245,9 @@ c     ... sum the duplicated element ...
           
         else if (descra(1:1).eq.'S' .and. descra(2:2).eq.'U') then
 
-          do 20 k = 1, m
-            p2(k) = k
- 20       continue
+          ierror = 3021
+          call fcpsb_errpush(ierror,name,int_val)
+          goto 9999
 
         else if (descra(1:1).eq.'T' .and. descra(2:2).eq.'U') then
           ierror = 3021

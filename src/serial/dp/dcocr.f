@@ -75,7 +75,7 @@ C
 
       CHECK_FLAG=IBITS(INFO(PSB_UPD_),1,2)
 c$$$      write(0,*) 'DCOCR FLAG ',info(psb_upd_),check_flag
-      IF (TRANS.EQ.'N') THEN
+      IF ((TRANS.EQ.'N').or.(TRANS.EQ.'n')) THEN
 
         SCALE  = (UNITD.EQ.'L') ! meaningless
         P1(1) = 0

@@ -1,6 +1,12 @@
 Changelog. A lot less detailed than usual, at least for past
 history. 
 
+2006/03/31: We declare RC2 now. Improved I/O routines in test/Fileread.
+
+2006/03/24: We have a complex version now, working (not necessarily bug free). 
+
+2006/03/15: Started move to complex version.  
+
 2006/03/01: Complete restructure of PREC section. 
 
 2006/02/01: New naming scheme.

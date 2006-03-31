@@ -85,6 +85,22 @@ Module psb_methd_mod
        integer, optional, intent(out)     :: iter
        real(kind(1.d0)), optional, intent(out) :: err
      end subroutine psb_dcgstab
+     subroutine psb_zcgstab(a,prec,b,x,eps,&
+	  & desc_a,info,itmax,iter,err,itrace,istop)
+       use psb_serial_mod
+       use psb_descriptor_type
+       use psb_prec_type
+       type(psb_zspmat_type), intent(in)  :: a
+       type(psb_desc_type), intent(in)    :: desc_a
+       complex(kind(1.d0)), intent(in)       :: b(:)
+       complex(kind(1.d0)), intent(inout)    :: x(:)
+       real(kind(1.d0)), intent(in)       :: eps
+       type(psb_zprec_type), intent(in)   :: prec
+       integer, intent(out)               :: info
+       integer, optional, intent(in)      :: itmax, itrace,istop
+       integer, optional, intent(out)     :: iter
+       real(kind(1.d0)), optional, intent(out) :: err
+     end subroutine psb_zcgstab
   end interface
 
   interface psb_bicgstabl
@@ -144,6 +160,22 @@ Module psb_methd_mod
       integer, optional, intent(out)     :: iter
       real(kind(1.d0)), optional, intent(out) :: err
     end subroutine psb_dcgs
+     subroutine psb_zcgs(a,prec,b,x,eps,&
+	  & desc_a,info,itmax,iter,err,itrace,istop)
+       use psb_serial_mod
+       use psb_descriptor_type
+       use psb_prec_type
+       type(psb_zspmat_type), intent(in)  :: a
+       type(psb_desc_type), intent(in)    :: desc_a
+       complex(kind(1.d0)), intent(in)       :: b(:)
+       complex(kind(1.d0)), intent(inout)    :: x(:)
+       real(kind(1.d0)), intent(in)       :: eps
+       type(psb_zprec_type), intent(in)   :: prec
+       integer, intent(out)               :: info
+       integer, optional, intent(in)      :: itmax, itrace,istop
+       integer, optional, intent(out)     :: iter
+       real(kind(1.d0)), optional, intent(out) :: err
+     end subroutine psb_zcgs
   end interface
 
 end module psb_methd_mod
