@@ -3,7 +3,7 @@ include ../../../Make.inc
 # The object files
 #
 
-FOBJS  = isr.o isrx.o lsame.o \
+FOBJS  = isr.o isrx.o \
 	mrgsrt.o isaperm.o ibsrch.o
 
 

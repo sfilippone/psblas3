@@ -31,10 +31,10 @@ C
       subroutine ibsrch(ipos,key,n,v)
       integer ipos, key, n
       integer v(n)
-
+      
       integer lb, ub, m
       
-
+      
       lb = 1 
       ub = n
       ipos = -1 
