@@ -32,54 +32,6 @@
 module psb_prec_mod
   use psb_prec_type
 
-  interface psb_bldaggrmat
-     subroutine psb_dbldaggrmat(a,desc_a,ac,p,desc_p,info)
-       use psb_prec_type
-       use psb_descriptor_type
-       use psb_spmat_type
-       type(psb_dspmat_type), intent(in), target  :: a
-       type(psb_desc_type), intent(in)            :: desc_a
-       type(psb_dspmat_type), intent(out), target :: ac
-       type(psb_dbaseprc_type), intent(inout)     :: p
-       type(psb_desc_type), intent(inout)         :: desc_p
-       integer, intent(out)                       :: info
-     end subroutine psb_dbldaggrmat
-     subroutine psb_zbldaggrmat(a,desc_a,ac,p,desc_p,info)
-       use psb_prec_type
-       use psb_descriptor_type
-       use psb_spmat_type
-       type(psb_zspmat_type), intent(in), target  :: a
-       type(psb_desc_type), intent(in)            :: desc_a
-       type(psb_zspmat_type), intent(out), target :: ac
-       type(psb_zbaseprc_type), intent(inout)     :: p
-       type(psb_desc_type), intent(inout)         :: desc_p
-       integer, intent(out)                       :: info
-     end subroutine psb_zbldaggrmat
-  end interface
-  
-
-interface psb_genaggrmap
-   subroutine psb_dgenaggrmap(aggr_type,a,desc_a,nlaggr,ilaggr,info)
-     use psb_spmat_type
-     use psb_descriptor_type
-     implicit none
-     integer, intent(in)               :: aggr_type
-     type(psb_dspmat_type), intent(in) :: a
-     type(psb_desc_type), intent(in)   :: desc_a
-     integer, pointer                  :: ilaggr(:),nlaggr(:)
-     integer, intent(out)              :: info
-   end subroutine psb_dgenaggrmap
-   subroutine psb_zgenaggrmap(aggr_type,a,desc_a,nlaggr,ilaggr,info)
-     use psb_spmat_type
-     use psb_descriptor_type
-     implicit none
-     integer, intent(in)               :: aggr_type
-     type(psb_zspmat_type), intent(in) :: a
-     type(psb_desc_type), intent(in)   :: desc_a
-     integer, pointer                  :: ilaggr(:),nlaggr(:)
-     integer, intent(out)              :: info
-   end subroutine psb_zgenaggrmap
-end interface
 
   interface psb_precbld
     subroutine psb_dprecbld(a,desc_a,prec,info,upd)
@@ -130,99 +82,70 @@ end interface
       integer, optional, intent(out)         :: ierr
     end subroutine psb_zprecset
   end interface
-  
+
 
   interface psb_precfree
-     subroutine psb_dprecfree(p,info)
-       use psb_descriptor_type
-       use psb_serial_mod
-       use psb_const_mod
-       use psb_prec_type
-       type(psb_dprec_type), intent(inout) :: p
-       integer, intent(out)                :: info
-     end subroutine psb_dprecfree
-     subroutine psb_zprecfree(p,info)
-       use psb_descriptor_type
-       use psb_serial_mod
-       use psb_const_mod
-       use psb_prec_type
-       type(psb_zprec_type), intent(inout) :: p
-       integer, intent(out)                :: info
-     end subroutine psb_zprecfree
+    subroutine psb_dprecfree(p,info)
+      use psb_descriptor_type
+      use psb_serial_mod
+      use psb_const_mod
+      use psb_prec_type
+      type(psb_dprec_type), intent(inout) :: p
+      integer, intent(out)                :: info
+    end subroutine psb_dprecfree
+    subroutine psb_zprecfree(p,info)
+      use psb_descriptor_type
+      use psb_serial_mod
+      use psb_const_mod
+      use psb_prec_type
+      type(psb_zprec_type), intent(inout) :: p
+      integer, intent(out)                :: info
+    end subroutine psb_zprecfree
   end interface
 
-  interface psb_asmatbld
-    Subroutine psb_dasmatbld(ptype,novr,a,blk,desc_data,upd,desc_p,info,outfmt)
-      use psb_serial_mod
-      Use psb_descriptor_type
-      Use psb_prec_type
-      integer, intent(in)                  :: ptype,novr
-      Type(psb_dspmat_type), Intent(in)    ::  a
-      Type(psb_dspmat_type), Intent(inout) ::  blk
-      Type(psb_desc_type), Intent(inout)   :: desc_p
-      Type(psb_desc_type), Intent(in)      :: desc_data 
-      Character, Intent(in)                :: upd
-      integer, intent(out)                 :: info
-      character(len=5), optional           :: outfmt
-    end Subroutine psb_dasmatbld
-    Subroutine psb_zasmatbld(ptype,novr,a,blk,desc_data,upd,desc_p,info,outfmt)
-      use psb_serial_mod
-      Use psb_descriptor_type
-      Use psb_prec_type
-      integer, intent(in)                  :: ptype,novr
-      Type(psb_zspmat_type), Intent(in)    ::  a
-      Type(psb_zspmat_type), Intent(inout) ::  blk
-      Type(psb_desc_type), Intent(inout)   :: desc_p
-      Type(psb_desc_type), Intent(in)      :: desc_data 
-      Character, Intent(in)                :: upd
-      integer, intent(out)                 :: info
-      character(len=5), optional           :: outfmt
-    end Subroutine psb_zasmatbld
- end interface
-
   interface psb_prc_aply
-     subroutine psb_dprc_aply(prec,x,y,desc_data,info,trans,work)
-       use psb_serial_mod
-       use psb_descriptor_type
-       use psb_prec_type
-       type(psb_desc_type),intent(in)    :: desc_data
-       type(psb_dprec_type), intent(in)  :: prec
-       real(kind(0.d0)),intent(inout)    :: x(:), y(:)
-       integer, intent(out)              :: info
-       character(len=1), optional        :: trans
-       real(kind(0.d0)),intent(inout), optional, target :: work(:)
-     end subroutine psb_dprc_aply
-     subroutine psb_dprc_aply1(prec,x,desc_data,info,trans)
-       use psb_serial_mod
-       use psb_descriptor_type
-       use psb_prec_type
-       type(psb_desc_type),intent(in)    :: desc_data
-       type(psb_dprec_type), intent(in)  :: prec
-       real(kind(0.d0)),intent(inout)    :: x(:)
-       integer, intent(out)              :: info
-       character(len=1), optional        :: trans
-     end subroutine psb_dprc_aply1
-     subroutine psb_zprc_aply(prec,x,y,desc_data,info,trans,work)
-       use psb_serial_mod
-       use psb_descriptor_type
-       use psb_prec_type
-       type(psb_desc_type),intent(in)    :: desc_data
-       type(psb_zprec_type), intent(in)  :: prec
-       complex(kind(0.d0)),intent(inout) :: x(:), y(:)
-       integer, intent(out)              :: info
-       character(len=1), optional        :: trans
-       complex(kind(0.d0)),intent(inout), optional, target :: work(:)
-     end subroutine psb_zprc_aply
-     subroutine psb_zprc_aply1(prec,x,desc_data,info,trans)
-       use psb_serial_mod
-       use psb_descriptor_type
-       use psb_prec_type
-       type(psb_desc_type),intent(in)    :: desc_data
-       type(psb_zprec_type), intent(in)  :: prec
-       complex(kind(0.d0)),intent(inout) :: x(:)
-       integer, intent(out)              :: info
-       character(len=1), optional        :: trans
-     end subroutine psb_zprc_aply1
+    subroutine psb_dprc_aply(prec,x,y,desc_data,info,trans,work)
+      use psb_serial_mod
+      use psb_descriptor_type
+      use psb_prec_type
+      type(psb_desc_type),intent(in)    :: desc_data
+      type(psb_dprec_type), intent(in)  :: prec
+      real(kind(0.d0)),intent(inout)    :: x(:), y(:)
+      integer, intent(out)              :: info
+      character(len=1), optional        :: trans
+      real(kind(0.d0)),intent(inout), optional, target :: work(:)
+    end subroutine psb_dprc_aply
+    subroutine psb_dprc_aply1(prec,x,desc_data,info,trans)
+      use psb_serial_mod
+      use psb_descriptor_type
+      use psb_prec_type
+      type(psb_desc_type),intent(in)    :: desc_data
+      type(psb_dprec_type), intent(in)  :: prec
+      real(kind(0.d0)),intent(inout)    :: x(:)
+      integer, intent(out)              :: info
+      character(len=1), optional        :: trans
+    end subroutine psb_dprc_aply1
+    subroutine psb_zprc_aply(prec,x,y,desc_data,info,trans,work)
+      use psb_serial_mod
+      use psb_descriptor_type
+      use psb_prec_type
+      type(psb_desc_type),intent(in)    :: desc_data
+      type(psb_zprec_type), intent(in)  :: prec
+      complex(kind(0.d0)),intent(inout) :: x(:), y(:)
+      integer, intent(out)              :: info
+      character(len=1), optional        :: trans
+      complex(kind(0.d0)),intent(inout), optional, target :: work(:)
+    end subroutine psb_zprc_aply
+    subroutine psb_zprc_aply1(prec,x,desc_data,info,trans)
+      use psb_serial_mod
+      use psb_descriptor_type
+      use psb_prec_type
+      type(psb_desc_type),intent(in)    :: desc_data
+      type(psb_zprec_type), intent(in)  :: prec
+      complex(kind(0.d0)),intent(inout) :: x(:)
+      integer, intent(out)              :: info
+      character(len=1), optional        :: trans
+    end subroutine psb_zprc_aply1
   end interface
 
 end module psb_prec_mod
