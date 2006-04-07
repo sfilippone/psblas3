@@ -165,17 +165,17 @@ subroutine psb_zins(m, n, x, ix, jx, blck, desc_a, info,&
   do i = 1, m
      !loop over all blck's rows
 
-     ! row actual block row 
-     glob_row=ix+i-1
-     if (glob_row > mglob) exit
-     loc_row=desc_a%glob_to_loc(glob_row)
-     if (loc_row.ge.1) then
-        ! this row belongs to me
-        ! copy i-th row of block blck in x
-	do col = 1, n
-	   x(loc_row,jx+col-1) = blck(iblock+i-1,jblock+col-1)
-	enddo
-     end if
+    ! row actual block row 
+    glob_row=ix+i-1
+    if (glob_row > mglob) exit
+    loc_row=desc_a%glob_to_loc(glob_row)
+    if (loc_row.ge.1) then
+      ! this row belongs to me
+      ! copy i-th row of block blck in x
+      do col = 1, n
+        x(loc_row,jx+col-1) = x(loc_row,jx+col-1) + blck(iblock+i-1,jblock+col-1)
+      enddo
+    end if
   enddo
 
   call psb_erractionrestore(err_act)
@@ -353,18 +353,18 @@ subroutine psb_zinsvm(m, x, ix, jx, blck, desc_a,info,&
   endif
 
   do i = 1, m
-     !loop over all blck's rows
+    !loop over all blck's rows
 
-     ! row actual block row 
-     glob_row=ix+i-1
-     if (glob_row > mglob) exit
+    ! row actual block row 
+    glob_row=ix+i-1
+    if (glob_row > mglob) exit
 
-     loc_row=desc_a%glob_to_loc(glob_row)
-     if (loc_row.ge.1) then
-        ! this row belongs to me
-        ! copy i-th row of block blck in x
-	x(loc_row,jx) = blck(iblock+i-1)
-     end if
+    loc_row=desc_a%glob_to_loc(glob_row)
+    if (loc_row.ge.1) then
+      ! this row belongs to me
+      ! copy i-th row of block blck in x
+      x(loc_row,jx) = x(loc_row,jx) + blck(iblock+i-1)
+    end if
   enddo
 
   call psb_erractionrestore(err_act)
@@ -530,25 +530,25 @@ subroutine psb_zinsvv(m, x, ix, blck, desc_a, info,&
   end if
 
   if (liflag == psb_upd_glb_) then 
-     do i = 1, m
-        !loop over all blck's rows
+    do i = 1, m
+      !loop over all blck's rows
 
-        ! row actual block row 
-        glob_row=ix+i-1
-        if (glob_row > mglob) exit
+      ! row actual block row 
+      glob_row=ix+i-1
+      if (glob_row > mglob) exit
 
-        loc_row=desc_a%glob_to_loc(glob_row)
-        if (loc_row.ge.1) then
-           ! this row belongs to me
-           ! copy i-th row of block blck in x
-           x(loc_row) = blck(iblock+i-1)
-        end if
-     enddo
+      loc_row=desc_a%glob_to_loc(glob_row)
+      if (loc_row.ge.1) then
+        ! this row belongs to me
+        ! copy i-th row of block blck in x
+        x(loc_row) = x(loc_row) +  blck(iblock+i-1)
+      end if
+    enddo
   else if (liflag == psb_upd_loc_) then 
-     k = min(ix+m-1,loc_rows)
-     do i=ix,k
-        x(i) = blck(i-ix+1)
-     enddo
+    k = min(ix+m-1,loc_rows)
+    do i=ix,k
+      x(i) = x(i) + blck(i-ix+1)
+    enddo
   else
      info=-1
      call psb_errpush(info,name)

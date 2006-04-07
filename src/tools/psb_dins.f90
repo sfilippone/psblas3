@@ -76,14 +76,14 @@ subroutine psb_dins(m, n, x, ix, jx, blck, desc_a, info,&
   name = 'psb_dins'
 
   if (.not.associated(desc_a%glob_to_loc)) then
-     info=3110
-     call psb_errpush(info,name)
-     return
+    info=3110
+    call psb_errpush(info,name)
+    return
   end if
   if ((.not.associated(desc_a%matrix_data))) then
-     int_err(1)=3110
-     call psb_errpush(info,name)
-     return
+    int_err(1)=3110
+    call psb_errpush(info,name)
+    return
   end if
 
   icontxt=desc_a%matrix_data(psb_ctxt_)
@@ -91,91 +91,91 @@ subroutine psb_dins(m, n, x, ix, jx, blck, desc_a, info,&
   ! check on blacs grid 
   call blacs_gridinfo(icontxt, nprow, npcol, me, mypcol)
   if (nprow.eq.-1) then
-     info = 2010
-     call psb_errpush(info,name)
-     goto 9999
+    info = 2010
+    call psb_errpush(info,name)
+    goto 9999
   else if (npcol.ne.1) then
-     info = 2030
-     int_err(1) = npcol
-     call psb_errpush(info,name,int_err)
-     goto 9999
+    info = 2030
+    int_err(1) = npcol
+    call psb_errpush(info,name,int_err)
+    goto 9999
   endif
 
   !... check parameters....
   if (m.lt.0) then
-     info = 10
-     int_err(1) = 1
-     int_err(2) = m
-     call psb_errpush(info,name,int_err)
-     goto 9999
+    info = 10
+    int_err(1) = 1
+    int_err(2) = m
+    call psb_errpush(info,name,int_err)
+    goto 9999
   else if (n.lt.0) then
-     info = 10
-     int_err(1) = 2
-     int_err(2) = n
-     call psb_errpush(info,name,int_err)
-     goto 9999
+    info = 10
+    int_err(1) = 2
+    int_err(2) = n
+    call psb_errpush(info,name,int_err)
+    goto 9999
   else if (ix.lt.1) then
-     info = 20
-     int_err(1) = 6
-     int_err(2) = ix
-     call psb_errpush(info,name,int_err)
-     goto 9999
+    info = 20
+    int_err(1) = 6
+    int_err(2) = ix
+    call psb_errpush(info,name,int_err)
+    goto 9999
   else if (jx.lt.1) then
-     info = 20
-     int_err(1) = 7
-     int_err(2) = jx
-     call psb_errpush(info,name,int_err)
-     goto 9999
+    info = 20
+    int_err(1) = 7
+    int_err(2) = jx
+    call psb_errpush(info,name,int_err)
+    goto 9999
   else if (.not.psb_is_ok_dec(desc_a%matrix_data(psb_dec_type_))) then
-     info = 3110
-     int_err(1) = desc_a%matrix_data(psb_dec_type_)
-     call psb_errpush(info,name,int_err)
-     goto 9999
+    info = 3110
+    int_err(1) = desc_a%matrix_data(psb_dec_type_)
+    call psb_errpush(info,name,int_err)
+    goto 9999
   else if (size(x, dim=1).lt.desc_a%matrix_data(psb_n_row_)) then
-     info = 310
-     int_err(1) = 5
-     int_err(2) = 4
-     call psb_errpush(info,name,int_err)
-     goto 9999
+    info = 310
+    int_err(1) = 5
+    int_err(2) = 4
+    call psb_errpush(info,name,int_err)
+    goto 9999
   else if (size(x, dim=2).lt.n) then
-     ! check if dimension of x is greater than dimension of submatrix
-     ! to insert
-     info = 320
-     int_err(1) = 2
-     int_err(2) = size(x, dim=2)
-     int_err(3) = n
-     call psb_errpush(info,name,int_err)
-     goto 9999
+    ! check if dimension of x is greater than dimension of submatrix
+    ! to insert
+    info = 320
+    int_err(1) = 2
+    int_err(2) = size(x, dim=2)
+    int_err(3) = n
+    call psb_errpush(info,name,int_err)
+    goto 9999
   endif
 
   loc_cols = desc_a%matrix_data(psb_n_col_)
   mglob    = desc_a%matrix_data(psb_m_)
   if (present(iblck)) then
-     iblock = iblck
+    iblock = iblck
   else
-     iblock = 1
+    iblock = 1
   endif
 
   if (present(jblck)) then
-     jblock = jblck
+    jblock = jblck
   else
-     jblock = 1
+    jblock = 1
   endif
 
   do i = 1, m
-     !loop over all blck's rows
+    !loop over all blck's rows
 
-     ! row actual block row 
-     glob_row=ix+i-1
-     if (glob_row > mglob) exit
-     loc_row=desc_a%glob_to_loc(glob_row)
-     if (loc_row.ge.1) then
-        ! this row belongs to me
-        ! copy i-th row of block blck in x
-	do col = 1, n
-	   x(loc_row,jx+col-1) = blck(iblock+i-1,jblock+col-1)
-	enddo
-     end if
+    ! row actual block row 
+    glob_row=ix+i-1
+    if (glob_row > mglob) exit
+    loc_row=desc_a%glob_to_loc(glob_row)
+    if (loc_row.ge.1) then
+      ! this row belongs to me
+      ! copy i-th row of block blck in x
+      do col = 1, n
+        x(loc_row,jx+col-1) = x(loc_row,jx+col-1) + blck(iblock+i-1,jblock+col-1)
+      enddo
+    end if
   enddo
 
   call psb_erractionrestore(err_act)
@@ -185,9 +185,9 @@ subroutine psb_dins(m, n, x, ix, jx, blck, desc_a, info,&
   call psb_erractionrestore(err_act)
 
   if (err_act.eq.act_ret) then
-     return
+    return
   else
-     call psb_error(icontxt)
+    call psb_error(icontxt)
   end if
   return
 
@@ -277,14 +277,14 @@ subroutine psb_dinsvm(m, x, ix, jx, blck, desc_a,info,&
   name = 'psb_dinsvm'
 
   if (.not.associated(desc_a%glob_to_loc)) then
-     info=3110
-     call psb_errpush(info,name)
-     return
+    info=3110
+    call psb_errpush(info,name)
+    return
   end if
   if ((.not.associated(desc_a%matrix_data))) then
-     int_err(1)=3110
-     call psb_errpush(info,name)
-     return
+    int_err(1)=3110
+    call psb_errpush(info,name)
+    return
   end if
 
   icontxt=desc_a%matrix_data(psb_ctxt_)
@@ -292,79 +292,79 @@ subroutine psb_dinsvm(m, x, ix, jx, blck, desc_a,info,&
   ! check on blacs grid 
   call blacs_gridinfo(icontxt, nprow, npcol, me, mypcol)
   if (nprow.eq.-1) then
-     info = 2010
-     call psb_errpush(info,name)
-     goto 9999
+    info = 2010
+    call psb_errpush(info,name)
+    goto 9999
   else if (npcol.ne.1) then
-     info = 2030
-     int_err(1) = npcol
-     call psb_errpush(info,name,int_err)
-     goto 9999
+    info = 2030
+    int_err(1) = npcol
+    call psb_errpush(info,name,int_err)
+    goto 9999
   endif
 
   !... check parameters....
   if (m.lt.0) then
-     info = 10
-     int_err(1) = 1
-     int_err(2) = m
-     call psb_errpush(info,name,int_err)
-     goto 9999
+    info = 10
+    int_err(1) = 1
+    int_err(2) = m
+    call psb_errpush(info,name,int_err)
+    goto 9999
   else if (ix.lt.1) then
-     info = 20
-     int_err(1) = 6
-     int_err(2) = ix
-     call psb_errpush(info,name,int_err)
-     goto 9999
+    info = 20
+    int_err(1) = 6
+    int_err(2) = ix
+    call psb_errpush(info,name,int_err)
+    goto 9999
   else if (jx.lt.1) then
-     info = 20
-     int_err(1) = 7
-     int_err(2) = jx
-     call psb_errpush(info,name,int_err)
-     goto 9999
+    info = 20
+    int_err(1) = 7
+    int_err(2) = jx
+    call psb_errpush(info,name,int_err)
+    goto 9999
   else if (.not.psb_is_ok_dec(desc_a%matrix_data(psb_dec_type_))) then
-     info = 3110
-     int_err(1) = desc_a%matrix_data(psb_dec_type_)
-     call psb_errpush(info,name,int_err)
-     goto 9999
+    info = 3110
+    int_err(1) = desc_a%matrix_data(psb_dec_type_)
+    call psb_errpush(info,name,int_err)
+    goto 9999
   else if (size(x, dim=1).lt.desc_a%matrix_data(psb_n_row_)) then
-     info = 310
-     int_err(1) = 5
-     int_err(2) = 4
-     call psb_errpush(info,name,int_err)
-     goto 9999
+    info = 310
+    int_err(1) = 5
+    int_err(2) = 4
+    call psb_errpush(info,name,int_err)
+    goto 9999
   else if (size(x, dim=2).lt.1) then
-     ! check if dimension of x is greater than dimension of submatrix
-     ! to insert
-     info = 320
-     int_err(1) = 2
-     int_err(2) = size(x, dim=2)
-     int_err(3) = 1
-     call psb_errpush(info,name,int_err)
-     goto 9999
+    ! check if dimension of x is greater than dimension of submatrix
+    ! to insert
+    info = 320
+    int_err(1) = 2
+    int_err(2) = size(x, dim=2)
+    int_err(3) = 1
+    call psb_errpush(info,name,int_err)
+    goto 9999
   endif
 
   loc_cols=desc_a%matrix_data(psb_n_col_)
   mglob    = desc_a%matrix_data(psb_m_)
 
   if (present(iblck)) then
-     iblock = iblck
+    iblock = iblck
   else
-     iblock = 1
+    iblock = 1
   endif
 
   do i = 1, m
-     !loop over all blck's rows
+    !loop over all blck's rows
 
-     ! row actual block row 
-     glob_row=ix+i-1
-     if (glob_row > mglob) exit
+    ! row actual block row 
+    glob_row=ix+i-1
+    if (glob_row > mglob) exit
 
-     loc_row=desc_a%glob_to_loc(glob_row)
-     if (loc_row.ge.1) then
-        ! this row belongs to me
-        ! copy i-th row of block blck in x
-	x(loc_row,jx) = blck(iblock+i-1)
-     end if
+    loc_row=desc_a%glob_to_loc(glob_row)
+    if (loc_row.ge.1) then
+      ! this row belongs to me
+      ! copy i-th row of block blck in x
+      x(loc_row,jx) = x(loc_row,jx) + blck(iblock+i-1)
+    end if
   enddo
 
   call psb_erractionrestore(err_act)
@@ -374,9 +374,9 @@ subroutine psb_dinsvm(m, x, ix, jx, blck, desc_a,info,&
   call psb_erractionrestore(err_act)
 
   if (err_act.eq.act_ret) then
-     return
+    return
   else
-     call psb_error(icontxt)
+    call psb_error(icontxt)
   end if
   return
 
@@ -463,14 +463,14 @@ subroutine psb_dinsvv(m, x, ix, blck, desc_a, info,&
   name = 'psb_dinsvv'
 
   if (.not.associated(desc_a%glob_to_loc)) then
-     info=3110
-     call psb_errpush(info,name)
-     return
+    info=3110
+    call psb_errpush(info,name)
+    return
   end if
   if ((.not.associated(desc_a%matrix_data))) then
-     int_err(1)=3110
-     call psb_errpush(info,name)
-     return
+    int_err(1)=3110
+    call psb_errpush(info,name)
+    return
   end if
 
   icontxt=desc_a%matrix_data(psb_ctxt_)
@@ -478,40 +478,40 @@ subroutine psb_dinsvv(m, x, ix, blck, desc_a, info,&
   ! check on blacs grid 
   call blacs_gridinfo(icontxt, nprow, npcol, me, mypcol)
   if (nprow.eq.-1) then
-     info = 2010
-     call psb_errpush(info,name)
-     goto 9999
+    info = 2010
+    call psb_errpush(info,name)
+    goto 9999
   else if (npcol.ne.1) then
-     info = 2030
-     int_err(1) = npcol
-     call psb_errpush(info,name,int_err)
-     goto 9999
+    info = 2030
+    int_err(1) = npcol
+    call psb_errpush(info,name,int_err)
+    goto 9999
   endif
 
   !... check parameters....
   if (m.lt.0) then
-     info = 10
-     int_err(1) = 1
-     int_err(2) = m
-     call psb_errpush(info,name,int_err)
-     goto 9999
+    info = 10
+    int_err(1) = 1
+    int_err(2) = m
+    call psb_errpush(info,name,int_err)
+    goto 9999
   else if (ix.lt.1) then
-     info = 20
-     int_err(1) = 6
-     int_err(2) = ix
-     call psb_errpush(info,name,int_err)
-     goto 9999
+    info = 20
+    int_err(1) = 6
+    int_err(2) = ix
+    call psb_errpush(info,name,int_err)
+    goto 9999
   else if (.not.psb_is_ok_dec(desc_a%matrix_data(psb_dec_type_))) then
-     info = 3110
-     int_err(1) = desc_a%matrix_data(psb_dec_type_)
-     call psb_errpush(info,name,int_err)
-     goto 9999
+    info = 3110
+    int_err(1) = desc_a%matrix_data(psb_dec_type_)
+    call psb_errpush(info,name,int_err)
+    goto 9999
   else if (size(x, dim=1).lt.desc_a%matrix_data(psb_n_row_)) then
-     info = 310
-     int_err(1) = 5
-     int_err(2) = 4
-     call psb_errpush(info,name,int_err)
-     goto 9999
+    info = 310
+    int_err(1) = 5
+    int_err(2) = 4
+    call psb_errpush(info,name,int_err)
+    goto 9999
   endif
 
   loc_rows=desc_a%matrix_data(psb_n_row_)
@@ -519,40 +519,40 @@ subroutine psb_dinsvv(m, x, ix, blck, desc_a, info,&
   mglob    = desc_a%matrix_data(psb_m_)
 
   if (present(iblck)) then
-     iblock = iblck
+    iblock = iblck
   else
-     iblock = 1
+    iblock = 1
   endif
   if (present(insflag)) then
-     liflag = insflag
+    liflag = insflag
   else
-     liflag = psb_upd_glb_
+    liflag = psb_upd_glb_
   end if
 
   if (liflag == psb_upd_glb_) then 
-     do i = 1, m
-        !loop over all blck's rows
+    do i = 1, m
+      !loop over all blck's rows
 
-        ! row actual block row 
-        glob_row=ix+i-1
-        if (glob_row > mglob) exit
+      ! row actual block row 
+      glob_row=ix+i-1
+      if (glob_row > mglob) exit
 
-        loc_row=desc_a%glob_to_loc(glob_row)
-        if (loc_row.ge.1) then
-           ! this row belongs to me
-           ! copy i-th row of block blck in x
-           x(loc_row) = blck(iblock+i-1)
-        end if
-     enddo
+      loc_row=desc_a%glob_to_loc(glob_row)
+      if (loc_row.ge.1) then
+        ! this row belongs to me
+        ! copy i-th row of block blck in x
+        x(loc_row) = x(loc_row) +  blck(iblock+i-1)
+      end if
+    enddo
   else if (liflag == psb_upd_loc_) then 
-     k = min(ix+m-1,loc_rows)
-     do i=ix,k
-        x(i) = blck(i-ix+1)
-     enddo
+    k = min(ix+m-1,loc_rows)
+    do i=ix,k
+      x(i) = x(i) + blck(i-ix+1)
+    enddo
   else
-     info=-1
-     call psb_errpush(info,name)
-     goto 9999
+    info=-1
+    call psb_errpush(info,name)
+    goto 9999
   endif
 
   call psb_erractionrestore(err_act)
@@ -562,9 +562,9 @@ subroutine psb_dinsvv(m, x, ix, blck, desc_a, info,&
   call psb_erractionrestore(err_act)
 
   if (err_act.eq.act_ret) then
-     return
+    return
   else
-     call psb_error(icontxt)
+    call psb_error(icontxt)
   end if
   return
 
