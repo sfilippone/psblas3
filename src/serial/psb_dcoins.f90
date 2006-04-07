@@ -197,7 +197,7 @@ contains
     if (nza >= nzl) then 
       do i=1, nz 
         nza = nza + 1 
-        a%aspk(nza) = val(i)
+        aspk(nza) = val(i)
       end do
     else
       do i=1, nz 
@@ -208,7 +208,7 @@ contains
           ic = gtl(ic) 
           if ((ir >=imin).and.(ir<=imax).and.(ic>=jmin).and.(ic<=jmax)) then 
             nza = nza + 1 
-            a%aspk(nza) = val(i)
+            aspk(nza) = val(i)
           end if
         end if
       end do
@@ -239,9 +239,9 @@ contains
         ic = gtl(ic) 
         if ((ir >=imin).and.(ir<=imax).and.(ic>=jmin).and.(ic<=jmax)) then 
           nza = nza + 1 
-          a%ia1(nza) = ir
-          a%ia2(nza) = ic
-          a%aspk(nza) = val(i)
+          ia1(nza) = ir
+          ia2(nza) = ic
+          aspk(nza) = val(i)
         end if
       end if
     end do
