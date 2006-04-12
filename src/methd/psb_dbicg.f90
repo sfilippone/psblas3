@@ -103,7 +103,7 @@ subroutine psb_dbicg(a,prec,b,x,eps,desc_a,info,&
   integer, pointer           :: iperm(:), ipnull(:), ipsave(:), int_err(:)
   real(kind(1.d0)) ::rerr
   integer       ::litmax, liter, naux, m, mglob, it, itrac,&
-       & nprows,npcols,me,mecol, n_row, n_col, listop, err_act
+       & nprows,npcols,me,mecol, n_row, n_col, istop_, err_act
   character     ::diagl, diagu
   logical, parameter :: debug = .false.
   logical, parameter :: exchange=.true., noexchange=.false.  
@@ -134,13 +134,13 @@ subroutine psb_dbicg(a,prec,b,x,eps,desc_a,info,&
 
 
   if (present(istop)) then 
-    listop = istop 
+    istop_ = istop 
   else
-    listop = 1
+    istop_ = 1
   endif
   !
-  !  listop = 1:  normwise backward error, infinity norm 
-  !  listop = 2:  ||r||/||b||   norm 2 
+  !  istop_ = 1:  normwise backward error, infinity norm 
+  !  istop_ = 2:  ||r||/||b||   norm 2 
   !
 !!$
 !!$  if ((prec%prec < min_prec_).or.(prec%prec > max_prec_) ) then
@@ -149,10 +149,10 @@ subroutine psb_dbicg(a,prec,b,x,eps,desc_a,info,&
 !!$    return
 !!$  endif
 
-  if ((listop < 1 ).or.(listop > 2 ) ) then
-    write(0,*) 'psb_bicg: invalid istop',listop 
+  if ((istop_ < 1 ).or.(istop_ > 2 ) ) then
+    write(0,*) 'psb_bicg: invalid istop',istop_ 
     info=5001
-    int_err=listop
+    int_err=istop_
     err=info
     call psb_errpush(info,name,i_err=int_err)
     goto 9999
@@ -197,10 +197,10 @@ subroutine psb_dbicg(a,prec,b,x,eps,desc_a,info,&
   diagu  = 'u'
   itx   = 0
   
-  if (listop == 1) then 
+  if (istop_ == 1) then 
      ani = psb_spnrmi(a,desc_a,info)
      bni = psb_geamax(b,desc_a,info)
-  else if (listop == 2) then 
+  else if (istop_ == 2) then 
      bn2 = psb_genrm2(b,desc_a,info)
   endif
  
@@ -228,10 +228,10 @@ subroutine psb_dbicg(a,prec,b,x,eps,desc_a,info,&
 
     rho = dzero
     if (debug) write(*,*) 'on entry to amax: b: ',size(b)
-    if (listop == 1) then 
+    if (istop_ == 1) then 
       rni = psb_geamax(r,desc_a,info)
       xni = psb_geamax(x,desc_a,info)
-    else if (listop == 2) then 
+    else if (istop_ == 2) then 
       rni = psb_genrm2(r,desc_a,info)
     endif
     if(info.ne.0) then
@@ -240,14 +240,14 @@ subroutine psb_dbicg(a,prec,b,x,eps,desc_a,info,&
        goto 9999
     end if
 
-    if (listop == 1) then 
+    if (istop_ == 1) then 
       xni  = psb_geamax(x,desc_a,info)
       rerr =  rni/(ani*xni+bni)
       if (itrac /= -1) then 
         if (me.eq.0) write(itrac,'(a,i4,5(2x,es10.4))') 'bicg: ',itx,rerr,rni,bni,&
              &xni,ani
       endif
-    else  if (listop == 2) then 
+    else  if (istop_ == 2) then 
       rerr = rni/bn2
       if (itrac /= -1) then 
         if (me.eq.0) write(itrac,'(a,i4,3(2x,es10.4))') 'bicg: ',itx,rerr,rni,bn2
@@ -307,21 +307,21 @@ subroutine psb_dbicg(a,prec,b,x,eps,desc_a,info,&
       call psb_geaxpby(-alpha,qt,done,rt,desc_a,info)
 
 
-      if (listop == 1) then 
+      if (istop_ == 1) then 
         rni = psb_geamax(r,desc_a,info)
         xni = psb_geamax(x,desc_a,info)
-      else if (listop == 2) then 
+      else if (istop_ == 2) then 
         rni = psb_genrm2(r,desc_a,info)
       endif
 
-      if (listop == 1) then 
+      if (istop_ == 1) then 
         xni  = psb_geamax(x,desc_a,info)
         rerr =  rni/(ani*xni+bni)
         if (itrac /= -1) then 
           if (me.eq.0) write(itrac,'(a,i4,5(2x,es10.4))') 'bicg: ',itx,rerr,rni,bni,&
                &xni,ani
         endif
-      else  if (listop == 2) then 
+      else  if (istop_  == 2) then 
         rerr = rni/bn2
         if (itrac /= -1) then 
           if (me.eq.0) write(itrac,'(a,i4,3(2x,es10.4))') 'bicg: ',itx,rerr,rni,bn2

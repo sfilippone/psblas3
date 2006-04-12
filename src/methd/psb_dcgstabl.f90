@@ -114,7 +114,7 @@ Subroutine psb_dcgstabl(a,prec,b,x,eps,desc_a,info,&
   Character     ::diagl, diagu
   Logical, Parameter :: exchange=.True., noexchange=.False.  
   Integer, Parameter :: irmax = 8
-  Integer            :: itx, i, isvch, ich, icontxt,listop,j, int_err(5)
+  Integer            :: itx, i, isvch, ich, icontxt,istop_,j, int_err(5)
   Logical            :: do_renum_left
   Logical, Parameter :: debug = .False.
   Real(Kind(1.d0)) :: alpha, beta, rho, rho_old, rni, xni, bni, ani,bn2,& 
@@ -136,19 +136,19 @@ Subroutine psb_dcgstabl(a,prec,b,x,eps,desc_a,info,&
   n_col = desc_a%matrix_data(psb_n_col_)
 
   if (present(istop)) then 
-    listop = istop 
+    istop_ = istop 
   else
-    listop = 1
+    istop_ = 1
   endif
 !
-!  LISTOP = 1:  Normwise backward error, infinity norm 
-!  LISTOP = 2:  ||r||/||b||   norm 2 
+!  ISTOP_ = 1:  Normwise backward error, infinity norm 
+!  ISTOP_ = 2:  ||r||/||b||   norm 2 
 !
 
-  if ((listop < 1 ).or.(listop > 2 ) ) then
-    write(0,*) 'psb_bicgstabl: invalid istop',listop 
+  if ((istop_ < 1 ).or.(istop_ > 2 ) ) then
+    write(0,*) 'psb_bicgstabl: invalid istop',istop_ 
     info=5001
-    int_err=listop
+    int_err=istop_
     err=info
     call psb_errpush(info,name,i_err=int_err)
     goto 9999
@@ -211,10 +211,10 @@ Subroutine psb_dcgstabl(a,prec,b,x,eps,desc_a,info,&
   ich = 1 
   Call blacs_set(icontxt,16,ich)
 
-  if (listop == 1) then 
+  if (istop_ == 1) then 
     ani = psb_spnrmi(a,desc_a,info)
     bni = psb_geamax(b,desc_a,info)
-  else if (listop == 2) then 
+  else if (istop_ == 2) then 
     bn2 = psb_genrm2(b,desc_a,info)
   endif
   if (info.ne.0) Then 
@@ -253,7 +253,7 @@ Subroutine psb_dcgstabl(a,prec,b,x,eps,desc_a,info,&
 
     If (debug) Write(0,*) 'on entry to amax: b: ',Size(b)
 
-    if (listop == 1) then 
+    if (istop_ == 1) then 
       rni = psb_geamax(r,desc_a,info)
       xni = psb_geamax(x,desc_a,info)
       rerr =  rni/(ani*xni+bni)
@@ -261,7 +261,7 @@ Subroutine psb_dcgstabl(a,prec,b,x,eps,desc_a,info,&
           If (me == 0) Write(itrac,'(a,i4,5(2x,es10.4))') 'bicgstab(l): ',&
                & itx,rerr,rni,bni,xni,ani
       endif
-    else if (listop == 2) then 
+    else if (istop_ == 2) then 
       rni = psb_genrm2(r,desc_a,info)
       rerr = rni/bn2
       if (itrac /= -1) then  
@@ -362,7 +362,7 @@ Subroutine psb_dcgstabl(a,prec,b,x,eps,desc_a,info,&
         Call psb_geaxpby(-gamma1(j),rh(:,j),done,rh(:,0),desc_a,info)        
       Enddo
       
-      if (listop == 1) then 
+      if (istop_ == 1) then 
         rni = psb_geamax(rh(:,0),desc_a,info)
         xni = psb_geamax(x,desc_a,info)
         rerr =  rni/(ani*xni+bni)
@@ -371,7 +371,7 @@ Subroutine psb_dcgstabl(a,prec,b,x,eps,desc_a,info,&
                & itx,rerr,rni,bni,xni,ani
         endif
 
-      else  if (listop == 2) then 
+      else  if (istop_ == 2) then 
 
         rni = psb_genrm2(rh(:,0),desc_a,info)
         rerr = rni/bn2

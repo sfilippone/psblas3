@@ -116,7 +116,7 @@ Subroutine psb_dgmresr(a,prec,b,x,eps,desc_a,info,&
   Character     ::diagl, diagu
   Logical, Parameter :: exchange=.True., noexchange=.False.  
   Integer, Parameter :: irmax = 8
-  Integer            :: itx, i, isvch, ich, icontxt,listop, err_act
+  Integer            :: itx, i, isvch, ich, icontxt,istop_, err_act
   Logical            :: do_renum_left,inner_stop
   Logical, Parameter :: debug = .false.
   Real(Kind(1.d0)) :: alpha, beta, rho, rho_old, rni, xni, bni, ani,bn2,& 
@@ -139,19 +139,19 @@ Subroutine psb_dgmresr(a,prec,b,x,eps,desc_a,info,&
   n_col = desc_a%matrix_data(psb_n_col_)
 
   if (present(istop)) then 
-    listop = istop 
+    istop_ = istop 
   else
-    listop = 1
+    istop_ = 1
   endif
 !
-!  LISTOP = 1:  Normwise backward error, infinity norm 
-!  LISTOP = 2:  ||r||/||b||   norm 2 
+!  ISTOP_ = 1:  Normwise backward error, infinity norm 
+!  ISTOP_ = 2:  ||r||/||b||   norm 2 
 !
 
-  if ((listop < 1 ).or.(listop > 2 ) ) then
-    write(0,*) 'psb_dgmres: invalid istop',listop 
+  if ((istop_ < 1 ).or.(istop_ > 2 ) ) then
+    write(0,*) 'psb_dgmres: invalid istop',istop_ 
     info=5001
-    int_err(1)=listop
+    int_err(1)=istop_
     err=info
     call psb_errpush(info,name,i_err=int_err)
     goto 9999
@@ -204,10 +204,10 @@ Subroutine psb_dgmresr(a,prec,b,x,eps,desc_a,info,&
   ich = 1 
   Call blacs_set(icontxt,16,ich)
 
-  if (listop == 1) then 
+  if (istop_ == 1) then 
     ani = psb_spnrmi(a,desc_a,info)
     bni = psb_geamax(b,desc_a,info)
-  else if (listop == 2) then 
+  else if (istop_ == 2) then 
     bn2 = psb_genrm2(b,desc_a,info)
   endif
   if (info.ne.0) Then 
@@ -244,7 +244,7 @@ Subroutine psb_dgmresr(a,prec,b,x,eps,desc_a,info,&
     scal=done/rs(1)
     If (debug) Write(0,*) 'on entry to amax: b: ',Size(b),rs(1),scal
 
-    if (listop == 1) then 
+    if (istop_ == 1) then 
       rni = psb_geamax(v(:,1),desc_a,info)
       xni = psb_geamax(x,desc_a,info)
       rerr =  rni/(ani*xni+bni)
@@ -252,7 +252,7 @@ Subroutine psb_dgmresr(a,prec,b,x,eps,desc_a,info,&
           If (me == 0) Write(itrac,'(a,i4,5(2x,es10.4))') 'gmresr(l): ',&
                & itx,rerr,rni,bni,xni,ani
       endif
-    else if (listop == 2) then 
+    else if (istop_ == 2) then 
       rni = psb_genrm2(v(:,1),desc_a,info)
       rerr = rni/bn2
       if (itrac /= -1) then  
@@ -301,7 +301,7 @@ Subroutine psb_dgmresr(a,prec,b,x,eps,desc_a,info,&
       rs(i)   = c(i)*rs(i)
       rr(i,i)  = c(i)*h(i,i)+s(i)*h(i+1,i)
             
-      if (listop == 1) then 
+      if (istop_ == 1) then 
         rni = abs(rs(i+1))
         xni = psb_geamax(x,desc_a,info)
         rerr =  rni/(ani*xni+bni)
@@ -309,7 +309,7 @@ Subroutine psb_dgmresr(a,prec,b,x,eps,desc_a,info,&
           If (me == 0) Write(itrac,'(a,i4,5(2x,es10.4))') 'gmresr(l): ',&
                & itx,rerr,rni,bni,xni,ani
         endif
-      else if (listop == 2) then 
+      else if (istop_ == 2) then 
         rni = abs(rs(i+1))
         rerr = rni/bn2
         if (itrac /= -1) then  

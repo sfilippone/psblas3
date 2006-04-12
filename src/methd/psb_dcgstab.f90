@@ -107,7 +107,7 @@ Subroutine psb_dcgstab(a,prec,b,x,eps,desc_a,info,&
   Logical, Parameter :: exchange=.True., noexchange=.False., debug1 = .False.
   Integer, Parameter :: irmax = 8
   Integer            :: itx, i, isvch, ich, icontxt, err_act, int_err(5),ii
-  Integer            :: listop
+  Integer            :: istop_
   Logical            :: do_renum_left
   Real(Kind(1.d0)) :: alpha, beta, rho, rho_old, rni, xni, bni, ani,& 
        & sigma, omega, tau, rn0, bn2
@@ -129,28 +129,28 @@ Subroutine psb_dcgstab(a,prec,b,x,eps,desc_a,info,&
   n_col = desc_a%matrix_data(psb_n_col_)
 
   If (Present(istop)) Then 
-    listop = istop 
+    istop_ = istop 
   Else
-    listop = 1
+    istop_ = 1
   Endif
 !
-!  LISTOP = 1:  Normwise backward error, infinity norm 
-!  LISTOP = 2:  ||r||/||b||   norm 2 
+!  ISTOP_ = 1:  Normwise backward error, infinity norm 
+!  ISTOP_ = 2:  ||r||/||b||   norm 2 
 !
 
-  If ((prec%prec < min_prec_).Or.(prec%prec > max_prec_) ) Then
-     Write(0,*) 'PSB_CGSTAB: Invalid IPREC',prec%prec
-     info=5002
-     int_err(1)=prec%prec
-     err=info
-     call psb_errpush(info,name,i_err=int_err)
-     goto 9999
-  Endif
+!!$  If ((prec%prec < min_prec_).Or.(prec%prec > max_prec_) ) Then
+!!$     Write(0,*) 'PSB_CGSTAB: Invalid IPREC',prec%prec
+!!$     info=5002
+!!$     int_err(1)=prec%prec
+!!$     err=info
+!!$     call psb_errpush(info,name,i_err=int_err)
+!!$     goto 9999
+!!$  Endif
   
-  if ((listop < 1 ).or.(listop > 2 ) ) then
-    write(0,*) 'psb_bicgstab: invalid istop',listop 
+  if ((istop_ < 1 ).or.(istop_ > 2 ) ) then
+    write(0,*) 'psb_bicgstab: invalid istop',istop_ 
     info=5001
-    int_err(1)=listop
+    int_err(1)=istop_
     err=info
     call psb_errpush(info,name,i_err=int_err)
     goto 9999
@@ -197,10 +197,10 @@ Subroutine psb_dcgstab(a,prec,b,x,eps,desc_a,info,&
 
   itx   = 0
 
-  If (listop == 1) Then 
+  If (istop_ == 1) Then 
     ani = psb_spnrmi(a,desc_a,info)
     bni = psb_geamax(b,desc_a,info)
-  Else If (listop == 2) Then 
+  Else If (istop_ == 2) Then 
     bn2 = psb_genrm2(b,desc_a,info)
   Endif
   if (info /= 0) Then 
@@ -231,10 +231,10 @@ Subroutine psb_dcgstab(a,prec,b,x,eps,desc_a,info,&
 !   Must always provide norm of R into RNI below for first check on 
 !   residual
 !
-    If (listop == 1) Then 
+    If (istop_ == 1) Then 
       rni = psb_geamax(r,desc_a,info)
       xni = psb_geamax(x,desc_a,info)
-    Else If (listop == 2) Then 
+    Else If (istop_ == 2) Then 
       rni = psb_genrm2(r,desc_a,info)
     Endif
     if (info /= 0) Then 
@@ -253,14 +253,14 @@ Subroutine psb_dcgstab(a,prec,b,x,eps,desc_a,info,&
       Exit restart
     End If
     
-    If (listop == 1) Then 
+    If (istop_ == 1) Then 
       xni  = psb_geamax(x,desc_a,info)
       rerr =  rni/(ani*xni+bni)
       If (itrac /= -1) Then 
         If (myrow == 0) Write(itrac,'(a,i4,5(2x,es10.4))') 'bicgstab: ',itx,rerr,rni,bni,&
              &xni,ani
       Endif
-    Else  If (listop == 2) Then 
+    Else  If (istop_ == 2) Then 
       rerr = rni/bn2
       If (itrac /= -1) Then 
         If (myrow == 0) Write(itrac,'(a,i4,3(2x,es10.4))') 'bicgstab: ',itx,rerr,rni,bn2
@@ -355,7 +355,7 @@ Subroutine psb_dcgstab(a,prec,b,x,eps,desc_a,info,&
       Call psb_geaxpby(done,s,dzero,r,desc_a,info)
       Call psb_geaxpby(-omega,t,done,r,desc_a,info)
       
-      If (listop == 1) Then 
+      If (istop_ == 1) Then 
         rni = psb_geamax(r,desc_a,info)
         xni = psb_geamax(x,desc_a,info)
         rerr =  rni/(ani*xni+bni)
@@ -364,7 +364,7 @@ Subroutine psb_dcgstab(a,prec,b,x,eps,desc_a,info,&
                & 'bicgstab: ',itx,rerr,rni,bni,xni,ani
         Endif
 
-      Else  If (listop == 2) Then 
+      Else  If (istop_ == 2) Then 
         rni = psb_genrm2(r,desc_a,info)
         rerr = rni/bn2
         If (itrac /= -1) Then 
