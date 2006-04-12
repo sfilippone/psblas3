@@ -108,7 +108,7 @@ subroutine psb_dcoins(nz,ia,ja,val,a,gtl,imin,imax,jmin,jmax,info)
      endif
 
      if ((nza+nz)>isza) then 
-        call psb_sp_reall(a,nza+nz,info)
+        call psb_sp_reall(a,max(nza+nz,int(1.5*isza)),info)
         if(info.ne.izero) then
            info=4010
            ch_err='psb_sp_reall'

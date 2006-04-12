@@ -29,8 +29,9 @@
 !!$ 
 !!$  
 module psb_realloc_mod
+  use psb_const_mod
   implicit none
-
+  
   Interface psb_realloc
     module procedure psb_dreallocate1i
     module procedure psb_dreallocate2i

@@ -15,6 +15,8 @@ LIBDIR = ../../lib
 
 psb_realloc_mod.o : psb_error_mod.o 
 psb_spmat_type.o : psb_realloc_mod.o psb_const_mod.o
+psb_error_mod.o: psb_const_mod.o
+psb_const_mod.f90: psb_const.fh
 
 lib: $(MODULES) $(OBJS)
 	$(AR) $(LIBDIR)/$(LIBNAME) $(MODULES) $(OBJS)

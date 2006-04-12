@@ -1,33 +1,33 @@
-C
-C             Parallel Sparse BLAS  v2.0
-C   (C) Copyright 2006 Salvatore Filippone    University of Rome Tor Vergata
-C                      Alfredo Buttari        University of Rome Tor Vergata
-C
-C Redistribution and use in source and binary forms, with or without
-C modification, are permitted provided that the following conditions
-C are met:
-C   1. Redistributions of source code must retain the above copyright
-C      notice, this list of conditions and the following disclaimer.
-C   2. Redistributions in binary form must reproduce the above copyright
-C      notice, this list of conditions, and the following disclaimer in the
-C      documentation and/or other materials provided with the distribution.
-C   3. The name of the PSBLAS group or the names of its contributors may
-C      not be used to endorse or promote products derived from this
-C      software without specific written permission.
-C
-C THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
-C ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
-C TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
-C PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE PSBLAS GROUP OR ITS CONTRIBUTORS
-C BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
-C CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
-C SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
-C INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
-C CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
-C ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-C POSSIBILITY OF SUCH DAMAGE.
-C
-C 
+!
+!             Parallel Sparse BLAS  v2.0
+!   (C) Copyright 2006 Salvatore Filippone    University of Rome Tor Vergata
+!                      Alfredo Buttari        University of Rome Tor Vergata
+!
+! Redistribution and use in source and binary forms, with or without
+! modification, are permitted provided that the following conditions
+! are met:
+!   1. Redistributions of source code must retain the above copyright
+!      notice, this list of conditions and the following disclaimer.
+!   2. Redistributions in binary form must reproduce the above copyright
+!      notice, this list of conditions, and the following disclaimer in the
+!      documentation and/or other materials provided with the distribution.
+!   3. The name of the PSBLAS group or the names of its contributors may
+!      not be used to endorse or promote products derived from this
+!      software without specific written permission.
+!
+! THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+! ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
+! TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+! PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE PSBLAS GROUP OR ITS CONTRIBUTORS
+! BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+! CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+! SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+! INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+! CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+! ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+! POSSIBILITY OF SUCH DAMAGE.
+!
+! 
       integer, parameter :: psb_nohalo_=0,  psb_halo_=4
       integer, parameter :: psb_none_=0,  psb_sum_=1
       integer, parameter :: psb_avg_=2,  psb_square_root_=3
@@ -58,12 +58,12 @@ C
       integer, parameter :: psb_elem_send_=3, psb_n_ovrlp_elem_=1
       integer, parameter :: psb_ovrlp_elem_to_=2, psb_ovrlp_elem_=0
       integer, parameter :: psb_n_dom_ovr_=1
-      integer, parameter :: psb_nnz_=1
       integer, parameter :: psb_no_comm_=-1
       integer, parameter :: ione=1, izero=0
       integer, parameter :: itwo=2, ithree=3,mone=-1, psb_root_=0
       integer, parameter :: psb_nztotreq_=1, psb_nzrowreq_=2
       integer, parameter :: psb_nzsizereq_=3
+      integer, parameter :: psb_nnz_=1
       integer, parameter :: psb_del_bnd_=6, psb_srtd_=7 
       integer, parameter :: psb_state_=8,  psb_upd_=9
       integer, parameter :: psb_upd_pnt_=10, psb_ifasize_=10
@@ -82,6 +82,7 @@ C
       real(kind(1.d0)), parameter :: dzero=0.d0, done=1.d0
       complex(kind(1.d0)), parameter :: zzero=(0.d0,0.0d0)
       complex(kind(1.d0)), parameter :: zone=(1.d0,0.0d0)
+      real(kind(1.d0)), parameter :: epstol=1.d-32
 
       character, parameter :: psb_all_='A',  psb_topdef_=' '
       character(len=5) :: psb_fidef_='CSR'

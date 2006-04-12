@@ -57,7 +57,6 @@ C     .. Local scalars ..
      +  NRC, IPH, JPH, JPA, LPA, IRET, LNK, NNZ, IP1
 C     .. Local arrays ..
       IERROR = 0
-c$$$      write(0,*) 'dcrcrupd ',infoa(upd_),ibits(infoa(upd_),2,1)
       IF (IBITS(INFOA(PSB_UPD_),2,1).EQ.1) THEN 
 C
 C     Smart update capability
