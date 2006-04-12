@@ -47,6 +47,7 @@
 !*****************************************************************************
 subroutine psb_dcsprt(iout,a,iv,eirs,eics,head,ivr,ivc)
   use psb_spmat_type
+  use psb_string_mod
   implicit none 
 
   integer, intent(in)               :: iout
@@ -76,7 +77,7 @@ subroutine psb_dcsprt(iout,a,iv,eirs,eics,head,ivr,ivc)
     write(iout,'(a)') '%'
   endif
 
-  if (a%fida=='CSR') then 
+  if (toupper(a%fida)=='CSR') then 
 
     write(iout,*) a%m,a%k,a%ia2(a%m+1)-1
 
@@ -114,7 +115,7 @@ subroutine psb_dcsprt(iout,a,iv,eirs,eics,head,ivr,ivc)
       endif
     endif
 
-  else  if (a%fida=='COO') then 
+  else  if (toupper(a%fida)=='COO') then 
 
     if (present(ivr).and..not.present(ivc)) then 
       write(iout,*) a%m,a%k,a%infoa(psb_nnz_)

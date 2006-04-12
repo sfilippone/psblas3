@@ -526,10 +526,10 @@ subroutine psb_zinsvv(m, x, ix, blck, desc_a, info,&
   if (present(insflag)) then
      liflag = insflag
   else
-     liflag = psb_upd_glb_
+     liflag = psb_upd_glbnum_
   end if
 
-  if (liflag == psb_upd_glb_) then 
+  if (liflag == psb_upd_glbnum_) then 
     do i = 1, m
       !loop over all blck's rows
 
@@ -544,7 +544,7 @@ subroutine psb_zinsvv(m, x, ix, blck, desc_a, info,&
         x(loc_row) = x(loc_row) +  blck(iblock+i-1)
       end if
     enddo
-  else if (liflag == psb_upd_loc_) then 
+  else if (liflag == psb_upd_locnum_) then 
     k = min(ix+m-1,loc_rows)
     do i=ix,k
       x(i) = x(i) + blck(i-ix+1)

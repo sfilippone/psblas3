@@ -43,6 +43,7 @@ subroutine psb_dspinfo(ireq,a,ires,info,iaux)
   use psb_spmat_type
   use psb_const_mod
   use psb_error_mod
+  use psb_string_mod
   implicit none
 
   type(psb_dspmat_type), intent(in) :: a
@@ -61,14 +62,14 @@ subroutine psb_dspinfo(ireq,a,ires,info,iaux)
 
   if (ireq == psb_nztotreq_) then 
      ! The number of nonzeroes
-     if (a%fida == 'CSR') then 
+     if (toupper(a%fida) == 'CSR') then 
         nr   = a%m
         ires = a%ia2(nr+1)-1
-     else if ((a%fida == 'COO').or.(a%fida == 'COI')) then 
+     else if ((toupper(a%fida) == 'COO').or.(toupper(a%fida) == 'COI')) then 
         ires = a%infoa(psb_nnz_)
-     else if (a%fida == 'JAD') then 
+     else if (toupper(a%fida) == 'JAD') then 
         ires = a%infoa(psb_nnz_)
-     else if (a%fida == 'CSC') then 
+     else if (toupper(a%fida) == 'CSC') then 
         nc   = a%k
         ires = a%ia2(nc+1)-1
       else
@@ -87,9 +88,9 @@ subroutine psb_dspinfo(ireq,a,ires,info,iaux)
         return
      endif
      irw = iaux
-     if (a%fida == 'CSR') then 
+     if (toupper(a%fida) == 'CSR') then 
         ires = a%ia2(irw+1)-a%ia2(irw)
-     else if ((a%fida == 'COO').or.(a%fida == 'COI')) then 
+     else if ((toupper(a%fida) == 'COO').or.(toupper(a%fida) == 'COI')) then 
 
         if (a%infoa(psb_srtd_) == psb_isrtdcoo_) then 
 !!$      write(0,*) 'Gtrow_: srtd coo',irw
@@ -123,7 +124,7 @@ subroutine psb_dspinfo(ireq,a,ires,info,iaux)
 !!$      do i=1, a%infoa(psb_nnz_) 
 !!$        if (a%ia1(i) == irw) ires = ires + 1
 !!$      enddo
-     else if (a%fida == 'JAD') then 
+     else if (toupper(a%fida) == 'JAD') then 
         pia = a%ia2(2) ! points to the beginning of ia(3,png)
         pja = a%ia2(3) ! points to the beginning of ja(:)
         ja  => a%ia2(pja:)             ! the array containing the pointers to ka and aspk
@@ -162,11 +163,11 @@ subroutine psb_dspinfo(ireq,a,ires,info,iaux)
      end if
 
   else  if (ireq == psb_nzsizereq_) then 
-     if (a%fida == 'CSR') then 
+     if (toupper(a%fida) == 'CSR') then 
         ires = size(a%aspk)
-     else if ((a%fida == 'COO').or.(a%fida == 'COI')) then 
+     else if ((toupper(a%fida) == 'COO').or.(toupper(a%fida) == 'COI')) then 
         ires = size(a%aspk)
-     else if (a%fida == 'JAD') then 
+     else if (toupper(a%fida) == 'JAD') then 
         ires = a%infoa(psb_nnz_)
      else
         ires=-1

@@ -87,6 +87,7 @@ subroutine  psb_dspmm(alpha,a,x,beta,y,desc_a,info,&
   use psi_mod
   use psb_check_mod
   use psb_error_mod
+  use psb_string_mod
   implicit none
 
   real(kind(1.D0)), intent(in)             :: alpha, beta
@@ -160,10 +161,9 @@ subroutine  psb_dspmm(alpha,a,x,beta,y,desc_a,info,&
   endif
 
   if (present(trans)) then     
-    if ((trans.eq.'N').or.(trans.eq.'T')&
-         & .or.(trans.eq.'n').or.(trans.eq.'t')) then
-      itrans = trans
-    else if ((trans.eq.'C').or.(trans.eq.'c')) then
+    if ( (toupper(trans).eq.'N').or.(toupper(trans).eq.'T')) then
+      itrans = toupper(trans)
+    else if (toupper(trans).eq.'C') then
       info = 3020
       call psb_errpush(info,name)
       goto 9999
@@ -317,7 +317,7 @@ subroutine  psb_dspmm(alpha,a,x,beta,y,desc_a,info,&
     y(iiy+nrow+1-1:iiy+ncol,1:ik)=dzero
 
     !  local Matrix-vector product
-    
+
     call psb_csmm(alpha,a,x(iix:lldx,jjx:jjx+ik-1),&
          & beta,y(iiy:lldy,jjy:jjy+ik-1),info,trans=itrans)
 
@@ -424,6 +424,7 @@ subroutine  psb_dspmv(alpha,a,x,beta,y,desc_a,info,&
   use psi_mod
   use psb_check_mod
   use psb_error_mod
+  use psb_string_mod
   implicit none
 
   real(kind(1.D0)), intent(in)             :: alpha, beta
@@ -482,9 +483,9 @@ subroutine  psb_dspmv(alpha,a,x,beta,y,desc_a,info,&
   endif
 
   if (present(trans)) then     
-     if((trans.eq.'N').or.(trans.eq.'T')) then
-        itrans = trans
-     else if (trans.eq.'C') then
+     if ( (toupper(trans).eq.'N').or.(toupper(trans).eq.'T')) then
+        itrans = toupper(trans)
+     else if (toupper(trans).eq.'C') then
         info = 3020
         call psb_errpush(info,name)
         goto 9999
