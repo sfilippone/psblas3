@@ -28,15 +28,15 @@
 !!$  POSSIBILITY OF SUCH DAMAGE.
 !!$ 
 !!$  
-subroutine psb_cest(afmt, m,n,nnz, lia1, lia2, lar, up, info)
+subroutine psb_cest(afmt, m,n,nnz, lia1, lia2, lar, iup, info)
 
   use psb_error_mod
   use psb_const_mod
   implicit none
 
   !     .. scalar arguments ..
-  integer           ::  m,n,nnz, lia1, lia2, lar, info
-  character         ::  up
+  integer, intent(in) ::  m,n,nnz,iup
+  integer, intent(out) :: lia1, lia2, lar, info
   !     .. array arguments..
   character(len=5)  ::  afmt
   integer           ::  int_val(5), err_act
@@ -46,55 +46,56 @@ subroutine psb_cest(afmt, m,n,nnz, lia1, lia2, lar, up, info)
   call psb_erractionsave(err_act)
 
   if (afmt.eq.'???') then 
-     afmt = psb_fidef_
+    afmt = psb_fidef_
   endif
 
-  if ((up.eq.'y').or.(up.eq.'Y')) then
-     if (afmt.eq.'JAD') then 
-        lia1 = 2*(nnz + nnz/5) +1000
-        lia2 = 2*(nnz + nnz/5) +1000 +m
-        lar = nnz + nnz/5
-     else if (afmt.eq.'COO') then 
-        lia1 = nnz
-        lia2 = 2*nnz + 1000
-        lar = nnz
-     else if(afmt.eq.'CSR') then
-        lia1 = nnz
-        lia2 = 2*nnz + 1000 + m + 1
-        lar = nnz
-     else
-        info = 136
-        call psb_errpush(info,name,a_err=afmt)
-        goto 9999
-     endif
+  select case(iup)
+  case (psb_upd_perm_)
+    if (afmt.eq.'JAD') then 
+      lia1 = 2*(nnz + nnz/5) +1000
+      lia2 = 2*(nnz + nnz/5) +1000 +m
+      lar = nnz + nnz/5
+    else if (afmt.eq.'COO') then 
+      lia1 = nnz
+      lia2 = 2*nnz + 1000
+      lar = nnz
+    else if(afmt.eq.'CSR') then
+      lia1 = nnz
+      lia2 = 2*nnz + 1000 + m + 1
+      lar = nnz
+    else
+      info = 136
+      call psb_errpush(info,name,a_err=afmt)
+      goto 9999
+    endif
 
-  else if ((up.eq.'n').or.(up.eq.'N')) then
+  case (psb_upd_dflt_, psb_upd_srch_)
 
-     if (afmt.eq.'JAD') then 
-        lia1 = nnz + nnz/5
-        lia2 = nnz + nnz/5
-        lar = nnz + nnz/5
-     else if (afmt.eq.'COO') then 
-        lia1 = nnz
-        lia2 = nnz
-        lar = nnz
-     else if(afmt.eq.'CSR') then
-        lia1 = nnz
-        lia2 = nnz
-        lar = nnz
-     else
-        info = 136
-        call psb_errpush(info,name,a_err=afmt)
-        goto 9999
-     endif
+    if (afmt.eq.'JAD') then 
+      lia1 = nnz + nnz/5
+      lia2 = nnz + nnz/5
+      lar = nnz + nnz/5
+    else if (afmt.eq.'COO') then 
+      lia1 = nnz
+      lia2 = nnz
+      lar = nnz
+    else if(afmt.eq.'CSR') then
+      lia1 = nnz
+      lia2 = nnz
+      lar = nnz
+    else
+      info = 136
+      call psb_errpush(info,name,a_err=afmt)
+      goto 9999
+    endif
 
-  else
+  case default
 
-     info = 3012
-     call psb_errpush(info,name,int_val)
-     goto 9999
+    info = 3012
+    call psb_errpush(info,name,int_val)
+    goto 9999
 
-  endif
+  end select
 
   call psb_erractionrestore(err_act)
   return

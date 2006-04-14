@@ -43,7 +43,7 @@
 !   trans  -  character(optional).            ???
 !   unitd  -  character(optional).            ???
 !
-subroutine psb_dcsdp(a, b,info,ifc,check,trans,unitd)
+subroutine psb_dcsdp(a, b,info,ifc,check,trans,unitd,upd,dupl)
   use psb_const_mod
   use psb_error_mod
   use psb_spmat_type
@@ -54,7 +54,7 @@ subroutine psb_dcsdp(a, b,info,ifc,check,trans,unitd)
   Type(psb_dspmat_type), intent(in)    :: A
   Type(psb_dspmat_type), intent(inout) :: B
   Integer, intent(out)                 :: info
-  Integer, intent(in), optional        :: ifc
+  Integer, intent(in), optional        :: ifc,upd,dupl
   character, intent(in), optional      :: check,trans,unitd
 
   !...Locals...
@@ -62,7 +62,7 @@ subroutine psb_dcsdp(a, b,info,ifc,check,trans,unitd)
   real(kind(1.d0)), allocatable :: work(:)
   type(psb_dspmat_type)         :: temp_a
   Integer                       :: nzr, ntry, ifc_,ierror, ia1_size,&
-       & ia2_size, aspk_size,size_req,n_row,n_col,iup
+       & ia2_size, aspk_size,size_req,n_row,n_col,upd_,dupl_
   integer                       :: ip1, ip2, nnz, iflag, ichk, nnzt,&
        & ipc, i, count, err_act, ierrv(5)
   character                     :: check_,trans_,unitd_, up
@@ -71,11 +71,10 @@ subroutine psb_dcsdp(a, b,info,ifc,check,trans,unitd)
   character(len=20)             :: name, ch_err
 
   interface psb_cest
-    subroutine psb_cest(afmt, m,n,nnz, lia1, lia2, lar, up, info)
-      integer, intent(in) ::  m,n,nnz 
+    subroutine psb_cest(afmt, m,n,nnz, lia1, lia2, lar, iup, info)
+      integer, intent(in) ::  m,n,nnz,iup
       integer, intent(out) :: lia1, lia2, lar, info
       character, intent(inout) :: afmt*5
-      character, intent(in) :: up
     end subroutine psb_cest
   end interface
 
@@ -115,12 +114,14 @@ subroutine psb_dcsdp(a, b,info,ifc,check,trans,unitd)
     unitd_ = 'U'
   endif
 
+
   if (check_=='R') then 
     allocate(work(max(size(a%aspk),size(b%aspk))+1000),stat=info)
   else
     allocate(work(max(size(a%ia1),size(b%ia1),&
          &     size(a%ia2),size(b%ia2))+max(a%m,b%m)+1000),stat=info)
   endif
+
   if (info /= 0) then
     info=2040
     call psb_errpush(info,name)
@@ -149,26 +150,32 @@ subroutine psb_dcsdp(a, b,info,ifc,check,trans,unitd)
 
   end if
 
+
+
   if (check_/='R') then
+    
+    if (present(upd)) then 
+      call psb_sp_setifld(upd,psb_upd_,b,info)    
+    end if
+    if (present(dupl)) then 
+      call psb_sp_setifld(dupl,psb_dupl_,b,info)    
+    end if
+    
+
     !  ...matrix conversion...
     b%m=a%m
     b%k=a%k
     call psb_spinfo(psb_nztotreq_,a,size_req,info)
     if (debug) write(0,*) 'DCSDP : size_req 1:',size_req
     !
-    iup = psb_sp_getifld(psb_upd_,b,info)
-    if (iup == psb_upd_perm_) then 
-      up = 'Y'
-    else
-      up = 'N'
-    endif
+    upd_ = psb_sp_getifld(psb_upd_,b,info)
 
     n_row=b%m 
     n_col=b%k
     call psb_cest(b%fida, n_row,n_col,size_req,&
-         & ia1_size, ia2_size, aspk_size, up,info)
+         & ia1_size, ia2_size, aspk_size, upd_,info)
 
-!!$    write(0,*) 'ESTIMATE : ',ia1_size,ia2_size,aspk_Size,iup
+!!$    write(0,*) 'ESTIMATE : ',ia1_size,ia2_size,aspk_Size,upd_
     if (info /= no_err) then    
       info=4010
       ch_err='psb_cest'

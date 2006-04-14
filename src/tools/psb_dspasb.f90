@@ -136,10 +136,6 @@ subroutine psb_dspasb(a,desc_a, info, afmt, upd, dupl)
       dupl_ =  psb_dupl_def_
     endif
 
-
-    call psb_sp_setifld(upd_,psb_upd_,a,info)
-    call psb_sp_setifld(dupl_,psb_dupl_,a,info)
-
     a%m = n_row
     a%k = n_col
 
@@ -167,7 +163,7 @@ subroutine psb_dspasb(a,desc_a, info, afmt, upd, dupl)
 
     ! Do the real conversion into the requested storage format
     ! result is put in A
-    call psb_csdp(atemp,a,info,ifc=2)
+    call psb_csdp(atemp,a,info,ifc=2,upd=upd_,dupl=dupl_)
 
     IF (debug) WRITE (*, *) myrow,'   ASB:  From DCSDP',info,' ',A%FIDA
     if (info /= no_err) then    
