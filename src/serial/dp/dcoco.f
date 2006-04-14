@@ -71,13 +71,14 @@ c
       ierror = 0
       call fcpsb_erractionsave(err_act)
 
-      check_flag=ibits(info(psb_upd_),1,2)
+      call psb_getifield(check_flag,psb_dupl_,info,psb_ifasize_,ierror)
+      
       if (trans.eq.'N') then
         scale  = (unitd.eq.'L') ! meaningless
         p1(1) = 0
         p2(1) = 0
 
-        nnz = info(psb_nnz_)
+        call psb_getifield(nnz,psb_nnz_,info,psb_ifasize_,ierror) 
         if (debug) then 
           write(*,*) 'on entry to dcoco: nnz laux ',
      +      nnz,laux,larn,lia1n,lia2n
@@ -171,16 +172,16 @@ c     ... insert remaining element ...
             do elem_in  = 2, nnz
               if ((ia1n(elem_in).eq.ia1n(elem_out)).and.
      +          (ia2n(elem_in).eq.ia2n(elem_out))) then 
-                if (check_flag.eq.1) then
+                if (check_flag.eq.psb_dupl_err_) then
 c     ... error, there are duplicated elements ...
                   ierror = 130
                   call fcpsb_errpush(ierror,name,int_val)
                   goto 9999
-                else if (check_flag.eq.2) then
+                else if (check_flag.eq.psb_dupl_ovwrt_) then
 c     ... insert only the first duplicated element ...
                   ia2n(ip2+aux(ipx+elem_in-1)-1) = elem_out
-                else if (check_flag.eq.3) then
-c     ... sum the duplicated element ...
+                else if (check_flag.eq.psb_dupl_add_) then
+c     ... add the duplicated element ...
                   arn(elem_out) = arn(elem_out) + arn(elem_in)
                   ia2n(ip2+aux(ipx+elem_in-1)-1) = elem_out
                 end if
@@ -219,15 +220,15 @@ c     ... insert remaining element ...
             do elem_in  = 2, nnz
               if ((ia1n(elem_in).eq.ia1n(elem_out)).and.
      +          (ia2n(elem_in).eq.ia2n(elem_out))) then 
-                if (check_flag.eq.1) then
+                if (check_flag.eq.psb_dupl_err_) then
 c     ... error, there are duplicated elements ...
                   ierror = 130
                   call fcpsb_errpush(ierror,name,int_val)
                   goto 9999
-                else if (check_flag.eq.2) then
+                else if (check_flag.eq.psb_dupl_ovwrt_) then
 c     ... insert only the first duplicated element ...
-                else if (check_flag.eq.3) then
-c     ... sum the duplicated element ...
+                else if (check_flag.eq.psb_dupl_add_) then
+c     ... add the duplicated element ...
                   arn(elem_out) = arn(elem_out) + arn(elem_in)
                 end if
               else

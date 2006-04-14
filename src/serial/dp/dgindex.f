@@ -59,7 +59,9 @@ c     .. Local Arrays ..
 
       POINT_AR = 1
       POINT_JA = 0
-      CHECK_FLAG=IBITS(INFON(PSB_UPD_),1,2)
+
+      call psb_getifield(check_flag,psb_dupl_,infon,psb_ifasize_,ierror)
+
 
       IF ((LARN.LT.POINT_AR).OR.(LKA.LT.POINT_AR)) THEN
          IERROR = 60

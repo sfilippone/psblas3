@@ -420,7 +420,7 @@ contains
 
       call blacs_barrier(icontxt,'all')
       t2 = mpi_wtime()
-      call psb_spasb(a,desc_a,info,dup=1,afmt=afmt)     
+      call psb_spasb(a,desc_a,info,dupl=psb_dupl_err_,afmt=afmt)     
       t3 = mpi_wtime()
       if(info/=0)then
         info=4010
@@ -437,7 +437,7 @@ contains
 
 
     else
-      call psb_spasb(a,desc_a,info,afmt=afmt,dup=1)     
+      call psb_spasb(a,desc_a,info,afmt=afmt,dupl=psb_dupl_err_)     
       if(info/=0)then
         info=4010
         ch_err='psspasb'
@@ -780,7 +780,7 @@ contains
 
     call blacs_barrier(icontxt,'all')
     t2 = mpi_wtime()
-    call psb_spasb(a,desc_a,info,dup=1,afmt=afmt)     
+    call psb_spasb(a,desc_a,info,dupl=psb_dupl_err_,afmt=afmt)     
     t3 = mpi_wtime()
     if(info/=0)then
       info=4010
@@ -1203,7 +1203,7 @@ contains
 
       call blacs_barrier(icontxt,'all')
       t2 = mpi_wtime()
-      call psb_spasb(a,desc_a,info,dup=1,afmt=afmt)     
+      call psb_spasb(a,desc_a,info,dupl=psb_dupl_err_,afmt=afmt)     
       t3 = mpi_wtime()
       if(info/=0)then
         info=4010
@@ -1220,7 +1220,7 @@ contains
 
 
     else
-      call psb_spasb(a,desc_a,info,afmt=afmt,dup=1)     
+      call psb_spasb(a,desc_a,info,afmt=afmt,dupl=psb_dupl_err_)     
       if(info/=0)then
         info=4010
         ch_err='psspasb'
@@ -1563,7 +1563,7 @@ contains
 
     call blacs_barrier(icontxt,'all')
     t2 = mpi_wtime()
-    call psb_spasb(a,desc_a,info,dup=1,afmt=afmt)     
+    call psb_spasb(a,desc_a,info,dupl=psb_dupl_err_,afmt=afmt)     
     t3 = mpi_wtime()
     if(info/=0)then
       info=4010

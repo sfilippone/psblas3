@@ -4,7 +4,7 @@ include ../../../Make.inc
 #
 
 FOBJS  = isr.o isrx.o \
-	mrgsrt.o isaperm.o ibsrch.o
+	mrgsrt.o isaperm.o ibsrch.o imsr.o imsrx.o
 
 
 OBJS=$(FOBJS)

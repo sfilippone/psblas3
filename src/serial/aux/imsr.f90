@@ -30,7 +30,8 @@
 !!$  
 ! File:  imsr.f90 
  ! Subroutine: 
- ! Parameters:subroutine imsr(n,x)
+ ! Parameters:
+subroutine imsr(n,x)
   integer :: n
   integer :: x(n)
   

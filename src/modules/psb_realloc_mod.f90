@@ -68,36 +68,37 @@ Contains
     if(psb_get_errstatus().ne.0) return 
     info=0
     if (associated(rrax)) then 
-       dim=size(rrax)
-       If (dim /= len) Then
-          Allocate(tmp(len),stat=info)
-          if (info /= 0) then
-             err=4000
-             call psb_errpush(err,name)
-             goto 9999
-          end if
-          if (.true.) then 
-             do i=1, min(len,dim)
-                tmp(i)=rrax(i)
-             end do
-          else
-             tmp(1:min(len,dim))=rrax(1:min(len,dim))
-          end if
-          deallocate(rrax,stat=info)
-          if (info /= 0) then
-             err=4000
-             call psb_errpush(err,name)
-             goto 9999
-          end if
-          rrax=>tmp
-       end if
-    else
-       allocate(rrax(len),stat=info)
-       if (info /= 0) then
+      dim=size(rrax)
+      If (dim /= len) Then
+        Allocate(tmp(len),stat=info)
+        if (info /= 0) then
           err=4000
           call psb_errpush(err,name)
           goto 9999
-       end if
+        end if
+        if (.true.) then 
+          do i=1, min(len,dim)
+            tmp(i)=rrax(i)
+          end do
+        else
+          tmp(1:min(len,dim))=rrax(1:min(len,dim))
+        end if
+        deallocate(rrax,stat=info)
+        if (info /= 0) then
+          err=4000
+          call psb_errpush(err,name)
+          goto 9999
+        end if
+        rrax=>tmp
+      end if
+    else
+      dim = 0
+      allocate(rrax(len),stat=info)
+      if (info /= 0) then
+        err=4000
+        call psb_errpush(err,name)
+        goto 9999
+      end if
     endif
     if (present(pad)) then 
       rrax(dim+1:len) = pad

@@ -47,6 +47,7 @@ subroutine psb_dcsdp(a, b,info,ifc,check,trans,unitd)
   use psb_const_mod
   use psb_error_mod
   use psb_spmat_type
+  use psb_string_mod
 
   implicit none
   !....Parameters...
@@ -68,13 +69,14 @@ subroutine psb_dcsdp(a, b,info,ifc,check,trans,unitd)
   Integer, Parameter            :: maxtry=8
   logical, parameter            :: debug=.false.
   character(len=20)             :: name, ch_err
+
   interface psb_cest
-     subroutine psb_cest(afmt, m,n,nnz, lia1, lia2, lar, up, info)
-       integer, intent(in) ::  m,n,nnz 
-       integer, intent(out) :: lia1, lia2, lar, info
-       character, intent(inout) :: afmt*5
-       character, intent(in) :: up
-     end subroutine psb_cest
+    subroutine psb_cest(afmt, m,n,nnz, lia1, lia2, lar, up, info)
+      integer, intent(in) ::  m,n,nnz 
+      integer, intent(out) :: lia1, lia2, lar, info
+      character, intent(inout) :: afmt*5
+      character, intent(in) :: up
+    end subroutine psb_cest
   end interface
 
   interface psb_spinfo
@@ -98,17 +100,17 @@ subroutine psb_dcsdp(a, b,info,ifc,check,trans,unitd)
     ifc_ = 1
   endif
   if (present(check)) then 
-    check_ = check 
+    check_ = toupper(check)
   else 
     check_ = 'N'
   endif
   if (present(trans)) then 
-    trans_ = trans 
+    trans_ = toupper(trans )
   else 
     trans_ = 'N'
   endif
   if (present(unitd)) then 
-    unitd_ = unitd 
+    unitd_ = toupper(unitd )
   else 
     unitd_ = 'U'
   endif
@@ -132,7 +134,7 @@ subroutine psb_dcsdp(a, b,info,ifc,check,trans,unitd)
   endif
 
   if((check_=='Y').or.(check_=='C')) then
-    if(a%fida(1:3)=='CSR') then
+    if(toupper(a%fida(1:3))=='CSR') then
       call dcsrck(trans,a%m,a%k,a%descra,a%aspk,a%ia1,a%ia2,work,size(work),info)
       if(info /= 0) then
         info=4010
@@ -153,13 +155,14 @@ subroutine psb_dcsdp(a, b,info,ifc,check,trans,unitd)
     b%k=a%k
     call psb_spinfo(psb_nztotreq_,a,size_req,info)
     if (debug) write(0,*) 'DCSDP : size_req 1:',size_req
-    !! PULL IUP FROM INFOA FIELD
-    iup = iand(b%infoa(psb_upd_),4) 
-    if (iup > 0) then 
+    !
+    iup = psb_sp_getifld(psb_upd_,b,info)
+    if (iup == psb_upd_perm_) then 
       up = 'Y'
     else
       up = 'N'
     endif
+
     n_row=b%m 
     n_col=b%k
     call psb_cest(b%fida, n_row,n_col,size_req,&
@@ -185,16 +188,16 @@ subroutine psb_dcsdp(a, b,info,ifc,check,trans,unitd)
       call psb_errpush(info,name,a_err=ch_err)
       goto 9999
     endif
-    
+
     b%pl(:)  = 0
     b%pr(:)  = 0
-    
 
-    select case (a%fida(1:3))
+
+    select case (toupper(a%fida(1:3)))
 
     case ('CSR')
 
-      select case (b%fida(1:3))
+      select case (toupper(b%fida(1:3)))
 
       case ('CSR')
 
@@ -281,7 +284,7 @@ subroutine psb_dcsdp(a, b,info,ifc,check,trans,unitd)
 
     case ('COO','COI')
 
-      select case (b%fida(1:3))
+      select case (toupper(b%fida(1:3)))
 
       case ('CSR')
 
@@ -375,99 +378,116 @@ subroutine psb_dcsdp(a, b,info,ifc,check,trans,unitd)
 
   else if (check_=='R') then
     !...Regenerating matrix    
-    if (b%infoa(psb_state_) /= psb_spmat_upd_) then 
-      info = 8888
-      call psb_errpush(info,name)
-      goto 9999
-    endif
-    if (ibits(b%infoa(psb_upd_),2,1).eq.0) then 
-      !
-      !       Nothing to be done......
-      !
+    if (psb_sp_getifld(psb_state_,b,info) /= psb_spmat_upd_) then 
       info = 8888
       call psb_errpush(info,name)
       goto 9999
     endif
 
+    select case(psb_sp_getifld(psb_upd_,b,info))
 
-    if (b%fida(1:3)/='JAD') then
-      ip1   = b%infoa(psb_upd_pnt_) 
-      ip2   = b%ia2(ip1+psb_ip2_)
-      nnz   = b%ia2(ip1+psb_nnz_)
-      iflag = b%ia2(ip1+psb_iflag_)
-      ichk  = b%ia2(ip1+psb_ichk_)
-      nnzt  = b%ia2(ip1+psb_nnzt_)
-      if (debug) write(*,*) 'Regeneration start: ',&
-           &   b%infoa(psb_upd_),psb_perm_update_,nnz,nnzt ,iflag,info
+    case(psb_upd_perm_)
 
-      if ((ichk/=nnzt+iflag).or.(nnz/=nnzt)) then               
-        info = 8889
-        write(*,*) 'Regeneration start error: ',&
-             &   b%infoa(psb_upd_),psb_perm_update_,nnz,nnzt ,iflag,ichk                    
-        call psb_errpush(info,name)
-        goto 9999
-      endif
-      do i= 1, nnz
-        work(i) = 0.d0
-      enddo
-      if (iflag.eq.2) then 
-        do i=1, nnz 
-          work(b%ia2(ip2+i-1)) = b%aspk(i) 
+      if (toupper(b%fida(1:3))/='JAD') then
+        ip1   = psb_sp_getifld(psb_upd_pnt_,b,info) 
+        ip2   = b%ia2(ip1+psb_ip2_)
+        nnz   = b%ia2(ip1+psb_nnz_)
+        iflag = b%ia2(ip1+psb_iflag_)
+        ichk  = b%ia2(ip1+psb_ichk_)
+        nnzt  = b%ia2(ip1+psb_nnzt_)
+        if (debug) write(*,*) 'Regeneration start: ',&
+             &   b%infoa(psb_upd_),psb_upd_perm_,nnz,nnzt ,iflag,info
+
+        if ((ichk/=nnzt+iflag).or.(nnz/=nnzt)) then               
+          info = 8889
+          write(*,*) 'Regeneration start error: ',&
+               &   b%infoa(psb_upd_),psb_upd_perm_,nnz,nnzt ,iflag,ichk                    
+          call psb_errpush(info,name)
+          goto 9999
+        endif
+        do i= 1, nnz
+          work(i) = 0.d0
         enddo
-      else if (iflag.eq.3) then 
-        do i=1, nnz 
-          work(b%ia2(ip2+i-1)) = b%aspk(i) + work(b%ia2(ip2+i-1)) 
+        select case(iflag) 
+        case(psb_dupl_ovwrt_,psb_dupl_err_) 
+          do i=1, nnz 
+            work(b%ia2(ip2+i-1)) = b%aspk(i) 
+          enddo
+        case(psb_dupl_add_) 
+          do i=1, nnz 
+            work(b%ia2(ip2+i-1)) = b%aspk(i) + work(b%ia2(ip2+i-1)) 
+          enddo
+        case default
+          info = 8887
+          call psb_errpush(info,name)
+          goto 9999          
+        end select
+
+        do i=1, nnz
+          b%aspk(i) = work(i)
         enddo
-      endif
-      do i=1, nnz
-        b%aspk(i) = work(i)
-      enddo
 
-    else if (b%fida(1:3) == 'JAD') then
+      else if (toupper(b%fida(1:3)) == 'JAD') then
 
-      ip1   = b%infoa(psb_upd_pnt_) 
-      ip2   = b%ia1(ip1+psb_ip2_)
-      count = b%ia1(ip1+psb_zero_)
-      ipc   = b%ia1(ip1+psb_ipc_)
-      nnz   = b%ia1(ip1+psb_nnz_)
-      iflag = b%ia1(ip1+psb_iflag_)
-      ichk  = b%ia1(ip1+psb_ichk_)
-      nnzt  = b%ia1(ip1+psb_nnzt_)
-      if (debug) write(*,*) 'Regeneration start: ',&
-           &  b%infoa(psb_upd_),psb_perm_update_,nnz,nnzt,count, &
-           &  iflag,info
 
-      if ((ichk/=nnzt+iflag).or.(nnz/=nnzt)) then               
-        info = 10
-        write(*,*) 'Regeneration start error: ',&
-             &  b%infoa(psb_upd_),psb_perm_update_,nnz,nnzt ,iflag,ichk     
-        call psb_errpush(info,name)
-        goto 9999
-      endif
+        ip1   = psb_sp_getifld(psb_upd_pnt_,b,info) 
+        ip2   = b%ia1(ip1+psb_ip2_)
+        count = b%ia1(ip1+psb_zero_)
+        ipc   = b%ia1(ip1+psb_ipc_)
+        nnz   = b%ia1(ip1+psb_nnz_)
+        iflag = b%ia1(ip1+psb_iflag_)
+        ichk  = b%ia1(ip1+psb_ichk_)
+        nnzt  = b%ia1(ip1+psb_nnzt_)
+        if (debug) write(*,*) 'Regeneration start: ',&
+             &  b%infoa(psb_upd_),psb_upd_perm_,nnz,nnzt,count, &
+             &  iflag,info
 
-      do i= 1, nnz+count
-        work(i) = 0.d0
-      enddo
-      if (iflag.eq.2) then 
-        do i=1, nnz 
-          work(b%ia1(ip2+i-1)) = b%aspk(i) 
+        if ((ichk/=nnzt+iflag).or.(nnz/=nnzt)) then               
+          info = 10
+          write(*,*) 'Regeneration start error: ',&
+               &  b%infoa(psb_upd_),psb_upd_perm_,nnz,nnzt ,iflag,ichk     
+          call psb_errpush(info,name)
+          goto 9999
+        endif
+
+        do i= 1, nnz+count
+          work(i) = 0.d0
         enddo
-      else if (iflag.eq.3) then 
-        do i=1, nnz 
-          work(b%ia1(ip2+i-1)) = b%aspk(i) + work(b%ia1(ip2+i-1)) 
+        select case(iflag) 
+        case(psb_dupl_ovwrt_,psb_dupl_err_) 
+          do i=1, nnz 
+            work(b%ia1(ip2+i-1)) = b%aspk(i) 
+          enddo
+        case(psb_dupl_add_) 
+          do i=1, nnz 
+            work(b%ia1(ip2+i-1)) = b%aspk(i) + work(b%ia1(ip2+i-1)) 
+          enddo
+        case default
+          info = 8887
+          call psb_errpush(info,name)
+          goto 9999          
+        end select
+
+        do i=1, nnz+count 
+          b%aspk(i) = work(i)
         enddo
+        do i=1, count
+          b%aspk(b%ia1(ipc+i-1)) = 0.d0
+        end do
       endif
-      do i=1, nnz+count 
-        b%aspk(i) = work(i)
-      enddo
-      do i=1, count
-        b%aspk(b%ia1(ipc+i-1)) = 0.d0
-      end do
-    endif
 
+    case(psb_upd_dflt_,psb_upd_srch_)
+      ! Nothing to be done 
+    case default
+      ! Wrong value
+      info = 8888
+      call psb_errpush(info,name)
+      goto 9999
 
+    end select
   end if
-  b%infoa(psb_state_) = psb_spmat_asb_
+  call psb_sp_setifld(psb_spmat_asb_,psb_state_,b,info)
+
   call psb_erractionrestore(err_act)
   return
 

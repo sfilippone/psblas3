@@ -667,7 +667,7 @@ contains
 
     t1 = mpi_wtime()
     call psb_cdasb(desc_a,info)
-    call psb_spasb(a,desc_a,info,dup=1,afmt=afmt)
+    call psb_spasb(a,desc_a,info,dupl=psb_dupl_err_,afmt=afmt)
     call blacs_barrier(icontxt,'ALL')
     tasb = mpi_wtime()-t1
     if(info.ne.0) then

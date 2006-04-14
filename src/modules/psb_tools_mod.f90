@@ -293,7 +293,7 @@ Module psb_tools_mod
   interface psb_geins
      ! 2-D double precision version
      subroutine psb_dins(m, n, x, ix, jx, blck, desc_a, info,&
-          & iblck, jblck)
+          & iblck, jblck,dupl)
        use psb_descriptor_type
        integer, intent(in)                ::  m,n
        type(psb_desc_type), intent(in)    ::  desc_a
@@ -302,10 +302,11 @@ Module psb_tools_mod
        real(kind(1.d0)), intent(in)       ::  blck(:,:)
        integer,intent(out)                ::  info
        integer, optional, intent(in)      ::  iblck,jblck
+       integer, optional, intent(in)      ::  dupl
      end subroutine psb_dins
      ! 2-D double precision square version
      subroutine psb_dinsvm(m, x, ix, jx, blck, desc_a,info,&
-          & iblck)
+          & iblck,dupl)
        use psb_descriptor_type
        integer, intent(in)                ::  m
        type(psb_desc_type), intent(in) ::  desc_a
@@ -314,10 +315,11 @@ Module psb_tools_mod
        real(kind(1.d0)), intent(in)       ::  blck(:)
        integer, intent(out)               ::  info
        integer, optional, intent(in)      ::  iblck
+       integer, optional, intent(in)      ::  dupl
      end subroutine psb_dinsvm
      ! 1-D double precision version
      subroutine psb_dinsvv(m, x, ix, blck, desc_a, info,&
-          & iblck,insflag)
+          & iblck,insflag,dupl)
        use psb_descriptor_type
        integer, intent(in)                ::  m
        type(psb_desc_type), intent(in)    ::  desc_a
@@ -327,10 +329,11 @@ Module psb_tools_mod
        integer, intent(out)               ::  info
        integer, optional, intent(in)      ::  iblck
        integer, optional, intent(in)      ::  insflag
+       integer, optional, intent(in)      ::  dupl
      end subroutine psb_dinsvv
      ! 2-D integer version
      subroutine psb_iins(m, n, x, ix, jx, blck, desc_a, info,&
-          & iblck, jblck)
+          & iblck, jblck,dupl)
        use psb_descriptor_type
        integer, intent(in)                ::  m,n
        type(psb_desc_type), intent(in)    ::  desc_a
@@ -339,10 +342,11 @@ Module psb_tools_mod
        integer, intent(in)                ::  blck(:,:)
        integer,intent(out)                ::  info
        integer, optional, intent(in)      ::  iblck,jblck
+       integer, optional, intent(in)      ::  dupl
      end subroutine psb_iins
      ! 2-D integer square version
      subroutine psb_iinsvm(m, x, ix, jx, blck, desc_a,info,&
-          & iblck)
+          & iblck,dupl)
        use psb_descriptor_type
        integer, intent(in)                ::  m
        type(psb_desc_type), intent(in)    ::  desc_a
@@ -351,10 +355,11 @@ Module psb_tools_mod
        integer, intent(in)                ::  blck(:)
        integer, intent(out)               ::  info
        integer, optional, intent(in)      ::  iblck
+       integer, optional, intent(in)      ::  dupl
      end subroutine psb_iinsvm
      ! 1-D integer version
      subroutine psb_iinsvv(m, x, ix, blck, desc_a, info,&
-          & iblck,insflag)
+          & iblck,insflag,dupl)
        use psb_descriptor_type
        integer, intent(in)                ::  m
        type(psb_desc_type), intent(in)    ::  desc_a
@@ -364,10 +369,11 @@ Module psb_tools_mod
        integer, intent(out)               ::  info
        integer, optional, intent(in)      ::  iblck
        integer, optional, intent(in)      ::  insflag
+       integer, optional, intent(in)      ::  dupl
      end subroutine psb_iinsvv
      ! 2-D double precision version
      subroutine psb_zins(m, n, x, ix, jx, blck, desc_a, info,&
-          & iblck, jblck)
+          & iblck, jblck,dupl)
        use psb_descriptor_type
        integer, intent(in)                ::  m,n
        type(psb_desc_type), intent(in)    ::  desc_a
@@ -376,10 +382,11 @@ Module psb_tools_mod
        complex(kind(1.d0)), intent(in)    ::  blck(:,:)
        integer,intent(out)                ::  info
        integer, optional, intent(in)      ::  iblck,jblck
+       integer, optional, intent(in)      ::  dupl
      end subroutine psb_zins
      ! 2-D double precision square version
      subroutine psb_zinsvm(m, x, ix, jx, blck, desc_a,info,&
-          & iblck)
+          & iblck,dupl)
        use psb_descriptor_type
        integer, intent(in)                ::  m
        type(psb_desc_type), intent(in)    ::  desc_a
@@ -388,10 +395,11 @@ Module psb_tools_mod
        complex(kind(1.d0)), intent(in)    ::  blck(:)
        integer, intent(out)               ::  info
        integer, optional, intent(in)      ::  iblck
+       integer, optional, intent(in)      ::  dupl
      end subroutine psb_zinsvm
      ! 1-D double precision version
      subroutine psb_zinsvv(m, x, ix, blck, desc_a, info,&
-          & iblck,insflag)
+          & iblck,insflag,dupl)
        use psb_descriptor_type
        integer, intent(in)                ::  m
        type(psb_desc_type), intent(in)    ::  desc_a
@@ -401,6 +409,7 @@ Module psb_tools_mod
        integer, intent(out)               ::  info
        integer, optional, intent(in)      ::  iblck
        integer, optional, intent(in)      ::  insflag
+       integer, optional, intent(in)      ::  dupl
      end subroutine psb_zinsvv
   end interface
 
@@ -523,23 +532,23 @@ Module psb_tools_mod
   end interface
 
   interface psb_spasb
-     subroutine psb_dspasb(a,desc_a, info, afmt, up, dup)
+     subroutine psb_dspasb(a,desc_a, info, afmt, upd, dupl)
        use psb_descriptor_type
        use psb_spmat_type
        type(psb_dspmat_type), intent (inout)   :: a
        type(psb_desc_type), intent(in)         :: desc_a
        integer, intent(out)                    :: info
-       integer,optional, intent(in)            :: dup
-       character, optional, intent(in)         :: afmt*5, up
+       integer,optional, intent(in)            :: dupl, upd
+       character, optional, intent(in)         :: afmt*5
      end subroutine psb_dspasb
-     subroutine psb_zspasb(a,desc_a, info, afmt, up, dup)
+     subroutine psb_zspasb(a,desc_a, info, afmt, upd, dupl)
        use psb_descriptor_type
        use psb_spmat_type
        type(psb_zspmat_type), intent (inout)   :: a
        type(psb_desc_type), intent(in)         :: desc_a
        integer, intent(out)                    :: info
-       integer,optional, intent(in)            :: dup
-       character, optional, intent(in)         :: afmt*5, up
+       integer,optional, intent(in)            :: dupl, upd
+       character, optional, intent(in)         :: afmt*5
      end subroutine psb_zspasb
   end interface
 

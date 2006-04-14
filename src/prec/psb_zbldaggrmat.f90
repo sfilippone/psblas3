@@ -165,7 +165,8 @@ contains
       goto 9999
     end if
 
-    b%infoa(psb_upd_) = 6
+    call psb_sp_setifld(psb_dupl_ovwrt_,psb_dupl_,b,info)
+    call psb_sp_setifld(psb_upd_dflt_,psb_upd_,b,info)
     b%fida = 'COO'
     b%m=a%m
     b%k=a%k

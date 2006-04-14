@@ -47,7 +47,7 @@ module psb_spmat_type
     ! describe some chacteristics of sparse matrix
     character(len=11) :: descra
     ! Contains some additional informations on sparse matrix
-    integer     :: infoa(10)
+    integer     :: infoa(psb_ifasize_)
     ! Contains sparse matrix coefficients
     real(kind(1.d0)), pointer :: aspk(:)=>null()
     ! Contains indeces that describes sparse matrix structure
@@ -63,7 +63,7 @@ module psb_spmat_type
     ! describe some chacteristics of sparse matrix
     character(len=11) :: descra
     ! Contains some additional informations on sparse matrix
-    integer     :: infoa(10)
+    integer     :: infoa(psb_ifasize_)
     ! Contains sparse matrix coefficients
     complex(kind(1.d0)), pointer :: aspk(:)=>null()
     ! Contains indeces that describes sparse matrix structure
@@ -78,6 +78,14 @@ module psb_spmat_type
 
   interface psb_sp_clone
     module procedure psb_dspclone, psb_zspclone
+  end interface
+
+  interface psb_sp_setifld
+    module procedure psb_dsp_setifld, psb_zsp_setifld
+  end interface
+
+  interface psb_sp_getifld
+    module procedure psb_dsp_getifld, psb_zsp_getifld
   end interface
 
   interface psb_sp_transfer
@@ -212,7 +220,7 @@ contains
     a%m=max(0,m)
     a%k=max(0,k)
     call psb_sp_reall(a,nnz,info)
-
+    if (debug) write(0,*) 'Check in ALLOCATE ',info,associated(a%pl),associated(a%pr)
     a%pl(1)=0
     a%pr(1)=0
     ! set infoa fields
@@ -296,6 +304,8 @@ contains
     call psb_realloc(max(1,a%m),a%pl,info)
     if (info /= 0) return
     call psb_realloc(max(1,a%k),a%pr,info)
+    if (debug) write(0,*) associated(a%ia1),associated(a%ia2),&
+         & associated(a%aspk),associated(a%pl),associated(a%pr),info
     if (info /= 0) return
 
     Return
@@ -419,6 +429,63 @@ contains
 
   End Subroutine psb_dsp_transfer
 
+
+  Subroutine psb_dsp_setifld(val,field,a,info)
+    implicit none
+    !....Parameters...
+
+    Type(psb_dspmat_type), intent(inout) :: A
+    Integer, intent(in)          :: field,val
+    Integer, intent(out)         :: info
+    
+    !locals
+    logical, parameter  :: debug=.false.
+    info  = 0
+
+!!$    call psb_realloc(psb_ifasize_,a%infoa,info)
+    
+    if (info == 0) &
+         & call psb_setifield(val,field,a%infoa,psb_ifasize_,info)
+    
+
+    Return
+
+  end subroutine psb_dsp_setifld
+
+
+  function psb_dsp_getifld(field,a,info)
+    implicit none
+    !....Parameters...
+
+    Type(psb_dspmat_type), intent(in) :: A
+    Integer, intent(in)          :: field
+    Integer                      :: psb_dsp_getifld
+    Integer, intent(out)         :: info
+
+    !locals
+    logical, parameter  :: debug=.false.
+    integer :: val
+
+    info  = 0
+    val   = -1
+
+    if ((field < 1).or.(field > psb_ifasize_)) then
+      info = -1
+      psb_dsp_getifld = val
+      return
+    endif
+
+!!$    if (.not.associated(a%infoa)) then 
+!!$      info = -2 
+!!$      return
+!!$    endif
+    
+    call psb_getifield(val,field,a%infoa,psb_ifasize_,info)
+    
+    psb_dsp_getifld = val
+    Return
+
+  end function psb_dsp_getifld
 
   subroutine psb_dsp_free(a,info)
     implicit none
@@ -764,6 +831,66 @@ contains
     Return
 
   End Subroutine psb_zsp_transfer
+
+  Subroutine psb_zsp_setifld(val,field,a,info)
+    implicit none
+    !....Parameters...
+
+    Type(psb_zspmat_type), intent(inout) :: A
+    Integer, intent(in)          :: field,val
+    Integer, intent(out)         :: info
+
+    !locals
+    logical, parameter  :: debug=.false.
+
+    info  = 0
+
+
+!!$    call psb_realloc(psb_ifasize_,a%infoa,info)
+    
+    if (info == 0) &
+         & call psb_setifield(val,field,a%infoa,psb_ifasize_,info)
+    
+
+    Return
+
+  end subroutine psb_zsp_setifld
+
+
+  function psb_zsp_getifld(field,a,info)
+    implicit none
+    !....Parameters...
+
+    Type(psb_zspmat_type), intent(in) :: A
+    Integer, intent(in)          :: field
+    Integer                      :: psb_zsp_getifld
+    Integer, intent(out)         :: info
+
+    !locals
+    logical, parameter  :: debug=.false.
+    integer :: val
+
+    info  = 0
+    val   = -1
+
+    if ((field < 1).or.(field > psb_ifasize_)) then
+      info = -1
+      psb_zsp_getifld = val
+      return
+    endif
+
+!!$    if (.not.associated(a%infoa)) then 
+!!$      info = -2 
+!!$      return
+!!$    endif
+    
+    call psb_getifield(val,field,a%infoa,psb_ifasize_,info)
+    
+    psb_zsp_getifld = val
+    Return
+
+  end function psb_zsp_getifld
+
 
 
   subroutine psb_zsp_free(a,info)

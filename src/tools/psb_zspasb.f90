@@ -42,7 +42,7 @@
 !    up       - character(optional).              ???
 !    dup      - integer(optional).                ???
 !
-subroutine psb_zspasb(a,desc_a, info, afmt, up, dup)
+subroutine psb_zspasb(a,desc_a, info, afmt, upd, dupl)
 
   use psb_descriptor_type
   use psb_spmat_type
@@ -50,33 +50,25 @@ subroutine psb_zspasb(a,desc_a, info, afmt, up, dup)
   use psb_const_mod
   use psi_mod
   use psb_error_mod
-
+  use psb_string_mod
   implicit none
 
-  interface psb_cest
-     subroutine psb_cest(afmt, m,n,nnz, lia1, lia2, lar, up, info)
-       integer, intent(in) ::  m,n,nnz 
-       integer, intent(out) :: lia1, lia2, lar, info
-       character, intent(inout) :: afmt*5
-       character, intent(in) :: up
-     end subroutine psb_cest
-  end interface
 
   !...Parameters....
   type(psb_zspmat_type), intent (inout)   :: a
   type(psb_desc_type), intent(in)         :: desc_a
   integer, intent(out)                    :: info
-  integer,optional, intent(in)            :: dup
-  character, optional, intent(in)         :: afmt*5, up
+  integer,optional, intent(in)            :: dupl, upd
+  character, optional, intent(in)         :: afmt*5
   !....Locals....
   integer               ::  int_err(5)
   type(psb_zspmat_type) ::  atemp
   real(kind(1.d0))      ::  real_err(5)
   integer               ::  ia1_size,ia2_size,aspk_size,m,i,err,&
-       & nprow,npcol,myrow,mycol ,size_req,idup,n_col,iout, err_act
-  integer               :: dscstate, spstate, nr,k,j, iupdup
+       & nprow,npcol,myrow,mycol ,size_req,n_col,iout, err_act
+  integer               :: dscstate, spstate, nr,k,j
+  integer               :: upd_, dupl_
   integer               :: icontxt,temp(2),isize(2),n_row
-  character             :: iup
   logical, parameter    :: debug=.false., debugwrt=.false.
   character(len=20)     :: name, ch_err
 
@@ -116,118 +108,81 @@ subroutine psb_zspasb(a,desc_a, info, afmt, up, dup)
 
   spstate = a%infoa(psb_state_) 
   if (spstate == psb_spmat_bld_) then 
-     !
-     ! First case: we come from a fresh build. 
-     ! 
+    !
+    ! First case: we come from a fresh build. 
+    ! 
 
-     n_row = desc_a%matrix_data(psb_n_row_)
-     n_col = desc_a%matrix_data(psb_n_col_)
+    n_row = desc_a%matrix_data(psb_n_row_)
+    n_col = desc_a%matrix_data(psb_n_col_)
 
-     !
-     ! Second step: handle the local matrix part. 
-     !
-     iupdup = 0
-     if (present(up)) then
-        if(up.eq.'Y') then
-           iupdup = 4
-           iup    = up
-        else if (up /= 'N') then
-           write(0,*)'Wrong value for update input in ASB...'
-           write(0,*)'Changing to default'
-           iup = 'N'
-        else
-           iup = 'N'
-        endif
-     else
-        iup = 'N'
-     endif
+    !
+    ! Second step: handle the local matrix part. 
+    !
+    if (present(upd)) then 
+      upd_=upd
+    else
+      upd_ = psb_upd_dflt_
+    endif
 
-     if (present(dup)) then
-        if((dup.lt.1).or.(dup.gt.3)) then
-           write(0,*)'Wrong value for duplicate input in ASB...'
-           write(0,*)'Changing to default'
-           idup = 1
-        else  
-           idup = dup
-        endif
-     else
-        idup = 1
-     endif
-     iupdup = ieor(iupdup,idup)
+    if (present(dupl)) then
+      if((dupl <  psb_dupl_ovwrt_).or.(dupl > psb_dupl_err_)) then
+        write(0,*)'Wrong value for duplicate input in ASB...'
+        write(0,*)'Changing to default'
+        dupl_ = psb_dupl_def_
+      else  
+        dupl_ = dupl
+      endif
+    else
+      dupl_ =  psb_dupl_def_
+    endif
 
 
-     a%infoa(psb_upd_)=iupdup
-     if (debug) write(0,*)'in ASB',psb_upd_,iupdup
+    call psb_sp_setifld(upd_,psb_upd_,a,info)
+    call psb_sp_setifld(dupl_,psb_dupl_,a,info)
 
-     a%m = n_row
-     a%k = n_col
+    a%m = n_row
+    a%k = n_col
 
-     call psb_sp_clone(a,atemp,info)
-     if(info /= no_err) then
-        info=4010
-        ch_err='psb_sp_clone'
-        call psb_errpush(info,name,a_err=ch_err)
-        goto 9999
-        ! convert to user requested format after the temp copy
-     end if
-     if (present(afmt)) then
-        a%fida = afmt
-     else 
-        a%fida = '???'
-     endif
+    call psb_sp_clone(a,atemp,info)
+    if(info /= no_err) then
+      info=4010
+      ch_err='psb_sp_clone'
+      call psb_errpush(info,name,a_err=ch_err)
+      goto 9999
+      ! convert to user requested format after the temp copy
+    end if
 
-     !
-     ! work area requested must be fixed to
-     ! No of Grid'd processes and NNZ+2
-     !
-!!$     size_req  = max(a%infoa(psb_nnz_),1)+3
-!!$     if (debug) write(0,*) 'DCSDP : size_req 1:',size_req
-!!$     call psb_cest(a%fida, n_row,n_col,size_req,&
-!!$          & ia1_size, ia2_size, aspk_size, iup,info)
-!!$     write(0,*) 'ESTIMATE : ',ia1_size,ia2_size,aspk_Size,iup
-!!$     if (info /= no_err) then    
-!!$        info=4010
-!!$        ch_err='psb_cest'
-!!$        call psb_errpush(info,name,a_err=ch_err)
-!!$        goto 9999
-!!$     endif
-!!$
-!!$     call psb_sp_reall(a,ia1_size,ia2_size,aspk_size,info)
-!!$     if (info /= no_err) then    
-!!$        info=4010
-!!$        ch_err='psb_sp_reall'
-!!$        call psb_errpush(info,name,a_err=ch_err)
-!!$        goto 9999
-!!$     endif
-!!$
-!!$     a%pl(:)  = 0
-!!$     a%pr(:)  = 0
+    if (present(afmt)) then
+      a%fida = afmt
+    else 
+      a%fida = '???'
+    endif
 
-     if (debugwrt) then
-        iout = 30+myrow
-        open(iout)
-        call psb_csprt(iout,atemp,head='Input mat')
-        close(iout)
-     endif
+    if (debugwrt) then
+      iout = 30+myrow
+      open(iout)
+      call psb_csprt(iout,atemp,head='Input mat')
+      close(iout)
+    endif
 
-     ! Do the real conversion into the requested storage formatmode
-     ! result is put in A
-     call psb_csdp(atemp,a,info,ifc=2)
+    ! Do the real conversion into the requested storage format
+    ! result is put in A
+    call psb_csdp(atemp,a,info,ifc=2)
 
-     IF (debug) WRITE (*, *) myrow,'   ASB:  From DCSDP',info,' ',A%FIDA
-     if (info /= no_err) then    
-        info=4010
-        ch_err='psb_csdp'
-        call psb_errpush(info,name,a_err=ch_err)
-        goto 9999
-     endif
+    IF (debug) WRITE (*, *) myrow,'   ASB:  From DCSDP',info,' ',A%FIDA
+    if (info /= no_err) then    
+      info=4010
+      ch_err='psb_csdp'
+      call psb_errpush(info,name,a_err=ch_err)
+      goto 9999
+    endif
 
-     if (debugwrt) then
-        iout = 60+myrow
-        open(iout)
-        call psb_csprt(iout,a,head='Output mat')
-        close(iout)
-     endif
+    if (debugwrt) then
+      iout = 60+myrow
+      open(iout)
+      call psb_csprt(iout,a,head='Output mat')
+      close(iout)
+    endif
 
      call psb_sp_free(atemp,info)
 
