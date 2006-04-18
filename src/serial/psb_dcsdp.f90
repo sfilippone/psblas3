@@ -150,8 +150,6 @@ subroutine psb_dcsdp(a, b,info,ifc,check,trans,unitd,upd,dupl)
 
   end if
 
-
-
   if (check_/='R') then
     
     if (present(upd)) then 
@@ -289,7 +287,11 @@ subroutine psb_dcsdp(a, b,info,ifc,check,trans,unitd,upd,dupl)
           call psb_errpush(4010,name,a_err='dcrco')
           goto 9999
         end if
-
+      case default
+        info=4010
+        call psb_errpush(info,name)
+        goto 9999
+        
       end select
 
     case ('COO','COI')
@@ -376,17 +378,22 @@ subroutine psb_dcsdp(a, b,info,ifc,check,trans,unitd,upd,dupl)
           goto 9999
         end if
 
+      case default
+        info=4010
+        call psb_errpush(info,name)
+        goto 9999
       end select
+
+    case default
+      info=4010
+      call psb_errpush(info,name)
+      goto 9999
 
     end select
 
-!!$    write(0,*) 'End of assembly', psb_sp_getifld(psb_upd_,b,info) ,psb_upd_perm_
     if (psb_sp_getifld(psb_upd_,b,info) /= psb_upd_perm_) then
-!!$      write(0,*) 'Going for trimsize',size(b%ia1),size(b%ia2),size(b%aspk)
       call psb_sp_trimsize(b,i1,i2,ia,info)
-!!$      write(0,*) 'From trimsize',i1,i2,ia,info
       if (info == 0) call psb_sp_reall(b,i1,i2,ia,info)
-!!$      write(0,*) 'From realloc',size(b%ia1),size(b%ia2),size(b%aspk)
     endif
 
   else if (check_=='R') then

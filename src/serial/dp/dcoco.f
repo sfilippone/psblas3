@@ -78,7 +78,7 @@ c
         p1(1) = 0
         p2(1) = 0
 
-        call psb_getifield(nnz,psb_nnz_,infon,psb_ifasize_,ierror) 
+        call psb_getifield(nnz,psb_nnz_,info,psb_ifasize_,ierror) 
         if (debug) then 
           write(*,*) 'on entry to dcoco: nnz laux ',
      +      nnz,laux,larn,lia1n,lia2n

@@ -101,7 +101,7 @@ C        ... Construct COO Representation...
               ELEM = ELEM + 1
             ENDDO
           ENDDO
-          INFON(1) = IA2(M+1)-1
+          INFON(psb_nnz_) = IA2(M+1)-1
         ELSE IF (DESCRA(1:1).EQ.'S' .AND. DESCRA(2:2).EQ.'U') THEN
 
           DO 20 K = 1, M

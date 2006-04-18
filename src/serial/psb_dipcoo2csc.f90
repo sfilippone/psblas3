@@ -101,7 +101,6 @@ subroutine psb_dipcoo2csc(a,info,clshr)
 
     if (clshr_) then 
       
-      
       j = 1
       i = 1
       icl = itemp(j) 

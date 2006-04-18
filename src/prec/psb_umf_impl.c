@@ -141,11 +141,12 @@ psb_dumf_factor_(int *n, int *nnz,
     
   if ( *info == UMFPACK_OK ) {
     *info = 0;
+    *numptr = (fptr) Numeric; 
   } else {
     printf("umfpack_di_numeric() error returns INFO= %d\n", *info);
+    *numptr = (fptr) NULL; 
   }
     
-  *numptr = (fptr) Numeric; 
   for (i = 0; i <= *n;  ++i) ++colptr[i];
   for (i = 0; i < *nnz; ++i) ++rowind[i];
 #else

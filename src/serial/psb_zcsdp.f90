@@ -189,7 +189,6 @@ subroutine psb_zcsdp(a, b,info,ifc,check,trans,unitd,upd,dupl)
     call psb_cest(b%fida, n_row,n_col,size_req,&
          & ia1_size, ia2_size, aspk_size, upd_,info)
 
-!!$    write(0,*) 'ESTIMATE : ',ia1_size,ia2_size,aspk_Size,upd_
     if (info /= no_err) then    
       info=4010
       ch_err='psb_cest'
@@ -289,7 +288,11 @@ subroutine psb_zcsdp(a, b,info,ifc,check,trans,unitd,upd,dupl)
           call psb_errpush(4010,name,a_err='dcrco')
           goto 9999
         end if
-
+      case default
+        info=4010
+        call psb_errpush(info,name)
+        goto 9999
+        
       end select
 
     case ('COO','COI')
@@ -365,8 +368,6 @@ subroutine psb_zcsdp(a, b,info,ifc,check,trans,unitd,upd,dupl)
 
         end do
 
-
-
       case ('COO')
 
         call zcoco(trans_, a%m, a%k, unitd_, d, a%descra, a%aspk,&
@@ -378,21 +379,27 @@ subroutine psb_zcsdp(a, b,info,ifc,check,trans,unitd,upd,dupl)
           goto 9999
         end if
 
+      case default
+        info=4010
+        call psb_errpush(info,name)
+        goto 9999
       end select
+
+    case default
+      info=4010
+      call psb_errpush(info,name)
+      goto 9999
 
     end select
 
-!!$    write(0,*) 'End of assembly', psb_sp_getifld(psb_upd_,b,info) ,psb_upd_perm_
     if (psb_sp_getifld(psb_upd_,b,info) /= psb_upd_perm_) then
-!!$      write(0,*) 'Going for trimsize',size(b%ia1),size(b%ia2),size(b%aspk)
       call psb_sp_trimsize(b,i1,i2,ia,info)
-!!$      write(0,*) 'From trimsize',i1,i2,ia,info
       if (info == 0) call psb_sp_reall(b,i1,i2,ia,info)
-!!$      write(0,*) 'From realloc',size(b%ia1),size(b%ia2),size(b%aspk)
     endif
 
   else if (check_=='R') then
     !...Regenerating matrix    
+
     if (psb_sp_getifld(psb_state_,b,info) /= psb_spmat_upd_) then 
       info = 8888
       call psb_errpush(info,name)

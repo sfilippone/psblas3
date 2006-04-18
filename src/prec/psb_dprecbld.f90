@@ -87,7 +87,7 @@ subroutine psb_dprecbld(a,desc_a,p,info,upd)
   integer      :: int_err(5)
   character    :: iupd
 
-  logical, parameter :: debug=.false.   
+  logical, parameter :: debug=.false. 
   integer,parameter  :: iroot=0,iout=60,ilout=40
   character(len=20)   :: name, ch_err
 

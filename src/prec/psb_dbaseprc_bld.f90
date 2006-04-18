@@ -86,7 +86,7 @@ subroutine psb_dbaseprc_bld(a,desc_a,p,info,upd)
       use psb_const_mod
       implicit none 
 
-      type(psb_dspmat_type), intent(in)      :: a
+      type(psb_dspmat_type), intent(inout)      :: a
       type(psb_desc_type), intent(in)        :: desc_a
       type(psb_dbaseprc_type), intent(inout) :: p
       integer, intent(out)                   :: info
@@ -101,7 +101,7 @@ subroutine psb_dbaseprc_bld(a,desc_a,p,info,upd)
       use psb_const_mod
       implicit none 
 
-      type(psb_dspmat_type), intent(in)      :: a
+      type(psb_dspmat_type), intent(inout)      :: a
       type(psb_desc_type), intent(in)        :: desc_a
       type(psb_dbaseprc_type), intent(inout) :: p
       integer, intent(out)                   :: info
@@ -194,13 +194,14 @@ subroutine psb_dbaseprc_bld(a,desc_a,p,info,upd)
          &  f_ilu_n_,is_legal_ml_fact)
 
     if (debug) write(0,*)me, ': Calling PSB_ILU_BLD'
-
+    if (debug) call blacs_barrier(icontxt,'All')
 
     select case(p%iprcparm(f_type_))
 
     case(f_ilu_n_,f_ilu_e_) 
       call psb_ilu_bld(a,desc_a,p,iupd,info)
       if(debug) write(0,*)me,': out of psb_ilu_bld'
+      if (debug) call blacs_barrier(icontxt,'All')
       if(info /= 0) then
         info=4010
         ch_err='psb_ilu_bld'
