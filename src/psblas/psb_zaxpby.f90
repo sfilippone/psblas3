@@ -223,7 +223,7 @@ subroutine  psb_zaxpbyv(alpha, x, beta,y,desc_a,info)
   integer                  :: int_err(5), icontxt, nprow, npcol, myrow, mycol,&
        & err_act, n, iix, jjx, temp(2), ix, iy, ijx, m, iiy, in, jjy
   character(len=20)        :: name, ch_err
-  logical, parameter :: debug=.true.
+  logical, parameter :: debug=.false.
 
   name='psb_dgeaxpby'
   if(psb_get_errstatus().ne.0) return 
