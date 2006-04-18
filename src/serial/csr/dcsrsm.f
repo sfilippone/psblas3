@@ -42,7 +42,7 @@ C
       PARAMETER (DEBUG=.FALSE.)
 C     .. Local Arrays ..
       CHARACTER*20       NAME
-      INTEGER            INT_VAL(5)
+      INTEGER            INT_VAL(5), err_Act
 
       NAME = 'DCSRSM\0'
       IERROR = 0

@@ -85,7 +85,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #ifdef Have_SLU_
 #include "zsp_defs.h"
-
+#undef Have_SLU_
 #define HANDLE_SIZE  8
 /* kind of integer to hold a pointer.  Use int.
    This might need to be changed on 64-bit systems. */
@@ -102,7 +102,6 @@ typedef struct {
     int *perm_r;
 } factors_t;
 
-#undef Have_SLU_
 
 #else
 
@@ -132,7 +131,7 @@ typedef struct {
 
 void
 psb_zslu_factor_(int *n, int *nnz,
-                 double *values, int *rowind, int *colptr,
+                 doublecomplex *values, int *rowind, int *colptr,
 #ifdef Have_SLU_		 
 		 fptr *f_factors, /* a handle containing the address
 				     pointing to the factored matrices */
@@ -181,8 +180,8 @@ psb_zslu_factor_(int *n, int *nnz,
     for (i = 0; i < *nnz; ++i) --colptr[i];
     for (i = 0; i <= *n; ++i) --rowind[i];
     
-    dCreate_CompRow_Matrix(&A, *n, *n, *nnz, values, colptr, rowind,
-			   SLU_NR, SLU_D, SLU_GE);
+    zCreate_CompRow_Matrix(&A, *n, *n, *nnz, values, colptr, rowind,
+			   SLU_NC, SLU_Z, SLU_GE);
     L = (SuperMatrix *) SUPERLU_MALLOC( sizeof(SuperMatrix) );
     U = (SuperMatrix *) SUPERLU_MALLOC( sizeof(SuperMatrix) );
     if ( !(perm_r = intMalloc(*n)) ) ABORT("Malloc fails for perm_r[].");
@@ -205,13 +204,13 @@ psb_zslu_factor_(int *n, int *nnz,
     panel_size = sp_ienv(1);
     relax = sp_ienv(2);
     
-    dgstrf(&options, &AC, drop_tol, relax, panel_size, 
+    zgstrf(&options, &AC, drop_tol, relax, panel_size, 
 	   etree, NULL, 0, perm_c, perm_r, L, U, &stat, info);
     
     if ( *info == 0 ) {
       Lstore = (SCformat *) L->Store;
       Ustore = (NCformat *) U->Store;
-      dQuerySpace(L, U, &mem_usage);
+      zQuerySpace(L, U, &mem_usage);
 #if 0
       printf("No of nonzeros in factor L = %d\n", Lstore->nnz);
       printf("No of nonzeros in factor U = %d\n", Ustore->nnz);
@@ -223,7 +222,7 @@ psb_zslu_factor_(int *n, int *nnz,
     } else {
       printf("dgstrf() error returns INFO= %d\n", *info);
       if ( *info <= *n ) { /* factorization completes */
-	dQuerySpace(L, U, &mem_usage);
+	zQuerySpace(L, U, &mem_usage);
 	printf("L\\U MB %.3f\ttotal MB needed %.3f\texpansions %d\n",
 		       mem_usage.for_lu/1e6, mem_usage.total_needed/1e6,
 	       mem_usage.expansions);
@@ -256,7 +255,7 @@ psb_zslu_factor_(int *n, int *nnz,
 
 void
 psb_zslu_solve_(int *itrans, int *n, int *nrhs, 
-                 double *b, int *ldb,
+                 doublecomplex *b, int *ldb,
 #ifdef Have_SLU_		 
 		 fptr *f_factors, /* a handle containing the address
 				     pointing to the factored matrices */
@@ -272,7 +271,7 @@ psb_zslu_solve_(int *itrans, int *n, int *nrhs,
  *
  */
 #ifdef Have_SLU_ 
-    SuperMatrix A, AC, B;
+    SuperMatrix  B;
     SuperMatrix *L, *U;
     int *perm_r; /* row permutations from partial pivoting */
     int *perm_c; /* column permutation vector */
@@ -306,9 +305,14 @@ psb_zslu_solve_(int *itrans, int *n, int *nrhs,
     perm_c = LUfactors->perm_c;
     perm_r = LUfactors->perm_r;
     
-    dCreate_Dense_Matrix(&B, *n, *nrhs, b, *ldb, SLU_DN, SLU_D, SLU_GE);
+    zCreate_Dense_Matrix(&B, *n, *nrhs, b, *ldb, SLU_DN, SLU_Z, SLU_GE);
     /* Solve the system A*X=B, overwriting B with X. */
-    dgstrs (trans, L, U, perm_c, perm_r, &B, &stat, info);
+    zgstrs (trans, L, U, perm_c, perm_r, &B, &stat, info);
+    if (info != 0) {
+      if (B.Stype != SLU_DN) fprintf(stderr,"zgstrs error kind 1: SLU_DN\n");
+      if (B.Dtype != SLU_Z) fprintf(stderr,"zgstrs error kind 2: SLU_Z\n");
+      if (B.Mtype != SLU_GE) fprintf(stderr,"zgstrs error kind 3: SLU_GE\n");
+    }
 
     Destroy_SuperMatrix_Store(&B);
     StatFree(&stat);

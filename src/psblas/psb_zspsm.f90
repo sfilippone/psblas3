@@ -262,7 +262,7 @@ subroutine  psb_zspsm(alpha,a,x,beta,y,desc_a,info,&
 
   if(info.ne.0) then
     info = 4010
-    ch_err='dcssm'
+    ch_err='zcssm'
     call psb_errpush(info,name,a_err=ch_err)
     goto 9999
   end if

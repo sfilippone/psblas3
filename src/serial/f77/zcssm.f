@@ -231,6 +231,7 @@ C
 C     Error handling
 C
       IF(IERROR.NE.0) THEN
+        write(0,*) 'zcssm ierror',ierror
         CALL FCPSB_ERRPUSH(IERROR,NAME,INT_VAL)
 
         GOTO 9999
@@ -335,6 +336,7 @@ C
       RETURN
  9999 CONTINUE
       CALL FCPSB_ERRACTIONRESTORE(ERR_ACT)
+      
 
       IF ( ERR_ACT .NE. 0 ) THEN 
          CALL FCPSB_SERROR()

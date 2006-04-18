@@ -172,351 +172,351 @@ C     .. Not simmetric matrix
 
 C     .. Symmetric matrix upper or lower 
       SYM = (TRANS.EQ.'L').OR.(TRANS.EQ.'U').OR.
-     +      (TRANS.EQ.'M').OR.(TRANS.EQ.'V')
+     +  (TRANS.EQ.'M').OR.(TRANS.EQ.'V')
 C
       IF (.NOT.(TRA.OR.COTRA)) THEN
-         NROWA = M
-         NCOLA = N
+        NROWA = M
+        NCOLA = N
       ELSE
-         NROWA = N
-         NCOLA = M
-      END IF    !(....(CO)TRA)
+        NROWA = N
+        NCOLA = M
+      END IF                    !(....(CO)TRA)
 
       IF (ALPHA.EQ.ZERO) THEN
-         IF (BETA.EQ.ZERO) THEN
-            DO I = 1, M
-               Y(I) = ZERO
-            ENDDO
-         ELSE
-            DO 20 I = 1, M
-               Y(I) = BETA*Y(I)
- 20         CONTINUE
-         ENDIF
-         RETURN
+        IF (BETA.EQ.ZERO) THEN
+          DO I = 1, M
+            Y(I) = ZERO
+          ENDDO
+        ELSE
+          DO 20 I = 1, M
+            Y(I) = BETA*Y(I)
+ 20       CONTINUE
+        ENDIF
+        RETURN
       END IF
 
 C
       IF (SYM) THEN
-         IF (UNI) THEN
+        IF (UNI) THEN
 C
 C              ......Symmetric with unitary diagonal.......
 C              ....OK!!
 C              To be optimized
-            
-            IF (BETA.NE.ZERO) THEN
-               DO 40 I = 1, M
+          
+          IF (BETA.NE.ZERO) THEN
+            DO 40 I = 1, M
 C
 C                 Product for diagonal elements
 C
-                  Y(I) = BETA*Y(I) + ALPHA*X(I)
- 40            CONTINUE
-            ELSE
-               DO I = 1, M
-                  Y(I) = ALPHA*X(I)
-               ENDDO
-            ENDIF
+              Y(I) = BETA*Y(I) + ALPHA*X(I)
+ 40         CONTINUE
+          ELSE
+            DO I = 1, M
+              Y(I) = ALPHA*X(I)
+            ENDDO
+          ENDIF
 
 C              Product for other elements
-            IF ((TRANS.EQ.'L').OR.(TRANS.EQ.'U')) THEN
-               DO 80 I = 1, M
-                  ACC = ZERO
-                  DO 60 J = IA(I), IA(I+1) - 1
-                     K = JA(J)
-                     Y(K) = Y(K) + ALPHA*AS(J)*X(I)
-                     ACC = ACC + AS(J)*X(K)
- 60               CONTINUE
-                  Y(I) = Y(I) + ALPHA*ACC
- 80            CONTINUE
-            ELSE   ! Perform computations on conjug(A)
-               DO 82 I = 1, M
-                  ACC = ZERO
-                  DO 81 J = IA(I), IA(I+1) - 1
-                     K = JA(J)
-                     Y(K) = Y(K) + ALPHA * CONJG(AS(J)) * X(I)
-                     ACC = ACC + CONJG(AS(J)) * X(K)
- 81               CONTINUE
-                  Y(I) = Y(I) + ALPHA*ACC
- 82            CONTINUE
-            ENDIF
+          IF ((TRANS.EQ.'L').OR.(TRANS.EQ.'U')) THEN
+            DO 80 I = 1, M
+              ACC = ZERO
+              DO 60 J = IA(I), IA(I+1) - 1
+                K = JA(J)
+                Y(K) = Y(K) + ALPHA*AS(J)*X(I)
+                ACC = ACC + AS(J)*X(K)
+ 60           CONTINUE
+              Y(I) = Y(I) + ALPHA*ACC
+ 80         CONTINUE
+          ELSE                  ! Perform computations on conjug(A)
+            DO 82 I = 1, M
+              ACC = ZERO
+              DO 81 J = IA(I), IA(I+1) - 1
+                K = JA(J)
+                Y(K) = Y(K) + ALPHA * CONJG(AS(J)) * X(I)
+                ACC = ACC + CONJG(AS(J)) * X(K)
+ 81           CONTINUE
+              Y(I) = Y(I) + ALPHA*ACC
+ 82         CONTINUE
+          ENDIF
 C
-         ELSE IF ( .NOT. UNI) THEN
+        ELSE IF ( .NOT. UNI) THEN
 C
 C            Check if matrix is lower or upper
 C
-            IF ((TRANS.EQ.'L').OR.(TRANS.EQ.'M')) THEN
+          IF ((TRANS.EQ.'L').OR.(TRANS.EQ.'M')) THEN
 C
 C               LOWER CASE: diagonal element is the last element of row
 C               ....OK!
 
-               IF (BETA.NE.ZERO) THEN
-                  DO 100 I = 1, M
-                     Y(I) = BETA*Y(I)
- 100              CONTINUE
-               ELSE
-                  DO I = 1, M
-                     Y(I) = ZERO
-                  ENDDO
-               ENDIF
+            IF (BETA.NE.ZERO) THEN
+              DO 100 I = 1, M
+                Y(I) = BETA*Y(I)
+ 100          CONTINUE
+            ELSE
+              DO I = 1, M
+                Y(I) = ZERO
+              ENDDO
+            ENDIF
 
-               IF  (TRANS.EQ.'L') THEN
-                  DO 140 I = 1, M
-                     ACC = ZERO
-                     DO 120 J = IA(I), IA(I+1) - 1 ! it was -2
-                        K = JA(J)
+            IF  (TRANS.EQ.'L') THEN
+              DO 140 I = 1, M
+                ACC = ZERO
+                DO 120 J = IA(I), IA(I+1) - 1 ! it was -2
+                  K = JA(J)
 C   
 C                    To be optimized
 C   
-                        IF (K.NE.I) THEN    !for symmetric element 
-                           Y(K) = Y(K) + ALPHA*AS(J)*X(I)
-                        ENDIF
-                        ACC = ACC + AS(J)*X(K)
- 120                 CONTINUE
+                  IF (K.NE.I) THEN !for symmetric element 
+                    Y(K) = Y(K) + ALPHA*AS(J)*X(I)
+                  ENDIF
+                  ACC = ACC + AS(J)*X(K)
+ 120            CONTINUE
 
-                     Y(I) = Y(I) + ALPHA*ACC 
- 140              CONTINUE
-               ELSE   ! Perform computations on conjug(A)
-                  DO 142 I = 1, M
-                     ACC = ZERO
-                     DO 141 J = IA(I), IA(I+1) - 1 ! it was -2
-                        K = JA(J)
+                Y(I) = Y(I) + ALPHA*ACC 
+ 140          CONTINUE
+            ELSE                ! Perform computations on conjug(A)
+              DO 142 I = 1, M
+                ACC = ZERO
+                DO 141 J = IA(I), IA(I+1) - 1 ! it was -2
+                  K = JA(J)
 C   
 C                    To be optimized
 C   
-                        IF (K.NE.I) THEN    !for symmetric element 
-                           Y(K) = Y(K) + ALPHA * CONJG(AS(J)) * X(I)
-                        ENDIF
-                        ACC = ACC + CONJG(AS(J)) * X(K)
- 141                 CONTINUE
-                     Y(I) = Y(I) + ALPHA * ACC 
- 142              CONTINUE
+                  IF (K.NE.I) THEN !for symmetric element 
+                    Y(K) = Y(K) + ALPHA * CONJG(AS(J)) * X(I)
+                  ENDIF
+                  ACC = ACC + CONJG(AS(J)) * X(K)
+ 141            CONTINUE
+                Y(I) = Y(I) + ALPHA * ACC 
+ 142          CONTINUE
 
-               ENDIF
+            ENDIF
 
-            ELSE   ! ....Trans<>L, M
+          ELSE                  ! ....Trans<>L, M
 C
 C              UPPER CASE
 C              ....OK!!
 C
-               IF (BETA.NE.ZERO) THEN
-                  DO 160 I = 1, M
-                     Y(I) = BETA*Y(I)
- 160              CONTINUE
-               ELSE
-                  DO I = 1, M
-                     Y(I) = ZERO
-                  ENDDO
-               ENDIF
-               IF (TRANS.EQ.'U') THEN
-                  DO 200 I = 1, M
-                     ACC = ZERO
-                     DO 180 J = IA(I) , IA(I+1) - 1 ! removed +1
-                        K = JA(J)
+            IF (BETA.NE.ZERO) THEN
+              DO 160 I = 1, M
+                Y(I) = BETA*Y(I)
+ 160          CONTINUE
+            ELSE
+              DO I = 1, M
+                Y(I) = ZERO
+              ENDDO
+            ENDIF
+            IF (TRANS.EQ.'U') THEN
+              DO 200 I = 1, M
+                ACC = ZERO
+                DO 180 J = IA(I) , IA(I+1) - 1 ! removed +1
+                  K = JA(J)
 C   
 C                    To be optimized
 C   
-                        IF(K.NE.I) THEN
-                           Y(K) = Y(K) + ALPHA*AS(J)*X(I)
-                        ENDIF
-                        ACC = ACC + AS(J)*X(K)
-  180                CONTINUE
-                     Y(I) = Y(I) + ALPHA*ACC
-  200             CONTINUE
-               ELSE  ! Perform computations on conjug(A)
-                  DO 202 I = 1, M
-                     ACC = ZERO
-                     DO 201 J = IA(I) , IA(I+1) - 1 ! removed +1
-                        K = JA(J)
+                  IF(K.NE.I) THEN
+                    Y(K) = Y(K) + ALPHA*AS(J)*X(I)
+                  ENDIF
+                  ACC = ACC + AS(J)*X(K)
+ 180            CONTINUE
+                Y(I) = Y(I) + ALPHA*ACC
+ 200          CONTINUE
+            ELSE                ! Perform computations on conjug(A)
+              DO 202 I = 1, M
+                ACC = ZERO
+                DO 201 J = IA(I) , IA(I+1) - 1 ! removed +1
+                  K = JA(J)
 C   
 C                    To be optimized
 C   
-                        IF(K.NE.I) THEN
-                           Y(K) = Y(K) + ALPHA * CONJG(AS(J)) * X(I)
-                        ENDIF
-                        ACC = ACC + CONJG(AS(J)) * X(K)
- 201                 CONTINUE
-                     Y(I) = Y(I) + ALPHA*ACC
- 202              CONTINUE
-               ENDIF
-            END IF   ! ......TRANS=='L'
-         END IF      ! ......Not UNI
+                  IF(K.NE.I) THEN
+                    Y(K) = Y(K) + ALPHA * CONJG(AS(J)) * X(I)
+                  ENDIF
+                  ACC = ACC + CONJG(AS(J)) * X(K)
+ 201            CONTINUE
+                Y(I) = Y(I) + ALPHA*ACC
+ 202          CONTINUE
+            ENDIF
+          END IF                ! ......TRANS=='L'
+        END IF                  ! ......Not UNI
 C
-      ELSE IF ((.NOT.TRA).AND.(.NOT.COTRA)) THEN    !......NOT SYM
+      ELSE IF ((.NOT.TRA).AND.(.NOT.COTRA)) THEN !......NOT SYM
 
-         IF ( .NOT. UNI) THEN      
+        IF ( .NOT. UNI) THEN      
 C
 C          .......General Not Unit, No Traspose
 C
 
-            IF (BETA.NE.ZERO) THEN
-               DO 240 I = 1, M
-                  ACC = ZERO
-                  DO 220 J = IA(I), IA(I+1) - 1
-                     ACC = ACC + AS(J)*X(JA(J))
- 220              CONTINUE
-                  Y(I) = ALPHA*ACC + BETA*Y(I)
- 240           CONTINUE
-            ELSE
-               DO I = 1, M
-                  ACC = ZERO
-                  DO J = IA(I), IA(I+1) - 1
-                     ACC = ACC + AS(J)*X(JA(J))
-                  ENDDO
-                  Y(I) = ALPHA*ACC
-               ENDDO
-            ENDIF
+          IF (BETA.NE.ZERO) THEN
+            DO 240 I = 1, M
+              ACC = ZERO
+              DO 220 J = IA(I), IA(I+1) - 1
+                ACC = ACC + AS(J)*X(JA(J))
+ 220          CONTINUE
+              Y(I) = ALPHA*ACC + BETA*Y(I)
+ 240        CONTINUE
+          ELSE
+            DO I = 1, M
+              ACC = ZERO
+              DO J = IA(I), IA(I+1) - 1
+                ACC = ACC + AS(J)*X(JA(J))
+              ENDDO
+              Y(I) = ALPHA*ACC
+            ENDDO
+          ENDIF
 C
-         ELSE IF (UNI) THEN
+        ELSE IF (UNI) THEN
 C
-            IF (BETA.NE.ZERO) THEN
-               DO 280 I = 1, M
-                  ACC = ZERO
-                  DO 260 J = IA(I), IA(I+1) - 1
-                     ACC = ACC + AS(J)*X(JA(J))
- 260              CONTINUE
-                  Y(I) = ALPHA*(ACC+X(I)) + BETA*Y(I)
- 280           CONTINUE
-            ELSE        !(BETA.EQ.ZERO)
-               DO I = 1, M
-                  ACC = ZERO
-                  DO J = IA(I), IA(I+1) - 1
-                     ACC = ACC + AS(J)*X(JA(J))
-                  ENDDO
-                  Y(I) = ALPHA*(ACC+X(I))
-               ENDDO
-            ENDIF
-         END IF   !....End Testing on UNI
+          IF (BETA.NE.ZERO) THEN
+            DO 280 I = 1, M
+              ACC = ZERO
+              DO 260 J = IA(I), IA(I+1) - 1
+                ACC = ACC + AS(J)*X(JA(J))
+ 260          CONTINUE
+              Y(I) = ALPHA*(ACC+X(I)) + BETA*Y(I)
+ 280        CONTINUE
+          ELSE                  !(BETA.EQ.ZERO)
+            DO I = 1, M
+              ACC = ZERO
+              DO J = IA(I), IA(I+1) - 1
+                ACC = ACC + AS(J)*X(JA(J))
+              ENDDO
+              Y(I) = ALPHA*(ACC+X(I))
+            ENDDO
+          ENDIF
+        END IF                  !....End Testing on UNI
 C
-      ELSE IF (TRA) THEN   !....Else on SYM (swapped M and N)
+      ELSE IF (TRA) THEN        !....Else on SYM (swapped M and N)
 C
-         IF ( .NOT. UNI) THEN
+        IF ( .NOT. UNI) THEN
 C
-            IF (BETA.NE.ZERO) THEN
-               DO 300 I = 1, M
-                  Y(I) = BETA*Y(I)
- 300           CONTINUE
-            ELSE        !(BETA.EQ.ZERO)
-               DO I = 1, M
-                  Y(I) = ZERO
-               ENDDO
-            ENDIF
+          IF (BETA.NE.ZERO) THEN
+            DO 300 I = 1, M
+              Y(I) = BETA*Y(I)
+ 300        CONTINUE
+          ELSE                  !(BETA.EQ.ZERO)
+            DO I = 1, M
+              Y(I) = ZERO
+            ENDDO
+          ENDIF
 C
-         ELSE IF (UNI) THEN
+        ELSE IF (UNI) THEN
 C
 
-            IF (BETA.NE.ZERO) THEN
-               DO 320 I = 1, M
-                  Y(I) = BETA*Y(I) + ALPHA*X(I)
- 320           CONTINUE
-            ELSE                !(BETA.EQ.ZERO)
-               DO I = 1, M
-                  Y(I) = ALPHA*X(I)
-               ENDDO
-            ENDIF
+          IF (BETA.NE.ZERO) THEN
+            DO 320 I = 1, M
+              Y(I) = BETA*Y(I) + ALPHA*X(I)
+ 320        CONTINUE
+          ELSE                  !(BETA.EQ.ZERO)
+            DO I = 1, M
+              Y(I) = ALPHA*X(I)
+            ENDDO
+          ENDIF
 
 C
-         END IF    !....UNI
+        END IF                  !....UNI
 C
-         IF (ALPHA.EQ.ONE) THEN
+        IF (ALPHA.EQ.ONE) THEN
 C
-            DO 360 I = 1, N
-               DO 340 J = IA(I), IA(I+1) - 1
-                  K = JA(J)
-                  Y(K) = Y(K) + AS(J)*X(I)
-  340          CONTINUE
-  360       CONTINUE
+          DO 360 I = 1, N
+            DO 340 J = IA(I), IA(I+1) - 1
+              K = JA(J)
+              Y(K) = Y(K) + AS(J)*X(I)
+ 340        CONTINUE
+ 360      CONTINUE
 C
-         ELSE IF (ALPHA.EQ.-ONE) THEN
+        ELSE IF (ALPHA.EQ.-ONE) THEN
 C
-            DO 400 I = 1, n
-               DO 380 J = IA(I), IA(I+1) - 1
-                  K = JA(J)
-                  Y(K) = Y(K) - AS(J)*X(I)
-  380          CONTINUE
-  400       CONTINUE
+          DO 400 I = 1, n
+            DO 380 J = IA(I), IA(I+1) - 1
+              K = JA(J)
+              Y(K) = Y(K) - AS(J)*X(I)
+ 380        CONTINUE
+ 400      CONTINUE
 C
-         ELSE           !.....Else on TRA
+        ELSE                    !.....Else on TRA
 C
 C           This work array is used for efficiency
 C
-            DO 420 I = 1, N
-               WORK(I) = ALPHA*X(I)
-  420       CONTINUE
+          DO 420 I = 1, N
+            WORK(I) = ALPHA*X(I)
+ 420      CONTINUE
 C
-            DO 460 I = 1, n
-               DO 440 J = IA(I), IA(I+1) - 1
-                  K = JA(J)
-                  Y(K) = Y(K) + AS(J)*WORK(I)
-  440          CONTINUE
-  460       CONTINUE
+          DO 460 I = 1, n
+            DO 440 J = IA(I), IA(I+1) - 1
+              K = JA(J)
+              Y(K) = Y(K) + AS(J)*WORK(I)
+ 440        CONTINUE
+ 460      CONTINUE
 C
-         END IF     !.....End testing on ALPHA
+        END IF                  !.....End testing on ALPHA
 
-      ELSE IF (COTRA) THEN   !....Else on SYM (swapped M and N)
+      ELSE IF (COTRA) THEN      !....Else on SYM (swapped M and N)
 C
-         IF ( .NOT. UNI) THEN
+        IF ( .NOT. UNI) THEN
 C
-            IF (BETA.NE.ZERO) THEN
-               DO 500 I = 1, M
-                  Y(I) = BETA*Y(I)
- 500           CONTINUE
-            ELSE        !(BETA.EQ.ZERO)
-               DO I = 1, M
-                  Y(I) = ZERO
-               ENDDO
-            ENDIF
+          IF (BETA.NE.ZERO) THEN
+            DO 500 I = 1, M
+              Y(I) = BETA*Y(I)
+ 500        CONTINUE
+          ELSE                  !(BETA.EQ.ZERO)
+            DO I = 1, M
+              Y(I) = ZERO
+            ENDDO
+          ENDIF
 C
-         ELSE IF (UNI) THEN
+        ELSE IF (UNI) THEN
 C
 
-            IF (BETA.NE.ZERO) THEN
-               DO 520 I = 1, M
-                  Y(I) = BETA*Y(I) + ALPHA*X(I)
- 520           CONTINUE
-            ELSE                !(BETA.EQ.ZERO)
-               DO I = 1, M
-                  Y(I) = ALPHA*X(I)
-               ENDDO
-            ENDIF
+          IF (BETA.NE.ZERO) THEN
+            DO 520 I = 1, M
+              Y(I) = BETA*Y(I) + ALPHA*X(I)
+ 520        CONTINUE
+          ELSE                  !(BETA.EQ.ZERO)
+            DO I = 1, M
+              Y(I) = ALPHA*X(I)
+            ENDDO
+          ENDIF
 
 C
-         END IF    !....UNI
+        END IF                  !....UNI
 C
-         IF (ALPHA.EQ.ONE) THEN
+        IF (ALPHA.EQ.ONE) THEN
 C
-            DO 560 I = 1, N
-               DO 540 J = IA(I), IA(I+1) - 1
-                  K = JA(J)
-                  Y(K) = Y(K) + CONJG(AS(J))*X(I)
-  540          CONTINUE
-  560       CONTINUE
+          DO 560 I = 1, N
+            DO 540 J = IA(I), IA(I+1) - 1
+              K = JA(J)
+              Y(K) = Y(K) + CONJG(AS(J))*X(I)
+ 540        CONTINUE
+ 560      CONTINUE
 C
-         ELSE IF (ALPHA.EQ.-ONE) THEN
+        ELSE IF (ALPHA.EQ.-ONE) THEN
 C
-            DO 600 I = 1, n
-               DO 580 J = IA(I), IA(I+1) - 1
-                  K = JA(J)
-                  Y(K) = Y(K) - CONJG(AS(J))*X(I)
-  580          CONTINUE
-  600       CONTINUE
+          DO 600 I = 1, n
+            DO 580 J = IA(I), IA(I+1) - 1
+              K = JA(J)
+              Y(K) = Y(K) - CONJG(AS(J))*X(I)
+ 580        CONTINUE
+ 600      CONTINUE
 C
-         ELSE           !.....Else on TRA
+        ELSE                    !.....Else on TRA
 C
 C           This work array is used for efficiency
 C
-            DO 620 I = 1, N
-               WORK(I) = ALPHA*X(I)
-  620       CONTINUE
+          DO 620 I = 1, N
+            WORK(I) = ALPHA*X(I)
+ 620      CONTINUE
 C
-            DO 660 I = 1, n
-               DO 640 J = IA(I), IA(I+1) - 1
-                  K = JA(J)
-                  Y(K) = Y(K) + CONJG(AS(J))*WORK(I)
-  640          CONTINUE
-  660       CONTINUE
+          DO 660 I = 1, n
+            DO 640 J = IA(I), IA(I+1) - 1
+              K = JA(J)
+              Y(K) = Y(K) + CONJG(AS(J))*WORK(I)
+ 640        CONTINUE
+ 660      CONTINUE
 C
-         END IF     !.....End testing on ALPHA
+        END IF                  !.....End testing on ALPHA
 
-      END IF        !.....End testing on SYM      
+      END IF                    !.....End testing on SYM      
 C
       RETURN
 C

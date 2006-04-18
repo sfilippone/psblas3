@@ -80,7 +80,7 @@ subroutine psb_zcssv(alpha,t,b,beta,c,info,trans,unitd,d)
   call zcssm(lt,m,n,alpha,lu,ddl,&
        & t%pl,t%fida,t%descra,t%aspk,t%ia1,t%ia2,t%infoa,t%pr,&
        & b,lb,beta,c,lc,work,iwsz,info)
-  
+
   if (.not.present(d)) then 
     deallocate(ddl)
   endif
