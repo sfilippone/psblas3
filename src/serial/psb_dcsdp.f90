@@ -64,7 +64,7 @@ subroutine psb_dcsdp(a, b,info,ifc,check,trans,unitd,upd,dupl)
   Integer                       :: nzr, ntry, ifc_,ierror, ia1_size,&
        & ia2_size, aspk_size,size_req,n_row,n_col,upd_,dupl_
   integer                       :: ip1, ip2, nnz, iflag, ichk, nnzt,&
-       & ipc, i, count, err_act, ierrv(5)
+       & ipc, i, count, err_act, ierrv(5), i1, i2, ia
   character                     :: check_,trans_,unitd_, up
   Integer, Parameter            :: maxtry=8
   logical, parameter            :: debug=.false.
@@ -104,12 +104,12 @@ subroutine psb_dcsdp(a, b,info,ifc,check,trans,unitd,upd,dupl)
     check_ = 'N'
   endif
   if (present(trans)) then 
-    trans_ = toupper(trans )
+    trans_ = toupper(trans)
   else 
     trans_ = 'N'
   endif
   if (present(unitd)) then 
-    unitd_ = toupper(unitd )
+    unitd_ = toupper(unitd)
   else 
     unitd_ = 'U'
   endif
@@ -161,21 +161,37 @@ subroutine psb_dcsdp(a, b,info,ifc,check,trans,unitd,upd,dupl)
       call psb_sp_setifld(dupl,psb_dupl_,b,info)    
     end if
     
-
+    upd_ = psb_sp_getifld(psb_upd_,b,info)
+    select case(upd_)
+    case(psb_upd_dflt_,psb_upd_srch_,psb_upd_perm_)
+      ! Legal value, do nothing
+    case default
+      ! Fix bad value
+      upd_ = psb_upd_dflt_
+      call psb_sp_setifld(upd_,psb_upd_,b,info)    
+    end select
+    dupl_ = psb_sp_getifld(psb_dupl_,b,info)
+    select case(dupl_)
+    case(psb_dupl_ovwrt_,psb_dupl_add_,psb_dupl_err_)
+      ! Legal value, do nothing
+    case default
+      ! Fix bad value
+      dupl_ = psb_dupl_def_
+      call psb_sp_setifld(dupl_,psb_dupl_,b,info)    
+    end select
+    
     !  ...matrix conversion...
     b%m=a%m
     b%k=a%k
     call psb_spinfo(psb_nztotreq_,a,size_req,info)
     if (debug) write(0,*) 'DCSDP : size_req 1:',size_req
     !
-    upd_ = psb_sp_getifld(psb_upd_,b,info)
-
+    
     n_row=b%m 
     n_col=b%k
     call psb_cest(b%fida, n_row,n_col,size_req,&
          & ia1_size, ia2_size, aspk_size, upd_,info)
 
-!!$    write(0,*) 'ESTIMATE : ',ia1_size,ia2_size,aspk_Size,upd_
     if (info /= no_err) then    
       info=4010
       ch_err='psb_cest'
@@ -208,12 +224,6 @@ subroutine psb_dcsdp(a, b,info,ifc,check,trans,unitd,upd,dupl)
 
       case ('CSR')
 
-!!$
-!!$        ia1_size=a%infoa(psb_nnz_)
-!!$        ia2_size=a%m+1
-!!$        aspk_size=a%infoa(psb_nnz_)
-!!$        call psb_sp_reall(b,ia1_size,ia2_size,aspk_size,info)
-
         call dcrcr(trans_, a%m, a%k, unitd_, d, a%descra, a%aspk,&
              & a%ia1, a%ia2, a%infoa, b%pl, b%descra, b%aspk, b%ia1,&
              & b%ia2, b%infoa, b%pr, size(b%aspk), size(b%ia1),&
@@ -231,10 +241,6 @@ subroutine psb_dcsdp(a, b,info,ifc,check,trans,unitd,upd,dupl)
 
         !...converting to JAD
         !...output matrix may not be big enough
-!!$        ia1_size=a%infoa(psb_nnz_)
-!!$        ia2_size=a%m+1
-!!$        aspk_size=a%infoa(psb_nnz_)
-!!$        call psb_sp_reall(b,ia1_size,ia2_size,aspk_size,info)
         do
 
           call dcrjd(trans_, a%m, a%k, unitd_, d, a%descra, a%aspk,&
@@ -274,9 +280,6 @@ subroutine psb_dcsdp(a, b,info,ifc,check,trans,unitd,upd,dupl)
 
       case ('COO')
 
-!!$        aspk_size=max(size(a%aspk),a%ia2(a%m+1))
-!!$        call psb_sp_reall(b,aspk_size,info)
-!!$        write(0,*) 'From DCSDP90:',b%fida,size(b%aspk),info
         call dcrco(trans_, a%m, a%k, unitd_, d, a%descra, a%aspk,&
              & a%ia1, a%ia2, a%infoa, b%pl, b%descra, b%aspk, b%ia1,&
              & b%ia2, b%infoa, b%pr, size(b%aspk), size(b%ia1),&
@@ -295,8 +298,6 @@ subroutine psb_dcsdp(a, b,info,ifc,check,trans,unitd,upd,dupl)
 
       case ('CSR')
 
-!!$        aspk_size=max(size(a%aspk),a%ia2(a%m+1))
-!!$        call psb_sp_reall(b,aspk_size,info)
         call dcocr(trans_, a%m, a%k, unitd_, d, a%descra, a%aspk,&
              & a%ia2, a%ia1, a%infoa, b%pl, b%descra, b%aspk, b%ia1,&
              & b%ia2, b%infoa, b%pr, size(b%aspk), size(b%ia1),&
@@ -364,12 +365,8 @@ subroutine psb_dcsdp(a, b,info,ifc,check,trans,unitd,upd,dupl)
 
         end do
 
-
-
       case ('COO')
 
-!!$        aspk_size=max(size(a%aspk),a%ia2(a%m+1))
-!!$        call psb_sp_reall(b,aspk_size,info)
         call dcoco(trans_, a%m, a%k, unitd_, d, a%descra, a%aspk,&
              & a%ia1, a%ia2, a%infoa, b%pl, b%descra, b%aspk, b%ia1,&
              & b%ia2, b%infoa, b%pr, size(b%aspk), size(b%ia1),&
@@ -383,18 +380,32 @@ subroutine psb_dcsdp(a, b,info,ifc,check,trans,unitd,upd,dupl)
 
     end select
 
+!!$    write(0,*) 'End of assembly', psb_sp_getifld(psb_upd_,b,info) ,psb_upd_perm_
+    if (psb_sp_getifld(psb_upd_,b,info) /= psb_upd_perm_) then
+!!$      write(0,*) 'Going for trimsize',size(b%ia1),size(b%ia2),size(b%aspk)
+      call psb_sp_trimsize(b,i1,i2,ia,info)
+!!$      write(0,*) 'From trimsize',i1,i2,ia,info
+      if (info == 0) call psb_sp_reall(b,i1,i2,ia,info)
+!!$      write(0,*) 'From realloc',size(b%ia1),size(b%ia2),size(b%aspk)
+    endif
+
   else if (check_=='R') then
+
     !...Regenerating matrix    
+
     if (psb_sp_getifld(psb_state_,b,info) /= psb_spmat_upd_) then 
       info = 8888
       call psb_errpush(info,name)
       goto 9999
     endif
 
+    !
+    !   dupl_ and upd_ fields should not be changed. 
+    !
     select case(psb_sp_getifld(psb_upd_,b,info))
 
     case(psb_upd_perm_)
-
+      if (debug) write(0,*) 'Regeneration with psb_upd_perm_'
       if (toupper(b%fida(1:3))/='JAD') then
         ip1   = psb_sp_getifld(psb_upd_pnt_,b,info) 
         ip2   = b%ia2(ip1+psb_ip2_)
@@ -484,7 +495,8 @@ subroutine psb_dcsdp(a, b,info,ifc,check,trans,unitd,upd,dupl)
       endif
 
     case(psb_upd_dflt_,psb_upd_srch_)
-      ! Nothing to be done 
+      ! Nothing to be done  here. 
+      if (debug) write(0,*) 'Going through on regeneration with psb_upd_srch_'
     case default
       ! Wrong value
       info = 8888

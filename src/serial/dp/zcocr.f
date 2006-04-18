@@ -73,7 +73,7 @@ C
       IERROR = 0
       CALL FCPSB_ERRACTIONSAVE(ERR_ACT)
 
-      call psb_getifield(check_flag,psb_dupl_,info,psb_ifasize_,ierror)
+      call psb_getifield(check_flag,psb_dupl_,infon,psb_ifasize_,ierror)
 
       IF ((TRANS.EQ.'N').or.(TRANS.EQ.'n')) THEN
 

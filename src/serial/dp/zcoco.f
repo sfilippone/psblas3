@@ -71,7 +71,7 @@ c
       ierror = 0
       call fcpsb_erractionsave(err_act)
 
-      call psb_getifield(check_flag,psb_dupl_,info,psb_ifasize_,ierror)
+      call psb_getifield(check_flag,psb_dupl_,infon,psb_ifasize_,ierror)
       if (trans.eq.'N') then
         scale  = (unitd.eq.'L') ! meaningless
         p1(1) = 0

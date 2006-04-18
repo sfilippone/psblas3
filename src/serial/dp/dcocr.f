@@ -73,7 +73,7 @@ C
       IERROR = 0
       CALL FCPSB_ERRACTIONSAVE(ERR_ACT)
 
-      call psb_getifield(check_flag,psb_dupl_,info,psb_ifasize_,ierror)
+      call psb_getifield(check_flag,psb_dupl_,infon,psb_ifasize_,ierror)
 
       IF ((TRANS.EQ.'N').or.(TRANS.EQ.'n')) THEN
 
@@ -230,16 +230,22 @@ C                    ... Error, there are duplicated elements ...
 C                    ... Insert only the last duplicated element ...
                     ARN(ELEM_CSR-1) = AR(ELEM)
                     ian2(ip2+aux(ipx+elem-1)-1) = elem_csr-1
+                    if (debug) write(0,*) 'Duplicated overwrite perm ',
+     +                elem_csr-1,elem
                   ELSE IF (CHECK_FLAG.EQ.psb_dupl_add_) THEN 
 C                    ... Sum the duplicated element ...
                     ARN(ELEM_CSR-1) = ARN(ELEM_CSR-1) + AR(ELEM)
                     ian2(ip2+aux(ipx+elem-1)-1) = elem_csr-1
+                    if (debug) write(0,*) 'Duplicated add perm ',
+     +                elem_csr-1,elem
                   END IF
                 ENDIF
                 ELEM = ELEM + 1
               ENDDO
               IAN2(ROW+1) = ELEM_CSR
             ENDDO
+
+            
           ELSE
 c$$$            write(0,*) 'Going for ELSE !!!?'
 C       .... Order with key IA ...
@@ -304,12 +310,12 @@ C     ... Error, there are duplicated elements ...
                   ELSE IF (CHECK_FLAG.EQ.psb_dupl_ovwrt_) THEN
 C                    ... Insert only the last duplicated element ...
                     ARN(ELEM_CSR-1) = AR(ELEM)
-                    if (debug) write(0,*) 'Duplicated overwrite',
+                    if (debug) write(0,*) 'Duplicated overwrite srch',
      +                elem_csr-1,elem
                   ELSE IF (CHECK_FLAG.EQ.psb_dupl_add_) THEN 
 C                    ... Sum the duplicated element ...
                     ARN(ELEM_CSR-1) = ARN(ELEM_CSR-1) + AR(ELEM)
-                    if (debug) write(0,*) 'Duplicated add',
+                    if (debug) write(0,*) 'Duplicated add srch',
      +                elem_csr-1,elem
                   END IF
                 ENDIF
@@ -321,11 +327,11 @@ C                    ... Sum the duplicated element ...
 
           if (debug) write(0,*)'Done Rebuild CSR',
      +      ian2(m+1),ia(elem)
-          if (debug) then 
-            do i=ian2(m+1), nnz
-              write(0,*) 'Overflow check :',ia(i),ja(i),ar(i)
-            enddo
-          endif
+c$$$          if (debug) then 
+c$$$            do i=ian2(m+1), nnz
+c$$$              write(0,*) 'Overflow check :',ia(i),ja(i),ar(i)
+c$$$            enddo
+c$$$          endif
 
         ELSE IF (DESCRA(1:1).EQ.'S' .AND. DESCRA(2:2).EQ.'U') THEN
 
@@ -396,19 +402,19 @@ C     ... Insert other element of row ...
                   ELEM_CSR = ELEM_CSR+1
                 ENDIF
               ELSE
-                IF (CHECK_FLAG.EQ.1) THEN
+                IF (CHECK_FLAG.EQ.psb_dupl_err_) THEN
 C     ... Error, there are duplicated elements ...
                   IERROR = 130
                   CALL FCPSB_ERRPUSH(IERROR,NAME,INT_VAL)
                   GOTO 9999
-                ELSE IF (CHECK_FLAG.EQ.2) THEN
+                ELSE IF (CHECK_FLAG.EQ.psb_dupl_ovwrt_) THEN
 C     ... Insert only the last duplicated element ...
                   IF(JA(ELEM).GT.IA(ELEM)) THEN                   
                     ARN(ELEM_CSR-1) = AR(ELEM)
                   ENDIF
                   if (debug) write(0,*) 'Duplicated overwrite',
      +              elem_csr-1,elem
-                ELSE IF (CHECK_FLAG.EQ.3) THEN 
+                ELSE IF (CHECK_FLAG.EQ.psb_dupl_add_) THEN 
 C     ... Sum the duplicated element ...
                   IF(JA(ELEM).GT.IA(ELEM)) THEN                   
                     ARN(ELEM_CSR-1) = ARN(ELEM_CSR-1) + AR(ELEM)
@@ -494,19 +500,19 @@ C     ... Insert other element of row ...
                   ELEM_CSR = ELEM_CSR+1
                 ENDIF
               ELSE
-                IF (CHECK_FLAG.EQ.1) THEN
+                IF (CHECK_FLAG.EQ.psb_dupl_err_) THEN
 C                    ... Error, there are duplicated elements ...
                   IERROR = 130
                   CALL FCPSB_ERRPUSH(IERROR,NAME,INT_VAL)
                   GOTO 9999
-                ELSE IF (CHECK_FLAG.EQ.2) THEN
+                ELSE IF (CHECK_FLAG.EQ.psb_dupl_ovwrt_) THEN
 C                    ... Insert only the last duplicated element ...
                   IF(JA(ELEM).LT.IA(ELEM)) THEN                   
                     ARN(ELEM_CSR-1) = AR(ELEM)
                   ENDIF
                   if (debug) write(0,*) 'Duplicated overwrite',
      +              elem_csr-1,elem
-                ELSE IF (CHECK_FLAG.EQ.3) THEN 
+                ELSE IF (CHECK_FLAG.EQ.psb_dupl_add_) THEN 
 C                    ... Sum the duplicated element ...
                   IF(JA(ELEM).LT.IA(ELEM)) THEN                   
                     ARN(ELEM_CSR-1) = ARN(ELEM_CSR-1) + AR(ELEM)

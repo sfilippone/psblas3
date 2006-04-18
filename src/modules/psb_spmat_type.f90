@@ -92,6 +92,10 @@ module psb_spmat_type
     module procedure psb_dsp_transfer, psb_zsp_transfer
   end interface
 
+  interface psb_sp_trimsize
+    module procedure psb_dsp_trimsize, psb_zsp_trimsize
+  end interface
+
   interface psb_sp_reall
     module procedure psb_dspreallocate, psb_dspreall3, &
          & psb_zspreallocate, psb_zspreall3
@@ -108,6 +112,10 @@ module psb_spmat_type
 
   interface psb_sp_reinit
     module procedure psb_dspreinit,  psb_zspreinit
+  end interface
+
+  interface psb_sp_sizeof
+    module procedure psb_dspsizeof,  psb_zspsizeof
   end interface
 
 contains 
@@ -323,7 +331,9 @@ contains
     logical, parameter  :: debug=.false.
 
     info  = 0
+    if (debug) write(0,*) 'Before realloc',nd,size(a%aspk)
     call psb_realloc(nd,a%aspk,info)
+    if (debug) write(0,*) 'After realloc',nd,size(a%aspk),info
     if (info /= 0) return 
     call psb_realloc(ni2,a%ia2,info)
     if (info /= 0) return 
@@ -453,6 +463,52 @@ contains
   end subroutine psb_dsp_setifld
 
 
+  subroutine psb_dsp_trimsize(a, i1,i2,ia,info)
+    use psb_string_mod
+    implicit none
+    !....Parameters...
+    Type(psb_dspmat_type), intent(in) :: A
+    Integer, intent(out)              :: i1, i2, ia, info
+
+    !locals
+    Integer             :: nza,nz1, nz2, nzl, nzr
+    logical, parameter  :: debug=.false.
+
+    info  = 0
+    if (psb_sp_getifld(psb_upd_,a,info) == psb_upd_perm_) then 
+      info = -1 
+      i1 = size(a%ia1)
+      i2 = size(a%ia2)
+      ia = size(a%aspk)
+      return
+    endif
+    select case(toupper(a%fida))
+    case('CSR')
+      nza = a%ia2(a%m+1)-1
+      ia  = nza
+      i1  = nza
+      i2  = a%m + 1
+    case('COO')
+      nza = a%infoa(psb_nnz_)
+      i1  = nza
+      i2  = nza
+      ia  = nza
+    case('JAD')
+      ! Feeling lazy today
+      i1 = size(a%ia1)
+      i2 = size(a%ia2)
+      ia = size(a%aspk)
+    case default
+      info = -2
+      i1 = size(a%ia1)
+      i2 = size(a%ia2)
+      ia = size(a%aspk)
+    end select
+
+    Return
+
+  End Subroutine psb_dsp_trimsize
+  
   function psb_dsp_getifld(field,a,info)
     implicit none
     !....Parameters...
@@ -486,6 +542,42 @@ contains
     Return
 
   end function psb_dsp_getifld
+
+  function psb_dspsizeof(a)
+    implicit none
+    !....Parameters...
+
+    Type(psb_dspmat_type), intent(in) :: A
+    Integer                      :: psb_dspsizeof
+
+    !locals
+    logical, parameter  :: debug=.false.
+    integer :: val
+
+    val   = 4*size(a%infoa)
+    
+    if (associated(a%aspk)) then 
+      val = val + 8 * size(a%aspk)
+    endif
+
+    if (associated(a%ia1)) then 
+      val = val + 4 * size(a%ia1)
+    endif
+    if (associated(a%ia2)) then 
+      val = val + 4 * size(a%ia2)
+    endif
+    if (associated(a%pl)) then 
+      val = val + 4 * size(a%pl)
+    endif
+    if (associated(a%pr)) then 
+      val = val + 4 * size(a%pr)
+    endif
+
+    
+    psb_dspsizeof = val
+    Return
+
+  end function psb_dspsizeof
 
   subroutine psb_dsp_free(a,info)
     implicit none
@@ -857,6 +949,52 @@ contains
   end subroutine psb_zsp_setifld
 
 
+  subroutine psb_zsp_trimsize(a, i1,i2,ia,info)
+    use psb_string_mod
+    implicit none
+    !....Parameters...
+    Type(psb_zspmat_type), intent(in) :: A
+    Integer, intent(out)              :: i1, i2, ia, info
+
+    !locals
+    Integer             :: nza,nz1, nz2, nzl, nzr
+    logical, parameter  :: debug=.false.
+
+    info  = 0
+    if (psb_sp_getifld(psb_upd_,a,info) == psb_upd_perm_) then 
+      info = -1 
+      i1 = size(a%ia1)
+      i2 = size(a%ia2)
+      ia = size(a%aspk)
+      return
+    endif
+    select case(toupper(a%fida))
+    case('CSR')
+      nza = a%ia2(a%m+1)-1
+      ia  = nza
+      i1  = nza
+      i2  = a%m + 1
+    case('COO')
+      nza = a%infoa(psb_nnz_)
+      i1  = nza
+      i2  = nza
+      ia  = nza
+    case('JAD')
+      ! Feeling lazy today
+      i1 = size(a%ia1)
+      i2 = size(a%ia2)
+      ia = size(a%aspk)
+    case default
+      info = -2
+      i1 = size(a%ia1)
+      i2 = size(a%ia2)
+      ia = size(a%aspk)
+    end select
+
+    Return
+
+  End Subroutine psb_zsp_trimsize
+
   function psb_zsp_getifld(field,a,info)
     implicit none
     !....Parameters...
@@ -890,6 +1028,43 @@ contains
     Return
 
   end function psb_zsp_getifld
+
+  function psb_zspsizeof(a)
+    implicit none
+    !....Parameters...
+
+    Type(psb_zspmat_type), intent(in) :: A
+    Integer                      :: psb_zspsizeof
+
+    !locals
+    logical, parameter  :: debug=.false.
+    integer :: val
+
+    val   = 4*size(a%infoa)
+    
+    if (associated(a%aspk)) then 
+      val = val + 16 * size(a%aspk)
+    endif
+
+    if (associated(a%ia1)) then 
+      val = val + 4 * size(a%ia1)
+    endif
+    if (associated(a%ia2)) then 
+      val = val + 4 * size(a%ia2)
+    endif
+    if (associated(a%pl)) then 
+      val = val + 4 * size(a%pl)
+    endif
+    if (associated(a%pr)) then 
+      val = val + 4 * size(a%pr)
+    endif
+    
+    
+    psb_zspsizeof = val
+    Return
+
+  end function psb_zspsizeof
+
 
 
 

@@ -28,26 +28,18 @@ C ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 C POSSIBILITY OF SUCH DAMAGE.
 C
 C 
-      subroutine ibsrch(ipos,key,n,v)
+      subroutine issrch(ipos,key,n,v)
       integer ipos, key, n
       integer v(n)
       
-      integer lb, ub, m
+      integer i
       
       
-      lb = 1 
-      ub = n
       ipos = -1 
-      
-      do while (lb.le.ub) 
-        m = (lb+ub)/2
-        if (key.eq.v(m))  then
-          ipos = m 
-          lb   = ub + 1
-        else if (key.lt.v(m))  then
-          ub = m-1
-        else 
-          lb = m + 1
+      do i=1,n
+        if (key.eq.v(i))  then
+          ipos = i
+          return
         end if
       enddo
       return

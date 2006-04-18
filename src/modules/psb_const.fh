@@ -102,8 +102,8 @@
       integer, parameter :: psb_dupl_err_   = 2
       integer, parameter :: psb_dupl_def_   = psb_dupl_ovwrt_
       integer, parameter :: psb_upd_dflt_   = 0
-      integer, parameter :: psb_upd_perm_   = 98765
       integer, parameter :: psb_upd_srch_   = 98764
+      integer, parameter :: psb_upd_perm_   = 98765
       integer, parameter :: psb_isrtdcoo_   = 98761
       integer, parameter :: psb_maxjdrows_=8, psb_minjdrows_=4
       integer, parameter :: psb_dbleint_=2

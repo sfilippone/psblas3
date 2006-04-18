@@ -125,17 +125,15 @@ subroutine psb_zspasb(a,desc_a, info, afmt, upd, dupl)
     endif
 
     if (present(dupl)) then
-      if((dupl <  psb_dupl_ovwrt_).or.(dupl > psb_dupl_err_)) then
-        write(0,*)'Wrong value for duplicate input in ASB...'
-        write(0,*)'Changing to default'
-        dupl_ = psb_dupl_def_
-      else  
+      select case(dupl) 
+      case (psb_dupl_ovwrt_,psb_dupl_add_,psb_dupl_err_)
         dupl_ = dupl
-      endif
+      case default
+        dupl_ =  psb_dupl_def_
+      end select
     else
       dupl_ =  psb_dupl_def_
     endif
-
 
     a%m = n_row
     a%k = n_col
