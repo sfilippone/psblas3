@@ -131,11 +131,12 @@ typedef struct {
 
 void
 psb_zslu_factor_(int *n, int *nnz,
-                 doublecomplex *values, int *rowind, int *colptr,
 #ifdef Have_SLU_		 
+                 doublecomplex *values, int *rowind, int *colptr,
 		 fptr *f_factors, /* a handle containing the address
 				     pointing to the factored matrices */
 #else 
+                 void *values, int *rowind, int *colptr,
 		 void *f_factors,
 #endif
 		 int *info)
@@ -255,15 +256,16 @@ psb_zslu_factor_(int *n, int *nnz,
 
 void
 psb_zslu_solve_(int *itrans, int *n, int *nrhs, 
-                 doublecomplex *b, int *ldb,
 #ifdef Have_SLU_		 
-		 fptr *f_factors, /* a handle containing the address
-				     pointing to the factored matrices */
+		doublecomplex *b, int *ldb,
+		fptr *f_factors, /* a handle containing the address
+				    pointing to the factored matrices */
 #else 
-		 void *f_factors,
+		void  *b, int *ldb,
+		void *f_factors,
 #endif
-		 int *info)
-
+		int *info)
+     
 {
 /* 
  * This routine can be called from Fortran.
