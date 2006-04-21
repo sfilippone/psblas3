@@ -64,7 +64,7 @@ subroutine psb_dbldaggrmat(a,desc_a,ac,p,desc_p,info)
   select case (p%iprcparm(smth_kind_))
   case (no_smth_) 
 
-     call raw_aggregate(info)
+    call raw_aggregate(info)
 
     if(info /= 0) then
       call psb_errpush(4010,name,a_err='raw_aggregate')
@@ -120,6 +120,7 @@ contains
     call psb_erractionsave(err_act)
 
     bg => ac
+    call psb_nullify_sp(b)
 
     icontxt = desc_a%matrix_data(psb_ctxt_)
     call blacs_gridinfo(icontxt,nprows,npcols,myprow,mypcol)
@@ -347,7 +348,7 @@ contains
     type(psb_dspmat_type) :: am3,am4
     logical       :: ml_global_nmb
 
-    logical, parameter :: test_dump=.false.
+    logical, parameter :: test_dump=.false.,debug=.false.
     integer, parameter :: ncmax=16
     real(kind(1.d0))   :: omega, anorm, tmp, dg
     character(len=20) :: name, ch_err
@@ -362,6 +363,9 @@ contains
     call blacs_gridinfo(icontxt,nprows,npcols,myprow,mypcol)
 
     bg => ac
+    call psb_nullify_sp(b)
+    call psb_nullify_sp(am3)
+    call psb_nullify_sp(am4)
 
     am2 => p%av(sm_pr_t_)
     am1 => p%av(sm_pr_)
@@ -441,7 +445,15 @@ contains
 
 
     ! 1. Allocate Ptilde in sparse matrix form 
-    call psb_sp_all(am4,ncol,info)
+    am4%fida='COO'
+    am4%m=ncol
+    if (ml_global_nmb) then 
+      am4%k=ntaggr
+      call psb_sp_all(ncol,ntaggr,am4,ncol,info)
+    else 
+      am4%k=naggr
+      call psb_sp_all(ncol,naggr,am4,ncol,info)
+    endif
     if(info /= 0) then
       call psb_errpush(4010,name,a_err='spall')
       goto 9999
@@ -461,14 +473,6 @@ contains
         am4%ia2(i)  = p%mlia(i)  
       end do
       am4%infoa(psb_nnz_) = nrow
-    endif
-    am4%fida='COO'
-    am4%m=ncol
-
-    if (ml_global_nmb) then 
-      am4%k=ntaggr
-    else 
-      am4%k=naggr
     endif
 
 
@@ -560,6 +564,7 @@ contains
 
     if (test_dump) call psb_csprt(40+me,am3,head='% (I-wDA)',ivr=desc_a%loc_to_glob,&
          & ivc=desc_a%loc_to_glob)    
+    if (debug) write(0,*) me,'Done gather, going for SYMBMM 1'
     !
     ! Symbmm90 does the allocation for its result.
     ! 
@@ -570,6 +575,7 @@ contains
     call psb_symbmm(am3,am4,am1)
     call psb_numbmm(am3,am4,am1)
 
+    if (debug) write(0,*) me,'Done NUMBMM 1'
 
     call psb_sp_free(am4,info)
     if(info /= 0) then
@@ -615,6 +621,7 @@ contains
 
     call psb_symbmm(a,am1,am3)
     call psb_numbmm(a,am1,am3)
+    if (debug) write(0,*) me,'Done NUMBMM 2'
 
     if  (p%iprcparm(smth_kind_) == smth_omg_) then 
       call psb_transp(am1,am2,fmt='COO')
@@ -638,6 +645,7 @@ contains
     else
       call psb_transp(am1,am2)
     endif
+    if (debug) write(0,*) me,'starting sphalo/ rwxtd'
 
     if  (p%iprcparm(smth_kind_) == smth_omg_) then 
       ! am2 = ((i-wDA)Ptilde)^T
@@ -667,8 +675,11 @@ contains
       end if
     endif
 
+    if (debug) write(0,*) me,'starting symbmm 3'
     call psb_symbmm(am2,am3,b)
+    if (debug) write(0,*) me,'starting numbmm 3'
     call psb_numbmm(am2,am3,b)
+    if (debug) write(0,*) me,'Done NUMBMM 3'
 
 !!$    if (aggr_dump) call csprt(50+me,am1,head='% Operator PTrans.')
     call psb_sp_free(am3,info)
@@ -731,6 +742,7 @@ contains
           goto 9999
         end if
 
+        if (debug) write(0,*) me,'Created aux descr. distr.'
         call psb_cdasb(desc_p,info)
         if(info /= 0) then
           call psb_errpush(4010,name,a_err='psb_cdasb')
@@ -738,6 +750,7 @@ contains
         end if
 
 
+        if (debug) write(0,*) me,'Asmbld aux descr. distr.'
 
         call psb_glob_to_loc(bg%ia1(1:nzl),desc_p,info,iact='I')
         if(info /= 0) then

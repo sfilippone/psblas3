@@ -102,6 +102,7 @@ Subroutine psb_zasmatbld(ptype,novr,a,blk,desc_data,upd,desc_p,info,outfmt)
     ! Block Jacobi. Copy the descriptor, just in case we want to
     ! do the renumbering. 
     !
+    If(debug) Write(0,*)' asmatbld calling allocate '
     call psb_sp_all(0,0,blk,1,info)
     if(info /= 0) then
       info=4010
@@ -111,9 +112,10 @@ Subroutine psb_zasmatbld(ptype,novr,a,blk,desc_data,upd,desc_p,info,outfmt)
     end if
     blk%fida        = 'COO'
     blk%infoa(psb_nnz_) = 0
-
+    If(debug) Write(0,*)' asmatbld done spallocate'
     If (upd == 'F') Then
       call psb_cdcpy(desc_data,desc_p,info)
+      If(debug) Write(0,*)' asmatbld done cdcpy'
       if(info /= 0) then
         info=4010
         ch_err='psb_cdcpy'
@@ -143,6 +145,7 @@ Subroutine psb_zasmatbld(ptype,novr,a,blk,desc_data,upd,desc_p,info,outfmt)
       !
       ! This is really just Block Jacobi.....
       !
+      If(debug) Write(0,*)' asmatbld calling allocate novr=0'
       call psb_sp_all(0,0,blk,1,info)
       if(info /= 0) then
         info=4010
@@ -155,6 +158,7 @@ Subroutine psb_zasmatbld(ptype,novr,a,blk,desc_data,upd,desc_p,info,outfmt)
       if (debug) write(0,*) 'Calling desccpy'
       if (upd == 'F') then 
         call psb_cdcpy(desc_data,desc_p,info)
+        If(debug) Write(0,*)' asmatbld done cdcpy'
         if(info /= 0) then
           info=4010
           ch_err='psb_cdcpy'

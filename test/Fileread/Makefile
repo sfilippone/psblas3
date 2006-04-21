@@ -50,6 +50,8 @@ zhb2mm: $(ZH2MOBJS)
 zmm2hb: $(ZM2HOBJS)
 	$(MPF90) -o zmm2hb   $(ZM2HOBJS) $(PSBLAS_LIB) $(BLACS)
 
+srctst: srctst.o
+	$(MPF90) -o srctst srctst.o $(PSBLAS_LIB) $(BLACS)	
 .f90.o:
 	$(MPF90) $(F90COPT) $(INCDIRS) -c $<
 

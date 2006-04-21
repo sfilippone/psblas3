@@ -98,7 +98,7 @@ module psb_spmat_type
 
   interface psb_sp_reall
     module procedure psb_dspreallocate, psb_dspreall3, &
-         & psb_zspreallocate, psb_zspreall3
+         & psb_zspreall3, psb_zspreallocate
   end interface
 
   interface psb_sp_all
@@ -757,6 +757,32 @@ contains
 
   End Subroutine psb_zspall3
 
+  subroutine psb_zspreall3(a, ni1,ni2,nz,info)
+    implicit none
+    !....Parameters...
+    Type(psb_zspmat_type), intent(inout)  :: A
+    Integer, intent(in)                   :: ni1,ni2,nz
+    Integer, intent(inout)                :: info
+
+    !locals
+    logical, parameter  :: debug=.false.
+
+    info  = 0
+    call psb_realloc(nz,a%aspk,info)
+    if (info /= 0) return 
+    call psb_realloc(ni2,a%ia2,info)
+    if (info /= 0) return 
+    call psb_realloc(ni1,a%ia1,info)
+    if (info /= 0) return
+    call psb_realloc(max(1,a%m),a%pl,info)
+    if (info /= 0) return
+    call psb_realloc(max(1,a%k),a%pr,info)
+    if (info /= 0) return
+
+    Return
+
+  End Subroutine psb_zspreall3
+
 
   subroutine psb_zspreallocate(a, nnz,info,ifc)
     implicit none
@@ -806,33 +832,6 @@ contains
     Return
 
   End Subroutine psb_zspreallocate
-
-  subroutine psb_zspreall3(a, ni1,ni2,nd,info)
-    implicit none
-    !....Parameters...
-    Type(psb_zspmat_type), intent(inout)  :: A
-    Integer, intent(in)                   :: ni1,ni2,nd
-    Integer, intent(inout)                :: info
-
-    !locals
-    logical, parameter  :: debug=.false.
-
-    info  = 0
-    call psb_realloc(nd,a%aspk,info)
-    if (info /= 0) return 
-    call psb_realloc(ni2,a%ia2,info)
-    if (info /= 0) return 
-    call psb_realloc(ni1,a%ia1,info)
-    if (info /= 0) return
-    call psb_realloc(max(1,a%m),a%pl,info)
-    if (info /= 0) return
-    call psb_realloc(max(1,a%k),a%pr,info)
-    if (info /= 0) return
-
-    Return
-
-  End Subroutine psb_zspreall3
-
 
   subroutine psb_zspclone(a, b,info)
     implicit none

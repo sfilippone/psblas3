@@ -82,6 +82,7 @@ subroutine psb_dumf_bld(a,desc_a,p,info)
   fmt = 'COO'
   call psb_nullify_sp(blck)    
   call psb_nullify_sp(atmp)    
+
   atmp%fida='COO'
   if (Debug) then 
     write(0,*) me, 'UMFBLD: Calling  csdp'

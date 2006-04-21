@@ -157,6 +157,8 @@ subroutine psb_dilu_bld(a,desc_a,p,upd,info)
 
   icontxt=desc_a%matrix_data(psb_ctxt_)
   call psb_nullify_sp(blck)
+  call psb_nullify_sp(atmp)
+
   t1= mpi_wtime()
 
   if(debug) write(0,*)me,': calling psb_asmatbld',p%iprcparm(p_type_),p%iprcparm(n_ovr_)
@@ -193,7 +195,7 @@ subroutine psb_dilu_bld(a,desc_a,p,upd,info)
   end if
   if (debug) write(0,*)me,': out spinfo',nztota
   if (debug) call blacs_barrier(icontxt,'All')
-  
+
   n_col  = desc_a%matrix_data(psb_n_col_)
   nhalo  = n_col-nrow_a
   n_row  = p%desc_data%matrix_data(psb_n_row_)

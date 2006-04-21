@@ -149,7 +149,7 @@ contains
     if(psb_get_errstatus().ne.0) return 
     info=0
     call psb_erractionsave(err_act)
-
+    call psb_nullify_sp(trw)
     trw%m=0
     trw%k=0
     if(debug) write(0,*)'LUINT Allocating TRW'
@@ -298,7 +298,7 @@ contains
         !     
         info = 2
         int_err(1) = i
-        write(ch_err,'(g20.10)'),abs(dia)
+        write(ch_err,'(g20.10)') abs(dia)
         call psb_errpush(info,name,i_err=int_err,a_err=ch_err)
         goto 9999
       else
@@ -437,7 +437,7 @@ contains
         !     Pivot too small: unstable factorization
         !     
         int_err(1) = i
-        write(ch_err,'(g20.10)'),abs(dia)
+        write(ch_err,'(g20.10)') abs(dia)
         info = 2
         call psb_errpush(info,name,i_err=int_err,a_err=ch_err)
         goto 9999

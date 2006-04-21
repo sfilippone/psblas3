@@ -150,6 +150,7 @@ subroutine psb_zmlprc_bld(a,desc_a,p,info)
     goto 9999
   end if
 
+  if (debug) write(0,*) 'Out from genaggrmap',p%nlaggr
   nullify(desc_p) 
   allocate(desc_p)
   call psb_nullify_desc(desc_p)
@@ -165,6 +166,7 @@ subroutine psb_zmlprc_bld(a,desc_a,p,info)
 
 
   call psb_baseprc_bld(ac,desc_p,p,info)
+  if (debug) write(0,*) 'Out from basaeprcbld',info
 
   !
   ! We have used a separate ac because:

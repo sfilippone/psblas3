@@ -61,13 +61,15 @@ Contains
     Integer,Pointer :: tmp(:)
     Integer :: dim, err_act, err,i
     character(len=20)  :: name
+    logical, parameter :: debug=.false.
 
     name='psb_dreallocate1i'
     call psb_erractionsave(err_act)
 
     if(psb_get_errstatus().ne.0) return 
     info=0
-    if (associated(rrax)) then 
+    if (debug) write(0,*) 'reallocate I',len
+    if (associated(rrax)) then a
       dim=size(rrax)
       If (dim /= len) Then
         Allocate(tmp(len),stat=info)
@@ -137,9 +139,12 @@ Contains
     Real(kind(1.d0)),Pointer :: tmp(:)
     Integer :: dim,err_act,err,i, m
     character(len=20)  :: name
+    logical, parameter :: debug=.false.
 
     name='psb_dreallocate1d'
     call psb_erractionsave(err_act)
+    info = 0 
+    if (debug) write(0,*) 'reallocate D',len
 
     if (associated(rrax)) then 
       dim=size(rrax)
@@ -210,9 +215,12 @@ Contains
     complex(kind(1.d0)),Pointer :: tmp(:)
     Integer :: dim,err_act,err,i, m
     character(len=20)  :: name
+    logical, parameter :: debug=.false.
 
     name='psb_dreallocate1z'
     call psb_erractionsave(err_act)
+    info = 0
+    if (debug) write(0,*) 'reallocate Z',len    
 
     if (associated(rrax)) then 
       dim=size(rrax)
@@ -286,6 +294,7 @@ Contains
 
     name='psb_dreallocated2'
     call psb_erractionsave(err_act)
+    info = 0 
 
     if (associated(rrax)) then 
       dim=size(rrax,1)
@@ -357,6 +366,7 @@ Contains
 
     name='psb_dreallocatez2'
     call psb_erractionsave(err_act)
+    info = 0 
 
     if (associated(rrax)) then 
       dim=size(rrax,1)

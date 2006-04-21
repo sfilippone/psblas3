@@ -348,7 +348,7 @@ module psb_psblas_mod
        real(kind(1.d0)), intent(in)         :: alpha, beta
        type(psb_desc_type), intent(in)      :: desc_a
        character, optional, intent(in)      :: trans
-       real(kind(1.d0)), optional, intent(inout) :: work(:)
+       real(kind(1.d0)), optional, intent(inout),target :: work(:)
        integer, optional, intent(in)        :: k, jx, jy,doswap
        integer, intent(out)                 :: info
      end subroutine psb_dspmm
@@ -362,7 +362,7 @@ module psb_psblas_mod
        real(kind(1.d0)), intent(in)         :: alpha, beta
        type(psb_desc_type), intent(in)      :: desc_a
        character, optional, intent(in)      :: trans
-       real(kind(1.d0)), optional, intent(inout) :: work(:)
+       real(kind(1.d0)), optional, intent(inout),target :: work(:)
        integer, optional, intent(in)        :: doswap
        integer, intent(out)                 :: info
      end subroutine psb_dspmv
@@ -376,7 +376,7 @@ module psb_psblas_mod
        complex(kind(1.d0)), intent(in)         :: alpha, beta
        type(psb_desc_type), intent(in)      :: desc_a
        character, optional, intent(in)      :: trans
-       complex(kind(1.d0)), optional, intent(inout) :: work(:)
+       complex(kind(1.d0)), optional, intent(inout),target :: work(:)
        integer, optional, intent(in)        :: k, jx, jy,doswap
        integer, intent(out)                 :: info
      end subroutine psb_zspmm
@@ -390,7 +390,7 @@ module psb_psblas_mod
        complex(kind(1.d0)), intent(in)         :: alpha, beta
        type(psb_desc_type), intent(in)      :: desc_a
        character, optional, intent(in)      :: trans
-       complex(kind(1.d0)), optional, intent(inout) :: work(:)
+       complex(kind(1.d0)), optional, intent(inout),target :: work(:)
        integer, optional, intent(in)        :: doswap
        integer, intent(out)                 :: info
      end subroutine psb_zspmv
@@ -410,7 +410,7 @@ module psb_psblas_mod
        character, optional, intent(in)        :: trans, unit
        integer, optional, intent(in)          :: n, jx, jy
        integer, optional, intent(in)          :: choice
-       real(kind(1.d0)), optional, intent(in) :: work(:), diag(:)
+       real(kind(1.d0)), optional, intent(inout),target :: work(:), diag(:)
        integer, intent(out)               :: info
      end subroutine psb_dspsm
      subroutine psb_dspsv(alpha, t, x, beta, y,&
@@ -425,7 +425,7 @@ module psb_psblas_mod
        type(psb_desc_type), intent(in)        :: desc_a
        character, optional, intent(in)        :: trans, unit
        integer, optional, intent(in)          :: choice
-       real(kind(1.d0)), optional, intent(in) :: work(:), diag(:)
+       real(kind(1.d0)), optional, intent(inout),target :: work(:), diag(:)
        integer, intent(out)                   :: info
      end subroutine psb_dspsv
      subroutine psb_zspsm(alpha, t, x, beta, y,&
@@ -441,7 +441,7 @@ module psb_psblas_mod
        character, optional, intent(in)        :: trans, unit
        integer, optional, intent(in)          :: n, jx, jy
        integer, optional, intent(in)          :: choice
-       complex(kind(1.d0)), optional, intent(in) :: work(:), diag(:)
+       complex(kind(1.d0)), optional, intent(inout),target :: work(:), diag(:)
        integer, intent(out)               :: info
      end subroutine psb_zspsm
      subroutine psb_zspsv(alpha, t, x, beta, y,&
@@ -456,7 +456,7 @@ module psb_psblas_mod
        type(psb_desc_type), intent(in)        :: desc_a
        character, optional, intent(in)        :: trans, unit
        integer, optional, intent(in)          :: choice
-       complex(kind(1.d0)), optional, intent(in) :: work(:), diag(:)
+       complex(kind(1.d0)), optional, intent(inout),target :: work(:), diag(:)
        integer, intent(out)                   :: info
      end subroutine psb_zspsv
   end interface

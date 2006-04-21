@@ -96,6 +96,7 @@ Subroutine psb_dcdovrbld(n_ovr,desc_p,desc_a,a,&
   icontxt = desc_a%matrix_data(psb_ctxt_)
 !!$  call blacs_barrier(icontxt,'All')
   Call blacs_gridinfo(icontxt,np,npcol,myrow,mycol)
+  call psb_nullify_sp(blk)
 
   Allocate(brvindx(np+1),rvsz(np),sdsz(np),bsdindx(np+1),stat=info)
   tl = 0.0

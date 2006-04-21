@@ -69,7 +69,7 @@ subroutine psb_zumf_bld(a,desc_a,p,info)
       integer, intent(out)                 :: info
       character(len=5), optional           :: outfmt
     end Subroutine psb_zasmatbld
- end interface
+  end interface
 
   info=0
   name='psb_umf_bld'
@@ -82,97 +82,98 @@ subroutine psb_zumf_bld(a,desc_a,p,info)
   fmt = 'COO'
   call psb_nullify_sp(blck)    
   call psb_nullify_sp(atmp)    
+
   atmp%fida='COO'
   if (Debug) then 
-     write(0,*) me, 'UMFBLD: Calling  csdp'
-     call blacs_barrier(icontxt,'All')
+    write(0,*) me, 'UMFBLD: Calling  csdp'
+    call blacs_barrier(icontxt,'All')
   endif
 
   call psb_zcsdp(a,atmp,info)
   if(info /= 0) then
-     info=4010
-     ch_err='psb_zcsdp'
-     call psb_errpush(info,name,a_err=ch_err)
-     goto 9999
+    info=4010
+    ch_err='psb_zcsdp'
+    call psb_errpush(info,name,a_err=ch_err)
+    goto 9999
   end if
   call psb_spinfo(psb_nztotreq_,atmp,nza,info)
   if (Debug) then 
-     write(0,*) me, 'UMFBLD: Done csdp',info,nza,atmp%m,atmp%k
-     call blacs_barrier(icontxt,'All')
+    write(0,*) me, 'UMFBLD: Done csdp',info,nza,atmp%m,atmp%k
+    call blacs_barrier(icontxt,'All')
   endif
   call psb_asmatbld(p%iprcparm(p_type_),p%iprcparm(n_ovr_),a,&
        & blck,desc_a,upd,p%desc_data,info,outfmt=fmt)  
   if(info /= 0) then
-     info=4010
-     ch_err='psb_asmatbld'
-     call psb_errpush(info,name,a_err=ch_err)
-     goto 9999
+    info=4010
+    ch_err='psb_asmatbld'
+    call psb_errpush(info,name,a_err=ch_err)
+    goto 9999
   end if
 
   call psb_spinfo(psb_nztotreq_,blck,nzb,info)
   if (Debug) then 
-     write(0,*) me, 'UMFBLD: Done asmatbld',info,nzb,blck%fida
-     call blacs_barrier(icontxt,'All')
+    write(0,*) me, 'UMFBLD: Done asmatbld',info,nzb,blck%fida
+    call blacs_barrier(icontxt,'All')
   endif
   if (nzb > 0 ) then 
-     if (size(atmp%aspk)<nza+nzb) then 
-        call psb_sp_reall(atmp,nza+nzb,info)
-        if(info /= 0) then
-           info=4010
-           ch_err='psb_sp_reall'
-           call psb_errpush(info,name,a_err=ch_err)
-           goto 9999
-        end if
-     endif
-     if (Debug) then 
-        write(0,*) me, 'UMFBLD: Done realloc',info,nza+nzb,atmp%fida
-        call blacs_barrier(icontxt,'All')
-     endif
+    if (size(atmp%aspk)<nza+nzb) then 
+      call psb_sp_reall(atmp,nza+nzb,info)
+      if(info /= 0) then
+        info=4010
+        ch_err='psb_sp_reall'
+        call psb_errpush(info,name,a_err=ch_err)
+        goto 9999
+      end if
+    endif
+    if (Debug) then 
+      write(0,*) me, 'UMFBLD: Done realloc',info,nza+nzb,atmp%fida
+      call blacs_barrier(icontxt,'All')
+    endif
 
-     do j=1,nzb
-        atmp%aspk(nza+j) = blck%aspk(j)
-        atmp%ia1(nza+j)  = blck%ia1(j)
-        atmp%ia2(nza+j)  = blck%ia2(j)
-     end do
-     atmp%infoa(psb_nnz_) = nza+nzb
-     atmp%m = atmp%m + blck%m
-     atmp%k = max(a%k,blck%k)
+    do j=1,nzb
+      atmp%aspk(nza+j) = blck%aspk(j)
+      atmp%ia1(nza+j)  = blck%ia1(j)
+      atmp%ia2(nza+j)  = blck%ia2(j)
+    end do
+    atmp%infoa(psb_nnz_) = nza+nzb
+    atmp%m = atmp%m + blck%m
+    atmp%k = max(a%k,blck%k)
   else
-     atmp%infoa(psb_nnz_) = nza
-     atmp%m = a%m 
-     atmp%k = a%k
+    atmp%infoa(psb_nnz_) = nza
+    atmp%m = a%m 
+    atmp%k = a%k
   endif
 
   i=0
   do j=1, atmp%infoa(psb_nnz_) 
-     if (atmp%ia2(j) <= atmp%m) then 
-        i = i + 1
-        atmp%aspk(i) = atmp%aspk(j)
-        atmp%ia1(i) = atmp%ia1(j)
-        atmp%ia2(i) = atmp%ia2(j)
-     endif
+    if (atmp%ia2(j) <= atmp%m) then 
+      i = i + 1
+      atmp%aspk(i) = atmp%aspk(j)
+      atmp%ia1(i) = atmp%ia1(j)
+      atmp%ia2(i) = atmp%ia2(j)
+    endif
   enddo
   atmp%infoa(psb_nnz_) = i
 
 
   call psb_ipcoo2csc(atmp,info)
   if(info /= 0) then
-     info=4010
-     ch_err='psb_ipcoo2csc'
-     call psb_errpush(info,name,a_err=ch_err)
-     goto 9999
+    info=4010
+    ch_err='psb_ipcoo2csc'
+    call psb_errpush(info,name,a_err=ch_err)
+    goto 9999
   end if
   call psb_spinfo(psb_nztotreq_,atmp,nzt,info)
   if(info /= 0) then
-     info=4010
-     ch_err='psb_spinfo'
-     call psb_errpush(info,name,a_err=ch_err)
-     goto 9999
+    info=4010
+    ch_err='psb_spinfo'
+    call psb_errpush(info,name,a_err=ch_err)
+    goto 9999
   end if
   if (Debug) then 
-     write(0,*) me,'Calling psb_umf_factor ',nzt,atmp%m,&
-          & atmp%k,p%desc_data%matrix_data(psb_n_row_)
-     call blacs_barrier(icontxt,'All')
+    write(0,*) me,'Calling psb_umf_factor ',nzt,atmp%m,&
+         & atmp%k,p%desc_data%matrix_data(psb_n_row_)
+    call blacs_barrier(icontxt,'All')
   endif
 
   call psb_zumf_factor(atmp%m,nzt,&
@@ -180,23 +181,23 @@ subroutine psb_zumf_bld(a,desc_a,p,info)
        & p%iprcparm(umf_symptr_),p%iprcparm(umf_numptr_),info)
 
   if(info /= 0) then
-     info=4010
-     ch_err='psb_umf_fact'
-     call psb_errpush(info,name,a_err=ch_err)
-     goto 9999
+    info=4010
+    ch_err='psb_umf_fact'
+    call psb_errpush(info,name,a_err=ch_err)
+    goto 9999
   end if
 
   if (Debug) then 
-     write(0,*) me, 'UMFBLD: Done umf_Factor',info,p%iprcparm(umf_numptr_)
-     call blacs_barrier(icontxt,'All')
+    write(0,*) me, 'UMFBLD: Done umf_Factor',info,p%iprcparm(umf_numptr_)
+    call blacs_barrier(icontxt,'All')
   endif
   call psb_sp_free(blck,info)
   call psb_sp_free(atmp,info)
   if(info /= 0) then
-     info=4010
-     ch_err='psb_sp_free'
-     call psb_errpush(info,name,a_err=ch_err)
-     goto 9999
+    info=4010
+    ch_err='psb_sp_free'
+    call psb_errpush(info,name,a_err=ch_err)
+    goto 9999
   end if
 
   call psb_erractionrestore(err_act)
@@ -205,8 +206,8 @@ subroutine psb_zumf_bld(a,desc_a,p,info)
 9999 continue
   call psb_erractionrestore(err_act)
   if (err_act.eq.act_abort) then
-     call psb_error()
-     return
+    call psb_error()
+    return
   end if
   return
 

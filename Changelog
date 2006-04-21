@@ -1,6 +1,9 @@
 Changelog. A lot less detailed than usual, at least for past
 history. 
 
+2006/04/21: A bunch of fixes related to various scratch spmat(s) initialization 
+	    problems that were revealed while testing on SP5.         
+
 2006/04/18: Changed interface to spasb and csdp: better handling of 
 	    regeneration. To be tested further for sophisticated uses.
 

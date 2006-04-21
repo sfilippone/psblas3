@@ -91,7 +91,7 @@ subroutine  psb_dspsm(alpha,a,x,beta,y,desc_a,info,&
   type(psb_desc_type), intent(in)           :: desc_a
   integer, intent(out)                      :: info
   real(kind(1.d0)), intent(in), optional, target      :: d(:)
-  real(kind(1.d0)), optional, pointer       :: work(:)
+  real(kind(1.d0)), optional, target       :: work(:)
   character, intent(in), optional           :: trans, unitd
   integer, intent(in), optional             :: choice
   integer, intent(in), optional             :: k, jx, jy
@@ -107,6 +107,7 @@ subroutine  psb_dspsm(alpha,a,x,beta,y,desc_a,info,&
   real(kind(1.d0)),pointer :: iwork(:), xp(:,:), yp(:,:), id(:)
   character                :: itrans
   character(len=20)        :: name, ch_err
+  logical                  :: aliw
 
   name='psb_dspsm'
   if(psb_get_errstatus().ne.0) return 
@@ -195,29 +196,32 @@ subroutine  psb_dspsm(alpha,a,x,beta,y,desc_a,info,&
   end if
 
   ! check for presence/size of a work area
+  iwork => null()
   liwork= 2*ncol
   if (a%pr(1) /= 0) llwork = liwork + m * ik
   if (a%pl(1) /= 0) llwork = llwork + m * ik
-  if (present(work)) then     
-    if(size(work).lt.liwork) then
-      call psb_realloc(liwork,work,info)
+ if (present(work)) then
+    if (size(work) >= liwork) then
+        aliw =.false.
+    else
+        aliw=.true.
+    endif
+  else
+        aliw=.true.
+  end if
+
+  if (aliw) then
+      call psb_realloc(liwork,iwork,info)
       if(info.ne.0) then
         info=4010
         ch_err='psb_realloc'
         call psb_errpush(info,name,a_err=ch_err)
         goto 9999
       end if
-    end if
-    iwork => work
   else
-    call psb_realloc(liwork,iwork,info)
-    if(info.ne.0) then
-      info=4010
-      ch_err='psb_realloc'
-      call psb_errpush(info,name,a_err=ch_err)
-      goto 9999
-    end if
-  end if
+     iwork => work
+  endif
+
   iwork(1)=0.d0
 
   if(present(d)) then
@@ -302,7 +306,7 @@ subroutine  psb_dspsm(alpha,a,x,beta,y,desc_a,info,&
     end select
   end if
 
-  if(.not.present(work)) deallocate(iwork)
+  if(aliw) deallocate(iwork)
   if(.not.present(d)) deallocate(id)
 
   call psb_erractionrestore(err_act)
@@ -398,7 +402,7 @@ subroutine  psb_dspsv(alpha,a,x,beta,y,desc_a,info,&
   type(psb_desc_type), intent(in)           :: desc_a
   integer, intent(out)                      :: info
   real(kind(1.d0)), intent(in), optional, target    :: d(:)
-  real(kind(1.d0)), optional, pointer       :: work(:)
+  real(kind(1.d0)), optional, target        :: work(:)
   character, intent(in), optional           :: trans, unitd
   integer, intent(in), optional             :: choice
 
@@ -413,6 +417,7 @@ subroutine  psb_dspsv(alpha,a,x,beta,y,desc_a,info,&
   real(kind(1.d0)),pointer :: iwork(:), xp(:), yp(:), id(:)
   character                :: itrans
   character(len=20)        :: name, ch_err
+  logical                  :: aliw
 
   name='psb_dspsv'
   if(psb_get_errstatus().ne.0) return 
@@ -484,30 +489,35 @@ subroutine  psb_dspsv(alpha,a,x,beta,y,desc_a,info,&
     goto 9999
   end if
 
+  iwork => null()
   ! check for presence/size of a work area
   liwork= 2*ncol
   if (a%pr(1) /= 0) llwork = liwork + m * ik
   if (a%pl(1) /= 0) llwork = llwork + m * ik
+  
   if (present(work)) then     
-    if(size(work).lt.liwork) then
-      call psb_realloc(liwork,work,info)
+    if (size(work) >= liwork) then 
+	aliw =.false.
+    else 
+	aliw=.true.
+    endif
+  else
+	aliw=.true.
+  end if
+ 
+	aliw=.true.
+  if (aliw) then 
+      call psb_realloc(liwork,iwork,info)
       if(info.ne.0) then
         info=4010
         ch_err='psb_realloc'
         call psb_errpush(info,name,a_err=ch_err)
         goto 9999
       end if
-    end if
-    iwork => work
   else
-    call psb_realloc(liwork,iwork,info)
-    if(info.ne.0) then
-      info=4010
-      ch_err='psb_realloc'
-      call psb_errpush(info,name,a_err=ch_err)
-      goto 9999
-    end if
-  end if
+     iwork => work
+  endif
+
   iwork(1)=0.d0
 
   if (present(d)) then
@@ -591,7 +601,7 @@ subroutine  psb_dspsv(alpha,a,x,beta,y,desc_a,info,&
     end select
   end if
 
-  if(.not.present(work)) deallocate(iwork)
+   if (aliw) deallocate(iwork)
   if(.not.present(d)) deallocate(id)
 
   call psb_erractionrestore(err_act)
