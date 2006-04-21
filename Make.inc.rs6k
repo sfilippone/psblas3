@@ -30,7 +30,9 @@ BLAS=-lessl
 BLACS=-lmpiblacs
 #These should be uncommented when using the ESSL BLACS library
 #EXTRA_BLACS_P2P_OBJS= krecvid.o ksendid.o
-EXTRA_BLACS_ENV_OBJS=extra_env_essl.o
+#EXTRA_BLACS_ENV_OBJS=extra_env_essl.o
+#This should be uncommented when using the ESSL BLACS library
+EXTRA_BLACS_ENV_OBJS=extra_env.o
 
 
 #######################  Section 4 #######################
@@ -45,7 +47,7 @@ EXTRA_BLACS_ENV_OBJS=extra_env_essl.o
 #UMFDEF=-DHave_UMF_ -I$(UMFDIR)
 
 #  Add -DLargeFptr for 64-bit addresses
-CDEFINES=-DAdd_ $(SLUDEF) $(UMFDEF)
+CDEFINES=-DAdd_ $(SLUDEF) $(UMFDEF) -DLargeFptr
 
 AR=ar -cur
 RANLIB=ranlib
