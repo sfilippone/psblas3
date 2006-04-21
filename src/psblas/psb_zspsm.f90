@@ -90,7 +90,7 @@ subroutine  psb_zspsm(alpha,a,x,beta,y,desc_a,info,&
   type(psb_desc_type), intent(in)           :: desc_a
   integer, intent(out)                      :: info
   complex(kind(1.d0)), intent(in), optional, target      :: d(:)
-  complex(kind(1.d0)), optional, pointer       :: work(:)
+  complex(kind(1.d0)), optional, target       :: work(:)
   character, intent(in), optional           :: trans, unitd
   integer, intent(in), optional             :: choice
   integer, intent(in), optional             :: k, jx, jy
@@ -106,6 +106,7 @@ subroutine  psb_zspsm(alpha,a,x,beta,y,desc_a,info,&
   complex(kind(1.d0)),pointer :: iwork(:), xp(:,:), yp(:,:), id(:)
   character                :: itrans
   character(len=20)        :: name, ch_err
+  logical                  :: aliw
 
   name='psb_zspsm'
   if(psb_get_errstatus().ne.0) return 
@@ -159,16 +160,16 @@ subroutine  psb_zspsm(alpha,a,x,beta,y,desc_a,info,&
   endif
 
   if (present(unitd)) then     
-    lunitd = unitd
+    lunitd = toupper(unitd)
   else
     lunitd = 'U'
   endif
 
   if (present(trans)) then     
-    if ((trans.eq.'N').or.(trans.eq.'T')&
-         & .or.(trans.eq.'n').or.(trans.eq.'t')) then
-      itrans = trans
-    else if ((trans.eq.'C').or.(trans.eq.'c')) then
+    itrans = toupper(trans)
+    if((itrans.eq.'N').or.(itrans.eq.'T')) then
+      ! Ok
+    else if (itrans.eq.'C') then
       info = 3020
       call psb_errpush(info,name)
       goto 9999
@@ -194,29 +195,32 @@ subroutine  psb_zspsm(alpha,a,x,beta,y,desc_a,info,&
   end if
 
   ! check for presence/size of a work area
+  iwork => null()
   liwork= 2*ncol
   if (a%pr(1) /= 0) llwork = liwork + m * ik
   if (a%pl(1) /= 0) llwork = llwork + m * ik
-  if (present(work)) then     
-    if(size(work).lt.liwork) then
-      call psb_realloc(liwork,work,info)
+ if (present(work)) then
+    if (size(work) >= liwork) then
+        aliw =.false.
+    else
+        aliw=.true.
+    endif
+  else
+        aliw=.true.
+  end if
+
+  if (aliw) then
+      call psb_realloc(liwork,iwork,info)
       if(info.ne.0) then
         info=4010
         ch_err='psb_realloc'
         call psb_errpush(info,name,a_err=ch_err)
         goto 9999
       end if
-    end if
-    iwork => work
   else
-    call psb_realloc(liwork,iwork,info)
-    if(info.ne.0) then
-      info=4010
-      ch_err='psb_realloc'
-      call psb_errpush(info,name,a_err=ch_err)
-      goto 9999
-    end if
-  end if
+     iwork => work
+  endif
+
   iwork(1)=0.d0
 
   if(present(d)) then
@@ -301,7 +305,7 @@ subroutine  psb_zspsm(alpha,a,x,beta,y,desc_a,info,&
     end select
   end if
 
-  if(.not.present(work)) deallocate(iwork)
+  if(aliw) deallocate(iwork)
   if(.not.present(d)) deallocate(id)
 
   call psb_erractionrestore(err_act)
@@ -388,6 +392,7 @@ subroutine  psb_zspsv(alpha,a,x,beta,y,desc_a,info,&
   use psi_mod
   use psb_check_mod
   use psb_error_mod
+  use psb_string_mod
 
   complex(kind(1.D0)), intent(in)              :: alpha, beta
   complex(kind(1.d0)), intent(in), target      :: x(:)
@@ -396,7 +401,7 @@ subroutine  psb_zspsv(alpha,a,x,beta,y,desc_a,info,&
   type(psb_desc_type), intent(in)           :: desc_a
   integer, intent(out)                      :: info
   complex(kind(1.d0)), intent(in), optional, target    :: d(:)
-  complex(kind(1.d0)), optional, pointer       :: work(:)
+  complex(kind(1.d0)), optional, target      :: work(:)
   character, intent(in), optional           :: trans, unitd
   integer, intent(in), optional             :: choice
 
@@ -411,6 +416,7 @@ subroutine  psb_zspsv(alpha,a,x,beta,y,desc_a,info,&
   complex(kind(1.d0)),pointer :: iwork(:), xp(:), yp(:), id(:)
   character                :: itrans
   character(len=20)        :: name, ch_err
+  logical                  :: aliw
 
   name='psb_zspsv'
   if(psb_get_errstatus().ne.0) return 
@@ -448,23 +454,20 @@ subroutine  psb_zspsv(alpha,a,x,beta,y,desc_a,info,&
   endif
 
   if (present(unitd)) then     
-    lunitd = unitd
+    lunitd = toupper(unitd)
   else
     lunitd = 'U'
   endif
 
   if (present(trans)) then     
-     if((trans.eq.'N').or.(trans.eq.'T')) then
-        itrans = trans
-     else if (trans.eq.'C') then
-        info = 3020
-        call psb_errpush(info,name)
-        goto 9999
-     else
-        info = 70
-        call psb_errpush(info,name)
-        goto 9999
-     end if
+    itrans = toupper(trans)
+    if((itrans.eq.'N').or.(itrans.eq.'T').or.(itrans.eq.'C')) then
+      ! Ok
+    else
+      info = 70
+      call psb_errpush(info,name)
+      goto 9999
+    end if
   else
      itrans = 'N'
   endif
@@ -481,30 +484,34 @@ subroutine  psb_zspsv(alpha,a,x,beta,y,desc_a,info,&
      goto 9999
   end if
 
+  iwork => null()
   ! check for presence/size of a work area
   liwork= 2*ncol
   if (a%pr(1) /= 0) llwork = liwork + m * ik
   if (a%pl(1) /= 0) llwork = llwork + m * ik
+  
   if (present(work)) then     
-     if(size(work).lt.liwork) then
-        call psb_realloc(liwork,work,info)
-        if(info.ne.0) then
-           info=4010
-           ch_err='psb_realloc'
-           call psb_errpush(info,name,a_err=ch_err)
-           goto 9999
-        end if
-     end if
-     iwork => work
+    if (size(work) >= liwork) then 
+	aliw =.false.
+    else 
+	aliw=.true.
+    endif
   else
-     call psb_realloc(liwork,iwork,info)
-     if(info.ne.0) then
+	aliw=.true.
+  end if
+ 
+  if (aliw) then 
+      call psb_realloc(liwork,iwork,info)
+      if(info.ne.0) then
         info=4010
         ch_err='psb_realloc'
         call psb_errpush(info,name,a_err=ch_err)
         goto 9999
-     end if
-  end if
+      end if
+  else
+     iwork => work
+  endif
+
   iwork(1)=0.d0
 
   if(present(d)) then
@@ -588,7 +595,7 @@ subroutine  psb_zspsv(alpha,a,x,beta,y,desc_a,info,&
      end select
   end if
 
-  if(.not.present(work)) deallocate(iwork)
+   if (aliw) deallocate(iwork)
   if(.not.present(d)) deallocate(id)
 
   call psb_erractionrestore(err_act)

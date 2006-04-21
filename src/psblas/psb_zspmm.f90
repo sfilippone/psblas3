@@ -95,7 +95,7 @@ subroutine  psb_zspmm(alpha,a,x,beta,y,desc_a,info,&
   type(psb_zspmat_type), intent(in)        :: a
   type(psb_desc_type), intent(in)          :: desc_a
   integer, intent(out)                     :: info
-  complex(kind(1.d0)), optional, pointer      :: work(:)
+  complex(kind(1.d0)), optional, target      :: work(:)
   character, intent(in), optional          :: trans
   integer, intent(in), optional            :: k, jx, jy,doswap
 
@@ -108,6 +108,7 @@ subroutine  psb_zspmm(alpha,a,x,beta,y,desc_a,info,&
   complex(kind(1.d0)),pointer :: tmpx(:), xp(:,:), yp(:,:), iwork(:)
   character                :: itrans
   character(len=20)        :: name, ch_err
+  logical                  :: aliw
 
   name='psb_zspmm'
   if(psb_get_errstatus().ne.0) return 
@@ -160,13 +161,8 @@ subroutine  psb_zspmm(alpha,a,x,beta,y,desc_a,info,&
   endif
 
   if (present(trans)) then     
-    if ((trans.eq.'N').or.(trans.eq.'T')&
-         & .or.(trans.eq.'n').or.(trans.eq.'t')) then
-      itrans = trans
-    else if ((trans.eq.'C').or.(trans.eq.'c')) then
-      info = 3020
-      call psb_errpush(info,name)
-      goto 9999
+    if ( (toupper(trans).eq.'N').or.(toupper(trans).eq.'T').or. (toupper(trans).eq.'C')) then
+      itrans = toupper(trans)
     else
       info = 70
       call psb_errpush(info,name)
@@ -187,26 +183,28 @@ subroutine  psb_zspmm(alpha,a,x,beta,y,desc_a,info,&
   liwork= 2*ncol
   if (a%pr(1) /= 0) liwork = liwork + n * ik
   if (a%pl(1) /= 0) liwork = liwork + m * ik
-  if (present(work)) then     
-    if(size(work).lt.liwork) then
-      call psb_realloc(liwork,work,info)
+if (present(work)) then
+    if (size(work) >= liwork) then
+        aliw =.false.
+    else
+        aliw=.true.
+    endif
+  else
+        aliw=.true.
+  end if
+
+  if (aliw) then
+      call psb_realloc(liwork,iwork,info)
       if(info.ne.0) then
         info=4010
         ch_err='psb_realloc'
         call psb_errpush(info,name,a_err=ch_err)
         goto 9999
       end if
-    end if
-    iwork => work
   else
-    call psb_realloc(liwork,iwork,info)
-    if(info.ne.0) then
-      info=4010
-      ch_err='psb_realloc'
-      call psb_errpush(info,name,a_err=ch_err)
-      goto 9999
-    end if
-  end if
+     iwork => work
+  endif
+
   iwork(1)=zzero
 
   ! checking for matrix correctness
@@ -342,7 +340,7 @@ subroutine  psb_zspmm(alpha,a,x,beta,y,desc_a,info,&
 
   end if
 
-  if(.not.present(work)) deallocate(iwork)
+  if(aliw) deallocate(iwork)
   nullify(iwork)
 
   call psb_erractionrestore(err_act)
@@ -432,7 +430,7 @@ subroutine  psb_zspmv(alpha,a,x,beta,y,desc_a,info,&
   type(psb_zspmat_type), intent(in)        :: a
   type(psb_desc_type), intent(in)          :: desc_a
   integer, intent(out)                     :: info
-  complex(kind(1.d0)), optional, pointer      :: work(:)
+  complex(kind(1.d0)), optional, target      :: work(:)
   character, intent(in), optional          :: trans
   integer, intent(in), optional            :: doswap
 
@@ -445,6 +443,7 @@ subroutine  psb_zspmv(alpha,a,x,beta,y,desc_a,info,&
   complex(kind(1.d0)),pointer :: tmpx(:), iwork(:), xp(:), yp(:)
   character                :: itrans
   character(len=20)        :: name, ch_err
+  logical                  :: aliw
 
   name='psb_zspmv'
   if(psb_get_errstatus().ne.0) return 
@@ -482,17 +481,13 @@ subroutine  psb_zspmv(alpha,a,x,beta,y,desc_a,info,&
   endif
 
   if (present(trans)) then     
-     if((trans.eq.'N').or.(trans.eq.'T')) then
-        itrans = trans
-     else if (trans.eq.'C') then
-        info = 3020
-        call psb_errpush(info,name)
-        goto 9999
-     else
-        info = 70
-        call psb_errpush(info,name)
-        goto 9999
-     end if
+    if ( (toupper(trans).eq.'N').or.(toupper(trans).eq.'T') .or.(toupper(trans).eq.'C')) then
+      itrans = toupper(trans)
+    else
+      info = 70
+      call psb_errpush(info,name)
+      goto 9999
+    end if
   else
      itrans = 'N'
   endif
@@ -504,33 +499,35 @@ subroutine  psb_zspmv(alpha,a,x,beta,y,desc_a,info,&
   lldx = size(x)
   lldy = size(y)
 
+  iwork => null()
   ! check for presence/size of a work area
   liwork= 2*ncol
   if (a%pr(1) /= 0) liwork = liwork + n * ik
   if (a%pl(1) /= 0) liwork = liwork + m * ik
-!  write(0,*)'---->>>',work(1)
-  if (present(work)) then
-     if(size(work).ge.liwork) then
-        iwork => work
-        liwork=size(work)
-     else
-        call psb_realloc(liwork,iwork,info)
-        if(info.ne.0) then
-           info=4010
-           ch_err='psb_realloc'
-           call psb_errpush(info,name,a_err=ch_err)
-           goto 9999
-        end if
-     end if
+  !  write(0,*)'---->>>',work(1)
+ if (present(work)) then
+    if (size(work) >= liwork) then
+        aliw =.false.
+    else
+        aliw=.true.
+    endif
   else
-     call psb_realloc(liwork,iwork,info)
-     if(info.ne.0) then
+        aliw=.true.
+  end if
+
+        aliw=.true.
+  if (aliw) then
+      call psb_realloc(liwork,iwork,info)
+      if(info.ne.0) then
         info=4010
         ch_err='psb_realloc'
         call psb_errpush(info,name,a_err=ch_err)
         goto 9999
-     end if
-  end if
+      end if
+  else
+     iwork => work
+  endif
+
 
   ! checking for matrix correctness
   call psb_chkmat(m,n,ia,ja,desc_a%matrix_data,info,iia,jja)
@@ -643,9 +640,7 @@ subroutine  psb_zspmv(alpha,a,x,beta,y,desc_a,info,&
 
   end if
 
-  if(.not.present(work)) then
-     deallocate(iwork)
-  end if
+  if(aliw) deallocate(iwork)
   nullify(iwork)
 
   call psb_erractionrestore(err_act)

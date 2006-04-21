@@ -168,12 +168,8 @@ subroutine  psb_dspsm(alpha,a,x,beta,y,desc_a,info,&
 
   if (present(trans)) then     
     itrans = toupper(trans)
-    if((itrans.eq.'N').or.(itrans.eq.'T')) then
-      ! Ok
-    else if (itrans.eq.'C') then
-      info = 3020
-      call psb_errpush(info,name)
-      goto 9999
+    if((itrans.eq.'N').or.(itrans.eq.'T').or.  (itrans.eq.'C')) then
+      ! OK 
     else
       info = 70
       call psb_errpush(info,name)
@@ -505,7 +501,6 @@ subroutine  psb_dspsv(alpha,a,x,beta,y,desc_a,info,&
 	aliw=.true.
   end if
  
-	aliw=.true.
   if (aliw) then 
       call psb_realloc(liwork,iwork,info)
       if(info.ne.0) then
