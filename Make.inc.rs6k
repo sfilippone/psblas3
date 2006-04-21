@@ -20,6 +20,7 @@ CCOPT=-O3
 MPF90=mpxlf95 -qsuffix=f=f90
 F90LINK=$(MPF90)
 FLINK=$(MPF90)
+MPF77=mpxlf77 
 MPCC=mpxlc
 
 #######################  Section 3 #######################
@@ -27,6 +28,9 @@ MPCC=mpxlc
 ##########################################################
 BLAS=-lessl
 BLACS=-lmpiblacs
+#These should be uncommented when using the ESSL BLACS library
+#EXTRA_BLACS_P2P_OBJS= krecvid.o ksendid.o
+EXTRA_BLACS_ENV_OBJS=extra_env_essl.o
 
 
 #######################  Section 4 #######################

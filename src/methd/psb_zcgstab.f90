@@ -191,9 +191,7 @@ Subroutine psb_zcgstab(a,prec,b,x,eps,desc_a,info,&
   diagu = 'U'
 
   ! Ensure global coherence for convergence checks.
-  Call blacs_get(icontxt,16,isvch)
-  ich = 1 
-  Call blacs_set(icontxt,16,ich)
+  call psb_set_coher(icontxt,isvch)
 
   itx   = 0
 
@@ -389,8 +387,10 @@ Subroutine psb_zcgstab(a,prec,b,x,eps,desc_a,info,&
 
   Deallocate(aux)
   Call psb_gefree(wwrk,desc_a,info)
+
   ! restore external global coherence behaviour
-  Call blacs_set(icontxt,16,isvch)
+  call psb_restore_coher(icontxt,isvch)
+
 !!$  imerr = MPE_Log_event( istpe, 0, "ed CGSTAB" )
   if(info/=0) then
      call psb_errpush(info,name)

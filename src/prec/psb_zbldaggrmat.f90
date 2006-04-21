@@ -348,7 +348,7 @@ contains
     type(psb_zspmat_type) :: am3,am4
     logical       :: ml_global_nmb
 
-    logical, parameter :: test_dump=.false.
+    logical, parameter :: test_dump=.false., debug=.false.
     integer, parameter :: ncmax=16
     real(kind(1.d0))   :: omega, anorm, tmp, dg
     character(len=20) :: name, ch_err

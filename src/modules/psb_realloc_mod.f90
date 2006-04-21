@@ -69,7 +69,7 @@ Contains
     if(psb_get_errstatus().ne.0) return 
     info=0
     if (debug) write(0,*) 'reallocate I',len
-    if (associated(rrax)) then a
+    if (associated(rrax)) then 
       dim=size(rrax)
       If (dim /= len) Then
         Allocate(tmp(len),stat=info)

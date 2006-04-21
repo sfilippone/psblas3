@@ -18,8 +18,9 @@ CCOPT=-O3
 #  Define your linker and linker flags here              #
 ##########################################################
 F90LINK=/usr/local/mpich-ifc71/bin/mpif90 
-FLINK=/usr/local/mpich-ifc71/mpif77 
+FLINK=/usr/local/mpich-ifc71/bin/mpif77 
 MPF90=/usr/local/mpich-ifc71/bin/mpif90 
+MPF77=/usr/local/mpich-ifc71/bin/mpif77 	
 MPCC=/usr/local/mpich-ifc71/bin/mpicc 
 
 #######################  Section 3 #######################
@@ -27,6 +28,7 @@ MPCC=/usr/local/mpich-ifc71/bin/mpicc
 ##########################################################
 BLAS=-lblasintel -L$(HOME)/LIB
 BLACS=-lmpiblacsifc71 -L$(HOME)/LIB
+EXTRA_BLACS_ENV_OBJS=extra_env.o
 
 
 #######################  Section 4 #######################

@@ -186,10 +186,8 @@ Subroutine psb_dcgs(a,prec,b,x,eps,desc_a,info,&
      itrac = -1
   End If
 
-  ! ensure global coherence for convergence checks.
-  Call blacs_get(icontxt,16,isvch)
-  ich = 1 
-  Call blacs_set(icontxt,16,ich)
+  ! Ensure global coherence for convergence checks.
+  call psb_set_coher(icontxt,isvch)
   
   diagl  = 'u'
   diagu  = 'u'
@@ -336,8 +334,9 @@ Subroutine psb_dcgs(a,prec,b,x,eps,desc_a,info,&
 
   Deallocate(aux)
   Call psb_gefree(wwrk,desc_a,info)
+
   ! restore external global coherence behaviour
-  Call blacs_set(icontxt,16,isvch)
+  call psb_restore_coher(icontxt,isvch)
 
   if(info/=0) then
      call psb_errpush(info,name)

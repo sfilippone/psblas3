@@ -178,9 +178,7 @@ Subroutine psb_dcg(a,prec,b,x,eps,desc_a,info,&
   itx=0
 
   ! Ensure global coherence for convergence checks.
-  call blacs_get(icontxt,16,isvch)
-  ich = 1 
-  call blacs_set(icontxt,16,ich)
+  call psb_set_coher(icontxt,isvch)
 
   restart: do 
 !!$   
@@ -273,8 +271,9 @@ Subroutine psb_dcg(a,prec,b,x,eps,desc_a,info,&
 
   deallocate(aux)
   call psb_gefree(wwrk,desc_a,info)
+
   ! restore external global coherence behaviour
-  call blacs_set(icontxt,16,isvch)
+  call psb_restore_coher(icontxt,isvch)
 
   if (info.ne.0) then 
     call psb_errpush(info,name)

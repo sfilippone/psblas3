@@ -127,10 +127,8 @@ subroutine psb_dbicg(a,prec,b,x,eps,desc_a,info,&
   n_row = desc_a%matrix_data(psb_n_row_)
   n_col = desc_a%matrix_data(psb_n_col_)
 
-  ! ensure global coherence for convergence checks.
-  call blacs_get(icontxt,16,isvch)
-  ich = 1 
-  call blacs_set(icontxt,16,ich)
+  ! Ensure global coherence for convergence checks.
+  call psb_set_coher(icontxt,isvch)
 
 
   if (present(istop)) then 
@@ -344,8 +342,9 @@ subroutine psb_dbicg(a,prec,b,x,eps,desc_a,info,&
 
   deallocate(aux)
   call psb_gefree(wwrk,desc_a,info)
+
   ! restore external global coherence behaviour
-  call blacs_set(icontxt,16,isvch)
+  call psb_restore_coher(icontxt,isvch)
 
   if(info/=0) then
      call psb_errpush(info,name)

@@ -21,7 +21,7 @@ F90OBJS=psb_dasmatbld.o psb_dslu_bld.o psb_dumf_bld.o psb_dilu_fct.o\
 COBJS=psb_slu_impl.o psb_umf_impl.o psb_zslu_impl.o psb_zumf_impl.o
 INCDIRS=-I. -I.. -I$(LIBDIR) 
 
-OBJS=$(F90OBJS) $(COBJS)
+OBJS=$(F90OBJS) $(COBJS) $(MPFOBJS)
 
 lib:  mpobjs $(OBJS) 
 	$(AR) $(LIBDIR)/$(LIBNAME) $(MPFOBJS) $(OBJS)

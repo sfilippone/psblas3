@@ -18,8 +18,9 @@ CCOPT=-O3
 #  Define your linker and linker flags here              #
 ##########################################################
 F90LINK=/usr/local/mpich-ifc80/bin/mpif90 -g -CB -no_cpprt
-FLINK=/usr/local/mpich-ifc80/mpif77 -g -CB -no_cpprt
+FLINK=/usr/local/mpich-ifc80/bin/mpif77 -g -CB -no_cpprt
 MPF90=/usr/local/mpich-ifc80/bin/mpif90 -g -CB -no_cpprt
+MPF77=/usr/local/mpich-ifc80/bin/mpif77 -g -CB -no_cpprt
 MPCC=/usr/local/mpich-ifc80/bin/mpicc -g -CB -no_cpprt
 
 #######################  Section 3 #######################
@@ -27,6 +28,7 @@ MPCC=/usr/local/mpich-ifc80/bin/mpicc -g -CB -no_cpprt
 ##########################################################
 BLAS=-lblas-intel -L$(HOME)/NUMERICAL/LIB
 BLACS=-lmpiblacs-intel -L$(HOME)/NUMERICAL/LIB
+EXTRA_BLACS_ENV_OBJS=extra_env.o
 
 
 #######################  Section 4 #######################

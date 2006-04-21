@@ -199,10 +199,9 @@ Subroutine psb_dgmresr(a,prec,b,x,eps,desc_a,info,&
   End If
   if (debug) write(0,*) 'Size of V,W ',size(v),size(v,1),&
        &size(w),size(w,1), size(v(:,1))
-  ! ensure global coherence for convergence checks.
-  Call blacs_get(icontxt,16,isvch)
-  ich = 1 
-  Call blacs_set(icontxt,16,ich)
+
+  ! Ensure global coherence for convergence checks.
+  call psb_set_coher(icontxt,isvch)
 
   if (istop_ == 1) then 
     ani = psb_spnrmi(a,desc_a,info)
@@ -348,8 +347,9 @@ Subroutine psb_dgmresr(a,prec,b,x,eps,desc_a,info,&
   Deallocate(aux,h,c,s,rs,rr, stat=info)
   Call psb_gefree(v,desc_a,info)
   Call psb_gefree(w,desc_a,info)
+
   ! restore external global coherence behaviour
-  Call blacs_set(icontxt,16,isvch)
+  call psb_restore_coher(icontxt,isvch)
 
   if (info /= 0) then
      info=4011

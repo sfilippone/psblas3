@@ -206,10 +206,8 @@ Subroutine psb_dcgstabl(a,prec,b,x,eps,desc_a,info,&
   ww  => wwrk(:,9)
   rt0 => wwrk(:,10)
   
-  ! ensure global coherence for convergence checks.
-  Call blacs_get(icontxt,16,isvch)
-  ich = 1 
-  Call blacs_set(icontxt,16,ich)
+  ! Ensure global coherence for convergence checks.
+  call psb_set_coher(icontxt,isvch)
 
   if (istop_ == 1) then 
     ani = psb_spnrmi(a,desc_a,info)
@@ -400,8 +398,9 @@ Subroutine psb_dcgstabl(a,prec,b,x,eps,desc_a,info,&
   Call psb_gefree(wwrk,desc_a,info)
   Call psb_gefree(uh,desc_a,info)
   Call psb_gefree(rh,desc_a,info)
+
   ! restore external global coherence behaviour
-  Call blacs_set(icontxt,16,isvch)
+  call psb_restore_coher(icontxt,isvch)
 
   if(info/=0) then
      call psb_errpush(info,name)
