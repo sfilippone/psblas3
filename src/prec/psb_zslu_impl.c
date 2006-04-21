@@ -85,7 +85,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #ifdef Have_SLU_
 #include "zsp_defs.h"
-#undef Have_SLU_
 #define HANDLE_SIZE  8
 /* kind of integer to hold a pointer.  Use int.
    This might need to be changed on 64-bit systems. */
@@ -132,11 +131,11 @@ typedef struct {
 void
 psb_zslu_factor_(int *n, int *nnz,
 #ifdef Have_SLU_		 
-                 doublecomplex *values, int *rowind, int *colptr,
+                 doublecomplex *values, int *colind, int *rowptr,
 		 fptr *f_factors, /* a handle containing the address
 				     pointing to the factored matrices */
 #else 
-                 void *values, int *rowind, int *colptr,
+                 void *values, int *colind, int *rowptr,
 		 void *f_factors,
 #endif
 		 int *info)
@@ -178,11 +177,11 @@ psb_zslu_factor_(int *n, int *nnz,
     StatInit(&stat);
     
     /* Adjust to 0-based indexing */
-    for (i = 0; i < *nnz; ++i) --colptr[i];
-    for (i = 0; i <= *n; ++i) --rowind[i];
+    for (i = 0; i < *nnz; ++i) --colind[i];
+    for (i = 0; i <= *n; ++i) --rowptr[i];
     
-    zCreate_CompRow_Matrix(&A, *n, *n, *nnz, values, colptr, rowind,
-			   SLU_NC, SLU_Z, SLU_GE);
+    zCreate_CompRow_Matrix(&A, *n, *n, *nnz, values, colind, rowptr,
+			   SLU_NR, SLU_Z, SLU_GE);
     L = (SuperMatrix *) SUPERLU_MALLOC( sizeof(SuperMatrix) );
     U = (SuperMatrix *) SUPERLU_MALLOC( sizeof(SuperMatrix) );
     if ( !(perm_r = intMalloc(*n)) ) ABORT("Malloc fails for perm_r[].");
@@ -231,8 +230,8 @@ psb_zslu_factor_(int *n, int *nnz,
     }
     
     /* Restore to 1-based indexing */
-    for (i = 0; i < *nnz; ++i) ++colptr[i];
-    for (i = 0; i <= *n; ++i) ++rowind[i];
+    for (i = 0; i < *nnz; ++i) ++colind[i];
+    for (i = 0; i <= *n; ++i) ++rowptr[i];
     
     /* Save the LU factors in the factors handle */
     LUfactors = (factors_t*) SUPERLU_MALLOC(sizeof(factors_t));

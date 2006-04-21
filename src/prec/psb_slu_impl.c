@@ -131,7 +131,7 @@ typedef struct {
 
 void
 psb_dslu_factor_(int *n, int *nnz,
-                 double *values, int *rowind, int *colptr,
+                 double *values, int *rowptr, int *colind,
 #ifdef Have_SLU_		 
 		 fptr *f_factors, /* a handle containing the address
 				     pointing to the factored matrices */
@@ -177,10 +177,10 @@ psb_dslu_factor_(int *n, int *nnz,
     StatInit(&stat);
     
     /* Adjust to 0-based indexing */
-    for (i = 0; i < *nnz; ++i) --colptr[i];
-    for (i = 0; i <= *n; ++i) --rowind[i];
+    for (i = 0; i < *nnz; ++i) --colind[i];
+    for (i = 0; i <= *n; ++i) --rowptr[i];
     
-    dCreate_CompRow_Matrix(&A, *n, *n, *nnz, values, colptr, rowind,
+    dCreate_CompRow_Matrix(&A, *n, *n, *nnz, values, colind, rowptr,
 			   SLU_NR, SLU_D, SLU_GE);
     L = (SuperMatrix *) SUPERLU_MALLOC( sizeof(SuperMatrix) );
     U = (SuperMatrix *) SUPERLU_MALLOC( sizeof(SuperMatrix) );
@@ -230,8 +230,8 @@ psb_dslu_factor_(int *n, int *nnz,
     }
     
     /* Restore to 1-based indexing */
-    for (i = 0; i < *nnz; ++i) ++colptr[i];
-    for (i = 0; i <= *n; ++i) ++rowind[i];
+    for (i = 0; i < *nnz; ++i) ++colind[i];
+    for (i = 0; i <= *n; ++i) ++rowptr[i];
     
     /* Save the LU factors in the factors handle */
     LUfactors = (factors_t*) SUPERLU_MALLOC(sizeof(factors_t));

@@ -177,7 +177,7 @@ subroutine psb_zslu_bld(a,desc_a,p,info)
   endif
 
   call psb_zslu_factor(atmp%m,nzt,&
-       & atmp%aspk,atmp%ia2,atmp%ia1,p%iprcparm(slu_ptr_),info)
+       & atmp%aspk,atmp%ia1,atmp%ia2,p%iprcparm(slu_ptr_),info)
   if(info /= 0) then
     info=4010
     ch_err='psb_slu_fact'
