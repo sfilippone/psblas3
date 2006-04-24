@@ -1,9 +1,11 @@
 Changelog. A lot less detailed than usual, at least for past
 history. 
 
-2006/04/24: Rewritten documentation; minor changes to the interface of
-	    dense tools routines, trying to achieve a uniform
-	    look & feel. 
+2006/04/24: Minor changes to the interface of dense tools routines,
+	    trying to achieve a uniform look & feel.
+	    Rewritten documentation; it is now reasonable, though not
+	    perfect, except for the preconditioner routines. 
+	    We can now declare RC3. 
 
 2006/04/21: A bunch of fixes related to various matrix initialization 
 	    problems that were revealed while testing on SP5.         
