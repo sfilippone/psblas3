@@ -208,10 +208,10 @@ program df_sample
          & desc_a,b_col_glob,b_col,info,fmt=afmt)
   end if
   
-  call psb_geall(m_problem,x_col,desc_a,info)
+  call psb_geall(x_col,desc_a,info)
   x_col(:) =0.0
   call psb_geasb(x_col,desc_a,info)
-  call psb_geall(m_problem,r_col,desc_a,info)
+  call psb_geall(r_col,desc_a,info)
   r_col(:) =0.0
   call psb_geasb(r_col,desc_a,info)
   t2 = mpi_wtime() - t1

@@ -111,7 +111,7 @@ Subroutine psb_dgmresr(a,prec,b,x,eps,desc_a,info,&
        &pv1(:),  pv2(:), pm1(:,:), rr(:,:)
   Integer, Pointer           :: iperm(:), ipnull(:), ipsave(:), ierrv(:)
   Real(Kind(1.d0)) :: rerr, scal, gm 
-  Integer       ::litmax, liter, naux, m, mglob, it,k, itrac,&
+  Integer       ::litmax, liter, naux, m, mglob, it,k, itrace_,&
        & nprows,npcols,me,mecol, n_row, n_col, nl, int_err(5)
   Character     ::diagl, diagu
   Logical, Parameter :: exchange=.True., noexchange=.False.  
@@ -164,9 +164,9 @@ Subroutine psb_dgmresr(a,prec,b,x,eps,desc_a,info,&
   Endif
 
   If (Present(itrace)) Then
-     itrac = itrace
+     itrace_ = itrace
   Else
-     itrac = -1
+     itrace_ = 0
   End If
   
   If (Present(irst)) Then
@@ -188,8 +188,8 @@ Subroutine psb_dgmresr(a,prec,b,x,eps,desc_a,info,&
      goto 9999
   End If
 
-  Call psb_geall(mglob,nl+1,v,desc_a,info)
-  Call psb_geall(mglob,w,desc_a,info)
+  Call psb_geall(v,desc_a,info,n=nl+1)
+  Call psb_geall(w,desc_a,info)
   Call psb_geasb(v,desc_a,info)  
   Call psb_geasb(w,desc_a,info)  
   if (info.ne.0) Then 
@@ -247,17 +247,9 @@ Subroutine psb_dgmresr(a,prec,b,x,eps,desc_a,info,&
       rni = psb_geamax(v(:,1),desc_a,info)
       xni = psb_geamax(x,desc_a,info)
       rerr =  rni/(ani*xni+bni)
-      if (itrac /= -1) then 
-          If (me == 0) Write(itrac,'(a,i4,5(2x,es10.4))') 'gmresr(l): ',&
-               & itx,rerr,rni,bni,xni,ani
-      endif
     else if (istop_ == 2) then 
       rni = psb_genrm2(v(:,1),desc_a,info)
       rerr = rni/bn2
-      if (itrac /= -1) then  
-        If (me == 0) Write(itrac,'(a,i4,3(2x,es10.4))') 'gmresr(l): ',&
-             & itx,rerr,rni,bn2
-      endif
     endif
     if (info.ne.0) Then 
        info=4011 
@@ -268,6 +260,10 @@ Subroutine psb_dgmresr(a,prec,b,x,eps,desc_a,info,&
     If (rerr<=eps) Then 
       Exit restart
     End If
+    If (itrace_ > 0) then 
+      if ((mod(itx,itrace_)==0).and.(me == 0))&
+           & write(*,'(a,i4,3(2x,es10.4))') 'gmres(l): ',itx,rerr
+    end If
      
     If (itx.Ge.litmax) Exit restart  
 
@@ -304,17 +300,9 @@ Subroutine psb_dgmresr(a,prec,b,x,eps,desc_a,info,&
         rni = abs(rs(i+1))
         xni = psb_geamax(x,desc_a,info)
         rerr =  rni/(ani*xni+bni)
-        if (itrac /= -1) then 
-          If (me == 0) Write(itrac,'(a,i4,5(2x,es10.4))') 'gmresr(l): ',&
-               & itx,rerr,rni,bni,xni,ani
-        endif
       else if (istop_ == 2) then 
         rni = abs(rs(i+1))
         rerr = rni/bn2
-        if (itrac /= -1) then  
-          If (me == 0) Write(itrac,'(a,i4,3(2x,es10.4))') 'gmresr(l): ',&
-               & itx,rerr,rni,bn2
-        endif
       endif
 
       if (rerr < eps ) then 
@@ -325,6 +313,10 @@ Subroutine psb_dgmresr(a,prec,b,x,eps,desc_a,info,&
         end do
         exit restart
       end if
+      If (itrace_ > 0) then 
+        if ((mod(itx,itrace_)==0).and.(me == 0))&
+             & write(*,'(a,i4,3(2x,es10.4))') 'gmres(l): ',itx,rerr
+      end If
 
     end Do inner
     if (debug) write(0,*) 'Before DTRSM :',rs(1:nl)
@@ -335,6 +327,9 @@ Subroutine psb_dgmresr(a,prec,b,x,eps,desc_a,info,&
     end do
      
   End Do restart
+  If (itrace_ > 0) then 
+    if (me == 0) write(*,'(a,i4,3(2x,es10.4))') 'gmres(l): ',itx,rerr
+  end If
 
   If (Present(err)) err=rerr
   If (Present(iter)) iter = itx

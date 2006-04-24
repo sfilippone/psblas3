@@ -23,7 +23,7 @@ or
 according to the value passed through the  istop argument (see later).
 
 
-\syntax{call psb\_cgs}{a,prec,b,x,eps,desc\_a,info,itmax,iter,err,itrace,istop}
+\syntax{call psb\_cg}{a,prec,b,x,eps,desc\_a,info,itmax,iter,err,itrace,istop}
 
 \begin{description}
 \item[\bf On Entry]
@@ -57,7 +57,7 @@ Scope: {\bf global} \\
 Type: {\bf optional}\\
 Default: $itmax = 1000$.\\
 Specified as: an integer variable $itmax \ge 1$.
-\item[itrace]  A tracing parameter.\\
+\item[itrace] If $>0$  print out a convergence message every $itrace$ iterations.\\
 Scope: {\bf global} \\
 Type: {\bf optional}\\
 \item[istop]  An integer specifying the stopping criterion.\\

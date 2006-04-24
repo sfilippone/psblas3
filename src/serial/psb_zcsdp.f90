@@ -67,7 +67,7 @@ subroutine psb_zcsdp(a, b,info,ifc,check,trans,unitd,upd,dupl)
        & ipc, i, count, err_act, ierrv(5), i1, i2, ia
   character                     :: check_,trans_,unitd_, up
   Integer, Parameter            :: maxtry=8
-  logical, parameter            :: debug=.false.
+  logical, parameter            :: debug=.true.
   character(len=20)             :: name, ch_err
 
   interface psb_cest
@@ -114,11 +114,11 @@ subroutine psb_zcsdp(a, b,info,ifc,check,trans,unitd,upd,dupl)
     unitd_ = 'U'
   endif
 
+
   if (check_=='R') then 
     allocate(work(max(size(a%aspk),size(b%aspk))+1000),stat=info)
   else
-    allocate(work(max(size(a%ia1),size(b%ia1),&
-         &     size(a%ia2),size(b%ia2))+max(a%m,b%m)+1000),stat=info)
+    allocate(work(max(size(a%ia1),size(a%ia2))+max(a%m,b%m)+1000),stat=info)
   endif
 
   if (info /= 0) then
@@ -127,7 +127,7 @@ subroutine psb_zcsdp(a, b,info,ifc,check,trans,unitd,upd,dupl)
     goto 9999
   end if
   if (ifc_<1) then 
-    write(0,*) 'dcsdp90 Error: invalid ifc ',ifc_
+    write(0,*) 'csdp90 Error: invalid ifc ',ifc_
     info = -4
     call psb_errpush(info,name)
     goto 9999
@@ -181,13 +181,15 @@ subroutine psb_zcsdp(a, b,info,ifc,check,trans,unitd,upd,dupl)
     b%m=a%m
     b%k=a%k
     call psb_spinfo(psb_nztotreq_,a,size_req,info)
-    if (debug) write(0,*) 'DCSDP : size_req 1:',size_req
+    if (debug) write(0,*) 'DCSDP : size_req 1:',size_req,a%m,a%k
     !
     
     n_row=b%m 
     n_col=b%k
     call psb_cest(b%fida, n_row,n_col,size_req,&
          & ia1_size, ia2_size, aspk_size, upd_,info)
+!!$    write(0,*) size(b%aspk),size(b%ia1),size(b%ia2),size(b%pl),size(b%pr),&
+!!$         & ia1_size, ia2_size, aspk_size,b%fida,b%m,b%k
 
     if (info /= no_err) then    
       info=4010
@@ -195,13 +197,20 @@ subroutine psb_zcsdp(a, b,info,ifc,check,trans,unitd,upd,dupl)
       call psb_errpush(info,name,a_err=ch_err)
       goto 9999
     endif
-    if ((size(b%aspk)  < aspk_size) .or.&
+    if (.not.associated(b%aspk).or.&
+         &.not.associated(b%ia1).or.&
+         &.not.associated(b%ia2).or.&
+         &.not.associated(b%pl).or.&
+         &.not.associated(b%pr)) then
+      call psb_sp_reall(b,ia1_size,ia2_size,aspk_size,info)
+    else if ((size(b%aspk)  < aspk_size) .or.&
          &(size(b%ia1) < ia1_size) .or.&
          &(size(b%ia2) < ia2_size) .or.&
          &(size(b%pl)  < b%m) .or.&
          &(size(b%pr) < b%k )) then 
       call psb_sp_reall(b,ia1_size,ia2_size,aspk_size,info)
     endif
+
     if (info /= no_err) then    
       info=4010
       ch_err='psb_sp_reall'

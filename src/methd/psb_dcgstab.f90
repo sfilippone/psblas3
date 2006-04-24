@@ -100,7 +100,7 @@ Subroutine psb_dcgstab(a,prec,b,x,eps,desc_a,info,&
        & r(:), p(:), v(:), s(:), t(:), z(:), f(:)
   Integer, Pointer           :: iperm(:), ipnull(:), ipsave(:)
   Real(Kind(1.d0)) ::rerr
-  Integer       ::litmax, liter, naux, m, mglob, it,itrac,&
+  Integer       ::litmax, liter, naux, m, mglob, it,itrace_,&
        & nprows,npcols,myrow,mycol, n_row, n_col
   Character     ::diagl, diagu
   Logical, Parameter :: debug = .false.
@@ -158,7 +158,7 @@ Subroutine psb_dcgstab(a,prec,b,x,eps,desc_a,info,&
 
   naux=6*n_col 
   allocate(aux(naux),stat=info)
-  if (info == 0) call psb_geall(mglob,8,wwrk,desc_a,info)
+  if (info == 0) call psb_geall(wwrk,desc_a,info,n=8)
   if (info == 0) call psb_geasb(wwrk,desc_a,info)  
   if (info /= 0) then 
      info=4011
@@ -182,9 +182,9 @@ Subroutine psb_dcgstab(a,prec,b,x,eps,desc_a,info,&
   Endif
 
   If (Present(itrace)) Then
-     itrac = itrace
+     itrace_ = itrace
   Else
-     itrac = -1
+     itrace_ = 0
   End If
   
   diagl = 'U'
@@ -245,8 +245,8 @@ Subroutine psb_dcgstab(a,prec,b,x,eps,desc_a,info,&
       rn0 = rni
     End If
     If (rn0 == 0.d0 ) Then 
-      If (itrac /= -1) Then 
-        If (myrow == 0) Write(itrac,*) 'BiCGSTAB: ',itx,rn0
+      If (itrace_ > 0 ) Then 
+        If (myrow == 0) Write(*,*) 'BiCGSTAB: ',itx,rn0
       Endif
       Exit restart
     End If
@@ -254,15 +254,8 @@ Subroutine psb_dcgstab(a,prec,b,x,eps,desc_a,info,&
     If (istop_ == 1) Then 
       xni  = psb_geamax(x,desc_a,info)
       rerr =  rni/(ani*xni+bni)
-      If (itrac /= -1) Then 
-        If (myrow == 0) Write(itrac,'(a,i4,5(2x,es10.4))') 'bicgstab: ',itx,rerr,rni,bni,&
-             &xni,ani
-      Endif
     Else  If (istop_ == 2) Then 
       rerr = rni/bn2
-      If (itrac /= -1) Then 
-        If (myrow == 0) Write(itrac,'(a,i4,3(2x,es10.4))') 'bicgstab: ',itx,rerr,rni,bn2
-      Endif
     Endif
     if (info /= 0) Then 
        info=4011
@@ -270,10 +263,14 @@ Subroutine psb_dcgstab(a,prec,b,x,eps,desc_a,info,&
        goto 9999
     End If
 
-    
     If (rerr<=eps) Then 
       Exit restart
     End If
+    
+    If (itrace_ > 0) then 
+      if (((itx==0).or.(mod(itx,itrace_)==0)).and.(myrow == 0)) &
+           & write(*,'(a,i4,3(2x,es10.4))') 'bicgstab: ',itx,rerr
+    Endif
 
     iteration:  Do 
       it   = it + 1
@@ -357,33 +354,35 @@ Subroutine psb_dcgstab(a,prec,b,x,eps,desc_a,info,&
         rni = psb_geamax(r,desc_a,info)
         xni = psb_geamax(x,desc_a,info)
         rerr =  rni/(ani*xni+bni)
-        If (itrac /= -1) Then 
-          If (myrow == 0) Write(itrac,'(a,i4,5(2x,es10.4))') &
-               & 'bicgstab: ',itx,rerr,rni,bni,xni,ani
-        Endif
 
       Else  If (istop_ == 2) Then 
         rni = psb_genrm2(r,desc_a,info)
         rerr = rni/bn2
-        If (itrac /= -1) Then 
-          If (myrow == 0) Write(itrac,'(a,i4,3(2x,es10.4)))') &
-               & 'bicgstab: ',itx,rerr,rni,bn2
-        Endif
       Endif
-      
       If (rerr<=eps) Then 
         Exit restart
       End If
       
       If (itx.Ge.litmax) Exit restart
+
+      If (itrace_ > 0) then 
+        if ((mod(itx,itrace_)==0).and.(myrow == 0)) &
+             & write(*,'(a,i4,3(2x,es10.4)))') &
+             & 'bicgstab: ',itx,rerr
+      Endif
+      
     End Do iteration
   End Do restart
 
+  If (itrace_ > 0) then 
+    if (myrow == 0) write(*,'(a,i4,3(2x,es10.4))') 'bicgstab: ',itx,rerr
+  Endif
+  
   If (Present(err)) err=rerr
   If (Present(iter)) iter = itx
   If (rerr>eps) Then
-    Write(0,*) 'BI-CGSTAB FAILED TO CONVERGE TO ',EPS,&
-         & ' IN ',ITX,' ITERATIONS  '
+    Write(0,*) 'BI-CGSTAB failed to converge to ',EPS,&
+         & ' in ',ITX,' iterations. '
   End If
 
   Deallocate(aux)

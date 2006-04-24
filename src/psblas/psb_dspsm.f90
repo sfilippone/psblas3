@@ -196,26 +196,26 @@ subroutine  psb_dspsm(alpha,a,x,beta,y,desc_a,info,&
   liwork= 2*ncol
   if (a%pr(1) /= 0) llwork = liwork + m * ik
   if (a%pl(1) /= 0) llwork = llwork + m * ik
- if (present(work)) then
+  if (present(work)) then
     if (size(work) >= liwork) then
-        aliw =.false.
+      aliw =.false.
     else
-        aliw=.true.
+      aliw=.true.
     endif
   else
-        aliw=.true.
+    aliw=.true.
   end if
 
   if (aliw) then
-      call psb_realloc(liwork,iwork,info)
-      if(info.ne.0) then
-        info=4010
-        ch_err='psb_realloc'
-        call psb_errpush(info,name,a_err=ch_err)
-        goto 9999
-      end if
+    call psb_realloc(liwork,iwork,info)
+    if(info.ne.0) then
+      info=4010
+      ch_err='psb_realloc'
+      call psb_errpush(info,name,a_err=ch_err)
+      goto 9999
+    end if
   else
-     iwork => work
+    iwork => work
   endif
 
   iwork(1)=0.d0
@@ -490,27 +490,27 @@ subroutine  psb_dspsv(alpha,a,x,beta,y,desc_a,info,&
   liwork= 2*ncol
   if (a%pr(1) /= 0) llwork = liwork + m * ik
   if (a%pl(1) /= 0) llwork = llwork + m * ik
-  
+
   if (present(work)) then     
     if (size(work) >= liwork) then 
-	aliw =.false.
+      aliw =.false.
     else 
-	aliw=.true.
+      aliw=.true.
     endif
   else
-	aliw=.true.
+    aliw=.true.
   end if
- 
+
   if (aliw) then 
-      call psb_realloc(liwork,iwork,info)
-      if(info.ne.0) then
-        info=4010
-        ch_err='psb_realloc'
-        call psb_errpush(info,name,a_err=ch_err)
-        goto 9999
-      end if
+    call psb_realloc(liwork,iwork,info)
+    if(info.ne.0) then
+      info=4010
+      ch_err='psb_realloc'
+      call psb_errpush(info,name,a_err=ch_err)
+      goto 9999
+    end if
   else
-     iwork => work
+    iwork => work
   endif
 
   iwork(1)=0.d0
@@ -596,7 +596,7 @@ subroutine  psb_dspsv(alpha,a,x,beta,y,desc_a,info,&
     end select
   end if
 
-   if (aliw) deallocate(iwork)
+  if (aliw) deallocate(iwork)
   if(.not.present(d)) deallocate(id)
 
   call psb_erractionrestore(err_act)

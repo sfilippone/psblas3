@@ -102,7 +102,7 @@ subroutine psb_dbicg(a,prec,b,x,eps,desc_a,info,&
        & r(:), p(:), zt(:), pt(:), z(:), rt(:),qt(:)
   integer, pointer           :: iperm(:), ipnull(:), ipsave(:), int_err(:)
   real(kind(1.d0)) ::rerr
-  integer       ::litmax, liter, naux, m, mglob, it, itrac,&
+  integer       ::litmax, liter, naux, m, mglob, it, itrace_,&
        & nprows,npcols,me,mecol, n_row, n_col, istop_, err_act
   character     ::diagl, diagu
   logical, parameter :: debug = .false.
@@ -159,7 +159,7 @@ subroutine psb_dbicg(a,prec,b,x,eps,desc_a,info,&
   naux=4*n_col 
 
   allocate(aux(naux),stat=info)
-  call psb_geall(mglob,9,wwrk,desc_a,info)
+  call psb_geall(wwrk,desc_a,info,n=9)
   call psb_geasb(wwrk,desc_a,info)  
   if(info.ne.0) then
      info=4011
@@ -186,9 +186,9 @@ subroutine psb_dbicg(a,prec,b,x,eps,desc_a,info,&
   endif
 
   if (present(itrace)) then
-    itrac = itrace
+    itrace_ = itrace
   else
-    itrac = -1
+    itrace_ = 0
   end if
 
   diagl  = 'u'
@@ -241,15 +241,8 @@ subroutine psb_dbicg(a,prec,b,x,eps,desc_a,info,&
     if (istop_ == 1) then 
       xni  = psb_geamax(x,desc_a,info)
       rerr =  rni/(ani*xni+bni)
-      if (itrac /= -1) then 
-        if (me.eq.0) write(itrac,'(a,i4,5(2x,es10.4))') 'bicg: ',itx,rerr,rni,bni,&
-             &xni,ani
-      endif
     else  if (istop_ == 2) then 
       rerr = rni/bn2
-      if (itrac /= -1) then 
-        if (me.eq.0) write(itrac,'(a,i4,3(2x,es10.4))') 'bicg: ',itx,rerr,rni,bn2
-      endif
     endif
 
     if(info.ne.0) then
@@ -261,6 +254,11 @@ subroutine psb_dbicg(a,prec,b,x,eps,desc_a,info,&
     if (rerr<=eps) then 
       exit restart
     end if
+    If (itrace_ > 0) then 
+      if ((mod(itx,itrace_)==0).and.(me == 0))&
+           & write(*,'(a,i4,3(2x,es10.4))') 'bicg: ',itx,rerr
+    end If
+
 
     iteration:  do 
       it   = it + 1
@@ -315,23 +313,25 @@ subroutine psb_dbicg(a,prec,b,x,eps,desc_a,info,&
       if (istop_ == 1) then 
         xni  = psb_geamax(x,desc_a,info)
         rerr =  rni/(ani*xni+bni)
-        if (itrac /= -1) then 
-          if (me.eq.0) write(itrac,'(a,i4,5(2x,es10.4))') 'bicg: ',itx,rerr,rni,bni,&
-               &xni,ani
-        endif
       else  if (istop_  == 2) then 
         rerr = rni/bn2
-        if (itrac /= -1) then 
-          if (me.eq.0) write(itrac,'(a,i4,3(2x,es10.4))') 'bicg: ',itx,rerr,rni,bn2
-        endif
       endif
       if (rerr<=eps) then 
         exit restart
       end if
+
       if (itx.ge.litmax) exit restart
+
+      If (itrace_ > 0) then 
+        if ((mod(itx,itrace_)==0).and.(me == 0))&
+             & write(*,'(a,i4,3(2x,es10.4))') 'bicg: ',itx,rerr
+      end If
     end do iteration
   end do restart
-
+  If (itrace_ > 0) then 
+    if (me == 0) write(*,'(a,i4,3(2x,es10.4))') 'bicg: ',itx,rerr
+  end If
+  
   if (present(err)) err=rerr
   if (present(iter)) iter = itx
   if (rerr>eps) then

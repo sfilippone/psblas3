@@ -100,7 +100,7 @@ Subroutine psb_dcgs(a,prec,b,x,eps,desc_a,info,&
        & r(:), p(:), v(:), s(:), t(:), z(:), f(:), rt(:),qt(:),uv(:)
   Integer, Pointer           :: iperm(:), ipnull(:), ipsave(:)
   Real(Kind(1.d0)) ::rerr
-  Integer       ::litmax, liter, naux, m, mglob, it, itrac,int_err(5),&
+  Integer       ::litmax, liter, naux, m, mglob, it, itrace_,int_err(5),&
        & nprows,npcols,me,mecol, n_row, n_col,istop_, err_act
   Character     ::diagl, diagu
   Logical, Parameter :: exchange=.True., noexchange=.False.  
@@ -153,7 +153,7 @@ Subroutine psb_dcgs(a,prec,b,x,eps,desc_a,info,&
   naux=4*n_col 
   Allocate(aux(naux),stat=info)
 
-  Call psb_geall(mglob,11,wwrk,desc_a,info)
+  Call psb_geall(wwrk,desc_a,info,n=11)
   Call psb_geasb(wwrk,desc_a,info)  
   if (info.ne.0) Then 
      info=4011 
@@ -181,9 +181,9 @@ Subroutine psb_dcgs(a,prec,b,x,eps,desc_a,info,&
   Endif
 
   If (Present(itrace)) Then
-     itrac = itrace
+     itrace_ = itrace
   Else
-     itrac = -1
+     itrace_ = 0
   End If
 
   ! Ensure global coherence for convergence checks.
@@ -227,26 +227,23 @@ Subroutine psb_dcgs(a,prec,b,x,eps,desc_a,info,&
       rni = psb_geamax(r,desc_a,info)
       xni = psb_geamax(x,desc_a,info)
       rerr =  rni/(ani*xni+bni)
-      if (itrac /= -1) then 
-        If (me == 0) Write(itrac,'(a,i4,5(2x,es10.4))') 'cgs: ',&
-             & itx,rerr,rni,bni,xni,ani
-      endif
     else if (istop_ == 2) then 
       rni = psb_genrm2(r,desc_a,info)
       rerr = rni/bn2
-      if (itrac /= -1) then 
-        If (me == 0) Write(itrac,'(a,i4,3(2x,es10.4))') 'cgs: ',itx,rerr,rni,bn2
-      endif
     endif
     if(info/=0)then
        info=4011
        call psb_errpush(info,name)
        goto 9999
-    end if
-    
+    end if    
     If (rerr<=eps) Then 
       Exit restart
     End If
+    If (itrace_ > 0) then 
+      if ((mod(itx,itrace_)==0).and.(me == 0))&
+           & write(*,'(a,i4,3(2x,es10.4))') 'cgs: ',itx,rerr
+    end If
+
 
     iteration:  Do 
       it   = it + 1
@@ -303,27 +300,30 @@ Subroutine psb_dcgs(a,prec,b,x,eps,desc_a,info,&
         rni = psb_geamax(r,desc_a,info)
         xni = psb_geamax(x,desc_a,info)
         rerr =  rni/(ani*xni+bni)
-        if (itrac /= -1) then 
-        If (me == 0) Write(itrac,'(a,i4,5(2x,es10.4))') 'cgs: ',&
-             & itx,rerr,rni,bni,xni,ani
-        endif
-
       else  if (istop_ == 2) then 
-
         rni = psb_genrm2(r,desc_a,info)
         rerr = rni/bn2
-        if (itrac /= -1) then 
-        If (me == 0) Write(itrac,'(a,i4,3(2x,es10.4))') 'cgs: ',&
-             & itx,rerr,rni,bn2
-        endif
       endif
 
       If (rerr<=eps) Then 
         Exit restart
       End If
+      
       If (itx.Ge.litmax) Exit restart
+
+      If (itrace_ > 0) then 
+        if ((mod(itx,itrace_)==0).and.(me == 0))&
+             & write(*,'(a,i4,3(2x,es10.4))') 'cgs: ',itx,rerr
+      end If
+
     End Do iteration
   End Do restart
+
+  If (itrace_ > 0) then 
+    if ((mod(itx,itrace_)==0).and.(me == 0))&
+         & write(*,'(a,i4,3(2x,es10.4))') 'cgs: ',itx,rerr
+  end If
+
 
   If (Present(err)) err=rerr
   If (Present(iter)) iter = itx

@@ -40,10 +40,9 @@
 !   jx          -  integer(optional).            The starting column of the global matrix. 
 !   ik          -  integer(optional).            The number of columns to gather. 
 !   work        -  real(optional).               A working area.
-!   choice      -  logical(optional).            ???.
-!   update_type -  integer(optional).            ???.
+!   update -  integer(optional).            ???.
 !
-subroutine  psb_zovrlm(x,desc_a,info,jx,ik,work,choice,update_type)
+subroutine  psb_zovrlm(x,desc_a,info,jx,ik,work,update)
   use psb_descriptor_type
   use psb_const_mod
   use psi_mod
@@ -56,15 +55,14 @@ subroutine  psb_zovrlm(x,desc_a,info,jx,ik,work,choice,update_type)
   type(psb_desc_type), intent(in)           :: desc_a
   integer, intent(out)                      :: info
   complex(kind(1.d0)), optional, target        :: work(:)
-  logical, intent(in), optional             :: choice
-  integer, intent(in), optional             :: update_type,jx,ik
+  integer, intent(in), optional             :: update,jx,ik
 
   ! locals
   integer                  :: int_err(5), icontxt, nprow, npcol, myrow, mycol,&
        & err_act, m, n, iix, jjx, temp(2), ix, ijx, nrow, ncol, k, maxk, iupdate,&
        & imode, err, liwork, i
   complex(kind(1.d0)),pointer :: iwork(:), xp(:,:)
-  logical                  :: ichoice
+  logical                  :: do_update
   character(len=20)        :: name, ch_err
 
   name='psb_zovrlm'
@@ -111,17 +109,13 @@ subroutine  psb_zovrlm(x,desc_a,info,jx,ik,work,choice,update_type)
      k = maxk
   end if
 
-  if (present(choice)) then     
-     ichoice = choice
+  if (present(update)) then 
+     iupdate = update
   else
-     ichoice = .true.
-  endif
-  if (present(update_type)) then 
-     iupdate = update_type
-  else
-     iupdate = psb_none_
+     iupdate = psb_avg_
   endif
 
+  do_update = (iupdate /= psb_none_)
   imode = IOR(psb_swap_send_,psb_swap_recv_)
 
   ! check vector correctness
@@ -166,7 +160,7 @@ subroutine  psb_zovrlm(x,desc_a,info,jx,ik,work,choice,update_type)
   end if
 
   ! exchange overlap elements
-  if(ichoice) then
+  if(do_update) then
      xp => x(iix:size(x,1),jjx:jjx+k-1)
      call psi_swapdata(imode,k,zone,xp,&
           & desc_a,iwork,info,data=psb_comm_ovr_)
@@ -263,10 +257,9 @@ end subroutine psb_zovrlm
 !   desc_a      -  type(<psb_desc_type>).        The communication descriptor.
 !   info        -  integer.                      Eventually returns an error code.
 !   work        -  real(optional).               A working area.
-!   choice      -  logical(optional).            ???.
-!   update_type -  integer(optional).            ???.
+!   update -  integer(optional).            ???.
 !
-subroutine  psb_zovrlv(x,desc_a,info,work,choice,update_type)
+subroutine  psb_zovrlv(x,desc_a,info,work,update)
   use psb_descriptor_type
   use psi_mod
   use psb_const_mod
@@ -279,15 +272,14 @@ subroutine  psb_zovrlv(x,desc_a,info,work,choice,update_type)
   type(psb_desc_type), intent(in)           :: desc_a
   integer, intent(out)                      :: info
   complex(kind(1.d0)), optional, target        :: work(:)
-  logical, intent(in), optional             :: choice
-  integer, intent(in), optional             :: update_type
+  integer, intent(in), optional             :: update
 
   ! locals
   integer                  :: int_err(5), icontxt, nprow, npcol, myrow, mycol,&
        & err_act, m, n, iix, jjx, temp(2), ix, ijx, nrow, ncol, k, maxk, iupdate,&
        & imode, err, liwork, i
   complex(kind(1.d0)),pointer :: iwork(:)
-  logical                  :: ichoice
+  logical                  :: do_update
   character(len=20)        :: name, ch_err
 
   name='psb_zovrlv'
@@ -320,17 +312,13 @@ subroutine  psb_zovrlv(x,desc_a,info,work,choice,update_type)
 
   k = 1
 
-  if (present(choice)) then     
-     ichoice = choice
-  else
-     ichoice = .true.
-  endif
-  if (present(update_type)) then 
-     iupdate = update_type
+  if (present(update)) then 
+     iupdate = update
   else
      iupdate = psb_none_
   endif
 
+  do_update = (iupdate /= psb_none_)
   imode = IOR(psb_swap_send_,psb_swap_recv_)
 
   ! check vector correctness
@@ -376,7 +364,7 @@ subroutine  psb_zovrlv(x,desc_a,info,work,choice,update_type)
 
   ! exchange overlap elements
 
-  if(ichoice) then
+  if(do_update) then
      call psi_swapdata(imode,zone,x(iix:size(x)),&
           & desc_a,iwork,info,data=psb_comm_ovr_)
   end if

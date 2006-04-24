@@ -211,7 +211,7 @@ contains
       call psb_errpush(info,name,a_err=ch_err)
       goto 9999
     end if
-    call psb_geall(nrow,b,desc_a,info)   
+    call psb_geall(b,desc_a,info)   
     if(info/=0) then
       info=4010
       ch_err='psb_psdsall'
@@ -272,7 +272,7 @@ contains
               call psb_errpush(info,name,a_err=ch_err)
               goto 9999
             end if
-            call psb_geins(nnr,b,i_count,b_glob(i_count:j_count-1),&
+            call psb_geins(nnr,b_glob(i_count:j_count-1),b,i_count,&
                  &desc_a,info)
             if(info/=0) then
               info=4010
@@ -318,7 +318,7 @@ contains
               call psb_errpush(info,name,a_err=ch_err)
               goto 9999
             end if
-            call psb_geins(nnr,b,i_count,b_glob(i_count:i_count+nnr-1),&
+            call psb_geins(nnr,b_glob(i_count:i_count+nnr-1),b,i_count,&
                  &desc_a,info)
             if(info/=0) then
               info=4010
@@ -354,7 +354,7 @@ contains
                 call psb_errpush(info,name,a_err=ch_err)
                 goto 9999
               end if
-              call psb_geins(1,b,i_count,b_glob(i_count:i_count),&
+              call psb_geins(1,b_glob(i_count:i_count),b,i_count,&
                    &desc_a,info)
               if(info/=0) then
                 info=4010
@@ -385,7 +385,7 @@ contains
                 call psb_errpush(info,name,a_err=ch_err)
                 goto 9999
               end if
-              call psb_geins(1,b,i_count,b_glob(i_count:i_count),&
+              call psb_geins(1,b_glob(i_count:i_count),b,i_count,&
                    &desc_a,info)
               if(info/=0) then
                 info=4010
@@ -633,7 +633,7 @@ contains
       call psb_errpush(info,name,a_err=ch_err)
       goto 9999
     end if
-    call psb_geall(nrow,b,desc_a,info)   
+    call psb_geall(b,desc_a,info)   
     if(info/=0) then
       info=4010
       ch_err='psb_psdsall'
@@ -699,7 +699,7 @@ contains
             goto 9999
           end if
 
-          call psb_geins(nnr,b,i_count,b_glob(i_count:j_count-1),&
+          call psb_geins(nnr,b_glob(i_count:j_count-1),b,i_count,&
                &desc_a,info)
           if(info/=0) then
             info=4010
@@ -745,7 +745,7 @@ contains
             call psb_errpush(info,name,a_err=ch_err)
             goto 9999
           end if
-          call psb_geins(nnr,b,i_count,b_glob(i_count:i_count+nnr-1),&
+          call psb_geins(nnr,b_glob(i_count:i_count+nnr-1),b,i_count,&
                &desc_a,info)
           if(info/=0) then
             info=4010
@@ -994,7 +994,7 @@ contains
       call psb_errpush(info,name,a_err=ch_err)
       goto 9999
     end if
-    call psb_geall(nrow,b,desc_a,info)   
+    call psb_geall(b,desc_a,info)   
     if(info/=0) then
       info=4010
       ch_err='psb_psdsall'
@@ -1055,7 +1055,7 @@ contains
               call psb_errpush(info,name,a_err=ch_err)
               goto 9999
             end if
-            call psb_geins(nnr,b,i_count,b_glob(i_count:j_count-1),&
+            call psb_geins(nnr,b_glob(i_count:j_count-1),b,i_count,&
                  &desc_a,info)
             if(info/=0) then
               info=4010
@@ -1101,7 +1101,7 @@ contains
               call psb_errpush(info,name,a_err=ch_err)
               goto 9999
             end if
-            call psb_geins(nnr,b,i_count,b_glob(i_count:i_count+nnr-1),&
+            call psb_geins(nnr,b_glob(i_count:i_count+nnr-1),b,i_count,&
                  &desc_a,info)
             if(info/=0) then
               info=4010
@@ -1137,7 +1137,7 @@ contains
                 call psb_errpush(info,name,a_err=ch_err)
                 goto 9999
               end if
-              call psb_geins(1,b,i_count,b_glob(i_count:i_count),&
+              call psb_geins(1,b_glob(i_count:i_count),b,i_count,&
                    &desc_a,info)
               if(info/=0) then
                 info=4010
@@ -1168,7 +1168,7 @@ contains
                 call psb_errpush(info,name,a_err=ch_err)
                 goto 9999
               end if
-              call psb_geins(1,b,i_count,b_glob(i_count:i_count),&
+              call psb_geins(1,b_glob(i_count:i_count),b,i_count,&
                    &desc_a,info)
               if(info/=0) then
                 info=4010
@@ -1416,7 +1416,7 @@ contains
       call psb_errpush(info,name,a_err=ch_err)
       goto 9999
     end if
-    call psb_geall(nrow,b,desc_a,info)   
+    call psb_geall(b,desc_a,info)   
     if(info/=0) then
       info=4010
       ch_err='psb_psdsall'
@@ -1482,7 +1482,7 @@ contains
             goto 9999
           end if
 
-          call psb_geins(nnr,b,i_count,b_glob(i_count:j_count-1),&
+          call psb_geins(nnr,b_glob(i_count:j_count-1),b,i_count,&
                &desc_a,info)
           if(info/=0) then
             info=4010
@@ -1528,7 +1528,7 @@ contains
             call psb_errpush(info,name,a_err=ch_err)
             goto 9999
           end if
-          call psb_geins(nnr,b,i_count,b_glob(i_count:i_count+nnr-1),&
+          call psb_geins(nnr,b_glob(i_count:i_count+nnr-1),b,i_count,&
                &desc_a,info)
           if(info/=0) then
             info=4010

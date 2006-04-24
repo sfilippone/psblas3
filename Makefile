@@ -1,6 +1,6 @@
 include Make.inc
 
-lib:
+library:
 	( [ -d lib ] || mkdir lib)
 	(cd src; make lib)
 	@echo "====================================="

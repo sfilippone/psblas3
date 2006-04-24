@@ -21,7 +21,7 @@ Fields contained in Sparse matrix structures are:
 \item[{\bf aspk}] Contains values of the local distributed sparse
 matrix.\\
 Specified as: a pointer to an array of rank one of type corresponding
-to matrix entries type .
+to matrix entries type.
 \item[{\bf ia1}] Holds integer information on distributed sparse
 matrix. Actual information will depend on data format used.\\
 Specified as: a pointer to an integer array of rank one.
@@ -30,7 +30,7 @@ matrix. Actual information will depend on data format used.\\
 Specified as: a pointer to an integer array of rank one.
 \item[{\bf infoa}] On entry can hold auxiliary information on distributed sparse
 matrix.  Actual information will depend on data format used.\\
-Specified as: integer array of length 10.
+Specified as: integer array of length \verb|psb_ifasize_|.
 \item[{\bf fida}] Defines the format of the distributed sparse matrix.\\
 Specified as: a string of length 5
 \item[{\bf descra}] Describe the characteristic of the distributed sparse matrix.\\
@@ -61,7 +61,7 @@ type psb_dspmat_type
    integer     :: m, k
    character   :: fida(5)
    character   :: descra(10)
-   integer     :: infoa(10)
+   integer     :: infoa(psb_ifa_size_)
    real(kind(1.d0)), pointer :: aspk(:)
    integer, pointer :: ia1(:), ia2(:), pr(:), pl(:)
 end type psb_dspmat_type
@@ -72,7 +72,9 @@ end type psb_dspmat_type
   \begin{center}
     \fbox{\TheSbox}
   \end{center}
-  \caption{\label{fig:spmattype}The PSBLAS defined data type that contains a sparse matrix.}
+  \caption{\label{fig:spmattype} 
+    The PSBLAS defined data type that
+    contains a sparse matrix.} 
 \end{figure}
 
 The following two cases are among the most commonly used: 
@@ -98,6 +100,36 @@ column index are stored into \verb|apsk(j)|, \verb|ia1(j)| and
 \verb|ia2(j)| respectively. 
 \end{enumerate}
 \end{description}
+A sparse matrix has an associated state, which can take the following
+values:
+\begin{description}
+\item[Build:] State entered after the first allocation, and before the
+  first assembly; in this state it is possible to add nonzero entries.
+\item[Assembled:] State entered after the assembly; computations using
+  the sparse matrix, such as matrix-vector products, are only possible
+  in this state;
+\item[Update:] State entered after a reinitalization; this is used to
+  handle applications in which the same sparsity pattern is used
+  multiple times with different coefficients. In this state it is only
+  possible to enter coefficients for already existing nonzero entries.
+\end{description}
+\subsubsection{Named Constants}
+\label{sec:sp_constants}
+\begin{description}
+\item[psb\_nztotreq\_] Request to fetch the total number of nonzeroes
+  stored in a sparse matrix
+\item[psb\_nzrowreq\_] Request to fetch the number of nonzeroes in a
+  given row in a sparse matrix
+\item[psb\_dupl\_ovwrt\_] Duplicate coefficients should be overwritten
+  (i.e. ignore duplications)
+\item[psb\_dupl\_add\_] Duplicate coefficients should be added;	         
+\item[psb\_dupl\_err\_] Duplicate coefficients should trigger an error conditino
+\item[psb\_upd\_dflt\_] Default update strategy for matrix coefficients;
+\item[psb\_upd\_srch\_] Update strategy based on search into the data structure;
+\item[psb\_upd\_perm\_] Update strategy based on additional
+  permutation data (see tools routine description).
+\end{description}
+
 
 
 \subsection{Descriptor data structure}
@@ -196,6 +228,41 @@ end type psb_desc_type
     contains the communication descriptor.}
 \end{figure}
 
+A communication descriptor associated with a sparse  matrix has a
+state, which can take the following values:
+\begin{description}
+\item[Build:] State entered after the first allocation, and before the
+  first assembly; in this state it is possible to add communication
+  requirements among different processes. 
+\item[Assembled:] State entered after the assembly; computations using
+  the associated sparse matrix, such as matrix-vector products, are
+  only possible   in this state.
+\end{description}
+\subsubsection{Named Constants}
+\label{sec:cd_constants}
+\begin{description}
+\item[psb\_none\_] Generic no-op;
+\item[psb\_nohalo\_]  Do not fetch halo elements;
+\item[psb\_halo\_]  Fetch halo elements from neighbouring processes;
+\item[psb\_sum\_] Sum overlapped elements
+\item[psb\_avg\_] Average overlapped elements
+%% \item[psb\_square\_root\_] Update with the square root of the average
+%%   of overlapped elements;
+\item[psb\_dec\_type\_] Entry holding decomposition type (in \verb|desc_a%matrix_data|)
+\item[psb\_m\_] Entry holding total number of rows
+\item[psb\_n\_] Entry holding total number of columns
+\item[ psb\_n\_row\_] Entry holding the number of rows stored in the
+  current process
+\item[psb\_n\_col\_] Entry holding the number of columns stored in the
+  current process
+\item[psb\_ctxt\_] Entry holding a copy of the BLACS communication context
+\item[psb\_desc\_asb\_] State of the descriptor: assembled,
+      i.e. suitable for computational tasks. 
+\item[psb\_desc\_bld\_] State of the descriptor: build, must be
+  assembled before computational use.
+\end{description}
+
+
 \subsection{Preconditioner data structure}
 \label{sec:prec}
 PSBLAS-2.0 offers the possibility to use many different types of
@@ -203,8 +270,9 @@ preconditioning schemes. Besides the simple well known preconditioners
 like Diagonal Scaling or Block Jacobi (with ILU(0) incomplete
 factorization) also more complex preconditioning methods are
 implemented like the Additive Schwarz and Two-Level ones. A
-preconditioner is held in the \hypertarget{precdata}{{\tt psb\_prec\_type}} data structure
-which depends on the \verb|psb_base_prec| reported in
+preconditioner is held in the \hypertarget{precdata}{{\tt
+    psb\_prec\_type}} data structure which depends on the
+\verb|psb_base_prec| reported in 
 figure~\ref{fig:prectype}. The \verb|psb_base_prec| 
 data type may contain a simple preconditioning matrix with the
 associated communication descriptor which may be different than the
@@ -216,7 +284,7 @@ The user can choose the type of preconditioner to be used by means of
 the \verb|psb_precset| subroutine; once the type of preconditioning
 method is specified, along with all the parameters that characterize
 it, the preconditioner data structure can be built using the
-\verb|psb_precbuild| subroutine.
+\verb|psb_precbld| subroutine.
 This data structure wants to be flexible enough to easily allow the
 implementation of new kind of preconditioners. The values contained in
 the \verb|iprcparm| and \verb|dprcparm| define tha type of
@@ -257,8 +325,24 @@ to be interpreted.
   \end{center}
   \caption{\label{fig:prectype}The PSBLAS defined data type that contains a preconditioner.}
 \end{figure}
-
-
+\subsubsection{Named Constants}
+\label{sec:prec_constants}
+\begin{description}
+\item[f\_ilu\_n\_] Incomplete LU factorization with $n$ levels of
+  fill-in; currently only $n=0$ is implemented;
+\item[f\_slu\_]  Sparse factorization using SuperLU;
+\item[f\_umf\_]  Sparse factorization using UMFPACK;
+\item[add\_ml\_prec\_] Additive multilevel correction;
+\item[mult\_ml\_prec\_] Multiplicative multilevel correction;
+\item[pre\_smooth\_] Pre-smoothing in applying multiplicative
+  multilevel corrections;
+\item[post\_smooth\_] Post-smoothing in applying multiplicative
+  multilevel corrections;
+\item[smooth\_both\_] Two-sided (i.e. symmetric) smoothing in applying multiplicative
+  multilevel corrections;
+\item[mat\_distr\_] Coarse matrix distributed among processes
+\item[mat\_repl\_] Coarse matrix replicated among processes
+\end{description}
 
 
 %%% Local Variables: 

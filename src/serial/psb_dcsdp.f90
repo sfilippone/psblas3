@@ -118,8 +118,7 @@ subroutine psb_dcsdp(a, b,info,ifc,check,trans,unitd,upd,dupl)
   if (check_=='R') then 
     allocate(work(max(size(a%aspk),size(b%aspk))+1000),stat=info)
   else
-    allocate(work(max(size(a%ia1),size(b%ia1),&
-         &     size(a%ia2),size(b%ia2))+max(a%m,b%m)+1000),stat=info)
+    allocate(work(max(size(a%ia1),size(a%ia2))+max(a%m,b%m)+1000),stat=info)
   endif
 
   if (info /= 0) then
@@ -196,13 +195,20 @@ subroutine psb_dcsdp(a, b,info,ifc,check,trans,unitd,upd,dupl)
       call psb_errpush(info,name,a_err=ch_err)
       goto 9999
     endif
-    if ((size(b%aspk)  < aspk_size) .or.&
+    if (.not.associated(b%aspk).or.&
+         &.not.associated(b%ia1).or.&
+         &.not.associated(b%ia2).or.&
+         &.not.associated(b%pl).or.&
+         &.not.associated(b%pr)) then
+      call psb_sp_reall(b,ia1_size,ia2_size,aspk_size,info)
+    else if ((size(b%aspk)  < aspk_size) .or.&
          &(size(b%ia1) < ia1_size) .or.&
          &(size(b%ia2) < ia2_size) .or.&
          &(size(b%pl)  < b%m) .or.&
          &(size(b%pr) < b%k )) then 
       call psb_sp_reall(b,ia1_size,ia2_size,aspk_size,info)
     endif
+
     if (info /= no_err) then    
       info=4010
       ch_err='psb_sp_reall'

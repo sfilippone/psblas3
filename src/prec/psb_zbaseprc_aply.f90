@@ -234,11 +234,11 @@ subroutine psb_zbaseprc_aply(prec,x,beta,y,desc_data,trans,work,info)
 
       case(psb_none_) 
         ! Would work anyway, but since it's supposed to do nothing...
-        ! call f90_psovrl(ty,prec%desc_data,update_type=prec%a_restrict)
+        ! call f90_psovrl(ty,prec%desc_data,update=prec%a_restrict)
 
       case(psb_sum_,psb_avg_) 
         call psb_ovrl(ty,prec%desc_data,info,&
-             & update_type=prec%iprcparm(prol_),work=aux)
+             & update=prec%iprcparm(prol_),work=aux)
         if(info /=0) then
           info=4010
           ch_err='psb_ovrl'

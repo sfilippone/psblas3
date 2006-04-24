@@ -102,7 +102,7 @@ Subroutine psb_dcg(a,prec,b,x,eps,desc_a,info,&
   real(kind(1.d0))    ::rerr
   real(kind(1.d0))    ::alpha, beta, rho, rho_old, rni, xni, bni, ani,bn2,& 
        & sigma
-  integer         :: litmax, liter, istop_, naux, m, mglob, it, itx, itrac,&
+  integer         :: litmax, liter, istop_, naux, m, mglob, it, itx, itrace_,&
        & nprows,npcols,me,mecol, n_col, isvch, ich, icontxt, n_row,err_act, int_err(5)
   character          ::diagl, diagu
   logical, parameter :: exchange=.true., noexchange=.false.  
@@ -148,7 +148,7 @@ Subroutine psb_dcg(a,prec,b,x,eps,desc_a,info,&
 
   naux=4*n_col
   allocate(aux(naux), stat=info)
-  call psb_geall(mglob,5,wwrk,desc_a,info)
+  call psb_geall(wwrk,desc_a,info,n=5)
   call psb_geasb(wwrk,desc_a,info)  
   if (info.ne.0) then 
     info=4011
@@ -170,9 +170,9 @@ Subroutine psb_dcg(a,prec,b,x,eps,desc_a,info,&
   endif
 
   if (present(itrace)) then
-    itrac = itrace
+    itrace_ = itrace
   else
-    itrac = -1
+    itrace_ = 0
   end if
 
   itx=0
@@ -243,23 +243,24 @@ Subroutine psb_dcg(a,prec,b,x,eps,desc_a,info,&
         rni = psb_geamax(r,desc_a,info)
         xni = psb_geamax(x,desc_a,info)
         rerr =  rni/(ani*xni+bni)
-        If (itrac /= -1) Then 
-          If (me.Eq.0) Write(itrac,'(a,i4,5(2x,es10.4))') 'cg: ',itx,rerr,rni,bni,&
-               &xni,ani
-        Endif
-
       Else  If (istop_ == 2) Then 
 
         rni = psb_genrm2(r,desc_a,info)
         rerr = rni/bn2
-        If (itrac /= -1) Then 
-          If (me.Eq.0) Write(itrac,'(a,i4,3(2x,es10.4)))') 'cg: ',itx,rerr,rni,bn2
-        Endif
       Endif
       if (rerr<=eps) exit restart
+
       if (itx>= litmax) exit restart 
+
+      If (itrace_ > 0) then 
+        if ((mod(itx,itrace_)==0).and.(me == 0))&
+             & write(*,'(a,i4,3(2x,es10.4))') 'cg: ',itx,rerr
+      end If
     end do iteration
   end do restart
+  If (itrace_ > 0) then 
+    if (me == 0) write(*,'(a,i4,3(2x,es10.4))') 'cg: ',itx,rerr
+  end If
 
   if (present(err)) err=rerr
   if (present(iter)) iter = itx

@@ -162,6 +162,7 @@ subroutine psb_zspasb(a,desc_a, info, afmt, upd, dupl)
 
     ! Do the real conversion into the requested storage format
     ! result is put in A
+    write(0,*) 'Calling csdp from SPASB'
     call psb_csdp(atemp,a,info,ifc=2,upd=upd_,dupl=dupl_)
 
     IF (debug) WRITE (*, *) myrow,'   ASB:  From DCSDP',info,' ',A%FIDA

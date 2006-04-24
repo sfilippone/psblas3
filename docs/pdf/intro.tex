@@ -124,6 +124,15 @@ internally defined in the PSBLAS software package:
   Interface overloading allows the usage of the same subroutine
   interfaces for both real and complex data.
 \end{itemize}
+In the description of the subroutines, arguments or argument entries
+are classified as:
+\begin{description}
+\item[global] For input arguments, the value must be the same on all processes
+  participating in the subroutine call; for output arguments the value
+  is guaranteed to be the same.
+\item[local] Each process has its own value(s) independently.
+\end{description}
+
 
 %%% Local Variables: 
 %%% mode: latex

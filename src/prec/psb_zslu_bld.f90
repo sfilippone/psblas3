@@ -51,7 +51,7 @@ subroutine psb_zslu_bld(a,desc_a,p,info)
   character(len=5)         :: fmt
   character                :: upd='F'
   integer                  :: i,j,nza,nzb,nzt,icontxt, me,mycol,nprow,npcol,err_act
-  logical, parameter :: debug=.false.
+  logical, parameter :: debug=.true.
   character(len=20)   :: name, ch_err
 
   interface psb_asmatbld
@@ -85,14 +85,14 @@ subroutine psb_zslu_bld(a,desc_a,p,info)
 
   atmp%fida='COO'
   if (Debug) then 
-    write(0,*) me, 'SPLUBLD: Calling  csdp'
+    write(0,*) me, 'ZSLUBLD: Calling  csdp'
     call blacs_barrier(icontxt,'All')
   endif
 
-  call psb_zcsdp(a,atmp,info)
+  call psb_csdp(a,atmp,info)
   if(info /= 0) then
     info=4010
-    ch_err='psb_zcsdp'
+    ch_err='psb_csdp'
     call psb_errpush(info,name,a_err=ch_err)
     goto 9999
   end if

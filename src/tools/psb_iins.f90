@@ -44,7 +44,7 @@
 !    info    - integer.                          Eventually returns an error code
 !    iblck   - integer(optional).                First row of submatrix belonging to blck to be inserted.
 !    jblck   - integer(optional).                First col of submatrix belonging to blck to be inserted.
-subroutine psb_iins(m, n, x, ix, jx, blck, desc_a, info,&
+subroutine psb_iins(m, n, blck, x, ix, jx, desc_a, info,&
      & iblck, jblck,dupl)
   !....insert dense submatrix to dense matrix .....
   use psb_descriptor_type
@@ -266,7 +266,7 @@ end subroutine psb_iins
 !    desc_a  - type(<psb_desc_type>).            The communication descriptor.
 !    info    - integer.                          Eventually returns an error code
 !    iblck   - integer(optional).                First row of submatrix belonging to blck to be inserted.
-subroutine psb_iinsvm(m, x, ix, jx, blck, desc_a, info,&
+subroutine psb_iinsvm(m, blck, x, ix, jx, desc_a, info,&
      & iblck,dupl)
   !....insert dense submatrix to dense matrix .....
   use psb_descriptor_type
@@ -413,7 +413,7 @@ end subroutine psb_iinsvm
 !    desc_a  - type(<psb_desc_type>).            The communication descriptor.
 !    info    - integer.                          Eventually returns an error code
 !    iblck   - integer(optional).                First row of submatrix belonging to blck to be inserted.
-subroutine psb_iinsvv(m, x, ix, blck, desc_a, info,&
+subroutine psb_iinsvv(m, blck, x, ix, desc_a, info,&
      & iblck,dupl)
   !....insert dense submatrix to dense matrix .....
   use psb_descriptor_type

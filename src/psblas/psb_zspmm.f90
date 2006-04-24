@@ -183,26 +183,26 @@ subroutine  psb_zspmm(alpha,a,x,beta,y,desc_a,info,&
   liwork= 2*ncol
   if (a%pr(1) /= 0) liwork = liwork + n * ik
   if (a%pl(1) /= 0) liwork = liwork + m * ik
-if (present(work)) then
+  if (present(work)) then
     if (size(work) >= liwork) then
-        aliw =.false.
+      aliw =.false.
     else
-        aliw=.true.
+      aliw=.true.
     endif
   else
-        aliw=.true.
+    aliw=.true.
   end if
 
   if (aliw) then
-      call psb_realloc(liwork,iwork,info)
-      if(info.ne.0) then
-        info=4010
-        ch_err='psb_realloc'
-        call psb_errpush(info,name,a_err=ch_err)
-        goto 9999
-      end if
+    call psb_realloc(liwork,iwork,info)
+    if(info.ne.0) then
+      info=4010
+      ch_err='psb_realloc'
+      call psb_errpush(info,name,a_err=ch_err)
+      goto 9999
+    end if
   else
-     iwork => work
+    iwork => work
   endif
 
   iwork(1)=zzero
@@ -315,7 +315,7 @@ if (present(work)) then
     y(iiy+nrow+1-1:iiy+ncol,1:ik)=zzero
 
     !  local Matrix-vector product
-    
+
     call psb_csmm(alpha,a,x(iix:lldx,jjx:jjx+ik-1),&
          & beta,y(iiy:lldy,jjy:jjy+ik-1),info,trans=itrans)
 

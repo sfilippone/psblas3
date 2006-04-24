@@ -28,27 +28,65 @@
 !!$  POSSIBILITY OF SUCH DAMAGE.
 !!$ 
 !!$  
-!
-! Storage conversion filter: reads from standar input a sparse matrix 
-! stored in Harwell-Boeing format, and writes to standard output in MatrixMarket 
-! format
-!
-program zhb2mm
-  use psb_sparse_mod
-  use mmio
-  use hbio
-  type(psb_zspmat_type) :: a
+! File:  psb_ztransc.f90 
+! Subroutine: 
+! Parameters:
+
+subroutine psb_ztransc(a,b,c,fmt)
+  use psb_spmat_type
+  use psb_tools_mod
+  use psb_string_mod
+  use psb_serial_mod, only : psb_ipcoo2csr, psb_ipcsr2coo, psb_fixcoo
+  implicit none
+
+  type(psb_zspmat_type)      :: a,b
+  integer, optional          :: c
+  character(len=*), optional :: fmt
+
+  character(len=5)           :: fmt_
+  integer  ::c_, info, nz, i
+  integer, pointer :: itmp(:)
+  if (present(c)) then 
+    c_=c
+  else
+    c_=1
+  endif
+  if (present(fmt)) then 
+    fmt_ = toupper(fmt)
+  else 
+    fmt_='CSR'
+  endif
+  if (associated(b%aspk)) call psb_sp_free(b,info)
+  call psb_sp_clone(a,b,info)
   
-  integer    :: info
-  character(len=72)  :: mtitle
+  if (b%fida=='CSR') then 
+    call psb_ipcsr2coo(b,info)
+  else if (b%fida=='COO') then 
+    ! do nothing 
+  else
+    write(0,*) 'Unimplemented case in TRANSC '
+  endif
+  itmp  => b%ia1
+  b%ia1 => b%ia2
+  b%ia2 => itmp
 
+  b%m = a%k 
+  b%k = a%m
   
-  call hb_read(a,info,mtitle=mtitle)
+  do i=1, b%infoa(psb_nnz_) 
+    b%aspk(i) = conjg(b%aspk(i))
+  end do
 
-  call mm_mat_write(a,mtitle,info)
+!!$  write(0,*) 'Calling IPCOO2CSR from transc90 ',b%m,b%k
+  if (fmt_=='CSR') then 
+    call psb_ipcoo2csr(b,info)
+    b%fida='CSR'
+  else if (fmt_=='COO') then 
+    call psb_fixcoo(b,info)
+    b%fida='COO'
+  else
+    write(0,*) 'Unknown FMT in TRANSC : "',fmt_,'"'
+  endif
 
-  stop
-
-
-end program zhb2mm
-  
+  return
+end subroutine psb_ztransc

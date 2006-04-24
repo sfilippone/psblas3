@@ -199,26 +199,26 @@ subroutine  psb_zspsm(alpha,a,x,beta,y,desc_a,info,&
   liwork= 2*ncol
   if (a%pr(1) /= 0) llwork = liwork + m * ik
   if (a%pl(1) /= 0) llwork = llwork + m * ik
- if (present(work)) then
+  if (present(work)) then
     if (size(work) >= liwork) then
-        aliw =.false.
+      aliw =.false.
     else
-        aliw=.true.
+      aliw=.true.
     endif
   else
-        aliw=.true.
+    aliw=.true.
   end if
 
   if (aliw) then
-      call psb_realloc(liwork,iwork,info)
-      if(info.ne.0) then
-        info=4010
-        ch_err='psb_realloc'
-        call psb_errpush(info,name,a_err=ch_err)
-        goto 9999
-      end if
+    call psb_realloc(liwork,iwork,info)
+    if(info.ne.0) then
+      info=4010
+      ch_err='psb_realloc'
+      call psb_errpush(info,name,a_err=ch_err)
+      goto 9999
+    end if
   else
-     iwork => work
+    iwork => work
   endif
 
   iwork(1)=0.d0
@@ -428,14 +428,14 @@ subroutine  psb_zspsv(alpha,a,x,beta,y,desc_a,info,&
   ! check on blacs grid 
   call blacs_gridinfo(icontxt, nprow, npcol, myrow, mycol)
   if (nprow == -1) then
-     info = 2010
-     call psb_errpush(info,name)
-     goto 9999
+    info = 2010
+    call psb_errpush(info,name)
+    goto 9999
   else if (npcol /= 1) then
-     info = 2030
-     int_err(1) = npcol
-     call psb_errpush(info,name)
-     goto 9999
+    info = 2030
+    int_err(1) = npcol
+    call psb_errpush(info,name)
+    goto 9999
   endif
 
   ! just this case right now
@@ -469,7 +469,7 @@ subroutine  psb_zspsv(alpha,a,x,beta,y,desc_a,info,&
       goto 9999
     end if
   else
-     itrans = 'N'
+    itrans = 'N'
   endif
 
   m    = desc_a%matrix_data(psb_m_)
@@ -479,9 +479,9 @@ subroutine  psb_zspsv(alpha,a,x,beta,y,desc_a,info,&
   lldy = size(y)
 
   if((lldx.lt.ncol).or.(lldy.lt.ncol)) then
-     info=3010
-     call psb_errpush(info,name)
-     goto 9999
+    info=3010
+    call psb_errpush(info,name)
+    goto 9999
   end if
 
   iwork => null()
@@ -489,38 +489,38 @@ subroutine  psb_zspsv(alpha,a,x,beta,y,desc_a,info,&
   liwork= 2*ncol
   if (a%pr(1) /= 0) llwork = liwork + m * ik
   if (a%pl(1) /= 0) llwork = llwork + m * ik
-  
+
   if (present(work)) then     
     if (size(work) >= liwork) then 
-	aliw =.false.
+      aliw =.false.
     else 
-	aliw=.true.
+      aliw=.true.
     endif
   else
-	aliw=.true.
+    aliw=.true.
   end if
- 
+
   if (aliw) then 
-      call psb_realloc(liwork,iwork,info)
-      if(info.ne.0) then
-        info=4010
-        ch_err='psb_realloc'
-        call psb_errpush(info,name,a_err=ch_err)
-        goto 9999
-      end if
+    call psb_realloc(liwork,iwork,info)
+    if(info.ne.0) then
+      info=4010
+      ch_err='psb_realloc'
+      call psb_errpush(info,name,a_err=ch_err)
+      goto 9999
+    end if
   else
-     iwork => work
+    iwork => work
   endif
 
   iwork(1)=0.d0
 
   if(present(d)) then
-     lld = size(d)
-     id => d
+    lld = size(d)
+    id => d
   else
-     lld=1
-     allocate(id(1))
-     id=1.d0
+    lld=1
+    allocate(id(1))
+    id=1.d0
   end if
 
   ! checking for matrix correctness
@@ -529,25 +529,25 @@ subroutine  psb_zspsv(alpha,a,x,beta,y,desc_a,info,&
   call psb_chkvect(m,ik,size(x),ix,jx,desc_a%matrix_data,info,iix,jjx)
   call psb_chkvect(m,ik,size(y),iy,jy,desc_a%matrix_data,info,iiy,jjy)
   if(info.ne.0) then
-     info=4010
-     ch_err='psb_chkvect/mat'
-     call psb_errpush(info,name,a_err=ch_err)
-     goto 9999
+    info=4010
+    ch_err='psb_chkvect/mat'
+    call psb_errpush(info,name,a_err=ch_err)
+    goto 9999
   end if
 
   if(ja.ne.ix) then
-     ! this case is not yet implemented
-     info = 3030
+    ! this case is not yet implemented
+    info = 3030
   end if
 
   if((iix.ne.1).or.(iiy.ne.1)) then
-     ! this case is not yet implemented
-     info = 3040
+    ! this case is not yet implemented
+    info = 3040
   end if
 
   if(info.ne.0) then
-     call psb_errpush(info,name)
-     goto 9999
+    call psb_errpush(info,name)
+    goto 9999
   end if
 
   ! Perform local triangular system solve
@@ -556,46 +556,46 @@ subroutine  psb_zspsv(alpha,a,x,beta,y,desc_a,info,&
   call psb_cssm(alpha,a,xp,beta,yp,info,unitd=lunitd,d=id,trans=itrans)
 
   if(info.ne.0) then
-     info = 4010
-     ch_err='dcssm'
-     call psb_errpush(info,name,a_err=ch_err)
-     goto 9999
+    info = 4010
+    ch_err='dcssm'
+    call psb_errpush(info,name,a_err=ch_err)
+    goto 9999
   end if
 
   ! update overlap elements
   if(lchoice.gt.0) then
-     call psi_swapdata(ior(psb_swap_send_,psb_swap_recv_),&
-          & zone,yp,desc_a,iwork,info)
+    call psi_swapdata(ior(psb_swap_send_,psb_swap_recv_),&
+         & zone,yp,desc_a,iwork,info)
 
-     i=0
-     ! switch on update type
-     select case (lchoice)
-     case(psb_square_root_)
-        do while(desc_a%ovrlap_elem(i).ne.-ione)
-           y(desc_a%ovrlap_elem(i+psb_ovrlp_elem_)) =&
-                & y(desc_a%ovrlap_elem(i+psb_ovrlp_elem_))/&
-                & sqrt(real(desc_a%ovrlap_elem(i+psb_n_dom_ovr_)))
-           i = i+2
-        end do
-     case(psb_avg_)
-        do while(desc_a%ovrlap_elem(i).ne.-ione)
-           y(desc_a%ovrlap_elem(i+psb_ovrlp_elem_)) =&
-                & y(desc_a%ovrlap_elem(i+psb_ovrlp_elem_))/&
-                & real(desc_a%ovrlap_elem(i+psb_n_dom_ovr_))
-           i = i+2
-        end do
-     case(psb_sum_)
-        ! do nothing
-     case default 
-        ! wrong value for choice argument
-        info = 70
-        int_err=(/10,lchoice,0,0,0/)
-        call psb_errpush(info,name,i_err=int_err)
-        goto 9999
-     end select
+    i=0
+    ! switch on update type
+    select case (lchoice)
+    case(psb_square_root_)
+      do while(desc_a%ovrlap_elem(i).ne.-ione)
+        y(desc_a%ovrlap_elem(i+psb_ovrlp_elem_)) =&
+             & y(desc_a%ovrlap_elem(i+psb_ovrlp_elem_))/&
+             & sqrt(real(desc_a%ovrlap_elem(i+psb_n_dom_ovr_)))
+        i = i+2
+      end do
+    case(psb_avg_)
+      do while(desc_a%ovrlap_elem(i).ne.-ione)
+        y(desc_a%ovrlap_elem(i+psb_ovrlp_elem_)) =&
+             & y(desc_a%ovrlap_elem(i+psb_ovrlp_elem_))/&
+             & real(desc_a%ovrlap_elem(i+psb_n_dom_ovr_))
+        i = i+2
+      end do
+    case(psb_sum_)
+      ! do nothing
+    case default 
+      ! wrong value for choice argument
+      info = 70
+      int_err=(/10,lchoice,0,0,0/)
+      call psb_errpush(info,name,i_err=int_err)
+      goto 9999
+    end select
   end if
 
-   if (aliw) deallocate(iwork)
+  if (aliw) deallocate(iwork)
   if(.not.present(d)) deallocate(id)
 
   call psb_erractionrestore(err_act)
@@ -605,8 +605,8 @@ subroutine  psb_zspsv(alpha,a,x,beta,y,desc_a,info,&
   call psb_erractionrestore(err_act)
 
   if (err_act.eq.act_abort) then
-     call psb_error(icontxt)
-     return
+    call psb_error(icontxt)
+    return
   end if
   return
 end subroutine psb_zspsv

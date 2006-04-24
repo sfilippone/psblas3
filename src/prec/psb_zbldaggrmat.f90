@@ -624,7 +624,7 @@ contains
     if (debug) write(0,*) me,'Done NUMBMM 2'
 
     if  (p%iprcparm(smth_kind_) == smth_omg_) then 
-      call psb_transp(am1,am2,fmt='COO')
+      call psb_transc(am1,am2,fmt='COO')
       nzl = am2%infoa(psb_nnz_)
       i=0
       !
@@ -643,7 +643,7 @@ contains
       am2%infoa(psb_nnz_) = i
       call psb_ipcoo2csr(am2,info)
     else
-      call psb_transp(am1,am2)
+      call psb_transc(am1,am2)
     endif
     if (debug) write(0,*) me,'starting sphalo/ rwxtd'
 

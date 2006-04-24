@@ -89,7 +89,7 @@ subroutine psb_dslu_bld(a,desc_a,p,info)
     call blacs_barrier(icontxt,'All')
   endif
 
-  call psb_dcsdp(a,atmp,info)
+  call psb_csdp(a,atmp,info)
   if(info /= 0) then
     info=4010
     ch_err='psb_dcsdp'

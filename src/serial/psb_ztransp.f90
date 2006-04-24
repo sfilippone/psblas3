@@ -45,7 +45,7 @@ subroutine psb_ztransp(a,b,c,fmt)
 
   character(len=5)           :: fmt_
   integer  ::c_, info, nz 
-  integer, pointer :: itmp(:)=>null()
+  integer, pointer :: itmp(:)
   if (present(c)) then 
     c_=c
   else

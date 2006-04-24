@@ -10,14 +10,14 @@
 This subroutine is an interface to the computational kernel for
 dense matrix sum:
 \[ y \leftarrow  \alpha\> x+ \beta y \] 
-where:
-\begin{description}
-\item[$x$] represents the global dense submatrix $x_{:, jx:jx+n-1}$
-\item[$y$] represents the global dense submatrix $y_{:, jy:jy+n-1}$
-\end{description}
+%% where:
+%% \begin{description}
+%% \item[$x$] represents the global dense submatrix $x_{:, :1}$
+%% \item[$y$] represents the global dense submatrix $y_{:, :}$
+%% \end{description}
 
 \syntax{call psb\_geaxpby}{alpha, x, beta, y, desc\_a, info}
-\syntax*{call psb\_geaxpby}{alpha, x, beta, y, desc\_a, info, n, jx, jy}
+%% \syntax*{call psb\_geaxpby}{alpha, x, beta, y, desc\_a, info, n, jx, jy}
 
 %( calculating y <- alpha*x+beta*y )
 \begin{table}[h]
@@ -44,7 +44,7 @@ Specified as: a number of the data type indicated in Table~\ref{tab:f90axpby}.
 $x$.\\
 Scope: {\bf local} \\
 Type: {\bf required} \\
-Specified as: a rank one or two array with the POINTER attribute
+Specified as: a rank one or two array 
 containing numbers of type 
 specified in Table~\ref{tab:f90axpby}.  The rank of $x$ must be the same of $y$. 
 \item[beta] the scalar $\beta$.\\
@@ -55,30 +55,29 @@ Specified as: a number of the data type indicated in Table~\ref{tab:f90axpby}.
 $y$. \\
 Scope: {\bf local} \\
 Type: {\bf required} \\
-Specified as:  a rank one or two array with the POINTER
-attributecontaining numbers of the type 
+Specified as:  a rank one or two array containing numbers of the type 
 indicated in Table~\ref{tab:f90axpby}.  The rank of $y$ must be the same of $x$. 
 \item[desc\_a] contains data structures for communications.\\
 Scope: {\bf local} \\
 Type: {\bf required}\\
 Specified as: a structured data of type \descdata.
-\item[n] number of columns in dense submatrices $x$ and $y$.\\
-Scope: {\bf global} \\
-Type: {\bf optional}; can only be present if $x$ and $y$ are of rank 2.\\
-Default: \verb|min(size(x,2),size(y,2))|.\\
-Specified as: an integer variable $n\ge 0$.
-\item[jx]  the column index of the global dense matrix $x$,
-identifying the first column of the submatrix $x$.\\
-Scope: {\bf global} \\
-Type: {\bf optional}; can only be present if $x$ and $y$ are of rank 2.\\
-Default: $jx = 1$.\\
-Specified as: an integer variable $jx\ge 1$. 
-\item[jy]  the column index of the global dense matrix $y$,
-identifying the first column of the submatrix $y$.\\
-Scope: {\bf global} \\
-Type: {\bf optional}; can only be present if $x$ and $y$ are of rank 2.\\
-Default: $jy = 1$.\\
-Specified as: an integer variable $jy\ge 1$. 
+%% \item[n] number of columns in dense submatrices $x$ and $y$.\\
+%% Scope: {\bf global} \\
+%% Type: {\bf optional}; can only be present if $x$ and $y$ are of rank 2.\\
+%% Default: \verb|min(size(x,2),size(y,2))|.\\
+%% Specified as: an integer variable $n\ge 0$.
+%% \item[jx]  the column index of the global dense matrix $x$,
+%% identifying the first column of the submatrix $x$.\\
+%% Scope: {\bf global} \\
+%% Type: {\bf optional}; can only be present if $x$ and $y$ are of rank 2.\\
+%% Default: $jx = 1$.\\
+%% Specified as: an integer variable $jx\ge 1$. 
+%% \item[jy]  the column index of the global dense matrix $y$,
+%% identifying the first column of the submatrix $y$.\\
+%% Scope: {\bf global} \\
+%% Type: {\bf optional}; can only be present if $x$ and $y$ are of rank 2.\\
+%% Default: $jy = 1$.\\
+%% Specified as: an integer variable $jy\ge 1$. 
 
 \end{description}
 
@@ -111,14 +110,14 @@ computes dot-product as:
 \[dot \leftarrow x^T y\]
 Else if $x$ and $y$ are double precision complex vectors then computes dot-product as:
 \[dot \leftarrow x^H y\]
-where:
-\begin{description}
-\item[$x$] represents the global subvector $x_{:,jx}$
-\item[$y$] represents the global subvector $y_{:,jy}$
-\end{description}
+%% where:
+%% \begin{description}
+%% \item[$x$] represents the global subvector $x_{:,jx}$
+%% \item[$y$] represents the global subvector $y_{:,jy}$
+%% \end{description}
 
 \syntax{psb\_gedot}{x, y, desc\_a, info}
-\syntax*{psb\_gedot}{x, y, desc\_a, info, jx, jy}
+%% \syntax*{psb\_gedot}{x, y, desc\_a, info, jx, jy}
 \begin{table}[h]
 \begin{center}
 \begin{tabular}{ll}
@@ -136,37 +135,39 @@ Long Precision Complex & psb\_gedot \\
 \begin{description}
 \item[\bf On Entry]
 \item[x] the local portion of global dense matrix
-$x$. This function computes the location of the first element of
-local subarray used, based on $jx$ and the field $matrix\_data$ of $desc\_a$ . \\
+$x$.\\
+%%  This function computes the location of the first element of
+%% local subarray used, based on $jx$ and the field $matrix\_data$ of $desc\_a$ . \\
 Scope: {\bf local} \\
 Type: {\bf required} \\
-Specified as: a pointer to array of rank one or two
+Specified as: an array of rank one or two
 containing numbers of type specified in
 Table~\ref{tab:f90dot}. The rank of $x$ must be the same of $y$. 
 \item[y] the local portion of global dense matrix
-$y$. This function computes the location of the first element of
-local subarray used, based on $iy, jy$ and the field $matrix\_data$ of $desc\_a$ . \\
+$y$. \\
+%% This function computes the location of the first element of
+%% local subarray used, based on $iy, jy$ and the field $matrix\_data$ of $desc\_a$ . \\
 Scope: {\bf local} \\
 Type: {\bf required} \\
-Specified as: a pointer to array of rank one or two
+Specified as: an array of rank one or two
 containing numbers of type specified in
 Table~\ref{tab:f90dot}. The rank of $y$ must be the same of $x$. 
 \item[desc\_a] contains data structures for communications.\\
 Scope: {\bf local} \\
 Type: {\bf required}\\
 Specified as: a structured data of type \descdata.
-\item[jx]  the column index of global dense matrix $x$,
-identifying the column of subvector $x$.\\
-Scope: {\bf global} \\
-Type: {\bf optional}; can only be present if $x$ and $y$ are of rank 2.\\
-Default: $jx = 1$.\\
+%% \item[jx]  the column index of global dense matrix $x$,
+%% identifying the column of subvector $x$.\\
+%% Scope: {\bf global} \\
+%% Type: {\bf optional}; can only be present if $x$ and $y$ are of rank 2.\\
+%% Default: $jx = 1$.\\
 
-\item[jy]  the column index of global dense matrix $y$,
-identifying the column of subvector $y$.\\
-Scope: {\bf global} \\
-Type: {\bf optional}; can only be present if $x$ and $y$ are of rank 2.\\
-Default: $jy = 1$.\\
-Specified as: an integer variable $jy\ge 1$. 
+%% \item[jy]  the column index of global dense matrix $y$,
+%% identifying the column of subvector $y$.\\
+%% Scope: {\bf global} \\
+%% Type: {\bf optional}; can only be present if $x$ and $y$ are of rank 2.\\
+%% Default: $jy = 1$.\\
+%% Specified as: an integer variable $jy\ge 1$. 
 \item[\bf On Return] 
 \item[Function value] is the dot product of subvectors $x$ and $y$.\\
 Scope: {\bf global} \\
@@ -213,14 +214,14 @@ Long Precision Complex & psb\_gedot \\
 $x$. \\
 Scope: {\bf local} \\
 Type: {\bf required} \\
-Specified as: a pointer to array of rank one or two
+Specified as: an array of rank one or two
 containing numbers of type specified in
 Table~\ref{tab:f90mdot}. The rank of $x$ must be the same of $y$. 
 \item[y] the local portion of global dense matrix
 $y$. \\
 Scope: {\bf local} \\
 Type: {\bf required} \\
-Specified as: a pointer to array of rank one or two
+Specified as: an array of rank one or two
 containing numbers of type specified in
 Table~\ref{tab:f90mdot}. The rank of $y$ must be the same of $x$. 
 \item[desc\_a] contains data structures for communications.\\
@@ -232,7 +233,7 @@ Specified as: a structured data of type \descdata.
 Scope: {\bf global} \\
 Specified as: a number or a rank-one array  of the data type indicated
 in Table~\ref{tab:f90dot}. 
-\item[info] the local portion of result submatrix $y$.\\
+\item[info] 
 Scope: {\bf local} \\
 Type: {\bf required} \\
 An integer value that contains an error code. 
@@ -254,13 +255,13 @@ computes infinity norm as:
 \[ amax \leftarrow \max_i |x_i|\]
 else if $x$ is a double precision complex vector then computes infinity-norm  as:
 \[ amax \leftarrow \max_i {(|re(x_i)| + |im(x_i)|)}\]
-where:
-\begin{description}
-\item[$x$] represents the global subvector $x_{:,jx}$
-\end{description}
+%% where:
+%% \begin{description}
+%% \item[$x$] represents the global subvector $x_{:,jx}$
+%% \end{description}
 
 \syntax{psb\_geamax}{x, desc\_a, info}
-\syntax*{psb\_geamax}{x, desc\_a, info, jx}
+%% \syntax*{psb\_geamax}{x, desc\_a, info, jx}
 
 \begin{table}[h]
 \begin{center}
@@ -280,30 +281,31 @@ Long Precision Real&Long Precision Complex & psb\_geamax \\
 \begin{description}
 \item[\bf On Entry]
 \item[x] the local portion of global dense matrix
-$x$. This function computes the location of the first element of
-local subarray used, based on $jx$ and the field $matrix\_data$ of $desc\_a$ . \\
+$x$. %% This function computes the location of the first element of
+%% local subarray used, based on $jx$ and the field $matrix\_data$ of $desc\_a$ . 
+\\
 Scope: {\bf local} \\
 Type: {\bf required} \\
-Specified as:  a rank one or two array with the POINTER attribute 
+Specified as:  a rank one or two array  
 containing numbers of type specified in
 Table~\ref{tab:f90amax}.
 \item[desc\_a] contains data structures for communications.\\
 Scope: {\bf local} \\
 Type: {\bf required}\\
 Specified as: a structured data of type \descdata.
-\item[jx]  the column index of global dense matrix $x$,
-identifying the column of subvector $x$.\\
-Scope: {\bf global} \\
-Type: {\bf optional}; can only be present if $x$ is of rank 2.\\	
-Default: $jx = 1$\\	
-Specified as: an integer variable $jx\ge 1$. 
+%% \item[jx]  the column index of global dense matrix $x$,
+%% identifying the column of subvector $x$.\\
+%% Scope: {\bf global} \\
+%% Type: {\bf optional}; can only be present if $x$ is of rank 2.\\	
+%% Default: $jx = 1$\\	
+%% Specified as: an integer variable $jx\ge 1$. 
 
 \item[\bf On Return] 
 \item[Function value] is the infinity norm of subvector $x$.\\
 Scope: {\bf global} \\
-Specified as: a number of the data type indicated in Table~\ref{tab:f90amax}.
-\item[info] the local portion of result submatrix $y$.\\
-Scope: {\bf local} \\
+Specified as: a long precision real number.
+\item[info] 
+Scope: {\bf global} \\
 Type: {\bf required} \\
 An integer value that contains an error code. 
 \end{description}
@@ -340,7 +342,7 @@ Long Precision Real &Long Precision Complex & psb\_geamax\\
 $x$. \\
 Scope: {\bf local} \\
 Type: {\bf required} \\
-Specified as: a rank one or two array with the POINTER attribute
+Specified as: a rank one or two array 
 containing numbers of type specified in
 Table~\ref{tab:f90mamax}. 
 \item[desc\_a] contains data structures for communications.\\
@@ -350,9 +352,8 @@ Specified as: a structured data of type \descdata.
 \item[\bf On Return] 
 \item[res] is the infinity norm of the columns of $x$.\\
 Scope: {\bf global} \\
-Specified as: a number or a rank-one array  of the data type indicated
-in Table~\ref{tab:f90amax}. 
-\item[info] the local portion of result submatrix $y$.\\
+Specified as: a number or a rank-one array  of long precision real numbers. 
+\item[info] 
 Scope: {\bf local} \\
 Type: {\bf required} \\
 An integer value that contains an error code. 
@@ -373,22 +374,18 @@ computes 1-norm as:
 \[ asum \leftarrow  \|x_i\|\]
 else if $x$ ic double precision complex vector then computes 1-norm  as:
 \[ asum \leftarrow \|re(x)\|_1 + \|im(x)\|_1\]
-where:
-\begin{description}
-\item[$x$] represents the global subvector $x_{:,jx}$
-\end{description}
+
 
 \syntax{psb\_geasum}{x, desc\_a, info}
-\syntax*{psb\_geasum}{x, desc\_a, info, jx}
 
 \begin{table}[h]
 \begin{center}
-\begin{tabular}{ll}
+\begin{tabular}{lll}
 \hline
-$dot$, $x$, $y$ & {\bf Function}\\
+$asum$ & $x$ & {\bf Function}\\
 \hline
-Long Precision Real & psb\_geasum \\
-Long Precision Complex & psb\_geasum \\	
+Long Precision Real&Long Precision Real & psb\_geasum \\
+Long Precision Real&Long Precision Complex & psb\_geasum \\
 \hline
 \end{tabular}
 \end{center}
@@ -398,29 +395,24 @@ Long Precision Complex & psb\_geasum \\
 \begin{description}
 \item[\bf On Entry]
 \item[x] the local portion of global dense matrix
-$x$. This function computes the location of the first element of 
-local subarray used, based on $jx$ and the field $matrix\_data$ of $desc\_a$ . \\
+$x$. %% This function computes the location of the first element of 
+%% local subarray used, based on the field $matrix\_data$ of $desc\_a$ . 
+\\
 Scope: {\bf local} \\
 Type: {\bf required} \\
-Specified as: a rank one or two array with the POINTER attribute
+Specified as: a rank one or two array 
 containing numbers of type specified in
 Table~\ref{tab:f90asum}.
 \item[desc\_a] contains data structures for communications.\\
 Scope: {\bf local} \\
 Type: {\bf required}\\
 Specified as: a structured data of type \descdata.
-\item[jx]  the column index of global dense matrix $x$,
-identifying the column of subvector $x$.\\
-Scope: {\bf global} \\
-Type: {\bf optional}; can only be present if $x$ is of rank 2.\\	
-Default: $jx = 1$\\	
-Specified as: an integer variable $jx\ge 1$. 
 
 \item[\bf On Return] 
-\item[Function value] is the 1-norm of subvector $x$.\\
+\item[Function value] is the 1-norm of vector $x$.\\
 Scope: {\bf global} \\
-Specified as: a number of the data type indicated in Table~\ref{tab:f90asum}.
-\item[info] the local portion of result submatrix $y$.\\
+Specified as: a long precision real  number.
+\item[info]
 Scope: {\bf local} \\
 Type: {\bf required} \\
 An integer value that contains an error code. 
@@ -442,19 +434,19 @@ computes 2-norm as:
 \[ nrm2 \leftarrow \sqrt{x^T x}\]
 else if $x$ is double precision complex vector then computes 2-norm  as:
 \[ nrm2 \leftarrow \sqrt{x^H x}\]
-where:
-\begin{description}
-\item[$x$] represents the global subvector $x_{:,jx}$
-\end{description}
+%% where:
+%% \begin{description}
+%% \item[$x$] represents the global subvector $x_{:,jx}$
+%% \end{description}
 
 \begin{table}[h]
 \begin{center}
-\begin{tabular}{ll}
+\begin{tabular}{lll}
 \hline
-$nrm2$, $x$ & {\bf Function}\\
+$nrm2$ & $x$ & {\bf Function}\\
 \hline
-Long Precision Real & psb\_genrm2 \\
-Long Precision Complex & psb\_genrm2 \\
+Long Precision Real&Long Precision Real & psb\_genrm2 \\
+Long Precision Real&Long Precision Complex & psb\_genrm2 \\
 \hline
 \end{tabular}
 \end{center}
@@ -462,34 +454,35 @@ Long Precision Complex & psb\_genrm2 \\
 \end{table}
 
 \syntax{psb\_genrm2}{x, desc\_a, info}
-\syntax*{psb\_genrm2}{x, desc\_a, info, jx}
+%% \syntax*{psb\_genrm2}{x, desc\_a, info, jx}
 \begin{description}
 \item[\bf On Entry]
 \item[x] the local portion of global dense matrix
-$x$. This function computes the location of the first element of
-local subarray used, based on $jx$ and the field $matrix\_data$ of $desc\_a$ . \\
+$x$.%%  This function computes the location of the first element of
+%% local subarray used, based on $jx$ and the field $matrix\_data$ of $desc\_a$ . 
+\\
 Scope: {\bf local} \\
 Type: {\bf required} \\
-Specified as:  a rank one or two array with the POINTER attribute
+Specified as:  a rank one or two array 
 containing numbers of type specified in
 Table~\ref{tab:f90nrm2}.
 \item[desc\_a] contains data structures for communications.\\
 Scope: {\bf local} \\
 Type: {\bf required}\\
 Specified as: a structured data of type \descdata.
-\item[jx]  the column index of global dense matrix $x$,
-identifying the column of subvector $x$.\\
-Scope: {\bf global} \\
-Type: {\bf optional}; can only be present if $x$ is of rank 2.\\	
-Default: $jx = 1$\\	
-Specified as: an integer variable $jx\ge 1$. 
+%% \item[jx]  the column index of global dense matrix $x$,
+%% identifying the column of subvector $x$.\\
+%% Scope: {\bf global} \\
+%% Type: {\bf optional}; can only be present if $x$ is of rank 2.\\	
+%% Default: $jx = 1$\\	
+%% Specified as: an integer variable $jx\ge 1$. 
 
 \item[\bf On Return] 
 \item[Function Value] is the 2-norm of subvector $x$.\\
 Scope: {\bf global} \\
 Type: {\bf required} \\
-Specified as: a number of the data type indicated in Table~\ref{tab:f90nrm2}.
-\item[info] the local portion of result submatrix $y$.\\
+Specified as: a long precision real number.
+\item[info] 
 Scope: {\bf local} \\
 Type: {\bf required} \\
 An integer value that contains an error code. 
@@ -516,7 +509,7 @@ where:
 \begin{center}
 \begin{tabular}{ll}
 \hline
-$nrmi$, $A$ & {\bf Function}\\
+$A$ & {\bf Function}\\
 \hline
 Long Precision Real & psb\_spnrmi \\
 Long Precision Complex & psb\_spnrmi \\
@@ -542,8 +535,8 @@ Specified as: a structured data of type \descdata.
 \item[\bf On Return] 
 \item[Function value] is the infinity-norm of sparse submatrix $A$.\\
 Scope: {\bf global} \\
-Specified as: a number of the data type indicated in Table~\ref{tab:f90nrmi}.
-\item[info] the local portion of result submatrix $y$.\\
+Specified as: a long precision real number.
+\item[info] 
 Scope: {\bf local} \\
 Type: {\bf required} \\
 An integer value that contains an error code. 
@@ -576,8 +569,8 @@ y \leftarrow \alpha P_r A^H P_c x + \beta y
 
 where:
 \begin{description}
-\item[$x$] is the global dense submatrix $x_{:, jx:jx+k-1}$
-\item[$y$] is the global dense submatrix $y_{:, jy:jy+k-1}$
+\item[$x$] is the global dense submatrix $x_{:, :}$
+\item[$y$] is the global dense submatrix $y_{:, :}$
 \item[$A$] is the global sparse submatrix $A$
 \item[$P_r, P_c$] are the permutation matrices.
 \end{description}
@@ -598,7 +591,7 @@ Long Precision Complex & psb\_spmm \\
 
 \syntax{CALL psb\_spmm}{alpha, a, x, beta, y, desc\_a, info}
 \syntax*{CALL psb\_spmm}{alpha, a, x, beta, y,desc\_a, info,
-trans, k, jx, jy, work} 
+trans, work} 
 
 \begin{description}
 \item[\bf On Entry]
@@ -613,11 +606,12 @@ Scope: {\bf local} \\
 Type: {\bf required}\\
 Specified as: a structured data of type \spdata.
 \item[x] the local portion of global dense matrix
-$x$. This subroutine computes the location of the first element of
-local subarray used, based on $jx$ and the field $matrix\_data$ of $desc\_a$ . \\
+$x$. %% This subroutine computes the location of the first element of
+%% local subarray used, based on $jx$ and the field $matrix\_data$ of $desc\_a$ . 
+\\
 Scope: {\bf local} \\
 Type: {\bf required} \\
-Specified as:  a rank one or two array with the POINTER attribute
+Specified as:  a rank one or two array
 containing numbers of type specified in
 Table~\ref{tab:f90spmm}.  The rank of $x$ must be the same of $y$. 
 \item[beta] the scalar $\beta$.\\
@@ -625,11 +619,12 @@ Scope: {\bf global} \\
 Type: {\bf required} \\
 Specified as: a number of the data type indicated in Table~\ref{tab:f90spmm}.
 \item[y] the local portion of global dense matrix
-$y$. This subroutine computes the location of the first element of
-local subarray used, based on $jy$ and the field $matrix\_data$ of $desc\_a$ . \\
+$y$. %% This subroutine computes the location of the first element of
+%% local subarray used, based on $jy$ and the field $matrix\_data$ of $desc\_a$ . 
+\\
 Scope: {\bf local} \\
 Type: {\bf required} \\
-Specified as:  a rank one or two array with the POINTER attribute
+Specified as:  a rank one or two array 
 containing numbers of type specified in
 Table~\ref{tab:f90spmm}. The rank of $y$ must be the same of $x$. 
 \item[desc\_a] contains data structures for communications.\\
@@ -648,37 +643,38 @@ Scope: {\bf global} \\
 Type: {\bf optional}\\	
 Default: $trans = N$\\	
 Specified as: a character variable.
-\item[k] number of columns in dense submatrices $x$ and $y$. \\
-Scope: {\bf global} \\
-Type: {\bf optional}\\	
-Default: \verb|min(size(x,2)-jx+1,size(y,2)-jy+1)|\\	
-Specified as: an integer variable $ k \ge 1$.
-\item[jx]  the column index of global dense matrix $x$,
-identifying the column of subvector $x$.\\
-Scope: {\bf global} \\
-Type: {\bf optional}; can only be present if $x$ is of rank 2.\\	
-Default: $iy = 1$\\	
-Specified as: an integer variable $jx\ge 1$. 
-\item[jy]  the column index of global dense matrix $y$,
-identifying the column of subvector $y$.\\
-Scope: {\bf global} \\
-Type: {\bf optional}; can only be present if $y$ is of rank 2.\\	
-Default: $jy = 1$\\	
-Specified as: an integer variable $jy\ge 1$. 
+%% \item[k] number of columns in dense submatrices $x$ and $y$. \\
+%% Scope: {\bf global} \\
+%% Type: {\bf optional}\\	
+%% Default: \verb|min(size(x,2)-jx+1,size(y,2)-jy+1)|\\	
+%% Specified as: an integer variable $ k \ge 1$.
+%% \item[jx]  the column index of global dense matrix $x$,
+%% identifying the column of subvector $x$.\\
+%% Scope: {\bf global} \\
+%% Type: {\bf optional}; can only be present if $x$ is of rank 2.\\	
+%% Default: $iy = 1$\\	
+%% Specified as: an integer variable $jx\ge 1$. 
+%% \item[jy]  the column index of global dense matrix $y$,
+%% identifying the column of subvector $y$.\\
+%% Scope: {\bf global} \\
+%% Type: {\bf optional}; can only be present if $y$ is of rank 2.\\	
+%% Default: $jy = 1$\\	
+%% Specified as: an integer variable $jy\ge 1$. 
 
-\item[work] the work array.\\
+\item[work]  work array.\\
 Scope: {\bf local} \\
+Type: {\bf optional}\\	
 Specified as: a rank one array of the same type of $x$ and $y$ with
-the POINTER attribute. 
+the TARGET attribute. 
 
 \item[\bf On Return]
 \item[y] the local portion of result submatrix $y$.\\
 Scope: {\bf local} \\
 Type: {\bf required} \\
-Specified as: a pointer to array of rank one or two
+Specified as: an array of rank one or two
 containing numbers of type specified in
 Table~\ref{tab:f90spmm}.
-\item[info] the local portion of result submatrix $y$.\\
+\item[info] 
 Scope: {\bf local} \\
 Type: {\bf required} \\
 An integer value that contains an error code. 
@@ -710,8 +706,8 @@ y &\leftarrow& \alpha P_r T^{-H} P_c D x + \beta y\\
 
 where:
 \begin{description}
-\item[$x$] is the global dense submatrix $x_{:, jx:jx+n-1}$
-\item[$y$] is the global dense submatrix $y_{:, jy:jy+n-1}$
+\item[$x$] is the global dense submatrix $x_{:, :}$
+\item[$y$] is the global dense submatrix $y_{:, :}$
 \item[$T$] is the global sparse block triangular submatrix $T$
 \item[$D$] is the scaling diagonal matrix.
 \item[$P_r, P_c$] are the permutation matrices.
@@ -719,7 +715,7 @@ where:
 
 \syntax{CALL psb\_spsm}{alpha, t, x, beta, y, desc\_a, info} 
 \syntax*{CALL psb\_spsm}{alpha, t, x, beta, y, desc\_a, info,
-trans, unit, choice, diag, n, jx, jy, work} 
+trans, unit, choice, diag, work} 
 
 \begin{table}[h]
 \begin{center}
@@ -751,11 +747,12 @@ Type: {\bf required}\\
 Specified as: a structured data type specified in
 \S~\ref{sec:datastruct}.
 \item[x] the local portion of global dense matrix
-$x$. This subroutine computes the location of the first element of
-local subarray used, based on $jx$ and the field $matrix\_data$ of $desc\_a$ . \\
+$x$. %% This subroutine computes the location of the first element of
+%% local subarray used, based on $jx$ and the field $matrix\_data$ of $desc\_a$ .
+\\
 Scope: {\bf local} \\
 Type: {\bf required} \\
-Specified as:  a rank one or two array with the POINTER attribute
+Specified as:  a rank one or two array 
 containing numbers of type specified in
 Table~\ref{tab:f90spsm}.  The rank of $x$ must be the same of $y$. 
 \item[beta] the scalar $\beta$.\\
@@ -763,11 +760,12 @@ Scope: {\bf global} \\
 Type: {\bf required} \\
 Specified as: a number of the data type indicated in Table~\ref{tab:f90spsm}.
 \item[y] the local portion of global dense matrix
-$y$. This subroutine computes the location of the first element of
-local subarray used, based on $jy$ and the field $matrix\_data$ of $desc\_a$ . \\
+$y$. %% This subroutine computes the location of the first element of
+%% local subarray used, based on $jy$ and the field $matrix\_data$ of $desc\_a$ .
+\\
 Scope: {\bf local} \\
 Type: {\bf required} \\
-Specified as:  a rank one or two array with the POINTER attribute
+Specified as:  a rank one or two array 
 containing numbers of type specified in
 Table~\ref{tab:f90spsm}. The rank of $y$ must be the same of $x$. 
 \item[desc\_a] contains data structures for communications.\\
@@ -794,57 +792,41 @@ Scope: {\bf global} \\
 Type: {\bf optional}\\	
 Default: $unitd = U$\\	
 Specified as: a character variable.
-\item[choice] specify whether a cleanup of the overlapped elements is
-required on exit.
+\item[choice] specifies the update of overlap elements to be performed
+  on exit:
 \begin{description}
-\item[choice = .false.] no cleanup on exit
-\item[choice = .true.] cleanup on exit.\\
+\item \verb|psb_none_|
+\item \verb|psb_sum_|
+\item \verb|psb_avg_|
+\item \verb|psb_square_root_|
 \end{description}
 Scope: {\bf global} \\
 Type: {\bf optional}\\	
-Default: $choice = .true.$\\	
-Specified as: a logical variable.
+Default: \verb|psb_avg_|\\	
+Specified as: an integer variable.
 \item[diag] the diagonal scaling matrix.\\
 Scope: {\bf local} \\
 Type: {\bf optional}\\	
 Default: $diag(1) = 1 (no scaling)$\\	
 Specified as: a rank one  array containing numbers of the type
 indicated in Table~\ref{tab:f90spsm}.
-\item[n] number of columns in dense submatrices $x$ and $y$. \\
-Scope: {\bf global} \\
-Type: {\bf optional}\\	
-Default:  \verb|min(size(x,2)-jx+1,size(y,2)-jy+1)|\\	
-Specified as: an integer variable $ n \ge 0$.
-\item[jx]  the column index of global dense matrix $x$,
-identifying the column of subvector $x$.\\
-Scope: {\bf global} \\
-Type: {\bf optional}; can only be present if $x$ is of rank 2.\\	
-Default: $jx = 1 $\\	
-Specified as: an integer variable $jx\ge 1$. 
-\item[jy]  the column index of global dense matrix $y$,
-identifying the column of subvector $y$.\\
-Scope: {\bf global} \\
-Type: {\bf optional}; can only be present if $y$ is of rank 2.\\	
-Default: $jy = 1 $\\	
-Specified as: an integer variable $jy\ge 1$. \\
-Scope: {\bf global} \\
-Specified as: a number of the data type indicated in Table~\ref{tab:f90spsm}.
-\item[work] the work array. \\
+\item[work] a work array. \\
 Scope: {\bf local} \\
 Type: {\bf optional}\\	
 Specified as: a rank one array of the same type of $x$ with the
-POINTER attribute. 
+TARGET attribute. 
 
 \item[\bf On Return] 
 \item[y] the local portion of global dense matrix
-$y$. This subroutine computes the location of the first element of
-local subarray used, based on $jy$ and the field $matrix\_data$ of $desc\_a$ . \\
+$y$. %% This subroutine computes the location of the first element of
+%% local subarray used, based on $jy$ and the field $matrix\_data$ of $desc\_a$ . 
+\\
 Scope: {\bf local} \\
 Type: {\bf required} \\
 Specified as: a pointer to array of rank one or two
 containing numbers of type specified in
 Table~\ref{tab:f90spsm}.
-\item[info] the local portion of result submatrix $y$.\\
+\item[info] 
 Scope: {\bf local} \\
 Type: {\bf required} \\
 An integer value that contains an error code. 

@@ -109,7 +109,7 @@ Subroutine psb_dcgstabl(a,prec,b,x,eps,desc_a,info,&
        &pv1(:),  pv2(:), pm1(:,:), pm2(:,:)
   Integer, Pointer           :: iperm(:), ipnull(:), ipsave(:)
   Real(Kind(1.d0)) ::rerr
-  Integer       ::litmax, liter, naux, m, mglob, it, itrac,&
+  Integer       ::litmax, liter, naux, m, mglob, it, itrace_,&
        & nprows,npcols,me,mecol, n_row, n_col, nl, err_act
   Character     ::diagl, diagu
   Logical, Parameter :: exchange=.True., noexchange=.False.  
@@ -161,9 +161,9 @@ Subroutine psb_dcgstabl(a,prec,b,x,eps,desc_a,info,&
   Endif
 
   If (Present(itrace)) Then
-     itrac = itrace
+     itrace_ = itrace
   Else
-     itrac = -1
+     itrace_ = 0
   End If
   
   If (Present(irst)) Then
@@ -183,9 +183,9 @@ Subroutine psb_dcgstabl(a,prec,b,x,eps,desc_a,info,&
      call psb_errpush(info,name)
      goto 9999
   End If
-  Call psb_geall(mglob,10,wwrk,desc_a,info)
-  Call psb_geall(mglob,nl+1,uh,desc_a,info,js=0)
-  Call psb_geall(mglob,nl+1,rh,desc_a,info,js=0)
+  Call psb_geall(wwrk,desc_a,info,n=10)
+  Call psb_geall(uh,desc_a,info,n=nl+1)
+  Call psb_geall(rh,desc_a,info,n=nl+1)
   Call psb_geasb(wwrk,desc_a,info)  
   Call psb_geasb(uh,desc_a,info)  
   Call psb_geasb(rh,desc_a,info)  
@@ -255,17 +255,9 @@ Subroutine psb_dcgstabl(a,prec,b,x,eps,desc_a,info,&
       rni = psb_geamax(r,desc_a,info)
       xni = psb_geamax(x,desc_a,info)
       rerr =  rni/(ani*xni+bni)
-      if (itrac /= -1) then 
-          If (me == 0) Write(itrac,'(a,i4,5(2x,es10.4))') 'bicgstab(l): ',&
-               & itx,rerr,rni,bni,xni,ani
-      endif
     else if (istop_ == 2) then 
       rni = psb_genrm2(r,desc_a,info)
       rerr = rni/bn2
-      if (itrac /= -1) then  
-        If (me == 0) Write(itrac,'(a,i4,3(2x,es10.4))') 'bicgstab(l): ',&
-             & itx,rerr,rni,bn2
-      endif
     endif
     if (info.ne.0) Then 
        info=4011 
@@ -276,6 +268,10 @@ Subroutine psb_dcgstabl(a,prec,b,x,eps,desc_a,info,&
     If (rerr<=eps) Then 
       Exit restart
     End If
+    If (itrace_ > 0) then 
+      if ((mod(itx,itrace_)==0).and.(me == 0))&
+           & write(*,'(a,i4,3(2x,es10.4))') 'bicgstab(l): ',itx,rerr
+    end If
      
     iteration:  Do 
       it   = it + nl
@@ -364,29 +360,27 @@ Subroutine psb_dcgstabl(a,prec,b,x,eps,desc_a,info,&
         rni = psb_geamax(rh(:,0),desc_a,info)
         xni = psb_geamax(x,desc_a,info)
         rerr =  rni/(ani*xni+bni)
-        if (itrac /= -1) then 
-          If (me == 0) Write(itrac,'(a,i4,5(2x,es10.4))') 'bicgstab(l): ',&
-               & itx,rerr,rni,bni,xni,ani
-        endif
-
       else  if (istop_ == 2) then 
-
         rni = psb_genrm2(rh(:,0),desc_a,info)
         rerr = rni/bn2
-        if (itrac /= -1) then 
-          If (me == 0) Write(itrac,'(a,i4,3(2x,es10.4))') 'bicgstab(l): ',&
-               & itx,rerr,rni,bn2
-        endif
       endif
 
       If (rerr<=eps) Then 
         Exit restart
       End If
-      
       If (itx.Ge.litmax) Exit restart
+
+      If (itrace_ > 0) then 
+        if ((mod(itx,itrace_)==0).and.(me == 0))&
+             & write(*,'(a,i4,3(2x,es10.4))') 'bicgstab(l): ',itx,rerr
+      end If
+      
     End Do iteration
   End Do restart
 
+  If (itrace_ > 0) then 
+    if (me == 0) write(*,'(a,i4,3(2x,es10.4))') 'bicgstab(l): ',itx,rerr
+  end If
   If (Present(err)) err=rerr
   If (Present(iter)) iter = itx
   If (rerr>eps) Then
