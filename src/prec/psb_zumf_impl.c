@@ -90,7 +90,6 @@ Availability:
 #include <stdio.h>
 #ifdef Have_UMF_		 
 #include "umfpack.h"
-#undef Have_UMF_
 #endif
 
 #ifdef LargeFptr
@@ -120,11 +119,11 @@ psb_zumf_factor_(int *n, int *nnz,
   int i;
   
   
-  umfpack_di_defaults(Control);
+  umfpack_zi_defaults(Control);
   
   for (i = 0; i <= *n;  ++i) --colptr[i];
   for (i = 0; i < *nnz; ++i) --rowind[i];
-  *info = umfpack_di_symbolic (*n, *n, colptr, rowind, values, &Symbolic,
+  *info = umfpack_zi_symbolic (*n, *n, colptr, rowind, values, NULL, &Symbolic,
 				Control, Info);
   
     
@@ -136,7 +135,7 @@ psb_zumf_factor_(int *n, int *nnz,
     
   *symptr = (fptr) Symbolic; 
   
-  *info = umfpack_di_numeric (colptr, rowind, values, Symbolic, &Numeric,
+  *info = umfpack_zi_numeric (colptr, rowind, values, NULL, Symbolic, &Numeric,
 				Control, Info) ;
   
     
@@ -186,8 +185,8 @@ psb_zumf_solve_(int *itrans, int *n,
     trans = UMFPACK_A;
   }
 
-  *info = umfpack_di_solve(trans,NULL,NULL,NULL,
-			   x,b,(void *) *numptr,Control,Info);
+  *info = umfpack_zi_solve(trans,NULL,NULL,NULL,NULL,
+			   x,NULL,b,NULL,(void *) *numptr,Control,Info);
   
 #else
     fprintf(stderr," UMF Not Configured, fix make.inc and recompile\n");
@@ -215,8 +214,8 @@ psb_zumf_free_(
   Symbolic = (void *) *symptr;
   Numeric  = (void *) *numptr;
   
-  umfpack_di_free_numeric(&Numeric);
-  umfpack_di_free_symbolic(&Symbolic);
+  umfpack_zi_free_numeric(&Numeric);
+  umfpack_zi_free_symbolic(&Symbolic);
   *info=0;
 #else
     fprintf(stderr," UMF Not Configured, fix make.inc and recompile\n");

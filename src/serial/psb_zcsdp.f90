@@ -67,7 +67,7 @@ subroutine psb_zcsdp(a, b,info,ifc,check,trans,unitd,upd,dupl)
        & ipc, i, count, err_act, ierrv(5), i1, i2, ia
   character                     :: check_,trans_,unitd_, up
   Integer, Parameter            :: maxtry=8
-  logical, parameter            :: debug=.true.
+  logical, parameter            :: debug=.false.
   character(len=20)             :: name, ch_err
 
   interface psb_cest

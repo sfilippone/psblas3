@@ -51,7 +51,7 @@ subroutine psb_zslu_bld(a,desc_a,p,info)
   character(len=5)         :: fmt
   character                :: upd='F'
   integer                  :: i,j,nza,nzb,nzt,icontxt, me,mycol,nprow,npcol,err_act
-  logical, parameter :: debug=.true.
+  logical, parameter :: debug=.false.
   character(len=20)   :: name, ch_err
 
   interface psb_asmatbld
