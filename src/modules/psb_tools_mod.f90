@@ -33,56 +33,53 @@ Module psb_tools_mod
 
   interface  psb_geall
      ! 2-D double precision version
-     subroutine psb_dalloc(m, n, x, desc_a, info, js)
+     subroutine psb_dalloc(x, desc_a, info, n)
        use psb_descriptor_type
        implicit none
-       integer, intent(in)                   :: m,n
-       real(kind(1.d0)), pointer             :: x(:,:)
-       type(psb_desc_type), intent(in)       :: desc_a
-       integer                               :: info
-       integer, optional, intent(in)         :: js
+       real(kind(1.d0)), pointer       :: x(:,:)
+       type(psb_desc_type), intent(in) :: desc_a
+       integer                         :: info
+       integer, optional, intent(in)   :: n
      end subroutine psb_dalloc
      ! 1-D double precision version
-     subroutine psb_dallocv(m, x, desc_a,info)
+     subroutine psb_dallocv(x, desc_a,info,n)
        use psb_descriptor_type
-       integer, intent(in)            :: m
-       real(kind(1.d0)), pointer      :: x(:)
-       type(psb_desc_type), intent(in):: desc_a
-       integer                        :: info
+       real(kind(1.d0)), pointer       :: x(:)
+       type(psb_desc_type), intent(in) :: desc_a
+       integer                         :: info
+       integer, optional, intent(in)   :: n
      end subroutine psb_dallocv
      ! 2-D integer version
-     subroutine psb_ialloc(m, n, x, desc_a, info,js)
+     subroutine psb_ialloc(x, desc_a, info,n)
        use psb_descriptor_type
-       integer, intent(in)                   :: m,n
-       integer, pointer                      :: x(:,:)
-       type(psb_desc_type), intent(inout)    :: desc_a
-       integer, intent(out)                  :: info
-       integer, optional, intent(in)         :: js
+       integer, pointer                 :: x(:,:)
+       type(psb_desc_type), intent(in)  :: desc_a
+       integer, intent(out)             :: info
+       integer, optional, intent(in)    :: n
      end subroutine psb_ialloc
-     subroutine psb_iallocv(m, x, desc_a,info)
+     subroutine psb_iallocv(x, desc_a,info,n)
        use psb_descriptor_type
-       integer, intent(in)            :: m
-       integer, pointer               :: x(:)
-       type(psb_desc_type), intent(in):: desc_a
-       integer                        :: info
+       integer, pointer                :: x(:)
+       type(psb_desc_type), intent(in) :: desc_a
+       integer                         :: info
+       integer, optional, intent(in)   :: n
      end subroutine psb_iallocv
      ! 2-D double precision version
-     subroutine psb_zalloc(m, n, x, desc_a, info, js)
+     subroutine psb_zalloc(x, desc_a, info, n)
        use psb_descriptor_type
        implicit none
-       integer, intent(in)                   :: m,n
-       complex(kind(1.d0)), pointer             :: x(:,:)
-       type(psb_desc_type), intent(in)       :: desc_a
-       integer                               :: info
-       integer, optional, intent(in)         :: js
+       complex(kind(1.d0)), pointer    :: x(:,:)
+       type(psb_desc_type), intent(in) :: desc_a
+       integer                         :: info
+       integer, optional, intent(in)   :: n
      end subroutine psb_zalloc
      ! 1-D double precision version
-     subroutine psb_zallocv(m, x, desc_a,info)
+     subroutine psb_zallocv(x, desc_a,info,n)
        use psb_descriptor_type
-       integer, intent(in)            :: m
-       complex(kind(1.d0)), pointer      :: x(:)
-       type(psb_desc_type), intent(in):: desc_a
-       integer                        :: info
+       complex(kind(1.d0)), pointer    :: x(:)
+       type(psb_desc_type), intent(in) :: desc_a
+       integer                         :: info
+       integer, optional, intent(in)   :: n
      end subroutine psb_zallocv
   end interface
 
@@ -292,7 +289,7 @@ Module psb_tools_mod
 
   interface psb_geins
      ! 2-D double precision version
-     subroutine psb_dins(m, n, x, ix, jx, blck, desc_a, info,&
+     subroutine psb_dins(m, n, blck, x, ix, jx, desc_a, info,&
           & iblck, jblck,dupl)
        use psb_descriptor_type
        integer, intent(in)                ::  m,n
@@ -305,7 +302,7 @@ Module psb_tools_mod
        integer, optional, intent(in)      ::  dupl
      end subroutine psb_dins
      ! 2-D double precision square version
-     subroutine psb_dinsvm(m, x, ix, jx, blck, desc_a,info,&
+     subroutine psb_dinsvm(m, blck, x, ix, jx, desc_a,info,&
           & iblck,dupl)
        use psb_descriptor_type
        integer, intent(in)                ::  m
@@ -318,7 +315,7 @@ Module psb_tools_mod
        integer, optional, intent(in)      ::  dupl
      end subroutine psb_dinsvm
      ! 1-D double precision version
-     subroutine psb_dinsvv(m, x, ix, blck, desc_a, info,&
+     subroutine psb_dinsvv(m, blck, x, ix, desc_a, info,&
           & iblck,insflag,dupl)
        use psb_descriptor_type
        integer, intent(in)                ::  m
@@ -332,7 +329,7 @@ Module psb_tools_mod
        integer, optional, intent(in)      ::  dupl
      end subroutine psb_dinsvv
      ! 2-D integer version
-     subroutine psb_iins(m, n, x, ix, jx, blck, desc_a, info,&
+     subroutine psb_iins(m, n, blck, x, ix, jx, desc_a, info,&
           & iblck, jblck,dupl)
        use psb_descriptor_type
        integer, intent(in)                ::  m,n
@@ -345,7 +342,7 @@ Module psb_tools_mod
        integer, optional, intent(in)      ::  dupl
      end subroutine psb_iins
      ! 2-D integer square version
-     subroutine psb_iinsvm(m, x, ix, jx, blck, desc_a,info,&
+     subroutine psb_iinsvm(m, blck, x, ix, jx, desc_a,info,&
           & iblck,dupl)
        use psb_descriptor_type
        integer, intent(in)                ::  m
@@ -358,7 +355,7 @@ Module psb_tools_mod
        integer, optional, intent(in)      ::  dupl
      end subroutine psb_iinsvm
      ! 1-D integer version
-     subroutine psb_iinsvv(m, x, ix, blck, desc_a, info,&
+     subroutine psb_iinsvv(m, blck, x, ix, desc_a, info,&
           & iblck,insflag,dupl)
        use psb_descriptor_type
        integer, intent(in)                ::  m
@@ -372,7 +369,7 @@ Module psb_tools_mod
        integer, optional, intent(in)      ::  dupl
      end subroutine psb_iinsvv
      ! 2-D double precision version
-     subroutine psb_zins(m, n, x, ix, jx, blck, desc_a, info,&
+     subroutine psb_zins(m, n, blck, x, ix, jx, desc_a, info,&
           & iblck, jblck,dupl)
        use psb_descriptor_type
        integer, intent(in)                ::  m,n
@@ -385,7 +382,7 @@ Module psb_tools_mod
        integer, optional, intent(in)      ::  dupl
      end subroutine psb_zins
      ! 2-D double precision square version
-     subroutine psb_zinsvm(m, x, ix, jx, blck, desc_a,info,&
+     subroutine psb_zinsvm(m, blck, x, ix, jx, desc_a,info,&
           & iblck,dupl)
        use psb_descriptor_type
        integer, intent(in)                ::  m
@@ -398,7 +395,7 @@ Module psb_tools_mod
        integer, optional, intent(in)      ::  dupl
      end subroutine psb_zinsvm
      ! 1-D double precision version
-     subroutine psb_zinsvv(m, x, ix, blck, desc_a, info,&
+     subroutine psb_zinsvv(m, blck, x, ix, desc_a, info,&
           & iblck,insflag,dupl)
        use psb_descriptor_type
        integer, intent(in)                ::  m

@@ -366,6 +366,15 @@ module psb_serial_mod
      end subroutine psb_ztransp
   end interface
 
+  interface psb_transc
+     subroutine psb_ztransc(a,b,c,fmt)
+       use psb_spmat_type
+       type(psb_zspmat_type) :: a,b
+       integer, optional :: c
+       character(len=*), optional :: fmt
+     end subroutine psb_ztransc
+  end interface
+
   interface psb_rwextd
      subroutine psb_drwextd(nr,a,info,b)
        use psb_spmat_type

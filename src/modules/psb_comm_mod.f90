@@ -31,41 +31,37 @@
 module psb_comm_mod
 
   interface psb_ovrl
-     subroutine  psb_dovrlm(x,desc_a,info,jx,ik,work,choice,update_type)
+     subroutine  psb_dovrlm(x,desc_a,info,jx,ik,work,update)
        use psb_descriptor_type
        real(kind(1.d0)), intent(inout)           :: x(:,:)
        type(psb_desc_type), intent(in)           :: desc_a
        integer, intent(out)                      :: info
        real(kind(1.d0)), intent(inout), optional :: work(:)
-       logical, intent(in), optional             :: choice
-       integer, intent(in), optional             :: update_type,jx,ik
+       integer, intent(in), optional             :: update,jx,ik
      end subroutine psb_dovrlm
-     subroutine  psb_dovrlv(x,desc_a,info,work,choice,update_type)
+     subroutine  psb_dovrlv(x,desc_a,info,work,update)
        use psb_descriptor_type
        real(kind(1.d0)), intent(inout)           :: x(:)
        type(psb_desc_type), intent(in)           :: desc_a
        integer, intent(out)                      :: info
        real(kind(1.d0)), intent(inout), optional :: work(:)
-       logical, intent(in), optional             :: choice
-       integer, intent(in), optional             :: update_type
+       integer, intent(in), optional             :: update
      end subroutine psb_dovrlv
-     subroutine  psb_zovrlm(x,desc_a,info,jx,ik,work,choice,update_type)
+     subroutine  psb_zovrlm(x,desc_a,info,jx,ik,work,update)
        use psb_descriptor_type
        complex(kind(1.d0)), intent(inout)           :: x(:,:)
        type(psb_desc_type), intent(in)           :: desc_a
        integer, intent(out)                      :: info
        complex(kind(1.d0)), intent(inout), optional :: work(:)
-       logical, intent(in), optional             :: choice
-       integer, intent(in), optional             :: update_type,jx,ik
+       integer, intent(in), optional             :: update,jx,ik
      end subroutine psb_zovrlm
-     subroutine  psb_zovrlv(x,desc_a,info,work,choice,update_type)
+     subroutine  psb_zovrlv(x,desc_a,info,work,update)
        use psb_descriptor_type
        complex(kind(1.d0)), intent(inout)           :: x(:)
        type(psb_desc_type), intent(in)           :: desc_a
        integer, intent(out)                      :: info
        complex(kind(1.d0)), intent(inout), optional :: work(:)
-       logical, intent(in), optional             :: choice
-       integer, intent(in), optional             :: update_type
+       integer, intent(in), optional             :: update
      end subroutine psb_zovrlv
   end interface
 
