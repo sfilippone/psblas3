@@ -159,8 +159,8 @@ subroutine psb_dbicg(a,prec,b,x,eps,desc_a,info,&
   naux=4*n_col 
 
   allocate(aux(naux),stat=info)
-  call psb_geall(wwrk,desc_a,info,n=9)
-  call psb_geasb(wwrk,desc_a,info)  
+  if (info == 0) call psb_geall(wwrk,desc_a,info,n=9)
+  if (info == 0) call psb_geasb(wwrk,desc_a,info)  
   if(info.ne.0) then
      info=4011
      ch_err='psb_asb'

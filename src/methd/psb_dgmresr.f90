@@ -182,16 +182,10 @@ Subroutine psb_dgmresr(a,prec,b,x,eps,desc_a,info,&
   Allocate(aux(naux),h(nl+1,nl+1),rr(nl+1,nl+1),&
        &c(nl+1),s(nl+1),rs(nl+1), stat=info)
 
-  If (info.Ne.0) Then 
-     info = 4000
-     call psb_errpush(info,name)
-     goto 9999
-  End If
-
-  Call psb_geall(v,desc_a,info,n=nl+1)
-  Call psb_geall(w,desc_a,info)
-  Call psb_geasb(v,desc_a,info)  
-  Call psb_geasb(w,desc_a,info)  
+  if (info == 0) Call psb_geall(v,desc_a,info,n=nl+1)
+  if (info == 0) Call psb_geall(w,desc_a,info)
+  if (info == 0) Call psb_geasb(v,desc_a,info)  
+  if (info == 0) Call psb_geasb(w,desc_a,info)  
   if (info.ne.0) Then 
      info=4011 
      call psb_errpush(info,name)

@@ -148,8 +148,8 @@ Subroutine psb_dcg(a,prec,b,x,eps,desc_a,info,&
 
   naux=4*n_col
   allocate(aux(naux), stat=info)
-  call psb_geall(wwrk,desc_a,info,n=5)
-  call psb_geasb(wwrk,desc_a,info)  
+  if (info == 0) call psb_geall(wwrk,desc_a,info,n=5)
+  if (info == 0) call psb_geasb(wwrk,desc_a,info)  
   if (info.ne.0) then 
     info=4011
     call psb_errpush(info,name)

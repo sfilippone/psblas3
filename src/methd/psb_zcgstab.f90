@@ -134,18 +134,9 @@ Subroutine psb_zcgstab(a,prec,b,x,eps,desc_a,info,&
     istop_ = 1
   Endif
 !
-!  ISTOP_ = 1:  Normwise backward error, infinity norm 
-!  ISTOP_ = 2:  ||r||/||b||   norm 2 
+!  ISTOP = 1:  Normwise backward error, infinity norm 
+!  ISTOP = 2:  ||r||/||b||   norm 2 
 !
-!!$
-!!$  If ((prec%prec < min_prec_).Or.(prec%prec > max_prec_) ) Then
-!!$     Write(0,*) 'PSB_CGSTAB: Invalid IPREC',prec%prec
-!!$     info=5002
-!!$     int_err(1)=prec%prec
-!!$     err=info
-!!$     call psb_errpush(info,name,i_err=int_err)
-!!$     goto 9999
-!!$  Endif
   
   if ((istop_ < 1 ).or.(istop_ > 2 ) ) then
     write(0,*) 'psb_bicgstab: invalid istop',istop_ 
@@ -158,8 +149,8 @@ Subroutine psb_zcgstab(a,prec,b,x,eps,desc_a,info,&
 
   naux=6*n_col 
   allocate(aux(naux),stat=info)
-  call psb_geall(wwrk,desc_a,info,n=8)
-  call psb_geasb(wwrk,desc_a,info)  
+  if (info==0) call psb_geall(wwrk,desc_a,info,n=8)
+  if (info==0) call psb_geasb(wwrk,desc_a,info)  
   if (info /= 0) then 
      info=4011
      call psb_errpush(info,name)
@@ -225,10 +216,10 @@ Subroutine psb_zcgstab(a,prec,b,x,eps,desc_a,info,&
     rho = zzero
     If (debug) Write(*,*) 'On entry to AMAX: B: ',Size(b)
     
-!
-!   Must always provide norm of R into RNI below for first check on 
-!   residual
-!
+    !
+    !   Must always provide norm of R into RNI below for first check on 
+    !   residual
+    !
     If (istop_ == 1) Then 
       rni = psb_geamax(r,desc_a,info)
       xni = psb_geamax(x,desc_a,info)

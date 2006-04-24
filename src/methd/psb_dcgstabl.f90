@@ -183,12 +183,12 @@ Subroutine psb_dcgstabl(a,prec,b,x,eps,desc_a,info,&
      call psb_errpush(info,name)
      goto 9999
   End If
-  Call psb_geall(wwrk,desc_a,info,n=10)
-  Call psb_geall(uh,desc_a,info,n=nl+1)
-  Call psb_geall(rh,desc_a,info,n=nl+1)
-  Call psb_geasb(wwrk,desc_a,info)  
-  Call psb_geasb(uh,desc_a,info)  
-  Call psb_geasb(rh,desc_a,info)  
+  if (info == 0) Call psb_geall(wwrk,desc_a,info,n=10)
+  if (info == 0) Call psb_geall(uh,desc_a,info,n=nl+1)
+  if (info == 0) Call psb_geall(rh,desc_a,info,n=nl+1)
+  if (info == 0) Call psb_geasb(wwrk,desc_a,info)  
+  if (info == 0) Call psb_geasb(uh,desc_a,info)  
+  if (info == 0) Call psb_geasb(rh,desc_a,info)  
   if (info.ne.0) Then 
      info=4011 
      call psb_errpush(info,name)
