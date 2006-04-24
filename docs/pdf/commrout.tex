@@ -121,8 +121,8 @@ Specified as: a structured data of type \descdata.
 \item[update] Update operator. \\
 \begin{description}
 \item[update = psb\_none\_] Do nothing;
-\item[update = psb\_add\_] Sum overlap entries;
-\item[update = psb\_avg\_] Average overlap entries;
+\item[update = psb\_add\_] Sum overlap entries, i.e. apply $P^T$;
+\item[update = psb\_avg\_] Average overlap entries, i.e. apply $P_aP^T$;
 %% \item[update = psb\_square\_root\_] square root update $\sqrt{P_a}$;
 \end{description}
 Scope: {\bf global} \\
@@ -153,18 +153,18 @@ An integer value that contains an error code.
 \item If there is no overlap in the data distribution, no operations
 are performed;
 \item The operator $P^{T}$ performs the reduction sum of overlap
-elements; it is the inverse of a ``stretch'' operator $P$ that
+elements; it is a ``prolongation'' operator $P^T$ that
 replicates overlap elements, accounting for the physical replication
 of data;
 \item The operator $P_a$ performs a scaling on the overlap elements by
 the amount of replication; thus, when combined with the reduction
 operator, it implements the average of replicated elements over all of
 their instances. 
-\item The square root update option makes it possible to applythe
-following operator: 
-\[ x\leftarrow \sqrt{P_a} P^{T} K^{-1} P \sqrt{P_a} x\]
-In the case of a symmetric $K$, this preserves simmetry of the overall
-preconditioner, which would otherwise be destroyed. 
+%% \item The square root update option makes it possible to applythe
+%% following operator: 
+%% \[ x\leftarrow \sqrt{P_a} P^{T} K^{-1} P \sqrt{P_a} x\]
+%% In the case of a symmetric $K$, this preserves simmetry of the overall
+%% preconditioner, which would otherwise be destroyed. 
 \end{enumerate}
 
 
