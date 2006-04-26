@@ -1,5 +1,6 @@
 /*
- *                  MPcube: Multilevel Parallel Preconditioners Package 
+ *                    MD2P4
+ *    Multilevel Domain Decomposition Parallel Preconditioner Package for PSBLAS
  *                              for 
  *                    Parallel Sparse BLAS  v2.0
  *
@@ -16,14 +17,14 @@
  *   2. Redistributions in binary form must reproduce the above copyright
  *      notice, this list of conditions, and the following disclaimer in the
  *      documentation and/or other materials provided with the distribution.
- *   3. The name of the MPcube group or the names of its contributors may
+ *   3. The name of the MD2P4 group or the names of its contributors may
  *      not be used to endorse or promote products derived from this
  *      software without specific written permission.
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
  * TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
- * PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE MPcube GROUP OR ITS CONTRIBUTORS
+ * PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE MD2P4 GROUP OR ITS CONTRIBUTORS
  * BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
  * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
  * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
@@ -36,7 +37,7 @@
 /* This file is an interface to the UMFPACK  routines for sparse
    factorization.   
    
-   PSBLAS v 2.0, rc1,  May 03, 2005  */ 
+   PSBLAS v 2.0  */ 
 
 
 /*		=====================
