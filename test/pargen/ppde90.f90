@@ -644,10 +644,10 @@ contains
           call psb_spins(element-1,irow,icol,val,a,desc_a,info)
           if(info.ne.0) exit
           tins = tins + (mpi_wtime()-t3)
-          call psb_geins(1,zt(1:1),b,ia,desc_a,info)
+          call psb_geins(1,(/ia/),zt(1:1),b,desc_a,info)
           if(info.ne.0) exit
           zt(1)=0.d0
-          call psb_geins(1,zt(1:1),t,ia,desc_a,info)
+          call psb_geins(1,(/ia/),zt(1:1),t,desc_a,info)
           if(info.ne.0) exit
         end if
       end do

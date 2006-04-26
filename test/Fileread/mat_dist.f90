@@ -40,7 +40,7 @@ contains
        & b_glob, b, info, inroot,fmt)
     !
     ! an utility subroutine to distribute a matrix among processors
-    ! according to a user defined data distribution, using pessl
+    ! according to a user defined data distribution, using 
     ! sparse matrix subroutines.
     !
     !  type(d_spmat)                            :: a_glob
@@ -272,8 +272,8 @@ contains
               call psb_errpush(info,name,a_err=ch_err)
               goto 9999
             end if
-            call psb_geins(nnr,b_glob(i_count:j_count-1),b,i_count,&
-                 &desc_a,info)
+            call psb_geins(nnr,(/(i,i=i_count,j_count-1)/),&
+                 & b_glob(i_count:j_count-1),b,desc_a,info)
             if(info/=0) then
               info=4010
               ch_err='psb_ins'
@@ -318,8 +318,8 @@ contains
               call psb_errpush(info,name,a_err=ch_err)
               goto 9999
             end if
-            call psb_geins(nnr,b_glob(i_count:i_count+nnr-1),b,i_count,&
-                 &desc_a,info)
+            call psb_geins(nnr,(/(i,i=i_count,i_count+nnr-1)/),&
+                 & b_glob(i_count:i_count+nnr-1),b,desc_a,info)
             if(info/=0) then
               info=4010
               ch_err='psdsins'
@@ -354,8 +354,8 @@ contains
                 call psb_errpush(info,name,a_err=ch_err)
                 goto 9999
               end if
-              call psb_geins(1,b_glob(i_count:i_count),b,i_count,&
-                   &desc_a,info)
+              call psb_geins(1,(/i_count/),b_glob(i_count:i_count),&
+                   & b,desc_a,info)
               if(info/=0) then
                 info=4010
                 ch_err='psdsins'
@@ -385,8 +385,8 @@ contains
                 call psb_errpush(info,name,a_err=ch_err)
                 goto 9999
               end if
-              call psb_geins(1,b_glob(i_count:i_count),b,i_count,&
-                   &desc_a,info)
+              call psb_geins(1,(/i_count/),b_glob(i_count:i_count),&
+                   & b,desc_a,info)
               if(info/=0) then
                 info=4010
                 ch_err='psdsins'
@@ -483,7 +483,7 @@ contains
        & b_glob, b, info, inroot,fmt)
     !
     ! an utility subroutine to distribute a matrix among processors
-    ! according to a user defined data distribution, using pessl
+    ! according to a user defined data distribution, using 
     ! sparse matrix subroutines.
     !
     !  type(d_spmat)                            :: a_glob
@@ -699,8 +699,8 @@ contains
             goto 9999
           end if
 
-          call psb_geins(nnr,b_glob(i_count:j_count-1),b,i_count,&
-               &desc_a,info)
+          call psb_geins(nnr,(/(i,i=i_count,j_count-1)/),b_glob(i_count:j_count-1),&
+               & b,desc_a,info)
           if(info/=0) then
             info=4010
             ch_err='dsins'
@@ -745,8 +745,8 @@ contains
             call psb_errpush(info,name,a_err=ch_err)
             goto 9999
           end if
-          call psb_geins(nnr,b_glob(i_count:i_count+nnr-1),b,i_count,&
-               &desc_a,info)
+          call psb_geins(nnr,(/(i,i=i_count,i_count+nnr-1)/),&
+               & b_glob(i_count:i_count+nnr-1),b,desc_a,info)
           if(info/=0) then
             info=4010
             ch_err='psdsins'
@@ -823,7 +823,7 @@ contains
        & b_glob, b, info, inroot,fmt)
     !
     ! an utility subroutine to distribute a matrix among processors
-    ! according to a user defined data distribution, using pessl
+    ! according to a user defined data distribution, using
     ! sparse matrix subroutines.
     !
     !  type(d_spmat)                            :: a_glob
@@ -1055,8 +1055,8 @@ contains
               call psb_errpush(info,name,a_err=ch_err)
               goto 9999
             end if
-            call psb_geins(nnr,b_glob(i_count:j_count-1),b,i_count,&
-                 &desc_a,info)
+            call psb_geins(nnr,(/(i,i=i_count,j_count-1)/),b_glob(i_count:j_count-1),&
+                 & b,desc_a,info)
             if(info/=0) then
               info=4010
               ch_err='psb_ins'
@@ -1101,8 +1101,8 @@ contains
               call psb_errpush(info,name,a_err=ch_err)
               goto 9999
             end if
-            call psb_geins(nnr,b_glob(i_count:i_count+nnr-1),b,i_count,&
-                 &desc_a,info)
+            call psb_geins(nnr,(/(i,i=i_count,i_count+nnr-1)/),&
+                 & b_glob(i_count:i_count+nnr-1),b,desc_a,info)
             if(info/=0) then
               info=4010
               ch_err='psdsins'
@@ -1137,8 +1137,8 @@ contains
                 call psb_errpush(info,name,a_err=ch_err)
                 goto 9999
               end if
-              call psb_geins(1,b_glob(i_count:i_count),b,i_count,&
-                   &desc_a,info)
+              call psb_geins(1,(/i_count/),b_glob(i_count:i_count),&
+                   & b,desc_a,info)
               if(info/=0) then
                 info=4010
                 ch_err='psdsins'
@@ -1168,8 +1168,8 @@ contains
                 call psb_errpush(info,name,a_err=ch_err)
                 goto 9999
               end if
-              call psb_geins(1,b_glob(i_count:i_count),b,i_count,&
-                   &desc_a,info)
+              call psb_geins(1,(/i_count/),b_glob(i_count:i_count),&
+                   & b,desc_a,info)
               if(info/=0) then
                 info=4010
                 ch_err='psdsins'
@@ -1266,7 +1266,7 @@ contains
        & b_glob, b, info, inroot,fmt)
     !
     ! an utility subroutine to distribute a matrix among processors
-    ! according to a user defined data distribution, using pessl
+    ! according to a user defined data distribution, using 
     ! sparse matrix subroutines.
     !
     !  type(d_spmat)                            :: a_glob
@@ -1482,8 +1482,8 @@ contains
             goto 9999
           end if
 
-          call psb_geins(nnr,b_glob(i_count:j_count-1),b,i_count,&
-               &desc_a,info)
+          call psb_geins(nnr,(/(i,i=i_count,j_count-1)/),b_glob(i_count:j_count-1),&
+               & b,desc_a,info)
           if(info/=0) then
             info=4010
             ch_err='dsins'
@@ -1528,8 +1528,8 @@ contains
             call psb_errpush(info,name,a_err=ch_err)
             goto 9999
           end if
-          call psb_geins(nnr,b_glob(i_count:i_count+nnr-1),b,i_count,&
-               &desc_a,info)
+          call psb_geins(nnr,(/(i,i=i_count,i_count+nnr-1)/),&
+               & b_glob(i_count:i_count+nnr-1),b,desc_a,info)
           if(info/=0) then
             info=4010
             ch_err='psdsins'
