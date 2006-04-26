@@ -391,7 +391,7 @@ Module psb_tools_mod
        integer, optional, intent(in)      ::  dupl
      end subroutine psb_iinsvv
      ! 2-D double precision version
-     subroutine psb_iinsi(m,val,irw, x,desc_a,info,dupl)
+     subroutine psb_iinsi(m,irw,val, x,desc_a,info,dupl)
        use psb_descriptor_type
        integer, intent(in)              ::  m
        type(psb_desc_type), intent(in)  ::  desc_a
@@ -402,7 +402,7 @@ Module psb_tools_mod
        integer, optional, intent(in)    ::  dupl
      end subroutine psb_iinsi
      ! 1-D double precision version
-     subroutine psb_iinsvi(m, val,irw, x,desc_a,info,dupl)
+     subroutine psb_iinsvi(m, irw,val, x,desc_a,info,dupl)
        use psb_descriptor_type
        integer, intent(in)             ::  m
        type(psb_desc_type), intent(in) ::  desc_a
