@@ -9,128 +9,6 @@ calling PSBLAS routines in Fortran~90 language and will be used to next
 chapters containing these callings. Their definitions are included in
 the modules \verb|psb_spmat_type|, \verb|psb_descriptor_type| and \verb|psb_prec_type|. 
 
-\subsection{Sparse Matrix data structure}
-\label{sec:spmat}
-The \hypertarget{spdata}{{\tt psb\_spmat\_type}} data structure
-contains all information about local portion of the sparse matrix and   
-its storage mode. Many of this fields are set in fully-transparent
-mode by PSBLAS-TOOLS routines when inserting a new sparse matrix, user
-must set only fields which describe matrix storage mode. \\
-Fields contained in Sparse matrix structures are:
-\begin{description}
-\item[{\bf aspk}] Contains values of the local distributed sparse
-matrix.\\
-Specified as: a pointer to an array of rank one of type corresponding
-to matrix entries type.
-\item[{\bf ia1}] Holds integer information on distributed sparse
-matrix. Actual information will depend on data format used.\\
-Specified as: a pointer to an integer array of rank one.
-\item[{\bf ia2}] Holds integer information on distributed sparse
-matrix. Actual information will depend on data format used.\\
-Specified as: a pointer to an integer array of rank one.
-\item[{\bf infoa}] On entry can hold auxiliary information on distributed sparse
-matrix.  Actual information will depend on data format used.\\
-Specified as: integer array of length \verb|psb_ifasize_|.
-\item[{\bf fida}] Defines the format of the distributed sparse matrix.\\
-Specified as: a string of length 5
-\item[{\bf descra}] Describe the characteristic of the distributed sparse matrix.\\
-Specified as: array of character of length 9.
-\item[{\bf pl}] Specifies the local row permutation of distributed sparse
-matrix. If pl(1) is equal to 0, then there isn't row permutation.\\
-Specified as: pointer to integer array of dimension equal to number of local row (matrix\_data[psb\_n\_row\_\hbox{]})
-\item[{\bf pr}] Specifies the local column permutation of distributed sparse
-matrix. If PR(1) is equal to 0, then there isn't columnm permutation.\\
-Specified as: pointer to integer array of dimension equal to number of
-local row (matrix\_data[psb\_n\_col\_\hbox{]})
-\item[{\bf m}] Number of rows; if row indices are stored explicitly,
-as in Coordinate Storage, should be greater than or equal to the
-maximum row index actually present in the sparse matrix.
-Specified as: integer variable.
-\item[{\bf k}] Number of columns; if column indices are stored explicitly,
-as in Coordinate Storage or Compressed Sparse Rows, should be greater
-than or equal to the maximum column  index actually present in the sparse matrix.
-Specified as: integer variable.
-\end{description}
-FORTRAN95 interface for distributed sparse matrices containing double precision
-real entries is defined as in figure~\ref{fig:spmattype}.
-\begin{figure}[h!]
-  \begin{Sbox}
-    \begin{minipage}[tl]{0.85\textwidth}
-\begin{verbatim}
-type psb_dspmat_type
-   integer     :: m, k
-   character   :: fida(5)
-   character   :: descra(10)
-   integer     :: infoa(psb_ifa_size_)
-   real(kind(1.d0)), pointer :: aspk(:)
-   integer, pointer :: ia1(:), ia2(:), pr(:), pl(:)
-end type psb_dspmat_type
-\end{verbatim}
-    \end{minipage}
-  \end{Sbox}
-  \setlength{\fboxsep}{8pt}
-  \begin{center}
-    \fbox{\TheSbox}
-  \end{center}
-  \caption{\label{fig:spmattype} 
-    The PSBLAS defined data type that
-    contains a sparse matrix.} 
-\end{figure}
-
-The following two cases are among the most commonly used: 
-\begin{description}
-\item[fida=``CSR''] Compressed storage by rows. In this case the
-following should hold: 
-\begin{enumerate}
-\item \verb|ia2(i)| contains the index of the first element of row
-\verb|i|; the last element of the sparse matrix is thus stored at
-index $ia2(m+1)-1$. It should contain \verb|m+1| entries in
-nondecreasing order (strictly increasing, if there are no empty rows).
-\item \verb|ia1(j)| contains the column index and \verb|aspk(j)|
-contains the corresponding coefficient value, for all $ia2(1) \le j
-\le ia2(m+1)-1$.
-\end{enumerate}
-\item[fida=``COO''] Coordinate storage. In this case the following
-should hold: 
-\begin{enumerate}
-\item \verb|infoa(1)| contains the number of nonzero elements in the
-matrix; 
-\item For all $1 \le j \le infoa(1)$, the coefficient, row index and
-column index are stored into \verb|apsk(j)|, \verb|ia1(j)| and
-\verb|ia2(j)| respectively. 
-\end{enumerate}
-\end{description}
-A sparse matrix has an associated state, which can take the following
-values:
-\begin{description}
-\item[Build:] State entered after the first allocation, and before the
-  first assembly; in this state it is possible to add nonzero entries.
-\item[Assembled:] State entered after the assembly; computations using
-  the sparse matrix, such as matrix-vector products, are only possible
-  in this state;
-\item[Update:] State entered after a reinitalization; this is used to
-  handle applications in which the same sparsity pattern is used
-  multiple times with different coefficients. In this state it is only
-  possible to enter coefficients for already existing nonzero entries.
-\end{description}
-\subsubsection{Named Constants}
-\label{sec:sp_constants}
-\begin{description}
-\item[psb\_nztotreq\_] Request to fetch the total number of nonzeroes
-  stored in a sparse matrix
-\item[psb\_nzrowreq\_] Request to fetch the number of nonzeroes in a
-  given row in a sparse matrix
-\item[psb\_dupl\_ovwrt\_] Duplicate coefficients should be overwritten
-  (i.e. ignore duplications)
-\item[psb\_dupl\_add\_] Duplicate coefficients should be added;	         
-\item[psb\_dupl\_err\_] Duplicate coefficients should trigger an error conditino
-\item[psb\_upd\_dflt\_] Default update strategy for matrix coefficients;
-\item[psb\_upd\_srch\_] Update strategy based on search into the data structure;
-\item[psb\_upd\_perm\_] Update strategy based on additional
-  permutation data (see tools routine description).
-\end{description}
-
-
 
 \subsection{Descriptor data structure}
 \label{sec:desc}
@@ -139,7 +17,8 @@ exchanged among processes are stored within a data structure of the
 type \hypertarget{descdata}{{\tt psb\_desc\_type}}. 
 Every structure of this type is associated to a sparse matrix, it
 contains data about general matrix informations and elements to be
-exchanged among processes.  \\ 
+exchanged among processes.  
+
 It is not necessary for the user to
 know the internal structure of \verb|psb_desc_type|, it is set in
 fully-transparent mode by PSBLAS-TOOLS routines when inserting a new
@@ -261,6 +140,130 @@ state, which can take the following values:
 \item[psb\_desc\_bld\_] State of the descriptor: build, must be
   assembled before computational use.
 \end{description}
+
+
+
+\subsection{Sparse Matrix data structure}
+\label{sec:spmat}
+The \hypertarget{spdata}{{\tt psb\_spmat\_type}} data structure
+contains all information about local portion of the sparse matrix and   
+its storage mode. Many of this fields are set in fully-transparent
+mode by PSBLAS-TOOLS routines when inserting a new sparse matrix, user
+must set only fields which describe matrix storage mode. \\
+Fields contained in Sparse matrix structures are:
+\begin{description}
+\item[{\bf aspk}] Contains values of the local distributed sparse
+matrix.\\
+Specified as: a pointer to an array of rank one of type corresponding
+to matrix entries type.
+\item[{\bf ia1}] Holds integer information on distributed sparse
+matrix. Actual information will depend on data format used.\\
+Specified as: a pointer to an integer array of rank one.
+\item[{\bf ia2}] Holds integer information on distributed sparse
+matrix. Actual information will depend on data format used.\\
+Specified as: a pointer to an integer array of rank one.
+\item[{\bf infoa}] On entry can hold auxiliary information on distributed sparse
+matrix.  Actual information will depend on data format used.\\
+Specified as: integer array of length \verb|psb_ifasize_|.
+\item[{\bf fida}] Defines the format of the distributed sparse matrix.\\
+Specified as: a string of length 5
+\item[{\bf descra}] Describe the characteristic of the distributed sparse matrix.\\
+Specified as: array of character of length 9.
+\item[{\bf pl}] Specifies the local row permutation of distributed sparse
+matrix. If pl(1) is equal to 0, then there isn't row permutation.\\
+Specified as: pointer to integer array of dimension equal to number of local row (matrix\_data[psb\_n\_row\_\hbox{]})
+\item[{\bf pr}] Specifies the local column permutation of distributed sparse
+matrix. If PR(1) is equal to 0, then there isn't columnm permutation.\\
+Specified as: pointer to integer array of dimension equal to number of
+local row (matrix\_data[psb\_n\_col\_\hbox{]})
+\item[{\bf m}] Number of rows; if row indices are stored explicitly,
+as in Coordinate Storage, should be greater than or equal to the
+maximum row index actually present in the sparse matrix.
+Specified as: integer variable.
+\item[{\bf k}] Number of columns; if column indices are stored explicitly,
+as in Coordinate Storage or Compressed Sparse Rows, should be greater
+than or equal to the maximum column  index actually present in the sparse matrix.
+Specified as: integer variable.
+\end{description}
+FORTRAN95 interface for distributed sparse matrices containing double precision
+real entries is defined as in figure~\ref{fig:spmattype}.
+\begin{figure}[h!]
+  \begin{Sbox}
+    \begin{minipage}[tl]{0.85\textwidth}
+\begin{verbatim}
+type psb_dspmat_type
+   integer     :: m, k
+   character   :: fida(5)
+   character   :: descra(10)
+   integer     :: infoa(psb_ifa_size_)
+   real(kind(1.d0)), pointer :: aspk(:)
+   integer, pointer :: ia1(:), ia2(:), pr(:), pl(:)
+end type psb_dspmat_type
+\end{verbatim}
+    \end{minipage}
+  \end{Sbox}
+  \setlength{\fboxsep}{8pt}
+  \begin{center}
+    \fbox{\TheSbox}
+  \end{center}
+  \caption{\label{fig:spmattype} 
+    The PSBLAS defined data type that
+    contains a sparse matrix.} 
+\end{figure}
+
+The following two cases are among the most commonly used: 
+\begin{description}
+\item[fida=``CSR''] Compressed storage by rows. In this case the
+following should hold: 
+\begin{enumerate}
+\item \verb|ia2(i)| contains the index of the first element of row
+\verb|i|; the last element of the sparse matrix is thus stored at
+index $ia2(m+1)-1$. It should contain \verb|m+1| entries in
+nondecreasing order (strictly increasing, if there are no empty rows).
+\item \verb|ia1(j)| contains the column index and \verb|aspk(j)|
+contains the corresponding coefficient value, for all $ia2(1) \le j
+\le ia2(m+1)-1$.
+\end{enumerate}
+\item[fida=``COO''] Coordinate storage. In this case the following
+should hold: 
+\begin{enumerate}
+\item \verb|infoa(1)| contains the number of nonzero elements in the
+matrix; 
+\item For all $1 \le j \le infoa(1)$, the coefficient, row index and
+column index are stored into \verb|apsk(j)|, \verb|ia1(j)| and
+\verb|ia2(j)| respectively. 
+\end{enumerate}
+\end{description}
+A sparse matrix has an associated state, which can take the following
+values:
+\begin{description}
+\item[Build:] State entered after the first allocation, and before the
+  first assembly; in this state it is possible to add nonzero entries.
+\item[Assembled:] State entered after the assembly; computations using
+  the sparse matrix, such as matrix-vector products, are only possible
+  in this state;
+\item[Update:] State entered after a reinitalization; this is used to
+  handle applications in which the same sparsity pattern is used
+  multiple times with different coefficients. In this state it is only
+  possible to enter coefficients for already existing nonzero entries.
+\end{description}
+\subsubsection{Named Constants}
+\label{sec:sp_constants}
+\begin{description}
+%% \item[psb\_nztotreq\_] Request to fetch the total number of nonzeroes
+%%   stored in a sparse matrix
+%% \item[psb\_nzrowreq\_] Request to fetch the number of nonzeroes in a
+%%   given row in a sparse matrix
+\item[psb\_dupl\_ovwrt\_] Duplicate coefficients should be overwritten
+  (i.e. ignore duplications)
+\item[psb\_dupl\_add\_] Duplicate coefficients should be added;	         
+\item[psb\_dupl\_err\_] Duplicate coefficients should trigger an error conditino
+\item[psb\_upd\_dflt\_] Default update strategy for matrix coefficients;
+\item[psb\_upd\_srch\_] Update strategy based on search into the data structure;
+\item[psb\_upd\_perm\_] Update strategy based on additional
+  permutation data (see tools routine description).
+\end{description}
+
 
 
 \subsection{Preconditioner data structure}

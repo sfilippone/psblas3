@@ -133,6 +133,49 @@ are classified as:
 \item[local] Each process has its own value(s) independently.
 \end{description}
 
+\subsection{Application structure}
+
+The main underlying principle of the PSBLAS library is that the
+library objects are created and exist with reference to a discretized
+space to which there corresponds and index space and a matrix sparsity
+pattern. As an example, consider a cell-centered finite-volume
+discretization of  the Navier-Stokes equations on a simulation domain;
+the index space $1\dots n$ is isomorphic to the set of cell centers,
+whereas the pattern of the associated linear system matrix is
+isomorphic to the adjacency graph imposed on the discretization mesh
+by the discretization stencil. 
+
+Thus the first order of business is to establish an index space, and
+this is done with a call to  \verb|psb_cdall| in which we specify the
+size of the index space $n$ and the allocation of the elements of the
+index space to the various processes making up the MPI (virtual)
+parallel machine. 
+
+The index space is partitioned among processes, and this creates a
+mapping from the ``global'' numbering $1\dots n$ to a numbering
+``local'' to each process; each process $i$ will own a certain subset
+$1\dots n_{\hbox{row}_i}$, each element of which corresponds to a certain
+element of $1\dots n$. The user does not set explicitly this mapping;
+when the application needs to indicate to which element of the index
+space a certain item is related, such as the row and column index of a
+matrix coefficient, it does so in the ``global'' numbering, and the
+library will translate into the appropriate ``local'' numbering. 
+
+For  a given index space $1\dots n$ there are many possible associated
+topologies, i.e. many different discretization stencils; thus the
+description of the index space is not completed until the user has
+defined a sparsity pattern, either explicitly through \verb|psb_cdins|
+or implicitly through \verb|psb_spins|. The descriptor is finalized
+with a call to \verb|psb_cdasb| and a sparse matrix with a call to
+\verb|psb_spasb|. After \verb|psb_cdasb| each process $i$ will have
+defined a set of ``halo'' (or ``ghost'') indices
+$n_{\hbox{row}_i}+1\dots n_{\hbox{col}_i}$, denoting elements of the index
+space that are \emph{not} assigned to process $i$; however the
+variables associated with them are needed to complete computations
+associated with the sparse matrix $A$, and thus they have to be
+fetched from (neighbouring) processes. The descriptor of the index
+space is built exactly for the purpose of properly sequencing the
+communication steps required to achieve this objective. 
 
 %%% Local Variables: 
 %%% mode: latex
