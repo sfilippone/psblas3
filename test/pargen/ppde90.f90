@@ -173,19 +173,6 @@ program pde90
      call psb_precset(pre,'asm',iv=(/novr,halo_,none_/))
   case(rash_)             
      call psb_precset(pre,'asm',iv=(/novr,nohalo_,none_/))
-  case(ras2lv_) 
-     ptype='asm'
-     call psb_precset(pre,ptype,iv=(/novr,halo_,none_/))
-     ptype='ml'
-     call psb_precset(pre,ptype,&
-          &iv=(/add_ml_prec_,loc_aggr_,no_smth_,mat_repl_,&
-          &    pre_smooth_/),rs=0.d0)
-  case(ras2lvm_) 
-     ptype='asm'
-     call psb_precset(pre,ptype,iv=(/novr,halo_,none_/))
-     ptype='ml'
-     call psb_precset(pre,ptype,&
-          & iv=(/mult_ml_prec_,glb_aggr_,pre_smooth_/),rs=0.d0)
   end select
   
   call blacs_barrier(icontxt,'ALL')

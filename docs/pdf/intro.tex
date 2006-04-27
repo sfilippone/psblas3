@@ -22,7 +22,7 @@ subroutines. In this way, the library can take care of runtime memory
 requirements that are quite difficult or even impossible to predict at
 implementation or compilation time.  The following presentation of the
 PSBLAS library follows the general structure of the proposal for
-serial Sparse BLAS~\cite{sblas97}, which in its turn is based on the
+serial Sparse BLAS~\cite{sblas97,sblas02}, which in its turn is based on the
 proposal for BLAS on dense matrices~\cite{BLAS1,BLAS2,BLAS3}.
 
 The applicability of sparse iterative solvers to many different areas
@@ -63,7 +63,7 @@ the serial sparse BLAS, so that any extension made to the data
 structures of the serial kernels is available to the parallel
 version. The overall design and parallelization strategy have been
 influenced by the structure of the ScaLAPACK parallel
-library~\cite{scalapack}.  The layered structure of the PSBLAS library
+library.  The layered structure of the PSBLAS library
 is shown in figure~\ref{fig:psblas} ; lower layers of the library
 indicate an encapsulation relationship with upper layers. The ongoing
 discussion focuses on the Fortran~95 layer immediately below the
@@ -76,7 +76,11 @@ that guarantees a portable and efficient communication layer. The
 Message Passing Interface code is encapsulated within the BLACS
 layer. However, in some cases, MPI routines are directly used either
 to improve efficiency or to implement communication patterns for which
-the BLACS package doesn't provide any method.
+the BLACS package doesn't provide any method. 
+We assume that the user program has initialized a BLACS process grid
+with one column and as many rows as there are processes; the PSBLAS
+initialization routines will take the communication context for this
+grid and store internally for further use. 
 
 \begin{figure}[h] \begin{center}
 \includegraphics[scale=0.45]{figures/psblas}
@@ -87,7 +91,6 @@ the BLACS package doesn't provide any method.
 The PSBLAS library consists of two classes of subroutines that is, the
 {\em computational routines} and the {\em auxiliary routines}.  The
 computational routine set includes:
-
 \begin{itemize}
 \item Sparse matrix by dense matrix product; \item Sparse triangular
 systems solution for block diagonal matrices;
@@ -176,6 +179,97 @@ associated with the sparse matrix $A$, and thus they have to be
 fetched from (neighbouring) processes. The descriptor of the index
 space is built exactly for the purpose of properly sequencing the
 communication steps required to achieve this objective. 
+
+A simple application structure will walk through the index space
+allocation, matrix/vector creation and linear system solution as
+follows:
+\begin{enumerate}
+\item Initialize parallel environment with \verb|blacs_gridinit|
+\item Initialize index space with \verb|psb_cdall|
+\item Allocate sparse matrix and dense vectors with \verb|psb_spall|
+  and \verb|psb_geall|
+\item Loop over all local rows, generate matrix and vector entries,
+  and insert them with \verb|psb_spins| and \verb|psb_geins|
+\item Assemble the various entities: 
+\begin{enumerate}
+\item \verb|psb_cdasb|
+\item \verb|psb_spasb|
+\item \verb|psb_geasb|
+\end{enumerate}
+\item Choose the preconditioner to be used with \verb|psb_precset| and
+  build it with \verb|psb_precbld|
+\item Call the iterative method of choice, e.g. \verb|psb_bicgstab|
+\end{enumerate}
+This is the structure of the sample program
+\verb|test/pargen/ppde90.f90|. 
+
+For a simulation in which the same discretization mesh is used over
+multiple time steps, the following structure may be more appropriate:
+\begin{enumerate}
+\item Initialize parallel environment with \verb|blacs_gridinit|
+\item Initialize index space with \verb|psb_cdall|
+\item Loop over the topology of the discretization mesh and build the
+  descriptor with \verb|psb_cdins|
+\item Assemble the descriptor with \verb|psb_cdasb|
+\item Allocate the sparse matrices and dense vectors with
+  \verb|psb_spall| and \verb|psb_geall|
+\item Loop over the time steps: 
+\begin{enumerate}
+\item If after first time step, 
+  reinitialize the sparse matrix with \verb|psb_sprn|; also zero out
+  the dense vectors;
+\item Loop over the mesh, generate the coefficients and insert/update
+  them with \verb|psb_spins| and \verb|psb_geins|
+\item Assemble with \verb|psb_spasb| and \verb|psb_geasb|
+\item Choose and build preconditioner with \verb|psb_precset| and
+  \verb|psb_precbld|
+\item Call the iterative method of choice, e.g. \verb|psb_bicgstab|
+ \end{enumerate}
+\end{enumerate}
+The insertion routines will be called as many times as needed; it is
+clear that they only need be called on the data that is actually
+allocated to the current process, i.e. each process generates its own
+data. 
+
+In principle there is no specific order in the calls to
+\verb|psb_spins|, nor is there a requirement to build a matrix row in
+its entirety before calling the routine; this allows the application
+programmer to walk through the discretization mesh element by element,
+generating the main part of a given matrix row but also contributions
+to the rows corresponding to neighbouring elements. 
+
+From a functional point of view it is even possible to execute one
+call for each nonzero coefficient; however this would have a
+substantial computational overhead. It is therefore advisable to pack
+a certain amount of data into each call to the insertion routine, say
+touching on a few tens of rows; the best performng value would depend
+on both the architecture of the computer being used and on the problem
+structure. 
+At the opposite extreme, it would be possible to generate the entire
+part of a coefficient matrix residing on a process and pass it in a
+single call to \verb|psb_spins|; this, however, would entail a
+doubling of memory occupation, and thus would be almost always far
+from optimal. 
+
+\subsection{Programming model}
+
+The PSBLAS librarary is based on the Single Program Multiple Data
+(SPMD) programming model: each process participating in the
+computation performs the same actions on a chunk of data. Parallelism
+is thus data-driven. 
+
+Because of this structure, practically all subroutines \emph{must} be
+called simultaneously by all processes participating in the
+computation, i.e each subroutine call acts implicitly as a
+synchronization point. The exceptions to this rule are:
+\begin{itemize}
+\item The insertion routines \verb|psb_cdins|, \verb|psb_spins| and
+  \verb|psb_geins|;
+\item The error handling routines.
+\end{itemize}
+In particular, as per the discussion in the previous section, the
+insertion routines may be called a different number of times on each
+process, depending on  the data distribution chosen by the user. 
 
 %%% Local Variables: 
 %%% mode: latex

@@ -158,7 +158,8 @@ module psb_prec_type
   end interface
 
   interface psb_prec_descr
-    module procedure psb_file_prec_descr, psb_zfile_prec_descr
+    module procedure psb_out_prec_descr, psb_file_prec_descr, &
+         &  psb_zout_prec_descr, psb_zfile_prec_descr
   end interface
 
   interface psb_prec_short_descr
@@ -166,6 +167,16 @@ module psb_prec_type
   end interface
 
 contains
+
+  subroutine psb_out_prec_descr(p)
+    type(psb_dprec_type), intent(in) :: p
+    call psb_file_prec_descr(6,p)
+  end subroutine psb_out_prec_descr
+
+  subroutine psb_zout_prec_descr(p)
+    type(psb_zprec_type), intent(in) :: p
+    call psb_zfile_prec_descr(6,p)
+  end subroutine psb_zout_prec_descr
 
   subroutine psb_file_prec_descr(iout,p)
     integer, intent(in)              :: iout

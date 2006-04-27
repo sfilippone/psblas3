@@ -18,38 +18,118 @@ many parameters that is possible to adjust to fit the user's needs:
 
 
 
-\subroutine{psb\_precset}{Sets the precodntioner type}
+\subroutine{psb\_precset}{Sets the preconditioner type}
 
-\syntax{call psb\_precset}{prec, ptype, iv, rs, rv, ierr}
+\syntax{call psb\_precset}{prec, ptype, iv, rs, ierr}
 
 \begin{description}
 \item[\bf On Entry]
 \item[prec] 
-Scope: {\bf global} \\
+Scope: {\bf local} \\
 Type: {\bf required}\\
-Specified as: e pronditioner data structure \precdata.
+Specified as: a pronditioner data structure \precdata.
 \item[ptype] the type of preconditioner. 
 Scope: {\bf global} \\
 Type: {\bf required}\\
-Specified as: a string.
+Specified as: a character string, see usage notes.
 \item[iv] integer parameters for the precondtioner. 
 Scope: {\bf global} \\
 Type: {\bf required}\\
-Specified as: an integer array.
+Specified as: an integer array, see usage notes. 
 \item[rs] 
-Scope: {\bf } \\
-Type: {\bf }\\
-Specified as: .
-\item[rv] 
-Scope: {\bf } \\
-Type: {\bf }\\
-Specified as: .
-\item[ierr] 
-Scope: {\bf } \\
-Type: {\bf }\\
-Specified as: .
-\end{description}
+Scope: {\bf global} \\
+Type: {\bf optional}\\
+Specified as: a long precision real number.
 
+\item[ierr] 
+Scope: {\bf global} \\
+Type: {\bf required}\\
+\end{description}
+\section*{Usage Notes}
+The PSBLAS 2.0 contains a number of preconditioners, ranging from a
+simple diagonal scaling to 2-level domain decomposition. These
+preconditioners may use the SuperLU or the UMFPACK software, if
+installed; see~\cite{SUPERLU,UMFPACK}. 
+Legal inputs to this subroutine are interpreted depending on the
+$ptype$ string as follows\footnote{The string is case-insensitive}:
+\begin{description}
+\item[NONE] No preconditioning, i.e. the preconditioner is just a copy
+  operator.
+\item[DIAG] Diagonal scaling; each entry of the input vector is
+  multiplied by the reciprocal of the sum of the absolute values of
+  the coefficients in the corresponding row of matrix  $A$;
+\item[ILU] Precondition by the incomplete LU factorization of the
+  block-diagonal of matrix $A$, where block boundaries are determined
+  by the data allocation boundaries for each process; requires no
+  communication. Only $ILU(0)$ is currently implemented. 
+\item[AS] Additive Schwarz preconditioner (see~\cite{PARA04}); in this
+  case the user may specify additional flags through the integer
+  vector \verb|ir| as follows:
+\begin{description}
+\item[$iv(1)$] Number of overlap levels, an integer $novr>0$, default
+  $novr=1$.  
+\item[$iv(2)$] Restriction operator, legal values: \verb|psb_halo_|,
+  \verb|psb_none_|; default: \verb|psb_halo_|
+\item[$iv(3)$] Prolongation operator, legal values: \verb|psb_none_|,
+  \verb|psb_sum_|, \verb|psb_avg_|, default: \verb|psb_none_|
+\item[$iv(4)$] Factorization type, legal values: \verb|f_ilu_n_|,
+  \verb|f_slu_|, \verb|f_umf_|, default: \verb|f_ilu_n_|.
+\end{description}
+Note that the default corresponds to a Restricted Additive Schwarz
+preconditioner with $ILU(0)$ and 1 level of overlap.
+\end{description}
+If a multilevel preconditioner is desired, the user should call
+\verb|psb_precset| once choosing AS, and a second time specifying
+$ptype=ML$ with the following optional parameters in $iv$ (see
+also~\cite{APNUM,DD2}): 
+\begin{description}
+\item[$iv(1)$] Type of multilevel correction, legal values: \verb|no_ml_|,
+  \verb|add_ml_prec_|, \verb|mult_ml_prec_|,
+  default: \verb|mult_ml_prec_|;
+\item[$iv(2)$] Aggregation algorithm, legal values: \verb|loc_aggr_|;
+\item[$iv(3)$] Smoother type, legal values: \verb|no_smth_|,
+  \verb|smth_omg_|, default: \verb|smth_omg_|;
+\item[$iv(4)$] Coarse matrix allocation, legal values:
+  \verb|mat_distr_|, \verb|mat_repl_|, default: \verb|mat_distr_|
+\item[$iv(5)$] Smoother position, legal values: \verb|pre_smooth_|,
+  \verb|post_smooth_|, \verb|smooth_both_|, default:
+  \verb|post_smooth_|
+\item[$iv(6)$] Factorization type (for coarse matrix), legal values: \verb|f_ilu_n_|,
+  \verb|f_slu_|, \verb|f_umf_|, default: \verb|f_ilu_n_|;
+\item[$iv(7)$] Number of Jacobi sweeps for coarse system correction,
+  default 1.
+\item[$rs$] Set the smoother parameter $\omega$ a user defined value;
+  default: esitimate with the infinity norm of matrix $A$.
+\end{description}
+The 2-level preconditioners are based on the idea of building a
+coarse-space approximation $A_C$ of the matrix $A$; given a set $W_C$
+of coarse vertices, with size $n_C$, and a suitable restriction
+operator $R_C \in \Re^{n_C \times n}$, $A_C$ is defined as 
+\[
+A_C=R_C A R_C^T .
+\]
+The prolongator $R_C^T$ is built with the smoothed aggregation technique,
+in which we start from a tentative prolongator that simply maps
+fine-level entries onto their aggregates $P_C$; if the user chooses
+\verb|no_smth_| this is the prolongator used, otherwise it is
+multiplied by a smoother \[ S = I - \omega D^{-1} A \], where $D$ is
+the diagonal of $A$ and  $\omega$ may be imposed by the user or
+estimated internally.   
+The coarse space correction may be added to the fine level solution
+\verb|add_ml_prec_|
+\[
+M_{2L-A}^{-1} = M_{C}^{-1} + M_{1L}^{-1}. 
+\]
+or it can be composed  in a multiplicative framework as a pre-smoothed
+correction
+\[
+M_{2L-H1}^{-1} = M_{C}^{-1} + \left( I - M_{C}^{-1}A \right) M_{1L}^{-1}, 
+\]
+post-smoothed correction
+\[
+M_{2L-H2}^{-1} = M_{1L}^{-1} + \left( I - M_{1L}^{-1}A \right) M_{C}^{-1}. 
+\]
+or two-sided. 
 
 
 
@@ -60,11 +140,11 @@ Specified as: .
 \begin{description}
 \item[\bf On Entry]
 \item[a] the system sparse matrix.
-Scope: {\bf global} \\
+Scope: {\bf local} \\
 Type: {\bf required}\\
 Specified as: a sparse matrix data structure \spdata.
 \item[desc\_a] the problem communication descriptor. 
-Scope: {\bf global} \\
+Scope: {\bf local} \\
 Type: {\bf required}\\
 Specified as: a communication descriptor data structure \descdata.
 \item[upd] 
@@ -75,14 +155,14 @@ Specified as: a character.
 
 \begin{description}
 \item[\bf On Return]
-\item[prec] the precodntioner.\\
-Scope: {\bf global} \\
+\item[prec] the preconditioner.\\
+Scope: {\bf local} \\
 Type: {\bf required}\\
 Specified as: a precondtioner data structure \precdata\\
 \item[info] the return error code.\\
-Scope: {\bf local} \\
+Scope: {\bf global} \\
 Type: {\bf required}\\
-Specified as: an integer.\\
+Specified as: an integer, upon successful completion $info=0$ \\
 \end{description}
 
 
@@ -95,15 +175,15 @@ Specified as: an integer.\\
 \begin{description}
 \item[\bf On Entry]
 \item[prec] the preconditioner.
-Scope: {\bf global} \\
+Scope: {\bf local} \\
 Type: {\bf required}\\
 Specified as: a preconditioner data structure \precdata.
 \item[x] the source vector.
-Scope: {\bf global} \\
+Scope: {\bf local} \\
 Type: {\bf require}\\
 Specified as: a double precision array.
 \item[desc\_a] the problem communication descriptor.
-Scope: {\bf global} \\
+Scope: {\bf local} \\
 Type: {\bf required}\\
 Specified as: a communication data structure \descdata.
 \item[trans] 
@@ -119,13 +199,27 @@ Specified as: a double precision array.
 \begin{description}
 \item[\bf On Return]
 \item[y] the destination vector.
-Scope: {\bf global} \\
+Scope: {\bf local} \\
 Type: {\bf required}\\
 Specified as: a double precision array.
 \item[info] the return error code.\\
 Scope: {\bf local} \\
 Type: {\bf required}\\
-Specified as: an integer.\\
+Specified as: an integer, upon successful completion $info=0$ .\\
+\end{description}
+
+
+
+\subroutine{psb\_prec\_descr}{Prints a description of current preconditioner}
+
+\syntax{call psb\_prec\_descr}{prec}
+
+\begin{description}
+\item[\bf On Entry]
+\item[prec] the preconditioner.
+Scope: {\bf local} \\
+Type: {\bf required}\\
+Specified as: a preconditioner data structure \precdata.
 \end{description}
 
 

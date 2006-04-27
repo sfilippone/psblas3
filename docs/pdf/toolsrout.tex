@@ -65,6 +65,11 @@ Type: {\bf required}\\
 Specified as: an integer variable.\\
 \end{description}
 
+\section*{Notes}
+\begin{enumerate}
+\item On exit from this routine the descriptor is in the build state
+\end{enumerate}
+
 
 %
 %%   psb_cdins %%
@@ -108,6 +113,11 @@ Scope: {\bf local} \\
 Type: {\bf required}\\
 Specified as: an integer variable.
 \end{description}
+\section*{Notes}
+\begin{enumerate}
+\item This routine may only be called if the descriptor is in the
+  build state
+\end{enumerate}
 
 
 
@@ -134,6 +144,11 @@ Type: {\bf required}\\
 Specified as: an integer variable.
 %\item[arg] 
 \end{description}
+\section*{Notes}
+\begin{enumerate}
+\item On exit from this routine the descriptor is in the assembled
+  state. 
+\end{enumerate}
 
 
 
@@ -285,6 +300,12 @@ Scope: {\bf local} \\
 Type: {\bf required}\\
 Specified as: an integer variable.
 \end{description}
+\section*{Notes}
+\begin{enumerate}
+\item On exit from this routine the sparse matrix  is in the build
+  state.
+\item The descriptor may be in either the build or assembled state.
+\end{enumerate}
 
 
 
@@ -342,6 +363,22 @@ Scope: {\bf local} \\
 Type: {\bf required}\\
 \end{description}
 
+\section*{Notes}
+\begin{enumerate}
+\item On entry to this routine the descriptor may be in either the
+  build or assembled state.
+\item On entry to this routine the sparse matrix may be in either the
+  build or update state. 
+\item If the descriptor is in the build state, then the sparse matrix
+  ought also be in the buld state; the action of the routine is to
+  (implicitly) call \verb|psb_cdins| to add entries to the sparsity
+  pattern;
+\item If the descriptor is in the assembled state, then any entries in
+  the sparse matrix that would generate additional communication
+  requirements will be ignored; 
+\item If the matrix is in the update state, any entries in positions
+  that were not present in the original matrix will be ignored. 
+\end{enumerate}
 
 %
 %%   psb_spasb %%
@@ -382,6 +419,22 @@ Scope: {\bf local} \\
 Type: {\bf required}\\
 Specified as: an integer variable.
 \end{description}
+
+\section*{Notes}
+\begin{enumerate}
+\item On entry to this routine the descriptor must  be in  the
+  assembled state, i.e. \verb|psb_cdasb| must already have been called.
+\item The sparse matrix may be in either the build or update state;
+\item Duplicate entries are detected and handled in both build and
+  update state, with the exception of the error action that is only
+  taken in the build state, i.e. on the first assembly; 
+\item If the update choice is \verb|psb_upd_perm_|, then subsequent
+  calls to \verb|psb_spins| to update the matrix must be arranged in
+  such a way as to produce exactly the same sequence of coefficient
+  values as encountered at the first assembly; 
+\item On exit from this routine the matrix is in the assembled state,
+  and thus is suitable for the computational routines. 
+\end{enumerate}
 
 
 
@@ -474,7 +527,11 @@ Scope: {\bf local} \\
 Type: {\bf required}\\
 Specified as: an integer variable.
 \end{description}
-
+\section*{Notes}
+\begin{enumerate}
+\item On exit from this routine the sparse matrix is in the update
+  state. 
+\end{enumerate}
 %
 %%   psb_spupdate %%
 %
@@ -591,7 +648,7 @@ Specified as: a structured data of type \descdata.
 Scope: {\bf global}.\\
 Type: {\bf optional}.\\
 Specified as: integer, possible values: \verb|psb_dupl_ovwrt_|,
-\verb|psb_dupl_add_|, \verb|psb_dupl_err_|.
+\verb|psb_dupl_add_|.
 \end{description}
 
 \begin{description}
@@ -606,6 +663,14 @@ Scope: {\bf local} \\
 Type: {\bf required}\\
 Specified as: an integer variable.
 \end{description}
+
+\section*{Notes}
+\begin{enumerate}
+\item Dense vectors/matrices do not have an associated state;
+\item Duplicate entries are either overwritten or added, there is no
+  provision for raising an error condition. 
+\end{enumerate}
+
 
 %
 %%   psb_asb %%

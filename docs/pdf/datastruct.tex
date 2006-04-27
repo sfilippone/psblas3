@@ -6,8 +6,12 @@ In this chapter are illustrated data structures used for definition of
 routines interfaces. This include data structure for sparse matrix,
 communication descriptor and preconditioner. These data structures are used for
 calling PSBLAS routines in Fortran~90 language and will be used to next
-chapters containing these callings. Their definitions are included in
-the modules \verb|psb_spmat_type|, \verb|psb_descriptor_type| and \verb|psb_prec_type|. 
+chapters containing these callings. 
+
+All the data types and subroutine interfaces are defined in the module
+\verb|psb_sparse_mod|; this will have to be included by every user
+subroutine that makes use of the library. 
+
 
 
 \subsection{Descriptor data structure}

@@ -251,11 +251,11 @@ program df_sample
   case(7)
     call psb_precset(pre,'asm',iv=(/ml,halo_,none_/))
     call psb_precset(pre,'ml',&
-         & iv=(/mult_ml_prec_,loc_aggr_,smth_omg_,mat_distr_,post_smooth_,1,f_ilu_n_,4/))
+         & iv=(/mult_ml_prec_,loc_aggr_,smth_omg_,mat_distr_,post_smooth_,f_ilu_n_,4/))
   case(8)
     call psb_precset(pre,'asm',iv=(/ml,halo_,none_/))
     call psb_precset(pre,'ml',&
-         & iv=(/mult_ml_prec_,loc_aggr_,smth_omg_,mat_distr_,post_smooth_,1,f_umf_,4/))
+         & iv=(/mult_ml_prec_,loc_aggr_,smth_omg_,mat_distr_,post_smooth_,f_umf_,4/))
 
   case default
     call psb_precset(pre,'ilu')
