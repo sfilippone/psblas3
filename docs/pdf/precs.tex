@@ -77,11 +77,13 @@ $ptype$ string as follows\footnote{The string is case-insensitive}:
 \end{description}
 Note that the default corresponds to a Restricted Additive Schwarz
 preconditioner with $ILU(0)$ and 1 level of overlap.
+\item[2L] Second level of a multilevel preconditioner, see below
 \end{description}
 If a multilevel preconditioner is desired, the user should call
-\verb|psb_precset| once choosing AS, and a second time specifying
-$ptype=ML$ with the following optional parameters in $iv$ (see
-also~\cite{APNUM,DD2}): 
+\verb|psb_precset| twice, the first time  choosing an AS variant, and
+a second time specifying 
+$ptype=2L$ with the following optional parameters in $iv$ (see
+also~\cite{APNUM06,DD2}): 
 \begin{description}
 \item[$iv(1)$] Type of multilevel correction, legal values: \verb|no_ml_|,
   \verb|add_ml_prec_|, \verb|mult_ml_prec_|,

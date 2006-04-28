@@ -120,7 +120,7 @@ subroutine psb_dprecset(p,ptype,iv,rs,rv,info)
     end if
 
 
-  case ('ML', '2LEV')
+  case ('ML', '2L', '2LEV')
 
     select case (size(p%baseprecv)) 
     case(1)
