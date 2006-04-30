@@ -119,8 +119,8 @@ Subroutine psb_dsprn(a, desc_a,info)
 9999 continue
   call psb_erractionrestore(err_act)
   if (err_act.eq.act_abort) then
-     call psb_error(icontxt)
-     return
+    call psb_error(icontxt)
+    return
   end if
   return
 

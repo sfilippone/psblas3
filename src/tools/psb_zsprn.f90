@@ -73,39 +73,39 @@ Subroutine psb_zsprn(a, desc_a,info)
 
   !     ....verify blacs grid correctness..
   if (npcol.ne.1) then
-     info = 2030
-     call psb_errpush(info,name)
-     goto 9999
+    info = 2030
+    call psb_errpush(info,name)
+    goto 9999
   endif
 
   if (debug) write(*,*) 'got through igamx2d '
 
   if (.not.psb_is_asb_dec(desc_a%matrix_data(psb_dec_type_))) then
-     info=590     
-     call psb_errpush(info,name)
-     goto 9999
+    info=590     
+    call psb_errpush(info,name)
+    goto 9999
   endif
 
   if (a%infoa(psb_state_) == psb_spmat_asb_) then
 
-     a%aspk(:) = zzero
-     if (ibits(a%infoa(psb_upd_),2,1)==1) then 
-        if(a%fida(1:3).eq.'JAD') then
-           a%ia1(a%infoa(psb_upd_pnt_)+psb_nnz_) = 0
-        else
-           a%ia2(a%infoa(psb_upd_pnt_)+psb_nnz_) = 0
-        endif
-     endif
-     a%infoa(psb_state_) = psb_spmat_upd_
+    a%aspk(:) = zzero
+    if (psb_sp_getifld(psb_upd_,a,info)==psb_upd_perm_) then 
+      if(a%fida(1:3).eq.'JAD') then
+        a%ia1(a%infoa(psb_upd_pnt_)+psb_nnz_) = 0
+      else
+        a%ia2(a%infoa(psb_upd_pnt_)+psb_nnz_) = 0
+      endif
+    endif
+    a%infoa(psb_state_) = psb_spmat_upd_
   else if (a%infoa(psb_state_) == psb_spmat_bld_) then
-     ! in this case do nothing. this allows sprn to be called 
-     ! right after allocate, with spins doing the right thing.
-     ! hopefully :-)
+    ! in this case do nothing. this allows sprn to be called 
+    ! right after allocate, with spins doing the right thing.
+    ! hopefully :-)
   else if (a%infoa(psb_state_) == psb_spmat_upd_) then
 
   else
-     info=591     
-     call psb_errpush(info,name)
+    info=591     
+    call psb_errpush(info,name)
   endif
 
   if (info /= 0) goto 9999
@@ -117,8 +117,8 @@ Subroutine psb_zsprn(a, desc_a,info)
 9999 continue
   call psb_erractionrestore(err_act)
   if (err_act.eq.act_abort) then
-     call psb_error(icontxt)
-     return
+    call psb_error(icontxt)
+    return
   end if
   return
 
