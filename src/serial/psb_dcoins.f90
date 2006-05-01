@@ -38,7 +38,8 @@ subroutine psb_dcoins(nz,ia,ja,val,a,gtl,imin,imax,jmin,jmax,info)
   use psb_realloc_mod
   use psb_string_mod
   use psb_error_mod
-  use psb_serial_mod, only : psb_spinfo
+  use psb_serial_mod, only : psb_spinfo, psb_csdp
+  use psb_update_mod
   implicit none 
 
   integer, intent(in)                  :: nz, imin,imax,jmin,jmax
@@ -49,9 +50,11 @@ subroutine psb_dcoins(nz,ia,ja,val,a,gtl,imin,imax,jmin,jmax,info)
 
   character(len=5)     :: ufida
   integer              :: i,j,ir,ic,nr,nc, ng, nza, isza,spstate, nnz,&
-       & ip1, nzl, err_act, int_err(5), iupd
+       & ip1, nzl, err_act, int_err(5), iupd, irst
   logical, parameter   :: debug=.false.
+  logical              :: rebuild_
   character(len=20)    :: name, ch_err
+  type(psb_dspmat_type) :: tmp
 
   name='psb_dcoins'
   info  = 0
@@ -84,8 +87,12 @@ subroutine psb_dcoins(nz,ia,ja,val,a,gtl,imin,imax,jmin,jmax,info)
     goto 9999
   end if
 
+!!$  if (present(rebuild)) then 
+!!$    rebuild_ = rebuild
+!!$  else
+    rebuild_ = .false.
+!!$  end if
 
-!!$  ufida = toupper(a%fida)
   call touppers(a%fida,ufida)
   ng = size(gtl)
   spstate = psb_sp_getifld(psb_state_,a,info) 
@@ -101,7 +108,7 @@ subroutine psb_dcoins(nz,ia,ja,val,a,gtl,imin,imax,jmin,jmax,info)
     end if
     call psb_spinfo(psb_nztotreq_,a,nza,info)
     call psb_spinfo(psb_nzsizereq_,a,isza,info)
-    if(info.ne.izero) then
+    if(info /= izero) then
       info=4010
       ch_err='psb_spinfo'
       call psb_errpush(info,name,a_err=ch_err)
@@ -110,7 +117,7 @@ subroutine psb_dcoins(nz,ia,ja,val,a,gtl,imin,imax,jmin,jmax,info)
 
     if ((nza+nz)>isza) then 
       call psb_sp_reall(a,max(nza+nz,int(1.5*isza)),info)
-      if(info.ne.izero) then
+      if(info /= izero) then
         info=4010
         ch_err='psb_sp_reall'
         call psb_errpush(info,name,a_err=ch_err)
@@ -119,7 +126,7 @@ subroutine psb_dcoins(nz,ia,ja,val,a,gtl,imin,imax,jmin,jmax,info)
     endif
     call psb_inner_ins(nz,ia,ja,val,nza,a%ia1,a%ia2,a%aspk,gtl,ng,&
          & imin,imax,jmin,jmax,info)
-    if(info.ne.izero) then
+    if(info /= izero) then
       info=4010
       ch_err='psb_inner_ins'
       call psb_errpush(info,name,a_err=ch_err)
@@ -150,7 +157,7 @@ subroutine psb_dcoins(nz,ia,ja,val,a,gtl,imin,imax,jmin,jmax,info)
       call psb_inner_upd(nz,ia,ja,val,nza,a%aspk,gtl,ng,&
            & imin,imax,jmin,jmax,nzl,info)
 
-      if(info.ne.izero) then
+      if (info /= izero) then
         info=4010
         ch_err='psb_inner_upd'
         call psb_errpush(info,name,a_err=ch_err)
@@ -167,22 +174,51 @@ subroutine psb_dcoins(nz,ia,ja,val,a,gtl,imin,imax,jmin,jmax,info)
 
     case (psb_upd_dflt_, psb_upd_srch_)
 
-      select case(toupper(a%fida))
-      case ('CSR') 
-!!$      write(0,*) 'Calling csr_inner_upd'
-        call  csr_inner_upd(nz,ia,ja,val,nza,a,gtl,ng,&
+      call  psb_srch_upd(nz,ia,ja,val,nza,a,gtl,ng,&
              & imin,imax,jmin,jmax,nzl,info)
-!!$      write(0,*) 'From csr_inner_upd:',info
-      case ('COO') 
-        call  coo_inner_upd(nz,ia,ja,val,nza,a,gtl,ng,&
-             & imin,imax,jmin,jmax,nzl,info)
-
-      case default
-
+      if (info > 0) then 
+        if (rebuild_) then 
+          write(0,*) 'COINS: Going through rebuild_ fingers crossed!'
+          irst = info
+          call psb_nullify_sp(tmp)
+          tmp%fida='COO'
+          call psb_csdp(a,tmp,info)
+          call psb_setifield(psb_spmat_bld_,psb_state_,tmp,info)
+          call psb_sp_transfer(tmp,a,info)
+          call psb_spinfo(psb_nztotreq_,a,nza,info)
+          call psb_spinfo(psb_nzsizereq_,a,isza,info)
+          if(info /= izero) then
+            info=4010
+            ch_err='psb_spinfo'
+            call psb_errpush(info,name,a_err=ch_err)
+            goto 9999
+          endif
+          
+          if ((nza+nz)>isza) then 
+            call psb_sp_reall(a,max(nza+nz,int(1.5*isza)),info)
+            if(info /= izero) then
+              info=4010
+              ch_err='psb_sp_reall'
+              call psb_errpush(info,name,a_err=ch_err)
+              goto 9999
+            endif
+          endif
+          if (irst <= nz) then 
+            call psb_inner_ins((nz-irst+1),ia(irst:nz),ja(irst:nz),val(irst:nz),&
+                 & nza,a%ia1,a%ia2,a%aspk,gtl,ng,imin,imax,jmin,jmax,info)
+          end if
+          
+        else
+          info = 2231
+          call psb_errpush(info,name)
+          goto 9999 
+        end if
+      else if (info < 0) then
         info = 2230
         call psb_errpush(info,name)
         goto 9999 
-      end select
+
+      end if
 
     case default  
 
@@ -277,215 +313,6 @@ contains
     end do
 
   end subroutine psb_inner_ins
-
-
-  subroutine csr_inner_upd(nz,ia,ja,val,nza,a,gtl,ng,&
-       & imin,imax,jmin,jmax,nzl,info)
-    implicit none 
-
-    type(psb_dspmat_type), intent(inout) :: a
-    integer, intent(in) :: nz, imin,imax,jmin,jmax,nzl,ng
-    integer, intent(in) :: ia(*),ja(*),gtl(*)
-    integer, intent(inout) :: nza
-    real(kind(1.d0)), intent(in) :: val(*)
-    integer, intent(out) :: info
-    integer  :: i,ir,ic,check_flag, ilr, ilc, ip, &
-         & i1,i2,nc,lb,ub,m,nnz,dupl
-
-    info = 0
-
-    dupl = psb_sp_getifld(psb_dupl_,a,info)
-
-    select case(dupl)
-    case(psb_dupl_ovwrt_,psb_dupl_err_)
-      ! Overwrite.
-      ! Cannot test for error, should have been caught earlier.
-
-      ilr = -1 
-      ilc = -1 
-      do i=1, nz
-        ir = ia(i)
-        ic = ja(i) 
-        if ((ir >=1).and.(ir<=ng).and.(ic>=1).and.(ic<=ng)) then 
-          ir = gtl(ir)
-          ic = gtl(ic) 
-          i1 = a%ia2(ir)
-          i2 = a%ia2(ir+1)
-          nc=i2-i1
-
-
-          if (.true.) then 
-            call issrch(ip,ic,nc,a%ia1(i1:i2-1))    
-            if (ip>0) then 
-              a%aspk(i1+ip-1) = val(i)
-            else
-              write(0,*)'Was searching ',ic,' in: ',i1,i2,' : ',a%ia1(i1:i2-1)
-              info = -1
-              return
-            end if
-
-          else
-!!$ 
-            ip = -1
-            lb = i1
-            ub = i2-1
-            do
-              if (lb > ub) exit
-              m = (lb+ub)/2
-!!$              write(0,*) 'Debug: ',lb,m,ub
-              if (ic == a%ia1(m))  then
-                ip   = m 
-                lb   = ub + 1
-              else if (ic < a%ia1(m))  then
-                ub = m-1
-              else 
-                lb = m + 1
-              end if
-            enddo
-
-            if (ip>0) then 
-              a%aspk(ip) = val(i)                
-            else
-              write(0,*)'Was searching ',ic,' in: ',i1,i2,' : ',a%ia1(i1:i2-1)
-              info = -1
-              return
-            end if
-
-          end if
-        end if
-      end do
-
-    case(psb_dupl_add_)
-      ! Add
-      ilr = -1 
-      ilc = -1 
-      do i=1, nz
-        ir = ia(i)
-        ic = ja(i) 
-        if ((ir >=1).and.(ir<=ng).and.(ic>=1).and.(ic<=ng)) then 
-          ir = gtl(ir)
-          ic = gtl(ic) 
-          i1 = a%ia2(ir)
-          i2 = a%ia2(ir+1)
-          nc = i2-i1
-          call issrch(ip,ic,nc,a%ia1(i1:i2-1))
-          if (ip>0) then 
-            a%aspk(i1+ip-1) = a%aspk(i1+ip-1) + val(i)
-          else
-            info = -2 
-            return
-          end if
-        end if
-      end do
-
-    case default
-      info = -3
-      write(0,*) 'Duplicate handling: ',dupl
-    end select
-  end subroutine csr_inner_upd
-
-  subroutine coo_inner_upd(nz,ia,ja,val,nza,a,gtl,ng,&
-       & imin,imax,jmin,jmax,nzl,info)
-    implicit none 
-
-    type(psb_dspmat_type), intent(inout) :: a
-    integer, intent(in) :: nz, imin,imax,jmin,jmax,nzl,ng
-    integer, intent(in) :: ia(*),ja(*),gtl(*)
-    integer, intent(inout) :: nza
-    real(kind(1.d0)), intent(in) :: val(*)
-    integer, intent(out) :: info
-    integer  :: i,ir,ic,check_flag, ilr, ilc, ip, &
-         & i1,i2,nc,lb,ub,m,nnz,dupl,isrt
-
-    info = 0
-
-    dupl = psb_sp_getifld(psb_dupl_,a,info)
-
-    if (psb_sp_getifld(psb_srtd_,a,info) /= psb_isrtdcoo_) then 
-      info = -4
-      return
-    end if
-
-    ilr = -1 
-    ilc = -1 
-    nnz = psb_sp_getifld(psb_nnz_,a,info)
-
-
-    select case(dupl)
-    case(psb_dupl_ovwrt_,psb_dupl_err_)
-      ! Overwrite.
-      ! Cannot test for error, should have been caught earlier.
-      do i=1, nz
-        ir = ia(i)
-        ic = ja(i) 
-        if ((ir >=1).and.(ir<=ng).and.(ic>=1).and.(ic<=ng)) then 
-          ir = gtl(ir)
-          ic = gtl(ic) 
-          if (ir /= ilr) then 
-            call ibsrch(i1,ir,nnz,a%ia1)
-            i2 = i1
-            do 
-              if (i2+1 > nnz) exit
-              if (a%ia1(i2+1) /= a%ia1(i2)) exit
-              i2 = i2 + 1
-            end do
-            do 
-              if (i1-1 < 1) exit
-              if (a%ia1(i1-1) /= a%ia1(i1)) exit
-              i1 = i1 - 1
-            end do
-            ilr = ir
-          end if
-          nc = i2-i1+1
-          call issrch(ip,ic,nc,a%ia2(i1:i2))
-          if (ip>0) then 
-            a%aspk(i1+ip-1) = val(i)
-          else
-            info = -2 
-            return
-          end if
-        end if
-      end do
-    case(psb_dupl_add_)
-      ! Add
-      do i=1, nz
-        ir = ia(i)
-        ic = ja(i) 
-        if ((ir >=1).and.(ir<=ng).and.(ic>=1).and.(ic<=ng)) then 
-          ir = gtl(ir)
-          ic = gtl(ic) 
-          if (ir /= ilr) then 
-            call ibsrch(i1,ir,nnz,a%ia1)
-            i2 = i1
-            do 
-              if (i2+1 > nnz) exit
-              if (a%ia1(i2+1) /= a%ia1(i2)) exit
-              i2 = i2 + 1
-            end do
-            do 
-              if (i1-1 < 1) exit
-              if (a%ia1(i1-1) /= a%ia1(i1)) exit
-              i1 = i1 - 1
-            end do
-            ilr = ir
-          end if
-          nc = i2-i1+1
-          call issrch(ip,ic,nc,a%ia2(i1:i2))
-          if (ip>0) then 
-            a%aspk(i1+ip-1) = a%aspk(i1+ip-1) + val(i)
-          else
-            info = -2 
-            return
-          end if
-        end if
-      end do
-
-    case default
-      info = -3
-      write(0,*) 'Duplicate handling: ',dupl
-    end select
-
-  end subroutine coo_inner_upd
 
 end subroutine psb_dcoins
 

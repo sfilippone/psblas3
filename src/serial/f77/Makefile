@@ -3,8 +3,8 @@ include ../../../Make.inc
 #
 # The object files
 #
-FOBJS =  daxpby.o dcsmm.o dcsnmi.o dcsrp.o dcssm.o \
-	dcsupd.o dgelp.o dlpupd.o dswmm.o dswprt.o \
+FOBJS = daxpby.o dcsmm.o dcsnmi.o dcsrp.o dcssm.o \
+	dgelp.o dlpupd.o dswmm.o dswprt.o \
 	dswsm.o smmp.o dcsrws.o \
 	zcsnmi.o  zaxpby.o zcsmm.o zcssm.o zswmm.o zswsm.o\
 	zcsrws.o zgelp.o zlpupd.o
