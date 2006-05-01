@@ -63,7 +63,7 @@ Subroutine psb_dsphalo(a,desc_a,blk,info,rwcnv,clcnv,outfmt)
   integer, intent(out)                :: info
   logical, optional, intent(in)       :: rwcnv,clcnv
   character(len=5), optional          :: outfmt 
-  !c     ...local scalars....
+  !     ...local scalars....
   Integer    :: nprow,npcol,me,mycol,counter,proc,n,i,&
        &     n_el_send,k,n_el_recv,icontxt, idx, r, tot_elem,&
        &     n_elem, m, j, ipx,mat_recv, iszs, iszr,&

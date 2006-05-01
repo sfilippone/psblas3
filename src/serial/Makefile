@@ -46,7 +46,7 @@ f77d:
 	(cd f77; make lib)
 
 clean:
-	/bin/rm -f $(FOBJS)
+	/bin/rm -f $(FOBJS) *$(.mod)
 	(cd aux; make clean)
 	(cd coo; make clean)
 	(cd csr; make clean)
@@ -55,7 +55,7 @@ clean:
 	(cd f77; make clean)
 
 veryclean:
-	/bin/rm -f $(FOBJS)
+	/bin/rm -f $(FOBJS) *$(.mod)
 	(cd aux; make veryclean)
 	(cd coo; make veryclean)
 	(cd csr; make veryclean)

@@ -64,6 +64,7 @@ subroutine psb_dsymbmm(a,b,c)
   c%m=a%m
   c%k=b%k
   c%fida='CSR'
+  c%descra='GUN'
   deallocate(itemp) 
   return
 end subroutine psb_dsymbmm

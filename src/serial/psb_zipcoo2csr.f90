@@ -180,6 +180,7 @@ subroutine psb_zipcoo2csr(a,info,rwshr)
 
 !!$  write(0,*) 'IPcoo2csr end loop ',i,nr,a%ia2(nr+1),nza
   a%fida='CSR'
+  a%infoa(psb_upd_) = psb_upd_srch_
 
   deallocate(itemp)
   call psb_erractionrestore(err_act)

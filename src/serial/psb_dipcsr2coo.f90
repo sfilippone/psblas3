@@ -81,6 +81,8 @@ Subroutine psb_dipcsr2coo(a,info)
   a%fida='COO'
   a%infoa(psb_nnz_) = nza
   a%infoa(psb_srtd_) = psb_isrtdcoo_
+  a%infoa(psb_upd_) = psb_upd_srch_
+
   deallocate(itemp)
 
   call psb_erractionrestore(err_act)

@@ -36,7 +36,7 @@ subroutine psb_ztransc(a,b,c,fmt)
   use psb_spmat_type
   use psb_tools_mod
   use psb_string_mod
-  use psb_serial_mod, only : psb_ipcoo2csr, psb_ipcsr2coo, psb_fixcoo
+  use psb_serial_mod, only : psb_ipcoo2csr, psb_ipcsr2coo, psb_fixcoo, psb_csdp
   implicit none
 
   type(psb_zspmat_type)      :: a,b
@@ -45,7 +45,9 @@ subroutine psb_ztransc(a,b,c,fmt)
 
   character(len=5)           :: fmt_
   integer  ::c_, info, nz, i
-  integer, pointer :: itmp(:)
+  integer, pointer :: itmp(:)=>null()
+  type(psb_zspmat_type)      :: tmp
+
   if (present(c)) then 
     c_=c
   else
@@ -56,15 +58,20 @@ subroutine psb_ztransc(a,b,c,fmt)
   else 
     fmt_='CSR'
   endif
-  if (associated(b%aspk)) call psb_sp_free(b,info)
-  call psb_sp_clone(a,b,info)
-  
-  if (b%fida=='CSR') then 
-    call psb_ipcsr2coo(b,info)
-  else if (b%fida=='COO') then 
-    ! do nothing 
+  if (.true.) then 
+    b%fida = 'COO'
+    call psb_csdp(a,b,info)
   else
-    write(0,*) 'Unimplemented case in TRANSC '
+    if (associated(b%aspk)) call psb_sp_free(b,info)
+    call psb_sp_clone(a,b,info)
+    
+    if (b%fida=='CSR') then 
+      call psb_ipcsr2coo(b,info)
+    else if (b%fida=='COO') then 
+      ! do nothing 
+    else
+      write(0,*) 'Unimplemented case in TRANSC '
+    endif
   endif
   itmp  => b%ia1
   b%ia1 => b%ia2
@@ -85,7 +92,13 @@ subroutine psb_ztransc(a,b,c,fmt)
     call psb_fixcoo(b,info)
     b%fida='COO'
   else
-    write(0,*) 'Unknown FMT in TRANSC : "',fmt_,'"'
+    call psb_nullify_sp(tmp)
+    call psb_sp_clone(b,tmp,info)
+    b%fida=fmt_
+    call psb_csdp(tmp,b,info)
+    !!!!!! ADD HERE ERRPUSH!!! 
+    call psb_sp_free(tmp,info)
+
   endif
 
   return

@@ -52,7 +52,7 @@ C     .. Local Scalars ..
 c     .. Local Arrays ..
       CHARACTER*20       NAME
       INTEGER            INT_VAL(5)
-
+      logical, parameter :: debug=.false.
 C     .. External Subroutines ..
       EXTERNAL           MAX_NNZERO
 C     .. Executable Statements ..
@@ -67,6 +67,8 @@ C
          IP1(1) = 0
          IP2(1) = 0
          NNZ = IA2(M+1)-1
+         if (debug) write(0,*) 'CRCO: ',m,n,nnz,' : ',
+     +     descra,' : ',descrn
          IF (LARN.LT.NNZ) THEN
           IERROR = 60
           INT_VAL(1) = 18
@@ -91,17 +93,18 @@ C
          
          IF (DESCRA(1:1).EQ.'G') THEN
 C        ... Construct COO Representation...
-            ELEM = 1
+            ELEM = 0
 
             DO ROW = 1, M
                DO J = IA2(ROW), IA2(ROW+1)-1
+                  ELEM = ELEM + 1
                   IAN1(ELEM) = ROW
                   IAN2(ELEM) = IA1(J)
                   ARN(ELEM) = AR(J)
-                  ELEM = ELEM + 1
                ENDDO
             ENDDO
-            INFON(psb_nnz_) = IA2(M+1)-1
+            INFON(psb_nnz_) = elem
+            if (debug) write(0,*) 'CRCO endloop',m,elem
          ELSE IF (DESCRA(1:1).EQ.'S' .AND. DESCRA(2:2).EQ.'U') THEN
 
             DO 20 K = 1, M

@@ -188,8 +188,6 @@ subroutine psb_zcsdp(a, b,info,ifc,check,trans,unitd,upd,dupl)
     n_col=b%k
     call psb_cest(b%fida, n_row,n_col,size_req,&
          & ia1_size, ia2_size, aspk_size, upd_,info)
-!!$    write(0,*) size(b%aspk),size(b%ia1),size(b%ia2),size(b%pl),size(b%pr),&
-!!$         & ia1_size, ia2_size, aspk_size,b%fida,b%m,b%k
 
     if (info /= no_err) then    
       info=4010
@@ -221,6 +219,7 @@ subroutine psb_zcsdp(a, b,info,ifc,check,trans,unitd,upd,dupl)
     b%pl(:)  = 0
     b%pr(:)  = 0
 
+    b%descra = a%descra
 
     select case (toupper(a%fida(1:3)))
 
@@ -248,7 +247,6 @@ subroutine psb_zcsdp(a, b,info,ifc,check,trans,unitd,upd,dupl)
 
         !...converting to JAD
         !...output matrix may not be big enough
-
         do
 
           call zcrjd(trans_, a%m, a%k, unitd_, d, a%descra, a%aspk,&

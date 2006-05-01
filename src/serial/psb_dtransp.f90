@@ -35,7 +35,8 @@
 subroutine psb_dtransp(a,b,c,fmt)
   use psb_spmat_type
   use psb_tools_mod
-  use psb_serial_mod, only : psb_ipcoo2csr, psb_ipcsr2coo, psb_fixcoo
+  use psb_string_mod
+  use psb_serial_mod, only : psb_ipcoo2csr, psb_ipcsr2coo, psb_fixcoo, psb_csdp
   implicit none
 
   type(psb_dspmat_type)      :: a,b
@@ -45,25 +46,41 @@ subroutine psb_dtransp(a,b,c,fmt)
   character(len=5)           :: fmt_
   integer  ::c_, info, nz 
   integer, pointer :: itmp(:)=>null()
+  type(psb_dspmat_type)      :: tmp
+
   if (present(c)) then 
     c_=c
   else
     c_=1
   endif
   if (present(fmt)) then 
-    fmt_ = fmt
+    fmt_ = toupper(fmt)
   else 
     fmt_='CSR'
   endif
-  if (associated(b%aspk)) call psb_sp_free(b,info)
-  call psb_sp_clone(a,b,info)
-  
-  if (b%fida=='CSR') then 
-    call psb_ipcsr2coo(b,info)
-  else if (b%fida=='COO') then 
-    ! do nothing 
+
+  if (.true.) then 
+    if (associated(b%aspk)) call psb_sp_free(b,info)
+    b%fida   = 'COO'
+    b%descra = 'GUN'
+    call psb_csdp(a,b,info)
+!!$    write(0,*) 'Check from CSDP',b%m,b%k,b%fida,b%descra,b%infoa(psb_nnz_)
+    if (info /= 0) then 
+      write(0,*) 'transp: info from CSDP ',info
+      return
+    end if
   else
-    write(0,*) 'Unimplemented case in TRANSP '
+    if (associated(b%aspk)) call psb_sp_free(b,info)
+    call psb_sp_clone(a,b,info)
+    
+    if (b%fida=='CSR') then 
+      call psb_ipcsr2coo(b,info)
+    else if (b%fida=='COO') then 
+      ! do nothing 
+    else
+      write(0,*) 'Unimplemented case in TRANSP '
+    endif
+!!$    write(0,*) 'Check from CLONE',b%m,b%k,b%fida,b%descra,b%infoa(psb_nnz_)
   endif
 !!$  nz = b%infoa(nnz_)
 !!$  write(0,*) 'TRANSP CHECKS:',a%m,a%k,&
@@ -83,7 +100,13 @@ subroutine psb_dtransp(a,b,c,fmt)
     call psb_fixcoo(b,info)
     b%fida='COO'
   else
-    write(0,*) 'Unknown FMT in TRANSP : "',fmt_,'"'
+    call psb_nullify_sp(tmp)
+    call psb_sp_clone(b,tmp,info)
+    b%fida=fmt_
+    call psb_csdp(tmp,b,info)
+    !!!!!! ADD HERE ERRPUSH!!! 
+    call psb_sp_free(tmp,info)
+
   endif
 
   return

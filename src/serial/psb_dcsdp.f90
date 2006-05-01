@@ -127,7 +127,7 @@ subroutine psb_dcsdp(a, b,info,ifc,check,trans,unitd,upd,dupl)
     goto 9999
   end if
   if (ifc_<1) then 
-    write(0,*) 'dcsdp90 Error: invalid ifc ',ifc_
+    write(0,*) 'csdp90 Error: invalid ifc ',ifc_
     info = -4
     call psb_errpush(info,name)
     goto 9999
@@ -219,6 +219,7 @@ subroutine psb_dcsdp(a, b,info,ifc,check,trans,unitd,upd,dupl)
     b%pl(:)  = 0
     b%pr(:)  = 0
 
+    b%descra = a%descra
 
     select case (toupper(a%fida(1:3)))
 
@@ -283,7 +284,7 @@ subroutine psb_dcsdp(a, b,info,ifc,check,trans,unitd,upd,dupl)
         end if
 
       case ('COO')
-
+        if (debug) write(0,*) 'Calling CRCO ',a%descra
         call dcrco(trans_, a%m, a%k, unitd_, d, a%descra, a%aspk,&
              & a%ia1, a%ia2, a%infoa, b%pl, b%descra, b%aspk, b%ia1,&
              & b%ia2, b%infoa, b%pr, size(b%aspk), size(b%ia1),&

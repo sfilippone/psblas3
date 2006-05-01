@@ -154,6 +154,7 @@ Subroutine psb_zfixcoo(A,INFO,idir)
   case default
     write(0,*) 'Fixcoo: unknown direction ',idir_
   end select
+  a%infoa(psb_upd_) = psb_upd_srch_
 
   deallocate(iaux)
   return
