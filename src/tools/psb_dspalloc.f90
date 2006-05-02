@@ -92,7 +92,7 @@ subroutine psb_dspalloc(a, desc_a, info, nnz)
   ! set fields in desc_a%matrix_data....
   loc_row = desc_a%matrix_data(psb_n_row_)
   m       = desc_a%matrix_data(psb_m_)
-  n       =  desc_a%matrix_data(psb_n_)
+  n       = desc_a%matrix_data(psb_n_)
 
   !...allocate matrix data...
   if (present(nnz))then 
@@ -133,7 +133,7 @@ subroutine psb_dspalloc(a, desc_a, info, nnz)
 
   if (debug) write(0,*) 'spall: ',  &
        &desc_a%matrix_data(psb_dec_type_),psb_desc_bld_
-  desc_a%matrix_data(psb_dec_type_) = psb_desc_bld_
+!!$  desc_a%matrix_data(psb_dec_type_) = psb_desc_bld_
   return
   
   call psb_erractionrestore(err_act)
