@@ -81,7 +81,7 @@ subroutine psb_cest(afmt, m,n,nnz, lia1, lia2, lar, iup, info)
       lar = nnz
     else if(afmt.eq.'CSR') then
       lia1 = nnz
-      lia2 = nnz
+      lia2 = max(nnz,m+1)
       lar = nnz
     else
       info = 136
