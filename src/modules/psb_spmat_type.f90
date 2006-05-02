@@ -173,7 +173,7 @@ contains
       ! right after allocate, with spins doing the right thing.
       ! hopefully :-)
 
-    case( psb_spmat_upd_) 
+    case(psb_spmat_upd_) 
 
     case default
       info=591     

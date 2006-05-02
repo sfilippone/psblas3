@@ -194,17 +194,18 @@ Subroutine psb_dsphalo(a,desc_a,blk,info,rwcnv,clcnv,outfmt)
   end if
   mat_recv = iszr
   iszs=sum(sdsz)
+  call psb_nullify_sp(tmp)
   call psb_sp_all(0,0,tmp,max(iszs,1),info)
   tmp%fida='COO'
-  
+  call psb_sp_setifld(psb_spmat_asb_,psb_state_,tmp,info)
+
   t2 = mpi_wtime()
 
   l1  = 0
   ipx = 1
   counter=1
   idx = 0
-  call psb_sp_reinit(tmp,info)
-  tmp%infoa(psb_nnz_) = 0 
+
   Do 
     proc=desc_a%halo_index(counter)
     if (proc == -1) exit 
