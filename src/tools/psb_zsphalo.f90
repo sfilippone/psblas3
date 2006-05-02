@@ -203,7 +203,8 @@ Subroutine psb_zsphalo(a,desc_a,blk,info,rwcnv,clcnv,outfmt)
   ipx = 1
   counter=1
   idx = 0
-  call psb_sp_reinit(tmp)
+  call psb_sp_reinit(tmp,info)
+  tmp%infoa(psb_nnz_) = 0 
   Do 
     proc=desc_a%halo_index(counter)
     if (proc == -1) exit 

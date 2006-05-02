@@ -132,18 +132,53 @@ contains
 
   end subroutine psb_nullify_dsp
 
-  Subroutine psb_dspreinit(a)
-    implicit none
+  Subroutine psb_dspreinit(a,info,clear)
+
+    Implicit None
+
     !....Parameters...
-    Type(psb_dspmat_type), intent(inout) :: A
+    Type(psb_dspmat_type), intent(inout) :: a
+    integer, intent(out)                 :: info
+    logical, intent(in), optional        :: clear
 
     !locals
     logical, parameter  :: debug=.false.
+    logical             :: clear_
+    character(len=20)   :: name, ch_err
+    
+    info = 0
+    name = 'psb_sp_reinit'
 
-    if (debug) write(0,*) 'spreinit init ',a%fida,a%infoa(psb_nnz_)
-    if (a%fida=='COO') a%infoa(psb_nnz_) = 0
-    if (associated(a%aspk)) a%aspk(:) = 0.d0
-    if (debug) write(0,*) 'spreinit end ',a%fida,a%infoa(psb_nnz_)
+    if (present(clear)) then 
+      clear_ = clear
+    else
+      clear_ = .true.
+    end if
+    
+    select case(psb_sp_getifld(psb_state_,a,info))
+    case(psb_spmat_asb_) 
+
+      if (clear_) a%aspk(:) = dzero
+
+      if (psb_sp_getifld(psb_upd_,a,info)==psb_upd_perm_) then 
+        if(a%fida(1:3).eq.'JAD') then
+          a%ia1(a%infoa(psb_upd_pnt_)+psb_nnz_) = 0
+        else
+          a%ia2(a%infoa(psb_upd_pnt_)+psb_nnz_) = 0
+        endif
+      endif
+      a%infoa(psb_state_) = psb_spmat_upd_
+    case(psb_spmat_bld_) 
+      ! in this case do nothing. this allows sprn to be called 
+      ! right after allocate, with spins doing the right thing.
+      ! hopefully :-)
+
+    case( psb_spmat_upd_) 
+
+    case default
+      info=591     
+      call psb_errpush(info,name)
+    end select
 
   end Subroutine psb_dspreinit
 
@@ -621,18 +656,53 @@ contains
 
   end subroutine psb_nullify_zsp
 
-  Subroutine psb_zspreinit(a)
-    implicit none
+  Subroutine psb_zspreinit(a,info,clear)
+
+    Implicit None
+
     !....Parameters...
-    Type(psb_zspmat_type), intent(inout) :: A
+    Type(psb_zspmat_type), intent(inout) :: a
+    integer, intent(out)                 :: info
+    logical, intent(in), optional        :: clear
 
     !locals
     logical, parameter  :: debug=.false.
+    logical             :: clear_
+    character(len=20)   :: name, ch_err
+    
+    info = 0
+    name = 'psb_sp_reinit'
 
-    if (debug) write(0,*) 'spreinit init ',a%fida,a%infoa(psb_nnz_)
-    if (a%fida=='COO') a%infoa(psb_nnz_) = 0
-    if (associated(a%aspk)) a%aspk(:) = 0.d0
-    if (debug) write(0,*) 'spreinit end ',a%fida,a%infoa(psb_nnz_)
+    if (present(clear)) then 
+      clear_ = clear
+    else
+      clear_ = .true.
+    end if
+    
+    select case(psb_sp_getifld(psb_state_,a,info))
+    case(psb_spmat_asb_) 
+
+      if (clear_) a%aspk(:) = zzero
+
+      if (psb_sp_getifld(psb_upd_,a,info)==psb_upd_perm_) then 
+        if(a%fida(1:3).eq.'JAD') then
+          a%ia1(a%infoa(psb_upd_pnt_)+psb_nnz_) = 0
+        else
+          a%ia2(a%infoa(psb_upd_pnt_)+psb_nnz_) = 0
+        endif
+      endif
+      a%infoa(psb_state_) = psb_spmat_upd_
+    case(psb_spmat_bld_) 
+      ! in this case do nothing. this allows sprn to be called 
+      ! right after allocate, with spins doing the right thing.
+      ! hopefully :-)
+
+    case( psb_spmat_upd_) 
+
+    case default
+      info=591     
+      call psb_errpush(info,name)
+    end select
 
   end Subroutine psb_zspreinit
 

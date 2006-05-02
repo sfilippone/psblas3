@@ -38,7 +38,7 @@
 !    desc_a   - type(<psb_desc_type>).            The communication descriptor.
 !    info     - integer.                          Eventually returns an error code.
 !
-Subroutine psb_dsprn(a, desc_a,info)
+Subroutine psb_dsprn(a, desc_a,info,clear)
 
   use psb_descriptor_type
   use psb_spmat_type
@@ -51,6 +51,7 @@ Subroutine psb_dsprn(a, desc_a,info)
   Type(psb_desc_type), intent(in)      :: desc_a
   Type(psb_dspmat_type), intent(inout) :: a
   integer, intent(out)                 :: info
+  logical, intent(in), optional        :: clear
 
   !locals
   Integer             :: icontxt
@@ -59,6 +60,7 @@ Subroutine psb_dsprn(a, desc_a,info)
   integer             :: int_err(5)
   real(kind(1.d0))    :: real_err(5)
   character(len=20)   :: name, ch_err
+  logical             :: clear_
 
   info = 0
   err  = 0
@@ -79,37 +81,23 @@ Subroutine psb_dsprn(a, desc_a,info)
   endif
 
   if (debug) write(*,*) 'got through igamx2d '
-
+  
+  if (psb_is_bld_dec(desc_a%matrix_data(psb_dec_type_))) then
+    ! Should do nothing, we are called redundantly
+    return
+  endif
   if (.not.psb_is_asb_dec(desc_a%matrix_data(psb_dec_type_))) then
     info=590     
     call psb_errpush(info,name)
     goto 9999
   endif
+  if (present(clear)) then 
+    clear_ = clear
+  else
+    clear_ = .true.
+  end if
 
-  select case(psb_sp_getifld(psb_state_,a,info))
-  case(psb_spmat_asb_) 
-
-    a%aspk(:) = dzero
-
-    if (psb_sp_getifld(psb_upd_,a,info)==psb_upd_perm_) then 
-      if(a%fida(1:3).eq.'JAD') then
-        a%ia1(a%infoa(psb_upd_pnt_)+psb_nnz_) = 0
-      else
-        a%ia2(a%infoa(psb_upd_pnt_)+psb_nnz_) = 0
-      endif
-    endif
-    a%infoa(psb_state_) = psb_spmat_upd_
-  case(psb_spmat_bld_) 
-    ! in this case do nothing. this allows sprn to be called 
-    ! right after allocate, with spins doing the right thing.
-    ! hopefully :-)
-
-  case( psb_spmat_upd_) 
-
-  case default
-    info=591     
-    call psb_errpush(info,name)
-  end select
+  call psb_sp_reinit(a,info,clear=clear_)
 
   if (info /= 0) goto 9999
 

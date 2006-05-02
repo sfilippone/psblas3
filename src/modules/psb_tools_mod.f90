@@ -559,19 +559,21 @@ Module psb_tools_mod
 
 
   interface psb_sprn
-     subroutine psb_dsprn(a, desc_a,info)
+     subroutine psb_dsprn(a, desc_a,info,clear)
        use psb_descriptor_type
        use psb_spmat_type
        type(psb_desc_type), intent(in)      :: desc_a
        type(psb_dspmat_type), intent(inout) :: a
        integer, intent(out)                 :: info
+       logical, intent(in), optional        :: clear
      end subroutine psb_dsprn
-     subroutine psb_zsprn(a, desc_a,info)
+     subroutine psb_zsprn(a, desc_a,info,clear)
        use psb_descriptor_type
        use psb_spmat_type
        type(psb_desc_type), intent(in)      :: desc_a
        type(psb_zspmat_type), intent(inout) :: a
        integer, intent(out)                 :: info
+       logical, intent(in), optional        :: clear
      end subroutine psb_zsprn
   end interface
 
