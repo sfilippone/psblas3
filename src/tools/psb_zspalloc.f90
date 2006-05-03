@@ -133,7 +133,7 @@ subroutine psb_zspalloc(a, desc_a, info, nnz)
 
   if (debug) write(0,*) 'spall: ',  &
        &desc_a%matrix_data(psb_dec_type_),psb_desc_bld_
-!!$  desc_a%matrix_data(psb_dec_type_) = psb_desc_bld_
+
   return
   
   call psb_erractionrestore(err_act)

@@ -14,7 +14,6 @@ FOBJS = psb_cest.o psb_dcoins.o psb_dcsdp.o psb_dcsmm.o psb_dcsmv.o \
 	psb_zrwextd.o psb_zsymbmm.o psb_znumbmm.o psb_zspinfo.o psb_zspscal.o\
 	psb_getifield.o psb_setifield.o psb_update_mod.o
 
-
 INCDIRS = -I ../../lib -I .
 LIBDIR = ../../lib
 

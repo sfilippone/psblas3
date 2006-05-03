@@ -310,21 +310,23 @@ module psb_serial_mod
   end interface
 
   interface psb_coins
-     subroutine psb_dcoins(nz,ia,ja,val,a,gtl,imin,imax,jmin,jmax,info)
+     subroutine psb_dcoins(nz,ia,ja,val,a,gtl,imin,imax,jmin,jmax,info,rebuild)
        use psb_spmat_type
        integer, intent(in) :: nz, imin,imax,jmin,jmax
        integer, intent(in) :: ia(:),ja(:),gtl(:)
        real(kind(1.d0)), intent(in) :: val(:)
        type(psb_dspmat_type), intent(inout) :: a
        integer, intent(out) :: info
+       logical, optional, intent(in) :: rebuild
      end subroutine psb_dcoins
-     subroutine psb_zcoins(nz,ia,ja,val,a,gtl,imin,imax,jmin,jmax,info)
+     subroutine psb_zcoins(nz,ia,ja,val,a,gtl,imin,imax,jmin,jmax,info,rebuild)
        use psb_spmat_type
        integer, intent(in) :: nz, imin,imax,jmin,jmax
        integer, intent(in) :: ia(:),ja(:),gtl(:)
        complex(kind(1.d0)), intent(in) :: val(:)
        type(psb_zspmat_type), intent(inout) :: a
        integer, intent(out) :: info
+       logical, optional, intent(in) :: rebuild
      end subroutine psb_zcoins
   end interface
 

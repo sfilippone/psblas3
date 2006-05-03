@@ -94,18 +94,18 @@ C
         ELSE IF (LARN.LT.NNZ) THEN
           IERROR = 60
           INT_VAL(1) = 18
-          INT_VAL(2) = NNZ+2
-          INT_VAL(3) = LAUX
+          INT_VAL(2) = NNZ
+          INT_VAL(3) = LARN
         ELSE IF (LIAN1.LT.NNZ) THEN
           IERROR = 60
           INT_VAL(1) = 19
-          INT_VAL(2) = NNZ+2
-          INT_VAL(3) = LAUX
+          INT_VAL(2) = NNZ
+          INT_VAL(3) = LIAN1
         ELSE IF (LIAN2.LT.M+1) THEN
           IERROR = 60
           INT_VAL(1) = 20
-          INT_VAL(2) = NNZ+2
-          INT_VAL(3) = LAUX
+          INT_VAL(2) = M+1
+          INT_VAL(3) = LIAN2
         ENDIF
         
 C

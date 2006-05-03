@@ -51,7 +51,7 @@ subroutine psb_cdins(nz,ia,ja,desc_a,info,is,js)
 
   !....PARAMETERS...
   Type(psb_desc_type), intent(inout) :: desc_a
-  Integer, intent(in)                :: nz,IA(:),JA(:)
+  Integer, intent(in)                :: nz,ia(:),ja(:)
   integer, intent(out)               :: info
   integer, intent(in), optional      :: is,js
 

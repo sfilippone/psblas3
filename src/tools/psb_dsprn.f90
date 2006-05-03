@@ -53,6 +53,7 @@ Subroutine psb_dsprn(a, desc_a,info,clear)
   integer, intent(out)                 :: info
   logical, intent(in), optional        :: clear
 
+
   !locals
   Integer             :: icontxt
   Integer             :: nprow,npcol,myrow,mycol,err,err_act

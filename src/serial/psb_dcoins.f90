@@ -31,7 +31,7 @@
 ! File:  psbdcoins.f90 
  ! Subroutine: 
  ! Parameters:
-subroutine psb_dcoins(nz,ia,ja,val,a,gtl,imin,imax,jmin,jmax,info)
+subroutine psb_dcoins(nz,ia,ja,val,a,gtl,imin,imax,jmin,jmax,info,rebuild)
 
   use psb_spmat_type
   use psb_const_mod
@@ -47,6 +47,7 @@ subroutine psb_dcoins(nz,ia,ja,val,a,gtl,imin,imax,jmin,jmax,info)
   real(kind(1.d0)), intent(in)         :: val(:)
   type(psb_dspmat_type), intent(inout) :: a
   integer, intent(out)                 :: info
+  logical, intent(in), optional        :: rebuild
 
   character(len=5)     :: ufida
   integer              :: i,j,ir,ic,nr,nc, ng, nza, isza,spstate, nnz,&
@@ -87,11 +88,11 @@ subroutine psb_dcoins(nz,ia,ja,val,a,gtl,imin,imax,jmin,jmax,info)
     goto 9999
   end if
 
-!!$  if (present(rebuild)) then 
-!!$    rebuild_ = rebuild
-!!$  else
+  if (present(rebuild)) then 
+    rebuild_ = rebuild
+  else
     rebuild_ = .false.
-!!$  end if
+  end if
 
   call touppers(a%fida,ufida)
   ng = size(gtl)
@@ -178,12 +179,16 @@ subroutine psb_dcoins(nz,ia,ja,val,a,gtl,imin,imax,jmin,jmax,info)
              & imin,imax,jmin,jmax,nzl,info)
       if (info > 0) then 
         if (rebuild_) then 
-          write(0,*) 'COINS: Going through rebuild_ fingers crossed!'
+          if (debug)  write(0,*)&
+               &  'COINS: Going through rebuild_ fingers crossed!'
           irst = info
           call psb_nullify_sp(tmp)
           tmp%fida='COO'
           call psb_csdp(a,tmp,info)
-          call psb_setifield(psb_spmat_bld_,psb_state_,tmp,info)
+          call psb_sp_setifld(psb_spmat_bld_,psb_state_,tmp,info)
+          if (debug) then
+            write(0,*) 'COINS  Rebuild: size',tmp%infoa(psb_nnz_) ,irst            
+          endif
           call psb_sp_transfer(tmp,a,info)
           call psb_spinfo(psb_nztotreq_,a,nza,info)
           call psb_spinfo(psb_nzsizereq_,a,isza,info)
@@ -194,6 +199,8 @@ subroutine psb_dcoins(nz,ia,ja,val,a,gtl,imin,imax,jmin,jmax,info)
             goto 9999
           endif
           
+          if (debug)  write(0,*)&
+               &  'COINS: Reinserting',a%fida,nza,isza
           if ((nza+nz)>isza) then 
             call psb_sp_reall(a,max(nza+nz,int(1.5*isza)),info)
             if(info /= izero) then
@@ -206,6 +213,8 @@ subroutine psb_dcoins(nz,ia,ja,val,a,gtl,imin,imax,jmin,jmax,info)
           if (irst <= nz) then 
             call psb_inner_ins((nz-irst+1),ia(irst:nz),ja(irst:nz),val(irst:nz),&
                  & nza,a%ia1,a%ia2,a%aspk,gtl,ng,imin,imax,jmin,jmax,info)
+            call psb_sp_setifld(nza,psb_del_bnd_,a,info)
+            call psb_sp_setifld(nza,psb_nnz_,a,info)
           end if
           
         else
@@ -292,7 +301,6 @@ contains
     real(kind(1.d0)), intent(in) :: val(*)
     real(kind(1.d0)), intent(inout) :: aspk(*)
     integer, intent(out) :: info
-
     integer :: i,ir,ic
 
     info = 0

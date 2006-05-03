@@ -44,7 +44,7 @@
 !    is       - integer(optional).                The row offset.
 !    js       - integer(optional).                The column offset.
 !
-subroutine psb_zspins(nz,ia,ja,val,a,desc_a,info,is,js)
+subroutine psb_zspins(nz,ia,ja,val,a,desc_a,info,is,js,rebuild)
 
   use psb_descriptor_type
   use psb_spmat_type
@@ -60,7 +60,7 @@ subroutine psb_zspins(nz,ia,ja,val,a,desc_a,info,is,js)
   complex(kind(1.d0)), intent(in)      :: val(:)
   integer, intent(out)                 :: info
   integer, intent(in), optional        :: is,js
-
+  logical, intent(in), optional        :: rebuild
   !locals.....
 
   integer :: i,icontxt,nprocs ,glob_row,row,k,start_row,end_row,&
@@ -70,6 +70,7 @@ subroutine psb_zspins(nz,ia,ja,val,a,desc_a,info,is,js)
   integer                :: nprow,npcol, myrow ,mycol, iflag, isize, irlc
   logical, parameter     :: debug=.false.
   integer, parameter     :: relocsz=200
+  logical                :: rebuild_
 
   interface psb_cdins
      subroutine psb_cdins(nz,ia,ja,desc_a,info,is,js)
@@ -127,6 +128,11 @@ subroutine psb_zspins(nz,ia,ja,val,a,desc_a,info,is,js)
      goto 9999
   end if
 
+  if (present(rebuild)) then 
+    rebuild_ = rebuild
+  else
+    rebuild_ = .false.
+  endif
 
   spstate = a%infoa(psb_state_)
   if (psb_is_bld_dec(dectype)) then 
@@ -156,7 +162,8 @@ subroutine psb_zspins(nz,ia,ja,val,a,desc_a,info,is,js)
   else if (psb_is_asb_dec(dectype)) then 
      nrow = desc_a%matrix_data(psb_n_row_)
      ncol = desc_a%matrix_data(psb_n_col_)
-     call psb_coins(nz,ia,ja,val,a,desc_a%glob_to_loc,1,nrow,1,ncol,info)
+     call psb_coins(nz,ia,ja,val,a,desc_a%glob_to_loc,1,nrow,1,ncol,&
+          & info,rebuild=rebuild_)
      if (info /= 0) then
         info=4010
         ch_err='psb_coins'
