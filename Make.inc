@@ -6,34 +6,36 @@
 #######################  Section 1 #######################
 #  Define your compilers and compiler flags here         #
 ##########################################################
-F90=/usr/local/gfortran/bin/gfortran
-FC=/usr/local/gfortran/bin/gfortran
+F90=/usr/local/gcc42/bin/gfortran
+FC=/usr/local/gcc42/bin/gfortran
 F77=$(FC)
-CC=/usr/local/gfortran/bin/gcc
-F90COPT= -O3  -ffast-math -march=pentium4 
-FCOPT=-O3  -ffast-math -march=pentium4 
-CCOPT=-O3 -ffast-math -march=pentium4 
+CC=/usr/local/gcc42/bin/gcc
+F90COPT= -O3  -ffast-math -march=pentium4 -msse2 -mfpmath=sse 
+FCOPT=-O3  -ffast-math -march=pentium4 -msse2 -mfpmath=sse 
+CCOPT=-O3 -ffast-math -march=pentium4 -msse2 -mfpmath=sse 
 
 #######################  Section 2 #######################
 #  Define your linker and linker flags here              #
 ##########################################################
-F90LINK=/usr/local/mpich-gfortran/bin/mpif90 
-FLINK=/usr/local/mpich-gfortran/mpif77 
-MPF90=/usr/local/mpich-gfortran/bin/mpif90 
-MPCC=/usr/local/mpich-gfortran/bin/mpicc 
+F90LINK=/usr/local/mpich-gcc42/bin/mpif90 
+FLINK=/usr/local/mpich-gcc42/bin/mpif77 
+MPF90=/usr/local/mpich-gcc42/bin/mpif90 
+MPF77=/usr/local/mpich-gcc42/bin/mpif77 	
+MPCC=/usr/local/mpich-gcc42/bin/mpicc 
 
 #######################  Section 3 #######################
 #  Specify paths to libraries                            #
 ##########################################################
-BLAS=-lblas-gcc41 -L$(HOME)/LIB
-BLACS=-lmpiblacs-gfortran -L$(HOME)/LIB
+BLAS=-lblas-gcc42 -L$(HOME)/LIB
+BLACS=-lmpiblacs-gcc42 -L$(HOME)/LIB
+EXTRA_BLACS_ENV_OBJS=extra_env.o
 
 
 #######################  Section 4 #######################
 #  Other useful tools&defines                            #
 ##########################################################
 SLUDIR=/usr/local/SuperLU_3.0
-SLU=-lslu_lx_gfort -L$(SLUDIR)
+SLU=-lslu_lx_gcc42 -L$(SLUDIR)
 SLUDEF=-DHave_SLU_ -I$(SLUDIR)
 
 UMFDIR=$(HOME)/LIB/Umfpack_gcc41
