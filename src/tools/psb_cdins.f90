@@ -39,9 +39,7 @@
 !    ja       - integer,dimension(:).          The column indices of the points.
 !    desc_a   - type(<psb_desc_type>).         The communication descriptor to be freed.
 !    info     - integer.                       Eventually returns an error code.
-!    is       - integer(optional).             The row offset.
-!    js       - integer(optional).             The column offset.
-subroutine psb_cdins(nz,ia,ja,desc_a,info,is,js)
+subroutine psb_cdins(nz,ia,ja,desc_a,info)
 
   use psb_descriptor_type
   use psb_serial_mod
@@ -53,7 +51,6 @@ subroutine psb_cdins(nz,ia,ja,desc_a,info,is,js)
   Type(psb_desc_type), intent(inout) :: desc_a
   Integer, intent(in)                :: nz,ia(:),ja(:)
   integer, intent(out)               :: info
-  integer, intent(in), optional      :: is,js
 
   !LOCALS.....
 

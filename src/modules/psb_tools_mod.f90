@@ -413,12 +413,11 @@ Module psb_tools_mod
   end interface
   
   interface psb_cdins
-     subroutine psb_cdins(nz,ia,ja,desc_a,info,is,js)
+     subroutine psb_cdins(nz,ia,ja,desc_a,info)
        use psb_descriptor_type
        type(psb_desc_type), intent(inout) :: desc_a
        Integer, intent(in)                :: nz,IA(:),JA(:)
        integer, intent(out)               :: info
-       integer, intent(in), optional      :: is,js
      end subroutine psb_cdins
   end interface
 
@@ -535,7 +534,7 @@ Module psb_tools_mod
 
 
   interface psb_spins
-     subroutine psb_dspins(nz,ia,ja,val,a,desc_a,info,is,js,rebuild)
+     subroutine psb_dspins(nz,ia,ja,val,a,desc_a,info,rebuild)
        use psb_descriptor_type
        use psb_spmat_type
        type(psb_desc_type), intent(inout)   :: desc_a
@@ -543,10 +542,9 @@ Module psb_tools_mod
        integer, intent(in)                  :: nz,ia(:),ja(:)
        real(kind(1.d0)), intent(in)         :: val(:)
        integer, intent(out)                 :: info
-       integer, intent(in), optional        :: is,js
        logical, intent(in), optional        :: rebuild
      end subroutine psb_dspins
-     subroutine psb_zspins(nz,ia,ja,val,a,desc_a,info,is,js)
+     subroutine psb_zspins(nz,ia,ja,val,a,desc_a,info,rebuild)
        use psb_descriptor_type
        use psb_spmat_type
        type(psb_desc_type), intent(inout)   :: desc_a
@@ -554,7 +552,7 @@ Module psb_tools_mod
        integer, intent(in)                  :: nz,ia(:),ja(:)
        complex(kind(1.d0)), intent(in)      :: val(:)
        integer, intent(out)                 :: info
-       integer, intent(in), optional        :: is,js
+       logical, intent(in), optional        :: rebuild
      end subroutine psb_zspins
   end interface
 

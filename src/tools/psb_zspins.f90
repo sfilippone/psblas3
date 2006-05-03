@@ -40,11 +40,11 @@
 !    val      - real,dimension(:).                The values of the points to be inserted.
 !    a        - type(<psb_zspmat_type>).          The sparse destination matrix.      
 !    desc_a   - type(<psb_desc_type>).            The communication descriptor.
-!    info     - integer.                          Eventually returns an error code.
-!    is       - integer(optional).                The row offset.
-!    js       - integer(optional).                The column offset.
+!    info     - integer.                          Error code
+!    rebuild  - logical                           Allows to reopen a matrix under
+!                                                 certain circumstances.
 !
-subroutine psb_zspins(nz,ia,ja,val,a,desc_a,info,is,js,rebuild)
+subroutine psb_zspins(nz,ia,ja,val,a,desc_a,info,rebuild)
 
   use psb_descriptor_type
   use psb_spmat_type
@@ -59,7 +59,6 @@ subroutine psb_zspins(nz,ia,ja,val,a,desc_a,info,is,js,rebuild)
   integer, intent(in)                  :: nz,ia(:),ja(:)
   complex(kind(1.d0)), intent(in)      :: val(:)
   integer, intent(out)                 :: info
-  integer, intent(in), optional        :: is,js
   logical, intent(in), optional        :: rebuild
   !locals.....
 
@@ -73,13 +72,12 @@ subroutine psb_zspins(nz,ia,ja,val,a,desc_a,info,is,js,rebuild)
   logical                :: rebuild_
 
   interface psb_cdins
-     subroutine psb_cdins(nz,ia,ja,desc_a,info,is,js)
+     subroutine psb_cdins(nz,ia,ja,desc_a,info)
        use psb_descriptor_type
        implicit none
        type(psb_desc_type), intent(inout) ::  desc_a
        integer, intent(in)            ::  nz,ia(:),ja(:)
        integer, intent(out)           :: info
-       integer, intent(in), optional  :: is,js
      end subroutine psb_cdins
   end interface
 
