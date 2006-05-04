@@ -7,8 +7,6 @@ We now have complex routines, and a complex  test program in the
 Fileread directory.  In the same directory there are utilities for
 reading/writing in MatrixMarket and Harwell-Boeing formats.
 
-The users' guide is not yet complete, specifically the preconditioners
-section still needs some work, but has been largely updated. 
 
 
 The version 1.0 of the library was described in:
