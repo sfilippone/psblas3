@@ -1,6 +1,9 @@
 Changelog. A lot less detailed than usual, at least for past
 history. 
 
+2006/05/03: Bug fixes, plus some change in the internals for SPINS,
+	    preparing hooks for insertion with local numbering.
+
 2006/04/24: Minor changes to the interface of dense tools routines,
 	    trying to achieve a uniform look & feel.
 	    Rewritten documentation; it is now reasonable, though not

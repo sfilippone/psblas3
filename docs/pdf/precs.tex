@@ -122,16 +122,16 @@ The coarse space correction may be added to the fine level solution
 \[
 M_{2L-A}^{-1} = M_{C}^{-1} + M_{1L}^{-1}. 
 \]
-or it can be composed  in a multiplicative framework as a pre-smoothed
-correction
+or it can be composed  in a multiplicative framework
+(\verb|mult_ml_prec_|)as a pre-smoothed correction (\verb|pre_smooth_|)
 \[
 M_{2L-H1}^{-1} = M_{C}^{-1} + \left( I - M_{C}^{-1}A \right) M_{1L}^{-1}, 
 \]
-post-smoothed correction
+post-smoothed correction (\verb|post_smooth_|)
 \[
 M_{2L-H2}^{-1} = M_{1L}^{-1} + \left( I - M_{1L}^{-1}A \right) M_{C}^{-1}. 
 \]
-or two-sided. 
+or two-sided for symmetric matrices (\verb|smooth_both_|).
 
 
 
