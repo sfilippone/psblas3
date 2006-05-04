@@ -31,7 +31,7 @@
 ! File:  psbzcoins.f90 
  ! Subroutine: 
  ! Parameters:
-subroutine psb_zcoins(nz,ia,ja,val,a,gtl,imin,imax,jmin,jmax,info,rebuild)
+subroutine psb_zcoins(nz,ia,ja,val,a,imin,imax,jmin,jmax,info,gtl,rebuild)
 
   use psb_spmat_type
   use psb_const_mod
@@ -43,11 +43,12 @@ subroutine psb_zcoins(nz,ia,ja,val,a,gtl,imin,imax,jmin,jmax,info,rebuild)
   implicit none 
 
   integer, intent(in)                  :: nz, imin,imax,jmin,jmax
-  integer, intent(in)                  :: ia(:),ja(:),gtl(:)
+  integer, intent(in)                  :: ia(:),ja(:)
   complex(kind(1.d0)), intent(in)         :: val(:)
   type(psb_zspmat_type), intent(inout) :: a
   integer, intent(out)                 :: info
-  logical, optional, intent(in) :: rebuild
+  integer, intent(in), optional        :: gtl(:)
+  logical, intent(in), optional        :: rebuild
 
   character(len=5)     :: ufida
   integer              :: i,j,ir,ic,nr,nc, ng, nza, isza,spstate, nnz,&
@@ -95,153 +96,312 @@ subroutine psb_zcoins(nz,ia,ja,val,a,gtl,imin,imax,jmin,jmax,info,rebuild)
   end if
 
   call touppers(a%fida,ufida)
-  ng = size(gtl)
   spstate = psb_sp_getifld(psb_state_,a,info) 
 
-  select case(spstate) 
 
-  case(psb_spmat_bld_) 
-    if ((ufida /= 'COO').and.(ufida/='COI')) then 
-      info = 134
-      ch_err(1:3)=ufida(1:3)
-      call psb_errpush(info,name,a_err=ch_err)
-      goto 9999
-    end if
-    call psb_spinfo(psb_nztotreq_,a,nza,info)
-    call psb_spinfo(psb_nzsizereq_,a,isza,info)
-    if(info /= izero) then
-      info=4010
-      ch_err='psb_spinfo'
-      call psb_errpush(info,name,a_err=ch_err)
-      goto 9999
-    endif
+  if (present(gtl)) then 
 
-    if ((nza+nz)>isza) then 
-      call psb_sp_reall(a,max(nza+nz,int(1.5*isza)),info)
+    ng = size(gtl)
+    select case(spstate) 
+    case(psb_spmat_bld_) 
+      if ((ufida /= 'COO').and.(ufida/='COI')) then 
+        info = 134
+        ch_err(1:3)=ufida(1:3)
+        call psb_errpush(info,name,a_err=ch_err)
+        goto 9999
+      end if
+      call psb_spinfo(psb_nztotreq_,a,nza,info)
+      call psb_spinfo(psb_nzsizereq_,a,isza,info)
       if(info /= izero) then
         info=4010
-        ch_err='psb_sp_reall'
+        ch_err='psb_spinfo'
         call psb_errpush(info,name,a_err=ch_err)
         goto 9999
       endif
-    endif
-    call psb_inner_ins(nz,ia,ja,val,nza,a%ia1,a%ia2,a%aspk,gtl,ng,&
-         & imin,imax,jmin,jmax,info)
-    if(info /= izero) then
-      info=4010
-      ch_err='psb_inner_ins'
-      call psb_errpush(info,name,a_err=ch_err)
-      goto 9999
-    endif
-    if (debug) then 
-      if ((nza - a%infoa(psb_nnz_)) /= nz) then 
-        write(0,*) 'PSB_COINS: insert discarded items '
-      end if
-    end if
-    if ((nza - psb_sp_getifld(psb_nnz_,a,info)) /= nz) then
-      call psb_sp_setifld(nza,psb_del_bnd_,a,info)
-    endif
-    call psb_sp_setifld(nza,psb_nnz_,a,info)
 
-  case(psb_spmat_upd_)
+      if ((nza+nz)>isza) then 
+        call psb_sp_reall(a,max(nza+nz,int(1.5*isza)),info)
+        if(info /= izero) then
+          info=4010
+          ch_err='psb_sp_reall'
+          call psb_errpush(info,name,a_err=ch_err)
+          goto 9999
+        endif
+      endif
 
-    iupd = psb_sp_getifld(psb_upd_,a,info)
-    select case (iupd)
-    case (psb_upd_perm_)
-      ip1 = psb_sp_getifld(psb_upd_pnt_,a,info)      
-      nzl = psb_sp_getifld(psb_del_bnd_,a,info)      
-      nza = a%ia2(ip1+psb_nnz_)
+      call psb_inner_ins(nz,ia,ja,val,nza,a%ia1,a%ia2,a%aspk,&
+             & imin,imax,jmin,jmax,info,gtl,ng)
 
-      nza = a%ia2(ip1+psb_nnz_)
-      nzl = a%infoa(psb_del_bnd_)
-
-      call psb_inner_upd(nz,ia,ja,val,nza,a%aspk,gtl,ng,&
-           & imin,imax,jmin,jmax,nzl,info)
-
-      if (info /= izero) then
+      if(info /= izero) then
         info=4010
-        ch_err='psb_inner_upd'
+        ch_err='psb_inner_ins'
         call psb_errpush(info,name,a_err=ch_err)
         goto 9999
       endif
       if (debug) then 
-        if ((nza - a%ia2(ip1+psb_nnz_)) /= nz) then 
-          write(0,*) 'PSB_COINS: update discarded items '
+        if ((nza - a%infoa(psb_nnz_)) /= nz) then 
+          write(0,*) 'PSB_COINS: insert discarded items '
         end if
       end if
-      a%ia2(ip1+psb_nnz_) = nza
+      if ((nza - psb_sp_getifld(psb_nnz_,a,info)) /= nz) then
+        call psb_sp_setifld(nza,psb_del_bnd_,a,info)
+      endif
+      call psb_sp_setifld(nza,psb_nnz_,a,info)
 
-      if (debug) write(0,*) 'From COINS(UPD) : NZA:',nza
+    case(psb_spmat_upd_)
 
-    case (psb_upd_dflt_, psb_upd_srch_)
+      iupd = psb_sp_getifld(psb_upd_,a,info)
+      select case (iupd)
+      case (psb_upd_perm_)
+        ip1 = psb_sp_getifld(psb_upd_pnt_,a,info)      
+        nzl = psb_sp_getifld(psb_del_bnd_,a,info)      
+        nza = a%ia2(ip1+psb_nnz_)
 
-      call  psb_srch_upd(nz,ia,ja,val,nza,a,gtl,ng,&
-             & imin,imax,jmin,jmax,nzl,info)
-      if (info > 0) then 
-        if (rebuild_) then 
-          if (debug)  write(0,*)&
-               &  'COINS: Going through rebuild_ fingers crossed!'
-          irst = info
-          call psb_nullify_sp(tmp)
-          tmp%fida='COO'
-          call psb_csdp(a,tmp,info)
-          call psb_sp_setifld(psb_spmat_bld_,psb_state_,tmp,info)
-          if (debug) then
-            write(0,*) 'COINS  Rebuild: size',tmp%infoa(psb_nnz_) ,irst            
-          endif
-          call psb_sp_transfer(tmp,a,info)
-          call psb_spinfo(psb_nztotreq_,a,nza,info)
-          call psb_spinfo(psb_nzsizereq_,a,isza,info)
-          if(info /= izero) then
-            info=4010
-            ch_err='psb_spinfo'
-            call psb_errpush(info,name,a_err=ch_err)
-            goto 9999
-          endif
-          
-          if (debug)  write(0,*)&
-               &  'COINS: Reinserting',a%fida,nza,isza
-          if ((nza+nz)>isza) then 
-            call psb_sp_reall(a,max(nza+nz,int(1.5*isza)),info)
+
+        call psb_inner_upd(nz,ia,ja,val,nza,a%aspk,&
+             & imin,imax,jmin,jmax,nzl,info,gtl,ng)
+
+        if (info /= izero) then
+          info=4010
+          ch_err='psb_inner_upd'
+          call psb_errpush(info,name,a_err=ch_err)
+          goto 9999
+        endif
+        if (debug) then 
+          if ((nza - a%ia2(ip1+psb_nnz_)) /= nz) then 
+            write(0,*) 'PSB_COINS: update discarded items '
+          end if
+        end if
+        a%ia2(ip1+psb_nnz_) = nza
+
+        if (debug) write(0,*) 'From COINS(UPD) : NZA:',nza
+
+      case (psb_upd_dflt_, psb_upd_srch_)
+
+        call  psb_srch_upd(nz,ia,ja,val,nza,a,&
+             & imin,imax,jmin,jmax,nzl,info,gtl,ng)
+
+        if (info > 0) then 
+          if (rebuild_) then 
+            if (debug)  write(0,*)&
+                 &  'COINS: Going through rebuild_ fingers crossed!'
+            irst = info
+            call psb_nullify_sp(tmp)
+            tmp%fida='COO'
+            call psb_csdp(a,tmp,info)
+            call psb_sp_setifld(psb_spmat_bld_,psb_state_,tmp,info)
+            if (debug) then
+              write(0,*) 'COINS  Rebuild: size',tmp%infoa(psb_nnz_) ,irst            
+            endif
+            call psb_sp_transfer(tmp,a,info)
+            call psb_spinfo(psb_nztotreq_,a,nza,info)
+            call psb_spinfo(psb_nzsizereq_,a,isza,info)
             if(info /= izero) then
               info=4010
-              ch_err='psb_sp_reall'
+              ch_err='psb_spinfo'
               call psb_errpush(info,name,a_err=ch_err)
               goto 9999
             endif
-          endif
-          if (irst <= nz) then 
-            call psb_inner_ins((nz-irst+1),ia(irst:nz),ja(irst:nz),val(irst:nz),&
-                 & nza,a%ia1,a%ia2,a%aspk,gtl,ng,imin,imax,jmin,jmax,info)
-            call psb_sp_setifld(nza,psb_del_bnd_,a,info)
-            call psb_sp_setifld(nza,psb_nnz_,a,info)
+
+            if (debug)  write(0,*)&
+                 &  'COINS: Reinserting',a%fida,nza,isza
+            if ((nza+nz)>isza) then 
+              call psb_sp_reall(a,max(nza+nz,int(1.5*isza)),info)
+              if(info /= izero) then
+                info=4010
+                ch_err='psb_sp_reall'
+                call psb_errpush(info,name,a_err=ch_err)
+                goto 9999
+              endif
+            endif
+            if (irst <= nz) then 
+              call psb_inner_ins((nz-irst+1),ia(irst:nz),ja(irst:nz),val(irst:nz),&
+                   & nza,a%ia1,a%ia2,a%aspk,imin,imax,jmin,jmax,info,gtl,ng)
+              call psb_sp_setifld(nza,psb_del_bnd_,a,info)
+              call psb_sp_setifld(nza,psb_nnz_,a,info)
+            end if
+
+          else
+            info = 2231
+            call psb_errpush(info,name)
+            goto 9999 
           end if
-          
-        else
-          info = 2231
+        else if (info < 0) then
+          info = 2230
           call psb_errpush(info,name)
           goto 9999 
+
         end if
-      else if (info < 0) then
-        info = 2230
+
+      case default  
+
+        info = 2231
         call psb_errpush(info,name)
         goto 9999 
+      end select
 
-      end if
 
-    case default  
-
-      info = 2231
+    case default
+      info = 2232
       call psb_errpush(info,name)
-      goto 9999 
+      goto 9999
     end select
 
 
-  case default
-    info = 2232
-    call psb_errpush(info,name)
-    goto 9999
-  end select
+
+
+
+  else
+
+    ng = -1 
+
+    select case(spstate) 
+    case(psb_spmat_bld_) 
+      if ((ufida /= 'COO').and.(ufida/='COI')) then 
+        info = 134
+        ch_err(1:3)=ufida(1:3)
+        call psb_errpush(info,name,a_err=ch_err)
+        goto 9999
+      end if
+      call psb_spinfo(psb_nztotreq_,a,nza,info)
+      call psb_spinfo(psb_nzsizereq_,a,isza,info)
+      if(info /= izero) then
+        info=4010
+        ch_err='psb_spinfo'
+        call psb_errpush(info,name,a_err=ch_err)
+        goto 9999
+      endif
+
+      if ((nza+nz)>isza) then 
+        call psb_sp_reall(a,max(nza+nz,int(1.5*isza)),info)
+        if(info /= izero) then
+          info=4010
+          ch_err='psb_sp_reall'
+          call psb_errpush(info,name,a_err=ch_err)
+          goto 9999
+        endif
+      endif
+
+      call psb_inner_ins(nz,ia,ja,val,nza,a%ia1,a%ia2,a%aspk,&
+           & imin,imax,jmin,jmax,info)
+
+      if(info /= izero) then
+        info=4010
+        ch_err='psb_inner_ins'
+        call psb_errpush(info,name,a_err=ch_err)
+        goto 9999
+      endif
+      if (debug) then 
+        if ((nza - a%infoa(psb_nnz_)) /= nz) then 
+          write(0,*) 'PSB_COINS: insert discarded items '
+        end if
+      end if
+      if ((nza - psb_sp_getifld(psb_nnz_,a,info)) /= nz) then
+        call psb_sp_setifld(nza,psb_del_bnd_,a,info)
+      endif
+      call psb_sp_setifld(nza,psb_nnz_,a,info)
+
+    case(psb_spmat_upd_)
+
+      iupd = psb_sp_getifld(psb_upd_,a,info)
+      select case (iupd)
+      case (psb_upd_perm_)
+        ip1 = psb_sp_getifld(psb_upd_pnt_,a,info)      
+        nzl = psb_sp_getifld(psb_del_bnd_,a,info)      
+        nza = a%ia2(ip1+psb_nnz_)
+
+
+        call psb_inner_upd(nz,ia,ja,val,nza,a%aspk,&
+             & imin,imax,jmin,jmax,nzl,info)
+
+        if (info /= izero) then
+          info=4010
+          ch_err='psb_inner_upd'
+          call psb_errpush(info,name,a_err=ch_err)
+          goto 9999
+        endif
+        if (debug) then 
+          if ((nza - a%ia2(ip1+psb_nnz_)) /= nz) then 
+            write(0,*) 'PSB_COINS: update discarded items '
+          end if
+        end if
+        a%ia2(ip1+psb_nnz_) = nza
+
+        if (debug) write(0,*) 'From COINS(UPD) : NZA:',nza
+
+      case (psb_upd_dflt_, psb_upd_srch_)
+
+        call  psb_srch_upd(nz,ia,ja,val,nza,a,&
+             & imin,imax,jmin,jmax,nzl,info)
+
+        if (info > 0) then 
+          if (rebuild_) then 
+            if (debug)  write(0,*)&
+                 &  'COINS: Going through rebuild_ fingers crossed!'
+            irst = info
+            call psb_nullify_sp(tmp)
+            tmp%fida='COO'
+            call psb_csdp(a,tmp,info)
+            call psb_sp_setifld(psb_spmat_bld_,psb_state_,tmp,info)
+            if (debug) then
+              write(0,*) 'COINS  Rebuild: size',tmp%infoa(psb_nnz_) ,irst            
+            endif
+            call psb_sp_transfer(tmp,a,info)
+            call psb_spinfo(psb_nztotreq_,a,nza,info)
+            call psb_spinfo(psb_nzsizereq_,a,isza,info)
+            if(info /= izero) then
+              info=4010
+              ch_err='psb_spinfo'
+              call psb_errpush(info,name,a_err=ch_err)
+              goto 9999
+            endif
+
+            if (debug)  write(0,*)&
+                 &  'COINS: Reinserting',a%fida,nza,isza
+            if ((nza+nz)>isza) then 
+              call psb_sp_reall(a,max(nza+nz,int(1.5*isza)),info)
+              if(info /= izero) then
+                info=4010
+                ch_err='psb_sp_reall'
+                call psb_errpush(info,name,a_err=ch_err)
+                goto 9999
+              endif
+            endif
+            if (irst <= nz) then 
+              call psb_inner_ins((nz-irst+1),ia(irst:nz),ja(irst:nz),val(irst:nz),&
+                   & nza,a%ia1,a%ia2,a%aspk,imin,imax,jmin,jmax,info)
+              call psb_sp_setifld(nza,psb_del_bnd_,a,info)
+              call psb_sp_setifld(nza,psb_nnz_,a,info)
+            end if
+
+          else
+            info = 2231
+            call psb_errpush(info,name)
+            goto 9999 
+          end if
+        else if (info < 0) then
+          info = 2230
+          call psb_errpush(info,name)
+          goto 9999 
+
+        end if
+
+      case default  
+
+        info = 2231
+        call psb_errpush(info,name)
+        goto 9999 
+      end select
+
+
+    case default
+      info = 2232
+      call psb_errpush(info,name)
+      goto 9999
+    end select
+  endif
+
+
   return
 
   call psb_erractionrestore(err_act)
@@ -257,24 +417,81 @@ subroutine psb_zcoins(nz,ia,ja,val,a,gtl,imin,imax,jmin,jmax,info,rebuild)
 
 contains
 
-  subroutine psb_inner_upd(nz,ia,ja,val,nza,aspk,gtl,ng,&
-       & imin,imax,jmin,jmax,nzl,info)
+  subroutine psb_inner_upd(nz,ia,ja,val,nza,aspk,&
+       & imin,imax,jmin,jmax,nzl,info,gtl,ng)
     implicit none 
 
-    integer, intent(in) :: nz, imin,imax,jmin,jmax,nzl,ng
-    integer, intent(in) :: ia(*),ja(*),gtl(*)
+    integer, intent(in) :: nz, imin,imax,jmin,jmax,nzl
+    integer, intent(in) :: ia(*),ja(*)
     integer, intent(inout) :: nza
     complex(kind(1.d0)), intent(in) :: val(*)
     complex(kind(1.d0)), intent(inout) :: aspk(*)
     integer, intent(out) :: info
+    integer, intent(in), optional  :: ng,gtl(*)
     integer  :: i,ir,ic
 
-    if (nza >= nzl) then 
-      do i=1, nz 
-        nza = nza + 1 
-        aspk(nza) = val(i)
-      end do
+    if (present(gtl)) then 
+      if (.not.present(ng)) then 
+        info = -1
+        return
+      endif
+      if (nza >= nzl) then 
+        do i=1, nz 
+          nza = nza + 1 
+          aspk(nza) = val(i)
+        end do
+      else
+        do i=1, nz 
+          ir = ia(i)
+          ic = ja(i) 
+          if ((ir >=1).and.(ir<=ng).and.(ic>=1).and.(ic<=ng)) then 
+            ir = gtl(ir)
+            ic = gtl(ic) 
+            if ((ir >=imin).and.(ir<=imax).and.(ic>=jmin).and.(ic<=jmax)) then 
+              nza = nza + 1 
+              aspk(nza) = val(i)
+            end if
+          end if
+        end do
+      end if
     else
+      if (nza >= nzl) then 
+        do i=1, nz 
+          nza = nza + 1 
+          aspk(nza) = val(i)
+        end do
+      else
+        do i=1, nz 
+          ir = ia(i)
+          ic = ja(i) 
+          if ((ir >=imin).and.(ir<=imax).and.(ic>=jmin).and.(ic<=jmax)) then 
+            nza = nza + 1 
+            aspk(nza) = val(i)
+          end if
+        end do
+      end if
+    end if
+  end subroutine psb_inner_upd
+
+  subroutine psb_inner_ins(nz,ia,ja,val,nza,ia1,ia2,aspk,&
+       & imin,imax,jmin,jmax,info,gtl,ng)
+    implicit none 
+
+    integer, intent(in) :: nz, imin,imax,jmin,jmax
+    integer, intent(in) :: ia(*),ja(*)
+    integer, intent(inout) :: nza,ia1(*),ia2(*)
+    complex(kind(1.d0)), intent(in) :: val(*)
+    complex(kind(1.d0)), intent(inout) :: aspk(*)
+    integer, intent(out) :: info
+    integer, intent(in), optional  :: ng,gtl(*)
+    integer :: i,ir,ic
+
+    info = 0
+    if (present(gtl)) then 
+      if (.not.present(ng)) then 
+        info = -1
+        return
+      endif
       do i=1, nz 
         ir = ia(i)
         ic = ja(i) 
@@ -283,43 +500,25 @@ contains
           ic = gtl(ic) 
           if ((ir >=imin).and.(ir<=imax).and.(ic>=jmin).and.(ic<=jmax)) then 
             nza = nza + 1 
+            ia1(nza) = ir
+            ia2(nza) = ic
             aspk(nza) = val(i)
           end if
         end if
       end do
-    end if
+    else
 
-  end subroutine psb_inner_upd
-
-  subroutine psb_inner_ins(nz,ia,ja,val,nza,ia1,ia2,aspk,gtl,ng,&
-       & imin,imax,jmin,jmax,info)
-    implicit none 
-
-    integer, intent(in) :: nz, imin,imax,jmin,jmax,ng
-    integer, intent(in) :: ia(*),ja(*),gtl(*)
-    integer, intent(inout) :: nza,ia1(*),ia2(*)
-    complex(kind(1.d0)), intent(in) :: val(*)
-    complex(kind(1.d0)), intent(inout) :: aspk(*)
-    integer, intent(out) :: info
-
-    integer :: i,ir,ic
-
-    info = 0
-    do i=1, nz 
-      ir = ia(i)
-      ic = ja(i) 
-
-      if ((ir >=1).and.(ir<=ng).and.(ic>=1).and.(ic<=ng)) then 
-        ir = gtl(ir)
-        ic = gtl(ic) 
+      do i=1, nz 
+        ir = ia(i)
+        ic = ja(i) 
         if ((ir >=imin).and.(ir<=imax).and.(ic>=jmin).and.(ic<=jmax)) then 
           nza = nza + 1 
           ia1(nza) = ir
           ia2(nza) = ic
           aspk(nza) = val(i)
         end if
-      end if
-    end do
+      end do
+    end if
 
   end subroutine psb_inner_ins
 

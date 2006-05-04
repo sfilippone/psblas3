@@ -145,7 +145,7 @@ subroutine psb_zspins(nz,ia,ja,val,a,desc_a,info,rebuild)
      ncol = desc_a%matrix_data(psb_n_col_)
 
      if (spstate == psb_spmat_bld_) then 
-        call psb_coins(nz,ia,ja,val,a,desc_a%glob_to_loc,1,nrow,1,ncol,info)
+        call psb_coins(nz,ia,ja,val,a,1,nrow,1,ncol,info,gtl=desc_a%glob_to_loc)
         if (info /= 0) then
            info=4010
            ch_err='psb_coins'
@@ -160,8 +160,8 @@ subroutine psb_zspins(nz,ia,ja,val,a,desc_a,info,rebuild)
   else if (psb_is_asb_dec(dectype)) then 
      nrow = desc_a%matrix_data(psb_n_row_)
      ncol = desc_a%matrix_data(psb_n_col_)
-     call psb_coins(nz,ia,ja,val,a,desc_a%glob_to_loc,1,nrow,1,ncol,&
-          & info,rebuild=rebuild_)
+     call psb_coins(nz,ia,ja,val,a,1,nrow,1,ncol,&
+          & info,gtl=desc_a%glob_to_loc,rebuild=rebuild_)
      if (info /= 0) then
         info=4010
         ch_err='psb_coins'

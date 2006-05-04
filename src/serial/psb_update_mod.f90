@@ -51,79 +51,129 @@ module psb_update_mod
 contains
 
 
-  subroutine psb_d_srch_upd(nz,ia,ja,val,nza,a,gtl,ng,&
-       & imin,imax,jmin,jmax,nzl,info)
+  subroutine psb_d_srch_upd(nz,ia,ja,val,nza,a,&
+       & imin,imax,jmin,jmax,nzl,info,gtl,ng)
     implicit none 
 
     type(psb_dspmat_type), intent(inout) :: a
-    integer, intent(in) :: nz, imin,imax,jmin,jmax,nzl,ng
-    integer, intent(in) :: ia(*),ja(*),gtl(*)
+    integer, intent(in) :: nz, imin,imax,jmin,jmax,nzl
+    integer, intent(in) :: ia(*),ja(*)
     integer, intent(inout) :: nza
     real(kind(1.d0)), intent(in) :: val(*)
     integer, intent(out) :: info
+    integer, intent(in), optional  :: ng,gtl(*)
     
     info  = 0
 
-    select case(toupper(a%fida))
-    case ('CSR') 
+    if (present(gtl)) then 
+      if (.not.present(ng)) then 
+        info = -1
+        return
+      endif
+      
+      select case(toupper(a%fida))
+      case ('CSR') 
 !!$      write(0,*) 'Calling csr_srch_upd'
-      call  csr_srch_upd(nz,ia,ja,val,nza,a,gtl,ng,&
-           & imin,imax,jmin,jmax,nzl,info)
+        call  csr_srch_upd(nz,ia,ja,val,nza,a,&
+             & imin,imax,jmin,jmax,nzl,info,gtl,ng)
 !!$      write(0,*) 'From csr_srch_upd:',info
-    case ('COO') 
-      call  coo_srch_upd(nz,ia,ja,val,nza,a,gtl,ng,&
-           & imin,imax,jmin,jmax,nzl,info)
-
-    case default
-
-      info = -9
-
-    end select
+      case ('COO') 
+        call  coo_srch_upd(nz,ia,ja,val,nza,a,&
+             & imin,imax,jmin,jmax,nzl,info,gtl,ng)
+        
+      case default
+        
+        info = -9
+        
+      end select
+    else
+      select case(toupper(a%fida))
+      case ('CSR') 
+!!$      write(0,*) 'Calling csr_srch_upd'
+        call  csr_srch_upd(nz,ia,ja,val,nza,a,&
+             & imin,imax,jmin,jmax,nzl,info)
+!!$      write(0,*) 'From csr_srch_upd:',info
+      case ('COO') 
+        call  coo_srch_upd(nz,ia,ja,val,nza,a,&
+             & imin,imax,jmin,jmax,nzl,info)
+        
+      case default
+        
+        info = -9
+        
+      end select
+    end if
 
   end subroutine psb_d_srch_upd
 
-  subroutine psb_z_srch_upd(nz,ia,ja,val,nza,a,gtl,ng,&
-       & imin,imax,jmin,jmax,nzl,info)
+  subroutine psb_z_srch_upd(nz,ia,ja,val,nza,a,&
+       & imin,imax,jmin,jmax,nzl,info,gtl,ng)
     implicit none 
 
     type(psb_zspmat_type), intent(inout) :: a
-    integer, intent(in) :: nz, imin,imax,jmin,jmax,nzl,ng
-    integer, intent(in) :: ia(*),ja(*),gtl(*)
+    integer, intent(in) :: nz, imin,imax,jmin,jmax,nzl
+    integer, intent(in) :: ia(*),ja(*)
     integer, intent(inout) :: nza
     complex(kind(1.d0)), intent(in) :: val(*)
     integer, intent(out) :: info
-
+    integer, intent(in), optional  :: ng,gtl(*)
+    
     info  = 0
 
-    select case(toupper(a%fida))
-    case ('CSR') 
+    if (present(gtl)) then 
+      if (.not.present(ng)) then 
+        info = -1
+        return
+      endif
+      
+      select case(toupper(a%fida))
+      case ('CSR') 
 !!$      write(0,*) 'Calling csr_srch_upd'
-      call  csr_srch_upd(nz,ia,ja,val,nza,a,gtl,ng,&
-           & imin,imax,jmin,jmax,nzl,info)
+        call  csr_srch_upd(nz,ia,ja,val,nza,a,&
+             & imin,imax,jmin,jmax,nzl,info,gtl,ng)
 !!$      write(0,*) 'From csr_srch_upd:',info
-    case ('COO') 
-      call  coo_srch_upd(nz,ia,ja,val,nza,a,gtl,ng,&
-           & imin,imax,jmin,jmax,nzl,info)
-
-    case default
-
-      info = -9
-
-    end select
+      case ('COO') 
+        call  coo_srch_upd(nz,ia,ja,val,nza,a,&
+             & imin,imax,jmin,jmax,nzl,info,gtl,ng)
+        
+      case default
+        
+        info = -9
+        
+      end select
+    else
+      select case(toupper(a%fida))
+      case ('CSR') 
+!!$      write(0,*) 'Calling csr_srch_upd'
+        call  csr_srch_upd(nz,ia,ja,val,nza,a,&
+             & imin,imax,jmin,jmax,nzl,info)
+!!$      write(0,*) 'From csr_srch_upd:',info
+      case ('COO') 
+        call  coo_srch_upd(nz,ia,ja,val,nza,a,&
+             & imin,imax,jmin,jmax,nzl,info)
+        
+      case default
+        
+        info = -9
+        
+      end select
+    end if
 
   end subroutine psb_z_srch_upd
 
 
-  subroutine d_csr_srch_upd(nz,ia,ja,val,nza,a,gtl,ng,&
-       & imin,imax,jmin,jmax,nzl,info)
+  subroutine d_csr_srch_upd(nz,ia,ja,val,nza,a,&
+       & imin,imax,jmin,jmax,nzl,info,gtl,ng)
     implicit none 
 
     type(psb_dspmat_type), intent(inout) :: a
-    integer, intent(in) :: nz, imin,imax,jmin,jmax,nzl,ng
-    integer, intent(in) :: ia(*),ja(*),gtl(*)
+    integer, intent(in) :: nz, imin,imax,jmin,jmax,nzl
+    integer, intent(in) :: ia(*),ja(*)
     integer, intent(inout) :: nza
     real(kind(1.d0)), intent(in) :: val(*)
     integer, intent(out) :: info
+    integer, intent(in), optional  :: ng,gtl(*)
+
     integer  :: i,ir,ic,check_flag, ilr, ilc, ip, &
          & i1,i2,nc,lb,ub,m,nnz,dupl
 
@@ -131,19 +181,112 @@ contains
 
     dupl = psb_sp_getifld(psb_dupl_,a,info)
 
-    select case(dupl)
-    case(psb_dupl_ovwrt_,psb_dupl_err_)
-      ! Overwrite.
-      ! Cannot test for error, should have been caught earlier.
 
-      ilr = -1 
-      ilc = -1 
-      do i=1, nz
-        ir = ia(i)
-        ic = ja(i) 
-        if ((ir >=1).and.(ir<=ng).and.(ic>=1).and.(ic<=ng)) then 
-          ir = gtl(ir)
-          ic = gtl(ic) 
+    if (present(gtl)) then 
+      if (.not.present(ng)) then 
+        info = -1
+        return
+      endif
+
+      select case(dupl)
+      case(psb_dupl_ovwrt_,psb_dupl_err_)
+        ! Overwrite.
+        ! Cannot test for error, should have been caught earlier.
+
+        ilr = -1 
+        ilc = -1 
+        do i=1, nz
+          ir = ia(i)
+          ic = ja(i) 
+          if ((ir >=1).and.(ir<=ng).and.(ic>=1).and.(ic<=ng)) then 
+            ir = gtl(ir)
+            ic = gtl(ic) 
+            i1 = a%ia2(ir)
+            i2 = a%ia2(ir+1)
+            nc=i2-i1
+
+
+            if (.true.) then 
+              call issrch(ip,ic,nc,a%ia1(i1:i2-1))    
+              if (ip>0) then 
+                a%aspk(i1+ip-1) = val(i)
+              else
+                write(0,*)'Was searching ',ic,' in: ',i1,i2,' : ',a%ia1(i1:i2-1)
+                info = i
+                return
+              end if
+
+            else
+!!$ 
+              ip = -1
+              lb = i1
+              ub = i2-1
+              do
+                if (lb > ub) exit
+                m = (lb+ub)/2
+!!$              write(0,*) 'Debug: ',lb,m,ub
+                if (ic == a%ia1(m))  then
+                  ip   = m 
+                  lb   = ub + 1
+                else if (ic < a%ia1(m))  then
+                  ub = m-1
+                else 
+                  lb = m + 1
+                end if
+              enddo
+
+              if (ip>0) then 
+                a%aspk(ip) = val(i)                
+              else
+                write(0,*)'Was searching ',ic,' in: ',i1,i2,' : ',a%ia1(i1:i2-1)
+                info = i
+                return
+              end if
+
+            end if
+          end if
+        end do
+
+      case(psb_dupl_add_)
+        ! Add
+        ilr = -1 
+        ilc = -1 
+        do i=1, nz
+          ir = ia(i)
+          ic = ja(i) 
+          if ((ir >=1).and.(ir<=ng).and.(ic>=1).and.(ic<=ng)) then 
+            ir = gtl(ir)
+            ic = gtl(ic) 
+            i1 = a%ia2(ir)
+            i2 = a%ia2(ir+1)
+            nc = i2-i1
+            call issrch(ip,ic,nc,a%ia1(i1:i2-1))
+            if (ip>0) then 
+              a%aspk(i1+ip-1) = a%aspk(i1+ip-1) + val(i)
+            else
+              info = i
+              return
+            end if
+          end if
+        end do
+
+      case default
+        info = -3
+        write(0,*) 'Duplicate handling: ',dupl
+      end select
+
+    else
+
+      select case(dupl)
+      case(psb_dupl_ovwrt_,psb_dupl_err_)
+        ! Overwrite.
+        ! Cannot test for error, should have been caught earlier.
+
+        ilr = -1 
+        ilc = -1 
+        do i=1, nz
+          ir = ia(i)
+          ic = ja(i) 
           i1 = a%ia2(ir)
           i2 = a%ia2(ir+1)
           nc=i2-i1
@@ -187,19 +330,15 @@ contains
             end if
 
           end if
-        end if
-      end do
+        end do
 
-    case(psb_dupl_add_)
-      ! Add
-      ilr = -1 
-      ilc = -1 
-      do i=1, nz
-        ir = ia(i)
-        ic = ja(i) 
-        if ((ir >=1).and.(ir<=ng).and.(ic>=1).and.(ic<=ng)) then 
-          ir = gtl(ir)
-          ic = gtl(ic) 
+      case(psb_dupl_add_)
+        ! Add
+        ilr = -1 
+        ilc = -1 
+        do i=1, nz
+          ir = ia(i)
+          ic = ja(i) 
           i1 = a%ia2(ir)
           i2 = a%ia2(ir+1)
           nc = i2-i1
@@ -210,25 +349,27 @@ contains
             info = i
             return
           end if
-        end if
-      end do
+        end do
 
-    case default
-      info = -3
-      write(0,*) 'Duplicate handling: ',dupl
-    end select
+      case default
+        info = -3
+        write(0,*) 'Duplicate handling: ',dupl
+      end select
+    end if
+
   end subroutine d_csr_srch_upd
 
-  subroutine d_coo_srch_upd(nz,ia,ja,val,nza,a,gtl,ng,&
-       & imin,imax,jmin,jmax,nzl,info)
+  subroutine d_coo_srch_upd(nz,ia,ja,val,nza,a,&
+       & imin,imax,jmin,jmax,nzl,info,gtl,ng)
     implicit none 
 
     type(psb_dspmat_type), intent(inout) :: a
-    integer, intent(in) :: nz, imin,imax,jmin,jmax,nzl,ng
-    integer, intent(in) :: ia(*),ja(*),gtl(*)
+    integer, intent(in) :: nz, imin,imax,jmin,jmax,nzl
+    integer, intent(in) :: ia(*),ja(*)
     integer, intent(inout) :: nza
     real(kind(1.d0)), intent(in) :: val(*)
     integer, intent(out) :: info
+    integer, intent(in), optional  :: ng,gtl(*)
     integer  :: i,ir,ic,check_flag, ilr, ilc, ip, &
          & i1,i2,nc,lb,ub,m,nnz,dupl,isrt
 
@@ -246,16 +387,95 @@ contains
     nnz = psb_sp_getifld(psb_nnz_,a,info)
 
 
-    select case(dupl)
-    case(psb_dupl_ovwrt_,psb_dupl_err_)
-      ! Overwrite.
-      ! Cannot test for error, should have been caught earlier.
-      do i=1, nz
-        ir = ia(i)
-        ic = ja(i) 
-        if ((ir >=1).and.(ir<=ng).and.(ic>=1).and.(ic<=ng)) then 
-          ir = gtl(ir)
-          ic = gtl(ic) 
+    if (present(gtl)) then 
+      if (.not.present(ng)) then 
+        info = -1
+        return
+      endif
+
+      select case(dupl)
+      case(psb_dupl_ovwrt_,psb_dupl_err_)
+        ! Overwrite.
+        ! Cannot test for error, should have been caught earlier.
+        do i=1, nz
+          ir = ia(i)
+          ic = ja(i) 
+          if ((ir >=1).and.(ir<=ng).and.(ic>=1).and.(ic<=ng)) then 
+            ir = gtl(ir)
+            ic = gtl(ic) 
+            if (ir /= ilr) then 
+              call ibsrch(i1,ir,nnz,a%ia1)
+              i2 = i1
+              do 
+                if (i2+1 > nnz) exit
+                if (a%ia1(i2+1) /= a%ia1(i2)) exit
+                i2 = i2 + 1
+              end do
+              do 
+                if (i1-1 < 1) exit
+                if (a%ia1(i1-1) /= a%ia1(i1)) exit
+                i1 = i1 - 1
+              end do
+              ilr = ir
+            end if
+            nc = i2-i1+1
+            call issrch(ip,ic,nc,a%ia2(i1:i2))
+            if (ip>0) then 
+              a%aspk(i1+ip-1) = val(i)
+            else
+              info = i 
+              return
+            end if
+          end if
+        end do
+      case(psb_dupl_add_)
+        ! Add
+        do i=1, nz
+          ir = ia(i)
+          ic = ja(i) 
+          if ((ir >=1).and.(ir<=ng).and.(ic>=1).and.(ic<=ng)) then 
+            ir = gtl(ir)
+            ic = gtl(ic) 
+            if (ir /= ilr) then 
+              call ibsrch(i1,ir,nnz,a%ia1)
+              i2 = i1
+              do 
+                if (i2+1 > nnz) exit
+                if (a%ia1(i2+1) /= a%ia1(i2)) exit
+                i2 = i2 + 1
+              end do
+              do 
+                if (i1-1 < 1) exit
+                if (a%ia1(i1-1) /= a%ia1(i1)) exit
+                i1 = i1 - 1
+              end do
+              ilr = ir
+            end if
+            nc = i2-i1+1
+            call issrch(ip,ic,nc,a%ia2(i1:i2))
+            if (ip>0) then 
+              a%aspk(i1+ip-1) = a%aspk(i1+ip-1) + val(i)
+            else
+              info = i 
+              return
+            end if
+          end if
+        end do
+
+      case default
+        info = -3
+        write(0,*) 'Duplicate handling: ',dupl
+      end select
+
+    else
+
+      select case(dupl)
+      case(psb_dupl_ovwrt_,psb_dupl_err_)
+        ! Overwrite.
+        ! Cannot test for error, should have been caught earlier.
+        do i=1, nz
+          ir = ia(i)
+          ic = ja(i) 
           if (ir /= ilr) then 
             call ibsrch(i1,ir,nnz,a%ia1)
             i2 = i1
@@ -279,16 +499,13 @@ contains
             info = i 
             return
           end if
-        end if
-      end do
-    case(psb_dupl_add_)
-      ! Add
-      do i=1, nz
-        ir = ia(i)
-        ic = ja(i) 
-        if ((ir >=1).and.(ir<=ng).and.(ic>=1).and.(ic<=ng)) then 
-          ir = gtl(ir)
-          ic = gtl(ic) 
+        end do
+
+      case(psb_dupl_add_)
+        ! Add
+        do i=1, nz
+          ir = ia(i)
+          ic = ja(i) 
           if (ir /= ilr) then 
             call ibsrch(i1,ir,nnz,a%ia1)
             i2 = i1
@@ -312,28 +529,30 @@ contains
             info = i 
             return
           end if
-        end if
-      end do
+        end do
 
-    case default
-      info = -3
-      write(0,*) 'Duplicate handling: ',dupl
-    end select
+      case default
+        info = -3
+        write(0,*) 'Duplicate handling: ',dupl
+      end select
+
+    end if
 
   end subroutine d_coo_srch_upd
 
 
-
-  subroutine z_csr_srch_upd(nz,ia,ja,val,nza,a,gtl,ng,&
-       & imin,imax,jmin,jmax,nzl,info)
+  subroutine z_csr_srch_upd(nz,ia,ja,val,nza,a,&
+       & imin,imax,jmin,jmax,nzl,info,gtl,ng)
     implicit none 
 
     type(psb_zspmat_type), intent(inout) :: a
-    integer, intent(in) :: nz, imin,imax,jmin,jmax,nzl,ng
-    integer, intent(in) :: ia(*),ja(*),gtl(*)
+    integer, intent(in) :: nz, imin,imax,jmin,jmax,nzl
+    integer, intent(in) :: ia(*),ja(*)
     integer, intent(inout) :: nza
     complex(kind(1.d0)), intent(in) :: val(*)
     integer, intent(out) :: info
+    integer, intent(in), optional  :: ng,gtl(*)
+
     integer  :: i,ir,ic,check_flag, ilr, ilc, ip, &
          & i1,i2,nc,lb,ub,m,nnz,dupl
 
@@ -341,19 +560,112 @@ contains
 
     dupl = psb_sp_getifld(psb_dupl_,a,info)
 
-    select case(dupl)
-    case(psb_dupl_ovwrt_,psb_dupl_err_)
-      ! Overwrite.
-      ! Cannot test for error, should have been caught earlier.
 
-      ilr = -1 
-      ilc = -1 
-      do i=1, nz
-        ir = ia(i)
-        ic = ja(i) 
-        if ((ir >=1).and.(ir<=ng).and.(ic>=1).and.(ic<=ng)) then 
-          ir = gtl(ir)
-          ic = gtl(ic) 
+    if (present(gtl)) then 
+      if (.not.present(ng)) then 
+        info = -1
+        return
+      endif
+
+      select case(dupl)
+      case(psb_dupl_ovwrt_,psb_dupl_err_)
+        ! Overwrite.
+        ! Cannot test for error, should have been caught earlier.
+
+        ilr = -1 
+        ilc = -1 
+        do i=1, nz
+          ir = ia(i)
+          ic = ja(i) 
+          if ((ir >=1).and.(ir<=ng).and.(ic>=1).and.(ic<=ng)) then 
+            ir = gtl(ir)
+            ic = gtl(ic) 
+            i1 = a%ia2(ir)
+            i2 = a%ia2(ir+1)
+            nc=i2-i1
+
+
+            if (.true.) then 
+              call issrch(ip,ic,nc,a%ia1(i1:i2-1))    
+              if (ip>0) then 
+                a%aspk(i1+ip-1) = val(i)
+              else
+                write(0,*)'Was searching ',ic,' in: ',i1,i2,' : ',a%ia1(i1:i2-1)
+                info = i
+                return
+              end if
+
+            else
+!!$ 
+              ip = -1
+              lb = i1
+              ub = i2-1
+              do
+                if (lb > ub) exit
+                m = (lb+ub)/2
+!!$              write(0,*) 'Debug: ',lb,m,ub
+                if (ic == a%ia1(m))  then
+                  ip   = m 
+                  lb   = ub + 1
+                else if (ic < a%ia1(m))  then
+                  ub = m-1
+                else 
+                  lb = m + 1
+                end if
+              enddo
+
+              if (ip>0) then 
+                a%aspk(ip) = val(i)                
+              else
+                write(0,*)'Was searching ',ic,' in: ',i1,i2,' : ',a%ia1(i1:i2-1)
+                info = i
+                return
+              end if
+
+            end if
+          end if
+        end do
+
+      case(psb_dupl_add_)
+        ! Add
+        ilr = -1 
+        ilc = -1 
+        do i=1, nz
+          ir = ia(i)
+          ic = ja(i) 
+          if ((ir >=1).and.(ir<=ng).and.(ic>=1).and.(ic<=ng)) then 
+            ir = gtl(ir)
+            ic = gtl(ic) 
+            i1 = a%ia2(ir)
+            i2 = a%ia2(ir+1)
+            nc = i2-i1
+            call issrch(ip,ic,nc,a%ia1(i1:i2-1))
+            if (ip>0) then 
+              a%aspk(i1+ip-1) = a%aspk(i1+ip-1) + val(i)
+            else
+              info = i
+              return
+            end if
+          end if
+        end do
+
+      case default
+        info = -3
+        write(0,*) 'Duplicate handling: ',dupl
+      end select
+
+    else
+
+      select case(dupl)
+      case(psb_dupl_ovwrt_,psb_dupl_err_)
+        ! Overwrite.
+        ! Cannot test for error, should have been caught earlier.
+
+        ilr = -1 
+        ilc = -1 
+        do i=1, nz
+          ir = ia(i)
+          ic = ja(i) 
           i1 = a%ia2(ir)
           i2 = a%ia2(ir+1)
           nc=i2-i1
@@ -397,19 +709,15 @@ contains
             end if
 
           end if
-        end if
-      end do
+        end do
 
-    case(psb_dupl_add_)
-      ! Add
-      ilr = -1 
-      ilc = -1 
-      do i=1, nz
-        ir = ia(i)
-        ic = ja(i) 
-        if ((ir >=1).and.(ir<=ng).and.(ic>=1).and.(ic<=ng)) then 
-          ir = gtl(ir)
-          ic = gtl(ic) 
+      case(psb_dupl_add_)
+        ! Add
+        ilr = -1 
+        ilc = -1 
+        do i=1, nz
+          ir = ia(i)
+          ic = ja(i) 
           i1 = a%ia2(ir)
           i2 = a%ia2(ir+1)
           nc = i2-i1
@@ -420,25 +728,27 @@ contains
             info = i
             return
           end if
-        end if
-      end do
+        end do
 
-    case default
-      info = -3
-      write(0,*) 'Duplicate handling: ',dupl
-    end select
+      case default
+        info = -3
+        write(0,*) 'Duplicate handling: ',dupl
+      end select
+    end if
+
   end subroutine z_csr_srch_upd
 
-  subroutine z_coo_srch_upd(nz,ia,ja,val,nza,a,gtl,ng,&
-       & imin,imax,jmin,jmax,nzl,info)
+  subroutine z_coo_srch_upd(nz,ia,ja,val,nza,a,&
+       & imin,imax,jmin,jmax,nzl,info,gtl,ng)
     implicit none 
 
     type(psb_zspmat_type), intent(inout) :: a
-    integer, intent(in) :: nz, imin,imax,jmin,jmax,nzl,ng
-    integer, intent(in) :: ia(*),ja(*),gtl(*)
+    integer, intent(in) :: nz, imin,imax,jmin,jmax,nzl
+    integer, intent(in) :: ia(*),ja(*)
     integer, intent(inout) :: nza
     complex(kind(1.d0)), intent(in) :: val(*)
     integer, intent(out) :: info
+    integer, intent(in), optional  :: ng,gtl(*)
     integer  :: i,ir,ic,check_flag, ilr, ilc, ip, &
          & i1,i2,nc,lb,ub,m,nnz,dupl,isrt
 
@@ -456,16 +766,95 @@ contains
     nnz = psb_sp_getifld(psb_nnz_,a,info)
 
 
-    select case(dupl)
-    case(psb_dupl_ovwrt_,psb_dupl_err_)
-      ! Overwrite.
-      ! Cannot test for error, should have been caught earlier.
-      do i=1, nz
-        ir = ia(i)
-        ic = ja(i) 
-        if ((ir >=1).and.(ir<=ng).and.(ic>=1).and.(ic<=ng)) then 
-          ir = gtl(ir)
-          ic = gtl(ic) 
+    if (present(gtl)) then 
+      if (.not.present(ng)) then 
+        info = -1
+        return
+      endif
+
+      select case(dupl)
+      case(psb_dupl_ovwrt_,psb_dupl_err_)
+        ! Overwrite.
+        ! Cannot test for error, should have been caught earlier.
+        do i=1, nz
+          ir = ia(i)
+          ic = ja(i) 
+          if ((ir >=1).and.(ir<=ng).and.(ic>=1).and.(ic<=ng)) then 
+            ir = gtl(ir)
+            ic = gtl(ic) 
+            if (ir /= ilr) then 
+              call ibsrch(i1,ir,nnz,a%ia1)
+              i2 = i1
+              do 
+                if (i2+1 > nnz) exit
+                if (a%ia1(i2+1) /= a%ia1(i2)) exit
+                i2 = i2 + 1
+              end do
+              do 
+                if (i1-1 < 1) exit
+                if (a%ia1(i1-1) /= a%ia1(i1)) exit
+                i1 = i1 - 1
+              end do
+              ilr = ir
+            end if
+            nc = i2-i1+1
+            call issrch(ip,ic,nc,a%ia2(i1:i2))
+            if (ip>0) then 
+              a%aspk(i1+ip-1) = val(i)
+            else
+              info = i 
+              return
+            end if
+          end if
+        end do
+      case(psb_dupl_add_)
+        ! Add
+        do i=1, nz
+          ir = ia(i)
+          ic = ja(i) 
+          if ((ir >=1).and.(ir<=ng).and.(ic>=1).and.(ic<=ng)) then 
+            ir = gtl(ir)
+            ic = gtl(ic) 
+            if (ir /= ilr) then 
+              call ibsrch(i1,ir,nnz,a%ia1)
+              i2 = i1
+              do 
+                if (i2+1 > nnz) exit
+                if (a%ia1(i2+1) /= a%ia1(i2)) exit
+                i2 = i2 + 1
+              end do
+              do 
+                if (i1-1 < 1) exit
+                if (a%ia1(i1-1) /= a%ia1(i1)) exit
+                i1 = i1 - 1
+              end do
+              ilr = ir
+            end if
+            nc = i2-i1+1
+            call issrch(ip,ic,nc,a%ia2(i1:i2))
+            if (ip>0) then 
+              a%aspk(i1+ip-1) = a%aspk(i1+ip-1) + val(i)
+            else
+              info = i 
+              return
+            end if
+          end if
+        end do
+
+      case default
+        info = -3
+        write(0,*) 'Duplicate handling: ',dupl
+      end select
+
+    else
+
+      select case(dupl)
+      case(psb_dupl_ovwrt_,psb_dupl_err_)
+        ! Overwrite.
+        ! Cannot test for error, should have been caught earlier.
+        do i=1, nz
+          ir = ia(i)
+          ic = ja(i) 
           if (ir /= ilr) then 
             call ibsrch(i1,ir,nnz,a%ia1)
             i2 = i1
@@ -476,7 +865,6 @@ contains
             end do
             do 
               if (i1-1 < 1) exit
-
               if (a%ia1(i1-1) /= a%ia1(i1)) exit
               i1 = i1 - 1
             end do
@@ -487,19 +875,16 @@ contains
           if (ip>0) then 
             a%aspk(i1+ip-1) = val(i)
           else
-            info = i
+            info = i 
             return
           end if
-        end if
-      end do
-    case(psb_dupl_add_)
-      ! Add
-      do i=1, nz
-        ir = ia(i)
-        ic = ja(i) 
-        if ((ir >=1).and.(ir<=ng).and.(ic>=1).and.(ic<=ng)) then 
-          ir = gtl(ir)
-          ic = gtl(ic) 
+        end do
+
+      case(psb_dupl_add_)
+        ! Add
+        do i=1, nz
+          ir = ia(i)
+          ic = ja(i) 
           if (ir /= ilr) then 
             call ibsrch(i1,ir,nnz,a%ia1)
             i2 = i1
@@ -520,19 +905,19 @@ contains
           if (ip>0) then 
             a%aspk(i1+ip-1) = a%aspk(i1+ip-1) + val(i)
           else
-            info = i
+            info = i 
             return
           end if
-        end if
-      end do
+        end do
 
-    case default
-      info = -3
-      write(0,*) 'Duplicate handling: ',dupl
-    end select
+      case default
+        info = -3
+        write(0,*) 'Duplicate handling: ',dupl
+      end select
+
+    end if
 
   end subroutine z_coo_srch_upd
-
 
 end module psb_update_mod
 
