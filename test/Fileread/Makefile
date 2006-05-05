@@ -57,7 +57,7 @@ srctst: srctst.o
 
 clean: 
 	/bin/rm -f $(DFOBJS) $(ZFOBJS) $(IOOBJS) $(MMHBOBJS) \
-        *$(.mod) $(EXEDIR)/df_sample $(EXEDIR)/zf_sample 
+        *$(.mod) $(EXEDIR)/df_sample $(EXEDIR)/zf_sample  dhb2mm zhb2mm dmm2hb zmm2hb
 
 lib:
 	(cd ../../; make lib)

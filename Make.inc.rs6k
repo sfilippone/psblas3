@@ -28,11 +28,11 @@ MPCC=mpxlc
 ##########################################################
 BLAS=-lessl
 BLACS=-lmpiblacs
+EXTRA_BLACS_ENV_OBJS=extra_env.o
 #These should be uncommented when using the ESSL BLACS library
 #EXTRA_BLACS_P2P_OBJS= krecvid.o ksendid.o
 #EXTRA_BLACS_ENV_OBJS=extra_env_essl.o
-#This should be uncommented when using the ESSL BLACS library
-EXTRA_BLACS_ENV_OBJS=extra_env.o
+
 
 
 #######################  Section 4 #######################

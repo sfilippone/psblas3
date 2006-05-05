@@ -1,14 +1,6 @@
 This directory contains  the PSBLAS library, version 2.0.
 
 
-Release Candidate 3: 
-
-We now have complex routines, and a complex  test program in the
-Fileread directory.  In the same directory there are utilities for
-reading/writing in MatrixMarket and Harwell-Boeing formats.
-
-
-
 The version 1.0 of the library was described in:
 S. Filippone, M. Colajanni
 PSBLAS: A library for parallel linear algebra computation on sparse matrices
@@ -24,7 +16,7 @@ other compiler/operating systems please let us know.
 IBM SP.
 The library has been tested on an IBM SP2, SP4 and SP5, with XLC and XLF
 compilers, and a version of the BLACS based on MPI.
-The rather baroque setting 
+The  setting 
  F90=xlf90 -qsuffix=f=f90
 in Make.inc.rs6k takes care of the f90 extension. 
 WARNING: xlf 8.1 introduced a performance bug, whereas a Fortan 90
@@ -40,8 +32,6 @@ development snapshots from GCC 3.5.0, later 4.1 and 4.2  since July
 our reference platform. 
 
 
-Vast F90/Linux is  now obsolete, in that we have a NULL()
-initialization for pointers that is outside strict F90. 
 For the PGI compilers, we used them in conjunction with gcc, NOT
 pgcc. Note that with pgi 3.6 we have horrible performance, due to
 spurious array copies when calling Fortran 77 codes from Fortran 90;
@@ -59,6 +49,10 @@ INTERFACE for the dummy argument subroutine PARTS, it wanted an
 EXTERNAL specification. Again, please move to 7.1.
 
 
+
+UTILITIES
+The TEST/Fileread directory contains some utilities to convert to/from
+Harwell-Boeing and MatrixMarket file formats. 
 
 
 DOCUMENTATION
