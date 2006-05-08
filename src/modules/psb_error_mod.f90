@@ -439,6 +439,8 @@ contains
        write (0,'("Error from call to a subroutine ")')
     case(4012)
        write (0,'("Error ",i0," from call to a subroutine ")')i_e_d(1)
+    case(4110)
+       write (0,'("Error ",i0," from call to an external package in subroutine ",a)')i_e_d(1),a_e_d
     case (5001)
        write (0,'("Invalid ISTOP: ",i0)')i_e_d(1)
     case (5002)

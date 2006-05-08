@@ -131,7 +131,10 @@ psb_zumf_factor_(int *n, int *nnz,
   if ( *info == UMFPACK_OK ) {
     *info = 0;
   } else {
-    printf("umfpack_di_symbolic() error returns INFO= %d\n", *info);
+    printf("umfpack_zi_symbolic() error returns INFO= %d\n", *info);
+    *info = -11;
+    *numptr = (fptr) NULL; 
+    return;
   }
     
   *symptr = (fptr) Symbolic; 
@@ -142,11 +145,13 @@ psb_zumf_factor_(int *n, int *nnz,
     
   if ( *info == UMFPACK_OK ) {
     *info = 0;
+    *numptr = (fptr) Numeric; 
   } else {
-    printf("umfpack_di_numeric() error returns INFO= %d\n", *info);
+    printf("umfpack_zi_numeric() error returns INFO= %d\n", *info);
+    *info = -12;
+    *numptr = (fptr) NULL; 
   }
     
-  *numptr = (fptr) Numeric; 
   for (i = 0; i <= *n;  ++i) ++colptr[i];
   for (i = 0; i < *nnz; ++i) ++rowind[i];
 #else

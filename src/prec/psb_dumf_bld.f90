@@ -52,6 +52,7 @@ subroutine psb_dumf_bld(a,desc_a,p,info)
   character(len=5)         :: fmt
   character                :: upd='F'
   integer                  :: i,j,nza,nzb,nzt,icontxt, me,mycol,nprow,npcol,err_act
+  integer                  :: i_err(5)
   logical, parameter :: debug=.false.
   character(len=20)   :: name, ch_err
 
@@ -183,10 +184,11 @@ subroutine psb_dumf_bld(a,desc_a,p,info)
   call psb_dumf_factor(atmp%m,nzt,&
        & atmp%aspk,atmp%ia1,atmp%ia2,&
        & p%iprcparm(umf_symptr_),p%iprcparm(umf_numptr_),info)
-  if(info /= 0) then
-    info=4010
+  if (info /= 0) then
+    i_err(1) = info 
+    info=4110
     ch_err='psb_umf_fact'
-    call psb_errpush(info,name,a_err=ch_err)
+    call psb_errpush(info,name,a_err=ch_err,i_err=i_err)
     goto 9999
   end if
 

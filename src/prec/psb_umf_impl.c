@@ -132,6 +132,9 @@ psb_dumf_factor_(int *n, int *nnz,
     *info = 0;
   } else {
     printf("umfpack_di_symbolic() error returns INFO= %d\n", *info);
+    *info = -11;
+    *numptr = (fptr) NULL; 
+    return;
   }
     
   *symptr = (fptr) Symbolic; 
@@ -145,6 +148,7 @@ psb_dumf_factor_(int *n, int *nnz,
     *numptr = (fptr) Numeric; 
   } else {
     printf("umfpack_di_numeric() error returns INFO= %d\n", *info);
+    *info = -12;
     *numptr = (fptr) NULL; 
   }
     

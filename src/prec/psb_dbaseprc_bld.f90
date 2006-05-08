@@ -225,7 +225,7 @@ subroutine psb_dbaseprc_bld(a,desc_a,p,info,upd)
       if(debug) write(0,*)me,': calling umf_bld'
       call psb_umf_bld(a,desc_a,p,info)
       if(debug) write(0,*)me,': Done umf_bld ',info
-      if(info /= 0) then
+      if (info /= 0) then
         info=4010
         ch_err='umf_bld'
         call psb_errpush(info,name,a_err=ch_err)

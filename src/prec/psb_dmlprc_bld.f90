@@ -168,6 +168,13 @@ subroutine psb_dmlprc_bld(a,desc_a,p,info)
 
   call psb_baseprc_bld(ac,desc_p,p,info)
   if (debug) write(0,*) 'Out from basaeprcbld',info
+  if(info /= 0) then
+    info=4010
+    ch_err='psb_baseprc_bld'
+    call psb_errpush(info,name,a_err=ch_err)
+    goto 9999
+  end if
+  
 
   !
   ! We have used a separate ac because:
