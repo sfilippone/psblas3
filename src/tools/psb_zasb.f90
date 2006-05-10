@@ -41,8 +41,9 @@ subroutine psb_zasb(x, desc_a, info)
   !....assembly dense matrix x .....
   use psb_descriptor_type
   use psb_const_mod
-  use psb_psblas_mod
+  use psb_comm_mod
   use psb_error_mod
+  use psb_realloc_mod
   implicit none
 
   type(psb_desc_type), intent(in) ::  desc_a
@@ -51,7 +52,6 @@ subroutine psb_zasb(x, desc_a, info)
 
   ! local variables
   integer :: err, icontxt,nprow,npcol,me,mypcol,temp,lwork,nrow,ncol, err_act
-  complex(kind(1.d0)),pointer ::  ztemp(:,:)
   integer :: int_err(5), i1sz, i2sz, dectype, i,j
   double precision :: real_err(5)
   logical, parameter :: debug=.false.
@@ -61,18 +61,18 @@ subroutine psb_zasb(x, desc_a, info)
   info=0
   name='psb_zasb'
   call psb_erractionsave(err_act)
-  
+
   icontxt=desc_a%matrix_data(psb_ctxt_)
   dectype=desc_a%matrix_data(psb_dec_type_)
-  
+
   call blacs_gridinfo(icontxt, nprow, npcol, me, mypcol)
-  
+
   if ((.not.associated(desc_a%matrix_data))) then
-     info=3110
-     call psb_errpush(info,name)
-     goto 9999
+    info=3110
+    call psb_errpush(info,name)
+    goto 9999
   endif
-  
+
   if (debug) write(*,*) 'asb start: ',nprow,npcol,me,&
        &desc_a%matrix_data(psb_dec_type_)
   !     ....verify blacs grid correctness..
@@ -92,7 +92,7 @@ subroutine psb_zasb(x, desc_a, info)
     call psb_errpush(info,name,i_err=int_err)
     goto 9999
   endif
-   
+
   ! check size
   icontxt=desc_a%matrix_data(psb_ctxt_)
   nrow=desc_a%matrix_data(psb_n_row_)
@@ -101,22 +101,13 @@ subroutine psb_zasb(x, desc_a, info)
   i2sz = size(x,dim=2)
   if (debug) write(*,*) 'asb: ',i1sz,i2sz,nrow,ncol
   if (i1sz.lt.ncol) then
-     allocate(ztemp(ncol,i2sz),stat=info)
-     if (info.ne.0) then
-        info=2025
-        int_err(1)=ncol
-        call psb_errpush(info,name,i_err=int_err)
-        goto 9999
-     endif
-
-     do j=1,size(x,2)
-       do i=1,nrow
-         ztemp(i,j) = x(i,j)
-       end do
-     end do
-     
-     deallocate(x)
-     x => ztemp
+    call psb_realloc(ncol,i2sz,x,info)
+    if (info.ne.0) then
+      info=2025
+      int_err(1)=ncol
+      call psb_errpush(info,name,i_err=int_err)
+      goto 9999
+    endif
   endif
 
   ! ..update halo elements..
@@ -185,7 +176,7 @@ subroutine psb_zasbv(x, desc_a, info)
   !....assembly dense matrix x .....
   use psb_descriptor_type
   use psb_const_mod
-  use psb_psblas_mod
+  use psb_comm_mod
   use psb_error_mod
   use psb_realloc_mod
   implicit none

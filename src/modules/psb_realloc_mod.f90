@@ -38,6 +38,7 @@ module psb_realloc_mod
     module procedure psb_dreallocate2i1d
     module procedure psb_dreallocate1d
     module procedure psb_dreallocated2
+    module procedure psb_dreallocatei2
     module procedure psb_dreallocate2i1z
     module procedure psb_dreallocate1z
     module procedure psb_dreallocatez2
@@ -285,7 +286,7 @@ Contains
 
     ! ...Local Variables
     Real(kind(1.d0)),Pointer :: tmp(:,:)
-    Integer :: dim,err_act,err,i, m
+    Integer :: dim,err_act,err,i, m, dim2
     character(len=20)  :: name
 
     name='psb_dreallocated2'
@@ -294,6 +295,7 @@ Contains
 
     if (associated(rrax)) then 
       dim=size(rrax,1)
+      dim2=size(rrax,2)
 
       If (dim /= len1) Then
         Allocate(tmp(len1,len2),stat=info)
@@ -306,10 +308,10 @@ Contains
 !!$        write(0,*) 'DA: copying ',min(len,dim)
         if (.true.) then 
           do i=1,m
-            tmp(i,:) = rrax(i,:)
+            tmp(i,1:min(len2,dim2)) = rrax(i,1:min(len2,dim2))
           end do
         else
-          tmp(1:m,:) = rrax(1:m,:)
+          tmp(1:m,1:min(len2,dim2)) = rrax(1:m,1:min(len2,dim2))
         end if
 !!$        write(0,*) 'DA: copying done ',m
         Deallocate(rrax,stat=info)
@@ -331,6 +333,7 @@ Contains
     endif
     if (present(pad)) then 
       rrax(dim+1:len1,:) = pad
+      rrax(:,dim2+1:len2) = pad
     endif
     call psb_erractionrestore(err_act)
     return
@@ -357,7 +360,7 @@ Contains
 
     ! ...Local Variables
     complex(kind(1.d0)),Pointer :: tmp(:,:)
-    Integer :: dim,err_act,err,i, m
+    Integer :: dim,err_act,err,i, m, dim2
     character(len=20)  :: name
 
     name='psb_dreallocatez2'
@@ -366,6 +369,7 @@ Contains
 
     if (associated(rrax)) then 
       dim=size(rrax,1)
+      dim2=size(rrax,2)
 
       If (dim /= len1) Then
         Allocate(tmp(len1,len2),stat=info)
@@ -378,10 +382,10 @@ Contains
 !!$        write(0,*) 'DA: copying ',min(len,dim)
         if (.true.) then 
           do i=1,m
-            tmp(i,:) = rrax(i,:)
+            tmp(i,1:min(len2,dim2)) = rrax(i,1:min(len2,dim2))
           end do
         else
-          tmp(1:m,:) = rrax(1:m,:)
+          tmp(1:m,1:min(len2,dim2)) = rrax(1:m,1:min(len2,dim2))
         end if
 !!$        write(0,*) 'DA: copying done ',m
         Deallocate(rrax,stat=info)
@@ -403,6 +407,7 @@ Contains
     endif
     if (present(pad)) then 
       rrax(dim+1:len1,:) = pad
+      rrax(:,dim2+1:len2) = pad
     endif
     call psb_erractionrestore(err_act)
     return
@@ -418,6 +423,80 @@ Contains
     return
 
   End Subroutine psb_dreallocatez2
+
+  Subroutine psb_dreallocatei2(len1,len2,rrax,info,pad)
+    use psb_error_mod
+    ! ...Subroutine Arguments  
+    Integer,Intent(in) :: len1,len2
+    integer,pointer :: rrax(:,:)
+    integer :: info
+    integer, optional, intent(in) :: pad
+
+    ! ...Local Variables
+    integer,Pointer :: tmp(:,:)
+    Integer :: dim,err_act,err,i, m, dim2
+    character(len=20)  :: name
+
+    name='psb_dreallocatei2'
+    call psb_erractionsave(err_act)
+    info = 0 
+
+    if (associated(rrax)) then 
+      dim=size(rrax,1)
+      dim2=size(rrax,2)
+
+      If (dim /= len1) Then
+        Allocate(tmp(len1,len2),stat=info)
+        if (info /= 0) then
+          err=4000
+          call psb_errpush(err,name)
+          goto 9999
+        end if
+        m = min(dim,len1)
+!!$        write(0,*) 'DA: copying ',min(len,dim)
+        if (.true.) then 
+          do i=1,m
+            tmp(i,1:min(len2,dim2)) = rrax(i,1:min(len2,dim2))
+          end do
+        else
+          tmp(1:m,1:min(len2,dim2)) = rrax(1:m,1:min(len2,dim2))
+        end if
+!!$        write(0,*) 'DA: copying done ',m
+        Deallocate(rrax,stat=info)
+        if (info /= 0) then
+          err=4000
+          call psb_errpush(err,name)
+          goto 9999
+        end if
+        rrax=>tmp
+      End If
+    else
+      dim = 0
+      Allocate(rrax(len1,len2),stat=info)
+      if (info /= 0) then
+        err=4000
+        call psb_errpush(err,name)
+        goto 9999
+      end if
+    endif
+    if (present(pad)) then 
+      rrax(dim+1:len1,:) = pad
+      rrax(:,dim2+1:len2) = pad
+    endif
+    call psb_erractionrestore(err_act)
+    return
+
+9999 continue
+    call psb_erractionrestore(err_act)
+
+    if (err_act.eq.act_ret) then
+      return
+    else
+      call psb_error()
+    end if
+    return
+
+  End Subroutine psb_dreallocatei2
 
 
   Subroutine psb_dreallocate2i(len,rrax,y,info,pad)
