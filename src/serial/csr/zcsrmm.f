@@ -121,7 +121,7 @@ C     .. Local Scalars ..
       CHARACTER         DIAG, TRANS
 
 C     .. External Subroutines ..
-      EXTERNAL          ZSRMV, ZXSPERR
+      EXTERNAL          ZSRMV
 C     .. Executable Statements ..
 C
 C
