@@ -43,10 +43,6 @@ module psb_realloc_mod
     module procedure psb_dreallocatez2
   end Interface
 
-  Interface psb_realloc1it
-    module procedure  psb_dreallocate1it
-  end Interface
-
 Contains
 
   Subroutine psb_dreallocate1i(len,rrax,info,pad)
@@ -565,71 +561,6 @@ Contains
     end if
     return
   End Subroutine psb_dreallocate2i1z
-
-
-  Subroutine psb_dreallocate1it(len,rrax,info,pad)
-    use psb_error_mod
-    ! ...Subroutine Arguments  
-    Integer,Intent(in) :: len
-    Integer,pointer :: rrax(:)
-    integer         :: info
-    integer, optional, intent(in) :: pad
-    ! ...Local Variables
-    Integer,Pointer :: tmp(:)
-    Integer :: dim,err_act,err
-    character(len=20)  :: name
-
-    name='psb_dreallocate1it'
-    call psb_erractionsave(err_act)
-
-    if(psb_get_errstatus().ne.0) return 
-    info=0
-    if (associated(rrax)) then 
-      dim=size(rrax)
-      If (dim /= len) Then
-        Allocate(tmp(len),stat=info)
-        if (info /= 0) then
-          err=4000
-          call psb_errpush(err,name)
-          goto 9999
-        end if
-!!$        write(0,*) 'IA: copying ',min(len,dim)
-        tmp(1:min(len,dim))=rrax(1:min(len,dim))
-!!$        write(0,*) 'IA: copying done'
-        Deallocate(rrax,stat=info)
-        if (info /= 0) then
-          err=4000
-          call psb_errpush(err,name)
-          goto 9999
-        end if
-        rrax=>tmp
-      End If
-    else
-      allocate(rrax(len),stat=info)
-      if (info /= 0) then
-        err=4000
-        call psb_errpush(err,name)
-        goto 9999
-      end if
-    endif
-    if (present(pad)) then 
-!!$      write(0,*) 'IA: padding'
-      rrax(dim+1:len) = pad
-    endif
-    call psb_erractionrestore(err_act)
-    return
-
-9999 continue
-    call psb_erractionrestore(err_act)
-
-    if (err_act.eq.act_ret) then
-      return
-    else
-      call psb_error()
-    end if
-    return
-
-  End Subroutine psb_dreallocate1it
 
 
 end module psb_realloc_mod
