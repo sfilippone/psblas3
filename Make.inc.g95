@@ -6,8 +6,8 @@
 #######################  Section 1 #######################
 #  Define your compilers and compiler flags here         #
 ##########################################################
-F90=/usr/local/g95-install/bin/g95
-FC=/usr/local/g95-install/bin/g95
+F90=/usr/local/bin/g95
+FC=/usr/local/bin/g95
 F77=$(FC)
 F90COPT= -O3 
 FCOPT=-O3 
@@ -25,7 +25,7 @@ MPCC=/usr/local/mpich-g95/bin/mpicc
 #######################  Section 3 #######################
 #  Specify paths to libraries                            #
 ##########################################################
-BLAS=-lblas -L$(HOME)/LIB
+BLAS=-lblasg95 -L$(HOME)/LIB
 BLACS=-lmpiblacsg95 -L$(HOME)/LIB
 EXTRA_BLACS_ENV_OBJS=extra_env.o
 
