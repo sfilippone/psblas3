@@ -52,7 +52,8 @@
 !      uses information prepared by the previous two subroutines.
 !
 MODULE PARTGRAPH
-  public part_graph, build_grppart, distr_grppart,getv_grppart
+  public part_graph, build_grppart, distr_grppart,&
+       & getv_grppart, build_usrpart, free_part
   private 
   INTEGER, POINTER, SAVE :: GRAPH_VECT(:)
   
