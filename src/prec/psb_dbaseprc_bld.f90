@@ -234,11 +234,24 @@ subroutine psb_dbaseprc_bld(a,desc_a,p,info,upd)
 
     case(f_none_) 
       write(0,*) 'Fact=None in BASEPRC_BLD Bja/ASM??'
+      info=4010
+      ch_err='Inconsistent prec  f_none_'
+      call psb_errpush(info,name,a_err=ch_err)
+      goto 9999
 
     case default
       write(0,*) 'Unknown factor type in baseprc_bld bja/asm: ',&
            &p%iprcparm(f_type_)
+      info=4010
+      ch_err='Unknown f_type_'
+      call psb_errpush(info,name,a_err=ch_err)
+      goto 9999
     end select
+  case default
+    info=4010
+    ch_err='Unknown p_type_'
+    call psb_errpush(info,name,a_err=ch_err)
+    goto 9999
 
   end select
 

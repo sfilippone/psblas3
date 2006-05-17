@@ -146,8 +146,10 @@ Subroutine psb_dcdovr(a,desc_a,novr,desc_ov,info)
 !!$      info = mpe_describe_state(idscb,idsce,"CDASB ","NavyBlue")
 !!$      info = mpe_describe_state(iovrb,iovre,"CDOVRR ","DeepPink")
 !!$    endif
-  If(debug)Write(0,*)'BEGIN cdovr',me,nhalo
-!!$  call blacs_barrier(icontxt,'All')
+  If(debug) then
+    Write(0,*)'BEGIN cdovr',me,nhalo
+    call blacs_barrier(icontxt,'All')
+  endif
   t1 = mpi_wtime()
 
 
@@ -180,7 +182,7 @@ Subroutine psb_dcdovr(a,desc_a,novr,desc_ov,info)
 
   allocate(desc_ov%ovrlap_index(novr*(Max(2*index_dim,1)+1)),&
        &   desc_ov%ovrlap_elem(novr*(Max(elem_dim,1)+3)),&
-       &   desc_ov%matrix_data(10),&
+       &   desc_ov%matrix_data(psb_mdata_size_),&
        &   desc_ov%halo_index(novr*(Size(desc_a%halo_index)+3)),STAT=INFO)
   if (info.ne.0) then
      info=4000
@@ -202,9 +204,10 @@ Subroutine psb_dcdovr(a,desc_a,novr,desc_ov,info)
 
   desc_ov%loc_to_glob(:) = desc_a%loc_to_glob(:)
   desc_ov%glob_to_loc(:) = desc_a%glob_to_loc(:)
-  If(debug)Write(0,*)'Start cdovrbld',me,lworks,lworkr
-  call blacs_barrier(icontxt,'All')
-  
+  If(debug) then
+    Write(0,*)'Start cdovrbld',me,lworks,lworkr
+    call blacs_barrier(icontxt,'All')
+  endif
   !
   ! The real work goes on in here....
   !
@@ -217,8 +220,10 @@ Subroutine psb_dcdovr(a,desc_a,novr,desc_ov,info)
      goto 9999
   end if
   desc_ov%matrix_data(psb_dec_type_) = psb_desc_asb_
-  If(debug)Write(0,*)'Done cdovrbld',me,lworks,lworkr
-  call blacs_barrier(icontxt,'All')
+  If(debug) then
+    Write(0,*)'Done cdovrbld',me,lworks,lworkr
+    call blacs_barrier(icontxt,'All')
+  endif
 !!$      ierr = MPE_Log_event( idsce, 0, "st CDASB" )
 
   call psb_erractionrestore(err_act)
