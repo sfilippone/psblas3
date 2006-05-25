@@ -86,24 +86,30 @@ grid and store internally for further use.
 \caption{PSBLAS library components hierarchy.\label{fig:psblas}}
 \end{figure}
 
-The PSBLAS library consists of two classes of subroutines that is, the
-{\em computational routines} and the {\em auxiliary routines}.  The
-computational routine set includes:
+The PSBLAS library consists of various classes of subroutines:
+\begin{description}
+\item[Computational routines] comprising:
 \begin{itemize}
-\item Sparse matrix by dense matrix product; \item Sparse triangular
+\item Sparse matrix by dense matrix product; 
+\item Sparse triangular
 systems solution for block diagonal matrices;
 \item Vector and matrix norms;
 \item Dense matrix sums;
 \item Dot products.
 \end{itemize} 
-The auxiliary routine set includes:
+\item[Communication routines] handling halo and overlap
+  communications;
+\item[Data management and auxiliary routines] including:
 \begin{itemize}
 \item Communication descriptors allocation;
 \item Dense and sparse matrix allocation;
 \item Dense and sparse matrix build and update;
 \item Sparse matrix and data distribution preprocessing.
 \end{itemize} 
-
+\item[Preconditioner routines]
+\item[Iterative methods] a subset of Krylov subspace iterative
+  methods
+\end{description}
 The following naming scheme has been adopted for all the symbols
 internally defined in the PSBLAS software package:
 \begin{itemize}
