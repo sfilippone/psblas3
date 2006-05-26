@@ -44,7 +44,7 @@ subroutine psi_crea_index(desc_a,index_in,index_out,glob_idx,info)
 !         ....local scalars...      
   integer    :: me,npcol,mycol,nprow,i,j,k,&
        & mode, int_err(5), err, err_act, np,&
-       & dl_lda, icontxt, proc, nerv, nesd
+       & dl_lda, ictxt, proc, nerv, nesd
 !         ...parameters...
   integer, pointer     :: dep_list(:,:), length_dl(:)
   integer,parameter    :: root=0,no_comm=-1
@@ -88,8 +88,8 @@ subroutine psi_crea_index(desc_a,index_in,index_out,glob_idx,info)
   name='psi_crea_index'
   call psb_erractionsave(err_act)
 
-  icontxt = desc_a%matrix_data(psb_ctxt_)
-  call blacs_gridinfo(icontxt,np,npcol,me,mycol)
+  ictxt = desc_a%matrix_data(psb_ctxt_)
+  call blacs_gridinfo(ictxt,np,npcol,me,mycol)
   if (np == -1) then
     info = 2010
     call psb_errpush(info,name)
@@ -159,7 +159,7 @@ subroutine psi_crea_index(desc_a,index_in,index_out,glob_idx,info)
 9999 continue
   call psb_erractionrestore(err_act)
   if (err_act.eq.act_abort) then
-     call psb_error(icontxt)
+     call psb_error(ictxt)
      return
   end if
   return

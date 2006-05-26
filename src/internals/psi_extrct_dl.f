@@ -135,7 +135,7 @@ c     .....local arrays....
 
 c     .....local scalars...
       integer i,nprow,npcol,me,mycol,pointer_dep_list,proc,j,err_act
-      integer icontxt, err, icomm
+      integer ictxt, err, icomm
       logical debug
       parameter (debug=.false.)
       character  name*20
@@ -143,10 +143,10 @@ c     .....local scalars...
       call fcpsb_get_erraction(err_act)
 
       info = 0
-      icontxt = desc_data(psb_ctxt_)
+      ictxt = desc_data(psb_ctxt_)
 
 
-      call blacs_gridinfo(icontxt,nprow,npcol,me,mycol)
+      call blacs_gridinfo(ictxt,nprow,npcol,me,mycol)
       do i=0,np 
         length_dl(i) = 0
       enddo
@@ -244,14 +244,14 @@ c     ... check for errors...
  998  continue 
       if (debug) write(0,*) 'extract: info ',info
       err = info
-c$$$      call igamx2d(icontxt, all, topdef, ione, ione, err, ione, 
+c$$$      call igamx2d(ictxt, all, topdef, ione, ione, err, ione, 
 c$$$     +  i, i, -ione ,-ione,-ione)
 
       if (err.ne.0) goto 9999
 
       if (.true.) then 
-        call igsum2d(icontxt,'all',' ',np+1,1,length_dl,np+1,-1,-1)
-        call blacs_get(icontxt,10,icomm )
+        call igsum2d(ictxt,'all',' ',np+1,1,length_dl,np+1,-1,-1)
+        call blacs_get(ictxt,10,icomm )
         allocate(itmp(dl_lda),stat=info)
         if (info /= 0) goto 9999
         itmp(1:dl_lda) = dep_list(1:dl_lda,me)
@@ -266,11 +266,11 @@ c$$$     +  i, i, -ione ,-ione,-ione)
             if (proc.ne.psb_root_) then
               if (debug) write(0,*) 'receiving from: ',proc
 c              ...receive from proc length of its dependence list....
-              call igerv2d(icontxt,1,1,length_dl(proc),1,
+              call igerv2d(ictxt,1,1,length_dl(proc),1,
      +          proc,mycol)
 
 c              ...receive from proc its dependence list....
-              call igerv2d(icontxt,length_dl(proc),1,
+              call igerv2d(ictxt,length_dl(proc),1,
      +          dep_list(1,proc),length_dl(proc),proc,mycol)
 
             endif
@@ -278,10 +278,10 @@ c              ...receive from proc its dependence list....
         else if (me.ne.psb_root_) then
 c        ...send to root dependence list length.....
           if (debug) write(0,*) 'sending to: ',me,psb_root_
-          call igesd2d(icontxt,1,1,length_dl(me),1,psb_root_,mycol)
+          call igesd2d(ictxt,1,1,length_dl(me),1,psb_root_,mycol)
           if (debug) write(0,*) 'sending to: ',me,psb_root_
 c        ...send to root dependence list....
-          call igesd2d(icontxt,length_dl(me),1,dep_list(1,me),
+          call igesd2d(ictxt,length_dl(me),1,dep_list(1,me),
      +      length_dl(me),psb_root_,mycol)
 
         endif
@@ -292,7 +292,7 @@ c        ...send to root dependence list....
  9999 continue
       call fcpsb_errpush(info,name,int_err)
       if(err_act.eq.act_abort) then
-         call fcpsb_perror(icontxt)
+         call fcpsb_perror(ictxt)
       endif
       return
 

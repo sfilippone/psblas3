@@ -52,7 +52,7 @@ subroutine psb_dprecfree(p,info)
   integer             :: int_err(5)
   integer             :: temp(1), me
   real(kind(1.d0))    :: real_err(5)
-  integer             :: icontxt,err_act,i
+  integer             :: ictxt,err_act,i
   character(len=20)   :: name, ch_err
 
   if(psb_get_errstatus().ne.0) return 

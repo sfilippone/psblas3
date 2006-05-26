@@ -32,12 +32,12 @@
 !  Wrapper subroutines to provide error tools to F77 and C code
 !
 
-subroutine FCpsb_errcomm(icontxt, err)
+subroutine FCpsb_errcomm(ictxt, err)
   use psb_error_mod
-  integer, intent(in)   :: icontxt
+  integer, intent(in)   :: ictxt
   integer, intent(inout):: err
 
-  call psb_errcomm(icontxt, err)
+  call psb_errcomm(ictxt, err)
 
 end subroutine FCpsb_errcomm
 
@@ -67,13 +67,13 @@ end subroutine FCpsb_serror
 
 
 
-subroutine FCpsb_perror(icontxt)
+subroutine FCpsb_perror(ictxt)
   use psb_error_mod
   implicit none
 
-  integer, intent(in)   :: icontxt
+  integer, intent(in)   :: ictxt
 
-  call psb_error(icontxt)
+  call psb_error(ictxt)
 
 end subroutine FCpsb_perror
 

@@ -37,18 +37,18 @@
 ! Parameters: 
 !    m       - integer.                       The number of rows.
 !    v       - integer, dimension(:).         The array containg the partitioning scheme.
-!    icontxt - integer.                       The communication context.
+!    ictxt - integer.                       The communication context.
 !    desc_a  - type(<psb_desc_type>).         The communication descriptor.
 !    info    - integer.                       Eventually returns an error code
 !    flag    - integer.                       ???
-subroutine psb_cdalv(m, v, icontxt, desc_a, info, flag)
+subroutine psb_cdalv(m, v, ictxt, desc_a, info, flag)
   use psb_descriptor_type
   use psb_serial_mod
   use psb_const_mod
   use psb_error_mod
   implicit None
   !....Parameters...
-  Integer, intent(in)               :: m,icontxt, v(:)
+  Integer, intent(in)               :: m,ictxt, v(:)
   integer, intent(in), optional     :: flag
   integer, intent(out)              :: info
   type(psb_desc_type), intent(out)  :: desc_a
@@ -68,7 +68,7 @@ subroutine psb_cdalv(m, v, icontxt, desc_a, info, flag)
   err=0
   name = 'psb_cdalv'
 
-  call blacs_gridinfo(icontxt, nprow, npcol, myrow, mycol)
+  call blacs_gridinfo(ictxt, nprow, npcol, myrow, mycol)
   if (debug) write(*,*) 'psb_cdall: ',nprow,npcol,myrow,mycol
   !     ....verify blacs grid correctness..
   if (npcol /= 1) then
@@ -104,9 +104,9 @@ subroutine psb_cdalv(m, v, icontxt, desc_a, info, flag)
   if (myrow.eq.psb_root_) then
     exch(1)=m
     exch(2)=n
-    call igebs2d(icontxt,psb_all_,psb_topdef_, itwo,ione, exch, itwo)
+    call igebs2d(ictxt,psb_all_,psb_topdef_, itwo,ione, exch, itwo)
   else
-    call igebr2d(icontxt,psb_all_,psb_topdef_, itwo,ione, exch, itwo, psb_root_,&
+    call igebr2d(ictxt,psb_all_,psb_topdef_, itwo,ione, exch, itwo, psb_root_,&
          & 0)
     if (exch(1) /= m) then
       info=550
@@ -282,8 +282,8 @@ subroutine psb_cdalv(m, v, icontxt, desc_a, info, flag)
   desc_a%matrix_data(psb_m_)        = m
   desc_a%matrix_data(psb_n_)        = n
   desc_a%matrix_data(psb_dec_type_) = psb_desc_bld_
-  desc_a%matrix_data(psb_ctxt_)     = icontxt
-  call blacs_get(icontxt,10,desc_a%matrix_data(psb_mpi_c_))
+  desc_a%matrix_data(psb_ctxt_)     = ictxt
+  call blacs_get(ictxt,10,desc_a%matrix_data(psb_mpi_c_))
 
   call psb_erractionrestore(err_act)
   return
@@ -291,7 +291,7 @@ subroutine psb_cdalv(m, v, icontxt, desc_a, info, flag)
 9999 continue
   call psb_erractionrestore(err_act)
   if (err_act.eq.act_abort) then
-     call psb_error(icontxt)
+     call psb_error(ictxt)
      return
   end if
   return

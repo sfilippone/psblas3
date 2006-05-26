@@ -358,16 +358,16 @@ Module psb_tools_mod
 
 
   interface psb_cdall
-     subroutine psb_cdall(m, n, parts, icontxt, desc_a, info)
+     subroutine psb_cdall(m, n, parts, ictxt, desc_a, info)
        use psb_descriptor_type
        include 'parts.fh'
-       Integer, intent(in)                 :: m,n,icontxt
+       Integer, intent(in)                 :: m,n,ictxt
        Type(psb_desc_type), intent(out)    :: desc_a
        integer, intent(out)                :: info
      end subroutine psb_cdall
-     subroutine psb_cdalv(m, v, icontxt, desc_a, info, flag)
+     subroutine psb_cdalv(m, v, ictxt, desc_a, info, flag)
        use psb_descriptor_type
-       Integer, intent(in)               :: m,icontxt, v(:)
+       Integer, intent(in)               :: m,ictxt, v(:)
        integer, intent(in), optional     :: flag
        integer, intent(out)              :: info
        Type(psb_desc_type), intent(out)  :: desc_a
@@ -615,22 +615,45 @@ Module psb_tools_mod
 
 
   interface psb_cdrep
-     subroutine psb_cdrep(m, icontxt, desc_a,info)
+     subroutine psb_cdrep(m, ictxt, desc_a,info)
        use psb_descriptor_type
-       Integer, intent(in)               :: m,icontxt
+       Integer, intent(in)               :: m,ictxt
        Type(psb_desc_type), intent(out)  :: desc_a
        integer, intent(out)              :: info
      end subroutine psb_cdrep
   end interface
 
   interface psb_cddec
-     subroutine psb_cddec(nloc, icontxt, desc_a,info)
+     subroutine psb_cddec(nloc, ictxt, desc_a,info)
        use psb_descriptor_type
-       Integer, intent(in)               :: nloc,icontxt
+       Integer, intent(in)               :: nloc,ictxt
        Type(psb_desc_type), intent(out)  :: desc_a
        integer, intent(out)              :: info
      end subroutine psb_cddec
   end interface
 
+  interface psb_init
+    subroutine psb_init(ictxt,np)
+      integer, intent(out) :: ictxt
+      integer, intent(in), optional :: np
+    end subroutine psb_init
+  end interface
+  interface psb_exit
+    subroutine psb_exit(ictxt)
+      integer, intent(in) :: ictxt
+    end subroutine psb_exit
+  end interface
+  interface psb_info
+    subroutine psb_info(ictxt,iam,np)
+      integer, intent(in)  :: ictxt
+      integer, intent(out) :: iam, np
+    end subroutine psb_info
+  end interface
+  
+  interface psb_barrier
+    subroutine psb_barrier(ictxt)
+      integer, intent(in) :: ictxt
+    end subroutine psb_barrier
+  end interface
 
 end module psb_tools_mod

@@ -54,7 +54,7 @@ subroutine psb_zprc_aply(prec,x,y,desc_data,info,trans, work)
   ! Local variables
   character     :: trans_ 
   complex(kind(1.d0)), pointer :: work_(:)
-  integer :: icontxt,nprow,npcol,me,mycol,err_act, int_err(5)
+  integer :: ictxt,nprow,npcol,me,mycol,err_act, int_err(5)
   logical,parameter                 :: debug=.false., debugprt=.false.
   external mpi_wtime
   character(len=20)   :: name, ch_err
@@ -91,8 +91,8 @@ subroutine psb_zprc_aply(prec,x,y,desc_data,info,trans, work)
   info = 0
   call psb_erractionsave(err_act)
 
-  icontxt=desc_data%matrix_data(psb_ctxt_)
-  call blacs_gridinfo(icontxt,nprow,npcol,me,mycol)
+  ictxt=desc_data%matrix_data(psb_ctxt_)
+  call blacs_gridinfo(ictxt,nprow,npcol,me,mycol)
 
   if (present(trans)) then 
     trans_=trans
@@ -218,7 +218,7 @@ subroutine psb_zprc_aply1(prec,x,desc_data,info,trans)
 
   ! Local variables
   character     :: trans_
-  integer :: icontxt,nprow,npcol,me,mycol,i, isz, err_act, int_err(5)
+  integer :: ictxt,nprow,npcol,me,mycol,i, isz, err_act, int_err(5)
   complex(kind(1.d0)), pointer :: WW(:), w1(:)
   character(len=20)   :: name, ch_err
   name='psb_zprec1'
@@ -226,8 +226,8 @@ subroutine psb_zprc_aply1(prec,x,desc_data,info,trans)
   call psb_erractionsave(err_act)
   
 
-  icontxt=desc_data%matrix_data(psb_ctxt_)
-  call blacs_gridinfo(icontxt,nprow,npcol,me,mycol)
+  ictxt=desc_data%matrix_data(psb_ctxt_)
+  call blacs_gridinfo(ictxt,nprow,npcol,me,mycol)
   if (present(trans)) then 
     trans_=trans
   else

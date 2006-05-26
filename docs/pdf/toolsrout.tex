@@ -1,5 +1,121 @@
-\section{Data management and initialization routines}
+\section{Data management and environment handling  routines}
 \label{sec:toolsrout}
+
+\subroutine{psb\_init}{Initializes PSBLAS parallel environment}
+
+\syntax{call psb\_init}{ictxt, np}
+
+This subroutine initializes the PSBLAS parallel environment, defining
+a virtual parallel machine.
+\begin{description}
+\item[\bf  On Entry ]
+\item[np] Number of processes in the PSBLAS virtual parallel machine.\\
+Scope:{\bf global}.\\
+Type:{\bf optional}.\\
+Specified as: an integer value. \
+Default: use all available processes provided by the underlying
+parallel environment.
+\end{description}
+
+\begin{description}
+\item[\bf On Return]
+\item[icontxt] the communication context identifying the virtual
+  parallel machine.\\
+Scope:{\bf global}.\\
+Type:{\bf required}.\\
+Specified as: an integer variable.
+\end{description}
+
+
+\section*{Notes}
+\begin{enumerate}
+\item A call to this routine must precede any other PSBLAS call. 
+\item It is an error to specify a value for $np$ greater than the
+  number of processes available in the underlying parallel execution
+  environment. 
+\end{enumerate}
+
+
+\subroutine{psb\_info}{Return information about  PSBLAS parallel environment}
+
+\syntax{call psb\_info}{ictxt, iam, np}
+
+This subroutine returns informantion about  the PSBLAS parallel environment, defining
+a virtual parallel machine.
+\begin{description}
+\item[\bf  On Entry ]
+\item[icontxt] the communication context identifying the virtual
+  parallel machine.\\
+Scope:{\bf global}.\\
+Type:{\bf required}.\\
+Specified as: an integer variable.
+\end{description}
+
+\begin{description}
+\item[\bf On Return]
+\item[iam] Identifier of current  process in the PSBLAS virtual parallel machine.\\
+Scope:{\bf local}.\\
+Type:{\bf required}.\\
+Specified as: an integer value. $-1 \le iam \le np-1$\
+\item[np] Number of processes in the PSBLAS virtual parallel machine.\\
+Scope:{\bf global}.\\
+Type:{\bf required}.\\
+Specified as: an integer variable. \
+\end{description}
+
+
+\section*{Notes}
+\begin{enumerate}
+\item For processes in the virtual parallel machine  the identifier
+  will satisfy $0 \le iam \le np-1$;
+\item If the user has requested on \verb|psb_init| a number of
+  processes less than the total available in the parallel execution
+  environment, the remaining processes will have on return $iam=-1$;
+  any such process may  only place a call to \verb|psb_exit|, and is
+  required to do so.
+\end{enumerate}
+
+
+\subroutine{psb\_exit}{Exit from  PSBLAS parallel environment}
+
+\syntax{call psb\_exit}{ictxt}
+
+This subroutine exits from the  PSBLAS parallel virtual  machine.
+\begin{description}
+\item[\bf  On Entry ]
+\item[icontxt] the communication context identifying the virtual
+  parallel machine.\\
+Scope:{\bf global}.\\
+Type:{\bf required}.\\
+Specified as: an integer variable.
+\end{description}
+
+\section*{Notes}
+\begin{enumerate}
+\item This routine may be called even if a previous call to
+  \verb|psb_info| has returned with $iam=-1$; indeed, it it is the ONLY
+  routine that may be called in this situation, and it is required to
+  do so.
+\end{enumerate}
+
+
+
+\subroutine{psb\_barrier}{Sinchronization point  parallel environment}
+
+\syntax{call psb\_barrier}{ictxt}
+
+This subroutine acts as a synchronization point for  the  PSBLAS
+parallel virtual  machine. As such, it must be called by all
+participating processes. 
+\begin{description}
+\item[\bf  On Entry ]
+\item[icontxt] the communication context identifying the virtual
+  parallel machine.\\
+Scope:{\bf global}.\\
+Type:{\bf required}.\\
+Specified as: an integer variable.
+\end{description}
+
 
 
 %

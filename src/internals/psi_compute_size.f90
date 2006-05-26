@@ -41,7 +41,7 @@ subroutine psi_compute_size(desc_data,&
   integer  :: desc_data(:), index_in(:)
   !     ....local scalars....      
   integer  :: i,npcol,nprow,mycol,myrow,proc,counter, max_index
-  integer  :: icontxt, err, err_act, np
+  integer  :: ictxt, err, err_act, np
   !     ...local array...
   integer  :: exch(2)
   integer  :: int_err(5)
@@ -55,9 +55,9 @@ subroutine psi_compute_size(desc_data,&
   call psb_get_erraction(err_act)
 
   info = 0
-  icontxt = desc_data(psb_ctxt_)
+  ictxt = desc_data(psb_ctxt_)
 
-  call blacs_gridinfo(icontxt,nprow,npcol,myrow,mycol)
+  call blacs_gridinfo(ictxt,nprow,npcol,myrow,mycol)
   if (nprow == -1) then
      info = 2010
      call psb_errpush(info,name)
@@ -113,7 +113,7 @@ subroutine psi_compute_size(desc_data,&
   enddo
 
   !     computing max global value of dl_lda
-  call igamx2d(icontxt, psb_all_, psb_topdef_, 1, ione, dl_lda, &
+  call igamx2d(ictxt, psb_all_, psb_topdef_, 1, ione, dl_lda, &
        &1, counter, counter, -ione ,-ione,-ione)
 
   if (debug) then 
@@ -126,7 +126,7 @@ subroutine psi_compute_size(desc_data,&
 9999 continue
   call psb_erractionrestore(err_act)
   if (err_act.eq.act_abort) then
-     call psb_error(icontxt)
+     call psb_error(ictxt)
      return
   end if
   return

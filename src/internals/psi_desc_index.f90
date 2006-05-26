@@ -47,7 +47,7 @@ subroutine psi_desc_index(desc_data,index_in,dep_list,&
   !c     ....local scalars...        
   integer :: j,me,np,npcol,mycol,i,proc,dim
   !c     ...parameters...
-  integer :: icontxt
+  integer :: ictxt
   integer :: no_comm,err
   parameter (no_comm=-1)
   !c     ...local arrays..
@@ -67,8 +67,8 @@ subroutine psi_desc_index(desc_data,index_in,dep_list,&
 
   !c     if mode == 1 then we can use glob_to_loc array
   !c     else we can't utilize it
-  icontxt=desc_data(psb_ctxt_)
-  call blacs_gridinfo(icontxt,np,npcol,me,mycol) 
+  ictxt=desc_data(psb_ctxt_)
+  call blacs_gridinfo(ictxt,np,npcol,me,mycol) 
   if (np == -1) then
      info = 2010
      call psb_errpush(info,name)
@@ -82,10 +82,10 @@ subroutine psi_desc_index(desc_data,index_in,dep_list,&
 
   if (debug) then 
      write(0,*) me,'start desc_index'
-     call blacs_barrier(icontxt,'all')
+     call blacs_barrier(ictxt,'all')
   endif
 
-  call blacs_get(icontxt,10,icomm)
+  call blacs_get(ictxt,10,icomm)
   !c 
   !c     first, find out the total sizes to be exchanged.
   !c     note: things marked here as sndbuf/rcvbuf (for mpi) corresponds to things  
@@ -136,7 +136,7 @@ subroutine psi_desc_index(desc_data,index_in,dep_list,&
   end if
   if (debug) then 
      write(0,*) me,'computed sizes ',iszr,iszs
-     call blacs_barrier(icontxt,'all')
+     call blacs_barrier(ictxt,'all')
   endif
 
   ntot = (3*(max(count(sdsz>0),count(rvsz>0)))+ iszs + iszr) + 1
@@ -153,7 +153,7 @@ subroutine psi_desc_index(desc_data,index_in,dep_list,&
 
   if (debug) then 
      write(0,*) me,'computed allocated workspace ',iszr,iszs
-     call blacs_barrier(icontxt,'all')
+     call blacs_barrier(ictxt,'all')
   endif
   allocate(sndbuf(iszs),rcvbuf(iszr),stat=info)
   if(info /= 0) then
@@ -190,7 +190,7 @@ subroutine psi_desc_index(desc_data,index_in,dep_list,&
 
   if (debug) then 
      write(0,*) me,' prepared send buffer '
-     call blacs_barrier(icontxt,'all')
+     call blacs_barrier(ictxt,'all')
   endif
   !c
   !c     now have to regenerate bsdindx
@@ -245,7 +245,7 @@ subroutine psi_desc_index(desc_data,index_in,dep_list,&
 
   if (debug) then 
      write(0,*) me,'end desc_index'
-     call blacs_barrier(icontxt,'all')
+     call blacs_barrier(ictxt,'all')
   endif
 
   call psb_erractionrestore(err_act)
@@ -254,7 +254,7 @@ subroutine psi_desc_index(desc_data,index_in,dep_list,&
 9999 continue
   call psb_erractionrestore(err_act)
   if (err_act.eq.act_abort) then
-     call psb_error(icontxt)
+     call psb_error(ictxt)
      return
   end if
   return

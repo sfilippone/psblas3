@@ -57,7 +57,7 @@ subroutine psb_zsp_renum(a,desc_a,blck,p,atmp,info)
   integer   istpb, istpe, ifctb, ifcte, err_act, irank, icomm, nztota, nztotb,&
        & nztmp, nzl, nnr, ir, mglob, mtype, n_row, nrow_a,n_col, nhalo,lovr, &
        & ind, iind, pi,nr,ns,i,j,jj,k,kk
-  integer ::icontxt,nprow,npcol,me,mycol
+  integer ::ictxt,nprow,npcol,me,mycol
   integer, pointer :: itmp(:), itmp2(:)
   complex(kind(1.d0)), pointer :: ztmp(:)
   real(kind(1.d0)) :: t1,t2,t3,t4,t5,t6,mpi_wtime, t7, t8
@@ -68,8 +68,8 @@ subroutine psb_zsp_renum(a,desc_a,blck,p,atmp,info)
   name='apply_renum'
   call psb_erractionsave(err_act)
 
-  icontxt=desc_a%matrix_data(psb_ctxt_)
-  call blacs_gridinfo(icontxt,nprow,npcol,me,mycol)
+  ictxt=desc_a%matrix_data(psb_ctxt_)
+  call blacs_gridinfo(ictxt,nprow,npcol,me,mycol)
 
 !!!!!!!!!!!!!!!! CHANGE FOR NON-CSR A
   !
@@ -245,7 +245,7 @@ subroutine psb_zsp_renum(a,desc_a,blck,p,atmp,info)
 
     itmp(1:8) = 0
     !          write(0,*) me,' Renumbering: Calling Metis'
-    !        call blacs_barrier(icontxt,'All')
+    !        call blacs_barrier(ictxt,'All')
 
     !          write(0,*) size(p%av(u_pr_)%pl),size(p%av(l_pr_)%pr)
     call  gps_reduction(atmp%m,atmp%ia2,atmp%ia1,p%perm,p%invperm,info)
@@ -257,7 +257,7 @@ subroutine psb_zsp_renum(a,desc_a,blck,p,atmp,info)
     end if
 
     !      write(0,*) me,' Renumbering: Done GPS'
-    call blacs_barrier(icontxt,'All')
+    call blacs_barrier(ictxt,'All')
     do i=1, atmp%m 
       if (p%perm(i) /= i) then 
         write(0,*) me,' permutation is not identity '

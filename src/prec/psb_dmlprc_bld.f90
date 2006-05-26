@@ -96,7 +96,7 @@ subroutine psb_dmlprc_bld(a,desc_a,p,info)
     end subroutine psb_dbldaggrmat
   end interface
 
-  integer :: icontxt, nprow, npcol, me, mycol
+  integer :: ictxt, nprow, npcol, me, mycol
 
   name='psb_mlprec_bld'
   if(psb_get_errstatus().ne.0) return 

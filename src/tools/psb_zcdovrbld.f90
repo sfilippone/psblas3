@@ -73,7 +73,7 @@ Subroutine psb_zcdovrbld(n_ovr,desc_p,desc_a,a,&
   Integer, Pointer :: tmp_halo(:),tmp_ovr_idx(:)
 
   Integer :: counter,counter_h, counter_o, counter_e,j,idx,gidx,proc,n_elem_recv,&
-       & n_elem_send,tot_recv,tot_elem,n_col,m,icontxt,np,npcol,myrow,mycol,dl_lda,lwork,&
+       & n_elem_send,tot_recv,tot_elem,n_col,m,ictxt,np,npcol,myrow,mycol,dl_lda,lwork,&
        & counter_t,n_elem,i_ovr,jj,n,i,proc_id,isz, mglob, glx,n_row, &
        & idxr, idxs, lx, iszs, iszr, err_act
 
@@ -93,16 +93,16 @@ Subroutine psb_zcdovrbld(n_ovr,desc_p,desc_a,a,&
   call psb_erractionsave(err_act)
 
   If(debug) Write(0,*)'cdovrbld begin'
-  icontxt = desc_a%matrix_data(psb_ctxt_)
-!!$  call blacs_barrier(icontxt,'All')
-  Call blacs_gridinfo(icontxt,np,npcol,myrow,mycol)
+  ictxt = desc_a%matrix_data(psb_ctxt_)
+!!$  call blacs_barrier(ictxt,'All')
+  Call blacs_gridinfo(ictxt,np,npcol,myrow,mycol)
   call psb_nullify_sp(blk)
 
   Allocate(brvindx(np+1),rvsz(np),sdsz(np),bsdindx(np+1),stat=info)
   tl = 0.0
   tch = 0.0
   t4 = 0.0
-  call blacs_get(icontxt,10,icomm )
+  call blacs_get(ictxt,10,icomm )
 
   mglob = desc_a%matrix_data(psb_m_)
   m     = desc_a%matrix_data(psb_n_row_)
@@ -586,7 +586,7 @@ Subroutine psb_zcdovrbld(n_ovr,desc_p,desc_a,a,&
 !!$             & desc_p%glob_to_loc,work,lwork,info)
         if (debug) then 
            write(0,*) myrow,'Done Crea_Halo'
-           call blacs_barrier(icontxt,'All')
+           call blacs_barrier(ictxt,'All')
         end if
         if (debug) write(0,*) myrow,'Checktmp_o_i 2',tmp_ovr_idx(1:10)
         if (debug) write(0,*) myrow,'Done Crea_Halo'
@@ -620,7 +620,7 @@ Subroutine psb_zcdovrbld(n_ovr,desc_p,desc_a,a,&
 
   if (debug) then
      write(0,*) 'psb_cdasb: converting indexes'
-     call blacs_barrier(icontxt,'All')
+     call blacs_barrier(ictxt,'All')
   end if
   !.... convert comunication stuctures....
   ! first the halo index
@@ -657,7 +657,7 @@ Subroutine psb_zcdovrbld(n_ovr,desc_p,desc_a,a,&
 
   if (debug) then 
      write(0,*) myrow,'Done Convert_comm'
-     call blacs_barrier(icontxt,'All')
+     call blacs_barrier(ictxt,'All')
   end if
 
   if (.false.) then
@@ -684,7 +684,7 @@ Subroutine psb_zcdovrbld(n_ovr,desc_p,desc_a,a,&
 9999 continue
   call psb_erractionrestore(err_act)
   if (err_act.eq.act_abort) then
-     call psb_error(icontxt)
+     call psb_error(ictxt)
      return
   end if
   return

@@ -64,7 +64,7 @@ subroutine  psb_zaxpby(alpha, x, beta,y,desc_a,info, n, jx, jy)
   complex(kind(1.D0)), intent(inout) :: y(:,:)
 
   ! locals
-  integer                  :: int_err(5), icontxt, nprow, npcol, myrow, mycol,&
+  integer                  :: int_err(5), ictxt, nprow, npcol, myrow, mycol,&
        & err_act, iix, jjx, temp(2), ix, iy, ijx, ijy, m, iiy, in, jjy
   character(len=20)        :: name, ch_err
 
@@ -73,10 +73,10 @@ subroutine  psb_zaxpby(alpha, x, beta,y,desc_a,info, n, jx, jy)
   info=0
   call psb_erractionsave(err_act)
 
-  icontxt=desc_a%matrix_data(psb_ctxt_)
+  ictxt=desc_a%matrix_data(psb_ctxt_)
 
   ! check on blacs grid 
-  call blacs_gridinfo(icontxt, nprow, npcol, myrow, mycol)
+  call blacs_gridinfo(ictxt, nprow, npcol, myrow, mycol)
   if (nprow == -ione) then
     info = 2010
     call psb_errpush(info,name)
@@ -152,7 +152,7 @@ subroutine  psb_zaxpby(alpha, x, beta,y,desc_a,info, n, jx, jy)
   call psb_erractionrestore(err_act)
 
   if (err_act.eq.act_abort) then
-     call psb_error(icontxt)
+     call psb_error(ictxt)
      return
   end if
   return
@@ -220,7 +220,7 @@ subroutine  psb_zaxpbyv(alpha, x, beta,y,desc_a,info)
   complex(kind(1.D0)), intent(inout) :: y(:)
 
   ! locals
-  integer                  :: int_err(5), icontxt, nprow, npcol, myrow, mycol,&
+  integer                  :: int_err(5), ictxt, nprow, npcol, myrow, mycol,&
        & err_act, n, iix, jjx, temp(2), ix, iy, ijx, m, iiy, in, jjy
   character(len=20)        :: name, ch_err
   logical, parameter :: debug=.false.
@@ -230,10 +230,10 @@ subroutine  psb_zaxpbyv(alpha, x, beta,y,desc_a,info)
   info=0
   call psb_erractionsave(err_act)
 
-  icontxt=desc_a%matrix_data(psb_ctxt_)
+  ictxt=desc_a%matrix_data(psb_ctxt_)
 
   ! check on blacs grid 
-  call blacs_gridinfo(icontxt, nprow, npcol, myrow, mycol)
+  call blacs_gridinfo(ictxt, nprow, npcol, myrow, mycol)
   if (nprow == -ione) then
     info = 2010
     call psb_errpush(info,name)
@@ -284,7 +284,7 @@ subroutine  psb_zaxpbyv(alpha, x, beta,y,desc_a,info)
   call psb_erractionrestore(err_act)
 
   if (err_act.eq.act_abort) then
-     call psb_error(icontxt)
+     call psb_error(ictxt)
      return
   end if
   return

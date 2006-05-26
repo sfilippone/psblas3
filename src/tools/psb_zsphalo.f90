@@ -65,7 +65,7 @@ Subroutine psb_zsphalo(a,desc_a,blk,info,rwcnv,clcnv,outfmt)
   character(len=5), optional          :: outfmt 
   !c     ...local scalars....
   Integer    :: nprow,npcol,me,mycol,counter,proc,n,i,&
-       &     n_el_send,k,n_el_recv,icontxt, idx, r, tot_elem,&
+       &     n_el_send,k,n_el_recv,ictxt, idx, r, tot_elem,&
        &     n_elem, m, j, ipx,mat_recv, iszs, iszr,&
        &     idxs,idxr, nrv, nsd,nz
   Type(psb_zspmat_type)     :: tmp
@@ -101,8 +101,8 @@ Subroutine psb_zsphalo(a,desc_a,blk,info,rwcnv,clcnv,outfmt)
     outfmt_ = 'CSR'
   endif
 
-  icontxt=desc_a%matrix_data(psb_ctxt_)
-  Call blacs_gridinfo(icontxt,nprow,npcol,me,mycol)
+  ictxt=desc_a%matrix_data(psb_ctxt_)
+  Call blacs_gridinfo(ictxt,nprow,npcol,me,mycol)
 
   t1 = mpi_wtime()
   Allocate(sdid(nprow,3),rvid(nprow,3),brvindx(nprow+1),&
@@ -156,7 +156,7 @@ Subroutine psb_zsphalo(a,desc_a,blk,info,rwcnv,clcnv,outfmt)
 
     counter   = counter+n_el_send+3
   Enddo
-  call blacs_get(icontxt,10,icomm)
+  call blacs_get(ictxt,10,icomm)
   
   call mpi_alltoall(sdsz,1,mpi_integer,rvsz,1,mpi_integer,icomm,info)
   if (info /= 0) then
@@ -347,7 +347,7 @@ Subroutine psb_zsphalo(a,desc_a,blk,info,rwcnv,clcnv,outfmt)
 9999 continue
   call psb_erractionrestore(err_act)
   if (err_act.eq.act_abort) then
-     call psb_error(icontxt)
+     call psb_error(ictxt)
      return
   end if
   return

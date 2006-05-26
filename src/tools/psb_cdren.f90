@@ -60,7 +60,7 @@ subroutine psb_cdren(trans,iperm,desc_a,info)
   !....locals....
   integer                       :: i,j,err,nprow,npcol,myrow,mycol, n_col, kh, nh
   integer                       :: dectype
-  integer                       :: icontxt,temp(1),n_row, int_err(5), err_act
+  integer                       :: ictxt,temp(1),n_row, int_err(5), err_act
   real(kind(1.d0))              :: time(10), mpi_wtime, real_err(6)
   external mpi_wtime
   logical, parameter            :: debug=.false.
@@ -73,13 +73,13 @@ subroutine psb_cdren(trans,iperm,desc_a,info)
 
   time(1) = mpi_wtime()
 
-  icontxt=desc_a%matrix_data(psb_ctxt_)
+  ictxt=desc_a%matrix_data(psb_ctxt_)
   dectype=desc_a%matrix_data(psb_dec_type_)
   n_row = desc_a%matrix_data(psb_n_row_)
   n_col = desc_a%matrix_data(psb_n_col_)
      
   ! check on blacs grid 
-  call blacs_gridinfo(icontxt, nprow, npcol, myrow, mycol)
+  call blacs_gridinfo(ictxt, nprow, npcol, myrow, mycol)
   if (nprow.eq.-1) then
      info = 2010
      call psb_errpush(info,name)
@@ -213,7 +213,7 @@ subroutine psb_cdren(trans,iperm,desc_a,info)
   time(4) = mpi_wtime()
   time(4) = time(4) - time(3)
   if (debug) then 
-    call dgamx2d(icontxt, psb_all_, psb_topdef_, ione, ione, time(4),&
+    call dgamx2d(ictxt, psb_all_, psb_topdef_, ione, ione, time(4),&
          & ione,temp ,temp,-ione ,-ione,-ione)
 
     write (*, *) '         comm structs assembly: ', time(4)*1.d-3
@@ -228,7 +228,7 @@ subroutine psb_cdren(trans,iperm,desc_a,info)
   if (err_act.eq.act_ret) then
      return
   else
-     call psb_error(icontxt)
+     call psb_error(ictxt)
   end if
   return
 

@@ -53,7 +53,7 @@ subroutine psb_ifree(x, desc_a, info)
   integer             :: int_err(5)
   integer             :: temp(1)
   real(kind(1.d0))    :: real_err(5)
-  integer             :: icontxt,nprow,npcol,me,mypcol,err_act
+  integer             :: ictxt,nprow,npcol,me,mypcol,err_act
   character(len=20)   :: name, ch_err
 
   if(psb_get_errstatus().ne.0) return 
@@ -67,8 +67,8 @@ subroutine psb_ifree(x, desc_a, info)
      return
   end if
 
-  icontxt=desc_a%matrix_data(psb_ctxt_)
-  call blacs_gridinfo(icontxt, nprow, npcol, me, mypcol)
+  ictxt=desc_a%matrix_data(psb_ctxt_)
+  call blacs_gridinfo(ictxt, nprow, npcol, me, mypcol)
      !     ....verify blacs grid correctness..
   if (nprow.eq.-1) then
      info = 2010
@@ -103,7 +103,7 @@ subroutine psb_ifree(x, desc_a, info)
 9999 continue
   call psb_erractionrestore(err_act)
   if (err_act.eq.act_abort) then
-     call psb_error(icontxt)
+     call psb_error(ictxt)
      return
   end if
   return
@@ -163,7 +163,7 @@ subroutine psb_ifreev(x, desc_a,info)
   integer             :: int_err(5)
   integer             :: temp(1)
   real(kind(1.d0))    :: real_err(5)
-  integer             :: icontxt,nprow,npcol,me,mypcol,err_act
+  integer             :: ictxt,nprow,npcol,me,mypcol,err_act
   character(len=20)   :: name, ch_err
 
   if(psb_get_errstatus().ne.0) return 
@@ -178,8 +178,8 @@ subroutine psb_ifreev(x, desc_a,info)
      return
   end if
 
-  icontxt=desc_a%matrix_data(psb_ctxt_)
-  call blacs_gridinfo(icontxt, nprow, npcol, me, mypcol)
+  ictxt=desc_a%matrix_data(psb_ctxt_)
+  call blacs_gridinfo(ictxt, nprow, npcol, me, mypcol)
      !     ....verify blacs grid correctness..
   if (nprow.eq.-1) then
      info = 2010
@@ -214,7 +214,7 @@ subroutine psb_ifreev(x, desc_a,info)
 9999 continue
   call psb_erractionrestore(err_act)
   if (err_act.eq.act_abort) then
-     call psb_error(icontxt)
+     call psb_error(ictxt)
      return
   end if
   return

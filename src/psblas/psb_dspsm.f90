@@ -97,7 +97,7 @@ subroutine  psb_dspsm(alpha,a,x,beta,y,desc_a,info,&
   integer, intent(in), optional             :: k, jx, jy
 
   ! locals
-  integer                  :: int_err(5), icontxt, nprow, npcol, myrow, mycol,&
+  integer                  :: int_err(5), ictxt, nprow, npcol, myrow, mycol,&
        & err_act, n, iix, jjx, ia, ja, iia, jja, temp(2), lldx,lldy, lchoice,&
        & ix, iy, ik, ijx, ijy, i, lld,&
        & idoswap, m, nrow, ncol, liwork, llwork, iiy, jjy
@@ -114,10 +114,10 @@ subroutine  psb_dspsm(alpha,a,x,beta,y,desc_a,info,&
   info=0
   call psb_erractionsave(err_act)
 
-  icontxt=desc_a%matrix_data(psb_ctxt_)
+  ictxt=desc_a%matrix_data(psb_ctxt_)
 
   ! check on blacs grid 
-  call blacs_gridinfo(icontxt, nprow, npcol, myrow, mycol)
+  call blacs_gridinfo(ictxt, nprow, npcol, myrow, mycol)
   if (nprow == -1) then
     info = 2010
     call psb_errpush(info,name)
@@ -312,7 +312,7 @@ subroutine  psb_dspsm(alpha,a,x,beta,y,desc_a,info,&
   call psb_erractionrestore(err_act)
 
   if (err_act.eq.act_abort) then
-    call psb_error(icontxt)
+    call psb_error(ictxt)
     return
   end if
   return
@@ -403,7 +403,7 @@ subroutine  psb_dspsv(alpha,a,x,beta,y,desc_a,info,&
   integer, intent(in), optional             :: choice
 
   ! locals
-  integer                  :: int_err(5), icontxt, nprow, npcol, myrow, mycol,&
+  integer                  :: int_err(5), ictxt, nprow, npcol, myrow, mycol,&
        & err_act, n, iix, jjx, ia, ja, iia, jja, temp(2), lldx,lldy, lchoice,&
        & ix, iy, ik, jx, jy, i, lld,&
        & idoswap, m, nrow, ncol, liwork, llwork, iiy, jjy
@@ -420,10 +420,10 @@ subroutine  psb_dspsv(alpha,a,x,beta,y,desc_a,info,&
   info=0
   call psb_erractionsave(err_act)
 
-  icontxt=desc_a%matrix_data(psb_ctxt_)
+  ictxt=desc_a%matrix_data(psb_ctxt_)
 
   ! check on blacs grid 
-  call blacs_gridinfo(icontxt, nprow, npcol, myrow, mycol)
+  call blacs_gridinfo(ictxt, nprow, npcol, myrow, mycol)
   if (nprow == -1) then
     info = 2010
     call psb_errpush(info,name)
@@ -606,7 +606,7 @@ subroutine  psb_dspsv(alpha,a,x,beta,y,desc_a,info,&
   call psb_erractionrestore(err_act)
 
   if (err_act.eq.act_abort) then
-    call psb_error(icontxt)
+    call psb_error(ictxt)
     return
   end if
   return

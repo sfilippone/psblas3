@@ -58,7 +58,7 @@ subroutine  psb_zovrlm(x,desc_a,info,jx,ik,work,update)
   integer, intent(in), optional             :: update,jx,ik
 
   ! locals
-  integer                  :: int_err(5), icontxt, nprow, npcol, myrow, mycol,&
+  integer                  :: int_err(5), ictxt, nprow, npcol, myrow, mycol,&
        & err_act, m, n, iix, jjx, temp(2), ix, ijx, nrow, ncol, k, maxk, iupdate,&
        & imode, err, liwork, i
   complex(kind(1.d0)),pointer :: iwork(:), xp(:,:)
@@ -70,10 +70,10 @@ subroutine  psb_zovrlm(x,desc_a,info,jx,ik,work,update)
   info=0
   call psb_erractionsave(err_act)
 
-  icontxt=desc_a%matrix_data(psb_ctxt_)
+  ictxt=desc_a%matrix_data(psb_ctxt_)
 
   ! check on blacs grid 
-  call blacs_gridinfo(icontxt, nprow, npcol, myrow, mycol)
+  call blacs_gridinfo(ictxt, nprow, npcol, myrow, mycol)
   if (nprow == -1) then
      info = 2010
      call psb_errpush(info,name)
@@ -132,7 +132,7 @@ subroutine  psb_zovrlm(x,desc_a,info,jx,ik,work,update)
   end if
 
   err=info
-  call psb_errcomm(icontxt,err)
+  call psb_errcomm(ictxt,err)
   if(err.ne.0) goto 9999
 
   ! check for presence/size of a work area
@@ -208,7 +208,7 @@ subroutine  psb_zovrlm(x,desc_a,info,jx,ik,work,update)
   call psb_erractionrestore(err_act)
 
   if (err_act.eq.act_abort) then
-     call psb_error(icontxt)
+     call psb_error(ictxt)
      return
   end if
   return
@@ -275,7 +275,7 @@ subroutine  psb_zovrlv(x,desc_a,info,work,update)
   integer, intent(in), optional             :: update
 
   ! locals
-  integer                  :: int_err(5), icontxt, nprow, npcol, myrow, mycol,&
+  integer                  :: int_err(5), ictxt, nprow, npcol, myrow, mycol,&
        & err_act, m, n, iix, jjx, temp(2), ix, ijx, nrow, ncol, k, maxk, iupdate,&
        & imode, err, liwork, i
   complex(kind(1.d0)),pointer :: iwork(:)
@@ -287,10 +287,10 @@ subroutine  psb_zovrlv(x,desc_a,info,work,update)
   info=0
   call psb_erractionsave(err_act)
 
-  icontxt=desc_a%matrix_data(psb_ctxt_)
+  ictxt=desc_a%matrix_data(psb_ctxt_)
 
   ! check on blacs grid 
-  call blacs_gridinfo(icontxt, nprow, npcol, myrow, mycol)
+  call blacs_gridinfo(ictxt, nprow, npcol, myrow, mycol)
   if (nprow == -1) then
      info = 2010
      call psb_errpush(info,name)
@@ -335,7 +335,7 @@ subroutine  psb_zovrlv(x,desc_a,info,work,update)
   end if
 
   err=info
-  call psb_errcomm(icontxt,err)
+  call psb_errcomm(ictxt,err)
   if(err.ne.0) goto 9999
 
   ! check for presence/size of a work area
@@ -411,7 +411,7 @@ subroutine  psb_zovrlv(x,desc_a,info,work,update)
   call psb_erractionrestore(err_act)
 
   if (err_act.eq.act_abort) then
-     call psb_error(icontxt)
+     call psb_error(ictxt)
      return
   end if
   return

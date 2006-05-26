@@ -28,7 +28,7 @@
 !!$  POSSIBILITY OF SUCH DAMAGE.
 !!$ 
 !!$  
-subroutine psb_cdrep(m, icontxt, desc_a, info)
+subroutine psb_cdrep(m, ictxt, desc_a, info)
 
   !  Purpose
   !  =======
@@ -43,7 +43,7 @@ subroutine psb_cdrep(m, icontxt, desc_a, info)
   !                    Total number of  equations
   !                    required.
   !
-  ! ICONTXT      : (Global Input)Integer BLACS context for an NPx1 grid 
+  ! ictxt      : (Global Input)Integer BLACS context for an NPx1 grid 
   !                required.
   !
   ! OUTPUT
@@ -109,7 +109,7 @@ subroutine psb_cdrep(m, icontxt, desc_a, info)
   use psb_error_mod
   implicit None
   !....Parameters...
-  Integer, intent(in)               :: m,icontxt
+  Integer, intent(in)               :: m,ictxt
   integer, intent(out)              :: info
   Type(psb_desc_type), intent(out)  :: desc_a
 
@@ -128,7 +128,7 @@ subroutine psb_cdrep(m, icontxt, desc_a, info)
   err=0
   name = 'psb_cdrep'
 
-  call blacs_gridinfo(icontxt, nprow, npcol, myrow, mycol)
+  call blacs_gridinfo(ictxt, nprow, npcol, myrow, mycol)
   if (debug) write(*,*) 'psb_cdrep: ',nprow,npcol,myrow,mycol
   !     ....verify blacs grid correctness..
   if (npcol /= 1) then
@@ -160,9 +160,9 @@ subroutine psb_cdrep(m, icontxt, desc_a, info)
   if (myrow.eq.psb_root_) then
     exch(1)=m
     exch(2)=n
-    call igebs2d(icontxt,psb_all_,psb_topdef_, itwo,ione, exch, itwo)
+    call igebs2d(ictxt,psb_all_,psb_topdef_, itwo,ione, exch, itwo)
   else
-    call igebr2d(icontxt,psb_all_,psb_topdef_, itwo,ione, exch, itwo, psb_root_,&
+    call igebr2d(ictxt,psb_all_,psb_topdef_, itwo,ione, exch, itwo, psb_root_,&
          & 0)
     if (exch(1) /= m) then
       info=550
@@ -212,8 +212,8 @@ subroutine psb_cdrep(m, icontxt, desc_a, info)
   desc_a%matrix_data(psb_n_row_)  = m
   desc_a%matrix_data(psb_n_col_)  = n
   desc_a%matrix_data(psb_dec_type_) = psb_desc_repl_
-  desc_a%matrix_data(psb_ctxt_)     = icontxt
-  call blacs_get(icontxt,10,desc_a%matrix_data(psb_mpi_c_))
+  desc_a%matrix_data(psb_ctxt_)     = ictxt
+  call blacs_get(ictxt,10,desc_a%matrix_data(psb_mpi_c_))
 
   call psb_erractionrestore(err_act)
   return
@@ -221,7 +221,7 @@ subroutine psb_cdrep(m, icontxt, desc_a, info)
 9999 continue
   call psb_erractionrestore(err_act)
   if (err_act.eq.act_abort) then
-     call psb_error(icontxt)
+     call psb_error(ictxt)
      return
   end if
   return

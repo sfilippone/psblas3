@@ -60,7 +60,7 @@ function psb_ddot(x, y,desc_a, info, jx, jy)
   real(kind(1.D0))                 :: psb_ddot
 
   ! locals
-  integer                  :: int_err(5), icontxt, nprow, npcol, myrow, mycol,&
+  integer                  :: int_err(5), ictxt, nprow, npcol, myrow, mycol,&
        & err_act, n, iix, jjx, temp(2), ix, ijx, iy, ijy, iiy, jjy, i, m, j, k
   real(kind(1.D0))         :: dot_local
   real(kind(1.d0))         :: ddot
@@ -71,10 +71,10 @@ function psb_ddot(x, y,desc_a, info, jx, jy)
   info=0
   call psb_erractionsave(err_act)
 
-  icontxt=desc_a%matrix_data(psb_ctxt_)
+  ictxt=desc_a%matrix_data(psb_ctxt_)
 
   ! check on blacs grid 
-  call blacs_gridinfo(icontxt, nprow, npcol, myrow, mycol)
+  call blacs_gridinfo(ictxt, nprow, npcol, myrow, mycol)
   if (nprow == -ione) then
     info = 2010
     call psb_errpush(info,name)
@@ -145,7 +145,7 @@ function psb_ddot(x, y,desc_a, info, jx, jy)
   end if
 
   ! compute global sum
-  call dgsum2d(icontxt, 'A', ' ', ione, ione, dot_local,&
+  call dgsum2d(ictxt, 'A', ' ', ione, ione, dot_local,&
        & ione, mone ,mycol)
   
   psb_ddot = dot_local
@@ -157,7 +157,7 @@ function psb_ddot(x, y,desc_a, info, jx, jy)
   call psb_erractionrestore(err_act)
 
   if (err_act.eq.act_abort) then
-     call psb_error(icontxt)
+     call psb_error(ictxt)
      return
   end if
   return
@@ -219,7 +219,7 @@ function psb_ddotv(x, y,desc_a, info)
   real(kind(1.D0))                 :: psb_ddotv
 
   ! locals
-  integer                  :: int_err(5), icontxt, nprow, npcol, myrow, mycol,&
+  integer                  :: int_err(5), ictxt, nprow, npcol, myrow, mycol,&
        & err_act, n, iix, jjx, temp(2), ix, jx, iy, jy, iiy, jjy, i, m, j, k
   real(kind(1.D0))         :: dot_local
   real(kind(1.d0))         :: ddot
@@ -230,10 +230,10 @@ function psb_ddotv(x, y,desc_a, info)
   info=0
   call psb_erractionsave(err_act)
 
-  icontxt=desc_a%matrix_data(psb_ctxt_)
+  ictxt=desc_a%matrix_data(psb_ctxt_)
 
   ! check on blacs grid 
-  call blacs_gridinfo(icontxt, nprow, npcol, myrow, mycol)
+  call blacs_gridinfo(ictxt, nprow, npcol, myrow, mycol)
   if (nprow == -ione) then
     info = 2010
     call psb_errpush(info,name)
@@ -288,7 +288,7 @@ function psb_ddotv(x, y,desc_a, info)
   end if
 
   ! compute global sum
-  call dgsum2d(icontxt, 'A', ' ', ione, ione, dot_local,&
+  call dgsum2d(ictxt, 'A', ' ', ione, ione, dot_local,&
        & ione, mone ,mycol)
   
   psb_ddotv = dot_local
@@ -300,7 +300,7 @@ function psb_ddotv(x, y,desc_a, info)
   call psb_erractionrestore(err_act)
 
   if (err_act.eq.act_abort) then
-     call psb_error(icontxt)
+     call psb_error(ictxt)
      return
   end if
   return
@@ -362,7 +362,7 @@ subroutine psb_ddotvs(res, x, y,desc_a, info)
   integer, intent(out)             :: info
 
   ! locals
-  integer                  :: int_err(5), icontxt, nprow, npcol, myrow, mycol,&
+  integer                  :: int_err(5), ictxt, nprow, npcol, myrow, mycol,&
        & err_act, n, iix, jjx, temp(2), ix, ijx, iy, ijy, iiy, jjy, i, m, j, k
   real(kind(1.D0))         :: dot_local
   real(kind(1.d0))         :: ddot
@@ -373,10 +373,10 @@ subroutine psb_ddotvs(res, x, y,desc_a, info)
   info=0
   call psb_erractionsave(err_act)
 
-  icontxt=desc_a%matrix_data(psb_ctxt_)
+  ictxt=desc_a%matrix_data(psb_ctxt_)
 
   ! check on blacs grid 
-  call blacs_gridinfo(icontxt, nprow, npcol, myrow, mycol)
+  call blacs_gridinfo(ictxt, nprow, npcol, myrow, mycol)
   if (nprow == -ione) then
     info = 2010
     call psb_errpush(info,name)
@@ -429,7 +429,7 @@ subroutine psb_ddotvs(res, x, y,desc_a, info)
   end if
 
   ! compute global sum
-  call dgsum2d(icontxt, 'A', ' ', ione, ione, dot_local,&
+  call dgsum2d(ictxt, 'A', ' ', ione, ione, dot_local,&
        & ione, mone ,mycol)
   
   res = dot_local
@@ -441,7 +441,7 @@ subroutine psb_ddotvs(res, x, y,desc_a, info)
   call psb_erractionrestore(err_act)
 
   if (err_act.eq.act_abort) then
-     call psb_error(icontxt)
+     call psb_error(ictxt)
      return
   end if
   return
@@ -508,7 +508,7 @@ subroutine psb_dmdots(res, x, y, desc_a, info)
   integer, intent(out)             :: info
 
   ! locals
-  integer                  :: int_err(5), icontxt, nprow, npcol, myrow, mycol,&
+  integer                  :: int_err(5), ictxt, nprow, npcol, myrow, mycol,&
        & err_act, n, iix, jjx, temp(2), ix, ijx, iy, ijy, iiy, jjy, i, m, j, k
   real(kind(1.d0)),allocatable  :: dot_local(:)
   real(kind(1.d0))         :: ddot
@@ -519,10 +519,10 @@ subroutine psb_dmdots(res, x, y, desc_a, info)
   info=0
   call psb_erractionsave(err_act)
 
-  icontxt=desc_a%matrix_data(psb_ctxt_)
+  ictxt=desc_a%matrix_data(psb_ctxt_)
 
   ! check on blacs grid 
-  call blacs_gridinfo(icontxt, nprow, npcol, myrow, mycol)
+  call blacs_gridinfo(ictxt, nprow, npcol, myrow, mycol)
   if (nprow == -ione) then
     info = 2010
     call psb_errpush(info,name)
@@ -587,7 +587,7 @@ subroutine psb_dmdots(res, x, y, desc_a, info)
   end if
 
   ! compute global sum
-  call dgsum2d(icontxt, 'A', ' ', ione, ione, dot_local,&
+  call dgsum2d(ictxt, 'A', ' ', ione, ione, dot_local,&
        & ione, mone ,mycol)
   
   res(1:k) = dot_local(1:k)
@@ -599,7 +599,7 @@ subroutine psb_dmdots(res, x, y, desc_a, info)
   call psb_erractionrestore(err_act)
 
   if (err_act.eq.act_abort) then
-     call psb_error(icontxt)
+     call psb_error(ictxt)
      return
   end if
   return

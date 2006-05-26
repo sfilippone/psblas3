@@ -81,7 +81,7 @@ subroutine psb_zcsrp(trans,iperm,a, desc_a, info)
        & mypcol ,ierror ,n_col,l_dcsdp, iout, ipsize
   integer                               ::  dectype
   real(kind(1.d0)), pointer             ::  work_dcsdp(:)
-  integer                               ::  icontxt,temp(1),n_row,err_act
+  integer                               ::  ictxt,temp(1),n_row,err_act
   character(len=20)                     ::  name, char_err
 
   real(kind(1.d0))                      ::  time(10), mpi_wtime
@@ -90,7 +90,7 @@ subroutine psb_zcsrp(trans,iperm,a, desc_a, info)
 
   time(1) = mpi_wtime()
 
-  icontxt=desc_a%matrix_data(psb_ctxt_)
+  ictxt=desc_a%matrix_data(psb_ctxt_)
   dectype=desc_a%matrix_data(psb_dec_type_)
   n_row = desc_a%matrix_data(psb_n_row_)
   n_col = desc_a%matrix_data(psb_n_col_)
@@ -101,7 +101,7 @@ subroutine psb_zcsrp(trans,iperm,a, desc_a, info)
   name = 'psd_csrp'
 
   ! check on blacs grid 
-  call blacs_gridinfo(icontxt, nprow, npcol, me, mypcol)
+  call blacs_gridinfo(ictxt, nprow, npcol, me, mypcol)
   if (nprow.eq.-1) then
      info = 2010
      call psb_errpush(info,name)
@@ -179,7 +179,7 @@ subroutine psb_zcsrp(trans,iperm,a, desc_a, info)
   time(4) = mpi_wtime()
   time(4) = time(4) - time(3)
   if (debug) then 
-    call dgamx2d(icontxt, all, topdef, ione, ione, time(4),&
+    call dgamx2d(ictxt, all, topdef, ione, ione, time(4),&
          & ione,temp ,temp,-ione ,-ione,-ione)
 
     write (*, *) '         comm structs assembly: ', time(4)*1.d-3

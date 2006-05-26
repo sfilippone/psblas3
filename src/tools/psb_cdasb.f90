@@ -55,7 +55,7 @@ subroutine psb_cdasb(desc_a,info)
   integer          ::  i,err,nprow,npcol,me,mypcol,&
        & lovrlap,lhalo,nhalo,novrlap,max_size,max_halo,n_col,ldesc_halo,&
        & ldesc_ovrlap, dectype, err_act
-  integer                       :: icontxt,temp(1),n_row
+  integer                       :: ictxt,temp(1),n_row
   logical, parameter            :: debug=.false., debugwrt=.false.
   character(len=20)             :: name,ch_err
 
@@ -65,13 +65,13 @@ subroutine psb_cdasb(desc_a,info)
 
   call psb_erractionsave(err_act)
 
-  icontxt = desc_a%matrix_data(psb_ctxt_)
+  ictxt = desc_a%matrix_data(psb_ctxt_)
   dectype = desc_a%matrix_data(psb_dec_type_)
   n_row   = desc_a%matrix_data(psb_n_row_)
   n_col   = desc_a%matrix_data(psb_n_col_)
 
   ! check on blacs grid 
-  call blacs_gridinfo(icontxt, nprow, npcol, me, mypcol)
+  call blacs_gridinfo(ictxt, nprow, npcol, me, mypcol)
   if (nprow == -1) then
     info = 2010
     call psb_errpush(info,name)
@@ -134,7 +134,7 @@ subroutine psb_cdasb(desc_a,info)
 
     itemp(1) = max_size
     itemp(2) = max_halo
-    call igamx2d(icontxt, psb_all_, psb_topdef_, itwo, ione, itemp,&
+    call igamx2d(ictxt, psb_all_, psb_topdef_, itwo, ione, itemp,&
          & itwo,temp ,temp,-ione ,-ione,-ione)
     max_size = itemp(1) 
     max_halo = itemp(2) 
@@ -224,7 +224,7 @@ subroutine psb_cdasb(desc_a,info)
   if (err_act.eq.act_ret) then
      return
   else
-     call psb_error(icontxt)
+     call psb_error(ictxt)
   end if
   return
   

@@ -54,7 +54,7 @@ subroutine psb_cdins(nz,ia,ja,desc_a,info)
 
   !LOCALS.....
 
-  integer :: i,icontxt,nprocs ,glob_row,row,k,start_row,end_row,&
+  integer :: i,ictxt,nprocs ,glob_row,row,k,start_row,end_row,&
        & first_loc_row,j, ierror,locix,locjx,&
        & dectype,mglob, nnza, nglob,err
   integer,pointer        :: tia1(:),tia2(:), temp(:)
@@ -68,7 +68,7 @@ subroutine psb_cdins(nz,ia,ja,desc_a,info)
   name = 'psb_cdins'
   call psb_erractionsave(err_act)
 
-  icontxt = desc_a%matrix_data(psb_ctxt_)
+  ictxt = desc_a%matrix_data(psb_ctxt_)
   dectype = desc_a%matrix_data(psb_dec_type_)
   mglob   = desc_a%matrix_data(psb_m_)
   nglob   = desc_a%matrix_data(psb_n_)
@@ -76,7 +76,7 @@ subroutine psb_cdins(nz,ia,ja,desc_a,info)
   ncol    = desc_a%matrix_data(psb_n_col_)
 
   ! check on blacs grid 
-  call blacs_gridinfo(icontxt, nprow, npcol, me, mypcol)
+  call blacs_gridinfo(ictxt, nprow, npcol, me, mypcol)
   if (npcol.ne.1) then
     info = 2030
     call psb_errpush(info,name)
@@ -180,7 +180,7 @@ subroutine psb_cdins(nz,ia,ja,desc_a,info)
   if (err_act.eq.act_ret) then
      return
   else
-     call psb_error(icontxt)
+     call psb_error(ictxt)
   end if
   return
 

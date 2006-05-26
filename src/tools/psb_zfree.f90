@@ -51,7 +51,7 @@ subroutine psb_zfree(x, desc_a, info)
 
   !...locals....
   integer             :: int_err(5)
-  integer             :: icontxt,nprow,npcol,me,mypcol,err, err_act
+  integer             :: ictxt,nprow,npcol,me,mypcol,err, err_act
   character(len=20)   :: name
 
 
@@ -60,9 +60,9 @@ subroutine psb_zfree(x, desc_a, info)
   call psb_erractionsave(err_act)
   name='psb_zfree'
 
-  icontxt=desc_a%matrix_data(psb_ctxt_)
+  ictxt=desc_a%matrix_data(psb_ctxt_)
 
-  call blacs_gridinfo(icontxt, nprow, npcol, me, mypcol)
+  call blacs_gridinfo(ictxt, nprow, npcol, me, mypcol)
   !     ....verify blacs grid correctness..
   if (nprow.eq.-1) then
      info = 2010
@@ -107,7 +107,7 @@ subroutine psb_zfree(x, desc_a, info)
   if (err_act.eq.act_ret) then
      return
   else
-     call psb_error(icontxt)
+     call psb_error(ictxt)
   end if
   return
 
@@ -136,7 +136,7 @@ subroutine psb_zfreev(x, desc_a, info)
 
   !...locals....
   integer             :: int_err(5)
-  integer             :: icontxt,nprow,npcol,me,mypcol,err, err_act
+  integer             :: ictxt,nprow,npcol,me,mypcol,err, err_act
   character(len=20)   :: name
 
 
@@ -145,7 +145,7 @@ subroutine psb_zfreev(x, desc_a, info)
   call psb_erractionsave(err_act)
   name='psb_zfreev'
 
-  icontxt=desc_a%matrix_data(psb_ctxt_)
+  ictxt=desc_a%matrix_data(psb_ctxt_)
 
   if (.not.associated(desc_a%matrix_data)) then
      info=295
@@ -153,7 +153,7 @@ subroutine psb_zfreev(x, desc_a, info)
      goto 9999
   end if
 
-  call blacs_gridinfo(icontxt, nprow, npcol, me, mypcol)
+  call blacs_gridinfo(ictxt, nprow, npcol, me, mypcol)
   !     ....verify blacs grid correctness..
   if (nprow.eq.-1) then
      info = 2010
@@ -190,7 +190,7 @@ subroutine psb_zfreev(x, desc_a, info)
   if (err_act.eq.act_ret) then
      return
   else
-     call psb_error(icontxt)
+     call psb_error(ictxt)
   end if
   return
 

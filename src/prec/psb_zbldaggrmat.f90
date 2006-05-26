@@ -52,15 +52,15 @@ subroutine psb_zbldaggrmat(a,desc_a,ac,p,desc_p,info)
   integer, intent(out)                       :: info
 
   logical, parameter :: aggr_dump=.false.
-  integer ::icontxt,nprow,npcol,me,mycol, err_act
+  integer ::ictxt,nprow,npcol,me,mycol, err_act
   character(len=20) :: name, ch_err
   name='psb_zbldaggrmat'
   if(psb_get_errstatus().ne.0) return 
   info=0
   call psb_erractionsave(err_act)
 
-  icontxt=desc_a%matrix_data(psb_ctxt_)
-  call blacs_gridinfo(icontxt,nprow,npcol,me,mycol)
+  ictxt=desc_a%matrix_data(psb_ctxt_)
+  call blacs_gridinfo(ictxt,nprow,npcol,me,mycol)
 
   select case (p%iprcparm(smth_kind_))
   case (no_smth_) 
@@ -112,7 +112,7 @@ contains
     type(psb_zspmat_type), pointer :: bg 
     type(psb_zspmat_type)          :: b, tmp
     integer, pointer :: nzbr(:), idisp(:)
-    integer :: icontxt, nrow, nglob, ncol, ntaggr, nzbg, ip, ndx,&
+    integer :: ictxt, nrow, nglob, ncol, ntaggr, nzbg, ip, ndx,&
          & naggr, np, myprow, mypcol, nprows, npcols,nzt,irs,jl,nzl,nlr,&
          & icomm,naggrm1, mtype, i, j, err_act
     name='raw_aggregate'
@@ -123,8 +123,8 @@ contains
     bg => ac
     call psb_nullify_sp(b)
 
-    icontxt = desc_a%matrix_data(psb_ctxt_)
-    call blacs_gridinfo(icontxt,nprows,npcols,myprow,mypcol)
+    ictxt = desc_a%matrix_data(psb_ctxt_)
+    call blacs_gridinfo(ictxt,nprows,npcols,myprow,mypcol)
     np = nprows*npcols
     nglob = desc_a%matrix_data(psb_m_)
     nrow  = desc_a%matrix_data(psb_n_row_)
@@ -244,11 +244,11 @@ contains
 
     if (p%iprcparm(coarse_mat_) == mat_repl_) then 
 
-      call psb_cdrep(ntaggr,icontxt,desc_p,info)
+      call psb_cdrep(ntaggr,ictxt,desc_p,info)
 
       nzbr(:) = 0
       nzbr(myprow+1) = irs
-      call igsum2d(icontxt,'All',' ',np,1,nzbr,np,-1,-1)
+      call igsum2d(ictxt,'All',' ',np,1,nzbr,np,-1,-1)
       nzbg = sum(nzbr)
       call psb_sp_all(ntaggr,ntaggr,bg,nzbg,info)
       if(info /= 0) then
@@ -256,7 +256,7 @@ contains
         goto 9999
       end if
 
-      call blacs_get(icontxt,10,icomm )
+      call blacs_get(ictxt,10,icomm )
       do ip=1,np
         idisp(ip) = sum(nzbr(1:ip-1))
       enddo
@@ -293,7 +293,7 @@ contains
 
     else if (p%iprcparm(coarse_mat_) == mat_distr_) then 
 
-      call psb_cddec(naggr,icontxt,desc_p,info)
+      call psb_cddec(naggr,ictxt,desc_p,info)
       call psb_sp_clone(b,bg,info)
       if(info /= 0) then
         call psb_errpush(4010,name,a_err='spclone')
@@ -342,7 +342,7 @@ contains
     type(psb_zspmat_type), pointer :: bg 
     type(psb_zspmat_type)          :: b
     integer, pointer :: nzbr(:), idisp(:), ivall(:)
-    integer :: icontxt, nrow, nglob, ncol, ntaggr, nzbg, ip, ndx,&
+    integer :: ictxt, nrow, nglob, ncol, ntaggr, nzbg, ip, ndx,&
          & naggr, np, myprow, mypcol, nprows, npcols,&
          & icomm, naggrm1,naggrp1,mtype,i,j,err_act,k,nzl,itemp(1),jtemp(1)
     type(psb_zspmat_type), pointer  :: am1,am2
@@ -360,8 +360,8 @@ contains
     info=0
     call psb_erractionsave(err_act)
 
-    icontxt = desc_a%matrix_data(psb_ctxt_)
-    call blacs_gridinfo(icontxt,nprows,npcols,myprow,mypcol)
+    ictxt = desc_a%matrix_data(psb_ctxt_)
+    call blacs_gridinfo(ictxt,nprows,npcols,myprow,mypcol)
 
     bg => ac
     call psb_nullify_sp(b)
@@ -522,7 +522,7 @@ contains
           anorm = max(anorm,tmp/dg) 
         enddo
 
-        call dgamx2d(icontxt,'All',' ',1,1,anorm,1,itemp,jtemp,-1,-1,-1)     
+        call dgamx2d(ictxt,'All',' ',1,1,anorm,1,itemp,jtemp,-1,-1,-1)     
       else
         anorm = psb_spnrmi(am3,desc_a,info)
       endif
@@ -730,7 +730,7 @@ contains
             i = i + 1
           end do
         end do
-        call psb_cdall(ntaggr,ivall,icontxt,desc_p,info,flag=1)
+        call psb_cdall(ntaggr,ivall,ictxt,desc_p,info,flag=1)
         if(info /= 0) then
           call psb_errpush(4010,name,a_err='psb_cdall')
           goto 9999
@@ -804,7 +804,7 @@ contains
           call psb_errpush(4010,name,a_err='psb_ipcoo2csr')
           goto 9999
         end if
-        call igsum2d(icontxt,'All',' ',1,1,k,1,-1,-1)
+        call igsum2d(ictxt,'All',' ',1,1,k,1,-1,-1)
 
         if (k == 0) then 
           ! If the off diagonal part is emtpy, there's no point 
@@ -852,15 +852,15 @@ contains
         nzbr(:) = 0
         nzbr(myprow+1) = b%infoa(psb_nnz_)
 
-        call psb_cdrep(ntaggr,icontxt,desc_p,info)
+        call psb_cdrep(ntaggr,ictxt,desc_p,info)
 
-        call igsum2d(icontxt,'All',' ',np,1,nzbr,np,-1,-1)
+        call igsum2d(ictxt,'All',' ',np,1,nzbr,np,-1,-1)
         nzbg = sum(nzbr)
         call psb_sp_all(ntaggr,ntaggr,bg,nzbg,info)
         if(info /= 0) goto 9999
 
 
-        call blacs_get(icontxt,10,icomm )
+        call blacs_get(ictxt,10,icomm )
         do ip=1,np
           idisp(ip) = sum(nzbr(1:ip-1))
         enddo
@@ -906,7 +906,7 @@ contains
           call psb_errpush(4010,name,a_err='spclone')
           goto 9999
         end if
-        call psb_cddec(naggr,icontxt,desc_p,info)
+        call psb_cddec(naggr,ictxt,desc_p,info)
 
         call psb_sp_free(b,info)
         if(info /=  0) then
@@ -921,10 +921,10 @@ contains
         nzbr(:) = 0
         nzbr(myprow+1) = b%infoa(psb_nnz_)
 
-        call psb_cdrep(ntaggr,icontxt,desc_p,info)
+        call psb_cdrep(ntaggr,ictxt,desc_p,info)
 
 
-        call igsum2d(icontxt,'All',' ',np,1,nzbr,np,-1,-1)
+        call igsum2d(ictxt,'All',' ',np,1,nzbr,np,-1,-1)
         nzbg = sum(nzbr)
         call psb_sp_all(ntaggr,ntaggr,bg,nzbg,info)
         if(info /= 0) then
@@ -932,7 +932,7 @@ contains
           goto 9999
         end if
 
-        call blacs_get(icontxt,10,icomm )
+        call blacs_get(ictxt,10,icomm )
         do ip=1,np
           idisp(ip) = sum(nzbr(1:ip-1))
         enddo

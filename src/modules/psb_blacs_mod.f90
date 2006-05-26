@@ -77,16 +77,16 @@ module psb_blacs_mod
  
 contains 
   
-  subroutine igebs2ds(icontxt,scope,dat,top)
-    integer, intent(in)   :: icontxt,dat
+  subroutine igebs2ds(ictxt,scope,dat,top)
+    integer, intent(in)   :: ictxt,dat
     character, intent(in) :: scope
     character, intent(in), optional  :: top
     
     character             :: top_ 
     
     interface 
-      subroutine igebs2d(icontxt,scope,top,m,n,v,ld)
-        integer, intent(in)   :: icontxt,m,n,ld
+      subroutine igebs2d(ictxt,scope,top,m,n,v,ld)
+        integer, intent(in)   :: ictxt,m,n,ld
         integer, intent(in)   :: v
         character, intent(in) :: scope, top
       end subroutine igebs2d
@@ -98,19 +98,19 @@ contains
       top_ = ' '
     endif
 
-    call igebs2d(icontxt,scope,top_,1,1,dat,1)
+    call igebs2d(ictxt,scope,top_,1,1,dat,1)
     
   end subroutine igebs2ds
 
-  subroutine igebs2dv(icontxt,scope,dat,top)
-    integer, intent(in)   :: icontxt,dat(:)
+  subroutine igebs2dv(ictxt,scope,dat,top)
+    integer, intent(in)   :: ictxt,dat(:)
     character, intent(in) :: scope
     character, intent(in), optional  :: top
     
 
     interface 
-      subroutine igebs2d(icontxt,scope,top,m,n,v,ld)
-        integer, intent(in)   :: icontxt,m,n,ld
+      subroutine igebs2d(ictxt,scope,top,m,n,v,ld)
+        integer, intent(in)   :: ictxt,m,n,ld
         integer, intent(in)   :: v(*)
         character, intent(in) :: scope, top
       end subroutine igebs2d
@@ -124,18 +124,18 @@ contains
       top_ = ' '
     endif
 
-    call igebs2d(icontxt,scope,top_,size(dat,1),1,dat,size(dat,1))
+    call igebs2d(ictxt,scope,top_,size(dat,1),1,dat,size(dat,1))
     
   end subroutine igebs2dv
 
-  subroutine igebs2dm(icontxt,scope,dat,top)
-    integer, intent(in)   :: icontxt,dat(:,:)
+  subroutine igebs2dm(ictxt,scope,dat,top)
+    integer, intent(in)   :: ictxt,dat(:,:)
     character, intent(in) :: scope
     character, intent(in), optional  :: top
     
     interface 
-      subroutine igebs2d(icontxt,scope,top,m,n,v,ld)
-        integer, intent(in)   :: icontxt,m,n,ld
+      subroutine igebs2d(ictxt,scope,top,m,n,v,ld)
+        integer, intent(in)   :: ictxt,m,n,ld
         integer, intent(in)   :: v(ld,*)
         character, intent(in) :: scope, top
       end subroutine igebs2d
@@ -148,21 +148,21 @@ contains
       top_ = ' '
     endif
 
-    call igebs2d(icontxt,scope,top_,size(dat,1),size(dat,2),dat,size(dat,1))
+    call igebs2d(ictxt,scope,top_,size(dat,1),size(dat,2),dat,size(dat,1))
     
   end subroutine igebs2dm
 
 
 
-  subroutine dgebs2ds(icontxt,scope,dat,top)
-    integer, intent(in)   :: icontxt
+  subroutine dgebs2ds(ictxt,scope,dat,top)
+    integer, intent(in)   :: ictxt
     real(kind(1.d0)), intent(in)   :: dat
     character, intent(in) :: scope
     character, intent(in), optional  :: top
     
     interface 
-      subroutine dgebs2d(icontxt,scope,top,m,n,v,ld)
-        integer, intent(in)   :: icontxt,m,n,ld
+      subroutine dgebs2d(ictxt,scope,top,m,n,v,ld)
+        integer, intent(in)   :: ictxt,m,n,ld
         real(kind(1.d0)), intent(in)   :: v
         character, intent(in) :: scope, top
       end subroutine dgebs2d
@@ -175,19 +175,19 @@ contains
       top_ = ' '
     endif
 
-    call dgebs2d(icontxt,scope,top_,1,1,dat,1)
+    call dgebs2d(ictxt,scope,top_,1,1,dat,1)
     
   end subroutine dgebs2ds
 
-  subroutine dgebs2dv(icontxt,scope,dat,top)
-    integer, intent(in)   :: icontxt
+  subroutine dgebs2dv(ictxt,scope,dat,top)
+    integer, intent(in)   :: ictxt
     real(kind(1.d0)), intent(in)   :: dat(:)
     character, intent(in) :: scope
     character, intent(in), optional  :: top
     
     interface 
-      subroutine dgebs2d(icontxt,scope,top,m,n,v,ld)
-        integer, intent(in)   :: icontxt,m,n,ld
+      subroutine dgebs2d(ictxt,scope,top,m,n,v,ld)
+        integer, intent(in)   :: ictxt,m,n,ld
         real(kind(1.d0)), intent(in)   :: v(*)
         character, intent(in) :: scope, top
       end subroutine dgebs2d
@@ -201,20 +201,20 @@ contains
       top_ = ' '
     endif
 
-    call dgebs2d(icontxt,scope,top_,size(dat),1,dat,size(dat))
+    call dgebs2d(ictxt,scope,top_,size(dat),1,dat,size(dat))
     
   end subroutine dgebs2dv
 
-  subroutine dgebs2dm(icontxt,scope,dat,top)
-    integer, intent(in)   :: icontxt
+  subroutine dgebs2dm(ictxt,scope,dat,top)
+    integer, intent(in)   :: ictxt
     real(kind(1.d0)), intent(in)   :: dat(:,:)
 
     character, intent(in) :: scope
     character, intent(in), optional  :: top
     
     interface 
-      subroutine dgebs2d(icontxt,scope,top,m,n,v,ld)
-        integer, intent(in)   :: icontxt,m,n,ld
+      subroutine dgebs2d(ictxt,scope,top,m,n,v,ld)
+        integer, intent(in)   :: ictxt,m,n,ld
         real(kind(1.d0)), intent(in)   :: v(ld,*)
         character, intent(in) :: scope, top
       end subroutine dgebs2d
@@ -228,21 +228,21 @@ contains
       top_ = ' '
     endif
 
-    call dgebs2d(icontxt,scope,top_,size(dat,1),size(dat,2),dat,size(dat,1))
+    call dgebs2d(ictxt,scope,top_,size(dat,1),size(dat,2),dat,size(dat,1))
     
   end subroutine dgebs2dm
 
 
 
-  subroutine zgebs2ds(icontxt,scope,dat,top)
-    integer, intent(in)   :: icontxt
+  subroutine zgebs2ds(ictxt,scope,dat,top)
+    integer, intent(in)   :: ictxt
     complex(kind(1.d0)), intent(in)   :: dat
     character, intent(in) :: scope
     character, intent(in), optional  :: top
     
     interface 
-      subroutine zgebs2d(icontxt,scope,top,m,n,v,ld)
-        integer, intent(in)   :: icontxt,m,n,ld
+      subroutine zgebs2d(ictxt,scope,top,m,n,v,ld)
+        integer, intent(in)   :: ictxt,m,n,ld
         complex(kind(1.d0)), intent(in)   :: v
         character, intent(in) :: scope, top
       end subroutine zgebs2d
@@ -255,19 +255,19 @@ contains
       top_ = ' '
     endif
 
-    call zgebs2d(icontxt,scope,top_,1,1,dat,1)
+    call zgebs2d(ictxt,scope,top_,1,1,dat,1)
     
   end subroutine zgebs2ds
 
-  subroutine zgebs2dv(icontxt,scope,dat,top)
-    integer, intent(in)   :: icontxt
+  subroutine zgebs2dv(ictxt,scope,dat,top)
+    integer, intent(in)   :: ictxt
     complex(kind(1.d0)), intent(in)   :: dat(:)
     character, intent(in) :: scope
     character, intent(in), optional  :: top
     
     interface 
-      subroutine zgebs2d(icontxt,scope,top,m,n,v,ld)
-        integer, intent(in)   :: icontxt,m,n,ld
+      subroutine zgebs2d(ictxt,scope,top,m,n,v,ld)
+        integer, intent(in)   :: ictxt,m,n,ld
         complex(kind(1.d0)), intent(in)   :: v(*)
         character, intent(in) :: scope, top
       end subroutine zgebs2d
@@ -281,20 +281,20 @@ contains
       top_ = ' '
     endif
 
-    call zgebs2d(icontxt,scope,top_,size(dat),1,dat,size(dat))
+    call zgebs2d(ictxt,scope,top_,size(dat),1,dat,size(dat))
     
   end subroutine zgebs2dv
 
-  subroutine zgebs2dm(icontxt,scope,dat,top)
-    integer, intent(in)   :: icontxt
+  subroutine zgebs2dm(ictxt,scope,dat,top)
+    integer, intent(in)   :: ictxt
     complex(kind(1.d0)), intent(in)   :: dat(:,:)
 
     character, intent(in) :: scope
     character, intent(in), optional  :: top
     
     interface 
-      subroutine zgebs2d(icontxt,scope,top,m,n,v,ld)
-        integer, intent(in)   :: icontxt,m,n,ld
+      subroutine zgebs2d(ictxt,scope,top,m,n,v,ld)
+        integer, intent(in)   :: ictxt,m,n,ld
         complex(kind(1.d0)), intent(in)   :: v(ld,*)
         character, intent(in) :: scope, top
       end subroutine zgebs2d
@@ -308,7 +308,7 @@ contains
       top_ = ' '
     endif
 
-    call zgebs2d(icontxt,scope,top_,size(dat,1),size(dat,2),dat,size(dat,1))
+    call zgebs2d(ictxt,scope,top_,size(dat,1),size(dat,2),dat,size(dat,1))
     
   end subroutine zgebs2dm
 
@@ -316,16 +316,16 @@ contains
 
 
 
-  subroutine dgebr2ds(icontxt,scope,dat,top,rrt,crt)
-    integer, intent(in)   :: icontxt
+  subroutine dgebr2ds(ictxt,scope,dat,top,rrt,crt)
+    integer, intent(in)   :: ictxt
     real(kind(1.d0)), intent(inout)   :: dat
     character, intent(in) :: scope
     character, intent(in), optional  :: top
     integer, intent(in), optional  :: rrt,crt
     
     interface 
-      subroutine dgebr2d(icontxt,scope,top,m,n,v,ld,rrt,crt)
-        integer, intent(in)   :: icontxt,m,n,ld
+      subroutine dgebr2d(ictxt,scope,top,m,n,v,ld,rrt,crt)
+        integer, intent(in)   :: ictxt,m,n,ld
         real(kind(1.d0)), intent(inout)   :: v
         character, intent(in) :: scope, top
         integer, intent(in)   :: rrt,crt
@@ -335,7 +335,7 @@ contains
     integer   :: rrt_, crt_
     integer   :: nrows,ncols,myrow,mycol
     
-    call blacs_gridinfo(icontxt,nrows,ncols,myrow,mycol)
+    call blacs_gridinfo(ictxt,nrows,ncols,myrow,mycol)
     select case(scope)
     case('R','r')
       rrt_ = myrow
@@ -364,20 +364,20 @@ contains
       crt_ = crt
     endif
     
-    call dgebr2d(icontxt,scope,top_,1,1,dat,1,rrt_,crt_)
+    call dgebr2d(ictxt,scope,top_,1,1,dat,1,rrt_,crt_)
     
   end subroutine dgebr2ds
 
-  subroutine dgebr2dv(icontxt,scope,dat,top,rrt,crt)
-    integer, intent(in)   :: icontxt
+  subroutine dgebr2dv(ictxt,scope,dat,top,rrt,crt)
+    integer, intent(in)   :: ictxt
     real(kind(1.d0)), intent(inout)   :: dat(:)
     character, intent(in) :: scope
     character, intent(in), optional  :: top
     integer, intent(in), optional  :: rrt,crt
 
     interface 
-      subroutine dgebr2d(icontxt,scope,top,m,n,v,ld,rrt,crt)
-        integer, intent(in)   :: icontxt,m,n,ld
+      subroutine dgebr2d(ictxt,scope,top,m,n,v,ld,rrt,crt)
+        integer, intent(in)   :: ictxt,m,n,ld
         real(kind(1.d0)), intent(inout)   :: v(*)
         character, intent(in) :: scope, top
         integer, intent(in)   :: rrt,crt
@@ -388,7 +388,7 @@ contains
     integer   :: nrows,ncols,myrow,mycol
     integer   :: rrt_, crt_
 
-    call blacs_gridinfo(icontxt,nrows,ncols,myrow,mycol)
+    call blacs_gridinfo(ictxt,nrows,ncols,myrow,mycol)
     select case(scope)
     case('R','r')
       rrt_ = myrow
@@ -417,12 +417,12 @@ contains
       crt_ = crt
     endif
 
-    call dgebr2d(icontxt,scope,top_,size(dat),1,dat,size(dat),rrt_,crt_)
+    call dgebr2d(ictxt,scope,top_,size(dat),1,dat,size(dat),rrt_,crt_)
     
   end subroutine dgebr2dv
 
-  subroutine dgebr2dm(icontxt,scope,dat,top,rrt,crt)
-    integer, intent(in)   :: icontxt
+  subroutine dgebr2dm(ictxt,scope,dat,top,rrt,crt)
+    integer, intent(in)   :: ictxt
     real(kind(1.d0)), intent(inout)   :: dat(:,:)
 
     character, intent(in) :: scope
@@ -430,8 +430,8 @@ contains
     integer, intent(in), optional  :: rrt,crt
 
     interface 
-      subroutine dgebr2d(icontxt,scope,top,m,n,v,ld,rrt,crt)
-        integer, intent(in)   :: icontxt,m,n,ld
+      subroutine dgebr2d(ictxt,scope,top,m,n,v,ld,rrt,crt)
+        integer, intent(in)   :: ictxt,m,n,ld
         real(kind(1.d0)), intent(inout)   :: v(ld,*)
         character, intent(in) :: scope, top
         integer, intent(in)   :: rrt,crt
@@ -442,7 +442,7 @@ contains
     integer   :: nrows,ncols,myrow,mycol
     integer   :: rrt_, crt_
 
-    call blacs_gridinfo(icontxt,nrows,ncols,myrow,mycol)
+    call blacs_gridinfo(ictxt,nrows,ncols,myrow,mycol)
     select case(scope)
     case('R','r')
       rrt_ = myrow
@@ -471,23 +471,23 @@ contains
       crt_ = crt
     endif
 
-    call dgebr2d(icontxt,scope,top_,size(dat,1),size(dat,2),dat,size(dat,1),rrt_,crt_)
+    call dgebr2d(ictxt,scope,top_,size(dat,1),size(dat,2),dat,size(dat,1),rrt_,crt_)
     
   end subroutine dgebr2dm
 
 
 
 
-  subroutine zgebr2ds(icontxt,scope,dat,top,rrt,crt)
-    integer, intent(in)   :: icontxt
+  subroutine zgebr2ds(ictxt,scope,dat,top,rrt,crt)
+    integer, intent(in)   :: ictxt
     complex(kind(1.d0)), intent(inout)   :: dat
     character, intent(in) :: scope
     character, intent(in), optional  :: top
     integer, intent(in), optional  :: rrt,crt
     
     interface 
-      subroutine zgebr2d(icontxt,scope,top,m,n,v,ld,rrt,crt)
-        integer, intent(in)   :: icontxt,m,n,ld
+      subroutine zgebr2d(ictxt,scope,top,m,n,v,ld,rrt,crt)
+        integer, intent(in)   :: ictxt,m,n,ld
         complex(kind(1.d0)), intent(inout)   :: v
         character, intent(in) :: scope, top
         integer, intent(in)   :: rrt,crt
@@ -497,7 +497,7 @@ contains
     integer   :: rrt_, crt_
     integer   :: nrows,ncols,myrow,mycol
 
-    call blacs_gridinfo(icontxt,nrows,ncols,myrow,mycol)
+    call blacs_gridinfo(ictxt,nrows,ncols,myrow,mycol)
     select case(scope)
     case('R','r')
       rrt_ = myrow
@@ -525,20 +525,20 @@ contains
       crt_ = crt
     endif
     
-    call zgebr2d(icontxt,scope,top_,1,1,dat,1,rrt_,crt_)
+    call zgebr2d(ictxt,scope,top_,1,1,dat,1,rrt_,crt_)
     
   end subroutine zgebr2ds
 
-  subroutine zgebr2dv(icontxt,scope,dat,top,rrt,crt)
-    integer, intent(in)   :: icontxt
+  subroutine zgebr2dv(ictxt,scope,dat,top,rrt,crt)
+    integer, intent(in)   :: ictxt
     complex(kind(1.d0)), intent(inout)   :: dat(:)
     character, intent(in) :: scope
     character, intent(in), optional  :: top
     integer, intent(in), optional  :: rrt,crt
 
     interface 
-      subroutine zgebr2d(icontxt,scope,top,m,n,v,ld,rrt,crt)
-        integer, intent(in)   :: icontxt,m,n,ld
+      subroutine zgebr2d(ictxt,scope,top,m,n,v,ld,rrt,crt)
+        integer, intent(in)   :: ictxt,m,n,ld
         complex(kind(1.d0)), intent(inout)   :: v(*)
         character, intent(in) :: scope, top
         integer, intent(in)   :: rrt,crt
@@ -549,7 +549,7 @@ contains
     integer   :: nrows,ncols,myrow,mycol
     integer   :: rrt_, crt_
 
-    call blacs_gridinfo(icontxt,nrows,ncols,myrow,mycol)
+    call blacs_gridinfo(ictxt,nrows,ncols,myrow,mycol)
     select case(scope)
     case('R','r')
       rrt_ = myrow
@@ -578,12 +578,12 @@ contains
       crt_ = crt
     endif
 
-    call zgebr2d(icontxt,scope,top_,size(dat),1,dat,size(dat),rrt_,crt_)
+    call zgebr2d(ictxt,scope,top_,size(dat),1,dat,size(dat),rrt_,crt_)
     
   end subroutine zgebr2dv
 
-  subroutine zgebr2dm(icontxt,scope,dat,top,rrt,crt)
-    integer, intent(in)   :: icontxt
+  subroutine zgebr2dm(ictxt,scope,dat,top,rrt,crt)
+    integer, intent(in)   :: ictxt
     complex(kind(1.d0)), intent(inout)   :: dat(:,:)
 
     character, intent(in) :: scope
@@ -591,8 +591,8 @@ contains
     integer, intent(in), optional  :: rrt,crt
 
     interface 
-      subroutine zgebr2d(icontxt,scope,top,m,n,v,ld,rrt,crt)
-        integer, intent(in)   :: icontxt,m,n,ld
+      subroutine zgebr2d(ictxt,scope,top,m,n,v,ld,rrt,crt)
+        integer, intent(in)   :: ictxt,m,n,ld
         complex(kind(1.d0)), intent(inout)   :: v(ld,*)
         character, intent(in) :: scope, top
         integer, intent(in)   :: rrt,crt
@@ -603,7 +603,7 @@ contains
     integer   :: nrows,ncols,myrow,mycol
     integer   :: rrt_, crt_
 
-    call blacs_gridinfo(icontxt,nrows,ncols,myrow,mycol)
+    call blacs_gridinfo(ictxt,nrows,ncols,myrow,mycol)
     select case(scope)
     case('R','r')
       rrt_ = myrow
@@ -632,22 +632,22 @@ contains
       crt_ = crt
     endif
 
-    call zgebr2d(icontxt,scope,top_,size(dat,1),size(dat,2),dat,size(dat,1),rrt_,crt_)
+    call zgebr2d(ictxt,scope,top_,size(dat,1),size(dat,2),dat,size(dat,1),rrt_,crt_)
     
   end subroutine zgebr2dm
 
 
 
-  subroutine igebr2ds(icontxt,scope,dat,top,rrt,crt)
-    integer, intent(in)   :: icontxt
+  subroutine igebr2ds(ictxt,scope,dat,top,rrt,crt)
+    integer, intent(in)   :: ictxt
     integer, intent(inout)   :: dat
     character, intent(in) :: scope
     character, intent(in), optional  :: top
     integer, intent(in), optional  :: rrt,crt
     
     interface 
-      subroutine igebr2d(icontxt,scope,top,m,n,v,ld,rrt,crt)
-        integer, intent(in)   :: icontxt,m,n,ld
+      subroutine igebr2d(ictxt,scope,top,m,n,v,ld,rrt,crt)
+        integer, intent(in)   :: ictxt,m,n,ld
         integer, intent(inout)   :: v
         character, intent(in) :: scope, top
         integer, intent(in)   :: rrt,crt
@@ -657,7 +657,7 @@ contains
     integer   :: rrt_, crt_
     integer   :: nrows,ncols,myrow,mycol
 
-    call blacs_gridinfo(icontxt,nrows,ncols,myrow,mycol)
+    call blacs_gridinfo(ictxt,nrows,ncols,myrow,mycol)
     select case(scope)
     case('R','r')
       rrt_ = myrow
@@ -685,20 +685,20 @@ contains
       crt_ = crt
     endif
     
-    call igebr2d(icontxt,scope,top_,1,1,dat,1,rrt_,crt_)
+    call igebr2d(ictxt,scope,top_,1,1,dat,1,rrt_,crt_)
     
   end subroutine igebr2ds
 
-  subroutine igebr2dv(icontxt,scope,dat,top,rrt,crt)
-    integer, intent(in)   :: icontxt
+  subroutine igebr2dv(ictxt,scope,dat,top,rrt,crt)
+    integer, intent(in)   :: ictxt
     integer, intent(inout)   :: dat(:)
     character, intent(in) :: scope
     character, intent(in), optional  :: top
     integer, intent(in), optional  :: rrt,crt
 
     interface 
-      subroutine igebr2d(icontxt,scope,top,m,n,v,ld,rrt,crt)
-        integer, intent(in)   :: icontxt,m,n,ld
+      subroutine igebr2d(ictxt,scope,top,m,n,v,ld,rrt,crt)
+        integer, intent(in)   :: ictxt,m,n,ld
         integer, intent(inout)   :: v(*)
         character, intent(in) :: scope, top
         integer, intent(in)   :: rrt,crt
@@ -709,7 +709,7 @@ contains
     integer   :: nrows,ncols,myrow,mycol
     integer   :: rrt_, crt_
 
-    call blacs_gridinfo(icontxt,nrows,ncols,myrow,mycol)
+    call blacs_gridinfo(ictxt,nrows,ncols,myrow,mycol)
     select case(scope)
     case('R','r')
       rrt_ = myrow
@@ -738,12 +738,12 @@ contains
       crt_ = crt
     endif
 
-    call igebr2d(icontxt,scope,top_,size(dat),1,dat,size(dat),rrt_,crt_)
+    call igebr2d(ictxt,scope,top_,size(dat),1,dat,size(dat),rrt_,crt_)
     
   end subroutine igebr2dv
 
-  subroutine igebr2dm(icontxt,scope,dat,top,rrt,crt)
-    integer, intent(in)   :: icontxt
+  subroutine igebr2dm(ictxt,scope,dat,top,rrt,crt)
+    integer, intent(in)   :: ictxt
     integer, intent(inout)   :: dat(:,:)
 
     character, intent(in) :: scope
@@ -751,8 +751,8 @@ contains
     integer, intent(in), optional  :: rrt,crt
 
     interface 
-      subroutine igebr2d(icontxt,scope,top,m,n,v,ld,rrt,crt)
-        integer, intent(in)   :: icontxt,m,n,ld
+      subroutine igebr2d(ictxt,scope,top,m,n,v,ld,rrt,crt)
+        integer, intent(in)   :: ictxt,m,n,ld
         integer, intent(inout)   :: v(ld,*)
         character, intent(in) :: scope, top
         integer, intent(in)   :: rrt,crt
@@ -763,7 +763,7 @@ contains
     integer   :: nrows,ncols,myrow,mycol
     integer   :: rrt_, crt_
 
-    call blacs_gridinfo(icontxt,nrows,ncols,myrow,mycol)
+    call blacs_gridinfo(ictxt,nrows,ncols,myrow,mycol)
     select case(scope)
     case('R','r')
       rrt_ = myrow
@@ -792,344 +792,344 @@ contains
       crt_ = crt
     endif
 
-    call igebr2d(icontxt,scope,top_,size(dat,1),size(dat,2),dat,size(dat,1),rrt_,crt_)
+    call igebr2d(ictxt,scope,top_,size(dat,1),size(dat,2),dat,size(dat,1),rrt_,crt_)
     
   end subroutine igebr2dm
 
 
 
-  subroutine dgesd2ds(icontxt,dat,rdst,cdst)
-    integer, intent(in)   :: icontxt
+  subroutine dgesd2ds(ictxt,dat,rdst,cdst)
+    integer, intent(in)   :: ictxt
     real(kind(1.d0)), intent(in)   :: dat
     integer, intent(in)  :: rdst,cdst
     
     interface 
-      subroutine dgesd2d(icontxt,m,n,v,ld,rd,cd)
-        integer, intent(in)   :: icontxt,m,n,ld
+      subroutine dgesd2d(ictxt,m,n,v,ld,rd,cd)
+        integer, intent(in)   :: ictxt,m,n,ld
         real(kind(1.d0)), intent(in)   :: v
         integer, intent(in)   :: rd,cd
       end subroutine dgesd2d
     end interface
 
-    call dgesd2d(icontxt,1,1,dat,1,rdst,cdst)
+    call dgesd2d(ictxt,1,1,dat,1,rdst,cdst)
     
   end subroutine dgesd2ds
 
 
-  subroutine dgesd2dv(icontxt,dat,rdst,cdst)
-    integer, intent(in)   :: icontxt
+  subroutine dgesd2dv(ictxt,dat,rdst,cdst)
+    integer, intent(in)   :: ictxt
     real(kind(1.d0)), intent(in)   :: dat(:)
     integer, intent(in)  :: rdst,cdst
     
     interface 
-      subroutine dgesd2d(icontxt,m,n,v,ld,rd,cd)
-        integer, intent(in)   :: icontxt,m,n,ld
+      subroutine dgesd2d(ictxt,m,n,v,ld,rd,cd)
+        integer, intent(in)   :: ictxt,m,n,ld
         real(kind(1.d0)), intent(in)   :: v(*)
         integer, intent(in)   :: rd,cd
       end subroutine dgesd2d
     end interface
 
-    call dgesd2d(icontxt,size(dat),1,dat,size(dat),rdst,cdst)
+    call dgesd2d(ictxt,size(dat),1,dat,size(dat),rdst,cdst)
     
   end subroutine dgesd2dv
 
-  subroutine dgesd2dm(icontxt,dat,rdst,cdst)
-    integer, intent(in)   :: icontxt
+  subroutine dgesd2dm(ictxt,dat,rdst,cdst)
+    integer, intent(in)   :: ictxt
     real(kind(1.d0)), intent(in)   :: dat(:,:)
     integer, intent(in)  :: rdst,cdst
     
     interface 
-      subroutine dgesd2d(icontxt,m,n,v,ld,rd,cd)
-        integer, intent(in)   :: icontxt,m,n,ld
+      subroutine dgesd2d(ictxt,m,n,v,ld,rd,cd)
+        integer, intent(in)   :: ictxt,m,n,ld
         real(kind(1.d0)), intent(in)   :: v(ld,*)
         integer, intent(in)   :: rd,cd
       end subroutine dgesd2d
     end interface
 
-    call dgesd2d(icontxt,size(dat,1),size(dat,2),dat,size(dat,1),rdst,cdst)
+    call dgesd2d(ictxt,size(dat,1),size(dat,2),dat,size(dat,1),rdst,cdst)
     
   end subroutine dgesd2dm
 
 
-  subroutine igesd2ds(icontxt,dat,rdst,cdst)
-    integer, intent(in)   :: icontxt
+  subroutine igesd2ds(ictxt,dat,rdst,cdst)
+    integer, intent(in)   :: ictxt
     integer, intent(in)   :: dat
     integer, intent(in)  :: rdst,cdst
     
     interface 
-      subroutine igesd2d(icontxt,m,n,v,ld,rd,cd)
-        integer, intent(in)   :: icontxt,m,n,ld
+      subroutine igesd2d(ictxt,m,n,v,ld,rd,cd)
+        integer, intent(in)   :: ictxt,m,n,ld
         integer, intent(in)   :: v
         integer, intent(in)   :: rd,cd
       end subroutine igesd2d
     end interface
 
-    call igesd2d(icontxt,1,1,dat,1,rdst,cdst)
+    call igesd2d(ictxt,1,1,dat,1,rdst,cdst)
     
   end subroutine igesd2ds
 
 
-  subroutine igesd2dv(icontxt,dat,rdst,cdst)
-    integer, intent(in)   :: icontxt
+  subroutine igesd2dv(ictxt,dat,rdst,cdst)
+    integer, intent(in)   :: ictxt
     integer, intent(in)   :: dat(:)
     integer, intent(in)  :: rdst,cdst
     
     interface 
-      subroutine igesd2d(icontxt,m,n,v,ld,rd,cd)
-        integer, intent(in)   :: icontxt,m,n,ld
+      subroutine igesd2d(ictxt,m,n,v,ld,rd,cd)
+        integer, intent(in)   :: ictxt,m,n,ld
         integer, intent(in)   :: v(*)
         integer, intent(in)   :: rd,cd
       end subroutine igesd2d
     end interface
 
-    call igesd2d(icontxt,size(dat),1,dat,size(dat),rdst,cdst)
+    call igesd2d(ictxt,size(dat),1,dat,size(dat),rdst,cdst)
     
   end subroutine igesd2dv
 
-  subroutine igesd2dm(icontxt,dat,rdst,cdst)
-    integer, intent(in)   :: icontxt
+  subroutine igesd2dm(ictxt,dat,rdst,cdst)
+    integer, intent(in)   :: ictxt
     integer, intent(in)   :: dat(:,:)
     integer, intent(in)  :: rdst,cdst
     
     interface 
-      subroutine igesd2d(icontxt,m,n,v,ld,rd,cd)
-        integer, intent(in)   :: icontxt,m,n,ld
+      subroutine igesd2d(ictxt,m,n,v,ld,rd,cd)
+        integer, intent(in)   :: ictxt,m,n,ld
         integer, intent(in)   :: v(ld,*)
         integer, intent(in)   :: rd,cd
       end subroutine igesd2d
     end interface
 
-    call igesd2d(icontxt,size(dat,1),size(dat,2),dat,size(dat,1),rdst,cdst)
+    call igesd2d(ictxt,size(dat,1),size(dat,2),dat,size(dat,1),rdst,cdst)
     
   end subroutine igesd2dm
 
 
 
-  subroutine zgesd2ds(icontxt,dat,rdst,cdst)
-    integer, intent(in)   :: icontxt
+  subroutine zgesd2ds(ictxt,dat,rdst,cdst)
+    integer, intent(in)   :: ictxt
     complex(kind(1.d0)), intent(in)   :: dat
     integer, intent(in)  :: rdst,cdst
     
     interface 
-      subroutine zgesd2d(icontxt,m,n,v,ld,rd,cd)
-        integer, intent(in)   :: icontxt,m,n,ld
+      subroutine zgesd2d(ictxt,m,n,v,ld,rd,cd)
+        integer, intent(in)   :: ictxt,m,n,ld
         complex(kind(1.d0)), intent(in)   :: v
         integer, intent(in)   :: rd,cd
       end subroutine zgesd2d
     end interface
 
-    call zgesd2d(icontxt,1,1,dat,1,rdst,cdst)
+    call zgesd2d(ictxt,1,1,dat,1,rdst,cdst)
     
   end subroutine zgesd2ds
 
 
-  subroutine zgesd2dv(icontxt,dat,rdst,cdst)
-    integer, intent(in)   :: icontxt
+  subroutine zgesd2dv(ictxt,dat,rdst,cdst)
+    integer, intent(in)   :: ictxt
     complex(kind(1.d0)), intent(in)   :: dat(:)
     integer, intent(in)  :: rdst,cdst
     
     interface 
-      subroutine zgesd2d(icontxt,m,n,v,ld,rd,cd)
-        integer, intent(in)   :: icontxt,m,n,ld
+      subroutine zgesd2d(ictxt,m,n,v,ld,rd,cd)
+        integer, intent(in)   :: ictxt,m,n,ld
         complex(kind(1.d0)), intent(in)   :: v(*)
         integer, intent(in)   :: rd,cd
       end subroutine zgesd2d
     end interface
 
-    call zgesd2d(icontxt,size(dat),1,dat,size(dat),rdst,cdst)
+    call zgesd2d(ictxt,size(dat),1,dat,size(dat),rdst,cdst)
     
   end subroutine zgesd2dv
 
-  subroutine zgesd2dm(icontxt,dat,rdst,cdst)
-    integer, intent(in)   :: icontxt
+  subroutine zgesd2dm(ictxt,dat,rdst,cdst)
+    integer, intent(in)   :: ictxt
     complex(kind(1.d0)), intent(in)   :: dat(:,:)
     integer, intent(in)  :: rdst,cdst
     
     interface 
-      subroutine zgesd2d(icontxt,m,n,v,ld,rd,cd)
-        integer, intent(in)   :: icontxt,m,n,ld
+      subroutine zgesd2d(ictxt,m,n,v,ld,rd,cd)
+        integer, intent(in)   :: ictxt,m,n,ld
         complex(kind(1.d0)), intent(in)   :: v(ld,*)
         integer, intent(in)   :: rd,cd
       end subroutine zgesd2d
     end interface
 
-    call zgesd2d(icontxt,size(dat,1),size(dat,2),dat,size(dat,1),rdst,cdst)
+    call zgesd2d(ictxt,size(dat,1),size(dat,2),dat,size(dat,1),rdst,cdst)
     
   end subroutine zgesd2dm
 
 
 
-  subroutine dgerv2ds(icontxt,dat,rdst,cdst)
-    integer, intent(in)   :: icontxt
+  subroutine dgerv2ds(ictxt,dat,rdst,cdst)
+    integer, intent(in)   :: ictxt
     real(kind(1.d0)), intent(inout)   :: dat
     integer, intent(in)  :: rdst,cdst
     
     interface 
-      subroutine dgerv2d(icontxt,m,n,v,ld,rd,cd)
-        integer, intent(in)   :: icontxt,m,n,ld
+      subroutine dgerv2d(ictxt,m,n,v,ld,rd,cd)
+        integer, intent(in)   :: ictxt,m,n,ld
         real(kind(1.d0)), intent(inout)   :: v
         integer, intent(in)   :: rd,cd
       end subroutine dgerv2d
     end interface
 
-    call dgerv2d(icontxt,1,1,dat,1,rdst,cdst)
+    call dgerv2d(ictxt,1,1,dat,1,rdst,cdst)
     
   end subroutine dgerv2ds
 
 
-  subroutine dgerv2dv(icontxt,dat,rdst,cdst)
-    integer, intent(in)   :: icontxt
+  subroutine dgerv2dv(ictxt,dat,rdst,cdst)
+    integer, intent(in)   :: ictxt
     real(kind(1.d0)), intent(inout)   :: dat(:)
     integer, intent(in)  :: rdst,cdst
     
     interface 
-      subroutine dgerv2d(icontxt,m,n,v,ld,rd,cd)
-        integer, intent(in)   :: icontxt,m,n,ld
+      subroutine dgerv2d(ictxt,m,n,v,ld,rd,cd)
+        integer, intent(in)   :: ictxt,m,n,ld
         real(kind(1.d0)), intent(inout)   :: v(*)
         integer, intent(in)   :: rd,cd
       end subroutine dgerv2d
     end interface
 
-    call dgerv2d(icontxt,size(dat),1,dat,size(dat),rdst,cdst)
+    call dgerv2d(ictxt,size(dat),1,dat,size(dat),rdst,cdst)
     
   end subroutine dgerv2dv
 
-  subroutine dgerv2dm(icontxt,dat,rdst,cdst)
-    integer, intent(in)   :: icontxt
+  subroutine dgerv2dm(ictxt,dat,rdst,cdst)
+    integer, intent(in)   :: ictxt
     real(kind(1.d0)), intent(inout)   :: dat(:,:)
     integer, intent(in)  :: rdst,cdst
     
     interface 
-      subroutine dgerv2d(icontxt,m,n,v,ld,rd,cd)
-        integer, intent(in)   :: icontxt,m,n,ld
+      subroutine dgerv2d(ictxt,m,n,v,ld,rd,cd)
+        integer, intent(in)   :: ictxt,m,n,ld
         real(kind(1.d0)), intent(inout)   :: v(ld,*)
         integer, intent(in)   :: rd,cd
       end subroutine dgerv2d
     end interface
 
-    call dgerv2d(icontxt,size(dat,1),size(dat,2),dat,size(dat,1),rdst,cdst)
+    call dgerv2d(ictxt,size(dat,1),size(dat,2),dat,size(dat,1),rdst,cdst)
     
   end subroutine dgerv2dm
 
 
-  subroutine igerv2ds(icontxt,dat,rdst,cdst)
-    integer, intent(in)   :: icontxt
+  subroutine igerv2ds(ictxt,dat,rdst,cdst)
+    integer, intent(in)   :: ictxt
     integer, intent(inout)   :: dat
     integer, intent(in)  :: rdst,cdst
     
     interface 
-      subroutine igerv2d(icontxt,m,n,v,ld,rd,cd)
-        integer, intent(in)   :: icontxt,m,n,ld
+      subroutine igerv2d(ictxt,m,n,v,ld,rd,cd)
+        integer, intent(in)   :: ictxt,m,n,ld
         integer, intent(inout)   :: v
         integer, intent(in)   :: rd,cd
       end subroutine igerv2d
     end interface
 
-    call igerv2d(icontxt,1,1,dat,1,rdst,cdst)
+    call igerv2d(ictxt,1,1,dat,1,rdst,cdst)
     
   end subroutine igerv2ds
 
 
-  subroutine igerv2dv(icontxt,dat,rdst,cdst)
-    integer, intent(in)   :: icontxt
+  subroutine igerv2dv(ictxt,dat,rdst,cdst)
+    integer, intent(in)   :: ictxt
     integer, intent(inout)   :: dat(:)
     integer, intent(in)  :: rdst,cdst
     
     interface 
-      subroutine igerv2d(icontxt,m,n,v,ld,rd,cd)
-        integer, intent(in)   :: icontxt,m,n,ld
+      subroutine igerv2d(ictxt,m,n,v,ld,rd,cd)
+        integer, intent(in)   :: ictxt,m,n,ld
         integer, intent(inout)   :: v(*)
         integer, intent(in)   :: rd,cd
       end subroutine igerv2d
     end interface
 
-    call igerv2d(icontxt,size(dat),1,dat,size(dat),rdst,cdst)
+    call igerv2d(ictxt,size(dat),1,dat,size(dat),rdst,cdst)
     
   end subroutine igerv2dv
 
-  subroutine igerv2dm(icontxt,dat,rdst,cdst)
-    integer, intent(in)   :: icontxt
+  subroutine igerv2dm(ictxt,dat,rdst,cdst)
+    integer, intent(in)   :: ictxt
     integer, intent(inout)   :: dat(:,:)
     integer, intent(in)  :: rdst,cdst
     
     interface 
-      subroutine igerv2d(icontxt,m,n,v,ld,rd,cd)
-        integer, intent(in)   :: icontxt,m,n,ld
+      subroutine igerv2d(ictxt,m,n,v,ld,rd,cd)
+        integer, intent(in)   :: ictxt,m,n,ld
         integer, intent(inout)   :: v(ld,*)
         integer, intent(in)   :: rd,cd
       end subroutine igerv2d
     end interface
 
-    call igerv2d(icontxt,size(dat,1),size(dat,2),dat,size(dat,1),rdst,cdst)
+    call igerv2d(ictxt,size(dat,1),size(dat,2),dat,size(dat,1),rdst,cdst)
     
   end subroutine igerv2dm
 
 
 
-  subroutine zgerv2ds(icontxt,dat,rdst,cdst)
-    integer, intent(in)   :: icontxt
+  subroutine zgerv2ds(ictxt,dat,rdst,cdst)
+    integer, intent(in)   :: ictxt
     complex(kind(1.d0)), intent(inout)   :: dat
     integer, intent(in)  :: rdst,cdst
     
     interface 
-      subroutine zgerv2d(icontxt,m,n,v,ld,rd,cd)
-        integer, intent(in)   :: icontxt,m,n,ld
+      subroutine zgerv2d(ictxt,m,n,v,ld,rd,cd)
+        integer, intent(in)   :: ictxt,m,n,ld
         complex(kind(1.d0)), intent(inout)   :: v
         integer, intent(in)   :: rd,cd
       end subroutine zgerv2d
     end interface
 
-    call zgerv2d(icontxt,1,1,dat,1,rdst,cdst)
+    call zgerv2d(ictxt,1,1,dat,1,rdst,cdst)
     
   end subroutine zgerv2ds
 
 
-  subroutine zgerv2dv(icontxt,dat,rdst,cdst)
-    integer, intent(in)   :: icontxt
+  subroutine zgerv2dv(ictxt,dat,rdst,cdst)
+    integer, intent(in)   :: ictxt
     complex(kind(1.d0)), intent(inout)   :: dat(:)
     integer, intent(in)  :: rdst,cdst
     
     interface 
-      subroutine zgerv2d(icontxt,m,n,v,ld,rd,cd)
-        integer, intent(in)   :: icontxt,m,n,ld
+      subroutine zgerv2d(ictxt,m,n,v,ld,rd,cd)
+        integer, intent(in)   :: ictxt,m,n,ld
         complex(kind(1.d0)), intent(inout)   :: v(*)
         integer, intent(in)   :: rd,cd
       end subroutine zgerv2d
     end interface
 
-    call zgerv2d(icontxt,size(dat),1,dat,size(dat),rdst,cdst)
+    call zgerv2d(ictxt,size(dat),1,dat,size(dat),rdst,cdst)
     
   end subroutine zgerv2dv
 
-  subroutine zgerv2dm(icontxt,dat,rdst,cdst)
-    integer, intent(in)   :: icontxt
+  subroutine zgerv2dm(ictxt,dat,rdst,cdst)
+    integer, intent(in)   :: ictxt
     complex(kind(1.d0)), intent(inout)   :: dat(:,:)
     integer, intent(in)  :: rdst,cdst
     
     interface 
-      subroutine zgerv2d(icontxt,m,n,v,ld,rd,cd)
-        integer, intent(in)   :: icontxt,m,n,ld
+      subroutine zgerv2d(ictxt,m,n,v,ld,rd,cd)
+        integer, intent(in)   :: ictxt,m,n,ld
         complex(kind(1.d0)), intent(inout)   :: v(ld,*)
         integer, intent(in)   :: rd,cd
       end subroutine zgerv2d
     end interface
 
-    call zgerv2d(icontxt,size(dat,1),size(dat,2),dat,size(dat,1),rdst,cdst)
+    call zgerv2d(ictxt,size(dat,1),size(dat,2),dat,size(dat,1),rdst,cdst)
     
   end subroutine zgerv2dm
 
 
 
-  subroutine dgsum2ds(icontxt,scope,dat,top,rrt,crt)
-    integer, intent(in)   :: icontxt
+  subroutine dgsum2ds(ictxt,scope,dat,top,rrt,crt)
+    integer, intent(in)   :: ictxt
     real(kind(1.d0)), intent(inout)   :: dat
     character, intent(in) :: scope
     character, intent(in), optional  :: top
     integer, intent(in), optional  :: rrt,crt
     
     interface 
-      subroutine dgsum2d(icontxt,scope,top,m,n,v,ld,rrt,crt)
-        integer, intent(in)   :: icontxt,m,n,ld
+      subroutine dgsum2d(ictxt,scope,top,m,n,v,ld,rrt,crt)
+        integer, intent(in)   :: ictxt,m,n,ld
         real(kind(1.d0)), intent(inout)   :: v
         character, intent(in) :: scope, top
         integer, intent(in)   :: rrt,crt
@@ -1140,7 +1140,7 @@ contains
     integer   :: nrows,ncols,myrow,mycol
 
 
-    call blacs_gridinfo(icontxt,nrows,ncols,myrow,mycol)
+    call blacs_gridinfo(ictxt,nrows,ncols,myrow,mycol)
     select case(scope)
     case('R','r')
       rrt_ = myrow
@@ -1169,20 +1169,20 @@ contains
       crt_ = crt
     endif
     
-    call dgsum2d(icontxt,scope,top_,1,1,dat,1,rrt_,crt_)
+    call dgsum2d(ictxt,scope,top_,1,1,dat,1,rrt_,crt_)
     
   end subroutine dgsum2ds
 
-  subroutine dgsum2dv(icontxt,scope,dat,top,rrt,crt)
-    integer, intent(in)   :: icontxt
+  subroutine dgsum2dv(ictxt,scope,dat,top,rrt,crt)
+    integer, intent(in)   :: ictxt
     real(kind(1.d0)), intent(inout)   :: dat(:)
     character, intent(in) :: scope
     character, intent(in), optional  :: top
     integer, intent(in), optional  :: rrt,crt
 
     interface 
-      subroutine dgsum2d(icontxt,scope,top,m,n,v,ld,rrt,crt)
-        integer, intent(in)   :: icontxt,m,n,ld
+      subroutine dgsum2d(ictxt,scope,top,m,n,v,ld,rrt,crt)
+        integer, intent(in)   :: ictxt,m,n,ld
         real(kind(1.d0)), intent(inout)   :: v(*)
         character, intent(in) :: scope, top
         integer, intent(in)   :: rrt,crt
@@ -1194,7 +1194,7 @@ contains
     integer   :: nrows,ncols,myrow,mycol
 
 
-    call blacs_gridinfo(icontxt,nrows,ncols,myrow,mycol)
+    call blacs_gridinfo(ictxt,nrows,ncols,myrow,mycol)
     select case(scope)
     case('R','r')
       rrt_ = myrow
@@ -1223,12 +1223,12 @@ contains
       crt_ = crt
     endif
 
-    call dgsum2d(icontxt,scope,top_,size(dat),1,dat,size(dat),rrt_,crt_)
+    call dgsum2d(ictxt,scope,top_,size(dat),1,dat,size(dat),rrt_,crt_)
     
   end subroutine dgsum2dv
 
-  subroutine dgsum2dm(icontxt,scope,dat,top,rrt,crt)
-    integer, intent(in)   :: icontxt
+  subroutine dgsum2dm(ictxt,scope,dat,top,rrt,crt)
+    integer, intent(in)   :: ictxt
     real(kind(1.d0)), intent(inout)   :: dat(:,:)
 
     character, intent(in) :: scope
@@ -1236,8 +1236,8 @@ contains
     integer, intent(in), optional  :: rrt,crt
 
     interface 
-      subroutine dgsum2d(icontxt,scope,top,m,n,v,ld,rrt,crt)
-        integer, intent(in)   :: icontxt,m,n,ld
+      subroutine dgsum2d(ictxt,scope,top,m,n,v,ld,rrt,crt)
+        integer, intent(in)   :: ictxt,m,n,ld
         real(kind(1.d0)), intent(inout)   :: v(ld,*)
         character, intent(in) :: scope, top
         integer, intent(in)   :: rrt,crt
@@ -1249,7 +1249,7 @@ contains
     integer   :: nrows,ncols,myrow,mycol
 
 
-    call blacs_gridinfo(icontxt,nrows,ncols,myrow,mycol)
+    call blacs_gridinfo(ictxt,nrows,ncols,myrow,mycol)
     select case(scope)
     case('R','r')
       rrt_ = myrow
@@ -1278,22 +1278,22 @@ contains
       crt_ = crt
     endif
 
-    call dgsum2d(icontxt,scope,top_,size(dat,1),size(dat,2),dat,size(dat,1),rrt_,crt_)
+    call dgsum2d(ictxt,scope,top_,size(dat,1),size(dat,2),dat,size(dat,1),rrt_,crt_)
     
   end subroutine dgsum2dm
 
 
 
-  subroutine igsum2ds(icontxt,scope,dat,top,rrt,crt)
-    integer, intent(in)   :: icontxt
+  subroutine igsum2ds(ictxt,scope,dat,top,rrt,crt)
+    integer, intent(in)   :: ictxt
     integer, intent(inout)   :: dat
     character, intent(in) :: scope
     character, intent(in), optional  :: top
     integer, intent(in), optional  :: rrt,crt
     
     interface 
-      subroutine igsum2d(icontxt,scope,top,m,n,v,ld,rrt,crt)
-        integer, intent(in)   :: icontxt,m,n,ld
+      subroutine igsum2d(ictxt,scope,top,m,n,v,ld,rrt,crt)
+        integer, intent(in)   :: ictxt,m,n,ld
         integer, intent(inout)   :: v
         character, intent(in) :: scope, top
         integer, intent(in)   :: rrt,crt
@@ -1304,7 +1304,7 @@ contains
     integer   :: nrows,ncols,myrow,mycol
 
 
-    call blacs_gridinfo(icontxt,nrows,ncols,myrow,mycol)
+    call blacs_gridinfo(ictxt,nrows,ncols,myrow,mycol)
     select case(scope)
     case('R','r')
       rrt_ = myrow
@@ -1333,20 +1333,20 @@ contains
       crt_ = crt
     endif
     
-    call igsum2d(icontxt,scope,top_,1,1,dat,1,rrt_,crt_)
+    call igsum2d(ictxt,scope,top_,1,1,dat,1,rrt_,crt_)
     
   end subroutine igsum2ds
 
-  subroutine igsum2dv(icontxt,scope,dat,top,rrt,crt)
-    integer, intent(in)   :: icontxt
+  subroutine igsum2dv(ictxt,scope,dat,top,rrt,crt)
+    integer, intent(in)   :: ictxt
     integer, intent(inout)   :: dat(:)
     character, intent(in) :: scope
     character, intent(in), optional  :: top
     integer, intent(in), optional  :: rrt,crt
 
     interface 
-      subroutine igsum2d(icontxt,scope,top,m,n,v,ld,rrt,crt)
-        integer, intent(in)   :: icontxt,m,n,ld
+      subroutine igsum2d(ictxt,scope,top,m,n,v,ld,rrt,crt)
+        integer, intent(in)   :: ictxt,m,n,ld
         integer, intent(inout)   :: v(*)
         character, intent(in) :: scope, top
         integer, intent(in)   :: rrt,crt
@@ -1358,7 +1358,7 @@ contains
     integer   :: nrows,ncols,myrow,mycol
 
 
-    call blacs_gridinfo(icontxt,nrows,ncols,myrow,mycol)
+    call blacs_gridinfo(ictxt,nrows,ncols,myrow,mycol)
     select case(scope)
     case('R','r')
       rrt_ = myrow
@@ -1387,12 +1387,12 @@ contains
       crt_ = crt
     endif
 
-    call igsum2d(icontxt,scope,top_,size(dat),1,dat,size(dat),rrt_,crt_)
+    call igsum2d(ictxt,scope,top_,size(dat),1,dat,size(dat),rrt_,crt_)
     
   end subroutine igsum2dv
 
-  subroutine igsum2dm(icontxt,scope,dat,top,rrt,crt)
-    integer, intent(in)   :: icontxt
+  subroutine igsum2dm(ictxt,scope,dat,top,rrt,crt)
+    integer, intent(in)   :: ictxt
     integer, intent(inout)   :: dat(:,:)
 
     character, intent(in) :: scope
@@ -1400,8 +1400,8 @@ contains
     integer, intent(in), optional  :: rrt,crt
 
     interface 
-      subroutine igsum2d(icontxt,scope,top,m,n,v,ld,rrt,crt)
-        integer, intent(in)   :: icontxt,m,n,ld
+      subroutine igsum2d(ictxt,scope,top,m,n,v,ld,rrt,crt)
+        integer, intent(in)   :: ictxt,m,n,ld
         integer, intent(inout)   :: v(ld,*)
         character, intent(in) :: scope, top
         integer, intent(in)   :: rrt,crt
@@ -1413,7 +1413,7 @@ contains
     integer   :: nrows,ncols,myrow,mycol
 
 
-    call blacs_gridinfo(icontxt,nrows,ncols,myrow,mycol)
+    call blacs_gridinfo(ictxt,nrows,ncols,myrow,mycol)
     select case(scope)
     case('R','r')
       rrt_ = myrow
@@ -1442,22 +1442,22 @@ contains
       crt_ = crt
     endif
 
-    call igsum2d(icontxt,scope,top_,size(dat,1),size(dat,2),dat,size(dat,1),rrt_,crt_)
+    call igsum2d(ictxt,scope,top_,size(dat,1),size(dat,2),dat,size(dat,1),rrt_,crt_)
     
   end subroutine igsum2dm
 
 
 
-  subroutine zgsum2ds(icontxt,scope,dat,top,rrt,crt)
-    integer, intent(in)   :: icontxt
+  subroutine zgsum2ds(ictxt,scope,dat,top,rrt,crt)
+    integer, intent(in)   :: ictxt
     complex(kind(1.d0)), intent(inout)   :: dat
     character, intent(in) :: scope
     character, intent(in), optional  :: top
     integer, intent(in), optional  :: rrt,crt
     
     interface 
-      subroutine zgsum2d(icontxt,scope,top,m,n,v,ld,rrt,crt)
-        integer, intent(in)   :: icontxt,m,n,ld
+      subroutine zgsum2d(ictxt,scope,top,m,n,v,ld,rrt,crt)
+        integer, intent(in)   :: ictxt,m,n,ld
         complex(kind(1.d0)), intent(inout)   :: v
         character, intent(in) :: scope, top
         integer, intent(in)   :: rrt,crt
@@ -1468,7 +1468,7 @@ contains
     integer   :: nrows,ncols,myrow,mycol
 
 
-    call blacs_gridinfo(icontxt,nrows,ncols,myrow,mycol)
+    call blacs_gridinfo(ictxt,nrows,ncols,myrow,mycol)
     select case(scope)
     case('R','r')
       rrt_ = myrow
@@ -1497,20 +1497,20 @@ contains
       crt_ = crt
     endif
     
-    call zgsum2d(icontxt,scope,top_,1,1,dat,1,rrt_,crt_)
+    call zgsum2d(ictxt,scope,top_,1,1,dat,1,rrt_,crt_)
     
   end subroutine zgsum2ds
 
-  subroutine zgsum2dv(icontxt,scope,dat,top,rrt,crt)
-    integer, intent(in)   :: icontxt
+  subroutine zgsum2dv(ictxt,scope,dat,top,rrt,crt)
+    integer, intent(in)   :: ictxt
     complex(kind(1.d0)), intent(inout)   :: dat(:)
     character, intent(in) :: scope
     character, intent(in), optional  :: top
     integer, intent(in), optional  :: rrt,crt
 
     interface 
-      subroutine zgsum2d(icontxt,scope,top,m,n,v,ld,rrt,crt)
-        integer, intent(in)   :: icontxt,m,n,ld
+      subroutine zgsum2d(ictxt,scope,top,m,n,v,ld,rrt,crt)
+        integer, intent(in)   :: ictxt,m,n,ld
         complex(kind(1.d0)), intent(inout)   :: v(*)
         character, intent(in) :: scope, top
         integer, intent(in)   :: rrt,crt
@@ -1522,7 +1522,7 @@ contains
     integer   :: nrows,ncols,myrow,mycol
 
 
-    call blacs_gridinfo(icontxt,nrows,ncols,myrow,mycol)
+    call blacs_gridinfo(ictxt,nrows,ncols,myrow,mycol)
     select case(scope)
     case('R','r')
       rrt_ = myrow
@@ -1551,12 +1551,12 @@ contains
       crt_ = crt
     endif
 
-    call zgsum2d(icontxt,scope,top_,size(dat),1,dat,size(dat),rrt_,crt_)
+    call zgsum2d(ictxt,scope,top_,size(dat),1,dat,size(dat),rrt_,crt_)
     
   end subroutine zgsum2dv
 
-  subroutine zgsum2dm(icontxt,scope,dat,top,rrt,crt)
-    integer, intent(in)   :: icontxt
+  subroutine zgsum2dm(ictxt,scope,dat,top,rrt,crt)
+    integer, intent(in)   :: ictxt
     complex(kind(1.d0)), intent(inout)   :: dat(:,:)
 
     character, intent(in) :: scope
@@ -1564,8 +1564,8 @@ contains
     integer, intent(in), optional  :: rrt,crt
 
     interface 
-      subroutine zgsum2d(icontxt,scope,top,m,n,v,ld,rrt,crt)
-        integer, intent(in)   :: icontxt,m,n,ld
+      subroutine zgsum2d(ictxt,scope,top,m,n,v,ld,rrt,crt)
+        integer, intent(in)   :: ictxt,m,n,ld
         complex(kind(1.d0)), intent(inout)   :: v(ld,*)
         character, intent(in) :: scope, top
         integer, intent(in)   :: rrt,crt
@@ -1577,7 +1577,7 @@ contains
     integer   :: nrows,ncols,myrow,mycol
 
 
-    call blacs_gridinfo(icontxt,nrows,ncols,myrow,mycol)
+    call blacs_gridinfo(ictxt,nrows,ncols,myrow,mycol)
     select case(scope)
     case('R','r')
       rrt_ = myrow
@@ -1606,15 +1606,15 @@ contains
       crt_ = crt
     endif
 
-    call zgsum2d(icontxt,scope,top_,size(dat,1),size(dat,2),dat,size(dat,1),rrt_,crt_)
+    call zgsum2d(ictxt,scope,top_,size(dat,1),size(dat,2),dat,size(dat,1),rrt_,crt_)
     
   end subroutine zgsum2dm
 
 
 
 
-  subroutine dgamx2ds(icontxt,scope,dat,top,ria,cia,rrt,crt)
-    integer, intent(in)              :: icontxt
+  subroutine dgamx2ds(ictxt,scope,dat,top,ria,cia,rrt,crt)
+    integer, intent(in)              :: ictxt
     real(kind(1.d0)), intent(inout)  :: dat
     character, intent(in)            :: scope
     character, intent(in), optional  :: top
@@ -1622,8 +1622,8 @@ contains
     integer, intent(inout), optional :: ria,cia
     
     interface 
-      subroutine dgamx2d(icontxt,scope,top,m,n,v,ld,ria,cia,ldia,rrt,crt)
-        integer, intent(in)             :: icontxt,m,n,ld
+      subroutine dgamx2d(ictxt,scope,top,m,n,v,ld,ria,cia,ldia,rrt,crt)
+        integer, intent(in)             :: ictxt,m,n,ld
         real(kind(1.d0)), intent(inout) :: v
         character, intent(in)           :: scope, top
         integer, intent(inout)          :: ria(*),cia(*)
@@ -1636,7 +1636,7 @@ contains
     integer   :: nrows,ncols,myrow,mycol
 
 
-    call blacs_gridinfo(icontxt,nrows,ncols,myrow,mycol)
+    call blacs_gridinfo(ictxt,nrows,ncols,myrow,mycol)
     select case(scope)
     case('R','r')
       rrt_ = myrow
@@ -1666,17 +1666,17 @@ contains
     endif
     
     if (present(ria).or.present(cia)) then 
-      call dgamx2d(icontxt,scope,top_,1,1,dat,1,ria_,cia_,1,rrt_,crt_)
+      call dgamx2d(ictxt,scope,top_,1,1,dat,1,ria_,cia_,1,rrt_,crt_)
       if (present(ria)) ria=ria_(1)
       if (present(cia)) cia=cia_(1)
     else
-      call dgamx2d(icontxt,scope,top_,1,1,dat,1,ria_,cia_,-1,rrt_,crt_)
+      call dgamx2d(ictxt,scope,top_,1,1,dat,1,ria_,cia_,-1,rrt_,crt_)
     endif
   end subroutine dgamx2ds
 
 
-  subroutine dgamx2dv(icontxt,scope,dat,top,ria,cia,rrt,crt)
-    integer, intent(in)              :: icontxt
+  subroutine dgamx2dv(ictxt,scope,dat,top,ria,cia,rrt,crt)
+    integer, intent(in)              :: ictxt
     real(kind(1.d0)), intent(inout)  :: dat(:)
     character, intent(in)            :: scope
     character, intent(in), optional  :: top
@@ -1684,8 +1684,8 @@ contains
     integer, intent(in), optional    :: rrt,crt
 
     interface 
-      subroutine dgamx2d(icontxt,scope,top,m,n,v,ld,ria,cia,ldia,rrt,crt)
-        integer, intent(in)             :: icontxt,m,n,ld
+      subroutine dgamx2d(ictxt,scope,top,m,n,v,ld,ria,cia,ldia,rrt,crt)
+        integer, intent(in)             :: ictxt,m,n,ld
         real(kind(1.d0)), intent(inout) :: v(*)
         character, intent(in)           :: scope, top
         integer, intent(inout)          :: ria(*),cia(*)
@@ -1699,7 +1699,7 @@ contains
     integer   :: nrows,ncols,myrow,mycol
 
 
-    call blacs_gridinfo(icontxt,nrows,ncols,myrow,mycol)
+    call blacs_gridinfo(ictxt,nrows,ncols,myrow,mycol)
     select case(scope)
     case('R','r')
       rrt_ = myrow
@@ -1729,18 +1729,18 @@ contains
     endif
     
     if (present(ria).and.present(cia)) then 
-      call dgamx2d(icontxt,scope,top_,size(dat),1,dat,size(dat),&
+      call dgamx2d(ictxt,scope,top_,size(dat),1,dat,size(dat),&
            &  ria,cia,min(size(ria),size(cia)),rrt_,crt_)
     else
       ldia_ = -1
-      call dgamx2d(icontxt,scope,top_,size(dat),1,dat,size(dat),&
+      call dgamx2d(ictxt,scope,top_,size(dat),1,dat,size(dat),&
            &  ria_,cia_,ldia_,rrt_,crt_)
     end if
     
   end subroutine dgamx2dv
 
-  subroutine dgamx2dm(icontxt,scope,dat,top,ria,cia,rrt,crt)
-    integer, intent(in)              :: icontxt
+  subroutine dgamx2dm(ictxt,scope,dat,top,ria,cia,rrt,crt)
+    integer, intent(in)              :: ictxt
     real(kind(1.d0)), intent(inout)  :: dat(:,:)
     character, intent(in)            :: scope
     integer, intent(inout), optional :: ria(:,:),cia(:,:)
@@ -1748,8 +1748,8 @@ contains
     integer, intent(in), optional    :: rrt,crt
 
     interface 
-      subroutine dgamx2d(icontxt,scope,top,m,n,v,ld,ria,cia,ldia,rrt,crt)
-        integer, intent(in)             :: icontxt,m,n,ld,ldia
+      subroutine dgamx2d(ictxt,scope,top,m,n,v,ld,ria,cia,ldia,rrt,crt)
+        integer, intent(in)             :: ictxt,m,n,ld,ldia
         real(kind(1.d0)), intent(inout) :: v(ld,*)
         integer, intent(inout)          :: ria(ldia,*),cia(ldia,*)
         character, intent(in)           :: scope, top
@@ -1763,7 +1763,7 @@ contains
     integer   :: nrows,ncols,myrow,mycol
 
 
-    call blacs_gridinfo(icontxt,nrows,ncols,myrow,mycol)
+    call blacs_gridinfo(ictxt,nrows,ncols,myrow,mycol)
     select case(scope)
     case('R','r')
       rrt_ = myrow
@@ -1793,11 +1793,11 @@ contains
     endif
 
     if (present(ria).and.present(cia)) then 
-      call dgamx2d(icontxt,scope,top_,size(dat,1),size(dat,2),dat,size(dat,1),&
+      call dgamx2d(ictxt,scope,top_,size(dat,1),size(dat,2),dat,size(dat,1),&
            & ria,cia,min(size(ria,1),size(cia,1)),rrt_,crt_)
     else
       ldia_ = -1
-      call dgamx2d(icontxt,scope,top_,size(dat,1),size(dat,2),dat,size(dat,1),&
+      call dgamx2d(ictxt,scope,top_,size(dat,1),size(dat,2),dat,size(dat,1),&
            & ria_,cia_,ldia_,rrt_,crt_)
     end if
       
@@ -1805,8 +1805,8 @@ contains
 
 
 
-  subroutine igamx2ds(icontxt,scope,dat,top,ria,cia,rrt,crt)
-    integer, intent(in)              :: icontxt
+  subroutine igamx2ds(ictxt,scope,dat,top,ria,cia,rrt,crt)
+    integer, intent(in)              :: ictxt
     integer, intent(inout)  :: dat
     character, intent(in)            :: scope
     character, intent(in), optional  :: top
@@ -1814,8 +1814,8 @@ contains
     integer, intent(inout), optional :: ria,cia
     
     interface 
-      subroutine igamx2d(icontxt,scope,top,m,n,v,ld,ria,cia,ldia,rrt,crt)
-        integer, intent(in)             :: icontxt,m,n,ld
+      subroutine igamx2d(ictxt,scope,top,m,n,v,ld,ria,cia,ldia,rrt,crt)
+        integer, intent(in)             :: ictxt,m,n,ld
         integer, intent(inout) :: v
         character, intent(in)           :: scope, top
         integer, intent(inout)          :: ria(*),cia(*)
@@ -1828,7 +1828,7 @@ contains
     integer   :: nrows,ncols,myrow,mycol
 
 
-    call blacs_gridinfo(icontxt,nrows,ncols,myrow,mycol)
+    call blacs_gridinfo(ictxt,nrows,ncols,myrow,mycol)
     select case(scope)
     case('R','r')
       rrt_ = myrow
@@ -1858,17 +1858,17 @@ contains
     endif
     
     if (present(ria).or.present(cia)) then 
-      call igamx2d(icontxt,scope,top_,1,1,dat,1,ria_,cia_,1,rrt_,crt_)
+      call igamx2d(ictxt,scope,top_,1,1,dat,1,ria_,cia_,1,rrt_,crt_)
       if (present(ria)) ria=ria_(1)
       if (present(cia)) cia=cia_(1)
     else
-      call igamx2d(icontxt,scope,top_,1,1,dat,1,ria_,cia_,-1,rrt_,crt_)
+      call igamx2d(ictxt,scope,top_,1,1,dat,1,ria_,cia_,-1,rrt_,crt_)
     endif
   end subroutine igamx2ds
 
 
-  subroutine igamx2dv(icontxt,scope,dat,top,ria,cia,rrt,crt)
-    integer, intent(in)              :: icontxt
+  subroutine igamx2dv(ictxt,scope,dat,top,ria,cia,rrt,crt)
+    integer, intent(in)              :: ictxt
     integer, intent(inout)  :: dat(:)
     character, intent(in)            :: scope
     character, intent(in), optional  :: top
@@ -1876,8 +1876,8 @@ contains
     integer, intent(in), optional    :: rrt,crt
 
     interface 
-      subroutine igamx2d(icontxt,scope,top,m,n,v,ld,ria,cia,ldia,rrt,crt)
-        integer, intent(in)             :: icontxt,m,n,ld
+      subroutine igamx2d(ictxt,scope,top,m,n,v,ld,ria,cia,ldia,rrt,crt)
+        integer, intent(in)             :: ictxt,m,n,ld
         integer, intent(inout) :: v(*)
         character, intent(in)           :: scope, top
         integer, intent(inout)          :: ria(*),cia(*)
@@ -1891,7 +1891,7 @@ contains
     integer   :: nrows,ncols,myrow,mycol
 
 
-    call blacs_gridinfo(icontxt,nrows,ncols,myrow,mycol)
+    call blacs_gridinfo(ictxt,nrows,ncols,myrow,mycol)
     select case(scope)
     case('R','r')
       rrt_ = myrow
@@ -1921,18 +1921,18 @@ contains
     endif
 
     if (present(ria).and.present(cia)) then 
-      call igamx2d(icontxt,scope,top_,size(dat),1,dat,size(dat),&
+      call igamx2d(ictxt,scope,top_,size(dat),1,dat,size(dat),&
            &  ria,cia,min(size(ria),size(cia)),rrt_,crt_)
     else
       ldia_ = -1
-      call igamx2d(icontxt,scope,top_,size(dat),1,dat,size(dat),&
+      call igamx2d(ictxt,scope,top_,size(dat),1,dat,size(dat),&
            &  ria_,cia_,ldia_,rrt_,crt_)
     end if
     
   end subroutine igamx2dv
 
-  subroutine igamx2dm(icontxt,scope,dat,top,ria,cia,rrt,crt)
-    integer, intent(in)              :: icontxt
+  subroutine igamx2dm(ictxt,scope,dat,top,ria,cia,rrt,crt)
+    integer, intent(in)              :: ictxt
     integer, intent(inout)  :: dat(:,:)
     character, intent(in)            :: scope
     integer, intent(inout), optional :: ria(:,:),cia(:,:)
@@ -1940,8 +1940,8 @@ contains
     integer, intent(in), optional    :: rrt,crt
 
     interface 
-      subroutine igamx2d(icontxt,scope,top,m,n,v,ld,ria,cia,ldia,rrt,crt)
-        integer, intent(in)             :: icontxt,m,n,ld,ldia
+      subroutine igamx2d(ictxt,scope,top,m,n,v,ld,ria,cia,ldia,rrt,crt)
+        integer, intent(in)             :: ictxt,m,n,ld,ldia
         integer, intent(inout) :: v(ld,*)
         integer, intent(inout)          :: ria(ldia,*),cia(ldia,*)
         character, intent(in)           :: scope, top
@@ -1955,7 +1955,7 @@ contains
     integer   :: nrows,ncols,myrow,mycol
 
 
-    call blacs_gridinfo(icontxt,nrows,ncols,myrow,mycol)
+    call blacs_gridinfo(ictxt,nrows,ncols,myrow,mycol)
     select case(scope)
     case('R','r')
       rrt_ = myrow
@@ -1985,11 +1985,11 @@ contains
     endif
 
     if (present(ria).and.present(cia)) then 
-      call igamx2d(icontxt,scope,top_,size(dat,1),size(dat,2),dat,size(dat,1),&
+      call igamx2d(ictxt,scope,top_,size(dat,1),size(dat,2),dat,size(dat,1),&
            & ria,cia,min(size(ria,1),size(cia,1)),rrt_,crt_)
     else
       ldia_ = -1
-      call igamx2d(icontxt,scope,top_,size(dat,1),size(dat,2),dat,size(dat,1),&
+      call igamx2d(ictxt,scope,top_,size(dat,1),size(dat,2),dat,size(dat,1),&
            & ria_,cia_,ldia_,rrt_,crt_)
     end if
       
@@ -1997,8 +1997,8 @@ contains
 
   
 
-  subroutine zgamx2ds(icontxt,scope,dat,top,ria,cia,rrt,crt)
-    integer, intent(in)              :: icontxt
+  subroutine zgamx2ds(ictxt,scope,dat,top,ria,cia,rrt,crt)
+    integer, intent(in)              :: ictxt
     complex(kind(1.d0)), intent(inout)  :: dat
     character, intent(in)            :: scope
     character, intent(in), optional  :: top
@@ -2006,8 +2006,8 @@ contains
     integer, intent(inout), optional :: ria,cia
     
     interface 
-      subroutine zgamx2d(icontxt,scope,top,m,n,v,ld,ria,cia,ldia,rrt,crt)
-        integer, intent(in)             :: icontxt,m,n,ld
+      subroutine zgamx2d(ictxt,scope,top,m,n,v,ld,ria,cia,ldia,rrt,crt)
+        integer, intent(in)             :: ictxt,m,n,ld
         complex(kind(1.d0)), intent(inout) :: v
         character, intent(in)           :: scope, top
         integer, intent(inout)          :: ria(*),cia(*)
@@ -2020,7 +2020,7 @@ contains
     integer   :: nrows,ncols,myrow,mycol
 
 
-    call blacs_gridinfo(icontxt,nrows,ncols,myrow,mycol)
+    call blacs_gridinfo(ictxt,nrows,ncols,myrow,mycol)
     select case(scope)
     case('R','r')
       rrt_ = myrow
@@ -2050,17 +2050,17 @@ contains
     endif
     
     if (present(ria).or.present(cia)) then 
-      call zgamx2d(icontxt,scope,top_,1,1,dat,1,ria_,cia_,1,rrt_,crt_)
+      call zgamx2d(ictxt,scope,top_,1,1,dat,1,ria_,cia_,1,rrt_,crt_)
       if (present(ria)) ria=ria_(1)
       if (present(cia)) cia=cia_(1)
     else
-      call zgamx2d(icontxt,scope,top_,1,1,dat,1,ria_,cia_,-1,rrt_,crt_)
+      call zgamx2d(ictxt,scope,top_,1,1,dat,1,ria_,cia_,-1,rrt_,crt_)
     endif
   end subroutine zgamx2ds
 
 
-  subroutine zgamx2dv(icontxt,scope,dat,top,ria,cia,rrt,crt)
-    integer, intent(in)              :: icontxt
+  subroutine zgamx2dv(ictxt,scope,dat,top,ria,cia,rrt,crt)
+    integer, intent(in)              :: ictxt
     complex(kind(1.d0)), intent(inout)  :: dat(:)
     character, intent(in)            :: scope
     character, intent(in), optional  :: top
@@ -2068,8 +2068,8 @@ contains
     integer, intent(in), optional    :: rrt,crt
 
     interface 
-      subroutine zgamx2d(icontxt,scope,top,m,n,v,ld,ria,cia,ldia,rrt,crt)
-        integer, intent(in)             :: icontxt,m,n,ld
+      subroutine zgamx2d(ictxt,scope,top,m,n,v,ld,ria,cia,ldia,rrt,crt)
+        integer, intent(in)             :: ictxt,m,n,ld
         complex(kind(1.d0)), intent(inout) :: v(*)
         character, intent(in)           :: scope, top
         integer, intent(inout)          :: ria(*),cia(*)
@@ -2083,7 +2083,7 @@ contains
     integer   :: nrows,ncols,myrow,mycol
 
 
-    call blacs_gridinfo(icontxt,nrows,ncols,myrow,mycol)
+    call blacs_gridinfo(ictxt,nrows,ncols,myrow,mycol)
     select case(scope)
     case('R','r')
       rrt_ = myrow
@@ -2113,18 +2113,18 @@ contains
     endif
 
     if (present(ria).and.present(cia)) then 
-      call zgamx2d(icontxt,scope,top_,size(dat),1,dat,size(dat),&
+      call zgamx2d(ictxt,scope,top_,size(dat),1,dat,size(dat),&
            &  ria,cia,min(size(ria),size(cia)),rrt_,crt_)
     else
       ldia_ = -1
-      call zgamx2d(icontxt,scope,top_,size(dat),1,dat,size(dat),&
+      call zgamx2d(ictxt,scope,top_,size(dat),1,dat,size(dat),&
            &  ria_,cia_,ldia_,rrt_,crt_)
     end if
     
   end subroutine zgamx2dv
 
-  subroutine zgamx2dm(icontxt,scope,dat,top,ria,cia,rrt,crt)
-    integer, intent(in)              :: icontxt
+  subroutine zgamx2dm(ictxt,scope,dat,top,ria,cia,rrt,crt)
+    integer, intent(in)              :: ictxt
     complex(kind(1.d0)), intent(inout)  :: dat(:,:)
     character, intent(in)            :: scope
     integer, intent(inout), optional :: ria(:,:),cia(:,:)
@@ -2132,8 +2132,8 @@ contains
     integer, intent(in), optional    :: rrt,crt
 
     interface 
-      subroutine zgamx2d(icontxt,scope,top,m,n,v,ld,ria,cia,ldia,rrt,crt)
-        integer, intent(in)             :: icontxt,m,n,ld,ldia
+      subroutine zgamx2d(ictxt,scope,top,m,n,v,ld,ria,cia,ldia,rrt,crt)
+        integer, intent(in)             :: ictxt,m,n,ld,ldia
         complex(kind(1.d0)), intent(inout) :: v(ld,*)
         integer, intent(inout)          :: ria(ldia,*),cia(ldia,*)
         character, intent(in)           :: scope, top
@@ -2147,7 +2147,7 @@ contains
     integer   :: nrows,ncols,myrow,mycol
 
 
-    call blacs_gridinfo(icontxt,nrows,ncols,myrow,mycol)
+    call blacs_gridinfo(ictxt,nrows,ncols,myrow,mycol)
     select case(scope)
     case('R','r')
       rrt_ = myrow
@@ -2177,19 +2177,19 @@ contains
     endif
 
     if (present(ria).and.present(cia)) then 
-      call zgamx2d(icontxt,scope,top_,size(dat,1),size(dat,2),dat,size(dat,1),&
+      call zgamx2d(ictxt,scope,top_,size(dat,1),size(dat,2),dat,size(dat,1),&
            & ria,cia,min(size(ria,1),size(cia,1)),rrt_,crt_)
     else
       ldia_ = -1
-      call zgamx2d(icontxt,scope,top_,size(dat,1),size(dat,2),dat,size(dat,1),&
+      call zgamx2d(ictxt,scope,top_,size(dat,1),size(dat,2),dat,size(dat,1),&
            & ria_,cia_,ldia_,rrt_,crt_)
     end if
       
   end subroutine zgamx2dm
   
 
-  subroutine dgamn2ds(icontxt,scope,dat,top,ria,cia,rrt,crt)
-    integer, intent(in)              :: icontxt
+  subroutine dgamn2ds(ictxt,scope,dat,top,ria,cia,rrt,crt)
+    integer, intent(in)              :: ictxt
     real(kind(1.d0)), intent(inout)  :: dat
     character, intent(in)            :: scope
     character, intent(in), optional  :: top
@@ -2197,8 +2197,8 @@ contains
     integer, intent(inout), optional :: ria,cia
     
     interface 
-      subroutine dgamn2d(icontxt,scope,top,m,n,v,ld,ria,cia,ldia,rrt,crt)
-        integer, intent(in)             :: icontxt,m,n,ld
+      subroutine dgamn2d(ictxt,scope,top,m,n,v,ld,ria,cia,ldia,rrt,crt)
+        integer, intent(in)             :: ictxt,m,n,ld
         real(kind(1.d0)), intent(inout) :: v
         character, intent(in)           :: scope, top
         integer, intent(inout)          :: ria(*),cia(*)
@@ -2211,7 +2211,7 @@ contains
     integer   :: nrows,ncols,myrow,mycol
 
 
-    call blacs_gridinfo(icontxt,nrows,ncols,myrow,mycol)
+    call blacs_gridinfo(ictxt,nrows,ncols,myrow,mycol)
     select case(scope)
     case('R','r')
       rrt_ = myrow
@@ -2241,17 +2241,17 @@ contains
     endif
     
     if (present(ria).or.present(cia)) then 
-      call dgamn2d(icontxt,scope,top_,1,1,dat,1,ria_,cia_,1,rrt_,crt_)
+      call dgamn2d(ictxt,scope,top_,1,1,dat,1,ria_,cia_,1,rrt_,crt_)
       if (present(ria)) ria=ria_(1)
       if (present(cia)) cia=cia_(1)
     else
-      call dgamn2d(icontxt,scope,top_,1,1,dat,1,ria_,cia_,-1,rrt_,crt_)
+      call dgamn2d(ictxt,scope,top_,1,1,dat,1,ria_,cia_,-1,rrt_,crt_)
     endif
   end subroutine dgamn2ds
 
 
-  subroutine dgamn2dv(icontxt,scope,dat,top,ria,cia,rrt,crt)
-    integer, intent(in)              :: icontxt
+  subroutine dgamn2dv(ictxt,scope,dat,top,ria,cia,rrt,crt)
+    integer, intent(in)              :: ictxt
     real(kind(1.d0)), intent(inout)  :: dat(:)
     character, intent(in)            :: scope
     character, intent(in), optional  :: top
@@ -2259,8 +2259,8 @@ contains
     integer, intent(in), optional    :: rrt,crt
 
     interface 
-      subroutine dgamn2d(icontxt,scope,top,m,n,v,ld,ria,cia,ldia,rrt,crt)
-        integer, intent(in)             :: icontxt,m,n,ld
+      subroutine dgamn2d(ictxt,scope,top,m,n,v,ld,ria,cia,ldia,rrt,crt)
+        integer, intent(in)             :: ictxt,m,n,ld
         real(kind(1.d0)), intent(inout) :: v(*)
         character, intent(in)           :: scope, top
         integer, intent(inout)          :: ria(*),cia(*)
@@ -2274,7 +2274,7 @@ contains
     integer   :: nrows,ncols,myrow,mycol
 
 
-    call blacs_gridinfo(icontxt,nrows,ncols,myrow,mycol)
+    call blacs_gridinfo(ictxt,nrows,ncols,myrow,mycol)
     select case(scope)
     case('R','r')
       rrt_ = myrow
@@ -2304,18 +2304,18 @@ contains
     endif
 
     if (present(ria).and.present(cia)) then 
-      call dgamn2d(icontxt,scope,top_,size(dat),1,dat,size(dat),&
+      call dgamn2d(ictxt,scope,top_,size(dat),1,dat,size(dat),&
            &  ria,cia,min(size(ria),size(cia)),rrt_,crt_)
     else
       ldia_ = -1
-      call dgamn2d(icontxt,scope,top_,size(dat),1,dat,size(dat),&
+      call dgamn2d(ictxt,scope,top_,size(dat),1,dat,size(dat),&
            &  ria_,cia_,ldia_,rrt_,crt_)
     end if
     
   end subroutine dgamn2dv
 
-  subroutine dgamn2dm(icontxt,scope,dat,top,ria,cia,rrt,crt)
-    integer, intent(in)              :: icontxt
+  subroutine dgamn2dm(ictxt,scope,dat,top,ria,cia,rrt,crt)
+    integer, intent(in)              :: ictxt
     real(kind(1.d0)), intent(inout)  :: dat(:,:)
     character, intent(in)            :: scope
     integer, intent(inout), optional :: ria(:,:),cia(:,:)
@@ -2323,8 +2323,8 @@ contains
     integer, intent(in), optional    :: rrt,crt
 
     interface 
-      subroutine dgamn2d(icontxt,scope,top,m,n,v,ld,ria,cia,ldia,rrt,crt)
-        integer, intent(in)             :: icontxt,m,n,ld,ldia
+      subroutine dgamn2d(ictxt,scope,top,m,n,v,ld,ria,cia,ldia,rrt,crt)
+        integer, intent(in)             :: ictxt,m,n,ld,ldia
         real(kind(1.d0)), intent(inout) :: v(ld,*)
         integer, intent(inout)          :: ria(ldia,*),cia(ldia,*)
         character, intent(in)           :: scope, top
@@ -2338,7 +2338,7 @@ contains
     integer   :: nrows,ncols,myrow,mycol
 
 
-    call blacs_gridinfo(icontxt,nrows,ncols,myrow,mycol)
+    call blacs_gridinfo(ictxt,nrows,ncols,myrow,mycol)
     select case(scope)
     case('R','r')
       rrt_ = myrow
@@ -2368,11 +2368,11 @@ contains
     endif
 
     if (present(ria).and.present(cia)) then 
-      call dgamn2d(icontxt,scope,top_,size(dat,1),size(dat,2),dat,size(dat,1),&
+      call dgamn2d(ictxt,scope,top_,size(dat,1),size(dat,2),dat,size(dat,1),&
            & ria,cia,min(size(ria,1),size(cia,1)),rrt_,crt_)
     else
       ldia_ = -1
-      call dgamn2d(icontxt,scope,top_,size(dat,1),size(dat,2),dat,size(dat,1),&
+      call dgamn2d(ictxt,scope,top_,size(dat,1),size(dat,2),dat,size(dat,1),&
            & ria_,cia_,ldia_,rrt_,crt_)
     end if
       
@@ -2380,8 +2380,8 @@ contains
 
 
 
-  subroutine igamn2ds(icontxt,scope,dat,top,ria,cia,rrt,crt)
-    integer, intent(in)              :: icontxt
+  subroutine igamn2ds(ictxt,scope,dat,top,ria,cia,rrt,crt)
+    integer, intent(in)              :: ictxt
     integer, intent(inout)  :: dat
     character, intent(in)            :: scope
     character, intent(in), optional  :: top
@@ -2389,8 +2389,8 @@ contains
     integer, intent(inout), optional :: ria,cia
     
     interface 
-      subroutine igamn2d(icontxt,scope,top,m,n,v,ld,ria,cia,ldia,rrt,crt)
-        integer, intent(in)             :: icontxt,m,n,ld
+      subroutine igamn2d(ictxt,scope,top,m,n,v,ld,ria,cia,ldia,rrt,crt)
+        integer, intent(in)             :: ictxt,m,n,ld
         integer, intent(inout) :: v
         character, intent(in)           :: scope, top
         integer, intent(inout)          :: ria(*),cia(*)
@@ -2403,7 +2403,7 @@ contains
     integer   :: nrows,ncols,myrow,mycol
 
 
-    call blacs_gridinfo(icontxt,nrows,ncols,myrow,mycol)
+    call blacs_gridinfo(ictxt,nrows,ncols,myrow,mycol)
     select case(scope)
     case('R','r')
       rrt_ = myrow
@@ -2433,17 +2433,17 @@ contains
     endif
     
     if (present(ria).or.present(cia)) then 
-      call igamn2d(icontxt,scope,top_,1,1,dat,1,ria_,cia_,1,rrt_,crt_)
+      call igamn2d(ictxt,scope,top_,1,1,dat,1,ria_,cia_,1,rrt_,crt_)
       if (present(ria)) ria=ria_(1)
       if (present(cia)) cia=cia_(1)
     else
-      call igamn2d(icontxt,scope,top_,1,1,dat,1,ria_,cia_,-1,rrt_,crt_)
+      call igamn2d(ictxt,scope,top_,1,1,dat,1,ria_,cia_,-1,rrt_,crt_)
     endif
   end subroutine igamn2ds
 
 
-  subroutine igamn2dv(icontxt,scope,dat,top,ria,cia,rrt,crt)
-    integer, intent(in)              :: icontxt
+  subroutine igamn2dv(ictxt,scope,dat,top,ria,cia,rrt,crt)
+    integer, intent(in)              :: ictxt
     integer, intent(inout)  :: dat(:)
     character, intent(in)            :: scope
     character, intent(in), optional  :: top
@@ -2451,8 +2451,8 @@ contains
     integer, intent(in), optional    :: rrt,crt
 
     interface 
-      subroutine igamn2d(icontxt,scope,top,m,n,v,ld,ria,cia,ldia,rrt,crt)
-        integer, intent(in)             :: icontxt,m,n,ld
+      subroutine igamn2d(ictxt,scope,top,m,n,v,ld,ria,cia,ldia,rrt,crt)
+        integer, intent(in)             :: ictxt,m,n,ld
         integer, intent(inout) :: v(*)
         character, intent(in)           :: scope, top
         integer, intent(inout)          :: ria(*),cia(*)
@@ -2466,7 +2466,7 @@ contains
     integer   :: nrows,ncols,myrow,mycol
 
 
-    call blacs_gridinfo(icontxt,nrows,ncols,myrow,mycol)
+    call blacs_gridinfo(ictxt,nrows,ncols,myrow,mycol)
     select case(scope)
     case('R','r')
       rrt_ = myrow
@@ -2496,18 +2496,18 @@ contains
     endif
 
     if (present(ria).and.present(cia)) then 
-      call igamn2d(icontxt,scope,top_,size(dat),1,dat,size(dat),&
+      call igamn2d(ictxt,scope,top_,size(dat),1,dat,size(dat),&
            &  ria,cia,min(size(ria),size(cia)),rrt_,crt_)
     else
       ldia_ = -1
-      call igamn2d(icontxt,scope,top_,size(dat),1,dat,size(dat),&
+      call igamn2d(ictxt,scope,top_,size(dat),1,dat,size(dat),&
            &  ria_,cia_,ldia_,rrt_,crt_)
     end if
     
   end subroutine igamn2dv
 
-  subroutine igamn2dm(icontxt,scope,dat,top,ria,cia,rrt,crt)
-    integer, intent(in)              :: icontxt
+  subroutine igamn2dm(ictxt,scope,dat,top,ria,cia,rrt,crt)
+    integer, intent(in)              :: ictxt
     integer, intent(inout)  :: dat(:,:)
     character, intent(in)            :: scope
     integer, intent(inout), optional :: ria(:,:),cia(:,:)
@@ -2515,8 +2515,8 @@ contains
     integer, intent(in), optional    :: rrt,crt
 
     interface 
-      subroutine igamn2d(icontxt,scope,top,m,n,v,ld,ria,cia,ldia,rrt,crt)
-        integer, intent(in)             :: icontxt,m,n,ld,ldia
+      subroutine igamn2d(ictxt,scope,top,m,n,v,ld,ria,cia,ldia,rrt,crt)
+        integer, intent(in)             :: ictxt,m,n,ld,ldia
         integer, intent(inout) :: v(ld,*)
         integer, intent(inout)          :: ria(ldia,*),cia(ldia,*)
         character, intent(in)           :: scope, top
@@ -2530,7 +2530,7 @@ contains
     integer   :: nrows,ncols,myrow,mycol
 
 
-    call blacs_gridinfo(icontxt,nrows,ncols,myrow,mycol)
+    call blacs_gridinfo(ictxt,nrows,ncols,myrow,mycol)
     select case(scope)
     case('R','r')
       rrt_ = myrow
@@ -2560,11 +2560,11 @@ contains
     endif
 
     if (present(ria).and.present(cia)) then 
-      call igamn2d(icontxt,scope,top_,size(dat,1),size(dat,2),dat,size(dat,1),&
+      call igamn2d(ictxt,scope,top_,size(dat,1),size(dat,2),dat,size(dat,1),&
            & ria,cia,min(size(ria,1),size(cia,1)),rrt_,crt_)
     else
       ldia_ = -1
-      call igamn2d(icontxt,scope,top_,size(dat,1),size(dat,2),dat,size(dat,1),&
+      call igamn2d(ictxt,scope,top_,size(dat,1),size(dat,2),dat,size(dat,1),&
            & ria_,cia_,ldia_,rrt_,crt_)
     end if
       
@@ -2572,8 +2572,8 @@ contains
 
   
 
-  subroutine zgamn2ds(icontxt,scope,dat,top,ria,cia,rrt,crt)
-    integer, intent(in)              :: icontxt
+  subroutine zgamn2ds(ictxt,scope,dat,top,ria,cia,rrt,crt)
+    integer, intent(in)              :: ictxt
     complex(kind(1.d0)), intent(inout)  :: dat
     character, intent(in)            :: scope
     character, intent(in), optional  :: top
@@ -2581,8 +2581,8 @@ contains
     integer, intent(inout), optional :: ria,cia
     
     interface 
-      subroutine zgamn2d(icontxt,scope,top,m,n,v,ld,ria,cia,ldia,rrt,crt)
-        integer, intent(in)             :: icontxt,m,n,ld
+      subroutine zgamn2d(ictxt,scope,top,m,n,v,ld,ria,cia,ldia,rrt,crt)
+        integer, intent(in)             :: ictxt,m,n,ld
         complex(kind(1.d0)), intent(inout) :: v
         character, intent(in)           :: scope, top
         integer, intent(inout)          :: ria(*),cia(*)
@@ -2595,7 +2595,7 @@ contains
     integer   :: nrows,ncols,myrow,mycol
 
 
-    call blacs_gridinfo(icontxt,nrows,ncols,myrow,mycol)
+    call blacs_gridinfo(ictxt,nrows,ncols,myrow,mycol)
     select case(scope)
     case('R','r')
       rrt_ = myrow
@@ -2625,17 +2625,17 @@ contains
     endif
     
     if (present(ria).or.present(cia)) then 
-      call zgamn2d(icontxt,scope,top_,1,1,dat,1,ria_,cia_,1,rrt_,crt_)
+      call zgamn2d(ictxt,scope,top_,1,1,dat,1,ria_,cia_,1,rrt_,crt_)
       if (present(ria)) ria=ria_(1)
       if (present(cia)) cia=cia_(1)
     else
-      call zgamn2d(icontxt,scope,top_,1,1,dat,1,ria_,cia_,-1,rrt_,crt_)
+      call zgamn2d(ictxt,scope,top_,1,1,dat,1,ria_,cia_,-1,rrt_,crt_)
     endif
   end subroutine zgamn2ds
 
 
-  subroutine zgamn2dv(icontxt,scope,dat,top,ria,cia,rrt,crt)
-    integer, intent(in)              :: icontxt
+  subroutine zgamn2dv(ictxt,scope,dat,top,ria,cia,rrt,crt)
+    integer, intent(in)              :: ictxt
     complex(kind(1.d0)), intent(inout)  :: dat(:)
     character, intent(in)            :: scope
     character, intent(in), optional  :: top
@@ -2643,8 +2643,8 @@ contains
     integer, intent(in), optional    :: rrt,crt
 
     interface 
-      subroutine zgamn2d(icontxt,scope,top,m,n,v,ld,ria,cia,ldia,rrt,crt)
-        integer, intent(in)             :: icontxt,m,n,ld
+      subroutine zgamn2d(ictxt,scope,top,m,n,v,ld,ria,cia,ldia,rrt,crt)
+        integer, intent(in)             :: ictxt,m,n,ld
         complex(kind(1.d0)), intent(inout) :: v(*)
         character, intent(in)           :: scope, top
         integer, intent(inout)          :: ria(*),cia(*)
@@ -2658,7 +2658,7 @@ contains
     integer   :: nrows,ncols,myrow,mycol
 
 
-    call blacs_gridinfo(icontxt,nrows,ncols,myrow,mycol)
+    call blacs_gridinfo(ictxt,nrows,ncols,myrow,mycol)
     select case(scope)
     case('R','r')
       rrt_ = myrow
@@ -2687,18 +2687,18 @@ contains
     endif
 
     if (present(ria).and.present(cia)) then 
-      call zgamn2d(icontxt,scope,top_,size(dat),1,dat,size(dat),&
+      call zgamn2d(ictxt,scope,top_,size(dat),1,dat,size(dat),&
            &  ria,cia,min(size(ria),size(cia)),rrt_,crt_)
     else
       ldia_ = -1
-      call zgamn2d(icontxt,scope,top_,size(dat),1,dat,size(dat),&
+      call zgamn2d(ictxt,scope,top_,size(dat),1,dat,size(dat),&
            &  ria_,cia_,ldia_,rrt_,crt_)
     end if
     
   end subroutine zgamn2dv
 
-  subroutine zgamn2dm(icontxt,scope,dat,top,ria,cia,rrt,crt)
-    integer, intent(in)              :: icontxt
+  subroutine zgamn2dm(ictxt,scope,dat,top,ria,cia,rrt,crt)
+    integer, intent(in)              :: ictxt
     complex(kind(1.d0)), intent(inout)  :: dat(:,:)
     character, intent(in)            :: scope
     integer, intent(inout), optional :: ria(:,:),cia(:,:)
@@ -2706,8 +2706,8 @@ contains
     integer, intent(in), optional    :: rrt,crt
 
     interface 
-      subroutine zgamn2d(icontxt,scope,top,m,n,v,ld,ria,cia,ldia,rrt,crt)
-        integer, intent(in)             :: icontxt,m,n,ld,ldia
+      subroutine zgamn2d(ictxt,scope,top,m,n,v,ld,ria,cia,ldia,rrt,crt)
+        integer, intent(in)             :: ictxt,m,n,ld,ldia
         complex(kind(1.d0)), intent(inout) :: v(ld,*)
         integer, intent(inout)          :: ria(ldia,*),cia(ldia,*)
         character, intent(in)           :: scope, top
@@ -2721,7 +2721,7 @@ contains
     integer   :: nrows,ncols,myrow,mycol
 
 
-    call blacs_gridinfo(icontxt,nrows,ncols,myrow,mycol)
+    call blacs_gridinfo(ictxt,nrows,ncols,myrow,mycol)
     select case(scope)
     case('R','r')
       rrt_ = myrow
@@ -2751,11 +2751,11 @@ contains
     endif
 
     if (present(ria).and.present(cia)) then 
-      call zgamn2d(icontxt,scope,top_,size(dat,1),size(dat,2),dat,size(dat,1),&
+      call zgamn2d(ictxt,scope,top_,size(dat,1),size(dat,2),dat,size(dat,1),&
            & ria,cia,min(size(ria,1),size(cia,1)),rrt_,crt_)
     else
       ldia_ = -1
-      call zgamn2d(icontxt,scope,top_,size(dat,1),size(dat,2),dat,size(dat,1),&
+      call zgamn2d(ictxt,scope,top_,size(dat,1),size(dat,2),dat,size(dat,1),&
            & ria_,cia_,ldia_,rrt_,crt_)
     end if
       

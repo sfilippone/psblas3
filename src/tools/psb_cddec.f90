@@ -28,7 +28,7 @@
 !!$  POSSIBILITY OF SUCH DAMAGE.
 !!$ 
 !!$  
-subroutine psb_cddec(nloc, icontxt, desc_a, info)
+subroutine psb_cddec(nloc, ictxt, desc_a, info)
 
   !  Purpose
   !  =======
@@ -43,7 +43,7 @@ subroutine psb_cddec(nloc, icontxt, desc_a, info)
   !                    Number of local indices 
   !                    required.
   !
-  ! ICONTXT      : (Global Input)Integer BLACS context for an NPx1 grid 
+  ! ictxt      : (Global Input)Integer BLACS context for an NPx1 grid 
   !                required.
   !
   ! OUTPUT
@@ -109,7 +109,7 @@ subroutine psb_cddec(nloc, icontxt, desc_a, info)
   use psb_error_mod
   implicit None
   !....Parameters...
-  Integer, intent(in)               :: nloc,icontxt
+  Integer, intent(in)               :: nloc,ictxt
   integer, intent(out)              :: info
   Type(psb_desc_type), intent(out)  :: desc_a
 
@@ -129,7 +129,7 @@ subroutine psb_cddec(nloc, icontxt, desc_a, info)
   err=0
   name = 'psb_cddec'
 
-  call blacs_gridinfo(icontxt, nprow, npcol, me, mypcol)
+  call blacs_gridinfo(ictxt, nprow, npcol, me, mypcol)
   if (debug) write(*,*) 'psb_cdalll: ',nprow,npcol,me,mypcol
   !     ....verify blacs grid correctness..
   if (npcol /= 1) then
@@ -163,7 +163,7 @@ subroutine psb_cddec(nloc, icontxt, desc_a, info)
   nlv(:)  = 0
   nlv(me) = nloc
   
-  call igsum2d(icontxt,'All',' ',nprow,1,nlv,nprow,-1,-1)
+  call igsum2d(ictxt,'All',' ',nprow,1,nlv,nprow,-1,-1)
   m = sum(nlv)
 
   
@@ -216,8 +216,8 @@ subroutine psb_cddec(nloc, icontxt, desc_a, info)
   desc_a%matrix_data(psb_n_row_)  = nloc
   desc_a%matrix_data(psb_n_col_)  = nloc
   desc_a%matrix_data(psb_dec_type_) = psb_desc_asb_
-  desc_a%matrix_data(psb_ctxt_)     = icontxt
-  call blacs_get(icontxt,10,desc_a%matrix_data(psb_mpi_c_))
+  desc_a%matrix_data(psb_ctxt_)     = ictxt
+  call blacs_get(ictxt,10,desc_a%matrix_data(psb_mpi_c_))
 
   call psb_erractionrestore(err_act)
   return
@@ -225,7 +225,7 @@ subroutine psb_cddec(nloc, icontxt, desc_a, info)
 9999 continue
   call psb_erractionrestore(err_act)
   if (err_act.eq.act_abort) then
-     call psb_error(icontxt)
+     call psb_error(ictxt)
      return
   end if
   return

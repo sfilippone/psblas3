@@ -62,7 +62,7 @@ subroutine  psb_zgatherm(globx, locx, desc_a, info, iroot,&
 
 
   ! locals
-  integer                  :: int_err(5), icontxt, nprow, npcol, myrow, mycol,&
+  integer                  :: int_err(5), ictxt, nprow, npcol, myrow, mycol,&
        & err_act, n, iix, jjx, temp(2), root, iiroot, ilocx, iglobx, jlocx,&
        & jglobx, lda_locx, lda_globx, m, lock, globk, maxk, k, jlx, ilx, i, j, idx
   complex(kind(1.d0)),pointer :: tmpx(:)
@@ -73,10 +73,10 @@ subroutine  psb_zgatherm(globx, locx, desc_a, info, iroot,&
   info=0
   call psb_erractionsave(err_act)
 
-  icontxt=desc_a%matrix_data(psb_ctxt_)
+  ictxt=desc_a%matrix_data(psb_ctxt_)
 
   ! check on blacs grid 
-  call blacs_gridinfo(icontxt, nprow, npcol, myrow, mycol)
+  call blacs_gridinfo(ictxt, nprow, npcol, myrow, mycol)
   if (nprow == -1) then
     info = 2010
     call psb_errpush(info,name)
@@ -148,9 +148,9 @@ subroutine  psb_zgatherm(globx, locx, desc_a, info, iroot,&
   end if
 
   if (myrow == iiroot) then
-     call igebs2d(icontxt, 'all', ' ', 1, 1, k, 1)
+     call igebs2d(ictxt, 'all', ' ', 1, 1, k, 1)
   else
-     call igebr2d(icontxt, 'all', ' ', 1, 1, k, 1, iiroot, 0)
+     call igebr2d(ictxt, 'all', ' ', 1, 1, k, 1, iiroot, 0)
   end if
 
   !  there should be a global check on k here!!!
@@ -187,7 +187,7 @@ subroutine  psb_zgatherm(globx, locx, desc_a, info, iroot,&
      end do
   end do
 
-  call gsum2d(icontxt,'a',globx(:,jglobx),rrt=root)
+  call gsum2d(ictxt,'a',globx(:,jglobx),rrt=root)
 
   call psb_erractionrestore(err_act)
   return  
@@ -196,7 +196,7 @@ subroutine  psb_zgatherm(globx, locx, desc_a, info, iroot,&
   call psb_erractionrestore(err_act)
 
   if (err_act.eq.act_abort) then
-     call psb_error(icontxt)
+     call psb_error(ictxt)
      return
   end if
   return
@@ -267,7 +267,7 @@ subroutine  psb_zgatherv(globx, locx, desc_a, info, iroot,&
 
 
   ! locals
-  integer                  :: int_err(5), icontxt, nprow, npcol, myrow, mycol,&
+  integer                  :: int_err(5), ictxt, nprow, npcol, myrow, mycol,&
        & err_act, n, iix, jjx, temp(2), root, iiroot, ilocx, iglobx, jlocx,&
        & jglobx, lda_locx, lda_globx, lock, maxk, globk, m, k, jlx, ilx, i, j, idx
   complex(kind(1.d0)),pointer :: tmpx(:)
@@ -278,10 +278,10 @@ subroutine  psb_zgatherv(globx, locx, desc_a, info, iroot,&
   info=0
   call psb_erractionsave(err_act)
 
-  icontxt=desc_a%matrix_data(psb_ctxt_)
+  ictxt=desc_a%matrix_data(psb_ctxt_)
 
   ! check on blacs grid 
-  call blacs_gridinfo(icontxt, nprow, npcol, myrow, mycol)
+  call blacs_gridinfo(ictxt, nprow, npcol, myrow, mycol)
   if (nprow == -1) then
     info = 2010
     call psb_errpush(info,name)
@@ -331,9 +331,9 @@ subroutine  psb_zgatherv(globx, locx, desc_a, info, iroot,&
   k = 1
 
   if (myrow == root) then
-     call igebs2d(icontxt, 'all', ' ', 1, 1, k, 1)
+     call igebs2d(ictxt, 'all', ' ', 1, 1, k, 1)
   else
-     call igebr2d(icontxt, 'all', ' ', 1, 1, k, 1, root, 0)
+     call igebr2d(ictxt, 'all', ' ', 1, 1, k, 1, root, 0)
   end if
 
   !  there should be a global check on k here!!!
@@ -368,7 +368,7 @@ subroutine  psb_zgatherv(globx, locx, desc_a, info, iroot,&
      i=i+2
   end do
   
-  call dgsum2d(icontxt,'a',' ',m,k,globx,size(globx),root,mycol)
+  call dgsum2d(ictxt,'a',' ',m,k,globx,size(globx),root,mycol)
 
   call psb_erractionrestore(err_act)
   return  
@@ -377,7 +377,7 @@ subroutine  psb_zgatherv(globx, locx, desc_a, info, iroot,&
   call psb_erractionrestore(err_act)
 
   if (err_act.eq.act_abort) then
-     call psb_error(icontxt)
+     call psb_error(ictxt)
      return
   end if
   return

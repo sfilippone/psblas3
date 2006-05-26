@@ -106,7 +106,7 @@ Subroutine psb_dcgstab(a,prec,b,x,eps,desc_a,info,&
   Logical, Parameter :: debug = .false.
   Logical, Parameter :: exchange=.True., noexchange=.False., debug1 = .False.
   Integer, Parameter :: irmax = 8
-  Integer            :: itx, i, isvch, ich, icontxt, err_act, int_err(5),ii
+  Integer            :: itx, i, isvch, ich, ictxt, err_act, int_err(5),ii
   Integer            :: istop_
   Logical            :: do_renum_left
   Real(Kind(1.d0)) :: alpha, beta, rho, rho_old, rni, xni, bni, ani,& 
@@ -120,8 +120,8 @@ Subroutine psb_dcgstab(a,prec,b,x,eps,desc_a,info,&
   call psb_erractionsave(err_act)
 
   If (debug) Write(*,*) 'Entering PSB_DCGSTAB',present(istop)
-  icontxt = desc_a%matrix_data(psb_ctxt_)
-  CALL blacs_gridinfo(icontxt,nprows,npcols,myrow,mycol)
+  ictxt = desc_a%matrix_data(psb_ctxt_)
+  CALL blacs_gridinfo(ictxt,nprows,npcols,myrow,mycol)
   if (debug) write(*,*) 'PSB_DCGSTAB: From GRIDINFO',nprows,npcols,myrow
 
   mglob = desc_a%matrix_data(psb_m_)
@@ -191,7 +191,7 @@ Subroutine psb_dcgstab(a,prec,b,x,eps,desc_a,info,&
   diagu = 'U'
 
   ! Ensure global coherence for convergence checks.
-  call psb_set_coher(icontxt,isvch)
+  call psb_set_coher(ictxt,isvch)
 
   itx   = 0
 
@@ -278,9 +278,9 @@ Subroutine psb_dcgstab(a,prec,b,x,eps,desc_a,info,&
       If (debug) Write(*,*) 'Iteration: ',itx
       rho_old = rho    
       rho = psb_gedot(q,r,desc_a,info)
-!!$    call blacs_barrier(icontxt,'All') ! to be removed
+!!$    call blacs_barrier(ictxt,'All') ! to be removed
 !!$      write(0,'(i2," rho old ",2(f,2x))')myrow,rho,rho_old
-!!$    call blacs_barrier(icontxt,'All') ! to be removed
+!!$    call blacs_barrier(ictxt,'All') ! to be removed
       If (rho==dzero) Then
          If (debug) Write(0,*) 'Bi-CGSTAB Itxation breakdown R',rho
         Exit iteration
@@ -388,7 +388,7 @@ Subroutine psb_dcgstab(a,prec,b,x,eps,desc_a,info,&
   Deallocate(aux)
   Call psb_gefree(wwrk,desc_a,info)
   ! restore external global coherence behaviour
-  call psb_restore_coher(icontxt,isvch)
+  call psb_restore_coher(ictxt,isvch)
 !!$  imerr = MPE_Log_event( istpe, 0, "ed CGSTAB" )
   if(info/=0) then
      call psb_errpush(info,name)
@@ -401,7 +401,7 @@ Subroutine psb_dcgstab(a,prec,b,x,eps,desc_a,info,&
 9999 continue
   call psb_erractionrestore(err_act)
   if (err_act.eq.act_abort) then
-     call psb_error(icontxt)
+     call psb_error(ictxt)
      return
   end if
   return

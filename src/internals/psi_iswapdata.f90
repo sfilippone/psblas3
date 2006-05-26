@@ -43,7 +43,7 @@ subroutine psi_iswapdatam(flag,n,beta,y,desc_a,work,info,data)
   integer, optional        :: data
 
   ! locals
-  integer  :: icontxt, nprow, npcol, myrow,&
+  integer  :: ictxt, nprow, npcol, myrow,&
        & mycol, point_to_proc, nesd, nerv,&
        & proc_to_comm, p2ptag, icomm, p2pstat(mpi_status_size),&
        & idxs, idxr, iret, errlen, ifcomm, rank,&
@@ -99,8 +99,8 @@ subroutine psi_iswapdatam(flag,n,beta,y,desc_a,work,info,data)
   name='psi_dswap_data'
   call psb_erractionsave(err_act)
 
-  icontxt=desc_a%matrix_data(psb_ctxt_)
-  call blacs_gridinfo(icontxt,nprow,npcol,myrow,mycol) 
+  ictxt=desc_a%matrix_data(psb_ctxt_)
+  call blacs_gridinfo(ictxt,nprow,npcol,myrow,mycol) 
   if (nprow == -1) then
      info = 2010
      call psb_errpush(info,name)
@@ -112,7 +112,7 @@ subroutine psi_iswapdatam(flag,n,beta,y,desc_a,work,info,data)
      goto 9999
   endif
 
-  call blacs_get(icontxt,10,icomm)
+  call blacs_get(ictxt,10,icomm)
 
   allocate(sdsz(0:nprow-1), rvsz(0:nprow-1), bsdidx(0:nprow-1),&
        & brvidx(0:nprow-1), rvhd(0:nprow-1), prcid(0:nprow-1),&
@@ -152,7 +152,7 @@ subroutine psi_iswapdatam(flag,n,beta,y,desc_a,work,info,data)
      nerv = d_idx(point_to_proc+psb_n_elem_recv_)
      nesd = d_idx(point_to_proc+nerv+psb_n_elem_send_)
 
-     prcid(proc_to_comm) = blacs_pnum(icontxt,proc_to_comm,mycol)
+     prcid(proc_to_comm) = blacs_pnum(ictxt,proc_to_comm,mycol)
      ptp(proc_to_comm)   = point_to_proc
 
      brvidx(proc_to_comm) = idxr
@@ -240,20 +240,20 @@ subroutine psi_iswapdatam(flag,n,beta,y,desc_a,work,info,data)
            snd_pt = bsdidx(proc_to_comm)
            call psi_gth(nesd,n,d_idx(idx_pt:idx_pt+nesd-1),&
                 & y,sndbuf(snd_pt:snd_pt+nesd*n-1))
-           call igesd2d(icontxt,nesd,n,sndbuf(snd_pt),nesd,proc_to_comm,0)
+           call igesd2d(ictxt,nesd,n,sndbuf(snd_pt),nesd,proc_to_comm,0)
            ! Then I receive
            rcv_pt = brvidx(proc_to_comm)
-           call igerv2d(icontxt,nerv,n,rcvbuf(rcv_pt),nerv,proc_to_comm,0)
+           call igerv2d(ictxt,nerv,n,rcvbuf(rcv_pt),nerv,proc_to_comm,0)
         else if (proc_to_comm .gt. myrow) then
            ! First I receive
            rcv_pt = brvidx(proc_to_comm)
-           call igerv2d(icontxt,nerv,n,rcvbuf(rcv_pt),nerv,proc_to_comm,0)
+           call igerv2d(ictxt,nerv,n,rcvbuf(rcv_pt),nerv,proc_to_comm,0)
            ! Then I send
            idx_pt = point_to_proc+nerv+psb_elem_send_
            snd_pt = bsdidx(proc_to_comm)
            call psi_gth(nesd,n,d_idx(idx_pt:idx_pt+nesd-1),&
                 & y,sndbuf(snd_pt:snd_pt+nesd*n-1))
-           call igesd2d(icontxt,nesd,n,sndbuf(snd_pt),nesd,proc_to_comm,0)
+           call igesd2d(ictxt,nesd,n,sndbuf(snd_pt),nesd,proc_to_comm,0)
         else if (proc_to_comm .eq. myrow) then
            ! I send to myself
            idx_pt = point_to_proc+nerv+psb_elem_send_
@@ -297,7 +297,7 @@ subroutine psi_iswapdatam(flag,n,beta,y,desc_a,work,info,data)
         nesd = d_idx(point_to_proc+nerv+psb_n_elem_send_)
 
         if(proc_to_comm.ne.myrow) then
-           p2ptag = krecvid(icontxt,proc_to_comm,myrow)
+           p2ptag = krecvid(ictxt,proc_to_comm,myrow)
            rcv_pt = brvidx(proc_to_comm)
            call mpi_irecv(rcvbuf(rcv_pt),rvsz(proc_to_comm),&
                 & mpi_integer,prcid(proc_to_comm),&
@@ -328,7 +328,7 @@ subroutine psi_iswapdatam(flag,n,beta,y,desc_a,work,info,data)
              & y,sndbuf(snd_pt:snd_pt+nesd*n-1))
 
         if(proc_to_comm .ne. myrow) then
-           p2ptag=ksendid(icontxt,proc_to_comm,myrow)
+           p2ptag=ksendid(ictxt,proc_to_comm,myrow)
            call mpi_send(sndbuf(snd_pt),sdsz(proc_to_comm),&
                 & mpi_integer,prcid(proc_to_comm),&
                 & p2ptag,icomm,iret)
@@ -435,7 +435,7 @@ subroutine psi_iswapdatam(flag,n,beta,y,desc_a,work,info,data)
         snd_pt = bsdidx(proc_to_comm)
         call psi_gth(nesd,n,d_idx(idx_pt:idx_pt+nesd-1),&
              & y,sndbuf(snd_pt:snd_pt+nesd*n-1))
-        call igesd2d(icontxt,nesd,n,sndbuf(snd_pt),nesd,proc_to_comm,0)
+        call igesd2d(ictxt,nesd,n,sndbuf(snd_pt),nesd,proc_to_comm,0)
 
         point_to_proc = point_to_proc+nerv+nesd+3
         proc_to_comm  = d_idx(point_to_proc+psb_proc_id_)
@@ -451,7 +451,7 @@ subroutine psi_iswapdatam(flag,n,beta,y,desc_a,work,info,data)
 
         if(proc_to_comm.ne.myrow) then
            rcv_pt = brvidx(proc_to_comm)
-           call igerv2d(icontxt,nerv,n,rcvbuf(rcv_pt),nerv,proc_to_comm,0)
+           call igerv2d(ictxt,nerv,n,rcvbuf(rcv_pt),nerv,proc_to_comm,0)
            idx_pt = point_to_proc+psb_elem_recv_
            rcv_pt = brvidx(proc_to_comm)
            call psi_sct(nerv,n,d_idx(idx_pt:idx_pt+nerv-1),&
@@ -484,7 +484,7 @@ subroutine psi_iswapdatam(flag,n,beta,y,desc_a,work,info,data)
 9999 continue
   call psb_erractionrestore(err_act)
   if (err_act.eq.act_abort) then
-     call psb_error(icontxt)
+     call psb_error(ictxt)
      return
   end if
   return
@@ -536,7 +536,7 @@ subroutine psi_iswapdatav(flag,beta,y,desc_a,work,info,data)
   integer, optional        :: data
 
   ! locals
-  integer  :: icontxt, nprow, npcol, myrow,&
+  integer  :: ictxt, nprow, npcol, myrow,&
        & mycol, point_to_proc, nesd, nerv,&
        & proc_to_comm, p2ptag, icomm, p2pstat(mpi_status_size),&
        & idxs, idxr, iret, errlen, ifcomm, rank,&
@@ -593,8 +593,8 @@ subroutine psi_iswapdatav(flag,beta,y,desc_a,work,info,data)
   name='psi_dswap_datav'
   call psb_erractionsave(err_act)
 
-  icontxt=desc_a%matrix_data(psb_ctxt_)
-  call blacs_gridinfo(icontxt,nprow,npcol,myrow,mycol) 
+  ictxt=desc_a%matrix_data(psb_ctxt_)
+  call blacs_gridinfo(ictxt,nprow,npcol,myrow,mycol) 
   if (nprow == -1) then
      info = 2010
      call psb_errpush(info,name)
@@ -606,7 +606,7 @@ subroutine psi_iswapdatav(flag,beta,y,desc_a,work,info,data)
      goto 9999
   endif
 
-  call blacs_get(icontxt,10,icomm)
+  call blacs_get(ictxt,10,icomm)
 
 
   allocate(sdsz(0:nprow-1), rvsz(0:nprow-1), bsdidx(0:nprow-1),&
@@ -648,7 +648,7 @@ subroutine psi_iswapdatav(flag,beta,y,desc_a,work,info,data)
      nerv = d_idx(point_to_proc+psb_n_elem_recv_)
      nesd = d_idx(point_to_proc+nerv+psb_n_elem_send_)
 
-     prcid(proc_to_comm) = blacs_pnum(icontxt,proc_to_comm,mycol)
+     prcid(proc_to_comm) = blacs_pnum(ictxt,proc_to_comm,mycol)
      ptp(proc_to_comm)   = point_to_proc
 
      brvidx(proc_to_comm) = idxr
@@ -735,20 +735,20 @@ subroutine psi_iswapdatav(flag,beta,y,desc_a,work,info,data)
            snd_pt = bsdidx(proc_to_comm)
            call psi_gth(nesd,d_idx(idx_pt:idx_pt+nesd-1),&
                 & y,sndbuf(snd_pt:snd_pt+nesd-1))
-           call igesd2d(icontxt,nesd,1,sndbuf(snd_pt),nesd,proc_to_comm,0)
+           call igesd2d(ictxt,nesd,1,sndbuf(snd_pt),nesd,proc_to_comm,0)
            ! Then I receive
            rcv_pt = brvidx(proc_to_comm)
-           call igerv2d(icontxt,nerv,1,rcvbuf(rcv_pt),nerv,proc_to_comm,0)
+           call igerv2d(ictxt,nerv,1,rcvbuf(rcv_pt),nerv,proc_to_comm,0)
         else if (proc_to_comm .gt. myrow) then
            ! First I receive
            rcv_pt = brvidx(proc_to_comm)
-           call igerv2d(icontxt,nerv,1,rcvbuf(rcv_pt),nerv,proc_to_comm,0)
+           call igerv2d(ictxt,nerv,1,rcvbuf(rcv_pt),nerv,proc_to_comm,0)
            ! Then I send
            idx_pt = point_to_proc+nerv+psb_elem_send_
            snd_pt = bsdidx(proc_to_comm)
            call psi_gth(nesd,d_idx(idx_pt:idx_pt+nesd-1),&
                 & y,sndbuf(snd_pt:snd_pt+nesd-1))
-           call igesd2d(icontxt,nesd,1,sndbuf(snd_pt),nesd,proc_to_comm,0)
+           call igesd2d(ictxt,nesd,1,sndbuf(snd_pt),nesd,proc_to_comm,0)
         else if (proc_to_comm .eq. myrow) then
            ! I send to myself
            idx_pt = point_to_proc+nerv+psb_elem_send_
@@ -792,7 +792,7 @@ subroutine psi_iswapdatav(flag,beta,y,desc_a,work,info,data)
         nesd = d_idx(point_to_proc+nerv+psb_n_elem_send_)
 
         if(proc_to_comm.ne.myrow) then
-           p2ptag = krecvid(icontxt,proc_to_comm,myrow)
+           p2ptag = krecvid(ictxt,proc_to_comm,myrow)
            rcv_pt = brvidx(proc_to_comm)
            call mpi_irecv(rcvbuf(rcv_pt),rvsz(proc_to_comm),&
                 & mpi_integer,prcid(proc_to_comm),&
@@ -822,7 +822,7 @@ subroutine psi_iswapdatav(flag,beta,y,desc_a,work,info,data)
              & y,sndbuf(snd_pt:snd_pt+nesd-1))
 
         if(proc_to_comm .ne. myrow) then
-           p2ptag=ksendid(icontxt,proc_to_comm,myrow)
+           p2ptag=ksendid(ictxt,proc_to_comm,myrow)
            call mpi_send(sndbuf(snd_pt),sdsz(proc_to_comm),&
                 & mpi_integer,prcid(proc_to_comm),&
                 & p2ptag,icomm,iret)
@@ -930,7 +930,7 @@ subroutine psi_iswapdatav(flag,beta,y,desc_a,work,info,data)
         snd_pt = bsdidx(proc_to_comm)
         call psi_gth(nesd,d_idx(idx_pt:idx_pt+nesd-1),&
              & y,sndbuf(snd_pt:snd_pt+nesd-1))
-        call igesd2d(icontxt,nesd,1,sndbuf(snd_pt),nesd,proc_to_comm,0)
+        call igesd2d(ictxt,nesd,1,sndbuf(snd_pt),nesd,proc_to_comm,0)
 
         point_to_proc = point_to_proc+nerv+nesd+3
         proc_to_comm  = d_idx(point_to_proc+psb_proc_id_)
@@ -946,7 +946,7 @@ subroutine psi_iswapdatav(flag,beta,y,desc_a,work,info,data)
 
         if(proc_to_comm.ne.myrow) then
            rcv_pt = brvidx(proc_to_comm)
-           call igerv2d(icontxt,nerv,1,rcvbuf(rcv_pt),nerv,proc_to_comm,0)
+           call igerv2d(ictxt,nerv,1,rcvbuf(rcv_pt),nerv,proc_to_comm,0)
            idx_pt = point_to_proc+psb_elem_recv_
            rcv_pt = brvidx(proc_to_comm)
            call psi_sct(nerv,d_idx(idx_pt:idx_pt+nerv-1),&
@@ -979,7 +979,7 @@ subroutine psi_iswapdatav(flag,beta,y,desc_a,work,info,data)
 9999 continue
   call psb_erractionrestore(err_act)
   if (err_act.eq.act_abort) then
-     call psb_error(icontxt)
+     call psb_error(ictxt)
      return
   end if
   return

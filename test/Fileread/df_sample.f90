@@ -76,8 +76,7 @@ program df_sample
   type(psb_desc_type):: desc_a
 
   ! blacs variables
-  integer               :: nprow, npcol, ictxt, iam, np, myprow, mypcol
-  character, parameter  :: order='r'
+  integer               :: ictxt, iam, np
   logical               :: amroot
 
   ! solver paramters
@@ -90,7 +89,7 @@ program df_sample
   integer   :: iparm(20)
 
   ! other variables
-  integer            :: i,info,j,m_problem, nproc
+  integer            :: i,info,j,m_problem
   integer            :: internal, m,ii,nnzero
   real(kind(1.d0)) :: mpi_wtime, t1, t2, tprec, r_amax, b_amax,&
        &scale,resmx,resmxp
@@ -100,15 +99,16 @@ program df_sample
   external mpi_wtime
   
 
-  ! initialize blacs
-  call blacs_pinfo(iam, np)
-  call blacs_get(izero, izero, ictxt)
+  call psb_init(ictxt)
+  call psb_info(ictxt,iam,np)
 
-  ! rectangular grid,  np x 1
+  if (iam < 0) then 
+    ! This should not happen, but just in case
+    call psb_exit(ictxt)
+    stop
+  endif
+  amroot = (iam==0)
 
-  call blacs_gridinit(ictxt, order, np, ione)
-  call blacs_gridinfo(ictxt, nprow, npcol, myprow, mypcol)
-  amroot = (myprow==0).and.(mypcol==0)
 
   name='df_sample'
   if(psb_get_errstatus().ne.0) goto 9999
@@ -121,11 +121,10 @@ program df_sample
   call get_parms(ictxt,mtrx_file,rhs_file,cmethd,&
        & ipart,afmt,istopc,itmax,itrace,novr,iprec,eps)
 
-  call blacs_barrier(ictxt,'a')
+  call psb_barrier(ictxt)
   t1 = mpi_wtime()  
   ! read the input matrix to be processed and (possibly) the rhs 
   nrhs = 1
-  nproc = nprow 
 
   if (amroot) then
     nullify(aux_b)
@@ -171,7 +170,7 @@ program df_sample
 
   ! switch over different partition types
   if (ipart.eq.0) then 
-     call blacs_barrier(ictxt,'a')
+     call psb_barrier(ictxt)
      if (amroot) write(*,'("Partition type: block")')
      allocate(ivg(m_problem),ipv(np))
      do i=1,m_problem
@@ -181,7 +180,7 @@ program df_sample
      call matdist(aux_a, a, ivg, ictxt, &
           & desc_a,b_col_glob,b_col,info,fmt=afmt)
   else  if (ipart.eq.1) then 
-    call blacs_barrier(ictxt,'a')
+    call psb_barrier(ictxt)
     if (amroot) write(*,'("Partition type: blk2")')
     allocate(ivg(m_problem),ipv(np))
     do i=1,m_problem
@@ -197,7 +196,7 @@ program df_sample
 !      write(0,'("Build type: graph")')
       call build_grppart(aux_a%m,aux_a%fida,aux_a%ia1,aux_a%ia2,np)
     endif
-    call blacs_barrier(ictxt,'a')
+    call psb_barrier(ictxt)
     call distr_grppart(0,0,ictxt)
     call getv_grppart(ivg)
     call matdist(aux_a, a, ivg, ictxt, &
@@ -300,7 +299,7 @@ program df_sample
   if (amroot) then 
     call psb_prec_descr(6,pre)
     write(*,'("Matrix: ",a)')mtrx_file
-    write(*,'("Computed solution on ",i4," processors")')nprow
+    write(*,'("Computed solution on ",i4," processors")')np
     write(*,'("Iterations to convergence: ",i6)')iter
     write(*,'("Error indicator on exit: ",f7.2)')err
     write(*,'("Time to buil prec.   : ",es10.4)')tprec
@@ -321,7 +320,7 @@ program df_sample
       write(0,'(" ")')
       write(0,'("Saving x on file")')
       write(20,*) 'matrix: ',mtrx_file
-      write(20,*) 'computed solution on ',nprow,' processors.'
+      write(20,*) 'computed solution on ',np,' processors.'
       write(20,*) 'iterations to convergence: ',iter
       write(20,*) 'error indicator (infinity norm) on exit:', &
            & ' ||r||/(||a||||x||+||b||) = ',err
@@ -344,13 +343,8 @@ program df_sample
 9999 continue
   if(info /= 0) then
      call psb_error(ictxt)
-     call blacs_gridexit(ictxt)
-     call blacs_exit(0)
-  else
-     call blacs_gridexit(ictxt)
-     call blacs_exit(0)
   end if
-
+  call psb_exit(ictxt)
   stop
   
 end program df_sample

@@ -55,7 +55,7 @@ subroutine psb_dspalloc(a, desc_a, info, nnz)
   integer, optional, intent(in)      :: nnz
 
   !locals
-  integer             :: icontxt, dectype
+  integer             :: ictxt, dectype
   integer             :: nprow,npcol,myrow,mycol,loc_row,&
        &  length_ia1,length_ia2,err,nprocs, err_act,m,n
   integer             :: int_err(5),temp(1)
@@ -68,9 +68,9 @@ subroutine psb_dspalloc(a, desc_a, info, nnz)
   call psb_erractionsave(err_act)
   name = 'psb_dspalloc'
 
-  icontxt = desc_a%matrix_data(psb_ctxt_)
+  ictxt = desc_a%matrix_data(psb_ctxt_)
   dectype = desc_a%matrix_data(psb_dec_type_)
-  call blacs_gridinfo(icontxt, nprow, npcol, myrow, mycol)
+  call blacs_gridinfo(ictxt, nprow, npcol, myrow, mycol)
 !     ....verify blacs grid correctness..
   if (nprow.eq.-1) then
      info = 2010
@@ -145,7 +145,7 @@ subroutine psb_dspalloc(a, desc_a, info, nnz)
   if (err_act.eq.act_ret) then
      return
   else
-     call psb_error(icontxt)
+     call psb_error(ictxt)
   end if
   return
 

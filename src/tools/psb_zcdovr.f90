@@ -92,7 +92,7 @@ Subroutine psb_zcdovr(a,desc_a,novr,desc_ov,info)
 
   !     .. Local Scalars ..
   Integer ::  i, j, k, nprow,npcol, me, mycol,m,nnzero,&
-       &  icontxt, lovr, lelem,lworks,lworkr, n_col, int_err(5),&
+       &  ictxt, lovr, lelem,lworks,lworkr, n_col, int_err(5),&
        &  n_row,index_dim,elem_dim, l_tmp_ovr_idx,l_tmp_halo, nztot,nhalo
   Logical,Parameter :: debug=.false.
   character(len=20)                 :: name, ch_err
@@ -101,9 +101,9 @@ Subroutine psb_zcdovr(a,desc_a,novr,desc_ov,info)
   info  = 0
   call psb_erractionsave(err_act)
 
-  icontxt=desc_a%matrix_data(psb_ctxt_)
+  ictxt=desc_a%matrix_data(psb_ctxt_)
 
-  Call blacs_gridinfo(icontxt,nprow,npcol,me,mycol)
+  Call blacs_gridinfo(ictxt,nprow,npcol,me,mycol)
 
   If(debug) Write(0,*)'in psb_cdovr',novr
 
@@ -136,7 +136,7 @@ Subroutine psb_zcdovr(a,desc_a,novr,desc_ov,info)
     return
   endif
 
-  call blacs_get(icontxt,10,icomm )
+  call blacs_get(ictxt,10,icomm )
 !!$    call MPI_Comm_rank(icomm,irank,ierr)
 !!$    idscb  = mpe_log_get_event_number()
 !!$    idsce  = mpe_log_get_event_number()
@@ -148,7 +148,7 @@ Subroutine psb_zcdovr(a,desc_a,novr,desc_ov,info)
 !!$    endif
   If(debug)then 
     Write(0,*)'BEGIN cdovr',me,nhalo
-    call blacs_barrier(icontxt,'All')
+    call blacs_barrier(ictxt,'All')
   endif
   t1 = mpi_wtime()
 
@@ -206,7 +206,7 @@ Subroutine psb_zcdovr(a,desc_a,novr,desc_ov,info)
   desc_ov%glob_to_loc(:) = desc_a%glob_to_loc(:)
   If(debug)then 
     Write(0,*)'Start cdovrbld',me,lworks,lworkr
-    call blacs_barrier(icontxt,'All')
+    call blacs_barrier(ictxt,'All')
   endif
   
   !
@@ -223,7 +223,7 @@ Subroutine psb_zcdovr(a,desc_a,novr,desc_ov,info)
   desc_ov%matrix_data(psb_dec_type_) = psb_desc_asb_
   If(debug)then 
     Write(0,*)'Done cdovrbld',me,lworks,lworkr
-    call blacs_barrier(icontxt,'All')
+    call blacs_barrier(ictxt,'All')
   endif
 !!$      ierr = MPE_Log_event( idsce, 0, "st CDASB" )
 
@@ -233,7 +233,7 @@ Subroutine psb_zcdovr(a,desc_a,novr,desc_ov,info)
 9999 continue
   call psb_erractionrestore(err_act)
   if (err_act.eq.act_abort) then
-     call psb_error(icontxt)
+     call psb_error(ictxt)
      return
   end if
   Return

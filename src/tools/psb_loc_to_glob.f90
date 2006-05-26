@@ -55,7 +55,7 @@ subroutine psb_loc_to_glob2(x,y,desc_a,info,iact)
   character, intent(in), optional    ::  iact
 
   !....locals....
-  integer                            ::  err, n, i, tmp, icontxt
+  integer                            ::  err, n, i, tmp, ictxt
   character                          ::  strings,act
   integer                            ::  int_err(5), err_act
   real(kind(1.d0))                   ::  real_val
@@ -178,7 +178,7 @@ subroutine psb_loc_to_glob(x,desc_a,info,iact)
   character, intent(in), optional    ::  iact
 
   !....locals....
-  integer                            ::  err, n ,i, tmp,icontxt, err_act
+  integer                            ::  err, n ,i, tmp,ictxt, err_act
   character                          ::  act
   integer                            ::  int_err(5)
   real(kind(1.d0))                   ::  real_val

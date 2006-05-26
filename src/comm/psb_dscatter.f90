@@ -65,7 +65,7 @@ subroutine  psb_dscatterm(globx, locx, desc_a, info, iroot,&
 
 
   ! locals
-  integer                  :: int_err(5), icontxt, nprow, npcol, myrow, mycol,&
+  integer                  :: int_err(5), ictxt, nprow, npcol, myrow, mycol,&
        & err_act, m, n, iix, jjx, temp(2), i, j, idx, nrow, iiroot, iglobx, jglobx,&
        & ilocx, jlocx, lda_locx, lda_globx, lock, globk, icomm, k, maxk, root, ilx,&
        & jlx, myrank, rootrank, c, pos
@@ -79,10 +79,10 @@ subroutine  psb_dscatterm(globx, locx, desc_a, info, iroot,&
   info=0
   call psb_erractionsave(err_act)
 
-  icontxt=desc_a%matrix_data(psb_ctxt_)
+  ictxt=desc_a%matrix_data(psb_ctxt_)
 
   ! check on blacs grid 
-  call blacs_gridinfo(icontxt, nprow, npcol, myrow, mycol)
+  call blacs_gridinfo(ictxt, nprow, npcol, myrow, mycol)
   if (nprow == -1) then
     info = 2010
     call psb_errpush(info,name)
@@ -153,8 +153,8 @@ subroutine  psb_dscatterm(globx, locx, desc_a, info, iroot,&
      k = maxk
   end if
 
-  call blacs_get(icontxt,10,icomm)
-  myrank = blacs_pnum(icontxt,myrow,mycol)
+  call blacs_get(ictxt,10,icomm)
+  myrank = blacs_pnum(ictxt,myrow,mycol)
 
   lda_globx = size(globx)
   lda_locx  = size(locx)
@@ -163,9 +163,9 @@ subroutine  psb_dscatterm(globx, locx, desc_a, info, iroot,&
   n = desc_a%matrix_data(psb_n_)
   
   if (myrow == iiroot) then
-     call igebs2d(icontxt, 'all', ' ', 1, 1, k, 1)
+     call igebs2d(ictxt, 'all', ' ', 1, 1, k, 1)
   else
-     call igebr2d(icontxt, 'all', ' ', 1, 1, k, 1, iiroot, 0)
+     call igebr2d(ictxt, 'all', ' ', 1, 1, k, 1, iiroot, 0)
   end if
 
   !  there should be a global check on k here!!!
@@ -196,7 +196,7 @@ subroutine  psb_dscatterm(globx, locx, desc_a, info, iroot,&
         end do
      end do
   else
-     rootrank = blacs_pnum(icontxt,root,mycol)
+     rootrank = blacs_pnum(ictxt,root,mycol)
   end if
 
   ! root has to gather size information
@@ -258,7 +258,7 @@ subroutine  psb_dscatterm(globx, locx, desc_a, info, iroot,&
   call psb_erractionrestore(err_act)
 
   if (err_act.eq.act_abort) then
-     call psb_error(icontxt)
+     call psb_error(ictxt)
      return
   end if
   return
@@ -326,7 +326,7 @@ subroutine  psb_dscatterv(globx, locx, desc_a, info, iroot)
 
 
   ! locals
-  integer                  :: int_err(5), icontxt, nprow, npcol, myrow, mycol,&
+  integer                  :: int_err(5), ictxt, nprow, npcol, myrow, mycol,&
        & err_act, m, n, iix, jjx, temp(2), i, j, idx, nrow, iiroot, iglobx, jglobx,&
        & ilocx, jlocx, lda_locx, lda_globx, lock, globk, root, k, maxk, icomm, myrank,&
        & rootrank, c, pos, ilx, jlx
@@ -340,10 +340,10 @@ subroutine  psb_dscatterv(globx, locx, desc_a, info, iroot)
   info=0
   call psb_erractionsave(err_act)
 
-  icontxt=desc_a%matrix_data(psb_ctxt_)
+  ictxt=desc_a%matrix_data(psb_ctxt_)
 
   ! check on blacs grid 
-  call blacs_gridinfo(icontxt, nprow, npcol, myrow, mycol)
+  call blacs_gridinfo(ictxt, nprow, npcol, myrow, mycol)
   if (nprow == -1) then
     info = 2010
     call psb_errpush(info,name)
@@ -367,8 +367,8 @@ subroutine  psb_dscatterv(globx, locx, desc_a, info, iroot)
      root = -1
   end if
   
-  call blacs_get(icontxt,10,icomm)
-  myrank = blacs_pnum(icontxt,myrow,mycol)
+  call blacs_get(ictxt,10,icomm)
+  myrank = blacs_pnum(ictxt,myrow,mycol)
 
   lda_globx = size(globx)
   lda_locx  = size(locx)
@@ -379,9 +379,9 @@ subroutine  psb_dscatterv(globx, locx, desc_a, info, iroot)
   k = 1
 
   if (myrow == iiroot) then
-     call igebs2d(icontxt, 'all', ' ', 1, 1, k, 1)
+     call igebs2d(ictxt, 'all', ' ', 1, 1, k, 1)
   else
-     call igebr2d(icontxt, 'all', ' ', 1, 1, k, 1, iiroot, 0)
+     call igebr2d(ictxt, 'all', ' ', 1, 1, k, 1, iiroot, 0)
   end if
 
   !  there should be a global check on k here!!!
@@ -410,7 +410,7 @@ subroutine  psb_dscatterv(globx, locx, desc_a, info, iroot)
         locx(i)=globx(idx)
      end do
   else
-     rootrank = blacs_pnum(icontxt,root,mycol)
+     rootrank = blacs_pnum(ictxt,root,mycol)
   end if
 
   ! root has to gather size information
@@ -454,7 +454,7 @@ subroutine  psb_dscatterv(globx, locx, desc_a, info, iroot)
   call psb_erractionrestore(err_act)
 
   if (err_act.eq.act_abort) then
-     call psb_error(icontxt)
+     call psb_error(ictxt)
      return
   end if
   return

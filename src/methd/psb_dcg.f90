@@ -103,7 +103,7 @@ Subroutine psb_dcg(a,prec,b,x,eps,desc_a,info,&
   real(kind(1.d0))    ::alpha, beta, rho, rho_old, rni, xni, bni, ani,bn2,& 
        & sigma
   integer         :: litmax, liter, istop_, naux, m, mglob, it, itx, itrace_,&
-       & nprows,npcols,me,mecol, n_col, isvch, ich, icontxt, n_row,err_act, int_err(5)
+       & nprows,npcols,me,mecol, n_col, isvch, ich, ictxt, n_row,err_act, int_err(5)
   character          ::diagl, diagu
   logical, parameter :: exchange=.true., noexchange=.false.  
   character(len=20)             :: name,ch_err
@@ -113,8 +113,8 @@ Subroutine psb_dcg(a,prec,b,x,eps,desc_a,info,&
   call psb_erractionsave(err_act)
 
 
-  icontxt = desc_a%matrix_data(psb_ctxt_)
-  call blacs_gridinfo(icontxt,nprows,npcols,me,mecol)
+  ictxt = desc_a%matrix_data(psb_ctxt_)
+  call blacs_gridinfo(ictxt,nprows,npcols,me,mecol)
 
   mglob = desc_a%matrix_data(psb_m_)
   n_row = desc_a%matrix_data(psb_n_row_)
@@ -178,7 +178,7 @@ Subroutine psb_dcg(a,prec,b,x,eps,desc_a,info,&
   itx=0
 
   ! Ensure global coherence for convergence checks.
-  call psb_set_coher(icontxt,isvch)
+  call psb_set_coher(ictxt,isvch)
 
   restart: do 
 !!$   
@@ -274,7 +274,7 @@ Subroutine psb_dcg(a,prec,b,x,eps,desc_a,info,&
   call psb_gefree(wwrk,desc_a,info)
 
   ! restore external global coherence behaviour
-  call psb_restore_coher(icontxt,isvch)
+  call psb_restore_coher(ictxt,isvch)
 
   if (info.ne.0) then 
     call psb_errpush(info,name)

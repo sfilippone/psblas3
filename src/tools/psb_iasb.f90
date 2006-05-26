@@ -51,7 +51,7 @@ subroutine psb_iasb(x, desc_a, info)
   integer, intent(out)            ::  info
 
   ! local variables
-  integer :: icontxt,nprow,npcol,me,mypcol,temp,lwork,nrow,ncol,err_act
+  integer :: ictxt,nprow,npcol,me,mypcol,temp,lwork,nrow,ncol,err_act
   integer :: int_err(5), i1sz, i2sz, dectype, i
   real(kind(1.d0)) :: real_err(5)
   logical, parameter :: debug=.false.
@@ -68,10 +68,10 @@ subroutine psb_iasb(x, desc_a, info)
     return
   endif
 
-  icontxt=desc_a%matrix_data(psb_ctxt_)
+  ictxt=desc_a%matrix_data(psb_ctxt_)
   dectype=desc_a%matrix_data(psb_dec_type_)
 
-  call blacs_gridinfo(icontxt, nprow, npcol, me, mypcol)
+  call blacs_gridinfo(ictxt, nprow, npcol, me, mypcol)
   if (nprow.eq.-1) then
     info = 2010
     call psb_errpush(info,name)
@@ -84,7 +84,7 @@ subroutine psb_iasb(x, desc_a, info)
   endif
 
   ! check size
-  icontxt=desc_a%matrix_data(psb_ctxt_)
+  ictxt=desc_a%matrix_data(psb_ctxt_)
   nrow=desc_a%matrix_data(psb_n_row_)
   ncol=desc_a%matrix_data(psb_n_col_)
   i1sz = size(x,dim=1)
@@ -109,7 +109,7 @@ subroutine psb_iasb(x, desc_a, info)
 9999 continue
   call psb_erractionrestore(err_act)
   if (err_act.eq.act_abort) then
-     call psb_error(icontxt)
+     call psb_error(ictxt)
      return
   end if
   return
@@ -169,7 +169,7 @@ subroutine psb_iasbv(x, desc_a, info)
   integer, intent(out)            ::  info
 
   ! local variables
-  integer :: icontxt,nprow,npcol,me,mypcol,temp,lwork, err_act
+  integer :: ictxt,nprow,npcol,me,mypcol,temp,lwork, err_act
   integer :: int_err(5), i1sz,nrow,ncol, dectype, i
   real(kind(1.d0)) :: real_err(5)
   logical, parameter :: debug=.false.
@@ -181,10 +181,10 @@ subroutine psb_iasbv(x, desc_a, info)
   name = 'psb_iasbv'
   
   
-  icontxt=desc_a%matrix_data(psb_ctxt_)
+  ictxt=desc_a%matrix_data(psb_ctxt_)
   dectype=desc_a%matrix_data(psb_dec_type_)
 
-  call blacs_gridinfo(icontxt, nprow, npcol, me, mypcol)
+  call blacs_gridinfo(ictxt, nprow, npcol, me, mypcol)
   if (nprow.eq.-1) then
      info = 2010
      call psb_errpush(info,name)
@@ -220,7 +220,7 @@ subroutine psb_iasbv(x, desc_a, info)
 9999 continue
   call psb_erractionrestore(err_act)
   if (err_act.eq.act_abort) then
-     call psb_error(icontxt)
+     call psb_error(ictxt)
      return
   end if
   return

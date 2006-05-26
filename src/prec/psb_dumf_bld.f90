@@ -51,7 +51,7 @@ subroutine psb_dumf_bld(a,desc_a,p,info)
   type(psb_dspmat_type)    :: blck, atmp
   character(len=5)         :: fmt
   character                :: upd='F'
-  integer                  :: i,j,nza,nzb,nzt,icontxt, me,mycol,nprow,npcol,err_act
+  integer                  :: i,j,nza,nzb,nzt,ictxt, me,mycol,nprow,npcol,err_act
   integer                  :: i_err(5)
   logical, parameter :: debug=.false.
   character(len=20)   :: name, ch_err
@@ -76,8 +76,8 @@ subroutine psb_dumf_bld(a,desc_a,p,info)
   name='psb_umf_bld'
   call psb_erractionsave(err_act)
 
-  icontxt = desc_A%matrix_data(psb_ctxt_)
-  call blacs_gridinfo(icontxt, nprow, npcol, me, mycol)
+  ictxt = desc_A%matrix_data(psb_ctxt_)
+  call blacs_gridinfo(ictxt, nprow, npcol, me, mycol)
 
 
   fmt = 'COO'
@@ -87,7 +87,7 @@ subroutine psb_dumf_bld(a,desc_a,p,info)
   atmp%fida='COO'
   if (Debug) then 
     write(0,*) me, 'UMFBLD: Calling  csdp'
-    call blacs_barrier(icontxt,'All')
+    call blacs_barrier(ictxt,'All')
   endif
 
   call psb_dcsdp(a,atmp,info)
@@ -101,7 +101,7 @@ subroutine psb_dumf_bld(a,desc_a,p,info)
   if (Debug) then 
     call psb_spinfo(psb_nztotreq_,a,nzb,info)
     write(0,*) me, 'UMFBLD: Done csdp',info,nza,atmp%m,atmp%k,nzb
-    call blacs_barrier(icontxt,'All')
+    call blacs_barrier(ictxt,'All')
   endif
   call psb_asmatbld(p%iprcparm(p_type_),p%iprcparm(n_ovr_),a,&
        & blck,desc_a,upd,p%desc_data,info,outfmt=fmt)  
@@ -115,7 +115,7 @@ subroutine psb_dumf_bld(a,desc_a,p,info)
   call psb_spinfo(psb_nztotreq_,blck,nzb,info)
   if (Debug) then 
     write(0,*) me, 'UMFBLD: Done asmatbld',info,nzb,blck%fida
-    call blacs_barrier(icontxt,'All')
+    call blacs_barrier(ictxt,'All')
   endif
   if (nzb > 0 ) then 
     if (size(atmp%aspk)<nza+nzb) then 
@@ -129,7 +129,7 @@ subroutine psb_dumf_bld(a,desc_a,p,info)
     endif
     if (Debug) then 
       write(0,*) me, 'UMFBLD: Done realloc',info,nza+nzb,atmp%fida
-      call blacs_barrier(icontxt,'All')
+      call blacs_barrier(ictxt,'All')
     endif
 
     do j=1,nzb
@@ -178,7 +178,7 @@ subroutine psb_dumf_bld(a,desc_a,p,info)
     open(80+me)
     call psb_csprt(80+me,atmp)
     close(80+me)
-    call blacs_barrier(icontxt,'All')
+    call blacs_barrier(ictxt,'All')
   endif
 
   call psb_dumf_factor(atmp%m,nzt,&
@@ -194,7 +194,7 @@ subroutine psb_dumf_bld(a,desc_a,p,info)
 
   if (Debug) then 
     write(0,*) me, 'UMFBLD: Done umf_Factor',info,p%iprcparm(umf_numptr_)
-    call blacs_barrier(icontxt,'All')
+    call blacs_barrier(ictxt,'All')
   endif
   call psb_sp_free(blck,info)
   call psb_sp_free(atmp,info)

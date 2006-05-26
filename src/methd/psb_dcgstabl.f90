@@ -114,7 +114,7 @@ Subroutine psb_dcgstabl(a,prec,b,x,eps,desc_a,info,&
   Character     ::diagl, diagu
   Logical, Parameter :: exchange=.True., noexchange=.False.  
   Integer, Parameter :: irmax = 8
-  Integer            :: itx, i, isvch, ich, icontxt,istop_,j, int_err(5)
+  Integer            :: itx, i, isvch, ich, ictxt,istop_,j, int_err(5)
   Logical            :: do_renum_left
   Logical, Parameter :: debug = .False.
   Real(Kind(1.d0)) :: alpha, beta, rho, rho_old, rni, xni, bni, ani,bn2,& 
@@ -126,8 +126,8 @@ Subroutine psb_dcgstabl(a,prec,b,x,eps,desc_a,info,&
   call psb_erractionsave(err_act)
 
   If (debug) Write(0,*) 'entering psb_dbicgstabl'
-  icontxt = desc_a%matrix_data(psb_ctxt_)
-  Call blacs_gridinfo(icontxt,nprows,npcols,me,mecol)
+  ictxt = desc_a%matrix_data(psb_ctxt_)
+  Call blacs_gridinfo(ictxt,nprows,npcols,me,mecol)
 
   If (debug) Write(0,*) 'psb_dbicgstabl: from gridinfo',nprows,npcols,me
 
@@ -207,7 +207,7 @@ Subroutine psb_dcgstabl(a,prec,b,x,eps,desc_a,info,&
   rt0 => wwrk(:,10)
   
   ! Ensure global coherence for convergence checks.
-  call psb_set_coher(icontxt,isvch)
+  call psb_set_coher(ictxt,isvch)
 
   if (istop_ == 1) then 
     ani = psb_spnrmi(a,desc_a,info)
@@ -394,7 +394,7 @@ Subroutine psb_dcgstabl(a,prec,b,x,eps,desc_a,info,&
   Call psb_gefree(rh,desc_a,info)
 
   ! restore external global coherence behaviour
-  call psb_restore_coher(icontxt,isvch)
+  call psb_restore_coher(ictxt,isvch)
 
   if(info/=0) then
      call psb_errpush(info,name)

@@ -30,13 +30,14 @@ sparse matrix, however the definition of the descriptor is the
 following.  
 \begin{description}
 \item[{\bf matrix\_data}] includes general information about matrix and
-BLACS grid. More precisely:
+process grid. More precisely:
 \begin{description}
 \item[matrix\_data[psb\_dec\_type\_\hbox{]}] Identifies the decomposition type
 (global); the actual values are internally defined, so they should
 never be accessed directly.
-\item[matrix\_data[psb\_ctxt\_\hbox{]}] Communication context as returned by the
-BLACS (global).
+\item[matrix\_data[psb\_ctxt\_\hbox{]}] Communication context
+  associated with the processes comprised in the virtual parallel
+  machine (global).
 \item[matrix\_data[psb\_m\_\hbox{]}] Total number of equations (global).
 \item[matrix\_data[psb\_n\_\hbox{]}] Total number of variables (global).
 \item[matrix\_data[psb\_n\_row\_\hbox{]}] Number of grid variables owned by the

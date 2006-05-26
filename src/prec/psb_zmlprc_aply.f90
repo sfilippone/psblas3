@@ -63,7 +63,7 @@ subroutine psb_zmlprc_aply(baseprecv,x,beta,y,desc_data,trans,work,info)
   complex(kind(1.d0)), allocatable :: tx(:),ty(:),t2l(:),w2l(:),&
        &   x2l(:),b2l(:),tz(:),tty(:)
   character     ::diagl, diagu
-  integer :: icontxt,nprow,npcol,me,mycol,i, isz, nrg,nr2l,err_act, iptype, int_err(5)
+  integer :: ictxt,nprow,npcol,me,mycol,i, isz, nrg,nr2l,err_act, iptype, int_err(5)
   real(kind(1.d0)) :: omega
   real(kind(1.d0)) :: t1, t2, t3, t4, t5, t6, t7, mpi_wtime
   logical, parameter          :: debug=.false., debugprt=.false.
@@ -90,8 +90,8 @@ subroutine psb_zmlprc_aply(baseprecv,x,beta,y,desc_data,trans,work,info)
   call psb_erractionsave(err_act)
 
 
-  icontxt=desc_data%matrix_data(psb_ctxt_)
-  call blacs_gridinfo(icontxt,nprow,npcol,me,mycol)
+  ictxt=desc_data%matrix_data(psb_ctxt_)
+  call blacs_gridinfo(ictxt,nprow,npcol,me,mycol)
 
   omega=baseprecv(2)%dprcparm(smooth_omega_)
   ismth=baseprecv(2)%iprcparm(smth_kind_)
@@ -161,7 +161,7 @@ subroutine psb_zmlprc_aply(baseprecv,x,beta,y,desc_data,trans,work,info)
     end if
 
     if (baseprecv(2)%iprcparm(coarse_mat_)==mat_repl_) Then 
-      call gsum2d(icontxt,'All',t2l(1:nrg))
+      call gsum2d(ictxt,'All',t2l(1:nrg))
     else if (baseprecv(2)%iprcparm(coarse_mat_) /= mat_distr_) Then 
         write(0,*) 'Unknown value for baseprecv(2)%iprcparm(coarse_mat_) ',&
              & baseprecv(2)%iprcparm(coarse_mat_)
@@ -264,7 +264,7 @@ subroutine psb_zmlprc_aply(baseprecv,x,beta,y,desc_data,trans,work,info)
       end if
 
       if (baseprecv(2)%iprcparm(coarse_mat_)==mat_repl_) Then 
-        call gsum2d(icontxt,'All',t2l(1:nrg))
+        call gsum2d(ictxt,'All',t2l(1:nrg))
       else if (baseprecv(2)%iprcparm(coarse_mat_) /= mat_distr_) Then 
         write(0,*) 'Unknown value for baseprecv(2)%iprcparm(coarse_mat_) ',&
              & baseprecv(2)%iprcparm(coarse_mat_)
@@ -367,7 +367,7 @@ subroutine psb_zmlprc_aply(baseprecv,x,beta,y,desc_data,trans,work,info)
       end if
 
       if (baseprecv(2)%iprcparm(coarse_mat_)==mat_repl_) Then 
-        call gsum2d(icontxt,'All',t2l(1:nrg))
+        call gsum2d(ictxt,'All',t2l(1:nrg))
       else if (baseprecv(2)%iprcparm(coarse_mat_) /= mat_distr_) Then 
         write(0,*) 'Unknown value for baseprecv(2)%iprcparm(coarse_mat_) ',&
              & baseprecv(2)%iprcparm(coarse_mat_)
@@ -458,7 +458,7 @@ subroutine psb_zmlprc_aply(baseprecv,x,beta,y,desc_data,trans,work,info)
 
 
       if (baseprecv(2)%iprcparm(coarse_mat_)==mat_repl_) Then 
-        call gsum2d(icontxt,'All',t2l(1:nrg))
+        call gsum2d(ictxt,'All',t2l(1:nrg))
       else if (baseprecv(2)%iprcparm(coarse_mat_) /= mat_distr_) Then 
         write(0,*) 'Unknown value for baseprecv(2)%iprcparm(coarse_mat_) ',&
              & baseprecv(2)%iprcparm(coarse_mat_)

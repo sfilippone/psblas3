@@ -62,7 +62,7 @@ subroutine psb_zspins(nz,ia,ja,val,a,desc_a,info,rebuild)
   logical, intent(in), optional        :: rebuild
   !locals.....
 
-  integer :: i,icontxt,nprocs ,glob_row,row,k,start_row,end_row,&
+  integer :: i,ictxt,nprocs ,glob_row,row,k,start_row,end_row,&
        & first_loc_row,nrow,j, err,locix,locjx,err_act,&
        & dectype,mglob, nnza,m,n, pnt_halo,ncol, nh, ip, spstate
   integer,pointer        :: tia1(:),tia2(:), temp(:)
@@ -88,11 +88,11 @@ subroutine psb_zspins(nz,ia,ja,val,a,desc_a,info,rebuild)
   call psb_erractionsave(err_act)
 
 
-  icontxt = desc_a%matrix_data(psb_ctxt_)
+  ictxt = desc_a%matrix_data(psb_ctxt_)
   dectype = desc_a%matrix_data(psb_dec_type_)
   mglob   = desc_a%matrix_data(psb_m_)
   ! check on blacs grid 
-  call blacs_gridinfo(icontxt, nprow, npcol, myrow, mycol)
+  call blacs_gridinfo(ictxt, nprow, npcol, myrow, mycol)
   if (npcol.ne.1) then
      info = 2030
      call psb_errpush(info,name)
@@ -180,7 +180,7 @@ subroutine psb_zspins(nz,ia,ja,val,a,desc_a,info,rebuild)
 9999 continue
   call psb_erractionrestore(err_act)
   if (err_act.eq.act_abort) then
-     call psb_error(icontxt)
+     call psb_error(ictxt)
      return
   end if
   return

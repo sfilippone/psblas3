@@ -116,7 +116,7 @@ Subroutine psb_dgmresr(a,prec,b,x,eps,desc_a,info,&
   Character     ::diagl, diagu
   Logical, Parameter :: exchange=.True., noexchange=.False.  
   Integer, Parameter :: irmax = 8
-  Integer            :: itx, i, isvch, ich, icontxt,istop_, err_act
+  Integer            :: itx, i, isvch, ich, ictxt,istop_, err_act
   Logical            :: do_renum_left,inner_stop
   Logical, Parameter :: debug = .false.
   Real(Kind(1.d0)) :: alpha, beta, rho, rho_old, rni, xni, bni, ani,bn2,& 
@@ -129,8 +129,8 @@ Subroutine psb_dgmresr(a,prec,b,x,eps,desc_a,info,&
   call psb_erractionsave(err_act)
 
   If (debug) Write(0,*) 'entering psb_dgmres'
-  icontxt = desc_a%matrix_data(psb_ctxt_)
-  Call blacs_gridinfo(icontxt,nprows,npcols,me,mecol)
+  ictxt = desc_a%matrix_data(psb_ctxt_)
+  Call blacs_gridinfo(ictxt,nprows,npcols,me,mecol)
 
   If (debug) Write(0,*) 'psb_dgmres: from gridinfo',nprows,npcols,me
 
@@ -195,7 +195,7 @@ Subroutine psb_dgmresr(a,prec,b,x,eps,desc_a,info,&
        &size(w),size(w,1), size(v(:,1))
 
   ! Ensure global coherence for convergence checks.
-  call psb_set_coher(icontxt,isvch)
+  call psb_set_coher(ictxt,isvch)
 
   if (istop_ == 1) then 
     ani = psb_spnrmi(a,desc_a,info)
@@ -338,7 +338,7 @@ Subroutine psb_dgmresr(a,prec,b,x,eps,desc_a,info,&
   Call psb_gefree(w,desc_a,info)
 
   ! restore external global coherence behaviour
-  call psb_restore_coher(icontxt,isvch)
+  call psb_restore_coher(ictxt,isvch)
 
   if (info /= 0) then
      info=4011

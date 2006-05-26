@@ -79,7 +79,7 @@ Subroutine psb_zasmatbld(ptype,novr,a,blk,desc_data,upd,desc_p,info,outfmt)
   !     .. Local Scalars ..
   Integer ::  k, tot_elem,proc,&
        &  point,nprow,npcol, me, mycol, start,m,nnzero,&
-       &  icontxt, lovr, n_col, linp,ier,n,int_err(5),&
+       &  ictxt, lovr, n_col, linp,ier,n,int_err(5),&
        &  tot_recv, ircode, n_row, nztot,nhalo, nrow_a,err_act
   Logical,Parameter :: debug=.false., debugprt=.false.
   character(len=20) :: name, ch_err
@@ -89,7 +89,7 @@ Subroutine psb_zasmatbld(ptype,novr,a,blk,desc_data,upd,desc_p,info,outfmt)
   call psb_erractionsave(err_act)
 
   If(debug) Write(0,*)'IN DASMATBLD  ', upd
-  icontxt=desc_data%matrix_data(psb_ctxt_)
+  ictxt=desc_data%matrix_data(psb_ctxt_)
   tot_recv=0
 
   nrow_a = desc_data%matrix_data(psb_n_row_)
@@ -133,7 +133,7 @@ Subroutine psb_zasmatbld(ptype,novr,a,blk,desc_data,upd,desc_p,info,outfmt)
     !
     !
 
-    icontxt=desc_data%matrix_data(psb_ctxt_)
+    ictxt=desc_data%matrix_data(psb_ctxt_)
 
     if (novr < 0) then
       info=3
@@ -171,9 +171,9 @@ Subroutine psb_zasmatbld(ptype,novr,a,blk,desc_data,upd,desc_p,info,outfmt)
       return
     endif
 
-    call blacs_get(icontxt,10,icomm )
+    call blacs_get(ictxt,10,icomm )
 
-    Call blacs_gridinfo(icontxt,nprow,npcol,me,mycol)
+    Call blacs_gridinfo(ictxt,nprow,npcol,me,mycol)
     If(debug)Write(0,*)'BEGIN dasmatbld',me,upd,novr
     t1 = mpi_wtime()
 

@@ -104,13 +104,13 @@ contains
 
 
   ! checks wether an error has occurred on one of the porecesses in the execution pool
-  subroutine psb_errcomm(icontxt, err)
-    integer, intent(in)   :: icontxt
+  subroutine psb_errcomm(ictxt, err)
+    integer, intent(in)   :: ictxt
     integer, intent(inout):: err
     integer :: temp(2)
     integer, parameter :: ione=1
 
-    call igamx2d(icontxt, 'A', ' ', ione, ione, err, ione,&
+    call igamx2d(ictxt, 'A', ' ', ione, ione, err, ione,&
          &temp ,temp,-ione ,-ione,-ione)
   end subroutine psb_errcomm
 
@@ -192,16 +192,16 @@ contains
 
 
   ! handles the occurence of an error in a parallel routine
-  subroutine psb_perror(icontxt)
+  subroutine psb_perror(ictxt)
 
-    integer, intent(in)     ::  icontxt
+    integer, intent(in)     ::  ictxt
     integer                 ::  err_c
     character(len=20)       ::  r_name, a_e_d
     integer                 ::  i_e_d(5)
     integer                 ::  nprow, npcol, me, mypcol, temp(2)
     integer, parameter      ::  ione=1, izero=0
 
-    call blacs_gridinfo(icontxt, nprow, npcol, me, mypcol)
+    call blacs_gridinfo(ictxt, nprow, npcol, me, mypcol)
 
     if(error_status.gt.0) then
        if(verbosity_level.gt.1) then
@@ -212,7 +212,7 @@ contains
              call psb_errmsg(err_c, r_name, i_e_d, a_e_d,me)
              !            write(0,'(50("="))')
           end do
-          call blacs_abort(icontxt,-1)
+          call blacs_abort(ictxt,-1)
        else
 
           call psb_errpop(err_c, r_name, i_e_d, a_e_d)
@@ -220,12 +220,12 @@ contains
           do while (error_stack%n_elems.gt.0)
              call psb_errpop(err_c, r_name, i_e_d, a_e_d)
           end do
-          call blacs_abort(icontxt,-1)
+          call blacs_abort(ictxt,-1)
        end if
     end if
 
     if(error_status.gt.izero) then
-       call blacs_abort(icontxt,err_c)
+       call blacs_abort(ictxt,err_c)
     end if
 
 
@@ -384,6 +384,8 @@ contains
        write (0,'("computational error. code: ",i0)')err_c
     case(2010)
        write (0,'("BLACS error. Number of processes=-1")')
+    case(2011)
+       write (0,'("Initialization error: not enough processes available in the parallel environment")')
     case(2025)
        write (0,'("Cannot allocate ",i0," bytes")')i_e_d(1)
     case(2030)

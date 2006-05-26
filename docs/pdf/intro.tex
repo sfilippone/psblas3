@@ -75,10 +75,10 @@ Message Passing Interface code is encapsulated within the BLACS
 layer. However, in some cases, MPI routines are directly used either
 to improve efficiency or to implement communication patterns for which
 the BLACS package doesn't provide any method. 
-We assume that the user program has initialized a BLACS process grid
-with one column and as many rows as there are processes; the PSBLAS
-initialization routines will take the communication context for this
-grid and store internally for further use. 
+%% We assume that the user program has initialized a BLACS process grid
+%% with one column and as many rows as there are processes; the PSBLAS
+%% initialization routines will take the communication context for this
+%% grid and store internally for further use. 
 
 \begin{figure}[h] \begin{center}
 \includegraphics[scale=0.45]{figures/psblas}
@@ -101,6 +101,7 @@ systems solution for block diagonal matrices;
   communications;
 \item[Data management and auxiliary routines] including:
 \begin{itemize}
+\item Parallel environment management
 \item Communication descriptors allocation;
 \item Dense and sparse matrix allocation;
 \item Dense and sparse matrix build and update;
@@ -188,7 +189,7 @@ A simple application structure will walk through the index space
 allocation, matrix/vector creation and linear system solution as
 follows:
 \begin{enumerate}
-\item Initialize parallel environment with \verb|blacs_gridinit|
+\item Initialize parallel environment with \verb|psb_init|
 \item Initialize index space with \verb|psb_cdall|
 \item Allocate sparse matrix and dense vectors with \verb|psb_spall|
   and \verb|psb_geall|
@@ -210,7 +211,7 @@ This is the structure of the sample program
 For a simulation in which the same discretization mesh is used over
 multiple time steps, the following structure may be more appropriate:
 \begin{enumerate}
-\item Initialize parallel environment with \verb|blacs_gridinit|
+\item Initialize parallel environment with \verb|psb_init|
 \item Initialize index space with \verb|psb_cdall|
 \item Loop over the topology of the discretization mesh and build the
   descriptor with \verb|psb_cdins|

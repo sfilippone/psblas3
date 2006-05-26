@@ -87,7 +87,6 @@ program pde90
   integer      :: idim, iret
 
   ! miscellaneous 
-  character, parameter :: order='r'
   integer              :: iargc,convert_descr,dim, check_descr
   real(kind(1.d0)), parameter :: one = 1.d0
   real(kind(1.d0)) :: mpi_wtime, t1, t2, tprec, tsolve, t3, t4 
@@ -102,7 +101,7 @@ program pde90
   real(kind(1.d0)), pointer :: b(:), x(:), d(:),ld(:)
   integer, pointer :: work(:)
   ! blacs parameters
-  integer            :: nprow, npcol, icontxt, iam, np, myprow, mypcol
+  integer            :: ictxt, iam, np
   
   ! solver parameters
   integer            :: iter, itmax,ierr,itrace, methd,iprec, istopc,&
@@ -121,27 +120,28 @@ program pde90
   call psb_set_errverbosity(2)
   call psb_set_erraction(0)
 
-  ! initialize blacs  
-  call blacs_pinfo(iam, np)
-  call blacs_get(izero, izero, icontxt)
 
-  ! rectangular grid,  p x 1
+  call psb_init(ictxt)
+  call psb_info(ictxt,iam,np)
 
-  call blacs_gridinit(icontxt, order, np, ione)
-  call blacs_gridinfo(icontxt, nprow, npcol, myprow, mypcol)
+  if (iam < 0) then 
+    ! This should not happen, but just in case
+    call psb_exit(ictxt)
+    stop
+  endif
 
   !
   !  get parameters
   !
-  call get_parms(icontxt,cmethd,iprec,novr,afmt,idim,istopc,itmax,itrace,ml)
+  call get_parms(ictxt,cmethd,iprec,novr,afmt,idim,istopc,itmax,itrace,ml)
   
   !
   !  allocate and fill in the coefficient matrix, rhs and initial guess 
   !
 
-  call blacs_barrier(icontxt,'ALL')
+  call psb_barrier(ictxt)
   t1 = mpi_wtime()
-  call create_matrix(idim,a,b,x,desc_a,part_block,icontxt,afmt,info)  
+  call create_matrix(idim,a,b,x,desc_a,part_block,ictxt,afmt,info)  
   t2 = mpi_wtime() - t1
   if(info.ne.0) then
      info=4010
@@ -150,7 +150,7 @@ program pde90
      goto 9999
   end if
 
-  call gamx2d(icontxt,'a',t2)
+  call gamx2d(ictxt,'a',t2)
   if (iam.eq.0) write(*,'("Overall matrix creation time : ",es10.4)')t2
   if (iam.eq.0) write(*,'(" ")')
   !
@@ -175,7 +175,7 @@ program pde90
      call psb_precset(pre,'asm',iv=(/novr,nohalo_,none_/))
   end select
   
-  call blacs_barrier(icontxt,'ALL')
+  call psb_barrier(ictxt)
   t1 = mpi_wtime()
   call psb_precbld(a,desc_a,pre,info)
   if(info.ne.0) then
@@ -187,7 +187,7 @@ program pde90
 
   tprec = mpi_wtime()-t1
   
-  call gamx2d(icontxt,'a',tprec)
+  call gamx2d(ictxt,'a',tprec)
   
   if (iam.eq.0) write(*,'("Preconditioner time : ",es10.4)')tprec
   if (iam.eq.0) write(*,'(" ")')
@@ -196,7 +196,7 @@ program pde90
   ! iterative method parameters 
   !
   if(iam.eq.psb_root_) write(*,'("Calling iterative method ",a)')cmethd
-  call blacs_barrier(icontxt,'ALL')
+  call psb_barrier(ictxt)
   t1 = mpi_wtime()  
   eps   = 1.d-9
   if (cmethd.eq.'BICGSTAB') then 
@@ -222,9 +222,9 @@ program pde90
      goto 9999
   end if
   
-  call blacs_barrier(icontxt,'ALL')
+  call psb_barrier(ictxt)
   t2 = mpi_wtime() - t1
-  call gamx2d(icontxt,'a',t2)
+  call gamx2d(ictxt,'a',t2)
 
   if (iam.eq.0) then
      write(*,'(" ")')
@@ -252,32 +252,27 @@ program pde90
   
 9999 continue
   if(info /= 0) then
-     call psb_error(icontxt)
-     call blacs_gridexit(icontxt)
-     call blacs_exit(0)
-  else
-     call blacs_gridexit(icontxt)
-     call blacs_exit(0)
+     call psb_error(ictxt)
   end if
-
+  call psb_exit(ictxt)
   stop
 
 contains
   !
   ! get iteration parameters from the command line
   !
-  subroutine  get_parms(icontxt,cmethd,iprec,novr,afmt,idim,istopc,itmax,itrace,ml)
-    integer      :: icontxt
+  subroutine  get_parms(ictxt,cmethd,iprec,novr,afmt,idim,istopc,itmax,itrace,ml)
+    integer      :: ictxt
     character    :: cmethd*10, afmt*5
     integer      :: idim, iret, istopc,itmax,itrace,ml, iprec, novr
     character*40 :: charbuf
-    integer      :: iargc, nprow, npcol, myprow, mypcol
+    integer      :: iargc, np, iam
     external     iargc
     integer      :: intbuf(10), ip
     
-    call blacs_gridinfo(icontxt, nprow, npcol, myprow, mypcol)
+    call psb_info(ictxt, iam, np)
 
-    if (myprow==0) then
+    if (iam==0) then
        read(*,*) ip
        if (ip.ge.3) then
           read(*,*) cmethd
@@ -290,19 +285,19 @@ contains
              intbuf(i) = iachar(cmethd(i:i))
           end do
         ! broadcast parameters to all processors
-          call igebs2d(icontxt,'ALL',' ',10,1,intbuf,10)
+          call igebs2d(ictxt,'ALL',' ',10,1,intbuf,10)
         
         ! broadcast parameters to all processors
-          call igebs2d(icontxt,'ALL',' ',1,1,iprec,10)
+          call igebs2d(ictxt,'ALL',' ',1,1,iprec,10)
 
         ! broadcast parameters to all processors
-          call igebs2d(icontxt,'ALL',' ',1,1,novr,10)
+          call igebs2d(ictxt,'ALL',' ',1,1,novr,10)
         
           do i = 1, len(afmt)
              intbuf(i) = iachar(afmt(i:i))
           end do
         ! broadcast parameters to all processors
-          call igebs2d(icontxt,'ALL',' ',10,1,intbuf,10)
+          call igebs2d(ictxt,'ALL',' ',10,1,intbuf,10)
         
           read(*,*) idim
           if (ip.ge.4) then
@@ -332,11 +327,11 @@ contains
           intbuf(3) = itmax
           intbuf(4) = itrace
           intbuf(5) = ml
-          call igebs2d(icontxt,'ALL',' ',5,1,intbuf,5)
+          call igebs2d(ictxt,'ALL',' ',5,1,intbuf,5)
 
           write(*,'("Solving matrix       : ell1")')      
           write(*,'("Grid dimensions      : ",i4,"x",i4,"x",i4)')idim,idim,idim
-          write(*,'("Number of processors : ",i0)')nprow
+          write(*,'("Number of processors : ",i0)')np
           write(*,'("Data distribution    : BLOCK")')
           write(*,'("Preconditioner       : ",a)')pr_to_str(iprec)
           if(iprec.gt.2) write(*,'("Overlapping levels   : ",i0)')novr
@@ -345,25 +340,25 @@ contains
        else
         ! wrong number of parameter, print an error message and exit
           call pr_usage(0)      
-          call blacs_abort(icontxt,-1)
+          call blacs_abort(ictxt,-1)
           stop 1
        endif
     else
    ! receive parameters
-       call igebr2d(icontxt,'ALL',' ',10,1,intbuf,10,0,0)
+       call igebr2d(ictxt,'ALL',' ',10,1,intbuf,10,0,0)
        do i = 1, 10
           cmethd(i:i) = achar(intbuf(i))
        end do
 
-       call igebr2d(icontxt,'ALL',' ',1,1,iprec,10,0,0)
+       call igebr2d(ictxt,'ALL',' ',1,1,iprec,10,0,0)
 
-       call igebr2d(icontxt,'ALL',' ',1,1,novr,10,0,0)
+       call igebr2d(ictxt,'ALL',' ',1,1,novr,10,0,0)
 
-       call igebr2d(icontxt,'ALL',' ',10,1,intbuf,10,0,0)
+       call igebr2d(ictxt,'ALL',' ',10,1,intbuf,10,0,0)
        do i = 1, 5
           afmt(i:i) = achar(intbuf(i))
        end do
-       call igebr2d(icontxt,'ALL',' ',5,1,intbuf,5,0,0)
+       call igebr2d(ictxt,'ALL',' ',5,1,intbuf,5,0,0)
        idim    = intbuf(1)
        istopc  = intbuf(2)
        itmax   = intbuf(3)
@@ -398,7 +393,7 @@ contains
 !  subroutine to allocate and fill in the coefficient matrix and
 !  the rhs. 
 !
-  subroutine create_matrix(idim,a,b,t,desc_a,parts,icontxt,afmt,info)
+  subroutine create_matrix(idim,a,b,t,desc_a,parts,ictxt,afmt,info)
     !
     !   discretize the partial diferential equation
     ! 
@@ -420,7 +415,7 @@ contains
     integer, parameter       :: nbmax=10
     real(kind(1.d0)),pointer :: b(:),t(:)
     type(psb_desc_type)      :: desc_a
-    integer                  :: icontxt, info
+    integer                  :: ictxt, info
     character                :: afmt*5
     interface 
       !   .....user passed subroutine.....
@@ -435,7 +430,7 @@ contains
     real(kind(1.d0))         :: zt(nbmax),glob_x,glob_y,glob_z
     integer                  :: m,n,nnz,glob_row,j
     integer                  :: x,y,z,counter,ia,i,indx_owner
-    integer                  :: nprow,npcol,myprow,mypcol
+    integer                  :: np, iam
     integer                  :: element
     integer                  :: nv, inv
     integer, allocatable     :: irow(:),icol(:)
@@ -460,8 +455,8 @@ contains
     info = 0
     name = 'create_matrix'
     call psb_erractionsave(err_act)
-
-    call blacs_gridinfo(icontxt, nprow, npcol, myprow, mypcol)
+    
+    call psb_info(ictxt, iam, np)
 
     deltah = 1.d0/(idim-1)
 
@@ -470,10 +465,10 @@ contains
 
     m   = idim*idim*idim
     n   = m
-    nnz = ((n*9)/(nprow*npcol))
-    if(myprow.eq.psb_root_) write(0,'("Generating Matrix (size=",i0x,")...")')n
+    nnz = ((n*9)/(np))
+    if(iam.eq.psb_root_) write(0,'("Generating Matrix (size=",i0x,")...")')n
 
-    call psb_cdall(n,n,parts,icontxt,desc_a,info)
+    call psb_cdall(n,n,parts,ictxt,desc_a,info)
     call psb_spall(a,desc_a,info,nnz=nnz)
     ! define  rhs from boundary conditions; also build initial guess 
     call psb_geall(b,desc_a,info)
@@ -490,7 +485,7 @@ contains
     ! a bunch of rows per call. 
     ! 
     allocate(val(20*nbmax),irow(20*nbmax),&
-         &icol(20*nbmax),prv(nprow),stat=info)
+         &icol(20*nbmax),prv(np),stat=info)
     if (info.ne.0 ) then 
        info=4000
        call psb_errpush(info,name)
@@ -498,7 +493,7 @@ contains
     endif
 
     tins = 0.d0
-    call blacs_barrier(icontxt,'ALL')
+    call psb_barrier(ictxt)
     t1 = mpi_wtime()
 
     ! loop over rows belonging to current process in a block
@@ -506,10 +501,10 @@ contains
 
 !    icol(1)=1    
     do glob_row = 1, n
-      call parts(glob_row,n,nprow,prv,nv)
+      call parts(glob_row,n,np,prv,nv)
       do inv = 1, nv
         indx_owner = prv(inv)
-        if (indx_owner == myprow) then
+        if (indx_owner == iam) then
           ! local matrix pointer 
           element=1
           ! compute gridpoint coordinates
@@ -640,7 +635,7 @@ contains
       end do
     end do
 
-    call blacs_barrier(icontxt,'ALL')    
+    call psb_barrier(ictxt)    
     t2 = mpi_wtime()-t1
 
     if(info.ne.0) then
@@ -655,7 +650,7 @@ contains
     t1 = mpi_wtime()
     call psb_cdasb(desc_a,info)
     call psb_spasb(a,desc_a,info,dupl=psb_dupl_err_,afmt=afmt)
-    call blacs_barrier(icontxt,'ALL')
+    call psb_barrier(ictxt)
     tasb = mpi_wtime()-t1
     if(info.ne.0) then
        info=4010
@@ -664,11 +659,11 @@ contains
        goto 9999
     end if
 
-    call gamx2d(icontxt,'a',t2)
-    call gamx2d(icontxt,'a',tins)
-    call gamx2d(icontxt,'a',tasb)
+    call gamx2d(ictxt,'a',t2)
+    call gamx2d(ictxt,'a',tins)
+    call gamx2d(ictxt,'a',tasb)
 
-    if(myprow.eq.psb_root_) then
+    if(iam.eq.psb_root_) then
        write(*,'("The matrix has been generated and assembeld in ",a3," format.")')a%fida(1:3)
        write(*,'("-pspins time   : ",es10.4)')tins
        write(*,'("-insert time   : ",es10.4)')t2
@@ -690,7 +685,7 @@ contains
 9999 continue
     call psb_erractionrestore(err_act)
     if (err_act.eq.act_abort) then
-       call psb_error(icontxt)
+       call psb_error(ictxt)
        return
     end if
     return

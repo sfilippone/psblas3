@@ -60,7 +60,7 @@ subroutine psb_dbaseprc_aply(prec,x,beta,y,desc_data,trans,work,info)
   integer :: n_row,n_col, int_err(5)
   real(kind(1.d0)), pointer :: ww(:), aux(:), tx(:),ty(:)
   character     ::diagl, diagu
-  integer :: icontxt,nprow,npcol,me,mycol,i, isz, nrg, err_act
+  integer :: ictxt,nprow,npcol,me,mycol,i, isz, nrg, err_act
   real(kind(1.d0)) :: t1, t2, t3, t4, t5, t6, t7, mpi_wtime
   logical,parameter                 :: debug=.false., debugprt=.false.
   external mpi_wtime
@@ -84,8 +84,8 @@ subroutine psb_dbaseprc_aply(prec,x,beta,y,desc_data,trans,work,info)
   info = 0
   call psb_erractionsave(err_act)
 
-  icontxt=desc_data%matrix_data(psb_ctxt_)
-  call blacs_gridinfo(icontxt,nprow,npcol,me,mycol)
+  ictxt=desc_data%matrix_data(psb_ctxt_)
+  call blacs_gridinfo(ictxt,nprow,npcol,me,mycol)
 
   diagl='U'
   diagu='U'

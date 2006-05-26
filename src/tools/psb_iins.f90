@@ -60,7 +60,7 @@ subroutine psb_iinsvi(m, irw, val, x, desc_a, info, dupl)
   integer, optional, intent(in)   ::  dupl
 
   !locals.....
-  integer                :: icontxt,i,loc_row,glob_row,row,k,&
+  integer                :: ictxt,i,loc_row,glob_row,row,k,&
        & loc_rows,loc_cols,iblock, liflag,mglob,err_act, int_err(5), err
   integer                :: nprow,npcol, me ,mypcol,dupl_
   character(len=20)   :: name, char_err
@@ -81,10 +81,10 @@ subroutine psb_iinsvi(m, irw, val, x, desc_a, info, dupl)
     return
   end if
 
-  icontxt=desc_a%matrix_data(psb_ctxt_)
+  ictxt=desc_a%matrix_data(psb_ctxt_)
 
   ! check on blacs grid 
-  call blacs_gridinfo(icontxt, nprow, npcol, me, mypcol)
+  call blacs_gridinfo(ictxt, nprow, npcol, me, mypcol)
   if (nprow.eq.-1) then
     info = 2010
     call psb_errpush(info,name)
@@ -177,7 +177,7 @@ subroutine psb_iinsvi(m, irw, val, x, desc_a, info, dupl)
   if (err_act.eq.act_ret) then
     return
   else
-    call psb_error(icontxt)
+    call psb_error(ictxt)
   end if
   return
 
@@ -246,7 +246,7 @@ subroutine psb_iinsi(m,irw, val, x, desc_a, info, dupl)
   integer, optional, intent(in)   ::  dupl
 
   !locals.....
-  integer                :: icontxt,i,loc_row,glob_row,row,k,j,n,&
+  integer                :: ictxt,i,loc_row,glob_row,row,k,j,n,&
        & loc_rows,loc_cols,iblock, liflag,mglob,err_act, int_err(5), err
   integer                :: nprow,npcol, me ,mypcol,dupl_
   character(len=20)   :: name, char_err
@@ -267,10 +267,10 @@ subroutine psb_iinsi(m,irw, val, x, desc_a, info, dupl)
     return
   end if
 
-  icontxt=desc_a%matrix_data(psb_ctxt_)
+  ictxt=desc_a%matrix_data(psb_ctxt_)
 
   ! check on blacs grid 
-  call blacs_gridinfo(icontxt, nprow, npcol, me, mypcol)
+  call blacs_gridinfo(ictxt, nprow, npcol, me, mypcol)
   if (nprow.eq.-1) then
     info = 2010
     call psb_errpush(info,name)
@@ -369,7 +369,7 @@ subroutine psb_iinsi(m,irw, val, x, desc_a, info, dupl)
   if (err_act.eq.act_ret) then
     return
   else
-    call psb_error(icontxt)
+    call psb_error(ictxt)
   end if
   return
 

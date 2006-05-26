@@ -54,7 +54,7 @@ subroutine psb_ialloc(x, desc_a, info, n)
 
   !locals
   integer             :: nprow,npcol,myrow,mypcol,err,n_col,n_row,i,j,jj,err_act
-  integer             :: icontxt,dectype,n_
+  integer             :: ictxt,dectype,n_
   integer             :: int_err(5),temp(1),exch(3)
   real(kind(1.d0))    :: real_err(5)
   character(len=20)   :: name, ch_err
@@ -64,9 +64,9 @@ subroutine psb_ialloc(x, desc_a, info, n)
   name='psb_ialloc'
   call psb_erractionsave(err_act)
   
-  icontxt=desc_a%matrix_data(psb_ctxt_)
+  ictxt=desc_a%matrix_data(psb_ctxt_)
   
-  call blacs_gridinfo(icontxt, nprow, npcol, myrow, mypcol)
+  call blacs_gridinfo(ictxt, nprow, npcol, myrow, mypcol)
   !     ....verify blacs grid correctness..
   if (nprow.eq.-1) then
      info = 2010
@@ -95,9 +95,9 @@ subroutine psb_ialloc(x, desc_a, info, n)
   !global check on n parameters
   if (myrow.eq.psb_root_) then
     exch(1)=n_
-    call igebs2d(icontxt,psb_all_,psb_topdef_, ione,ione, exch, ione)
+    call igebs2d(ictxt,psb_all_,psb_topdef_, ione,ione, exch, ione)
   else
-    call igebr2d(icontxt,psb_all_,psb_topdef_, ione,ione, exch, ione, psb_root_, 0)
+    call igebr2d(ictxt,psb_all_,psb_topdef_, ione,ione, exch, ione, psb_root_, 0)
     if (exch(1).ne.n_) then
       info=550
       int_err(1)=1
@@ -143,7 +143,7 @@ subroutine psb_ialloc(x, desc_a, info, n)
 9999 continue
   call psb_erractionrestore(err_act)
   if (err_act.eq.act_abort) then
-    call psb_error(icontxt)
+    call psb_error(ictxt)
     return
   end if
   return
@@ -207,7 +207,7 @@ subroutine psb_iallocv(x, desc_a, info,n)
 
   !locals
   integer             :: nprow,npcol,myrow,mycol,err,n_col,n_row,dectype,i,err_act
-  integer             :: icontxt, n_
+  integer             :: ictxt, n_
   integer             :: int_err(5),temp(1),exch
   real(kind(1.d0))    :: real_err(5)
   logical, parameter  :: debug=.false. 
@@ -218,9 +218,9 @@ subroutine psb_iallocv(x, desc_a, info,n)
   name='psb_iallocv'
   call psb_erractionsave(err_act)
   
-  icontxt=desc_a%matrix_data(psb_ctxt_)
+  ictxt=desc_a%matrix_data(psb_ctxt_)
 
-  call blacs_gridinfo(icontxt, nprow, npcol, myrow, mycol)
+  call blacs_gridinfo(ictxt, nprow, npcol, myrow, mycol)
   !     ....verify blacs grid correctness..
   if (nprow.eq.-1) then
     info = 2010
@@ -274,7 +274,7 @@ subroutine psb_iallocv(x, desc_a, info,n)
 9999 continue
   call psb_erractionrestore(err_act)
   if (err_act.eq.act_abort) then
-    call psb_error(icontxt)
+    call psb_error(ictxt)
     return
   end if
   return

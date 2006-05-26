@@ -62,7 +62,7 @@ subroutine  psb_zhalom(x,desc_a,info,alpha,jx,ik,work,tran,mode)
   character, intent(in), optional           :: tran
 
   ! locals
-  integer                  :: int_err(5), icontxt, nprow, npcol, myrow, mycol,&
+  integer                  :: int_err(5), ictxt, nprow, npcol, myrow, mycol,&
        & err_act, m, n, iix, jjx, temp(2), ix, ijx, k, maxk, nrow, imode, i,&
        & err, liwork, ncol
   complex(kind(1.d0)),pointer :: iwork(:), xp(:,:)
@@ -74,10 +74,10 @@ subroutine  psb_zhalom(x,desc_a,info,alpha,jx,ik,work,tran,mode)
   info=0
   call psb_erractionsave(err_act)
 
-  icontxt=desc_a%matrix_data(psb_ctxt_)
+  ictxt=desc_a%matrix_data(psb_ctxt_)
 
   ! check on blacs grid 
-  call blacs_gridinfo(icontxt, nprow, npcol, myrow, mycol)
+  call blacs_gridinfo(ictxt, nprow, npcol, myrow, mycol)
   if (nprow == -1) then
     info = 2010
     call psb_errpush(info,name)
@@ -137,7 +137,7 @@ subroutine  psb_zhalom(x,desc_a,info,alpha,jx,ik,work,tran,mode)
   end if
 
   err=info
-  call psb_errcomm(icontxt,err)
+  call psb_errcomm(ictxt,err)
   if(err.ne.0) goto 9999
 
   if(present(alpha)) then
@@ -197,7 +197,7 @@ subroutine  psb_zhalom(x,desc_a,info,alpha,jx,ik,work,tran,mode)
   call psb_erractionrestore(err_act)
 
   if (err_act.eq.act_abort) then
-     call psb_error(icontxt)
+     call psb_error(ictxt)
      return
   end if
   return
@@ -267,7 +267,7 @@ subroutine  psb_zhalov(x,desc_a,info,alpha,work,tran,mode)
   character, intent(in), optional           :: tran
 
   ! locals
-  integer                  :: int_err(5), icontxt, nprow, npcol, myrow, mycol,&
+  integer                  :: int_err(5), ictxt, nprow, npcol, myrow, mycol,&
        & err_act, m, n, iix, jjx, temp(2), ix, ijx, k, maxk, nrow, imode, i,&
        & err, liwork, ncol
   complex(kind(1.d0)),pointer :: iwork(:)
@@ -279,10 +279,10 @@ subroutine  psb_zhalov(x,desc_a,info,alpha,work,tran,mode)
   info=0
   call psb_erractionsave(err_act)
 
-  icontxt=desc_a%matrix_data(psb_ctxt_)
+  ictxt=desc_a%matrix_data(psb_ctxt_)
 
   ! check on blacs grid 
-  call blacs_gridinfo(icontxt, nprow, npcol, myrow, mycol)
+  call blacs_gridinfo(ictxt, nprow, npcol, myrow, mycol)
   if (nprow == -1) then
     info = 2010
     call psb_errpush(info,name)
@@ -326,7 +326,7 @@ subroutine  psb_zhalov(x,desc_a,info,alpha,work,tran,mode)
   end if
 
   err=info
-  call psb_errcomm(icontxt,err)
+  call psb_errcomm(ictxt,err)
   if(err.ne.0) goto 9999
 
   if(present(alpha)) then
@@ -383,7 +383,7 @@ subroutine  psb_zhalov(x,desc_a,info,alpha,work,tran,mode)
   call psb_erractionrestore(err_act)
 
   if (err_act.eq.act_abort) then
-     call psb_error(icontxt)
+     call psb_error(ictxt)
      return
   end if
   return

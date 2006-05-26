@@ -108,7 +108,7 @@ subroutine psb_dbicg(a,prec,b,x,eps,desc_a,info,&
   logical, parameter :: debug = .false.
   logical, parameter :: exchange=.true., noexchange=.false.  
   integer, parameter :: irmax = 8
-  integer            :: itx, i, isvch, ich, icontxt
+  integer            :: itx, i, isvch, ich, ictxt
   logical            :: do_renum_left
   real(kind(1.d0)) :: alpha, beta, rho, rho_old, rni, xni, bni, ani,& 
        & sigma, omega, tau,bn2
@@ -119,8 +119,8 @@ subroutine psb_dbicg(a,prec,b,x,eps,desc_a,info,&
   call psb_erractionsave(err_act)
 
   if (debug) write(*,*) 'entering psb_dbicg'
-  icontxt = desc_a%matrix_data(psb_ctxt_)
-  call blacs_gridinfo(icontxt,nprows,npcols,me,mecol)
+  ictxt = desc_a%matrix_data(psb_ctxt_)
+  call blacs_gridinfo(ictxt,nprows,npcols,me,mecol)
   if (debug) write(*,*) 'psb_dbicg: from gridinfo',nprows,npcols,me
 
   mglob = desc_a%matrix_data(psb_m_)
@@ -128,7 +128,7 @@ subroutine psb_dbicg(a,prec,b,x,eps,desc_a,info,&
   n_col = desc_a%matrix_data(psb_n_col_)
 
   ! Ensure global coherence for convergence checks.
-  call psb_set_coher(icontxt,isvch)
+  call psb_set_coher(ictxt,isvch)
 
 
   if (present(istop)) then 
@@ -344,7 +344,7 @@ subroutine psb_dbicg(a,prec,b,x,eps,desc_a,info,&
   call psb_gefree(wwrk,desc_a,info)
 
   ! restore external global coherence behaviour
-  call psb_restore_coher(icontxt,isvch)
+  call psb_restore_coher(ictxt,isvch)
 
   if(info/=0) then
      call psb_errpush(info,name)

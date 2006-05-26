@@ -55,7 +55,7 @@ subroutine psb_dspfree(a, desc_a,info)
   integer             :: int_err(5)
   integer             :: temp(1)
   real(kind(1.d0))    :: real_err(5)
-  integer             :: icontxt,nprow,npcol,me,mypcol,err, err_act
+  integer             :: ictxt,nprow,npcol,me,mypcol,err, err_act
   character(len=20)   :: name, ch_err
 
   if(psb_get_errstatus().ne.0) return 
@@ -68,7 +68,7 @@ subroutine psb_dspfree(a, desc_a,info)
     call psb_errpush(info,name)
     return
   else
-    icontxt=desc_a%matrix_data(psb_ctxt_)
+    ictxt=desc_a%matrix_data(psb_ctxt_)
   end if
 
   !...deallocate a....
@@ -87,7 +87,7 @@ subroutine psb_dspfree(a, desc_a,info)
 9999 continue
   call psb_erractionrestore(err_act)
   if (err_act.eq.act_abort) then
-    call psb_error(icontxt)
+    call psb_error(ictxt)
     return
   end if
   return

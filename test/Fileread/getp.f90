@@ -37,20 +37,20 @@ CONTAINS
   !
   ! Get iteration parameters from the command line
   !
-  SUBROUTINE  GET_PARMS(ICONTXT,MTRX_FILE,RHS_FILE,CMETHD,IPART,&
+  SUBROUTINE  GET_PARMS(ICTXT,MTRX_FILE,RHS_FILE,CMETHD,IPART,&
        & AFMT,ISTOPC,ITMAX,ITRACE,NOVR,IPREC,EPS)
-    integer      :: icontxt
+    integer      :: ictxt
     Character*40 :: CMETHD, MTRX_FILE, RHS_FILE
     Integer      :: IRET, ISTOPC,ITMAX,ITRACE,IPART,IPREC,NOVR
     Character*40 :: CHARBUF
     real(kind(1.d0)) :: eps
     character    :: afmt*5
-    INTEGER      :: IARGC, NPROW, NPCOL, MYPROW, MYPCOL
+    INTEGER      :: IARGC, NP, IAM
     EXTERNAL     IARGC
     INTEGER      :: INPARMS(40), IP 
     
-    CALL BLACS_GRIDINFO(ICONTXT, NPROW, NPCOL, MYPROW, MYPCOL)
-    IF (MYPROW==0) THEN
+    call psb_info(ictxt,iam,np)
+    IF (IAM==0) THEN
       ! Read Input Parameters
       READ(*,*) IP
       IF (IP.GE.3) THEN
@@ -64,20 +64,20 @@ CONTAINS
           INPARMS(I) = IACHAR(MTRX_FILE(I:I))
         END DO
         ! Broadcast parameters to all processors
-        CALL IGEBS2D(ICONTXT,'ALL',' ',40,1,INPARMS,40)
+        CALL IGEBS2D(ICTXT,'ALL',' ',40,1,INPARMS,40)
 
         ! Convert strings in array
         DO I = 1, LEN(CMETHD)
           INPARMS(I) = IACHAR(CMETHD(I:I))
         END DO
         ! Broadcast parameters to all processors
-        CALL IGEBS2D(ICONTXT,'ALL',' ',40,1,INPARMS,40)
+        CALL IGEBS2D(ICTXT,'ALL',' ',40,1,INPARMS,40)
 
         DO I = 1, LEN(AFMT)
           INPARMS(I) = IACHAR(AFMT(I:I))
         END DO
         ! Broadcast parameters to all processors
-        CALL IGEBS2D(ICONTXT,'ALL',' ',40,1,INPARMS,40)
+        CALL IGEBS2D(ICTXT,'ALL',' ',40,1,INPARMS,40)
 
         READ(*,*) IPART
         IF (IP.GE.5) THEN
@@ -118,8 +118,8 @@ CONTAINS
         INPARMS(4) = ITRACE
         INPARMS(5) = IPREC
         INPARMS(6) = NOVR
-        CALL IGEBS2D(ICONTXT,'ALL',' ',6,1,INPARMS,6)
-        CALL DGEBS2D(ICONTXT,'ALL',' ',1,1,EPS,1)
+        CALL IGEBS2D(ICTXT,'ALL',' ',6,1,INPARMS,6)
+        CALL DGEBS2D(ICTXT,'ALL',' ',1,1,EPS,1)
 
           write(*,'("Solving matrix       : ",a40)')mtrx_file      
           write(*,'("Number of processors : ",i3)')nprow
@@ -131,27 +131,27 @@ CONTAINS
           write(*,'(" ")')
       else
         CALL PR_USAGE(0)
-        CALL BLACS_ABORT(ICONTXT,-1)
+        CALL BLACS_ABORT(ICTXT,-1)
         STOP 1
       END IF
     ELSE
       ! Receive Parameters
-      CALL IGEBR2D(ICONTXT,'A',' ',40,1,INPARMS,40,0,0)
+      CALL IGEBR2D(ICTXT,'A',' ',40,1,INPARMS,40,0,0)
       DO I = 1, 40
         MTRX_FILE(I:I) = ACHAR(INPARMS(I))
       END DO
       
-      CALL IGEBR2D(ICONTXT,'A',' ',40,1,INPARMS,40,0,0)
+      CALL IGEBR2D(ICTXT,'A',' ',40,1,INPARMS,40,0,0)
       DO I = 1, 40
         CMETHD(I:I) = ACHAR(INPARMS(I))
       END DO
 
-      CALL IGEBR2D(ICONTXT,'A',' ',40,1,INPARMS,40,0,0)
+      CALL IGEBR2D(ICTXT,'A',' ',40,1,INPARMS,40,0,0)
       DO I = 1, LEN(AFMT)
         AFMT(I:I) = ACHAR(INPARMS(I))
       END DO
       
-      CALL IGEBR2D(ICONTXT,'A',' ',6,1,INPARMS,6,0,0)
+      CALL IGEBR2D(ICTXT,'A',' ',6,1,INPARMS,6,0,0)
 
       IPART  =  INPARMS(1) 
       ISTOPC =  INPARMS(2) 
@@ -159,7 +159,7 @@ CONTAINS
       ITRACE =  INPARMS(4) 
       IPREC  =  INPARMS(5) 
       NOVR     =  INPARMS(6) 
-      CALL DGEBR2D(ICONTXT,'A',' ',1,1,EPS,1,0,0)     
+      CALL DGEBR2D(ICTXT,'A',' ',1,1,EPS,1,0,0)     
     END IF
     
   END SUBROUTINE GET_PARMS

@@ -53,7 +53,7 @@ subroutine psb_dgelp(trans,iperm,x,desc_a,info)
   character, intent(in)                :: trans
 
   ! local variables
-  integer                  :: err, icontxt,nprow, &
+  integer                  :: err, ictxt,nprow, &
        & npcol,me,mypcol,temp,lwork,nrow,ncol
   real(kind(1.d0)),pointer ::  dtemp(:)
   integer                  :: int_err(5), i1sz, i2sz, dectype, i, err_act
@@ -86,14 +86,14 @@ subroutine psb_dgelp(trans,iperm,x,desc_a,info)
   info=0
   call psb_erractionsave(err_act)
 
-  icontxt=desc_a%matrix_data(psb_ctxt_)
+  ictxt=desc_a%matrix_data(psb_ctxt_)
   dectype=desc_a%matrix_data(psb_dec_type_)
   nrow    = desc_a%matrix_data(psb_n_row_)
   ncol    = desc_a%matrix_data(psb_n_col_)
   i1sz    = size(x,dim=1)
   i2sz    = size(x,dim=2)
 
-  call blacs_gridinfo(icontxt, nprow, npcol, me, mypcol)
+  call blacs_gridinfo(ictxt, nprow, npcol, me, mypcol)
 
   if (debug) write(*,*) 'asb start: ',nprow,npcol,me,&
        &desc_a%matrix_data(psb_dec_type_)
@@ -142,7 +142,7 @@ subroutine psb_dgelp(trans,iperm,x,desc_a,info)
   if (err_act.eq.act_ret) then
      return
   else
-     call psb_error(icontxt)
+     call psb_error(ictxt)
   end if
   return
 
@@ -203,7 +203,7 @@ subroutine psb_dgelpv(trans,iperm,x,desc_a,info)
   character, intent(in)              ::  trans
 
   ! local variables
-  integer :: err, icontxt,nprow,npcol,me,mypcol,temp,lwork
+  integer :: err, ictxt,nprow,npcol,me,mypcol,temp,lwork
   integer :: int_err(5), i1sz,nrow,ncol,dectype, i, err_act
   real(kind(1.d0)),pointer ::  dtemp(:)
   double precision :: real_err(5)
@@ -238,12 +238,12 @@ subroutine psb_dgelpv(trans,iperm,x,desc_a,info)
 
   i1sz = size(x)
 
-  icontxt=desc_a%matrix_data(psb_ctxt_)
+  ictxt=desc_a%matrix_data(psb_ctxt_)
   dectype=desc_a%matrix_data(psb_dec_type_)
   nrow=desc_a%matrix_data(psb_n_row_)
   ncol=desc_a%matrix_data(psb_n_col_)
 
-  call blacs_gridinfo(icontxt, nprow, npcol, me, mypcol)
+  call blacs_gridinfo(ictxt, nprow, npcol, me, mypcol)
 
   !     ....verify blacs grid correctness..
   if (nprow.eq.-1) then
@@ -290,7 +290,7 @@ subroutine psb_dgelpv(trans,iperm,x,desc_a,info)
   if (err_act.eq.act_ret) then
      return
   else
-     call psb_error(icontxt)
+     call psb_error(ictxt)
   end if
   return
 

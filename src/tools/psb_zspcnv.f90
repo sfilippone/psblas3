@@ -106,7 +106,7 @@ subroutine psb_zspcnv(a,b,desc_a,info)
   integer                       ::  ia1_size,ia2_size,aspk_size,err_act&
        & ,i,err,nprow,npcol,myrow,mycol,n_col,l_dcsdp, iout, nrow
   integer                       ::  lwork_dcsdp,dectype
-  integer                       ::  icontxt,temp(1),n_row
+  integer                       ::  ictxt,temp(1),n_row
   character                     ::  check*1, trans*1, unitd*1
 
   real(kind(1.d0))              :: time(10), mpi_wtime
@@ -122,13 +122,13 @@ subroutine psb_zspcnv(a,b,desc_a,info)
   time(1) = mpi_wtime()
 
 
-  icontxt = desc_a%matrix_data(psb_ctxt_)
+  ictxt = desc_a%matrix_data(psb_ctxt_)
   dectype = desc_a%matrix_data(psb_dec_type_)
   n_row   = desc_a%matrix_data(psb_n_row_)
   n_col   = desc_a%matrix_data(psb_n_col_)
 
   ! check on blacs grid 
-  call blacs_gridinfo(icontxt, nprow, npcol, myrow, mycol)
+  call blacs_gridinfo(ictxt, nprow, npcol, myrow, mycol)
   if (nprow.eq.-1) then
      info = 2010
      call psb_errpush(info,name)
@@ -247,7 +247,7 @@ subroutine psb_zspcnv(a,b,desc_a,info)
 9999 continue
   call psb_erractionrestore(err_act)
   if (err_act.eq.act_abort) then
-     call psb_error(icontxt)
+     call psb_error(ictxt)
      return
   end if
   return

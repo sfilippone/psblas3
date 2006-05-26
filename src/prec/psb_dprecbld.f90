@@ -82,7 +82,7 @@ subroutine psb_dprecbld(a,desc_a,p,info,upd)
   end interface
 
   ! Local scalars
-  Integer      :: err, nnzero, I,j,k,icontxt,&
+  Integer      :: err, nnzero, I,j,k,ictxt,&
        & me,mycol,nprow,npcol,lw, mtype, nrg, nzg, err_act
   real(kind(1.d0))         :: temp, real_err(5)
   integer      :: int_err(5)
@@ -101,10 +101,10 @@ subroutine psb_dprecbld(a,desc_a,p,info,upd)
   if (debug) write(0,*) 'Entering precbld',P%prec,desc_a%matrix_data(:)
   info = 0
   int_err(1) = 0
-  icontxt = desc_a%matrix_data(psb_ctxt_)
+  ictxt = desc_a%matrix_data(psb_ctxt_)
 
   if (debug) write(0,*) 'Preconditioner Blacs_gridinfo'
-  call blacs_gridinfo(icontxt, nprow, npcol, me, mycol)
+  call blacs_gridinfo(ictxt, nprow, npcol, me, mycol)
 
   if (present(upd)) then 
     if (debug) write(0,*) 'UPD ', upd

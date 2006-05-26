@@ -61,7 +61,7 @@ function psb_zdot(x, y,desc_a, info, jx, jy)
   complex(kind(1.D0))              :: psb_zdot
 
   ! locals
-  integer                  :: int_err(5), icontxt, nprow, npcol, myrow, mycol,&
+  integer                  :: int_err(5), ictxt, nprow, npcol, myrow, mycol,&
        & err_act, n, iix, jjx, temp(2), ix, ijx, iy, ijy, iiy, jjy, i, m, j, k
   complex(kind(1.D0))         :: dot_local
   complex(kind(1.d0))         :: zdotc
@@ -72,10 +72,10 @@ function psb_zdot(x, y,desc_a, info, jx, jy)
   info=0
   call psb_erractionsave(err_act)
 
-  icontxt=desc_a%matrix_data(psb_ctxt_)
+  ictxt=desc_a%matrix_data(psb_ctxt_)
 
   ! check on blacs grid 
-  call blacs_gridinfo(icontxt, nprow, npcol, myrow, mycol)
+  call blacs_gridinfo(ictxt, nprow, npcol, myrow, mycol)
   if (nprow == -ione) then
     info = 2010
     call psb_errpush(info,name)
@@ -146,7 +146,7 @@ function psb_zdot(x, y,desc_a, info, jx, jy)
   end if
 
   ! compute global sum
-  call gsum2d(icontxt, 'A', dot_local)
+  call gsum2d(ictxt, 'A', dot_local)
   
   psb_zdot = dot_local
 
@@ -157,7 +157,7 @@ function psb_zdot(x, y,desc_a, info, jx, jy)
   call psb_erractionrestore(err_act)
 
   if (err_act.eq.act_abort) then
-     call psb_error(icontxt)
+     call psb_error(ictxt)
      return
   end if
   return
@@ -220,7 +220,7 @@ function psb_zdotv(x, y,desc_a, info)
   complex(kind(1.D0))              :: psb_zdotv
 
   ! locals
-  integer                  :: int_err(5), icontxt, nprow, npcol, myrow, mycol,&
+  integer                  :: int_err(5), ictxt, nprow, npcol, myrow, mycol,&
        & err_act, n, iix, jjx, temp(2), ix, jx, iy, jy, iiy, jjy, i, m, j, k
   complex(kind(1.D0))         :: dot_local
   complex(kind(1.d0))         :: zdotc
@@ -231,10 +231,10 @@ function psb_zdotv(x, y,desc_a, info)
   info=0
   call psb_erractionsave(err_act)
 
-  icontxt=desc_a%matrix_data(psb_ctxt_)
+  ictxt=desc_a%matrix_data(psb_ctxt_)
 
   ! check on blacs grid 
-  call blacs_gridinfo(icontxt, nprow, npcol, myrow, mycol)
+  call blacs_gridinfo(ictxt, nprow, npcol, myrow, mycol)
   if (nprow == -ione) then
     info = 2010
     call psb_errpush(info,name)
@@ -289,7 +289,7 @@ function psb_zdotv(x, y,desc_a, info)
   end if
 
   ! compute global sum
-  call gsum2d(icontxt, 'A', dot_local)
+  call gsum2d(ictxt, 'A', dot_local)
   
   psb_zdotv = dot_local
 
@@ -300,7 +300,7 @@ function psb_zdotv(x, y,desc_a, info)
   call psb_erractionrestore(err_act)
 
   if (err_act.eq.act_abort) then
-     call psb_error(icontxt)
+     call psb_error(ictxt)
      return
   end if
   return
@@ -363,7 +363,7 @@ subroutine psb_zdotvs(res, x, y,desc_a, info)
   integer, intent(out)             :: info
 
   ! locals
-  integer                  :: int_err(5), icontxt, nprow, npcol, myrow, mycol,&
+  integer                  :: int_err(5), ictxt, nprow, npcol, myrow, mycol,&
        & err_act, n, iix, jjx, temp(2), ix, ijx, iy, ijy, iiy, jjy, i, m, j, k
   complex(kind(1.D0))         :: dot_local
   complex(kind(1.d0))         :: zdotc
@@ -374,10 +374,10 @@ subroutine psb_zdotvs(res, x, y,desc_a, info)
   info=0
   call psb_erractionsave(err_act)
 
-  icontxt=desc_a%matrix_data(psb_ctxt_)
+  ictxt=desc_a%matrix_data(psb_ctxt_)
 
   ! check on blacs grid 
-  call blacs_gridinfo(icontxt, nprow, npcol, myrow, mycol)
+  call blacs_gridinfo(ictxt, nprow, npcol, myrow, mycol)
   if (nprow == -ione) then
     info = 2010
     call psb_errpush(info,name)
@@ -430,7 +430,7 @@ subroutine psb_zdotvs(res, x, y,desc_a, info)
   end if
 
   ! compute global sum
-  call gsum2d(icontxt, 'A', dot_local)
+  call gsum2d(ictxt, 'A', dot_local)
   
   res = dot_local
 
@@ -441,7 +441,7 @@ subroutine psb_zdotvs(res, x, y,desc_a, info)
   call psb_erractionrestore(err_act)
 
   if (err_act.eq.act_abort) then
-     call psb_error(icontxt)
+     call psb_error(ictxt)
      return
   end if
   return
@@ -509,7 +509,7 @@ subroutine psb_zmdots(res, x, y, desc_a, info)
   integer, intent(out)             :: info
 
   ! locals
-  integer                  :: int_err(5), icontxt, nprow, npcol, myrow, mycol,&
+  integer                  :: int_err(5), ictxt, nprow, npcol, myrow, mycol,&
        & err_act, n, iix, jjx, temp(2), ix, ijx, iy, ijy, iiy, jjy, i, m, j, k
   complex(kind(1.d0)),allocatable  :: dot_local(:)
   complex(kind(1.d0))         :: zdotc
@@ -520,10 +520,10 @@ subroutine psb_zmdots(res, x, y, desc_a, info)
   info=0
   call psb_erractionsave(err_act)
 
-  icontxt=desc_a%matrix_data(psb_ctxt_)
+  ictxt=desc_a%matrix_data(psb_ctxt_)
 
   ! check on blacs grid 
-  call blacs_gridinfo(icontxt, nprow, npcol, myrow, mycol)
+  call blacs_gridinfo(ictxt, nprow, npcol, myrow, mycol)
   if (nprow == -ione) then
     info = 2010
     call psb_errpush(info,name)
@@ -588,7 +588,7 @@ subroutine psb_zmdots(res, x, y, desc_a, info)
   end if
 
   ! compute global sum
-  call gsum2d(icontxt, 'A', dot_local(1:k))
+  call gsum2d(ictxt, 'A', dot_local(1:k))
   
   res(1:k) = dot_local(1:k)
 
@@ -600,7 +600,7 @@ subroutine psb_zmdots(res, x, y, desc_a, info)
   call psb_erractionrestore(err_act)
 
   if (err_act.eq.act_abort) then
-     call psb_error(icontxt)
+     call psb_error(ictxt)
      return
   end if
   return

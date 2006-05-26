@@ -51,7 +51,7 @@ subroutine psb_zgenaggrmap(aggr_type,a,desc_a,nlaggr,ilaggr,info)
 
   logical :: recovery
   logical, parameter :: debug=.false.
-  integer ::icontxt,nprow,npcol,me,mycol,err_act
+  integer ::ictxt,nprow,npcol,me,mycol,err_act
   integer :: nrow, ncol, n_ne
   integer, parameter :: one=1, two=2
   character(len=20)   :: name, ch_err
@@ -65,8 +65,8 @@ subroutine psb_zgenaggrmap(aggr_type,a,desc_a,nlaggr,ilaggr,info)
   ! so that we only have local decoupled aggregation. This might 
   ! change in the future. 
   !
-  icontxt=desc_a%matrix_data(psb_ctxt_)
-  call blacs_gridinfo(icontxt,nprow,npcol,me,mycol)
+  ictxt=desc_a%matrix_data(psb_ctxt_)
+  call blacs_gridinfo(ictxt,nprow,npcol,me,mycol)
   nrow  = desc_a%matrix_data(psb_n_row_)
   ncol  = desc_a%matrix_data(psb_n_col_)
 
@@ -279,7 +279,7 @@ subroutine psb_zgenaggrmap(aggr_type,a,desc_a,nlaggr,ilaggr,info)
 
   nlaggr(:) = 0
   nlaggr(me+1) = naggr
-  call igsum2d(icontxt,'All',' ',nprow,1,nlaggr,nprow,-1,-1)
+  call igsum2d(ictxt,'All',' ',nprow,1,nlaggr,nprow,-1,-1)
 
   call psb_erractionrestore(err_act)
   return

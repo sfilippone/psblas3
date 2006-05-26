@@ -68,7 +68,7 @@ subroutine psb_dspasb(a,desc_a, info, afmt, upd, dupl)
        & nprow,npcol,myrow,mycol ,size_req,n_col,iout, err_act
   integer               :: dscstate, spstate, nr,k,j
   integer               :: upd_, dupl_
-  integer               :: icontxt,temp(2),isize(2),n_row
+  integer               :: ictxt,temp(2),isize(2),n_row
   logical, parameter    :: debug=.false., debugwrt=.false.
   character(len=20)     :: name, ch_err
 
@@ -77,13 +77,13 @@ subroutine psb_dspasb(a,desc_a, info, afmt, upd, dupl)
   name = 'psb_spasb'
   call psb_erractionsave(err_act)
 
-  icontxt  = desc_a%matrix_data(psb_ctxt_)
+  ictxt  = desc_a%matrix_data(psb_ctxt_)
   dscstate = desc_a%matrix_data(psb_dec_type_)
   n_row    = desc_a%matrix_data(psb_n_row_)
   n_col    = desc_a%matrix_data(psb_n_col_)
 
   ! check on BLACS grid 
-  call blacs_gridinfo(icontxt, nprow, npcol, myrow, mycol)
+  call blacs_gridinfo(ictxt, nprow, npcol, myrow, mycol)
   if (nprow.eq.-1) then
     info = 2010
     call psb_errpush(info,name)
@@ -234,7 +234,7 @@ subroutine psb_dspasb(a,desc_a, info, afmt, upd, dupl)
 9999 continue
   call psb_erractionrestore(err_act)
   if (err_act.eq.act_abort) then
-    call psb_error(icontxt)
+    call psb_error(ictxt)
     return
   end if
   return

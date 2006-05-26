@@ -54,7 +54,7 @@ function psb_znrmi(a,desc_a,info)
   real(kind(1.d0))                    :: psb_znrmi
 
   ! locals
-  integer                  :: int_err(5), icontxt, nprow, npcol, myrow, mycol,&
+  integer                  :: int_err(5), ictxt, nprow, npcol, myrow, mycol,&
        & err_act, n, iia, jja, ia, ja, temp(2), mdim, ndim, m
   real(kind(1.d0))         :: nrmi, zcsnmi
   character(len=20)        :: name, ch_err
@@ -64,10 +64,10 @@ function psb_znrmi(a,desc_a,info)
   info=0
   call psb_erractionsave(err_act)
 
-  icontxt=desc_a%matrix_data(psb_ctxt_)
+  ictxt=desc_a%matrix_data(psb_ctxt_)
 
   ! check on blacs grid 
-  call blacs_gridinfo(icontxt, nprow, npcol, myrow, mycol)
+  call blacs_gridinfo(ictxt, nprow, npcol, myrow, mycol)
   if (nprow == -1) then
     info = 2010
     call psb_errpush(info,name)
@@ -113,7 +113,7 @@ function psb_znrmi(a,desc_a,info)
      end if
 
      ! compute global max
-     call gamx2d(icontxt, 'A', nrmi)
+     call gamx2d(ictxt, 'A', nrmi)
   else
      nrmi = 0.d0
   end if
@@ -127,7 +127,7 @@ function psb_znrmi(a,desc_a,info)
   call psb_erractionrestore(err_act)
 
   if (err_act.eq.act_abort) then
-     call psb_error(icontxt)
+     call psb_error(ictxt)
      return
   end if
   return

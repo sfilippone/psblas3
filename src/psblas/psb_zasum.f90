@@ -59,7 +59,7 @@ function psb_zasum (x,desc_a, info, jx)
   real(kind(1.d0))                  :: psb_zasum
 
   ! locals
-  integer                  :: int_err(5), icontxt, nprow, npcol, myrow, mycol,&
+  integer                  :: int_err(5), ictxt, nprow, npcol, myrow, mycol,&
        & err_act, n, iix, jjx, temp(2), ix, ijx, m, i
   real(kind(1.d0))         :: asum, dzasum
   character(len=20)        :: name, ch_err
@@ -75,10 +75,10 @@ function psb_zasum (x,desc_a, info, jx)
 
   asum=0.d0
 
-  icontxt=desc_a%matrix_data(psb_ctxt_)
+  ictxt=desc_a%matrix_data(psb_ctxt_)
 
   ! check on blacs grid 
-  call blacs_gridinfo(icontxt, nprow, npcol, myrow, mycol)
+  call blacs_gridinfo(ictxt, nprow, npcol, myrow, mycol)
   if (nprow == -1) then
     info = 2010
     call psb_errpush(info,name)
@@ -130,12 +130,12 @@ function psb_zasum (x,desc_a, info, jx)
       end do
 
       ! compute global sum
-      call gsum2d(icontxt, 'A', asum)
+      call gsum2d(ictxt, 'A', asum)
 
     else
       asum=0.d0
       ! compute global sum
-      call gsum2d(icontxt, 'A', asum)
+      call gsum2d(ictxt, 'A', asum)
     end if
   else
      asum=0.d0
@@ -151,7 +151,7 @@ function psb_zasum (x,desc_a, info, jx)
   call psb_erractionrestore(err_act)
 
   if (err_act.eq.act_abort) then
-     call psb_error(icontxt)
+     call psb_error(ictxt)
      return
   end if
   return
@@ -213,7 +213,7 @@ function psb_zasumv (x,desc_a, info)
   real(kind(1.d0))                  :: psb_zasumv
 
   ! locals
-  integer                  :: int_err(5), icontxt, nprow, npcol, myrow, mycol,&
+  integer                  :: int_err(5), ictxt, nprow, npcol, myrow, mycol,&
        & err_act, n, iix, jjx, temp(2), jx, ix, ijx, m, i
   real(kind(1.d0))         :: asum, dzasum
   character(len=20)        :: name, ch_err
@@ -229,10 +229,10 @@ function psb_zasumv (x,desc_a, info)
 
   asum=0.d0
 
-  icontxt=desc_a%matrix_data(psb_ctxt_)
+  ictxt=desc_a%matrix_data(psb_ctxt_)
 
   ! check on blacs grid 
-  call blacs_gridinfo(icontxt, nprow, npcol, myrow, mycol)
+  call blacs_gridinfo(ictxt, nprow, npcol, myrow, mycol)
   if (nprow == -1) then
     info = 2010
     call psb_errpush(info,name)
@@ -280,12 +280,12 @@ function psb_zasumv (x,desc_a, info)
       end do
 
       ! compute global sum
-      call gsum2d(icontxt, 'A', asum)
+      call gsum2d(ictxt, 'A', asum)
 
     else
       asum=0.d0
       ! compute global sum
-      call gsum2d(icontxt, 'A', asum)
+      call gsum2d(ictxt, 'A', asum)
     end if
   else
     asum=0.d0
@@ -300,7 +300,7 @@ function psb_zasumv (x,desc_a, info)
   call psb_erractionrestore(err_act)
 
   if (err_act.eq.act_abort) then
-    call psb_error(icontxt)
+    call psb_error(ictxt)
     return
   end if
   return
@@ -363,7 +363,7 @@ subroutine psb_zasumvs (res,x,desc_a, info)
   integer, intent(out)              :: info
 
   ! locals
-  integer                  :: int_err(5), icontxt, nprow, npcol, myrow, mycol,&
+  integer                  :: int_err(5), ictxt, nprow, npcol, myrow, mycol,&
        & err_act, n, iix, jjx, temp(2), ix, jx, ijx, m, i
   real(kind(1.d0))         :: asum, dzasum
   character(len=20)        :: name, ch_err
@@ -379,10 +379,10 @@ subroutine psb_zasumvs (res,x,desc_a, info)
 
   asum=0.d0
 
-  icontxt=desc_a%matrix_data(psb_ctxt_)
+  ictxt=desc_a%matrix_data(psb_ctxt_)
 
   ! check on blacs grid 
-  call blacs_gridinfo(icontxt, nprow, npcol, myrow, mycol)
+  call blacs_gridinfo(ictxt, nprow, npcol, myrow, mycol)
   if (nprow == -1) then
     info = 2010
     call psb_errpush(info,name)
@@ -430,12 +430,12 @@ subroutine psb_zasumvs (res,x,desc_a, info)
       end do
 
       ! compute global sum
-      call gsum2d(icontxt, 'A',asum)
+      call gsum2d(ictxt, 'A',asum)
 
     else
       asum=0.d0
       ! compute global sum
-      call gsum2d(icontxt, 'A', asum)
+      call gsum2d(ictxt, 'A', asum)
     end if
   else
     asum=0.d0
@@ -451,7 +451,7 @@ subroutine psb_zasumvs (res,x,desc_a, info)
   call psb_erractionrestore(err_act)
 
   if (err_act.eq.act_abort) then
-    call psb_error(icontxt)
+    call psb_error(ictxt)
     return
   end if
   return

@@ -55,7 +55,7 @@ subroutine psb_zdiagsc_bld(a,desc_a,p,upd,info)
 
 
   ! Local scalars
-  Integer      :: err, nnzero, n_row, n_col,I,j,k,icontxt,&
+  Integer      :: err, nnzero, n_row, n_col,I,j,k,ictxt,&
        & me,mycol,nprow,npcol,mglob,lw, mtype, nrg, nzg, err_act
   real(kind(1.d0))            :: temp, real_err(5)
   complex(kind(1.d0)),pointer :: gd(:), work(:)
@@ -75,12 +75,12 @@ subroutine psb_zdiagsc_bld(a,desc_a,p,upd,info)
   if (debug) write(0,*) 'Entering diagsc_bld'
   info = 0
   int_err(1) = 0
-  icontxt = desc_a%matrix_data(psb_ctxt_)
+  ictxt = desc_a%matrix_data(psb_ctxt_)
   n_row   = desc_a%matrix_data(psb_n_row_)
   n_col   = desc_a%matrix_data(psb_n_col_)
   mglob   = desc_a%matrix_data(psb_m_)
   if (debug) write(0,*) 'Preconditioner Blacs_gridinfo'
-  call blacs_gridinfo(icontxt, nprow, npcol, me, mycol)
+  call blacs_gridinfo(ictxt, nprow, npcol, me, mycol)
 
   if (debug) write(0,*) 'Precond: Diagonal scaling'
   ! diagonal scaling

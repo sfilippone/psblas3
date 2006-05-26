@@ -55,7 +55,7 @@ Subroutine psb_dsprn(a, desc_a,info,clear)
 
 
   !locals
-  Integer             :: icontxt
+  Integer             :: ictxt
   Integer             :: nprow,npcol,myrow,mycol,err,err_act
   logical, parameter  :: debug=.false.
   integer             :: int_err(5)
@@ -69,10 +69,10 @@ Subroutine psb_dsprn(a, desc_a,info,clear)
   name = 'psb_dsprn'
   call psb_erractionsave(err_act)
 
-  icontxt = desc_a%matrix_data(psb_ctxt_)
-  call blacs_gridinfo(icontxt, nprow, npcol, myrow, mycol)
+  ictxt = desc_a%matrix_data(psb_ctxt_)
+  call blacs_gridinfo(ictxt, nprow, npcol, myrow, mycol)
   if (debug) &
-       &write(*,*) 'starting spalloc ',icontxt,nprow,npcol,myrow
+       &write(*,*) 'starting spalloc ',ictxt,nprow,npcol,myrow
 
   !     ....verify blacs grid correctness..
   if (npcol.ne.1) then
@@ -108,7 +108,7 @@ Subroutine psb_dsprn(a, desc_a,info,clear)
 9999 continue
   call psb_erractionrestore(err_act)
   if (err_act.eq.act_abort) then
-    call psb_error(icontxt)
+    call psb_error(ictxt)
     return
   end if
   return

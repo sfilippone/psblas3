@@ -81,7 +81,7 @@ subroutine psb_dilu_bld(a,desc_a,p,upd,info)
   integer   istpb, istpe, ifctb, ifcte, err_act, irank, icomm, nztota, nztotb,&
        & nztmp, nzl, nnr, ir, mglob, mtype, n_row, nrow_a,n_col, nhalo,lovr, &
        & ind, iind, pi,nr,ns
-  integer ::icontxt,nprow,npcol,me,mycol
+  integer ::ictxt,nprow,npcol,me,mycol
   character(len=20)      :: name, ch_err
 
   interface psb_ilu_fct
@@ -132,8 +132,8 @@ subroutine psb_dilu_bld(a,desc_a,p,upd,info)
   name='psb_ilu_bld'
   call psb_erractionsave(err_act)
 
-  icontxt=desc_a%matrix_data(psb_ctxt_)
-  call blacs_gridinfo(icontxt,nprow,npcol,me,mycol)
+  ictxt=desc_a%matrix_data(psb_ctxt_)
+  call blacs_gridinfo(ictxt,nprow,npcol,me,mycol)
 
   m = a%m
   if (m < 0) then
@@ -153,17 +153,17 @@ subroutine psb_dilu_bld(a,desc_a,p,upd,info)
     goto 9999
   endif
 
-  !  call blacs_gridinfo(icontxt,nprow,npcol,me,mycol)
+  !  call blacs_gridinfo(ictxt,nprow,npcol,me,mycol)
 
 
-  icontxt=desc_a%matrix_data(psb_ctxt_)
+  ictxt=desc_a%matrix_data(psb_ctxt_)
   call psb_nullify_sp(blck)
   call psb_nullify_sp(atmp)
 
   t1= mpi_wtime()
 
   if(debug) write(0,*)me,': calling psb_asmatbld',p%iprcparm(p_type_),p%iprcparm(n_ovr_)
-  if (debug) call blacs_barrier(icontxt,'All')
+  if (debug) call blacs_barrier(ictxt,'All')
   call psb_asmatbld(p%iprcparm(p_type_),p%iprcparm(n_ovr_),a,&
        & blck,desc_a,upd,p%desc_data,info)
   if(info/=0) then
@@ -174,7 +174,7 @@ subroutine psb_dilu_bld(a,desc_a,p,upd,info)
   end if
   t2= mpi_wtime()
   if (debug) write(0,*)me,': out of psb_asmatbld'
-  if (debug) call blacs_barrier(icontxt,'All')
+  if (debug) call blacs_barrier(ictxt,'All')
 
   if (associated(p%av)) then 
     if (size(p%av) < bp_ilu_avsz) then 
@@ -195,7 +195,7 @@ subroutine psb_dilu_bld(a,desc_a,p,upd,info)
     goto 9999
   end if
   if (debug) write(0,*)me,': out spinfo',nztota
-  if (debug) call blacs_barrier(icontxt,'All')
+  if (debug) call blacs_barrier(ictxt,'All')
 
   n_col  = desc_a%matrix_data(psb_n_col_)
   nhalo  = n_col-nrow_a
@@ -231,7 +231,7 @@ subroutine psb_dilu_bld(a,desc_a,p,upd,info)
 
   if (debug) then 
     write(0,*) me,'Done psb_asmatbld'
-    call blacs_barrier(icontxt,'All')
+    call blacs_barrier(ictxt,'All')
   endif
 
 
@@ -264,7 +264,7 @@ subroutine psb_dilu_bld(a,desc_a,p,upd,info)
 
     t3 = mpi_wtime()
     if (debugprt) then 
-      call blacs_barrier(icontxt,'All')
+      call blacs_barrier(ictxt,'All')
       open(40+me) 
       call psb_csprt(40+me,atmp,head='% Local matrix')
       close(40+me)
@@ -301,7 +301,7 @@ subroutine psb_dilu_bld(a,desc_a,p,upd,info)
 
     if (debugprt) then 
       open(40+me)
-      call blacs_barrier(icontxt,'All')
+      call blacs_barrier(ictxt,'All')
       call psb_csprt(40+me,a,iv=p%desc_data%loc_to_glob,&
            &    head='% Local matrix')
       if (p%iprcparm(p_type_)==asm_) then 
@@ -313,7 +313,7 @@ subroutine psb_dilu_bld(a,desc_a,p,upd,info)
 
     t5= mpi_wtime()
     if (debug) write(0,*) me,' Going for dilu_fct'
-    if (debug) call blacs_barrier(icontxt,'All')
+    if (debug) call blacs_barrier(ictxt,'All')
     call psb_ilu_fct(a,p%av(l_pr_),p%av(u_pr_),p%d,info,blck=blck)
     if(info/=0) then
       info=4010
