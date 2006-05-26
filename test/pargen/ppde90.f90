@@ -102,18 +102,18 @@ program pde90
   integer, pointer :: work(:)
   ! blacs parameters
   integer            :: ictxt, iam, np
-  
+
   ! solver parameters
   integer            :: iter, itmax,ierr,itrace, methd,iprec, istopc,&
        & iparm(20), ml, novr
   real(kind(1.d0))   :: err, eps, rparm(20)
-   
+
   ! other variables
   integer            :: i,info
   integer            :: internal, m,ii
   character(len=10)  :: ptype
   character(len=20)  :: name,ch_err
- 
+
   if(psb_get_errstatus().ne.0) goto 9999
   info=0
   name='pde90'
@@ -134,7 +134,7 @@ program pde90
   !  get parameters
   !
   call get_parms(ictxt,cmethd,iprec,novr,afmt,idim,istopc,itmax,itrace,ml)
-  
+
   !
   !  allocate and fill in the coefficient matrix, rhs and initial guess 
   !
@@ -144,10 +144,10 @@ program pde90
   call create_matrix(idim,a,b,x,desc_a,part_block,ictxt,afmt,info)  
   t2 = mpi_wtime() - t1
   if(info.ne.0) then
-     info=4010
-     ch_err='create_matrix'
-     call psb_errpush(info,name,a_err=ch_err)
-     goto 9999
+    info=4010
+    ch_err='create_matrix'
+    call psb_errpush(info,name,a_err=ch_err)
+    goto 9999
   end if
 
   call gamx2d(ictxt,'a',t2)
@@ -160,35 +160,37 @@ program pde90
   if(iam.eq.psb_root_) write(0,'("Setting preconditioner to : ",a)')pr_to_str(iprec)
   select case(iprec)
   case(noprec_)
-     call psb_precset(pre,'noprec')
+    call psb_precset(pre,'noprec')
   case(diagsc_)             
-     call psb_precset(pre,'diagsc')
+    call psb_precset(pre,'diagsc')
   case(bja_)             
-     call psb_precset(pre,'ilu')
+    call psb_precset(pre,'ilu')
   case(asm_)             
-     call psb_precset(pre,'asm',iv=(/novr,halo_,sum_/))
+    call psb_precset(pre,'asm',iv=(/novr,halo_,sum_/))
   case(ash_)             
-     call psb_precset(pre,'asm',iv=(/novr,nohalo_,sum_/))
+    call psb_precset(pre,'asm',iv=(/novr,nohalo_,sum_/))
   case(ras_)             
-     call psb_precset(pre,'asm',iv=(/novr,halo_,none_/))
+    call psb_precset(pre,'asm',iv=(/novr,halo_,none_/))
   case(rash_)             
-     call psb_precset(pre,'asm',iv=(/novr,nohalo_,none_/))
+    call psb_precset(pre,'asm',iv=(/novr,nohalo_,none_/))
+  case default
+    call psb_precset(pre,'ilu')
   end select
-  
+
   call psb_barrier(ictxt)
   t1 = mpi_wtime()
   call psb_precbld(a,desc_a,pre,info)
   if(info.ne.0) then
-     info=4010
-     ch_err='psb_precbld'
-     call psb_errpush(info,name,a_err=ch_err)
-     goto 9999
+    info=4010
+    ch_err='psb_precbld'
+    call psb_errpush(info,name,a_err=ch_err)
+    goto 9999
   end if
 
   tprec = mpi_wtime()-t1
-  
+
   call gamx2d(ictxt,'a',tprec)
-  
+
   if (iam.eq.0) write(*,'("Preconditioner time : ",es10.4)')tprec
   if (iam.eq.0) write(*,'(" ")')
 
@@ -216,23 +218,23 @@ program pde90
   end if
 
   if(info.ne.0) then
-     info=4010
-     ch_err='solver routine'
-     call psb_errpush(info,name,a_err=ch_err)
-     goto 9999
+    info=4010
+    ch_err='solver routine'
+    call psb_errpush(info,name,a_err=ch_err)
+    goto 9999
   end if
-  
+
   call psb_barrier(ictxt)
   t2 = mpi_wtime() - t1
   call gamx2d(ictxt,'a',t2)
 
   if (iam.eq.0) then
-     write(*,'(" ")')
-     write(*,'("Time to solve matrix : ",es10.4)')t2
-     write(*,'("Time per iteration   : ",es10.4)')t2/iter
-     write(*,'("Number of iterations : ",i0)')iter
-     write(*,'("Error on exit        : ",es10.4)')err
-     write(*,'("Info  on exit        : ",i0)')info
+    write(*,'(" ")')
+    write(*,'("Time to solve matrix : ",es10.4)')t2
+    write(*,'("Time per iteration   : ",es10.4)')t2/iter
+    write(*,'("Number of iterations : ",i0)')iter
+    write(*,'("Error on exit        : ",es10.4)')err
+    write(*,'("Info  on exit        : ",i0)')info
   end if
 
   !  
@@ -244,15 +246,15 @@ program pde90
   call psb_precfree(pre,info)
   call psb_cdfree(desc_a,info)
   if(info.ne.0) then
-     info=4010
-     ch_err='free routine'
-     call psb_errpush(info,name,a_err=ch_err)
-     goto 9999
+    info=4010
+    ch_err='free routine'
+    call psb_errpush(info,name,a_err=ch_err)
+    goto 9999
   end if
-  
+
 9999 continue
   if(info /= 0) then
-     call psb_error(ictxt)
+    call psb_error(ictxt)
   end if
   call psb_exit(ictxt)
   stop
@@ -269,104 +271,104 @@ contains
     integer      :: iargc, np, iam
     external     iargc
     integer      :: intbuf(10), ip
-    
+
     call psb_info(ictxt, iam, np)
 
     if (iam==0) then
-       read(*,*) ip
-       if (ip.ge.3) then
-          read(*,*) cmethd
-          read(*,*) iprec
-          read(*,*) novr
-          read(*,*) afmt
-         
+      read(*,*) ip
+      if (ip.ge.3) then
+        read(*,*) cmethd
+        read(*,*) iprec
+        read(*,*) novr
+        read(*,*) afmt
+
         ! convert strings in array
-          do i = 1, len(cmethd)
-             intbuf(i) = iachar(cmethd(i:i))
-          end do
+        do i = 1, len(cmethd)
+          intbuf(i) = iachar(cmethd(i:i))
+        end do
         ! broadcast parameters to all processors
-          call igebs2d(ictxt,'ALL',' ',10,1,intbuf,10)
-        
-        ! broadcast parameters to all processors
-          call igebs2d(ictxt,'ALL',' ',1,1,iprec,10)
+        call igebs2d(ictxt,'ALL',' ',10,1,intbuf,10)
 
         ! broadcast parameters to all processors
-          call igebs2d(ictxt,'ALL',' ',1,1,novr,10)
-        
-          do i = 1, len(afmt)
-             intbuf(i) = iachar(afmt(i:i))
-          end do
+        call igebs2d(ictxt,'ALL',' ',1,1,iprec,10)
+
         ! broadcast parameters to all processors
-          call igebs2d(ictxt,'ALL',' ',10,1,intbuf,10)
-        
-          read(*,*) idim
-          if (ip.ge.4) then
-             read(*,*) istopc
-          else
-             istopc=1        
-          endif
-          if (ip.ge.5) then
-             read(*,*) itmax
-          else
-             itmax=500
-          endif
-          if (ip.ge.6) then
-             read(*,*) itrace
-          else
-             itrace=-1
-          endif
-          if (ip.ge.7) then
-             read(*,*) ml
-          else
-             ml=1
-          endif
+        call igebs2d(ictxt,'ALL',' ',1,1,novr,10)
+
+        do i = 1, len(afmt)
+          intbuf(i) = iachar(afmt(i:i))
+        end do
+        ! broadcast parameters to all processors
+        call igebs2d(ictxt,'ALL',' ',10,1,intbuf,10)
+
+        read(*,*) idim
+        if (ip.ge.4) then
+          read(*,*) istopc
+        else
+          istopc=1        
+        endif
+        if (ip.ge.5) then
+          read(*,*) itmax
+        else
+          itmax=500
+        endif
+        if (ip.ge.6) then
+          read(*,*) itrace
+        else
+          itrace=-1
+        endif
+        if (ip.ge.7) then
+          read(*,*) ml
+        else
+          ml=1
+        endif
         ! broadcast parameters to all processors    
-          
-          intbuf(1) = idim
-          intbuf(2) = istopc
-          intbuf(3) = itmax
-          intbuf(4) = itrace
-          intbuf(5) = ml
-          call igebs2d(ictxt,'ALL',' ',5,1,intbuf,5)
 
-          write(*,'("Solving matrix       : ell1")')      
-          write(*,'("Grid dimensions      : ",i4,"x",i4,"x",i4)')idim,idim,idim
-          write(*,'("Number of processors : ",i0)')np
-          write(*,'("Data distribution    : BLOCK")')
-          write(*,'("Preconditioner       : ",a)')pr_to_str(iprec)
-          if(iprec.gt.2) write(*,'("Overlapping levels   : ",i0)')novr
-          write(*,'("Iterative method     : ",a)')cmethd
-          write(*,'(" ")')
-       else
+        intbuf(1) = idim
+        intbuf(2) = istopc
+        intbuf(3) = itmax
+        intbuf(4) = itrace
+        intbuf(5) = ml
+        call igebs2d(ictxt,'ALL',' ',5,1,intbuf,5)
+
+        write(*,'("Solving matrix       : ell1")')      
+        write(*,'("Grid dimensions      : ",i4,"x",i4,"x",i4)')idim,idim,idim
+        write(*,'("Number of processors : ",i0)')np
+        write(*,'("Data distribution    : BLOCK")')
+        write(*,'("Preconditioner       : ",a)')pr_to_str(iprec)
+        if(iprec.gt.2) write(*,'("Overlapping levels   : ",i0)')novr
+        write(*,'("Iterative method     : ",a)')cmethd
+        write(*,'(" ")')
+      else
         ! wrong number of parameter, print an error message and exit
-          call pr_usage(0)      
-          call blacs_abort(ictxt,-1)
-          stop 1
-       endif
+        call pr_usage(0)      
+        call blacs_abort(ictxt,-1)
+        stop 1
+      endif
     else
-   ! receive parameters
-       call igebr2d(ictxt,'ALL',' ',10,1,intbuf,10,0,0)
-       do i = 1, 10
-          cmethd(i:i) = achar(intbuf(i))
-       end do
+      ! receive parameters
+      call igebr2d(ictxt,'ALL',' ',10,1,intbuf,10,0,0)
+      do i = 1, 10
+        cmethd(i:i) = achar(intbuf(i))
+      end do
 
-       call igebr2d(ictxt,'ALL',' ',1,1,iprec,10,0,0)
+      call igebr2d(ictxt,'ALL',' ',1,1,iprec,10,0,0)
 
-       call igebr2d(ictxt,'ALL',' ',1,1,novr,10,0,0)
+      call igebr2d(ictxt,'ALL',' ',1,1,novr,10,0,0)
 
-       call igebr2d(ictxt,'ALL',' ',10,1,intbuf,10,0,0)
-       do i = 1, 5
-          afmt(i:i) = achar(intbuf(i))
-       end do
-       call igebr2d(ictxt,'ALL',' ',5,1,intbuf,5,0,0)
-       idim    = intbuf(1)
-       istopc  = intbuf(2)
-       itmax   = intbuf(3)
-       itrace  = intbuf(4)
-       ml      = intbuf(5)
+      call igebr2d(ictxt,'ALL',' ',10,1,intbuf,10,0,0)
+      do i = 1, 5
+        afmt(i:i) = achar(intbuf(i))
+      end do
+      call igebr2d(ictxt,'ALL',' ',5,1,intbuf,5,0,0)
+      idim    = intbuf(1)
+      istopc  = intbuf(2)
+      itmax   = intbuf(3)
+      itrace  = intbuf(4)
+      ml      = intbuf(5)
     end if
     return
-    
+
   end subroutine get_parms
   !
   !  print an error message 
@@ -389,10 +391,10 @@ contains
     write(iout,*)'               iterations ' 
   end subroutine pr_usage
 
-!
-!  subroutine to allocate and fill in the coefficient matrix and
-!  the rhs. 
-!
+  !
+  !  subroutine to allocate and fill in the coefficient matrix and
+  !  the rhs. 
+  !
   subroutine create_matrix(idim,a,b,t,desc_a,parts,ictxt,afmt,info)
     !
     !   discretize the partial diferential equation
@@ -455,7 +457,7 @@ contains
     info = 0
     name = 'create_matrix'
     call psb_erractionsave(err_act)
-    
+
     call psb_info(ictxt, iam, np)
 
     deltah = 1.d0/(idim-1)
@@ -474,10 +476,10 @@ contains
     call psb_geall(b,desc_a,info)
     call psb_geall(t,desc_a,info)
     if(info.ne.0) then
-       info=4010
-       ch_err='allocation rout.'
-       call psb_errpush(info,name,a_err=ch_err)
-       goto 9999
+      info=4010
+      ch_err='allocation rout.'
+      call psb_errpush(info,name,a_err=ch_err)
+      goto 9999
     end if
 
     ! we build an auxiliary matrix consisting of one row at a
@@ -487,9 +489,9 @@ contains
     allocate(val(20*nbmax),irow(20*nbmax),&
          &icol(20*nbmax),prv(np),stat=info)
     if (info.ne.0 ) then 
-       info=4000
-       call psb_errpush(info,name)
-       goto 9999
+      info=4000
+      call psb_errpush(info,name)
+      goto 9999
     endif
 
     tins = 0.d0
@@ -499,7 +501,7 @@ contains
     ! loop over rows belonging to current process in a block
     ! distribution.
 
-!    icol(1)=1    
+    !    icol(1)=1    
     do glob_row = 1, n
       call parts(glob_row,n,np,prv,nv)
       do inv = 1, nv
@@ -531,48 +533,48 @@ contains
           !  term depending on   (x-1,y,z)
           !
           if (x==1) then 
-             val(element)=-b1(glob_x,glob_y,glob_z)&
-                  & -a1(glob_x,glob_y,glob_z)
-             val(element) = val(element)/(deltah*&
-                  & deltah)
-             zt(1) = exp(-glob_y**2-glob_z**2)*(-val(element))
+            val(element)=-b1(glob_x,glob_y,glob_z)&
+                 & -a1(glob_x,glob_y,glob_z)
+            val(element) = val(element)/(deltah*&
+                 & deltah)
+            zt(1) = exp(-glob_y**2-glob_z**2)*(-val(element))
           else
-             val(element)=-b1(glob_x,glob_y,glob_z)&
-                  & -a1(glob_x,glob_y,glob_z)
-             val(element) = val(element)/(deltah*&
-                  & deltah)
-             icol(element)=(x-2)*idim*idim+(y-1)*idim+(z)
-             element=element+1
+            val(element)=-b1(glob_x,glob_y,glob_z)&
+                 & -a1(glob_x,glob_y,glob_z)
+            val(element) = val(element)/(deltah*&
+                 & deltah)
+            icol(element)=(x-2)*idim*idim+(y-1)*idim+(z)
+            element=element+1
           endif
           !  term depending on     (x,y-1,z)
           if (y==1) then 
-             val(element)=-b2(glob_x,glob_y,glob_z)&
-                  & -a2(glob_x,glob_y,glob_z)
-             val(element) = val(element)/(deltah*&
-                  & deltah)
-             zt(1) = exp(-glob_y**2-glob_z**2)*exp(-glob_x)*(-val(element))  
+            val(element)=-b2(glob_x,glob_y,glob_z)&
+                 & -a2(glob_x,glob_y,glob_z)
+            val(element) = val(element)/(deltah*&
+                 & deltah)
+            zt(1) = exp(-glob_y**2-glob_z**2)*exp(-glob_x)*(-val(element))  
           else
-             val(element)=-b2(glob_x,glob_y,glob_z)&
-                  & -a2(glob_x,glob_y,glob_z)
-             val(element) = val(element)/(deltah*&
-                  & deltah)
-             icol(element)=(x-1)*idim*idim+(y-2)*idim+(z)
-             element=element+1
+            val(element)=-b2(glob_x,glob_y,glob_z)&
+                 & -a2(glob_x,glob_y,glob_z)
+            val(element) = val(element)/(deltah*&
+                 & deltah)
+            icol(element)=(x-1)*idim*idim+(y-2)*idim+(z)
+            element=element+1
           endif
           !  term depending on     (x,y,z-1)
           if (z==1) then 
-             val(element)=-b3(glob_x,glob_y,glob_z)&
-                  & -a3(glob_x,glob_y,glob_z)
-             val(element) = val(element)/(deltah*&
-                  & deltah)
-             zt(1) = exp(-glob_y**2-glob_z**2)*exp(-glob_x)*(-val(element))  
+            val(element)=-b3(glob_x,glob_y,glob_z)&
+                 & -a3(glob_x,glob_y,glob_z)
+            val(element) = val(element)/(deltah*&
+                 & deltah)
+            zt(1) = exp(-glob_y**2-glob_z**2)*exp(-glob_x)*(-val(element))  
           else
-             val(element)=-b3(glob_x,glob_y,glob_z)&
-                  & -a3(glob_x,glob_y,glob_z)
-             val(element) = val(element)/(deltah*&
-                  & deltah)
-             icol(element)=(x-1)*idim*idim+(y-1)*idim+(z-1)
-             element=element+1
+            val(element)=-b3(glob_x,glob_y,glob_z)&
+                 & -a3(glob_x,glob_y,glob_z)
+            val(element) = val(element)/(deltah*&
+                 & deltah)
+            icol(element)=(x-1)*idim*idim+(y-1)*idim+(z-1)
+            element=element+1
           endif
           !  term depending on     (x,y,z)
           val(element)=2*b1(glob_x,glob_y,glob_z)&
@@ -587,37 +589,37 @@ contains
           element=element+1                  
           !  term depending on     (x,y,z+1)
           if (z==idim) then 
-             val(element)=-b1(glob_x,glob_y,glob_z)
-             val(element) = val(element)/(deltah*&
-                  & deltah)
-             zt(1) = exp(-glob_y**2-glob_z**2)*exp(-glob_x)*(-val(element))  
+            val(element)=-b1(glob_x,glob_y,glob_z)
+            val(element) = val(element)/(deltah*&
+                 & deltah)
+            zt(1) = exp(-glob_y**2-glob_z**2)*exp(-glob_x)*(-val(element))  
           else
-             val(element)=-b1(glob_x,glob_y,glob_z)
-             val(element) = val(element)/(deltah*&
-                  & deltah)
-             icol(element)=(x-1)*idim*idim+(y-1)*idim+(z+1)
-             element=element+1
+            val(element)=-b1(glob_x,glob_y,glob_z)
+            val(element) = val(element)/(deltah*&
+                 & deltah)
+            icol(element)=(x-1)*idim*idim+(y-1)*idim+(z+1)
+            element=element+1
           endif
           !  term depending on     (x,y+1,z)
           if (y==idim) then 
-             val(element)=-b2(glob_x,glob_y,glob_z)
-             val(element) = val(element)/(deltah*&
-                  & deltah)
-             zt(1) = exp(-glob_y**2-glob_z**2)*exp(-glob_x)*(-val(element))  
+            val(element)=-b2(glob_x,glob_y,glob_z)
+            val(element) = val(element)/(deltah*&
+                 & deltah)
+            zt(1) = exp(-glob_y**2-glob_z**2)*exp(-glob_x)*(-val(element))  
           else
-             val(element)=-b2(glob_x,glob_y,glob_z)
-             val(element) = val(element)/(deltah*&
-                  & deltah)
-             icol(element)=(x-1)*idim*idim+(y)*idim+(z)
-             element=element+1
+            val(element)=-b2(glob_x,glob_y,glob_z)
+            val(element) = val(element)/(deltah*&
+                 & deltah)
+            icol(element)=(x-1)*idim*idim+(y)*idim+(z)
+            element=element+1
           endif
           !  term depending on     (x+1,y,z)
           if (x<idim) then 
-             val(element)=-b3(glob_x,glob_y,glob_z)
-             val(element) = val(element)/(deltah*&
-                  & deltah)
-             icol(element)=(x)*idim*idim+(y-1)*idim+(z)
-             element=element+1
+            val(element)=-b3(glob_x,glob_y,glob_z)
+            val(element) = val(element)/(deltah*&
+                 & deltah)
+            icol(element)=(x)*idim*idim+(y-1)*idim+(z)
+            element=element+1
           endif
           irow(1:element-1)=glob_row
           ia=glob_row
@@ -639,10 +641,10 @@ contains
     t2 = mpi_wtime()-t1
 
     if(info.ne.0) then
-       info=4010
-       ch_err='insert rout.'
-       call psb_errpush(info,name,a_err=ch_err)
-       goto 9999
+      info=4010
+      ch_err='insert rout.'
+      call psb_errpush(info,name,a_err=ch_err)
+      goto 9999
     end if
 
     deallocate(val,irow,icol)
@@ -653,10 +655,10 @@ contains
     call psb_barrier(ictxt)
     tasb = mpi_wtime()-t1
     if(info.ne.0) then
-       info=4010
-       ch_err='asb rout.'
-       call psb_errpush(info,name,a_err=ch_err)
-       goto 9999
+      info=4010
+      ch_err='asb rout.'
+      call psb_errpush(info,name,a_err=ch_err)
+      goto 9999
     end if
 
     call gamx2d(ictxt,'a',t2)
@@ -664,29 +666,29 @@ contains
     call gamx2d(ictxt,'a',tasb)
 
     if(iam.eq.psb_root_) then
-       write(*,'("The matrix has been generated and assembeld in ",a3," format.")')a%fida(1:3)
-       write(*,'("-pspins time   : ",es10.4)')tins
-       write(*,'("-insert time   : ",es10.4)')t2
-       write(*,'("-assembly time : ",es10.4)')tasb
+      write(*,'("The matrix has been generated and assembeld in ",a3," format.")')a%fida(1:3)
+      write(*,'("-pspins time   : ",es10.4)')tins
+      write(*,'("-insert time   : ",es10.4)')t2
+      write(*,'("-assembly time : ",es10.4)')tasb
     end if
 
     call psb_geasb(b,desc_a,info)
     call psb_geasb(t,desc_a,info)
     if(info.ne.0) then
-       info=4010
-       ch_err='asb rout.'
-       call psb_errpush(info,name,a_err=ch_err)
-       goto 9999
+      info=4010
+      ch_err='asb rout.'
+      call psb_errpush(info,name,a_err=ch_err)
+      goto 9999
     end if
 
     call psb_erractionrestore(err_act)
     return
-    
+
 9999 continue
     call psb_erractionrestore(err_act)
     if (err_act.eq.act_abort) then
-       call psb_error(ictxt)
-       return
+      call psb_error(ictxt)
+      return
     end if
     return
   end subroutine create_matrix
