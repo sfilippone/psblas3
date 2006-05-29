@@ -29,6 +29,54 @@
 !!$ 
 !!$  
 module psb_blacs_mod
+
+
+  interface psb_init
+    module procedure  psb_init
+  end interface
+
+  interface psb_exit
+    module procedure  psb_exit
+  end interface
+
+  interface psb_abort
+    module procedure  psb_abort
+  end interface
+
+  interface psb_info
+    module procedure psb_info
+  end interface
+  
+  interface psb_barrier
+    module procedure  psb_barrier
+  end interface
+
+  interface psb_bcast
+    module procedure psb_ibcasts, psb_ibcastv, psb_ibcastm,&
+         & psb_dbcasts, psb_dbcastv, psb_dbcastm,&
+         & psb_zbcasts, psb_zbcastv, psb_zbcastm
+  end interface
+
+
+  interface psb_amx
+    module procedure psb_iamxs, psb_iamxv, psb_iamxm,&
+         & psb_damxs, psb_damxv, psb_damxm,&
+         & psb_zamxs, psb_zamxv, psb_zamxm
+  end interface
+
+  interface psb_amn
+    module procedure psb_iamns, psb_iamnv, psb_iamnm,&
+         & psb_damns, psb_damnv, psb_damnm,&
+         & psb_zamns, psb_zamnv, psb_zamnm
+  end interface
+
+  interface psb_sum
+    module procedure psb_isums, psb_isumv, psb_isumm,&
+         & psb_dsums, psb_dsumv, psb_dsumm,&
+         & psb_zsums, psb_zsumv, psb_zsumm
+  end interface
+
+
   
   interface gebs2d
     module procedure igebs2ds, igebs2dv, igebs2dm,&
@@ -72,40 +120,6 @@ module psb_blacs_mod
     module procedure igamn2ds, igamn2dv, igamn2dm,&
          &           dgamn2ds, dgamn2dv, dgamn2dm,&
          &           zgamn2ds, zgamn2dv, zgamn2dm
-  end interface
-
-
-  interface psb_init
-    module procedure  psb_init
-  end interface
-
-  interface psb_exit
-    module procedure  psb_exit
-  end interface
-
-  interface psb_abort
-    module procedure  psb_abort
-  end interface
-
-  interface psb_info
-    module procedure psb_info
-  end interface
-  
-  interface psb_barrier
-    module procedure  psb_barrier
-  end interface
-
-  interface psb_bcast
-    module procedure psb_ibcasts, psb_ibcastv, psb_ibcastm,&
-         & psb_dbcasts, psb_dbcastv, psb_dbcastm,&
-         & psb_zbcasts, psb_zbcastv, psb_zbcastm
-  end interface
-
-
-  interface psb_amx
-    module procedure psb_iamxs, psb_iamxv, psb_iamxm,&
-         & psb_damxs, psb_damxv, psb_damxm,&
-         & psb_zamxs, psb_zamxv, psb_zamxm
   end interface
 
 
@@ -520,6 +534,360 @@ contains
       call gamx2d(ictxt,'A',dat,rrt=rt_) 
     endif
   end subroutine psb_zamxm
+
+
+
+  subroutine psb_iamns(ictxt,dat,rt,ia)
+    integer, intent(in)              :: ictxt
+    integer, intent(inout)  :: dat
+    integer, intent(in), optional    :: rt
+    integer, intent(inout), optional :: ia
+    
+    integer   :: rt_
+    
+    if (present(rt)) then 
+      rt_ = rt
+    else
+      rt_ = -1
+    endif
+    if (present(ia)) then 
+      call gamn2d(ictxt,'A',dat,ria=ia,rrt=rt_) 
+    else
+      call gamn2d(ictxt,'A',dat,rrt=rt_) 
+    endif
+  end subroutine psb_iamns
+
+  subroutine psb_iamnv(ictxt,dat,rt,ia)
+    integer, intent(in)              :: ictxt
+    integer, intent(inout)  :: dat(:)
+    integer, intent(in), optional    :: rt
+    integer, intent(inout), optional :: ia(:)
+    
+    integer   :: rt_
+    integer, allocatable :: cia(:)
+    
+    if (present(rt)) then 
+      rt_ = rt
+    else
+      rt_ = -1
+    endif
+    if (present(ia)) then 
+      allocate(cia(size(ia)))
+      call gamn2d(ictxt,'A',dat,ria=ia,cia=cia,rrt=rt_) 
+    else
+      call gamn2d(ictxt,'A',dat,rrt=rt_) 
+    endif
+  end subroutine psb_iamnv
+
+  subroutine psb_iamnm(ictxt,dat,rt,ia)
+    integer, intent(in)              :: ictxt
+    integer, intent(inout)  :: dat(:,:)
+    integer, intent(in), optional    :: rt
+    integer, intent(inout), optional :: ia(:,:)
+    
+    integer   :: rt_
+    integer, allocatable :: cia(:,:)
+    
+    if (present(rt)) then 
+      rt_ = rt
+    else
+      rt_ = -1
+    endif
+    if (present(ia)) then 
+      allocate(cia(size(ia,1),size(ia,2)))
+      call gamn2d(ictxt,'A',dat,ria=ia,cia=cia,rrt=rt_) 
+    else
+      call gamn2d(ictxt,'A',dat,rrt=rt_) 
+    endif
+  end subroutine psb_iamnm
+
+
+  subroutine psb_damns(ictxt,dat,rt,ia)
+    integer, intent(in)              :: ictxt
+    real(kind(1.d0)), intent(inout)  :: dat
+    integer, intent(in), optional    :: rt
+    integer, intent(inout), optional :: ia
+    
+    integer   :: rt_
+    
+    if (present(rt)) then 
+      rt_ = rt
+    else
+      rt_ = -1
+    endif
+    if (present(ia)) then 
+      call gamn2d(ictxt,'A',dat,ria=ia,rrt=rt_) 
+    else
+      call gamn2d(ictxt,'A',dat,rrt=rt_) 
+    endif
+  end subroutine psb_damns
+
+  subroutine psb_damnv(ictxt,dat,rt,ia)
+    integer, intent(in)              :: ictxt
+    real(kind(1.d0)), intent(inout)  :: dat(:)
+    integer, intent(in), optional    :: rt
+    integer, intent(inout), optional :: ia(:)
+    
+    integer   :: rt_
+    integer, allocatable :: cia(:)
+    
+    if (present(rt)) then 
+      rt_ = rt
+    else
+      rt_ = -1
+    endif
+    if (present(ia)) then 
+      allocate(cia(size(ia)))
+      call gamn2d(ictxt,'A',dat,ria=ia,cia=cia,rrt=rt_) 
+    else
+      call gamn2d(ictxt,'A',dat,rrt=rt_) 
+    endif
+  end subroutine psb_damnv
+
+  subroutine psb_damnm(ictxt,dat,rt,ia)
+    integer, intent(in)              :: ictxt
+    real(kind(1.d0)), intent(inout)  :: dat(:,:)
+    integer, intent(in), optional    :: rt
+    integer, intent(inout), optional :: ia(:,:)
+    
+    integer   :: rt_
+    integer, allocatable :: cia(:,:)
+    
+    if (present(rt)) then 
+      rt_ = rt
+    else
+      rt_ = -1
+    endif
+    if (present(ia)) then 
+      allocate(cia(size(ia,1),size(ia,2)))
+      call gamn2d(ictxt,'A',dat,ria=ia,cia=cia,rrt=rt_) 
+    else
+      call gamn2d(ictxt,'A',dat,rrt=rt_) 
+    endif
+  end subroutine psb_damnm
+
+
+  subroutine psb_zamns(ictxt,dat,rt,ia)
+    integer, intent(in)              :: ictxt
+    complex(kind(1.d0)), intent(inout)  :: dat
+    integer, intent(in), optional    :: rt
+    integer, intent(inout), optional :: ia
+    
+    integer   :: rt_
+    
+    if (present(rt)) then 
+      rt_ = rt
+    else
+      rt_ = -1
+    endif
+    if (present(ia)) then 
+      call gamn2d(ictxt,'A',dat,ria=ia,rrt=rt_) 
+    else
+      call gamn2d(ictxt,'A',dat,rrt=rt_) 
+    endif
+  end subroutine psb_zamns
+
+  subroutine psb_zamnv(ictxt,dat,rt,ia)
+    integer, intent(in)              :: ictxt
+    complex(kind(1.d0)), intent(inout)  :: dat(:)
+    integer, intent(in), optional    :: rt
+    integer, intent(inout), optional :: ia(:)
+    
+    integer   :: rt_
+    integer, allocatable :: cia(:)
+    
+    if (present(rt)) then 
+      rt_ = rt
+    else
+      rt_ = -1
+    endif
+    if (present(ia)) then 
+      allocate(cia(size(ia)))
+      call gamn2d(ictxt,'A',dat,ria=ia,cia=cia,rrt=rt_) 
+    else
+      call gamn2d(ictxt,'A',dat,rrt=rt_) 
+    endif
+  end subroutine psb_zamnv
+
+  subroutine psb_zamnm(ictxt,dat,rt,ia)
+    integer, intent(in)              :: ictxt
+    complex(kind(1.d0)), intent(inout)  :: dat(:,:)
+    integer, intent(in), optional    :: rt
+    integer, intent(inout), optional :: ia(:,:)
+    
+    integer   :: rt_
+    integer, allocatable :: cia(:,:)
+    
+    if (present(rt)) then 
+      rt_ = rt
+    else
+      rt_ = -1
+    endif
+    if (present(ia)) then 
+      allocate(cia(size(ia,1),size(ia,2))) 
+      call gamn2d(ictxt,'A',dat,ria=ia,cia=cia,rrt=rt_) 
+    else
+      call gamn2d(ictxt,'A',dat,rrt=rt_) 
+    endif
+  end subroutine psb_zamnm
+
+
+
+  subroutine psb_isums(ictxt,dat,rt)
+    integer, intent(in)              :: ictxt
+    integer, intent(inout)  :: dat
+    integer, intent(in), optional    :: rt
+    
+    integer   :: rt_
+    
+    if (present(rt)) then 
+      rt_ = rt
+    else
+      rt_ = -1
+    endif
+
+    call gsum2d(ictxt,'A',dat,rrt=rt_) 
+
+  end subroutine psb_isums
+
+  subroutine psb_isumv(ictxt,dat,rt)
+    integer, intent(in)              :: ictxt
+    integer, intent(inout)  :: dat(:)
+    integer, intent(in), optional    :: rt
+    
+    integer   :: rt_
+    
+    if (present(rt)) then 
+      rt_ = rt
+    else
+      rt_ = -1
+    endif
+    
+    call gsum2d(ictxt,'A',dat,rrt=rt_) 
+  end subroutine psb_isumv
+
+  subroutine psb_isumm(ictxt,dat,rt)
+    integer, intent(in)              :: ictxt
+    integer, intent(inout)  :: dat(:,:)
+    integer, intent(in), optional    :: rt
+    
+    integer   :: rt_
+    
+    if (present(rt)) then 
+      rt_ = rt
+    else
+      rt_ = -1
+
+    endif
+
+    call gsum2d(ictxt,'A',dat,rrt=rt_) 
+
+  end subroutine psb_isumm
+
+
+  subroutine psb_dsums(ictxt,dat,rt)
+    integer, intent(in)              :: ictxt
+    real(kind(1.d0)), intent(inout)  :: dat
+    integer, intent(in), optional    :: rt
+    
+    integer   :: rt_
+    
+    if (present(rt)) then 
+      rt_ = rt
+    else
+      rt_ = -1
+    endif
+
+    call gsum2d(ictxt,'A',dat,rrt=rt_) 
+
+  end subroutine psb_dsums
+
+  subroutine psb_dsumv(ictxt,dat,rt)
+    integer, intent(in)              :: ictxt
+    real(kind(1.d0)), intent(inout)  :: dat(:)
+    integer, intent(in), optional    :: rt
+    
+    integer   :: rt_
+    
+    if (present(rt)) then 
+      rt_ = rt
+    else
+      rt_ = -1
+    endif
+
+    call gsum2d(ictxt,'A',dat,rrt=rt_) 
+
+  end subroutine psb_dsumv
+
+  subroutine psb_dsumm(ictxt,dat,rt)
+    integer, intent(in)              :: ictxt
+    real(kind(1.d0)), intent(inout)  :: dat(:,:)
+    integer, intent(in), optional    :: rt
+    
+    integer   :: rt_
+    
+    if (present(rt)) then 
+      rt_ = rt
+    else
+      rt_ = -1
+    endif
+    
+    call gsum2d(ictxt,'A',dat,rrt=rt_) 
+
+  end subroutine psb_dsumm
+
+
+  subroutine psb_zsums(ictxt,dat,rt)
+    integer, intent(in)              :: ictxt
+    complex(kind(1.d0)), intent(inout)  :: dat
+    integer, intent(in), optional    :: rt
+    
+    integer   :: rt_
+    
+    if (present(rt)) then 
+      rt_ = rt
+    else
+      rt_ = -1
+    endif
+
+    call gsum2d(ictxt,'A',dat,rrt=rt_) 
+
+  end subroutine psb_zsums
+
+  subroutine psb_zsumv(ictxt,dat,rt)
+    integer, intent(in)              :: ictxt
+    complex(kind(1.d0)), intent(inout)  :: dat(:)
+    integer, intent(in), optional    :: rt
+    
+    integer   :: rt_
+    integer, allocatable :: cia(:)
+    
+    if (present(rt)) then 
+      rt_ = rt
+    else
+      rt_ = -1
+    endif
+
+    call gsum2d(ictxt,'A',dat,rrt=rt_) 
+
+  end subroutine psb_zsumv
+
+  subroutine psb_zsumm(ictxt,dat,rt)
+    integer, intent(in)              :: ictxt
+    complex(kind(1.d0)), intent(inout)  :: dat(:,:)
+    integer, intent(in), optional    :: rt
+    
+    integer   :: rt_
+    
+    if (present(rt)) then 
+      rt_ = rt
+    else
+      rt_ = -1
+    endif
+    
+    call gsum2d(ictxt,'A',dat,rrt=rt_) 
+
+  end subroutine psb_zsumm
 
 
 

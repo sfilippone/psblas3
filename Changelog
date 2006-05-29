@@ -1,6 +1,8 @@
 Changelog. A lot less detailed than usual, at least for past
 history. 
 
+2006/05/29: Added BLACS-like routines for broadcast and reduction.
+
 2006/05/25: Added environment management routines.
 
 2006/05/03: Bug fixes, plus some change in the internals for SPINS,
