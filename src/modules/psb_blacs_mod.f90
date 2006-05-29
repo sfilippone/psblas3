@@ -74,8 +74,469 @@ module psb_blacs_mod
          &           zgamn2ds, zgamn2dv, zgamn2dm
   end interface
 
+
+  interface psb_init
+    module procedure  psb_init
+  end interface
+
+  interface psb_exit
+    module procedure  psb_exit
+  end interface
+
+  interface psb_abort
+    module procedure  psb_abort
+  end interface
+
+  interface psb_info
+    module procedure psb_info
+  end interface
+  
+  interface psb_barrier
+    module procedure  psb_barrier
+  end interface
+
+  interface psb_bcast
+    module procedure psb_ibcasts, psb_ibcastv, psb_ibcastm,&
+         & psb_dbcasts, psb_dbcastv, psb_dbcastm,&
+         & psb_zbcasts, psb_zbcastv, psb_zbcastm
+  end interface
+
+
+  interface psb_amx
+    module procedure psb_iamxs, psb_iamxv, psb_iamxm,&
+         & psb_damxs, psb_damxv, psb_damxm,&
+         & psb_zamxs, psb_zamxv, psb_zamxm
+  end interface
+
+
  
 contains 
+
+
+  
+
+  subroutine psb_init(ictxt,np)
+    use psb_const_mod
+    use psb_error_mod
+    integer, intent(out) :: ictxt
+    integer, intent(in), optional :: np
+    
+    integer :: np_, npavail, iam, info
+    character(len=20), parameter :: name='psb_init'
+    
+    call blacs_pinfo(iam, npavail)
+    call blacs_get(izero, izero, ictxt)
+    
+    if (present(np)) then 
+      np_ = max(1,min(np,npavail))
+    else
+      np_ = npavail
+    endif
+    
+    call blacs_gridinit(ictxt, 'R', np_, ione)
+    
+    if (present(np)) then 
+      if (np_ < np) then 
+        info = 2011
+        call psb_errpush(info,name)
+        call psb_error(ictxt)
+      endif
+    endif
+        
+  end subroutine psb_init
+
+  subroutine psb_exit(ictxt)
+    integer, intent(in) :: ictxt
+    
+    integer  :: nprow, npcol, myprow, mypcol
+    
+    call blacs_gridinfo(ictxt, nprow, npcol, myprow, mypcol)
+    if ((myprow >=0).and.(mypcol>=0)) then
+      call blacs_gridexit(ictxt)
+    end if
+    call blacs_exit(0)
+    
+  end subroutine psb_exit
+
+
+  subroutine psb_barrier(ictxt)
+    integer, intent(in) :: ictxt
+    
+    call blacs_barrier(ictxt,'All')
+    
+  end subroutine psb_barrier
+
+
+  subroutine psb_abort(ictxt)
+    integer, intent(in) :: ictxt
+    
+    call blacs_abort(ictxt,-1)
+    
+  end subroutine psb_abort
+
+
+  subroutine psb_info(ictxt,iam,np)
+    integer, intent(in)  :: ictxt
+    integer, intent(out) :: iam, np
+    integer              :: nprow, npcol, myprow, mypcol
+    
+    call blacs_gridinfo(ictxt, nprow, npcol, myprow, mypcol)
+    
+    iam = myprow
+    np  = nprow
+    
+  end subroutine psb_info
+
+    
+  subroutine psb_ibcasts(ictxt,dat,root)
+    integer, intent(in)      :: ictxt,root
+    integer, intent(inout)   :: dat
+
+    integer  :: iam, np
+
+    call psb_info(ictxt,iam,np)
+    
+    if (iam==root) then 
+      call gebs2d(ictxt,'A',dat)
+    else
+      call gebr2d(ictxt,'A',dat,rrt=root)
+    endif
+  end subroutine psb_ibcasts
+
+  subroutine psb_ibcastv(ictxt,dat,root)
+    integer, intent(in)    :: ictxt,root
+    integer, intent(inout) :: dat(:)
+
+    integer  :: iam, np
+
+    call psb_info(ictxt,iam,np)
+    
+    if (iam==root) then 
+      call gebs2d(ictxt,'A',dat)
+    else
+      call gebr2d(ictxt,'A',dat,rrt=root)
+    endif
+  end subroutine psb_ibcastv
+    
+  subroutine psb_ibcastm(ictxt,dat,root)
+    integer, intent(in)    :: ictxt,root
+    integer, intent(inout) :: dat(:,:)
+
+    integer  :: iam, np
+
+    call psb_info(ictxt,iam,np)
+    
+    if (iam==root) then 
+      call gebs2d(ictxt,'A',dat)
+    else
+      call gebr2d(ictxt,'A',dat,rrt=root)
+    endif
+  end subroutine psb_ibcastm
+
+
+  subroutine psb_dbcasts(ictxt,dat,root)
+    integer, intent(in)      :: ictxt,root
+    real(kind(1.d0)), intent(inout)   :: dat
+
+    integer  :: iam, np
+
+    call psb_info(ictxt,iam,np)
+    
+    if (iam==root) then 
+      call gebs2d(ictxt,'A',dat)
+    else
+      call gebr2d(ictxt,'A',dat,rrt=root)
+    endif
+  end subroutine psb_dbcasts
+
+  subroutine psb_dbcastv(ictxt,dat,root)
+    integer, intent(in)    :: ictxt,root
+    real(kind(1.d0)), intent(inout) :: dat(:)
+
+    integer  :: iam, np
+
+    call psb_info(ictxt,iam,np)
+    
+    if (iam==root) then 
+      call gebs2d(ictxt,'A',dat)
+    else
+      call gebr2d(ictxt,'A',dat,rrt=root)
+    endif
+  end subroutine psb_dbcastv
+    
+  subroutine psb_dbcastm(ictxt,dat,root)
+    integer, intent(in)    :: ictxt,root
+    real(kind(1.d0)), intent(inout) :: dat(:,:)
+
+    integer  :: iam, np
+
+    call psb_info(ictxt,iam,np)
+    
+    if (iam==root) then 
+      call gebs2d(ictxt,'A',dat)
+    else
+      call gebr2d(ictxt,'A',dat,rrt=root)
+    endif
+  end subroutine psb_dbcastm
+    
+
+  subroutine psb_zbcasts(ictxt,dat,root)
+    integer, intent(in)      :: ictxt,root
+    complex(kind(1.d0)), intent(inout)   :: dat
+
+    integer  :: iam, np
+
+    call psb_info(ictxt,iam,np)
+    
+    if (iam==root) then 
+      call gebs2d(ictxt,'A',dat)
+    else
+      call gebr2d(ictxt,'A',dat,rrt=root)
+    endif
+  end subroutine psb_zbcasts
+
+  subroutine psb_zbcastv(ictxt,dat,root)
+    integer, intent(in)    :: ictxt,root
+    complex(kind(1.d0)), intent(inout) :: dat(:)
+
+    integer  :: iam, np
+
+    call psb_info(ictxt,iam,np)
+    
+    if (iam==root) then 
+      call gebs2d(ictxt,'A',dat)
+    else
+      call gebr2d(ictxt,'A',dat,rrt=root)
+    endif
+  end subroutine psb_zbcastv
+    
+  subroutine psb_zbcastm(ictxt,dat,root)
+    integer, intent(in)    :: ictxt,root
+    complex(kind(1.d0)), intent(inout) :: dat(:,:)
+
+    integer  :: iam, np
+
+    call psb_info(ictxt,iam,np)
+    
+    if (iam==root) then 
+      call gebs2d(ictxt,'A',dat)
+    else
+      call gebr2d(ictxt,'A',dat,rrt=root)
+    endif
+  end subroutine psb_zbcastm
+
+
+
+  subroutine psb_iamxs(ictxt,dat,rt,ia)
+    integer, intent(in)              :: ictxt
+    integer, intent(inout)  :: dat
+    integer, intent(in), optional    :: rt
+    integer, intent(inout), optional :: ia
+    
+    integer   :: rt_
+    
+    if (present(rt)) then 
+      rt_ = rt
+    else
+      rt_ = -1
+    endif
+    if (present(ia)) then 
+      call gamx2d(ictxt,'A',dat,ria=ia,rrt=rt_) 
+    else
+      call gamx2d(ictxt,'A',dat,rrt=rt_) 
+    endif
+  end subroutine psb_iamxs
+
+  subroutine psb_iamxv(ictxt,dat,rt,ia)
+    integer, intent(in)              :: ictxt
+    integer, intent(inout)  :: dat(:)
+    integer, intent(in), optional    :: rt
+    integer, intent(inout), optional :: ia(:)
+    
+    integer   :: rt_
+    integer, allocatable :: cia(:)
+    
+    if (present(rt)) then 
+      rt_ = rt
+    else
+      rt_ = -1
+    endif
+    if (present(ia)) then 
+      allocate(cia(size(ia)))
+      call gamx2d(ictxt,'A',dat,ria=ia,cia=cia,rrt=rt_) 
+    else
+      call gamx2d(ictxt,'A',dat,rrt=rt_) 
+    endif
+  end subroutine psb_iamxv
+
+  subroutine psb_iamxm(ictxt,dat,rt,ia)
+    integer, intent(in)              :: ictxt
+    integer, intent(inout)  :: dat(:,:)
+    integer, intent(in), optional    :: rt
+    integer, intent(inout), optional :: ia(:,:)
+    
+    integer   :: rt_
+    integer, allocatable :: cia(:,:)
+    
+    if (present(rt)) then 
+      rt_ = rt
+    else
+      rt_ = -1
+    endif
+    if (present(ia)) then 
+      allocate(cia(size(ia,1),size(ia,2)))
+      call gamx2d(ictxt,'A',dat,ria=ia,cia=cia,rrt=rt_) 
+    else
+      call gamx2d(ictxt,'A',dat,rrt=rt_) 
+    endif
+  end subroutine psb_iamxm
+
+
+  subroutine psb_damxs(ictxt,dat,rt,ia)
+    integer, intent(in)              :: ictxt
+    real(kind(1.d0)), intent(inout)  :: dat
+    integer, intent(in), optional    :: rt
+    integer, intent(inout), optional :: ia
+    
+    integer   :: rt_
+    
+    if (present(rt)) then 
+      rt_ = rt
+    else
+      rt_ = -1
+    endif
+    if (present(ia)) then 
+      call gamx2d(ictxt,'A',dat,ria=ia,rrt=rt_) 
+    else
+      call gamx2d(ictxt,'A',dat,rrt=rt_) 
+    endif
+  end subroutine psb_damxs
+
+  subroutine psb_damxv(ictxt,dat,rt,ia)
+    integer, intent(in)              :: ictxt
+    real(kind(1.d0)), intent(inout)  :: dat(:)
+    integer, intent(in), optional    :: rt
+    integer, intent(inout), optional :: ia(:)
+    
+    integer   :: rt_
+    integer, allocatable :: cia(:)
+    
+    if (present(rt)) then 
+      rt_ = rt
+    else
+      rt_ = -1
+    endif
+    if (present(ia)) then 
+      allocate(cia(size(ia)))
+      call gamx2d(ictxt,'A',dat,ria=ia,cia=cia,rrt=rt_) 
+    else
+      call gamx2d(ictxt,'A',dat,rrt=rt_) 
+    endif
+  end subroutine psb_damxv
+
+  subroutine psb_damxm(ictxt,dat,rt,ia)
+    integer, intent(in)              :: ictxt
+    real(kind(1.d0)), intent(inout)  :: dat(:,:)
+    integer, intent(in), optional    :: rt
+    integer, intent(inout), optional :: ia(:,:)
+    
+    integer   :: rt_
+    integer, allocatable :: cia(:,:)
+    
+    if (present(rt)) then 
+      rt_ = rt
+    else
+      rt_ = -1
+    endif
+    if (present(ia)) then 
+      allocate(cia(size(ia,1),size(ia,2)))
+      call gamx2d(ictxt,'A',dat,ria=ia,cia=cia,rrt=rt_) 
+    else
+      call gamx2d(ictxt,'A',dat,rrt=rt_) 
+    endif
+  end subroutine psb_damxm
+
+
+  subroutine psb_zamxs(ictxt,dat,rt,ia)
+    integer, intent(in)              :: ictxt
+    complex(kind(1.d0)), intent(inout)  :: dat
+    integer, intent(in), optional    :: rt
+    integer, intent(inout), optional :: ia
+    
+    integer   :: rt_
+    
+    if (present(rt)) then 
+      rt_ = rt
+    else
+      rt_ = -1
+    endif
+    if (present(ia)) then 
+      call gamx2d(ictxt,'A',dat,ria=ia,rrt=rt_) 
+    else
+      call gamx2d(ictxt,'A',dat,rrt=rt_) 
+    endif
+  end subroutine psb_zamxs
+
+  subroutine psb_zamxv(ictxt,dat,rt,ia)
+    integer, intent(in)              :: ictxt
+    complex(kind(1.d0)), intent(inout)  :: dat(:)
+    integer, intent(in), optional    :: rt
+    integer, intent(inout), optional :: ia(:)
+    
+    integer   :: rt_
+    integer, allocatable :: cia(:)
+    
+    if (present(rt)) then 
+      rt_ = rt
+    else
+      rt_ = -1
+    endif
+    if (present(ia)) then 
+      allocate(cia(size(ia)))
+      call gamx2d(ictxt,'A',dat,ria=ia,cia=cia,rrt=rt_) 
+    else
+      call gamx2d(ictxt,'A',dat,rrt=rt_) 
+    endif
+  end subroutine psb_zamxv
+
+  subroutine psb_zamxm(ictxt,dat,rt,ia)
+    integer, intent(in)              :: ictxt
+    complex(kind(1.d0)), intent(inout)  :: dat(:,:)
+    integer, intent(in), optional    :: rt
+    integer, intent(inout), optional :: ia(:,:)
+    
+    integer   :: rt_
+    integer, allocatable :: cia(:,:)
+    
+    if (present(rt)) then 
+      rt_ = rt
+    else
+      rt_ = -1
+    endif
+    if (present(ia)) then 
+      allocate(cia(size(ia,1),size(ia,2))) 
+      call gamx2d(ictxt,'A',dat,ria=ia,cia=cia,rrt=rt_) 
+    else
+      call gamx2d(ictxt,'A',dat,rrt=rt_) 
+    endif
+  end subroutine psb_zamxm
+
+
+
+
+
+
+
+
+
+!
+!
+!
+!
+!
+!
+!
+
   
   subroutine igebs2ds(ictxt,scope,dat,top)
     integer, intent(in)   :: ictxt,dat

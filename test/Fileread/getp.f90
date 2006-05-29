@@ -29,7 +29,7 @@
 !!$ 
 !!$  
 MODULE GETP
-
+  use psb_sparse_mod
   PUBLIC GET_PARMS
   PUBLIC PR_USAGE
 
@@ -48,7 +48,7 @@ CONTAINS
     INTEGER      :: IARGC, NP, IAM
     EXTERNAL     IARGC
     INTEGER      :: INPARMS(40), IP 
-    
+
     call psb_info(ictxt,iam,np)
     IF (IAM==0) THEN
       ! Read Input Parameters
@@ -64,20 +64,20 @@ CONTAINS
           INPARMS(I) = IACHAR(MTRX_FILE(I:I))
         END DO
         ! Broadcast parameters to all processors
-        CALL IGEBS2D(ICTXT,'ALL',' ',40,1,INPARMS,40)
+        call psb_bcast(ictxt,inparms(1:40),0)
 
         ! Convert strings in array
         DO I = 1, LEN(CMETHD)
           INPARMS(I) = IACHAR(CMETHD(I:I))
         END DO
         ! Broadcast parameters to all processors
-        CALL IGEBS2D(ICTXT,'ALL',' ',40,1,INPARMS,40)
+        call psb_bcast(ictxt,inparms(1:40),0)
 
         DO I = 1, LEN(AFMT)
           INPARMS(I) = IACHAR(AFMT(I:I))
         END DO
         ! Broadcast parameters to all processors
-        CALL IGEBS2D(ICTXT,'ALL',' ',40,1,INPARMS,40)
+        call psb_bcast(ictxt,inparms(1:40),0)
 
         READ(*,*) IPART
         IF (IP.GE.5) THEN
@@ -118,50 +118,52 @@ CONTAINS
         INPARMS(4) = ITRACE
         INPARMS(5) = IPREC
         INPARMS(6) = NOVR
-        CALL IGEBS2D(ICTXT,'ALL',' ',6,1,INPARMS,6)
-        CALL DGEBS2D(ICTXT,'ALL',' ',1,1,EPS,1)
+        call psb_bcast(ictxt,inparms(1:6),0)
+        call psb_bcast(ictxt,eps,0)
 
-          write(*,'("Solving matrix       : ",a40)')mtrx_file      
-          write(*,'("Number of processors : ",i3)')nprow
-          write(*,'("Data distribution    : ",i2)')ipart
-          write(*,'("Preconditioner       : ",i2)')iprec
-          if(iprec.gt.2) write(*,'("Overlapping levels   : ",i2)')novr
-          write(*,'("Iterative method     : ",a40)')cmethd
-          write(*,'("Storage format       : ",a3)')afmt(1:3)
-          write(*,'(" ")')
+        write(*,'("Solving matrix       : ",a40)')mtrx_file      
+        write(*,'("Number of processors : ",i3)')nprow
+        write(*,'("Data distribution    : ",i2)')ipart
+        write(*,'("Preconditioner       : ",i2)')iprec
+        if(iprec.gt.2) write(*,'("Overlapping levels   : ",i2)')novr
+        write(*,'("Iterative method     : ",a40)')cmethd
+        write(*,'("Storage format       : ",a3)')afmt(1:3)
+        write(*,'(" ")')
       else
-        CALL PR_USAGE(0)
-        CALL BLACS_ABORT(ICTXT,-1)
-        STOP 1
-      END IF
-    ELSE
+        call pr_usage(0)
+        call psb_exit(ictxt)
+        stop 1
+      end if
+    else
       ! Receive Parameters
-      CALL IGEBR2D(ICTXT,'A',' ',40,1,INPARMS,40,0,0)
-      DO I = 1, 40
-        MTRX_FILE(I:I) = ACHAR(INPARMS(I))
-      END DO
-      
-      CALL IGEBR2D(ICTXT,'A',' ',40,1,INPARMS,40,0,0)
+      call psb_bcast(ictxt,inparms(1:40),0)
+
+      do i = 1, 40
+        mtrx_file(i:i) = achar(inparms(i))
+      end do
+      call psb_bcast(ictxt,inparms(1:40),0)
+
       DO I = 1, 40
         CMETHD(I:I) = ACHAR(INPARMS(I))
       END DO
 
-      CALL IGEBR2D(ICTXT,'A',' ',40,1,INPARMS,40,0,0)
+      call psb_bcast(ictxt,inparms(1:40),0)
       DO I = 1, LEN(AFMT)
         AFMT(I:I) = ACHAR(INPARMS(I))
       END DO
-      
-      CALL IGEBR2D(ICTXT,'A',' ',6,1,INPARMS,6,0,0)
 
-      IPART  =  INPARMS(1) 
-      ISTOPC =  INPARMS(2) 
-      ITMAX  =  INPARMS(3) 
-      ITRACE =  INPARMS(4) 
-      IPREC  =  INPARMS(5) 
-      NOVR     =  INPARMS(6) 
-      CALL DGEBR2D(ICTXT,'A',' ',1,1,EPS,1,0,0)     
-    END IF
-    
+      call psb_bcast(ictxt,inparms(1:6),0)
+
+      ipart  =  inparms(1) 
+      istopc =  inparms(2) 
+      itmax  =  inparms(3) 
+      itrace =  inparms(4) 
+      iprec  =  inparms(5) 
+      novr     =  inparms(6) 
+      call psb_bcast(ictxt,eps,0)
+
+    end if
+
   END SUBROUTINE GET_PARMS
   SUBROUTINE PR_USAGE(IOUT)
     INTEGER IOUT

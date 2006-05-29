@@ -632,28 +632,4 @@ Module psb_tools_mod
      end subroutine psb_cddec
   end interface
 
-  interface psb_init
-    subroutine psb_init(ictxt,np)
-      integer, intent(out) :: ictxt
-      integer, intent(in), optional :: np
-    end subroutine psb_init
-  end interface
-  interface psb_exit
-    subroutine psb_exit(ictxt)
-      integer, intent(in) :: ictxt
-    end subroutine psb_exit
-  end interface
-  interface psb_info
-    subroutine psb_info(ictxt,iam,np)
-      integer, intent(in)  :: ictxt
-      integer, intent(out) :: iam, np
-    end subroutine psb_info
-  end interface
-  
-  interface psb_barrier
-    subroutine psb_barrier(ictxt)
-      integer, intent(in) :: ictxt
-    end subroutine psb_barrier
-  end interface
-
 end module psb_tools_mod

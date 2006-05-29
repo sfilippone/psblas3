@@ -216,7 +216,7 @@ program df_sample
   t2 = mpi_wtime() - t1
   
   
-  call gamx2d(ictxt, 'a', t2)
+  call psb_amx(ictxt, t2)
   
   if (amroot) then
      write(*,'(" ")')
@@ -262,7 +262,7 @@ program df_sample
   end if
   
   
-  call gamx2d(ictxt,'a',tprec)
+  call psb_amx(ictxt, tprec)
   
   if(amroot) then
      write(*,'("Preconditioner time: ",es10.4)')tprec
@@ -290,7 +290,7 @@ program df_sample
   endif
   call blacs_barrier(ictxt,'all')
   t2 = mpi_wtime() - t1
-  call gamx2d(ictxt,'a',t2)
+  call psb_amx(ictxt,t2)
   call psb_geaxpby(1.d0,b_col,0.d0,r_col,desc_a,info)
   call psb_spmm(-1.d0,a,x_col,1.d0,r_col,desc_a,info)
   call psb_genrm2s(resmx,r_col,desc_a,info)

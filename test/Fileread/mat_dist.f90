@@ -165,17 +165,12 @@ contains
       nnzero = size(a_glob%aspk)
       nrhs   = 1
       ! broadcast informations to other processors
-      call gebs2d(ictxt, 'a', nrow)
-      call gebs2d(ictxt, 'a', ncol)
-      call gebs2d(ictxt, 'a', nnzero)
-      call gebs2d(ictxt, 'a', nrhs)
-    else !(iam /= root)
-      ! receive informations
-      call gebr2d(ictxt, 'a', nrow)
-      call gebr2d(ictxt, 'a', ncol)
-      call gebr2d(ictxt, 'a', nnzero)
-      call gebr2d(ictxt, 'a', nrhs)
-    end if   ! allocate integer work area
+    endif
+    call psb_bcast(ictxt, nrow,root)
+    call psb_bcast(ictxt, ncol,root)
+    call psb_bcast(ictxt, nnzero,root)
+    call psb_bcast(ictxt, nrhs,root)
+    
     liwork = max(np, nrow + ncol)
     allocate(iwork(liwork), stat = info)
     if (info /= 0) then
@@ -597,18 +592,12 @@ contains
 
       nnzero = size(a_glob%aspk)
       nrhs   = 1
-      ! broadcast informations to other processors
-      call igebs2d(ictxt, 'a', ' ', 1, 1, nrow, 1)
-      call igebs2d(ictxt, 'a', ' ', 1, 1, ncol, 1)
-      call igebs2d(ictxt, 'a', ' ', 1, 1, nnzero, 1)
-      call igebs2d(ictxt, 'a', ' ', 1, 1, nrhs, 1)
-    else !(iam /= root)
-      ! receive informations
-      call igebr2d(ictxt, 'a', ' ', 1, 1, nrow, 1, root, 0)
-      call igebr2d(ictxt, 'a', ' ', 1, 1, ncol, 1, root, 0)
-      call igebr2d(ictxt, 'a', ' ', 1, 1, nnzero, 1, root, 0)
-      call igebr2d(ictxt, 'a', ' ', 1, 1, nrhs, 1, root, 0)
-    end if   ! allocate integer work area
+    end if
+    ! broadcast informations to other processors
+    call psb_bcast(ictxt,nrow, root)
+    call psb_bcast(ictxt,ncol, root)
+    call psb_bcast(ictxt,nnzero, root)
+    call psb_bcast(ictxt,nrhs, root)
     liwork = max(np, nrow + ncol)
     allocate(iwork(liwork), stat = info)
     if (info /= 0) then
@@ -947,18 +936,12 @@ contains
       endif
       nnzero = size(a_glob%aspk)
       nrhs   = 1
-      ! broadcast informations to other processors
-      call gebs2d(ictxt, 'a', nrow)
-      call gebs2d(ictxt, 'a', ncol)
-      call gebs2d(ictxt, 'a', nnzero)
-      call gebs2d(ictxt, 'a', nrhs)
-    else !(iam /= root)
-      ! receive informations
-      call gebr2d(ictxt, 'a', nrow)
-      call gebr2d(ictxt, 'a', ncol)
-      call gebr2d(ictxt, 'a', nnzero)
-      call gebr2d(ictxt, 'a', nrhs)
-    end if   ! allocate integer work area
+    endif
+    ! broadcast informations to other processors
+    call psb_bcast(ictxt,nrow, root)
+    call psb_bcast(ictxt,ncol, root)
+    call psb_bcast(ictxt,nnzero, root)
+    call psb_bcast(ictxt,nrhs, root)
     liwork = max(np, nrow + ncol)
     allocate(iwork(liwork), stat = info)
     if (info /= 0) then
@@ -1380,18 +1363,12 @@ contains
       
       nnzero = size(a_glob%aspk)
       nrhs   = 1
-      ! broadcast informations to other processors
-      call gebs2d(ictxt, 'a', nrow)
-      call gebs2d(ictxt, 'a', ncol)
-      call gebs2d(ictxt, 'a', nnzero)
-      call gebs2d(ictxt, 'a', nrhs)
-    else !(iam /= root)
-      ! receive informations
-      call gebr2d(ictxt, 'a', nrow)
-      call gebr2d(ictxt, 'a', ncol)
-      call gebr2d(ictxt, 'a', nnzero)
-      call gebr2d(ictxt, 'a', nrhs)
-    end if   ! allocate integer work area
+    end if
+    ! broadcast informations to other processors
+    call psb_bcast(ictxt,nrow, root)
+    call psb_bcast(ictxt,ncol, root)
+    call psb_bcast(ictxt,nnzero, root)
+    call psb_bcast(ictxt,nrhs, root)
     liwork = max(np, nrow + ncol)
     allocate(iwork(liwork), stat = info)
     if (info /= 0) then

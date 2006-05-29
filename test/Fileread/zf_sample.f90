@@ -217,7 +217,7 @@ program zf_sample
   t2 = mpi_wtime() - t1
   
   
-  call gamx2d(ictxt, 'a', t2)
+  call psb_amx(ictxt, t2)
   
   if (amroot) then
      write(*,'(" ")')
@@ -262,7 +262,7 @@ program zf_sample
   end if
   
   
-  call gamx2d(ictxt,'a',tprec)
+  call psb_amx(ictxt,tprec)
   
   if(amroot) then
      write(*,'("Preconditioner time: ",es10.4)')tprec
@@ -281,7 +281,7 @@ program zf_sample
   endif
   call blacs_barrier(ictxt,'all')
   t2 = mpi_wtime() - t1
-  call gamx2d(ictxt,'a',t2)
+  call psb_amx(ictxt,t2)
   call psb_geaxpby(zone,b_col,zzero,r_col,desc_a,info)
   call psb_spmm(-zone,a,x_col,zone,r_col,desc_a,info)
   call psb_genrm2s(resmx,r_col,desc_a,info)

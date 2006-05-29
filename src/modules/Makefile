@@ -17,6 +17,7 @@ psb_realloc_mod.o : psb_error_mod.o
 psb_spmat_type.o : psb_realloc_mod.o psb_const_mod.o
 psb_error_mod.o: psb_const_mod.o
 psb_const_mod.f90: psb_const.fh
+psb_blacs_mod.o	: psb_const_mod.o psb_error_mod.o
 
 lib: $(MODULES) $(OBJS)
 	$(AR) $(LIBDIR)/$(LIBNAME) $(MODULES) $(OBJS)
