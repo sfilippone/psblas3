@@ -1,4 +1,5 @@
-\section{Data management and environment handling  routines}
+\section{Data management, environment handling  and auxiliary
+  communication routines}
 \label{sec:toolsrout}
 
 \subroutine{psb\_init}{Initializes PSBLAS parallel environment}
@@ -107,6 +108,21 @@ Specified as: an integer variable.
 This subroutine acts as a synchronization point for  the  PSBLAS
 parallel virtual  machine. As such, it must be called by all
 participating processes. 
+\begin{description}
+\item[\bf  On Entry ]
+\item[icontxt] the communication context identifying the virtual
+  parallel machine.\\
+Scope:{\bf global}.\\
+Type:{\bf required}.\\
+Specified as: an integer variable.
+\end{description}
+
+
+\subroutine{psb\_abort}{Abort a computation}
+
+\syntax{call psb\_abort}{ictxt}
+
+This subroutine aborts computation on the parallel virtual machine. 
 \begin{description}
 \item[\bf  On Entry ]
 \item[icontxt] the communication context identifying the virtual
@@ -974,6 +990,234 @@ Scope: {\bf local} \\
 Type: {\bf required}\\
 Specified as: an integer variable.
 \end{description}
+
+
+\subroutine{psb\_bcast}{Broadcast data}
+
+\syntax{call psb\_bcast}{ictxt, dat, root}
+
+This subroutine implements a broadcast operation based on the
+underlying communication library. 
+\begin{description}
+\item[\bf  On Entry ]
+\item[icontxt] the communication context identifying the virtual
+  parallel machine.\\
+Scope:{\bf global}.\\
+Type:{\bf required}.\\
+Specified as: an integer variable.
+\item[dat] On the root process, the data to be broadcast.\\
+Scope:{\bf global}.\\
+Type:{\bf required}.\\
+Specified as: an integer, real or complex variable, which may be a
+scalar, or a rank 1 or 2 array. \
+Type, rank and size must agree on all processes.
+\item[root] Root process holding data to be broadcast.\\
+Scope:{\bf global}.\\
+Type:{\bf required}.\\
+Specified as: an integer value $0<= root <= np-1$. \
+\end{description}
+
+
+\begin{description}
+\item[\bf On Return]
+\item[dat] On processes other than  root, the data to be broadcast.\\
+Scope:{\bf global}.\\
+Type:{\bf required}.\\
+Specified as: an integer, real or complex variable, which may be a
+scalar, or a rank 1 or 2 array. \
+Type, rank and size must agree on all processes.
+\end{description}
+
+
+\subroutine{psb\_sum}{Global sum}
+
+\syntax{call psb\_sum}{ictxt, dat, dst}
+
+This subroutine implements a sum reduction  operation based on the
+underlying communication library. 
+\begin{description}
+\item[\bf  On Entry ]
+\item[icontxt] the communication context identifying the virtual
+  parallel machine.\\
+Scope:{\bf global}.\\
+Type:{\bf required}.\\
+Specified as: an integer variable.
+\item[dat] The local contribution to the global sum.\\
+Scope:{\bf global}.\\
+Type:{\bf required}.\\
+Specified as: an integer, real or complex variable, which may be a
+scalar, or a rank 1 or 2 array. \
+Type, rank and size must agree on all processes.
+\item[dst] Process to hold the final sum, or $-1$ to make it available
+  on all processes.\\
+Scope:{\bf global}.\\
+Type:{\bf optional}.\\
+Specified as: an integer value $-1<= dst <= np-1$, default -1. \
+\end{description}
+
+
+\begin{description}
+\item[\bf On Return]
+\item[dat] On destination process(es), the result of the sum operation.\\
+Scope:{\bf global}.\\
+Type:{\bf required}.\\
+Specified as: an integer, real or complex variable, which may be a
+scalar, or a rank 1 or 2 array. \\
+Type, rank and size must agree on all processes.
+\end{description}
+
+\subroutine{psb\_amx}{Global maximum absolute value}
+
+\syntax{call psb\_amx}{ictxt, dat, dst}
+
+This subroutine implements a maximum absolute value reduction
+operation based on the underlying communication library. 
+\begin{description}
+\item[\bf  On Entry ]
+\item[icontxt] the communication context identifying the virtual
+  parallel machine.\\
+Scope:{\bf global}.\\
+Type:{\bf required}.\\
+Specified as: an integer variable.
+\item[dat] The local contribution to the global maximum.\\
+Scope:{\bf local}.\\
+Type:{\bf required}.\\
+Specified as: an integer, real or complex variable, which may be a
+scalar, or a rank 1 or 2 array. \
+Type, rank and size must agree on all processes.
+\item[dst] Process to hold the final sum, or $-1$ to make it available
+  on all processes.\\
+Scope:{\bf global}.\\
+Type:{\bf optional}.\\
+Specified as: an integer value $-1<= dst <= np-1$, default -1. \\
+\end{description}
+
+
+\begin{description}
+\item[\bf On Return]
+\item[dat] On destination process(es), the result of the maximum operation.\\
+Scope:{\bf global}.\\
+Type:{\bf required}.\\
+Specified as: an integer, real or complex variable, which may be a
+scalar, or a rank 1 or 2 array. \
+Type, rank and size must agree on all processes.
+\end{description}
+
+\subroutine{psb\_amn}{Global minimum absolute value}
+
+\syntax{call psb\_amn}{ictxt, dat, dst}
+
+This subroutine implements a minimum absolute value reduction
+operation based on the underlying communication library. 
+\begin{description}
+\item[\bf  On Entry ]
+\item[icontxt] the communication context identifying the virtual
+  parallel machine.\\
+Scope:{\bf global}.\\
+Type:{\bf required}.\\
+Specified as: an integer variable.
+\item[dat] The local contribution to the global minimum.\\
+Scope:{\bf local}.\\
+Type:{\bf required}.\\
+Specified as: an integer, real or complex variable, which may be a
+scalar, or a rank 1 or 2 array. \
+Type, rank and size must agree on all processes.
+\item[dst] Process to hold the final sum, or $-1$ to make it available
+  on all processes.\\
+Scope:{\bf global}.\\
+Type:{\bf optional}.\\
+Specified as: an integer value $-1<= dst <= np-1$, default -1. \\
+\end{description}
+
+
+\begin{description}
+\item[\bf On Return]
+\item[dat] On destination process(es), the result of the minimum operation.\\
+Scope:{\bf global}.\\
+Type:{\bf required}.\\
+Specified as: an integer, real or complex variable, which may be a
+scalar, or a rank 1 or 2 array. \\
+Type, rank and size must agree on all processes.
+\end{description}
+
+
+\subroutine{psb\_snd}{Send data}
+
+\syntax{call psb\_snd}{ictxt, dat, dst, m}
+
+This subroutine sends a packet of data to a destination.
+\begin{description}
+\item[\bf  On Entry ]
+\item[icontxt] the communication context identifying the virtual
+  parallel machine.\\
+Scope:{\bf global}.\\
+Type:{\bf required}.\\
+Specified as: an integer variable.
+\item[dat] The data to be sent.\\
+Scope:{\bf local}.\\
+Type:{\bf required}.\\
+Specified as: an integer, real or complex variable, which may be a
+scalar, or a rank 1 or 2 array. \
+Type and  rank must agree on sender and receiver process; if $m$ is
+not specified, size must agree as well. 
+\item[dst] Destination process.\\
+Scope:{\bf global}.\\
+Type:{\bf required}.\\
+Specified as: an integer value $0<= dst <= np-1$. \\
+\item[m] Number of rows.\\
+Scope:{\bf global}.\\
+Type:{\bf Optional}.\\
+Specified as: an integer value $0<= m <= size(dat,1)$. \\
+When $dat$ is a rank 2 array, specifies the number of rows to be sent
+independently of the leading dimension $size(dat,1)$; must have the
+same value on sending and receiving processes.
+\end{description}
+
+
+\begin{description}
+\item[\bf On Return]
+\end{description}
+
+\subroutine{psb\_rcv}{Receive data}
+
+\syntax{call psb\_rcv}{ictxt, dat, src, m}
+
+This subroutine receives a packet of data to a destination.
+\begin{description}
+\item[\bf  On Entry ]
+\item[icontxt] the communication context identifying the virtual
+  parallel machine.\\
+Scope:{\bf global}.\\
+Type:{\bf required}.\\
+Specified as: an integer variable.
+\item[src] Source process.\\
+Scope:{\bf global}.\\
+Type:{\bf required}.\\
+Specified as: an integer value $0<= src <= np-1$. \\
+\item[m] Number of rows.\\
+Scope:{\bf global}.\\
+Type:{\bf Optional}.\\
+Specified as: an integer value $0<= m <= size(dat,1)$. \\
+When $dat$ is a rank 2 array, specifies the number of rows to be sent
+independently of the leading dimension $size(dat,1)$; must have the
+same value on sending and receiving processes.
+\end{description}
+
+
+\begin{description}
+\item[\bf On Return]
+\item[dat] The data to be received.\\
+Scope:{\bf local}.\\
+Type:{\bf required}.\\
+Specified as: an integer, real or complex variable, which may be a
+scalar, or a rank 1 or 2 array. \
+Type and  rank must agree on sender and receiver process; if $m$ is
+not specified, size must agree as well. 
+\end{description}
+
+
+
+
 
 %%% Local Variables: 
 %%% mode: latex

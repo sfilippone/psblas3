@@ -58,6 +58,19 @@ module psb_blacs_mod
   end interface
 
 
+  interface psb_snd
+    module procedure psb_isnds, psb_isndv, psb_isndm,&
+         & psb_dsnds, psb_dsndv, psb_dsndm,&
+         & psb_zsnds, psb_zsndv, psb_zsndm
+  end interface
+
+  interface psb_rcv
+    module procedure psb_ircvs, psb_ircvv, psb_ircvm,&
+         & psb_drcvs, psb_drcvv, psb_drcvm,&
+         & psb_zrcvs, psb_zrcvv, psb_zrcvm
+  end interface
+
+
   interface psb_amx
     module procedure psb_iamxs, psb_iamxv, psb_iamxm,&
          & psb_damxs, psb_damxv, psb_damxm,&
@@ -89,7 +102,6 @@ module psb_blacs_mod
          &           dgebr2ds, dgebr2dv, dgebr2dm,&
          &           zgebr2ds, zgebr2dv, zgebr2dm    
   end interface
-
 
   interface gesd2d
     module procedure igesd2ds, igesd2dv, igesd2dm,&
@@ -892,6 +904,181 @@ contains
 
 
 
+  subroutine psb_isnds(ictxt,dat,dst)
+    integer, intent(in)  :: ictxt
+    integer, intent(in)  :: dat
+    integer, intent(in)  :: dst
+    
+
+    call gesd2d(ictxt,dat,dst,0) 
+
+  end subroutine psb_isnds
+
+  subroutine psb_isndv(ictxt,dat,dst)
+    integer, intent(in)  :: ictxt
+    integer, intent(in)  :: dat(:)
+    integer, intent(in)  :: dst
+
+    call gesd2d(ictxt,dat,dst,0) 
+
+  end subroutine psb_isndv
+
+  subroutine psb_isndm(ictxt,dat,dst)
+    integer, intent(in)  :: ictxt
+    integer, intent(in)  :: dat(:,:)
+    integer, intent(in)  :: dst
+
+    call gesd2d(ictxt,dat,dst,0) 
+
+  end subroutine psb_isndm
+
+
+  subroutine psb_dsnds(ictxt,dat,dst)
+    integer, intent(in)  :: ictxt
+    real(kind(1.d0)), intent(in)  :: dat
+    integer, intent(in)  :: dst
+    
+
+    call gesd2d(ictxt,dat,dst,0) 
+
+  end subroutine psb_dsnds
+
+  subroutine psb_dsndv(ictxt,dat,dst)
+    integer, intent(in)  :: ictxt
+    real(kind(1.d0)), intent(in)  :: dat(:)
+    integer, intent(in)  :: dst
+
+    call gesd2d(ictxt,dat,dst,0) 
+
+  end subroutine psb_dsndv
+
+  subroutine psb_dsndm(ictxt,dat,dst)
+    integer, intent(in)  :: ictxt
+    real(kind(1.d0)), intent(in)  :: dat(:,:)
+    integer, intent(in)  :: dst
+
+    call gesd2d(ictxt,dat,dst,0) 
+
+  end subroutine psb_dsndm
+
+
+  subroutine psb_zsnds(ictxt,dat,dst)
+    integer, intent(in)  :: ictxt
+    complex(kind(1.d0)), intent(in)  :: dat
+    integer, intent(in)  :: dst
+    
+
+    call gesd2d(ictxt,dat,dst,0) 
+
+  end subroutine psb_zsnds
+  
+  subroutine psb_zsndv(ictxt,dat,dst)
+    integer, intent(in)  :: ictxt
+    complex(kind(1.d0)), intent(in)  :: dat(:)
+    integer, intent(in)  :: dst
+
+    call gesd2d(ictxt,dat,dst,0) 
+
+  end subroutine psb_zsndv
+
+  subroutine psb_zsndm(ictxt,dat,dst)
+    integer, intent(in)  :: ictxt
+    complex(kind(1.d0)), intent(in)  :: dat(:,:)
+    integer, intent(in)  :: dst
+
+    call gesd2d(ictxt,dat,dst,0) 
+
+  end subroutine psb_zsndm
+
+
+
+  subroutine psb_ircvs(ictxt,dat,src)
+    integer, intent(in)  :: ictxt
+    integer, intent(inout)  :: dat
+    integer, intent(in)  :: src
+    
+
+    call gerv2d(ictxt,dat,src,0) 
+
+  end subroutine psb_ircvs
+
+  subroutine psb_ircvv(ictxt,dat,src)
+    integer, intent(in)  :: ictxt
+    integer, intent(inout)  :: dat(:)
+    integer, intent(in)  :: src
+
+    call gerv2d(ictxt,dat,src,0) 
+
+  end subroutine psb_ircvv
+
+  subroutine psb_ircvm(ictxt,dat,src)
+    integer, intent(in)  :: ictxt
+    integer, intent(inout)  :: dat(:,:)
+    integer, intent(in)  :: src
+
+    call gerv2d(ictxt,dat,src,0) 
+
+  end subroutine psb_ircvm
+
+
+  subroutine psb_drcvs(ictxt,dat,src)
+    integer, intent(in)  :: ictxt
+    real(kind(1.d0)), intent(inout)  :: dat
+    integer, intent(in)  :: src
+    
+
+    call gerv2d(ictxt,dat,src,0) 
+
+  end subroutine psb_drcvs
+
+  subroutine psb_drcvv(ictxt,dat,src)
+    integer, intent(in)  :: ictxt
+    real(kind(1.d0)), intent(inout)  :: dat(:)
+    integer, intent(in)  :: src
+
+    call gerv2d(ictxt,dat,src,0) 
+
+  end subroutine psb_drcvv
+
+  subroutine psb_drcvm(ictxt,dat,src)
+    integer, intent(in)  :: ictxt
+    real(kind(1.d0)), intent(inout)  :: dat(:,:)
+    integer, intent(in)  :: src
+
+    call gerv2d(ictxt,dat,src,0) 
+
+  end subroutine psb_drcvm
+
+
+  subroutine psb_zrcvs(ictxt,dat,src)
+    integer, intent(in)  :: ictxt
+    complex(kind(1.d0)), intent(inout)  :: dat
+    integer, intent(in)  :: src
+    
+
+    call gerv2d(ictxt,dat,src,0) 
+
+  end subroutine psb_zrcvs
+  
+  subroutine psb_zrcvv(ictxt,dat,src)
+    integer, intent(in)  :: ictxt
+    complex(kind(1.d0)), intent(inout)  :: dat(:)
+    integer, intent(in)  :: src
+
+    call gerv2d(ictxt,dat,src,0) 
+
+  end subroutine psb_zrcvv
+
+  subroutine psb_zrcvm(ictxt,dat,src)
+    integer, intent(in)  :: ictxt
+    complex(kind(1.d0)), intent(inout)  :: dat(:,:)
+    integer, intent(in)  :: src
+
+    call gerv2d(ictxt,dat,src,0) 
+
+  end subroutine psb_zrcvm
+
+
 
 
 
@@ -1662,11 +1849,13 @@ contains
     
   end subroutine dgesd2dv
 
-  subroutine dgesd2dm(ictxt,dat,rdst,cdst)
+  subroutine dgesd2dm(ictxt,dat,rdst,cdst,m)
     integer, intent(in)   :: ictxt
     real(kind(1.d0)), intent(in)   :: dat(:,:)
     integer, intent(in)  :: rdst,cdst
+    integer, intent(in), optional :: m
     
+    integer :: m_
     interface 
       subroutine dgesd2d(ictxt,m,n,v,ld,rd,cd)
         integer, intent(in)   :: ictxt,m,n,ld
@@ -1675,7 +1864,13 @@ contains
       end subroutine dgesd2d
     end interface
 
-    call dgesd2d(ictxt,size(dat,1),size(dat,2),dat,size(dat,1),rdst,cdst)
+    if (present(m)) then 
+      m_ = m
+    else
+      m_ = size(dat,1)
+    endif
+
+    call dgesd2d(ictxt,m_,size(dat,2),dat,size(dat,1),rdst,cdst)
     
   end subroutine dgesd2dm
 
@@ -1715,11 +1910,14 @@ contains
     
   end subroutine igesd2dv
 
-  subroutine igesd2dm(ictxt,dat,rdst,cdst)
+  subroutine igesd2dm(ictxt,dat,rdst,cdst,m)
     integer, intent(in)   :: ictxt
     integer, intent(in)   :: dat(:,:)
     integer, intent(in)  :: rdst,cdst
+    integer, intent(in), optional :: m
     
+    integer :: m_
+
     interface 
       subroutine igesd2d(ictxt,m,n,v,ld,rd,cd)
         integer, intent(in)   :: ictxt,m,n,ld
@@ -1728,7 +1926,13 @@ contains
       end subroutine igesd2d
     end interface
 
-    call igesd2d(ictxt,size(dat,1),size(dat,2),dat,size(dat,1),rdst,cdst)
+    if (present(m)) then 
+      m_ = m
+    else
+      m_ = size(dat,1)
+    endif
+
+    call igesd2d(ictxt,m_,size(dat,2),dat,size(dat,1),rdst,cdst)
     
   end subroutine igesd2dm
 
@@ -1769,11 +1973,14 @@ contains
     
   end subroutine zgesd2dv
 
-  subroutine zgesd2dm(ictxt,dat,rdst,cdst)
+  subroutine zgesd2dm(ictxt,dat,rdst,cdst,m)
     integer, intent(in)   :: ictxt
     complex(kind(1.d0)), intent(in)   :: dat(:,:)
     integer, intent(in)  :: rdst,cdst
+    integer, intent(in), optional :: m
     
+    integer :: m_
+
     interface 
       subroutine zgesd2d(ictxt,m,n,v,ld,rd,cd)
         integer, intent(in)   :: ictxt,m,n,ld
@@ -1782,7 +1989,13 @@ contains
       end subroutine zgesd2d
     end interface
 
-    call zgesd2d(ictxt,size(dat,1),size(dat,2),dat,size(dat,1),rdst,cdst)
+    if (present(m)) then 
+      m_ = m
+    else
+      m_ = size(dat,1)
+    endif
+
+    call zgesd2d(ictxt,m_,size(dat,2),dat,size(dat,1),rdst,cdst)
     
   end subroutine zgesd2dm
 
@@ -1823,11 +2036,14 @@ contains
     
   end subroutine dgerv2dv
 
-  subroutine dgerv2dm(ictxt,dat,rdst,cdst)
+  subroutine dgerv2dm(ictxt,dat,rdst,cdst,m)
     integer, intent(in)   :: ictxt
     real(kind(1.d0)), intent(inout)   :: dat(:,:)
     integer, intent(in)  :: rdst,cdst
+    integer, intent(in), optional :: m
     
+    integer :: m_
+
     interface 
       subroutine dgerv2d(ictxt,m,n,v,ld,rd,cd)
         integer, intent(in)   :: ictxt,m,n,ld
@@ -1836,7 +2052,13 @@ contains
       end subroutine dgerv2d
     end interface
 
-    call dgerv2d(ictxt,size(dat,1),size(dat,2),dat,size(dat,1),rdst,cdst)
+    if (present(m)) then 
+      m_ = m
+    else
+      m_ = size(dat,1)
+    endif
+
+    call dgerv2d(ictxt,m_,size(dat,2),dat,size(dat,1),rdst,cdst)
     
   end subroutine dgerv2dm
 
@@ -1876,11 +2098,14 @@ contains
     
   end subroutine igerv2dv
 
-  subroutine igerv2dm(ictxt,dat,rdst,cdst)
+  subroutine igerv2dm(ictxt,dat,rdst,cdst,m)
     integer, intent(in)   :: ictxt
     integer, intent(inout)   :: dat(:,:)
     integer, intent(in)  :: rdst,cdst
+    integer, intent(in), optional :: m
     
+    integer :: m_
+
     interface 
       subroutine igerv2d(ictxt,m,n,v,ld,rd,cd)
         integer, intent(in)   :: ictxt,m,n,ld
@@ -1889,7 +2114,14 @@ contains
       end subroutine igerv2d
     end interface
 
-    call igerv2d(ictxt,size(dat,1),size(dat,2),dat,size(dat,1),rdst,cdst)
+
+    if (present(m)) then 
+      m_ = m
+    else
+      m_ = size(dat,1)
+    endif
+
+    call igerv2d(ictxt,m_,size(dat,2),dat,size(dat,1),rdst,cdst)
     
   end subroutine igerv2dm
 
@@ -1930,10 +2162,13 @@ contains
     
   end subroutine zgerv2dv
 
-  subroutine zgerv2dm(ictxt,dat,rdst,cdst)
+  subroutine zgerv2dm(ictxt,dat,rdst,cdst,m)
     integer, intent(in)   :: ictxt
     complex(kind(1.d0)), intent(inout)   :: dat(:,:)
     integer, intent(in)  :: rdst,cdst
+    integer, intent(in), optional :: m
+    
+    integer :: m_
     
     interface 
       subroutine zgerv2d(ictxt,m,n,v,ld,rd,cd)
@@ -1943,7 +2178,14 @@ contains
       end subroutine zgerv2d
     end interface
 
-    call zgerv2d(ictxt,size(dat,1),size(dat,2),dat,size(dat,1),rdst,cdst)
+
+    if (present(m)) then 
+      m_ = m
+    else
+      m_ = size(dat,1)
+    endif
+
+    call zgerv2d(ictxt,m_,size(dat,2),dat,size(dat,1),rdst,cdst)
     
   end subroutine zgerv2dm
 

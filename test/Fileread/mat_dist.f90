@@ -145,7 +145,7 @@ contains
       root = 0
     end if
     call psb_info(ictxt, iam, np)     
-    
+
     if (iam == root) then
       ! extract information from a_glob
       if (a_glob%fida.ne. 'CSR') then
@@ -170,7 +170,7 @@ contains
     call psb_bcast(ictxt, ncol,root)
     call psb_bcast(ictxt, nnzero,root)
     call psb_bcast(ictxt, nrhs,root)
-    
+
     liwork = max(np, nrow + ncol)
     allocate(iwork(liwork), stat = info)
     if (info /= 0) then
@@ -248,18 +248,16 @@ contains
 
         if (iam == root) then
 
+          ll=0
           do j = i_count, j_count
-            icol(j-i_count+1) = a_glob%ia2(j) - &
-                 & a_glob%ia2(i_count) + 1
+            do k=a_glob%ia2(j),a_glob%ia2(j+1)-1
+              ll       = ll+1
+              irow(ll) = j
+              icol(ll) = a_glob%ia1(k)
+              val(ll)  = a_glob%aspk(k)
+            end do
           enddo
 
-          k = a_glob%ia2(i_count)
-          do j = k, a_glob%ia2(j_count)-1
-            val(j-k+1) = a_glob%aspk(j)
-            irow(j-k+1) = a_glob%ia1(j)
-          enddo
-
-          ll     = icol(nnr+1) - 1
           if (iproc == iam) then
             call psb_spins(ll,irow,icol,val,a,desc_a,info)
             if(info/=0) then
@@ -277,19 +275,19 @@ contains
               goto 9999
             end if
           else
-            call igesd2d(ictxt,1,1,nnr,1,iproc,0)
-            call igesd2d(ictxt,1,1,ll,1,iproc,0)
-            call igesd2d(ictxt,nnr+1,1,icol,nnr+1,iproc,0)
-            call igesd2d(ictxt,ll,1,irow,ll,iproc,0)
-            call dgesd2d(ictxt,ll,1,val,ll,iproc,0)
-            call dgesd2d(ictxt,nnr,1,b_glob(i_count:j_count-1),nnr,iproc,0)
-            call igerv2d(ictxt,1,1,ll,1,iproc,0)
+            call psb_snd(ictxt,nnr,iproc)
+            call psb_snd(ictxt,ll,iproc)
+            call psb_snd(ictxt,irow(1:ll),iproc)
+            call psb_snd(ictxt,icol(1:ll),iproc)
+            call psb_snd(ictxt,val(1:ll),iproc)
+            call psb_snd(ictxt,b_glob(i_count:j_count-1),iproc)
+            call psb_rcv(ictxt,ll,iproc)
           endif
         else if (iam /= root) then
 
           if (iproc == iam) then
-            call igerv2d(ictxt,1,1,nnr,1,root,0)
-            call igerv2d(ictxt,1,1,ll,1,root,0)
+            call psb_rcv(ictxt,nnr,root)
+            call psb_rcv(ictxt,ll,root)
             if (ll > size(irow)) then 
               write(0,*) iam,'need to reallocate ',ll
               deallocate(val,irow,icol)
@@ -302,11 +300,11 @@ contains
               end if
 
             endif
-            call igerv2d(ictxt,ll,1,irow,ll,root,0)
-            call igerv2d(ictxt,nnr+1,1,icol,nnr+1,root,0)
-            call dgerv2d(ictxt,ll,1,val,ll,root,0)
-            call dgerv2d(ictxt,nnr,1,b_glob(i_count:i_count+nnr-1),nnr,root,0)
-            call igesd2d(ictxt,1,1,ll,1,root,0)
+            call psb_rcv(ictxt,irow(1:ll),root)
+            call psb_rcv(ictxt,icol(1:ll),root)
+            call psb_rcv(ictxt,val(1:ll),root)
+            call psb_rcv(ictxt,b_glob(i_count:i_count+nnr-1),root)
+            call psb_snd(ictxt,ll,root)
             call psb_spins(ll,irow,icol,val,a,desc_a,info)
             if(info/=0) then
               info=4010
@@ -333,14 +331,17 @@ contains
         do j_count = 1, length_row
           k_count = iwork(j_count)
           if (iam == root) then
-            icol(1) = 1
-            icol(2) = 1
-            do j = a_glob%ia2(i_count), a_glob%ia2(i_count+1)-1
-              val(icol(2)) = a_glob%aspk(j)
-              irow(icol(2)) = a_glob%ia1(j)
-              icol(2) =icol(2) + 1
+
+            ll=0
+            do j = i_count, i_count
+              do k=a_glob%ia2(j),a_glob%ia2(j+1)-1
+                ll       = ll+1
+                irow(ll) = j
+                icol(ll) = a_glob%ia1(k)
+                val(ll)  = a_glob%aspk(k)
+              end do
             enddo
-            ll = icol(2) - 1
+
             if (k_count == iam) then
 
               call psb_spins(ll,irow,icol,val,a,desc_a,info)
@@ -359,21 +360,22 @@ contains
                 goto 9999
               end if
             else
-              call igesd2d(ictxt,1,1,ll,1,k_count,0)
-              call igesd2d(ictxt,ll,1,irow,ll,k_count,0)
-              call dgesd2d(ictxt,ll,1,val,ll,k_count,0)
-              call dgesd2d(ictxt,1,1,b_glob(i_count),1,k_count,0)
-              call igerv2d(ictxt,1,1,ll,1,k_count,0)
+              call psb_snd(ictxt,ll,k_count)
+              call psb_snd(ictxt,irow(1:ll),k_count)
+              call psb_snd(ictxt,icol(1:ll),k_count)
+              call psb_snd(ictxt,val(1:ll),k_count)
+              call psb_snd(ictxt,b_glob(i_count),k_count)
+              call psb_rcv(ictxt,ll,k_count)
             endif
           else if (iam /= root) then
             if (k_count == iam) then
-              call igerv2d(ictxt,1,1,ll,1,root,0)
-              icol(1) = 1
-              icol(2) = ll+1
-              call igerv2d(ictxt,ll,1,irow,ll,root,0)
-              call dgerv2d(ictxt,ll,1,val,ll,root,0)
-              call dgerv2d(ictxt,1,1,b_glob(i_count),1,root,0)
-              call igesd2d(ictxt,1,1,ll,1,root,0)
+
+              call psb_rcv(ictxt,ll,root)
+              call psb_rcv(ictxt,irow(1:ll),root)
+              call psb_rcv(ictxt,icol(1:ll),root)
+              call psb_rcv(ictxt,val(1:ll),root)
+              call psb_rcv(ictxt,b_glob(i_count),root)
+              call psb_snd(ictxt,ll,root)
               call psb_spins(ll,irow,icol,val,a,desc_a,info)
               if(info/=0) then
                 info=4010
@@ -698,19 +700,19 @@ contains
             goto 9999
           end if
         else
-          call igesd2d(ictxt,1,1,nnr,1,iproc,0)
-          call igesd2d(ictxt,1,1,ll,1,iproc,0)
-          call igesd2d(ictxt,ll,1,irow,ll,iproc,0)
-          call igesd2d(ictxt,ll,1,icol,ll,iproc,0)
-          call dgesd2d(ictxt,ll,1,val,ll,iproc,0)
-          call dgesd2d(ictxt,nnr,1,b_glob(i_count:j_count-1),nnr,iproc,0)
-          call igerv2d(ictxt,1,1,ll,1,iproc,0)
+          call psb_snd(ictxt,nnr,iproc)
+          call psb_snd(ictxt,ll,iproc)
+          call psb_snd(ictxt,irow(1:ll),iproc)
+          call psb_snd(ictxt,icol(1:ll),iproc)
+          call psb_snd(ictxt,val(1:ll),iproc)
+          call psb_snd(ictxt,b_glob(i_count:j_count-1),iproc)
+          call psb_rcv(ictxt,ll,iproc)
         endif
       else if (iam /= root) then
 
         if (iproc == iam) then
-          call igerv2d(ictxt,1,1,nnr,1,root,0)
-          call igerv2d(ictxt,1,1,ll,1,root,0)
+          call psb_rcv(ictxt,nnr,root)
+          call psb_rcv(ictxt,ll,root)
           if (ll > size(val)) then 
             write(0,*) iam,'need to reallocate ',ll
             deallocate(val,irow,icol)
@@ -722,11 +724,11 @@ contains
               goto 9999
             end if
           endif
-          call igerv2d(ictxt,ll,1,irow,ll,root,0)
-          call igerv2d(ictxt,ll,1,icol,ll,root,0)
-          call dgerv2d(ictxt,ll,1,val,ll,root,0)
-          call dgerv2d(ictxt,nnr,1,b_glob(i_count:i_count+nnr-1),nnr,root,0)
-          call igesd2d(ictxt,1,1,ll,1,root,0)
+          call psb_rcv(ictxt,irow(1:ll),root)
+          call psb_rcv(ictxt,icol(1:ll),root)
+          call psb_rcv(ictxt,val(1:ll),root)
+          call psb_rcv(ictxt,b_glob(i_count:i_count+nnr-1),root)
+          call psb_snd(ictxt,ll,root)
 
           call psb_spins(ll,irow,icol,val,a,desc_a,info)
           if(info/=0) then
@@ -1019,18 +1021,16 @@ contains
 
         if (iam == root) then
 
+          ll=0
           do j = i_count, j_count
-            icol(j-i_count+1) = a_glob%ia2(j) - &
-                 & a_glob%ia2(i_count) + 1
+            do k=a_glob%ia2(j),a_glob%ia2(j+1)-1
+              ll       = ll+1
+              irow(ll) = j
+              icol(ll) = a_glob%ia1(k)
+              val(ll)  = a_glob%aspk(k)
+            end do
           enddo
 
-          k = a_glob%ia2(i_count)
-          do j = k, a_glob%ia2(j_count)-1
-            val(j-k+1) = a_glob%aspk(j)
-            irow(j-k+1) = a_glob%ia1(j)
-          enddo
-
-          ll     = icol(nnr+1) - 1
           if (iproc == iam) then
             call psb_spins(ll,irow,icol,val,a,desc_a,info)
             if(info/=0) then
@@ -1048,19 +1048,19 @@ contains
               goto 9999
             end if
           else
-            call igesd2d(ictxt,1,1,nnr,1,iproc,0)
-            call igesd2d(ictxt,1,1,ll,1,iproc,0)
-            call igesd2d(ictxt,nnr+1,1,icol,nnr+1,iproc,0)
-            call igesd2d(ictxt,ll,1,irow,ll,iproc,0)
-            call zgesd2d(ictxt,ll,1,val,ll,iproc,0)
-            call zgesd2d(ictxt,nnr,1,b_glob(i_count:j_count-1),nnr,iproc,0)
-            call igerv2d(ictxt,1,1,ll,1,iproc,0)
+            call psb_snd(ictxt,nnr,iproc)
+            call psb_snd(ictxt,ll,iproc)
+            call psb_snd(ictxt,irow(1:ll),iproc)
+            call psb_snd(ictxt,icol(1:ll),iproc)
+            call psb_snd(ictxt,val(1:ll),iproc)
+            call psb_snd(ictxt,b_glob(i_count:j_count-1),iproc)
+            call psb_rcv(ictxt,ll,iproc)
           endif
         else if (iam /= root) then
 
           if (iproc == iam) then
-            call igerv2d(ictxt,1,1,nnr,1,root,0)
-            call igerv2d(ictxt,1,1,ll,1,root,0)
+            call psb_rcv(ictxt,nnr,root)
+            call psb_rcv(ictxt,ll,root)
             if (ll > size(irow)) then 
               write(0,*) iam,'need to reallocate ',ll
               deallocate(val,irow,icol)
@@ -1073,11 +1073,11 @@ contains
               end if
 
             endif
-            call igerv2d(ictxt,ll,1,irow,ll,root,0)
-            call igerv2d(ictxt,nnr+1,1,icol,nnr+1,root,0)
-            call zgerv2d(ictxt,ll,1,val,ll,root,0)
-            call zgerv2d(ictxt,nnr,1,b_glob(i_count:i_count+nnr-1),nnr,root,0)
-            call igesd2d(ictxt,1,1,ll,1,root,0)
+            call psb_rcv(ictxt,irow(1:ll),root)
+            call psb_rcv(ictxt,icol(1:ll),root)
+            call psb_rcv(ictxt,val(1:ll),root)
+            call psb_rcv(ictxt,b_glob(i_count:i_count+nnr-1),root)
+            call psb_snd(ictxt,ll,root)
             call psb_spins(ll,irow,icol,val,a,desc_a,info)
             if(info/=0) then
               info=4010
@@ -1104,14 +1104,17 @@ contains
         do j_count = 1, length_row
           k_count = iwork(j_count)
           if (iam == root) then
-            icol(1) = 1
-            icol(2) = 1
-            do j = a_glob%ia2(i_count), a_glob%ia2(i_count+1)-1
-              val(icol(2)) = a_glob%aspk(j)
-              irow(icol(2)) = a_glob%ia1(j)
-              icol(2) =icol(2) + 1
+
+            ll=0
+            do j = i_count, i_count
+              do k=a_glob%ia2(j),a_glob%ia2(j+1)-1
+                ll       = ll+1
+                irow(ll) = j
+                icol(ll) = a_glob%ia1(k)
+                val(ll)  = a_glob%aspk(k)
+              end do
             enddo
-            ll = icol(2) - 1
+
             if (k_count == iam) then
 
               call psb_spins(ll,irow,icol,val,a,desc_a,info)
@@ -1130,21 +1133,21 @@ contains
                 goto 9999
               end if
             else
-              call igesd2d(ictxt,1,1,ll,1,k_count,0)
-              call igesd2d(ictxt,ll,1,irow,ll,k_count,0)
-              call zgesd2d(ictxt,ll,1,val,ll,k_count,0)
-              call zgesd2d(ictxt,1,1,b_glob(i_count),1,k_count,0)
-              call igerv2d(ictxt,1,1,ll,1,k_count,0)
+              call psb_snd(ictxt,ll,k_count)
+              call psb_snd(ictxt,irow(1:ll),k_count)
+              call psb_snd(ictxt,icol(1:ll),k_count)
+              call psb_snd(ictxt,val(1:ll),k_count)
+              call psb_snd(ictxt,b_glob(i_count),k_count)
+              call psb_rcv(ictxt,ll,k_count)
             endif
           else if (iam /= root) then
             if (k_count == iam) then
-              call igerv2d(ictxt,1,1,ll,1,root,0)
-              icol(1) = 1
-              icol(2) = ll+1
-              call igerv2d(ictxt,ll,1,irow,ll,root,0)
-              call zgerv2d(ictxt,ll,1,val,ll,root,0)
-              call zgerv2d(ictxt,1,1,b_glob(i_count),1,root,0)
-              call igesd2d(ictxt,1,1,ll,1,root,0)
+              call psb_rcv(ictxt,ll,root)
+              call psb_rcv(ictxt,irow(1:ll),root)
+              call psb_rcv(ictxt,icol(1:ll),root)
+              call psb_rcv(ictxt,val(1:ll),root)
+              call psb_rcv(ictxt,b_glob(i_count),root)
+              call psb_snd(ictxt,ll,root)
               call psb_spins(ll,irow,icol,val,a,desc_a,info)
               if(info/=0) then
                 info=4010
@@ -1469,19 +1472,19 @@ contains
             goto 9999
           end if
         else
-          call igesd2d(ictxt,1,1,nnr,1,iproc,0)
-          call igesd2d(ictxt,1,1,ll,1,iproc,0)
-          call igesd2d(ictxt,ll,1,irow,ll,iproc,0)
-          call igesd2d(ictxt,ll,1,icol,ll,iproc,0)
-          call zgesd2d(ictxt,ll,1,val,ll,iproc,0)
-          call zgesd2d(ictxt,nnr,1,b_glob(i_count:j_count-1),nnr,iproc,0)
-          call igerv2d(ictxt,1,1,ll,1,iproc,0)
+          call psb_snd(ictxt,nnr,iproc)
+          call psb_snd(ictxt,ll,iproc)
+          call psb_snd(ictxt,irow(1:ll),iproc)
+          call psb_snd(ictxt,icol(1:ll),iproc)
+          call psb_snd(ictxt,val(1:ll),iproc)
+          call psb_snd(ictxt,b_glob(i_count:j_count-1),iproc)
+          call psb_rcv(ictxt,ll,iproc)
         endif
       else if (iam /= root) then
 
         if (iproc == iam) then
-          call igerv2d(ictxt,1,1,nnr,1,root,0)
-          call igerv2d(ictxt,1,1,ll,1,root,0)
+          call psb_rcv(ictxt,nnr,root)
+          call psb_rcv(ictxt,ll,root)
           if (ll > size(val)) then 
             write(0,*) iam,'need to reallocate ',ll
             deallocate(val,irow,icol)
@@ -1493,11 +1496,11 @@ contains
               goto 9999
             end if
           endif
-          call igerv2d(ictxt,ll,1,irow,ll,root,0)
-          call igerv2d(ictxt,ll,1,icol,ll,root,0)
-          call zgerv2d(ictxt,ll,1,val,ll,root,0)
-          call zgerv2d(ictxt,nnr,1,b_glob(i_count:i_count+nnr-1),nnr,root,0)
-          call igesd2d(ictxt,1,1,ll,1,root,0)
+          call psb_rcv(ictxt,irow(1:ll),root)
+          call psb_rcv(ictxt,icol(1:ll),root)
+          call psb_rcv(ictxt,val(1:ll),root)
+          call psb_rcv(ictxt,b_glob(i_count:i_count+nnr-1),root)
+          call psb_snd(ictxt,ll,root)
 
           call psb_spins(ll,irow,icol,val,a,desc_a,info)
           if(info/=0) then
