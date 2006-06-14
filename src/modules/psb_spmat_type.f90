@@ -125,6 +125,7 @@ contains
     type(psb_dspmat_type), intent(inout) :: mat
 
     nullify(mat%aspk,mat%ia1,mat%ia2,mat%pl,mat%pr)
+    mat%infoa(:) = 0
     mat%m=0
     mat%k=0
     mat%fida=''
@@ -614,6 +615,7 @@ contains
 
   end function psb_dspsizeof
 
+
   subroutine psb_dsp_free(a,info)
     implicit none
     !....Parameters...
@@ -649,6 +651,7 @@ contains
     type(psb_zspmat_type), intent(inout) :: mat
 
     nullify(mat%aspk,mat%ia1,mat%ia2,mat%pl,mat%pr)
+    mat%infoa(:) = 0
     mat%m=0
     mat%k=0
     mat%fida=''
@@ -1165,6 +1168,7 @@ contains
     call psb_nullify_sp(a)
     Return
   End Subroutine psb_zsp_free
+
 
 
 end module psb_spmat_type

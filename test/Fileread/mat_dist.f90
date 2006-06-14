@@ -122,7 +122,7 @@ contains
     integer                     :: np, iam 
     integer                     :: ircode, length_row, i_count, j_count,&
          & k_count, blockdim, root, liwork, nrow, ncol, nnzero, nrhs,&
-         & i,j,k, ll, isize, iproc, nnr, err, err_act, int_err(5)
+         & i,j,k, ll, nz, isize, iproc, nnr, err, err_act, int_err(5)
     integer, pointer            :: iwork(:)
     character                   :: afmt*5, atyp*5
     integer, allocatable          :: irow(:),icol(:)
@@ -248,15 +248,19 @@ contains
 
         if (iam == root) then
 
-          ll=0
-          do j = i_count, j_count
-            do k=a_glob%ia2(j),a_glob%ia2(j+1)-1
-              ll       = ll+1
-              irow(ll) = j
-              icol(ll) = a_glob%ia1(k)
-              val(ll)  = a_glob%aspk(k)
-            end do
-          enddo
+          ll = 0
+          do i= i_count, j_count-1
+            call psb_sp_extrow(i,a_glob,nz,&
+                 & irow(ll+1:),icol(ll+1:),val(ll+1:), info)
+            if (info /= 0) then            
+              if (nz >min(size(irow(ll+1:)),size(icol(ll+1:)),size(val(ll+1:)))) then 
+                write(0,*) 'Allocation failure? This should not happen!'
+              end if
+              call psb_errpush(info,name,a_err=ch_err)
+              goto 9999
+            end if
+            ll = ll + nz
+          end do
 
           if (iproc == iam) then
             call psb_spins(ll,irow,icol,val,a,desc_a,info)
@@ -332,15 +336,19 @@ contains
           k_count = iwork(j_count)
           if (iam == root) then
 
-            ll=0
-            do j = i_count, i_count
-              do k=a_glob%ia2(j),a_glob%ia2(j+1)-1
-                ll       = ll+1
-                irow(ll) = j
-                icol(ll) = a_glob%ia1(k)
-                val(ll)  = a_glob%aspk(k)
-              end do
-            enddo
+            ll = 0
+            do i= i_count, i_count
+              call psb_sp_extrow(i,a_glob,nz,&
+                   & irow(ll+1:),icol(ll+1:),val(ll+1:), info)
+              if (info /= 0) then            
+                if (nz >min(size(irow(ll+1:)),size(icol(ll+1:)),size(val(ll+1:)))) then 
+                  write(0,*) 'Allocation failure? This should not happen!'
+                end if
+                call psb_errpush(info,name,a_err=ch_err)
+                goto 9999
+              end if
+              ll = ll + nz
+            end do
 
             if (k_count == iam) then
 
@@ -550,7 +558,7 @@ contains
     integer                     :: np, iam
     integer                     :: ircode, length_row, i_count, j_count,&
          & k_count, blockdim, root, liwork, nrow, ncol, nnzero, nrhs,&
-         & i,j,k, ll, isize, iproc, nnr, err, err_act, int_err(5)
+         & i,j,k, ll, nz, isize, iproc, nnr, err, err_act, int_err(5)
     integer, pointer            :: iwork(:)
     character                   :: afmt*5, atyp*5
     integer, allocatable          :: irow(:),icol(:)
@@ -661,26 +669,20 @@ contains
       nnr = j_count - i_count
 
       if (iam == root) then
-        ll = a_glob%ia2(j_count)-a_glob%ia2(i_count)
-        if (ll > size(val)) then 
-          deallocate(val,irow,icol)
-          allocate(val(ll),irow(ll),icol(ll),stat=info)
-          if(info/=0) then
-            info=4010
-            ch_err='Allocate'
+        
+        ll = 0
+        do i= i_count, j_count-1
+          call psb_sp_extrow(i,a_glob,nz,&
+               & irow(ll+1:),icol(ll+1:),val(ll+1:), info)
+          if (info /= 0) then            
+            if (nz >min(size(irow(ll+1:)),size(icol(ll+1:)),size(val(ll+1:)))) then 
+              write(0,*) 'Allocation failure? This should not happen!'
+            end if
             call psb_errpush(info,name,a_err=ch_err)
             goto 9999
           end if
-
-        endif
-        k = a_glob%ia2(i_count)
-        do i= i_count, j_count-1
-          do j = a_glob%ia2(i),a_glob%ia2(i+1)-1
-            irow(j-k+1)  = i
-            icol(j-k+1)  = a_glob%ia1(j) 
-            val(j-k+1) = a_glob%aspk(j)
-          end do
-        enddo
+          ll = ll + nz
+        end do
 
         if (iproc == iam) then
           call psb_spins(ll,irow,icol,val,a,desc_a,info)
@@ -897,7 +899,7 @@ contains
     integer                     :: np, iam
     integer                     :: ircode, length_row, i_count, j_count,&
          & k_count, blockdim, root, liwork, nrow, ncol, nnzero, nrhs,&
-         & i,j,k, ll, isize, iproc, nnr, err, err_act, int_err(5)
+         & i,j,k, ll, nz, isize, iproc, nnr, err, err_act, int_err(5)
     integer, pointer            :: iwork(:)
     character                   :: afmt*5, atyp*5
     integer, allocatable          :: irow(:),icol(:)
@@ -1021,15 +1023,19 @@ contains
 
         if (iam == root) then
 
-          ll=0
-          do j = i_count, j_count
-            do k=a_glob%ia2(j),a_glob%ia2(j+1)-1
-              ll       = ll+1
-              irow(ll) = j
-              icol(ll) = a_glob%ia1(k)
-              val(ll)  = a_glob%aspk(k)
-            end do
-          enddo
+          ll = 0
+          do i= i_count, j_count-1
+            call psb_sp_extrow(i,a_glob,nz,&
+                 & irow(ll+1:),icol(ll+1:),val(ll+1:), info)
+            if (info /= 0) then            
+              if (nz >min(size(irow(ll+1:)),size(icol(ll+1:)),size(val(ll+1:)))) then 
+                write(0,*) 'Allocation failure? This should not happen!'
+              end if
+              call psb_errpush(info,name,a_err=ch_err)
+              goto 9999
+            end if
+            ll = ll + nz
+          end do
 
           if (iproc == iam) then
             call psb_spins(ll,irow,icol,val,a,desc_a,info)
@@ -1105,15 +1111,19 @@ contains
           k_count = iwork(j_count)
           if (iam == root) then
 
-            ll=0
-            do j = i_count, i_count
-              do k=a_glob%ia2(j),a_glob%ia2(j+1)-1
-                ll       = ll+1
-                irow(ll) = j
-                icol(ll) = a_glob%ia1(k)
-                val(ll)  = a_glob%aspk(k)
-              end do
-            enddo
+            ll = 0
+            do i= i_count, i_count
+              call psb_sp_extrow(i,a_glob,nz,&
+                   & irow(ll+1:),icol(ll+1:),val(ll+1:), info)
+              if (info /= 0) then            
+                if (nz >min(size(irow(ll+1:)),size(icol(ll+1:)),size(val(ll+1:)))) then 
+                  write(0,*) 'Allocation failure? This should not happen!'
+                end if
+                call psb_errpush(info,name,a_err=ch_err)
+                goto 9999
+              end if
+              ll = ll + nz
+            end do
 
             if (k_count == iam) then
 
@@ -1322,7 +1332,7 @@ contains
     integer                     :: np, iam
     integer                     :: ircode, length_row, i_count, j_count,&
          & k_count, blockdim, root, liwork, nrow, ncol, nnzero, nrhs,&
-         & i,j,k, ll, isize, iproc, nnr, err, err_act, int_err(5)
+         & i,j,k, ll, nz, isize, iproc, nnr, err, err_act, int_err(5)
     integer, pointer            :: iwork(:)
     character                   :: afmt*5, atyp*5
     integer, allocatable          :: irow(:),icol(:)
@@ -1363,7 +1373,7 @@ contains
         call psb_errpush(info,name)
         goto 9999
       endif
-      
+
       nnzero = size(a_glob%aspk)
       nrhs   = 1
     end if
@@ -1433,26 +1443,19 @@ contains
       nnr = j_count - i_count
 
       if (iam == root) then
-        ll = a_glob%ia2(j_count)-a_glob%ia2(i_count)
-        if (ll > size(val)) then 
-          deallocate(val,irow,icol)
-          allocate(val(ll),irow(ll),icol(ll),stat=info)
-          if(info/=0) then
-            info=4010
-            ch_err='Allocate'
+        ll = 0
+        do i= i_count, j_count-1
+          call psb_sp_extrow(i,a_glob,nz,&
+               & irow(ll+1:),icol(ll+1:),val(ll+1:), info)
+          if (info /= 0) then            
+            if (nz >min(size(irow(ll+1:)),size(icol(ll+1:)),size(val(ll+1:)))) then 
+              write(0,*) 'Allocation failure? This should not happen!'
+            end if
             call psb_errpush(info,name,a_err=ch_err)
             goto 9999
           end if
-
-        endif
-        k = a_glob%ia2(i_count)
-        do i= i_count, j_count-1
-          do j = a_glob%ia2(i),a_glob%ia2(i+1)-1
-            irow(j-k+1)  = i
-            icol(j-k+1)  = a_glob%ia1(j) 
-            val(j-k+1) = a_glob%aspk(j)
-          end do
-        enddo
+          ll = ll + nz
+        end do
 
         if (iproc == iam) then
           call psb_spins(ll,irow,icol,val,a,desc_a,info)

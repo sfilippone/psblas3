@@ -288,6 +288,31 @@ module psb_serial_mod
      end subroutine psb_zspgtrow
   end interface
 
+  interface psb_sp_extrow
+     subroutine psb_dspextrow(irw,a,nz,ia,ja,val,info,iren,lrw)
+       use psb_spmat_type
+       type(psb_dspmat_type), intent(in) :: a
+       integer, intent(in)       :: irw
+       integer, intent(out)      :: nz
+       integer, intent(inout)    :: ia(:), ja(:)
+       real(kind(1.d0)),  intent(inout)    :: val(:)
+       integer, intent(in), target, optional :: iren(:)
+       integer, intent(in), optional :: lrw
+       integer, intent(out)  :: info
+     end subroutine psb_dspextrow
+     subroutine psb_zspextrow(irw,a,nz,ia,ja,val,info,iren,lrw)
+       use psb_spmat_type
+       type(psb_zspmat_type), intent(in) :: a
+       integer, intent(in)       :: irw
+       integer, intent(out)      :: nz
+       integer, intent(inout)    :: ia(:), ja(:)
+       complex(kind(1.d0)),  intent(inout)    :: val(:)
+       integer, intent(in), target, optional :: iren(:)
+       integer, intent(in), optional :: lrw
+       integer, intent(out)  :: info
+     end subroutine psb_zspextrow
+  end interface
+
   interface psb_neigh
      subroutine psb_dneigh(a,idx,neigh,n,info,lev)
        use psb_spmat_type

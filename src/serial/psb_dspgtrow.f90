@@ -141,96 +141,95 @@ contains
     integer, pointer :: indices(:)
 
     if (append) then 
-       nzb = b%infoa(psb_nnz_)
+      nzb = b%infoa(psb_nnz_)
     else
-       nzb = 0
+      nzb = 0
     endif
 
     if (a%pl(1) /= 0) then
 
-       nr = lrw - irw + 1 
-       allocate(indices(nr))
-       do i=1,nr
-          indices(i)=a%pl(irw+i-1)
-          nz=nz+a%ia2(indices(i)+1)-a%ia2(indices(i))
-       end do
+      nr = lrw - irw + 1 
+      allocate(indices(nr))
+      do i=1,nr
+        indices(i)=a%pl(irw+i-1)
+        nz=nz+a%ia2(indices(i)+1)-a%ia2(indices(i))
+      end do
 
-       if (min(size(b%ia1),size(b%ia2),size(b%aspk)) < nzb+nz) then 
-          call psb_sp_reall(b,nzb+nz,iret)
-       endif
+      if (min(size(b%ia1),size(b%ia2),size(b%aspk)) < nzb+nz) then 
+        call psb_sp_reall(b,nzb+nz,iret)
+      endif
 
-       k=0
-       if(associated(iren)) then
-          do i=1,nr
-             row_idx=indices(i)
-             do j=a%ia2(row_idx),a%ia2(row_idx+1)-1
-                k             = k + 1
-                b%aspk(nzb+k) = a%aspk(j)
-                b%ia1(nzb+k)  = iren(row_idx)
-                b%ia2(nzb+k)  = iren(a%ia1(j))
-             end do
+      k=0
+      if(associated(iren)) then
+        do i=1,nr
+          row_idx=indices(i)
+          do j=a%ia2(row_idx),a%ia2(row_idx+1)-1
+            k             = k + 1
+            b%aspk(nzb+k) = a%aspk(j)
+            b%ia1(nzb+k)  = iren(row_idx)
+            b%ia2(nzb+k)  = iren(a%ia1(j))
           end do
-       else
-          do i=1,nr
-             row_idx=indices(i)
-             do j=a%ia2(row_idx),a%ia2(row_idx+1)-1
-                k             = k + 1
-                b%aspk(nzb+k) = a%aspk(j)
-                b%ia1(nzb+k)  = row_idx
-                b%ia2(nzb+k)  = a%ia1(j)
-             end do
+        end do
+      else
+        do i=1,nr
+          row_idx=indices(i)
+          do j=a%ia2(row_idx),a%ia2(row_idx+1)-1
+            k             = k + 1
+            b%aspk(nzb+k) = a%aspk(j)
+            b%ia1(nzb+k)  = row_idx
+            b%ia2(nzb+k)  = a%ia1(j)
           end do
-       end if
+        end do
+      end if
 
-       b%infoa(psb_nnz_) = nzb+k
-       b%m = b%m+nr
-       b%k = max(b%k,a%k)
+      b%infoa(psb_nnz_) = nzb+k
+      b%m = b%m+nr
+      b%k = max(b%k,a%k)
 
     else
-       idx = irw
+      idx = irw
 
-       if (idx<0) then 
-          write(0,*) ' spgtrow Error : idx no good ',idx
-          return
-       end if
-       nr = lrw - irw + 1 
-       nz = a%ia2(idx+nr) - a%ia2(idx)
+      if (idx<0) then 
+        write(0,*) ' spgtrow Error : idx no good ',idx
+        return
+      end if
+      nr = lrw - irw + 1 
+      nz = a%ia2(idx+nr) - a%ia2(idx)
 
-       if (min(size(b%ia1),size(b%ia2),size(b%aspk)) < nzb+nz) then 
-          call psb_sp_reall(b,nzb+nz,iret)
-       endif
-       b%fida='COO'
+      if (min(size(b%ia1),size(b%ia2),size(b%aspk)) < nzb+nz) then 
+        call psb_sp_reall(b,nzb+nz,iret)
+      endif
+      b%fida='COO'
 
-       if (associated(iren)) then 
-          k=0
-          do i=irw,lrw
-             do j=a%ia2(i),a%ia2(i+1)-1
-                k             = k + 1
-                b%aspk(nzb+k) = a%aspk(j)
-                b%ia1(nzb+k)  = iren(i)
-                b%ia2(nzb+k)  = iren(a%ia1(j))
-             end do
-          enddo
-       else
-          k=0
+      if (associated(iren)) then 
+        k=0
+        do i=irw,lrw
+          do j=a%ia2(i),a%ia2(i+1)-1
+            k             = k + 1
+            b%aspk(nzb+k) = a%aspk(j)
+            b%ia1(nzb+k)  = iren(i)
+            b%ia2(nzb+k)  = iren(a%ia1(j))
+          end do
+        enddo
+      else
+        k=0
 
-          do i=irw,lrw
-
-             do j=a%ia2(i),a%ia2(i+1)-1
-                k             = k + 1
-                b%aspk(nzb+k) = a%aspk(j)
-                b%ia1(nzb+k)  = i
-                b%ia2(nzb+k)  = a%ia1(j)
+        do i=irw,lrw
+          do j=a%ia2(i),a%ia2(i+1)-1
+            k             = k + 1
+            b%ia1(nzb+k)  = i
+            b%ia2(nzb+k)  = a%ia1(j)
+            b%aspk(nzb+k) = a%aspk(j)
 !!$          write(0,*) 'csr_gtrow: in:',a%aspk(j),i,a%ia1(j)
-             end do
-          enddo
-       end if
-       b%infoa(psb_nnz_) = nzb+nz
-       if (a%pr(1) /= 0) then
-          write(0,*) 'Feeling lazy today, Right Permutation will have to wait'
-       endif
-       b%m = b%m+lrw-irw+1
-       b%k = max(b%k,a%k)
+          end do
+        enddo
+      end if
+      b%infoa(psb_nnz_) = nzb+nz
+      if (a%pr(1) /= 0) then
+        write(0,*) 'Feeling lazy today, Right Permutation will have to wait'
+      endif
+      b%m = b%m+lrw-irw+1
+      b%k = max(b%k,a%k)
 
     endif
 
