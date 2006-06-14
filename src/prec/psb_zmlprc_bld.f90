@@ -45,7 +45,7 @@ subroutine psb_zmlprc_bld(a,desc_a,p,info)
   implicit none 
 
   type(psb_zspmat_type), intent(in), target :: a
-  type(psb_desc_type), intent(in)           :: desc_a
+  type(psb_desc_type), intent(in), target   :: desc_a
   type(psb_zbaseprc_type), intent(inout)    :: p
   integer, intent(out)                      :: info
 

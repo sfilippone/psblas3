@@ -60,7 +60,7 @@ subroutine psb_zspgtrow(irw,a,b,info,append,iren,lrw)
   integer :: i,j,k,ip,jp,nr,idx, nz,iret,nzb, nza, lrw_, irw_, err_act
   character(len=20)                 :: name, ch_err
 
-  name='psb_zspgtrow'
+  name='psb_spgtrow'
   info  = 0
   call psb_erractionsave(err_act)
 
@@ -218,9 +218,9 @@ contains
 
           do j=a%ia2(i),a%ia2(i+1)-1
             k             = k + 1
-            b%aspk(nzb+k) = a%aspk(j)
             b%ia1(nzb+k)  = i
             b%ia2(nzb+k)  = a%ia1(j)
+            b%aspk(nzb+k) = a%aspk(j)
 !!$          write(0,*) 'csr_gtrow: in:',a%aspk(j),i,a%ia1(j)
           end do
         enddo

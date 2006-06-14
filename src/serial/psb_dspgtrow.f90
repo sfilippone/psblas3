@@ -60,7 +60,7 @@ subroutine psb_dspgtrow(irw,a,b,info,append,iren,lrw)
   integer :: i,j,k,ip,jp,nr,idx, nz,iret,nzb, nza, lrw_, irw_, err_act
   character(len=20)                 :: name, ch_err
 
-  name='psb_dspgtrow'
+  name='psb_spgtrow'
   info  = 0
   call psb_erractionsave(err_act)
 

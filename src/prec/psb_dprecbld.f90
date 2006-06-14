@@ -58,7 +58,7 @@ subroutine psb_dprecbld(a,desc_a,p,info,upd)
       Use psb_spmat_type
       use psb_descriptor_type
       use psb_prec_type
-      type(psb_dspmat_type), target              :: a
+      type(psb_dspmat_type)                      :: a
       type(psb_desc_type), intent(in)            :: desc_a
       type(psb_dbaseprc_type),intent(inout)      :: p
       integer, intent(out)                       :: info
@@ -74,10 +74,10 @@ subroutine psb_dprecbld(a,desc_a,p,info,upd)
       use psb_const_mod
       implicit none 
 
-      type(psb_dspmat_type), intent(in)      :: a
-      type(psb_desc_type), intent(in)        :: desc_a
-      type(psb_dbaseprc_type), intent(inout) :: p
-      integer, intent(out)                   :: info
+      type(psb_dspmat_type), intent(in), target :: a
+      type(psb_desc_type), intent(in), target   :: desc_a
+      type(psb_dbaseprc_type), intent(inout)    :: p
+      integer, intent(out)                      :: info
     end subroutine psb_dmlprc_bld
   end interface
 
