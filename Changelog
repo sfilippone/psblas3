@@ -1,6 +1,11 @@
 Changelog. A lot less detailed than usual, at least for past
 history. 
 
+2006/06/14: Defined ExtRow, probably to be renamed to GetRow.
+	    This way we may close the mat objects.
+	    Next we will rewrite SMMP to only make use of GetRow,
+	    not to rely on CSR storage format. 
+
 2006/05/29: Added BLACS-like routines for data communication,
 	    broadcasts, reductions, send/receive.
 

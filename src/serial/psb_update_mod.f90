@@ -174,6 +174,7 @@ contains
     integer, intent(out) :: info
     integer, intent(in), optional  :: ng,gtl(*)
 
+    logical, parameter :: debug=.false.
     integer  :: i,ir,ic,check_flag, ilr, ilc, ip, &
          & i1,i2,nc,lb,ub,m,nnz,dupl
 
@@ -200,7 +201,109 @@ contains
           ic = ja(i) 
           if ((ir >=1).and.(ir<=ng).and.(ic>=1).and.(ic<=ng)) then 
             ir = gtl(ir)
-            ic = gtl(ic) 
+            ic = gtl(ic)
+            if ((ir > 0).and.(ir <= a%m)) then 
+              i1 = a%ia2(ir)
+              i2 = a%ia2(ir+1)
+              nc=i2-i1
+
+
+              if (.true.) then 
+                call issrch(ip,ic,nc,a%ia1(i1:i2-1))    
+                if (ip>0) then 
+                  a%aspk(i1+ip-1) = val(i)
+                else
+                  if (debug) &
+                       & write(0,*)'Was searching ',ic,' in: ',i1,i2,' : ',a%ia1(i1:i2-1)
+                  info = i
+                  return
+                end if
+
+              else
+!!$ 
+                ip = -1
+                lb = i1
+                ub = i2-1
+                do
+                  if (lb > ub) exit
+                  m = (lb+ub)/2
+!!$              write(0,*) 'Debug: ',lb,m,ub
+                  if (ic == a%ia1(m))  then
+                    ip   = m 
+                    lb   = ub + 1
+                  else if (ic < a%ia1(m))  then
+                    ub = m-1
+                  else 
+                    lb = m + 1
+                  end if
+                enddo
+
+                if (ip>0) then 
+                  a%aspk(ip) = val(i)                
+                else
+                  if (debug) write(0,*)'Was searching ',ic,&
+                       & ' in: ',i1,i2,' : ',a%ia1(i1:i2-1)
+                  info = i
+                  return
+                end if
+
+              end if
+            else
+              if (debug) write(0,*) 'Discarding row that does not belong to us.'
+            end if
+          end if
+        end do
+
+      case(psb_dupl_add_)
+        ! Add
+        ilr = -1 
+        ilc = -1 
+        do i=1, nz
+          ir = ia(i)
+          ic = ja(i) 
+          if ((ir >=1).and.(ir<=ng).and.(ic>=1).and.(ic<=ng)) then 
+            ir = gtl(ir)
+            ic = gtl(ic)
+            if ((ir > 0).and.(ir <= a%m)) then 
+              i1 = a%ia2(ir)
+              i2 = a%ia2(ir+1)
+              nc = i2-i1
+!!$              write(0,*) 'ir ic ',ir,ic,i1,i2,a%m,a%k
+              call issrch(ip,ic,nc,a%ia1(i1:i2-1))
+              if (ip>0) then 
+                a%aspk(i1+ip-1) = a%aspk(i1+ip-1) + val(i)
+              else
+                if (debug) write(0,*)'Was searching ',ic,&
+                     & ' in: ',i1,i2,' : ',a%ia1(i1:i2-1)
+                info = i
+                return
+              end if
+            else
+              if (debug) write(0,*) 'Discarding row that does not belong to us.'
+            end if
+          end if
+        end do
+
+      case default
+        info = -3
+        if (debug) write(0,*) 'Duplicate handling: ',dupl
+      end select
+
+    else
+
+      select case(dupl)
+      case(psb_dupl_ovwrt_,psb_dupl_err_)
+        ! Overwrite.
+        ! Cannot test for error, should have been caught earlier.
+
+        ilr = -1 
+        ilc = -1 
+        do i=1, nz
+          ir = ia(i)
+          ic = ja(i) 
+
+          if ((ir > 0).and.(ir <= a%m)) then 
+
             i1 = a%ia2(ir)
             i2 = a%ia2(ir+1)
             nc=i2-i1
@@ -211,7 +314,8 @@ contains
               if (ip>0) then 
                 a%aspk(i1+ip-1) = val(i)
               else
-                write(0,*)'Was searching ',ic,' in: ',i1,i2,' : ',a%ia1(i1:i2-1)
+                if (debug) write(0,*)'Was searching ',ic,&
+                     & ' in: ',i1,i2,' : ',a%ia1(i1:i2-1)
                 info = i
                 return
               end if
@@ -238,13 +342,16 @@ contains
               if (ip>0) then 
                 a%aspk(ip) = val(i)                
               else
-                write(0,*)'Was searching ',ic,' in: ',i1,i2,' : ',a%ia1(i1:i2-1)
+                if (debug) write(0,*)'Was searching ',ic,&
+                     & ' in: ',i1,i2,' : ',a%ia1(i1:i2-1)
                 info = i
                 return
               end if
-
             end if
+          else
+            if (debug) write(0,*) 'Discarding row that does not belong to us.'
           end if
+
         end do
 
       case(psb_dupl_add_)
@@ -254,9 +361,7 @@ contains
         do i=1, nz
           ir = ia(i)
           ic = ja(i) 
-          if ((ir >=1).and.(ir<=ng).and.(ic>=1).and.(ic<=ng)) then 
-            ir = gtl(ir)
-            ic = gtl(ic) 
+          if ((ir > 0).and.(ir <= a%m)) then 
             i1 = a%ia2(ir)
             i2 = a%ia2(ir+1)
             nc = i2-i1
@@ -267,93 +372,14 @@ contains
               info = i
               return
             end if
+          else
+            if (debug) write(0,*) 'Discarding row that does not belong to us.'
           end if
         end do
 
       case default
         info = -3
-        write(0,*) 'Duplicate handling: ',dupl
-      end select
-
-    else
-
-      select case(dupl)
-      case(psb_dupl_ovwrt_,psb_dupl_err_)
-        ! Overwrite.
-        ! Cannot test for error, should have been caught earlier.
-
-        ilr = -1 
-        ilc = -1 
-        do i=1, nz
-          ir = ia(i)
-          ic = ja(i) 
-          i1 = a%ia2(ir)
-          i2 = a%ia2(ir+1)
-          nc=i2-i1
-
-
-          if (.true.) then 
-            call issrch(ip,ic,nc,a%ia1(i1:i2-1))    
-            if (ip>0) then 
-              a%aspk(i1+ip-1) = val(i)
-            else
-              write(0,*)'Was searching ',ic,' in: ',i1,i2,' : ',a%ia1(i1:i2-1)
-              info = i
-              return
-            end if
-
-          else
-!!$ 
-            ip = -1
-            lb = i1
-            ub = i2-1
-            do
-              if (lb > ub) exit
-              m = (lb+ub)/2
-!!$              write(0,*) 'Debug: ',lb,m,ub
-              if (ic == a%ia1(m))  then
-                ip   = m 
-                lb   = ub + 1
-              else if (ic < a%ia1(m))  then
-                ub = m-1
-              else 
-                lb = m + 1
-              end if
-            enddo
-
-            if (ip>0) then 
-              a%aspk(ip) = val(i)                
-            else
-              write(0,*)'Was searching ',ic,' in: ',i1,i2,' : ',a%ia1(i1:i2-1)
-              info = i
-              return
-            end if
-
-          end if
-        end do
-
-      case(psb_dupl_add_)
-        ! Add
-        ilr = -1 
-        ilc = -1 
-        do i=1, nz
-          ir = ia(i)
-          ic = ja(i) 
-          i1 = a%ia2(ir)
-          i2 = a%ia2(ir+1)
-          nc = i2-i1
-          call issrch(ip,ic,nc,a%ia1(i1:i2-1))
-          if (ip>0) then 
-            a%aspk(i1+ip-1) = a%aspk(i1+ip-1) + val(i)
-          else
-            info = i
-            return
-          end if
-        end do
-
-      case default
-        info = -3
-        write(0,*) 'Duplicate handling: ',dupl
+        if (debug) write(0,*) 'Duplicate handling: ',dupl
       end select
     end if
 
@@ -372,6 +398,7 @@ contains
     integer, intent(in), optional  :: ng,gtl(*)
     integer  :: i,ir,ic,check_flag, ilr, ilc, ip, &
          & i1,i2,nc,lb,ub,m,nnz,dupl,isrt
+    logical, parameter :: debug=.false.
 
     info = 0
 
@@ -402,7 +429,92 @@ contains
           ic = ja(i) 
           if ((ir >=1).and.(ir<=ng).and.(ic>=1).and.(ic<=ng)) then 
             ir = gtl(ir)
+            if ((ir > 0).and.(ir <= a%m)) then 
+              ic = gtl(ic) 
+              if (ir /= ilr) then 
+                call ibsrch(i1,ir,nnz,a%ia1)
+                i2 = i1
+                do 
+                  if (i2+1 > nnz) exit
+                  if (a%ia1(i2+1) /= a%ia1(i2)) exit
+                  i2 = i2 + 1
+                end do
+                do 
+                  if (i1-1 < 1) exit
+                  if (a%ia1(i1-1) /= a%ia1(i1)) exit
+                  i1 = i1 - 1
+                end do
+                ilr = ir
+              end if
+              nc = i2-i1+1
+              call issrch(ip,ic,nc,a%ia2(i1:i2))
+              if (ip>0) then 
+                a%aspk(i1+ip-1) = val(i)
+              else
+                info = i 
+                return
+              end if
+            else
+              if (debug) write(0,*) 'Discarding row does not belong'
+            endif
+          end if
+        end do
+      case(psb_dupl_add_)
+        ! Add
+        do i=1, nz
+          ir = ia(i)
+          ic = ja(i) 
+          if ((ir >=1).and.(ir<=ng).and.(ic>=1).and.(ic<=ng)) then 
+            ir = gtl(ir)
             ic = gtl(ic) 
+            if ((ir > 0).and.(ir <= a%m)) then 
+
+              if (ir /= ilr) then 
+                call ibsrch(i1,ir,nnz,a%ia1)
+                i2 = i1
+                do 
+                  if (i2+1 > nnz) exit
+                  if (a%ia1(i2+1) /= a%ia1(i2)) exit
+                  i2 = i2 + 1
+                end do
+                do 
+                  if (i1-1 < 1) exit
+                  if (a%ia1(i1-1) /= a%ia1(i1)) exit
+                  i1 = i1 - 1
+                end do
+                ilr = ir
+              end if
+              nc = i2-i1+1
+              call issrch(ip,ic,nc,a%ia2(i1:i2))
+              if (ip>0) then 
+                a%aspk(i1+ip-1) = a%aspk(i1+ip-1) + val(i)
+              else
+                info = i 
+                return
+              end if
+            else
+              if (debug) write(0,*) 'Discarding row does not belong'
+
+            end if
+          end if
+        end do
+
+      case default
+        info = -3
+        if (debug) write(0,*) 'Duplicate handling: ',dupl
+      end select
+
+    else
+
+      select case(dupl)
+      case(psb_dupl_ovwrt_,psb_dupl_err_)
+        ! Overwrite.
+        ! Cannot test for error, should have been caught earlier.
+        do i=1, nz
+          ir = ia(i)
+          ic = ja(i) 
+          if ((ir > 0).and.(ir <= a%m)) then 
+
             if (ir /= ilr) then 
               call ibsrch(i1,ir,nnz,a%ia1)
               i2 = i1
@@ -428,14 +540,14 @@ contains
             end if
           end if
         end do
+
       case(psb_dupl_add_)
         ! Add
         do i=1, nz
           ir = ia(i)
           ic = ja(i) 
-          if ((ir >=1).and.(ir<=ng).and.(ic>=1).and.(ic<=ng)) then 
-            ir = gtl(ir)
-            ic = gtl(ic) 
+          if ((ir > 0).and.(ir <= a%m)) then 
+
             if (ir /= ilr) then 
               call ibsrch(i1,ir,nnz,a%ia1)
               i2 = i1
@@ -464,76 +576,7 @@ contains
 
       case default
         info = -3
-        write(0,*) 'Duplicate handling: ',dupl
-      end select
-
-    else
-
-      select case(dupl)
-      case(psb_dupl_ovwrt_,psb_dupl_err_)
-        ! Overwrite.
-        ! Cannot test for error, should have been caught earlier.
-        do i=1, nz
-          ir = ia(i)
-          ic = ja(i) 
-          if (ir /= ilr) then 
-            call ibsrch(i1,ir,nnz,a%ia1)
-            i2 = i1
-            do 
-              if (i2+1 > nnz) exit
-              if (a%ia1(i2+1) /= a%ia1(i2)) exit
-              i2 = i2 + 1
-            end do
-            do 
-              if (i1-1 < 1) exit
-              if (a%ia1(i1-1) /= a%ia1(i1)) exit
-              i1 = i1 - 1
-            end do
-            ilr = ir
-          end if
-          nc = i2-i1+1
-          call issrch(ip,ic,nc,a%ia2(i1:i2))
-          if (ip>0) then 
-            a%aspk(i1+ip-1) = val(i)
-          else
-            info = i 
-            return
-          end if
-        end do
-
-      case(psb_dupl_add_)
-        ! Add
-        do i=1, nz
-          ir = ia(i)
-          ic = ja(i) 
-          if (ir /= ilr) then 
-            call ibsrch(i1,ir,nnz,a%ia1)
-            i2 = i1
-            do 
-              if (i2+1 > nnz) exit
-              if (a%ia1(i2+1) /= a%ia1(i2)) exit
-              i2 = i2 + 1
-            end do
-            do 
-              if (i1-1 < 1) exit
-              if (a%ia1(i1-1) /= a%ia1(i1)) exit
-              i1 = i1 - 1
-            end do
-            ilr = ir
-          end if
-          nc = i2-i1+1
-          call issrch(ip,ic,nc,a%ia2(i1:i2))
-          if (ip>0) then 
-            a%aspk(i1+ip-1) = a%aspk(i1+ip-1) + val(i)
-          else
-            info = i 
-            return
-          end if
-        end do
-
-      case default
-        info = -3
-        write(0,*) 'Duplicate handling: ',dupl
+        if (debug) write(0,*) 'Duplicate handling: ',dupl
       end select
 
     end if
@@ -556,6 +599,7 @@ contains
     integer  :: i,ir,ic,check_flag, ilr, ilc, ip, &
          & i1,i2,nc,lb,ub,m,nnz,dupl
 
+    logical, parameter :: debug=.false.
     info = 0
 
     dupl = psb_sp_getifld(psb_dupl_,a,info)
@@ -580,6 +624,102 @@ contains
           if ((ir >=1).and.(ir<=ng).and.(ic>=1).and.(ic<=ng)) then 
             ir = gtl(ir)
             ic = gtl(ic) 
+            if ((ir > 0).and.(ir <= a%m)) then 
+              i1 = a%ia2(ir)
+              i2 = a%ia2(ir+1)
+              nc=i2-i1
+
+
+              if (.true.) then 
+                call issrch(ip,ic,nc,a%ia1(i1:i2-1))    
+                if (ip>0) then 
+                  a%aspk(i1+ip-1) = val(i)
+                else
+                  write(0,*)'Was searching ',ic,' in: ',i1,i2,' : ',a%ia1(i1:i2-1)
+                  info = i
+                  return
+                end if
+
+              else
+!!$ 
+                ip = -1
+                lb = i1
+                ub = i2-1
+                do
+                  if (lb > ub) exit
+                  m = (lb+ub)/2
+!!$              write(0,*) 'Debug: ',lb,m,ub
+                  if (ic == a%ia1(m))  then
+                    ip   = m 
+                    lb   = ub + 1
+                  else if (ic < a%ia1(m))  then
+                    ub = m-1
+                  else 
+                    lb = m + 1
+                  end if
+                enddo
+
+                if (ip>0) then 
+                  a%aspk(ip) = val(i)                
+                else
+                  write(0,*)'Was searching ',ic,' in: ',i1,i2,' : ',a%ia1(i1:i2-1)
+                  info = i
+                  return
+                end if
+
+              end if
+            else
+              if (debug) write(0,*) 'Discarding row does not belong'
+            endif
+
+          end if
+        end do
+
+      case(psb_dupl_add_)
+        ! Add
+        ilr = -1 
+        ilc = -1 
+        do i=1, nz
+          ir = ia(i)
+          ic = ja(i) 
+          if ((ir >=1).and.(ir<=ng).and.(ic>=1).and.(ic<=ng)) then 
+            ir = gtl(ir)
+            ic = gtl(ic) 
+            if ((ir > 0).and.(ir <= a%m)) then 
+              i1 = a%ia2(ir)
+              i2 = a%ia2(ir+1)
+              nc = i2-i1
+              call issrch(ip,ic,nc,a%ia1(i1:i2-1))
+              if (ip>0) then 
+                a%aspk(i1+ip-1) = a%aspk(i1+ip-1) + val(i)
+              else
+                info = i
+                return
+              end if
+            else
+              if (debug) write(0,*) 'Discarding row does not belong'
+            endif
+          end if
+        end do
+
+      case default
+        info = -3
+        if (debug) write(0,*) 'Duplicate handling: ',dupl
+      end select
+
+    else
+
+      select case(dupl)
+      case(psb_dupl_ovwrt_,psb_dupl_err_)
+        ! Overwrite.
+        ! Cannot test for error, should have been caught earlier.
+
+        ilr = -1 
+        ilc = -1 
+        do i=1, nz
+          ir = ia(i)
+          ic = ja(i) 
+          if ((ir > 0).and.(ir <= a%m)) then 
             i1 = a%ia2(ir)
             i2 = a%ia2(ir+1)
             nc=i2-i1
@@ -623,7 +763,9 @@ contains
               end if
 
             end if
-          end if
+          else
+            if (debug) write(0,*) 'Discarding row does not belong'
+          endif
         end do
 
       case(psb_dupl_add_)
@@ -633,9 +775,7 @@ contains
         do i=1, nz
           ir = ia(i)
           ic = ja(i) 
-          if ((ir >=1).and.(ir<=ng).and.(ic>=1).and.(ic<=ng)) then 
-            ir = gtl(ir)
-            ic = gtl(ic) 
+          if ((ir > 0).and.(ir <= a%m)) then 
             i1 = a%ia2(ir)
             i2 = a%ia2(ir+1)
             nc = i2-i1
@@ -646,93 +786,14 @@ contains
               info = i
               return
             end if
-          end if
+          else
+            if (debug) write(0,*) 'Discarding row does not belong'
+          endif
         end do
 
       case default
         info = -3
-        write(0,*) 'Duplicate handling: ',dupl
-      end select
-
-    else
-
-      select case(dupl)
-      case(psb_dupl_ovwrt_,psb_dupl_err_)
-        ! Overwrite.
-        ! Cannot test for error, should have been caught earlier.
-
-        ilr = -1 
-        ilc = -1 
-        do i=1, nz
-          ir = ia(i)
-          ic = ja(i) 
-          i1 = a%ia2(ir)
-          i2 = a%ia2(ir+1)
-          nc=i2-i1
-
-
-          if (.true.) then 
-            call issrch(ip,ic,nc,a%ia1(i1:i2-1))    
-            if (ip>0) then 
-              a%aspk(i1+ip-1) = val(i)
-            else
-              write(0,*)'Was searching ',ic,' in: ',i1,i2,' : ',a%ia1(i1:i2-1)
-              info = i
-              return
-            end if
-
-          else
-!!$ 
-            ip = -1
-            lb = i1
-            ub = i2-1
-            do
-              if (lb > ub) exit
-              m = (lb+ub)/2
-!!$              write(0,*) 'Debug: ',lb,m,ub
-              if (ic == a%ia1(m))  then
-                ip   = m 
-                lb   = ub + 1
-              else if (ic < a%ia1(m))  then
-                ub = m-1
-              else 
-                lb = m + 1
-              end if
-            enddo
-
-            if (ip>0) then 
-              a%aspk(ip) = val(i)                
-            else
-              write(0,*)'Was searching ',ic,' in: ',i1,i2,' : ',a%ia1(i1:i2-1)
-              info = i
-              return
-            end if
-
-          end if
-        end do
-
-      case(psb_dupl_add_)
-        ! Add
-        ilr = -1 
-        ilc = -1 
-        do i=1, nz
-          ir = ia(i)
-          ic = ja(i) 
-          i1 = a%ia2(ir)
-          i2 = a%ia2(ir+1)
-          nc = i2-i1
-          call issrch(ip,ic,nc,a%ia1(i1:i2-1))
-          if (ip>0) then 
-            a%aspk(i1+ip-1) = a%aspk(i1+ip-1) + val(i)
-          else
-            info = i
-            return
-          end if
-        end do
-
-      case default
-        info = -3
-        write(0,*) 'Duplicate handling: ',dupl
+        if (debug) write(0,*) 'Duplicate handling: ',dupl
       end select
     end if
 
@@ -751,7 +812,8 @@ contains
     integer, intent(in), optional  :: ng,gtl(*)
     integer  :: i,ir,ic,check_flag, ilr, ilc, ip, &
          & i1,i2,nc,lb,ub,m,nnz,dupl,isrt
-
+    logical, parameter :: debug=.false.
+    
     info = 0
 
     dupl = psb_sp_getifld(psb_dupl_,a,info)
@@ -782,6 +844,88 @@ contains
           if ((ir >=1).and.(ir<=ng).and.(ic>=1).and.(ic<=ng)) then 
             ir = gtl(ir)
             ic = gtl(ic) 
+            if ((ir > 0).and.(ir <= a%m)) then 
+              if (ir /= ilr) then 
+                call ibsrch(i1,ir,nnz,a%ia1)
+                i2 = i1
+                do 
+                  if (i2+1 > nnz) exit
+                  if (a%ia1(i2+1) /= a%ia1(i2)) exit
+                  i2 = i2 + 1
+                end do
+                do 
+                  if (i1-1 < 1) exit
+                  if (a%ia1(i1-1) /= a%ia1(i1)) exit
+                  i1 = i1 - 1
+                end do
+                ilr = ir
+              end if
+              nc = i2-i1+1
+              call issrch(ip,ic,nc,a%ia2(i1:i2))
+              if (ip>0) then 
+                a%aspk(i1+ip-1) = val(i)
+              else
+                info = i 
+                return
+              end if
+            else
+              if (debug) write(0,*) 'Discarding row does not belong'
+            endif
+          end if
+        end do
+      case(psb_dupl_add_)
+        ! Add
+        do i=1, nz
+          ir = ia(i)
+          ic = ja(i) 
+          if ((ir >=1).and.(ir<=ng).and.(ic>=1).and.(ic<=ng)) then 
+            ir = gtl(ir)
+            ic = gtl(ic) 
+            if ((ir > 0).and.(ir <= a%m)) then 
+              if (ir /= ilr) then 
+                call ibsrch(i1,ir,nnz,a%ia1)
+                i2 = i1
+                do 
+                  if (i2+1 > nnz) exit
+                  if (a%ia1(i2+1) /= a%ia1(i2)) exit
+                  i2 = i2 + 1
+                end do
+                do 
+                  if (i1-1 < 1) exit
+                  if (a%ia1(i1-1) /= a%ia1(i1)) exit
+                  i1 = i1 - 1
+                end do
+                ilr = ir
+              end if
+              nc = i2-i1+1
+              call issrch(ip,ic,nc,a%ia2(i1:i2))
+              if (ip>0) then 
+                a%aspk(i1+ip-1) = a%aspk(i1+ip-1) + val(i)
+              else
+                info = i 
+                return
+              end if
+            else
+              if (debug) write(0,*) 'Discarding row does not belong'
+            endif
+          end if
+        end do
+
+      case default
+        info = -3
+        if (debug) write(0,*) 'Duplicate handling: ',dupl
+      end select
+
+    else
+
+      select case(dupl)
+      case(psb_dupl_ovwrt_,psb_dupl_err_)
+        ! Overwrite.
+        ! Cannot test for error, should have been caught earlier.
+        do i=1, nz
+          ir = ia(i)
+          ic = ja(i) 
+          if ((ir > 0).and.(ir <= a%m)) then 
             if (ir /= ilr) then 
               call ibsrch(i1,ir,nnz,a%ia1)
               i2 = i1
@@ -805,16 +949,17 @@ contains
               info = i 
               return
             end if
-          end if
+          else
+            if (debug) write(0,*) 'Discarding row does not belong'
+          endif
         end do
+
       case(psb_dupl_add_)
         ! Add
         do i=1, nz
           ir = ia(i)
           ic = ja(i) 
-          if ((ir >=1).and.(ir<=ng).and.(ic>=1).and.(ic<=ng)) then 
-            ir = gtl(ir)
-            ic = gtl(ic) 
+          if ((ir > 0).and.(ir <= a%m)) then 
             if (ir /= ilr) then 
               call ibsrch(i1,ir,nnz,a%ia1)
               i2 = i1
@@ -838,81 +983,14 @@ contains
               info = i 
               return
             end if
-          end if
+          else
+            if (debug) write(0,*) 'Discarding row does not belong'
+          endif
         end do
 
       case default
         info = -3
-        write(0,*) 'Duplicate handling: ',dupl
-      end select
-
-    else
-
-      select case(dupl)
-      case(psb_dupl_ovwrt_,psb_dupl_err_)
-        ! Overwrite.
-        ! Cannot test for error, should have been caught earlier.
-        do i=1, nz
-          ir = ia(i)
-          ic = ja(i) 
-          if (ir /= ilr) then 
-            call ibsrch(i1,ir,nnz,a%ia1)
-            i2 = i1
-            do 
-              if (i2+1 > nnz) exit
-              if (a%ia1(i2+1) /= a%ia1(i2)) exit
-              i2 = i2 + 1
-            end do
-            do 
-              if (i1-1 < 1) exit
-              if (a%ia1(i1-1) /= a%ia1(i1)) exit
-              i1 = i1 - 1
-            end do
-            ilr = ir
-          end if
-          nc = i2-i1+1
-          call issrch(ip,ic,nc,a%ia2(i1:i2))
-          if (ip>0) then 
-            a%aspk(i1+ip-1) = val(i)
-          else
-            info = i 
-            return
-          end if
-        end do
-
-      case(psb_dupl_add_)
-        ! Add
-        do i=1, nz
-          ir = ia(i)
-          ic = ja(i) 
-          if (ir /= ilr) then 
-            call ibsrch(i1,ir,nnz,a%ia1)
-            i2 = i1
-            do 
-              if (i2+1 > nnz) exit
-              if (a%ia1(i2+1) /= a%ia1(i2)) exit
-              i2 = i2 + 1
-            end do
-            do 
-              if (i1-1 < 1) exit
-              if (a%ia1(i1-1) /= a%ia1(i1)) exit
-              i1 = i1 - 1
-            end do
-            ilr = ir
-          end if
-          nc = i2-i1+1
-          call issrch(ip,ic,nc,a%ia2(i1:i2))
-          if (ip>0) then 
-            a%aspk(i1+ip-1) = a%aspk(i1+ip-1) + val(i)
-          else
-            info = i 
-            return
-          end if
-        end do
-
-      case default
-        info = -3
-        write(0,*) 'Duplicate handling: ',dupl
+        if (debug) write(0,*) 'Duplicate handling: ',dupl
       end select
 
     end if
