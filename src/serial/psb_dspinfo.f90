@@ -93,7 +93,6 @@ subroutine psb_dspinfo(ireq,a,ires,info,iaux)
      else if ((toupper(a%fida) == 'COO').or.(toupper(a%fida) == 'COI')) then 
 
         if (a%infoa(psb_srtd_) == psb_isrtdcoo_) then 
-!!$      write(0,*) 'Gtrow_: srtd coo',irw
            ! In this case we can do a binary search. 
            nz = a%infoa(psb_nnz_)
            call ibsrch(ip,irw,nz,a%ia1)

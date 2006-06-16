@@ -51,8 +51,8 @@ subroutine psb_zspgtdiag(a,d,info)
   complex(kind(1.d0)), intent(inout)       :: d(:) 
   integer, intent(out)                  :: info
 
-  interface psb_spgtrow
-     subroutine psb_zspgtrow(irw,a,b,info,append,iren,lrw)
+  interface psb_spgtblk
+     subroutine psb_zspgtblk(irw,a,b,info,append,iren,lrw)
        use psb_spmat_type
        type(psb_zspmat_type), intent(in) :: a
        integer, intent(in)       :: irw
@@ -61,7 +61,7 @@ subroutine psb_zspgtdiag(a,d,info)
        integer, intent(in), target, optional :: iren(:)
        integer, intent(in), optional :: lrw
        integer, intent(out)  :: info
-     end subroutine psb_zspgtrow
+     end subroutine psb_zspgtblk
   end interface
 
   type(psb_zspmat_type)     :: tmpa
@@ -102,10 +102,10 @@ subroutine psb_zspgtdiag(a,d,info)
     write(0,*)'in spgtdiag'
     do i=1, rng, nrb
        irb=min(i+nrb-1,rng)
-       call psb_spgtrow(i,a,tmpa,info,lrw=irb)
+       call psb_spgtblk(i,a,tmpa,info,lrw=irb)
        if(info.ne.0) then
           info=4010
-          ch_err='psb_spgtrow'
+          ch_err='psb_spgtblk'
           call psb_errpush(info,name,a_err=ch_err)
           goto 9999
        end if

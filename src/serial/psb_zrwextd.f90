@@ -58,7 +58,7 @@ subroutine psb_zrwextd(nr,a,info,b)
         call psb_realloc(size(a%ia1)+jb,a%ia1,info)
         call psb_realloc(size(a%aspk)+jb,a%aspk,info)
         do i=1, min(nr-a%m,b%m)
-          ! Should use spgtrow. 
+          ! Should use spgtblk. 
           ! Don't care for the time being.
           a%ia2(a%m+i+1) =  a%ia2(a%m+i) + b%ia2(i+1) - b%ia2(i)
           ja = a%ia2(a%m+i)

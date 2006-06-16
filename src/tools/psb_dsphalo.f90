@@ -33,7 +33,7 @@
 !*****************************************************************************
 !*                                                                           *
 !*  This routine does the retrieval of remote matrix rows.                   *
-!*  Note that retrieval is done through GTROW, therefore it should work      *
+!*  Note that retrieval is done through GTBLK, therefore it should work      *
 !*  for any format.                                                          *
 !*  Currently the output is BLK%FIDA='CSR' but it would take little          *
 !*  work to change that; the pieces are transferred in COO format            *
@@ -224,10 +224,10 @@ Subroutine psb_dsphalo(a,desc_a,blk,info,rwcnv,clcnv,outfmt)
          goto 9999
       end if
 !!$      write(0,*) me,'Getting row ',idx,n_elem
-      call psb_spgtrow(idx,a,tmp,info,append=.true.)
+      call psb_spgtblk(idx,a,tmp,info,append=.true.)
       if (info /= 0) then
          info=4010
-         ch_err='psb_spgtrow'
+         ch_err='psb_spgtblk'
          call psb_errpush(info,name,a_err=ch_err)
          goto 9999
       end if

@@ -199,9 +199,9 @@ contains
       jl = 0
       do i=1,a%m,50
         nlr = min(a%m-i+1,50)
-        call psb_spgtrow(i,a,b,info,append=.true.,iren=p%mlia,lrw=i+nlr-1)
+        call psb_spgtblk(i,a,b,info,append=.true.,iren=p%mlia,lrw=i+nlr-1)
         if(info /= 0) then
-          call psb_errpush(4010,name,a_err='spgtrow')
+          call psb_errpush(4010,name,a_err='spgtblk')
           goto 9999
         end if
 

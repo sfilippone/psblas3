@@ -52,6 +52,7 @@ subroutine psb_zumf_bld(a,desc_a,p,info)
   character(len=5)         :: fmt
   character                :: upd='F'
   integer                  :: i,j,nza,nzb,nzt,ictxt, me,mycol,nprow,npcol,err_act
+  integer                  :: i_err(5)
   logical, parameter :: debug=.false.
   character(len=20)   :: name, ch_err
 

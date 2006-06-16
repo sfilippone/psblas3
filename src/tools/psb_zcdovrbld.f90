@@ -409,10 +409,10 @@ Subroutine psb_zcdovrbld(n_ovr,desc_p,desc_a,a,&
                  end if
               End If
 
-              call psb_spgtrow(idx,a,blk,info)
+              call psb_spgtblk(idx,a,blk,info)
               if (info.ne.0) then
                  info=4010
-                 ch_err='psb_spgtrow'
+                 ch_err='psb_spgtblk'
                  call psb_errpush(info,name,a_err=ch_err)
                  goto 9999
               end if

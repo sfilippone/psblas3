@@ -265,8 +265,8 @@ module psb_serial_mod
      end subroutine psb_zspinfo
   end interface
 
-  interface psb_spgtrow
-     subroutine psb_dspgtrow(irw,a,b,info,append,iren,lrw)
+  interface psb_spgtblk
+     subroutine psb_dspgtblk(irw,a,b,info,append,iren,lrw)
        use psb_spmat_type
        type(psb_dspmat_type), intent(in) :: a
        integer, intent(in)       :: irw
@@ -275,8 +275,8 @@ module psb_serial_mod
        integer, intent(in), target, optional :: iren(:)
        integer, intent(in), optional :: lrw
        integer, intent(out)  :: info
-     end subroutine psb_dspgtrow
-     subroutine psb_zspgtrow(irw,a,b,info,append,iren,lrw)
+     end subroutine psb_dspgtblk
+     subroutine psb_zspgtblk(irw,a,b,info,append,iren,lrw)
        use psb_spmat_type
        type(psb_zspmat_type), intent(in) :: a
        integer, intent(in)       :: irw
@@ -285,11 +285,11 @@ module psb_serial_mod
        integer, intent(in), target, optional :: iren(:)
        integer, intent(in), optional :: lrw
        integer, intent(out)  :: info
-     end subroutine psb_zspgtrow
+     end subroutine psb_zspgtblk
   end interface
 
-  interface psb_sp_extrow
-     subroutine psb_dspextrow(irw,a,nz,ia,ja,val,info,iren,lrw)
+  interface psb_sp_getrow
+     subroutine psb_dspgetrow(irw,a,nz,ia,ja,val,info,iren,lrw)
        use psb_spmat_type
        type(psb_dspmat_type), intent(in) :: a
        integer, intent(in)       :: irw
@@ -299,8 +299,8 @@ module psb_serial_mod
        integer, intent(in), target, optional :: iren(:)
        integer, intent(in), optional :: lrw
        integer, intent(out)  :: info
-     end subroutine psb_dspextrow
-     subroutine psb_zspextrow(irw,a,nz,ia,ja,val,info,iren,lrw)
+     end subroutine psb_dspgetrow
+     subroutine psb_zspgetrow(irw,a,nz,ia,ja,val,info,iren,lrw)
        use psb_spmat_type
        type(psb_zspmat_type), intent(in) :: a
        integer, intent(in)       :: irw
@@ -310,7 +310,7 @@ module psb_serial_mod
        integer, intent(in), target, optional :: iren(:)
        integer, intent(in), optional :: lrw
        integer, intent(out)  :: info
-     end subroutine psb_zspextrow
+     end subroutine psb_zspgetrow
   end interface
 
   interface psb_neigh
