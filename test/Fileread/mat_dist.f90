@@ -250,7 +250,7 @@ contains
 
           ll = 0
           do i= i_count, j_count-1
-            call psb_sp_extrow(i,a_glob,nz,&
+            call psb_sp_getrow(i,a_glob,nz,&
                  & irow(ll+1:),icol(ll+1:),val(ll+1:), info)
             if (info /= 0) then            
               if (nz >min(size(irow(ll+1:)),size(icol(ll+1:)),size(val(ll+1:)))) then 
@@ -338,7 +338,7 @@ contains
 
             ll = 0
             do i= i_count, i_count
-              call psb_sp_extrow(i,a_glob,nz,&
+              call psb_sp_getrow(i,a_glob,nz,&
                    & irow(ll+1:),icol(ll+1:),val(ll+1:), info)
               if (info /= 0) then            
                 if (nz >min(size(irow(ll+1:)),size(icol(ll+1:)),size(val(ll+1:)))) then 
@@ -672,7 +672,7 @@ contains
         
         ll = 0
         do i= i_count, j_count-1
-          call psb_sp_extrow(i,a_glob,nz,&
+          call psb_sp_getrow(i,a_glob,nz,&
                & irow(ll+1:),icol(ll+1:),val(ll+1:), info)
           if (info /= 0) then            
             if (nz >min(size(irow(ll+1:)),size(icol(ll+1:)),size(val(ll+1:)))) then 
@@ -1025,7 +1025,7 @@ contains
 
           ll = 0
           do i= i_count, j_count-1
-            call psb_sp_extrow(i,a_glob,nz,&
+            call psb_sp_getrow(i,a_glob,nz,&
                  & irow(ll+1:),icol(ll+1:),val(ll+1:), info)
             if (info /= 0) then            
               if (nz >min(size(irow(ll+1:)),size(icol(ll+1:)),size(val(ll+1:)))) then 
@@ -1113,7 +1113,7 @@ contains
 
             ll = 0
             do i= i_count, i_count
-              call psb_sp_extrow(i,a_glob,nz,&
+              call psb_sp_getrow(i,a_glob,nz,&
                    & irow(ll+1:),icol(ll+1:),val(ll+1:), info)
               if (info /= 0) then            
                 if (nz >min(size(irow(ll+1:)),size(icol(ll+1:)),size(val(ll+1:)))) then 
@@ -1445,7 +1445,7 @@ contains
       if (iam == root) then
         ll = 0
         do i= i_count, j_count-1
-          call psb_sp_extrow(i,a_glob,nz,&
+          call psb_sp_getrow(i,a_glob,nz,&
                & irow(ll+1:),icol(ll+1:),val(ll+1:), info)
           if (info /= 0) then            
             if (nz >min(size(irow(ll+1:)),size(icol(ll+1:)),size(val(ll+1:)))) then 

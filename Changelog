@@ -1,8 +1,7 @@
 Changelog. A lot less detailed than usual, at least for past
 history. 
 
-2006/06/14: Defined ExtRow, probably to be renamed to GetRow.
-	    This way we may close the mat objects.
+2006/06/16: Defined GetRow. This way we may close the mat objects.
 	    Next we will rewrite SMMP to only make use of GetRow,
 	    not to rely on CSR storage format. 
 
