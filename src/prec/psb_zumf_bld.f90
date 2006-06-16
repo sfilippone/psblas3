@@ -179,11 +179,11 @@ subroutine psb_zumf_bld(a,desc_a,p,info)
   call psb_zumf_factor(atmp%m,nzt,&
        & atmp%aspk,atmp%ia1,atmp%ia2,&
        & p%iprcparm(umf_symptr_),p%iprcparm(umf_numptr_),info)
-
-  if(info /= 0) then
-    info=4010
+  if (info /= 0) then
+    i_err(1) = info 
+    info=4110
     ch_err='psb_umf_fact'
-    call psb_errpush(info,name,a_err=ch_err)
+    call psb_errpush(info,name,a_err=ch_err,i_err=i_err)
     goto 9999
   end if
 

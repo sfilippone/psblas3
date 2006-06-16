@@ -180,9 +180,8 @@ subroutine psb_zslu_bld(a,desc_a,p,info)
   call psb_zslu_factor(atmp%m,nzt,&
        & atmp%aspk,atmp%ia1,atmp%ia2,p%iprcparm(slu_ptr_),info)
   if(info /= 0) then
-    info=4010
     ch_err='psb_slu_fact'
-    call psb_errpush(info,name,a_err=ch_err)
+    call psb_errpush(4110,name,a_err=ch_err,i_err=(/info,0,0,0,0/))
     goto 9999
   end if
 

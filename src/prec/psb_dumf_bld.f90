@@ -98,8 +98,8 @@ subroutine psb_dumf_bld(a,desc_a,p,info)
     goto 9999
   end if
   call psb_spinfo(psb_nztotreq_,atmp,nza,info)
+  call psb_spinfo(psb_nztotreq_,a,nzb,info)
   if (Debug) then 
-    call psb_spinfo(psb_nztotreq_,a,nzb,info)
     write(0,*) me, 'UMFBLD: Done csdp',info,nza,atmp%m,atmp%k,nzb
     call blacs_barrier(ictxt,'All')
   endif
