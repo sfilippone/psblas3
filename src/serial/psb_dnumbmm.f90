@@ -39,13 +39,49 @@ subroutine psb_dnumbmm(a,b,c)
   type(psb_dspmat_type)         :: a,b,c
   real(kind(1.d0)), allocatable :: temp(:)
   integer                       :: info
+  
+  interface psb_sp_getrow
+    subroutine psb_dspgetrow(irw,a,nz,ia,ja,val,info,iren,lrw)
+      use psb_spmat_type
+      type(psb_dspmat_type), intent(in) :: a
+      integer, intent(in)       :: irw
+      integer, intent(out)      :: nz
+      integer, intent(inout)    :: ia(:), ja(:)
+      real(kind(1.d0)),  intent(inout)    :: val(:)
+      integer, intent(in), target, optional :: iren(:)
+      integer, intent(in), optional :: lrw
+      integer, intent(out)  :: info
+    end subroutine psb_dspgetrow
+  end interface
+
 
   allocate(temp(max(a%m,a%k,b%m,b%k)),stat=info)
-
+  if (info /= 0) then
+    return
+  endif
   call psb_realloc(size(c%ia1),c%aspk,info)
-  call numbmm(a%m,a%k,b%k,a%ia2,a%ia1,0,a%aspk,&
-       & b%ia2,b%ia1,0,b%aspk,&
-       & c%ia2,c%ia1,0,c%aspk,temp)
+  if (.true.) then 
+    call numbmm(a%m,a%k,b%k,a%ia2,a%ia1,0,a%aspk,&
+         & b%ia2,b%ia1,0,b%aspk,&
+         & c%ia2,c%ia1,0,c%aspk,temp)
+  else
+    call inner_numbmm(a,b,c,temp,info)
+  end if
   deallocate(temp) 
   return
+
+contains 
+
+  subroutine inner_numbmm(a,b,c,temp,info)
+    type(psb_dspmat_type) :: a,b,c
+    integer               :: info
+    real(kind(1.d0))      :: temp(:)
+    integer, allocatable  :: iarw(:), iacl(:),ibrw(:),ibcl(:)
+    real(kind(1.d0)), allocatable :: aval(:),bval(:)
+    integer  :: maxlmn,i,j,m,n,k,l,istart,length,nazr,nbzr,jj,ii,minlm,minmn
+
+
+  end subroutine inner_numbmm
+
+
 end subroutine psb_dnumbmm

@@ -2,11 +2,11 @@
 \label{sec:datastruct}
 %\ifthenelse{\boolean{mtc}}{\minitoc}{}
 
-In this chapter are illustrated data structures used for definition of
-routines interfaces. This include data structure for sparse matrix,
-communication descriptor and preconditioner. These data structures are used for
-calling PSBLAS routines in Fortran~90 language and will be used to next
-chapters containing these callings. 
+In this chapter we  illustrate the  data structures used for definition of
+routines interfaces. They  include data structures for sparse matrices,
+communication descriptors and preconditioners.%%  These data structures
+%% are used for calling PSBLAS routines in Fortran~90 language and will
+%% be used to next chapters containing these callings.  
 
 All the data types and subroutine interfaces are defined in the module
 \verb|psb_sparse_mod|; this will have to be included by every user
@@ -23,11 +23,10 @@ Every structure of this type is associated to a sparse matrix, it
 contains data about general matrix informations and elements to be
 exchanged among processes.  
 
-It is not necessary for the user to
-know the internal structure of \verb|psb_desc_type|, it is set in
-fully-transparent mode by PSBLAS-TOOLS routines when inserting a new
-sparse matrix, however the definition of the descriptor is the
-following.  
+It is not necessary for the user to know the internal structure of
+\verb|psb_desc_type|, it is set in a transparent mode by the tools
+routines of Sec.~\ref{sec:toolsrout} while creating a new sparse
+matrix; nevertheless we include its description for the curious reader:  
 \begin{description}
 \item[{\bf matrix\_data}] includes general information about matrix and
 process grid. More precisely:
@@ -90,16 +89,16 @@ process then element $i$ contains local index correpondent to global variable $i
 else element $i$ contains -1 (NULL) value.\\
 Specified as: a pointer to an integer array of rank one.
 \end{description}
-FORTRAN95 interface for \verb|psb_desc_type| structures is therefore defined
+The Fortran95 definition  for \verb|psb_desc_type| structures is 
 as follows:
 \begin{figure}[h!]
   \begin{Sbox}
     \begin{minipage}[tl]{0.9\textwidth}
 \begin{verbatim} 
 type psb_desc_type 
-   integer, pointer :: matrix_data(:), halo_index(:)
-   integer, pointer :: overlap_elem(:), overlap_index(:)
-   integer, pointer :: loc_to_glob(:), glob_to_loc(:)
+   integer, pointer :: matrix_data(:)=>null(), halo_index(:)=>null()
+   integer, pointer :: overlap_elem(:)=>null(), overlap_index(:)=>null()
+   integer, pointer :: loc_to_glob(:)=>null(), glob_to_loc(:)=>null()
 end type psb_desc_type 
 \end{verbatim}
     \end{minipage}
@@ -152,10 +151,9 @@ state, which can take the following values:
 \label{sec:spmat}
 The \hypertarget{spdata}{{\tt psb\_spmat\_type}} data structure
 contains all information about local portion of the sparse matrix and   
-its storage mode. Many of this fields are set in fully-transparent
-mode by PSBLAS-TOOLS routines when inserting a new sparse matrix, user
-must set only fields which describe matrix storage mode. \\
-Fields contained in Sparse matrix structures are:
+its storage mode. Most  of these fields are set  by the tools
+routines when inserting a new sparse matrix; the user needs only
+choose, if he/she so whishes, a specific matrix storage mode. \\
 \begin{description}
 \item[{\bf aspk}] Contains values of the local distributed sparse
 matrix.\\
@@ -201,8 +199,9 @@ type psb_dspmat_type
    character   :: fida(5)
    character   :: descra(10)
    integer     :: infoa(psb_ifa_size_)
-   real(kind(1.d0)), pointer :: aspk(:)
-   integer, pointer :: ia1(:), ia2(:), pr(:), pl(:)
+   real(kind(1.d0)), pointer :: aspk(:)=>null()
+   integer, pointer :: ia1(:)=>null(), ia2(:)=>null()
+   integer, pointer :: pr(:)=>null(), pl(:)=>null()
 end type psb_dspmat_type
 \end{verbatim}
     \end{minipage}
@@ -273,12 +272,16 @@ values:
 
 \subsection{Preconditioner data structure}
 \label{sec:prec}
-PSBLAS-2.0 offers the possibility to use many different types of
+Our library  offers support for  many different types of
 preconditioning schemes. Besides the simple well known preconditioners
-like Diagonal Scaling or Block Jacobi (with ILU(0) incomplete
-factorization) also more complex preconditioning methods are
-implemented like the Additive Schwarz and Two-Level ones. A
-preconditioner is held in the \hypertarget{precdata}{{\tt
+like Diagonal Scaling or Block Jacobi with either  incomplete
+factorization ILU(0) or complete LU factorization.  We also provide an
+experimental package of  complex 
+preconditioning methods like the Additive Schwarz and Multilevel
+Additive Schwarz; these last preconditioners will be described in a
+separate document. 
+
+ A preconditioner is held in the \hypertarget{precdata}{{\tt
     psb\_prec\_type}} data structure which depends on the
 \verb|psb_base_prec| reported in 
 figure~\ref{fig:prectype}. The \verb|psb_base_prec| 

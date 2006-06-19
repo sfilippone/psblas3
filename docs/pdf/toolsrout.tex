@@ -412,7 +412,8 @@ Specified as: an integer variable.
 Scope:{\bf local}.\\
 Type:{\bf required}.\\
 Specified as: a structured data of type \descdata.
-\item[nnz] the number of nonzeroes in the local part of the assembled matrix.\\
+\item[nnz] An estimate of the number of nonzeroes in the local
+  part of the assembled matrix.\\ 
 Scope: {\bf global}.\\
 Type: {\bf optional}.\\
 Specified as: an integer value. 
@@ -437,7 +438,7 @@ Specified as: an integer variable.
 \item Providing a good estimate for the number of nonzeroes $nnz$ in
   the assembled matrix may substantially improve performance in the
   matrix build phase, as it will reduce or eliminate the need for
-  multiple data allocations. 
+  (potentially multiple) data reallocations. 
 \end{enumerate}
 
 

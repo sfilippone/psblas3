@@ -68,7 +68,7 @@ subroutine psb_dspgetrow(irw,a,nz,ia,ja,val,info,iren,lrw)
     end subroutine psb_dspgtblk
   end interface
 
-  integer               :: lrw_, ierr(2), err_act
+  integer               :: lrw_, ierr(5), err_act
   type(psb_dspmat_type) :: b
   integer, pointer      :: iren_(:)
   character(len=20)     :: name, ch_err

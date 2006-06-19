@@ -68,7 +68,7 @@ subroutine psb_zspgetrow(irw,a,nz,ia,ja,val,info,iren,lrw)
     end subroutine psb_zspgtblk
   end interface
 
-  integer               :: lrw_, ierr(2), err_act
+  integer               :: lrw_, ierr(5), err_act
   type(psb_zspmat_type) :: b
   integer, pointer      :: iren_(:)
   character(len=20)     :: name, ch_err

@@ -26,12 +26,12 @@ proposal for BLAS on dense matrices~\cite{BLAS1,BLAS2,BLAS3}.
 The applicability of sparse iterative solvers to many different areas
 causes some terminology problems because the same concept may be
 denoted through different names depending on the application area. The
-PSBLAS features presented in this section will be discussed mainly in terms of finite
-difference discretizations of Partial Differential Equations (PDEs).
-However, the scope of the library is wider than that: for example, it
-can be applied to finite element discretizations of PDEs, and even to
-different classes of problems such as nonlinear optimization, for
-example in optimal control problems.
+PSBLAS features presented in this document will be discussed referring
+to a   finite difference discretization of a Partial Differential
+Equation (PDE). However, the scope of the library is wider than
+that: for example, it can be applied to finite element discretizations
+of PDEs, and even to different classes of problems such as nonlinear
+optimization, for example in optimal control problems.
 
 The design of a solver for sparse linear systems is driven by many
 conflicting objectives, such as limiting occupation of storage
@@ -75,6 +75,9 @@ Message Passing Interface code is encapsulated within the BLACS
 layer. However, in some cases, MPI routines are directly used either
 to improve efficiency or to implement communication patterns for which
 the BLACS package doesn't provide any method. 
+
+In any case we provide wrappers around the BLACS routines so that the
+user does not need to delve into their details (see Sec.~\ref{sec:toolsrout}).
 %% We assume that the user program has initialized a BLACS process grid
 %% with one column and as many rows as there are processes; the PSBLAS
 %% initialization routines will take the communication context for this
@@ -85,6 +88,121 @@ the BLACS package doesn't provide any method.
 \end{center}
 \caption{PSBLAS library components hierarchy.\label{fig:psblas}}
 \end{figure}
+
+
+The type of linear system matrices that we address  typically arise in the
+numerical solution of PDEs;  in such a context,
+it is necessary to pay special attention to the
+structure of the problem from which the application originates. 
+The nonzero pattern of a matrix arising from the
+discretization of a PDE is influenced by various factors, such as the
+shape of the  domain, the discretization strategy, and
+the equation/unknown ordering. The matrix itself can be interpreted as
+the  adjacency matrix of the graph associated with the discretization
+mesh. 
+
+The distribution of the coefficient matrix for the linear system is
+based on the ``owner computes'' rule: 
+the variable associated to each mesh point is assigned to a process
+that will  own the corresponding row in the coefficient matrix and
+will  carry out all related computations. This allocation strategy 
+is equivalent to a partition of the discretization mesh into {\em
+sub-domains}. 
+Our library  supports any distribution that keeps together 
+the coefficients of each matrix row; there are no other constraints on
+the variable assignment. 
+This choice is consistent with  data distributions commonly used in
+ScaLAPACK  such as  \verb|CYCLIC(N)| and \verb|BLOCK|, 
+as well as completely arbitrary assignments of
+equation indices to processes. In particular it is consistent with the
+usage of graph partitioning tools commonly available in the
+literature, e.g. METIS~\cite{METIS}.
+Dense vectors  conform  to sparse
+matrices, that is, the entries of a vector follow the same distribution
+of the matrix rows.  
+
+We assume that the sparse matrix is built in parallel, where each
+process generates its own portion. We never require that the entire
+matrix be available on a single node. However, it is possible
+to hold the entire matrix in one process and distribute it
+explicitly\footnote{In our prototype implementation  we provide 
+sample scatter/gather routines.}, even though  the resulting 
+bottleneck would make this option unattractive in most  cases. 
+
+
+\subsection{Basic Nomenclature}
+
+
+Our computational model implies that the data allocation on the
+parallel distributed memory machine is guided by the structure of the
+physical model, and specifically by the discretization mesh of the
+PDE. 
+
+Each point of the discretization mesh will have (at least) one
+associated equation/variable, and therefore one index. We say that
+point  $i$ {\em depends\/} on point $j$ if the  equation for a
+variable associated with $i$ contains a term in $j$,  or equivalently
+if $a_{ij} \ne0$.  
+After the partition of the discretization mesh into {\em sub-domains\/}
+assigned to the parallel processes,
+we classify the  points of a given sub-domain as following.
+\begin{description}
+\item[Internal.] An internal point of
+ a given domain {\em depends} only on  points of the
+same domain. 
+If all points of a domain are assigned to one
+process, then a computational step (e.g., a
+matrix-vector product) of the 
+equations associated with the internal points  requires no data
+items from other domains and no communications.
+
+\item[Boundary.] A point of
+a given domain is a boundary point if it {\em depends} on  points
+belonging to other domains.
+
+\item[Halo.] A halo point for a given domain is a point belonging to
+another domain such that there is a boundary point which {\em depends\/}
+on it. Whenever performing a computational step, such as a
+matrix-vector product, the values associated with halo points are
+requested from other domains. A boundary point of a given 
+domain is a halo point for (at least) another domain; therefore
+the cardinality of the boundary points set denotes the amount of data
+ sent to other domains. 
+\item[Overlap.] An overlap point is a boundary point assigned to
+multiple domains. Any operation that involves an overlap point
+has to be replicated for each assignment. 
+\end{description}
+Overlap points do not usually exist in the basic data
+distribution, but they are a feature of Domain Decomposition
+Schwarz preconditioners which we are in the process of including in
+our distribution~\cite{PARA04,APNUM06}. 
+
+We denote the sets of  internal, boundary and halo points for a given
+subdomain  by $\cal I$, $\cal B$ and $\cal H$.
+Each subdomain is assigned to one process; each process usually
+owns one subdomain, although the user may choose to assign more than
+one subdomain to a process.  If each process $i$ owns one
+subdomain, the number of rows in the local sparse matrix is
+$|{\cal I}_i| + |{\cal B}_i|$, and the number of local columns
+(i.e. those for which there exists at least one non-zero entry in the
+local rows)  is $|{\cal I}_i| + |{\cal B}_i| +|{\cal H}_i|$.
+
+\begin{figure}[h] 
+\begin{center}
+\leavevmode
+\rotatebox{-90}{\includegraphics[scale=0.45]{figures/points}}
+\end{center}
+\caption{Point classfication.\label{fig:points}}
+\end{figure}
+
+This classification of mesh points guides the naming scheme that we
+adopted in the library internals and in the data structures. We
+explicitly note that ``Halo'' points are also often called ``ghost''
+points in the literature. 
+
+
+
+\subsection{Library contents}
 
 The PSBLAS library consists of various classes of subroutines:
 \begin{description}
@@ -231,8 +349,8 @@ multiple time steps, the following structure may be more appropriate:
 \item Call the iterative method of choice, e.g. \verb|psb_bicgstab|
  \end{enumerate}
 \end{enumerate}
-The insertion routines will be called as many times as needed; it is
-clear that they only need be called on the data that is actually
+The insertion routines will be called as many times as needed; 
+they only need to  be called on the data that is actually
 allocated to the current process, i.e. each process generates its own
 data. 
 

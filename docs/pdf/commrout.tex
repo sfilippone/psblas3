@@ -10,7 +10,7 @@ routines not tied to a discretization space see~\ref{sec:toolsrout}.
 
 \subroutine{psb\_halo}{Halo Data Communication}    
 
-These subroutines restore a consistent status for the halo
+These subroutines gathers the values of the halo
 elements, and  (optionally) scale the result:
 
 \[ x \leftarrow \alpha x \]
@@ -80,8 +80,7 @@ An integer value that contains an error code.
 
 \subroutine{psb\_ovrl}{Overlap Update}    
 
-These subroutines restore a consistent status for the overlap
-elements:
+These subroutines applies an overlap operator to the input vector:
 
 \[ x \leftarrow Q x \]
 where:
@@ -152,8 +151,8 @@ An integer value that contains an error code.
 
 \section*{Usage notes}
 \begin{enumerate}
-\item If there is no overlap in the data distribution, no operations
-are performed;
+\item If there is no overlap in the data distribution associated with
+  the descriptor, no operations are performed;
 \item The operator $P^{T}$ performs the reduction sum of overlap
 elements; it is a ``prolongation'' operator $P^T$ that
 replicates overlap elements, accounting for the physical replication
