@@ -215,142 +215,205 @@ contains
 
     
   subroutine psb_ibcasts(ictxt,dat,root)
-    integer, intent(in)      :: ictxt,root
+    integer, intent(in)      :: ictxt
     integer, intent(inout)   :: dat
+    integer, intent(in), optional :: root
 
-    integer  :: iam, np
+    integer  :: iam, np, root_
+
+    if (present(root)) then
+      root_ = root
+    else
+      root_ = 0
+    endif
 
     call psb_info(ictxt,iam,np)
     
-    if (iam==root) then 
+    if (iam==root_) then 
       call gebs2d(ictxt,'A',dat)
     else
-      call gebr2d(ictxt,'A',dat,rrt=root)
+      call gebr2d(ictxt,'A',dat,rrt=root_)
     endif
   end subroutine psb_ibcasts
 
   subroutine psb_ibcastv(ictxt,dat,root)
-    integer, intent(in)    :: ictxt,root
+    integer, intent(in)    :: ictxt
     integer, intent(inout) :: dat(:)
+    integer, intent(in), optional  :: root
 
-    integer  :: iam, np
+    integer  :: iam, np, root_
+
+    if (present(root)) then
+      root_ = root
+    else
+      root_ = 0
+    endif
 
     call psb_info(ictxt,iam,np)
     
-    if (iam==root) then 
+    if (iam==root_) then 
       call gebs2d(ictxt,'A',dat)
     else
-      call gebr2d(ictxt,'A',dat,rrt=root)
+      call gebr2d(ictxt,'A',dat,rrt=root_)
     endif
   end subroutine psb_ibcastv
     
   subroutine psb_ibcastm(ictxt,dat,root)
-    integer, intent(in)    :: ictxt,root
+    integer, intent(in)    :: ictxt
     integer, intent(inout) :: dat(:,:)
+    integer, intent(in), optional :: root
 
-    integer  :: iam, np
+    integer  :: iam, np, root_
+
+    if (present(root)) then
+      root_ = root
+    else
+      root_ = 0
+    endif
 
     call psb_info(ictxt,iam,np)
     
-    if (iam==root) then 
+    if (iam==root_) then 
       call gebs2d(ictxt,'A',dat)
     else
-      call gebr2d(ictxt,'A',dat,rrt=root)
+      call gebr2d(ictxt,'A',dat,rrt=root_)
     endif
   end subroutine psb_ibcastm
 
 
   subroutine psb_dbcasts(ictxt,dat,root)
-    integer, intent(in)      :: ictxt,root
+    integer, intent(in)      :: ictxt
     real(kind(1.d0)), intent(inout)   :: dat
+    integer, intent(in), optional :: root
 
-    integer  :: iam, np
+    integer  :: iam, np, root_
+
+    if (present(root)) then
+      root_ = root
+    else
+      root_ = 0
+    endif
 
     call psb_info(ictxt,iam,np)
     
-    if (iam==root) then 
+    if (iam==root_) then 
       call gebs2d(ictxt,'A',dat)
     else
-      call gebr2d(ictxt,'A',dat,rrt=root)
+      call gebr2d(ictxt,'A',dat,rrt=root_)
     endif
   end subroutine psb_dbcasts
 
-  subroutine psb_dbcastv(ictxt,dat,root)
-    integer, intent(in)    :: ictxt,root
-    real(kind(1.d0)), intent(inout) :: dat(:)
 
-    integer  :: iam, np
+  subroutine psb_dbcastv(ictxt,dat,root)
+    integer, intent(in)    :: ictxt
+    real(kind(1.d0)), intent(inout) :: dat(:)
+    integer, intent(in), optional :: root
+
+    integer  :: iam, np, root_
+
+    if (present(root)) then
+      root_ = root
+    else
+      root_ = 0
+    endif
 
     call psb_info(ictxt,iam,np)
     
-    if (iam==root) then 
+    if (iam==root_) then 
       call gebs2d(ictxt,'A',dat)
     else
-      call gebr2d(ictxt,'A',dat,rrt=root)
+      call gebr2d(ictxt,'A',dat,rrt=root_)
     endif
   end subroutine psb_dbcastv
     
   subroutine psb_dbcastm(ictxt,dat,root)
-    integer, intent(in)    :: ictxt,root
+    integer, intent(in)    :: ictxt
     real(kind(1.d0)), intent(inout) :: dat(:,:)
+    integer, intent(in), optional :: root
 
-    integer  :: iam, np
+    integer  :: iam, np, root_
+
+    if (present(root)) then
+      root_ = root
+    else
+      root_ = 0
+    endif
 
     call psb_info(ictxt,iam,np)
     
-    if (iam==root) then 
+    if (iam==root_) then 
       call gebs2d(ictxt,'A',dat)
     else
-      call gebr2d(ictxt,'A',dat,rrt=root)
+      call gebr2d(ictxt,'A',dat,rrt=root_)
     endif
   end subroutine psb_dbcastm
     
 
   subroutine psb_zbcasts(ictxt,dat,root)
-    integer, intent(in)      :: ictxt,root
+    integer, intent(in)      :: ictxt
     complex(kind(1.d0)), intent(inout)   :: dat
+    integer, intent(in), optional :: root
 
-    integer  :: iam, np
+    integer  :: iam, np, root_
+
+    if (present(root)) then
+      root_ = root
+    else
+      root_ = 0
+    endif
 
     call psb_info(ictxt,iam,np)
     
-    if (iam==root) then 
+    if (iam==root_) then 
       call gebs2d(ictxt,'A',dat)
     else
-      call gebr2d(ictxt,'A',dat,rrt=root)
+      call gebr2d(ictxt,'A',dat,rrt=root_)
     endif
   end subroutine psb_zbcasts
 
   subroutine psb_zbcastv(ictxt,dat,root)
-    integer, intent(in)    :: ictxt,root
+    integer, intent(in)    :: ictxt
     complex(kind(1.d0)), intent(inout) :: dat(:)
+    integer, intent(in), optional :: root
 
-    integer  :: iam, np
+    integer  :: iam, np, root_
+
+    if (present(root)) then
+      root_ = root
+    else
+      root_ = 0
+    endif
 
     call psb_info(ictxt,iam,np)
     
-    if (iam==root) then 
+    if (iam==root_) then 
       call gebs2d(ictxt,'A',dat)
     else
-      call gebr2d(ictxt,'A',dat,rrt=root)
+      call gebr2d(ictxt,'A',dat,rrt=root_)
     endif
   end subroutine psb_zbcastv
     
   subroutine psb_zbcastm(ictxt,dat,root)
-    integer, intent(in)    :: ictxt,root
+    integer, intent(in)    :: ictxt
     complex(kind(1.d0)), intent(inout) :: dat(:,:)
+    integer, intent(in), optional :: root
 
-    integer  :: iam, np
+    integer  :: iam, np, root_
+
+    if (present(root)) then
+      root_ = root
+    else
+      root_ = 0
+    endif
 
     call psb_info(ictxt,iam,np)
     
-    if (iam==root) then 
+    if (iam==root_) then 
       call gebs2d(ictxt,'A',dat)
     else
-      call gebr2d(ictxt,'A',dat,rrt=root)
+      call gebr2d(ictxt,'A',dat,rrt=root_)
     endif
   end subroutine psb_zbcastm
-
 
 
   subroutine psb_iamxs(ictxt,dat,rt,ia)

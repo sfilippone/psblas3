@@ -64,20 +64,20 @@ CONTAINS
           INPARMS(I) = IACHAR(MTRX_FILE(I:I))
         END DO
         ! Broadcast parameters to all processors
-        call psb_bcast(ictxt,inparms(1:40),0)
+        call psb_bcast(ictxt,inparms(1:40))
 
         ! Convert strings in array
         DO I = 1, LEN(CMETHD)
           INPARMS(I) = IACHAR(CMETHD(I:I))
         END DO
         ! Broadcast parameters to all processors
-        call psb_bcast(ictxt,inparms(1:40),0)
+        call psb_bcast(ictxt,inparms(1:40))
 
         DO I = 1, LEN(AFMT)
           INPARMS(I) = IACHAR(AFMT(I:I))
         END DO
         ! Broadcast parameters to all processors
-        call psb_bcast(ictxt,inparms(1:40),0)
+        call psb_bcast(ictxt,inparms(1:40))
 
         READ(*,*) IPART
         IF (IP.GE.5) THEN
@@ -118,8 +118,8 @@ CONTAINS
         INPARMS(4) = ITRACE
         INPARMS(5) = IPREC
         INPARMS(6) = NOVR
-        call psb_bcast(ictxt,inparms(1:6),0)
-        call psb_bcast(ictxt,eps,0)
+        call psb_bcast(ictxt,inparms(1:6))
+        call psb_bcast(ictxt,eps)
 
         write(*,'("Solving matrix       : ",a40)')mtrx_file      
         write(*,'("Number of processors : ",i3)')nprow
@@ -136,23 +136,23 @@ CONTAINS
       end if
     else
       ! Receive Parameters
-      call psb_bcast(ictxt,inparms(1:40),0)
+      call psb_bcast(ictxt,inparms(1:40))
 
       do i = 1, 40
         mtrx_file(i:i) = achar(inparms(i))
       end do
-      call psb_bcast(ictxt,inparms(1:40),0)
+      call psb_bcast(ictxt,inparms(1:40))
 
       DO I = 1, 40
         CMETHD(I:I) = ACHAR(INPARMS(I))
       END DO
 
-      call psb_bcast(ictxt,inparms(1:40),0)
+      call psb_bcast(ictxt,inparms(1:40))
       DO I = 1, LEN(AFMT)
         AFMT(I:I) = ACHAR(INPARMS(I))
       END DO
 
-      call psb_bcast(ictxt,inparms(1:6),0)
+      call psb_bcast(ictxt,inparms(1:6))
 
       ipart  =  inparms(1) 
       istopc =  inparms(2) 
@@ -160,7 +160,7 @@ CONTAINS
       itrace =  inparms(4) 
       iprec  =  inparms(5) 
       novr     =  inparms(6) 
-      call psb_bcast(ictxt,eps,0)
+      call psb_bcast(ictxt,eps)
 
     end if
 

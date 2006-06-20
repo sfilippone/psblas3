@@ -287,16 +287,16 @@ contains
           intbuf(i) = iachar(cmethd(i:i))
         end do
         ! broadcast parameters to all processors
-        call psb_bcast(ictxt,intbuf(1:10),0)
+        call psb_bcast(ictxt,intbuf(1:10))
 
         ! broadcast parameters to all processors
-        call psb_bcast(ictxt,iprec,0)
-        call psb_bcast(ictxt,novr,0)
+        call psb_bcast(ictxt,iprec)
+        call psb_bcast(ictxt,novr)
 
         do i = 1, len(afmt)
           intbuf(i) = iachar(afmt(i:i))
         end do
-        call psb_bcast(ictxt,intbuf(1:10),0)
+        call psb_bcast(ictxt,intbuf(1:10))
 
         read(*,*) idim
         if (ip.ge.4) then
@@ -326,7 +326,7 @@ contains
         intbuf(3) = itmax
         intbuf(4) = itrace
         intbuf(5) = ml
-        call psb_bcast(ictxt,intbuf(1:5),0)
+        call psb_bcast(ictxt,intbuf(1:5))
 
         write(*,'("Solving matrix       : ell1")')      
         write(*,'("Grid dimensions      : ",i4,"x",i4,"x",i4)')idim,idim,idim
@@ -343,19 +343,19 @@ contains
         stop 1
       endif
     else
-      call psb_bcast(ictxt,intbuf(1:10),0)
+      call psb_bcast(ictxt,intbuf(1:10))
 
       do i = 1, 10
         cmethd(i:i) = achar(intbuf(i))
       end do
 
-      call psb_bcast(ictxt,iprec,0)
-      call psb_bcast(ictxt,novr,0)
-      call psb_bcast(ictxt,intbuf(1:10),0)
+      call psb_bcast(ictxt,iprec)
+      call psb_bcast(ictxt,novr)
+      call psb_bcast(ictxt,intbuf(1:10))
       do i = 1, 5
         afmt(i:i) = achar(intbuf(i))
       end do
-      call psb_bcast(ictxt,intbuf(1:5),0)
+      call psb_bcast(ictxt,intbuf(1:5))
       idim    = intbuf(1)
       istopc  = intbuf(2)
       itmax   = intbuf(3)
