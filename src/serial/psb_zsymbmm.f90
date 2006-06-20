@@ -31,6 +31,12 @@
 ! File:  psb_zsymbmm.f90 
 ! Subroutine: 
 ! Parameters:
+!
+!
+! Note: This subroutine performs the symbolic product of two sparse matrices.
+!       It is modeled after the SMMP package by R. Bank and C. Douglas, but is 
+!       rewritten in Fortran 95 making use of our sparse matrix facilities.
+!
 
 subroutine psb_zsymbmm(a,b,c)
   use psb_spmat_type
@@ -73,6 +79,10 @@ subroutine psb_zsymbmm(a,b,c)
   nze = max(a%m+1,2*a%m)
   call psb_sp_reall(c,nze,info)
 !!$  write(0,*) 'SYMBMM90 ',size(c%pl),size(c%pr)
+  !
+  ! Note: we need to test whether there is a performance impact 
+  !       in not using the original Douglas & Bank code. 
+  !
   if (.false.) then 
     call symbmm(a%m,a%k,b%k,a%ia2,a%ia1,0,&
          & b%ia2,b%ia1,0,&
@@ -88,6 +98,7 @@ subroutine psb_zsymbmm(a,b,c)
   c%descra='GUN'
   deallocate(itemp) 
   return
+
 contains
   subroutine inner_symbmm(a,b,c,index,info)
     type(psb_zspmat_type) :: a,b,c
@@ -166,4 +177,5 @@ contains
       end do main
 
   end subroutine inner_symbmm
+
 end subroutine psb_zsymbmm
