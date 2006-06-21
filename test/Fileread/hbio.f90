@@ -86,21 +86,21 @@ contains
          & type,nrow,ncol,nnzero,neltvl,ptrfmt,indfmt,valfmt,rhsfmt
     if (rhscrd.gt.0) read(infile,fmt=fmt11)rhstype,nrhs,nrhsix
 
+    call psb_sp_all(a,nnzero,nrow+1,nnzero,ircode)
+    if (ircode /= 0 ) then 
+      write(0,*) 'Memory allocation failed'
+      goto 993
+    end if
+
+    a%m    = nrow
+    a%k    = ncol
+    a%fida = 'CSR'
+    a%descra='G'
+
 
     if (tolower(type(1:1)) == 'r') then 
       if (tolower(type(2:2)) == 'u') then 
 
-        call psb_sp_all(a,nnzero,nrow+1,nnzero,ircode)
-        
-        if (ircode /= 0 ) then 
-          write(0,*) 'Memory allocation failed'
-          goto 993
-        end if
-        
-        a%m    = nrow
-        a%k    = ncol
-        a%fida = 'CSR'
-        a%descra='G'
 
         read (infile,fmt=ptrfmt) (a%ia2(i),i=1,nrow+1)
         read (infile,fmt=indfmt) (a%ia1(i),i=1,nnzero)
@@ -120,16 +120,6 @@ contains
 
         ! we are generally working with non-symmetric matrices, so
         ! we de-symmetrize what we are about to read
-        
-        call psb_sp_all(nrow,ncol,a,2*nnzero,ircode)
-        
-        if (ircode /= 0 ) then 
-          write(0,*) 'Memory allocation failed'
-          goto 993
-        end if
-        a%fida = 'CSR'
-        a%descra='G'
-        
 
         read (infile,fmt=ptrfmt) (a%ia2(i),i=1,nrow+1)
         read (infile,fmt=indfmt) (a%ia1(i),i=1,nnzero)
@@ -144,11 +134,11 @@ contains
           endif
           read (infile,fmt=rhsfmt) (b(i),i=1,nrow)
         endif
-        
+
         call psb_ipcsr2coo(a,ircode)
         if (ircode /= 0)   goto 993  
-        
 
+        call psb_sp_reall(a,2*nnzero,ircode)
         ! A is now in COO format
         nzr = nnzero
         do i=1,nnzero
@@ -480,6 +470,12 @@ contains
         if (ircode /= 0) then
           write(0,*) 'ipcsr2coo ',ircode
           goto 993  
+        end if
+        call psb_sp_reall(a,2*nnzero,ircode)
+      
+        if (ircode /= 0 ) then 
+          write(0,*) 'Memory allocation failed'
+          goto 993
         end if
 
         ! A is now in COO format
