@@ -1,6 +1,8 @@
 Changelog. A lot less detailed than usual, at least for past
 history. 
 
+2006/06/21: Bug fix in hb_read when dealing with symmetric matrices. 
+
 2006/06/20: Rewritten symbmm and numbmm from SMMP to be intependent of
 	    CSR  storage by using GetRow. Still need to test for
 	    performance. 
