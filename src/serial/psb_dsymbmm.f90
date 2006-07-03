@@ -83,7 +83,7 @@ subroutine psb_dsymbmm(a,b,c)
   ! Note: we need to test whether there is a performance impact 
   !       in not using the original Douglas & Bank code. 
   !
-  if (.false.) then 
+  if (.true.) then 
     call symbmm(a%m,a%k,b%k,a%ia2,a%ia1,0,&
          & b%ia2,b%ia1,0,&
          & c%ia2,c%ia1,0,itemp)

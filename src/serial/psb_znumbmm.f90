@@ -71,7 +71,7 @@ subroutine psb_znumbmm(a,b,c)
   ! Note: we still have to test about possible performance hits. 
   !
   !
-  if (.false.) then 
+  if (.true.) then 
     call znumbmm(a%m,a%k,b%k,a%ia2,a%ia1,0,a%aspk,&
          & b%ia2,b%ia1,0,b%aspk,&
          & c%ia2,c%ia1,0,c%aspk,temp)
