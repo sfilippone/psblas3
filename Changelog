@@ -1,6 +1,9 @@
 Changelog. A lot less detailed than usual, at least for past
 history. 
 
+2006/07/03: Ooops, the GetRow mod in SMMP is a performance hit, at
+	    least on SP machines. Need to investigate further. 
+
 2006/06/21: Bug fix in hb_read when dealing with symmetric matrices. 
 
 2006/06/20: Rewritten symbmm and numbmm from SMMP to be intependent of
