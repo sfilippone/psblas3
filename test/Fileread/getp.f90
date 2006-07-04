@@ -122,7 +122,7 @@ CONTAINS
         call psb_bcast(ictxt,eps)
 
         write(*,'("Solving matrix       : ",a40)')mtrx_file      
-        write(*,'("Number of processors : ",i3)')nprow
+        write(*,'("Number of processors : ",i3)')np
         write(*,'("Data distribution    : ",i2)')ipart
         write(*,'("Preconditioner       : ",i2)')iprec
         if(iprec.gt.2) write(*,'("Overlapping levels   : ",i2)')novr
