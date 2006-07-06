@@ -201,21 +201,8 @@ program pde90
   call psb_barrier(ictxt)
   t1 = mpi_wtime()  
   eps   = 1.d-9
-  if (cmethd == 'BICGSTAB') then 
-    call  psb_bicgstab(a,pre,b,x,eps,desc_a,info,& 
-         & itmax,iter,err,itrace)     
-  else  if (cmethd == 'CGS') then 
-    call  psb_cgs(a,pre,b,x,eps,desc_a,info,& 
-         & itmax,iter,err,itrace)     
-  else  if (cmethd == 'CG') then 
-    call  psb_cg(a,pre,b,x,eps,desc_a,info,& 
-         & itmax,iter,err,itrace)     
-  else if (cmethd == 'BICGSTABL') then 
-    call  psb_bicgstabl(a,pre,b,x,eps,desc_a,info,& 
-         & itmax,iter,err,itrace,ml)     
-  else
-    write(0,*) 'unknown method ',cmethd
-  end if
+  call psb_krylov(cmethd,a,pre,b,x,eps,desc_a,info,& 
+       & itmax,iter,err,itrace,istop=istopc,irst=ml)     
 
   if(info.ne.0) then
     info=4010

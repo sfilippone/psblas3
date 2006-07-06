@@ -156,8 +156,8 @@ subroutine psi_zswaptranm(flag,n,beta,y,desc_a,work,info,data)
     d_idx => desc_a%halo_index
   end if
 
-  idxs = 0
-  idxr = 0
+  idxs = 1
+  idxr = 1
   totxch = 0
   point_to_proc = 1
   rvhd(:) = mpi_request_null
@@ -670,8 +670,8 @@ subroutine psi_zswaptranv(flag,beta,y,desc_a,work,info,data)
      d_idx => desc_a%halo_index
   end if
 
-  idxs = 0
-  idxr = 0
+  idxs = 1
+  idxr = 1
   totxch = 0
   point_to_proc = 1
   rvhd(:) = mpi_request_null

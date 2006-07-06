@@ -216,8 +216,9 @@ subroutine psb_dbicg(a,prec,b,x,eps,desc_a,info,&
     if (itx.ge.litmax) exit restart  
     it = 0      
     call psb_geaxpby(done,b,dzero,r,desc_a,info)
-    call psb_spmm(-done,a,x,done,r,desc_a,info,work=aux)
-    call psb_geaxpby(done,r,dzero,rt,desc_a,info)
+    if (info == 0) call psb_spmm(-done,a,x,done,r,desc_a,info,work=aux)
+    if (debug) write(0,*) me,' Done spmm',info
+    if (info == 0) call psb_geaxpby(done,r,dzero,rt,desc_a,info)
     if(info.ne.0) then
        info=4011
        call psb_errpush(info,name)

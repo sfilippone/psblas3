@@ -155,6 +155,9 @@ program df_sample
       do i=1, m_problem
          b_col_glob(i) = 1.d0
       enddo      
+      call random_seed()
+      call random_number(b_col_glob(1:m_problem))
+      b_col_glob(1:m_problem) =  2.0d0 * b_col_glob(1:m_problem) - 1.0d0
     endif
     call gebs2d(ictxt,'a',b_col_glob(1:m_problem))
   else
@@ -272,22 +275,8 @@ program df_sample
   iparm = 0
   call blacs_barrier(ictxt,'all')
   t1 = mpi_wtime()
-  if (cmethd.eq.'BICGSTAB') then
-    call  psb_bicgstab(a,pre,b_col,x_col,eps,desc_a,info,& 
-       & itmax,iter,err,itrace,istop=istopc)     
-  else if (cmethd.eq.'BICG') then
-    call  psb_bicg(a,pre,b_col,x_col,eps,desc_a,info,& 
-       & itmax,iter,err,itrace)     
-  else if (cmethd.eq.'CGS') then
-    call  psb_cgs(a,pre,b_col,x_col,eps,desc_a,info,& 
-       & itmax,iter,err,itrace)     
-  else if (cmethd.eq.'CG') then
-    call  psb_cg(a,pre,b_col,x_col,eps,desc_a,info,& 
-       & itmax,iter,err,itrace)     
-  else if (cmethd.eq.'BICGSTABL') then
-    call  psb_bicgstabl(a,pre,b_col,x_col,eps,desc_a,info,& 
-       & itmax,iter,err,ierr,itrace,ml)     
-  endif
+  call psb_krylov(cmethd,a,pre,b_col,x_col,eps,desc_a,info,& 
+       & itmax,iter,err,itrace,istop=istopc,irst=ml)     
   call blacs_barrier(ictxt,'all')
   t2 = mpi_wtime() - t1
   call psb_amx(ictxt,t2)
@@ -299,7 +288,7 @@ program df_sample
   if (amroot) then 
     call psb_prec_descr(6,pre)
     write(*,'("Matrix: ",a)')mtrx_file
-    write(*,'("Computed solution on ",i4," processors")')np
+    write(*,'("Computed solution on ",i8," processors")')np
     write(*,'("Iterations to convergence: ",i6)')iter
     write(*,'("Error indicator on exit: ",f7.2)')err
     write(*,'("Time to buil prec.   : ",es10.4)')tprec

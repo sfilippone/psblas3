@@ -272,13 +272,8 @@ program zf_sample
   iparm = 0
   call blacs_barrier(ictxt,'all')
   t1 = mpi_wtime()
-  if (cmethd.eq.'BICGSTAB') then
-    call  psb_bicgstab(a,pre,b_col,x_col,eps,desc_a,info,& 
-       & itmax,iter,err,itrace,istop=istopc)     
-  else if (cmethd.eq.'CGS') then
-    call  psb_cgs(a,pre,b_col,x_col,eps,desc_a,info,& 
-       & itmax,iter,err,itrace)     
-  endif
+  call psb_krylov(cmethd,a,pre,b_col,x_col,eps,desc_a,info,& 
+       & itmax,iter,err,itrace,istop=istopc,irst=ml)     
   call blacs_barrier(ictxt,'all')
   t2 = mpi_wtime() - t1
   call psb_amx(ictxt,t2)

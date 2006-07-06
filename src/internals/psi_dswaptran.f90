@@ -118,20 +118,20 @@ subroutine psi_dswaptranm(flag,n,beta,y,desc_a,work,info,data)
   allocate(sdsz(0:nprow-1), rvsz(0:nprow-1), bsdidx(0:nprow-1),&
        & brvidx(0:nprow-1), rvhd(0:nprow-1), prcid(0:nprow-1),&
        & ptp(0:nprow-1), stat=info)
-  if(info.ne.0) then
+  if(info /= 0) then
      call psb_errpush(4000,name)
      goto 9999
   end if
 
-  swap_mpi  = iand(flag,psb_swap_mpi_).ne.0
-  swap_sync = iand(flag,psb_swap_sync_).ne.0
-  swap_send = iand(flag,psb_swap_send_).ne.0
-  swap_recv = iand(flag,psb_swap_recv_).ne.0
+  swap_mpi  = iand(flag,psb_swap_mpi_) /= 0
+  swap_sync = iand(flag,psb_swap_sync_) /= 0
+  swap_send = iand(flag,psb_swap_send_) /= 0
+  swap_recv = iand(flag,psb_swap_recv_) /= 0
 
   if(present(data)) then
-     if(data.eq.psb_comm_halo_) then
+     if(data == psb_comm_halo_) then
         d_idx => desc_a%halo_index
-     else if(data.eq.psb_comm_ovr_) then
+     else if(data == psb_comm_ovr_) then
         d_idx => desc_a%ovrlap_index
      else
         d_idx => desc_a%halo_index
@@ -140,16 +140,16 @@ subroutine psi_dswaptranm(flag,n,beta,y,desc_a,work,info,data)
      d_idx => desc_a%halo_index
   end if
 
-  idxs = 0
-  idxr = 0
+  idxs = 1
+  idxr = 1
   totxch = 0
   point_to_proc = 1
   rvhd(:) = mpi_request_null
 
   ! prepare info for communications
   proc_to_comm = d_idx(point_to_proc+psb_proc_id_)
-  do while (proc_to_comm.ne.-1)
-     if(proc_to_comm .ne. myrow) totxch = totxch+1
+  do while (proc_to_comm /= -1)
+     if(proc_to_comm  /=  myrow) totxch = totxch+1
      nerv = d_idx(point_to_proc+psb_n_elem_recv_)
      nesd = d_idx(point_to_proc+nerv+psb_n_elem_send_)
 
@@ -174,7 +174,7 @@ subroutine psi_dswaptranm(flag,n,beta,y,desc_a,work,info,data)
      all=.false.
   else
      allocate(sndbuf(idxs),rcvbuf(idxr), stat=info)
-     if(info.ne.0) then
+     if(info /= 0) then
         call psb_errpush(4000,name)
         goto 9999
      end if
@@ -187,7 +187,7 @@ subroutine psi_dswaptranm(flag,n,beta,y,desc_a,work,info,data)
      ! gather elements into sendbuffer for swapping
      point_to_proc = 1
      proc_to_comm  = d_idx(point_to_proc+psb_proc_id_)
-     do while (proc_to_comm .ne. -1)
+     do while (proc_to_comm  /=  -1)
         nerv = d_idx(point_to_proc+psb_n_elem_recv_)
         nesd = d_idx(point_to_proc+nerv+psb_n_elem_send_)
 
@@ -205,7 +205,7 @@ subroutine psi_dswaptranm(flag,n,beta,y,desc_a,work,info,data)
      call mpi_alltoallv(rcvbuf,rvsz,brvidx,&
           & mpi_double_precision,sndbuf,sdsz,&
           & bsdidx,mpi_double_precision,icomm,iret)
-     if(iret.ne.mpi_success) then
+     if(iret /= mpi_success) then
         int_err(1) = iret
         info=400
         call psb_errpush(info,name,i_err=int_err)
@@ -215,7 +215,7 @@ subroutine psi_dswaptranm(flag,n,beta,y,desc_a,work,info,data)
      ! scatter elements from receivebuffer after swapping
      point_to_proc = 1
      proc_to_comm  = d_idx(point_to_proc+psb_proc_id_)
-     do while (proc_to_comm .ne. -1)
+     do while (proc_to_comm  /=  -1)
         nerv = d_idx(point_to_proc+psb_n_elem_recv_)
         nesd = d_idx(point_to_proc+nerv+psb_n_elem_send_)
 
@@ -232,7 +232,7 @@ subroutine psi_dswaptranm(flag,n,beta,y,desc_a,work,info,data)
 
      point_to_proc = 1
      proc_to_comm  = d_idx(point_to_proc+psb_proc_id_)
-     do while (proc_to_comm .ne. -1)
+     do while (proc_to_comm  /=  -1)
         nerv = d_idx(point_to_proc+psb_n_elem_recv_)
         nesd = d_idx(point_to_proc+nerv+psb_n_elem_send_)
         if (proc_to_comm .lt. myrow) then
@@ -255,7 +255,7 @@ subroutine psi_dswaptranm(flag,n,beta,y,desc_a,work,info,data)
            call psi_gth(nerv,n,d_idx(idx_pt:idx_pt+nerv-1),&
                 & y,rcvbuf(rcv_pt:rcv_pt+nerv*n-1))
            call dgesd2d(ictxt,nerv,n,rcvbuf(rcv_pt),nerv,proc_to_comm,0)
-        else if (proc_to_comm .eq. myrow) then
+        else if (proc_to_comm  ==  myrow) then
            ! I send to myself
            idx_pt = point_to_proc+psb_elem_recv_
            rcv_pt = bsdidx(proc_to_comm)
@@ -269,11 +269,11 @@ subroutine psi_dswaptranm(flag,n,beta,y,desc_a,work,info,data)
 
      point_to_proc = 1
      proc_to_comm  = d_idx(point_to_proc+psb_proc_id_)
-     do while (proc_to_comm .ne. -1)
+     do while (proc_to_comm  /=  -1)
         nerv = d_idx(point_to_proc+psb_n_elem_recv_)
         nesd = d_idx(point_to_proc+nerv+psb_n_elem_send_)
 
-        if(proc_to_comm.ne.myrow) then
+        if(proc_to_comm /= myrow) then
            idx_pt = point_to_proc+nerv+psb_elem_send_
            snd_pt = bsdidx(proc_to_comm)
            call psi_sct(nesd,n,d_idx(idx_pt:idx_pt+nesd-1),&
@@ -294,17 +294,17 @@ subroutine psi_dswaptranm(flag,n,beta,y,desc_a,work,info,data)
      ! First I post all the non blocking receives
      point_to_proc = 1
      proc_to_comm  = d_idx(point_to_proc+psb_proc_id_)
-     do while (proc_to_comm .ne. -1)
+     do while (proc_to_comm  /=  -1)
         nerv = d_idx(point_to_proc+psb_n_elem_recv_)
         nesd = d_idx(point_to_proc+nerv+psb_n_elem_send_)
 
-        if(proc_to_comm.ne.myrow) then
+        if(proc_to_comm /= myrow) then
            p2ptag = krecvid(ictxt,proc_to_comm,myrow)
            snd_pt = brvidx(proc_to_comm)
            call mpi_irecv(sndbuf(rcv_pt),sdsz(proc_to_comm),&
                 & mpi_double_precision,prcid(proc_to_comm),&
                 & p2ptag, icomm,rvhd(proc_to_comm),iret)
-           if(iret.ne.mpi_success) then
+           if(iret /= mpi_success) then
               int_err(1) = iret
               info=400
               call psb_errpush(info,name,i_err=int_err)
@@ -319,7 +319,7 @@ subroutine psi_dswaptranm(flag,n,beta,y,desc_a,work,info,data)
      ! Then I post all the blocking sends
      point_to_proc = 1
      proc_to_comm  = d_idx(point_to_proc+psb_proc_id_)
-     do while (proc_to_comm .ne. -1)
+     do while (proc_to_comm  /=  -1)
         nerv = d_idx(point_to_proc+psb_n_elem_recv_)
         nesd = d_idx(point_to_proc+nerv+psb_n_elem_send_)
 
@@ -328,12 +328,12 @@ subroutine psi_dswaptranm(flag,n,beta,y,desc_a,work,info,data)
         call psi_gth(nerv,n,d_idx(idx_pt:idx_pt+nerv-1),&
              & y,rcvbuf(rcv_pt:rcv_pt+nerv*n-1))
 
-        if(proc_to_comm .ne. myrow) then
+        if(proc_to_comm  /=  myrow) then
            p2ptag=ksendid(ictxt,proc_to_comm,myrow)
            call mpi_send(rcvbuf(rcv_pt),rvsz(proc_to_comm),&
                 & mpi_double_precision,prcid(proc_to_comm),&
                 & p2ptag,icomm,iret)
-           if(iret.ne.mpi_success) then
+           if(iret /= mpi_success) then
               int_err(1) = iret
               info=400
               call psb_errpush(info,name,i_err=int_err)
@@ -347,14 +347,14 @@ subroutine psi_dswaptranm(flag,n,beta,y,desc_a,work,info,data)
      if(.false.) then
         do i=1, totxch
            call mpi_waitany(nprow,rvhd,ixrec,p2pstat,iret)
-           if(iret.ne.mpi_success) then
+           if(iret /= mpi_success) then
               int_err(1) = iret
               info=400
               call psb_errpush(info,name,i_err=int_err)
               goto 9999
            end if
 
-           if (ixrec .ne. mpi_undefined) then
+           if (ixrec  /=  mpi_undefined) then
               ixrec=ixrec-1  ! mpi_waitany returns an 1 to nprow index
               point_to_proc = ptp(ixrec)
               proc_to_comm  = d_idx(point_to_proc+psb_proc_id_)
@@ -375,11 +375,11 @@ subroutine psi_dswaptranm(flag,n,beta,y,desc_a,work,info,data)
 
         point_to_proc = 1
         proc_to_comm  = d_idx(point_to_proc+psb_proc_id_)
-        do while (proc_to_comm .ne. -1)
+        do while (proc_to_comm  /=  -1)
            nerv = d_idx(point_to_proc+psb_n_elem_recv_)
            nesd = d_idx(point_to_proc+nerv+psb_n_elem_send_)
 
-           if(proc_to_comm .eq. myrow) then
+           if(proc_to_comm  ==  myrow) then
               idx_pt = point_to_proc+nerv+psb_elem_send_
               rcv_pt = brvidx(proc_to_comm)
               call psi_sct(nesd,n,d_idx(idx_pt:idx_pt+nesd-1),&
@@ -393,13 +393,13 @@ subroutine psi_dswaptranm(flag,n,beta,y,desc_a,work,info,data)
 
         point_to_proc = 1
         proc_to_comm  = d_idx(point_to_proc+psb_proc_id_)
-        do while (proc_to_comm .ne. -1)
+        do while (proc_to_comm  /=  -1)
            nerv = d_idx(point_to_proc+psb_n_elem_recv_)
            nesd = d_idx(point_to_proc+nerv+psb_n_elem_send_)
 
-           if(proc_to_comm.ne.myrow) then
+           if(proc_to_comm /= myrow) then
               call mpi_wait(rvhd(proc_to_comm),p2pstat,iret)
-              if(iret.ne.mpi_success) then
+              if(iret /= mpi_success) then
                  int_err(1) = iret
                  info=400
                  call psb_errpush(info,name,i_err=int_err)
@@ -428,7 +428,7 @@ subroutine psi_dswaptranm(flag,n,beta,y,desc_a,work,info,data)
 
      point_to_proc = 1
      proc_to_comm  = d_idx(point_to_proc+psb_proc_id_)
-     do while (proc_to_comm .ne. -1)
+     do while (proc_to_comm  /=  -1)
         nerv = d_idx(point_to_proc+psb_n_elem_recv_)
         nesd = d_idx(point_to_proc+nerv+psb_n_elem_send_)
 
@@ -446,11 +446,11 @@ subroutine psi_dswaptranm(flag,n,beta,y,desc_a,work,info,data)
 
      point_to_proc = 1
      proc_to_comm  = d_idx(point_to_proc+psb_proc_id_)
-     do while (proc_to_comm .ne. -1)
+     do while (proc_to_comm  /=  -1)
         nerv = d_idx(point_to_proc+psb_n_elem_recv_)
         nesd = d_idx(point_to_proc+nerv+psb_n_elem_send_)
 
-        if(proc_to_comm.ne.myrow) then
+        if(proc_to_comm /= myrow) then
            snd_pt = bsdidx(proc_to_comm)
            call dgerv2d(ictxt,nesd,n,sndbuf(snd_pt),nesd,proc_to_comm,0)
            idx_pt = point_to_proc+nerv+psb_elem_send_
@@ -473,7 +473,7 @@ subroutine psi_dswaptranm(flag,n,beta,y,desc_a,work,info,data)
        & brvidx,rvhd,prcid,&
        & ptp,stat=info)
   if(all) deallocate(sndbuf,rcvbuf,stat=info)
-  if(info.ne.0) then
+  if(info /= 0) then
     call psb_errpush(4000,name)
     goto 9999
   end if
@@ -483,7 +483,7 @@ subroutine psi_dswaptranm(flag,n,beta,y,desc_a,work,info,data)
 
 9999 continue
   call psb_erractionrestore(err_act)
-  if (err_act.eq.act_abort) then
+  if (err_act == act_abort) then
      call psb_error(ictxt)
      return
   end if
@@ -616,20 +616,20 @@ subroutine psi_dswaptranv(flag,beta,y,desc_a,work,info,data)
   allocate(sdsz(0:nprow-1), rvsz(0:nprow-1), bsdidx(0:nprow-1),&
        & brvidx(0:nprow-1), rvhd(0:nprow-1), prcid(0:nprow-1),&
        & ptp(0:nprow-1), stat=info)
-  if(info.ne.0) then
+  if(info /= 0) then
      call psb_errpush(4000,name)
      goto 9999
   end if
 
-  swap_mpi  = iand(flag,psb_swap_mpi_).ne.0
-  swap_sync = iand(flag,psb_swap_sync_).ne.0
-  swap_send = iand(flag,psb_swap_send_).ne.0
-  swap_recv = iand(flag,psb_swap_recv_).ne.0
+  swap_mpi  = iand(flag,psb_swap_mpi_) /= 0
+  swap_sync = iand(flag,psb_swap_sync_) /= 0
+  swap_send = iand(flag,psb_swap_send_) /= 0
+  swap_recv = iand(flag,psb_swap_recv_) /= 0
 
   if(present(data)) then
-     if(data.eq.psb_comm_halo_) then
+     if(data == psb_comm_halo_) then
         d_idx => desc_a%halo_index
-     else if(data.eq.psb_comm_ovr_) then
+     else if(data == psb_comm_ovr_) then
         d_idx => desc_a%ovrlap_index
      else
         d_idx => desc_a%halo_index
@@ -638,8 +638,8 @@ subroutine psi_dswaptranv(flag,beta,y,desc_a,work,info,data)
      d_idx => desc_a%halo_index
   end if
 
-  idxs = 0
-  idxr = 0
+  idxs = 1
+  idxr = 1
   totxch = 0
   point_to_proc = 1
   rvhd(:) = mpi_request_null
@@ -647,8 +647,8 @@ subroutine psi_dswaptranv(flag,beta,y,desc_a,work,info,data)
 
   ! prepare info for communications
   proc_to_comm = d_idx(point_to_proc+psb_proc_id_)
-  do while (proc_to_comm.ne.-1)
-     if(proc_to_comm .ne. myrow) totxch = totxch+1
+  do while (proc_to_comm /= -1)
+     if(proc_to_comm  /=  myrow) totxch = totxch+1
      nerv = d_idx(point_to_proc+psb_n_elem_recv_)
      nesd = d_idx(point_to_proc+nerv+psb_n_elem_send_)
 
@@ -673,7 +673,7 @@ subroutine psi_dswaptranv(flag,beta,y,desc_a,work,info,data)
      all=.false.
   else
      allocate(sndbuf(idxs),rcvbuf(idxr), stat=info)
-     if(info.ne.0) then
+     if(info /= 0) then
         call psb_errpush(4000,name)
         goto 9999
      end if
@@ -686,7 +686,7 @@ subroutine psi_dswaptranv(flag,beta,y,desc_a,work,info,data)
      ! gather elements into sendbuffer for swapping
      point_to_proc = 1
      proc_to_comm  = d_idx(point_to_proc+psb_proc_id_)
-     do while (proc_to_comm .ne. -1)
+     do while (proc_to_comm  /=  -1)
         nerv = d_idx(point_to_proc+psb_n_elem_recv_)
         nesd = d_idx(point_to_proc+nerv+psb_n_elem_send_)
 
@@ -703,7 +703,7 @@ subroutine psi_dswaptranv(flag,beta,y,desc_a,work,info,data)
      call mpi_alltoallv(rcvbuf,rvsz,brvidx,&
           & mpi_double_precision,sndbuf,sdsz,&
           & bsdidx,mpi_double_precision,icomm,iret)
-     if(iret.ne.mpi_success) then
+     if(iret /= mpi_success) then
         int_err(1) = iret
         info=400
         call psb_errpush(info,name,i_err=int_err)
@@ -713,7 +713,7 @@ subroutine psi_dswaptranv(flag,beta,y,desc_a,work,info,data)
      ! scatter elements from receivebuffer after swapping
      point_to_proc = 1
      proc_to_comm  = d_idx(point_to_proc+psb_proc_id_)
-     do while (proc_to_comm .ne. -1)
+     do while (proc_to_comm  /=  -1)
         nerv = d_idx(point_to_proc+psb_n_elem_recv_)
         nesd = d_idx(point_to_proc+nerv+psb_n_elem_send_)
 
@@ -730,7 +730,7 @@ subroutine psi_dswaptranv(flag,beta,y,desc_a,work,info,data)
 
      point_to_proc = 1
      proc_to_comm  = d_idx(point_to_proc+psb_proc_id_)
-     do while (proc_to_comm .ne. -1)
+     do while (proc_to_comm  /=  -1)
         nerv = d_idx(point_to_proc+psb_n_elem_recv_)
         nesd = d_idx(point_to_proc+nerv+psb_n_elem_send_)
         if (proc_to_comm .lt. myrow) then
@@ -753,7 +753,7 @@ subroutine psi_dswaptranv(flag,beta,y,desc_a,work,info,data)
            call psi_gth(nerv,d_idx(idx_pt:idx_pt+nerv-1),&
                 & y,rcvbuf(rcv_pt:rcv_pt+nerv-1))
            call dgesd2d(ictxt,nerv,1,rcvbuf(rcv_pt),nerv,proc_to_comm,0)
-        else if (proc_to_comm .eq. myrow) then
+        else if (proc_to_comm  ==  myrow) then
            ! I send to myself
            idx_pt = point_to_proc+psb_elem_recv_
            rcv_pt = bsdidx(proc_to_comm)
@@ -767,11 +767,11 @@ subroutine psi_dswaptranv(flag,beta,y,desc_a,work,info,data)
 
      point_to_proc = 1
      proc_to_comm  = d_idx(point_to_proc+psb_proc_id_)
-     do while (proc_to_comm .ne. -1)
+     do while (proc_to_comm  /=  -1)
         nerv = d_idx(point_to_proc+psb_n_elem_recv_)
         nesd = d_idx(point_to_proc+nerv+psb_n_elem_send_)
 
-        if(proc_to_comm.ne.myrow) then
+        if(proc_to_comm /= myrow) then
            idx_pt = point_to_proc+nerv+psb_elem_send_
            snd_pt = bsdidx(proc_to_comm)
            call psi_sct(nesd,d_idx(idx_pt:idx_pt+nesd-1),&
@@ -792,17 +792,18 @@ subroutine psi_dswaptranv(flag,beta,y,desc_a,work,info,data)
      ! First I post all the non blocking receives
      point_to_proc = 1
      proc_to_comm  = d_idx(point_to_proc+psb_proc_id_)
-     do while (proc_to_comm .ne. -1)
+     do while (proc_to_comm  /=  -1)
         nerv = d_idx(point_to_proc+psb_n_elem_recv_)
         nesd = d_idx(point_to_proc+nerv+psb_n_elem_send_)
 
-        if(proc_to_comm.ne.myrow) then
+        if (proc_to_comm /= myrow) then
            p2ptag = krecvid(ictxt,proc_to_comm,myrow)
            snd_pt = brvidx(proc_to_comm)
+!!$           write(0,*) myrow,'Swaptran ',snd_pt,' to',proc_to_comm
            call mpi_irecv(sndbuf(snd_pt),sdsz(proc_to_comm),&
                 & mpi_double_precision,prcid(proc_to_comm),&
                 & p2ptag, icomm,rvhd(proc_to_comm),iret)
-           if(iret.ne.mpi_success) then
+           if(iret /= mpi_success) then
               int_err(1) = iret
               info=400
               call psb_errpush(info,name,i_err=int_err)
@@ -817,7 +818,7 @@ subroutine psi_dswaptranv(flag,beta,y,desc_a,work,info,data)
      ! Then I post all the blocking sends
      point_to_proc = 1
      proc_to_comm  = d_idx(point_to_proc+psb_proc_id_)
-     do while (proc_to_comm .ne. -1)
+     do while (proc_to_comm  /=  -1)
         nerv = d_idx(point_to_proc+psb_n_elem_recv_)
         nesd = d_idx(point_to_proc+nerv+psb_n_elem_send_)
 
@@ -826,12 +827,12 @@ subroutine psi_dswaptranv(flag,beta,y,desc_a,work,info,data)
         call psi_gth(nerv,d_idx(idx_pt:idx_pt+nerv-1),&
              & y,rcvbuf(rcv_pt:rcv_pt+nerv-1))
 
-        if(proc_to_comm .ne. myrow) then
+        if(proc_to_comm  /=  myrow) then
            p2ptag=ksendid(ictxt,proc_to_comm,myrow)
            call mpi_send(rcvbuf(rcv_pt),rvsz(proc_to_comm),&
                 & mpi_double_precision,prcid(proc_to_comm),&
                 & p2ptag,icomm,iret)
-           if(iret.ne.mpi_success) then
+           if(iret /= mpi_success) then
               int_err(1) = iret
               info=400
               call psb_errpush(info,name,i_err=int_err)
@@ -845,14 +846,14 @@ subroutine psi_dswaptranv(flag,beta,y,desc_a,work,info,data)
      if(.false.) then
         do i=1, totxch
            call mpi_waitany(nprow,rvhd,ixrec,p2pstat,iret)
-           if(iret.ne.mpi_success) then
+           if(iret /= mpi_success) then
               int_err(1) = iret
               info=400
               call psb_errpush(info,name,i_err=int_err)
               goto 9999
            end if
 
-           if (ixrec .ne. mpi_undefined) then
+           if (ixrec  /=  mpi_undefined) then
               ixrec=ixrec-1  ! mpi_waitany returns an 1 to nprow index
               point_to_proc = ptp(ixrec)
               proc_to_comm  = d_idx(point_to_proc+psb_proc_id_)
@@ -873,11 +874,11 @@ subroutine psi_dswaptranv(flag,beta,y,desc_a,work,info,data)
 
         point_to_proc = 1
         proc_to_comm  = d_idx(point_to_proc+psb_proc_id_)
-        do while (proc_to_comm .ne. -1)
+        do while (proc_to_comm  /=  -1)
            nerv = d_idx(point_to_proc+psb_n_elem_recv_)
            nesd = d_idx(point_to_proc+nerv+psb_n_elem_send_)
 
-           if(proc_to_comm .eq. myrow) then
+           if(proc_to_comm  ==  myrow) then
               idx_pt = point_to_proc+nerv+psb_elem_send_
               rcv_pt = brvidx(proc_to_comm)
               call psi_sct(nesd,d_idx(idx_pt:idx_pt+nesd-1),&
@@ -892,13 +893,13 @@ subroutine psi_dswaptranv(flag,beta,y,desc_a,work,info,data)
 
         point_to_proc = 1
         proc_to_comm  = d_idx(point_to_proc+psb_proc_id_)
-        do while (proc_to_comm .ne. -1)
+        do while (proc_to_comm  /=  -1)
            nerv = d_idx(point_to_proc+psb_n_elem_recv_)
            nesd = d_idx(point_to_proc+nerv+psb_n_elem_send_)
 
-           if(proc_to_comm.ne.myrow) then
+           if(proc_to_comm /= myrow) then
               call mpi_wait(rvhd(proc_to_comm),p2pstat,iret)
-              if(iret.ne.mpi_success) then
+              if(iret /= mpi_success) then
                  int_err(1) = iret
                  info=400
                  call psb_errpush(info,name,i_err=int_err)
@@ -926,7 +927,7 @@ subroutine psi_dswaptranv(flag,beta,y,desc_a,work,info,data)
 
      point_to_proc = 1
      proc_to_comm  = d_idx(point_to_proc+psb_proc_id_)
-     do while (proc_to_comm .ne. -1)
+     do while (proc_to_comm  /=  -1)
         nerv = d_idx(point_to_proc+psb_n_elem_recv_)
         nesd = d_idx(point_to_proc+nerv+psb_n_elem_send_)
 
@@ -944,11 +945,11 @@ subroutine psi_dswaptranv(flag,beta,y,desc_a,work,info,data)
 
      point_to_proc = 1
      proc_to_comm  = d_idx(point_to_proc+psb_proc_id_)
-     do while (proc_to_comm .ne. -1)
+     do while (proc_to_comm  /=  -1)
         nerv = d_idx(point_to_proc+psb_n_elem_recv_)
         nesd = d_idx(point_to_proc+nerv+psb_n_elem_send_)
 
-        if(proc_to_comm.ne.myrow) then
+        if(proc_to_comm /= myrow) then
            snd_pt = bsdidx(proc_to_comm)
            call dgerv2d(ictxt,nesd,1,sndbuf(snd_pt),nesd,proc_to_comm,0)
            idx_pt = point_to_proc+psb_elem_recv_
@@ -971,8 +972,14 @@ subroutine psi_dswaptranv(flag,beta,y,desc_a,work,info,data)
   deallocate(sdsz,rvsz,bsdidx,&
        & brvidx,rvhd,prcid,&
        & ptp,stat=info)
-  if(all) deallocate(sndbuf,rcvbuf,stat=info)
-  if(info.ne.0) then
+  if ((info==0).and. (all)) then 
+    write(0,*) myrow, 'Deallocating sndbuf? '
+    deallocate(sndbuf,rcvbuf,stat=info)
+
+  end if
+
+  if(info /= 0) then
+    write(0,*) 'Error on deallocate ',info
     call psb_errpush(4000,name)
     goto 9999
   end if
@@ -982,9 +989,10 @@ subroutine psi_dswaptranv(flag,beta,y,desc_a,work,info,data)
 
 9999 continue
   call psb_erractionrestore(err_act)
-  if (err_act.eq.act_abort) then
+  if (err_act == act_abort) then
      call psb_error(ictxt)
      return
   end if
   return
+
 end subroutine psi_dswaptranv

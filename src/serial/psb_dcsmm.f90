@@ -67,22 +67,46 @@ subroutine psb_dcsmm(alpha,a,b,beta,c,info,trans)
   lb = size(b,1)
   lc = size(c,1)
   iwsz = 2*m*n
-  allocate(work(iwsz))
-  
+  allocate(work(iwsz),stat=info)
+  if (info /= 0) then
+    info = 4010
+    ch_err='allocate'
+    call psb_errpush(info,name,a_err=ch_err)
+    goto 9999
+  end if
+      
   call dcsmm(trans_,m,n,k,alpha,&
        & a%pl,a%fida,a%descra,a%aspk,a%ia1,a%ia2,a%infoa,a%pr,&
        & b,lb,beta,c,lc,work,iwsz,info)
   
-  deallocate(work)
-  call psb_erractionrestore(err_act)
 
-  if(info.ne.0) then
-     if (err_act.eq.act_abort) then
-        call psb_error()
-        return
-     end if
+  if (info.ne.0) then
+    info = 4010
+    ch_err='Serial csmm'
+    call psb_errpush(info,name,a_err=ch_err)
+    goto 9999
+
+    goto 9999
   end if
-     
+  deallocate(work,stat=info)
+
+  if (info.ne.0) then
+    info = 4010
+    ch_err='Deallocate'
+    call psb_errpush(info,name,a_err=ch_err)
+    goto 9999
+
+    goto 9999
+  end if
+  call psb_erractionrestore(err_act)
   return
 
+9999 continue
+  call psb_erractionrestore(err_act)
+
+  if (err_act == act_abort) then
+    call psb_error()
+    return
+  end if
+  return
 end subroutine psb_dcsmm
