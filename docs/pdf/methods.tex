@@ -4,6 +4,95 @@
 In this chapter we provide routines for preconditioners and iterative
 methods. 
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+%  Krylov Methods driver routine
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subroutine{psb\_krylov \label{cg}}{Krylov Methods Driver Routine}
+
+This subroutine is a driver that provides a general interface for all
+the Krylov-Subspace family methods implemented in PSBLAS-2.0. The
+stopping criterion is the normwise backward error, in the infinity
+norm, i.e. the iteration is stopped when 
+\[ \frac{\|r\|}{(\|A\|\|x\|+\|b\|)} < eps \]
+or
+\[ \frac{\|r_i\|}{\|b\|_2} < eps \]
+according to the value passed through the  istop argument (see later).
+
+
+\syntax{call psb\_krylov}{method,a,prec,b,x,eps,desc\_a,info,itmax,iter,err,itrace,istop}
+
+\begin{description}
+\item[\bf On Entry]
+\item[method] a string that defines the iterative method to be
+  used. Valid values in PSBLAS-2.0 are:
+  \begin{description}
+  \item[CG]: the Conjugate gradient method;
+  \item[CGS]:the Conjugate Gradient Stabilized method;
+
+  \item[BICG]: the Bi-Conjugate Gradient method;
+  \item[BICGSTAB]: the Bi-Conjugate Gradient Stabilized method;
+  \item[BICGSTABL]: the Bi-Conjugate Gradient Stabilized method with restarting;
+  \item[RGMRES]: the Generalized Minimal Residual method with restarting.
+  \end{description}
+\item[a] the local portion of global sparse matrix
+$A$. \\
+Scope: {\bf local} \\
+Type: {\bf required}\\
+Specified as: a structured data of type \spdata.
+\item[prec] The data structure containing the preconditioner.\\
+Scope: {\bf local} \\
+Type: {\bf required}\\
+Specified as: a structured data of type \precdata.
+\item[b] The RHS vector. \\
+Scope: {\bf local} \\
+Type: {\bf required}\\
+Specified as: a rank one array.
+\item[x] The initial guess. \\
+Scope: {\bf local} \\
+Type: {\bf required}\\
+Specified as: a rank one array.
+\item[eps] The stopping tolerance. \\
+Scope: {\bf global} \\
+Type: {\bf required}\\
+Specified as: a real number. 
+\item[desc\_a] contains data structures for communications.\\
+Scope: {\bf local} \\
+Type: {\bf required}\\
+Specified as: a structured data of type \descdata.
+\item[itmax]  The maximum number of iterations to perform.\\
+Scope: {\bf global} \\
+Type: {\bf optional}\\
+Default: $itmax = 1000$.\\
+Specified as: an integer variable $itmax \ge 1$.
+\item[itrace] If $>0$  print out an informational message about
+  convergence  every $itrace$ iterations.\\ 
+Scope: {\bf global} \\
+Type: {\bf optional}\\
+\item[istop]  An integer specifying the stopping criterion.\\
+Scope: {\bf global} \\
+Type: {\bf optional}\\
+
+\item[\bf On Return] 
+\item[x] The computed solution. \\
+Scope: {\bf local} \\
+Type: {\bf required}\\
+Specified as: a rank one array.
+\item[iter]  The number of iterations performed.\\
+Scope: {\bf global} \\
+Type: {\bf optional}\\
+Returned  as: an integer variable.
+\item[err]  The error estimate on exit.\\
+Scope: {\bf global} \\
+Type: {\bf optional}\\
+Returned  as: a real number.
+\item[info]  An error code.\\
+Scope: {\bf global} \\
+Type: {\bf optional}\\
+Returned  as: an integer variable.
+\end{description}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
