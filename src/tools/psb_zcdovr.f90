@@ -126,7 +126,7 @@ Subroutine psb_zcdovr(a,desc_a,novr,desc_ov,info)
     !
     if (debug) write(0,*) 'Calling desccpy'
     call psb_cdcpy(desc_a,desc_ov,info)
-    if (info.ne.0) then
+    if (info /= 0) then
        info=4010
        ch_err='psb_cdcpy'
        call psb_errpush(info,name,a_err=ch_err)
@@ -161,7 +161,7 @@ Subroutine psb_zcdovr(a,desc_a,novr,desc_ov,info)
   ! nonzeros per row is the same as the global. 
   !
   call psb_spinfo(psb_nztotreq_,a,nztot,info)
-  if (info.ne.0) then
+  if (info /= 0) then
      info=4010
      ch_err='psb_spinfo'
      call psb_errpush(info,name,a_err=ch_err)
@@ -184,7 +184,7 @@ Subroutine psb_zcdovr(a,desc_a,novr,desc_ov,info)
        &   desc_ov%ovrlap_elem(novr*(Max(elem_dim,1)+3)),&
        &   desc_ov%matrix_data(psb_mdata_size_),&
        &   desc_ov%halo_index(novr*(Size(desc_a%halo_index)+3)),STAT=INFO)
-  if (info.ne.0) then
+  if (info /= 0) then
      info=4000
      call psb_errpush(info,name)
      goto 9999
@@ -200,7 +200,12 @@ Subroutine psb_zcdovr(a,desc_a,novr,desc_ov,info)
   desc_ov%matrix_data(psb_dec_type_) = psb_desc_bld_ 
 
   Allocate(desc_ov%loc_to_glob(Size(desc_a%loc_to_glob)),&
-       & desc_ov%glob_to_loc(Size(desc_a%glob_to_loc)))
+       & desc_ov%glob_to_loc(Size(desc_a%glob_to_loc)),stat=info)
+  if (info /= 0) then
+     info=4000
+     call psb_errpush(info,name)
+     goto 9999
+  end if
 
   desc_ov%loc_to_glob(:) = desc_a%loc_to_glob(:)
   desc_ov%glob_to_loc(:) = desc_a%glob_to_loc(:)
@@ -214,7 +219,7 @@ Subroutine psb_zcdovr(a,desc_a,novr,desc_ov,info)
   !
   Call psb_cdovrbld(novr,desc_ov,desc_a,a,&
        & l_tmp_halo,l_tmp_ovr_idx,lworks,lworkr,info) 
-  if (info.ne.0) then
+  if (info /= 0) then
      info=4010
      ch_err='psb_cdovrbld'
      call psb_errpush(info,name,a_err=ch_err)
@@ -232,7 +237,7 @@ Subroutine psb_zcdovr(a,desc_a,novr,desc_ov,info)
   
 9999 continue
   call psb_erractionrestore(err_act)
-  if (err_act.eq.act_abort) then
+  if (err_act == act_abort) then
      call psb_error(ictxt)
      return
   end if

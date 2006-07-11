@@ -87,7 +87,7 @@ Subroutine psb_dcdovrbld(n_ovr,desc_p,desc_a,a,&
   real(kind(1.d0)) :: t1,t2,t3,t4,t5,t6,t7, tl, tch
   character(len=20)   :: name, ch_err
 
-  if(psb_get_errstatus().ne.0) return 
+  if(psb_get_errstatus() /= 0) return 
   info=0
   name='psb_cdovrbld'
   call psb_erractionsave(err_act)
@@ -99,6 +99,10 @@ Subroutine psb_dcdovrbld(n_ovr,desc_p,desc_a,a,&
   call psb_nullify_sp(blk)
 
   Allocate(brvindx(np+1),rvsz(np),sdsz(np),bsdindx(np+1),stat=info)
+  if (info /= 0) then 
+    call psb_errpush(4010,name,a_err='Allocate')
+    goto 9999      
+  end if
   tl = 0.0
   tch = 0.0
   t4 = 0.0
@@ -122,7 +126,7 @@ Subroutine psb_dcdovrbld(n_ovr,desc_p,desc_a,a,&
 
 
   call psb_sp_all(blk,max(lworks,lworkr),info)
-  if (info.ne.0) then
+  if (info /= 0) then
      info=4010
      ch_err='psb_sp_all'
      call psb_errpush(info,name,a_err=ch_err)
@@ -148,7 +152,7 @@ Subroutine psb_dcdovrbld(n_ovr,desc_p,desc_a,a,&
 
   ! See comment in main loop below.
   call InitPairSearchTree(info)
-  if (info.ne.0) then
+  if (info /= 0) then
      info=4010
      ch_err='InitPairSearhTree'
      call psb_errpush(info,name,a_err=ch_err)
@@ -254,7 +258,7 @@ Subroutine psb_dcdovrbld(n_ovr,desc_p,desc_a,a,&
               isz = max((3*Size(tmp_ovr_idx))/2,(counter_o+3))
               if (debug) write(0,*) myrow,'Realloc tmp_ovr',isz
               call psb_realloc(isz,tmp_ovr_idx,info,pad=-1)
-              if (info.ne.0) then
+              if (info /= 0) then
                  info=4010
                  ch_err='psb_realloc'
                  call psb_errpush(info,name,a_err=ch_err)
@@ -272,7 +276,7 @@ Subroutine psb_dcdovrbld(n_ovr,desc_p,desc_a,a,&
               isz = max((3*Size(tmp_halo))/2,(counter_h+3))
               if (debug) write(0,*) myrow,'Realloc tmp_halo',isz
               call psb_realloc(isz,tmp_halo,info)
-              if (info.ne.0) then
+              if (info /= 0) then
                  info=4010
                  ch_err='psb_realloc'
                  call psb_errpush(info,name,a_err=ch_err)
@@ -298,7 +302,7 @@ Subroutine psb_dcdovrbld(n_ovr,desc_p,desc_a,a,&
                     isz = max((3*Size(desc_p%ovrlap_elem))/2,(counter_e+3))
                     if (debug) write(0,*) myrow,'Realloc ovr_El',isz
                     call psb_realloc(isz,desc_p%ovrlap_elem,info)
-                    if (info.ne.0) then
+                    if (info /= 0) then
                        info=4010
                        ch_err='psrealloc'
                        call psb_errpush(info,name,a_err=ch_err)
@@ -331,7 +335,7 @@ Subroutine psb_dcdovrbld(n_ovr,desc_p,desc_a,a,&
               isz = max((3*Size(tmp_ovr_idx))/2,(counter_o+3))
               if (debug) write(0,*) myrow,'Realloc tmp_ovr',isz
               call psb_realloc(isz,tmp_ovr_idx,info)
-              if (info.ne.0) then
+              if (info /= 0) then
                  info=4010
                  ch_err='psrealloc'
                  call psb_errpush(info,name,a_err=ch_err)
@@ -356,7 +360,7 @@ Subroutine psb_dcdovrbld(n_ovr,desc_p,desc_a,a,&
                     isz = max((3*Size(desc_p%ovrlap_elem))/2,(counter_e+3))
                     if (debug) write(0,*) myrow,'Realloc ovr_el',isz
                     call psb_realloc(isz,desc_p%ovrlap_elem,info)
-                    if (info.ne.0) then
+                    if (info /= 0) then
                        info=4010
                        ch_err='psb_realloc'
                        call psb_errpush(info,name,a_err=ch_err)
@@ -378,7 +382,7 @@ Subroutine psb_dcdovrbld(n_ovr,desc_p,desc_a,a,&
            !
            If (i_ovr < (n_ovr)) Then
               call psb_spinfo(psb_nzrowreq_,a,n_elem,info,iaux=idx)
-              if (info.ne.0) then
+              if (info /= 0) then
                  info=4010
                  ch_err='psb_spinfo'
                  call psb_errpush(info,name,a_err=ch_err)
@@ -389,7 +393,7 @@ Subroutine psb_dcdovrbld(n_ovr,desc_p,desc_a,a,&
                  isz = max((3*lworks)/2,(idxs+tot_elem+n_elem))
                  if (debug) write(0,*) myrow,'Realloc works',isz
                  call psb_realloc(isz,works,info)
-                 if (info.ne.0) then
+                 if (info /= 0) then
                     info=4010
                     ch_err='psb_realloc'
                     call psb_errpush(info,name,a_err=ch_err)
@@ -401,7 +405,7 @@ Subroutine psb_dcdovrbld(n_ovr,desc_p,desc_a,a,&
                  isz = max((3*size(blk%ia2))/2,(n_elem))
                  if (debug) write(0,*) myrow,'Realloc blk',isz
                  call psb_sp_reall(blk,isz,info)
-                 if (info.ne.0) then
+                 if (info /= 0) then
                     info=4010
                     ch_err='psb_sp_reall'
                     call psb_errpush(info,name,a_err=ch_err)
@@ -410,7 +414,7 @@ Subroutine psb_dcdovrbld(n_ovr,desc_p,desc_a,a,&
               End If
 
               call psb_spgtblk(idx,a,blk,info)
-              if (info.ne.0) then
+              if (info /= 0) then
                  info=4010
                  ch_err='psb_spgtblk'
                  call psb_errpush(info,name,a_err=ch_err)
@@ -434,6 +438,10 @@ Subroutine psb_dcdovrbld(n_ovr,desc_p,desc_a,a,&
 !!$            write(0,*) me,'Realloc temp',tot_elem+2
                  deallocate(temp)
                  allocate(temp(tot_elem+2),stat=info)   
+                 if (info /= 0) then 
+                   call psb_errpush(4010,name,a_err='Allocate')
+                   goto 9999      
+                 end if
               endif
               Call mrgsrt(tot_elem,works(idxs+1),temp,info)
               If (info.Eq.0) Call ireordv1(tot_elem,works(idxs+1),temp)
@@ -467,7 +475,7 @@ Subroutine psb_dcdovrbld(n_ovr,desc_p,desc_a,a,&
         ! matchings SENDs.
         !       
         call mpi_alltoall(sdsz,1,mpi_integer,rvsz,1,mpi_integer,icomm,info)
-        if (info.ne.0) then
+        if (info /= 0) then
            info=4010
            ch_err='mpi_alltoall'
            call psb_errpush(info,name,a_err=ch_err)
@@ -493,7 +501,7 @@ Subroutine psb_dcdovrbld(n_ovr,desc_p,desc_a,a,&
         iszr=sum(rvsz)
         if (max(iszr,1) > lworkr) then 
            call psb_realloc(max(iszr,1),workr,info)
-           if (info.ne.0) then
+           if (info /= 0) then
               info=4010
               ch_err='psb_realloc'
               call psb_errpush(info,name,a_err=ch_err)
@@ -504,7 +512,7 @@ Subroutine psb_dcdovrbld(n_ovr,desc_p,desc_a,a,&
 
         call mpi_alltoallv(works,sdsz,bsdindx,mpi_integer,&
              & workr,rvsz,brvindx,mpi_integer,icomm,info)
-        if (info.ne.0) then
+        if (info /= 0) then
            info=4010
            ch_err='mpi_alltoallv'
            call psb_errpush(info,name,a_err=ch_err)
@@ -528,7 +536,7 @@ Subroutine psb_dcdovrbld(n_ovr,desc_p,desc_a,a,&
                  isz = 3*n_col/2
                  if (debug) write(0,*) myrow,'Realloc loc_to_glob'
                  call psb_realloc(isz,desc_p%loc_to_glob,info)
-                 if (info.ne.0) then
+                 if (info /= 0) then
                     info=4010
                     ch_err='psrealloc'
                     call psb_errpush(info,name,a_err=ch_err)
@@ -570,6 +578,11 @@ Subroutine psb_dcdovrbld(n_ovr,desc_p,desc_a,a,&
            if (debug) write(0,*) myrow,'Realloc work',isz
            deallocate(work)
            allocate(work(isz),stat=info)
+           if (info /= 0) then 
+             call psb_errpush(4010,name,a_err='Allocate')
+             goto 9999      
+           end if
+
            lwork=size(work)
         Endif
         t_halo_in(counter_t)=-1
@@ -626,7 +639,7 @@ Subroutine psb_dcdovrbld(n_ovr,desc_p,desc_a,a,&
   ! first the halo index
   call psi_crea_index(desc_p,tmp_halo,&
        & desc_p%halo_index,.false.,info)
-  if(info.ne.0) then
+  if(info /= 0) then
      call psb_errpush(4010,name,a_err='psi_crea_index')
      goto 9999
   end if
@@ -634,7 +647,7 @@ Subroutine psb_dcdovrbld(n_ovr,desc_p,desc_a,a,&
   ! then the overlap index
   call psi_crea_index(desc_p,tmp_ovr_idx,&
        & desc_p%ovrlap_index,.true.,info)
-  if(info.ne.0) then
+  if(info /= 0) then
      call psb_errpush(4010,name,a_err='psi_crea_index')
      goto 9999
   end if
@@ -644,7 +657,7 @@ Subroutine psb_dcdovrbld(n_ovr,desc_p,desc_a,a,&
 
   ! finally bnd_elem
   call psi_crea_bnd_elem(desc_p,info)
-  if(info.ne.0) then
+  if(info /= 0) then
      call psb_errpush(4010,name,a_err='psi_crea_bnd_elem')
      goto 9999
   end if
@@ -652,7 +665,12 @@ Subroutine psb_dcdovrbld(n_ovr,desc_p,desc_a,a,&
   ! Ok, register into MATRIX_DATA &  free temporary work areas
   desc_p%matrix_data(psb_dec_type_) = psb_desc_asb_
 
-  allocate(desc_p%lprm(1))
+  allocate(desc_p%lprm(1),stat=info)
+  if (info /= 0) then 
+    call psb_errpush(4010,name,a_err='Allocate')
+    goto 9999      
+  end if
+
   desc_p%lprm(1) = 0
 
   if (debug) then 
@@ -669,8 +687,8 @@ Subroutine psb_dcdovrbld(n_ovr,desc_p,desc_a,a,&
   Deallocate(works,workr,t_halo_in,t_halo_out,work,&
        & length_dl,dep_list,tmp_ovr_idx,tmp_halo,&
        & brvindx,rvsz,sdsz,bsdindx,temp,stat=info)
-  call psb_sp_free(blk,info)
-  if (info.ne.0) then
+  if (info == 0) call psb_sp_free(blk,info)
+  if (info /= 0) then
      info=4010
      ch_err='sp_free'
      call psb_errpush(info,name,a_err=ch_err)

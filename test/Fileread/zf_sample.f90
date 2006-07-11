@@ -273,7 +273,7 @@ program zf_sample
   call blacs_barrier(ictxt,'all')
   t1 = mpi_wtime()
   call psb_krylov(cmethd,a,pre,b_col,x_col,eps,desc_a,info,& 
-       & itmax,iter,err,itrace,istop=istopc,irst=ml)     
+       & itmax=itmax,iter=iter,err=err,itrace=itrace,istop=istopc,irst=ml)     
   call blacs_barrier(ictxt,'all')
   t2 = mpi_wtime() - t1
   call psb_amx(ictxt,t2)

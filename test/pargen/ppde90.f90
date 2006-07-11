@@ -202,7 +202,7 @@ program pde90
   t1 = mpi_wtime()  
   eps   = 1.d-9
   call psb_krylov(cmethd,a,pre,b,x,eps,desc_a,info,& 
-       & itmax,iter,err,itrace,istop=istopc,irst=ml)     
+       & itmax=itmax,iter=iter,err=err,itrace=itrace,istop=istopc,irst=ml)     
 
   if(info.ne.0) then
     info=4010
