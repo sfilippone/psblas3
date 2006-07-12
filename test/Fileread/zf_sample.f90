@@ -131,7 +131,7 @@ program zf_sample
     call readmat(mtrx_file, aux_a, ictxt)
 
     m_problem = aux_a%m
-    call gebs2d(ictxt,'a',m_problem)
+    call psb_bcast(ictxt,m_problem)
 
     if(rhs_file /= 'NONE') then
        !  reading an rhs
@@ -156,16 +156,16 @@ program zf_sample
          b_col_glob(i) = (1.d0,1.d0)
       enddo      
     endif
-    call gebs2d(ictxt,'a',b_col_glob(1:m_problem))
+    call psb_bcast(ictxt,b_col_glob(1:m_problem))
   else
-    call gebr2d(ictxt,'a',m_problem)
+    call psb_bcast(ictxt,m_problem)
     allocate(aux_b(m_problem,1), stat=ircode)
     if (ircode /= 0) then
        call psb_errpush(4000,name)
        goto 9999
     endif
     b_col_glob =>aux_b(:,1)
-    call gebr2d(ictxt,'a',b_col_glob(1:m_problem)) 
+    call psb_bcast(ictxt,b_col_glob(1:m_problem)) 
   end if
 
   ! switch over different partition types
