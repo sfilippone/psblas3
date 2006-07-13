@@ -114,7 +114,7 @@ contains
     integer, pointer :: nzbr(:), idisp(:)
     integer :: ictxt, nrow, nglob, ncol, ntaggr, nzbg, ip, ndx,&
          & naggr, np, myprow, mypcol, nprows, npcols,nzt,irs,jl,nzl,nlr,&
-         & icomm,naggrm1, mtype, i, j, err_act
+         & icomm,naggrm1, mtype, i, j, k, err_act
     name='raw_aggregate'
     if(psb_get_errstatus().ne.0) return 
     info=0
