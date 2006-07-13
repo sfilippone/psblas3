@@ -39,6 +39,7 @@ subroutine psb_zgenaggrmap(aggr_type,a,desc_a,nlaggr,ilaggr,info)
   use psb_serial_mod
   use psb_descriptor_type
   use psb_error_mod
+  use psb_penv_mod
   implicit none
   integer, intent(in)               :: aggr_type
   type(psb_zspmat_type), intent(in) :: a
@@ -279,7 +280,7 @@ subroutine psb_zgenaggrmap(aggr_type,a,desc_a,nlaggr,ilaggr,info)
 
   nlaggr(:) = 0
   nlaggr(me+1) = naggr
-  call igsum2d(ictxt,'All',' ',nprow,1,nlaggr,nprow,-1,-1)
+  call psb_sum(ictxt,nlaggr(1:nprow))
 
   call psb_erractionrestore(err_act)
   return

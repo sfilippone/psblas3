@@ -80,7 +80,6 @@ Subroutine psb_zsprn(a, desc_a,info,clear)
     goto 9999
   endif
 
-  if (debug) write(*,*) 'got through igamx2d '
   
   if (psb_is_bld_dec(desc_a%matrix_data(psb_dec_type_))) then
     ! Should do nothing, we are called redundantly

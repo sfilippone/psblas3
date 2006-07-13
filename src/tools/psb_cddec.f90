@@ -107,6 +107,7 @@ subroutine psb_cddec(nloc, ictxt, desc_a, info)
   use psb_serial_mod
   use psb_const_mod
   use psb_error_mod
+  use psb_penv_mod
   implicit None
   !....Parameters...
   Integer, intent(in)               :: nloc,ictxt
@@ -129,7 +130,7 @@ subroutine psb_cddec(nloc, ictxt, desc_a, info)
   err=0
   name = 'psb_cddec'
 
-  call blacs_gridinfo(ictxt, nprow, npcol, me, mypcol)
+  call psb_info(ictxt, me, nprow)
   if (debug) write(*,*) 'psb_cdalll: ',nprow,npcol,me,mypcol
   !     ....verify blacs grid correctness..
   if (npcol /= 1) then
@@ -163,7 +164,7 @@ subroutine psb_cddec(nloc, ictxt, desc_a, info)
   nlv(:)  = 0
   nlv(me) = nloc
   
-  call igsum2d(ictxt,'All',' ',nprow,1,nlv,nprow,-1,-1)
+  call psb_sum(ictxt,nlv(1:nprow))
   m = sum(nlv)
 
   

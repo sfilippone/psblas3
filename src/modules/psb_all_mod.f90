@@ -35,7 +35,7 @@ module psb_all_mod
   use psb_prec_mod
   use psb_methd_mod
   use psb_serial_mod
-  use psb_blacs_mod
+  use psb_penv_mod
   use psb_comm_mod
   use psb_error_mod
   use psb_psblas_mod

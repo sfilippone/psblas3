@@ -49,7 +49,7 @@ function psb_dasum (x,desc_a, info, jx)
   use psb_descriptor_type
   use psb_check_mod
   use psb_error_mod
-  use psb_blacs_mod
+  use psb_penv_mod
   implicit none
 
   real(kind(1.d0)), intent(in)      :: x(:,:)
@@ -125,12 +125,12 @@ function psb_dasum (x,desc_a, info, jx)
       end do
 
       ! compute global sum
-      call gsum2d(ictxt, 'A', asum)
+      call psb_sum(ictxt, asum)
 
     else
       asum=0.d0
       ! compute global sum
-      call gsum2d(ictxt, 'A', asum)
+      call psb_sum(ictxt, asum)
     end if
   else
     asum=0.d0
@@ -199,7 +199,7 @@ function psb_dasumv (x,desc_a, info)
   use psb_descriptor_type
   use psb_check_mod
   use psb_error_mod
-  use psb_blacs_mod
+  use psb_penv_mod
   implicit none
 
   real(kind(1.d0)), intent(in)      :: x(:)
@@ -270,12 +270,12 @@ function psb_dasumv (x,desc_a, info)
       end do
 
       ! compute global sum
-      call gsum2d(ictxt, 'A', asum)
+      call psb_sum(ictxt, asum)
 
     else
       asum=0.d0
       ! compute global sum
-      call gsum2d(ictxt, 'A', asum)
+      call psb_sum(ictxt, asum)
     end if
   else
     asum=0.d0
@@ -344,7 +344,7 @@ subroutine psb_dasumvs (res,x,desc_a, info)
   use psb_descriptor_type
   use psb_check_mod
   use psb_error_mod
-  use psb_blacs_mod
+  use psb_penv_mod
   implicit none
 
   real(kind(1.d0)), intent(in)      :: x(:)
@@ -415,12 +415,12 @@ subroutine psb_dasumvs (res,x,desc_a, info)
       end do
 
       ! compute global sum
-      call gsum2d(ictxt, 'A',asum)
+      call psb_sum(ictxt,asum)
 
     else
       asum=0.d0
       ! compute global sum
-      call gsum2d(ictxt, 'A', asum)
+      call psb_sum(ictxt, asum)
     end if
   else
     asum=0.d0

@@ -28,7 +28,7 @@
 !!$  POSSIBILITY OF SUCH DAMAGE.
 !!$ 
 !!$  
-module psb_blacs_mod
+module psb_penv_mod
 
 
   interface psb_init
@@ -3896,4 +3896,4 @@ contains
   end subroutine zgamn2dm
   
 
-end module psb_blacs_mod
+end module psb_penv_mod

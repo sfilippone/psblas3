@@ -118,7 +118,7 @@ c            must communicate with. this list with its order is extracted from
 c            desc_str list.
 c   length_dl  integer array(0:np)
 c             length_dl(i) is the length of dep_list(*,i) list
-
+      use psb_penv_mod
       implicit none
       include 'psb_const.fh'
       include 'mpif.h'
@@ -146,13 +146,13 @@ c     .....local scalars...
       ictxt = desc_data(psb_ctxt_)
 
 
-      call blacs_gridinfo(ictxt,nprow,npcol,me,mycol)
+      call psb_info(ictxt,me,nprow)
       do i=0,np 
         length_dl(i) = 0
       enddo
       i=1
       if (debug) write(0,*) 'extract: info ',info,
-     +     desc_data(psb_dec_type_)
+     +  desc_data(psb_dec_type_)
       pointer_dep_list=1
       if (desc_data(psb_dec_type_).eq.psb_desc_bld_) then
         do while (desc_str(i).ne.-1)
@@ -244,47 +244,18 @@ c     ... check for errors...
  998  continue 
       if (debug) write(0,*) 'extract: info ',info
       err = info
-c$$$      call igamx2d(ictxt, all, topdef, ione, ione, err, ione, 
-c$$$     +  i, i, -ione ,-ione,-ione)
 
       if (err.ne.0) goto 9999
 
-      if (.true.) then 
-        call igsum2d(ictxt,'all',' ',np+1,1,length_dl,np+1,-1,-1)
-        call blacs_get(ictxt,10,icomm )
-        allocate(itmp(dl_lda),stat=info)
-        if (info /= 0) goto 9999
-        itmp(1:dl_lda) = dep_list(1:dl_lda,me)
-        call mpi_allgather(itmp,dl_lda,mpi_integer,
-     +    dep_list,dl_lda,mpi_integer,icomm,info)
-        deallocate(itmp)
+      call psb_sum(ictxt,length_dl(0:np))
+      call blacs_get(ictxt,10,icomm )
+      allocate(itmp(dl_lda),stat=info)
+      if (info /= 0) goto 9999
+      itmp(1:dl_lda) = dep_list(1:dl_lda,me)
+      call mpi_allgather(itmp,dl_lda,mpi_integer,
+     +  dep_list,dl_lda,mpi_integer,icomm,info)
+      deallocate(itmp)
 
-      else
-        
-        if (me.eq.psb_root_) then
-          do proc=0,np-1
-            if (proc.ne.psb_root_) then
-              if (debug) write(0,*) 'receiving from: ',proc
-c              ...receive from proc length of its dependence list....
-              call igerv2d(ictxt,1,1,length_dl(proc),1,
-     +          proc,mycol)
-
-c              ...receive from proc its dependence list....
-              call igerv2d(ictxt,length_dl(proc),1,
-     +          dep_list(1,proc),length_dl(proc),proc,mycol)
-
-            endif
-          enddo
-        else if (me.ne.psb_root_) then
-c        ...send to root dependence list length.....
-          if (debug) write(0,*) 'sending to: ',me,psb_root_
-          call igesd2d(ictxt,1,1,length_dl(me),1,psb_root_,mycol)
-          if (debug) write(0,*) 'sending to: ',me,psb_root_
-c        ...send to root dependence list....
-          call igesd2d(ictxt,length_dl(me),1,dep_list(1,me),
-     +      length_dl(me),psb_root_,mycol)
-
-        endif
       end if 
 
       return
@@ -292,7 +263,7 @@ c        ...send to root dependence list....
  9999 continue
       call fcpsb_errpush(info,name,int_err)
       if(err_act.eq.act_abort) then
-         call fcpsb_perror(ictxt)
+        call fcpsb_perror(ictxt)
       endif
       return
 

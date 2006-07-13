@@ -36,6 +36,7 @@
 !!$  
 subroutine psb_dbldaggrmat(a,desc_a,ac,p,desc_p,info)
   use psb_serial_mod
+  use psb_penv_mod
   use psb_prec_type
   use psb_descriptor_type
   use psb_spmat_type
@@ -105,6 +106,7 @@ contains
     use psb_const_mod
     use psb_psblas_mod
     use psb_error_mod
+    use psb_penv_mod
     implicit none
 
     include 'mpif.h'
@@ -248,7 +250,7 @@ contains
 
       nzbr(:) = 0
       nzbr(myprow+1) = irs
-      call igsum2d(ictxt,'All',' ',np,1,nzbr,np,-1,-1)
+      call psb_sum(ictxt,nzbr(1:np))
       nzbg = sum(nzbr)
       call psb_sp_all(ntaggr,ntaggr,bg,nzbg,info)
       if(info /= 0) then
@@ -327,7 +329,7 @@ contains
         call psb_errpush(4010,name,a_err='psb_ipcoo2csr')
         goto 9999
       end if
-      call igsum2d(icontxt,'All',' ',1,1,k,1,-1,-1)
+      call psb_sum(ictxt,k)
 
       if (k == 0) then 
         ! If the off diagonal part is emtpy, there's no point 
@@ -380,6 +382,7 @@ contains
     use psb_comm_mod
     use psb_tools_mod
     use psb_error_mod
+    use psb_penv_mod
     implicit none 
     include 'mpif.h'
 
@@ -390,7 +393,7 @@ contains
     integer, pointer :: nzbr(:), idisp(:), ivall(:)
     integer :: ictxt, nrow, nglob, ncol, ntaggr, nzbg, ip, ndx,&
          & naggr, np, myprow, mypcol, nprows, npcols,&
-         & icomm, naggrm1,naggrp1,mtype,i,j,err_act,k,nzl,itemp(1),jtemp(1)
+         & icomm, naggrm1,naggrp1,mtype,i,j,err_act,k,nzl
     type(psb_dspmat_type), pointer  :: am1,am2
     type(psb_dspmat_type) :: am3,am4
     logical       :: ml_global_nmb
@@ -568,7 +571,7 @@ contains
           anorm = max(anorm,tmp/dg) 
         enddo
 
-        call dgamx2d(ictxt,'All',' ',1,1,anorm,1,itemp,jtemp,-1,-1,-1)     
+        call psb_amx(ictxt,anorm)     
       else
         anorm = psb_spnrmi(am3,desc_a,info)
       endif
@@ -850,7 +853,7 @@ contains
           call psb_errpush(4010,name,a_err='psb_ipcoo2csr')
           goto 9999
         end if
-        call igsum2d(ictxt,'All',' ',1,1,k,1,-1,-1)
+        call psb_sum(ictxt,k)
 
         if (k == 0) then 
           ! If the off diagonal part is emtpy, there's no point 
@@ -900,7 +903,7 @@ contains
 
         call psb_cdrep(ntaggr,ictxt,desc_p,info)
 
-        call igsum2d(ictxt,'All',' ',np,1,nzbr,np,-1,-1)
+        call psb_sum(ictxt,nzbr(1:np))
         nzbg = sum(nzbr)
         call psb_sp_all(ntaggr,ntaggr,bg,nzbg,info)
         if(info /= 0) goto 9999
@@ -970,7 +973,7 @@ contains
         call psb_cdrep(ntaggr,ictxt,desc_p,info)
 
 
-        call igsum2d(ictxt,'All',' ',np,1,nzbr,np,-1,-1)
+        call psb_sum(ictxt,nzbr(1:np))
         nzbg = sum(nzbr)
         call psb_sp_all(ntaggr,ntaggr,bg,nzbg,info)
         if(info /= 0) then

@@ -44,7 +44,7 @@ subroutine psb_dmlprc_aply(baseprecv,x,beta,y,desc_data,trans,work,info)
   use psb_descriptor_type
   use psb_prec_type
   use psb_psblas_mod
-  use psb_blacs_mod
+  use psb_penv_mod
   use psb_const_mod
   use psb_error_mod
   implicit none
@@ -161,7 +161,7 @@ subroutine psb_dmlprc_aply(baseprecv,x,beta,y,desc_data,trans,work,info)
     end if
 
     if (baseprecv(2)%iprcparm(coarse_mat_)==mat_repl_) Then 
-      call gsum2d(ictxt,'All',t2l(1:nrg))
+      call psb_sum(ictxt,t2l(1:nrg))
     else if (baseprecv(2)%iprcparm(coarse_mat_) /= mat_distr_) Then 
         write(0,*) 'Unknown value for baseprecv(2)%iprcparm(coarse_mat_) ',&
              & baseprecv(2)%iprcparm(coarse_mat_)
@@ -264,7 +264,7 @@ subroutine psb_dmlprc_aply(baseprecv,x,beta,y,desc_data,trans,work,info)
       end if
 
       if (baseprecv(2)%iprcparm(coarse_mat_)==mat_repl_) Then 
-        call gsum2d(ictxt,'All',t2l(1:nrg))
+        call psb_sum(ictxt,t2l(1:nrg))
       else if (baseprecv(2)%iprcparm(coarse_mat_) /= mat_distr_) Then 
         write(0,*) 'Unknown value for baseprecv(2)%iprcparm(coarse_mat_) ',&
              & baseprecv(2)%iprcparm(coarse_mat_)
@@ -367,7 +367,7 @@ subroutine psb_dmlprc_aply(baseprecv,x,beta,y,desc_data,trans,work,info)
       end if
 
       if (baseprecv(2)%iprcparm(coarse_mat_)==mat_repl_) Then 
-        call gsum2d(ictxt,'All',t2l(1:nrg))
+        call psb_sum(ictxt,t2l(1:nrg))
       else if (baseprecv(2)%iprcparm(coarse_mat_) /= mat_distr_) Then 
         write(0,*) 'Unknown value for baseprecv(2)%iprcparm(coarse_mat_) ',&
              & baseprecv(2)%iprcparm(coarse_mat_)
@@ -458,7 +458,7 @@ subroutine psb_dmlprc_aply(baseprecv,x,beta,y,desc_data,trans,work,info)
 
 
       if (baseprecv(2)%iprcparm(coarse_mat_)==mat_repl_) Then 
-        call gsum2d(ictxt,'All',t2l(1:nrg))
+        call psb_sum(ictxt,t2l(1:nrg))
       else if (baseprecv(2)%iprcparm(coarse_mat_) /= mat_distr_) Then 
         write(0,*) 'Unknown value for baseprecv(2)%iprcparm(coarse_mat_) ',&
              & baseprecv(2)%iprcparm(coarse_mat_)

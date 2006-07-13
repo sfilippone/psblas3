@@ -90,13 +90,13 @@ contains
     else
       root = 0
     end if
-    call blacs_gridinfo(ictxt, nprow, npcol, myprow, mypcol)    
+    call psb_info(ictxt, myprow, nprow)    
     if (myprow == root) then
       write(*, '("Reading matrix...")')      ! open input file
       call mm_mat_read(a,info,infile,filename)
       if (info /= 0) then 
         write(0,*) 'Error return from MM_MAT_READ ',info
-        call blacs_abort(ictxt, 1)   ! Unexpected End of File
+        call psb_abort(ictxt)   ! Unexpected End of File
       endif
     end if 
     return 
@@ -123,7 +123,7 @@ contains
     else
       root = 0
     end if
-    call blacs_gridinfo(ictxt, nprow, npcol, myprow, mypcol)    
+    call psb_info(ictxt, myprow, nprow)    
     if (myprow == root) then
       write(*, '("Reading rhs...")')      ! open input file
       open(infile,file=filename, status='old', err=901, action="read")
@@ -131,7 +131,7 @@ contains
       write(0,*)'obj fmt',object, fmt
       if ( (object .ne. 'matrix').or.(fmt.ne.'array')) then
         write(0,*) 'read_rhs: input file type not yet supported'
-        call blacs_abort(ictxt, 1)
+        call psb_abort(ictxt)
       end if
 
       do 
@@ -148,7 +148,7 @@ contains
            
       else
         write(0,*) 'read_rhs: rhs type not yet supported'
-        call blacs_abort(ictxt, 1)
+        call psb_abort(ictxt)
       end if      ! read right hand sides
       write(*,*) 'end read_rhs'
     end if 
@@ -156,12 +156,12 @@ contains
     ! open failed
 901 write(0,*) 'read_rhs: could not open file ',&
          & infile,' for input'
-    call blacs_abort(ictxt, 1)   ! unexpected end of file
+    call psb_abort(ictxt)   ! unexpected end of file
 902 write(0,*) 'read_rhs: unexpected end of file ',infile,&
          & ' during input'
-    call blacs_abort(ictxt, 1)   ! allocation failed
+    call psb_abort(ictxt)   ! allocation failed
 993 write(0,*) 'read_rhs: memory allocation failure'
-    call blacs_abort(ictxt, 1)
+    call psb_abort(ictxt)
   end subroutine dread_rhs
 
 
@@ -181,13 +181,13 @@ contains
     else
       root = 0
     end if
-    call blacs_gridinfo(ictxt, nprow, npcol, myprow, mypcol)    
+    call psb_info(ictxt, myprow, nprow)
     if (myprow == root) then
       write(*, '("Reading matrix...")')      ! open input file
       call mm_mat_read(a,info,infile,filename)
       if (info /= 0) then 
         write(0,*) 'Error return from MM_MAT_READ ',info
-        call blacs_abort(ictxt, 1)   ! Unexpected End of File
+        call psb_abort(ictxt)   ! Unexpected End of File
       endif
     end if 
     return 
@@ -214,7 +214,7 @@ contains
     else
       root = 0
     end if
-    call blacs_gridinfo(ictxt, nprow, npcol, myprow, mypcol)    
+    call psb_info(ictxt, myprow, nprow)
     if (myprow == root) then
       write(*, '("Reading rhs...")')      ! open input file
       open(infile,file=filename, status='old', err=901, action="read")
@@ -222,7 +222,7 @@ contains
 !!$      write(0,*)'obj fmt',object, fmt
       if ( (object .ne. 'matrix').or.(fmt.ne.'array')) then
         write(0,*) 'read_rhs: input file type not yet supported'
-        call blacs_abort(ictxt, 1)
+        call psb_abort(ictxt)
       end if
 
       do 
@@ -239,7 +239,7 @@ contains
            
       else
         write(0,*) 'read_rhs: rhs type not yet supported'
-        call blacs_abort(ictxt, 1)
+        call psb_abort(ictxt)
       end if      ! read right hand sides
       write(*,*) 'end read_rhs'
     end if 
@@ -247,12 +247,12 @@ contains
     ! open failed
 901 write(0,*) 'read_rhs: could not open file ',&
          & infile,' for input'
-    call blacs_abort(ictxt, 1)   ! unexpected end of file
+    call psb_abort(ictxt)   ! unexpected end of file
 902 write(0,*) 'read_rhs: unexpected end of file ',infile,&
          & ' during input'
-    call blacs_abort(ictxt, 1)   ! allocation failed
+    call psb_abort(ictxt)   ! allocation failed
 993 write(0,*) 'read_rhs: memory allocation failure'
-    call blacs_abort(ictxt, 1)
+    call psb_abort(ictxt)
   end subroutine zread_rhs
 
 

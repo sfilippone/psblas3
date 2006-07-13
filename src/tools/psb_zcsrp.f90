@@ -44,19 +44,20 @@ subroutine psb_zcsrp(trans,iperm,a, desc_a, info)
   use psb_descriptor_type
   use psb_serial_mod
   use psb_const_mod
+  use psb_penv_mod
   !  implicit none
 
   interface 
-     subroutine zcsrp(trans,m,n,fida,descra,ia1,ia2,&
-          & infoa,p,work,lwork,ierror)
-       integer, intent(in)  :: m, n, lwork
-       integer, intent(out) :: ierror
-       character, intent(in) ::       trans
-       complex(kind(1.d0)), intent(inout) :: work(*)                     
-       integer, intent(in)    :: p(*)
-       integer, intent(inout) :: ia1(*), ia2(*), infoa(*) 
-       character, intent(in)  :: fida*5, descra*11
-     end subroutine dcsrp
+    subroutine zcsrp(trans,m,n,fida,descra,ia1,ia2,&
+         & infoa,p,work,lwork,ierror)
+      integer, intent(in)  :: m, n, lwork
+      integer, intent(out) :: ierror
+      character, intent(in) ::       trans
+      complex(kind(1.d0)), intent(inout) :: work(*)                     
+      integer, intent(in)    :: p(*)
+      integer, intent(inout) :: ia1(*), ia2(*), infoa(*) 
+      character, intent(in)  :: fida*5, descra*11
+    end subroutine zcsrp
   end interface
 
 
@@ -81,7 +82,7 @@ subroutine psb_zcsrp(trans,iperm,a, desc_a, info)
        & mypcol ,ierror ,n_col,l_dcsdp, iout, ipsize
   integer                               ::  dectype
   real(kind(1.d0)), pointer             ::  work_dcsdp(:)
-  integer                               ::  ictxt,temp(1),n_row,err_act
+  integer                               ::  ictxt,n_row,err_act
   character(len=20)                     ::  name, char_err
 
   real(kind(1.d0))                      ::  time(10), mpi_wtime
@@ -94,23 +95,23 @@ subroutine psb_zcsrp(trans,iperm,a, desc_a, info)
   dectype=desc_a%matrix_data(psb_dec_type_)
   n_row = desc_a%matrix_data(psb_n_row_)
   n_col = desc_a%matrix_data(psb_n_col_)
-     
+
   if(psb_get_errstatus().ne.0) return 
   info=0
   call psb_erractionsave(err_act)
   name = 'psd_csrp'
 
   ! check on blacs grid 
-  call blacs_gridinfo(ictxt, nprow, npcol, me, mypcol)
+  call psb_info(ictxt, me, nprow)
   if (nprow.eq.-1) then
-     info = 2010
-     call psb_errpush(info,name)
-     goto 9999
+    info = 2010
+    call psb_errpush(info,name)
+    goto 9999
   else if (npcol.ne.1) then
-     info = 2030
-     int_err(1) = npcol
-     call psb_errpush(info,name,int_err)
-     goto 9999
+    info = 2030
+    int_err(1) = npcol
+    call psb_errpush(info,name,int_err)
+    goto 9999
   endif
 
 
@@ -119,7 +120,7 @@ subroutine psb_zcsrp(trans,iperm,a, desc_a, info)
     int_err(1) = dectype
     call psb_errpush(info,name,int_err)
     goto 9999
- endif
+  endif
 
   ipsize = size(iperm)
   if (.not.((ipsize.eq.n_col).or.(ipsize.eq.n_row) )) then 
@@ -179,8 +180,7 @@ subroutine psb_zcsrp(trans,iperm,a, desc_a, info)
   time(4) = mpi_wtime()
   time(4) = time(4) - time(3)
   if (debug) then 
-    call dgamx2d(ictxt, all, topdef, ione, ione, time(4),&
-         & ione,temp ,temp,-ione ,-ione,-ione)
+    call psb_amx(ictxt, time(4))
 
     write (*, *) '         comm structs assembly: ', time(4)*1.d-3
   end if

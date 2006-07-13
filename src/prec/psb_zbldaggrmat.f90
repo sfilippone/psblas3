@@ -42,6 +42,7 @@ subroutine psb_zbldaggrmat(a,desc_a,ac,p,desc_p,info)
   use psb_tools_mod
   use psb_psblas_mod
   use psb_error_mod
+  use psb_penv_mod
   implicit none
 
   type(psb_zspmat_type), intent(in), target  :: a
@@ -105,6 +106,7 @@ contains
     use psb_const_mod
     use psb_psblas_mod
     use psb_error_mod
+    use psb_penv_mod
     implicit none
 
     include 'mpif.h'
@@ -114,7 +116,7 @@ contains
     integer, pointer :: nzbr(:), idisp(:)
     integer :: ictxt, nrow, nglob, ncol, ntaggr, nzbg, ip, ndx,&
          & naggr, np, myprow, mypcol, nprows, npcols,nzt,irs,jl,nzl,nlr,&
-         & icomm,naggrm1, mtype, i, j, err_act
+         & icomm,naggrm1, mtype, i, j, k, err_act
     name='raw_aggregate'
     if(psb_get_errstatus().ne.0) return 
     info=0
@@ -248,7 +250,7 @@ contains
 
       nzbr(:) = 0
       nzbr(myprow+1) = irs
-      call igsum2d(ictxt,'All',' ',np,1,nzbr,np,-1,-1)
+      call psb_sum(ictxt,nzbr(1:np))
       nzbg = sum(nzbr)
       call psb_sp_all(ntaggr,ntaggr,bg,nzbg,info)
       if(info /= 0) then
@@ -279,11 +281,6 @@ contains
       bg%infoa(psb_nnz_) = nzbg
       bg%fida='COO'
       bg%descra='G'
-      call psb_fixcoo(bg,info)
-      if(info /= 0) then
-        call psb_errpush(4010,name,a_err='fixcoo')
-        goto 9999
-      end if
 
       call psb_sp_free(b,info)
       if(info /= 0) then
@@ -305,9 +302,60 @@ contains
         goto 9999
       end if
 
+      !if(.not.associated(p%av(ap_nd_)%aspk)) p%iprcparm(jac_sweeps_) = 1
+      !------------------------------------------------------------------
+      ! Split BG=M+N  N off-diagonal part
+      call psb_sp_all(bg%m,bg%k,p%av(ap_nd_),nzl,info)
+      if(info /= 0) then
+        call psb_errpush(4010,name,a_err='psb_sp_all')
+        goto 9999
+      end if
+      if(.not.associated(p%av(ap_nd_)%aspk)) write(0,*) '.not.associated(p%av(ap_nd_)%ia1)'
+      if(.not.associated(p%av(ap_nd_)%ia1)) write(0,*) '.not.associated(p%av(ap_nd_)%ia1)'
+      !write(0,*) 'ok line 238'
+
+      k=0
+      do i=1,nzl
+        if (bg%ia2(i)>bg%m) then 
+          k = k + 1
+          p%av(ap_nd_)%aspk(k) = bg%aspk(i)
+          p%av(ap_nd_)%ia1(k)  = bg%ia1(i)
+          p%av(ap_nd_)%ia2(k)  = bg%ia2(i)
+        endif
+      enddo
+      p%av(ap_nd_)%infoa(psb_nnz_) = k
+
+      if(info /= 0) then
+        call psb_errpush(4010,name,a_err='psb_ipcoo2csr')
+        goto 9999
+      end if
+      call psb_sum(ictxt,k)
+
+      if (k == 0) then 
+        ! If the off diagonal part is emtpy, there's no point 
+        ! in doing multiple  Jacobi sweeps. This is certain 
+        ! to happen when running on a single processor.
+        p%iprcparm(jac_sweeps_) = 1
+      end if
+      !write(0,*) 'operations in bldaggrmat are ok !'
+      !------------------------------------------------------------------
+
+      call psb_ipcoo2csr(p%av(ap_nd_),info)
+      if(info /= 0) then
+        call psb_errpush(4010,name,a_err='ipcoo2csr')
+        goto 9999
+      end if
+
+
     else 
 
       write(0,*) 'Unknown p%iprcparm(coarse_mat) in aggregate_sp',p%iprcparm(coarse_mat_)
+    end if
+
+    call psb_ipcoo2csr(bg,info)
+    if(info /= 0) then
+      call psb_errpush(4010,name,a_err='ipcoo2csr')
+      goto 9999
     end if
 
 
@@ -334,6 +382,7 @@ contains
     use psb_comm_mod
     use psb_tools_mod
     use psb_error_mod
+    use psb_penv_mod
     implicit none 
     include 'mpif.h'
 
@@ -344,7 +393,7 @@ contains
     integer, pointer :: nzbr(:), idisp(:), ivall(:)
     integer :: ictxt, nrow, nglob, ncol, ntaggr, nzbg, ip, ndx,&
          & naggr, np, myprow, mypcol, nprows, npcols,&
-         & icomm, naggrm1,naggrp1,mtype,i,j,err_act,k,nzl,itemp(1),jtemp(1)
+         & icomm, naggrm1,naggrp1,mtype,i,j,err_act,k,nzl
     type(psb_zspmat_type), pointer  :: am1,am2
     type(psb_zspmat_type) :: am3,am4
     logical       :: ml_global_nmb
@@ -522,7 +571,7 @@ contains
           anorm = max(anorm,tmp/dg) 
         enddo
 
-        call dgamx2d(ictxt,'All',' ',1,1,anorm,1,itemp,jtemp,-1,-1,-1)     
+        call psb_amx(ictxt,anorm)     
       else
         anorm = psb_spnrmi(am3,desc_a,info)
       endif
@@ -804,7 +853,7 @@ contains
           call psb_errpush(4010,name,a_err='psb_ipcoo2csr')
           goto 9999
         end if
-        call igsum2d(ictxt,'All',' ',1,1,k,1,-1,-1)
+        call psb_sum(ictxt,k)
 
         if (k == 0) then 
           ! If the off diagonal part is emtpy, there's no point 
@@ -854,7 +903,7 @@ contains
 
         call psb_cdrep(ntaggr,ictxt,desc_p,info)
 
-        call igsum2d(ictxt,'All',' ',np,1,nzbr,np,-1,-1)
+        call psb_sum(ictxt,nzbr(1:np))
         nzbg = sum(nzbr)
         call psb_sp_all(ntaggr,ntaggr,bg,nzbg,info)
         if(info /= 0) goto 9999
@@ -924,7 +973,7 @@ contains
         call psb_cdrep(ntaggr,ictxt,desc_p,info)
 
 
-        call igsum2d(ictxt,'All',' ',np,1,nzbr,np,-1,-1)
+        call psb_sum(ictxt,nzbr(1:np))
         nzbg = sum(nzbr)
         call psb_sp_all(ntaggr,ntaggr,bg,nzbg,info)
         if(info /= 0) then

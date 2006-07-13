@@ -51,7 +51,7 @@ function psb_zdot(x, y,desc_a, info, jx, jy)
   use psb_descriptor_type
   use psb_check_mod
   use psb_error_mod
-  use psb_blacs_mod
+  use psb_penv_mod
   implicit none
 
   complex(kind(1.d0)), intent(in)     :: x(:,:), y(:,:)
@@ -146,7 +146,7 @@ function psb_zdot(x, y,desc_a, info, jx, jy)
   end if
 
   ! compute global sum
-  call gsum2d(ictxt, 'A', dot_local)
+  call psb_sum(ictxt, dot_local)
   
   psb_zdot = dot_local
 
@@ -211,7 +211,7 @@ function psb_zdotv(x, y,desc_a, info)
   use psb_descriptor_type
   use psb_check_mod
   use psb_error_mod
-  use psb_blacs_mod
+  use psb_penv_mod
   implicit none
 
   complex(kind(1.d0)), intent(in)  :: x(:), y(:)
@@ -289,7 +289,7 @@ function psb_zdotv(x, y,desc_a, info)
   end if
 
   ! compute global sum
-  call gsum2d(ictxt, 'A', dot_local)
+  call psb_sum(ictxt, dot_local)
   
   psb_zdotv = dot_local
 
@@ -354,7 +354,7 @@ subroutine psb_zdotvs(res, x, y,desc_a, info)
   use psb_descriptor_type
   use psb_check_mod
   use psb_error_mod
-  use psb_blacs_mod
+  use psb_penv_mod
   implicit none
 
   complex(kind(1.d0)), intent(in)     :: x(:), y(:)
@@ -430,7 +430,7 @@ subroutine psb_zdotvs(res, x, y,desc_a, info)
   end if
 
   ! compute global sum
-  call gsum2d(ictxt, 'A', dot_local)
+  call psb_sum(ictxt, dot_local)
   
   res = dot_local
 
@@ -500,7 +500,7 @@ subroutine psb_zmdots(res, x, y, desc_a, info)
   use psb_descriptor_type
   use psb_check_mod
   use psb_error_mod
-  use psb_blacs_mod
+  use psb_penv_mod
   implicit none
 
   complex(kind(1.d0)), intent(in)     :: x(:,:), y(:,:)
@@ -588,7 +588,7 @@ subroutine psb_zmdots(res, x, y, desc_a, info)
   end if
 
   ! compute global sum
-  call gsum2d(ictxt, 'A', dot_local(1:k))
+  call psb_sum(ictxt, dot_local(1:k))
   
   res(1:k) = dot_local(1:k)
 

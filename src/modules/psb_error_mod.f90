@@ -109,7 +109,7 @@ contains
     integer, intent(inout):: err
     integer :: temp(2)
     integer, parameter :: ione=1
-
+    ! Cannot use psb_amx or otherwise we have a recursion in module usage
     call igamx2d(ictxt, 'A', ' ', ione, ione, err, ione,&
          &temp ,temp,-ione ,-ione,-ione)
   end subroutine psb_errcomm

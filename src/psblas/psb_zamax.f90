@@ -44,7 +44,7 @@
 !    jx     -  integer(optional).         The column offset.
 !
 function psb_zamax (x,desc_a, info, jx)
-  use psb_blacs_mod 
+  use psb_penv_mod 
   use psb_serial_mod
   use psb_descriptor_type
   use psb_check_mod
@@ -118,7 +118,7 @@ function psb_zamax (x,desc_a, info, jx)
   end if
   
   ! compute global max
-  call gamx2d(ictxt, 'A', amax)
+  call psb_amx(ictxt, amax)
 
   psb_zamax=amax
 
@@ -179,7 +179,7 @@ end function psb_zamax
 !    info   -  integer.                   Eventually returns an error code.
 !
 function psb_zamaxv (x,desc_a, info)
-  use psb_blacs_mod
+  use psb_penv_mod
   use psb_serial_mod
   use psb_descriptor_type
   use psb_check_mod
@@ -250,7 +250,7 @@ function psb_zamaxv (x,desc_a, info)
   end if
   
   ! compute global max
-  call gamx2d(ictxt, 'A', amax)
+  call psb_amx(ictxt, amax)
 
   psb_zamaxv=amax
 
@@ -313,7 +313,7 @@ end function psb_zamaxv
 !    jx     -  integer(optional).         The column offset.
 !
 subroutine psb_zamaxvs (res,x,desc_a, info)
-  use psb_blacs_mod
+  use psb_penv_mod
   use psb_serial_mod
   use psb_descriptor_type
   use psb_check_mod
@@ -384,7 +384,7 @@ subroutine psb_zamaxvs (res,x,desc_a, info)
   end if
   
   ! compute global max
-  call gamx2d(ictxt, 'A', amax)
+  call psb_amx(ictxt, amax)
 
   res = amax
 
@@ -445,7 +445,7 @@ end subroutine psb_zamaxvs
 !    info   -  integer.                   Eventually returns an error code.
 !
 subroutine psb_zmamaxs (res,x,desc_a, info,jx)
-  use psb_blacs_mod
+  use psb_penv_mod
   use psb_serial_mod
   use psb_descriptor_type
   use psb_check_mod
@@ -524,7 +524,7 @@ subroutine psb_zmamaxs (res,x,desc_a, info,jx)
   end if
   
   ! compute global max
-  call gamx2d(ictxt, 'A', res(1:k))
+  call psb_amx(ictxt, res(1:k))
 
   call psb_erractionrestore(err_act)
   return  

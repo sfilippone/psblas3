@@ -43,6 +43,7 @@ subroutine psb_cdren(trans,iperm,desc_a,info)
   use psb_descriptor_type
   use psb_const_mod
   use psb_error_mod
+  use psb_penv_mod
   implicit none
 
   interface isaperm
@@ -60,7 +61,7 @@ subroutine psb_cdren(trans,iperm,desc_a,info)
   !....locals....
   integer                       :: i,j,err,nprow,npcol,myrow,mycol, n_col, kh, nh
   integer                       :: dectype
-  integer                       :: ictxt,temp(1),n_row, int_err(5), err_act
+  integer                       :: ictxt,n_row, int_err(5), err_act
   real(kind(1.d0))              :: time(10), mpi_wtime, real_err(6)
   external mpi_wtime
   logical, parameter            :: debug=.false.
@@ -77,25 +78,25 @@ subroutine psb_cdren(trans,iperm,desc_a,info)
   dectype=desc_a%matrix_data(psb_dec_type_)
   n_row = desc_a%matrix_data(psb_n_row_)
   n_col = desc_a%matrix_data(psb_n_col_)
-     
+
   ! check on blacs grid 
-  call blacs_gridinfo(ictxt, nprow, npcol, myrow, mycol)
+  call psb_info(ictxt, myrow, nprow)
   if (nprow.eq.-1) then
-     info = 2010
-     call psb_errpush(info,name)
-     goto 9999
+    info = 2010
+    call psb_errpush(info,name)
+    goto 9999
   else if (npcol.ne.1) then
-     info = 2030
-     int_err(1) = npcol
-     call psb_errpush(info,name,int_err)
-     goto 9999
+    info = 2030
+    int_err(1) = npcol
+    call psb_errpush(info,name,int_err)
+    goto 9999
   endif
 
   if (.not.psb_is_asb_dec(dectype)) then 
     info = 600
     int_err(1) = dectype
-     call psb_errpush(info,name,int_err)
-     goto 9999
+    call psb_errpush(info,name,int_err)
+    goto 9999
   endif
 
   if (iperm(1) /= 0) then 
@@ -105,12 +106,12 @@ subroutine psb_cdren(trans,iperm,desc_a,info)
       call psb_errpush(info,name,int_err)
       goto 9999
     endif
- endif
+  endif
 
   if (debug) write (*, *) '   begin matrix assembly...'
 
   !check on errors encountered in psdspins
-  
+
   if ((iperm(1) /= 0))   then 
 
     if (debug) write(0,*) 'spasb: here we go with ',iperm(1) 
@@ -202,19 +203,18 @@ subroutine psb_cdren(trans,iperm,desc_a,info)
       enddo
       close(60+myrow)
     end if
-    
+
 !!$    iperm(1) = 0
   else 
 !!$    allocate(desc_a%lprm(1))
 !!$    desc_a%lprm(1) = 0       
-  endif    
+  endif
 
 
   time(4) = mpi_wtime()
   time(4) = time(4) - time(3)
   if (debug) then 
-    call dgamx2d(ictxt, psb_all_, psb_topdef_, ione, ione, time(4),&
-         & ione,temp ,temp,-ione ,-ione,-ione)
+    call psb_amx(ictxt, time(4))
 
     write (*, *) '         comm structs assembly: ', time(4)*1.d-3
   end if
@@ -224,11 +224,11 @@ subroutine psb_cdren(trans,iperm,desc_a,info)
 
 9999 continue
   call psb_erractionrestore(err_act)
-  
+
   if (err_act.eq.act_ret) then
-     return
+    return
   else
-     call psb_error(ictxt)
+    call psb_error(ictxt)
   end if
   return
 

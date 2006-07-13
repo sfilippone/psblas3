@@ -51,6 +51,7 @@ subroutine  psb_dgatherm(globx, locx, desc_a, info, iroot,&
   use psb_descriptor_type
   use psb_check_mod
   use psb_error_mod
+  use psb_penv_mod
   implicit none
 
   real(kind(1.d0)), intent(in)    :: locx(:,:)
@@ -88,42 +89,42 @@ subroutine  psb_dgatherm(globx, locx, desc_a, info, iroot,&
   endif
 
   if (present(iroot)) then
-     root = iroot
-     if((root.lt.-1).or.(root.gt.nprow)) then
-        info=30
-        int_err(1:2)=(/5,root/)
-        call psb_errpush(info,name,i_err=int_err)
-        goto 9999
-     end if
+    root = iroot
+    if((root.lt.-1).or.(root.gt.nprow)) then
+      info=30
+      int_err(1:2)=(/5,root/)
+      call psb_errpush(info,name,i_err=int_err)
+      goto 9999
+    end if
   else
-     root = -1
+    root = -1
   end if
   if (root==-1) then
-     iiroot=0
+    iiroot=0
   endif
 
   if (present(iiglobx)) then
-     iglobx = iiglobx
+    iglobx = iiglobx
   else
-     iglobx = 1
+    iglobx = 1
   end if
 
   if (present(ijglobx)) then
-     jglobx = ijglobx
+    jglobx = ijglobx
   else
-     jglobx = 1
+    jglobx = 1
   end if
 
   if (present(iilocx)) then
-     ilocx = iilocx
+    ilocx = iilocx
   else
-     ilocx = 1
+    ilocx = 1
   end if
 
   if (present(ijlocx)) then
-     jlocx = ijlocx
+    jlocx = ijlocx
   else
-     jlocx = 1
+    jlocx = 1
   end if
 
   lda_globx = size(globx,1)
@@ -131,62 +132,58 @@ subroutine  psb_dgatherm(globx, locx, desc_a, info, iroot,&
 
   m = desc_a%matrix_data(psb_m_)
   n = desc_a%matrix_data(psb_n_)
-  
+
   lock=size(locx,2)-jlocx+1
   globk=size(globx,2)-jglobx+1
   maxk=min(lock,globk)
-  
+
   if(present(ik)) then
-     if(ik.gt.maxk) then
-        k=maxk
-     else
-        k=ik
-     end if
+    if(ik.gt.maxk) then
+      k=maxk
+    else
+      k=ik
+    end if
   else
-     k = maxk
+    k = maxk
   end if
 
-  if (myrow == iiroot) then
-     call igebs2d(ictxt, 'all', ' ', 1, 1, k, 1)
-  else
-     call igebr2d(ictxt, 'all', ' ', 1, 1, k, 1, iiroot, 0)
-  end if
+  call psb_bcast(ictxt,k,root=iiroot)
 
   !  there should be a global check on k here!!!
 
   call psb_chkglobvect(m,n,size(globx,1),iglobx,jglobx,desc_a%matrix_data,info)
   call psb_chkvect(m,n,size(locx,1),ilocx,jlocx,desc_a%matrix_data,info,ilx,jlx)
   if(info.ne.0) then
-     info=4010
-     ch_err='psb_chk(glob)vect'
-     call psb_errpush(info,name,a_err=ch_err)
-     goto 9999
+    info=4010
+    ch_err='psb_chk(glob)vect'
+    call psb_errpush(info,name,a_err=ch_err)
+    goto 9999
   end if
 
   if ((ilx.ne.1).or.(iglobx.ne.1)) then
-     info=3040
-     call psb_errpush(info,name)
-     goto 9999
+    info=3040
+    call psb_errpush(info,name)
+    goto 9999
   end if
-  
+
   globx(:,:)=0.d0
 
   do j=1,k
-     do i=1,desc_a%matrix_data(psb_n_row_)
-        idx = desc_a%loc_to_glob(i)
-        globx(idx,jglobx+j-1) = locx(i,jlx+j-1)
-     end do
-     ! adjust overlapped elements
-     i=0
-     do while (desc_a%ovrlap_elem(i).ne.-1)
-        idx=desc_a%ovrlap_elem(i+psb_ovrlp_elem_)
-        idx=desc_a%loc_to_glob(idx)
-        globx(idx,jglobx+j-1) = globx(idx,jglobx+j-1)/desc_a%ovrlap_elem(i+psb_n_dom_ovr_)
-        i=i+2
-     end do
+    do i=1,desc_a%matrix_data(psb_n_row_)
+      idx = desc_a%loc_to_glob(i)
+      globx(idx,jglobx+j-1) = locx(i,jlx+j-1)
+    end do
+    ! adjust overlapped elements
+    i=0
+    do while (desc_a%ovrlap_elem(i).ne.-1)
+      idx=desc_a%ovrlap_elem(i+psb_ovrlp_elem_)
+      idx=desc_a%loc_to_glob(idx)
+      globx(idx,jglobx+j-1) = globx(idx,jglobx+j-1)/desc_a%ovrlap_elem(i+psb_n_dom_ovr_)
+      i=i+2
+    end do
   end do
 
-  call dgsum2d(ictxt,'a',' ',m,k,globx(1,jglobx),size(globx,1),root,mycol)
+  call psb_sum(ictxt,globx(1:m,jglobx:jglobx+k-1),root=root)
 
   call psb_erractionrestore(err_act)
   return  
@@ -195,8 +192,8 @@ subroutine  psb_dgatherm(globx, locx, desc_a, info, iroot,&
   call psb_erractionrestore(err_act)
 
   if (err_act.eq.act_abort) then
-     call psb_error(ictxt)
-     return
+    call psb_error(ictxt)
+    return
   end if
   return
 
@@ -255,6 +252,7 @@ subroutine  psb_dgatherv(globx, locx, desc_a, info, iroot,&
   use psb_descriptor_type
   use psb_check_mod
   use psb_error_mod
+  use psb_penv_mod
   implicit none
 
   real(kind(1.d0)), intent(in)    :: locx(:)
@@ -279,7 +277,7 @@ subroutine  psb_dgatherv(globx, locx, desc_a, info, iroot,&
   ictxt=desc_a%matrix_data(psb_ctxt_)
 
   ! check on blacs grid 
-  call blacs_gridinfo(ictxt, nprow, npcol, myrow, mycol)
+  call psb_info(ictxt, myrow, nprow)
   if (nprow == -1) then
     info = 2010
     call psb_errpush(info,name)
@@ -303,7 +301,7 @@ subroutine  psb_dgatherv(globx, locx, desc_a, info, iroot,&
      root = -1
   end if
   if (root==-1) then
-     root=0
+    iiroot=0
   endif
 
   jglobx=1
@@ -328,11 +326,6 @@ subroutine  psb_dgatherv(globx, locx, desc_a, info, iroot,&
   
   k = 1
 
-  if (myrow == root) then
-     call igebs2d(ictxt, 'all', ' ', 1, 1, k, 1)
-  else
-     call igebr2d(ictxt, 'all', ' ', 1, 1, k, 1, root, 0)
-  end if
 
   !  there should be a global check on k here!!!
 
@@ -366,7 +359,7 @@ subroutine  psb_dgatherv(globx, locx, desc_a, info, iroot,&
      i=i+2
   end do
   
-  call dgsum2d(ictxt,'a',' ',m,k,globx,size(globx),root,mycol)
+  call psb_sum(ictxt,globx(1:m),root=root)
 
   call psb_erractionrestore(err_act)
   return  

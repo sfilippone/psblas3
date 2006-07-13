@@ -44,6 +44,7 @@ subroutine psb_dcsrp(trans,iperm,a, desc_a, info)
   use psb_descriptor_type
   use psb_serial_mod
   use psb_const_mod
+  use psb_penv_mod
   !  implicit none
 
   interface dcsrp
@@ -82,7 +83,7 @@ subroutine psb_dcsrp(trans,iperm,a, desc_a, info)
        & mypcol ,ierror ,n_col,l_dcsdp, iout, ipsize
   integer                               ::  dectype
   real(kind(1.d0)), pointer             ::  work_dcsdp(:)
-  integer                               ::  ictxt,temp(1),n_row,err_act
+  integer                               ::  ictxt,n_row,err_act
   character(len=20)                     ::  name, char_err
 
   real(kind(1.d0))                      ::  time(10), mpi_wtime
@@ -102,7 +103,7 @@ subroutine psb_dcsrp(trans,iperm,a, desc_a, info)
   name = 'psd_csrp'
 
   ! check on blacs grid 
-  call blacs_gridinfo(ictxt, nprow, npcol, me, mypcol)
+  call psb_info(ictxt, me, nprow)
   if (nprow.eq.-1) then
      info = 2010
      call psb_errpush(info,name)
@@ -180,8 +181,7 @@ subroutine psb_dcsrp(trans,iperm,a, desc_a, info)
   time(4) = mpi_wtime()
   time(4) = time(4) - time(3)
   if (debug) then 
-    call dgamx2d(ictxt, all, topdef, ione, ione, time(4),&
-         & ione,temp ,temp,-ione ,-ione,-ione)
+    call psb_amx(ictxt, time(4))
 
     write (*, *) '         comm structs assembly: ', time(4)*1.d-3
   end if

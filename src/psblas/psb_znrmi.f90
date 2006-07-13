@@ -45,7 +45,7 @@ function psb_znrmi(a,desc_a,info)
   use psb_serial_mod
   use psb_check_mod
   use psb_error_mod
-  use psb_blacs_mod
+  use psb_penv_mod
   implicit none
 
   type(psb_zspmat_type), intent(in)   :: a
@@ -67,7 +67,7 @@ function psb_znrmi(a,desc_a,info)
   ictxt=desc_a%matrix_data(psb_ctxt_)
 
   ! check on blacs grid 
-  call blacs_gridinfo(ictxt, nprow, npcol, myrow, mycol)
+  call psb_info(ictxt, myrow, nprow)
   if (nprow == -1) then
     info = 2010
     call psb_errpush(info,name)
@@ -86,37 +86,37 @@ function psb_znrmi(a,desc_a,info)
 
   call psb_chkmat(m,n,ia,ja,desc_a%matrix_data,info,iia,jja)
   if(info.ne.0) then
-     info=4010
-     ch_err='psb_chkmat'
-     call psb_errpush(info,name,a_err=ch_err)
-     goto 9999
+    info=4010
+    ch_err='psb_chkmat'
+    call psb_errpush(info,name,a_err=ch_err)
+    goto 9999
   end if
 
   if ((iia.ne.1).or.(jja.ne.1)) then
-     info=3040
-     call psb_errpush(info,name)
-     goto 9999
+    info=3040
+    call psb_errpush(info,name)
+    goto 9999
   end if
 
   if ((m.ne.0).and.(n.ne.0)) then
-     mdim = desc_a%matrix_data(psb_n_row_)
-     ndim = desc_a%matrix_data(psb_n_col_)
-     nrmi = zcsnmi('N',mdim,ndim,a%fida,&
-          & a%descra,a%aspk,a%ia1,a%ia2,&
-          & a%infoa,info)
+    mdim = desc_a%matrix_data(psb_n_row_)
+    ndim = desc_a%matrix_data(psb_n_col_)
+    nrmi = zcsnmi('N',mdim,ndim,a%fida,&
+         & a%descra,a%aspk,a%ia1,a%ia2,&
+         & a%infoa,info)
 
-     if(info.ne.0) then
-        info=4010
-        ch_err='dcsnmi'
-        call psb_errpush(info,name,a_err=ch_err)
-        goto 9999
-     end if
-
-     ! compute global max
-     call gamx2d(ictxt, 'A', nrmi)
+    if(info.ne.0) then
+      info=4010
+      ch_err='dcsnmi'
+      call psb_errpush(info,name,a_err=ch_err)
+      goto 9999
+    end if
   else
-     nrmi = 0.d0
+    nrmi = 0.d0
   end if
+
+  ! compute global max
+  call psb_amx(ictxt, nrmi)
 
   psb_znrmi = nrmi
 
@@ -127,8 +127,8 @@ function psb_znrmi(a,desc_a,info)
   call psb_erractionrestore(err_act)
 
   if (err_act.eq.act_abort) then
-     call psb_error(ictxt)
-     return
+    call psb_error(ictxt)
+    return
   end if
   return
 end function psb_znrmi

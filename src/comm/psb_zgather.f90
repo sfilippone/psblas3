@@ -51,7 +51,7 @@ subroutine  psb_zgatherm(globx, locx, desc_a, info, iroot,&
   use psb_descriptor_type
   use psb_check_mod
   use psb_error_mod
-  use psb_blacs_mod
+  use psb_penv_mod
   implicit none
 
   complex(kind(1.d0)), intent(in)    :: locx(:,:)
@@ -147,11 +147,7 @@ subroutine  psb_zgatherm(globx, locx, desc_a, info, iroot,&
      k = maxk
   end if
 
-  if (myrow == iiroot) then
-     call igebs2d(ictxt, 'all', ' ', 1, 1, k, 1)
-  else
-     call igebr2d(ictxt, 'all', ' ', 1, 1, k, 1, iiroot, 0)
-  end if
+  call psb_bcast(ictxt,k,root=iiroot)
 
   !  there should be a global check on k here!!!
 
@@ -187,7 +183,7 @@ subroutine  psb_zgatherm(globx, locx, desc_a, info, iroot,&
      end do
   end do
 
-  call gsum2d(ictxt,'a',globx(:,jglobx),rrt=root)
+  call psb_sum(ictxt,globx(1:m,jglobx:jglobx+k-1),root=root)
 
   call psb_erractionrestore(err_act)
   return  
@@ -256,7 +252,7 @@ subroutine  psb_zgatherv(globx, locx, desc_a, info, iroot,&
   use psb_descriptor_type
   use psb_check_mod
   use psb_error_mod
-  use psb_blacs_mod
+  use psb_penv_mod
   implicit none
 
   complex(kind(1.d0)), intent(in)    :: locx(:)
@@ -281,7 +277,7 @@ subroutine  psb_zgatherv(globx, locx, desc_a, info, iroot,&
   ictxt=desc_a%matrix_data(psb_ctxt_)
 
   ! check on blacs grid 
-  call blacs_gridinfo(ictxt, nprow, npcol, myrow, mycol)
+  call psb_info(ictxt, myrow, nprow)
   if (nprow == -1) then
     info = 2010
     call psb_errpush(info,name)
@@ -304,9 +300,6 @@ subroutine  psb_zgatherv(globx, locx, desc_a, info, iroot,&
   else
      root = -1
   end if
-  if (root==-1) then
-     root=0
-  endif
 
   jglobx=1
   if (present(iiglobx)) then
@@ -330,11 +323,6 @@ subroutine  psb_zgatherv(globx, locx, desc_a, info, iroot,&
   
   k = 1
 
-  if (myrow == root) then
-     call igebs2d(ictxt, 'all', ' ', 1, 1, k, 1)
-  else
-     call igebr2d(ictxt, 'all', ' ', 1, 1, k, 1, root, 0)
-  end if
 
   !  there should be a global check on k here!!!
 
@@ -368,8 +356,8 @@ subroutine  psb_zgatherv(globx, locx, desc_a, info, iroot,&
      i=i+2
   end do
   
-  call dgsum2d(ictxt,'a',' ',m,k,globx,size(globx),root,mycol)
-
+  call psb_sum(ictxt,globx(1:m),root=root)
+  
   call psb_erractionrestore(err_act)
   return  
 

@@ -1032,7 +1032,7 @@ Type, rank and size must agree on all processes.
 
 \subroutine{psb\_sum}{Global sum}
 
-\syntax{call psb\_sum}{ictxt, dat, dst}
+\syntax{call psb\_sum}{ictxt, dat, root}
 
 This subroutine implements a sum reduction  operation based on the
 underlying communication library. 
@@ -1049,11 +1049,11 @@ Type:{\bf required}.\\
 Specified as: an integer, real or complex variable, which may be a
 scalar, or a rank 1 or 2 array. \
 Type, rank and size must agree on all processes.
-\item[dst] Process to hold the final sum, or $-1$ to make it available
+\item[root] Process to hold the final sum, or $-1$ to make it available
   on all processes.\\
 Scope:{\bf global}.\\
 Type:{\bf optional}.\\
-Specified as: an integer value $-1<= dst <= np-1$, default -1. \
+Specified as: an integer value $-1<= root <= np-1$, default -1. \
 \end{description}
 
 
@@ -1069,7 +1069,7 @@ Type, rank and size must agree on all processes.
 
 \subroutine{psb\_amx}{Global maximum absolute value}
 
-\syntax{call psb\_amx}{ictxt, dat, dst}
+\syntax{call psb\_amx}{ictxt, dat, root}
 
 This subroutine implements a maximum absolute value reduction
 operation based on the underlying communication library. 
@@ -1086,11 +1086,11 @@ Type:{\bf required}.\\
 Specified as: an integer, real or complex variable, which may be a
 scalar, or a rank 1 or 2 array. \
 Type, rank and size must agree on all processes.
-\item[dst] Process to hold the final sum, or $-1$ to make it available
+\item[root] Process to hold the final sum, or $-1$ to make it available
   on all processes.\\
 Scope:{\bf global}.\\
 Type:{\bf optional}.\\
-Specified as: an integer value $-1<= dst <= np-1$, default -1. \\
+Specified as: an integer value $-1<= root <= np-1$, default -1. \\
 \end{description}
 
 
@@ -1106,7 +1106,7 @@ Type, rank and size must agree on all processes.
 
 \subroutine{psb\_amn}{Global minimum absolute value}
 
-\syntax{call psb\_amn}{ictxt, dat, dst}
+\syntax{call psb\_amn}{ictxt, dat, root}
 
 This subroutine implements a minimum absolute value reduction
 operation based on the underlying communication library. 
@@ -1123,11 +1123,11 @@ Type:{\bf required}.\\
 Specified as: an integer, real or complex variable, which may be a
 scalar, or a rank 1 or 2 array. \
 Type, rank and size must agree on all processes.
-\item[dst] Process to hold the final sum, or $-1$ to make it available
+\item[root] Process to hold the final sum, or $-1$ to make it available
   on all processes.\\
 Scope:{\bf global}.\\
 Type:{\bf optional}.\\
-Specified as: an integer value $-1<= dst <= np-1$, default -1. \\
+Specified as: an integer value $-1<= root <= np-1$, default -1. \\
 \end{description}
 
 

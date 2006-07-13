@@ -45,6 +45,7 @@ function psb_dnrmi(a,desc_a,info)
   use psb_serial_mod
   use psb_check_mod
   use psb_error_mod
+  use psb_penv_mod
   implicit none
 
   type(psb_dspmat_type), intent(in)   :: a
@@ -54,7 +55,7 @@ function psb_dnrmi(a,desc_a,info)
 
   ! locals
   integer                  :: int_err(5), ictxt, nprow, npcol, myrow, mycol,&
-       & err_act, n, iia, jja, ia, ja, temp(2), mdim, ndim, m
+       & err_act, n, iia, jja, ia, ja, mdim, ndim, m
   real(kind(1.d0))         :: nrmi, dcsnmi
   character(len=20)        :: name, ch_err
 
@@ -66,7 +67,7 @@ function psb_dnrmi(a,desc_a,info)
   ictxt=desc_a%matrix_data(psb_ctxt_)
 
   ! check on blacs grid 
-  call blacs_gridinfo(ictxt, nprow, npcol, myrow, mycol)
+  call psb_info(ictxt, myrow, nprow)
   if (nprow == -1) then
     info = 2010
     call psb_errpush(info,name)
@@ -111,12 +112,11 @@ function psb_dnrmi(a,desc_a,info)
         goto 9999
      end if
 
-     ! compute global max
-     call dgamx2d(ictxt, 'A', ' ', ione, ione, nrmi, ione,&
-          &temp ,temp,-ione ,-ione,-ione)
   else
      nrmi = 0.d0
   end if
+  ! compute global max
+  call psb_amx(ictxt, nrmi)
 
   psb_dnrmi = nrmi
 

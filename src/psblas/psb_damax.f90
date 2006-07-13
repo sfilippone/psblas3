@@ -44,7 +44,7 @@
 !    jx     -  integer(optional).         The column offset.
 !
 function psb_damax (x,desc_a, info, jx)
-  use psb_blacs_mod 
+  use psb_penv_mod 
   use psb_serial_mod
   use psb_descriptor_type
   use psb_check_mod
@@ -59,7 +59,7 @@ function psb_damax (x,desc_a, info, jx)
 
   ! locals
   integer                  :: int_err(5), ictxt, nprow, npcol, myrow, mycol,&
-       & err_act, n, iix, jjx, temp(2), ix, ijx, m, i, k, imax, idamax
+       & err_act, n, iix, jjx, ix, ijx, m, i, k, imax, idamax
   real(kind(1.d0))         :: amax
   character(len=20)        :: name, ch_err
 
@@ -73,7 +73,7 @@ function psb_damax (x,desc_a, info, jx)
   ictxt=desc_a%matrix_data(psb_ctxt_)
 
   ! check on blacs grid 
-  call blacs_gridinfo(ictxt, nprow, npcol, myrow, mycol)
+  call psb_info(ictxt, myrow, nprow)
   if (nprow == -1) then
     info = 2010
     call psb_errpush(info,name)
@@ -115,8 +115,7 @@ function psb_damax (x,desc_a, info, jx)
   end if
   
   ! compute global max
-  call dgamx2d(ictxt, 'A', ' ', ione, ione, amax, ione,&
-           &temp ,temp,-ione ,-ione,-ione)
+  call psb_amx(ictxt, amax)
 
   psb_damax=amax
 
@@ -177,7 +176,7 @@ end function psb_damax
 !    info   -  integer.                   Eventually returns an error code.
 !
 function psb_damaxv (x,desc_a, info)
-  use psb_blacs_mod
+  use psb_penv_mod
   use psb_serial_mod
   use psb_descriptor_type
   use psb_check_mod
@@ -191,7 +190,7 @@ function psb_damaxv (x,desc_a, info)
 
   ! locals
   integer                  :: int_err(5), err, ictxt, nprow, npcol, myrow, mycol,&
-       & err_act, n, iix, jjx, jx, temp(2), ix, ijx, m, imax, idamax
+       & err_act, n, iix, jjx, jx, ix, ijx, m, imax, idamax
   real(kind(1.d0))         :: amax
   character(len=20)        :: name, ch_err
 
@@ -205,7 +204,7 @@ function psb_damaxv (x,desc_a, info)
   ictxt=desc_a%matrix_data(psb_ctxt_)
 
   ! check on blacs grid 
-  call blacs_gridinfo(ictxt, nprow, npcol, myrow, mycol)
+  call psb_info(ictxt, myrow, nprow)
   if (nprow == -1) then
     info = 2010
     call psb_errpush(info,name)
@@ -243,7 +242,7 @@ function psb_damaxv (x,desc_a, info)
   end if
   
   ! compute global max
-  call gamx2d(ictxt, 'A', amax)
+  call psb_amx(ictxt, amax)
 
   psb_damaxv=amax
 
@@ -306,7 +305,7 @@ end function psb_damaxv
 !    jx     -  integer(optional).         The column offset.
 !
 subroutine psb_damaxvs (res,x,desc_a, info)
-  use psb_blacs_mod
+  use psb_penv_mod
   use psb_serial_mod
   use psb_descriptor_type
   use psb_check_mod
@@ -320,7 +319,7 @@ subroutine psb_damaxvs (res,x,desc_a, info)
 
   ! locals
   integer                  :: int_err(5), ictxt, nprow, npcol, myrow, mycol,&
-       & err_act, n, iix, jjx, temp(2), ix, ijx, m, imax, idamax
+       & err_act, n, iix, jjx, ix, ijx, m, imax, idamax
   real(kind(1.d0))         :: amax
   character(len=20)        :: name, ch_err
 
@@ -334,7 +333,7 @@ subroutine psb_damaxvs (res,x,desc_a, info)
   ictxt=desc_a%matrix_data(psb_ctxt_)
 
   ! check on blacs grid 
-  call blacs_gridinfo(ictxt, nprow, npcol, myrow, mycol)
+  call psb_info(ictxt, myrow, nprow)
   if (nprow == -1) then
     info = 2010
     call psb_errpush(info,name)
@@ -372,7 +371,7 @@ subroutine psb_damaxvs (res,x,desc_a, info)
   end if
   
   ! compute global max
-  call gamx2d(ictxt, 'A', amax)
+  call psb_amx(ictxt, amax)
 
   res = amax
 
@@ -433,7 +432,7 @@ end subroutine psb_damaxvs
 !    info   -  integer.                   Eventually returns an error code.
 !
 subroutine psb_dmamaxs (res,x,desc_a, info,jx)
-  use psb_blacs_mod
+  use psb_penv_mod
   use psb_serial_mod
   use psb_descriptor_type
   use psb_check_mod
@@ -448,7 +447,7 @@ subroutine psb_dmamaxs (res,x,desc_a, info,jx)
 
   ! locals
   integer                  :: int_err(5), ictxt, nprow, npcol, myrow, mycol,&
-       & err_act, n, iix, jjx, ix, temp(2), ijx, m, imax, i, k, idamax
+       & err_act, n, iix, jjx, ix, ijx, m, imax, i, k, idamax
   real(kind(1.d0))         :: amax
   character(len=20)        :: name, ch_err
 
@@ -462,7 +461,7 @@ subroutine psb_dmamaxs (res,x,desc_a, info,jx)
   ictxt=desc_a%matrix_data(psb_ctxt_)
 
   ! check on blacs grid 
-  call blacs_gridinfo(ictxt, nprow, npcol, myrow, mycol)
+  call psb_info(ictxt, myrow, nprow)
   if (nprow == -1) then
     info = 2010
     call psb_errpush(info,name)
@@ -507,7 +506,7 @@ subroutine psb_dmamaxs (res,x,desc_a, info,jx)
   end if
   
   ! compute global max
-  call gamx2d(ictxt, 'A', res(1:k))
+  call psb_amx(ictxt, res(1:k))
 
   call psb_erractionrestore(err_act)
   return  
