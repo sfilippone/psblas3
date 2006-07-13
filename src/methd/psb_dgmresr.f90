@@ -300,7 +300,7 @@ Subroutine psb_dgmresr(a,prec,b,x,eps,desc_a,info,&
       endif
 
       if (rerr < eps ) then 
-        call dtrsm('l','u','n','n',i,1,done,rr,size(rr,1),rs,nl)
+        call dtrsm('l','u','n','n',i,1,done,rr,size(rr,1),rs,size(rs))
         if (debug) write(0,*) 'Rebuild x-> RS:',rs(21:nl)
         do k=1, i
           call psb_geaxpby(rs(k),v(:,k),done,x,desc_a,info)
@@ -314,7 +314,7 @@ Subroutine psb_dgmresr(a,prec,b,x,eps,desc_a,info,&
 
     end Do inner
     if (debug) write(0,*) 'Before DTRSM :',rs(1:nl)
-    call dtrsm('l','u','n','n',nl,1,done,rr,size(rr,1),rs,nl)
+    call dtrsm('l','u','n','n',nl,1,done,rr,size(rr,1),rs,size(rs))
     if (debug) write(0,*) 'Rebuild x-> RS:',rs(21:nl)
     do k=1, nl
       call psb_geaxpby(rs(k),v(:,k),done,x,desc_a,info)
