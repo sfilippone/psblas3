@@ -279,11 +279,6 @@ contains
       bg%infoa(psb_nnz_) = nzbg
       bg%fida='COO'
       bg%descra='G'
-      call psb_fixcoo(bg,info)
-      if(info /= 0) then
-        call psb_errpush(4010,name,a_err='fixcoo')
-        goto 9999
-      end if
 
       call psb_sp_free(b,info)
       if(info /= 0) then
@@ -305,9 +300,60 @@ contains
         goto 9999
       end if
 
+      !if(.not.associated(p%av(ap_nd_)%aspk)) p%iprcparm(jac_sweeps_) = 1
+      !------------------------------------------------------------------
+      ! Split BG=M+N  N off-diagonal part
+      call psb_sp_all(bg%m,bg%k,p%av(ap_nd_),nzl,info)
+      if(info /= 0) then
+        call psb_errpush(4010,name,a_err='psb_sp_all')
+        goto 9999
+      end if
+      if(.not.associated(p%av(ap_nd_)%aspk)) write(0,*) '.not.associated(p%av(ap_nd_)%ia1)'
+      if(.not.associated(p%av(ap_nd_)%ia1)) write(0,*) '.not.associated(p%av(ap_nd_)%ia1)'
+      !write(0,*) 'ok line 238'
+
+      k=0
+      do i=1,nzl
+        if (bg%ia2(i)>bg%m) then 
+          k = k + 1
+          p%av(ap_nd_)%aspk(k) = bg%aspk(i)
+          p%av(ap_nd_)%ia1(k)  = bg%ia1(i)
+          p%av(ap_nd_)%ia2(k)  = bg%ia2(i)
+        endif
+      enddo
+      p%av(ap_nd_)%infoa(psb_nnz_) = k
+
+      if(info /= 0) then
+        call psb_errpush(4010,name,a_err='psb_ipcoo2csr')
+        goto 9999
+      end if
+      call igsum2d(icontxt,'All',' ',1,1,k,1,-1,-1)
+
+      if (k == 0) then 
+        ! If the off diagonal part is emtpy, there's no point 
+        ! in doing multiple  Jacobi sweeps. This is certain 
+        ! to happen when running on a single processor.
+        p%iprcparm(jac_sweeps_) = 1
+      end if
+      !write(0,*) 'operations in bldaggrmat are ok !'
+      !------------------------------------------------------------------
+
+      call psb_ipcoo2csr(p%av(ap_nd_),info)
+      if(info /= 0) then
+        call psb_errpush(4010,name,a_err='ipcoo2csr')
+        goto 9999
+      end if
+
+
     else 
 
       write(0,*) 'Unknown p%iprcparm(coarse_mat) in aggregate_sp',p%iprcparm(coarse_mat_)
+    end if
+
+    call psb_ipcoo2csr(bg,info)
+    if(info /= 0) then
+      call psb_errpush(4010,name,a_err='ipcoo2csr')
+      goto 9999
     end if
 
 
