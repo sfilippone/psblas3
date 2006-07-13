@@ -216,9 +216,11 @@ contains
                &   aggr_names(p%baseprecv(2)%iprcparm(aggr_alg_))
           write(iout,*) 'Smoother:               ', &
                &  smooth_kinds(p%baseprecv(2)%iprcparm(smth_kind_))
-          write(iout,*) 'Smoothing omega: ', p%baseprecv(2)%dprcparm(smooth_omega_)
-          write(iout,*) 'Smoothing position: ',&
-               & smooth_names(p%baseprecv(2)%iprcparm(smth_pos_))
+          if (p%baseprecv(2)%iprcparm(smth_kind_) /= no_smth_) then 
+            write(iout,*) 'Smoothing omega: ', p%baseprecv(2)%dprcparm(smooth_omega_)
+            write(iout,*) 'Smoothing position: ',&
+                 & smooth_names(p%baseprecv(2)%iprcparm(smth_pos_))
+          end if
           write(iout,*) 'Coarse matrix: ',&
                & matrix_names(p%baseprecv(2)%iprcparm(coarse_mat_))
           write(iout,*) 'Aggregation sizes: ', &
@@ -354,10 +356,12 @@ contains
           write(iout,*) 'Smoother:               ', &
                &  smooth_kinds(p%baseprecv(2)%iprcparm(smth_kind_))
           write(iout,*) 'Smoothing omega: ', p%baseprecv(2)%dprcparm(smooth_omega_)
-          write(iout,*) 'Smoothing position: ',&
-               & smooth_names(p%baseprecv(2)%iprcparm(smth_pos_))
-          write(iout,*) 'Coarse matrix: ',&
-               & matrix_names(p%baseprecv(2)%iprcparm(coarse_mat_))
+          if (p%baseprecv(2)%iprcparm(smth_kind_) /= no_smth_) then 
+            write(iout,*) 'Smoothing position: ',&
+                 & smooth_names(p%baseprecv(2)%iprcparm(smth_pos_))
+            write(iout,*) 'Coarse matrix: ',&
+                 & matrix_names(p%baseprecv(2)%iprcparm(coarse_mat_))
+          end if
           write(iout,*) 'Aggregation sizes: ', &
                &  sum( p%baseprecv(2)%nlaggr(:)),' : ',p%baseprecv(2)%nlaggr(:)
           write(iout,*) 'Factorization type: ',&
