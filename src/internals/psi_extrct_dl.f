@@ -248,15 +248,13 @@ c     ... check for errors...
       if (err.ne.0) goto 9999
 
       call psb_sum(ictxt,length_dl(0:np))
-      call blacs_get(ictxt,10,icomm )
+      call psb_get_mpicomm(ictxt,icomm )
       allocate(itmp(dl_lda),stat=info)
       if (info /= 0) goto 9999
       itmp(1:dl_lda) = dep_list(1:dl_lda,me)
       call mpi_allgather(itmp,dl_lda,mpi_integer,
      +  dep_list,dl_lda,mpi_integer,icomm,info)
       deallocate(itmp)
-
-      end if 
 
       return
 
