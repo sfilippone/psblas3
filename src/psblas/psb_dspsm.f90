@@ -82,6 +82,7 @@ subroutine  psb_dspsm(alpha,a,x,beta,y,desc_a,info,&
   use psb_check_mod
   use psb_error_mod
   use psb_string_mod
+  use psb_penv_mod
   implicit none
 
   real(kind(1.D0)), intent(in)              :: alpha, beta
@@ -97,7 +98,7 @@ subroutine  psb_dspsm(alpha,a,x,beta,y,desc_a,info,&
   integer, intent(in), optional             :: k, jx, jy
 
   ! locals
-  integer                  :: int_err(5), ictxt, nprow, npcol, myrow, mycol,&
+  integer                  :: int_err(5), ictxt, np, npcol, me, mycol,&
        & err_act, n, iix, jjx, ia, ja, iia, jja, temp(2), lldx,lldy, lchoice,&
        & ix, iy, ik, ijx, ijy, i, lld,&
        & idoswap, m, nrow, ncol, liwork, llwork, iiy, jjy
@@ -116,15 +117,9 @@ subroutine  psb_dspsm(alpha,a,x,beta,y,desc_a,info,&
 
   ictxt=desc_a%matrix_data(psb_ctxt_)
 
-  ! check on blacs grid 
-  call blacs_gridinfo(ictxt, nprow, npcol, myrow, mycol)
-  if (nprow == -1) then
+  call psb_info(ictxt, me, np)
+  if (np == -1) then
     info = 2010
-    call psb_errpush(info,name)
-    goto 9999
-  else if (npcol /= 1) then
-    info = 2030
-    int_err(1) = npcol
     call psb_errpush(info,name)
     goto 9999
   endif
@@ -390,6 +385,8 @@ subroutine  psb_dspsv(alpha,a,x,beta,y,desc_a,info,&
   use psb_check_mod
   use psb_error_mod
   use psb_string_mod
+  use psb_penv_mod
+  implicit none 
 
   real(kind(1.D0)), intent(in)              :: alpha, beta
   real(kind(1.d0)), intent(in), target      :: x(:)
@@ -403,7 +400,7 @@ subroutine  psb_dspsv(alpha,a,x,beta,y,desc_a,info,&
   integer, intent(in), optional             :: choice
 
   ! locals
-  integer                  :: int_err(5), ictxt, nprow, npcol, myrow, mycol,&
+  integer                  :: int_err(5), ictxt, np, npcol, me, mycol,&
        & err_act, n, iix, jjx, ia, ja, iia, jja, temp(2), lldx,lldy, lchoice,&
        & ix, iy, ik, jx, jy, i, lld,&
        & idoswap, m, nrow, ncol, liwork, llwork, iiy, jjy
@@ -422,15 +419,9 @@ subroutine  psb_dspsv(alpha,a,x,beta,y,desc_a,info,&
 
   ictxt=desc_a%matrix_data(psb_ctxt_)
 
-  ! check on blacs grid 
-  call blacs_gridinfo(ictxt, nprow, npcol, myrow, mycol)
-  if (nprow == -1) then
+  call psb_info(ictxt, me, np)
+  if (np == -1) then
     info = 2010
-    call psb_errpush(info,name)
-    goto 9999
-  else if (npcol /= 1) then
-    info = 2030
-    int_err(1) = npcol
     call psb_errpush(info,name)
     goto 9999
   endif

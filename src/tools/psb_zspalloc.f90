@@ -46,6 +46,7 @@ subroutine psb_zspalloc(a, desc_a, info, nnz)
   use psb_serial_mod
   use psb_const_mod
   use psb_error_mod
+  use psb_penv_mod
   implicit none
 
   !....parameters...
@@ -56,31 +57,26 @@ subroutine psb_zspalloc(a, desc_a, info, nnz)
 
   !locals
   integer             :: ictxt, dectype
-  integer             :: nprow,npcol,myrow,mycol,loc_row,&
+  integer             :: np,npcol,me,mycol,loc_row,&
        &  length_ia1,length_ia2,err,nprocs, err_act,m,n
   integer             :: int_err(5),temp(1)
   real(kind(1.d0))    :: real_err(5)
   logical, parameter  :: debug=.false.
   character(len=20)   :: name, ch_err
 
-  if(psb_get_errstatus().ne.0) return 
+  if(psb_get_errstatus() /= 0) return 
   info=0
   call psb_erractionsave(err_act)
   name = 'psb_zspalloc'
 
   ictxt = desc_a%matrix_data(psb_ctxt_)
-  dectype=desc_a%matrix_data(psb_dec_type_)
-  call blacs_gridinfo(ictxt, nprow, npcol, myrow, mycol)
-!     ....verify blacs grid correctness..
-  if (nprow.eq.-1) then
-     info = 2010
-     call psb_errpush(info,name)
-     goto 9999
-  else if (npcol.ne.1) then
-     info = 2030
-     int_err(1) = npcol
-     call psb_errpush(info,name,int_err)
-     goto 9999
+  dectype = desc_a%matrix_data(psb_dec_type_)
+  call psb_info(ictxt, me, np)
+  !     ....verify blacs grid correctness..
+  if (np == -1) then
+    info = 2010
+    call psb_errpush(info,name)
+    goto 9999
   endif
 
   !
@@ -96,29 +92,29 @@ subroutine psb_zspalloc(a, desc_a, info, nnz)
 
   !...allocate matrix data...
   if (present(nnz))then 
-    if (nnz.lt.0) then
-	info=45
-	int_err(1)=7
-	int_err(2)=nnz
-        call psb_errpush(info,name,int_err)
-        goto 9999
-     endif
-     length_ia1=nnz
-     length_ia2=nnz
+    if (nnz < 0) then
+      info=45
+      int_err(1)=7
+      int_err(2)=nnz
+      call psb_errpush(info,name,int_err)
+      goto 9999
+    endif
+    length_ia1=nnz
+    length_ia2=nnz
   else 
-     length_ia1=max(1,4*loc_row)
-     length_ia2=max(1,4*loc_row)
+    length_ia1=max(1,4*loc_row)
+    length_ia2=max(1,4*loc_row)
   endif
 
   if (debug) write(*,*) 'allocating size:',length_ia1
 
   !....allocate aspk, ia1, ia2.....
   call psb_sp_all(loc_row,loc_row,a,length_ia1,info)
-  if(info.ne.0) then
-     info=4010
-     ch_err='sp_all'
-     call psb_errpush(info,name,int_err)
-     goto 9999
+  if(info /= 0) then
+    info=4010
+    ch_err='sp_all'
+    call psb_errpush(info,name,int_err)
+    goto 9999
   end if
 
   ! set permutation matrices
@@ -135,17 +131,17 @@ subroutine psb_zspalloc(a, desc_a, info, nnz)
        &desc_a%matrix_data(psb_dec_type_),psb_desc_bld_
 
   return
-  
+
   call psb_erractionrestore(err_act)
   return
-  
+
 9999 continue
   call psb_erractionrestore(err_act)
-  
-  if (err_act.eq.act_ret) then
-     return
+
+  if (err_act == act_ret) then
+    return
   else
-     call psb_error(ictxt)
+    call psb_error(ictxt)
   end if
   return
 

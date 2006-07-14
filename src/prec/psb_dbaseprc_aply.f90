@@ -46,6 +46,7 @@ subroutine psb_dbaseprc_aply(prec,x,beta,y,desc_data,trans,work,info)
   use psb_psblas_mod
   use psb_const_mod
   use psb_error_mod
+  use psb_penv_mod
   implicit none 
 
   type(psb_desc_type),intent(in)      :: desc_data
@@ -60,32 +61,32 @@ subroutine psb_dbaseprc_aply(prec,x,beta,y,desc_data,trans,work,info)
   integer :: n_row,n_col, int_err(5)
   real(kind(1.d0)), pointer :: ww(:), aux(:), tx(:),ty(:)
   character     ::diagl, diagu
-  integer :: ictxt,nprow,npcol,me,mycol,i, isz, nrg, err_act
+  integer :: ictxt,np,npcol,me,mycol,i, isz, nrg, err_act
   real(kind(1.d0)) :: t1, t2, t3, t4, t5, t6, t7, mpi_wtime
   logical,parameter                 :: debug=.false., debugprt=.false.
   external mpi_wtime
   character(len=20)   :: name, ch_err
 
   interface psb_bjac_aply
-     subroutine psb_dbjac_aply(prec,x,beta,y,desc_data,trans,work,info)
-       use psb_descriptor_type
-       use psb_prec_type
-       type(psb_desc_type), intent(in)       :: desc_data
-       type(psb_dbaseprc_type), intent(in)   :: prec
-       real(kind(0.d0)),intent(inout)        :: x(:), y(:)
-       real(kind(0.d0)),intent(in)           :: beta
-       character(len=1)                      :: trans
-       real(kind(0.d0)),target               :: work(:)
-       integer, intent(out)                  :: info
-     end subroutine psb_dbjac_aply
+    subroutine psb_dbjac_aply(prec,x,beta,y,desc_data,trans,work,info)
+      use psb_descriptor_type
+      use psb_prec_type
+      type(psb_desc_type), intent(in)       :: desc_data
+      type(psb_dbaseprc_type), intent(in)   :: prec
+      real(kind(0.d0)),intent(inout)        :: x(:), y(:)
+      real(kind(0.d0)),intent(in)           :: beta
+      character(len=1)                      :: trans
+      real(kind(0.d0)),target               :: work(:)
+      integer, intent(out)                  :: info
+    end subroutine psb_dbjac_aply
   end interface
-  
+
   name='psb_dbaseprc_aply'
   info = 0
   call psb_erractionsave(err_act)
 
   ictxt=desc_data%matrix_data(psb_ctxt_)
-  call blacs_gridinfo(ictxt,nprow,npcol,me,mycol)
+  call psb_info(ictxt, me, np)
 
   diagl='U'
   diagu='U'
@@ -94,10 +95,10 @@ subroutine psb_dbaseprc_aply(prec,x,beta,y,desc_data,trans,work,info)
   case('N','n')
   case('T','t','C','c')
   case default
-     info=40
-     int_err(1)=6
-     ch_err(2:2)=trans
-     goto 9999
+    info=40
+    int_err(1)=6
+    ch_err(2:2)=trans
+    goto 9999
   end select
 
   select case(prec%iprcparm(p_type_))
@@ -132,9 +133,9 @@ subroutine psb_dbaseprc_aply(prec,x,beta,y,desc_data,trans,work,info)
 
     call psb_bjac_aply(prec,x,beta,y,desc_data,trans,work,info)
     if(info.ne.0) then
-       info=4010
-       ch_err='psb_bjac_aply'
-       goto 9999
+      info=4010
+      ch_err='psb_bjac_aply'
+      goto 9999
     end if
 
   case(asm_,ras_,ash_,rash_)

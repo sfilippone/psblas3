@@ -47,6 +47,7 @@ subroutine psb_dmlprc_aply(baseprecv,x,beta,y,desc_data,trans,work,info)
   use psb_penv_mod
   use psb_const_mod
   use psb_error_mod
+  use psb_penv_mod
   implicit none
 
   type(psb_desc_type),intent(in)      :: desc_data
@@ -63,7 +64,7 @@ subroutine psb_dmlprc_aply(baseprecv,x,beta,y,desc_data,trans,work,info)
   real(kind(1.d0)), allocatable :: tx(:),ty(:),t2l(:),w2l(:),&
        &   x2l(:),b2l(:),tz(:),tty(:)
   character     ::diagl, diagu
-  integer :: ictxt,nprow,npcol,me,mycol,i, isz, nrg,nr2l,err_act, iptype, int_err(5)
+  integer :: ictxt,np,npcol,me,mycol,i, isz, nrg,nr2l,err_act, iptype, int_err(5)
   real(kind(1.d0)) :: omega
   real(kind(1.d0)) :: t1, t2, t3, t4, t5, t6, t7, mpi_wtime
   logical, parameter          :: debug=.false., debugprt=.false.
@@ -72,17 +73,17 @@ subroutine psb_dmlprc_aply(baseprecv,x,beta,y,desc_data,trans,work,info)
   character(len=20)   :: name, ch_err
 
   interface psb_baseprc_aply
-     subroutine psb_dbaseprc_aply(prec,x,beta,y,desc_data,trans,work,info)
-       use psb_descriptor_type
-       use psb_prec_type
-       type(psb_desc_type),intent(in)      :: desc_data
-       type(psb_dbaseprc_type), intent(in) :: prec
-       real(kind(0.d0)),intent(inout)      :: x(:), y(:)
-       real(kind(0.d0)),intent(in)         :: beta
-       character(len=1)                    :: trans
-       real(kind(0.d0)),target             :: work(:)
-       integer, intent(out)                :: info
-     end subroutine psb_dbaseprc_aply
+    subroutine psb_dbaseprc_aply(prec,x,beta,y,desc_data,trans,work,info)
+      use psb_descriptor_type
+      use psb_prec_type
+      type(psb_desc_type),intent(in)      :: desc_data
+      type(psb_dbaseprc_type), intent(in) :: prec
+      real(kind(0.d0)),intent(inout)      :: x(:), y(:)
+      real(kind(0.d0)),intent(in)         :: beta
+      character(len=1)                    :: trans
+      real(kind(0.d0)),target             :: work(:)
+      integer, intent(out)                :: info
+    end subroutine psb_dbaseprc_aply
   end interface
 
   name='psb_dmlprc_aply'
@@ -91,7 +92,7 @@ subroutine psb_dmlprc_aply(baseprecv,x,beta,y,desc_data,trans,work,info)
 
 
   ictxt=desc_data%matrix_data(psb_ctxt_)
-  call blacs_gridinfo(ictxt,nprow,npcol,me,mycol)
+  call psb_info(ictxt, me, np)
 
   omega=baseprecv(2)%dprcparm(smooth_omega_)
   ismth=baseprecv(2)%iprcparm(smth_kind_)
@@ -163,8 +164,8 @@ subroutine psb_dmlprc_aply(baseprecv,x,beta,y,desc_data,trans,work,info)
     if (baseprecv(2)%iprcparm(coarse_mat_)==mat_repl_) Then 
       call psb_sum(ictxt,t2l(1:nrg))
     else if (baseprecv(2)%iprcparm(coarse_mat_) /= mat_distr_) Then 
-        write(0,*) 'Unknown value for baseprecv(2)%iprcparm(coarse_mat_) ',&
-             & baseprecv(2)%iprcparm(coarse_mat_)
+      write(0,*) 'Unknown value for baseprecv(2)%iprcparm(coarse_mat_) ',&
+           & baseprecv(2)%iprcparm(coarse_mat_)
     endif
 
     w2l=t2l
@@ -488,7 +489,7 @@ subroutine psb_dmlprc_aply(baseprecv,x,beta,y,desc_data,trans,work,info)
         enddo
 
       end if
-      
+
       call psb_geaxpby(done,x,dzero,tx,desc_data,info)
       if(info /=0) goto 9999
 
@@ -498,7 +499,7 @@ subroutine psb_dmlprc_aply(baseprecv,x,beta,y,desc_data,trans,work,info)
 
 
       call psb_geaxpby(done,tty,beta,y,desc_data,info)
-      
+
       deallocate(t2l,w2l,tx,ty,tty)
 
 

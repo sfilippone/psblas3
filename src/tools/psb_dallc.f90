@@ -44,6 +44,7 @@ subroutine psb_dalloc(x, desc_a, info, n)
   use psb_descriptor_type
   use psb_const_mod
   use psb_error_mod
+  use psb_penv_mod
 
   implicit none
 
@@ -55,14 +56,14 @@ subroutine psb_dalloc(x, desc_a, info, n)
 
 
   !locals
-  integer             :: nprow,npcol,myrow,mycol,err,n_col,n_row,i,j,jj,err_act
+  integer             :: np,npcol,me,mycol,err,n_col,n_row,i,j,jj,err_act
   integer             :: ictxt,dectype,n_
   integer             :: int_err(5),temp(1),exch(3)
   real(kind(1.d0))    :: real_err(5)
   character(len=20)   :: name, ch_err
 
   name='psb_dallc'
-  if(psb_get_errstatus().ne.0) return 
+  if(psb_get_errstatus() /= 0) return 
   info=0
   err=0
   int_err(1)=0
@@ -70,16 +71,10 @@ subroutine psb_dalloc(x, desc_a, info, n)
 
   ictxt=desc_a%matrix_data(psb_ctxt_)
 
-  call blacs_gridinfo(ictxt, nprow, npcol, myrow, mycol)
-  !     ....verify blacs grid correctness..
-  if (nprow.eq.-1) then
+  call psb_info(ictxt, me, np)
+  if (np == -1) then
     info = 2010
     call psb_errpush(info,name)
-    goto 9999
-  else if (npcol.ne.1) then
-    info = 2030
-    int_err(1) = npcol
-    call psb_errpush(info,name,int_err)
     goto 9999
   endif
 
@@ -97,12 +92,12 @@ subroutine psb_dalloc(x, desc_a, info, n)
     n_ = 1
   endif
   !global check on n parameters
-  if (myrow.eq.psb_root_) then
+  if (me == psb_root_) then
     exch(1)=n_
-    call igebs2d(ictxt,psb_all_,psb_topdef_, ione,ione, exch, ione)
+    call psb_bcast(ictxt,exch(1),root=psb_root_)
   else
-    call igebr2d(ictxt,psb_all_,psb_topdef_, ione,ione, exch, ione, psb_root_, 0)
-    if (exch(1).ne.n_) then
+    call psb_bcast(ictxt,exch(1),root=psb_root_)
+    if (exch(1) /= n_) then
       info=550
       int_err(1)=1
       call psb_errpush(info,name,int_err)
@@ -114,7 +109,7 @@ subroutine psb_dalloc(x, desc_a, info, n)
   if (psb_is_asb_dec(dectype).or.psb_is_upd_dec(dectype)) then
     n_col = max(1,desc_a%matrix_data(psb_n_col_))
     allocate(x(n_col,n_),stat=info)
-    if (info.ne.0) then
+    if (info /= 0) then
       info=4010
       ch_err='allocate'
       call psb_errpush(info,name,a_err=ch_err)
@@ -128,7 +123,7 @@ subroutine psb_dalloc(x, desc_a, info, n)
   else if (psb_is_bld_dec(dectype)) then
     n_row = max(1,desc_a%matrix_data(psb_n_row_))
     allocate(x(n_row,n_),stat=info)
-    if (info.ne.0) then
+    if (info /= 0) then
       info=4010
       ch_err='allocate'
       call psb_errpush(info,name,a_err=ch_err)
@@ -146,7 +141,7 @@ subroutine psb_dalloc(x, desc_a, info, n)
 
 9999 continue
   call psb_erractionrestore(err_act)
-  if (err_act.eq.act_abort) then
+  if (err_act == act_abort) then
     call psb_error(ictxt)
     return
   end if
@@ -198,6 +193,7 @@ subroutine psb_dallocv(x, desc_a,info,n)
   use psb_const_mod
   use psb_realloc_mod
   use psb_error_mod
+  use psb_penv_mod
 
   implicit none
 
@@ -208,30 +204,25 @@ subroutine psb_dallocv(x, desc_a,info,n)
   integer, optional, intent(in)   :: n
 
   !locals
-  integer             :: nprow,npcol,myrow,mycol,err,n_col,n_row,dectype,i,err_act
+  integer             :: np,npcol,me,mycol,err,n_col,n_row,dectype,i,err_act
   integer             :: ictxt, n_
   integer             :: int_err(5),temp(1),exch
   real(kind(1.d0))    :: real_err(5)
   logical, parameter  :: debug=.false. 
   character(len=20)   :: name, ch_err
 
-  if(psb_get_errstatus().ne.0) return 
+  if(psb_get_errstatus() /= 0) return 
   info=0
   name='psb_dallcv'
   call psb_erractionsave(err_act)
 
   ictxt=desc_a%matrix_data(psb_ctxt_)
 
-  call blacs_gridinfo(ictxt, nprow, npcol, myrow, mycol)
+  call psb_info(ictxt, me, np)
   !     ....verify blacs grid correctness..
-  if (nprow.eq.-1) then
+  if (np == -1) then
     info = 2010
     call psb_errpush(info,name)
-    goto 9999
-  else if (npcol.ne.1) then
-    info = 2030
-    int_err(1) = npcol
-    call psb_errpush(info,name,int_err)
     goto 9999
   endif
 
@@ -251,7 +242,7 @@ subroutine psb_dallocv(x, desc_a,info,n)
   if (psb_is_asb_dec(dectype).or.psb_is_upd_dec(dectype)) then
     n_col = max(1,desc_a%matrix_data(psb_n_col_))
     call psb_realloc(n_col,x,info)
-    if (info.ne.0) then
+    if (info /= 0) then
       info=4010
       ch_err='psb_realloc'
       call psb_errpush(info,name,a_err=ch_err)
@@ -264,7 +255,7 @@ subroutine psb_dallocv(x, desc_a,info,n)
   else if (psb_is_bld_dec(dectype)) then
     n_row = max(1,desc_a%matrix_data(psb_n_row_))
     call psb_realloc(n_row,x,info)
-    if (info.ne.0) then
+    if (info /= 0) then
       info=4010
       ch_err='psb_realloc'
       call psb_errpush(info,name,a_err=ch_err)
@@ -280,7 +271,7 @@ subroutine psb_dallocv(x, desc_a,info,n)
 
 9999 continue
   call psb_erractionrestore(err_act)
-  if (err_act.eq.act_abort) then
+  if (err_act == act_abort) then
     call psb_error(ictxt)
     return
   end if

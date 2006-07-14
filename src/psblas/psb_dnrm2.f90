@@ -47,6 +47,7 @@ function psb_dnrm2(x, desc_a, info, jx)
   use psb_descriptor_type
   use psb_check_mod
   use psb_error_mod
+  use psb_penv_mod
   implicit none
 
   real(kind(1.d0)), intent(in)      ::  x(:,:)
@@ -56,10 +57,9 @@ function psb_dnrm2(x, desc_a, info, jx)
   real(kind(1.D0))                  :: psb_dnrm2
 
   ! locals
-  integer                  :: int_err(5), ictxt, nprow, npcol, myrow, mycol,&
+  integer                  :: int_err(5), ictxt, np, npcol, me, mycol,&
        & err_act, n, iix, jjx, temp(2), ndim, ix, ijx, i, m, id 
   real(kind(1.d0))         :: nrm2, dnrm2, dd
-  real(kind(1.d0)),pointer :: tmpx(:)
   external dcombnrm2
   character(len=20)        :: name, ch_err
 
@@ -70,68 +70,62 @@ function psb_dnrm2(x, desc_a, info, jx)
 
   ictxt=desc_a%matrix_data(psb_ctxt_)
 
-  ! check on blacs grid 
-  call blacs_gridinfo(ictxt, nprow, npcol, myrow, mycol)
-  if (nprow == -1) then
+  call psb_info(ictxt, me, np)
+  if (np == -1) then
     info = 2010
     call psb_errpush(info,name)
     goto 9999
-  else if (npcol /= 1) then
-    info = 2030
-    int_err(1) = npcol
-    call psb_errpush(info,name)
-    goto 9999
   endif
-  
+
   ix = 1
   if (present(jx)) then
-     ijx = jx
+    ijx = jx
   else
-     ijx = 1
+    ijx = 1
   endif
 
   m = desc_a%matrix_data(psb_m_)
 
   call psb_chkvect(m,1,size(x,1),ix,ijx,desc_a%matrix_data,info,iix,jjx)
   if(info.ne.0) then
-     info=4010
-     ch_err='psb_chkvect'
-     call psb_errpush(info,name,a_err=ch_err)
+    info=4010
+    ch_err='psb_chkvect'
+    call psb_errpush(info,name,a_err=ch_err)
   end if
 
   if (iix.ne.1) then
-     info=3040
-     call psb_errpush(info,name)
-     goto 9999
+    info=3040
+    call psb_errpush(info,name)
+    goto 9999
   end if
 
   if(m.ne.0) then
-     if (desc_a%matrix_data(psb_n_row_) .gt. 0) then 
-        ndim = desc_a%matrix_data(psb_n_row_)
-        nrm2 = dnrm2( ndim, x(iix,jjx), ione )
-        i=1
-        do while (desc_a%ovrlap_elem(i) .ne. -1)
-           id = desc_a%ovrlap_elem(i+psb_n_dom_ovr_)
-           dd = dble(id-1)/dble(id)
-           nrm2 = nrm2 * sqrt(&
-                &  done - dd * ( &
-                &  x(desc_a%ovrlap_elem(i+psb_ovrlp_elem_), jjx) &
-                &  / nrm2 &
-                &  ) ** 2 &
-                &  ) 
-           i = i+2
-        end do
-     else 	    
-        nrm2 = dzero
-     end if
+    if (desc_a%matrix_data(psb_n_row_) .gt. 0) then 
+      ndim = desc_a%matrix_data(psb_n_row_)
+      nrm2 = dnrm2( ndim, x(iix,jjx), ione )
+      i=1
+      do while (desc_a%ovrlap_elem(i) .ne. -1)
+        id = desc_a%ovrlap_elem(i+psb_n_dom_ovr_)
+        dd = dble(id-1)/dble(id)
+        nrm2 = nrm2 * sqrt(&
+             &  done - dd * ( &
+             &  x(desc_a%ovrlap_elem(i+psb_ovrlp_elem_), jjx) &
+             &  / nrm2 &
+             &  ) ** 2 &
+             &  ) 
+        i = i+2
+      end do
+    else 	    
+      nrm2 = dzero
+    end if
   else 	    
-     nrm2 = dzero
+    nrm2 = dzero
   end if
-  
+
   call pdtreecomb(ictxt,'All',1,nrm2,-1,-1,dcombnrm2)
-  
+
   psb_dnrm2 = nrm2  
-  
+
   call psb_erractionrestore(err_act)
   return  
 
@@ -139,8 +133,8 @@ function psb_dnrm2(x, desc_a, info, jx)
   call psb_erractionrestore(err_act)
 
   if (err_act.eq.act_abort) then
-     call psb_error(ictxt)
-     return
+    call psb_error(ictxt)
+    return
   end if
   return
 end function psb_dnrm2
@@ -191,6 +185,7 @@ function psb_dnrm2v(x, desc_a, info)
   use psb_descriptor_type
   use psb_check_mod
   use psb_error_mod
+  use psb_penv_mod
   implicit none
 
   real(kind(1.d0)), intent(in)      :: x(:)
@@ -199,10 +194,9 @@ function psb_dnrm2v(x, desc_a, info)
   real(kind(1.D0))                  :: psb_dnrm2v
 
   ! locals
-  integer                  :: int_err(5), ictxt, nprow, npcol, myrow, mycol,&
+  integer                  :: int_err(5), ictxt, np, npcol, me, mycol,&
        & err_act, n, iix, jjx, temp(2), ndim, ix, jx, ijx, i, m, id 
   real(kind(1.d0))         :: nrm2, dnrm2, dd
-  real(kind(1.d0)),pointer :: tmpx(:)
   external dcombnrm2
   character(len=20)        :: name, ch_err
 
@@ -213,19 +207,13 @@ function psb_dnrm2v(x, desc_a, info)
 
   ictxt=desc_a%matrix_data(psb_ctxt_)
 
-  ! check on blacs grid 
-  call blacs_gridinfo(ictxt, nprow, npcol, myrow, mycol)
-  if (nprow == -1) then
+  call psb_info(ictxt, me, np)
+  if (np == -1) then
     info = 2010
     call psb_errpush(info,name)
     goto 9999
-  else if (npcol /= 1) then
-    info = 2030
-    int_err(1) = npcol
-    call psb_errpush(info,name)
-    goto 9999
   endif
-  
+
   ix = 1
   jx=1
 
@@ -234,44 +222,44 @@ function psb_dnrm2v(x, desc_a, info)
 
   call psb_chkvect(m,1,size(x),ix,jx,desc_a%matrix_data,info,iix,jjx)
   if(info.ne.0) then
-     info=4010
-     ch_err='psb_chkvect'
-     call psb_errpush(info,name,a_err=ch_err)
+    info=4010
+    ch_err='psb_chkvect'
+    call psb_errpush(info,name,a_err=ch_err)
   end if
 
   if (iix.ne.1) then
-     info=3040
-     call psb_errpush(info,name)
-     goto 9999
+    info=3040
+    call psb_errpush(info,name)
+    goto 9999
   end if
 
   if(m.ne.0) then
-     if (desc_a%matrix_data(psb_n_row_) .gt. 0) then 
-        ndim = desc_a%matrix_data(psb_n_row_)
-        nrm2 = dnrm2( ndim, x, ione )
-        i=1
-        do while (desc_a%ovrlap_elem(i) .ne. -1)
-           id = desc_a%ovrlap_elem(i+psb_n_dom_ovr_)
-           dd = dble(id-1)/dble(id)
-           nrm2 = nrm2 * sqrt(&
-                &  done - dd * ( &
-                &  x(desc_a%ovrlap_elem(i+psb_ovrlp_elem_)) &
-                &  / nrm2 &
-                &  ) ** 2 &
-                &  ) 
-           i = i+2
-        end do
-     else 	    
-        nrm2 = dzero
-     end if
+    if (desc_a%matrix_data(psb_n_row_) .gt. 0) then 
+      ndim = desc_a%matrix_data(psb_n_row_)
+      nrm2 = dnrm2( ndim, x, ione )
+      i=1
+      do while (desc_a%ovrlap_elem(i) .ne. -1)
+        id = desc_a%ovrlap_elem(i+psb_n_dom_ovr_)
+        dd = dble(id-1)/dble(id)
+        nrm2 = nrm2 * sqrt(&
+             &  done - dd * ( &
+             &  x(desc_a%ovrlap_elem(i+psb_ovrlp_elem_)) &
+             &  / nrm2 &
+             &  ) ** 2 &
+             &  ) 
+        i = i+2
+      end do
+    else 	    
+      nrm2 = dzero
+    end if
   else 	    
-     nrm2 = dzero
+    nrm2 = dzero
   end if
-  
+
   call pdtreecomb(ictxt,'All',1,nrm2,-1,-1,dcombnrm2)
-  
+
   psb_dnrm2v = nrm2  
-  
+
   call psb_erractionrestore(err_act)
   return  
 
@@ -279,8 +267,8 @@ function psb_dnrm2v(x, desc_a, info)
   call psb_erractionrestore(err_act)
 
   if (err_act.eq.act_abort) then
-     call psb_error(ictxt)
-     return
+    call psb_error(ictxt)
+    return
   end if
   return
 end function psb_dnrm2v
@@ -333,6 +321,7 @@ subroutine psb_dnrm2vs(res, x, desc_a, info)
   use psb_descriptor_type
   use psb_check_mod
   use psb_error_mod
+  use psb_penv_mod
   implicit none
 
   real(kind(1.d0)), intent(in)      :: x(:)
@@ -341,10 +330,9 @@ subroutine psb_dnrm2vs(res, x, desc_a, info)
   integer, intent(out)              :: info
 
   ! locals
-  integer                  :: int_err(5), ictxt, nprow, npcol, myrow, mycol,&
+  integer                  :: int_err(5), ictxt, np, npcol, me, mycol,&
        & err_act, n, iix, jjx, temp(2), ndim, ix, jx, ijx, i, m, id 
   real(kind(1.d0))         :: nrm2, dnrm2, dd
-  real(kind(1.d0)),pointer :: tmpx(:)
   external dcombnrm2
   character(len=20)        :: name, ch_err
 
@@ -355,63 +343,57 @@ subroutine psb_dnrm2vs(res, x, desc_a, info)
 
   ictxt=desc_a%matrix_data(psb_ctxt_)
 
-  ! check on blacs grid 
-  call blacs_gridinfo(ictxt, nprow, npcol, myrow, mycol)
-  if (nprow == -1) then
+  call psb_info(ictxt, me, np)
+  if (np == -1) then
     info = 2010
     call psb_errpush(info,name)
     goto 9999
-  else if (npcol /= 1) then
-    info = 2030
-    int_err(1) = npcol
-    call psb_errpush(info,name)
-    goto 9999
   endif
-  
+
   ix = 1
   jx = 1
   m = desc_a%matrix_data(psb_m_)
 
   call psb_chkvect(m,1,size(x),ix,jx,desc_a%matrix_data,info,iix,jjx)
   if(info.ne.0) then
-     info=4010
-     ch_err='psb_chkvect'
-     call psb_errpush(info,name,a_err=ch_err)
+    info=4010
+    ch_err='psb_chkvect'
+    call psb_errpush(info,name,a_err=ch_err)
   end if
 
   if (iix.ne.1) then
-     info=3040
-     call psb_errpush(info,name)
-     goto 9999
+    info=3040
+    call psb_errpush(info,name)
+    goto 9999
   end if
 
   if(m.ne.0) then
-     if (desc_a%matrix_data(psb_n_row_) .gt. 0) then 
-        ndim = desc_a%matrix_data(psb_n_row_)
-        nrm2 = dnrm2( ndim, x, ione )
-        i=1
-        do while (desc_a%ovrlap_elem(i) .ne. -1)
-           id = desc_a%ovrlap_elem(i+psb_n_dom_ovr_)
-           dd = dble(id-1)/dble(id)
-           nrm2 = nrm2 * sqrt(&
-                &  done - dd * ( &
-                &  x(desc_a%ovrlap_elem(i+psb_ovrlp_elem_)) &
-                &  / nrm2 &
-                &  ) ** 2 &
-                &  ) 
-           i = i+2
-        end do
-     else 	    
-        nrm2 = dzero
-     end if
+    if (desc_a%matrix_data(psb_n_row_) .gt. 0) then 
+      ndim = desc_a%matrix_data(psb_n_row_)
+      nrm2 = dnrm2( ndim, x, ione )
+      i=1
+      do while (desc_a%ovrlap_elem(i) .ne. -1)
+        id = desc_a%ovrlap_elem(i+psb_n_dom_ovr_)
+        dd = dble(id-1)/dble(id)
+        nrm2 = nrm2 * sqrt(&
+             &  done - dd * ( &
+             &  x(desc_a%ovrlap_elem(i+psb_ovrlp_elem_)) &
+             &  / nrm2 &
+             &  ) ** 2 &
+             &  ) 
+        i = i+2
+      end do
+    else 	    
+      nrm2 = dzero
+    end if
   else 	    
-     nrm2 = dzero
+    nrm2 = dzero
   end if
-  
+
   call pdtreecomb(ictxt,'All',1,nrm2,-1,-1,dcombnrm2)
-  
+
   res = nrm2  
-  
+
   call psb_erractionrestore(err_act)
   return  
 
@@ -419,8 +401,8 @@ subroutine psb_dnrm2vs(res, x, desc_a, info)
   call psb_erractionrestore(err_act)
 
   if (err_act.eq.act_abort) then
-     call psb_error(ictxt)
-     return
+    call psb_error(ictxt)
+    return
   end if
   return
 end subroutine psb_dnrm2vs

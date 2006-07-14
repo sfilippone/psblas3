@@ -49,16 +49,16 @@ subroutine psb_dcsrp(trans,iperm,a, desc_a, info)
 
   interface dcsrp
 
-     subroutine dcsrp(trans,m,n,fida,descra,ia1,ia2,&
-          & infoa,p,work,lwork,ierror)
-       integer, intent(in)  :: m, n, lwork
-       integer, intent(out) :: ierror
-       character, intent(in) ::       trans
-       double precision, intent(inout) :: work(*)                     
-       integer, intent(in)    :: p(*)
-       integer, intent(inout) :: ia1(*), ia2(*), infoa(*) 
-       character, intent(in)  :: fida*5, descra*11
-     end subroutine dcsrp
+    subroutine dcsrp(trans,m,n,fida,descra,ia1,ia2,&
+         & infoa,p,work,lwork,ierror)
+      integer, intent(in)  :: m, n, lwork
+      integer, intent(out) :: ierror
+      character, intent(in) ::       trans
+      double precision, intent(inout) :: work(*)                     
+      integer, intent(in)    :: p(*)
+      integer, intent(inout) :: ia1(*), ia2(*), infoa(*) 
+      character, intent(in)  :: fida*5, descra*11
+    end subroutine dcsrp
   end interface
 
 
@@ -79,7 +79,7 @@ subroutine psb_dcsrp(trans,iperm,a, desc_a, info)
   integer                               ::  int_err(5),p(1),infoa(10)
   real(kind(1.d0))                      ::  real_err(5)
   integer,pointer                       ::  ipt(:)
-  integer                               ::  i,err,nprow,npcol,me,&
+  integer                               ::  i,err,np,npcol,me,&
        & mypcol ,ierror ,n_col,l_dcsdp, iout, ipsize
   integer                               ::  dectype
   real(kind(1.d0)), pointer             ::  work_dcsdp(:)
@@ -96,23 +96,18 @@ subroutine psb_dcsrp(trans,iperm,a, desc_a, info)
   dectype=desc_a%matrix_data(psb_dec_type_)
   n_row = desc_a%matrix_data(psb_n_row_)
   n_col = desc_a%matrix_data(psb_n_col_)
-     
-  if(psb_get_errstatus().ne.0) return 
+
+  if(psb_get_errstatus() /= 0) return 
   info=0
   call psb_erractionsave(err_act)
   name = 'psd_csrp'
 
   ! check on blacs grid 
-  call psb_info(ictxt, me, nprow)
-  if (nprow.eq.-1) then
-     info = 2010
-     call psb_errpush(info,name)
-     goto 9999
-  else if (npcol.ne.1) then
-     info = 2030
-     int_err(1) = npcol
-     call psb_errpush(info,name,int_err)
-     goto 9999
+  call psb_info(ictxt, me, np)
+  if (np == -1) then
+    info = 2010
+    call psb_errpush(info,name)
+    goto 9999
   endif
 
 
@@ -121,10 +116,10 @@ subroutine psb_dcsrp(trans,iperm,a, desc_a, info)
     int_err(1) = dectype
     call psb_errpush(info,name,int_err)
     goto 9999
- endif
+  endif
 
   ipsize = size(iperm)
-  if (.not.((ipsize.eq.n_col).or.(ipsize.eq.n_row) )) then 
+  if (.not.((ipsize == n_col).or.(ipsize == n_row) )) then 
     info = 35
     int_err(1) = 1
     int_err(2) = ipsize
@@ -140,17 +135,17 @@ subroutine psb_dcsrp(trans,iperm,a, desc_a, info)
   endif
 
   l_dcsdp = (n_col)
-  
+
   call psb_realloc(l_dcsdp,work_dcsdp,info)
   call psb_realloc(n_col,ipt,info)
   if(info /= no_err) then
-     info=4010
-     char_err='psrealloc'
-     call psb_errpush(info,name,a_err=char_err)
-     goto 9999
+    info=4010
+    char_err='psrealloc'
+    call psb_errpush(info,name,a_err=char_err)
+    goto 9999
   end if
 
-  if (ipsize.eq.n_col) then 
+  if (ipsize == n_col) then 
     do i=1, n_col
       ipt(i) = iperm(i)
     enddo
@@ -170,19 +165,18 @@ subroutine psb_dcsrp(trans,iperm,a, desc_a, info)
   call dcsrp(trans,n_row,n_col,a%fida,a%descra,a%ia1,a%ia2,a%infoa,&
        & ipt,work_dcsdp,size(work_dcsdp),info)
   if(info /= no_err) then
-     info=4010
-     char_err='dcsrp'
-     call psb_errpush(info,name,a_err=char_err)
-     goto 9999
+    info=4010
+    char_err='dcsrp'
+    call psb_errpush(info,name,a_err=char_err)
+    goto 9999
   end if
-  
+
   deallocate(ipt,work_dcsdp)
-  
+
   time(4) = mpi_wtime()
   time(4) = time(4) - time(3)
   if (debug) then 
     call psb_amx(ictxt, time(4))
-
     write (*, *) '         comm structs assembly: ', time(4)*1.d-3
   end if
 
@@ -191,9 +185,9 @@ subroutine psb_dcsrp(trans,iperm,a, desc_a, info)
 
 9999 continue
   call psb_erractionrestore(err_act)
-  if (err_act.eq.act_abort) then
-     call psb_error()
-     return
+  if (err_act == act_abort) then
+    call psb_error()
+    return
   end if
   return
 

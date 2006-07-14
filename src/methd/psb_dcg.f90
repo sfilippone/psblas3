@@ -83,6 +83,7 @@ Subroutine psb_dcg(a,prec,b,x,eps,desc_a,info,&
   use psb_const_mod
   use psb_prec_mod
   use psb_error_mod
+  use psb_penv_mod
   implicit none
 
 !!$  Parameters 
@@ -103,7 +104,7 @@ Subroutine psb_dcg(a,prec,b,x,eps,desc_a,info,&
   real(kind(1.d0))    ::alpha, beta, rho, rho_old, rni, xni, bni, ani,bn2,& 
        & sigma
   integer         :: litmax, liter, istop_, naux, m, mglob, it, itx, itrace_,&
-       & nprows,npcols,me,mecol, n_col, isvch, ich, ictxt, n_row,err_act, int_err(5)
+       & np,me, n_col, isvch, ich, ictxt, n_row,err_act, int_err(5)
   character          ::diagl, diagu
   logical, parameter :: exchange=.true., noexchange=.false.  
   character(len=20)             :: name,ch_err
@@ -114,7 +115,7 @@ Subroutine psb_dcg(a,prec,b,x,eps,desc_a,info,&
 
 
   ictxt = desc_a%matrix_data(psb_ctxt_)
-  call blacs_gridinfo(ictxt,nprows,npcols,me,mecol)
+  call psb_info(ictxt, me, np)
 
   mglob = desc_a%matrix_data(psb_m_)
   n_row = desc_a%matrix_data(psb_n_row_)

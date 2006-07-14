@@ -29,10 +29,11 @@
 !!$ 
 !!$  
 subroutine psi_crea_index(desc_a,index_in,index_out,glob_idx,info)
-  
+
   use psb_realloc_mod
   use psb_descriptor_type
   use psb_error_mod
+  use psb_penv_mod
   implicit none
 
   type(psb_desc_type), intent(in)  :: desc_a
@@ -40,48 +41,48 @@ subroutine psi_crea_index(desc_a,index_in,index_out,glob_idx,info)
   integer, intent(in)              :: index_in(:)
   integer, pointer                 :: index_out(:)
   logical                          :: glob_idx
-  
-!         ....local scalars...      
-  integer    :: me,npcol,mycol,nprow,i,j,k,&
-       & mode, int_err(5), err, err_act, np,&
+
+  !         ....local scalars...      
+  integer    :: me,np,i,j,k,&
+       & mode, int_err(5), err, err_act,&
        & dl_lda, ictxt, proc, nerv, nesd
-!         ...parameters...
+  !         ...parameters...
   integer, pointer     :: dep_list(:,:), length_dl(:)
   integer,parameter    :: root=0,no_comm=-1
   logical,parameter    :: debug=.false.
   character(len=20)    :: name, ch_err
 
   interface
-     subroutine psi_compute_size(desc_data,&
-          & index_in, dl_lda, info)
-       integer  :: info, dl_lda
-       integer  :: desc_data(:), index_in(:)
-     end subroutine psi_compute_size
+    subroutine psi_compute_size(desc_data,&
+         & index_in, dl_lda, info)
+      integer  :: info, dl_lda
+      integer  :: desc_data(:), index_in(:)
+    end subroutine psi_compute_size
   end interface
 
   interface
-     subroutine psi_sort_dl(dep_list,l_dep_list,np,info)
-       integer :: np,dep_list(:,:), l_dep_list(:), info
-     end subroutine psi_sort_dl
+    subroutine psi_sort_dl(dep_list,l_dep_list,np,info)
+      integer :: np,dep_list(:,:), l_dep_list(:), info
+    end subroutine psi_sort_dl
   end interface
 
   interface
-     subroutine psi_dl_check(dep_list,dl_lda,np,length_dl)
-       integer  :: np,dl_lda,length_dl(0:np)
-       integer  :: dep_list(dl_lda,0:np)
-     end subroutine psi_dl_check
+    subroutine psi_dl_check(dep_list,dl_lda,np,length_dl)
+      integer  :: np,dl_lda,length_dl(0:np)
+      integer  :: dep_list(dl_lda,0:np)
+    end subroutine psi_dl_check
   end interface
 
   interface
-     subroutine psi_desc_index(desc_data,index_in,dep_list,&
-          & length_dl,loc_to_glob,glob_to_loc,desc_index,&
-          & isglob_in,info)
-       integer :: desc_data(:),index_in(:),dep_list(:)
-       integer :: loc_to_glob(:),glob_to_loc(:)
-       integer,pointer :: desc_index(:)
-       integer :: length_dl, info
-       logical :: isglob_in
-     end subroutine psi_desc_index
+    subroutine psi_desc_index(desc_data,index_in,dep_list,&
+         & length_dl,loc_to_glob,glob_to_loc,desc_index,&
+         & isglob_in,info)
+      integer :: desc_data(:),index_in(:),dep_list(:)
+      integer :: loc_to_glob(:),glob_to_loc(:)
+      integer,pointer :: desc_index(:)
+      integer :: length_dl, info
+      logical :: isglob_in
+    end subroutine psi_desc_index
   end interface
 
   info = 0
@@ -89,14 +90,9 @@ subroutine psi_crea_index(desc_a,index_in,index_out,glob_idx,info)
   call psb_erractionsave(err_act)
 
   ictxt = desc_a%matrix_data(psb_ctxt_)
-  call blacs_gridinfo(ictxt,np,npcol,me,mycol)
+  call psb_info(ictxt,me,np)
   if (np == -1) then
     info = 2010
-    call psb_errpush(info,name)
-    goto 9999
-  else if (npcol /= 1) then
-    info = 2030
-    int_err(1) = npcol
     call psb_errpush(info,name)
     goto 9999
   endif
@@ -121,8 +117,8 @@ subroutine psi_crea_index(desc_a,index_in,index_out,glob_idx,info)
   call psi_extract_dep_list(desc_a%matrix_data,index_in,&
        & dep_list,length_dl,np,max(1,dl_lda),mode,info)
   if(info /= 0) then
-     call psb_errpush(4010,name,a_err='extrct_dl')
-     goto 9999
+    call psb_errpush(4010,name,a_err='extrct_dl')
+    goto 9999
   end if
 
   if (debug) write(*,*) 'crea_index: from extract_dep_list',&
@@ -136,8 +132,8 @@ subroutine psi_crea_index(desc_a,index_in,index_out,glob_idx,info)
   ! ....now i can sort dependence list......
   call psi_sort_dl(dep_list,length_dl,np,info)
   if(info.ne.0) then
-     call psb_errpush(4010,name,a_err='psi_sort_dl')
-     goto 9999
+    call psb_errpush(4010,name,a_err='psi_sort_dl')
+    goto 9999
   end if
 
   ! ...create desc_halo array.....
@@ -148,19 +144,19 @@ subroutine psi_crea_index(desc_a,index_in,index_out,glob_idx,info)
        & index_out,glob_idx,info)
 
   if(info.ne.0) then
-     call psb_errpush(4010,name,a_err='psi_desc_index')
-     goto 9999
+    call psb_errpush(4010,name,a_err='psi_desc_index')
+    goto 9999
   end if
-  
+
   deallocate(dep_list,length_dl)
   call psb_erractionrestore(err_act)
   return
-  
+
 9999 continue
   call psb_erractionrestore(err_act)
   if (err_act.eq.act_abort) then
-     call psb_error(ictxt)
-     return
+    call psb_error(ictxt)
+    return
   end if
   return
 end subroutine psi_crea_index

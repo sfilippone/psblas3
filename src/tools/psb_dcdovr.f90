@@ -50,6 +50,7 @@ Subroutine psb_dcdovr(a,desc_a,novr,desc_ov,info)
   Use psb_prec_type
   Use psb_prec_mod
   use psb_error_mod
+  use psb_penv_mod
   Implicit None
 
   !     .. Array Arguments ..
@@ -65,33 +66,33 @@ Subroutine psb_dcdovr(a,desc_a,novr,desc_ov,info)
 !!$  integer mpe_log_get_event_number,mpe_Describe_state,mpe_log_event
 
   interface psb_cdcpy
-     subroutine psb_cdcpy(desc_in,desc_out,info)
-       use psb_descriptor_type
-       type(psb_desc_type), intent(in)  :: desc_in
-       type(psb_desc_type), intent(out) :: desc_out
-       integer, intent(out)             :: info
-     end subroutine psb_cdcpy
+    subroutine psb_cdcpy(desc_in,desc_out,info)
+      use psb_descriptor_type
+      type(psb_desc_type), intent(in)  :: desc_in
+      type(psb_desc_type), intent(out) :: desc_out
+      integer, intent(out)             :: info
+    end subroutine psb_cdcpy
   end interface
 
   interface psb_cdovrbld
-     subroutine psb_dcdovrbld(n_ovr,desc_p,desc_a,a,l_tmp_halo,&
-          & l_tmp_ovr_idx,lworks,lworkr,info)
-       use psb_prec_type
-       use psb_spmat_type
-       type(psb_dspmat_type),intent(in)     :: a
-       type(psb_desc_type),intent(in)       :: desc_a
-       type(psb_desc_type),intent(inout)    :: desc_p
-       integer,intent(in)                   :: n_ovr
-       integer, intent(in)                  :: l_tmp_halo,l_tmp_ovr_idx
-       integer, intent(inout)               :: lworks, lworkr
-       integer, intent(out)                 :: info
-     end subroutine psb_dcdovrbld
+    subroutine psb_dcdovrbld(n_ovr,desc_p,desc_a,a,l_tmp_halo,&
+         & l_tmp_ovr_idx,lworks,lworkr,info)
+      use psb_prec_type
+      use psb_spmat_type
+      type(psb_dspmat_type),intent(in)     :: a
+      type(psb_desc_type),intent(in)       :: desc_a
+      type(psb_desc_type),intent(inout)    :: desc_p
+      integer,intent(in)                   :: n_ovr
+      integer, intent(in)                  :: l_tmp_halo,l_tmp_ovr_idx
+      integer, intent(inout)               :: lworks, lworkr
+      integer, intent(out)                 :: info
+    end subroutine psb_dcdovrbld
   end interface
 
 
 
   !     .. Local Scalars ..
-  Integer ::  i, j, k, nprow,npcol, me, mycol,m,nnzero,&
+  Integer ::  i, j, k, np,npcol, me, mycol,m,nnzero,&
        &  ictxt, lovr, lelem,lworks,lworkr, n_col, int_err(5),&
        &  n_row,index_dim,elem_dim, l_tmp_ovr_idx,l_tmp_halo, nztot,nhalo
   Logical,Parameter :: debug=.false.
@@ -103,7 +104,7 @@ Subroutine psb_dcdovr(a,desc_a,novr,desc_ov,info)
 
   ictxt=desc_a%matrix_data(psb_ctxt_)
 
-  Call blacs_gridinfo(ictxt,nprow,npcol,me,mycol)
+  Call psb_info(ictxt, me, np)
 
   If(debug) Write(0,*)'in psb_cdovr',novr
 
@@ -113,11 +114,11 @@ Subroutine psb_dcdovr(a,desc_a,novr,desc_ov,info)
   nhalo = n_col-m
   If(debug) Write(0,*)'IN CDOVR1',novr ,m,nnzero,n_col
   if (novr<0) then
-     info=10
-     int_err(1)=1
-     int_err(2)=novr
-     call psb_errpush(info,name,i_err=int_err)
-     goto 9999
+    info=10
+    int_err(1)=1
+    int_err(2)=novr
+    call psb_errpush(info,name,i_err=int_err)
+    goto 9999
   endif
 
   if (novr==0) then 
@@ -127,16 +128,16 @@ Subroutine psb_dcdovr(a,desc_a,novr,desc_ov,info)
     if (debug) write(0,*) 'Calling desccpy'
     call psb_cdcpy(desc_a,desc_ov,info)
     if (info /= 0) then
-       info=4010
-       ch_err='psb_cdcpy'
-       call psb_errpush(info,name,a_err=ch_err)
-       goto 9999
+      info=4010
+      ch_err='psb_cdcpy'
+      call psb_errpush(info,name,a_err=ch_err)
+      goto 9999
     end if
     if (debug) write(0,*) 'From desccpy'
     return
   endif
 
-  call blacs_get(ictxt,10,icomm )
+  call psb_get_mpicomm(ictxt,icomm )
 !!$    call MPI_Comm_rank(icomm,irank,ierr)
 !!$    idscb  = mpe_log_get_event_number()
 !!$    idsce  = mpe_log_get_event_number()
@@ -148,7 +149,7 @@ Subroutine psb_dcdovr(a,desc_a,novr,desc_ov,info)
 !!$    endif
   If(debug) then
     Write(0,*)'BEGIN cdovr',me,nhalo
-    call blacs_barrier(ictxt,'All')
+    call psb_barrier(ictxt)
   endif
   t1 = mpi_wtime()
 
@@ -162,19 +163,19 @@ Subroutine psb_dcdovr(a,desc_a,novr,desc_ov,info)
   !
   call psb_spinfo(psb_nztotreq_,a,nztot,info)
   if (info /= 0) then
-     info=4010
-     ch_err='psb_spinfo'
-     call psb_errpush(info,name,a_err=ch_err)
-     goto 9999
+    info=4010
+    ch_err='psb_spinfo'
+    call psb_errpush(info,name,a_err=ch_err)
+    goto 9999
   end if
   if (nztot>0) then 
-     lovr   = ((nztot+m-1)/m)*nhalo*novr
-     lworks = ((nztot+m-1)/m)*nhalo
-     lworkr = ((nztot+m-1)/m)*nhalo
+    lovr   = ((nztot+m-1)/m)*nhalo*novr
+    lworks = ((nztot+m-1)/m)*nhalo
+    lworkr = ((nztot+m-1)/m)*nhalo
   else
-     info=-1
-     call psb_errpush(info,name)
-     goto 9999
+    info=-1
+    call psb_errpush(info,name)
+    goto 9999
   endif
   If(debug)Write(0,*)'ovr_est done',me,novr,lovr
   index_dim = size(desc_a%halo_index)
@@ -185,9 +186,9 @@ Subroutine psb_dcdovr(a,desc_a,novr,desc_ov,info)
        &   desc_ov%matrix_data(psb_mdata_size_),&
        &   desc_ov%halo_index(novr*(Size(desc_a%halo_index)+3)),STAT=INFO)
   if (info /= 0) then
-     info=4000
-     call psb_errpush(info,name)
-     goto 9999
+    info=4000
+    call psb_errpush(info,name)
+    goto 9999
   end if
 
   l_tmp_ovr_idx=novr*(3*Max(2*index_dim,1)+1)
@@ -202,16 +203,16 @@ Subroutine psb_dcdovr(a,desc_a,novr,desc_ov,info)
   Allocate(desc_ov%loc_to_glob(Size(desc_a%loc_to_glob)),&
        & desc_ov%glob_to_loc(Size(desc_a%glob_to_loc)),stat=info)
   if (info /= 0) then
-     info=4000
-     call psb_errpush(info,name)
-     goto 9999
+    info=4000
+    call psb_errpush(info,name)
+    goto 9999
   end if
 
   desc_ov%loc_to_glob(:) = desc_a%loc_to_glob(:)
   desc_ov%glob_to_loc(:) = desc_a%glob_to_loc(:)
   If(debug) then
     Write(0,*)'Start cdovrbld',me,lworks,lworkr
-    call blacs_barrier(ictxt,'All')
+    call psb_barrier(ictxt)
   endif
   !
   ! The real work goes on in here....
@@ -219,26 +220,26 @@ Subroutine psb_dcdovr(a,desc_a,novr,desc_ov,info)
   Call psb_cdovrbld(novr,desc_ov,desc_a,a,&
        & l_tmp_halo,l_tmp_ovr_idx,lworks,lworkr,info) 
   if (info /= 0) then
-     info=4010
-     ch_err='psb_cdovrbld'
-     call psb_errpush(info,name,a_err=ch_err)
-     goto 9999
+    info=4010
+    ch_err='psb_cdovrbld'
+    call psb_errpush(info,name,a_err=ch_err)
+    goto 9999
   end if
   desc_ov%matrix_data(psb_dec_type_) = psb_desc_asb_
   If(debug) then
     Write(0,*)'Done cdovrbld',me,lworks,lworkr
-    call blacs_barrier(ictxt,'All')
+    call psb_barrier(ictxt)
   endif
 !!$      ierr = MPE_Log_event( idsce, 0, "st CDASB" )
 
   call psb_erractionrestore(err_act)
   return
-  
+
 9999 continue
   call psb_erractionrestore(err_act)
   if (err_act == act_abort) then
-     call psb_error(ictxt)
-     return
+    call psb_error(ictxt)
+    return
   end if
   Return
 

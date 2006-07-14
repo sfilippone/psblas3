@@ -45,6 +45,7 @@ Subroutine psb_dsprn(a, desc_a,info,clear)
   use psb_serial_mod
   use psb_const_mod
   use psb_error_mod
+  use psb_penv_mod
   Implicit None
 
   !....Parameters...
@@ -56,7 +57,7 @@ Subroutine psb_dsprn(a, desc_a,info,clear)
 
   !locals
   Integer             :: ictxt
-  Integer             :: nprow,npcol,myrow,mycol,err,err_act
+  Integer             :: np,npcol,me,mycol,err,err_act
   logical, parameter  :: debug=.false.
   integer             :: int_err(5)
   real(kind(1.d0))    :: real_err(5)
@@ -70,18 +71,10 @@ Subroutine psb_dsprn(a, desc_a,info,clear)
   call psb_erractionsave(err_act)
 
   ictxt = desc_a%matrix_data(psb_ctxt_)
-  call blacs_gridinfo(ictxt, nprow, npcol, myrow, mycol)
+  call psb_info(ictxt, me, np)
   if (debug) &
-       &write(*,*) 'starting spalloc ',ictxt,nprow,npcol,myrow
+       &write(*,*) 'starting spalloc ',ictxt,np,me
 
-  !     ....verify blacs grid correctness..
-  if (npcol.ne.1) then
-    info = 2030
-    call psb_errpush(info,name)
-    goto 9999
-  endif
-
-  
   if (psb_is_bld_dec(desc_a%matrix_data(psb_dec_type_))) then
     ! Should do nothing, we are called redundantly
     return
@@ -106,7 +99,7 @@ Subroutine psb_dsprn(a, desc_a,info,clear)
 
 9999 continue
   call psb_erractionrestore(err_act)
-  if (err_act.eq.act_abort) then
+  if (err_act == act_abort) then
     call psb_error(ictxt)
     return
   end if

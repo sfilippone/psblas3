@@ -45,6 +45,7 @@ subroutine psb_dprecbld(a,desc_a,p,info,upd)
   use psb_const_mod
   use psb_psblas_mod
   use psb_error_mod
+  use psb_penv_mod
   Implicit None
 
   type(psb_dspmat_type), target              :: a
@@ -83,7 +84,7 @@ subroutine psb_dprecbld(a,desc_a,p,info,upd)
 
   ! Local scalars
   Integer      :: err, nnzero, I,j,k,ictxt,&
-       & me,mycol,nprow,npcol,lw, mtype, nrg, nzg, err_act
+       & me,mycol,np,npcol,lw, mtype, nrg, nzg, err_act
   real(kind(1.d0))         :: temp, real_err(5)
   integer      :: int_err(5)
   character    :: iupd
@@ -103,8 +104,8 @@ subroutine psb_dprecbld(a,desc_a,p,info,upd)
   int_err(1) = 0
   ictxt = desc_a%matrix_data(psb_ctxt_)
 
-  if (debug) write(0,*) 'Preconditioner Blacs_gridinfo'
-  call blacs_gridinfo(ictxt, nprow, npcol, me, mycol)
+  if (debug) write(0,*) 'Preconditioner psb_info'
+  call psb_info(ictxt, me, np)
 
   if (present(upd)) then 
     if (debug) write(0,*) 'UPD ', upd
@@ -119,10 +120,10 @@ subroutine psb_dprecbld(a,desc_a,p,info,upd)
 
   if (.not.associated(p%baseprecv)) then 
     !! Error 1: should call precset
-      info=4010
-      ch_err='unassociated bpv'
-      call psb_errpush(info,name,a_err=ch_err)
-      goto 9999
+    info=4010
+    ch_err='unassociated bpv'
+    call psb_errpush(info,name,a_err=ch_err)
+    goto 9999
   end if
   !
   ! Should add check to ensure all procs have the same... 
@@ -138,14 +139,14 @@ subroutine psb_dprecbld(a,desc_a,p,info,upd)
       call psb_errpush(info,name,a_err=ch_err)
       goto 9999
     endif
-    
+
     call psb_baseprc_bld(a,desc_a,p%baseprecv(1),info,iupd)
 
   else
-      info=4010
-      ch_err='size bpv'
-      call psb_errpush(info,name,a_err=ch_err)
-      goto 9999
+    info=4010
+    ch_err='size bpv'
+    call psb_errpush(info,name,a_err=ch_err)
+    goto 9999
 
   endif
 
@@ -184,7 +185,7 @@ subroutine psb_dprecbld(a,desc_a,p,info,upd)
       call psb_mlprc_bld(p%baseprecv(i-1)%av(ac_),p%baseprecv(i-1)%desc_data,&
            & p%baseprecv(i),info)
     end do
-    
+
   endif
 
   call psb_erractionrestore(err_act)

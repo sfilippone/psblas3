@@ -43,6 +43,7 @@ subroutine psb_zsp_renum(a,desc_a,blck,p,atmp,info)
   use psb_tools_mod
   use psb_psblas_mod
   use psb_error_mod
+  use psb_penv_mod
   implicit none
 
   !     .. array Arguments ..                                                     
@@ -57,7 +58,7 @@ subroutine psb_zsp_renum(a,desc_a,blck,p,atmp,info)
   integer   istpb, istpe, ifctb, ifcte, err_act, irank, icomm, nztota, nztotb,&
        & nztmp, nzl, nnr, ir, mglob, mtype, n_row, nrow_a,n_col, nhalo,lovr, &
        & ind, iind, pi,nr,ns,i,j,jj,k,kk
-  integer ::ictxt,nprow,npcol,me,mycol
+  integer ::ictxt,np,npcol,me,mycol
   integer, pointer :: itmp(:), itmp2(:)
   complex(kind(1.d0)), pointer :: ztmp(:)
   real(kind(1.d0)) :: t1,t2,t3,t4,t5,t6,mpi_wtime, t7, t8
@@ -69,7 +70,7 @@ subroutine psb_zsp_renum(a,desc_a,blck,p,atmp,info)
   call psb_erractionsave(err_act)
 
   ictxt=desc_a%matrix_data(psb_ctxt_)
-  call blacs_gridinfo(ictxt,nprow,npcol,me,mycol)
+  call psb_info(ictxt, me, np)
 
 !!!!!!!!!!!!!!!! CHANGE FOR NON-CSR A
   !
@@ -245,7 +246,6 @@ subroutine psb_zsp_renum(a,desc_a,blck,p,atmp,info)
 
     itmp(1:8) = 0
     !          write(0,*) me,' Renumbering: Calling Metis'
-    !        call blacs_barrier(ictxt,'All')
 
     !          write(0,*) size(p%av(u_pr_)%pl),size(p%av(l_pr_)%pr)
     call  gps_reduction(atmp%m,atmp%ia2,atmp%ia1,p%perm,p%invperm,info)
@@ -257,7 +257,7 @@ subroutine psb_zsp_renum(a,desc_a,blck,p,atmp,info)
     end if
 
     !      write(0,*) me,' Renumbering: Done GPS'
-    call blacs_barrier(ictxt,'All')
+    !    call psb_barrier(ictxt)
     do i=1, atmp%m 
       if (p%perm(i) /= i) then 
         write(0,*) me,' permutation is not identity '

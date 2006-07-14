@@ -115,7 +115,7 @@ subroutine psb_cddec(nloc, ictxt, desc_a, info)
   Type(psb_desc_type), intent(out)  :: desc_a
 
   !locals
-  Integer              :: counter,i,j,nprow,npcol,me,mypcol,&
+  Integer              :: counter,i,j,np,npcol,me,mypcol,&
        & loc_row,err,loc_col,nprocs,n,itmpov, k,&
        & l_ov_ix,l_ov_el,idx, flag_, err_act,m, ip
   Integer              :: INT_ERR(5),TEMP(1),EXCH(2)
@@ -125,20 +125,13 @@ subroutine psb_cddec(nloc, ictxt, desc_a, info)
   logical, parameter   :: debug=.false.
   character(len=20)    :: name, ch_err
 
-  if(psb_get_errstatus().ne.0) return 
+  if(psb_get_errstatus() /= 0) return 
   info=0
   err=0
   name = 'psb_cddec'
 
-  call psb_info(ictxt, me, nprow)
-  if (debug) write(*,*) 'psb_cdalll: ',nprow,npcol,me,mypcol
-  !     ....verify blacs grid correctness..
-  if (npcol /= 1) then
-     info = 2030
-     int_err(1) = npcol
-     call psb_errpush(info,name,i_err=int_err)
-     goto 9999
-  endif
+  call psb_info(ictxt, me, np)
+  if (debug) write(*,*) 'psb_cdalll: ',np,me
 
   n = nloc
   !... check nloc and n parameters....
@@ -153,21 +146,21 @@ subroutine psb_cddec(nloc, ictxt, desc_a, info)
   endif
 
   if (info /= 0) then 
-     call psb_errpush(info,name,i_err=int_err)
-     goto 9999
+    call psb_errpush(info,name,i_err=int_err)
+    goto 9999
   end if
 
   if (debug) write(*,*) 'psb_cdall:  doing global checks'  
   !global check on m and n parameters
 
-  allocate(nlv(0:nprow-1))
+  allocate(nlv(0:np-1))
   nlv(:)  = 0
   nlv(me) = nloc
-  
-  call psb_sum(ictxt,nlv(1:nprow))
+
+  call psb_sum(ictxt,nlv(1:np))
   m = sum(nlv)
 
-  
+
 
   call psb_nullify_desc(desc_a)
 
@@ -186,9 +179,9 @@ subroutine psb_cddec(nloc, ictxt, desc_a, info)
   endif
 
 
-  
+
   j = 1
-  do ip=0, nprow-1
+  do ip=0, np-1
     if (ip==me) then 
       do i=1, nlv(ip) 
         desc_a%glob_to_loc(j) = i
@@ -197,11 +190,11 @@ subroutine psb_cddec(nloc, ictxt, desc_a, info)
       enddo
     else
       do i=1, nlv(ip) 
-        desc_a%glob_to_loc(j) = -(nprow+ip+1)
+        desc_a%glob_to_loc(j) = -(np+ip+1)
         j = j + 1
       enddo
     endif
-  enddo 
+  enddo
 
 
 
@@ -218,17 +211,17 @@ subroutine psb_cddec(nloc, ictxt, desc_a, info)
   desc_a%matrix_data(psb_n_col_)  = nloc
   desc_a%matrix_data(psb_dec_type_) = psb_desc_asb_
   desc_a%matrix_data(psb_ctxt_)     = ictxt
-  call blacs_get(ictxt,10,desc_a%matrix_data(psb_mpi_c_))
+  call psb_get_mpicomm(ictxt,desc_a%matrix_data(psb_mpi_c_))
 
   call psb_erractionrestore(err_act)
   return
-  
+
 9999 continue
   call psb_erractionrestore(err_act)
-  if (err_act.eq.act_abort) then
-     call psb_error(ictxt)
-     return
+  if (err_act == act_abort) then
+    call psb_error(ictxt)
+    return
   end if
   return
-  
+
 end subroutine psb_cddec

@@ -58,7 +58,7 @@ function psb_zamax (x,desc_a, info, jx)
   real(kind(1.d0))                  :: psb_zamax
 
   ! locals
-  integer                  :: int_err(5), ictxt, nprow, npcol, myrow, mycol,&
+  integer                  :: int_err(5), ictxt, np, me, mycol,&
        & err_act, n, iix, jjx, temp(2), ix, ijx, m, i, k, imax, izamax
   real(kind(1.d0))         :: amax
   character(len=20)        :: name, ch_err
@@ -75,17 +75,11 @@ function psb_zamax (x,desc_a, info, jx)
 
   ictxt=desc_a%matrix_data(psb_ctxt_)
 
-  ! check on blacs grid 
-  call blacs_gridinfo(ictxt, nprow, npcol, myrow, mycol)
-  if (nprow == -1) then
+  call psb_info(ictxt, me, np)
+  if (np == -1) then
     info = 2010
     call psb_errpush(info,name)
     goto 9999 
- else if (npcol /= 1) then
-    info = 2030
-    int_err(1) = npcol
-    call psb_errpush(info,name)
-    goto 9999
   endif
   
   ix = 1
@@ -192,7 +186,7 @@ function psb_zamaxv (x,desc_a, info)
   real(kind(1.d0))                  :: psb_zamaxv
 
   ! locals
-  integer                  :: int_err(5), err, ictxt, nprow, npcol, myrow, mycol,&
+  integer                  :: int_err(5), err, ictxt, np, me, mycol,&
        & err_act, n, iix, jjx, jx, temp(2), ix, ijx, m, imax, izamax
   real(kind(1.d0))         :: amax
   complex(kind(1.d0))      :: cmax
@@ -210,15 +204,9 @@ function psb_zamaxv (x,desc_a, info)
 
   ictxt=desc_a%matrix_data(psb_ctxt_)
 
-  ! check on blacs grid 
-  call blacs_gridinfo(ictxt, nprow, npcol, myrow, mycol)
-  if (nprow == -1) then
+  call psb_info(ictxt, me, np)
+  if (np == -1) then
     info = 2010
-    call psb_errpush(info,name)
-    goto 9999
-  else if (npcol /= 1) then
-    info = 2030
-    int_err(1) = npcol
     call psb_errpush(info,name)
     goto 9999
   endif
@@ -326,7 +314,7 @@ subroutine psb_zamaxvs (res,x,desc_a, info)
   real(kind(1.D0)), intent(out)     :: res
 
   ! locals
-  integer                  :: int_err(5), ictxt, nprow, npcol, myrow, mycol,&
+  integer                  :: int_err(5), ictxt, np, me, mycol,&
        & err_act, n, iix, jjx, temp(2), ix, ijx, m, imax, izamax
   real(kind(1.d0))         :: amax
   character(len=20)        :: name, ch_err
@@ -344,15 +332,9 @@ subroutine psb_zamaxvs (res,x,desc_a, info)
 
   ictxt=desc_a%matrix_data(psb_ctxt_)
 
-  ! check on blacs grid 
-  call blacs_gridinfo(ictxt, nprow, npcol, myrow, mycol)
-  if (nprow == -1) then
+  call psb_info(ictxt, me, np)
+  if (np == -1) then
     info = 2010
-    call psb_errpush(info,name)
-    goto 9999
-  else if (npcol /= 1) then
-    info = 2030
-    int_err(1) = npcol
     call psb_errpush(info,name)
     goto 9999
   endif
@@ -459,7 +441,7 @@ subroutine psb_zmamaxs (res,x,desc_a, info,jx)
   real(kind(1.d0)), intent(out) :: res(:)
 
   ! locals
-  integer                  :: int_err(5), ictxt, nprow, npcol, myrow, mycol,&
+  integer                  :: int_err(5), ictxt, np, me, mycol,&
        & err_act, n, iix, jjx, ix, temp(2), ijx, m, imax, i, k, izamax
   real(kind(1.d0))         :: amax
   character(len=20)        :: name, ch_err
@@ -477,15 +459,9 @@ subroutine psb_zmamaxs (res,x,desc_a, info,jx)
 
   ictxt=desc_a%matrix_data(psb_ctxt_)
 
-  ! check on blacs grid 
-  call blacs_gridinfo(ictxt, nprow, npcol, myrow, mycol)
-  if (nprow == -1) then
+  call psb_info(ictxt, me, np)
+  if (np == -1) then
     info = 2010
-    call psb_errpush(info,name)
-    goto 9999
-  else if (npcol /= 1) then
-    info = 2030
-    int_err(1) = npcol
     call psb_errpush(info,name)
     goto 9999
   endif

@@ -45,6 +45,7 @@ subroutine psb_ddiagsc_bld(a,desc_a,p,upd,info)
   use psb_const_mod
   use psb_psblas_mod
   use psb_error_mod
+  use psb_penv_mod
   Implicit None
 
   type(psb_dspmat_type), target           :: a
@@ -56,7 +57,7 @@ subroutine psb_ddiagsc_bld(a,desc_a,p,upd,info)
 
   ! Local scalars
   Integer      :: err, nnzero, n_row, n_col,I,j,k,ictxt,&
-       & me,mycol,nprow,npcol,mglob,lw, mtype, nrg, nzg, err_act
+       & me,mycol,np,npcol,mglob,lw, mtype, nrg, nzg, err_act
   real(kind(1.d0))         :: temp, real_err(5)
   real(kind(1.d0)),pointer :: gd(:), work(:)
   integer      :: int_err(5)
@@ -80,7 +81,7 @@ subroutine psb_ddiagsc_bld(a,desc_a,p,upd,info)
   n_col   = desc_a%matrix_data(psb_n_col_)
   mglob   = desc_a%matrix_data(psb_m_)
   if (debug) write(0,*) 'Preconditioner Blacs_gridinfo'
-  call blacs_gridinfo(ictxt, nprow, npcol, me, mycol)
+  call psb_info(ictxt, me, np)
 
   if (debug) write(0,*) 'Precond: Diagonal scaling'
   ! diagonal scaling
@@ -146,9 +147,9 @@ subroutine psb_ddiagsc_bld(a,desc_a,p,upd,info)
     end if
 
     if (me.eq.iroot) then
-      write(iout+nprow,*) 'VDIAG CHECK ',mglob
+      write(iout+np,*) 'VDIAG CHECK ',mglob
       do i=1,mglob
-        write(iout+nprow,*) i,gd(i)
+        write(iout+np,*) i,gd(i)
       enddo
     endif
     deallocate(gd)

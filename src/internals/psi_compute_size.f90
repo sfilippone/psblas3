@@ -40,8 +40,8 @@ subroutine psi_compute_size(desc_data, index_in, dl_lda, info)
   !     .....array parameters....
   integer  :: desc_data(:), index_in(:)
   !     ....local scalars....      
-  integer  :: i,npcol,nprow,mycol,myrow,proc, max_index
-  integer  :: ictxt, err, err_act, np
+  integer  :: i,np,me,proc, max_index
+  integer  :: ictxt, err, err_act
   !     ...local array...
   integer  :: exch(2)
   integer  :: int_err(5)
@@ -57,19 +57,13 @@ subroutine psi_compute_size(desc_data, index_in, dl_lda, info)
   info = 0
   ictxt = desc_data(psb_ctxt_)
 
-  call psb_info(ictxt,myrow,nprow)
-  if (nprow == -1) then
+  call psb_info(ictxt,me,np)
+  if (np == -1) then
     info = 2010
-    call psb_errpush(info,name)
-    goto 9999
-  else if (npcol /= 1) then
-    info = 2030
-    int_err(1) = npcol
     call psb_errpush(info,name)
     goto 9999
   endif
 
-  np=nprow
   allocate(counter_dl(0:np-1),counter_recv(0:np-1),stat=info)
   if (info /= 0) then 
     call psb_errpush(4010,name,a_err='Allocate')

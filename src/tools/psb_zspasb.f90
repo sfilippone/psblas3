@@ -51,6 +51,7 @@ subroutine psb_zspasb(a,desc_a, info, afmt, upd, dupl)
   use psi_mod
   use psb_error_mod
   use psb_string_mod
+  use psb_penv_mod
   implicit none
 
 
@@ -65,7 +66,7 @@ subroutine psb_zspasb(a,desc_a, info, afmt, upd, dupl)
   type(psb_zspmat_type) ::  atemp
   real(kind(1.d0))      ::  real_err(5)
   integer               ::  ia1_size,ia2_size,aspk_size,m,i,err,&
-       & nprow,npcol,myrow,mycol ,size_req,n_col,iout, err_act
+       & np,npcol,me,mycol ,size_req,n_col,iout, err_act
   integer               :: dscstate, spstate, nr,k,j
   integer               :: upd_, dupl_
   integer               :: ictxt,temp(2),isize(2),n_row
@@ -83,23 +84,18 @@ subroutine psb_zspasb(a,desc_a, info, afmt, upd, dupl)
   n_col    = desc_a%matrix_data(psb_n_col_)
 
   ! check on BLACS grid 
-  call blacs_gridinfo(ictxt, nprow, npcol, myrow, mycol)
-  if (nprow.eq.-1) then
-     info = 2010
-     call psb_errpush(info,name)
-     goto 9999
-  else if (npcol /= 1) then
-     info = 2030
-     int_err(1) = npcol
-     call psb_errpush(info,name)
-     goto 9999
+  call psb_info(ictxt, me, np)
+  if (np == -1) then
+    info = 2010
+    call psb_errpush(info,name)
+    goto 9999
   endif
 
   if (.not.psb_is_asb_dec(dscstate)) then 
-     info = 600
-     int_err(1) = dscstate
-     call psb_errpush(info,name)
-     goto 9999
+    info = 600
+    int_err(1) = dscstate
+    call psb_errpush(info,name)
+    goto 9999
   endif
 
   if (debug) Write (*, *) '   Begin matrix assembly...'
@@ -154,7 +150,7 @@ subroutine psb_zspasb(a,desc_a, info, afmt, upd, dupl)
     endif
 
     if (debugwrt) then
-      iout = 30+myrow
+      iout = 30+me
       open(iout)
       call psb_csprt(iout,atemp,head='Input mat')
       close(iout)
@@ -164,7 +160,7 @@ subroutine psb_zspasb(a,desc_a, info, afmt, upd, dupl)
     ! result is put in A
     call psb_csdp(atemp,a,info,ifc=2,upd=upd_,dupl=dupl_)
 
-    IF (debug) WRITE (*, *) myrow,'   ASB:  From DCSDP',info,' ',A%FIDA
+    IF (debug) WRITE (*, *) me,'   ASB:  From ZCSDP',info,' ',A%FIDA
     if (info /= no_err) then    
       info=4010
       ch_err='psb_csdp'
@@ -173,58 +169,58 @@ subroutine psb_zspasb(a,desc_a, info, afmt, upd, dupl)
     endif
 
     if (debugwrt) then
-      iout = 60+myrow
+      iout = 60+me
       open(iout)
       call psb_csprt(iout,a,head='Output mat')
       close(iout)
     endif
 
-     call psb_sp_free(atemp,info)
+    call psb_sp_free(atemp,info)
 
 
   else if (spstate == psb_spmat_upd_) then
-     !
-     ! Second  case: we come from an update loop.
-     ! 
+    !
+    ! Second  case: we come from an update loop.
+    ! 
 
 
-     ! Right now, almost nothing to be done, but this 
-     ! may change in the future
-     ! as we revise the implementation of the update routine. 
-     call psb_sp_all(atemp,1,info)
-     atemp%m=a%m
-     atemp%k=a%k
-     ! check on allocation
-     if (info /= no_err) then    
-        info=4010
-        ch_err='psb_sp_all'
-        call psb_errpush(info,name,a_err=ch_err)
-        goto 9999
-     endif
+    ! Right now, almost nothing to be done, but this 
+    ! may change in the future
+    ! as we revise the implementation of the update routine. 
+    call psb_sp_all(atemp,1,info)
+    atemp%m=a%m
+    atemp%k=a%k
+    ! check on allocation
+    if (info /= no_err) then    
+      info=4010
+      ch_err='psb_sp_all'
+      call psb_errpush(info,name,a_err=ch_err)
+      goto 9999
+    endif
 
-     call psb_csdp(atemp,a,info,check='R')
-     ! check on error retuned by dcsdp
-     if (info /= no_err) then
-        info = 4010
-        ch_err='psb_csdp90'
-        call psb_errpush(info,name,a_err=ch_err)
-        goto 9999
-     end if
+    call psb_csdp(atemp,a,info,check='R')
+    ! check on error retuned by zcsdp
+    if (info /= no_err) then
+      info = 4010
+      ch_err='psb_csdp90'
+      call psb_errpush(info,name,a_err=ch_err)
+      goto 9999
+    end if
 
-     call psb_sp_free(atemp,info)
-     if (info /= no_err) then
-        info = 4010
-        ch_err='sp_free'
-        call psb_errpush(info,name,a_err=ch_err)
-        goto 9999
-     end if
+    call psb_sp_free(atemp,info)
+    if (info /= no_err) then
+      info = 4010
+      ch_err='sp_free'
+      call psb_errpush(info,name,a_err=ch_err)
+      goto 9999
+    end if
 
   else
 
-     info = 600
-     call psb_errpush(info,name)
-     goto 9999
-     if (debug) write(0,*) 'Sparse matrix state:',spstate,psb_spmat_bld_,psb_spmat_upd_
+    info = 600
+    call psb_errpush(info,name)
+    goto 9999
+    if (debug) write(0,*) 'Sparse matrix state:',spstate,psb_spmat_bld_,psb_spmat_upd_
 
   endif
 
@@ -233,9 +229,9 @@ subroutine psb_zspasb(a,desc_a, info, afmt, upd, dupl)
 
 9999 continue
   call psb_erractionrestore(err_act)
-  if (err_act.eq.act_abort) then
-     call psb_error(ictxt)
-     return
+  if (err_act == act_abort) then
+    call psb_error(ictxt)
+    return
   end if
   return
 

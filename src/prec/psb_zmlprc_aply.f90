@@ -47,6 +47,7 @@ subroutine psb_zmlprc_aply(baseprecv,x,beta,y,desc_data,trans,work,info)
   use psb_penv_mod
   use psb_const_mod
   use psb_error_mod
+  use psb_penv_mod
   implicit none
 
   type(psb_desc_type),intent(in)      :: desc_data
@@ -63,7 +64,7 @@ subroutine psb_zmlprc_aply(baseprecv,x,beta,y,desc_data,trans,work,info)
   complex(kind(1.d0)), allocatable :: tx(:),ty(:),t2l(:),w2l(:),&
        &   x2l(:),b2l(:),tz(:),tty(:)
   character     ::diagl, diagu
-  integer :: ictxt,nprow,npcol,me,mycol,i, isz, nrg,nr2l,err_act, iptype, int_err(5)
+  integer :: ictxt,np,npcol,me,mycol,i, isz, nrg,nr2l,err_act, iptype, int_err(5)
   real(kind(1.d0)) :: omega
   real(kind(1.d0)) :: t1, t2, t3, t4, t5, t6, t7, mpi_wtime
   logical, parameter          :: debug=.false., debugprt=.false.
@@ -91,7 +92,7 @@ subroutine psb_zmlprc_aply(baseprecv,x,beta,y,desc_data,trans,work,info)
 
 
   ictxt=desc_data%matrix_data(psb_ctxt_)
-  call blacs_gridinfo(ictxt,nprow,npcol,me,mycol)
+  call psb_info(ictxt, me, np)
 
   omega=baseprecv(2)%dprcparm(smooth_omega_)
   ismth=baseprecv(2)%iprcparm(smth_kind_)

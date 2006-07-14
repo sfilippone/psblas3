@@ -44,6 +44,7 @@ subroutine psb_cdren(trans,iperm,desc_a,info)
   use psb_const_mod
   use psb_error_mod
   use psb_penv_mod
+  use psb_string_mod
   implicit none
 
   interface isaperm
@@ -59,7 +60,7 @@ subroutine psb_cdren(trans,iperm,desc_a,info)
   character, intent(in)                 :: trans
   integer, intent(out)                  :: info
   !....locals....
-  integer                       :: i,j,err,nprow,npcol,myrow,mycol, n_col, kh, nh
+  integer                       :: i,j,err,np,npcol,me,mycol, n_col, kh, nh
   integer                       :: dectype
   integer                       :: ictxt,n_row, int_err(5), err_act
   real(kind(1.d0))              :: time(10), mpi_wtime, real_err(6)
@@ -67,7 +68,7 @@ subroutine psb_cdren(trans,iperm,desc_a,info)
   logical, parameter            :: debug=.false.
   character(len=20)             :: name, char_err
 
-  if(psb_get_errstatus().ne.0) return 
+  if(psb_get_errstatus() /= 0) return 
   info=0
   call psb_erractionsave(err_act)
   name = 'psb_dcren'
@@ -80,15 +81,10 @@ subroutine psb_cdren(trans,iperm,desc_a,info)
   n_col = desc_a%matrix_data(psb_n_col_)
 
   ! check on blacs grid 
-  call psb_info(ictxt, myrow, nprow)
-  if (nprow.eq.-1) then
+  call psb_info(ictxt, me, np)
+  if (np == -1) then
     info = 2010
     call psb_errpush(info,name)
-    goto 9999
-  else if (npcol.ne.1) then
-    info = 2030
-    int_err(1) = npcol
-    call psb_errpush(info,name,int_err)
     goto 9999
   endif
 
@@ -117,14 +113,14 @@ subroutine psb_cdren(trans,iperm,desc_a,info)
     if (debug) write(0,*) 'spasb: here we go with ',iperm(1) 
     deallocate(desc_a%lprm)
     allocate(desc_a%lprm(n_col))
-    if (trans.eq.'n') then 
+    if (toupper(trans) == 'N') then 
       do i=1, n_row
         desc_a%lprm(iperm(i)) = i
       enddo
       do i=n_row+1,n_col
         desc_a%lprm(i) = i
       enddo
-    else if (trans.eq.'t') then 
+    else if (toupper(trans) == 'T') then 
       do i=1, n_row
         desc_a%lprm(i) = iperm(i)
       enddo
@@ -190,18 +186,18 @@ subroutine psb_cdren(trans,iperm,desc_a,info)
     enddo
     if (debug) write(0,*) 'spasb: done renumbering'
     if (debug) then
-      write(60+myrow,*) 'n_row ',n_row,' n_col',n_col, ' trans: ',trans
+      write(60+me,*) 'n_row ',n_row,' n_col',n_col, ' trans: ',trans
       do i=1,n_col
-        write(60+myrow,*)i, ' lprm ', desc_a%lprm(i), ' iperm',iperm(i)
+        write(60+me,*)i, ' lprm ', desc_a%lprm(i), ' iperm',iperm(i)
       enddo
       i=1
       kh = desc_a%halo_index(i)
       do while (kh /= -1) 
-        write(60+myrow,*) i, kh 
+        write(60+me,*) i, kh 
         i = i+1
         kh = desc_a%halo_index(i)
       enddo
-      close(60+myrow)
+      close(60+me)
     end if
 
 !!$    iperm(1) = 0
@@ -225,7 +221,7 @@ subroutine psb_cdren(trans,iperm,desc_a,info)
 9999 continue
   call psb_erractionrestore(err_act)
 
-  if (err_act.eq.act_ret) then
+  if (err_act == act_ret) then
     return
   else
     call psb_error(ictxt)

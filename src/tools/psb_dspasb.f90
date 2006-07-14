@@ -51,6 +51,7 @@ subroutine psb_dspasb(a,desc_a, info, afmt, upd, dupl)
   use psi_mod
   use psb_error_mod
   use psb_string_mod
+  use psb_penv_mod
   implicit none
 
 
@@ -65,7 +66,7 @@ subroutine psb_dspasb(a,desc_a, info, afmt, upd, dupl)
   type(psb_dspmat_type) ::  atemp
   real(kind(1.d0))      ::  real_err(5)
   integer               ::  ia1_size,ia2_size,aspk_size,m,i,err,&
-       & nprow,npcol,myrow,mycol ,size_req,n_col,iout, err_act
+       & np,npcol,me,mycol ,size_req,n_col,iout, err_act
   integer               :: dscstate, spstate, nr,k,j
   integer               :: upd_, dupl_
   integer               :: ictxt,temp(2),isize(2),n_row
@@ -83,14 +84,9 @@ subroutine psb_dspasb(a,desc_a, info, afmt, upd, dupl)
   n_col    = desc_a%matrix_data(psb_n_col_)
 
   ! check on BLACS grid 
-  call blacs_gridinfo(ictxt, nprow, npcol, myrow, mycol)
-  if (nprow.eq.-1) then
+  call psb_info(ictxt, me, np)
+  if (np == -1) then
     info = 2010
-    call psb_errpush(info,name)
-    goto 9999
-  else if (npcol /= 1) then
-    info = 2030
-    int_err(1) = npcol
     call psb_errpush(info,name)
     goto 9999
   endif
@@ -154,7 +150,7 @@ subroutine psb_dspasb(a,desc_a, info, afmt, upd, dupl)
     endif
 
     if (debugwrt) then
-      iout = 30+myrow
+      iout = 30+me
       open(iout)
       call psb_csprt(iout,atemp,head='Input mat')
       close(iout)
@@ -164,7 +160,7 @@ subroutine psb_dspasb(a,desc_a, info, afmt, upd, dupl)
     ! result is put in A
     call psb_csdp(atemp,a,info,ifc=2,upd=upd_,dupl=dupl_)
 
-    IF (debug) WRITE (*, *) myrow,'   ASB:  From DCSDP',info,' ',A%FIDA
+    IF (debug) WRITE (*, *) me,'   ASB:  From DCSDP',info,' ',A%FIDA
     if (info /= no_err) then    
       info=4010
       ch_err='psb_csdp'
@@ -173,7 +169,7 @@ subroutine psb_dspasb(a,desc_a, info, afmt, upd, dupl)
     endif
 
     if (debugwrt) then
-      iout = 60+myrow
+      iout = 60+me
       open(iout)
       call psb_csprt(iout,a,head='Output mat')
       close(iout)
@@ -233,7 +229,7 @@ subroutine psb_dspasb(a,desc_a, info, afmt, upd, dupl)
 
 9999 continue
   call psb_erractionrestore(err_act)
-  if (err_act.eq.act_abort) then
+  if (err_act == act_abort) then
     call psb_error(ictxt)
     return
   end if

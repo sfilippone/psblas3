@@ -62,8 +62,8 @@ subroutine  psb_dgatherm(globx, locx, desc_a, info, iroot,&
 
 
   ! locals
-  integer                  :: int_err(5), ictxt, nprow, npcol, myrow, mycol,&
-       & err_act, n, iix, jjx, temp(2), root, iiroot, ilocx, iglobx, jlocx,&
+  integer                  :: int_err(5), ictxt, np, me,&
+       & err_act, n, iix, jjx, root, iiroot, ilocx, iglobx, jlocx,&
        & jglobx, lda_locx, lda_globx, m, lock, globk, maxk, k, jlx, ilx, i, j, idx
   real(kind(1.d0)),pointer :: tmpx(:)
   character(len=20)        :: name, ch_err
@@ -76,21 +76,16 @@ subroutine  psb_dgatherm(globx, locx, desc_a, info, iroot,&
   ictxt=desc_a%matrix_data(psb_ctxt_)
 
   ! check on blacs grid 
-  call blacs_gridinfo(ictxt, nprow, npcol, myrow, mycol)
-  if (nprow == -1) then
+  call psb_info(ictxt, me, np)
+  if (np == -1) then
     info = 2010
-    call psb_errpush(info,name)
-    goto 9999
-  else if (npcol /= 1) then
-    info = 2030
-    int_err(1) = npcol
     call psb_errpush(info,name)
     goto 9999
   endif
 
   if (present(iroot)) then
     root = iroot
-    if((root.lt.-1).or.(root.gt.nprow)) then
+    if((root.lt.-1).or.(root.gt.np)) then
       info=30
       int_err(1:2)=(/5,root/)
       call psb_errpush(info,name,i_err=int_err)
@@ -263,8 +258,8 @@ subroutine  psb_dgatherv(globx, locx, desc_a, info, iroot,&
 
 
   ! locals
-  integer                  :: int_err(5), ictxt, nprow, npcol, myrow, mycol,&
-       & err_act, n, iix, jjx, temp(2), root, iiroot, ilocx, iglobx, jlocx,&
+  integer                  :: int_err(5), ictxt, np, me, mycol,&
+       & err_act, n, iix, jjx, root, iiroot, ilocx, iglobx, jlocx,&
        & jglobx, lda_locx, lda_globx, lock, maxk, globk, m, k, jlx, ilx, i, j, idx
   real(kind(1.d0)),pointer :: tmpx(:)
   character(len=20)        :: name, ch_err
@@ -277,21 +272,16 @@ subroutine  psb_dgatherv(globx, locx, desc_a, info, iroot,&
   ictxt=desc_a%matrix_data(psb_ctxt_)
 
   ! check on blacs grid 
-  call psb_info(ictxt, myrow, nprow)
-  if (nprow == -1) then
+  call psb_info(ictxt, me, np)
+  if (np == -1) then
     info = 2010
-    call psb_errpush(info,name)
-    goto 9999
-  else if (npcol /= 1) then
-    info = 2030
-    int_err(1) = npcol
     call psb_errpush(info,name)
     goto 9999
   endif
 
   if (present(iroot)) then
      root = iroot
-     if((root.lt.-1).or.(root.gt.nprow)) then
+     if((root.lt.-1).or.(root.gt.np)) then
         info=30
         int_err(1:2)=(/5,root/)
         call psb_errpush(info,name,i_err=int_err)

@@ -50,6 +50,7 @@ Subroutine psb_zcdovr(a,desc_a,novr,desc_ov,info)
   Use psb_prec_type
   Use psb_prec_mod
   use psb_error_mod
+  use psb_penv_mod
   Implicit None
 
   !     .. Array Arguments ..
@@ -91,7 +92,7 @@ Subroutine psb_zcdovr(a,desc_a,novr,desc_ov,info)
 
 
   !     .. Local Scalars ..
-  Integer ::  i, j, k, nprow,npcol, me, mycol,m,nnzero,&
+  Integer ::  i, j, k, np,npcol, me, mycol,m,nnzero,&
        &  ictxt, lovr, lelem,lworks,lworkr, n_col, int_err(5),&
        &  n_row,index_dim,elem_dim, l_tmp_ovr_idx,l_tmp_halo, nztot,nhalo
   Logical,Parameter :: debug=.false.
@@ -103,7 +104,7 @@ Subroutine psb_zcdovr(a,desc_a,novr,desc_ov,info)
 
   ictxt=desc_a%matrix_data(psb_ctxt_)
 
-  Call blacs_gridinfo(ictxt,nprow,npcol,me,mycol)
+  Call psb_info(ictxt, me, np)
 
   If(debug) Write(0,*)'in psb_cdovr',novr
 
@@ -136,7 +137,7 @@ Subroutine psb_zcdovr(a,desc_a,novr,desc_ov,info)
     return
   endif
 
-  call blacs_get(ictxt,10,icomm )
+  call psb_get_mpicomm(ictxt,icomm )
 !!$    call MPI_Comm_rank(icomm,irank,ierr)
 !!$    idscb  = mpe_log_get_event_number()
 !!$    idsce  = mpe_log_get_event_number()
@@ -148,7 +149,7 @@ Subroutine psb_zcdovr(a,desc_a,novr,desc_ov,info)
 !!$    endif
   If(debug)then 
     Write(0,*)'BEGIN cdovr',me,nhalo
-    call blacs_barrier(ictxt,'All')
+    call psb_barrier(ictxt)
   endif
   t1 = mpi_wtime()
 
@@ -211,7 +212,7 @@ Subroutine psb_zcdovr(a,desc_a,novr,desc_ov,info)
   desc_ov%glob_to_loc(:) = desc_a%glob_to_loc(:)
   If(debug)then 
     Write(0,*)'Start cdovrbld',me,lworks,lworkr
-    call blacs_barrier(ictxt,'All')
+    call psb_barrier(ictxt)
   endif
   
   !
@@ -228,7 +229,7 @@ Subroutine psb_zcdovr(a,desc_a,novr,desc_ov,info)
   desc_ov%matrix_data(psb_dec_type_) = psb_desc_asb_
   If(debug)then 
     Write(0,*)'Done cdovrbld',me,lworks,lworkr
-    call blacs_barrier(ictxt,'All')
+    call psb_barrier(ictxt)
   endif
 !!$      ierr = MPE_Log_event( idsce, 0, "st CDASB" )
 

@@ -107,6 +107,7 @@ subroutine psb_cdrep(m, ictxt, desc_a, info)
   use psb_serial_mod
   use psb_const_mod
   use psb_error_mod
+  use psb_penv_mod
   implicit None
   !....Parameters...
   Integer, intent(in)               :: m,ictxt
@@ -114,7 +115,7 @@ subroutine psb_cdrep(m, ictxt, desc_a, info)
   Type(psb_desc_type), intent(out)  :: desc_a
 
   !locals
-  Integer             :: counter,i,j,nprow,npcol,myrow,mycol,&
+  Integer             :: counter,i,j,np,npcol,me,mycol,&
        & loc_row,err,loc_col,nprocs,n,itmpov, k,&
        & l_ov_ix,l_ov_el,idx, flag_, err_act
   Integer             :: INT_ERR(5),TEMP(1),EXCH(2)
@@ -123,20 +124,13 @@ subroutine psb_cdrep(m, ictxt, desc_a, info)
   logical, parameter  :: debug=.false.
   character(len=20)   :: name, ch_err
 
-  if(psb_get_errstatus().ne.0) return 
+  if(psb_get_errstatus() /= 0) return 
   info=0
   err=0
   name = 'psb_cdrep'
 
-  call blacs_gridinfo(ictxt, nprow, npcol, myrow, mycol)
-  if (debug) write(*,*) 'psb_cdrep: ',nprow,npcol,myrow,mycol
-  !     ....verify blacs grid correctness..
-  if (npcol /= 1) then
-     info = 2030
-     int_err(1) = npcol
-     call psb_errpush(info,name,i_err=int_err)
-     goto 9999
-  endif
+  call psb_info(ictxt, me, np)
+  if (debug) write(*,*) 'psb_cdrep: ',np,me
 
   n = m
   !... check m and n parameters....
@@ -151,19 +145,18 @@ subroutine psb_cdrep(m, ictxt, desc_a, info)
   endif
 
   if (info /= 0) then 
-     call psb_errpush(info,name,i_err=int_err)
-     goto 9999
+    call psb_errpush(info,name,i_err=int_err)
+    goto 9999
   end if
 
   if (debug) write(*,*) 'psb_dscall:  doing global checks'  
   !global check on m and n parameters
-  if (myrow.eq.psb_root_) then
+  if (me == psb_root_) then
     exch(1)=m
     exch(2)=n
-    call igebs2d(ictxt,psb_all_,psb_topdef_, itwo,ione, exch, itwo)
+    call psb_bcast(ictxt,exch(1:2),root=psb_root_)
   else
-    call igebr2d(ictxt,psb_all_,psb_topdef_, itwo,ione, exch, itwo, psb_root_,&
-         & 0)
+    call psb_bcast(ictxt,exch(1:2),root=psb_root_)
     if (exch(1) /= m) then
       info=550
       int_err(1)=1
@@ -213,16 +206,16 @@ subroutine psb_cdrep(m, ictxt, desc_a, info)
   desc_a%matrix_data(psb_n_col_)  = n
   desc_a%matrix_data(psb_dec_type_) = psb_desc_repl_
   desc_a%matrix_data(psb_ctxt_)     = ictxt
-  call blacs_get(ictxt,10,desc_a%matrix_data(psb_mpi_c_))
+  call psb_get_mpicomm(ictxt,desc_a%matrix_data(psb_mpi_c_))
 
   call psb_erractionrestore(err_act)
   return
-  
+
 9999 continue
   call psb_erractionrestore(err_act)
-  if (err_act.eq.act_abort) then
-     call psb_error(ictxt)
-     return
+  if (err_act == act_abort) then
+    call psb_error(ictxt)
+    return
   end if
   return
 

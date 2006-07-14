@@ -81,6 +81,7 @@ Subroutine psb_zcgs(a,prec,b,x,eps,desc_a,info,&
   use psb_const_mod
   use psb_prec_mod
   use psb_error_mod
+  use psb_penv_mod
   implicit none
 
 !!$  parameters 
@@ -101,7 +102,7 @@ Subroutine psb_zcgs(a,prec,b,x,eps,desc_a,info,&
   Integer, Pointer           :: iperm(:), ipnull(:), ipsave(:)
   Real(Kind(1.d0)) ::rerr
   Integer       ::litmax, liter, naux, m, mglob, it, itrace_,int_err(5),&
-       & nprows,npcols,me,mecol, n_row, n_col,istop_, err_act
+       & np,me, n_row, n_col,istop_, err_act
   Character     ::diagl, diagu
   Logical, Parameter :: exchange=.True., noexchange=.False.  
   Integer, Parameter :: irmax = 8
@@ -118,8 +119,8 @@ Subroutine psb_zcgs(a,prec,b,x,eps,desc_a,info,&
 
   If (debug) Write(*,*) 'entering psb_zcgs'
   ictxt = desc_a%matrix_data(psb_ctxt_)
-  Call blacs_gridinfo(ictxt,nprows,npcols,me,mecol)
-  If (debug) Write(*,*) 'psb_zcgs: from gridinfo',nprows,npcols,me
+  Call psb_info(ictxt, me, np)
+  If (debug) Write(*,*) 'psb_zcgs: from gridinfo',np,me
 
   mglob = desc_a%matrix_data(psb_m_)
   n_row = desc_a%matrix_data(psb_n_row_)

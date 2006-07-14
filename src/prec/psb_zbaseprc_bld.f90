@@ -45,6 +45,7 @@ subroutine psb_zbaseprc_bld(a,desc_a,p,info,upd)
   use psb_const_mod
   use psb_psblas_mod
   use psb_error_mod
+  use psb_penv_mod
   Implicit None
 
   type(psb_zspmat_type), target           :: a
@@ -111,7 +112,7 @@ subroutine psb_zbaseprc_bld(a,desc_a,p,info,upd)
 
   ! Local scalars
   Integer      :: err, nnzero, n_row, n_col,I,j,k,ictxt,&
-       & me,mycol,nprow,npcol,mglob,lw, mtype, nrg, nzg, err_act
+       & me,mycol,np,npcol,mglob,lw, mtype, nrg, nzg, err_act
   real(kind(1.d0))         :: temp, real_err(5)
   real(kind(1.d0)),pointer :: gd(:), work(:)
   integer      :: int_err(5)
@@ -135,7 +136,7 @@ subroutine psb_zbaseprc_bld(a,desc_a,p,info,upd)
   n_col   = desc_a%matrix_data(psb_n_col_)
   mglob   = desc_a%matrix_data(psb_m_)
   if (debug) write(0,*) 'Preconditioner Blacs_gridinfo'
-  call blacs_gridinfo(ictxt, nprow, npcol, me, mycol)
+  call psb_info(ictxt, me, np)
 
   if (present(upd)) then 
     if (debug) write(0,*) 'UPD ', upd
@@ -195,14 +196,14 @@ subroutine psb_zbaseprc_bld(a,desc_a,p,info,upd)
          &  f_ilu_n_,is_legal_ml_fact)
 
     if (debug) write(0,*)me, ': Calling PSB_ILU_BLD'
-    if (debug) call blacs_barrier(ictxt,'All')
+    if (debug) call psb_barrier(ictxt)
 
     select case(p%iprcparm(f_type_))
 
     case(f_ilu_n_,f_ilu_e_) 
       call psb_ilu_bld(a,desc_a,p,iupd,info)
       if(debug) write(0,*)me,': out of psb_ilu_bld'
-      if (debug) call blacs_barrier(ictxt,'All')
+      if (debug) call psb_barrier(ictxt)
       if(info /= 0) then
         info=4010
         ch_err='psb_ilu_bld'

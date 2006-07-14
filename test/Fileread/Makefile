@@ -60,7 +60,7 @@ clean:
         *$(.mod) $(EXEDIR)/df_sample $(EXEDIR)/zf_sample  dhb2mm zhb2mm dmm2hb zmm2hb
 
 lib:
-	(cd ../../; make lib)
+	(cd ../../; make library)
 verycleanlib:
 	(cd ../../; make veryclean)
 

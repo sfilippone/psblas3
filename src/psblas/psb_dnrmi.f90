@@ -54,7 +54,7 @@ function psb_dnrmi(a,desc_a,info)
   real(kind(1.d0))                    :: psb_dnrmi
 
   ! locals
-  integer                  :: int_err(5), ictxt, nprow, npcol, myrow, mycol,&
+  integer                  :: int_err(5), ictxt, np, npcol, me, mycol,&
        & err_act, n, iia, jja, ia, ja, mdim, ndim, m
   real(kind(1.d0))         :: nrmi, dcsnmi
   character(len=20)        :: name, ch_err
@@ -66,15 +66,9 @@ function psb_dnrmi(a,desc_a,info)
 
   ictxt=desc_a%matrix_data(psb_ctxt_)
 
-  ! check on blacs grid 
-  call psb_info(ictxt, myrow, nprow)
-  if (nprow == -1) then
+  call psb_info(ictxt, me, np)
+  if (np == -1) then
     info = 2010
-    call psb_errpush(info,name)
-    goto 9999
-  else if (npcol /= 1) then
-    info = 2030
-    int_err(1) = npcol
     call psb_errpush(info,name)
     goto 9999
   endif
@@ -86,34 +80,34 @@ function psb_dnrmi(a,desc_a,info)
 
   call psb_chkmat(m,n,ia,ja,desc_a%matrix_data,info,iia,jja)
   if(info.ne.0) then
-     info=4010
-     ch_err='psb_chkmat'
-     call psb_errpush(info,name,a_err=ch_err)
-     goto 9999
+    info=4010
+    ch_err='psb_chkmat'
+    call psb_errpush(info,name,a_err=ch_err)
+    goto 9999
   end if
 
   if ((iia.ne.1).or.(jja.ne.1)) then
-     info=3040
-     call psb_errpush(info,name)
-     goto 9999
+    info=3040
+    call psb_errpush(info,name)
+    goto 9999
   end if
 
   if ((m.ne.0).and.(n.ne.0)) then
-     mdim = desc_a%matrix_data(psb_n_row_)
-     ndim = desc_a%matrix_data(psb_n_col_)
-     nrmi = dcsnmi('N',mdim,ndim,a%fida,&
-          & a%descra,a%aspk,a%ia1,a%ia2,&
-          & a%infoa,info)
+    mdim = desc_a%matrix_data(psb_n_row_)
+    ndim = desc_a%matrix_data(psb_n_col_)
+    nrmi = dcsnmi('N',mdim,ndim,a%fida,&
+         & a%descra,a%aspk,a%ia1,a%ia2,&
+         & a%infoa,info)
 
-     if(info.ne.0) then
-        info=4010
-        ch_err='dcsnmi'
-        call psb_errpush(info,name,a_err=ch_err)
-        goto 9999
-     end if
+    if(info.ne.0) then
+      info=4010
+      ch_err='dcsnmi'
+      call psb_errpush(info,name,a_err=ch_err)
+      goto 9999
+    end if
 
   else
-     nrmi = 0.d0
+    nrmi = 0.d0
   end if
   ! compute global max
   call psb_amx(ictxt, nrmi)
@@ -127,8 +121,8 @@ function psb_dnrmi(a,desc_a,info)
   call psb_erractionrestore(err_act)
 
   if (err_act.eq.act_abort) then
-     call psb_error(ictxt)
-     return
+    call psb_error(ictxt)
+    return
   end if
   return
 end function psb_dnrmi

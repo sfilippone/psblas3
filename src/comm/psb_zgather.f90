@@ -62,7 +62,7 @@ subroutine  psb_zgatherm(globx, locx, desc_a, info, iroot,&
 
 
   ! locals
-  integer                  :: int_err(5), ictxt, nprow, npcol, myrow, mycol,&
+  integer                  :: int_err(5), ictxt, np, me, mycol,&
        & err_act, n, iix, jjx, temp(2), root, iiroot, ilocx, iglobx, jlocx,&
        & jglobx, lda_locx, lda_globx, m, lock, globk, maxk, k, jlx, ilx, i, j, idx
   complex(kind(1.d0)),pointer :: tmpx(:)
@@ -76,55 +76,50 @@ subroutine  psb_zgatherm(globx, locx, desc_a, info, iroot,&
   ictxt=desc_a%matrix_data(psb_ctxt_)
 
   ! check on blacs grid 
-  call blacs_gridinfo(ictxt, nprow, npcol, myrow, mycol)
-  if (nprow == -1) then
+  call psb_info(ictxt, me, np)
+  if (np == -1) then
     info = 2010
-    call psb_errpush(info,name)
-    goto 9999
-  else if (npcol /= 1) then
-    info = 2030
-    int_err(1) = npcol
     call psb_errpush(info,name)
     goto 9999
   endif
 
   if (present(iroot)) then
-     root = iroot
-     if((root.lt.-1).or.(root.gt.nprow)) then
-        info=30
-        int_err(1:2)=(/5,root/)
-        call psb_errpush(info,name,i_err=int_err)
-        goto 9999
-     end if
+    root = iroot
+    if((root.lt.-1).or.(root.gt.np)) then
+      info=30
+      int_err(1:2)=(/5,root/)
+      call psb_errpush(info,name,i_err=int_err)
+      goto 9999
+    end if
   else
-     root = -1
+    root = -1
   end if
   if (root==-1) then
-     iiroot=0
+    iiroot=0
   endif
 
   if (present(iiglobx)) then
-     iglobx = iiglobx
+    iglobx = iiglobx
   else
-     iglobx = 1
+    iglobx = 1
   end if
 
   if (present(ijglobx)) then
-     jglobx = ijglobx
+    jglobx = ijglobx
   else
-     jglobx = 1
+    jglobx = 1
   end if
 
   if (present(iilocx)) then
-     ilocx = iilocx
+    ilocx = iilocx
   else
-     ilocx = 1
+    ilocx = 1
   end if
 
   if (present(ijlocx)) then
-     jlocx = ijlocx
+    jlocx = ijlocx
   else
-     jlocx = 1
+    jlocx = 1
   end if
 
   lda_globx = size(globx,1)
@@ -132,19 +127,19 @@ subroutine  psb_zgatherm(globx, locx, desc_a, info, iroot,&
 
   m = desc_a%matrix_data(psb_m_)
   n = desc_a%matrix_data(psb_n_)
-  
+
   lock=size(locx,2)-jlocx+1
   globk=size(globx,2)-jglobx+1
   maxk=min(lock,globk)
-  
+
   if(present(ik)) then
-     if(ik.gt.maxk) then
-        k=maxk
-     else
-        k=ik
-     end if
+    if(ik.gt.maxk) then
+      k=maxk
+    else
+      k=ik
+    end if
   else
-     k = maxk
+    k = maxk
   end if
 
   call psb_bcast(ictxt,k,root=iiroot)
@@ -154,10 +149,10 @@ subroutine  psb_zgatherm(globx, locx, desc_a, info, iroot,&
   call psb_chkglobvect(m,n,size(globx,1),iglobx,jglobx,desc_a%matrix_data,info)
   call psb_chkvect(m,n,size(locx,1),ilocx,jlocx,desc_a%matrix_data,info,ilx,jlx)
   if(info.ne.0) then
-     info=4010
-     ch_err='psb_chk(glob)vect'
-     call psb_errpush(info,name,a_err=ch_err)
-     goto 9999
+    info=4010
+    ch_err='psb_chk(glob)vect'
+    call psb_errpush(info,name,a_err=ch_err)
+    goto 9999
   end if
 
   if ((ilx.ne.1).or.(iglobx.ne.1)) then
@@ -263,7 +258,7 @@ subroutine  psb_zgatherv(globx, locx, desc_a, info, iroot,&
 
 
   ! locals
-  integer                  :: int_err(5), ictxt, nprow, npcol, myrow, mycol,&
+  integer                  :: int_err(5), ictxt, np, me, mycol,&
        & err_act, n, iix, jjx, temp(2), root, iiroot, ilocx, iglobx, jlocx,&
        & jglobx, lda_locx, lda_globx, lock, maxk, globk, m, k, jlx, ilx, i, j, idx
   complex(kind(1.d0)),pointer :: tmpx(:)
@@ -277,42 +272,37 @@ subroutine  psb_zgatherv(globx, locx, desc_a, info, iroot,&
   ictxt=desc_a%matrix_data(psb_ctxt_)
 
   ! check on blacs grid 
-  call psb_info(ictxt, myrow, nprow)
-  if (nprow == -1) then
+  call psb_info(ictxt, me, np)
+  if (np == -1) then
     info = 2010
-    call psb_errpush(info,name)
-    goto 9999
-  else if (npcol /= 1) then
-    info = 2030
-    int_err(1) = npcol
     call psb_errpush(info,name)
     goto 9999
   endif
 
   if (present(iroot)) then
-     root = iroot
-     if((root.lt.-1).or.(root.gt.nprow)) then
-        info=30
-        int_err(1:2)=(/5,root/)
-        call psb_errpush(info,name,i_err=int_err)
-        goto 9999
-     end if
+    root = iroot
+    if((root.lt.-1).or.(root.gt.np)) then
+      info=30
+      int_err(1:2)=(/5,root/)
+      call psb_errpush(info,name,i_err=int_err)
+      goto 9999
+    end if
   else
-     root = -1
+    root = -1
   end if
 
   jglobx=1
   if (present(iiglobx)) then
-     iglobx = iiglobx
+    iglobx = iiglobx
   else
-     iglobx = 1
+    iglobx = 1
   end if
 
   jlocx=1
   if (present(iilocx)) then
-     ilocx = iilocx
+    ilocx = iilocx
   else
-     ilocx = 1
+    ilocx = 1
   end if
 
   lda_globx = size(globx)
@@ -320,7 +310,7 @@ subroutine  psb_zgatherv(globx, locx, desc_a, info, iroot,&
 
   m = desc_a%matrix_data(psb_m_)
   n = desc_a%matrix_data(psb_n_)
-  
+
   k = 1
 
 
@@ -329,35 +319,35 @@ subroutine  psb_zgatherv(globx, locx, desc_a, info, iroot,&
   call psb_chkglobvect(m,n,size(globx),iglobx,jglobx,desc_a%matrix_data,info)
   call psb_chkvect(m,n,size(locx),ilocx,jlocx,desc_a%matrix_data,info,ilx,jlx)
   if(info.ne.0) then
-     info=4010
-     ch_err='psb_chk(glob)vect'
-     call psb_errpush(info,name,a_err=ch_err)
-     goto 9999
+    info=4010
+    ch_err='psb_chk(glob)vect'
+    call psb_errpush(info,name,a_err=ch_err)
+    goto 9999
   end if
 
   if ((ilx.ne.1).or.(iglobx.ne.1)) then
-     info=3040
-     call psb_errpush(info,name)
-     goto 9999
+    info=3040
+    call psb_errpush(info,name)
+    goto 9999
   end if
-  
+
   globx(:)=0.d0
 
   do i=1,desc_a%matrix_data(psb_n_row_)
-     idx = desc_a%loc_to_glob(i)
-     globx(idx) = locx(i)
+    idx = desc_a%loc_to_glob(i)
+    globx(idx) = locx(i)
   end do
   ! adjust overlapped elements
   i=1
   do while (desc_a%ovrlap_elem(i).ne.-1)
-     idx=desc_a%ovrlap_elem(i+psb_ovrlp_elem_)
-     idx=desc_a%loc_to_glob(idx)
-     globx(idx) = globx(idx)/desc_a%ovrlap_elem(i+psb_n_dom_ovr_)
-     i=i+2
+    idx=desc_a%ovrlap_elem(i+psb_ovrlp_elem_)
+    idx=desc_a%loc_to_glob(idx)
+    globx(idx) = globx(idx)/desc_a%ovrlap_elem(i+psb_n_dom_ovr_)
+    i=i+2
   end do
-  
+
   call psb_sum(ictxt,globx(1:m),root=root)
-  
+
   call psb_erractionrestore(err_act)
   return  
 
@@ -365,8 +355,8 @@ subroutine  psb_zgatherv(globx, locx, desc_a, info, iroot,&
   call psb_erractionrestore(err_act)
 
   if (err_act.eq.act_abort) then
-     call psb_error(ictxt)
-     return
+    call psb_error(ictxt)
+    return
   end if
   return
 

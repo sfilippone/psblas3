@@ -45,6 +45,7 @@ subroutine psb_dgelp(trans,iperm,x,desc_a,info)
   use psb_const_mod
   use psb_psblas_mod
   use psb_error_mod
+  use psb_penv_mod
   implicit none
 
   type(psb_desc_type), intent(in)      ::  desc_a
@@ -53,7 +54,7 @@ subroutine psb_dgelp(trans,iperm,x,desc_a,info)
   character, intent(in)                :: trans
 
   ! local variables
-  integer                  :: err, ictxt,nprow, &
+  integer                  :: err, ictxt,np, &
        & npcol,me,mypcol,temp,lwork,nrow,ncol
   real(kind(1.d0)),pointer ::  dtemp(:)
   integer                  :: int_err(5), i1sz, i2sz, dectype, i, err_act
@@ -62,27 +63,27 @@ subroutine psb_dgelp(trans,iperm,x,desc_a,info)
   logical, parameter :: debug=.false.
 
   interface dgelp
-     subroutine dgelp(trans,m,n,p,b,ldb,work,lwork,ierror)
-       integer, intent(in)  :: ldb, m, n, lwork
-       integer, intent(out) :: ierror
-       character, intent(in) :: trans
-       double precision, intent(inout) ::  b(ldb,*), work(*)
-       integer, intent(in)  :: p(*)
-     end subroutine dgelp
+    subroutine dgelp(trans,m,n,p,b,ldb,work,lwork,ierror)
+      integer, intent(in)  :: ldb, m, n, lwork
+      integer, intent(out) :: ierror
+      character, intent(in) :: trans
+      double precision, intent(inout) ::  b(ldb,*), work(*)
+      integer, intent(in)  :: p(*)
+    end subroutine dgelp
   end interface
 
   interface isaperm
 
-     logical function isaperm(n,ip)
-       integer, intent(in)    :: n   
-       integer, intent(inout) :: ip(*)
-     end function isaperm
+    logical function isaperm(n,ip)
+      integer, intent(in)    :: n   
+      integer, intent(inout) :: ip(*)
+    end function isaperm
   end interface
 
   character(len=20)   :: name, ch_err
   name = 'psb_dgelp'
 
-  if(psb_get_errstatus().ne.0) return 
+  if(psb_get_errstatus() /= 0) return 
   info=0
   call psb_erractionsave(err_act)
 
@@ -93,42 +94,37 @@ subroutine psb_dgelp(trans,iperm,x,desc_a,info)
   i1sz    = size(x,dim=1)
   i2sz    = size(x,dim=2)
 
-  call blacs_gridinfo(ictxt, nprow, npcol, me, mypcol)
+  call psb_info(ictxt, me, np)
 
-  if (debug) write(*,*) 'asb start: ',nprow,npcol,me,&
+  if (debug) write(*,*) 'asb start: ',np,npcol,me,&
        &desc_a%matrix_data(psb_dec_type_)
   !     ....verify blacs grid correctness..
-  if (nprow.eq.-1) then
-     info = 2010
-     call psb_errpush(info,name)
-     goto 9999
-  else if (npcol.ne.1) then
-     info = 2030
-     int_err(1) = npcol
-     call psb_errpush(info,name,i_err=int_err)
-     goto 9999
+  if (np == -1) then
+    info = 2010
+    call psb_errpush(info,name)
+    goto 9999
   else if (.not.psb_is_asb_dec(dectype)) then
-     info = 3110
-     call psb_errpush(info,name)
-     goto 9999
+    info = 3110
+    call psb_errpush(info,name)
+    goto 9999
   endif
 
 
   if (.not.isaperm(i1sz,iperm)) then
-     info = 70
-     int_err(1) = 1      
-     call psb_errpush(info,name,i_err=int_err)
-     goto 9999
+    info = 70
+    int_err(1) = 1      
+    call psb_errpush(info,name,i_err=int_err)
+    goto 9999
   endif
 
   if (debug) write(*,*) 'asb: ',i1sz,i2sz,nrow,ncol
   allocate(dtemp(i1sz),stat=info)
 
   call dgelp(trans,i1sz,i2sz,iperm,x,i1sz,dtemp,i1sz,info)
-  if(info.ne.0) then
-     info=4010
-     ch_err='dgelp'
-     call psb_errpush(info,name,a_err=ch_err)
+  if(info /= 0) then
+    info=4010
+    ch_err='dgelp'
+    call psb_errpush(info,name,a_err=ch_err)
   end if
 
   deallocate(dtemp)
@@ -139,10 +135,10 @@ subroutine psb_dgelp(trans,iperm,x,desc_a,info)
 9999 continue
   call psb_erractionrestore(err_act)
 
-  if (err_act.eq.act_ret) then
-     return
+  if (err_act == act_ret) then
+    return
   else
-     call psb_error(ictxt)
+    call psb_error(ictxt)
   end if
   return
 
@@ -195,6 +191,7 @@ subroutine psb_dgelpv(trans,iperm,x,desc_a,info)
   use psb_const_mod
   use psb_psblas_mod
   use psb_error_mod
+  use psb_penv_mod
   implicit none
 
   type(psb_desc_type), intent(in)    ::  desc_a
@@ -203,7 +200,7 @@ subroutine psb_dgelpv(trans,iperm,x,desc_a,info)
   character, intent(in)              ::  trans
 
   ! local variables
-  integer :: err, ictxt,nprow,npcol,me,mypcol,temp,lwork
+  integer :: err, ictxt,np,npcol,me,mypcol,temp,lwork
   integer :: int_err(5), i1sz,nrow,ncol,dectype, i, err_act
   real(kind(1.d0)),pointer ::  dtemp(:)
   double precision :: real_err(5)
@@ -212,27 +209,27 @@ subroutine psb_dgelpv(trans,iperm,x,desc_a,info)
   logical, parameter :: debug=.false.
 
   interface dgelp
-     subroutine dgelp(trans,m,n,p,b,ldb,work,lwork,ierror)
-       integer, intent(in)  :: ldb, m, n, lwork
-       integer, intent(out) :: ierror
-       character, intent(in) :: trans
-       double precision, intent(inout) ::  b(*), work(*)
-       integer, intent(in)  :: p(*)
-     end subroutine dgelp
+    subroutine dgelp(trans,m,n,p,b,ldb,work,lwork,ierror)
+      integer, intent(in)  :: ldb, m, n, lwork
+      integer, intent(out) :: ierror
+      character, intent(in) :: trans
+      double precision, intent(inout) ::  b(*), work(*)
+      integer, intent(in)  :: p(*)
+    end subroutine dgelp
   end interface
 
   interface isaperm
 
-     logical function isaperm(n,ip)
-       integer, intent(in)    :: n   
-       integer, intent(inout) :: ip(*)
-     end function isaperm
+    logical function isaperm(n,ip)
+      integer, intent(in)    :: n   
+      integer, intent(inout) :: ip(*)
+    end function isaperm
   end interface
 
   character(len=20)   :: name, ch_err
   name = 'psb_dgelpv'
 
-  if(psb_get_errstatus().ne.0) return 
+  if(psb_get_errstatus() /= 0) return 
   info=0
   call psb_erractionsave(err_act)
 
@@ -243,40 +240,35 @@ subroutine psb_dgelpv(trans,iperm,x,desc_a,info)
   nrow=desc_a%matrix_data(psb_n_row_)
   ncol=desc_a%matrix_data(psb_n_col_)
 
-  call blacs_gridinfo(ictxt, nprow, npcol, me, mypcol)
+  call psb_info(ictxt, me, np)
 
   !     ....verify blacs grid correctness..
-  if (nprow.eq.-1) then
-     info = 2010
-     call psb_errpush(info,name)
-     goto 9999
-  else if (npcol.ne.1) then
-     info = 2030
-     int_err(1) = npcol
-     call psb_errpush(info,name,i_err=int_err)
-     goto 9999
+  if (np == -1) then
+    info = 2010
+    call psb_errpush(info,name)
+    goto 9999
   else if (.not.psb_is_asb_dec(dectype)) then
-     info = 3110
-     call psb_errpush(info,name)
-     goto 9999
+    info = 3110
+    call psb_errpush(info,name)
+    goto 9999
   endif
 
   if (debug) write(0,*) 'calling isaperm ',i1sz,size(iperm),trans
 
   if (.not.isaperm(i1sz,iperm)) then
-     info = 70
-     int_err(1) = 1      
-     call psb_errpush(info,name,i_err=int_err)
-     goto 9999
+    info = 70
+    int_err(1) = 1      
+    call psb_errpush(info,name,i_err=int_err)
+    goto 9999
   endif
 
   allocate(dtemp(i1sz),stat=info)
 
   call dgelp(trans,i1sz,1,iperm,x,i1sz,dtemp,i1sz,info)
-  if(info.ne.0) then
-     info=4010
-     ch_err='dgelp'
-     call psb_errpush(info,name,a_err=ch_err)
+  if(info /= 0) then
+    info=4010
+    ch_err='dgelp'
+    call psb_errpush(info,name,a_err=ch_err)
   end if
 
   deallocate(dtemp)
@@ -287,10 +279,10 @@ subroutine psb_dgelpv(trans,iperm,x,desc_a,info)
 9999 continue
   call psb_erractionrestore(err_act)
 
-  if (err_act.eq.act_ret) then
-     return
+  if (err_act == act_ret) then
+    return
   else
-     call psb_error(ictxt)
+    call psb_error(ictxt)
   end if
   return
 

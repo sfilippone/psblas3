@@ -82,6 +82,7 @@ Subroutine psb_zcgstab(a,prec,b,x,eps,desc_a,info,&
   use psb_const_mod
   use psb_prec_mod
   use psb_error_mod
+  use psb_penv_mod
   Implicit None
 !!$  parameters 
   Type(psb_zspmat_type), Intent(in)  :: a
@@ -101,7 +102,7 @@ Subroutine psb_zcgstab(a,prec,b,x,eps,desc_a,info,&
   Integer, Pointer           :: iperm(:), ipnull(:), ipsave(:)
   Real(Kind(1.d0)) :: rerr
   Integer          :: litmax, liter, naux, m, mglob, it,itrace_,&
-       & nprows,npcols,myrow,mycol, n_row, n_col
+       & np,me, n_row, n_col
   Character     ::diagl, diagu
   Logical, Parameter :: debug = .false.
   Logical, Parameter :: exchange=.True., noexchange=.False., debug1 = .False.
@@ -121,8 +122,8 @@ Subroutine psb_zcgstab(a,prec,b,x,eps,desc_a,info,&
 
   If (debug) Write(*,*) 'Entering PSB_ZCGSTAB',present(istop)
   ictxt = desc_a%matrix_data(psb_ctxt_)
-  CALL blacs_gridinfo(ictxt,nprows,npcols,myrow,mycol)
-  if (debug) write(*,*) 'PSB_ZCGSTAB: From GRIDINFO',nprows,npcols,myrow
+  CALL psb_info(ictxt, me, np)
+  if (debug) write(*,*) 'PSB_ZCGSTAB: From GRIDINFO',np,me
 
   mglob = desc_a%matrix_data(psb_m_)
   n_row = desc_a%matrix_data(psb_n_row_)
@@ -256,7 +257,7 @@ Subroutine psb_zcgstab(a,prec,b,x,eps,desc_a,info,&
     End If
 
     If (itrace_ > 0) then 
-      if ((mod(itx,itrace_)==0).and.(myrow == 0))&
+      if ((mod(itx,itrace_)==0).and.(me == 0))&
            & write(*,'(a,i4,3(2x,es10.4))') 'bicgstab: ',itx,rerr
     end If
 
@@ -352,14 +353,14 @@ Subroutine psb_zcgstab(a,prec,b,x,eps,desc_a,info,&
       
       If (itx.Ge.litmax) Exit restart
       If (itrace_ > 0) then 
-        if ((mod(itx,itrace_)==0).and.(myrow == 0))&
+        if ((mod(itx,itrace_)==0).and.(me == 0))&
              & write(*,'(a,i4,3(2x,es10.4))') 'bicgstab: ',itx,rerr
       end If
 
     End Do iteration
   End Do restart
   If (itrace_ > 0) then 
-    if (myrow == 0) write(*,'(a,i4,3(2x,es10.4))') 'bicgstab: ',itx,rerr
+    if (me == 0) write(*,'(a,i4,3(2x,es10.4))') 'bicgstab: ',itx,rerr
   end If
 
   If (Present(err)) err=rerr

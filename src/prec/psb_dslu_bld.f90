@@ -40,6 +40,7 @@ subroutine psb_dslu_bld(a,desc_a,p,info)
   use psb_prec_type
   use psb_tools_mod
   use psb_const_mod
+  use psb_penv_mod
   implicit none 
 
   type(psb_dspmat_type), intent(inout)      :: a
@@ -51,7 +52,7 @@ subroutine psb_dslu_bld(a,desc_a,p,info)
   type(psb_dspmat_type)    :: blck, atmp
   character(len=5)         :: fmt
   character                :: upd='F'
-  integer                  :: i,j,nza,nzb,nzt,ictxt, me,mycol,nprow,npcol,err_act
+  integer                  :: i,j,nza,nzb,nzt,ictxt, me,mycol,np,npcol,err_act
   logical, parameter :: debug=.false.
   character(len=20)   :: name, ch_err
 
@@ -77,8 +78,8 @@ subroutine psb_dslu_bld(a,desc_a,p,info)
   call psb_erractionsave(err_act)
 
   ictxt = desc_A%matrix_data(psb_ctxt_)
-  call blacs_gridinfo(ictxt, nprow, npcol, me, mycol)
 
+  call psb_info(ictxt, me, np)
 
   fmt = 'COO'
   call psb_nullify_sp(blck)    
@@ -87,7 +88,7 @@ subroutine psb_dslu_bld(a,desc_a,p,info)
   atmp%fida='COO'
   if (Debug) then 
     write(0,*) me, 'SPLUBLD: Calling  csdp'
-    call blacs_barrier(ictxt,'All')
+    call psb_barrier(ictxt)
   endif
 
   call psb_csdp(a,atmp,info)
@@ -100,7 +101,7 @@ subroutine psb_dslu_bld(a,desc_a,p,info)
   nza = atmp%infoa(psb_nnz_)
   if (Debug) then 
     write(0,*) me, 'SPLUBLD: Done csdp',info,nza,atmp%m,atmp%k
-    call blacs_barrier(ictxt,'All')
+    call psb_barrier(ictxt)
   endif
   call psb_asmatbld(p%iprcparm(p_type_),p%iprcparm(n_ovr_),a,&
        & blck,desc_a,upd,p%desc_data,info,outfmt=fmt)  
@@ -114,7 +115,7 @@ subroutine psb_dslu_bld(a,desc_a,p,info)
   nzb = blck%infoa(psb_nnz_)
   if (Debug) then 
     write(0,*) me, 'SPLUBLD: Done asmatbld',info,nzb,blck%fida
-    call blacs_barrier(ictxt,'All')
+    call psb_barrier(ictxt)
   endif
   if (nzb > 0 ) then 
     if (size(atmp%aspk)<nza+nzb) then 
@@ -128,7 +129,7 @@ subroutine psb_dslu_bld(a,desc_a,p,info)
     endif
     if (Debug) then 
       write(0,*) me, 'SPLUBLD: Done realloc',info,nza+nzb,atmp%fida
-      call blacs_barrier(ictxt,'All')
+      call psb_barrier(ictxt)
     endif
 
     do j=1,nzb
@@ -174,7 +175,7 @@ subroutine psb_dslu_bld(a,desc_a,p,info)
   if (Debug) then 
     write(0,*) me,'Calling psb_slu_factor ',nzt,atmp%m,&
          & atmp%k,p%desc_data%matrix_data(psb_n_row_)
-    call blacs_barrier(ictxt,'All')
+    call psb_barrier(ictxt)
   endif
 
   call psb_dslu_factor(atmp%m,nzt,&
@@ -187,7 +188,7 @@ subroutine psb_dslu_bld(a,desc_a,p,info)
 
   if (Debug) then 
     write(0,*) me, 'SPLUBLD: Done slu_Factor',info,p%iprcparm(slu_ptr_)
-    call blacs_barrier(ictxt,'All')
+    call psb_barrier(ictxt)
   endif
 
   call psb_sp_free(blck,info)

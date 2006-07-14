@@ -69,72 +69,72 @@ subroutine psb_chkvect( m, n, lldx, ix, jx, desc_dec, info, iix, jjx)
   name='psb_chkvect'
   call psb_erractionsave(err_act)
 
-  
+
   if (m.lt.0) then
-     info=10
-     int_err(1) = 1
-     int_err(2) = m
+    info=10
+    int_err(1) = 1
+    int_err(2) = m
   else if (n.lt.0) then
-     info=10
-     int_err(1) = 3
-     int_err(2) = n
+    info=10
+    int_err(1) = 3
+    int_err(2) = n
   else if ((ix.lt.1) .and. (m.ne.0)) then
-     info=20
-     int_err(1) = 4
-     int_err(2) = ix
+    info=20
+    int_err(1) = 4
+    int_err(2) = ix
   else if ((jx.lt.1) .and. (n.ne.0)) then
-     info=20
-     int_err(1) = 5
-     int_err(2) = jx
+    info=20
+    int_err(1) = 5
+    int_err(2) = jx
   else if (desc_dec(psb_n_col_).lt.0) then
-     info=40
-     int_err(1) = 6
-     int_err(2) = psb_n_col_ 
-     int_err(3) = desc_dec(psb_n_col_)
+    info=40
+    int_err(1) = 6
+    int_err(2) = psb_n_col_ 
+    int_err(3) = desc_dec(psb_n_col_)
   else if (desc_dec(psb_n_row_).lt.0) then
-     info=40
-     int_err(1) = 6
-     int_err(2) = psb_n_row_ 
-     int_err(3) = desc_dec(psb_n_row_)
+    info=40
+    int_err(1) = 6
+    int_err(2) = psb_n_row_ 
+    int_err(3) = desc_dec(psb_n_row_)
   else if (lldx.lt.desc_dec(psb_n_col_)) then
-     info=50
-     int_err(1) = 3
-     int_err(2) = lldx
-     int_err(3) = 6
-     int_err(4) = psb_n_col_
-     int_err(5) = desc_dec(psb_n_col_)
+    info=50
+    int_err(1) = 3
+    int_err(2) = lldx
+    int_err(3) = 6
+    int_err(4) = psb_n_col_
+    int_err(5) = desc_dec(psb_n_col_)
   else if (desc_dec(psb_n_).lt.m) then
-     info=60
-     int_err(1) = 1
-     int_err(2) = m
-     int_err(3) = 6
-     int_err(4) = psb_n_
-     int_err(5) = desc_dec(psb_n_)
+    info=60
+    int_err(1) = 1
+    int_err(2) = m
+    int_err(3) = 6
+    int_err(4) = psb_n_
+    int_err(5) = desc_dec(psb_n_)
   else if (desc_dec(psb_n_).lt.ix) then
-     info=60
-     int_err(1) = 4
-     int_err(2) = ix
-     int_err(3) = 6
-     int_err(4) = psb_n_
-     int_err(5) = desc_dec(psb_n_)
+    info=60
+    int_err(1) = 4
+    int_err(2) = ix
+    int_err(3) = 6
+    int_err(4) = psb_n_
+    int_err(5) = desc_dec(psb_n_)
   else if (desc_dec(psb_m_).lt.jx) then
-     info=60
-     int_err(1) = 5
-     int_err(2) = jx
-     int_err(3) = 6
-     int_err(4) = psb_m_
-     int_err(5) = desc_dec(psb_m_)
+    info=60
+    int_err(1) = 5
+    int_err(2) = jx
+    int_err(3) = 6
+    int_err(4) = psb_m_
+    int_err(5) = desc_dec(psb_m_)
   else if (desc_dec(psb_n_).lt.(ix+m-1)) then
-     info=80
-     int_err(1) = 1
-     int_err(2) = m
-     int_err(3) = 4
-     int_err(4) = ix
+    info=80
+    int_err(1) = 1
+    int_err(2) = m
+    int_err(3) = 4
+    int_err(4) = ix
   end if
 
   if (info.ne.0) then
-     call psb_errpush(info,name,i_err=int_err)
-     goto 9999
+    call psb_errpush(info,name,i_err=int_err)
+    goto 9999
   end if
 
   ! Compute local indices for submatrix starting
@@ -149,8 +149,8 @@ subroutine psb_chkvect( m, n, lldx, ix, jx, desc_dec, info, iix, jjx)
   call psb_erractionrestore(err_act)
 
   if (err_act.eq.act_abort) then
-     call psb_error()
-     return
+    call psb_error()
+    return
   end if
   return
 

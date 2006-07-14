@@ -88,6 +88,7 @@ subroutine  psb_dspmm(alpha,a,x,beta,y,desc_a,info,&
   use psb_check_mod
   use psb_error_mod
   use psb_string_mod
+  use psb_penv_mod
   implicit none
 
   real(kind(1.D0)), intent(in)             :: alpha, beta
@@ -101,7 +102,7 @@ subroutine  psb_dspmm(alpha,a,x,beta,y,desc_a,info,&
   integer, intent(in), optional            :: k, jx, jy,doswap
 
   ! locals
-  integer                  :: int_err(5), ictxt, nprow, npcol, myrow, mycol,&
+  integer                  :: int_err(5), ictxt, np, npcol, me, mycol,&
        & err_act, n, iix, jjx, ia, ja, iia, jja, temp(2), ix, iy, ik, ijx, ijy,&
        & idoswap, m, nrow, ncol, lldx, lldy, liwork, llwork, iiy, jjy,&
        & i, ib, ib1
@@ -118,15 +119,9 @@ subroutine  psb_dspmm(alpha,a,x,beta,y,desc_a,info,&
 
   ictxt=desc_a%matrix_data(psb_ctxt_)
 
-  ! check on blacs grid 
-  call blacs_gridinfo(ictxt, nprow, npcol, myrow, mycol)
-  if (nprow == -1) then
+  call psb_info(ictxt, me, np)
+  if (np == -1) then
     info = 2010
-    call psb_errpush(info,name)
-    goto 9999
-  else if (npcol /= 1) then
-    info = 2030
-    int_err(1) = npcol
     call psb_errpush(info,name)
     goto 9999
   endif
@@ -428,6 +423,7 @@ subroutine  psb_dspmv(alpha,a,x,beta,y,desc_a,info,&
   use psb_check_mod
   use psb_error_mod
   use psb_string_mod
+  use psb_penv_mod
   implicit none
 
   real(kind(1.D0)), intent(in)             :: alpha, beta
@@ -441,7 +437,7 @@ subroutine  psb_dspmv(alpha,a,x,beta,y,desc_a,info,&
   integer, intent(in), optional            :: doswap
 
   ! locals
-  integer                  :: int_err(5), ictxt, nprow, npcol, myrow, mycol,&
+  integer                  :: int_err(5), ictxt, np, npcol, me, mycol,&
        & err_act, n, iix, jjx, ia, ja, iia, jja, temp(2), ix, iy, ik, ijx, ijy,&
        & idoswap, m, nrow, ncol, lldx, lldy, liwork, llwork, jx, jy, iiy, jjy,&
        & i, ib, ib1
@@ -459,15 +455,9 @@ subroutine  psb_dspmv(alpha,a,x,beta,y,desc_a,info,&
 
   ictxt=desc_a%matrix_data(psb_ctxt_)
 
-  ! check on blacs grid 
-  call blacs_gridinfo(ictxt, nprow, npcol, myrow, mycol)
-  if (nprow == -1) then
+  call psb_info(ictxt, me, np)
+  if (np == -1) then
     info = 2010
-    call psb_errpush(info,name)
-    goto 9999
-  else if (npcol /= 1) then
-    info = 2030
-    int_err(1) = npcol
     call psb_errpush(info,name)
     goto 9999
   endif
@@ -539,7 +529,7 @@ subroutine  psb_dspmv(alpha,a,x,beta,y,desc_a,info,&
     iwork => work
   endif
 
-  if (debug) write(0,*) myrow,name,' Allocated work ', info
+  if (debug) write(0,*) me,name,' Allocated work ', info
   ! checking for matrix correctness
   call psb_chkmat(m,n,ia,ja,desc_a%matrix_data,info,iia,jja)
   if(info /= 0) then
@@ -549,7 +539,7 @@ subroutine  psb_dspmv(alpha,a,x,beta,y,desc_a,info,&
     goto 9999
   end if
 
-  if (debug) write(0,*) myrow,name,' Checkmat ', info
+  if (debug) write(0,*) me,name,' Checkmat ', info
   if (itrans == 'N') then
     !  Matrix is not transposed
     if((ja /= ix).or.(ia /= iy)) then
@@ -628,10 +618,10 @@ subroutine  psb_dspmv(alpha,a,x,beta,y,desc_a,info,&
     yp => y(iiy:lldy)
 
     yp(nrow+1:ncol)=dzero
-    if (debug) write(0,*) myrow,name,' checkvect ', info
+    if (debug) write(0,*) me,name,' checkvect ', info
     !  local Matrix-vector product
     call psb_csmm(alpha,a,xp,beta,yp,info,trans=itrans)
-    if (debug) write(0,*) myrow,name,' csmm ', info
+    if (debug) write(0,*) me,name,' csmm ', info
     if(info /= 0) then
       info = 4010
       ch_err='dcsmm'
@@ -642,7 +632,7 @@ subroutine  psb_dspmv(alpha,a,x,beta,y,desc_a,info,&
     if(idoswap /= 0)&
          & call psi_swaptran(ior(psb_swap_send_,psb_swap_recv_),&
          & done,yp,desc_a,iwork,info)
-    if (debug) write(0,*) myrow,name,' swaptran ', info
+    if (debug) write(0,*) me,name,' swaptran ', info
     if(info /= 0) then
       info = 4010
       ch_err='PSI_dSwapTran'
@@ -653,7 +643,7 @@ subroutine  psb_dspmv(alpha,a,x,beta,y,desc_a,info,&
   end if
 
   if (aliw) deallocate(iwork,stat=info)
-  if (debug) write(0,*) myrow,name,' deallocat ',aliw, info
+  if (debug) write(0,*) me,name,' deallocat ',aliw, info
   if(info /= 0) then
     info = 4010
     ch_err='Deallocate iwork'
@@ -664,8 +654,8 @@ subroutine  psb_dspmv(alpha,a,x,beta,y,desc_a,info,&
   nullify(iwork)
 
   call psb_erractionrestore(err_act)
-  if (debug) call blacs_barrier(ictxt,'A')
-  if (debug) write(0,*) myrow,name,' Returning '
+  if (debug) call psb_barrier(ictxt)
+  if (debug) write(0,*) me,name,' Returning '
   return  
 
 9999 continue

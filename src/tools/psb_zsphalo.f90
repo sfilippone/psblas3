@@ -53,6 +53,7 @@ Subroutine psb_zsphalo(a,desc_a,blk,info,rwcnv,clcnv,outfmt)
   use psb_realloc_mod
   use psb_tools_mod, only : psb_glob_to_loc, psb_loc_to_glob
   use psb_error_mod
+  use psb_penv_mod
 
   Implicit None
 
@@ -63,8 +64,8 @@ Subroutine psb_zsphalo(a,desc_a,blk,info,rwcnv,clcnv,outfmt)
   integer, intent(out)                :: info
   logical, optional, intent(in)       :: rwcnv,clcnv
   character(len=5), optional          :: outfmt 
-  !c     ...local scalars....
-  Integer    :: nprow,npcol,me,mycol,counter,proc,n,i,&
+  !     ...local scalars....
+  Integer    :: np,me,counter,proc,n,i,&
        &     n_el_send,k,n_el_recv,ictxt, idx, r, tot_elem,&
        &     n_elem, m, j, ipx,mat_recv, iszs, iszr,&
        &     idxs,idxr, nrv, nsd,nz
@@ -78,7 +79,7 @@ Subroutine psb_zsphalo(a,desc_a,blk,info,rwcnv,clcnv,outfmt)
   real(kind(1.d0)) :: t1,t2,t3,t4,t5,t6,t7,t8,t9
   character(len=20)   :: name, ch_err
 
-  if(psb_get_errstatus().ne.0) return 
+  if(psb_get_errstatus() /= 0) return 
   info=0
   name='psb_zsphalo'
   call psb_erractionsave(err_act)
@@ -102,16 +103,16 @@ Subroutine psb_zsphalo(a,desc_a,blk,info,rwcnv,clcnv,outfmt)
   endif
 
   ictxt=desc_a%matrix_data(psb_ctxt_)
-  Call blacs_gridinfo(ictxt,nprow,npcol,me,mycol)
+  Call psb_info(ictxt, me, np)
 
   t1 = mpi_wtime()
-  Allocate(sdid(nprow,3),rvid(nprow,3),brvindx(nprow+1),&
-       & rvsz(nprow),sdsz(nprow),bsdindx(nprow+1),stat=info)
+  Allocate(sdid(np,3),rvid(np,3),brvindx(np+1),&
+       & rvsz(np),sdsz(np),bsdindx(np+1),stat=info)
 
   if (info /= 0) then
-     info=4000
-     call psb_errpush(info,name)
-     goto 9999
+    info=4000
+    call psb_errpush(info,name)
+    goto 9999
   end if
 
   If (debug) Write(0,*)'dsphalo',me
@@ -142,10 +143,10 @@ Subroutine psb_zsphalo(a,desc_a,blk,info,rwcnv,clcnv,outfmt)
       idx = desc_a%halo_index(counter+psb_elem_send_+j)
       call psb_spinfo(psb_nzrowreq_,a,n_elem,info,iaux=idx)
       if (info /= 0) then
-         info=4010
-         ch_err='psb_spinfo'
-         call psb_errpush(info,name,a_err=ch_err)
-         goto 9999
+        info=4010
+        ch_err='psb_spinfo'
+        call psb_errpush(info,name,a_err=ch_err)
+        goto 9999
       end if
 
       tot_elem = tot_elem+n_elem      
@@ -156,14 +157,14 @@ Subroutine psb_zsphalo(a,desc_a,blk,info,rwcnv,clcnv,outfmt)
 
     counter   = counter+n_el_send+3
   Enddo
-  call blacs_get(ictxt,10,icomm)
-  
+  call psb_get_mpicomm(ictxt,icomm)
+
   call mpi_alltoall(sdsz,1,mpi_integer,rvsz,1,mpi_integer,icomm,info)
   if (info /= 0) then
-     info=4010
-     ch_err='mpi_alltoall'
-     call psb_errpush(info,name,a_err=ch_err)
-     goto 9999
+    info=4010
+    ch_err='mpi_alltoall'
+    call psb_errpush(info,name,a_err=ch_err)
+    goto 9999
   end if
 
   idxs = 0
@@ -187,10 +188,10 @@ Subroutine psb_zsphalo(a,desc_a,blk,info,rwcnv,clcnv,outfmt)
   call psb_sp_reall(blk,max(iszr,1),info)
   if(debug)  write(0,*)me,'SPHALO Sizes:',size(blk%ia1),size(blk%ia2)
   if (info /= 0) then
-     info=4010
-     ch_err='psb_sp_reall'
-     call psb_errpush(info,name,a_err=ch_err)
-     goto 9999
+    info=4010
+    ch_err='psb_sp_reall'
+    call psb_errpush(info,name,a_err=ch_err)
+    goto 9999
   end if
   mat_recv = iszr
   iszs=sum(sdsz)
@@ -218,18 +219,18 @@ Subroutine psb_zsphalo(a,desc_a,blk,info,rwcnv,clcnv,outfmt)
       idx = desc_a%halo_index(counter+psb_elem_send_+j)
       call psb_spinfo(psb_nzrowreq_,a,n_elem,info,iaux=idx)      
       if (info /= 0) then
-         info=4010
-         ch_err='spinfo'
-         call psb_errpush(info,name,a_err=ch_err)
-         goto 9999
+        info=4010
+        ch_err='spinfo'
+        call psb_errpush(info,name,a_err=ch_err)
+        goto 9999
       end if
 !!$      write(0,*) me,'Getting row ',idx,n_elem
       call psb_spgtblk(idx,a,tmp,info,append=.true.)
       if (info /= 0) then
-         info=4010
-         ch_err='psb_spgtblk'
-         call psb_errpush(info,name,a_err=ch_err)
-         goto 9999
+        info=4010
+        ch_err='psb_spgtblk'
+        call psb_errpush(info,name,a_err=ch_err)
+        goto 9999
       end if
       tot_elem=tot_elem+n_elem
     Enddo
@@ -245,10 +246,10 @@ Subroutine psb_zsphalo(a,desc_a,blk,info,rwcnv,clcnv,outfmt)
   if (rwcnv_) call psb_loc_to_glob(tmp%ia1(1:nz),desc_a,info,iact='I')
   if (clcnv_) call psb_loc_to_glob(tmp%ia2(1:nz),desc_a,info,iact='I')
   if (info /= 0) then
-     info=4010
-     ch_err='psb_loc_to_glob'
-     call psb_errpush(info,name,a_err=ch_err)
-     goto 9999
+    info=4010
+    ch_err='psb_loc_to_glob'
+    call psb_errpush(info,name,a_err=ch_err)
+    goto 9999
   end if
 !!$  call csprt(30+me,tmp,head='% SPHALO border SEND .')
 !!$  close(30+me)
@@ -261,10 +262,10 @@ Subroutine psb_zsphalo(a,desc_a,blk,info,rwcnv,clcnv,outfmt)
   call mpi_alltoallv(tmp%ia2,sdsz,bsdindx,mpi_integer,&
        & blk%ia2,rvsz,brvindx,mpi_integer,icomm,info)
   if (info /= 0) then
-     info=4010
-     ch_err='mpi_alltoallv'
-     call psb_errpush(info,name,a_err=ch_err)
-     goto 9999
+    info=4010
+    ch_err='mpi_alltoallv'
+    call psb_errpush(info,name,a_err=ch_err)
+    goto 9999
   end if
 
   t3 = mpi_wtime()
@@ -276,12 +277,12 @@ Subroutine psb_zsphalo(a,desc_a,blk,info,rwcnv,clcnv,outfmt)
   if (rwcnv_) call psb_glob_to_loc(blk%ia1(1:iszr),desc_a,info,iact='I')
   if (clcnv_) call psb_glob_to_loc(blk%ia2(1:iszr),desc_a,info,iact='I')
   if (info /= 0) then
-     info=4010
-     ch_err='psbglob_to_loc'
-     call psb_errpush(info,name,a_err=ch_err)
-     goto 9999
+    info=4010
+    ch_err='psbglob_to_loc'
+    call psb_errpush(info,name,a_err=ch_err)
+    goto 9999
   end if
-  
+
   l1  = 0
   Do i=1,iszr
 !!$      write(0,*) work5(i),work6(i)
@@ -313,12 +314,12 @@ Subroutine psb_zsphalo(a,desc_a,blk,info,rwcnv,clcnv,outfmt)
   case ('CSR') 
     call psb_ipcoo2csr(blk,info,rwshr=.true.)
     if (info /= 0) then
-       info=4010
-       ch_err='psb_ipcoo2csr'
-       call psb_errpush(info,name,a_err=ch_err)
-       goto 9999
+      info=4010
+      ch_err='psb_ipcoo2csr'
+      call psb_errpush(info,name,a_err=ch_err)
+      goto 9999
     end if
- case('COO')
+  case('COO')
     ! Do nothing! 
   case default
     write(0,*) 'Error in DSPHALO : invalid outfmt "',outfmt_,'"'
@@ -335,20 +336,20 @@ Subroutine psb_zsphalo(a,desc_a,blk,info,rwcnv,clcnv,outfmt)
 
   call psb_sp_free(tmp,info)
   if (info /= 0) then
-     info=4010
-     ch_err='psb_sp_free'
-     call psb_errpush(info,name,a_err=ch_err)
-     goto 9999
+    info=4010
+    ch_err='psb_sp_free'
+    call psb_errpush(info,name,a_err=ch_err)
+    goto 9999
   end if
-  
+
   call psb_erractionrestore(err_act)
   return
-  
+
 9999 continue
   call psb_erractionrestore(err_act)
-  if (err_act.eq.act_abort) then
-     call psb_error(ictxt)
-     return
+  if (err_act == act_abort) then
+    call psb_error(ictxt)
+    return
   end if
   return
 

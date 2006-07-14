@@ -42,6 +42,7 @@ subroutine psb_ifree(x, desc_a, info)
   use psb_const_mod
   use psb_descriptor_type
   use psb_error_mod
+  use psb_penv_mod
   implicit none
 
   !....parameters...
@@ -51,12 +52,11 @@ subroutine psb_ifree(x, desc_a, info)
   
   !...locals....
   integer             :: int_err(5)
-  integer             :: temp(1)
-  real(kind(1.d0))    :: real_err(5)
-  integer             :: ictxt,nprow,npcol,me,mypcol,err_act
-  character(len=20)   :: name, ch_err
+  integer             :: ictxt,np,npcol,me,mypcol,err, err_act
+  character(len=20)   :: name
 
-  if(psb_get_errstatus().ne.0) return 
+
+  if(psb_get_errstatus() /= 0) return 
   info=0
   call psb_erractionsave(err_act)
   name = 'psb_ifree'
@@ -68,17 +68,13 @@ subroutine psb_ifree(x, desc_a, info)
   end if
 
   ictxt=desc_a%matrix_data(psb_ctxt_)
-  call blacs_gridinfo(ictxt, nprow, npcol, me, mypcol)
-     !     ....verify blacs grid correctness..
-  if (nprow.eq.-1) then
-     info = 2010
-     call psb_errpush(info,name)
-     goto 9999
-  else if (npcol.ne.1) then
-     info = 2030
-     int_err(1) = npcol
-     call psb_errpush(info,name,int_err)
-     goto 9999
+
+  call psb_info(ictxt, me, np)
+  !     ....verify blacs grid correctness..
+  if (np == -1) then
+    info = 2010
+    call psb_errpush(info,name)
+    goto 9999
   endif
 
   if (.not.associated(x)) then
@@ -102,7 +98,7 @@ subroutine psb_ifree(x, desc_a, info)
 
 9999 continue
   call psb_erractionrestore(err_act)
-  if (err_act.eq.act_abort) then
+  if (err_act == act_abort) then
      call psb_error(ictxt)
      return
   end if
@@ -154,6 +150,8 @@ subroutine psb_ifreev(x, desc_a,info)
   use psb_const_mod
   use psb_descriptor_type
   use psb_error_mod
+  use psb_penv_mod
+
   implicit none
   !....parameters...
   integer, pointer                :: x(:)
@@ -161,12 +159,11 @@ subroutine psb_ifreev(x, desc_a,info)
   integer, intent(out)            :: info 
   !...locals....
   integer             :: int_err(5)
-  integer             :: temp(1)
-  real(kind(1.d0))    :: real_err(5)
-  integer             :: ictxt,nprow,npcol,me,mypcol,err_act
-  character(len=20)   :: name, ch_err
+  integer             :: ictxt,np,npcol,me,mypcol,err, err_act
+  character(len=20)   :: name
 
-  if(psb_get_errstatus().ne.0) return 
+
+  if(psb_get_errstatus() /= 0) return 
   info=0
   call psb_erractionsave(err_act)
   name = 'psb_ifreev'
@@ -177,33 +174,27 @@ subroutine psb_ifreev(x, desc_a,info)
      call psb_errpush(info,name)
      return
   end if
-
   ictxt=desc_a%matrix_data(psb_ctxt_)
-  call blacs_gridinfo(ictxt, nprow, npcol, me, mypcol)
-     !     ....verify blacs grid correctness..
-  if (nprow.eq.-1) then
-     info = 2010
-     call psb_errpush(info,name)
-     goto 9999
-  else if (npcol.ne.1) then
-     info = 2030
-     int_err(1) = npcol
-     call psb_errpush(info,name,int_err)
-     goto 9999
+
+  call psb_info(ictxt, me, np)
+  !     ....verify blacs grid correctness..
+  if (np == -1) then
+    info = 2010
+    call psb_errpush(info,name)
+    goto 9999
   endif
 
   if (.not.associated(x)) then
-     info=290
-     call psb_errpush(info,name,int_err)
-     goto 9999
+    info=295
+    call psb_errpush(info,name)
+    goto 9999
   end if
   
   !deallocate x
   deallocate(x,stat=info)
-  if (info.ne.0) then 
-     info=2045
-     call psb_errpush(info,name,int_err)
-     goto 9999
+  if (info /= no_err) then
+    info=4000
+    call psb_errpush(info,name)
   else
      nullify(x)
   endif
@@ -213,7 +204,7 @@ subroutine psb_ifreev(x, desc_a,info)
 
 9999 continue
   call psb_erractionrestore(err_act)
-  if (err_act.eq.act_abort) then
+  if (err_act == act_abort) then
      call psb_error(ictxt)
      return
   end if

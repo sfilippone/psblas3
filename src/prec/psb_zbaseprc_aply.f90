@@ -46,6 +46,7 @@ subroutine psb_zbaseprc_aply(prec,x,beta,y,desc_data,trans,work,info)
   use psb_psblas_mod
   use psb_const_mod
   use psb_error_mod
+  use psb_penv_mod
   implicit none 
 
   type(psb_desc_type),intent(in)      :: desc_data
@@ -60,7 +61,7 @@ subroutine psb_zbaseprc_aply(prec,x,beta,y,desc_data,trans,work,info)
   integer :: n_row,n_col, int_err(5)
   complex(kind(1.d0)), pointer :: ww(:), aux(:), tx(:),ty(:)
   character     ::diagl, diagu
-  integer :: ictxt,nprow,npcol,me,mycol,i, isz, nrg, err_act
+  integer :: ictxt,np,npcol,me,mycol,i, isz, nrg, err_act
   real(kind(1.d0)) :: t1, t2, t3, t4, t5, t6, t7, mpi_wtime
   logical,parameter                 :: debug=.false., debugprt=.false.
   external mpi_wtime
@@ -85,7 +86,7 @@ subroutine psb_zbaseprc_aply(prec,x,beta,y,desc_data,trans,work,info)
   call psb_erractionsave(err_act)
 
   ictxt=desc_data%matrix_data(psb_ctxt_)
-  call blacs_gridinfo(ictxt,nprow,npcol,me,mycol)
+  call psb_info(ictxt, me, np)
 
   diagl='U'
   diagu='U'

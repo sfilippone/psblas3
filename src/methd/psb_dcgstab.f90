@@ -82,6 +82,7 @@ Subroutine psb_dcgstab(a,prec,b,x,eps,desc_a,info,&
   use psb_const_mod
   use psb_prec_mod
   use psb_error_mod
+  use psb_penv_mod
   Implicit None
 !!$  parameters 
   Type(psb_dspmat_type), Intent(in)  :: a
@@ -101,7 +102,7 @@ Subroutine psb_dcgstab(a,prec,b,x,eps,desc_a,info,&
   Integer, Pointer           :: iperm(:), ipnull(:), ipsave(:)
   Real(Kind(1.d0)) ::rerr
   Integer       ::litmax, liter, naux, m, mglob, it,itrace_,&
-       & nprows,npcols,myrow,mycol, n_row, n_col
+       & np,me, n_row, n_col
   Character     ::diagl, diagu
   Logical, Parameter :: debug = .false.
   Logical, Parameter :: exchange=.True., noexchange=.False., debug1 = .False.
@@ -121,8 +122,8 @@ Subroutine psb_dcgstab(a,prec,b,x,eps,desc_a,info,&
 
   If (debug) Write(*,*) 'Entering PSB_DCGSTAB',present(istop)
   ictxt = desc_a%matrix_data(psb_ctxt_)
-  CALL blacs_gridinfo(ictxt,nprows,npcols,myrow,mycol)
-  if (debug) write(*,*) 'PSB_DCGSTAB: From GRIDINFO',nprows,npcols,myrow
+  call psb_info(ictxt, me, np)
+  if (debug) write(*,*) 'PSB_DCGSTAB: From GRIDINFO',np,me
 
   mglob = desc_a%matrix_data(psb_m_)
   n_row = desc_a%matrix_data(psb_n_row_)
@@ -246,7 +247,7 @@ Subroutine psb_dcgstab(a,prec,b,x,eps,desc_a,info,&
     End If
     If (rn0 == 0.d0 ) Then 
       If (itrace_ > 0 ) Then 
-        If (myrow == 0) Write(*,*) 'BiCGSTAB: ',itx,rn0
+        If (me == 0) Write(*,*) 'BiCGSTAB: ',itx,rn0
       Endif
       Exit restart
     End If
@@ -268,7 +269,7 @@ Subroutine psb_dcgstab(a,prec,b,x,eps,desc_a,info,&
     End If
     
     If (itrace_ > 0) then 
-      if (((itx==0).or.(mod(itx,itrace_)==0)).and.(myrow == 0)) &
+      if (((itx==0).or.(mod(itx,itrace_)==0)).and.(me == 0)) &
            & write(*,'(a,i4,3(2x,es10.4))') 'bicgstab: ',itx,rerr
     Endif
 
@@ -278,9 +279,7 @@ Subroutine psb_dcgstab(a,prec,b,x,eps,desc_a,info,&
       If (debug) Write(*,*) 'Iteration: ',itx
       rho_old = rho    
       rho = psb_gedot(q,r,desc_a,info)
-!!$    call blacs_barrier(ictxt,'All') ! to be removed
-!!$      write(0,'(i2," rho old ",2(f,2x))')myrow,rho,rho_old
-!!$    call blacs_barrier(ictxt,'All') ! to be removed
+!!$      write(0,'(i2," rho old ",2(f,2x))')me,rho,rho_old
       If (rho==dzero) Then
          If (debug) Write(0,*) 'Bi-CGSTAB Itxation breakdown R',rho
         Exit iteration
@@ -366,7 +365,7 @@ Subroutine psb_dcgstab(a,prec,b,x,eps,desc_a,info,&
       If (itx.Ge.litmax) Exit restart
 
       If (itrace_ > 0) then 
-        if ((mod(itx,itrace_)==0).and.(myrow == 0)) &
+        if ((mod(itx,itrace_)==0).and.(me == 0)) &
              & write(*,'(a,i4,3(2x,es10.4)))') &
              & 'bicgstab: ',itx,rerr
       Endif
@@ -375,7 +374,7 @@ Subroutine psb_dcgstab(a,prec,b,x,eps,desc_a,info,&
   End Do restart
 
   If (itrace_ > 0) then 
-    if (myrow == 0) write(*,'(a,i4,3(2x,es10.4))') 'bicgstab: ',itx,rerr
+    if (me == 0) write(*,'(a,i4,3(2x,es10.4))') 'bicgstab: ',itx,rerr
   Endif
   
   If (Present(err)) err=rerr

@@ -55,6 +55,7 @@ Subroutine psb_dcdovrbld(n_ovr,desc_p,desc_a,a,&
   use psb_tools_mod, only : psb_cdprt
   use psb_error_mod
   use psb_const_mod
+  use psb_penv_mod
   Implicit None
 
   include 'mpif.h'
@@ -73,7 +74,7 @@ Subroutine psb_dcdovrbld(n_ovr,desc_p,desc_a,a,&
   Integer, Pointer :: tmp_halo(:),tmp_ovr_idx(:)
 
   Integer :: counter,counter_h, counter_o, counter_e,j,idx,gidx,proc,n_elem_recv,&
-       & n_elem_send,tot_recv,tot_elem,n_col,m,ictxt,np,npcol,myrow,mycol,dl_lda,lwork,&
+       & n_elem_send,tot_recv,tot_elem,n_col,m,ictxt,np,npcol,me,mycol,dl_lda,lwork,&
        & counter_t,n_elem,i_ovr,jj,n,i,proc_id,isz, mglob, glx,n_row, &
        & idxr, idxs, lx, iszs, iszr, err_act
 
@@ -94,8 +95,9 @@ Subroutine psb_dcdovrbld(n_ovr,desc_p,desc_a,a,&
 
   If(debug) Write(0,*)'cdovrbld begin'
   ictxt = desc_a%matrix_data(psb_ctxt_)
-!!$  call blacs_barrier(ictxt,'All')
-  Call blacs_gridinfo(ictxt,np,npcol,myrow,mycol)
+
+  Call psb_info(ictxt,me,np)
+
   call psb_nullify_sp(blk)
 
   Allocate(brvindx(np+1),rvsz(np),sdsz(np),bsdindx(np+1),stat=info)
@@ -106,13 +108,13 @@ Subroutine psb_dcdovrbld(n_ovr,desc_p,desc_a,a,&
   tl = 0.0
   tch = 0.0
   t4 = 0.0
-  call blacs_get(ictxt,10,icomm )
+  call psb_get_mpicomm(ictxt,icomm )
 
   mglob = desc_a%matrix_data(psb_m_)
   m     = desc_a%matrix_data(psb_n_row_)
   n_row = desc_a%matrix_data(psb_n_row_)
   n_col = desc_a%matrix_data(psb_n_col_)
-  if (debug) write(0,*) myrow,' On entry to CDOVRBLD n_col:',n_col
+  if (debug) write(0,*) me,' On entry to CDOVRBLD n_col:',n_col
 
   dl_lda=np*5
   lwork=5*(5*np+2)*np+10
@@ -127,10 +129,10 @@ Subroutine psb_dcdovrbld(n_ovr,desc_p,desc_a,a,&
 
   call psb_sp_all(blk,max(lworks,lworkr),info)
   if (info /= 0) then
-     info=4010
-     ch_err='psb_sp_all'
-     call psb_errpush(info,name,a_err=ch_err)
-     goto 9999
+    info=4010
+    ch_err='psb_sp_all'
+    call psb_errpush(info,name,a_err=ch_err)
+    goto 9999
   end if
 
   blk%fida='COO'
@@ -153,12 +155,12 @@ Subroutine psb_dcdovrbld(n_ovr,desc_p,desc_a,a,&
   ! See comment in main loop below.
   call InitPairSearchTree(info)
   if (info /= 0) then
-     info=4010
-     ch_err='InitPairSearhTree'
-     call psb_errpush(info,name,a_err=ch_err)
-     goto 9999
+    info=4010
+    ch_err='InitPairSearhTree'
+    call psb_errpush(info,name,a_err=ch_err)
+    goto 9999
   end if
-  if (debug) write(0,*) myrow,'Done InitPairSearchTree',info
+  if (debug) write(0,*) me,'Done InitPairSearchTree',info
 
   !
   ! A picture is in order to understand what goes on here.
@@ -182,438 +184,438 @@ Subroutine psb_dcdovrbld(n_ovr,desc_p,desc_a,a,&
   !
   Do i_ovr=1,n_ovr
 
-     if (debug) write(0,*) myrow,'Running on overlap level ',i_ovr,' of ',n_ovr
+    if (debug) write(0,*) me,'Running on overlap level ',i_ovr,' of ',n_ovr
 !!$    t_halo_in(:) = -1
 
-     !
-     ! At this point, halo contains a valid halo corresponding to the
-     ! matrix enlarged with the elements in the frontier for I_OVR-1.
-     ! At the start, this is just the halo for A; the rows for indices in
-     ! the first halo will contain column indices defining the second halo
-     ! level and so on.
-     !
-     bsdindx(:) = 0
-     sdsz(:)    = 0
-     brvindx(:) = 0
-     rvsz(:)    = 0
-     idxr       = 0
-     idxs       = 0
-     counter      = 1
-     counter_t    = 1
+    !
+    ! At this point, halo contains a valid halo corresponding to the
+    ! matrix enlarged with the elements in the frontier for I_OVR-1.
+    ! At the start, this is just the halo for A; the rows for indices in
+    ! the first halo will contain column indices defining the second halo
+    ! level and so on.
+    !
+    bsdindx(:) = 0
+    sdsz(:)    = 0
+    brvindx(:) = 0
+    rvsz(:)    = 0
+    idxr       = 0
+    idxs       = 0
+    counter      = 1
+    counter_t    = 1
 
-     t1 = mpi_wtime()
-     Do While (halo(counter) /= -1)
-        tot_elem=0
-        proc=halo(counter+psb_proc_id_)
-        n_elem_recv=halo(counter+psb_n_elem_recv_)
-        n_elem_send=halo(counter+n_elem_recv+psb_n_elem_send_)
-        If ((counter+n_elem_recv+n_elem_send) > Size(halo)) then
-           info=-1
-           call psb_errpush(info,name)
-           goto 9999
-        end If
-        tot_recv=tot_recv+n_elem_recv
-        if (debug) write(0,*) myrow,' CDOVRBLD tot_recv:',proc,n_elem_recv,tot_recv
-        !
-        ! While running through the column indices exchanged with other procs
-        ! we have to keep track of which elements actually are overlap and halo 
-        ! ones to record them in overlap_elem.  We do this by maintaining  
-        ! an AVL balanced search tree: at each point counter_e is the next
-        ! free index element. The search routine for gidx will return
-        ! glx if gidx was already assigned a local index (glx<counter_e)
-        ! but if gidx was a new index for this process, then it creates
-        ! a new pair (gidx,counter_e), and glx==counter_e. In this case we
-        ! need to record this for the overlap exchange. In the first iteration
-        ! this gets filled with the first halo indices.
-        !
-        ! The format of the halo vector exists in two forms: 1. Temporary 
-        ! 2. Assembled. In this loop we are using the (assembled) halo_in and 
-        ! copying it into (temporary) tmp_halo; this is because tmp_halo will
-        ! be enlarged with the new column indices received, and will reassemble
-        ! everything for the next iteration.
-        ! 
+    t1 = mpi_wtime()
+    Do While (halo(counter) /= -1)
+      tot_elem=0
+      proc=halo(counter+psb_proc_id_)
+      n_elem_recv=halo(counter+psb_n_elem_recv_)
+      n_elem_send=halo(counter+n_elem_recv+psb_n_elem_send_)
+      If ((counter+n_elem_recv+n_elem_send) > Size(halo)) then
+        info=-1
+        call psb_errpush(info,name)
+        goto 9999
+      end If
+      tot_recv=tot_recv+n_elem_recv
+      if (debug) write(0,*) me,' CDOVRBLD tot_recv:',proc,n_elem_recv,tot_recv
+      !
+      ! While running through the column indices exchanged with other procs
+      ! we have to keep track of which elements actually are overlap and halo 
+      ! ones to record them in overlap_elem.  We do this by maintaining  
+      ! an AVL balanced search tree: at each point counter_e is the next
+      ! free index element. The search routine for gidx will return
+      ! glx if gidx was already assigned a local index (glx<counter_e)
+      ! but if gidx was a new index for this process, then it creates
+      ! a new pair (gidx,counter_e), and glx==counter_e. In this case we
+      ! need to record this for the overlap exchange. In the first iteration
+      ! this gets filled with the first halo indices.
+      !
+      ! The format of the halo vector exists in two forms: 1. Temporary 
+      ! 2. Assembled. In this loop we are using the (assembled) halo_in and 
+      ! copying it into (temporary) tmp_halo; this is because tmp_halo will
+      ! be enlarged with the new column indices received, and will reassemble
+      ! everything for the next iteration.
+      ! 
 
 !!$      if (me==0) Write(0,*)'Loop ',size(halo), counter, n_elem_recv,n_elem_send 
-        t3 = mpi_wtime()
-        !
-        ! add recv elements in halo_index into ovrlap_index
-        !
-        Do j=0,n_elem_recv-1
-           If((counter+psb_elem_recv_+j)>Size(halo)) then 
-              info=-2
-              call psb_errpush(info,name)
-              goto 9999
-           end If
-           idx = halo(counter+psb_elem_recv_+j)
-           idx = halo(counter+psb_elem_recv_+j)
-           If(idx > Size(desc_p%loc_to_glob)) then 
-              info=-3
-              call psb_errpush(info,name)
-              goto 9999
-           endif
+      t3 = mpi_wtime()
+      !
+      ! add recv elements in halo_index into ovrlap_index
+      !
+      Do j=0,n_elem_recv-1
+        If((counter+psb_elem_recv_+j)>Size(halo)) then 
+          info=-2
+          call psb_errpush(info,name)
+          goto 9999
+        end If
+        idx = halo(counter+psb_elem_recv_+j)
+        idx = halo(counter+psb_elem_recv_+j)
+        If(idx > Size(desc_p%loc_to_glob)) then 
+          info=-3
+          call psb_errpush(info,name)
+          goto 9999
+        endif
 
-           gidx = desc_p%loc_to_glob(idx)
+        gidx = desc_p%loc_to_glob(idx)
 
-           If((counter_o+2) > Size(tmp_ovr_idx)) Then
-              isz = max((3*Size(tmp_ovr_idx))/2,(counter_o+3))
-              if (debug) write(0,*) myrow,'Realloc tmp_ovr',isz
-              call psb_realloc(isz,tmp_ovr_idx,info,pad=-1)
-              if (info /= 0) then
-                 info=4010
-                 ch_err='psb_realloc'
-                 call psb_errpush(info,name,a_err=ch_err)
-                 goto 9999
-              end if
-           End If
+        If((counter_o+2) > Size(tmp_ovr_idx)) Then
+          isz = max((3*Size(tmp_ovr_idx))/2,(counter_o+3))
+          if (debug) write(0,*) me,'Realloc tmp_ovr',isz
+          call psb_realloc(isz,tmp_ovr_idx,info,pad=-1)
+          if (info /= 0) then
+            info=4010
+            ch_err='psb_realloc'
+            call psb_errpush(info,name,a_err=ch_err)
+            goto 9999
+          end if
+        End If
 
-           tmp_ovr_idx(counter_o)=proc
-           tmp_ovr_idx(counter_o+1)=1
-           tmp_ovr_idx(counter_o+2)=gidx
-           tmp_ovr_idx(counter_o+3)=-1
-           counter_o=counter_o+3
+        tmp_ovr_idx(counter_o)=proc
+        tmp_ovr_idx(counter_o+1)=1
+        tmp_ovr_idx(counter_o+2)=gidx
+        tmp_ovr_idx(counter_o+3)=-1
+        counter_o=counter_o+3
 
-           If((counter_h+2) > Size(tmp_halo)) Then
-              isz = max((3*Size(tmp_halo))/2,(counter_h+3))
-              if (debug) write(0,*) myrow,'Realloc tmp_halo',isz
-              call psb_realloc(isz,tmp_halo,info)
-              if (info /= 0) then
-                 info=4010
-                 ch_err='psb_realloc'
-                 call psb_errpush(info,name,a_err=ch_err)
-                 goto 9999
-              end if
-           End If
+        If((counter_h+2) > Size(tmp_halo)) Then
+          isz = max((3*Size(tmp_halo))/2,(counter_h+3))
+          if (debug) write(0,*) me,'Realloc tmp_halo',isz
+          call psb_realloc(isz,tmp_halo,info)
+          if (info /= 0) then
+            info=4010
+            ch_err='psb_realloc'
+            call psb_errpush(info,name,a_err=ch_err)
+            goto 9999
+          end if
+        End If
 
-           tmp_halo(counter_h)=proc
-           tmp_halo(counter_h+1)=1
-           tmp_halo(counter_h+2)=idx
-           tmp_halo(counter_h+3)=-1
+        tmp_halo(counter_h)=proc
+        tmp_halo(counter_h+1)=1
+        tmp_halo(counter_h+2)=idx
+        tmp_halo(counter_h+3)=-1
 
-           counter_h=counter_h+3
+        counter_h=counter_h+3
 
-           call SearchInsKeyVal(gidx,counter_e,glx,info)
+        call SearchInsKeyVal(gidx,counter_e,glx,info)
 !!$        if (debug) write(0,*) 'From searchInsKey ',gidx,glx,counter_e,info
-           if (info>=0) then
-              If (glx < counter_e)  Then
-                 desc_p%ovrlap_elem(glx+psb_n_dom_ovr_)= &
-                      &                 desc_p%ovrlap_elem(glx+psb_n_dom_ovr_)+1
-              Else
-                 If((counter_e+2) > Size(desc_p%ovrlap_elem)) Then
-                    isz = max((3*Size(desc_p%ovrlap_elem))/2,(counter_e+3))
-                    if (debug) write(0,*) myrow,'Realloc ovr_El',isz
-                    call psb_realloc(isz,desc_p%ovrlap_elem,info)
-                    if (info /= 0) then
-                       info=4010
-                       ch_err='psrealloc'
-                       call psb_errpush(info,name,a_err=ch_err)
-                       goto 9999
-                    end if
-                 End If
+        if (info>=0) then
+          If (glx < counter_e)  Then
+            desc_p%ovrlap_elem(glx+psb_n_dom_ovr_)= &
+                 &                 desc_p%ovrlap_elem(glx+psb_n_dom_ovr_)+1
+          Else
+            If((counter_e+2) > Size(desc_p%ovrlap_elem)) Then
+              isz = max((3*Size(desc_p%ovrlap_elem))/2,(counter_e+3))
+              if (debug) write(0,*) me,'Realloc ovr_El',isz
+              call psb_realloc(isz,desc_p%ovrlap_elem,info)
+              if (info /= 0) then
+                info=4010
+                ch_err='psrealloc'
+                call psb_errpush(info,name,a_err=ch_err)
+                goto 9999
+              end if
+            End If
 !!$            if (debug) write(0,*) 'Adding into ovrlap ',gidx,glx,counter_e,info
 
-                 desc_p%ovrlap_elem(counter_e)=gidx
-                 desc_p%ovrlap_elem(counter_e+psb_n_dom_ovr_)=2
-                 desc_p%ovrlap_elem(counter_e+2)=-1
-                 counter_e  = counter_e + 2
-              End If
-           else
-              write(0,*) myrow, 'Cdovrbld From SearchInsKeyVal: ',info
-           endif
-        Enddo
-        if (debug) write(0,*) myrow,'Checktmp_o_i Loop Mid1',tmp_ovr_idx(1:10)
-        counter   = counter+n_elem_recv
+            desc_p%ovrlap_elem(counter_e)=gidx
+            desc_p%ovrlap_elem(counter_e+psb_n_dom_ovr_)=2
+            desc_p%ovrlap_elem(counter_e+2)=-1
+            counter_e  = counter_e + 2
+          End If
+        else
+          write(0,*) me, 'Cdovrbld From SearchInsKeyVal: ',info
+        endif
+      Enddo
+      if (debug) write(0,*) me,'Checktmp_o_i Loop Mid1',tmp_ovr_idx(1:10)
+      counter   = counter+n_elem_recv
 
-        !
-        ! add send elements in halo_index into ovrlap_index
-        !
-        Do j=0,n_elem_send-1
+      !
+      ! add send elements in halo_index into ovrlap_index
+      !
+      Do j=0,n_elem_send-1
 
-           idx = halo(counter+psb_elem_send_+j)
-           gidx = desc_p%loc_to_glob(idx)
+        idx = halo(counter+psb_elem_send_+j)
+        gidx = desc_p%loc_to_glob(idx)
 
-           If((counter_o+2) > Size(tmp_ovr_idx)) Then
-              isz = max((3*Size(tmp_ovr_idx))/2,(counter_o+3))
-              if (debug) write(0,*) myrow,'Realloc tmp_ovr',isz
-              call psb_realloc(isz,tmp_ovr_idx,info)
-              if (info /= 0) then
-                 info=4010
-                 ch_err='psrealloc'
-                 call psb_errpush(info,name,a_err=ch_err)
-                 goto 9999
-              end if
-           End If
+        If((counter_o+2) > Size(tmp_ovr_idx)) Then
+          isz = max((3*Size(tmp_ovr_idx))/2,(counter_o+3))
+          if (debug) write(0,*) me,'Realloc tmp_ovr',isz
+          call psb_realloc(isz,tmp_ovr_idx,info)
+          if (info /= 0) then
+            info=4010
+            ch_err='psrealloc'
+            call psb_errpush(info,name,a_err=ch_err)
+            goto 9999
+          end if
+        End If
 
-           tmp_ovr_idx(counter_o)=proc
-           tmp_ovr_idx(counter_o+1)=1
-           tmp_ovr_idx(counter_o+2)=gidx
-           tmp_ovr_idx(counter_o+3)=-1
-           counter_o=counter_o+3
+        tmp_ovr_idx(counter_o)=proc
+        tmp_ovr_idx(counter_o+1)=1
+        tmp_ovr_idx(counter_o+2)=gidx
+        tmp_ovr_idx(counter_o+3)=-1
+        counter_o=counter_o+3
 
-           call SearchInsKeyVal(gidx,counter_e,glx,info)
+        call SearchInsKeyVal(gidx,counter_e,glx,info)
 !!$          if (debug) write(0,*) 'From searchInsKey ',gidx,glx,counter_e,info
-           if (info>=0) then
-              If (glx < counter_e)  Then
-                 desc_p%ovrlap_elem(glx+psb_n_dom_ovr_)= &
-                      &                 desc_p%ovrlap_elem(glx+psb_n_dom_ovr_)+1
-              Else
-                 If((counter_e+2) > Size(desc_p%ovrlap_elem)) Then
-                    isz = max((3*Size(desc_p%ovrlap_elem))/2,(counter_e+3))
-                    if (debug) write(0,*) myrow,'Realloc ovr_el',isz
-                    call psb_realloc(isz,desc_p%ovrlap_elem,info)
-                    if (info /= 0) then
-                       info=4010
-                       ch_err='psb_realloc'
-                       call psb_errpush(info,name,a_err=ch_err)
-                       goto 9999
-                    end if
-                 End If
+        if (info>=0) then
+          If (glx < counter_e)  Then
+            desc_p%ovrlap_elem(glx+psb_n_dom_ovr_)= &
+                 &                 desc_p%ovrlap_elem(glx+psb_n_dom_ovr_)+1
+          Else
+            If((counter_e+2) > Size(desc_p%ovrlap_elem)) Then
+              isz = max((3*Size(desc_p%ovrlap_elem))/2,(counter_e+3))
+              if (debug) write(0,*) me,'Realloc ovr_el',isz
+              call psb_realloc(isz,desc_p%ovrlap_elem,info)
+              if (info /= 0) then
+                info=4010
+                ch_err='psb_realloc'
+                call psb_errpush(info,name,a_err=ch_err)
+                goto 9999
+              end if
+            End If
 !!$            if (debug) write(0,*) 'Adding into ovrlap ',gidx,glx,counter_e,info
-                 desc_p%ovrlap_elem(counter_e)=gidx
-                 desc_p%ovrlap_elem(counter_e+psb_n_dom_ovr_)=2
-                 desc_p%ovrlap_elem(counter_e+2)=-1
-                 counter_e  = counter_e + 2
-              End If
-           else
-              write(0,*) myrow,'Cdovrbld From SearchInsKeyVal: ',info
-           endif
+            desc_p%ovrlap_elem(counter_e)=gidx
+            desc_p%ovrlap_elem(counter_e+psb_n_dom_ovr_)=2
+            desc_p%ovrlap_elem(counter_e+2)=-1
+            counter_e  = counter_e + 2
+          End If
+        else
+          write(0,*) me,'Cdovrbld From SearchInsKeyVal: ',info
+        endif
 
-           !
-           ! Prepare to exchange the halo rows with the other proc.
-           !
-           If (i_ovr < (n_ovr)) Then
-              call psb_spinfo(psb_nzrowreq_,a,n_elem,info,iaux=idx)
-              if (info /= 0) then
-                 info=4010
-                 ch_err='psb_spinfo'
-                 call psb_errpush(info,name,a_err=ch_err)
-                 goto 9999
-              end if
+        !
+        ! Prepare to exchange the halo rows with the other proc.
+        !
+        If (i_ovr < (n_ovr)) Then
+          call psb_spinfo(psb_nzrowreq_,a,n_elem,info,iaux=idx)
+          if (info /= 0) then
+            info=4010
+            ch_err='psb_spinfo'
+            call psb_errpush(info,name,a_err=ch_err)
+            goto 9999
+          end if
 
-              If((idxs+tot_elem+n_elem) > lworks) Then
-                 isz = max((3*lworks)/2,(idxs+tot_elem+n_elem))
-                 if (debug) write(0,*) myrow,'Realloc works',isz
-                 call psb_realloc(isz,works,info)
-                 if (info /= 0) then
-                    info=4010
-                    ch_err='psb_realloc'
-                    call psb_errpush(info,name,a_err=ch_err)
-                    goto 9999
-                 end if
-                 lworks = isz
-              End If
-              If((n_elem) > size(blk%ia2)) Then
-                 isz = max((3*size(blk%ia2))/2,(n_elem))
-                 if (debug) write(0,*) myrow,'Realloc blk',isz
-                 call psb_sp_reall(blk,isz,info)
-                 if (info /= 0) then
-                    info=4010
-                    ch_err='psb_sp_reall'
-                    call psb_errpush(info,name,a_err=ch_err)
-                    goto 9999
-                 end if
-              End If
-
-              call psb_spgtblk(idx,a,blk,info)
-              if (info /= 0) then
-                 info=4010
-                 ch_err='psb_spgtblk'
-                 call psb_errpush(info,name,a_err=ch_err)
-                 goto 9999
-              end if
-
-              Do jj=1,n_elem
-                 works(idxs+tot_elem+jj)=desc_p%loc_to_glob(blk%ia2(jj))
-              End Do
-              tot_elem=tot_elem+n_elem
-           End If
-
-        Enddo
-
-        t4 = t4 + mpi_wtime() -t3
-
-        if (i_ovr < n_ovr) then 
-           if (tot_elem > 1) then 
-!!$          write(0,*) me,'Realloc temp',tot_elem+2
-              if (tot_elem+2 > size(temp)) then 
-!!$            write(0,*) me,'Realloc temp',tot_elem+2
-                 deallocate(temp)
-                 allocate(temp(tot_elem+2),stat=info)   
-                 if (info /= 0) then 
-                   call psb_errpush(4010,name,a_err='Allocate')
-                   goto 9999      
-                 end if
-              endif
-              Call mrgsrt(tot_elem,works(idxs+1),temp,info)
-              If (info.Eq.0) Call ireordv1(tot_elem,works(idxs+1),temp)
-              lx = works(idxs+1)
-              i = 1 
-              j = 1
-              do 
-                 j = j + 1 
-                 if (j > tot_elem) exit
-                 if (works(idxs+j) /= lx) then 
-                    i = i + 1
-                    works(idxs+i) = works(idxs+j) 
-                    lx = works(idxs+i) 
-                 end if
-              end do
-              tot_elem = i
-           endif
-           if (debug) write(0,*) myrow,'Checktmp_o_i Loop Mid2',tmp_ovr_idx(1:10)
-           sdsz(proc+1) = tot_elem
-           idxs         = idxs + tot_elem
-        end if
-        counter   = counter+n_elem_send+3
-        if (debug) write(0,*) myrow,'Checktmp_o_i Loop End',tmp_ovr_idx(1:10)
-     Enddo
-     if (debug) write(0,*)myrow,'End phase 1 CDOVRBLD', m, n_col, tot_recv
-
-     if (i_ovr < n_ovr) then
-        ! 
-        ! Exchange data requests with everybody else: so far we have 
-        ! accumulated RECV requests, we have an all-to-all to build
-        ! matchings SENDs.
-        !       
-        call mpi_alltoall(sdsz,1,mpi_integer,rvsz,1,mpi_integer,icomm,info)
-        if (info /= 0) then
-           info=4010
-           ch_err='mpi_alltoall'
-           call psb_errpush(info,name,a_err=ch_err)
-           goto 9999
-        end if
-        idxs = 0
-        idxr = 0
-        counter = 1
-        Do 
-           proc=halo(counter)
-           if (proc == -1) exit
-           n_elem_recv = halo(counter+psb_n_elem_recv_)
-           counter     = counter+n_elem_recv
-           n_elem_send = halo(counter+psb_n_elem_send_)
-
-           bsdindx(proc+1) = idxs
-           idxs = idxs + sdsz(proc+1)
-           brvindx(proc+1) = idxr
-           idxr = idxr + rvsz(proc+1)
-           counter   = counter+n_elem_send+3
-        Enddo
-
-        iszr=sum(rvsz)
-        if (max(iszr,1) > lworkr) then 
-           call psb_realloc(max(iszr,1),workr,info)
-           if (info /= 0) then
+          If((idxs+tot_elem+n_elem) > lworks) Then
+            isz = max((3*lworks)/2,(idxs+tot_elem+n_elem))
+            if (debug) write(0,*) me,'Realloc works',isz
+            call psb_realloc(isz,works,info)
+            if (info /= 0) then
               info=4010
               ch_err='psb_realloc'
               call psb_errpush(info,name,a_err=ch_err)
               goto 9999
-           end if
-           lworkr=max(iszr,1)
-        end if
+            end if
+            lworks = isz
+          End If
+          If((n_elem) > size(blk%ia2)) Then
+            isz = max((3*size(blk%ia2))/2,(n_elem))
+            if (debug) write(0,*) me,'Realloc blk',isz
+            call psb_sp_reall(blk,isz,info)
+            if (info /= 0) then
+              info=4010
+              ch_err='psb_sp_reall'
+              call psb_errpush(info,name,a_err=ch_err)
+              goto 9999
+            end if
+          End If
 
-        call mpi_alltoallv(works,sdsz,bsdindx,mpi_integer,&
-             & workr,rvsz,brvindx,mpi_integer,icomm,info)
+          call psb_spgtblk(idx,a,blk,info)
+          if (info /= 0) then
+            info=4010
+            ch_err='psb_spgtblk'
+            call psb_errpush(info,name,a_err=ch_err)
+            goto 9999
+          end if
+
+          Do jj=1,n_elem
+            works(idxs+tot_elem+jj)=desc_p%loc_to_glob(blk%ia2(jj))
+          End Do
+          tot_elem=tot_elem+n_elem
+        End If
+
+      Enddo
+
+      t4 = t4 + mpi_wtime() -t3
+
+      if (i_ovr < n_ovr) then 
+        if (tot_elem > 1) then 
+!!$          write(0,*) me,'Realloc temp',tot_elem+2
+          if (tot_elem+2 > size(temp)) then 
+!!$            write(0,*) me,'Realloc temp',tot_elem+2
+            deallocate(temp)
+            allocate(temp(tot_elem+2),stat=info)   
+            if (info /= 0) then 
+              call psb_errpush(4010,name,a_err='Allocate')
+              goto 9999      
+            end if
+          endif
+          Call mrgsrt(tot_elem,works(idxs+1),temp,info)
+          If (info == 0) Call ireordv1(tot_elem,works(idxs+1),temp)
+          lx = works(idxs+1)
+          i = 1 
+          j = 1
+          do 
+            j = j + 1 
+            if (j > tot_elem) exit
+            if (works(idxs+j) /= lx) then 
+              i = i + 1
+              works(idxs+i) = works(idxs+j) 
+              lx = works(idxs+i) 
+            end if
+          end do
+          tot_elem = i
+        endif
+        if (debug) write(0,*) me,'Checktmp_o_i Loop Mid2',tmp_ovr_idx(1:10)
+        sdsz(proc+1) = tot_elem
+        idxs         = idxs + tot_elem
+      end if
+      counter   = counter+n_elem_send+3
+      if (debug) write(0,*) me,'Checktmp_o_i Loop End',tmp_ovr_idx(1:10)
+    Enddo
+    if (debug) write(0,*)me,'End phase 1 CDOVRBLD', m, n_col, tot_recv
+
+    if (i_ovr < n_ovr) then
+      ! 
+      ! Exchange data requests with everybody else: so far we have 
+      ! accumulated RECV requests, we have an all-to-all to build
+      ! matchings SENDs.
+      !       
+      call mpi_alltoall(sdsz,1,mpi_integer,rvsz,1,mpi_integer,icomm,info)
+      if (info /= 0) then
+        info=4010
+        ch_err='mpi_alltoall'
+        call psb_errpush(info,name,a_err=ch_err)
+        goto 9999
+      end if
+      idxs = 0
+      idxr = 0
+      counter = 1
+      Do 
+        proc=halo(counter)
+        if (proc == -1) exit
+        n_elem_recv = halo(counter+psb_n_elem_recv_)
+        counter     = counter+n_elem_recv
+        n_elem_send = halo(counter+psb_n_elem_send_)
+
+        bsdindx(proc+1) = idxs
+        idxs = idxs + sdsz(proc+1)
+        brvindx(proc+1) = idxr
+        idxr = idxr + rvsz(proc+1)
+        counter   = counter+n_elem_send+3
+      Enddo
+
+      iszr=sum(rvsz)
+      if (max(iszr,1) > lworkr) then 
+        call psb_realloc(max(iszr,1),workr,info)
         if (info /= 0) then
-           info=4010
-           ch_err='mpi_alltoallv'
-           call psb_errpush(info,name,a_err=ch_err)
-           goto 9999
+          info=4010
+          ch_err='psb_realloc'
+          call psb_errpush(info,name,a_err=ch_err)
+          goto 9999
+        end if
+        lworkr=max(iszr,1)
+      end if
+
+      call mpi_alltoallv(works,sdsz,bsdindx,mpi_integer,&
+           & workr,rvsz,brvindx,mpi_integer,icomm,info)
+      if (info /= 0) then
+        info=4010
+        ch_err='mpi_alltoallv'
+        call psb_errpush(info,name,a_err=ch_err)
+        goto 9999
+      end if
+
+      Do i=1,iszr
+        idx=workr(i)
+        if (idx <1) then 
+          write(0,*) me,'Error in CDOVRBLD ',idx,i,iszr
+!!$          write(0,*) me, ' WORKR :',workr(1:iszr)
+        else  If (desc_p%glob_to_loc(idx) < -np) Then
+          !
+          ! This is a new index. Assigning a local index as
+          ! we receive the guarantees that all indices for HALO(I)
+          ! will be less than those for HALO(J) whenever I<J
+          !
+          n_col=n_col+1
+          proc_id=-desc_p%glob_to_loc(idx)-np-1
+          If(n_col > Size(desc_p%loc_to_glob)) Then
+            isz = 3*n_col/2
+            if (debug) write(0,*) me,'Realloc loc_to_glob'
+            call psb_realloc(isz,desc_p%loc_to_glob,info)
+            if (info /= 0) then
+              info=4010
+              ch_err='psrealloc'
+              call psb_errpush(info,name,a_err=ch_err)
+              goto 9999
+            end if
+          End If
+          desc_p%glob_to_loc(idx)=n_col
+          desc_p%loc_to_glob(n_col)=idx
+          If((counter_t+3) > Size(t_halo_in))Write(0,*)'bingo'
+          t_halo_in(counter_t)=proc_id
+          t_halo_in(counter_t+1)=1
+          t_halo_in(counter_t+2)=n_col
+          counter_t=counter_t+3
+          if (debug) write(0,*) me,' CDOVRBLD: Added into t_halo_in from recv',&
+               &proc_id,n_col,idx
+        else if (desc_p%glob_to_loc(idx) < 0) Then
+          if (debug) write(0,*) me,'Wrong input to cdovrbld??',&
+               &idx,desc_p%glob_to_loc(idx)
+        End If
+      End Do
+    end if
+    t2 = mpi_wtime()
+    n_row=m+tot_recv
+    desc_p%matrix_data(psb_n_row_)=n_row
+    desc_p%matrix_data(psb_n_col_)=n_col
+
+    !
+    ! Ok, now we have a temporary halo with all the info for the
+    ! next round. If we need to keep going, convert the halo format
+    ! from temporary to final, so that we can work out the next iteration.
+    ! This uses one of the convert_comm internals, i.e. we are doing
+    ! the equivalent of a partial call to convert_comm
+    !
+
+    If (i_ovr < (n_ovr)) Then
+
+      If(lwork < (counter_t/3+np*3)) Then
+        isz = max((3*lwork)/2,(counter_t/3+np*3))
+        if (debug) write(0,*) me,'Realloc work',isz
+        deallocate(work)
+        allocate(work(isz),stat=info)
+        if (info /= 0) then 
+          call psb_errpush(4010,name,a_err='Allocate')
+          goto 9999      
         end if
 
-        Do i=1,iszr
-           idx=workr(i)
-           if (idx <1) then 
-              write(0,*) myrow,'Error in CDOVRBLD ',idx,i,iszr
-!!$          write(0,*) myrow, ' WORKR :',workr(1:iszr)
-           else  If (desc_p%glob_to_loc(idx) < -np) Then
-              !
-              ! This is a new index. Assigning a local index as
-              ! we receive the guarantees that all indices for HALO(I)
-              ! will be less than those for HALO(J) whenever I<J
-              !
-              n_col=n_col+1
-              proc_id=-desc_p%glob_to_loc(idx)-np-1
-              If(n_col > Size(desc_p%loc_to_glob)) Then
-                 isz = 3*n_col/2
-                 if (debug) write(0,*) myrow,'Realloc loc_to_glob'
-                 call psb_realloc(isz,desc_p%loc_to_glob,info)
-                 if (info /= 0) then
-                    info=4010
-                    ch_err='psrealloc'
-                    call psb_errpush(info,name,a_err=ch_err)
-                    goto 9999
-                 end if
-              End If
-              desc_p%glob_to_loc(idx)=n_col
-              desc_p%loc_to_glob(n_col)=idx
-              If((counter_t+3) > Size(t_halo_in))Write(0,*)'bingo'
-              t_halo_in(counter_t)=proc_id
-              t_halo_in(counter_t+1)=1
-              t_halo_in(counter_t+2)=n_col
-              counter_t=counter_t+3
-              if (debug) write(0,*) myrow,' CDOVRBLD: Added into t_halo_in from recv',&
-                   &proc_id,n_col,idx
-           else if (desc_p%glob_to_loc(idx) < 0) Then
-              if (debug) write(0,*) myrow,'Wrong input to cdovrbld??',&
-                   &idx,desc_p%glob_to_loc(idx)
-           End If
-        End Do
-     end if
-     t2 = mpi_wtime()
-     n_row=m+tot_recv
-     desc_p%matrix_data(psb_n_row_)=n_row
-     desc_p%matrix_data(psb_n_col_)=n_col
-
-     !
-     ! Ok, now we have a temporary halo with all the info for the
-     ! next round. If we need to keep going, convert the halo format
-     ! from temporary to final, so that we can work out the next iteration.
-     ! This uses one of the convert_comm internals, i.e. we are doing
-     ! the equivalent of a partial call to convert_comm
-     !
-
-     If (i_ovr < (n_ovr)) Then
-
-        If(lwork < (counter_t/3+np*3)) Then
-           isz = max((3*lwork)/2,(counter_t/3+np*3))
-           if (debug) write(0,*) myrow,'Realloc work',isz
-           deallocate(work)
-           allocate(work(isz),stat=info)
-           if (info /= 0) then 
-             call psb_errpush(4010,name,a_err='Allocate')
-             goto 9999      
-           end if
-
-           lwork=size(work)
-        Endif
-        t_halo_in(counter_t)=-1
+        lwork=size(work)
+      Endif
+      t_halo_in(counter_t)=-1
 !!$
 !!$      t_halo_out(:)=-1
 !!$      ierr = MPE_Log_event( icrhb, 0, "st CRTHAL" )
-        if (debug) write(0,*) myrow,'Checktmp_o_i 1',tmp_ovr_idx(1:10)
-        if (debug) write(0,*) myrow,'Calling Crea_Halo'
-        
-        call psi_crea_index(desc_p,t_halo_in,t_halo_out,.false.,info)
+      if (debug) write(0,*) me,'Checktmp_o_i 1',tmp_ovr_idx(1:10)
+      if (debug) write(0,*) me,'Calling Crea_Halo'
+
+      call psi_crea_index(desc_p,t_halo_in,t_halo_out,.false.,info)
 !!$        Call psi_crea_halo(desc_p%matrix_data,t_halo_in,&
 !!$             & np,t_halo_out,Size(t_halo_out),dep_list,&
 !!$             & dl_lda,length_dl,desc_p%loc_to_glob,&
 !!$             & desc_p%glob_to_loc,work,lwork,info)
-        if (debug) then 
-           write(0,*) myrow,'Done Crea_Halo'
-           call blacs_barrier(ictxt,'All')
-        end if
-        if (debug) write(0,*) myrow,'Checktmp_o_i 2',tmp_ovr_idx(1:10)
-        if (debug) write(0,*) myrow,'Done Crea_Halo'
+      if (debug) then 
+        write(0,*) me,'Done Crea_Halo'
+        call psb_barrier(ictxt)
+      end if
+      if (debug) write(0,*) me,'Checktmp_o_i 2',tmp_ovr_idx(1:10)
+      if (debug) write(0,*) me,'Done Crea_Halo'
 !!$      ierr = MPE_Log_event( icrhe, 0, "ed CRHAL " )
 
-        halo => t_halo_out
-        !
-        ! At this point we have built the halo necessary for I_OVR+1.
-        !
-     End If
-     if (debug) write(0,*) myrow,'Checktmp_o_i ',tmp_ovr_idx(1:10)
-     t3 = mpi_wtime()
-     tl = tl +(t2-t1)
-     tch = tch +(t3-t2)
+      halo => t_halo_out
+      !
+      ! At this point we have built the halo necessary for I_OVR+1.
+      !
+    End If
+    if (debug) write(0,*) me,'Checktmp_o_i ',tmp_ovr_idx(1:10)
+    t3 = mpi_wtime()
+    tl = tl +(t2-t1)
+    tch = tch +(t3-t2)
   End Do
   t1 = mpi_wtime()
   call FreePairSearchTree()
@@ -632,24 +634,24 @@ Subroutine psb_dcdovrbld(n_ovr,desc_p,desc_a,a,&
   !
 
   if (debug) then
-     write(0,*) 'psb_cdasb: converting indexes'
-     call blacs_barrier(ictxt,'All')
+    write(0,*) 'psb_cdasb: converting indexes'
+    call psb_barrier(ictxt)
   end if
   !.... convert comunication stuctures....
   ! first the halo index
   call psi_crea_index(desc_p,tmp_halo,&
        & desc_p%halo_index,.false.,info)
   if(info /= 0) then
-     call psb_errpush(4010,name,a_err='psi_crea_index')
-     goto 9999
+    call psb_errpush(4010,name,a_err='psi_crea_index')
+    goto 9999
   end if
 
   ! then the overlap index
   call psi_crea_index(desc_p,tmp_ovr_idx,&
        & desc_p%ovrlap_index,.true.,info)
   if(info /= 0) then
-     call psb_errpush(4010,name,a_err='psi_crea_index')
-     goto 9999
+    call psb_errpush(4010,name,a_err='psi_crea_index')
+    goto 9999
   end if
 
   ! next is the ovrlap_elem index
@@ -658,8 +660,8 @@ Subroutine psb_dcdovrbld(n_ovr,desc_p,desc_a,a,&
   ! finally bnd_elem
   call psi_crea_bnd_elem(desc_p,info)
   if(info /= 0) then
-     call psb_errpush(4010,name,a_err='psi_crea_bnd_elem')
-     goto 9999
+    call psb_errpush(4010,name,a_err='psi_crea_bnd_elem')
+    goto 9999
   end if
 
   ! Ok, register into MATRIX_DATA &  free temporary work areas
@@ -674,25 +676,25 @@ Subroutine psb_dcdovrbld(n_ovr,desc_p,desc_a,a,&
   desc_p%lprm(1) = 0
 
   if (debug) then 
-     write(0,*) myrow,'Done Convert_comm'
-     call blacs_barrier(ictxt,'All')
+    write(0,*) me,'Done Convert_comm'
+    call psb_barrier(ictxt)
   end if
 
   if (.false.) then
-     call psb_cdprt(70+myrow,desc_p,.false.)
+    call psb_cdprt(70+me,desc_p,.false.)
   end if
 
-  if (debug) write(0,*) myrow,'Done ConvertComm'
+  if (debug) write(0,*) me,'Done ConvertComm'
 !!$  ierr = MPE_Log_event( iovre, 0, "ed CNVCRT" )
   Deallocate(works,workr,t_halo_in,t_halo_out,work,&
        & length_dl,dep_list,tmp_ovr_idx,tmp_halo,&
        & brvindx,rvsz,sdsz,bsdindx,temp,stat=info)
   if (info == 0) call psb_sp_free(blk,info)
   if (info /= 0) then
-     info=4010
-     ch_err='sp_free'
-     call psb_errpush(info,name,a_err=ch_err)
-     goto 9999
+    info=4010
+    ch_err='sp_free'
+    call psb_errpush(info,name,a_err=ch_err)
+    goto 9999
   end if
   t2 = mpi_wtime()
 
@@ -701,9 +703,9 @@ Subroutine psb_dcdovrbld(n_ovr,desc_p,desc_a,a,&
 
 9999 continue
   call psb_erractionrestore(err_act)
-  if (err_act.eq.act_abort) then
-     call psb_error(ictxt)
-     return
+  if (err_act == act_abort) then
+    call psb_error(ictxt)
+    return
   end if
   return
 

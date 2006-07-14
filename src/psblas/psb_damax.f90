@@ -58,7 +58,7 @@ function psb_damax (x,desc_a, info, jx)
   real(kind(1.d0))                  :: psb_damax
 
   ! locals
-  integer                  :: int_err(5), ictxt, nprow, npcol, myrow, mycol,&
+  integer                  :: int_err(5), ictxt, np, me, mycol,&
        & err_act, n, iix, jjx, ix, ijx, m, i, k, imax, idamax
   real(kind(1.d0))         :: amax
   character(len=20)        :: name, ch_err
@@ -72,48 +72,42 @@ function psb_damax (x,desc_a, info, jx)
 
   ictxt=desc_a%matrix_data(psb_ctxt_)
 
-  ! check on blacs grid 
-  call psb_info(ictxt, myrow, nprow)
-  if (nprow == -1) then
+  call psb_info(ictxt, me, np)
+  if (np == -1) then
     info = 2010
     call psb_errpush(info,name)
     goto 9999 
- else if (npcol /= 1) then
-    info = 2030
-    int_err(1) = npcol
-    call psb_errpush(info,name)
-    goto 9999
   endif
-  
+
   ix = 1
   if (present(jx)) then
-     ijx = jx
+    ijx = jx
   else
-     ijx = 1
+    ijx = 1
   endif
 
   m = desc_a%matrix_data(psb_m_)
 
   call psb_chkvect(m,1,size(x,1),ix,ijx,desc_a%matrix_data,info,iix,jjx)
   if(info.ne.0) then
-     info=4010
-     ch_err='psb_chkvect'
-     call psb_errpush(info,name,a_err=ch_err)
-     goto 9999
+    info=4010
+    ch_err='psb_chkvect'
+    call psb_errpush(info,name,a_err=ch_err)
+    goto 9999
   end if
 
   if (iix.ne.1) then
-     info=3040
-     call psb_errpush(info,name)
-     goto 9999
+    info=3040
+    call psb_errpush(info,name)
+    goto 9999
   end if
 
   ! compute local max
   if ((desc_a%matrix_data(psb_n_row_).gt.0).and.(m.ne.0)) then
-     imax=idamax(desc_a%matrix_data(psb_n_row_)-iix+1,x(iix,jjx),1)
-     amax=abs(x(iix+imax-1,jjx))
+    imax=idamax(desc_a%matrix_data(psb_n_row_)-iix+1,x(iix,jjx),1)
+    amax=abs(x(iix+imax-1,jjx))
   end if
-  
+
   ! compute global max
   call psb_amx(ictxt, amax)
 
@@ -126,8 +120,8 @@ function psb_damax (x,desc_a, info, jx)
   call psb_erractionrestore(err_act)
 
   if (err_act.eq.act_abort) then
-     call psb_error(ictxt)
-     return
+    call psb_error(ictxt)
+    return
   end if
   return
 end function psb_damax
@@ -189,7 +183,7 @@ function psb_damaxv (x,desc_a, info)
   real(kind(1.d0))                  :: psb_damaxv
 
   ! locals
-  integer                  :: int_err(5), err, ictxt, nprow, npcol, myrow, mycol,&
+  integer                  :: int_err(5), err, ictxt, np, me, mycol,&
        & err_act, n, iix, jjx, jx, ix, ijx, m, imax, idamax
   real(kind(1.d0))         :: amax
   character(len=20)        :: name, ch_err
@@ -203,19 +197,13 @@ function psb_damaxv (x,desc_a, info)
 
   ictxt=desc_a%matrix_data(psb_ctxt_)
 
-  ! check on blacs grid 
-  call psb_info(ictxt, myrow, nprow)
-  if (nprow == -1) then
+  call psb_info(ictxt, me, np)
+  if (np == -1) then
     info = 2010
     call psb_errpush(info,name)
     goto 9999
-  else if (npcol /= 1) then
-    info = 2030
-    int_err(1) = npcol
-    call psb_errpush(info,name)
-    goto 9999
   endif
-  
+
   ix = 1
   jx = 1
 
@@ -223,24 +211,24 @@ function psb_damaxv (x,desc_a, info)
 
   call psb_chkvect(m,1,size(x,1),ix,jx,desc_a%matrix_data,info,iix,jjx)
   if(info.ne.0) then
-     info=4010
-     ch_err='psb_chkvect'
-     call psb_errpush(info,name,a_err=ch_err)
-     goto 9999
+    info=4010
+    ch_err='psb_chkvect'
+    call psb_errpush(info,name,a_err=ch_err)
+    goto 9999
   end if
 
   if (iix.ne.1) then
-     info=3040
-     call psb_errpush(info,name)
-     goto 9999
+    info=3040
+    call psb_errpush(info,name)
+    goto 9999
   end if
 
   ! compute local max
   if ((desc_a%matrix_data(psb_n_row_).gt.0).and.(m.ne.0)) then
-     imax=idamax(desc_a%matrix_data(psb_n_row_)-iix+1,x(iix),1)
-     amax=abs(x(iix+imax-1))
+    imax=idamax(desc_a%matrix_data(psb_n_row_)-iix+1,x(iix),1)
+    amax=abs(x(iix+imax-1))
   end if
-  
+
   ! compute global max
   call psb_amx(ictxt, amax)
 
@@ -253,8 +241,8 @@ function psb_damaxv (x,desc_a, info)
   call psb_erractionrestore(err_act)
 
   if (err_act.eq.act_abort) then
-     call psb_error(ictxt)
-     return
+    call psb_error(ictxt)
+    return
   end if
   return
 end function psb_damaxv
@@ -318,7 +306,7 @@ subroutine psb_damaxvs (res,x,desc_a, info)
   real(kind(1.D0)), intent(out)     :: res
 
   ! locals
-  integer                  :: int_err(5), ictxt, nprow, npcol, myrow, mycol,&
+  integer                  :: int_err(5), ictxt, np, me, mycol,&
        & err_act, n, iix, jjx, ix, ijx, m, imax, idamax
   real(kind(1.d0))         :: amax
   character(len=20)        :: name, ch_err
@@ -332,15 +320,9 @@ subroutine psb_damaxvs (res,x,desc_a, info)
 
   ictxt=desc_a%matrix_data(psb_ctxt_)
 
-  ! check on blacs grid 
-  call psb_info(ictxt, myrow, nprow)
-  if (nprow == -1) then
+  call psb_info(ictxt, me, np)
+  if (np == -1) then
     info = 2010
-    call psb_errpush(info,name)
-    goto 9999
-  else if (npcol /= 1) then
-    info = 2030
-    int_err(1) = npcol
     call psb_errpush(info,name)
     goto 9999
   endif
@@ -352,24 +334,24 @@ subroutine psb_damaxvs (res,x,desc_a, info)
 
   call psb_chkvect(m,1,size(x,1),ix,ijx,desc_a%matrix_data,info,iix,jjx)
   if(info.ne.0) then
-     info=4010
-     ch_err='psb_chkvect'
-     call psb_errpush(info,name,a_err=ch_err)
-     goto 9999
+    info=4010
+    ch_err='psb_chkvect'
+    call psb_errpush(info,name,a_err=ch_err)
+    goto 9999
   end if
 
   if (iix.ne.1) then
-     info=3040
-     call psb_errpush(info,name)
-     goto 9999
+    info=3040
+    call psb_errpush(info,name)
+    goto 9999
   end if
 
   ! compute local max
   if ((desc_a%matrix_data(psb_n_row_).gt.0).and.(m.ne.0)) then
-     imax=idamax(desc_a%matrix_data(psb_n_row_)-iix+1,x(iix),1)
-     amax=abs(x(iix+imax-1))
+    imax=idamax(desc_a%matrix_data(psb_n_row_)-iix+1,x(iix),1)
+    amax=abs(x(iix+imax-1))
   end if
-  
+
   ! compute global max
   call psb_amx(ictxt, amax)
 
@@ -382,8 +364,8 @@ subroutine psb_damaxvs (res,x,desc_a, info)
   call psb_erractionrestore(err_act)
 
   if (err_act.eq.act_abort) then
-     call psb_error(ictxt)
-     return
+    call psb_error(ictxt)
+    return
   end if
   return
 end subroutine psb_damaxvs
@@ -446,7 +428,7 @@ subroutine psb_dmamaxs (res,x,desc_a, info,jx)
   real(kind(1.d0)), intent(out) :: res(:)
 
   ! locals
-  integer                  :: int_err(5), ictxt, nprow, npcol, myrow, mycol,&
+  integer                  :: int_err(5), ictxt, np, me, mycol,&
        & err_act, n, iix, jjx, ix, ijx, m, imax, i, k, idamax
   real(kind(1.d0))         :: amax
   character(len=20)        :: name, ch_err
@@ -460,15 +442,9 @@ subroutine psb_dmamaxs (res,x,desc_a, info,jx)
 
   ictxt=desc_a%matrix_data(psb_ctxt_)
 
-  ! check on blacs grid 
-  call psb_info(ictxt, myrow, nprow)
-  if (nprow == -1) then
+  call psb_info(ictxt, me, np)
+  if (np == -1) then
     info = 2010
-    call psb_errpush(info,name)
-    goto 9999
-  else if (npcol /= 1) then
-    info = 2030
-    int_err(1) = npcol
     call psb_errpush(info,name)
     goto 9999
   endif

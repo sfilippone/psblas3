@@ -75,7 +75,7 @@ subroutine psb_zspfree(a, desc_a,info)
   call psb_sp_free(a,info)
 
 
-  if(info.ne.0) then
+  if(info /= 0) then
     info=2045
     call psb_errpush(info,name)
     goto 9999
@@ -86,7 +86,7 @@ subroutine psb_zspfree(a, desc_a,info)
 
 9999 continue
   call psb_erractionrestore(err_act)
-  if (err_act.eq.act_abort) then
+  if (err_act == act_abort) then
     call psb_error(ictxt)
     return
   end if

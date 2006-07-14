@@ -52,6 +52,7 @@ subroutine  psb_ihalom(x,desc_a,info,alpha,jx,ik,work,tran,mode)
   use psb_realloc_mod
   use psb_check_mod
   use psb_error_mod
+  use psb_penv_mod
   implicit none
 
   integer, intent(inout), target           :: x(:,:)
@@ -63,7 +64,7 @@ subroutine  psb_ihalom(x,desc_a,info,alpha,jx,ik,work,tran,mode)
   character, intent(in), optional          :: tran
 
   ! locals
-  integer                  :: int_err(5), ictxt, nprow, npcol, myrow, mycol,&
+  integer                  :: int_err(5), ictxt, np, me, mycol,&
        & err_act, m, n, iix, jjx, temp(2), ix, ijx, nrow, ncol, k, maxk, liwork,&
        & imode, err
   integer, pointer         :: xp(:,:), iwork(:)
@@ -78,14 +79,9 @@ subroutine  psb_ihalom(x,desc_a,info,alpha,jx,ik,work,tran,mode)
   ictxt=desc_a%matrix_data(psb_ctxt_)
 
   ! check on blacs grid 
-  call blacs_gridinfo(ictxt, nprow, npcol, myrow, mycol)
-  if (nprow == -1) then
+  call psb_info(ictxt, me, np)
+  if (np == -1) then
     info = 2010
-    call psb_errpush(info,name)
-    goto 9999
-  else if (npcol /= 1) then
-    info = 2030
-    int_err(1) = npcol
     call psb_errpush(info,name)
     goto 9999
   endif
@@ -258,6 +254,7 @@ subroutine  psb_ihalov(x,desc_a,info,alpha,work,tran,mode)
   use psb_realloc_mod
   use psb_check_mod
   use psb_error_mod
+  use psb_penv_mod
   implicit none
 
   integer, intent(inout)                   :: x(:)
@@ -269,7 +266,7 @@ subroutine  psb_ihalov(x,desc_a,info,alpha,work,tran,mode)
   character, intent(in), optional          :: tran
 
   ! locals
-  integer                  :: int_err(5), ictxt, nprow, npcol, myrow, mycol,&
+  integer                  :: int_err(5), ictxt, np, me,&
        & err_act, m, n, iix, jjx, temp(2), ix, ijx, nrow, ncol, k, maxk, imode,&
        & err, liwork
   integer,pointer          :: iwork(:)
@@ -284,14 +281,9 @@ subroutine  psb_ihalov(x,desc_a,info,alpha,work,tran,mode)
   ictxt=desc_a%matrix_data(psb_ctxt_)
 
   ! check on blacs grid 
-  call blacs_gridinfo(ictxt, nprow, npcol, myrow, mycol)
-  if (nprow == -1) then
+  call psb_info(ictxt, me, np)
+  if (np == -1) then
     info = 2010
-    call psb_errpush(info,name)
-    goto 9999
-  else if (npcol /= 1) then
-    info = 2030
-    int_err(1) = npcol
     call psb_errpush(info,name)
     goto 9999
   endif
@@ -302,31 +294,31 @@ subroutine  psb_ihalov(x,desc_a,info,alpha,work,tran,mode)
   m = desc_a%matrix_data(psb_m_)
   n = desc_a%matrix_data(psb_n_)
   nrow = desc_a%matrix_data(psb_n_row_)
-!  ncol = desc_a%matrix_data(psb_n_col_)
-  
+  !  ncol = desc_a%matrix_data(psb_n_col_)
+
 
   if (present(tran)) then     
-     ltran = tran
+    ltran = tran
   else
-     ltran = 'N'
+    ltran = 'N'
   endif
   if (present(mode)) then 
-     imode = mode
+    imode = mode
   else
-     imode = IOR(psb_swap_send_,psb_swap_recv_)
+    imode = IOR(psb_swap_send_,psb_swap_recv_)
   endif
 
   ! check vector correctness
   call psb_chkvect(m,1,size(x,1),ix,ijx,desc_a%matrix_data,info,iix,jjx)
   if(info.ne.0) then
-     info=4010
-     ch_err='psb_chkvect'
-     call psb_errpush(info,name,a_err=ch_err)
+    info=4010
+    ch_err='psb_chkvect'
+    call psb_errpush(info,name,a_err=ch_err)
   end if
 
   if (iix.ne.1) then
-     info=3040
-     call psb_errpush(info,name)
+    info=3040
+    call psb_errpush(info,name)
   end if
 
   err=info
@@ -341,39 +333,39 @@ subroutine  psb_ihalov(x,desc_a,info,alpha,work,tran,mode)
 
   liwork=nrow
   if (present(work)) then
-     if(size(work).ge.liwork) then
-        iwork => work
-     else
-        call psb_realloc(liwork,iwork,info)
-        if(info.ne.0) then
-           info=4010
-           ch_err='psb_realloc'
-           call psb_errpush(info,name,a_err=ch_err)
-           goto 9999
-        end if
-     end if
-  else
-     call psb_realloc(liwork,iwork,info)
-     if(info.ne.0) then
+    if(size(work).ge.liwork) then
+      iwork => work
+    else
+      call psb_realloc(liwork,iwork,info)
+      if(info.ne.0) then
         info=4010
         ch_err='psb_realloc'
         call psb_errpush(info,name,a_err=ch_err)
         goto 9999
-     end if
+      end if
+    end if
+  else
+    call psb_realloc(liwork,iwork,info)
+    if(info.ne.0) then
+      info=4010
+      ch_err='psb_realloc'
+      call psb_errpush(info,name,a_err=ch_err)
+      goto 9999
+    end if
   end if
 
   ! exchange halo elements
   if(ltran.eq.'N') then
-     call psi_swapdata(imode,0,x(iix:size(x)),&
-          & desc_a,iwork,info)
+    call psi_swapdata(imode,0,x(iix:size(x)),&
+         & desc_a,iwork,info)
   else if((ltran.eq.'T').or.(ltran.eq.'H')) then
-     call psi_swaptran(imode,1,x(iix:size(x)),&
-          & desc_a,iwork,info)
+    call psi_swaptran(imode,1,x(iix:size(x)),&
+         & desc_a,iwork,info)
   end if
 
   if(info.ne.0) then
-     call psb_errpush(4010,name,a_err='PSI_iSwap...')
-     goto 9999
+    call psb_errpush(4010,name,a_err='PSI_iSwap...')
+    goto 9999
   end if
 
   if(.not.present(work)) deallocate(iwork)
@@ -386,8 +378,8 @@ subroutine  psb_ihalov(x,desc_a,info,alpha,work,tran,mode)
   call psb_erractionrestore(err_act)
 
   if (err_act.eq.act_abort) then
-     call psb_error(ictxt)
-     return
+    call psb_error(ictxt)
+    return
   end if
   return
 end subroutine psb_ihalov

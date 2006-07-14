@@ -49,6 +49,7 @@ subroutine  psb_zovrlm(x,desc_a,info,jx,ik,work,update)
   use psb_realloc_mod
   use psb_check_mod
   use psb_error_mod
+  use psb_penv_mod
   implicit none
 
   complex(kind(1.d0)), intent(inout), target   :: x(:,:)
@@ -58,7 +59,7 @@ subroutine  psb_zovrlm(x,desc_a,info,jx,ik,work,update)
   integer, intent(in), optional             :: update,jx,ik
 
   ! locals
-  integer                  :: int_err(5), ictxt, nprow, npcol, myrow, mycol,&
+  integer                  :: int_err(5), ictxt, np, me, mycol,&
        & err_act, m, n, iix, jjx, temp(2), ix, ijx, nrow, ncol, k, maxk, iupdate,&
        & imode, err, liwork, i
   complex(kind(1.d0)),pointer :: iwork(:), xp(:,:)
@@ -73,23 +74,18 @@ subroutine  psb_zovrlm(x,desc_a,info,jx,ik,work,update)
   ictxt=desc_a%matrix_data(psb_ctxt_)
 
   ! check on blacs grid 
-  call blacs_gridinfo(ictxt, nprow, npcol, myrow, mycol)
-  if (nprow == -1) then
-     info = 2010
-     call psb_errpush(info,name)
-     goto 9999
-  else if (npcol /= 1) then
-     info = 2030
-     int_err(1) = npcol
-     call psb_errpush(info,name)
-     goto 9999
+  call psb_info(ictxt, me, np)
+  if (np == -1) then
+    info = 2010
+    call psb_errpush(info,name)
+    goto 9999
   endif
 
   ix = 1
   if (present(jx)) then
-     ijx = jx
+    ijx = jx
   else
-     ijx = 1
+    ijx = 1
   endif
 
   m = desc_a%matrix_data(psb_m_)
@@ -100,19 +96,19 @@ subroutine  psb_zovrlm(x,desc_a,info,jx,ik,work,update)
   maxk=size(x,2)-ijx+1
 
   if(present(ik)) then
-     if(ik.gt.maxk) then
-        k=maxk
-     else
-        k=ik
-     end if
+    if(ik.gt.maxk) then
+      k=maxk
+    else
+      k=ik
+    end if
   else
-     k = maxk
+    k = maxk
   end if
 
   if (present(update)) then 
-     iupdate = update
+    iupdate = update
   else
-     iupdate = psb_avg_
+    iupdate = psb_avg_
   endif
 
   do_update = (iupdate /= psb_none_)
@@ -121,14 +117,14 @@ subroutine  psb_zovrlm(x,desc_a,info,jx,ik,work,update)
   ! check vector correctness
   call psb_chkvect(m,1,size(x,1),ix,ijx,desc_a%matrix_data,info,iix,jjx)
   if(info.ne.0) then
-     info=4010
-     ch_err='psb_chkvect'
-     call psb_errpush(info,name,a_err=ch_err)
+    info=4010
+    ch_err='psb_chkvect'
+    call psb_errpush(info,name,a_err=ch_err)
   end if
 
   if (iix.ne.1) then
-     info=3040
-     call psb_errpush(info,name)
+    info=3040
+    call psb_errpush(info,name)
   end if
 
   err=info
@@ -138,64 +134,64 @@ subroutine  psb_zovrlm(x,desc_a,info,jx,ik,work,update)
   ! check for presence/size of a work area
   liwork=ncol
   if (present(work)) then
-     if(size(work).ge.liwork) then
-        iwork => work
-     else
-        call psb_realloc(liwork,iwork,info)
-        if(info.ne.0) then
-           info=4010
-           ch_err='psb_realloc'
-           call psb_errpush(info,name,a_err=ch_err)
-           goto 9999
-        end if
-     end if
-  else
-     call psb_realloc(liwork,iwork,info)
-     if(info.ne.0) then
+    if(size(work).ge.liwork) then
+      iwork => work
+    else
+      call psb_realloc(liwork,iwork,info)
+      if(info.ne.0) then
         info=4010
         ch_err='psb_realloc'
         call psb_errpush(info,name,a_err=ch_err)
         goto 9999
-     end if
+      end if
+    end if
+  else
+    call psb_realloc(liwork,iwork,info)
+    if(info.ne.0) then
+      info=4010
+      ch_err='psb_realloc'
+      call psb_errpush(info,name,a_err=ch_err)
+      goto 9999
+    end if
   end if
 
   ! exchange overlap elements
   if(do_update) then
-     xp => x(iix:size(x,1),jjx:jjx+k-1)
-     call psi_swapdata(imode,k,zone,xp,&
-          & desc_a,iwork,info,data=psb_comm_ovr_)
+    xp => x(iix:size(x,1),jjx:jjx+k-1)
+    call psi_swapdata(imode,k,zone,xp,&
+         & desc_a,iwork,info,data=psb_comm_ovr_)
   end if
 
   if(info.ne.0) then
-     call psb_errpush(4010,name,a_err='psi_swapdata')
-     goto 9999
+    call psb_errpush(4010,name,a_err='psi_swapdata')
+    goto 9999
   end if
 
   i=0
   ! switch on update type
   select case (iupdate)
   case(psb_square_root_)
-     do while(desc_a%ovrlap_elem(i).ne.-ione)
-        x(desc_a%ovrlap_elem(i+psb_ovrlp_elem_),:) =&
-             & x(desc_a%ovrlap_elem(i+psb_ovrlp_elem_),:)/&
-             & sqrt(real(desc_a%ovrlap_elem(i+psb_n_dom_ovr_)))
-        i = i+2
-     end do
+    do while(desc_a%ovrlap_elem(i).ne.-ione)
+      x(desc_a%ovrlap_elem(i+psb_ovrlp_elem_),:) =&
+           & x(desc_a%ovrlap_elem(i+psb_ovrlp_elem_),:)/&
+           & sqrt(real(desc_a%ovrlap_elem(i+psb_n_dom_ovr_)))
+      i = i+2
+    end do
   case(psb_avg_)
-     do while(desc_a%ovrlap_elem(i).ne.-ione)
-        x(desc_a%ovrlap_elem(i+psb_ovrlp_elem_),:) =&
-             & x(desc_a%ovrlap_elem(i+psb_ovrlp_elem_),:)/&
-             & real(desc_a%ovrlap_elem(i+psb_n_dom_ovr_))
-        i = i+2
-     end do
+    do while(desc_a%ovrlap_elem(i).ne.-ione)
+      x(desc_a%ovrlap_elem(i+psb_ovrlp_elem_),:) =&
+           & x(desc_a%ovrlap_elem(i+psb_ovrlp_elem_),:)/&
+           & real(desc_a%ovrlap_elem(i+psb_n_dom_ovr_))
+      i = i+2
+    end do
   case(psb_sum_)
-     ! do nothing
+    ! do nothing
   case default 
-     ! wrong value for choice argument
-     info = 70
-     int_err=(/10,iupdate,0,0,0/)
-     call psb_errpush(info,name,i_err=int_err)
-     goto 9999
+    ! wrong value for choice argument
+    info = 70
+    int_err=(/10,iupdate,0,0,0/)
+    call psb_errpush(info,name,i_err=int_err)
+    goto 9999
   end select
 
   if(.not.present(work)) deallocate(iwork)
@@ -208,8 +204,8 @@ subroutine  psb_zovrlm(x,desc_a,info,jx,ik,work,update)
   call psb_erractionrestore(err_act)
 
   if (err_act.eq.act_abort) then
-     call psb_error(ictxt)
-     return
+    call psb_error(ictxt)
+    return
   end if
   return
 end subroutine psb_zovrlm
@@ -266,6 +262,7 @@ subroutine  psb_zovrlv(x,desc_a,info,work,update)
   use psb_realloc_mod
   use psb_check_mod
   use psb_error_mod
+  use psb_penv_mod
   implicit none
 
   complex(kind(1.d0)), intent(inout), target   :: x(:)
@@ -275,7 +272,7 @@ subroutine  psb_zovrlv(x,desc_a,info,work,update)
   integer, intent(in), optional             :: update
 
   ! locals
-  integer                  :: int_err(5), ictxt, nprow, npcol, myrow, mycol,&
+  integer                  :: int_err(5), ictxt, np, me, mycol,&
        & err_act, m, n, iix, jjx, temp(2), ix, ijx, nrow, ncol, k, maxk, iupdate,&
        & imode, err, liwork, i
   complex(kind(1.d0)),pointer :: iwork(:)
@@ -290,16 +287,11 @@ subroutine  psb_zovrlv(x,desc_a,info,work,update)
   ictxt=desc_a%matrix_data(psb_ctxt_)
 
   ! check on blacs grid 
-  call blacs_gridinfo(ictxt, nprow, npcol, myrow, mycol)
-  if (nprow == -1) then
-     info = 2010
-     call psb_errpush(info,name)
-     goto 9999
-  else if (npcol /= 1) then
-     info = 2030
-     int_err(1) = npcol
-     call psb_errpush(info,name)
-     goto 9999
+  call psb_info(ictxt, me, np)
+  if (np == -1) then
+    info = 2010
+    call psb_errpush(info,name)
+    goto 9999
   endif
 
   ix = 1
@@ -313,9 +305,9 @@ subroutine  psb_zovrlv(x,desc_a,info,work,update)
   k = 1
 
   if (present(update)) then 
-     iupdate = update
+    iupdate = update
   else
-     iupdate = psb_none_
+    iupdate = psb_none_
   endif
 
   do_update = (iupdate /= psb_none_)
@@ -324,14 +316,14 @@ subroutine  psb_zovrlv(x,desc_a,info,work,update)
   ! check vector correctness
   call psb_chkvect(m,1,size(x),ix,ijx,desc_a%matrix_data,info,iix,jjx)
   if(info.ne.0) then
-     info=4010
-     ch_err='psb_chkvect'
-     call psb_errpush(info,name,a_err=ch_err)
+    info=4010
+    ch_err='psb_chkvect'
+    call psb_errpush(info,name,a_err=ch_err)
   end if
 
   if (iix.ne.1) then
-     info=3040
-     call psb_errpush(info,name)
+    info=3040
+    call psb_errpush(info,name)
   end if
 
   err=info
@@ -341,69 +333,69 @@ subroutine  psb_zovrlv(x,desc_a,info,work,update)
   ! check for presence/size of a work area
   liwork=ncol
   if (present(work)) then
-     if(size(work).ge.liwork) then
-        iwork => work
-     else
-        call psb_realloc(liwork,iwork,info)
-        if(info.ne.0) then
-           info=4010
-           ch_err='psb_realloc'
-           call psb_errpush(info,name,a_err=ch_err)
-           goto 9999
-        end if
-     end if
-  else
-     call psb_realloc(liwork,iwork,info)
-     if(info.ne.0) then
+    if(size(work).ge.liwork) then
+      iwork => work
+    else
+      call psb_realloc(liwork,iwork,info)
+      if(info.ne.0) then
         info=4010
         ch_err='psb_realloc'
         call psb_errpush(info,name,a_err=ch_err)
         goto 9999
-     end if
+      end if
+    end if
+  else
+    call psb_realloc(liwork,iwork,info)
+    if(info.ne.0) then
+      info=4010
+      ch_err='psb_realloc'
+      call psb_errpush(info,name,a_err=ch_err)
+      goto 9999
+    end if
   end if
 
   ! exchange overlap elements
 
   if(do_update) then
-     call psi_swapdata(imode,zone,x(iix:size(x)),&
-          & desc_a,iwork,info,data=psb_comm_ovr_)
+    call psi_swapdata(imode,zone,x(iix:size(x)),&
+         & desc_a,iwork,info,data=psb_comm_ovr_)
   end if
 
   if(info.ne.0) then
-     call psb_errpush(4010,name,a_err='PSI_SwapData')
-     goto 9999
+    call psb_errpush(4010,name,a_err='PSI_SwapData')
+    goto 9999
   end if
 
   i=0
   ! switch on update type
   select case (iupdate)
   case(psb_square_root_)
-     do while(desc_a%ovrlap_elem(i).ne.-ione)
-        x(desc_a%ovrlap_elem(i+psb_ovrlp_elem_)) =&
-             & x(desc_a%ovrlap_elem(i+psb_ovrlp_elem_))/&
-             & sqrt(real(desc_a%ovrlap_elem(i+psb_n_dom_ovr_)))
-        i = i+2
-     end do
+    do while(desc_a%ovrlap_elem(i).ne.-ione)
+      x(desc_a%ovrlap_elem(i+psb_ovrlp_elem_)) =&
+           & x(desc_a%ovrlap_elem(i+psb_ovrlp_elem_))/&
+           & sqrt(real(desc_a%ovrlap_elem(i+psb_n_dom_ovr_)))
+      i = i+2
+    end do
   case(psb_avg_)
-     do while(desc_a%ovrlap_elem(i).ne.-ione)
-        x(desc_a%ovrlap_elem(i+psb_ovrlp_elem_)) =&
-             & x(desc_a%ovrlap_elem(i+psb_ovrlp_elem_))/&
-             & real(desc_a%ovrlap_elem(i+psb_n_dom_ovr_))
-        i = i+2
-     end do
+    do while(desc_a%ovrlap_elem(i).ne.-ione)
+      x(desc_a%ovrlap_elem(i+psb_ovrlp_elem_)) =&
+           & x(desc_a%ovrlap_elem(i+psb_ovrlp_elem_))/&
+           & real(desc_a%ovrlap_elem(i+psb_n_dom_ovr_))
+      i = i+2
+    end do
   case(psb_sum_)
-     ! do nothing
+    ! do nothing
   case default 
-     ! wrong value for choice argument
-     info = 70
-     int_err=(/10,iupdate,0,0,0/)
-     call psb_errpush(info,name,i_err=int_err)
-     goto 9999
+    ! wrong value for choice argument
+    info = 70
+    int_err=(/10,iupdate,0,0,0/)
+    call psb_errpush(info,name,i_err=int_err)
+    goto 9999
   end select
 
   if(.not.present(work)) deallocate(iwork)
   nullify(iwork)
-  
+
   call psb_erractionrestore(err_act)
   return  
 
@@ -411,8 +403,8 @@ subroutine  psb_zovrlv(x,desc_a,info,work,update)
   call psb_erractionrestore(err_act)
 
   if (err_act.eq.act_abort) then
-     call psb_error(ictxt)
-     return
+    call psb_error(ictxt)
+    return
   end if
   return
 end subroutine psb_zovrlv

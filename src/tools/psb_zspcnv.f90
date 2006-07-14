@@ -46,50 +46,51 @@ subroutine psb_zspcnv(a,b,desc_a,info)
   use psb_serial_mod
   use psb_const_mod
   use psb_error_mod
+  use psb_penv_mod
   implicit none
 
   interface zcsdp
 
-     subroutine zcsdp(check,trans,m,n,unitd,d,&
-          & fida,descra,a,ia1,ia2,infoa,&
-          & pl,fidh,descrh,h,ih1,ih2,infoh,pr,lh,lh1,lh2,&
-          & work,lwork,ierror)
-       integer, intent(in)   :: lh, lwork, lh1, lh2, m, n                 
-       integer, intent(out)  :: ierror                 
-       character, intent(in) :: check, trans, unitd                               
-       complex(kind(1.d0)), intent(in)  :: d(*), a(*)
-       complex(kind(1.d0)), intent(out) :: h(*)
-       complex(kind(1.d0)), intent(inout) :: work(*)
-       integer, intent(in)  :: ia1(*), ia2(*), infoa(*)
-       integer, intent(out) :: ih1(*), ih2(*), pl(*),pr(*), infoh(*) 
-       character, intent(in) ::  fida*5, descra*11
-       character, intent(out) :: fidh*5, descrh*11
-     end subroutine zcsdp
+    subroutine zcsdp(check,trans,m,n,unitd,d,&
+         & fida,descra,a,ia1,ia2,infoa,&
+         & pl,fidh,descrh,h,ih1,ih2,infoh,pr,lh,lh1,lh2,&
+         & work,lwork,ierror)
+      integer, intent(in)   :: lh, lwork, lh1, lh2, m, n                 
+      integer, intent(out)  :: ierror                 
+      character, intent(in) :: check, trans, unitd                               
+      complex(kind(1.d0)), intent(in)  :: d(*), a(*)
+      complex(kind(1.d0)), intent(out) :: h(*)
+      complex(kind(1.d0)), intent(inout) :: work(*)
+      integer, intent(in)  :: ia1(*), ia2(*), infoa(*)
+      integer, intent(out) :: ih1(*), ih2(*), pl(*),pr(*), infoh(*) 
+      character, intent(in) ::  fida*5, descra*11
+      character, intent(out) :: fidh*5, descrh*11
+    end subroutine zcsdp
   end interface
 
 
   interface zcsrp
 
-     subroutine zcsrp(trans,m,n,fida,descra,ia1,ia2,&
-          & infoa,p,work,lwork,ierror)
-       integer, intent(in)  :: m, n, lwork
-       integer, intent(out) :: ierror
-       character, intent(in) ::       trans
-       complex(kind(1.d0)), intent(inout) :: work(*)                     
-       integer, intent(in)    :: p(*)
-       integer, intent(inout) :: ia1(*), ia2(*), infoa(*) 
-       character, intent(in)  :: fida*5, descra*11
-     end subroutine zcsrp
+    subroutine zcsrp(trans,m,n,fida,descra,ia1,ia2,&
+         & infoa,p,work,lwork,ierror)
+      integer, intent(in)  :: m, n, lwork
+      integer, intent(out) :: ierror
+      character, intent(in) ::       trans
+      complex(kind(1.d0)), intent(inout) :: work(*)                     
+      integer, intent(in)    :: p(*)
+      integer, intent(inout) :: ia1(*), ia2(*), infoa(*) 
+      character, intent(in)  :: fida*5, descra*11
+    end subroutine zcsrp
   end interface
 
   interface zcsprt
-     subroutine zcsprt(m,n,fida,descra,a,ia1,ia2,infoa ,iout,ierror)
-       integer, intent(in)  ::  iout,m, n                 
-       integer, intent(out) ::  ierror                 
-       complex(kind(1.d0)), intent(in) :: a(*)
-       integer, intent(in)   :: ia1(*), ia2(*), infoa(*)
-       character, intent(in) :: fida*5, descra*11
-     end subroutine zcsprt
+    subroutine zcsprt(m,n,fida,descra,a,ia1,ia2,infoa ,iout,ierror)
+      integer, intent(in)  ::  iout,m, n                 
+      integer, intent(out) ::  ierror                 
+      complex(kind(1.d0)), intent(in) :: a(*)
+      integer, intent(in)   :: ia1(*), ia2(*), infoa(*)
+      character, intent(in) :: fida*5, descra*11
+    end subroutine zcsprt
   end interface
 
   !...parameters....
@@ -104,7 +105,7 @@ subroutine psb_zspcnv(a,b,desc_a,info)
   integer,pointer               ::  i_temp(:)
   complex(kind(1.d0)),pointer      ::  work_dcsdp(:)
   integer                       ::  ia1_size,ia2_size,aspk_size,err_act&
-       & ,i,err,nprow,npcol,myrow,mycol,n_col,l_dcsdp, iout, nrow
+       & ,i,err,np,npcol,me,mycol,n_col,l_dcsdp, iout, nrow
   integer                       ::  lwork_dcsdp,dectype
   integer                       ::  ictxt,temp(1),n_row
   character                     ::  check*1, trans*1, unitd*1
@@ -114,7 +115,7 @@ subroutine psb_zspcnv(a,b,desc_a,info)
   logical, parameter :: debug=.false.
   character(len=20)   :: name, ch_err
 
-  if(psb_get_errstatus().ne.0) return 
+  if(psb_get_errstatus() /= 0) return 
   info=0
   name = 'psb_zspcnv'
   call psb_erractionsave(err_act)
@@ -128,23 +129,18 @@ subroutine psb_zspcnv(a,b,desc_a,info)
   n_col   = desc_a%matrix_data(psb_n_col_)
 
   ! check on blacs grid 
-  call blacs_gridinfo(ictxt, nprow, npcol, myrow, mycol)
-  if (nprow.eq.-1) then
-     info = 2010
-     call psb_errpush(info,name)
-     goto 9999
-  else if (npcol.ne.1) then
-     info = 2030
-     int_err(1) = npcol
-     call psb_errpush(info,name,i_err=int_err)
-     goto 9999
+  call psb_info(ictxt, me, np)
+  if (np == -1) then
+    info = 2010
+    call psb_errpush(info,name)
+    goto 9999
   endif
 
   if (.not.psb_is_ok_dec((dectype))) then
-     info = 600
-     int_err(1) = dectype
-     call psb_errpush(info,name,i_err=int_err)
-     goto 9999
+    info = 600
+    int_err(1) = dectype
+    call psb_errpush(info,name,i_err=int_err)
+    goto 9999
   endif
 
   if (debug) write (0, *) name,'   begin matrix assembly...'
@@ -167,11 +163,11 @@ subroutine psb_zspcnv(a,b,desc_a,info)
   b%k=n_col
   call psb_sp_all(b,ia1_size,ia2_size,aspk_size,info)
   allocate(work_dcsdp(l_dcsdp),stat=info)
-  if (info.ne.0) then
-     info=2025
-     int_err(1)=l_dcsdp
-     call psb_errpush(info, name, i_err=int_err)
-     goto 9999
+  if (info /= 0) then
+    info=2025
+    int_err(1)=l_dcsdp
+    call psb_errpush(info, name, i_err=int_err)
+    goto 9999
   endif
 
   lwork_dcsdp=size(work_dcsdp)
@@ -192,53 +188,53 @@ subroutine psb_zspcnv(a,b,desc_a,info)
        & size(b%aspk),size(b%ia1),size(b%ia2),&
        & work_dcsdp,size(work_dcsdp),info)
 
-  if(info.ne.no_err) then
-     info=4010
-     ch_err='zcsdp'
-     call psb_errpush(info, name, a_err=ch_err)
-     goto 9999
+  if(info /= no_err) then
+    info=4010
+    ch_err='zcsdp'
+    call psb_errpush(info, name, a_err=ch_err)
+    goto 9999
   end if
 
   !
   !  hmmm, have to fix b%pl and b%pr according to a%pl and a%pr!!! 
   !  should work (crossed fingers :-)
-  if (a%pr(1).ne.0) then 
-     if (b%pr(1).ne.0) then 
-        allocate(i_temp(n_col))
-        do i=1,  n_col
-           i_temp(i) = b%pr(a%pr(i))
-        enddo
-        deallocate(b%pr)
-        b%pr => i_temp
-     else
-        allocate(i_temp(n_col))
-        do i=1,  n_col
-           i_temp(i) = a%pr(i)
-        enddo
-        deallocate(b%pr)
-        b%pr => i_temp
-     endif
+  if (a%pr(1) /= 0) then 
+    if (b%pr(1) /= 0) then 
+      allocate(i_temp(n_col))
+      do i=1,  n_col
+        i_temp(i) = b%pr(a%pr(i))
+      enddo
+      deallocate(b%pr)
+      b%pr => i_temp
+    else
+      allocate(i_temp(n_col))
+      do i=1,  n_col
+        i_temp(i) = a%pr(i)
+      enddo
+      deallocate(b%pr)
+      b%pr => i_temp
+    endif
   endif
-  if (a%pl(1).ne.0) then 
-     if (b%pr(1).ne.0) then 
-        allocate(i_temp(n_row))
-        do i=1,  n_row
-           i_temp(i) = a%pl(b%pl(i))
-        enddo
-        deallocate(b%pl)
-        b%pl => i_temp
-     else
-        allocate(i_temp(n_row))
-        do i=1,  n_row
-           i_temp(i) = a%pl(i)
-        enddo
-        deallocate(b%pl)
-        b%pl => i_temp
-     endif
+  if (a%pl(1) /= 0) then 
+    if (b%pr(1) /= 0) then 
+      allocate(i_temp(n_row))
+      do i=1,  n_row
+        i_temp(i) = a%pl(b%pl(i))
+      enddo
+      deallocate(b%pl)
+      b%pl => i_temp
+    else
+      allocate(i_temp(n_row))
+      do i=1,  n_row
+        i_temp(i) = a%pl(i)
+      enddo
+      deallocate(b%pl)
+      b%pl => i_temp
+    endif
   endif
 
 
-  if (debug) write (0, *) myrow,name,'  from dcsdp ',&
+  if (debug) write (0, *) me,name,'  from zcsdp ',&
        &b%fida,' pl ', b%pl(:),'pr',b%pr(:)
 
   call psb_erractionrestore(err_act)
@@ -246,9 +242,9 @@ subroutine psb_zspcnv(a,b,desc_a,info)
 
 9999 continue
   call psb_erractionrestore(err_act)
-  if (err_act.eq.act_abort) then
-     call psb_error(ictxt)
-     return
+  if (err_act == act_abort) then
+    call psb_error(ictxt)
+    return
   end if
   return
 

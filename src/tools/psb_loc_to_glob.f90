@@ -45,6 +45,7 @@ subroutine psb_loc_to_glob2(x,y,desc_a,info,iact)
   use psb_descriptor_type
   use psb_const_mod
   use psb_error_mod
+  use psb_string_mod
   implicit none
 
   !...parameters....
@@ -62,51 +63,52 @@ subroutine psb_loc_to_glob2(x,y,desc_a,info,iact)
   integer, parameter                 ::  zero=0
   character(len=20)   :: name, char_err
 
-  if(psb_get_errstatus().ne.0) return 
+  if(psb_get_errstatus() /= 0) return 
   info=0
   name='psb_loc_to_glob2'
   call psb_erractionsave(err_act)
 
   if (present(iact)) then
-     act=iact
+    act=iact
   else
-     act='A'
-  endif   
-  
+    act='A'
+  endif
+  act=toupper(act)
+
   real_val = 0.d0
 
   n=size(x)
   do i=1,n
-     if ((x(i).gt.desc_a%matrix_data(psb_n_col_)).or.&
-          &  (x(i).le.zero)) then
-        info=140
+    if ((x(i).gt.desc_a%matrix_data(psb_n_col_)).or.&
+         &  (x(i).le.zero)) then
+      info=140
+      int_err(1)=tmp
+      int_err(2)=desc_a%matrix_data(psb_n_col_)  
+      exit
+    else
+      tmp=desc_a%loc_to_glob(x(i))
+      if((tmp.gt.zero).or.(tmp.le.desc_a%matrix_data(psb_m_))) then
+        y(i)=tmp
+      else
+        info = 140
         int_err(1)=tmp
-        int_err(2)=desc_a%matrix_data(psb_n_col_)  
+        int_err(2)=desc_a%matrix_data(psb_n_col_)
         exit
-     else
-        tmp=desc_a%loc_to_glob(x(i))
-        if((tmp.gt.zero).or.(tmp.le.desc_a%matrix_data(psb_m_))) then
-           y(i)=tmp
-        else
-           info = 140
-           int_err(1)=tmp
-           int_err(2)=desc_a%matrix_data(psb_n_col_)
-           exit
-        end if
-     end if
+      end if
+    end if
   enddo
-  
-  if (info.ne.0) then
-     select case(act)
-     case('E')
-        call psb_erractionrestore(err_act)
-        return
-     case('W')
-        write(0,'("Error ",i5," in subroutine glob_to_loc")') info
-     case('A')
-        call psb_errpush(info,name)
-        goto 9999
-     end select
+
+  if (info /= 0) then
+    select case(act)
+    case('E')
+      call psb_erractionrestore(err_act)
+      return
+    case('W')
+      write(0,'("Error ",i5," in subroutine glob_to_loc")') info
+    case('A')
+      call psb_errpush(info,name)
+      goto 9999
+    end select
   endif
 
   call psb_erractionrestore(err_act)
@@ -115,10 +117,10 @@ subroutine psb_loc_to_glob2(x,y,desc_a,info,iact)
 9999 continue
   call psb_erractionrestore(err_act)
 
-  if (err_act.eq.act_ret) then
-     return
+  if (err_act == act_ret) then
+    return
   else
-     call psb_error()
+    call psb_error()
   end if
   return
 
@@ -169,6 +171,7 @@ subroutine psb_loc_to_glob(x,desc_a,info,iact)
   use psb_descriptor_type
   use psb_const_mod
   use psb_error_mod
+  use psb_string_mod
   implicit none
 
   !...parameters....
@@ -185,16 +188,17 @@ subroutine psb_loc_to_glob(x,desc_a,info,iact)
   integer, parameter                 ::  zero=0
   character(len=20)   :: name, char_err
 
-  if(psb_get_errstatus().ne.0) return 
+  if(psb_get_errstatus() /= 0) return 
   info=0
   name='psb_loc_to_glob'
   call psb_erractionsave(err_act)
 
   if (present(iact)) then
-     act=iact
+    act=iact
   else
-     act='A'
-  endif   
+    act='A'
+  endif
+  act = toupper(act)
 
   real_val = 0.d0
 
@@ -217,17 +221,17 @@ subroutine psb_loc_to_glob(x,desc_a,info,iact)
     end if
   enddo
 
-  if (info.ne.0) then
-     select case(act)
-     case('E')
-        call psb_erractionrestore(err_act)
-        return
-     case('W')
-        write(0,'("Error ",i5," in subroutine glob_to_loc")') info
-     case('A')
-        call psb_errpush(info,name)
-        goto 9999
-     end select
+  if (info /= 0) then
+    select case(act)
+    case('E')
+      call psb_erractionrestore(err_act)
+      return
+    case('W')
+      write(0,'("Error ",i5," in subroutine glob_to_loc")') info
+    case('A')
+      call psb_errpush(info,name)
+      goto 9999
+    end select
   endif
 
   call psb_erractionrestore(err_act)
@@ -236,10 +240,10 @@ subroutine psb_loc_to_glob(x,desc_a,info,iact)
 9999 continue
   call psb_erractionrestore(err_act)
 
-  if (err_act.eq.act_ret) then
-     return
+  if (err_act == act_ret) then
+    return
   else
-     call psb_error()
+    call psb_error()
   end if
   return
 

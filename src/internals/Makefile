@@ -20,7 +20,7 @@ lib: mpfobjs $(FOBJS) $(FOBJS2) $(COBJS) $(MPFOBJS2)
 	$(RANLIB) $(LIBDIR)/$(LIBNAME)
 
 
-mpfobjs: 
+mpfobjs: psi_gthsct.o
 	(make $(MPFOBJS) F90="$(MPF90)" FC="$(MPF90)" FCOPT="$(F90COPT)")	
 	(make $(MPFOBJS2) F90="$(MPF77)" FC="$(MPF77)" FCOPT="$(FCOPT)")
 	(make $(FOBJS2) F90="$(MPF77)" FC="$(MPF77)" FCOPT="$(FCOPT)")

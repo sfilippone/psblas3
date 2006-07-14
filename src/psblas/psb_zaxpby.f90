@@ -54,6 +54,7 @@ subroutine  psb_zaxpby(alpha, x, beta,y,desc_a,info, n, jx, jy)
   use psb_check_mod
   use psb_const_mod
   use psb_error_mod
+  use psb_penv_mod
   implicit none                    
 
   integer, intent(in), optional   :: n, jx, jy
@@ -64,7 +65,7 @@ subroutine  psb_zaxpby(alpha, x, beta,y,desc_a,info, n, jx, jy)
   complex(kind(1.D0)), intent(inout) :: y(:,:)
 
   ! locals
-  integer                  :: int_err(5), ictxt, nprow, npcol, myrow, mycol,&
+  integer                  :: int_err(5), ictxt, np, npcol, me, mycol,&
        & err_act, iix, jjx, temp(2), ix, iy, ijx, ijy, m, iiy, in, jjy
   character(len=20)        :: name, ch_err
 
@@ -75,48 +76,42 @@ subroutine  psb_zaxpby(alpha, x, beta,y,desc_a,info, n, jx, jy)
 
   ictxt=desc_a%matrix_data(psb_ctxt_)
 
-  ! check on blacs grid 
-  call blacs_gridinfo(ictxt, nprow, npcol, myrow, mycol)
-  if (nprow == -ione) then
+  call psb_info(ictxt, me, np)
+  if (np == -ione) then
     info = 2010
-    call psb_errpush(info,name)
-    goto 9999
-  else if (npcol /= ione) then
-    info = 2030
-    int_err(1) = npcol
     call psb_errpush(info,name)
     goto 9999
   endif
 
   ix = ione
   if (present(jx)) then
-     ijx = jx
+    ijx = jx
   else
-     ijx = ione
+    ijx = ione
   endif
 
   iy = ione
   if (present(jy)) then
-     ijy = jy
+    ijy = jy
   else
-     ijy = ione
+    ijy = ione
   endif
 
   if (present(n)) then
-     if(((ijx+n).le.size(x,2)).and.&
-          & ((ijy+n).le.size(y,2))) then 
-        in = n
-     else
-        in = min(size(x,2),size(y,2))
-     end if
+    if(((ijx+n).le.size(x,2)).and.&
+         & ((ijy+n).le.size(y,2))) then 
+      in = n
+    else
+      in = min(size(x,2),size(y,2))
+    end if
   else
-     in = min(size(x,2),size(y,2))
+    in = min(size(x,2),size(y,2))
   endif
 
   if(ijx.ne.ijy) then
-     info=3050
-     call psb_errpush(info,name)
-     goto 9999
+    info=3050
+    call psb_errpush(info,name)
+    goto 9999
   end if
 
   m = desc_a%matrix_data(psb_m_)
@@ -125,26 +120,26 @@ subroutine  psb_zaxpby(alpha, x, beta,y,desc_a,info, n, jx, jy)
   call psb_chkvect(m,ione,size(x,1),ix,ijx,desc_a%matrix_data,info,iix,jjx)
   call psb_chkvect(m,ione,size(y,1),iy,ijy,desc_a%matrix_data,info,iiy,jjy)
   if(info.ne.0) then
-     info=4010
-     ch_err='psb_chkvect'
-     call psb_errpush(info,name,a_err=ch_err)
-     goto 9999
+    info=4010
+    ch_err='psb_chkvect'
+    call psb_errpush(info,name,a_err=ch_err)
+    goto 9999
   end if
 
   if ((iix.ne.ione).or.(iiy.ne.ione)) then
-     info=3040
-     call psb_errpush(info,name)
-     goto 9999
+    info=3040
+    call psb_errpush(info,name)
+    goto 9999
   end if
-  
+
   if ((in.ne.0)) then
-     if(desc_a%matrix_data(psb_n_row_).gt.0) then
-        call zaxpby(desc_a%matrix_data(psb_n_col_),in,&
-             & alpha,x(iix,jjx),size(x,1),beta,&
-             & y(iiy,jjy),size(y,1),info)
-     end if
+    if(desc_a%matrix_data(psb_n_row_).gt.0) then
+      call zaxpby(desc_a%matrix_data(psb_n_col_),in,&
+           & alpha,x(iix,jjx),size(x,1),beta,&
+           & y(iiy,jjy),size(y,1),info)
+    end if
   end if
-        
+
   call psb_erractionrestore(err_act)
   return  
 
@@ -152,8 +147,8 @@ subroutine  psb_zaxpby(alpha, x, beta,y,desc_a,info, n, jx, jy)
   call psb_erractionrestore(err_act)
 
   if (err_act.eq.act_abort) then
-     call psb_error(ictxt)
-     return
+    call psb_error(ictxt)
+    return
   end if
   return
 end subroutine psb_zaxpby
@@ -211,6 +206,7 @@ subroutine  psb_zaxpbyv(alpha, x, beta,y,desc_a,info)
   use psb_const_mod
   use psb_check_mod
   use psb_error_mod
+  use psb_penv_mod
   implicit none                    
 
   integer, intent(out)            :: info
@@ -220,7 +216,7 @@ subroutine  psb_zaxpbyv(alpha, x, beta,y,desc_a,info)
   complex(kind(1.D0)), intent(inout) :: y(:)
 
   ! locals
-  integer                  :: int_err(5), ictxt, nprow, npcol, myrow, mycol,&
+  integer                  :: int_err(5), ictxt, np, npcol, me, mycol,&
        & err_act, n, iix, jjx, temp(2), ix, iy, ijx, m, iiy, in, jjy
   character(len=20)        :: name, ch_err
   logical, parameter :: debug=.false.
@@ -232,15 +228,9 @@ subroutine  psb_zaxpbyv(alpha, x, beta,y,desc_a,info)
 
   ictxt=desc_a%matrix_data(psb_ctxt_)
 
-  ! check on blacs grid 
-  call blacs_gridinfo(ictxt, nprow, npcol, myrow, mycol)
-  if (nprow == -ione) then
+  call psb_info(ictxt, me, np)
+  if (np == -ione) then
     info = 2010
-    call psb_errpush(info,name)
-    goto 9999
-  else if (npcol /= ione) then
-    info = 2030
-    int_err(1) = npcol
     call psb_errpush(info,name)
     goto 9999
   endif
@@ -249,34 +239,34 @@ subroutine  psb_zaxpbyv(alpha, x, beta,y,desc_a,info)
   iy = ione
 
   m = desc_a%matrix_data(psb_m_)
-  
+
   ! check vector correctness
   call psb_chkvect(m,ione,size(x),ix,ione,desc_a%matrix_data,info,iix,jjx)
   if(info.ne.0) then
-     info=4010
-     ch_err='psb_chkvect 1'
-     call psb_errpush(info,name,a_err=ch_err)
-     goto 9999
+    info=4010
+    ch_err='psb_chkvect 1'
+    call psb_errpush(info,name,a_err=ch_err)
+    goto 9999
   end if
   call psb_chkvect(m,ione,size(y),iy,ione,desc_a%matrix_data,info,iiy,jjy)
   if(info.ne.0) then
-     info=4010
-     ch_err='psb_chkvect 2'
-     call psb_errpush(info,name,a_err=ch_err)
-     goto 9999
+    info=4010
+    ch_err='psb_chkvect 2'
+    call psb_errpush(info,name,a_err=ch_err)
+    goto 9999
   end if
 
   if ((iix.ne.ione).or.(iiy.ne.ione)) then
-     info=3040
-     call psb_errpush(info,name)
+    info=3040
+    call psb_errpush(info,name)
   end if
-  
+
   if(desc_a%matrix_data(psb_n_row_).gt.0) then
-     call zaxpby(desc_a%matrix_data(psb_n_col_),ione,&
-          & alpha,x,size(x),beta,&
-          & y,size(y),info)
+    call zaxpby(desc_a%matrix_data(psb_n_col_),ione,&
+         & alpha,x,size(x),beta,&
+         & y,size(y),info)
   end if
-  
+
   call psb_erractionrestore(err_act)
   return  
 
@@ -284,8 +274,8 @@ subroutine  psb_zaxpbyv(alpha, x, beta,y,desc_a,info)
   call psb_erractionrestore(err_act)
 
   if (err_act.eq.act_abort) then
-     call psb_error(ictxt)
-     return
+    call psb_error(ictxt)
+    return
   end if
   return
 end subroutine psb_zaxpbyv

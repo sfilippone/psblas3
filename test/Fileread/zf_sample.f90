@@ -75,7 +75,6 @@ program zf_sample
   ! communications data structure
   type(psb_desc_type):: desc_a
 
-  ! blacs variables
   integer               :: ictxt, iam, np
   logical               :: amroot
 
@@ -270,11 +269,11 @@ program zf_sample
   end if
 
   iparm = 0
-  call blacs_barrier(ictxt,'all')
+  call psb_barrier(ictxt)
   t1 = mpi_wtime()
   call psb_krylov(cmethd,a,pre,b_col,x_col,eps,desc_a,info,& 
        & itmax=itmax,iter=iter,err=err,itrace=itrace,istop=istopc,irst=ml)     
-  call blacs_barrier(ictxt,'all')
+  call psb_barrier(ictxt)
   t2 = mpi_wtime() - t1
   call psb_amx(ictxt,t2)
   call psb_geaxpby(zone,b_col,zzero,r_col,desc_a,info)

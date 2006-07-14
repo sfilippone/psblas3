@@ -45,6 +45,7 @@ subroutine psb_cdins(nz,ia,ja,desc_a,info)
   use psb_serial_mod
   use psb_const_mod
   use psb_error_mod
+  use psb_penv_mod
   implicit none
 
   !....PARAMETERS...
@@ -58,7 +59,7 @@ subroutine psb_cdins(nz,ia,ja,desc_a,info)
        & first_loc_row,j, ierror,locix,locjx,&
        & dectype,mglob, nnza, nglob,err
   integer,pointer        :: tia1(:),tia2(:), temp(:)
-  integer                :: nprow,npcol, me ,mypcol, iflag, isize, irlc
+  integer                :: np,npcol, me ,mypcol, iflag, isize, irlc
   integer                :: m,n, pnt_halo,nrow,ncol, nh, ip,jp, err_act
   logical, parameter     :: debug=.false.
   integer, parameter     :: relocsz=200
@@ -75,13 +76,8 @@ subroutine psb_cdins(nz,ia,ja,desc_a,info)
   nrow    = desc_a%matrix_data(psb_n_row_)
   ncol    = desc_a%matrix_data(psb_n_col_)
 
-  ! check on blacs grid 
-  call blacs_gridinfo(ictxt, nprow, npcol, me, mypcol)
-  if (npcol.ne.1) then
-    info = 2030
-    call psb_errpush(info,name)
-    goto 9999
-  endif
+  call psb_info(ictxt, me, np)
+
   if (.not.psb_is_bld_dec(dectype)) then 
     info = 3110
     call psb_errpush(info,name)
@@ -98,20 +94,20 @@ subroutine psb_cdins(nz,ia,ja,desc_a,info)
     call psb_errpush(info,name)
     goto 9999
   end if
-    
+
   if (size(ja) < nz) then 
     info = 1111
     call psb_errpush(info,name)
     goto 9999
   end if
-    
+
 
   if (.not.associated(desc_a%halo_index)) then
     allocate(desc_a%halo_index(relocsz))
     desc_a%halo_index(:) = -1
   endif
   pnt_halo=1
-  do while (desc_a%halo_index(pnt_halo) .ne.  -1 )
+  do while (desc_a%halo_index(pnt_halo)  /=   -1 )
     pnt_halo = pnt_halo + 1
   end do
   isize = size(desc_a%halo_index)
@@ -120,15 +116,15 @@ subroutine psb_cdins(nz,ia,ja,desc_a,info)
     ip = ia(i) 
     jp = ja(i)
     if ((ip < 1 ).or.(ip>mglob).or.(jp<1).or.(jp>mglob)) then 
-!      write(0,*) 'wrong input ',i,ip,jp
+      !      write(0,*) 'wrong input ',i,ip,jp
       info = 1133
       call psb_errpush(info,name)
       goto 9999
     endif
     if ((1<=desc_a%glob_to_loc(ip)).and.(desc_a%glob_to_loc(ip))<=nrow) then
       k  = desc_a%glob_to_loc(jp)
-      if (k.lt.-nprow) then
-        k = k + nprow
+      if (k.lt.-np) then
+        k = k + np
         k = - k - 1
         ncol = ncol + 1      
         desc_a%glob_to_loc(jp)   = ncol
@@ -140,10 +136,10 @@ subroutine psb_cdins(nz,ia,ja,desc_a,info)
             if (debug) write(0,*) 'done realloc ',nh
           end if
           if (info /= 0) then
-             info=4010
-             ch_err='psb_realloc'
-             call psb_errpush(info,name)
-             goto 9999
+            info=4010
+            ch_err='psb_realloc'
+            call psb_errpush(info,name)
+            goto 9999
           end if
           isize = nh
         endif
@@ -153,10 +149,10 @@ subroutine psb_cdins(nz,ia,ja,desc_a,info)
           nh = isize + max(nz,relocsz)
           call psb_realloc(nh,desc_a%halo_index,info,pad=-1)
           if (info /= 0) then
-             info=4010
-             ch_err='psb_realloc'
-             call psb_errpush(info,name)
-             goto 9999
+            info=4010
+            ch_err='psb_realloc'
+            call psb_errpush(info,name)
+            goto 9999
           end if
           isize = nh 
         endif
@@ -170,17 +166,17 @@ subroutine psb_cdins(nz,ia,ja,desc_a,info)
     endif
   enddo
   desc_a%matrix_data(psb_n_col_) = ncol
-  
+
   call psb_erractionrestore(err_act)
   return
-  
+
 9999 continue
   call psb_erractionrestore(err_act)
-  
+
   if (err_act.eq.act_ret) then
-     return
+    return
   else
-     call psb_error(ictxt)
+    call psb_error(ictxt)
   end if
   return
 

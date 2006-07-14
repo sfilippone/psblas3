@@ -83,6 +83,7 @@ subroutine psb_dbicg(a,prec,b,x,eps,desc_a,info,&
   use psb_const_mod
   use psb_prec_mod
   use psb_error_mod
+  use psb_penv_mod
   implicit none
 
 !!$  parameters 
@@ -103,7 +104,7 @@ subroutine psb_dbicg(a,prec,b,x,eps,desc_a,info,&
   integer, pointer           :: iperm(:), ipnull(:), ipsave(:), int_err(:)
   real(kind(1.d0)) ::rerr
   integer       ::litmax, liter, naux, m, mglob, it, itrace_,&
-       & nprows,npcols,me,mecol, n_row, n_col, istop_, err_act
+       & np,me, n_row, n_col, istop_, err_act
   character     ::diagl, diagu
   logical, parameter :: debug = .false.
   logical, parameter :: exchange=.true., noexchange=.false.  
@@ -120,8 +121,8 @@ subroutine psb_dbicg(a,prec,b,x,eps,desc_a,info,&
 
   if (debug) write(*,*) 'entering psb_dbicg'
   ictxt = desc_a%matrix_data(psb_ctxt_)
-  call blacs_gridinfo(ictxt,nprows,npcols,me,mecol)
-  if (debug) write(*,*) 'psb_dbicg: from gridinfo',nprows,npcols,me
+  call psb_info(ictxt, me, np)
+  if (debug) write(*,*) 'psb_dbicg: from gridinfo',np,me
 
   mglob = desc_a%matrix_data(psb_m_)
   n_row = desc_a%matrix_data(psb_n_row_)

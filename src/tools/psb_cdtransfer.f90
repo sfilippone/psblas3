@@ -44,6 +44,7 @@ subroutine psb_cdtransfer(desc_in, desc_out, info)
   use psb_realloc_mod
   use psb_const_mod
   use psb_error_mod
+  use psb_penv_mod
 
   implicit none
   !....parameters...
@@ -53,7 +54,7 @@ subroutine psb_cdtransfer(desc_in, desc_out, info)
   integer, intent(out)                :: info
 
   !locals
-  integer             :: nprow,npcol,me,mypcol,&
+  integer             :: np,npcol,me,mypcol,&
        & ictxt, isz, dectype, err_act, err
   integer             :: int_err(5),temp(1)
   real(kind(1.d0))    :: real_err(5)
@@ -66,17 +67,12 @@ subroutine psb_cdtransfer(desc_in, desc_out, info)
   name = 'psb_cdtransfer'
   
   ictxt=desc_in%matrix_data(psb_ctxt_)
-  ! check on blacs grid 
-  call blacs_gridinfo(ictxt, nprow, npcol, me, mypcol)
+
+  call psb_info(ictxt, me, np)
   if (debug) write(0,*) me,'Entered CDTRANSFER'
-  if (nprow.eq.-1) then
+  if (np == -1) then
      info = 2010
      call psb_errpush(info,name)
-     goto 9999
-  else if (npcol.ne.1) then
-     info = 2030
-     int_err(1) = npcol
-     call psb_errpush(info,name,int_err)
      goto 9999
   endif
 
@@ -100,7 +96,7 @@ subroutine psb_cdtransfer(desc_in, desc_out, info)
 9999 continue
   call psb_erractionrestore(err_act)
   
-  if (err_act.eq.act_ret) then
+  if (err_act == act_ret) then
      return
   else
      call psb_error(ictxt)

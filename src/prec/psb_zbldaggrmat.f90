@@ -36,13 +36,13 @@
 !!$  
 subroutine psb_zbldaggrmat(a,desc_a,ac,p,desc_p,info)
   use psb_serial_mod
+  use psb_penv_mod
   use psb_prec_type
   use psb_descriptor_type
   use psb_spmat_type
   use psb_tools_mod
   use psb_psblas_mod
   use psb_error_mod
-  use psb_penv_mod
   implicit none
 
   type(psb_zspmat_type), intent(in), target  :: a
@@ -53,7 +53,7 @@ subroutine psb_zbldaggrmat(a,desc_a,ac,p,desc_p,info)
   integer, intent(out)                       :: info
 
   logical, parameter :: aggr_dump=.false.
-  integer ::ictxt,nprow,npcol,me,mycol, err_act
+  integer ::ictxt,np,npcol,me,mycol, err_act
   character(len=20) :: name, ch_err
   name='psb_zbldaggrmat'
   if(psb_get_errstatus().ne.0) return 
@@ -61,7 +61,7 @@ subroutine psb_zbldaggrmat(a,desc_a,ac,p,desc_p,info)
   call psb_erractionsave(err_act)
 
   ictxt=desc_a%matrix_data(psb_ctxt_)
-  call blacs_gridinfo(ictxt,nprow,npcol,me,mycol)
+  call psb_info(ictxt, me, np)
 
   select case (p%iprcparm(smth_kind_))
   case (no_smth_) 
@@ -115,7 +115,7 @@ contains
     type(psb_zspmat_type)          :: b, tmp
     integer, pointer :: nzbr(:), idisp(:)
     integer :: ictxt, nrow, nglob, ncol, ntaggr, nzbg, ip, ndx,&
-         & naggr, np, myprow, mypcol, nprows, npcols,nzt,irs,jl,nzl,nlr,&
+         & naggr, np, me, mypcol, nprows, npcols,nzt,irs,jl,nzl,nlr,&
          & icomm,naggrm1, mtype, i, j, k, err_act
     name='raw_aggregate'
     if(psb_get_errstatus().ne.0) return 
@@ -126,13 +126,12 @@ contains
     call psb_nullify_sp(b)
 
     ictxt = desc_a%matrix_data(psb_ctxt_)
-    call blacs_gridinfo(ictxt,nprows,npcols,myprow,mypcol)
-    np = nprows*npcols
+    call psb_info(ictxt, me, np)
     nglob = desc_a%matrix_data(psb_m_)
     nrow  = desc_a%matrix_data(psb_n_row_)
     ncol  = desc_a%matrix_data(psb_n_col_)
 
-    naggr  = p%nlaggr(myprow+1)
+    naggr  = p%nlaggr(me+1)
     ntaggr = sum(p%nlaggr)
     allocate(nzbr(np), idisp(np),stat=info)
 
@@ -141,7 +140,7 @@ contains
       goto 9999      
     end if
 
-    naggrm1=sum(p%nlaggr(1:myprow))
+    naggrm1=sum(p%nlaggr(1:me))
 
     if (p%iprcparm(coarse_mat_) == mat_repl_) then
       do i=1, nrow
@@ -249,7 +248,7 @@ contains
       call psb_cdrep(ntaggr,ictxt,desc_p,info)
 
       nzbr(:) = 0
-      nzbr(myprow+1) = irs
+      nzbr(me+1) = irs
       call psb_sum(ictxt,nzbr(1:np))
       nzbg = sum(nzbr)
       call psb_sp_all(ntaggr,ntaggr,bg,nzbg,info)
@@ -258,11 +257,11 @@ contains
         goto 9999
       end if
 
-      call blacs_get(ictxt,10,icomm )
+      call psb_get_mpicomm(ictxt,icomm)
       do ip=1,np
         idisp(ip) = sum(nzbr(1:ip-1))
       enddo
-      ndx = nzbr(myprow+1) 
+      ndx = nzbr(me+1) 
 
       call mpi_allgatherv(b%aspk,ndx,mpi_double_complex,bg%aspk,nzbr,idisp,&
            & mpi_double_complex,icomm,info)
@@ -392,7 +391,7 @@ contains
     type(psb_zspmat_type)          :: b
     integer, pointer :: nzbr(:), idisp(:), ivall(:)
     integer :: ictxt, nrow, nglob, ncol, ntaggr, nzbg, ip, ndx,&
-         & naggr, np, myprow, mypcol, nprows, npcols,&
+         & naggr, np, me, mypcol, nprows, npcols,&
          & icomm, naggrm1,naggrp1,mtype,i,j,err_act,k,nzl
     type(psb_zspmat_type), pointer  :: am1,am2
     type(psb_zspmat_type) :: am3,am4
@@ -410,7 +409,7 @@ contains
     call psb_erractionsave(err_act)
 
     ictxt = desc_a%matrix_data(psb_ctxt_)
-    call blacs_gridinfo(ictxt,nprows,npcols,myprow,mypcol)
+    call psb_info(ictxt, me, np)
 
     bg => ac
     call psb_nullify_sp(b)
@@ -420,13 +419,11 @@ contains
     am2 => p%av(sm_pr_t_)
     am1 => p%av(sm_pr_)
 
-
-    np    = nprows*npcols
     nglob = desc_a%matrix_data(psb_m_)
     nrow  = desc_a%matrix_data(psb_n_row_)
     ncol  = desc_a%matrix_data(psb_n_col_)
 
-    naggr  = p%nlaggr(myprow+1)
+    naggr  = p%nlaggr(me+1)
     ntaggr = sum(p%nlaggr)
 
     allocate(nzbr(np), idisp(np),stat=info)
@@ -436,8 +433,8 @@ contains
     end if
 
 
-    naggrm1 = sum(p%nlaggr(1:myprow))
-    naggrp1 = sum(p%nlaggr(1:myprow+1))
+    naggrm1 = sum(p%nlaggr(1:me))
+    naggrp1 = sum(p%nlaggr(1:me+1))
 
     ml_global_nmb = ( (p%iprcparm(smth_kind_) == smth_omg_).or.&
          & ( (p%iprcparm(smth_kind_) == smth_biz_).and.&
@@ -899,7 +896,7 @@ contains
         !
         !
         nzbr(:) = 0
-        nzbr(myprow+1) = b%infoa(psb_nnz_)
+        nzbr(me+1) = b%infoa(psb_nnz_)
 
         call psb_cdrep(ntaggr,ictxt,desc_p,info)
 
@@ -909,11 +906,11 @@ contains
         if(info /= 0) goto 9999
 
 
-        call blacs_get(ictxt,10,icomm )
+        call psb_get_mpicomm(ictxt,icomm)
         do ip=1,np
           idisp(ip) = sum(nzbr(1:ip-1))
         enddo
-        ndx = nzbr(myprow+1) 
+        ndx = nzbr(me+1) 
 
         call mpi_allgatherv(b%aspk,ndx,mpi_double_complex,bg%aspk,nzbr,idisp,&
              & mpi_double_complex,icomm,info)
@@ -968,7 +965,7 @@ contains
         !
         !
         nzbr(:) = 0
-        nzbr(myprow+1) = b%infoa(psb_nnz_)
+        nzbr(me+1) = b%infoa(psb_nnz_)
 
         call psb_cdrep(ntaggr,ictxt,desc_p,info)
 
@@ -981,11 +978,11 @@ contains
           goto 9999
         end if
 
-        call blacs_get(ictxt,10,icomm )
+        call psb_get_mpicomm(ictxt,icomm)
         do ip=1,np
           idisp(ip) = sum(nzbr(1:ip-1))
         enddo
-        ndx = nzbr(myprow+1) 
+        ndx = nzbr(me+1) 
 
         call mpi_allgatherv(b%aspk,ndx,mpi_double_complex,bg%aspk,nzbr,idisp,&
              & mpi_double_complex,icomm,info)

@@ -53,7 +53,7 @@ subroutine psb_cdasb(desc_a,info)
   !....Locals....
   integer          ::  int_err(5), itemp(2)
   integer,pointer  ::  ovrlap_index(:),halo_index(:)
-  integer          ::  i,err,nprow,npcol,me,mypcol,&
+  integer          ::  i,err,np,me,&
        & lovrlap,lhalo,nhalo,novrlap,max_size,max_halo,n_col,ldesc_halo,&
        & ldesc_ovrlap, dectype, err_act
   integer                       :: ictxt,n_row
@@ -72,14 +72,9 @@ subroutine psb_cdasb(desc_a,info)
   n_col   = desc_a%matrix_data(psb_n_col_)
 
   ! check on blacs grid 
-  call psb_info(ictxt, me, nprow)
-  if (nprow == -1) then
+  call psb_info(ictxt, me, np)
+  if (np == -1) then
     info = 2010
-    call psb_errpush(info,name)
-    goto 9999
-  else if (npcol /= 1) then
-    info = 2030
-    int_err(1) = npcol
     call psb_errpush(info,name)
     goto 9999
   endif

@@ -44,11 +44,10 @@ subroutine psb_dinsvi(m, irw, val, x, desc_a, info, dupl)
   use psb_descriptor_type
   use psb_const_mod
   use psb_error_mod
+  use psb_penv_mod
   implicit none
 
   ! m rows number of submatrix belonging to val to be inserted
-
-
   ! ix  x global-row corresponding to position at which val submatrix
   !     must be inserted
 
@@ -64,10 +63,10 @@ subroutine psb_dinsvi(m, irw, val, x, desc_a, info, dupl)
   !locals.....
   integer                :: ictxt,i,loc_row,glob_row,row,k,&
        & loc_rows,loc_cols,iblock, liflag,mglob,err_act, int_err(5), err
-  integer                :: nprow,npcol, me ,mypcol,dupl_
+  integer                :: np,npcol, me ,mypcol,dupl_
   character(len=20)   :: name, char_err
 
-  if(psb_get_errstatus().ne.0) return 
+  if(psb_get_errstatus() /= 0) return 
   info=0
   call psb_erractionsave(err_act)
   name = 'psb_dinsvi'
@@ -85,21 +84,15 @@ subroutine psb_dinsvi(m, irw, val, x, desc_a, info, dupl)
 
   ictxt=desc_a%matrix_data(psb_ctxt_)
 
-  ! check on blacs grid 
-  call blacs_gridinfo(ictxt, nprow, npcol, me, mypcol)
-  if (nprow.eq.-1) then
+  call psb_info(ictxt, me, np)
+  if (np == -1) then
     info = 2010
     call psb_errpush(info,name)
-    goto 9999
-  else if (npcol.ne.1) then
-    info = 2030
-    int_err(1) = npcol
-    call psb_errpush(info,name,int_err)
     goto 9999
   endif
 
   !... check parameters....
-  if (m.lt.0) then
+  if (m < 0) then
     info = 10
     int_err(1) = 1
     int_err(2) = m
@@ -110,7 +103,7 @@ subroutine psb_dinsvi(m, irw, val, x, desc_a, info, dupl)
     int_err(1) = desc_a%matrix_data(psb_dec_type_)
     call psb_errpush(info,name,int_err)
     goto 9999
-  else if (size(x, dim=1).lt.desc_a%matrix_data(psb_n_row_)) then
+  else if (size(x, dim=1) < desc_a%matrix_data(psb_n_row_)) then
     info = 310
     int_err(1) = 5
     int_err(2) = 4
@@ -176,7 +169,7 @@ subroutine psb_dinsvi(m, irw, val, x, desc_a, info, dupl)
 9999 continue
   call psb_erractionrestore(err_act)
 
-  if (err_act.eq.act_ret) then
+  if (err_act == act_ret) then
     return
   else
     call psb_error(ictxt)
@@ -231,6 +224,7 @@ subroutine psb_dinsi(m, irw, val, x, desc_a, info, dupl)
   use psb_descriptor_type
   use psb_const_mod
   use psb_error_mod
+  use psb_penv_mod
   implicit none
 
   ! m rows number of submatrix belonging to val to be inserted
@@ -252,10 +246,10 @@ subroutine psb_dinsi(m, irw, val, x, desc_a, info, dupl)
   !locals.....
   integer                :: ictxt,i,loc_row,glob_row,row,k,j,n,&
        & loc_rows,loc_cols,iblock, liflag,mglob,err_act, int_err(5), err
-  integer                :: nprow,npcol, me ,mypcol,dupl_
+  integer                :: np,npcol, me ,mypcol,dupl_
   character(len=20)   :: name, char_err
 
-  if(psb_get_errstatus().ne.0) return 
+  if(psb_get_errstatus() /= 0) return 
   info=0
   call psb_erractionsave(err_act)
   name = 'psb_dinsi'
@@ -273,21 +267,15 @@ subroutine psb_dinsi(m, irw, val, x, desc_a, info, dupl)
 
   ictxt=desc_a%matrix_data(psb_ctxt_)
 
-  ! check on blacs grid 
-  call blacs_gridinfo(ictxt, nprow, npcol, me, mypcol)
-  if (nprow.eq.-1) then
+  call psb_info(ictxt, me, np)
+  if (np == -1) then
     info = 2010
     call psb_errpush(info,name)
-    goto 9999
-  else if (npcol.ne.1) then
-    info = 2030
-    int_err(1) = npcol
-    call psb_errpush(info,name,int_err)
     goto 9999
   endif
 
   !... check parameters....
-  if (m.lt.0) then
+  if (m < 0) then
     info = 10
     int_err(1) = 1
     int_err(2) = m
@@ -298,7 +286,7 @@ subroutine psb_dinsi(m, irw, val, x, desc_a, info, dupl)
     int_err(1) = desc_a%matrix_data(psb_dec_type_)
     call psb_errpush(info,name,int_err)
     goto 9999
-  else if (size(x, dim=1).lt.desc_a%matrix_data(psb_n_row_)) then
+  else if (size(x, dim=1) < desc_a%matrix_data(psb_n_row_)) then
     info = 310
     int_err(1) = 5
     int_err(2) = 4
@@ -370,7 +358,7 @@ subroutine psb_dinsi(m, irw, val, x, desc_a, info, dupl)
 9999 continue
   call psb_erractionrestore(err_act)
 
-  if (err_act.eq.act_ret) then
+  if (err_act == act_ret) then
     return
   else
     call psb_error(ictxt)

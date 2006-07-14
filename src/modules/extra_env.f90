@@ -13,3 +13,8 @@ subroutine psb_get_mpicomm(ictxt,comm)
   integer :: ictxt, comm
   call blacs_get(ictxt,10,comm)
 end subroutine psb_get_mpicomm
+subroutine psb_get_rank(rank,ictxt,id)
+  integer :: rank,ictxt, id
+  integer :: blacs_pnum
+  rank =  blacs_pnum(ictxt,id,0)
+end subroutine psb_get_rank

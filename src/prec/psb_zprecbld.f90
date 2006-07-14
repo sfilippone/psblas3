@@ -45,6 +45,7 @@ subroutine psb_zprecbld(a,desc_a,p,info,upd)
   use psb_const_mod
   use psb_psblas_mod
   use psb_error_mod
+  use psb_penv_mod
   Implicit None
 
   type(psb_zspmat_type), target              :: a
@@ -83,7 +84,7 @@ subroutine psb_zprecbld(a,desc_a,p,info,upd)
 
   ! Local scalars
   Integer      :: err, nnzero, I,j,k,ictxt,&
-       & me,mycol,nprow,npcol,lw, mtype, nrg, nzg, err_act
+       & me,mycol,np,npcol,lw, mtype, nrg, nzg, err_act
   real(kind(1.d0))         :: temp, real_err(5)
   integer      :: int_err(5)
   character    :: iupd
@@ -103,8 +104,8 @@ subroutine psb_zprecbld(a,desc_a,p,info,upd)
   int_err(1) = 0
   ictxt = desc_a%matrix_data(psb_ctxt_)
 
-  if (debug) write(0,*) 'Preconditioner Blacs_gridinfo'
-  call blacs_gridinfo(ictxt, nprow, npcol, me, mycol)
+  if (debug) write(0,*) 'Preconditioner psb_info'
+  call psb_info(ictxt, me, np)
 
   if (present(upd)) then 
     if (debug) write(0,*) 'UPD ', upd

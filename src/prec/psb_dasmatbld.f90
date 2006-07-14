@@ -59,6 +59,7 @@ Subroutine psb_dasmatbld(ptype,novr,a,blk,desc_data,upd,desc_p,info,outfmt)
   use psb_tools_mod
   use psb_const_mod
   use psb_error_mod
+  use psb_penv_mod
   Implicit None
 
   !     .. Array Arguments ..
@@ -173,7 +174,7 @@ Subroutine psb_dasmatbld(ptype,novr,a,blk,desc_data,upd,desc_p,info,outfmt)
 
     call blacs_get(ictxt,10,icomm )
 
-    Call blacs_gridinfo(ictxt,nprow,npcol,me,mycol)
+    Call psb_info(ictxt, me, nprow)
     If(debug)Write(0,*)'BEGIN dasmatbld',me,upd,novr
     t1 = mpi_wtime()
 

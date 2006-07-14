@@ -46,6 +46,7 @@ subroutine psb_cdalv(m, v, ictxt, desc_a, info, flag)
   use psb_serial_mod
   use psb_const_mod
   use psb_error_mod
+  use psb_penv_mod
   implicit None
   !....Parameters...
   Integer, intent(in)               :: m,ictxt, v(:)
@@ -54,7 +55,7 @@ subroutine psb_cdalv(m, v, ictxt, desc_a, info, flag)
   type(psb_desc_type), intent(out)  :: desc_a
 
   !locals
-  Integer             :: counter,i,j,nprow,npcol,myrow,mycol,&
+  Integer             :: counter,i,j,np,npcol,me,mycol,&
        & loc_row,err,loc_col,nprocs,n,itmpov, k,&
        & l_ov_ix,l_ov_el,idx, flag_, err_act
   Integer             :: INT_ERR(5),TEMP(1),EXCH(2)
@@ -63,20 +64,13 @@ subroutine psb_cdalv(m, v, ictxt, desc_a, info, flag)
   logical, parameter  :: debug=.false.
   character(len=20)   :: name, ch_err
 
-  if(psb_get_errstatus().ne.0) return 
+  if(psb_get_errstatus() /= 0) return 
   info=0
   err=0
   name = 'psb_cdalv'
 
-  call blacs_gridinfo(ictxt, nprow, npcol, myrow, mycol)
-  if (debug) write(*,*) 'psb_cdall: ',nprow,npcol,myrow,mycol
-  !     ....verify blacs grid correctness..
-  if (npcol /= 1) then
-     info = 2030
-     int_err(1) = npcol
-     call psb_errpush(info,name,i_err=int_err)
-     goto 9999
-  endif
+  call psb_info(ictxt, me, np)
+  if (debug) write(*,*) 'psb_cdall: ',np,me
 
   n = m
   !... check m and n parameters....
@@ -101,13 +95,12 @@ subroutine psb_cdalv(m, v, ictxt, desc_a, info, flag)
 
   if (debug) write(*,*) 'psb_cdall:  doing global checks'  
   !global check on m and n parameters
-  if (myrow.eq.psb_root_) then
+  if (me == psb_root_) then
     exch(1)=m
     exch(2)=n
-    call igebs2d(ictxt,psb_all_,psb_topdef_, itwo,ione, exch, itwo)
+    call psb_bcast(ictxt,exch(1:2),root=psb_root_)
   else
-    call igebr2d(ictxt,psb_all_,psb_topdef_, itwo,ione, exch, itwo, psb_root_,&
-         & 0)
+    call psb_bcast(ictxt,exch(1:2),root=psb_root_)
     if (exch(1) /= m) then
       info=550
       int_err(1)=1
@@ -156,7 +149,7 @@ subroutine psb_cdalv(m, v, ictxt, desc_a, info, flag)
   temp_ovrlap(:) = -1
   do i=1,m
     
-    if (((v(i)-flag_) > nprow-1).or.((v(i)-flag_) < 0)) then
+    if (((v(i)-flag_) > np-1).or.((v(i)-flag_) < 0)) then
       info=580
       int_err(1)=3
       int_err(2)=v(i) - flag_
@@ -164,12 +157,12 @@ subroutine psb_cdalv(m, v, ictxt, desc_a, info, flag)
       exit
     end if
 
-    if ((v(i)-flag_) == myrow) then
+    if ((v(i)-flag_) == me) then
       ! this point belongs to me
       counter=counter+1
       desc_a%glob_to_loc(i) = counter
     else
-      desc_a%glob_to_loc(i) = -(nprow+(v(i)-flag_)+1)
+      desc_a%glob_to_loc(i) = -(np+(v(i)-flag_)+1)
     end if
   enddo
 
@@ -219,7 +212,7 @@ subroutine psb_cdalv(m, v, ictxt, desc_a, info, flag)
     ov_el(l_ov_el+2)  = nprocs
     l_ov_el           = l_ov_el+2
     do j=1, nprocs
-      if (temp_ovrlap(i+j) /= myrow) then
+      if (temp_ovrlap(i+j) /= me) then
         ov_idx(l_ov_ix+1) = temp_ovrlap(i+j)
         ov_idx(l_ov_ix+2) = 1
         ov_idx(l_ov_ix+3) = idx
@@ -283,14 +276,14 @@ subroutine psb_cdalv(m, v, ictxt, desc_a, info, flag)
   desc_a%matrix_data(psb_n_)        = n
   desc_a%matrix_data(psb_dec_type_) = psb_desc_bld_
   desc_a%matrix_data(psb_ctxt_)     = ictxt
-  call blacs_get(ictxt,10,desc_a%matrix_data(psb_mpi_c_))
+  call psb_get_mpicomm(ictxt,desc_a%matrix_data(psb_mpi_c_))
 
   call psb_erractionrestore(err_act)
   return
   
 9999 continue
   call psb_erractionrestore(err_act)
-  if (err_act.eq.act_abort) then
+  if (err_act == act_abort) then
      call psb_error(ictxt)
      return
   end if

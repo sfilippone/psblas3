@@ -90,6 +90,7 @@ Subroutine psb_dgmresr(a,prec,b,x,eps,desc_a,info,&
   use psb_const_mod
   use psb_prec_mod
   use psb_error_mod
+  use psb_penv_mod
   implicit none
 
 !!$  Parameters 
@@ -112,7 +113,7 @@ Subroutine psb_dgmresr(a,prec,b,x,eps,desc_a,info,&
   Integer, Pointer           :: iperm(:), ipnull(:), ipsave(:), ierrv(:)
   Real(Kind(1.d0)) :: rerr, scal, gm 
   Integer       ::litmax, liter, naux, m, mglob, it,k, itrace_,&
-       & nprows,npcols,me,mecol, n_row, n_col, nl, int_err(5)
+       & np,me, n_row, n_col, nl, int_err(5)
   Character     ::diagl, diagu
   Logical, Parameter :: exchange=.True., noexchange=.False.  
   Integer, Parameter :: irmax = 8
@@ -130,9 +131,9 @@ Subroutine psb_dgmresr(a,prec,b,x,eps,desc_a,info,&
 
   If (debug) Write(0,*) 'entering psb_dgmres'
   ictxt = desc_a%matrix_data(psb_ctxt_)
-  Call blacs_gridinfo(ictxt,nprows,npcols,me,mecol)
+  Call psb_info(ictxt, me, np)
 
-  If (debug) Write(0,*) 'psb_dgmres: from gridinfo',nprows,npcols,me
+  If (debug) Write(0,*) 'psb_dgmres: from gridinfo',np,me
 
   mglob = desc_a%matrix_data(psb_m_)
   n_row = desc_a%matrix_data(psb_n_row_)

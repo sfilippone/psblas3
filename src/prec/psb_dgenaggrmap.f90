@@ -52,7 +52,7 @@ subroutine psb_dgenaggrmap(aggr_type,a,desc_a,nlaggr,ilaggr,info)
 
   logical :: recovery
   logical, parameter :: debug=.false.
-  integer ::ictxt,nprow,npcol,me,mycol,err_act
+  integer ::ictxt,np,npcol,me,mycol,err_act
   integer :: nrow, ncol, n_ne
   integer, parameter :: one=1, two=2
   character(len=20)   :: name, ch_err
@@ -67,7 +67,7 @@ subroutine psb_dgenaggrmap(aggr_type,a,desc_a,nlaggr,ilaggr,info)
   ! change in the future. 
   !
   ictxt=desc_a%matrix_data(psb_ctxt_)
-  call psb_info(ictxt,me,nprow)
+  call psb_info(ictxt,me,np)
   nrow  = desc_a%matrix_data(psb_n_row_)
   ncol  = desc_a%matrix_data(psb_n_col_)
 
@@ -271,7 +271,7 @@ subroutine psb_dgenaggrmap(aggr_type,a,desc_a,nlaggr,ilaggr,info)
     goto 9999
   end if
 
-  allocate(nlaggr(nprow),stat=info)
+  allocate(nlaggr(np),stat=info)
   if (info/=0) then 
     info=4000
     call psb_errpush(info,name)
@@ -280,7 +280,7 @@ subroutine psb_dgenaggrmap(aggr_type,a,desc_a,nlaggr,ilaggr,info)
 
   nlaggr(:) = 0
   nlaggr(me+1) = naggr
-  call psb_sum(ictxt,nlaggr(1:nprow))
+  call psb_sum(ictxt,nlaggr(1:np))
 
   call psb_erractionrestore(err_act)
   return

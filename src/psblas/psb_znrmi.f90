@@ -54,8 +54,8 @@ function psb_znrmi(a,desc_a,info)
   real(kind(1.d0))                    :: psb_znrmi
 
   ! locals
-  integer                  :: int_err(5), ictxt, nprow, npcol, myrow, mycol,&
-       & err_act, n, iia, jja, ia, ja, temp(2), mdim, ndim, m
+  integer                  :: int_err(5), ictxt, np, npcol, me, mycol,&
+       & err_act, n, iia, jja, ia, ja, mdim, ndim, m
   real(kind(1.d0))         :: nrmi, zcsnmi
   character(len=20)        :: name, ch_err
 
@@ -66,15 +66,9 @@ function psb_znrmi(a,desc_a,info)
 
   ictxt=desc_a%matrix_data(psb_ctxt_)
 
-  ! check on blacs grid 
-  call psb_info(ictxt, myrow, nprow)
-  if (nprow == -1) then
+  call psb_info(ictxt, me, np)
+  if (np == -1) then
     info = 2010
-    call psb_errpush(info,name)
-    goto 9999
-  else if (npcol /= 1) then
-    info = 2030
-    int_err(1) = npcol
     call psb_errpush(info,name)
     goto 9999
   endif

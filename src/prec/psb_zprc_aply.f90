@@ -42,6 +42,7 @@ subroutine psb_zprc_aply(prec,x,y,desc_data,info,trans, work)
   use psb_psblas_mod
   use psb_const_mod
   use psb_error_mod
+  use psb_penv_mod
   implicit none
 
   type(psb_desc_type),intent(in)      :: desc_data
@@ -54,7 +55,7 @@ subroutine psb_zprc_aply(prec,x,y,desc_data,info,trans, work)
   ! Local variables
   character     :: trans_ 
   complex(kind(1.d0)), pointer :: work_(:)
-  integer :: ictxt,nprow,npcol,me,mycol,err_act, int_err(5)
+  integer :: ictxt,np,npcol,me,mycol,err_act, int_err(5)
   logical,parameter                 :: debug=.false., debugprt=.false.
   external mpi_wtime
   character(len=20)   :: name, ch_err
@@ -92,7 +93,7 @@ subroutine psb_zprc_aply(prec,x,y,desc_data,info,trans, work)
   call psb_erractionsave(err_act)
 
   ictxt=desc_data%matrix_data(psb_ctxt_)
-  call blacs_gridinfo(ictxt,nprow,npcol,me,mycol)
+  call psb_info(ictxt, me, np)
 
   if (present(trans)) then 
     trans_=trans
@@ -191,6 +192,7 @@ subroutine psb_zprc_aply1(prec,x,desc_data,info,trans)
   use psb_psblas_mod
   use psb_const_mod
   use psb_error_mod
+  use psb_penv_mod
   implicit none
 
   type(psb_desc_type),intent(in)    :: desc_data
@@ -218,7 +220,7 @@ subroutine psb_zprc_aply1(prec,x,desc_data,info,trans)
 
   ! Local variables
   character     :: trans_
-  integer :: ictxt,nprow,npcol,me,mycol,i, isz, err_act, int_err(5)
+  integer :: ictxt,np,npcol,me,mycol,i, isz, err_act, int_err(5)
   complex(kind(1.d0)), pointer :: WW(:), w1(:)
   character(len=20)   :: name, ch_err
   name='psb_zprec1'
@@ -227,7 +229,7 @@ subroutine psb_zprc_aply1(prec,x,desc_data,info,trans)
   
 
   ictxt=desc_data%matrix_data(psb_ctxt_)
-  call blacs_gridinfo(ictxt,nprow,npcol,me,mycol)
+  call psb_info(ictxt, me, np)
   if (present(trans)) then 
     trans_=trans
   else
