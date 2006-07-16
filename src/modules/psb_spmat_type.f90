@@ -145,7 +145,7 @@ contains
     !locals
     logical, parameter  :: debug=.false.
     logical             :: clear_
-    character(len=20)   :: name, ch_err
+    character(len=20)   :: name
     
     info = 0
     name = 'psb_sp_reinit'
@@ -436,10 +436,9 @@ contains
     Integer, intent(out)                  :: info
 
     !locals
-    Integer             :: nza,nz1, nz2, nzl, nzr
     logical, parameter  :: debug=.false.
 
-    INFO  = 0
+    info  = 0
 
     if (associated(b%pr)) then  
       deallocate(b%pr,stat=info)
@@ -507,7 +506,7 @@ contains
     Integer, intent(out)              :: i1, i2, ia, info
 
     !locals
-    Integer             :: nza,nz1, nz2, nzl, nzr
+    Integer             :: nza
     logical, parameter  :: debug=.false.
 
     info  = 0
@@ -671,7 +670,7 @@ contains
     !locals
     logical, parameter  :: debug=.false.
     logical             :: clear_
-    character(len=20)   :: name, ch_err
+    character(len=20)   :: name
     
     info = 0
     name = 'psb_sp_reinit'
@@ -957,10 +956,9 @@ contains
     Integer, intent(out)                  :: info
 
     !locals
-    Integer             :: nza,nz1, nz2, nzl, nzr
     logical, parameter  :: debug=.false.
 
-    INFO  = 0
+    info  = 0
 
     if (associated(b%pr)) then  
       deallocate(b%pr,stat=info)
@@ -1029,7 +1027,7 @@ contains
     Integer, intent(out)              :: i1, i2, ia, info
 
     !locals
-    Integer             :: nza,nz1, nz2, nzl, nzr
+    Integer             :: nza
     logical, parameter  :: debug=.false.
 
     info  = 0

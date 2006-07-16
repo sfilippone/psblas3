@@ -105,25 +105,20 @@ Subroutine psb_dgmresr(a,prec,b,x,eps,desc_a,info,&
   Integer, Optional, Intent(out)     :: iter
   Real(Kind(1.d0)), Optional, Intent(out) :: err
 !!$   local data
-  Real(Kind(1.d0)), Pointer  :: aux(:),wwrk(:,:)
-  Real(Kind(1.d0)), Pointer  :: w(:), q(:), r(:), rt0(:), p(:), v(:,:), &
-       & c(:),s(:), t(:), z(:), f(:), uh(:,:), h(:,:), rs(:),&
-       & gamma(:), gamma1(:), gamma2(:), taum(:,:), sigma(:),&
-       &pv1(:),  pv2(:), pm1(:,:), rr(:,:)
-  Integer, Pointer           :: iperm(:), ipnull(:), ipsave(:), ierrv(:)
+  Real(Kind(1.d0)), Pointer  :: aux(:)
+  Real(Kind(1.d0)), Pointer  :: w(:), v(:,:), &
+       & c(:),s(:), h(:,:), rs(:), rr(:,:)
   Real(Kind(1.d0)) :: rerr, scal, gm 
   Integer       ::litmax, liter, naux, m, mglob, it,k, itrace_,&
        & np,me, n_row, n_col, nl, int_err(5)
-  Character     ::diagl, diagu
+  Character     :: diagl, diagu
   Logical, Parameter :: exchange=.True., noexchange=.False.  
   Integer, Parameter :: irmax = 8
   Integer            :: itx, i, isvch, ich, ictxt,istop_, err_act
-  Logical            :: do_renum_left,inner_stop
   Logical, Parameter :: debug = .false.
-  Real(Kind(1.d0)) :: alpha, beta, rho, rho_old, rni, xni, bni, ani,bn2,& 
-       & omega, tau 
+  Real(Kind(1.d0)) :: rni, xni, bni, ani,bn2 
   real(kind(1.d0)), external :: dnrm2
-  character(len=20)             :: name,ch_err
+  character(len=20)          :: name
 
   info = 0
   name = 'psb_dgmres'

@@ -98,20 +98,19 @@ Subroutine psb_zcgs(a,prec,b,x,eps,desc_a,info,&
 !!$   local data
   Complex(Kind(1.d0)), Pointer  :: aux(:),wwrk(:,:)
   Complex(Kind(1.d0)), Pointer  :: ww(:), q(:),&
-       & r(:), p(:), v(:), s(:), t(:), z(:), f(:), rt(:),qt(:),uv(:)
-  Integer, Pointer           :: iperm(:), ipnull(:), ipsave(:)
-  Real(Kind(1.d0)) ::rerr
-  Integer       ::litmax, liter, naux, m, mglob, it, itrace_,int_err(5),&
+       & r(:), p(:), v(:), s(:), z(:), f(:), rt(:),qt(:),uv(:)
+  Real(Kind(1.d0)) :: rerr
+  Integer       :: litmax, naux, m, mglob, it, itrace_,int_err(5),&
        & np,me, n_row, n_col,istop_, err_act
   Character     ::diagl, diagu
   Logical, Parameter :: exchange=.True., noexchange=.False.  
   Integer, Parameter :: irmax = 8
-  Integer            :: itx, i, isvch, ich, ictxt
+  Integer            :: itx, i, isvch, ictxt
   Logical            :: do_renum_left
   Logical, Parameter :: debug = .false.
   Real(Kind(1.d0)) :: rni, xni, bni, ani,bn2
-  complex(Kind(1.d0)) :: alpha, beta, rho, rho_old, sigma, omega, tau 
-  character(len=20)             :: name,ch_err
+  complex(Kind(1.d0)) :: alpha, beta, rho, rho_old, sigma 
+  character(len=20)   :: name
 
   info = 0
   name = 'psb_zcgs'

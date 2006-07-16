@@ -39,7 +39,7 @@ subroutine psi_crea_bnd_elem(desc_a,info)
 
   integer, pointer :: work(:)
   integer :: i, j, nr, ns, k, irv, err_act
-  character(len=20)    :: name, ch_err
+  character(len=20)    :: name
 
   info = 0
   name='psi_crea_bnd_elem'

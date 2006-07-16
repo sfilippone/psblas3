@@ -47,11 +47,8 @@ subroutine psb_cdfree(desc_a,info)
   type(psb_desc_type), intent(inout) :: desc_a
   integer, intent(out)               :: info
   !...locals....
-  integer             :: int_err(5)
-  integer             :: temp(1)
-  real(kind(1.d0))    :: real_err(5)
-  integer             :: ictxt,np,npcol,me,mypcol, err_act
-  character(len=20)   :: name, char_err
+  integer             :: ictxt,np,me, err_act
+  character(len=20)   :: name
 
   if(psb_get_errstatus() /= 0) return 
   info=0

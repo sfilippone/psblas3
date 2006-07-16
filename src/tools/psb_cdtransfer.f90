@@ -54,12 +54,10 @@ subroutine psb_cdtransfer(desc_in, desc_out, info)
   integer, intent(out)                :: info
 
   !locals
-  integer             :: np,npcol,me,mypcol,&
-       & ictxt, isz, dectype, err_act, err
-  integer             :: int_err(5),temp(1)
-  real(kind(1.d0))    :: real_err(5)
+  integer             :: np,me,ictxt, err_act
   logical, parameter  :: debug=.false.,debugprt=.false.
-  character(len=20)   :: name, char_err
+  character(len=20)   :: name
+
   if (debug) write(0,*) me,'Entered CDTRANSFER'
   if (psb_get_errstatus().ne.0) return 
   info = 0

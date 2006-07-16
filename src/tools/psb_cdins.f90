@@ -55,15 +55,12 @@ subroutine psb_cdins(nz,ia,ja,desc_a,info)
 
   !LOCALS.....
 
-  integer :: i,ictxt,nprocs ,glob_row,row,k,start_row,end_row,&
-       & first_loc_row,j, ierror,locix,locjx,&
-       & dectype,mglob, nnza, nglob,err
-  integer,pointer        :: tia1(:),tia2(:), temp(:)
-  integer                :: np,npcol, me ,mypcol, iflag, isize, irlc
-  integer                :: m,n, pnt_halo,nrow,ncol, nh, ip,jp, err_act
+  integer :: i,ictxt,row,k,dectype,mglob, nglob,err
+  integer                :: np, me, isize
+  integer                :: pnt_halo,nrow,ncol, nh, ip,jp, err_act
   logical, parameter     :: debug=.false.
   integer, parameter     :: relocsz=200
-  character(len=20)             :: name,ch_err
+  character(len=20)      :: name,ch_err
 
   info = 0
   name = 'psb_cdins'

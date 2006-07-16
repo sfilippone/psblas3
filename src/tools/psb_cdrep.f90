@@ -115,14 +115,10 @@ subroutine psb_cdrep(m, ictxt, desc_a, info)
   Type(psb_desc_type), intent(out)  :: desc_a
 
   !locals
-  Integer             :: counter,i,j,np,npcol,me,mycol,&
-       & loc_row,err,loc_col,nprocs,n,itmpov, k,&
-       & l_ov_ix,l_ov_el,idx, flag_, err_act
-  Integer             :: INT_ERR(5),TEMP(1),EXCH(2)
-  Real(Kind(1.d0))    :: REAL_ERR(5)
-  Integer, Pointer    :: temp_ovrlap(:), ov_idx(:),ov_el(:)
+  Integer             :: i,np,me,err,n,err_act
+  integer             :: int_err(5),exch(2)
   logical, parameter  :: debug=.false.
-  character(len=20)   :: name, ch_err
+  character(len=20)   :: name
 
   if(psb_get_errstatus() /= 0) return 
   info=0

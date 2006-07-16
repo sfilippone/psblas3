@@ -43,14 +43,12 @@ subroutine psi_crea_index(desc_a,index_in,index_out,glob_idx,info)
   logical                          :: glob_idx
 
   !         ....local scalars...      
-  integer    :: me,np,i,j,k,&
-       & mode, int_err(5), err, err_act,&
-       & dl_lda, ictxt, proc, nerv, nesd
+  integer    :: ictxt, me, np, mode, err_act, dl_lda
   !         ...parameters...
   integer, pointer     :: dep_list(:,:), length_dl(:)
   integer,parameter    :: root=0,no_comm=-1
   logical,parameter    :: debug=.false.
-  character(len=20)    :: name, ch_err
+  character(len=20)    :: name
 
   interface
     subroutine psi_compute_size(desc_data,&
@@ -131,7 +129,7 @@ subroutine psi_crea_index(desc_a,index_in,index_out,glob_idx,info)
 
   ! ....now i can sort dependence list......
   call psi_sort_dl(dep_list,length_dl,np,info)
-  if(info.ne.0) then
+  if(info /= 0) then
     call psb_errpush(4010,name,a_err='psi_sort_dl')
     goto 9999
   end if
@@ -143,7 +141,7 @@ subroutine psi_crea_index(desc_a,index_in,index_out,glob_idx,info)
        & length_dl(me),desc_a%loc_to_glob,desc_a%glob_to_loc,&
        & index_out,glob_idx,info)
 
-  if(info.ne.0) then
+  if(info /= 0) then
     call psb_errpush(4010,name,a_err='psi_desc_index')
     goto 9999
   end if
@@ -154,7 +152,7 @@ subroutine psi_crea_index(desc_a,index_in,index_out,glob_idx,info)
 
 9999 continue
   call psb_erractionrestore(err_act)
-  if (err_act.eq.act_abort) then
+  if (err_act == act_abort) then
     call psb_error(ictxt)
     return
   end if

@@ -57,8 +57,8 @@ function psb_dnrm2(x, desc_a, info, jx)
   real(kind(1.D0))                  :: psb_dnrm2
 
   ! locals
-  integer                  :: int_err(5), ictxt, np, npcol, me, mycol,&
-       & err_act, n, iix, jjx, temp(2), ndim, ix, ijx, i, m, id 
+  integer                  :: ictxt, np, me,&
+       & err_act, n, iix, jjx, ndim, ix, ijx, i, m, id 
   real(kind(1.d0))         :: nrm2, dnrm2, dd
   external dcombnrm2
   character(len=20)        :: name, ch_err
@@ -194,8 +194,8 @@ function psb_dnrm2v(x, desc_a, info)
   real(kind(1.D0))                  :: psb_dnrm2v
 
   ! locals
-  integer                  :: int_err(5), ictxt, np, npcol, me, mycol,&
-       & err_act, n, iix, jjx, temp(2), ndim, ix, jx, ijx, i, m, id 
+  integer                  :: ictxt, np, me,&
+       & err_act, n, iix, jjx, ndim, ix, jx, ijx, i, m, id 
   real(kind(1.d0))         :: nrm2, dnrm2, dd
   external dcombnrm2
   character(len=20)        :: name, ch_err
@@ -330,8 +330,8 @@ subroutine psb_dnrm2vs(res, x, desc_a, info)
   integer, intent(out)              :: info
 
   ! locals
-  integer                  :: int_err(5), ictxt, np, npcol, me, mycol,&
-       & err_act, n, iix, jjx, temp(2), ndim, ix, jx, ijx, i, m, id 
+  integer                  :: ictxt, np, me,&
+       & err_act, n, iix, jjx, ndim, ix, jx, ijx, i, m, id 
   real(kind(1.d0))         :: nrm2, dnrm2, dd
   external dcombnrm2
   character(len=20)        :: name, ch_err

@@ -56,12 +56,10 @@ subroutine psb_cdall(m, n, parts, ictxt, desc_a, info)
   integer, intent(out)                :: info
 
   !locals
-  Integer             :: counter,i,j,np,npcol,me,mycol,&
-       & loc_row,err,loc_col,nprocs,&
+  Integer             :: counter,i,j,np,me,loc_row,err,loc_col,nprocs,&
        & l_ov_ix,l_ov_el,idx, err_act, itmpov, k
-  Integer             :: INT_ERR(5),TEMP(1),EXCH(2)
-  Real(Kind(1.d0))    :: REAL_ERR(5)
-  Integer, Pointer    :: PRC_V(:), TEMP_OVRLAP(:), OV_IDX(:),OV_EL(:)
+  integer             :: int_err(5),exch(2)
+  integer, pointer    :: prc_v(:), temp_ovrlap(:), ov_idx(:),ov_el(:)
   logical, parameter  :: debug=.false.
   character(len=20)   :: name, char_err
 

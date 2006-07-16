@@ -101,7 +101,7 @@ subroutine psb_dbicg(a,prec,b,x,eps,desc_a,info,&
   real(kind(1.d0)), pointer  :: aux(:),wwrk(:,:)
   real(kind(1.d0)), pointer  :: ww(:), q(:),&
        & r(:), p(:), zt(:), pt(:), z(:), rt(:),qt(:)
-  integer, pointer           :: iperm(:), ipnull(:), ipsave(:), int_err(:)
+  integer           :: int_err(5)
   real(kind(1.d0)) ::rerr
   integer       ::litmax, liter, naux, m, mglob, it, itrace_,&
        & np,me, n_row, n_col, istop_, err_act
@@ -109,10 +109,9 @@ subroutine psb_dbicg(a,prec,b,x,eps,desc_a,info,&
   logical, parameter :: debug = .false.
   logical, parameter :: exchange=.true., noexchange=.false.  
   integer, parameter :: irmax = 8
-  integer            :: itx, i, isvch, ich, ictxt
-  logical            :: do_renum_left
+  integer            :: itx, i, isvch, ictxt
   real(kind(1.d0)) :: alpha, beta, rho, rho_old, rni, xni, bni, ani,& 
-       & sigma, omega, tau,bn2
+       & sigma,bn2
   character(len=20)             :: name,ch_err
 
   info = 0

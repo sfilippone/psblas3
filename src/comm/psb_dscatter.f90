@@ -67,7 +67,7 @@ subroutine  psb_dscatterm(globx, locx, desc_a, info, iroot,&
 
   ! locals
   integer                  :: int_err(5), ictxt, np, me,&
-       & err_act, m, n, iix, jjx, temp(2), i, j, idx, nrow, iiroot, iglobx, jglobx,&
+       & err_act, m, n, i, j, idx, nrow, iiroot, iglobx, jglobx,&
        & ilocx, jlocx, lda_locx, lda_globx, lock, globk, icomm, k, maxk, root, ilx,&
        & jlx, myrank, rootrank, c, pos
   real(kind(1.d0)),pointer :: scatterv(:)
@@ -312,6 +312,7 @@ subroutine  psb_dscatterv(globx, locx, desc_a, info, iroot)
   use psb_check_mod
   use psb_error_mod
   use mpi
+  use psb_penv_mod
   implicit none
 
   real(kind(1.d0)), intent(out)    :: locx(:)
@@ -322,10 +323,10 @@ subroutine  psb_dscatterv(globx, locx, desc_a, info, iroot)
 
 
   ! locals
-  integer                  :: int_err(5), ictxt, np, me, mycol,&
-       & err_act, m, n, iix, jjx, temp(2), i, j, idx, nrow, iiroot, iglobx, jglobx,&
-       & ilocx, jlocx, lda_locx, lda_globx, lock, globk, root, k, maxk, icomm, myrank,&
-       & rootrank, c, pos, ilx, jlx
+  integer                  :: int_err(5), ictxt, np, me, &
+       & err_act, m, n, i, j, idx, nrow, iiroot, iglobx, jglobx,&
+       & ilocx, jlocx, lda_locx, lda_globx, root, k, icomm, myrank,&
+       & rootrank, pos, ilx, jlx
   real(kind(1.d0)),pointer :: scatterv(:)
   integer, pointer         :: displ(:), l_t_g_all(:), all_dim(:)
   character(len=20)        :: name, ch_err

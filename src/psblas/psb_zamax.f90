@@ -58,8 +58,8 @@ function psb_zamax (x,desc_a, info, jx)
   real(kind(1.d0))                  :: psb_zamax
 
   ! locals
-  integer                  :: int_err(5), ictxt, np, me, mycol,&
-       & err_act, n, iix, jjx, temp(2), ix, ijx, m, i, k, imax, izamax
+  integer                  :: ictxt, np, me,&
+       & err_act, n, iix, jjx, ix, ijx, m, i, k, imax, izamax
   real(kind(1.d0))         :: amax
   character(len=20)        :: name, ch_err
   double complex    ::         zdum
@@ -186,8 +186,8 @@ function psb_zamaxv (x,desc_a, info)
   real(kind(1.d0))                  :: psb_zamaxv
 
   ! locals
-  integer                  :: int_err(5), err, ictxt, np, me, mycol,&
-       & err_act, n, iix, jjx, jx, temp(2), ix, ijx, m, imax, izamax
+  integer                  :: ictxt, np, me,&
+       & err_act, n, iix, jjx, jx, ix, ijx, m, imax, izamax
   real(kind(1.d0))         :: amax
   complex(kind(1.d0))      :: cmax
   character(len=20)        :: name, ch_err
@@ -314,8 +314,8 @@ subroutine psb_zamaxvs (res,x,desc_a, info)
   real(kind(1.D0)), intent(out)     :: res
 
   ! locals
-  integer                  :: int_err(5), ictxt, np, me, mycol,&
-       & err_act, n, iix, jjx, temp(2), ix, ijx, m, imax, izamax
+  integer                  :: ictxt, np, me,&
+       & err_act, n, iix, jjx, ix, ijx, m, imax, izamax
   real(kind(1.d0))         :: amax
   character(len=20)        :: name, ch_err
   complex(kind(1.d0))      :: cmax
@@ -441,8 +441,8 @@ subroutine psb_zmamaxs (res,x,desc_a, info,jx)
   real(kind(1.d0)), intent(out) :: res(:)
 
   ! locals
-  integer                  :: int_err(5), ictxt, np, me, mycol,&
-       & err_act, n, iix, jjx, ix, temp(2), ijx, m, imax, i, k, izamax
+  integer                  :: ictxt, np, me,&
+       & err_act, n, iix, jjx, ix, ijx, m, imax, i, k, izamax
   real(kind(1.d0))         :: amax
   character(len=20)        :: name, ch_err
   complex(kind(1.d0))      :: cmax

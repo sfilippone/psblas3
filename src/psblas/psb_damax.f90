@@ -58,7 +58,7 @@ function psb_damax (x,desc_a, info, jx)
   real(kind(1.d0))                  :: psb_damax
 
   ! locals
-  integer                  :: int_err(5), ictxt, np, me, mycol,&
+  integer                  :: ictxt, np, me,&
        & err_act, n, iix, jjx, ix, ijx, m, i, k, imax, idamax
   real(kind(1.d0))         :: amax
   character(len=20)        :: name, ch_err
@@ -183,7 +183,7 @@ function psb_damaxv (x,desc_a, info)
   real(kind(1.d0))                  :: psb_damaxv
 
   ! locals
-  integer                  :: int_err(5), err, ictxt, np, me, mycol,&
+  integer                  :: err, ictxt, np, me,&
        & err_act, n, iix, jjx, jx, ix, ijx, m, imax, idamax
   real(kind(1.d0))         :: amax
   character(len=20)        :: name, ch_err
@@ -306,7 +306,7 @@ subroutine psb_damaxvs (res,x,desc_a, info)
   real(kind(1.D0)), intent(out)     :: res
 
   ! locals
-  integer                  :: int_err(5), ictxt, np, me, mycol,&
+  integer                  :: ictxt, np, me,&
        & err_act, n, iix, jjx, ix, ijx, m, imax, idamax
   real(kind(1.d0))         :: amax
   character(len=20)        :: name, ch_err
@@ -428,7 +428,7 @@ subroutine psb_dmamaxs (res,x,desc_a, info,jx)
   real(kind(1.d0)), intent(out) :: res(:)
 
   ! locals
-  integer                  :: int_err(5), ictxt, np, me, mycol,&
+  integer                  :: ictxt, np, me,&
        & err_act, n, iix, jjx, ix, ijx, m, imax, i, k, idamax
   real(kind(1.d0))         :: amax
   character(len=20)        :: name, ch_err

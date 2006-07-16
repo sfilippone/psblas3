@@ -59,8 +59,8 @@ subroutine  psb_zovrlm(x,desc_a,info,jx,ik,work,update)
   integer, intent(in), optional             :: update,jx,ik
 
   ! locals
-  integer                  :: int_err(5), ictxt, np, me, mycol,&
-       & err_act, m, n, iix, jjx, temp(2), ix, ijx, nrow, ncol, k, maxk, iupdate,&
+  integer                  :: int_err(5), ictxt, np, me, &
+       & err_act, m, n, iix, jjx, ix, ijx, nrow, ncol, k, maxk, iupdate,&
        & imode, err, liwork, i
   complex(kind(1.d0)),pointer :: iwork(:), xp(:,:)
   logical                  :: do_update
@@ -272,8 +272,8 @@ subroutine  psb_zovrlv(x,desc_a,info,work,update)
   integer, intent(in), optional             :: update
 
   ! locals
-  integer                  :: int_err(5), ictxt, np, me, mycol,&
-       & err_act, m, n, iix, jjx, temp(2), ix, ijx, nrow, ncol, k, maxk, iupdate,&
+  integer                  :: int_err(5), ictxt, np, me, &
+       & err_act, m, n, iix, jjx, ix, ijx, nrow, ncol, k, iupdate,&
        & imode, err, liwork, i
   complex(kind(1.d0)),pointer :: iwork(:)
   logical                  :: do_update

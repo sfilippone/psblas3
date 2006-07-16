@@ -55,10 +55,9 @@ subroutine psb_dsp_renum(a,desc_a,blck,p,atmp,info)
 
 
   character(len=20)      :: name, ch_err
-  integer   istpb, istpe, ifctb, ifcte, err_act, irank, icomm, nztota, nztotb,&
-       & nztmp, nzl, nnr, ir, mglob, mtype, n_row, nrow_a,n_col, nhalo,lovr, &
-       & ind, iind, pi,nr,ns,i,j,jj,k,kk
-  integer ::ictxt,np,npcol,me,mycol
+  integer   nztota, nztotb, nztmp, nzl, nnr, ir, mglob, mtype, n_row, &
+       & nrow_a,n_col, nhalo,lovr,  ind, iind, pi,nr,ns,i,j,jj,k,kk
+  integer ::ictxt,np,me, err_act
   integer, pointer :: itmp(:), itmp2(:)
   real(kind(1.d0)), pointer :: rtmp(:)
   real(kind(1.d0)) :: t1,t2,t3,t4,t5,t6,mpi_wtime, t7, t8
@@ -112,7 +111,7 @@ subroutine psb_dsp_renum(a,desc_a,blck,p,atmp,info)
     t3 = mpi_wtime()
 
     ! Build  ATMP with new numbering. 
-
+    nztmp=size(atmp%aspk)
     allocate(itmp(max(8,atmp%m+2,nztmp+2)),rtmp(atmp%m),stat=info)
     if (info /= 0) then 
       call psb_errpush(4010,name,a_err='Allocate')
@@ -204,7 +203,7 @@ subroutine psb_dsp_renum(a,desc_a,blck,p,atmp,info)
       enddo
     enddo
     atmp%ia2(a%m+1) = a%ia2(a%m+1)
-
+    nztota =     atmp%ia2(a%m+1) -1
     if (blck%m>0) then 
       do i=1, blck%m
         atmp%ia2(a%m+i) = nztota+blck%ia2(i)

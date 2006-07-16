@@ -54,11 +54,9 @@ subroutine psb_dgelp(trans,iperm,x,desc_a,info)
   character, intent(in)                :: trans
 
   ! local variables
-  integer                  :: err, ictxt,np, &
-       & npcol,me,mypcol,temp,lwork,nrow,ncol
-  real(kind(1.d0)),pointer ::  dtemp(:)
+  integer                  :: ictxt,np, me,nrow,ncol
+  real(kind(1.d0)),pointer :: dtemp(:)
   integer                  :: int_err(5), i1sz, i2sz, dectype, i, err_act
-  character(len=20)         :: itrans
   real(kind(1.d0)),parameter    :: one=1
   logical, parameter :: debug=.false.
 
@@ -96,7 +94,7 @@ subroutine psb_dgelp(trans,iperm,x,desc_a,info)
 
   call psb_info(ictxt, me, np)
 
-  if (debug) write(*,*) 'asb start: ',np,npcol,me,&
+  if (debug) write(*,*) 'asb start: ',np,me,&
        &desc_a%matrix_data(psb_dec_type_)
   !     ....verify blacs grid correctness..
   if (np == -1) then
@@ -200,11 +198,9 @@ subroutine psb_dgelpv(trans,iperm,x,desc_a,info)
   character, intent(in)              ::  trans
 
   ! local variables
-  integer :: err, ictxt,np,npcol,me,mypcol,temp,lwork
-  integer :: int_err(5), i1sz,nrow,ncol,dectype, i, err_act
+  integer :: ictxt,np,me
+  integer :: int_err(5), i1sz,nrow,ncol,dectype, err_act
   real(kind(1.d0)),pointer ::  dtemp(:)
-  double precision :: real_err(5)
-  character :: itrans
   real(kind(1.d0)),parameter    :: one=1
   logical, parameter :: debug=.false.
 

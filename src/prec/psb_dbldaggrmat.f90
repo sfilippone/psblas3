@@ -53,7 +53,7 @@ subroutine psb_dbldaggrmat(a,desc_a,ac,p,desc_p,info)
   integer, intent(out)                       :: info
 
   logical, parameter :: aggr_dump=.false.
-  integer ::ictxt,np,npcol,me,mycol, err_act
+  integer ::ictxt,np,me, err_act
   character(len=20) :: name, ch_err
   name='psb_dbldaggrmat'
   if(psb_get_errstatus().ne.0) return 
@@ -115,8 +115,8 @@ contains
     type(psb_dspmat_type)          :: b, tmp
     integer, pointer :: nzbr(:), idisp(:)
     integer :: ictxt, nrow, nglob, ncol, ntaggr, nzbg, ip, ndx,&
-         & naggr, np, me, mypcol, nprows, npcols,nzt,irs,jl,nzl,nlr,&
-         & icomm,naggrm1, mtype, i, j, k, err_act
+         & naggr, np, me, nzt,irs,jl,nzl,nlr,&
+         & icomm,naggrm1, i, j, k, err_act
     name='raw_aggregate'
     if(psb_get_errstatus().ne.0) return 
     info=0
@@ -391,8 +391,8 @@ contains
     type(psb_dspmat_type)          :: b
     integer, pointer :: nzbr(:), idisp(:), ivall(:)
     integer :: ictxt, nrow, nglob, ncol, ntaggr, nzbg, ip, ndx,&
-         & naggr, np, me, mypcol, nprows, npcols,&
-         & icomm, naggrm1,naggrp1,mtype,i,j,err_act,k,nzl
+         & naggr, np, me, &
+         & icomm, naggrm1,naggrp1,i,j,err_act,k,nzl
     type(psb_dspmat_type), pointer  :: am1,am2
     type(psb_dspmat_type) :: am3,am4
     logical       :: ml_global_nmb
@@ -400,7 +400,7 @@ contains
     logical, parameter :: test_dump=.false.,debug=.false.
     integer, parameter :: ncmax=16
     real(kind(1.d0))   :: omega, anorm, tmp, dg
-    character(len=20) :: name, ch_err
+    character(len=20) :: name
 
 
     name='smooth_aggregate'
@@ -555,6 +555,7 @@ contains
         ! This only works with CSR.
         !
         anorm = dzero
+        dg    = done
         do i=1,am3%m
           tmp = dzero
           do j=am3%ia2(i),am3%ia2(i+1)-1
@@ -770,7 +771,7 @@ contains
         end if
 
         i = 1
-        do ip=1,nprows
+        do ip=1,np
           do k=1, p%nlaggr(ip)
             ivall(i) = ip
             i = i + 1

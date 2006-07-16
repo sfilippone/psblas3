@@ -150,6 +150,7 @@ contains
 
       nr = lrw - irw + 1 
       allocate(indices(nr))
+      nz = 0
       do i=1,nr
         indices(i)=a%pl(irw+i-1)
         nz=nz+a%ia2(indices(i)+1)-a%ia2(indices(i))
@@ -402,7 +403,6 @@ contains
     ia1 => a%ia2(pia:pja-1:3)      ! the array containing the first row index of each block
     ia2 => a%ia2(pia+1:pja-1:3)    ! the array containing a pointer to the pos. in ja to the first jad column
     ia3 => a%ia2(pia+2:pja-1:3)    ! the array containing a pointer to the pos. in ja to the first csr column
-
 
     if (append) then 
        nzb = b%infoa(psb_nnz_)

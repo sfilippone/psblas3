@@ -46,21 +46,20 @@ subroutine psi_desc_index(desc_data,index_in,dep_list,&
   integer         :: length_dl, info
   logical         :: isglob_in
   !c     ....local scalars...        
-  integer :: j,me,np,i,proc,dim
+  integer :: j,me,np,i,proc
   !c     ...parameters...
   integer :: ictxt
   integer :: no_comm,err
   parameter (no_comm=-1)
   !c     ...local arrays..
-  integer :: int_err(5)
   integer,pointer :: brvindx(:),rvsz(:),&
        & bsdindx(:),sdsz(:), sndbuf(:), rcvbuf(:)
 
   integer :: ihinsz,ntot,k,err_act,&
-       & idxr, idxs, iszs, iszr, nesd, nerv, icomm, iret
+       & idxr, idxs, iszs, iszr, nesd, nerv, icomm
 
   logical,parameter :: debug=.false., usempi=.true.
-  character(len=20)    :: name, ch_err
+  character(len=20)  :: name
 
   info = 0
   name='psi_desc_index'

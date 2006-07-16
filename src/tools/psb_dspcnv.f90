@@ -99,14 +99,13 @@ subroutine psb_dspcnv(a,b,desc_a,info)
   integer, intent(out)                :: info
   !....locals....
   integer                       ::  int_err(5)
-  integer,pointer               ::  ovrlap_elem(:),ovrlap_index(:)
   real(kind(1.d0))              ::  d(1)
   integer,pointer               ::  i_temp(:)
   real(kind(1.d0)),pointer      ::  work_dcsdp(:)
-  integer                       ::  ia1_size,ia2_size,aspk_size,err_act&
-       & ,i,err,np,npcol,me,mycol,n_col,l_dcsdp, iout, nrow
+  integer                       ::  ia1_size,ia2_size,aspk_size,&
+       & err_act,i,np,me,n_col,l_dcsdp
   integer                       ::  lwork_dcsdp,dectype
-  integer                       ::  ictxt,temp(1),n_row
+  integer                       ::  ictxt,n_row
   character                     ::  check*1, trans*1, unitd*1
 
   real(kind(1.d0))              :: time(10), mpi_wtime
@@ -158,7 +157,7 @@ subroutine psb_dspcnv(a,b,desc_a,info)
   ! l_dcsdp is the size requested for dcsdp procedure
   l_dcsdp=(ia1_size+100)
 
-  b%m=nrow
+  b%m=n_row
   b%k=n_col
   call psb_sp_all(b,ia1_size,ia2_size,aspk_size,info)
   allocate(work_dcsdp(l_dcsdp),stat=info)

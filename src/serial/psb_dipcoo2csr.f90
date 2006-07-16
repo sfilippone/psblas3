@@ -51,7 +51,7 @@ subroutine psb_dipcoo2csr(a,info,rwshr)
   Integer             :: nza, nr, i,j,irw, idl,err_act
   Integer, Parameter  :: maxtry=8
   logical, parameter  :: debug=.false.
-  character(len=20)                 :: name, ch_err
+  character(len=20)   :: name
 
   name='psb_ipcoo2csr'
   info  = 0

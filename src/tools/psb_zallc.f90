@@ -55,10 +55,9 @@ subroutine psb_zalloc(x, desc_a, info, n)
   integer, optional, intent(in)         :: n
 
   !locals
-  integer             :: np,npcol,me,mycol,err,n_col,n_row,i,j,jj,err_act
+  integer             :: np,me,err,n_col,n_row,i,j,err_act
   integer             :: ictxt,dectype,n_
-  integer             :: int_err(5),temp(1),exch(3)
-  real(kind(1.d0))    :: real_err(5)
+  integer             :: int_err(5),exch(3)
   character(len=20)   :: name, ch_err
 
   name='psb_zallc'
@@ -203,10 +202,8 @@ subroutine psb_zallocv(x, desc_a,info,n)
   integer, optional, intent(in)         :: n
 
   !locals
-  integer             :: np,npcol,me,mycol,err,n_col,n_row,dectype,i,err_act
+  integer             :: np,me,n_col,n_row,dectype,i,err_act
   integer             :: ictxt, n_
-  integer             :: int_err(5),temp(1),exch
-  real(kind(1.d0))    :: real_err(5)
   logical, parameter  :: debug=.false. 
   character(len=20)   :: name, ch_err
 

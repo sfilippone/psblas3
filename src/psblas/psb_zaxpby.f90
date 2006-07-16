@@ -65,8 +65,8 @@ subroutine  psb_zaxpby(alpha, x, beta,y,desc_a,info, n, jx, jy)
   complex(kind(1.D0)), intent(inout) :: y(:,:)
 
   ! locals
-  integer                  :: int_err(5), ictxt, np, npcol, me, mycol,&
-       & err_act, iix, jjx, temp(2), ix, iy, ijx, ijy, m, iiy, in, jjy
+  integer                  :: ictxt, np, me,&
+       & err_act, iix, jjx, ix, iy, ijx, ijy, m, iiy, in, jjy
   character(len=20)        :: name, ch_err
 
   name='psb_dgeaxpby'
@@ -216,8 +216,8 @@ subroutine  psb_zaxpbyv(alpha, x, beta,y,desc_a,info)
   complex(kind(1.D0)), intent(inout) :: y(:)
 
   ! locals
-  integer                  :: int_err(5), ictxt, np, npcol, me, mycol,&
-       & err_act, n, iix, jjx, temp(2), ix, iy, ijx, m, iiy, in, jjy
+  integer                  :: ictxt, np, me,&
+       & err_act, n, iix, jjx, ix, iy, ijx, m, iiy, in, jjy
   character(len=20)        :: name, ch_err
   logical, parameter :: debug=.false.
 

@@ -41,9 +41,8 @@ subroutine psi_compute_size(desc_data, index_in, dl_lda, info)
   integer  :: desc_data(:), index_in(:)
   !     ....local scalars....      
   integer  :: i,np,me,proc, max_index
-  integer  :: ictxt, err, err_act
+  integer  :: ictxt, err_act
   !     ...local array...
-  integer  :: exch(2)
   integer  :: int_err(5)
   integer, allocatable :: counter_recv(:), counter_dl(:)
 
@@ -118,7 +117,7 @@ subroutine psi_compute_size(desc_data, index_in, dl_lda, info)
 
 9999 continue
   call psb_erractionrestore(err_act)
-  if (err_act.eq.act_abort) then
+  if (err_act == act_abort) then
     call psb_error(ictxt)
     return
   end if

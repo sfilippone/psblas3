@@ -45,11 +45,9 @@ subroutine psi_iswaptranm(flag,n,beta,y,desc_a,work,info,data)
   integer, optional        :: data
 
   ! locals
-  integer  :: ictxt, np, npcol, me,&
-       & mycol, point_to_proc, nesd, nerv,&
+  integer  :: ictxt, np, me, point_to_proc, nesd, nerv,&
        & proc_to_comm, p2ptag, icomm, p2pstat(mpi_status_size),&
-       & idxs, idxr, iret, errlen, ifcomm, rank,&
-       & err_act, totxch, ixrec, i, lw, idx_pt,&
+       & idxs, idxr, iret, err_act, totxch, ixrec, i, idx_pt,&
        & snd_pt, rcv_pt
 
   integer, pointer, dimension(:) :: bsdidx, brvidx,&
@@ -58,7 +56,7 @@ subroutine psi_iswaptranm(flag,n,beta,y,desc_a,work,info,data)
   integer  :: krecvid, ksendid
   logical :: swap_mpi, swap_sync, swap_send, swap_recv, all
   integer, pointer, dimension(:) :: sndbuf, rcvbuf
-  character(len=20)  :: name, ch_err
+  character(len=20)  :: name
 
   info = 0
   name='psi_dswaptranm'
@@ -499,11 +497,9 @@ subroutine psi_iswaptranv(flag,beta,y,desc_a,work,info,data)
   integer, optional    :: data
 
   ! locals
-  integer  :: ictxt, np, npcol, me,&
-       & mycol, point_to_proc, nesd, nerv,&
+  integer  :: ictxt, np, me, point_to_proc, nesd, nerv,&
        & proc_to_comm, p2ptag, icomm, p2pstat(mpi_status_size),&
-       & idxs, idxr, iret, errlen, ifcomm, rank,&
-       & err_act, totxch, ixrec, i, lw, idx_pt,&
+       & idxs, idxr, iret, err_act, totxch, ixrec, i, idx_pt,&
        & snd_pt, rcv_pt, n
 
   integer, pointer, dimension(:) :: bsdidx, brvidx,&
@@ -512,7 +508,7 @@ subroutine psi_iswaptranv(flag,beta,y,desc_a,work,info,data)
   integer  :: krecvid, ksendid
   logical :: swap_mpi, swap_sync, swap_send, swap_recv, all
   integer, pointer, dimension(:) :: sndbuf, rcvbuf
-  character(len=20)  :: name, ch_err
+  character(len=20)  :: name
 
 
   info = 0

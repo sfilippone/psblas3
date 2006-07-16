@@ -65,13 +65,12 @@ Subroutine psb_dsphalo(a,desc_a,blk,info,rwcnv,clcnv,outfmt)
   logical, optional, intent(in)       :: rwcnv,clcnv
   character(len=5), optional          :: outfmt 
   !     ...local scalars....
-  Integer    :: np,me,counter,proc,n,i,&
+  Integer    :: np,me,counter,proc,i, &
        &     n_el_send,k,n_el_recv,ictxt, idx, r, tot_elem,&
-       &     n_elem, m, j, ipx,mat_recv, iszs, iszr,&
-       &     idxs,idxr, nrv, nsd,nz
+       &     n_elem, j, ipx,mat_recv, iszs, iszr,idxs,idxr,nz
   Type(psb_dspmat_type)     :: tmp
-  Integer :: l1,ircode, icomm, err_act
-  Integer,Pointer :: wrk(:), sdid(:,:), brvindx(:),rvid(:,:), &
+  Integer :: l1, icomm, err_act
+  Integer, allocatable  :: sdid(:,:), brvindx(:),rvid(:,:), &
        & rvsz(:), bsdindx(:),sdsz(:)
   logical :: rwcnv_,clcnv_
   character(len=5)  :: outfmt_

@@ -55,10 +55,10 @@ subroutine psb_dprc_aply(prec,x,y,desc_data,info,trans, work)
   ! Local variables
   character     :: trans_ 
   real(kind(1.d0)), pointer :: work_(:)
-  integer :: ictxt,np,npcol,me,mycol,err_act, int_err(5)
-  logical,parameter                 :: debug=.false., debugprt=.false.
+  integer :: ictxt,np,me,err_act
+  logical,parameter    :: debug=.false., debugprt=.false.
   external mpi_wtime
-  character(len=20)   :: name, ch_err
+  character(len=20)   :: name
 
   interface psb_baseprc_aply
      subroutine psb_dbaseprc_aply(prec,x,beta,y,desc_data,trans,work,info)
@@ -220,9 +220,9 @@ subroutine psb_dprc_aply1(prec,x,desc_data,info,trans)
 
   ! Local variables
   character     :: trans_
-  integer :: ictxt,np,npcol,me,mycol,i, isz, err_act, int_err(5)
+  integer :: ictxt,np,me,i, err_act
   real(kind(1.d0)), pointer :: WW(:), w1(:)
-  character(len=20)   :: name, ch_err
+  character(len=20)   :: name
   name='psb_dprec1'
   info = 0
   call psb_erractionsave(err_act)

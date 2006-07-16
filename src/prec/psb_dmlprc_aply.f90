@@ -64,7 +64,7 @@ subroutine psb_dmlprc_aply(baseprecv,x,beta,y,desc_data,trans,work,info)
   real(kind(1.d0)), allocatable :: tx(:),ty(:),t2l(:),w2l(:),&
        &   x2l(:),b2l(:),tz(:),tty(:)
   character     ::diagl, diagu
-  integer :: ictxt,np,npcol,me,mycol,i, isz, nrg,nr2l,err_act, iptype, int_err(5)
+  integer :: ictxt,np,me,i, isz, nrg,nr2l,err_act, iptype, int_err(5)
   real(kind(1.d0)) :: omega
   real(kind(1.d0)) :: t1, t2, t3, t4, t5, t6, t7, mpi_wtime
   logical, parameter          :: debug=.false., debugprt=.false.

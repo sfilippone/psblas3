@@ -63,7 +63,7 @@ subroutine psb_dbjac_aply(prec,x,beta,y,desc_data,trans,work,info)
   integer :: n_row,n_col
   real(kind(1.d0)), pointer :: ww(:), aux(:), tx(:),ty(:),tb(:)
   character     ::diagl, diagu
-  integer :: ictxt,np,npcol,me,mycol,i, isz, nrg, err_act, int_err(5)
+  integer :: ictxt,np,me,i, nrg, err_act, int_err(5)
   real(kind(1.d0)) :: t1, t2, t3, t4, t5, t6, t7, mpi_wtime
   logical,parameter                 :: debug=.false., debugprt=.false.
   external mpi_wtime

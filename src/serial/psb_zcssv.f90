@@ -47,7 +47,7 @@ subroutine psb_zcssv(alpha,t,b,beta,c,info,trans,unitd,d)
   complex(kind(1.d0)), pointer :: ddl(:)
   character :: lt, lu
   integer   :: iwsz,m,n,lb,lc,err_act
-  character(len=20)                 :: name, ch_err
+  character(len=20) :: name
 
   name='psb_zcssv'
   info  = 0

@@ -55,12 +55,10 @@ Subroutine psb_zsprn(a, desc_a,info,clear)
   logical, intent(in), optional        :: clear
 
   !locals
-  Integer             :: ictxt
-  Integer             :: np,npcol,me,mycol,err,err_act
+  Integer             :: ictxt, np,me,err,err_act
   logical, parameter  :: debug=.false.
   integer             :: int_err(5)
-  real(kind(1.d0))    :: real_err(5)
-  character(len=20)   :: name, ch_err
+  character(len=20)   :: name
   logical             :: clear_
 
   info = 0

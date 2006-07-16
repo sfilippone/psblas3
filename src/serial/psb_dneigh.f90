@@ -47,9 +47,8 @@ subroutine psb_dneigh(a,idx,neigh,n,info,lev)
   integer, optional                 :: lev ! level of neighbours to find
 
   integer, pointer  :: tmpn(:)=>null()
-  integer :: level, dim, i, j, k, r, c, brow,&
-       & elem_pt, ii, n1, col_idx, ne, err_act, nn, nidx
-  character(len=20)                 :: name, ch_err
+  integer :: level, dim, i, j, k, n1, err_act, nn, nidx
+  character(len=20) :: name
 
   name='psb_dneigh'
   info  = 0

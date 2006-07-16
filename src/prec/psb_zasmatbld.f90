@@ -75,13 +75,12 @@ Subroutine psb_zasmatbld(ptype,novr,a,blk,desc_data,upd,desc_p,info,outfmt)
 
   real(kind(1.d0)) :: t1,t2,t3,mpi_wtime
   external  mpi_wtime
-  integer   idscb,idsce,iovrb,iovre, err, irank, icomm
+  integer   icomm
 
   !     .. Local Scalars ..
-  Integer ::  k, tot_elem,proc,&
-       &  point,nprow,npcol, me, mycol, start,m,nnzero,&
-       &  ictxt, lovr, n_col, linp,ier,n,int_err(5),&
-       &  tot_recv, ircode, n_row, nztot,nhalo, nrow_a,err_act
+  Integer ::  k, np,me,m,nnzero,&
+       &  ictxt, n_col,ier,n,int_err(5),&
+       &  tot_recv, ircode, n_row,nhalo, nrow_a,err_act
   Logical,Parameter :: debug=.false., debugprt=.false.
   character(len=20) :: name, ch_err
   name='psb_zasmatbld'
@@ -172,9 +171,9 @@ Subroutine psb_zasmatbld(ptype,novr,a,blk,desc_data,upd,desc_p,info,outfmt)
       return
     endif
 
-    call blacs_get(ictxt,10,icomm )
+    call psb_get_mpicomm(ictxt,icomm)
 
-    Call psb_info(ictxt, me, nprow)
+    Call psb_info(ictxt, me, np)
     If(debug)Write(0,*)'BEGIN dasmatbld',me,upd,novr
     t1 = mpi_wtime()
 
@@ -198,9 +197,6 @@ Subroutine psb_zasmatbld(ptype,novr,a,blk,desc_data,upd,desc_p,info,outfmt)
     t2 = mpi_wtime()
 
     if (debug) write(0,*) 'Before sphalo ',blk%fida,blk%m,psb_nnz_,blk%infoa(psb_nnz_)
-!!$    ierr = MPE_Log_event( iovrb, 0, "st OVR" )
-!!$    blk%m = n_row-nrow_a
-!!$    blk%k = n_row
 
     if (present(outfmt)) then 
       if(debug) write(0,*) me,': Calling SPHALO with ',size(blk%ia2)
@@ -219,7 +215,6 @@ Subroutine psb_zasmatbld(ptype,novr,a,blk,desc_data,upd,desc_p,info,outfmt)
     end if
 
     if (debug) write(0,*) 'After psb_sphalo ',blk%fida,blk%m,psb_nnz_,blk%infoa(psb_nnz_)
-!!$    ierr = MPE_Log_event( iovre, 0, "ed OVR" )
 
     t3 = mpi_wtime()
     if (debugprt) then 

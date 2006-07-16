@@ -105,9 +105,9 @@ Subroutine psb_dcg(a,prec,b,x,eps,desc_a,info,&
        & sigma
   integer         :: litmax, liter, istop_, naux, m, mglob, it, itx, itrace_,&
        & np,me, n_col, isvch, ich, ictxt, n_row,err_act, int_err(5)
-  character          ::diagl, diagu
+  character          :: diagl, diagu
   logical, parameter :: exchange=.true., noexchange=.false.  
-  character(len=20)             :: name,ch_err
+  character(len=20)             :: name
 
   info = 0
   name = 'psb_dcg'

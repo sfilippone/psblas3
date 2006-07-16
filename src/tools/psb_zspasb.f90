@@ -62,14 +62,12 @@ subroutine psb_zspasb(a,desc_a, info, afmt, upd, dupl)
   integer,optional, intent(in)            :: dupl, upd
   character, optional, intent(in)         :: afmt*5
   !....Locals....
-  integer               ::  int_err(5)
-  type(psb_zspmat_type) ::  atemp
-  real(kind(1.d0))      ::  real_err(5)
-  integer               ::  ia1_size,ia2_size,aspk_size,m,i,err,&
-       & np,npcol,me,mycol ,size_req,n_col,iout, err_act
-  integer               :: dscstate, spstate, nr,k,j
+  integer               :: int_err(5)
+  type(psb_zspmat_type) :: atemp
+  integer               :: np,me,n_col,iout, err_act
+  integer               :: dscstate, spstate
   integer               :: upd_, dupl_
-  integer               :: ictxt,temp(2),isize(2),n_row
+  integer               :: ictxt,n_row
   logical, parameter    :: debug=.false., debugwrt=.false.
   character(len=20)     :: name, ch_err
 

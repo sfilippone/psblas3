@@ -75,14 +75,11 @@ subroutine psb_dilu_bld(a,desc_a,p,upd,info)
   character ::        trans, unitd
   type(psb_dspmat_type) :: blck, atmp
   real(kind(1.d0)) :: t1,t2,t3,t4,t5,t6,mpi_wtime, t7, t8
-  integer, pointer :: itmp(:), itmp2(:)
-  real(kind(1.d0)), pointer :: rtmp(:)
   external  mpi_wtime
   logical, parameter :: debugprt=.false., debug=.false., aggr_dump=.false.
-  integer   istpb, istpe, ifctb, ifcte, err_act, irank, icomm, nztota, nztotb,&
-       & nztmp, nzl, nnr, ir, mglob, mtype, n_row, nrow_a,n_col, nhalo,lovr, &
-       & ind, iind, pi,nr,ns
-  integer ::ictxt,np,npcol,me,mycol
+  integer   nztota, nztotb, nztmp, nzl, nnr, ir, err_act,&
+       & n_row, nrow_a,n_col, nhalo,lovr, ind, iind
+  integer :: ictxt,np,me
   character(len=20)      :: name, ch_err
 
   interface psb_ilu_fct

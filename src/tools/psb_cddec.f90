@@ -115,15 +115,12 @@ subroutine psb_cddec(nloc, ictxt, desc_a, info)
   Type(psb_desc_type), intent(out)  :: desc_a
 
   !locals
-  Integer              :: counter,i,j,np,npcol,me,mypcol,&
-       & loc_row,err,loc_col,nprocs,n,itmpov, k,&
-       & l_ov_ix,l_ov_el,idx, flag_, err_act,m, ip
-  Integer              :: INT_ERR(5),TEMP(1),EXCH(2)
-  Real(Kind(1.d0))     :: REAL_ERR(5)
-  Integer, Pointer     :: temp_ovrlap(:), ov_idx(:), ov_el(:)
+  Integer              :: i,j,np,me,err,n,itmpov, k,&
+       & l_ov_ix,l_ov_el,idx, err_act,m, ip
+  Integer              :: INT_ERR(5)
   integer, allocatable :: nlv(:)
   logical, parameter   :: debug=.false.
-  character(len=20)    :: name, ch_err
+  character(len=20)    :: name
 
   if(psb_get_errstatus() /= 0) return 
   info=0

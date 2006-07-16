@@ -102,12 +102,12 @@ subroutine  psb_zspmm(alpha,a,x,beta,y,desc_a,info,&
   integer, intent(in), optional            :: k, jx, jy,doswap
 
   ! locals
-  integer                  :: int_err(5), ictxt, np, npcol, me, mycol,&
-       & err_act, n, iix, jjx, ia, ja, iia, jja, temp(2), ix, iy, ik, ijx, ijy,&
-       & idoswap, m, nrow, ncol, lldx, lldy, liwork, llwork, iiy, jjy,&
+  integer                  :: ictxt, np, me,&
+       & err_act, n, iix, jjx, ia, ja, iia, jja, ix, iy, ik, ijx, ijy,&
+       & idoswap, m, nrow, ncol, lldx, lldy, liwork, iiy, jjy,&
        & i, ib, ib1
-  integer, parameter       :: nb=4
-  complex(kind(1.d0)),pointer :: tmpx(:), xp(:,:), yp(:,:), iwork(:)
+  integer, parameter          :: nb=4
+  complex(kind(1.d0)),pointer :: xp(:,:), yp(:,:), iwork(:)
   character                :: itrans
   character(len=20)        :: name, ch_err
   logical                  :: aliw
@@ -433,12 +433,12 @@ subroutine  psb_zspmv(alpha,a,x,beta,y,desc_a,info,&
   integer, intent(in), optional            :: doswap
 
   ! locals
-  integer                  :: int_err(5), ictxt, np, npcol, me, mycol,&
-       & err_act, n, iix, jjx, ia, ja, iia, jja, temp(2), ix, iy, ik, ijx, ijy,&
-       & idoswap, m, nrow, ncol, lldx, lldy, liwork, llwork, jx, jy, iiy, jjy,&
+  integer                  :: ictxt, np, me,&
+       & err_act, n, iix, jjx, ia, ja, iia, jja, ix, iy, ik, ijx, ijy,&
+       & idoswap, m, nrow, ncol, lldx, lldy, liwork, jx, jy, iiy, jjy,&
        & i, ib, ib1
   integer, parameter       :: nb=4
-  complex(kind(1.d0)),pointer :: tmpx(:), iwork(:), xp(:), yp(:)
+  complex(kind(1.d0)),pointer :: iwork(:), xp(:), yp(:)
   character                :: itrans
   character(len=20)        :: name, ch_err
   logical                  :: aliw

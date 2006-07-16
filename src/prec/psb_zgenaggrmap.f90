@@ -52,7 +52,7 @@ subroutine psb_zgenaggrmap(aggr_type,a,desc_a,nlaggr,ilaggr,info)
 
   logical :: recovery
   logical, parameter :: debug=.false.
-  integer ::ictxt,np,npcol,me,mycol,err_act
+  integer ::ictxt,np,me,err_act
   integer :: nrow, ncol, n_ne
   integer, parameter :: one=1, two=2
   character(len=20)   :: name, ch_err

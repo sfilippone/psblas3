@@ -60,13 +60,13 @@ subroutine psb_cdren(trans,iperm,desc_a,info)
   character, intent(in)                 :: trans
   integer, intent(out)                  :: info
   !....locals....
-  integer                       :: i,j,err,np,npcol,me,mycol, n_col, kh, nh
+  integer                       :: i,j,np,me, n_col, kh, nh
   integer                       :: dectype
   integer                       :: ictxt,n_row, int_err(5), err_act
   real(kind(1.d0))              :: time(10), mpi_wtime, real_err(6)
   external mpi_wtime
   logical, parameter            :: debug=.false.
-  character(len=20)             :: name, char_err
+  character(len=20)             :: name
 
   if(psb_get_errstatus() /= 0) return 
   info=0

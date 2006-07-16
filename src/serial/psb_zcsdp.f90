@@ -61,11 +61,11 @@ subroutine psb_zcsdp(a, b,info,ifc,check,trans,unitd,upd,dupl)
   complex(kind(1.d0))              :: d(1)
   complex(kind(1.d0)), allocatable :: work(:)
   type(psb_zspmat_type)         :: temp_a
-  Integer                       :: nzr, ntry, ifc_,ierror, ia1_size,&
+  Integer                       :: nzr, ntry, ifc_, ia1_size,&
        & ia2_size, aspk_size,size_req,n_row,n_col,upd_,dupl_
   integer                       :: ip1, ip2, nnz, iflag, ichk, nnzt,&
-       & ipc, i, count, err_act, ierrv(5), i1, i2, ia
-  character                     :: check_,trans_,unitd_, up
+       & ipc, i, count, err_act, i1, i2, ia
+  character                     :: check_,trans_,unitd_
   Integer, Parameter            :: maxtry=8
   logical, parameter            :: debug=.false.
   character(len=20)             :: name, ch_err

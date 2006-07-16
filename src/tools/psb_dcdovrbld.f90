@@ -74,15 +74,14 @@ Subroutine psb_dcdovrbld(n_ovr,desc_p,desc_a,a,&
   Integer, Pointer :: tmp_halo(:),tmp_ovr_idx(:)
 
   Integer :: counter,counter_h, counter_o, counter_e,j,idx,gidx,proc,n_elem_recv,&
-       & n_elem_send,tot_recv,tot_elem,n_col,m,ictxt,np,npcol,me,mycol,dl_lda,lwork,&
-       & counter_t,n_elem,i_ovr,jj,n,i,proc_id,isz, mglob, glx,n_row, &
-       & idxr, idxs, lx, iszs, iszr, err_act
+       & n_elem_send,tot_recv,tot_elem,n_col,m,ictxt,np,me,dl_lda,lwork,&
+       & counter_t,n_elem,i_ovr,jj,i,proc_id,isz, mglob, glx,n_row, &
+       & idxr, idxs, lx, iszr, err_act, icomm
 
   Integer,Pointer  :: halo(:),length_dl(:),works(:),workr(:),t_halo_in(:),&
        & t_halo_out(:),work(:),dep_list(:),temp(:)
   Integer,Pointer :: brvindx(:),rvsz(:), bsdindx(:),sdsz(:)
 
-  integer   idscb,idsce,iovrb,iovre, icrhb, icrhe,  ierr, irank, icomm
 
   Logical,Parameter :: debug=.false.
   real(kind(1.d0)) :: t1,t2,t3,t4,t5,t6,t7, tl, tch
@@ -588,24 +587,18 @@ Subroutine psb_dcdovrbld(n_ovr,desc_p,desc_a,a,&
         lwork=size(work)
       Endif
       t_halo_in(counter_t)=-1
-!!$
-!!$      t_halo_out(:)=-1
-!!$      ierr = MPE_Log_event( icrhb, 0, "st CRTHAL" )
+
       if (debug) write(0,*) me,'Checktmp_o_i 1',tmp_ovr_idx(1:10)
       if (debug) write(0,*) me,'Calling Crea_Halo'
 
       call psi_crea_index(desc_p,t_halo_in,t_halo_out,.false.,info)
-!!$        Call psi_crea_halo(desc_p%matrix_data,t_halo_in,&
-!!$             & np,t_halo_out,Size(t_halo_out),dep_list,&
-!!$             & dl_lda,length_dl,desc_p%loc_to_glob,&
-!!$             & desc_p%glob_to_loc,work,lwork,info)
+
       if (debug) then 
-        write(0,*) me,'Done Crea_Halo'
+        write(0,*) me,'Done Crea_Index'
         call psb_barrier(ictxt)
       end if
       if (debug) write(0,*) me,'Checktmp_o_i 2',tmp_ovr_idx(1:10)
       if (debug) write(0,*) me,'Done Crea_Halo'
-!!$      ierr = MPE_Log_event( icrhe, 0, "ed CRHAL " )
 
       halo => t_halo_out
       !
@@ -619,13 +612,13 @@ Subroutine psb_dcdovrbld(n_ovr,desc_p,desc_a,a,&
   End Do
   t1 = mpi_wtime()
   call FreePairSearchTree()
-!!$  ierr = MPE_Log_event( idsce, 0, "st CDASB" )
+
   desc_p%matrix_data(psb_m_)=desc_a%matrix_data(psb_m_)
   desc_p%matrix_data(psb_n_)=desc_a%matrix_data(psb_n_)
 
   tmp_halo(counter_h)=-1
   tmp_ovr_idx(counter_o)=-1
-!!$  ierr = MPE_Log_event( iovrb, 0, "st CNVCRT" )
+
 
   !
   ! At this point we have gathered all the indices in the halo at
@@ -685,7 +678,7 @@ Subroutine psb_dcdovrbld(n_ovr,desc_p,desc_a,a,&
   end if
 
   if (debug) write(0,*) me,'Done ConvertComm'
-!!$  ierr = MPE_Log_event( iovre, 0, "ed CNVCRT" )
+
   Deallocate(works,workr,t_halo_in,t_halo_out,work,&
        & length_dl,dep_list,tmp_ovr_idx,tmp_halo,&
        & brvindx,rvsz,sdsz,bsdindx,temp,stat=info)

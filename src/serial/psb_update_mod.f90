@@ -175,7 +175,7 @@ contains
     integer, intent(in), optional  :: ng,gtl(*)
 
     logical, parameter :: debug=.false.
-    integer  :: i,ir,ic,check_flag, ilr, ilc, ip, &
+    integer  :: i,ir,ic, ilr, ilc, ip, &
          & i1,i2,nc,lb,ub,m,nnz,dupl
 
     info = 0
@@ -396,7 +396,7 @@ contains
     real(kind(1.d0)), intent(in) :: val(*)
     integer, intent(out) :: info
     integer, intent(in), optional  :: ng,gtl(*)
-    integer  :: i,ir,ic,check_flag, ilr, ilc, ip, &
+    integer  :: i,ir,ic, ilr, ilc, ip, &
          & i1,i2,nc,lb,ub,m,nnz,dupl,isrt
     logical, parameter :: debug=.false.
 
@@ -596,7 +596,7 @@ contains
     integer, intent(out) :: info
     integer, intent(in), optional  :: ng,gtl(*)
 
-    integer  :: i,ir,ic,check_flag, ilr, ilc, ip, &
+    integer  :: i,ir,ic, ilr, ilc, ip, &
          & i1,i2,nc,lb,ub,m,nnz,dupl
 
     logical, parameter :: debug=.false.
@@ -810,7 +810,7 @@ contains
     complex(kind(1.d0)), intent(in) :: val(*)
     integer, intent(out) :: info
     integer, intent(in), optional  :: ng,gtl(*)
-    integer  :: i,ir,ic,check_flag, ilr, ilc, ip, &
+    integer  :: i,ir,ic, ilr, ilc, ip, &
          & i1,i2,nc,lb,ub,m,nnz,dupl,isrt
     logical, parameter :: debug=.false.
     

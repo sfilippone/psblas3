@@ -56,9 +56,8 @@ subroutine psb_zdiagsc_bld(a,desc_a,p,upd,info)
 
 
   ! Local scalars
-  Integer      :: err, nnzero, n_row, n_col,I,j,k,ictxt,&
-       & me,mycol,np,npcol,mglob,lw, mtype, nrg, nzg, err_act
-  real(kind(1.d0))            :: temp, real_err(5)
+  Integer      :: err, n_row, n_col,I,j,k,ictxt,&
+       & me,np,mglob,lw, err_act
   complex(kind(1.d0)),pointer :: gd(:), work(:)
   integer      :: int_err(5)
   character    :: iupd

@@ -98,19 +98,17 @@ Subroutine psb_dcgs(a,prec,b,x,eps,desc_a,info,&
 !!$   local data
   Real(Kind(1.d0)), Pointer  :: aux(:),wwrk(:,:)
   Real(Kind(1.d0)), Pointer  :: ww(:), q(:),&
-       & r(:), p(:), v(:), s(:), t(:), z(:), f(:), rt(:),qt(:),uv(:)
-  Integer, Pointer           :: iperm(:), ipnull(:), ipsave(:)
-  Real(Kind(1.d0)) ::rerr
-  Integer       ::litmax, liter, naux, m, mglob, it, itrace_,int_err(5),&
-       & np,me,mecol, n_row, n_col,istop_, err_act
+       & r(:), p(:), v(:), s(:), z(:), f(:), rt(:),qt(:),uv(:)
+  Real(Kind(1.d0)) :: rerr
+  Integer       :: litmax, naux, m, mglob, it, itrace_,int_err(5),&
+       & np,me, n_row, n_col,istop_, err_act
   Character     ::diagl, diagu
   Logical, Parameter :: exchange=.True., noexchange=.False.  
   Integer, Parameter :: irmax = 8
   Integer            :: itx, i, isvch, ich, ictxt
-  Logical            :: do_renum_left
   Logical, Parameter :: debug = .false.
   Real(Kind(1.d0)) :: alpha, beta, rho, rho_old, rni, xni, bni, ani,bn2,& 
-       & sigma, omega, tau 
+       & sigma 
   character(len=20)             :: name,ch_err
 
   info = 0

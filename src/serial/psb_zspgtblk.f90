@@ -150,6 +150,7 @@ contains
 
       nr = lrw - irw + 1 
       allocate(indices(nr))
+      nz = 0
       do i=1,nr
         indices(i)=a%pl(irw+i-1)
         nz=nz+a%ia2(indices(i)+1)-a%ia2(indices(i))

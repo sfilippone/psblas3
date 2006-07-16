@@ -52,11 +52,10 @@ subroutine psb_iasb(x, desc_a, info)
   integer, intent(out)            ::  info
 
   ! local variables
-  integer :: ictxt,np,npcol,me,mypcol,temp,lwork,nrow,ncol,err_act
-  integer :: int_err(5), i1sz, i2sz, dectype, i
-  real(kind(1.d0)) :: real_err(5)
+  integer :: ictxt,np,me,nrow,ncol,err_act
+  integer :: int_err(5), i1sz, i2sz, dectype
   logical, parameter :: debug=.false.
-  character(len=20)   :: name, char_err
+  character(len=20)   :: name
 
   if(psb_get_errstatus() /= 0) return 
   info=0
@@ -75,7 +74,7 @@ subroutine psb_iasb(x, desc_a, info)
   call psb_info(ictxt, me, np)
 
 
-  if (debug) write(*,*) 'asb start: ',np,npcol,me,&
+  if (debug) write(*,*) 'asb start: ',np,me,&
        &desc_a%matrix_data(psb_dec_type_)
   !     ....verify blacs grid correctness..
   if (np == -1) then
@@ -177,11 +176,10 @@ subroutine psb_iasbv(x, desc_a, info)
   integer, intent(out)            ::  info
 
   ! local variables
-  integer :: ictxt,np,npcol,me,mypcol,temp,lwork, err_act
-  integer :: int_err(5), i1sz,nrow,ncol, dectype, i
-  real(kind(1.d0)) :: real_err(5)
+  integer :: ictxt,np,me, err_act
+  integer :: int_err(5), i1sz,nrow,ncol, dectype
   logical, parameter :: debug=.false.
-  character(len=20)   :: name, ch_err
+  character(len=20)   :: name
 
   if(psb_get_errstatus().ne.0) return 
   info=0

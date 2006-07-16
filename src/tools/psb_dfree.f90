@@ -51,8 +51,7 @@ subroutine psb_dfree(x, desc_a, info)
   integer                     :: info
 
   !...locals....
-  integer             :: int_err(5)
-  integer             :: ictxt,np,npcol,me,mypcol,err, err_act
+  integer             :: ictxt,np,me,err_act
   character(len=20)   :: name
 
 
@@ -128,8 +127,7 @@ subroutine psb_dfreev(x, desc_a, info)
   type(psb_desc_type), intent(in) :: desc_a
   integer, intent(out)            :: info 
   !...locals....
-  integer             :: int_err(5)
-  integer             :: ictxt,np,npcol,me,mypcol,err, err_act
+  integer             :: ictxt,np,me,err_act
   character(len=20)   :: name
 
 

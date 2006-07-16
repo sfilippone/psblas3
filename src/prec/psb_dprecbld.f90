@@ -83,9 +83,7 @@ subroutine psb_dprecbld(a,desc_a,p,info,upd)
   end interface
 
   ! Local scalars
-  Integer      :: err, nnzero, I,j,k,ictxt,&
-       & me,mycol,np,npcol,lw, mtype, nrg, nzg, err_act
-  real(kind(1.d0))         :: temp, real_err(5)
+  Integer      :: err, I,j,k,ictxt, me,np,lw, err_act
   integer      :: int_err(5)
   character    :: iupd
 

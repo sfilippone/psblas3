@@ -63,9 +63,8 @@ subroutine  psb_dgatherm(globx, locx, desc_a, info, iroot,&
 
   ! locals
   integer                  :: int_err(5), ictxt, np, me,&
-       & err_act, n, iix, jjx, root, iiroot, ilocx, iglobx, jlocx,&
+       & err_act, n, root, iiroot, ilocx, iglobx, jlocx,&
        & jglobx, lda_locx, lda_globx, m, lock, globk, maxk, k, jlx, ilx, i, j, idx
-  real(kind(1.d0)),pointer :: tmpx(:)
   character(len=20)        :: name, ch_err
 
   name='psb_dgatherm'
@@ -258,10 +257,10 @@ subroutine  psb_dgatherv(globx, locx, desc_a, info, iroot,&
 
 
   ! locals
-  integer                  :: int_err(5), ictxt, np, me, mycol,&
-       & err_act, n, iix, jjx, root, iiroot, ilocx, iglobx, jlocx,&
-       & jglobx, lda_locx, lda_globx, lock, maxk, globk, m, k, jlx, ilx, i, j, idx
-  real(kind(1.d0)),pointer :: tmpx(:)
+  integer                  :: int_err(5), ictxt, np, me, &
+       & err_act, n, root, iiroot, ilocx, iglobx, jlocx,&
+       & jglobx, lda_locx, lda_globx, m, k, jlx, ilx, i, idx
+
   character(len=20)        :: name, ch_err
 
   name='psb_dgatherv'

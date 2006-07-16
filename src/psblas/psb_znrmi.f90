@@ -54,7 +54,7 @@ function psb_znrmi(a,desc_a,info)
   real(kind(1.d0))                    :: psb_znrmi
 
   ! locals
-  integer                  :: int_err(5), ictxt, np, npcol, me, mycol,&
+  integer                  :: ictxt, np, me,&
        & err_act, n, iia, jja, ia, ja, mdim, ndim, m
   real(kind(1.d0))         :: nrmi, zcsnmi
   character(len=20)        :: name, ch_err

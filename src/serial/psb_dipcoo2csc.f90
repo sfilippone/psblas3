@@ -48,10 +48,10 @@ subroutine psb_dipcoo2csc(a,info,clshr)
   integer, pointer    :: iaux(:), itemp(:)
   !locals
   logical             :: clshr_
-  Integer             :: nza, nr, i,j,irw, idl,err_act,nc,icl
+  Integer             :: nza, nr, i,j, idl,err_act,nc,icl
   Integer, Parameter  :: maxtry=8
   logical, parameter  :: debug=.false.
-  character(len=20)                 :: name, ch_err
+  character(len=20)   :: name
 
   name='psb_ipcoo2csc'
   info  = 0

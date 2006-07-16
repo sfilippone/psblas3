@@ -99,22 +99,20 @@ Subroutine psb_dcgstab(a,prec,b,x,eps,desc_a,info,&
   Real(Kind(1.d0)), Pointer  :: aux(:),wwrk(:,:)
   Real(Kind(1.d0)), Pointer  :: q(:),&
        & r(:), p(:), v(:), s(:), t(:), z(:), f(:)
-  Integer, Pointer           :: iperm(:), ipnull(:), ipsave(:)
-  Real(Kind(1.d0)) ::rerr
-  Integer       ::litmax, liter, naux, m, mglob, it,itrace_,&
+  Real(Kind(1.d0)) :: rerr
+  Integer       :: litmax, naux, m, mglob, it,itrace_,&
        & np,me, n_row, n_col
   Character     ::diagl, diagu
   Logical, Parameter :: debug = .false.
   Logical, Parameter :: exchange=.True., noexchange=.False., debug1 = .False.
   Integer, Parameter :: irmax = 8
-  Integer            :: itx, i, isvch, ich, ictxt, err_act, int_err(5),ii
+  Integer            :: itx, i, isvch, ictxt, err_act, int_err(5),ii
   Integer            :: istop_
-  Logical            :: do_renum_left
   Real(Kind(1.d0)) :: alpha, beta, rho, rho_old, rni, xni, bni, ani,& 
        & sigma, omega, tau, rn0, bn2
 !!$  Integer   istpb, istpe, ifctb, ifcte, imerr, irank, icomm,immb,imme
 !!$  Integer mpe_log_get_event_number,mpe_Describe_state,mpe_log_event
-  character(len=20)             :: name,ch_err
+  character(len=20)             :: name
 
   info = 0
   name = 'psb_dcgstab'

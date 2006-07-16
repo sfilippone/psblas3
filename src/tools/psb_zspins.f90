@@ -63,11 +63,8 @@ subroutine psb_zspins(nz,ia,ja,val,a,desc_a,info,rebuild)
   logical, intent(in), optional        :: rebuild
   !locals.....
 
-  integer :: i,ictxt,nprocs ,glob_row,row,k,start_row,end_row,&
-       & first_loc_row,nrow,j, err,locix,locjx,err_act,&
-       & dectype,mglob, nnza,m,n, pnt_halo,ncol, nh, ip, spstate
-  integer,pointer        :: tia1(:),tia2(:), temp(:)
-  integer                :: np,npcol, me ,mycol, iflag, isize, irlc
+  integer :: nrow,err_act, dectype,mglob,ncol, spstate
+  integer                :: ictxt,np, me
   logical, parameter     :: debug=.false.
   integer, parameter     :: relocsz=200
   logical                :: rebuild_

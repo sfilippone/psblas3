@@ -61,8 +61,8 @@ function psb_zdot(x, y,desc_a, info, jx, jy)
   complex(kind(1.D0))              :: psb_zdot
 
   ! locals
-  integer                  :: int_err(5), ictxt, np, npcol, me, mycol,&
-       & err_act, n, iix, jjx, temp(2), ix, ijx, iy, ijy, iiy, jjy, i, m, j, k
+  integer                  :: ictxt, np, me,&
+       & err_act, n, iix, jjx, ix, ijx, iy, ijy, iiy, jjy, i, m, j, k
   complex(kind(1.D0))         :: dot_local
   complex(kind(1.d0))         :: zdotc
   character(len=20)        :: name, ch_err
@@ -214,8 +214,8 @@ function psb_zdotv(x, y,desc_a, info)
   complex(kind(1.D0))              :: psb_zdotv
 
   ! locals
-  integer                  :: int_err(5), ictxt, np, npcol, me, mycol,&
-       & err_act, n, iix, jjx, temp(2), ix, jx, iy, jy, iiy, jjy, i, m, j, k
+  integer                  :: ictxt, np, me,&
+       & err_act, n, iix, jjx, ix, jx, iy, jy, iiy, jjy, i, m, j, k
   complex(kind(1.D0))         :: dot_local
   complex(kind(1.d0))         :: zdotc
   character(len=20)        :: name, ch_err
@@ -351,8 +351,8 @@ subroutine psb_zdotvs(res, x, y,desc_a, info)
   integer, intent(out)             :: info
 
   ! locals
-  integer                  :: int_err(5), ictxt, np, npcol, me, mycol,&
-       & err_act, n, iix, jjx, temp(2), ix, ijx, iy, ijy, iiy, jjy, i, m, j, k
+  integer                  :: ictxt, np, me,&
+       & err_act, n, iix, jjx, ix, ijx, iy, ijy, iiy, jjy, i, m, j, k
   complex(kind(1.D0))         :: dot_local
   complex(kind(1.d0))         :: zdotc
   character(len=20)        :: name, ch_err
@@ -491,8 +491,8 @@ subroutine psb_zmdots(res, x, y, desc_a, info)
   integer, intent(out)             :: info
 
   ! locals
-  integer                  :: int_err(5), ictxt, np, npcol, me, mycol,&
-       & err_act, n, iix, jjx, temp(2), ix, ijx, iy, ijy, iiy, jjy, i, m, j, k
+  integer                  :: ictxt, np, me,&
+       & err_act, n, iix, jjx, ix, ijx, iy, ijy, iiy, jjy, i, m, j, k
   complex(kind(1.d0)),allocatable  :: dot_local(:)
   complex(kind(1.d0))         :: zdotc
   character(len=20)        :: name, ch_err

@@ -55,10 +55,9 @@ subroutine psb_ialloc(x, desc_a, info, n)
 
 
   !locals
-  integer             :: np,npcol,me,mycol,err,n_col,n_row,i,j,jj,err_act
+  integer             :: np,me,n_col,n_row,i,j,err_act
   integer             :: ictxt,dectype,n_
-  integer             :: int_err(5),temp(1),exch(3)
-  real(kind(1.d0))    :: real_err(5)
+  integer             :: int_err(5),exch(3)
   character(len=20)   :: name, ch_err
 
   if(psb_get_errstatus() /= 0) return 
@@ -203,12 +202,11 @@ subroutine psb_iallocv(x, desc_a, info,n)
   integer, optional, intent(in)   :: n
 
   !locals
-  integer             :: np,npcol,me,mycol,err,n_col,n_row,dectype,i,err_act
+  integer             :: np,me,n_col,n_row,dectype,err_act
   integer             :: ictxt, n_
-  integer             :: int_err(5),temp(1),exch
-  real(kind(1.d0))    :: real_err(5)
+  integer             :: int_err(5)
   logical, parameter  :: debug=.false. 
-  character(len=20)   :: name, ch_err
+  character(len=20)   :: name
 
   if(psb_get_errstatus() /= 0) return 
   info=0

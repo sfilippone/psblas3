@@ -106,21 +106,19 @@ Subroutine psb_dcgstabl(a,prec,b,x,eps,desc_a,info,&
   Real(Kind(1.d0)), Pointer  :: aux(:),wwrk(:,:)
   Real(Kind(1.d0)), Pointer  :: ww(:), q(:), r(:), rt0(:), p(:), v(:), &
        & s(:), t(:), z(:), f(:), uh(:,:), rh(:,:), &
-       & gamma(:), gamma1(:), gamma2(:), taum(:,:), sigma(:),&
-       &pv1(:),  pv2(:), pm1(:,:), pm2(:,:)
-  Integer, Pointer           :: iperm(:), ipnull(:), ipsave(:)
-  Real(Kind(1.d0)) ::rerr
-  Integer       ::litmax, liter, naux, m, mglob, it, itrace_,&
+       & gamma(:), gamma1(:), gamma2(:), taum(:,:), sigma(:)
+
+  Real(Kind(1.d0)) :: rerr
+  Integer       :: litmax, naux, m, mglob, it, itrace_,&
        & np,me, n_row, n_col, nl, err_act
   Character     ::diagl, diagu
   Logical, Parameter :: exchange=.True., noexchange=.False.  
   Integer, Parameter :: irmax = 8
   Integer            :: itx, i, isvch, ich, ictxt,istop_,j, int_err(5)
-  Logical            :: do_renum_left
   Logical, Parameter :: debug = .False.
   Real(Kind(1.d0)) :: alpha, beta, rho, rho_old, rni, xni, bni, ani,bn2,& 
        & omega, tau 
-  character(len=20)             :: name,ch_err
+  character(len=20)             :: name
 
   info = 0
   name = 'psb_dcgstabl'

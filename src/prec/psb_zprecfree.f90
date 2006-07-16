@@ -49,11 +49,8 @@ subroutine psb_zprecfree(p,info)
   integer, intent(out)                :: info
 
   !...locals....
-  integer             :: int_err(5)
-  integer             :: temp(1), me
-  real(kind(1.d0))    :: real_err(5)
-  integer             :: ictxt,err_act,i
-  character(len=20)   :: name, ch_err
+  integer             :: ictxt,me, np,err_act,i
+  character(len=20)   :: name
 
   if(psb_get_errstatus().ne.0) return 
   info=0

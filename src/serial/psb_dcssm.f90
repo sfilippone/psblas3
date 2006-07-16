@@ -47,7 +47,7 @@ subroutine psb_dcssm(alpha,t,b,beta,c,info,trans,unitd,d)
   real(kind(1.d0)), pointer :: ddl(:)
   character :: lt, lu
   integer   :: iwsz,m,n,lb,lc,err_act
-  character(len=20)                 :: name, ch_err
+  character(len=20) :: name
 
   name='psb_dcssm'
   info  = 0

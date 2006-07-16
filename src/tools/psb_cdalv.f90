@@ -55,14 +55,13 @@ subroutine psb_cdalv(m, v, ictxt, desc_a, info, flag)
   type(psb_desc_type), intent(out)  :: desc_a
 
   !locals
-  Integer             :: counter,i,j,np,npcol,me,mycol,&
-       & loc_row,err,loc_col,nprocs,n,itmpov, k,&
+  Integer             :: counter,i,j,np,me,loc_row,err,&
+       & loc_col,nprocs,n,itmpov, k,&
        & l_ov_ix,l_ov_el,idx, flag_, err_act
-  Integer             :: INT_ERR(5),TEMP(1),EXCH(2)
-  Real(Kind(1.d0))    :: REAL_ERR(5)
+  integer             :: int_err(5),exch(2)
   Integer, Pointer    :: temp_ovrlap(:), ov_idx(:),ov_el(:)
   logical, parameter  :: debug=.false.
-  character(len=20)   :: name, ch_err
+  character(len=20)   :: name
 
   if(psb_get_errstatus() /= 0) return 
   info=0
@@ -196,7 +195,7 @@ subroutine psb_cdalv(m, v, ictxt, desc_a, info, flag)
   allocate(ov_idx(l_ov_ix),ov_el(l_ov_el), stat=info)
   if (info /= 0) then
     info=2025
-    int_err(1)=loc_col
+    int_err(1)=l_ov_ix
     call psb_errpush(info,name,i_err=int_err)
     goto 9999
   end if

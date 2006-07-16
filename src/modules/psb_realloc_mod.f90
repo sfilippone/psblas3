@@ -323,7 +323,8 @@ Contains
         rrax=>tmp
       End If
     else
-      dim = 0
+      dim  = 0
+      dim2 = 0
       Allocate(rrax(len1,len2),stat=info)
       if (info /= 0) then
         err=4000
@@ -397,7 +398,8 @@ Contains
         rrax=>tmp
       End If
     else
-      dim = 0
+      dim  = 0
+      dim2 = 0
       Allocate(rrax(len1,len2),stat=info)
       if (info /= 0) then
         err=4000
@@ -471,7 +473,8 @@ Contains
         rrax=>tmp
       End If
     else
-      dim = 0
+      dim  = 0
+      dim2 = 0
       Allocate(rrax(len1,len2),stat=info)
       if (info /= 0) then
         err=4000

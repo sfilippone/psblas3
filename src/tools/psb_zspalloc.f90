@@ -57,10 +57,9 @@ subroutine psb_zspalloc(a, desc_a, info, nnz)
 
   !locals
   integer             :: ictxt, dectype
-  integer             :: np,npcol,me,mycol,loc_row,&
-       &  length_ia1,length_ia2,err,nprocs, err_act,m,n
-  integer             :: int_err(5),temp(1)
-  real(kind(1.d0))    :: real_err(5)
+  integer             :: np,me,loc_row,&
+       &  length_ia1,length_ia2, err_act,m,n
+  integer             :: int_err(5)
   logical, parameter  :: debug=.false.
   character(len=20)   :: name, ch_err
 

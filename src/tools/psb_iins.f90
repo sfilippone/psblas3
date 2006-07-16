@@ -61,10 +61,10 @@ subroutine psb_iinsvi(m, irw, val, x, desc_a, info, dupl)
   integer, optional, intent(in)   ::  dupl
 
   !locals.....
-  integer                :: ictxt,i,loc_row,glob_row,row,k,&
-       & loc_rows,loc_cols,iblock, liflag,mglob,err_act, int_err(5), err
-  integer                :: np,npcol, me ,mypcol,dupl_
-  character(len=20)   :: name, char_err
+  integer                :: ictxt,i,loc_row,glob_row,&
+       & loc_rows,loc_cols,mglob,err_act, int_err(5), err
+  integer                :: np, me,dupl_
+  character(len=20)   :: name
 
   if(psb_get_errstatus() /= 0) return 
   info=0
@@ -242,10 +242,10 @@ subroutine psb_iinsi(m,irw, val, x, desc_a, info, dupl)
   integer, optional, intent(in)   ::  dupl
 
   !locals.....
-  integer                :: ictxt,i,loc_row,glob_row,row,k,j,n,&
-       & loc_rows,loc_cols,iblock, liflag,mglob,err_act, int_err(5), err
-  integer                :: np,npcol, me ,mypcol,dupl_
-  character(len=20)   :: name, char_err
+  integer                :: ictxt,i,loc_row,glob_row,j,n,&
+       & loc_rows,loc_cols,mglob,err_act, int_err(5)
+  integer                :: np, me,dupl_
+  character(len=20)   :: name
 
   if(psb_get_errstatus() /= 0) return 
   info=0

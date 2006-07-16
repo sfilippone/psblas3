@@ -52,9 +52,8 @@ subroutine psb_zasb(x, desc_a, info)
   integer, intent(out)            ::  info
 
   ! local variables
-  integer :: err, ictxt,np,npcol,me,mypcol,temp,lwork,nrow,ncol, err_act
-  integer :: int_err(5), i1sz, i2sz, dectype, i,j
-  double precision :: real_err(5)
+  integer :: ictxt,np,me,nrow,ncol, err_act
+  integer :: int_err(5), i1sz, i2sz, dectype
   logical, parameter :: debug=.false.
   character(len=20)   :: name, ch_err
 
@@ -75,7 +74,7 @@ subroutine psb_zasb(x, desc_a, info)
   call psb_info(ictxt, me, np)
 
 
-  if (debug) write(*,*) 'asb start: ',np,npcol,me,&
+  if (debug) write(*,*) 'asb start: ',np,me,&
        &desc_a%matrix_data(psb_dec_type_)
   !     ....verify blacs grid correctness..
   if (np == -1) then
@@ -182,12 +181,11 @@ subroutine psb_zasbv(x, desc_a, info)
   integer, intent(out)        ::  info
 
   ! local variables
-  integer :: err, ictxt,np,npcol,me,mypcol,temp,lwork
-  integer :: int_err(5), i1sz,nrow,ncol, dectype, i, err_act
-  double precision :: real_err(5)
+  integer :: ictxt,np,me
+  integer :: int_err(5), i1sz,nrow,ncol, dectype, err_act
 
   logical, parameter :: debug=.false.
-  character(len=20)             :: name,ch_err
+  character(len=20)  :: name,ch_err
 
   info = 0
   int_err(1) = 0

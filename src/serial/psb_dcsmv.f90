@@ -44,7 +44,7 @@ subroutine psb_dcsmv(alpha,a,b,beta,c,info,trans)
   real(kind(1.d0)), allocatable :: work(:)
   character :: trans_
   integer   :: iwsz,m,n,k,lb,lc, err_act
-  character(len=20)                 :: name, ch_err
+  character(len=20) :: name
 
   name='psb_dcsmv'
   info  = 0

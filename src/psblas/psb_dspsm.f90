@@ -98,10 +98,10 @@ subroutine  psb_dspsm(alpha,a,x,beta,y,desc_a,info,&
   integer, intent(in), optional             :: k, jx, jy
 
   ! locals
-  integer                  :: int_err(5), ictxt, np, npcol, me, mycol,&
-       & err_act, n, iix, jjx, ia, ja, iia, jja, temp(2), lldx,lldy, lchoice,&
+  integer                  :: int_err(5), ictxt, np, me,&
+       & err_act, n, iix, jjx, ia, ja, iia, jja, lldx,lldy, lchoice,&
        & ix, iy, ik, ijx, ijy, i, lld,&
-       & idoswap, m, nrow, ncol, liwork, llwork, iiy, jjy
+       & m, nrow, ncol, liwork, llwork, iiy, jjy
 
   character                :: lunitd
   integer, parameter       :: nb=4
@@ -400,10 +400,10 @@ subroutine  psb_dspsv(alpha,a,x,beta,y,desc_a,info,&
   integer, intent(in), optional             :: choice
 
   ! locals
-  integer                  :: int_err(5), ictxt, np, npcol, me, mycol,&
-       & err_act, n, iix, jjx, ia, ja, iia, jja, temp(2), lldx,lldy, lchoice,&
+  integer                  :: int_err(5), ictxt, np, me,&
+       & err_act, n, iix, jjx, ia, ja, iia, jja, lldx,lldy, lchoice,&
        & ix, iy, ik, jx, jy, i, lld,&
-       & idoswap, m, nrow, ncol, liwork, llwork, iiy, jjy
+       & m, nrow, ncol, liwork, llwork, iiy, jjy
 
   character                :: lunitd
   integer, parameter       :: nb=4

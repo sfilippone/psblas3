@@ -55,8 +55,8 @@ subroutine psb_dcsrws(rw,a,info,trans)
   end interface
 
   character :: trans_
-  integer   :: iwsz,m,n,k,lb,lc,err_act
-  character(len=20)                 :: name, ch_err
+  integer   :: m,k,err_act
+  character(len=20)  :: name
 
   name='psb_dcsrws'
   info  = 0

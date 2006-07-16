@@ -52,9 +52,8 @@ subroutine psb_dasb(x, desc_a, info)
   integer, intent(out)            ::  info
 
   ! local variables
-  integer :: err, ictxt,np,npcol,me,mypcol,temp,lwork,nrow,ncol, err_act
-  integer :: int_err(5), i1sz, i2sz, dectype, i,j
-  double precision :: real_err(5)
+  integer :: ictxt,np,me,nrow,ncol, err_act
+  integer :: int_err(5), i1sz, i2sz, dectype
   real(kind(1.d0)),parameter    :: one=1
   logical, parameter :: debug=.false.
   character(len=20)   :: name, ch_err
@@ -76,7 +75,7 @@ subroutine psb_dasb(x, desc_a, info)
   call psb_info(ictxt, me, np)
 
 
-  if (debug) write(*,*) 'asb start: ',np,npcol,me,&
+  if (debug) write(*,*) 'asb start: ',np,me,&
        &desc_a%matrix_data(psb_dec_type_)
   !     ....verify blacs grid correctness..
   if (np == -1) then
@@ -183,9 +182,8 @@ subroutine psb_dasbv(x, desc_a, info)
   integer, intent(out)        ::  info
 
   ! local variables
-  integer :: err, ictxt,np,npcol,me,mypcol,temp,lwork
-  integer :: int_err(5), i1sz,nrow,ncol, dectype, i, err_act
-  double precision :: real_err(5)
+  integer :: ictxt,np,me
+  integer :: int_err(5), i1sz,nrow,ncol, dectype, err_act
   real(kind(1.d0)),parameter    :: one=1
   logical, parameter :: debug=.false.
   character(len=20)             :: name,ch_err

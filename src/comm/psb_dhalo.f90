@@ -63,9 +63,9 @@ subroutine  psb_dhalom(x,desc_a,info,alpha,jx,ik,work,tran,mode)
   character, intent(in), optional           :: tran
 
   ! locals
-  integer                  :: int_err(5), ictxt, np, me,&
+  integer                  :: ictxt, np, me,&
        & err_act, m, n, iix, jjx, ix, ijx, k, maxk, nrow, imode, i,&
-       & err, liwork, ncol
+       & err, liwork
   real(kind(1.d0)),pointer :: iwork(:), xp(:,:)
   character                :: ltran
   character(len=20)        :: name, ch_err
@@ -270,9 +270,9 @@ subroutine  psb_dhalov(x,desc_a,info,alpha,work,tran,mode)
   character, intent(in), optional           :: tran
 
   ! locals
-  integer                  :: int_err(5), ictxt, np, me,&
-       & err_act, m, n, iix, jjx, ix, ijx, k, maxk, nrow, imode, i,&
-       & err, liwork, ncol
+  integer                  :: ictxt, np, me,&
+       & err_act, m, n, iix, jjx, ix, ijx, nrow, imode, i,&
+       & err, liwork
   real(kind(1.d0)),pointer :: iwork(:)
   character                :: ltran
   character(len=20)        :: name, ch_err

@@ -51,8 +51,7 @@ subroutine psb_zfree(x, desc_a, info)
   integer                     :: info
 
   !...locals....
-  integer             :: int_err(5)
-  integer             :: ictxt,np,npcol,me,mypcol,err, err_act
+  integer             :: ictxt,np,me, err_act
   character(len=20)   :: name
 
 
@@ -129,8 +128,7 @@ subroutine psb_zfreev(x, desc_a, info)
   integer                     :: info
 
   !...locals....
-  integer             :: int_err(5)
-  integer             :: ictxt,np,npcol,me,mypcol,err, err_act
+  integer             :: ictxt,np,me, err_act
   character(len=20)   :: name
 
 
