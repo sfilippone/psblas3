@@ -75,8 +75,9 @@ program zf_sample
   ! communications data structure
   type(psb_desc_type):: desc_a
 
-  integer               :: ictxt, iam, np
-  logical               :: amroot
+  integer            :: ictxt, iam, np
+  logical            :: amroot
+  integer, parameter :: root=0
 
   ! solver paramters
   integer            :: iter, itmax, ierr, itrace, ircode, ipart,&
@@ -106,7 +107,7 @@ program zf_sample
     call psb_exit(ictxt)
     stop
   endif
-  amroot = (iam==0)
+  amroot = (iam==root)
 
 
   name='zf_sample'
@@ -197,7 +198,7 @@ program zf_sample
     endif
     write(0,'("Done graph build")')
     call psb_barrier(ictxt)
-    call distr_grppart(0,0,ictxt)
+    call distr_grppart(root,ictxt)
     call getv_grppart(ivg)
     call matdist(aux_a, a, ivg, ictxt, &
          & desc_a,b_col_glob,b_col,info,fmt=afmt)

@@ -55,73 +55,72 @@ MODULE PARTGRAPH
   public part_graph, build_grppart, distr_grppart,&
        & getv_grppart, build_usrpart, free_part
   private 
-  INTEGER, POINTER, SAVE :: GRAPH_VECT(:)
+  integer, pointer, save :: graph_vect(:)
   
 CONTAINS
   
-  SUBROUTINE PART_GRAPH(GLOBAL_INDX,N,NP,PV,NV)
+  subroutine part_graph(global_indx,n,np,pv,nv)
     
-    INTEGER, INTENT(IN)  :: GLOBAL_INDX, N, NP
-    INTEGER, INTENT(OUT) :: NV
-    INTEGER, INTENT(OUT) :: PV(*)
+    integer, intent(in)  :: global_indx, n, np
+    integer, intent(out) :: nv
+    integer, intent(out) :: pv(*)
     
-    IF (.NOT.ASSOCIATED(GRAPH_VECT)) THEN
-       WRITE(0,*) 'Fatal error in PART_GRAPH: vector GRAPH_VECT ',&
+    IF (.not.associated(graph_vect)) then
+       write(0,*) 'Fatal error in PART_GRAPH: vector GRAPH_VECT ',&
 	    & 'not initialized'
-       RETURN
-    ENDIF
-    IF ((GLOBAL_INDX<1).OR.(GLOBAL_INDX > SIZE(GRAPH_VECT))) THEN       
-       WRITE(0,*) 'Fatal error in PART_GRAPH: index GLOBAL_INDX ',&
+       return
+    endif
+    if ((global_indx<1).or.(global_indx > size(graph_vect))) then       
+       write(0,*) 'Fatal error in PART_GRAPH: index GLOBAL_INDX ',&
 	    & 'outside GRAPH_VECT bounds',global_indx,size(graph_vect)
-       RETURN
-    ENDIF
-    NV = 1
-    PV(NV) = GRAPH_VECT(GLOBAL_INDX)
-    RETURN
-  END SUBROUTINE PART_GRAPH
+       return
+    endif
+    nv = 1
+    pv(nv) = graph_vect(global_indx)
+    return
+  end subroutine part_graph
 
 
-  SUBROUTINE DISTR_GRPPART(RROOT, CROOT, ICTXT)
-    INTEGER    :: RROOT, CROOT, ICTXT
-    INTEGER    :: N, MER, MEC, NPR, NPC
-    
-    CALL BLACS_GRIDINFO(ICTXT,NPR,NPC,MER,MEC)
-    
-    IF (.NOT.((RROOT>=0).AND.(RROOT<NPR).AND.&
-	 & (CROOT>=0).AND.(CROOT<NPC))) THEN 
-       WRITE(0,*) 'Fatal error in DISTR_GRPPART: invalid ROOT  ',&
-	    & 'coordinates '
-       CALL BLACS_ABORT(ICTXT,-1)
-       RETURN
-    ENDIF
+  subroutine distr_grppart(root, ictxt)
+    use psb_sparse_mod
+    integer    :: root, ictxt
+    integer    :: n, me, np
 
-    IF ((MER == RROOT) .AND.(MEC == CROOT)) THEN 
-       IF (.NOT.ASSOCIATED(GRAPH_VECT)) THEN
-	  WRITE(0,*) 'Fatal error in DISTR_GRPPART: vector GRAPH_VECT ',&
-	       & 'not initialized'
-	  CALL BLACS_ABORT(ICTXT,-1)
-	  RETURN
-       ENDIF
-       N = SIZE(GRAPH_VECT)
-       CALL IGEBS2D(ICTXT,'All',' ',1,1,N,1)
-       CALL IGEBS2D(ICTXT,'All',' ',N,1,GRAPH_VECT,N)
-    ELSE 
-       CALL IGEBR2D(ICTXT,'All',' ',1,1,N,1,RROOT,CROOT)
-!!$       IF (ASSOCIATED(GRAPH_VECT)) THEN
-!!$	  DEALLOCATE(GRAPH_VECT)
-!!$       ENDIF
-       ALLOCATE(GRAPH_VECT(N),STAT=INFO)
-       IF (INFO /= 0) THEN
-	  WRITE(0,*) 'Fatal error in DISTR_GRPPART: memory allocation ',&
-	       & ' failure.'
-	  RETURN
-       ENDIF       
-       CALL IGEBR2D(ICTXT,'All',' ',N,1,GRAPH_VECT,N,RROOT,CROOT)
-    ENDIF
+    call psb_info(ictxt,me,np)
 
-    RETURN
-    
-  END SUBROUTINE DISTR_GRPPART
+    if (.not.((root>=0).and.(root<np))) then 
+      write(0,*) 'Fatal error in DISTR_GRPPART: invalid ROOT  ',&
+           & 'coordinates '
+      call psb_abort(ictxt)
+      return
+    endif
+
+    if (me == root) then 
+      if (.not.associated(graph_vect)) then
+        write(0,*) 'Fatal error in DISTR_GRPPART: vector GRAPH_VECT ',&
+             & 'not initialized'
+        call psb_abort(ictxt)
+        return
+      endif
+      n = size(graph_vect)
+      call psb_bcast(ictxt,n,root=root)
+    else 
+      call psb_bcast(ictxt,n,root=root)
+!!$       if (associated(graph_vect)) then
+!!$	  deallocate(graph_vect)
+!!$       endif
+      allocate(graph_vect(n),stat=info)
+      if (info /= 0) then
+        write(0,*) 'Fatal error in DISTR_GRPPART: memory allocation ',&
+             & ' failure.'
+        return
+      endif
+    endif
+    call psb_bcast(ictxt,graph_vect(1:n),root=root)
+
+    return
+
+  end subroutine distr_grppart
   
   subroutine  getv_grppart(ivg)
     integer, pointer :: ivg(:)
@@ -134,14 +133,15 @@ CONTAINS
   end subroutine getv_grppart
   
 
-  SUBROUTINE BUILD_GRPPART(N,FIDA,IA1,IA2,NPARTS)
-    INTEGER       :: NPARTS
-    INTEGER       :: IA1(:), IA2(:)
-    INTEGER       :: N, I, IB, II,numflag,nedc,wgflag
-    CHARACTER(LEN=5)     :: FIDA
-    INTEGER, PARAMETER :: NB=512
-    REAL(KIND(1.D0)), PARAMETER :: SEED=12345.D0
-    REAL(KIND(1.D0)) :: XV(NB)
+  subroutine build_grppart(n,fida,ia1,ia2,nparts)
+    use psb_sparse_mod
+    integer       :: nparts
+    integer       :: ia1(:), ia2(:)
+    integer       :: n, i, ib, ii,numflag,nedc,wgflag
+    character(len=5)     :: fida
+    integer, parameter :: nb=512
+    real(kind(1.d0)), parameter :: seed=12345.d0
+    real(kind(1.d0)) :: XV(NB)
     integer          :: iopt(10),idummy(2),jdummy(2)
     interface 
       subroutine METIS_PartGraphRecursive(n,ixadj,iadj,ivwg,iajw,&
@@ -156,15 +156,15 @@ CONTAINS
 !!$       DEALLOCATE(GRAPH_VECT)
 !!$    ENDIF
     
-    ALLOCATE(GRAPH_VECT(N),STAT=INFO)
+    allocate(graph_vect(n),stat=info)
     
-    IF (INFO /= 0) THEN
-       WRITE(0,*) 'Fatal error in BUILD_GRPPART: memory allocation ',&
+    if (info /= 0) then
+       write(0,*) 'Fatal error in BUILD_GRPPART: memory allocation ',&
 	    & ' failure.'
-       RETURN
-    ENDIF
-    IF (NPARTS.GT.1) THEN
-      IF (FIDA.EQ.'CSR') THEN 
+       return
+    endif
+    if (nparts.gt.1) then
+      if (toupper(fida).eq.'CSR') then 
         iopt(1) = 0
         numflag  = 1
         wgflag   = 0
@@ -174,47 +174,41 @@ CONTAINS
         call METIS_PartGraphRecursive(n,ia2,ia1,idummy,jdummy,&
              & wgflag,numflag,nparts,iopt,nedc,graph_vect)
 !!$        write(0,*)'Edge cut from Metis ',nedc
-        DO I=1, N
-          GRAPH_VECT(I) = GRAPH_VECT(I) - 1
-        ENDDO
-      ELSE
-        WRITE(0,*) 'Fatal error in BUILD_GRPPART: matrix format ',&
+        do i=1, n
+          graph_vect(i) = graph_vect(i) - 1
+        enddo
+      else
+        write(0,*) 'Fatal error in BUILD_GRPPART: matrix format ',&
              & ' failure. ', FIDA
-        RETURN
-      ENDIF
-    ELSE
-      DO I=1, N
-        GRAPH_VECT(I) = 0
-      ENDDO
-    ENDIF
+        return
+      endif
+    else
+      do i=1, n
+        graph_vect(i) = 0
+      enddo
+    endif
     
-    RETURN
+    return
 
-  END SUBROUTINE BUILD_GRPPART 
+  end subroutine build_grppart 
 
-  SUBROUTINE BUILD_USRPART(N,V,NPARTS)
-    INTEGER       :: NPARTS
-    INTEGER       :: V(:)
-    INTEGER       :: N, I, IB, II,numflag,nedc,wgflag
-    CHARACTER(LEN=5)     :: FIDA
+  subroutine build_usrpart(n,v,nparts)
+    integer       :: nparts
+    integer       :: v(:)
+    integer       :: n, i, ib, ii,numflag,nedc,wgflag
 
     if ((n<=0) .or. (nparts<1)) then 
       write(0,*) 'Invalid input to BUILD_USRPART ',n,nparts
       return
     endif
-
-
-!!$    IF (ASSOCIATED(GRAPH_VECT)) THEN
-!!$       DEALLOCATE(GRAPH_VECT)
-!!$    ENDIF
     
-    ALLOCATE(GRAPH_VECT(N),STAT=INFO)
+    allocate(graph_vect(n),stat=info)
     
-    IF (INFO /= 0) THEN
-       WRITE(0,*) 'Fatal error in BUILD_USRPART: memory allocation ',&
+    if (info /= 0) then
+       write(0,*) 'Fatal error in BUILD_USRPART: memory allocation ',&
 	    & ' failure.'
-       RETURN
-    ENDIF
+       return
+    endif
 
     do i=1, n
       if ((0<=v(i)).and.(v(i)<nparts)) then 
@@ -224,9 +218,9 @@ CONTAINS
       endif
     end do
         
-    RETURN
+    return
 
-  END SUBROUTINE BUILD_USRPART
+  end subroutine build_usrpart
 
   subroutine free_part(info)
     integer :: info

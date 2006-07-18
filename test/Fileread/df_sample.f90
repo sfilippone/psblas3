@@ -75,8 +75,9 @@ program df_sample
   ! communications data structure
   type(psb_desc_type):: desc_a
 
-  integer               :: ictxt, iam, np
-  logical               :: amroot
+  integer            :: ictxt, iam, np
+  logical            :: amroot
+  integer, parameter :: root=0
 
   ! solver paramters
   integer            :: iter, itmax, ierr, itrace, ircode, ipart,&
@@ -106,7 +107,7 @@ program df_sample
     call psb_exit(ictxt)
     stop
   endif
-  amroot = (iam==0)
+  amroot = (iam==root)
 
 
   name='df_sample'
@@ -196,7 +197,7 @@ program df_sample
       call build_grppart(aux_a%m,aux_a%fida,aux_a%ia1,aux_a%ia2,np)
     endif
     call psb_barrier(ictxt)
-    call distr_grppart(0,0,ictxt)
+    call distr_grppart(root,ictxt)
     call getv_grppart(ivg)
     call matdist(aux_a, a, ivg, ictxt, &
          & desc_a,b_col_glob,b_col,info,fmt=afmt)
