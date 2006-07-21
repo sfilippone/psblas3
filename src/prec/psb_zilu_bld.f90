@@ -354,6 +354,17 @@ subroutine psb_zilu_bld(a,desc_a,p,upd,info)
     goto 9999
   end if
 
+  if (psb_sp_getifld(psb_upd_,p%av(u_pr_),info) /= psb_upd_perm_) then
+    call psb_sp_trimsize(p%av(u_pr_),i1,i2,ia,info)
+    if (info == 0) call psb_sp_reall(p%av(u_pr_),i1,i2,ia,info)
+  endif
+
+  if (psb_sp_getifld(psb_upd_,p%av(l_pr_),info) /= psb_upd_perm_) then
+    call psb_sp_trimsize(p%av(l_pr_),i1,i2,ia,info)
+    if (info == 0) call psb_sp_reall(p%av(l_pr_),i1,i2,ia,info)
+  endif
+
+
   if (debug) write(0,*) me,'End of ilu_bld'
 
   call psb_erractionrestore(err_act)

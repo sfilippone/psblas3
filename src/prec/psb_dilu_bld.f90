@@ -78,7 +78,7 @@ subroutine psb_dilu_bld(a,desc_a,p,upd,info)
   external  mpi_wtime
   logical, parameter :: debugprt=.false., debug=.false., aggr_dump=.false.
   integer   nztota, nztotb, nztmp, nzl, nnr, ir, err_act,&
-       & n_row, nrow_a,n_col, nhalo, ind, iind
+       & n_row, nrow_a,n_col, nhalo, ind, iind, i1,i2,ia
   integer :: ictxt,np,me
   character(len=20)      :: name, ch_err
 
@@ -353,6 +353,17 @@ subroutine psb_dilu_bld(a,desc_a,p,upd,info)
     call psb_errpush(info,name,a_err=ch_err)
     goto 9999
   end if
+
+  if (psb_sp_getifld(psb_upd_,p%av(u_pr_),info) /= psb_upd_perm_) then
+    call psb_sp_trimsize(p%av(u_pr_),i1,i2,ia,info)
+    if (info == 0) call psb_sp_reall(p%av(u_pr_),i1,i2,ia,info)
+  endif
+
+  if (psb_sp_getifld(psb_upd_,p%av(l_pr_),info) /= psb_upd_perm_) then
+    call psb_sp_trimsize(p%av(l_pr_),i1,i2,ia,info)
+    if (info == 0) call psb_sp_reall(p%av(l_pr_),i1,i2,ia,info)
+  endif
+
 
   if (debug) write(0,*) me,'End of ilu_bld'
 
