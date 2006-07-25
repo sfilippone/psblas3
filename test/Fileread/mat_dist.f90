@@ -128,8 +128,7 @@ contains
     integer, allocatable          :: irow(:),icol(:)
     real(kind(1.d0)), allocatable :: val(:)
     integer, parameter          :: nb=30
-    real(kind(1.d0))            :: t0, t1, t2, t3, t4, t5, mpi_wtime
-    external                    :: mpi_wtime
+    real(kind(1.d0))            :: t0, t1, t2, t3, t4, t5
     logical, parameter          :: newt=.true.
     character(len=20)           :: name, ch_err
 
@@ -414,9 +413,9 @@ contains
     if (newt) then 
 
       call psb_barrier(ictxt)
-      t0 = mpi_wtime()
+      t0 = psb_wtime()
       call psb_cdasb(desc_a,info)     
-      t1 = mpi_wtime()
+      t1 = psb_wtime()
       if(info/=0)then
         info=4010
         ch_err='psb_cdasb'
@@ -425,9 +424,9 @@ contains
       end if
 
       call psb_barrier(ictxt)
-      t2 = mpi_wtime()
+      t2 = psb_wtime()
       call psb_spasb(a,desc_a,info,dupl=psb_dupl_err_,afmt=afmt)     
-      t3 = mpi_wtime()
+      t3 = psb_wtime()
       if(info/=0)then
         info=4010
         ch_err='psb_spasb'
@@ -565,8 +564,7 @@ contains
     real(kind(1.d0)), allocatable :: val(:)
     integer, parameter          :: nb=30
     logical, parameter          :: newt=.true.
-    real(kind(1.d0))            :: t0, t1, t2, t3, t4, t5, mpi_wtime
-    external                    :: mpi_wtime
+    real(kind(1.d0))            :: t0, t1, t2, t3, t4, t5
     character(len=20)  :: name, ch_err
 
     info = 0
@@ -762,9 +760,9 @@ contains
       afmt = 'CSR'
     endif
     call psb_barrier(ictxt)
-    t0 = mpi_wtime()
+    t0 = psb_wtime()
     call psb_cdasb(desc_a,info)     
-    t1 = mpi_wtime()
+    t1 = psb_wtime()
     if(info/=0)then
       info=4010
       ch_err='psb_cdasb'
@@ -773,9 +771,9 @@ contains
     end if
 
     call psb_barrier(ictxt)
-    t2 = mpi_wtime()
+    t2 = psb_wtime()
     call psb_spasb(a,desc_a,info,dupl=psb_dupl_err_,afmt=afmt)     
-    t3 = mpi_wtime()
+    t3 = psb_wtime()
     if(info/=0)then
       info=4010
       ch_err='psb_spasb'
@@ -905,8 +903,7 @@ contains
     integer, allocatable          :: irow(:),icol(:)
     complex(kind(1.d0)), allocatable :: val(:)
     integer, parameter          :: nb=30
-    real(kind(1.d0))            :: t0, t1, t2, t3, t4, t5, mpi_wtime
-    external                    :: mpi_wtime
+    real(kind(1.d0))            :: t0, t1, t2, t3, t4, t5
     logical, parameter          :: newt=.true.
     character(len=20)           :: name, ch_err
 
@@ -1188,9 +1185,9 @@ contains
     if (newt) then 
 
       call psb_barrier(ictxt)
-      t0 = mpi_wtime()
+      t0 = psb_wtime()
       call psb_cdasb(desc_a,info)     
-      t1 = mpi_wtime()
+      t1 = psb_wtime()
       if(info/=0)then
         info=4010
         ch_err='psb_cdasb'
@@ -1199,9 +1196,9 @@ contains
       end if
 
       call psb_barrier(ictxt)
-      t2 = mpi_wtime()
+      t2 = psb_wtime()
       call psb_spasb(a,desc_a,info,dupl=psb_dupl_err_,afmt=afmt)     
-      t3 = mpi_wtime()
+      t3 = psb_wtime()
       if(info/=0)then
         info=4010
         ch_err='psb_spasb'
@@ -1339,8 +1336,7 @@ contains
     complex(kind(1.d0)), allocatable :: val(:)
     integer, parameter          :: nb=30
     logical, parameter          :: newt=.true.
-    real(kind(1.d0))            :: t0, t1, t2, t3, t4, t5, mpi_wtime
-    external                    :: mpi_wtime
+    real(kind(1.d0))            :: t0, t1, t2, t3, t4, t5
     character(len=20)  :: name, ch_err
 
     info = 0
@@ -1535,9 +1531,9 @@ contains
       afmt = 'CSR'
     endif
     call psb_barrier(ictxt)
-    t0 = mpi_wtime()
+    t0 = psb_wtime()
     call psb_cdasb(desc_a,info)     
-    t1 = mpi_wtime()
+    t1 = psb_wtime()
     if(info/=0)then
       info=4010
       ch_err='psb_cdasb'
@@ -1546,9 +1542,9 @@ contains
     end if
 
     call psb_barrier(ictxt)
-    t2 = mpi_wtime()
+    t2 = psb_wtime()
     call psb_spasb(a,desc_a,info,dupl=psb_dupl_err_,afmt=afmt)     
-    t3 = mpi_wtime()
+    t3 = psb_wtime()
     if(info/=0)then
       info=4010
       ch_err='psb_spasb'
