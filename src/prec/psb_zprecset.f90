@@ -34,7 +34,7 @@
 !!$  POSSIBILITY OF SUCH DAMAGE.
 !!$ 
 !!$  
-subroutine psb_zprecset(p,ptype,iv,rs,rv,info)
+subroutine psb_zprecset(p,ptype,info,iv,rs,rv)
 
   use psb_serial_mod
   use psb_descriptor_type
@@ -43,16 +43,16 @@ subroutine psb_zprecset(p,ptype,iv,rs,rv,info)
 
   type(psb_zprec_type), intent(inout)    :: p
   character(len=*), intent(in)           :: ptype
+  integer, intent(out)                   :: info
   integer, optional, intent(in)          :: iv(:)
   real(kind(1.d0)), optional, intent(in) :: rs
   real(kind(1.d0)), optional, intent(in) :: rv(:)
-  integer, optional, intent(out)         :: info
 
   type(psb_zbaseprc_type), pointer       :: bpv(:)=>null()
   character(len=len(ptype))              :: typeup
   integer                                :: isz, err
 
-  if (present(info)) info = 0
+  info = 0
 
   if (.not.associated(p%baseprecv)) then 
     allocate(p%baseprecv(1),stat=err)
@@ -196,6 +196,6 @@ subroutine psb_zprecset(p,ptype,iv,rs,rv,info)
 
   end select
 
-  if (present(info)) info = err
+  info = err
 
 end subroutine psb_zprecset

@@ -89,8 +89,7 @@ program pde90
   ! miscellaneous 
   integer              :: iargc,convert_descr,dim, check_descr
   real(kind(1.d0)), parameter :: one = 1.d0
-  real(kind(1.d0)) :: mpi_wtime, t1, t2, tprec, tsolve, t3, t4 
-  external  mpi_wtime
+  real(kind(1.d0)) :: t1, t2, tprec, tsolve, t3, t4 
 
   ! sparse matrix and preconditioner
   type(psb_dspmat_type) :: a,  l, u, h
@@ -140,9 +139,9 @@ program pde90
   !
 
   call psb_barrier(ictxt)
-  t1 = mpi_wtime()
+  t1 = psb_wtime()
   call create_matrix(idim,a,b,x,desc_a,part_block,ictxt,afmt,info)  
-  t2 = mpi_wtime() - t1
+  t2 = psb_wtime() - t1
   if(info.ne.0) then
     info=4010
     ch_err='create_matrix'
@@ -160,25 +159,25 @@ program pde90
   if(iam == psb_root_) write(0,'("Setting preconditioner to : ",a)')pr_to_str(iprec)
   select case(iprec)
   case(noprec_)
-    call psb_precset(pre,'noprec')
+    call psb_precset(pre,'noprec',info)
   case(diagsc_)             
-    call psb_precset(pre,'diagsc')
+    call psb_precset(pre,'diagsc',info)
   case(bja_)             
-    call psb_precset(pre,'ilu')
+    call psb_precset(pre,'ilu',info)
   case(asm_)             
-    call psb_precset(pre,'asm',iv=(/novr,halo_,sum_/))
+    call psb_precset(pre,'asm',info,iv=(/novr,halo_,sum_/))
   case(ash_)             
-    call psb_precset(pre,'asm',iv=(/novr,nohalo_,sum_/))
+    call psb_precset(pre,'asm',info,iv=(/novr,nohalo_,sum_/))
   case(ras_)             
-    call psb_precset(pre,'asm',iv=(/novr,halo_,none_/))
+    call psb_precset(pre,'asm',info,iv=(/novr,halo_,none_/))
   case(rash_)             
-    call psb_precset(pre,'asm',iv=(/novr,nohalo_,none_/))
+    call psb_precset(pre,'asm',info,iv=(/novr,nohalo_,none_/))
   case default
-    call psb_precset(pre,'ilu')
+    call psb_precset(pre,'ilu',info)
   end select
 
   call psb_barrier(ictxt)
-  t1 = mpi_wtime()
+  t1 = psb_wtime()
   call psb_precbld(a,desc_a,pre,info)
   if(info.ne.0) then
     info=4010
@@ -187,7 +186,7 @@ program pde90
     goto 9999
   end if
 
-  tprec = mpi_wtime()-t1
+  tprec = psb_wtime()-t1
 
   call psb_amx(ictxt,tprec)
 
@@ -199,7 +198,7 @@ program pde90
   !
   if(iam == psb_root_) write(*,'("Calling iterative method ",a)')cmethd
   call psb_barrier(ictxt)
-  t1 = mpi_wtime()  
+  t1 = psb_wtime()  
   eps   = 1.d-9
   call psb_krylov(cmethd,a,pre,b,x,eps,desc_a,info,& 
        & itmax=itmax,iter=iter,err=err,itrace=itrace,istop=istopc,irst=ml)     
@@ -212,7 +211,7 @@ program pde90
   end if
 
   call psb_barrier(ictxt)
-  t2 = mpi_wtime() - t1
+  t2 = psb_wtime() - t1
   call psb_amx(ictxt,t2)
 
   if (iam == 0) then
@@ -427,9 +426,9 @@ contains
     ! deltat discretization time
     real(kind(1.d0))         :: deltah
     real(kind(1.d0)),parameter   :: rhs=0.d0,one=1.d0,zero=0.d0
-    real(kind(1.d0))   :: mpi_wtime, t1, t2, t3, tins, tasb
+    real(kind(1.d0))   :: t1, t2, t3, tins, tasb
     real(kind(1.d0))   :: a1, a2, a3, a4, b1, b2, b3 
-    external            mpi_wtime,a1, a2, a3, a4, b1, b2, b3
+    external           :: a1, a2, a3, a4, b1, b2, b3
     integer            :: nb, ir1, ir2, ipr, err_act
     logical            :: own
     ! common area
@@ -478,7 +477,7 @@ contains
 
     tins = 0.d0
     call psb_barrier(ictxt)
-    t1 = mpi_wtime()
+    t1 = psb_wtime()
 
     ! loop over rows belonging to current process in a block
     ! distribution.
@@ -606,10 +605,10 @@ contains
           irow(1:element-1)=glob_row
           ia=glob_row
 
-          t3 = mpi_wtime()
+          t3 = psb_wtime()
           call psb_spins(element-1,irow,icol,val,a,desc_a,info)
           if(info.ne.0) exit
-          tins = tins + (mpi_wtime()-t3)
+          tins = tins + (psb_wtime()-t3)
           call psb_geins(1,(/ia/),zt(1:1),b,desc_a,info)
           if(info.ne.0) exit
           zt(1)=0.d0
@@ -620,7 +619,7 @@ contains
     end do
 
     call psb_barrier(ictxt)    
-    t2 = mpi_wtime()-t1
+    t2 = psb_wtime()-t1
 
     if(info.ne.0) then
       info=4010
@@ -631,11 +630,11 @@ contains
 
     deallocate(val,irow,icol)
 
-    t1 = mpi_wtime()
+    t1 = psb_wtime()
     call psb_cdasb(desc_a,info)
     call psb_spasb(a,desc_a,info,dupl=psb_dupl_err_,afmt=afmt)
     call psb_barrier(ictxt)
-    tasb = mpi_wtime()-t1
+    tasb = psb_wtime()-t1
     if(info.ne.0) then
       info=4010
       ch_err='asb rout.'

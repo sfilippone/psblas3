@@ -57,29 +57,29 @@ module psb_prec_mod
   end interface
 
   interface psb_precset
-    subroutine psb_dprecset(prec,ptype,iv,rs,rv,ierr)
+    subroutine psb_dprecset(prec,ptype,info,iv,rs,rv)
       use psb_serial_mod
       use psb_descriptor_type
       use psb_prec_type
       implicit none
       type(psb_dprec_type), intent(inout)    :: prec
       character(len=*), intent(in)           :: ptype
+      integer, intent(out)                   :: info
       integer, optional, intent(in)          :: iv(:)
       real(kind(1.d0)), optional, intent(in) :: rs
       real(kind(1.d0)), optional, intent(in) :: rv(:)
-      integer, optional, intent(out)         :: ierr
     end subroutine psb_dprecset
-    subroutine psb_zprecset(prec,ptype,iv,rs,rv,ierr)
+    subroutine psb_zprecset(prec,ptype,info,iv,rs,rv)
       use psb_serial_mod
       use psb_descriptor_type
       use psb_prec_type
       implicit none
       type(psb_zprec_type), intent(inout)    :: prec
       character(len=*), intent(in)           :: ptype
+      integer, intent(out)                   :: info
       integer, optional, intent(in)          :: iv(:)
       real(kind(1.d0)), optional, intent(in) :: rs
       real(kind(1.d0)), optional, intent(in) :: rv(:)
-      integer, optional, intent(out)         :: ierr
     end subroutine psb_zprecset
   end interface
 

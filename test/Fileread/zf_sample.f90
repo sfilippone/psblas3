@@ -91,12 +91,11 @@ program zf_sample
   ! other variables
   integer            :: i,info,j,m_problem
   integer            :: internal, m,ii,nnzero
-  real(kind(1.d0)) :: mpi_wtime, t1, t2, tprec, r_amax, b_amax,&
+  real(kind(1.d0)) :: t1, t2, tprec, r_amax, b_amax,&
        &scale,resmx,resmxp
   integer :: nrhs, nrow, n_row, dim, nv, ne
   integer, pointer :: ivg(:), ipv(:), neigh(:)
 
-  external mpi_wtime
   
 
   call psb_init(ictxt)
@@ -122,7 +121,7 @@ program zf_sample
        & ipart,afmt,istopc,itmax,itrace,novr,iprec,eps)
 
   call psb_barrier(ictxt)
-  t1 = mpi_wtime()  
+  t1 = psb_wtime()  
   ! read the input matrix to be processed and (possibly) the rhs 
   nrhs = 1
 
@@ -214,7 +213,7 @@ program zf_sample
   call psb_geall(r_col,desc_a,info)
   r_col(:) =0.0
   call psb_geasb(r_col,desc_a,info)
-  t2 = mpi_wtime() - t1
+  t2 = psb_wtime() - t1
   
   
   call psb_amx(ictxt, t2)
@@ -235,27 +234,27 @@ program zf_sample
   igsmth=-1
   select case(iprec)
   case(noprec_)
-    call psb_precset(pre,'noprec')
+    call psb_precset(pre,'noprec',info)
   case(diagsc_)             
-    call psb_precset(pre,'diagsc')
+    call psb_precset(pre,'diagsc',info)
   case(bja_)             
-    call psb_precset(pre,'ilu')
+    call psb_precset(pre,'ilu',info)
   case(asm_)             
-    call psb_precset(pre,'asm',iv=(/novr,halo_,sum_/))
+    call psb_precset(pre,'asm',info,iv=(/novr,halo_,sum_/))
   case(ash_)             
-    call psb_precset(pre,'asm',iv=(/novr,nohalo_,sum_/))
+    call psb_precset(pre,'asm',info,iv=(/novr,nohalo_,sum_/))
   case(ras_)             
-    call psb_precset(pre,'asm',iv=(/novr,halo_,none_/))
+    call psb_precset(pre,'asm',info,iv=(/novr,halo_,none_/))
   case(rash_)             
-    call psb_precset(pre,'asm',iv=(/novr,nohalo_,none_/))
+    call psb_precset(pre,'asm',info,iv=(/novr,nohalo_,none_/))
   case default
-    call psb_precset(pre,'ilu')
+    call psb_precset(pre,'ilu',info)
   end select
 
   ! building the preconditioner
-  t1 = mpi_wtime()
+  t1 = psb_wtime()
   call psb_precbld(a,desc_a,pre,info)
-  tprec = mpi_wtime()-t1
+  tprec = psb_wtime()-t1
   if (info /= 0) then
      call psb_errpush(4010,name,a_err='psb_precbld')
      goto 9999
@@ -271,11 +270,11 @@ program zf_sample
 
   iparm = 0
   call psb_barrier(ictxt)
-  t1 = mpi_wtime()
+  t1 = psb_wtime()
   call psb_krylov(cmethd,a,pre,b_col,x_col,eps,desc_a,info,& 
        & itmax=itmax,iter=iter,err=err,itrace=itrace,istop=istopc,irst=ml)     
   call psb_barrier(ictxt)
-  t2 = mpi_wtime() - t1
+  t2 = psb_wtime() - t1
   call psb_amx(ictxt,t2)
   call psb_geaxpby(zone,b_col,zzero,r_col,desc_a,info)
   call psb_spmm(-zone,a,x_col,zone,r_col,desc_a,info)

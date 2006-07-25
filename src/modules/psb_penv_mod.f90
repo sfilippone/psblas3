@@ -51,6 +51,10 @@ module psb_penv_mod
     module procedure  psb_barrier
   end interface
 
+  interface psb_wtime
+    module procedure  psb_wtime
+  end interface
+
   interface psb_bcast
     module procedure psb_ibcasts, psb_ibcastv, psb_ibcastm,&
          & psb_dbcasts, psb_dbcastv, psb_dbcastm,&
@@ -192,6 +196,13 @@ contains
     
   end subroutine psb_barrier
 
+  function psb_wtime()
+    real(kind(1.d0)) :: psb_wtime
+    
+    real(kind(1.d0)), external :: mpi_wtime
+    
+    psb_wtime = mpi_wtime()
+  end function psb_wtime
 
   subroutine psb_abort(ictxt)
     integer, intent(in) :: ictxt
@@ -202,6 +213,7 @@ contains
 
 
   subroutine psb_info(ictxt,iam,np)
+
     integer, intent(in)  :: ictxt
     integer, intent(out) :: iam, np
     integer              :: nprow, npcol, myprow, mypcol

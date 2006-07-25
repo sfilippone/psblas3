@@ -70,7 +70,7 @@ subroutine psb_zilu_bld(a,desc_a,p,upd,info)
   character, intent(in)                     :: upd
 
   !     .. Local Scalars ..                                                       
-  integer  ::    i, j, jj, k, kk, m
+  integer  ::    i, j, jj, k, kk, m, i1, i2, ia
   integer  ::    int_err(5)
   character ::        trans, unitd
   type(psb_zspmat_type) :: blck, atmp
