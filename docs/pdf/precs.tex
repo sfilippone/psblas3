@@ -24,7 +24,7 @@ The PSBLAS library is incorporating a package of two-level Additive
 
 \subroutine{psb\_precset}{Sets the preconditioner type}
 
-\syntax{call psb\_precset}{prec, ptype, iv, rs, ierr}
+\syntax{call psb\_precset}{prec, ptype, info, iv, rs}
 
 \begin{description}
 \item[\bf On Entry]
@@ -44,10 +44,12 @@ Specified as: an integer array, see usage notes.
 Scope: {\bf global} \\
 Type: {\bf optional}\\
 Specified as: a long precision real number.
+\item[\bf On Exit]
 
-\item[ierr] 
+\item[info] 
 Scope: {\bf global} \\
 Type: {\bf required}\\
+Error code: if no error, 0 is returned.
 \end{description}
 \section*{Usage Notes}
 The PSBLAS 2.0 contains a number of preconditioners, ranging from a
