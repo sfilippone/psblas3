@@ -50,8 +50,7 @@ contains
     character      :: mmheader*15, fmt*15, object*10, type*10, sym*15
     character(1024)      :: line
     integer        :: nrow, ncol, nnzero, neltvl, nrhs, nrhsix
-    integer        :: ircode, i,iel,nzr,infile,&
-         & j, liwork, root, nprow, npcol, myprow, mypcol
+    integer        :: ircode, i,iel,nzr,infile, j
     logical, parameter :: debug=.false.
 
     iret = 0
@@ -206,8 +205,7 @@ contains
     character      :: mmheader*15, fmt*15, object*10, type*10, sym*15
     character(1024)      :: line
     integer        :: nrow, ncol, nnzero, neltvl, nrhs, nrhsix
-    integer        :: ircode, i,iel,nzr,infile,&
-         & j, liwork, root, nprow, npcol, myprow, mypcol
+    integer        :: ircode, i,iel,nzr,infile,j
     real(kind(1.d0))   :: are, aim
     logical, parameter :: debug=.false.
     
