@@ -1,6 +1,9 @@
 Changelog. A lot less detailed than usual, at least for past
 history. 
 
+2006/07/25: Defined a new psb_wtime function. Modified precset to
+	    have a non-optional INFO dummy argument.
+
 2006/07/06: Fixed bug in swaptran. Added psb_krylov generic interface.
 
 2006/07/04: Ooops, the GetRow mod in SMMP is a performance hit.
