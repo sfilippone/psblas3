@@ -470,9 +470,9 @@ contains
     end if
 
     ! Get diagonal D
-    call psb_spgtdiag(a,p%dorig,info)
+    call psb_sp_getdiag(a,p%dorig,info)
     if(info /= 0) then
-      call psb_errpush(4010,name,a_err='spgtdiag')
+      call psb_errpush(4010,name,a_err='sp_getdiag')
       goto 9999
     end if
 

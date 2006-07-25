@@ -215,7 +215,7 @@ module psb_serial_mod
      end subroutine psb_zcsprt
   end interface
 
-  interface psb_spgtdiag
+  interface psb_sp_getdiag
      subroutine psb_dspgtdiag(a,d,info)
        use psb_spmat_type
        type(psb_dspmat_type), intent(in)     :: a
