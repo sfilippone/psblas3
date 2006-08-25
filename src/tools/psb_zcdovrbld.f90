@@ -75,13 +75,13 @@ Subroutine psb_zcdovrbld(n_ovr,desc_p,desc_a,a,&
 
   Integer :: counter,counter_h, counter_o, counter_e,j,idx,gidx,proc,n_elem_recv,&
        & n_elem_send,tot_recv,tot_elem,n_col,m,ictxt,np,me,dl_lda,lwork,&
-       & counter_t,n_elem,i_ovr,jj,n,i,proc_id,isz, mglob, glx,n_row, &
+       & counter_t,n_elem,i_ovr,jj,i,proc_id,isz, mglob, glx,n_row, &
        & idxr, idxs, lx, iszr, err_act, icomm
 
   Integer,Pointer  :: halo(:),length_dl(:),works(:),workr(:),t_halo_in(:),&
        & t_halo_out(:),work(:),dep_list(:),temp(:)
   Integer,Pointer :: brvindx(:),rvsz(:), bsdindx(:),sdsz(:)
-
+  integer :: pairtree(2)
 
   Logical,Parameter :: debug=.false.
   real(kind(1.d0)) :: t1,t2,t3,t4,t5,t6,t7, tl, tch
@@ -152,7 +152,7 @@ Subroutine psb_zcdovrbld(n_ovr,desc_p,desc_a,a,&
   counter_o             = 1
 
   ! See comment in main loop below.
-  call InitPairSearchTree(info)
+  call InitPairSearchTree(pairtree,info)
   if (info /= 0) then
     info=4010
     ch_err='InitPairSearhTree'
@@ -292,7 +292,7 @@ Subroutine psb_zcdovrbld(n_ovr,desc_p,desc_a,a,&
 
         counter_h=counter_h+3
 
-        call SearchInsKeyVal(gidx,counter_e,glx,info)
+        call SearchInsKeyVal(pairtree,gidx,counter_e,glx,info)
 !!$        if (debug) write(0,*) 'From searchInsKey ',gidx,glx,counter_e,info
         if (info>=0) then
           If (glx < counter_e)  Then
@@ -350,7 +350,7 @@ Subroutine psb_zcdovrbld(n_ovr,desc_p,desc_a,a,&
         tmp_ovr_idx(counter_o+3)=-1
         counter_o=counter_o+3
 
-        call SearchInsKeyVal(gidx,counter_e,glx,info)
+        call SearchInsKeyVal(pairtree,gidx,counter_e,glx,info)
 !!$          if (debug) write(0,*) 'From searchInsKey ',gidx,glx,counter_e,info
         if (info>=0) then
           If (glx < counter_e)  Then
@@ -594,7 +594,7 @@ Subroutine psb_zcdovrbld(n_ovr,desc_p,desc_a,a,&
       call psi_crea_index(desc_p,t_halo_in,t_halo_out,.false.,info)
 
       if (debug) then 
-        write(0,*) me,'Done Crea_index'
+        write(0,*) me,'Done Crea_Index'
         call psb_barrier(ictxt)
       end if
       if (debug) write(0,*) me,'Checktmp_o_i 2',tmp_ovr_idx(1:10)
@@ -611,12 +611,14 @@ Subroutine psb_zcdovrbld(n_ovr,desc_p,desc_a,a,&
     tch = tch +(t3-t2)
   End Do
   t1 = mpi_wtime()
-  call FreePairSearchTree()
+  call FreePairSearchTree(pairtree)
+
   desc_p%matrix_data(psb_m_)=desc_a%matrix_data(psb_m_)
   desc_p%matrix_data(psb_n_)=desc_a%matrix_data(psb_n_)
 
   tmp_halo(counter_h)=-1
   tmp_ovr_idx(counter_o)=-1
+
 
   !
   ! At this point we have gathered all the indices in the halo at
@@ -676,6 +678,7 @@ Subroutine psb_zcdovrbld(n_ovr,desc_p,desc_a,a,&
   end if
 
   if (debug) write(0,*) me,'Done ConvertComm'
+
   Deallocate(works,workr,t_halo_in,t_halo_out,work,&
        & length_dl,dep_list,tmp_ovr_idx,tmp_halo,&
        & brvindx,rvsz,sdsz,bsdindx,temp,stat=info)

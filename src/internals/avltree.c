@@ -99,8 +99,8 @@
 /*                                                               */
 /*   int AVLTreeInsert(AVLTreePtr Tree, void *key,               */
 /*                     int (*comp)(void*,void*),                 */
-/*                     void (*update)(void*,void*))              */
-/*                                                               */
+/*                     void (*update)(void*,void*,void*),        */
+/*                     void *data)                               */
 /*       Purpose: Insert an item into an existing (possibly      */
 /*                empty) tree.                                   */
 /*                                                               */
@@ -308,9 +308,14 @@ AVLNodePtr AVLTreeSearch(AVLTreePtr Tree, void *key,
   int icmp; 
   if (Tree==NULL) return(NULL);
   current = Tree->root;
-  
+#ifdef PROFILE
+  Tree->nsteps=0;
+#endif
   while (current != NULL) {
     icmp = (*comp)(key,current->key);
+#ifdef PROFILE
+    Tree->nsteps +=1;
+#endif
     if (icmp<0) {
       current = current->llink;
     } else if (icmp==0){      
@@ -517,7 +522,7 @@ AVLNodePtr GetAVLNode(AVLTreePtr Tree)
 }
 
 int AVLTreeInsert(AVLTreePtr Tree, void *key,int (*comp)(void *, void *),
-                  void (*update)(void *, void *)) 
+                  void (*update)(void *, void *, void *), void *data) 
 {
   AVLNodePtr root, t, s, p, q, r; 
   int search, bal, icmp;
@@ -558,7 +563,7 @@ int AVLTreeInsert(AVLTreePtr Tree, void *key,int (*comp)(void *, void *),
         }
       }
     } else if (icmp == 0) {
-      (*update)(key,p->key);
+      (*update)(key,p->key,data);
       return(1);
     } else { 
       if ((q=p->rlink)==NULL) {

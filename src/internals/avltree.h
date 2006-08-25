@@ -46,6 +46,9 @@ typedef struct avltree {
   AVLTVectPtr first, current;
   AVLNodePtr root;
   int nnodes;
+#ifdef PROFILE
+  int nsteps;
+#endif
 } AVLTree;
 
 
@@ -55,7 +58,7 @@ int  AVLTreeInit(AVLTreePtr);
 int  AVLTreeReInit(AVLTreePtr);
 AVLTreePtr GetAVLTree();
 int  AVLTreeInsert(AVLTreePtr, void *, int (*)(void *, void *),
-                   void (*)(void *, void *));
+                   void (*)(void *, void *, void *), void *);
 AVLNodePtr AVLTreeUserInsert(AVLTreePtr, void *, int (*)(void *, void *));
 void AVLTreeInorderTraverse(AVLTreePtr, void (*)(void *, void *), void *);
 void AVLTreePreorderTraverse(AVLTreePtr, void (*)(void *, void *), void *);

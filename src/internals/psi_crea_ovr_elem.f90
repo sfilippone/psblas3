@@ -39,6 +39,7 @@ subroutine psi_crea_ovr_elem(desc_overlap,ovr_elem)
   !     ...local scalars...
   integer :: i,pnt_new_elem,ret,j, info
   integer :: dim_ovr_elem
+  integer :: pairtree(2)
 
   !     ...external function...
   integer  :: psi_exist_ovr_elem,dim
@@ -49,7 +50,7 @@ subroutine psi_crea_ovr_elem(desc_overlap,ovr_elem)
   dim_ovr_elem=size(ovr_elem)
   i=1
   pnt_new_elem=1
-  if (usetree)   call initpairsearchtree(info)
+  if (usetree)   call initpairsearchtree(pairtree,info)
   do while (desc_overlap(i).ne.-1)
     !        ...loop over all procs of desc_overlap list....
 
@@ -57,7 +58,7 @@ subroutine psi_crea_ovr_elem(desc_overlap,ovr_elem)
     do j=1,desc_overlap(i)
       !           ....loop over all overlap indices referred to act proc.....
       if (usetree) then 
-        call searchinskeyval(desc_overlap(i+j),pnt_new_elem,&
+        call searchinskeyval(pairtree,desc_overlap(i+j),pnt_new_elem,&
              & ret,info)
         if (ret == pnt_new_elem) ret=-1
       else
@@ -89,6 +90,6 @@ subroutine psi_crea_ovr_elem(desc_overlap,ovr_elem)
 
   !     ...add -1 at the end of output list......
   ovr_elem(pnt_new_elem)=-1
-  if (usetree)   call freepairsearchtree()
+  if (usetree)   call freepairsearchtree(pairtree)
 
 end subroutine psi_crea_ovr_elem

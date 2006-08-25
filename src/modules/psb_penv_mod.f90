@@ -58,20 +58,23 @@ module psb_penv_mod
   interface psb_bcast
     module procedure psb_ibcasts, psb_ibcastv, psb_ibcastm,&
          & psb_dbcasts, psb_dbcastv, psb_dbcastm,&
-         & psb_zbcasts, psb_zbcastv, psb_zbcastm
+         & psb_zbcasts, psb_zbcastv, psb_zbcastm,&
+         & psb_hbcasts, psb_lbcasts
   end interface
 
 
   interface psb_snd
     module procedure psb_isnds, psb_isndv, psb_isndm,&
          & psb_dsnds, psb_dsndv, psb_dsndm,&
-         & psb_zsnds, psb_zsndv, psb_zsndm
+         & psb_zsnds, psb_zsndv, psb_zsndm,&
+         & psb_hsnds, psb_lsnds
   end interface
 
   interface psb_rcv
     module procedure psb_ircvs, psb_ircvv, psb_ircvm,&
          & psb_drcvs, psb_drcvv, psb_drcvm,&
-         & psb_zrcvs, psb_zrcvv, psb_zrcvm
+         & psb_zrcvs, psb_zrcvv, psb_zrcvm,&
+         & psb_hrcvs, psb_lrcvs
   end interface
 
 
@@ -184,7 +187,6 @@ contains
     if ((myprow >=0).and.(mypcol>=0)) then
       call blacs_gridexit(ictxt)
     end if
-    call blacs_exit(0)
     
   end subroutine psb_exit
 
@@ -426,6 +428,53 @@ contains
       call gebr2d(ictxt,'A',dat,rrt=root_)
     endif
   end subroutine psb_zbcastm
+
+
+  subroutine psb_hbcasts(ictxt,dat,root,length)
+    use mpi
+    integer, intent(in)             :: ictxt
+    character(len=*), intent(inout) :: dat
+    integer, intent(in), optional   :: root,length
+
+    integer  :: iam, np, root_,icomm,length_,info
+
+    if (present(root)) then
+      root_ = root
+    else
+      root_ = 0
+    endif
+    if (present(length)) then
+      length_ = length
+    else
+      length_ = len(dat)
+    endif
+
+    call psb_info(ictxt,iam,np)
+    call psb_get_mpicomm(ictxt,icomm)
+    
+    call mpi_bcast(dat,length_,MPI_CHARACTER,root_,icomm,info)
+
+  end subroutine psb_hbcasts
+
+  subroutine psb_lbcasts(ictxt,dat,root)
+    use mpi
+    integer, intent(in)             :: ictxt
+    logical, intent(inout)          :: dat
+    integer, intent(in), optional   :: root
+
+    integer  :: iam, np, root_,icomm,info
+
+    if (present(root)) then
+      root_ = root
+    else
+      root_ = 0
+    endif
+
+    call psb_info(ictxt,iam,np)
+    call psb_get_mpicomm(ictxt,icomm)
+    call mpi_bcast(dat,1,MPI_LOGICAL,root_,icomm,info)
+
+  end subroutine psb_lbcasts
 
 
   subroutine psb_iamxs(ictxt,dat,root,ia)
@@ -978,6 +1027,77 @@ contains
 
 
 
+  subroutine psb_hsnds(ictxt,dat,dst,length)
+    integer, intent(in)           :: ictxt
+    character(len=*), intent(in)  :: dat
+    integer, intent(in)           :: dst
+    integer, intent(in), optional :: length
+    integer, allocatable          :: buffer(:)
+    integer :: length_, i
+    
+    if (present(length)) then 
+      length_ = length
+    else
+      length_ = len(dat)
+    endif
+    allocate(buffer(length_))
+    do i=1,length_
+      buffer(i) = iachar(dat(i:i))
+    end do
+    
+    call gesd2d(ictxt,buffer,dst,0) 
+
+  end subroutine psb_hsnds
+
+  subroutine psb_hrcvs(ictxt,dat,src,length)
+    integer, intent(in)           :: ictxt
+    character(len=*), intent(out)  :: dat
+    integer, intent(in)           :: src
+    integer, intent(in), optional :: length
+    integer, allocatable          :: buffer(:)
+    integer :: length_, i
+    
+    if (present(length)) then 
+      length_ = length
+    else
+      length_ = len(dat)
+    endif
+    allocate(buffer(length_))
+    
+    call gerv2d(ictxt,buffer,src,0) 
+    do i=1,length_
+      dat(i:i) = achar(buffer(i))
+    end do
+
+  end subroutine psb_hrcvs
+
+  subroutine psb_lsnds(ictxt,dat,dst,length)
+    integer, intent(in)           :: ictxt
+    logical, intent(in)           :: dat
+    integer, intent(in)           :: dst
+    integer :: i
+    
+    if (dat) then 
+      i = 1
+    else
+      i = 0
+    endif
+    call gesd2d(ictxt,i,dst,0) 
+
+  end subroutine psb_lsnds
+
+  subroutine psb_lrcvs(ictxt,dat,src,length)
+    integer, intent(in)           :: ictxt
+    logical, intent(out)          :: dat
+    integer, intent(in)           :: src
+    integer :: i
+    
+    call gerv2d(ictxt,i,src,0) 
+
+    dat = (i == 1) 
+
+  end subroutine psb_lrcvs
+
 
   subroutine psb_isnds(ictxt,dat,dst)
     integer, intent(in)  :: ictxt
@@ -1158,14 +1278,6 @@ contains
 
 
 
-
-!
-!
-!
-!
-!
-!
-!
 
   
   subroutine igebs2ds(ictxt,scope,dat,top)

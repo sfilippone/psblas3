@@ -81,7 +81,7 @@ Subroutine psb_dcdovrbld(n_ovr,desc_p,desc_a,a,&
   Integer,Pointer  :: halo(:),length_dl(:),works(:),workr(:),t_halo_in(:),&
        & t_halo_out(:),work(:),dep_list(:),temp(:)
   Integer,Pointer :: brvindx(:),rvsz(:), bsdindx(:),sdsz(:)
-
+  integer :: pairtree(2)
 
   Logical,Parameter :: debug=.false.
   real(kind(1.d0)) :: t1,t2,t3,t4,t5,t6,t7, tl, tch
@@ -152,7 +152,7 @@ Subroutine psb_dcdovrbld(n_ovr,desc_p,desc_a,a,&
   counter_o             = 1
 
   ! See comment in main loop below.
-  call InitPairSearchTree(info)
+  call InitPairSearchTree(pairtree,info)
   if (info /= 0) then
     info=4010
     ch_err='InitPairSearhTree'
@@ -292,7 +292,7 @@ Subroutine psb_dcdovrbld(n_ovr,desc_p,desc_a,a,&
 
         counter_h=counter_h+3
 
-        call SearchInsKeyVal(gidx,counter_e,glx,info)
+        call SearchInsKeyVal(pairtree,gidx,counter_e,glx,info)
 !!$        if (debug) write(0,*) 'From searchInsKey ',gidx,glx,counter_e,info
         if (info>=0) then
           If (glx < counter_e)  Then
@@ -350,7 +350,7 @@ Subroutine psb_dcdovrbld(n_ovr,desc_p,desc_a,a,&
         tmp_ovr_idx(counter_o+3)=-1
         counter_o=counter_o+3
 
-        call SearchInsKeyVal(gidx,counter_e,glx,info)
+        call SearchInsKeyVal(pairtree,gidx,counter_e,glx,info)
 !!$          if (debug) write(0,*) 'From searchInsKey ',gidx,glx,counter_e,info
         if (info>=0) then
           If (glx < counter_e)  Then
@@ -611,7 +611,7 @@ Subroutine psb_dcdovrbld(n_ovr,desc_p,desc_a,a,&
     tch = tch +(t3-t2)
   End Do
   t1 = mpi_wtime()
-  call FreePairSearchTree()
+  call FreePairSearchTree(pairtree)
 
   desc_p%matrix_data(psb_m_)=desc_a%matrix_data(psb_m_)
   desc_p%matrix_data(psb_n_)=desc_a%matrix_data(psb_n_)
