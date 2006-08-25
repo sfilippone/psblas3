@@ -106,9 +106,7 @@ CONTAINS
       call psb_bcast(ictxt,n,root=root)
     else 
       call psb_bcast(ictxt,n,root=root)
-!!$       if (associated(graph_vect)) then
-!!$	  deallocate(graph_vect)
-!!$       endif
+
       allocate(graph_vect(n),stat=info)
       if (info /= 0) then
         write(0,*) 'Fatal error in DISTR_GRPPART: memory allocation ',&
@@ -151,11 +149,6 @@ CONTAINS
       end subroutine METIS_PartGraphRecursive
     end interface    
     
-
-!!$    IF (ASSOCIATED(GRAPH_VECT)) THEN
-!!$       DEALLOCATE(GRAPH_VECT)
-!!$    ENDIF
-    
     allocate(graph_vect(n),stat=info)
     
     if (info /= 0) then
@@ -168,12 +161,10 @@ CONTAINS
         iopt(1) = 0
         numflag  = 1
         wgflag   = 0
-!!$
-!!$        write(0,*)'CSR structure ', size(ia2),size(ia1),&
-!!$             & ia2(n+1),minval(ia1(1:ia2(n+1)-1)),maxval(ia1(1:ia2(n+1)-1))
+
         call METIS_PartGraphRecursive(n,ia2,ia1,idummy,jdummy,&
              & wgflag,numflag,nparts,iopt,nedc,graph_vect)
-!!$        write(0,*)'Edge cut from Metis ',nedc
+
         do i=1, n
           graph_vect(i) = graph_vect(i) - 1
         enddo
