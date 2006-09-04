@@ -28,106 +28,89 @@
 !!$  POSSIBILITY OF SUCH DAMAGE.
 !!$ 
 !!$  
-MODULE GETP
+Module getp
   use psb_sparse_mod
-  PUBLIC GET_PARMS
-  PUBLIC PR_USAGE
+  public get_parms
+  public pr_usage
 
-CONTAINS
+contains
   !
   ! Get iteration parameters from the command line
   !
-  SUBROUTINE  GET_PARMS(ICTXT,MTRX_FILE,RHS_FILE,CMETHD,IPART,&
-       & AFMT,ISTOPC,ITMAX,ITRACE,NOVR,IPREC,EPS)
+  subroutine  get_parms(ictxt,mtrx_file,rhs_file,cmethd,ipart,&
+       & afmt,istopc,itmax,itrace,novr,iprec,eps)
     integer      :: ictxt
-    Character*40 :: CMETHD, MTRX_FILE, RHS_FILE
-    Integer      :: IRET, ISTOPC,ITMAX,ITRACE,IPART,IPREC,NOVR
-    Character*40 :: CHARBUF
+    character*40 :: cmethd, mtrx_file, rhs_file
+    integer      :: iret, istopc,itmax,itrace,ipart,iprec,novr
+    character*40 :: charbuf
     real(kind(1.d0)) :: eps
     character    :: afmt*5
-    INTEGER      :: IARGC, NP, IAM
-    EXTERNAL     IARGC
-    INTEGER      :: INPARMS(40), IP 
+    integer      :: np, iam
+    integer      :: inparms(40), ip 
 
     call psb_info(ictxt,iam,np)
-    IF (IAM==0) THEN
+    if (iam==0) then
       ! Read Input Parameters
-      READ(*,*) IP
-      IF (IP.GE.3) THEN
-        READ(*,*) MTRX_FILE
-        READ(*,*) RHS_FILE
-        READ(*,*) CMETHD
-        READ(*,*) AFMT
+      read(*,*) ip
+      if (ip >= 3) then
+        read(*,*) mtrx_file
+        read(*,*) rhs_file
+        read(*,*) cmethd
+        read(*,*) afmt
 
-        ! Convert strings in array
-        DO I = 1, LEN(MTRX_FILE)
-          INPARMS(I) = IACHAR(MTRX_FILE(I:I))
-        END DO
-        ! Broadcast parameters to all processors
-        call psb_bcast(ictxt,inparms(1:40))
 
-        ! Convert strings in array
-        DO I = 1, LEN(CMETHD)
-          INPARMS(I) = IACHAR(CMETHD(I:I))
-        END DO
-        ! Broadcast parameters to all processors
-        call psb_bcast(ictxt,inparms(1:40))
+        call psb_bcast(ictxt,mtrx_file)
+        call psb_bcast(ictxt,rhs_file)
+        call psb_bcast(ictxt,cmethd)
+        call psb_bcast(ictxt,afmt)
 
-        DO I = 1, LEN(AFMT)
-          INPARMS(I) = IACHAR(AFMT(I:I))
-        END DO
-        ! Broadcast parameters to all processors
-        call psb_bcast(ictxt,inparms(1:40))
-
-        READ(*,*) IPART
-        IF (IP.GE.5) THEN
-          READ(*,*) ISTOPC
-        ELSE
-          ISTOPC=1        
-        ENDIF
-        IF (IP.GE.6) THEN
-          READ(*,*) ITMAX
-        ELSE
-          ITMAX=500
-        ENDIF
-        IF (IP.GE.7) THEN
-          READ(*,*) ITRACE
-        ELSE
-          ITRACE=-1
-        ENDIF
-        IF (IP.GE.8) THEN
-          READ(*,*) IPREC
-        ELSE
-          IPREC=0
-        ENDIF
-        IF (IP.GE.9) THEN
-          READ(*,*) NOVR
-        ELSE
-          NOVR  = 1
-        ENDIF
-        IF (IP.GE.10) THEN
-          READ(*,*) EPS
-        ELSE
-          EPS=1.D-6
-        ENDIF
-        ! Broadcast parameters to all processors    
-
-        INPARMS(1) = IPART
-        INPARMS(2) = ISTOPC
-        INPARMS(3) = ITMAX
-        INPARMS(4) = ITRACE
-        INPARMS(5) = IPREC
-        INPARMS(6) = NOVR
+        read(*,*) ipart
+        if (ip >= 5) then
+          read(*,*) istopc
+        else
+          istopc=1        
+        endif
+        if (ip >= 6) then
+          read(*,*) itmax
+        else
+          itmax=500
+        endif
+        if (ip >= 7) then
+          read(*,*) itrace
+        else
+          itrace=-1
+        endif
+        if (ip >= 8) then
+          read(*,*) iprec
+        else
+          iprec=0
+        endif
+        if (ip >= 9) then
+          read(*,*) novr
+        else
+          novr  = 1
+        endif
+        if (ip >= 10) then
+          read(*,*) eps
+        else
+          eps=1.d-6
+        endif
+        inparms(1) = ipart
+        inparms(2) = istopc
+        inparms(3) = itmax
+        inparms(4) = itrace
+        inparms(5) = iprec
+        inparms(6) = novr
         call psb_bcast(ictxt,inparms(1:6))
         call psb_bcast(ictxt,eps)
 
-        write(*,'("Solving matrix       : ",a40)')mtrx_file      
-        write(*,'("Number of processors : ",i3)')np
-        write(*,'("Data distribution    : ",i2)')ipart
-        write(*,'("Preconditioner       : ",i2)')iprec
+        write(*,'("Solving matrix       : ",a40)') mtrx_file      
+        write(*,'("Number of processors : ",i3)')  np
+        write(*,'("Data distribution    : ",i2)')  ipart
+        write(*,'("Preconditioner       : ",i2)')  iprec
         if(iprec.gt.2) write(*,'("Overlapping levels   : ",i2)')novr
-        write(*,'("Iterative method     : ",a40)')cmethd
-        write(*,'("Storage format       : ",a3)')afmt(1:3)
+        write(*,'("Iterative method     : ",a40)') cmethd
+        write(*,'("Storage format       : ",a3)')  afmt(1:3)
         write(*,'(" ")')
       else
         call pr_usage(0)
@@ -136,24 +119,12 @@ CONTAINS
       end if
     else
       ! Receive Parameters
-      call psb_bcast(ictxt,inparms(1:40))
-
-      do i = 1, 40
-        mtrx_file(i:i) = achar(inparms(i))
-      end do
-      call psb_bcast(ictxt,inparms(1:40))
-
-      DO I = 1, 40
-        CMETHD(I:I) = ACHAR(INPARMS(I))
-      END DO
-
-      call psb_bcast(ictxt,inparms(1:40))
-      DO I = 1, LEN(AFMT)
-        AFMT(I:I) = ACHAR(INPARMS(I))
-      END DO
+      call psb_bcast(ictxt,mtrx_file)
+      call psb_bcast(ictxt,rhs_file)
+      call psb_bcast(ictxt,cmethd)
+      call psb_bcast(ictxt,afmt)
 
       call psb_bcast(ictxt,inparms(1:6))
-
       ipart  =  inparms(1) 
       istopc =  inparms(2) 
       itmax  =  inparms(3) 
@@ -164,21 +135,22 @@ CONTAINS
 
     end if
 
-  END SUBROUTINE GET_PARMS
-  SUBROUTINE PR_USAGE(IOUT)
-    INTEGER IOUT
-    WRITE(IOUT, *) ' Number of parameters is incorrect!'
-    WRITE(IOUT, *) ' Use: hb_sample mtrx_file methd prec [ptype &
+  end subroutine get_parms
+
+  subroutine pr_usage(iout)
+    integer iout
+    write(iout, *) ' Number of parameters is incorrect!'
+    write(iout, *) ' Use: hb_sample mtrx_file methd prec [ptype &
          &itmax istopc itrace]' 
-    WRITE(IOUT, *) ' Where:'
-    WRITE(IOUT, *) '     mtrx_file      is stored in HB format'
-    WRITE(IOUT, *) '     methd          may be: CGSTAB '
-    WRITE(IOUT, *) '     ptype          Partition strategy default 0'
-    WRITE(IOUT, *) '                    0: BLOCK partition '
-    WRITE(IOUT, *) '     itmax          Max iterations [500]        '
-    WRITE(IOUT, *) '     istopc         Stopping criterion [1]      '
-    WRITE(IOUT, *) '     itrace         0  (no tracing, default) or '
-    WRITE(IOUT, *) '                    >= 0 do tracing every ITRACE'
-    WRITE(IOUT, *) '                    iterations ' 
-  END SUBROUTINE PR_USAGE
-END MODULE GETP
+    write(iout, *) ' Where:'
+    write(iout, *) '     mtrx_file      is stored in HB format'
+    write(iout, *) '     methd          may be: CGSTAB '
+    write(iout, *) '     ptype          Partition strategy default 0'
+    write(iout, *) '                    0: BLOCK partition '
+    write(iout, *) '     itmax          Max iterations [500]        '
+    write(iout, *) '     istopc         Stopping criterion [1]      '
+    write(iout, *) '     itrace         0  (no tracing, default) or '
+    write(iout, *) '                    >= 0 do tracing every ITRACE'
+    write(iout, *) '                    iterations ' 
+  end subroutine pr_usage
+end module getp
