@@ -1,6 +1,9 @@
 Changelog. A lot less detailed than usual, at least for past
 history. 
 
+2006/09/02: Declared version 2.0.2, after having fixed a lot of
+	    details in the environment routines.
+
 2006/07/25: Defined a new psb_wtime function. Modified precset to
 	    have a non-optional INFO dummy argument.
 

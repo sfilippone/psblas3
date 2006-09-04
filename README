@@ -1,4 +1,4 @@
-This directory contains  the PSBLAS library, version 2.0.1.
+This directory contains  the PSBLAS library, version 2.0.2.
 
 
 Version 1.0 of the library was described in:
@@ -104,9 +104,10 @@ To compile and run our software you will need
 
 
 TODO:
-   As soon as TR 15581 and MOVE_ALLOC become available in GNU Fortran
+-  As soon as TR 15581 and MOVE_ALLOC become available in GNU Fortran
    we shall move from POINTERS to ALLOCATABLE for both vectors and
    derived data types components. 
+-  The GLOB_TO_LOC array should be changed for large test cases. 
 
 
 The PSBLAS team. 
