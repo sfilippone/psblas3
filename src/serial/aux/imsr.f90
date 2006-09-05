@@ -70,7 +70,7 @@ subroutine imsr(n,x)
       x(k)     = iswap
       lswap    = iaux(lp)
       iaux(lp) = iaux(k)
-      iaux(k)  = lswap
+      iaux(k)  = lp
       lp = lswap 
       k  = k + 1
     enddo
