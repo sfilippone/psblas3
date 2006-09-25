@@ -32,6 +32,7 @@ subroutine psb_cest(afmt, m,n,nnz, lia1, lia2, lar, iup, info)
 
   use psb_error_mod
   use psb_const_mod
+  use psb_string_mod
   implicit none
 
   !     .. scalar arguments ..
@@ -45,21 +46,21 @@ subroutine psb_cest(afmt, m,n,nnz, lia1, lia2, lar, iup, info)
   name = 'psb_cest'      
   call psb_erractionsave(err_act)
 
-  if (afmt.eq.'???') then 
+  if (afmt == '???') then 
     afmt = psb_fidef_
   endif
 
   select case(iup)
   case (psb_upd_perm_)
-    if (afmt.eq.'JAD') then 
+    if (toupper(afmt) == 'JAD') then 
       lia1 = 2*(nnz + nnz/5) +1000
       lia2 = 2*(nnz + nnz/5) +1000 +m
       lar = nnz + nnz/5
-    else if (afmt.eq.'COO') then 
+    else if (toupper(afmt) == 'COO') then 
       lia1 = nnz
       lia2 = 2*nnz + 1000
       lar = nnz
-    else if(afmt.eq.'CSR') then
+    else if(toupper(afmt) == 'CSR') then
       lia1 = nnz
       lia2 = 2*nnz + 1000 + m + 1
       lar = nnz
@@ -71,15 +72,15 @@ subroutine psb_cest(afmt, m,n,nnz, lia1, lia2, lar, iup, info)
 
   case (psb_upd_dflt_, psb_upd_srch_)
 
-    if (afmt.eq.'JAD') then 
+    if (toupper(afmt) == 'JAD') then 
       lia1 = nnz + nnz/5
       lia2 = nnz + nnz/5
       lar = nnz + nnz/5
-    else if (afmt.eq.'COO') then 
+    else if (toupper(afmt) == 'COO') then 
       lia1 = nnz
       lia2 = nnz
       lar = nnz
-    else if(afmt.eq.'CSR') then
+    else if(toupper(afmt) == 'CSR') then
       lia1 = nnz
       lia2 = max(nnz,m+1)
       lar = nnz
