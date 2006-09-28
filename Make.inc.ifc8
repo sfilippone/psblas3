@@ -6,8 +6,9 @@
 #######################  Section 1 #######################
 #  Define your compilers and compiler flags here         #
 ##########################################################
-F90=${IFC8}/bin/ifort
-FC=${IFC8}/bin/ifort
+IFC8=/opt/intel_fc_80
+F90=$(IFC8)/bin/ifort
+FC=$(IFC8)/bin/ifort
 F77=$(FC)
 CC=gcc
 F90COPT= -O3 
