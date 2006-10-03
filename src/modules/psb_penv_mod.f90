@@ -178,16 +178,22 @@ contains
         
   end subroutine psb_init
 
-  subroutine psb_exit(ictxt)
+  subroutine psb_exit(ictxt,close)
     integer, intent(in) :: ictxt
-    
+    logical, intent(in), optional :: close
+    logical  :: close_
     integer  :: nprow, npcol, myprow, mypcol
     
+    if (present(close)) then 
+      close_ = close
+    else
+      close_ = .true.
+    end if
     call blacs_gridinfo(ictxt, nprow, npcol, myprow, mypcol)
     if ((myprow >=0).and.(mypcol>=0)) then
       call blacs_gridexit(ictxt)
     end if
-    
+    if (close_) call blacs_exit(0)
   end subroutine psb_exit
 
 

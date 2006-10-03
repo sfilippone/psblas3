@@ -80,6 +80,7 @@ Specified as: an integer variable. \
 \subroutine{psb\_exit}{Exit from  PSBLAS parallel environment}
 
 \syntax{call psb\_exit}{icontxt}
+\syntax*{call psb\_exit}{icontxt,close}
 
 This subroutine exits from the  PSBLAS parallel virtual  machine.
 \begin{description}
@@ -89,13 +90,24 @@ This subroutine exits from the  PSBLAS parallel virtual  machine.
 Scope:{\bf global}.\\
 Type:{\bf required}.\\
 Specified as: an integer variable.
+\item[close] Whether to close all data structures related to the
+  virtual parallel machine, besides those associated with icontxt.\\
+Scope:{\bf global}.\\
+Type:{\bf optional}.\\
+Specified as: a logical  variable, default value: true.
 \end{description}
 
 \section*{Notes}
 \begin{enumerate}
 \item This routine may be called even if a previous call to
   \verb|psb_info| has returned with $iam=-1$; indeed, it it is the only
-  routine that may be called with argument \verb|icontxt| in this situation.
+  routine that may be called with argument \verb|icontxt| in this
+  situation.
+\item If the user wants to use multiple communication contexts in the
+  same program, this routine may be called multiple times to
+  selectively close the contexts with \verb|close=.false.|, while on
+  the last call it should be called with \verb|close=.true.| to
+  shutdown in a clean way the entire parallel environment.
 \end{enumerate}
 
 
@@ -271,6 +283,15 @@ scalar, or a rank 1 or 2 array. \\
 Type, rank and size must agree on all processes.
 \end{description}
 
+\section*{Notes}
+\begin{enumerate}
+\item The \verb|dat| argument is both input and output, and its
+  value may be changed even on processes different from the final
+  result destination.
+\end{enumerate}
+
+
+
 \subroutine{psb\_amx}{Global maximum absolute value}
 
 \syntax{call psb\_amx}{icontxt, dat, root}
@@ -308,6 +329,14 @@ scalar, or a rank 1 or 2 array. \
 Type, rank and size must agree on all processes.
 \end{description}
 
+
+\section*{Notes}
+\begin{enumerate}
+\item The \verb|dat| argument is both input and output, and its
+  value may be changed even on processes different from the final
+  result destination.
+\end{enumerate}
+
 \subroutine{psb\_amn}{Global minimum absolute value}
 
 \syntax{call psb\_amn}{icontxt, dat, root}
@@ -344,6 +373,14 @@ Specified as: an integer, real or complex variable, which may be a
 scalar, or a rank 1 or 2 array. \\
 Type, rank and size must agree on all processes.
 \end{description}
+
+
+\section*{Notes}
+\begin{enumerate}
+\item The \verb|dat| argument is both input and output, and its
+  value may be changed even on processes different from the final
+  result destination.
+\end{enumerate}
 
 
 \subroutine{psb\_snd}{Send data}
