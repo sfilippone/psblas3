@@ -1,0 +1,89 @@
+.mod=.mod
+.fh=.fh
+.SUFFIXES: .f90 $(.mod)
+
+
+#######################  Section 1 #######################
+#  Define your compilers and compiler flags here         #
+##########################################################
+IFC9=/opt/intel/fc/9.1.033
+F90=$(IFC9)/bin/ifort
+FC=$(IFC9)/bin/ifort
+F77=$(FC)
+CC=gcc
+F90COPT= -O3 
+FCOPT=-O3 
+CCOPT=-O3
+
+#######################  Section 2 #######################
+#  Define your linker and linker flags here              #
+##########################################################
+F90LINK=/usr/local/mpich-ifc91/bin/mpif90 -g -CB -no_cpprt
+FLINK=/usr/local/mpich-ifc91/bin/mpif77 -g -CB -no_cpprt
+MPF90=/usr/local/mpich-ifc91/bin/mpif90 -g -CB -no_cpprt
+MPF77=/usr/local/mpich-ifc91/bin/mpif77 -g -CB -no_cpprt
+MPCC=/usr/local/mpich-ifc91/bin/mpicc -g -CB -no_cpprt
+
+#######################  Section 3 #######################
+#  Specify paths to libraries                            #
+##########################################################
+BLAS=-lblas-intel -L$(HOME)/NUMERICAL/LIB
+BLACS=-lmpiblacs-intel -L$(HOME)/NUMERICAL/LIB
+EXTRA_BLACS_ENV_OBJS=extra_env.o
+
+
+#######################  Section 4 #######################
+#  Other useful tools&defines                            #
+##########################################################
+SLUDIR=/usr/local/SuperLU_3.0
+SLU=-lslu_lx_ifc9 -L$(SLUDIR)
+SLUDEF=-DHave_SLU_ -I$(SLUDIR)
+
+UMFDIR=$(HOME)/LIB/Umfpack_gcc41
+UMF=-lumfpack -lamd -L$(UMFDIR)
+UMFDEF=-DHave_UMF_ -I$(UMFDIR)
+
+#  Add -DLargeFptr for 64-bit addresses
+CDEFINES=-DAdd_ $(SLUDEF) $(UMFDEF)
+
+AR=ar -cur
+RANLIB=ranlib
+
+
+
+#######################  Section 5 #######################
+#  Do not edit this                                      #
+##########################################################
+LIBDIR = lib
+LIBNAME = libpsblas.a
+
+TYPEMODS =  psb_spmat_type$(.mod) psb_descriptor_type$(.mod) psb_prec_type$(.mod) psb_realloc_mod$(.mod)
+CONSTMODS = psb_const_mod$(.mod)
+BLASMODS  = $(TYPEMODS) psb_psblas_mod$(.mod) psb_comm_mod$(.mod)
+METHDMODS = psb_methd_mod$(.mod)
+TOOLSMODS = $(CONSTMODS) psi_mod$(.mod) psb_tools_mod$(.mod) psb_serial_mod$(.mod)
+PRECMODS  = psb_prec_mod$(.mod)
+ERRORMODS = psb_error_mod$(.mod)
+F90MODS= $(BLASMODS) $(PRECMODS) $(METHDMODS) $(TOOLSMODS) $(ERRORMODS) string$(.mod)
+
+MODS=$(LIBDIR)/psb_const_mod$(.mod) $(LIBDIR)/psb_spmat_type$(.mod) $(LIBDIR)/psb_realloc_mod$(.mod) \
+  $(LIBDIR)/psb_descriptor_type$(.mod)  $(LIBDIR)/psb_prec_type$(.mod) $(LIBDIR)/parts.fh \
+  $(LIBDIR)/psb_serial_mod$(.mod) $(LIBDIR)/psb_comm_mod$(.mod) $(LIBDIR)/psb_error_mod$(.mod)
+
+# Under Linux/gmake there is a rule interpreting .mod as Modula source! 
+$(.mod).o:
+	
+.f.o:
+	$(FC) $(FCOPT) $(INCDIRS)  -c $<
+.c.o:
+	$(CC) $(CCOPT) $(INCDIRS) $(CDEFINES) -c $<
+.f$(.mod):
+	$(F90) $(FCOPT) $(INCDIRS) -c $<
+.f90$(.mod):
+	$(F90) $(F90COPT) $(INCDIRS) -c $<
+.f90.o:
+	$(F90) $(F90COPT) $(INCDIRS) -c $<
+
+
+
+
