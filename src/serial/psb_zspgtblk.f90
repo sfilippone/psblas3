@@ -382,7 +382,7 @@ contains
 
   subroutine jad_zspgtblk(irw,a,b,append,iren,lrw)
 
-    type(psb_zspmat_type), intent(in)     :: a
+    type(psb_zspmat_type), intent(in),target  :: a
     integer                               :: irw
     type(psb_zspmat_type), intent(inout)  :: b
     logical, intent(in)                   :: append

@@ -381,7 +381,7 @@ contains
 
   subroutine jad_dspgtblk(irw,a,b,append,iren,lrw)
 
-    type(psb_dspmat_type), intent(in)     :: a
+    type(psb_dspmat_type), intent(in), target :: a
     integer                               :: irw
     type(psb_dspmat_type), intent(inout)  :: b
     logical, intent(in)                   :: append
