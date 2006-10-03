@@ -620,7 +620,12 @@ contains
     ! Doing it this way means to consider diag(Ai)
     ! 
     !
-    call psb_symbmm(am3,am4,am1)
+    call psb_symbmm(am3,am4,am1,info)
+    if(info /= 0) then
+      call psb_errpush(4010,name,a_err='symbmm')
+      goto 9999
+    end if
+
     call psb_numbmm(am3,am4,am1)
 
     if (debug) write(0,*) me,'Done NUMBMM 1'
@@ -667,7 +672,12 @@ contains
     if (test_dump) &
          & call psb_csprt(60+me,am1,head='% (I-wDA)Pt',ivr=desc_a%loc_to_glob)    
 
-    call psb_symbmm(a,am1,am3)
+    call psb_symbmm(a,am1,am3,info)
+    if(info /= 0) then
+      call psb_errpush(4010,name,a_err='symbmm')
+      goto 9999
+    end if
+
     call psb_numbmm(a,am1,am3)
     if (debug) write(0,*) me,'Done NUMBMM 2'
 
@@ -724,7 +734,12 @@ contains
     endif
 
     if (debug) write(0,*) me,'starting symbmm 3'
-    call psb_symbmm(am2,am3,b)
+    call psb_symbmm(am2,am3,b,info)
+    if(info /= 0) then
+      call psb_errpush(4010,name,a_err='symbmm')
+      goto 9999
+    end if
+
     if (debug) write(0,*) me,'starting numbmm 3'
     call psb_numbmm(am2,am3,b)
     if (debug) write(0,*) me,'Done NUMBMM 3'

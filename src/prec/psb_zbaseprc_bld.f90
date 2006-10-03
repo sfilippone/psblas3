@@ -49,7 +49,7 @@ subroutine psb_zbaseprc_bld(a,desc_a,p,info,upd)
   Implicit None
 
   type(psb_zspmat_type), target           :: a
-  type(psb_desc_type), intent(in)         :: desc_a
+  type(psb_desc_type), intent(in), target :: desc_a
   type(psb_zbaseprc_type),intent(inout)   :: p
   integer, intent(out)                    :: info
   character, intent(in), optional         :: upd
@@ -88,7 +88,7 @@ subroutine psb_zbaseprc_bld(a,desc_a,p,info,upd)
       use psb_const_mod
       implicit none 
 
-      type(psb_zspmat_type), intent(in)      :: a
+      type(psb_zspmat_type), intent(inout)   :: a
       type(psb_desc_type), intent(in)        :: desc_a
       type(psb_zbaseprc_type), intent(inout) :: p
       integer, intent(out)                   :: info
@@ -169,7 +169,13 @@ subroutine psb_zbaseprc_bld(a,desc_a,p,info,upd)
   select case(p%iprcparm(p_type_)) 
   case (noprec_)
     ! Do nothing. 
-
+    call psb_cdcpy(desc_a,p%desc_data,info)
+    if(info /= 0) then
+      info=4010
+      ch_err='psb_cdcpy'
+      call psb_errpush(info,name,a_err=ch_err)
+      goto 9999
+    end if
 
   case (diagsc_)
 
@@ -256,7 +262,8 @@ subroutine psb_zbaseprc_bld(a,desc_a,p,info,upd)
 
   end select
 
-
+  p%base_a    => a
+  p%base_desc => desc_a
 
   call psb_erractionrestore(err_act)
   return

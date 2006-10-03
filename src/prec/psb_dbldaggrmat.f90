@@ -75,13 +75,14 @@ subroutine psb_dbldaggrmat(a,desc_a,ac,p,desc_p,info)
     if (aggr_dump) call psb_csprt(90+me,ac,head='% Raw aggregate.')
 
   case(smth_omg_,smth_biz_) 
-
+    if (aggr_dump) call psb_csprt(70+me,a,head='% Input matrix')
     call smooth_aggregate(info)
 
     if(info /= 0) then
       call psb_errpush(4010,name,a_err='smooth_aggregate')
       goto 9999
     end if
+    if (aggr_dump) call psb_csprt(90+me,ac,head='% Smooth aggregate.')
   case default
     call psb_errpush(4010,name,a_err=name)
     goto 9999
@@ -117,6 +118,7 @@ contains
     integer :: ictxt, nrow, nglob, ncol, ntaggr, nzbg, ip, ndx,&
          & naggr, np, me, nzt,irs,jl,nzl,nlr,&
          & icomm,naggrm1, i, j, k, err_act
+
     name='raw_aggregate'
     if(psb_get_errstatus().ne.0) return 
     info=0
@@ -228,11 +230,6 @@ contains
       enddo
     end if
 
-    call psb_fixcoo(b,info)
-    if(info /= 0) then
-      call psb_errpush(4010,name,a_err='fixcoo')
-      goto 9999
-    end if
 
     irs = b%infoa(psb_nnz_)
     call psb_sp_reall(b,irs,info)
@@ -523,8 +520,6 @@ contains
     endif
 
 
-    if (test_dump)  call &
-         & psb_csprt(20+me,am4,head='% Operator Ptilde.',ivr=desc_a%loc_to_glob)
 
 
     call psb_ipcoo2csr(am4,info)
@@ -542,7 +537,7 @@ contains
     !
     ! WARNING: the cycles below assume that AM3 does have 
     ! its diagonal elements stored explicitly!!! 
-    ! Should we swicth to something safer? 
+    ! Should we switch to something safer? 
     !
     call psb_spscal(am3,p%dorig,info)
     if(info /= 0) goto 9999
@@ -604,12 +599,15 @@ contains
           am3%aspk(j) = done - omega*am3%aspk(j) 
         endif
       end do
+      call psb_ipcoo2csr(am3,info)      
     else
       write(0,*) 'Missing implementation of I sum' 
       call psb_errpush(4010,name)
       goto 9999
     end if
 
+    if (test_dump)  call &
+         & psb_csprt(20+me,am4,head='% Operator Ptilde.',ivr=desc_a%loc_to_glob)
     if (test_dump) call psb_csprt(40+me,am3,head='% (I-wDA)',ivr=desc_a%loc_to_glob,&
          & ivc=desc_a%loc_to_glob)    
     if (debug) write(0,*) me,'Done gather, going for SYMBMM 1'
@@ -620,7 +618,15 @@ contains
     ! Doing it this way means to consider diag(Ai)
     ! 
     !
-    call psb_symbmm(am3,am4,am1)
+    call psb_symbmm(am3,am4,am1,info)
+    if(info /= 0) then
+      call psb_errpush(4010,name,a_err='symbmm 1')
+      goto 9999
+    end if
+    am1%aspk(:) = 0.d0 
+    if (test_dump) &
+         & call psb_csprt(50+me,am1,head='% (I-wDA)Pt symbmm ')    
+
     call psb_numbmm(am3,am4,am1)
 
     if (debug) write(0,*) me,'Done NUMBMM 1'
@@ -667,7 +673,12 @@ contains
     if (test_dump) &
          & call psb_csprt(60+me,am1,head='% (I-wDA)Pt',ivr=desc_a%loc_to_glob)    
 
-    call psb_symbmm(a,am1,am3)
+    call psb_symbmm(a,am1,am3,info)
+    if(info /= 0) then
+      call psb_errpush(4010,name,a_err='symbmm 2')
+      goto 9999
+    end if
+
     call psb_numbmm(a,am1,am3)
     if (debug) write(0,*) me,'Done NUMBMM 2'
 
@@ -724,7 +735,12 @@ contains
     endif
 
     if (debug) write(0,*) me,'starting symbmm 3'
-    call psb_symbmm(am2,am3,b)
+    call psb_symbmm(am2,am3,b,info)
+    if(info /= 0) then
+      call psb_errpush(4010,name,a_err='symbmm 3')
+      goto 9999
+    end if
+
     if (debug) write(0,*) me,'starting numbmm 3'
     call psb_numbmm(am2,am3,b)
     if (debug) write(0,*) me,'Done NUMBMM 3'
@@ -1018,6 +1034,7 @@ contains
       deallocate(nzbr,idisp)
 
     end select
+    call psb_ipcoo2csr(bg,info)
 
     call psb_erractionrestore(err_act)
     return

@@ -66,7 +66,7 @@ subroutine psb_cest(afmt, m,n,nnz, lia1, lia2, lar, iup, info)
       lar = nnz
     else
       info = 136
-      call psb_errpush(info,name,a_err=afmt)
+      call psb_errpush(info,name,a_err=toupper(afmt))
       goto 9999
     endif
 
@@ -86,7 +86,7 @@ subroutine psb_cest(afmt, m,n,nnz, lia1, lia2, lar, iup, info)
       lar = nnz
     else
       info = 136
-      call psb_errpush(info,name,a_err=afmt)
+      call psb_errpush(info,name,a_err=toupper(afmt))
       goto 9999
     endif
 

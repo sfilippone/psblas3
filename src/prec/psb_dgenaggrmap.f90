@@ -92,7 +92,7 @@ subroutine psb_dgenaggrmap(aggr_type,a,desc_a,nlaggr,ilaggr,info)
   ! Very simple minded strategy. 
   ! 
   naggr = 0
-  nlp = 0
+  nlp   = 0
   do
     icnt = 0
     do i=1, nr 

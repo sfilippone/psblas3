@@ -34,9 +34,9 @@
 !!$  POSSIBILITY OF SUCH DAMAGE.
 !!$ 
 !!$  
-subroutine psb_dbjac_aply(prec,x,beta,y,desc_data,trans,work,info)
+subroutine psb_dbjac_aply(alpha,prec,x,beta,y,desc_data,trans,work,info)
   !
-  !  Compute   Y <-  beta*Y + K^-1 X 
+  !  Compute   Y <-  beta*Y + alpha*K^-1 X 
   !  where K is a a Block Jacobi  preconditioner stored in prec
   !  Note that desc_data may or may not be the same as prec%desc_data,
   !  but since both are INTENT(IN) this should be legal. 
@@ -54,7 +54,7 @@ subroutine psb_dbjac_aply(prec,x,beta,y,desc_data,trans,work,info)
   type(psb_desc_type), intent(in)       :: desc_data
   type(psb_dbaseprc_type), intent(in)   :: prec
   real(kind(0.d0)),intent(inout)        :: x(:), y(:)
-  real(kind(0.d0)),intent(in)           :: beta
+  real(kind(0.d0)),intent(in)           :: alpha,beta
   character(len=1)                      :: trans
   real(kind(0.d0)),target               :: work(:)
   integer, intent(out)                  :: info
@@ -125,7 +125,7 @@ subroutine psb_dbjac_aply(prec,x,beta,y,desc_data,trans,work,info)
              & trans='N',unit=diagl,choice=psb_none_,work=aux)
         if(info /=0) goto 9999
         ww(1:n_row) = ww(1:n_row)*prec%d(1:n_row)
-        call psb_spsm(done,prec%av(u_pr_),ww,beta,y,desc_data,info,&
+        call psb_spsm(alpha,prec%av(u_pr_),ww,beta,y,desc_data,info,&
              & trans='N',unit=diagu,choice=psb_none_, work=aux)
         if(info /=0) goto 9999
 
@@ -134,7 +134,7 @@ subroutine psb_dbjac_aply(prec,x,beta,y,desc_data,trans,work,info)
              & trans=trans,unit=diagu,choice=psb_none_, work=aux)
         if(info /=0) goto 9999
         ww(1:n_row) = ww(1:n_row)*prec%d(1:n_row)
-        call psb_spsm(done,prec%av(l_pr_),ww,beta,y,desc_data,info,&
+        call psb_spsm(alpha,prec%av(l_pr_),ww,beta,y,desc_data,info,&
              & trans=trans,unit=diagl,choice=psb_none_,work=aux)
         if(info /=0) goto 9999
 
@@ -152,16 +152,8 @@ subroutine psb_dbjac_aply(prec,x,beta,y,desc_data,trans,work,info)
       end select
 
       if(info /=0) goto 9999
+      call psb_geaxpby(alpha,ww,beta,y,desc_data,info)
 
-      if (beta == dzero) then 
-        y(1:n_row) = ww(1:n_row)
-      else if (beta==done) then 
-        y(1:n_row) = ww(1:n_row) + y(1:n_row) 
-      else if (beta==-done) then 
-        y(1:n_row) = ww(1:n_row) - y(1:n_row) 
-      else 
-        y(1:n_row) = ww(1:n_row) + beta*y(1:n_row) 
-      endif
     case (f_umf_) 
 
 
@@ -174,15 +166,7 @@ subroutine psb_dbjac_aply(prec,x,beta,y,desc_data,trans,work,info)
 
       if(info /=0) goto 9999
 
-      if (beta == dzero) then 
-        y(1:n_row) = ww(1:n_row)
-      else if (beta==dzero) then 
-        y(1:n_row) = ww(1:n_row) + y(1:n_row) 
-      else if (beta==-dzero) then 
-        y(1:n_row) = ww(1:n_row) - y(1:n_row) 
-      else 
-        y(1:n_row) = ww(1:n_row) + beta*y(1:n_row) 
-      endif
+      call psb_geaxpby(alpha,ww,beta,y,desc_data,info)
 
     case default
       write(0,*) 'Unknown factorization type in bjac_aply',prec%iprcparm(f_type_)
@@ -252,16 +236,9 @@ subroutine psb_dbjac_aply(prec,x,beta,y,desc_data,trans,work,info)
       end do
 
     end select
-
-    if (beta == dzero) then 
-      y(1:n_row) = tx(1:n_row)
-    else if (beta==done) then 
-      y(1:n_row) = tx(1:n_row) + y(1:n_row) 
-    else if (beta==-done) then 
-      y(1:n_row) = tx(1:n_row) - y(1:n_row) 
-    else 
-      y(1:n_row) = tx(1:n_row) + beta*y(1:n_row) 
-    endif
+    
+    call psb_geaxpby(alpha,tx,beta,y,desc_data,info)
+    
 
     deallocate(tx,ty)
 

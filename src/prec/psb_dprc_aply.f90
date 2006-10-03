@@ -61,13 +61,13 @@ subroutine psb_dprc_aply(prec,x,y,desc_data,info,trans, work)
   character(len=20)   :: name
 
   interface psb_baseprc_aply
-     subroutine psb_dbaseprc_aply(prec,x,beta,y,desc_data,trans,work,info)
+     subroutine psb_dbaseprc_aply(alpha,prec,x,beta,y,desc_data,trans,work,info)
        use psb_descriptor_type
        use psb_prec_type
        type(psb_desc_type),intent(in)      :: desc_data
        type(psb_dbaseprc_type), intent(in) :: prec
        real(kind(0.d0)),intent(inout)      :: x(:), y(:)
-       real(kind(0.d0)),intent(in)         :: beta
+       real(kind(0.d0)),intent(in)         :: alpha,beta
        character(len=1)                    :: trans
        real(kind(0.d0)),target             :: work(:)
        integer, intent(out)                :: info
@@ -75,12 +75,12 @@ subroutine psb_dprc_aply(prec,x,y,desc_data,info,trans, work)
   end interface
 
   interface psb_mlprc_aply
-     subroutine psb_dmlprc_aply(baseprecv,x,beta,y,desc_data,trans,work,info)
+     subroutine psb_dmlprc_aply(alpha,baseprecv,x,beta,y,desc_data,trans,work,info)
        use psb_descriptor_type
        use psb_prec_type
        type(psb_desc_type),intent(in)      :: desc_data
        type(psb_dbaseprc_type), intent(in) :: baseprecv(:)
-       real(kind(0.d0)),intent(in)         :: beta
+       real(kind(0.d0)),intent(in)         :: alpha,beta
        real(kind(0.d0)),intent(inout)      :: x(:), y(:)
        character                           :: trans
        real(kind(0.d0)),target             :: work(:)
@@ -117,14 +117,14 @@ subroutine psb_dprc_aply(prec,x,y,desc_data,info,trans, work)
   end if
   if (size(prec%baseprecv) >1) then 
     if (debug) write(0,*) 'Into mlprc_aply',size(x),size(y)
-    call psb_mlprc_aply(prec%baseprecv,x,dzero,y,desc_data,trans_,work_,info)
+    call psb_mlprc_aply(done,prec%baseprecv,x,dzero,y,desc_data,trans_,work_,info)
     if(info /= 0) then
       call psb_errpush(4010,name,a_err='psb_dmlprc_aply')
       goto 9999
     end if
 
   else  if (size(prec%baseprecv) == 1) then 
-    call psb_baseprc_aply(prec%baseprecv(1),x,dzero,y,desc_data,trans_, work_,info)
+    call psb_baseprc_aply(done,prec%baseprecv(1),x,dzero,y,desc_data,trans_, work_,info)
   else 
     write(0,*) 'Inconsistent preconditioner: size of baseprecv???' 
   endif

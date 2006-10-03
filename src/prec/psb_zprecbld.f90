@@ -49,7 +49,7 @@ subroutine psb_zprecbld(a,desc_a,p,info,upd)
   Implicit None
 
   type(psb_zspmat_type), target              :: a
-  type(psb_desc_type), intent(in)            :: desc_a
+  type(psb_desc_type), intent(in), target    :: desc_a
   type(psb_zprec_type),intent(inout)         :: p
   integer, intent(out)                       :: info
   character, intent(in), optional            :: upd
@@ -60,7 +60,7 @@ subroutine psb_zprecbld(a,desc_a,p,info,upd)
       use psb_descriptor_type
       use psb_prec_type
       type(psb_zspmat_type), target              :: a
-      type(psb_desc_type), intent(in)            :: desc_a
+      type(psb_desc_type), intent(in), target    :: desc_a
       type(psb_zbaseprc_type),intent(inout)      :: p
       integer, intent(out)                       :: info
       character, intent(in), optional            :: upd
@@ -149,29 +149,8 @@ subroutine psb_zprecbld(a,desc_a,p,info,upd)
   endif
 
   if (size(p%baseprecv) > 1) then
-    call init_baseprc_av(p%baseprecv(2),info)
-    if (info /= 0) then 
-      info=4010
-      ch_err='allocate'
-      call psb_errpush(info,name,a_err=ch_err)
-      goto 9999
-    endif
 
-
-    call psb_mlprc_bld(a,desc_a,p%baseprecv(2),info)
-
-    if(info /= 0) then
-      info=4010
-      ch_err='psb_mlprc_bld'
-      call psb_errpush(info,name,a_err=ch_err)
-      goto 9999
-    end if
-    !
-    ! Note: this here has not been tried out. We probably need 
-    ! a different baseprc field %desc_ac, in case we try RAS on lev. 2 of 
-    ! a 3-level  prec. 
-    !
-    do i=3, size(p%baseprecv)
+    do i=2, size(p%baseprecv)
       call init_baseprc_av(p%baseprecv(i),info)
       if (info /= 0) then 
         info=4010
@@ -180,10 +159,19 @@ subroutine psb_zprecbld(a,desc_a,p,info,upd)
         goto 9999
       endif
 
-      call psb_mlprc_bld(p%baseprecv(i-1)%av(ac_),p%baseprecv(i-1)%desc_data,&
+      call psb_mlprc_bld(p%baseprecv(i-1)%base_a,p%baseprecv(i-1)%base_desc,&
            & p%baseprecv(i),info)
+      if (info /= 0) then 
+        info=4010
+        call psb_errpush(info,name)
+        goto 9999
+      endif
+      if (debug) then 
+        write(0,*) 'Return from ',i-1,' call to mlprcbld ',info
+      endif
+
     end do
-    
+
   endif
 
   call psb_erractionrestore(err_act)

@@ -135,8 +135,6 @@ subroutine psb_dmlprc_bld(a,desc_a,p,info)
 
 
 
-  p%aorig => a
-
   nullify(p%d) 
 
 
@@ -167,7 +165,7 @@ subroutine psb_dmlprc_bld(a,desc_a,p,info)
 
 
   call psb_baseprc_bld(ac,desc_p,p,info)
-  if (debug) write(0,*) 'Out from basaeprcbld',info
+  if (debug) write(0,*) 'Out from baseprcbld',info
   if(info /= 0) then
     info=4010
     ch_err='psb_baseprc_bld'
@@ -180,13 +178,13 @@ subroutine psb_dmlprc_bld(a,desc_a,p,info)
   ! We have used a separate ac because:
   ! 1. We want to reuse the same routines psb_ilu_bld etc.
   ! 2. We do NOT want to pass an argument twice to them 
-  !    p%av(ac_) and p 
-  ! Hence a separate AC and a TRANSFER function. 
+  !    p%av(ac_) and p, as this would violate the Fortran standard
+  ! Hence a separate AC and a TRANSFER function at the end. 
   !
   call psb_sp_transfer(ac,p%av(ac_),info)
-
-  call psb_cdfree(desc_p,info)
-  deallocate(desc_p)
+  p%base_a  => p%av(ac_)
+  p%desc_ac => desc_p
+  nullify(desc_p)
 
   call psb_erractionrestore(err_act)
   return

@@ -359,13 +359,15 @@ module psb_serial_mod
 
 
   interface psb_symbmm
-     subroutine psb_dsymbmm(a,b,c)
+     subroutine psb_dsymbmm(a,b,c,info)
        use psb_spmat_type
        type(psb_dspmat_type) :: a,b,c
+       integer               :: info
      end subroutine psb_dsymbmm
-     subroutine psb_zsymbmm(a,b,c)
+     subroutine psb_zsymbmm(a,b,c,info)
        use psb_spmat_type
        type(psb_zspmat_type) :: a,b,c
+       integer               :: info
      end subroutine psb_zsymbmm
   end interface
 

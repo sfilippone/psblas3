@@ -49,7 +49,7 @@ C     .. External routines ..
       PNG = IA(1)
       PIA = IA(2)
       PJA = IA(3)
-
+      djdnrmi = 0.d0
       IF (DESCRA(1:1).EQ.'G') THEN
          DJDNRMI = DJADNR(TRANS,M,N,IA(PNG),
      +      A,JA,IA(PJA),IA(PIA),

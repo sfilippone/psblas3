@@ -48,19 +48,19 @@ subroutine psb_dprecbld(a,desc_a,p,info,upd)
   use psb_penv_mod
   Implicit None
 
-  type(psb_dspmat_type), target              :: a
-  type(psb_desc_type), intent(in)            :: desc_a
-  type(psb_dprec_type),intent(inout)         :: p
-  integer, intent(out)                       :: info
-  character, intent(in), optional            :: upd
+  type(psb_dspmat_type), target           :: a
+  type(psb_desc_type), intent(in), target :: desc_a
+  type(psb_dprec_type),intent(inout)      :: p
+  integer, intent(out)                    :: info
+  character, intent(in), optional         :: upd
 
   interface psb_baseprc_bld
     subroutine psb_dbaseprc_bld(a,desc_a,p,info,upd)
       Use psb_spmat_type
       use psb_descriptor_type
       use psb_prec_type
-      type(psb_dspmat_type)                      :: a
-      type(psb_desc_type), intent(in)            :: desc_a
+      type(psb_dspmat_type), target              :: a
+      type(psb_desc_type), intent(in), target    :: desc_a
       type(psb_dbaseprc_type),intent(inout)      :: p
       integer, intent(out)                       :: info
       character, intent(in), optional            :: upd
@@ -87,7 +87,7 @@ subroutine psb_dprecbld(a,desc_a,p,info,upd)
   integer      :: int_err(5)
   character    :: iupd
 
-  logical, parameter :: debug=.false. 
+  logical, parameter :: debug=.false.
   integer,parameter  :: iroot=0,iout=60,ilout=40
   character(len=20)   :: name, ch_err
 
@@ -149,29 +149,8 @@ subroutine psb_dprecbld(a,desc_a,p,info,upd)
   endif
 
   if (size(p%baseprecv) > 1) then
-    call init_baseprc_av(p%baseprecv(2),info)
-    if (info /= 0) then 
-      info=4010
-      ch_err='allocate'
-      call psb_errpush(info,name,a_err=ch_err)
-      goto 9999
-    endif
 
-
-    call psb_mlprc_bld(a,desc_a,p%baseprecv(2),info)
-
-    if(info /= 0) then
-      info=4010
-      ch_err='psb_mlprc_bld'
-      call psb_errpush(info,name,a_err=ch_err)
-      goto 9999
-    end if
-    !
-    ! Note: this here has not been tried out. We probably need 
-    ! a different baseprc field %desc_ac, in case we try RAS on lev. 2 of 
-    ! a 3-level  prec. 
-    !
-    do i=3, size(p%baseprecv)
+    do i=2, size(p%baseprecv)
       call init_baseprc_av(p%baseprecv(i),info)
       if (info /= 0) then 
         info=4010
@@ -180,8 +159,17 @@ subroutine psb_dprecbld(a,desc_a,p,info,upd)
         goto 9999
       endif
 
-      call psb_mlprc_bld(p%baseprecv(i-1)%av(ac_),p%baseprecv(i-1)%desc_data,&
+      call psb_mlprc_bld(p%baseprecv(i-1)%base_a,p%baseprecv(i-1)%base_desc,&
            & p%baseprecv(i),info)
+      if (info /= 0) then 
+        info=4010
+        call psb_errpush(info,name)
+        goto 9999
+      endif
+      if (debug) then 
+        write(0,*) 'Return from ',i-1,' call to mlprcbld ',info
+      endif
+
     end do
 
   endif
@@ -206,7 +194,7 @@ contains
       ! Have not decided what to do yet
     end if
     allocate(p%av(max_avsz),stat=info)
-    if (info /= 0) return
+!!$    if (info /= 0) return
     do k=1,size(p%av)
       call psb_nullify_sp(p%av(k))
     end do

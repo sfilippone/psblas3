@@ -38,8 +38,9 @@
 !       rewritten in Fortran 95 making use of our sparse matrix facilities.
 !
 
-subroutine psb_dsymbmm(a,b,c)
+subroutine psb_dsymbmm(a,b,c,info)
   use psb_spmat_type
+  use psb_string_mod
   implicit none 
 
   type(psb_dspmat_type) :: a,b,c
@@ -52,9 +53,8 @@ subroutine psb_dsymbmm(a,b,c)
       integer  n,m,l,  ia(*), ja(*), diaga, ib(*), jb(*), diagb,&
            & diagc,  index(*)
       integer, pointer :: ic(:),jc(:)
-    end subroutine symbmm
+    end subroutine symbmm 
   end interface
-
   interface psb_sp_getrow
     subroutine psb_dspgetrow(irw,a,nz,ia,ja,val,info,iren,lrw)
       use psb_spmat_type
@@ -69,6 +69,28 @@ subroutine psb_dsymbmm(a,b,c)
     end subroutine psb_dspgetrow
   end interface
 
+  character(len=20)         :: name, ch_err
+  integer                   :: err_act
+  name='psb_symbmm'
+  call psb_erractionsave(err_act)
+
+  select case(toupper(a%fida(1:3)))
+  case  ('CSR')
+  case default
+    info=135
+    ch_err=a%fida(1:3)
+    call psb_errpush(info,name,a_err=ch_err)
+    goto 9999
+  end select
+  select case(toupper(b%fida(1:3)))
+  case  ('CSR')
+  case default
+    info=136
+    ch_err=b%fida(1:3)
+    call psb_errpush(info,name,a_err=ch_err)
+    goto 9999
+  end select
+
   if (b%m /= a%k) then 
     write(0,*) 'Mismatch in SYMBMM: ',a%m,a%k,b%m,b%k
   endif
@@ -78,7 +100,6 @@ subroutine psb_dsymbmm(a,b,c)
   endif
   nze = max(a%m+1,2*a%m)
   call psb_sp_reall(c,nze,info)
-!!$  write(0,*) 'SYMBMM90 ',size(c%pl),size(c%pr)
   !
   ! Note: we need to test whether there is a performance impact 
   !       in not using the original Douglas & Bank code. 
@@ -97,6 +118,15 @@ subroutine psb_dsymbmm(a,b,c)
   c%fida='CSR'
   c%descra='GUN'
   deallocate(itemp) 
+  call psb_erractionrestore(err_act)
+  return
+
+9999 continue
+  call psb_erractionrestore(err_act)
+  if (err_act.eq.act_abort) then
+     call psb_error()
+     return
+  end if
   return
 
 contains

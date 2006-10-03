@@ -51,7 +51,7 @@ C     Local scalars
       
       NNZ = NZ
       
-      LIMIT = INT(DIM_BLOCK*PSB_PERCENT_)
+c$$$      LIMIT = INT(DIM_BLOCK*PSB_PERCENT_)
       
       DO BLOCK = 1, NG
          DIM_BLOCK = IA(1,BLOCK+1)-IA(1,BLOCK)

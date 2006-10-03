@@ -135,8 +135,6 @@ subroutine psb_zmlprc_bld(a,desc_a,p,info)
 
 
 
-  p%aorig => a
-
   nullify(p%d) 
 
 
@@ -180,8 +178,8 @@ subroutine psb_zmlprc_bld(a,desc_a,p,info)
   ! We have used a separate ac because:
   ! 1. We want to reuse the same routines psb_ilu_bld etc.
   ! 2. We do NOT want to pass an argument twice to them 
-  !    p%av(ac_) and p 
-  ! Hence a separate AC and a TRANSFER function. 
+  !    p%av(ac_) and p, as this would violate the Fortran standard
+  ! Hence a separate AC and a TRANSFER function at the end. 
   !
   call psb_sp_transfer(ac,p%av(ac_),info)
 

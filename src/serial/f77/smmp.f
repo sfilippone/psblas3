@@ -24,10 +24,21 @@ c
      *  index(*)
       integer, pointer :: ic(:),jc(:)
       integer       :: nze, info
+      integer, save :: iunit=11
 c
 c       symbolic matrix multiply c=a*b
 c
-c$$$      write(0,*) 'SYMBMM: ',n,m,l,ib(m+1)-1,jb(ib(m+1)-1)
+c$$$      open(iunit)
+c$$$      write(iunit,*) 'SYMBMM: ',n,m,l
+c$$$      write(iunit,*) 'SYMBMM: A:'
+c$$$      do i=1,n
+c$$$        write(iunit,*) 'Row:',i,' : ',ja(ia(i):ia(i+1)-1)
+c$$$      enddo
+c$$$      write(iunit,*) 'SYMBMM: B:'
+c$$$      do i=1,m
+c$$$        write(iunit,*) 'Row:',i,' : ',jb(ib(i):ib(i+1)-1)
+c$$$      enddo
+      
       if (size(ic) < n+1) then 
         call psb_realloc(n+1,ic,info)
       endif
@@ -71,7 +82,7 @@ c    b = d + ...
           endif
           do 20 k=ib(j),ib(j+1)-1 
             if ((jb(k)<1).or.(jb(k)>maxlmn)) then 
-                write(0,*) 'Problem in SYMBMM 1:',j,k,jb(k),maxlmn
+              write(0,*) 'Problem in SYMBMM 1:',j,k,jb(k),maxlmn
             else
               if(index(jb(k)).eq.0) then
                 index(jb(k))=istart
@@ -95,6 +106,7 @@ c
           endif 
           call psb_realloc(nze,jc,info)
         end if 
+
         do 40 j= ic(i),ic(i+1)-1
           if (diagc.eq.1 .and. istart.eq.i) then
             istart = index(istart)
@@ -105,8 +117,11 @@ c
           index(jc(j))=0
  40     continue
         call isr(length,jc(ic(i)))
+c$$$        write(iunit,*) length,' : ',jc(ic(i):ic(i)+length-1)
         index(i) = 0
  50   continue
+c$$$      close(iunit)
+c$$$      iunit = iunit + 1
 c$$$      write(0,*) 'SYMBMM: on exit',ic(n+1)-1,jc(ic(n+1)-1)
       return
       end

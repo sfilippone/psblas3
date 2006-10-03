@@ -98,6 +98,11 @@ subroutine psb_ddiagsc_bld(a,desc_a,p,upd,info)
     call psb_errpush(info,name,a_err=ch_err)
     goto 9999
   end if
+  call psb_cdcpy(desc_a,p%desc_Data,info)
+  if (info /= 0) then
+    call psb_errpush(4010,name,a_err='psb_cdcpy')
+    goto 9999
+  end if
 
   if (debug) write(ilout+me,*) 'VDIAG ',n_row
   do i=1,n_row

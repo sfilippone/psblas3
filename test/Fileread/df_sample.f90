@@ -245,7 +245,6 @@ program df_sample
     call psb_precset(pre,'asm',info,iv=(/novr,halo_,none_/))
   case(rash_)             
     call psb_precset(pre,'asm',info,iv=(/novr,nohalo_,none_/))
-
   case default
     call psb_precset(pre,'ilu',info)
   end select

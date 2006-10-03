@@ -70,11 +70,12 @@ subroutine psb_dcsprt(iout,a,iv,eirs,eics,head,ivr,ivc)
   else
     ics = 0
   endif
-
+  open(iout)
   if (present(head)) then 
     write(iout,'(a)') '%%MatrixMarket matrix coordinate real general'
     write(iout,'(a,a)') '% ',head 
-    write(iout,'(a)') '%'
+    write(iout,'(a)') '%'    
+    write(iout,'(a,a)') '% ',toupper(a%fida)
   endif
 
   select case(toupper(a%fida)) 
@@ -181,4 +182,5 @@ subroutine psb_dcsprt(iout,a,iv,eirs,eics,head,ivr,ivc)
   case default
     write(0,*) 'Feeling lazy today, format not implemented: "',a%fida,'"'
   end select
+  close(iout)
 end subroutine psb_dcsprt

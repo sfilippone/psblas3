@@ -49,7 +49,7 @@ subroutine psb_dbaseprc_bld(a,desc_a,p,info,upd)
   Implicit None
 
   type(psb_dspmat_type), target           :: a
-  type(psb_desc_type), intent(in)         :: desc_a
+  type(psb_desc_type), intent(in), target :: desc_a
   type(psb_dbaseprc_type),intent(inout)   :: p
   integer, intent(out)                    :: info
   character, intent(in), optional         :: upd
@@ -118,7 +118,7 @@ subroutine psb_dbaseprc_bld(a,desc_a,p,info,upd)
   integer      :: int_err(5)
   character    :: iupd
 
-  logical, parameter :: debug=.false.   
+  logical, parameter :: debug=.false.  
   integer,parameter  :: iroot=0,iout=60,ilout=40
   character(len=20)   :: name, ch_err
 
@@ -169,7 +169,13 @@ subroutine psb_dbaseprc_bld(a,desc_a,p,info,upd)
   select case(p%iprcparm(p_type_)) 
   case (noprec_)
     ! Do nothing. 
-
+    call psb_cdcpy(desc_a,p%desc_data,info)
+    if(info /= 0) then
+      info=4010
+      ch_err='psb_cdcpy'
+      call psb_errpush(info,name,a_err=ch_err)
+      goto 9999
+    end if
 
   case (diagsc_)
 
@@ -256,7 +262,8 @@ subroutine psb_dbaseprc_bld(a,desc_a,p,info,upd)
 
   end select
 
-
+  p%base_a    => a
+  p%base_desc => desc_a
 
   call psb_erractionrestore(err_act)
   return

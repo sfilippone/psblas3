@@ -34,9 +34,9 @@
 !!$  POSSIBILITY OF SUCH DAMAGE.
 !!$ 
 !!$  
-subroutine psb_dbaseprc_aply(prec,x,beta,y,desc_data,trans,work,info)
+subroutine psb_dbaseprc_aply(alpha,prec,x,beta,y,desc_data,trans,work,info)
   !
-  !  Compute   Y <-  beta*Y + K^-1 X 
+  !  Compute   Y <-  beta*Y + alpha*K^-1 X 
   !  where K is a a basic preconditioner stored in prec
   ! 
 
@@ -52,7 +52,7 @@ subroutine psb_dbaseprc_aply(prec,x,beta,y,desc_data,trans,work,info)
   type(psb_desc_type),intent(in)      :: desc_data
   type(psb_dbaseprc_type), intent(in) :: prec
   real(kind(0.d0)),intent(inout)      :: x(:), y(:)
-  real(kind(0.d0)),intent(in)         :: beta
+  real(kind(0.d0)),intent(in)         :: alpha,beta
   character(len=1)                    :: trans
   real(kind(0.d0)),target             :: work(:)
   integer, intent(out)                :: info
@@ -68,17 +68,17 @@ subroutine psb_dbaseprc_aply(prec,x,beta,y,desc_data,trans,work,info)
   character(len=20)   :: name, ch_err
 
   interface psb_bjac_aply
-    subroutine psb_dbjac_aply(prec,x,beta,y,desc_data,trans,work,info)
-      use psb_descriptor_type
-      use psb_prec_type
-      type(psb_desc_type), intent(in)       :: desc_data
-      type(psb_dbaseprc_type), intent(in)   :: prec
-      real(kind(0.d0)),intent(inout)        :: x(:), y(:)
-      real(kind(0.d0)),intent(in)           :: beta
-      character(len=1)                      :: trans
-      real(kind(0.d0)),target               :: work(:)
-      integer, intent(out)                  :: info
-    end subroutine psb_dbjac_aply
+     subroutine psb_dbjac_aply(alpha,prec,x,beta,y,desc_data,trans,work,info)
+       use psb_descriptor_type
+       use psb_prec_type
+       type(psb_desc_type), intent(in)       :: desc_data
+       type(psb_dbaseprc_type), intent(in)   :: prec
+       real(kind(0.d0)),intent(inout)        :: x(:), y(:)
+       real(kind(0.d0)),intent(in)           :: alpha,beta
+       character(len=1)                      :: trans
+       real(kind(0.d0)),target               :: work(:)
+       integer, intent(out)                  :: info
+     end subroutine psb_dbjac_aply
   end interface
 
   name='psb_dbaseprc_aply'
@@ -105,33 +105,35 @@ subroutine psb_dbaseprc_aply(prec,x,beta,y,desc_data,trans,work,info)
 
   case(noprec_)
 
-    n_row=desc_data%matrix_data(psb_n_row_)
-    if (beta==dzero) then 
-      y(1:n_row) = x(1:n_row)
-    else if (beta==done) then 
-      y(1:n_row) = x(1:n_row) + y(1:n_row)
-    else if (beta==-done) then 
-      y(1:n_row) = x(1:n_row) - y(1:n_row)
-    else 
-      y(1:n_row) = x(1:n_row) + beta*y(1:n_row)
-    end if
+    call psb_geaxpby(alpha,x,beta,y,desc_data,info)
 
   case(diagsc_)
+    
+    if (size(work) >= size(x)) then 
+      ww => work
+    else
+      allocate(ww(size(x)),stat=info)
+      if (info /= 0) then 
+        call psb_errpush(4010,name,a_err='Allocate')
+        goto 9999      
+      end if
+    end if
 
     n_row=desc_data%matrix_data(psb_n_row_)
-    if (beta==dzero) then 
-      y(1:n_row) = x(1:n_row)*prec%d(1:n_row)
-    else if (beta==done) then 
-      y(1:n_row) = x(1:n_row)*prec%d(1:n_row) + y(1:n_row)
-    else if (beta==-done) then 
-      y(1:n_row) = x(1:n_row)*prec%d(1:n_row) - y(1:n_row)
-    else 
-      y(1:n_row) = x(1:n_row)*prec%d(1:n_row) + beta*y(1:n_row)
+    ww(1:n_row) = x(1:n_row)*prec%d(1:n_row)
+    call psb_geaxpby(alpha,ww,beta,y,desc_data,info)
+
+    if (size(work) < size(x)) then 
+      deallocate(ww,stat=info)
+      if (info /= 0) then 
+        call psb_errpush(4010,name,a_err='Deallocate')
+        goto 9999      
+      end if
     end if
 
   case(bja_)
 
-    call psb_bjac_aply(prec,x,beta,y,desc_data,trans,work,info)
+    call psb_bjac_aply(alpha,prec,x,beta,y,desc_data,trans,work,info)
     if(info.ne.0) then
       info=4010
       ch_err='psb_bjac_aply'
@@ -142,7 +144,7 @@ subroutine psb_dbaseprc_aply(prec,x,beta,y,desc_data,trans,work,info)
 
     if (prec%iprcparm(n_ovr_)==0) then 
       ! shortcut: this fixes performance for RAS(0) == BJA
-      call psb_bjac_aply(prec,x,beta,y,desc_data,trans,work,info)
+      call psb_bjac_aply(alpha,prec,x,beta,y,desc_data,trans,work,info)
       if(info.ne.0) then
         info=4010
         ch_err='psb_bjacaply'
@@ -214,7 +216,7 @@ subroutine psb_dbaseprc_aply(prec,x,beta,y,desc_data,trans,work,info)
         end if
       endif
 
-      call psb_bjac_aply(prec,tx,dzero,ty,prec%desc_data,trans,aux,info)
+      call psb_bjac_aply(done,prec,tx,dzero,ty,prec%desc_data,trans,aux,info)
       if(info.ne.0) then
         info=4010
         ch_err='psb_bjac_aply'
@@ -250,18 +252,7 @@ subroutine psb_dbaseprc_aply(prec,x,beta,y,desc_data,trans,work,info)
              & prec%iprcparm(prol_)
       end select
 
-      if (beta == dzero)  then 
-        y(1:desc_data%matrix_data(psb_n_row_)) = ty(1:desc_data%matrix_data(psb_n_row_)) 
-      else if (beta == done) then 
-        y(1:desc_data%matrix_data(psb_n_row_)) = y(1:desc_data%matrix_data(psb_n_row_)) + &
-             & ty(1:desc_data%matrix_data(psb_n_row_)) 
-      else if (beta == -done) then 
-        y(1:desc_data%matrix_data(psb_n_row_)) = -y(1:desc_data%matrix_data(psb_n_row_)) + &
-             & ty(1:desc_data%matrix_data(psb_n_row_)) 
-      else 
-        y(1:desc_data%matrix_data(psb_n_row_)) = beta*y(1:desc_data%matrix_data(psb_n_row_)) + &
-             & ty(1:desc_data%matrix_data(psb_n_row_)) 
-      end if
+      call psb_geaxpby(alpha,ty,beta,y,desc_data,info) 
 
 
       if ((6*isz) <= size(work)) then 

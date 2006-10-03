@@ -39,7 +39,7 @@ module psb_prec_mod
       use psb_prec_type
       implicit none
       type(psb_dspmat_type), intent(in), target  :: a
-      type(psb_desc_type), intent(in)            :: desc_a
+      type(psb_desc_type), intent(in), target    :: desc_a
       type(psb_dprec_type), intent(inout)        :: prec
       integer, intent(out)                       :: info
       character, intent(in),optional             :: upd
@@ -49,7 +49,7 @@ module psb_prec_mod
       use psb_prec_type
       implicit none
       type(psb_zspmat_type), intent(in), target  :: a
-      type(psb_desc_type), intent(in)            :: desc_a
+      type(psb_desc_type), intent(in), target    :: desc_a
       type(psb_zprec_type), intent(inout)        :: prec
       integer, intent(out)                       :: info
       character, intent(in),optional             :: upd
@@ -57,7 +57,7 @@ module psb_prec_mod
   end interface
 
   interface psb_precset
-    subroutine psb_dprecset(prec,ptype,info,iv,rs,rv)
+    subroutine psb_dprecset(prec,ptype,info,iv,rs,rv,ilev,nlev)
       use psb_serial_mod
       use psb_descriptor_type
       use psb_prec_type
@@ -66,6 +66,7 @@ module psb_prec_mod
       character(len=*), intent(in)           :: ptype
       integer, intent(out)                   :: info
       integer, optional, intent(in)          :: iv(:)
+      integer, optional, intent(in)          :: nlev,ilev
       real(kind(1.d0)), optional, intent(in) :: rs
       real(kind(1.d0)), optional, intent(in) :: rv(:)
     end subroutine psb_dprecset

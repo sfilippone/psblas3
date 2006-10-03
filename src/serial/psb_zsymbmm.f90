@@ -38,8 +38,9 @@
 !       rewritten in Fortran 95 making use of our sparse matrix facilities.
 !
 
-subroutine psb_zsymbmm(a,b,c)
+subroutine psb_zsymbmm(a,b,c,info)
   use psb_spmat_type
+  use psb_string_mod
   implicit none 
 
   type(psb_zspmat_type) :: a,b,c
@@ -68,6 +69,27 @@ subroutine psb_zsymbmm(a,b,c)
       integer, intent(out)  :: info
     end subroutine psb_zspgetrow
   end interface
+  character(len=20)         :: name, ch_err
+  integer                   :: err_act
+  name='psb_symbmm'
+  call psb_erractionsave(err_act)
+
+  select case(toupper(a%fida(1:3)))
+  case  ('CSR')
+  case default
+    info=135
+    ch_err=a%fida(1:3)
+    call psb_errpush(info,name,a_err=ch_err)
+    goto 9999
+  end select
+  select case(toupper(b%fida(1:3)))
+  case  ('CSR')
+  case default
+    info=136
+    ch_err=b%fida(1:3)
+    call psb_errpush(info,name,a_err=ch_err)
+    goto 9999
+  end select
 
   if (b%m /= a%k) then 
     write(0,*) 'Mismatch in SYMBMM: ',a%m,a%k,b%m,b%k
@@ -97,6 +119,15 @@ subroutine psb_zsymbmm(a,b,c)
   c%fida='CSR'
   c%descra='GUN'
   deallocate(itemp) 
+  call psb_erractionrestore(err_act)
+  return
+
+9999 continue
+  call psb_erractionrestore(err_act)
+  if (err_act.eq.act_abort) then
+     call psb_error()
+     return
+  end if
   return
 
 contains

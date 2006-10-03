@@ -86,16 +86,60 @@ module psb_prec_type
 
     type(psb_dspmat_type), pointer :: av(:) => null() !
     real(kind(1.d0)), pointer      :: d(:)  => null()
-    type(psb_desc_type), pointer   :: desc_data => null() !
+    type(psb_desc_type), pointer   :: desc_data => null(), desc_ac=>null()! !
     integer, pointer               :: iprcparm(:) => null() !
     real(kind(1.d0)), pointer      :: dprcparm(:) => null() !
     integer, pointer               :: perm(:)  => null(), invperm(:) => null()
     integer, pointer               :: mlia(:)  => null(), nlaggr(:)  => null() !
-    type(psb_dspmat_type), pointer :: aorig    => null() !
+    type(psb_dspmat_type), pointer :: base_a    => null() !
+    type(psb_desc_type), pointer   :: base_desc => null() !
     real(kind(1.d0)), pointer      :: dorig(:) => null() !
 
   end type psb_dbaseprc_type
 
+
+  !
+  !  Multilevel preconditioning
+  !
+  !  To each level I there corresponds a matrix A(I) and a preconditioner K(I)
+  !
+  !  A notational difference: in the DD reference above the preconditioner for 
+  !  a given level K(I) is written out as a sum over the subdomains
+  !
+  !  SUM_k(R_k^T A_k R_k) 
+  !
+  !  whereas in this code the sum is implicit in the parallelization, 
+  !  i.e. each process takes care of one subdomain, and for each level we have 
+  !  as many subdomains as there are processes (except for the coarsest level where 
+  !  we might have a replicated index space). Thus the sum apparently disappears 
+  !  from our code, but only apparently, because it is implicit in the call 
+  !  to psb_baseprc_aply. 
+  !
+  !  A bit of description of the baseprecv(:) data structure:
+  !   1. Number of levels = NLEV = size(baseprecv(:))
+  !   2. baseprecv(ilev)%av(:)    sparse matrices needed for the current level. 
+  !      Includes:
+  !   2.1.:  baseprecv(ilev)%av(l_pr_)    L factor of ILU preconditioners
+  !   2.2.:  baseprecv(ilev)%av(u_pr_)    U factor of ILU preconditioners
+  !   2.3.:  baseprecv(ilev)%av(ap_nd_)   Off-diagonal part of A for Jacobi sweeps
+  !   2.4.:  baseprecv(ilev)%av(ac_)      Aggregated matrix of level ILEV 
+  !   2.5.:  baseprecv(ilev)%av(sm_pr_t_) Smoother prolongator transpose; maps vectors  
+  !                                          (ilev-1) --->  (ilev) 
+  !   2.6.:  baseprecv(ilev)%av(sm_pr_)   Smoother prolongator; maps vectors  
+  !                                          (ilev)   --->  (ilev-1) 
+  !   Shouldn't we keep just one of them and handle transpose in the sparse BLAS? maybe 
+  !
+  !   3.    baseprecv(ilev)%desc_data     comm descriptor for level ILEV
+  !   4.    baseprecv(ilev)%base_a        Pointer (really a pointer!) to the base matrix 
+  !                                       of the current level, i.e.: if ILEV=1 then  A
+  !                                       else the aggregated matrix av(ac_); so we have 
+  !                                       a unified treatment of residuals. Need this to 
+  !                                       avoid passing explicitly matrix A to the 
+  !                                       outer prec. routine
+  !   5.    baseprecv(ilev)%mlia          The aggregation map from (ilev-1)-->(ilev)
+  !                                       if no smoother, it is used instead of sm_pr_
+  !   6.    baseprecv(ilev)%nlaggr        Number of aggregates on the various procs. 
+  !   
   type psb_dprec_type
     type(psb_dbaseprc_type), pointer :: baseprecv(:) => null()
     ! contain type of preconditioning to be performed
@@ -105,14 +149,15 @@ module psb_prec_type
   type psb_zbaseprc_type
 
     type(psb_zspmat_type), pointer :: av(:) => null() !
-    complex(kind(1.d0)), pointer      :: d(:)  => null()
-    type(psb_desc_type), pointer   :: desc_data => null() !
+    complex(kind(1.d0)), pointer   :: d(:)  => null()
+    type(psb_desc_type), pointer   :: desc_data => null() , desc_ac=>null()!
     integer, pointer               :: iprcparm(:) => null() !
     real(kind(1.d0)), pointer      :: dprcparm(:) => null() !
     integer, pointer               :: perm(:)  => null(), invperm(:) => null()
     integer, pointer               :: mlia(:)  => null(), nlaggr(:)  => null() !
-    type(psb_zspmat_type), pointer :: aorig    => null() !
-    complex(kind(1.d0)), pointer      :: dorig(:) => null() !
+    type(psb_zspmat_type), pointer :: base_a    => null() !
+    type(psb_desc_type), pointer   :: base_desc => null() !
+    complex(kind(1.d0)), pointer   :: dorig(:) => null() !
 
   end type psb_zbaseprc_type
 
@@ -181,6 +226,7 @@ contains
   subroutine psb_file_prec_descr(iout,p)
     integer, intent(in)              :: iout
     type(psb_dprec_type), intent(in) :: p
+    integer  :: ilev
 
     write(iout,*) 'Preconditioner description'
     if (associated(p%baseprecv)) then 
@@ -206,40 +252,44 @@ contains
         end select
       end if
       if (size(p%baseprecv)>=2) then 
-        if (.not.associated(p%baseprecv(2)%iprcparm)) then 
-          write(iout,*) 'Inconsistent MLPREC part!'
-          return
-        endif
-        write(iout,*) 'Multilevel: ',ml_names(p%baseprecv(2)%iprcparm(ml_type_))
-        if (p%baseprecv(2)%iprcparm(ml_type_)>no_ml_) then 
-          write(iout,*) 'Multilevel aggregation: ', &
-               &   aggr_names(p%baseprecv(2)%iprcparm(aggr_alg_))
-          write(iout,*) 'Smoother:               ', &
-               &  smooth_kinds(p%baseprecv(2)%iprcparm(smth_kind_))
-          if (p%baseprecv(2)%iprcparm(smth_kind_) /= no_smth_) then 
-            write(iout,*) 'Smoothing omega: ', p%baseprecv(2)%dprcparm(smooth_omega_)
-            write(iout,*) 'Smoothing position: ',&
-                 & smooth_names(p%baseprecv(2)%iprcparm(smth_pos_))
+        do ilev = 2, size(p%baseprecv) 
+          if (.not.associated(p%baseprecv(ilev)%iprcparm)) then 
+            write(iout,*) 'Inconsistent MLPREC part!'
+            return
+          endif
+          
+          write(iout,*) 'Multilevel: Level No', ilev
+          write(iout,*) 'Multilevel type: ',&
+               &   ml_names(p%baseprecv(ilev)%iprcparm(ml_type_))
+          if (p%baseprecv(ilev)%iprcparm(ml_type_)>no_ml_) then 
+            write(iout,*) 'Multilevel aggregation: ', &
+                 &   aggr_names(p%baseprecv(ilev)%iprcparm(aggr_alg_))
+            write(iout,*) 'Smoother:               ', &
+                 &  smooth_kinds(p%baseprecv(ilev)%iprcparm(smth_kind_))
+            if (p%baseprecv(ilev)%iprcparm(smth_kind_) /= no_smth_) then 
+              write(iout,*) 'Smoothing omega: ', p%baseprecv(ilev)%dprcparm(smooth_omega_)
+              write(iout,*) 'Smoothing position: ',&
+                   & smooth_names(p%baseprecv(ilev)%iprcparm(smth_pos_))
+            end if
+            write(iout,*) 'Coarse matrix: ',&
+                 & matrix_names(p%baseprecv(ilev)%iprcparm(coarse_mat_))
+            write(iout,*) 'Aggregation sizes: ', &
+                 &  sum( p%baseprecv(ilev)%nlaggr(:)),' : ',p%baseprecv(ilev)%nlaggr(:)
+            write(iout,*) 'Factorization type: ',&
+                 & fact_names(p%baseprecv(ilev)%iprcparm(f_type_))
+            select case(p%baseprecv(ilev)%iprcparm(f_type_))
+            case(f_ilu_n_)      
+              write(iout,*) 'Fill level :',p%baseprecv(ilev)%iprcparm(ilu_fill_in_)
+            case(f_ilu_e_)         
+              write(iout,*) 'Fill threshold :',p%baseprecv(ilev)%dprcparm(fact_eps_)
+            case(f_slu_,f_umf_)         
+            case default
+              write(iout,*) 'Should never get here!'
+            end select
+            write(iout,*) 'Number of Jacobi sweeps: ', &
+                 &   (p%baseprecv(ilev)%iprcparm(jac_sweeps_))
           end if
-          write(iout,*) 'Coarse matrix: ',&
-               & matrix_names(p%baseprecv(2)%iprcparm(coarse_mat_))
-          write(iout,*) 'Aggregation sizes: ', &
-               &  sum( p%baseprecv(2)%nlaggr(:)),' : ',p%baseprecv(2)%nlaggr(:)
-          write(iout,*) 'Factorization type: ',&
-               & fact_names(p%baseprecv(2)%iprcparm(f_type_))
-          select case(p%baseprecv(2)%iprcparm(f_type_))
-          case(f_ilu_n_)      
-            write(iout,*) 'Fill level :',p%baseprecv(2)%iprcparm(ilu_fill_in_)
-          case(f_ilu_e_)         
-            write(iout,*) 'Fill threshold :',p%baseprecv(2)%dprcparm(fact_eps_)
-          case(f_slu_,f_umf_)         
-          case default
-            write(iout,*) 'Should never get here!'
-          end select
-          write(iout,*) 'Number of Jacobi sweeps: ', &
-               &   (p%baseprecv(2)%iprcparm(jac_sweeps_))
-
-        end if
+        end do
       end if
 
     else
@@ -355,13 +405,14 @@ contains
                &   aggr_names(p%baseprecv(2)%iprcparm(aggr_alg_))
           write(iout,*) 'Smoother:               ', &
                &  smooth_kinds(p%baseprecv(2)%iprcparm(smth_kind_))
-          write(iout,*) 'Smoothing omega: ', p%baseprecv(2)%dprcparm(smooth_omega_)
           if (p%baseprecv(2)%iprcparm(smth_kind_) /= no_smth_) then 
+            write(iout,*) 'Smoothing omega: ', p%baseprecv(2)%dprcparm(smooth_omega_)
             write(iout,*) 'Smoothing position: ',&
                  & smooth_names(p%baseprecv(2)%iprcparm(smth_pos_))
-            write(iout,*) 'Coarse matrix: ',&
-                 & matrix_names(p%baseprecv(2)%iprcparm(coarse_mat_))
           end if
+          
+          write(iout,*) 'Coarse matrix: ',&
+               & matrix_names(p%baseprecv(2)%iprcparm(coarse_mat_))
           write(iout,*) 'Aggregation sizes: ', &
                &  sum( p%baseprecv(2)%nlaggr(:)),' : ',p%baseprecv(2)%nlaggr(:)
           write(iout,*) 'Factorization type: ',&
@@ -631,12 +682,23 @@ contains
       end if
       deallocate(p%desc_data)
     endif
+    if (associated(p%desc_ac)) then 
+      if (associated(p%desc_ac%matrix_data))  then 
+        call psb_cdfree(p%desc_ac,info)
+      end if
+      deallocate(p%desc_ac)
+    endif
+
     if (associated(p%dprcparm)) then 
       deallocate(p%dprcparm,stat=info)
     end if
-    if (associated(p%aorig)) then 
+    if (associated(p%base_a)) then 
       ! This is a pointer to something else, must not free it here. 
-      nullify(p%aorig) 
+      nullify(p%base_a) 
+    endif
+    if (associated(p%base_desc)) then 
+      ! This is a pointer to something else, must not free it here. 
+      nullify(p%base_desc) 
     endif
     if (associated(p%dorig)) then 
       deallocate(p%dorig,stat=info)
@@ -676,7 +738,7 @@ contains
     type(psb_dbaseprc_type), intent(inout) :: p
 
     nullify(p%av,p%d,p%iprcparm,p%dprcparm,p%perm,p%invperm,p%mlia,&
-         & p%nlaggr,p%aorig,p%dorig,p%desc_data)
+         & p%nlaggr,p%base_a,p%base_desc,p%dorig,p%desc_data, p%desc_ac)
 
   end subroutine psb_nullify_dbaseprec
 
@@ -712,12 +774,22 @@ contains
       end if
       deallocate(p%desc_data)
     endif
+    if (associated(p%desc_ac)) then 
+      if (associated(p%desc_ac%matrix_data))  then 
+        call psb_cdfree(p%desc_ac,info)
+      end if
+      deallocate(p%desc_ac)
+    endif
     if (associated(p%dprcparm)) then 
       deallocate(p%dprcparm,stat=info)
     end if
-    if (associated(p%aorig)) then 
+    if (associated(p%base_a)) then 
       ! This is a pointer to something else, must not free it here. 
-      nullify(p%aorig) 
+      nullify(p%base_a) 
+    endif
+    if (associated(p%base_desc)) then 
+      ! This is a pointer to something else, must not free it here. 
+      nullify(p%base_desc) 
     endif
     if (associated(p%dorig)) then 
       deallocate(p%dorig,stat=info)
@@ -741,11 +813,11 @@ contains
 
     if (associated(p%iprcparm)) then 
       if (p%iprcparm(f_type_)==f_slu_) then 
-!!$        call psb_zslu_free(p%iprcparm(slu_ptr_),info)
+        call psb_zslu_free(p%iprcparm(slu_ptr_),info)
       end if
       if (p%iprcparm(f_type_)==f_umf_) then 
-!!$        call psb_zumf_free(p%iprcparm(umf_symptr_),&
-!!$             & p%iprcparm(umf_numptr_),info)
+        call psb_zumf_free(p%iprcparm(umf_symptr_),&
+             & p%iprcparm(umf_numptr_),info)
       end if
       deallocate(p%iprcparm,stat=info)
     end if
@@ -757,7 +829,7 @@ contains
     type(psb_zbaseprc_type), intent(inout) :: p
 
     nullify(p%av,p%d,p%iprcparm,p%dprcparm,p%perm,p%invperm,p%mlia,&
-         & p%nlaggr,p%aorig,p%dorig,p%desc_data)
+         & p%nlaggr,p%base_a,p%base_desc,p%dorig,p%desc_data,p%desc_ac)
 
   end subroutine psb_nullify_zbaseprec
 
