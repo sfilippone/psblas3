@@ -1,6 +1,10 @@
 Changelog. A lot less detailed than usual, at least for past
 history. 
 
+2006/10/03: Fixed a bunch of minor bugs, incuding the sorting routines
+	    imsr  and imsrx. Added a default call to blacs_exit inside
+	    psb_exit fixed a bad termination in test/pargen/ppde90.f90
+
 2006/09/02: Declared version 2.0.2, after having fixed a lot of
 	    details in the environment routines.
 
