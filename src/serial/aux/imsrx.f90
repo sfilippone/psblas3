@@ -62,7 +62,7 @@ subroutine imsrx(n,x,indx)
     indx(k) = k
   enddo
 
-  call mrgsrt(n,x(1),iaux(1),iret)
+  call mrgsrt(n,x,iaux,iret)
   
   if (iret /= 1) then 
     lp = iaux(0)

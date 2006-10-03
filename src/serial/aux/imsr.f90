@@ -54,7 +54,7 @@ subroutine imsr(n,x)
   endif
   
 
-  call mrgsrt(n,x(1),iaux(1),iret)
+  call mrgsrt(n,x,iaux,iret)
   
   if (iret == 0) then 
     lp = iaux(0)
