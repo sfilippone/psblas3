@@ -52,7 +52,7 @@ subroutine psb_cdasb(desc_a,info)
 
   !....Locals....
   integer          ::  int_err(5), itemp(2)
-  integer,pointer  ::  ovrlap_index(:),halo_index(:)
+  integer,pointer  ::  ovrlap_index(:),halo_index(:),ovrlap_out(:),halo_out(:)
   integer          ::  i,err,np,me,&
        & lovrlap,lhalo,nhalo,novrlap,max_size,max_halo,n_col,ldesc_halo,&
        & ldesc_ovrlap, dectype, err_act
@@ -102,15 +102,16 @@ subroutine psb_cdasb(desc_a,info)
       call psb_errpush(info,name,i_err=int_err)
       goto 9999
     endif
+    call psb_realloc(desc_a%matrix_data(psb_n_col_),desc_a%loc_to_glob,info)
 
 
     ! comm desc_size is size requested for temporary comm descriptors
     ! (expressed in No of dble element)
     ldesc_halo   = (((3*(n_col-n_row)+1)+1))
     ovrlap_index => desc_a%ovrlap_index
-    nullify(desc_a%ovrlap_index)
+    nullify(desc_a%ovrlap_index,ovrlap_out)
     halo_index => desc_a%halo_index
-    nullify(desc_a%halo_index)
+    nullify(desc_a%halo_index,halo_out)
 
     lhalo = 1
     do while (halo_index(lhalo) /= -1)
@@ -137,7 +138,7 @@ subroutine psb_cdasb(desc_a,info)
     ldesc_halo = 3*max_halo+3*nhalo+1
 
     ! allocate HALO_INDEX field
-    call psb_realloc(ldesc_halo, desc_a%halo_index, info)
+    call psb_realloc(ldesc_halo, halo_out, info)
     ! check on allocate
     if (info /= no_err) then
       info=4010
@@ -150,7 +151,7 @@ subroutine psb_cdasb(desc_a,info)
     ldesc_ovrlap = 2*lovrlap+1
 
     ! allocate OVRLAP_INDEX field
-    call psb_realloc(ldesc_ovrlap, desc_a%ovrlap_index, info)
+    call psb_realloc(ldesc_ovrlap, ovrlap_out, info)
     ! check on allocate
     if (info /= no_err) then
       info=4010
@@ -167,19 +168,21 @@ subroutine psb_cdasb(desc_a,info)
     ! first the halo index
 
     call psi_crea_index(desc_a,halo_index,&
-         & desc_a%halo_index,.false.,info)
+         & halo_out,.false.,info)
     if(info.ne.0) then
       call psb_errpush(4010,name,a_err='psi_crea_index')
       goto 9999
     end if
+    desc_a%halo_index => halo_out
 
     ! then the overlap index
     call psi_crea_index(desc_a,ovrlap_index,&
-         & desc_a%ovrlap_index,.true.,info)
+         & ovrlap_out,.true.,info)
     if(info.ne.0) then
       call psb_errpush(4010,name,a_err='psi_crea_index')
       goto 9999
     end if
+    desc_a%ovrlap_index => ovrlap_out
 
     ! next is the ovrlap_elem index
     call psi_crea_ovr_elem(desc_a%ovrlap_index,desc_a%ovrlap_elem)
