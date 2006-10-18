@@ -57,7 +57,7 @@ subroutine psb_cdall(m, n, parts, ictxt, desc_a, info)
 
   !locals
   Integer             :: counter,i,j,np,me,loc_row,err,loc_col,nprocs,&
-       & l_ov_ix,l_ov_el,idx, err_act, itmpov, k
+       & l_ov_ix,l_ov_el,idx, err_act, itmpov, k, ns
   integer             :: int_err(5),exch(2)
   integer, pointer    :: prc_v(:), temp_ovrlap(:), ov_idx(:),ov_el(:)
   logical, parameter  :: debug=.false.
@@ -178,20 +178,23 @@ subroutine psb_cdall(m, n, parts, ictxt, desc_a, info)
           counter=counter+1
           desc_a%glob_to_loc(i) = counter
           if (nprocs > 1)  then
-            if ((itmpov+2+nprocs) > m)  then
-              info=2025
-              int_err(1)=m
-              err=info
-              call psb_errpush(err,name,int_err)
-              goto 9999
-            else
-              itmpov = itmpov + 1
-              temp_ovrlap(itmpov) = i
-              itmpov = itmpov + 1
-              temp_ovrlap(itmpov) = nprocs
-              temp_ovrlap(itmpov+1:itmpov+nprocs) = prc_v(1:nprocs)
-              itmpov = itmpov + nprocs
+            if ((itmpov+2+nprocs) > size(temp_ovrlap))  then
+              ns = max(itmpov+2+nprocs,int(1.25*size(temp_ovrlap)))
+              call psb_realloc(ns,temp_ovrlap,info,pad=-1)
+              if (info /= 0) then 
+                info=2025
+                int_err(1)=m
+                err=info
+                call psb_errpush(err,name,int_err)
+                goto 9999
+              endif
             endif
+            itmpov = itmpov + 1
+            temp_ovrlap(itmpov) = i
+            itmpov = itmpov + 1
+            temp_ovrlap(itmpov) = nprocs
+            temp_ovrlap(itmpov+1:itmpov+nprocs) = prc_v(1:nprocs)
+            itmpov = itmpov + nprocs
           endif
         end if
       end if
