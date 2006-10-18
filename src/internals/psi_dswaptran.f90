@@ -102,7 +102,8 @@ subroutine psi_dswaptranm(flag,n,beta,y,desc_a,work,info,data)
   totxch = 0
   point_to_proc = 1
   rvhd(:) = mpi_request_null
-
+  sdsz(:) = 0 
+  rvsz(:) = 0 
   ! prepare info for communications
   proc_to_comm = d_idx(point_to_proc+psb_proc_id_)
   do while (proc_to_comm /= -1)
@@ -557,6 +558,8 @@ subroutine psi_dswaptranv(flag,beta,y,desc_a,work,info,data)
   totxch = 0
   point_to_proc = 1
   rvhd(:) = mpi_request_null
+  sdsz(:) = 0 
+  rvsz(:) = 0 
   n=1
 
   ! prepare info for communications
