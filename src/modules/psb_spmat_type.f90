@@ -335,11 +335,11 @@ contains
     endif
 
     if (ifc_ == 1) then 
-      call psb_realloc(nnz,a%ia1,a%ia2,a%aspk,info)
+      call psb_realloc(max(nnz,a%m+1,a%k+1),a%ia1,a%ia2,a%aspk,info)
     else
-      call psb_realloc(nnz,a%aspk,info)
+      call psb_realloc(max(nnz,a%m+1,a%k+1),a%aspk,info)
       if (info /= 0) return 
-      call psb_realloc(nnz,a%ia2,info)
+      call psb_realloc(max(nnz,a%m+1,a%k+1),a%ia2,info)
       if (info /= 0) return 
       call psb_realloc(ifc*nnz+200,a%ia1,info)
       if (info /= 0) return 
@@ -886,11 +886,11 @@ contains
     endif
 
     if (ifc_ == 1) then 
-      call psb_realloc(nnz,a%ia1,a%ia2,a%aspk,info)
+      call psb_realloc(max(nnz,a%m+1,a%k+1),a%ia1,a%ia2,a%aspk,info)
     else
-      call psb_realloc(nnz,a%aspk,info)
+      call psb_realloc(max(nnz,a%m+1,a%k+1),a%aspk,info)
       if (info /= 0) return 
-      call psb_realloc(nnz,a%ia2,info)
+      call psb_realloc(max(nnz,a%m+1,a%k+1),a%ia2,info)
       if (info /= 0) return 
       call psb_realloc(ifc*nnz+200,a%ia1,info)
       if (info /= 0) return 
