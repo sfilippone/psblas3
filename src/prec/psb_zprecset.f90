@@ -176,11 +176,11 @@ subroutine psb_zprecset(p,ptype,info,iv,rs,rv)
       isz = size(iv)
       if (isz >= 1) p%baseprecv(2)%iprcparm(ml_type_)      = iv(1)
       if (isz >= 2) p%baseprecv(2)%iprcparm(aggr_alg_)     = iv(2) 
-      if (isz >= 3) p%baseprecv(2)%iprcparm(smth_kind_)    = iv(3) 
-      if (isz >= 4) p%baseprecv(2)%iprcparm(coarse_mat_)   = iv(4) 
-      if (isz >= 5) p%baseprecv(2)%iprcparm(smth_pos_)     = iv(5)
-      if (isz >= 6) p%baseprecv(2)%iprcparm(f_type_)       = iv(6)
-      if (isz >= 7) p%baseprecv(2)%iprcparm(jac_sweeps_)   = iv(7)
+      if (isz >= 3) p%baseprecv(2)%iprcparm(coarse_mat_)   = iv(3) 
+      if (isz >= 4) p%baseprecv(2)%iprcparm(smth_pos_)     = iv(4)
+      if (isz >= 5) p%baseprecv(2)%iprcparm(f_type_)       = iv(5)
+      if (isz >= 6) p%baseprecv(2)%iprcparm(jac_sweeps_)   = iv(6)
+      if (isz >= 7) p%baseprecv(2)%iprcparm(smth_kind_)    = iv(7) 
 
     end if
 
