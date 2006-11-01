@@ -116,8 +116,8 @@ C
 C
       SUBROUTINE DCSRP1(TRANS,M,N,DESCRA,JA,IA,
      +   P,WORK,IWORK,LWORK,IERROR)
+      use psb_const_mod
       IMPLICIT NONE
-      INCLUDE 'psb_const.fh'
 C     .. Scalar Arguments ..
       INTEGER          LWORK,M, N, IERROR
       CHARACTER        TRANS

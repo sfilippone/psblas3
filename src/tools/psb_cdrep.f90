@@ -107,6 +107,7 @@ subroutine psb_cdrep(m, ictxt, desc_a, info)
   use psb_serial_mod
   use psb_const_mod
   use psb_error_mod
+  use psi_mod
   use psb_penv_mod
   implicit None
   !....Parameters...
@@ -116,7 +117,7 @@ subroutine psb_cdrep(m, ictxt, desc_a, info)
 
   !locals
   Integer             :: i,np,me,err,n,err_act
-  integer             :: int_err(5),exch(2)
+  integer             :: int_err(5),exch(2), thalo(1), tovr(1) 
   logical, parameter  :: debug=.false.
   character(len=20)   :: name
 
@@ -174,9 +175,9 @@ subroutine psb_cdrep(m, ictxt, desc_a, info)
   !count local rows number
   ! allocate work vector
   allocate(desc_a%glob_to_loc(m),desc_a%matrix_data(psb_mdata_size_),&
-       &   desc_a%loc_to_glob(m),desc_a%lprm(1),&
-       &   desc_a%ovrlap_index(1),desc_a%ovrlap_elem(1),&
-       &   desc_a%halo_index(1),desc_a%bnd_elem(1),stat=info)
+       &   desc_a%loc_to_glob(m),desc_a%lprm(1),stat=info)
+!!$       &   desc_a%ovrlap_index(1),desc_a%ovrlap_elem(1),&
+!!$       &   desc_a%halo_index(1),desc_a%bnd_elem(1),stat=info)
   if (info /= 0) then     
     info=2025
     int_err(1)=m
@@ -184,25 +185,32 @@ subroutine psb_cdrep(m, ictxt, desc_a, info)
     goto 9999
   endif
 
+
+  desc_a%matrix_data(psb_m_)        = m
+  desc_a%matrix_data(psb_n_)        = n
+  desc_a%matrix_data(psb_n_row_)    = m
+  desc_a%matrix_data(psb_n_col_)    = n
+  desc_a%matrix_data(psb_dec_type_) = psb_desc_bld_
+  desc_a%matrix_data(psb_ctxt_)     = ictxt
+  call psb_get_mpicomm(ictxt,desc_a%matrix_data(psb_mpi_c_))
   do i=1,m
     desc_a%glob_to_loc(i) = i
     desc_a%loc_to_glob(i) = i
   enddo
 
+
+
+  tovr  = -1 
+  thalo = -1
   desc_a%lprm(:)         = 0
-  desc_a%halo_index(:)   = -1
-  desc_a%bnd_elem(:)     = -1
-  desc_a%ovrlap_index(:) = -1
-  desc_a%ovrlap_elem(:)  = -1
 
-
-  desc_a%matrix_data(psb_m_)        = m
-  desc_a%matrix_data(psb_n_)        = n
-  desc_a%matrix_data(psb_n_row_)  = m
-  desc_a%matrix_data(psb_n_col_)  = n
+  call psi_cnv_dsc(thalo,tovr,desc_a,info)
+  if (info /= 0) then
+    call psb_errpush(4010,name,a_err='psi_bld_cdesc')
+    goto 9999
+  end if
+  
   desc_a%matrix_data(psb_dec_type_) = psb_desc_repl_
-  desc_a%matrix_data(psb_ctxt_)     = ictxt
-  call psb_get_mpicomm(ictxt,desc_a%matrix_data(psb_mpi_c_))
 
   call psb_erractionrestore(err_act)
   return

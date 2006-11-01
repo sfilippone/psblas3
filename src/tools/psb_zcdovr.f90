@@ -91,7 +91,8 @@ Subroutine psb_zcdovr(a,desc_a,novr,desc_ov,info)
 
 
   !     .. Local Scalars ..
-  Integer ::  np, me,m,nnzero, ictxt, lovr, lworks,lworkr, n_col, int_err(5),&
+  Integer ::  i, j, k, np, me,m,nnzero,&
+       &  ictxt, lovr, lworks,lworkr, n_col, int_err(5),&
        &  index_dim,elem_dim, l_tmp_ovr_idx,l_tmp_halo, nztot,nhalo
   Logical, parameter :: debug=.false.
   character(len=20)  :: name, ch_err
@@ -144,7 +145,6 @@ Subroutine psb_zcdovr(a,desc_a,novr,desc_ov,info)
   t1 = mpi_wtime()
 
 
-
   !
   ! Ok, since we are only estimating, do it as follows: 
   ! LOVR= (NNZ/NROW)*N_HALO*N_OVR  This assumes that the local average 
@@ -170,10 +170,9 @@ Subroutine psb_zcdovr(a,desc_a,novr,desc_ov,info)
   index_dim = size(desc_a%halo_index)
   elem_dim  = size(desc_a%halo_index)
 
-  allocate(desc_ov%ovrlap_index(novr*(Max(2*index_dim,1)+1)),&
-       &   desc_ov%ovrlap_elem(novr*(Max(elem_dim,1)+3)),&
-       &   desc_ov%matrix_data(psb_mdata_size_),&
-       &   desc_ov%halo_index(novr*(Size(desc_a%halo_index)+3)),STAT=INFO)
+  nullify(desc_ov%ovrlap_index,desc_ov%halo_index,desc_ov%ovrlap_elem)
+  allocate(desc_ov%ovrlap_elem(novr*(Max(elem_dim,1)+3)),&
+       &   desc_ov%matrix_data(psb_mdata_size_),STAT=INFO)
   if (info /= 0) then
      info=4000
      call psb_errpush(info,name)
@@ -183,10 +182,7 @@ Subroutine psb_zcdovr(a,desc_a,novr,desc_ov,info)
   l_tmp_ovr_idx=novr*(3*Max(2*index_dim,1)+1)
   l_tmp_halo=novr*(3*Size(desc_a%halo_index))
 
-  desc_ov%ovrlap_index(:)   = -1
-  desc_ov%ovrlap_elem(:)    = -1
-  desc_ov%halo_index(:)     = -1
-  desc_ov%matrix_data(1:10) = desc_a%matrix_data(1:10)
+  desc_ov%matrix_data(:)    = desc_a%matrix_data(:)
   desc_ov%matrix_data(psb_dec_type_) = psb_desc_bld_ 
 
   Allocate(desc_ov%loc_to_glob(Size(desc_a%loc_to_glob)),&

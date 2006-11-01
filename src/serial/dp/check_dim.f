@@ -31,8 +31,8 @@ C
       SUBROUTINE CHECK_DIM(M, N, IA, NG, IA2, 
      +   NZ, LARN, LIAN1, LIAN2, IERRV)
 
+      use psb_const_mod
       IMPLICIT NONE
-      INCLUDE  'psb_const.fh'
 
 C
 C     .. Scalar Arguments ..

@@ -45,58 +45,128 @@ subroutine psi_crea_ovr_elem(desc_overlap,ovr_elem)
   integer  :: psi_exist_ovr_elem,dim
   external :: psi_exist_ovr_elem
 
-  logical, parameter :: usetree=.true.
-  
+  integer  :: nel, ip, ix, iel, insize 
+  integer, allocatable :: telem(:,:)
+
+  logical, parameter :: usetree=.false.
+
   if (associated(ovr_elem)) then 
     dim_ovr_elem=size(ovr_elem)
   else
     dim_ovr_elem = 0 
   endif
-  i=1
-  pnt_new_elem=1
-  if (usetree)   call initpairsearchtree(pairtree,info)
-  do while (desc_overlap(i).ne.-1)
-    !        ...loop over all procs of desc_overlap list....
 
-    i=i+1
-    do j=1,desc_overlap(i)
-      !           ....loop over all overlap indices referred to act proc.....
-      if (usetree) then 
+
+  if (usetree)  then 
+
+    !
+    ! While running through the column indices exchanged with other procs
+    ! we have to record them in overlap_elem.  We do this by maintaining  
+    ! an AVL balanced search tree: at each point counter_e is the next
+    ! free index element. The search routine for gidx will return
+    ! glx if gidx was already assigned a local index (glx<counter_e)
+    ! but if gidx was a new index for this process, then it creates
+    ! a new pair (gidx,counter_e), and glx==counter_e. In this case we
+    ! need to record this for the overlap exchange. Otherwise it was 
+    ! already there, so we need to record one more parnter in the exchange
+    !
+
+    i=1
+    pnt_new_elem=1
+    call initpairsearchtree(pairtree,info)
+    do while (desc_overlap(i).ne.-1)
+      !        ...loop over all procs of desc_overlap list....
+
+      i=i+1
+      do j=1,desc_overlap(i)
+        !           ....loop over all overlap indices referred to act proc.....
         call searchinskeyval(pairtree,desc_overlap(i+j),pnt_new_elem,&
              & ret,info)
         if (ret == pnt_new_elem) ret=-1
-      else
-        ret=psi_exist_ovr_elem(ovr_elem,pnt_new_elem-2,&
-             & desc_overlap(i+j))
-      endif
-      if (ret.eq.-1) then
+        if (ret.eq.-1) then
 
-        !            ...this point not exist in ovr_elem list:
-        !               add to it.............................
-        ovr_elem(pnt_new_elem)=desc_overlap(i+j)  
-        ovr_elem(pnt_new_elem+1)=2             
-        pnt_new_elem=pnt_new_elem+2              
-
-        !              ...check if overflow element_d array......
-        if (pnt_new_elem.gt.dim_ovr_elem) then
-          dim_ovr_elem=max(((3*size(ovr_elem))/2+2),pnt_new_elem+100)
-!!$          write(0,*) 'calling realloc crea_ovr_elem',dim
-          call psb_realloc(dim_ovr_elem,ovr_elem,info)
-          if (info /= 0) then 
-            write(0,*) 'Error in CREA_OVR_ELEM'
+          !            ...this point not exist in ovr_elem list:
+          !               add to it.............................
+          !              ...check if overflow element_d array......
+          if ((pnt_new_elem +2) > dim_ovr_elem) then
+            dim_ovr_elem=max(((3*dim_ovr_elem)/2+2),pnt_new_elem+100)
+            call psb_realloc(dim_ovr_elem,ovr_elem,info)
+            if (info /= 0) then 
+              write(0,*) 'Error in CREA_OVR_ELEM'
+            endif
           endif
+          ovr_elem(pnt_new_elem)=desc_overlap(i+j)  
+          ovr_elem(pnt_new_elem+1)=2             
+          pnt_new_elem=pnt_new_elem+2              
+
+        else
+          !              ....this point already exist in ovr_elem list
+          !                  its position is ret............................
+          ovr_elem(ret+1)=ovr_elem(ret+1)+1
         endif
-      else
-        !              ....this point already exist in ovr_elem list
-        !                  its position is ret............................
-        ovr_elem(ret+1)=ovr_elem(ret+1)+1
-      endif
+      enddo
+      i=i+2*desc_overlap(i)+2
     enddo
-    i=i+2*desc_overlap(i)+2
-  enddo
 
-  !     ...add -1 at the end of output list......
-  ovr_elem(pnt_new_elem)=-1
-  if (usetree)   call freepairsearchtree(pairtree)
+    !  Add -1 at the end of output list. 
+    !  And fix the size to the minimum necessary.
+    dim_ovr_elem=pnt_new_elem
+    call psb_realloc(dim_ovr_elem,ovr_elem,info)
+    if (info /= 0) then 
+      write(0,*) 'Error in CREA_OVR_ELEM'
+    endif
+    ovr_elem(pnt_new_elem)=-1
+    call freepairsearchtree(pairtree)
+  else
 
+    insize = size(desc_overlap)
+    insize = max(1,(insize+1)/2)
+    allocate(telem(insize,2),stat=info)
+    if (info /= 0) then 
+      write(0,*) 'Error in CREA_OVR_ELEM'
+    endif
+    i   = 1
+    nel = 0
+    do while (desc_overlap(i).ne.-1)
+      !        ...loop over all procs of desc_overlap list....
+
+      i=i+1
+      do j=1,desc_overlap(i)
+        nel = nel + 1 
+        telem(nel,1) = desc_overlap(i+j)
+      enddo
+      i=i+2*desc_overlap(i)+2
+    enddo
+    if (nel > 0) then 
+      call imsr(nel,telem(:,1))
+      iel        = telem(1,1)
+      telem(1,2) = 2
+      ix = 1
+      ip = 2
+      do 
+        if (ip > nel) exit
+        if (telem(ip,1) == iel) then 
+          telem(ix,2) = telem(ix,2) + 1
+        else
+          ix = ix + 1
+          telem(ix,1) = telem(ip,1)
+          iel         = telem(ip,1)
+          telem(ix,2) = 2
+        end if
+        ip = ip + 1
+      end do
+    else
+      ix = 0
+    end if
+    dim_ovr_elem=2*ix+1
+    call psb_realloc(dim_ovr_elem,ovr_elem,info)
+    iel = 1
+    do i=1, ix
+      ovr_elem(iel)   = telem(i,1)
+      ovr_elem(iel+1) = telem(i,2)
+      iel = iel + 2
+    end do
+    ovr_elem(iel) = -1 
+    deallocate(telem)
+  endif
 end subroutine psi_crea_ovr_elem

@@ -29,9 +29,9 @@ C POSSIBILITY OF SUCH DAMAGE.
 C
 C 
       SUBROUTINE GEN_BLOCK(M,NG,IA,AUX)
+      use psb_const_mod
       IMPLICIT NONE
 
-      INCLUDE 'psb_const.fh'
       INTEGER M, NG
       INTEGER IA(3,*), AUX(*)
 

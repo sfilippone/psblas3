@@ -44,7 +44,287 @@ module psb_realloc_mod
     module procedure psb_dreallocatez2
   end Interface
 
-Contains
+  Interface psb_safe_cpy
+    module procedure psb_icpy1d,psb_icpy2d, &
+         & psb_dcpy1d, psb_dcpy2d, psb_zcpy1d, psb_zcpy2d
+  end Interface
+
+
+contains
+  
+  subroutine psb_icpy1d(vin,vout,info) 
+    use psb_error_mod
+
+    ! ...Subroutine Arguments  
+    Integer,pointer :: vin(:),vout(:)
+    integer         :: info
+    ! ...Local Variables
+
+    Integer :: isz,err_act
+    character(len=20)  :: name, char_err
+    logical, parameter :: debug=.false.
+
+    name='psb_cpy1d'
+    call psb_erractionsave(err_act)
+
+    if(psb_get_errstatus().ne.0) return 
+    info = 0
+    if (associated(vin)) then 
+      isz = size(vin)
+      call psb_realloc(isz,vout,info)
+      if (info /= 0) then     
+        info=4010
+        char_err='psb_realloc'
+        call psb_errpush(info,name,a_err=char_err)
+        goto 9999
+      else
+        vout(:) = vin(:)
+      endif
+    endif
+
+    call psb_erractionrestore(err_act)
+    return
+
+9999 continue
+    call psb_erractionrestore(err_act)
+
+    if (err_act.eq.act_ret) then
+      return
+    else
+      call psb_error()
+    end if
+    return
+
+  end subroutine psb_icpy1d
+
+  subroutine psb_icpy2d(vin,vout,info) 
+    use psb_error_mod
+
+    ! ...Subroutine Arguments  
+    Integer,pointer :: vin(:,:),vout(:,:)
+    integer         :: info
+    ! ...Local Variables
+
+    Integer :: isz1, isz2,err_act 
+    character(len=20)  :: name, char_err
+    logical, parameter :: debug=.false.
+
+    name='psb_cpy1d'
+    call psb_erractionsave(err_act)
+
+    if(psb_get_errstatus().ne.0) return 
+    info = 0
+    if (associated(vin)) then 
+      isz1 = size(vin,1)
+      isz2 = size(vin,2)
+      call psb_realloc(isz1,isz2,vout,info)
+      if (info /= 0) then     
+        info=4010
+        char_err='psb_realloc'
+        call psb_errpush(info,name,a_err=char_err)
+        goto 9999
+      else
+        vout(:,:) = vin(:,:)
+      endif
+    endif
+
+    call psb_erractionrestore(err_act)
+    return
+
+9999 continue
+    call psb_erractionrestore(err_act)
+
+    if (err_act.eq.act_ret) then
+      return
+    else
+      call psb_error()
+    end if
+    return
+
+  end subroutine psb_icpy2d
+  
+  subroutine psb_dcpy1d(vin,vout,info) 
+    use psb_error_mod
+
+    ! ...Subroutine Arguments  
+    real(kind(1.d0)),pointer :: vin(:),vout(:)
+    integer         :: info
+    ! ...Local Variables
+
+    Integer :: isz,err_act 
+    character(len=20)  :: name, char_err
+    logical, parameter :: debug=.false.
+
+    name='psb_cpy1d'
+    call psb_erractionsave(err_act)
+
+    if(psb_get_errstatus().ne.0) return 
+    info = 0
+    if (associated(vin)) then 
+      isz = size(vin)
+      call psb_realloc(isz,vout,info)
+      if (info /= 0) then     
+        info=4010
+        char_err='psb_realloc'
+        call psb_errpush(info,name,a_err=char_err)
+        goto 9999
+      else
+        vout(:) = vin(:)
+      endif
+    endif
+
+    call psb_erractionrestore(err_act)
+    return
+
+9999 continue
+    call psb_erractionrestore(err_act)
+
+    if (err_act.eq.act_ret) then
+      return
+    else
+      call psb_error()
+    end if
+    return
+
+  end subroutine psb_dcpy1d
+  
+  subroutine psb_dcpy2d(vin,vout,info) 
+    use psb_error_mod
+
+    ! ...Subroutine Arguments  
+    real(kind(1.d0)),pointer :: vin(:,:),vout(:,:)
+    integer         :: info
+    ! ...Local Variables
+
+    Integer :: isz1, isz2,err_act 
+    character(len=20)  :: name, char_err
+    logical, parameter :: debug=.false.
+
+    name='psb_cpy1d'
+    call psb_erractionsave(err_act)
+
+    if(psb_get_errstatus().ne.0) return 
+    info = 0
+    if (associated(vin)) then 
+      isz1 = size(vin,1)
+      isz2 = size(vin,2)
+      call psb_realloc(isz1,isz2,vout,info)
+      if (info /= 0) then     
+        info=4010
+        char_err='psb_realloc'
+        call psb_errpush(info,name,a_err=char_err)
+        goto 9999
+      else
+        vout(:,:) = vin(:,:)
+      endif
+    endif
+
+    call psb_erractionrestore(err_act)
+    return
+
+9999 continue
+    call psb_erractionrestore(err_act)
+
+    if (err_act.eq.act_ret) then
+      return
+    else
+      call psb_error()
+    end if
+    return
+
+  end subroutine psb_dcpy2d
+  
+  subroutine psb_zcpy1d(vin,vout,info) 
+    use psb_error_mod
+
+    ! ...Subroutine Arguments  
+    complex(kind(1.d0)),pointer :: vin(:),vout(:)
+    integer         :: info
+    ! ...Local Variables
+
+    Integer :: isz,err_act 
+    character(len=20)  :: name, char_err
+    logical, parameter :: debug=.false.
+
+    name='psb_cpy1d'
+    call psb_erractionsave(err_act)
+
+    if(psb_get_errstatus().ne.0) return 
+    info = 0
+    if (associated(vin)) then 
+      isz = size(vin)
+      call psb_realloc(isz,vout,info)
+      if (info /= 0) then     
+        info=4010
+        char_err='psb_realloc'
+        call psb_errpush(info,name,a_err=char_err)
+        goto 9999
+      else
+        vout(:) = vin(:)
+      endif
+    endif
+
+    call psb_erractionrestore(err_act)
+    return
+
+9999 continue
+    call psb_erractionrestore(err_act)
+
+    if (err_act.eq.act_ret) then
+      return
+    else
+      call psb_error()
+    end if
+    return
+
+  end subroutine psb_zcpy1d
+  
+  subroutine psb_zcpy2d(vin,vout,info) 
+    use psb_error_mod
+
+    ! ...Subroutine Arguments  
+    complex(kind(1.d0)),pointer :: vin(:,:),vout(:,:)
+    integer         :: info
+    ! ...Local Variables
+
+    Integer :: isz1, isz2,err_act 
+    character(len=20)  :: name, char_err
+    logical, parameter :: debug=.false.
+
+    name='psb_cpy1d'
+    call psb_erractionsave(err_act)
+
+    if(psb_get_errstatus().ne.0) return 
+    info = 0
+    if (associated(vin)) then 
+      isz1 = size(vin,1)
+      isz2 = size(vin,2)
+      call psb_realloc(isz1,isz2,vout,info)
+      if (info /= 0) then     
+        info=4010
+        char_err='psb_realloc'
+        call psb_errpush(info,name,a_err=char_err)
+        goto 9999
+      else
+        vout(:,:) = vin(:,:)
+      endif
+    endif
+
+    call psb_erractionrestore(err_act)
+    return
+
+9999 continue
+    call psb_erractionrestore(err_act)
+
+    if (err_act.eq.act_ret) then
+      return
+    else
+      call psb_error()
+    end if
+    return
+
+  end subroutine psb_zcpy2d
+  
 
   Subroutine psb_dreallocate1i(len,rrax,info,pad)
     use psb_error_mod
@@ -120,9 +400,6 @@ Contains
   End Subroutine psb_dreallocate1i
 
 
-
-
-
   Subroutine psb_dreallocate1d(len,rrax,info,pad)
     use psb_error_mod
 
@@ -154,7 +431,6 @@ Contains
           goto 9999
         end if
         m = min(dim,len)
-!!$        write(0,*) 'DA: copying ',min(len,dim)
         if (.true.) then 
           do i=1,m
             tmp(i) = rrax(i)
@@ -162,7 +438,6 @@ Contains
         else
           tmp(1:m) = rrax(1:m)
         end if
-!!$        write(0,*) 'DA: copying done ',m
         Deallocate(rrax,stat=info)
         if (info /= 0) then
           err=4000

@@ -31,8 +31,8 @@ C
       SUBROUTINE ZGIND_TRI(M,N_BLOCKS,A,IA1,IA2,ARN,KA,IA,JA,
      +  LARN,LKA,LJA,IPERM,WORK, LWORK, IERROR)
 
+      use psb_const_mod
       IMPLICIT NONE
-      INCLUDE  'psb_const.fh'
 
 C     ... Scalar arguments ...
 

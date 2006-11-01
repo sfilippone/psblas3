@@ -62,7 +62,7 @@ subroutine psb_cdprt(iout,desc_p,glob,short)
   endif
 
   if (.not.lglob) then
-    write(iout,*) 'Precond. descriptor:',desc_p%matrix_data(1:10)
+    write(iout,*) 'Communication descriptor:',desc_p%matrix_data(1:10)
     m=desc_p%matrix_data(psb_m_)
     n_row=desc_p%matrix_data(psb_n_row_)
     n_col=desc_p%matrix_data(psb_n_col_)
@@ -121,7 +121,7 @@ subroutine psb_cdprt(iout,desc_p,glob,short)
 
   else if (lglob) then 
 
-    write(iout,*) 'Precond. descriptor:',desc_p%matrix_data(1:10)
+    write(iout,*) 'Communication descriptor:',desc_p%matrix_data(1:10)
     m=desc_p%matrix_data(psb_m_)
     n_row=desc_p%matrix_data(psb_n_row_)
     n_col=desc_p%matrix_data(psb_n_col_)

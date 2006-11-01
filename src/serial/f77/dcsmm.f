@@ -190,8 +190,8 @@ C
 C
       SUBROUTINE DCSMM(TRANS,M,N,K,ALPHA,PL,FIDA,DESCRA,A,IA1,IA2,     
      &   INFOA,PR,B,LDB,BETA,C,LDC,WORK,LWORK,IERROR)
+      use psb_const_mod
       IMPLICIT NONE
-      INCLUDE 'psb_const.fh'
 
 C     .. Scalar Arguments ..
       INTEGER           M,N,K,LDB,LDC,LWORK, IERROR

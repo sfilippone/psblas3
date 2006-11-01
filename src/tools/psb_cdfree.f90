@@ -159,6 +159,34 @@ subroutine psb_cdfree(desc_a,info)
     goto 9999
   end if
 
+  if (associated(desc_a%idx_space)) then 
+    deallocate(desc_a%idx_space,stat=info)
+    if (info /= 0) then 
+      info=2056
+      call psb_errpush(info,name)
+      goto 9999
+    end if
+  end if
+
+!!$  if (associated(desc_a%halo_pt)) then 
+!!$    deallocate(desc_a%halo_pt,stat=info)
+!!$    if (info /= 0) then 
+!!$      info=2056
+!!$      call psb_errpush(info,name)
+!!$      goto 9999
+!!$    end if
+!!$  end if
+!!$
+!!$  if (associated(desc_a%ovrlap_pt)) then 
+!!$    deallocate(desc_a%ovrlap_pt,stat=info)
+!!$    if (info /= 0) then 
+!!$      info=2056
+!!$      call psb_errpush(info,name)
+!!$      goto 9999
+!!$    end if
+!!$  end if
+
+
   call psb_nullify_desc(desc_a)
 
   call psb_erractionrestore(err_act)

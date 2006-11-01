@@ -34,8 +34,8 @@ c
      *  p1,descrn,arn,ia1n,ia2n,infon,p2,larn,lia1n,
      *  lia2n,aux,laux,ierror)
 
+      use psb_const_mod
       implicit none
-      include  'psb_const.fh'
 
 c     .. scalar arguments ..
       integer            larn, laux, lia1n, lia2n, 

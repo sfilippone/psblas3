@@ -31,8 +31,8 @@ C
       SUBROUTINE ZGINDEX(M,N_BLOCKS,A,IA1,IA2,ARN,KA,IA,JA, INFON,
      +  LARN,LKA,LJA,IPERM,WORK, LWORK, SIZE_REQ, IERROR)
 
+      use psb_const_mod
       IMPLICIT NONE
-      INCLUDE  'psb_const.fh'
 
 C     ... Scalar arguments ...
       INTEGER          M, LWORK,N_BLOCKS,LARN,LKA,LJA,

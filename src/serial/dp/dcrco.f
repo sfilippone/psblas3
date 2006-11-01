@@ -32,8 +32,8 @@ C
      *   IP1,DESCRN,ARN,IAN1,IAN2,INFON,IP2,LARN,LIAN1,
      *   LIAN2,AUX,LAUX,IERROR)
 
+      use psb_const_mod
       IMPLICIT NONE
-      INCLUDE  'psb_const.fh'
 
 C
 C     .. Scalar Arguments ..

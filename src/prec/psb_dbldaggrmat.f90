@@ -243,6 +243,10 @@ contains
     if (p%iprcparm(coarse_mat_) == mat_repl_) then 
 
       call psb_cdrep(ntaggr,ictxt,desc_p,info)
+      if(info /= 0) then
+        call psb_errpush(4010,name,a_err='psb_cdrep')
+        goto 9999
+      end if
 
       nzbr(:) = 0
       nzbr(me+1) = irs
@@ -287,6 +291,12 @@ contains
     else if (p%iprcparm(coarse_mat_) == mat_distr_) then 
 
       call psb_cddec(naggr,ictxt,desc_p,info)
+      if(info /= 0) then
+        call psb_errpush(4010,name,a_err='psb_cddec')
+        goto 9999
+      end if
+
+
       call psb_sp_clone(b,bg,info)
       if(info /= 0) then
         call psb_errpush(4010,name,a_err='spclone')
@@ -916,6 +926,10 @@ contains
         nzbr(me+1) = b%infoa(psb_nnz_)
 
         call psb_cdrep(ntaggr,ictxt,desc_p,info)
+        if(info /= 0) then
+          call psb_errpush(4010,name,a_err='psb_cdrep')
+          goto 9999
+        end if
 
         call psb_sum(ictxt,nzbr(1:np))
         nzbg = sum(nzbr)
@@ -970,6 +984,10 @@ contains
           goto 9999
         end if
         call psb_cddec(naggr,ictxt,desc_p,info)
+        if(info /= 0) then
+          call psb_errpush(4010,name,a_err='psb_cddec')
+          goto 9999
+        end if
 
         call psb_sp_free(b,info)
         if(info /=  0) then
@@ -985,6 +1003,10 @@ contains
         nzbr(me+1) = b%infoa(psb_nnz_)
 
         call psb_cdrep(ntaggr,ictxt,desc_p,info)
+        if(info /= 0) then
+          call psb_errpush(4010,name,a_err='psb_cdrep')
+          goto 9999
+        end if
 
 
         call psb_sum(ictxt,nzbr(1:np))

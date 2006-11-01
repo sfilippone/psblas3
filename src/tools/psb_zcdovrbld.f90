@@ -37,15 +37,17 @@
 !     Note that n_ovr > 0 thanks to the caller routine.                  
 ! 
 ! Parameters: 
-!    n_ovr         - integer.                The number of overlap levels                 
-!    desc_p        - type(<psb_desc_type>).  The communication descriptor for the preconditioner.
+!    n_ovr         - integer.                The number of overlap levels             
+!    desc_p        - type(<psb_desc_type>).  The communication descriptor 
+!                                            for the preconditioner.
 !    desc_a        - type(<psb_desc_type>).  The communication descriptor.
-!    a             - type(<psb_dspmat_type). The matrix upon which the preconditioner will be built.
+!    a             - type(<psb_dspmat_type). The matrix upon which the preconditioner
+!                                            will be built.
 !    l_tmp_halo    - integer.                Input estimate for allocation sizes.
 !    l_tmp_ovr_idx - integer.                Input estimate for allocation sizes.
 !    lworkr        - integer.                Input estimate for allocation sizes.
 !    lworks        - integer.                Input estimate for allocation sizes.
-!    info          - integer.                Eventually returns an error code
+!    info          - integer.                Possibly returns an error code
 Subroutine psb_zcdovrbld(n_ovr,desc_p,desc_a,a,&
      &       l_tmp_halo,l_tmp_ovr_idx,lworks,lworkr,info)
   use psb_descriptor_type
@@ -76,12 +78,11 @@ Subroutine psb_zcdovrbld(n_ovr,desc_p,desc_a,a,&
   Integer :: counter,counter_h, counter_o, counter_e,j,idx,gidx,proc,n_elem_recv,&
        & n_elem_send,tot_recv,tot_elem,n_col,m,ictxt,np,me,dl_lda,lwork,&
        & counter_t,n_elem,i_ovr,jj,i,proc_id,isz, mglob, glx,n_row, &
-       & idxr, idxs, lx, iszr, err_act, icomm
+       & idxr, idxs, lx, iszr, err_act, icomm,nxch,nsnd,nrcv
 
   Integer,Pointer  :: halo(:),length_dl(:),works(:),workr(:),t_halo_in(:),&
        & t_halo_out(:),work(:),dep_list(:),temp(:)
   Integer,Pointer :: brvindx(:),rvsz(:), bsdindx(:),sdsz(:)
-  integer :: pairtree(2)
 
   Logical,Parameter :: debug=.false.
   real(kind(1.d0)) :: t1,t2,t3,t4,t5,t6,t7, tl, tch
@@ -117,8 +118,8 @@ Subroutine psb_zcdovrbld(n_ovr,desc_p,desc_a,a,&
 
   dl_lda=np*5
   lwork=5*(5*np+2)*np+10
-  Allocate(works(lworks),workr(lworkr),t_halo_in(3*Size(desc_p%halo_index)),&
-       & t_halo_out(Size(desc_p%halo_index)), work(lwork),&
+  Allocate(works(lworks),workr(lworkr),t_halo_in(l_tmp_halo),&
+       & t_halo_out(l_tmp_halo), work(lwork),&
        & length_dl(np+1),dep_list(dl_lda*np),temp(lworkr),stat=info)
   if (info /= 0) then 
     call psb_errpush(4010,name,a_err='Allocate')
@@ -152,14 +153,6 @@ Subroutine psb_zcdovrbld(n_ovr,desc_p,desc_a,a,&
   counter_o             = 1
 
   ! See comment in main loop below.
-  call InitPairSearchTree(pairtree,info)
-  if (info /= 0) then
-    info=4010
-    ch_err='InitPairSearhTree'
-    call psb_errpush(info,name,a_err=ch_err)
-    goto 9999
-  end if
-  if (debug) write(0,*) me,'Done InitPairSearchTree',info
 
   !
   ! A picture is in order to understand what goes on here.
@@ -184,7 +177,6 @@ Subroutine psb_zcdovrbld(n_ovr,desc_p,desc_a,a,&
   Do i_ovr=1,n_ovr
 
     if (debug) write(0,*) me,'Running on overlap level ',i_ovr,' of ',n_ovr
-!!$    t_halo_in(:) = -1
 
     !
     ! At this point, halo contains a valid halo corresponding to the
@@ -216,16 +208,6 @@ Subroutine psb_zcdovrbld(n_ovr,desc_p,desc_a,a,&
       tot_recv=tot_recv+n_elem_recv
       if (debug) write(0,*) me,' CDOVRBLD tot_recv:',proc,n_elem_recv,tot_recv
       !
-      ! While running through the column indices exchanged with other procs
-      ! we have to keep track of which elements actually are overlap and halo 
-      ! ones to record them in overlap_elem.  We do this by maintaining  
-      ! an AVL balanced search tree: at each point counter_e is the next
-      ! free index element. The search routine for gidx will return
-      ! glx if gidx was already assigned a local index (glx<counter_e)
-      ! but if gidx was a new index for this process, then it creates
-      ! a new pair (gidx,counter_e), and glx==counter_e. In this case we
-      ! need to record this for the overlap exchange. In the first iteration
-      ! this gets filled with the first halo indices.
       !
       ! The format of the halo vector exists in two forms: 1. Temporary 
       ! 2. Assembled. In this loop we are using the (assembled) halo_in and 
@@ -234,13 +216,13 @@ Subroutine psb_zcdovrbld(n_ovr,desc_p,desc_a,a,&
       ! everything for the next iteration.
       ! 
 
-!!$      if (me==0) Write(0,*)'Loop ',size(halo), counter, n_elem_recv,n_elem_send 
       t3 = mpi_wtime()
       !
       ! add recv elements in halo_index into ovrlap_index
       !
       Do j=0,n_elem_recv-1
-        If((counter+psb_elem_recv_+j)>Size(halo)) then 
+
+        If ((counter+psb_elem_recv_+j)>Size(halo)) then 
           info=-2
           call psb_errpush(info,name)
           goto 9999
@@ -292,34 +274,6 @@ Subroutine psb_zcdovrbld(n_ovr,desc_p,desc_a,a,&
 
         counter_h=counter_h+3
 
-        call SearchInsKeyVal(pairtree,gidx,counter_e,glx,info)
-!!$        if (debug) write(0,*) 'From searchInsKey ',gidx,glx,counter_e,info
-        if (info>=0) then
-          If (glx < counter_e)  Then
-            desc_p%ovrlap_elem(glx+psb_n_dom_ovr_)= &
-                 &                 desc_p%ovrlap_elem(glx+psb_n_dom_ovr_)+1
-          Else
-            If((counter_e+2) > Size(desc_p%ovrlap_elem)) Then
-              isz = max((3*Size(desc_p%ovrlap_elem))/2,(counter_e+3))
-              if (debug) write(0,*) me,'Realloc ovr_El',isz
-              call psb_realloc(isz,desc_p%ovrlap_elem,info)
-              if (info /= 0) then
-                info=4010
-                ch_err='psrealloc'
-                call psb_errpush(info,name,a_err=ch_err)
-                goto 9999
-              end if
-            End If
-!!$            if (debug) write(0,*) 'Adding into ovrlap ',gidx,glx,counter_e,info
-
-            desc_p%ovrlap_elem(counter_e)=gidx
-            desc_p%ovrlap_elem(counter_e+psb_n_dom_ovr_)=2
-            desc_p%ovrlap_elem(counter_e+2)=-1
-            counter_e  = counter_e + 2
-          End If
-        else
-          write(0,*) me, 'Cdovrbld From SearchInsKeyVal: ',info
-        endif
       Enddo
       if (debug) write(0,*) me,'Checktmp_o_i Loop Mid1',tmp_ovr_idx(1:10)
       counter   = counter+n_elem_recv
@@ -350,34 +304,6 @@ Subroutine psb_zcdovrbld(n_ovr,desc_p,desc_a,a,&
         tmp_ovr_idx(counter_o+3)=-1
         counter_o=counter_o+3
 
-        call SearchInsKeyVal(pairtree,gidx,counter_e,glx,info)
-!!$          if (debug) write(0,*) 'From searchInsKey ',gidx,glx,counter_e,info
-        if (info>=0) then
-          If (glx < counter_e)  Then
-            desc_p%ovrlap_elem(glx+psb_n_dom_ovr_)= &
-                 &                 desc_p%ovrlap_elem(glx+psb_n_dom_ovr_)+1
-          Else
-            If((counter_e+2) > Size(desc_p%ovrlap_elem)) Then
-              isz = max((3*Size(desc_p%ovrlap_elem))/2,(counter_e+3))
-              if (debug) write(0,*) me,'Realloc ovr_el',isz
-              call psb_realloc(isz,desc_p%ovrlap_elem,info)
-              if (info /= 0) then
-                info=4010
-                ch_err='psb_realloc'
-                call psb_errpush(info,name,a_err=ch_err)
-                goto 9999
-              end if
-            End If
-!!$            if (debug) write(0,*) 'Adding into ovrlap ',gidx,glx,counter_e,info
-            desc_p%ovrlap_elem(counter_e)=gidx
-            desc_p%ovrlap_elem(counter_e+psb_n_dom_ovr_)=2
-            desc_p%ovrlap_elem(counter_e+2)=-1
-            counter_e  = counter_e + 2
-          End If
-        else
-          write(0,*) me,'Cdovrbld From SearchInsKeyVal: ',info
-        endif
-
         !
         ! Prepare to exchange the halo rows with the other proc.
         !
@@ -402,6 +328,7 @@ Subroutine psb_zcdovrbld(n_ovr,desc_p,desc_a,a,&
             end if
             lworks = isz
           End If
+
           If((n_elem) > size(blk%ia2)) Then
             isz = max((3*size(blk%ia2))/2,(n_elem))
             if (debug) write(0,*) me,'Realloc blk',isz
@@ -434,18 +361,7 @@ Subroutine psb_zcdovrbld(n_ovr,desc_p,desc_a,a,&
 
       if (i_ovr < n_ovr) then 
         if (tot_elem > 1) then 
-!!$          write(0,*) me,'Realloc temp',tot_elem+2
-          if (tot_elem+2 > size(temp)) then 
-!!$            write(0,*) me,'Realloc temp',tot_elem+2
-            deallocate(temp)
-            allocate(temp(tot_elem+2),stat=info)   
-            if (info /= 0) then 
-              call psb_errpush(4010,name,a_err='Allocate')
-              goto 9999      
-            end if
-          endif
-          Call mrgsrt(tot_elem,works(idxs+1),temp,info)
-          If (info == 0) Call ireordv1(tot_elem,works(idxs+1),temp)
+          call imsr(tot_elem,works(idxs+1))
           lx = works(idxs+1)
           i = 1 
           j = 1
@@ -546,7 +462,18 @@ Subroutine psb_zcdovrbld(n_ovr,desc_p,desc_a,a,&
           End If
           desc_p%glob_to_loc(idx)=n_col
           desc_p%loc_to_glob(n_col)=idx
-          If((counter_t+3) > Size(t_halo_in))Write(0,*)'bingo'
+          If ((counter_t+3) > Size(t_halo_in)) then 
+            isz = max((3*Size(t_halo_in))/2,(counter_t+3+1000))
+            if (debug) write(0,*) me,'Realloc ovr_el',isz
+            call psb_realloc(isz,t_halo_in,info)
+            if (info /= 0) then
+              info=4010
+              ch_err='psrealloc'
+              call psb_errpush(info,name,a_err=ch_err)
+              goto 9999
+            end if
+          end If
+
           t_halo_in(counter_t)=proc_id
           t_halo_in(counter_t+1)=1
           t_halo_in(counter_t+2)=n_col
@@ -591,7 +518,7 @@ Subroutine psb_zcdovrbld(n_ovr,desc_p,desc_a,a,&
       if (debug) write(0,*) me,'Checktmp_o_i 1',tmp_ovr_idx(1:10)
       if (debug) write(0,*) me,'Calling Crea_Halo'
 
-      call psi_crea_index(desc_p,t_halo_in,t_halo_out,.false.,info)
+      call psi_crea_index(desc_p,t_halo_in,t_halo_out,.false.,nxch,nsnd,nrcv,info)
 
       if (debug) then 
         write(0,*) me,'Done Crea_Index'
@@ -611,7 +538,6 @@ Subroutine psb_zcdovrbld(n_ovr,desc_p,desc_a,a,&
     tch = tch +(t3-t2)
   End Do
   t1 = mpi_wtime()
-  call FreePairSearchTree(pairtree)
 
   desc_p%matrix_data(psb_m_)=desc_a%matrix_data(psb_m_)
   desc_p%matrix_data(psb_n_)=desc_a%matrix_data(psb_n_)
@@ -627,35 +553,12 @@ Subroutine psb_zcdovrbld(n_ovr,desc_p,desc_a,a,&
   !
 
   if (debug) then
-    write(0,*) 'psb_cdasb: converting indexes'
+    write(0,*) 'psb_cdovrbld: converting indexes'
     call psb_barrier(ictxt)
   end if
   !.... convert comunication stuctures....
-  ! first the halo index
-  call psi_crea_index(desc_p,tmp_halo,&
-       & desc_p%halo_index,.false.,info)
-  if(info /= 0) then
-    call psb_errpush(4010,name,a_err='psi_crea_index')
-    goto 9999
-  end if
 
-  ! then the overlap index
-  call psi_crea_index(desc_p,tmp_ovr_idx,&
-       & desc_p%ovrlap_index,.true.,info)
-  if(info /= 0) then
-    call psb_errpush(4010,name,a_err='psi_crea_index')
-    goto 9999
-  end if
-
-  ! next is the ovrlap_elem index
-  call psi_crea_ovr_elem(desc_p%ovrlap_index,desc_p%ovrlap_elem)
-
-  ! finally bnd_elem
-  call psi_crea_bnd_elem(desc_p,info)
-  if(info /= 0) then
-    call psb_errpush(4010,name,a_err='psi_crea_bnd_elem')
-    goto 9999
-  end if
+  call psi_cnv_dsc(tmp_halo,tmp_ovr_idx,desc_p,info) 
 
   ! Ok, register into MATRIX_DATA &  free temporary work areas
   desc_p%matrix_data(psb_dec_type_) = psb_desc_asb_

@@ -29,9 +29,9 @@ C POSSIBILITY OF SUCH DAMAGE.
 C
 C 
       SUBROUTINE PARTITION(M, WORK, IA, N_BLOCK)
+      use psb_const_mod
       IMPLICIT NONE
 
-      INCLUDE 'psb_const.fh'
 
 C     ...Scalar arguments...
 

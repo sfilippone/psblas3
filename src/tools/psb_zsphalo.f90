@@ -54,10 +54,9 @@ Subroutine psb_zsphalo(a,desc_a,blk,info,rwcnv,clcnv,outfmt)
   use psb_tools_mod, only : psb_glob_to_loc, psb_loc_to_glob
   use psb_error_mod
   use psb_penv_mod
-
+  use mpi
   Implicit None
 
-  include 'mpif.h'
   Type(psb_zspmat_type),Intent(in)    :: a
   Type(psb_zspmat_type),Intent(inout) :: blk
   Type(psb_desc_type),Intent(in)      :: desc_a

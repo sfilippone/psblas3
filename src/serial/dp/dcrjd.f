@@ -59,8 +59,8 @@ C     DESCRN  Output matrix in JAD format
 C     ARN,IAN1
 C     IAN2,INFON, IP1, IP2
 C   
+      use psb_const_mod
       IMPLICIT NONE
-      INCLUDE  'psb_const.fh'
 
 C
 C     .. Scalar Arguments ..

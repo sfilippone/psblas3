@@ -54,7 +54,7 @@ subroutine psb_cdcpy(desc_in, desc_out, info)
   integer, intent(out)             :: info
 
   !locals
-  integer             :: np,me,ictxt, isz, err_act
+  integer             :: np,me,ictxt, isz, err_act, isz1, isz2
   logical, parameter  :: debug=.false.,debugprt=.false.
   character(len=20)   :: name, char_err
   if (debug) write(0,*) me,'Entered CDCPY'
@@ -62,162 +62,37 @@ subroutine psb_cdcpy(desc_in, desc_out, info)
   info = 0
   call psb_erractionsave(err_act)
   name = 'psb_cdcpy'
-  
+
   ictxt=desc_in%matrix_data(psb_ctxt_)
   ! check on blacs grid 
   call psb_info(ictxt, me, np)
   if (debug) write(0,*) me,'Entered CDCPY'
   if (np == -1) then
-     info = 2010
-     call psb_errpush(info,name)
-     goto 9999
+    info = 2010
+    call psb_errpush(info,name)
+    goto 9999
   endif
 
   call psb_nullify_desc(desc_out)
 
-  if (associated(desc_in%matrix_data)) then 
-     isz = size(desc_in%matrix_data)
-     !    allocate(desc_out%matrix_data(isz),stat=info)
-     call psb_realloc(isz,desc_out%matrix_data,info)
-     if(debug) write(0,*) 'cdcpy: m_data',isz,':',desc_in%matrix_data(:)
-     if (info /= 0) then     
-        info=4010
-        char_err='psb_realloc'
-        call psb_errpush(info,name,a_err=char_err)
-        goto 9999
-     else
-        desc_out%matrix_data(:) = desc_in%matrix_data(:)
-     endif
-  endif
-  if (debug) write(0,*) me,'Done matrix_data  '
-
-  if (associated(desc_in%halo_index)) then 
-     isz = size(desc_in%halo_index)
-     !    allocate(desc_out%matrix_data(isz),stat=info)
-     call psb_realloc(isz,desc_out%halo_index,info)
-     if(debugprt) write(0,*) 'cdcpy: h_idx',isz,':',desc_in%halo_index(:)
-     if (info /= 0) then     
-        info=4010
-        char_err='psb_realloc'
-        call psb_errpush(info,name,a_err=char_err)
-        goto 9999
-     else
-        desc_out%halo_index(:) = desc_in%halo_index(:)
-     endif
-  endif
-  if (debug) write(0,*) me,'Done halo_index'
+  call psb_safe_cpy(desc_in%matrix_data,desc_out%matrix_data,info)
+  if (info == 0)   call psb_safe_cpy(desc_in%halo_index,desc_out%halo_index,info)
+!!$  if (info == 0)   call psb_safe_cpy(desc_in%halo_pt,desc_out%halo_pt,info)
+  if (info == 0)   call psb_safe_cpy(desc_in%ovrlap_index,desc_out%ovrlap_index,info)
+!!$  if (info == 0)   call psb_safe_cpy(desc_in%ovrlap_pt,desc_out%ovrlap_pt,info)
+  if (info == 0)   call psb_safe_cpy(desc_in%bnd_elem,desc_out%bnd_elem,info)
+  if (info == 0)   call psb_safe_cpy(desc_in%ovrlap_elem,desc_out%ovrlap_elem,info)
+  if (info == 0)   call psb_safe_cpy(desc_in%loc_to_glob,desc_out%loc_to_glob,info)
+  if (info == 0)   call psb_safe_cpy(desc_in%glob_to_loc,desc_out%glob_to_loc,info)
+  if (info == 0)   call psb_safe_cpy(desc_in%lprm,desc_out%lprm,info)
+  if (info == 0)   call psb_safe_cpy(desc_in%idx_space,desc_out%idx_space,info)
   
-  if (associated(desc_in%bnd_elem)) then 
-     isz = size(desc_in%bnd_elem)
-     !    allocate(desc_out%matrix_data(isz),stat=info)
-     call psb_realloc(isz,desc_out%bnd_elem,info)
-     if(debugprt) write(0,*) 'cdcpy: bnd_elem',isz,':',desc_in%bnd_elem(:)
-     if (info /= 0) then     
-        info=4010
-        char_err='psb_realloc'
-        call psb_errpush(info,name,a_err=char_err)
-        goto 9999
-     else
-        desc_out%bnd_elem(:) = desc_in%bnd_elem(:)
-     endif
+  if (info /= 0) then
+    info = 4010
+    call psb_errpush(info,name)
+    goto 9999
   endif
-  if (debug) write(0,*) me,'Done bnd_elem'
   
-  if (associated(desc_in%ovrlap_elem)) then 
-     isz = size(desc_in%ovrlap_elem)
-     !    allocate(desc_out%matrix_data(isz),stat=info)
-     call psb_realloc(isz,desc_out%ovrlap_elem,info)
-     if(debugprt) write(0,*) 'cdcpy: ovrlap_elem',isz,':',desc_in%ovrlap_elem(:)
-     if (info /= 0) then     
-        info=4010
-        char_err='psrealloc'
-        call psb_errpush(info,name,a_err=char_err)
-        goto 9999
-     else
-        desc_out%ovrlap_elem(:) = desc_in%ovrlap_elem(:)
-     endif
-  endif
-  if (debug) write(0,*) me,'Done ovrlap_elem'
-
-  if (associated(desc_in%ovrlap_index)) then 
-     isz = size(desc_in%ovrlap_index)
-     !    allocate(desc_out%matrix_data(isz),stat=info)
-     call psb_realloc(isz,desc_out%ovrlap_index,info)
-     if(debugprt) write(0,*) 'cdcpy: ovrlap_index',isz,':',desc_in%ovrlap_index(:)
-     if (info /= 0) then     
-        info=4010
-        char_err='psrealloc'
-        call psb_errpush(info,name,a_err=char_err)
-        goto 9999
-     else
-        desc_out%ovrlap_index(:) = desc_in%ovrlap_index(:)
-     endif
-  endif
-  if (debug) write(0,*) me,'Done ovrlap_index'
-
-  if (associated(desc_in%loc_to_glob)) then 
-     isz = size(desc_in%loc_to_glob)
-     !    allocate(desc_out%matrix_data(isz),stat=info)
-     call psb_realloc(isz,desc_out%loc_to_glob,info)
-     if(debugprt) write(0,*) 'cdcpy: loc_to_glob',isz,':',desc_in%loc_to_glob(:)
-     if (info /= 0) then     
-        info=4010
-        char_err='psrealloc'
-        call psb_errpush(info,name,a_err=char_err)
-        goto 9999
-     else
-        desc_out%loc_to_glob(:) = desc_in%loc_to_glob(:)
-     endif
-  endif
-  if (debug) write(0,*) me,'Done loc_to_glob'
-
-  if (associated(desc_in%glob_to_loc)) then 
-     isz = size(desc_in%glob_to_loc)
-     !    allocate(desc_out%matrix_data(isz),stat=info)
-     call psb_realloc(isz,desc_out%glob_to_loc,info)
-     if(debugprt) write(0,*) 'cdcpy: glob_to_loc',isz,':',desc_in%glob_to_loc(:)
-     if (info /= 0) then     
-        info=4010
-        char_err='psrealloc'
-        call psb_errpush(info,name,a_err=char_err)
-        goto 9999
-     else
-        desc_out%glob_to_loc(:) = desc_in%glob_to_loc(:)
-     endif
-  endif
-  if (debug) write(0,*) me,'Done glob_to_loc'
-
-  if (associated(desc_in%lprm)) then 
-     isz = size(desc_in%lprm)
-     !    allocate(desc_out%matrix_data(isz),stat=info)
-     call psb_realloc(isz,desc_out%lprm,info)
-     if(debugprt) write(0,*) 'cdcpy: lprm',isz,':',desc_in%lprm(:)
-     if (info /= 0) then     
-        info=4010
-        char_err='psb_realloc'
-        call psb_errpush(info,name,a_err=char_err)
-        goto 9999
-     else
-        desc_out%lprm(:) = desc_in%lprm(:)
-     endif
-  endif
-  if (debug) write(0,*) me,'Done lprm'
-
-  if (associated(desc_in%idx_space)) then 
-     isz = size(desc_in%idx_space)
-     !    allocate(desc_out%matrix_data(isz),stat=info)
-     call psb_realloc(isz,desc_out%idx_space,info)
-     if(debugprt) write(0,*) 'cdcpy: idx_space',isz,':',desc_in%idx_space(:)
-     if (info /= 0) then     
-        info=4010
-        char_err='psb_realloc'
-        call psb_errpush(info,name,a_err=char_err)
-        goto 9999
-     else
-        desc_out%idx_space(:) = desc_in%idx_space(:)
-     endif
-  endif
-
   call psb_erractionrestore(err_act)
   return
   

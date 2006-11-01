@@ -84,7 +84,7 @@ subroutine  psb_dhalom(x,desc_a,info,alpha,jx,ik,work,tran,mode)
     call psb_errpush(info,name)
     goto 9999
   endif
-
+  
   ix = 1
   if (present(jx)) then
     ijx = jx
@@ -184,7 +184,7 @@ subroutine  psb_dhalom(x,desc_a,info,alpha,jx,ik,work,tran,mode)
   end if
 
   if(info.ne.0) then
-    ch_err='PSI_dSwap...'
+    ch_err='PSI_dSwapdata'
     call psb_errpush(4010,name,a_err=ch_err)
     goto 9999
   end if

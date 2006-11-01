@@ -170,10 +170,9 @@ Subroutine psb_dcdovr(a,desc_a,novr,desc_ov,info)
   index_dim = size(desc_a%halo_index)
   elem_dim  = size(desc_a%halo_index)
 
-  allocate(desc_ov%ovrlap_index(novr*(Max(2*index_dim,1)+1)),&
-       &   desc_ov%ovrlap_elem(novr*(Max(elem_dim,1)+3)),&
-       &   desc_ov%matrix_data(psb_mdata_size_),&
-       &   desc_ov%halo_index(novr*(Size(desc_a%halo_index)+3)),STAT=INFO)
+  nullify(desc_ov%ovrlap_index,desc_ov%halo_index,desc_ov%ovrlap_elem)
+  allocate(desc_ov%ovrlap_elem(novr*(Max(elem_dim,1)+3)),&
+       &   desc_ov%matrix_data(psb_mdata_size_),STAT=INFO)
   if (info /= 0) then
     info=4000
     call psb_errpush(info,name)
@@ -183,10 +182,7 @@ Subroutine psb_dcdovr(a,desc_a,novr,desc_ov,info)
   l_tmp_ovr_idx=novr*(3*Max(2*index_dim,1)+1)
   l_tmp_halo=novr*(3*Size(desc_a%halo_index))
 
-  desc_ov%ovrlap_index(:)   = -1
-  desc_ov%ovrlap_elem(:)    = -1
-  desc_ov%halo_index(:)     = -1
-  desc_ov%matrix_data(1:10) = desc_a%matrix_data(1:10)
+  desc_ov%matrix_data(:)    = desc_a%matrix_data(:)
   desc_ov%matrix_data(psb_dec_type_) = psb_desc_bld_ 
 
   Allocate(desc_ov%loc_to_glob(Size(desc_a%loc_to_glob)),&
@@ -203,11 +199,13 @@ Subroutine psb_dcdovr(a,desc_a,novr,desc_ov,info)
     Write(0,*)'Start cdovrbld',me,lworks,lworkr
     call psb_barrier(ictxt)
   endif
+
   !
   ! The real work goes on in here....
   !
   Call psb_cdovrbld(novr,desc_ov,desc_a,a,&
        & l_tmp_halo,l_tmp_ovr_idx,lworks,lworkr,info) 
+
   if (info /= 0) then
     info=4010
     ch_err='psb_cdovrbld'

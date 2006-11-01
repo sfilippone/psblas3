@@ -51,10 +51,10 @@ module psi_mod
   end interface
 
   interface
-     subroutine psi_crea_index(desc_a,index_in,index_out,glob_idx,info)
+     subroutine psi_crea_index(desc_a,index_in,index_out,glob_idx,nxch,nsnd,nrcv,info)
        use psb_descriptor_type
        type(psb_desc_type), intent(in)  :: desc_a
-       integer, intent(out)             :: info
+       integer, intent(out)             :: info,nxch,nsnd,nrcv
        integer, intent(in)              :: index_in(:)
        integer, pointer                 :: index_out(:)
        logical                          :: glob_idx
@@ -70,12 +70,12 @@ module psi_mod
   
   interface
      subroutine psi_desc_index(desc_data,index_in,dep_list,&
-          & length_dl,loc_to_glob,glob_to_loc,desc_index,&
+          & length_dl,nsnd,nrcv,loc_to_glob,glob_to_loc,desc_index,&
           & isglob_in,info)
        integer :: desc_data(:),index_in(:),dep_list(:)
        integer :: loc_to_glob(:),glob_to_loc(:)
        integer,pointer :: desc_index(:)
-       integer :: length_dl, info
+       integer :: length_dl,nsnd,nrcv, info
        logical :: isglob_in
      end subroutine psi_desc_index
   end interface
@@ -237,5 +237,105 @@ module psi_mod
        complex(kind(1.d0)) :: beta, x(:), y(:)
      end subroutine psi_zsctv
   end interface
+
+  interface psi_cnv_dsc
+    module procedure psi_cnv_dsc
+  end interface
+
+
+contains
+  
+  subroutine psi_cnv_dsc(halo_in,ovrlap_in,cdesc, info)
+
+    use psb_const_mod
+    use psb_error_mod
+    use psb_penv_mod
+    use psb_descriptor_type
+    implicit none
+
+    !     ....scalars parameters....
+    integer, intent(in)  :: halo_in(:), ovrlap_in(:)
+    type(psb_desc_type), intent(inout) :: cdesc
+    integer, intent(out)  :: info
+
+    !     ....local scalars....      
+    integer  :: i,np,me,proc, max_index
+    integer  :: ictxt, err_act,nxch,nsnd,nrcv
+    !     ...local array...
+    integer  :: int_err(5)
+    integer, pointer :: idx_out(:)
+
+    !     ...parameters
+    logical, parameter :: debug=.false.
+    character(len=20)  :: name
+
+    name='psi_bld_cdesc'
+    call psb_get_erraction(err_act)
+
+    info = 0
+    ictxt = cdesc%matrix_data(psb_ctxt_)
+
+    call psb_info(ictxt,me,np)
+    if (np == -1) then
+      info = 2010
+      call psb_errpush(info,name)
+      goto 9999
+    endif
+
+
+    ! first the halo index
+    if (debug) write(0,*) me,'Calling crea_index on halo'
+    idx_out => null()
+    call psi_crea_index(cdesc,halo_in, idx_out,.false.,nxch,nsnd,nrcv,info)
+    if(info /= 0) then
+      call psb_errpush(4010,name,a_err='psi_crea_index')
+      goto 9999
+    end if
+    cdesc%halo_index => idx_out
+    cdesc%matrix_data(psb_thal_xch_) = nxch
+    cdesc%matrix_data(psb_thal_snd_) = nsnd
+    cdesc%matrix_data(psb_thal_rcv_) = nrcv 
+    
+    if (debug) write(0,*) me,'Done crea_index on halo'
+    if (debug) write(0,*) me,'Calling crea_index on ovrlap'
+
+    ! then the overlap index
+    idx_out => null() 
+    call psi_crea_index(cdesc,ovrlap_in, idx_out,.true.,nxch,nsnd,nrcv,info)
+    if(info /= 0) then
+      call psb_errpush(4010,name,a_err='psi_crea_index')
+      goto 9999
+    end if
+    cdesc%ovrlap_index => idx_out
+    cdesc%matrix_data(psb_tovr_xch_) = nxch
+    cdesc%matrix_data(psb_tovr_snd_) = nsnd
+    cdesc%matrix_data(psb_tovr_rcv_) = nrcv 
+
+    if (debug) write(0,*) me,'Calling crea_ovr_elem'
+    ! next  ovrlap_elem 
+    call psi_crea_ovr_elem(cdesc%ovrlap_index,cdesc%ovrlap_elem)
+    if (debug) write(0,*) me,'Done crea_ovr_elem'
+
+    ! finally bnd_elem
+    call psi_crea_bnd_elem(cdesc,info)
+    if(info /= 0) then
+      call psb_errpush(4010,name,a_err='psi_crea_bnd_elem')
+      goto 9999
+    end if
+    if (debug) write(0,*) me,'Done crea_bnd_elem'
+
+    call psb_erractionrestore(err_act)
+    return
+
+9999 continue
+    call psb_erractionrestore(err_act)
+    if (err_act == act_abort) then
+      call psb_error(ictxt)
+      return
+    end if
+    return
+
+  end subroutine psi_cnv_dsc
+
 
 end module psi_mod

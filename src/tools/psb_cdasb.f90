@@ -52,8 +52,8 @@ subroutine psb_cdasb(desc_a,info)
 
   !....Locals....
   integer          ::  int_err(5), itemp(2)
-  integer,pointer  ::  ovrlap_index(:),halo_index(:),ovrlap_out(:),halo_out(:)
-  integer          ::  i,err,np,me,&
+  integer,pointer  ::  ovrlap_index(:),halo_index(:)
+  integer          ::  i,err,np,me,& 
        & lovrlap,lhalo,nhalo,novrlap,max_size,max_halo,n_col,ldesc_halo,&
        & ldesc_ovrlap, dectype, err_act
   integer                       :: ictxt,n_row
@@ -105,106 +105,28 @@ subroutine psb_cdasb(desc_a,info)
     call psb_realloc(desc_a%matrix_data(psb_n_col_),desc_a%loc_to_glob,info)
 
 
-    ! comm desc_size is size requested for temporary comm descriptors
-    ! (expressed in No of dble element)
-    ldesc_halo   = (((3*(n_col-n_row)+1)+1))
     ovrlap_index => desc_a%ovrlap_index
-    nullify(desc_a%ovrlap_index,ovrlap_out)
-    halo_index => desc_a%halo_index
-    nullify(desc_a%halo_index,halo_out)
+    nullify(desc_a%ovrlap_index)
+    halo_index   => desc_a%halo_index
+    nullify(desc_a%halo_index)
 
-    lhalo = 1
-    do while (halo_index(lhalo) /= -1)
-      lhalo = lhalo + 1 
-    enddo
-    nhalo = (lhalo-1)/3
-    lovrlap=1
-    do while (ovrlap_index(lovrlap) /= -1) 
-      lovrlap=lovrlap+1
-    enddo
-    novrlap = (lovrlap-1)/3
-
-    ! Allocate final comm PSBLAS descriptors
-    ! compute necessary dimension of halo index
-    max_halo  = max(nhalo,1)
-    max_size  = max(1,min(3*desc_a%matrix_data(psb_n_row_),novrlap*3))
-
-    itemp(1) = max_size
-    itemp(2) = max_halo
-    call psb_amx(ictxt, itemp(1:2))
-    max_size = itemp(1) 
-    max_halo = itemp(2) 
-
-    ldesc_halo = 3*max_halo+3*nhalo+1
-
-    ! allocate HALO_INDEX field
-    call psb_realloc(ldesc_halo, halo_out, info)
-    ! check on allocate
-    if (info /= no_err) then
-      info=4010
-      ch_err='psb_realloc'
-      call psb_errpush(info,name,a_err=ch_err)
-      goto 9999
-    endif
-
-    ! compute necessary dimension of ovrlap index
-    ldesc_ovrlap = 2*lovrlap+1
-
-    ! allocate OVRLAP_INDEX field
-    call psb_realloc(ldesc_ovrlap, ovrlap_out, info)
-    ! check on allocate
-    if (info /= no_err) then
-      info=4010
-      ch_err='psb_realloc'
-      call psb_errpush(info,name,a_err=ch_err)
-      goto 9999
-    endif
-
-
-
-    if (debug) write(0,*) 'psb_cdasb: converting indexes',&
-         & nhalo,lhalo,halo_index(lhalo)
-    !.... convert comunication stuctures....
-    ! first the halo index
-
-    call psi_crea_index(desc_a,halo_index,&
-         & halo_out,.false.,info)
-    if(info.ne.0) then
-      call psb_errpush(4010,name,a_err='psi_crea_index')
+    call psi_cnv_dsc(halo_index,ovrlap_index,desc_a,info) 
+    if (info /= 0) then
+      call psb_errpush(4010,name,a_err='psi_bld_cdesc')
       goto 9999
     end if
-    desc_a%halo_index => halo_out
-
-    ! then the overlap index
-    call psi_crea_index(desc_a,ovrlap_index,&
-         & ovrlap_out,.true.,info)
-    if(info.ne.0) then
-      call psb_errpush(4010,name,a_err='psi_crea_index')
-      goto 9999
-    end if
-    desc_a%ovrlap_index => ovrlap_out
-
-    ! next is the ovrlap_elem index
-    call psi_crea_ovr_elem(desc_a%ovrlap_index,desc_a%ovrlap_elem)
-
-    ! finally bnd_elem
-    call psi_crea_bnd_elem(desc_a,info)
-    if(info.ne.0) then
-      call psb_errpush(4010,name,a_err='psi_crea_bnd_elem')
-      goto 9999
-    end if
+      
 
     ! Ok, register into MATRIX_DATA &  free temporary work areas
     desc_a%matrix_data(psb_dec_type_) = psb_desc_asb_
 
-    deallocate(ovrlap_index, stat=info)
-    deallocate(halo_index, stat=info)
+    deallocate(ovrlap_index, halo_index, stat=info)
     if (info /= 0) then
       info =4000
       call psb_errpush(info,name)
       goto 9999
     end if
-
+    
   else
     info = 600
     call psb_errpush(info,name)

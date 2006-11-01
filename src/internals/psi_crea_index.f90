@@ -28,7 +28,7 @@
 !!$  POSSIBILITY OF SUCH DAMAGE.
 !!$ 
 !!$  
-subroutine psi_crea_index(desc_a,index_in,index_out,glob_idx,info)
+subroutine psi_crea_index(desc_a,index_in,index_out,glob_idx,nxch,nsnd,nrcv,info)
 
   use psb_realloc_mod
   use psb_descriptor_type
@@ -37,7 +37,7 @@ subroutine psi_crea_index(desc_a,index_in,index_out,glob_idx,info)
   implicit none
 
   type(psb_desc_type), intent(in)  :: desc_a
-  integer, intent(out)             :: info
+  integer, intent(out)             :: info,nxch,nsnd,nrcv
   integer, intent(in)              :: index_in(:)
   integer, pointer                 :: index_out(:)
   logical                          :: glob_idx
@@ -50,13 +50,6 @@ subroutine psi_crea_index(desc_a,index_in,index_out,glob_idx,info)
   logical,parameter    :: debug=.false.
   character(len=20)    :: name
 
-  interface
-    subroutine psi_compute_size(desc_data,&
-         & index_in, dl_lda, info)
-      integer  :: info, dl_lda
-      integer  :: desc_data(:), index_in(:)
-    end subroutine psi_compute_size
-  end interface
 
   interface
     subroutine psi_sort_dl(dep_list,l_dep_list,np,info)
@@ -73,12 +66,12 @@ subroutine psi_crea_index(desc_a,index_in,index_out,glob_idx,info)
 
   interface
     subroutine psi_desc_index(desc_data,index_in,dep_list,&
-         & length_dl,loc_to_glob,glob_to_loc,desc_index,&
+         & length_dl,nsnd,nrcv,loc_to_glob,glob_to_loc,desc_index,&
          & isglob_in,info)
       integer :: desc_data(:),index_in(:),dep_list(:)
       integer :: loc_to_glob(:),glob_to_loc(:)
       integer,pointer :: desc_index(:)
-      integer :: length_dl, info
+      integer :: length_dl,nsnd,nrcv, info
       logical :: isglob_in
     end subroutine psi_desc_index
   end interface
@@ -96,7 +89,6 @@ subroutine psi_crea_index(desc_a,index_in,index_out,glob_idx,info)
   endif
 
   ! allocate dependency list
-  !  call psi_compute_size(desc_a%matrix_data, index_in, dl_lda, info)
   ! This should be computed more efficiently to save space when
   ! the number of processors becomes very high
   dl_lda=np+1
@@ -119,10 +111,10 @@ subroutine psi_crea_index(desc_a,index_in,index_out,glob_idx,info)
     goto 9999
   end if
 
-  if (debug) write(*,*) 'crea_index: from extract_dep_list',&
+  if (debug) write(0,*) 'crea_index: from extract_dep_list',&
        &     me,length_dl(0),index_in(1), ':',dep_list(:length_dl(me),me)
   ! ...now process root contains dependence list of all processes...
-  if (debug) write(*,*) 'crea_halo: root sorting dep list'
+  if (debug) write(0,*) 'crea_index: root sorting dep list'
 
   ! ....i must order communication in in halo
   call psi_dl_check(dep_list,max(1,dl_lda),np,length_dl)
@@ -138,9 +130,11 @@ subroutine psi_crea_index(desc_a,index_in,index_out,glob_idx,info)
   if(debug) write(0,*)'in psi_crea_index calling psi_desc_index',&
        & size(index_out)
   call psi_desc_index(desc_a%matrix_data,index_in,dep_list(1:,me),&
-       & length_dl(me),desc_a%loc_to_glob,desc_a%glob_to_loc,&
+       & length_dl(me),nsnd,nrcv,desc_a%loc_to_glob,desc_a%glob_to_loc,&
        & index_out,glob_idx,info)
-
+  if(debug) write(0,*)'out of  psi_desc_index',&
+       & size(index_out)
+  nxch = length_dl(me)
   if(info /= 0) then
     call psb_errpush(4010,name,a_err='psi_desc_index')
     goto 9999

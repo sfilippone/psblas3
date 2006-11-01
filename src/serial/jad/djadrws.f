@@ -31,8 +31,8 @@ C
 C     ... Compute infinity norma for sparse matrix in CSR Format ...
       SUBROUTINE  DJADRWS(TRANS,M,N,NG,A,KA,JA,IA,
      +   INFOA,ROWSUM,IERROR)
+      use psb_const_mod
       IMPLICIT NONE
-      INCLUDE  'psb_const.fh'
 C     .. Scalar Arguments ..
       INTEGER           M,N, IERROR, NG
       CHARACTER         TRANS

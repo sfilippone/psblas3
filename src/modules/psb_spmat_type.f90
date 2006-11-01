@@ -393,27 +393,18 @@ contains
     Integer, intent(out)                :: info
 
     !locals
-    Integer             :: nza,nz1, nz2, nzl, nzr
-    logical, parameter  :: debug=.false.
 
     INFO  = 0
-
-    nza = size(a%aspk)
-    nz1 = size(a%ia1)
-    nz2 = size(a%ia2)
-    nzl = size(a%pl)
-    nzr = size(a%pr)
-    allocate(b%aspk(nza),b%ia1(nz1),b%ia2(nz2),&
-         & b%pl(nzl),b%pr(nzr),stat=info)
+    call psb_nullify_sp(b)
+    call psb_safe_cpy(a%aspk,b%aspk,info)
+    if (info == 0) call psb_safe_cpy(a%ia1,b%ia1,info)
+    if (info == 0) call psb_safe_cpy(a%ia2,b%ia2,info)
+    if (info == 0) call psb_safe_cpy(a%pl,b%pl,info)
+    if (info == 0) call psb_safe_cpy(a%pr,b%pr,info)
     if (info /= 0) then
       info=2023
       return
     Endif
-    b%aspk(:)  = a%aspk(:)
-    b%ia1(:)   = a%ia1(:)
-    b%ia2(:)   = a%ia2(:)
-    b%pl(:)    = a%pl(:)
-    b%pr(:)    = a%pr(:)    
     b%infoa(:) = a%infoa(:)
     b%fida     = a%fida
     b%descra   = a%descra
@@ -913,27 +904,21 @@ contains
     Integer, intent(out)                :: info
 
     !locals
-    Integer             :: nza,nz1, nz2, nzl, nzr
+
     logical, parameter  :: debug=.false.
 
-    INFO  = 0
 
-    nza = size(a%aspk)
-    nz1 = size(a%ia1)
-    nz2 = size(a%ia2)
-    nzl = size(a%pl)
-    nzr = size(a%pr)
-    allocate(b%aspk(nza),b%ia1(nz1),b%ia2(nz2),&
-         & b%pl(nzl),b%pr(nzr),stat=info)
+    INFO  = 0
+    call psb_nullify_sp(b)
+    call psb_safe_cpy(a%aspk,b%aspk,info)
+    if (info == 0) call psb_safe_cpy(a%ia1,b%ia1,info)
+    if (info == 0) call psb_safe_cpy(a%ia2,b%ia2,info)
+    if (info == 0) call psb_safe_cpy(a%pl,b%pl,info)
+    if (info == 0) call psb_safe_cpy(a%pr,b%pr,info)
     if (info /= 0) then
       info=2023
       return
     Endif
-    b%aspk(:)  = a%aspk(:)
-    b%ia1(:)   = a%ia1(:)
-    b%ia2(:)   = a%ia2(:)
-    b%pl(:)    = a%pl(:)
-    b%pr(:)    = a%pr(:)    
     b%infoa(:) = a%infoa(:)
     b%fida     = a%fida
     b%descra   = a%descra

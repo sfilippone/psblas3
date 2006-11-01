@@ -31,8 +31,8 @@ C
       SUBROUTINE DJDCO(TRANS,M,N,DESCRA,AR,IA1,IA2,IPERM,INFO,
      *     IP1,DESCRN,ARN,IA1N,IA2N,INFON,IP2,LARN,LIA1N,
      *     LIA2N,AUX,LAUX,IERROR)      
+      use psb_const_mod
       IMPLICIT NONE
-      INCLUDE  'psb_const.fh'      
 C     
 C     .. Scalar Arguments ..
       INTEGER            LARN, LAUX, LIA1N, LIA2N, M, N, IERROR

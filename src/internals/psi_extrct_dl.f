@@ -119,8 +119,8 @@ c            desc_str list.
 c   length_dl  integer array(0:np)
 c             length_dl(i) is the length of dep_list(*,i) list
       use psb_penv_mod
+      use psb_const_mod
       implicit none
-      include 'psb_const.fh'
       include 'mpif.h'
 c     ....scalar parameters...
       integer np,dl_lda,mode, info

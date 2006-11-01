@@ -29,7 +29,7 @@
 !!$ 
 !!$  
 subroutine psi_desc_index(desc_data,index_in,dep_list,&
-     & length_dl,loc_to_glob,glob_to_loc,desc_index,&
+     & length_dl,nsnd,nrcv,loc_to_glob,glob_to_loc,desc_index,&
      & isglob_in,info)
 
   use psb_realloc_mod
@@ -39,23 +39,22 @@ subroutine psi_desc_index(desc_data,index_in,dep_list,&
   use psb_penv_mod
   implicit none
 
-  !c     ...array parameters.....
+  !    ...array parameters.....
   integer         :: desc_data(:),index_in(:),dep_list(:)
   integer         :: loc_to_glob(:),glob_to_loc(:)
   integer,pointer :: desc_index(:)
-  integer         :: length_dl, info
+  integer         :: length_dl, nsnd,nrcv,info
   logical         :: isglob_in
-  !c     ....local scalars...        
+  !    ....local scalars...        
   integer :: j,me,np,i,proc
-  !c     ...parameters...
+  !    ...parameters...
   integer :: ictxt
   integer :: no_comm,err
   parameter (no_comm=-1)
-  !c     ...local arrays..
-  integer,pointer :: brvindx(:),rvsz(:),&
-       & bsdindx(:),sdsz(:), sndbuf(:), rcvbuf(:)
+  !    ...local arrays..
+  integer,pointer :: brvindx(:),rvsz(:), bsdindx(:),sdsz(:), sndbuf(:), rcvbuf(:)
 
-  integer :: ihinsz,ntot,k,err_act,&
+  integer :: ihinsz,ntot,k,err_act, l_di, &
        & idxr, idxs, iszs, iszr, nesd, nerv, icomm
 
   logical,parameter :: debug=.false., usempi=.true.
@@ -65,9 +64,8 @@ subroutine psi_desc_index(desc_data,index_in,dep_list,&
   name='psi_desc_index'
   call psb_erractionsave(err_act)
 
-  !c     if mode == 1 then we can use glob_to_loc array
-  !c     else we can't utilize it
   ictxt=desc_data(psb_ctxt_)
+  icomm=desc_data(psb_mpi_c_)
   call psb_info(ictxt,me,np) 
   if (np == -1) then
     info = 2010
@@ -80,13 +78,12 @@ subroutine psi_desc_index(desc_data,index_in,dep_list,&
     call psb_barrier(ictxt)
   endif
 
-  call psb_get_mpicomm(ictxt,icomm)
-  !c 
-  !c     first, find out the total sizes to be exchanged.
-  !c     note: things marked here as sndbuf/rcvbuf (for mpi) corresponds to things  
-  !c     to be received/sent (in the final psblas descriptor).
-  !c     be careful of the inversion
-  !c   
+  ! 
+  !     first, find out the total sizes to be exchanged.
+  !     note: things marked here as sndbuf/rcvbuf (for mpi) corresponds to things  
+  !     to be received/sent (in the final psblas descriptor).
+  !     be careful of the inversion
+  !   
   allocate(sdsz(np),rvsz(np),bsdindx(np),brvindx(np),stat=info)
   if(info /= 0) then
     info=4000
@@ -126,6 +123,9 @@ subroutine psi_desc_index(desc_data,index_in,dep_list,&
   end do
   iszs = sum(sdsz)
   iszr = sum(rvsz)
+  nsnd = iszr
+  nrcv = iszs  
+
   if ((iszs /= idxs).or.(iszr /= idxr)) then 
     write(0,*) 'strange results???', iszs,idxs,iszr,idxr
   end if
@@ -134,11 +134,14 @@ subroutine psi_desc_index(desc_data,index_in,dep_list,&
     call psb_barrier(ictxt)
   endif
 
-  ntot = (3*(max(count(sdsz>0),count(rvsz>0)))+ iszs + iszr) + 1
-  if (size(desc_index) < ntot) then 
-    !c$$$          write(0,*)  'potential error on desc_index :',
-    !c$$$     +      length_dh, size(desc_index),ntot
-    write(0,*) 'calling irealloc psi_desc_index ',ntot
+  ntot = (3*(count((sdsz>0).or.(rvsz>0)))+ iszs + iszr) + 1
+
+  if (associated(desc_index)) then 
+    l_di = size(desc_index)
+  else
+    l_di = 0
+  endif
+  if (l_di < ntot) then 
     call psb_realloc(ntot,desc_index,info)
   endif
   if (info /= 0) then 
@@ -167,9 +170,9 @@ subroutine psi_desc_index(desc_data,index_in,dep_list,&
     proc = index_in(i)
     i = i + 1 
     nerv = index_in(i)
-    !     c
-    !     c    note that here bsdinx is zero-based, hence the following loop
-    !     c          
+    !  
+    !   note that here bsdinx is zero-based, hence the following loop
+    !          
     if (isglob_in) then 
       do j=1, nerv
         sndbuf(bsdindx(proc+1)+j) = (index_in(i+j))
@@ -187,9 +190,9 @@ subroutine psi_desc_index(desc_data,index_in,dep_list,&
     write(0,*) me,' prepared send buffer '
     call psb_barrier(ictxt)
   endif
-  !c
-  !c     now have to regenerate bsdindx
-  !c   
+  !
+  !   now have to regenerate bsdindx
+  !  
   idxs = 0
   idxr = 0
   do i=1, length_dl
@@ -207,10 +210,10 @@ subroutine psi_desc_index(desc_data,index_in,dep_list,&
     goto 9999
   end if
 
-  !c
-  !c   at this point we can finally build the output desc_index. beware
-  !c   of snd/rcv inversion. 
-  !c       
+  !
+  !  at this point we can finally build the output desc_index. beware
+  !  of snd/rcv inversion. 
+  !      
   i = 1
   do k = 1, length_dl
     proc = dep_list(k)
