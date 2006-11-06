@@ -112,10 +112,9 @@ subroutine psb_cdasb(desc_a,info)
 
     call psi_cnv_dsc(halo_index,ovrlap_index,desc_a,info) 
     if (info /= 0) then
-      call psb_errpush(4010,name,a_err='psi_bld_cdesc')
+      call psb_errpush(4010,name,a_err='psi_cnv_dsc')
       goto 9999
     end if
-      
 
     ! Ok, register into MATRIX_DATA &  free temporary work areas
     desc_a%matrix_data(psb_dec_type_) = psb_desc_asb_

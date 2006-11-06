@@ -41,8 +41,8 @@ subroutine psi_zswaptranm(flag,n,beta,y,desc_a,work,info,data)
   integer, intent(out)     :: info
   complex(kind(1.d0))         :: y(:,:), beta
   complex(kind(1.d0)), target :: work(:)
-  type(psb_desc_type)      :: desc_a
-  integer, optional        :: data
+  type(psb_desc_type),target       :: desc_a
+  integer, optional         :: data
 
   ! locals
   integer  :: ictxt, np, me, point_to_proc, nesd, nerv,&
@@ -438,8 +438,8 @@ subroutine psi_zswaptranv(flag,beta,y,desc_a,work,info,data)
   integer, intent(out)     :: info
   complex(kind(1.d0))         :: y(:), beta
   complex(kind(1.d0)), target :: work(:)
-  type(psb_desc_type)      :: desc_a
-  integer, optional        :: data
+  type(psb_desc_type),target  :: desc_a
+  integer, optional    :: data
 
   ! locals
   integer  :: ictxt, np, me, point_to_proc, nesd, nerv,&

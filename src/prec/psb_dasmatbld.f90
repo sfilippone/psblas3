@@ -90,6 +90,8 @@ Subroutine psb_dasmatbld(ptype,novr,a,blk,desc_data,upd,desc_p,info,outfmt)
 
   If(debug) Write(0,*)'IN DASMATBLD  ', upd
   ictxt=desc_data%matrix_data(psb_ctxt_)
+  Call psb_info(ictxt, me, np)
+
   tot_recv=0
 
   nrow_a = desc_data%matrix_data(psb_n_row_)
@@ -133,7 +135,6 @@ Subroutine psb_dasmatbld(ptype,novr,a,blk,desc_data,upd,desc_p,info,outfmt)
     !
     !
 
-    ictxt=desc_data%matrix_data(psb_ctxt_)
 
     if (novr < 0) then
       info=3
@@ -173,7 +174,6 @@ Subroutine psb_dasmatbld(ptype,novr,a,blk,desc_data,upd,desc_p,info,outfmt)
 
     call psb_get_mpicomm(ictxt,icomm)
 
-    Call psb_info(ictxt, me, np)
     If(debug)Write(0,*)'BEGIN dasmatbld',me,upd,novr
     t1 = mpi_wtime()
 

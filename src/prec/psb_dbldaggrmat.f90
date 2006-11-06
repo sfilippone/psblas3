@@ -633,7 +633,7 @@ contains
       call psb_errpush(4010,name,a_err='symbmm 1')
       goto 9999
     end if
-    am1%aspk(:) = 0.d0 
+!!$    am1%aspk(:) = 0.d0 
     if (test_dump) &
          & call psb_csprt(50+me,am1,head='% (I-wDA)Pt symbmm ')    
 

@@ -77,7 +77,7 @@ subroutine psb_dprecbld(a,desc_a,p,info,upd)
 
       type(psb_dspmat_type), intent(in), target :: a
       type(psb_desc_type), intent(in), target   :: desc_a
-      type(psb_dbaseprc_type), intent(inout)    :: p
+      type(psb_dbaseprc_type), intent(inout), target :: p
       integer, intent(out)                      :: info
     end subroutine psb_dmlprc_bld
   end interface
@@ -128,7 +128,6 @@ subroutine psb_dprecbld(a,desc_a,p,info,upd)
   !
   ! ALso should define symbolic names for the preconditioners. 
   !
-
   if (size(p%baseprecv) >= 1) then 
     call init_baseprc_av(p%baseprecv(1),info)
     if (info /= 0) then 

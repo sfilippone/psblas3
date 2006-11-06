@@ -41,7 +41,7 @@ subroutine psi_zswapdatam(flag,n,beta,y,desc_a,work,info,data)
   integer, intent(out)     :: info
   complex(kind(1.d0))         :: y(:,:), beta
   complex(kind(1.d0)), target :: work(:)
-  type(psb_desc_type)      :: desc_a
+  type(psb_desc_type),target      :: desc_a
   integer, optional        :: data
 
   ! locals
@@ -82,7 +82,7 @@ subroutine psi_zswapdatam(flag,n,beta,y,desc_a,work,info,data)
 
   icomm = desc_a%matrix_data(psb_mpi_c_)
 
-  swap_mpi  = iand(flag,psb_swap_mpi_) /= 0
+  swap_mpi  = iand(flag,psb_swap_mpi_)  /= 0
   swap_sync = iand(flag,psb_swap_sync_) /= 0
   swap_send = iand(flag,psb_swap_send_) /= 0
   swap_recv = iand(flag,psb_swap_recv_) /= 0
@@ -449,7 +449,7 @@ subroutine psi_zswapdatav(flag,beta,y,desc_a,work,info,data)
   integer, intent(out)     :: info
   complex(kind(1.d0))         :: y(:), beta
   complex(kind(1.d0)), target :: work(:)
-  type(psb_desc_type)      :: desc_a
+  type(psb_desc_type),target      :: desc_a
   integer, optional        :: data
 
   ! locals

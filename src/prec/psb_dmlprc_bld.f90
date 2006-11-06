@@ -46,7 +46,7 @@ subroutine psb_dmlprc_bld(a,desc_a,p,info)
 
   type(psb_dspmat_type), intent(in), target :: a
   type(psb_desc_type), intent(in), target   :: desc_a
-  type(psb_dbaseprc_type), intent(inout)    :: p
+  type(psb_dbaseprc_type), intent(inout),target    :: p
   integer, intent(out)                      :: info
 
   type(psb_desc_type), pointer              :: desc_p
@@ -88,7 +88,7 @@ subroutine psb_dmlprc_bld(a,desc_a,p,info)
       use psb_descriptor_type
       use psb_spmat_type
       type(psb_dspmat_type), intent(in), target :: a
-      type(psb_dbaseprc_type), intent(inout)    :: p
+      type(psb_dbaseprc_type), intent(inout),target :: p
       type(psb_dspmat_type), intent(out),target :: ac
       type(psb_desc_type), intent(in)           :: desc_a
       type(psb_desc_type), intent(inout)        :: desc_p

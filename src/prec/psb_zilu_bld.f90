@@ -58,6 +58,7 @@ subroutine psb_zilu_bld(a,desc_a,p,upd,info)
   use psb_tools_mod
   use psb_psblas_mod
   use psb_error_mod
+  use psb_realloc_mod
   use psb_penv_mod
   implicit none
   !                                                                               

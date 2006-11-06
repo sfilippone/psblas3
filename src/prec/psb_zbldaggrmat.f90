@@ -49,7 +49,7 @@ subroutine psb_zbldaggrmat(a,desc_a,ac,p,desc_p,info)
   type(psb_zbaseprc_type), intent(inout)     :: p
   type(psb_zspmat_type), intent(out), target :: ac
   type(psb_desc_type), intent(in)            :: desc_a
-  type(psb_desc_type), intent(inout)         :: desc_p
+  type(psb_desc_type), intent(inout),target  :: desc_p
   integer, intent(out)                       :: info
 
   logical, parameter :: aggr_dump=.false.

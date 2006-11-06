@@ -51,8 +51,9 @@ subroutine psi_desc_index(desc_data,index_in,dep_list,&
   integer :: ictxt
   integer :: no_comm,err
   parameter (no_comm=-1)
-  !    ...local arrays..
-  integer,pointer :: brvindx(:),rvsz(:), bsdindx(:),sdsz(:), sndbuf(:), rcvbuf(:)
+  !     ...local arrays..
+  integer,allocatable  :: brvindx(:),rvsz(:),&
+       & bsdindx(:),sdsz(:), sndbuf(:), rcvbuf(:)
 
   integer :: ihinsz,ntot,k,err_act, l_di, &
        & idxr, idxs, iszs, iszr, nesd, nerv, icomm

@@ -249,7 +249,7 @@ module psb_serial_mod
   interface psb_spinfo
      subroutine psb_dspinfo(ireq,a,ires,info,iaux)
        use psb_spmat_type
-       type(psb_dspmat_type), intent(in) :: a
+       type(psb_dspmat_type), intent(in),target :: a
        integer, intent(in)       :: ireq
        integer, intent(out)      :: ires
        integer, intent(out)  :: info
@@ -257,7 +257,7 @@ module psb_serial_mod
      end subroutine psb_dspinfo
      subroutine psb_zspinfo(ireq,a,ires,info,iaux)
        use psb_spmat_type
-       type(psb_zspmat_type), intent(in) :: a
+       type(psb_zspmat_type), intent(in),target :: a
        integer, intent(in)       :: ireq
        integer, intent(out)      :: ires
        integer, intent(out)  :: info

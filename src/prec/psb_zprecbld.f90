@@ -77,7 +77,7 @@ subroutine psb_zprecbld(a,desc_a,p,info,upd)
 
       type(psb_zspmat_type), intent(in), target :: a
       type(psb_desc_type), intent(in), target   :: desc_a
-      type(psb_zbaseprc_type), intent(inout)    :: p
+      type(psb_zbaseprc_type), intent(inout),target :: p
       integer, intent(out)                      :: info
     end subroutine psb_zmlprc_bld
   end interface

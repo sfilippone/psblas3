@@ -151,10 +151,6 @@ subroutine psb_dilu_bld(a,desc_a,p,upd,info)
     goto 9999
   endif
 
-  !  call psb_info(ictxt, me, np)
-
-
-  ictxt=desc_a%matrix_data(psb_ctxt_)
   call psb_nullify_sp(blck)
   call psb_nullify_sp(atmp)
 

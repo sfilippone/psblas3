@@ -81,7 +81,7 @@ contains
     character(len=20) :: name, ch_err
 
     if(psb_get_errstatus().ne.0) return 
-  info=0
+    info=0
     name='psb_chkvect'
     call psb_erractionsave(err_act)
 
@@ -205,7 +205,7 @@ contains
     character(len=20) :: name, ch_err
 
     if(psb_get_errstatus().ne.0) return 
-  info=0
+    info=0
     name='psb_chkglobvect'
     call psb_erractionsave(err_act)
 

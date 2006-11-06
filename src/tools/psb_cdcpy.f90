@@ -54,7 +54,7 @@ subroutine psb_cdcpy(desc_in, desc_out, info)
   integer, intent(out)             :: info
 
   !locals
-  integer             :: np,me,ictxt, isz, err_act, isz1, isz2
+  integer             :: np,me,ictxt, isz, err_act
   logical, parameter  :: debug=.false.,debugprt=.false.
   character(len=20)   :: name, char_err
   if (debug) write(0,*) me,'Entered CDCPY'

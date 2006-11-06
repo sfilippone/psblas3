@@ -1153,6 +1153,5 @@ contains
   End Subroutine psb_zsp_free
 
 
-
 end module psb_spmat_type
 

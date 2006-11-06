@@ -314,24 +314,116 @@ C
 C
 C          .......General Not Unit, No Traspose
 C
+          if (beta  == zero) then
+            if (alpha==one) then 
+              do i = 1, m
+                acc = zero
+                do j = ia(i), ia(i+1) - 1
+                  acc = acc + as(j)*x(ja(j))
+                enddo
+                y(i) = acc
+              enddo
+            else if (alpha==-one) then 
+              do i = 1, m
+                acc = zero
+                do j = ia(i), ia(i+1) - 1
+                  acc = acc - as(j)*x(ja(j))
+                enddo
+                y(i) = acc
+              enddo
+            else
+              do i = 1, m
+                acc = zero
+                do j = ia(i), ia(i+1) - 1
+                  acc = acc + as(j)*x(ja(j))
+                enddo
+                y(i) = alpha*acc
+              enddo
+              
+            endif 
 
-          IF (BETA.NE.ZERO) THEN
-            DO 240 I = 1, M
-              ACC = ZERO
-              DO 220 J = IA(I), IA(I+1) - 1
-                ACC = ACC + AS(J)*X(JA(J))
- 220          CONTINUE
-              Y(I) = ALPHA*ACC + BETA*Y(I)
- 240        CONTINUE
-          ELSE
-            DO I = 1, M
-              ACC = ZERO
-              DO J = IA(I), IA(I+1) - 1
-                ACC = ACC + AS(J)*X(JA(J))
-              ENDDO
-              Y(I) = ALPHA*ACC
-            ENDDO
-          ENDIF
+          else if (beta==one) then 
+
+            if (alpha==one) then 
+              do i = 1, m
+                acc = y(i)
+                do j = ia(i), ia(i+1) - 1
+                  acc = acc + as(j)*x(ja(j))
+                enddo
+                y(i) = acc
+              enddo
+            else if (alpha==-one) then 
+              do i = 1, m
+                acc = y(i)
+                do j = ia(i), ia(i+1) - 1
+                  acc = acc - as(j)*x(ja(j))
+                enddo
+                y(i) = acc
+              enddo
+            else
+              do i = 1, m
+                acc = zero
+                do j = ia(i), ia(i+1) - 1
+                  acc = acc + as(j)*x(ja(j))
+                enddo
+                y(i) = alpha*acc + y(i)
+              enddo
+            endif 
+
+          else if (beta==-one) then 
+
+            if (alpha==one) then 
+              do i = 1, m
+                acc = -y(i)
+                do j = ia(i), ia(i+1) - 1
+                  acc = acc + as(j)*x(ja(j))
+                enddo
+                y(i) = acc
+              enddo
+            else if (alpha==-one) then 
+              do i = 1, m
+                acc = -y(i)
+                do j = ia(i), ia(i+1) - 1
+                  acc = acc - as(j)*x(ja(j))
+                enddo
+                y(i) = acc
+              enddo
+            else
+              do i = 1, m
+                acc = zero
+                do j = ia(i), ia(i+1) - 1
+                  acc = acc + as(j)*x(ja(j))
+                enddo
+                y(i) = alpha*acc - y(i)
+              enddo
+            endif 
+          else  
+            if (alpha==one) then 
+              do i = 1, m
+                acc = zero
+                do j = ia(i), ia(i+1) - 1
+                  acc = acc + as(j)*x(ja(j))
+                enddo
+                y(i) = acc + beta*y(i)
+              enddo
+            else if (alpha==-one) then 
+              do i = 1, m
+                acc = zero
+                do j = ia(i), ia(i+1) - 1
+                  acc = acc - as(j)*x(ja(j))
+                enddo
+                y(i) = acc + beta*y(i)
+              enddo
+            else
+              do i = 1, m
+                acc = zero
+                do j = ia(i), ia(i+1) - 1
+                  acc = acc + as(j)*x(ja(j))
+                enddo
+                y(i) = alpha*acc + beta*y(i)
+              enddo
+            endif 
+          end if 
 C
         ELSE IF (UNI) THEN
 C

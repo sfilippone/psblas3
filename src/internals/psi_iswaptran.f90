@@ -41,7 +41,7 @@ subroutine psi_iswaptranm(flag,n,beta,y,desc_a,work,info,data)
   integer, intent(out)     :: info
   integer          :: y(:,:), beta
   integer, target :: work(:)
-  type(psb_desc_type)      :: desc_a
+  type(psb_desc_type),target   :: desc_a
   integer, optional        :: data
 
   ! locals
@@ -437,12 +437,12 @@ subroutine psi_iswaptranv(flag,beta,y,desc_a,work,info,data)
   use mpi
   implicit none
 
-  integer, intent(in)      :: flag
-  integer, intent(out)     :: info
-  integer                  :: y(:), beta
-  integer, target          :: work(:)
-  type(psb_desc_type)      :: desc_a
-  integer, optional        :: data
+  integer, intent(in)  :: flag
+  integer, intent(out) :: info
+  integer              :: y(:), beta
+  integer, target :: work(:)
+  type(psb_desc_type),target  :: desc_a
+  integer, optional    :: data
 
   ! locals
   integer  :: ictxt, np, me, point_to_proc, nesd, nerv,&
