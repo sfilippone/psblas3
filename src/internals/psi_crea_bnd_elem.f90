@@ -80,16 +80,20 @@ subroutine psi_crea_bnd_elem(desc_a,info)
     j = 0
   endif
 
-  allocate(desc_a%bnd_elem(j+1),stat=info)
-  if (info /= 0) then 
-    call psb_errpush(4010,name,a_err='Allocate')
-    goto 9999      
-  end if
 
-  if (.false.) then 
-    desc_a%bnd_elem(1) = j 
-    desc_a%bnd_elem(2:j+1) = work(1:j)
+  if (.true.) then 
+    allocate(desc_a%bnd_elem(j),stat=info)
+    if (info /= 0) then 
+      call psb_errpush(4010,name,a_err='Allocate')
+      goto 9999      
+    end if
+    desc_a%bnd_elem(1:j) = work(1:j)
   else
+    allocate(desc_a%bnd_elem(j+1),stat=info)
+    if (info /= 0) then 
+      call psb_errpush(4010,name,a_err='Allocate')
+      goto 9999      
+    end if
     desc_a%bnd_elem(1:j) = work(1:j)
     desc_a%bnd_elem(j+1) = -1
   endif
