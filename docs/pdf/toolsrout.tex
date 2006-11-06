@@ -861,6 +861,109 @@ Specified as: an integer variable.
 \end{description}
 
 
+\subroutine{psb\_geall}{Allocates a dense matrix}
+
+\syntax{call psb\_geall}{x, desc\_a, info, n}
+
+\begin{description}
+\item[\bf On Entry]
+\item[desc\_a] The communication descriptor.\\
+Scope: {\bf local} \\
+Type: {\bf required}\\
+Specified as: a variable of type \descdata.\\
+\item[n] The number of columns of the dense matrix to be allocated.\\
+Scope: {\bf local} \\
+Type: {\bf optional}\\
+Specified as: Integer scalar, default $1$. It is ignored if $x$ is a
+rank-1 array. 
+\end{description}
+
+\begin{description}
+\item[\bf On Return]
+\item[x] The dense matrix to be allocated.\\
+Scope: {\bf local} \\
+Type: {\bf required}\\
+Specified as: a rank one or two array with the POINTER
+attribute, of type real, complex or integer.\\
+\item[info] Error code.
+Scope: {\bf local} \\
+Type: {\bf required}\\
+Specified as: Integer scalar.
+\end{description}
+
+
+%
+%%   psb_ins %%
+%
+\subroutine{psb\_get\_boundary}{Extract list of boundary elements}
+
+\syntax{call psb\_get\_boundary}{bndel, desc, info}
+
+\begin{description}
+\item[\bf On Entry]
+\item[desc] the communication descriptor.\\
+Scope:{\bf local}.\\
+Type:{\bf required}.\\
+Specified as: a structured data of type \descdata.
+\end{description}
+
+\begin{description}
+\item[\bf On Return]
+\item[bndel] The list of boundary elements on the calling process, in
+  local numbering.\\
+Scope: {\bf local} \\
+Type: {\bf required}\\
+Specified as: a rank one array with the POINTER
+attribute, of type integer.\\
+\item[info] Error code.
+Scope: {\bf local} \\
+Type: {\bf required}\\
+Specified as: an integer variable.
+\end{description}
+
+\section*{Notes}
+\begin{enumerate}
+\item If there are no boundary elements (i.e., if the local part of
+  the connectivity graph is self-contained) the output vector is set
+  to \verb|NULL()|
+\item Otherwise the size of \verb|bndel| will be exactly equal to the
+  number of boundary elements. 
+\end{enumerate}
+
+\subroutine{psb\_get\_overlap}{Extract list of overlap elements}
+
+\syntax{call psb\_get\_overlap}{ovrel, desc, info}
+
+\begin{description}
+\item[\bf On Entry]
+\item[desc] the communication descriptor.\\
+Scope:{\bf local}.\\
+Type:{\bf required}.\\
+Specified as: a structured data of type \descdata.
+\end{description}
+
+\begin{description}
+\item[\bf On Return]
+\item[ovrel] The list of overlap elements on the calling process, in
+  local numbering.\\
+Scope: {\bf local} \\
+Type: {\bf required}\\
+Specified as: a rank one array with the POINTER
+attribute, of type integer.\\
+\item[info] Error code.
+Scope: {\bf local} \\
+Type: {\bf required}\\
+Specified as: an integer variable.
+\end{description}
+
+\section*{Notes}
+\begin{enumerate}
+\item If there are no overlap elements the output vector is set
+  to \verb|NULL()|
+\item Otherwise the size of \verb|ovrel| will be exactly equal to the
+  number of overlap elements. 
+\end{enumerate}
+
 
 
 
