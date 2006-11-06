@@ -28,7 +28,6 @@ MPCC=/usr/local/mpich-gcc42/bin/mpicc
 ##########################################################
 BLAS=-lblas-gcc42 -L$(HOME)/LIB
 BLACS=-lmpiblacs-gcc42 -L$(HOME)/LIB
-EXTRA_BLACS_ENV_OBJS=extra_env.o
 
 
 #######################  Section 4 #######################
@@ -44,6 +43,7 @@ UMFDEF=-DHave_UMF_ -I$(UMFDIR)
 
 #  Add -DLargeFptr for 64-bit addresses
 CDEFINES=-DAdd_ $(SLUDEF) $(UMFDEF)
+FDEFINES=-DNORMAL
 
 AR=ar -cur
 RANLIB=ranlib
@@ -82,6 +82,8 @@ $(.mod).o:
 	$(F90) $(F90COPT) $(INCDIRS) -c $<
 .f90.o:
 	$(F90) $(F90COPT) $(INCDIRS) -c $<
+.F90.o:
+	$(F90) $(F90COPT) $(INCDIRS) $(FDEFINES) -c $<
 
 
 

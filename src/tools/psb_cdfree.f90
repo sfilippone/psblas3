@@ -115,20 +115,21 @@ subroutine psb_cdfree(desc_a,info)
     goto 9999
   end if
 
-  if (.not.associated(desc_a%bnd_elem)) then
-    info=296
-    call psb_errpush(info,name)
-    goto 9999
-  end if
+!!$  if (.not.associated(desc_a%bnd_elem)) then
+!!$    info=296
+!!$    call psb_errpush(info,name)
+!!$    goto 9999
+!!$  end if
 
   !deallocate halo_index field
-  deallocate(desc_a%bnd_elem,stat=info)
-  if (info /= 0) then
-    info=2054
-    call psb_errpush(info,name)
-    goto 9999
+  if (associated(desc_a%bnd_elem)) then 
+    deallocate(desc_a%bnd_elem,stat=info)
+    if (info /= 0) then
+      info=2054
+      call psb_errpush(info,name)
+      goto 9999
+    end if
   end if
-
   if (.not.associated(desc_a%ovrlap_index)) then
     info=295
     call psb_errpush(info,name)

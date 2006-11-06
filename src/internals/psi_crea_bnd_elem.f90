@@ -28,12 +28,13 @@
 !!$  POSSIBILITY OF SUCH DAMAGE.
 !!$ 
 !!$  
-subroutine psi_crea_bnd_elem(desc_a,info)
-
+subroutine psi_crea_bnd_elem(bndel,desc_a,info)
+  use psb_realloc_mod
   use psb_descriptor_type
   use psb_error_mod
   implicit none
-
+  
+  integer, pointer     :: bndel(:)
   type(psb_desc_type)  :: desc_a
   integer, intent(out) :: info
 
@@ -82,20 +83,26 @@ subroutine psi_crea_bnd_elem(desc_a,info)
 
 
   if (.true.) then 
-    allocate(desc_a%bnd_elem(j),stat=info)
-    if (info /= 0) then 
-      call psb_errpush(4010,name,a_err='Allocate')
-      goto 9999      
+    if (j>0) then 
+      allocate(bndel(j),stat=info)
+      if (info /= 0) then 
+        call psb_errpush(4010,name,a_err='Allocate')
+        goto 9999      
+      end if
+      bndel(1:j) = work(1:j)
+    else
+      if (associated(bndel)) then 
+        deallocate(bndel)
+      end if
     end if
-    desc_a%bnd_elem(1:j) = work(1:j)
   else
-    allocate(desc_a%bnd_elem(j+1),stat=info)
+    allocate(bndel(j+1),stat=info)
     if (info /= 0) then 
       call psb_errpush(4010,name,a_err='Allocate')
       goto 9999      
     end if
-    desc_a%bnd_elem(1:j) = work(1:j)
-    desc_a%bnd_elem(j+1) = -1
+    bndel(1:j) = work(1:j)
+    bndel(j+1) = -1
   endif
 
   deallocate(work)

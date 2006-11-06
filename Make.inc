@@ -1,6 +1,6 @@
 .mod=.mod
 .fh=.fh
-.SUFFIXES: .f90 $(.mod)
+.SUFFIXES: .f90 $(.mod) .F90
 
 
 #######################  Section 1 #######################
@@ -10,9 +10,9 @@ F90=/usr/local/gcc42/bin/gfortran
 FC=/usr/local/gcc42/bin/gfortran
 F77=$(FC)
 CC=/usr/local/gcc42/bin/gcc
-F90COPT= -O3  -march=pentium4 -msse2 -mfpmath=sse 
-FCOPT=-O3  -march=pentium4 -msse2 -mfpmath=sse 
-CCOPT=-O3 -march=pentium4 -msse2 -mfpmath=sse 
+F90COPT= -O3  -march=pentium4 -msse2 -mfpmath=sse -ggdb -fbounds-check
+FCOPT=-O3  -march=pentium4 -msse2 -mfpmath=sse   -ggdb -fbounds-check
+CCOPT=-O3 -march=pentium4 -msse2 -mfpmath=sse  -ggdb
 
 #######################  Section 2 #######################
 #  Define your linker and linker flags here              #
@@ -28,7 +28,6 @@ MPCC=/usr/local/mpich-gcc42/bin/mpicc
 ##########################################################
 BLAS=-lblas-gcc42 -L$(HOME)/LIB
 BLACS=-lmpiblacs-gcc42 -L$(HOME)/LIB
-EXTRA_BLACS_ENV_OBJS=extra_env.o
 
 
 #######################  Section 4 #######################
@@ -44,6 +43,7 @@ UMFDEF=-DHave_UMF_ -I$(UMFDIR)
 
 #  Add -DLargeFptr for 64-bit addresses
 CDEFINES=-DAdd_ $(SLUDEF) $(UMFDEF)
+FDEFINES=-DNORMAL
 
 AR=ar -cur
 RANLIB=ranlib
@@ -82,6 +82,9 @@ $(.mod).o:
 	$(F90) $(F90COPT) $(INCDIRS) -c $<
 .f90.o:
 	$(F90) $(F90COPT) $(INCDIRS) -c $<
+.F90.o:
+	$(F90) $(F90COPT) $(INCDIRS) $(FDEFINES) -c $<
+
 
 
 

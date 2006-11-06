@@ -632,4 +632,34 @@ Module psb_tools_mod
      end subroutine psb_cddec
   end interface
 
+  interface psb_get_boundary
+    module procedure psb_get_boundary
+  end interface
+  
+  interface psb_get_overlap
+    subroutine psb_get_ovrlap(ovrel,desc,info)
+      use psb_descriptor_type
+      implicit none 
+      integer, pointer                :: ovrel(:)
+      type(psb_desc_type), intent(in) :: desc
+      integer, intent(out)            :: info
+    end subroutine psb_get_ovrlap
+  end interface
+  
+
+
+contains
+
+  subroutine psb_get_boundary(bndel,desc,info)
+    use psb_descriptor_type
+    use psi_mod
+    implicit none 
+    integer, pointer                :: bndel(:)
+    type(psb_desc_type), intent(in) :: desc
+    integer, intent(out)            :: info
+    
+    call psb_crea_bnd_elem(bndel,desc,info)
+
+  end subroutine psb_get_boundary
+
 end module psb_tools_mod

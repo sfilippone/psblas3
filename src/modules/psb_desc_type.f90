@@ -49,10 +49,10 @@ module psb_descriptor_type
     ! contain indices of boundary  elements 
     integer, pointer :: bnd_elem(:)=>null()
     ! contain index of overlap elements to send/receive
-    integer, pointer :: ovrlap_elem(:)=>null()
+    integer, pointer :: ovrlap_index(:)=>null()
     ! contain for each local overlap element, the number of times
     ! that is duplicated
-    integer, pointer :: ovrlap_index(:)=>null()
+    integer, pointer :: ovrlap_elem(:)=>null()
     ! contain for each local element the corresponding global index
     integer, pointer :: loc_to_glob(:)=>null()
     ! contain for each global element the corresponding local index,

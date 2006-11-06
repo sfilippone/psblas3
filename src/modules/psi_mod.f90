@@ -43,10 +43,11 @@ module psi_mod
   end interface
 
   interface
-     subroutine psi_crea_bnd_elem(desc_a,info)
+     subroutine psi_crea_bnd_elem(bndel,desc_a,info)
        use psb_descriptor_type
-       type(psb_desc_type)  :: desc_a
-       integer, intent(out) :: info
+       integer, pointer                :: bndel(:)
+       type(psb_desc_type), intent(in) :: desc_a
+       integer, intent(out)            :: info
      end subroutine psi_crea_bnd_elem
   end interface
 
@@ -317,7 +318,13 @@ contains
     if (debug) write(0,*) me,'Done crea_ovr_elem'
 
     ! finally bnd_elem
-    call psi_crea_bnd_elem(cdesc,info)
+    idx_out => null()
+    call psi_crea_bnd_elem(idx_out,cdesc,info)
+    if (associated(idx_out)) then 
+      cdesc%bnd_elem => idx_out
+    else
+      cdesc%bnd_elem => null()
+    endif
     if(info /= 0) then
       call psb_errpush(4010,name,a_err='psi_crea_bnd_elem')
       goto 9999
