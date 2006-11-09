@@ -34,11 +34,11 @@ subroutine psi_crea_bnd_elem(bndel,desc_a,info)
   use psb_error_mod
   implicit none
   
-  integer, pointer     :: bndel(:)
+  integer, allocatable :: bndel(:)
   type(psb_desc_type)  :: desc_a
   integer, intent(out) :: info
 
-  integer, pointer :: work(:)
+  integer, allocatable :: work(:)
   integer :: i, j, nr, ns, k, irv, err_act
   character(len=20)    :: name
 
@@ -84,19 +84,19 @@ subroutine psi_crea_bnd_elem(bndel,desc_a,info)
 
   if (.true.) then 
     if (j>0) then 
-      allocate(bndel(j),stat=info)
+      call psb_realloc(j,bndel,info)
       if (info /= 0) then 
         call psb_errpush(4010,name,a_err='Allocate')
         goto 9999      
       end if
       bndel(1:j) = work(1:j)
     else
-      if (associated(bndel)) then 
+      if (allocated(bndel)) then 
         deallocate(bndel)
       end if
     end if
   else
-    allocate(bndel(j+1),stat=info)
+    call psb_realloc(j+1,bndel,info)
     if (info /= 0) then 
       call psb_errpush(4010,name,a_err='Allocate')
       goto 9999      

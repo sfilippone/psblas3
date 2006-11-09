@@ -87,6 +87,7 @@ subroutine psb_dilu_fct(a,l,u,d,info,blck)
     blck_%m=0
   endif
 
+!!$  write(0,*) 'ilu_fct: ',size(l%ia2),size(u%ia2),a%m,blck_%m
   call psb_dilu_fctint(m,a%m,a,blck_%m,blck_,&
        & d,l%aspk,l%ia1,l%ia2,u%aspk,u%ia1,u%ia2,l1,l2,info)
   if(info.ne.0) then

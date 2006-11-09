@@ -105,9 +105,8 @@ Subroutine psb_dgmresr(a,prec,b,x,eps,desc_a,info,&
   Integer, Optional, Intent(out)     :: iter
   Real(Kind(1.d0)), Optional, Intent(out) :: err
 !!$   local data
-  Real(Kind(1.d0)), Pointer  :: aux(:)
-  Real(Kind(1.d0)), Pointer  :: w(:), v(:,:), &
-       & c(:),s(:), h(:,:), rs(:), rr(:,:)
+  Real(Kind(1.d0)), allocatable, target   :: aux(:),w(:), v(:,:)
+  Real(Kind(1.d0)), allocatable   ::  c(:),s(:), h(:,:), rs(:), rr(:,:)
   Real(Kind(1.d0)) :: rerr, scal, gm 
   Integer       ::litmax, liter, naux, m, mglob, it,k, itrace_,&
        & np,me, n_row, n_col, nl, int_err(5)

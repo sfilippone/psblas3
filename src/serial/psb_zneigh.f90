@@ -43,10 +43,10 @@ subroutine psb_zneigh(a,idx,neigh,n,info,lev)
   type(psb_zspmat_type), intent(in) :: a   ! the sparse matrix
   integer, intent(in)               :: idx ! the index whose neighbours we want to find
   integer, intent(out)              :: n, info   ! the number of neighbours and the info
-  integer, pointer                  :: neigh(:) ! the neighbours
+  integer, allocatable                  :: neigh(:) ! the neighbours
   integer, optional                 :: lev ! level of neighbours to find
 
-  integer, pointer  :: tmpn(:)=>null()
+  integer, allocatable   :: tmpn(:)
   integer :: level, dim, i, j, k, r, c, brow,&
        & elem_pt, ii, n1, col_idx, ne, err_act, nn, nidx
   character(len=20)                 :: name, ch_err
@@ -111,7 +111,7 @@ contains
     type(psb_zspmat_type), intent(in) :: a   ! the sparse matrix
     integer, intent(in)               :: idx ! the index whose neighbours we want to find
     integer, intent(out)              :: n   ! the number of neighbours and the info
-    integer, pointer                  :: neigh(:) ! the neighbours
+    integer, allocatable                  :: neigh(:) ! the neighbours
     
     integer :: dim, i, iidx
 
@@ -144,7 +144,7 @@ contains
     type(psb_zspmat_type), intent(in) :: a   ! the sparse matrix
     integer, intent(in)               :: idx ! the index whose neighbours we want to find
     integer, intent(out)              :: n   ! the number of neighbours and the info
-    integer, pointer                  :: neigh(:) ! the neighbours
+    integer, allocatable                  :: neigh(:) ! the neighbours
 
     integer :: dim, i, iidx, ip, nza
 
@@ -208,10 +208,10 @@ contains
     implicit none
     
     
-    type(psb_zspmat_type), intent(in) :: a   ! the sparse matrix
+    type(psb_zspmat_type), intent(in),target :: a   ! the sparse matrix
     integer, intent(in)               :: idx ! the index whose neighbours we want to find
     integer, intent(out)              :: n   ! the number of neighbours and the info
-    integer, pointer                  :: neigh(:) ! the neighbours
+    integer, allocatable              :: neigh(:) ! the neighbours
     
     integer :: dim, i, iidx, ip, nza
     integer, pointer                      :: ia1(:), ia2(:), ia3(:),&
@@ -297,7 +297,7 @@ contains
     type(psb_zspmat_type), intent(in) :: a   ! the sparse matrix
     integer, intent(in)               :: idx ! the index whose neighbours we want to find
     integer, intent(out)              :: n   ! the number of neighbours and the info
-    integer, pointer                  :: neigh(:) ! the neighbours
+    integer, allocatable                  :: neigh(:) ! the neighbours
 
 
     select case(toupper(a%fida(1:3)))

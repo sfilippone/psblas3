@@ -35,6 +35,7 @@
 subroutine psb_dipcoo2csr(a,info,rwshr)
   use psb_spmat_type
   use psb_const_mod
+  use psb_realloc_mod
   use psb_serial_mod, only : psb_fixcoo
   use psb_error_mod
   use psb_string_mod
@@ -45,7 +46,7 @@ subroutine psb_dipcoo2csr(a,info,rwshr)
   Integer, intent(out)                 :: info
   logical, optional                    :: rwshr
 
-  integer, pointer    :: iaux(:), itemp(:)
+  integer, allocatable :: iaux(:), itemp(:)
   !locals
   logical             :: rwshr_
   Integer             :: nza, nr, i,j,irw, idl,err_act
@@ -81,9 +82,9 @@ subroutine psb_dipcoo2csr(a,info,rwshr)
 
   if(debug) write(0,*)'DIPCOO2CSR: out of fixcoo',nza,nr,size(a%ia2),size(iaux)
 
-  itemp => a%ia1
-  a%ia1 => a%ia2
-  a%ia2 => iaux
+  call psb_transfer(a%ia1,itemp,info)
+  call psb_transfer(a%ia2,a%ia1,info)
+  call psb_transfer(iaux,a%ia2,info)
 
   !
   ! This routine can be used in two modes:

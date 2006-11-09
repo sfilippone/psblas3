@@ -39,7 +39,7 @@ subroutine psi_crea_index(desc_a,index_in,index_out,glob_idx,nxch,nsnd,nrcv,info
   type(psb_desc_type), intent(in)  :: desc_a
   integer, intent(out)             :: info,nxch,nsnd,nrcv
   integer, intent(in)              :: index_in(:)
-  integer, pointer                 :: index_out(:)
+  integer, allocatable             :: index_out(:)
   logical                          :: glob_idx
 
   !         ....local scalars...      
@@ -70,8 +70,8 @@ subroutine psi_crea_index(desc_a,index_in,index_out,glob_idx,nxch,nsnd,nrcv,info
          & isglob_in,info)
       integer :: desc_data(:),index_in(:),dep_list(:)
       integer :: loc_to_glob(:),glob_to_loc(:)
-      integer,pointer :: desc_index(:)
-      integer :: length_dl,nsnd,nrcv, info
+      integer, allocatable  :: desc_index(:)
+      integer :: length_dl,nsnd,nrcv,info
       logical :: isglob_in
     end subroutine psi_desc_index
   end interface

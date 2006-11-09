@@ -105,8 +105,6 @@ subroutine psb_dmlprc_aply(alpha,baseprecv,x,beta,y,desc_data,trans,work,info)
 
   ! Local variables
   integer :: n_row,n_col
-  real(kind(1.d0)), allocatable :: tx(:),ty(:),x2l(:),y2l(:),&
-       &   b2l(:),tty(:)
   character     ::diagl, diagu
   integer :: ictxt,np,me,i, isz, nrg,nr2l,err_act, iptype, int_err(5)
   real(kind(1.d0)) :: omega
@@ -117,11 +115,9 @@ subroutine psb_dmlprc_aply(alpha,baseprecv,x,beta,y,desc_data,trans,work,info)
   character(len=20)   :: name, ch_err
 
   type psb_mlprec_wrk_type
-    real(kind(1.d0)), pointer :: tx(:)=>null(),ty(:)=>null(),&
-         & x2l(:)=>null(),y2l(:)=>null(),&
-         & b2l(:)=>null(),tty(:)=>null()
+    real(kind(1.d0)), allocatable  :: tx(:), ty(:), x2l(:), y2l(:)
   end type psb_mlprec_wrk_type
-  type(psb_mlprec_wrk_type), pointer :: mlprec_wrk(:)
+  type(psb_mlprec_wrk_type), allocatable  :: mlprec_wrk(:)
 
   interface psb_baseprc_aply
     subroutine psb_dbaseprc_aply(alpha,prec,x,beta,y,desc_data,trans,work,info)
@@ -455,8 +451,6 @@ subroutine psb_dmlprc_aply(alpha,baseprecv,x,beta,y,desc_data,trans,work,info)
       end if
 
       mlprec_wrk(1)%y2l(:) = dzero
-
-
       mlprec_wrk(1)%x2l(:) = x
 
       call psb_baseprc_aply(done,baseprecv(1),mlprec_wrk(1)%x2l,&
@@ -744,7 +738,6 @@ subroutine psb_dmlprc_aply(alpha,baseprecv,x,beta,y,desc_data,trans,work,info)
 
       if(info /=0) goto 9999
 
-
     case default
 
       call psb_errpush(4013,name,a_err='wrong smooth_pos',&
@@ -760,8 +753,6 @@ subroutine psb_dmlprc_aply(alpha,baseprecv,x,beta,y,desc_data,trans,work,info)
 
   end select
 
-
-  call mlprec_wrk_free(mlprec_wrk)
   deallocate(mlprec_wrk)
 
   call psb_erractionrestore(err_act)
@@ -776,24 +767,24 @@ subroutine psb_dmlprc_aply(alpha,baseprecv,x,beta,y,desc_data,trans,work,info)
   end if
   return
 
-contains
-  subroutine mlprec_wrk_free(wrk)
-    type(psb_mlprec_wrk_type) :: wrk(:)
-    ! This will not be needed when we have allocatables, as 
-    ! it is sufficient to deallocate the container, and 
-    ! the compiler is supposed to recursively deallocate the 
-    ! various components. 
-    integer i
-
-    do i=1, size(wrk)
-      if (associated(wrk(i)%tx))  deallocate(wrk(i)%tx)
-      if (associated(wrk(i)%ty))  deallocate(wrk(i)%ty)
-      if (associated(wrk(i)%x2l)) deallocate(wrk(i)%x2l)
-      if (associated(wrk(i)%y2l)) deallocate(wrk(i)%y2l)
-      if (associated(wrk(i)%b2l)) deallocate(wrk(i)%b2l)
-      if (associated(wrk(i)%tty)) deallocate(wrk(i)%tty)
-    end do
-  end subroutine mlprec_wrk_free
+!!$contains
+!!$  subroutine mlprec_wrk_free(wrk)
+!!$    type(psb_mlprec_wrk_type) :: wrk(:)
+!!$    ! This will not be needed when we have allocatables, as 
+!!$    ! it is sufficient to deallocate the container, and 
+!!$    ! the compiler is supposed to recursively deallocate the 
+!!$    ! various components. 
+!!$    integer i
+!!$
+!!$    do i=1, size(wrk)
+!!$      if (associated(wrk(i)%tx))  deallocate(wrk(i)%tx)
+!!$      if (associated(wrk(i)%ty))  deallocate(wrk(i)%ty)
+!!$      if (associated(wrk(i)%x2l)) deallocate(wrk(i)%x2l)
+!!$      if (associated(wrk(i)%y2l)) deallocate(wrk(i)%y2l)
+!!$      if (associated(wrk(i)%b2l)) deallocate(wrk(i)%b2l)
+!!$      if (associated(wrk(i)%tty)) deallocate(wrk(i)%tty)
+!!$    end do
+!!$  end subroutine mlprec_wrk_free
 
 end subroutine psb_dmlprc_aply
 

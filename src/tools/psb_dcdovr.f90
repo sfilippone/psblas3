@@ -170,9 +170,8 @@ Subroutine psb_dcdovr(a,desc_a,novr,desc_ov,info)
   index_dim = size(desc_a%halo_index)
   elem_dim  = size(desc_a%halo_index)
 
-  nullify(desc_ov%ovrlap_index,desc_ov%halo_index,desc_ov%ovrlap_elem)
-  allocate(desc_ov%ovrlap_elem(novr*(Max(elem_dim,1)+3)),&
-       &   desc_ov%matrix_data(psb_mdata_size_),STAT=INFO)
+  call psb_realloc(psb_mdata_size_,desc_ov%matrix_data,info)
+  if (info==0) call psb_realloc(novr*(Max(elem_dim,1)+3),desc_ov%ovrlap_elem,info)
   if (info /= 0) then
     info=4000
     call psb_errpush(info,name)
@@ -199,7 +198,6 @@ Subroutine psb_dcdovr(a,desc_a,novr,desc_ov,info)
     Write(0,*)'Start cdovrbld',me,lworks,lworkr
     call psb_barrier(ictxt)
   endif
-
   !
   ! The real work goes on in here....
   !

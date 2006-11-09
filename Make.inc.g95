@@ -1,6 +1,6 @@
 .mod=.mod
 .fh=.fh
-.SUFFIXES: .f90 $(.mod)
+.SUFFIXES: .f90 $(.mod) .F90
 
 
 #######################  Section 1 #######################

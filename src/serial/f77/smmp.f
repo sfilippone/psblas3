@@ -22,7 +22,7 @@ c
      *  ib(*), jb(*), diagb,
      *  diagc,
      *  index(*)
-      integer, pointer :: ic(:),jc(:)
+      integer, allocatable :: ic(:),jc(:)
       integer       :: nze, info
       integer, save :: iunit=11
 c
@@ -40,7 +40,11 @@ c$$$        write(iunit,*) 'Row:',i,' : ',jb(ib(i):ib(i+1)-1)
 c$$$      enddo
       
       if (size(ic) < n+1) then 
+        write(0,*) 'Called realloc in SYMBMM '
         call psb_realloc(n+1,ic,info)
+        if (info /=0) then 
+          write(0,*) 'realloc failed in SYMBMM ',info
+        end if
       endif
       maxlmn = max(l,m,n)
       do 10 i=1,maxlmn

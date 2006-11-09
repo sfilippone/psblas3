@@ -28,16 +28,20 @@
 !!$  POSSIBILITY OF SUCH DAMAGE.
 !!$ 
 !!$  
-subroutine psi_crea_ovr_elem(desc_overlap,ovr_elem)
+subroutine psi_crea_ovr_elem(desc_overlap,ovr_elem,info)
 
   use psb_realloc_mod
+  use psb_error_mod
+  use psb_penv_mod
   implicit none
 
   !     ...parameter arrays....      
   integer          :: desc_overlap(:)
-  integer, pointer :: ovr_elem(:)
+  integer, allocatable, intent(inout)  :: ovr_elem(:)
+  integer, intent(out) :: info
+
   !     ...local scalars...
-  integer :: i,pnt_new_elem,ret,j, info
+  integer :: i,pnt_new_elem,ret,j,iret
   integer :: dim_ovr_elem
   integer :: pairtree(2)
 
@@ -45,15 +49,21 @@ subroutine psi_crea_ovr_elem(desc_overlap,ovr_elem)
   integer  :: psi_exist_ovr_elem,dim
   external :: psi_exist_ovr_elem
 
-  integer  :: nel, ip, ix, iel, insize 
+  integer  :: nel, ip, ix, iel, insize, err_act
   integer, allocatable :: telem(:,:)
 
   logical, parameter :: usetree=.false.
+  character(len=20)    :: name
 
-  if (associated(ovr_elem)) then 
-    dim_ovr_elem=size(ovr_elem)
+
+  info = 0
+  name='psi_crea_ovr_elem'
+  
+
+  if (allocated(ovr_elem)) then 
+    dim_ovr_elem = size(ovr_elem)
   else
-    dim_ovr_elem = 0 
+    dim_ovr_elem = 0
   endif
 
 
@@ -76,7 +86,6 @@ subroutine psi_crea_ovr_elem(desc_overlap,ovr_elem)
     call initpairsearchtree(pairtree,info)
     do while (desc_overlap(i).ne.-1)
       !        ...loop over all procs of desc_overlap list....
-
       i=i+1
       do j=1,desc_overlap(i)
         !           ....loop over all overlap indices referred to act proc.....
@@ -92,8 +101,10 @@ subroutine psi_crea_ovr_elem(desc_overlap,ovr_elem)
             dim_ovr_elem=max(((3*dim_ovr_elem)/2+2),pnt_new_elem+100)
             call psb_realloc(dim_ovr_elem,ovr_elem,info)
             if (info /= 0) then 
-              write(0,*) 'Error in CREA_OVR_ELEM'
-            endif
+              info = 4000
+              call psb_errpush(info,name)
+              goto 9999
+            end if
           endif
           ovr_elem(pnt_new_elem)=desc_overlap(i+j)  
           ovr_elem(pnt_new_elem+1)=2             
@@ -113,17 +124,22 @@ subroutine psi_crea_ovr_elem(desc_overlap,ovr_elem)
     dim_ovr_elem=pnt_new_elem
     call psb_realloc(dim_ovr_elem,ovr_elem,info)
     if (info /= 0) then 
-      write(0,*) 'Error in CREA_OVR_ELEM'
-    endif
+      info = 4000
+      call psb_errpush(info,name)
+      goto 9999
+    end if
     ovr_elem(pnt_new_elem)=-1
     call freepairsearchtree(pairtree)
+
   else
 
     insize = size(desc_overlap)
     insize = max(1,(insize+1)/2)
     allocate(telem(insize,2),stat=info)
     if (info /= 0) then 
-      write(0,*) 'Error in CREA_OVR_ELEM'
+      info = 4000
+      call psb_errpush(info,name)
+      goto 9999
     endif
     i   = 1
     nel = 0
@@ -169,4 +185,15 @@ subroutine psi_crea_ovr_elem(desc_overlap,ovr_elem)
     ovr_elem(iel) = -1 
     deallocate(telem)
   endif
+  call psb_erractionrestore(err_act)
+  return
+
+9999 continue
+  call psb_erractionrestore(err_act)
+  if (err_act == act_abort) then
+    call psb_error()
+    return
+  end if
+  return
+
 end subroutine psi_crea_ovr_elem

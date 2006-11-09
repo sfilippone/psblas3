@@ -31,15 +31,16 @@
 ! File:  psb_zovrl.f90
 !
 ! Subroutine: psb_zovrlm
-!   This subroutine performs the exchange of the overlap elements in a distributed dense matrix between all the processes.
+!   This subroutine performs the exchange of the overlap elements in a 
+!    distributed dense matrix between all the processes.
 !
 ! Parameters:
-!   x           -  real,dimension(:,:).          The local part of the dense matrix.
-!   desc_a      -  type(<psb_desc_type>).        The communication descriptor.
-!   info        -  integer.                      Eventually returns an error code.
-!   jx          -  integer(optional).            The starting column of the global matrix. 
-!   ik          -  integer(optional).            The number of columns to gather. 
-!   work        -  real(optional).               A working area.
+!   x           -  real,dimension(:,:).        The local part of the dense matrix.
+!   desc_a      -  type(<psb_desc_type>).      The communication descriptor.
+!   info        -  integer.                    Returns an output  code.
+!   jx          -  integer(optional).          The starting column of the global matrix. 
+!   ik          -  integer(optional).          The number of columns to gather. 
+!   work        -  real(optional).             A working area.
 !   update -  integer(optional).            ???.
 !
 subroutine  psb_zovrlm(x,desc_a,info,jx,ik,work,update)
@@ -65,6 +66,7 @@ subroutine  psb_zovrlm(x,desc_a,info,jx,ik,work,update)
   complex(kind(1.d0)),pointer :: iwork(:), xp(:,:)
   logical                  :: do_update
   character(len=20)        :: name, ch_err
+  logical                  :: aliw
 
   name='psb_zovrlm'
   if(psb_get_errstatus().ne.0) return 
@@ -135,9 +137,11 @@ subroutine  psb_zovrlm(x,desc_a,info,jx,ik,work,update)
   liwork=ncol
   if (present(work)) then
     if(size(work).ge.liwork) then
+      aliw=.false.
       iwork => work
     else
-      call psb_realloc(liwork,iwork,info)
+      aliw=.true.
+      allocate(iwork(liwork),stat=info)
       if(info.ne.0) then
         info=4010
         ch_err='psb_realloc'
@@ -146,7 +150,8 @@ subroutine  psb_zovrlm(x,desc_a,info,jx,ik,work,update)
       end if
     end if
   else
-    call psb_realloc(liwork,iwork,info)
+    aliw=.true.
+    allocate(iwork(liwork),stat=info)
     if(info.ne.0) then
       info=4010
       ch_err='psb_realloc'
@@ -194,7 +199,7 @@ subroutine  psb_zovrlm(x,desc_a,info,jx,ik,work,update)
     goto 9999
   end select
 
-  if(.not.present(work)) deallocate(iwork)
+  if (aliw) deallocate(iwork)
   nullify(iwork)
 
   call psb_erractionrestore(err_act)
@@ -246,7 +251,8 @@ end subroutine psb_zovrlm
 !!$ 
 !!$  
 ! Subroutine: psb_zovrlv
-!   This subroutine performs the exchange of the overlap elements in a distributed dense vector between all the processes.
+!   This subroutine performs the exchange of the overlap elements in a 
+!    distributed dense vector between all the processes.
 !
 ! Parameters:
 !   x           -  real,dimension(:).          The local part of the dense vector.
@@ -278,6 +284,7 @@ subroutine  psb_zovrlv(x,desc_a,info,work,update)
   complex(kind(1.d0)),pointer :: iwork(:)
   logical                  :: do_update
   character(len=20)        :: name, ch_err
+  logical                  :: aliw
 
   name='psb_zovrlv'
   if(psb_get_errstatus().ne.0) return 
@@ -334,9 +341,11 @@ subroutine  psb_zovrlv(x,desc_a,info,work,update)
   liwork=ncol
   if (present(work)) then
     if(size(work).ge.liwork) then
+      aliw=.false.
       iwork => work
     else
-      call psb_realloc(liwork,iwork,info)
+      aliw=.true.
+      allocate(iwork(liwork),stat=info)
       if(info.ne.0) then
         info=4010
         ch_err='psb_realloc'
@@ -345,7 +354,8 @@ subroutine  psb_zovrlv(x,desc_a,info,work,update)
       end if
     end if
   else
-    call psb_realloc(liwork,iwork,info)
+    aliw=.true.
+    allocate(iwork(liwork),stat=info)
     if(info.ne.0) then
       info=4010
       ch_err='psb_realloc'
@@ -393,7 +403,7 @@ subroutine  psb_zovrlv(x,desc_a,info,work,update)
     goto 9999
   end select
 
-  if(.not.present(work)) deallocate(iwork)
+  if (aliw) deallocate(iwork)
   nullify(iwork)
 
   call psb_erractionrestore(err_act)

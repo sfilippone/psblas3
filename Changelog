@@ -1,6 +1,14 @@
 Changelog. A lot less detailed than usual, at least for past
 history. 
 
+2006/11/09: The allocatable version works, but under gcc42 there is a
+	    strange problem when using -fbounds-check. Be careful!
+
+2006/11/08: Merged the allocatable version; hope everything works!
+
+2006/11/08: Branched version psblas2-2-0-maint, and defined tag
+	    2.0.2.6 
+
 2006/11/01: Merged changes in the handling of data exchange.
 
 2006/10/03: Merged in the multilevel preconditioner stuff. This is

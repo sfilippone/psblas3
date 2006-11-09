@@ -55,7 +55,7 @@ subroutine psb_iinsvi(m, irw, val, x, desc_a, info, dupl)
   integer, intent(in)             ::  m
   integer, intent(in)             ::  irw(:)
   integer, intent(in)             ::  val(:)
-  integer,pointer                 ::  x(:)
+  integer,intent(inout)           ::  x(:)
   type(psb_desc_type), intent(in) ::  desc_a
   integer, intent(out)            ::  info
   integer, optional, intent(in)   ::  dupl
@@ -71,12 +71,12 @@ subroutine psb_iinsvi(m, irw, val, x, desc_a, info, dupl)
   call psb_erractionsave(err_act)
   name = 'psb_dinsvv'
 
-  if (.not.associated(desc_a%glob_to_loc)) then
+  if (.not.allocated(desc_a%glob_to_loc)) then
     info=3110
     call psb_errpush(info,name)
     return
   end if
-  if ((.not.associated(desc_a%matrix_data))) then
+  if ((.not.allocated(desc_a%matrix_data))) then
     int_err(1)=3110
     call psb_errpush(info,name)
     return
@@ -236,7 +236,7 @@ subroutine psb_iinsi(m,irw, val, x, desc_a, info, dupl)
   integer, intent(in)             ::  m
   integer, intent(in)             ::  irw(:)
   integer, intent(in)             ::  val(:,:)
-  integer,pointer                 ::  x(:,:)
+  integer,intent(inout)           ::  x(:,:)
   type(psb_desc_type), intent(in) ::  desc_a
   integer, intent(out)            ::  info
   integer, optional, intent(in)   ::  dupl
@@ -252,12 +252,12 @@ subroutine psb_iinsi(m,irw, val, x, desc_a, info, dupl)
   call psb_erractionsave(err_act)
   name = 'psb_dinsvv'
 
-  if (.not.associated(desc_a%glob_to_loc)) then
+  if (.not.allocated(desc_a%glob_to_loc)) then
     info=3110
     call psb_errpush(info,name)
     return
   end if
-  if ((.not.associated(desc_a%matrix_data))) then
+  if ((.not.allocated(desc_a%matrix_data))) then
     int_err(1)=3110
     call psb_errpush(info,name)
     return

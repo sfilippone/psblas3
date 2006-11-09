@@ -98,8 +98,8 @@ Subroutine psb_dcg(a,prec,b,x,eps,desc_a,info,&
   Integer, Optional, Intent(out)     :: iter
   Real(Kind(1.d0)), Optional, Intent(out) :: err
 !!$   Local data
-  real(kind(1.d0)), pointer  :: aux(:), q(:), p(:),&
-       & r(:), z(:), w(:), wwrk(:,:)
+  real(kind(1.d0)), allocatable, target   :: aux(:), wwrk(:,:)
+  real(kind(1.d0)), pointer  :: q(:), p(:), r(:), z(:), w(:)
   real(kind(1.d0))    ::rerr
   real(kind(1.d0))    ::alpha, beta, rho, rho_old, rni, xni, bni, ani,bn2,& 
        & sigma

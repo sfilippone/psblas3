@@ -63,14 +63,16 @@ subroutine psb_cdcpy(desc_in, desc_out, info)
   call psb_erractionsave(err_act)
   name = 'psb_cdcpy'
 
+  
   ictxt=desc_in%matrix_data(psb_ctxt_)
+
   ! check on blacs grid 
   call psb_info(ictxt, me, np)
   if (debug) write(0,*) me,'Entered CDCPY'
   if (np == -1) then
-    info = 2010
-    call psb_errpush(info,name)
-    goto 9999
+     info = 2010
+     call psb_errpush(info,name)
+     goto 9999
   endif
 
   call psb_nullify_desc(desc_out)

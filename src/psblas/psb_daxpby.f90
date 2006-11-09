@@ -135,7 +135,7 @@ subroutine  psb_daxpby(alpha, x, beta,y,desc_a,info, n, jx, jy)
 
   if ((in.ne.0)) then
     if(desc_a%matrix_data(psb_n_row_).gt.0) then
-      call daxpby(desc_a%matrix_data(psb_n_col_),in,&
+      call daxpby(desc_a%matrix_data(psb_n_row_),in,&
            & alpha,x(iix,jjx),size(x,1),beta,&
            & y(iiy,jjy),size(y,1),info)
     end if
@@ -263,7 +263,7 @@ subroutine  psb_daxpbyv(alpha, x, beta,y,desc_a,info)
   end if
 
   if(desc_a%matrix_data(psb_n_row_).gt.0) then
-    call daxpby(desc_a%matrix_data(psb_n_col_),ione,&
+    call daxpby(desc_a%matrix_data(psb_n_row_),ione,&
          & alpha,x,size(x),beta,&
          & y,size(y),info)
   end if

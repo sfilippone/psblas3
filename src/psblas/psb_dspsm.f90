@@ -202,7 +202,7 @@ subroutine  psb_dspsm(alpha,a,x,beta,y,desc_a,info,&
   end if
 
   if (aliw) then
-    call psb_realloc(liwork,iwork,info)
+    allocate(iwork(liwork),stat=info)
     if(info.ne.0) then
       info=4010
       ch_err='psb_realloc'
@@ -493,7 +493,7 @@ subroutine  psb_dspsv(alpha,a,x,beta,y,desc_a,info,&
   end if
 
   if (aliw) then 
-    call psb_realloc(liwork,iwork,info)
+    allocate(iwork(liwork),stat=info)
     if(info.ne.0) then
       info=4010
       ch_err='psb_realloc'

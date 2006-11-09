@@ -73,16 +73,16 @@ Subroutine psb_dcdovrbld(n_ovr,desc_p,desc_a,a,&
   type(psb_dspmat_type)            :: blk
 
 
-  Integer, Pointer :: tmp_halo(:),tmp_ovr_idx(:)
+  Integer, allocatable  :: tmp_halo(:),tmp_ovr_idx(:)
 
   Integer :: counter,counter_h, counter_o, counter_e,j,idx,gidx,proc,n_elem_recv,&
        & n_elem_send,tot_recv,tot_elem,n_col,m,ictxt,np,me,dl_lda,lwork,&
        & counter_t,n_elem,i_ovr,jj,i,proc_id,isz, mglob, glx,n_row, &
        & idxr, idxs, lx, iszr, err_act, icomm, nxch, nsnd, nrcv
 
-  Integer,Pointer  :: halo(:),length_dl(:),works(:),workr(:),t_halo_in(:),&
+  Integer,allocatable   :: halo(:),length_dl(:),works(:),workr(:),t_halo_in(:),&
        & t_halo_out(:),work(:),dep_list(:),temp(:)
-  Integer,Pointer :: brvindx(:),rvsz(:), bsdindx(:),sdsz(:)
+  Integer,allocatable  :: brvindx(:),rvsz(:), bsdindx(:),sdsz(:)
 
   Logical,Parameter :: debug=.false.
   real(kind(1.d0)) :: t1,t2,t3,t4,t5,t6,t7, tl, tch
@@ -97,8 +97,6 @@ Subroutine psb_dcdovrbld(n_ovr,desc_p,desc_a,a,&
   ictxt = desc_a%matrix_data(psb_ctxt_)
 
   Call psb_info(ictxt,me,np)
-
-  call psb_nullify_sp(blk)
 
   Allocate(brvindx(np+1),rvsz(np),sdsz(np),bsdindx(np+1),stat=info)
   if (info /= 0) then 
@@ -136,14 +134,14 @@ Subroutine psb_dcdovrbld(n_ovr,desc_p,desc_a,a,&
   end if
 
   blk%fida='COO'
-  halo => desc_a%halo_index
 
-  Allocate(tmp_ovr_idx(l_tmp_ovr_idx),tmp_halo(l_tmp_halo),stat=info)
+  Allocate(tmp_ovr_idx(l_tmp_ovr_idx),tmp_halo(l_tmp_halo),&
+       & halo(size(desc_a%halo_index)),stat=info)
   if (info /= 0) then 
     call psb_errpush(4010,name,a_err='Allocate')
     goto 9999      
   end if
-
+  halo(:) = desc_a%halo_index(:)
   desc_p%ovrlap_elem(:) = -1
   tmp_ovr_idx(:)        = -1
   tmp_halo(:)           = -1
@@ -222,8 +220,7 @@ Subroutine psb_dcdovrbld(n_ovr,desc_p,desc_a,a,&
       ! add recv elements in halo_index into ovrlap_index
       !
       Do j=0,n_elem_recv-1
-
-        If ((counter+psb_elem_recv_+j)>Size(halo)) then 
+        If((counter+psb_elem_recv_+j)>Size(halo)) then 
           info=-2
           call psb_errpush(info,name)
           goto 9999
@@ -527,8 +524,7 @@ Subroutine psb_dcdovrbld(n_ovr,desc_p,desc_a,a,&
       end if
       if (debug) write(0,*) me,'Checktmp_o_i 2',tmp_ovr_idx(1:10)
       if (debug) write(0,*) me,'Done Crea_Halo'
-
-      halo => t_halo_out
+      call psb_transfer( t_halo_out,halo,info)
       !
       ! At this point we have built the halo necessary for I_OVR+1.
       !
@@ -537,6 +533,7 @@ Subroutine psb_dcdovrbld(n_ovr,desc_p,desc_a,a,&
     t3 = mpi_wtime()
     tl = tl +(t2-t1)
     tch = tch +(t3-t2)
+
   End Do
   t1 = mpi_wtime()
 
@@ -582,15 +579,25 @@ Subroutine psb_dcdovrbld(n_ovr,desc_p,desc_a,a,&
   end if
 
   if (debug) write(0,*) me,'Done ConvertComm'
-
-  Deallocate(works,workr,t_halo_in,t_halo_out,work,&
-       & length_dl,dep_list,tmp_ovr_idx,tmp_halo,&
-       & brvindx,rvsz,sdsz,bsdindx,temp,stat=info)
+!!$  write(0,*) 't_halo_out ',allocated(t_halo_out)
+!!$  Deallocate(works,workr,t_halo_in,work,&
+!!$       & length_dl,dep_list,stat=info)
+!!$  if (info /= 0) then
+!!$    ch_err='Deallocate 1'
+!!$    call psb_errpush(4013,name,a_err=ch_err,i_err=(/info,0,0,0,0/))
+!!$    goto 9999
+!!$  end if
+!!$  Deallocate(tmp_ovr_idx,tmp_halo,&
+!!$       & brvindx,rvsz,sdsz,bsdindx,temp,halo,stat=info)
+!!$  if (info /= 0) then
+!!$    ch_err='Deallocate 2'
+!!$    call psb_errpush(4013,name,a_err=ch_err,i_err=(/info,0,0,0,0/))
+!!$    goto 9999
+!!$  end if
   if (info == 0) call psb_sp_free(blk,info)
   if (info /= 0) then
-    info=4010
     ch_err='sp_free'
-    call psb_errpush(info,name,a_err=ch_err)
+    call psb_errpush(4013,name,a_err=ch_err,i_err=(/info,0,0,0,0/))
     goto 9999
   end if
   t2 = mpi_wtime()

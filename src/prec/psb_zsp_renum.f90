@@ -58,8 +58,8 @@ subroutine psb_zsp_renum(a,desc_a,blck,p,atmp,info)
   integer   nztota, nztotb, nztmp, nzl, nnr, ir, mglob, mtype, n_row, &
        & nrow_a,n_col, nhalo,lovr,  ind, iind, pi,nr,ns,i,j,jj,k,kk
   integer ::ictxt,np,me, err_act
-  integer, pointer :: itmp(:), itmp2(:)
-  complex(kind(1.d0)), pointer :: ztmp(:)
+  integer, allocatable  :: itmp(:), itmp2(:)
+  complex(kind(1.d0)), allocatable  :: ztmp(:)
   real(kind(1.d0)) :: t1,t2,t3,t4,t5,t6,mpi_wtime, t7, t8
   external  mpi_wtime
 

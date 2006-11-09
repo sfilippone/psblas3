@@ -59,12 +59,11 @@ subroutine psb_dprecfree(p,info)
 
   me=-1
 
-  if (associated(p%baseprecv)) then 
+  if (allocated(p%baseprecv)) then 
     do i=1,size(p%baseprecv) 
       call psb_base_precfree(p%baseprecv(i),info)
     end do
     deallocate(p%baseprecv)
-    p%baseprecv => null()
   end if
   call psb_erractionrestore(err_act)
   return

@@ -31,7 +31,8 @@
 ! File:  psb_dhalo.f90
 !
 ! Subroutine: psb_dhalom
-!   This subroutine performs the exchange of the halo elements in a distributed dense matrix between all the processes.
+!   This subroutine performs the exchange of the halo elements in a 
+!   distributed dense matrix between all the processes.
 !
 ! Parameters:
 !   x         -  real,dimension(:,:).          The local part of the dense matrix.
@@ -69,6 +70,7 @@ subroutine  psb_dhalom(x,desc_a,info,alpha,jx,ik,work,tran,mode)
   real(kind(1.d0)),pointer :: iwork(:), xp(:,:)
   character                :: ltran
   character(len=20)        :: name, ch_err
+  logical                  :: aliw
 
   name='psb_dhalom'
   if(psb_get_errstatus().ne.0) return 
@@ -148,8 +150,10 @@ subroutine  psb_dhalom(x,desc_a,info,alpha,jx,ik,work,tran,mode)
   if (present(work)) then
     if(size(work).ge.liwork) then
       iwork => work
+      aliw=.false.
     else
-      call psb_realloc(liwork,iwork,info)
+      aliw=.true.
+      allocate(iwork(liwork),stat=info)
       if(info.ne.0) then
         info=4010
         ch_err='psb_realloc'
@@ -158,7 +162,9 @@ subroutine  psb_dhalom(x,desc_a,info,alpha,jx,ik,work,tran,mode)
       end if
     end if
   else
-    call psb_realloc(liwork,iwork,info)
+    aliw=.true.
+!!$    write(0,*) 'halom ',liwork
+    allocate(iwork(liwork),stat=info)
     if(info.ne.0) then
       info=4010
       ch_err='psb_realloc'
@@ -189,8 +195,7 @@ subroutine  psb_dhalom(x,desc_a,info,alpha,jx,ik,work,tran,mode)
     goto 9999
   end if
 
-  if(.not.present(work)) deallocate(iwork)
-  nullify(iwork)
+  if (aliw) deallocate(iwork)
 
   call psb_erractionrestore(err_act)
   return  
@@ -240,7 +245,8 @@ end subroutine psb_dhalom
 !!$  
 !
 ! Subroutine: psb_dhalov
-!   This subroutine performs the exchange of the halo elements in a distributed dense vector between all the processes.
+!   This subroutine performs the exchange of the halo elements in a 
+!   distributed dense vector between all the processes.
 !
 ! Parameters:
 !   x         -  real,dimension(:).            The local part of the dense vector.
@@ -276,6 +282,7 @@ subroutine  psb_dhalov(x,desc_a,info,alpha,work,tran,mode)
   real(kind(1.d0)),pointer :: iwork(:)
   character                :: ltran
   character(len=20)        :: name, ch_err
+  logical                  :: aliw
 
   name='psb_dhalov'
   if(psb_get_errstatus().ne.0) return 
@@ -337,8 +344,10 @@ subroutine  psb_dhalov(x,desc_a,info,alpha,work,tran,mode)
   if (present(work)) then
     if(size(work).ge.liwork) then
       iwork => work
+      aliw=.false.
     else
-      call psb_realloc(liwork,iwork,info)
+      aliw=.true.
+      allocate(iwork(liwork),stat=info)
       if(info.ne.0) then
         info=4010
         ch_err='psb_realloc'
@@ -347,7 +356,7 @@ subroutine  psb_dhalov(x,desc_a,info,alpha,work,tran,mode)
       end if
     end if
   else
-    call psb_realloc(liwork,iwork,info)
+    allocate(iwork(liwork),stat=info)
     if(info.ne.0) then
       info=4010
       ch_err='psb_realloc'
@@ -366,13 +375,12 @@ subroutine  psb_dhalov(x,desc_a,info,alpha,work,tran,mode)
   end if
 
   if(info.ne.0) then
-    ch_err='PSI_dSwap...'
+    ch_err='PSI_swapdata'
     call psb_errpush(4010,name,a_err=ch_err)
     goto 9999
   end if
 
-  if(.not.present(work)) deallocate(iwork)
-  nullify(iwork)
+  if (aliw) deallocate(iwork)
 
   call psb_erractionrestore(err_act)
   return  

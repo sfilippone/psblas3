@@ -52,7 +52,7 @@ subroutine psb_zsymbmm(a,b,c,info)
          & ib, jb, diagb, ic, jc, diagc, index)
       integer  n,m,l,  ia(*), ja(*), diaga, ib(*), jb(*), diagb,&
            & diagc,  index(*)
-      integer, pointer :: ic(:),jc(:)
+      integer, allocatable  :: ic(:),jc(:)
     end subroutine symbmm
   end interface
 
@@ -100,7 +100,7 @@ subroutine psb_zsymbmm(a,b,c,info)
   endif
   nze = max(a%m+1,2*a%m)
   call psb_sp_reall(c,nze,info)
-!!$  write(0,*) 'SYMBMM90 ',size(c%pl),size(c%pr)
+
   !
   ! Note: we need to test whether there is a performance impact 
   !       in not using the original Douglas & Bank code. 
@@ -112,6 +112,7 @@ subroutine psb_zsymbmm(a,b,c,info)
   else 
     call inner_symbmm(a,b,c,itemp,info)
   endif
+  call psb_realloc(size(c%ia1),c%aspk,info)
   c%pl(1) = 0
   c%pr(1) = 0
   c%m=a%m

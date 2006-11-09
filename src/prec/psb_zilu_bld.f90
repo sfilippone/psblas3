@@ -175,7 +175,7 @@ subroutine psb_zilu_bld(a,desc_a,p,upd,info)
   if (debug) write(0,*)me,': out of psb_asmatbld'
   if (debug) call psb_barrier(ictxt)
 
-  if (associated(p%av)) then 
+  if (allocated(p%av)) then 
     if (size(p%av) < bp_ilu_avsz) then 
       call psb_errpush(4010,name,a_err='Insufficient av size')
       goto 9999      
@@ -213,12 +213,12 @@ subroutine psb_zilu_bld(a,desc_a,p,upd,info)
     goto 9999
   end if
 
-  if (associated(p%d)) then 
+  if (allocated(p%d)) then 
     if (size(p%d) < n_row) then 
       deallocate(p%d)
     endif
   endif
-  if (.not.associated(p%d)) then 
+  if (.not.allocated(p%d)) then 
     allocate(p%d(n_row),stat=info)
     if (info /= 0) then 
       call psb_errpush(4010,name,a_err='Allocate')

@@ -34,7 +34,7 @@
 !!$  POSSIBILITY OF SUCH DAMAGE.
 !!$ 
 !!$  
-subroutine psb_zbldaggrmat(a,desc_a,ac,p,desc_p,info)
+subroutine psb_zbldaggrmat(a,desc_a,ac,desc_ac,p,info)
   use psb_serial_mod
   use psb_penv_mod
   use psb_prec_type
@@ -46,10 +46,10 @@ subroutine psb_zbldaggrmat(a,desc_a,ac,p,desc_p,info)
   implicit none
 
   type(psb_zspmat_type), intent(in), target  :: a
-  type(psb_zbaseprc_type), intent(inout)     :: p
+  type(psb_zbaseprc_type), intent(inout),target     :: p
   type(psb_zspmat_type), intent(out), target :: ac
   type(psb_desc_type), intent(in)            :: desc_a
-  type(psb_desc_type), intent(inout),target  :: desc_p
+  type(psb_desc_type), intent(inout)         :: desc_ac
   integer, intent(out)                       :: info
 
   logical, parameter :: aggr_dump=.false.
@@ -111,18 +111,17 @@ contains
 
     include 'mpif.h'
     integer, intent(out)   :: info
-    type(psb_zspmat_type), pointer :: bg 
     type(psb_zspmat_type)          :: b, tmp
     integer, pointer :: nzbr(:), idisp(:)
-    integer :: ictxt, nrow, nglob, ncol, ntaggr, nzbg, ip, ndx,&
+    integer :: ictxt, nrow, nglob, ncol, ntaggr, nzac, ip, ndx,&
          & naggr, np, me, nzt,irs,jl,nzl,nlr,&
          & icomm,naggrm1, i, j, k, err_act
+
     name='raw_aggregate'
     if(psb_get_errstatus().ne.0) return 
     info=0
     call psb_erractionsave(err_act)
 
-    bg => ac
     call psb_nullify_sp(b)
 
     ictxt = desc_a%matrix_data(psb_ctxt_)
@@ -173,7 +172,7 @@ contains
     b%fida = 'COO'
     b%m=a%m
     b%k=a%k
-    if (.false.) then 
+    if (.true.) then 
       call psb_csdp(a,b,info)
       if(info /= 0) then
         info=4010
@@ -194,38 +193,38 @@ contains
       enddo
 
     else
-      ! Ok, this is extremely dirty because we use pointers from 
-      ! one sparse matrix into another. But it gives us something 
-      ! in term of performance
-      jl = 0
-      do i=1,a%m,50
-        nlr = min(a%m-i+1,50)
-        call psb_spgtblk(i,a,b,info,append=.true.,iren=p%mlia,lrw=i+nlr-1)
-        if(info /= 0) then
-          call psb_errpush(4010,name,a_err='spgtblk')
-          goto 9999
-        end if
-
-        call psb_spinfo(psb_nztotreq_,b,nzl,info)
-        if(info /= 0) then
-          call psb_errpush(4010,name,a_err='spinfo')
-          goto 9999
-        end if
-        nzl = nzl - jl 
-        tmp%fida  = 'COO'
-        tmp%infoa(psb_nnz_) = nzl
-        tmp%aspk => b%aspk(jl+1:jl+nzl)
-        tmp%ia1 => b%ia1(jl+1:jl+nzl)
-        tmp%ia2 => b%ia2(jl+1:jl+nzl)
-        call psb_fixcoo(tmp,info)
-        if(info /= 0) then
-          call psb_errpush(4010,name,a_err='psb_fixcoo')
-          goto 9999
-        end if
-        nzl = tmp%infoa(psb_nnz_)
-        b%infoa(psb_nnz_) = jl+nzl
-        jl = jl + nzl
-      enddo
+!!$      ! Ok, this is extremely dirty because we use pointers from 
+!!$      ! one sparse matrix into another. But it gives us something 
+!!$      ! in term of performance
+!!$      jl = 0
+!!$      do i=1,a%m,50
+!!$        nlr = min(a%m-i+1,50)
+!!$        call psb_spgtblk(i,a,b,info,append=.true.,iren=p%mlia,lrw=i+nlr-1)
+!!$        if(info /= 0) then
+!!$          call psb_errpush(4010,name,a_err='spgtblk')
+!!$          goto 9999
+!!$        end if
+!!$
+!!$        call psb_spinfo(psb_nztotreq_,b,nzl,info)
+!!$        if(info /= 0) then
+!!$          call psb_errpush(4010,name,a_err='spinfo')
+!!$          goto 9999
+!!$        end if
+!!$        nzl = nzl - jl 
+!!$        tmp%fida  = 'COO'
+!!$        tmp%infoa(psb_nnz_) = nzl
+!!$        tmp%aspk => b%aspk(jl+1:jl+nzl)
+!!$        tmp%ia1 => b%ia1(jl+1:jl+nzl)
+!!$        tmp%ia2 => b%ia2(jl+1:jl+nzl)
+!!$        call psb_fixcoo(tmp,info)
+!!$        if(info /= 0) then
+!!$          call psb_errpush(4010,name,a_err='psb_fixcoo')
+!!$          goto 9999
+!!$        end if
+!!$        nzl = tmp%infoa(psb_nnz_)
+!!$        b%infoa(psb_nnz_) = jl+nzl
+!!$        jl = jl + nzl
+!!$      enddo
     end if
 
     call psb_fixcoo(b,info)
@@ -245,13 +244,17 @@ contains
 
     if (p%iprcparm(coarse_mat_) == mat_repl_) then 
 
-      call psb_cdrep(ntaggr,ictxt,desc_p,info)
+      call psb_cdrep(ntaggr,ictxt,desc_ac,info)
+      if(info /= 0) then
+        call psb_errpush(4010,name,a_err='psb_cdrep')
+        goto 9999
+      end if
 
       nzbr(:) = 0
       nzbr(me+1) = irs
       call psb_sum(ictxt,nzbr(1:np))
-      nzbg = sum(nzbr)
-      call psb_sp_all(ntaggr,ntaggr,bg,nzbg,info)
+      nzac = sum(nzbr)
+      call psb_sp_all(ntaggr,ntaggr,ac,nzac,info)
       if(info /= 0) then
         call psb_errpush(4010,name,a_err='spall')
         goto 9999
@@ -263,11 +266,11 @@ contains
       enddo
       ndx = nzbr(me+1) 
 
-      call mpi_allgatherv(b%aspk,ndx,mpi_double_complex,bg%aspk,nzbr,idisp,&
+      call mpi_allgatherv(b%aspk,ndx,mpi_double_complex,ac%aspk,nzbr,idisp,&
            & mpi_double_complex,icomm,info)
-      call mpi_allgatherv(b%ia1,ndx,mpi_integer,bg%ia1,nzbr,idisp,&
+      call mpi_allgatherv(b%ia1,ndx,mpi_integer,ac%ia1,nzbr,idisp,&
            & mpi_integer,icomm,info)
-      call mpi_allgatherv(b%ia2,ndx,mpi_integer,bg%ia2,nzbr,idisp,&
+      call mpi_allgatherv(b%ia2,ndx,mpi_integer,ac%ia2,nzbr,idisp,&
            & mpi_integer,icomm,info)
       if(info /= 0) then
         info=-1
@@ -275,13 +278,12 @@ contains
         goto 9999
       end if
 
-      bg%m = ntaggr
-      bg%k = ntaggr
-      bg%infoa(psb_nnz_) = nzbg
-      bg%fida='COO'
-      bg%descra='G'
-
-      call psb_sp_free(b,info)
+      ac%m = ntaggr
+      ac%k = ntaggr
+      ac%infoa(psb_nnz_) = nzac
+      ac%fida='COO'
+      ac%descra='G'
+      call psb_fixcoo(ac,info)
       if(info /= 0) then
         call psb_errpush(4010,name,a_err='sp_free')
         goto 9999
@@ -289,8 +291,12 @@ contains
 
     else if (p%iprcparm(coarse_mat_) == mat_distr_) then 
 
-      call psb_cddec(naggr,ictxt,desc_p,info)
-      call psb_sp_clone(b,bg,info)
+      call psb_cddec(naggr,ictxt,desc_ac,info)
+      if(info /= 0) then
+        call psb_errpush(4010,name,a_err='psb_cddec')
+        goto 9999
+      end if
+      call psb_sp_clone(b,ac,info)
       if(info /= 0) then
         call psb_errpush(4010,name,a_err='spclone')
         goto 9999
@@ -303,23 +309,23 @@ contains
 
       !if(.not.associated(p%av(ap_nd_)%aspk)) p%iprcparm(jac_sweeps_) = 1
       !------------------------------------------------------------------
-      ! Split BG=M+N  N off-diagonal part
-      call psb_sp_all(bg%m,bg%k,p%av(ap_nd_),nzl,info)
+      ! Split AC=M+N  N off-diagonal part
+      call psb_sp_all(ac%m,ac%k,p%av(ap_nd_),nzl,info)
       if(info /= 0) then
         call psb_errpush(4010,name,a_err='psb_sp_all')
         goto 9999
       end if
-      if(.not.associated(p%av(ap_nd_)%aspk)) write(0,*) '.not.associated(p%av(ap_nd_)%ia1)'
-      if(.not.associated(p%av(ap_nd_)%ia1)) write(0,*) '.not.associated(p%av(ap_nd_)%ia1)'
+      if(.not.allocated(p%av(ap_nd_)%aspk)) write(0,*) '.not.associated(p%av(ap_nd_)%ia1)'
+      if(.not.allocated(p%av(ap_nd_)%ia1)) write(0,*) '.not.associated(p%av(ap_nd_)%ia1)'
       !write(0,*) 'ok line 238'
 
       k=0
       do i=1,nzl
-        if (bg%ia2(i)>bg%m) then 
+        if (ac%ia2(i)>ac%m) then 
           k = k + 1
-          p%av(ap_nd_)%aspk(k) = bg%aspk(i)
-          p%av(ap_nd_)%ia1(k)  = bg%ia1(i)
-          p%av(ap_nd_)%ia2(k)  = bg%ia2(i)
+          p%av(ap_nd_)%aspk(k) = ac%aspk(i)
+          p%av(ap_nd_)%ia1(k)  = ac%ia1(i)
+          p%av(ap_nd_)%ia2(k)  = ac%ia2(i)
         endif
       enddo
       p%av(ap_nd_)%infoa(psb_nnz_) = k
@@ -345,18 +351,16 @@ contains
         goto 9999
       end if
 
-
-    else 
+    else
 
       write(0,*) 'Unknown p%iprcparm(coarse_mat) in aggregate_sp',p%iprcparm(coarse_mat_)
     end if
 
-    call psb_ipcoo2csr(bg,info)
+    call psb_ipcoo2csr(ac,info)
     if(info /= 0) then
       call psb_errpush(4010,name,a_err='ipcoo2csr')
       goto 9999
     end if
-
 
     deallocate(nzbr,idisp)
 
@@ -387,11 +391,10 @@ contains
 
     integer, intent(out)   :: info
 
-    type(psb_zspmat_type), pointer :: bg 
     type(psb_zspmat_type)          :: b
     integer, pointer :: nzbr(:), idisp(:), ivall(:)
-    integer :: ictxt, nrow, nglob, ncol, ntaggr, nzbg, ip, ndx,&
-         & naggr, np, me,&
+    integer :: ictxt, nrow, nglob, ncol, ntaggr, nzac, ip, ndx,&
+         & naggr, np, me, &
          & icomm, naggrm1,naggrp1,i,j,err_act,k,nzl
     type(psb_zspmat_type), pointer  :: am1,am2
     type(psb_zspmat_type) :: am3,am4
@@ -411,7 +414,6 @@ contains
     ictxt = desc_a%matrix_data(psb_ctxt_)
     call psb_info(ictxt, me, np)
 
-    bg => ac
     call psb_nullify_sp(b)
     call psb_nullify_sp(am3)
     call psb_nullify_sp(am4)
@@ -523,8 +525,6 @@ contains
     endif
 
 
-    if (test_dump)  call &
-         & psb_csprt(20+me,am4,head='% Operator Ptilde.',ivr=desc_a%loc_to_glob)
 
 
     call psb_ipcoo2csr(am4,info)
@@ -542,7 +542,7 @@ contains
     !
     ! WARNING: the cycles below assume that AM3 does have 
     ! its diagonal elements stored explicitly!!! 
-    ! Should we swicth to something safer? 
+    ! Should we switch to something safer? 
     !
     call psb_spscal(am3,p%dorig,info)
     if(info /= 0) goto 9999
@@ -604,12 +604,24 @@ contains
           am3%aspk(j) = done - omega*am3%aspk(j) 
         endif
       end do
+      call psb_ipcoo2csr(am3,info)      
     else
       write(0,*) 'Missing implementation of I sum' 
       call psb_errpush(4010,name)
       goto 9999
     end if
 
+    if (test_dump) then 
+      open(30+me)
+      write(30+me,*) 'OMEGA: ',omega
+      do i=1,size(p%dorig)
+        write(30+me,*) p%dorig(i) 
+      end do
+      close(30+me)
+    end if
+
+    if (test_dump)  call &
+         & psb_csprt(20+me,am4,head='% Operator Ptilde.',ivr=desc_a%loc_to_glob)
     if (test_dump) call psb_csprt(40+me,am3,head='% (I-wDA)',ivr=desc_a%loc_to_glob,&
          & ivc=desc_a%loc_to_glob)    
     if (debug) write(0,*) me,'Done gather, going for SYMBMM 1'
@@ -622,7 +634,7 @@ contains
     !
     call psb_symbmm(am3,am4,am1,info)
     if(info /= 0) then
-      call psb_errpush(4010,name,a_err='symbmm')
+      call psb_errpush(4010,name,a_err='symbmm 1')
       goto 9999
     end if
 
@@ -674,7 +686,7 @@ contains
 
     call psb_symbmm(a,am1,am3,info)
     if(info /= 0) then
-      call psb_errpush(4010,name,a_err='symbmm')
+      call psb_errpush(4010,name,a_err='symbmm 2')
       goto 9999
     end if
 
@@ -736,7 +748,7 @@ contains
     if (debug) write(0,*) me,'starting symbmm 3'
     call psb_symbmm(am2,am3,b,info)
     if(info /= 0) then
-      call psb_errpush(4010,name,a_err='symbmm')
+      call psb_errpush(4010,name,a_err='symbmm 3')
       goto 9999
     end if
 
@@ -774,10 +786,10 @@ contains
 
       case(mat_distr_) 
 
-        call psb_sp_clone(b,bg,info)
+        call psb_sp_clone(b,ac,info)
         if(info /= 0) goto 9999
-        nzbg = bg%infoa(psb_nnz_) 
-        nzl =  bg%infoa(psb_nnz_) 
+        nzac = ac%infoa(psb_nnz_) 
+        nzl =  ac%infoa(psb_nnz_) 
 
         allocate(ivall(ntaggr),stat=info)
         if (info /= 0) then 
@@ -792,21 +804,22 @@ contains
             i = i + 1
           end do
         end do
-        call psb_cdall(ntaggr,ivall,ictxt,desc_p,info,flag=1)
+
+        call psb_cdall(ntaggr,ivall,ictxt,desc_ac,info,flag=1)
         if(info /= 0) then
           call psb_errpush(4010,name,a_err='psb_cdall')
           goto 9999
         end if
 
 
-        call psb_cdins(nzl,bg%ia1,bg%ia2,desc_p,info)
+        call psb_cdins(nzl,ac%ia1,ac%ia2,desc_ac,info)
         if(info /= 0) then
           call psb_errpush(4010,name,a_err='psb_cdins')
           goto 9999
         end if
 
         if (debug) write(0,*) me,'Created aux descr. distr.'
-        call psb_cdasb(desc_p,info)
+        call psb_cdasb(desc_ac,info)
         if(info /= 0) then
           call psb_errpush(4010,name,a_err='psb_cdasb')
           goto 9999
@@ -815,24 +828,24 @@ contains
 
         if (debug) write(0,*) me,'Asmbld aux descr. distr.'
 
-        call psb_glob_to_loc(bg%ia1(1:nzl),desc_p,info,iact='I')
+        call psb_glob_to_loc(ac%ia1(1:nzl),desc_ac,info,iact='I')
         if(info /= 0) then
           call psb_errpush(4010,name,a_err='psglob_to_loc')
           goto 9999
         end if
 
 
-        call psb_glob_to_loc(bg%ia2(1:nzl),desc_p,info,iact='I')
+        call psb_glob_to_loc(ac%ia2(1:nzl),desc_ac,info,iact='I')
         if(info /= 0) then
           call psb_errpush(4010,name,a_err='psglob_to_loc')
           goto 9999
         end if
 
 
-        bg%m=desc_p%matrix_data(psb_n_row_)
-        bg%k=desc_p%matrix_data(psb_n_col_)
-        bg%fida='COO'
-        bg%descra='G'
+        ac%m=desc_ac%matrix_data(psb_n_row_)
+        ac%k=desc_ac%matrix_data(psb_n_col_)
+        ac%fida='COO'
+        ac%descra='G'
 
         call psb_sp_free(b,info)
         if(info /= 0) then
@@ -843,8 +856,8 @@ contains
 
         deallocate(ivall,nzbr,idisp)
 
-        ! Split BG=M+N  N off-diagonal part
-        call psb_sp_all(bg%m,bg%k,p%av(ap_nd_),nzl,info)
+        ! Split AC=M+N  N off-diagonal part
+        call psb_sp_all(ac%m,ac%k,p%av(ap_nd_),nzl,info)
         if(info /= 0) then
           call psb_errpush(4010,name,a_err='psb_sp_all')
           goto 9999
@@ -852,11 +865,11 @@ contains
 
         k=0
         do i=1,nzl
-          if (bg%ia2(i)>bg%m) then 
+          if (ac%ia2(i)>ac%m) then 
             k = k + 1
-            p%av(ap_nd_)%aspk(k) = bg%aspk(i)
-            p%av(ap_nd_)%ia1(k)  = bg%ia1(i)
-            p%av(ap_nd_)%ia2(k)  = bg%ia2(i)
+            p%av(ap_nd_)%aspk(k) = ac%aspk(i)
+            p%av(ap_nd_)%ia1(k)  = ac%ia1(i)
+            p%av(ap_nd_)%ia2(k)  = ac%ia2(i)
           endif
         enddo
         p%av(ap_nd_)%infoa(psb_nnz_) = k
@@ -878,13 +891,13 @@ contains
 
         if (np>1) then 
           call psb_spinfo(psb_nztotreq_,am1,nzl,info)
-          call psb_glob_to_loc(am1%ia1(1:nzl),desc_p,info,'I')
+          call psb_glob_to_loc(am1%ia1(1:nzl),desc_ac,info,'I')
           if(info /= 0) then
             call psb_errpush(4010,name,a_err='psb_glob_to_loc')
             goto 9999
           end if
         endif
-        am1%k=desc_p%matrix_data(psb_n_col_)
+        am1%k=desc_ac%matrix_data(psb_n_col_)
 
         if (np>1) then 
           call psb_ipcsr2coo(am2,info)
@@ -894,7 +907,7 @@ contains
           end if
 
           nzl = am2%infoa(psb_nnz_) 
-          call psb_glob_to_loc(am2%ia1(1:nzl),desc_p,info,'I')
+          call psb_glob_to_loc(am2%ia1(1:nzl),desc_ac,info,'I')
           if(info /= 0) then
             call psb_errpush(4010,name,a_err='psb_glob_to_loc')
             goto 9999
@@ -906,19 +919,23 @@ contains
             goto 9999
           end if
         end if
-        am2%m=desc_p%matrix_data(psb_n_col_)
+        am2%m=desc_ac%matrix_data(psb_n_col_)
 
       case(mat_repl_) 
         !
         !
+        call psb_cdrep(ntaggr,ictxt,desc_ac,info)
+        if(info /= 0) then
+          call psb_errpush(4010,name,a_err='psb_cdrep')
+          goto 9999
+        end if
+
         nzbr(:) = 0
         nzbr(me+1) = b%infoa(psb_nnz_)
 
-        call psb_cdrep(ntaggr,ictxt,desc_p,info)
-
         call psb_sum(ictxt,nzbr(1:np))
-        nzbg = sum(nzbr)
-        call psb_sp_all(ntaggr,ntaggr,bg,nzbg,info)
+        nzac = sum(nzbr)
+        call psb_sp_all(ntaggr,ntaggr,ac,nzac,info)
         if(info /= 0) goto 9999
 
 
@@ -928,26 +945,26 @@ contains
         enddo
         ndx = nzbr(me+1) 
 
-        call mpi_allgatherv(b%aspk,ndx,mpi_double_complex,bg%aspk,nzbr,idisp,&
+        call mpi_allgatherv(b%aspk,ndx,mpi_double_complex,ac%aspk,nzbr,idisp,&
              & mpi_double_complex,icomm,info)
-        call mpi_allgatherv(b%ia1,ndx,mpi_integer,bg%ia1,nzbr,idisp,&
+        call mpi_allgatherv(b%ia1,ndx,mpi_integer,ac%ia1,nzbr,idisp,&
              & mpi_integer,icomm,info)
-        call mpi_allgatherv(b%ia2,ndx,mpi_integer,bg%ia2,nzbr,idisp,&
+        call mpi_allgatherv(b%ia2,ndx,mpi_integer,ac%ia2,nzbr,idisp,&
              & mpi_integer,icomm,info)
         if(info /= 0) goto 9999
 
 
-        bg%m = ntaggr
-        bg%k = ntaggr
-        bg%infoa(psb_nnz_) = nzbg
-        bg%fida='COO'
-        bg%descra='G'
-        call psb_fixcoo(bg,info)
+        ac%m = ntaggr
+        ac%k = ntaggr
+        ac%infoa(psb_nnz_) = nzac
+        ac%fida='COO'
+        ac%descra='G'
+        call psb_fixcoo(ac,info)
         if(info /= 0) goto 9999
         call psb_sp_free(b,info)
         if(info /= 0) goto 9999
         if (me==0) then 
-          if (test_dump) call psb_csprt(80+me,bg,head='% Smoothed aggregate AC.')    
+          if (test_dump) call psb_csprt(80+me,ac,head='% Smoothed aggregate AC.')    
         endif
 
         deallocate(nzbr,idisp)
@@ -963,12 +980,16 @@ contains
 
       case(mat_distr_) 
 
-        call psb_sp_clone(b,bg,info)
+        call psb_sp_clone(b,ac,info)
         if(info /= 0) then
           call psb_errpush(4010,name,a_err='spclone')
           goto 9999
         end if
-        call psb_cddec(naggr,ictxt,desc_p,info)
+        call psb_cddec(naggr,ictxt,desc_ac,info)
+        if(info /= 0) then
+          call psb_errpush(4010,name,a_err='psb_cddec')
+          goto 9999
+        end if
 
         call psb_sp_free(b,info)
         if(info /=  0) then
@@ -980,15 +1001,18 @@ contains
       case(mat_repl_) 
         !
         !
+
+        call psb_cdrep(ntaggr,ictxt,desc_ac,info)
+        if(info /= 0) then
+          call psb_errpush(4010,name,a_err='psb_cdrep')
+          goto 9999
+        end if
+
         nzbr(:) = 0
         nzbr(me+1) = b%infoa(psb_nnz_)
-
-        call psb_cdrep(ntaggr,ictxt,desc_p,info)
-
-
         call psb_sum(ictxt,nzbr(1:np))
-        nzbg = sum(nzbr)
-        call psb_sp_all(ntaggr,ntaggr,bg,nzbg,info)
+        nzac = sum(nzbr)
+        call psb_sp_all(ntaggr,ntaggr,ac,nzac,info)
         if(info /= 0) then
           call psb_errpush(4010,name,a_err='psb_sp_all')
           goto 9999
@@ -1000,11 +1024,11 @@ contains
         enddo
         ndx = nzbr(me+1) 
 
-        call mpi_allgatherv(b%aspk,ndx,mpi_double_complex,bg%aspk,nzbr,idisp,&
+        call mpi_allgatherv(b%aspk,ndx,mpi_double_complex,ac%aspk,nzbr,idisp,&
              & mpi_double_complex,icomm,info)
-        call mpi_allgatherv(b%ia1,ndx,mpi_integer,bg%ia1,nzbr,idisp,&
+        call mpi_allgatherv(b%ia1,ndx,mpi_integer,ac%ia1,nzbr,idisp,&
              & mpi_integer,icomm,info)
-        call mpi_allgatherv(b%ia2,ndx,mpi_integer,bg%ia2,nzbr,idisp,&
+        call mpi_allgatherv(b%ia2,ndx,mpi_integer,ac%ia2,nzbr,idisp,&
              & mpi_integer,icomm,info)
         if(info /= 0) then
           info=-1
@@ -1013,12 +1037,12 @@ contains
         end if
 
 
-        bg%m = ntaggr
-        bg%k = ntaggr
-        bg%infoa(psb_nnz_) = nzbg
-        bg%fida='COO'
-        bg%descra='G'
-        call psb_fixcoo(bg,info)
+        ac%m = ntaggr
+        ac%k = ntaggr
+        ac%infoa(psb_nnz_) = nzac
+        ac%fida='COO'
+        ac%descra='G'
+        call psb_fixcoo(ac,info)
         if(info /= 0) then
           call psb_errpush(4010,name,a_err='psb_fixcoo')
           goto 9999
@@ -1034,6 +1058,13 @@ contains
 
     end select
 
+    call psb_ipcoo2csr(ac,info)
+    if(info /= 0) then
+      call psb_errpush(4010,name,a_err='psb_ipcoo2csr')
+      goto 9999
+    end if
+
+    if (debug) write(0,*) me,'Done smooth_aggregate '
     call psb_erractionrestore(err_act)
     return
 

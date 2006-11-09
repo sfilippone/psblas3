@@ -38,7 +38,7 @@ subroutine psb_dcsrws(rw,a,info,trans)
   implicit none 
 
   type(psb_dspmat_type)      :: a
-  real(kind(1.d0)), pointer  :: rw(:) 
+  real(kind(1.d0)), allocatable   :: rw(:) 
   integer                    :: info
   character, optional        :: trans
 

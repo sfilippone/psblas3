@@ -112,7 +112,7 @@ subroutine psb_dprc_aply(prec,x,y,desc_data,info,trans, work)
 
   end if
 
-  if (.not.(associated(prec%baseprecv))) then 
+  if (.not.(allocated(prec%baseprecv))) then 
     write(0,*) 'Inconsistent preconditioner: neither SMTH nor BASE?'      
   end if
   if (size(prec%baseprecv) >1) then 

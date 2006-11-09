@@ -32,7 +32,8 @@
 ! File:  psb_ihalo.f90
 !
 ! Subroutine: psb_ihalom
-!   This subroutine performs the exchange of the halo elements in a distributed dense matrix between all the processes.
+!   This subroutine performs the exchange of the halo elements in a 
+!    distributed dense matrix between all the processes.
 !
 ! Parameters:
 !   x         -  integer,dimension(:,:).       The local part of the dense matrix.
@@ -70,6 +71,7 @@ subroutine  psb_ihalom(x,desc_a,info,alpha,jx,ik,work,tran,mode)
   integer, pointer         :: xp(:,:), iwork(:)
   character                :: ltran
   character(len=20)        :: name, ch_err
+  logical                  :: aliw
 
   name='psb_ihalom'
   if(psb_get_errstatus().ne.0) return 
@@ -88,49 +90,49 @@ subroutine  psb_ihalom(x,desc_a,info,alpha,jx,ik,work,tran,mode)
 
   ix = 1
   if (present(jx)) then
-     ijx = jx
+    ijx = jx
   else
-     ijx = 1
+    ijx = 1
   endif
 
   m = desc_a%matrix_data(psb_m_)
   n = desc_a%matrix_data(psb_n_)
   nrow = desc_a%matrix_data(psb_n_row_)
-  
+
   maxk=size(x,2)-ijx+1
-  
+
   if(present(ik)) then
-     if(ik.gt.maxk) then
-        k=maxk
-     else
-        k=ik
-     end if
+    if(ik.gt.maxk) then
+      k=maxk
+    else
+      k=ik
+    end if
   else
-     k = maxk
+    k = maxk
   end if
 
   if (present(tran)) then     
-     ltran = tran
+    ltran = tran
   else
-     ltran = 'N'
+    ltran = 'N'
   endif
   if (present(mode)) then 
-     imode = mode
+    imode = mode
   else
-     imode = IOR(psb_swap_send_,psb_swap_recv_)
+    imode = IOR(psb_swap_send_,psb_swap_recv_)
   endif
 
   ! check vector correctness
   call psb_chkvect(m,1,size(x,1),ix,ijx,desc_a%matrix_data,info,iix,jjx)
   if(info.ne.0) then
-     info=4010
-     ch_err='psb_chkvect'
-     call psb_errpush(info,name,a_err=ch_err)
+    info=4010
+    ch_err='psb_chkvect'
+    call psb_errpush(info,name,a_err=ch_err)
   end if
 
   if (iix.ne.1) then
-     info=3040
-     call psb_errpush(info,name)
+    info=3040
+    call psb_errpush(info,name)
   end if
 
   err=info
@@ -149,43 +151,46 @@ subroutine  psb_ihalom(x,desc_a,info,alpha,jx,ik,work,tran,mode)
 
   liwork=nrow
   if (present(work)) then
-     if(size(work).ge.liwork) then
-        iwork => work
-     else
-        call psb_realloc(liwork,iwork,info)
-        if(info.ne.0) then
-           info=4010
-           ch_err='psb_realloc'
-           call psb_errpush(info,name,a_err=ch_err)
-           goto 9999
-        end if
-     end if
-  else
-     call psb_realloc(liwork,iwork,info)
-     if(info.ne.0) then
+    if(size(work).ge.liwork) then
+      aliw=.false.
+      iwork => work
+    else
+      aliw=.true.
+      allocate(iwork(liwork),stat=info)
+      if(info.ne.0) then
         info=4010
         ch_err='psb_realloc'
         call psb_errpush(info,name,a_err=ch_err)
         goto 9999
-     end if
+      end if
+    end if
+  else
+    aliw=.true.
+    allocate(iwork(liwork),stat=info)
+    if(info.ne.0) then
+      info=4010
+      ch_err='psb_realloc'
+      call psb_errpush(info,name,a_err=ch_err)
+      goto 9999
+    end if
   end if
 
   xp => x(iix:size(x,1),jjx:jjx+k-1)
   ! exchange halo elements
   if(ltran.eq.'N') then
-     call psi_swapdata(imode,k,0,xp,&
-          & desc_a,iwork,info)
+    call psi_swapdata(imode,k,0,xp,&
+         & desc_a,iwork,info)
   else if((ltran.eq.'T').or.(ltran.eq.'H')) then
-     call psi_swaptran(imode,k,1,xp,&
-          & desc_a,iwork,info)
+    call psi_swaptran(imode,k,1,xp,&
+         & desc_a,iwork,info)
   end if
 
   if(info.ne.0) then
-     call psb_errpush(4010,name,a_err='PSI_iSwap...')
-     goto 9999
+    call psb_errpush(4010,name,a_err='PSI_iSwap...')
+    goto 9999
   end if
 
-  if(.not.present(work)) deallocate(iwork)
+  if (aliw) deallocate(iwork)
   nullify(iwork)
 
   call psb_erractionrestore(err_act)
@@ -195,8 +200,8 @@ subroutine  psb_ihalom(x,desc_a,info,alpha,jx,ik,work,tran,mode)
   call psb_erractionrestore(err_act)
 
   if (err_act.eq.act_abort) then
-     call psb_error(ictxt)
-     return
+    call psb_error(ictxt)
+    return
   end if
   return
 end subroutine psb_ihalom
@@ -236,7 +241,8 @@ end subroutine psb_ihalom
 !!$  
 
 ! Subroutine: psb_ihalov
-!   This subroutine performs the exchange of the halo elements in a distributed dense matrix between all the processes.
+!   This subroutine performs the exchange of the halo elements in a 
+!    distributed dense matrix between all the processes.
 !
 ! Parameters:
 !   x         -  integer,dimension(:).         The local part of the dense matrix.
@@ -272,6 +278,7 @@ subroutine  psb_ihalov(x,desc_a,info,alpha,work,tran,mode)
   integer,pointer          :: iwork(:)
   character                :: ltran
   character(len=20)        :: name, ch_err
+  logical                  :: aliw
 
   name='psb_ihalov'
   if(psb_get_errstatus().ne.0) return 
@@ -334,9 +341,11 @@ subroutine  psb_ihalov(x,desc_a,info,alpha,work,tran,mode)
   liwork=nrow
   if (present(work)) then
     if(size(work).ge.liwork) then
+      aliw=.false.
       iwork => work
     else
-      call psb_realloc(liwork,iwork,info)
+      aliw=.true.
+      allocate(iwork(liwork),stat=info)
       if(info.ne.0) then
         info=4010
         ch_err='psb_realloc'
@@ -345,7 +354,8 @@ subroutine  psb_ihalov(x,desc_a,info,alpha,work,tran,mode)
       end if
     end if
   else
-    call psb_realloc(liwork,iwork,info)
+    aliw=.true.
+    allocate(iwork(liwork),stat=info)
     if(info.ne.0) then
       info=4010
       ch_err='psb_realloc'
@@ -364,11 +374,11 @@ subroutine  psb_ihalov(x,desc_a,info,alpha,work,tran,mode)
   end if
 
   if(info.ne.0) then
-    call psb_errpush(4010,name,a_err='PSI_iSwap...')
+    call psb_errpush(4010,name,a_err='PSI_iswapdata')
     goto 9999
   end if
 
-  if(.not.present(work)) deallocate(iwork)
+  if (aliw) deallocate(iwork)
   nullify(iwork)
 
   call psb_erractionrestore(err_act)

@@ -40,7 +40,7 @@ subroutine psi_sort_dl(dep_list,l_dep_list,np,info)
   integer :: np,dep_list(:,:), l_dep_list(:)
   integer :: idg, iupd, idgp, iedges, iidx, iich,ndgmx, isz, err_act
   integer :: i, info
-  integer, pointer   :: work(:)
+  integer, allocatable   :: work(:)
   logical, parameter :: debug=.false.
   character(len=20)        :: name
   

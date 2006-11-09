@@ -58,6 +58,7 @@ subroutine psb_dilu_bld(a,desc_a,p,upd,info)
   use psb_tools_mod
   use psb_psblas_mod
   use psb_error_mod
+  use psb_realloc_mod
   use psb_penv_mod
   implicit none
   !                                                                               
@@ -170,7 +171,7 @@ subroutine psb_dilu_bld(a,desc_a,p,upd,info)
   if (debug) write(0,*)me,': out of psb_asmatbld'
   if (debug) call psb_barrier(ictxt)
 
-  if (associated(p%av)) then 
+  if (allocated(p%av)) then 
     if (size(p%av) < bp_ilu_avsz) then 
       call psb_errpush(4010,name,a_err='Insufficient av size')
       goto 9999      
@@ -179,6 +180,7 @@ subroutine psb_dilu_bld(a,desc_a,p,upd,info)
     call psb_errpush(4010,name,a_err='AV not associated')
     goto 9999      
   endif
+!!$  call psb_csprt(50+me,a,head='% (A)')    
 
   nrow_a = desc_a%matrix_data(psb_n_row_)
   call psb_spinfo(psb_nztotreq_,a,nztota,info)
@@ -208,12 +210,12 @@ subroutine psb_dilu_bld(a,desc_a,p,upd,info)
     goto 9999
   end if
 
-  if (associated(p%d)) then 
+  if (allocated(p%d)) then 
     if (size(p%d) < n_row) then 
       deallocate(p%d)
     endif
   endif
-  if (.not.associated(p%d)) then 
+  if (.not.allocated(p%d)) then 
     allocate(p%d(n_row),stat=info)
     if (info /= 0) then 
       call psb_errpush(4010,name,a_err='Allocate')
@@ -334,6 +336,8 @@ subroutine psb_dilu_bld(a,desc_a,p,upd,info)
 
     close(80+me)
   endif
+
+!!$  call psb_csprt(60+me,a,head='% (A)')    
 
 
   !    ierr = MPE_Log_event( ifcte, 0, "st SIMPLE" )

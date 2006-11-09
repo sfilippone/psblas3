@@ -50,7 +50,7 @@ subroutine psb_cdtransfer(desc_in, desc_out, info)
   !....parameters...
 
   type(psb_desc_type), intent(inout)  :: desc_in
-  type(psb_desc_type), intent(out)    :: desc_out
+  type(psb_desc_type), intent(out)  :: desc_out
   integer, intent(out)                :: info
 
   !locals
@@ -74,19 +74,19 @@ subroutine psb_cdtransfer(desc_in, desc_out, info)
      goto 9999
   endif
 
-  call psb_nullify_desc(desc_out)
-  
-  desc_out%matrix_data  => desc_in%matrix_data
-  desc_out%halo_index   => desc_in%halo_index
-  desc_out%bnd_elem     => desc_in%bnd_elem    
-  desc_out%ovrlap_elem  => desc_in%ovrlap_elem
-  desc_out%ovrlap_index => desc_in%ovrlap_index
-  desc_out%loc_to_glob  => desc_in%loc_to_glob
-  desc_out%glob_to_loc  => desc_in%glob_to_loc
-  desc_out%lprm         => desc_in%lprm
-  desc_out%idx_space    => desc_in%idx_space
+!!$  call psb_nullify_desc(desc_out)
+!!$  
 
-  call psb_nullify_desc(desc_in)
+  call psb_transfer( desc_in%matrix_data ,    desc_out%matrix_data  , info)
+  call psb_transfer( desc_in%halo_index  ,    desc_out%halo_index   , info)
+  call psb_transfer( desc_in%bnd_elem    ,    desc_out%bnd_elem     , info)
+  call psb_transfer( desc_in%ovrlap_elem ,    desc_out%ovrlap_elem  , info)
+  call psb_transfer( desc_in%ovrlap_index,    desc_out%ovrlap_index , info)
+  call psb_transfer( desc_in%loc_to_glob ,    desc_out%loc_to_glob  , info)
+  call psb_transfer( desc_in%glob_to_loc ,    desc_out%glob_to_loc  , info)
+  call psb_transfer( desc_in%lprm        ,    desc_out%lprm         , info)
+  call psb_transfer( desc_in%idx_space   ,    desc_out%idx_space    , info)
+
 
   call psb_erractionrestore(err_act)
   return

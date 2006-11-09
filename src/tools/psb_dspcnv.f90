@@ -43,6 +43,7 @@ subroutine psb_dspcnv(a,b,desc_a,info)
 
   use psb_descriptor_type
   use psb_spmat_type
+  use psb_realloc_mod
   use psb_serial_mod
   use psb_const_mod
   use psb_error_mod
@@ -100,8 +101,8 @@ subroutine psb_dspcnv(a,b,desc_a,info)
   !....locals....
   integer                       ::  int_err(5)
   real(kind(1.d0))              ::  d(1)
-  integer,pointer               ::  i_temp(:)
-  real(kind(1.d0)),pointer      ::  work_dcsdp(:)
+  integer,allocatable           ::  i_temp(:)
+  real(kind(1.d0)),allocatable  ::  work_dcsdp(:)
   integer                       ::  ia1_size,ia2_size,aspk_size,&
        & err_act,i,np,me,n_col,l_dcsdp
   integer                       ::  lwork_dcsdp,dectype
@@ -202,15 +203,13 @@ subroutine psb_dspcnv(a,b,desc_a,info)
       do i=1,  n_col
         i_temp(i) = b%pr(a%pr(i))
       enddo
-      deallocate(b%pr)
-      b%pr => i_temp
+      call psb_transfer(i_temp,b%pr,info)
     else
       allocate(i_temp(n_col))
       do i=1,  n_col
         i_temp(i) = a%pr(i)
       enddo
-      deallocate(b%pr)
-      b%pr => i_temp
+      call psb_transfer(i_temp,b%pr,info)
     endif
   endif
   if (a%pl(1) /= 0) then 
@@ -219,15 +218,13 @@ subroutine psb_dspcnv(a,b,desc_a,info)
       do i=1,  n_row
         i_temp(i) = a%pl(b%pl(i))
       enddo
-      deallocate(b%pl)
-      b%pl => i_temp
+      call psb_transfer(i_temp,b%pl,info)
     else
       allocate(i_temp(n_row))
       do i=1,  n_row
         i_temp(i) = a%pl(i)
       enddo
-      deallocate(b%pl)
-      b%pl => i_temp
+      call psb_transfer(i_temp,b%pl,info)
     endif
   endif
 

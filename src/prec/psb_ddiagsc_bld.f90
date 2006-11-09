@@ -58,7 +58,7 @@ subroutine psb_ddiagsc_bld(a,desc_a,p,upd,info)
   ! Local scalars
   Integer      :: err, n_row, n_col,I,j,k,ictxt,&
        & me,np,mglob,lw, err_act
-  real(kind(1.d0)),pointer :: gd(:), work(:)
+  real(kind(1.d0)),allocatable  :: gd(:), work(:)
   integer      :: int_err(5)
   character    :: iupd
 

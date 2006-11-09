@@ -52,8 +52,8 @@ subroutine psb_cdasb(desc_a,info)
 
   !....Locals....
   integer          ::  int_err(5), itemp(2)
-  integer,pointer  ::  ovrlap_index(:),halo_index(:)
-  integer          ::  i,err,np,me,& 
+  integer,allocatable  ::  ovrlap_index(:),halo_index(:)
+  integer          ::  i,err,np,me,&
        & lovrlap,lhalo,nhalo,novrlap,max_size,max_halo,n_col,ldesc_halo,&
        & ldesc_ovrlap, dectype, err_act
   integer                       :: ictxt,n_row
@@ -104,11 +104,8 @@ subroutine psb_cdasb(desc_a,info)
     endif
     call psb_realloc(desc_a%matrix_data(psb_n_col_),desc_a%loc_to_glob,info)
 
-
-    ovrlap_index => desc_a%ovrlap_index
-    nullify(desc_a%ovrlap_index)
-    halo_index   => desc_a%halo_index
-    nullify(desc_a%halo_index)
+    call psb_transfer(desc_a%ovrlap_index,ovrlap_index,info)
+    call psb_transfer(desc_a%halo_index,halo_index,info)
 
     call psi_cnv_dsc(halo_index,ovrlap_index,desc_a,info) 
     if (info /= 0) then

@@ -49,7 +49,6 @@ subroutine psb_dprecset(p,ptype,info,iv,rs,rv,ilev,nlev)
   real(kind(1.d0)), optional, intent(in) :: rs
   real(kind(1.d0)), optional, intent(in) :: rv(:)
 
-  type(psb_dbaseprc_type), pointer       :: bpv(:)=>null()
   character(len=len(ptype))              :: typeup
   integer                                :: isz, err, nlev_, ilev_, i
 
@@ -61,18 +60,16 @@ subroutine psb_dprecset(p,ptype,info,iv,rs,rv,ilev,nlev)
     ilev_ = 1 
   end if
   if (present(nlev)) then 
-    if (associated(p%baseprecv)) then 
-      write(0,*) 'Warning: NLEV is ignored when P is already associated'
+    if (allocated(p%baseprecv)) then 
+      write(0,*) 'Warning: NLEV is ignored when P is already allocated'
     end if
     nlev_ = max(1, nlev)
   else
     nlev_ = 1 
   end if
-  if (.not.associated(p%baseprecv)) then 
+
+  if (.not.allocated(p%baseprecv)) then 
     allocate(p%baseprecv(nlev_),stat=err)
-    do i=1, nlev_
-      call psb_nullify_baseprec(p%baseprecv(i))
-    end do
   else
     nlev_ = size(p%baseprecv)
   endif
@@ -82,14 +79,12 @@ subroutine psb_dprecset(p,ptype,info,iv,rs,rv,ilev,nlev)
     info = -1
     return
   endif
-    
-  if (.not.associated(p%baseprecv(ilev_)%iprcparm)) then 
-    allocate(p%baseprecv(ilev_)%iprcparm(ifpsz),&
-         & p%baseprecv(ilev_)%dprcparm(dfpsz),stat=err)
-    if (err/=0) then 
-      write(0,*)'Precset Memory Failure',err
-    endif
-  end if
+
+
+  call psb_realloc(ifpsz,p%baseprecv(ilev_)%iprcparm,info)
+  if (info == 0) call psb_realloc(dfpsz,p%baseprecv(ilev_)%dprcparm,info)
+  if (info /= 0) return
+  p%baseprecv(ilev_)%iprcparm(:) = 0
 
   select case(toupper(ptype(1:len_trim(ptype))))
   case ('NONE','NOPREC') 
@@ -147,17 +142,8 @@ subroutine psb_dprecset(p,ptype,info,iv,rs,rv,ilev,nlev)
 
   case ('ML', '2L', '2LEV')
 
-!!$    allocate(p%baseprecv(ilev_)%iprcparm(ifpsz),stat=err)
-!!$    if (err/=0) then 
-!!$      write(0,*)'Precset Memory Failure 2l:2',err
-!!$    endif
-!!$    allocate(p%baseprecv(ilev_)%dprcparm(dfpsz),stat=err)
-!!$    if (err/=0) then 
-!!$      write(0,*)'Precset Memory Failure 2l:3',err
-!!$    endif
 
     p%baseprecv(ilev_)%iprcparm(:)             = 0
-
     p%baseprecv(ilev_)%iprcparm(p_type_)       = bja_
     p%baseprecv(ilev_)%iprcparm(restr_)        = psb_none_
     p%baseprecv(ilev_)%iprcparm(prol_)         = psb_none_
@@ -174,7 +160,6 @@ subroutine psb_dprecset(p,ptype,info,iv,rs,rv,ilev,nlev)
     p%baseprecv(ilev_)%iprcparm(ilu_fill_in_)  = 0
     p%baseprecv(ilev_)%dprcparm(smooth_omega_) = 4.d0/3.d0         
     p%baseprecv(ilev_)%iprcparm(jac_sweeps_)   = 1
-
 
     if (present(iv)) then 
       isz = size(iv)

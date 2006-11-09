@@ -83,7 +83,7 @@ subroutine psb_dprecbld(a,desc_a,p,info,upd)
   end interface
 
   ! Local scalars
-  Integer      :: err, I,j,k,ictxt, me,np,lw, err_act
+  Integer      :: err,i,j,k,ictxt, me,np,lw, err_act
   integer      :: int_err(5)
   character    :: iupd
 
@@ -116,10 +116,10 @@ subroutine psb_dprecbld(a,desc_a,p,info,upd)
     iupd='F'
   endif
 
-  if (.not.associated(p%baseprecv)) then 
+  if (.not.allocated(p%baseprecv)) then 
     !! Error 1: should call precset
     info=4010
-    ch_err='unassociated bpv'
+    ch_err='unallocated bpv'
     call psb_errpush(info,name,a_err=ch_err)
     goto 9999
   end if
@@ -157,7 +157,7 @@ subroutine psb_dprecbld(a,desc_a,p,info,upd)
         call psb_errpush(info,name,a_err=ch_err)
         goto 9999
       endif
-
+      
       call psb_mlprc_bld(p%baseprecv(i-1)%base_a,p%baseprecv(i-1)%base_desc,&
            & p%baseprecv(i),info)
       if (info /= 0) then 
@@ -189,7 +189,7 @@ contains
   subroutine init_baseprc_av(p,info)
     type(psb_dbaseprc_type), intent(inout) :: p
     integer                                :: info
-    if (associated(p%av)) then 
+    if (allocated(p%av)) then 
       ! Have not decided what to do yet
     end if
     allocate(p%av(max_avsz),stat=info)

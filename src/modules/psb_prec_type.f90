@@ -84,16 +84,16 @@ module psb_prec_type
 
   type psb_dbaseprc_type
 
-    type(psb_dspmat_type), pointer :: av(:) => null() !
-    real(kind(1.d0)), pointer      :: d(:)  => null()
-    type(psb_desc_type), pointer   :: desc_data => null(), desc_ac=>null()! !
-    integer, pointer               :: iprcparm(:) => null() !
-    real(kind(1.d0)), pointer      :: dprcparm(:) => null() !
-    integer, pointer               :: perm(:)  => null(), invperm(:) => null()
-    integer, pointer               :: mlia(:)  => null(), nlaggr(:)  => null() !
-    type(psb_dspmat_type), pointer :: base_a    => null() !
-    type(psb_desc_type), pointer   :: base_desc => null() !
-    real(kind(1.d0)), pointer      :: dorig(:) => null() !
+    type(psb_dspmat_type), allocatable :: av(:) 
+    real(kind(1.d0)), allocatable      :: d(:)  
+    type(psb_desc_type)                :: desc_data , desc_ac
+    integer, allocatable               :: iprcparm(:) 
+    real(kind(1.d0)), allocatable      :: dprcparm(:) 
+    integer, allocatable               :: perm(:),  invperm(:) 
+    integer, allocatable               :: mlia(:), nlaggr(:) 
+    type(psb_dspmat_type), pointer     :: base_a    => null() !
+    type(psb_desc_type), pointer       :: base_desc=> null() ! 
+    real(kind(1.d0)), allocatable      :: dorig(:) 
 
   end type psb_dbaseprc_type
 
@@ -141,28 +141,28 @@ module psb_prec_type
   !   6.    baseprecv(ilev)%nlaggr        Number of aggregates on the various procs. 
   !   
   type psb_dprec_type
-    type(psb_dbaseprc_type), pointer :: baseprecv(:) => null()
+    type(psb_dbaseprc_type), allocatable  :: baseprecv(:) 
     ! contain type of preconditioning to be performed
     integer                       :: prec, base_prec
   end type psb_dprec_type
 
   type psb_zbaseprc_type
 
-    type(psb_zspmat_type), pointer :: av(:) => null() !
-    complex(kind(1.d0)), pointer   :: d(:)  => null()
-    type(psb_desc_type), pointer   :: desc_data => null() , desc_ac=>null()!
-    integer, pointer               :: iprcparm(:) => null() !
-    real(kind(1.d0)), pointer      :: dprcparm(:) => null() !
-    integer, pointer               :: perm(:)  => null(), invperm(:) => null()
-    integer, pointer               :: mlia(:)  => null(), nlaggr(:)  => null() !
-    type(psb_zspmat_type), pointer :: base_a    => null() !
-    type(psb_desc_type), pointer   :: base_desc => null() !
-    complex(kind(1.d0)), pointer   :: dorig(:) => null() !
+    type(psb_zspmat_type), allocatable :: av(:) 
+    complex(kind(1.d0)), allocatable   :: d(:)  
+    type(psb_desc_type)                :: desc_data , desc_ac
+    integer, allocatable               :: iprcparm(:) 
+    real(kind(1.d0)), allocatable      :: dprcparm(:) 
+    integer, allocatable               :: perm(:),  invperm(:) 
+    integer, allocatable               :: mlia(:), nlaggr(:) 
+    type(psb_zspmat_type), pointer     :: base_a    => null() !
+    type(psb_desc_type), pointer       :: base_desc => null() !
+    complex(kind(1.d0)), allocatable   :: dorig(:)
 
   end type psb_zbaseprc_type
 
   type psb_zprec_type
-    type(psb_zbaseprc_type), pointer :: baseprecv(:) => null()
+    type(psb_zbaseprc_type), allocatable  :: baseprecv(:) 
     ! contain type of preconditioning to be performed
     integer                       :: prec, base_prec
   end type psb_zprec_type
@@ -229,7 +229,7 @@ contains
     integer  :: ilev
 
     write(iout,*) 'Preconditioner description'
-    if (associated(p%baseprecv)) then 
+    if (allocated(p%baseprecv)) then 
       if (size(p%baseprecv)>=1) then 
         write(iout,*) 'Base preconditioner'
         select case(p%baseprecv(1)%iprcparm(p_type_))
@@ -253,7 +253,7 @@ contains
       end if
       if (size(p%baseprecv)>=2) then 
         do ilev = 2, size(p%baseprecv) 
-          if (.not.associated(p%baseprecv(ilev)%iprcparm)) then 
+          if (.not.allocated(p%baseprecv(ilev)%iprcparm)) then 
             write(iout,*) 'Inconsistent MLPREC part!'
             return
           endif
@@ -267,7 +267,8 @@ contains
             write(iout,*) 'Smoother:               ', &
                  &  smooth_kinds(p%baseprecv(ilev)%iprcparm(smth_kind_))
             if (p%baseprecv(ilev)%iprcparm(smth_kind_) /= no_smth_) then 
-              write(iout,*) 'Smoothing omega: ', p%baseprecv(ilev)%dprcparm(smooth_omega_)
+              write(iout,*) 'Smoothing omega: ', &
+                   & p%baseprecv(ilev)%dprcparm(smooth_omega_)
               write(iout,*) 'Smoothing position: ',&
                    & smooth_names(p%baseprecv(ilev)%iprcparm(smth_pos_))
             end if
@@ -372,7 +373,7 @@ contains
     type(psb_zprec_type), intent(in) :: p
 
     write(iout,*) 'Preconditioner description'
-    if (associated(p%baseprecv)) then 
+    if (allocated(p%baseprecv)) then 
       if (size(p%baseprecv)>=1) then 
         write(iout,*) 'Base preconditioner'
         select case(p%baseprecv(1)%iprcparm(p_type_))
@@ -395,7 +396,7 @@ contains
         end select
       end if
       if (size(p%baseprecv)>=2) then 
-        if (.not.associated(p%baseprecv(2)%iprcparm)) then 
+        if (.not.allocated(p%baseprecv(2)%iprcparm)) then 
           write(iout,*) 'Inconsistent MLPREC part!'
           return
         endif
@@ -660,11 +661,14 @@ contains
 
     info = 0
 
-    if (associated(p%d)) then 
+    ! Actually we migh just deallocate the top level array, except 
+    ! for the inner UMFPACK or SLU stuff
+
+    if (allocated(p%d)) then 
       deallocate(p%d,stat=info)
     end if
 
-    if (associated(p%av))  then 
+    if (allocated(p%av))  then 
       do i=1,size(p%av) 
         call psb_sp_free(p%av(i),info)
         if (info /= 0) then 
@@ -674,53 +678,40 @@ contains
         end if
       enddo
       deallocate(p%av,stat=info)
-      p%av => null()
     end if
-    if (associated(p%desc_data)) then 
-      if (associated(p%desc_data%matrix_data))  then 
-        call psb_cdfree(p%desc_data,info)
-      end if
-      deallocate(p%desc_data)
-    endif
-    if (associated(p%desc_ac)) then 
-      if (associated(p%desc_ac%matrix_data))  then 
-        call psb_cdfree(p%desc_ac,info)
-      end if
-      deallocate(p%desc_ac)
-    endif
-
-    if (associated(p%dprcparm)) then 
+    ! Do we really need the two below? Probably not.
+    ! call psb_cdfree(p%desc_data,info)
+    ! call psb_cdfree(p%desc_ac,info)
+    
+    if (allocated(p%dprcparm)) then 
       deallocate(p%dprcparm,stat=info)
     end if
-    if (associated(p%base_a)) then 
-      ! This is a pointer to something else, must not free it here. 
-      nullify(p%base_a) 
-    endif
-    if (associated(p%base_desc)) then 
-      ! This is a pointer to something else, must not free it here. 
-      nullify(p%base_desc) 
-    endif
-    if (associated(p%dorig)) then 
+    ! This is a pointer to something else, must not free it here. 
+    nullify(p%base_a) 
+    ! This is a pointer to something else, must not free it here. 
+    nullify(p%base_desc) 
+
+    if (allocated(p%dorig)) then 
       deallocate(p%dorig,stat=info)
     endif
 
-    if (associated(p%mlia)) then 
+    if (allocated(p%mlia)) then 
       deallocate(p%mlia,stat=info)
     endif
 
-    if (associated(p%nlaggr)) then 
+    if (allocated(p%nlaggr)) then 
       deallocate(p%nlaggr,stat=info)
     endif
 
-    if (associated(p%perm)) then 
+    if (allocated(p%perm)) then 
       deallocate(p%perm,stat=info)
     endif
 
-    if (associated(p%invperm)) then 
+    if (allocated(p%invperm)) then 
       deallocate(p%invperm,stat=info)
     endif
 
-    if (associated(p%iprcparm)) then 
+    if (allocated(p%iprcparm)) then 
       if (p%iprcparm(f_type_)==f_slu_) then 
         call psb_dslu_free(p%iprcparm(slu_ptr_),info)
       end if
@@ -737,8 +728,10 @@ contains
     use psb_descriptor_type
     type(psb_dbaseprc_type), intent(inout) :: p
 
-    nullify(p%av,p%d,p%iprcparm,p%dprcparm,p%perm,p%invperm,p%mlia,&
-         & p%nlaggr,p%base_a,p%base_desc,p%dorig,p%desc_data, p%desc_ac)
+    nullify(p%base_a) 
+    nullify(p%base_desc) 
+!!$    nullify(p%av,p%d,p%iprcparm,p%dprcparm,p%perm,p%invperm,p%mlia,&
+!!$         & p%nlaggr,p%base_a,p%base_desc,p%dorig,p%desc_data, p%desc_ac)
 
   end subroutine psb_nullify_dbaseprec
 
@@ -752,11 +745,11 @@ contains
 
     info = 0
 
-    if (associated(p%d)) then 
+    if (allocated(p%d)) then 
       deallocate(p%d,stat=info)
     end if
 
-    if (associated(p%av))  then 
+    if (allocated(p%av))  then 
       do i=1,size(p%av) 
         call psb_sp_free(p%av(i),info)
         if (info /= 0) then 
@@ -766,52 +759,40 @@ contains
         end if
       enddo
       deallocate(p%av,stat=info)
-      p%av => null()
+
     end if
-    if (associated(p%desc_data)) then 
-      if (associated(p%desc_data%matrix_data))  then 
-        call psb_cdfree(p%desc_data,info)
-      end if
-      deallocate(p%desc_data)
-    endif
-    if (associated(p%desc_ac)) then 
-      if (associated(p%desc_ac%matrix_data))  then 
-        call psb_cdfree(p%desc_ac,info)
-      end if
-      deallocate(p%desc_ac)
-    endif
-    if (associated(p%dprcparm)) then 
+    ! call psb_cdfree(p%desc_data,info)
+    ! call psb_cdfree(p%desc_ac,info)
+
+    if (allocated(p%dprcparm)) then 
       deallocate(p%dprcparm,stat=info)
     end if
-    if (associated(p%base_a)) then 
-      ! This is a pointer to something else, must not free it here. 
-      nullify(p%base_a) 
-    endif
-    if (associated(p%base_desc)) then 
-      ! This is a pointer to something else, must not free it here. 
-      nullify(p%base_desc) 
-    endif
-    if (associated(p%dorig)) then 
+    ! This is a pointer to something else, must not free it here. 
+    nullify(p%base_a) 
+    ! This is a pointer to something else, must not free it here. 
+    nullify(p%base_desc) 
+
+    if (allocated(p%dorig)) then 
       deallocate(p%dorig,stat=info)
     endif
 
-    if (associated(p%mlia)) then 
+    if (allocated(p%mlia)) then 
       deallocate(p%mlia,stat=info)
     endif
 
-    if (associated(p%nlaggr)) then 
+    if (allocated(p%nlaggr)) then 
       deallocate(p%nlaggr,stat=info)
     endif
 
-    if (associated(p%perm)) then 
+    if (allocated(p%perm)) then 
       deallocate(p%perm,stat=info)
     endif
 
-    if (associated(p%invperm)) then 
+    if (allocated(p%invperm)) then 
       deallocate(p%invperm,stat=info)
     endif
 
-    if (associated(p%iprcparm)) then 
+    if (allocated(p%iprcparm)) then 
       if (p%iprcparm(f_type_)==f_slu_) then 
         call psb_zslu_free(p%iprcparm(slu_ptr_),info)
       end if
@@ -828,8 +809,9 @@ contains
     use psb_descriptor_type
     type(psb_zbaseprc_type), intent(inout) :: p
 
-    nullify(p%av,p%d,p%iprcparm,p%dprcparm,p%perm,p%invperm,p%mlia,&
-         & p%nlaggr,p%base_a,p%base_desc,p%dorig,p%desc_data,p%desc_ac)
+
+    nullify(p%base_a) 
+    nullify(p%base_desc) 
 
   end subroutine psb_nullify_zbaseprec
 

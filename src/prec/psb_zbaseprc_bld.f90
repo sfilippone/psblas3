@@ -158,13 +158,13 @@ subroutine psb_zbaseprc_bld(a,desc_a,p,info,upd)
   call psb_check_def(p%iprcparm(p_type_),'base_prec',&
        &  diagsc_,is_legal_base_prec)
 
-  allocate(p%desc_data,stat=info)
-  if (info /= 0) then 
-    call psb_errpush(4010,name,a_err='Allocate')
-    goto 9999      
-  end if
-
-  call psb_nullify_desc(p%desc_data)
+!!$  allocate(p%desc_data,stat=info)
+!!$  if (info /= 0) then 
+!!$    call psb_errpush(4010,name,a_err='Allocate')
+!!$    goto 9999      
+!!$  end if
+!!$
+!!$  call psb_nullify_desc(p%desc_data)
 
   select case(p%iprcparm(p_type_)) 
   case (noprec_)

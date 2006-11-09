@@ -59,7 +59,7 @@ subroutine psb_cdalv(m, v, ictxt, desc_a, info, flag)
        & loc_col,nprocs,n,itmpov, k,&
        & l_ov_ix,l_ov_el,idx, flag_, err_act
   integer             :: int_err(5),exch(2)
-  Integer, Pointer    :: temp_ovrlap(:), ov_idx(:),ov_el(:)
+  Integer, allocatable  :: temp_ovrlap(:), ov_idx(:),ov_el(:)
   logical, parameter  :: debug=.false.
   character(len=20)   :: name
 
@@ -225,8 +225,8 @@ subroutine psb_cdalv(m, v, ictxt, desc_a, info, flag)
   l_ov_ix         = l_ov_ix + 1
   ov_idx(l_ov_ix) = -1
 
-  desc_a%ovrlap_index => ov_idx
-  desc_a%ovrlap_elem  => ov_el
+  call psb_transfer(ov_idx,desc_a%ovrlap_index,info) 
+  if (info == 0) call psb_transfer(ov_el,desc_a%ovrlap_elem,info)
   deallocate(temp_ovrlap,stat=info)
   if (info /= 0) then 
     info=4000
@@ -254,9 +254,7 @@ subroutine psb_cdalv(m, v, ictxt, desc_a, info, flag)
       desc_a%loc_to_glob(k) = i
     endif
   enddo
-  nullify(desc_a%bnd_elem,desc_a%halo_index)
 
-!!$  if (debug) write(*,*) 'PSB_CDALL:  Last bits in desc_a', loc_row,k
   ! set fields in desc_a%MATRIX_DATA....
   desc_a%matrix_data(psb_n_row_)  = loc_row
   desc_a%matrix_data(psb_n_col_)  = loc_row

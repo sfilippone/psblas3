@@ -43,6 +43,7 @@ module psi_gthsct_mod
   end interface
 
 contains
+
   subroutine psi_dgthm(n,k,idx,x,y)
 
     implicit none
@@ -116,7 +117,6 @@ contains
       end do
     end if
   end subroutine psi_dsctm
-
 
   subroutine psi_dsctv(n,idx,x,beta,y)
 

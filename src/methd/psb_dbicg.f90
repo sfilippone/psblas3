@@ -98,7 +98,7 @@ subroutine psb_dbicg(a,prec,b,x,eps,desc_a,info,&
   integer, optional, intent(out)     :: iter
   real(kind(1.d0)), optional, intent(out) :: err
 !!$   local data
-  real(kind(1.d0)), pointer  :: aux(:),wwrk(:,:)
+  real(kind(1.d0)), allocatable, target  :: aux(:),wwrk(:,:)
   real(kind(1.d0)), pointer  :: ww(:), q(:),&
        & r(:), p(:), zt(:), pt(:), z(:), rt(:),qt(:)
   integer           :: int_err(5)

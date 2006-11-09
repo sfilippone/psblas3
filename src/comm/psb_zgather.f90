@@ -96,6 +96,8 @@ subroutine  psb_zgatherm(globx, locx, desc_a, info, iroot,&
   end if
   if (root==-1) then
     iiroot=0
+  else 
+    iiroot = root
   endif
 
   if (present(iiglobx)) then

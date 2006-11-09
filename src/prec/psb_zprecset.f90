@@ -34,7 +34,7 @@
 !!$  POSSIBILITY OF SUCH DAMAGE.
 !!$ 
 !!$  
-subroutine psb_zprecset(p,ptype,info,iv,rs,rv)
+subroutine psb_zprecset(p,ptype,info,iv,rs,rv,ilev,nlev)
 
   use psb_serial_mod
   use psb_descriptor_type
@@ -45,148 +45,135 @@ subroutine psb_zprecset(p,ptype,info,iv,rs,rv)
   character(len=*), intent(in)           :: ptype
   integer, intent(out)                   :: info
   integer, optional, intent(in)          :: iv(:)
+  integer, optional, intent(in)          :: nlev,ilev
   real(kind(1.d0)), optional, intent(in) :: rs
   real(kind(1.d0)), optional, intent(in) :: rv(:)
 
-  type(psb_zbaseprc_type), pointer       :: bpv(:)=>null()
   character(len=len(ptype))              :: typeup
-  integer                                :: isz, err
+  integer                                :: isz, err, nlev_, ilev_, i
 
   info = 0
 
-  if (.not.associated(p%baseprecv)) then 
-    allocate(p%baseprecv(1),stat=err)
-    call psb_nullify_baseprec(p%baseprecv(1))
+  if (present(ilev)) then 
+    ilev_ = max(1, ilev)
+  else
+    ilev_ = 1 
+  end if
+  if (present(nlev)) then 
+    if (allocated(p%baseprecv)) then 
+      write(0,*) 'Warning: NLEV is ignored when P is already allocated'
+    end if
+    nlev_ = max(1, nlev)
+  else
+    nlev_ = 1 
+  end if
+
+  if (.not.allocated(p%baseprecv)) then 
+    allocate(p%baseprecv(nlev_),stat=err)
+  else
+    nlev_ = size(p%baseprecv)
   endif
 
-  if (.not.associated(p%baseprecv(1)%iprcparm)) then 
-    allocate(p%baseprecv(1)%iprcparm(ifpsz),stat=err)
-    if (err/=0) then 
-      write(0,*)'Precset Memory Failure',err
-    endif
-  end if
+  if ((ilev_<1).or.(ilev_ > nlev_)) then 
+    write(0,*) 'PRECSET ERRROR: ilev out of bounds'
+    info = -1
+    return
+  endif
+
+  call psb_realloc(ifpsz,p%baseprecv(ilev_)%iprcparm,info)
+  if (info == 0) call psb_realloc(dfpsz,p%baseprecv(ilev_)%dprcparm,info)
+  if (info /= 0) return
+  p%baseprecv(ilev_)%iprcparm(:) = 0
 
   select case(toupper(ptype(1:len_trim(ptype))))
   case ('NONE','NOPREC') 
-    p%baseprecv(1)%iprcparm(:)           = 0
-    p%baseprecv(1)%iprcparm(p_type_)     = noprec_
-    p%baseprecv(1)%iprcparm(f_type_)     = f_none_
-    p%baseprecv(1)%iprcparm(restr_)      = psb_none_
-    p%baseprecv(1)%iprcparm(prol_)       = psb_none_
-    p%baseprecv(1)%iprcparm(iren_)       = 0
-    p%baseprecv(1)%iprcparm(n_ovr_)      = 0
-    p%baseprecv(1)%iprcparm(jac_sweeps_) = 1
+    p%baseprecv(ilev_)%iprcparm(:)           = 0
+    p%baseprecv(ilev_)%iprcparm(p_type_)     = noprec_
+    p%baseprecv(ilev_)%iprcparm(f_type_)     = f_none_
+    p%baseprecv(ilev_)%iprcparm(restr_)      = psb_none_
+    p%baseprecv(ilev_)%iprcparm(prol_)       = psb_none_
+    p%baseprecv(ilev_)%iprcparm(iren_)       = 0
+    p%baseprecv(ilev_)%iprcparm(n_ovr_)      = 0
+    p%baseprecv(ilev_)%iprcparm(jac_sweeps_) = 1
 
   case ('DIAG','DIAGSC')
-    p%baseprecv(1)%iprcparm(:)           = 0
-    p%baseprecv(1)%iprcparm(p_type_)     = diagsc_
-    p%baseprecv(1)%iprcparm(f_type_)     = f_none_
-    p%baseprecv(1)%iprcparm(restr_)      = psb_none_
-    p%baseprecv(1)%iprcparm(prol_)       = psb_none_
-    p%baseprecv(1)%iprcparm(iren_)       = 0 
-    p%baseprecv(1)%iprcparm(n_ovr_)      = 0
-    p%baseprecv(1)%iprcparm(jac_sweeps_) = 1
+    p%baseprecv(ilev_)%iprcparm(:)           = 0
+    p%baseprecv(ilev_)%iprcparm(p_type_)     = diagsc_
+    p%baseprecv(ilev_)%iprcparm(f_type_)     = f_none_
+    p%baseprecv(ilev_)%iprcparm(restr_)      = psb_none_
+    p%baseprecv(ilev_)%iprcparm(prol_)       = psb_none_
+    p%baseprecv(ilev_)%iprcparm(iren_)       = 0 
+    p%baseprecv(ilev_)%iprcparm(n_ovr_)      = 0
+    p%baseprecv(ilev_)%iprcparm(jac_sweeps_) = 1
 
   case ('BJA','ILU') 
-    p%baseprecv(1)%iprcparm(:)            = 0
-    p%baseprecv(1)%iprcparm(p_type_)      = bja_
-    p%baseprecv(1)%iprcparm(f_type_)      = f_ilu_n_
-    p%baseprecv(1)%iprcparm(restr_)       = psb_none_
-    p%baseprecv(1)%iprcparm(prol_)        = psb_none_
-    p%baseprecv(1)%iprcparm(iren_)        = 0
-    p%baseprecv(1)%iprcparm(n_ovr_)       = 0
-    p%baseprecv(1)%iprcparm(ilu_fill_in_) = 0
-    p%baseprecv(1)%iprcparm(jac_sweeps_)  = 1
+    p%baseprecv(ilev_)%iprcparm(:)            = 0
+    p%baseprecv(ilev_)%iprcparm(p_type_)      = bja_
+    p%baseprecv(ilev_)%iprcparm(f_type_)      = f_ilu_n_
+    p%baseprecv(ilev_)%iprcparm(restr_)       = psb_none_
+    p%baseprecv(ilev_)%iprcparm(prol_)        = psb_none_
+    p%baseprecv(ilev_)%iprcparm(iren_)        = 0
+    p%baseprecv(ilev_)%iprcparm(n_ovr_)       = 0
+    p%baseprecv(ilev_)%iprcparm(ilu_fill_in_) = 0
+    p%baseprecv(ilev_)%iprcparm(jac_sweeps_)  = 1
 
   case ('ASM','AS')
-    p%baseprecv(1)%iprcparm(:)            = 0
+    p%baseprecv(ilev_)%iprcparm(:)            = 0
     ! Defaults first 
-    p%baseprecv(1)%iprcparm(p_type_)      = asm_
-    p%baseprecv(1)%iprcparm(f_type_)      = f_ilu_n_
-    p%baseprecv(1)%iprcparm(restr_)       = psb_halo_
-    p%baseprecv(1)%iprcparm(prol_)        = psb_none_
-    p%baseprecv(1)%iprcparm(iren_)        = 0
-    p%baseprecv(1)%iprcparm(n_ovr_)       = 1
-    p%baseprecv(1)%iprcparm(ilu_fill_in_) = 0
-    p%baseprecv(1)%iprcparm(jac_sweeps_)  = 1
+    p%baseprecv(ilev_)%iprcparm(p_type_)      = asm_
+    p%baseprecv(ilev_)%iprcparm(f_type_)      = f_ilu_n_
+    p%baseprecv(ilev_)%iprcparm(restr_)       = psb_halo_
+    p%baseprecv(ilev_)%iprcparm(prol_)        = psb_none_
+    p%baseprecv(ilev_)%iprcparm(iren_)        = 0
+    p%baseprecv(ilev_)%iprcparm(n_ovr_)       = 1
+    p%baseprecv(ilev_)%iprcparm(ilu_fill_in_) = 0
+    p%baseprecv(ilev_)%iprcparm(jac_sweeps_)  = 1
     if (present(iv)) then 
       isz = size(iv) 
-      if (isz >= 1) p%baseprecv(1)%iprcparm(n_ovr_)  = iv(1)
-      if (isz >= 2) p%baseprecv(1)%iprcparm(restr_)  = iv(2)
-      if (isz >= 3) p%baseprecv(1)%iprcparm(prol_)   = iv(3)
-      if (isz >= 4) p%baseprecv(1)%iprcparm(f_type_) = iv(4) 
+      if (isz >= 1) p%baseprecv(ilev_)%iprcparm(n_ovr_)  = iv(1)
+      if (isz >= 2) p%baseprecv(ilev_)%iprcparm(restr_)  = iv(2)
+      if (isz >= 3) p%baseprecv(ilev_)%iprcparm(prol_)   = iv(3)
+      if (isz >= 4) p%baseprecv(ilev_)%iprcparm(f_type_) = iv(4) 
       ! Do not consider renum for the time being. 
-!!$      if (isz >= 5) p%baseprecv(1)%iprcparm(iren_) = iv(5)
+!!$      if (isz >= 5) p%baseprecv(ilev_)%iprcparm(iren_) = iv(5)
     end if
 
 
-  case ('ML', '2L','2LEV')
+  case ('ML', '2L', '2LEV')
 
-    select case (size(p%baseprecv)) 
-    case(1)
-      ! Reallocate
-      allocate(bpv(2),stat=err)
-      if (err/=0) then 
-        write(0,*)'Precset Memory Failure 2l:1',err
-      endif
-      bpv(1) = p%baseprecv(1)
-      call psb_nullify_baseprec(bpv(2))
-      deallocate(p%baseprecv)
-      p%baseprecv => bpv
-      nullify(bpv)
 
-    case(2)
-      ! Do nothing
-
-    case default
-      ! Error
-
-    end select
-
-    allocate(p%baseprecv(2)%iprcparm(ifpsz),stat=err)
-    if (err/=0) then 
-      write(0,*)'Precset Memory Failure 2l:2',err
-    endif
-    allocate(p%baseprecv(2)%dprcparm(dfpsz),stat=err)
-    if (err/=0) then 
-      write(0,*)'Precset Memory Failure 2l:3',err
-    endif
-
-    p%baseprecv(2)%iprcparm(:)             = 0
-
-    p%baseprecv(2)%iprcparm(p_type_)       = bja_
-    p%baseprecv(2)%iprcparm(restr_)        = psb_none_
-    p%baseprecv(2)%iprcparm(prol_)         = psb_none_
-    p%baseprecv(2)%iprcparm(iren_)         = 0
-    p%baseprecv(2)%iprcparm(n_ovr_)        = 0
-    p%baseprecv(2)%iprcparm(ml_type_)      = mult_ml_prec_
-    p%baseprecv(2)%iprcparm(aggr_alg_)     = loc_aggr_
-    p%baseprecv(2)%iprcparm(smth_kind_)    = smth_omg_
-    p%baseprecv(2)%iprcparm(coarse_mat_)   = mat_distr_
-    p%baseprecv(2)%iprcparm(smth_pos_)     = post_smooth_
-    p%baseprecv(2)%iprcparm(glb_smth_)     = 1
-    p%baseprecv(2)%iprcparm(om_choice_)    = lib_choice_
-    p%baseprecv(2)%iprcparm(f_type_)       = f_ilu_n_
-    p%baseprecv(2)%iprcparm(ilu_fill_in_)  = 0
-    p%baseprecv(2)%dprcparm(smooth_omega_) = 4.d0/3.d0         
-    p%baseprecv(2)%iprcparm(jac_sweeps_)   = 1
-
+    p%baseprecv(ilev_)%iprcparm(:)             = 0
+    p%baseprecv(ilev_)%iprcparm(p_type_)       = bja_
+    p%baseprecv(ilev_)%iprcparm(restr_)        = psb_none_
+    p%baseprecv(ilev_)%iprcparm(prol_)         = psb_none_
+    p%baseprecv(ilev_)%iprcparm(iren_)         = 0
+    p%baseprecv(ilev_)%iprcparm(n_ovr_)        = 0
+    p%baseprecv(ilev_)%iprcparm(ml_type_)      = mult_ml_prec_
+    p%baseprecv(ilev_)%iprcparm(aggr_alg_)     = loc_aggr_
+    p%baseprecv(ilev_)%iprcparm(smth_kind_)    = smth_omg_
+    p%baseprecv(ilev_)%iprcparm(coarse_mat_)   = mat_distr_
+    p%baseprecv(ilev_)%iprcparm(smth_pos_)     = post_smooth_
+    p%baseprecv(ilev_)%iprcparm(glb_smth_)     = 1
+    p%baseprecv(ilev_)%iprcparm(om_choice_)    = lib_choice_
+    p%baseprecv(ilev_)%iprcparm(f_type_)       = f_ilu_n_
+    p%baseprecv(ilev_)%iprcparm(ilu_fill_in_)  = 0
+    p%baseprecv(ilev_)%dprcparm(smooth_omega_) = 4.d0/3.d0         
+    p%baseprecv(ilev_)%iprcparm(jac_sweeps_)   = 1
 
     if (present(iv)) then 
       isz = size(iv)
-      if (isz >= 1) p%baseprecv(2)%iprcparm(ml_type_)      = iv(1)
-      if (isz >= 2) p%baseprecv(2)%iprcparm(aggr_alg_)     = iv(2) 
-      if (isz >= 3) p%baseprecv(2)%iprcparm(coarse_mat_)   = iv(3) 
-      if (isz >= 4) p%baseprecv(2)%iprcparm(smth_pos_)     = iv(4)
-      if (isz >= 5) p%baseprecv(2)%iprcparm(f_type_)       = iv(5)
-      if (isz >= 6) p%baseprecv(2)%iprcparm(jac_sweeps_)   = iv(6)
-      if (isz >= 7) p%baseprecv(2)%iprcparm(smth_kind_)    = iv(7) 
-
+      if (isz >= 1) p%baseprecv(ilev_)%iprcparm(ml_type_)      = iv(1)
+      if (isz >= 2) p%baseprecv(ilev_)%iprcparm(aggr_alg_)     = iv(2) 
+      if (isz >= 3) p%baseprecv(ilev_)%iprcparm(coarse_mat_)   = iv(3) 
+      if (isz >= 4) p%baseprecv(ilev_)%iprcparm(smth_pos_)     = iv(4)
+      if (isz >= 5) p%baseprecv(ilev_)%iprcparm(f_type_)       = iv(5)
+      if (isz >= 6) p%baseprecv(ilev_)%iprcparm(jac_sweeps_)   = iv(6)
+      if (isz >= 7) p%baseprecv(ilev_)%iprcparm(smth_kind_)    = iv(7) 
     end if
 
     if (present(rs)) then 
-      p%baseprecv(2)%iprcparm(om_choice_)    = user_choice_
-      p%baseprecv(2)%dprcparm(smooth_omega_) = rs      
+      p%baseprecv(ilev_)%iprcparm(om_choice_)    = user_choice_
+      p%baseprecv(ilev_)%dprcparm(smooth_omega_) = rs      
     end if
 
 

@@ -96,7 +96,7 @@ Subroutine psb_dcgstab(a,prec,b,x,eps,desc_a,info,&
   Integer, Optional, Intent(out)     :: iter
   Real(Kind(1.d0)), Optional, Intent(out) :: err
 !!$   Local data
-  Real(Kind(1.d0)), Pointer  :: aux(:),wwrk(:,:)
+  Real(Kind(1.d0)), allocatable, target   :: aux(:),wwrk(:,:)
   Real(Kind(1.d0)), Pointer  :: q(:),&
        & r(:), p(:), v(:), s(:), t(:), z(:), f(:)
   Real(Kind(1.d0)) :: rerr
@@ -278,6 +278,7 @@ Subroutine psb_dcgstab(a,prec,b,x,eps,desc_a,info,&
       rho_old = rho    
       rho = psb_gedot(q,r,desc_a,info)
 !!$      write(0,'(i2," rho old ",2(f,2x))')me,rho,rho_old
+      If (debug) Write(0,*) 'Bi-CGSTAB RHO:',rho
       If (rho==dzero) Then
          If (debug) Write(0,*) 'Bi-CGSTAB Itxation breakdown R',rho
         Exit iteration
@@ -301,7 +302,7 @@ Subroutine psb_dcgstab(a,prec,b,x,eps,desc_a,info,&
          If (debug) Write(0,*) 'Bi-CGSTAB Iteration breakdown S1', sigma
          Exit iteration
       Endif
-      
+      If (debug) Write(0,*) 'Bi-CGSTAB SIGMA:',sigma
       alpha = rho/sigma
       Call psb_geaxpby(done,r,dzero,s,desc_a,info)
       if(info.ne.0) then
@@ -336,7 +337,7 @@ Subroutine psb_dcgstab(a,prec,b,x,eps,desc_a,info,&
       
       tau  = psb_gedot(t,s,desc_a,info)
       omega = tau/sigma
-      
+      If (debug) Write(0,*) 'Bi-CGSTAB OMEGA:',omega      
       If (omega==dzero) Then
          If (debug) Write(0,*) 'BI-CGSTAB ITERATION BREAKDOWN O',omega
         Exit iteration
@@ -364,7 +365,7 @@ Subroutine psb_dcgstab(a,prec,b,x,eps,desc_a,info,&
 
       If (itrace_ > 0) then 
         if ((mod(itx,itrace_)==0).and.(me == 0)) &
-             & write(*,'(a,i4,3(2x,es10.4)))') &
+             & write(*,'(a,i4,3(2x,es10.4))') &
              & 'bicgstab: ',itx,rerr
       Endif
       

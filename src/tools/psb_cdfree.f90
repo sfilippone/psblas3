@@ -56,7 +56,7 @@ subroutine psb_cdfree(desc_a,info)
   name = 'psb_cdfree'
 
 
-  if (.not.associated(desc_a%matrix_data)) then
+  if (.not.allocated(desc_a%matrix_data)) then
     info=295
     call psb_errpush(info,name)
     return
@@ -73,7 +73,7 @@ subroutine psb_cdfree(desc_a,info)
   endif
 
   !...deallocate desc_a....
-  if(.not.associated(desc_a%loc_to_glob)) then
+  if(.not.allocated(desc_a%loc_to_glob)) then
     info=295
     call psb_errpush(info,name)
     goto 9999
@@ -87,7 +87,7 @@ subroutine psb_cdfree(desc_a,info)
     goto 9999
   end if
 
-  if (.not.associated(desc_a%glob_to_loc)) then
+  if (.not.allocated(desc_a%glob_to_loc)) then
     info=295
     call psb_errpush(info,name)
     goto 9999
@@ -101,7 +101,7 @@ subroutine psb_cdfree(desc_a,info)
     goto 9999
   end if
 
-  if (.not.associated(desc_a%halo_index)) then
+  if (.not.allocated(desc_a%halo_index)) then
     info=295
     call psb_errpush(info,name)
     goto 9999
@@ -115,14 +115,13 @@ subroutine psb_cdfree(desc_a,info)
     goto 9999
   end if
 
-!!$  if (.not.associated(desc_a%bnd_elem)) then
+  if (.not.allocated(desc_a%bnd_elem)) then
 !!$    info=296
 !!$    call psb_errpush(info,name)
 !!$    goto 9999
 !!$  end if
-
-  !deallocate halo_index field
-  if (associated(desc_a%bnd_elem)) then 
+  else
+    !deallocate halo_index field
     deallocate(desc_a%bnd_elem,stat=info)
     if (info /= 0) then
       info=2054
@@ -130,7 +129,8 @@ subroutine psb_cdfree(desc_a,info)
       goto 9999
     end if
   end if
-  if (.not.associated(desc_a%ovrlap_index)) then
+
+  if (.not.allocated(desc_a%ovrlap_index)) then
     info=295
     call psb_errpush(info,name)
     goto 9999
@@ -160,7 +160,7 @@ subroutine psb_cdfree(desc_a,info)
     goto 9999
   end if
 
-  if (associated(desc_a%idx_space)) then 
+  if (allocated(desc_a%idx_space)) then 
     deallocate(desc_a%idx_space,stat=info)
     if (info /= 0) then 
       info=2056
@@ -168,25 +168,6 @@ subroutine psb_cdfree(desc_a,info)
       goto 9999
     end if
   end if
-
-!!$  if (associated(desc_a%halo_pt)) then 
-!!$    deallocate(desc_a%halo_pt,stat=info)
-!!$    if (info /= 0) then 
-!!$      info=2056
-!!$      call psb_errpush(info,name)
-!!$      goto 9999
-!!$    end if
-!!$  end if
-!!$
-!!$  if (associated(desc_a%ovrlap_pt)) then 
-!!$    deallocate(desc_a%ovrlap_pt,stat=info)
-!!$    if (info /= 0) then 
-!!$      info=2056
-!!$      call psb_errpush(info,name)
-!!$      goto 9999
-!!$    end if
-!!$  end if
-
 
   call psb_nullify_desc(desc_a)
 

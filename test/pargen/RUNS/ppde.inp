@@ -1,6 +1,6 @@
 7                      Number of entries below this
 BICGSTAB               Iterative method BICGSTAB CGS  BICG BICGSTABL
-5                      Preconditioner 0: NONE 1:DIAGSC 2:ILU 3: AS 4:ASH 5:RAS 6:RASH 
+2                      Preconditioner ILU DIAGSC NONE 
 2                      Number ov overlapping levels
 COO                    A Storage format CSR COO JAD 
 20                     Domain size (acutal sistem is this**3)

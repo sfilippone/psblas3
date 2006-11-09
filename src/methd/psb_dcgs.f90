@@ -96,7 +96,7 @@ Subroutine psb_dcgs(a,prec,b,x,eps,desc_a,info,&
   Integer, Optional, Intent(out)     :: iter
   Real(Kind(1.d0)), Optional, Intent(out) :: err
 !!$   local data
-  Real(Kind(1.d0)), Pointer  :: aux(:),wwrk(:,:)
+  Real(Kind(1.d0)), allocatable, target   :: aux(:),wwrk(:,:)
   Real(Kind(1.d0)), Pointer  :: ww(:), q(:),&
        & r(:), p(:), v(:), s(:), z(:), f(:), rt(:),qt(:),uv(:)
   Real(Kind(1.d0)) :: rerr

@@ -45,7 +45,7 @@ subroutine psb_dtransp(a,b,c,fmt)
 
   character(len=5)           :: fmt_
   integer  ::c_, info, nz 
-  integer, pointer :: itmp(:)=>null()
+  integer, allocatable  :: itmp(:)
   type(psb_dspmat_type)      :: tmp
 
   if (present(c)) then 
@@ -60,7 +60,7 @@ subroutine psb_dtransp(a,b,c,fmt)
   endif
 
   if (.true.) then 
-    if (associated(b%aspk)) call psb_sp_free(b,info)
+    if (allocated(b%aspk)) call psb_sp_free(b,info)
     b%fida   = 'COO'
     b%descra = 'GUN'
     call psb_csdp(a,b,info)
@@ -70,7 +70,7 @@ subroutine psb_dtransp(a,b,c,fmt)
       return
     end if
   else
-    if (associated(b%aspk)) call psb_sp_free(b,info)
+    if (allocated(b%aspk)) call psb_sp_free(b,info)
     call psb_sp_clone(a,b,info)
     
     if (b%fida=='CSR') then 
@@ -86,9 +86,9 @@ subroutine psb_dtransp(a,b,c,fmt)
 !!$  write(0,*) 'TRANSP CHECKS:',a%m,a%k,&
 !!$       &minval(b%ia1(1:nz)),maxval(b%ia1(1:nz)),&
 !!$       &minval(b%ia2(1:nz)),maxval(b%ia2(1:nz))
-  itmp  => b%ia1
-  b%ia1 => b%ia2
-  b%ia2 => itmp
+  call psb_transfer(b%ia1,itmp,info)
+  call psb_transfer(b%ia2,b%ia1,info)
+  call psb_transfer(itmp,b%ia2,info)
 
   b%m = a%k 
   b%k = a%m

@@ -77,6 +77,9 @@ subroutine psb_dnumbmm(a,b,c)
          & c%ia2,c%ia1,0,c%aspk,temp)
   else
     call inner_numbmm(a,b,c,temp,info)
+    if (info /= 0) then 
+      write(0,*) 'Error ',info,' from inner numbmm'
+    end if
   end if
   deallocate(temp) 
   return
@@ -118,11 +121,16 @@ contains
         ajj = aval(jj)
         if ((j<1).or.(j>m)) then 
           write(0,*) ' NUMBMM: Problem with A ',i,jj,j,m
+            info = 1
+            return
+          
         endif
         call psb_sp_getrow(j,b,nbzr,ibrw,ibcl,bval,info)
         do k=1,nbzr
           if ((ibcl(k)<1).or.(ibcl(k)>maxlmn)) then 
             write(0,*) 'Problem in NUMBM 1:',j,k,ibcl(k),maxlmn
+            info = 2
+            return
           else
             temp(ibcl(k)) = temp(ibcl(k)) + ajj * bval(k)
           endif
@@ -131,6 +139,8 @@ contains
       do  j = c%ia2(i),c%ia2(i+1)-1
         if((c%ia1(j)<1).or. (c%ia1(j) > maxlmn))  then 
           write(0,*) ' NUMBMM: output problem',i,j,c%ia1(j),maxlmn
+            info = 3
+            return
         else
           c%aspk(j) = temp(c%ia1(j))
           temp(c%ia1(j)) = dzero
@@ -142,6 +152,5 @@ contains
 
 
   end subroutine inner_numbmm
-
 
 end subroutine psb_dnumbmm

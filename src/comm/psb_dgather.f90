@@ -95,6 +95,8 @@ subroutine  psb_dgatherm(globx, locx, desc_a, info, iroot,&
   end if
   if (root==-1) then
     iiroot=0
+  else 
+    iiroot = root
   endif
 
   if (present(iiglobx)) then
@@ -258,7 +260,7 @@ subroutine  psb_dgatherv(globx, locx, desc_a, info, iroot,&
 
   ! locals
   integer                  :: int_err(5), ictxt, np, me, &
-       & err_act, n, root, iiroot, ilocx, iglobx, jlocx,&
+       & err_act, n, root, ilocx, iglobx, jlocx,&
        & jglobx, lda_locx, lda_globx, m, k, jlx, ilx, i, idx
 
   character(len=20)        :: name, ch_err
@@ -289,9 +291,6 @@ subroutine  psb_dgatherv(globx, locx, desc_a, info, iroot,&
   else
      root = -1
   end if
-  if (root==-1) then
-    iiroot=0
-  endif
 
   jglobx=1
   if (present(iiglobx)) then

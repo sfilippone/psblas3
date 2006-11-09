@@ -49,7 +49,7 @@ subroutine psb_dalloc(x, desc_a, info, n)
   implicit none
 
   !....parameters...
-  real(kind(1.d0)), pointer             :: x(:,:)
+  real(kind(1.d0)), allocatable, intent(out)  :: x(:,:)
   type(psb_desc_type), intent(in)       :: desc_a
   integer                               :: info
   integer, optional, intent(in)         :: n
@@ -197,7 +197,7 @@ subroutine psb_dallocv(x, desc_a,info,n)
   implicit none
 
   !....parameters...
-  real(kind(1.d0)), pointer       :: x(:)
+  real(kind(1.d0)), allocatable, intent(out) :: x(:)
   type(psb_desc_type), intent(in) :: desc_a
   integer                         :: info
   integer, optional, intent(in)   :: n

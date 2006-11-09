@@ -49,7 +49,7 @@ subroutine psb_zmlprc_bld(a,desc_a,p,info)
   type(psb_zbaseprc_type), intent(inout),target    :: p
   integer, intent(out)                      :: info
 
-  type(psb_desc_type), pointer              :: desc_p
+  type(psb_desc_type), pointer              :: desc_ac
 
   integer :: i, nrg, nzg, err_act,k
   character(len=20) :: name, ch_err
@@ -77,13 +77,13 @@ subroutine psb_zmlprc_bld(a,desc_a,p,info)
       integer, intent(in)               :: aggr_type
       type(psb_zspmat_type), intent(in) :: a
       type(psb_desc_type), intent(in)   :: desc_a
-      integer, pointer                  :: ilaggr(:),nlaggr(:)
+      integer, allocatable              :: ilaggr(:),nlaggr(:)
       integer, intent(out)              :: info
     end subroutine psb_zgenaggrmap
   end interface
 
   interface psb_bldaggrmat
-    subroutine psb_zbldaggrmat(a,desc_a,ac,p,desc_p,info)
+    subroutine psb_zbldaggrmat(a,desc_a,ac,desc_ac,p,info)
       use psb_prec_type
       use psb_descriptor_type
       use psb_spmat_type
@@ -91,7 +91,7 @@ subroutine psb_zmlprc_bld(a,desc_a,p,info)
       type(psb_zbaseprc_type), intent(inout),target    :: p
       type(psb_zspmat_type), intent(out),target :: ac
       type(psb_desc_type), intent(in)           :: desc_a
-      type(psb_desc_type), intent(inout)        :: desc_p
+      type(psb_desc_type), intent(inout)        :: desc_ac
       integer, intent(out)                      :: info
     end subroutine psb_zbldaggrmat
   end interface
@@ -105,7 +105,7 @@ subroutine psb_zmlprc_bld(a,desc_a,p,info)
   call psb_nullify_sp(ac)
 
 
-  if (.not.associated(p%iprcparm)) then 
+  if (.not.allocated(p%iprcparm)) then 
     info = 2222
     call psb_errpush(info,name)
     goto 9999
@@ -122,7 +122,7 @@ subroutine psb_zmlprc_bld(a,desc_a,p,info)
        &   pre_smooth_,is_legal_ml_smooth_pos)
 
 
-  nullify(p%desc_data)
+!!$  nullify(p%desc_data)
   select case(p%iprcparm(f_type_))
   case(f_ilu_n_)      
     call psb_check_def(p%iprcparm(ilu_fill_in_),'Level',0,is_legal_ml_lev)
@@ -132,10 +132,6 @@ subroutine psb_zmlprc_bld(a,desc_a,p,info)
   call psb_check_def(p%dprcparm(smooth_omega_),'omega',dzero,is_legal_omega)
   call psb_check_def(p%iprcparm(jac_sweeps_),'Jacobi sweeps',&
        & 1,is_legal_jac_sweeps)
-
-
-
-  nullify(p%d) 
 
 
   ! Currently this is ignored by gen_aggrmap, but it could be 
@@ -150,22 +146,22 @@ subroutine psb_zmlprc_bld(a,desc_a,p,info)
   end if
 
   if (debug) write(0,*) 'Out from genaggrmap',p%nlaggr
-  nullify(desc_p) 
-  allocate(desc_p)
-  call psb_nullify_desc(desc_p)
-  call psb_bldaggrmat(a,desc_a,ac,p,desc_p,info)
+  nullify(desc_ac) 
+  allocate(desc_ac)
+  call psb_nullify_desc(desc_ac)
+  call psb_bldaggrmat(a,desc_a,ac,desc_ac,p,info)
   if(info /= 0) then
     info=4010
     ch_err='psb_bld_aggrmat'
     call psb_errpush(info,name,a_err=ch_err)
     goto 9999
   end if
-  if (debug) write(0,*) 'Out from bldaggrmat',desc_p%matrix_data(:)
+  if (debug) write(0,*) 'Out from bldaggrmat',desc_ac%matrix_data(:)
 
 
 
-  call psb_baseprc_bld(ac,desc_p,p,info)
-  if (debug) write(0,*) 'Out from basaeprcbld',info
+  call psb_baseprc_bld(ac,desc_ac,p,info)
+  if (debug) write(0,*) 'Out from baseprcbld',info
   if(info /= 0) then
     info=4010
     ch_err='psb_baseprc_bld'
@@ -182,9 +178,9 @@ subroutine psb_zmlprc_bld(a,desc_a,p,info)
   ! Hence a separate AC and a TRANSFER function at the end. 
   !
   call psb_sp_transfer(ac,p%av(ac_),info)
-
-  call psb_cdfree(desc_p,info)
-  deallocate(desc_p)
+  p%base_a => p%av(ac_)
+  call psb_cdtransfer(desc_ac,p%desc_ac,info)
+  p%base_desc => p%desc_ac
 
   call psb_erractionrestore(err_act)
   return

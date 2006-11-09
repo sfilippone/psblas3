@@ -70,7 +70,7 @@ module psb_prec_mod
       real(kind(1.d0)), optional, intent(in) :: rs
       real(kind(1.d0)), optional, intent(in) :: rv(:)
     end subroutine psb_dprecset
-    subroutine psb_zprecset(prec,ptype,info,iv,rs,rv)
+    subroutine psb_zprecset(prec,ptype,info,iv,rs,rv,ilev,nlev)
       use psb_serial_mod
       use psb_descriptor_type
       use psb_prec_type
@@ -81,6 +81,7 @@ module psb_prec_mod
       integer, optional, intent(in)          :: iv(:)
       real(kind(1.d0)), optional, intent(in) :: rs
       real(kind(1.d0)), optional, intent(in) :: rv(:)
+      integer, optional, intent(in)          :: nlev,ilev
     end subroutine psb_zprecset
   end interface
 

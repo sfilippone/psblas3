@@ -36,6 +36,7 @@ subroutine psb_ztransp(a,b,c,fmt)
   use psb_spmat_type
   use psb_tools_mod
   use psb_string_mod
+  use psb_realloc_mod
   use psb_serial_mod, only : psb_ipcoo2csr, psb_ipcsr2coo, psb_fixcoo, psb_csdp
   implicit none
 
@@ -44,8 +45,8 @@ subroutine psb_ztransp(a,b,c,fmt)
   character(len=*), optional :: fmt
 
   character(len=5)           :: fmt_
-  integer  ::c_, info, nz 
-  integer, pointer :: itmp(:)=>null()
+  integer                    :: c_, info, nz 
+  integer, allocatable       :: itmp(:)
   type(psb_zspmat_type)      :: tmp
 
   if (present(c)) then 
@@ -58,11 +59,19 @@ subroutine psb_ztransp(a,b,c,fmt)
   else 
     fmt_='CSR'
   endif
+
   if (.true.) then 
-    b%fida = 'COO'
+    if (allocated(b%aspk)) call psb_sp_free(b,info)
+    b%fida   = 'COO'
+    b%descra = 'GUN'
     call psb_csdp(a,b,info)
+!!$    write(0,*) 'Check from CSDP',b%m,b%k,b%fida,b%descra,b%infoa(psb_nnz_)
+    if (info /= 0) then 
+      write(0,*) 'transp: info from CSDP ',info
+      return
+    end if
   else
-    if (associated(b%aspk)) call psb_sp_free(b,info)
+    if (allocated(b%aspk)) call psb_sp_free(b,info)
     call psb_sp_clone(a,b,info)
     
     if (b%fida=='CSR') then 
@@ -73,17 +82,14 @@ subroutine psb_ztransp(a,b,c,fmt)
       write(0,*) 'Unimplemented case in TRANSP '
     endif
   endif
-!!$  nz = b%infoa(nnz_)
-!!$  write(0,*) 'TRANSP CHECKS:',a%m,a%k,&
-!!$       &minval(b%ia1(1:nz)),maxval(b%ia1(1:nz)),&
-!!$       &minval(b%ia2(1:nz)),maxval(b%ia2(1:nz))
-  itmp  => b%ia1
-  b%ia1 => b%ia2
-  b%ia2 => itmp
+
+  call psb_transfer(b%ia1,itmp,info)
+  call psb_transfer(b%ia2,b%ia1,info)
+  call psb_transfer(itmp,b%ia2,info)
 
   b%m = a%k 
   b%k = a%m
-!!$  write(0,*) 'Calling IPCOO2CSR from transp90 ',b%m,b%k
+
   if (fmt_=='CSR') then 
     call psb_ipcoo2csr(b,info)
     b%fida='CSR'

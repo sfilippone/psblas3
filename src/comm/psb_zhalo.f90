@@ -31,7 +31,8 @@
 ! File:  psb_zhalo.f90
 !
 ! Subroutine: psb_zhalom
-!   This subroutine performs the exchange of the halo elements in a distributed dense matrix between all the processes.
+!   This subroutine performs the exchange of the halo elements in a 
+!    distributed dense matrix between all the processes.
 !
 ! Parameters:
 !   x         -  real,dimension(:,:).          The local part of the dense matrix.
@@ -69,6 +70,7 @@ subroutine  psb_zhalom(x,desc_a,info,alpha,jx,ik,work,tran,mode)
   complex(kind(1.d0)),pointer :: iwork(:), xp(:,:)
   character                :: ltran
   character(len=20)        :: name, ch_err
+  logical                  :: aliw
 
   name='psb_zhalom'
   if(psb_get_errstatus().ne.0) return 
@@ -147,9 +149,11 @@ subroutine  psb_zhalom(x,desc_a,info,alpha,jx,ik,work,tran,mode)
   liwork=nrow
   if (present(work)) then
     if(size(work).ge.liwork) then
+      aliw=.false.
       iwork => work
     else
-      call psb_realloc(liwork,iwork,info)
+      aliw=.true.
+      allocate(iwork(liwork),stat=info)
       if(info.ne.0) then
         info=4010
         ch_err='psb_realloc'
@@ -158,7 +162,9 @@ subroutine  psb_zhalom(x,desc_a,info,alpha,jx,ik,work,tran,mode)
       end if
     end if
   else
-    call psb_realloc(liwork,iwork,info)
+    aliw=.true.
+    allocate(iwork(liwork),stat=info)
+
     if(info.ne.0) then
       info=4010
       ch_err='psb_realloc'
@@ -178,12 +184,12 @@ subroutine  psb_zhalom(x,desc_a,info,alpha,jx,ik,work,tran,mode)
   end if
 
   if(info.ne.0) then
-    ch_err='PSI_dSwap...'
+    ch_err='PSI_zswapdata'
     call psb_errpush(4010,name,a_err=ch_err)
     goto 9999
   end if
 
-  if(.not.present(work)) deallocate(iwork)
+  if (aliw) deallocate(iwork)
   nullify(iwork)
 
   call psb_erractionrestore(err_act)
@@ -234,7 +240,8 @@ end subroutine psb_zhalom
 !!$  
 !
 ! Subroutine: psb_zhalov
-!   This subroutine performs the exchange of the halo elements in a distributed dense vector between all the processes.
+!   This subroutine performs the exchange of the halo elements in a 
+!    distributed dense vector between all the processes.
 !
 ! Parameters:
 !   x         -  real,dimension(:).            The local part of the dense vector.
@@ -269,6 +276,7 @@ subroutine  psb_zhalov(x,desc_a,info,alpha,work,tran,mode)
   complex(kind(1.d0)),pointer :: iwork(:)
   character                :: ltran
   character(len=20)        :: name, ch_err
+  logical                  :: aliw
 
   name='psb_zhalov'
   if(psb_get_errstatus().ne.0) return 
@@ -329,9 +337,11 @@ subroutine  psb_zhalov(x,desc_a,info,alpha,work,tran,mode)
   liwork=nrow
   if (present(work)) then
     if(size(work).ge.liwork) then
+      aliw=.false.
       iwork => work
     else
-      call psb_realloc(liwork,iwork,info)
+      aliw=.true.
+      allocate(iwork(liwork),stat=info)
       if(info.ne.0) then
         info=4010
         ch_err='psb_realloc'
@@ -340,7 +350,8 @@ subroutine  psb_zhalov(x,desc_a,info,alpha,work,tran,mode)
       end if
     end if
   else
-    call psb_realloc(liwork,iwork,info)
+    aliw=.true.
+    allocate(iwork(liwork),stat=info)
     if(info.ne.0) then
       info=4010
       ch_err='psb_realloc'
@@ -364,7 +375,7 @@ subroutine  psb_zhalov(x,desc_a,info,alpha,work,tran,mode)
     goto 9999
   end if
 
-  if(.not.present(work)) deallocate(iwork)
+  if (aliw) deallocate(iwork)
   nullify(iwork)
 
   call psb_erractionrestore(err_act)

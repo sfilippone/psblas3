@@ -46,7 +46,7 @@ subroutine psb_dfree(x, desc_a, info)
   implicit none
 
   !....parameters...
-  real(kind(1.d0)),pointer    :: x(:,:)
+  real(kind(1.d0)),allocatable, intent(inout)  :: x(:,:)
   type(psb_desc_type), intent(in) :: desc_a
   integer                     :: info
 
@@ -59,10 +59,10 @@ subroutine psb_dfree(x, desc_a, info)
   info=0
   call psb_erractionsave(err_act)
   name='psb_dfree'
- if (.not.associated(desc_a%matrix_data)) then
+  if (.not.allocated(desc_a%matrix_data)) then
      info=295
      call psb_errpush(info,name)
-     return
+     goto 9999
   end if
 
   ictxt=desc_a%matrix_data(psb_ctxt_)
@@ -75,10 +75,10 @@ subroutine psb_dfree(x, desc_a, info)
     goto 9999
   endif
 
-  if (.not.associated(x)) then
-    info=295
-    call psb_errpush(info,name)
-    goto 9999
+  if (.not.allocated(x)) then
+     info=295
+     call psb_errpush(info,name)
+     goto 9999
   end if
 
   !deallocate x
@@ -87,8 +87,6 @@ subroutine psb_dfree(x, desc_a, info)
     info=4000
     call psb_errpush(info,name)
     goto 9999
-  else
-    nullify(x)
   endif
 
 
@@ -123,7 +121,7 @@ subroutine psb_dfreev(x, desc_a, info)
 
   implicit none
   !....parameters...
-  real(kind(1.d0)),pointer    :: x(:)
+  real(kind(1.d0)),allocatable, intent(inout)    :: x(:)
   type(psb_desc_type), intent(in) :: desc_a
   integer, intent(out)            :: info 
   !...locals....
@@ -136,8 +134,7 @@ subroutine psb_dfreev(x, desc_a, info)
   call psb_erractionsave(err_act)
   name='psb_dfreev'
 
-  
-  if (.not.associated(desc_a%matrix_data)) then
+  if (.not.allocated(desc_a%matrix_data)) then
      info=295
      call psb_errpush(info,name)
      return
@@ -151,10 +148,10 @@ subroutine psb_dfreev(x, desc_a, info)
     goto 9999
   endif
 
-  if (.not.associated(x)) then
-    info=295
-    call psb_errpush(info,name)
-    goto 9999
+  if (.not.allocated(x)) then
+     info=295
+     call psb_errpush(info,name)
+     goto 9999
   end if
 
   !deallocate x
@@ -162,8 +159,6 @@ subroutine psb_dfreev(x, desc_a, info)
   if (info /= no_err) then
     info=4000
     call psb_errpush(info,name)
-  else
-    nullify(x)
   endif
 
   call psb_erractionrestore(err_act)

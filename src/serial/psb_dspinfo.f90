@@ -46,7 +46,7 @@ subroutine psb_dspinfo(ireq,a,ires,info,iaux)
   use psb_string_mod
   implicit none
 
-  type(psb_dspmat_type), intent(in) :: a
+  type(psb_dspmat_type), intent(in), target :: a
   integer, intent(in)               :: ireq
   integer, intent(out)              :: ires, info
   integer, intent(in), optional     :: iaux

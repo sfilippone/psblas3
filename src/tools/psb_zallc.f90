@@ -49,7 +49,7 @@ subroutine psb_zalloc(x, desc_a, info, n)
   implicit none
 
   !....parameters...
-  complex(kind(1.d0)), pointer          :: x(:,:)
+  complex(kind(1.d0)), allocatable, intent(out) :: x(:,:)
   type(psb_desc_type), intent(in)       :: desc_a
   integer                               :: info
   integer, optional, intent(in)         :: n
@@ -196,7 +196,7 @@ subroutine psb_zallocv(x, desc_a,info,n)
   implicit none
 
   !....parameters...
-  complex(kind(1.d0)), pointer    :: x(:)
+  complex(kind(1.d0)), allocatable, intent(out) :: x(:)
   type(psb_desc_type), intent(in) :: desc_a
   integer                         :: info
   integer, optional, intent(in)         :: n

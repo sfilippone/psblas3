@@ -580,3 +580,104 @@ subroutine psb_dmdots(res, x, y, desc_a, info)
   end if
   return
 end subroutine psb_dmdots
+
+
+
+
+subroutine psb_ddot2v(res, x, y,w,z,desc_a, info)  
+  use psb_descriptor_type
+  use psb_check_mod
+  use psb_error_mod
+  use psb_penv_mod
+  implicit none
+
+  real(kind(1.d0)), intent(in)     :: x(:), y(:),w(:), z(:)
+  real(kind(1.d0)), intent(out)    :: res(:)
+  type(psb_desc_type), intent(in)  :: desc_a
+  integer, intent(out)             :: info
+
+  ! locals
+  integer                  :: int_err(5), ictxt, np, me,&
+       & err_act, n, iix, jjx, ix, ijx, iy, ijy, iiy, jjy, i, m, j, k
+  real(kind(1.D0))         :: dot_local(2)
+  real(kind(1.d0))         :: ddot
+  character(len=20)        :: name, ch_err
+
+  name='psb_ddot'
+  if(psb_get_errstatus().ne.0) return 
+  info=0
+  call psb_erractionsave(err_act)
+
+  ictxt=desc_a%matrix_data(psb_ctxt_)
+
+  call psb_info(ictxt, me, np)
+  if (np == -ione) then
+    info = 2010
+    call psb_errpush(info,name)
+    goto 9999
+  endif
+
+  ix = ione
+  iy = ione
+  m = desc_a%matrix_data(psb_m_)
+
+  ! check vector correctness
+  call psb_chkvect(m,ione,size(x,1),ix,ix,desc_a%matrix_data,info,iix,jjx)
+  call psb_chkvect(m,ione,size(y,1),iy,iy,desc_a%matrix_data,info,iiy,jjy)
+  if(info.ne.0) then
+    info=4010
+    ch_err='psb_chkvect'
+    call psb_errpush(info,name,a_err=ch_err)
+    goto 9999
+  end if
+
+  if ((iix.ne.ione).or.(iiy.ne.ione)) then
+    info=3040
+    call psb_errpush(info,name)
+    goto 9999
+  end if
+
+  if(m.ne.0) then
+    if(desc_a%matrix_data(psb_n_row_).gt.0) then
+      dot_local(1) = ddot(desc_a%matrix_data(psb_n_row_),&
+           & x,ione,y,ione)
+      dot_local(2) = ddot(desc_a%matrix_data(psb_n_row_),&
+           & w,ione,z,ione)
+      ! adjust dot_local because overlapped elements are computed more than once
+      i=1
+      do while (desc_a%ovrlap_elem(i).ne.-ione)
+        dot_local(1) = dot_local(1) -&
+             & (desc_a%ovrlap_elem(i+1)-1)/desc_a%ovrlap_elem(i+1)*&
+             & x(desc_a%ovrlap_elem(i))*&
+             & y(desc_a%ovrlap_elem(i))
+        dot_local(2) = dot_local(2) -&
+             & (desc_a%ovrlap_elem(i+1)-1)/desc_a%ovrlap_elem(i+1)*&
+             & w(desc_a%ovrlap_elem(i))*&
+             & z(desc_a%ovrlap_elem(i))
+        i = i+2
+      end do
+    else
+      dot_local=0.d0
+    end if
+  else
+    dot_local=0.d0
+  end if
+
+  ! compute global sum
+  call psb_sum(ictxt, dot_local)
+
+  res(1:2) = dot_local(1:2)
+
+  call psb_erractionrestore(err_act)
+  return  
+
+9999 continue
+  call psb_erractionrestore(err_act)
+
+  if (err_act.eq.act_abort) then
+    call psb_error(ictxt)
+    return
+  end if
+  return
+end subroutine psb_ddot2v
+

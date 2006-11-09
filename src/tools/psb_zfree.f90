@@ -46,7 +46,7 @@ subroutine psb_zfree(x, desc_a, info)
   implicit none
 
   !....parameters...
-  complex(kind(1.d0)),pointer    :: x(:,:)
+  complex(kind(1.d0)),allocatable, intent(inout)    :: x(:,:)
   type(psb_desc_type), intent(in) :: desc_a
   integer                     :: info
 
@@ -59,7 +59,7 @@ subroutine psb_zfree(x, desc_a, info)
   info=0
   call psb_erractionsave(err_act)
   name='psb_zfree'
- if (.not.associated(desc_a%matrix_data)) then
+ if (.not.allocated(desc_a%matrix_data)) then
      info=295
      call psb_errpush(info,name)
      return
@@ -75,7 +75,7 @@ subroutine psb_zfree(x, desc_a, info)
     goto 9999
   endif
 
-  if (.not.associated(x)) then
+  if (.not.allocated(x)) then
      info=295
      call psb_errpush(info,name)
      goto 9999
@@ -87,8 +87,6 @@ subroutine psb_zfree(x, desc_a, info)
     info=4000
     call psb_errpush(info,name)
     goto 9999
-  else
-     nullify(x)
   endif
   
 
@@ -123,7 +121,7 @@ subroutine psb_zfreev(x, desc_a, info)
 
   implicit none
   !....parameters...
-  complex(kind(1.d0)),pointer    :: x(:)
+  complex(kind(1.d0)),allocatable, intent(inout)    :: x(:)
   type(psb_desc_type), intent(in) :: desc_a
   integer                     :: info
 
@@ -138,7 +136,7 @@ subroutine psb_zfreev(x, desc_a, info)
   name='psb_zfreev'
 
 
-  if (.not.associated(desc_a%matrix_data)) then
+  if (.not.allocated(desc_a%matrix_data)) then
      info=295
      call psb_errpush(info,name)
      goto 9999
@@ -153,7 +151,7 @@ subroutine psb_zfreev(x, desc_a, info)
 
   endif
 
-  if (.not.associated(x)) then
+  if (.not.allocated(x)) then
      info=295
      call psb_errpush(info,name)
      goto 9999
@@ -164,8 +162,6 @@ subroutine psb_zfreev(x, desc_a, info)
   if (info /= no_err) then
      info=4000
      call psb_errpush(info,name)
-  else
-     nullify(x)
   endif
   
   call psb_erractionrestore(err_act)

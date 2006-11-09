@@ -48,7 +48,7 @@ subroutine psb_zasb(x, desc_a, info)
   implicit none
 
   type(psb_desc_type), intent(in) ::  desc_a
-  complex(kind(1.d0)), pointer       ::  x(:,:)
+  complex(kind(1.d0)), allocatable, intent(inout) ::  x(:,:)
   integer, intent(out)            ::  info
 
   ! local variables
@@ -62,7 +62,7 @@ subroutine psb_zasb(x, desc_a, info)
   name='psb_zasb'
   call psb_erractionsave(err_act)
 
-  if ((.not.associated(desc_a%matrix_data))) then
+  if ((.not.allocated(desc_a%matrix_data))) then
     info=3110
     call psb_errpush(info,name)
     goto 9999
@@ -176,8 +176,8 @@ subroutine psb_zasbv(x, desc_a, info)
   use psb_penv_mod
   implicit none
 
-  type(psb_desc_type), intent(in) ::  desc_a
-  complex(kind(1.d0)), pointer   ::  x(:)
+  type(psb_desc_type), intent(in)                 ::  desc_a
+  complex(kind(1.d0)), allocatable, intent(inout) ::  x(:)
   integer, intent(out)        ::  info
 
   ! local variables

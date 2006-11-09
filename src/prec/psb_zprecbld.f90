@@ -116,10 +116,10 @@ subroutine psb_zprecbld(a,desc_a,p,info,upd)
     iupd='F'
   endif
 
-  if (.not.associated(p%baseprecv)) then 
+  if (.not.allocated(p%baseprecv)) then 
     !! Error 1: should call precset
       info=4010
-      ch_err='unassociated bpv'
+      ch_err='unallocated bpv'
       call psb_errpush(info,name,a_err=ch_err)
       goto 9999
   end if
@@ -128,7 +128,6 @@ subroutine psb_zprecbld(a,desc_a,p,info,upd)
   !
   ! ALso should define symbolic names for the preconditioners. 
   !
-
   if (size(p%baseprecv) >= 1) then 
     call init_baseprc_av(p%baseprecv(1),info)
     if (info /= 0) then 
@@ -190,11 +189,11 @@ contains
   subroutine init_baseprc_av(p,info)
     type(psb_zbaseprc_type), intent(inout) :: p
     integer                                :: info
-    if (associated(p%av)) then 
+    if (allocated(p%av)) then 
       ! Have not decided what to do yet
     end if
     allocate(p%av(max_avsz),stat=info)
-    if (info /= 0) return
+!!$    if (info /= 0) return
     do k=1,size(p%av)
       call psb_nullify_sp(p%av(k))
     end do

@@ -47,9 +47,9 @@ subroutine psb_iasb(x, desc_a, info)
   use psb_penv_mod
   implicit none
 
-  type(psb_desc_type), intent(in) ::  desc_a
-  integer, pointer                ::  x(:,:)
-  integer, intent(out)            ::  info
+  type(psb_desc_type), intent(in)     ::  desc_a
+  integer, allocatable, intent(inout) ::  x(:,:)
+  integer, intent(out)                ::  info
 
   ! local variables
   integer :: ictxt,np,me,nrow,ncol,err_act
@@ -62,10 +62,10 @@ subroutine psb_iasb(x, desc_a, info)
   name='psb_iasb'
   call psb_erractionsave(err_act)
 
-  if ((.not.associated(desc_a%matrix_data))) then
-    info=3110
-    call psb_errpush(info,name)
-    return
+  if ((.not.allocated(desc_a%matrix_data))) then
+     info=3110
+     call psb_errpush(info,name)
+     return
   endif
 
   ictxt=desc_a%matrix_data(psb_ctxt_)
@@ -171,9 +171,9 @@ subroutine psb_iasbv(x, desc_a, info)
   use psb_penv_mod
   implicit none
 
-  type(psb_desc_type), intent(in) ::  desc_a
-  integer, pointer                ::  x(:)
-  integer, intent(out)            ::  info
+  type(psb_desc_type), intent(in)     ::  desc_a
+  integer, allocatable, intent(inout) ::  x(:)
+  integer, intent(out)                ::  info
 
   ! local variables
   integer :: ictxt,np,me, err_act

@@ -55,14 +55,14 @@ module psb_serial_mod
      subroutine psb_dcsrws(rw,a,info,trans)
        use psb_spmat_type
        type(psb_dspmat_type) :: a
-       real(kind(1.d0)), pointer  :: rw(:) 
+       real(kind(1.d0)), allocatable   :: rw(:) 
        integer :: info
        character, optional :: trans
      end subroutine psb_dcsrws
      subroutine psb_zcsrws(rw,a,info,trans)
        use psb_spmat_type
        type(psb_zspmat_type) :: a
-       complex(kind(1.d0)), pointer  :: rw(:) 
+       complex(kind(1.d0)), allocatable :: rw(:) 
        integer :: info
        character, optional :: trans
      end subroutine psb_zcsrws
@@ -319,7 +319,7 @@ module psb_serial_mod
        type(psb_dspmat_type), intent(in) :: a   
        integer, intent(in)       :: idx 
        integer, intent(out)      :: n   
-       integer, pointer          :: neigh(:)
+       integer, allocatable          :: neigh(:)
        integer, intent(out)  :: info
        integer, optional, intent(in) :: lev 
      end subroutine psb_dneigh
@@ -328,7 +328,7 @@ module psb_serial_mod
        type(psb_zspmat_type), intent(in) :: a   
        integer, intent(in)       :: idx 
        integer, intent(out)      :: n   
-       integer, pointer          :: neigh(:)
+       integer, allocatable      :: neigh(:)
        integer, intent(out)  :: info
        integer, optional, intent(in) :: lev 
      end subroutine psb_zneigh

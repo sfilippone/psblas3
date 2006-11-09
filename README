@@ -1,4 +1,4 @@
-This directory contains  the PSBLAS library, version 2.0.2.
+This directory contains  the PSBLAS library, version 2.1.0
 
 
 Version 1.0 of the library was described in:
@@ -19,24 +19,17 @@ LINUX:
 There finally exist a GNU Fortran 95 implementation: we are using the
 development snapshots from GCC 3.5.0, later 4.1 and 4.2  since July
 2004, and it appears  to work. The 4.2 version of GNU compilers is now
-our reference platform. 
+our reference platform; the official 4.2.0 release is due pretty
+soon. It now includes  support for ALLOCATABLES. 
 
-
-For the PGI compilers, we used them in conjunction with gcc, NOT
-pgcc. Note that with pgi 3.6 we have horrible performance, due to
-spurious array copies when calling Fortran 77 codes from Fortran 90;
-this is fixed in version 4 and later. 
 
 The Lahey version we got access to (6.0 and 6.1) seems to suffer from
-the same extra copies problem; this is most apparent in the matrix
+spurious extra copies problem; this is most apparent in the matrix
 build process.  
 
-For the Intel compilers, we used ifc versions  7, 8 and 9; with version 6.0 
-you need to change the way modules are handled, but we recommend to migrate
-to the new version anyway. Moreover, with versions prior to 7.1, there
-is a strange error in pargen/ppde90: the compiler did not like the
-INTERFACE for the dummy argument subroutine PARTS, it wanted an
-EXTERNAL specification. Again, please move to 7.1.
+For the Intel compilers, we recommend moving to version 9; previous
+versions of the library have been compiled with version 7 and 8 of
+ifort. 
 
 IBM SP.
 The library has been tested on an IBM SP2, SP4 and SP5, with XLC and XLF

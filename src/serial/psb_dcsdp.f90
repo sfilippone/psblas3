@@ -195,11 +195,11 @@ subroutine psb_dcsdp(a, b,info,ifc,check,trans,unitd,upd,dupl)
       call psb_errpush(info,name,a_err=ch_err)
       goto 9999
     endif
-    if (.not.associated(b%aspk).or.&
-         &.not.associated(b%ia1).or.&
-         &.not.associated(b%ia2).or.&
-         &.not.associated(b%pl).or.&
-         &.not.associated(b%pr)) then
+    if (.not.allocated(b%aspk).or.&
+         &.not.allocated(b%ia1).or.&
+         &.not.allocated(b%ia2).or.&
+         &.not.allocated(b%pl).or.&
+         &.not.allocated(b%pr)) then
       call psb_sp_reall(b,ia1_size,ia2_size,aspk_size,info)
     else if ((size(b%aspk)  < aspk_size) .or.&
          &(size(b%ia1) < ia1_size) .or.&

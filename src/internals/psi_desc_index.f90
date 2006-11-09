@@ -42,8 +42,8 @@ subroutine psi_desc_index(desc_data,index_in,dep_list,&
   !    ...array parameters.....
   integer         :: desc_data(:),index_in(:),dep_list(:)
   integer         :: loc_to_glob(:),glob_to_loc(:)
-  integer,pointer :: desc_index(:)
-  integer         :: length_dl, nsnd,nrcv,info
+  integer,allocatable  :: desc_index(:)
+  integer         :: length_dl,nsnd,nrcv,info
   logical         :: isglob_in
   !    ....local scalars...        
   integer :: j,me,np,i,proc
@@ -55,7 +55,7 @@ subroutine psi_desc_index(desc_data,index_in,dep_list,&
   integer,allocatable  :: brvindx(:),rvsz(:),&
        & bsdindx(:),sdsz(:), sndbuf(:), rcvbuf(:)
 
-  integer :: ihinsz,ntot,k,err_act, l_di, &
+  integer :: ihinsz,ntot,k,err_act,nidx,&
        & idxr, idxs, iszs, iszr, nesd, nerv, icomm
 
   logical,parameter :: debug=.false., usempi=.true.
@@ -136,13 +136,13 @@ subroutine psi_desc_index(desc_data,index_in,dep_list,&
   endif
 
   ntot = (3*(count((sdsz>0).or.(rvsz>0)))+ iszs + iszr) + 1
-
-  if (associated(desc_index)) then 
-    l_di = size(desc_index)
+  if (allocated(desc_index)) then 
+    nidx = size(desc_index)
   else
-    l_di = 0
+    nidx = 0 
   endif
-  if (l_di < ntot) then 
+
+  if (nidx < ntot) then 
     call psb_realloc(ntot,desc_index,info)
   endif
   if (info /= 0) then 

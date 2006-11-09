@@ -96,7 +96,7 @@ Subroutine psb_zcgstab(a,prec,b,x,eps,desc_a,info,&
   Integer, Optional, Intent(out)     :: iter
   Real(Kind(1.d0)), Optional, Intent(out) :: err
 !!$   Local data
-  Complex(Kind(1.d0)), Pointer  :: aux(:),wwrk(:,:)
+  Complex(Kind(1.d0)), allocatable, target   :: aux(:),wwrk(:,:)
   Complex(Kind(1.d0)), Pointer  :: q(:),&
        & r(:), p(:), v(:), s(:), t(:), z(:), f(:)
   Real(Kind(1.d0)) :: rerr

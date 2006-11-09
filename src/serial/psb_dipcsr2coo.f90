@@ -37,6 +37,7 @@ Subroutine psb_dipcsr2coo(a,info)
   use psb_const_mod
   use psb_error_mod
   use psb_string_mod
+  use psb_realloc_mod
   implicit none
 
   !....Parameters...
@@ -44,11 +45,11 @@ Subroutine psb_dipcsr2coo(a,info)
   Integer, intent(out)                 :: info
 
   !locals
-  Integer             :: nza, nr
-  integer             :: i,j,err_act
-  logical, parameter  :: debug=.false.
-  integer, pointer    :: iaux(:), itemp(:)
-  character(len=20)   :: name
+  Integer              :: nza, nr
+  integer              :: i,j,err_act
+  logical, parameter   :: debug=.false.
+  integer, allocatable :: iaux(:), itemp(:)
+  character(len=20)    :: name, ch_err
 
   name='psb_dipcsr2coo'
   info  = 0
@@ -68,9 +69,9 @@ Subroutine psb_dipcsr2coo(a,info)
     return
   end if
 !!$  write(0,*) 'ipcsr2coo ',a%m      
-  itemp => a%ia2
-  a%ia2 => a%ia1
-  a%ia1 => iaux
+  call psb_transfer(a%ia2,itemp,info)
+  call psb_transfer(a%ia1,a%ia2,info)
+  call psb_transfer(iaux,a%ia1,info)
   
   do i=1, nr
     do j=itemp(i),itemp(i+1)-1

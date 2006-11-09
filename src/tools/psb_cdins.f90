@@ -98,8 +98,7 @@ subroutine psb_cdins(nz,ia,ja,desc_a,info)
     goto 9999
   end if
 
-
-  if (.not.associated(desc_a%halo_index)) then
+  if (.not.allocated(desc_a%halo_index)) then
     allocate(desc_a%halo_index(relocsz))
     desc_a%halo_index(:) = -1
   endif

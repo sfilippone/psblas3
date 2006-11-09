@@ -49,11 +49,11 @@ module psb_spmat_type
     ! Contains some additional informations on sparse matrix
     integer     :: infoa(psb_ifasize_)
     ! Contains sparse matrix coefficients
-    real(kind(1.d0)), pointer :: aspk(:)=>null()
+    real(kind(1.d0)), allocatable  :: aspk(:)
     ! Contains indeces that describes sparse matrix structure
-    integer, pointer :: ia1(:)=>null(), ia2(:)=>null()
+    integer, allocatable :: ia1(:), ia2(:)
     ! Permutations matrix
-    integer, pointer :: pl(:)=>null(), pr(:)=>null()
+    integer, allocatable :: pl(:), pr(:)
   end type psb_dspmat_type
   type psb_zspmat_type
     ! Rows & columns 
@@ -65,11 +65,11 @@ module psb_spmat_type
     ! Contains some additional informations on sparse matrix
     integer     :: infoa(psb_ifasize_)
     ! Contains sparse matrix coefficients
-    complex(kind(1.d0)), pointer :: aspk(:)=>null()
+    complex(kind(1.d0)), allocatable  :: aspk(:)
     ! Contains indeces that describes sparse matrix structure
-    integer, pointer :: ia1(:)=>null(), ia2(:)=>null()
+    integer, allocatable  :: ia1(:), ia2(:)
     ! Permutations matrix
-    integer, pointer :: pl(:)=>null(), pr(:)=>null()
+    integer, allocatable  :: pl(:), pr(:)
   end type psb_zspmat_type
 
   interface psb_nullify_sp
@@ -124,8 +124,9 @@ contains
     implicit none
     type(psb_dspmat_type), intent(inout) :: mat
 
-    nullify(mat%aspk,mat%ia1,mat%ia2,mat%pl,mat%pr)
-    mat%infoa(:) = 0
+!!$    nullify(mat%aspk,mat%ia1,mat%ia2,mat%pl,mat%pr)
+
+    mat%infoa(:)=0
     mat%m=0
     mat%k=0
     mat%fida=''
@@ -264,7 +265,7 @@ contains
     a%m=max(0,m)
     a%k=max(0,k)
     call psb_sp_reall(a,nnz,info)
-    if (debug) write(0,*) 'Check in ALLOCATE ',info,associated(a%pl),associated(a%pr)
+    if (debug) write(0,*) 'Check in ALLOCATE ',info,allocated(a%pl),allocated(a%pr)
     a%pl(1)=0
     a%pr(1)=0
     ! set infoa fields
@@ -348,8 +349,8 @@ contains
     call psb_realloc(max(1,a%m),a%pl,info)
     if (info /= 0) return
     call psb_realloc(max(1,a%k),a%pr,info)
-    if (debug) write(0,*) associated(a%ia1),associated(a%ia2),&
-         & associated(a%aspk),associated(a%pl),associated(a%pr),info
+    if (debug) write(0,*) allocated(a%ia1),allocated(a%ia2),&
+         & allocated(a%aspk),allocated(a%pl),allocated(a%pr),info
     if (info /= 0) return
 
     Return
@@ -416,9 +417,8 @@ contains
   End Subroutine psb_dspclone
 
 
-  ! This is done with pointer assignments, but it 
-  ! will be feasible with MOVE_ALLOC when we move 
-  ! to ALLOCATABLE components. 
+  
+  ! Will be changed to use MOVE_ALLOC 
   subroutine psb_dsp_transfer(a, b,info)
     implicit none
     !....Parameters...
@@ -431,28 +431,12 @@ contains
 
     info  = 0
 
-    if (associated(b%pr)) then  
-      deallocate(b%pr,stat=info)
-    end if
 
-    if (associated(b%pl)) then 
-      deallocate(b%pl,stat=info)
-    end if
-    if (associated(b%ia2)) then
-      deallocate(b%ia2,stat=info)
-    end if
-    if (associated(b%ia1))  then
-      deallocate(b%ia1,stat=info)
-    endif
-    if (associated(b%aspk))  then
-      deallocate(b%aspk,stat=info)
-    endif
-
-    b%aspk  => a%aspk
-    b%ia1   => a%ia1
-    b%ia2   => a%ia2
-    b%pl    => a%pl
-    b%pr    => a%pr    
+    call psb_transfer( a%aspk,     b%aspk  , info)
+    call psb_transfer( a%ia1 ,     b%ia1   , info)
+    call psb_transfer( a%ia2 ,     b%ia2   , info)
+    call psb_transfer( a%pl  ,     b%pl    , info)
+    call psb_transfer( a%pr  ,     b%pr    , info)
     b%infoa(:) = a%infoa(:)
     b%fida     = a%fida
     b%descra   = a%descra
@@ -557,11 +541,6 @@ contains
       return
     endif
 
-!!$    if (.not.associated(a%infoa)) then 
-!!$      info = -2 
-!!$      return
-!!$    endif
-    
     call psb_getifield(val,field,a%infoa,psb_ifasize_,info)
     
     psb_dsp_getifld = val
@@ -582,20 +561,20 @@ contains
 
     val   = 4*size(a%infoa)
     
-    if (associated(a%aspk)) then 
+    if (allocated(a%aspk)) then 
       val = val + 8 * size(a%aspk)
     endif
 
-    if (associated(a%ia1)) then 
+    if (allocated(a%ia1)) then 
       val = val + 4 * size(a%ia1)
     endif
-    if (associated(a%ia2)) then 
+    if (allocated(a%ia2)) then 
       val = val + 4 * size(a%ia2)
     endif
-    if (associated(a%pl)) then 
+    if (allocated(a%pl)) then 
       val = val + 4 * size(a%pl)
     endif
-    if (associated(a%pr)) then 
+    if (allocated(a%pr)) then 
       val = val + 4 * size(a%pr)
     endif
 
@@ -613,25 +592,33 @@ contains
     Integer, intent(out)        :: info
     !locals
     logical, parameter  :: debug=.false.
-
+    integer             :: iret
     info  = 0
 
-    if (associated(a%aspk)) then
-      deallocate(a%aspk,STAT=INFO)
+    if (allocated(a%aspk)) then
+!!$      write(0,*) 'Deallocating aspk'
+      deallocate(a%aspk,STAT=IRET)
+!!$      write(0,*) 'Deallocated  aspk',iret
+      if (iret /= 0) info = max(info,1)
     endif
-    if ((info == 0) .and. associated(a%ia1)) then
-      deallocate(a%ia1,STAT=INFO)
+    if (allocated(a%ia1)) then
+      deallocate(a%ia1,STAT=IRET)
+      if (iret /= 0) info = max(info,2)
     endif
-    if ((info == 0) .and. associated(a%ia2)) then
-      deallocate(a%ia2,STAT=INFO)
+    if (allocated(a%ia2)) then
+      deallocate(a%ia2,STAT=IRET)
+      if (iret /= 0) info = max(info,3)
     endif
-    if ((info == 0) .and. associated(a%pr)) then
-      deallocate(a%pr,STAT=INFO)
+    if (allocated(a%pr)) then
+      deallocate(a%pr,STAT=IRET)
+      if (iret /= 0) info = max(info,4)
     endif
-    if ((info == 0) .and. associated(a%pl)) then
-      deallocate(a%pl,STAT=INFO)
+    if (allocated(a%pl)) then
+      deallocate(a%pl,STAT=IRET)
+      if (iret /= 0) info = max(info,5)
     endif
     call psb_nullify_sp(a)
+!!$    write(0,*) 'End of sp_free ',info
     Return
   End Subroutine psb_dsp_free
 
@@ -640,8 +627,7 @@ contains
     implicit none
     type(psb_zspmat_type), intent(inout) :: mat
 
-    nullify(mat%aspk,mat%ia1,mat%ia2,mat%pl,mat%pr)
-    mat%infoa(:) = 0
+    mat%infoa(:)=0
     mat%m=0
     mat%k=0
     mat%fida=''
@@ -945,28 +931,11 @@ contains
 
     info  = 0
 
-    if (associated(b%pr)) then  
-      deallocate(b%pr,stat=info)
-    end if
-
-    if (associated(b%pl)) then 
-      deallocate(b%pl,stat=info)
-    end if
-    if (associated(b%ia2)) then
-      deallocate(b%ia2,stat=info)
-    end if
-    if (associated(b%ia1))  then
-      deallocate(b%ia1,stat=info)
-    endif
-    if (associated(b%aspk))  then
-      deallocate(b%aspk,stat=info)
-    endif
-
-    b%aspk  => a%aspk
-    b%ia1   => a%ia1
-    b%ia2   => a%ia2
-    b%pl    => a%pl
-    b%pr    => a%pr    
+    call psb_transfer( a%aspk,     b%aspk  , info)
+    call psb_transfer( a%ia1 ,     b%ia1   , info)
+    call psb_transfer( a%ia2 ,     b%ia2   , info)
+    call psb_transfer( a%pl  ,     b%pl    , info)
+    call psb_transfer( a%pr  ,     b%pr    , info)
     b%infoa(:) = a%infoa(:)
     b%fida     = a%fida
     b%descra   = a%descra
@@ -1072,11 +1041,6 @@ contains
       return
     endif
 
-!!$    if (.not.associated(a%infoa)) then 
-!!$      info = -2 
-!!$      return
-!!$    endif
-    
     call psb_getifield(val,field,a%infoa,psb_ifasize_,info)
     
     psb_zsp_getifld = val
@@ -1097,20 +1061,20 @@ contains
 
     val   = 4*size(a%infoa)
     
-    if (associated(a%aspk)) then 
+    if (allocated(a%aspk)) then 
       val = val + 16 * size(a%aspk)
     endif
 
-    if (associated(a%ia1)) then 
+    if (allocated(a%ia1)) then 
       val = val + 4 * size(a%ia1)
     endif
-    if (associated(a%ia2)) then 
+    if (allocated(a%ia2)) then 
       val = val + 4 * size(a%ia2)
     endif
-    if (associated(a%pl)) then 
+    if (allocated(a%pl)) then 
       val = val + 4 * size(a%pl)
     endif
-    if (associated(a%pr)) then 
+    if (allocated(a%pr)) then 
       val = val + 4 * size(a%pr)
     endif
     
@@ -1133,19 +1097,19 @@ contains
 
     info  = 0
 
-    if (associated(a%aspk)) then
+    if (allocated(a%aspk)) then
       deallocate(a%aspk,STAT=INFO)
     endif
-    if ((info == 0) .and. associated(a%ia1)) then
+    if (allocated(a%ia1)) then
       deallocate(a%ia1,STAT=INFO)
     endif
-    if ((info == 0) .and. associated(a%ia2)) then
+    if ( allocated(a%ia2)) then
       deallocate(a%ia2,STAT=INFO)
     endif
-    if ((info == 0) .and. associated(a%pr)) then
+    if ( allocated(a%pr)) then
       deallocate(a%pr,STAT=INFO)
     endif
-    if ((info == 0) .and. associated(a%pl)) then
+    if ( allocated(a%pl)) then
       deallocate(a%pl,STAT=INFO)
     endif
     call psb_nullify_sp(a)

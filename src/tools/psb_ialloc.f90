@@ -48,10 +48,10 @@ subroutine psb_ialloc(x, desc_a, info, n)
   implicit none
   
   !....parameters...
-  integer, pointer                :: x(:,:)
-  type(psb_desc_type), intent(in) :: desc_a
-  integer, intent(out)            :: info
-  integer, optional, intent(in)         :: n
+  integer, allocatable, intent(out) :: x(:,:)
+  type(psb_desc_type), intent(in)   :: desc_a
+  integer, intent(out)              :: info
+  integer, optional, intent(in)     :: n
 
 
   !locals
@@ -196,10 +196,10 @@ subroutine psb_iallocv(x, desc_a, info,n)
   implicit none
   
   !....parameters...
-  integer, pointer                :: x(:)
-  type(psb_desc_type), intent(in) :: desc_a
-  integer, intent(out)            :: info
-  integer, optional, intent(in)   :: n
+  integer, allocatable, intent(out) :: x(:)
+  type(psb_desc_type), intent(in)   :: desc_a
+  integer, intent(out)              :: info
+  integer, optional, intent(in)     :: n
 
   !locals
   integer             :: np,me,n_col,n_row,dectype,err_act

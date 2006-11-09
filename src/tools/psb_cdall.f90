@@ -59,7 +59,7 @@ subroutine psb_cdall(m, n, parts, ictxt, desc_a, info)
   Integer             :: counter,i,j,np,me,loc_row,err,loc_col,nprocs,&
        & l_ov_ix,l_ov_el,idx, err_act, itmpov, k, ns
   integer             :: int_err(5),exch(2)
-  integer, pointer    :: prc_v(:), temp_ovrlap(:), ov_idx(:),ov_el(:)
+  integer, allocatable  :: prc_v(:), temp_ovrlap(:), ov_idx(:),ov_el(:)
   logical, parameter  :: debug=.false.
   character(len=20)   :: name, char_err
 
@@ -166,7 +166,6 @@ subroutine psb_cdall(m, n, parts, ictxt, desc_a, info)
       endif
       desc_a%glob_to_loc(i) = -(np+prc_v(1)+1)
       j=1
-!!$      do while ((j <= nprocs).and.(prc_v(j) /= me))
       do 
         if (j > nprocs) exit
         if (prc_v(j) == me) exit
@@ -259,8 +258,8 @@ subroutine psb_cdall(m, n, parts, ictxt, desc_a, info)
   l_ov_ix         = l_ov_ix + 1
   ov_idx(l_ov_ix) = -1
 
-  desc_a%ovrlap_index => ov_idx
-  desc_a%ovrlap_elem  => ov_el
+  call psb_transfer(ov_idx,desc_a%ovrlap_index,info) 
+  if (info == 0) call psb_transfer(ov_el,desc_a%ovrlap_elem,info)
   deallocate(prc_v,temp_ovrlap,stat=info)
   if (info /= no_err) then 
     info=4000
@@ -269,7 +268,6 @@ subroutine psb_cdall(m, n, parts, ictxt, desc_a, info)
     Goto 9999
   endif
   ! estimate local cols number 
-!!$  loc_col=int((psb_colrow_+1.d0)*loc_row)+1  
   loc_col=min(2*loc_row,m)
   allocate(desc_a%loc_to_glob(loc_col),&
        &desc_a%lprm(1),stat=info)  
@@ -287,9 +285,7 @@ subroutine psb_cdall(m, n, parts, ictxt, desc_a, info)
       desc_a%loc_to_glob(k) = i
     endif
   enddo
-  nullify(desc_a%bnd_elem,desc_a%halo_index)
 
-!!$  if (debug) write(*,*) 'PSB_CDALL:  Last bits in desc_a', loc_row,k
   ! set fields in desc_a%MATRIX_DATA....
   desc_a%matrix_data(psb_n_row_)  = loc_row
   desc_a%matrix_data(psb_n_col_)  = loc_row

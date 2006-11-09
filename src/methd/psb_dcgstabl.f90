@@ -103,10 +103,9 @@ Subroutine psb_dcgstabl(a,prec,b,x,eps,desc_a,info,&
   Integer, Optional, Intent(out)     :: iter
   Real(Kind(1.d0)), Optional, Intent(out) :: err
 !!$   local data
-  Real(Kind(1.d0)), Pointer  :: aux(:),wwrk(:,:)
+  Real(Kind(1.d0)), allocatable, target   :: aux(:),wwrk(:,:),uh(:,:), rh(:,:)
   Real(Kind(1.d0)), Pointer  :: ww(:), q(:), r(:), rt0(:), p(:), v(:), &
-       & s(:), t(:), z(:), f(:), uh(:,:), rh(:,:), &
-       & gamma(:), gamma1(:), gamma2(:), taum(:,:), sigma(:)
+       & s(:), t(:), z(:), f(:), gamma(:), gamma1(:), gamma2(:), taum(:,:), sigma(:)
 
   Real(Kind(1.d0)) :: rerr
   Integer       :: litmax, naux, m, mglob, it, itrace_,&

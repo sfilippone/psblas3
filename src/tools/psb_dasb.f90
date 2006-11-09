@@ -48,7 +48,7 @@ subroutine psb_dasb(x, desc_a, info)
   implicit none
 
   type(psb_desc_type), intent(in) ::  desc_a
-  real(kind(1.d0)), pointer       ::  x(:,:)
+  real(kind(1.d0)), allocatable, intent(inout)       ::  x(:,:)
   integer, intent(out)            ::  info
 
   ! local variables
@@ -63,7 +63,7 @@ subroutine psb_dasb(x, desc_a, info)
   name='psb_dasb'
   call psb_erractionsave(err_act)
 
-  if ((.not.associated(desc_a%matrix_data))) then
+  if ((.not.allocated(desc_a%matrix_data))) then
     info=3110
     call psb_errpush(info,name)
     goto 9999
@@ -97,7 +97,8 @@ subroutine psb_dasb(x, desc_a, info)
   i1sz = size(x,dim=1)
   i2sz = size(x,dim=2)
   if (debug) write(*,*) 'asb: ',i1sz,i2sz,nrow,ncol
-  if (i1sz.lt.ncol) then
+
+  if (i1sz < ncol) then
     call psb_realloc(ncol,i2sz,x,info)
     if (info /= 0) then
       info=2025
@@ -178,7 +179,7 @@ subroutine psb_dasbv(x, desc_a, info)
   implicit none
 
   type(psb_desc_type), intent(in) ::  desc_a
-  real(kind(1.d0)), pointer   ::  x(:)
+  real(kind(1.d0)), allocatable, intent(inout)   ::  x(:)
   integer, intent(out)        ::  info
 
   ! local variables
@@ -213,7 +214,7 @@ subroutine psb_dasbv(x, desc_a, info)
   if (debug) write(*,*) name,' sizes: ',nrow,ncol
   i1sz = size(x)
   if (debug) write(*,*) 'dasb: sizes ',i1sz,ncol
-  if (i1sz.lt.ncol) then
+  if (i1sz < ncol) then
     call psb_realloc(ncol,x,info)
     if (info /= 0) then           
       info=2025

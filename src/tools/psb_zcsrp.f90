@@ -75,10 +75,10 @@ subroutine psb_zcsrp(trans,iperm,a, desc_a, info)
   integer, intent(inout)                :: iperm(:), info
   character, intent(in)                 :: trans
   !....locals....
-  integer,pointer                       ::  ipt(:)
+  integer, allocatable                  ::  ipt(:)
   integer                               ::  i,np,me, n_col,l_dcsdp, ipsize
   integer                               ::  dectype
-  real(kind(1.d0)), pointer             ::  work_dcsdp(:)
+  real(kind(1.d0)), allocatable         ::  work_dcsdp(:)
   integer                               ::  ictxt,n_row,err_act, int_err(5)
   character(len=20)                     ::  name, char_err
 

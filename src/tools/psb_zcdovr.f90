@@ -170,13 +170,12 @@ Subroutine psb_zcdovr(a,desc_a,novr,desc_ov,info)
   index_dim = size(desc_a%halo_index)
   elem_dim  = size(desc_a%halo_index)
 
-  nullify(desc_ov%ovrlap_index,desc_ov%halo_index,desc_ov%ovrlap_elem)
-  allocate(desc_ov%ovrlap_elem(novr*(Max(elem_dim,1)+3)),&
-       &   desc_ov%matrix_data(psb_mdata_size_),STAT=INFO)
+  call psb_realloc(psb_mdata_size_,desc_ov%matrix_data,info)
+  if (info==0) call psb_realloc(novr*(Max(elem_dim,1)+3),desc_ov%ovrlap_elem,info)
   if (info /= 0) then
-     info=4000
-     call psb_errpush(info,name)
-     goto 9999
+    info=4000
+    call psb_errpush(info,name)
+    goto 9999
   end if
 
   l_tmp_ovr_idx=novr*(3*Max(2*index_dim,1)+1)
@@ -188,38 +187,38 @@ Subroutine psb_zcdovr(a,desc_a,novr,desc_ov,info)
   Allocate(desc_ov%loc_to_glob(Size(desc_a%loc_to_glob)),&
        & desc_ov%glob_to_loc(Size(desc_a%glob_to_loc)),stat=info)
   if (info /= 0) then
-     info=4000
-     call psb_errpush(info,name)
-     goto 9999
+    info=4000
+    call psb_errpush(info,name)
+    goto 9999
   end if
 
   desc_ov%loc_to_glob(:) = desc_a%loc_to_glob(:)
   desc_ov%glob_to_loc(:) = desc_a%glob_to_loc(:)
-  If(debug)then 
+  If(debug) then
     Write(0,*)'Start cdovrbld',me,lworks,lworkr
     call psb_barrier(ictxt)
   endif
-  
   !
   ! The real work goes on in here....
   !
   Call psb_cdovrbld(novr,desc_ov,desc_a,a,&
        & l_tmp_halo,l_tmp_ovr_idx,lworks,lworkr,info) 
+
   if (info /= 0) then
-     info=4010
-     ch_err='psb_cdovrbld'
-     call psb_errpush(info,name,a_err=ch_err)
-     goto 9999
+    info=4010
+    ch_err='psb_cdovrbld'
+    call psb_errpush(info,name,a_err=ch_err)
+    goto 9999
   end if
   desc_ov%matrix_data(psb_dec_type_) = psb_desc_asb_
-  If(debug)then 
+  If(debug) then
     Write(0,*)'Done cdovrbld',me,lworks,lworkr
     call psb_barrier(ictxt)
   endif
 
   call psb_erractionrestore(err_act)
   return
-  
+
 9999 continue
   call psb_erractionrestore(err_act)
   if (err_act == act_abort) then

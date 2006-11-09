@@ -42,37 +42,36 @@ module psb_descriptor_type
 
   ! desc_type contains data for communications.
   type psb_desc_type
-    ! contain decomposition informations
-    integer, pointer :: matrix_data(:)=>null()
-    ! contain index of halo elements to send/receive
-    integer, pointer :: halo_index(:)=>null()
-    ! contain indices of boundary  elements 
-    integer, pointer :: bnd_elem(:)=>null()
-    ! contain index of overlap elements to send/receive
-    integer, pointer :: ovrlap_index(:)=>null()
-    ! contain for each local overlap element, the number of times
-    ! that is duplicated
-    integer, pointer :: ovrlap_elem(:)=>null()
-    ! contain for each local element the corresponding global index
-    integer, pointer :: loc_to_glob(:)=>null()
-    ! contain for each global element the corresponding local index,
-    ! if exist.
-    integer, pointer :: glob_to_loc (:)=>null()
-    ! local renumbering induced by sparse matrix storage. 
-    integer, pointer :: lprm(:)=>null()
-    ! index space in case it is not just the contiguous range 1:n
-    integer, pointer :: idx_space(:)=>null()
+     ! contain decomposition informations
+     integer, allocatable :: matrix_data(:)
+     ! contain index of halo elements to send/receive
+     integer, allocatable :: halo_index(:)
+     ! contain indices of boundary  elements 
+     integer, allocatable :: bnd_elem(:)
+     ! contain index of overlap elements to send/receive
+     integer, allocatable :: ovrlap_index(:)
+     ! contain for each local overlap element, the number of times
+     ! that is duplicated
+     integer, allocatable :: ovrlap_elem(:)
+     ! contain for each local element the corresponding global index
+     integer, allocatable :: loc_to_glob(:)
+     ! contain for each global element the corresponding local index,
+     ! if exist.
+     integer, allocatable :: glob_to_loc (:)
+     ! local renumbering induced by sparse matrix storage. 
+     integer, allocatable :: lprm(:)
+     ! index space in case it is not just the contiguous range 1:n
+     integer, allocatable :: idx_space(:)
   end type psb_desc_type
 
 contains 
 
   subroutine psb_nullify_desc(desc)
     type(psb_desc_type), intent(inout) :: desc
-
-    nullify(desc%matrix_data,desc%loc_to_glob,desc%glob_to_loc,&
-         & desc%halo_index,desc%bnd_elem,desc%ovrlap_elem,&
-         & desc%ovrlap_index, desc%lprm, desc%idx_space)!,&
-    !         & desc%halo_pt,desc%ovrlap_pt)
+    
+!!$    nullify(desc%matrix_data,desc%loc_to_glob,desc%glob_to_loc,&
+!!$         &desc%halo_index,desc%bnd_elem,desc%ovrlap_elem,&
+!!$         &desc%ovrlap_index, desc%lprm, desc%idx_space)
 
   end subroutine psb_nullify_desc
 

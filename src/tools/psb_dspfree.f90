@@ -60,7 +60,7 @@ subroutine psb_dspfree(a, desc_a,info)
   name = 'psb_dspfree'
   call psb_erractionsave(err_act)
 
-  if (.not.associated(desc_a%matrix_data)) then 
+  if (.not.allocated(desc_a%matrix_data)) then 
     info=295
     call psb_errpush(info,name)
     return

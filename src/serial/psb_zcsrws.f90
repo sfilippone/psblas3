@@ -38,7 +38,7 @@ subroutine psb_zcsrws(rw,a,info,trans)
   implicit none 
 
   type(psb_zspmat_type)      :: a
-  complex(kind(1.d0)), pointer  :: rw(:) 
+  complex(kind(1.d0)), allocatable   :: rw(:) 
   integer                    :: info
   character, optional        :: trans
 

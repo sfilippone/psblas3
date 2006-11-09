@@ -46,9 +46,9 @@ subroutine psb_ifree(x, desc_a, info)
   implicit none
 
   !....parameters...
-  integer, pointer                :: x(:,:)
-  type(psb_desc_type), intent(in) :: desc_a
-  integer, intent(out)            :: info
+  integer, allocatable, intent(inout) :: x(:,:)
+  type(psb_desc_type), intent(in)     :: desc_a
+  integer, intent(out)                :: info
   
   !...locals....
   integer             :: ictxt,np,me, err_act
@@ -60,7 +60,7 @@ subroutine psb_ifree(x, desc_a, info)
   call psb_erractionsave(err_act)
   name = 'psb_ifree'
   
-  if (.not.associated(desc_a%matrix_data)) then
+  if (.not.allocated(desc_a%matrix_data)) then
      info=295
      call psb_errpush(info,name)
      return
@@ -76,7 +76,7 @@ subroutine psb_ifree(x, desc_a, info)
     goto 9999
   endif
 
-  if (.not.associated(x)) then
+  if (.not.allocated(x)) then
      info=290
      call psb_errpush(info,name)
      goto 9999
@@ -84,12 +84,10 @@ subroutine psb_ifree(x, desc_a, info)
   
   !deallocate x
   deallocate(x,stat=info)
-  if (info.ne.0) then
+  if (info /= 0) then
      info=2045
      call psb_errpush(info,name)
      goto 9999
-  else
-     nullify(x)
   endif
   
   call psb_erractionrestore(err_act)
@@ -153,9 +151,9 @@ subroutine psb_ifreev(x, desc_a,info)
 
   implicit none
   !....parameters...
-  integer, pointer                :: x(:)
-  type(psb_desc_type), intent(in) :: desc_a
-  integer, intent(out)            :: info 
+  integer, allocatable, intent(inout) :: x(:)
+  type(psb_desc_type), intent(in)     :: desc_a
+  integer, intent(out)                :: info 
   !...locals....
   integer             :: ictxt,np,me, err_act
   character(len=20)   :: name
@@ -167,7 +165,7 @@ subroutine psb_ifreev(x, desc_a,info)
   name = 'psb_ifreev'
 
   
-  if (.not.associated(desc_a%matrix_data)) then
+  if (.not.allocated(desc_a%matrix_data)) then
      info=295
      call psb_errpush(info,name)
      return
@@ -182,10 +180,10 @@ subroutine psb_ifreev(x, desc_a,info)
     goto 9999
   endif
 
-  if (.not.associated(x)) then
-    info=295
-    call psb_errpush(info,name)
-    goto 9999
+  if (.not.allocated(x)) then
+     info=290
+     call psb_errpush(info,name)
+     goto 9999
   end if
   
   !deallocate x
@@ -193,8 +191,6 @@ subroutine psb_ifreev(x, desc_a,info)
   if (info /= no_err) then
     info=4000
     call psb_errpush(info,name)
-  else
-     nullify(x)
   endif
   
   call psb_erractionrestore(err_act)

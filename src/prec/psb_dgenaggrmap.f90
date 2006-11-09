@@ -44,10 +44,10 @@ subroutine psb_dgenaggrmap(aggr_type,a,desc_a,nlaggr,ilaggr,info)
   integer, intent(in)               :: aggr_type
   type(psb_dspmat_type), intent(in) :: a
   type(psb_desc_type), intent(in)   :: desc_a
-  integer, pointer                  :: ilaggr(:),nlaggr(:)
+  integer, allocatable              :: ilaggr(:),nlaggr(:)
   integer, intent(out)              :: info
   ! Locals 
-  integer, pointer :: ils(:), neigh(:)
+  integer, allocatable  :: ils(:), neigh(:)
   integer :: icnt,nlp,k,n,ia,isz,nr, naggr,i,j,m
 
   logical :: recovery

@@ -52,7 +52,7 @@ subroutine psb_dsymbmm(a,b,c,info)
          & ib, jb, diagb, ic, jc, diagc, index)
       integer  n,m,l,  ia(*), ja(*), diaga, ib(*), jb(*), diagb,&
            & diagc,  index(*)
-      integer, pointer :: ic(:),jc(:)
+      integer, allocatable :: ic(:),jc(:)
     end subroutine symbmm 
   end interface
   interface psb_sp_getrow
@@ -111,6 +111,8 @@ subroutine psb_dsymbmm(a,b,c,info)
   else 
     call inner_symbmm(a,b,c,itemp,info)
   endif
+  call psb_realloc(size(c%ia1),c%aspk,info)
+
   c%pl(1) = 0
   c%pr(1) = 0
   c%m=a%m
@@ -173,11 +175,15 @@ contains
           
           if ((j<1).or.(j>m)) then 
             write(0,*) ' SymbMM: Problem with A ',i,jj,j,m
+            info = 1
+            return
           endif
           call psb_sp_getrow(j,b,nbzr,ibrw,ibcl,bval,info)
           do k=1,nbzr
             if ((ibcl(k)<1).or.(ibcl(k)>maxlmn)) then 
                 write(0,*) 'Problem in SYMBMM 1:',j,k,ibcl(k),maxlmn
+                info=2
+                return
             else
               if(index(ibcl(k)).eq.0) then
                 index(ibcl(k))=istart

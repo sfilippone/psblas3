@@ -10,8 +10,8 @@ F90=/usr/local/gcc42/bin/gfortran
 FC=/usr/local/gcc42/bin/gfortran
 F77=$(FC)
 CC=/usr/local/gcc42/bin/gcc
-F90COPT= -O3  -march=pentium4 -msse2 -mfpmath=sse -ggdb -fbounds-check
-FCOPT=-O3  -march=pentium4 -msse2 -mfpmath=sse   -ggdb -fbounds-check
+F90COPT= -O3  -march=pentium4 -msse2 -mfpmath=sse -ggdb 
+FCOPT=-O3  -march=pentium4 -msse2 -mfpmath=sse   -ggdb 
 CCOPT=-O3 -march=pentium4 -msse2 -mfpmath=sse  -ggdb
 
 #######################  Section 2 #######################
