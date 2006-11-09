@@ -9,6 +9,10 @@ history.
 2006/11/08: Branched version psblas2-2-0-maint, and defined tag
 	    2.0.2.6 
 
+2006/11/02: Done in the allocatable branch: repackaging of cdasb and
+	    friends, taking out AVL trees where they were not
+	    absolutely needed, and new dcsrmv routine. 
+
 2006/11/01: Merged changes in the handling of data exchange.
 
 2006/10/03: Merged in the multilevel preconditioner stuff. This is
