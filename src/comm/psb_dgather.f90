@@ -34,16 +34,21 @@
 !   This subroutine gathers pieces of a distributed dense matrix into a local one.
 !
 ! Parameters:
-!   globx     -  real,dimension(:,:).          The local matrix into which gather the distributed pieces.
-!   locx      -  real,dimension(:,:).          The local piece of the ditributed matrix to be gathered.
+!   globx     -  real,dimension(:,:).          The local matrix into which gather 
+!                                                the distributed pieces.
+!   locx      -  real,dimension(:,:).          The local piece of the distributed 
+!                                                matrix to be gathered.
 !   desc_a    -  type(<psb_desc_type>).        The communication descriptor.
 !   info      -  integer.                      Eventually returns an error code.
-!   iroot     -  integer.                      The process that has to own the global matrix. If -1 all
+!   iroot     -  integer.                      The process that has to own the 
+!                                                 global matrix. If -1 all
 !                                              the processes will have a copy.
 !   iiglobx   -  integer(optional).            The starting row of the global matrix. 
 !   ijglobx   -  integer(optional).            The starting column of the global matrix. 
-!   iilocx    -  integer(optional).            The starting row of the local piece of matrix. 
-!   ijlocx    -  integer(optional).            The starting column of the local piece of matrix.
+!   iilocx    -  integer(optional).            The starting row of the local piece 
+!                                                 of matrix. 
+!   ijlocx    -  integer(optional).            The starting column of the local piece 
+!                                                 of matrix.
 !   ik        -  integer(optional).            The number of columns to gather. 
 !
 subroutine  psb_dgatherm(globx, locx, desc_a, info, iroot,&
@@ -170,11 +175,12 @@ subroutine  psb_dgatherm(globx, locx, desc_a, info, iroot,&
       globx(idx,jglobx+j-1) = locx(i,jlx+j-1)
     end do
     ! adjust overlapped elements
-    i=0
+    i=1
     do while (desc_a%ovrlap_elem(i).ne.-1)
       idx=desc_a%ovrlap_elem(i+psb_ovrlp_elem_)
       idx=desc_a%loc_to_glob(idx)
-      globx(idx,jglobx+j-1) = globx(idx,jglobx+j-1)/desc_a%ovrlap_elem(i+psb_n_dom_ovr_)
+      globx(idx,jglobx+j-1) = &
+           &  globx(idx,jglobx+j-1)/desc_a%ovrlap_elem(i+psb_n_dom_ovr_)
       i=i+2
     end do
   end do
@@ -234,14 +240,18 @@ end subroutine psb_dgatherm
 !   This subroutine gathers pieces of a distributed dense vector into a local one.
 !
 ! Parameters:
-!   globx     -  real,dimension(:).            The local vector into which gather the distributed pieces.
-!   locx      -  real,dimension(:).            The local piece of the ditributed vector to be gathered.
+!   globx     -  real,dimension(:).            The local vector into which gather the 
+!                                                  distributed pieces.
+!   locx      -  real,dimension(:).            The local piece of the ditributed
+!                                                  vector to be gathered.
 !   desc_a    -  type(<psb_desc_type>).        The communication descriptor.
 !   info      -  integer.                      Eventually returns an error code.
-!   iroot     -  integer.                      The process that has to own the global vector. If -1 all
+!   iroot     -  integer.                      The process that has to own the 
+!                                                  global vector. If -1 all
 !                                              the processes will have a copy.
 !   iiglobx   -  integer(optional).            The starting row of the global vector. 
-!   iilocx    -  integer(optional).            The starting row of the local piece of vector. 
+!   iilocx    -  integer(optional).            The starting row of the local piece
+!                                                  of vector. 
 !
 subroutine  psb_dgatherv(globx, locx, desc_a, info, iroot,&
      & iiglobx, iilocx)
