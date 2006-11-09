@@ -12,13 +12,21 @@ addresses a distributed memory execution model operating with message
 passing. 
 
 The PSBLAS library is internally implemented in a mixture of
-Fortran~77 and Fortran~95~\cite{metcalf} programming languages. A
-similar approach has been advocated by a number of authors,
+Fortran~77 and Fortran~95~\cite{metcalf} programming languages. 
+A similar approach has been advocated by a number of authors,
 e.g.~\cite{machiels}.  Moreover, the Fortran~95 facilities for dynamic
-memory management and interface overloading greatly enhance the usability of the PSBLAS
+memory management and interface overloading greatly enhance the
+usability of the PSBLAS 
 subroutines. In this way, the library can take care of runtime memory
 requirements that are quite difficult or even impossible to predict at
-implementation or compilation time.  The following presentation of the
+implementation or compilation time.  
+In the current release we rely on the availability of the so-called
+allocatable extensions, specified in TR~15581. Strictly speaking they
+are outside the Fortran~95 standard; however they have been included
+in  the Fortran~2003 language standard, and are available in
+prctically all Fortran~95 compilers on the market, including the GCC
+compiler from the Free Software Foundation (as of version 4.2). 
+The presentation of the
 PSBLAS library follows the general structure of the proposal for
 serial Sparse BLAS~\cite{sblas97,sblas02}, which in its turn is based on the
 proposal for BLAS on dense matrices~\cite{BLAS1,BLAS2,BLAS3}.

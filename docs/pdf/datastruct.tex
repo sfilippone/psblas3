@@ -46,7 +46,7 @@ sparse coefficient matrix.
 current process (local); equivalent to the number of local columns in
 the sparse coefficient matrix. They include the halo.
 \end{description}
-Specified as: a pointer to integer array of dimension 10.
+Specified as: an allocatable integer array of dimension \verb|psb_mdata_size_|.
 \item[{\bf halo\_index}] A list of the halo and boundary elements for
 the current process to be exchanged with other processes; for each
 processes with which it is necessary to communicate:
@@ -59,7 +59,7 @@ processes with which it is necessary to communicate:
 \end{enumerate}
 The list may contain an arbitrary number of groups; its end is marked
 by a -1.\\
-Specified as: a pointer to an integer array of rank one.
+Specified as: an allocatable integer array of rank one.
 \item [{\bf ovrlap\_index}] A list of the overlap elements for the
 current process, organized in groups like the previous vector:
 \begin{enumerate}
@@ -71,7 +71,7 @@ current process, organized in groups like the previous vector:
 \end{enumerate}
 The list may contain an arbitrary number of groups; its end is marked
 by a -1.\\
-Specified as: a pointer to an integer array  of rank one.
+Specified as: an allocatable integer array  of rank one.
 \item [{\bf ovrlap\_index}] For all overlap points belonging to th
 ecurrent process:
 \begin{enumerate}
@@ -80,14 +80,14 @@ ecurrent process:
 \end{enumerate}
 The list may contain an arbitrary number of groups; its end is marked
 by a -1.\\
-Specified as: a pointer to an integer array of rank one.
+Specified as: an allocatable integer array of rank one.
 \item[{\bf loc\_to\_glob}] each element $i$ of this array contains
 global identifier of the local variable $i$.\\
-Specified as: a pointer to an integer array of rank one.
+Specified as: an allocatable integer array of rank one.
 \item[{\bf glob\_to\_loc}]  if global variable $i$ is read by current
 process then element $i$ contains local index correpondent to global variable $i$;
 else element $i$ contains -1 (NULL) value.\\
-Specified as: a pointer to an integer array of rank one.
+Specified as: an allocatabled integer array of rank one.
 \end{description}
 The Fortran95 definition  for \verb|psb_desc_type| structures is 
 as follows:
@@ -96,9 +96,9 @@ as follows:
     \begin{minipage}[tl]{0.9\textwidth}
 \begin{verbatim} 
 type psb_desc_type 
-   integer, pointer :: matrix_data(:)=>null(), halo_index(:)=>null()
-   integer, pointer :: overlap_elem(:)=>null(), overlap_index(:)=>null()
-   integer, pointer :: loc_to_glob(:)=>null(), glob_to_loc(:)=>null()
+   integer, allocatable :: matrix_data(:), halo_index(:)
+   integer, allocatable :: overlap_elem(:), overlap_index(:)
+   integer, allocatable :: loc_to_glob(:), glob_to_loc(:)
 end type psb_desc_type 
 \end{verbatim}
     \end{minipage}
@@ -157,27 +157,27 @@ choose, if he/she so whishes, a specific matrix storage mode. \\
 \begin{description}
 \item[{\bf aspk}] Contains values of the local distributed sparse
 matrix.\\
-Specified as: a pointer to an array of rank one of type corresponding
+Specified as: an allocatable array of rank one of type corresponding
 to matrix entries type.
 \item[{\bf ia1}] Holds integer information on distributed sparse
 matrix. Actual information will depend on data format used.\\
-Specified as: a pointer to an integer array of rank one.
+Specified as: an allocatable  integer array of rank one.
 \item[{\bf ia2}] Holds integer information on distributed sparse
 matrix. Actual information will depend on data format used.\\
-Specified as: a pointer to an integer array of rank one.
+Specified as: an allocatable  integer array of rank one.
 \item[{\bf infoa}] On entry can hold auxiliary information on distributed sparse
 matrix.  Actual information will depend on data format used.\\
-Specified as: integer array of length \verb|psb_ifasize_|.
+Specified as: an integer array of length \verb|psb_ifasize_|.
 \item[{\bf fida}] Defines the format of the distributed sparse matrix.\\
 Specified as: a string of length 5
 \item[{\bf descra}] Describe the characteristic of the distributed sparse matrix.\\
 Specified as: array of character of length 9.
 \item[{\bf pl}] Specifies the local row permutation of distributed sparse
 matrix. If pl(1) is equal to 0, then there isn't row permutation.\\
-Specified as: pointer to integer array of dimension equal to number of local row (matrix\_data[psb\_n\_row\_\hbox{]})
+Specified as: an allocatable integer array of dimension equal to number of local row (matrix\_data[psb\_n\_row\_\hbox{]})
 \item[{\bf pr}] Specifies the local column permutation of distributed sparse
 matrix. If PR(1) is equal to 0, then there isn't columnm permutation.\\
-Specified as: pointer to integer array of dimension equal to number of
+Specified as: an allocatable integer array of dimension equal to number of
 local row (matrix\_data[psb\_n\_col\_\hbox{]})
 \item[{\bf m}] Number of rows; if row indices are stored explicitly,
 as in Coordinate Storage, should be greater than or equal to the
@@ -199,9 +199,9 @@ type psb_dspmat_type
    character   :: fida(5)
    character   :: descra(10)
    integer     :: infoa(psb_ifa_size_)
-   real(kind(1.d0)), pointer :: aspk(:)=>null()
-   integer, pointer :: ia1(:)=>null(), ia2(:)=>null()
-   integer, pointer :: pr(:)=>null(), pl(:)=>null()
+   real(kind(1.d0)), allocatable :: aspk(:)
+   integer, allocatable :: ia1(:), ia2(:)
+   integer, allocatable :: pr(:), pl(:)
 end type psb_dspmat_type
 \end{verbatim}
     \end{minipage}
@@ -307,26 +307,27 @@ to be interpreted.
   \begin{Sbox}
     \begin{minipage}[tl]{0.9\textwidth}
 \begin{verbatim}
-  type psb_base_prec
 
-    type(psb_spmat_type), pointer  :: av(:) => null()
-    real(kind(1.d0)), pointer      :: d(:)  => null()
-    type(psb_desc_type), pointer   :: desc_data => null()
-    integer, pointer               :: iprcparm(:) => null()
-    real(kind(1.d0)), pointer      :: dprcparm(:) => null()
-    integer, pointer               :: perm(:)  => null()
-    integer, pointer               :: mlia(:)  => null()
-    integer, pointer               :: invperm(:) => null()
-    integer, pointer               :: nlaggr(:)  => null()
-    type(psb_spmat_type), pointer  :: aorig    => null()
-    real(kind(1.d0)), pointer      :: dorig(:) => null()
-    
- end type psb_base_prec
+  type psb_dbaseprc_type
+
+    type(psb_dspmat_type), allocatable :: av(:) 
+    real(kind(1.d0)), allocatable      :: d(:)  
+    type(psb_desc_type)                :: desc_data , desc_ac
+    integer, allocatable               :: iprcparm(:) 
+    real(kind(1.d0)), allocatable      :: dprcparm(:) 
+    integer, allocatable               :: perm(:),  invperm(:) 
+    integer, allocatable               :: mlia(:), nlaggr(:) 
+    type(psb_dspmat_type), pointer     :: base_a    => null() !
+    type(psb_desc_type), pointer       :: base_desc => null() ! 
+    real(kind(1.d0)), allocatable      :: dorig(:) 
+
+  end type psb_dbaseprc_type
   
-  type psb_prec_type
-    type(psb_base_prec), pointer  :: baseprecv(:) => null()
+  type psb_dprec_type
+    type(psb_dbaseprc_type), allocatable  :: baseprecv(:) 
     integer                       :: prec, base_prec
- end type psb_prec_type
+  end type psb_dprec_type
+
 \end{verbatim}
     \end{minipage}
   \end{Sbox}
