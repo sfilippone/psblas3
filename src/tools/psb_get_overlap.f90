@@ -3,7 +3,7 @@ subroutine psb_get_ovrlap(ovrel,desc,info)
   use psb_realloc_mod
   use psb_error_mod
   implicit none 
-  integer, pointer                :: ovrel(:)
+  integer, allocatable            :: ovrel(:)
   type(psb_desc_type), intent(in) :: desc
   integer, intent(out)            :: info
 
@@ -40,7 +40,7 @@ subroutine psb_get_ovrlap(ovrel,desc,info)
 
   else
 
-    if (associated(ovrel)) then 
+    if (allocated(ovrel)) then 
       deallocate(ovrel,stat=info)
       if (info /= 0) then 
         call psb_errpush(4010,name,a_err='Deallocate')
