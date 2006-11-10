@@ -172,7 +172,7 @@ subroutine  psb_dovrlm(x,desc_a,info,jx,ik,work,update)
     goto 9999
   end if
 
-  i=0
+  i=1
   ! switch on update type
   select case (iupdate)
   case(psb_square_root_)
@@ -375,7 +375,7 @@ subroutine  psb_dovrlv(x,desc_a,info,work,update)
     goto 9999
   end if
 
-  i=0
+  i=1
   ! switch on update type
   select case (iupdate)
   case(psb_square_root_)
