@@ -68,9 +68,10 @@ program df_sample
   integer               :: igsmth, matop, novr
 
   ! dense matrices
-  real(kind(1.d0)), pointer       ::  aux_b(:,:), d(:)
-  real(kind(1.d0)), pointer, save :: b_col(:), x_col(:), r_col(:), &
-       & b_col_glob(:), x_col_glob(:), r_col_glob(:)
+  real(kind(1.d0)), allocatable, target ::  aux_b(:,:), d(:)
+  real(kind(1.d0)), allocatable , save  :: b_col(:), x_col(:), r_col(:), &
+       & x_col_glob(:), r_col_glob(:)
+  real(kind(1.d0)), pointer  :: b_col_glob(:)
 
   ! communications data structure
   type(psb_desc_type):: desc_a
@@ -125,7 +126,6 @@ program df_sample
   nrhs = 1
 
   if (amroot) then
-    nullify(aux_b)
     call readmat(mtrx_file, aux_a, ictxt)
 
     m_problem = aux_a%m
@@ -136,14 +136,14 @@ program df_sample
       call read_rhs(rhs_file,aux_b,ictxt)
     end if
 
-    if (associated(aux_b).and.size(aux_b,1)==m_problem) then
+    if (psb_size(aux_b,dim=1)==m_problem) then
       ! if any rhs were present, broadcast the first one
       write(0,'("Ok, got an rhs ")')
       b_col_glob =>aux_b(:,1)
     else
       write(*,'("Generating an rhs...")')
       write(*,'(" ")')
-      allocate(aux_b(m_problem,1), stat=ircode)
+      call psb_realloc(m_problem,1,aux_b,ircode)
       if (ircode /= 0) then
         call psb_errpush(4000,name)
         goto 9999
@@ -157,7 +157,7 @@ program df_sample
     call psb_bcast(ictxt,b_col_glob(1:m_problem))
   else
     call psb_bcast(ictxt,m_problem)
-    allocate(aux_b(m_problem,1), stat=ircode)
+    call psb_realloc(m_problem,1,aux_b,ircode)
     if (ircode /= 0) then
       call psb_errpush(4000,name)
       goto 9999
@@ -274,8 +274,8 @@ program df_sample
   call psb_barrier(ictxt)
   t2 = psb_wtime() - t1
   call psb_amx(ictxt,t2)
-  call psb_geaxpby(1.d0,b_col,0.d0,r_col,desc_a,info)
-  call psb_spmm(-1.d0,a,x_col,1.d0,r_col,desc_a,info)
+  call psb_geaxpby(done,b_col,dzero,r_col,desc_a,info)
+  call psb_spmm(-done,a,x_col,done,r_col,desc_a,info)
   call psb_genrm2s(resmx,r_col,desc_a,info)
   call psb_geamaxs(resmxp,r_col,desc_a,info)
 

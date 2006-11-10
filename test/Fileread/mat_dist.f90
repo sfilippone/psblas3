@@ -82,11 +82,11 @@ contains
     !     on entry: fresh variable.
     !     on exit : the updated array descriptor
     !
-    !  real(kind(1.d0)), pointer, optional      :: b_glob(:)
+    !  real(kind(1.d0)), optional      :: b_glob(:)
     !     on entry: this contains right hand side.
     !     on exit :
     !
-    !  real(kind(1.d0)), pointer, optional      :: b(:)
+    !  real(kind(1.d0)), allocatable, optional      :: b(:)
     !     on entry: fresh variable.
     !     on exit : this will contain the local right hand side.
     !
@@ -99,10 +99,10 @@ contains
 
     ! parameters
     type(psb_dspmat_type)      :: a_glob
-    real(kind(1.d0)), pointer  :: b_glob(:)
+    real(kind(1.d0))           :: b_glob(:)
     integer                    :: ictxt
     type(psb_dspmat_type)      :: a
-    real(kind(1.d0)), pointer  :: b(:)
+    real(kind(1.d0)), allocatable  :: b(:)
     type (psb_desc_type)       :: desc_a
     integer, intent(out)       :: info
     integer, optional          :: inroot
@@ -123,7 +123,7 @@ contains
     integer                     :: ircode, length_row, i_count, j_count,&
          & k_count, blockdim, root, liwork, nrow, ncol, nnzero, nrhs,&
          & i,j,k, ll, nz, isize, iproc, nnr, err, err_act, int_err(5)
-    integer, pointer            :: iwork(:)
+    integer, allocatable            :: iwork(:)
     character                   :: afmt*5, atyp*5
     integer, allocatable          :: irow(:),icol(:)
     real(kind(1.d0)), allocatable :: val(:)
@@ -530,11 +530,11 @@ contains
     !     on entry: fresh variable.
     !     on exit : the updated array descriptor
     !
-    !  real(kind(1.d0)), pointer, optional      :: b_glob(:)
+    !  real(kind(1.d0)),  optional      :: b_glob(:)
     !     on entry: this contains right hand side.
     !     on exit :
     !
-    !  real(kind(1.d0)), pointer, optional      :: b(:)
+    !  real(kind(1.d0)), allocatable, optional      :: b(:)
     !     on entry: fresh variable.
     !     on exit : this will contain the local right hand side.
     !
@@ -545,10 +545,10 @@ contains
     use psb_sparse_mod
     implicit none   ! parameters
     type(psb_dspmat_type)      :: a_glob
-    real(kind(1.d0)), pointer  :: b_glob(:)
+    real(kind(1.d0))           :: b_glob(:)
     integer                    :: ictxt, v(:)
     type(psb_dspmat_type)      :: a
-    real(kind(1.d0)), pointer  :: b(:)
+    real(kind(1.d0)), allocatable  :: b(:)
     type (psb_desc_type)       :: desc_a
     integer, intent(out)       :: info
     integer, optional          :: inroot
@@ -558,7 +558,7 @@ contains
     integer                     :: ircode, length_row, i_count, j_count,&
          & k_count, blockdim, root, liwork, nrow, ncol, nnzero, nrhs,&
          & i,j,k, ll, nz, isize, iproc, nnr, err, err_act, int_err(5)
-    integer, pointer            :: iwork(:)
+    integer, allocatable            :: iwork(:)
     character                   :: afmt*5, atyp*5
     integer, allocatable          :: irow(:),icol(:)
     real(kind(1.d0)), allocatable :: val(:)
@@ -857,11 +857,11 @@ contains
     !     on entry: fresh variable.
     !     on exit : the updated array descriptor
     !
-    !  real(kind(1.d0)), pointer, optional      :: b_glob(:)
+    !  real(kind(1.d0)),  optional      :: b_glob(:)
     !     on entry: this contains right hand side.
     !     on exit :
     !
-    !  real(kind(1.d0)), pointer, optional      :: b(:)
+    !  real(kind(1.d0)), allocatable, optional      :: b(:)
     !     on entry: fresh variable.
     !     on exit : this will contain the local right hand side.
     !
@@ -874,10 +874,10 @@ contains
 
     ! parameters
     type(psb_zspmat_type)      :: a_glob
-    complex(kind(1.d0)), pointer  :: b_glob(:)
+    complex(kind(1.d0))        :: b_glob(:)
     integer                    :: ictxt
     type(psb_zspmat_type)      :: a
-    complex(kind(1.d0)), pointer  :: b(:)
+    complex(kind(1.d0)), allocatable  :: b(:)
     type (psb_desc_type)       :: desc_a
     integer, intent(out)       :: info
     integer, optional          :: inroot
@@ -898,7 +898,7 @@ contains
     integer                     :: ircode, length_row, i_count, j_count,&
          & k_count, blockdim, root, liwork, nrow, ncol, nnzero, nrhs,&
          & i,j,k, ll, nz, isize, iproc, nnr, err, err_act, int_err(5)
-    integer, pointer            :: iwork(:)
+    integer, allocatable            :: iwork(:)
     character                   :: afmt*5, atyp*5
     integer, allocatable          :: irow(:),icol(:)
     complex(kind(1.d0)), allocatable :: val(:)
@@ -1302,11 +1302,11 @@ contains
     !     on entry: fresh variable.
     !     on exit : the updated array descriptor
     !
-    !  real(kind(1.d0)), pointer, optional      :: b_glob(:)
+    !  real(kind(1.d0)),  optional      :: b_glob(:)
     !     on entry: this contains right hand side.
     !     on exit :
     !
-    !  real(kind(1.d0)), pointer, optional      :: b(:)
+    !  real(kind(1.d0)), allocatable, optional      :: b(:)
     !     on entry: fresh variable.
     !     on exit : this will contain the local right hand side.
     !
@@ -1317,10 +1317,10 @@ contains
     use psb_sparse_mod
     implicit none   ! parameters
     type(psb_zspmat_type)      :: a_glob
-    complex(kind(1.d0)), pointer  :: b_glob(:)
+    complex(kind(1.d0))        :: b_glob(:)
     integer                    :: ictxt, v(:)
     type(psb_zspmat_type)      :: a
-    complex(kind(1.d0)), pointer  :: b(:)
+    complex(kind(1.d0)), allocatable  :: b(:)
     type(psb_desc_type)       :: desc_a
     integer, intent(out)       :: info
     integer, optional          :: inroot
@@ -1330,7 +1330,7 @@ contains
     integer                     :: ircode, length_row, i_count, j_count,&
          & k_count, blockdim, root, liwork, nrow, ncol, nnzero, nrhs,&
          & i,j,k, ll, nz, isize, iproc, nnr, err, err_act, int_err(5)
-    integer, pointer            :: iwork(:)
+    integer, allocatable            :: iwork(:)
     character                   :: afmt*5, atyp*5
     integer, allocatable          :: irow(:),icol(:)
     complex(kind(1.d0)), allocatable :: val(:)

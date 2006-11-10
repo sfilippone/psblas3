@@ -339,9 +339,9 @@ Contains
   
   function psb_isize1d(vin)
     integer :: psb_isize1d
-    integer, pointer :: vin(:)
+    integer, allocatable, intent(in) :: vin(:)
     
-    if (.not.associated(vin)) then 
+    if (.not.allocated(vin)) then 
       psb_isize1d = 0
     else
       psb_isize1d = size(vin)
@@ -349,10 +349,10 @@ Contains
   end function psb_isize1d
   function psb_isize2d(vin,dim)
     integer :: psb_isize2d
-    integer, pointer :: vin(:,:)
+    integer, allocatable, intent(in) :: vin(:,:)
     integer, optional :: dim
 
-    if (.not.associated(vin)) then 
+    if (.not.allocated(vin)) then 
       psb_isize2d = 0
     else
       if (present(dim)) then 
@@ -365,9 +365,9 @@ Contains
   
   function psb_dsize1d(vin)
     integer :: psb_dsize1d
-    real(kind(1.d0)), pointer :: vin(:)
+    real(kind(1.d0)), allocatable, intent(in) :: vin(:)
     
-    if (.not.associated(vin)) then 
+    if (.not.allocated(vin)) then 
       psb_dsize1d = 0
     else
       psb_dsize1d = size(vin)
@@ -375,10 +375,10 @@ Contains
   end function psb_dsize1d
   function psb_dsize2d(vin,dim)
     integer :: psb_dsize2d
-    real(kind(1.d0)), pointer :: vin(:,:)
+    real(kind(1.d0)), allocatable, intent(in) :: vin(:,:)
     integer, optional :: dim
 
-    if (.not.associated(vin)) then 
+    if (.not.allocated(vin)) then 
       psb_dsize2d = 0
     else
       if (present(dim)) then 
@@ -392,9 +392,9 @@ Contains
   
   function psb_zsize1d(vin)
     integer :: psb_zsize1d
-    complex(kind(1.d0)), pointer :: vin(:)
+    complex(kind(1.d0)), allocatable, intent(in) :: vin(:)
     
-    if (.not.associated(vin)) then 
+    if (.not.allocated(vin)) then 
       psb_zsize1d = 0
     else
       psb_zsize1d = size(vin)
@@ -402,10 +402,10 @@ Contains
   end function psb_zsize1d
   function psb_zsize2d(vin,dim)
     integer :: psb_zsize2d
-    complex(kind(1.d0)), pointer :: vin(:,:)
+    complex(kind(1.d0)), allocatable, intent(in) :: vin(:,:)
     integer, optional :: dim
 
-    if (.not.associated(vin)) then 
+    if (.not.allocated(vin)) then 
       psb_zsize2d = 0
     else
       if (present(dim)) then 

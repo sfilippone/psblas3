@@ -97,8 +97,8 @@ program pde90
   ! descriptor
   type(psb_desc_type)   :: desc_a, desc_a_out
   ! dense matrices
-  real(kind(1.d0)), pointer :: b(:), x(:), d(:),ld(:)
-  integer, pointer :: work(:)
+  real(kind(1.d0)), allocatable :: b(:), x(:), d(:),ld(:)
+  integer, allocatable :: work(:)
   ! blacs parameters
   integer            :: ictxt, iam, np
 
@@ -394,12 +394,12 @@ contains
 
     use psb_sparse_mod
     implicit none
-    integer                  :: idim
-    integer, parameter       :: nbmax=10
-    real(kind(1.d0)),pointer :: b(:),t(:)
-    type(psb_desc_type)      :: desc_a
-    integer                  :: ictxt, info
-    character                :: afmt*5
+    integer                        :: idim
+    integer, parameter             :: nbmax=10
+    real(kind(1.d0)), allocatable  :: b(:),t(:)
+    type(psb_desc_type)            :: desc_a
+    integer                        :: ictxt, info
+    character                      :: afmt*5
     interface 
       !   .....user passed subroutine.....
       subroutine parts(global_indx,n,np,pv,nv)
@@ -419,9 +419,6 @@ contains
     integer, allocatable     :: irow(:),icol(:)
     real(kind(1.d0)), allocatable :: val(:)
     integer, allocatable     :: prv(:)
-    integer, pointer         :: ierrv(:)
-    real(kind(1.d0)), pointer ::  dwork(:)
-    integer,pointer        ::  iwork(:)
     ! deltah dimension of each grid cell
     ! deltat discretization time
     real(kind(1.d0))         :: deltah

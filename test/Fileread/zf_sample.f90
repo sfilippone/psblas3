@@ -68,9 +68,10 @@ program zf_sample
   integer               :: igsmth, matop, novr
 
   ! dense matrices
-  complex(kind(1.d0)), pointer       ::  aux_b(:,:), d(:)
-  complex(kind(1.d0)), pointer, save :: b_col(:), x_col(:), r_col(:), &
-       & b_col_glob(:), x_col_glob(:), r_col_glob(:)
+  complex(kind(1.d0)), allocatable, target ::  aux_b(:,:), d(:)
+  complex(kind(1.d0)), allocatable , save  :: b_col(:), x_col(:), r_col(:), &
+       & x_col_glob(:), r_col_glob(:)
+  complex(kind(1.d0)), pointer  :: b_col_glob(:)
 
   ! communications data structure
   type(psb_desc_type):: desc_a
@@ -126,7 +127,6 @@ program zf_sample
   nrhs = 1
 
   if (amroot) then
-    nullify(aux_b)
     call readmat(mtrx_file, aux_a, ictxt)
 
     m_problem = aux_a%m
@@ -137,14 +137,14 @@ program zf_sample
        call read_rhs(rhs_file,aux_b,ictxt)
     end if
 
-    if (associated(aux_b).and.size(aux_b,1)==m_problem) then
+    if (psb_size(aux_b,dim=1)==m_problem) then
       ! if any rhs were present, broadcast the first one
       write(0,'("Ok, got an rhs ")')
       b_col_glob =>aux_b(:,1)
     else
       write(*,'("Generating an rhs...")')
       write(*,'(" ")')
-      allocate(aux_b(m_problem,1), stat=ircode)
+      call psb_realloc(m_problem,1,aux_b,ircode)
       if (ircode /= 0) then
          call psb_errpush(4000,name)
          goto 9999
@@ -158,7 +158,7 @@ program zf_sample
     call psb_bcast(ictxt,b_col_glob(1:m_problem))
   else
     call psb_bcast(ictxt,m_problem)
-    allocate(aux_b(m_problem,1), stat=ircode)
+    call psb_realloc(m_problem,1,aux_b,ircode)
     if (ircode /= 0) then
        call psb_errpush(4000,name)
        goto 9999
@@ -192,10 +192,9 @@ program zf_sample
     if (amroot) then 
       write(*,'("Partition type: graph")')
       write(*,'(" ")')
-      write(0,'("Build type: graph")')
+      !      write(0,'("Build type: graph")')
       call build_grppart(aux_a%m,aux_a%fida,aux_a%ia1,aux_a%ia2,np)
     endif
-    write(0,'("Done graph build")')
     call psb_barrier(ictxt)
     call distr_grppart(root,ictxt)
     call getv_grppart(ivg)
@@ -284,7 +283,7 @@ program zf_sample
   if (amroot) then 
     call psb_prec_descr(6,pre)
     write(*,'("Matrix: ",a)')mtrx_file
-    write(*,'("Computed solution on ",i4," processors")')np
+    write(*,'("Computed solution on ",i8," processors")')np
     write(*,'("Iterations to convergence: ",i6)')iter
     write(*,'("Error indicator on exit: ",f7.2)')err
     write(*,'("Time to buil prec.   : ",es10.4)')tprec

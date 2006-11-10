@@ -57,12 +57,6 @@
 !     On Entry: Index of root processor (default: 0)
 !     On Exit : unchanged.
 !
-!  Real(Kind(1.D0)), Pointer, Optional  :: indwork(:)
-!     On Entry/Exit: Double Precision Work Area.
-!
-!  Integer, Pointer, Optional           :: iniwork()
-!     On Entry/Exit: Integer Work Area.
-!
 module read_mat
   interface readmat
     module procedure dreadmat, zreadmat
@@ -104,20 +98,17 @@ contains
   end subroutine dreadmat
 
 
-  subroutine dread_rhs (filename, b, ictxt, inroot,&
-       & indwork, iniwork)   
+  subroutine dread_rhs (filename, b, ictxt, inroot)   
     use psb_sparse_mod
     implicit none
     integer                               :: ictxt
     character                             :: filename*(*)
     integer, optional                     :: inroot
-    real(kind(1.0d0)), pointer, optional  :: indwork(:)
-    integer, pointer, optional            :: iniwork(:)   ! local variables
     integer, parameter   :: infile = 2
     integer              :: nrow, ncol, i,root, nprow, npcol, myprow, mypcol, ircode, j
     character            :: mmheader*15, fmt*15, object*10, type*10, sym*15,&
          & line*1024
-    real(kind(1.0d0)), pointer  :: b(:,:)
+    real(kind(1.0d0)), allocatable  :: b(:,:)
     if (present(inroot)) then
       root = inroot
     else
@@ -195,20 +186,17 @@ contains
   end subroutine zreadmat
 
 
-  subroutine zread_rhs (filename, b, ictxt, inroot,&
-       & indwork, iniwork)   
+  subroutine zread_rhs (filename, b, ictxt, inroot)   
     use psb_sparse_mod
     implicit none
     integer                               :: ictxt
     character                             :: filename*(*)
     integer, optional                     :: inroot
-    complex(kind(1.0d0)), pointer, optional  :: indwork(:)
-    integer, pointer, optional            :: iniwork(:)   ! local variables
     integer, parameter   :: infile = 2
     integer              :: nrow, ncol, i,root, nprow, npcol, myprow, mypcol, ircode, j
     character            :: mmheader*15, fmt*15, object*10, type*10, sym*15,&
          & line*1024
-    complex(kind(1.0d0)), pointer  :: b(:,:)
+    complex(kind(1.0d0)), allocatable  :: b(:,:)
     if (present(inroot)) then
       root = inroot
     else
