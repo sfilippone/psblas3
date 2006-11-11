@@ -274,8 +274,10 @@ contains
             end if
             write(iout,*) 'Coarse matrix: ',&
                  & matrix_names(p%baseprecv(ilev)%iprcparm(coarse_mat_))
-            write(iout,*) 'Aggregation sizes: ', &
-                 &  sum( p%baseprecv(ilev)%nlaggr(:)),' : ',p%baseprecv(ilev)%nlaggr(:)
+            if (allocated(p%baseprecv(ilev)%nlaggr)) then 
+              write(iout,*) 'Aggregation sizes: ', &
+                   &  sum( p%baseprecv(ilev)%nlaggr(:)),' : ',p%baseprecv(ilev)%nlaggr(:)
+            end if
             write(iout,*) 'Factorization type: ',&
                  & fact_names(p%baseprecv(ilev)%iprcparm(f_type_))
             select case(p%baseprecv(ilev)%iprcparm(f_type_))
@@ -414,8 +416,10 @@ contains
           
           write(iout,*) 'Coarse matrix: ',&
                & matrix_names(p%baseprecv(2)%iprcparm(coarse_mat_))
-          write(iout,*) 'Aggregation sizes: ', &
-               &  sum( p%baseprecv(2)%nlaggr(:)),' : ',p%baseprecv(2)%nlaggr(:)
+          if (allocated(p%baseprecv(ilev)%nlaggr)) then 
+            write(iout,*) 'Aggregation sizes: ', &
+                 &  sum( p%baseprecv(2)%nlaggr(:)),' : ',p%baseprecv(2)%nlaggr(:)
+          endif
           write(iout,*) 'Factorization type: ',&
                & fact_names(p%baseprecv(2)%iprcparm(f_type_))
           select case(p%baseprecv(2)%iprcparm(f_type_))

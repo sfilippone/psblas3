@@ -75,7 +75,6 @@ subroutine psb_cdcpy(desc_in, desc_out, info)
      goto 9999
   endif
 
-  call psb_nullify_desc(desc_out)
 
   call psb_safe_cpy(desc_in%matrix_data,desc_out%matrix_data,info)
   if (info == 0)   call psb_safe_cpy(desc_in%halo_index,desc_out%halo_index,info)
