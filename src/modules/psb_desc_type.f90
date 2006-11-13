@@ -112,4 +112,34 @@ contains
 
   end function psb_is_asb_dec
 
+  integer function psb_get_local_rows(desc)
+    type(psb_desc_type), intent(in) :: desc
+    
+    psb_get_local_rows = desc%matrix_data(psb_n_row_)
+  end function psb_get_local_rows
+
+  integer function psb_get_local_cols(desc)
+    type(psb_desc_type), intent(in) :: desc
+    
+    psb_get_local_cols = desc%matrix_data(psb_n_col_)
+  end function psb_get_local_cols
+
+  integer function psb_get_global_rows(desc)
+    type(psb_desc_type), intent(in) :: desc
+    
+    psb_get_global_rows = desc%matrix_data(psb_m_)
+  end function psb_get_global_rows
+
+  integer function psb_get_global_cols(desc)
+    type(psb_desc_type), intent(in) :: desc
+    
+    psb_get_global_cols = desc%matrix_data(psb_n_)
+  end function psb_get_global_cols
+
+  integer function psb_get_context(desc)
+    type(psb_desc_type), intent(in) :: desc
+    
+    psb_get_context = desc%matrix_data(psb_ctxt_)
+  end function psb_get_context
+    
 end module psb_descriptor_type
