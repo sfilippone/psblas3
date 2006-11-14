@@ -66,16 +66,16 @@ subroutine psb_cdins(nz,ia,ja,desc_a,info)
   name = 'psb_cdins'
   call psb_erractionsave(err_act)
 
-  ictxt = desc_a%matrix_data(psb_ctxt_)
-  dectype = desc_a%matrix_data(psb_dec_type_)
-  mglob   = desc_a%matrix_data(psb_m_)
-  nglob   = desc_a%matrix_data(psb_n_)
-  nrow    = desc_a%matrix_data(psb_n_row_)
-  ncol    = desc_a%matrix_data(psb_n_col_)
+  ictxt = psb_get_context(desc_a)
+  dectype = psb_get_dectype(desc_a)
+  mglob   = psb_get_global_rows(desc_a)
+  nglob   = psb_get_global_cols(desc_a)
+  nrow    = psb_get_local_rows(desc_a)
+  ncol    = psb_get_local_cols(desc_a)
 
   call psb_info(ictxt, me, np)
 
-  if (.not.psb_is_bld_dec(dectype)) then 
+  if (.not.psb_is_bld_desc(desc_a)) then 
     info = 3110
     call psb_errpush(info,name)
     goto 9999

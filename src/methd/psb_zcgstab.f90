@@ -119,13 +119,13 @@ Subroutine psb_zcgstab(a,prec,b,x,eps,desc_a,info,&
   call psb_erractionsave(err_act)
 
   If (debug) Write(*,*) 'Entering PSB_ZCGSTAB',present(istop)
-  ictxt = desc_a%matrix_data(psb_ctxt_)
+  ictxt = psb_get_context(desc_a)
   CALL psb_info(ictxt, me, np)
   if (debug) write(*,*) 'PSB_ZCGSTAB: From GRIDINFO',np,me
 
-  mglob = desc_a%matrix_data(psb_m_)
-  n_row = desc_a%matrix_data(psb_n_row_)
-  n_col = desc_a%matrix_data(psb_n_col_)
+  mglob = psb_get_global_rows(desc_a)
+  n_row = psb_get_local_rows(desc_a)
+  n_col = psb_get_local_cols(desc_a)
 
   If (Present(istop)) Then 
     istop_ = istop 

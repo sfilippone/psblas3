@@ -79,7 +79,7 @@ subroutine  psb_zscatterm(globx, locx, desc_a, info, iroot,&
   info=0
   call psb_erractionsave(err_act)
 
-  ictxt=desc_a%matrix_data(psb_ctxt_)
+  ictxt=psb_get_context(desc_a)
 
   ! check on blacs grid 
   call psb_info(ictxt, me, np)
@@ -131,8 +131,8 @@ subroutine  psb_zscatterm(globx, locx, desc_a, info, iroot,&
   lda_globx = size(globx,1)
   lda_locx  = size(locx, 1)
 
-  m = desc_a%matrix_data(psb_m_)
-  n = desc_a%matrix_data(psb_n_)
+  m = psb_get_global_rows(desc_a)
+  n = psb_get_global_cols(desc_a)
 
   lock=size(locx,2)-jlocx+1
   globk=size(globx,2)-jglobx+1
@@ -154,8 +154,8 @@ subroutine  psb_zscatterm(globx, locx, desc_a, info, iroot,&
   lda_globx = size(globx)
   lda_locx  = size(locx)
 
-  m = desc_a%matrix_data(psb_m_)
-  n = desc_a%matrix_data(psb_n_)
+  m = psb_get_global_rows(desc_a)
+  n = psb_get_global_cols(desc_a)
 
   if (me == iiroot) then
     call igebs2d(ictxt, 'all', ' ', 1, 1, k, 1)
@@ -165,8 +165,9 @@ subroutine  psb_zscatterm(globx, locx, desc_a, info, iroot,&
 
   !  there should be a global check on k here!!!
 
-  call psb_chkglobvect(m,n,size(globx),iglobx,jglobx,desc_a%matrix_data,info)
-  call psb_chkvect(m,n,size(locx),ilocx,jlocx,desc_a%matrix_data,info,ilx,jlx)
+  call psb_chkglobvect(m,n,size(globx),iglobx,jglobx,desc_a,info)
+  if (info == 0)  &
+       & call psb_chkvect(m,n,size(locx),ilocx,jlocx,desc_a,info,ilx,jlx)
   if(info /= 0) then
     info=4010
     ch_err='psb_chk(glob)vect'
@@ -180,7 +181,7 @@ subroutine  psb_zscatterm(globx, locx, desc_a, info, iroot,&
     goto 9999
   end if
 
-  nrow=desc_a%matrix_data(psb_n_row_)
+  nrow=psb_get_local_rows(desc_a)
 
   if(root == -1) then
     ! extract my chunk
@@ -335,7 +336,7 @@ subroutine  psb_zscatterv(globx, locx, desc_a, info, iroot)
   info=0
   call psb_erractionsave(err_act)
 
-  ictxt=desc_a%matrix_data(psb_ctxt_)
+  ictxt=psb_get_context(desc_a)
 
   ! check on blacs grid 
   call psb_info(ictxt, me, np)
@@ -363,8 +364,8 @@ subroutine  psb_zscatterv(globx, locx, desc_a, info, iroot)
   lda_globx = size(globx)
   lda_locx  = size(locx)
 
-  m = desc_a%matrix_data(psb_m_)
-  n = desc_a%matrix_data(psb_n_)
+  m = psb_get_global_rows(desc_a)
+  n = psb_get_global_cols(desc_a)
 
   k = 1
 
@@ -376,8 +377,9 @@ subroutine  psb_zscatterv(globx, locx, desc_a, info, iroot)
 
   !  there should be a global check on k here!!!
 
-  call psb_chkglobvect(m,n,size(globx),iglobx,jglobx,desc_a%matrix_data,info)
-  call psb_chkvect(m,n,size(locx),ilocx,jlocx,desc_a%matrix_data,info,ilx,jlx)
+  call psb_chkglobvect(m,n,size(globx),iglobx,jglobx,desc_a,info)
+  if (info == 0) &
+       & call psb_chkvect(m,n,size(locx),ilocx,jlocx,desc_a,info,ilx,jlx)
   if(info /= 0) then
     info=4010
     ch_err='psb_chk(glob)vect'
@@ -391,7 +393,7 @@ subroutine  psb_zscatterv(globx, locx, desc_a, info, iroot)
     goto 9999
   end if
 
-  nrow=desc_a%matrix_data(psb_n_row_)
+  nrow=psb_get_local_rows(desc_a)
 
   if(root == -1) then
     ! extract my chunk

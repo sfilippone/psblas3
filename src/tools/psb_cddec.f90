@@ -178,10 +178,11 @@ subroutine psb_cddec(nloc, ictxt, desc_a, info)
     goto 9999
   endif
 
-  desc_a%matrix_data(psb_m_)        = m
-  desc_a%matrix_data(psb_n_)        = m
+
   desc_a%matrix_data(psb_n_row_)    = nloc
   desc_a%matrix_data(psb_n_col_)    = nloc
+  desc_a%matrix_data(psb_m_)        = m
+  desc_a%matrix_data(psb_n_)        = m
   desc_a%matrix_data(psb_dec_type_) = psb_desc_bld_
   desc_a%matrix_data(psb_ctxt_)     = ictxt
   call psb_get_mpicomm(ictxt,desc_a%matrix_data(psb_mpi_c_))
@@ -213,6 +214,7 @@ subroutine psb_cddec(nloc, ictxt, desc_a, info)
     call psb_errpush(4010,name,a_err='psi_bld_cdesc')
     goto 9999
   end if
+
 
   desc_a%matrix_data(psb_dec_type_) = psb_desc_asb_
 

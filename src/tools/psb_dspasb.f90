@@ -76,10 +76,10 @@ subroutine psb_dspasb(a,desc_a, info, afmt, upd, dupl)
   name = 'psb_spasb'
   call psb_erractionsave(err_act)
 
-  ictxt  = desc_a%matrix_data(psb_ctxt_)
-  dscstate = desc_a%matrix_data(psb_dec_type_)
-  n_row    = desc_a%matrix_data(psb_n_row_)
-  n_col    = desc_a%matrix_data(psb_n_col_)
+  ictxt  = psb_get_context(desc_a)
+  dscstate = psb_get_dectype(desc_a)
+  n_row    = psb_get_local_rows(desc_a)
+  n_col    = psb_get_local_cols(desc_a)
 
   ! check on BLACS grid 
   call psb_info(ictxt, me, np)
@@ -106,8 +106,8 @@ subroutine psb_dspasb(a,desc_a, info, afmt, upd, dupl)
     ! First case: we come from a fresh build. 
     ! 
 
-    n_row = desc_a%matrix_data(psb_n_row_)
-    n_col = desc_a%matrix_data(psb_n_col_)
+    n_row = psb_get_local_rows(desc_a)
+    n_col = psb_get_local_cols(desc_a)
 
     !
     ! Second step: handle the local matrix part. 

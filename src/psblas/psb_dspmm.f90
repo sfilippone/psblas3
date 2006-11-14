@@ -117,7 +117,7 @@ subroutine  psb_dspmm(alpha,a,x,beta,y,desc_a,info,&
   info=0
   call psb_erractionsave(err_act)
 
-  ictxt=desc_a%matrix_data(psb_ctxt_)
+  ictxt=psb_get_context(desc_a)
 
   call psb_info(ictxt, me, np)
   if (np == -1) then
@@ -172,10 +172,10 @@ subroutine  psb_dspmm(alpha,a,x,beta,y,desc_a,info,&
     itrans = 'N'
   endif
 
-  m    = desc_a%matrix_data(psb_m_)
-  n    = desc_a%matrix_data(psb_n_)
-  nrow = desc_a%matrix_data(psb_n_row_)
-  ncol = desc_a%matrix_data(psb_n_col_)
+  m    = psb_get_global_rows(desc_a)
+  n    = psb_get_global_cols(desc_a)
+  nrow = psb_get_local_rows(desc_a)
+  ncol = psb_get_local_cols(desc_a)
   lldx = size(x,1)
   lldy = size(y,1)
 
@@ -208,7 +208,7 @@ subroutine  psb_dspmm(alpha,a,x,beta,y,desc_a,info,&
   iwork(1)=dzero
 
   ! checking for matrix correctness
-  call psb_chkmat(m,n,ia,ja,desc_a%matrix_data,info,iia,jja)
+  call psb_chkmat(m,n,ia,ja,desc_a,info,iia,jja)
   if(info /= 0) then
     info=4010
     ch_err='psb_chkmat'
@@ -227,8 +227,9 @@ subroutine  psb_dspmm(alpha,a,x,beta,y,desc_a,info,&
     end if
 
     ! checking for vectors correctness
-    call psb_chkvect(n,ik,size(x,1),ix,ijx,desc_a%matrix_data,info,iix,jjx)
-    call psb_chkvect(m,ik,size(y,1),iy,ijy,desc_a%matrix_data,info,iiy,jjy)
+    call psb_chkvect(n,ik,size(x,1),ix,ijx,desc_a,info,iix,jjx)
+    if (info == 0) &
+         & call psb_chkvect(m,ik,size(y,1),iy,ijy,desc_a,info,iiy,jjy)
     if(info /= 0) then
       info=4010
       ch_err='psb_chkvect'
@@ -296,8 +297,9 @@ subroutine  psb_dspmm(alpha,a,x,beta,y,desc_a,info,&
     end if
 
     ! checking for vectors correctness
-    call psb_chkvect(m,ik,size(x,1),ix,ijx,desc_a%matrix_data,info,iix,jjx)
-    call psb_chkvect(n,ik,size(y,1),iy,ijy,desc_a%matrix_data,info,iiy,jjy)
+    call psb_chkvect(m,ik,size(x,1),ix,ijx,desc_a,info,iix,jjx)
+    if (info == 0) &
+         & call psb_chkvect(n,ik,size(y,1),iy,ijy,desc_a,info,iiy,jjy)
     if(info /= 0) then
       info=4010
       ch_err='psb_chkvect'
@@ -453,7 +455,7 @@ subroutine  psb_dspmv(alpha,a,x,beta,y,desc_a,info,&
   info=0
   call psb_erractionsave(err_act)
 
-  ictxt=desc_a%matrix_data(psb_ctxt_)
+  ictxt=psb_get_context(desc_a)
 
   call psb_info(ictxt, me, np)
   if (np == -1) then
@@ -493,10 +495,10 @@ subroutine  psb_dspmv(alpha,a,x,beta,y,desc_a,info,&
     itrans = 'N'
   endif
 
-  m    = desc_a%matrix_data(psb_m_)
-  n    = desc_a%matrix_data(psb_n_)
-  nrow = desc_a%matrix_data(psb_n_row_)
-  ncol = desc_a%matrix_data(psb_n_col_)
+  m    = psb_get_global_rows(desc_a)
+  n    = psb_get_global_cols(desc_a)
+  nrow = psb_get_local_rows(desc_a)
+  ncol = psb_get_local_cols(desc_a)
   lldx = size(x)
   lldy = size(y)
 
@@ -531,7 +533,7 @@ subroutine  psb_dspmv(alpha,a,x,beta,y,desc_a,info,&
 
   if (debug) write(0,*) me,name,' Allocated work ', info
   ! checking for matrix correctness
-  call psb_chkmat(m,n,ia,ja,desc_a%matrix_data,info,iia,jja)
+  call psb_chkmat(m,n,ia,ja,desc_a,info,iia,jja)
   if(info /= 0) then
     info=4010
     ch_err='psb_chkmat'
@@ -550,8 +552,9 @@ subroutine  psb_dspmv(alpha,a,x,beta,y,desc_a,info,&
     end if
 
     ! checking for vectors correctness
-    call psb_chkvect(n,ik,size(x),ix,jx,desc_a%matrix_data,info,iix,jjx)
-    call psb_chkvect(m,ik,size(y),iy,jy,desc_a%matrix_data,info,iiy,jjy)
+    call psb_chkvect(n,ik,size(x),ix,jx,desc_a,info,iix,jjx)
+    if (info == 0) &
+         & call psb_chkvect(m,ik,size(y),iy,jy,desc_a,info,iiy,jjy)
     if(info /= 0) then
       info=4010
       ch_err='psb_chkvect'
@@ -598,8 +601,9 @@ subroutine  psb_dspmv(alpha,a,x,beta,y,desc_a,info,&
     end if
 
     ! checking for vectors correctness
-    call psb_chkvect(m,ik,size(x),ix,jx,desc_a%matrix_data,info,iix,jjx)
-    call psb_chkvect(n,ik,size(y),iy,jy,desc_a%matrix_data,info,iiy,jjy)
+    call psb_chkvect(m,ik,size(x),ix,jx,desc_a,info,iix,jjx)
+    if (info == 0)&
+         & call psb_chkvect(n,ik,size(y),iy,jy,desc_a,info,iiy,jjy)
     if(info /= 0) then
       info=4010
       ch_err='psb_chkvect'

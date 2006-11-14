@@ -101,15 +101,15 @@ Subroutine psb_dcdovr(a,desc_a,novr,desc_ov,info)
   info  = 0
   call psb_erractionsave(err_act)
 
-  ictxt=desc_a%matrix_data(psb_ctxt_)
+  ictxt=psb_get_context(desc_a)
 
   Call psb_info(ictxt, me, np)
 
   If(debug) Write(0,*)'in psb_cdovr',novr
 
-  m=desc_a%matrix_data(psb_n_row_)
+  m=psb_get_local_rows(desc_a)
   nnzero=Size(a%aspk)
-  n_col=desc_a%matrix_data(psb_n_col_)
+  n_col=psb_get_local_cols(desc_a)
   nhalo = n_col-m
   If(debug) Write(0,*)'IN CDOVR1',novr ,m,nnzero,n_col
   if (novr<0) then

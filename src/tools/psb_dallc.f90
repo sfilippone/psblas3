@@ -68,7 +68,7 @@ subroutine psb_dalloc(x, desc_a, info, n)
   int_err(1)=0
   call psb_erractionsave(err_act)
 
-  ictxt=desc_a%matrix_data(psb_ctxt_)
+  ictxt=psb_get_context(desc_a)
 
   call psb_info(ictxt, me, np)
   if (np == -1) then
@@ -77,9 +77,9 @@ subroutine psb_dalloc(x, desc_a, info, n)
     goto 9999
   endif
 
-  dectype=desc_a%matrix_data(psb_dec_type_)
+  dectype=psb_get_dectype(desc_a)
   !... check m and n parameters....
-  if (.not.psb_is_ok_dec(dectype)) then 
+  if (.not.psb_is_ok_desc(desc_a)) then 
     info = 3110
     call psb_errpush(info,name)
     goto 9999
@@ -105,8 +105,8 @@ subroutine psb_dalloc(x, desc_a, info, n)
   endif
 
   !....allocate x .....
-  if (psb_is_asb_dec(dectype).or.psb_is_upd_dec(dectype)) then
-    n_col = max(1,desc_a%matrix_data(psb_n_col_))
+  if (psb_is_asb_desc(desc_a).or.psb_is_upd_desc(desc_a)) then
+    n_col = max(1,psb_get_local_cols(desc_a))
     allocate(x(n_col,n_),stat=info)
     if (info /= 0) then
       info=4010
@@ -119,8 +119,8 @@ subroutine psb_dalloc(x, desc_a, info, n)
         x(i,j) = 0.0d0
       end do
     end do
-  else if (psb_is_bld_dec(dectype)) then
-    n_row = max(1,desc_a%matrix_data(psb_n_row_))
+  else if (psb_is_bld_desc(desc_a)) then
+    n_row = max(1,psb_get_local_rows(desc_a))
     allocate(x(n_row,n_),stat=info)
     if (info /= 0) then
       info=4010
@@ -213,7 +213,7 @@ subroutine psb_dallocv(x, desc_a,info,n)
   name='psb_dallcv'
   call psb_erractionsave(err_act)
 
-  ictxt=desc_a%matrix_data(psb_ctxt_)
+  ictxt=psb_get_context(desc_a)
 
   call psb_info(ictxt, me, np)
   !     ....verify blacs grid correctness..
@@ -223,11 +223,11 @@ subroutine psb_dallocv(x, desc_a,info,n)
     goto 9999
   endif
 
-  dectype=desc_a%matrix_data(psb_dec_type_)
+  dectype=psb_get_dectype(desc_a)
   if (debug) write(0,*) 'dall: dectype',dectype
-  if (debug) write(0,*) 'dall: is_ok? dectype',psb_is_ok_dec(dectype)
+  if (debug) write(0,*) 'dall: is_ok? dectype',psb_is_ok_desc(desc_a)
   !... check m and n parameters....
-  if (.not.psb_is_ok_dec(dectype)) then 
+  if (.not.psb_is_ok_desc(desc_a)) then 
     info = 3110
     call psb_errpush(info,name)
     goto 9999
@@ -236,8 +236,8 @@ subroutine psb_dallocv(x, desc_a,info,n)
   ! As this is a rank-1 array, optional parameter N is actually ignored.
 
   !....allocate x .....
-  if (psb_is_asb_dec(dectype).or.psb_is_upd_dec(dectype)) then
-    n_col = max(1,desc_a%matrix_data(psb_n_col_))
+  if (psb_is_asb_desc(desc_a).or.psb_is_upd_desc(desc_a)) then
+    n_col = max(1,psb_get_local_cols(desc_a))
     call psb_realloc(n_col,x,info)
     if (info /= 0) then
       info=4010
@@ -249,8 +249,8 @@ subroutine psb_dallocv(x, desc_a,info,n)
       x(i) = 0.0d0
     end do
 
-  else if (psb_is_bld_dec(dectype)) then
-    n_row = max(1,desc_a%matrix_data(psb_n_row_))
+  else if (psb_is_bld_desc(desc_a)) then
+    n_row = max(1,psb_get_local_rows(desc_a))
     call psb_realloc(n_row,x,info)
     if (info /= 0) then
       info=4010

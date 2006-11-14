@@ -78,7 +78,7 @@ subroutine  psb_ihalom(x,desc_a,info,alpha,jx,ik,work,tran,mode)
   info=0
   call psb_erractionsave(err_act)
 
-  ictxt=desc_a%matrix_data(psb_ctxt_)
+  ictxt=psb_get_context(desc_a)
 
   ! check on blacs grid 
   call psb_info(ictxt, me, np)
@@ -95,9 +95,9 @@ subroutine  psb_ihalom(x,desc_a,info,alpha,jx,ik,work,tran,mode)
     ijx = 1
   endif
 
-  m = desc_a%matrix_data(psb_m_)
-  n = desc_a%matrix_data(psb_n_)
-  nrow = desc_a%matrix_data(psb_n_row_)
+  m = psb_get_global_rows(desc_a)
+  n = psb_get_global_cols(desc_a)
+  nrow = psb_get_local_rows(desc_a)
 
   maxk=size(x,2)-ijx+1
 
@@ -123,7 +123,7 @@ subroutine  psb_ihalom(x,desc_a,info,alpha,jx,ik,work,tran,mode)
   endif
 
   ! check vector correctness
-  call psb_chkvect(m,1,size(x,1),ix,ijx,desc_a%matrix_data,info,iix,jjx)
+  call psb_chkvect(m,1,size(x,1),ix,ijx,desc_a,info,iix,jjx)
   if(info.ne.0) then
     info=4010
     ch_err='psb_chkvect'
@@ -285,7 +285,7 @@ subroutine  psb_ihalov(x,desc_a,info,alpha,work,tran,mode)
   info=0
   call psb_erractionsave(err_act)
 
-  ictxt=desc_a%matrix_data(psb_ctxt_)
+  ictxt=psb_get_context(desc_a)
 
   ! check on blacs grid 
   call psb_info(ictxt, me, np)
@@ -298,10 +298,10 @@ subroutine  psb_ihalov(x,desc_a,info,alpha,work,tran,mode)
   ix = 1
   ijx = 1
 
-  m = desc_a%matrix_data(psb_m_)
-  n = desc_a%matrix_data(psb_n_)
-  nrow = desc_a%matrix_data(psb_n_row_)
-  !  ncol = desc_a%matrix_data(psb_n_col_)
+  m = psb_get_global_rows(desc_a)
+  n = psb_get_global_cols(desc_a)
+  nrow = psb_get_local_rows(desc_a)
+  !  ncol = psb_get_local_cols(desc_a)
 
 
   if (present(tran)) then     
@@ -316,7 +316,7 @@ subroutine  psb_ihalov(x,desc_a,info,alpha,work,tran,mode)
   endif
 
   ! check vector correctness
-  call psb_chkvect(m,1,size(x,1),ix,ijx,desc_a%matrix_data,info,iix,jjx)
+  call psb_chkvect(m,1,size(x,1),ix,ijx,desc_a,info,iix,jjx)
   if(info.ne.0) then
     info=4010
     ch_err='psb_chkvect'

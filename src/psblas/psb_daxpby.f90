@@ -75,7 +75,7 @@ subroutine  psb_daxpby(alpha, x, beta,y,desc_a,info, n, jx, jy)
   info=0
   call psb_erractionsave(err_act)
 
-  ictxt=desc_a%matrix_data(psb_ctxt_)
+  ictxt=psb_get_context(desc_a)
 
   call psb_info(ictxt, me, np)
   if (np == -ione) then
@@ -115,11 +115,12 @@ subroutine  psb_daxpby(alpha, x, beta,y,desc_a,info, n, jx, jy)
     goto 9999
   end if
 
-  m = desc_a%matrix_data(psb_m_)
+  m = psb_get_global_rows(desc_a)
 
   ! check vector correctness
-  call psb_chkvect(m,ione,size(x,1),ix,ijx,desc_a%matrix_data,info,iix,jjx)
-  call psb_chkvect(m,ione,size(y,1),iy,ijy,desc_a%matrix_data,info,iiy,jjy)
+  call psb_chkvect(m,ione,size(x,1),ix,ijx,desc_a,info,iix,jjx)
+  if (info == 0) &
+       & call psb_chkvect(m,ione,size(y,1),iy,ijy,desc_a,info,iiy,jjy)
   if(info.ne.0) then
     info=4010
     ch_err='psb_chkvect'
@@ -134,8 +135,8 @@ subroutine  psb_daxpby(alpha, x, beta,y,desc_a,info, n, jx, jy)
   end if
 
   if ((in.ne.0)) then
-    if(desc_a%matrix_data(psb_n_row_).gt.0) then
-      call daxpby(desc_a%matrix_data(psb_n_row_),in,&
+    if(psb_get_local_rows(desc_a).gt.0) then
+      call daxpby(psb_get_local_rows(desc_a),in,&
            & alpha,x(iix,jjx),size(x,1),beta,&
            & y(iiy,jjy),size(y,1),info)
     end if
@@ -227,7 +228,7 @@ subroutine  psb_daxpbyv(alpha, x, beta,y,desc_a,info)
   info=0
   call psb_erractionsave(err_act)
 
-  ictxt=desc_a%matrix_data(psb_ctxt_)
+  ictxt=psb_get_context(desc_a)
 
   call psb_info(ictxt, me, np)
   if (np == -ione) then
@@ -239,17 +240,17 @@ subroutine  psb_daxpbyv(alpha, x, beta,y,desc_a,info)
   ix = ione
   iy = ione
 
-  m = desc_a%matrix_data(psb_m_)
+  m = psb_get_global_rows(desc_a)
 
   ! check vector correctness
-  call psb_chkvect(m,ione,size(x),ix,ione,desc_a%matrix_data,info,iix,jjx)
+  call psb_chkvect(m,ione,size(x),ix,ione,desc_a,info,iix,jjx)
   if(info.ne.0) then
     info=4010
     ch_err='psb_chkvect 1'
     call psb_errpush(info,name,a_err=ch_err)
     goto 9999
   end if
-  call psb_chkvect(m,ione,size(y),iy,ione,desc_a%matrix_data,info,iiy,jjy)
+  call psb_chkvect(m,ione,size(y),iy,ione,desc_a,info,iiy,jjy)
   if(info.ne.0) then
     info=4010
     ch_err='psb_chkvect 2'
@@ -262,8 +263,8 @@ subroutine  psb_daxpbyv(alpha, x, beta,y,desc_a,info)
     call psb_errpush(info,name)
   end if
 
-  if(desc_a%matrix_data(psb_n_row_).gt.0) then
-    call daxpby(desc_a%matrix_data(psb_n_row_),ione,&
+  if(psb_get_local_rows(desc_a).gt.0) then
+    call daxpby(psb_get_local_rows(desc_a),ione,&
          & alpha,x,size(x),beta,&
          & y,size(y),info)
   end if

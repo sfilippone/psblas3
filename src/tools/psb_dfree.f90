@@ -65,7 +65,7 @@ subroutine psb_dfree(x, desc_a, info)
      goto 9999
   end if
 
-  ictxt=desc_a%matrix_data(psb_ctxt_)
+  ictxt=psb_get_context(desc_a)
 
   call psb_info(ictxt, me, np)
   !     ....verify blacs grid correctness..
@@ -139,7 +139,7 @@ subroutine psb_dfreev(x, desc_a, info)
      call psb_errpush(info,name)
      return
   end if
-  ictxt=desc_a%matrix_data(psb_ctxt_)
+  ictxt=psb_get_context(desc_a)
 
   call psb_info(ictxt, me, np)
   if (np == -1) then

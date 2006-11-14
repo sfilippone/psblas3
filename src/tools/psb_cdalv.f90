@@ -269,6 +269,7 @@ subroutine psb_cdalv(m, v, ictxt, desc_a, info, flag)
   desc_a%halo_index(:) = -1
 
 
+
   desc_a%matrix_data(psb_m_)        = m
   desc_a%matrix_data(psb_n_)        = n
   desc_a%matrix_data(psb_dec_type_) = psb_desc_bld_

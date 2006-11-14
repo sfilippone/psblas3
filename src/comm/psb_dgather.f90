@@ -77,7 +77,7 @@ subroutine  psb_dgatherm(globx, locx, desc_a, info, iroot,&
   info=0
   call psb_erractionsave(err_act)
 
-  ictxt=desc_a%matrix_data(psb_ctxt_)
+  ictxt=psb_get_context(desc_a)
 
   ! check on blacs grid 
   call psb_info(ictxt, me, np)
@@ -131,8 +131,8 @@ subroutine  psb_dgatherm(globx, locx, desc_a, info, iroot,&
   lda_globx = size(globx,1)
   lda_locx  = size(locx, 1)
 
-  m = desc_a%matrix_data(psb_m_)
-  n = desc_a%matrix_data(psb_n_)
+  m = psb_get_global_rows(desc_a)
+  n = psb_get_global_cols(desc_a)
 
   lock=size(locx,2)-jlocx+1
   globk=size(globx,2)-jglobx+1
@@ -152,8 +152,8 @@ subroutine  psb_dgatherm(globx, locx, desc_a, info, iroot,&
 
   !  there should be a global check on k here!!!
 
-  call psb_chkglobvect(m,n,size(globx,1),iglobx,jglobx,desc_a%matrix_data,info)
-  call psb_chkvect(m,n,size(locx,1),ilocx,jlocx,desc_a%matrix_data,info,ilx,jlx)
+  call psb_chkglobvect(m,n,size(globx,1),iglobx,jglobx,desc_a,info)
+  call psb_chkvect(m,n,size(locx,1),ilocx,jlocx,desc_a,info,ilx,jlx)
   if(info.ne.0) then
     info=4010
     ch_err='psb_chk(glob)vect'
@@ -170,7 +170,7 @@ subroutine  psb_dgatherm(globx, locx, desc_a, info, iroot,&
   globx(:,:)=0.d0
 
   do j=1,k
-    do i=1,desc_a%matrix_data(psb_n_row_)
+    do i=1,psb_get_local_rows(desc_a)
       idx = desc_a%loc_to_glob(i)
       globx(idx,jglobx+j-1) = locx(i,jlx+j-1)
     end do
@@ -280,7 +280,7 @@ subroutine  psb_dgatherv(globx, locx, desc_a, info, iroot,&
   info=0
   call psb_erractionsave(err_act)
 
-  ictxt=desc_a%matrix_data(psb_ctxt_)
+  ictxt=psb_get_context(desc_a)
 
   ! check on blacs grid 
   call psb_info(ictxt, me, np)
@@ -319,16 +319,16 @@ subroutine  psb_dgatherv(globx, locx, desc_a, info, iroot,&
   lda_globx = size(globx)
   lda_locx  = size(locx)
 
-  m = desc_a%matrix_data(psb_m_)
-  n = desc_a%matrix_data(psb_n_)
+  m = psb_get_global_rows(desc_a)
+  n = psb_get_global_cols(desc_a)
   
   k = 1
 
 
   !  there should be a global check on k here!!!
 
-  call psb_chkglobvect(m,n,size(globx),iglobx,jglobx,desc_a%matrix_data,info)
-  call psb_chkvect(m,n,size(locx),ilocx,jlocx,desc_a%matrix_data,info,ilx,jlx)
+  call psb_chkglobvect(m,n,size(globx),iglobx,jglobx,desc_a,info)
+  call psb_chkvect(m,n,size(locx),ilocx,jlocx,desc_a,info,ilx,jlx)
   if(info.ne.0) then
      info=4010
      ch_err='psb_chk(glob)vect'
@@ -344,7 +344,7 @@ subroutine  psb_dgatherv(globx, locx, desc_a, info, iroot,&
   
   globx(:)=0.d0
 
-  do i=1,desc_a%matrix_data(psb_n_row_)
+  do i=1,psb_get_local_rows(desc_a)
      idx = desc_a%loc_to_glob(i)
      globx(idx) = locx(i)
   end do

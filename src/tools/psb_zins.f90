@@ -83,7 +83,7 @@ subroutine psb_zinsvi(m, irw, val, x, desc_a, info, dupl)
     return
   end if
 
-  ictxt=desc_a%matrix_data(psb_ctxt_)
+  ictxt=psb_get_context(desc_a)
 
   call psb_info(ictxt, me, np)
   if (np == -1) then
@@ -99,12 +99,12 @@ subroutine psb_zinsvi(m, irw, val, x, desc_a, info, dupl)
     int_err(2) = m
     call psb_errpush(info,name,int_err)
     goto 9999
-  else if (.not.psb_is_ok_dec(desc_a%matrix_data(psb_dec_type_))) then
+  else if (.not.psb_is_ok_desc(desc_a)) then
     info = 3110
-    int_err(1) = desc_a%matrix_data(psb_dec_type_)
+    int_err(1) = psb_get_dectype(desc_a)
     call psb_errpush(info,name,int_err)
     goto 9999
-  else if (size(x, dim=1) < desc_a%matrix_data(psb_n_row_)) then
+  else if (size(x, dim=1) < psb_get_local_rows(desc_a)) then
     info = 310
     int_err(1) = 5
     int_err(2) = 4
@@ -112,9 +112,9 @@ subroutine psb_zinsvi(m, irw, val, x, desc_a, info, dupl)
     goto 9999
   endif
 
-  loc_rows=desc_a%matrix_data(psb_n_row_)
-  loc_cols=desc_a%matrix_data(psb_n_col_)
-  mglob    = desc_a%matrix_data(psb_m_)
+  loc_rows=psb_get_local_rows(desc_a)
+  loc_cols=psb_get_local_cols(desc_a)
+  mglob    = psb_get_global_rows(desc_a)
 
   if (present(dupl)) then 
     dupl_ = dupl
@@ -264,7 +264,7 @@ subroutine psb_zinsi(m,irw, val, x, desc_a, info, dupl)
     return
   end if
 
-  ictxt=desc_a%matrix_data(psb_ctxt_)
+  ictxt=psb_get_context(desc_a)
 
   call psb_info(ictxt, me, np)
   if (np == -1) then
@@ -280,12 +280,12 @@ subroutine psb_zinsi(m,irw, val, x, desc_a, info, dupl)
     int_err(2) = m
     call psb_errpush(info,name,int_err)
     goto 9999
-  else if (.not.psb_is_ok_dec(desc_a%matrix_data(psb_dec_type_))) then
+  else if (.not.psb_is_ok_desc(desc_a)) then
     info = 3110
-    int_err(1) = desc_a%matrix_data(psb_dec_type_)
+    int_err(1) = psb_get_dectype(desc_a)
     call psb_errpush(info,name,int_err)
     goto 9999
-  else if (size(x, dim=1) < desc_a%matrix_data(psb_n_row_)) then
+  else if (size(x, dim=1) < psb_get_local_rows(desc_a)) then
     info = 310
     int_err(1) = 5
     int_err(2) = 4
@@ -293,9 +293,9 @@ subroutine psb_zinsi(m,irw, val, x, desc_a, info, dupl)
     goto 9999
   endif
 
-  loc_rows=desc_a%matrix_data(psb_n_row_)
-  loc_cols=desc_a%matrix_data(psb_n_col_)
-  mglob    = desc_a%matrix_data(psb_m_)
+  loc_rows=psb_get_local_rows(desc_a)
+  loc_cols=psb_get_local_cols(desc_a)
+  mglob    = psb_get_global_rows(desc_a)
 
   n = min(size(val,2),size(x,2))
 

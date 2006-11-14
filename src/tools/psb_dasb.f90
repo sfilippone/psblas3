@@ -69,20 +69,20 @@ subroutine psb_dasb(x, desc_a, info)
     goto 9999
   endif
 
-  ictxt=desc_a%matrix_data(psb_ctxt_)
-  dectype=desc_a%matrix_data(psb_dec_type_)
+  ictxt=psb_get_context(desc_a)
+  dectype=psb_get_dectype(desc_a)
 
   call psb_info(ictxt, me, np)
 
 
   if (debug) write(*,*) 'asb start: ',np,me,&
-       &desc_a%matrix_data(psb_dec_type_)
+       &psb_get_dectype(desc_a)
   !     ....verify blacs grid correctness..
   if (np == -1) then
     info = 2010
     call psb_errpush(info,name)
     goto 9999
-  else if (.not.psb_is_asb_dec(dectype)) then
+  else if (.not.psb_is_asb_desc(desc_a)) then
     if (debug) write(*,*) 'asb error ',&
          &dectype
     info = 3110
@@ -91,9 +91,9 @@ subroutine psb_dasb(x, desc_a, info)
   endif
 
   ! check size
-  ictxt=desc_a%matrix_data(psb_ctxt_)
-  nrow=desc_a%matrix_data(psb_n_row_)
-  ncol=desc_a%matrix_data(psb_n_col_)
+  ictxt=psb_get_context(desc_a)
+  nrow=psb_get_local_rows(desc_a)
+  ncol=psb_get_local_cols(desc_a)
   i1sz = size(x,dim=1)
   i2sz = size(x,dim=2)
   if (debug) write(*,*) 'asb: ',i1sz,i2sz,nrow,ncol
@@ -193,8 +193,8 @@ subroutine psb_dasbv(x, desc_a, info)
   int_err(1) = 0
   name = 'psb_dasbv'
 
-  ictxt=desc_a%matrix_data(psb_ctxt_)
-  dectype=desc_a%matrix_data(psb_dec_type_)
+  ictxt=psb_get_context(desc_a)
+  dectype=psb_get_dectype(desc_a)
 
   call psb_info(ictxt, me, np)
 
@@ -203,14 +203,14 @@ subroutine psb_dasbv(x, desc_a, info)
     info = 2010
     call psb_errpush(info,name)
     goto 9999
-  else if (.not.psb_is_asb_dec(dectype)) then
+  else if (.not.psb_is_asb_desc(desc_a)) then
     info = 3110
     call psb_errpush(info,name)
     goto 9999
   endif
 
-  nrow=desc_a%matrix_data(psb_n_row_)
-  ncol=desc_a%matrix_data(psb_n_col_)
+  nrow=psb_get_local_rows(desc_a)
+  ncol=psb_get_local_cols(desc_a)
   if (debug) write(*,*) name,' sizes: ',nrow,ncol
   i1sz = size(x)
   if (debug) write(*,*) 'dasb: sizes ',i1sz,ncol

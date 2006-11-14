@@ -60,7 +60,7 @@ subroutine psb_zbldaggrmat(a,desc_a,ac,desc_ac,p,info)
   info=0
   call psb_erractionsave(err_act)
 
-  ictxt=desc_a%matrix_data(psb_ctxt_)
+  ictxt=psb_get_context(desc_a)
   call psb_info(ictxt, me, np)
 
   select case (p%iprcparm(smth_kind_))
@@ -124,11 +124,11 @@ contains
 
     call psb_nullify_sp(b)
 
-    ictxt = desc_a%matrix_data(psb_ctxt_)
+    ictxt = psb_get_context(desc_a)
     call psb_info(ictxt, me, np)
-    nglob = desc_a%matrix_data(psb_m_)
-    nrow  = desc_a%matrix_data(psb_n_row_)
-    ncol  = desc_a%matrix_data(psb_n_col_)
+    nglob = psb_get_global_rows(desc_a)
+    nrow  = psb_get_local_rows(desc_a)
+    ncol  = psb_get_local_cols(desc_a)
 
     naggr  = p%nlaggr(me+1)
     ntaggr = sum(p%nlaggr)
@@ -154,13 +154,7 @@ contains
     end if
 
 
-    call psb_spinfo(psb_nztotreq_,a,nzt,info)
-
-    if(info /= 0) then
-      call psb_errpush(4010,name,a_err='spinfo')
-      goto 9999
-    end if
-
+    nzt = psb_get_nnzeros(a)
     call psb_sp_all(b,nzt,info)
     if(info /= 0) then
       call psb_errpush(4010,name,a_err='spall')
@@ -180,13 +174,8 @@ contains
         call psb_errpush(info,name,a_err=ch_err)
         goto 9999
       end if
-      call psb_spinfo(psb_nztotreq_,b,nzt,info)
-      if(info /= 0) then
-        info=4010
-        ch_err='psb_spinfo'
-        call psb_errpush(info,name,a_err=ch_err)
-        goto 9999
-      end if
+
+      nzt = psb_get_nnzeros(b)
       do i=1, nzt 
         b%ia1(i) = p%mlia(b%ia1(i))
         b%ia2(i) = p%mlia(b%ia2(i))
@@ -233,7 +222,7 @@ contains
       goto 9999
     end if
 
-    irs = b%infoa(psb_nnz_)
+    irs = psb_get_nnzeros(b)
     call psb_sp_reall(b,irs,info)
     if(info /= 0) then
       call psb_errpush(4010,name,a_err='spreall')
@@ -296,6 +285,7 @@ contains
         call psb_errpush(4010,name,a_err='psb_cddec')
         goto 9999
       end if
+
       call psb_sp_clone(b,ac,info)
       if(info /= 0) then
         call psb_errpush(4010,name,a_err='spclone')
@@ -411,7 +401,7 @@ contains
     info=0
     call psb_erractionsave(err_act)
 
-    ictxt = desc_a%matrix_data(psb_ctxt_)
+    ictxt = psb_get_context(desc_a)
     call psb_info(ictxt, me, np)
 
     call psb_nullify_sp(b)
@@ -421,9 +411,9 @@ contains
     am2 => p%av(sm_pr_t_)
     am1 => p%av(sm_pr_)
 
-    nglob = desc_a%matrix_data(psb_m_)
-    nrow  = desc_a%matrix_data(psb_n_row_)
-    ncol  = desc_a%matrix_data(psb_n_col_)
+    nglob = psb_get_global_rows(desc_a)
+    nrow  = psb_get_local_rows(desc_a)
+    ncol  = psb_get_local_cols(desc_a)
 
     naggr  = p%nlaggr(me+1)
     ntaggr = sum(p%nlaggr)
@@ -890,7 +880,7 @@ contains
 
 
         if (np>1) then 
-          call psb_spinfo(psb_nztotreq_,am1,nzl,info)
+          nzl = psb_get_nnzeros(am1)
           call psb_glob_to_loc(am1%ia1(1:nzl),desc_ac,info,'I')
           if(info /= 0) then
             call psb_errpush(4010,name,a_err='psb_glob_to_loc')

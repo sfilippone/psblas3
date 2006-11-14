@@ -80,7 +80,7 @@ subroutine psi_crea_index(desc_a,index_in,index_out,glob_idx,nxch,nsnd,nrcv,info
   name='psi_crea_index'
   call psb_erractionsave(err_act)
 
-  ictxt = desc_a%matrix_data(psb_ctxt_)
+  ictxt = psb_get_context(desc_a)
   call psb_info(ictxt,me,np)
   if (np == -1) then
     info = 2010

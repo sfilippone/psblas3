@@ -69,16 +69,16 @@ Subroutine psb_dsprn(a, desc_a,info,clear)
   name = 'psb_dsprn'
   call psb_erractionsave(err_act)
 
-  ictxt = desc_a%matrix_data(psb_ctxt_)
+  ictxt = psb_get_context(desc_a)
   call psb_info(ictxt, me, np)
   if (debug) &
        &write(*,*) 'starting spalloc ',ictxt,np,me
 
-  if (psb_is_bld_dec(desc_a%matrix_data(psb_dec_type_))) then
+  if (psb_is_bld_desc(desc_a)) then
     ! Should do nothing, we are called redundantly
     return
   endif
-  if (.not.psb_is_asb_dec(desc_a%matrix_data(psb_dec_type_))) then
+  if (.not.psb_is_asb_desc(desc_a)) then
     info=590     
     call psb_errpush(info,name)
     goto 9999

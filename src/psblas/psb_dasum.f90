@@ -71,7 +71,7 @@ function psb_dasum (x,desc_a, info, jx)
 
   asum=0.d0
 
-  ictxt=desc_a%matrix_data(psb_ctxt_)
+  ictxt=psb_get_context(desc_a)
 
   call psb_info(ictxt, me, np)
   if (np == -1) then
@@ -87,10 +87,10 @@ function psb_dasum (x,desc_a, info, jx)
     ijx = 1
   endif
 
-  m = desc_a%matrix_data(psb_m_)
+  m = psb_get_global_rows(desc_a)
 
   ! check vector correctness
-  call psb_chkvect(m,1,size(x,1),ix,ijx,desc_a%matrix_data,info,iix,jjx)
+  call psb_chkvect(m,1,size(x,1),ix,ijx,desc_a,info,iix,jjx)
   if(info.ne.0) then
     info=4010
     ch_err='psb_chkvect'
@@ -106,8 +106,8 @@ function psb_dasum (x,desc_a, info, jx)
 
   ! compute local max
   if ((m.ne.0)) then
-    if(desc_a%matrix_data(psb_n_row_).gt.0) then
-      asum=dasum(desc_a%matrix_data(psb_n_row_)-iix+1,x(iix,jjx),ione)
+    if(psb_get_local_rows(desc_a).gt.0) then
+      asum=dasum(psb_get_local_rows(desc_a)-iix+1,x(iix,jjx),ione)
 
       ! adjust asum because overlapped elements are computed more than once
       i=1
@@ -213,7 +213,7 @@ function psb_dasumv (x,desc_a, info)
 
   asum=0.d0
 
-  ictxt=desc_a%matrix_data(psb_ctxt_)
+  ictxt=psb_get_context(desc_a)
 
   call psb_info(ictxt, me, np)
   if (np == -1) then
@@ -225,10 +225,10 @@ function psb_dasumv (x,desc_a, info)
   ix = 1
   jx=1
 
-  m = desc_a%matrix_data(psb_m_)
+  m = psb_get_global_rows(desc_a)
 
   ! check vector correctness
-  call psb_chkvect(m,1,size(x),ix,jx,desc_a%matrix_data,info,iix,jjx)
+  call psb_chkvect(m,1,size(x),ix,jx,desc_a,info,iix,jjx)
   if(info.ne.0) then
     info=4010
     ch_err='psb_chkvect'
@@ -244,8 +244,8 @@ function psb_dasumv (x,desc_a, info)
 
   ! compute local max
   if ((m.ne.0)) then
-    if(desc_a%matrix_data(psb_n_row_).gt.0) then
-      asum=dasum(desc_a%matrix_data(psb_n_row_),x,ione)
+    if(psb_get_local_rows(desc_a).gt.0) then
+      asum=dasum(psb_get_local_rows(desc_a),x,ione)
 
       ! adjust asum because overlapped elements are computed more than once
       i=1
@@ -351,7 +351,7 @@ subroutine psb_dasumvs (res,x,desc_a, info)
 
   asum=0.d0
 
-  ictxt=desc_a%matrix_data(psb_ctxt_)
+  ictxt=psb_get_context(desc_a)
 
   call psb_info(ictxt, me, np)
   if (np == -1) then
@@ -363,10 +363,10 @@ subroutine psb_dasumvs (res,x,desc_a, info)
   ix = 1
   jx = 1
 
-  m = desc_a%matrix_data(psb_m_)
+  m = psb_get_global_rows(desc_a)
 
   ! check vector correctness
-  call psb_chkvect(m,1,size(x),ix,jx,desc_a%matrix_data,info,iix,jjx)
+  call psb_chkvect(m,1,size(x),ix,jx,desc_a,info,iix,jjx)
   if(info.ne.0) then
     info=4010
     ch_err='psb_chkvect'
@@ -382,8 +382,8 @@ subroutine psb_dasumvs (res,x,desc_a, info)
 
   ! compute local max
   if ((m.ne.0)) then
-    if(desc_a%matrix_data(psb_n_row_).gt.0) then
-      asum=dasum(desc_a%matrix_data(psb_n_row_),x,ione)
+    if(psb_get_local_rows(desc_a).gt.0) then
+      asum=dasum(psb_get_local_rows(desc_a),x,ione)
 
       ! adjust asum because overlapped elements are computed more than once
       i=1

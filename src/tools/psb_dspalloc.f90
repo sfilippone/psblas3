@@ -68,8 +68,8 @@ subroutine psb_dspalloc(a, desc_a, info, nnz)
   call psb_erractionsave(err_act)
   name = 'psb_dspalloc'
 
-  ictxt = desc_a%matrix_data(psb_ctxt_)
-  dectype = desc_a%matrix_data(psb_dec_type_)
+  ictxt = psb_get_context(desc_a)
+  dectype = psb_get_dectype(desc_a)
   call psb_info(ictxt, me, np)
   !     ....verify blacs grid correctness..
   if (np == -1) then
@@ -85,9 +85,9 @@ subroutine psb_dspalloc(a, desc_a, info, nnz)
   ! check if psdalloc is already called for this matrix
 
   ! set fields in desc_a%matrix_data....
-  loc_row = desc_a%matrix_data(psb_n_row_)
-  m       = desc_a%matrix_data(psb_m_)
-  n       = desc_a%matrix_data(psb_n_)
+  loc_row = psb_get_local_rows(desc_a)
+  m       = psb_get_global_rows(desc_a)
+  n       = psb_get_global_cols(desc_a)
 
   !...allocate matrix data...
   if (present(nnz))then 
@@ -127,7 +127,7 @@ subroutine psb_dspalloc(a, desc_a, info, nnz)
   a%infoa(psb_state_) = psb_spmat_bld_
 
   if (debug) write(0,*) 'spall: ',  &
-       &desc_a%matrix_data(psb_dec_type_),psb_desc_bld_
+       &psb_get_dectype(desc_a),psb_desc_bld_
 
   return
 

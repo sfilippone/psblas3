@@ -68,7 +68,7 @@ subroutine psb_zsp_renum(a,desc_a,blck,p,atmp,info)
   name='apply_renum'
   call psb_erractionsave(err_act)
 
-  ictxt=desc_a%matrix_data(psb_ctxt_)
+  ictxt=psb_get_context(desc_a)
   call psb_info(ictxt, me, np)
 
 !!!!!!!!!!!!!!!! CHANGE FOR NON-CSR A
@@ -84,7 +84,7 @@ subroutine psb_zsp_renum(a,desc_a,blck,p,atmp,info)
     atmp%descra = 'GUN'
 
     ! This is the renumbering coherent with global indices..
-    mglob = desc_a%matrix_data(psb_m_)
+    mglob = psb_get_global_rows(desc_a)
     !
     !  Remember: we have switched IA1=COLS and IA2=ROWS
     !  Now identify the set of distinct local column indices

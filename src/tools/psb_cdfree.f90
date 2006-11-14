@@ -62,7 +62,7 @@ subroutine psb_cdfree(desc_a,info)
     return
   end if
 
-  ictxt=desc_a%matrix_data(psb_ctxt_)
+  ictxt=psb_get_context(desc_a)
   deallocate(desc_a%matrix_data)
   call psb_info(ictxt, me, np)
   !     ....verify blacs grid correctness..

@@ -94,7 +94,7 @@ Subroutine psb_dcdovrbld(n_ovr,desc_p,desc_a,a,&
   call psb_erractionsave(err_act)
 
   If(debug) Write(0,*)'cdovrbld begin'
-  ictxt = desc_a%matrix_data(psb_ctxt_)
+  ictxt = psb_get_context(desc_a)
 
   Call psb_info(ictxt,me,np)
 
@@ -108,10 +108,10 @@ Subroutine psb_dcdovrbld(n_ovr,desc_p,desc_a,a,&
   t4 = 0.0
   call psb_get_mpicomm(ictxt,icomm )
 
-  mglob = desc_a%matrix_data(psb_m_)
-  m     = desc_a%matrix_data(psb_n_row_)
-  n_row = desc_a%matrix_data(psb_n_row_)
-  n_col = desc_a%matrix_data(psb_n_col_)
+  mglob = psb_get_global_rows(desc_a)
+  m     = psb_get_local_rows(desc_a)
+  n_row = psb_get_local_rows(desc_a)
+  n_col = psb_get_local_cols(desc_a)
   if (debug) write(0,*) me,' On entry to CDOVRBLD n_col:',n_col
 
   dl_lda=np*5
@@ -537,8 +537,8 @@ Subroutine psb_dcdovrbld(n_ovr,desc_p,desc_a,a,&
   End Do
   t1 = mpi_wtime()
 
-  desc_p%matrix_data(psb_m_)=desc_a%matrix_data(psb_m_)
-  desc_p%matrix_data(psb_n_)=desc_a%matrix_data(psb_n_)
+  desc_p%matrix_data(psb_m_)=psb_get_global_rows(desc_a)
+  desc_p%matrix_data(psb_n_)=psb_get_global_cols(desc_a)
 
   tmp_halo(counter_h)=-1
   tmp_ovr_idx(counter_o)=-1

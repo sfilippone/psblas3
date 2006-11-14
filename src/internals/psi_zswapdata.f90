@@ -65,7 +65,7 @@ subroutine psi_zswapdatam(flag,n,beta,y,desc_a,work,info,data)
   name='psi_swap_data'
   call psb_erractionsave(err_act)
 
-  ictxt=desc_a%matrix_data(psb_ctxt_)
+  ictxt=psb_get_context(desc_a)
   call psb_info(ictxt,me,np) 
   if (np == -1) then
     info = 2010
@@ -73,7 +73,7 @@ subroutine psi_zswapdatam(flag,n,beta,y,desc_a,work,info,data)
     goto 9999
   endif
 
-  if (.not.psb_is_asb_dec(desc_a%matrix_data(psb_dec_type_))) then 
+  if (.not.psb_is_asb_desc(desc_a)) then 
     info = 1122
     call psb_errpush(info,name)
     goto 9999
@@ -474,7 +474,7 @@ subroutine psi_zswapdatav(flag,beta,y,desc_a,work,info,data)
   name='psi_swap_datav'
   call psb_erractionsave(err_act)
 
-  ictxt=desc_a%matrix_data(psb_ctxt_)
+  ictxt=psb_get_context(desc_a)
   call psb_info(ictxt,me,np) 
   if (np == -1) then
     info = 2010
@@ -482,7 +482,7 @@ subroutine psi_zswapdatav(flag,beta,y,desc_a,work,info,data)
     goto 9999
   endif
 
-  if (.not.psb_is_asb_dec(desc_a%matrix_data(psb_dec_type_))) then 
+  if (.not.psb_is_asb_desc(desc_a)) then 
     info = 1122
     call psb_errpush(info,name)
     goto 9999

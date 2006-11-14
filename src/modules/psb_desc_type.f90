@@ -75,6 +75,42 @@ contains
 
   end subroutine psb_nullify_desc
 
+  logical function psb_is_ok_desc(desc)
+    type(psb_desc_type), intent(in) :: desc
+
+    psb_is_ok_desc = psb_is_ok_dec(psb_get_dectype(desc))
+
+  end function psb_is_ok_desc
+
+  logical function psb_is_bld_desc(desc)
+    type(psb_desc_type), intent(in) :: desc
+
+    psb_is_bld_desc = psb_is_bld_dec(psb_get_dectype(desc))
+
+  end function psb_is_bld_desc
+
+  logical function psb_is_upd_desc(desc)
+    type(psb_desc_type), intent(in) :: desc
+
+    psb_is_upd_desc = psb_is_upd_dec(psb_get_dectype(desc))
+
+  end function psb_is_upd_desc
+
+  logical function psb_is_asb_upd_desc(desc)
+    type(psb_desc_type), intent(in) :: desc
+
+    psb_is_asb_upd_desc = psb_is_asb_upd_dec(psb_get_dectype(desc))
+    
+  end function psb_is_asb_upd_desc
+
+  logical function psb_is_asb_desc(desc)
+    type(psb_desc_type), intent(in) :: desc
+
+    psb_is_asb_desc = psb_is_asb_dec(psb_get_dectype(desc))
+
+  end function psb_is_asb_desc
+
+
   logical function psb_is_ok_dec(dectype)
     integer :: dectype
 
@@ -112,6 +148,8 @@ contains
 
   end function psb_is_asb_dec
 
+
+
   integer function psb_get_local_rows(desc)
     type(psb_desc_type), intent(in) :: desc
     
@@ -141,5 +179,11 @@ contains
     
     psb_get_context = desc%matrix_data(psb_ctxt_)
   end function psb_get_context
+
+  integer function psb_get_dectype(desc)
+    type(psb_desc_type), intent(in) :: desc
+    
+    psb_get_dectype = desc%matrix_data(psb_dec_type_)
+  end function psb_get_dectype
     
 end module psb_descriptor_type

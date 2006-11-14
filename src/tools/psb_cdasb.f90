@@ -66,10 +66,10 @@ subroutine psb_cdasb(desc_a,info)
 
   call psb_erractionsave(err_act)
 
-  ictxt = desc_a%matrix_data(psb_ctxt_)
-  dectype = desc_a%matrix_data(psb_dec_type_)
-  n_row   = desc_a%matrix_data(psb_n_row_)
-  n_col   = desc_a%matrix_data(psb_n_col_)
+  ictxt   = psb_get_context(desc_a)
+  dectype = psb_get_dectype(desc_a)
+  n_row   = psb_get_local_rows(desc_a)
+  n_col   = psb_get_local_cols(desc_a)
 
   ! check on blacs grid 
   call psb_info(ictxt, me, np)
@@ -79,7 +79,7 @@ subroutine psb_cdasb(desc_a,info)
     goto 9999
   endif
 
-  if (.not.psb_is_ok_dec(dectype)) then 
+  if (.not.psb_is_ok_desc(desc_a)) then 
     info = 600
     int_err(1) = dectype
     call psb_errpush(info,name)
@@ -88,10 +88,10 @@ subroutine psb_cdasb(desc_a,info)
 
   if (debug) write (0, *) '   Begin matrix assembly...'
 
-  if (psb_is_bld_dec(dectype)) then 
+  if (psb_is_bld_desc(desc_a)) then 
     if (debug) write(0,*) 'psb_cdasb: Checking rows insertion'
     ! check if all local row are inserted
-    do i=1,desc_a%matrix_data(psb_n_col_)
+    do i=1,psb_get_local_cols(desc_a)
       if (desc_a%loc_to_glob(i) < 0) then
         info=3100
         exit
@@ -102,7 +102,7 @@ subroutine psb_cdasb(desc_a,info)
       call psb_errpush(info,name,i_err=int_err)
       goto 9999
     endif
-    call psb_realloc(desc_a%matrix_data(psb_n_col_),desc_a%loc_to_glob,info)
+    call psb_realloc(psb_get_local_cols(desc_a),desc_a%loc_to_glob,info)
 
     call psb_transfer(desc_a%ovrlap_index,ovrlap_index,info)
     call psb_transfer(desc_a%halo_index,halo_index,info)

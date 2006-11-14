@@ -89,10 +89,10 @@ subroutine psb_dcsrp(trans,iperm,a, desc_a, info)
 
   time(1) = mpi_wtime()
 
-  ictxt=desc_a%matrix_data(psb_ctxt_)
-  dectype=desc_a%matrix_data(psb_dec_type_)
-  n_row = desc_a%matrix_data(psb_n_row_)
-  n_col = desc_a%matrix_data(psb_n_col_)
+  ictxt=psb_get_context(desc_a)
+  dectype=psb_get_dectype(desc_a)
+  n_row = psb_get_local_rows(desc_a)
+  n_col = psb_get_local_cols(desc_a)
 
   if(psb_get_errstatus() /= 0) return 
   info=0
@@ -108,7 +108,7 @@ subroutine psb_dcsrp(trans,iperm,a, desc_a, info)
   endif
 
 
-  if (.not.psb_is_asb_dec(dectype)) then 
+  if (.not.psb_is_asb_desc(desc_a)) then 
     info = 600
     int_err(1) = dectype
     call psb_errpush(info,name,int_err)

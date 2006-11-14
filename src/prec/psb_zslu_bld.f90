@@ -165,13 +165,7 @@ subroutine psb_zslu_bld(a,desc_a,p,info)
     call psb_errpush(info,name,a_err=ch_err)
     goto 9999
   end if
-  call psb_spinfo(psb_nztotreq_,atmp,nzt,info)
-  if(info /= 0) then
-    info=4010
-    ch_err='psb_spinfo'
-    call psb_errpush(info,name,a_err=ch_err)
-    goto 9999
-  end if
+  nzt = psb_get_nnzeros(atmp)
   if (Debug) then 
     write(0,*) me,'Calling psb_slu_factor ',nzt,atmp%m,&
          & atmp%k,p%desc_data%matrix_data(psb_n_row_)

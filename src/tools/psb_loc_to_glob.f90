@@ -79,20 +79,20 @@ subroutine psb_loc_to_glob2(x,y,desc_a,info,iact)
 
   n=size(x)
   do i=1,n
-    if ((x(i).gt.desc_a%matrix_data(psb_n_col_)).or.&
+    if ((x(i).gt.psb_get_local_cols(desc_a)).or.&
          &  (x(i).le.zero)) then
       info=140
       int_err(1)=tmp
-      int_err(2)=desc_a%matrix_data(psb_n_col_)  
+      int_err(2)=psb_get_local_cols(desc_a)  
       exit
     else
       tmp=desc_a%loc_to_glob(x(i))
-      if((tmp.gt.zero).or.(tmp.le.desc_a%matrix_data(psb_m_))) then
+      if((tmp.gt.zero).or.(tmp.le.psb_get_global_rows(desc_a))) then
         y(i)=tmp
       else
         info = 140
         int_err(1)=tmp
-        int_err(2)=desc_a%matrix_data(psb_n_col_)
+        int_err(2)=psb_get_local_cols(desc_a)
         exit
       end if
     end if
@@ -204,15 +204,15 @@ subroutine psb_loc_to_glob(x,desc_a,info,iact)
 
   n=size(x)
   do i=1,n
-    if ((x(i).gt.desc_a%matrix_data(psb_n_col_)).or.&
+    if ((x(i).gt.psb_get_local_cols(desc_a)).or.&
          &  (x(i).le.zero)) then
       info=140
       int_err(1)=x(i)
-      int_err(2)=desc_a%matrix_data(psb_n_col_)  
+      int_err(2)=psb_get_local_cols(desc_a)  
       exit
     else
       tmp=desc_a%loc_to_glob(x(i))
-      if((tmp.gt.zero).or.(tmp.le.desc_a%matrix_data(psb_m_))) then
+      if((tmp.gt.zero).or.(tmp.le.psb_get_global_rows(desc_a))) then
         x(i)=tmp
       else
         info = 140

@@ -438,5 +438,113 @@ module psb_serial_mod
      end function psb_zcsnmi
   end interface
 
+
+  interface psb_get_nrows
+    module procedure psb_get_dsp_nrows, psb_get_zsp_nrows
+  end interface
+
+  interface psb_get_ncols
+    module procedure psb_get_dsp_ncols, psb_get_zsp_ncols
+  end interface
+
+  interface psb_get_nnzeros
+    module procedure psb_get_dsp_nnzeros, psb_get_zsp_nnzeros
+  end interface
+
+  interface psb_get_nnz_row
+    module procedure psb_get_dsp_nnz_row, psb_get_zsp_nnz_row
+  end interface
+  
+
+
+contains
+
+  integer function psb_get_dsp_nrows(a)
+    use psb_spmat_type
+    type(psb_dspmat_type), intent(in) :: a
+    psb_get_dsp_nrows = a%m
+
+    return
+  end function psb_get_dsp_nrows
+
+  integer function psb_get_dsp_ncols(a)
+    use psb_spmat_type
+    type(psb_dspmat_type), intent(in) :: a
+    psb_get_dsp_ncols = a%k
+
+    return
+  end function psb_get_dsp_ncols
+  integer function psb_get_zsp_nrows(a)
+    use psb_spmat_type
+    type(psb_zspmat_type), intent(in) :: a
+    psb_get_zsp_nrows = a%m
+
+    return
+  end function psb_get_zsp_nrows
+
+  integer function psb_get_zsp_ncols(a)
+    use psb_spmat_type
+    type(psb_zspmat_type), intent(in) :: a
+    psb_get_zsp_ncols = a%k
+
+    return
+  end function psb_get_zsp_ncols
+  
+
+  integer function psb_get_dsp_nnzeros(a)
+    use psb_spmat_type
+    type(psb_dspmat_type), intent(in) :: a  
+    integer :: ires,info
+    
+    call psb_spinfo(psb_nztotreq_,a,ires,info)
+    if (info == 0) then 
+      psb_get_dsp_nnzeros = ires
+    else
+      psb_get_dsp_nnzeros = 0
+    end if
+  end function psb_get_dsp_nnzeros
+
+  integer function psb_get_zsp_nnzeros(a)
+    use psb_spmat_type
+    type(psb_zspmat_type), intent(in) :: a  
+    integer :: ires,info
+    
+    call psb_spinfo(psb_nztotreq_,a,ires,info)
+    if (info == 0) then 
+      psb_get_zsp_nnzeros = ires
+    else
+      psb_get_zsp_nnzeros = 0
+    end if
+  end function psb_get_zsp_nnzeros
+
+
+  integer function psb_get_dsp_nnz_row(ir,a)
+    use psb_spmat_type
+    integer, intent(in)               :: ir
+    type(psb_dspmat_type), intent(in) :: a  
+    integer :: ires,info
+    
+    call psb_spinfo(psb_nzrowreq_,a,ires,info,iaux=ir)
+    if (info == 0) then 
+      psb_get_dsp_nnz_row = ires
+    else
+      psb_get_dsp_nnz_row = 0
+    end if
+  end function psb_get_dsp_nnz_row
+  integer function psb_get_zsp_nnz_row(ir,a)
+    use psb_spmat_type
+    integer, intent(in)               :: ir
+    type(psb_zspmat_type), intent(in) :: a  
+    integer :: ires,info
+    
+    call psb_spinfo(psb_nzrowreq_,a,ires,info,iaux=ir)
+    if (info == 0) then 
+      psb_get_zsp_nnz_row = ires
+    else
+      psb_get_zsp_nnz_row = 0
+    end if
+  end function psb_get_zsp_nnz_row
+
+  
 end module psb_serial_mod
 

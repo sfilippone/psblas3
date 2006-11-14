@@ -80,11 +80,15 @@ subroutine psb_dprecset(p,ptype,info,iv,rs,rv,ilev,nlev)
     return
   endif
 
-
-  call psb_realloc(ifpsz,p%baseprecv(ilev_)%iprcparm,info)
-  if (info == 0) call psb_realloc(dfpsz,p%baseprecv(ilev_)%dprcparm,info)
-  if (info /= 0) return
-  p%baseprecv(ilev_)%iprcparm(:) = 0
+  if (.not.allocated(p%baseprecv(ilev_)%iprcparm)) then 
+    call psb_realloc(ifpsz,p%baseprecv(ilev_)%iprcparm,info)
+    if (info == 0) call psb_realloc(dfpsz,p%baseprecv(ilev_)%dprcparm,info)
+    if (info /= 0) then 
+      write(0,*) 'Info from realloc ',info
+      return
+    end if
+    p%baseprecv(ilev_)%iprcparm(:) = 0
+  end if
 
   select case(toupper(ptype(1:len_trim(ptype))))
   case ('NONE','NOPREC') 

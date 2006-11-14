@@ -71,7 +71,7 @@ subroutine psb_zilu_bld(a,desc_a,p,upd,info)
   character, intent(in)                     :: upd
 
   !     .. Local Scalars ..                                                       
-  integer  ::    i, j, jj, k, kk, m, i1, i2, ia
+  integer  ::    i, j, jj, k, kk, m
   integer  ::    int_err(5)
   character ::        trans, unitd
   type(psb_zspmat_type) :: blck, atmp
@@ -79,7 +79,7 @@ subroutine psb_zilu_bld(a,desc_a,p,upd,info)
   external  mpi_wtime
   logical, parameter :: debugprt=.false., debug=.false., aggr_dump=.false.
   integer   nztota, nztotb, nztmp, nzl, nnr, ir, err_act,&
-       & n_row, nrow_a,n_col, nhalo, ind, iind
+       & n_row, nrow_a,n_col, nhalo, ind, iind, i1,i2,ia
   integer :: ictxt,np,me
   character(len=20)      :: name, ch_err
 
@@ -131,7 +131,7 @@ subroutine psb_zilu_bld(a,desc_a,p,upd,info)
   name='psb_ilu_bld'
   call psb_erractionsave(err_act)
 
-  ictxt=desc_a%matrix_data(psb_ctxt_)
+  ictxt=psb_get_context(desc_a)
   call psb_info(ictxt, me, np)
 
   m = a%m
@@ -152,10 +152,6 @@ subroutine psb_zilu_bld(a,desc_a,p,upd,info)
     goto 9999
   endif
 
-  !  call psb_info(ictxt, me, np)
-
-
-  ictxt=desc_a%matrix_data(psb_ctxt_)
   call psb_nullify_sp(blck)
   call psb_nullify_sp(atmp)
 
@@ -185,19 +181,13 @@ subroutine psb_zilu_bld(a,desc_a,p,upd,info)
     goto 9999      
   endif
 
-  nrow_a = desc_a%matrix_data(psb_n_row_)
-  call psb_spinfo(psb_nztotreq_,a,nztota,info)
-  if (info == 0) call psb_spinfo(psb_nztotreq_,blck,nztotb,info)
-  if(info/=0) then
-    info=4010
-    ch_err='psb_spinfo'
-    call psb_errpush(info,name,a_err=ch_err)
-    goto 9999
-  end if
-  if (debug) write(0,*)me,': out spinfo',nztota
+  nrow_a = psb_get_local_rows(desc_a)
+  nztota = psb_get_nnzeros(a)
+  nztotb = psb_get_nnzeros(blck)
+  if (debug) write(0,*)me,': out get_nnzeros',nztota
   if (debug) call psb_barrier(ictxt)
 
-  n_col  = desc_a%matrix_data(psb_n_col_)
+  n_col  = psb_get_local_cols(desc_a)
   nhalo  = n_col-nrow_a
   n_row  = p%desc_data%matrix_data(psb_n_row_)
   p%av(l_pr_)%m  = n_row
@@ -240,8 +230,8 @@ subroutine psb_zilu_bld(a,desc_a,p,upd,info)
     ! Here we allocate a full copy to hold local A and received BLK
     !
 
-    call psb_spinfo(psb_nztotreq_,a,nztota,info)
-    call psb_spinfo(psb_nztotreq_,blck,nztotb,info)
+    nztota = psb_get_nnzeros(a)
+    nztotb = psb_get_nnzeros(blck)
     call psb_sp_all(atmp,nztota+nztotb,info)
     if(info/=0) then
       info=4011

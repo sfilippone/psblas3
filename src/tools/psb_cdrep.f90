@@ -186,6 +186,7 @@ subroutine psb_cdrep(m, ictxt, desc_a, info)
   endif
 
 
+
   desc_a%matrix_data(psb_m_)        = m
   desc_a%matrix_data(psb_n_)        = n
   desc_a%matrix_data(psb_n_row_)    = m
