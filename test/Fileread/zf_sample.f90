@@ -95,7 +95,7 @@ program zf_sample
   real(kind(1.d0)) :: t1, t2, tprec, r_amax, b_amax,&
        &scale,resmx,resmxp
   integer :: nrhs, nrow, n_row, dim, nv, ne
-  integer, pointer :: ivg(:), ipv(:), neigh(:)
+  integer, allocatable :: ivg(:), ipv(:)
 
   
 

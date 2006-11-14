@@ -196,6 +196,7 @@ contains
     integer              :: nrow, ncol, i,root, nprow, npcol, myprow, mypcol, ircode, j
     character            :: mmheader*15, fmt*15, object*10, type*10, sym*15,&
          & line*1024
+    real(kind(1.d0))     :: bre, bim 
     complex(kind(1.0d0)), allocatable  :: b(:,:)
     if (present(inroot)) then
       root = inroot
@@ -223,8 +224,12 @@ contains
       if ((tolower(type) == 'complex').and.(tolower(sym) == 'general')) then
         allocate(b(nrow,ncol),stat = ircode)
         if (ircode /= 0)   goto 993
-        read(infile,fmt=*,end=902) ((b(i,j), i=1,nrow),j=1,ncol)
-           
+        do j=1, ncol
+          do i=1, nrow
+            read(infile,fmt=*,end=902) bre,bim
+            b(i,j) = cmplx(bre,bim)
+          end do
+        end do
       else
         write(0,*) 'read_rhs: rhs type not yet supported'
         call psb_abort(ictxt)

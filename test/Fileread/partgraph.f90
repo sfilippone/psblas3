@@ -55,7 +55,7 @@ MODULE PARTGRAPH
   public part_graph, build_grppart, distr_grppart,&
        & getv_grppart, build_usrpart, free_part
   private 
-  integer, pointer, save :: graph_vect(:)
+  integer, allocatable, save :: graph_vect(:)
   
 CONTAINS
   
@@ -65,7 +65,7 @@ CONTAINS
     integer, intent(out) :: nv
     integer, intent(out) :: pv(*)
     
-    IF (.not.associated(graph_vect)) then
+    IF (.not.allocated(graph_vect)) then
        write(0,*) 'Fatal error in PART_GRAPH: vector GRAPH_VECT ',&
 	    & 'not initialized'
        return
@@ -96,7 +96,7 @@ CONTAINS
     endif
 
     if (me == root) then 
-      if (.not.associated(graph_vect)) then
+      if (.not.allocated(graph_vect)) then
         write(0,*) 'Fatal error in DISTR_GRPPART: vector GRAPH_VECT ',&
              & 'not initialized'
         call psb_abort(ictxt)
@@ -121,12 +121,10 @@ CONTAINS
   end subroutine distr_grppart
   
   subroutine  getv_grppart(ivg)
-    integer, pointer :: ivg(:)
-    if (associated(graph_vect)) then 
+    integer, allocatable, intent(out)  :: ivg(:)
+    if (allocated(graph_vect)) then 
       allocate(ivg(size(graph_vect)))
       ivg(:) = graph_vect(:)
-    else
-      ivg => null()
     end if
   end subroutine getv_grppart
   
