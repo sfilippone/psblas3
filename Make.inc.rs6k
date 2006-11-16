@@ -6,7 +6,7 @@
 #######################  Section 1 #######################
 #  Define your compilers and compiler flags here         #
 ##########################################################
-F90=xlf95 -qsuffix=f=f90
+F90=xlf95 -qsuffix=f=f90:cpp=F90
 FC=xlf
 F77=$(FC)
 CC=xlc
@@ -42,8 +42,8 @@ BLACS=-lmpiblacs
 #UMFDEF=-DHave_UMF_ -I$(UMFDIR)
 
 #  Add -DLargeFptr for 64-bit addresses
-CDEFINES=-DAdd_ $(SLUDEF) $(UMFDEF) -DLargeFptr
-FDEFINES=-DHAVE_ESSL
+CDEFINES=-DNoChange $(SLUDEF) $(UMFDEF) -DLargeFptr
+FDEFINES=-WF,-DHAVE_ESSL
 
 AR=ar -cur
 RANLIB=ranlib
