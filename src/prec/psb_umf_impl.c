@@ -6,7 +6,7 @@
  *
  *   (C) Copyright 2006 Salvatore Filippone    University of Rome Tor Vergata
  *                      Alfredo Buttari
- *                      Daniela Di Serafino    II University of Naples
+ *                      Daniela di Serafino    Second University of Naples
  *                      Pasqua D'Ambra         ICAR-CNR
  *
  * Redistribution and use in source and binary forms, with or without

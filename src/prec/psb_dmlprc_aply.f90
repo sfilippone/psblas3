@@ -6,7 +6,7 @@
 !!$              Parallel Sparse BLAS  v2.0
 !!$    (C) Copyright 2006 Salvatore Filippone    University of Rome Tor Vergata
 !!$                       Alfredo Buttari        University of Rome Tor Vergata
-!!$                       Daniela Di Serafino    II University of Naples
+!!$                       Daniela di Serafino    Second University of Naples
 !!$                       Pasqua D'Ambra         ICAR-CNR                      
 !!$ 
 !!$  Redistribution and use in source and binary forms, with or without
@@ -165,10 +165,10 @@ subroutine psb_dmlprc_aply(alpha,baseprecv,x,beta,y,desc_data,trans,work,info)
     !    1.  X(1) = Xext
     !    2.  DO ILEV=2,NLEV 
     !           X(ILEV) = AV(PR_SM_T_)*X(ILEV-1)    
-    !    3.  Y(ILEV) = (K(ILEV)**(-1))*X(ILEV)
-    !    4.  DO  ILEV=NLEV-1,1,-1
+    !           Y(ILEV) = (K(ILEV)**(-1))*X(ILEV)
+    !    3.  DO  ILEV=NLEV-1,1,-1
     !           Y(ILEV) = AV(PR_SM_)*Y(ILEV+1)     
-    !    5.  Yext    = beta*Yext + Y(1)
+    !    4.  Yext    = beta*Yext + alpha*Y(1)
     !
     !    Note: level numbering reversed wrt ref. DD, i.e. 
     !         1..NLEV <=>  (j) <-> 0
@@ -294,12 +294,12 @@ subroutine psb_dmlprc_aply(alpha,baseprecv,x,beta,y,desc_data,trans,work,info)
       !          Y(ILEV) = AV(PR_SM_,ILEV+1)*Y(ILEV+1)     
       !          Y(ILEV) = Y(ILEV) + (K(ILEV)**(-1))*(X(ILEV)-A(ILEV)*Y(ILEV))
       !
-      !    5.  Yext    = beta*Yext + Y(1)
+      !    5.  Yext    = beta*Yext + alpha*Y(1)
       !
       !    Note: level numbering reversed wrt ref. DD, i.e. 
       !         1..NLEV <=>  (j) <-> 0
       !
-      !    Also: post smoothing is not spelled out in detail in DD. 
+      !    Also: post smoothing in the ref. DD is only presented for NLEV=2. 
       ! 
       ! 
     
@@ -433,7 +433,7 @@ subroutine psb_dmlprc_aply(alpha,baseprecv,x,beta,y,desc_data,trans,work,info)
       !          TX(ILEV) = (X(ILEV)-A(ILEV)*Y(ILEV))
       !    5.   DO  ILEV=NLEV-1,1,-1
       !          Y(ILEV) = Y(ILEV) + AV(PR_SM_,ILEV+1)*Y(ILEV+1)     
-      !    6.  Yext    = beta*Yext + Y(1)
+      !    6.  Yext    = beta*Yext + alpha*Y(1)
       !
       !    Note: level numbering reversed wrt ref. DD, i.e. 
       !         1..NLEV <=>  (j) <-> 0
@@ -584,7 +584,7 @@ subroutine psb_dmlprc_aply(alpha,baseprecv,x,beta,y,desc_data,trans,work,info)
       !    5.   DO  ILEV=NLEV-1,1,-1
       !          Y(ILEV) = Y(ILEV) + AV(PR_SM_,ILEV+1)*Y(ILEV+1)     
       !          Y(ILEV) = Y(ILEV) + (K(ILEV)**(-1))*(X(ILEV)-A(ILEV)*Y(ILEV))
-      !    6.  Yext    = beta*Yext + Y(1)
+      !    6.  Yext    = beta*Yext + alpha*Y(1)
       !
       !    Note: level numbering reversed wrt ref. DD, i.e. 
       !         1..NLEV <=>  (j) <-> 0

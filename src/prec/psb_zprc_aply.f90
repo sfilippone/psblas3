@@ -6,7 +6,7 @@
 !!$              Parallel Sparse BLAS  v2.0
 !!$    (C) Copyright 2006 Salvatore Filippone    University of Rome Tor Vergata
 !!$                       Alfredo Buttari        University of Rome Tor Vergata
-!!$                       Daniela Di Serafino    II University of Naples
+!!$                       Daniela di Serafino    Second University of Naples
 !!$                       Pasqua D'Ambra         ICAR-CNR                      
 !!$ 
 !!$  Redistribution and use in source and binary forms, with or without
@@ -156,7 +156,7 @@ end subroutine psb_zprc_aply
 !!$              Parallel Sparse BLAS  v2.0
 !!$    (C) Copyright 2006 Salvatore Filippone    University of Rome Tor Vergata
 !!$                       Alfredo Buttari        University of Rome Tor Vergata
-!!$                       Daniela Di Serafino    II University of Naples
+!!$                       Daniela di Serafino    Second University of Naples
 !!$                       Pasqua D'Ambra         ICAR-CNR                      
 !!$ 
 !!$  Redistribution and use in source and binary forms, with or without
