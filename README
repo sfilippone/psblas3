@@ -115,7 +115,7 @@ Alfredo    Buttari
 The MD2P4 multilevel parallel preconditioners contained in directory
 src/prec were developed with the contribution of:  
 Pasqua     D'Ambra
-Daniela    Di Serafino
+Daniela    di Serafino
 They are still in an early experimental stage, use at your own risk!
 
 Credits for version 1.0:
