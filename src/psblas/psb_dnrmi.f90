@@ -64,7 +64,7 @@ function psb_dnrmi(a,desc_a,info)
   info=0
   call psb_erractionsave(err_act)
 
-  ictxt=psb_get_context(desc_a)
+  ictxt=psb_cd_get_context(desc_a)
 
   call psb_info(ictxt, me, np)
   if (np == -1) then
@@ -75,8 +75,8 @@ function psb_dnrmi(a,desc_a,info)
 
   ia = 1
   ja = 1
-  m = psb_get_global_rows(desc_a)
-  n = psb_get_global_cols(desc_a)
+  m = psb_cd_get_global_rows(desc_a)
+  n = psb_cd_get_global_cols(desc_a)
 
   call psb_chkmat(m,n,ia,ja,desc_a,info,iia,jja)
   if(info.ne.0) then
@@ -93,8 +93,8 @@ function psb_dnrmi(a,desc_a,info)
   end if
 
   if ((m.ne.0).and.(n.ne.0)) then
-    mdim = psb_get_local_rows(desc_a)
-    ndim = psb_get_local_cols(desc_a)
+    mdim = psb_cd_get_local_rows(desc_a)
+    ndim = psb_cd_get_local_cols(desc_a)
     nrmi = dcsnmi('N',mdim,ndim,a%fida,&
          & a%descra,a%aspk,a%ia1,a%ia2,&
          & a%infoa,info)

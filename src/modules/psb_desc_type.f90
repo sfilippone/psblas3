@@ -78,35 +78,35 @@ contains
   logical function psb_is_ok_desc(desc)
     type(psb_desc_type), intent(in) :: desc
 
-    psb_is_ok_desc = psb_is_ok_dec(psb_get_dectype(desc))
+    psb_is_ok_desc = psb_is_ok_dec(psb_cd_get_dectype(desc))
 
   end function psb_is_ok_desc
 
   logical function psb_is_bld_desc(desc)
     type(psb_desc_type), intent(in) :: desc
 
-    psb_is_bld_desc = psb_is_bld_dec(psb_get_dectype(desc))
+    psb_is_bld_desc = psb_is_bld_dec(psb_cd_get_dectype(desc))
 
   end function psb_is_bld_desc
 
   logical function psb_is_upd_desc(desc)
     type(psb_desc_type), intent(in) :: desc
 
-    psb_is_upd_desc = psb_is_upd_dec(psb_get_dectype(desc))
+    psb_is_upd_desc = psb_is_upd_dec(psb_cd_get_dectype(desc))
 
   end function psb_is_upd_desc
 
   logical function psb_is_asb_upd_desc(desc)
     type(psb_desc_type), intent(in) :: desc
 
-    psb_is_asb_upd_desc = psb_is_asb_upd_dec(psb_get_dectype(desc))
+    psb_is_asb_upd_desc = psb_is_asb_upd_dec(psb_cd_get_dectype(desc))
     
   end function psb_is_asb_upd_desc
 
   logical function psb_is_asb_desc(desc)
     type(psb_desc_type), intent(in) :: desc
 
-    psb_is_asb_desc = psb_is_asb_dec(psb_get_dectype(desc))
+    psb_is_asb_desc = psb_is_asb_dec(psb_cd_get_dectype(desc))
 
   end function psb_is_asb_desc
 
@@ -150,40 +150,40 @@ contains
 
 
 
-  integer function psb_get_local_rows(desc)
+  integer function psb_cd_get_local_rows(desc)
     type(psb_desc_type), intent(in) :: desc
     
-    psb_get_local_rows = desc%matrix_data(psb_n_row_)
-  end function psb_get_local_rows
+    psb_cd_get_local_rows = desc%matrix_data(psb_n_row_)
+  end function psb_cd_get_local_rows
 
-  integer function psb_get_local_cols(desc)
+  integer function psb_cd_get_local_cols(desc)
     type(psb_desc_type), intent(in) :: desc
     
-    psb_get_local_cols = desc%matrix_data(psb_n_col_)
-  end function psb_get_local_cols
+    psb_cd_get_local_cols = desc%matrix_data(psb_n_col_)
+  end function psb_cd_get_local_cols
 
-  integer function psb_get_global_rows(desc)
+  integer function psb_cd_get_global_rows(desc)
     type(psb_desc_type), intent(in) :: desc
     
-    psb_get_global_rows = desc%matrix_data(psb_m_)
-  end function psb_get_global_rows
+    psb_cd_get_global_rows = desc%matrix_data(psb_m_)
+  end function psb_cd_get_global_rows
 
-  integer function psb_get_global_cols(desc)
+  integer function psb_cd_get_global_cols(desc)
     type(psb_desc_type), intent(in) :: desc
     
-    psb_get_global_cols = desc%matrix_data(psb_n_)
-  end function psb_get_global_cols
+    psb_cd_get_global_cols = desc%matrix_data(psb_n_)
+  end function psb_cd_get_global_cols
 
-  integer function psb_get_context(desc)
+  integer function psb_cd_get_context(desc)
     type(psb_desc_type), intent(in) :: desc
     
-    psb_get_context = desc%matrix_data(psb_ctxt_)
-  end function psb_get_context
+    psb_cd_get_context = desc%matrix_data(psb_ctxt_)
+  end function psb_cd_get_context
 
-  integer function psb_get_dectype(desc)
+  integer function psb_cd_get_dectype(desc)
     type(psb_desc_type), intent(in) :: desc
     
-    psb_get_dectype = desc%matrix_data(psb_dec_type_)
-  end function psb_get_dectype
+    psb_cd_get_dectype = desc%matrix_data(psb_dec_type_)
+  end function psb_cd_get_dectype
     
 end module psb_descriptor_type

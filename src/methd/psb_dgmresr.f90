@@ -124,14 +124,14 @@ Subroutine psb_dgmresr(a,prec,b,x,eps,desc_a,info,&
   call psb_erractionsave(err_act)
 
   If (debug) Write(0,*) 'entering psb_dgmres'
-  ictxt = psb_get_context(desc_a)
+  ictxt = psb_cd_get_context(desc_a)
   Call psb_info(ictxt, me, np)
 
   If (debug) Write(0,*) 'psb_dgmres: from gridinfo',np,me
 
-  mglob = psb_get_global_rows(desc_a)
-  n_row = psb_get_local_rows(desc_a)
-  n_col = psb_get_local_cols(desc_a)
+  mglob = psb_cd_get_global_rows(desc_a)
+  n_row = psb_cd_get_local_rows(desc_a)
+  n_col = psb_cd_get_local_cols(desc_a)
 
   if (present(istop)) then 
     istop_ = istop 

@@ -114,12 +114,12 @@ Subroutine psb_dcg(a,prec,b,x,eps,desc_a,info,&
   call psb_erractionsave(err_act)
 
 
-  ictxt = psb_get_context(desc_a)
+  ictxt = psb_cd_get_context(desc_a)
   call psb_info(ictxt, me, np)
 
-  mglob = psb_get_global_rows(desc_a)
-  n_row = psb_get_local_rows(desc_a)
-  n_col = psb_get_local_cols(desc_a)
+  mglob = psb_cd_get_global_rows(desc_a)
+  n_row = psb_cd_get_local_rows(desc_a)
+  n_col = psb_cd_get_local_cols(desc_a)
 
 
   if (present(istop)) then 

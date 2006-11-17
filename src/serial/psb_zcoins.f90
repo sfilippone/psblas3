@@ -38,7 +38,7 @@ subroutine psb_zcoins(nz,ia,ja,val,a,imin,imax,jmin,jmax,info,gtl,rebuild)
   use psb_realloc_mod
   use psb_string_mod
   use psb_error_mod
-  use psb_serial_mod, only : psb_spinfo, psb_csdp
+  use psb_serial_mod, only : psb_sp_info, psb_csdp
   use psb_update_mod
   implicit none 
 
@@ -110,8 +110,8 @@ subroutine psb_zcoins(nz,ia,ja,val,a,imin,imax,jmin,jmax,info,gtl,rebuild)
         call psb_errpush(info,name,a_err=ch_err)
         goto 9999
       end if
-      call psb_spinfo(psb_nztotreq_,a,nza,info)
-      call psb_spinfo(psb_nzsizereq_,a,isza,info)
+      call psb_sp_info(psb_nztotreq_,a,nza,info)
+      call psb_sp_info(psb_nzsizereq_,a,isza,info)
       if(info /= izero) then
         info=4010
         ch_err='psb_spinfo'
@@ -206,8 +206,8 @@ subroutine psb_zcoins(nz,ia,ja,val,a,imin,imax,jmin,jmax,info,gtl,rebuild)
               call psb_errpush(info,name,a_err=ch_err)
               goto 9999
             endif
-            call psb_spinfo(psb_nztotreq_,a,nza,info)
-            call psb_spinfo(psb_nzsizereq_,a,isza,info)
+            call psb_sp_info(psb_nztotreq_,a,nza,info)
+            call psb_sp_info(psb_nzsizereq_,a,isza,info)
             if(info /= izero) then
               info=4010
               ch_err='psb_spinfo'
@@ -282,8 +282,8 @@ subroutine psb_zcoins(nz,ia,ja,val,a,imin,imax,jmin,jmax,info,gtl,rebuild)
         call psb_errpush(info,name,a_err=ch_err)
         goto 9999
       end if
-      call psb_spinfo(psb_nztotreq_,a,nza,info)
-      call psb_spinfo(psb_nzsizereq_,a,isza,info)
+      call psb_sp_info(psb_nztotreq_,a,nza,info)
+      call psb_sp_info(psb_nzsizereq_,a,isza,info)
       if(info /= izero) then
         info=4010
         ch_err='psb_spinfo'
@@ -367,8 +367,8 @@ subroutine psb_zcoins(nz,ia,ja,val,a,imin,imax,jmin,jmax,info,gtl,rebuild)
               write(0,*) 'COINS  Rebuild: size',tmp%infoa(psb_nnz_) ,irst            
             endif
             call psb_sp_transfer(tmp,a,info)
-            call psb_spinfo(psb_nztotreq_,a,nza,info)
-            call psb_spinfo(psb_nzsizereq_,a,isza,info)
+            call psb_sp_info(psb_nztotreq_,a,nza,info)
+            call psb_sp_info(psb_nzsizereq_,a,isza,info)
             if(info /= izero) then
               info=4010
               ch_err='psb_spinfo'

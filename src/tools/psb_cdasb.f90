@@ -66,10 +66,10 @@ subroutine psb_cdasb(desc_a,info)
 
   call psb_erractionsave(err_act)
 
-  ictxt   = psb_get_context(desc_a)
-  dectype = psb_get_dectype(desc_a)
-  n_row   = psb_get_local_rows(desc_a)
-  n_col   = psb_get_local_cols(desc_a)
+  ictxt   = psb_cd_get_context(desc_a)
+  dectype = psb_cd_get_dectype(desc_a)
+  n_row   = psb_cd_get_local_rows(desc_a)
+  n_col   = psb_cd_get_local_cols(desc_a)
 
   ! check on blacs grid 
   call psb_info(ictxt, me, np)
@@ -91,7 +91,7 @@ subroutine psb_cdasb(desc_a,info)
   if (psb_is_bld_desc(desc_a)) then 
     if (debug) write(0,*) 'psb_cdasb: Checking rows insertion'
     ! check if all local row are inserted
-    do i=1,psb_get_local_cols(desc_a)
+    do i=1,psb_cd_get_local_cols(desc_a)
       if (desc_a%loc_to_glob(i) < 0) then
         info=3100
         exit
@@ -102,7 +102,7 @@ subroutine psb_cdasb(desc_a,info)
       call psb_errpush(info,name,i_err=int_err)
       goto 9999
     endif
-    call psb_realloc(psb_get_local_cols(desc_a),desc_a%loc_to_glob,info)
+    call psb_realloc(psb_cd_get_local_cols(desc_a),desc_a%loc_to_glob,info)
 
     call psb_transfer(desc_a%ovrlap_index,ovrlap_index,info)
     call psb_transfer(desc_a%halo_index,halo_index,info)

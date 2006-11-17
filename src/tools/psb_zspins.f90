@@ -86,9 +86,9 @@ subroutine psb_zspins(nz,ia,ja,val,a,desc_a,info,rebuild)
   call psb_erractionsave(err_act)
 
 
-  ictxt = psb_get_context(desc_a)
-  dectype = psb_get_dectype(desc_a)
-  mglob   = psb_get_global_rows(desc_a)
+  ictxt = psb_cd_get_context(desc_a)
+  dectype = psb_cd_get_dectype(desc_a)
+  mglob   = psb_cd_get_global_rows(desc_a)
 
   call psb_info(ictxt, me, np)
 
@@ -135,8 +135,8 @@ subroutine psb_zspins(nz,ia,ja,val,a,desc_a,info,rebuild)
       call psb_errpush(info,name,a_err=ch_err)
       goto 9999
     end if
-    nrow = psb_get_local_rows(desc_a)
-    ncol = psb_get_local_cols(desc_a)
+    nrow = psb_cd_get_local_rows(desc_a)
+    ncol = psb_cd_get_local_cols(desc_a)
 
     if (spstate == psb_spmat_bld_) then 
       call psb_coins(nz,ia,ja,val,a,1,nrow,1,ncol,info,gtl=desc_a%glob_to_loc)
@@ -152,8 +152,8 @@ subroutine psb_zspins(nz,ia,ja,val,a,desc_a,info,rebuild)
       goto 9999
     end if
   else if (psb_is_asb_desc(desc_a)) then 
-    nrow = psb_get_local_rows(desc_a)
-    ncol = psb_get_local_cols(desc_a)
+    nrow = psb_cd_get_local_rows(desc_a)
+    ncol = psb_cd_get_local_cols(desc_a)
     call psb_coins(nz,ia,ja,val,a,1,nrow,1,ncol,&
          & info,gtl=desc_a%glob_to_loc,rebuild=rebuild_)
     if (info /= 0) then

@@ -100,7 +100,7 @@ Subroutine psb_dsphalo(a,desc_a,blk,info,rwcnv,clcnv,outfmt)
     outfmt_ = 'CSR'
   endif
 
-  ictxt=psb_get_context(desc_a)
+  ictxt=psb_cd_get_context(desc_a)
   Call psb_info(ictxt, me, np)
 
   t1 = mpi_wtime()
@@ -139,14 +139,7 @@ Subroutine psb_dsphalo(a,desc_a,blk,info,rwcnv,clcnv,outfmt)
     tot_elem = 0
     Do j=0,n_el_send-1
       idx = desc_a%halo_index(counter+psb_elem_send_+j)
-      call psb_spinfo(psb_nzrowreq_,a,n_elem,info,iaux=idx)
-      if (info /= 0) then
-        info=4010
-        ch_err='psb_spinfo'
-        call psb_errpush(info,name,a_err=ch_err)
-        goto 9999
-      end if
-
+      n_elem = psb_sp_get_nnz_row(idx,a)
       tot_elem = tot_elem+n_elem      
     Enddo
     sdsz(proc+1) = tot_elem
@@ -215,18 +208,12 @@ Subroutine psb_dsphalo(a,desc_a,blk,info,rwcnv,clcnv,outfmt)
 
     Do j=0,n_el_send-1
       idx = desc_a%halo_index(counter+psb_elem_send_+j)
-      call psb_spinfo(psb_nzrowreq_,a,n_elem,info,iaux=idx)      
+      n_elem = psb_sp_get_nnz_row(idx,a)
+
+      call psb_sp_getblk(idx,a,tmp,info,append=.true.)
       if (info /= 0) then
         info=4010
-        ch_err='spinfo'
-        call psb_errpush(info,name,a_err=ch_err)
-        goto 9999
-      end if
-!!$      write(0,*) me,'Getting row ',idx,n_elem
-      call psb_spgtblk(idx,a,tmp,info,append=.true.)
-      if (info /= 0) then
-        info=4010
-        ch_err='psb_spgtblk'
+        ch_err='psb_sp_getblk'
         call psb_errpush(info,name,a_err=ch_err)
         goto 9999
       end if

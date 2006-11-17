@@ -82,7 +82,7 @@ subroutine psb_dinsvi(m, irw, val, x, desc_a, info, dupl)
     return
   end if
 
-  ictxt=psb_get_context(desc_a)
+  ictxt=psb_cd_get_context(desc_a)
 
   call psb_info(ictxt, me, np)
   if (np == -1) then
@@ -100,10 +100,10 @@ subroutine psb_dinsvi(m, irw, val, x, desc_a, info, dupl)
     goto 9999
   else if (.not.psb_is_ok_desc(desc_a)) then
     info = 3110
-    int_err(1) = psb_get_dectype(desc_a)
+    int_err(1) = psb_cd_get_dectype(desc_a)
     call psb_errpush(info,name,int_err)
     goto 9999
-  else if (size(x, dim=1) < psb_get_local_rows(desc_a)) then
+  else if (size(x, dim=1) < psb_cd_get_local_rows(desc_a)) then
     info = 310
     int_err(1) = 5
     int_err(2) = 4
@@ -111,9 +111,9 @@ subroutine psb_dinsvi(m, irw, val, x, desc_a, info, dupl)
     goto 9999
   endif
 
-  loc_rows=psb_get_local_rows(desc_a)
-  loc_cols=psb_get_local_cols(desc_a)
-  mglob    = psb_get_global_rows(desc_a)
+  loc_rows=psb_cd_get_local_rows(desc_a)
+  loc_cols=psb_cd_get_local_cols(desc_a)
+  mglob    = psb_cd_get_global_rows(desc_a)
 
   if (present(dupl)) then 
     dupl_ = dupl
@@ -265,7 +265,7 @@ subroutine psb_dinsi(m, irw, val, x, desc_a, info, dupl)
     return
   end if
 
-  ictxt=psb_get_context(desc_a)
+  ictxt=psb_cd_get_context(desc_a)
 
   call psb_info(ictxt, me, np)
   if (np == -1) then
@@ -283,10 +283,10 @@ subroutine psb_dinsi(m, irw, val, x, desc_a, info, dupl)
     goto 9999
   else if (.not.psb_is_ok_desc(desc_a)) then
     info = 3110
-    int_err(1) = psb_get_dectype(desc_a)
+    int_err(1) = psb_cd_get_dectype(desc_a)
     call psb_errpush(info,name,int_err)
     goto 9999
-  else if (size(x, dim=1) < psb_get_local_rows(desc_a)) then
+  else if (size(x, dim=1) < psb_cd_get_local_rows(desc_a)) then
     info = 310
     int_err(1) = 5
     int_err(2) = 4
@@ -294,9 +294,9 @@ subroutine psb_dinsi(m, irw, val, x, desc_a, info, dupl)
     goto 9999
   endif
 
-  loc_rows=psb_get_local_rows(desc_a)
-  loc_cols=psb_get_local_cols(desc_a)
-  mglob    = psb_get_global_rows(desc_a)
+  loc_rows=psb_cd_get_local_rows(desc_a)
+  loc_cols=psb_cd_get_local_cols(desc_a)
+  mglob    = psb_cd_get_global_rows(desc_a)
 
   n = min(size(val,2),size(x,2))
 

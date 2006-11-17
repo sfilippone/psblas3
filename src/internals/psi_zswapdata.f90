@@ -65,7 +65,7 @@ subroutine psi_zswapdatam(flag,n,beta,y,desc_a,work,info,data)
   name='psi_swap_data'
   call psb_erractionsave(err_act)
 
-  ictxt=psb_get_context(desc_a)
+  ictxt=psb_cd_get_context(desc_a)
   call psb_info(ictxt,me,np) 
   if (np == -1) then
     info = 2010
@@ -474,7 +474,7 @@ subroutine psi_zswapdatav(flag,beta,y,desc_a,work,info,data)
   name='psi_swap_datav'
   call psb_erractionsave(err_act)
 
-  ictxt=psb_get_context(desc_a)
+  ictxt=psb_cd_get_context(desc_a)
   call psb_info(ictxt,me,np) 
   if (np == -1) then
     info = 2010

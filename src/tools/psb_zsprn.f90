@@ -67,7 +67,7 @@ Subroutine psb_zsprn(a, desc_a,info,clear)
   name = 'psb_zsprn'
   call psb_erractionsave(err_act)
 
-  ictxt = psb_get_context(desc_a)
+  ictxt = psb_cd_get_context(desc_a)
   call psb_info(ictxt, me, np)
   if (debug) &
        &write(*,*) 'starting spalloc ',ictxt,np,me

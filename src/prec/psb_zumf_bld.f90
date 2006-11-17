@@ -97,8 +97,8 @@ subroutine psb_zumf_bld(a,desc_a,p,info)
     call psb_errpush(info,name,a_err=ch_err)
     goto 9999
   end if
-  nza = psb_get_nnzeros(atmp)
-  nzb = psb_get_nnzeros(a)
+  nza = psb_sp_get_nnzeros(atmp)
+  nzb = psb_sp_get_nnzeros(a)
   if (Debug) then 
     write(0,*) me, 'UMFBLD: Done csdp',info,nza,atmp%m,atmp%k,nzb
     call psb_barrier(ictxt)
@@ -112,7 +112,7 @@ subroutine psb_zumf_bld(a,desc_a,p,info)
     goto 9999
   end if
 
-  nzb = psb_get_nnzeros(blck)
+  nzb = psb_sp_get_nnzeros(blck)
   if (Debug) then 
     write(0,*) me, 'UMFBLD: Done asmatbld',info,nzb,blck%fida
     call psb_barrier(ictxt)
@@ -165,7 +165,7 @@ subroutine psb_zumf_bld(a,desc_a,p,info)
     call psb_errpush(info,name,a_err=ch_err)
     goto 9999
   end if
-  nzt = psb_get_nnzeros(atmp)
+  nzt = psb_sp_get_nnzeros(atmp)
   if (Debug) then 
     write(0,*) me,'Calling psb_umf_factor ',nzt,atmp%m,&
          & atmp%k,p%desc_data%matrix_data(psb_n_row_)

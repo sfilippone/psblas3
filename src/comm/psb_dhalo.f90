@@ -77,7 +77,7 @@ subroutine  psb_dhalom(x,desc_a,info,alpha,jx,ik,work,tran,mode)
   info=0
   call psb_erractionsave(err_act)
 
-  ictxt=psb_get_context(desc_a)
+  ictxt=psb_cd_get_context(desc_a)
 
   ! check on blacs grid 
   call psb_info(ictxt, me, np)
@@ -94,9 +94,9 @@ subroutine  psb_dhalom(x,desc_a,info,alpha,jx,ik,work,tran,mode)
     ijx = 1
   endif
 
-  m = psb_get_global_rows(desc_a)
-  n = psb_get_global_cols(desc_a)
-  nrow = psb_get_local_rows(desc_a)
+  m = psb_cd_get_global_rows(desc_a)
+  n = psb_cd_get_global_cols(desc_a)
+  nrow = psb_cd_get_local_rows(desc_a)
 
   maxk=size(x,2)-ijx+1
 
@@ -289,7 +289,7 @@ subroutine  psb_dhalov(x,desc_a,info,alpha,work,tran,mode)
   info=0
   call psb_erractionsave(err_act)
 
-  ictxt=psb_get_context(desc_a)
+  ictxt=psb_cd_get_context(desc_a)
 
   ! check on blacs grid 
   call psb_info(ictxt, me, np)
@@ -302,9 +302,9 @@ subroutine  psb_dhalov(x,desc_a,info,alpha,work,tran,mode)
   ix = 1
   ijx = 1
 
-  m = psb_get_global_rows(desc_a)
-  n = psb_get_global_cols(desc_a)
-  nrow = psb_get_local_rows(desc_a)
+  m = psb_cd_get_global_rows(desc_a)
+  n = psb_cd_get_global_cols(desc_a)
+  nrow = psb_cd_get_local_rows(desc_a)
 
   if (present(tran)) then     
     ltran = tran

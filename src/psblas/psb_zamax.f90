@@ -73,7 +73,7 @@ function psb_zamax (x,desc_a, info, jx)
 
   amax=0.d0
 
-  ictxt=psb_get_context(desc_a)
+  ictxt=psb_cd_get_context(desc_a)
 
   call psb_info(ictxt, me, np)
   if (np == -1) then
@@ -89,7 +89,7 @@ function psb_zamax (x,desc_a, info, jx)
      ijx = 1
   endif
 
-  m = psb_get_global_rows(desc_a)
+  m = psb_cd_get_global_rows(desc_a)
 
   call psb_chkvect(m,1,size(x,1),ix,ijx,desc_a,info,iix,jjx)
   if(info.ne.0) then
@@ -106,8 +106,8 @@ function psb_zamax (x,desc_a, info, jx)
   end if
 
   ! compute local max
-  if ((psb_get_local_rows(desc_a).gt.0).and.(m.ne.0)) then
-     imax=izamax(psb_get_local_rows(desc_a)-iix+1,x(iix,jjx),1)
+  if ((psb_cd_get_local_rows(desc_a).gt.0).and.(m.ne.0)) then
+     imax=izamax(psb_cd_get_local_rows(desc_a)-iix+1,x(iix,jjx),1)
      amax=cabs1(x(iix+imax-1,jjx))
   end if
   
@@ -202,7 +202,7 @@ function psb_zamaxv (x,desc_a, info)
 
   amax=0.d0
 
-  ictxt=psb_get_context(desc_a)
+  ictxt=psb_cd_get_context(desc_a)
 
   call psb_info(ictxt, me, np)
   if (np == -1) then
@@ -214,7 +214,7 @@ function psb_zamaxv (x,desc_a, info)
   ix = 1
   jx = 1
 
-  m = psb_get_global_rows(desc_a)
+  m = psb_cd_get_global_rows(desc_a)
 
   call psb_chkvect(m,1,size(x,1),ix,jx,desc_a,info,iix,jjx)
   if(info.ne.0) then
@@ -231,8 +231,8 @@ function psb_zamaxv (x,desc_a, info)
   end if
 
   ! compute local max
-  if ((psb_get_local_rows(desc_a).gt.0).and.(m.ne.0)) then
-     imax=izamax(psb_get_local_rows(desc_a)-iix+1,x(iix),1)
+  if ((psb_cd_get_local_rows(desc_a).gt.0).and.(m.ne.0)) then
+     imax=izamax(psb_cd_get_local_rows(desc_a)-iix+1,x(iix),1)
      cmax=(x(iix+imax-1))
      amax=cabs1(cmax)
   end if
@@ -330,7 +330,7 @@ subroutine psb_zamaxvs (res,x,desc_a, info)
 
   amax=0.d0
 
-  ictxt=psb_get_context(desc_a)
+  ictxt=psb_cd_get_context(desc_a)
 
   call psb_info(ictxt, me, np)
   if (np == -1) then
@@ -342,7 +342,7 @@ subroutine psb_zamaxvs (res,x,desc_a, info)
   ix = 1
   ijx=1
 
-  m = psb_get_global_rows(desc_a)
+  m = psb_cd_get_global_rows(desc_a)
 
   call psb_chkvect(m,1,size(x,1),ix,ijx,desc_a,info,iix,jjx)
   if(info.ne.0) then
@@ -359,8 +359,8 @@ subroutine psb_zamaxvs (res,x,desc_a, info)
   end if
 
   ! compute local max
-  if ((psb_get_local_rows(desc_a).gt.0).and.(m.ne.0)) then
-     imax=izamax(psb_get_local_rows(desc_a)-iix+1,x(iix),1)
+  if ((psb_cd_get_local_rows(desc_a).gt.0).and.(m.ne.0)) then
+     imax=izamax(psb_cd_get_local_rows(desc_a)-iix+1,x(iix),1)
      cmax=(x(iix+imax-1))
      amax=cabs1(cmax)
   end if
@@ -457,7 +457,7 @@ subroutine psb_zmamaxs (res,x,desc_a, info,jx)
 
   amax=0.d0
 
-  ictxt=psb_get_context(desc_a)
+  ictxt=psb_cd_get_context(desc_a)
 
   call psb_info(ictxt, me, np)
   if (np == -1) then
@@ -473,7 +473,7 @@ subroutine psb_zmamaxs (res,x,desc_a, info,jx)
      ijx = 1
   endif
 
-  m = psb_get_global_rows(desc_a)
+  m = psb_cd_get_global_rows(desc_a)
   k  = min(size(x,2),size(res,1))
 
   call psb_chkvect(m,1,size(x,1),ix,ijx,desc_a,info,iix,jjx)
@@ -491,9 +491,9 @@ subroutine psb_zmamaxs (res,x,desc_a, info,jx)
   end if
 
   ! compute local max
-  if ((psb_get_local_rows(desc_a).gt.0).and.(m.ne.0)) then
+  if ((psb_cd_get_local_rows(desc_a).gt.0).and.(m.ne.0)) then
      do i=1,k
-        imax=izamax(psb_get_local_rows(desc_a)-iix+1,x(iix,jjx+i-1),1)
+        imax=izamax(psb_cd_get_local_rows(desc_a)-iix+1,x(iix,jjx+i-1),1)
         cmax=(x(iix+imax-1,jjx+i-1))
         res(i)=cabs1(cmax)
      end do

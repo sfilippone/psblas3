@@ -94,7 +94,7 @@ Subroutine psb_zcdovrbld(n_ovr,desc_p,desc_a,a,&
   call psb_erractionsave(err_act)
 
   If(debug) Write(0,*)'cdovrbld begin'
-  ictxt = psb_get_context(desc_a)
+  ictxt = psb_cd_get_context(desc_a)
 
   Call psb_info(ictxt,me,np)
 
@@ -108,10 +108,10 @@ Subroutine psb_zcdovrbld(n_ovr,desc_p,desc_a,a,&
   t4 = 0.0
   call psb_get_mpicomm(ictxt,icomm )
 
-  mglob = psb_get_global_rows(desc_a)
-  m     = psb_get_local_rows(desc_a)
-  n_row = psb_get_local_rows(desc_a)
-  n_col = psb_get_local_cols(desc_a)
+  mglob = psb_cd_get_global_rows(desc_a)
+  m     = psb_cd_get_local_rows(desc_a)
+  n_row = psb_cd_get_local_rows(desc_a)
+  n_col = psb_cd_get_local_cols(desc_a)
   if (debug) write(0,*) me,' On entry to CDOVRBLD n_col:',n_col
 
   dl_lda=np*5
@@ -306,13 +306,7 @@ Subroutine psb_zcdovrbld(n_ovr,desc_p,desc_a,a,&
         ! Prepare to exchange the halo rows with the other proc.
         !
         If (i_ovr < (n_ovr)) Then
-          call psb_spinfo(psb_nzrowreq_,a,n_elem,info,iaux=idx)
-          if (info /= 0) then
-            info=4010
-            ch_err='psb_spinfo'
-            call psb_errpush(info,name,a_err=ch_err)
-            goto 9999
-          end if
+          n_elem = psb_sp_get_nnz_row(idx,a)
 
           If((idxs+tot_elem+n_elem) > lworks) Then
             isz = max((3*lworks)/2,(idxs+tot_elem+n_elem))
@@ -339,10 +333,10 @@ Subroutine psb_zcdovrbld(n_ovr,desc_p,desc_a,a,&
             end if
           End If
 
-          call psb_spgtblk(idx,a,blk,info)
+          call psb_sp_getblk(idx,a,blk,info)
           if (info /= 0) then
             info=4010
-            ch_err='psb_spgtblk'
+            ch_err='psb_sp_getblk'
             call psb_errpush(info,name,a_err=ch_err)
             goto 9999
           end if
@@ -537,8 +531,8 @@ Subroutine psb_zcdovrbld(n_ovr,desc_p,desc_a,a,&
   End Do
   t1 = mpi_wtime()
 
-  desc_p%matrix_data(psb_m_)=psb_get_global_rows(desc_a)
-  desc_p%matrix_data(psb_n_)=psb_get_global_cols(desc_a)
+  desc_p%matrix_data(psb_m_)=psb_cd_get_global_rows(desc_a)
+  desc_p%matrix_data(psb_n_)=psb_cd_get_global_cols(desc_a)
 
   tmp_halo(counter_h)=-1
   tmp_ovr_idx(counter_o)=-1

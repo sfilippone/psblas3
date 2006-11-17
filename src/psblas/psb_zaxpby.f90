@@ -74,7 +74,7 @@ subroutine  psb_zaxpby(alpha, x, beta,y,desc_a,info, n, jx, jy)
   info=0
   call psb_erractionsave(err_act)
 
-  ictxt=psb_get_context(desc_a)
+  ictxt=psb_cd_get_context(desc_a)
 
   call psb_info(ictxt, me, np)
   if (np == -ione) then
@@ -114,7 +114,7 @@ subroutine  psb_zaxpby(alpha, x, beta,y,desc_a,info, n, jx, jy)
     goto 9999
   end if
 
-  m = psb_get_global_rows(desc_a)
+  m = psb_cd_get_global_rows(desc_a)
 
   ! check vector correctness
   call psb_chkvect(m,ione,size(x,1),ix,ijx,desc_a,info,iix,jjx)
@@ -134,8 +134,8 @@ subroutine  psb_zaxpby(alpha, x, beta,y,desc_a,info, n, jx, jy)
   end if
 
   if ((in.ne.0)) then
-    if(psb_get_local_rows(desc_a).gt.0) then
-      call zaxpby(psb_get_local_cols(desc_a),in,&
+    if(psb_cd_get_local_rows(desc_a).gt.0) then
+      call zaxpby(psb_cd_get_local_cols(desc_a),in,&
            & alpha,x(iix,jjx),size(x,1),beta,&
            & y(iiy,jjy),size(y,1),info)
     end if
@@ -227,7 +227,7 @@ subroutine  psb_zaxpbyv(alpha, x, beta,y,desc_a,info)
   info=0
   call psb_erractionsave(err_act)
 
-  ictxt=psb_get_context(desc_a)
+  ictxt=psb_cd_get_context(desc_a)
 
   call psb_info(ictxt, me, np)
   if (np == -ione) then
@@ -239,7 +239,7 @@ subroutine  psb_zaxpbyv(alpha, x, beta,y,desc_a,info)
   ix = ione
   iy = ione
 
-  m = psb_get_global_rows(desc_a)
+  m = psb_cd_get_global_rows(desc_a)
 
   ! check vector correctness
   call psb_chkvect(m,ione,size(x),ix,ione,desc_a,info,iix,jjx)
@@ -262,8 +262,8 @@ subroutine  psb_zaxpbyv(alpha, x, beta,y,desc_a,info)
     call psb_errpush(info,name)
   end if
 
-  if(psb_get_local_rows(desc_a).gt.0) then
-    call zaxpby(psb_get_local_cols(desc_a),ione,&
+  if(psb_cd_get_local_rows(desc_a).gt.0) then
+    call zaxpby(psb_cd_get_local_cols(desc_a),ione,&
          & alpha,x,size(x),beta,&
          & y,size(y),info)
   end if

@@ -60,7 +60,7 @@ subroutine psb_zbldaggrmat(a,desc_a,ac,desc_ac,p,info)
   info=0
   call psb_erractionsave(err_act)
 
-  ictxt=psb_get_context(desc_a)
+  ictxt=psb_cd_get_context(desc_a)
   call psb_info(ictxt, me, np)
 
   select case (p%iprcparm(smth_kind_))
@@ -124,11 +124,11 @@ contains
 
     call psb_nullify_sp(b)
 
-    ictxt = psb_get_context(desc_a)
+    ictxt = psb_cd_get_context(desc_a)
     call psb_info(ictxt, me, np)
-    nglob = psb_get_global_rows(desc_a)
-    nrow  = psb_get_local_rows(desc_a)
-    ncol  = psb_get_local_cols(desc_a)
+    nglob = psb_cd_get_global_rows(desc_a)
+    nrow  = psb_cd_get_local_rows(desc_a)
+    ncol  = psb_cd_get_local_cols(desc_a)
 
     naggr  = p%nlaggr(me+1)
     ntaggr = sum(p%nlaggr)
@@ -154,7 +154,7 @@ contains
     end if
 
 
-    nzt = psb_get_nnzeros(a)
+    nzt = psb_sp_get_nnzeros(a)
     call psb_sp_all(b,nzt,info)
     if(info /= 0) then
       call psb_errpush(4010,name,a_err='spall')
@@ -175,7 +175,7 @@ contains
         goto 9999
       end if
 
-      nzt = psb_get_nnzeros(b)
+      nzt = psb_sp_get_nnzeros(b)
       do i=1, nzt 
         b%ia1(i) = p%mlia(b%ia1(i))
         b%ia2(i) = p%mlia(b%ia2(i))
@@ -222,7 +222,7 @@ contains
       goto 9999
     end if
 
-    irs = psb_get_nnzeros(b)
+    irs = psb_sp_get_nnzeros(b)
     call psb_sp_reall(b,irs,info)
     if(info /= 0) then
       call psb_errpush(4010,name,a_err='spreall')
@@ -401,7 +401,7 @@ contains
     info=0
     call psb_erractionsave(err_act)
 
-    ictxt = psb_get_context(desc_a)
+    ictxt = psb_cd_get_context(desc_a)
     call psb_info(ictxt, me, np)
 
     call psb_nullify_sp(b)
@@ -411,9 +411,9 @@ contains
     am2 => p%av(sm_pr_t_)
     am1 => p%av(sm_pr_)
 
-    nglob = psb_get_global_rows(desc_a)
-    nrow  = psb_get_local_rows(desc_a)
-    ncol  = psb_get_local_cols(desc_a)
+    nglob = psb_cd_get_global_rows(desc_a)
+    nrow  = psb_cd_get_local_rows(desc_a)
+    ncol  = psb_cd_get_local_cols(desc_a)
 
     naggr  = p%nlaggr(me+1)
     ntaggr = sum(p%nlaggr)
@@ -534,7 +534,7 @@ contains
     ! its diagonal elements stored explicitly!!! 
     ! Should we switch to something safer? 
     !
-    call psb_spscal(am3,p%dorig,info)
+    call psb_sp_scal(am3,p%dorig,info)
     if(info /= 0) goto 9999
 
     if (p%iprcparm(om_choice_) == lib_choice_) then 
@@ -880,7 +880,7 @@ contains
 
 
         if (np>1) then 
-          nzl = psb_get_nnzeros(am1)
+          nzl = psb_sp_get_nnzeros(am1)
           call psb_glob_to_loc(am1%ia1(1:nzl),desc_ac,info,'I')
           if(info /= 0) then
             call psb_errpush(4010,name,a_err='psb_glob_to_loc')

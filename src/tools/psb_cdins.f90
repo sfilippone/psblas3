@@ -66,12 +66,12 @@ subroutine psb_cdins(nz,ia,ja,desc_a,info)
   name = 'psb_cdins'
   call psb_erractionsave(err_act)
 
-  ictxt = psb_get_context(desc_a)
-  dectype = psb_get_dectype(desc_a)
-  mglob   = psb_get_global_rows(desc_a)
-  nglob   = psb_get_global_cols(desc_a)
-  nrow    = psb_get_local_rows(desc_a)
-  ncol    = psb_get_local_cols(desc_a)
+  ictxt = psb_cd_get_context(desc_a)
+  dectype = psb_cd_get_dectype(desc_a)
+  mglob   = psb_cd_get_global_rows(desc_a)
+  nglob   = psb_cd_get_global_cols(desc_a)
+  nrow    = psb_cd_get_local_rows(desc_a)
+  ncol    = psb_cd_get_local_cols(desc_a)
 
   call psb_info(ictxt, me, np)
 

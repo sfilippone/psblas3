@@ -69,7 +69,7 @@ function psb_znrm2(x, desc_a, info, jx)
   info=0
   call psb_erractionsave(err_act)
 
-  ictxt=psb_get_context(desc_a)
+  ictxt=psb_cd_get_context(desc_a)
 
   call psb_info(ictxt, me, np)
   if (np == -1) then
@@ -85,7 +85,7 @@ function psb_znrm2(x, desc_a, info, jx)
     ijx = 1
   endif
 
-  m = psb_get_global_rows(desc_a)
+  m = psb_cd_get_global_rows(desc_a)
 
   call psb_chkvect(m,1,size(x,1),ix,ijx,desc_a,info,iix,jjx)
   if(info.ne.0) then
@@ -101,8 +101,8 @@ function psb_znrm2(x, desc_a, info, jx)
   end if
 
   if(m.ne.0) then
-    if (psb_get_local_rows(desc_a) .gt. 0) then 
-      ndim = psb_get_local_rows(desc_a)
+    if (psb_cd_get_local_rows(desc_a) .gt. 0) then 
+      ndim = psb_cd_get_local_rows(desc_a)
       nrm2 = dznrm2( ndim, x(iix,jjx), ione )
       i=1
       do while (desc_a%ovrlap_elem(i) .ne. -1)
@@ -206,7 +206,7 @@ function psb_znrm2v(x, desc_a, info)
   info=0
   call psb_erractionsave(err_act)
 
-  ictxt=psb_get_context(desc_a)
+  ictxt=psb_cd_get_context(desc_a)
 
   call psb_info(ictxt, me, np)
   if (np == -1) then
@@ -218,7 +218,7 @@ function psb_znrm2v(x, desc_a, info)
   ix = 1
   jx=1
 
-  m = psb_get_global_rows(desc_a)
+  m = psb_cd_get_global_rows(desc_a)
 
 
   call psb_chkvect(m,1,size(x),ix,jx,desc_a,info,iix,jjx)
@@ -235,8 +235,8 @@ function psb_znrm2v(x, desc_a, info)
   end if
 
   if(m.ne.0) then
-    if (psb_get_local_rows(desc_a) .gt. 0) then 
-      ndim = psb_get_local_rows(desc_a)
+    if (psb_cd_get_local_rows(desc_a) .gt. 0) then 
+      ndim = psb_cd_get_local_rows(desc_a)
       nrm2 = dznrm2( ndim, x, ione )
       i=1
       do while (desc_a%ovrlap_elem(i) .ne. -1)
@@ -342,7 +342,7 @@ subroutine psb_znrm2vs(res, x, desc_a, info)
   info=0
   call psb_erractionsave(err_act)
 
-  ictxt=psb_get_context(desc_a)
+  ictxt=psb_cd_get_context(desc_a)
 
   call psb_info(ictxt, me, np)
   if (np == -1) then
@@ -353,7 +353,7 @@ subroutine psb_znrm2vs(res, x, desc_a, info)
 
   ix = 1
   jx = 1
-  m = psb_get_global_rows(desc_a)
+  m = psb_cd_get_global_rows(desc_a)
 
   call psb_chkvect(m,1,size(x),ix,jx,desc_a,info,iix,jjx)
   if(info.ne.0) then
@@ -369,8 +369,8 @@ subroutine psb_znrm2vs(res, x, desc_a, info)
   end if
 
   if(m.ne.0) then
-    if (psb_get_local_rows(desc_a) .gt. 0) then 
-      ndim = psb_get_local_rows(desc_a)
+    if (psb_cd_get_local_rows(desc_a) .gt. 0) then 
+      ndim = psb_cd_get_local_rows(desc_a)
       nrm2 = dznrm2( ndim, x, ione )
       i=1
       do while (desc_a%ovrlap_elem(i) .ne. -1)

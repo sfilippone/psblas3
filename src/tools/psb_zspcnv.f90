@@ -123,10 +123,10 @@ subroutine psb_zspcnv(a,b,desc_a,info)
   time(1) = mpi_wtime()
 
 
-  ictxt = psb_get_context(desc_a)
-  dectype = psb_get_dectype(desc_a)
-  n_row   = psb_get_local_rows(desc_a)
-  n_col   = psb_get_local_cols(desc_a)
+  ictxt = psb_cd_get_context(desc_a)
+  dectype = psb_cd_get_dectype(desc_a)
+  n_row   = psb_cd_get_local_rows(desc_a)
+  n_col   = psb_cd_get_local_cols(desc_a)
 
   ! check on blacs grid 
   call psb_info(ictxt, me, np)

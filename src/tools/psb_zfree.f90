@@ -65,7 +65,7 @@ subroutine psb_zfree(x, desc_a, info)
      return
   end if
 
-  ictxt=psb_get_context(desc_a)
+  ictxt=psb_cd_get_context(desc_a)
 
   call psb_info(ictxt, me, np)
   !     ....verify blacs grid correctness..
@@ -141,7 +141,7 @@ subroutine psb_zfreev(x, desc_a, info)
      call psb_errpush(info,name)
      goto 9999
   end if
-  ictxt=psb_get_context(desc_a)
+  ictxt=psb_cd_get_context(desc_a)
 
   call psb_info(ictxt, me, np)
   if (np == -1) then

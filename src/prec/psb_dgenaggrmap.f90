@@ -66,10 +66,10 @@ subroutine psb_dgenaggrmap(aggr_type,a,desc_a,nlaggr,ilaggr,info)
   ! so that we only have local decoupled aggregation. This might 
   ! change in the future. 
   !
-  ictxt=psb_get_context(desc_a)
+  ictxt=psb_cd_get_context(desc_a)
   call psb_info(ictxt,me,np)
-  nrow  = psb_get_local_rows(desc_a)
-  ncol  = psb_get_local_cols(desc_a)
+  nrow  = psb_cd_get_local_rows(desc_a)
+  ncol  = psb_cd_get_local_cols(desc_a)
 
 
   nr = a%m

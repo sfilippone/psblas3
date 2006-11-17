@@ -100,7 +100,7 @@ subroutine psb_dprecbld(a,desc_a,p,info,upd)
   if (debug) write(0,*) 'Entering precbld',P%prec,desc_a%matrix_data(:)
   info = 0
   int_err(1) = 0
-  ictxt = psb_get_context(desc_a)
+  ictxt = psb_cd_get_context(desc_a)
 
   if (debug) write(0,*) 'Preconditioner psb_info'
   call psb_info(ictxt, me, np)

@@ -215,104 +215,6 @@ module psb_serial_mod
      end subroutine psb_zcsprt
   end interface
 
-  interface psb_sp_getdiag
-     subroutine psb_dspgtdiag(a,d,info)
-       use psb_spmat_type
-       type(psb_dspmat_type), intent(in)     :: a
-       real(kind(1.d0)), intent(inout) :: d(:) 
-       integer, intent(out)  :: info
-     end subroutine psb_dspgtdiag
-     subroutine psb_zspgtdiag(a,d,info)
-       use psb_spmat_type
-       type(psb_zspmat_type), intent(in)     :: a
-       complex(kind(1.d0)), intent(inout) :: d(:) 
-       integer, intent(out)  :: info
-     end subroutine psb_zspgtdiag
-  end interface
-
-  interface psb_spscal
-     subroutine psb_dspscal(a,d,info)
-       use psb_spmat_type
-       type(psb_dspmat_type), intent(inout) :: a
-       real(kind(1.d0)), intent(in) :: d(:) 
-       integer, intent(out)  :: info
-     end subroutine psb_dspscal
-     subroutine psb_zspscal(a,d,info)
-       use psb_spmat_type
-       type(psb_zspmat_type), intent(inout) :: a
-       complex(kind(1.d0)), intent(in) :: d(:) 
-       integer, intent(out)  :: info
-     end subroutine psb_zspscal
-  end interface
-
-
-  interface psb_spinfo
-     subroutine psb_dspinfo(ireq,a,ires,info,iaux)
-       use psb_spmat_type
-       type(psb_dspmat_type), intent(in),target :: a
-       integer, intent(in)       :: ireq
-       integer, intent(out)      :: ires
-       integer, intent(out)  :: info
-       integer, intent(in), optional :: iaux
-     end subroutine psb_dspinfo
-     subroutine psb_zspinfo(ireq,a,ires,info,iaux)
-       use psb_spmat_type
-       type(psb_zspmat_type), intent(in),target :: a
-       integer, intent(in)       :: ireq
-       integer, intent(out)      :: ires
-       integer, intent(out)  :: info
-       integer, intent(in), optional :: iaux
-     end subroutine psb_zspinfo
-  end interface
-
-  interface psb_spgtblk
-     subroutine psb_dspgtblk(irw,a,b,info,append,iren,lrw)
-       use psb_spmat_type
-       type(psb_dspmat_type), intent(in) :: a
-       integer, intent(in)       :: irw
-       type(psb_dspmat_type), intent(inout)    :: b
-       logical, intent(in), optional :: append
-       integer, intent(in), target, optional :: iren(:)
-       integer, intent(in), optional :: lrw
-       integer, intent(out)  :: info
-     end subroutine psb_dspgtblk
-     subroutine psb_zspgtblk(irw,a,b,info,append,iren,lrw)
-       use psb_spmat_type
-       type(psb_zspmat_type), intent(in) :: a
-       integer, intent(in)       :: irw
-       type(psb_zspmat_type), intent(inout)    :: b
-       logical, intent(in), optional :: append
-       integer, intent(in), target, optional :: iren(:)
-       integer, intent(in), optional :: lrw
-       integer, intent(out)  :: info
-     end subroutine psb_zspgtblk
-  end interface
-
-  interface psb_sp_getrow
-     subroutine psb_dspgetrow(irw,a,nz,ia,ja,val,info,iren,lrw)
-       use psb_spmat_type
-       type(psb_dspmat_type), intent(in) :: a
-       integer, intent(in)       :: irw
-       integer, intent(out)      :: nz
-       integer, intent(inout)    :: ia(:), ja(:)
-       real(kind(1.d0)),  intent(inout)    :: val(:)
-       integer, intent(in), target, optional :: iren(:)
-       integer, intent(in), optional :: lrw
-       integer, intent(out)  :: info
-     end subroutine psb_dspgetrow
-     subroutine psb_zspgetrow(irw,a,nz,ia,ja,val,info,iren,lrw)
-       use psb_spmat_type
-       type(psb_zspmat_type), intent(in) :: a
-       integer, intent(in)       :: irw
-       integer, intent(out)      :: nz
-       integer, intent(inout)    :: ia(:), ja(:)
-       complex(kind(1.d0)),  intent(inout)    :: val(:)
-       integer, intent(in), target, optional :: iren(:)
-       integer, intent(in), optional :: lrw
-       integer, intent(out)  :: info
-     end subroutine psb_zspgetrow
-  end interface
-
   interface psb_neigh
      subroutine psb_dneigh(a,idx,neigh,n,info,lev)
        use psb_spmat_type
@@ -439,111 +341,85 @@ module psb_serial_mod
   end interface
 
 
-  interface psb_get_nrows
-    module procedure psb_get_dsp_nrows, psb_get_zsp_nrows
+  interface psb_sp_getdiag
+     subroutine psb_dspgtdiag(a,d,info)
+       use psb_spmat_type
+       type(psb_dspmat_type), intent(in)     :: a
+       real(kind(1.d0)), intent(inout) :: d(:) 
+       integer, intent(out)  :: info
+     end subroutine psb_dspgtdiag
+     subroutine psb_zspgtdiag(a,d,info)
+       use psb_spmat_type
+       type(psb_zspmat_type), intent(in)     :: a
+       complex(kind(1.d0)), intent(inout) :: d(:) 
+       integer, intent(out)  :: info
+     end subroutine psb_zspgtdiag
   end interface
 
-  interface psb_get_ncols
-    module procedure psb_get_dsp_ncols, psb_get_zsp_ncols
+  interface psb_sp_scal
+     subroutine psb_dspscal(a,d,info)
+       use psb_spmat_type
+       type(psb_dspmat_type), intent(inout) :: a
+       real(kind(1.d0)), intent(in) :: d(:) 
+       integer, intent(out)  :: info
+     end subroutine psb_dspscal
+     subroutine psb_zspscal(a,d,info)
+       use psb_spmat_type
+       type(psb_zspmat_type), intent(inout) :: a
+       complex(kind(1.d0)), intent(in) :: d(:) 
+       integer, intent(out)  :: info
+     end subroutine psb_zspscal
   end interface
 
-  interface psb_get_nnzeros
-    module procedure psb_get_dsp_nnzeros, psb_get_zsp_nnzeros
+  interface psb_sp_getblk
+     subroutine psb_dspgtblk(irw,a,b,info,append,iren,lrw)
+       use psb_spmat_type
+       type(psb_dspmat_type), intent(in) :: a
+       integer, intent(in)       :: irw
+       type(psb_dspmat_type), intent(inout)    :: b
+       logical, intent(in), optional :: append
+       integer, intent(in), target, optional :: iren(:)
+       integer, intent(in), optional :: lrw
+       integer, intent(out)  :: info
+     end subroutine psb_dspgtblk
+     subroutine psb_zspgtblk(irw,a,b,info,append,iren,lrw)
+       use psb_spmat_type
+       type(psb_zspmat_type), intent(in) :: a
+       integer, intent(in)       :: irw
+       type(psb_zspmat_type), intent(inout)    :: b
+       logical, intent(in), optional :: append
+       integer, intent(in), target, optional :: iren(:)
+       integer, intent(in), optional :: lrw
+       integer, intent(out)  :: info
+     end subroutine psb_zspgtblk
   end interface
 
-  interface psb_get_nnz_row
-    module procedure psb_get_dsp_nnz_row, psb_get_zsp_nnz_row
+  interface psb_sp_getrow
+     subroutine psb_dspgetrow(irw,a,nz,ia,ja,val,info,iren,lrw)
+       use psb_spmat_type
+       type(psb_dspmat_type), intent(in) :: a
+       integer, intent(in)       :: irw
+       integer, intent(out)      :: nz
+       integer, intent(inout)    :: ia(:), ja(:)
+       real(kind(1.d0)),  intent(inout)    :: val(:)
+       integer, intent(in), target, optional :: iren(:)
+       integer, intent(in), optional :: lrw
+       integer, intent(out)  :: info
+     end subroutine psb_dspgetrow
+     subroutine psb_zspgetrow(irw,a,nz,ia,ja,val,info,iren,lrw)
+       use psb_spmat_type
+       type(psb_zspmat_type), intent(in) :: a
+       integer, intent(in)       :: irw
+       integer, intent(out)      :: nz
+       integer, intent(inout)    :: ia(:), ja(:)
+       complex(kind(1.d0)),  intent(inout)    :: val(:)
+       integer, intent(in), target, optional :: iren(:)
+       integer, intent(in), optional :: lrw
+       integer, intent(out)  :: info
+     end subroutine psb_zspgetrow
   end interface
   
 
-
-contains
-
-  integer function psb_get_dsp_nrows(a)
-    use psb_spmat_type
-    type(psb_dspmat_type), intent(in) :: a
-    psb_get_dsp_nrows = a%m
-
-    return
-  end function psb_get_dsp_nrows
-
-  integer function psb_get_dsp_ncols(a)
-    use psb_spmat_type
-    type(psb_dspmat_type), intent(in) :: a
-    psb_get_dsp_ncols = a%k
-
-    return
-  end function psb_get_dsp_ncols
-  integer function psb_get_zsp_nrows(a)
-    use psb_spmat_type
-    type(psb_zspmat_type), intent(in) :: a
-    psb_get_zsp_nrows = a%m
-
-    return
-  end function psb_get_zsp_nrows
-
-  integer function psb_get_zsp_ncols(a)
-    use psb_spmat_type
-    type(psb_zspmat_type), intent(in) :: a
-    psb_get_zsp_ncols = a%k
-
-    return
-  end function psb_get_zsp_ncols
-  
-
-  integer function psb_get_dsp_nnzeros(a)
-    use psb_spmat_type
-    type(psb_dspmat_type), intent(in) :: a  
-    integer :: ires,info
-    
-    call psb_spinfo(psb_nztotreq_,a,ires,info)
-    if (info == 0) then 
-      psb_get_dsp_nnzeros = ires
-    else
-      psb_get_dsp_nnzeros = 0
-    end if
-  end function psb_get_dsp_nnzeros
-
-  integer function psb_get_zsp_nnzeros(a)
-    use psb_spmat_type
-    type(psb_zspmat_type), intent(in) :: a  
-    integer :: ires,info
-    
-    call psb_spinfo(psb_nztotreq_,a,ires,info)
-    if (info == 0) then 
-      psb_get_zsp_nnzeros = ires
-    else
-      psb_get_zsp_nnzeros = 0
-    end if
-  end function psb_get_zsp_nnzeros
-
-
-  integer function psb_get_dsp_nnz_row(ir,a)
-    use psb_spmat_type
-    integer, intent(in)               :: ir
-    type(psb_dspmat_type), intent(in) :: a  
-    integer :: ires,info
-    
-    call psb_spinfo(psb_nzrowreq_,a,ires,info,iaux=ir)
-    if (info == 0) then 
-      psb_get_dsp_nnz_row = ires
-    else
-      psb_get_dsp_nnz_row = 0
-    end if
-  end function psb_get_dsp_nnz_row
-  integer function psb_get_zsp_nnz_row(ir,a)
-    use psb_spmat_type
-    integer, intent(in)               :: ir
-    type(psb_zspmat_type), intent(in) :: a  
-    integer :: ires,info
-    
-    call psb_spinfo(psb_nzrowreq_,a,ires,info,iaux=ir)
-    if (info == 0) then 
-      psb_get_zsp_nnz_row = ires
-    else
-      psb_get_zsp_nnz_row = 0
-    end if
-  end function psb_get_zsp_nnz_row
 
   
 end module psb_serial_mod

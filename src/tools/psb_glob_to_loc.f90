@@ -79,28 +79,28 @@ subroutine psb_glob_to_loc2(x,y,desc_a,info,iact)
 
   n=size(x)
   do i=1,n
-    if ((x(i).gt.psb_get_global_rows(desc_a)).or.&
+    if ((x(i).gt.psb_cd_get_global_rows(desc_a)).or.&
          &  (x(i).le.zero)) then
       if (act == 'I') then
-        y(i)=-3*psb_get_global_rows(desc_a)
+        y(i)=-3*psb_cd_get_global_rows(desc_a)
       else
         info=140
         int_err(1)=x(i)
-        int_err(2)=psb_get_global_rows(desc_a)
+        int_err(2)=psb_cd_get_global_rows(desc_a)
         exit
       end if
     else
       tmp=desc_a%glob_to_loc(x(i))
-      if((tmp.gt.zero).or.(tmp.le.psb_get_local_cols(desc_a))) then
+      if((tmp.gt.zero).or.(tmp.le.psb_cd_get_local_cols(desc_a))) then
         y(i)=tmp
       else if (tmp.le.zero) then
         info = 150
         int_err(1)=tmp
         exit
-      else if (tmp.gt.psb_get_local_cols(desc_a)) then
+      else if (tmp.gt.psb_cd_get_local_cols(desc_a)) then
         info = 140
         int_err(1)=tmp
-        int_err(2)=psb_get_local_cols(desc_a)
+        int_err(2)=psb_cd_get_local_cols(desc_a)
         exit
       end if
     end if
@@ -213,28 +213,28 @@ subroutine psb_glob_to_loc(x,desc_a,info,iact)
   real_val = 0.d0
   n=size(x)
   do i=1,n
-    if ((x(i).gt.psb_get_global_rows(desc_a)).or.&
+    if ((x(i).gt.psb_cd_get_global_rows(desc_a)).or.&
          &  (x(i).le.zero)) then
       if(act == 'I') then
-        x(i)=-3*psb_get_global_rows(desc_a)
+        x(i)=-3*psb_cd_get_global_rows(desc_a)
       else
         info=140
         int_err(1)=x(i)
-        int_err(2)=psb_get_global_rows(desc_a)
+        int_err(2)=psb_cd_get_global_rows(desc_a)
         exit
       end if
     else
       tmp=desc_a%glob_to_loc(x(i))
-      if((tmp.gt.zero).or.(tmp.le.psb_get_local_cols(desc_a))) then
+      if((tmp.gt.zero).or.(tmp.le.psb_cd_get_local_cols(desc_a))) then
         x(i)=tmp
       else if (tmp.le.zero) then
         info = 150
         int_err(1)=tmp
         exit
-      else if (tmp.ge.psb_get_local_cols(desc_a)) then
+      else if (tmp.ge.psb_cd_get_local_cols(desc_a)) then
         info = 140
         int_err(1)=tmp
-        int_err(2)=psb_get_local_cols(desc_a)
+        int_err(2)=psb_cd_get_local_cols(desc_a)
         exit
       end if
     end if

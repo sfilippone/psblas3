@@ -65,7 +65,7 @@ subroutine psi_iswaptranm(flag,n,beta,y,desc_a,work,info,data)
   name='psi_swap_tran'
   call psb_erractionsave(err_act)
 
-  ictxt=psb_get_context(desc_a)
+  ictxt=psb_cd_get_context(desc_a)
   call psb_info(ictxt,me,np) 
   if (np == -1) then
     info = 2010
@@ -466,7 +466,7 @@ subroutine psi_iswaptranv(flag,beta,y,desc_a,work,info,data)
   name='psi_swap_tranv'
   call psb_erractionsave(err_act)
 
-  ictxt=psb_get_context(desc_a)
+  ictxt=psb_cd_get_context(desc_a)
   call psb_info(ictxt,me,np) 
   if (np == -1) then
     info = 2010

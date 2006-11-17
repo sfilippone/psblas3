@@ -67,7 +67,7 @@ subroutine psb_zalloc(x, desc_a, info, n)
   int_err(1)=0
   call psb_erractionsave(err_act)
 
-  ictxt=psb_get_context(desc_a)
+  ictxt=psb_cd_get_context(desc_a)
 
   call psb_info(ictxt, me, np)
   if (np == -1) then
@@ -76,7 +76,7 @@ subroutine psb_zalloc(x, desc_a, info, n)
     goto 9999
   endif
 
-  dectype=psb_get_dectype(desc_a)
+  dectype=psb_cd_get_dectype(desc_a)
   !... check m and n parameters....
   if (.not.psb_is_ok_desc(desc_a)) then 
     info = 3110
@@ -105,7 +105,7 @@ subroutine psb_zalloc(x, desc_a, info, n)
 
   !....allocate x .....
   if (psb_is_asb_desc(desc_a).or.psb_is_upd_desc(desc_a)) then
-    n_col = max(1,psb_get_local_cols(desc_a))
+    n_col = max(1,psb_cd_get_local_cols(desc_a))
     allocate(x(n_col,n_),stat=info)
     if (info /= 0) then
       info=4010
@@ -119,7 +119,7 @@ subroutine psb_zalloc(x, desc_a, info, n)
       end do
     end do
   else if (psb_is_bld_desc(desc_a)) then
-    n_row = max(1,psb_get_local_rows(desc_a))
+    n_row = max(1,psb_cd_get_local_rows(desc_a))
     allocate(x(n_row,n_),stat=info)
     if (info /= 0) then
       info=4010
@@ -212,7 +212,7 @@ subroutine psb_zallocv(x, desc_a,info,n)
   name='psb_zallcv'
   call psb_erractionsave(err_act)
 
-  ictxt=psb_get_context(desc_a)
+  ictxt=psb_cd_get_context(desc_a)
 
   call psb_info(ictxt, me, np)
   !     ....verify blacs grid correctness..
@@ -222,7 +222,7 @@ subroutine psb_zallocv(x, desc_a,info,n)
     goto 9999
   endif
 
-  dectype=psb_get_dectype(desc_a)
+  dectype=psb_cd_get_dectype(desc_a)
   if (debug) write(0,*) 'dall: dectype',dectype
   if (debug) write(0,*) 'dall: is_ok? dectype',psb_is_ok_desc(desc_a)
   !... check m and n parameters....
@@ -236,7 +236,7 @@ subroutine psb_zallocv(x, desc_a,info,n)
 
   !....allocate x .....
   if (psb_is_asb_desc(desc_a).or.psb_is_upd_desc(desc_a)) then
-    n_col = max(1,psb_get_local_cols(desc_a))
+    n_col = max(1,psb_cd_get_local_cols(desc_a))
     call psb_realloc(n_col,x,info)
     if (info /= 0) then
       info=4010
@@ -249,7 +249,7 @@ subroutine psb_zallocv(x, desc_a,info,n)
     end do
 
   else if (psb_is_bld_desc(desc_a)) then
-    n_row = max(1,psb_get_local_rows(desc_a))
+    n_row = max(1,psb_cd_get_local_rows(desc_a))
     call psb_realloc(n_row,x,info)
     if (info /= 0) then
       info=4010

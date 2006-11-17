@@ -199,10 +199,10 @@ contains
 
         if ((mod(i,nrb) == 1).or.(nrb==1)) then 
           irb = min(ma-i+1,nrb)
-          call psb_spgtblk(i,a,trw,info,lrw=i+irb-1)
+          call psb_sp_getblk(i,a,trw,info,lrw=i+irb-1)
           if(info.ne.0) then
             info=4010
-            ch_err='psb_spgtblk'
+            ch_err='psb_sp_getblk'
             call psb_errpush(info,name,a_err=ch_err)
             goto 9999
           end if
@@ -341,10 +341,10 @@ contains
 
         if ((mod((i-ma),nrb) == 1).or.(nrb==1)) then 
           irb = min(m-i+1,nrb)
-          call psb_spgtblk(i-ma,b,trw,info,lrw=i-ma+irb-1)
+          call psb_sp_getblk(i-ma,b,trw,info,lrw=i-ma+irb-1)
           if(info.ne.0) then
             info=4010
-            ch_err='psb_spgtblk'
+            ch_err='psb_sp_getblk'
             call psb_errpush(info,name,a_err=ch_err)
             goto 9999
           end if

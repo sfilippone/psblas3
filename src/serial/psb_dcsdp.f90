@@ -78,17 +78,7 @@ subroutine psb_dcsdp(a, b,info,ifc,check,trans,unitd,upd,dupl)
     end subroutine psb_cest
   end interface
 
-  interface psb_spinfo
-    subroutine psb_dspinfo(ireq,a,ires,info,iaux)
-      use psb_spmat_type
-      type(psb_dspmat_type), intent(in) :: a
-      integer, intent(in)               :: ireq
-      integer, intent(out)              :: ires, info
-      integer, intent(in), optional     :: iaux
-    end subroutine psb_dspinfo
-  end interface
-
-  name='psb_dcsdp'
+  name='psb_csdp'
   info  = 0
   call psb_erractionsave(err_act)
 
@@ -180,7 +170,7 @@ subroutine psb_dcsdp(a, b,info,ifc,check,trans,unitd,upd,dupl)
     !  ...matrix conversion...
     b%m=a%m
     b%k=a%k
-    call psb_spinfo(psb_nztotreq_,a,size_req,info)
+    size_req = psb_sp_get_nnzeros(a)
     if (debug) write(0,*) 'DCSDP : size_req 1:',size_req
     !
     

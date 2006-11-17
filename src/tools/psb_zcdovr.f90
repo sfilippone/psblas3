@@ -101,15 +101,15 @@ Subroutine psb_zcdovr(a,desc_a,novr,desc_ov,info)
   info  = 0
   call psb_erractionsave(err_act)
 
-  ictxt=psb_get_context(desc_a)
+  ictxt=psb_cd_get_context(desc_a)
 
   Call psb_info(ictxt, me, np)
 
   If(debug) Write(0,*)'in psb_cdovr',novr
 
-  m=psb_get_local_rows(desc_a)
+  m=psb_cd_get_local_rows(desc_a)
   nnzero=Size(a%aspk)
-  n_col=psb_get_local_cols(desc_a)
+  n_col=psb_cd_get_local_cols(desc_a)
   nhalo = n_col-m
   If(debug) Write(0,*)'IN CDOVR1',novr ,m,nnzero,n_col
   if (novr<0) then
@@ -150,13 +150,7 @@ Subroutine psb_zcdovr(a,desc_a,novr,desc_ov,info)
   ! LOVR= (NNZ/NROW)*N_HALO*N_OVR  This assumes that the local average 
   ! nonzeros per row is the same as the global. 
   !
-  call psb_spinfo(psb_nztotreq_,a,nztot,info)
-  if (info /= 0) then
-     info=4010
-     ch_err='psb_spinfo'
-     call psb_errpush(info,name,a_err=ch_err)
-     goto 9999
-  end if
+  nztot = psb_sp_get_nnzeros(a)
   if (nztot>0) then 
      lovr   = ((nztot+m-1)/m)*nhalo*novr
      lworks = ((nztot+m-1)/m)*nhalo

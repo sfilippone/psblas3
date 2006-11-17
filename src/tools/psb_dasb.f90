@@ -69,14 +69,14 @@ subroutine psb_dasb(x, desc_a, info)
     goto 9999
   endif
 
-  ictxt=psb_get_context(desc_a)
-  dectype=psb_get_dectype(desc_a)
+  ictxt=psb_cd_get_context(desc_a)
+  dectype=psb_cd_get_dectype(desc_a)
 
   call psb_info(ictxt, me, np)
 
 
   if (debug) write(*,*) 'asb start: ',np,me,&
-       &psb_get_dectype(desc_a)
+       &psb_cd_get_dectype(desc_a)
   !     ....verify blacs grid correctness..
   if (np == -1) then
     info = 2010
@@ -91,9 +91,9 @@ subroutine psb_dasb(x, desc_a, info)
   endif
 
   ! check size
-  ictxt=psb_get_context(desc_a)
-  nrow=psb_get_local_rows(desc_a)
-  ncol=psb_get_local_cols(desc_a)
+  ictxt=psb_cd_get_context(desc_a)
+  nrow=psb_cd_get_local_rows(desc_a)
+  ncol=psb_cd_get_local_cols(desc_a)
   i1sz = size(x,dim=1)
   i2sz = size(x,dim=2)
   if (debug) write(*,*) 'asb: ',i1sz,i2sz,nrow,ncol
@@ -193,8 +193,8 @@ subroutine psb_dasbv(x, desc_a, info)
   int_err(1) = 0
   name = 'psb_dasbv'
 
-  ictxt=psb_get_context(desc_a)
-  dectype=psb_get_dectype(desc_a)
+  ictxt=psb_cd_get_context(desc_a)
+  dectype=psb_cd_get_dectype(desc_a)
 
   call psb_info(ictxt, me, np)
 
@@ -209,8 +209,8 @@ subroutine psb_dasbv(x, desc_a, info)
     goto 9999
   endif
 
-  nrow=psb_get_local_rows(desc_a)
-  ncol=psb_get_local_cols(desc_a)
+  nrow=psb_cd_get_local_rows(desc_a)
+  ncol=psb_cd_get_local_cols(desc_a)
   if (debug) write(*,*) name,' sizes: ',nrow,ncol
   i1sz = size(x)
   if (debug) write(*,*) 'dasb: sizes ',i1sz,ncol
