@@ -26,7 +26,9 @@ exchanged among processes.
 It is not necessary for the user to know the internal structure of
 \verb|psb_desc_type|, it is set in a transparent mode by the tools
 routines of Sec.~\ref{sec:toolsrout} while creating a new sparse
-matrix; nevertheless we include its description for the curious reader:  
+matrix, and its fields may be accessed if necessary via appropriate
+routines; nevertheless we include its description for the curious
+reader:   
 \begin{description}
 \item[{\bf matrix\_data}] includes general information about matrix and
 process grid. More precisely:
