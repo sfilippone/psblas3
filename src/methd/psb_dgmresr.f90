@@ -106,7 +106,7 @@ Subroutine psb_dgmresr(a,prec,b,x,eps,desc_a,info,&
   Real(Kind(1.d0)), Optional, Intent(out) :: err
 !!$   local data
   Real(Kind(1.d0)), allocatable, target   :: aux(:),w(:), v(:,:)
-  Real(Kind(1.d0)), allocatable   ::  c(:),s(:), h(:,:), rs(:), rr(:,:)
+  Real(Kind(1.d0)), allocatable   ::  c(:),s(:), h(:,:), rs(:)
   Real(Kind(1.d0)) :: rerr, scal, gm 
   Integer       ::litmax, liter, naux, m, mglob, it,k, itrace_,&
        & np,me, n_row, n_col, nl, int_err(5)
@@ -115,7 +115,7 @@ Subroutine psb_dgmresr(a,prec,b,x,eps,desc_a,info,&
   Integer, Parameter :: irmax = 8
   Integer            :: itx, i, isvch, ich, ictxt,istop_, err_act
   Logical, Parameter :: debug = .false.
-  Real(Kind(1.d0)) :: rni, xni, bni, ani,bn2 
+  Real(Kind(1.d0)) :: rni, xni, bni, ani,bn2, dt
   real(kind(1.d0)), external :: dnrm2
   character(len=20)          :: name
 
@@ -174,7 +174,7 @@ Subroutine psb_dgmresr(a,prec,b,x,eps,desc_a,info,&
 
 
   naux=4*n_col 
-  Allocate(aux(naux),h(nl+1,nl+1),rr(nl+1,nl+1),&
+  Allocate(aux(naux),h(nl+1,nl+1),&
        &c(nl+1),s(nl+1),rs(nl+1), stat=info)
 
   if (info == 0) Call psb_geall(v,desc_a,info,n=nl+1)
@@ -272,8 +272,9 @@ Subroutine psb_dgmresr(a,prec,b,x,eps,desc_a,info,&
       scal=done/h(i+1,i)
       call psb_geaxpby(scal,w,dzero,v(:,i+1),desc_a,info)
       do k=2,i
-        rr(k-1,i) =  c(k-1)*h(k-1,i) + s(k-1)*h(k,i)
-        rr(k,i)   = -s(k-1)*h(k-1,i) + c(k-1)*h(k,i)
+        dt       = h(k-1,i)
+        h(k-1,i) =  c(k-1)*dt + s(k-1)*h(k,i)
+        h(k,i)   = -s(k-1)*dt + c(k-1)*h(k,i)
       enddo
       gm =  safe_dn2(h(i,i),h(i+1,i))
       if (debug) write(0,*) 'GM : ',gm
@@ -283,9 +284,10 @@ Subroutine psb_dgmresr(a,prec,b,x,eps,desc_a,info,&
       s(i) = h(i+1,i)/gm
       rs(i+1) = -s(i)*rs(i)
       rs(i)   = c(i)*rs(i)
-      rr(i,i)  = c(i)*h(i,i)+s(i)*h(i+1,i)
+      h(i,i)  = c(i)*h(i,i)+s(i)*h(i+1,i)
             
       if (istop_ == 1) then 
+!da modificare, la norma infinito del residuo va calcolata a parte
         rni = abs(rs(i+1))
         xni = psb_geamax(x,desc_a,info)
         rerr =  rni/(ani*xni+bni)
@@ -295,7 +297,7 @@ Subroutine psb_dgmresr(a,prec,b,x,eps,desc_a,info,&
       endif
 
       if (rerr < eps ) then 
-        call dtrsm('l','u','n','n',i,1,done,rr,size(rr,1),rs,size(rs))
+        call dtrsm('l','u','n','n',i,1,done,h,size(h,1),rs,nl)
         if (debug) write(0,*) 'Rebuild x-> RS:',rs(21:nl)
         do k=1, i
           call psb_geaxpby(rs(k),v(:,k),done,x,desc_a,info)
@@ -309,7 +311,7 @@ Subroutine psb_dgmresr(a,prec,b,x,eps,desc_a,info,&
 
     end Do inner
     if (debug) write(0,*) 'Before DTRSM :',rs(1:nl)
-    call dtrsm('l','u','n','n',nl,1,done,rr,size(rr,1),rs,size(rs))
+    call dtrsm('l','u','n','n',nl,1,done,h,size(h,1),rs,nl)
     if (debug) write(0,*) 'Rebuild x-> RS:',rs(21:nl)
     do k=1, nl
       call psb_geaxpby(rs(k),v(:,k),done,x,desc_a,info)
@@ -322,13 +324,13 @@ Subroutine psb_dgmresr(a,prec,b,x,eps,desc_a,info,&
 
   If (Present(err)) err=rerr
   If (Present(iter)) iter = itx
-  If (rerr>eps) Then
+  If ((rerr>eps).and. (me == 0))  Then
     Write(0,*) 'gmresr(l) failed to converge to ',eps,&
          & ' in ',itx,' iterations  '
   End If
 
 
-  Deallocate(aux,h,c,s,rs,rr, stat=info)
+  Deallocate(aux,h,c,s,rs, stat=info)
   Call psb_gefree(v,desc_a,info)
   Call psb_gefree(w,desc_a,info)
 
