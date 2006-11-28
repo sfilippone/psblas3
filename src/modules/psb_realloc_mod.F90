@@ -46,13 +46,20 @@ module psb_realloc_mod
 
   interface psb_transfer
     module procedure psb_dtransfer1d
+    module procedure psb_dtransfer2d
     module procedure psb_itransfer1d
+    module procedure psb_itransfer2d
     module procedure psb_ztransfer1d
+    module procedure psb_ztransfer2d
   end interface
 
   Interface psb_safe_cpy
     module procedure psb_icpy1d,psb_icpy2d, &
          & psb_dcpy1d, psb_dcpy2d, psb_zcpy1d, psb_zcpy2d
+  end Interface
+
+  Interface psb_check_size
+    module procedure psb_icksz1d, psb_dcksz1d, psb_zcksz1d
   end Interface
 
   interface psb_size
@@ -400,6 +407,7 @@ Contains
       psb_zsize1d = size(vin)
     end if
   end function psb_zsize1d
+
   function psb_zsize2d(vin,dim)
     integer :: psb_zsize2d
     complex(kind(1.d0)), allocatable, intent(in) :: vin(:,:)
@@ -417,7 +425,157 @@ Contains
   end function psb_zsize2d
 
 
-  Subroutine psb_dreallocate1i(len,rrax,info,pad)
+  Subroutine psb_icksz1d(len,v,info,pad)
+    use psb_error_mod
+
+    ! ...Subroutine Arguments  
+    Integer,Intent(in)                 :: len
+    Integer,allocatable, intent(inout) :: v(:)
+    integer         :: info
+    integer, optional, intent(in) :: pad
+    ! ...Local Variables
+    character(len=20)  :: name
+    logical, parameter :: debug=.false.
+    integer :: isz, err_act
+
+    name='psb_check_size'
+    call psb_erractionsave(err_act)
+
+    if(psb_get_errstatus().ne.0) return 
+    info=0
+    
+    If (len > psb_size(v)) Then
+      isz = max((3*psb_size(v))/2,(len+1))
+      if (present(pad)) then
+        call psb_realloc(isz,v,info,pad=pad)
+      else
+        call psb_realloc(isz,v,info)
+        if (info /= 0) then
+          info=4010
+          call psb_errpush(info,name,a_err='psb_realloc')
+          goto 9999
+        end if
+      End If
+    end If
+
+    call psb_erractionrestore(err_act)
+    return
+
+9999 continue
+    call psb_erractionrestore(err_act)
+
+    if (err_act.eq.act_ret) then
+      return
+    else
+      call psb_error()
+    end if
+    return
+
+
+  End Subroutine psb_icksz1d
+
+
+  Subroutine psb_dcksz1d(len,v,info,pad)
+    use psb_error_mod
+
+    ! ...Subroutine Arguments  
+    Integer,Intent(in)                 :: len
+    real(kind(1.d0)),allocatable, intent(inout) :: v(:)
+    integer         :: info
+    real(kind(1.d0)), optional, intent(in) :: pad
+    ! ...Local Variables
+    character(len=20)  :: name
+    logical, parameter :: debug=.false.
+    integer :: isz, err_act
+
+    name='psb_check_size'
+    call psb_erractionsave(err_act)
+
+    if(psb_get_errstatus().ne.0) return 
+    info=0
+    
+    If (len > psb_size(v)) Then
+      isz = max((3*psb_size(v))/2,(len+1))
+      if (present(pad)) then
+        call psb_realloc(isz,v,info,pad=pad)
+      else
+        call psb_realloc(isz,v,info)
+        if (info /= 0) then
+          info=4010
+          call psb_errpush(info,name,a_err='psb_realloc')
+          goto 9999
+        end if
+      End If
+    end If
+
+    call psb_erractionrestore(err_act)
+    return
+
+9999 continue
+    call psb_erractionrestore(err_act)
+
+    if (err_act.eq.act_ret) then
+      return
+    else
+      call psb_error()
+    end if
+    return
+
+
+  End Subroutine psb_dcksz1d
+
+
+  Subroutine psb_zcksz1d(len,v,info,pad)
+    use psb_error_mod
+
+    ! ...Subroutine Arguments  
+    Integer,Intent(in)                 :: len
+    complex(kind(1.d0)),allocatable, intent(inout) :: v(:)
+    integer         :: info
+    complex(kind(1.d0)), optional, intent(in) :: pad
+    ! ...Local Variables
+    character(len=20)  :: name
+    logical, parameter :: debug=.false.
+    integer :: isz, err_act
+
+    name='psb_check_size'
+    call psb_erractionsave(err_act)
+
+    if(psb_get_errstatus().ne.0) return 
+    info=0
+    
+    If (len > psb_size(v)) Then
+      isz = max((3*psb_size(v))/2,(len+1))
+      if (present(pad)) then
+        call psb_realloc(isz,v,info,pad=pad)
+      else
+        call psb_realloc(isz,v,info)
+        if (info /= 0) then
+          info=4010
+          call psb_errpush(info,name,a_err='psb_realloc')
+          goto 9999
+        end if
+      End If
+    end If
+
+    call psb_erractionrestore(err_act)
+    return
+
+9999 continue
+    call psb_erractionrestore(err_act)
+
+    if (err_act.eq.act_ret) then
+      return
+    else
+      call psb_error()
+    end if
+    return
+
+
+  End Subroutine psb_zcksz1d
+
+
+  Subroutine psb_dreallocate1i(len,rrax,info,pad,lb)
     use psb_error_mod
 
     ! ...Subroutine Arguments  
@@ -425,9 +583,10 @@ Contains
     Integer,allocatable, intent(inout) :: rrax(:)
     integer         :: info
     integer, optional, intent(in) :: pad
+    integer, optional, intent(in) :: lb
     ! ...Local Variables
     Integer,allocatable  :: tmp(:)
-    Integer :: dim, err_act, err,i
+    Integer :: dim, err_act, err,i,lb_
     character(len=20)  :: name
     logical, parameter :: debug=.false.
 
@@ -437,23 +596,29 @@ Contains
     if(psb_get_errstatus().ne.0) return 
     info=0
     if (debug) write(0,*) 'reallocate I',len
+    if (present(lb)) then
+      lb_ = lb
+    else
+      lb_ = 1
+    endif
+
     if (allocated(rrax)) then 
       dim=size(rrax)
       If (dim /= len) Then
-        Allocate(tmp(len),stat=info)
+        Allocate(tmp(lb_:len),stat=info)
         if (info /= 0) then
           err=4000
           call psb_errpush(err,name)
           goto 9999
         end if
         tmp(1:min(len,dim))=rrax(1:min(len,dim))
-
-        call move_alloc(tmp,rrax)
+        
+        call psb_transfer(tmp,rrax,info)
         
       end if
     else
       dim = 0
-      allocate(rrax(len),stat=info)
+      allocate(rrax(lb_:len),stat=info)
       if (info /= 0) then
         err=4000
         call psb_errpush(err,name)
@@ -481,7 +646,7 @@ Contains
   End Subroutine psb_dreallocate1i
 
 
-  Subroutine psb_dreallocate1d(len,rrax,info,pad)
+  Subroutine psb_dreallocate1d(len,rrax,info,pad,lb)
     use psb_error_mod
 
     ! ...Subroutine Arguments  
@@ -489,10 +654,11 @@ Contains
     Real(kind(1.d0)),allocatable, intent(inout) :: rrax(:)
     integer :: info
     real(kind(1.d0)), optional, intent(in) :: pad
+    integer, optional, intent(in) :: lb
 
     ! ...Local Variables
     Real(kind(1.d0)),allocatable  :: tmp(:)
-    Integer :: dim,err_act,err,i, m
+    Integer :: dim,err_act,err,i, m, lb_
     character(len=20)  :: name
     logical, parameter :: debug=.false.
 
@@ -501,11 +667,17 @@ Contains
     info = 0 
     if (debug) write(0,*) 'reallocate D',len
 
+    if (present(lb)) then
+      lb_ = lb
+    else
+      lb_ = 1
+    endif
+
     if (allocated(rrax)) then 
       dim=size(rrax)
 
       If (dim /= len) Then
-        Allocate(tmp(len),stat=info)
+        Allocate(tmp(lb_:len),stat=info)
         if (info /= 0) then
           err=4000
           call psb_errpush(err,name)
@@ -514,12 +686,12 @@ Contains
         m = min(dim,len)
         tmp(1:m) = rrax(1:m)
         
-        call move_alloc(tmp,rrax)
+        call psb_transfer(tmp,rrax,info)
 
       End If
     else
       dim = 0
-      Allocate(rrax(len),stat=info)
+      Allocate(rrax(lb_:len),stat=info)
       if (info /= 0) then
         err=4000
         call psb_errpush(err,name)
@@ -578,7 +750,7 @@ Contains
         m = min(dim,len)
         tmp(1:m) = rrax(1:m)
 
-        call move_alloc(tmp,rrax)
+        call psb_transfer(tmp,rrax,info)
 
       End If
     else
@@ -642,7 +814,7 @@ Contains
         m = min(dim,len1)
         tmp(1:m,1:min(len2,dim2)) = rrax(1:m,1:min(len2,dim2))
 
-        call move_alloc(tmp,rrax)
+        call psb_transfer(tmp,rrax,info)
 
       End If
     else
@@ -708,7 +880,7 @@ Contains
         m = min(dim,len1)
         tmp(1:m,1:min(len2,dim2)) = rrax(1:m,1:min(len2,dim2))
 
-        call move_alloc(tmp,rrax)
+        call psb_transfer(tmp,rrax,info)
 
       End If
     else
@@ -771,7 +943,7 @@ Contains
         m = min(dim,len1)
         tmp(1:m,1:min(len2,dim2)) = rrax(1:m,1:min(len2,dim2))
 
-        call move_alloc(tmp,rrax)
+        call psb_transfer(tmp,rrax,info)
 
       End If
     else
@@ -945,98 +1117,226 @@ Contains
     return
   End Subroutine psb_dreallocate2i1z
 
-
   Subroutine psb_dtransfer1d(vin,vout,info)
     use psb_error_mod
     real(kind(1.d0)), allocatable, intent(inout) :: vin(:),vout(:)
     integer, intent(out) :: info 
     !
-    ! To be reimplemented with MOVE_ALLOC
     ! 
     info = 0
-    call move_alloc(vin,vout)
-!!$    
-!!$    if (.not.allocated(vin) ) then 
-!!$      if (allocated(vout)) then 
-!!$        deallocate(vout,stat=info)
-!!$      end if
-!!$    else if (allocated(vin)) then 
-!!$      if (.not.allocated(vout)) then 
-!!$        allocate(vout(size(vin)),stat=info)
-!!$        if (info /= 0) return
-!!$      else
-!!$        if (size(vout) /= size(vin)) then 
-!!$          deallocate(vout,stat=info)
-!!$          if (info /= 0) return
-!!$          allocate(vout(size(vin)),stat=info)
-!!$          if (info /= 0) return
-!!$        end if
-!!$      end if
-!!$      vout = vin
-!!$      deallocate(vin,stat=info)
-!!$    end if
+#ifdef HAVE_MOVE_ALLOC    
+    
+    if (allocated(vin)) then 
+      call move_alloc(vin,vout)
+    else if (allocated(vout)) then 
+      write(0,*) 'transfer: Clearing output'
+      deallocate(vout)
+    end if
+
+#else      
+    
+    if (.not.allocated(vin) ) then 
+      if (allocated(vout)) then 
+        deallocate(vout,stat=info)
+      end if
+    else if (allocated(vin)) then 
+      if (.not.allocated(vout)) then 
+        allocate(vout(size(vin)),stat=info)
+        if (info /= 0) return
+      else
+        if (size(vout) /= size(vin)) then 
+          deallocate(vout,stat=info)
+          if (info /= 0) return
+          allocate(vout(size(vin)),stat=info)
+          if (info /= 0) return
+        end if
+      end if
+      vout = vin
+      deallocate(vin,stat=info)
+    end if
+#endif
   end Subroutine psb_dtransfer1d
 
+  Subroutine psb_dtransfer2d(vin,vout,info)
+    use psb_error_mod
+    real(kind(1.d0)), allocatable, intent(inout) :: vin(:,:),vout(:,:)
+    integer, intent(out) :: info 
+    !
+    ! 
+    info = 0
+#ifdef HAVE_MOVE_ALLOC
+    if (allocated(vin)) then 
+      call move_alloc(vin,vout)
+    else if (allocated(vout)) then 
+      deallocate(vout)
+    end if
+#else
+    
+    if (.not.allocated(vin) ) then 
+      if (allocated(vout)) then 
+        deallocate(vout,stat=info)
+      end if
+    else if (allocated(vin)) then 
+      if (.not.allocated(vout)) then 
+        allocate(vout(size(vin,1),size(vin,2)),stat=info)
+        if (info /= 0) return
+      else
+        if (size(vout) /= size(vin)) then 
+          deallocate(vout,stat=info)
+          if (info /= 0) return
+          allocate(vout(size(vin,1),size(vin,2)),stat=info)
+          if (info /= 0) return
+        end if
+      end if
+      vout = vin
+      deallocate(vin,stat=info)
+    end if
+#endif
+  end Subroutine psb_dtransfer2d
 
   Subroutine psb_ztransfer1d(vin,vout,info)
     use psb_error_mod
     complex(kind(1.d0)), allocatable, intent(inout) :: vin(:),vout(:)
     integer, intent(out) :: info 
     !
-    ! To be reimplemented with MOVE_ALLOC
     ! 
     info = 0
-    call move_alloc(vin,vout)
-!!$    if (.not.allocated(vin) ) then 
-!!$      if (allocated(vout)) then 
-!!$        deallocate(vout,stat=info)
-!!$      end if
-!!$    else if (allocated(vin)) then 
-!!$      if (.not.allocated(vout)) then 
-!!$        allocate(vout(size(vin)),stat=info)
-!!$        if (info /= 0) return
-!!$      else
-!!$        if (size(vout) /= size(vin)) then 
-!!$          deallocate(vout,stat=info)
-!!$          if (info /= 0) return
-!!$          allocate(vout(size(vin)),stat=info)
-!!$          if (info /= 0) return
-!!$        end if
-!!$      end if
-!!$      vout = vin
-!!$      deallocate(vin,stat=info)
-!!$    end if
+#ifdef HAVE_MOVE_ALLOC
+    if (allocated(vin)) then 
+      call move_alloc(vin,vout)
+    else if (allocated(vout)) then 
+      deallocate(vout)
+    end if
+#else
+    if (.not.allocated(vin) ) then 
+      if (allocated(vout)) then 
+        deallocate(vout,stat=info)
+      end if
+    else if (allocated(vin)) then 
+      if (.not.allocated(vout)) then 
+        allocate(vout(size(vin)),stat=info)
+        if (info /= 0) return
+      else
+        if (size(vout) /= size(vin)) then 
+          deallocate(vout,stat=info)
+          if (info /= 0) return
+          allocate(vout(size(vin)),stat=info)
+          if (info /= 0) return
+        end if
+      end if
+      vout = vin
+      deallocate(vin,stat=info)
+    end if
+#endif
   end Subroutine psb_ztransfer1d
 
+  Subroutine psb_ztransfer2d(vin,vout,info)
+    use psb_error_mod
+    complex(kind(1.d0)), allocatable, intent(inout) :: vin(:,:),vout(:,:)
+    integer, intent(out) :: info 
+    !
+    ! 
+    info = 0
+#ifdef HAVE_MOVE_ALLOC
+    if (allocated(vin)) then 
+      call move_alloc(vin,vout)
+    else if (allocated(vout)) then 
+      deallocate(vout)
+    end if
+#else
+    if (.not.allocated(vin) ) then 
+      if (allocated(vout)) then 
+        deallocate(vout,stat=info)
+      end if
+    else if (allocated(vin)) then 
+      if (.not.allocated(vout)) then 
+        allocate(vout(size(vin,1),size(vin,2)),stat=info)
+        if (info /= 0) return
+      else
+        if (size(vout) /= size(vin)) then 
+          deallocate(vout,stat=info)
+          if (info /= 0) return
+          allocate(vout(size(vin,1),size(vin,2)),stat=info)
+          if (info /= 0) return
+        end if
+      end if
+      vout = vin
+      deallocate(vin,stat=info)
+    end if
+#endif
+  end Subroutine psb_ztransfer2d
 
   Subroutine psb_itransfer1d(vin,vout,info)
     use psb_error_mod
     integer, allocatable, intent(inout) :: vin(:),vout(:)
     integer, intent(out) :: info 
     !
-    ! To be reimplemented with MOVE_ALLOC
     ! 
     info = 0
-    call move_alloc(vin,vout)
-!!$    if (.not.allocated(vin) ) then 
-!!$      if (allocated(vout)) then 
-!!$        deallocate(vout,stat=info)
-!!$      end if
-!!$    else if (allocated(vin)) then 
-!!$      if (.not.allocated(vout)) then 
-!!$        allocate(vout(size(vin)),stat=info)
-!!$        if (info /= 0) return
-!!$      else
-!!$        if (size(vout) /= size(vin)) then 
-!!$          deallocate(vout,stat=info)
-!!$          if (info /= 0) return
-!!$          allocate(vout(size(vin)),stat=info)
-!!$          if (info /= 0) return
-!!$        end if
-!!$      end if
-!!$      vout = vin
-!!$      deallocate(vin,stat=info)
-!!$    end if
+#ifdef HAVE_MOVE_ALLOC
+    if (allocated(vin)) then 
+      call move_alloc(vin,vout)
+    else if (allocated(vout)) then 
+      write(0,*) 'transfer: Clearing output'
+      deallocate(vout)
+    end if
+#else
+    if (.not.allocated(vin) ) then 
+      if (allocated(vout)) then 
+        deallocate(vout,stat=info)
+      end if
+    else if (allocated(vin)) then 
+      if (.not.allocated(vout)) then 
+        allocate(vout(size(vin)),stat=info)
+        if (info /= 0) return
+      else
+        if (size(vout) /= size(vin)) then 
+          deallocate(vout,stat=info)
+          if (info /= 0) return
+          allocate(vout(size(vin)),stat=info)
+          if (info /= 0) return
+        end if
+      end if
+      vout = vin
+      deallocate(vin,stat=info)
+    end if
+#endif
   end Subroutine psb_itransfer1d
+
+  Subroutine psb_itransfer2d(vin,vout,info)
+    use psb_error_mod
+    integer, allocatable, intent(inout) :: vin(:,:),vout(:,:)
+    integer, intent(out) :: info 
+    !
+    ! 
+    info = 0
+#ifdef HAVE_MOVE_ALLOC
+    if (allocated(vin)) then 
+      call move_alloc(vin,vout)
+    else if (allocated(vout)) then 
+      deallocate(vout)
+    end if
+#else
+    if (.not.allocated(vin) ) then 
+      if (allocated(vout)) then 
+        deallocate(vout,stat=info)
+      end if
+    else if (allocated(vin)) then 
+      if (.not.allocated(vout)) then 
+        allocate(vout(size(vin,1),size(vin,2)),stat=info)
+        if (info /= 0) return
+      else
+        if (size(vout) /= size(vin)) then 
+          deallocate(vout,stat=info)
+          if (info /= 0) return
+          allocate(vout(size(vin,1),size(vin,2)),stat=info)
+          if (info /= 0) return
+        end if
+      end if
+      vout = vin
+      deallocate(vin,stat=info)
+    end if
+#endif
+  end Subroutine psb_itransfer2d
 
 end module psb_realloc_mod

@@ -1556,6 +1556,5 @@ contains
 
   end subroutine psb_zspinfo
 
-
 end module psb_spmat_type
 

@@ -683,9 +683,11 @@ contains
       enddo
       deallocate(p%av,stat=info)
     end if
-    ! Do we really need the two below? Probably not.
-    ! call psb_cdfree(p%desc_data,info)
-    ! call psb_cdfree(p%desc_ac,info)
+
+    if (allocated(p%desc_data%matrix_data)) &
+         & call psb_cdfree(p%desc_data,info)
+    if (allocated(p%desc_ac%matrix_data)) &
+         & call psb_cdfree(p%desc_ac,info)
     
     if (allocated(p%dprcparm)) then 
       deallocate(p%dprcparm,stat=info)

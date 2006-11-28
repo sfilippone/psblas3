@@ -1,11 +1,11 @@
 subroutine psb_set_coher(ictxt,isvch)
   integer :: ictxt, isvch
   ! Ensure global coherence for convergence checks.
-#ifdef NORMAL
+#ifdef NETLIB_BLACS
   Call blacs_get(ictxt,16,isvch)
   Call blacs_set(ictxt,16,1)
 #endif
-#ifdef HAVE_ESSL
+#ifdef ESSL_BLACS
   ! Do nothing: ESSL does coherence by default,
   ! and does not handle req=16 
 #endif
@@ -13,10 +13,10 @@ end subroutine psb_set_coher
 subroutine psb_restore_coher(ictxt,isvch)
   integer :: ictxt, isvch
   ! Ensure global coherence for convergence checks.
-#ifdef NORMAL
+#ifdef NETLIB_BLACS
   Call blacs_set(ictxt,16,isvch)
 #endif
-#ifdef HAVE_ESSL
+#ifdef ESSL_BLACS
   ! Do nothing: ESSL does coherence by default,
   ! and does not handle req=16 
 #endif
@@ -31,7 +31,7 @@ subroutine psb_get_rank(rank,ictxt,id)
   rank =  blacs_pnum(ictxt,id,0)
 end subroutine psb_get_rank
 
-#ifdef HAVE_ESSL
+#ifdef ESSL_BLACS
 !
 ! Need these, as they are not in the ESSL implementation 
 ! of the BLACS. 

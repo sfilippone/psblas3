@@ -71,6 +71,11 @@ module psb_const_mod
   integer, parameter :: psb_desc_repl_=3199
   integer, parameter :: psb_desc_upd_=psb_desc_bld_+1
   integer, parameter :: psb_desc_upd_asb_=psb_desc_upd_+1
+  integer, parameter :: psb_desc_large_asb_=psb_desc_upd_asb_+1
+  integer, parameter :: psb_desc_large_bld_=psb_desc_large_asb_+1
+  integer, parameter :: nbits=14
+  integer, parameter :: hashsize=2**nbits, hashmask=hashsize-1
+  integer, parameter :: psb_default_large_threshold=4*1024*1024   ! to be reviewed
   integer, parameter :: psb_hpnt_nentries_=7
 
   !

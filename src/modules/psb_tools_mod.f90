@@ -38,7 +38,7 @@ Module psb_tools_mod
        implicit none
        real(kind(1.d0)), allocatable, intent(out) :: x(:,:)
        type(psb_desc_type), intent(in) :: desc_a
-       integer                         :: info
+       integer,intent(out)             :: info
        integer, optional, intent(in)   :: n
      end subroutine psb_dalloc
      ! 1-D double precision version
@@ -46,7 +46,7 @@ Module psb_tools_mod
        use psb_descriptor_type
        real(kind(1.d0)), allocatable, intent(out)       :: x(:)
        type(psb_desc_type), intent(in) :: desc_a
-       integer                         :: info
+       integer,intent(out)             :: info
        integer, optional, intent(in)   :: n
      end subroutine psb_dallocv
      ! 2-D integer version
@@ -372,6 +372,13 @@ Module psb_tools_mod
        integer, intent(out)              :: info
        Type(psb_desc_type), intent(out)  :: desc_a
      end subroutine psb_cdalv
+     subroutine psb_cd_inloc(v, ictxt, desc_a, info)
+       use psb_descriptor_type
+       implicit None
+       Integer, intent(in)               :: ictxt, v(:)
+       integer, intent(out)              :: info
+       type(psb_desc_type), intent(out)  :: desc_a
+     end subroutine psb_cd_inloc
   end interface
   
 
@@ -398,7 +405,7 @@ Module psb_tools_mod
      subroutine psb_cdtransfer(desc_in, desc_out, info)
        use psb_descriptor_type
        type(psb_desc_type), intent(inout) :: desc_in
-       type(psb_desc_type), intent(out)   :: desc_out
+       type(psb_desc_type), intent(inout)   :: desc_out
        integer, intent(out)               :: info
      end subroutine psb_cdtransfer
   end interface
@@ -413,11 +420,12 @@ Module psb_tools_mod
   end interface
   
   interface psb_cdins
-     subroutine psb_cdins(nz,ia,ja,desc_a,info)
+     subroutine psb_cdins(nz,ia,ja,desc_a,info,ila,jla)
        use psb_descriptor_type
        type(psb_desc_type), intent(inout) :: desc_a
-       Integer, intent(in)                :: nz,IA(:),JA(:)
+       integer, intent(in)                :: nz,ia(:),ja(:)
        integer, intent(out)               :: info
+       integer, optional, intent(out)     :: ila(:), jla(:)
      end subroutine psb_cdins
   end interface
 

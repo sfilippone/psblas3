@@ -28,12 +28,18 @@
 !!$  POSSIBILITY OF SUCH DAMAGE.
 !!$ 
 !!$  
-! Module containing interfaces for subroutine in SRC/F90/INTERNALS
 
 module psi_mod
 
   use psb_descriptor_type
 
+!!$  interface 
+!!$    subroutine psi_inner_cnv(n,x,hashsize,hashmask,hashv,glb_lc)
+!!$      integer, intent(in)    :: n, hashsize,hashmask,hashv(0:),glb_lc(:,:)
+!!$      integer, intent(inout) :: x(:)
+!!$    end subroutine psi_inner_cnv
+!!$  end interface
+ 
   interface
      subroutine psi_compute_size(desc_data,&
           & index_in, dl_lda, info)
@@ -256,6 +262,85 @@ module psi_mod
     module procedure psi_cnv_dsc
   end interface
 
+  interface psi_inner_cnv
+    module procedure psi_inner_cnv1, psi_inner_cnv2
+  end interface
+
+  interface psi_fnd_owner
+     subroutine psi_fnd_owner(nv,idx,iprc,desc,info)
+       use psb_descriptor_type
+       integer, intent(in) :: nv
+       integer, intent(in) ::  idx(:)
+       integer, allocatable, intent(out) ::  iprc(:)
+       type(psb_desc_type), intent(in) :: desc
+       integer, intent(out) :: info
+     end subroutine psi_fnd_owner
+   end interface
+  
+  interface psi_ldsc_pre_halo
+     subroutine psi_ldsc_pre_halo(desc,info)
+       use psb_descriptor_type
+       type(psb_desc_type), intent(inout) :: desc
+       integer, intent(out) :: info
+     end subroutine psi_ldsc_pre_halo
+   end interface
+
+  interface psi_idx_cnv
+     subroutine psi_idx_cnv1(nv,idxin,desc,info,mask,owned)
+       use psb_descriptor_type
+       integer, intent(in)    :: nv
+       integer, intent(inout) ::  idxin(:)
+       type(psb_desc_type), intent(in) :: desc
+       integer, intent(out) :: info
+       logical, intent(in), optional, target :: mask(:)
+       logical, intent(in), optional :: owned
+     end subroutine psi_idx_cnv1
+     subroutine psi_idx_cnv2(nv,idxin,idxout,desc,info,mask,owned)
+       use psb_descriptor_type
+       integer, intent(in)  :: nv, idxin(:)
+       integer, intent(out) :: idxout(:)
+       type(psb_desc_type), intent(in) :: desc
+       integer, intent(out) :: info
+       logical, intent(in), optional, target :: mask(:)
+       logical, intent(in), optional :: owned
+     end subroutine psi_idx_cnv2
+     subroutine psi_idx_cnvs(idxin,idxout,desc,info,mask,owned)
+       use psb_descriptor_type
+       integer, intent(in)  :: idxin
+       integer, intent(out) :: idxout
+       type(psb_desc_type), intent(in) :: desc
+       integer, intent(out) :: info
+       logical, intent(in), optional, target :: mask
+       logical, intent(in), optional :: owned
+     end subroutine psi_idx_cnvs
+  end interface
+
+  interface psi_idx_ins_cnv
+     subroutine psi_idx_ins_cnv1(nv,idxin,desc,info,mask)
+       use psb_descriptor_type
+       integer, intent(in)    :: nv
+       integer, intent(inout) ::  idxin(:)
+       type(psb_desc_type), intent(inout) :: desc
+       integer, intent(out) :: info
+       logical, intent(in), optional, target :: mask(:)
+     end subroutine psi_idx_ins_cnv1
+     subroutine psi_idx_ins_cnv2(nv,idxin,idxout,desc,info,mask)
+       use psb_descriptor_type
+       integer, intent(in)  :: nv, idxin(:)
+       integer, intent(out) :: idxout(:)
+       type(psb_desc_type), intent(inout) :: desc
+       integer, intent(out) :: info
+       logical, intent(in), optional, target :: mask(:)
+     end subroutine psi_idx_ins_cnv2
+     subroutine psi_idx_ins_cnvs(idxin,idxout,desc,info,mask)
+       use psb_descriptor_type
+       integer, intent(in)  :: idxin
+       integer, intent(out) :: idxout
+       type(psb_desc_type), intent(inout) :: desc
+       integer, intent(out) :: info
+       logical, intent(in), optional, target :: mask
+     end subroutine psi_idx_ins_cnvs
+  end interface
 
 contains
   
@@ -361,5 +446,88 @@ contains
     return
 
   end subroutine psi_cnv_dsc
+
+
+
+  subroutine psi_inner_cnv1(n,x,hashsize,hashmask,hashv,glb_lc)
+    integer, intent(in)    :: n, hashsize,hashmask,hashv(0:),glb_lc(:,:)
+    integer, intent(inout) :: x(:)
+
+    integer :: i, ih, key, idx,nh,tmp,lb,ub,lm
+    do i=1, n
+      key = x(i) 
+      ih  = iand(key,hashmask)
+      idx = hashv(ih)
+      nh  = hashv(ih+1) - hashv(ih) 
+      if (nh > 0) then 
+        tmp = -1 
+        lb = idx
+        ub = idx+nh-1
+        do 
+          if (lb>ub) exit
+          lm = (lb+ub)/2
+          if (key==glb_lc(lm,1)) then 
+            tmp = lm
+            exit
+          else if (key<glb_lc(lm,1)) then 
+            ub = lm - 1
+          else
+            lb = lm + 1
+          end if
+        end do
+      else 
+        tmp = -1
+      end if
+      if (tmp > 0) then 
+        x(i) = glb_lc(tmp,2)
+      else         
+        x(i) = tmp 
+      end if
+    end do
+  end subroutine psi_inner_cnv1
+
+
+  subroutine psi_inner_cnv2(n,x,y,hashsize,hashmask,hashv,glb_lc)
+    integer, intent(in)  :: n, hashsize,hashmask,hashv(0:),glb_lc(:,:)
+    integer, intent(in)  :: x(:)
+    integer, intent(out) :: y(:)
+
+    integer :: i, ih, key, idx,nh,tmp,lb,ub,lm
+    
+    do i=1, n
+      key = x(i) 
+      ih  = iand(key,hashmask)
+      if (ih > ubound(hashv,1) ) then 
+        write(0,*) ' In inner cnv: ',ih,ubound(hashv)
+        call flush(0)
+      end if
+      idx = hashv(ih)
+      nh  = hashv(ih+1) - hashv(ih) 
+      if (nh > 0) then 
+        tmp = -1 
+        lb = idx
+        ub = idx+nh-1
+        do 
+          if (lb>ub) exit
+          lm = (lb+ub)/2
+          if (key==glb_lc(lm,1)) then 
+            tmp = lm
+            exit
+          else if (key<glb_lc(lm,1)) then 
+            ub = lm - 1
+          else
+            lb = lm + 1
+          end if
+        end do
+      else 
+        tmp = -1
+      end if
+      if (tmp > 0) then 
+        y(i) = glb_lc(tmp,2)
+      else         
+        y(i) = tmp 
+      end if
+    end do
+  end subroutine psi_inner_cnv2
 
 end module psi_mod
