@@ -217,8 +217,7 @@ Subroutine psb_dcdovrbld(n_ovr,desc_p,desc_a,a,&
     idxs       = 0
     counter      = 1
     counter_t    = 1
-    
-    
+
     t1 = mpi_wtime()
     Do While (halo(counter) /= -1)
       tot_elem=0
@@ -434,6 +433,13 @@ Subroutine psb_dcdovrbld(n_ovr,desc_p,desc_a,a,&
         ch_err='mpi_alltoallv'
         call psb_errpush(info,name,a_err=ch_err)
         goto 9999
+      end if
+      if (.false.) then 
+        open(70+me,position='append')
+        write(70+me,*) ' Workr on iteration ',i_ovr
+        write(70+me,'(8(i7,1x))') workr(1:iszr)
+        call flush(70+me)
+        close(70+me)
       end if
 
       if (debug) write(0,*) 'ISZR :',iszr

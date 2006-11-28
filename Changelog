@@ -1,8 +1,15 @@
 Changelog. A lot less detailed than usual, at least for past
 history. 
 
+2006/11/28: Merged the mods for descriptors of large index spaces to
+	    avoid having the GLOB_TO_LOC array. Took the chance to
+	    reorganize the descriptor build routines and define some
+	    access functions for decsriptor features and entries, so
+	    as not to use the descriptor components directly. Tested
+	    with AS, 2- and 3- level Post smoothers. 
+
 2006/11/09: The allocatable version works, but under gcc42 there is a
-	    strange problem when using -fbounds-check. Be careful!
+	    compiler bug when using -fbounds-check. 
 
 2006/11/08: Merged the allocatable version; hope everything works!
 

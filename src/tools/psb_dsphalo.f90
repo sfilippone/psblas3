@@ -295,6 +295,7 @@ Subroutine psb_dsphalo(a,desc_a,blk,info,rwcnv,clcnv,outfmt)
   Enddo
   blk%fida='COO'
   blk%infoa(psb_nnz_)=l1
+
   if (debugprt) then 
     open(50+me)
     call psb_csprt(50+me,blk,head='% SPHALO border .')

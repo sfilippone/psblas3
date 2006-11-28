@@ -1295,6 +1295,11 @@ contains
         return
       endif
       irw = iaux
+      if (irw > a%m) then 
+        write(0,*) 'SPINFO: Accessing out of bounds? ',irw,a%m
+        ires = 0
+        return
+      endif
       if (toupper(a%fida) == 'CSR') then 
         ires = a%ia2(irw+1)-a%ia2(irw)
       else if ((toupper(a%fida) == 'COO').or.(toupper(a%fida) == 'COI')) then 
