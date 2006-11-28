@@ -190,12 +190,17 @@ Subroutine psb_dasmatbld(ptype,novr,a,blk,desc_data,upd,desc_p,info,outfmt)
       end if
     Endif
 
-    if(debug) write(0,*) me,' From cdovr _:',desc_p%matrix_data(psb_n_row_),desc_p%matrix_data(psb_n_col_)
+    if(debug) write(0,*) me,' From cdovr _:',desc_p%matrix_data(psb_n_row_),&
+         & desc_p%matrix_data(psb_n_col_)
 
 
     n_row = desc_p%matrix_data(psb_n_row_)
     t2 = mpi_wtime()
-
+!!$    open(60+me)
+!!$    call psb_cdprt(60+me,desc_p,short=.false.)
+!!$    call flush(60+me)
+!!$    close(60+me)
+!!$    call psb_barrier(ictxt)
     if (debug) write(0,*) 'Before sphalo ',blk%fida,blk%m,psb_nnz_,blk%infoa(psb_nnz_)
 !!$    ierr = MPE_Log_event( iovrb, 0, "st OVR" )
 !!$    blk%m = n_row-nrow_a

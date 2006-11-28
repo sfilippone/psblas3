@@ -166,6 +166,7 @@ subroutine psb_dslu_bld(a,desc_a,p,info)
     goto 9999
   end if
   nzt = psb_sp_get_nnzeros(atmp)
+
   if (Debug) then 
     write(0,*) me,'Calling psb_slu_factor ',nzt,atmp%m,&
          & atmp%k,p%desc_data%matrix_data(psb_n_row_)

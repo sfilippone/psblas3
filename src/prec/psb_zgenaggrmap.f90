@@ -71,7 +71,6 @@ subroutine psb_zgenaggrmap(aggr_type,a,desc_a,nlaggr,ilaggr,info)
   nrow  = psb_cd_get_local_rows(desc_a)
   ncol  = psb_cd_get_local_cols(desc_a)
 
-
   nr = a%m
   allocate(ilaggr(nr),neigh(nr),stat=info)
   if(info.ne.0) then

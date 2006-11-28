@@ -99,6 +99,7 @@ subroutine psb_dumf_bld(a,desc_a,p,info)
   end if
   nza = psb_sp_get_nnzeros(atmp)
   nzb = psb_sp_get_nnzeros(a)
+
   if (Debug) then 
     write(0,*) me, 'UMFBLD: Done csdp',info,nza,atmp%m,atmp%k,nzb
     call psb_barrier(ictxt)

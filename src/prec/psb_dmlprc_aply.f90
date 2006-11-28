@@ -303,7 +303,6 @@ subroutine psb_dmlprc_aply(alpha,baseprecv,x,beta,y,desc_data,trans,work,info)
       ! 
       ! 
     
-
       n_col = desc_data%matrix_data(psb_n_col_)
       nr2l  = baseprecv(1)%desc_data%matrix_data(psb_n_col_)
 
@@ -601,7 +600,6 @@ subroutine psb_dmlprc_aply(alpha,baseprecv,x,beta,y,desc_data,trans,work,info)
       mlprec_wrk(1)%tx(:) = dzero
       mlprec_wrk(1)%ty(:) = dzero
       
-
       if (info /= 0) then 
         call psb_errpush(4010,name,a_err='Allocate')
         goto 9999

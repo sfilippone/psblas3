@@ -46,6 +46,7 @@ subroutine psb_dprecbld(a,desc_a,p,info,upd)
   use psb_psblas_mod
   use psb_error_mod
   use psb_penv_mod
+  use psb_prec_mod
   Implicit None
 
   type(psb_dspmat_type), target           :: a
@@ -53,34 +54,6 @@ subroutine psb_dprecbld(a,desc_a,p,info,upd)
   type(psb_dprec_type),intent(inout)      :: p
   integer, intent(out)                    :: info
   character, intent(in), optional         :: upd
-
-  interface psb_baseprc_bld
-    subroutine psb_dbaseprc_bld(a,desc_a,p,info,upd)
-      Use psb_spmat_type
-      use psb_descriptor_type
-      use psb_prec_type
-      type(psb_dspmat_type), target              :: a
-      type(psb_desc_type), intent(in), target    :: desc_a
-      type(psb_dbaseprc_type),intent(inout)      :: p
-      integer, intent(out)                       :: info
-      character, intent(in), optional            :: upd
-    end subroutine psb_dbaseprc_bld
-  end interface
-
-  interface psb_mlprc_bld
-    subroutine psb_dmlprc_bld(a,desc_a,p,info)
-      use psb_serial_mod
-      use psb_descriptor_type
-      use psb_prec_type
-      use psb_const_mod
-      implicit none 
-
-      type(psb_dspmat_type), intent(in), target :: a
-      type(psb_desc_type), intent(in), target   :: desc_a
-      type(psb_dbaseprc_type), intent(inout), target :: p
-      integer, intent(out)                      :: info
-    end subroutine psb_dmlprc_bld
-  end interface
 
   ! Local scalars
   Integer      :: err,i,j,k,ictxt, me,np,lw, err_act
@@ -150,6 +123,7 @@ subroutine psb_dprecbld(a,desc_a,p,info,upd)
   if (size(p%baseprecv) > 1) then
 
     do i=2, size(p%baseprecv)
+      
       call init_baseprc_av(p%baseprecv(i),info)
       if (info /= 0) then 
         info=4010
@@ -157,7 +131,7 @@ subroutine psb_dprecbld(a,desc_a,p,info,upd)
         call psb_errpush(info,name,a_err=ch_err)
         goto 9999
       endif
-      
+
       call psb_mlprc_bld(p%baseprecv(i-1)%base_a,p%baseprecv(i-1)%base_desc,&
            & p%baseprecv(i),info)
       if (info /= 0) then 
@@ -168,7 +142,7 @@ subroutine psb_dprecbld(a,desc_a,p,info,upd)
       if (debug) then 
         write(0,*) 'Return from ',i-1,' call to mlprcbld ',info
       endif
-
+      
     end do
 
   endif
@@ -197,6 +171,7 @@ contains
     do k=1,size(p%av)
       call psb_nullify_sp(p%av(k))
     end do
+    
   end subroutine init_baseprc_av
 
 end subroutine psb_dprecbld

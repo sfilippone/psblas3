@@ -46,6 +46,7 @@ subroutine psb_zprecbld(a,desc_a,p,info,upd)
   use psb_psblas_mod
   use psb_error_mod
   use psb_penv_mod
+  use psb_prec_mod
   Implicit None
 
   type(psb_zspmat_type), target              :: a
@@ -54,33 +55,6 @@ subroutine psb_zprecbld(a,desc_a,p,info,upd)
   integer, intent(out)                       :: info
   character, intent(in), optional            :: upd
 
-  interface psb_baseprc_bld
-    subroutine psb_zbaseprc_bld(a,desc_a,p,info,upd)
-      Use psb_spmat_type
-      use psb_descriptor_type
-      use psb_prec_type
-      type(psb_zspmat_type), target              :: a
-      type(psb_desc_type), intent(in), target    :: desc_a
-      type(psb_zbaseprc_type),intent(inout)      :: p
-      integer, intent(out)                       :: info
-      character, intent(in), optional            :: upd
-    end subroutine psb_zbaseprc_bld
-  end interface
-
-  interface psb_mlprc_bld
-    subroutine psb_zmlprc_bld(a,desc_a,p,info)
-      use psb_serial_mod
-      use psb_descriptor_type
-      use psb_prec_type
-      use psb_const_mod
-      implicit none 
-
-      type(psb_zspmat_type), intent(in), target :: a
-      type(psb_desc_type), intent(in), target   :: desc_a
-      type(psb_zbaseprc_type), intent(inout),target :: p
-      integer, intent(out)                      :: info
-    end subroutine psb_zmlprc_bld
-  end interface
 
   ! Local scalars
   Integer      :: err,i,j,k,ictxt, me,np,lw, err_act

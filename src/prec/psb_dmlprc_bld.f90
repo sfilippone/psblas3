@@ -42,6 +42,7 @@ subroutine psb_dmlprc_bld(a,desc_a,p,info)
   use psb_prec_type
   use psb_const_mod
   use psb_error_mod
+  use psb_penv_mod
   implicit none 
 
   type(psb_dspmat_type), intent(in), target :: a
@@ -49,7 +50,7 @@ subroutine psb_dmlprc_bld(a,desc_a,p,info)
   type(psb_dbaseprc_type), intent(inout),target    :: p
   integer, intent(out)                      :: info
 
-  type(psb_desc_type), pointer              :: desc_ac
+  type(psb_desc_type)                       :: desc_ac
 
   integer :: i, nrg, nzg, err_act,k
   character(len=20) :: name, ch_err
@@ -99,8 +100,10 @@ subroutine psb_dmlprc_bld(a,desc_a,p,info)
   integer :: ictxt, np, me
 
   name='psb_mlprec_bld'
-  if(psb_get_errstatus().ne.0) return 
-  info=0
+  if (psb_get_errstatus().ne.0) return 
+  info = 0
+  ictxt = psb_cd_get_context(desc_a)
+  call psb_info(ictxt,me,np)
   call psb_erractionsave(err_act)
   call psb_nullify_sp(ac)
 
@@ -146,8 +149,7 @@ subroutine psb_dmlprc_bld(a,desc_a,p,info)
   end if
 
   if (debug) write(0,*) 'Out from genaggrmap',p%nlaggr
-  nullify(desc_ac) 
-  allocate(desc_ac)
+
   call psb_nullify_desc(desc_ac)
   call psb_bldaggrmat(a,desc_a,ac,desc_ac,p,info)
   if(info /= 0) then
@@ -180,6 +182,13 @@ subroutine psb_dmlprc_bld(a,desc_a,p,info)
   call psb_sp_transfer(ac,p%av(ac_),info)
   p%base_a => p%av(ac_)
   call psb_cdtransfer(desc_ac,p%desc_ac,info)
+
+  if (info /= 0) then 
+    info=4010
+    ch_err='psb_cdtransfer'
+    call psb_errpush(info,name,a_err=ch_err)
+    goto 9999
+  end if
   p%base_desc => p%desc_ac
 
   call psb_erractionrestore(err_act)

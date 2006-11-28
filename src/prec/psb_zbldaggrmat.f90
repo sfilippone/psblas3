@@ -61,6 +61,7 @@ subroutine psb_zbldaggrmat(a,desc_a,ac,desc_ac,p,info)
   call psb_erractionsave(err_act)
 
   ictxt=psb_cd_get_context(desc_a)
+
   call psb_info(ictxt, me, np)
 
   select case (p%iprcparm(smth_kind_))
@@ -155,6 +156,7 @@ contains
 
 
     nzt = psb_sp_get_nnzeros(a)
+
     call psb_sp_all(b,nzt,info)
     if(info /= 0) then
       call psb_errpush(4010,name,a_err='spall')
@@ -176,6 +178,7 @@ contains
       end if
 
       nzt = psb_sp_get_nnzeros(b)
+
       do i=1, nzt 
         b%ia1(i) = p%mlia(b%ia1(i))
         b%ia2(i) = p%mlia(b%ia2(i))
@@ -223,6 +226,7 @@ contains
     end if
 
     irs = psb_sp_get_nnzeros(b)
+
     call psb_sp_reall(b,irs,info)
     if(info /= 0) then
       call psb_errpush(4010,name,a_err='spreall')
@@ -402,6 +406,7 @@ contains
     call psb_erractionsave(err_act)
 
     ictxt = psb_cd_get_context(desc_a)
+
     call psb_info(ictxt, me, np)
 
     call psb_nullify_sp(b)
@@ -882,6 +887,7 @@ contains
         if (np>1) then 
           nzl = psb_sp_get_nnzeros(am1)
           call psb_glob_to_loc(am1%ia1(1:nzl),desc_ac,info,'I')
+
           if(info /= 0) then
             call psb_errpush(4010,name,a_err='psb_glob_to_loc')
             goto 9999

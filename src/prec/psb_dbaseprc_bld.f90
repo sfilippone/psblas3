@@ -131,10 +131,11 @@ subroutine psb_dbaseprc_bld(a,desc_a,p,info,upd)
   if (debug) write(0,*) 'Entering baseprc_bld'
   info = 0
   int_err(1) = 0
-  ictxt = psb_cd_get_context(desc_a)
+  ictxt   = psb_cd_get_context(desc_a)
   n_row   = psb_cd_get_local_rows(desc_a)
   n_col   = psb_cd_get_local_cols(desc_a)
   mglob   = psb_cd_get_global_rows(desc_a)
+
   if (debug) write(0,*) 'Preconditioner Blacs_gridinfo'
   call psb_info(ictxt, me, np)
 

@@ -80,15 +80,10 @@ subroutine psb_dprecset(p,ptype,info,iv,rs,rv,ilev,nlev)
     return
   endif
 
-  if (.not.allocated(p%baseprecv(ilev_)%iprcparm)) then 
-    call psb_realloc(ifpsz,p%baseprecv(ilev_)%iprcparm,info)
-    if (info == 0) call psb_realloc(dfpsz,p%baseprecv(ilev_)%dprcparm,info)
-    if (info /= 0) then 
-      write(0,*) 'Info from realloc ',info
-      return
-    end if
-    p%baseprecv(ilev_)%iprcparm(:) = 0
-  end if
+  call psb_realloc(ifpsz,p%baseprecv(ilev_)%iprcparm,info)
+  if (info == 0) call psb_realloc(dfpsz,p%baseprecv(ilev_)%dprcparm,info)
+  if (info /= 0) return
+  p%baseprecv(ilev_)%iprcparm(:) = 0
 
   select case(toupper(ptype(1:len_trim(ptype))))
   case ('NONE','NOPREC') 
@@ -125,7 +120,7 @@ subroutine psb_dprecset(p,ptype,info,iv,rs,rv,ilev,nlev)
   case ('ASM','AS')
     p%baseprecv(ilev_)%iprcparm(:)            = 0
     ! Defaults first 
-    p%baseprecv(ilev_)%iprcparm(p_type_)      = asm_
+    p%baseprecv(ilev_)%iprcparm(p_type_)      = asm_ 
     p%baseprecv(ilev_)%iprcparm(f_type_)      = f_ilu_n_
     p%baseprecv(ilev_)%iprcparm(restr_)       = psb_halo_
     p%baseprecv(ilev_)%iprcparm(prol_)        = psb_none_
@@ -133,6 +128,7 @@ subroutine psb_dprecset(p,ptype,info,iv,rs,rv,ilev,nlev)
     p%baseprecv(ilev_)%iprcparm(n_ovr_)       = 1
     p%baseprecv(ilev_)%iprcparm(ilu_fill_in_) = 0
     p%baseprecv(ilev_)%iprcparm(jac_sweeps_)  = 1
+
     if (present(iv)) then 
       isz = size(iv) 
       if (isz >= 1) p%baseprecv(ilev_)%iprcparm(n_ovr_)  = iv(1)

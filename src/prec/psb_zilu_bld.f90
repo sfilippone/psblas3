@@ -232,6 +232,7 @@ subroutine psb_zilu_bld(a,desc_a,p,upd,info)
 
     nztota = psb_sp_get_nnzeros(a)
     nztotb = psb_sp_get_nnzeros(blck)
+
     call psb_sp_all(atmp,nztota+nztotb,info)
     if(info/=0) then
       info=4011

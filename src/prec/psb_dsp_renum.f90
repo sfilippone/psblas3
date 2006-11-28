@@ -69,6 +69,7 @@ subroutine psb_dsp_renum(a,desc_a,blck,p,atmp,info)
   call psb_erractionsave(err_act)
 
   ictxt=psb_cd_get_context(desc_a)
+
   call psb_info(ictxt, me, np)
 
 !!!!!!!!!!!!!!!! CHANGE FOR NON-CSR A
@@ -85,6 +86,7 @@ subroutine psb_dsp_renum(a,desc_a,blck,p,atmp,info)
 
     ! This is the renumbering coherent with global indices..
     mglob = psb_cd_get_global_rows(desc_a)
+
     !
     !  Remember: we have switched IA1=COLS and IA2=ROWS
     !  Now identify the set of distinct local column indices

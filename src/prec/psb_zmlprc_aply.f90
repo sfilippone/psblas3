@@ -283,7 +283,6 @@ subroutine psb_zmlprc_aply(alpha,baseprecv,x,beta,y,desc_data,trans,work,info)
 
     case(post_smooth_)
 
-      
       !
       !    Post smoothing. 
       !    1.   X(1) = Xext
@@ -302,7 +301,6 @@ subroutine psb_zmlprc_aply(alpha,baseprecv,x,beta,y,desc_data,trans,work,info)
       ! 
       ! 
     
-
       n_col = desc_data%matrix_data(psb_n_col_)
       nr2l  = baseprecv(1)%desc_data%matrix_data(psb_n_col_)
 
@@ -420,7 +418,6 @@ subroutine psb_zmlprc_aply(alpha,baseprecv,x,beta,y,desc_data,trans,work,info)
 
     case(pre_smooth_)
 
-      
       !
       !    Pre smoothing. 
       !    1.   X(1)  = Xext
@@ -599,7 +596,6 @@ subroutine psb_zmlprc_aply(alpha,baseprecv,x,beta,y,desc_data,trans,work,info)
       mlprec_wrk(1)%y2l(:) = zzero
       mlprec_wrk(1)%tx(:) = zzero
       mlprec_wrk(1)%ty(:) = zzero
-
 
       if (info /= 0) then 
         call psb_errpush(4010,name,a_err='Allocate')
