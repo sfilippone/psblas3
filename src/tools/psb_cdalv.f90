@@ -56,7 +56,7 @@ subroutine psb_cdalv(m, v, ictxt, desc_a, info, flag)
 
   !locals
   Integer             :: counter,i,j,np,me,loc_row,err,&
-       & loc_col,nprocs,n,itmpov, k,&
+       & loc_col,nprocs,n,itmpov, k,glx,gidx,gle,&
        & l_ov_ix,l_ov_el,idx, flag_, err_act
   integer             :: int_err(5),exch(2)
   Integer, allocatable  :: temp_ovrlap(:), ov_idx(:),ov_el(:)
@@ -88,8 +88,8 @@ subroutine psb_cdalv(m, v, ictxt, desc_a, info, flag)
   endif
 
   if (info /= 0) then 
-     call psb_errpush(info,name,i_err=int_err)
-     goto 9999
+    call psb_errpush(info,name,i_err=int_err)
+    goto 9999
   end if
 
   if (debug) write(*,*) 'psb_cdall:  doing global checks'  
@@ -122,7 +122,7 @@ subroutine psb_cdalv(m, v, ictxt, desc_a, info, flag)
   else
     flag_=0
   endif
-  
+
   if ((flag_<0).or.(flag_>1)) then
     info = 6
     err=info
@@ -132,8 +132,13 @@ subroutine psb_cdalv(m, v, ictxt, desc_a, info, flag)
 
   !count local rows number
   ! allocate work vector
-  allocate(desc_a%glob_to_loc(m),desc_a%matrix_data(psb_mdata_size_),&
-       &temp_ovrlap(m),stat=info)
+  if (m > psb_cd_get_large_threshold()) then 
+    allocate(desc_a%matrix_data(psb_mdata_size_),&
+         &temp_ovrlap(m),stat=info)
+  else
+    allocate(desc_a%glob_to_loc(m),desc_a%matrix_data(psb_mdata_size_),&
+         &temp_ovrlap(m),stat=info)
+  end if
   if (info /= 0) then     
     info=2025
     int_err(1)=m
@@ -146,34 +151,127 @@ subroutine psb_cdalv(m, v, ictxt, desc_a, info, flag)
   counter = 0
   itmpov  = 0
   temp_ovrlap(:) = -1
-  do i=1,m
-    
-    if (((v(i)-flag_) > np-1).or.((v(i)-flag_) < 0)) then
-      info=580
-      int_err(1)=3
-      int_err(2)=v(i) - flag_
-      int_err(3)=i
-      exit
+
+  if ( m >psb_cd_get_large_threshold()) then 
+    desc_a%matrix_data(psb_dec_type_) = psb_desc_large_bld_
+
+    do i=1,m
+
+      if (((v(i)-flag_) > np-1).or.((v(i)-flag_) < 0)) then
+        info=580
+        int_err(1)=3
+        int_err(2)=v(i) - flag_
+        int_err(3)=i
+        exit
+      end if
+
+      if ((v(i)-flag_) == me) then
+        ! this point belongs to me
+        counter=counter+1
+      end if
+    enddo
+
+
+    loc_row=counter
+    ! check on parts function
+    if (debug) write(*,*) 'PSB_CDALL:  End main loop:' ,loc_row,itmpov,info
+
+    if (info /= 0) then 
+      call psb_errpush(info,name,i_err=int_err)
+      goto 9999
+    end if
+    if (debug) write(*,*) 'PSB_CDALL:  error check:' ,err
+
+    ! estimate local cols number 
+    loc_col = min(2*loc_row,m)
+
+    allocate(desc_a%loc_to_glob(loc_col), desc_a%lprm(1),&
+         & desc_a%ptree(2),stat=info)  
+    if (info == 0) call InitPairSearchTree(desc_a%ptree,info)
+    if (info /= 0) then
+      info=2025
+      int_err(1)=loc_col
+      call psb_errpush(info,name,i_err=int_err)
+      goto 9999
     end if
 
-    if ((v(i)-flag_) == me) then
-      ! this point belongs to me
-      counter=counter+1
-      desc_a%glob_to_loc(i) = counter
-    else
-      desc_a%glob_to_loc(i) = -(np+(v(i)-flag_)+1)
+    ! set LOC_TO_GLOB array to all "-1" values
+    desc_a%lprm(1) = 0
+    desc_a%loc_to_glob(:) = -1
+    k = 0
+    do i=1,m
+      if ((v(i)-flag_) == me) then
+        k = k + 1 
+        desc_a%loc_to_glob(k) = i
+        call SearchInsKeyVal(desc_a%ptree,i,k,glx,info)
+      endif
+    enddo
+    if (k /= loc_row) then 
+      write(0,*) 'Large cd init: ',k,loc_row
     end if
-  enddo
 
-  loc_row=counter
-  ! check on parts function
-  if (debug) write(*,*) 'PSB_CDALL:  End main loop:' ,loc_row,itmpov,info
+    if (info /= 0) then 
+      info=4000
+      call psb_errpush(info,name)
+      goto 9999
+    endif
 
-  if (info /= 0) then 
-    call psb_errpush(info,name,i_err=int_err)
-    goto 9999
+  else 
+
+    desc_a%matrix_data(psb_dec_type_) = psb_desc_bld_
+    do i=1,m
+
+      if (((v(i)-flag_) > np-1).or.((v(i)-flag_) < 0)) then
+        info=580
+        int_err(1)=3
+        int_err(2)=v(i) - flag_
+        int_err(3)=i
+        exit
+      end if
+
+      if ((v(i)-flag_) == me) then
+        ! this point belongs to me
+        counter=counter+1
+        desc_a%glob_to_loc(i) = counter
+      else
+        desc_a%glob_to_loc(i) = -(np+(v(i)-flag_)+1)
+      end if
+    enddo
+
+
+    loc_row=counter
+    ! check on parts function
+    if (debug) write(*,*) 'PSB_CDALL:  End main loop:' ,loc_row,itmpov,info
+
+    if (info /= 0) then 
+      call psb_errpush(info,name,i_err=int_err)
+      goto 9999
+    end if
+    if (debug) write(*,*) 'PSB_CDALL:  error check:' ,err
+
+    ! estimate local cols number 
+    loc_col = min(2*loc_row,m)
+
+    allocate(desc_a%loc_to_glob(loc_col),&
+         &desc_a%lprm(1),stat=info)  
+    if (info /= 0) then
+      info=2025
+      int_err(1)=loc_col
+      call psb_errpush(info,name,i_err=int_err)
+      goto 9999
+    end if
+
+    ! set LOC_TO_GLOB array to all "-1" values
+    desc_a%lprm(1) = 0
+    desc_a%loc_to_glob(:) = -1
+    do i=1,m
+      k = desc_a%glob_to_loc(i) 
+      if (k.gt.0) then 
+        desc_a%loc_to_glob(k) = i
+      endif
+    enddo
+
   end if
-  if (debug) write(*,*) 'PSB_CDALL:  error check:' ,err
 
   l_ov_ix=0
   l_ov_el=0
@@ -234,27 +332,6 @@ subroutine psb_cdalv(m, v, ictxt, desc_a, info, flag)
     goto 9999
   endif
 
-  ! estimate local cols number 
-  loc_col = min(2*loc_row,m)
-  allocate(desc_a%loc_to_glob(loc_col),&
-       &desc_a%lprm(1),stat=info)  
-  if (info /= 0) then
-    info=2025
-    int_err(1)=loc_col
-    call psb_errpush(info,name,i_err=int_err)
-    goto 9999
-  end if
-
-  ! set LOC_TO_GLOB array to all "-1" values
-  desc_a%lprm(1) = 0
-  desc_a%loc_to_glob(:) = -1
-  do i=1,m
-    k = desc_a%glob_to_loc(i) 
-    if (k.gt.0) then 
-      desc_a%loc_to_glob(k) = i
-    endif
-  enddo
-
   ! set fields in desc_a%MATRIX_DATA....
   desc_a%matrix_data(psb_n_row_)  = loc_row
   desc_a%matrix_data(psb_n_col_)  = loc_row
@@ -268,22 +345,20 @@ subroutine psb_cdalv(m, v, ictxt, desc_a, info, flag)
 
   desc_a%halo_index(:) = -1
 
-
-
   desc_a%matrix_data(psb_m_)        = m
   desc_a%matrix_data(psb_n_)        = n
-  desc_a%matrix_data(psb_dec_type_) = psb_desc_bld_
   desc_a%matrix_data(psb_ctxt_)     = ictxt
   call psb_get_mpicomm(ictxt,desc_a%matrix_data(psb_mpi_c_))
 
+
   call psb_erractionrestore(err_act)
   return
-  
+
 9999 continue
   call psb_erractionrestore(err_act)
   if (err_act == act_abort) then
-     call psb_error(ictxt)
-     return
+    call psb_error(ictxt)
+    return
   end if
   return
 

@@ -50,7 +50,7 @@ subroutine psb_cdtransfer(desc_in, desc_out, info)
   !....parameters...
 
   type(psb_desc_type), intent(inout)  :: desc_in
-  type(psb_desc_type), intent(out)  :: desc_out
+  type(psb_desc_type), intent(inout)  :: desc_out
   integer, intent(out)                :: info
 
   !locals
@@ -63,41 +63,59 @@ subroutine psb_cdtransfer(desc_in, desc_out, info)
   info = 0
   call psb_erractionsave(err_act)
   name = 'psb_cdtransfer'
-  
-  ictxt=desc_in%matrix_data(psb_ctxt_)
+
+  ictxt=psb_cd_get_context(desc_in)
 
   call psb_info(ictxt, me, np)
   if (debug) write(0,*) me,'Entered CDTRANSFER'
   if (np == -1) then
-     info = 2010
-     call psb_errpush(info,name)
-     goto 9999
+    info = 2010
+    call psb_errpush(info,name)
+    goto 9999
   endif
 
-!!$  call psb_nullify_desc(desc_out)
-!!$  
-
   call psb_transfer( desc_in%matrix_data ,    desc_out%matrix_data  , info)
-  call psb_transfer( desc_in%halo_index  ,    desc_out%halo_index   , info)
-  call psb_transfer( desc_in%bnd_elem    ,    desc_out%bnd_elem     , info)
-  call psb_transfer( desc_in%ovrlap_elem ,    desc_out%ovrlap_elem  , info)
-  call psb_transfer( desc_in%ovrlap_index,    desc_out%ovrlap_index , info)
-  call psb_transfer( desc_in%loc_to_glob ,    desc_out%loc_to_glob  , info)
-  call psb_transfer( desc_in%glob_to_loc ,    desc_out%glob_to_loc  , info)
-  call psb_transfer( desc_in%lprm        ,    desc_out%lprm         , info)
-  call psb_transfer( desc_in%idx_space   ,    desc_out%idx_space    , info)
-
+  if (info == 0)  call psb_transfer( desc_in%halo_index  ,    desc_out%halo_index   , info)
+  if (info == 0)  call psb_transfer( desc_in%bnd_elem    ,    desc_out%bnd_elem     , info)
+  if (info == 0)  call psb_transfer( desc_in%ovrlap_elem ,    desc_out%ovrlap_elem  , info)
+  if (info == 0)  call psb_transfer( desc_in%ovrlap_index,    desc_out%ovrlap_index , info)
+  if (info == 0)  call psb_transfer( desc_in%loc_to_glob ,    desc_out%loc_to_glob  , info)
+  if (info == 0)  call psb_transfer( desc_in%glob_to_loc ,    desc_out%glob_to_loc  , info)
+  if (info == 0)  call psb_transfer( desc_in%lprm        ,    desc_out%lprm         , info)
+  if (info == 0)  call psb_transfer( desc_in%idx_space   ,    desc_out%idx_space    , info)
+  if (info == 0)  call psb_transfer( desc_in%hashv       ,    desc_out%hashv        , info)
+  if (info == 0)  call psb_transfer( desc_in%glb_lc      ,    desc_out%glb_lc       , info)
+  ! Why doesn't transfer work below? Dunno..... 
+  if (info == 0)  call psb_transfer( desc_in%ptree       ,    desc_out%ptree        , info)
+  if (.false.) then
+    if (info == 0) then 
+      if (allocated(desc_in%ptree)) then 
+        allocate(desc_out%ptree(2),stat=info)
+        if (info /= 0) then 
+          info=4000
+          goto 9999
+        endif
+        desc_out%ptree(1:2) = desc_in%ptree(1:2)
+        deallocate(desc_in%ptree,stat=info)
+      end if
+    end if
+  endif
+  if (info /= 0) then
+    info = 4010
+    call psb_errpush(info,name)
+    goto 9999
+  endif
 
   call psb_erractionrestore(err_act)
   return
-  
+
 9999 continue
   call psb_erractionrestore(err_act)
-  
+
   if (err_act == act_ret) then
-     return
+    return
   else
-     call psb_error(ictxt)
+    call psb_error(ictxt)
   end if
   return
 

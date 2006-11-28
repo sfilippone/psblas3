@@ -63,7 +63,7 @@ subroutine psb_cdfree(desc_a,info)
   end if
 
   ictxt=psb_cd_get_context(desc_a)
-  deallocate(desc_a%matrix_data)
+
   call psb_info(ictxt, me, np)
   !     ....verify blacs grid correctness..
   if (np == -1) then
@@ -74,7 +74,7 @@ subroutine psb_cdfree(desc_a,info)
 
   !...deallocate desc_a....
   if(.not.allocated(desc_a%loc_to_glob)) then
-    info=295
+    info=296
     call psb_errpush(info,name)
     goto 9999
   end if
@@ -87,22 +87,24 @@ subroutine psb_cdfree(desc_a,info)
     goto 9999
   end if
 
-  if (.not.allocated(desc_a%glob_to_loc)) then
-    info=295
-    call psb_errpush(info,name)
-    goto 9999
-  end if
-
-  !deallocate glob_to_loc field
-  deallocate(desc_a%glob_to_loc,stat=info)
-  if (info /= 0) then
-    info=2052
-    call psb_errpush(info,name)
-    goto 9999
-  end if
+  if (.not.psb_is_large_desc(desc_a)) then 
+    if (.not.allocated(desc_a%glob_to_loc)) then
+      info=297
+      call psb_errpush(info,name)
+      goto 9999
+    end if
+    
+    !deallocate glob_to_loc field
+    deallocate(desc_a%glob_to_loc,stat=info)
+    if (info /= 0) then
+      info=2052
+      call psb_errpush(info,name)
+      goto 9999
+    end if
+  endif
 
   if (.not.allocated(desc_a%halo_index)) then
-    info=295
+    info=298
     call psb_errpush(info,name)
     goto 9999
   end if
@@ -131,7 +133,7 @@ subroutine psb_cdfree(desc_a,info)
   end if
 
   if (.not.allocated(desc_a%ovrlap_index)) then
-    info=295
+    info=299
     call psb_errpush(info,name)
     goto 9999
   end if
@@ -160,6 +162,36 @@ subroutine psb_cdfree(desc_a,info)
     goto 9999
   end if
 
+  if (allocated(desc_a%hashv)) then 
+    deallocate(desc_a%hashv,stat=info)
+    if (info /= 0) then 
+      info=2058
+      call psb_errpush(info,name)
+      goto 9999
+    end if
+  end if
+
+  if (allocated(desc_a%glb_lc)) then 
+    deallocate(desc_a%glb_lc,stat=info)
+    if (info /= 0) then 
+      info=2059
+      call psb_errpush(info,name)
+      goto 9999
+    end if
+  end if
+
+  if (allocated(desc_a%ptree)) then 
+    call FreePairSearchTree(desc_a%ptree)   
+    deallocate(desc_a%ptree,stat=info)
+    if (info /= 0) then 
+      info=2059
+      call psb_errpush(info,name)
+      goto 9999
+    end if
+  end if
+
+
+
   if (allocated(desc_a%idx_space)) then 
     deallocate(desc_a%idx_space,stat=info)
     if (info /= 0) then 
@@ -168,6 +200,8 @@ subroutine psb_cdfree(desc_a,info)
       goto 9999
     end if
   end if
+
+  deallocate(desc_a%matrix_data)
 
   call psb_nullify_desc(desc_a)
 

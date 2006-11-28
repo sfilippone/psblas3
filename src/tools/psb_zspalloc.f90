@@ -56,7 +56,7 @@ subroutine psb_zspalloc(a, desc_a, info, nnz)
   integer, optional, intent(in)      :: nnz
 
   !locals
-  integer             :: ictxt, dectype
+  integer             :: ictxt
   integer             :: np,me,loc_row,&
        &  length_ia1,length_ia2, err_act,m,n
   integer             :: int_err(5)
@@ -69,7 +69,6 @@ subroutine psb_zspalloc(a, desc_a, info, nnz)
   name = 'psb_zspalloc'
 
   ictxt = psb_cd_get_context(desc_a)
-  dectype = psb_cd_get_dectype(desc_a)
   call psb_info(ictxt, me, np)
   !     ....verify blacs grid correctness..
   if (np == -1) then
@@ -127,7 +126,7 @@ subroutine psb_zspalloc(a, desc_a, info, nnz)
   a%infoa(psb_state_) = psb_spmat_bld_
 
   if (debug) write(0,*) 'spall: ',  &
-       &psb_cd_get_dectype(desc_a),psb_desc_bld_
+       & psb_cd_get_dectype(desc_a),psb_desc_bld_
 
   return
 

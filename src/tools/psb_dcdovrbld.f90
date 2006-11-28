@@ -37,7 +37,7 @@
 !     Note that n_ovr > 0 thanks to the caller routine.                  
 ! 
 ! Parameters: 
-!    n_ovr         - integer.                The number of overlap levels                 
+!    n_ovr         - integer.                The number of overlap levels               
 !    desc_p        - type(<psb_desc_type>).  The communication descriptor 
 !                                            for the preconditioner.
 !    desc_a        - type(<psb_desc_type>).  The communication descriptor.
@@ -54,34 +54,30 @@ Subroutine psb_dcdovrbld(n_ovr,desc_p,desc_a,a,&
   use psb_serial_mod
   Use psi_mod
   use psb_realloc_mod
-  use psb_tools_mod, only : psb_cdprt
   use psb_error_mod
   use psb_const_mod
   use psb_penv_mod
+  use psb_tools_mod
+  use mpi
   Implicit None
 
-  include 'mpif.h'
   type(psb_dspmat_type),intent(in)  :: a
   type(psb_desc_type),intent(in)    :: desc_a
   type(psb_desc_type),intent(inout) :: desc_p
-  integer,intent(in)                   :: n_ovr
+  integer,intent(in)                :: n_ovr
   ! Input estimates for allocation sizes. Could we do without these two???
-  Integer, Intent(in) :: l_tmp_halo,l_tmp_ovr_idx
+  Integer, Intent(in)     :: l_tmp_halo,l_tmp_ovr_idx
   Integer, Intent(inout)  :: lworks, lworkr
   integer, intent(out)    :: info
 
-  type(psb_dspmat_type)            :: blk
-
-
-  Integer, allocatable  :: tmp_halo(:),tmp_ovr_idx(:)
-
+  type(psb_dspmat_type)  :: blk
+  Integer, allocatable   :: tmp_halo(:),tmp_ovr_idx(:)
   Integer :: counter,counter_h, counter_o, counter_e,j,idx,gidx,proc,n_elem_recv,&
        & n_elem_send,tot_recv,tot_elem,n_col,m,ictxt,np,me,dl_lda,lwork,&
        & counter_t,n_elem,i_ovr,jj,i,proc_id,isz, mglob, glx,n_row, &
-       & idxr, idxs, lx, iszr, err_act, icomm, nxch, nsnd, nrcv
-
-  Integer,allocatable   :: halo(:),length_dl(:),works(:),workr(:),t_halo_in(:),&
-       & t_halo_out(:),work(:),dep_list(:),temp(:)
+       & idxr, idxs, lx, iszr, iszs, err_act, icomm, nxch, nsnd, nrcv,lidx
+  Integer,allocatable   :: halo(:),works(:),workr(:),t_halo_in(:),&
+       & t_halo_out(:),temp(:),maskr(:)
   Integer,allocatable  :: brvindx(:),rvsz(:), bsdindx(:),sdsz(:)
 
   Logical,Parameter :: debug=.false.
@@ -114,11 +110,8 @@ Subroutine psb_dcdovrbld(n_ovr,desc_p,desc_a,a,&
   n_col = psb_cd_get_local_cols(desc_a)
   if (debug) write(0,*) me,' On entry to CDOVRBLD n_col:',n_col
 
-  dl_lda=np*5
-  lwork=5*(5*np+2)*np+10
   Allocate(works(lworks),workr(lworkr),t_halo_in(l_tmp_halo),&
-       & t_halo_out(l_tmp_halo), work(lwork),&
-       & length_dl(np+1),dep_list(dl_lda*np),temp(lworkr),stat=info)
+       & t_halo_out(l_tmp_halo), temp(lworkr),stat=info)
   if (info /= 0) then 
     call psb_errpush(4010,name,a_err='Allocate')
     goto 9999      
@@ -141,7 +134,7 @@ Subroutine psb_dcdovrbld(n_ovr,desc_p,desc_a,a,&
     call psb_errpush(4010,name,a_err='Allocate')
     goto 9999      
   end if
-  halo(:) = desc_a%halo_index(:)
+  halo(:)               = desc_a%halo_index(:)
   desc_p%ovrlap_elem(:) = -1
   tmp_ovr_idx(:)        = -1
   tmp_halo(:)           = -1
@@ -150,7 +143,40 @@ Subroutine psb_dcdovrbld(n_ovr,desc_p,desc_a,a,&
   counter_h             = 1
   counter_o             = 1
 
-  ! See comment in main loop below.
+  ! Init overlap with desc_a%ovrlap (if any) 
+  counter = 1
+  Do While (desc_a%ovrlap_index(counter) /= -1)
+    proc        = desc_a%ovrlap_index(counter+psb_proc_id_)
+    n_elem_recv = desc_a%ovrlap_index(counter+psb_n_elem_recv_)
+    n_elem_send = desc_a%ovrlap_index(counter+n_elem_recv+psb_n_elem_send_)
+
+    Do j=0,n_elem_recv-1
+
+      idx = desc_a%ovrlap_index(counter+psb_elem_recv_+j)
+      If(idx > Size(desc_p%loc_to_glob)) then 
+        info=-3
+        call psb_errpush(info,name)
+        goto 9999
+      endif
+
+      gidx = desc_p%loc_to_glob(idx)
+
+      call psb_check_size((counter_o+3),tmp_ovr_idx,info,pad=-1)
+      if (info /= 0) then
+        info=4010
+        call psb_errpush(info,name,a_err='psb_check_size')
+        goto 9999
+      end if
+
+      tmp_ovr_idx(counter_o)=proc
+      tmp_ovr_idx(counter_o+1)=1
+      tmp_ovr_idx(counter_o+2)=gidx
+      tmp_ovr_idx(counter_o+3)=-1
+      counter_o=counter_o+3
+    end Do
+    counter=counter+n_elem_recv+n_elem_send+2
+  end Do
+      
 
   !
   ! A picture is in order to understand what goes on here.
@@ -175,7 +201,6 @@ Subroutine psb_dcdovrbld(n_ovr,desc_p,desc_a,a,&
   Do i_ovr=1,n_ovr
 
     if (debug) write(0,*) me,'Running on overlap level ',i_ovr,' of ',n_ovr
-!!$    t_halo_in(:) = -1
 
     !
     ! At this point, halo contains a valid halo corresponding to the
@@ -192,7 +217,8 @@ Subroutine psb_dcdovrbld(n_ovr,desc_p,desc_a,a,&
     idxs       = 0
     counter      = 1
     counter_t    = 1
-
+    
+    
     t1 = mpi_wtime()
     Do While (halo(counter) /= -1)
       tot_elem=0
@@ -200,7 +226,7 @@ Subroutine psb_dcdovrbld(n_ovr,desc_p,desc_a,a,&
       n_elem_recv=halo(counter+psb_n_elem_recv_)
       n_elem_send=halo(counter+n_elem_recv+psb_n_elem_send_)
       If ((counter+n_elem_recv+n_elem_send) > Size(halo)) then
-        info=-1
+        info = -1
         call psb_errpush(info,name)
         goto 9999
       end If
@@ -210,7 +236,7 @@ Subroutine psb_dcdovrbld(n_ovr,desc_p,desc_a,a,&
       !
       ! The format of the halo vector exists in two forms: 1. Temporary 
       ! 2. Assembled. In this loop we are using the (assembled) halo_in and 
-      ! copying it into (temporary) tmp_halo; this is because tmp_halo will
+      ! copying it into (temporary) halo_out; this is because tmp_halo will
       ! be enlarged with the new column indices received, and will reassemble
       ! everything for the next iteration.
       ! 
@@ -225,7 +251,7 @@ Subroutine psb_dcdovrbld(n_ovr,desc_p,desc_a,a,&
           call psb_errpush(info,name)
           goto 9999
         end If
-        idx = halo(counter+psb_elem_recv_+j)
+
         idx = halo(counter+psb_elem_recv_+j)
         If(idx > Size(desc_p%loc_to_glob)) then 
           info=-3
@@ -235,42 +261,33 @@ Subroutine psb_dcdovrbld(n_ovr,desc_p,desc_a,a,&
 
         gidx = desc_p%loc_to_glob(idx)
 
-        If((counter_o+2) > Size(tmp_ovr_idx)) Then
-          isz = max((3*Size(tmp_ovr_idx))/2,(counter_o+3))
-          if (debug) write(0,*) me,'Realloc tmp_ovr',isz
-          call psb_realloc(isz,tmp_ovr_idx,info,pad=-1)
-          if (info /= 0) then
-            info=4010
-            ch_err='psb_realloc'
-            call psb_errpush(info,name,a_err=ch_err)
-            goto 9999
-          end if
-        End If
+        call psb_check_size((counter_o+3),tmp_ovr_idx,info,pad=-1)
+        if (info /= 0) then
+          info=4010
+          call psb_errpush(info,name,a_err='psb_check_size')
+          goto 9999
+        end if
 
         tmp_ovr_idx(counter_o)=proc
         tmp_ovr_idx(counter_o+1)=1
         tmp_ovr_idx(counter_o+2)=gidx
         tmp_ovr_idx(counter_o+3)=-1
         counter_o=counter_o+3
-
-        If((counter_h+2) > Size(tmp_halo)) Then
-          isz = max((3*Size(tmp_halo))/2,(counter_h+3))
-          if (debug) write(0,*) me,'Realloc tmp_halo',isz
-          call psb_realloc(isz,tmp_halo,info)
+        if (.not.psb_is_large_desc(desc_p)) then 
+          call psb_check_size((counter_h+3),tmp_halo,info,pad=-1)
           if (info /= 0) then
             info=4010
-            ch_err='psb_realloc'
-            call psb_errpush(info,name,a_err=ch_err)
+            call psb_errpush(info,name,a_err='psb_check_size')
             goto 9999
           end if
-        End If
-
-        tmp_halo(counter_h)=proc
-        tmp_halo(counter_h+1)=1
-        tmp_halo(counter_h+2)=idx
-        tmp_halo(counter_h+3)=-1
-
-        counter_h=counter_h+3
+          
+          tmp_halo(counter_h)=proc
+          tmp_halo(counter_h+1)=1
+          tmp_halo(counter_h+2)=idx
+          tmp_halo(counter_h+3)=-1
+          
+          counter_h=counter_h+3
+        end if
 
       Enddo
       if (debug) write(0,*) me,'Checktmp_o_i Loop Mid1',tmp_ovr_idx(1:10)
@@ -283,18 +300,15 @@ Subroutine psb_dcdovrbld(n_ovr,desc_p,desc_a,a,&
 
         idx = halo(counter+psb_elem_send_+j)
         gidx = desc_p%loc_to_glob(idx)
-
-        If((counter_o+2) > Size(tmp_ovr_idx)) Then
-          isz = max((3*Size(tmp_ovr_idx))/2,(counter_o+3))
-          if (debug) write(0,*) me,'Realloc tmp_ovr',isz
-          call psb_realloc(isz,tmp_ovr_idx,info)
-          if (info /= 0) then
-            info=4010
-            ch_err='psrealloc'
-            call psb_errpush(info,name,a_err=ch_err)
-            goto 9999
-          end if
-        End If
+        if (idx > psb_cd_get_local_rows(Desc_a)) &
+             & write(0,*) me,i_ovr,'Out of local rows ',idx,psb_cd_get_local_rows(Desc_a)
+        
+        call psb_check_size((counter_o+3),tmp_ovr_idx,info,pad=-1)
+        if (info /= 0) then
+          info=4010
+          call psb_errpush(info,name,a_err='psb_check_size')
+          goto 9999
+        end if
 
         tmp_ovr_idx(counter_o)=proc
         tmp_ovr_idx(counter_o+1)=1
@@ -308,18 +322,12 @@ Subroutine psb_dcdovrbld(n_ovr,desc_p,desc_a,a,&
         If (i_ovr < (n_ovr)) Then
           n_elem = psb_sp_get_nnz_row(idx,a)
 
-          If((idxs+tot_elem+n_elem) > lworks) Then
-            isz = max((3*lworks)/2,(idxs+tot_elem+n_elem))
-            if (debug) write(0,*) me,'Realloc works',isz
-            call psb_realloc(isz,works,info)
-            if (info /= 0) then
-              info=4010
-              ch_err='psb_realloc'
-              call psb_errpush(info,name,a_err=ch_err)
-              goto 9999
-            end if
-            lworks = isz
-          End If
+          call psb_check_size((idxs+tot_elem+n_elem),works,info)
+          if (info /= 0) then
+            info=4010
+            call psb_errpush(info,name,a_err='psb_check_size')
+            goto 9999
+          end if
 
           If((n_elem) > size(blk%ia2)) Then
             isz = max((3*size(blk%ia2))/2,(n_elem))
@@ -428,61 +436,109 @@ Subroutine psb_dcdovrbld(n_ovr,desc_p,desc_a,a,&
         goto 9999
       end if
 
-      Do i=1,iszr
-        idx=workr(i)
-        if (idx <1) then 
-          write(0,*) me,'Error in CDOVRBLD ',idx,i,iszr
-!!$          write(0,*) me, ' WORKR :',workr(1:iszr)
-        else  If (desc_p%glob_to_loc(idx) < -np) Then
-          !
-          ! This is a new index. Assigning a local index as
-          ! we receive the guarantees that all indices for HALO(I)
-          ! will be less than those for HALO(J) whenever I<J
-          !
-          n_col=n_col+1
-          proc_id=-desc_p%glob_to_loc(idx)-np-1
-          If(n_col > Size(desc_p%loc_to_glob)) Then
-            isz = 3*n_col/2
-            if (debug) write(0,*) me,'Realloc loc_to_glob'
-            call psb_realloc(isz,desc_p%loc_to_glob,info)
-            if (info /= 0) then
-              info=4010
-              ch_err='psrealloc'
-              call psb_errpush(info,name,a_err=ch_err)
-              goto 9999
-            end if
-          End If
-          desc_p%glob_to_loc(idx)=n_col
-          desc_p%loc_to_glob(n_col)=idx
-          If ((counter_t+3) > Size(t_halo_in)) then 
-            isz = max((3*Size(t_halo_in))/2,(counter_t+3+1000))
-            if (debug) write(0,*) me,'Realloc ovr_el',isz
-            call psb_realloc(isz,t_halo_in,info)
-            if (info /= 0) then
-              info=4010
-              ch_err='psrealloc'
-              call psb_errpush(info,name,a_err=ch_err)
-              goto 9999
-            end if
-          end If
+      if (debug) write(0,*) 'ISZR :',iszr
 
-          t_halo_in(counter_t)=proc_id
-          t_halo_in(counter_t+1)=1
-          t_halo_in(counter_t+2)=n_col
-          counter_t=counter_t+3
-          if (debug) write(0,*) me,' CDOVRBLD: Added into t_halo_in from recv',&
-               &proc_id,n_col,idx
-        else if (desc_p%glob_to_loc(idx) < 0) Then
-          if (debug) write(0,*) me,'Wrong input to cdovrbld??',&
-               &idx,desc_p%glob_to_loc(idx)
-        End If
-      End Do
+      if (psb_is_large_desc(desc_a)) then 
+        call psb_check_size(iszr,maskr,info)
+        if (info /= 0) then
+          info=4010
+          call psb_errpush(info,name,a_err='psb_check_size')
+          goto 9999
+        end if
+        call psi_idx_cnv(iszr,workr,maskr,desc_p,info)
+        iszs = count(maskr(1:iszr)<=0)
+        if (iszs > size(works)) call psb_realloc(iszs,works,info)
+        j = 0
+        do i=1,iszr
+          if (maskr(i) < 0) then 
+            j=j+1
+            works(j) = workr(i)
+          end if
+        end do
+        !
+        ! fnd_owner on desc_a because we want the procs who
+        ! owned the rows from the beginning!
+        !
+        call psi_fnd_owner(iszs,works,temp,desc_a,info)
+        n_col=psb_cd_get_local_cols(desc_p)
+
+        do i=1,iszs
+          idx = works(i)
+          n_col   = psb_cd_get_local_cols(desc_p)
+          call psi_idx_ins_cnv(idx,lidx,desc_p,info)
+          if (psb_cd_get_local_cols(desc_p) >  n_col ) then
+            !
+            ! This is a new index. Assigning a local index as
+            ! we receive them guarantees that all indices for HALO(I)
+            ! will be less than those for HALO(J) whenever I<J
+            !
+            proc_id = temp(i) 
+            
+            call psb_check_size((counter_t+3),t_halo_in,info,pad=-1)
+            if (info /= 0) then
+              info=4010
+              call psb_errpush(info,name,a_err='psb_check_size')
+              goto 9999
+            end if
+            
+            t_halo_in(counter_t)=proc_id
+            t_halo_in(counter_t+1)=1
+            t_halo_in(counter_t+2)=lidx
+            counter_t=counter_t+3
+            if (.false.) write(0,*) me,' CDOVRBLD: Added t_halo_in ',&
+                 &proc_id,lidx,idx
+          endif
+        end Do
+
+      else
+
+        Do i=1,iszr
+          idx=workr(i)
+          if (idx <1) then 
+            write(0,*) me,'Error in CDOVRBLD level',i_ovr,' : ',idx,i,iszr
+          else  If (desc_p%glob_to_loc(idx) < -np) Then
+            !
+            ! This is a new index. Assigning a local index as
+            ! we receive them guarantees that all indices for HALO(I)
+            ! will be less than those for HALO(J) whenever I<J
+            !
+            n_col=n_col+1
+            proc_id=-desc_p%glob_to_loc(idx)-np-1
+            call psb_check_size(n_col,desc_p%loc_to_glob,info,pad=-1)
+            if (info /= 0) then
+              info=4010
+              call psb_errpush(info,name,a_err='psb_check_size')
+              goto 9999
+            end if
+
+            desc_p%glob_to_loc(idx)=n_col
+            desc_p%loc_to_glob(n_col)=idx
+
+            call psb_check_size((counter_t+3),t_halo_in,info,pad=-1)
+            if (info /= 0) then
+              info=4010
+              call psb_errpush(info,name,a_err='psb_check_size')
+              goto 9999
+            end if
+            
+            t_halo_in(counter_t)=proc_id
+            t_halo_in(counter_t+1)=1
+            t_halo_in(counter_t+2)=n_col
+            counter_t=counter_t+3
+            if (debug) write(0,*) me,' CDOVRBLD: Added into t_halo_in from recv',&
+                 &proc_id,n_col,idx
+          else if (desc_p%glob_to_loc(idx) < 0) Then
+            if (debug) write(0,*) me,'Wrong input to cdovrbld??',&
+                 &idx,desc_p%glob_to_loc(idx)
+          End If
+        End Do
+        desc_p%matrix_data(psb_n_col_)=n_col
+
+      end if
+
     end if
     t2 = mpi_wtime()
-    n_row=m+tot_recv
-    desc_p%matrix_data(psb_n_row_)=n_row
-    desc_p%matrix_data(psb_n_col_)=n_col
-
+!!$    desc_p%matrix_data(psb_n_row_)=desc_p%matrix_data(psb_n_col_)
     !
     ! Ok, now we have a temporary halo with all the info for the
     ! next round. If we need to keep going, convert the halo format
@@ -493,18 +549,6 @@ Subroutine psb_dcdovrbld(n_ovr,desc_p,desc_a,a,&
 
     If (i_ovr < (n_ovr)) Then
 
-      If(lwork < (counter_t/3+np*3)) Then
-        isz = max((3*lwork)/2,(counter_t/3+np*3))
-        if (debug) write(0,*) me,'Realloc work',isz
-        deallocate(work)
-        allocate(work(isz),stat=info)
-        if (info /= 0) then 
-          call psb_errpush(4010,name,a_err='Allocate')
-          goto 9999      
-        end if
-
-        lwork=size(work)
-      Endif
       t_halo_in(counter_t)=-1
 
       if (debug) write(0,*) me,'Checktmp_o_i 1',tmp_ovr_idx(1:10)
@@ -518,7 +562,7 @@ Subroutine psb_dcdovrbld(n_ovr,desc_p,desc_a,a,&
       end if
       if (debug) write(0,*) me,'Checktmp_o_i 2',tmp_ovr_idx(1:10)
       if (debug) write(0,*) me,'Done Crea_Halo'
-      call psb_transfer( t_halo_out,halo,info)
+      call psb_transfer(t_halo_out,halo,info)
       !
       ! At this point we have built the halo necessary for I_OVR+1.
       !
@@ -534,14 +578,14 @@ Subroutine psb_dcdovrbld(n_ovr,desc_p,desc_a,a,&
   desc_p%matrix_data(psb_m_)=psb_cd_get_global_rows(desc_a)
   desc_p%matrix_data(psb_n_)=psb_cd_get_global_cols(desc_a)
 
-  tmp_halo(counter_h)=-1
-  tmp_ovr_idx(counter_o)=-1
+  tmp_halo(counter_h:)=-1
+  tmp_ovr_idx(counter_o:)=-1
 
 
   !
   ! At this point we have gathered all the indices in the halo at
-  ! N levels of overlap. Just call convert_comm. This is
-  ! the same routine as gets called inside SPASB.
+  ! N levels of overlap. Just call cnv_dsc. This is
+  ! the same routine as gets called inside CDASB.
   !
 
   if (debug) then
@@ -549,45 +593,19 @@ Subroutine psb_dcdovrbld(n_ovr,desc_p,desc_a,a,&
     call psb_barrier(ictxt)
   end if
   !.... convert comunication stuctures....
-
-  call psi_cnv_dsc(tmp_halo,tmp_ovr_idx,desc_p,info) 
-
-  ! Ok, register into MATRIX_DATA &  free temporary work areas
-  desc_p%matrix_data(psb_dec_type_) = psb_desc_asb_
-
-  allocate(desc_p%lprm(1),stat=info)
-  if (info /= 0) then 
-    call psb_errpush(4010,name,a_err='Allocate')
-    goto 9999      
-  end if
-
-  desc_p%lprm(1) = 0
+  ! Note that we have to keep local_rows until the very end, 
+  ! because otherwise the halo build mechanism of cdasb
+  ! will not work. 
+  call psb_transfer(tmp_ovr_idx,desc_p%ovrlap_index,info)
+  call psb_transfer(tmp_halo,desc_p%halo_index,info)
+  call psb_cdasb(desc_p,info)
+  desc_p%matrix_data(psb_n_row_)=desc_p%matrix_data(psb_n_col_)
 
   if (debug) then 
-    write(0,*) me,'Done Convert_comm'
+    write(0,*) me,'Done CDASB'
     call psb_barrier(ictxt)
   end if
 
-  if (.false.) then
-    call psb_cdprt(70+me,desc_p,.false.)
-  end if
-
-  if (debug) write(0,*) me,'Done ConvertComm'
-!!$  write(0,*) 't_halo_out ',allocated(t_halo_out)
-!!$  Deallocate(works,workr,t_halo_in,work,&
-!!$       & length_dl,dep_list,stat=info)
-!!$  if (info /= 0) then
-!!$    ch_err='Deallocate 1'
-!!$    call psb_errpush(4013,name,a_err=ch_err,i_err=(/info,0,0,0,0/))
-!!$    goto 9999
-!!$  end if
-!!$  Deallocate(tmp_ovr_idx,tmp_halo,&
-!!$       & brvindx,rvsz,sdsz,bsdindx,temp,halo,stat=info)
-!!$  if (info /= 0) then
-!!$    ch_err='Deallocate 2'
-!!$    call psb_errpush(4013,name,a_err=ch_err,i_err=(/info,0,0,0,0/))
-!!$    goto 9999
-!!$  end if
   if (info == 0) call psb_sp_free(blk,info)
   if (info /= 0) then
     ch_err='sp_free'

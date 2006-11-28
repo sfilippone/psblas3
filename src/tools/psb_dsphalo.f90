@@ -73,7 +73,7 @@ Subroutine psb_dsphalo(a,desc_a,blk,info,rwcnv,clcnv,outfmt)
        & rvsz(:), bsdindx(:),sdsz(:)
   logical :: rwcnv_,clcnv_
   character(len=5)  :: outfmt_
-  Logical,Parameter :: debug=.false., usea2av=.true.
+  Logical,Parameter :: debug=.false., debugprt=.false.
   real(kind(1.d0)) :: t1,t2,t3,t4,t5,t6,t7,t8,t9
   character(len=20)   :: name, ch_err
 
@@ -100,7 +100,8 @@ Subroutine psb_dsphalo(a,desc_a,blk,info,rwcnv,clcnv,outfmt)
     outfmt_ = 'CSR'
   endif
 
-  ictxt=psb_cd_get_context(desc_a)
+  ictxt = psb_cd_get_context(desc_a)
+
   Call psb_info(ictxt, me, np)
 
   t1 = mpi_wtime()
@@ -225,8 +226,6 @@ Subroutine psb_dsphalo(a,desc_a,blk,info,rwcnv,clcnv,outfmt)
     counter   = counter+n_el_send+3
   Enddo
   nz = tmp%infoa(psb_nnz_)
-!!$  call csprt(20+me,tmp,head='% SPHALO border SEND .')
-!!$  close(20+me)
 
   if (rwcnv_) call psb_loc_to_glob(tmp%ia1(1:nz),desc_a,info,iact='I')
   if (clcnv_) call psb_loc_to_glob(tmp%ia2(1:nz),desc_a,info,iact='I')
@@ -236,8 +235,12 @@ Subroutine psb_dsphalo(a,desc_a,blk,info,rwcnv,clcnv,outfmt)
     call psb_errpush(info,name,a_err=ch_err)
     goto 9999
   end if
-!!$  call csprt(30+me,tmp,head='% SPHALO border SEND .')
-!!$  close(30+me)
+  if (debugprt) then 
+    open(30+me)
+    call psb_csprt(30+me,tmp,head='% SPHALO border SEND .')
+    call flush(30+me)
+    close(30+me)
+  end if
 
 
   call mpi_alltoallv(tmp%aspk,sdsz,bsdindx,mpi_double_precision,&
@@ -261,6 +264,7 @@ Subroutine psb_dsphalo(a,desc_a,blk,info,rwcnv,clcnv,outfmt)
   !
   if (rwcnv_) call psb_glob_to_loc(blk%ia1(1:iszr),desc_a,info,iact='I')
   if (clcnv_) call psb_glob_to_loc(blk%ia2(1:iszr),desc_a,info,iact='I')
+
   if (info /= 0) then
     info=4010
     ch_err='psbglob_to_loc'
@@ -268,6 +272,14 @@ Subroutine psb_dsphalo(a,desc_a,blk,info,rwcnv,clcnv,outfmt)
     goto 9999
   end if
 
+  if (debugprt) then 
+    blk%fida='COO'
+    blk%infoa(psb_nnz_)=iszr
+    open(40+me)
+    call psb_csprt(40+me,blk,head='% SPHALO border .')
+    call flush(40+me)
+    close(40+me)
+  end if
   l1  = 0
   Do i=1,iszr
 !!$      write(0,*) work5(i),work6(i)
@@ -283,9 +295,13 @@ Subroutine psb_dsphalo(a,desc_a,blk,info,rwcnv,clcnv,outfmt)
   Enddo
   blk%fida='COO'
   blk%infoa(psb_nnz_)=l1
-!!$  open(50+me)
-!!$  call csprt(50+me,blk,head='% SPHALO border .')
-!!$  close(50+me)
+  if (debugprt) then 
+    open(50+me)
+    call psb_csprt(50+me,blk,head='% SPHALO border .')
+    call flush(50+me)
+    close(50+me)
+    call psb_barrier(ictxt)
+  end if
   t4 = mpi_wtime()
 
   if(debug) Write(0,*)me,'End first loop',counter,l1,blk%m

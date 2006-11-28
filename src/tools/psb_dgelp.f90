@@ -85,8 +85,8 @@ subroutine psb_dgelp(trans,iperm,x,desc_a,info)
   info=0
   call psb_erractionsave(err_act)
 
-  ictxt=psb_cd_get_context(desc_a)
-  dectype=psb_cd_get_dectype(desc_a)
+  ictxt   = psb_cd_get_context(desc_a)
+  dectype = psb_cd_get_dectype(desc_a)
   nrow    = psb_cd_get_local_rows(desc_a)
   ncol    = psb_cd_get_local_cols(desc_a)
   i1sz    = size(x,dim=1)
@@ -95,7 +95,7 @@ subroutine psb_dgelp(trans,iperm,x,desc_a,info)
   call psb_info(ictxt, me, np)
 
   if (debug) write(*,*) 'asb start: ',np,me,&
-       &psb_cd_get_dectype(desc_a)
+       & psb_cd_get_dectype(desc_a)
   !     ....verify blacs grid correctness..
   if (np == -1) then
     info = 2010
@@ -231,10 +231,10 @@ subroutine psb_dgelpv(trans,iperm,x,desc_a,info)
 
   i1sz = size(x)
 
-  ictxt=psb_cd_get_context(desc_a)
-  dectype=psb_cd_get_dectype(desc_a)
-  nrow=psb_cd_get_local_rows(desc_a)
-  ncol=psb_cd_get_local_cols(desc_a)
+  ictxt   = psb_cd_get_context(desc_a)
+  dectype = psb_cd_get_dectype(desc_a)
+  nrow    = psb_cd_get_local_rows(desc_a)
+  ncol    = psb_cd_get_local_cols(desc_a)
 
   call psb_info(ictxt, me, np)
 

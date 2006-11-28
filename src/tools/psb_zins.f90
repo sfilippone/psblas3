@@ -36,7 +36,7 @@
 !                              val to be inserted.
 !    irw    - integer(:)       Row indices of rows of val (global numbering)
 !    val    - complex, dimension(:).   The source dense submatrix.  
-!    x       - complex, pointer, dimension(:).   The destination dense matrix.  
+!    x       - complex, dimension(:).   The destination dense matrix.  
 !    desc_a  - type(<psb_desc_type>).         The communication descriptor.
 !    info    - integer.                       Eventually returns an error code
 subroutine psb_zinsvi(m, irw, val, x, desc_a, info, dupl)
@@ -45,6 +45,7 @@ subroutine psb_zinsvi(m, irw, val, x, desc_a, info, dupl)
   use psb_const_mod
   use psb_error_mod
   use psb_penv_mod
+  use psi_mod
   implicit none
 
   ! m rows number of submatrix belonging to val to be inserted
@@ -62,21 +63,22 @@ subroutine psb_zinsvi(m, irw, val, x, desc_a, info, dupl)
   integer, optional, intent(in)    ::  dupl
 
   !locals.....
-  integer                :: ictxt,i,loc_row,glob_row,row,&
+  integer                :: ictxt,i,loc_row,glob_row,&
        & loc_rows,loc_cols,mglob,err_act, int_err(5)
-  integer                :: np,me,dupl_
-  character(len=20)   :: name
+  integer                :: np, me, dupl_
+  integer, allocatable   :: irl(:)
+  character(len=20)      :: name
 
   if(psb_get_errstatus() /= 0) return 
   info=0
   call psb_erractionsave(err_act)
-  name = 'psb_dinsvv'
+  name = 'psb_zinsvi'
 
-  if (.not.allocated(desc_a%glob_to_loc)) then
-    info=3110
-    call psb_errpush(info,name)
-    return
-  end if
+!!$  if (.not.allocated(desc_a%glob_to_loc)) then
+!!$    info=3110
+!!$    call psb_errpush(info,name)
+!!$    return
+!!$  end if
   if ((.not.allocated(desc_a%matrix_data))) then
     int_err(1)=3110
     call psb_errpush(info,name)
@@ -112,15 +114,25 @@ subroutine psb_zinsvi(m, irw, val, x, desc_a, info, dupl)
     goto 9999
   endif
 
-  loc_rows=psb_cd_get_local_rows(desc_a)
-  loc_cols=psb_cd_get_local_cols(desc_a)
+  if (m==0) return
+  loc_rows = psb_cd_get_local_rows(desc_a)
+  loc_cols = psb_cd_get_local_cols(desc_a)
   mglob    = psb_cd_get_global_rows(desc_a)
 
+  allocate(irl(m),stat=info) 
+  if (info /= 0) then 
+    info = 4000
+    call psb_errpush(info,name)
+    goto 9999
+  endif
+    
   if (present(dupl)) then 
     dupl_ = dupl
   else
     dupl_ = psb_dupl_ovwrt_
   endif
+  
+  call psi_idx_cnv(m,irw,irl,desc_a,info,owned=.true.)
 
   select case(dupl_) 
   case(psb_dupl_ovwrt_) 
@@ -128,15 +140,10 @@ subroutine psb_zinsvi(m, irw, val, x, desc_a, info, dupl)
       !loop over all val's rows
 
       ! row actual block row 
-      glob_row=irw(i) 
-      if ((glob_row>0).and.(glob_row <= mglob)) then 
-
-        loc_row=desc_a%glob_to_loc(glob_row)
-        if (loc_row.ge.1) then
-          ! this row belongs to me
-          ! copy i-th row of block val in x
-          x(loc_row) = val(i)
-        end if
+      if (irl(i) > 0) then
+        ! this row belongs to me
+        ! copy i-th row of block val in x
+        x(irl(i)) = val(i)
       end if
     enddo
 
@@ -145,16 +152,10 @@ subroutine psb_zinsvi(m, irw, val, x, desc_a, info, dupl)
     do i = 1, m
       !loop over all val's rows
 
-      ! row actual block row 
-      glob_row=irw(i) 
-      if ((glob_row>0).and.(glob_row <= mglob)) then 
-
-        loc_row=desc_a%glob_to_loc(glob_row)
-        if (loc_row.ge.1) then
+      if (irl(i) > 0) then
           ! this row belongs to me
           ! copy i-th row of block val in x
-          x(loc_row) = x(loc_row) +  val(i)
-        end if
+        x(irl(i)) = x(irl(i)) +  val(i)
       end if
     enddo
 
@@ -163,6 +164,7 @@ subroutine psb_zinsvi(m, irw, val, x, desc_a, info, dupl)
     call psb_errpush(info,name)
     goto 9999
   end select
+  deallocate(irl)
 
   call psb_erractionrestore(err_act)
   return
@@ -217,7 +219,7 @@ end subroutine psb_zinsvi
 !                              val to be inserted.
 !    irw    - integer(:)       Row indices of rows of val (global numbering)
 !    val    - complex, dimension(:,:).   The source dense submatrix.  
-!    x       - complex, pointer, dimension(:,:).   The destination dense matrix.  
+!    x       - complex, dimension(:,:).   The destination dense matrix.  
 !    desc_a  - type(<psb_desc_type>).         The communication descriptor.
 !    info    - integer.                       Eventually returns an error code
 subroutine psb_zinsi(m,irw, val, x, desc_a, info, dupl)
@@ -226,6 +228,7 @@ subroutine psb_zinsi(m,irw, val, x, desc_a, info, dupl)
   use psb_const_mod
   use psb_error_mod
   use psb_penv_mod
+  use psi_mod
   implicit none
 
   ! m rows number of submatrix belonging to val to be inserted
@@ -246,18 +249,19 @@ subroutine psb_zinsi(m,irw, val, x, desc_a, info, dupl)
   integer                :: ictxt,i,loc_row,glob_row,j,n,&
        & loc_rows,loc_cols,mglob,err_act, int_err(5)
   integer                :: np,me,dupl_
+  integer, allocatable   :: irl(:)
   character(len=20)   :: name
 
   if(psb_get_errstatus() /= 0) return 
   info=0
   call psb_erractionsave(err_act)
-  name = 'psb_dinsvv'
+  name = 'psb_zinsi'
 
-  if (.not.allocated(desc_a%glob_to_loc)) then
-    info=3110
-    call psb_errpush(info,name)
-    return
-  end if
+!!$  if (.not.allocated(desc_a%glob_to_loc)) then
+!!$    info=3110
+!!$    call psb_errpush(info,name)
+!!$    return
+!!$  end if
   if ((.not.allocated(desc_a%matrix_data))) then
     int_err(1)=3110
     call psb_errpush(info,name)
@@ -274,7 +278,7 @@ subroutine psb_zinsi(m,irw, val, x, desc_a, info, dupl)
   endif
 
   !... check parameters....
-  if (m.lt.0) then
+  if (m < 0) then
     info = 10
     int_err(1) = 1
     int_err(2) = m
@@ -292,9 +296,10 @@ subroutine psb_zinsi(m,irw, val, x, desc_a, info, dupl)
     call psb_errpush(info,name,int_err)
     goto 9999
   endif
+  if (m==0) return 
 
-  loc_rows=psb_cd_get_local_rows(desc_a)
-  loc_cols=psb_cd_get_local_cols(desc_a)
+  loc_rows = psb_cd_get_local_rows(desc_a)
+  loc_cols = psb_cd_get_local_cols(desc_a)
   mglob    = psb_cd_get_global_rows(desc_a)
 
   n = min(size(val,2),size(x,2))
@@ -305,23 +310,28 @@ subroutine psb_zinsi(m,irw, val, x, desc_a, info, dupl)
     dupl_ = psb_dupl_ovwrt_
   endif
 
+  allocate(irl(m),stat=info) 
+  if (info /= 0) then 
+    info = 4000
+    call psb_errpush(info,name)
+    goto 9999
+  endif
+  
+  call psi_idx_cnv(m,irw,irl,desc_a,info,owned=.true.)
+
   select case(dupl_) 
   case(psb_dupl_ovwrt_) 
     do i = 1, m
       !loop over all val's rows
 
       ! row actual block row 
-      glob_row=irw(i) 
-      if ((glob_row>0).and.(glob_row <= mglob)) then 
-
-        loc_row=desc_a%glob_to_loc(glob_row)
-        if (loc_row.ge.1) then
-          ! this row belongs to me
-          ! copy i-th row of block val in x
-          do j=1,n
-            x(loc_row,j) = val(i,j)
-          end do
-        end if
+      loc_row = irl(i)
+      if (loc_row > 0) then
+        ! this row belongs to me
+        ! copy i-th row of block val in x
+        do j=1,n
+          x(loc_row,j) = val(i,j)
+        end do
       end if
     enddo
 
@@ -331,17 +341,13 @@ subroutine psb_zinsi(m,irw, val, x, desc_a, info, dupl)
       !loop over all val's rows
 
       ! row actual block row 
-      glob_row=irw(i) 
-      if ((glob_row>0).and.(glob_row <= mglob)) then 
-
-        loc_row=desc_a%glob_to_loc(glob_row)
-        if (loc_row.ge.1) then
-          ! this row belongs to me
-          ! copy i-th row of block val in x
-          do j=1,n
-            x(loc_row,j) = x(loc_row,j) +  val(i,j)
-          end do
-        end if
+      loc_row = irl(i)
+      if (loc_row > 0) then
+        ! this row belongs to me
+        ! copy i-th row of block val in x
+        do j=1,n
+          x(loc_row,j) = x(loc_row,j) +  val(i,j)
+        end do
       end if
     enddo
 
@@ -350,6 +356,7 @@ subroutine psb_zinsi(m,irw, val, x, desc_a, info, dupl)
     call psb_errpush(info,name)
     goto 9999
   end select
+  deallocate(irl)
 
   call psb_erractionrestore(err_act)
   return

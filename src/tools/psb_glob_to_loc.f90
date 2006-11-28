@@ -46,6 +46,8 @@ subroutine psb_glob_to_loc2(x,y,desc_a,info,iact)
   use psb_const_mod
   use psb_error_mod
   use psb_string_mod
+  use psb_penv_mod
+  use psi_mod
   implicit none
 
   !...parameters....
@@ -77,47 +79,23 @@ subroutine psb_glob_to_loc2(x,y,desc_a,info,iact)
   int_err=0
   real_val = 0.d0
 
-  n=size(x)
-  do i=1,n
-    if ((x(i).gt.psb_cd_get_global_rows(desc_a)).or.&
-         &  (x(i).le.zero)) then
-      if (act == 'I') then
-        y(i)=-3*psb_cd_get_global_rows(desc_a)
-      else
-        info=140
-        int_err(1)=x(i)
-        int_err(2)=psb_cd_get_global_rows(desc_a)
-        exit
-      end if
-    else
-      tmp=desc_a%glob_to_loc(x(i))
-      if((tmp.gt.zero).or.(tmp.le.psb_cd_get_local_cols(desc_a))) then
-        y(i)=tmp
-      else if (tmp.le.zero) then
-        info = 150
-        int_err(1)=tmp
-        exit
-      else if (tmp.gt.psb_cd_get_local_cols(desc_a)) then
-        info = 140
-        int_err(1)=tmp
-        int_err(2)=psb_cd_get_local_cols(desc_a)
-        exit
-      end if
-    end if
-  enddo
+  n = size(x)
+  call psi_idx_cnv(n,x,y,desc_a,info)
 
-  if (info /= 0) then
-    select case(act)
-    case('E','I')
-      call psb_erractionrestore(err_act)
-      return
-    case('W')
+  select case(act)
+  case('E','I')
+    call psb_erractionrestore(err_act)
+    return
+  case('W')
+    if ((info /= 0).or.(count(y(1:n)<0) >0)) then
       write(0,'("Error ",i5," in subroutine glob_to_loc")') info
-    case('A')
+    end if
+  case('A')
+    if ((info /= 0).or.(count(y(1:n)<0) >0)) then
       call psb_errpush(info,name)
       goto 9999
-    end select
-  endif
+    end if
+  end select
 
   call psb_erractionrestore(err_act)
   return
@@ -177,31 +155,37 @@ end subroutine psb_glob_to_loc2
 !
 subroutine psb_glob_to_loc(x,desc_a,info,iact)
 
+  use psb_penv_mod
   use psb_descriptor_type
   use psb_const_mod
   use psb_error_mod
   use psb_string_mod
+  use psi_mod
   implicit none
 
   !...parameters....
-  type(psb_desc_type), intent(in)        ::  desc_a
-  integer, intent(inout)             ::  x(:)  
-  integer, intent(out)               :: info
-  character, intent(in), optional    ::  iact
+  type(psb_desc_type), intent(in)  :: desc_a
+  integer, intent(inout)           :: x(:)  
+  integer, intent(out)             :: info
+  character, intent(in), optional  :: iact
 
   !....locals....
-  integer                            ::  n, i, tmp
-  character                          ::  act
-  integer                            ::  int_err(5), err_act
-  real(kind(1.d0))                   ::  real_val
-  integer, parameter                 ::  zero=0
+  integer                          :: n, i, tmp, nk, key, idx, ih, nh, lb, ub, lm
+  character                        :: act
+  integer                          :: int_err(5), err_act, dectype
+  real(kind(1.d0))                 :: real_val, t0, t1,t2
+  integer, parameter               :: zero=0
   character(len=20)   :: name
+  integer             :: ictxt, iam, np
 
   if(psb_get_errstatus() /= 0) return 
   info=0
   name = 'glob_to_loc'
+  ictxt = desc_a%matrix_data(psb_ctxt_)
+  call psb_info(ictxt,iam,np)
   call psb_erractionsave(err_act)
 
+  dectype  = desc_a%matrix_data(psb_dec_type_)
   if (present(iact)) then
     act=iact
   else
@@ -210,48 +194,24 @@ subroutine psb_glob_to_loc(x,desc_a,info,iact)
 
   act = toupper(act)
 
-  real_val = 0.d0
-  n=size(x)
-  do i=1,n
-    if ((x(i).gt.psb_cd_get_global_rows(desc_a)).or.&
-         &  (x(i).le.zero)) then
-      if(act == 'I') then
-        x(i)=-3*psb_cd_get_global_rows(desc_a)
-      else
-        info=140
-        int_err(1)=x(i)
-        int_err(2)=psb_cd_get_global_rows(desc_a)
-        exit
-      end if
-    else
-      tmp=desc_a%glob_to_loc(x(i))
-      if((tmp.gt.zero).or.(tmp.le.psb_cd_get_local_cols(desc_a))) then
-        x(i)=tmp
-      else if (tmp.le.zero) then
-        info = 150
-        int_err(1)=tmp
-        exit
-      else if (tmp.ge.psb_cd_get_local_cols(desc_a)) then
-        info = 140
-        int_err(1)=tmp
-        int_err(2)=psb_cd_get_local_cols(desc_a)
-        exit
-      end if
-    end if
-  enddo
+  n = size(x)
+  call psi_idx_cnv(n,x,desc_a,info)
 
-  if (info /= 0) then
-    select case(act)
-    case('E','I')
-      call psb_erractionrestore(err_act)
-      return
-    case('W')
+  select case(act)
+  case('E','I')
+    call psb_erractionrestore(err_act)
+    return
+  case('W')
+    if ((info /= 0).or.(count(x(1:n)<0) >0)) then
       write(0,'("Error ",i5," in subroutine glob_to_loc")') info
-    case('A')
+    end if
+  case('A')
+    if ((info /= 0).or.(count(x(1:n)<0) >0)) then
+      write(0,*) count(x(1:n)<0)
       call psb_errpush(info,name)
       goto 9999
-    end select
-  endif
+    end if
+  end select
 
   call psb_erractionrestore(err_act)
   return
@@ -265,6 +225,70 @@ subroutine psb_glob_to_loc(x,desc_a,info,iact)
     call psb_error()
   end if
   return
+
+contains 
+
+  subroutine inlbsrch(ipos,key,n,v)
+    implicit none
+    integer ipos, key, n
+    integer v(n)
+
+    integer lb, ub, m
+
+
+    lb = 1 
+    ub = n
+    ipos = -1 
+
+    do 
+      if (lb > ub) return
+      m = (lb+ub)/2
+      if (key.eq.v(m))  then
+        ipos = m 
+        return
+      else if (key.lt.v(m))  then
+        ub = m-1
+      else 
+        lb = m + 1
+      end if
+    enddo
+    return
+  end subroutine inlbsrch
+
+  subroutine inner_cnv(n,x,hashsize,hashmask,hashv,glb_lc)
+    integer :: n, hashsize,hashmask,x(:), hashv(0:),glb_lc(:,:)
+    integer :: i, ih, key, idx,nh,tmp,lb,ub,lm
+    do i=1, n
+      key = x(i) 
+      ih  = iand(key,hashmask)
+      idx = hashv(ih)
+      nh  = hashv(ih+1) - hashv(ih) 
+      if (nh > 0) then 
+        tmp = -1 
+        lb = idx
+        ub = idx+nh-1
+        do 
+          if (lb>ub) exit
+          lm = (lb+ub)/2
+          if (key==glb_lc(lm,1)) then 
+            tmp = lm
+            exit
+          else if (key<glb_lc(lm,1)) then 
+            ub = lm - 1
+          else
+            lb = lm + 1
+          end if
+        end do
+      else 
+        tmp = -1
+      end if
+      if (tmp > 0) then 
+        x(i) = glb_lc(tmp,2)
+      else         
+        x(i) = tmp 
+      end if
+    end do
+  end subroutine inner_cnv
 
 end subroutine psb_glob_to_loc
 

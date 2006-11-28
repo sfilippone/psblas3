@@ -70,7 +70,7 @@ subroutine psb_cdprt(iout,desc_p,glob,short)
          & write(iout,*) 'Loc_to_glob ',desc_p%loc_to_glob(1:n_row), ': ',&
          & desc_p%loc_to_glob(n_row+1:n_col)
 
-    if (.not.lshort) write(iout,*) 'glob_to_loc ',desc_p%glob_to_loc(1:m)
+!!$    if (.not.lshort) write(iout,*) 'glob_to_loc ',desc_p%glob_to_loc(1:m) 
     write(iout,*) 'Halo_index'
     counter      = 1
     Do

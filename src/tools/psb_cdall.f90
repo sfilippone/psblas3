@@ -269,6 +269,7 @@ subroutine psb_cdall(m, n, parts, ictxt, desc_a, info)
   endif
   ! estimate local cols number 
   loc_col=min(2*loc_row,m)
+
   allocate(desc_a%loc_to_glob(loc_col),&
        &desc_a%lprm(1),stat=info)  
   if (info /= 0) then 

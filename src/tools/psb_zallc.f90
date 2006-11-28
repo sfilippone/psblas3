@@ -56,7 +56,7 @@ subroutine psb_zalloc(x, desc_a, info, n)
 
   !locals
   integer             :: np,me,err,n_col,n_row,i,j,err_act
-  integer             :: ictxt,dectype,n_
+  integer             :: ictxt,n_
   integer             :: int_err(5),exch(3)
   character(len=20)   :: name, ch_err
 
@@ -76,7 +76,6 @@ subroutine psb_zalloc(x, desc_a, info, n)
     goto 9999
   endif
 
-  dectype=psb_cd_get_dectype(desc_a)
   !... check m and n parameters....
   if (.not.psb_is_ok_desc(desc_a)) then 
     info = 3110
@@ -202,7 +201,7 @@ subroutine psb_zallocv(x, desc_a,info,n)
   integer, optional, intent(in)         :: n
 
   !locals
-  integer             :: np,me,n_col,n_row,dectype,i,err_act
+  integer             :: np,me,n_col,n_row,i,err_act
   integer             :: ictxt, n_
   logical, parameter  :: debug=.false. 
   character(len=20)   :: name, ch_err
@@ -222,9 +221,7 @@ subroutine psb_zallocv(x, desc_a,info,n)
     goto 9999
   endif
 
-  dectype=psb_cd_get_dectype(desc_a)
-  if (debug) write(0,*) 'dall: dectype',dectype
-  if (debug) write(0,*) 'dall: is_ok? dectype',psb_is_ok_desc(desc_a)
+  if (debug) write(0,*) 'dall: is_ok?',psb_is_ok_desc(desc_a)
   !... check m and n parameters....
   if (.not.psb_is_ok_desc(desc_a)) then 
     info = 3110

@@ -54,7 +54,7 @@ subroutine psb_cdcpy(desc_in, desc_out, info)
   integer, intent(out)             :: info
 
   !locals
-  integer             :: np,me,ictxt, isz, err_act
+  integer             :: np,me,ictxt, isz, err_act,idx,gidx,lidx
   logical, parameter  :: debug=.false.,debugprt=.false.
   character(len=20)   :: name, char_err
   if (debug) write(0,*) me,'Entered CDCPY'
@@ -63,37 +63,60 @@ subroutine psb_cdcpy(desc_in, desc_out, info)
   call psb_erractionsave(err_act)
   name = 'psb_cdcpy'
 
-  
-  ictxt=desc_in%matrix_data(psb_ctxt_)
+  ictxt = psb_cd_get_context(desc_in)
 
   ! check on blacs grid 
   call psb_info(ictxt, me, np)
   if (debug) write(0,*) me,'Entered CDCPY'
   if (np == -1) then
-     info = 2010
-     call psb_errpush(info,name)
-     goto 9999
+    info = 2010
+    call psb_errpush(info,name)
+    goto 9999
   endif
+!!$  call psb_cdfree(desc_out,info)
 
+!!$  call psb_nullify_desc(desc_out)
 
   call psb_safe_cpy(desc_in%matrix_data,desc_out%matrix_data,info)
   if (info == 0)   call psb_safe_cpy(desc_in%halo_index,desc_out%halo_index,info)
-!!$  if (info == 0)   call psb_safe_cpy(desc_in%halo_pt,desc_out%halo_pt,info)
   if (info == 0)   call psb_safe_cpy(desc_in%ovrlap_index,desc_out%ovrlap_index,info)
-!!$  if (info == 0)   call psb_safe_cpy(desc_in%ovrlap_pt,desc_out%ovrlap_pt,info)
   if (info == 0)   call psb_safe_cpy(desc_in%bnd_elem,desc_out%bnd_elem,info)
   if (info == 0)   call psb_safe_cpy(desc_in%ovrlap_elem,desc_out%ovrlap_elem,info)
   if (info == 0)   call psb_safe_cpy(desc_in%loc_to_glob,desc_out%loc_to_glob,info)
   if (info == 0)   call psb_safe_cpy(desc_in%glob_to_loc,desc_out%glob_to_loc,info)
   if (info == 0)   call psb_safe_cpy(desc_in%lprm,desc_out%lprm,info)
   if (info == 0)   call psb_safe_cpy(desc_in%idx_space,desc_out%idx_space,info)
-  
+  if (info == 0)   call psb_safe_cpy(desc_in%hashv,desc_out%hashv,info)
+  if (info == 0)   call psb_safe_cpy(desc_in%glb_lc,desc_out%glb_lc,info)
+
+  if (info == 0) then 
+    if (allocated(desc_in%ptree)) then 
+      allocate(desc_out%ptree(2),stat=info)
+      if (info /= 0) then 
+        info=4000
+        goto 9999
+      endif
+      if (.true.) then 
+        call ClonePairSearchTree(desc_in%ptree,desc_out%ptree)
+      else
+        call InitPairSearchTree(desc_out%ptree,info)
+        do idx=1, psb_cd_get_local_cols(desc_out)
+          gidx = desc_out%loc_to_glob(idx)
+          call SearchInsKeyVal(desc_out%ptree,gidx,idx,lidx,info)        
+          if (lidx /= idx) then 
+            write(0,*) 'Warning from cdcpy: mismatch in PTREE ',idx,lidx
+          endif
+        enddo
+      end if
+    end if
+  end if
+
   if (info /= 0) then
     info = 4010
     call psb_errpush(info,name)
     goto 9999
   endif
-  
+
   call psb_erractionrestore(err_act)
   return
   

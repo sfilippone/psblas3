@@ -63,22 +63,34 @@ subroutine psb_dspins(nz,ia,ja,val,a,desc_a,info,rebuild)
   logical, intent(in), optional        :: rebuild
   !locals.....
 
-  integer :: nrow, err_act, dectype,mglob,ncol, spstate
+  integer :: nrow, err_act,mglob,ncol, spstate
   integer                :: ictxt,np,me
   logical, parameter     :: debug=.false.
   integer, parameter     :: relocsz=200
   logical                :: rebuild_
+  integer, allocatable   :: ila(:),jla(:)
 
   interface psb_cdins
-    subroutine psb_cdins(nz,ia,ja,desc_a,info)
+    subroutine psb_cdins(nz,ia,ja,desc_a,info,ila,jla)
       use psb_descriptor_type
       implicit none
       type(psb_desc_type), intent(inout) ::  desc_a
-      integer, intent(in)            ::  nz,ia(:),ja(:)
-      integer, intent(out)           :: info
+      integer, intent(in)                ::  nz,ia(:),ja(:)
+      integer, intent(out)               :: info
+      integer, optional, intent(out)     :: ila(:), jla(:)
     end subroutine psb_cdins
   end interface
 
+  interface psb_glob_to_loc
+    subroutine psb_glob_to_loc(x,desc_a,info,iact)
+      use psb_descriptor_type
+      implicit none
+      type(psb_desc_type), intent(in)  :: desc_a
+      integer, intent(inout)           :: x(:)  
+      integer, intent(out)             :: info
+      character, intent(in), optional  :: iact
+    end subroutine psb_glob_to_loc
+  end interface
   character(len=20)  :: name, ch_err
 
   info = 0
@@ -87,8 +99,7 @@ subroutine psb_dspins(nz,ia,ja,val,a,desc_a,info,rebuild)
 
 
   ictxt = psb_cd_get_context(desc_a)
-  dectype = psb_cd_get_dectype(desc_a)
-  mglob   = psb_cd_get_global_rows(desc_a)
+  mglob = psb_cd_get_global_rows(desc_a)
 
   call psb_info(ictxt, me, np)
 
@@ -98,7 +109,7 @@ subroutine psb_dspins(nz,ia,ja,val,a,desc_a,info,rebuild)
     goto 9999
   endif
 
-  if (nz <= 0) then 
+  if (nz < 0) then 
     info = 1111
     call psb_errpush(info,name)
     goto 9999
@@ -119,6 +130,7 @@ subroutine psb_dspins(nz,ia,ja,val,a,desc_a,info,rebuild)
     call psb_errpush(info,name)
     goto 9999
   end if
+  if (nz==0) return
 
   if (present(rebuild)) then 
     rebuild_ = rebuild
@@ -128,39 +140,104 @@ subroutine psb_dspins(nz,ia,ja,val,a,desc_a,info,rebuild)
 
   spstate = a%infoa(psb_state_)
   if (psb_is_bld_desc(desc_a)) then 
-    call  psb_cdins(nz,ia,ja,desc_a,info)
-    if (info /= 0) then
-      info=4010
-      ch_err='psb_cdins'
-      call psb_errpush(info,name,a_err=ch_err)
-      goto 9999
+    if (psb_is_large_desc(desc_a)) then 
+
+      allocate(ila(nz),jla(nz),stat=info)
+      if (info /= 0) then
+        ch_err='allocate'
+        call psb_errpush(4013,name,a_err=ch_err,i_err=(/info,0,0,0,0/))
+        goto 9999
+      end if
+      call  psb_cdins(nz,ia,ja,desc_a,info,ila=ila,jla=jla)
+      if (info /= 0) then
+        ch_err='psb_cdins'
+        call psb_errpush(4013,name,a_err=ch_err,i_err=(/info,0,0,0,0/))
+        goto 9999
+      end if
+      nrow = psb_cd_get_local_rows(desc_a)
+      ncol = psb_cd_get_local_cols(desc_a)
+
+      if (spstate == psb_spmat_bld_) then 
+        call psb_coins(nz,ila,jla,val,a,1,nrow,1,ncol,info)
+        if (info /= 0) then
+          info=4010
+          ch_err='psb_coins'
+          call psb_errpush(info,name,a_err=ch_err)
+          goto 9999
+        end if
+      else
+        info = 1123
+        call psb_errpush(info,name)
+        goto 9999
+      end if
+
+    else
+
+      call  psb_cdins(nz,ia,ja,desc_a,info)
+      if (info /= 0) then
+        ch_err='psb_cdins'
+        call psb_errpush(4013,name,a_err=ch_err,i_err=(/info,0,0,0,0/))
+        goto 9999
+      end if
+      nrow = psb_cd_get_local_rows(desc_a)
+      ncol = psb_cd_get_local_cols(desc_a)
+
+      if (spstate == psb_spmat_bld_) then 
+        call psb_coins(nz,ia,ja,val,a,1,nrow,1,ncol,info,gtl=desc_a%glob_to_loc)
+        if (info /= 0) then
+          info=4010
+          ch_err='psb_coins'
+          call psb_errpush(info,name,a_err=ch_err)
+          goto 9999
+        end if
+      else
+        info = 1123
+        call psb_errpush(info,name)
+        goto 9999
+      end if
+
     end if
     nrow = psb_cd_get_local_rows(desc_a)
     ncol = psb_cd_get_local_cols(desc_a)
 
-    if (spstate == psb_spmat_bld_) then 
-      call psb_coins(nz,ia,ja,val,a,1,nrow,1,ncol,info,gtl=desc_a%glob_to_loc)
+  else if (psb_is_asb_desc(desc_a)) then 
+
+    if (psb_is_large_desc(desc_a)) then 
+
+      allocate(ila(nz),jla(nz),stat=info)
+      if (info /= 0) then
+        ch_err='allocate'
+        call psb_errpush(4013,name,a_err=ch_err,i_err=(/info,0,0,0,0/))
+        goto 9999
+      end if
+
+      ila(1:nz) = ia(1:nz)
+      jla(1:nz) = ja(1:nz)
+      call psb_glob_to_loc(ila(1:nz),desc_a,info,iact='I')
+      call psb_glob_to_loc(jla(1:nz),desc_a,info,iact='I')
+      nrow = psb_cd_get_local_rows(desc_a)
+      ncol = psb_cd_get_local_cols(desc_a)
+
+      call psb_coins(nz,ia,ja,val,a,1,nrow,1,ncol,&
+           & info,rebuild=rebuild_)
       if (info /= 0) then
         info=4010
         ch_err='psb_coins'
         call psb_errpush(info,name,a_err=ch_err)
         goto 9999
       end if
+
     else
-      info = 1123
-      call psb_errpush(info,name)
-      goto 9999
-    end if
-  else if (psb_is_asb_desc(desc_a)) then 
-    nrow = psb_cd_get_local_rows(desc_a)
-    ncol = psb_cd_get_local_cols(desc_a)
-    call psb_coins(nz,ia,ja,val,a,1,nrow,1,ncol,&
-         & info,gtl=desc_a%glob_to_loc,rebuild=rebuild_)
-    if (info /= 0) then
-      info=4010
-      ch_err='psb_coins'
-      call psb_errpush(info,name,a_err=ch_err)
-      goto 9999
+      nrow = psb_cd_get_local_rows(desc_a)
+      ncol = psb_cd_get_local_cols(desc_a)
+      call psb_coins(nz,ia,ja,val,a,1,nrow,1,ncol,&
+           & info,gtl=desc_a%glob_to_loc,rebuild=rebuild_)
+      if (info /= 0) then
+        info=4010
+        ch_err='psb_coins'
+        call psb_errpush(info,name,a_err=ch_err)
+        goto 9999
+      end if
     end if
   else
     info = 1122

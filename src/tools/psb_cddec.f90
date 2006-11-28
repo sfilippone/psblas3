@@ -203,7 +203,6 @@ subroutine psb_cddec(nloc, ictxt, desc_a, info)
     endif
   enddo
 
-
   tovr  = -1 
   thalo = -1
   
@@ -214,7 +213,6 @@ subroutine psb_cddec(nloc, ictxt, desc_a, info)
     call psb_errpush(4010,name,a_err='psi_bld_cdesc')
     goto 9999
   end if
-
 
   desc_a%matrix_data(psb_dec_type_) = psb_desc_asb_
 

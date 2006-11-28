@@ -65,7 +65,7 @@ subroutine psb_zspasb(a,desc_a, info, afmt, upd, dupl)
   integer               :: int_err(5)
   type(psb_zspmat_type) :: atemp
   integer               :: np,me,n_col,iout, err_act
-  integer               :: dscstate, spstate
+  integer               :: spstate
   integer               :: upd_, dupl_
   integer               :: ictxt,n_row
   logical, parameter    :: debug=.false., debugwrt=.false.
@@ -76,8 +76,7 @@ subroutine psb_zspasb(a,desc_a, info, afmt, upd, dupl)
   name = 'psb_spasb'
   call psb_erractionsave(err_act)
 
-  ictxt  = psb_cd_get_context(desc_a)
-  dscstate = psb_cd_get_dectype(desc_a)
+  ictxt    = psb_cd_get_context(desc_a)
   n_row    = psb_cd_get_local_rows(desc_a)
   n_col    = psb_cd_get_local_cols(desc_a)
 
@@ -89,9 +88,9 @@ subroutine psb_zspasb(a,desc_a, info, afmt, upd, dupl)
     goto 9999
   endif
 
-  if (.not.psb_is_asb_dec(dscstate)) then 
+  if (.not.psb_is_asb_desc(desc_a)) then 
     info = 600
-    int_err(1) = dscstate
+    int_err(1) = psb_cd_get_dectype(desc_a)
     call psb_errpush(info,name)
     goto 9999
   endif
@@ -100,7 +99,7 @@ subroutine psb_zspasb(a,desc_a, info, afmt, upd, dupl)
 
   !check on errors encountered in psdspins
 
-  spstate = a%infoa(psb_state_) 
+  spstate     = a%infoa(psb_state_) 
   if (spstate == psb_spmat_bld_) then 
     !
     ! First case: we come from a fresh build. 

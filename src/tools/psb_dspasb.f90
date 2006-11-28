@@ -76,7 +76,7 @@ subroutine psb_dspasb(a,desc_a, info, afmt, upd, dupl)
   name = 'psb_spasb'
   call psb_erractionsave(err_act)
 
-  ictxt  = psb_cd_get_context(desc_a)
+  ictxt    = psb_cd_get_context(desc_a)
   dscstate = psb_cd_get_dectype(desc_a)
   n_row    = psb_cd_get_local_rows(desc_a)
   n_col    = psb_cd_get_local_cols(desc_a)
@@ -105,9 +105,9 @@ subroutine psb_dspasb(a,desc_a, info, afmt, upd, dupl)
     !
     ! First case: we come from a fresh build. 
     ! 
-
     n_row = psb_cd_get_local_rows(desc_a)
     n_col = psb_cd_get_local_cols(desc_a)
+
 
     !
     ! Second step: handle the local matrix part. 

@@ -51,13 +51,13 @@ subroutine psb_dalloc(x, desc_a, info, n)
   !....parameters...
   real(kind(1.d0)), allocatable, intent(out)  :: x(:,:)
   type(psb_desc_type), intent(in)       :: desc_a
-  integer                               :: info
+  integer,intent(out)                   :: info
   integer, optional, intent(in)         :: n
 
 
   !locals
   integer             :: np,me,err,n_col,n_row,i,j,err_act
-  integer             :: ictxt,dectype,n_
+  integer             :: ictxt,n_
   integer             :: int_err(5), exch(3)
   character(len=20)   :: name, ch_err
 
@@ -77,7 +77,6 @@ subroutine psb_dalloc(x, desc_a, info, n)
     goto 9999
   endif
 
-  dectype=psb_cd_get_dectype(desc_a)
   !... check m and n parameters....
   if (.not.psb_is_ok_desc(desc_a)) then 
     info = 3110
@@ -199,11 +198,11 @@ subroutine psb_dallocv(x, desc_a,info,n)
   !....parameters...
   real(kind(1.d0)), allocatable, intent(out) :: x(:)
   type(psb_desc_type), intent(in) :: desc_a
-  integer                         :: info
+  integer,intent(out)             :: info
   integer, optional, intent(in)   :: n
 
   !locals
-  integer             :: np,me,n_col,n_row,dectype,i,err_act
+  integer             :: np,me,n_col,n_row,i,err_act
   integer             :: ictxt
   logical, parameter  :: debug=.false. 
   character(len=20)   :: name, ch_err
@@ -223,9 +222,6 @@ subroutine psb_dallocv(x, desc_a,info,n)
     goto 9999
   endif
 
-  dectype=psb_cd_get_dectype(desc_a)
-  if (debug) write(0,*) 'dall: dectype',dectype
-  if (debug) write(0,*) 'dall: is_ok? dectype',psb_is_ok_desc(desc_a)
   !... check m and n parameters....
   if (.not.psb_is_ok_desc(desc_a)) then 
     info = 3110
@@ -261,6 +257,8 @@ subroutine psb_dallocv(x, desc_a,info,n)
     do i=1,n_row
       x(i) = 0.0d0
     end do
+  else
+    write(0,*) 'Did not allocate anything because of dectype',psb_cd_get_dectype(desc_a)
   endif
 
   call psb_erractionrestore(err_act)

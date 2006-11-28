@@ -61,11 +61,11 @@ subroutine psb_zspfree(a, desc_a,info)
   call psb_erractionsave(err_act)
 
   if (.not.allocated(desc_a%matrix_data)) then 
-    info=295
+    info = 295
     call psb_errpush(info,name)
     return
   else
-    ictxt=psb_cd_get_context(desc_a)
+    ictxt = psb_cd_get_context(desc_a)
   end if
 
   !...deallocate a....

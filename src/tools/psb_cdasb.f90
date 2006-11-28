@@ -1,4 +1,4 @@
-!!$ 
+!!$  
 !!$              Parallel Sparse BLAS  v2.0
 !!$    (C) Copyright 2006 Salvatore Filippone    University of Rome Tor Vergata
 !!$                       Alfredo Buttari        University of Rome Tor Vergata
@@ -45,6 +45,7 @@ subroutine psb_cdasb(desc_a,info)
   use psb_penv_mod
   implicit none
 
+  include 'mpif.h'
   !...Parameters....
   type(psb_desc_type), intent(inout) :: desc_a
   integer, intent(out)               :: info
@@ -52,10 +53,11 @@ subroutine psb_cdasb(desc_a,info)
 
   !....Locals....
   integer          ::  int_err(5), itemp(2)
-  integer,allocatable  ::  ovrlap_index(:),halo_index(:)
-  integer          ::  i,err,np,me,&
-       & lovrlap,lhalo,nhalo,novrlap,max_size,max_halo,n_col,ldesc_halo,&
-       & ldesc_ovrlap, dectype, err_act
+  integer,allocatable ::  ovrlap_index(:),halo_index(:)
+
+  integer          ::  i,j,err,np,me,lovrlap,lhalo,nhalo,novrlap,max_size,&
+       & max_halo,n_col,ldesc_halo, ldesc_ovrlap, dectype, err_act, &
+       & key, ih, nh, idx, nk,icomm,hsize
   integer                       :: ictxt,n_row
   logical, parameter            :: debug=.false., debugwrt=.false.
   character(len=20)             :: name,ch_err
@@ -70,6 +72,7 @@ subroutine psb_cdasb(desc_a,info)
   dectype = psb_cd_get_dectype(desc_a)
   n_row   = psb_cd_get_local_rows(desc_a)
   n_col   = psb_cd_get_local_cols(desc_a)
+  call psb_get_mpicomm(ictxt,icomm )
 
   ! check on blacs grid 
   call psb_info(ictxt, me, np)
@@ -102,7 +105,12 @@ subroutine psb_cdasb(desc_a,info)
       call psb_errpush(info,name,i_err=int_err)
       goto 9999
     endif
+
     call psb_realloc(psb_cd_get_local_cols(desc_a),desc_a%loc_to_glob,info)
+
+    if (psb_is_large_desc(desc_a)) then 
+      call psi_ldsc_pre_halo(desc_a,info)
+    end if
 
     call psb_transfer(desc_a%ovrlap_index,ovrlap_index,info)
     call psb_transfer(desc_a%halo_index,halo_index,info)
@@ -113,8 +121,6 @@ subroutine psb_cdasb(desc_a,info)
       goto 9999
     end if
 
-    ! Ok, register into MATRIX_DATA &  free temporary work areas
-    desc_a%matrix_data(psb_dec_type_) = psb_desc_asb_
 
     deallocate(ovrlap_index, halo_index, stat=info)
     if (info /= 0) then
@@ -122,7 +128,15 @@ subroutine psb_cdasb(desc_a,info)
       call psb_errpush(info,name)
       goto 9999
     end if
-    
+
+    if (psb_is_large_dec(dectype) ) then 
+      desc_a%matrix_data(psb_dec_type_) = psb_desc_large_asb_
+!!$      write(0,*) 'Done large dec asmbly',desc_a%matrix_data(psb_dec_type_),&
+!!$           & psb_desc_large_asb_,psb_is_asb_dec(desc_a%matrix_data(psb_dec_type_))
+    else
+      ! Ok, register into MATRIX_DATA &  free temporary work areas
+      desc_a%matrix_data(psb_dec_type_) = psb_desc_asb_
+    endif
   else
     info = 600
     call psb_errpush(info,name)

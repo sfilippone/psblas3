@@ -68,8 +68,9 @@ subroutine psb_dspalloc(a, desc_a, info, nnz)
   call psb_erractionsave(err_act)
   name = 'psb_dspalloc'
 
-  ictxt = psb_cd_get_context(desc_a)
+  ictxt   = psb_cd_get_context(desc_a)
   dectype = psb_cd_get_dectype(desc_a)
+
   call psb_info(ictxt, me, np)
   !     ....verify blacs grid correctness..
   if (np == -1) then
@@ -127,7 +128,7 @@ subroutine psb_dspalloc(a, desc_a, info, nnz)
   a%infoa(psb_state_) = psb_spmat_bld_
 
   if (debug) write(0,*) 'spall: ',  &
-       &psb_cd_get_dectype(desc_a),psb_desc_bld_
+       & psb_cd_get_dectype(desc_a),psb_desc_bld_
 
   return
 

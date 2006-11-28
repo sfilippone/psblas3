@@ -53,7 +53,7 @@ subroutine psb_dasb(x, desc_a, info)
 
   ! local variables
   integer :: ictxt,np,me,nrow,ncol, err_act
-  integer :: int_err(5), i1sz, i2sz, dectype
+  integer :: int_err(5), i1sz, i2sz
   real(kind(1.d0)),parameter    :: one=1
   logical, parameter :: debug=.false.
   character(len=20)   :: name, ch_err
@@ -69,14 +69,13 @@ subroutine psb_dasb(x, desc_a, info)
     goto 9999
   endif
 
-  ictxt=psb_cd_get_context(desc_a)
-  dectype=psb_cd_get_dectype(desc_a)
+  ictxt   = psb_cd_get_context(desc_a)
 
   call psb_info(ictxt, me, np)
 
 
   if (debug) write(*,*) 'asb start: ',np,me,&
-       &psb_cd_get_dectype(desc_a)
+       & psb_cd_get_dectype(desc_a)
   !     ....verify blacs grid correctness..
   if (np == -1) then
     info = 2010
@@ -84,16 +83,16 @@ subroutine psb_dasb(x, desc_a, info)
     goto 9999
   else if (.not.psb_is_asb_desc(desc_a)) then
     if (debug) write(*,*) 'asb error ',&
-         &dectype
+         & psb_cd_get_dectype(desc_a)
     info = 3110
     call psb_errpush(info,name)
     goto 9999
   endif
 
   ! check size
-  ictxt=psb_cd_get_context(desc_a)
-  nrow=psb_cd_get_local_rows(desc_a)
-  ncol=psb_cd_get_local_cols(desc_a)
+  ictxt = psb_cd_get_context(desc_a)
+  nrow  = psb_cd_get_local_rows(desc_a)
+  ncol  = psb_cd_get_local_cols(desc_a)
   i1sz = size(x,dim=1)
   i2sz = size(x,dim=2)
   if (debug) write(*,*) 'asb: ',i1sz,i2sz,nrow,ncol
@@ -184,7 +183,7 @@ subroutine psb_dasbv(x, desc_a, info)
 
   ! local variables
   integer :: ictxt,np,me
-  integer :: int_err(5), i1sz,nrow,ncol, dectype, err_act
+  integer :: int_err(5), i1sz,nrow,ncol, err_act
   real(kind(1.d0)),parameter    :: one=1
   logical, parameter :: debug=.false.
   character(len=20)             :: name,ch_err
@@ -193,8 +192,7 @@ subroutine psb_dasbv(x, desc_a, info)
   int_err(1) = 0
   name = 'psb_dasbv'
 
-  ictxt=psb_cd_get_context(desc_a)
-  dectype=psb_cd_get_dectype(desc_a)
+  ictxt   = psb_cd_get_context(desc_a)
 
   call psb_info(ictxt, me, np)
 
@@ -209,8 +207,8 @@ subroutine psb_dasbv(x, desc_a, info)
     goto 9999
   endif
 
-  nrow=psb_cd_get_local_rows(desc_a)
-  ncol=psb_cd_get_local_cols(desc_a)
+  nrow = psb_cd_get_local_rows(desc_a)
+  ncol = psb_cd_get_local_cols(desc_a)
   if (debug) write(*,*) name,' sizes: ',nrow,ncol
   i1sz = size(x)
   if (debug) write(*,*) 'dasb: sizes ',i1sz,ncol

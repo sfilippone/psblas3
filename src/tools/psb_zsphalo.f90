@@ -100,7 +100,8 @@ Subroutine psb_zsphalo(a,desc_a,blk,info,rwcnv,clcnv,outfmt)
     outfmt_ = 'CSR'
   endif
 
-  ictxt=psb_cd_get_context(desc_a)
+  ictxt = psb_cd_get_context(desc_a)
+
   Call psb_info(ictxt, me, np)
 
   t1 = mpi_wtime()

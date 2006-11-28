@@ -39,34 +39,37 @@
 !    ja       - integer,dimension(:).          The column indices of the points.
 !    desc_a   - type(<psb_desc_type>).         The communication descriptor to be freed.
 !    info     - integer.                       Eventually returns an error code.
-subroutine psb_cdins(nz,ia,ja,desc_a,info)
+subroutine psb_cdins(nz,ia,ja,desc_a,info,ila,jla)
 
   use psb_descriptor_type
   use psb_serial_mod
   use psb_const_mod
   use psb_error_mod
   use psb_penv_mod
+  use psi_mod
   implicit none
 
   !....PARAMETERS...
   Type(psb_desc_type), intent(inout) :: desc_a
   Integer, intent(in)                :: nz,ia(:),ja(:)
   integer, intent(out)               :: info
+  integer, optional, intent(out)     :: ila(:), jla(:)
 
   !LOCALS.....
 
   integer :: i,ictxt,row,k,dectype,mglob, nglob,err
   integer                :: np, me, isize
-  integer                :: pnt_halo,nrow,ncol, nh, ip,jp, err_act
+  integer                :: pnt_halo,nrow,ncol, nh, ip,jp, err_act,lip,ljp,nxt
   logical, parameter     :: debug=.false.
   integer, parameter     :: relocsz=200
+  integer, allocatable   :: ila_(:), jla_(:)
   character(len=20)      :: name,ch_err
 
   info = 0
   name = 'psb_cdins'
   call psb_erractionsave(err_act)
 
-  ictxt = psb_cd_get_context(desc_a)
+  ictxt   = psb_cd_get_context(desc_a)
   dectype = psb_cd_get_dectype(desc_a)
   mglob   = psb_cd_get_global_rows(desc_a)
   nglob   = psb_cd_get_global_cols(desc_a)
@@ -97,71 +100,39 @@ subroutine psb_cdins(nz,ia,ja,desc_a,info)
     call psb_errpush(info,name)
     goto 9999
   end if
-
-  if (.not.allocated(desc_a%halo_index)) then
-    allocate(desc_a%halo_index(relocsz))
-    desc_a%halo_index(:) = -1
-  endif
-  pnt_halo=1
-  do while (desc_a%halo_index(pnt_halo)  /=   -1 )
-    pnt_halo = pnt_halo + 1
-  end do
-  isize = size(desc_a%halo_index)
-
-  do i = 1, nz
-    ip = ia(i) 
-    jp = ja(i)
-    if ((ip < 1 ).or.(ip>mglob).or.(jp<1).or.(jp>mglob)) then 
-      !      write(0,*) 'wrong input ',i,ip,jp
-      info = 1133
+  if (present(ila)) then 
+    if (size(ila) < nz) then 
+      info = 1111
       call psb_errpush(info,name)
       goto 9999
+    end if
+  end if
+  if (present(jla)) then 
+    if (size(jla) < nz) then 
+      info = 1111
+      call psb_errpush(info,name)
+      goto 9999
+    end if
+  end if
+
+  if (present(ila).and.present(jla)) then 
+    call psi_idx_cnv(nz,ia,ila,desc_a,info,owned=.true.)
+    call psi_idx_ins_cnv(nz,ja,jla,desc_a,info,mask=(ila(1:nz)>0))
+
+  else
+    if (present(ila).or.present(jla)) then 
+      write(0,*) 'Inconsistent call : ',present(ila),present(jla)
     endif
-    if ((1<=desc_a%glob_to_loc(ip)).and.(desc_a%glob_to_loc(ip))<=nrow) then
-      k  = desc_a%glob_to_loc(jp)
-      if (k.lt.-np) then
-        k = k + np
-        k = - k - 1
-        ncol = ncol + 1      
-        desc_a%glob_to_loc(jp)   = ncol
-        isize = size(desc_a%loc_to_glob)
-        if (ncol > isize) then 
-          nh = ncol + max(nz,relocsz)
-          call psb_realloc(nh,desc_a%loc_to_glob,info,pad=-1)
-          if (me==0) then 
-            if (debug) write(0,*) 'done realloc ',nh
-          end if
-          if (info /= 0) then
-            info=4010
-            ch_err='psb_realloc'
-            call psb_errpush(info,name)
-            goto 9999
-          end if
-          isize = nh
-        endif
-        desc_a%loc_to_glob(ncol) = jp
-        isize = size(desc_a%halo_index)
-        if ((pnt_halo+3).gt.isize) then
-          nh = isize + max(nz,relocsz)
-          call psb_realloc(nh,desc_a%halo_index,info,pad=-1)
-          if (info /= 0) then
-            info=4010
-            ch_err='psb_realloc'
-            call psb_errpush(info,name)
-            goto 9999
-          end if
-          isize = nh 
-        endif
-        desc_a%halo_index(pnt_halo)   = k
-        desc_a%halo_index(pnt_halo+1) = 1
-        desc_a%halo_index(pnt_halo+2) = ncol
-        pnt_halo                      = pnt_halo + 3
-      endif
-    else
-      ! currently we ignore items not belonging to us. 
-    endif
-  enddo
-  desc_a%matrix_data(psb_n_col_) = ncol
+    allocate(ila_(nz),jla_(nz),stat=info)
+    if (info /= 0) then 
+      info = 4000
+      call psb_errpush(info,name)
+      goto 9999
+    end if
+    call psi_idx_cnv(nz,ia,ila_,desc_a,info,owned=.true.)
+    call psi_idx_ins_cnv(nz,ja,jla_,desc_a,info,mask=(ila_(1:nz)>0))
+    deallocate(ila_,jla_)
+  end if
 
   call psb_erractionrestore(err_act)
   return
