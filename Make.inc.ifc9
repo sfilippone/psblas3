@@ -11,7 +11,7 @@ F90=$(IFC9)/bin/ifort
 FC=$(IFC9)/bin/ifort
 F77=$(FC)
 CC=gcc
-F90COPT= -O3 
+F90COPT=-O3 
 FCOPT=-O3 
 CCOPT=-O3
 
@@ -45,7 +45,7 @@ UMFDEF=-DHave_UMF_ -I$(UMFDIR)
 
 #  Add -DLargeFptr for 64-bit addresses
 CDEFINES=-DAdd_ $(SLUDEF) $(UMFDEF)
-FDEFINES=-DNORMAL
+FDEFINES=-DNETLIB_BLACS -DHAVE_MOVE_ALLOC
 
 AR=ar -cur
 RANLIB=ranlib

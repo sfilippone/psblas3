@@ -43,7 +43,7 @@ UMFDEF=-DHave_UMF_ -I$(UMFDIR)
 
 #  Add -DLargeFptr for 64-bit addresses
 CDEFINES=-DAdd_ $(SLUDEF) $(UMFDEF)
-FDEFINES=-DNORMAL
+FDEFINES=-DNETLIB_BLACS -DHAVE_MOVE_ALLOC
 
 AR=ar -cur
 RANLIB=ranlib

@@ -10,9 +10,9 @@ F90=/usr/local/gcc42/bin/gfortran
 FC=/usr/local/gcc42/bin/gfortran
 F77=$(FC)
 CC=/usr/local/gcc42/bin/gcc
-F90COPT= -O3  -march=pentium4 -msse2 -mfpmath=sse -ggdb 
-FCOPT=-O3  -march=pentium4 -msse2 -mfpmath=sse   -ggdb 
-CCOPT=-O3 -march=pentium4 -msse2 -mfpmath=sse  -ggdb
+F90COPT=-O3 -ggdb
+FCOPT=-O3 -ggdb
+CCOPT=-O3 -ggdb
 
 #######################  Section 2 #######################
 #  Define your linker and linker flags here              #
@@ -43,7 +43,7 @@ UMFDEF=-DHave_UMF_ -I$(UMFDIR)
 
 #  Add -DLargeFptr for 64-bit addresses
 CDEFINES=-DAdd_ $(SLUDEF) $(UMFDEF)
-FDEFINES=-DNORMAL
+FDEFINES=-DNETLIB_BLACS -DHAVE_MOVE_ALLOC
 
 AR=ar -cur
 RANLIB=ranlib
@@ -84,7 +84,6 @@ $(.mod).o:
 	$(F90) $(F90COPT) $(INCDIRS) -c $<
 .F90.o:
 	$(F90) $(F90COPT) $(INCDIRS) $(FDEFINES) -c $<
-
 
 
 

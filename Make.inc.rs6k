@@ -43,7 +43,7 @@ BLACS=-lmpiblacs
 
 #  Add -DLargeFptr for 64-bit addresses
 CDEFINES=-DNoChange $(SLUDEF) $(UMFDEF) -DLargeFptr
-FDEFINES=-WF,-DHAVE_ESSL
+FDEFINES=-WF,-DESSL_BLACS -WF,-DHAVE_MOVE_ALLOC
 
 AR=ar -cur
 RANLIB=ranlib
