@@ -587,7 +587,7 @@ ET
 0 g 0 G
 1 0 0 1 -350.899 -402.693 cm
 BT
-/F29 9.963 Tf 355.88 402.693 Td[(b)32(y)-383(Sal)-1(v)64(ator)1(e)-384(F)1(i)-1(li)-1(p)1(p)-32(one)]TJ 12.89 -18.597 Td[(and)-383(Al)-1(fredo)-383(Buttari)]TJ/F8 9.963 Tf -139.997 -25.238 Td[(\134T)83(or)-333(V)84(e)-1(rg)1(ata")-334(Un)1(iv)28(ersit)28(y)-333(of)-333(Rom)-1(e.)-444(No)28(v)28(e)-1(m)28(b)-28(er)-333(17,)-333(2006)]TJ
+/F29 9.963 Tf 355.88 402.693 Td[(b)32(y)-383(Sal)-1(v)64(ator)1(e)-384(F)1(i)-1(li)-1(p)1(p)-32(one)]TJ 12.89 -18.597 Td[(and)-383(Al)-1(fredo)-383(Buttari)]TJ/F8 9.963 Tf -139.997 -25.238 Td[(\134T)83(or)-333(V)84(e)-1(rg)1(ata")-334(Un)1(iv)28(ersit)28(y)-333(of)-333(Rom)-1(e.)-444(No)28(v)28(e)-1(m)28(b)-28(er)-333(28,)-333(2006)]TJ
 ET
 1 0 0 1 99.895 90.438 cm
 0 g 0 G
@@ -30582,7 +30582,7 @@ stream
 /ItalicAngle -14.04 def
 /isFixedPitch false def
 end readonly def
-/FontName /PVMNIF+CMMI12 def
+/FontName /NAHILI+CMMI12 def
 /PaintType 0 def
 /FontType 1 def
 /FontMatrix [0.001 0 0 0.001 0 0] readonly def
@@ -30618,14 +30618,14 @@ endobj
 /FirstChar 108
 /LastChar 108
 /Widths 1392 0 R
-/BaseFont /PVMNIF+CMMI12
+/BaseFont /NAHILI+CMMI12
 /FontDescriptor 1179 0 R
 >> endobj
 1179 0 obj <<
 /Ascent 694
 /CapHeight 683
 /Descent -194
-/FontName /PVMNIF+CMMI12
+/FontName /NAHILI+CMMI12
 /ItalicAngle -14
 /StemV 65
 /XHeight 431
@@ -30661,7 +30661,7 @@ stream
 /ItalicAngle -14.035 def
 /isFixedPitch false def
 end readonly def
-/FontName /JEATTF+CMSY7 def
+/FontName /USLJHB+CMSY7 def
 /PaintType 0 def
 /FontType 1 def
 /FontMatrix [0.001 0 0 0.001 0 0] readonly def
@@ -30695,14 +30695,14 @@ endobj
 /FirstChar 0
 /LastChar 49
 /Widths 1394 0 R
-/BaseFont /JEATTF+CMSY7
+/BaseFont /USLJHB+CMSY7
 /FontDescriptor 761 0 R
 >> endobj
 761 0 obj <<
 /Ascent 750
 /CapHeight 683
 /Descent -194
-/FontName /JEATTF+CMSY7
+/FontName /USLJHB+CMSY7
 /ItalicAngle -14
 /StemV 93
 /XHeight 431
@@ -30738,7 +30738,7 @@ stream
 /ItalicAngle 0 def
 /isFixedPitch true def
 end readonly def
-/FontName /SXTKXX+CMTT9 def
+/FontName /YHLIIZ+CMTT9 def
 /PaintType 0 def
 /FontType 1 def
 /FontMatrix [0.001 0 0 0.001 0 0] readonly def
@@ -30827,14 +30827,14 @@ endobj
 /FirstChar 33
 /LastChar 122
 /Widths 1396 0 R
-/BaseFont /SXTKXX+CMTT9
+/BaseFont /YHLIIZ+CMTT9
 /FontDescriptor 667 0 R
 >> endobj
 667 0 obj <<
 /Ascent 611
 /CapHeight 611
 /Descent -222
-/FontName /SXTKXX+CMTT9
+/FontName /YHLIIZ+CMTT9
 /ItalicAngle 0
 /StemV 74
 /XHeight 431
@@ -30866,7 +30866,7 @@ stream
 /ItalicAngle -14.04 def
 /isFixedPitch false def
 end readonly def
-/FontName /NVEEQI+CMMI5 def
+/FontName /GLCYZI+CMMI5 def
 /PaintType 0 def
 /FontType 1 def
 /FontMatrix [0.001 0 0 0.001 0 0] readonly def
@@ -30900,14 +30900,14 @@ endobj
 /FirstChar 105
 /LastChar 105
 /Widths 1397 0 R
-/BaseFont /NVEEQI+CMMI5
+/BaseFont /GLCYZI+CMMI5
 /FontDescriptor 586 0 R
 >> endobj
 586 0 obj <<
 /Ascent 694
 /CapHeight 683
 /Descent -194
-/FontName /NVEEQI+CMMI5
+/FontName /GLCYZI+CMMI5
 /ItalicAngle -14
 /StemV 90
 /XHeight 431
@@ -30943,7 +30943,7 @@ stream
 /ItalicAngle 0 def
 /isFixedPitch false def
 end readonly def
-/FontName /PGASXW+CMR8 def
+/FontName /BTWXVP+CMR8 def
 /PaintType 0 def
 /FontType 1 def
 /FontMatrix [0.001 0 0 0.001 0 0] readonly def
@@ -31017,14 +31017,14 @@ endobj
 /FirstChar 45
 /LastChar 121
 /Widths 1399 0 R
-/BaseFont /PGASXW+CMR8
+/BaseFont /BTWXVP+CMR8
 /FontDescriptor 560 0 R
 >> endobj
 560 0 obj <<
 /Ascent 694
 /CapHeight 683
 /Descent -194
-/FontName /PGASXW+CMR8
+/FontName /BTWXVP+CMR8
 /ItalicAngle 0
 /StemV 76
 /XHeight 431
@@ -31056,7 +31056,7 @@ stream
 /ItalicAngle 0 def
 /isFixedPitch false def
 end readonly def
-/FontName /IOVLUB+CMR6 def
+/FontName /IWCDDE+CMR6 def
 /PaintType 0 def
 /FontType 1 def
 /FontMatrix [0.001 0 0 0.001 0 0] readonly def
@@ -31091,14 +31091,14 @@ endobj
 /FirstChar 49
 /LastChar 50
 /Widths 1400 0 R
-/BaseFont /IOVLUB+CMR6
+/BaseFont /IWCDDE+CMR6
 /FontDescriptor 556 0 R
 >> endobj
 556 0 obj <<
 /Ascent 694
 /CapHeight 683
 /Descent -194
-/FontName /IOVLUB+CMR6
+/FontName /IWCDDE+CMR6
 /ItalicAngle 0
 /StemV 83
 /XHeight 431
@@ -31130,7 +31130,7 @@ stream
 /ItalicAngle -14.035 def
 /isFixedPitch false def
 end readonly def
-/FontName /HZLOBO+CMSY10 def
+/FontName /VIUYQT+CMSY10 def
 /PaintType 0 def
 /FontType 1 def
 /FontMatrix [0.001 0 0 0.001 0 0] readonly def
@@ -31193,14 +31193,14 @@ endobj
 /FirstChar 0
 /LastChar 120
 /Widths 1401 0 R
-/BaseFont /HZLOBO+CMSY10
+/BaseFont /VIUYQT+CMSY10
 /FontDescriptor 551 0 R
 >> endobj
 551 0 obj <<
 /Ascent 750
 /CapHeight 683
 /Descent -194
-/FontName /HZLOBO+CMSY10
+/FontName /VIUYQT+CMSY10
 /ItalicAngle -14
 /StemV 85
 /XHeight 431
@@ -31232,7 +31232,7 @@ stream
 /ItalicAngle -14.04 def
 /isFixedPitch false def
 end readonly def
-/FontName /NQSIRE+CMMI7 def
+/FontName /MIGPWF+CMMI7 def
 /PaintType 0 def
 /FontType 1 def
 /FontMatrix [0.001 0 0 0.001 0 0] readonly def
@@ -31284,14 +31284,14 @@ endobj
 /FirstChar 59
 /LastChar 121
 /Widths 1402 0 R
-/BaseFont /NQSIRE+CMMI7
+/BaseFont /MIGPWF+CMMI7
 /FontDescriptor 548 0 R
 >> endobj
 548 0 obj <<
 /Ascent 694
 /CapHeight 683
 /Descent -194
-/FontName /NQSIRE+CMMI7
+/FontName /MIGPWF+CMMI7
 /ItalicAngle -14
 /StemV 81
 /XHeight 431
@@ -31323,7 +31323,7 @@ stream
 /ItalicAngle 0 def
 /isFixedPitch false def
 end readonly def
-/FontName /AFHOOH+CMR7 def
+/FontName /HFKEPJ+CMR7 def
 /PaintType 0 def
 /FontType 1 def
 /FontMatrix [0.001 0 0 0.001 0 0] readonly def
@@ -31363,14 +31363,14 @@ endobj
 /FirstChar 43
 /LastChar 58
 /Widths 1403 0 R
-/BaseFont /AFHOOH+CMR7
+/BaseFont /HFKEPJ+CMR7
 /FontDescriptor 545 0 R
 >> endobj
 545 0 obj <<
 /Ascent 694
 /CapHeight 683
 /Descent -194
-/FontName /AFHOOH+CMR7
+/FontName /HFKEPJ+CMR7
 /ItalicAngle 0
 /StemV 79
 /XHeight 431
@@ -31402,7 +31402,7 @@ stream
 /ItalicAngle 0 def
 /isFixedPitch true def
 end readonly def
-/FontName /RFSEHM+CMTT10 def
+/FontName /HMGDSE+CMTT10 def
 /PaintType 0 def
 /FontType 1 def
 /FontMatrix [0.001 0 0 0.001 0 0] readonly def
@@ -31525,14 +31525,14 @@ endobj
 /FirstChar 37
 /LastChar 126
 /Widths 1404 0 R
-/BaseFont /RFSEHM+CMTT10
+/BaseFont /HMGDSE+CMTT10
 /FontDescriptor 540 0 R
 >> endobj
 540 0 obj <<
 /Ascent 611
 /CapHeight 611
 /Descent -222
-/FontName /RFSEHM+CMTT10
+/FontName /HMGDSE+CMTT10
 /ItalicAngle 0
 /StemV 69
 /XHeight 431
@@ -31564,7 +31564,7 @@ stream
 /ItalicAngle -14.04 def
 /isFixedPitch false def
 end readonly def
-/FontName /MCVATF+CMMI10 def
+/FontName /NBLEGN+CMMI10 def
 /PaintType 0 def
 /FontType 1 def
 /FontMatrix [0.001 0 0 0.001 0 0] readonly def
@@ -31662,14 +31662,14 @@ endobj
 /FirstChar 11
 /LastChar 122
 /Widths 1405 0 R
-/BaseFont /MCVATF+CMMI10
+/BaseFont /NBLEGN+CMMI10
 /FontDescriptor 521 0 R
 >> endobj
 521 0 obj <<
 /Ascent 694
 /CapHeight 683
 /Descent -194
-/FontName /MCVATF+CMMI10
+/FontName /NBLEGN+CMMI10
 /ItalicAngle -14
 /StemV 72
 /XHeight 431
@@ -31705,7 +31705,7 @@ stream
 /ItalicAngle -14.04 def
 /isFixedPitch false def
 end readonly def
-/FontName /CIHHNL+CMTI10 def
+/FontName /QKFJRK+CMTI10 def
 /PaintType 0 def
 /FontType 1 def
 /FontMatrix [0.001 0 0 0.001 0 0] readonly def
@@ -31856,14 +31856,14 @@ endobj
 /FirstChar 11
 /LastChar 122
 /Widths 1407 0 R
-/BaseFont /CIHHNL+CMTI10
+/BaseFont /QKFJRK+CMTI10
 /FontDescriptor 506 0 R
 >> endobj
 506 0 obj <<
 /Ascent 694
 /CapHeight 683
 /Descent -194
-/FontName /CIHHNL+CMTI10
+/FontName /QKFJRK+CMTI10
 /ItalicAngle -14
 /StemV 68
 /XHeight 431
@@ -31895,7 +31895,7 @@ stream
 /ItalicAngle 0 def
 /isFixedPitch false def
 end readonly def
-/FontName /SHWZTM+CMR10 def
+/FontName /BDAGKG+CMR10 def
 /PaintType 0 def
 /FontType 1 def
 /FontMatrix [0.001 0 0 0.001 0 0] readonly def
@@ -32068,14 +32068,14 @@ endobj
 /FirstChar 11
 /LastChar 123
 /Widths 1408 0 R
-/BaseFont /SHWZTM+CMR10
+/BaseFont /BDAGKG+CMR10
 /FontDescriptor 388 0 R
 >> endobj
 388 0 obj <<
 /Ascent 694
 /CapHeight 683
 /Descent -194
-/FontName /SHWZTM+CMR10
+/FontName /BDAGKG+CMR10
 /ItalicAngle 0
 /StemV 69
 /XHeight 431
@@ -32107,7 +32107,7 @@ stream
 /ItalicAngle 0 def
 /isFixedPitch false def
 end readonly def
-/FontName /RHVIPZ+CMBX10 def
+/FontName /KGPVLJ+CMBX10 def
 /PaintType 0 def
 /FontType 1 def
 /FontMatrix [0.001 0 0 0.001 0 0] readonly def
@@ -32247,14 +32247,14 @@ endobj
 /FirstChar 12
 /LastChar 123
 /Widths 1409 0 R
-/BaseFont /RHVIPZ+CMBX10
+/BaseFont /KGPVLJ+CMBX10
 /FontDescriptor 385 0 R
 >> endobj
 385 0 obj <<
 /Ascent 694
 /CapHeight 686
 /Descent -194
-/FontName /RHVIPZ+CMBX10
+/FontName /KGPVLJ+CMBX10
 /ItalicAngle 0
 /StemV 114
 /XHeight 444
@@ -32286,7 +32286,7 @@ stream
 /ItalicAngle -14.04 def
 /isFixedPitch false def
 end readonly def
-/FontName /OFHQHM+CMTI12 def
+/FontName /GFZIAY+CMTI12 def
 /PaintType 0 def
 /FontType 1 def
 /FontMatrix [0.001 0 0 0.001 0 0] readonly def
@@ -32357,14 +32357,14 @@ endobj
 /FirstChar 65
 /LastChar 121
 /Widths 1410 0 R
-/BaseFont /OFHQHM+CMTI12
+/BaseFont /GFZIAY+CMTI12
 /FontDescriptor 382 0 R
 >> endobj
 382 0 obj <<
 /Ascent 694
 /CapHeight 683
 /Descent -194
-/FontName /OFHQHM+CMTI12
+/FontName /GFZIAY+CMTI12
 /ItalicAngle -14
 /StemV 63
 /XHeight 431
@@ -32396,7 +32396,7 @@ stream
 /ItalicAngle 0 def
 /isFixedPitch false def
 end readonly def
-/FontName /BQTZQE+CMBX12 def
+/FontName /INLVVS+CMBX12 def
 /PaintType 0 def
 /FontType 1 def
 /FontMatrix [0.001 0 0 0.001 0 0] readonly def
@@ -32527,14 +32527,14 @@ endobj
 /FirstChar 12
 /LastChar 124
 /Widths 1411 0 R
-/BaseFont /BQTZQE+CMBX12
+/BaseFont /INLVVS+CMBX12
 /FontDescriptor 379 0 R
 >> endobj
 379 0 obj <<
 /Ascent 694
 /CapHeight 686
 /Descent -194
-/FontName /BQTZQE+CMBX12
+/FontName /INLVVS+CMBX12
 /ItalicAngle 0
 /StemV 109
 /XHeight 444
@@ -33377,7 +33377,7 @@ endobj
 >> endobj
 1422 0 obj <<
  /Title (Parallel Sparse BLAS V. 2.1) /Subject (Parallel Sparse Basic Linear Algebra Subroutines) /Keywords (Computer Science Linear Algebra Fluid Dynamics Parallel Linux MPI PSBLAS Iterative Solvers Preconditioners) /Creator (pdfLaTeX) /Producer ($Id: userguide.tex,v 1.11 2006/11/09 14:34:14 sfilippo Exp $) /Author()/Title()/Subject()/Creator(LaTeX with hyperref package)/Producer(pdfTeX-1.10b)/Keywords()
-/CreationDate (D:20061117143800)
+/CreationDate (D:20061128142800)
 >> endobj
 xref
 0 1423
