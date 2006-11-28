@@ -84,25 +84,28 @@
 #define  POOLSIZE  4096
 #define  CACHESIZE 16
 #ifdef Add_
-#define InitPairSearchTree initpairsearchtree_
-#define FreePairSearchTree freepairsearchtree_
-#define SearchInsKeyVal    searchinskeyval_
-#define SearchKeyVal       searchkeyval_
-#define NPairs             npairs_
+#define InitPairSearchTree  initpairsearchtree_
+#define FreePairSearchTree  freepairsearchtree_
+#define ClonePairSearchTree clonepairsearchtree_
+#define SearchInsKeyVal     searchinskeyval_
+#define SearchKeyVal        searchkeyval_
+#define NPairs              npairs_
 #endif
 #ifdef AddDouble_
-#define InitPairSearchTree initpairsearchtree_
-#define FreePairSearchTree freepairsearchtree_
-#define SearchInsKeyVal    searchinskeyval_
-#define SearchKeyVal       searchkeyval_
-#define NPairs             npairs_
+#define InitPairSearchTree  initpairsearchtree_
+#define FreePairSearchTree  freepairsearchtree_
+#define ClonePairSearchTree clonepairsearchtree_
+#define SearchInsKeyVal     searchinskeyval_
+#define SearchKeyVal        searchkeyval_
+#define NPairs              npairs_
 #endif
 #ifdef NoChange
-#define InitPairSearchTree initpairsearchtree
-#define FreePairSearchTree freepairsearchtree
-#define SearchInsKeyVal    searchinskeyval
-#define SearchKeyVal       searchkeyval
-#define NPairs             npairs
+#define InitPairSearchTree  initpairsearchtree
+#define FreePairSearchTree  freepairsearchtree
+#define ClonePairSearchTree clonepairsearchtree
+#define SearchInsKeyVal     searchinskeyval
+#define SearchKeyVal        searchkeyval
+#define NPairs              npairs
 #endif
 
 
@@ -196,7 +199,6 @@ void KeyUpdate( void *key1, void *key2, void *data)
 {
   *((int *) data)=((KeyPairPtr) key2)->val;
 }
-
 
 void  FreePairSearchTree(fptr *ftree)   
 {
@@ -294,13 +296,14 @@ void SearchInsKeyVal(fptr *ftree, int *key, int *val, int *res, int *iret)
   
   info = AVLTreeInsert(PTree->tree,node,CompareKeys,KeyUpdate,&(PTree->retval));
   *iret = info;
+
   if (info==0) {
     *res = node->val;
     AdvanceKeyPair(PTree->PairPoolCrt);
   } else if (info == 1) {
     *res  = PTree->retval;
   }
-  return;
+     
 }
 
 
@@ -335,7 +338,7 @@ void SearchKeyVal(fptr *ftree, int *key, int *res, int *iret)
   node.key=*key;
   if ((noderes  = AVLTreeSearch(PTree->tree,&node,CompareKeys))==NULL) {
     *res = -1;
-    *iret = -1;
+    *iret = 0;
   } else {
     result = (KeyPairPtr) noderes->key;
     *res = result->val;
@@ -353,4 +356,39 @@ void SearchKeyVal(fptr *ftree, int *key, int *res, int *iret)
   *iret = PTree->tree->nsteps;
 #endif
   return;
+}   
+
+void PairTreeVisit(AVLNodePtr current, PairTreePtr PTree)
+{
+  KeyPairPtr node,inode; 
+  int info,i;
+    
+  if (current==NULL) return;
+  inode = (KeyPairPtr) current->key;
+  node      = GetKeyPair(&(PTree->PairPoolCrt));
+  node->key = inode->key;
+  node->val = inode->val;
+  info = AVLTreeInsert(PTree->tree,node,CompareKeys,KeyUpdate,&(PTree->retval));
+  if (info==0) {
+    AdvanceKeyPair(PTree->PairPoolCrt);
+  }
+  PairTreeVisit(current->llink,PTree);
+  PairTreeVisit(current->rlink,PTree);
+}
+
+void  ClonePairSearchTree(fptr *ftreein, fptr *ftreeout)   
+{
+  PairTreePtr PTreein, PTreeout;
+  int i,j;
+  AVLNodePtr nodept;
+
+  PTreein = (PairTreePtr) *ftreein;
+  
+  if (PTreein == NULL) {
+    *ftreeout = (fptr) NULL;
+    return;
+  }
+  InitPairSearchTree(ftreeout,&i);
+  PTreeout = (PairTreePtr) *ftreeout;
+  PairTreeVisit(PTreein->tree->root,PTreeout);
 }

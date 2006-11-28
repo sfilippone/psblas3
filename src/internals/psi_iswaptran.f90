@@ -79,7 +79,6 @@ subroutine psi_iswaptranm(flag,n,beta,y,desc_a,work,info,data)
     goto 9999
   endif
 
-
   icomm = desc_a%matrix_data(psb_mpi_c_)
 
   swap_mpi  = iand(flag,psb_swap_mpi_) /= 0
@@ -350,7 +349,6 @@ subroutine psi_iswaptranm(flag,n,beta,y,desc_a,work,info,data)
 
 
   if (do_recv) then 
-
     pnti   = 1
     snd_pt = 1
     rcv_pt = 1

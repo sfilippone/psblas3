@@ -213,7 +213,7 @@
 #include <string.h>
 #include "avltree.h"
 
-#define  POOLSIZE  4096
+#define  POOLSIZE  1024
 #define  MAXSTACK  64
 #define  MAX(a,b)  ((a)>=(b) ? (a) : (b))
 
@@ -257,12 +257,12 @@ int AVLTreeInit(AVLTreePtr Tree)
     return(-2);
   }
   
-  if ((current=(AVLTVectPtr)malloc(sizeof(AVLTVect)))==NULL) {
-    fprintf(stderr,"Memory allocation failure\n");
-    return(-3);
-  }
-  memset(current,'\0',sizeof(AVLTVect));
-  Tree->first=Tree->current=current;
+/*   if ((current=(AVLTVectPtr)malloc(sizeof(AVLTVect)))==NULL) { */
+/*     fprintf(stderr,"Memory allocation failure\n"); */
+/*     return(-3); */
+/*   } */
+/*   memset(current,'\0',sizeof(AVLTVect)); */
+  Tree->first=Tree->current=NULL;
   Tree->nnodes=0;
   Tree->root=NULL;
   return(0);
@@ -496,7 +496,12 @@ AVLNodePtr GetAVLNode(AVLTreePtr Tree)
     return(NULL);
   }   
   if ((current=Tree->current)==NULL) {
-    return(NULL);
+    if ((current=(AVLTVectPtr)malloc(sizeof(AVLTVect)))==NULL) {
+      fprintf(stderr,"Memory allocation failure\n");
+      return(NULL);
+    }
+    memset(current,'\0',sizeof(AVLTVect));
+    Tree->first=Tree->current=current;
   }
 
   while  ((current->avail>=POOLSIZE)&&(current->next!=NULL)) 
@@ -813,5 +818,4 @@ AVLNodePtr AVLTreeUserInsert(AVLTreePtr Tree, void *key,
   }
   return(q);
 }
-
 

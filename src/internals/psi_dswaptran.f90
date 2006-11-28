@@ -79,7 +79,6 @@ subroutine psi_dswaptranm(flag,n,beta,y,desc_a,work,info,data)
     goto 9999
   endif
 
-
   icomm = desc_a%matrix_data(psb_mpi_c_)
 
   swap_mpi  = iand(flag,psb_swap_mpi_) /= 0
@@ -347,8 +346,6 @@ subroutine psi_dswaptranm(flag,n,beta,y,desc_a,work,info,data)
 
   end if
 
-
-
   if (do_recv) then 
 
     pnti   = 1
@@ -467,6 +464,7 @@ subroutine psi_dswaptranv(flag,beta,y,desc_a,work,info,data)
   call psb_erractionsave(err_act)
 
   ictxt=psb_cd_get_context(desc_a)
+
   call psb_info(ictxt,me,np) 
   if (np == -1) then
     info = 2010

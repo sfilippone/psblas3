@@ -120,6 +120,7 @@ c   length_dl  integer array(0:np)
 c             length_dl(i) is the length of dep_list(*,i) list
       use psb_penv_mod
       use psb_const_mod
+      use psb_descriptor_type
       implicit none
       include 'mpif.h'
 c     ....scalar parameters...
@@ -154,7 +155,8 @@ c     .....local scalars...
       if (debug) write(0,*) 'extract: info ',info,
      +  desc_data(psb_dec_type_)
       pointer_dep_list=1
-      if (desc_data(psb_dec_type_).eq.psb_desc_bld_) then
+c$$$      if (desc_data(psb_dec_type_).eq.psb_desc_bld_) then
+      if (psb_is_bld_dec(desc_data(psb_dec_type_))) then 
         do while (desc_str(i).ne.-1)
           if (debug) write(0,*) me,' extract: looping ',i,
      +      desc_str(i),desc_str(i+1),desc_str(i+2)
@@ -195,7 +197,8 @@ c                 ...if not found.....
           endif
           i=i+desc_str(i+1)+2
         enddo
-      else if (desc_data(psb_dec_type_).eq.psb_desc_upd_) then
+c$$$      else if (desc_data(psb_dec_type_).eq.psb_desc_upd_) then
+      else if (psb_is_upd_dec(desc_data(psb_dec_type_))) then
         do while (desc_str(i).ne.-1)
           if (debug) write(0,*) 'extract: looping ',i,desc_str(i)
           
@@ -236,6 +239,7 @@ c                 ...if not found.....
       else
         write(0,*) 'invalid dec_type',desc_data(psb_dec_type_)
         info = 2020
+        goto 9999
       endif
 
       length_dl(me)=pointer_dep_list-1

@@ -28,20 +28,20 @@
 !!$  POSSIBILITY OF SUCH DAMAGE.
 !!$ 
 !!$  
-subroutine psi_desc_index(desc_data,index_in,dep_list,&
-     & length_dl,nsnd,nrcv,loc_to_glob,glob_to_loc,desc_index,&
-     & isglob_in,info)
-
+subroutine psi_desc_index(desc,index_in,dep_list,&
+     & length_dl,nsnd,nrcv,desc_index,isglob_in,info)
+  use psb_descriptor_type
   use psb_realloc_mod
   use psb_error_mod
   use psb_const_mod
   use mpi
   use psb_penv_mod
+  use psi_mod, only : psi_idx_cnv
   implicit none
 
   !    ...array parameters.....
-  integer         :: desc_data(:),index_in(:),dep_list(:)
-  integer         :: loc_to_glob(:),glob_to_loc(:)
+  type(psb_desc_type) :: desc
+  integer         :: index_in(:),dep_list(:)
   integer,allocatable  :: desc_index(:)
   integer         :: length_dl,nsnd,nrcv,info
   logical         :: isglob_in
@@ -65,8 +65,8 @@ subroutine psi_desc_index(desc_data,index_in,dep_list,&
   name='psi_desc_index'
   call psb_erractionsave(err_act)
 
-  ictxt=desc_data(psb_ctxt_)
-  icomm=desc_data(psb_mpi_c_)
+  ictxt = psb_cd_get_context(desc)
+  icomm = psb_cd_get_mpic(desc)
   call psb_info(ictxt,me,np) 
   if (np == -1) then
     info = 2010
@@ -179,8 +179,9 @@ subroutine psi_desc_index(desc_data,index_in,dep_list,&
         sndbuf(bsdindx(proc+1)+j) = (index_in(i+j))
       end do
     else
+      
       do j=1, nerv
-        sndbuf(bsdindx(proc+1)+j) = loc_to_glob(index_in(i+j))
+        sndbuf(bsdindx(proc+1)+j) = desc%loc_to_glob(index_in(i+j))
       end do
     endif
     bsdindx(proc+1) = bsdindx(proc+1) + nerv
@@ -222,15 +223,19 @@ subroutine psi_desc_index(desc_data,index_in,dep_list,&
     i = i + 1 
     nerv = sdsz(proc+1) 
     desc_index(i) = nerv
-    do j=1, nerv
-      desc_index(i+j) = glob_to_loc(sndbuf(bsdindx(proc+1)+j))
-    end do
+    call psi_idx_cnv(nerv,sndbuf(bsdindx(proc+1)+1:bsdindx(proc+1)+nerv),&
+         &  desc_index(i+1:i+nerv),desc,info)
+!!$    do j=1, nerv
+!!$      desc_index(i+j) = glob_to_loc(sndbuf(bsdindx(proc+1)+j))
+!!$    end do
     i = i + nerv + 1 
     nesd = rvsz(proc+1) 
     desc_index(i) = nesd
-    do j=1, nesd
-      desc_index(i+j) = glob_to_loc(rcvbuf(brvindx(proc+1)+j))
-    end do
+    call psi_idx_cnv(nesd,rcvbuf(brvindx(proc+1)+1:brvindx(proc+1)+nesd),&
+         &  desc_index(i+1:i+nesd),desc,info)
+!!$    do j=1, nesd
+!!$      desc_index(i+j) = glob_to_loc(rcvbuf(brvindx(proc+1)+j))
+!!$    end do
     i = i + nesd + 1 
   end do
   desc_index(i) = - 1 

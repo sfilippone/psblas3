@@ -79,7 +79,6 @@ subroutine psi_zswaptranm(flag,n,beta,y,desc_a,work,info,data)
     goto 9999
   endif
 
-
   icomm = desc_a%matrix_data(psb_mpi_c_)
 
   swap_mpi  = iand(flag,psb_swap_mpi_) /= 0
@@ -310,9 +309,7 @@ subroutine psi_zswaptranm(flag,n,beta,y,desc_a,work,info,data)
       pnti   = pnti + nerv + nesd + 3
     end do
 
-
   else if (swap_send) then
-
     pnti   = 1
     snd_pt = 1
     rcv_pt = 1
@@ -324,7 +321,6 @@ subroutine psi_zswaptranm(flag,n,beta,y,desc_a,work,info,data)
       rcv_pt = rcv_pt + n*nerv
       snd_pt = snd_pt + n*nesd
       pnti   = pnti + nerv + nesd + 3
-
     end do
 
   else if (swap_recv) then
@@ -343,7 +339,6 @@ subroutine psi_zswaptranm(flag,n,beta,y,desc_a,work,info,data)
     end do
 
   end if
-
 
 
   if (do_recv) then 
@@ -464,6 +459,7 @@ subroutine psi_zswaptranv(flag,beta,y,desc_a,work,info,data)
   call psb_erractionsave(err_act)
 
   ictxt=psb_cd_get_context(desc_a)
+
   call psb_info(ictxt,me,np) 
   if (np == -1) then
     info = 2010
@@ -774,10 +770,6 @@ subroutine psi_zswaptranv(flag,beta,y,desc_a,work,info,data)
          & stat=info)
   else
     deallocate(rvhd,prcid,stat=info)
-  end if
-  if(info /= 0) then
-    call psb_errpush(4000,name)
-    goto 9999
   end if
   if(albf) deallocate(sndbuf,rcvbuf,stat=info)
   if(info /= 0) then

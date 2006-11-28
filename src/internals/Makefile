@@ -1,9 +1,11 @@
 include ../../Make.inc
 
 FOBJS = psi_compute_size.o psi_crea_bnd_elem.o psi_crea_index.o \
-	psi_crea_ovr_elem.o psi_dl_check.o \
+        psi_crea_ovr_elem.o psi_dl_check.o \
 	psi_gthsct.o \
-	psi_sort_dl.o 
+	psi_sort_dl.o \
+	psi_gthsct.o psi_ldsc_pre_halo.o\
+	psi_sort_dl.o psi_idx_cnv.o psi_idx_ins_cnv.o psi_fnd_owner.o
 FOBJS2 = psi_exist_ovr_elem.o psi_list_search.o srtlist.o 
 COBJS = avltree.o srcht.o
 
@@ -16,7 +18,7 @@ LIBDIR = ../../lib
 
 lib: mpfobjs $(FOBJS) $(FOBJS2) $(COBJS) $(MPFOBJS2)
 	$(AR) $(LIBDIR)/$(LIBNAME) $(MPFOBJS) $(MPFOBJS2) $(FOBJS) $(FOBJS2) \
-	 $(COBJS)
+             $(COBJS)
 	$(RANLIB) $(LIBDIR)/$(LIBNAME)
 
 

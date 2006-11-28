@@ -45,7 +45,7 @@ subroutine psi_crea_index(desc_a,index_in,index_out,glob_idx,nxch,nsnd,nrcv,info
   !         ....local scalars...      
   integer    :: ictxt, me, np, mode, err_act, dl_lda
   !         ...parameters...
-  integer, pointer     :: dep_list(:,:), length_dl(:)
+  integer, allocatable :: dep_list(:,:), length_dl(:)
   integer,parameter    :: root=0,no_comm=-1
   logical,parameter    :: debug=.false.
   character(len=20)    :: name
@@ -65,12 +65,13 @@ subroutine psi_crea_index(desc_a,index_in,index_out,glob_idx,nxch,nsnd,nrcv,info
   end interface
 
   interface
-    subroutine psi_desc_index(desc_data,index_in,dep_list,&
-         & length_dl,nsnd,nrcv,loc_to_glob,glob_to_loc,desc_index,&
+    subroutine psi_desc_index(desc,index_in,dep_list,&
+         & length_dl,nsnd,nrcv,desc_index,&
          & isglob_in,info)
-      integer :: desc_data(:),index_in(:),dep_list(:)
-      integer :: loc_to_glob(:),glob_to_loc(:)
-      integer, allocatable  :: desc_index(:)
+      use psb_descriptor_type
+      type(psb_desc_type)  :: desc
+      integer              :: index_in(:),dep_list(:)
+      integer, allocatable :: desc_index(:)
       integer :: length_dl,nsnd,nrcv,info
       logical :: isglob_in
     end subroutine psi_desc_index
@@ -101,6 +102,10 @@ subroutine psi_crea_index(desc_a,index_in,index_out,glob_idx,nxch,nsnd,nrcv,info
 
   ! ...extract dependence list (ordered list of identifer process
   !    which every process must communcate with...
+!!$  write(0,*) me,name,' Size of desc_in ',size(index_in)
+!!$  if (size(index_in)>0) then 
+!!$    write(0,*) me,name,'first item ',index_in(1)
+!!$  end if
   if (debug) write(*,*) 'crea_halo: calling extract_dep_list'
   mode = 1
 
@@ -129,9 +134,8 @@ subroutine psi_crea_index(desc_a,index_in,index_out,glob_idx,nxch,nsnd,nrcv,info
   ! ...create desc_halo array.....
   if(debug) write(0,*)'in psi_crea_index calling psi_desc_index',&
        & size(index_out)
-  call psi_desc_index(desc_a%matrix_data,index_in,dep_list(1:,me),&
-       & length_dl(me),nsnd,nrcv,desc_a%loc_to_glob,desc_a%glob_to_loc,&
-       & index_out,glob_idx,info)
+  call psi_desc_index(desc_a,index_in,dep_list(1:,me),&
+       & length_dl(me),nsnd,nrcv, index_out,glob_idx,info)
   if(debug) write(0,*)'out of  psi_desc_index',&
        & size(index_out)
   nxch = length_dl(me)
