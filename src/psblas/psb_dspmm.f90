@@ -176,6 +176,7 @@ subroutine  psb_dspmm(alpha,a,x,beta,y,desc_a,info,&
   n    = psb_cd_get_global_cols(desc_a)
   nrow = psb_cd_get_local_rows(desc_a)
   ncol = psb_cd_get_local_cols(desc_a)
+
   lldx = size(x,1)
   lldy = size(y,1)
 
@@ -499,6 +500,7 @@ subroutine  psb_dspmv(alpha,a,x,beta,y,desc_a,info,&
   n    = psb_cd_get_global_cols(desc_a)
   nrow = psb_cd_get_local_rows(desc_a)
   ncol = psb_cd_get_local_cols(desc_a)
+
   lldx = size(x)
   lldy = size(y)
 

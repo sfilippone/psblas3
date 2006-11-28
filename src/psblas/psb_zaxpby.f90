@@ -75,7 +75,6 @@ subroutine  psb_zaxpby(alpha, x, beta,y,desc_a,info, n, jx, jy)
   call psb_erractionsave(err_act)
 
   ictxt=psb_cd_get_context(desc_a)
-
   call psb_info(ictxt, me, np)
   if (np == -ione) then
     info = 2010

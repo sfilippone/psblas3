@@ -219,7 +219,6 @@ function psb_dnrm2v(x, desc_a, info)
 
   m = psb_cd_get_global_rows(desc_a)
 
-
   call psb_chkvect(m,1,size(x),ix,jx,desc_a,info,iix,jjx)
   if(info.ne.0) then
     info=4010

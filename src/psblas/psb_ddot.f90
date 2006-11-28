@@ -585,8 +585,6 @@ subroutine psb_dmdots(res, x, y, desc_a, info)
 end subroutine psb_dmdots
 
 
-
-
 subroutine psb_ddot2v(res, x, y,w,z,desc_a, info)  
   use psb_descriptor_type
   use psb_check_mod

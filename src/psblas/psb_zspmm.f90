@@ -118,7 +118,6 @@ subroutine  psb_zspmm(alpha,a,x,beta,y,desc_a,info,&
   call psb_erractionsave(err_act)
 
   ictxt=psb_cd_get_context(desc_a)
-
   call psb_info(ictxt, me, np)
   if (np == -1) then
     info = 2010
@@ -451,7 +450,6 @@ subroutine  psb_zspmv(alpha,a,x,beta,y,desc_a,info,&
   call psb_erractionsave(err_act)
 
   ictxt=psb_cd_get_context(desc_a)
-
   call psb_info(ictxt, me, np)
   if (np == -1) then
     info = 2010

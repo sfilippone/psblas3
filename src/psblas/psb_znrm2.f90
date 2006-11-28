@@ -86,7 +86,6 @@ function psb_znrm2(x, desc_a, info, jx)
   endif
 
   m = psb_cd_get_global_rows(desc_a)
-
   call psb_chkvect(m,1,size(x,1),ix,ijx,desc_a,info,iix,jjx)
   if(info.ne.0) then
     info=4010
@@ -217,7 +216,6 @@ function psb_znrm2v(x, desc_a, info)
 
   ix = 1
   jx=1
-
   m = psb_cd_get_global_rows(desc_a)
 
 

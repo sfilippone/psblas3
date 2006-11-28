@@ -73,7 +73,6 @@ function psb_zdot(x, y,desc_a, info, jx, jy)
   call psb_erractionsave(err_act)
 
   ictxt=psb_cd_get_context(desc_a)
-
   call psb_info(ictxt, me, np)
   if (np == -ione) then
     info = 2010
@@ -376,7 +375,6 @@ subroutine psb_zdotvs(res, x, y,desc_a, info)
   ix = ione
   iy = ione
   m = psb_cd_get_global_rows(desc_a)
-
   ! check vector correctness
   call psb_chkvect(m,ione,size(x,1),ix,ix,desc_a,info,iix,jjx)
   if (info == 0) &
