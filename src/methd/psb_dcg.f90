@@ -115,12 +115,12 @@ Subroutine psb_dcg(a,prec,b,x,eps,desc_a,info,&
 
 
   ictxt = psb_cd_get_context(desc_a)
+
   call psb_info(ictxt, me, np)
 
   mglob = psb_cd_get_global_rows(desc_a)
   n_row = psb_cd_get_local_rows(desc_a)
   n_col = psb_cd_get_local_cols(desc_a)
-
 
   if (present(istop)) then 
     istop_ = istop 

@@ -117,7 +117,9 @@ Subroutine psb_zcgs(a,prec,b,x,eps,desc_a,info,&
   call psb_erractionsave(err_act)
 
   If (debug) Write(*,*) 'entering psb_zcgs'
+
   ictxt = psb_cd_get_context(desc_a)
+
   Call psb_info(ictxt, me, np)
   If (debug) Write(*,*) 'psb_zcgs: from gridinfo',np,me
 
