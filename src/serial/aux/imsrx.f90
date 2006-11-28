@@ -31,13 +31,13 @@
 ! File:  imsrx.f90 
  ! Subroutine: 
  ! Parameters:
-subroutine imsrx(n,x,indx)
-  integer :: n
+subroutine imsrx(n,x,indx,flag)
+  integer :: n, flag
   integer :: x(n)
   integer :: indx(n)
-  
+
   integer, allocatable :: iaux(:)
-  
+
   integer :: iswap, iret, info, lp, k
   integer :: lswap, ixswap
 
@@ -45,10 +45,12 @@ subroutine imsrx(n,x,indx)
     write(0,*) 'Error: IMSRX: N<0'
     return
   endif
-  
+
   if (n==0) return
   if (n==1) then 
-    indx(1) = 1
+    if (flag == 0) then 
+      indx(1) = 1
+    endif
     return
   endif
 
@@ -58,12 +60,13 @@ subroutine imsrx(n,x,indx)
     return
   endif
 
-  do k=1,n
-    indx(k) = k
-  enddo
-
+  if (flag == 0) then 
+    do k=1,n
+      indx(k) = k
+    enddo
+  end if
   call mrgsrt(n,x,iaux,iret)
-  
+
   if (iret /= 1) then 
     lp = iaux(0)
     k  = 1

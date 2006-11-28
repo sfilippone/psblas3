@@ -41,7 +41,7 @@ subroutine imsr(n,x)
   integer :: lswap
 
   if (n<0) then 
-    write(0,*) 'Error: IMSR: N<0'
+!!$    write(0,*) 'Error: IMSR: N<0'
     return
   endif
   

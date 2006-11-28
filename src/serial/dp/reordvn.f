@@ -63,6 +63,36 @@ C        ... Swap of vectors IA2, IA1, AR ...
  800  CONTINUE
       return
       end
+      subroutine ireordv2(nnz,ia1,ia2,idx)
+      integer nnz
+      integer ia1(*),ia2(*),idx(0:*)
+      integer lp, kk, swapia1, swapia2, lswap
+
+      LP = IDX(0)
+      KK = 1
+ 500  CONTINUE
+      IF ((LP.EQ.0).OR.(KK.GT.NNZ)) GOTO 800
+ 600  CONTINUE
+      IF (LP.GE.KK) GOTO 700
+      LP = IDX(LP)
+      GOTO 600
+ 700  CONTINUE
+C        ... Swap of vectors IA2, IA1 ..
+      SWAPIA2 = IA2(KK)
+      SWAPIA1 = IA1(KK)
+      IA2(KK) = IA2(LP)
+      IA1(KK) = IA1(LP)
+      IA2(LP) = SWAPIA2
+      IA1(LP) = SWAPIA1
+      LSWAP   = IDX(LP)
+      IDX(LP) = IDX(KK)
+      IDX(KK) = LP
+      LP      = LSWAP
+      KK      = KK+1
+      GOTO 500
+ 800  CONTINUE
+      return
+      end
       subroutine ireordv1(nnz,ia1,idx)
       integer nnz
       integer ia1(*),idx(0:*)
