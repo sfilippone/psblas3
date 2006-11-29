@@ -181,16 +181,16 @@ Subroutine psb_dasmatbld(ptype,novr,a,blk,desc_data,upd,desc_p,info,outfmt)
       !
       !  Build the  auiliary descriptor',desc_p%matrix_data(psb_n_row_)
       ! 
-      call psb_cdovr(a,desc_data,novr,desc_p,info)
+      call psb_cdbldovr(a,desc_data,novr,desc_p,info)
       if(info /= 0) then
         info=4010
-        ch_err='psb_cdovr'
+        ch_err='psb_cdbldovr'
         call psb_errpush(info,name,a_err=ch_err)
         goto 9999
       end if
     Endif
 
-    if(debug) write(0,*) me,' From cdovr _:',desc_p%matrix_data(psb_n_row_),&
+    if(debug) write(0,*) me,' From cdbldovr _:',desc_p%matrix_data(psb_n_row_),&
          & desc_p%matrix_data(psb_n_col_)
 
 

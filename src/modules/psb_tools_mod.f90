@@ -165,34 +165,6 @@ Module psb_tools_mod
   end interface
 
 
-  interface psb_cdovrbld
-     Subroutine psb_dcdovrbld(n_ovr,desc_p,desc_a,a,&
-          &       l_tmp_halo,l_tmp_ovr_idx,lworks,lworkr,info)
-       use psb_descriptor_type
-       use psb_spmat_type
-       type(psb_dspmat_type),intent(in)  :: a
-       type(psb_desc_type),intent(in)    :: desc_a
-       type(psb_desc_type),intent(inout) :: desc_p
-       integer,intent(in)                :: n_ovr
-       Integer, Intent(in)               :: l_tmp_halo,l_tmp_ovr_idx
-       Integer, Intent(inout)            :: lworks, lworkr
-       integer, intent(out)              :: info
-     end Subroutine psb_dcdovrbld
-     Subroutine psb_zcdovrbld(n_ovr,desc_p,desc_a,a,&
-          &       l_tmp_halo,l_tmp_ovr_idx,lworks,lworkr,info)
-       use psb_descriptor_type
-       use psb_spmat_type
-       type(psb_zspmat_type),intent(in)  :: a
-       type(psb_desc_type),intent(in)    :: desc_a
-       type(psb_desc_type),intent(inout) :: desc_p
-       integer,intent(in)                :: n_ovr
-       Integer, Intent(in)               :: l_tmp_halo,l_tmp_ovr_idx
-       Integer, Intent(inout)            :: lworks, lworkr
-       integer, intent(out)              :: info
-     end Subroutine psb_zcdovrbld
-  end interface
-
-
   interface psb_cdprt
      subroutine psb_cdprt(iout,desc_p,glob,short)
        use psb_const_mod
@@ -430,7 +402,7 @@ Module psb_tools_mod
   end interface
 
 
-  interface psb_cdovr
+  interface psb_cdbldovr
      Subroutine psb_dcdovr(a,desc_a,novr,desc_ov,info)
        use psb_descriptor_type
        Use psb_spmat_type
@@ -450,8 +422,7 @@ Module psb_tools_mod
        integer, intent(out)               :: info
      end Subroutine psb_zcdovr
   end interface
-       
-       
+
   interface psb_cdren
      subroutine psb_cdren(trans,iperm,desc_a,info)
        use psb_descriptor_type
