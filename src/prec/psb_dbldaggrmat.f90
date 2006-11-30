@@ -147,14 +147,13 @@ contains
       do i=1, nrow
         p%mlia(i) = p%mlia(i) + naggrm1
       end do
-      call psb_halo(p%mlia,desc_a,info)
-
-      if(info /= 0) then
-        call psb_errpush(4010,name,a_err='psb_halo')
-        goto 9999
-      end if
     end if
+    call psb_halo(p%mlia,desc_a,info)
 
+    if(info /= 0) then
+      call psb_errpush(4010,name,a_err='psb_halo')
+      goto 9999
+    end if
 
     nzt = psb_sp_get_nnzeros(a)
 
@@ -169,57 +168,21 @@ contains
     b%fida = 'COO'
     b%m=a%m
     b%k=a%k
-    if (.true.) then 
-      call psb_csdp(a,b,info)
-      if(info /= 0) then
-        info=4010
-        ch_err='psb_csdp'
-        call psb_errpush(info,name,a_err=ch_err)
-        goto 9999
-      end if
-
-      nzt = psb_sp_get_nnzeros(b)
-
-      do i=1, nzt 
-        b%ia1(i) = p%mlia(b%ia1(i))
-        b%ia2(i) = p%mlia(b%ia2(i))
-      enddo
-
-    else
-!!$      ! Ok, this is extremely dirty because we use pointers from 
-!!$      ! one sparse matrix into another. But it gives us something 
-!!$      ! in term of performance
-!!$      jl = 0
-!!$      do i=1,a%m,50
-!!$        nlr = min(a%m-i+1,50)
-!!$        call psb_spgtblk(i,a,b,info,append=.true.,iren=p%mlia,lrw=i+nlr-1)
-!!$        if(info /= 0) then
-!!$          call psb_errpush(4010,name,a_err='spgtblk')
-!!$          goto 9999
-!!$        end if
-!!$
-!!$        call psb_spinfo(psb_nztotreq_,b,nzl,info)
-!!$        if(info /= 0) then
-!!$          call psb_errpush(4010,name,a_err='spinfo')
-!!$          goto 9999
-!!$        end if
-!!$        nzl = nzl - jl 
-!!$        tmp%fida  = 'COO'
-!!$        tmp%infoa(psb_nnz_) = nzl
-!!$        tmp%aspk => b%aspk(jl+1:jl+nzl)
-!!$        tmp%ia1 => b%ia1(jl+1:jl+nzl)
-!!$        tmp%ia2 => b%ia2(jl+1:jl+nzl)
-!!$        call psb_fixcoo(tmp,info)
-!!$        if(info /= 0) then
-!!$          call psb_errpush(4010,name,a_err='psb_fixcoo')
-!!$          goto 9999
-!!$        end if
-!!$        nzl = tmp%infoa(psb_nnz_)
-!!$        b%infoa(psb_nnz_) = jl+nzl
-!!$        jl = jl + nzl
-!!$      enddo
+    call psb_csdp(a,b,info)
+    if(info /= 0) then
+      info=4010
+      ch_err='psb_csdp'
+      call psb_errpush(info,name,a_err=ch_err)
+      goto 9999
     end if
 
+    nzt = psb_sp_get_nnzeros(b)
+
+    do i=1, nzt 
+      b%ia1(i) = p%mlia(b%ia1(i))
+      b%ia2(i) = p%mlia(b%ia2(i))
+    enddo
+    call psb_fixcoo(b,info)
 
     irs = psb_sp_get_nnzeros(b)
 

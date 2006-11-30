@@ -73,7 +73,7 @@ subroutine psb_dbjac_aply(alpha,prec,x,beta,y,desc_data,trans,work,info)
   info = 0
   call psb_erractionsave(err_act)
 
-  ictxt=desc_data%matrix_data(psb_ctxt_)
+  ictxt=psb_cd_get_context(desc_data)
   call psb_info(ictxt, me, np)
 
   diagl='U'
