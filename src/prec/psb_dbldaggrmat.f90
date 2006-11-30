@@ -113,10 +113,10 @@ contains
 
     include 'mpif.h'
     integer, intent(out)   :: info
-    type(psb_dspmat_type)          :: b, tmp
+    type(psb_dspmat_type)          :: b
     integer, pointer :: nzbr(:), idisp(:)
     integer :: ictxt, nrow, nglob, ncol, ntaggr, nzac, ip, ndx,&
-         & naggr, np, me, nzt,irs,jl,nzl,nlr,&
+         & naggr, np, me, nzt,jl,nzl,nlr,&
          & icomm,naggrm1, i, j, k, err_act
 
     name='raw_aggregate'
@@ -184,9 +184,9 @@ contains
     enddo
     call psb_fixcoo(b,info)
 
-    irs = psb_sp_get_nnzeros(b)
+    nzt = psb_sp_get_nnzeros(b)
 
-    call psb_sp_reall(b,irs,info)
+    call psb_sp_reall(b,nzt,info)
     if(info /= 0) then
       call psb_errpush(4010,name,a_err='spreall')
       goto 9999
@@ -203,7 +203,7 @@ contains
       end if
 
       nzbr(:) = 0
-      nzbr(me+1) = irs
+      nzbr(me+1) = nzt
       call psb_sum(ictxt,nzbr(1:np))
       nzac = sum(nzbr)
       call psb_sp_all(ntaggr,ntaggr,ac,nzac,info)
