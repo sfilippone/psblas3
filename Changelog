@@ -1,10 +1,16 @@
 Changelog. A lot less detailed than usual, at least for past
 history. 
 
+2006/11/30: Fixed a bug in raw aggregation. Note: raw aggregation
+	    gives different results from smoothed with omega=0.0,
+	    because in the latter we have explicitly stored zero
+	    coefficients that would be absent in the first, thus
+	    generating different ILU factorizations.
+
 2006/11/28: Merged the mods for descriptors of large index spaces to
 	    avoid having the GLOB_TO_LOC array. Took the chance to
 	    reorganize the descriptor build routines and define some
-	    access functions for decsriptor features and entries, so
+	    access functions for descriptor features and entries, so
 	    as not to use the descriptor components directly. Tested
 	    with AS, 2- and 3- level Post smoothers. 
 
