@@ -193,6 +193,7 @@ contains
     use psb_descriptor_type
     Use psb_prec_type
     use psb_string_mod
+    use psb_penv_mod
 !!$  parameters 
     character(len=*)                   :: method
     Type(psb_dspmat_type), Intent(in)  :: a
@@ -206,8 +207,9 @@ contains
     Integer, Optional, Intent(out)     :: iter
     Real(Kind(1.d0)), Optional, Intent(out) :: err
     
-    integer             :: itmax_, itrace_, irst_, istop_, iter_
-    real(kind(1.d0))    :: err_
+    integer           :: ictxt, me, np
+    integer           :: itmax_, itrace_, irst_, istop_, iter_
+    real(kind(1.d0))  :: err_
     
     if (present(itmax)) then 
       itmax_ = itmax
@@ -233,6 +235,8 @@ contains
       istop_ = 1
     end if
 
+    ictxt = psb_cd_get_context(desc_a)
+    call psb_info(ictxt,me,np)
 
     select case(toupper(method))
     case('CG') 
@@ -254,6 +258,8 @@ contains
       call  psb_bicgstabl(a,prec,b,x,eps,desc_a,info,&
          &itmax_,iter_,err_,itrace_,irst_,istop_)
     case default
+      if (me==0)  write(0,*) &
+           & 'psb_krylov: unknown method, defaulting to BiCGSTAB'
       call  psb_bicgstab(a,prec,b,x,eps,desc_a,info,&
          &itmax_,iter_,err_,itrace_,istop_)
     end select
@@ -275,6 +281,7 @@ contains
     use psb_descriptor_type
     Use psb_prec_type
     use psb_string_mod
+    use psb_penv_mod
 !!$  parameters 
     character(len=*)                   :: method
     Type(psb_zspmat_type), Intent(in)  :: a
@@ -288,6 +295,8 @@ contains
     Integer, Optional, Intent(out)     :: iter
     Real(Kind(1.d0)), Optional, Intent(out) :: err
     
+    
+    integer           :: ictxt, me, np
     integer             :: itmax_, itrace_, irst_, istop_, iter_
     real(kind(1.d0))    :: err_
     
@@ -316,6 +325,9 @@ contains
     end if
 
 
+    ictxt = psb_cd_get_context(desc_a)
+    call psb_info(ictxt,me,np)
+
     select case(toupper(method))
 !!$    case('CG') 
 !!$      call  psb_cg(a,prec,b,x,eps,desc_a,info,&
@@ -336,6 +348,8 @@ contains
 !!$      call  psb_bicgstabl(a,prec,b,x,eps,desc_a,info,&
 !!$         &itmax_,iter_,err_,itrace_,irst_,istop_)
     case default
+      if (me==0)  write(0,*) &
+           & 'psb_krylov: unknown method, defaulting to BiCGSTAB'
       call  psb_bicgstab(a,prec,b,x,eps,desc_a,info,&
          &itmax_,iter_,err_,itrace_,istop_)
     end select
