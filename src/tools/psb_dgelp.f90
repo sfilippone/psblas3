@@ -69,15 +69,6 @@ subroutine psb_dgelp(trans,iperm,x,desc_a,info)
       integer, intent(in)  :: p(*)
     end subroutine dgelp
   end interface
-
-  interface isaperm
-
-    logical function isaperm(n,ip)
-      integer, intent(in)    :: n   
-      integer, intent(inout) :: ip(*)
-    end function isaperm
-  end interface
-
   character(len=20)   :: name, ch_err
   name = 'psb_dgelp'
 
@@ -212,14 +203,6 @@ subroutine psb_dgelpv(trans,iperm,x,desc_a,info)
       double precision, intent(inout) ::  b(*), work(*)
       integer, intent(in)  :: p(*)
     end subroutine dgelp
-  end interface
-
-  interface isaperm
-
-    logical function isaperm(n,ip)
-      integer, intent(in)    :: n   
-      integer, intent(inout) :: ip(*)
-    end function isaperm
   end interface
 
   character(len=20)   :: name, ch_err

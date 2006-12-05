@@ -43,6 +43,7 @@ subroutine psb_dprc_aply(prec,x,y,desc_data,info,trans, work)
   use psb_const_mod
   use psb_error_mod
   use psb_penv_mod
+  use psb_prec_mod
   implicit none
 
   type(psb_desc_type),intent(in)      :: desc_data
@@ -60,34 +61,6 @@ subroutine psb_dprc_aply(prec,x,y,desc_data,info,trans, work)
   external mpi_wtime
   character(len=20)   :: name
 
-  interface psb_baseprc_aply
-     subroutine psb_dbaseprc_aply(alpha,prec,x,beta,y,desc_data,trans,work,info)
-       use psb_descriptor_type
-       use psb_prec_type
-       type(psb_desc_type),intent(in)      :: desc_data
-       type(psb_dbaseprc_type), intent(in) :: prec
-       real(kind(0.d0)),intent(inout)      :: x(:), y(:)
-       real(kind(0.d0)),intent(in)         :: alpha,beta
-       character(len=1)                    :: trans
-       real(kind(0.d0)),target             :: work(:)
-       integer, intent(out)                :: info
-     end subroutine psb_dbaseprc_aply
-  end interface
-
-  interface psb_mlprc_aply
-     subroutine psb_dmlprc_aply(alpha,baseprecv,x,beta,y,desc_data,trans,work,info)
-       use psb_descriptor_type
-       use psb_prec_type
-       type(psb_desc_type),intent(in)      :: desc_data
-       type(psb_dbaseprc_type), intent(in) :: baseprecv(:)
-       real(kind(0.d0)),intent(in)         :: alpha,beta
-       real(kind(0.d0)),intent(inout)      :: x(:), y(:)
-       character                           :: trans
-       real(kind(0.d0)),target             :: work(:)
-       integer, intent(out)                :: info
-     end subroutine psb_dmlprc_aply
-  end interface
-  
   name='psb_dprc_aply'
   info = 0
   call psb_erractionsave(err_act)
@@ -193,6 +166,7 @@ subroutine psb_dprc_aply1(prec,x,desc_data,info,trans)
   use psb_const_mod
   use psb_error_mod
   use psb_penv_mod
+  use psb_prec_mod
   implicit none
 
   type(psb_desc_type),intent(in)    :: desc_data
@@ -202,21 +176,6 @@ subroutine psb_dprc_aply1(prec,x,desc_data,info,trans)
   character(len=1), optional        :: trans
   logical,parameter                 :: debug=.false., debugprt=.false.
 
-  interface 
-    subroutine psb_dprc_aply(prec,x,y,desc_data,info,trans, work)
-      
-      use psb_descriptor_type
-      use psb_prec_type
-      implicit none
-      
-      type(psb_desc_type),intent(in)      :: desc_data
-      type(psb_dprec_type), intent(in)    :: prec
-      real(kind(0.d0)),intent(inout)      :: x(:), y(:)
-      integer, intent(out)                :: info
-      character(len=1), optional          :: trans
-      real(kind(0.d0)), optional, target  :: work(:)
-    end subroutine psb_dprc_aply
-  end interface
 
   ! Local variables
   character     :: trans_
@@ -242,7 +201,7 @@ subroutine psb_dprc_aply1(prec,x,desc_data,info,trans)
     goto 9999      
   end if
   if (debug) write(0,*) 'Prc_aply1 Size(x) ',size(x), size(ww),size(w1)
-  call psb_dprc_aply(prec,x,ww,desc_data,info,trans_,work=w1)
+  call psb_prc_aply(prec,x,ww,desc_data,info,trans_,work=w1)
   if(info /=0) goto 9999
   x(:) = ww(:)
   deallocate(ww,W1)

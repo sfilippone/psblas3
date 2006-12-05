@@ -77,21 +77,28 @@ module psi_mod
   end interface
   
   interface
-     subroutine psi_desc_index(desc_data,index_in,dep_list,&
-          & length_dl,nsnd,nrcv,loc_to_glob,glob_to_loc,desc_index,&
-          & isglob_in,info)
-       integer :: desc_data(:),index_in(:),dep_list(:)
-       integer :: loc_to_glob(:),glob_to_loc(:)
-       integer,allocatable, intent(inout) :: desc_index(:)
-       integer :: length_dl,nsnd,nrcv,info
-       logical :: isglob_in
-     end subroutine psi_desc_index
+    subroutine psi_desc_index(desc,index_in,dep_list,&
+         & length_dl,nsnd,nrcv,desc_index,isglob_in,info)
+      use psb_descriptor_type
+      type(psb_desc_type) :: desc
+      integer         :: index_in(:),dep_list(:)
+      integer,allocatable  :: desc_index(:)
+      integer         :: length_dl,nsnd,nrcv,info
+      logical         :: isglob_in
+    end subroutine psi_desc_index
   end interface
   
   interface
      subroutine psi_sort_dl(dep_list,l_dep_list,np,info)
        integer :: np,dep_list(:,:), l_dep_list(:), info
      end subroutine psi_sort_dl
+  end interface
+
+  interface
+    subroutine psi_dl_check(dep_list,dl_lda,np,length_dl)
+      integer  :: np,dl_lda,length_dl(0:np)
+      integer  :: dep_list(dl_lda,0:np)
+    end subroutine psi_dl_check
   end interface
 
   interface psi_swapdata

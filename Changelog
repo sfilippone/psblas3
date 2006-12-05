@@ -1,6 +1,9 @@
 Changelog. A lot less detailed than usual, at least for past
 history. 
 
+2006/12/05: Taken out extra interfaces; inserted use modules with ONLY
+	    clauses where appropriate.
+
 2006/11/30: Fixed a bug in raw aggregation. Note: raw aggregation
 	    gives different results from smoothed with omega=0.0,
 	    because in the latter we have explicitly stored zero

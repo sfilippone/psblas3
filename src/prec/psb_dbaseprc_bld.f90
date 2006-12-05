@@ -46,6 +46,8 @@ subroutine psb_dbaseprc_bld(a,desc_a,p,info,upd)
   use psb_psblas_mod
   use psb_error_mod
   use psb_penv_mod
+  use psb_prec_mod
+
   Implicit None
 
   type(psb_dspmat_type), target           :: a
@@ -54,61 +56,6 @@ subroutine psb_dbaseprc_bld(a,desc_a,p,info,upd)
   integer, intent(out)                    :: info
   character, intent(in), optional         :: upd
 
-  interface psb_diagsc_bld
-    subroutine psb_ddiagsc_bld(a,desc_data,p,upd,info)
-      use psb_serial_mod
-      use psb_descriptor_type
-      use psb_prec_type
-      integer, intent(out) :: info
-      type(psb_dspmat_type), intent(in), target :: a
-      type(psb_desc_type),intent(in)            :: desc_data
-      type(psb_dbaseprc_type), intent(inout)    :: p
-      character, intent(in)                     :: upd
-    end subroutine psb_ddiagsc_bld
-  end interface
-
-  interface psb_ilu_bld
-    subroutine psb_dilu_bld(a,desc_data,p,upd,info)
-      use psb_serial_mod
-      use psb_descriptor_type
-      use psb_prec_type
-      integer, intent(out) :: info
-      type(psb_dspmat_type), intent(in), target :: a
-      type(psb_desc_type),intent(in)            :: desc_data
-      type(psb_dbaseprc_type), intent(inout)    :: p
-      character, intent(in)                     :: upd
-    end subroutine psb_dilu_bld
-  end interface
-
-  interface psb_slu_bld
-    subroutine psb_dslu_bld(a,desc_a,p,info)
-      use psb_serial_mod
-      use psb_descriptor_type
-      use psb_prec_type
-      use psb_const_mod
-      implicit none 
-
-      type(psb_dspmat_type), intent(inout)      :: a
-      type(psb_desc_type), intent(in)        :: desc_a
-      type(psb_dbaseprc_type), intent(inout) :: p
-      integer, intent(out)                   :: info
-    end subroutine psb_dslu_bld
-  end interface
-
-  interface psb_umf_bld
-    subroutine psb_dumf_bld(a,desc_a,p,info)
-      use psb_serial_mod
-      use psb_descriptor_type
-      use psb_prec_type
-      use psb_const_mod
-      implicit none 
-
-      type(psb_dspmat_type), intent(inout)      :: a
-      type(psb_desc_type), intent(in)        :: desc_a
-      type(psb_dbaseprc_type), intent(inout) :: p
-      integer, intent(out)                   :: info
-    end subroutine psb_dumf_bld
-  end interface
 
   ! Local scalars
   Integer      :: err, nnzero, n_row, n_col,I,j,k,ictxt,&
