@@ -488,7 +488,7 @@ module psb_prec_mod
       use psb_spmat_type
       type(psb_dspmat_type), intent(in), target :: a
       type(psb_desc_type), intent(in)           :: desc_a
-      type(psb_dspmat_type), intent(out),target :: ac
+      type(psb_dspmat_type), intent(inout),target :: ac
       type(psb_desc_type), intent(inout)        :: desc_ac
       type(psb_dbaseprc_type), intent(inout), target :: p
       integer, intent(out)                      :: info
@@ -499,7 +499,7 @@ module psb_prec_mod
       use psb_spmat_type
       type(psb_zspmat_type), intent(in), target :: a
       type(psb_zbaseprc_type), intent(inout),target    :: p
-      type(psb_zspmat_type), intent(out),target :: ac
+      type(psb_zspmat_type), intent(inout),target :: ac
       type(psb_desc_type), intent(in)           :: desc_a
       type(psb_desc_type), intent(inout)        :: desc_ac
       integer, intent(out)                      :: info
