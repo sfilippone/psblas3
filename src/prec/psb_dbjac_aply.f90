@@ -190,6 +190,12 @@ subroutine psb_dbjac_aply(alpha,prec,x,beta,y,desc_data,trans,work,info)
 
     tx = dzero
     ty = dzero
+!!$        open(50+me)
+!!$        call psb_csprt(50+me,prec%av(ap_nd_))
+!!$        call flush(50+me)
+!!$        close(50+me)
+!!$        call psb_barrier(ictxt)
+
     select case(prec%iprcparm(f_type_)) 
     case(f_ilu_n_,f_ilu_e_) 
       do i=1, prec%iprcparm(jac_sweeps_) 

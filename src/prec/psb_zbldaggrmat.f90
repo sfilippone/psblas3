@@ -47,7 +47,7 @@ subroutine psb_zbldaggrmat(a,desc_a,ac,desc_ac,p,info)
 
   type(psb_zspmat_type), intent(in), target  :: a
   type(psb_zbaseprc_type), intent(inout),target     :: p
-  type(psb_zspmat_type), intent(out), target :: ac
+  type(psb_zspmat_type), intent(inout), target :: ac
   type(psb_desc_type), intent(in)            :: desc_a
   type(psb_desc_type), intent(inout)         :: desc_ac
   integer, intent(out)                       :: info
@@ -112,7 +112,7 @@ contains
 
     include 'mpif.h'
     integer, intent(out)   :: info
-    type(psb_zspmat_type)          :: b, tmp
+    type(psb_zspmat_type)          :: b
     integer, pointer :: nzbr(:), idisp(:)
     integer :: ictxt, nrow, nglob, ncol, ntaggr, nzac, ip, ndx,&
          & naggr, np, me, nzt,jl,nzl,nlr,&
@@ -146,8 +146,8 @@ contains
       do i=1, nrow
         p%mlia(i) = p%mlia(i) + naggrm1
       end do
+      call psb_halo(p%mlia,desc_a,info)
     end if
-    call psb_halo(p%mlia,desc_a,info)
 
     if(info /= 0) then
       call psb_errpush(4010,name,a_err='psb_halo')
@@ -177,10 +177,16 @@ contains
 
     nzt = psb_sp_get_nnzeros(b)
 
+    j = 0 
     do i=1, nzt 
-      b%ia1(i) = p%mlia(b%ia1(i))
-      b%ia2(i) = p%mlia(b%ia2(i))
+      if ((1<=b%ia2(i)).and.(b%ia2(i)<=nrow)) then 
+        j = j + 1
+        b%aspk(j) = b%aspk(i)
+        b%ia1(j)  = p%mlia(b%ia1(i))
+        b%ia2(j)  = p%mlia(b%ia2(i))
+      end if
     enddo
+    b%infoa(psb_nnz_)=j
     call psb_fixcoo(b,info)
 
     nzt = psb_sp_get_nnzeros(b)
