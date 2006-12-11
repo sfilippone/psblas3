@@ -40,7 +40,7 @@
 !    info     - integer.                  Eventually returns an error code.
 !    iact     - integer(optional).        A character defining the behaviour of this subroutine when is found an index not belonging to the calling process
 !
-subroutine psb_glob_to_loc2(x,y,desc_a,info,iact)
+subroutine psb_glob_to_loc2(x,y,desc_a,info,iact,owned)
 
   use psb_descriptor_type
   use psb_const_mod
@@ -52,51 +52,63 @@ subroutine psb_glob_to_loc2(x,y,desc_a,info,iact)
 
   !...parameters....
   type(psb_desc_type), intent(in) ::  desc_a
-  integer, intent(in)                ::  x(:)  
-  integer, intent(out)               ::  y(:), info
-  character, intent(in), optional    ::  iact
+  integer, intent(in)             :: x(:)  
+  integer, intent(out)            :: y(:), info
+  character, intent(in), optional :: iact
+  logical, intent(in), optional   :: owned
 
   !....locals....
-  integer                            ::  n, i, tmp
-  character                          ::  act
-  integer                            ::  int_err(5), err_act
-  real(kind(1.d0))                   ::  real_val
-  integer, parameter                 ::  zero=0
+  integer                         :: n, i, tmp
+  character                       :: act
+  integer                         :: int_err(5), err_act
+  real(kind(1.d0))                :: real_val
+  integer, parameter              :: zero=0
+  logical                         :: owned_
   character(len=20)   :: name
+  integer             :: ictxt, iam, np
 
   if(psb_get_errstatus() /= 0) return 
   info=0
   name = 'glob_to_loc'
+  ictxt = psb_cd_get_context(desc_a)
+  call psb_info(ictxt,iam,np)
   call psb_erractionsave(err_act)
 
   if (present(iact)) then
     act=iact
   else
-    act='A'
+    act='I'
   endif
   act = toupper(act)
+  if (present(owned)) then 
+    owned_ = owned
+  else
+    owned_ = .false.
+  end if
 
   int_err=0
   real_val = 0.d0
 
   n = size(x)
-  call psi_idx_cnv(n,x,y,desc_a,info)
+  call psi_idx_cnv(n,x,y,desc_a,info,owned=owned_)
 
   select case(act)
-  case('E','I')
-    call psb_erractionrestore(err_act)
-    return
+  case('I')
   case('W')
-    if ((info /= 0).or.(count(y(1:n)<0) >0)) then
-      write(0,'("Error ",i5," in subroutine glob_to_loc")') info
+    if (count(y(1:n)<0) >0) then
+      write(0,'("Out of bounds input  in subroutine glob_to_loc")') 
     end if
-  case('A')
-    if ((info /= 0).or.(count(y(1:n)<0) >0)) then
-      call psb_errpush(info,name)
-      goto 9999
+    
+  case('E','A')
+    if (count(y(1:n)<0) >0) then
+      info = 151
     end if
   end select
-
+  if (info /= 0) then 
+    call psb_errpush(info,name)
+    goto 9999
+  end if
+  
   call psb_erractionrestore(err_act)
   return
 
@@ -153,7 +165,7 @@ end subroutine psb_glob_to_loc2
 !    info     - integer.                  Eventually returns an error code.
 !    iact     - integer(optional).        A character defining the behaviour of this subroutine when is found an index not belonging to the calling process
 !
-subroutine psb_glob_to_loc(x,desc_a,info,iact)
+subroutine psb_glob_to_loc(x,desc_a,info,iact,owned)
 
   use psb_penv_mod
   use psb_descriptor_type
@@ -168,51 +180,58 @@ subroutine psb_glob_to_loc(x,desc_a,info,iact)
   integer, intent(inout)           :: x(:)  
   integer, intent(out)             :: info
   character, intent(in), optional  :: iact
+  logical, intent(in), optional   :: owned
 
   !....locals....
   integer                          :: n, i, tmp, nk, key, idx, ih, nh, lb, ub, lm
   character                        :: act
-  integer                          :: int_err(5), err_act, dectype
+  integer                          :: int_err(5), err_act
   real(kind(1.d0))                 :: real_val, t0, t1,t2
   integer, parameter               :: zero=0
+  logical                         :: owned_
   character(len=20)   :: name
   integer             :: ictxt, iam, np
 
   if(psb_get_errstatus() /= 0) return 
   info=0
   name = 'glob_to_loc'
-  ictxt = desc_a%matrix_data(psb_ctxt_)
+  ictxt = psb_cd_get_context(desc_a)
   call psb_info(ictxt,iam,np)
   call psb_erractionsave(err_act)
 
-  dectype  = desc_a%matrix_data(psb_dec_type_)
   if (present(iact)) then
     act=iact
   else
-    act='A'
+    act='I'
   endif
 
   act = toupper(act)
+  if (present(owned)) then 
+    owned_ = owned
+  else
+    owned_ = .false.
+  end if
 
   n = size(x)
-  call psi_idx_cnv(n,x,desc_a,info)
+  call psi_idx_cnv(n,x,desc_a,info,owned=owned_)
 
   select case(act)
-  case('E','I')
-    call psb_erractionrestore(err_act)
-    return
+  case('I')
   case('W')
-    if ((info /= 0).or.(count(x(1:n)<0) >0)) then
-      write(0,'("Error ",i5," in subroutine glob_to_loc")') info
+    if (count(x(1:n)<0) >0) then
+      write(0,'("Out of bounds input  in subroutine glob_to_loc")') 
     end if
-  case('A')
-    if ((info /= 0).or.(count(x(1:n)<0) >0)) then
-      write(0,*) count(x(1:n)<0)
-      call psb_errpush(info,name)
-      goto 9999
+    
+  case('E','A')
+    if (count(x(1:n)<0) >0) then
+      info = 151
     end if
   end select
-
+  if (info /= 0) then 
+    call psb_errpush(info,name)
+    goto 9999
+  end if
+ 
   call psb_erractionrestore(err_act)
   return
 
@@ -226,69 +245,69 @@ subroutine psb_glob_to_loc(x,desc_a,info,iact)
   end if
   return
 
-contains 
-
-  subroutine inlbsrch(ipos,key,n,v)
-    implicit none
-    integer ipos, key, n
-    integer v(n)
-
-    integer lb, ub, m
-
-
-    lb = 1 
-    ub = n
-    ipos = -1 
-
-    do 
-      if (lb > ub) return
-      m = (lb+ub)/2
-      if (key.eq.v(m))  then
-        ipos = m 
-        return
-      else if (key.lt.v(m))  then
-        ub = m-1
-      else 
-        lb = m + 1
-      end if
-    enddo
-    return
-  end subroutine inlbsrch
-
-  subroutine inner_cnv(n,x,hashsize,hashmask,hashv,glb_lc)
-    integer :: n, hashsize,hashmask,x(:), hashv(0:),glb_lc(:,:)
-    integer :: i, ih, key, idx,nh,tmp,lb,ub,lm
-    do i=1, n
-      key = x(i) 
-      ih  = iand(key,hashmask)
-      idx = hashv(ih)
-      nh  = hashv(ih+1) - hashv(ih) 
-      if (nh > 0) then 
-        tmp = -1 
-        lb = idx
-        ub = idx+nh-1
-        do 
-          if (lb>ub) exit
-          lm = (lb+ub)/2
-          if (key==glb_lc(lm,1)) then 
-            tmp = lm
-            exit
-          else if (key<glb_lc(lm,1)) then 
-            ub = lm - 1
-          else
-            lb = lm + 1
-          end if
-        end do
-      else 
-        tmp = -1
-      end if
-      if (tmp > 0) then 
-        x(i) = glb_lc(tmp,2)
-      else         
-        x(i) = tmp 
-      end if
-    end do
-  end subroutine inner_cnv
+!!$contains 
+!!$
+!!$  subroutine inlbsrch(ipos,key,n,v)
+!!$    implicit none
+!!$    integer ipos, key, n
+!!$    integer v(n)
+!!$
+!!$    integer lb, ub, m
+!!$
+!!$
+!!$    lb = 1 
+!!$    ub = n
+!!$    ipos = -1 
+!!$
+!!$    do 
+!!$      if (lb > ub) return
+!!$      m = (lb+ub)/2
+!!$      if (key.eq.v(m))  then
+!!$        ipos = m 
+!!$        return
+!!$      else if (key.lt.v(m))  then
+!!$        ub = m-1
+!!$      else 
+!!$        lb = m + 1
+!!$      end if
+!!$    enddo
+!!$    return
+!!$  end subroutine inlbsrch
+!!$
+!!$  subroutine inner_cnv(n,x,hashsize,hashmask,hashv,glb_lc)
+!!$    integer :: n, hashsize,hashmask,x(:), hashv(0:),glb_lc(:,:)
+!!$    integer :: i, ih, key, idx,nh,tmp,lb,ub,lm
+!!$    do i=1, n
+!!$      key = x(i) 
+!!$      ih  = iand(key,hashmask)
+!!$      idx = hashv(ih)
+!!$      nh  = hashv(ih+1) - hashv(ih) 
+!!$      if (nh > 0) then 
+!!$        tmp = -1 
+!!$        lb = idx
+!!$        ub = idx+nh-1
+!!$        do 
+!!$          if (lb>ub) exit
+!!$          lm = (lb+ub)/2
+!!$          if (key==glb_lc(lm,1)) then 
+!!$            tmp = lm
+!!$            exit
+!!$          else if (key<glb_lc(lm,1)) then 
+!!$            ub = lm - 1
+!!$          else
+!!$            lb = lm + 1
+!!$          end if
+!!$        end do
+!!$      else 
+!!$        tmp = -1
+!!$      end if
+!!$      if (tmp > 0) then 
+!!$        x(i) = glb_lc(tmp,2)
+!!$      else         
+!!$        x(i) = tmp 
+!!$      end if
+!!$    end do
+!!$  end subroutine inner_cnv
 
 end subroutine psb_glob_to_loc
 

@@ -387,6 +387,7 @@ subroutine psb_cdall(m, n, parts, ictxt, desc_a, info)
   ! set fields in desc_a%MATRIX_DATA....
   desc_a%matrix_data(psb_n_row_)  = loc_row
   desc_a%matrix_data(psb_n_col_)  = loc_row
+  call psb_cd_set_bld(desc_a,info)
 
   call psb_realloc(1,desc_a%halo_index, info)
   if (info /= no_err) then

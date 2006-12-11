@@ -777,8 +777,8 @@ Specified as: Integer scalar.\\
 %
 \subroutine{psb\_glob\_to\_loc}{Global to local indices convertion}
 
-\syntax{call psb\_glob\_to\_loc}{x, y, desc\_a, info, iact}
-\syntax*{call psb\_glob\_to\_loc}{x, desc\_a, info, iact}
+\syntax{call psb\_glob\_to\_loc}{x, y, desc\_a, info, iact,owned}
+\syntax*{call psb\_glob\_to\_loc}{x, desc\_a, info, iact,owned}
 
 \begin{description}
 \item[\bf On Entry]
@@ -793,7 +793,14 @@ Specified as: a structured data of type \descdata.
 \item[iact] specifies action to be taken in case of range errors. 
 Scope: {\bf global} \\
 Type: {\bf optional}\\
-Specified as: a character variable  \verb|E|, \verb|W| or \verb|A|. 
+Specified as: a character variable  \verb|I|gnore, \verb|W|arning or
+\verb|A|bort, default \verb|I|gnore.
+\item[owned] Specfies valid range of input 
+Scope: {\bf global} \\
+Type: {\bf optional}\\
+If true, then only indices strictly owned by the current process are
+considered valid, if false then halo indices are also
+accepted. Default: false. 
 \end{description}
 
 \begin{description}
@@ -803,7 +810,7 @@ Specified as: a character variable  \verb|E|, \verb|W| or \verb|A|.
 Scope: {\bf global} \\
 Type: {\bf required}\\
 Specified as: a rank one integer array.
-\item[y] If $y$ is not present,
+\item[y] If $y$ is  present,
   then $y$ is overwritten with the translated integer indices, and $x$
   is left unchanged. 
 Scope: {\bf global} \\
@@ -815,6 +822,13 @@ Type: {\bf required}\\
 Specified as: an integer variable.
 \end{description}
 
+\section*{Notes}
+\begin{enumerate}
+\item If an input index is out of range, then the corresponding output
+  index is set to a negative number;
+\item The default \verb|I|gnore means that the negative output is the
+  only action taken on an out-of-range input.
+\end{enumerate}
 
 
 %

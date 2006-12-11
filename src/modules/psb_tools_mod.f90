@@ -557,20 +557,22 @@ Module psb_tools_mod
 
 
   interface psb_glob_to_loc
-     subroutine psb_glob_to_loc2(x,y,desc_a,info,iact)
+     subroutine psb_glob_to_loc2(x,y,desc_a,info,iact,owned)
        use psb_descriptor_type
-       type(psb_desc_type), intent(in)    ::  desc_a
-       integer,intent(in)                 ::  x(:)  
-       integer,intent(out)                ::  y(:)  
-       integer, intent(out)               ::  info
-       character, intent(in), optional    ::  iact
+       type(psb_desc_type), intent(in) ::  desc_a
+       integer,intent(in)              ::  x(:)  
+       integer,intent(out)             ::  y(:)  
+       integer, intent(out)            ::  info
+       character, intent(in), optional ::  iact
+       logical, intent(in), optional   :: owned
      end subroutine psb_glob_to_loc2
-     subroutine psb_glob_to_loc(x,desc_a,info,iact)
+     subroutine psb_glob_to_loc(x,desc_a,info,iact,owned)
        use psb_descriptor_type
-       type(psb_desc_type), intent(in)    ::  desc_a
-       integer,intent(inout)              ::  x(:)  
-       integer, intent(out)               ::  info
-       character, intent(in), optional    ::  iact
+       type(psb_desc_type), intent(in) ::  desc_a
+       integer,intent(inout)           ::  x(:)  
+       integer, intent(out)            ::  info
+       character, intent(in), optional ::  iact
+       logical, intent(in), optional   :: owned
      end subroutine psb_glob_to_loc
   end interface
 
