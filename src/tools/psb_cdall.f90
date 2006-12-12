@@ -228,6 +228,7 @@ subroutine psb_cdall(m, n, parts, ictxt, desc_a, info)
       goto 9999
     endif
     loc_row = k 
+
   else
 
     desc_a%matrix_data(psb_dec_type_) = psb_desc_bld_
@@ -376,13 +377,15 @@ subroutine psb_cdall(m, n, parts, ictxt, desc_a, info)
 
   call psb_transfer(ov_idx,desc_a%ovrlap_index,info) 
   if (info == 0) call psb_transfer(ov_el,desc_a%ovrlap_elem,info)
-  deallocate(prc_v,temp_ovrlap,stat=info)
+  if (info == 0) deallocate(prc_v,temp_ovrlap,stat=info)
   if (info /= no_err) then 
     info=4000
     err=info
     call psb_errpush(err,name)
     Goto 9999
   endif
+  ! At this point overlap is OK.
+  desc_a%matrix_data(psb_ovl_state_) = psb_cd_ovl_asb_
 
   ! set fields in desc_a%MATRIX_DATA....
   desc_a%matrix_data(psb_n_row_)  = loc_row

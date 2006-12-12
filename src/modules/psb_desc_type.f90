@@ -136,6 +136,28 @@ contains
 
   end function psb_is_asb_desc
 
+  logical function psb_is_ovl_bld(desc)
+    type(psb_desc_type), intent(in) :: desc
+
+    psb_is_ovl_bld = (desc%matrix_data(psb_ovl_state_)==psb_cd_ovl_bld_)
+
+  end function psb_is_ovl_bld
+
+  logical function psb_is_ovl_asb(desc)
+    type(psb_desc_type), intent(in) :: desc
+
+    psb_is_ovl_asb = (desc%matrix_data(psb_ovl_state_)==psb_cd_ovl_asb_)
+
+  end function psb_is_ovl_asb
+
+  logical function psb_is_ovl_ok(desc)
+    type(psb_desc_type), intent(in) :: desc
+
+    psb_is_ovl_ok = (desc%matrix_data(psb_ovl_state_)==psb_cd_ovl_asb_).or.&
+         & (desc%matrix_data(psb_ovl_state_)==psb_cd_ovl_bld_)
+
+  end function psb_is_ovl_ok
+
 
   logical function psb_is_ok_dec(dectype)
     integer :: dectype
@@ -228,6 +250,11 @@ contains
   end function psb_is_large_dec
 
   subroutine psb_cd_set_bld(desc,info)
+    !
+    ! Change state of a descriptor into BUILD. 
+    ! If the descriptor is LARGE, check the  AVL search tree
+    ! and initialize it if necessary.
+    !
     use psb_const_mod
     use psb_error_mod
     use psb_penv_mod
@@ -243,7 +270,7 @@ contains
     if (psb_get_errstatus() /= 0) return 
     info = 0
     call psb_erractionsave(err_act)
-    name = 'psb_cdcpy'
+    name = 'psb_cd_set_bld'
 
     ictxt = psb_cd_get_context(desc)
 

@@ -158,6 +158,7 @@ Subroutine psb_dcdovr(a,desc_a,novr,desc_ov,info)
   l_tmp_halo    = novr*(3*Size(desc_a%halo_index))
 
   call psb_cd_set_bld(desc_ov,info)
+  desc_ov%matrix_data(psb_ovl_state_)=psb_cd_ovl_bld_
 
   If(debug) then
     Write(0,*)'Start cdovrbld',me,lworks,lworkr

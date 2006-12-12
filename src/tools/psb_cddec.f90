@@ -254,6 +254,8 @@ subroutine psb_cddec(nloc, ictxt, desc_a, info)
 
     desc_a%lprm(:)         = 0
 
+    desc_a%matrix_data(psb_ovl_state_) = psb_cd_ovl_bld_
+
     call psi_cnv_dsc(thalo,tovr,desc_a,info)
     if (info /= 0) then
       call psb_errpush(4010,name,a_err='psi_bld_cdesc')

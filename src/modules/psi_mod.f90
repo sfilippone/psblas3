@@ -430,6 +430,7 @@ contains
       call psb_errpush(4010,name,a_err='psi_crea_ovr_elem')
       goto 9999
     end if
+    cdesc%matrix_data(psb_ovl_state_)=psb_cd_ovl_asb_
 
     ! finally bnd_elem
     call psi_crea_bnd_elem(idx_out,cdesc,info)

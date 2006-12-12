@@ -157,11 +157,8 @@ Subroutine psb_zcdovr(a,desc_a,novr,desc_ov,info)
   l_tmp_halo    = novr*(3*Size(desc_a%halo_index))
 
   call psb_cd_set_bld(desc_ov,info)
-!!$  if (psb_is_large_desc(desc_a)) then
-!!$    desc_ov%matrix_data(psb_dec_type_) = psb_desc_large_bld_ 
-!!$  else
-!!$    desc_ov%matrix_data(psb_dec_type_) = psb_desc_bld_ 
-!!$  end if
+  desc_ov%matrix_data(psb_ovl_state_)=psb_cd_ovl_bld_
+
   If(debug) then
     Write(0,*)'Start cdovrbld',me,lworks,lworkr
     call psb_barrier(ictxt)
