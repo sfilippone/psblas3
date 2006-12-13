@@ -14,7 +14,7 @@ subroutine psb_get_ovrlap(ovrel,desc,info)
   name='psb_get_overlap'
   call psb_erractionsave(err_act)
 
-  if (psb_is_ovl_bld(desc)) then 
+  if (psb_is_ovl_asb(desc)) then 
     i=0
     j=1
     do while(desc%ovrlap_elem(j) /= -1) 
