@@ -43,7 +43,7 @@ subroutine psb_zprc_aply(prec,x,y,desc_data,info,trans, work)
   use psb_const_mod
   use psb_error_mod
   use psb_penv_mod
-  use psb_prec_mod
+  use psb_prec_mod, only: psb_mlprc_aply, psb_baseprc_aply
   implicit none
 
   type(psb_desc_type),intent(in)      :: desc_data
@@ -166,9 +166,22 @@ subroutine psb_zprc_aply1(prec,x,desc_data,info,trans)
   use psb_const_mod
   use psb_error_mod
   use psb_penv_mod
-  use psb_prec_mod
   implicit none
-
+  interface psb_prc_aply
+    subroutine psb_zprc_aply(prec,x,y,desc_data,info,trans, work)
+      use psb_serial_mod
+      use psb_descriptor_type
+      use psb_prec_type
+      implicit none
+      
+      type(psb_desc_type),intent(in)      :: desc_data
+      type(psb_zprec_type), intent(in)    :: prec
+      complex(kind(0.d0)),intent(inout)      :: x(:), y(:)
+      integer, intent(out)                :: info
+      character(len=1), optional          :: trans
+      complex(kind(0.d0)), optional, target  :: work(:)
+    end subroutine psb_zprc_aply
+  end interface
   type(psb_desc_type),intent(in)    :: desc_data
   type(psb_zprec_type), intent(in)  :: prec
   complex(kind(0.d0)),intent(inout) :: x(:)

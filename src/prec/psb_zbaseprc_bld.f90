@@ -46,7 +46,8 @@ subroutine psb_zbaseprc_bld(a,desc_a,p,info,upd)
   use psb_psblas_mod
   use psb_error_mod
   use psb_penv_mod
-  use psb_prec_mod
+  use psb_prec_mod, only: psb_diagsc_bld, psb_ilu_bld, &
+       & psb_slu_bld,psb_umf_bld
   Implicit None
 
   type(psb_zspmat_type), target           :: a

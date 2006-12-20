@@ -43,7 +43,7 @@ subroutine psb_zmlprc_bld(a,desc_a,p,info)
   use psb_const_mod
   use psb_error_mod
   use psb_penv_mod
-  use psb_prec_mod
+  use psb_prec_mod, only : psb_genaggrmap, psb_bldaggrmat, psb_baseprc_bld
   implicit none 
 
   type(psb_zspmat_type), intent(in), target :: a

@@ -41,7 +41,7 @@ subroutine psb_zumf_bld(a,desc_a,p,info)
   use psb_tools_mod
   use psb_const_mod
   use psb_penv_mod
-  use psb_prec_mod
+  use psb_prec_mod, only: psb_as_matbld
   implicit none 
 
   type(psb_zspmat_type), intent(inout)      :: a

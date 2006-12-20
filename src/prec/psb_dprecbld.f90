@@ -46,7 +46,7 @@ subroutine psb_dprecbld(a,desc_a,p,info,upd)
   use psb_psblas_mod
   use psb_error_mod
   use psb_penv_mod
-  use psb_prec_mod
+  use psb_prec_mod, only: psb_mlprc_bld, psb_baseprc_bld
   Implicit None
 
   type(psb_dspmat_type), target           :: a

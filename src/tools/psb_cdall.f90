@@ -384,7 +384,7 @@ subroutine psb_cdall(m, n, parts, ictxt, desc_a, info)
     call psb_errpush(err,name)
     Goto 9999
   endif
-  ! At this point overlap is OK.
+  ! At this point overlap_elem is OK. 
   desc_a%matrix_data(psb_ovl_state_) = psb_cd_ovl_asb_
 
   ! set fields in desc_a%MATRIX_DATA....
