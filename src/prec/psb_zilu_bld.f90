@@ -60,7 +60,7 @@ subroutine psb_zilu_bld(a,desc_a,p,upd,info)
   use psb_error_mod
   use psb_realloc_mod
   use psb_penv_mod
-  use psb_prec_mod, only : psb_as_matbld, psb_ilu_fct
+  use psb_prec_mod, only : psb_as_matbld, psb_ilu_fct, psb_sp_renum
   implicit none
   !                                                                               
   !     .. Scalar Arguments ..                                                    
