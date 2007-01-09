@@ -44,8 +44,6 @@ module psb_prec_type
        & new_loc_smth_=14, new_glb_smth_=15, ag2lsm_=16,&
        & msy2l_=18, msy2g_=19, max_prec_=19
   integer, parameter   :: nohalo_=0,                 halo_=4
-  integer, parameter   :: none_=0,                   sum_=1
-  integer, parameter   :: avg_=2,                    square_root_=3
 
   ! Multilevel stuff.
   integer, parameter :: no_ml_=0, add_ml_prec_=1, mult_ml_prec_=2
@@ -546,14 +544,13 @@ contains
     integer, intent(in) :: ip
     logical             :: is_legal_prolong
 
-    is_legal_prolong = ((ip>=none_).and.(ip<=square_root_))
+    is_legal_prolong = ((ip>=psb_none_).and.(ip<=psb_square_root_))
     return
   end function is_legal_prolong
   function is_legal_restrict(ip)
     integer, intent(in) :: ip
     logical             :: is_legal_restrict
-
-    is_legal_restrict = ((ip==nohalo_).or.(ip==halo_))
+    is_legal_restrict = ((ip==psb_nohalo_).or.(ip==psb_halo_))
     return
   end function is_legal_restrict
   function is_legal_ml_type(ip)
