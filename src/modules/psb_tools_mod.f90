@@ -30,7 +30,7 @@
 !!$  
 Module psb_tools_mod
   use psb_const_mod
-
+  use psb_gps_mod
   interface  psb_geall
      ! 2-D double precision version
      subroutine psb_dalloc(x, desc_a, info, n)

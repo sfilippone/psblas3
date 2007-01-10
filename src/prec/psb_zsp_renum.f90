@@ -378,7 +378,6 @@ contains
     integer,dimension(:),allocatable::iOld,renum,ndeg,lvl,lvls1,lvls2,ccstor
     !--- Per la common area.
 
-    common /gra/ n,iDpth,iDeg
 
     character(len=20)      :: name, ch_err
 
@@ -437,11 +436,12 @@ contains
     do i=1,Npnt
       iOld(i)=i
     enddo
-    write(0,*) 'gps_red : Preparation done'
+!!$    write(0,*) 'gps_red : Preparation done'
     !--- 
     !--- Chiamiamo funzione reduce.
-    call reduce(Ndstk,Npnt,iOld,renum,ndeg,lvl,lvls1, lvls2,ccstor,ibw2,ipf2)
-    write(0,*) 'gps_red : Done reduce'
+    call psb_gps_reduce(Ndstk,Npnt,iOld,renum,ndeg,lvl,lvls1, lvls2,ccstor,&
+         & ibw2,ipf2,n,iDpth,iDeg)
+!!$    write(0,*) 'gps_red : Done reduce'
     !--- Permutazione
     perm(1:Npnt)=renum(1:Npnt)
     !--- Inversa permutazione

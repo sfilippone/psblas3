@@ -34,7 +34,8 @@
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 module psb_prec_type
-
+  
+  use psb_const_mod
   use psb_spmat_type
   use psb_descriptor_type
 
@@ -43,7 +44,6 @@ module psb_prec_type
        & lv2mras_=9, lv2smth_=10, lv2lsm_=11, sl2sm_=12, superlu_=13,&
        & new_loc_smth_=14, new_glb_smth_=15, ag2lsm_=16,&
        & msy2l_=18, msy2g_=19, max_prec_=19
-  integer, parameter   :: nohalo_=0,                 halo_=4
 
   ! Multilevel stuff.
   integer, parameter :: no_ml_=0, add_ml_prec_=1, mult_ml_prec_=2
