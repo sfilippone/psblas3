@@ -41,7 +41,7 @@
 !    ictxt - integer.                       The communication context.
 !    desc_a  - type(<psb_desc_type>).         The communication descriptor.
 !    info    - integer.                       Eventually returns an error code
-subroutine psb_cdall(m, n, parts, ictxt, desc_a, info)
+subroutine psb_cdals(m, n, parts, ictxt, desc_a, info)
   use psb_error_mod
   use psb_descriptor_type
   use psb_realloc_mod
@@ -319,4 +319,4 @@ subroutine psb_cdall(m, n, parts, ictxt, desc_a, info)
   end if
   return
 
-end subroutine psb_cdall
+end subroutine psb_cdals
