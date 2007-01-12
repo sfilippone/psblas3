@@ -28,11 +28,11 @@
 !!$  POSSIBILITY OF SUCH DAMAGE.
 !!$ 
 !!$  
-program df_sample
-  use psb_sparse_mod
-  use mat_dist
-  use read_mat
-  use partgraph
+program zf_sample
+  use psb_base_mod
+  use psb_prec_mod
+  use psb_krylov_mod
+  use psb_util_mod
   use getp
   implicit none
 
@@ -40,38 +40,18 @@ program df_sample
   character*40 :: cmethd, mtrx_file, rhs_file
   character*80 :: charbuf
 
-  interface 
-    !   .....user passed subroutine.....
-    subroutine part_block(global_indx,n,np,pv,nv)
-      implicit none
-      integer, intent(in)  :: global_indx, n, np
-      integer, intent(out) :: nv
-      integer, intent(out) :: pv(*) 
-    end subroutine part_block
-  end interface   ! local variables
-  interface 
-    !   .....user passed subroutine.....
-    subroutine part_blk2(global_indx,n,np,pv,nv)
-      implicit none
-      integer, intent(in)  :: global_indx, n, np
-      integer, intent(out) :: nv
-      integer, intent(out) :: pv(*) 
-    end subroutine part_blk2
-  end interface   ! local variables
-
-
   ! sparse matrices
-  type(psb_dspmat_type) :: a, aux_a
+  type(psb_zspmat_type) :: a, aux_a
 
   ! preconditioner data
-  type(psb_dprec_type)  :: pre
+  type(psb_zprec_type)  :: pre
   integer               :: igsmth, matop, novr
 
   ! dense matrices
-  real(kind(1.d0)), allocatable, target ::  aux_b(:,:), d(:)
-  real(kind(1.d0)), allocatable , save  :: b_col(:), x_col(:), r_col(:), &
+  complex(kind(1.d0)), allocatable, target ::  aux_b(:,:), d(:)
+  complex(kind(1.d0)), allocatable , save  :: b_col(:), x_col(:), r_col(:), &
        & x_col_glob(:), r_col_glob(:)
-  real(kind(1.d0)), pointer  :: b_col_glob(:)
+  complex(kind(1.d0)), pointer  :: b_col_glob(:)
 
   ! communications data structure
   type(psb_desc_type):: desc_a
@@ -97,6 +77,7 @@ program df_sample
   integer :: nrhs, nrow, n_row, dim, nv, ne
   integer, allocatable :: ivg(:), ipv(:)
 
+  
 
   call psb_init(ictxt)
   call psb_info(ictxt,iam,np)
@@ -109,7 +90,7 @@ program df_sample
   amroot = (iam==root)
 
 
-  name='df_sample'
+  name='zf_sample'
   if(psb_get_errstatus().ne.0) goto 9999
   info=0
   call psb_set_errverbosity(2)
@@ -126,14 +107,14 @@ program df_sample
   nrhs = 1
 
   if (amroot) then
-    call readmat(mtrx_file, aux_a, ictxt)
+    call read_mat(mtrx_file, aux_a, ictxt)
 
     m_problem = aux_a%m
     call psb_bcast(ictxt,m_problem)
 
     if(rhs_file /= 'NONE') then
-      !  reading an rhs
-      call read_rhs(rhs_file,aux_b,ictxt)
+       !  reading an rhs
+       call read_rhs(rhs_file,aux_b,ictxt)
     end if
 
     if (psb_size(aux_b,dim=1)==m_problem) then
@@ -145,22 +126,22 @@ program df_sample
       write(*,'(" ")')
       call psb_realloc(m_problem,1,aux_b,ircode)
       if (ircode /= 0) then
-        call psb_errpush(4000,name)
-        goto 9999
+         call psb_errpush(4000,name)
+         goto 9999
       endif
 
       b_col_glob => aux_b(:,1)
       do i=1, m_problem
-        b_col_glob(i) = 1.d0
-      enddo
+         b_col_glob(i) = (1.d0,1.d0)
+      enddo      
     endif
     call psb_bcast(ictxt,b_col_glob(1:m_problem))
   else
     call psb_bcast(ictxt,m_problem)
     call psb_realloc(m_problem,1,aux_b,ircode)
     if (ircode /= 0) then
-      call psb_errpush(4000,name)
-      goto 9999
+       call psb_errpush(4000,name)
+       goto 9999
     endif
     b_col_glob =>aux_b(:,1)
     call psb_bcast(ictxt,b_col_glob(1:m_problem)) 
@@ -168,25 +149,15 @@ program df_sample
 
   ! switch over different partition types
   if (ipart.eq.0) then 
-    call psb_barrier(ictxt)
-    if (amroot) write(*,'("Partition type: block")')
-    allocate(ivg(m_problem),ipv(np))
-    do i=1,m_problem
-      call part_block(i,m_problem,np,ipv,nv)
-      ivg(i) = ipv(1)
-    enddo
-    call matdist(aux_a, a, ivg, ictxt, &
-         & desc_a,b_col_glob,b_col,info,fmt=afmt)
-  else  if (ipart.eq.1) then 
-    call psb_barrier(ictxt)
-    if (amroot) write(*,'("Partition type: blk2")')
-    allocate(ivg(m_problem),ipv(np))
-    do i=1,m_problem
-      call part_blk2(i,m_problem,np,ipv,nv)
-      ivg(i) = ipv(1)
-    enddo
-    call matdist(aux_a, a, ivg, ictxt, &
-         & desc_a,b_col_glob,b_col,info,fmt=afmt)
+     call psb_barrier(ictxt)
+     if (amroot) write(*,'("Partition type: block")')
+     allocate(ivg(m_problem),ipv(np))
+     do i=1,m_problem
+        call part_block(i,m_problem,np,ipv,nv)
+        ivg(i) = ipv(1)
+     enddo
+     call psb_matdist(aux_a, a, ivg, ictxt, &
+          & desc_a,b_col_glob,b_col,info,fmt=afmt)
   else if (ipart.eq.2) then 
     if (amroot) then 
       write(*,'("Partition type: graph")')
@@ -197,14 +168,14 @@ program df_sample
     call psb_barrier(ictxt)
     call distr_grppart(root,ictxt)
     call getv_grppart(ivg)
-    call matdist(aux_a, a, ivg, ictxt, &
+    call psb_matdist(aux_a, a, ivg, ictxt, &
          & desc_a,b_col_glob,b_col,info,fmt=afmt)
   else 
     if (amroot) write(*,'("Partition type: block")')
-    call matdist(aux_a, a, part_block, ictxt, &
+    call psb_matdist(aux_a, a, part_block, ictxt, &
          & desc_a,b_col_glob,b_col,info,fmt=afmt)
   end if
-
+  
   call psb_geall(x_col,desc_a,info)
   x_col(:) =0.0
   call psb_geasb(x_col,desc_a,info)
@@ -212,14 +183,14 @@ program df_sample
   r_col(:) =0.0
   call psb_geasb(r_col,desc_a,info)
   t2 = psb_wtime() - t1
-
-
+  
+  
   call psb_amx(ictxt, t2)
-
+  
   if (amroot) then
-    write(*,'(" ")')
-    write(*,'("Time to read and partition matrix : ",es10.4)')t2
-    write(*,'(" ")')
+     write(*,'(" ")')
+     write(*,'("Time to read and partition matrix : ",es10.4)')t2
+     write(*,'(" ")')
   end if
 
   !
@@ -237,14 +208,6 @@ program df_sample
     call psb_precset(pre,'diagsc',info)
   case(bja_)             
     call psb_precset(pre,'ilu',info)
-  case(asm_)             
-    call psb_precset(pre,'asm',info,iv=(/novr,halo_,sum_/))
-  case(ash_)             
-    call psb_precset(pre,'asm',info,iv=(/novr,nohalo_,sum_/))
-  case(ras_)             
-    call psb_precset(pre,'asm',info,iv=(/novr,halo_,none_/))
-  case(rash_)             
-    call psb_precset(pre,'asm',info,iv=(/novr,nohalo_,none_/))
   case default
     call psb_precset(pre,'ilu',info)
   end select
@@ -254,16 +217,16 @@ program df_sample
   call psb_precbld(a,desc_a,pre,info)
   tprec = psb_wtime()-t1
   if (info /= 0) then
-    call psb_errpush(4010,name,a_err='psb_precbld')
-    goto 9999
+     call psb_errpush(4010,name,a_err='psb_precbld')
+     goto 9999
   end if
-
-
-  call psb_amx(ictxt, tprec)
-
+  
+  
+  call psb_amx(ictxt,tprec)
+  
   if(amroot) then
-    write(*,'("Preconditioner time: ",es10.4)')tprec
-    write(*,'(" ")')
+     write(*,'("Preconditioner time: ",es10.4)')tprec
+     write(*,'(" ")')
   end if
 
   iparm = 0
@@ -274,8 +237,8 @@ program df_sample
   call psb_barrier(ictxt)
   t2 = psb_wtime() - t1
   call psb_amx(ictxt,t2)
-  call psb_geaxpby(done,b_col,dzero,r_col,desc_a,info)
-  call psb_spmm(-done,a,x_col,done,r_col,desc_a,info)
+  call psb_geaxpby(zone,b_col,zzero,r_col,desc_a,info)
+  call psb_spmm(-zone,a,x_col,zone,r_col,desc_a,info)
   call psb_genrm2s(resmx,r_col,desc_a,info)
   call psb_geamaxs(resmxp,r_col,desc_a,info)
 
@@ -309,14 +272,14 @@ program df_sample
            & ' ||r||/(||a||||x||+||b||) = ',err
       write(20,*) 'max residual = ',resmx, resmxp
       do i=1,m_problem
-        write(20,998) i,x_col_glob(i),r_col_glob(i),b_col_glob(i)
+        write(20,998) i,x_col_glob(i),r_col_glob(i)!,b_col_glob(i)
       enddo
     end if
   end if
 998 format(i8,4(2x,g20.14))
 993 format(i6,4(1x,e12.6))
 
-
+  
   call psb_gefree(b_col, desc_a,info)
   call psb_gefree(x_col, desc_a,info)
   call psb_spfree(a, desc_a,info)
@@ -325,12 +288,12 @@ program df_sample
 
 9999 continue
   if(info /= 0) then
-    call psb_error(ictxt)
+     call psb_error(ictxt)
   end if
   call psb_exit(ictxt)
   stop
-
-end program df_sample
+  
+end program zf_sample
   
 
 

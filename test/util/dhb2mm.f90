@@ -30,21 +30,24 @@
 !!$  
 !
 ! Storage conversion filter: reads from standar input a sparse matrix 
-! stored in MatrixMarket  format, and writes to standard output in  Harwell-Boeing
+! stored in Harwell-Boeing format, and writes to standard output in MatrixMarket 
 ! format
 !
-program zmm2hb
-  use psb_sparse_mod
-  use mmio
-  use hbio
-  type(psb_zspmat_type) :: a
+program dhb2mm
+  use psb_base_mod
+  use psb_util_mod
+  type(psb_dspmat_type) :: a
   
-  integer info
+  integer    :: info
+  character(len=72)  :: mtitle
 
-  call mm_mat_read(a,info)
+  
+  call hb_read(a,info,mtitle=mtitle)
 
-  call hb_write(a,info)
+  call mm_mat_write(a,mtitle,info)
 
   stop
-end program zmm2hb
+
+
+end program dhb2mm
   

@@ -71,17 +71,12 @@
 !   u(x,y) = rhs(x,y)
 !
 program pde90
-  use psb_sparse_mod
+  use psb_base_mod
+  use psb_prec_mod
+  use psb_krylov_mod
+  use psb_util_mod
   implicit none
 
-  interface 
-    !.....user passed subroutine.....
-    subroutine part_block(glob_index,n,np,pv,nv)
-      integer, intent(in)  :: glob_index, n, np
-      integer, intent(out) :: nv
-      integer, intent(out) :: pv(*) 
-    end subroutine part_block
-  end interface
   ! input parameters
   character :: cmethd*10, prec*10, afmt*5
   integer      :: idim, iret
@@ -164,14 +159,6 @@ program pde90
     call psb_precset(pre,'diagsc',info)
   case(bja_)             
     call psb_precset(pre,'ilu',info)
-  case(asm_)             
-    call psb_precset(pre,'asm',info,iv=(/novr,halo_,sum_/))
-  case(ash_)             
-    call psb_precset(pre,'asm',info,iv=(/novr,nohalo_,sum_/))
-  case(ras_)             
-    call psb_precset(pre,'asm',info,iv=(/novr,halo_,none_/))
-  case(rash_)             
-    call psb_precset(pre,'asm',info,iv=(/novr,nohalo_,none_/))
   case default
     call psb_precset(pre,'ilu',info)
   end select
@@ -392,7 +379,7 @@ contains
     !  u(x,y,z)(2b1+2b2+2b3+a1+a2+a3)+u(x-1,y,z)(-b1-a1)+u(x,y-1,z)(-b2-a2)+
     !  + u(x,y,z-1)(-b3-a3)-u(x+1,y,z)b1-u(x,y+1,z)b2-u(x,y,z+1)b3
 
-    use psb_sparse_mod
+    use psb_base_mod
     implicit none
     integer                        :: idim
     integer, parameter             :: nbmax=10

@@ -29,7 +29,7 @@
 !!$ 
 !!$  
 Module getp
-  use psb_sparse_mod
+  use psb_base_mod
   public get_parms
   public pr_usage
 
