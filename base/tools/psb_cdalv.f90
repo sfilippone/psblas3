@@ -41,7 +41,7 @@
 !    desc_a  - type(<psb_desc_type>).         The communication descriptor.
 !    info    - integer.                       Eventually returns an error code
 !    flag    - integer.                       ???
-subroutine psb_cdalv(m, v, ictxt, desc_a, info, flag)
+subroutine psb_cdalv(v, ictxt, desc_a, info, flag)
   use psb_descriptor_type
   use psb_serial_mod
   use psb_const_mod
@@ -49,14 +49,14 @@ subroutine psb_cdalv(m, v, ictxt, desc_a, info, flag)
   use psb_penv_mod
   implicit None
   !....Parameters...
-  Integer, intent(in)               :: m,ictxt, v(:)
+  Integer, intent(in)               :: ictxt, v(:)
   integer, intent(in), optional     :: flag
   integer, intent(out)              :: info
   type(psb_desc_type), intent(out)  :: desc_a
 
   !locals
   Integer             :: counter,i,j,np,me,loc_row,err,&
-       & loc_col,nprocs,n,itmpov, k,glx,gidx,gle,&
+       & loc_col,nprocs,m,n,itmpov, k,glx,gidx,gle,&
        & l_ov_ix,l_ov_el,idx, flag_, err_act
   integer             :: int_err(5),exch(2)
   Integer, allocatable  :: temp_ovrlap(:), ov_idx(:),ov_el(:)
@@ -70,7 +70,8 @@ subroutine psb_cdalv(m, v, ictxt, desc_a, info, flag)
 
   call psb_info(ictxt, me, np)
   if (debug) write(*,*) 'psb_cdall: ',np,me
-
+  
+  m = size(v)
   n = m
   !... check m and n parameters....
   if (m < 1) then

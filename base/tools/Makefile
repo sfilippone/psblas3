@@ -3,7 +3,7 @@ include ../../Make.inc
 FOBJS = psb_dallc.o psb_dasb.o psb_dcsrp.o psb_cdprt.o \
 	psb_dfree.o psb_dgelp.o psb_dins.o \
 	psb_cdals.o psb_cdalv.o psb_cd_inloc.o psb_cdcpy.o \
-	psb_cddec.o psb_cdfree.o psb_cdins.o  \
+	psb_cdfree.o psb_cdins.o  \
 	psb_cdren.o psb_cdrep.o psb_cdtransfer.o psb_get_overlap.o\
 	psb_dspalloc.o psb_dspasb.o \
 	psb_dspcnv.o psb_dspfree.o psb_dspins.o psb_dsprn.o \

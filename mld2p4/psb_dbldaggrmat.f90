@@ -233,10 +233,16 @@ contains
       end if
 
     else if (p%iprcparm(coarse_mat_) == mat_distr_) then 
-
-      call psb_cddec(naggr,ictxt,desc_ac,info)
+      
+      call psb_cdall(ictxt,desc_ac,info,nl=naggr)
       if(info /= 0) then
-        call psb_errpush(4010,name,a_err='psb_cddec')
+        call psb_errpush(4010,name,a_err='psb_cdall')
+        goto 9999
+      end if
+      
+      call psb_cdasb(desc_ac,info)
+      if(info /= 0) then
+        call psb_errpush(4010,name,a_err='psb_cdasb')
         goto 9999
       end if
 
@@ -746,7 +752,7 @@ contains
           end do
         end do
 
-        call psb_cdall(ntaggr,ivall,ictxt,desc_ac,info,flag=1)
+        call psb_cdall(ictxt,desc_ac,info,vg=ivall(1:ntaggr),flag=1)
         if(info /= 0) then
           call psb_errpush(4010,name,a_err='psb_cdall')
           goto 9999
@@ -928,9 +934,15 @@ contains
           call psb_errpush(4010,name,a_err='spclone')
           goto 9999
         end if
-        call psb_cddec(naggr,ictxt,desc_ac,info)
+        call psb_cdall(ictxt,desc_ac,info,nl=naggr)
         if(info /= 0) then
-          call psb_errpush(4010,name,a_err='psb_cddec')
+          call psb_errpush(4010,name,a_err='psb_cdall')
+          goto 9999
+        end if
+        
+        call psb_cdasb(desc_ac,info)
+        if(info /= 0) then
+          call psb_errpush(4010,name,a_err='psb_cdasb')
           goto 9999
         end if
 

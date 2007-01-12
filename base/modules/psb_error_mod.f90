@@ -373,8 +373,12 @@ contains
     case(580)
       write (0,'("partition function passed as input argument n. ",i0," returns wrong processes identifier")')i_e_d(1)
       write (0,'("on global point ",i0,". Current value returned is : ",i0)')i_e_d(3),i_e_d(2)
+    case(581)
+      write (0,'("Exactly one of the optional arguments  ",a," must be present")')a_e_d
+    case(582)
+      write (0,'("Argument M is required when argument PARTS is specified")')
     case(600)
-      write (0,'("Sparse Matrix and decsriptors are in an invalid state for this subroutine call: ",i0)')i_e_d(1)
+      write (0,'("Sparse Matrix and descriptors are in an invalid state for this subroutine call: ",i0)')i_e_d(1)
     case (1122)
       write (0,'("Invalid state for communication descriptor")')
     case (1123)

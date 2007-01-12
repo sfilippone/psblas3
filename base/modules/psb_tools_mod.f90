@@ -31,6 +31,7 @@
 Module psb_tools_mod
   use psb_const_mod
   use psb_gps_mod
+    
   interface  psb_geall
      ! 2-D double precision version
      subroutine psb_dalloc(x, desc_a, info, n)
@@ -330,29 +331,17 @@ Module psb_tools_mod
 
 
   interface psb_cdall
-     subroutine psb_cdall(m, n, parts, ictxt, desc_a, info)
-       use psb_descriptor_type
-       include 'parts.fh'
-       Integer, intent(in)                 :: m,n,ictxt
-       Type(psb_desc_type), intent(out)    :: desc_a
-       integer, intent(out)                :: info
-     end subroutine psb_cdall
-     subroutine psb_cdalv(m, v, ictxt, desc_a, info, flag)
-       use psb_descriptor_type
-       Integer, intent(in)               :: m,ictxt, v(:)
-       integer, intent(in), optional     :: flag
-       integer, intent(out)              :: info
-       Type(psb_desc_type), intent(out)  :: desc_a
-     end subroutine psb_cdalv
-     subroutine psb_cd_inloc(v, ictxt, desc_a, info)
-       use psb_descriptor_type
-       implicit None
-       Integer, intent(in)               :: ictxt, v(:)
-       integer, intent(out)              :: info
-       type(psb_desc_type), intent(out)  :: desc_a
-     end subroutine psb_cd_inloc
+    module procedure psb_cdall
   end interface
-  
+
+  interface psb_cdrep
+     subroutine psb_cdrep(m, ictxt, desc_a,info)
+       use psb_descriptor_type
+       Integer, intent(in)               :: m,ictxt
+       Type(psb_desc_type), intent(out)  :: desc_a
+       integer, intent(out)              :: info
+     end subroutine psb_cdrep
+  end interface
 
   interface psb_cdasb
      subroutine psb_cdasb(desc_a,info)
@@ -593,24 +582,6 @@ Module psb_tools_mod
   end interface
 
 
-  interface psb_cdrep
-     subroutine psb_cdrep(m, ictxt, desc_a,info)
-       use psb_descriptor_type
-       Integer, intent(in)               :: m,ictxt
-       Type(psb_desc_type), intent(out)  :: desc_a
-       integer, intent(out)              :: info
-     end subroutine psb_cdrep
-  end interface
-
-  interface psb_cddec
-     subroutine psb_cddec(nloc, ictxt, desc_a,info)
-       use psb_descriptor_type
-       Integer, intent(in)               :: nloc,ictxt
-       Type(psb_desc_type), intent(out)  :: desc_a
-       integer, intent(out)              :: info
-     end subroutine psb_cddec
-  end interface
-
   interface psb_get_boundary
     module procedure psb_get_boundary
   end interface
@@ -637,8 +608,125 @@ contains
     type(psb_desc_type), intent(in) :: desc
     integer, intent(out)            :: info
     
-    call psb_crea_bnd_elem(bndel,desc,info)
+    call psi_crea_bnd_elem(bndel,desc,info)
 
   end subroutine psb_get_boundary
+  
+  subroutine psb_cdall(ictxt, desc_a, info,mg,ng,parts,vg,vl,flag,nl)
+    use psb_descriptor_type
+    use psb_serial_mod
+    use psb_const_mod
+    use psb_error_mod
+    use psb_penv_mod
+    implicit None
+    include 'parts.fh'
+    Integer, intent(in)               :: mg,ng,ictxt, vg(:), vl(:),nl
+    integer, intent(in)               :: flag
+    integer, intent(out)              :: info
+    type(psb_desc_type), intent(out)  :: desc_a
+
+    optional :: mg,ng,parts,vg,vl,flag,nl
+
+    interface 
+      subroutine psb_cdals(m, n, parts, ictxt, desc_a, info)
+        use psb_descriptor_type
+        include 'parts.fh'
+        Integer, intent(in)                 :: m,n,ictxt
+        Type(psb_desc_type), intent(out)    :: desc_a
+        integer, intent(out)                :: info
+      end subroutine psb_cdals
+      subroutine psb_cdalv(v, ictxt, desc_a, info, flag)
+        use psb_descriptor_type
+        Integer, intent(in)               :: ictxt, v(:)
+        integer, intent(in), optional     :: flag
+        integer, intent(out)              :: info
+        Type(psb_desc_type), intent(out)  :: desc_a
+      end subroutine psb_cdalv
+      subroutine psb_cd_inloc(v, ictxt, desc_a, info)
+        use psb_descriptor_type
+        implicit None
+        Integer, intent(in)               :: ictxt, v(:)
+        integer, intent(out)              :: info
+        type(psb_desc_type), intent(out)  :: desc_a
+      end subroutine psb_cd_inloc
+    end interface
+    character(len=20)   :: name, char_err
+    integer :: err_act, n_, flag_, i, me, np, nlp
+    integer, allocatable :: itmpsz(:) 
+
+
+
+    if(psb_get_errstatus() /= 0) return 
+    info=0
+    name = 'psb_cdall'
+    call psb_erractionsave(err_act)
+    
+    call psb_info(ictxt, me, np)
+
+    if (count((/ present(vg),present(vl),present(parts),present(nl) /)) /= 1) then 
+      info=581
+      call psb_errpush(info,name,a_err=" vg, vl, parts, nl")
+      goto 999 
+    endif
+    
+    if (present(parts)) then 
+      if (.not.present(mg)) then 
+        info=581
+        call psb_errpush(info,name)
+        goto 999 
+      end if
+      if (present(ng)) then 
+        n_ = ng
+      else
+        n_ = mg 
+      endif
+      call  psb_cdals(mg, n_, parts, ictxt, desc_a, info)
+
+    else if (present(vg)) then 
+      if (present(flag)) then 
+        flag_=flag
+      else
+        flag_=0
+      endif
+      call psb_cdalv(vg, ictxt, desc_a, info, flag_)
+
+    else if (present(vl)) then 
+      call psb_cd_inloc(vl,ictxt,desc_a,info)
+      
+    else if (present(nl)) then 
+      allocate(itmpsz(0:np-1),stat=info)
+      if (info /= 0) then 
+        info = 4000 
+        call psb_errpush(info,name)
+        goto 999
+      endif
+
+      itmpsz = 0
+      itmpsz(me) = nl
+      call psb_sum(ictxt,itmpsz)
+      nlp=0 
+      do i=0, me-1
+        nlp = nlp + itmpsz(me)
+      end do
+      call psb_cd_inloc((/(i,i=nlp+1,nlp+nl)/),ictxt,desc_a,info)
+      
+    endif
+    call psb_erractionrestore(err_act)
+    return
+    
+999 continue
+    call psb_erractionrestore(err_act)
+    if (err_act == act_abort) then
+      call psb_error(ictxt)
+      return
+    end if
+    return
+    
+
+  end subroutine psb_cdall
+
+
+
+
 
 end module psb_tools_mod

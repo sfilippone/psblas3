@@ -129,7 +129,6 @@ contains
     real(kind(1.d0)), allocatable :: val(:)
     integer, parameter          :: nb=30
     real(kind(1.d0))            :: t0, t1, t2, t3, t4, t5
-    logical, parameter          :: newt=.true.
     character(len=20)           :: name, ch_err
 
     info = 0
@@ -182,23 +181,14 @@ contains
       write (*, fmt = *) 'start matdist',root, size(iwork),&
            &nrow, ncol, nnzero,nrhs
     endif
-    if (newt) then 
-      call psb_cdall(nrow,nrow,parts,ictxt,desc_a,info)
-      if(info/=0) then
-        info=4010
-        ch_err='psb_cdall'
-        call psb_errpush(info,name,a_err=ch_err)
-        goto 9999
-      end if
-    else
-      call psb_cdall(nrow,nrow,parts,ictxt,desc_a,info)
-      if(info/=0) then
-        info=4010
-        ch_err='psb_pscdall'
-        call psb_errpush(info,name,a_err=ch_err)
-        goto 9999
-      end if
-    endif
+    call psb_cdall(ictxt,desc_a,info,mg=nrow,parts=parts)
+    if(info/=0) then
+      info=4010
+      ch_err='psb_cdall'
+      call psb_errpush(info,name,a_err=ch_err)
+      goto 9999
+    end if
+
     call psb_spall(a,desc_a,info,nnz=nnzero/np)
     if(info/=0) then
       info=4010
@@ -410,46 +400,34 @@ contains
     else
       afmt = 'CSR'
     endif
-    if (newt) then 
+    call psb_barrier(ictxt)
+    t0 = psb_wtime()
+    call psb_cdasb(desc_a,info)     
+    t1 = psb_wtime()
+    if(info/=0)then
+      info=4010
+      ch_err='psb_cdasb'
+      call psb_errpush(info,name,a_err=ch_err)
+      goto 9999
+    end if
 
-      call psb_barrier(ictxt)
-      t0 = psb_wtime()
-      call psb_cdasb(desc_a,info)     
-      t1 = psb_wtime()
-      if(info/=0)then
-        info=4010
-        ch_err='psb_cdasb'
-        call psb_errpush(info,name,a_err=ch_err)
-        goto 9999
-      end if
-
-      call psb_barrier(ictxt)
-      t2 = psb_wtime()
-      call psb_spasb(a,desc_a,info,dupl=psb_dupl_err_,afmt=afmt)     
-      t3 = psb_wtime()
-      if(info/=0)then
-        info=4010
-        ch_err='psb_spasb'
-        call psb_errpush(info,name,a_err=ch_err)
-        goto 9999
-      end if
+    call psb_barrier(ictxt)
+    t2 = psb_wtime()
+    call psb_spasb(a,desc_a,info,dupl=psb_dupl_err_,afmt=afmt)     
+    t3 = psb_wtime()
+    if(info/=0)then
+      info=4010
+      ch_err='psb_spasb'
+      call psb_errpush(info,name,a_err=ch_err)
+      goto 9999
+    end if
 
 
-      if (iam == root) then 
-        write(*,*) 'descriptor assembly: ',t1-t0
-        write(*,*) 'sparse matrix assembly: ',t3-t2
-      end if
+    if (iam == root) then 
+      write(*,*) 'descriptor assembly: ',t1-t0
+      write(*,*) 'sparse matrix assembly: ',t3-t2
+    end if
 
-
-    else
-      call psb_spasb(a,desc_a,info,afmt=afmt,dupl=psb_dupl_err_)     
-      if(info/=0)then
-        info=4010
-        ch_err='psspasb'
-        call psb_errpush(info,name,a_err=ch_err)
-        goto 9999
-      end if
-    endif
 
 
     call psb_geasb(b,desc_a,info)     
@@ -563,7 +541,6 @@ contains
     integer, allocatable          :: irow(:),icol(:)
     real(kind(1.d0)), allocatable :: val(:)
     integer, parameter          :: nb=30
-    logical, parameter          :: newt=.true.
     real(kind(1.d0))            :: t0, t1, t2, t3, t4, t5
     character(len=20)  :: name, ch_err
 
@@ -616,7 +593,7 @@ contains
       goto 9999
     endif
 
-    call psb_cdall(nrow,v,ictxt,desc_a,info)
+    call psb_cdall(ictxt,desc_a,info,vg=v)
     if(info/=0) then
       info=4010
       ch_err='psb_cdall'
@@ -904,7 +881,6 @@ contains
     complex(kind(1.d0)), allocatable :: val(:)
     integer, parameter          :: nb=30
     real(kind(1.d0))            :: t0, t1, t2, t3, t4, t5
-    logical, parameter          :: newt=.true.
     character(len=20)           :: name, ch_err
 
     info = 0
@@ -955,23 +931,13 @@ contains
       write (*, fmt = *) 'start matdist',root, size(iwork),&
            &nrow, ncol, nnzero,nrhs
     endif
-    if (newt) then 
-      call psb_cdall(nrow,nrow,parts,ictxt,desc_a,info)
-      if(info/=0) then
-        info=4010
-        ch_err='psb_cdall'
-        call psb_errpush(info,name,a_err=ch_err)
-        goto 9999
-      end if
-    else
-      call psb_cdall(nrow,nrow,parts,ictxt,desc_a,info)
-      if(info/=0) then
-        info=4010
-        ch_err='psb_pscdall'
-        call psb_errpush(info,name,a_err=ch_err)
-        goto 9999
-      end if
-    endif
+    call psb_cdall(ictxt,desc_a,info,mg=nrow,parts=parts)
+    if(info/=0) then
+      info=4010
+      ch_err='psb_cdall'
+      call psb_errpush(info,name,a_err=ch_err)
+      goto 9999
+    end if
     call psb_spall(a,desc_a,info,nnz=nnzero/np)
     if(info/=0) then
       info=4010
@@ -1182,47 +1148,34 @@ contains
     else
       afmt = 'CSR'
     endif
-    if (newt) then 
 
-      call psb_barrier(ictxt)
-      t0 = psb_wtime()
-      call psb_cdasb(desc_a,info)     
-      t1 = psb_wtime()
-      if(info/=0)then
-        info=4010
-        ch_err='psb_cdasb'
-        call psb_errpush(info,name,a_err=ch_err)
-        goto 9999
-      end if
+    call psb_barrier(ictxt)
+    t0 = psb_wtime()
+    call psb_cdasb(desc_a,info)     
+    t1 = psb_wtime()
+    if(info/=0)then
+      info=4010
+      ch_err='psb_cdasb'
+      call psb_errpush(info,name,a_err=ch_err)
+      goto 9999
+    end if
 
-      call psb_barrier(ictxt)
-      t2 = psb_wtime()
-      call psb_spasb(a,desc_a,info,dupl=psb_dupl_err_,afmt=afmt)     
-      t3 = psb_wtime()
-      if(info/=0)then
-        info=4010
-        ch_err='psb_spasb'
-        call psb_errpush(info,name,a_err=ch_err)
-        goto 9999
-      end if
-
-
-      if (iam == root) then 
-        write(*,*) 'descriptor assembly: ',t1-t0
-        write(*,*) 'sparse matrix assembly: ',t3-t2
-      end if
+    call psb_barrier(ictxt)
+    t2 = psb_wtime()
+    call psb_spasb(a,desc_a,info,dupl=psb_dupl_err_,afmt=afmt)     
+    t3 = psb_wtime()
+    if(info/=0)then
+      info=4010
+      ch_err='psb_spasb'
+      call psb_errpush(info,name,a_err=ch_err)
+      goto 9999
+    end if
 
 
-    else
-      call psb_spasb(a,desc_a,info,afmt=afmt,dupl=psb_dupl_err_)     
-      if(info/=0)then
-        info=4010
-        ch_err='psspasb'
-        call psb_errpush(info,name,a_err=ch_err)
-        goto 9999
-      end if
-    endif
-
+    if (iam == root) then 
+      write(*,*) 'descriptor assembly: ',t1-t0
+      write(*,*) 'sparse matrix assembly: ',t3-t2
+    end if
 
     call psb_geasb(b,desc_a,info)     
     if(info/=0)then
@@ -1388,7 +1341,7 @@ contains
       goto 9999
     endif
 
-    call psb_cdall(nrow,v,ictxt,desc_a,info)
+    call psb_cdall(ictxt,desc_a,info,vg=v)
     if(info/=0) then
       info=4010
       ch_err='psb_cdall'

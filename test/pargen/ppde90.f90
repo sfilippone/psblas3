@@ -435,7 +435,7 @@ contains
     nnz = ((n*9)/(np))
     if(iam == psb_root_) write(0,'("Generating Matrix (size=",i0x,")...")')n
 
-    call psb_cdall(n,n,parts,ictxt,desc_a,info)
+    call psb_cdall(ictxt,desc_a,info,mg=n,parts=parts)
     call psb_spall(a,desc_a,info,nnz=nnz)
     ! define  rhs from boundary conditions; also build initial guess 
     call psb_geall(b,desc_a,info)
