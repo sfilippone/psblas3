@@ -14,8 +14,9 @@ FOBJS = psb_cest.o psb_dcoins.o psb_dcsdp.o psb_dcsmm.o psb_dcsmv.o \
 	psb_zrwextd.o psb_zsymbmm.o psb_znumbmm.o psb_zspscal.o\
 	psb_getifield.o psb_setifield.o psb_update_mod.o
 
-INCDIRS = -I ../../lib -I .
-LIBDIR = ../../lib
+LIBDIR = ..
+MODDIR = ../modules
+INCDIRS = -I $(LIBDIR) -I $(MODDIR) -I . 
 
 lib: auxd cood csrd jadd f77d dpd lib1
 	$(AR) $(LIBDIR)/$(LIBNAME) $(FOBJS)
@@ -53,11 +54,4 @@ clean:
 	(cd dp; make  clean)
 	(cd f77; make clean)
 
-veryclean:
-	/bin/rm -f $(FOBJS) *$(.mod)
-	(cd aux; make veryclean)
-	(cd coo; make veryclean)
-	(cd csr; make veryclean)
-	(cd jad; make veryclean)
-	(cd dp; make  veryclean)
-	(cd f77; make veryclean)
+veryclean: clean 

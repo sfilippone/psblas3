@@ -35,15 +35,8 @@
 !!$ 
 !!$  
 subroutine psb_zsp_renum(a,desc_a,blck,p,atmp,info)
-  use psb_serial_mod
-  use psb_const_mod
+  use psb_base_mod
   use psb_prec_type
-  use psb_descriptor_type
-  use psb_spmat_type
-  use psb_tools_mod
-  use psb_psblas_mod
-  use psb_error_mod
-  use psb_penv_mod
   implicit none
 
   !     .. array Arguments ..                                                     
@@ -376,8 +369,6 @@ contains
 
     integer,dimension(:,:),allocatable::NDstk
     integer,dimension(:),allocatable::iOld,renum,ndeg,lvl,lvls1,lvls2,ccstor
-    !--- Per la common area.
-
 
     character(len=20)      :: name, ch_err
 
@@ -436,12 +427,12 @@ contains
     do i=1,Npnt
       iOld(i)=i
     enddo
-!!$    write(0,*) 'gps_red : Preparation done'
+    write(0,*) 'gps_red : Preparation done'
     !--- 
     !--- Chiamiamo funzione reduce.
     call psb_gps_reduce(Ndstk,Npnt,iOld,renum,ndeg,lvl,lvls1, lvls2,ccstor,&
-         & ibw2,ipf2,n,iDpth,iDeg)
-!!$    write(0,*) 'gps_red : Done reduce'
+         & ibw2,ipf2,n,idpth,ideg)
+    write(0,*) 'gps_red : Done reduce'
     !--- Permutazione
     perm(1:Npnt)=renum(1:Npnt)
     !--- Inversa permutazione

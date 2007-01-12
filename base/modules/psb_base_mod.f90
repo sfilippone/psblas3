@@ -28,21 +28,17 @@
 !!$  POSSIBILITY OF SUCH DAMAGE.
 !!$ 
 !!$  
-module psb_all_mod
-  ! the interface modules
-  use psb_tools_mod
-  use psb_const_mod
-  use psb_prec_mod
-  use psb_methd_mod
-  use psb_serial_mod
-  use psb_penv_mod
-  use psb_comm_mod
+module psb_base_mod
+  use psb_string_mod
   use psb_error_mod
-  use psb_psblas_mod
-
-  ! the types
-  use psb_spmat_type
+  use psb_penv_mod
   use psb_descriptor_type
-  use psb_prec_type
+  use psb_serial_mod
+  use psb_psblas_mod
+  use psb_tools_mod
+end module psb_base_mod
 
-end module psb_all_mod
+
+
+
+

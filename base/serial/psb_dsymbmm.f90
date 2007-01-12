@@ -41,7 +41,6 @@
 subroutine psb_dsymbmm(a,b,c,info)
   use psb_spmat_type
   use psb_string_mod
-  use psb_serial_mod, only : psb_sp_getrow
   implicit none 
 
   type(psb_dspmat_type) :: a,b,c
@@ -55,6 +54,19 @@ subroutine psb_dsymbmm(a,b,c,info)
            & diagc,  index(*)
       integer, allocatable :: ic(:),jc(:)
     end subroutine symbmm 
+  end interface
+  interface psb_sp_getrow
+    subroutine psb_dspgetrow(irw,a,nz,ia,ja,val,info,iren,lrw)
+      use psb_spmat_type
+      type(psb_dspmat_type), intent(in) :: a
+      integer, intent(in)       :: irw
+      integer, intent(out)      :: nz
+      integer, intent(inout)    :: ia(:), ja(:)
+      real(kind(1.d0)),  intent(inout)    :: val(:)
+      integer, intent(in), target, optional :: iren(:)
+      integer, intent(in), optional :: lrw
+      integer, intent(out)  :: info
+    end subroutine psb_dspgetrow
   end interface
 
   character(len=20)         :: name, ch_err
@@ -88,7 +100,6 @@ subroutine psb_dsymbmm(a,b,c,info)
   endif
   nze = max(a%m+1,2*a%m)
   call psb_sp_reall(c,nze,info)
-
   !
   ! Note: we need to test whether there is a performance impact 
   !       in not using the original Douglas & Bank code. 

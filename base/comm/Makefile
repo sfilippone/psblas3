@@ -4,8 +4,9 @@ OBJS = psb_dgather.o psb_dhalo.o psb_dovrl.o \
 	psb_ihalo.o psb_zgather.o psb_zhalo.o psb_zovrl.o 
 
 MPFOBJS = psb_dscatter.o  psb_zscatter.o
-INCDIRS = -I ../../lib -I .
-LIBDIR = ../../lib
+LIBDIR = ..
+MODDIR = ../modules
+INCDIRS = -I $(LIBDIR) -I $(MODDIR) -I . 
 
 lib: mpfobjs $(OBJS)
 	$(AR) $(LIBDIR)/$(LIBNAME) $(MPFOBJS) $(OBJS)

@@ -82,15 +82,8 @@
 !
 Subroutine psb_dgmresr(a,prec,b,x,eps,desc_a,info,&
      &itmax,iter,err,itrace,irst,istop)
-  use psb_serial_mod
-  use psb_descriptor_type
-  use psb_prec_type
-  use psb_psblas_mod
-  use psb_tools_mod
-  use psb_const_mod
+  use psb_base_mod
   use psb_prec_mod
-  use psb_error_mod
-  use psb_penv_mod
   implicit none
 
 !!$  Parameters 

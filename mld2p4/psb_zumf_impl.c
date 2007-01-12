@@ -34,9 +34,9 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  */
-/* This file is an interface to the UMFPACK  routines for sparse
-   factorization.   
-   
+/* This file is an interface to the UMFPACK  routines for 
+   factorization. It was obtained by adapting  umfpack_zi_demo
+   under the original copyright terms reproduced below.   
    PSBLAS v 2.0  */ 
 
 

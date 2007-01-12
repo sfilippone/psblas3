@@ -36,16 +36,8 @@
 !!$  
 subroutine psb_zdiagsc_bld(a,desc_a,p,upd,info)
 
-  use psb_serial_mod
-  Use psb_spmat_type
-  use psb_descriptor_type
+  use psb_base_mod
   use psb_prec_type
-  use psb_tools_mod
-  use psb_comm_mod
-  use psb_const_mod
-  use psb_psblas_mod
-  use psb_error_mod
-  use psb_penv_mod
   Implicit None
 
   type(psb_zspmat_type), target           :: a

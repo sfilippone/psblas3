@@ -28,20 +28,46 @@
 !!$  POSSIBILITY OF SUCH DAMAGE.
 !!$ 
 !!$  
-module psb_sparse_mod
-  use psb_penv_mod
-  use psb_descriptor_type
-  use psb_prec_type
-  use psb_serial_mod
-  use psb_tools_mod
-  use psb_psblas_mod
-  use psb_prec_mod
-  use psb_methd_mod
-  use psb_error_mod
-  use psb_string_mod
-end module psb_sparse_mod
+!
+!
+module psb_blockpart_mod
+  public part_block, bld_partblock
+  
+contains
+  subroutine part_block(global_indx,n,np,pv,nv)
+
+    implicit none
+
+    integer  global_indx, n, np
+    integer  nv
+    integer  pv(*)
+    integer  dim_block
+    integer  ib1, ib2, ipv
+
+    dim_block = (n + np - 1)/np
+    nv = 1  
+    pv(nv) = (global_indx - 1) / dim_block
+
+    return
+  end subroutine part_block
+      
 
 
 
+  subroutine bld_partblock(n,np,ivg)      
+    integer n,np,ivg(*)
 
+    integer  dim_block,i
+
+
+    dim_block = (n + np - 1)/np
+    do i=1,n
+      ivg(i) = (i - 1) / dim_block
+    enddo
+
+  end subroutine bld_partblock
+
+
+
+end module psb_blockpart_mod
 

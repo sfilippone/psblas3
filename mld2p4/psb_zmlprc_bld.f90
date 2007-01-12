@@ -36,14 +36,8 @@
 !!$  
 subroutine psb_zmlprc_bld(a,desc_a,p,info)
 
-  use psb_serial_mod
-  use psb_tools_mod
-  use psb_descriptor_type
+  use psb_base_mod
   use psb_prec_type
-  use psb_const_mod
-  use psb_error_mod
-  use psb_penv_mod
-  use psb_prec_mod, only : psb_genaggrmap, psb_bldaggrmat, psb_baseprc_bld
   implicit none 
 
   type(psb_zspmat_type), intent(in), target :: a
@@ -57,6 +51,44 @@ subroutine psb_zmlprc_bld(a,desc_a,p,info)
   character(len=20) :: name, ch_err
   logical, parameter :: debug=.false.
   type(psb_zspmat_type)                     :: ac
+
+  interface psb_baseprc_bld
+    subroutine psb_zbaseprc_bld(a,desc_a,p,info,upd)
+      use psb_base_mod
+      use psb_prec_type
+      type(psb_zspmat_type), target              :: a
+      type(psb_desc_type), intent(in)            :: desc_a
+      type(psb_zbaseprc_type),intent(inout)      :: p
+      integer, intent(out)                       :: info
+      character, intent(in), optional            :: upd
+    end subroutine psb_zbaseprc_bld
+  end interface
+
+  interface psb_genaggrmap
+    subroutine psb_zgenaggrmap(aggr_type,a,desc_a,nlaggr,ilaggr,info)
+      use psb_base_mod
+      use psb_prec_type
+      implicit none
+      integer, intent(in)               :: aggr_type
+      type(psb_zspmat_type), intent(in) :: a
+      type(psb_desc_type), intent(in)   :: desc_a
+      integer, allocatable              :: ilaggr(:),nlaggr(:)
+      integer, intent(out)              :: info
+    end subroutine psb_zgenaggrmap
+  end interface
+
+  interface psb_bldaggrmat
+    subroutine psb_zbldaggrmat(a,desc_a,ac,desc_ac,p,info)
+      use psb_base_mod
+      use psb_prec_type
+      type(psb_zspmat_type), intent(in), target :: a
+      type(psb_zbaseprc_type), intent(inout),target    :: p
+      type(psb_zspmat_type), intent(out),target :: ac
+      type(psb_desc_type), intent(in)           :: desc_a
+      type(psb_desc_type), intent(inout)        :: desc_ac
+      integer, intent(out)                      :: info
+    end subroutine psb_zbldaggrmat
+  end interface
 
   integer :: ictxt, np, me
 

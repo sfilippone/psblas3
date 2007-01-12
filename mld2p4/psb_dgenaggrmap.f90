@@ -35,11 +35,8 @@
 !!$ 
 !!$  
 subroutine psb_dgenaggrmap(aggr_type,a,desc_a,nlaggr,ilaggr,info)
-  use psb_spmat_type
-  use psb_serial_mod
-  use psb_descriptor_type
-  use psb_error_mod
-  use psb_penv_mod
+  use psb_base_mod
+  use psb_prec_type
   implicit none
   integer, intent(in)               :: aggr_type
   type(psb_dspmat_type), intent(in) :: a

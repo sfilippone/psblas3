@@ -36,14 +36,8 @@
 !!$  
 subroutine psb_dmlprc_bld(a,desc_a,p,info)
 
-  use psb_serial_mod
-  use psb_tools_mod
-  use psb_descriptor_type
+  use psb_base_mod
   use psb_prec_type
-  use psb_const_mod
-  use psb_error_mod
-  use psb_penv_mod
-  use psb_prec_mod, only : psb_genaggrmap, psb_bldaggrmat, psb_baseprc_bld
   implicit none 
 
   type(psb_dspmat_type), intent(in), target :: a
@@ -58,6 +52,43 @@ subroutine psb_dmlprc_bld(a,desc_a,p,info)
   logical, parameter :: debug=.false.
   type(psb_dspmat_type)                     :: ac
 
+  interface psb_baseprc_bld
+    subroutine psb_dbaseprc_bld(a,desc_a,p,info,upd)
+      use psb_base_mod
+      use psb_prec_type
+      type(psb_dspmat_type), target              :: a
+      type(psb_desc_type), intent(in)            :: desc_a
+      type(psb_dbaseprc_type),intent(inout)      :: p
+      integer, intent(out)                       :: info
+      character, intent(in), optional            :: upd
+    end subroutine psb_dbaseprc_bld
+  end interface
+
+  interface psb_genaggrmap
+    subroutine psb_dgenaggrmap(aggr_type,a,desc_a,nlaggr,ilaggr,info)
+      use psb_base_mod
+      use psb_prec_type
+      implicit none
+      integer, intent(in)               :: aggr_type
+      type(psb_dspmat_type), intent(in) :: a
+      type(psb_desc_type), intent(in)   :: desc_a
+      integer, allocatable              :: ilaggr(:),nlaggr(:)
+      integer, intent(out)              :: info
+    end subroutine psb_dgenaggrmap
+  end interface
+
+  interface psb_bldaggrmat
+    subroutine psb_dbldaggrmat(a,desc_a,ac,desc_ac,p,info)
+      use psb_base_mod
+      use psb_prec_type
+      type(psb_dspmat_type), intent(in), target :: a
+      type(psb_desc_type), intent(in)           :: desc_a
+      type(psb_dspmat_type), intent(out),target :: ac
+      type(psb_desc_type), intent(inout)        :: desc_ac
+      type(psb_dbaseprc_type), intent(inout), target :: p
+      integer, intent(out)                      :: info
+    end subroutine psb_dbldaggrmat
+  end interface
 
   integer :: ictxt, np, me
 

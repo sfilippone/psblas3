@@ -36,17 +36,9 @@
 !!$  
 subroutine psb_zprecbld(a,desc_a,p,info,upd)
 
-  use psb_serial_mod
-  Use psb_spmat_type
-  use psb_descriptor_type
+  use psb_base_mod
   use psb_prec_type
-  use psb_tools_mod
-  use psb_comm_mod
-  use psb_const_mod
-  use psb_psblas_mod
-  use psb_error_mod
-  use psb_penv_mod
-  use psb_prec_mod, only: psb_mlprc_bld, psb_baseprc_bld
+  use psb_prec_mod
   Implicit None
 
   type(psb_zspmat_type), target              :: a

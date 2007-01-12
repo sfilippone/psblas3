@@ -40,14 +40,8 @@ subroutine psb_dbaseprc_aply(alpha,prec,x,beta,y,desc_data,trans,work,info)
   !  where K is a a basic preconditioner stored in prec
   ! 
 
-  use psb_serial_mod
-  use psb_descriptor_type
+  use psb_base_mod
   use psb_prec_type
-  use psb_psblas_mod
-  use psb_const_mod
-  use psb_error_mod
-  use psb_penv_mod
-  use psb_prec_mod, only :  psb_bjac_aply
   implicit none 
 
   type(psb_desc_type),intent(in)      :: desc_data
@@ -68,6 +62,19 @@ subroutine psb_dbaseprc_aply(alpha,prec,x,beta,y,desc_data,trans,work,info)
   external mpi_wtime
   character(len=20)   :: name, ch_err
 
+  interface psb_bjac_aply
+     subroutine psb_dbjac_aply(alpha,prec,x,beta,y,desc_data,trans,work,info)
+       use psb_base_mod
+       use psb_prec_type
+       type(psb_desc_type), intent(in)       :: desc_data
+       type(psb_dbaseprc_type), intent(in)   :: prec
+       real(kind(0.d0)),intent(inout)        :: x(:), y(:)
+       real(kind(0.d0)),intent(in)           :: alpha,beta
+       character(len=1)                      :: trans
+       real(kind(0.d0)),target               :: work(:)
+       integer, intent(out)                  :: info
+     end subroutine psb_dbjac_aply
+  end interface
 
   name='psb_dbaseprc_aply'
   info = 0

@@ -351,8 +351,6 @@ contains
       write (0,'("indices in input array are not within problem dimension ",2(i0,2x))')i_e_d(1:2)
     case(150)
       write (0,'("indices in input array are not belonging to the calling process ",i0)')i_e_d(1)
-    case(151)
-      write (0,'("indices in input array are not belonging to the calling process ")')
     case(290)
       write (0,'("To call this routine you must first call psb_geall on the same matrix")')
     case(295)

@@ -136,28 +136,6 @@ contains
 
   end function psb_is_asb_desc
 
-  logical function psb_is_ovl_bld(desc)
-    type(psb_desc_type), intent(in) :: desc
-
-    psb_is_ovl_bld = (desc%matrix_data(psb_ovl_state_)==psb_cd_ovl_bld_)
-
-  end function psb_is_ovl_bld
-
-  logical function psb_is_ovl_asb(desc)
-    type(psb_desc_type), intent(in) :: desc
-
-    psb_is_ovl_asb = (desc%matrix_data(psb_ovl_state_)==psb_cd_ovl_asb_)
-
-  end function psb_is_ovl_asb
-
-  logical function psb_is_ovl_ok(desc)
-    type(psb_desc_type), intent(in) :: desc
-
-    psb_is_ovl_ok = (desc%matrix_data(psb_ovl_state_)==psb_cd_ovl_asb_).or.&
-         & (desc%matrix_data(psb_ovl_state_)==psb_cd_ovl_bld_)
-
-  end function psb_is_ovl_ok
-
 
   logical function psb_is_ok_dec(dectype)
     integer :: dectype
@@ -249,69 +227,5 @@ contains
 
   end function psb_is_large_dec
 
-  subroutine psb_cd_set_bld(desc,info)
-    !
-    ! Change state of a descriptor into BUILD. 
-    ! If the descriptor is LARGE, check the  AVL search tree
-    ! and initialize it if necessary.
-    !
-    use psb_const_mod
-    use psb_error_mod
-    use psb_penv_mod
-
-    implicit none
-    type(psb_desc_type), intent(inout) :: desc
-    integer                            :: info
-    !locals
-    integer             :: np,me,ictxt, isz, err_act,idx,gidx,lidx
-    logical, parameter  :: debug=.false.,debugprt=.false.
-    character(len=20)   :: name, char_err
-    if (debug) write(0,*) me,'Entered CDCPY'
-    if (psb_get_errstatus() /= 0) return 
-    info = 0
-    call psb_erractionsave(err_act)
-    name = 'psb_cd_set_bld'
-
-    ictxt = psb_cd_get_context(desc)
-
-    ! check on blacs grid 
-    call psb_info(ictxt, me, np)
-    if (debug) write(0,*) me,'Entered CDCPY'
-
-    if (psb_is_large_desc(desc)) then 
-      if (.not.allocated(desc%ptree)) then 
-        allocate(desc%ptree(2),stat=info)
-        if (info /= 0) then 
-          info=4000
-          goto 9999
-        endif
-        call InitPairSearchTree(desc%ptree,info)
-        do idx=1, psb_cd_get_local_cols(desc)
-          gidx = desc%loc_to_glob(idx)
-          call SearchInsKeyVal(desc%ptree,gidx,idx,lidx,info)        
-          if (lidx /= idx) then 
-            write(0,*) 'Warning from cdset: mismatch in PTREE ',idx,lidx
-          endif
-        enddo
-      end if
-      desc%matrix_data(psb_dec_type_) = psb_desc_large_bld_ 
-
-    else
-      desc%matrix_data(psb_dec_type_) = psb_desc_bld_ 
-    end if
-
-    call psb_erractionrestore(err_act)
-    return
-
-9999 continue
-    call psb_erractionrestore(err_act)
-
-    if (err_act == act_ret) then
-      return
-    else
-      call psb_error(ictxt)
-    end if
-    return
-  end subroutine psb_cd_set_bld
     
 end module psb_descriptor_type

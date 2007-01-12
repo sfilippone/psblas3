@@ -117,7 +117,7 @@ subroutine psb_cddec(nloc, ictxt, desc_a, info)
 
   !locals
   Integer              :: i,j,np,me,err,n,itmpov, k,&
-       & l_ov_ix,l_ov_el,idx, err_act,m, ip,glx
+       & l_ov_ix,l_ov_el,idx, err_act,m, ip
   Integer              :: INT_ERR(5), thalo(1), tovr(1) 
   integer, allocatable :: nlv(:)
   logical, parameter   :: debug=.false.
@@ -164,107 +164,57 @@ subroutine psb_cddec(nloc, ictxt, desc_a, info)
 
 
   !count local rows number
-  if ( m >psb_cd_get_large_threshold()) then 
-    allocate(desc_a%loc_to_glob(nloc), desc_a%lprm(1),&
-         & desc_a%ptree(2),desc_a%matrix_data(psb_mdata_size_),stat=info)  
-    if (info == 0) call InitPairSearchTree(desc_a%ptree,info)
-    if (info /= 0) then
-      info=2025
-      int_err(1)=nloc
-      call psb_errpush(info,name,i_err=int_err)
-      goto 9999
-    end if
-
-    ! set LOC_TO_GLOB array to all "-1" values
-    desc_a%lprm(1) = 0
-    desc_a%loc_to_glob(:) = -1
-    desc_a%matrix_data(psb_n_row_)    = nloc
-    desc_a%matrix_data(psb_n_col_)    = nloc
-    desc_a%matrix_data(psb_m_)        = m
-    desc_a%matrix_data(psb_n_)        = m
-    desc_a%matrix_data(psb_dec_type_) = psb_desc_large_bld_
-    desc_a%matrix_data(psb_ctxt_)     = ictxt
-    call psb_get_mpicomm(ictxt,desc_a%matrix_data(psb_mpi_c_))
-
-    do ip=0, np-1
-      if (ip==me) then 
-        do i=1, nlv(ip) 
-          call SearchInsKeyVal(desc_a%ptree,j,i,glx,info)
-          desc_a%loc_to_glob(i) = j
-          j = j + 1
-        enddo
-      else
-        do i=1, nlv(ip) 
-          j = j + 1
-        enddo
-      endif
-    enddo
-
-    tovr  = -1 
-    thalo = -1
-
-    desc_a%lprm(:)         = 0
-
-    call psi_cnv_dsc(thalo,tovr,desc_a,info)
-    if (info /= 0) then
-      call psb_errpush(4010,name,a_err='psi_bld_cdesc')
-      goto 9999
-    end if
-
-
-    desc_a%matrix_data(psb_dec_type_) = psb_desc_large_asb_
-  else
-
-    allocate(desc_a%glob_to_loc(m),desc_a%matrix_data(psb_mdata_size_),&
-         &   desc_a%loc_to_glob(m),desc_a%lprm(1),stat=info)
-    if (info /= 0) then     
-      info=2025
-      int_err(1)=m
-      call psb_errpush(info,name,i_err=int_err)
-      goto 9999
-    endif
-
-
-    desc_a%matrix_data(psb_n_row_)    = nloc
-    desc_a%matrix_data(psb_n_col_)    = nloc
-    desc_a%matrix_data(psb_m_)        = m
-    desc_a%matrix_data(psb_n_)        = m
-    desc_a%matrix_data(psb_dec_type_) = psb_desc_bld_
-    desc_a%matrix_data(psb_ctxt_)     = ictxt
-    call psb_get_mpicomm(ictxt,desc_a%matrix_data(psb_mpi_c_))
-
-    j = 1
-    do ip=0, np-1
-      if (ip==me) then 
-        do i=1, nlv(ip) 
-          desc_a%glob_to_loc(j) = i
-          desc_a%loc_to_glob(i) = j
-          j = j + 1
-        enddo
-      else
-        do i=1, nlv(ip) 
-          desc_a%glob_to_loc(j) = -(np+ip+1)
-          j = j + 1
-        enddo
-      endif
-    enddo
-
-    tovr  = -1 
-    thalo = -1
-
-    desc_a%lprm(:)         = 0
-
-    desc_a%matrix_data(psb_ovl_state_) = psb_cd_ovl_bld_
-
-    call psi_cnv_dsc(thalo,tovr,desc_a,info)
-    if (info /= 0) then
-      call psb_errpush(4010,name,a_err='psi_bld_cdesc')
-      goto 9999
-    end if
-
-    desc_a%matrix_data(psb_dec_type_) = psb_desc_asb_
-
+  ! allocate work vector
+!!$  allocate(desc_a%glob_to_loc(m),desc_a%matrix_data(psb_mdata_size_),&
+!!$       &   desc_a%loc_to_glob(nloc),desc_a%lprm(1),&
+!!$       &   desc_a%ovrlap_index(1),desc_a%ovrlap_elem(1),&
+!!$       &   desc_a%halo_index(1),desc_a%bnd_elem(1),stat=info)
+  allocate(desc_a%glob_to_loc(m),desc_a%matrix_data(psb_mdata_size_),&
+       &   desc_a%loc_to_glob(m),desc_a%lprm(1),stat=info)
+  if (info /= 0) then     
+    info=2025
+    int_err(1)=m
+    call psb_errpush(info,name,i_err=int_err)
+    goto 9999
   endif
+
+
+  desc_a%matrix_data(psb_n_row_)    = nloc
+  desc_a%matrix_data(psb_n_col_)    = nloc
+  desc_a%matrix_data(psb_m_)        = m
+  desc_a%matrix_data(psb_n_)        = m
+  desc_a%matrix_data(psb_dec_type_) = psb_desc_bld_
+  desc_a%matrix_data(psb_ctxt_)     = ictxt
+  call psb_get_mpicomm(ictxt,desc_a%matrix_data(psb_mpi_c_))
+
+  j = 1
+  do ip=0, np-1
+    if (ip==me) then 
+      do i=1, nlv(ip) 
+        desc_a%glob_to_loc(j) = i
+        desc_a%loc_to_glob(i) = j
+        j = j + 1
+      enddo
+    else
+      do i=1, nlv(ip) 
+        desc_a%glob_to_loc(j) = -(np+ip+1)
+        j = j + 1
+      enddo
+    endif
+  enddo
+
+  tovr  = -1 
+  thalo = -1
+  
+  desc_a%lprm(:)         = 0
+
+  call psi_cnv_dsc(thalo,tovr,desc_a,info)
+  if (info /= 0) then
+    call psb_errpush(4010,name,a_err='psi_bld_cdesc')
+    goto 9999
+  end if
+
+  desc_a%matrix_data(psb_dec_type_) = psb_desc_asb_
 
   call psb_erractionrestore(err_act)
   return

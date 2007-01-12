@@ -35,7 +35,8 @@
  *
  */
 /* This file is an interface to the UMFPACK  routines for sparse
-   factorization.   
+   factorization.  It was obtained by adapting  umfpack_di_demo
+   under the original copyright terms reproduced below.   
    
    PSBLAS v 2.0  */ 
 

@@ -71,6 +71,14 @@ subroutine psb_zgelp(trans,iperm,x,desc_a,info)
     end subroutine zgelp
   end interface
 
+  interface isaperm
+
+    logical function isaperm(n,ip)
+      integer, intent(in)    :: n   
+      integer, intent(inout) :: ip(*)
+    end function isaperm
+  end interface
+
   character(len=20)   :: name, ch_err
   name = 'psb_zgelp'
 
@@ -205,8 +213,16 @@ subroutine psb_zgelpv(trans,iperm,x,desc_a,info)
       integer, intent(in)  :: p(*)
     end subroutine zgelp
   end interface
-  character(len=20)   :: name, ch_err
 
+  interface isaperm
+
+    logical function isaperm(n,ip)
+      integer, intent(in)    :: n   
+      integer, intent(inout) :: ip(*)
+    end function isaperm
+  end interface
+
+  character(len=20)   :: name, ch_err
   name = 'psb_zgelpv'
 
   if(psb_get_errstatus() /= 0) return 

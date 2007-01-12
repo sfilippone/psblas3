@@ -50,17 +50,8 @@
 !*                                                                           *
 !*****************************************************************************
 subroutine psb_dilu_bld(a,desc_a,p,upd,info)
-  use psb_serial_mod
-  use psb_const_mod
+  use psb_base_mod
   use psb_prec_type
-  use psb_descriptor_type
-  use psb_spmat_type
-  use psb_tools_mod
-  use psb_psblas_mod
-  use psb_error_mod
-  use psb_realloc_mod
-  use psb_penv_mod
-  use psb_prec_mod, only : psb_as_matbld, psb_ilu_fct, psb_sp_renum
   implicit none
   !                                                                               
   !     .. Scalar Arguments ..                                                    
@@ -83,6 +74,45 @@ subroutine psb_dilu_bld(a,desc_a,p,upd,info)
        & n_row, nrow_a,n_col, nhalo, ind, iind, i1,i2,ia
   integer :: ictxt,np,me
   character(len=20)      :: name, ch_err
+
+  interface psb_ilu_fct
+    subroutine psb_dilu_fct(a,l,u,d,info,blck)
+      use psb_base_mod
+      integer, intent(out)                ::     info
+      type(psb_dspmat_type),intent(in)    :: a
+      type(psb_dspmat_type),intent(inout) :: l,u
+      type(psb_dspmat_type),intent(in), optional, target :: blck
+      real(kind(1.d0)), intent(inout)     ::  d(:)
+    end subroutine psb_dilu_fct
+  end interface
+
+  interface psb_asmatbld
+    Subroutine psb_dasmatbld(ptype,novr,a,blk,desc_data,upd,desc_p,info,outfmt)
+      use psb_base_mod
+      use psb_prec_type
+      integer, intent(in)                  :: ptype,novr
+      Type(psb_dspmat_type), Intent(in)    ::  a
+      Type(psb_dspmat_type), Intent(inout) ::  blk
+      Type(psb_desc_type), Intent(inout)   :: desc_p
+      Type(psb_desc_type), Intent(in)      :: desc_data 
+      Character, Intent(in)                :: upd
+      integer, intent(out)                 :: info
+      character(len=5), optional           :: outfmt
+    end Subroutine psb_dasmatbld
+  end interface
+
+  interface psb_sp_renum
+    subroutine psb_dsp_renum(a,desc_a,blck,p,atmp,info)
+      use psb_base_mod
+      use psb_prec_type
+      implicit none
+      type(psb_dspmat_type), intent(in)      :: a,blck
+      type(psb_dspmat_type), intent(inout)   :: atmp
+      type(psb_dbaseprc_type), intent(inout) :: p
+      type(psb_desc_type), intent(in)        :: desc_a
+      integer, intent(out)   :: info
+    end subroutine psb_dsp_renum
+  end interface
 
   if(psb_get_errstatus().ne.0) return 
   info=0
@@ -115,18 +145,18 @@ subroutine psb_dilu_bld(a,desc_a,p,upd,info)
 
   t1= mpi_wtime()
 
-  if(debug) write(0,*)me,': calling psb_as_matbld',p%iprcparm(p_type_),p%iprcparm(n_ovr_)
+  if(debug) write(0,*)me,': calling psb_asmatbld',p%iprcparm(p_type_),p%iprcparm(n_ovr_)
   if (debug) call psb_barrier(ictxt)
-  call psb_as_matbld(p%iprcparm(p_type_),p%iprcparm(n_ovr_),a,&
+  call psb_asmatbld(p%iprcparm(p_type_),p%iprcparm(n_ovr_),a,&
        & blck,desc_a,upd,p%desc_data,info)
   if(info/=0) then
     info=4010
-    ch_err='psb_as_matbld'
+    ch_err='psb_asmatbld'
     call psb_errpush(info,name,a_err=ch_err)
     goto 9999
   end if
   t2= mpi_wtime()
-  if (debug) write(0,*)me,': out of psb_as_matbld'
+  if (debug) write(0,*)me,': out of psb_asmatbld'
   if (debug) call psb_barrier(ictxt)
 
   if (allocated(p%av)) then 
@@ -178,7 +208,7 @@ subroutine psb_dilu_bld(a,desc_a,p,upd,info)
 
 
   if (debug) then 
-    write(0,*) me,'Done psb_as_matbld'
+    write(0,*) me,'Done psb_asmatbld'
     call psb_barrier(ictxt)
   endif
 

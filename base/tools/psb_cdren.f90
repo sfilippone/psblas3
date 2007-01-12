@@ -45,8 +45,14 @@ subroutine psb_cdren(trans,iperm,desc_a,info)
   use psb_error_mod
   use psb_penv_mod
   use psb_string_mod
-  use psb_serial_mod
   implicit none
+
+  interface isaperm
+    logical function isaperm(n,ip)
+      integer, intent(in)    :: n   
+      integer, intent(inout) :: ip(*)
+    end function isaperm
+  end interface
 
   !...parameters....
   type(psb_desc_type), intent(inout)    ::  desc_a
@@ -57,6 +63,8 @@ subroutine psb_cdren(trans,iperm,desc_a,info)
   integer                       :: i,j,np,me, n_col, kh, nh
   integer                       :: dectype
   integer                       :: ictxt,n_row, int_err(5), err_act
+  real(kind(1.d0))              :: time(10), mpi_wtime, real_err(6)
+  external mpi_wtime
   logical, parameter            :: debug=.false.
   character(len=20)             :: name
 
@@ -64,6 +72,8 @@ subroutine psb_cdren(trans,iperm,desc_a,info)
   info=0
   call psb_erractionsave(err_act)
   name = 'psb_dcren'
+
+  time(1) = mpi_wtime()
 
   ictxt   = psb_cd_get_context(desc_a)
   dectype = psb_cd_get_dectype(desc_a)
@@ -197,6 +207,13 @@ subroutine psb_cdren(trans,iperm,desc_a,info)
   endif
 
 
+  time(4) = mpi_wtime()
+  time(4) = time(4) - time(3)
+  if (debug) then 
+    call psb_amx(ictxt, time(4))
+
+    write (*, *) '         comm structs assembly: ', time(4)*1.d-3
+  end if
 
   call psb_erractionrestore(err_act)
   return

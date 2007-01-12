@@ -52,7 +52,6 @@ subroutine psb_dspins(nz,ia,ja,val,a,desc_a,info,rebuild)
   use psb_const_mod
   use psb_error_mod
   use psb_penv_mod
-  use psb_tools_mod
   implicit none
 
   !....parameters...
@@ -71,6 +70,27 @@ subroutine psb_dspins(nz,ia,ja,val,a,desc_a,info,rebuild)
   logical                :: rebuild_
   integer, allocatable   :: ila(:),jla(:)
 
+  interface psb_cdins
+    subroutine psb_cdins(nz,ia,ja,desc_a,info,ila,jla)
+      use psb_descriptor_type
+      implicit none
+      type(psb_desc_type), intent(inout) ::  desc_a
+      integer, intent(in)                ::  nz,ia(:),ja(:)
+      integer, intent(out)               :: info
+      integer, optional, intent(out)     :: ila(:), jla(:)
+    end subroutine psb_cdins
+  end interface
+
+  interface psb_glob_to_loc
+    subroutine psb_glob_to_loc(x,desc_a,info,iact)
+      use psb_descriptor_type
+      implicit none
+      type(psb_desc_type), intent(in)  :: desc_a
+      integer, intent(inout)           :: x(:)  
+      integer, intent(out)             :: info
+      character, intent(in), optional  :: iact
+    end subroutine psb_glob_to_loc
+  end interface
   character(len=20)  :: name, ch_err
 
   info = 0

@@ -49,7 +49,6 @@ Subroutine psb_dsphalo(a,desc_a,blk,info,rwcnv,clcnv,outfmt)
 
   use psb_serial_mod
   use psb_descriptor_type
-  Use psb_prec_type
   use psb_realloc_mod
   use psb_tools_mod, only : psb_glob_to_loc, psb_loc_to_glob
   use psb_error_mod

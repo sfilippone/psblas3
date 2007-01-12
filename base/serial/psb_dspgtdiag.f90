@@ -45,12 +45,24 @@ subroutine psb_dspgtdiag(a,d,info)
   use psb_spmat_type
   use psb_error_mod
   use psb_const_mod
-  use psb_serial_mod, only : psb_sp_getblk
   implicit none
 
   type(psb_dspmat_type), intent(in)     :: a
   real(kind(1.d0)), intent(inout)       :: d(:) 
   integer, intent(out)                  :: info
+
+  interface psb_spgtblk
+     subroutine psb_dspgtblk(irw,a,b,info,append,iren,lrw)
+       use psb_spmat_type
+       type(psb_dspmat_type), intent(in) :: a
+       integer, intent(in)       :: irw
+       type(psb_dspmat_type), intent(inout)    :: b
+       logical, intent(in), optional :: append
+       integer, intent(in), target, optional :: iren(:)
+       integer, intent(in), optional :: lrw
+       integer, intent(out)  :: info
+     end subroutine psb_dspgtblk
+  end interface
 
   type(psb_dspmat_type)     :: tmpa
   integer :: i,j,k,nr, nz, err_act, ii, rng, irb, nrb
@@ -90,10 +102,10 @@ subroutine psb_dspgtdiag(a,d,info)
     write(0,*)'in spgtdiag'
     do i=1, rng, nrb
        irb=min(i+nrb-1,rng)
-       call psb_sp_getblk(i,a,tmpa,info,lrw=irb)
+       call psb_spgtblk(i,a,tmpa,info,lrw=irb)
        if(info.ne.0) then
           info=4010
-          ch_err='psb_sp_getblk'
+          ch_err='psb_spgtblk'
           call psb_errpush(info,name,a_err=ch_err)
           goto 9999
        end if

@@ -13,8 +13,9 @@ MPFOBJS = psi_dswapdata.o psi_dswaptran.o psi_iswapdata.o \
 	psi_iswaptran.o psi_desc_index.o \
  	psi_zswapdata.o psi_zswaptran.o 
 MPFOBJS2 = psi_extrct_dl.o
-INCDIRS = -I ../../lib -I .
-LIBDIR = ../../lib
+LIBDIR = ..
+MODDIR = ../modules
+INCDIRS = -I $(LIBDIR) -I $(MODDIR) -I . 
 
 lib: mpfobjs $(FOBJS) $(FOBJS2) $(COBJS) $(MPFOBJS2)
 	$(AR) $(LIBDIR)/$(LIBNAME) $(MPFOBJS) $(MPFOBJS2) $(FOBJS) $(FOBJS2) \

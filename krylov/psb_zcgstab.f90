@@ -60,7 +60,8 @@
 !
 ! Parameters:
 !    a       -  type(<psb_zspmat_type>).     The sparse matrix containing A.
-!    prec    -  type(<psb_prec_type>).       The data structure containing the preconditioner.
+!    prec    -  type(<psb_prec_type>).       The data structure containing the 
+!                                             preconditioner.
 !    b       -  real,dimension(:).           The right hand side.
 !    x       -  real,dimension(:).           The vector of unknowns.
 !    eps     -  real.                        The error tolerance.
@@ -74,15 +75,8 @@
 !
 Subroutine psb_zcgstab(a,prec,b,x,eps,desc_a,info,&
      &itmax,iter,err,itrace, istop)
-  use psb_serial_mod
-  use psb_descriptor_type
-  use psb_prec_type
-  use psb_psblas_mod
-  use psb_tools_mod
-  use psb_const_mod
+  use psb_base_mod
   use psb_prec_mod
-  use psb_error_mod
-  use psb_penv_mod
   Implicit None
 !!$  parameters 
   Type(psb_zspmat_type), Intent(in)  :: a

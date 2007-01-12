@@ -49,6 +49,49 @@ subroutine psb_dspcnv(a,b,desc_a,info)
   use psb_error_mod
   use psb_penv_mod
   implicit none
+  interface dcsdp
+
+    subroutine dcsdp(check,trans,m,n,unitd,d,&
+         & fida,descra,a,ia1,ia2,infoa,&
+         & pl,fidh,descrh,h,ih1,ih2,infoh,pr,lh,lh1,lh2,&
+         & work,lwork,ierror)
+      integer, intent(in)   :: lh, lwork, lh1, lh2, m, n                 
+      integer, intent(out)  :: ierror                 
+      character, intent(in) :: check, trans, unitd                               
+      real(kind(1.d0)), intent(in)  :: d(*), a(*)
+      real(kind(1.d0)), intent(out) :: h(*)
+      real(kind(1.d0)), intent(inout) :: work(*)
+      integer, intent(in)  :: ia1(*), ia2(*), infoa(*)
+      integer, intent(out) :: ih1(*), ih2(*), pl(*),pr(*), infoh(*) 
+      character, intent(in) ::  fida*5, descra*11
+      character, intent(out) :: fidh*5, descrh*11
+    end subroutine dcsdp
+  end interface
+
+
+  interface dcsrp
+
+    subroutine dcsrp(trans,m,n,fida,descra,ia1,ia2,&
+         & infoa,p,work,lwork,ierror)
+      integer, intent(in)  :: m, n, lwork
+      integer, intent(out) :: ierror
+      character, intent(in) ::       trans
+      real(kind(1.d0)), intent(inout) :: work(*)                     
+      integer, intent(in)    :: p(*)
+      integer, intent(inout) :: ia1(*), ia2(*), infoa(*) 
+      character, intent(in)  :: fida*5, descra*11
+    end subroutine dcsrp
+  end interface
+
+  interface dcsprt
+    subroutine dcsprt(m,n,fida,descra,a,ia1,ia2,infoa ,iout,ierror)
+      integer, intent(in)  ::  iout,m, n                 
+      integer, intent(out) ::  ierror                 
+      real(kind(1.d0)), intent(in) :: a(*)
+      integer, intent(in)   :: ia1(*), ia2(*), infoa(*)
+      character, intent(in) :: fida*5, descra*11
+    end subroutine dcsprt
+  end interface
 
   !...parameters....
   type(psb_dspmat_type), intent(in)   :: a
@@ -57,11 +100,17 @@ subroutine psb_dspcnv(a,b,desc_a,info)
   integer, intent(out)                :: info
   !....locals....
   integer                       ::  int_err(5)
-  integer                       ::  ia1_size,ia2_size,aspk_size,err_act&
-       & ,i,err,np,me,n_col
-  integer, allocatable :: i_temp(:)
-  integer                       ::  dectype
+  real(kind(1.d0))              ::  d(1)
+  integer,allocatable           ::  i_temp(:)
+  real(kind(1.d0)),allocatable  ::  work_dcsdp(:)
+  integer                       ::  ia1_size,ia2_size,aspk_size,&
+       & err_act,i,np,me,n_col,l_dcsdp
+  integer                       ::  lwork_dcsdp,dectype
   integer                       ::  ictxt,n_row
+  character                     ::  check*1, trans*1, unitd*1
+
+  real(kind(1.d0))              :: time(10), mpi_wtime
+  external mpi_wtime
   logical, parameter :: debug=.false.
   character(len=20)   :: name, ch_err
 
@@ -70,6 +119,7 @@ subroutine psb_dspcnv(a,b,desc_a,info)
   name = 'psb_dspcnv'
   call psb_erractionsave(err_act)
 
+  time(1) = mpi_wtime()
 
   ictxt   = psb_cd_get_context(desc_a)
   dectype = psb_cd_get_dectype(desc_a)
@@ -99,15 +149,46 @@ subroutine psb_dspcnv(a,b,desc_a,info)
 
   if (debug) write (0, *) name,'  sizes',ia1_size,ia2_size,aspk_size
 
+  ! convert only without check
+  check='N'
+  trans='N'
+  unitd='U'
+
+  ! l_dcsdp is the size requested for dcsdp procedure
+  l_dcsdp=(ia1_size+100)
+
   b%m=n_row
   b%k=n_col
   call psb_sp_all(b,ia1_size,ia2_size,aspk_size,info)
+  allocate(work_dcsdp(l_dcsdp),stat=info)
+  if (info /= 0) then
+    info=2025
+    int_err(1)=l_dcsdp
+    call psb_errpush(info, name, i_err=int_err)
+    goto 9999
+  endif
 
-  call psb_csdp(a,b,info)
+  lwork_dcsdp=size(work_dcsdp)
+  ! set infoa(1) to nnzero
+  b%pl(:)  = 0
+  b%pr(:)  = 0
+
+  if (debug) write (0, *) name,'  calling dcsdp',lwork_dcsdp,&
+       &size(work_dcsdp)
+  ! convert aspk,ia1,ia2 in requested representation mode
+  if (debug) then
+
+  endif
+  ! result is put in b
+  call dcsdp(check,trans,n_row,n_col,unitd,d,a%fida,a%descra,&
+       & a%aspk,a%ia1,a%ia2,a%infoa,&
+       & b%pl,b%fida,b%descra,b%aspk,b%ia1,b%ia2,b%infoa,b%pr,&
+       & size(b%aspk),size(b%ia1),size(b%ia2),&
+       & work_dcsdp,size(work_dcsdp),info)
 
   if(info /= no_err) then
     info=4010
-    ch_err='psb_csdp'
+    ch_err='dcsdp'
     call psb_errpush(info, name, a_err=ch_err)
     goto 9999
   end if
@@ -146,6 +227,9 @@ subroutine psb_dspcnv(a,b,desc_a,info)
     endif
   endif
 
+
+  if (debug) write (0, *) me,name,'  from dcsdp ',&
+       &b%fida,' pl ', b%pl(:),'pr',b%pr(:)
 
   call psb_erractionrestore(err_act)
   return

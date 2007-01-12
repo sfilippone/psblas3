@@ -42,13 +42,8 @@ subroutine psb_zbjac_aply(alpha,prec,x,beta,y,desc_data,trans,work,info)
   !  but since both are INTENT(IN) this should be legal. 
   ! 
 
-  use psb_serial_mod
-  use psb_descriptor_type
+  use psb_base_mod
   use psb_prec_type
-  use psb_psblas_mod
-  use psb_const_mod
-  use psb_error_mod
-  use psb_penv_mod
   implicit none 
 
   type(psb_desc_type), intent(in)       :: desc_data

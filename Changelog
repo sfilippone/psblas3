@@ -1,6 +1,15 @@
 Changelog. A lot less detailed than usual, at least for past
 history. 
 
+
+2007/01/11: Migrated repository to SVN. 
+
+2007/01/11: MLD2P4 has been moved to the new org. Now tackling the 
+            test dirs.
+
+2007/01/09: First try at reorganizing directories. Subdir MLD2P4 still
+	    to be fixed. Documentation still to be updated. 
+
 2006/12/11: Documented options in glob_to_loc.
 
 2006/12/06: Fixed raw aggregation.

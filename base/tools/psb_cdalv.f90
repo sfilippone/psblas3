@@ -325,13 +325,12 @@ subroutine psb_cdalv(m, v, ictxt, desc_a, info, flag)
 
   call psb_transfer(ov_idx,desc_a%ovrlap_index,info) 
   if (info == 0) call psb_transfer(ov_el,desc_a%ovrlap_elem,info)
-  if (info == 0) deallocate(temp_ovrlap,stat=info)
+  deallocate(temp_ovrlap,stat=info)
   if (info /= 0) then 
     info=4000
     call psb_errpush(info,name)
     goto 9999
   endif
-  desc_a%matrix_data(psb_ovl_state_) = psb_cd_ovl_asb_
 
   ! set fields in desc_a%MATRIX_DATA....
   desc_a%matrix_data(psb_n_row_)  = loc_row

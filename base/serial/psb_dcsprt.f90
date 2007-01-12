@@ -57,7 +57,7 @@ subroutine psb_dcsprt(iout,a,iv,eirs,eics,head,ivr,ivc)
   character(len=*), optional        :: head
   integer, intent(in), optional     :: ivr(:), ivc(:)
 
-  character(len=*), parameter       :: frmtr='(2(i16,1x),e16.8,2(i16,1x))'
+  character(len=*), parameter       :: frmtr='(2(i6,1x),e16.8,2(i6,1x))'
   integer  :: irs,ics,i,j
 
   if (present(eirs)) then 

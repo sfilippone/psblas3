@@ -36,10 +36,8 @@
 !!$  
 subroutine psb_dprecset(p,ptype,info,iv,rs,rv,ilev,nlev)
 
-  use psb_serial_mod
-  use psb_descriptor_type
+  use psb_base_mod
   use psb_prec_type
-  use psb_string_mod
   implicit none
   type(psb_dprec_type), intent(inout)    :: p
   character(len=*), intent(in)           :: ptype

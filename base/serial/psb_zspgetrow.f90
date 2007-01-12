@@ -42,8 +42,6 @@
 subroutine psb_zspgetrow(irw,a,nz,ia,ja,val,info,iren,lrw)
   use psb_spmat_type
   use psb_string_mod
-  use psb_serial_mod, only: psb_sp_getblk
-  implicit none 
   type(psb_zspmat_type), intent(in) :: a
   integer, intent(in)       :: irw
   integer, intent(out)      :: nz
@@ -52,6 +50,23 @@ subroutine psb_zspgetrow(irw,a,nz,ia,ja,val,info,iren,lrw)
   integer, intent(in), target, optional :: iren(:)
   integer, intent(in), optional :: lrw
   integer, intent(out)  :: info
+  interface psb_spgtblk
+    subroutine psb_zspgtblk(irw,a,b,info,append,iren,lrw)
+      ! Output is always in  COO format  into B, irrespective of 
+      ! the input format 
+      use psb_spmat_type
+      use psb_const_mod
+      implicit none
+
+      type(psb_zspmat_type), intent(in)     :: a
+      integer, intent(in)                   :: irw
+      type(psb_zspmat_type), intent(inout)  :: b
+      integer,intent(out)                   :: info
+      logical, intent(in), optional         :: append
+      integer, intent(in), target, optional :: iren(:)
+      integer, intent(in), optional         :: lrw
+    end subroutine psb_zspgtblk
+  end interface
 
   integer               :: lrw_, ierr(5), err_act
   type(psb_zspmat_type) :: b
@@ -78,9 +93,9 @@ subroutine psb_zspgetrow(irw,a,nz,ia,ja,val,info,iren,lrw)
   call psb_sp_all(lrw_-irw+1,lrw_-irw+1,b,info)
 
   if (present(iren)) then
-    call psb_sp_getblk(irw,a,b,info,iren=iren,lrw=lrw_)
+    call psb_spgtblk(irw,a,b,info,iren=iren,lrw=lrw_)
   else 
-    call psb_sp_getblk(irw,a,b,info,lrw=lrw_)
+    call psb_spgtblk(irw,a,b,info,lrw=lrw_)
   end if
   if (info /= 0) then     
     info=136

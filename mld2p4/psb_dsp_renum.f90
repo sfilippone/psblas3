@@ -35,15 +35,8 @@
 !!$ 
 !!$  
 subroutine psb_dsp_renum(a,desc_a,blck,p,atmp,info)
-  use psb_serial_mod
-  use psb_const_mod
+  use psb_base_mod
   use psb_prec_type
-  use psb_descriptor_type
-  use psb_spmat_type
-  use psb_tools_mod
-  use psb_psblas_mod
-  use psb_error_mod
-  use psb_penv_mod
   implicit none
 
   !     .. array Arguments ..                                                     
@@ -377,7 +370,6 @@ contains
 
     integer,dimension(:,:),allocatable::NDstk
     integer,dimension(:),allocatable::iOld,renum,ndeg,lvl,lvls1,lvls2,ccstor
-    !--- Per la common area.
 
     character(len=20)      :: name, ch_err
 

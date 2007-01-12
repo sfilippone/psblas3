@@ -36,17 +36,9 @@
 !!$  
 subroutine psb_dprecbld(a,desc_a,p,info,upd)
 
-  use psb_serial_mod
-  Use psb_spmat_type
-  use psb_descriptor_type
+  use psb_base_mod
   use psb_prec_type
-  use psb_tools_mod
-  use psb_comm_mod
-  use psb_const_mod
-  use psb_psblas_mod
-  use psb_error_mod
-  use psb_penv_mod
-  use psb_prec_mod, only: psb_mlprc_bld, psb_baseprc_bld
+  use psb_prec_mod
   Implicit None
 
   type(psb_dspmat_type), target           :: a
@@ -60,9 +52,9 @@ subroutine psb_dprecbld(a,desc_a,p,info,upd)
   integer      :: int_err(5)
   character    :: iupd
 
-  logical, parameter :: debug=.false., filedump=.false.
+  logical, parameter :: debug=.false.
   integer,parameter  :: iroot=0,iout=60,ilout=40
-  character(len=20)   :: name, ch_err,dumpname
+  character(len=20)   :: name, ch_err
 
   if(psb_get_errstatus().ne.0) return 
   info=0
@@ -142,18 +134,7 @@ subroutine psb_dprecbld(a,desc_a,p,info,upd)
       if (debug) then 
         write(0,*) 'Return from ',i-1,' call to mlprcbld ',info
       endif
-      if (filedump) then 
-        write(dumpname,'(a,i2.2,a,i2.2,a)'),'ac_lev_',i,'.',me,'.out'
-        open(20,file=dumpname)
-        call psb_csprt(20,p%baseprecv(i)%av(ac_))
-        call flush(20) 
-        close(20)
-        write(dumpname,'(a,i2.2,a,i2.2,a)'),'nd_lev_',i,'.',me,'.out'
-        open(20,file=dumpname)
-        call psb_csprt(20,p%baseprecv(i)%av(ap_nd_))
-        call flush(20) 
-        close(20)
-      end if
+      
     end do
 
   endif

@@ -45,9 +45,29 @@ subroutine psb_zcsrp(trans,iperm,a, desc_a, info)
   use psb_serial_mod
   use psb_const_mod
   use psb_penv_mod
-  use psb_serial_mod
-  implicit none
+  !  implicit none
 
+  interface 
+    subroutine zcsrp(trans,m,n,fida,descra,ia1,ia2,&
+         & infoa,p,work,lwork,ierror)
+      integer, intent(in)  :: m, n, lwork
+      integer, intent(out) :: ierror
+      character, intent(in) ::       trans
+      complex(kind(1.d0)), intent(inout) :: work(*)                     
+      integer, intent(in)    :: p(*)
+      integer, intent(inout) :: ia1(*), ia2(*), infoa(*) 
+      character, intent(in)  :: fida*5, descra*11
+    end subroutine zcsrp
+  end interface
+
+
+  interface isaperm
+
+    logical function isaperm(n,ip)
+      integer, intent(in)    :: n   
+      integer, intent(inout) :: ip(*)
+    end function isaperm
+  end interface
 
   !...parameters....
   type(psb_zspmat_type), intent(inout)  ::  a
@@ -138,7 +158,7 @@ subroutine psb_zcsrp(trans,iperm,a, desc_a, info)
   ! hmm, maybe we should just move all of this onto a different level,
   ! have a specialized subroutine, and do it in the solver context???? 
   if (debug) write(0,*) 'spasb: calling dcsrp',size(work_dcsdp)
-  call csrp(trans,n_row,n_col,a%fida,a%descra,a%ia1,a%ia2,a%infoa,&
+  call zcsrp(trans,n_row,n_col,a%fida,a%descra,a%ia1,a%ia2,a%infoa,&
        & ipt,work_dcsdp,size(work_dcsdp),info)
   if(info /= no_err) then
     info=4010

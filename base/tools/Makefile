@@ -15,8 +15,9 @@ FOBJS = psb_dallc.o psb_dasb.o psb_dcsrp.o psb_cdprt.o \
 
 MPFOBJS = psb_dsphalo.o psb_zsphalo.o psb_cdasb.o psb_dcdovr.o psb_zcdovr.o
 
-INCDIRS = -I ../../lib -I .
-LIBDIR = ../../lib
+LIBDIR = ..
+MODDIR = ../modules
+INCDIRS = -I $(LIBDIR) -I $(MODDIR) -I . 
 
 lib: mpfobjs $(FOBJS)
 	$(AR) $(LIBDIR)/$(LIBNAME) $(MPFOBJS) $(FOBJS)
@@ -26,8 +27,6 @@ lib: mpfobjs $(FOBJS)
 mpfobjs: 
 	(make $(MPFOBJS) F90="$(MPF90)" FC="$(MPF90)" FCOPT="$(F90COPT)")
 
-psb_glob_to_loc.o: psb_glob_to_loc.f90
-	$(F90) $(F90COPT) $(INCDIRS) -c $< $(F90INLINE)
 clean:
 	/bin/rm -f $(MPFOBJS) $(FOBJS)
 

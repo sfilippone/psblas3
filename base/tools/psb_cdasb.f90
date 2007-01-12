@@ -130,16 +130,6 @@ subroutine psb_cdasb(desc_a,info)
     end if
 
     if (psb_is_large_dec(dectype) ) then 
-      if (allocated(desc_a%ptree)) then 
-        call FreePairSearchTree(desc_a%ptree)   
-        deallocate(desc_a%ptree,stat=info)
-        if (info /= 0) then 
-          info=2059
-          call psb_errpush(info,name)
-          goto 9999
-        end if
-      end if
-      
       desc_a%matrix_data(psb_dec_type_) = psb_desc_large_asb_
 !!$      write(0,*) 'Done large dec asmbly',desc_a%matrix_data(psb_dec_type_),&
 !!$           & psb_desc_large_asb_,psb_is_asb_dec(desc_a%matrix_data(psb_dec_type_))

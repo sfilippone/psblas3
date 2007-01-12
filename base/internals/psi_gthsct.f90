@@ -122,7 +122,7 @@ contains
 
     implicit none
 
-    integer :: n, idx(:)
+    integer :: n, k, idx(:)
     real(kind(1.d0)) :: beta, x(:), y(:)
 
     ! Locals

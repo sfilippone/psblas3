@@ -41,11 +41,8 @@ subroutine psb_zilu_fct(a,l,u,d,info,blck)
   ! into L/D/U. 
   !
   !
-  use psb_spmat_type
-  use psb_serial_mod
-  use psb_tools_mod
-  use psb_error_mod
-  use psb_const_mod
+  use psb_base_mod
+  use psb_prec_type
   implicit none
   !     .. Scalar Arguments ..
   integer, intent(out)                ::     info

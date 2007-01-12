@@ -40,6 +40,12 @@ BLACS=-lmpiblacs
 #UMFDIR=$(HOME)/LIB/Umfpack
 #UMF=-lumfpack -lamd -L$(UMFDIR)
 #UMFDEF=-DHave_UMF_ -I$(UMFDIR)
+#
+#  We are using the public domain tool METIS from U. Minnesota. To get it
+#  check URL http://www.cs.umn.edu:~karypis
+#  
+METIS_LIB = -L$(HOME)/NUMERICAL/metis-4.0 -lmetis 
+LDLIBS=$(BLACS) $(SLU) $(UMF) $(BLAS) $(METIS_LIB)
 
 #  Add -DLargeFptr for 64-bit addresses
 CDEFINES=-DNoChange $(SLUDEF) $(UMFDEF) -DLargeFptr
@@ -53,21 +59,11 @@ RANLIB=ranlib
 #######################  Section 5 #######################
 #  Do not edit this                                      #
 ##########################################################
-LIBDIR = lib
-LIBNAME = libpsblas.a
-
-TYPEMODS =  psb_spmat_type$(.mod) psb_descriptor_type$(.mod) psb_prec_type$(.mod) psb_realloc_mod$(.mod)
-CONSTMODS = psb_const_mod$(.mod)
-BLASMODS  = $(TYPEMODS) psb_psblas_mod$(.mod) psb_comm_mod$(.mod)
-METHDMODS = psb_methd_mod$(.mod)
-TOOLSMODS = $(CONSTMODS) psi_mod$(.mod) psb_tools_mod$(.mod) psb_serial_mod$(.mod)
-PRECMODS  = psb_prec_mod$(.mod)
-ERRORMODS = psb_error_mod$(.mod)
-F90MODS= $(BLASMODS) $(PRECMODS) $(METHDMODS) $(TOOLSMODS) $(ERRORMODS) string$(.mod)
-
-MODS=$(LIBDIR)/psb_const_mod$(.mod) $(LIBDIR)/psb_spmat_type$(.mod) $(LIBDIR)/psb_realloc_mod$(.mod) \
-  $(LIBDIR)/psb_descriptor_type$(.mod)  $(LIBDIR)/psb_prec_type$(.mod) $(LIBDIR)/parts.fh \
-  $(LIBDIR)/psb_serial_mod$(.mod) $(LIBDIR)/psb_comm_mod$(.mod) $(LIBDIR)/psb_error_mod$(.mod)
+LIBDIR=lib
+BASELIBNAME=libpsb_base.a
+PRECLIBNAME=libpsb_prec.a
+METHDLIBNAME=libpsb_krylov.a
+UTILLIBNAME=libpsb_util.a
 
 # Under Linux/gmake there is a rule interpreting .mod as Modula source! 
 $(.mod).o:

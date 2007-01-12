@@ -41,7 +41,6 @@
 subroutine psb_zsymbmm(a,b,c,info)
   use psb_spmat_type
   use psb_string_mod
-  use psb_serial_mod, only : psb_sp_getrow
   implicit none 
 
   type(psb_zspmat_type) :: a,b,c
@@ -57,6 +56,19 @@ subroutine psb_zsymbmm(a,b,c,info)
     end subroutine symbmm
   end interface
 
+  interface psb_sp_getrow
+    subroutine psb_zspgetrow(irw,a,nz,ia,ja,val,info,iren,lrw)
+      use psb_spmat_type
+      type(psb_zspmat_type), intent(in) :: a
+      integer, intent(in)       :: irw
+      integer, intent(out)      :: nz
+      integer, intent(inout)    :: ia(:), ja(:)
+      complex(kind(1.d0)),  intent(inout)    :: val(:)
+      integer, intent(in), target, optional :: iren(:)
+      integer, intent(in), optional :: lrw
+      integer, intent(out)  :: info
+    end subroutine psb_zspgetrow
+  end interface
   character(len=20)         :: name, ch_err
   integer                   :: err_act
   name='psb_symbmm'
@@ -101,7 +113,6 @@ subroutine psb_zsymbmm(a,b,c,info)
     call inner_symbmm(a,b,c,itemp,info)
   endif
   call psb_realloc(size(c%ia1),c%aspk,info)
-
   c%pl(1) = 0
   c%pr(1) = 0
   c%m=a%m

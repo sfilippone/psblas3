@@ -100,12 +100,12 @@ subroutine psb_loc_to_glob2(x,y,desc_a,info,iact)
 
   if (info /= 0) then
     select case(act)
-    case('I')
+    case('E')
       call psb_erractionrestore(err_act)
       return
     case('W')
       write(0,'("Error ",i5," in subroutine glob_to_loc")') info
-    case('E','A')
+    case('A')
       call psb_errpush(info,name)
       goto 9999
     end select
@@ -223,12 +223,12 @@ subroutine psb_loc_to_glob(x,desc_a,info,iact)
 
   if (info /= 0) then
     select case(act)
-    case('I')
+    case('E')
       call psb_erractionrestore(err_act)
       return
     case('W')
       write(0,'("Error ",i5," in subroutine glob_to_loc")') info
-    case('A','E')
+    case('A')
       call psb_errpush(info,name)
       goto 9999
     end select

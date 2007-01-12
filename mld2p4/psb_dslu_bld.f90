@@ -35,13 +35,9 @@
 !!$ 
 !!$  
 subroutine psb_dslu_bld(a,desc_a,p,info)
-  use psb_serial_mod
-  use psb_descriptor_type
+  use psb_base_mod
   use psb_prec_type
-  use psb_tools_mod
-  use psb_const_mod
-  use psb_penv_mod
-  use psb_prec_mod, only: psb_as_matbld
+
   implicit none 
 
   type(psb_dspmat_type), intent(inout)      :: a
@@ -57,12 +53,27 @@ subroutine psb_dslu_bld(a,desc_a,p,info)
   logical, parameter :: debug=.false.
   character(len=20)   :: name, ch_err
 
+  interface psb_asmatbld
+    Subroutine psb_dasmatbld(ptype,novr,a,blk,desc_data,upd,desc_p,info,outfmt)
+      use psb_base_mod
+      use psb_prec_type
+      integer, intent(in)                  :: ptype,novr
+      Type(psb_dspmat_type), Intent(in)    ::  a
+      Type(psb_dspmat_type), Intent(inout) ::  blk
+      Type(psb_desc_type), Intent(inout)   :: desc_p
+      Type(psb_desc_type), Intent(in)      :: desc_data 
+      Character, Intent(in)                :: upd
+      integer, intent(out)                 :: info
+      character(len=5), optional           :: outfmt
+    end Subroutine psb_dasmatbld
+  end interface
+
   if(psb_get_errstatus().ne.0) return 
   info=0
   name='psb_slu_bld'
   call psb_erractionsave(err_act)
 
-  ictxt = desc_A%matrix_data(psb_ctxt_)
+  ictxt = desc_a%matrix_data(psb_ctxt_)
 
   call psb_info(ictxt, me, np)
 
@@ -88,18 +99,18 @@ subroutine psb_dslu_bld(a,desc_a,p,info)
     write(0,*) me, 'SPLUBLD: Done csdp',info,nza,atmp%m,atmp%k
     call psb_barrier(ictxt)
   endif
-  call psb_as_matbld(p%iprcparm(p_type_),p%iprcparm(n_ovr_),a,&
+  call psb_asmatbld(p%iprcparm(p_type_),p%iprcparm(n_ovr_),a,&
        & blck,desc_a,upd,p%desc_data,info,outfmt=fmt)  
   if(info /= 0) then
     info=4010
-    ch_err='psb_as_matbld'
+    ch_err='psb_asmatbld'
     call psb_errpush(info,name,a_err=ch_err)
     goto 9999
   end if
 
   nzb = blck%infoa(psb_nnz_)
   if (Debug) then 
-    write(0,*) me, 'SPLUBLD: Done as_matbld',info,nzb,blck%fida
+    write(0,*) me, 'SPLUBLD: Done asmatbld',info,nzb,blck%fida
     call psb_barrier(ictxt)
   endif
   if (nzb > 0 ) then 

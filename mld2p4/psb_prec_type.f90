@@ -1,7 +1,13 @@
 !!$ 
+!!$ 
+!!$                    MD2P4
+!!$    Multilevel Domain Decomposition Parallel Preconditioner Package for PSBLAS
+!!$                      for 
 !!$              Parallel Sparse BLAS  v2.0
 !!$    (C) Copyright 2006 Salvatore Filippone    University of Rome Tor Vergata
 !!$                       Alfredo Buttari        University of Rome Tor Vergata
+!!$                       Daniela di Serafino    Second University of Naples
+!!$                       Pasqua D'Ambra         ICAR-CNR                      
 !!$ 
 !!$  Redistribution and use in source and binary forms, with or without
 !!$  modification, are permitted provided that the following conditions
@@ -11,14 +17,14 @@
 !!$    2. Redistributions in binary form must reproduce the above copyright
 !!$       notice, this list of conditions, and the following disclaimer in the
 !!$       documentation and/or other materials provided with the distribution.
-!!$    3. The name of the PSBLAS group or the names of its contributors may
+!!$    3. The name of the MD2P4 group or the names of its contributors may
 !!$       not be used to endorse or promote products derived from this
 !!$       software without specific written permission.
 !!$ 
 !!$  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 !!$  ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
 !!$  TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
-!!$  PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE PSBLAS GROUP OR ITS CONTRIBUTORS
+!!$  PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE MD2P4 GROUP OR ITS CONTRIBUTORS
 !!$  BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
 !!$  CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
 !!$  SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
@@ -27,17 +33,13 @@
 !!$  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 !!$  POSSIBILITY OF SUCH DAMAGE.
 !!$ 
-!!$  
+module psb_prec_type
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !!	Module to   define PREC_DATA,           !!
 !!      structure for preconditioning.          !!
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-module psb_prec_type
-  
-  use psb_const_mod
-  use psb_spmat_type
-  use psb_descriptor_type
+  use psb_base_mod
 
   integer, parameter :: min_prec_=0, noprec_=0, diagsc_=1, bja_=2,&
        & asm_=3, ras_=5, ash_=4, rash_=6, ras2lv_=7, ras2lvm_=8,&
@@ -653,9 +655,8 @@ contains
   end subroutine psb_dcheck_def
 
   subroutine psb_dbase_precfree(p,info)
-    use psb_serial_mod
-    use psb_descriptor_type
-    use psb_tools_mod
+    use psb_base_mod
+
     type(psb_dbaseprc_type), intent(inout) :: p
     integer, intent(out)                :: info
     integer :: i
@@ -728,7 +729,8 @@ contains
   end subroutine psb_dbase_precfree
 
   subroutine psb_nullify_dbaseprec(p)
-    use psb_descriptor_type
+    use psb_base_mod
+
     type(psb_dbaseprc_type), intent(inout) :: p
 
     nullify(p%base_a) 
@@ -739,9 +741,7 @@ contains
   end subroutine psb_nullify_dbaseprec
 
   subroutine psb_zbase_precfree(p,info)
-    use psb_serial_mod
-    use psb_descriptor_type
-    use psb_tools_mod
+    use psb_base_mod
     type(psb_zbaseprc_type), intent(inout) :: p
     integer, intent(out)                :: info
     integer :: i
@@ -809,7 +809,8 @@ contains
   end subroutine psb_zbase_precfree
 
   subroutine psb_nullify_zbaseprec(p)
-    use psb_descriptor_type
+    use psb_base_mod
+
     type(psb_zbaseprc_type), intent(inout) :: p
 
 

@@ -35,16 +35,9 @@
 !!$ 
 !!$  
 subroutine psb_dprecfree(p,info)
-  !...free sparse matrix structure...
-  use psb_descriptor_type
-  use psb_serial_mod
-  use psb_const_mod
+  use psb_base_mod
   use psb_prec_type
-  use psb_tools_mod
-  use psb_error_mod
   implicit none
-  !....parameters...
-
   type(psb_dprec_type), intent(inout) :: p
   integer, intent(out)                :: info
 

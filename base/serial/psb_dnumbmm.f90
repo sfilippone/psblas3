@@ -40,15 +40,27 @@
 !
 
 subroutine psb_dnumbmm(a,b,c)
-  use psb_realloc_mod
   use psb_spmat_type
-  use psb_serial_mod, only : psb_sp_getrow
   implicit none
 
   type(psb_dspmat_type)         :: a,b,c
   real(kind(1.d0)), allocatable :: temp(:)
   integer                       :: info
   
+  interface psb_sp_getrow
+    subroutine psb_dspgetrow(irw,a,nz,ia,ja,val,info,iren,lrw)
+      use psb_spmat_type
+      type(psb_dspmat_type), intent(in) :: a
+      integer, intent(in)       :: irw
+      integer, intent(out)      :: nz
+      integer, intent(inout)    :: ia(:), ja(:)
+      real(kind(1.d0)),  intent(inout)    :: val(:)
+      integer, intent(in), target, optional :: iren(:)
+      integer, intent(in), optional :: lrw
+      integer, intent(out)  :: info
+    end subroutine psb_dspgetrow
+  end interface
+
 
   allocate(temp(max(a%m,a%k,b%m,b%k)),stat=info)
   if (info /= 0) then

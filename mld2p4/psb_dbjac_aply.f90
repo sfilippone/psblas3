@@ -42,13 +42,8 @@ subroutine psb_dbjac_aply(alpha,prec,x,beta,y,desc_data,trans,work,info)
   !  but since both are INTENT(IN) this should be legal. 
   ! 
 
-  use psb_serial_mod
-  use psb_descriptor_type
+  use psb_base_mod
   use psb_prec_type
-  use psb_psblas_mod
-  use psb_const_mod
-  use psb_error_mod
-  use psb_penv_mod
   implicit none 
 
   type(psb_desc_type), intent(in)       :: desc_data
@@ -190,12 +185,6 @@ subroutine psb_dbjac_aply(alpha,prec,x,beta,y,desc_data,trans,work,info)
 
     tx = dzero
     ty = dzero
-!!$        open(50+me)
-!!$        call psb_csprt(50+me,prec%av(ap_nd_))
-!!$        call flush(50+me)
-!!$        close(50+me)
-!!$        call psb_barrier(ictxt)
-
     select case(prec%iprcparm(f_type_)) 
     case(f_ilu_n_,f_ilu_e_) 
       do i=1, prec%iprcparm(jac_sweeps_) 

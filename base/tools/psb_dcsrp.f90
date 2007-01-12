@@ -47,6 +47,28 @@ subroutine psb_dcsrp(trans,iperm,a, desc_a, info)
   use psb_penv_mod
   !  implicit none
 
+  interface dcsrp
+
+    subroutine dcsrp(trans,m,n,fida,descra,ia1,ia2,&
+         & infoa,p,work,lwork,ierror)
+      integer, intent(in)  :: m, n, lwork
+      integer, intent(out) :: ierror
+      character, intent(in) ::       trans
+      double precision, intent(inout) :: work(*)                     
+      integer, intent(in)    :: p(*)
+      integer, intent(inout) :: ia1(*), ia2(*), infoa(*) 
+      character, intent(in)  :: fida*5, descra*11
+    end subroutine dcsrp
+  end interface
+
+
+  interface isaperm
+
+    logical function isaperm(n,ip)
+      integer, intent(in)    :: n   
+      integer, intent(inout) :: ip(*)
+    end function isaperm
+  end interface
 
   !...parameters....
   type(psb_dspmat_type), intent(inout)  ::  a
@@ -61,7 +83,11 @@ subroutine psb_dcsrp(trans,iperm,a, desc_a, info)
   integer                               ::  ictxt,n_row,err_act, int_err(5)
   character(len=20)                     ::  name, char_err
 
+  real(kind(1.d0))                      ::  time(10), mpi_wtime
+  external mpi_wtime
   logical, parameter :: debug=.false.
+
+  time(1) = mpi_wtime()
 
   ictxt   = psb_cd_get_context(desc_a)
   dectype = psb_cd_get_dectype(desc_a)
@@ -133,7 +159,7 @@ subroutine psb_dcsrp(trans,iperm,a, desc_a, info)
   ! hmm, maybe we should just move all of this onto a different level,
   ! have a specialized subroutine, and do it in the solver context???? 
   if (debug) write(0,*) 'spasb: calling dcsrp',size(work_dcsdp)
-  call csrp(trans,n_row,n_col,a%fida,a%descra,a%ia1,a%ia2,a%infoa,&
+  call dcsrp(trans,n_row,n_col,a%fida,a%descra,a%ia1,a%ia2,a%infoa,&
        & ipt,work_dcsdp,size(work_dcsdp),info)
   if(info /= no_err) then
     info=4010
@@ -143,6 +169,13 @@ subroutine psb_dcsrp(trans,iperm,a, desc_a, info)
   end if
 
   deallocate(ipt,work_dcsdp)
+
+  time(4) = mpi_wtime()
+  time(4) = time(4) - time(3)
+  if (debug) then 
+    call psb_amx(ictxt, time(4))
+    write (*, *) '         comm structs assembly: ', time(4)*1.d-3
+  end if
 
   call psb_erractionrestore(err_act)
   return
