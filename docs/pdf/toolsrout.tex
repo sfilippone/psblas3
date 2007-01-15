@@ -7,50 +7,44 @@
 %
 \subroutine{psb\_cdall}{Allocates a communication descriptor}
 
-\syntax{call psb\_cdall}{m, n, parts, icontxt, desc\_a, info}
-\syntax*{call psb\_cdall}{m, v, icontxt, desc\_a, info, flag}
+\syntax{call psb\_cdall}{icontxt, desc\_a, info,mg=mg,parts=parts}
+\syntax{call psb\_cdall}{icontxt, desc\_a, info,vg=vg,flag=flag}
+\syntax{call psb\_cdall}{icontxt, desc\_a, info,vl=vl}
 
 This subroutine initializes the communication descriptor associated
-with an index space. It takes two forms depending on whether the user
-specifies the domain partitioning through a subroutine or through a vector
+with an index space. Exactly one of the  optional arguments
+\verb|parts|, \verb|vg|, \verb|vl| must be specified, thereby choosing
+the specific initialization strategy:
 \begin{description}
-\item[\bf  First Form: On Entry ]
-\item[m] the number of rows of the problem.\\
+\item[\bf  On Entry ]
+\item[icontxt] the communication context.\\
 Scope:{\bf global}.\\
 Type:{\bf required}.\\
 Specified as: an integer value.
-\item[n] the number of columns of the problem.\\
+\item[vg] Data allocation: each index $i\in \{1\dots mg\}$ is allocated
+  to process $vg(i)$.
 Scope:{\bf global}.\\
-Type:{\bf required}.\\
-Specified as: an integer value. Currently constrained to be  $m=n$.
+Type:{\bf optional}.\\
+Specified as: an integer array. 
+\item[flag] Specifies whether entries in $vg$ are zero- or one-based.
+Scope:{\bf global}.\\
+Type:{\bf optional}.\\
+Specified as: an integer value $0,1$, default $0$.
+
+\item[mg] the (global) number of rows of the problem.\\
+Scope:{\bf global}.\\
+Type:{\bf optional}.\\
+Specified as: an integer value. It is required if \verb|parts| is
+specified. 
 \item[parts] the subroutine that defines the partitioning scheme.\\
 Scope:{\bf global}.\\
 Type:{\bf required}.\\
 Specified as: a subroutine. 
-\item[icontxt] the communication context.\\
-Scope:{\bf global}.\\
-Type:{\bf required}.\\
-Specified as: an integer value.
-\end{description}
-\begin{description}
-\item[\bf  Second Form: On Entry ]
-\item[m] the size of the index space.\\
-Scope:{\bf global}.\\
-Type:{\bf required}.\\
-Specified as: an integer value $m>0$.
-\item[v] Data allocation: each index $i\in \{1\dots m\}$ is allocated
-  to process $v(i)$.
-Scope:{\bf global}.\\
-Type:{\bf required}.\\
-Specified as: an integer array of size $m$. 
-\item[icontxt] the communication context.\\
-Scope:{\bf global}.\\
-Type:{\bf required}.\\
-Specified as: an integer value.
-\item[flag] Specifies whether entries in $v$ are zero- or one-based.
-Scope:{\bf global}.\\
+\item[vl] Data allocation: the set of global indices belonging to the
+  calling process. 
+Scope:{\bf local}.\\
 Type:{\bf optional}.\\
-Specified as: an integer value $0,1$, default $0$.
+Specified as: an integer array. 
 \end{description}
 
 \begin{description}
@@ -67,6 +61,28 @@ Specified as: an integer variable.\\
 
 \section*{Notes}
 \begin{enumerate}
+\item Exactly one of the optional arguments  \verb|parts|, \verb|vg|,
+  \verb|vl| must be specified, thereby choosing the initialization
+  strategy as follows:
+\begin{description}
+\item[parts] In this case we have a subroutine that takes as input a
+  index and the total number of indices in the space, and produces in
+  output a  vector containing the set of processes (usually with just
+  one entry) to which the index should be assigned. If this argument
+  is specified, then it is mandatory to also specify the argument
+  \verb|mg|. 
+\item[vg] In this case the association between an index and a process
+  is specified via an integer vector; the size of the index space is
+  equal to the size of \verb|vg|, and each index $i$ is assigned to
+  the process $vg(i)$. The vector \verb|vg| must be identical on all
+  calling processes; its entries may have the ranges $(0\dots np-1)$
+  or $(1\dots np)$ according to the value of \verb|flag|.
+\item[vl] In this case we are specifying the list of indices assigned
+  to the current process; thus, the global problem size $mg$ is given by
+  the sum of the sizes of the individual vectors \verb|vl| specified
+  on the calling processes. The subroutine will check that each entry
+  in the global index space $(1\dots mg)$ is specified exactly once.
+\end{description}
 \item On exit from this routine the descriptor is in the build state
 \end{enumerate}
 

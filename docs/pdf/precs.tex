@@ -3,28 +3,30 @@
 
 % \section{Preconditioners}
 \label{sec:psprecs}
-PSBLAS contains the implementation of many preconditioning
-techniques some of which are very flexible thanks to the presence of
-many parameters that is possible to adjust to fit the user's needs:
+The base PSBLAS library  contains the implementation of two simple
+preconditioning techniques:
 \begin{itemize}
 \item Diagonal Scaling
 \item Block Jacobi with ILU(0) factorization
 %% \item Additive Schwarz with the Restricted Additive Schwarz and
 %%   Additive Schwarz with Harmonic extensions;
 \end{itemize}
-The PSBLAS library is incorporating a package of two-level Additive
-  Schwarz preconditioners called MD2P4; this is actually a family of 
-  preconditioners since there is the possibility to choose between
-  many variants, and is currently in an experimental state. Its
-  documentation is planned to appear after stabilization of the
-  package, which will characterize release  2.1 of our library.
+The supporting data type and subroutine interfaces are defined in the
+module  \verb|psb_prec_mod|.
+
+%% We also provide a companion  package of multi-level Additive
+%%   Schwarz preconditioners called MD2P4; this is actually a family of 
+%%   preconditioners since there is the possibility to choose between
+%%   many variants, and is currently in an experimental stateIts
+%%   documentation is planned to appear after stabilization of the
+%%   package, which will characterize release  2.1 of our library.
 
 
 
 
 \subroutine{psb\_precset}{Sets the preconditioner type}
 
-\syntax{call psb\_precset}{prec, ptype, info, iv, rs}
+\syntax{call psb\_precset}{prec, ptype, info}
 
 \begin{description}
 \item[\bf On Entry]
@@ -36,14 +38,14 @@ Specified as: a pronditioner data structure \precdata.
 Scope: {\bf global} \\
 Type: {\bf required}\\
 Specified as: a character string, see usage notes.
-\item[iv] integer parameters for the precondtioner. 
-Scope: {\bf global} \\
-Type: {\bf required}\\
-Specified as: an integer array, see usage notes. 
-\item[rs] 
-Scope: {\bf global} \\
-Type: {\bf optional}\\
-Specified as: a long precision real number.
+%% \item[iv] integer parameters for the precondtioner. 
+%% Scope: {\bf global} \\
+%% Type: {\bf required}\\
+%% Specified as: an integer array, see usage notes. 
+%% \item[rs] 
+%% Scope: {\bf global} \\
+%% Type: {\bf optional}\\
+%% Specified as: a long precision real number.
 \item[\bf On Exit]
 
 \item[info] 
@@ -52,10 +54,10 @@ Type: {\bf required}\\
 Error code: if no error, 0 is returned.
 \end{description}
 \section*{Usage Notes}
-The PSBLAS 2.0 contains a number of preconditioners, ranging from a
-simple diagonal scaling to 2-level domain decomposition. These
-preconditioners may use the SuperLU or the UMFPACK software, if
-installed; see~\cite{SUPERLU,UMFPACK}. 
+%% The PSBLAS 2.0 contains a number of preconditioners, ranging from a
+%% simple diagonal scaling to 2-level domain decomposition. These
+%% preconditioners may use the SuperLU or the UMFPACK software, if
+%% installed; see~\cite{SUPERLU,UMFPACK}. 
 Legal inputs to this subroutine are interpreted depending on the
 $ptype$ string as follows\footnote{The string is case-insensitive}:
 \begin{description}
@@ -64,7 +66,7 @@ $ptype$ string as follows\footnote{The string is case-insensitive}:
 \item[DIAG] Diagonal scaling; each entry of the input vector is
   multiplied by the reciprocal of the sum of the absolute values of
   the coefficients in the corresponding row of matrix  $A$;
-\item[ILU] Precondition by the incomplete LU factorization of the
+\item[ILU, BJA] Precondition by the incomplete LU factorization of the
   block-diagonal of matrix $A$, where block boundaries are determined
   by the data allocation boundaries for each process; requires no
   communication. Only $ILU(0)$ is currently implemented. 
