@@ -32,7 +32,7 @@
 !
 module psb_util_mod
   use psb_blockpart_mod
-  use psb_graphpart_mod
+  use psb_metispart_mod
   use psb_hbio_mod
   use psb_mmio_mod
   use psb_read_mat_mod

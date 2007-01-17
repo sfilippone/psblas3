@@ -31,11 +31,12 @@
 !
 ! Purpose: 
 !  Provide a set of subroutines to define a data distribution based on 
-!  a graph partitioning routine.
+!  a graph partitioning routine from METIS. May serve as the basis
+!  for interfacing other graph partitioning tools.
 ! 
 !  Subroutines:
 !  
-!  BUILD_GRPPART(A,NPARTS): This subroutine will be called by the root
+!  BUILD_MTPART(A,NPARTS): This subroutine will be called by the root
 !    process to build define the data distribuition mapping. 
 !      Input parameters:
 !        TYPE(D_SPMAT) :: A   The input matrix. The coefficients are
@@ -43,7 +44,7 @@
 !        INTEGER       :: NPARTS  How many parts we are requiring to the 
 !                                 partition utility
 ! 
-!  DISTR_GRPPART(RROOT,CROOT,ICTXT): This subroutine will be called by
+!  DISTR_MTPART(RROOT,CROOT,ICTXT): This subroutine will be called by
 !      all processes to distribute the information computed by the root
 !      process, to be used subsequently.
 !
@@ -51,9 +52,9 @@
 !  PART_GRAPH : The subroutine to be passed to PSBLAS sparse library;
 !      uses information prepared by the previous two subroutines.
 !
-module psb_graphpart_mod
-  public part_graph, build_grppart, distr_grppart,&
-       & getv_grppart, build_usrpart, free_part
+module psb_metispart_mod
+  public part_graph, build_mtpart, distr_mtpart,&
+       & getv_mtpart, free_part
   private 
   integer, allocatable, save :: graph_vect(:)
   
@@ -81,7 +82,7 @@ contains
   end subroutine part_graph
 
 
-  subroutine distr_grppart(root, ictxt)
+  subroutine distr_mtpart(root, ictxt)
     use psb_base_mod
     integer    :: root, ictxt
     integer    :: n, me, np
@@ -89,7 +90,7 @@ contains
     call psb_info(ictxt,me,np)
 
     if (.not.((root>=0).and.(root<np))) then 
-      write(0,*) 'Fatal error in DISTR_GRPPART: invalid ROOT  ',&
+      write(0,*) 'Fatal error in DISTR_MTPART: invalid ROOT  ',&
            & 'coordinates '
       call psb_abort(ictxt)
       return
@@ -97,7 +98,7 @@ contains
 
     if (me == root) then 
       if (.not.allocated(graph_vect)) then
-        write(0,*) 'Fatal error in DISTR_GRPPART: vector GRAPH_VECT ',&
+        write(0,*) 'Fatal error in DISTR_MTPART: vector GRAPH_VECT ',&
              & 'not initialized'
         call psb_abort(ictxt)
         return
@@ -109,7 +110,7 @@ contains
 
       allocate(graph_vect(n),stat=info)
       if (info /= 0) then
-        write(0,*) 'Fatal error in DISTR_GRPPART: memory allocation ',&
+        write(0,*) 'Fatal error in DISTR_MTPART: memory allocation ',&
              & ' failure.'
         return
       endif
@@ -118,18 +119,18 @@ contains
 
     return
 
-  end subroutine distr_grppart
+  end subroutine distr_mtpart
   
-  subroutine  getv_grppart(ivg)
+  subroutine  getv_mtpart(ivg)
     integer, allocatable, intent(out)  :: ivg(:)
     if (allocated(graph_vect)) then 
       allocate(ivg(size(graph_vect)))
       ivg(:) = graph_vect(:)
     end if
-  end subroutine getv_grppart
+  end subroutine getv_mtpart
   
 
-  subroutine build_grppart(n,fida,ia1,ia2,nparts)
+  subroutine build_mtpart(n,fida,ia1,ia2,nparts)
     use psb_base_mod
     integer       :: nparts
     integer       :: ia1(:), ia2(:)
@@ -150,7 +151,7 @@ contains
     allocate(graph_vect(n),stat=info)
     
     if (info /= 0) then
-       write(0,*) 'Fatal error in BUILD_GRPPART: memory allocation ',&
+       write(0,*) 'Fatal error in BUILD_MTPART: memory allocation ',&
 	    & ' failure.'
        return
     endif
@@ -167,7 +168,7 @@ contains
           graph_vect(i) = graph_vect(i) - 1
         enddo
       else
-        write(0,*) 'Fatal error in BUILD_GRPPART: matrix format ',&
+        write(0,*) 'Fatal error in BUILD_MTPART: matrix format ',&
              & ' failure. ', FIDA
         return
       endif
@@ -179,37 +180,8 @@ contains
     
     return
 
-  end subroutine build_grppart 
+  end subroutine build_mtpart 
 
-  subroutine build_usrpart(n,v,nparts)
-    integer       :: nparts
-    integer       :: v(:)
-    integer       :: n, i, ib, ii,numflag,nedc,wgflag
-
-    if ((n<=0) .or. (nparts<1)) then 
-      write(0,*) 'Invalid input to BUILD_USRPART ',n,nparts
-      return
-    endif
-    
-    allocate(graph_vect(n),stat=info)
-    
-    if (info /= 0) then
-       write(0,*) 'Fatal error in BUILD_USRPART: memory allocation ',&
-	    & ' failure.'
-       return
-    endif
-
-    do i=1, n
-      if ((0<=v(i)).and.(v(i)<nparts)) then 
-        graph_vect(i) = v(i)
-      else
-        write(0,*) 'Invalid V input to BUILD_USRPART',i,v(i),nparts
-      endif
-    end do
-        
-    return
-
-  end subroutine build_usrpart
 
   subroutine free_part(info)
     integer :: info
@@ -218,5 +190,5 @@ contains
     return
   end subroutine free_part    
 
-end module psb_graphpart_mod
+end module psb_metispart_mod
 

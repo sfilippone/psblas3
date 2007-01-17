@@ -5,7 +5,7 @@ LIBDIR=../lib
 
 HERE=.
 
-BASEOBJS= psb_blockpart_mod.o psb_graphpart_mod.o \
+BASEOBJS= psb_blockpart_mod.o psb_metispart_mod.o \
       psb_hbio_mod.o psb_mmio_mod.o psb_mat_dist_mod.o \
       psb_read_mat_mod.o 
 MODOBJ=psb_util_mod.o
