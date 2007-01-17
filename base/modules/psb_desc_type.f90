@@ -111,7 +111,7 @@ contains
   logical function psb_is_large_desc(desc)
     type(psb_desc_type), intent(in) :: desc
 
-    psb_is_large_desc = psb_is_large_dec(psb_cd_get_dectype(desc))
+    psb_is_large_desc =(psb_desc_large_==psb_cd_get_size(desc))
 
   end function psb_is_large_desc
 
@@ -122,12 +122,6 @@ contains
 
   end function psb_is_upd_desc
 
-  logical function psb_is_asb_upd_desc(desc)
-    type(psb_desc_type), intent(in) :: desc
-
-    psb_is_asb_upd_desc = psb_is_asb_upd_dec(psb_cd_get_dectype(desc))
-    
-  end function psb_is_asb_upd_desc
 
   logical function psb_is_asb_desc(desc)
     type(psb_desc_type), intent(in) :: desc
@@ -141,16 +135,14 @@ contains
     integer :: dectype
 
     psb_is_ok_dec = ((dectype == psb_desc_asb_).or.(dectype == psb_desc_bld_).or.&
-         &(dectype == psb_desc_upd_).or.(dectype== psb_desc_upd_asb_).or.&
-         &(dectype == psb_desc_large_asb_).or.(dectype == psb_desc_large_bld_).or.&
+         &(dectype == psb_desc_upd_).or.&
          &(dectype== psb_desc_repl_))
   end function psb_is_ok_dec
 
   logical function psb_is_bld_dec(dectype)
     integer :: dectype
 
-    psb_is_bld_dec = (dectype == psb_desc_bld_)&
-         & .or.(dectype == psb_desc_large_bld_)
+    psb_is_bld_dec = (dectype == psb_desc_bld_)
   end function psb_is_bld_dec
 
   logical function psb_is_upd_dec(dectype)          
@@ -160,18 +152,11 @@ contains
 
   end function psb_is_upd_dec
 
-  logical function psb_is_asb_upd_dec(dectype)
+
+  logical function psb_is_asb_dec(dectype)          
     integer :: dectype
 
-    psb_is_asb_upd_dec = (dectype == psb_desc_upd_asb_)
-
-  end function psb_is_asb_upd_dec
-
-  logical function psb_is_asb_dec(dectype)
-    integer :: dectype
-
-    psb_is_asb_dec = (dectype == psb_desc_asb_)&
-         & .or.(dectype == psb_desc_large_asb_).or.&
+    psb_is_asb_dec = (dectype == psb_desc_asb_).or.&
          & (dectype== psb_desc_repl_)
 
   end function psb_is_asb_dec
@@ -213,19 +198,79 @@ contains
     psb_cd_get_dectype = desc%matrix_data(psb_dec_type_)
   end function psb_cd_get_dectype
 
+  integer function psb_cd_get_size(desc)
+    type(psb_desc_type), intent(in) :: desc
+    
+    psb_cd_get_size = desc%matrix_data(psb_desc_size_)
+  end function psb_cd_get_size
+
   integer function psb_cd_get_mpic(desc)
     type(psb_desc_type), intent(in) :: desc
     
     psb_cd_get_mpic = desc%matrix_data(psb_mpi_c_)
   end function psb_cd_get_mpic
-    
-  logical function psb_is_large_dec(dectype)
-    integer :: dectype
 
-    psb_is_large_dec = (dectype == psb_desc_large_asb_)&
-         & .or.(dectype == psb_desc_large_bld_)
 
-  end function psb_is_large_dec
+  subroutine psb_cd_set_bld(desc,info)
+    !
+    ! Change state of a descriptor into BUILD. 
+    ! If the descriptor is LARGE, check the  AVL search tree
+    ! and initialize it if necessary.
+    !
+    use psb_const_mod
+    use psb_error_mod
+    use psb_penv_mod
 
+    implicit none
+    type(psb_desc_type), intent(inout) :: desc
+    integer                            :: info
+    !locals
+    integer             :: np,me,ictxt, isz, err_act,idx,gidx,lidx
+    logical, parameter  :: debug=.false.,debugprt=.false.
+    character(len=20)   :: name, char_err
+    if (debug) write(0,*) me,'Entered CDCPY'
+    if (psb_get_errstatus() /= 0) return 
+    info = 0
+    call psb_erractionsave(err_act)
+    name = 'psb_cd_set_bld'
+
+    ictxt = psb_cd_get_context(desc)
+
+    ! check on blacs grid 
+    call psb_info(ictxt, me, np)
+    if (debug) write(0,*) me,'Entered CDCPY'
+
+    if (psb_is_large_desc(desc)) then 
+      if (.not.allocated(desc%ptree)) then 
+        allocate(desc%ptree(2),stat=info)
+        if (info /= 0) then 
+          info=4000
+          goto 9999
+        endif
+        call InitPairSearchTree(desc%ptree,info)
+        do idx=1, psb_cd_get_local_cols(desc)
+          gidx = desc%loc_to_glob(idx)
+          call SearchInsKeyVal(desc%ptree,gidx,idx,lidx,info)        
+          if (lidx /= idx) then 
+            write(0,*) 'Warning from cdset: mismatch in PTREE ',idx,lidx
+          endif
+        enddo
+      end if
+    end if
+    desc%matrix_data(psb_dec_type_) = psb_desc_bld_ 
+
+    call psb_erractionrestore(err_act)
+    return
+
+9999 continue
+    call psb_erractionrestore(err_act)
+
+    if (err_act == act_ret) then
+      return
+    else
+      call psb_error(ictxt)
+    end if
+    return
+  end subroutine psb_cd_set_bld
     
 end module psb_descriptor_type

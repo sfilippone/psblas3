@@ -56,7 +56,7 @@ subroutine psb_cd_inloc(v, ictxt, desc_a, info)
   Integer             :: counter,i,j,np,me,loc_row,err,&
        & loc_col,nprocs,n,itmpov, k,glx,gidx,gle,&
        & l_ov_ix,l_ov_el,idx, flag_, err_act,m
-  integer             :: int_err(5),exch(2)
+  integer             :: int_err(5),exch(3)
   Integer, allocatable  :: temp_ovrlap(:), ov_idx(:),ov_el(:),tmpgidx(:,:)
   logical, parameter  :: debug=.false.
   character(len=20)   :: name
@@ -64,16 +64,16 @@ subroutine psb_cd_inloc(v, ictxt, desc_a, info)
   if(psb_get_errstatus() /= 0) return 
   info=0
   err=0
-  name = 'psb_cdalv'
+  name = 'psb_cd_inloc'
 
   call psb_info(ictxt, me, np)
   if (debug) write(*,*) 'psb_cdall: ',np,me
 
 
-  loc_row=size(v)
-
-  m = loc_row
+  loc_row = size(v)
+  m       = loc_row
   call psb_sum(ictxt,m)
+
   n = m
   !... check m and n parameters....
   if (m < 1) then
@@ -90,6 +90,26 @@ subroutine psb_cd_inloc(v, ictxt, desc_a, info)
     call psb_errpush(info,name,i_err=int_err)
     goto 9999
   end if
+  if (me == psb_root_) then
+    exch(1)=m
+    exch(2)=n
+    exch(3)=psb_cd_get_large_threshold()
+    call psb_bcast(ictxt,exch(1:3),root=psb_root_)
+  else
+    call psb_bcast(ictxt,exch(1:3),root=psb_root_)
+    if (exch(1) /= m) then
+      err=550
+      int_err(1)=1
+      call psb_errpush(err,name,int_err)
+      goto 9999
+    else if (exch(2) /= n) then
+      err=550
+      int_err(1)=2
+      call psb_errpush(err,name,int_err)
+      goto 9999
+    endif
+    call psb_cd_set_large_threshold(exch(3))
+  endif
 
   if (debug) write(*,*) 'psb_cdall:  doing global checks'  
   allocate(tmpgidx(m,2),stat=info) 
@@ -98,18 +118,30 @@ subroutine psb_cd_inloc(v, ictxt, desc_a, info)
     call psb_errpush(info,name,i_err=int_err)
     goto 9999
   end if
+
+
+
   tmpgidx=0
+  flag_=1
   do i=1,loc_row
     if ((v(i)<1).or.(v(i)>m)) then 
       info = 551
+      int_err(1) = i
+      int_err(2) = v(i)
+      int_err(3) = loc_row
+      int_err(4) = m
     else
-      tmpgidx(v(i),1) = me
+      tmpgidx(v(i),1) = me+flag_
       tmpgidx(v(i),2) = 1
     endif
   end do
   call psb_amx(ictxt,tmpgidx)
-  if (count(tmpgidx(:,2) == 0)>0) then 
-    info = 552
+  if (info ==0) then 
+    int_err(1) = count(tmpgidx(:,2) == 0)
+    int_err(2) = m
+    if (int_err(1)>0) then 
+      info = 552
+    end if
   end if
 
   if (info /= 0) then 
@@ -120,16 +152,17 @@ subroutine psb_cd_inloc(v, ictxt, desc_a, info)
 
   call psb_nullify_desc(desc_a)
 
-  flag_=0
 
   !count local rows number
   ! allocate work vector
   if (m > psb_cd_get_large_threshold()) then 
     allocate(desc_a%matrix_data(psb_mdata_size_),&
          &temp_ovrlap(m),stat=info)
+    desc_a%matrix_data(psb_desc_size_) = psb_desc_large_
   else
     allocate(desc_a%glob_to_loc(m),desc_a%matrix_data(psb_mdata_size_),&
          &temp_ovrlap(m),stat=info)
+    desc_a%matrix_data(psb_desc_size_) = psb_desc_normal_
   end if
   if (info /= 0) then     
     info=2025
@@ -145,7 +178,6 @@ subroutine psb_cd_inloc(v, ictxt, desc_a, info)
   temp_ovrlap(:) = -1
 
   if (m > psb_cd_get_large_threshold()) then 
-    desc_a%matrix_data(psb_dec_type_) = psb_desc_large_bld_
 
     do i=1,m
 
@@ -210,7 +242,6 @@ subroutine psb_cd_inloc(v, ictxt, desc_a, info)
 
   else 
 
-    desc_a%matrix_data(psb_dec_type_) = psb_desc_bld_
     do i=1,m
 
       if (((tmpgidx(i,1)-flag_) > np-1).or.((tmpgidx(i,1)-flag_) < 0)) then
@@ -327,13 +358,14 @@ subroutine psb_cd_inloc(v, ictxt, desc_a, info)
   ! set fields in desc_a%MATRIX_DATA....
   desc_a%matrix_data(psb_n_row_)  = loc_row
   desc_a%matrix_data(psb_n_col_)  = loc_row
+  call psb_cd_set_bld(desc_a,info)
 
-  allocate(desc_a%halo_index(1),stat=info)
-  if (info /= 0) then 
-    info=4000
-    call psb_errpush(info,name)
-    goto 9999
-  endif
+  call psb_realloc(1,desc_a%halo_index, info)
+  if (info /= no_err) then
+    info=2025
+    call psb_errpush(err,name,a_err='psb_realloc')
+    Goto 9999
+  end if
 
   desc_a%halo_index(:) = -1
 

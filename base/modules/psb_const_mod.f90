@@ -58,21 +58,24 @@ module psb_const_mod
   !
   integer, parameter :: psb_dec_type_=1, psb_m_=2,psb_n_=3
   integer, parameter :: psb_n_row_=4,  psb_n_col_=5,psb_ctxt_=6
-  integer, parameter :: psb_loc_to_glob_=7
+  integer, parameter :: psb_desc_size_=7
+  integer, parameter :: psb_ovl_state_=8 
+  integer, parameter :: psb_mpi_c_=9
   integer, parameter :: psb_thal_xch_=11
   integer, parameter :: psb_thal_snd_=12
   integer, parameter :: psb_thal_rcv_=13
   integer, parameter :: psb_tovr_xch_=14
   integer, parameter :: psb_tovr_snd_=15
   integer, parameter :: psb_tovr_rcv_=16
-  integer, parameter :: psb_mpi_c_=9,psb_mdata_size_=20
+  integer, parameter :: psb_mdata_size_=20
   integer, parameter :: psb_desc_asb_=3099
   integer, parameter :: psb_desc_bld_=psb_desc_asb_+1
   integer, parameter :: psb_desc_repl_=3199
   integer, parameter :: psb_desc_upd_=psb_desc_bld_+1
-  integer, parameter :: psb_desc_upd_asb_=psb_desc_upd_+1
-  integer, parameter :: psb_desc_large_asb_=psb_desc_upd_asb_+1
-  integer, parameter :: psb_desc_large_bld_=psb_desc_large_asb_+1
+  integer, parameter :: psb_desc_normal_=3299
+  integer, parameter :: psb_desc_large_=psb_desc_normal_+1
+  integer, parameter :: psb_cd_ovl_bld_=3399
+  integer, parameter :: psb_cd_ovl_asb_=psb_cd_ovl_bld_+1
   integer, parameter :: nbits=14
   integer, parameter :: hashsize=2**nbits, hashmask=hashsize-1
   integer, parameter :: psb_default_large_threshold=4*1024*1024   ! to be reviewed

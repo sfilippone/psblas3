@@ -58,7 +58,7 @@ subroutine psb_cdalv(v, ictxt, desc_a, info, flag)
   Integer             :: counter,i,j,np,me,loc_row,err,&
        & loc_col,nprocs,m,n,itmpov, k,glx,gidx,gle,&
        & l_ov_ix,l_ov_el,idx, flag_, err_act
-  integer             :: int_err(5),exch(2)
+  integer             :: int_err(5),exch(3)
   Integer, allocatable  :: temp_ovrlap(:), ov_idx(:),ov_el(:)
   logical, parameter  :: debug=.false.
   character(len=20)   :: name
@@ -93,28 +93,26 @@ subroutine psb_cdalv(v, ictxt, desc_a, info, flag)
     goto 9999
   end if
 
-  if (debug) write(*,*) 'psb_cdall:  doing global checks'  
-  !global check on m and n parameters
   if (me == psb_root_) then
     exch(1)=m
     exch(2)=n
-    call psb_bcast(ictxt,exch(1:2),root=psb_root_)
+    exch(3)=psb_cd_get_large_threshold()
+    call psb_bcast(ictxt,exch(1:3),root=psb_root_)
   else
-    call psb_bcast(ictxt,exch(1:2),root=psb_root_)
+    call psb_bcast(ictxt,exch(1:3),root=psb_root_)
     if (exch(1) /= m) then
-      info=550
+      err=550
       int_err(1)=1
+      call psb_errpush(err,name,int_err)
+      goto 9999
     else if (exch(2) /= n) then
-      info=550
+      err=550
       int_err(1)=2
+      call psb_errpush(err,name,int_err)
+      goto 9999
     endif
+    call psb_cd_set_large_threshold(exch(3))
   endif
-
-  if (info /= 0) then 
-    call psb_errpush(info,name,i_err=int_err)
-    goto 9999
-  end if
-
 
   call psb_nullify_desc(desc_a)
 
@@ -136,9 +134,11 @@ subroutine psb_cdalv(v, ictxt, desc_a, info, flag)
   if (m > psb_cd_get_large_threshold()) then 
     allocate(desc_a%matrix_data(psb_mdata_size_),&
          &temp_ovrlap(m),stat=info)
+    desc_a%matrix_data(psb_desc_size_) = psb_desc_large_
   else
     allocate(desc_a%glob_to_loc(m),desc_a%matrix_data(psb_mdata_size_),&
          &temp_ovrlap(m),stat=info)
+    desc_a%matrix_data(psb_desc_size_) = psb_desc_normal_
   end if
   if (info /= 0) then     
     info=2025
@@ -154,7 +154,6 @@ subroutine psb_cdalv(v, ictxt, desc_a, info, flag)
   temp_ovrlap(:) = -1
 
   if ( m >psb_cd_get_large_threshold()) then 
-    desc_a%matrix_data(psb_dec_type_) = psb_desc_large_bld_
 
     do i=1,m
 
@@ -219,7 +218,6 @@ subroutine psb_cdalv(v, ictxt, desc_a, info, flag)
 
   else 
 
-    desc_a%matrix_data(psb_dec_type_) = psb_desc_bld_
     do i=1,m
 
       if (((v(i)-flag_) > np-1).or.((v(i)-flag_) < 0)) then
@@ -336,13 +334,14 @@ subroutine psb_cdalv(v, ictxt, desc_a, info, flag)
   ! set fields in desc_a%MATRIX_DATA....
   desc_a%matrix_data(psb_n_row_)  = loc_row
   desc_a%matrix_data(psb_n_col_)  = loc_row
+  call psb_cd_set_bld(desc_a,info)
 
-  allocate(desc_a%halo_index(1),stat=info)
-  if (info /= 0) then 
-    info=4000
-    call psb_errpush(info,name)
-    goto 9999
-  endif
+  call psb_realloc(1,desc_a%halo_index, info)
+  if (info /= no_err) then
+    info=2025
+    call psb_errpush(err,name,a_err='psb_realloc')
+    Goto 9999
+  end if
 
   desc_a%halo_index(:) = -1
 

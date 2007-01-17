@@ -706,7 +706,7 @@ contains
       call psb_sum(ictxt,itmpsz)
       nlp=0 
       do i=0, me-1
-        nlp = nlp + itmpsz(me)
+        nlp = nlp + itmpsz(i)
       end do
       call psb_cd_inloc((/(i,i=nlp+1,nlp+nl)/),ictxt,desc_a,info)
       

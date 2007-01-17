@@ -128,21 +128,14 @@ subroutine psb_cdasb(desc_a,info)
       call psb_errpush(info,name)
       goto 9999
     end if
-
-    if (psb_is_large_dec(dectype) ) then 
-      desc_a%matrix_data(psb_dec_type_) = psb_desc_large_asb_
-!!$      write(0,*) 'Done large dec asmbly',desc_a%matrix_data(psb_dec_type_),&
-!!$           & psb_desc_large_asb_,psb_is_asb_dec(desc_a%matrix_data(psb_dec_type_))
-    else
-      ! Ok, register into MATRIX_DATA &  free temporary work areas
-      desc_a%matrix_data(psb_dec_type_) = psb_desc_asb_
-    endif
+    ! Ok, register into MATRIX_DATA &  free temporary work areas
+    desc_a%matrix_data(psb_dec_type_) = psb_desc_asb_
   else
     info = 600
     call psb_errpush(info,name)
     goto 9999
-    if (debug) write(0,*) 'dectype 2 :',dectype,psb_desc_bld_,&
-         &psb_desc_asb_,psb_desc_upd_
+    if (debug) write(0,*) 'dectype 2 :',psb_cd_get_dectype(desc_a),&
+         &psb_desc_bld_,psb_desc_asb_,psb_desc_upd_
   endif
 
   call psb_erractionrestore(err_act)

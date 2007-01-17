@@ -184,6 +184,9 @@ subroutine psb_cdrep(m, ictxt, desc_a, info)
     call psb_errpush(info,name,i_err=int_err)
     goto 9999
   endif
+  ! If the index space is replicated there's no point in having 
+  ! the AVL tree structure.... 
+  desc_a%matrix_data(psb_desc_size_) = psb_desc_normal_
 
 
   desc_a%matrix_data(psb_m_)        = m

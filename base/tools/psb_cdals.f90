@@ -57,11 +57,11 @@ subroutine psb_cdals(m, n, parts, ictxt, desc_a, info)
 
   !locals
   Integer             :: counter,i,j,np,me,loc_row,err,loc_col,nprocs,&
-       & l_ov_ix,l_ov_el,idx, err_act, itmpov, k, ns
-  integer             :: int_err(5),exch(2)
+       & l_ov_ix,l_ov_el,idx, err_act, itmpov, k, ns, glx, mth 
+  integer             :: int_err(5),exch(3)
   integer, allocatable  :: prc_v(:), temp_ovrlap(:), ov_idx(:),ov_el(:)
   logical, parameter  :: debug=.false.
-  character(len=20)   :: name, char_err
+  character(len=20)   :: name
 
   if(psb_get_errstatus() /= 0) return 
   info=0
@@ -96,9 +96,10 @@ subroutine psb_cdals(m, n, parts, ictxt, desc_a, info)
   if (me == psb_root_) then
     exch(1)=m
     exch(2)=n
-    call psb_bcast(ictxt,exch(1:2),root=psb_root_)
+    exch(3)=psb_cd_get_large_threshold()
+    call psb_bcast(ictxt,exch(1:3),root=psb_root_)
   else
-    call psb_bcast(ictxt,exch(1:2),root=psb_root_)
+    call psb_bcast(ictxt,exch(1:3),root=psb_root_)
     if (exch(1) /= m) then
       err=550
       int_err(1)=1
@@ -110,15 +111,23 @@ subroutine psb_cdals(m, n, parts, ictxt, desc_a, info)
       call psb_errpush(err,name,int_err)
       goto 9999
     endif
+    call psb_cd_set_large_threshold(exch(3))
   endif
 
   call psb_nullify_desc(desc_a)
 
   !count local rows number
   ! allocate work vector
-  allocate(prc_v(np),desc_a%glob_to_loc(m),&
-       &desc_a%matrix_data(psb_mdata_size_),temp_ovrlap(m),stat=info)
-  if (info /= no_err) then     
+  if (m > psb_cd_get_large_threshold()) then 
+    allocate(desc_a%matrix_data(psb_mdata_size_),&
+         & temp_ovrlap(m),prc_v(np),stat=info)
+    desc_a%matrix_data(psb_desc_size_) = psb_desc_large_
+  else
+    allocate(desc_a%glob_to_loc(m),desc_a%matrix_data(psb_mdata_size_),&
+         & temp_ovrlap(m),prc_v(np),stat=info)
+    desc_a%matrix_data(psb_desc_size_) = psb_desc_normal_
+  end if
+  if (info /= 0) then     
     info=2025
     err=info
     int_err(1)=m
@@ -131,76 +140,187 @@ subroutine psb_cdals(m, n, parts, ictxt, desc_a, info)
   counter = 0
   itmpov  = 0
   temp_ovrlap(:) = -1
-  do i=1,m
-    if (info == 0) then
-      call parts(i,m,np,prc_v,nprocs)
-      if (nprocs > np) then
-        info=570
-        int_err(1)=3
-        int_err(2)=np
-        int_err(3)=nprocs
-        int_err(4)=i
-        err=info
-        call psb_errpush(err,name,int_err)
-        goto 9999
-      else if (nprocs <= 0) then
-        info=575
-        int_err(1)=3
-        int_err(2)=nprocs
-        int_err(3)=i
-        err=info
-        call psb_errpush(err,name,int_err)
-        goto 9999
-      else
-        do j=1,nprocs
-          if ((prc_v(j) > np-1).or.(prc_v(j) < 0)) then
-            info=580
-            int_err(1)=3
-            int_err(2)=prc_v(j)
-            int_err(3)=i
-            err=info
-            call psb_errpush(err,name,int_err)
-            goto 9999
-          end if
-        end do
-      endif
-      desc_a%glob_to_loc(i) = -(np+prc_v(1)+1)
-      j=1
-      do 
-        if (j > nprocs) exit
-        if (prc_v(j) == me) exit
-        j=j+1
-      enddo
-      if (j <= nprocs) then 
-        if (prc_v(j) == me) then
-          ! this point belongs to me
-          counter=counter+1
-          desc_a%glob_to_loc(i) = counter
-          if (nprocs > 1)  then
-            if ((itmpov+2+nprocs) > size(temp_ovrlap))  then
-              ns = max(itmpov+2+nprocs,int(1.25*size(temp_ovrlap)))
-              call psb_realloc(ns,temp_ovrlap,info,pad=-1)
-              if (info /= 0) then 
-                info=2025
-                int_err(1)=m
-                err=info
-                call psb_errpush(err,name,int_err)
-                goto 9999
-              endif
-            endif
-            itmpov = itmpov + 1
-            temp_ovrlap(itmpov) = i
-            itmpov = itmpov + 1
-            temp_ovrlap(itmpov) = nprocs
-            temp_ovrlap(itmpov+1:itmpov+nprocs) = prc_v(1:nprocs)
-            itmpov = itmpov + nprocs
-          endif
-        end if
-      end if
-    endif
-  enddo
+  if ( m >psb_cd_get_large_threshold()) then 
+    loc_col = (m+np-1)/np
+        allocate(desc_a%loc_to_glob(loc_col), desc_a%lprm(1),&
+         & desc_a%ptree(2),stat=info)  
+    if (info == 0) call InitPairSearchTree(desc_a%ptree,info)
+    if (info /= 0) then
+      info=2025
+      int_err(1)=loc_col
+      call psb_errpush(info,name,i_err=int_err)
+      goto 9999
+    end if
 
-  loc_row=counter
+    ! set LOC_TO_GLOB array to all "-1" values
+    desc_a%lprm(1) = 0
+    desc_a%loc_to_glob(:) = -1
+    k = 0
+    do i=1,m
+      if (info == 0) then
+        call parts(i,m,np,prc_v,nprocs)
+        if (nprocs > np) then
+          info=570
+          int_err(1)=3
+          int_err(2)=np
+          int_err(3)=nprocs
+          int_err(4)=i
+          err=info
+          call psb_errpush(err,name,int_err)
+          goto 9999
+        else if (nprocs <= 0) then
+          info=575
+          int_err(1)=3
+          int_err(2)=nprocs
+          int_err(3)=i
+          err=info
+          call psb_errpush(err,name,int_err)
+          goto 9999
+        else
+          do j=1,nprocs
+            if ((prc_v(j) > np-1).or.(prc_v(j) < 0)) then
+              info=580
+              int_err(1)=3
+              int_err(2)=prc_v(j)
+              int_err(3)=i
+              err=info
+              call psb_errpush(err,name,int_err)
+              goto 9999
+            end if
+          end do
+        endif
+        j=1
+        do 
+          if (j > nprocs) exit
+          if (prc_v(j) == me) exit
+          j=j+1
+        enddo
+        
+        if (j <= nprocs) then 
+          if (prc_v(j) == me) then
+            ! this point belongs to me
+            k = k + 1 
+            call psb_check_size((k+1),desc_a%loc_to_glob,info,pad=-1)
+            if (info /= 0) then
+              info=4010
+              call psb_errpush(info,name,a_err='psb_check_size')
+              goto 9999
+            end if
+            desc_a%loc_to_glob(k) = i
+            call SearchInsKeyVal(desc_a%ptree,i,k,glx,info)
+            if (nprocs > 1)  then
+              call psb_check_size((itmpov+3+nprocs),temp_ovrlap,info,pad=-1)
+              if (info /= 0) then
+                info=4010
+                call psb_errpush(info,name,a_err='psb_check_size')
+                goto 9999
+              end if
+              itmpov = itmpov + 1
+              temp_ovrlap(itmpov) = i
+              itmpov = itmpov + 1
+              temp_ovrlap(itmpov) = nprocs
+              temp_ovrlap(itmpov+1:itmpov+nprocs) = prc_v(1:nprocs)
+              itmpov = itmpov + nprocs
+            endif
+          end if
+        end if        
+      end if
+    enddo
+    if (info /= 0) then 
+      info=4000
+      call psb_errpush(info,name)
+      goto 9999
+    endif
+    loc_row = k 
+
+  else
+
+    do i=1,m
+      if (info == 0) then
+        call parts(i,m,np,prc_v,nprocs)
+        if (nprocs > np) then
+          info=570
+          int_err(1)=3
+          int_err(2)=np
+          int_err(3)=nprocs
+          int_err(4)=i
+          err=info
+          call psb_errpush(err,name,int_err)
+          goto 9999
+        else if (nprocs <= 0) then
+          info=575
+          int_err(1)=3
+          int_err(2)=nprocs
+          int_err(3)=i
+          err=info
+          call psb_errpush(err,name,int_err)
+          goto 9999
+        else
+          do j=1,nprocs
+            if ((prc_v(j) > np-1).or.(prc_v(j) < 0)) then
+              info=580
+              int_err(1)=3
+              int_err(2)=prc_v(j)
+              int_err(3)=i
+              err=info
+              call psb_errpush(err,name,int_err)
+              goto 9999
+            end if
+          end do
+        endif
+        desc_a%glob_to_loc(i) = -(np+prc_v(1)+1)
+        j=1
+        do 
+          if (j > nprocs) exit
+          if (prc_v(j) == me) exit
+          j=j+1
+        enddo
+        if (j <= nprocs) then 
+          if (prc_v(j) == me) then
+            ! this point belongs to me
+            counter=counter+1
+            desc_a%glob_to_loc(i) = counter
+            if (nprocs > 1)  then
+              call psb_check_size((itmpov+3+nprocs),temp_ovrlap,info,pad=-1)
+              if (info /= 0) then
+                info=4010
+                call psb_errpush(info,name,a_err='psb_check_size')
+                goto 9999
+              end if
+              itmpov = itmpov + 1
+              temp_ovrlap(itmpov) = i
+              itmpov = itmpov + 1
+              temp_ovrlap(itmpov) = nprocs
+              temp_ovrlap(itmpov+1:itmpov+nprocs) = prc_v(1:nprocs)
+              itmpov = itmpov + nprocs
+            endif
+          end if
+        end if
+      endif
+    enddo
+    ! estimate local cols number 
+    loc_row=counter
+    loc_col=min(2*loc_row,m)
+
+    allocate(desc_a%loc_to_glob(loc_col),&
+         &desc_a%lprm(1),stat=info)  
+    if (info /= 0) then 
+      call psb_errpush(4010,name,a_err='Allocate')
+      goto 9999      
+    end if
+
+    ! set LOC_TO_GLOB array to all "-1" values
+    desc_a%lprm(1) = 0
+    desc_a%loc_to_glob(:) = -1
+    do i=1,m
+      k = desc_a%glob_to_loc(i) 
+      if (k > 0) then 
+        desc_a%loc_to_glob(k) = i
+      endif
+    enddo
+
+  end if
+
   ! check on parts function
   if (debug) write(*,*) 'PSB_CDALL:  End main loop:' ,loc_row,itmpov,info
 
@@ -227,9 +347,8 @@ subroutine psb_cdals(m, n, parts, ictxt, desc_a, info)
   allocate(ov_idx(l_ov_ix),ov_el(l_ov_el), stat=info)
   if (info /= no_err) then
     info=4010
-    char_err='psb_realloc'
     err=info
-    call psb_errpush(err,name,a_err=char_err)
+    call psb_errpush(err,name,a_err='psb_realloc')
     goto 9999
   end if
 
@@ -260,51 +379,32 @@ subroutine psb_cdals(m, n, parts, ictxt, desc_a, info)
 
   call psb_transfer(ov_idx,desc_a%ovrlap_index,info) 
   if (info == 0) call psb_transfer(ov_el,desc_a%ovrlap_elem,info)
-  deallocate(prc_v,temp_ovrlap,stat=info)
+  if (info == 0) deallocate(prc_v,temp_ovrlap,stat=info)
   if (info /= no_err) then 
     info=4000
     err=info
     call psb_errpush(err,name)
     Goto 9999
   endif
-  ! estimate local cols number 
-  loc_col=min(2*loc_row,m)
-
-  allocate(desc_a%loc_to_glob(loc_col),&
-       &desc_a%lprm(1),stat=info)  
-  if (info /= 0) then 
-    call psb_errpush(4010,name,a_err='Allocate')
-    goto 9999      
-  end if
-
-  ! set LOC_TO_GLOB array to all "-1" values
-  desc_a%lprm(1) = 0
-  desc_a%loc_to_glob(:) = -1
-  do i=1,m
-    k = desc_a%glob_to_loc(i) 
-    if (k > 0) then 
-      desc_a%loc_to_glob(k) = i
-    endif
-  enddo
+  ! At this point overlap_elem is OK. 
+  desc_a%matrix_data(psb_ovl_state_) = psb_cd_ovl_asb_
 
   ! set fields in desc_a%MATRIX_DATA....
   desc_a%matrix_data(psb_n_row_)  = loc_row
   desc_a%matrix_data(psb_n_col_)  = loc_row
+  call psb_cd_set_bld(desc_a,info)
 
   call psb_realloc(1,desc_a%halo_index, info)
   if (info /= no_err) then
     info=2025
-    char_err='psb_realloc'
-    call psb_errpush(err,name,a_err=char_err)
+    call psb_errpush(err,name,a_err='psb_realloc')
     Goto 9999
   end if
 
   desc_a%halo_index(:) = -1
 
-
   desc_a%matrix_data(psb_m_)        = m
   desc_a%matrix_data(psb_n_)        = n
-  desc_a%matrix_data(psb_dec_type_) = psb_desc_bld_
   desc_a%matrix_data(psb_ctxt_)     = ictxt
   call psb_get_mpicomm(ictxt,desc_a%matrix_data(psb_mpi_c_))
 
