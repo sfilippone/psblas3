@@ -88,10 +88,10 @@ Scope: {\bf local} \\
 Type: {\bf required} \\
 Specified as: a rank one or two array containing numbers of the type
 indicated in Table~\ref{tab:f90axpby}.
-\item[info] the local portion of result submatrix $y$.\\
+\item[info] Error code.\\
 Scope: {\bf local} \\
 Type: {\bf required} \\
-An integer value that contains an error code. 
+An integer value; 0 means no error has been detected. 
 \end{description}
 
 
@@ -172,10 +172,10 @@ Specified as: a structured data of type \descdata.
 \item[Function value] is the dot product of subvectors $x$ and $y$.\\
 Scope: {\bf global} \\
 Specified as: a number of the data type indicated in Table~\ref{tab:f90dot}.
-\item[info] the local portion of result submatrix $y$.\\
+\item[info] Error code.\\
 Scope: {\bf local} \\
 Type: {\bf required} \\
-An integer value that contains an error code. 
+An integer value; 0 means no error has been detected. 
 \end{description}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
@@ -183,7 +183,7 @@ An integer value that contains an error code.
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\subroutine{psb\_gedot}{Generalized Dot Product}
+\subroutine{psb\_gedots}{Generalized Dot Product}
 
 This subroutine computes a series of  dot products among the columns of
 two dense matrices  $x$ and $y$: 
@@ -193,15 +193,15 @@ usual convention applies, i.e. the conjugate transpose of $x$ is
 used. If $x$ and $y$ are of rank one, then $res$ is a scalar, else it
 is a rank one array. 
 
-\syntax{psb\_gedot}{res, x, y, desc\_a, info}
+\syntax{call psb\_gedots}{res, x, y, desc\_a, info}
 \begin{table}[h]
 \begin{center}
 \begin{tabular}{ll}
 \hline
 $res$, $x$, $y$ & {\bf Subroutine}\\
 \hline
-Long Precision Real & psb\_gedot \\
-Long Precision Complex & psb\_gedot \\	
+Long Precision Real & psb\_gedots \\
+Long Precision Complex & psb\_gedots \\	
 \hline
 \end{tabular}
 \end{center}
@@ -233,10 +233,10 @@ Specified as: a structured data of type \descdata.
 Scope: {\bf global} \\
 Specified as: a number or a rank-one array  of the data type indicated
 in Table~\ref{tab:f90dot}. 
-\item[info] 
+\item[info] Error code.\\
 Scope: {\bf local} \\
 Type: {\bf required} \\
-An integer value that contains an error code. 
+An integer value; 0 means no error has been detected. 
 \end{description}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -304,10 +304,10 @@ Specified as: a structured data of type \descdata.
 \item[Function value] is the infinity norm of subvector $x$.\\
 Scope: {\bf global} \\
 Specified as: a long precision real number.
-\item[info] 
-Scope: {\bf global} \\
+\item[info] Error code.\\
+Scope: {\bf local} \\
 Type: {\bf required} \\
-An integer value that contains an error code. 
+An integer value; 0 means no error has been detected. 
 \end{description}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
@@ -315,21 +315,21 @@ An integer value that contains an error code.
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\subroutine{psb\_geamax}{Generalized Infinity Norm}
+\subroutine{psb\_geamaxs}{Generalized Infinity Norm}
 
 This subroutine computes a series of  infinity norms on the columns of
 a  dense matrix  $x$: 
 \[ res(i) \leftarrow \max_k |x(k,i)| \]
 
-\syntax{psb\_geamax}{res, x, desc\_a, info}
+\syntax{call psb\_geamaxs}{res, x, desc\_a, info}
 \begin{table}[h]
 \begin{center}
 \begin{tabular}{lll}
 \hline
 $res$&  $x$& {\bf Subroutine}\\
 \hline
-Long Precision Real    &Long Precision Real    & psb\_geamax\\
-Long Precision Real &Long Precision Complex & psb\_geamax\\	
+Long Precision Real    &Long Precision Real    & psb\_geamaxs\\
+Long Precision Real &Long Precision Complex & psb\_geamaxs\\	
 \hline
 \end{tabular}
 \end{center}
@@ -353,10 +353,10 @@ Specified as: a structured data of type \descdata.
 \item[res] is the infinity norm of the columns of $x$.\\
 Scope: {\bf global} \\
 Specified as: a number or a rank-one array  of long precision real numbers. 
-\item[info] 
+\item[info] Error code.\\
 Scope: {\bf local} \\
 Type: {\bf required} \\
-An integer value that contains an error code. 
+An integer value; 0 means no error has been detected. 
 \end{description}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -372,7 +372,7 @@ This function computes the 1-norm of a vector $x$.\\
 If $x$ is a double precision real vector
 computes 1-norm as:
 \[ asum \leftarrow  \|x_i\|\]
-else if $x$ ic double precision complex vector then computes 1-norm  as:
+else if $x$ is double precision complex vector then computes 1-norm  as:
 \[ asum \leftarrow \|re(x)\|_1 + \|im(x)\|_1\]
 
 
@@ -412,10 +412,66 @@ Specified as: a structured data of type \descdata.
 \item[Function value] is the 1-norm of vector $x$.\\
 Scope: {\bf global} \\
 Specified as: a long precision real  number.
-\item[info]
+\item[info] Error code.\\
 Scope: {\bf local} \\
 Type: {\bf required} \\
-An integer value that contains an error code. 
+An integer value; 0 means no error has been detected. 
+\end{description}
+
+
+\subroutine{psb\_geasums}{Generalized 1-Norm of Vector}    
+
+This subroutine computes a series of  1-norms on the columns of
+a  dense matrix  $x$: 
+\[ res(i) \leftarrow \max_k |x(k,i)| \]
+This function computes the 1-norm of a vector $x$.\\
+If $x$ is a double precision real vector
+computes 1-norm as:
+\[ res(i) \leftarrow  \|x_i\|\]
+else if $x$ is double precision complex vector then computes 1-norm  as:
+\[ res(i) \leftarrow \|re(x)\|_1 + \|im(x)\|_1\]
+
+
+\syntax{call psb\_geasums}{res, x, desc\_a, info}
+
+\begin{table}[h]
+\begin{center}
+\begin{tabular}{lll}
+\hline
+$res$ & $x$ & {\bf Subroutine}\\
+\hline
+Long Precision Real&Long Precision Real & psb\_geasums \\
+Long Precision Real&Long Precision Complex & psb\_geasums \\
+\hline
+\end{tabular}
+\end{center}
+\caption{Data types\label{tab:f90asums}}
+\end{table}
+
+\begin{description}
+\item[\bf On Entry]
+\item[x] the local portion of global dense matrix
+$x$. %% This function computes the location of the first element of 
+%% local subarray used, based on the field $matrix\_data$ of $desc\_a$ . 
+\\
+Scope: {\bf local} \\
+Type: {\bf required} \\
+Specified as: a rank one or two array 
+containing numbers of type specified in
+Table~\ref{tab:f90asums}.
+\item[desc\_a] contains data structures for communications.\\
+Scope: {\bf local} \\
+Type: {\bf required}\\
+Specified as: a structured data of type \descdata.
+
+\item[\bf On Return] 
+\item[res] contains the 1-norm of (the columns of) $x$.\\
+Scope: {\bf global} \\
+Specified as: a long precision real  number.
+\item[info] Error code.\\
+Scope: {\bf local} \\
+Type: {\bf required} \\
+An integer value; 0 means no error has been detected. 
 \end{description}
 
 
@@ -482,11 +538,71 @@ Specified as: a structured data of type \descdata.
 Scope: {\bf global} \\
 Type: {\bf required} \\
 Specified as: a long precision real number.
-\item[info] 
+\item[info] Error code.\\
 Scope: {\bf local} \\
 Type: {\bf required} \\
-An integer value that contains an error code. 
+An integer value; 0 means no error has been detected. 
 \end{description}
+
+
+
+\subroutine{psb\_genrm2s}{Generalized 1-Norm of Vector}    
+
+This subroutine computes a series of  1-norms on the columns of
+a  dense matrix  $x$: 
+\[ res(i) \leftarrow \max_k |x(k,i)| \]
+This function computes the 1-norm of a vector $x$.\\
+If $x$ is a double precision real vector
+computes 1-norm as:
+\[ res(i) \leftarrow \sqrt{x^T x}\]
+
+else if $x$ is double precision complex vector then computes 1-norm  as:
+\[ res(i) \leftarrow \sqrt{x^H x}\]
+
+
+\syntax{call psb\_genrm2s}{res, x, desc\_a, info}
+
+\begin{table}[h]
+\begin{center}
+\begin{tabular}{lll}
+\hline
+$res$ & $x$ & {\bf Subroutine}\\
+\hline
+Long Precision Real&Long Precision Real & psb\_genrm2s \\
+Long Precision Real&Long Precision Complex & psb\_genrm2s \\
+\hline
+\end{tabular}
+\end{center}
+\caption{Data types\label{tab:f90nrm2s}}
+\end{table}
+
+\begin{description}
+\item[\bf On Entry]
+\item[x] the local portion of global dense matrix
+$x$. %% This function computes the location of the first element of 
+%% local subarray used, based on the field $matrix\_data$ of $desc\_a$ . 
+\\
+Scope: {\bf local} \\
+Type: {\bf required} \\
+Specified as: a rank one or two array 
+containing numbers of type specified in
+Table~\ref{tab:f90nrm2s}.
+\item[desc\_a] contains data structures for communications.\\
+Scope: {\bf local} \\
+Type: {\bf required}\\
+Specified as: a structured data of type \descdata.
+
+\item[\bf On Return] 
+\item[res] contains the 1-norm of (the columns of) $x$.\\
+Scope: {\bf global} \\
+Specified as: a long precision real  number.
+\item[info] Error code.\\
+Scope: {\bf local} \\
+Type: {\bf required} \\
+An integer value; 0 means no error has been detected. 
+\end{description}
+
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
@@ -536,10 +652,10 @@ Specified as: a structured data of type \descdata.
 \item[Function value] is the infinity-norm of sparse submatrix $A$.\\
 Scope: {\bf global} \\
 Specified as: a long precision real number.
-\item[info] 
+\item[info] Error code.\\
 Scope: {\bf local} \\
 Type: {\bf required} \\
-An integer value that contains an error code. 
+An integer value; 0 means no error has been detected. 
 \end{description}
 
 
@@ -589,8 +705,8 @@ Long Precision Complex & psb\_spmm \\
 \caption{Data types\label{tab:f90spmm}}
 \end{table}
 
-\syntax{CALL psb\_spmm}{alpha, a, x, beta, y, desc\_a, info}
-\syntax*{CALL psb\_spmm}{alpha, a, x, beta, y,desc\_a, info,
+\syntax{call psb\_spmm}{alpha, a, x, beta, y, desc\_a, info}
+\syntax*{call psb\_spmm}{alpha, a, x, beta, y,desc\_a, info,
 trans, work} 
 
 \begin{description}
@@ -674,10 +790,10 @@ Type: {\bf required} \\
 Specified as: an array of rank one or two
 containing numbers of type specified in
 Table~\ref{tab:f90spmm}.
-\item[info] 
+\item[info] Error code.\\
 Scope: {\bf local} \\
 Type: {\bf required} \\
-An integer value that contains an error code. 
+An integer value; 0 means no error has been detected. 
 \end{description}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -713,8 +829,8 @@ where:
 \item[$P_r, P_c$] are the permutation matrices.
 \end{description}
 
-\syntax{CALL psb\_spsm}{alpha, t, x, beta, y, desc\_a, info} 
-\syntax*{CALL psb\_spsm}{alpha, t, x, beta, y, desc\_a, info,
+\syntax{call psb\_spsm}{alpha, t, x, beta, y, desc\_a, info} 
+\syntax*{call psb\_spsm}{alpha, t, x, beta, y, desc\_a, info,
 trans, unit, choice, diag, work} 
 
 \begin{table}[h]
@@ -826,10 +942,10 @@ Type: {\bf required} \\
 Specified as: an array of rank one or two
 containing numbers of type specified in
 Table~\ref{tab:f90spsm}.
-\item[info] 
+\item[info] Error code.\\
 Scope: {\bf local} \\
 Type: {\bf required} \\
-An integer value that contains an error code. 
+An integer value; 0 means no error has been detected. 
 \end{description}
 
 

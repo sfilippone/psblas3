@@ -41,6 +41,11 @@
       \section*{\flushleft #1---#2 \endflushleft}%
       \addcontentsline{toc}{subsection}{#1}%
       \markright{#1}}%
+\newcommand{\subsubroutine}[2]{%
+\stepcounter{subroutine}%
+      \subsection*{\flushleft #1---#2 \endflushleft}%
+      \addcontentsline{toc}{subsubsection}{#1}%
+      \markright{#1}}%
 \newcommand{\examplename}{Example}
 \newcommand{\syntaxname}{Syntax}
 \makeatletter

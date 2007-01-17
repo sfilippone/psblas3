@@ -33,8 +33,8 @@ Long Precision Complex & psb\_halo \\
 \caption{Data types\label{tab:f90halo}}
 \end{table}
 
-\syntax{CALL psb\_halo}{x, desc\_a, info}
-\syntax*{CALL psb\_halo}{x, desc\_a, info, alpha, work}
+\syntax{call psb\_halo}{x, desc\_a, info}
+\syntax*{call psb\_halo}{x, desc\_a, info, alpha, work}
 
 \begin{description}
 \item[\bf On Entry]
@@ -104,8 +104,8 @@ Long Precision Complex & psb\_ovrl \\
 \caption{Data types\label{tab:f90ovrl}}
 \end{table}
 
-\syntax{CALL psb\_ovrl}{x, desc\_a, info}
-\syntax*{CALL psb\_ovrl}{x, desc\_a, info, update=update\_type, work=work} 
+\syntax{call psb\_ovrl}{x, desc\_a, info}
+\syntax*{call psb\_ovrl}{x, desc\_a, info, update=update\_type, work=work} 
 
 \begin{description}
 \item[\bf On Entry]
@@ -142,10 +142,10 @@ Type: {\bf required} \\
 Specified as: an  array of rank one or two
 containing numbers of type specified in
 Table~\ref{tab:f90ovrl}.
-\item[info] the local portion of result submatrix $y$.\\
+\item[info] Error code.\\
 Scope: {\bf local} \\
 Type: {\bf required} \\
-An integer value that contains an error code. 
+An integer value; 0 means no error has been detected. 
 \end{description}
 
 
@@ -225,7 +225,7 @@ Specified as: a structured data of type \descdata.
   the processes will have a copy of the global vector.\\
 Scope: {\bf global} \\
 Type: {\bf optional}\\
-Specified as: an integer variable $0\le ix\le np$. 
+Specified as: an integer variable $-1\le ix\le np-1$, default $-1$. 
 \item[iglobx]  Row index to define a submatrix in glob\_x into which
   gather the local pieces.\\
 Scope: {\bf global} \\
@@ -255,10 +255,10 @@ Specified as: an integer variable.
 Scope: {\bf global} \\
 Type: {\bf required}\\
 Specified as: a rank one or two array.
-\item[info] the local portion of result submatrix $y$.\\
+\item[info] Error code.\\
 Scope: {\bf local} \\
 Type: {\bf required} \\
-An integer value that contains an error code. 
+An integer value; 0 means no error has been detected. 
 \end{description}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -314,7 +314,7 @@ Specified as: a structured data of type \descdata.
   the processes have a copy of the global vector.\\
 Scope: {\bf global} \\
 Type: {\bf optional}\\
-Specified as: an integer variable $0\le ix\le np$. 
+Specified as: an integer variable $-1\le ix\le np-1$, default $-1$. 
 \item[iglobx]  Row index to define a submatrix in glob\_x that has to
   be scattered into local pieces.\\
 Scope: {\bf global} \\
@@ -346,10 +346,10 @@ Scope: {\bf local} \\
 Type: {\bf required}\\
 Specified as: a rank one or two array containing numbers of the type
 indicated in Table~\ref{tab:scatter}.
-\item[info] the local portion of result submatrix $y$.\\
+\item[info] Error code.\\
 Scope: {\bf local} \\
 Type: {\bf required} \\
-An integer value that contains an error code. 
+An integer value; 0 means no error has been detected. 
 \end{description}
 
 %%% Local Variables: 

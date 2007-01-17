@@ -53,7 +53,7 @@ Scope: {\bf global} \\
 Type: {\bf required}\\
 Error code: if no error, 0 is returned.
 \end{description}
-\section*{Usage Notes}
+\subsection*{Usage Notes}
 %% The PSBLAS 2.0 contains a number of preconditioners, ranging from a
 %% simple diagonal scaling to 2-level domain decomposition. These
 %% preconditioners may use the SuperLU or the UMFPACK software, if
@@ -169,10 +169,10 @@ Specified as: a character.
 Scope: {\bf local} \\
 Type: {\bf required}\\
 Specified as: a precondtioner data structure \precdata\\
-\item[info] the return error code.\\
-Scope: {\bf global} \\
-Type: {\bf required}\\
-Specified as: an integer, upon successful completion $info=0$ \\
+\item[info] Error code.\\
+Scope: {\bf local} \\
+Type: {\bf required} \\
+An integer value; 0 means no error has been detected. 
 \end{description}
 
 
@@ -212,10 +212,10 @@ Specified as: a double precision array.
 Scope: {\bf local} \\
 Type: {\bf required}\\
 Specified as: a double precision array.
-\item[info] the return error code.\\
+\item[info] Error code.\\
 Scope: {\bf local} \\
-Type: {\bf required}\\
-Specified as: an integer, upon successful completion $info=0$ .\\
+Type: {\bf required} \\
+An integer value; 0 means no error has been detected. 
 \end{description}
 
 

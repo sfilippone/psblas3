@@ -25,29 +25,31 @@ exchanged among processes.
 
 It is not necessary for the user to know the internal structure of
 \verb|psb_desc_type|, it is set in a transparent mode by the tools
-routines of Sec.~\ref{sec:toolsrout} while creating a new sparse
-matrix, and its fields may be accessed if necessary via appropriate
-routines; nevertheless we include its description for the curious
+routines of Sec.~\ref{sec:toolsrout}, and its fields may be accessed
+if necessary via  the routines of sec.~\ref{sec:dataquery};
+nevertheless we include a  description for the curious 
 reader:   
 \begin{description}
 \item[{\bf matrix\_data}] includes general information about matrix and
-process grid. More precisely:
-\begin{description}
-\item[matrix\_data[psb\_dec\_type\_\hbox{]}] Identifies the decomposition type
-(global); the actual values are internally defined, so they should
-never be accessed directly.
-\item[matrix\_data[psb\_ctxt\_\hbox{]}] Communication context
-  associated with the processes comprised in the virtual parallel
-  machine (global).
-\item[matrix\_data[psb\_m\_\hbox{]}] Total number of equations (global).
-\item[matrix\_data[psb\_n\_\hbox{]}] Total number of variables (global).
-\item[matrix\_data[psb\_n\_row\_\hbox{]}] Number of grid variables owned by the
-current process (local); equivalent to the number of local rows in the
-sparse coefficient matrix.
-\item[matrix\_data[psb\_n\_col\_\hbox{]}] Total number of grid variables read by the
-current process (local); equivalent to the number of local columns in
-the sparse coefficient matrix. They include the halo.
-\end{description}
+process grid, such as the communication context, the size of the
+global matrix, the size of the portion of matrix stored on the current
+process, and so on. %% More precisely:
+%% \begin{description}
+%% \item[matrix\_data[psb\_dec\_type\_\hbox{]}] Identifies the decomposition type
+%% (global); the actual values are internally defined, so they should
+%% never be accessed directly.
+%% \item[matrix\_data[psb\_ctxt\_\hbox{]}] Communication context
+%%   associated with the processes comprised in the virtual parallel
+%%   machine (global).
+%% \item[matrix\_data[psb\_m\_\hbox{]}] Total number of equations (global).
+%% \item[matrix\_data[psb\_n\_\hbox{]}] Total number of variables (global).
+%% \item[matrix\_data[psb\_n\_row\_\hbox{]}] Number of grid variables owned by the
+%% current process (local); equivalent to the number of local rows in the
+%% sparse coefficient matrix.
+%% \item[matrix\_data[psb\_n\_col\_\hbox{]}] Total number of grid variables read by the
+%% current process (local); equivalent to the number of local columns in
+%% the sparse coefficient matrix. They include the halo.
+%% \end{description}
 Specified as: an allocatable integer array of dimension \verb|psb_mdata_size_|.
 \item[{\bf halo\_index}] A list of the halo and boundary elements for
 the current process to be exchanged with other processes; for each
@@ -86,10 +88,9 @@ Specified as: an allocatable integer array of rank one.
 \item[{\bf loc\_to\_glob}] each element $i$ of this array contains
 global identifier of the local variable $i$.\\
 Specified as: an allocatable integer array of rank one.
-\item[{\bf glob\_to\_loc}]  if global variable $i$ is read by current
-process then element $i$ contains local index correpondent to global variable $i$;
-else element $i$ contains -1 (NULL) value.\\
-Specified as: an allocatabled integer array of rank one.
+\item[{\bf glob\_to\_loc, glb\_lc, hashv}] Contain a mapping from
+  global to local indices. The mapping may be stored in two different
+  ways depending on the size of the index space. 
 \end{description}
 The Fortran95 definition  for \verb|psb_desc_type| structures is 
 as follows:
@@ -101,6 +102,7 @@ type psb_desc_type
    integer, allocatable :: matrix_data(:), halo_index(:)
    integer, allocatable :: overlap_elem(:), overlap_index(:)
    integer, allocatable :: loc_to_glob(:), glob_to_loc(:)
+   integer, allocatable :: hashv(:), glb_lc(:,:)
 end type psb_desc_type 
 \end{verbatim}
     \end{minipage}
@@ -133,18 +135,18 @@ state, which can take the following values:
 \item[psb\_avg\_] Average overlapped elements
 %% \item[psb\_square\_root\_] Update with the square root of the average
 %%   of overlapped elements;
-\item[psb\_dec\_type\_] Entry holding decomposition type (in \verb|desc_a%matrix_data|)
-\item[psb\_m\_] Entry holding total number of rows
-\item[psb\_n\_] Entry holding total number of columns
-\item[ psb\_n\_row\_] Entry holding the number of rows stored in the
-  current process
-\item[psb\_n\_col\_] Entry holding the number of columns stored in the
-  current process
-\item[psb\_ctxt\_] Entry holding a copy of the BLACS communication context
-\item[psb\_desc\_asb\_] State of the descriptor: assembled,
-      i.e. suitable for computational tasks. 
-\item[psb\_desc\_bld\_] State of the descriptor: build, must be
-  assembled before computational use.
+%% \item[psb\_dec\_type\_] Entry holding decomposition type (in \verb|desc_a%matrix_data|)
+%% \item[psb\_m\_] Entry holding total number of rows
+%% \item[psb\_n\_] Entry holding total number of columns
+%% \item[ psb\_n\_row\_] Entry holding the number of rows stored in the
+%%   current process
+%% \item[psb\_n\_col\_] Entry holding the number of columns stored in the
+%%   current process
+%% \item[psb\_ctxt\_] Entry holding a copy of the BLACS communication context
+%% \item[psb\_desc\_asb\_] State of the descriptor: assembled,
+%%       i.e. suitable for computational tasks. 
+%% \item[psb\_desc\_bld\_] State of the descriptor: build, must be
+%%   assembled before computational use.
 \end{description}
 
 
@@ -274,14 +276,9 @@ values:
 
 \subsection{Preconditioner data structure}
 \label{sec:prec}
-Our library  offers support for  many different types of
-preconditioning schemes. Besides the simple well known preconditioners
-like Diagonal Scaling or Block Jacobi with either  incomplete
-factorization ILU(0) or complete LU factorization.  We also provide an
-experimental package of  complex 
-preconditioning methods like the Additive Schwarz and Multilevel
-Additive Schwarz; these last preconditioners will be described in a
-separate document. 
+Our base library  offers support for  simple well known preconditioners
+like Diagonal Scaling or Block Jacobi with incomplete
+factorization ILU(0). 
 
  A preconditioner is held in the \hypertarget{precdata}{{\tt
     psb\_prec\_type}} data structure which depends on the
@@ -310,23 +307,13 @@ to be interpreted.
     \begin{minipage}[tl]{0.9\textwidth}
 \begin{verbatim}
 
-  type psb_dbaseprc_type
-
+  type psb_dprec_type
     type(psb_dspmat_type), allocatable :: av(:) 
     real(kind(1.d0)), allocatable      :: d(:)  
-    type(psb_desc_type)                :: desc_data , desc_ac
+    type(psb_desc_type)                :: desc_data 
     integer, allocatable               :: iprcparm(:) 
     real(kind(1.d0)), allocatable      :: dprcparm(:) 
     integer, allocatable               :: perm(:),  invperm(:) 
-    integer, allocatable               :: mlia(:), nlaggr(:) 
-    type(psb_dspmat_type), pointer     :: base_a    => null() !
-    type(psb_desc_type), pointer       :: base_desc => null() ! 
-    real(kind(1.d0)), allocatable      :: dorig(:) 
-
-  end type psb_dbaseprc_type
-  
-  type psb_dprec_type
-    type(psb_dbaseprc_type), allocatable  :: baseprecv(:) 
     integer                       :: prec, base_prec
   end type psb_dprec_type
 
@@ -339,24 +326,167 @@ to be interpreted.
   \end{center}
   \caption{\label{fig:prectype}The PSBLAS defined data type that contains a preconditioner.}
 \end{figure}
-\subsubsection{Named Constants}
-\label{sec:prec_constants}
+
+%% \subsection{Named Constants}
+%% \label{sec:prec_constants}
+%% \begin{description}
+%% \item[f\_ilu\_n\_] Incomplete LU factorization with $n$ levels of
+%%   fill-in; currently only $n=0$ is implemented;
+%% \item[f\_slu\_]  Sparse factorization using SuperLU;
+%% \item[f\_umf\_]  Sparse factorization using UMFPACK;
+%% \item[add\_ml\_prec\_] Additive multilevel correction;
+%% \item[mult\_ml\_prec\_] Multiplicative multilevel correction;
+%% \item[pre\_smooth\_] Pre-smoothing in applying multiplicative
+%%   multilevel corrections;
+%% \item[post\_smooth\_] Post-smoothing in applying multiplicative
+%%   multilevel corrections;
+%% \item[smooth\_both\_] Two-sided (i.e. symmetric) smoothing in applying multiplicative
+%%   multilevel corrections;
+%% \item[mat\_distr\_] Coarse matrix distributed among processes
+%% \item[mat\_repl\_] Coarse matrix replicated among processes
+%% \end{description}
+
+
+\subsection{Data structure query routines}
+\label{sec:dataquery}
+\subsubroutine{psb\_cd\_get\_local\_rows}{Get number of local rows}
+
+\syntax{nr = psb\_cd\_get\_local\_rows}{desc}
+
 \begin{description}
-\item[f\_ilu\_n\_] Incomplete LU factorization with $n$ levels of
-  fill-in; currently only $n=0$ is implemented;
-\item[f\_slu\_]  Sparse factorization using SuperLU;
-\item[f\_umf\_]  Sparse factorization using UMFPACK;
-\item[add\_ml\_prec\_] Additive multilevel correction;
-\item[mult\_ml\_prec\_] Multiplicative multilevel correction;
-\item[pre\_smooth\_] Pre-smoothing in applying multiplicative
-  multilevel corrections;
-\item[post\_smooth\_] Post-smoothing in applying multiplicative
-  multilevel corrections;
-\item[smooth\_both\_] Two-sided (i.e. symmetric) smoothing in applying multiplicative
-  multilevel corrections;
-\item[mat\_distr\_] Coarse matrix distributed among processes
-\item[mat\_repl\_] Coarse matrix replicated among processes
+\item[\bf On Entry]
+\item[desc] the communication descriptor.\\
+Scope:{\bf local}.\\
+Type:{\bf required}.\\
+Specified as: a structured data of type \descdata.
 \end{description}
+
+\begin{description}
+\item[\bf On Return]
+\item[Function value] The number of local rows, i.e. the number of
+  rows owned by the current process; as explained in~\ref{sec:intro},
+  it is equal to $|{\cal I}_i| + |{\cal B}_i|$. The returned value is
+  specific to the calling process. 
+\end{description}
+
+
+\subsubroutine{psb\_cd\_get\_local\_cols}{Get number of local cols}
+
+\syntax{nc = psb\_cd\_get\_local\_cols}{desc}
+
+\begin{description}
+\item[\bf On Entry]
+\item[desc] the communication descriptor.\\
+Scope:{\bf local}.\\
+Type:{\bf required}.\\
+Specified as: a structured data of type \descdata.
+\end{description}
+
+\begin{description}
+\item[\bf On Return]
+\item[Function value] The number of local cols, i.e. the number of
+  indices used by the current process, including both local and halo
+  indices; as explained in~\ref{sec:intro}, 
+  it is equal to  $|{\cal I}_i| + |{\cal B}_i| +|{\cal H}_i|$. The
+  returned value is specific to the calling process. 
+\end{description}
+
+
+\subsubroutine{psb\_cd\_get\_global\_rows}{Get number of global rows}
+
+\syntax{nr = psb\_cd\_get\_global\_rows}{desc}
+
+\begin{description}
+\item[\bf On Entry]
+\item[desc] the communication descriptor.\\
+Scope:{\bf local}.\\
+Type:{\bf required}.\\
+Specified as: a structured data of type \descdata.
+\end{description}
+
+\begin{description}
+\item[\bf On Return]
+\item[Function value] The number of global rows in the mesh
+\end{description}
+
+
+\subsubroutine{psb\_cd\_get\_contex}{Get communication context}
+\syntax{ictxt = psb\_cd\_get\_context}{desc}
+
+\begin{description}
+\item[\bf On Entry]
+\item[desc] the communication descriptor.\\
+Scope:{\bf local}.\\
+Type:{\bf required}.\\
+Specified as: a structured data of type \descdata.
+\end{description}
+
+\begin{description}
+\item[\bf On Return]
+\item[Function value] The communication context.
+\end{description}
+
+
+
+\subsubroutine{psb\_sp\_get\_nrows}{Get number of  rows in a sparse matrix}
+
+\syntax{nr = psb\_sp\_get\_nrows}{a}
+
+\begin{description}
+\item[\bf On Entry]
+\item[a] the sparse matrix\\
+Scope:{\bf local}\\
+Type:{\bf required}\\
+Specified as: a structured data of type \spdata.
+\end{description}
+
+\begin{description}
+\item[\bf On Return]
+\item[Function value] The number of  rows  of sparse matrix \verb|a|.
+\end{description}
+
+
+\subsubroutine{psb\_sp\_get\_ncols}{Get number of  columns in a sparse matrix}
+
+\syntax{nr = psb\_sp\_get\_ncols}{a}
+
+\begin{description}
+\item[\bf On Entry]
+\item[a] the sparse matrix\\
+Scope:{\bf local}\\
+Type:{\bf required}\\
+Specified as: a structured data of type \spdata.
+\end{description}
+
+\begin{description}
+\item[\bf On Return]
+\item[Function value] The number of  columns  of sparse matrix \verb|a|.
+\end{description}
+
+
+\subsubroutine{psb\_sp\_get\_nnzeros}{Get number of nonzero elements in a sparse matrix}
+
+\syntax{nr = psb\_sp\_get\_nnzeros}{a}
+
+\begin{description}
+\item[\bf On Entry]
+\item[a] the sparse matrix\\
+Scope:{\bf local}\\
+Type:{\bf required}\\
+Specified as: a structured data of type \spdata.
+\end{description}
+
+\begin{description}
+\item[\bf On Return]
+\item[Function value] The number of nonzero elements stored in sparse matrix \verb|a|.
+\end{description}
+
+\subsubsection*{Notes}
+\begin{enumerate}
+\item The function value is specific to the storage format of matrix
+  \verb|a|; some storage formats employ padding, thus the returned
+  value for the same matrix may be different for different storage choices.
+\end{enumerate}
 
 
 %%% Local Variables: 

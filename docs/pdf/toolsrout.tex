@@ -53,10 +53,10 @@ Specified as: an integer array.
 Scope:{\bf local}.\\
 Type:{\bf required}.\\
 Specified as: a structured data of type \descdata.
-\item[info] Error code.
+\item[info] Error code.\\
 Scope: {\bf local} \\
-Type: {\bf required}\\
-Specified as: an integer variable.\\
+Type: {\bf required} \\
+An integer value; 0 means no error has been detected. 
 \end{description}
 
 \section*{Notes}
@@ -124,10 +124,10 @@ Specified as: an integer array of length $nz$.
 Scope:{\bf local}.\\
 Type:{\bf required}.\\
 Specified as: a structured data of type \descdata.
-\item[info] Error code.
+\item[info] Error code.\\
 Scope: {\bf local} \\
-Type: {\bf required}\\
-Specified as: an integer variable.
+Type: {\bf required} \\
+An integer value; 0 means no error has been detected. 
 \end{description}
 \section*{Notes}
 \begin{enumerate}
@@ -154,10 +154,10 @@ Specified as: a structured data of type \descdata.
 
 \begin{description}
 \item[\bf On Return]
-\item[info] Error code.
+\item[info] Error code.\\
 Scope: {\bf local} \\
-Type: {\bf required}\\
-Specified as: an integer variable.
+Type: {\bf required} \\
+An integer value; 0 means no error has been detected. 
 %\item[arg] 
 \end{description}
 \section*{Notes}
@@ -190,10 +190,10 @@ Specified as: a structured data of type \descdata.
 Scope:{\bf local}.\\
 Type:{\bf required}.\\
 Specified as: a structured data of type \descdata.
-\item[info] Error code.
+\item[info] Error code.\\
 Scope: {\bf local} \\
-Type: {\bf required}\\
-Specified as: an integer variable.\\
+Type: {\bf required} \\
+An integer value; 0 means no error has been detected. 
 \end{description}
 
 
@@ -214,10 +214,10 @@ Specified as: a structured data of type \descdata.
 
 \begin{description}
 \item[\bf On Return]
-\item[info] Error code.
+\item[info] Error code.\\
 Scope: {\bf local} \\
-Type: {\bf required}\\
-Specified as: an integer variable.
+Type: {\bf required} \\
+An integer value; 0 means no error has been detected. 
 \end{description}
 
 
@@ -309,10 +309,10 @@ Specified as: an integer value.
 Scope:{\bf local}\\
 Type:{\bf required}\\
 Specified as: a structured data of type \spdata.
-\item[info] Error code.
+\item[info] Error code.\\
 Scope: {\bf local} \\
-Type: {\bf required}\\
-Specified as: an integer variable.
+Type: {\bf required} \\
+An integer value; 0 means no error has been detected. 
 \end{description}
 \section*{Notes}
 \begin{enumerate}
@@ -378,7 +378,8 @@ Type: {\bf required}.\\
 Specified as: a variable of type \descdata.\\
 \item[info] Error code.\\
 Scope: {\bf local} \\
-Type: {\bf required}\\
+Type: {\bf required} \\
+An integer value; 0 means no error has been detected. 
 \end{description}
 
 \section*{Notes}
@@ -388,7 +389,7 @@ Type: {\bf required}\\
 \item On entry to this routine the sparse matrix may be in either the
   build or update state. 
 \item If the descriptor is in the build state, then the sparse matrix
-  ought also be in the build state; the action of the routine is to
+  must also be in the build state; the action of the routine is to
   (implicitly) call \verb|psb_cdins| to add entries to the sparsity
   pattern;
 \item If the descriptor is in the assembled state, then any entries in
@@ -432,10 +433,10 @@ Specified as: integer, possible values: \verb|psb_dupl_ovwrt_|,
 Scope:{\bf local}\\
 Type:{\bf required}\\
 Specified as: a structured data of type \spdata.
-\item[info] Error code.
+\item[info] Error code.\\
 Scope: {\bf local} \\
-Type: {\bf required}\\
-Specified as: an integer variable.
+Type: {\bf required} \\
+An integer value; 0 means no error has been detected. 
 \end{description}
 
 \section*{Notes}
@@ -510,10 +511,10 @@ Specified as: a structured data of type \descdata.
 
 \begin{description}
 \item[\bf On Return]
-\item[info] Error code.
+\item[info] Error code.\\
 Scope: {\bf local} \\
-Type: {\bf required}\\
-Specified as: an integer variable.
+Type: {\bf required} \\
+An integer value; 0 means no error has been detected. 
 \end{description}
 
 
@@ -544,10 +545,10 @@ Default: true.
 
 \begin{description}
 \item[\bf On Return]
-\item[info] Error code.
+\item[info] Error code.\\
 Scope: {\bf local} \\
-Type: {\bf required}\\
-Specified as: an integer variable.
+Type: {\bf required} \\
+An integer value; 0 means no error has been detected. 
 \end{description}
 \section*{Notes}
 \begin{enumerate}
@@ -631,10 +632,10 @@ Scope: {\bf local} \\
 Type: {\bf required}\\
 Specified as: a rank one or two array with the ALLOCATABLE
 attribute, of type real, complex or integer.\\
-\item[info] Error code.
+\item[info] Error code.\\
 Scope: {\bf local} \\
-Type: {\bf required}\\
-Specified as: Integer scalar.
+Type: {\bf required} \\
+An integer value; 0 means no error has been detected. 
 \end{description}
 
 
@@ -680,10 +681,10 @@ Scope: {\bf local} \\
 Type: {\bf required}\\
 Specified as: a rank one or two array with the ALLOCATABLE
 attribute, of type real, complex or integer.\\
-\item[info] Error code.
+\item[info] Error code.\\
 Scope: {\bf local} \\
-Type: {\bf required}\\
-Specified as: an integer variable.
+Type: {\bf required} \\
+An integer value; 0 means no error has been detected. 
 \end{description}
 
 \section*{Notes}
@@ -718,8 +719,8 @@ Specified as: a rank one or two array with the ALLOCATABLE
 attribute, of type real, complex or integer.\\
 \item[info] Error code.\\
 Scope: {\bf local} \\
-Type: {\bf required}\\
-Specified as: Integer scalar.\\
+Type: {\bf required} \\
+An integer value; 0 means no error has been detected. 
 \end{description}
 %
 %%   psb_free %%
@@ -747,8 +748,8 @@ Specified as: a variable of type \descdata.\\
 \item[\bf On Return]
 \item[info] Error code.\\
 Scope: {\bf local} \\
-Type: {\bf required}\\
-Specified as: Integer scalar.\\
+Type: {\bf required} \\
+An integer value; 0 means no error has been detected. 
 \end{description}
 
 
@@ -783,8 +784,8 @@ Specified as: a variable of type \descdata.\\
 \item[\bf On Return]
 \item[info] Error code.\\
 Scope: {\bf local} \\
-Type: {\bf required}\\
-Specified as: Integer scalar.\\
+Type: {\bf required} \\
+An integer value; 0 means no error has been detected. 
 \end{description}
 
 
@@ -832,10 +833,10 @@ Specified as: a rank one integer array.
 Scope: {\bf global} \\
 Type: {\bf optional}\\
 Specified as: a rank one integer array.
-\item[info] Error code.
+\item[info] Error code.\\
 Scope: {\bf local} \\
-Type: {\bf required}\\
-Specified as: an integer variable.
+Type: {\bf required} \\
+An integer value; 0 means no error has been detected. 
 \end{description}
 
 \section*{Notes}
@@ -884,41 +885,10 @@ Specified as: a rank one integer array.
 Scope: {\bf global} \\
 Type: {\bf optional}\\
 Specified as: a rank one integer array.
-\item[info] Error code.
+\item[info] Error code.\\
 Scope: {\bf local} \\
-Type: {\bf required}\\
-Specified as: an integer variable.
-\end{description}
-
-
-\subroutine{psb\_geall}{Allocates a dense matrix}
-
-\syntax{call psb\_geall}{x, desc\_a, info, n}
-
-\begin{description}
-\item[\bf On Entry]
-\item[desc\_a] The communication descriptor.\\
-Scope: {\bf local} \\
-Type: {\bf required}\\
-Specified as: a variable of type \descdata.\\
-\item[n] The number of columns of the dense matrix to be allocated.\\
-Scope: {\bf local} \\
-Type: {\bf optional}\\
-Specified as: Integer scalar, default $1$. It is ignored if $x$ is a
-rank-1 array. 
-\end{description}
-
-\begin{description}
-\item[\bf On Return]
-\item[x] The dense matrix to be allocated.\\
-Scope: {\bf local} \\
-Type: {\bf required}\\
-Specified as: a rank one or two array with the ALLOCATABLE
-attribute, of type real, complex or integer.\\
-\item[info] Error code.
-Scope: {\bf local} \\
-Type: {\bf required}\\
-Specified as: Integer scalar.
+Type: {\bf required} \\
+An integer value; 0 means no error has been detected. 
 \end{description}
 
 
@@ -945,17 +915,17 @@ Scope: {\bf local} \\
 Type: {\bf required}\\
 Specified as: a rank one array with the ALLOCATABLE
 attribute, of type integer.\\
-\item[info] Error code.
+\item[info] Error code.\\
 Scope: {\bf local} \\
-Type: {\bf required}\\
-Specified as: an integer variable.
+Type: {\bf required} \\
+An integer value; 0 means no error has been detected. 
 \end{description}
 
 \section*{Notes}
 \begin{enumerate}
 \item If there are no boundary elements (i.e., if the local part of
   the connectivity graph is self-contained) the output vector is set
-  to \verb|NULL()|
+  to the ``not allocated'' state. 
 \item Otherwise the size of \verb|bndel| will be exactly equal to the
   number of boundary elements. 
 \end{enumerate}
@@ -980,159 +950,21 @@ Scope: {\bf local} \\
 Type: {\bf required}\\
 Specified as: a rank one array with the ALLOCATABLE
 attribute, of type integer.\\
-\item[info] Error code.
+\item[info] Error code.\\
 Scope: {\bf local} \\
-Type: {\bf required}\\
-Specified as: an integer variable.
+Type: {\bf required} \\
+An integer value; 0 means no error has been detected. 
 \end{description}
 
 \section*{Notes}
 \begin{enumerate}
 \item If there are no overlap elements the output vector is set
-  to \verb|NULL()|
+  to the ``not allocated'' state.  
 \item Otherwise the size of \verb|ovrel| will be exactly equal to the
   number of overlap elements. 
 \end{enumerate}
 
 
-\subroutine{psb\_cd\_get\_local\_rows}{Get number of local rows}
-
-\syntax{nr = psb\_cd\_get\_local\_rows}{desc}
-
-\begin{description}
-\item[\bf On Entry]
-\item[desc] the communication descriptor.\\
-Scope:{\bf local}.\\
-Type:{\bf required}.\\
-Specified as: a structured data of type \descdata.
-\end{description}
-
-\begin{description}
-\item[\bf On Return]
-\item[Function value] The number of local rows, i.e. the number of
-  rows owned by the current process; as explained in~\ref{sec:intro},
-  it is equal to $|{\cal I}_i| + |{\cal B}_i|$. The returned value is
-  specific to the calling process. 
-\end{description}
-
-
-\subroutine{psb\_cd\_get\_local\_cols}{Get number of local cols}
-
-\syntax{nc = psb\_cd\_get\_local\_cols}{desc}
-
-\begin{description}
-\item[\bf On Entry]
-\item[desc] the communication descriptor.\\
-Scope:{\bf local}.\\
-Type:{\bf required}.\\
-Specified as: a structured data of type \descdata.
-\end{description}
-
-\begin{description}
-\item[\bf On Return]
-\item[Function value] The number of local cols, i.e. the number of
-  indices used by the current process, including both local and halo
-  indices; as explained in~\ref{sec:intro}, 
-  it is equal to  $|{\cal I}_i| + |{\cal B}_i| +|{\cal H}_i|$. The
-  returned value is specific to the calling process. 
-\end{description}
-
-
-\subroutine{psb\_cd\_get\_global\_rows}{Get number of global rows}
-
-\syntax{nr = psb\_cd\_get\_global\_rows}{desc}
-
-\begin{description}
-\item[\bf On Entry]
-\item[desc] the communication descriptor.\\
-Scope:{\bf local}.\\
-Type:{\bf required}.\\
-Specified as: a structured data of type \descdata.
-\end{description}
-
-\begin{description}
-\item[\bf On Return]
-\item[Function value] The number of global rows in the mesh
-\end{description}
-
-
-\subroutine{psb\_cd\_get\_contex}{Get communication context}
-\syntax{ictxt = psb\_cd\_get\_context}{desc}
-
-\begin{description}
-\item[\bf On Entry]
-\item[desc] the communication descriptor.\\
-Scope:{\bf local}.\\
-Type:{\bf required}.\\
-Specified as: a structured data of type \descdata.
-\end{description}
-
-\begin{description}
-\item[\bf On Return]
-\item[Function value] The communication context.
-\end{description}
-
-
-
-\subroutine{psb\_sp\_get\_nrows}{Get number of  rows in a sparse matrix}
-
-\syntax{nr = psb\_sp\_get\_nrows}{a}
-
-\begin{description}
-\item[\bf On Entry]
-\item[a] the sparse matrix\\
-Scope:{\bf local}\\
-Type:{\bf required}\\
-Specified as: a structured data of type \spdata.
-\end{description}
-
-\begin{description}
-\item[\bf On Return]
-\item[Function value] The number of  rows  of sparse matrix \verb|a|.
-\end{description}
-
-
-\subroutine{psb\_sp\_get\_ncols}{Get number of  columns in a sparse matrix}
-
-\syntax{nr = psb\_sp\_get\_ncols}{a}
-
-\begin{description}
-\item[\bf On Entry]
-\item[a] the sparse matrix\\
-Scope:{\bf local}\\
-Type:{\bf required}\\
-Specified as: a structured data of type \spdata.
-\end{description}
-
-\begin{description}
-\item[\bf On Return]
-\item[Function value] The number of  columns  of sparse matrix \verb|a|.
-\end{description}
-
-
-\subroutine{psb\_sp\_get\_nnzeros}{Get number of nonzero elements in a sparse matrix}
-
-\syntax{nr = psb\_sp\_get\_nnzeros}{a}
-
-\begin{description}
-\item[\bf On Entry]
-\item[a] the sparse matrix\\
-Scope:{\bf local}\\
-Type:{\bf required}\\
-Specified as: a structured data of type \spdata.
-\end{description}
-
-\begin{description}
-\item[\bf On Return]
-\item[Function value] The number of nonzero elements stored in sparse matrix \verb|a|.
-\end{description}
-
-\section*{Notes}
-\begin{enumerate}
-\item The function value is specific to the storage format of matrix
-  \verb|a|; some storage formats employ padding, thus the returned
-  value for the same matrix may be different for different storage choices.
-\end{enumerate}
 
 
 %%% Local Variables: 
