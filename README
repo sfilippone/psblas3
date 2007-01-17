@@ -97,11 +97,6 @@ To compile and run our software you will need
 
 
 TODO:
--  As soon as TR 15581 and MOVE_ALLOC become available in GNU Fortran
-   we shall move from POINTERS to ALLOCATABLE for both vectors and
-   derived data types components. 
--  The GLOB_TO_LOC array should be changed for large test cases. 
-
 
 The PSBLAS team. 
 
