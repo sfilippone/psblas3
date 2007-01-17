@@ -18,8 +18,8 @@ INCDIRS=-I. -I$(LIBDIR)
 lib:  $(OBJS) 
 	$(AR) $(HERE)/$(LIBNAME) $(OBJS)
 	$(RANLIB) $(HERE)/$(LIBNAME)
-	/bin/cp $(HERE)/$(LIBNAME) $(LIBDIR)
-	/bin/cp $(LIBMOD) $(LIBDIR)
+	/bin/cp -p $(HERE)/$(LIBNAME) $(LIBDIR)
+	/bin/cp -p $(LIBMOD) $(LIBDIR)
 
 veryclean: clean
 	/bin/rm -f $(HERE)/$(LIBNAME)

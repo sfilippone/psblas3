@@ -11,8 +11,8 @@ lib:
 	(cd tools; make lib LIBNAME=$(BASELIBNAME))
 	(cd serial; make lib LIBNAME=$(BASELIBNAME))
 	(cd psblas; make lib LIBNAME=$(BASELIBNAME))
-	/bin/cp $(HERE)/$(LIBNAME) $(LIBDIR)
-	/bin/cp $(LIBMOD) $(LIBDIR)
+	/bin/cp -p $(HERE)/$(LIBNAME) $(LIBDIR)
+	/bin/cp -p $(LIBMOD) $(LIBDIR)
 
 clean: 
 	(cd modules; make clean)

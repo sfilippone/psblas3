@@ -33,7 +33,7 @@ psb_base_mod.o: $(MODULES) $(MPFOBJS)
 lib:  mpfobjs $(MODULES)  $(OBJS)
 	$(AR) $(LIBDIR)/$(LIBNAME) $(MODULES) $(OBJS) $(MPFOBJS)
 	$(RANLIB) $(LIBDIR)/$(LIBNAME)
-	/bin/cp $(LIBMOD) ./parts.fh $(LIBDIR)
+	/bin/cp -p $(LIBMOD) ./parts.fh $(LIBDIR)
 
 
 mpfobjs: 
