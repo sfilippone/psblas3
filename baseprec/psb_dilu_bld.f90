@@ -37,7 +37,7 @@ subroutine psb_dilu_bld(a,desc_a,p,upd,info)
   integer, intent(out)                      :: info
   !     .. array Arguments ..                                                     
   type(psb_dspmat_type), intent(in), target :: a
-  type(psb_dbaseprc_type), intent(inout)    :: p
+  type(psb_dprec_type), intent(inout)    :: p
   type(psb_desc_type), intent(in)           :: desc_a
   character, intent(in)                     :: upd
 
@@ -74,7 +74,7 @@ subroutine psb_dilu_bld(a,desc_a,p,upd,info)
       !     .. array Arguments ..                                                     
       type(psb_dspmat_type), intent(in)      :: a
       type(psb_dspmat_type), intent(inout)   :: atmp
-      type(psb_dbaseprc_type), intent(inout) :: p
+      type(psb_dprec_type), intent(inout) :: p
       type(psb_desc_type), intent(in)        :: desc_a
       integer, intent(out)   :: info
     end subroutine psb_dsp_renum
@@ -266,7 +266,6 @@ subroutine psb_dilu_bld(a,desc_a,p,upd,info)
 
 
   if (debug) write(0,*) me,'End of ilu_bld'
-
   call psb_erractionrestore(err_act)
   return
 

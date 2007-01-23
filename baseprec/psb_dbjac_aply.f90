@@ -41,7 +41,7 @@ subroutine psb_dbjac_aply(alpha,prec,x,beta,y,desc_data,trans,work,info)
   implicit none 
 
   type(psb_desc_type), intent(in)       :: desc_data
-  type(psb_dbaseprc_type), intent(in)   :: prec
+  type(psb_dprec_type), intent(in)   :: prec
   real(kind(0.d0)),intent(inout)        :: x(:), y(:)
   real(kind(0.d0)),intent(in)           :: alpha,beta
   character(len=1)                      :: trans
@@ -99,7 +99,7 @@ subroutine psb_dbjac_aply(alpha,prec,x,beta,y,desc_data,trans,work,info)
       goto 9999      
     end if
   endif
-
+    
 
   if (prec%iprcparm(jac_sweeps_) == 1) then 
 

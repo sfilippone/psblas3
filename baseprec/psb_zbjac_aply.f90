@@ -41,7 +41,7 @@ subroutine psb_zbjac_aply(alpha,prec,x,beta,y,desc_data,trans,work,info)
   implicit none 
 
   type(psb_desc_type), intent(in)       :: desc_data
-  type(psb_zbaseprc_type), intent(in)   :: prec
+  type(psb_zprec_type), intent(in)   :: prec
   complex(kind(0.d0)),intent(inout)     :: x(:), y(:)
   complex(kind(0.d0)),intent(in)        :: alpha,beta
   character(len=1)                      :: trans

@@ -54,7 +54,7 @@ subroutine psb_dprc_aply(prec,x,y,desc_data,info,trans, work)
        use psb_base_mod
        use psb_prec_type
        type(psb_desc_type),intent(in)      :: desc_data
-       type(psb_dbaseprc_type), intent(in) :: prec
+       type(psb_dprec_type), intent(in) :: prec
        real(kind(0.d0)),intent(inout)      :: x(:), y(:)
        real(kind(0.d0)),intent(in)         :: alpha,beta
        character(len=1)                    :: trans
@@ -86,15 +86,8 @@ subroutine psb_dprc_aply(prec,x,y,desc_data,info,trans, work)
     end if
 
   end if
-  if (.not.(allocated(prec%baseprecv))) then 
-    write(0,*) 'Inconsistent preconditioner: neither SMTH nor BASE?'      
-  end if
-  
-  if (size(prec%baseprecv) == 1) then 
-    call psb_baseprc_aply(done,prec%baseprecv(1),x,dzero,y,desc_data,trans_, work_,info)
-  else 
-    write(0,*) 'Inconsistent preconditioner: size of baseprecv???' 
-  endif
+
+  call psb_baseprc_aply(done,prec,x,dzero,y,desc_data,trans_,work_,info)
 
   if (present(work)) then 
   else

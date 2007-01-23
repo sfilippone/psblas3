@@ -48,13 +48,7 @@ subroutine psb_dprecfree(p,info)
   call psb_erractionsave(err_act)
 
   me=-1
-
-  if (allocated(p%baseprecv)) then 
-    do i=1,size(p%baseprecv) 
-      call psb_base_precfree(p%baseprecv(i),info)
-    end do
-    deallocate(p%baseprecv)
-  end if
+  call psb_base_precfree(p,info)
   call psb_erractionrestore(err_act)
   return
 

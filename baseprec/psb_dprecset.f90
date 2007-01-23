@@ -28,7 +28,7 @@
 !!$  POSSIBILITY OF SUCH DAMAGE.
 !!$ 
 !!$  
-subroutine psb_dprecset(p,ptype,info,iv,rs,rv,ilev,nlev)
+subroutine psb_dprecset(p,ptype,info,iv,rs,rv)
 
   use psb_base_mod
   use psb_prec_type
@@ -37,7 +37,6 @@ subroutine psb_dprecset(p,ptype,info,iv,rs,rv,ilev,nlev)
   character(len=*), intent(in)           :: ptype
   integer, intent(out)                   :: info
   integer, optional, intent(in)          :: iv(:)
-  integer, optional, intent(in)          :: nlev,ilev
   real(kind(1.d0)), optional, intent(in) :: rs
   real(kind(1.d0)), optional, intent(in) :: rv(:)
 
@@ -46,48 +45,34 @@ subroutine psb_dprecset(p,ptype,info,iv,rs,rv,ilev,nlev)
 
   info = 0
 
-  ilev_ = 1 
-  nlev_ = 1 
-  
-  if (.not.allocated(p%baseprecv)) then 
-    allocate(p%baseprecv(nlev_),stat=err)
-  else
-    nlev_ = size(p%baseprecv)
-  endif
 
-  if ((ilev_<1).or.(ilev_ > nlev_)) then 
-    write(0,*) 'PRECSET ERRROR: ilev out of bounds'
-    info = -1
-    return
-  endif
-
-  call psb_realloc(ifpsz,p%baseprecv(ilev_)%iprcparm,info)
-  if (info == 0) call psb_realloc(dfpsz,p%baseprecv(ilev_)%dprcparm,info)
+  call psb_realloc(ifpsz,p%iprcparm,info)
+  if (info == 0) call psb_realloc(dfpsz,p%dprcparm,info)
   if (info /= 0) return
-  p%baseprecv(ilev_)%iprcparm(:) = 0
+  p%iprcparm(:) = 0
 
   select case(toupper(ptype(1:len_trim(ptype))))
   case ('NONE','NOPREC') 
-    p%baseprecv(ilev_)%iprcparm(:)           = 0
-    p%baseprecv(ilev_)%iprcparm(p_type_)     = noprec_
-    p%baseprecv(ilev_)%iprcparm(f_type_)     = f_none_
-    p%baseprecv(ilev_)%iprcparm(iren_)       = 0
-    p%baseprecv(ilev_)%iprcparm(jac_sweeps_) = 1
+    p%iprcparm(:)           = 0
+    p%iprcparm(p_type_)     = noprec_
+    p%iprcparm(f_type_)     = f_none_
+    p%iprcparm(iren_)       = 0
+    p%iprcparm(jac_sweeps_) = 1
 
   case ('DIAG','DIAGSC')
-    p%baseprecv(ilev_)%iprcparm(:)           = 0
-    p%baseprecv(ilev_)%iprcparm(p_type_)     = diagsc_
-    p%baseprecv(ilev_)%iprcparm(f_type_)     = f_none_
-    p%baseprecv(ilev_)%iprcparm(iren_)       = 0 
-    p%baseprecv(ilev_)%iprcparm(jac_sweeps_) = 1
+    p%iprcparm(:)           = 0
+    p%iprcparm(p_type_)     = diagsc_
+    p%iprcparm(f_type_)     = f_none_
+    p%iprcparm(iren_)       = 0 
+    p%iprcparm(jac_sweeps_) = 1
 
   case ('BJA','ILU') 
-    p%baseprecv(ilev_)%iprcparm(:)            = 0
-    p%baseprecv(ilev_)%iprcparm(p_type_)      = bja_
-    p%baseprecv(ilev_)%iprcparm(f_type_)      = f_ilu_n_
-    p%baseprecv(ilev_)%iprcparm(iren_)        = 0
-    p%baseprecv(ilev_)%iprcparm(ilu_fill_in_) = 0
-    p%baseprecv(ilev_)%iprcparm(jac_sweeps_)  = 1
+    p%iprcparm(:)            = 0
+    p%iprcparm(p_type_)      = bja_
+    p%iprcparm(f_type_)      = f_ilu_n_
+    p%iprcparm(iren_)        = 0
+    p%iprcparm(ilu_fill_in_) = 0
+    p%iprcparm(jac_sweeps_)  = 1
 
   case default
     write(0,*) 'Unknown preconditioner type request "',ptype,'"'

@@ -36,7 +36,7 @@ subroutine psb_zdiagsc_bld(a,desc_a,p,upd,info)
 
   type(psb_zspmat_type), target           :: a
   type(psb_desc_type), intent(in)         :: desc_a
-  type(psb_zbaseprc_type),intent(inout)   :: p
+  type(psb_zprec_type),intent(inout)   :: p
   character, intent(in)                   :: upd
   integer, intent(out)                    :: info
 

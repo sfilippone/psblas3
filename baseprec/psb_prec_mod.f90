@@ -56,7 +56,7 @@ module psb_prec_mod
   end interface
 
   interface psb_precset
-    subroutine psb_dprecset(prec,ptype,info,iv,rs,rv,ilev,nlev)
+    subroutine psb_dprecset(prec,ptype,info,iv,rs,rv)
       use psb_base_mod
       use psb_prec_type
       implicit none
@@ -64,11 +64,10 @@ module psb_prec_mod
       character(len=*), intent(in)           :: ptype
       integer, intent(out)                   :: info
       integer, optional, intent(in)          :: iv(:)
-      integer, optional, intent(in)          :: nlev,ilev
       real(kind(1.d0)), optional, intent(in) :: rs
       real(kind(1.d0)), optional, intent(in) :: rv(:)
     end subroutine psb_dprecset
-    subroutine psb_zprecset(prec,ptype,info,iv,rs,rv,ilev,nlev)
+    subroutine psb_zprecset(prec,ptype,info,iv,rs,rv)
       use psb_base_mod
       use psb_prec_type
       implicit none
@@ -78,7 +77,6 @@ module psb_prec_mod
       integer, optional, intent(in)          :: iv(:)
       real(kind(1.d0)), optional, intent(in) :: rs
       real(kind(1.d0)), optional, intent(in) :: rv(:)
-      integer, optional, intent(in)          :: nlev,ilev
     end subroutine psb_zprecset
   end interface
 
@@ -137,27 +135,6 @@ module psb_prec_mod
       integer, intent(out)              :: info
       character(len=1), optional        :: trans
     end subroutine psb_zprc_aply1
-  end interface
-
-  interface psb_baseprc_bld
-    subroutine psb_dbaseprc_bld(a,desc_a,p,info,upd)
-      use psb_base_mod
-      use psb_prec_type
-      type(psb_dspmat_type), target              :: a
-      type(psb_desc_type), intent(in), target    :: desc_a
-      type(psb_dbaseprc_type),intent(inout)      :: p
-      integer, intent(out)                       :: info
-      character, intent(in), optional            :: upd
-    end subroutine psb_dbaseprc_bld
-    subroutine psb_zbaseprc_bld(a,desc_a,p,info,upd)
-      use psb_base_mod
-      use psb_prec_type
-      type(psb_zspmat_type), target              :: a
-      type(psb_desc_type), intent(in), target    :: desc_a
-      type(psb_zbaseprc_type),intent(inout)      :: p
-      integer, intent(out)                       :: info
-      character, intent(in), optional            :: upd
-    end subroutine psb_zbaseprc_bld
   end interface
 
 end module psb_prec_mod

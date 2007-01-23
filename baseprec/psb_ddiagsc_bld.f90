@@ -36,7 +36,7 @@ subroutine psb_ddiagsc_bld(a,desc_a,p,upd,info)
 
   type(psb_dspmat_type), target           :: a
   type(psb_desc_type), intent(in)         :: desc_a
-  type(psb_dbaseprc_type),intent(inout)   :: p
+  type(psb_dprec_type),intent(inout)   :: p
   character, intent(in)                   :: upd
   integer, intent(out)                    :: info
 

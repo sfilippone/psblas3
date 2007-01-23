@@ -36,7 +36,7 @@ subroutine psb_zsp_renum(a,desc_a,p,atmp,info)
   !     .. array Arguments ..                                                     
   type(psb_zspmat_type), intent(in)      :: a
   type(psb_zspmat_type), intent(inout)   :: atmp
-  type(psb_zbaseprc_type), intent(inout) :: p
+  type(psb_zprec_type), intent(inout) :: p
   type(psb_desc_type), intent(in)        :: desc_a
   integer, intent(out)   :: info
 

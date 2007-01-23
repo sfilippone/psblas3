@@ -32,7 +32,6 @@ subroutine psb_zprecbld(a,desc_a,p,info,upd)
 
   use psb_base_mod
   use psb_prec_type
-  use psb_prec_mod, only : psb_baseprc_bld
   Implicit None
 
   type(psb_zspmat_type), target              :: a
@@ -43,9 +42,39 @@ subroutine psb_zprecbld(a,desc_a,p,info,upd)
 
 
   ! Local scalars
-  Integer      :: err,i,j,k,ictxt, me,np,lw, err_act
+
+  interface psb_diagsc_bld
+    subroutine psb_zdiagsc_bld(a,desc_data,p,upd,info)
+      use psb_base_mod
+      use psb_prec_type
+      integer, intent(out) :: info
+      type(psb_zspmat_type), intent(in), target :: a
+      type(psb_desc_type),intent(in)            :: desc_data
+      type(psb_zprec_type), intent(inout)    :: p
+      character, intent(in)                     :: upd
+    end subroutine psb_zdiagsc_bld
+  end interface
+
+  interface psb_ilu_bld
+    subroutine psb_zilu_bld(a,desc_data,p,upd,info)
+      use psb_base_mod
+      use psb_prec_type
+      integer, intent(out) :: info
+      type(psb_zspmat_type), intent(in), target :: a
+      type(psb_desc_type),intent(in)            :: desc_data
+      type(psb_zprec_type), intent(inout)    :: p
+      character, intent(in)                     :: upd
+    end subroutine psb_zilu_bld
+  end interface
+
+  ! Local scalars
+  Integer      :: err, nnzero, n_row, n_col,I,j,k,ictxt,&
+       & me,mycol,np,npcol,mglob,lw, mtype, nrg, nzg, err_act
+  real(kind(1.d0))         :: temp, real_err(5)
+  real(kind(1.d0)),pointer :: gd(:), work(:)
   integer      :: int_err(5)
   character    :: iupd
+
 
   logical, parameter :: debug=.false.   
   integer,parameter  :: iroot=0,iout=60,ilout=40
@@ -75,35 +104,100 @@ subroutine psb_zprecbld(a,desc_a,p,info,upd)
   else
     iupd='F'
   endif
-
-  if (.not.allocated(p%baseprecv)) then 
-    !! Error 1: should call precset
-      info=4010
-      ch_err='unallocated bpv'
-      call psb_errpush(info,name,a_err=ch_err)
-      goto 9999
-  end if
+  n_row   = psb_cd_get_local_rows(desc_a)
+  n_col   = psb_cd_get_local_cols(desc_a)
+  mglob   = psb_cd_get_global_rows(desc_a)
   !
   ! Should add check to ensure all procs have the same... 
   !
   ! ALso should define symbolic names for the preconditioners. 
   !
-  call init_baseprc_av(p%baseprecv(1),info)
-  if (info /= 0) then 
+
+  call psb_check_def(p%iprcparm(p_type_),'base_prec',&
+       &  diagsc_,is_legal_base_prec)
+
+  call psb_nullify_desc(p%desc_data)
+
+  select case(p%iprcparm(p_type_)) 
+  case (noprec_)
+    ! Do nothing. 
+    call psb_cdcpy(desc_a,p%desc_data,info)
+    if(info /= 0) then
+      info=4010
+      ch_err='psb_cdcpy'
+      call psb_errpush(info,name,a_err=ch_err)
+      goto 9999
+    end if
+
+  case (diagsc_)
+
+    call psb_diagsc_bld(a,desc_a,p,iupd,info)
+    if(debug) write(0,*)me,': out of psb_diagsc_bld'
+    if(info /= 0) then
+      info=4010
+      ch_err='psb_diagsc_bld'
+      call psb_errpush(info,name,a_err=ch_err)
+      goto 9999
+    end if
+
+  case (bja_)
+
+    call psb_check_def(p%iprcparm(iren_),'renumbering',&
+         &  renum_none_,is_legal_renum)
+    call psb_check_def(p%iprcparm(f_type_),'fact',&
+         &  f_ilu_n_,is_legal_ml_fact)
+
+    if (debug) write(0,*)me, ': Calling PSB_ILU_BLD'
+    if (debug) call psb_barrier(ictxt)
+    call psb_cdcpy(desc_a,p%desc_data,info)
+    if(info /= 0) then
+      info=4010
+      ch_err='psb_cdcpy'
+      call psb_errpush(info,name,a_err=ch_err)
+      goto 9999
+    end if
+    allocate(p%av(max_avsz),stat=info)
+    if(info /= 0) then
+      info=4000
+      call psb_errpush(info,name)
+      goto 9999
+    end if
+    
+    select case(p%iprcparm(f_type_))
+
+    case(f_ilu_n_,f_ilu_e_) 
+      call psb_ilu_bld(a,desc_a,p,iupd,info)
+      if(debug) write(0,*)me,': out of psb_ilu_bld'
+      if (debug) call psb_barrier(ictxt)
+      if(info /= 0) then
+        info=4010
+        ch_err='psb_ilu_bld'
+        call psb_errpush(info,name,a_err=ch_err)
+        goto 9999
+      end if
+
+    case(f_none_) 
+      write(0,*) 'Fact=None in BASEPRC_BLD Bja/ASM??'
+      info=4010
+      ch_err='Inconsistent prec  f_none_'
+      call psb_errpush(info,name,a_err=ch_err)
+      goto 9999
+
+    case default
+      write(0,*) 'Unknown factor type in baseprc_bld bja/asm: ',&
+           &p%iprcparm(f_type_)
+      info=4010
+      ch_err='Unknown f_type_'
+      call psb_errpush(info,name,a_err=ch_err)
+      goto 9999
+    end select
+  case default
     info=4010
-    ch_err='allocate'
+    ch_err='Unknown p_type_'
     call psb_errpush(info,name,a_err=ch_err)
     goto 9999
-  endif
-  
-  call psb_baseprc_bld(a,desc_a,p%baseprecv(1),info,iupd)
-  if (info /= 0) then 
-    info=4010
-    ch_err='baseprc_bld'
-    call psb_errpush(info,name,a_err=ch_err)
-    goto 9999
-  endif
-  
+
+  end select
 
   call psb_erractionrestore(err_act)
   return
@@ -116,20 +210,6 @@ subroutine psb_zprecbld(a,desc_a,p,info,upd)
   end if
   return
 
-contains
-
-  subroutine init_baseprc_av(p,info)
-    type(psb_zbaseprc_type), intent(inout) :: p
-    integer                                :: info
-    if (allocated(p%av)) then 
-      ! Have not decided what to do yet
-    end if
-    allocate(p%av(max_avsz),stat=info)
-!!$    if (info /= 0) return
-    do k=1,size(p%av)
-      call psb_nullify_sp(p%av(k))
-    end do
-  end subroutine init_baseprc_av
 
 end subroutine psb_zprecbld
 

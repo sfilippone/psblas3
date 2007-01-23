@@ -60,38 +60,23 @@ module psb_prec_type
   integer, parameter :: smth_avsz=6, max_avsz=smth_avsz 
 
 
-  type psb_dbaseprc_type
-
+  type psb_dprec_type
     type(psb_dspmat_type), allocatable :: av(:) 
     real(kind(1.d0)), allocatable      :: d(:)  
     type(psb_desc_type)                :: desc_data 
     integer, allocatable               :: iprcparm(:) 
     real(kind(1.d0)), allocatable      :: dprcparm(:) 
     integer, allocatable               :: perm(:),  invperm(:) 
-
-  end type psb_dbaseprc_type
-
-
-  type psb_dprec_type
-    type(psb_dbaseprc_type), allocatable  :: baseprecv(:) 
-    ! contain type of preconditioning to be performed
     integer                       :: prec, base_prec
   end type psb_dprec_type
 
-  type psb_zbaseprc_type
-
+  type psb_zprec_type
     type(psb_zspmat_type), allocatable :: av(:) 
     complex(kind(1.d0)), allocatable   :: d(:)  
     type(psb_desc_type)                :: desc_data 
     integer, allocatable               :: iprcparm(:) 
     real(kind(1.d0)), allocatable      :: dprcparm(:) 
     integer, allocatable               :: perm(:),  invperm(:) 
-
-  end type psb_zbaseprc_type
-
-  type psb_zprec_type
-    type(psb_zbaseprc_type), allocatable  :: baseprecv(:) 
-    ! contain type of preconditioning to be performed
     integer                       :: prec, base_prec
   end type psb_zprec_type
 
@@ -117,10 +102,6 @@ module psb_prec_type
          &  psb_zout_prec_descr, psb_zfile_prec_descr
   end interface
 
-  interface psb_prec_short_descr
-    module procedure psb_prec_short_descr, psb_zprec_short_descr
-  end interface
-
 contains
 
   subroutine psb_out_prec_descr(p)
@@ -137,190 +118,37 @@ contains
     integer, intent(in)              :: iout
     type(psb_dprec_type), intent(in) :: p
     integer  :: ilev
-
+    
     write(iout,*) 'Preconditioner description'
-    if (allocated(p%baseprecv)) then 
-      if (size(p%baseprecv)>=1) then 
-        write(iout,*) 'Base preconditioner'
-        select case(p%baseprecv(1)%iprcparm(p_type_))
-        case(noprec_)
-          write(iout,*) 'No preconditioning'
-        case(diagsc_)
-          write(iout,*) 'Diagonal scaling'
-        case(bja_)
-          write(iout,*) 'Block Jacobi with: ',&
-               &  fact_names(p%baseprecv(1)%iprcparm(f_type_))
-        end select
-      end if
-
-    else
-      write(iout,*) 'No Base preconditioner available, something is wrong!'
-      return
-    endif
-
+    write(iout,*) 'Base preconditioner'
+    select case(p%iprcparm(p_type_))
+    case(noprec_)
+      write(iout,*) 'No preconditioning'
+    case(diagsc_)
+      write(iout,*) 'Diagonal scaling'
+    case(bja_)
+      write(iout,*) 'Block Jacobi with: ',&
+           &  fact_names(p%iprcparm(f_type_))
+    end select
+    
   end subroutine psb_file_prec_descr
-
-  function  psb_prec_short_descr(p)
-    type(psb_dprec_type), intent(in) :: p
-    character(len=20) :: psb_prec_short_descr
-    psb_prec_short_descr = ' '
-!!$    write(iout,*) 'Preconditioner description'
-!!$    if (associated(p%baseprecv)) then 
-!!$      if (size(p%baseprecv)>=1) then 
-!!$        write(iout,*) 'Base preconditioner'
-!!$        select case(p%baseprecv(1)%iprcparm(p_type_))
-!!$        case(noprec_)
-!!$          write(iout,*) 'No preconditioning'
-!!$        case(diagsc_)
-!!$          write(iout,*) 'Diagonal scaling'
-!!$        case(bja_)
-!!$          write(iout,*) 'Block Jacobi with: ',&
-!!$               &  fact_names(p%baseprecv(1)%iprcparm(f_type_))
-!!$        case(asm_,ras_,ash_,rash_)
-!!$          write(iout,*) 'Additive Schwarz with: ',&
-!!$               &  fact_names(p%baseprecv(1)%iprcparm(f_type_))
-!!$          write(iout,*) 'Overlap:',&
-!!$               &  p%baseprecv(1)%iprcparm(n_ovr_)
-!!$          write(iout,*) 'Restriction: ',&
-!!$               &  restrict_names(p%baseprecv(1)%iprcparm(restr_))
-!!$          write(iout,*) 'Prolongation: ',&
-!!$               &  prolong_names(p%baseprecv(1)%iprcparm(prol_))
-!!$        end select
-!!$      end if
-!!$      if (size(p%baseprecv)>=2) then 
-!!$        if (.not.associated(p%baseprecv(2)%iprcparm)) then 
-!!$          write(iout,*) 'Inconsistent MLPREC part!'
-!!$          return
-!!$        endif
-!!$        write(iout,*) 'Multilevel: ',ml_names(p%baseprecv(2)%iprcparm(ml_type_))
-!!$        if (p%baseprecv(2)%iprcparm(ml_type_)>no_ml_) then 
-!!$          write(iout,*) 'Multilevel aggregation: ', &
-!!$               &   aggr_names(p%baseprecv(2)%iprcparm(aggr_alg_))
-!!$          write(iout,*) 'Smoother:               ', &
-!!$               &  smooth_kinds(p%baseprecv(2)%iprcparm(smth_kind_))
-!!$          write(iout,*) 'Smoothing omega: ', p%baseprecv(2)%dprcparm(smooth_omega_)
-!!$          write(iout,*) 'Smoothing position: ',&
-!!$               & smooth_names(p%baseprecv(2)%iprcparm(smth_pos_))
-!!$          write(iout,*) 'Coarse matrix: ',&
-!!$               & matrix_names(p%baseprecv(2)%iprcparm(coarse_mat_))
-!!$          write(iout,*) 'Factorization type: ',&
-!!$               & fact_names(p%baseprecv(2)%iprcparm(f_type_))
-!!$          select case(p%baseprecv(2)%iprcparm(f_type_))
-!!$          case(f_ilu_n_)      
-!!$            write(iout,*) 'Fill level :',p%baseprecv(2)%iprcparm(ilu_fill_in_)
-!!$          case(f_ilu_e_)         
-!!$            write(iout,*) 'Fill threshold :',p%baseprecv(2)%dprcparm(fact_eps_)
-!!$          case(f_slu_,f_umf_)         
-!!$          case default
-!!$            write(iout,*) 'Should never get here!'
-!!$          end select
-!!$          write(iout,*) 'Number of Jacobi sweeps: ', &
-!!$               &   (p%baseprecv(2)%iprcparm(jac_sweeps_))
-!!$
-!!$        end if
-!!$      end if
-!!$
-!!$    else
-!!$      write(iout,*) 'No Base preconditioner available, something is wrong!'
-!!$      return
-!!$    endif
-
-  end function psb_prec_short_descr
-
 
   subroutine psb_zfile_prec_descr(iout,p)
     integer, intent(in)              :: iout
     type(psb_zprec_type), intent(in) :: p
 
     write(iout,*) 'Preconditioner description'
-    if (allocated(p%baseprecv)) then 
-      if (size(p%baseprecv)>=1) then 
-        write(iout,*) 'Base preconditioner'
-        select case(p%baseprecv(1)%iprcparm(p_type_))
-        case(noprec_)
-          write(iout,*) 'No preconditioning'
-        case(diagsc_)
-          write(iout,*) 'Diagonal scaling'
-        case(bja_)
-          write(iout,*) 'Block Jacobi with: ',&
-               &  fact_names(p%baseprecv(1)%iprcparm(f_type_))
-        end select
-      end if
-    else
-      write(iout,*) 'No Base preconditioner available, something is wrong!'
-      return
-    endif
-
+    write(iout,*) 'Base preconditioner'
+    select case(p%iprcparm(p_type_))
+    case(noprec_)
+      write(iout,*) 'No preconditioning'
+    case(diagsc_)
+      write(iout,*) 'Diagonal scaling'
+    case(bja_)
+      write(iout,*) 'Block Jacobi with: ',&
+           &  fact_names(p%iprcparm(f_type_))
+    end select
   end subroutine psb_zfile_prec_descr
-
-  function  psb_zprec_short_descr(p)
-    type(psb_zprec_type), intent(in) :: p
-    character(len=20) :: psb_zprec_short_descr
-    psb_zprec_short_descr = ' '
-!!$    write(iout,*) 'Preconditioner description'
-!!$    if (associated(p%baseprecv)) then 
-!!$      if (size(p%baseprecv)>=1) then 
-!!$        write(iout,*) 'Base preconditioner'
-!!$        select case(p%baseprecv(1)%iprcparm(p_type_))
-!!$        case(noprec_)
-!!$          write(iout,*) 'No preconditioning'
-!!$        case(diagsc_)
-!!$          write(iout,*) 'Diagonal scaling'
-!!$        case(bja_)
-!!$          write(iout,*) 'Block Jacobi with: ',&
-!!$               &  fact_names(p%baseprecv(1)%iprcparm(f_type_))
-!!$        case(asm_,ras_,ash_,rash_)
-!!$          write(iout,*) 'Additive Schwarz with: ',&
-!!$               &  fact_names(p%baseprecv(1)%iprcparm(f_type_))
-!!$          write(iout,*) 'Overlap:',&
-!!$               &  p%baseprecv(1)%iprcparm(n_ovr_)
-!!$          write(iout,*) 'Restriction: ',&
-!!$               &  restrict_names(p%baseprecv(1)%iprcparm(restr_))
-!!$          write(iout,*) 'Prolongation: ',&
-!!$               &  prolong_names(p%baseprecv(1)%iprcparm(prol_))
-!!$        end select
-!!$      end if
-!!$      if (size(p%baseprecv)>=2) then 
-!!$        if (.not.associated(p%baseprecv(2)%iprcparm)) then 
-!!$          write(iout,*) 'Inconsistent MLPREC part!'
-!!$          return
-!!$        endif
-!!$        write(iout,*) 'Multilevel: ',ml_names(p%baseprecv(2)%iprcparm(ml_type_))
-!!$        if (p%baseprecv(2)%iprcparm(ml_type_)>no_ml_) then 
-!!$          write(iout,*) 'Multilevel aggregation: ', &
-!!$               &   aggr_names(p%baseprecv(2)%iprcparm(aggr_alg_))
-!!$          write(iout,*) 'Smoother:               ', &
-!!$               &  smooth_kinds(p%baseprecv(2)%iprcparm(smth_kind_))
-!!$          write(iout,*) 'Smoothing omega: ', p%baseprecv(2)%dprcparm(smooth_omega_)
-!!$          write(iout,*) 'Smoothing position: ',&
-!!$               & smooth_names(p%baseprecv(2)%iprcparm(smth_pos_))
-!!$          write(iout,*) 'Coarse matrix: ',&
-!!$               & matrix_names(p%baseprecv(2)%iprcparm(coarse_mat_))
-!!$          write(iout,*) 'Factorization type: ',&
-!!$               & fact_names(p%baseprecv(2)%iprcparm(f_type_))
-!!$          select case(p%baseprecv(2)%iprcparm(f_type_))
-!!$          case(f_ilu_n_)      
-!!$            write(iout,*) 'Fill level :',p%baseprecv(2)%iprcparm(ilu_fill_in_)
-!!$          case(f_ilu_e_)         
-!!$            write(iout,*) 'Fill threshold :',p%baseprecv(2)%dprcparm(fact_eps_)
-!!$          case(f_slu_,f_umf_)         
-!!$          case default
-!!$            write(iout,*) 'Should never get here!'
-!!$          end select
-!!$          write(iout,*) 'Number of Jacobi sweeps: ', &
-!!$               &   (p%baseprecv(2)%iprcparm(jac_sweeps_))
-!!$
-!!$        end if
-!!$      end if
-!!$
-!!$    else
-!!$      write(iout,*) 'No Base preconditioner available, something is wrong!'
-!!$      return
-!!$    endif
-
-  end function psb_zprec_short_descr
-
-
 
 
   function is_legal_base_prec(ip)
@@ -394,7 +222,7 @@ contains
   end subroutine psb_dcheck_def
 
   subroutine psb_dbase_precfree(p,info)
-    type(psb_dbaseprc_type), intent(inout) :: p
+    type(psb_dprec_type), intent(inout) :: p
     integer, intent(out)                :: info
     integer :: i
 
@@ -441,7 +269,7 @@ contains
   end subroutine psb_dbase_precfree
 
   subroutine psb_nullify_dbaseprec(p)
-    type(psb_dbaseprc_type), intent(inout) :: p
+    type(psb_dprec_type), intent(inout) :: p
 
 !!$    nullify(p%av,p%d,p%iprcparm,p%dprcparm,p%perm,p%invperm,p%mlia,&
 !!$         & p%nlaggr,p%base_a,p%base_desc,p%dorig,p%desc_data, p%desc_ac)
@@ -449,7 +277,7 @@ contains
   end subroutine psb_nullify_dbaseprec
 
   subroutine psb_zbase_precfree(p,info)
-    type(psb_zbaseprc_type), intent(inout) :: p
+    type(psb_zprec_type), intent(inout) :: p
     integer, intent(out)                :: info
     integer :: i
 
@@ -493,8 +321,7 @@ contains
   end subroutine psb_zbase_precfree
 
   subroutine psb_nullify_zbaseprec(p)
-    type(psb_zbaseprc_type), intent(inout) :: p
-
+    type(psb_zprec_type), intent(inout) :: p
 
 
   end subroutine psb_nullify_zbaseprec

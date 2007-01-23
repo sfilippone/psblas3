@@ -37,7 +37,7 @@ subroutine psb_zilu_bld(a,desc_a,p,upd,info)
   integer, intent(out)                      :: info
   !     .. array Arguments ..                                                     
   type(psb_zspmat_type), intent(in), target :: a
-  type(psb_zbaseprc_type), intent(inout)    :: p
+  type(psb_zprec_type), intent(inout)    :: p
   type(psb_desc_type), intent(in)           :: desc_a
   character, intent(in)                     :: upd
 
@@ -74,7 +74,7 @@ subroutine psb_zilu_bld(a,desc_a,p,upd,info)
       !     .. array Arguments ..                                                     
       type(psb_zspmat_type), intent(in)      :: a
       type(psb_zspmat_type), intent(inout)   :: atmp
-      type(psb_zbaseprc_type), intent(inout) :: p
+      type(psb_zprec_type), intent(inout) :: p
       type(psb_desc_type), intent(in)        :: desc_a
       integer, intent(out)   :: info
     end subroutine psb_zsp_renum
