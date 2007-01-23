@@ -32,6 +32,7 @@ C     ... Compute infinity norma for sparse matrix in CSR Format ...
       DOUBLE PRECISION FUNCTION DJADNR(TRANS,M,N,NG,A,KA,JA,IA,
      +  INFOA,IERROR)
       use psb_const_mod
+      use psb_spmat_type
       IMPLICIT NONE
 C     .. Scalar Arguments ..
       INTEGER           M,N, IERROR, NG

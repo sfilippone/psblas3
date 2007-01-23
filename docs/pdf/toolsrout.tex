@@ -65,12 +65,33 @@ An integer value; 0 means no error has been detected.
   \verb|vl| must be specified, thereby choosing the initialization
   strategy as follows:
 \begin{description}
-\item[parts] In this case we have a subroutine that takes as input a
-  index and the total number of indices in the space, and produces in
-  output a  vector containing the set of processes (usually with just
-  one entry) to which the index should be assigned. If this argument
-  is specified, then it is mandatory to also specify the argument
-  \verb|mg|. 
+\item[parts] In this case we have a subroutine specifying the mapping
+  between global indices and process/local index pairs. If this
+  optional argument   is specified, then it is mandatory to 
+  specify the argument \verb|mg| as well.  
+  The subroutine must conform to the following interface: 
+\begin{verbatim}
+  interface 
+     subroutine psb_parts(glob_index,nrow,np,pv,nv)
+       integer, intent (in)  :: glob_index,np,nrow
+       integer, intent (out) :: nv, pv(*)
+     end subroutine psb_parts
+  end interface
+\end{verbatim}
+  The input arguments are:
+  \begin{description}
+    \item[glob\_index] The global index to be mapped;
+    \item[np] The number of processes in the mapping;
+    \item[nrow] The total number of global rows in the mapping;
+  \end{description}
+  The output arguments are:
+  \begin{description}
+    \item[nv] The number of entries in \verb|pv|;
+    \item[pv] A vector containint the indices of the processes to
+    which the global index should be assigend; each entry must satisfy
+    $0\le pv(i) < np$; if $nv>1$ we have an index assigned to multiple
+    processes, i.e. we have an overlap among the subdomains.
+  \end{description}
 \item[vg] In this case the association between an index and a process
   is specified via an integer vector; the size of the index space is
   equal to the size of \verb|vg|, and each index $i$ is assigned to
@@ -81,7 +102,7 @@ An integer value; 0 means no error has been detected.
   to the current process; thus, the global problem size $mg$ is given by
   the sum of the sizes of the individual vectors \verb|vl| specified
   on the calling processes. The subroutine will check that each entry
-  in the global index space $(1\dots mg)$ is specified exactly once.
+  in the global index space $(1\dots mg)$ is specified exactly once. 
 \end{description}
 \item On exit from this routine the descriptor is in the build state
 \end{enumerate}
@@ -214,6 +235,52 @@ Specified as: a structured data of type \descdata.
 
 \begin{description}
 \item[\bf On Return]
+\item[info] Error code.\\
+Scope: {\bf local} \\
+Type: {\bf required} \\
+An integer value; 0 means no error has been detected. 
+\end{description}
+
+
+
+%
+%%   psb_cdcpy %%
+%
+\subroutine{psb\_cdbldext}{Build an extended  communication descriptor}
+
+\syntax{call psb\_cdbldext}{a,desc\_a,nl,desc\_out, info, extype}
+
+This subroutine builds an extended communication descriptor, based on
+the input descriptor \verb|desc_a| and on the stencil specified
+through the input sparse matrix \verb|a|. 
+\begin{description}
+\item[\bf On Entry]
+\item[a] A sparse matrix
+Scope:{\bf local}.\\
+Type:{\bf required}.\\
+Specified as: a structured data type.
+\item[desc\_a] the communication descriptor.\\
+Scope:{\bf local}.\\
+Type:{\bf required}.\\
+Specified as: a structured data of type \spdata.
+\item[nl] the number of layers desired.\\
+Scope:{\bf global}.\\
+Type:{\bf required}.\\
+Specified as: an integer value $nl\ge 0$. 
+\item[extype] the kiond of estension required.\\
+Scope:{\bf global}.\\
+Type:{\bf optional }.\\
+Specified as: an integer value
+\verb|psb_ovt_xhal_|, \verb|psb_ovt_asov_|, default: \verb|psb_ovt_xhal_|
+
+\end{description}
+
+\begin{description}
+\item[\bf On Return]
+\item[desc\_out] the extended communication descriptor.\\
+Scope:{\bf local}.\\
+Type:{\bf required}.\\
+Specified as: a structured data of type \descdata.
 \item[info] Error code.\\
 Scope: {\bf local} \\
 Type: {\bf required} \\
@@ -890,6 +957,8 @@ Scope: {\bf local} \\
 Type: {\bf required} \\
 An integer value; 0 means no error has been detected. 
 \end{description}
+
+
 
 
 %

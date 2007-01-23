@@ -148,7 +148,7 @@ subroutine  psb_daxpby(alpha, x, beta,y,desc_a,info, n, jx, jy)
 9999 continue
   call psb_erractionrestore(err_act)
 
-  if (err_act.eq.act_abort) then
+  if (err_act.eq.psb_act_abort_) then
     call psb_error(ictxt)
     return
   end if
@@ -275,7 +275,7 @@ subroutine  psb_daxpbyv(alpha, x, beta,y,desc_a,info)
 9999 continue
   call psb_erractionrestore(err_act)
 
-  if (err_act.eq.act_abort) then
+  if (err_act.eq.psb_act_abort_) then
     call psb_error(ictxt)
     return
   end if

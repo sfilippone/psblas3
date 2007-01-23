@@ -79,6 +79,7 @@ subroutine psb_cdcpy(desc_in, desc_out, info)
 
   call psb_safe_cpy(desc_in%matrix_data,desc_out%matrix_data,info)
   if (info == 0)   call psb_safe_cpy(desc_in%halo_index,desc_out%halo_index,info)
+  if (info == 0)   call psb_safe_cpy(desc_in%ext_index,desc_out%ext_index,info)
   if (info == 0)   call psb_safe_cpy(desc_in%ovrlap_index,desc_out%ovrlap_index,info)
   if (info == 0)   call psb_safe_cpy(desc_in%bnd_elem,desc_out%bnd_elem,info)
   if (info == 0)   call psb_safe_cpy(desc_in%ovrlap_elem,desc_out%ovrlap_elem,info)
@@ -123,7 +124,7 @@ subroutine psb_cdcpy(desc_in, desc_out, info)
 9999 continue
   call psb_erractionrestore(err_act)
   
-  if (err_act == act_ret) then
+  if (err_act == psb_act_ret_) then
      return
   else
      call psb_error(ictxt)

@@ -48,7 +48,7 @@ subroutine psi_dswapdatam(flag,n,beta,y,desc_a,work,info,data)
   integer  :: ictxt, np, me, point_to_proc, nesd, nerv,&
        & proc_to_comm, p2ptag, icomm, p2pstat(mpi_status_size),&
        & idxs, idxr, iret, err_act, totxch, ixrec, i, idx_pt,&
-       & snd_pt, rcv_pt, pnti
+       & snd_pt, rcv_pt, pnti, data_
   integer  :: krecvid, ksendid
   integer, allocatable, dimension(:) :: bsdidx, brvidx,&
        & sdsz, rvsz, prcid, rvhd, sdhd
@@ -90,29 +90,33 @@ subroutine psi_dswapdatam(flag,n,beta,y,desc_a,work,info,data)
   do_recv = swap_mpi .or. swap_sync .or. swap_recv
 
   if(present(data)) then
-    if(data == psb_comm_halo_) then
-      d_idx => desc_a%halo_index
-      totxch = desc_a%matrix_data(psb_thal_xch_)
-      idxr   = desc_a%matrix_data(psb_thal_rcv_)
-      idxs   = desc_a%matrix_data(psb_thal_snd_)
-
-    else if(data == psb_comm_ovr_) then
-      d_idx => desc_a%ovrlap_index
-      totxch = desc_a%matrix_data(psb_tovr_xch_)
-      idxr   = desc_a%matrix_data(psb_tovr_rcv_)
-      idxs   = desc_a%matrix_data(psb_tovr_snd_)
-    else
-      d_idx => desc_a%halo_index
-      totxch = desc_a%matrix_data(psb_thal_xch_)
-      idxr   = desc_a%matrix_data(psb_thal_rcv_)
-      idxs   = desc_a%matrix_data(psb_thal_snd_)
-    end if
+    data_ = data
   else
+    data_ = psb_comm_halo_
+  end if
+
+  select case(data_) 
+  case(psb_comm_halo_) 
     d_idx => desc_a%halo_index
     totxch = desc_a%matrix_data(psb_thal_xch_)
     idxr   = desc_a%matrix_data(psb_thal_rcv_)
     idxs   = desc_a%matrix_data(psb_thal_snd_)
-  end if
+
+  case(psb_comm_ovr_) 
+    d_idx => desc_a%ovrlap_index
+    totxch = desc_a%matrix_data(psb_tovr_xch_)
+    idxr   = desc_a%matrix_data(psb_tovr_rcv_)
+    idxs   = desc_a%matrix_data(psb_tovr_snd_)
+
+  case(psb_comm_ext_) 
+    d_idx => desc_a%ext_index
+    totxch = desc_a%matrix_data(psb_text_xch_)
+    idxr   = desc_a%matrix_data(psb_text_rcv_)
+    idxs   = desc_a%matrix_data(psb_text_snd_)
+  case default
+    call psb_errpush(4010,name,a_err='wrong Data selector')
+    goto 9999
+  end select
   idxr = idxr * n
   idxs = idxs * n
 
@@ -146,7 +150,7 @@ subroutine psi_dswapdatam(flag,n,beta,y,desc_a,work,info,data)
 
       bsdidx(proc_to_comm) = snd_pt
       sdsz(proc_to_comm)   = n*nesd
-      
+
       rcv_pt = rcv_pt + n*nerv
       snd_pt = snd_pt + n*nesd
       pnti   = pnti + nerv + nesd + 3
@@ -218,7 +222,7 @@ subroutine psi_dswapdatam(flag,n,beta,y,desc_a,work,info,data)
       proc_to_comm = d_idx(pnti+psb_proc_id_)
       nerv = d_idx(pnti+psb_n_elem_recv_)
       nesd = d_idx(pnti+nerv+psb_n_elem_send_)
-      
+
       if (proc_to_comm  <  me) then
         call psb_snd(ictxt,sndbuf(snd_pt:snd_pt+n*nesd-1), proc_to_comm)
         call psb_rcv(ictxt,rcvbuf(rcv_pt:rcv_pt+n*nerv-1), proc_to_comm)
@@ -226,7 +230,7 @@ subroutine psi_dswapdatam(flag,n,beta,y,desc_a,work,info,data)
         call psb_rcv(ictxt,rcvbuf(rcv_pt:rcv_pt+n*nerv-1), proc_to_comm)
         call psb_snd(ictxt,sndbuf(snd_pt:snd_pt+n*nesd-1), proc_to_comm)
       end if
-      
+
       rcv_pt = rcv_pt + n*nerv
       snd_pt = snd_pt + n*nesd
       pnti   = pnti + nerv + nesd + 3
@@ -237,7 +241,7 @@ subroutine psi_dswapdatam(flag,n,beta,y,desc_a,work,info,data)
   else if (swap_send .and. swap_recv) then
 
     ! First I post all the non blocking receives
-    
+
     pnti   = 1
     snd_pt = 1
     rcv_pt = 1
@@ -251,7 +255,7 @@ subroutine psi_dswapdatam(flag,n,beta,y,desc_a,work,info,data)
       call mpi_irecv(rcvbuf(rcv_pt),n*nerv,&
            & mpi_double_precision,prcid(i),&
            & p2ptag, icomm,rvhd(i),iret)
-      
+
       rcv_pt = rcv_pt + n*nerv
       snd_pt = snd_pt + n*nesd
       pnti   = pnti + nerv + nesd + 3
@@ -288,7 +292,7 @@ subroutine psi_dswapdatam(flag,n,beta,y,desc_a,work,info,data)
         call psb_errpush(info,name,i_err=int_err)
         goto 9999
       end if
-      
+
       rcv_pt = rcv_pt + n*nerv
       snd_pt = snd_pt + n*nesd
       pnti   = pnti + nerv + nesd + 3
@@ -304,7 +308,7 @@ subroutine psi_dswapdatam(flag,n,beta,y,desc_a,work,info,data)
       nesd = d_idx(pnti+nerv+psb_n_elem_send_)
 
       p2ptag = krecvid(ictxt,proc_to_comm,me)
-      
+
       if (proc_to_comm /= me) then
         call mpi_wait(rvhd(i),p2pstat,iret)
         if(iret /= mpi_success) then
@@ -316,7 +320,7 @@ subroutine psi_dswapdatam(flag,n,beta,y,desc_a,work,info,data)
       end if
       pnti   = pnti + nerv + nesd + 3
     end do
-    
+
 
   else if (swap_send) then
 
@@ -329,7 +333,7 @@ subroutine psi_dswapdatam(flag,n,beta,y,desc_a,work,info,data)
       nerv = d_idx(pnti+psb_n_elem_recv_)
       nesd = d_idx(pnti+nerv+psb_n_elem_send_)
       call psb_snd(ictxt,sndbuf(snd_pt:snd_pt+n*nesd-1), proc_to_comm)
-      
+
       rcv_pt = rcv_pt + n*nerv
       snd_pt = snd_pt + n*nesd
       pnti   = pnti + nerv + nesd + 3
@@ -398,7 +402,7 @@ subroutine psi_dswapdatam(flag,n,beta,y,desc_a,work,info,data)
 
 9999 continue
   call psb_erractionrestore(err_act)
-  if (err_act == act_abort) then
+  if (err_act == psb_act_abort_) then
     call psb_error(ictxt)
     return
   end if
@@ -456,7 +460,7 @@ subroutine psi_dswapdatav(flag,beta,y,desc_a,work,info,data)
   integer  :: ictxt, np, me, point_to_proc, nesd, nerv,&
        & proc_to_comm, p2ptag, icomm, p2pstat(mpi_status_size),&
        & idxs, idxr, iret, err_act, totxch, ixrec, i, &
-       & idx_pt, snd_pt, rcv_pt, n, pnti
+       & idx_pt, snd_pt, rcv_pt, n, pnti, data_
 
   integer, allocatable, dimension(:) :: bsdidx, brvidx,&
        & sdsz, rvsz, prcid, rvhd, sdhd
@@ -500,30 +504,34 @@ subroutine psi_dswapdatav(flag,beta,y,desc_a,work,info,data)
   do_recv = swap_mpi .or. swap_sync .or. swap_recv
 
   if(present(data)) then
-    if(data == psb_comm_halo_) then
-      d_idx => desc_a%halo_index
-      totxch = desc_a%matrix_data(psb_thal_xch_)
-      idxr   = desc_a%matrix_data(psb_thal_rcv_)
-      idxs   = desc_a%matrix_data(psb_thal_snd_)
-
-    else if(data == psb_comm_ovr_) then
-      d_idx => desc_a%ovrlap_index
-      totxch = desc_a%matrix_data(psb_tovr_xch_)
-      idxr   = desc_a%matrix_data(psb_tovr_rcv_)
-      idxs   = desc_a%matrix_data(psb_tovr_snd_)
-    else
-      d_idx => desc_a%halo_index
-      totxch = desc_a%matrix_data(psb_thal_xch_)
-      idxr   = desc_a%matrix_data(psb_thal_rcv_)
-      idxs   = desc_a%matrix_data(psb_thal_snd_)
-    end if
+    data_ = data
   else
+    data_ = psb_comm_halo_
+  end if
+
+
+  select case(data_) 
+  case(psb_comm_halo_) 
     d_idx => desc_a%halo_index
     totxch = desc_a%matrix_data(psb_thal_xch_)
     idxr   = desc_a%matrix_data(psb_thal_rcv_)
     idxs   = desc_a%matrix_data(psb_thal_snd_)
-  end if
 
+  case(psb_comm_ovr_) 
+    d_idx => desc_a%ovrlap_index
+    totxch = desc_a%matrix_data(psb_tovr_xch_)
+    idxr   = desc_a%matrix_data(psb_tovr_rcv_)
+    idxs   = desc_a%matrix_data(psb_tovr_snd_)
+
+  case(psb_comm_ext_) 
+    d_idx => desc_a%ext_index
+    totxch = desc_a%matrix_data(psb_text_xch_)
+    idxr   = desc_a%matrix_data(psb_text_rcv_)
+    idxs   = desc_a%matrix_data(psb_text_snd_)
+  case default
+    call psb_errpush(4010,name,a_err='wrong Data selector')
+    goto 9999
+  end select
 
   idxr = idxr * n
   idxs = idxs * n
@@ -793,7 +801,7 @@ subroutine psi_dswapdatav(flag,beta,y,desc_a,work,info,data)
 
 9999 continue
   call psb_erractionrestore(err_act)
-  if (err_act == act_abort) then
+  if (err_act == psb_act_abort_) then
     call psb_error(ictxt)
     return
   end if

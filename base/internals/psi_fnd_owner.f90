@@ -133,7 +133,7 @@ subroutine psi_fnd_owner(nv,idx,iprc,desc,info)
 9999 continue
   call psb_erractionrestore(err_act)
 
-  if (err_act.eq.act_ret) then
+  if (err_act.eq.psb_act_ret_) then
     return
   else
     call psb_error(ictxt)

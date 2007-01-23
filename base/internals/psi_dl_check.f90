@@ -31,6 +31,7 @@
 subroutine psi_dl_check(dep_list,dl_lda,np,length_dl)
 
   use psb_const_mod
+  use psb_descriptor_type
   implicit none
 
   integer  :: np,dl_lda,length_dl(0:np)

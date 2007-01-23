@@ -105,7 +105,7 @@ subroutine psb_drwextd(nr,a,info,b)
 
 9999 continue
   call psb_erractionrestore(err_act)
-  if (err_act.eq.act_abort) then
+  if (err_act.eq.psb_act_abort_) then
      call psb_error()
      return
   end if

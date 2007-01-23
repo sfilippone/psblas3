@@ -30,6 +30,7 @@ C
 C 
       SUBROUTINE PARTITION(M, WORK, IA, N_BLOCK)
       use psb_const_mod
+      use psb_spmat_type
       IMPLICIT NONE
 
 

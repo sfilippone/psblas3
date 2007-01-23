@@ -106,7 +106,7 @@ subroutine psb_dprc_aply(prec,x,y,desc_data,info,trans, work)
 
 9999 continue
   call psb_erractionrestore(err_act)
-  if (err_act.eq.act_abort) then
+  if (err_act.eq.psb_act_abort_) then
     call psb_error()
     return
   end if
@@ -215,7 +215,7 @@ subroutine psb_dprc_aply1(prec,x,desc_data,info,trans)
 9999 continue
   call psb_errpush(info,name)
   call psb_erractionrestore(err_act)
-  if (err_act.eq.act_abort) then
+  if (err_act.eq.psb_act_abort_) then
      call psb_error()
      return
   end if

@@ -40,7 +40,7 @@
 !    info     - integer.                  Eventually returns an error code.
 !    iact     - integer(optional).        A character defining the behaviour of this subroutine when is found an index not belonging to the calling process
 !
-subroutine psb_glob_to_loc2(x,y,desc_a,info,iact)
+subroutine psb_glob_to_loc2(x,y,desc_a,info,iact,owned)
 
   use psb_descriptor_type
   use psb_const_mod
@@ -55,12 +55,14 @@ subroutine psb_glob_to_loc2(x,y,desc_a,info,iact)
   integer, intent(in)                ::  x(:)  
   integer, intent(out)               ::  y(:), info
   character, intent(in), optional    ::  iact
+  logical, intent(in),  optional     :: owned
 
   !....locals....
   integer                            ::  n, i, tmp
   character                          ::  act
   integer                            ::  int_err(5), err_act
   real(kind(1.d0))                   ::  real_val
+  logical                            :: owned_
   integer, parameter                 ::  zero=0
   character(len=20)   :: name
 
@@ -75,12 +77,17 @@ subroutine psb_glob_to_loc2(x,y,desc_a,info,iact)
     act='A'
   endif
   act = toupper(act)
-
+  if (present(owned)) then 
+    owned_=owned
+  else
+    owned_=.false.
+  end if
+    
   int_err=0
   real_val = 0.d0
 
   n = size(x)
-  call psi_idx_cnv(n,x,y,desc_a,info)
+  call psi_idx_cnv(n,x,y,desc_a,info,owned=owned_)
 
   select case(act)
   case('E','I')
@@ -103,7 +110,7 @@ subroutine psb_glob_to_loc2(x,y,desc_a,info,iact)
 9999 continue
   call psb_erractionrestore(err_act)
 
-  if (err_act == act_ret) then
+  if (err_act == psb_act_ret_) then
     return
   else
     call psb_error()
@@ -153,7 +160,7 @@ end subroutine psb_glob_to_loc2
 !    info     - integer.                  Eventually returns an error code.
 !    iact     - integer(optional).        A character defining the behaviour of this subroutine when is found an index not belonging to the calling process
 !
-subroutine psb_glob_to_loc(x,desc_a,info,iact)
+subroutine psb_glob_to_loc(x,desc_a,info,iact,owned)
 
   use psb_penv_mod
   use psb_descriptor_type
@@ -167,6 +174,7 @@ subroutine psb_glob_to_loc(x,desc_a,info,iact)
   type(psb_desc_type), intent(in)  :: desc_a
   integer, intent(inout)           :: x(:)  
   integer, intent(out)             :: info
+  logical, intent(in),  optional     :: owned
   character, intent(in), optional  :: iact
 
   !....locals....
@@ -174,6 +182,7 @@ subroutine psb_glob_to_loc(x,desc_a,info,iact)
   character                        :: act
   integer                          :: int_err(5), err_act, dectype
   real(kind(1.d0))                 :: real_val, t0, t1,t2
+  logical                            :: owned_
   integer, parameter               :: zero=0
   character(len=20)   :: name
   integer             :: ictxt, iam, np
@@ -191,11 +200,16 @@ subroutine psb_glob_to_loc(x,desc_a,info,iact)
   else
     act='A'
   endif
+  if (present(owned)) then 
+    owned_=owned
+  else
+    owned_=.false.
+  end if
 
   act = toupper(act)
 
   n = size(x)
-  call psi_idx_cnv(n,x,desc_a,info)
+  call psi_idx_cnv(n,x,desc_a,info,owned=owned_)
 
   select case(act)
   case('E','I')
@@ -219,7 +233,7 @@ subroutine psb_glob_to_loc(x,desc_a,info,iact)
 9999 continue
   call psb_erractionrestore(err_act)
 
-  if (err_act == act_ret) then
+  if (err_act == psb_act_ret_) then
     return
   else
     call psb_error()

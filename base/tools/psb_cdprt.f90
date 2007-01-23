@@ -89,6 +89,24 @@ subroutine psb_cdprt(iout,desc_p,glob,short)
       counter   = counter+n_elem_recv+n_elem_send+3
     enddo
 
+    write(iout,*) 'Ext_index'
+    counter      = 1
+    Do
+      proc=desc_p%ext_index(counter+psb_proc_id_)
+      if (proc == -1) exit
+      n_elem_recv=desc_p%ext_index(counter+psb_n_elem_recv_)
+      n_elem_send=desc_p%ext_index(counter+n_elem_recv+psb_n_elem_send_)
+      write(iout,*) 'Ext_index Receive',proc,n_elem_recv
+      if (.not.lshort) write(iout,*) &
+           & desc_p%ext_index(counter+psb_n_elem_recv_+1:counter+psb_n_elem_recv_+n_elem_recv)
+      write(iout,*) 'Ext_index Send',proc,n_elem_send
+      if (.not.lshort) write(iout,*) &
+           & desc_p%ext_index(counter+n_elem_recv+psb_n_elem_send_+1: &
+           &                   counter+n_elem_recv+psb_n_elem_send_+n_elem_send)
+
+      counter   = counter+n_elem_recv+n_elem_send+3
+    enddo
+
 
     write(iout,*) 'Ovrlap_index'
     counter      = 1
@@ -135,10 +153,10 @@ subroutine psb_cdprt(iout,desc_p,glob,short)
         write(iout,*) i, desc_p%loc_to_glob(i)
       enddo
 
-      write(iout,*) 'glob_to_loc '
-      do i=1,m
-        write(iout,*) i,desc_p%glob_to_loc(i)
-      enddo
+!!$      write(iout,*) 'glob_to_loc '
+!!$      do i=1,m
+!!$        write(iout,*) i,desc_p%glob_to_loc(i)
+!!$      enddo
     endif
     write(iout,*) 'Halo_index'
     counter      = 1
@@ -160,6 +178,31 @@ subroutine psb_cdprt(iout,desc_p,glob,short)
              & counter+n_elem_recv+psb_n_elem_send_+n_elem_send
           write(iout,*) &
                & desc_p%loc_to_glob(desc_p%halo_index(i)),  desc_p%halo_index(i)
+        enddo
+      endif
+      counter   = counter+n_elem_recv+n_elem_send+3
+    enddo
+
+    write(iout,*) 'Ext_index'
+    counter      = 1
+    Do
+      proc=desc_p%ext_index(counter+psb_proc_id_)
+      if (proc == -1) exit
+      n_elem_recv=desc_p%ext_index(counter+psb_n_elem_recv_)
+      n_elem_send=desc_p%ext_index(counter+n_elem_recv+psb_n_elem_send_)
+      write(iout,*) 'Ext_index Receive',proc,n_elem_recv
+      if (.not.lshort) then 
+        do i=counter+psb_n_elem_recv_+1,counter+psb_n_elem_recv_+n_elem_recv
+          write(iout,*) &
+               & desc_p%loc_to_glob(desc_p%ext_index(i)),desc_p%ext_index(i)
+        enddo
+      endif
+      write(iout,*) 'Ext_index Send',proc,n_elem_send
+      if (.not.lshort) then 
+        do i=counter+n_elem_recv+psb_n_elem_send_+1, &
+             & counter+n_elem_recv+psb_n_elem_send_+n_elem_send
+          write(iout,*) &
+               & desc_p%loc_to_glob(desc_p%ext_index(i)),  desc_p%ext_index(i)
         enddo
       endif
       counter   = counter+n_elem_recv+n_elem_send+3

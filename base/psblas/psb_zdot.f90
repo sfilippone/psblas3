@@ -150,7 +150,7 @@ function psb_zdot(x, y,desc_a, info, jx, jy)
 9999 continue
   call psb_erractionrestore(err_act)
 
-  if (err_act.eq.act_abort) then
+  if (err_act.eq.psb_act_abort_) then
     call psb_error(ictxt)
     return
   end if
@@ -288,7 +288,7 @@ function psb_zdotv(x, y,desc_a, info)
 9999 continue
   call psb_erractionrestore(err_act)
 
-  if (err_act.eq.act_abort) then
+  if (err_act.eq.psb_act_abort_) then
     call psb_error(ictxt)
     return
   end if
@@ -423,7 +423,7 @@ subroutine psb_zdotvs(res, x, y,desc_a, info)
 9999 continue
   call psb_erractionrestore(err_act)
 
-  if (err_act.eq.act_abort) then
+  if (err_act.eq.psb_act_abort_) then
     call psb_error(ictxt)
     return
   end if
@@ -576,7 +576,7 @@ subroutine psb_zmdots(res, x, y, desc_a, info)
 9999 continue
   call psb_erractionrestore(err_act)
 
-  if (err_act.eq.act_abort) then
+  if (err_act.eq.psb_act_abort_) then
     call psb_error(ictxt)
     return
   end if

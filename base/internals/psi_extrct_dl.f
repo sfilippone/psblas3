@@ -120,6 +120,7 @@ c   length_dl  integer array(0:np)
 c             length_dl(i) is the length of dep_list(*,i) list
       use psb_penv_mod
       use psb_const_mod
+      use psb_error_mod
       use psb_descriptor_type
       implicit none
       include 'mpif.h'
@@ -141,7 +142,8 @@ c     .....local scalars...
       parameter (debug=.false.)
       character  name*20
       name='psi_extrct_dl'
-      call fcpsb_get_erraction(err_act)
+      
+      call psb_erractionsave(err_act)
 
       info = 0
       ictxt = desc_data(psb_ctxt_)
@@ -168,7 +170,9 @@ c           ..if number of element to be exchanged !=0
             proc=desc_str(i)
             if ((proc.lt.0).or.(proc.ge.nprow)) then
               if (debug) write(0,*) 'extract error ',i,desc_str(i)
-              info = 3999
+              info = 9999
+              int_err(1) = i
+              int_err(2) = desc_str(i)
               goto 998
             endif
 !            if((me.eq.1).and.(proc.eq.3))write(0,*)'found 3'
@@ -260,12 +264,18 @@ c     ... check for errors...
      +  dep_list,dl_lda,mpi_integer,icomm,info)
       deallocate(itmp)
 
+      call psb_erractionrestore(err_act)
       return
 
+
  9999 continue
-      call fcpsb_errpush(info,name,int_err)
-      if(err_act.eq.act_abort) then
-        call fcpsb_perror(ictxt)
+
+      call psb_errpush(info,name,i_err=int_err)
+      call psb_erractionrestore(err_act)
+      if (err_act.eq.psb_act_ret_) then
+        return
+      else
+        call psb_error()
       endif
       return
 

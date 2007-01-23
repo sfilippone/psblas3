@@ -332,7 +332,7 @@ Subroutine psb_zsphalo(a,desc_a,blk,info,rwcnv,clcnv,outfmt)
 
 9999 continue
   call psb_erractionrestore(err_act)
-  if (err_act == act_abort) then
+  if (err_act == psb_act_abort_) then
     call psb_error(ictxt)
     return
   end if

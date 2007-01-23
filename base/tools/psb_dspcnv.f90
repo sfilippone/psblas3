@@ -186,7 +186,7 @@ subroutine psb_dspcnv(a,b,desc_a,info)
        & size(b%aspk),size(b%ia1),size(b%ia2),&
        & work_dcsdp,size(work_dcsdp),info)
 
-  if(info /= no_err) then
+  if(info /= psb_no_err_) then
     info=4010
     ch_err='dcsdp'
     call psb_errpush(info, name, a_err=ch_err)
@@ -236,7 +236,7 @@ subroutine psb_dspcnv(a,b,desc_a,info)
 
 9999 continue
   call psb_erractionrestore(err_act)
-  if (err_act == act_abort) then
+  if (err_act == psb_act_abort_) then
     call psb_error(ictxt)
     return
   end if

@@ -113,7 +113,7 @@ subroutine psb_iasb(x, desc_a, info)
 
 9999 continue
   call psb_erractionrestore(err_act)
-  if (err_act == act_abort) then
+  if (err_act == psb_act_abort_) then
      call psb_error(ictxt)
      return
   end if
@@ -225,7 +225,7 @@ subroutine psb_iasbv(x, desc_a, info)
 
 9999 continue
   call psb_erractionrestore(err_act)
-  if (err_act == act_abort) then
+  if (err_act == psb_act_abort_) then
      call psb_error(ictxt)
      return
   end if

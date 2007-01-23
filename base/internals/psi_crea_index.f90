@@ -150,7 +150,7 @@ subroutine psi_crea_index(desc_a,index_in,index_out,glob_idx,nxch,nsnd,nrcv,info
 
 9999 continue
   call psb_erractionrestore(err_act)
-  if (err_act == act_abort) then
+  if (err_act == psb_act_abort_) then
     call psb_error(ictxt)
     return
   end if

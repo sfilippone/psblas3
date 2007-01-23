@@ -35,6 +35,7 @@ c
      *  lia2n,aux,laux,ierror)
 
       use psb_const_mod
+      use psb_spmat_type
       implicit none
 
 c     .. scalar arguments ..

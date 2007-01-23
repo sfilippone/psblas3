@@ -32,6 +32,7 @@ C
      +     LARN,LKA,LJA,IPERM,WORK, LWORK, SIZE_REQ, IERROR)
 
       use psb_const_mod
+      use psb_spmat_type
       IMPLICIT NONE
 
 C     ... Scalar arguments ...

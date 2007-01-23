@@ -32,13 +32,48 @@
 !!	Module to   define D_SPMAT, structure   !!
 !!      for sparse matrix.                      !!
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
 module psb_spmat_type
   use psb_error_mod
   use psb_realloc_mod
   use psb_const_mod
+  implicit none 
   ! Typedef: psb_dspmat_type
   !    Contains a sparse matrix
+
+  !
+  !     Queries into spmat%info
+  !     
+  integer, parameter :: psb_nztotreq_=1, psb_nzrowreq_=2
+  integer, parameter :: psb_nzsizereq_=3
+  !
+  !     Entries and values for  spmat%info
+  !     
+
+  integer, parameter :: psb_nnz_=1
+  integer, parameter :: psb_del_bnd_=7, psb_srtd_=8
+  integer, parameter :: psb_state_=9
+  integer, parameter :: psb_upd_pnt_=10
+  integer, parameter :: psb_dupl_=11,  psb_upd_=12
+  integer, parameter :: psb_ifasize_=16
+  integer, parameter :: psb_spmat_null_=0, psb_spmat_bld_=1
+  integer, parameter :: psb_spmat_asb_=2, psb_spmat_upd_=4
+  integer, parameter :: psb_ireg_flgs_=10, psb_ip2_=0
+  integer, parameter :: psb_iflag_=2, psb_ichk_=3
+  integer, parameter :: psb_nnzt_=4, psb_zero_=5,psb_ipc_=6
+  integer, parameter :: psb_dupl_ovwrt_ = 0
+  integer, parameter :: psb_dupl_add_   = 1
+  integer, parameter :: psb_dupl_err_   = 2
+  integer, parameter :: psb_dupl_def_   = psb_dupl_ovwrt_
+  integer, parameter :: psb_upd_dflt_   = 0
+  integer, parameter :: psb_upd_srch_   = 98764
+  integer, parameter :: psb_upd_perm_   = 98765
+  integer, parameter :: psb_isrtdcoo_   = 98761
+  integer, parameter :: psb_maxjdrows_=8, psb_minjdrows_=4
+  integer, parameter :: psb_dbleint_=2
+  character(len=5)   :: psb_fidef_='CSR'
+
+
+
   type psb_dspmat_type
     ! Rows & columns 
     integer     :: m, k
@@ -499,16 +534,25 @@ contains
     logical, parameter  :: debug=.false.
 
     info  = 0
-    if (debug) write(0,*) 'Before realloc',nd,size(a%aspk)
+    if (debug) write(0,*) 'Before realloc',nd,size(a%aspk),ni1,ni2
     call psb_realloc(nd,a%aspk,info)
     if (debug) write(0,*) 'After realloc',nd,size(a%aspk),info
+!!$    call flush(0)
     if (info /= 0) return 
+    if (debug) write(0,*) 'Before realloc2',ni2,allocated(a%ia2),size(a%ia2)
+!!$    call flush(0)
     call psb_realloc(ni2,a%ia2,info)
     if (info /= 0) return 
+    if (debug) write(0,*) 'Before realloc3',ni1,allocated(a%ia1),size(a%ia1)
+!!$    call flush(0)
     call psb_realloc(ni1,a%ia1,info)
     if (info /= 0) return
+    if (debug) write(0,*) 'Before realloc4',max(1,a%m),allocated(a%pl),size(a%pl)
+!!$    call flush(0)
     call psb_realloc(max(1,a%m),a%pl,info)
     if (info /= 0) return
+    if (debug) write(0,*) 'Before realloc5',max(1,a%k),allocated(a%pr),size(a%pr)
+!!$    call flush(0)
     call psb_realloc(max(1,a%k),a%pr,info)
     if (info /= 0) return
 
@@ -1398,7 +1442,7 @@ contains
 
 9999 continue
     call psb_erractionrestore(err_act)
-    if (err_act.eq.act_abort) then
+    if (err_act.eq.psb_act_abort_) then
       call psb_error()
       return
     end if
@@ -1553,7 +1597,7 @@ contains
 
 9999 continue
     call psb_erractionrestore(err_act)
-    if (err_act.eq.act_abort) then
+    if (err_act.eq.psb_act_abort_) then
       call psb_error()
       return
     end if

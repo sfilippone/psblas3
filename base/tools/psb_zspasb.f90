@@ -132,7 +132,7 @@ subroutine psb_zspasb(a,desc_a, info, afmt, upd, dupl)
     a%k = n_col
 
     call psb_sp_clone(a,atemp,info)
-    if(info /= no_err) then
+    if(info /= psb_no_err_) then
       info=4010
       ch_err='psb_sp_clone'
       call psb_errpush(info,name,a_err=ch_err)
@@ -158,7 +158,7 @@ subroutine psb_zspasb(a,desc_a, info, afmt, upd, dupl)
     call psb_csdp(atemp,a,info,ifc=2,upd=upd_,dupl=dupl_)
 
     IF (debug) WRITE (*, *) me,'   ASB:  From ZCSDP',info,' ',A%FIDA
-    if (info /= no_err) then    
+    if (info /= psb_no_err_) then    
       info=4010
       ch_err='psb_csdp'
       call psb_errpush(info,name,a_err=ch_err)
@@ -188,7 +188,7 @@ subroutine psb_zspasb(a,desc_a, info, afmt, upd, dupl)
     atemp%m=a%m
     atemp%k=a%k
     ! check on allocation
-    if (info /= no_err) then    
+    if (info /= psb_no_err_) then    
       info=4010
       ch_err='psb_sp_all'
       call psb_errpush(info,name,a_err=ch_err)
@@ -197,7 +197,7 @@ subroutine psb_zspasb(a,desc_a, info, afmt, upd, dupl)
 
     call psb_csdp(atemp,a,info,check='R')
     ! check on error retuned by zcsdp
-    if (info /= no_err) then
+    if (info /= psb_no_err_) then
       info = 4010
       ch_err='psb_csdp90'
       call psb_errpush(info,name,a_err=ch_err)
@@ -205,7 +205,7 @@ subroutine psb_zspasb(a,desc_a, info, afmt, upd, dupl)
     end if
 
     call psb_sp_free(atemp,info)
-    if (info /= no_err) then
+    if (info /= psb_no_err_) then
       info = 4010
       ch_err='sp_free'
       call psb_errpush(info,name,a_err=ch_err)
@@ -226,7 +226,7 @@ subroutine psb_zspasb(a,desc_a, info, afmt, upd, dupl)
 
 9999 continue
   call psb_erractionrestore(err_act)
-  if (err_act == act_abort) then
+  if (err_act == psb_act_abort_) then
     call psb_error(ictxt)
     return
   end if

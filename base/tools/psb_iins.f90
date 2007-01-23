@@ -42,6 +42,7 @@
 subroutine psb_iinsvi(m, irw, val, x, desc_a, info, dupl)
   !....insert dense submatrix to dense matrix .....
   use psb_descriptor_type
+  use psb_spmat_type
   use psb_const_mod
   use psb_error_mod
   use psb_penv_mod
@@ -171,7 +172,7 @@ subroutine psb_iinsvi(m, irw, val, x, desc_a, info, dupl)
 9999 continue
   call psb_erractionrestore(err_act)
 
-  if (err_act == act_ret) then
+  if (err_act == psb_act_ret_) then
     return
   else
     call psb_error(ictxt)
@@ -224,6 +225,7 @@ end subroutine psb_iinsvi
 subroutine psb_iinsi(m,irw, val, x, desc_a, info, dupl)
   !....insert dense submatrix to dense matrix .....
   use psb_descriptor_type
+  use psb_spmat_type
   use psb_const_mod
   use psb_error_mod
   use psb_penv_mod
@@ -363,7 +365,7 @@ subroutine psb_iinsi(m,irw, val, x, desc_a, info, dupl)
 9999 continue
   call psb_erractionrestore(err_act)
 
-  if (err_act == act_ret) then
+  if (err_act == psb_act_ret_) then
     return
   else
     call psb_error(ictxt)

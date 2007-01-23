@@ -133,7 +133,7 @@ subroutine psb_zgelp(trans,iperm,x,desc_a,info)
 9999 continue
   call psb_erractionrestore(err_act)
 
-  if (err_act == act_ret) then
+  if (err_act == psb_act_ret_) then
     return
   else
     call psb_error(ictxt)
@@ -274,7 +274,7 @@ subroutine psb_zgelpv(trans,iperm,x,desc_a,info)
 9999 continue
   call psb_erractionrestore(err_act)
 
-  if (err_act == act_ret) then
+  if (err_act == psb_act_ret_) then
     return
   else
     call psb_error(ictxt)

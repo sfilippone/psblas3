@@ -12,7 +12,7 @@ lib:
 	(cd serial; make lib LIBNAME=$(BASELIBNAME))
 	(cd psblas; make lib LIBNAME=$(BASELIBNAME))
 	/bin/cp -p $(HERE)/$(LIBNAME) $(LIBDIR)
-	/bin/cp -p $(LIBMOD) $(LIBDIR)
+	/bin/cp -p $(LIBMOD) *$(.mod) $(LIBDIR)
 
 clean: 
 	(cd modules; make clean)

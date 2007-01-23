@@ -75,7 +75,8 @@ Contains
     use psb_error_mod
 
     ! ...Subroutine Arguments  
-    Integer,allocatable :: vin(:),vout(:)
+    Integer,allocatable,intent(in)  :: vin(:)
+    Integer,allocatable,intent(out) :: vout(:)
     integer         :: info
     ! ...Local Variables
 
@@ -107,7 +108,7 @@ Contains
 9999 continue
     call psb_erractionrestore(err_act)
 
-    if (err_act.eq.act_ret) then
+    if (err_act.eq.psb_act_ret_) then
       return
     else
       call psb_error()
@@ -153,7 +154,7 @@ Contains
 9999 continue
     call psb_erractionrestore(err_act)
 
-    if (err_act.eq.act_ret) then
+    if (err_act.eq.psb_act_ret_) then
       return
     else
       call psb_error()
@@ -198,7 +199,7 @@ Contains
 9999 continue
     call psb_erractionrestore(err_act)
 
-    if (err_act.eq.act_ret) then
+    if (err_act.eq.psb_act_ret_) then
       return
     else
       call psb_error()
@@ -244,7 +245,7 @@ Contains
 9999 continue
     call psb_erractionrestore(err_act)
 
-    if (err_act.eq.act_ret) then
+    if (err_act.eq.psb_act_ret_) then
       return
     else
       call psb_error()
@@ -289,7 +290,7 @@ Contains
 9999 continue
     call psb_erractionrestore(err_act)
 
-    if (err_act.eq.act_ret) then
+    if (err_act.eq.psb_act_ret_) then
       return
     else
       call psb_error()
@@ -335,7 +336,7 @@ Contains
 9999 continue
     call psb_erractionrestore(err_act)
 
-    if (err_act.eq.act_ret) then
+    if (err_act.eq.psb_act_ret_) then
       return
     else
       call psb_error()
@@ -464,7 +465,7 @@ Contains
 9999 continue
     call psb_erractionrestore(err_act)
 
-    if (err_act.eq.act_ret) then
+    if (err_act.eq.psb_act_ret_) then
       return
     else
       call psb_error()
@@ -514,7 +515,7 @@ Contains
 9999 continue
     call psb_erractionrestore(err_act)
 
-    if (err_act.eq.act_ret) then
+    if (err_act.eq.psb_act_ret_) then
       return
     else
       call psb_error()
@@ -564,7 +565,7 @@ Contains
 9999 continue
     call psb_erractionrestore(err_act)
 
-    if (err_act.eq.act_ret) then
+    if (err_act.eq.psb_act_ret_) then
       return
     else
       call psb_error()
@@ -586,26 +587,31 @@ Contains
     integer, optional, intent(in) :: lb
     ! ...Local Variables
     Integer,allocatable  :: tmp(:)
-    Integer :: dim, err_act, err,i,lb_
+    Integer :: dim, err_act, err,i,lb_ 
     character(len=20)  :: name
     logical, parameter :: debug=.false.
 
-    name='psb_dreallocate1i'
+    name='psb_dreallocate1i' 
     call psb_erractionsave(err_act)
 
-    if(psb_get_errstatus().ne.0) return 
-    info=0
     if (debug) write(0,*) 'reallocate I',len
+    if (psb_get_errstatus().ne.0) return 
+    info=0
     if (present(lb)) then
       lb_ = lb
     else
       lb_ = 1
     endif
+    if ((len<0).or.(len>25*1024*1024)) then 
+      err=2025
+      call psb_errpush(err,name,i_err=(/len,0,0,0,0/))
+      goto 9999
+    end if
 
     if (allocated(rrax)) then 
       dim=size(rrax)
       If (dim /= len) Then
-        Allocate(tmp(lb_:len),stat=info)
+        Allocate(tmp(len),stat=info)
         if (info /= 0) then
           err=4000
           call psb_errpush(err,name)
@@ -618,7 +624,7 @@ Contains
       end if
     else
       dim = 0
-      allocate(rrax(lb_:len),stat=info)
+      allocate(rrax(len),stat=info)
       if (info /= 0) then
         err=4000
         call psb_errpush(err,name)
@@ -635,7 +641,7 @@ Contains
 9999 continue
     call psb_erractionrestore(err_act)
 
-    if (err_act.eq.act_ret) then
+    if (err_act.eq.psb_act_ret_) then
       return
     else
       call psb_error()
@@ -672,6 +678,12 @@ Contains
     else
       lb_ = 1
     endif
+    if ((len<0).or.(len>25*1024*1024)) then 
+      err=2025
+      call psb_errpush(err,name,i_err=(/len,0,0,0,0/))
+      goto 9999
+    end if
+
 
     if (allocated(rrax)) then 
       dim=size(rrax)
@@ -707,7 +719,7 @@ Contains
 9999 continue
     call psb_erractionrestore(err_act)
 
-    if (err_act.eq.act_ret) then
+    if (err_act.eq.psb_act_ret_) then
       return
     else
       call psb_error()
@@ -736,6 +748,12 @@ Contains
     call psb_erractionsave(err_act)
     info = 0
     if (debug) write(0,*) 'reallocate Z',len    
+    if ((len<0).or.(len>25*1024*1024)) then 
+      err=2025
+      call psb_errpush(err,name,i_err=(/len,0,0,0,0/))
+      goto 9999
+    end if
+
 
     if (allocated(rrax)) then 
       dim=size(rrax)
@@ -771,7 +789,7 @@ Contains
 9999 continue
     call psb_erractionrestore(err_act)
 
-    if (err_act.eq.act_ret) then
+    if (err_act.eq.psb_act_ret_) then
       return
     else
       call psb_error()
@@ -837,7 +855,7 @@ Contains
 9999 continue
     call psb_erractionrestore(err_act)
 
-    if (err_act.eq.act_ret) then
+    if (err_act.eq.psb_act_ret_) then
       return
     else
       call psb_error()
@@ -902,7 +920,7 @@ Contains
 9999 continue
     call psb_erractionrestore(err_act)
 
-    if (err_act.eq.act_ret) then
+    if (err_act.eq.psb_act_ret_) then
       return
     else
       call psb_error()
@@ -966,7 +984,7 @@ Contains
 9999 continue
     call psb_erractionrestore(err_act)
 
-    if (err_act.eq.act_ret) then
+    if (err_act.eq.psb_act_ret_) then
       return
     else
       call psb_error()
@@ -1009,7 +1027,7 @@ Contains
 9999 continue
     call psb_erractionrestore(err_act)
 
-    if (err_act.eq.act_ret) then
+    if (err_act.eq.psb_act_ret_) then
       return
     else
       call psb_error()
@@ -1060,7 +1078,7 @@ Contains
 9999 continue
     call psb_erractionrestore(err_act)
 
-    if (err_act.eq.act_ret) then
+    if (err_act.eq.psb_act_ret_) then
       return
     else
       call psb_error()
@@ -1109,7 +1127,7 @@ Contains
 9999 continue
     call psb_erractionrestore(err_act)
 
-    if (err_act.eq.act_ret) then
+    if (err_act.eq.psb_act_ret_) then
       return
     else
       call psb_error()

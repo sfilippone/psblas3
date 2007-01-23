@@ -36,6 +36,7 @@ C
      *  LIAN2,AUX,LAUX,IERROR)
 
       use psb_const_mod
+      use psb_spmat_type
       IMPLICIT NONE
 
 C

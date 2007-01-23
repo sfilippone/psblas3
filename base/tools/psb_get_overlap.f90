@@ -14,6 +14,12 @@ subroutine psb_get_ovrlap(ovrel,desc,info)
   name='psi_get_overlap'
   call psb_erractionsave(err_act)
 
+  if (.not.psb_is_asb_desc(desc)) then
+    info = 1122
+    call psb_errorpush(info,name)
+    goto 9999
+  end if
+
   i=0
   j=1
   do while(desc%ovrlap_elem(j) /= -1) 
@@ -55,7 +61,7 @@ subroutine psb_get_ovrlap(ovrel,desc,info)
 
 9999 continue
   call psb_erractionrestore(err_act)
-  if (err_act.eq.act_abort) then
+  if (err_act.eq.psb_act_abort_) then
     call psb_error()
     return
   end if

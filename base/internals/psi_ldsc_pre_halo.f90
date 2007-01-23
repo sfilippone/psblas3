@@ -28,7 +28,7 @@
 !!$  POSSIBILITY OF SUCH DAMAGE.
 !!$ 
 !!$  
-subroutine psi_ldsc_pre_halo(desc,info)
+subroutine psi_ldsc_pre_halo(desc,ext_hv,info)
   use psb_descriptor_type
   use psb_serial_mod
   use psb_const_mod
@@ -38,6 +38,7 @@ subroutine psi_ldsc_pre_halo(desc,info)
   use psi_mod, only : psi_fnd_owner
   implicit none
   type(psb_desc_type), intent(inout) :: desc
+  logical, intent(in)  :: ext_hv
   integer, intent(out) :: info
 
   integer,allocatable :: helem(:),hproc(:)
@@ -68,8 +69,9 @@ subroutine psi_ldsc_pre_halo(desc,info)
 
 
   if (.not.(psb_is_bld_desc(desc).and.psb_is_large_desc(desc))) then 
-    write(0,*) 'Invalid input descriptor in ldsc_pre_halo'
-
+    info = 1122
+    call psb_errpush(info,name)
+    goto 9999
   end if
 
 
@@ -115,56 +117,55 @@ subroutine psi_ldsc_pre_halo(desc,info)
     end if
   end do
 
-  nh = (n_col-n_row)
-  if (nh > 0) then 
-    Allocate(helem(nh),stat=info)
-    if (info /= 0) then 
-      call psb_errpush(4010,name,a_err='Allocate')
-      goto 9999      
-    end if
-
-    do i=1, nh
-      helem(i) = desc%loc_to_glob(n_row+i)
-    end do
-
-    call psi_fnd_owner(nh,helem,hproc,desc,info)
-    allocate(tmphl((3*((n_col-n_row)+1)+1)),stat=info)
-    if (info /= 0) then 
-      call psb_errpush(4010,name,a_err='Allocate')
-      goto 9999      
-    end if
-    j  = 1
-    do i=1,nh
-      tmphl(j+0) = hproc(i)
-      if (tmphl(j+0)<0) then 
-        write(0,*) 'Unrecoverable error: missing proc from asb'
+  if (.not.ext_hv) then
+    nh = (n_col-n_row)
+    if (nh > 0) then 
+      Allocate(helem(nh),stat=info)
+      if (info /= 0) then 
+        call psb_errpush(4010,name,a_err='Allocate')
+        goto 9999      
       end if
-      tmphl(j+1) = 1
-      tmphl(j+2) = n_row+i
-      j          = j + 3
-    end do
-    tmphl(j) = -1
-    lhalo = j
-    nhalo = (lhalo-1)/3
-  else 
-    allocate(tmphl(1),stat=info) 
-    if (info /= 0) then 
-      call psb_errpush(4010,name,a_err='Allocate')
-      goto 9999      
-    end if
-    tmphl=-1
-  endif
 
+      do i=1, nh
+        helem(i) = desc%loc_to_glob(n_row+i)
+      end do
 
-  call psb_transfer(tmphl,desc%halo_index,info)
-
+      call psi_fnd_owner(nh,helem,hproc,desc,info)
+      allocate(tmphl((3*((n_col-n_row)+1)+1)),stat=info)
+      if (info /= 0) then 
+        call psb_errpush(4010,name,a_err='Allocate')
+        goto 9999      
+      end if
+      j  = 1
+      do i=1,nh
+        tmphl(j+0) = hproc(i)
+        if (tmphl(j+0)<0) then 
+          write(0,*) 'Unrecoverable error: missing proc from asb'
+        end if
+        tmphl(j+1) = 1
+        tmphl(j+2) = n_row+i
+        j          = j + 3
+      end do
+      tmphl(j) = -1
+      lhalo = j
+      nhalo = (lhalo-1)/3
+    else 
+      allocate(tmphl(1),stat=info) 
+      if (info /= 0) then 
+        call psb_errpush(4010,name,a_err='Allocate')
+        goto 9999      
+      end if
+      tmphl=-1
+    endif
+    call psb_transfer(tmphl,desc%halo_index,info)
+  end if
   call psb_erractionrestore(err_act)
   return
 
 9999 continue
   call psb_erractionrestore(err_act)
 
-  if (err_act.eq.act_ret) then
+  if (err_act.eq.psb_act_ret_) then
     return
   else
     call psb_error(ictxt)

@@ -79,6 +79,7 @@ subroutine psb_cdtransfer(desc_in, desc_out, info)
   if (info == 0)  call psb_transfer( desc_in%bnd_elem    ,    desc_out%bnd_elem     , info)
   if (info == 0)  call psb_transfer( desc_in%ovrlap_elem ,    desc_out%ovrlap_elem  , info)
   if (info == 0)  call psb_transfer( desc_in%ovrlap_index,    desc_out%ovrlap_index , info)
+  if (info == 0)  call psb_transfer( desc_in%ext_index   ,    desc_out%ext_index    , info)
   if (info == 0)  call psb_transfer( desc_in%loc_to_glob ,    desc_out%loc_to_glob  , info)
   if (info == 0)  call psb_transfer( desc_in%glob_to_loc ,    desc_out%glob_to_loc  , info)
   if (info == 0)  call psb_transfer( desc_in%lprm        ,    desc_out%lprm         , info)
@@ -112,7 +113,7 @@ subroutine psb_cdtransfer(desc_in, desc_out, info)
 9999 continue
   call psb_erractionrestore(err_act)
 
-  if (err_act == act_ret) then
+  if (err_act == psb_act_ret_) then
     return
   else
     call psb_error(ictxt)

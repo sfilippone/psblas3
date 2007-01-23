@@ -45,7 +45,7 @@
 !   tran      -  character(optional).          ???.
 !   mode      -  integer(optional).
 !
-subroutine  psb_dhalom(x,desc_a,info,alpha,jx,ik,work,tran,mode)
+subroutine  psb_dhalom(x,desc_a,info,alpha,jx,ik,work,tran,mode,data)
   use psb_descriptor_type
   use psb_const_mod
   use psi_mod
@@ -60,13 +60,13 @@ subroutine  psb_dhalom(x,desc_a,info,alpha,jx,ik,work,tran,mode)
   integer, intent(out)                      :: info
   real(kind(1.d0)), intent(in), optional    :: alpha
   real(kind(1.d0)), optional, target        :: work(:)
-  integer, intent(in), optional             :: mode,jx,ik
+  integer, intent(in), optional             :: mode,jx,ik,data
   character, intent(in), optional           :: tran
 
   ! locals
   integer                  :: ictxt, np, me,&
        & err_act, m, n, iix, jjx, ix, ijx, k, maxk, nrow, imode, i,&
-       & err, liwork
+       & err, liwork,data_
   real(kind(1.d0)),pointer :: iwork(:), xp(:,:)
   character                :: ltran
   character(len=20)        :: name, ch_err
@@ -115,6 +115,14 @@ subroutine  psb_dhalom(x,desc_a,info,alpha,jx,ik,work,tran,mode)
   else
     ltran = 'N'
   endif
+
+  if (present(data)) then     
+    data_ = data
+  else
+    data_ = psb_comm_halo_
+  endif
+
+
   if (present(mode)) then 
     imode = mode
   else
@@ -177,16 +185,10 @@ subroutine  psb_dhalom(x,desc_a,info,alpha,jx,ik,work,tran,mode)
   xp => x(iix:size(x,1),jjx:jjx+k-1)
   if(ltran.eq.'N') then
     call psi_swapdata(imode,k,0.d0,xp,&
-         & desc_a,iwork,info,data=psb_comm_halo_)
-!!$     call PSI_dSwapData(imode,k,0.d0,x(1,jjx),&
-!!$          & size(x,1),desc_a%matrix_data,&
-!!$          & desc_a%halo_index,iwork,liwork,info)
+         & desc_a,iwork,info,data=data_)
   else if((ltran.eq.'T').or.(ltran.eq.'H')) then
     call psi_swaptran(imode,k,1.d0,xp,&
          &desc_a,iwork,info)
-!!$     call PSI_dSwapTran(imode,k,1.d0,x(1,jjx),&
-!!$          & size(x,1),desc_a%matrix_data,&
-!!$          & desc_a%halo_index,iwork,liwork,info)
   end if
 
   if(info.ne.0) then
@@ -203,7 +205,7 @@ subroutine  psb_dhalom(x,desc_a,info,alpha,jx,ik,work,tran,mode)
 9999 continue
   call psb_erractionrestore(err_act)
 
-  if (err_act.eq.act_abort) then
+  if (err_act.eq.psb_act_abort_) then
     call psb_error(ictxt)
     return
   end if
@@ -257,7 +259,7 @@ end subroutine psb_dhalom
 !   tran      -  character(optional).          ???.
 !   mode      -  integer(optional).
 !
-subroutine  psb_dhalov(x,desc_a,info,alpha,work,tran,mode)
+subroutine  psb_dhalov(x,desc_a,info,alpha,work,tran,mode,data)
   use psb_descriptor_type
   use psb_const_mod
   use psi_mod
@@ -272,13 +274,13 @@ subroutine  psb_dhalov(x,desc_a,info,alpha,work,tran,mode)
   integer, intent(out)                      :: info
   real(kind(1.d0)), intent(in), optional    :: alpha
   real(kind(1.d0)), target, optional        :: work(:)
-  integer, intent(in), optional             :: mode
+  integer, intent(in), optional             :: mode,data
   character, intent(in), optional           :: tran
 
   ! locals
   integer                  :: ictxt, np, me,&
        & err_act, m, n, iix, jjx, ix, ijx, nrow, imode, i,&
-       & err, liwork
+       & err, liwork,data_
   real(kind(1.d0)),pointer :: iwork(:)
   character                :: ltran
   character(len=20)        :: name, ch_err
@@ -310,6 +312,11 @@ subroutine  psb_dhalov(x,desc_a,info,alpha,work,tran,mode)
     ltran = tran
   else
     ltran = 'N'
+  endif
+  if (present(data)) then     
+    data_ = data
+  else
+    data_ = psb_comm_halo_
   endif
   if (present(mode)) then 
     imode = mode
@@ -368,7 +375,7 @@ subroutine  psb_dhalov(x,desc_a,info,alpha,work,tran,mode)
   ! exchange halo elements
   if(ltran.eq.'N') then
     call psi_swapdata(imode,0.d0,x(iix:size(x)),&
-         & desc_a,iwork,info,data=psb_comm_halo_)
+         & desc_a,iwork,info,data=data_)
   else if((ltran.eq.'T').or.(ltran.eq.'H')) then
     call psi_swaptran(imode,1.d0,x(iix:size(x)),&
          & desc_a,iwork,info)
@@ -388,7 +395,7 @@ subroutine  psb_dhalov(x,desc_a,info,alpha,work,tran,mode)
 9999 continue
   call psb_erractionrestore(err_act)
 
-  if (err_act.eq.act_abort) then
+  if (err_act.eq.psb_act_abort_) then
     call psb_error(ictxt)
     return
   end if

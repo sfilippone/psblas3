@@ -31,6 +31,7 @@
 subroutine psi_compute_size(desc_data, index_in, dl_lda, info)
 
   use psb_const_mod
+  use psb_descriptor_type
   use psb_error_mod
   use psb_penv_mod
   implicit none
@@ -117,7 +118,7 @@ subroutine psi_compute_size(desc_data, index_in, dl_lda, info)
 
 9999 continue
   call psb_erractionrestore(err_act)
-  if (err_act == act_abort) then
+  if (err_act == psb_act_abort_) then
     call psb_error(ictxt)
     return
   end if

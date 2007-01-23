@@ -30,7 +30,10 @@
 !!$  
 module psb_error_mod
 
-  use psb_const_mod
+  integer, parameter, public :: psb_act_ret_=0, psb_act_abort_=1, psb_no_err_=0
+  !
+  !     Error handling 
+  !
   public psb_errpush, psb_error, psb_get_errstatus,&
        & psb_get_errverbosity, psb_set_errverbosity,psb_errcomm, &
        & psb_erractionsave, psb_erractionrestore, &
@@ -41,7 +44,6 @@ module psb_error_mod
     module procedure psb_perror
   end interface
 
-!!$  integer, parameter  :: act_ret=0, act_abort=1, no_err=0
 
   private
 

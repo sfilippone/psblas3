@@ -117,7 +117,7 @@ subroutine psb_cdrep(m, ictxt, desc_a, info)
 
   !locals
   Integer             :: i,np,me,err,n,err_act
-  integer             :: int_err(5),exch(2), thalo(1), tovr(1) 
+  integer             :: int_err(5),exch(2), thalo(1), tovr(1), text(1)
   logical, parameter  :: debug=.false.
   character(len=20)   :: name
 
@@ -204,9 +204,10 @@ subroutine psb_cdrep(m, ictxt, desc_a, info)
 
   tovr  = -1 
   thalo = -1
+  text  = -1
   desc_a%lprm(:)         = 0
 
-  call psi_cnv_dsc(thalo,tovr,desc_a,info)
+  call psi_cnv_dsc(thalo,tovr,text,desc_a,info)
   if (info /= 0) then
     call psb_errpush(4010,name,a_err='psi_cvn_dsc')
     goto 9999
@@ -219,7 +220,7 @@ subroutine psb_cdrep(m, ictxt, desc_a, info)
 
 9999 continue
   call psb_erractionrestore(err_act)
-  if (err_act == act_abort) then
+  if (err_act == psb_act_abort_) then
     call psb_error(ictxt)
     return
   end if

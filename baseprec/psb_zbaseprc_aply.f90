@@ -140,7 +140,7 @@ subroutine psb_zbaseprc_aply(alpha,prec,x,beta,y,desc_data,trans,work,info)
 9999 continue
   call psb_errpush(info,name,i_err=int_err,a_err=ch_err)
   call psb_erractionrestore(err_act)
-  if (err_act.eq.act_abort) then
+  if (err_act.eq.psb_act_abort_) then
     call psb_error()
     return
   end if

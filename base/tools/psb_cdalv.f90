@@ -337,13 +337,20 @@ subroutine psb_cdalv(v, ictxt, desc_a, info, flag)
   call psb_cd_set_bld(desc_a,info)
 
   call psb_realloc(1,desc_a%halo_index, info)
-  if (info /= no_err) then
+  if (info /= psb_no_err_) then
     info=2025
     call psb_errpush(err,name,a_err='psb_realloc')
     Goto 9999
   end if
-
   desc_a%halo_index(:) = -1
+
+  call psb_realloc(1,desc_a%ext_index, info)
+  if (info /= psb_no_err_) then
+    info=2025
+    call psb_errpush(err,name,a_err='psb_realloc')
+    Goto 9999
+  end if
+  desc_a%ext_index(:) = -1
 
   desc_a%matrix_data(psb_m_)        = m
   desc_a%matrix_data(psb_n_)        = n
@@ -356,7 +363,7 @@ subroutine psb_cdalv(v, ictxt, desc_a, info, flag)
 
 9999 continue
   call psb_erractionrestore(err_act)
-  if (err_act == act_abort) then
+  if (err_act == psb_act_abort_) then
     call psb_error(ictxt)
     return
   end if

@@ -130,7 +130,7 @@ subroutine psi_idx_ins_cnv1(nv,idxin,desc,info,mask)
 9999 continue
   call psb_erractionrestore(err_act)
 
-  if (err_act.eq.act_ret) then
+  if (err_act.eq.psb_act_ret_) then
     return
   else
     call psb_error(ictxt)
@@ -368,7 +368,7 @@ subroutine psi_idx_ins_cnv2(nv,idxin,idxout,desc,info,mask)
 9999 continue
   call psb_erractionrestore(err_act)
 
-  if (err_act.eq.act_ret) then
+  if (err_act.eq.psb_act_ret_) then
     return
   else
     call psb_error(ictxt)

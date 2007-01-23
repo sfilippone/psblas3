@@ -19,7 +19,7 @@ lib:  $(OBJS)
 	$(AR) $(HERE)/$(LIBNAME) $(OBJS)
 	$(RANLIB) $(HERE)/$(LIBNAME)
 	/bin/cp -p $(HERE)/$(LIBNAME) $(LIBDIR)
-	/bin/cp -p $(LIBMOD) $(LIBDIR)
+	/bin/cp -p $(LIBMOD) $(LOCAL_MODS) $(LIBDIR)
 
 
 psb_util_mod.o: $(BASEOBJ)

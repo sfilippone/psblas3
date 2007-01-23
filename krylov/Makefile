@@ -21,6 +21,7 @@ lib:  $(OBJS)
 	/bin/cp -p $(HERE)/$(LIBNAME) $(LIBDIR)
 	/bin/cp -p $(LIBMOD) $(LIBDIR)
 
+$(OBJS): $(LIBDIR)/psb_prec_mod$(.mod)
 veryclean: clean
 	/bin/rm -f $(HERE)/$(LIBNAME)
 

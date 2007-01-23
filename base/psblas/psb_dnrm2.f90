@@ -132,7 +132,7 @@ function psb_dnrm2(x, desc_a, info, jx)
 9999 continue
   call psb_erractionrestore(err_act)
 
-  if (err_act.eq.act_abort) then
+  if (err_act.eq.psb_act_abort_) then
     call psb_error(ictxt)
     return
   end if
@@ -265,7 +265,7 @@ function psb_dnrm2v(x, desc_a, info)
 9999 continue
   call psb_erractionrestore(err_act)
 
-  if (err_act.eq.act_abort) then
+  if (err_act.eq.psb_act_abort_) then
     call psb_error(ictxt)
     return
   end if
@@ -399,7 +399,7 @@ subroutine psb_dnrm2vs(res, x, desc_a, info)
 9999 continue
   call psb_erractionrestore(err_act)
 
-  if (err_act.eq.act_abort) then
+  if (err_act.eq.psb_act_abort_) then
     call psb_error(ictxt)
     return
   end if

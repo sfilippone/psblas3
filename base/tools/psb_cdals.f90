@@ -345,7 +345,7 @@ subroutine psb_cdals(m, n, parts, ictxt, desc_a, info)
 
   if (debug) write(*,*) 'PSB_CDALL: Ov len',l_ov_ix,l_ov_el
   allocate(ov_idx(l_ov_ix),ov_el(l_ov_el), stat=info)
-  if (info /= no_err) then
+  if (info /= psb_no_err_) then
     info=4010
     err=info
     call psb_errpush(err,name,a_err='psb_realloc')
@@ -380,14 +380,12 @@ subroutine psb_cdals(m, n, parts, ictxt, desc_a, info)
   call psb_transfer(ov_idx,desc_a%ovrlap_index,info) 
   if (info == 0) call psb_transfer(ov_el,desc_a%ovrlap_elem,info)
   if (info == 0) deallocate(prc_v,temp_ovrlap,stat=info)
-  if (info /= no_err) then 
+  if (info /= psb_no_err_) then 
     info=4000
     err=info
     call psb_errpush(err,name)
     Goto 9999
   endif
-  ! At this point overlap_elem is OK. 
-  desc_a%matrix_data(psb_ovl_state_) = psb_cd_ovl_asb_
 
   ! set fields in desc_a%MATRIX_DATA....
   desc_a%matrix_data(psb_n_row_)  = loc_row
@@ -395,13 +393,20 @@ subroutine psb_cdals(m, n, parts, ictxt, desc_a, info)
   call psb_cd_set_bld(desc_a,info)
 
   call psb_realloc(1,desc_a%halo_index, info)
-  if (info /= no_err) then
+  if (info /= psb_no_err_) then
     info=2025
     call psb_errpush(err,name,a_err='psb_realloc')
     Goto 9999
   end if
-
   desc_a%halo_index(:) = -1
+
+  call psb_realloc(1,desc_a%ext_index, info)
+  if (info /= psb_no_err_) then
+    info=2025
+    call psb_errpush(err,name,a_err='psb_realloc')
+    Goto 9999
+  end if
+  desc_a%ext_index(:) = -1
 
   desc_a%matrix_data(psb_m_)        = m
   desc_a%matrix_data(psb_n_)        = n
@@ -413,7 +418,7 @@ subroutine psb_cdals(m, n, parts, ictxt, desc_a, info)
 
 9999 continue
   call psb_erractionrestore(err_act)
-  if (err_act == act_abort) then
+  if (err_act == psb_act_abort_) then
     call psb_error(ictxt)
     return
   end if

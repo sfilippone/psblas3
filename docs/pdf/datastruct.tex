@@ -99,7 +99,7 @@ as follows:
     \begin{minipage}[tl]{0.9\textwidth}
 \begin{verbatim} 
 type psb_desc_type 
-   integer, allocatable :: matrix_data(:), halo_index(:)
+   integer, allocatable :: matrix_data(:), halo_index(:), ext_index(:)
    integer, allocatable :: overlap_elem(:), overlap_index(:)
    integer, allocatable :: loc_to_glob(:), glob_to_loc(:)
    integer, allocatable :: hashv(:), glb_lc(:,:)

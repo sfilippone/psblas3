@@ -179,7 +179,7 @@ subroutine psb_dcsdp(a, b,info,ifc,check,trans,unitd,upd,dupl)
     call psb_cest(b%fida, n_row,n_col,size_req,&
          & ia1_size, ia2_size, aspk_size, upd_,info)
 
-    if (info /= no_err) then    
+    if (info /= psb_no_err_) then    
       info=4010
       ch_err='psb_cest'
       call psb_errpush(info,name,a_err=ch_err)
@@ -199,7 +199,7 @@ subroutine psb_dcsdp(a, b,info,ifc,check,trans,unitd,upd,dupl)
       call psb_sp_reall(b,ia1_size,ia2_size,aspk_size,info)
     endif
 
-    if (info /= no_err) then    
+    if (info /= psb_no_err_) then    
       info=4010
       ch_err='psb_sp_reall'
       call psb_errpush(info,name,a_err=ch_err)
@@ -516,7 +516,7 @@ subroutine psb_dcsdp(a, b,info,ifc,check,trans,unitd,upd,dupl)
 
 9999 continue
   call psb_erractionrestore(err_act)
-  if (err_act.eq.act_abort) then
+  if (err_act.eq.psb_act_abort_) then
     call psb_error()
     return
   end if

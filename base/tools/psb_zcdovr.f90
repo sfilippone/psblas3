@@ -43,7 +43,7 @@
 !    desc_ov  - type(<psb_desc_type>).         The auxiliary output communication descriptor.
 !    info     - integer.                       Eventually returns an error code.
 !
-Subroutine psb_zcdovr(a,desc_a,novr,desc_ov,info)
+Subroutine psb_zcdovr(a,desc_a,novr,desc_ov,info, extype)
 
   use psb_serial_mod
   use psb_descriptor_type
@@ -61,6 +61,17 @@ Subroutine psb_zcdovr(a,desc_a,novr,desc_ov,info)
   Type(psb_desc_type), Intent(in)    :: desc_a
   Type(psb_desc_type), Intent(inout) :: desc_ov
   integer, intent(out)               :: info
+  integer, intent(in),optional       :: extype
+
+  interface psb_icdasb
+    subroutine psb_icdasb(desc_a,info,ext_hv)
+      use psb_descriptor_type
+      Type(psb_desc_type), intent(inout) :: desc_a
+      integer, intent(out)               :: info
+      logical, intent(in),optional       :: ext_hv
+    end subroutine psb_icdasb
+  end interface
+
 
   integer   icomm, err_act
 
@@ -69,12 +80,12 @@ Subroutine psb_zcdovr(a,desc_a,novr,desc_ov,info)
        &  ictxt, lovr, lworks,lworkr, n_row,n_col, int_err(5),&
        &  index_dim,elem_dim, l_tmp_ovr_idx,l_tmp_halo, nztot,nhalo
   Integer :: counter,counter_h, counter_o, counter_e,idx,gidx,proc,n_elem_recv,&
-       & n_elem_send,tot_recv,tot_elem,&
+       & n_elem_send,tot_recv,tot_elem,cntov_o,&
        & counter_t,n_elem,i_ovr,jj,proc_id,isz, mglob, glx, &
-       & idxr, idxs, lx, iszr, iszs, nxch, nsnd, nrcv,lidx
+       & idxr, idxs, lx, iszr, iszs, nxch, nsnd, nrcv,lidx,irsv, extype_
 
   type(psb_zspmat_type) :: blk
-  Integer, allocatable  :: tmp_halo(:),tmp_ovr_idx(:)
+  Integer, allocatable  :: tmp_halo(:),tmp_ovr_idx(:), orig_ovr(:)
   Integer,allocatable   :: halo(:),works(:),workr(:),t_halo_in(:),&
        & t_halo_out(:),temp(:),maskr(:)
   Integer,allocatable  :: brvindx(:),rvsz(:), bsdindx(:),sdsz(:)
@@ -92,6 +103,11 @@ Subroutine psb_zcdovr(a,desc_a,novr,desc_ov,info)
 
   If(debug) Write(0,*)'in psb_cdovr',novr
 
+  if (present(extype)) then
+    extype_ = extype
+  else
+    extype_ = psb_ovt_xhal_  
+  endif
   m      = psb_cd_get_local_rows(desc_a)
   nnzero = Size(a%aspk)
   n_row  = psb_cd_get_local_rows(desc_a)
@@ -154,13 +170,9 @@ Subroutine psb_zcdovr(a,desc_a,novr,desc_ov,info)
   l_tmp_ovr_idx = novr*(3*Max(2*index_dim,1)+1)
   l_tmp_halo    = novr*(3*Size(desc_a%halo_index))
 
-  if (psb_is_large_desc(desc_a)) then
-    desc_ov%matrix_data(psb_desc_size_) = psb_desc_large_
-  else
-    desc_ov%matrix_data(psb_desc_size_) = psb_desc_normal_
-  end if
+!!$  write(0,*) 'Size of desc_ov ',    desc_ov%matrix_data(psb_desc_size_), &
+!!$       & psb_desc_normal_,psb_desc_large_
   call psb_cd_set_bld(desc_ov,info)
-!!$  desc_ov%matrix_data(psb_dec_type_) = psb_desc_bld_ 
 
   If(debug) then
     Write(0,*)'Start cdovrbld',me,lworks,lworkr
@@ -192,8 +204,8 @@ Subroutine psb_zcdovr(a,desc_a,novr,desc_ov,info)
 
   blk%fida='COO'
 
-  Allocate(tmp_ovr_idx(l_tmp_ovr_idx),tmp_halo(l_tmp_halo),&
-       & halo(size(desc_a%halo_index)),stat=info)
+  Allocate(orig_ovr(l_tmp_ovr_idx),tmp_ovr_idx(l_tmp_ovr_idx),&
+       & tmp_halo(l_tmp_halo), halo(size(desc_a%halo_index)),stat=info)
   if (info /= 0) then 
     call psb_errpush(4010,name,a_err='Allocate')
     goto 9999      
@@ -201,12 +213,13 @@ Subroutine psb_zcdovr(a,desc_a,novr,desc_ov,info)
   halo(:)                = desc_a%halo_index(:)
   desc_ov%ovrlap_elem(:) = -1
   tmp_ovr_idx(:)         = -1
+  orig_ovr(:)            = -1
   tmp_halo(:)            = -1
   counter_e              = 1
   tot_recv               = 0
   counter_h              = 1
   counter_o              = 1
-
+  cntov_o                = 1
   ! Init overlap with desc_a%ovrlap (if any) 
   counter = 1
   Do While (desc_a%ovrlap_index(counter) /= -1)
@@ -225,18 +238,18 @@ Subroutine psb_zcdovr(a,desc_a,novr,desc_ov,info)
 
       gidx = desc_ov%loc_to_glob(idx)
 
-      call psb_check_size((counter_o+3),tmp_ovr_idx,info,pad=-1)
+      call psb_check_size((cntov_o+3),orig_ovr,info,pad=-1)
       if (info /= 0) then
         info=4010
         call psb_errpush(info,name,a_err='psb_check_size')
         goto 9999
       end if
 
-      tmp_ovr_idx(counter_o)=proc
-      tmp_ovr_idx(counter_o+1)=1
-      tmp_ovr_idx(counter_o+2)=gidx
-      tmp_ovr_idx(counter_o+3)=-1
-      counter_o=counter_o+3
+      orig_ovr(cntov_o)=proc
+      orig_ovr(cntov_o+1)=1
+      orig_ovr(cntov_o+2)=gidx
+      orig_ovr(cntov_o+3)=-1
+      cntov_o=cntov_o+3
     end Do
     counter=counter+n_elem_recv+n_elem_send+2
   end Do
@@ -261,7 +274,7 @@ Subroutine psb_zcdovr(a,desc_a,novr,desc_ov,info)
   ! indices that will make up Hr1, and also who owns them. As we
   ! actually get those rows, we receive the column indices in Hc2;
   ! these define the row indices for Hr2, and so on. When we have
-  ! reached the desired level HrN, we may ignore HcN.
+  ! reached the desired level HrN. 
   !
   !
   Do i_ovr = 1, novr
@@ -284,6 +297,7 @@ Subroutine psb_zcdovr(a,desc_a,novr,desc_ov,info)
     counter    = 1
     counter_t  = 1
 
+    desc_ov%matrix_data(psb_n_row_)=desc_ov%matrix_data(psb_n_col_)
 
     Do While (halo(counter) /= -1)
       tot_elem=0
@@ -305,7 +319,6 @@ Subroutine psb_zcdovr(a,desc_a,novr,desc_ov,info)
       ! be enlarged with the new column indices received, and will reassemble
       ! everything for the next iteration.
       ! 
-
       !
       ! add recv elements in halo_index into ovrlap_index
       !
@@ -337,21 +350,19 @@ Subroutine psb_zcdovr(a,desc_a,novr,desc_ov,info)
         tmp_ovr_idx(counter_o+2)=gidx
         tmp_ovr_idx(counter_o+3)=-1
         counter_o=counter_o+3
-        if (.not.psb_is_large_desc(desc_ov)) then 
-          call psb_check_size((counter_h+3),tmp_halo,info,pad=-1)
-          if (info /= 0) then
-            info=4010
-            call psb_errpush(info,name,a_err='psb_check_size')
-            goto 9999
-          end if
-
-          tmp_halo(counter_h)=proc
-          tmp_halo(counter_h+1)=1
-          tmp_halo(counter_h+2)=idx
-          tmp_halo(counter_h+3)=-1
-
-          counter_h=counter_h+3
+        call psb_check_size((counter_h+3),tmp_halo,info,pad=-1)
+        if (info /= 0) then
+          info=4010
+          call psb_errpush(info,name,a_err='psb_check_size')
+          goto 9999
         end if
+
+        tmp_halo(counter_h)=proc
+        tmp_halo(counter_h+1)=1
+        tmp_halo(counter_h+2)=idx
+        tmp_halo(counter_h+3)=-1
+
+        counter_h=counter_h+3
 
       Enddo
       if (debug) write(0,*) me,'Checktmp_o_i Loop Mid1',tmp_ovr_idx(1:10)
@@ -384,7 +395,7 @@ Subroutine psb_zcdovr(a,desc_a,novr,desc_ov,info)
         !
         ! Prepare to exchange the halo rows with the other proc.
         !
-        If (i_ovr < (novr)) Then
+        If (i_ovr <= (novr)) Then
           n_elem = psb_sp_get_nnz_row(idx,a)
 
           call psb_check_size((idxs+tot_elem+n_elem),works,info)
@@ -423,7 +434,7 @@ Subroutine psb_zcdovr(a,desc_a,novr,desc_ov,info)
       Enddo
 
 
-      if (i_ovr < novr) then 
+      if (i_ovr <= novr) then 
         if (tot_elem > 1) then 
           call imsr(tot_elem,works(idxs+1))
           lx = works(idxs+1)
@@ -449,7 +460,7 @@ Subroutine psb_zcdovr(a,desc_a,novr,desc_ov,info)
     Enddo
     if (debug) write(0,*)me,'End phase 1 CDOVRBLD', m, n_col, tot_recv
 
-    if (i_ovr < novr) then
+    if (i_ovr <= novr) then
       ! 
       ! Exchange data requests with everybody else: so far we have 
       ! accumulated RECV requests, we have an all-to-all to build
@@ -502,7 +513,7 @@ Subroutine psb_zcdovr(a,desc_a,novr,desc_ov,info)
 
       if (debug) write(0,*) 'ISZR :',iszr
 
-      if (psb_is_large_desc(desc_a)) then 
+      if (psb_is_large_desc(desc_ov)) then 
         call psb_check_size(iszr,maskr,info)
         if (info /= 0) then
           info=4010
@@ -548,11 +559,13 @@ Subroutine psb_zcdovr(a,desc_a,novr,desc_ov,info)
             t_halo_in(counter_t)=proc_id
             t_halo_in(counter_t+1)=1
             t_halo_in(counter_t+2)=lidx
+            t_halo_in(counter_t+3)=-1
             counter_t=counter_t+3
             if (.false.) write(0,*) me,' CDOVRBLD: Added t_halo_in ',&
                  &proc_id,lidx,idx
           endif
         end Do
+        n_col   = psb_cd_get_local_cols(desc_ov)
 
       else
 
@@ -588,6 +601,7 @@ Subroutine psb_zcdovr(a,desc_a,novr,desc_ov,info)
             t_halo_in(counter_t)=proc_id
             t_halo_in(counter_t+1)=1
             t_halo_in(counter_t+2)=n_col
+            t_halo_in(counter_t+3)=-1
             counter_t=counter_t+3
             if (debug) write(0,*) me,' CDOVRBLD: Added into t_halo_in from recv',&
                  &proc_id,n_col,idx
@@ -601,7 +615,6 @@ Subroutine psb_zcdovr(a,desc_a,novr,desc_ov,info)
       end if
 
     end if
-!!$    desc_ov%matrix_data(psb_n_row_)=desc_ov%matrix_data(psb_n_col_)
     !
     ! Ok, now we have a temporary halo with all the info for the
     ! next round. If we need to keep going, convert the halo format
@@ -609,10 +622,10 @@ Subroutine psb_zcdovr(a,desc_a,novr,desc_ov,info)
     ! This uses one of the convert_comm internals, i.e. we are doing
     ! the equivalent of a partial call to convert_comm
     !
+    t_halo_in(counter_t)=-1
 
     If (i_ovr < (novr)) Then
 
-      t_halo_in(counter_t)=-1
 
       if (debug) write(0,*) me,'Checktmp_o_i 1',tmp_ovr_idx(1:10)
       if (debug) write(0,*) me,'Calling Crea_Halo'
@@ -635,16 +648,72 @@ Subroutine psb_zcdovr(a,desc_a,novr,desc_ov,info)
 
   End Do
 
-  desc_ov%matrix_data(psb_m_)=psb_cd_get_global_rows(desc_a)
-  desc_ov%matrix_data(psb_n_)=psb_cd_get_global_cols(desc_a)
 
-  tmp_halo(counter_h:)=-1
-  tmp_ovr_idx(counter_o:)=-1
+  select case(extype_) 
+  case(psb_ovt_xhal_)
+    !
+    ! Build an extended-stencil halo, but no overlap enlargement. 
+    ! Here we need: 1. orig_ovr -> ovrlap
+    !               2. (tmp_halo + t_halo_in) -> halo
+    !               3. (t_ovr_idx) -> /dev/null 
+    !               4. n_row(ov) = n_row(a)
+    !               5. n_col(ov)  current. 
+    !
+    desc_ov%matrix_data(psb_n_row_) = desc_a%matrix_data(psb_n_row_)
+    call psb_transfer(orig_ovr,desc_ov%ovrlap_index,info)
+    call psb_check_size((counter_h+counter_t+1),tmp_halo,info,pad=-1)
+    if (info /= 0) then
+      call psb_errpush(4010,name,a_err='psb_check_size')
+      goto 9999
+    end if
+    tmp_halo(counter_h:counter_h+counter_t-1) = t_halo_in(1:counter_t)
+    counter_h            = counter_h+counter_t-1
+    tmp_halo(counter_h:) = -1
+    call psb_transfer(tmp_halo,desc_ov%halo_index,info)
+    deallocate(tmp_ovr_idx,stat=info)
+    if (info /= 0) then
+      call psb_errpush(4010,name,a_err='deallocate')
+      goto 9999
+    end if
+    
+  case(psb_ovt_asov_)
+    !
+    ! Build an overlapped descriptor for Additive Schwarz 
+    !  with overlap enlargement; we need the overlap, 
+    !  the (new) halo and the mapping into the new index space. 
+    ! Here we need: 1. (orig_ovr + t_ovr_idx -> ovrlap
+    !               2. (tmp_halo) -> ext
+    !               3. (t_halo_in) -> halo 
+    !               4. n_row(ov)  current.
+    !               5. n_col(ov)  current. 
+    ! 
+    call psb_check_size((cntov_o+counter_o+1),orig_ovr,info,pad=-1)
+    if (info /= 0) then
+      call psb_errpush(4010,name,a_err='psb_check_size')
+      goto 9999
+    end if
+    orig_ovr(cntov_o:cntov_o+counter_o-1) = tmp_ovr_idx(1:counter_o)
+    cntov_o = cntov_o+counter_o-1
+    orig_ovr(cntov_o:) = -1
+    call psb_transfer(orig_ovr,desc_ov%ovrlap_index,info)
+    deallocate(tmp_ovr_idx,stat=info)
+    if (info /= 0) then
+      call psb_errpush(4010,name,a_err='deallocate')
+      goto 9999
+    end if
+    tmp_halo(counter_h:) = -1
+    call psb_transfer(tmp_halo,desc_ov%ext_index,info)
+    call psb_transfer(t_halo_in,desc_ov%halo_index,info)
 
+  case default
+    call psb_errpush(30,name,i_err=(/5,extype_,0,0,0/))
+    goto 9999
+  end select
 
   !
   ! At this point we have gathered all the indices in the halo at
-  ! N levels of overlap. Just call cnv_dsc. This is
+  ! N levels of overlap. Just call icdasb forcing to use 
+  ! the halo_index provided. This is
   ! the same routine as gets called inside CDASB.
   !
 
@@ -652,14 +721,7 @@ Subroutine psb_zcdovr(a,desc_a,novr,desc_ov,info)
     write(0,*) 'psb_cdovrbld: converting indexes'
     call psb_barrier(ictxt)
   end if
-  !.... convert comunication stuctures....
-  ! Note that we have to keep local_rows until the very end, 
-  ! because otherwise the halo build mechanism of cdasb
-  ! will not work. 
-  call psb_transfer(tmp_ovr_idx,desc_ov%ovrlap_index,info)
-  call psb_transfer(tmp_halo,desc_ov%halo_index,info)
-  call psb_cdasb(desc_ov,info)
-  desc_ov%matrix_data(psb_n_row_)=desc_ov%matrix_data(psb_n_col_)
+  call psb_icdasb(desc_ov,info,ext_hv=.true.)
 
   if (debug) then 
     write(0,*) me,'Done CDASB'
@@ -678,7 +740,7 @@ Subroutine psb_zcdovr(a,desc_a,novr,desc_ov,info)
 
 9999 continue
   call psb_erractionrestore(err_act)
-  if (err_act == act_abort) then
+  if (err_act == psb_act_abort_) then
     call psb_error(ictxt)
     return
   end if

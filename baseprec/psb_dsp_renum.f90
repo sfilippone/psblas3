@@ -284,7 +284,7 @@ subroutine psb_dsp_renum(a,desc_a,p,atmp,info)
 
 9999 continue
   call psb_erractionrestore(err_act)
-  if (err_act.eq.act_abort) then
+  if (err_act.eq.psb_act_abort_) then
     call psb_error()
     return
   end if
@@ -380,7 +380,7 @@ contains
 
 9999 continue
     call psb_erractionrestore(err_act)
-    if (err_act.eq.act_abort) then
+    if (err_act.eq.psb_act_abort_) then
       call psb_error()
       return
     end if

@@ -151,7 +151,7 @@ function psb_ddot(x, y,desc_a, info, jx, jy)
 9999 continue
   call psb_erractionrestore(err_act)
 
-  if (err_act.eq.act_abort) then
+  if (err_act.eq.psb_act_abort_) then
     call psb_error(ictxt)
     return
   end if
@@ -289,7 +289,7 @@ function psb_ddotv(x, y,desc_a, info)
 9999 continue
   call psb_erractionrestore(err_act)
 
-  if (err_act.eq.act_abort) then
+  if (err_act.eq.psb_act_abort_) then
     call psb_error(ictxt)
     return
   end if
@@ -425,7 +425,7 @@ subroutine psb_ddotvs(res, x, y,desc_a, info)
 9999 continue
   call psb_erractionrestore(err_act)
 
-  if (err_act.eq.act_abort) then
+  if (err_act.eq.psb_act_abort_) then
     call psb_error(ictxt)
     return
   end if
@@ -577,7 +577,7 @@ subroutine psb_dmdots(res, x, y, desc_a, info)
 9999 continue
   call psb_erractionrestore(err_act)
 
-  if (err_act.eq.act_abort) then
+  if (err_act.eq.psb_act_abort_) then
     call psb_error(ictxt)
     return
   end if
@@ -676,7 +676,7 @@ subroutine psb_ddot2v(res, x, y,w,z,desc_a, info)
 9999 continue
   call psb_erractionrestore(err_act)
 
-  if (err_act.eq.act_abort) then
+  if (err_act.eq.psb_act_abort_) then
     call psb_error(ictxt)
     return
   end if

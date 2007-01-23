@@ -278,9 +278,10 @@ module psi_mod
    end interface
   
   interface psi_ldsc_pre_halo
-     subroutine psi_ldsc_pre_halo(desc,info)
+     subroutine psi_ldsc_pre_halo(desc,ext_hv,info)
        use psb_descriptor_type
        type(psb_desc_type), intent(inout) :: desc
+       logical, intent(in)  :: ext_hv
        integer, intent(out) :: info
      end subroutine psi_ldsc_pre_halo
    end interface
@@ -344,7 +345,7 @@ module psi_mod
 
 contains
   
-  subroutine psi_cnv_dsc(halo_in,ovrlap_in,cdesc, info)
+  subroutine psi_cnv_dsc(halo_in,ovrlap_in,ext_in,cdesc, info)
 
     use psb_const_mod
     use psb_error_mod
@@ -354,7 +355,7 @@ contains
     implicit none
 
     !     ....scalars parameters....
-    integer, intent(in)  :: halo_in(:), ovrlap_in(:)
+    integer, intent(in)  :: halo_in(:), ovrlap_in(:),ext_in(:)
     type(psb_desc_type), intent(inout) :: cdesc
     integer, intent(out)  :: info
 
@@ -396,6 +397,22 @@ contains
     cdesc%matrix_data(psb_thal_rcv_) = nrcv 
     
     if (debug) write(0,*) me,'Done crea_index on halo'
+    if (debug) write(0,*) me,'Calling crea_index on ext'
+
+
+    ! then ext index
+    if (debug) write(0,*) me,'Calling crea_index on ext'
+    call psi_crea_index(cdesc,ext_in, idx_out,.false.,nxch,nsnd,nrcv,info)
+    if(info /= 0) then
+      call psb_errpush(4010,name,a_err='psi_crea_index')
+      goto 9999
+    end if
+    call psb_transfer(idx_out,cdesc%ext_index,info)
+    cdesc%matrix_data(psb_text_xch_) = nxch
+    cdesc%matrix_data(psb_text_snd_) = nsnd
+    cdesc%matrix_data(psb_text_rcv_) = nrcv 
+    
+    if (debug) write(0,*) me,'Done crea_index on ext'
     if (debug) write(0,*) me,'Calling crea_index on ovrlap'
 
     ! then the overlap index
@@ -439,7 +456,7 @@ contains
 
 9999 continue
     call psb_erractionrestore(err_act)
-    if (err_act == act_abort) then
+    if (err_act == psb_act_abort_) then
       call psb_error(ictxt)
       return
     end if

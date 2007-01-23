@@ -398,7 +398,7 @@ subroutine psi_zswapdatam(flag,n,beta,y,desc_a,work,info,data)
 
 9999 continue
   call psb_erractionrestore(err_act)
-  if (err_act == act_abort) then
+  if (err_act == psb_act_abort_) then
     call psb_error(ictxt)
     return
   end if
@@ -793,7 +793,7 @@ subroutine psi_zswapdatav(flag,beta,y,desc_a,work,info,data)
 
 9999 continue
   call psb_erractionrestore(err_act)
-  if (err_act == act_abort) then
+  if (err_act == psb_act_abort_) then
     call psb_error(ictxt)
     return
   end if

@@ -36,7 +36,7 @@
 ! Parameters: 
 !    desc_a  - type(<psb_desc_type>).         The communication descriptor.
 !    info    - integer.                       Eventually returns an error code.
-subroutine psb_cdasb(desc_a,info)
+subroutine psb_icdasb(desc_a,info,ext_hv)
   use psb_descriptor_type
   use psb_serial_mod
   use psb_const_mod
@@ -49,16 +49,17 @@ subroutine psb_cdasb(desc_a,info)
   !...Parameters....
   type(psb_desc_type), intent(inout) :: desc_a
   integer, intent(out)               :: info
-
+  logical, intent(in), optional      :: ext_hv
 
   !....Locals....
   integer          ::  int_err(5), itemp(2)
-  integer,allocatable ::  ovrlap_index(:),halo_index(:)
+  integer,allocatable ::  ovrlap_index(:),halo_index(:), ext_index(:)
 
   integer          ::  i,j,err,np,me,lovrlap,lhalo,nhalo,novrlap,max_size,&
        & max_halo,n_col,ldesc_halo, ldesc_ovrlap, dectype, err_act, &
        & key, ih, nh, idx, nk,icomm,hsize
   integer                       :: ictxt,n_row
+  logical                       :: ext_hv_
   logical, parameter            :: debug=.false., debugwrt=.false.
   character(len=20)             :: name,ch_err
 
@@ -88,7 +89,12 @@ subroutine psb_cdasb(desc_a,info)
     call psb_errpush(info,name)
     goto 9999
   endif
-
+  
+  if (present(ext_hv)) then 
+    ext_hv_ = ext_hv
+  else
+    ext_hv_ = .false.
+  end if
   if (debug) write (0, *) '   Begin matrix assembly...'
 
   if (psb_is_bld_desc(desc_a)) then 
@@ -101,7 +107,7 @@ subroutine psb_cdasb(desc_a,info)
       endif
     enddo
 
-    if (info /= no_err) then    
+    if (info /= psb_no_err_) then    
       call psb_errpush(info,name,i_err=int_err)
       goto 9999
     endif
@@ -109,20 +115,21 @@ subroutine psb_cdasb(desc_a,info)
     call psb_realloc(psb_cd_get_local_cols(desc_a),desc_a%loc_to_glob,info)
 
     if (psb_is_large_desc(desc_a)) then 
-      call psi_ldsc_pre_halo(desc_a,info)
+      call psi_ldsc_pre_halo(desc_a,ext_hv_,info)
     end if
 
     call psb_transfer(desc_a%ovrlap_index,ovrlap_index,info)
     call psb_transfer(desc_a%halo_index,halo_index,info)
+    call psb_transfer(desc_a%ext_index,ext_index,info)
 
-    call psi_cnv_dsc(halo_index,ovrlap_index,desc_a,info) 
+    call psi_cnv_dsc(halo_index,ovrlap_index,ext_index,desc_a,info) 
     if (info /= 0) then
       call psb_errpush(4010,name,a_err='psi_cnv_dsc')
       goto 9999
     end if
 
 
-    deallocate(ovrlap_index, halo_index, stat=info)
+    deallocate(ovrlap_index, halo_index, ext_index, stat=info)
     if (info /= 0) then
       info =4000
       call psb_errpush(info,name)
@@ -144,11 +151,11 @@ subroutine psb_cdasb(desc_a,info)
 9999 continue
   call psb_erractionrestore(err_act)
 
-  if (err_act.eq.act_ret) then
+  if (err_act.eq.psb_act_ret_) then
     return
   else
     call psb_error(ictxt)
   end if
   return
 
-end subroutine psb_cdasb
+end subroutine psb_icdasb

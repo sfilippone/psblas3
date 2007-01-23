@@ -13,7 +13,7 @@ FOBJS = psb_dallc.o psb_dasb.o psb_dcsrp.o psb_cdprt.o \
 	psb_zspalloc.o psb_zspasb.o psb_zspcnv.o psb_zspfree.o\
 	psb_zspins.o psb_zsprn.o psb_zcdovr.o psb_zgelp.o
 
-MPFOBJS = psb_dsphalo.o psb_zsphalo.o psb_cdasb.o psb_dcdovr.o psb_zcdovr.o
+MPFOBJS = psb_dsphalo.o psb_zsphalo.o psb_icdasb.o psb_dcdovr.o psb_zcdovr.o
 
 LIBDIR = ..
 MODDIR = ../modules

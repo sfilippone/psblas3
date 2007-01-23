@@ -134,7 +134,7 @@ subroutine psb_zcsrp(trans,iperm,a, desc_a, info)
 
   call psb_realloc(l_dcsdp,work_dcsdp,info)
   call psb_realloc(n_col,ipt,info)
-  if(info /= no_err) then
+  if(info /= psb_no_err_) then
     info=4010
     char_err='psrealloc'
     call psb_errpush(info,name,a_err=char_err)
@@ -160,7 +160,7 @@ subroutine psb_zcsrp(trans,iperm,a, desc_a, info)
   if (debug) write(0,*) 'spasb: calling dcsrp',size(work_dcsdp)
   call zcsrp(trans,n_row,n_col,a%fida,a%descra,a%ia1,a%ia2,a%infoa,&
        & ipt,work_dcsdp,size(work_dcsdp),info)
-  if(info /= no_err) then
+  if(info /= psb_no_err_) then
     info=4010
     char_err='dcsrp'
     call psb_errpush(info,name,a_err=char_err)
@@ -182,7 +182,7 @@ subroutine psb_zcsrp(trans,iperm,a, desc_a, info)
 
 9999 continue
   call psb_erractionrestore(err_act)
-  if (err_act == act_abort) then
+  if (err_act == psb_act_abort_) then
     call psb_error()
     return
   end if

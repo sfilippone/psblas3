@@ -83,7 +83,7 @@ subroutine psb_zfree(x, desc_a, info)
 
   !deallocate x
   deallocate(x,stat=info)
-  if (info /= no_err) then
+  if (info /= psb_no_err_) then
     info=4000
     call psb_errpush(info,name)
     goto 9999
@@ -95,7 +95,7 @@ subroutine psb_zfree(x, desc_a, info)
 
 9999 continue
   call psb_erractionrestore(err_act)
-  if (err_act == act_abort) then
+  if (err_act == psb_act_abort_) then
      call psb_error(ictxt)
      return
   end if
@@ -159,7 +159,7 @@ subroutine psb_zfreev(x, desc_a, info)
 
   !deallocate x
   deallocate(x,stat=info)
-  if (info /= no_err) then
+  if (info /= psb_no_err_) then
      info=4000
      call psb_errpush(info,name)
   endif
@@ -170,7 +170,7 @@ subroutine psb_zfreev(x, desc_a, info)
 9999 continue
   call psb_erractionrestore(err_act)
 
-  if (err_act == act_ret) then
+  if (err_act == psb_act_ret_) then
      return
   else
      call psb_error(ictxt)

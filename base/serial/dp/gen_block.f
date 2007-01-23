@@ -30,6 +30,7 @@ C
 C 
       SUBROUTINE GEN_BLOCK(M,NG,IA,AUX)
       use psb_const_mod
+      use psb_spmat_type
       IMPLICIT NONE
 
       INTEGER M, NG

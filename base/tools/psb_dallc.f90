@@ -139,7 +139,7 @@ subroutine psb_dalloc(x, desc_a, info, n)
 
 9999 continue
   call psb_erractionrestore(err_act)
-  if (err_act == act_abort) then
+  if (err_act == psb_act_abort_) then
     call psb_error(ictxt)
     return
   end if
@@ -266,7 +266,7 @@ subroutine psb_dallocv(x, desc_a,info,n)
 
 9999 continue
   call psb_erractionrestore(err_act)
-  if (err_act == act_abort) then
+  if (err_act == psb_act_abort_) then
     call psb_error(ictxt)
     return
   end if
