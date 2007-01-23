@@ -77,39 +77,39 @@ subroutine psi_ldsc_pre_halo(desc,ext_hv,info)
 
   nk = n_col
   call psb_realloc(nk,2,desc%glb_lc,info) 
-  if (info ==0) call psb_realloc(hashsize,desc%hashv,info,lb=0)
+  if (info ==0) call psb_realloc(psb_hash_size,desc%hashv,info,lb=0)
   if (info /= 0) then 
     ch_err='psb_realloc'
     call psb_errpush(info,name,a_err=ch_err)
     goto 9999
   end if
 
-  desc%hashv(0:hashsize) = 0
+  desc%hashv(0:psb_hash_size) = 0
   do i=1, nk
     key = desc%loc_to_glob(i)
-    ih  = iand(key,hashmask) 
+    ih  = iand(key,psb_hash_mask) 
     desc%hashv(ih) = desc%hashv(ih) + 1
   end do
   nh = desc%hashv(0) 
   idx = 1
-  do i=1, hashsize
+  do i=1, psb_hash_size
     desc%hashv(i-1) = idx
     idx = idx + nh
     nh = desc%hashv(i)
   end do
   do i=1, nk
     key = desc%loc_to_glob(i)
-    ih  = iand(key,hashmask)
+    ih  = iand(key,psb_hash_mask)
     idx = desc%hashv(ih) 
     desc%glb_lc(idx,1) = key
     desc%glb_lc(idx,2) = i
     desc%hashv(ih) = desc%hashv(ih) + 1
   end do
-  do i = hashsize, 1, -1 
+  do i = psb_hash_size, 1, -1 
     desc%hashv(i) = desc%hashv(i-1)
   end do
   desc%hashv(0) = 1
-  do i=0, hashsize-1 
+  do i=0, psb_hash_size-1 
     idx = desc%hashv(i)
     nh  = desc%hashv(i+1) - desc%hashv(i) 
     if (nh > 1) then 

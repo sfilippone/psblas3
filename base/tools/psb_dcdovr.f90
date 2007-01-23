@@ -713,8 +713,8 @@ Subroutine psb_dcdovr(a,desc_a,novr,desc_ov,info, extype)
   !
   ! At this point we have gathered all the indices in the halo at
   ! N levels of overlap. Just call icdasb forcing to use 
-  ! the halo_index provided. This is
-  ! the same routine as gets called inside CDASB.
+  ! the halo_index provided. This is the same routine as gets 
+  ! called inside CDASB.
   !
 
   if (debug) then

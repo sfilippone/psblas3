@@ -287,7 +287,7 @@ subroutine psi_idx_cnv2(nv,idxin,idxout,desc,info,mask,owned)
       if (.not.allocated(desc%hashv)) then 
         write(0,*) 'Inconsistent input to inner_cnv'
       end if
-      call psi_inner_cnv(nv,idxin,idxout,hashsize,hashmask,&
+      call psi_inner_cnv(nv,idxin,idxout,psb_hash_size,psb_hash_mask,&
            & desc%hashv,desc%glb_lc)
     end if
 

@@ -203,11 +203,11 @@ program pde90
 
   if (iam == 0) then
     write(*,'(" ")')
-    write(*,'("Time to solve matrix : ",es10.4)')t2
-    write(*,'("Time per iteration   : ",es10.4)')t2/iter
-    write(*,'("Number of iterations : ",i0)')iter
-    write(*,'("Error on exit        : ",es10.4)')err
-    write(*,'("Info  on exit        : ",i0)')info
+    write(*,'("Time to solve matrix          : ",es10.4)')t2
+    write(*,'("Time per iteration            : ",es10.4)')t2/iter
+    write(*,'("Number of iterations          : ",i0)')iter
+    write(*,'("Convergence indicator on exit : ",es10.4)')err
+    write(*,'("Info  on exit                 : ",i0)')info
   end if
 
   !  

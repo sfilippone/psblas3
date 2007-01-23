@@ -163,11 +163,11 @@ program zf_sample
       write(*,'("Partition type: graph")')
       write(*,'(" ")')
       !      write(0,'("Build type: graph")')
-      call build_grppart(aux_a%m,aux_a%fida,aux_a%ia1,aux_a%ia2,np)
+      call build_mtpart(aux_a%m,aux_a%fida,aux_a%ia1,aux_a%ia2,np)
     endif
     call psb_barrier(ictxt)
-    call distr_grppart(root,ictxt)
-    call getv_grppart(ivg)
+    call distr_mtpart(root,ictxt)
+    call getv_mtpart(ivg)
     call psb_matdist(aux_a, a, ivg, ictxt, &
          & desc_a,b_col_glob,b_col,info,fmt=afmt)
   else 

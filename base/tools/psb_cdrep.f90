@@ -187,7 +187,7 @@ subroutine psb_cdrep(m, ictxt, desc_a, info)
   ! If the index space is replicated there's no point in having 
   ! the AVL tree structure.... 
   desc_a%matrix_data(psb_desc_size_) = psb_desc_normal_
-
+  
 
   desc_a%matrix_data(psb_m_)        = m
   desc_a%matrix_data(psb_n_)        = n

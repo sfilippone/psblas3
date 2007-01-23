@@ -131,7 +131,7 @@ subroutine psb_cdalv(v, ictxt, desc_a, info, flag)
 
   !count local rows number
   ! allocate work vector
-  if (m > psb_cd_get_large_threshold()) then 
+  if (psb_cd_choose_large_state(ictxt,m)) then 
     allocate(desc_a%matrix_data(psb_mdata_size_),&
          &temp_ovrlap(m),stat=info)
     desc_a%matrix_data(psb_desc_size_) = psb_desc_large_
@@ -153,7 +153,7 @@ subroutine psb_cdalv(v, ictxt, desc_a, info, flag)
   itmpov  = 0
   temp_ovrlap(:) = -1
 
-  if ( m >psb_cd_get_large_threshold()) then 
+  if (psb_cd_choose_large_state(ictxt,m)) then 
 
     do i=1,m
 

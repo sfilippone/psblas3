@@ -79,8 +79,8 @@ module psb_descriptor_type
   integer, parameter :: psb_desc_large_=psb_desc_normal_+1
   integer, parameter :: psb_cd_ovl_bld_=3399
   integer, parameter :: psb_cd_ovl_asb_=psb_cd_ovl_bld_+1
-  integer, parameter :: nbits=14
-  integer, parameter :: hashsize=2**nbits, hashmask=hashsize-1
+  integer, parameter :: psb_hash_bits=14
+  integer, parameter :: psb_hash_size=2**psb_hash_bits, psb_hash_mask=psb_hash_size-1
   integer, parameter :: psb_default_large_threshold=4*1024*1024   ! to be reviewed
   integer, parameter :: psb_hpnt_nentries_=7
 
@@ -95,34 +95,170 @@ module psb_descriptor_type
   integer, parameter :: psb_elem_send_=3, psb_n_ovrlp_elem_=1
   integer, parameter :: psb_ovrlp_elem_to_=2, psb_ovrlp_elem_=0
   integer, parameter :: psb_n_dom_ovr_=1
+  
+  
+  !
+  !  DESC data structure. 
+  !  This is the most important data structure: it holds all the data 
+  !  necessary to organize data exchange. The pattern of communication 
+  !  among processes depends not only on the allocation of portions of 
+  !  the index space to the various processes, but also on the undelying
+  !  mesh discretization pattern. Thus building a communication descriptor is
+  !  very much linked to building a sparse matrix (since the matrix sparsity 
+  !  pattern embodies the topology of the discretization graph).
+  !  
+  !  Most general info about the descriptor is stored in the matrix_dataq
+  !  component, including the STATE which can be  PSB_DESC_BLD_, 
+  !  PSB_DESC_ASB_ or PSB_DESC_REPL_. 
+  !  Upon allocation with PSB_CDALL the descriptor enters the BLD state;
+  !  then the user can specify the discretization pattern with PSB_CDINS;
+  !  the call to PSB_CDASB puts the descriptor in the PSB_ASB_ state. 
+  !
+  !  PSB_DESC_REPL_ is a special value that specifies a replicated index space,
+  !  and is only entered by the psb_cdrep call. Currently it is only 
+  !  used in the last level of some multilevel preconditioners. 
+  ! 
+  !  The LOC_TO_GLOB, GLOB_TO_LOC, GLB_LC, HASHV and PTREE arrays implement the 
+  !  mapping between local and global indices, according to the following 
+  !  guidelines:
+  !
+  !  1. Each global index I is owned by at least one process;
+  !
+  !  2. On each process, indices from 1 to N_ROW (desc%matrix_dat(psb_n_row_))
+  !     are locally owned; the value of N_ROW can be determined upon allocation 
+  !     based on the index distribution (see also the interface to CDALL).
+  !
+  !  3. If a global index is owned by more than one process, we have an OVERLAP
+  !     in which case the sum of all the N_ROW values is greater than the total 
+  !     size of the index space; 
+  !
+  !  4. During the buildup of the descriptor, according to the user specified 
+  !     stencil, we also take notice of indices that are not owned by the current
+  !     process, but whose value is needed to proceed with the computation; these 
+  !     form the HALO of the current process. Halo indices are assigned local indices
+  !     from N_ROW+1 to N_COL (inclusive).
+  !
+  !  5. Regardless of the descriptor state, LOC_TO_GLOB(I), I=1:N_COL always 
+  !     contains the global index corresponding to local index I; the upper bound 
+  !     N_COL moves during the descriptor build process (see CDINS). 
+  !
+  !  6. The descriptor also contains the inverse global-to-local mapping. This 
+  !     mapping can take two forms according to the value returned by 
+  !     psb_cd_choose_large_state:
+  !     i. If the global index space size is not too large, it is possible to store 
+  !        a complete mapping  in GLOB_TO_LOC: each entry contains the corresponding 
+  !        local index (if there is one), or an encoded value identifying the process 
+  !        owning that index. This array is filled in at initialization time CDALL, 
+  !        and thus it is available throughout the insertion phase. The local storage 
+  !        will thus be N_COL + N_GLOB
+  !   ii.  If the global index space is very large (larger than the threshold value
+  !        which may be set by the user), then it is not advisable to have such an 
+  !        array; thus we only record the global indices that do have a 
+  !        local counterpart. Thus the local storage will be proportional to 
+  !        N_COL. During the build phase we keep the known global indices in an 
+  !        AVL tree data structure whose pointer is stored in ptree(:), so that we 
+  !        can do both search and insertions in log time. At assembly time, we move 
+  !        the information into hashv(:) and glb_lc(:,:). The idea is that 
+  !        glb_lc(:,1) will hold sorted global indices, and glb_lc(:,2) the 
+  !        corresponding local indices, so that we may do a binary search. To cut down
+  !        the search time we partition glb_lc into a set of lists addressed by 
+  !        hashv(:) based on the value of the lowest PSB_HASH_BITS bits of the 
+  !        global index. 
+  !
+  !  7. The data exchange is based on lists of local indices to be exchanged; all the 
+  !     lists have the same format, as follows:
+  !     the list is  composed of variable dimension blocks, one for each process to 
+  !     communicate with; each block contains indices of local elements to be 
+  !     exchanged. We do choose the order of communications:  do not change 
+  !     the sequence of blocks unless you know what you're doing, or you'll 
+  !     risk a deadlock. NOTE: This is the format when the state is PSB_ASB_.
+  !     See below for BLD. The end-of-list is marked with a -1. 
+  !
+  !  notation        stored in		          explanation
+  !  --------------- --------------------------- -----------------------------------
+  !  process_id      index_v(p+proc_id_)      identifier of process with which 
+  !                                                data is  exchanged.
+  !  n_elements_recv index_v(p+n_elem_recv_)  number of elements to receive.
+  !  elements_recv   index_v(p+elem_recv_+i)  indexes of local elements to
+  !					          receive. these are stored in the
+  !					          array from location p+elem_recv_ to
+  !					          location p+elem_recv_+
+  !						  index_v(p+n_elem_recv_)-1.
+  !  n_elements_send index_v(p+n_elem_send_)  number of elements to send.
+  !  elements_send   index_v(p+elem_send_+i)  indexes of local elements to
+  !					          send. these are stored in the
+  !					          array from location p+elem_send_ to
+  !					          location p+elem_send_+
+  !						  index_v(p+n_elem_send_)-1.
+  !
+  !     This organization is valid for both halo and overlap indices; overlap entries
+  !     need to be updated to ensure that a variable at a given global index 
+  !     (assigned to multiple processes) has the same value. The way to resolve the 
+  !     issue is to exchange the data and then sum (or average) the values. See
+  !     psb_ovrl subroutine. 
+  !  
+  !  8. When the descriptor is in the BLD state the INDEX vectors contains only 
+  !     the indices to be received, organized as  a sequence 
+  !     of entries of the form (proc,N,(lx1,lx2,...,lxn)) with owning process,
+  !     number of indices (most often N=1), list of local indices. 
+  !     This is because we only know the list of halo indices to be received 
+  !     as we go about building the sparse matrix pattern, and we want the build 
+  !     phase to be loosely synchronized. Thus we record the indices we have to ask 
+  !     for, and at the time we call PSB_CDASB we match all the requests to figure 
+  !     out who should be sending what. 
+  !     However this implies that we know who owns the indices; if we are in the 
+  !     LARGE case (as described above) this is actually only true for the OVERLAP list 
+  !     that is filled in at CDALL time, and not for the HALO; thus the HALO list 
+  !     is rebuilt during the CDASB process (in the psi_ldsc_pre_halo subroutine). 
+  !  
+  !  9. Yet another twist comes about when building an extended descriptor with 
+  !     the psb_cdbldext subroutine. In this case we are reaching out 
+  !     layer by layer, but we may use the results in two ways:
+  !      i. To build a descriptor with the same "owned" indices, but with an 
+  !         extended halo, with additional layers; in this case the requests 
+  !         go into halo_index;
+  !     ii. To build a descriptor suitable for overlapped Schwarz-type computations.
+  !         In this case we end up with more "owned" indices than in the base 
+  !         descriptor, so that what was a halo index in the base becomes an overlap
+  !         index in the extended descriptor. In this case we build three lists: 
+  !         ovrlap_index    the indices that overlap
+  !         halo_index      the halo indices (of the extended descriptor)
+  !         ext_index       the indices of elements that need to be gathered to 
+  !                         map the original index space onto the new (overlapped) 
+  !                         index space. 
+  !     So, ext_index has the same format as the others, but is only used in the 
+  !     context of Schwarz-type computations; otherwise it is empty (i.e. 
+  !     it only contains the end-of-list marker -1). 
+  !
+  ! 10. ovrlap_elem contains a list of overlap indices together with their degree
+  !     of overlap, i.e. the number of processes "owning" them.
+  ! 
+  !
+  !  Yes, it is complex, but it does the following:
+  !  1. Allows a purely local matrix/stencil buildup phase, requiring only 
+  !     one synch point at the end (CDASB)
+  !  2. Takes shortcuts when the problem size is not too large (the default threshold
+  !     assumes that you are willing to spend up to 16 MB on each process for the 
+  !     glob_to_loc mapping)
+  !  3. Supports restriction/prolongation operators with the same routines 
+  !     just choosing (in the swapdata/swaptran internals) on which index list 
+  !     they should work. 
+  !
+  !
+  !
 
-
-  ! desc_type contains data for communications.
   type psb_desc_type
-     ! contain decomposition informations
      integer, allocatable :: matrix_data(:)
-     ! contain index of halo elements to send/receive
      integer, allocatable :: halo_index(:), ext_index(:)
-     ! contain indices of boundary  elements 
      integer, allocatable :: bnd_elem(:)
-     ! contain index of overlap elements to send/receive
      integer, allocatable :: ovrlap_index(:)
-     ! contain for each local overlap element, the number of times
-     ! that is duplicated
      integer, allocatable :: ovrlap_elem(:)
-     ! contain for each local element the corresponding global index
      integer, allocatable :: loc_to_glob(:)
-     ! contain for each global element the corresponding local index,
-     ! if exist.
      integer, allocatable :: glob_to_loc (:)
      integer, allocatable :: hashv(:), glb_lc(:,:), ptree(:)
-     ! local renumbering induced by sparse matrix storage. 
      integer, allocatable :: lprm(:)
-     ! index space in case it is not just the contiguous range 1:n
      integer, allocatable :: idx_space(:)
   end type psb_desc_type
-
-
 
 
   integer, private, save :: cd_large_threshold=psb_default_large_threshold 
@@ -141,13 +277,28 @@ contains
     psb_cd_get_large_threshold = cd_large_threshold 
   end function psb_cd_get_large_threshold
 
+  logical  function  psb_cd_choose_large_state(ictxt,m)
+    use psb_penv_mod
+
+    implicit none
+    integer, intent(in) :: ictxt,m
+    !locals
+    integer             :: np,me, isz, err_act,idx,gidx,lidx
+
+    call psb_info(ictxt, me, np)
+    ! 
+    ! Since the hashed lists take up (somewhat) more than 2*N_COL integers,
+    ! it makes no sense to use them if you don't have at least 
+    ! 3 processes, no matter what the size of the process. 
+    !
+    psb_cd_choose_large_state = &
+         & (m > psb_cd_get_large_threshold()) .and. &
+         & (np > 2)
+  end function psb_cd_choose_large_state
+  
   subroutine psb_nullify_desc(desc)
     type(psb_desc_type), intent(inout) :: desc
     
-!!$    nullify(desc%matrix_data,desc%loc_to_glob,desc%glob_to_loc,&
-!!$         &desc%halo_index,desc%bnd_elem,desc%ovrlap_elem,&
-!!$         &desc%ovrlap_index, desc%lprm, desc%idx_space)
-
   end subroutine psb_nullify_desc
 
   logical function psb_is_ok_desc(desc)

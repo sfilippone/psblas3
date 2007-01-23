@@ -155,7 +155,7 @@ subroutine psb_cd_inloc(v, ictxt, desc_a, info)
 
   !count local rows number
   ! allocate work vector
-  if (m > psb_cd_get_large_threshold()) then 
+  if (psb_cd_choose_large_state(ictxt,m)) then 
     allocate(desc_a%matrix_data(psb_mdata_size_),&
          &temp_ovrlap(m),stat=info)
     desc_a%matrix_data(psb_desc_size_) = psb_desc_large_
@@ -177,8 +177,7 @@ subroutine psb_cd_inloc(v, ictxt, desc_a, info)
   itmpov  = 0
   temp_ovrlap(:) = -1
 
-  if (m > psb_cd_get_large_threshold()) then 
-
+  if (psb_cd_choose_large_state(ictxt,m)) then 
     do i=1,m
 
       if (((tmpgidx(i,1)-flag_) > np-1).or.((tmpgidx(i,1)-flag_) < 0)) then

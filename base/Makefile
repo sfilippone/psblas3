@@ -23,5 +23,5 @@ clean:
 	(cd psblas; make clean)
 
 veryclean: clean 
-	/bin/rm -f $(HERE)/$(LIBNAME) $(LIBMOD)
+	/bin/rm -f $(HERE)/$(LIBNAME) $(LIBMOD) *$(.mod)
     
