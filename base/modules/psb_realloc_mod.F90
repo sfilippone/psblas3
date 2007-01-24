@@ -80,7 +80,7 @@ Contains
     integer         :: info
     ! ...Local Variables
 
-    Integer :: isz,err_act
+    Integer :: isz,err_act,lb
     character(len=20)  :: name, char_err
     logical, parameter :: debug=.false.
 
@@ -91,7 +91,8 @@ Contains
     info = 0
     if (allocated(vin)) then 
       isz = size(vin)
-      call psb_realloc(isz,vout,info)
+      lb  = lbound(vin,1)
+      call psb_realloc(isz,vout,info,lb=lb)
       if (info /= 0) then     
         info=4010
         char_err='psb_realloc'
@@ -125,7 +126,7 @@ Contains
     integer         :: info
     ! ...Local Variables
 
-    Integer :: isz1, isz2,err_act 
+    Integer :: isz1, isz2,err_act, lb1, lb2
     character(len=20)  :: name, char_err
     logical, parameter :: debug=.false.
 
@@ -137,7 +138,9 @@ Contains
     if (allocated(vin)) then 
       isz1 = size(vin,1)
       isz2 = size(vin,2)
-      call psb_realloc(isz1,isz2,vout,info)
+      lb1  = lbound(vin,1)
+      lb2  = lbound(vin,2)
+      call psb_realloc(isz1,isz2,vout,info,lb1=lb1,lb2=lb2)
       if (info /= 0) then     
         info=4010
         char_err='psb_realloc'
@@ -171,7 +174,7 @@ Contains
     integer         :: info
     ! ...Local Variables
 
-    Integer :: isz,err_act 
+    Integer :: isz,err_act,lb
     character(len=20)  :: name, char_err
     logical, parameter :: debug=.false.
 
@@ -182,7 +185,8 @@ Contains
     info = 0
     if (allocated(vin)) then 
       isz = size(vin)
-      call psb_realloc(isz,vout,info)
+      lb  = lbound(vin,1)
+      call psb_realloc(isz,vout,info,lb=lb)
       if (info /= 0) then     
         info=4010
         char_err='psb_realloc'
@@ -216,7 +220,7 @@ Contains
     integer         :: info
     ! ...Local Variables
 
-    Integer :: isz1, isz2,err_act 
+    Integer :: isz1, isz2,err_act, lb1, lb2 
     character(len=20)  :: name, char_err
     logical, parameter :: debug=.false.
 
@@ -228,7 +232,9 @@ Contains
     if (allocated(vin)) then 
       isz1 = size(vin,1)
       isz2 = size(vin,2)
-      call psb_realloc(isz1,isz2,vout,info)
+      lb1  = lbound(vin,1)
+      lb2  = lbound(vin,2)
+      call psb_realloc(isz1,isz2,vout,info,lb1=lb1,lb2=lb2)
       if (info /= 0) then     
         info=4010
         char_err='psb_realloc'
@@ -262,7 +268,7 @@ Contains
     integer         :: info
     ! ...Local Variables
 
-    Integer :: isz,err_act 
+    Integer :: isz,err_act,lb
     character(len=20)  :: name, char_err
     logical, parameter :: debug=.false.
 
@@ -273,7 +279,8 @@ Contains
     info = 0
     if (allocated(vin)) then 
       isz = size(vin)
-      call psb_realloc(isz,vout,info)
+      lb  = lbound(vin,1)
+      call psb_realloc(isz,vout,info,lb=lb)
       if (info /= 0) then     
         info=4010
         char_err='psb_realloc'
@@ -307,7 +314,7 @@ Contains
     integer         :: info
     ! ...Local Variables
 
-    Integer :: isz1, isz2,err_act 
+    Integer :: isz1, isz2,err_act, lb1, lb2 
     character(len=20)  :: name, char_err
     logical, parameter :: debug=.false.
 
@@ -319,7 +326,9 @@ Contains
     if (allocated(vin)) then 
       isz1 = size(vin,1)
       isz2 = size(vin,2)
-      call psb_realloc(isz1,isz2,vout,info)
+      lb1  = lbound(vin,1)
+      lb2  = lbound(vin,2)
+      call psb_realloc(isz1,isz2,vout,info,lb1=lb1,lb2=lb2)
       if (info /= 0) then     
         info=4010
         char_err='psb_realloc'
@@ -587,7 +596,7 @@ Contains
     integer, optional, intent(in) :: lb
     ! ...Local Variables
     Integer,allocatable  :: tmp(:)
-    Integer :: dim, err_act, err,i,lb_ 
+    Integer :: dim, err_act, err,i,lb_, lbi, ub_
     character(len=20)  :: name
     logical, parameter :: debug=.false.
 
@@ -607,24 +616,24 @@ Contains
       call psb_errpush(err,name,i_err=(/len,0,0,0,0/))
       goto 9999
     end if
+    ub_ = lb_+len-1
 
     if (allocated(rrax)) then 
-      dim=size(rrax)
-      If (dim /= len) Then
-        Allocate(tmp(len),stat=info)
+      dim = size(rrax)
+      lbi = lbound(rrax,1) 
+      If ((dim /= len).or.(lbi /= lb_))  Then
+        Allocate(tmp(lb_:ub_),stat=info)
         if (info /= 0) then
           err=4000
           call psb_errpush(err,name)
           goto 9999
         end if
-        tmp(1:min(len,dim))=rrax(1:min(len,dim))
-        
+        tmp(lb_:lb_-1+min(len,dim))=rrax(lbi:lbi-1+min(len,dim))
         call psb_transfer(tmp,rrax,info)
-        
       end if
     else
       dim = 0
-      allocate(rrax(len),stat=info)
+      allocate(rrax(lb_:ub_),stat=info)
       if (info /= 0) then
         err=4000
         call psb_errpush(err,name)
@@ -632,7 +641,7 @@ Contains
       end if
     endif
     if (present(pad)) then 
-      rrax(dim+1:len) = pad
+      rrax(lb_-1+dim+1:lb_-1+len) = pad
     endif
 
     call psb_erractionrestore(err_act)
@@ -664,7 +673,7 @@ Contains
 
     ! ...Local Variables
     Real(kind(1.d0)),allocatable  :: tmp(:)
-    Integer :: dim,err_act,err,i, m, lb_
+    Integer :: dim,err_act,err,m, lb_, lbi,ub_
     character(len=20)  :: name
     logical, parameter :: debug=.false.
 
@@ -683,27 +692,24 @@ Contains
       call psb_errpush(err,name,i_err=(/len,0,0,0,0/))
       goto 9999
     end if
-
+    ub_ = lb_ + len-1
 
     if (allocated(rrax)) then 
-      dim=size(rrax)
-
-      If (dim /= len) Then
-        Allocate(tmp(lb_:len),stat=info)
+      dim = size(rrax)
+      lbi = lbound(rrax,1)
+      If ((dim /= len).or.(lbi /= lb_))  Then
+        Allocate(tmp(lb_:ub_),stat=info)
         if (info /= 0) then
           err=4000
           call psb_errpush(err,name)
           goto 9999
         end if
-        m = min(dim,len)
-        tmp(1:m) = rrax(1:m)
-        
+        tmp(lb_:lb_-1+min(len,dim))=rrax(lbi:lbi-1+min(len,dim))
         call psb_transfer(tmp,rrax,info)
-
       End If
     else
       dim = 0
-      Allocate(rrax(lb_:len),stat=info)
+      Allocate(rrax(lb_:ub_),stat=info)
       if (info /= 0) then
         err=4000
         call psb_errpush(err,name)
@@ -711,7 +717,7 @@ Contains
       end if
     endif
     if (present(pad)) then 
-      rrax(dim+1:len) = pad
+      rrax(lb_-1+dim+1:lb_-1+len) = pad
     endif
     call psb_erractionrestore(err_act)
     return
@@ -729,7 +735,7 @@ Contains
   End Subroutine psb_dreallocate1d
 
 
-  Subroutine psb_dreallocate1z(len,rrax,info,pad)
+  Subroutine psb_dreallocate1z(len,rrax,info,pad,lb)
     use psb_error_mod
 
     ! ...Subroutine Arguments  
@@ -737,10 +743,11 @@ Contains
     complex(kind(1.d0)),allocatable, intent(inout):: rrax(:)
     integer :: info
     complex(kind(1.d0)), optional, intent(in) :: pad
+    integer, optional, intent(in) :: lb
 
     ! ...Local Variables
     complex(kind(1.d0)),allocatable  :: tmp(:)
-    Integer :: dim,err_act,err,i, m
+    Integer :: dim,err_act,err,i,lb_,ub_,lbi
     character(len=20)  :: name
     logical, parameter :: debug=.false.
 
@@ -748,32 +755,34 @@ Contains
     call psb_erractionsave(err_act)
     info = 0
     if (debug) write(0,*) 'reallocate Z',len    
+    if (present(lb)) then
+      lb_ = lb
+    else
+      lb_ = 1
+    endif
     if ((len<0).or.(len>25*1024*1024)) then 
       err=2025
       call psb_errpush(err,name,i_err=(/len,0,0,0,0/))
       goto 9999
     end if
-
+    ub_ = lb_+len-1
 
     if (allocated(rrax)) then 
-      dim=size(rrax)
-
-      If (dim /= len) Then
-        Allocate(tmp(len),stat=info)
+      dim = size(rrax)
+      lbi = lbound(rrax,1) 
+      If ((dim /= len).or.(lbi /= lb_))  Then
+        Allocate(tmp(lb_:ub_),stat=info)
         if (info /= 0) then
           err=4000
           call psb_errpush(err,name)
           goto 9999
         end if
-        m = min(dim,len)
-        tmp(1:m) = rrax(1:m)
-
+        tmp(lb_:lb_-1+min(len,dim))=rrax(lbi:lbi-1+min(len,dim))
         call psb_transfer(tmp,rrax,info)
-
-      End If
+      end if
     else
       dim = 0
-      Allocate(rrax(len),stat=info)
+      Allocate(rrax(lb_:ub_),stat=info)
       if (info /= 0) then
         err=4000
         call psb_errpush(err,name)
@@ -781,7 +790,7 @@ Contains
       end if
     endif
     if (present(pad)) then 
-      rrax(dim+1:len) = pad
+      rrax(lb_-1+dim+1:lb_-1+len) = pad
     endif
     call psb_erractionrestore(err_act)
     return
@@ -800,45 +809,59 @@ Contains
 
 
 
-  Subroutine psb_dreallocated2(len1,len2,rrax,info,pad)
+  Subroutine psb_dreallocated2(len1,len2,rrax,info,pad,lb1,lb2)
     use psb_error_mod
     ! ...Subroutine Arguments  
     Integer,Intent(in) :: len1,len2
     Real(kind(1.d0)),allocatable :: rrax(:,:)
     integer :: info
     real(kind(1.d0)), optional, intent(in) :: pad
+    Integer,Intent(in), optional  :: lb1,lb2
 
     ! ...Local Variables
 
     Real(kind(1.d0)),allocatable  :: tmp(:,:)
-    Integer :: dim,err_act,err,i, m, dim2
+    Integer :: dim,err_act,err,i, m, dim2,lb1_, lb2_, ub1_, ub2_,&
+         & lbi1, lbi2
     character(len=20)  :: name
 
     name='psb_dreallocated2'
     call psb_erractionsave(err_act)
     info = 0 
+    if (present(lb1)) then 
+      lb1_ = lb1
+    else
+      lb1_ = 1
+    endif
+    if (present(lb2)) then 
+      lb2_ = lb2
+    else
+      lb2_ = 1
+    endif
+    ub1_ = lb1_ + len1 -1
+    ub2_ = lb2_ + len2 -1
 
     if (allocated(rrax)) then 
-      dim=size(rrax,1)
-      dim2=size(rrax,2)
-
-      If (dim /= len1) Then
-        Allocate(tmp(len1,len2),stat=info)
+      dim  = size(rrax,1)
+      lbi1 = lbound(rrax,1)
+      dim2 = size(rrax,2)
+      lbi2 = lbound(rrax,2)
+      If ((dim /= len1).or.(dim2 /= len2).or.(lbi1 /= lb1_)&
+           &  .or.(lbi2 /= lb2_)) Then
+        Allocate(tmp(lb1_:ub1_,lb2_:ub2_),stat=info)
         if (info /= 0) then
           err=4000
           call psb_errpush(err,name)
           goto 9999
         end if
-        m = min(dim,len1)
-        tmp(1:m,1:min(len2,dim2)) = rrax(1:m,1:min(len2,dim2))
-
+        tmp(lb1_:lb1_-1+min(len1,dim),lb2_:lb2_-1+min(len2,dim2)) = &
+             & rrax(lbi1:lbi1-1+min(len1,dim),lbi2:lbi2-1+min(len2,dim2))
         call psb_transfer(tmp,rrax,info)
-
       End If
     else
       dim  = 0
       dim2 = 0
-      Allocate(rrax(len1,len2),stat=info)
+      Allocate(rrax(lb1_:ub1_,lb2_:ub2_),stat=info)
       if (info /= 0) then
         err=4000
         call psb_errpush(err,name)
@@ -846,8 +869,8 @@ Contains
       end if
     endif
     if (present(pad)) then 
-      rrax(dim+1:len1,:) = pad
-      rrax(:,dim2+1:len2) = pad
+      rrax(lb1_-1+dim+1:lb1_-1+len1,:) = pad
+      rrax(lb1_:lb1_-1+dim,lb2_-1+dim2+1:lb2_-1+len2) = pad
     endif
     call psb_erractionrestore(err_act)
     return
@@ -866,44 +889,59 @@ Contains
 
 
 
-  Subroutine psb_dreallocatez2(len1,len2,rrax,info,pad)
+  Subroutine psb_dreallocatez2(len1,len2,rrax,info,pad,lb1,lb2)
     use psb_error_mod
     ! ...Subroutine Arguments  
     Integer,Intent(in) :: len1,len2
     complex(kind(1.d0)),allocatable :: rrax(:,:)
     integer :: info
     complex(kind(1.d0)), optional, intent(in) :: pad
+    Integer,Intent(in), optional  :: lb1,lb2
 
     ! ...Local Variables
 
     complex(kind(1.d0)),allocatable  :: tmp(:,:)
-    Integer :: dim,err_act,err,i, m, dim2
+    Integer :: dim,err_act,err,i, m, dim2,lb1_, lb2_, ub1_, ub2_,&
+         & lbi1, lbi2
     character(len=20)  :: name
 
     name='psb_dreallocatez2'
     call psb_erractionsave(err_act)
     info = 0 
+    if (present(lb1)) then 
+      lb1_ = lb1
+    else
+      lb1_ = 1
+    endif
+    if (present(lb2)) then 
+      lb2_ = lb2
+    else
+      lb2_ = 1
+    endif
+    ub1_ = lb1_ + len1 -1
+    ub2_ = lb2_ + len2 -1
 
     if (allocated(rrax)) then 
-      dim=size(rrax,1)
-      dim2=size(rrax,2)
-
-      If (dim /= len1) Then
-        Allocate(tmp(len1,len2),stat=info)
+      dim  = size(rrax,1)
+      lbi1 = lbound(rrax,1)
+      dim2 = size(rrax,2)
+      lbi2 = lbound(rrax,2)
+      If ((dim /= len1).or.(dim2 /= len2).or.(lbi1 /= lb1_)&
+           &  .or.(lbi2 /= lb2_)) Then
+        Allocate(tmp(lb1_:ub1_,lb2_:ub2_),stat=info)
         if (info /= 0) then
           err=4000
           call psb_errpush(err,name)
           goto 9999
         end if
-        m = min(dim,len1)
-        tmp(1:m,1:min(len2,dim2)) = rrax(1:m,1:min(len2,dim2))
-
+        tmp(lb1_:lb1_-1+min(len1,dim),lb2_:lb2_-1+min(len2,dim2)) = &
+             & rrax(lbi1:lbi1-1+min(len1,dim),lbi2:lbi2-1+min(len2,dim2))
         call psb_transfer(tmp,rrax,info)
-
       End If
     else
-      dim = 0
-      Allocate(rrax(len1,len2),stat=info)
+      dim  = 0
+      dim2 = 0
+      Allocate(rrax(lb1_:ub1_,lb2_:ub2_),stat=info)
       if (info /= 0) then
         err=4000
         call psb_errpush(err,name)
@@ -911,9 +949,10 @@ Contains
       end if
     endif
     if (present(pad)) then 
-      rrax(dim+1:len1,:) = pad
-      rrax(:,dim2+1:len2) = pad
+      rrax(lb1_-1+dim+1:lb1_-1+len1,:) = pad
+      rrax(lb1_:lb1_-1+dim,lb2_-1+dim2+1:lb2_-1+len2) = pad
     endif
+
     call psb_erractionrestore(err_act)
     return
 
@@ -930,44 +969,58 @@ Contains
   End Subroutine psb_dreallocatez2
 
 
-  Subroutine psb_dreallocatei2(len1,len2,rrax,info,pad)
+  Subroutine psb_dreallocatei2(len1,len2,rrax,info,pad,lb1,lb2)
     use psb_error_mod
     ! ...Subroutine Arguments  
     Integer,Intent(in) :: len1,len2
     integer,allocatable :: rrax(:,:)
     integer :: info
     integer, optional, intent(in) :: pad
+    Integer,Intent(in), optional  :: lb1,lb2
 
     ! ...Local Variables
     integer,allocatable  :: tmp(:,:)
-    Integer :: dim,err_act,err,i, m, dim2
+    Integer :: dim,err_act,err,i, m, dim2,lb1_, lb2_, ub1_, ub2_,&
+         & lbi1, lbi2
     character(len=20)  :: name
 
     name='psb_dreallocatei2'
     call psb_erractionsave(err_act)
     info = 0 
+    if (present(lb1)) then 
+      lb1_ = lb1
+    else
+      lb1_ = 1
+    endif
+    if (present(lb2)) then 
+      lb2_ = lb2
+    else
+      lb2_ = 1
+    endif
+    ub1_ = lb1_ + len1 -1
+    ub2_ = lb2_ + len2 -1
 
     if (allocated(rrax)) then 
-      dim=size(rrax,1)
-      dim2=size(rrax,2)
-
-      If (dim /= len1) Then
-        Allocate(tmp(len1,len2),stat=info)
+      dim  = size(rrax,1)
+      lbi1 = lbound(rrax,1)
+      dim2 = size(rrax,2)
+      lbi2 = lbound(rrax,2)
+      If ((dim /= len1).or.(dim2 /= len2).or.(lbi1 /= lb1_)&
+           &  .or.(lbi2 /= lb2_)) Then
+        Allocate(tmp(lb1_:ub1_,lb2_:ub2_),stat=info)
         if (info /= 0) then
           err=4000
           call psb_errpush(err,name)
           goto 9999
         end if
-        m = min(dim,len1)
-        tmp(1:m,1:min(len2,dim2)) = rrax(1:m,1:min(len2,dim2))
-
+        tmp(lb1_:lb1_-1+min(len1,dim),lb2_:lb2_-1+min(len2,dim2)) = &
+             & rrax(lbi1:lbi1-1+min(len1,dim),lbi2:lbi2-1+min(len2,dim2))
         call psb_transfer(tmp,rrax,info)
-
       End If
     else
       dim  = 0
       dim2 = 0
-      Allocate(rrax(len1,len2),stat=info)
+      Allocate(rrax(lb1_:ub1_,lb2_:ub2_),stat=info)
       if (info /= 0) then
         err=4000
         call psb_errpush(err,name)
@@ -975,9 +1028,10 @@ Contains
       end if
     endif
     if (present(pad)) then 
-      rrax(dim+1:len1,:) = pad
-      rrax(:,dim2+1:len2) = pad
+      rrax(lb1_-1+dim+1:lb1_-1+len1,:) = pad
+      rrax(lb1_:lb1_-1+dim,lb2_-1+dim2+1:lb2_-1+len2) = pad
     endif
+
     call psb_erractionrestore(err_act)
     return
 

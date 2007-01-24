@@ -77,7 +77,7 @@ subroutine psi_ldsc_pre_halo(desc,ext_hv,info)
 
   nk = n_col
   call psb_realloc(nk,2,desc%glb_lc,info) 
-  if (info ==0) call psb_realloc(psb_hash_size,desc%hashv,info,lb=0)
+  if (info ==0) call psb_realloc(psb_hash_size+1,desc%hashv,info,lb=0)
   if (info /= 0) then 
     ch_err='psb_realloc'
     call psb_errpush(info,name,a_err=ch_err)
