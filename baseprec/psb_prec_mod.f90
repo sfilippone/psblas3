@@ -96,7 +96,7 @@ module psb_prec_mod
     end subroutine psb_zprecfree
   end interface
 
-  interface psb_prc_aply
+  interface psb_precaply
     subroutine psb_dprc_aply(prec,x,y,desc_data,info,trans,work)
       use psb_base_mod
       use psb_prec_type
