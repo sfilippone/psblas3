@@ -281,26 +281,28 @@ like Diagonal Scaling or Block Jacobi with incomplete
 factorization ILU(0). 
 
  A preconditioner is held in the \hypertarget{precdata}{{\tt
-    psb\_prec\_type}} data structure which depends on the
-\verb|psb_base_prec| reported in 
-figure~\ref{fig:prectype}. The \verb|psb_base_prec| 
+    psb\_prec\_type}} data structure reported in 
+figure~\ref{fig:prectype}. The \verb|psb_prec_type| 
 data type may contain a simple preconditioning matrix with the
-associated communication descriptor which may be different than the
-system communication descriptor in the case of parallel
-preconditioners like the Additive Schwarz one. Then the
-\verb|psb_prec_type| may contain more than one preconditioning matrix
-like in the case of Two-Level (in general Multi-Level) preconditioners.
-The user can choose the type of preconditioner to be used by means of
-the \verb|psb_precset| subroutine; once the type of preconditioning
-method is specified, along with all the parameters that characterize
-it, the preconditioner data structure can be built using the
-\verb|psb_precbld| subroutine.
-This data structure wants to be flexible enough to easily allow the
-implementation of new kind of preconditioners. The values contained in
+associated communication descriptor.%%  which may be different than the
+%% system communication descriptor in the case of parallel
+%% preconditioners like the Additive Schwarz one. Then the
+%% \verb|psb_prec_type| may contain more than one preconditioning matrix
+%% like in the case of Two-Level (in general Multi-Level) preconditioners.
+%% The user can choose the type of preconditioner to be used by means of
+%% the \verb|psb_precset| subroutine; once the type of preconditioning
+%% method is specified, along with all the parameters that characterize
+%% it, the preconditioner data structure can be built using the
+%% \verb|psb_precbld| subroutine.
+%% This data structure wants to be flexible enough to easily allow the
+%% implementation of new kind of preconditioners.
+The values contained in
 the \verb|iprcparm| and \verb|dprcparm| define tha type of
 preconditioner along with all the parameters related to it; thus,
 \verb|iprcparm| and \verb|dprcparm| define how the other records have
-to be interpreted.
+to be interpreted. This data structure is the basis of ore complex
+preconditioning strategies, which are the subject of further
+research. 
 \begin{figure}[h!]
   \small
   \begin{Sbox}

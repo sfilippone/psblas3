@@ -8,8 +8,8 @@
 \subroutine{psb\_cdall}{Allocates a communication descriptor}
 
 \syntax{call psb\_cdall}{icontxt, desc\_a, info,mg=mg,parts=parts}
-\syntax{call psb\_cdall}{icontxt, desc\_a, info,vg=vg,flag=flag}
-\syntax{call psb\_cdall}{icontxt, desc\_a, info,vl=vl}
+\syntax*{call psb\_cdall}{icontxt, desc\_a, info,vg=vg,flag=flag}
+\syntax*{call psb\_cdall}{icontxt, desc\_a, info,vl=vl}
 
 This subroutine initializes the communication descriptor associated
 with an index space. Exactly one of the  optional arguments
@@ -72,8 +72,8 @@ An integer value; 0 means no error has been detected.
   The subroutine must conform to the following interface: 
 \begin{verbatim}
   interface 
-     subroutine psb_parts(glob_index,nrow,np,pv,nv)
-       integer, intent (in)  :: glob_index,np,nrow
+     subroutine psb_parts(glob_index,mg,np,pv,nv)
+       integer, intent (in)  :: glob_index,np,mg
        integer, intent (out) :: nv, pv(*)
      end subroutine psb_parts
   end interface
@@ -82,7 +82,7 @@ An integer value; 0 means no error has been detected.
   \begin{description}
     \item[glob\_index] The global index to be mapped;
     \item[np] The number of processes in the mapping;
-    \item[nrow] The total number of global rows in the mapping;
+    \item[mg] The total number of global rows in the mapping;
   \end{description}
   The output arguments are:
   \begin{description}
@@ -267,7 +267,7 @@ Specified as: a structured data of type \spdata.
 Scope:{\bf global}.\\
 Type:{\bf required}.\\
 Specified as: an integer value $nl\ge 0$. 
-\item[extype] the kiond of estension required.\\
+\item[extype] the kind of estension required.\\
 Scope:{\bf global}.\\
 Type:{\bf optional }.\\
 Specified as: an integer value
