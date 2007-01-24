@@ -214,7 +214,7 @@ Subroutine psb_dgmresr(a,prec,b,x,eps,desc_a,info,&
     End If
     Call psb_spmm(-done,a,x,done,v(:,1),desc_a,info,work=aux)
     
-    call psb_prc_aply(prec,v(:,1),desc_a,info)
+    call psb_precaply(prec,v(:,1),desc_a,info)
     rs(1) = psb_genrm2(v(:,1),desc_a,info)
     if (info.ne.0) Then 
        info=4011 
@@ -255,7 +255,7 @@ Subroutine psb_dgmresr(a,prec,b,x,eps,desc_a,info,&
       itx  = itx + 1
 
       Call psb_spmm(done,a,v(:,i),dzero,w,desc_a,info,work=aux)
-      call psb_prc_aply(prec,w,desc_a,info)
+      call psb_precaply(prec,w,desc_a,info)
 
       do k = 1, i
         h(k,i) = psb_gedot(v(:,k),w,desc_a,info)

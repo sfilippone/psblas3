@@ -259,7 +259,7 @@ Subroutine psb_dcgs(a,prec,b,x,eps,desc_a,info,&
 
       End If
 
-      Call psb_prc_aply(prec,p,f,desc_a,info,work=aux)
+      Call psb_precaply(prec,p,f,desc_a,info,work=aux)
 
       Call psb_spmm(done,a,f,dzero,v,desc_a,info,&
            & work=aux)
@@ -277,7 +277,7 @@ Subroutine psb_dcgs(a,prec,b,x,eps,desc_a,info,&
       Call psb_geaxpby(done,uv,dzero,s,desc_a,info)
       Call psb_geaxpby(done,q,done,s,desc_a,info)
       
-      Call psb_prc_aply(prec,s,z,desc_a,info,work=aux)
+      Call psb_precaply(prec,s,z,desc_a,info,work=aux)
 
       Call psb_geaxpby(alpha,z,done,x,desc_a,info)
 

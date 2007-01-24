@@ -285,7 +285,7 @@ Subroutine psb_dcgstab(a,prec,b,x,eps,desc_a,info,&
         Call psb_geaxpby(done,r,beta,p,desc_a,info)
       End If
 
-      Call psb_prc_aply(prec,p,f,desc_a,info,work=aux)
+      Call psb_precaply(prec,p,f,desc_a,info,work=aux)
 
       Call psb_spmm(done,a,f,dzero,v,desc_a,info,&
            & work=aux)
@@ -308,9 +308,9 @@ Subroutine psb_dcgstab(a,prec,b,x,eps,desc_a,info,&
          goto 9999
       end if
       
-      Call psb_prc_aply(prec,s,z,desc_a,info,work=aux)
+      Call psb_precaply(prec,s,z,desc_a,info,work=aux)
       if(info.ne.0) then
-         call psb_errpush(4010,name,a_err='psb_prc_aply')
+         call psb_errpush(4010,name,a_err='psb_precaply')
          goto 9999
       end if
 

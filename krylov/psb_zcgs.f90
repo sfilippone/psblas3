@@ -262,7 +262,7 @@ Subroutine psb_zcgs(a,prec,b,x,eps,desc_a,info,&
 
       End If
 
-      Call psb_prc_aply(prec,p,f,desc_a,info,work=aux)
+      Call psb_precaply(prec,p,f,desc_a,info,work=aux)
 
       Call psb_spmm(zone,a,f,zzero,v,desc_a,info,&
            & work=aux)
@@ -280,7 +280,7 @@ Subroutine psb_zcgs(a,prec,b,x,eps,desc_a,info,&
       Call psb_geaxpby(zone,uv,zzero,s,desc_a,info)
       Call psb_geaxpby(zone,q,zone,s,desc_a,info)
       
-      Call psb_prc_aply(prec,s,z,desc_a,info,work=aux)
+      Call psb_precaply(prec,s,z,desc_a,info,work=aux)
 
       Call psb_geaxpby(alpha,z,zone,x,desc_a,info)
 

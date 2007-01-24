@@ -206,7 +206,7 @@ Subroutine psb_dcg(a,prec,b,x,eps,desc_a,info,&
       it   = it + 1
       itx = itx + 1
 
-      Call psb_prc_aply(prec,r,z,desc_a,info,work=aux)
+      Call psb_precaply(prec,r,z,desc_a,info,work=aux)
       rho_old = rho
       rho     = psb_gedot(r,z,desc_a,info)
 
