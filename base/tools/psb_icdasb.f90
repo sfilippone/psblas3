@@ -135,6 +135,17 @@ subroutine psb_icdasb(desc_a,info,ext_hv)
       call psb_errpush(info,name)
       goto 9999
     end if
+    ! Finally, cleanup the AVL tree, as it is really only needed 
+    ! when building. 
+    if (allocated(desc_a%ptree)) then 
+      call FreePairSearchTree(desc_a%ptree)   
+      deallocate(desc_a%ptree,stat=info)
+      if (info /= 0) then 
+        info=2059
+        call psb_errpush(info,name)
+        goto 9999
+      end if
+    end if
     ! Ok, register into MATRIX_DATA &  free temporary work areas
     desc_a%matrix_data(psb_dec_type_) = psb_desc_asb_
   else

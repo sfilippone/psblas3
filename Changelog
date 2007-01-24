@@ -2,6 +2,11 @@ Changelog. A lot less detailed than usual, at least for past
 history. 
 
 
+2007/01/23: Defined new field ext_index in desc_type, and
+	    fixed long standing inconsistency in usage of overlap for
+	    AS preconditioners. Modified halo to accept selector for
+	    halo_index vs. ext_index.
+
 2007/01/11: Migrated repository to SVN. 
 
 2007/01/11: MLD2P4 has been moved to the new org. Now tackling the 

@@ -86,44 +86,44 @@ module psb_comm_mod
        integer, intent(in), optional             :: mode,data
        character, intent(in), optional           :: tran
      end subroutine psb_dhalov
-     subroutine  psb_ihalom(x,desc_a,info,alpha,jx,ik,work,tran,mode)
+     subroutine  psb_ihalom(x,desc_a,info,alpha,jx,ik,work,tran,mode,data)
        use psb_descriptor_type
        integer, intent(inout) :: x(:,:)
        type(psb_desc_type), intent(in)        :: desc_a
        integer, intent(out)                   :: info
        real(kind(1.d0)), intent(in), optional :: alpha
        integer, intent(inout), optional       :: work(:)
-       integer, intent(in), optional          :: mode,jx,ik
+       integer, intent(in), optional          :: mode,jx,ik,data
        character, intent(in), optional        :: tran
      end subroutine psb_ihalom
-     subroutine  psb_ihalov(x,desc_a,info,alpha,work,tran,mode)
+     subroutine  psb_ihalov(x,desc_a,info,alpha,work,tran,mode,data)
        use psb_descriptor_type
        integer, intent(inout)                 :: x(:)
        type(psb_desc_type), intent(in)        :: desc_a
        integer, intent(out)                   :: info
        real(kind(1.d0)), intent(in), optional :: alpha
        integer, intent(inout), optional       :: work(:)
-       integer, intent(in), optional          :: mode
+       integer, intent(in), optional          :: mode,data
        character, intent(in), optional        :: tran
      end subroutine psb_ihalov
-     subroutine  psb_zhalom(x,desc_a,info,alpha,jx,ik,work,tran,mode)
+     subroutine  psb_zhalom(x,desc_a,info,alpha,jx,ik,work,tran,mode,data)
        use psb_descriptor_type
        complex(kind(1.d0)), intent(inout)           :: x(:,:)
        type(psb_desc_type), intent(in)           :: desc_a
        integer, intent(out)                      :: info
        complex(kind(1.d0)), intent(in), optional    :: alpha
        complex(kind(1.d0)), target, optional        :: work(:)
-       integer, intent(in), optional             :: mode,jx,ik
+       integer, intent(in), optional             :: mode,jx,ik,data
        character, intent(in), optional           :: tran
      end subroutine psb_zhalom
-     subroutine  psb_zhalov(x,desc_a,info,alpha,work,tran,mode)
+     subroutine  psb_zhalov(x,desc_a,info,alpha,work,tran,mode,data)
        use psb_descriptor_type
        complex(kind(1.d0)), intent(inout)           :: x(:)
        type(psb_desc_type), intent(in)           :: desc_a
        integer, intent(out)                      :: info
        complex(kind(1.d0)), intent(in), optional    :: alpha
        complex(kind(1.d0)), target, optional :: work(:)
-       integer, intent(in), optional             :: mode
+       integer, intent(in), optional             :: mode,data
        character, intent(in), optional           :: tran
      end subroutine psb_zhalov
   end interface

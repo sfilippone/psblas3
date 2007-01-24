@@ -46,12 +46,12 @@
 !   tran      -  character(optional).          ???.
 !   mode      -  integer(optional).
 !
-subroutine  psb_ihalom(x,desc_a,info,alpha,jx,ik,work,tran,mode)
+subroutine  psb_ihalom(x,desc_a,info,alpha,jx,ik,work,tran,mode,data)
   use psb_descriptor_type
   use psb_const_mod
   use psi_mod
-  use psb_realloc_mod
   use psb_check_mod
+  use psb_realloc_mod
   use psb_error_mod
   use psb_penv_mod
   implicit none
@@ -61,13 +61,13 @@ subroutine  psb_ihalom(x,desc_a,info,alpha,jx,ik,work,tran,mode)
   integer, intent(out)                     :: info
   real(kind(1.d0)), intent(in), optional   :: alpha
   integer, intent(inout), optional, target :: work(:)
-  integer, intent(in), optional            :: mode,jx,ik
+  integer, intent(in), optional            :: mode,jx,ik,data
   character, intent(in), optional          :: tran
 
   ! locals
   integer                  :: ictxt, np, me, &
        & err_act, m, n, iix, jjx, ix, ijx, nrow, k, maxk, liwork,&
-       & imode, err
+       & imode, err,data_
   integer, pointer         :: xp(:,:), iwork(:)
   character                :: ltran
   character(len=20)        :: name, ch_err
@@ -116,6 +116,14 @@ subroutine  psb_ihalom(x,desc_a,info,alpha,jx,ik,work,tran,mode)
   else
     ltran = 'N'
   endif
+
+  if (present(data)) then     
+    data_ = data
+  else
+    data_ = psb_comm_halo_
+  endif
+
+
   if (present(mode)) then 
     imode = mode
   else
@@ -179,7 +187,7 @@ subroutine  psb_ihalom(x,desc_a,info,alpha,jx,ik,work,tran,mode)
   ! exchange halo elements
   if(ltran.eq.'N') then
     call psi_swapdata(imode,k,0,xp,&
-         & desc_a,iwork,info)
+         & desc_a,iwork,info,data=data_)
   else if((ltran.eq.'T').or.(ltran.eq.'H')) then
     call psi_swaptran(imode,k,1,xp,&
          & desc_a,iwork,info)
@@ -253,12 +261,12 @@ end subroutine psb_ihalom
 !   tran      -  character(optional).          ???.
 !   mode      -  integer(optional).
 !
-subroutine  psb_ihalov(x,desc_a,info,alpha,work,tran,mode)
+subroutine  psb_ihalov(x,desc_a,info,alpha,work,tran,mode,data)
   use psb_descriptor_type
   use psb_const_mod
   use psi_mod
-  use psb_realloc_mod
   use psb_check_mod
+  use psb_realloc_mod
   use psb_error_mod
   use psb_penv_mod
   implicit none
@@ -268,13 +276,13 @@ subroutine  psb_ihalov(x,desc_a,info,alpha,work,tran,mode)
   integer, intent(out)                     :: info
   real(kind(1.d0)), intent(in), optional   :: alpha
   integer, intent(inout), optional, target :: work(:)
-  integer, intent(in), optional            :: mode
+  integer, intent(in), optional            :: mode,data
   character, intent(in), optional          :: tran
 
   ! locals
   integer                  :: ictxt, np, me,&
        & err_act, m, n, iix, jjx, ix, ijx, nrow, imode,&
-       & err, liwork
+       & err, liwork, data_
   integer,pointer          :: iwork(:)
   character                :: ltran
   character(len=20)        :: name, ch_err
@@ -308,6 +316,11 @@ subroutine  psb_ihalov(x,desc_a,info,alpha,work,tran,mode)
     ltran = tran
   else
     ltran = 'N'
+  endif
+  if (present(data)) then     
+    data_ = data
+  else
+    data_ = psb_comm_halo_
   endif
   if (present(mode)) then 
     imode = mode
@@ -367,7 +380,7 @@ subroutine  psb_ihalov(x,desc_a,info,alpha,work,tran,mode)
   ! exchange halo elements
   if(ltran.eq.'N') then
     call psi_swapdata(imode,0,x(iix:size(x)),&
-         & desc_a,iwork,info)
+         & desc_a,iwork,info,data=data_)
   else if((ltran.eq.'T').or.(ltran.eq.'H')) then
     call psi_swaptran(imode,1,x(iix:size(x)),&
          & desc_a,iwork,info)
