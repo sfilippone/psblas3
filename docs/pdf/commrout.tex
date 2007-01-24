@@ -71,6 +71,70 @@ Scope: {\bf local} \\
 Type: {\bf required} \\
 An integer value that contains an error code. 
 \end{description}
+\begin{figure}[h] \begin{center}
+\rotatebox{-90}{\includegraphics[scale=0.45]{figures/try8x8}}
+\end{center}
+\caption{Sample discretization mesh.\label{fig:try8x8}}
+\end{figure}
+\section*{Example of use}
+Consider the discretization mesh depicted in fig.~\ref{fig:try8x8},
+partitioned among two processes as shown by the dashed line; the data
+distribution is such that each process will own 32 entries in the
+index space, with a halo made of 8 entries placed at local indices 33
+through 40. If process 0 assigns an initial value of 1 to its entries
+in the $x$ vector, and process 1 assigns a value of 2, then after a
+call to \verb|psb_halo| the contents of the local vectors will be the
+following: 
+\begin{table}
+\begin{center}
+\small\begin{tabular}{rrr@{\hspace{6\tabcolsep}}rrr}
+\multicolumn{3}{c}{Process  0}&
+\multicolumn{3}{c}{Process  1}\\
+  I  &   GLOB(I) & X(I)  &   I & GLOB(I) & X(I) \\
+  1   &    1  &  1.0   &   1  &  33  &   2.0 \\ 
+  2   &    2  &  1.0   &   2  &  34  &   2.0 \\
+  3   &    3  &  1.0   &   3  &  35  &   2.0 \\
+  4   &    4  &  1.0   &   4  &  36  &   2.0 \\
+  5   &    5  &  1.0   &   5  &  37  &   2.0 \\
+  6   &    6  &  1.0   &   6  &  38  &   2.0 \\
+  7   &    7  &  1.0   &   7  &  39  &   2.0 \\
+  8   &    8  &  1.0   &   8  &  40  &   2.0 \\
+  9   &    9  &  1.0   &   9  &  41  &   2.0 \\
+ 10   &   10  &  1.0   &  10  &  42  &   2.0 \\
+ 11   &   11  &  1.0   &  11  &  43  &   2.0 \\
+ 12   &   12  &  1.0   &  12  &  44  &   2.0 \\
+ 13   &   13  &  1.0   &  13  &  45  &   2.0 \\
+ 14   &   14  &  1.0   &  14  &  46  &   2.0 \\
+ 15   &   15  &  1.0   &  15  &  47  &   2.0 \\
+ 16   &   16  &  1.0   &  16  &  48  &   2.0 \\
+ 17   &   17  &  1.0   &  17  &  49  &   2.0 \\
+ 18   &   18  &  1.0   &  18  &  50  &   2.0 \\
+ 19   &   19  &  1.0   &  19  &  51  &   2.0 \\
+ 20   &   20  &  1.0   &  20  &  52  &   2.0 \\ 
+21   &   21  &  1.0   &  21  &  53  &   2.0 \\
+22   &   22  &  1.0   &  22  &  54  &   2.0 \\
+23   &   23  &  1.0   &  23  &  55  &   2.0 \\
+24   &   24  &  1.0   &  24  &  56  &   2.0 \\
+25   &   25  &  1.0   &  25  &  57  &   2.0 \\
+26   &   26  &  1.0   &  26  &  58  &   2.0 \\
+27   &   27  &  1.0   &  27  &  59  &   2.0 \\
+28   &   28  &  1.0   &  28  &  60  &   2.0 \\
+29   &   29  &  1.0   &  29  &  61  &   2.0 \\
+30   &   30  &  1.0   &  30  &  62  &   2.0 \\
+31   &   31  &  1.0   &  31  &  63  &   2.0 \\
+32   &   32  &  1.0   &  32  &  64  &   2.0 \\
+33   &   33  &  2.0   &  33  &  25  &   1.0 \\
+34   &   34  &  2.0   &  34  &  26  &   1.0 \\
+35   &   35  &  2.0   &  35  &  27  &   1.0 \\
+36   &   36  &  2.0   &  36  &  28  &   1.0 \\
+37   &   37  &  2.0   &  37  &  29  &   1.0 \\
+38   &   38  &  2.0   &  38  &  30  &   1.0 \\
+39   &   39  &  2.0   &  39  &  31  &   1.0 \\
+40   &   40  &  2.0   &  40  &  32  &   1.0 \\
+\end{tabular}
+\end{center}
+\end{table}
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 %       OVERLAP UPDATE
@@ -167,6 +231,84 @@ their instances.
 %% In the case of a symmetric $K$, this preserves simmetry of the overall
 %% preconditioner, which would otherwise be destroyed. 
 \end{enumerate}
+ 
+\begin{figure}[h] \begin{center}
+\rotatebox{-90}{\includegraphics[scale=0.65]{figures/try8x8_ov}}
+\end{center}
+\caption{Sample discretization mesh.\label{fig:try8x8_ov}}
+\end{figure}
+\section*{Example of use}
+Consider the discretization mesh depicted in fig.~\ref{fig:try8x8_ov},
+partitioned among two processes as shown by the dashed lines, with an
+overlap of 1 extra layer with respect to the partition of
+fig.~\ref{fig:try8x8}; the data 
+distribution is such that each process will own 40 entries in the
+index space, with an overlap of 16  entries placed at local indices 25 
+through 40; the halo will run from local index 41 through local index 48.. If process 0 assigns an initial value of 1 to its entries
+in the $x$ vector, and process 1 assigns a value of 2, then after a
+call to \verb|psb_ovrl| with \verb|psb_avg_| and a call to
+\verb|psb_halo_| the contents of the local vectors will be the
+following (showing a transition among the two subdomains)  
+
+\begin{table}
+\begin{center}
+\footnotesize
+\begin{tabular}{rrr@{\hspace{6\tabcolsep}}rrr}
+\multicolumn{3}{c}{Process  0}&
+\multicolumn{3}{c}{Process  1}\\
+  I  &   GLOB(I) & X(I)  &   I & GLOB(I) & X(I) \\
+  1   &    1  &  1.0   &   1  &  33  &   1.5 \\ 
+  2   &    2  &  1.0   &   2  &  34  &   1.5 \\
+  3   &    3  &  1.0   &   3  &  35  &   1.5 \\
+  4   &    4  &  1.0   &   4  &  36  &   1.5 \\
+  5   &    5  &  1.0   &   5  &  37  &   1.5 \\
+  6   &    6  &  1.0   &   6  &  38  &   1.5 \\
+  7   &    7  &  1.0   &   7  &  39  &   1.5 \\
+  8   &    8  &  1.0   &   8  &  40  &   1.5 \\
+  9   &    9  &  1.0   &   9  &  41  &   2.0 \\
+ 10   &   10  &  1.0   &  10  &  42  &   2.0 \\
+ 11   &   11  &  1.0   &  11  &  43  &   2.0 \\
+ 12   &   12  &  1.0   &  12  &  44  &   2.0 \\
+ 13   &   13  &  1.0   &  13  &  45  &   2.0 \\
+ 14   &   14  &  1.0   &  14  &  46  &   2.0 \\
+ 15   &   15  &  1.0   &  15  &  47  &   2.0 \\
+ 16   &   16  &  1.0   &  16  &  48  &   2.0 \\
+ 17   &   17  &  1.0   &  17  &  49  &   2.0 \\
+ 18   &   18  &  1.0   &  18  &  50  &   2.0 \\
+ 19   &   19  &  1.0   &  19  &  51  &   2.0 \\
+ 20   &   20  &  1.0   &  20  &  52  &   2.0 \\ 
+ 21   &   21  &  1.0   &  21  &  53  &   2.0 \\
+ 22   &   22  &  1.0   &  22  &  54  &   2.0 \\
+ 23   &   23  &  1.0   &  23  &  55  &   2.0 \\
+ 24   &   24  &  1.0   &  24  &  56  &   2.0 \\
+ 25   &   25  &  1.5   &  25  &  57  &   2.0 \\
+ 26   &   26  &  1.5   &  26  &  58  &   2.0 \\
+ 27   &   27  &  1.5   &  27  &  59  &   2.0 \\
+ 28   &   28  &  1.5   &  28  &  60  &   2.0 \\
+ 29   &   29  &  1.5   &  29  &  61  &   2.0 \\
+ 30   &   30  &  1.5   &  30  &  62  &   2.0 \\
+ 31   &   31  &  1.5   &  31  &  63  &   2.0 \\
+ 32   &   32  &  1.5   &  32  &  64  &   2.0 \\
+ 33   &   33  &  1.5   &  33  &  25  &   1.5 \\
+ 34   &   34  &  1.5   &  34  &  26  &   1.5 \\
+ 35   &   35  &  1.5   &  35  &  27  &   1.5 \\
+ 36   &   36  &  1.5   &  36  &  28  &   1.5 \\
+ 37   &   37  &  1.5   &  37  &  29  &   1.5 \\
+ 38   &   38  &  1.5   &  38  &  30  &   1.5 \\
+ 39   &   39  &  1.5   &  39  &  31  &   1.5 \\
+ 40   &   40  &  1.5   &  40  &  32  &   1.5 \\
+ 41   &   41  &  2.0   &  41  &  17  &   1.0 \\
+ 42   &   42  &  2.0   &  42  &  18  &   1.0 \\
+ 43   &   43  &  2.0   &  43  &  19  &   1.0 \\
+ 44   &   44  &  2.0   &  44  &  20  &   1.0 \\
+ 45   &   45  &  2.0   &  45  &  21  &   1.0 \\
+ 46   &   46  &  2.0   &  46  &  22  &   1.0 \\
+ 47   &   47  &  2.0   &  47  &  23  &   1.0 \\
+ 48   &   48  &  2.0   &  48  &  24  &   1.0 \\
+\end{tabular}
+\end{center}
+\end{table}
+
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
