@@ -130,15 +130,13 @@ module psb_comm_mod
 
 
   interface psb_dscatter
-     subroutine  psb_dscatterm(globx, locx, desc_a, info, iroot,&
-          & iiglobx, ijglobx, iilocx,ijlocx,ik)
+     subroutine  psb_dscatterm(globx, locx, desc_a, info, iroot)
        use psb_descriptor_type
        real(kind(1.d0)), intent(out)    :: locx(:,:)
        real(kind(1.d0)), intent(in)     :: globx(:,:)
        type(psb_desc_type), intent(in)  :: desc_a
        integer, intent(out)             :: info
-       integer, intent(in), optional    :: iroot,iiglobx,&
-            & ijglobx,iilocx,ijlocx,ik
+       integer, intent(in), optional    :: iroot
      end subroutine psb_dscatterm
      subroutine  psb_dscatterv(globx, locx, desc_a, info, iroot)
        use psb_descriptor_type
@@ -148,15 +146,13 @@ module psb_comm_mod
        integer, intent(out)             :: info
        integer, intent(in), optional    :: iroot
      end subroutine psb_dscatterv
-     subroutine  psb_zscatterm(globx, locx, desc_a, info, iroot,&
-          & iiglobx, ijglobx, iilocx,ijlocx,ik)
+     subroutine  psb_zscatterm(globx, locx, desc_a, info, iroot)
        use psb_descriptor_type
        complex(kind(1.d0)), intent(out)    :: locx(:,:)
        complex(kind(1.d0)), intent(in)     :: globx(:,:)
        type(psb_desc_type), intent(in)  :: desc_a
        integer, intent(out)             :: info
-       integer, intent(in), optional    :: iroot,iiglobx,&
-            & ijglobx,iilocx,ijlocx,ik
+       integer, intent(in), optional    :: iroot
      end subroutine psb_zscatterm
      subroutine  psb_zscatterv(globx, locx, desc_a, info, iroot)
        use psb_descriptor_type
@@ -166,44 +162,72 @@ module psb_comm_mod
        integer, intent(out)             :: info
        integer, intent(in), optional    :: iroot
      end subroutine psb_zscatterv
+     subroutine  psb_iscatterm(globx, locx, desc_a, info, iroot)
+       use psb_descriptor_type
+       integer, intent(out)    :: locx(:,:)
+       integer, intent(in)     :: globx(:,:)
+       type(psb_desc_type), intent(in)  :: desc_a
+       integer, intent(out)             :: info
+       integer, intent(in), optional    :: iroot
+     end subroutine psb_iscatterm
+     subroutine  psb_iscatterv(globx, locx, desc_a, info, iroot)
+       use psb_descriptor_type
+       integer, intent(out)    :: locx(:)
+       integer, intent(in)     :: globx(:)
+       type(psb_desc_type), intent(in)  :: desc_a
+       integer, intent(out)             :: info
+       integer, intent(in), optional    :: iroot
+     end subroutine psb_iscatterv
   end interface
 
   interface psb_gather
-     subroutine  psb_dgatherm(globx, locx, desc_a, info, iroot,&
-          & iiglobx, ijglobx, iilocx,ijlocx,ik)
+     subroutine  psb_igatherm(globx, locx, desc_a, info, iroot)
+       use psb_descriptor_type
+       integer, intent(in)    :: locx(:,:)
+       integer, intent(out)   :: globx(:,:)
+       type(psb_desc_type), intent(in) :: desc_a
+       integer, intent(out)            :: info
+       integer, intent(in), optional   :: iroot
+     end subroutine psb_igatherm
+     subroutine  psb_igatherv(globx, locx, desc_a, info, iroot)
+       use psb_descriptor_type
+       integer, intent(in)    :: locx(:)
+       integer, intent(out)   :: globx(:)
+       type(psb_desc_type), intent(in) :: desc_a
+       integer, intent(out)            :: info
+       integer, intent(in), optional   :: iroot
+     end subroutine psb_igatherv
+     subroutine  psb_dgatherm(globx, locx, desc_a, info, iroot)
        use psb_descriptor_type
        real(kind(1.d0)), intent(in)    :: locx(:,:)
        real(kind(1.d0)), intent(out)   :: globx(:,:)
        type(psb_desc_type), intent(in) :: desc_a
        integer, intent(out)            :: info
-       integer, intent(in), optional   :: iroot, iiglobx, ijglobx, iilocx, ijlocx, ik
+       integer, intent(in), optional   :: iroot
      end subroutine psb_dgatherm
-     subroutine  psb_dgatherv(globx, locx, desc_a, info, iroot,&
-          & iiglobx, iilocx)
+     subroutine  psb_dgatherv(globx, locx, desc_a, info, iroot)
        use psb_descriptor_type
        real(kind(1.d0)), intent(in)    :: locx(:)
        real(kind(1.d0)), intent(out)   :: globx(:)
        type(psb_desc_type), intent(in) :: desc_a
        integer, intent(out)            :: info
-       integer, intent(in), optional   :: iroot, iiglobx, iilocx
+       integer, intent(in), optional   :: iroot
      end subroutine psb_dgatherv
-     subroutine  psb_zgatherm(globx, locx, desc_a, info, iroot,&
-          & iiglobx, ijglobx, iilocx,ijlocx,ik)
+     subroutine  psb_zgatherm(globx, locx, desc_a, info, iroot)
        use psb_descriptor_type
        complex(kind(1.d0)), intent(in)    :: locx(:,:)
        complex(kind(1.d0)), intent(out)   :: globx(:,:)
        type(psb_desc_type), intent(in) :: desc_a
        integer, intent(out)            :: info
-       integer, intent(in), optional   :: iroot, iiglobx, ijglobx, iilocx, ijlocx, ik
+       integer, intent(in), optional   :: iroot
      end subroutine psb_zgatherm
-     subroutine  psb_zgatherv(globx, locx, desc_a, info, iroot,&
-          & iiglobx, iilocx)
+     subroutine  psb_zgatherv(globx, locx, desc_a, info, iroot)
        use psb_descriptor_type
        complex(kind(1.d0)), intent(in)    :: locx(:)
        complex(kind(1.d0)), intent(out)   :: globx(:)
        type(psb_desc_type), intent(in) :: desc_a
        integer, intent(out)            :: info
-       integer, intent(in), optional   :: iroot, iiglobx, iilocx
+       integer, intent(in), optional   :: iroot
      end subroutine psb_zgatherv
   end interface
   
