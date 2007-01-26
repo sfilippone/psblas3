@@ -10,6 +10,7 @@
 \syntax{call psb\_cdall}{icontxt, desc\_a, info,mg=mg,parts=parts}
 \syntax*{call psb\_cdall}{icontxt, desc\_a, info,vg=vg,flag=flag}
 \syntax*{call psb\_cdall}{icontxt, desc\_a, info,vl=vl}
+\syntax*{call psb\_cdall}{icontxt, desc\_a, info,nl=nl}
 
 This subroutine initializes the communication descriptor associated
 with an index space. Exactly one of the  optional arguments
@@ -45,6 +46,11 @@ Specified as: a subroutine.
 Scope:{\bf local}.\\
 Type:{\bf optional}.\\
 Specified as: an integer array. 
+\item[nl] Data allocation: in a generalized block-row distribution the
+  number of indices belonging to the current process. 
+Scope:{\bf local}.\\
+Type:{\bf optional}.\\
+Specified as: an integer value. 
 \end{description}
 
 \begin{description}
@@ -62,8 +68,8 @@ An integer value; 0 means no error has been detected.
 \section*{Notes}
 \begin{enumerate}
 \item Exactly one of the optional arguments  \verb|parts|, \verb|vg|,
-  \verb|vl| must be specified, thereby choosing the initialization
-  strategy as follows:
+  \verb|vl|, \verb|nl|  must be specified, thereby choosing the
+  initialization   strategy as follows:
 \begin{description}
 \item[parts] In this case we have a subroutine specifying the mapping
   between global indices and process/local index pairs. If this
@@ -103,6 +109,9 @@ An integer value; 0 means no error has been detected.
   the sum of the sizes of the individual vectors \verb|vl| specified
   on the calling processes. The subroutine will check that each entry
   in the global index space $(1\dots mg)$ is specified exactly once. 
+\item[nl] In this case we are implying a generalize row-block
+  distribution in which each process $I$ gets assigned a consecutive
+  chunk of $N_I=nl$ global indices.
 \end{description}
 \item On exit from this routine the descriptor is in the build state
 \end{enumerate}

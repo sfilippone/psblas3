@@ -34,7 +34,7 @@ Long Precision Complex & psb\_halo \\
 \end{table}
 
 \syntax{call psb\_halo}{x, desc\_a, info}
-\syntax*{call psb\_halo}{x, desc\_a, info, alpha, work}
+\syntax*{call psb\_halo}{x, desc\_a, info, alpha, work, data}
 
 \begin{description}
 \item[\bf On Entry]
@@ -58,6 +58,13 @@ Scope: {\bf local} \\
 Type: {\bf optional}\\
 Specified as: a rank one array of the same type of $x$ with the
 POINTER attribute.
+\item[data] index list selector.\\
+Scope: {\bf global} \\
+Type: {\bf optional} \\
+Specified as: an integer. Values:\verb|psb_comm_halo_|,
+\verb|psb_comm_ext_|, default: \verb|psb_comm_halo_|. Chooses the
+index list on which to base the data exchange. 
+
 
 \item[\bf On Return] 
 \item[x] global dense result matrix $x$.\\
