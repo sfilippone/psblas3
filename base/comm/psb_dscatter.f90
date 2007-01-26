@@ -38,17 +38,11 @@
 !   globx     -  real,dimension(:,:).          The global matrix to scatter.
 !   locx      -  real,dimension(:,:).          The local piece of the ditributed matrix.
 !   desc_a    -  type(<psb_desc_type>).        The communication descriptor.
-!   info      -  integer.                      Eventually returns an error code.
+!   info      -  integer.                      Error code.
 !   iroot     -  integer(optional).            The process that owns the global matrix. If -1 all
-!                                              the processes have a copy.
-!   iiglobx   -  integer(optional).            The starting row of the global matrix. 
-!   ijglobx   -  integer(optional).            The starting column of the global matrix. 
-!   iilocx    -  integer(optional).            The starting row of the local piece of matrix. 
-!   ijlocx    -  integer(optional).            The starting column of the local piece of matrix.
-!   ik        -  integer(optional).            The number of columns to gather. 
+!                                              the processes have a copy. Default -1.
 !
-subroutine  psb_dscatterm(globx, locx, desc_a, info, iroot,&
-     & iiglobx, ijglobx, iilocx,ijlocx,ik)
+subroutine  psb_dscatterm(globx, locx, desc_a, info, iroot)
 
   use psb_descriptor_type
   use psb_check_mod
@@ -61,8 +55,7 @@ subroutine  psb_dscatterm(globx, locx, desc_a, info, iroot,&
   real(kind(1.d0)), intent(in)     :: globx(:,:)
   type(psb_desc_type), intent(in)  :: desc_a
   integer, intent(out)             :: info
-  integer, intent(in), optional    :: iroot,iiglobx,&
-       & ijglobx,iilocx,ijlocx,ik
+  integer, intent(in), optional    :: iroot
 
 
   ! locals
@@ -70,8 +63,8 @@ subroutine  psb_dscatterm(globx, locx, desc_a, info, iroot,&
        & err_act, m, n, i, j, idx, nrow, iiroot, iglobx, jglobx,&
        & ilocx, jlocx, lda_locx, lda_globx, lock, globk, icomm, k, maxk, root, ilx,&
        & jlx, myrank, rootrank, c, pos
-  real(kind(1.d0)),pointer :: scatterv(:)
-  integer, pointer         :: displ(:), l_t_g_all(:), all_dim(:)
+  real(kind(1.d0)), allocatable  :: scatterv(:)
+  integer, allocatable           :: displ(:), l_t_g_all(:), all_dim(:)
   character(len=20)        :: name, ch_err
 
   name='psb_scatterm'
@@ -104,30 +97,10 @@ subroutine  psb_dscatterm(globx, locx, desc_a, info, iroot,&
      iiroot=0
   endif
   
-  if (present(iiglobx)) then
-     iglobx = iiglobx
-  else
-     iglobx = 1
-  end if
-
-  if (present(ijglobx)) then
-     jglobx = ijglobx
-  else
-     jglobx = 1
-  end if
-
-  if (present(iilocx)) then
-     ilocx = iilocx
-  else
-     ilocx = 1
-  end if
-
-  if (present(ijlocx)) then
-     jlocx = ijlocx
-  else
-     jlocx = 1
-  end if
-
+  iglobx = 1
+  jglobx = 1
+  ilocx = 1
+  jlocx = 1
   lda_globx = size(globx,1)
   lda_locx  = size(locx, 1)
 
@@ -137,17 +110,7 @@ subroutine  psb_dscatterm(globx, locx, desc_a, info, iroot,&
   lock=size(locx,2)-jlocx+1
   globk=size(globx,2)-jglobx+1
   maxk=min(lock,globk)
-  
-  if(present(ik)) then
-     if(ik.gt.maxk) then
-        k=maxk
-     else
-        k=ik
-     end if
-  else
-     k = maxk
-  end if
-
+  k = maxk
   call psb_get_mpicomm(ictxt,icomm)
   call psb_get_rank(myrank,ictxt,me)
 
@@ -303,7 +266,7 @@ end subroutine psb_dscatterm
 !   globx     -  real,dimension(:).            The global vector to scatter.
 !   locx      -  real,dimension(:).            The local piece of the ditributed vector.
 !   desc_a    -  type(<psb_desc_type>).        The communication descriptor.
-!   info      -  integer.                      Eventually returns an error code.
+!   info      -  integer.                      Error code.
 !   iroot     -  integer(optional).            The process that owns the global vector. If -1 all
 !                                              the processes have a copy.
 !
@@ -327,8 +290,8 @@ subroutine  psb_dscatterv(globx, locx, desc_a, info, iroot)
        & err_act, m, n, i, j, idx, nrow, iiroot, iglobx, jglobx,&
        & ilocx, jlocx, lda_locx, lda_globx, root, k, icomm, myrank,&
        & rootrank, pos, ilx, jlx
-  real(kind(1.d0)),pointer :: scatterv(:)
-  integer, pointer         :: displ(:), l_t_g_all(:), all_dim(:)
+  real(kind(1.d0)), allocatable  :: scatterv(:)
+  integer, allocatable           :: displ(:), l_t_g_all(:), all_dim(:)
   character(len=20)        :: name, ch_err
 
   name='psb_scatterv'

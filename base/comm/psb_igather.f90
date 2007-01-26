@@ -28,44 +28,44 @@
 !!$  POSSIBILITY OF SUCH DAMAGE.
 !!$ 
 !!$  
-! File:  psb_zgather.f90
+! File:  psb_igather.f90
 !
-! Subroutine: psb_zgatherm
+! Subroutine: psb_igatherm
 !   This subroutine gathers pieces of a distributed dense matrix into a local one.
 !
 ! Parameters:
-!   globx     -  cplx,dimension(:,:).          The local matrix into which gather 
-!                                                  the distributed pieces.
-!   locx      -  cplx,dimension(:,:).          The local piece of the distributed 
-!                                                  matrix to be gathered.
+!   globx     -  integer,dimension(:,:).          The local matrix into which gather 
+!                                                the distributed pieces.
+!   locx      -  integer,dimension(:,:).          The local piece of the distributed 
+!                                                matrix to be gathered.
 !   desc_a    -  type(<psb_desc_type>).        The communication descriptor.
 !   info      -  integer.                      Error code.
 !   iroot     -  integer.                      The process that has to own the 
 !                                              global matrix. If -1 all
 !                                              the processes will have a copy.
+!                                              Default: -1. 
 !
-subroutine  psb_zgatherm(globx, locx, desc_a, info, iroot)
+subroutine  psb_igatherm(globx, locx, desc_a, info, iroot)
   use psb_descriptor_type
   use psb_check_mod
   use psb_error_mod
   use psb_penv_mod
   implicit none
 
-  complex(kind(1.d0)), intent(in)    :: locx(:,:)
-  complex(kind(1.d0)), intent(out)   :: globx(:,:)
+  integer, intent(in)    :: locx(:,:)
+  integer, intent(out)   :: globx(:,:)
   type(psb_desc_type), intent(in) :: desc_a
   integer, intent(out)            :: info
   integer, intent(in), optional   :: iroot
 
 
   ! locals
-  integer                  :: int_err(5), ictxt, np, me, &
+  integer                  :: int_err(5), ictxt, np, me,&
        & err_act, n, root, iiroot, ilocx, iglobx, jlocx,&
        & jglobx, lda_locx, lda_globx, m, lock, globk, maxk, k, jlx, ilx, i, j, idx
-
   character(len=20)        :: name, ch_err
 
-  name='psb_zgatherm'
+  name='psb_igatherm'
   if(psb_get_errstatus().ne.0) return 
   info=0
   call psb_erractionsave(err_act)
@@ -111,7 +111,6 @@ subroutine  psb_zgatherm(globx, locx, desc_a, info, iroot)
   lock=size(locx,2)-jlocx+1
   globk=size(globx,2)-jglobx+1
   maxk=min(lock,globk)
-
   k = maxk
 
   call psb_bcast(ictxt,k,root=iiroot)
@@ -119,8 +118,7 @@ subroutine  psb_zgatherm(globx, locx, desc_a, info, iroot)
   !  there should be a global check on k here!!!
 
   call psb_chkglobvect(m,n,size(globx,1),iglobx,jglobx,desc_a,info)
-  if (info == 0) &
-       & call psb_chkvect(m,n,size(locx,1),ilocx,jlocx,desc_a,info,ilx,jlx)
+  call psb_chkvect(m,n,size(locx,1),ilocx,jlocx,desc_a,info,ilx,jlx)
   if(info.ne.0) then
     info=4010
     ch_err='psb_chk(glob)vect'
@@ -133,23 +131,23 @@ subroutine  psb_zgatherm(globx, locx, desc_a, info, iroot)
     call psb_errpush(info,name)
     goto 9999
   end if
-  
-  globx(:,:)=0.d0
+
+  globx(:,:)=0
 
   do j=1,k
-     do i=1,psb_cd_get_local_rows(desc_a)
-        idx = desc_a%loc_to_glob(i)
-        globx(idx,jglobx+j-1) = locx(i,jlx+j-1)
-     end do
-     ! adjust overlapped elements
-     i=1
-     do while (desc_a%ovrlap_elem(i).ne.-1)
-        idx=desc_a%ovrlap_elem(i+psb_ovrlp_elem_)
-        idx=desc_a%loc_to_glob(idx)
-        globx(idx,jglobx+j-1) = &
-             & globx(idx,jglobx+j-1)/desc_a%ovrlap_elem(i+psb_n_dom_ovr_)
-        i=i+2
-     end do
+    do i=1,psb_cd_get_local_rows(desc_a)
+      idx = desc_a%loc_to_glob(i)
+      globx(idx,jglobx+j-1) = locx(i,jlx+j-1)
+    end do
+    ! adjust overlapped elements
+    i=1
+    do while (desc_a%ovrlap_elem(i).ne.-1)
+      idx=desc_a%ovrlap_elem(i+psb_ovrlp_elem_)
+      idx=desc_a%loc_to_glob(idx)
+      globx(idx,jglobx+j-1) = &
+           &  globx(idx,jglobx+j-1)/desc_a%ovrlap_elem(i+psb_n_dom_ovr_)
+      i=i+2
+    end do
   end do
 
   call psb_sum(ictxt,globx(1:m,jglobx:jglobx+k-1),root=root)
@@ -161,12 +159,12 @@ subroutine  psb_zgatherm(globx, locx, desc_a, info, iroot)
   call psb_erractionrestore(err_act)
 
   if (err_act.eq.psb_act_abort_) then
-     call psb_error(ictxt)
-     return
+    call psb_error(ictxt)
+    return
   end if
   return
 
-end subroutine psb_zgatherm
+end subroutine psb_igatherm
 
 
 
@@ -203,30 +201,29 @@ end subroutine psb_zgatherm
 !!$  POSSIBILITY OF SUCH DAMAGE.
 !!$ 
 !!$  
-! Subroutine: psb_zgatherv
+! Subroutine: psb_igatherv
 !   This subroutine gathers pieces of a distributed dense vector into a local one.
 !
 ! Parameters:
-!   globx     -  cplx,dimension(:).            The local vector into which gather 
-!                                                  the distributed pieces.
-!   locx      -  cplx,dimension(:).            The local piece of the distributed 
+!   globx     -  integer,dimension(:).            The local vector into which gather the 
+!                                                  distributed pieces.
+!   locx      -  integer,dimension(:).            The local piece of the ditributed
 !                                                  vector to be gathered.
 !   desc_a    -  type(<psb_desc_type>).        The communication descriptor.
 !   info      -  integer.                      Error code.
 !   iroot     -  integer.                      The process that has to own the 
 !                                              global matrix. If -1 all
 !                                              the processes will have a copy.
-!                                              default: -1
 !
-subroutine  psb_zgatherv(globx, locx, desc_a, info, iroot)
+subroutine  psb_igatherv(globx, locx, desc_a, info, iroot)
   use psb_descriptor_type
   use psb_check_mod
   use psb_error_mod
   use psb_penv_mod
   implicit none
 
-  complex(kind(1.d0)), intent(in)    :: locx(:)
-  complex(kind(1.d0)), intent(out)   :: globx(:)
+  integer, intent(in)    :: locx(:)
+  integer, intent(out)   :: globx(:)
   type(psb_desc_type), intent(in) :: desc_a
   integer, intent(out)            :: info
   integer, intent(in), optional   :: iroot
@@ -239,7 +236,7 @@ subroutine  psb_zgatherv(globx, locx, desc_a, info, iroot)
 
   character(len=20)        :: name, ch_err
 
-  name='psb_zgatherv'
+  name='psb_igatherv'
   if(psb_get_errstatus().ne.0) return 
   info=0
   call psb_erractionsave(err_act)
@@ -255,15 +252,15 @@ subroutine  psb_zgatherv(globx, locx, desc_a, info, iroot)
   endif
 
   if (present(iroot)) then
-    root = iroot
-    if((root.lt.-1).or.(root.gt.np)) then
-      info=30
-      int_err(1:2)=(/5,root/)
-      call psb_errpush(info,name,i_err=int_err)
-      goto 9999
-    end if
+     root = iroot
+     if((root.lt.-1).or.(root.gt.np)) then
+        info=30
+        int_err(1:2)=(/5,root/)
+        call psb_errpush(info,name,i_err=int_err)
+        goto 9999
+     end if
   else
-    root = -1
+     root = -1
   end if
 
   jglobx=1
@@ -276,43 +273,42 @@ subroutine  psb_zgatherv(globx, locx, desc_a, info, iroot)
 
   m = psb_cd_get_global_rows(desc_a)
   n = psb_cd_get_global_cols(desc_a)
-
+  
   k = 1
 
 
   !  there should be a global check on k here!!!
 
   call psb_chkglobvect(m,n,size(globx),iglobx,jglobx,desc_a,info)
-  if (info == 0) &
-       & call psb_chkvect(m,n,size(locx),ilocx,jlocx,desc_a,info,ilx,jlx)
+  call psb_chkvect(m,n,size(locx),ilocx,jlocx,desc_a,info,ilx,jlx)
   if(info.ne.0) then
-    info=4010
-    ch_err='psb_chk(glob)vect'
-    call psb_errpush(info,name,a_err=ch_err)
-    goto 9999
+     info=4010
+     ch_err='psb_chk(glob)vect'
+     call psb_errpush(info,name,a_err=ch_err)
+     goto 9999
   end if
 
   if ((ilx.ne.1).or.(iglobx.ne.1)) then
-    info=3040
-    call psb_errpush(info,name)
-    goto 9999
+     info=3040
+     call psb_errpush(info,name)
+     goto 9999
   end if
-
-  globx(:)=0.d0
+  
+  globx(:)=0
 
   do i=1,psb_cd_get_local_rows(desc_a)
-    idx = desc_a%loc_to_glob(i)
-    globx(idx) = locx(i)
+     idx = desc_a%loc_to_glob(i)
+     globx(idx) = locx(i)
   end do
   ! adjust overlapped elements
   i=1
   do while (desc_a%ovrlap_elem(i).ne.-1)
-    idx=desc_a%ovrlap_elem(i+psb_ovrlp_elem_)
-    idx=desc_a%loc_to_glob(idx)
-    globx(idx) = globx(idx)/desc_a%ovrlap_elem(i+psb_n_dom_ovr_)
-    i=i+2
+     idx=desc_a%ovrlap_elem(i+psb_ovrlp_elem_)
+     idx=desc_a%loc_to_glob(idx)
+     globx(idx) = globx(idx)/desc_a%ovrlap_elem(i+psb_n_dom_ovr_)
+     i=i+2
   end do
-
+  
   call psb_sum(ictxt,globx(1:m),root=root)
 
   call psb_erractionrestore(err_act)
@@ -322,9 +318,9 @@ subroutine  psb_zgatherv(globx, locx, desc_a, info, iroot)
   call psb_erractionrestore(err_act)
 
   if (err_act.eq.psb_act_abort_) then
-    call psb_error(ictxt)
-    return
+     call psb_error(ictxt)
+     return
   end if
   return
 
-end subroutine psb_zgatherv
+end subroutine psb_igatherv

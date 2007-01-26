@@ -39,20 +39,13 @@
 !   locx      -  real,dimension(:,:).          The local piece of the distributed 
 !                                                matrix to be gathered.
 !   desc_a    -  type(<psb_desc_type>).        The communication descriptor.
-!   info      -  integer.                      Eventually returns an error code.
+!   info      -  integer.                      Error code.
 !   iroot     -  integer.                      The process that has to own the 
-!                                                 global matrix. If -1 all
+!                                              global matrix. If -1 all
 !                                              the processes will have a copy.
-!   iiglobx   -  integer(optional).            The starting row of the global matrix. 
-!   ijglobx   -  integer(optional).            The starting column of the global matrix. 
-!   iilocx    -  integer(optional).            The starting row of the local piece 
-!                                                 of matrix. 
-!   ijlocx    -  integer(optional).            The starting column of the local piece 
-!                                                 of matrix.
-!   ik        -  integer(optional).            The number of columns to gather. 
+!                                              Default: -1. 
 !
-subroutine  psb_dgatherm(globx, locx, desc_a, info, iroot,&
-     & iiglobx, ijglobx, iilocx,ijlocx,ik)
+subroutine  psb_dgatherm(globx, locx, desc_a, info, iroot)
   use psb_descriptor_type
   use psb_check_mod
   use psb_error_mod
@@ -63,7 +56,7 @@ subroutine  psb_dgatherm(globx, locx, desc_a, info, iroot,&
   real(kind(1.d0)), intent(out)   :: globx(:,:)
   type(psb_desc_type), intent(in) :: desc_a
   integer, intent(out)            :: info
-  integer, intent(in), optional   :: iroot, iiglobx, ijglobx, iilocx, ijlocx, ik
+  integer, intent(in), optional   :: iroot
 
 
   ! locals
@@ -104,29 +97,10 @@ subroutine  psb_dgatherm(globx, locx, desc_a, info, iroot,&
     iiroot = root
   endif
 
-  if (present(iiglobx)) then
-    iglobx = iiglobx
-  else
-    iglobx = 1
-  end if
-
-  if (present(ijglobx)) then
-    jglobx = ijglobx
-  else
-    jglobx = 1
-  end if
-
-  if (present(iilocx)) then
-    ilocx = iilocx
-  else
-    ilocx = 1
-  end if
-
-  if (present(ijlocx)) then
-    jlocx = ijlocx
-  else
-    jlocx = 1
-  end if
+  iglobx = 1
+  jglobx = 1
+  ilocx = 1
+  jlocx = 1
 
   lda_globx = size(globx,1)
   lda_locx  = size(locx, 1)
@@ -137,16 +111,7 @@ subroutine  psb_dgatherm(globx, locx, desc_a, info, iroot,&
   lock=size(locx,2)-jlocx+1
   globk=size(globx,2)-jglobx+1
   maxk=min(lock,globk)
-
-  if(present(ik)) then
-    if(ik.gt.maxk) then
-      k=maxk
-    else
-      k=ik
-    end if
-  else
-    k = maxk
-  end if
+  k = maxk
 
   call psb_bcast(ictxt,k,root=iiroot)
 
@@ -245,16 +210,12 @@ end subroutine psb_dgatherm
 !   locx      -  real,dimension(:).            The local piece of the ditributed
 !                                                  vector to be gathered.
 !   desc_a    -  type(<psb_desc_type>).        The communication descriptor.
-!   info      -  integer.                      Eventually returns an error code.
+!   info      -  integer.                      Error code.
 !   iroot     -  integer.                      The process that has to own the 
-!                                                  global vector. If -1 all
+!                                              global matrix. If -1 all
 !                                              the processes will have a copy.
-!   iiglobx   -  integer(optional).            The starting row of the global vector. 
-!   iilocx    -  integer(optional).            The starting row of the local piece
-!                                                  of vector. 
 !
-subroutine  psb_dgatherv(globx, locx, desc_a, info, iroot,&
-     & iiglobx, iilocx)
+subroutine  psb_dgatherv(globx, locx, desc_a, info, iroot)
   use psb_descriptor_type
   use psb_check_mod
   use psb_error_mod
@@ -265,7 +226,7 @@ subroutine  psb_dgatherv(globx, locx, desc_a, info, iroot,&
   real(kind(1.d0)), intent(out)   :: globx(:)
   type(psb_desc_type), intent(in) :: desc_a
   integer, intent(out)            :: info
-  integer, intent(in), optional   :: iroot, iiglobx, iilocx
+  integer, intent(in), optional   :: iroot
 
 
   ! locals
@@ -303,18 +264,9 @@ subroutine  psb_dgatherv(globx, locx, desc_a, info, iroot,&
   end if
 
   jglobx=1
-  if (present(iiglobx)) then
-     iglobx = iiglobx
-  else
-     iglobx = 1
-  end if
-
+  iglobx = 1
   jlocx=1
-  if (present(iilocx)) then
-     ilocx = iilocx
-  else
-     ilocx = 1
-  end if
+  ilocx = 1
 
   lda_globx = size(globx)
   lda_locx  = size(locx)

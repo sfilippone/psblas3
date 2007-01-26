@@ -28,20 +28,21 @@
 !!$  POSSIBILITY OF SUCH DAMAGE.
 !!$ 
 !!$  
-! File:  psb_zscatter.f90
+! File:  psb_iscatter.f90
 !
-! Subroutine: psb_zscatterm
+! Subroutine: psb_iscatterm
 !   This subroutine scatters a global matrix locally owned by one process
 !   into pieces that are local to alle the processes.
 !
 ! Parameters:
-!   globx     -  complex,dimension(:,:).          The global matrix to scatter.
-!   locx      -  complex,dimension(:,:).          The local piece of the ditributed matrix.
+!   globx     -  integer,dimension(:,:).          The global matrix to scatter.
+!   locx      -  integer,dimension(:,:).          The local piece of the ditributed matrix.
 !   desc_a    -  type(<psb_desc_type>).        The communication descriptor.
 !   info      -  integer.                      Error code.
 !   iroot     -  integer(optional).            The process that owns the global matrix. If -1 all
-!                                              the processes have a copy. Default -1
-subroutine  psb_zscatterm(globx, locx, desc_a, info, iroot)
+!                                              the processes have a copy.
+!
+subroutine  psb_iscatterm(globx, locx, desc_a, info, iroot)
 
   use psb_descriptor_type
   use psb_check_mod
@@ -50,20 +51,19 @@ subroutine  psb_zscatterm(globx, locx, desc_a, info, iroot)
   use psb_penv_mod
   implicit none
 
-  complex(kind(1.d0)), intent(out)    :: locx(:,:)
-  complex(kind(1.d0)), intent(in)     :: globx(:,:)
+  integer, intent(out)    :: locx(:,:)
+  integer, intent(in)     :: globx(:,:)
   type(psb_desc_type), intent(in)  :: desc_a
   integer, intent(out)             :: info
   integer, intent(in), optional    :: iroot
 
-
   ! locals
-  integer                  :: int_err(5), ictxt, np, me, &
+  integer                  :: int_err(5), ictxt, np, me,&
        & err_act, m, n, i, j, idx, nrow, iiroot, iglobx, jglobx,&
        & ilocx, jlocx, lda_locx, lda_globx, lock, globk, icomm, k, maxk, root, ilx,&
        & jlx, myrank, rootrank, c, pos
-  complex(kind(1.d0)),allocatable  :: scatterv(:)
-  integer, allocatable             :: displ(:), l_t_g_all(:), all_dim(:)
+  integer, allocatable :: scatterv(:)
+  integer, allocatable :: displ(:), l_t_g_all(:), all_dim(:)
   character(len=20)        :: name, ch_err
 
   name='psb_scatterm'
@@ -82,80 +82,77 @@ subroutine  psb_zscatterm(globx, locx, desc_a, info, iroot)
   endif
 
   if (present(iroot)) then
-    root = iroot
-    if((root.lt.-1).or.(root.gt.np)) then
-      info=30
-      int_err(1:2)=(/5,root/)
-      call psb_errpush(info,name,i_err=int_err)
-      goto 9999
-    end if
+     root = iroot
+     if((root.lt.-1).or.(root.gt.np)) then
+        info=30
+        int_err(1:2)=(/5,root/)
+        call psb_errpush(info,name,i_err=int_err)
+        goto 9999
+     end if
   else
-    root = -1
+     root = -1
   end if
   if (root==-1) then
-    iiroot=0
+     iiroot=0
   endif
-
-
+  
   iglobx = 1
   jglobx = 1
   ilocx = 1
   jlocx = 1
-  
   lda_globx = size(globx,1)
   lda_locx  = size(locx, 1)
 
   m = psb_cd_get_global_rows(desc_a)
   n = psb_cd_get_global_cols(desc_a)
-
+  
   lock=size(locx,2)-jlocx+1
   globk=size(globx,2)-jglobx+1
   maxk=min(lock,globk)
   k = maxk
-
   call psb_get_mpicomm(ictxt,icomm)
   call psb_get_rank(myrank,ictxt,me)
+
 
   lda_globx = size(globx)
   lda_locx  = size(locx)
 
   m = psb_cd_get_global_rows(desc_a)
   n = psb_cd_get_global_cols(desc_a)
-
+  
   if (me == iiroot) then
-    call igebs2d(ictxt, 'all', ' ', 1, 1, k, 1)
+     call igebs2d(ictxt, 'all', ' ', 1, 1, k, 1)
   else
-    call igebr2d(ictxt, 'all', ' ', 1, 1, k, 1, iiroot, 0)
+     call igebr2d(ictxt, 'all', ' ', 1, 1, k, 1, iiroot, 0)
   end if
 
   !  there should be a global check on k here!!!
 
   call psb_chkglobvect(m,n,size(globx),iglobx,jglobx,desc_a,info)
-  if (info == 0)  &
-       & call psb_chkvect(m,n,size(locx),ilocx,jlocx,desc_a,info,ilx,jlx)
+  if (info == 0) call psb_chkvect(m,n,size(locx),ilocx,jlocx,desc_a,info,ilx,jlx)
   if(info /= 0) then
-    info=4010
-    ch_err='psb_chk(glob)vect'
-    call psb_errpush(info,name,a_err=ch_err)
-    goto 9999
+     info=4010
+     ch_err='psb_chk(glob)vect'
+     call psb_errpush(info,name,a_err=ch_err)
+     goto 9999
   end if
 
   if ((ilx /= 1).or.(iglobx /= 1)) then
-    info=3040
-    call psb_errpush(info,name)
-    goto 9999
+     info=3040
+     call psb_errpush(info,name)
+     goto 9999
   end if
 
   nrow=psb_cd_get_local_rows(desc_a)
 
   if(root == -1) then
-    ! extract my chunk
-    do j=1,k
-      do i=1, nrow
-        idx=desc_a%loc_to_glob(i)
-        locx(i,jlocx+j-1)=globx(idx,jglobx+j-1)
-      end do
-    end do
+     ! extract my chunk
+     do j=1,k
+        do i=1, nrow
+           idx=desc_a%loc_to_glob(i)
+           locx(i,jlocx+j-1)=globx(idx,jglobx+j-1)
+        end do
+     end do
   else
     call psb_get_rank(rootrank,ictxt,root)
   end if
@@ -163,53 +160,53 @@ subroutine  psb_zscatterm(globx, locx, desc_a, info, iroot)
   ! root has to gather size information
   allocate(displ(np),all_dim(np),stat=info)
   if(info /= 0) then
-    info=4010
-    ch_err='Allocate'
-    call psb_errpush(info,name,a_err=ch_err)
-    goto 9999
+     info=4010
+     ch_err='Allocate'
+     call psb_errpush(info,name,a_err=ch_err)
+     goto 9999
   end if
   call mpi_gather(nrow,1,mpi_integer,all_dim,&
        & np,mpi_integer,rootrank,icomm,info)
-
+  
   displ(1)=1
   displ(2:)=all_dim(1:np-1)+1
 
   ! root has to gather loc_glob from each process
   if(me == root) then
-    allocate(l_t_g_all(sum(all_dim)),scatterv(sum(all_dim)),stat=info)
-    if(info /= 0) then
-      info=4010
-      ch_err='Allocate'
-      call psb_errpush(info,name,a_err=ch_err)
-      goto 9999
-    end if
+     allocate(l_t_g_all(sum(all_dim)),scatterv(sum(all_dim)),stat=info)
+     if(info /= 0) then
+       info=4010
+       ch_err='Allocate'
+       call psb_errpush(info,name,a_err=ch_err)
+       goto 9999
+     end if
 
   end if
-
+     
   call mpi_gatherv(desc_a%loc_to_glob,nrow,&
        & mpi_integer,l_t_g_all,all_dim,&
        & displ,mpi_integer,rootrank,icomm,info)
 
-
+  
   do c=1, k
-    ! prepare vector to scatter
-    if(me == root) then
-      do i=1,np
-        pos=displ(i)
-        do j=1, all_dim(i)
-          idx=l_t_g_all(pos+j-1)
-          scatterv(pos+j-1)=globx(idx,jglobx+c-1)
+     ! prepare vector to scatter
+     if(me == root) then
+        do i=1,np
+           pos=displ(i)
+           do j=1, all_dim(i)
+              idx=l_t_g_all(pos+j-1)
+              scatterv(pos+j-1)=globx(idx,jglobx+c-1)
+           end do
         end do
-      end do
-    end if
-
-    ! scatter !!!
-    call mpi_scatterv(scatterv,all_dim,displ,&
-         & mpi_double_complex,locx(1,jlocx+c-1),nrow,&
-         & mpi_double_complex,rootrank,icomm,info)
+     end if
+     
+     ! scatter !!!
+     call mpi_scatterv(scatterv,all_dim,displ,&
+          & mpi_integer,locx(1,jlocx+c-1),nrow,&
+          & mpi_integer,rootrank,icomm,info)
 
   end do
-
+  
   deallocate(all_dim, l_t_g_all, displ, scatterv)
 
   call psb_erractionrestore(err_act)
@@ -219,12 +216,12 @@ subroutine  psb_zscatterm(globx, locx, desc_a, info, iroot)
   call psb_erractionrestore(err_act)
 
   if (err_act == psb_act_abort_) then
-    call psb_error(ictxt)
-    return
+     call psb_error(ictxt)
+     return
   end if
   return
 
-end subroutine psb_zscatterm
+end subroutine psb_iscatterm
 
 
 
@@ -260,19 +257,19 @@ end subroutine psb_zscatterm
 !!$ 
 !!$  
 
-! Subroutine: psb_zscatterv
+! Subroutine: psb_iscatterv
 !   This subroutine scatters a global vector locally owned by one process
 !   into pieces that are local to alle the processes.
 !
 ! Parameters:
-!   globx     -  complex,dimension(:).         The global vector to scatter.
-!   locx      -  complex,dimension(:).         The local piece of the ditributed vector.
+!   globx     -  integer,dimension(:).            The global vector to scatter.
+!   locx      -  integer,dimension(:).            The local piece of the ditributed vector.
 !   desc_a    -  type(<psb_desc_type>).        The communication descriptor.
-!   info      -  integer.                      Eventually returns an error code.
+!   info      -  integer.                      Error code.
 !   iroot     -  integer(optional).            The process that owns the global vector. If -1 all
 !                                              the processes have a copy.
 !
-subroutine  psb_zscatterv(globx, locx, desc_a, info, iroot)
+subroutine  psb_iscatterv(globx, locx, desc_a, info, iroot)
   use psb_descriptor_type
   use psb_check_mod
   use psb_error_mod
@@ -280,8 +277,8 @@ subroutine  psb_zscatterv(globx, locx, desc_a, info, iroot)
   use psb_penv_mod
   implicit none
 
-  complex(kind(1.d0)), intent(out)    :: locx(:)
-  complex(kind(1.d0)), intent(in)     :: globx(:)
+  integer, intent(out)    :: locx(:)
+  integer, intent(in)     :: globx(:)
   type(psb_desc_type), intent(in)  :: desc_a
   integer, intent(out)             :: info
   integer, intent(in), optional    :: iroot
@@ -291,10 +288,10 @@ subroutine  psb_zscatterv(globx, locx, desc_a, info, iroot)
   integer                  :: int_err(5), ictxt, np, me, &
        & err_act, m, n, i, j, idx, nrow, iiroot, iglobx, jglobx,&
        & ilocx, jlocx, lda_locx, lda_globx, root, k, icomm, myrank,&
-       & rootrank, c, pos, ilx, jlx
-  complex(kind(1.d0)), allocatable  :: scatterv(:)
-  integer, allocatable              :: displ(:), l_t_g_all(:), all_dim(:)
-  character(len=20)        :: name, ch_err
+       & rootrank, pos, ilx, jlx
+  integer, allocatable  :: scatterv(:)
+  integer, allocatable  :: displ(:), l_t_g_all(:), all_dim(:)
+  character(len=20)     :: name, ch_err
 
   name='psb_scatterv'
   if(psb_get_errstatus() /= 0) return 
@@ -312,17 +309,17 @@ subroutine  psb_zscatterv(globx, locx, desc_a, info, iroot)
   endif
 
   if (present(iroot)) then
-    root = iroot
-    if((root.lt.-1).or.(root.gt.np)) then
-      info=30
-      int_err(1:2)=(/5,root/)
-      call psb_errpush(info,name,i_err=int_err)
-      goto 9999
-    end if
+     root = iroot
+     if((root.lt.-1).or.(root.gt.np)) then
+        info=30
+        int_err(1:2)=(/5,root/)
+        call psb_errpush(info,name,i_err=int_err)
+        goto 9999
+     end if
   else
-    root = -1
+     root = -1
   end if
-
+  
   call psb_get_mpicomm(ictxt,icomm)
   call psb_get_rank(myrank,ictxt,me)
 
@@ -331,13 +328,13 @@ subroutine  psb_zscatterv(globx, locx, desc_a, info, iroot)
 
   m = psb_cd_get_global_rows(desc_a)
   n = psb_cd_get_global_cols(desc_a)
-
+  
   k = 1
 
   if (me == iiroot) then
-    call igebs2d(ictxt, 'all', ' ', 1, 1, k, 1)
+     call igebs2d(ictxt, 'all', ' ', 1, 1, k, 1)
   else
-    call igebr2d(ictxt, 'all', ' ', 1, 1, k, 1, iiroot, 0)
+     call igebr2d(ictxt, 'all', ' ', 1, 1, k, 1, iiroot, 0)
   end if
 
   !  there should be a global check on k here!!!
@@ -346,26 +343,26 @@ subroutine  psb_zscatterv(globx, locx, desc_a, info, iroot)
   if (info == 0) &
        & call psb_chkvect(m,n,size(locx),ilocx,jlocx,desc_a,info,ilx,jlx)
   if(info /= 0) then
-    info=4010
-    ch_err='psb_chk(glob)vect'
-    call psb_errpush(info,name,a_err=ch_err)
-    goto 9999
+     info=4010
+     ch_err='psb_chk(glob)vect'
+     call psb_errpush(info,name,a_err=ch_err)
+     goto 9999
   end if
 
   if ((ilx /= 1).or.(iglobx /= 1)) then
-    info=3040
-    call psb_errpush(info,name)
-    goto 9999
+     info=3040
+     call psb_errpush(info,name)
+     goto 9999
   end if
 
   nrow=psb_cd_get_local_rows(desc_a)
 
   if(root == -1) then
-    ! extract my chunk
-    do i=1, nrow
-      idx=desc_a%loc_to_glob(i)
-      locx(i)=globx(idx)
-    end do
+     ! extract my chunk
+     do i=1, nrow
+        idx=desc_a%loc_to_glob(i)
+        locx(i)=globx(idx)
+     end do
   else
     call psb_get_rank(rootrank,ictxt,root)
   end if
@@ -374,33 +371,33 @@ subroutine  psb_zscatterv(globx, locx, desc_a, info, iroot)
   allocate(displ(np),all_dim(np))
   call mpi_gather(nrow,1,mpi_integer,all_dim,&
        & np,mpi_integer,rootrank,icomm,info)
-
+  
   displ(1)=1
   displ(2:)=all_dim(1:np-1)+1
 
   ! root has to gather loc_glob from each process
   if(me == root) then
-    allocate(l_t_g_all(sum(all_dim)),scatterv(sum(all_dim)))
+     allocate(l_t_g_all(sum(all_dim)),scatterv(sum(all_dim)))
   end if
-
+     
   call mpi_gatherv(desc_a%loc_to_glob,nrow,&
        & mpi_integer,l_t_g_all,all_dim,&
        & displ,mpi_integer,rootrank,icomm,info)
 
   ! prepare vector to scatter
   if(me == root) then
-    do i=1,np
-      pos=displ(i)
-      do j=1, all_dim(i)
-        idx=l_t_g_all(pos+j-1)
-        scatterv(pos+j-1)=globx(idx)
-      end do
-    end do
+     do i=1,np
+        pos=displ(i)
+        do j=1, all_dim(i)
+           idx=l_t_g_all(pos+j-1)
+           scatterv(pos+j-1)=globx(idx)
+        end do
+     end do
   end if
 
   call mpi_scatterv(scatterv,all_dim,displ,&
-       & mpi_double_precision,locx,nrow,&
-       & mpi_double_precision,rootrank,icomm,info)
+       & mpi_integer,locx,nrow,&
+       & mpi_integer,rootrank,icomm,info)
 
   deallocate(all_dim, l_t_g_all, displ, scatterv)
 
@@ -411,9 +408,9 @@ subroutine  psb_zscatterv(globx, locx, desc_a, info, iroot)
   call psb_erractionrestore(err_act)
 
   if (err_act == psb_act_abort_) then
-    call psb_error(ictxt)
-    return
+     call psb_error(ictxt)
+     return
   end if
   return
 
-end subroutine psb_zscatterv
+end subroutine psb_iscatterv
