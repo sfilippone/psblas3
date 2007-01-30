@@ -110,8 +110,6 @@ subroutine psb_zspcnv(a,b,desc_a,info)
   integer                       ::  ictxt,n_row
   character                     ::  check*1, trans*1, unitd*1
 
-  real(kind(1.d0))              :: time(10), mpi_wtime
-  external mpi_wtime
   logical, parameter :: debug=.false.
   character(len=20)   :: name, ch_err
 
@@ -120,7 +118,6 @@ subroutine psb_zspcnv(a,b,desc_a,info)
   name = 'psb_zspcnv'
   call psb_erractionsave(err_act)
 
-  time(1) = mpi_wtime()
 
   ictxt   = psb_cd_get_context(desc_a)
   dectype = psb_cd_get_dectype(desc_a)

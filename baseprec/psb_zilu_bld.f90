@@ -46,8 +46,7 @@ subroutine psb_zilu_bld(a,desc_a,p,upd,info)
   integer  ::    int_err(5)
   character ::        trans, unitd
   type(psb_zspmat_type) :: blck, atmp
-  real(kind(1.d0)) :: t1,t2,t3,t4,t5,t6,mpi_wtime, t7, t8
-  external  mpi_wtime
+  real(kind(1.d0)) :: t1,t2,t3,t4,t5,t6, t7, t8
   logical, parameter :: debugprt=.false., debug=.false., aggr_dump=.false.
   integer   nztota, nztotb, nztmp, nzl, nnr, ir, err_act,&
        & n_row, nrow_a,n_col, nhalo, ind, iind, i1,i2,ia
@@ -172,7 +171,7 @@ subroutine psb_zilu_bld(a,desc_a,p,upd,info)
       goto 9999
     end if
 
-    t3 = mpi_wtime()
+    t3 = psb_wtime()
     if (debugprt) then 
       call psb_barrier(ictxt)
       open(40+me) 
@@ -185,7 +184,7 @@ subroutine psb_zilu_bld(a,desc_a,p,upd,info)
     !
     ! Ok, factor the matrix.  
     !
-    t5 = mpi_wtime()
+    t5 = psb_wtime()
     blck%m=0
     call psb_ilu_fct(atmp,p%av(l_pr_),p%av(u_pr_),p%d,info)
     if(info/=0) then
@@ -205,7 +204,7 @@ subroutine psb_zilu_bld(a,desc_a,p,upd,info)
 
 
   else if (p%iprcparm(iren_) == 0) then
-    t3 = mpi_wtime()
+    t3 = psb_wtime()
     ! This is where we have mo renumbering, thus no need 
     ! for ATMP
 
@@ -217,7 +216,7 @@ subroutine psb_zilu_bld(a,desc_a,p,upd,info)
       close(40+me)
     endif
 
-    t5= mpi_wtime()
+    t5= psb_wtime()
     if (debug) write(0,*) me,' Going for ilu_fct'
     if (debug) call psb_barrier(ictxt)
     call psb_ilu_fct(a,p%av(l_pr_),p%av(u_pr_),p%d,info)
@@ -249,7 +248,7 @@ subroutine psb_zilu_bld(a,desc_a,p,upd,info)
 
 
   !    ierr = MPE_Log_event( ifcte, 0, "st SIMPLE" )
-  t6 = mpi_wtime()
+  t6 = psb_wtime()
   !
   !    write(0,'(i3,1x,a,3(1x,g18.9))') me,'renum/factor time',t3-t2,t6-t5
   !    if (me==0) write(0,'(a,3(1x,g18.9))') 'renum/factor time',t3-t2,t6-t5

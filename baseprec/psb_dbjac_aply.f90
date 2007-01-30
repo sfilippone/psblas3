@@ -53,9 +53,8 @@ subroutine psb_dbjac_aply(alpha,prec,x,beta,y,desc_data,trans,work,info)
   real(kind(1.d0)), pointer :: ww(:), aux(:), tx(:),ty(:),tb(:)
   character     ::diagl, diagu
   integer :: ictxt,np,me,i, nrg, err_act, int_err(5)
-  real(kind(1.d0)) :: t1, t2, t3, t4, t5, t6, t7, mpi_wtime
+  real(kind(1.d0)) :: t1, t2, t3, t4, t5, t6, t7
   logical,parameter                 :: debug=.false., debugprt=.false.
-  external mpi_wtime
   character(len=20)   :: name, ch_err
 
   name='psb_bjac_aply'

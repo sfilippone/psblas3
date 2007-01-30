@@ -103,7 +103,7 @@ Subroutine psb_zsphalo(a,desc_a,blk,info,rwcnv,clcnv,outfmt)
 
   Call psb_info(ictxt, me, np)
 
-  t1 = mpi_wtime()
+  t1 = psb_wtime()
   Allocate(sdid(np,3),rvid(np,3),brvindx(np+1),&
        & rvsz(np),sdsz(np),bsdindx(np+1),stat=info)
 
@@ -191,7 +191,7 @@ Subroutine psb_zsphalo(a,desc_a,blk,info,rwcnv,clcnv,outfmt)
   tmp%fida='COO'
   call psb_sp_setifld(psb_spmat_asb_,psb_state_,tmp,info)
 
-  t2 = mpi_wtime()
+  t2 = psb_wtime()
 
   l1  = 0
   ipx = 1
@@ -253,7 +253,7 @@ Subroutine psb_zsphalo(a,desc_a,blk,info,rwcnv,clcnv,outfmt)
     goto 9999
   end if
 
-  t3 = mpi_wtime()
+  t3 = psb_wtime()
 
 
   !
@@ -286,7 +286,7 @@ Subroutine psb_zsphalo(a,desc_a,blk,info,rwcnv,clcnv,outfmt)
 !!$  open(50+me)
 !!$  call csprt(50+me,blk,head='% SPHALO border .')
 !!$  close(50+me)
-  t4 = mpi_wtime()
+  t4 = psb_wtime()
 
   if(debug) Write(0,*)me,'End first loop',counter,l1,blk%m
 
@@ -309,7 +309,7 @@ Subroutine psb_zsphalo(a,desc_a,blk,info,rwcnv,clcnv,outfmt)
   case default
     write(0,*) 'Error in DSPHALO : invalid outfmt "',outfmt_,'"'
   end select
-  t5 = mpi_wtime()
+  t5 = psb_wtime()
 
 
 

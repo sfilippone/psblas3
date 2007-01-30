@@ -85,8 +85,6 @@ C
       INTEGER  I,J, NEDGES,IP1,IP2,NCH,IP,IEDGE,I1,IX,IST,ISWAP(2)
       INTEGER NO_COMM
       PARAMETER (NO_COMM=-1)
-      double precision mpi_wtime, t1, t2
-      external mpi_wtime
       
       
       IF (NP .LT. 0) THEN 
@@ -193,7 +191,6 @@ c$$$            write(0,*) 'SRTLIST Input :',i,ip
         ENDIF
       ENDDO
       
-c$$$      t2 = mpi_wtime() 
 c$$$      WRITE(0,*) 'Output communication:',t2-t1
 c$$$      do i=1,np
 c$$$         do j=1,ldl(i)

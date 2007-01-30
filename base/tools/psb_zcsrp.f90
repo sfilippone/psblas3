@@ -82,11 +82,10 @@ subroutine psb_zcsrp(trans,iperm,a, desc_a, info)
   integer                               ::  ictxt,n_row,err_act, int_err(5)
   character(len=20)                     ::  name, char_err
 
-  real(kind(1.d0))                      ::  time(10), mpi_wtime
-  external mpi_wtime
+  real(kind(1.d0))                      ::  time(10)
   logical, parameter :: debug=.false.
 
-  time(1) = mpi_wtime()
+  time(1) = psb_wtime()
 
   ictxt   = psb_cd_get_context(desc_a)
   dectype = psb_cd_get_dectype(desc_a)
@@ -169,7 +168,7 @@ subroutine psb_zcsrp(trans,iperm,a, desc_a, info)
 
   deallocate(ipt,work_dcsdp)
 
-  time(4) = mpi_wtime()
+  time(4) = psb_wtime()
   time(4) = time(4) - time(3)
   if (debug) then 
     call psb_amx(ictxt, time(4))

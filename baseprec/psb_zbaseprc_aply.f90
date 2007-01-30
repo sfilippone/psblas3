@@ -51,9 +51,8 @@ subroutine psb_zbaseprc_aply(alpha,prec,x,beta,y,desc_data,trans,work,info)
   complex(kind(1.d0)), pointer :: ww(:), aux(:), tx(:),ty(:)
   character     ::diagl, diagu
   integer :: ictxt,np,me,i, isz, nrg, err_act
-  real(kind(1.d0)) :: t1, t2, t3, t4, t5, t6, t7, mpi_wtime
-  logical,parameter                 :: debug=.false., debugprt=.false.
-  external mpi_wtime
+  real(kind(1.d0)) :: t1, t2, t3, t4, t5, t6, t7
+  logical,parameter                 :: debug=.false., debugprt=.
   character(len=20)   :: name, ch_err
 
   interface psb_bjac_aply

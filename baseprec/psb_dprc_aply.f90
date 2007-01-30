@@ -46,7 +46,6 @@ subroutine psb_dprc_aply(prec,x,y,desc_data,info,trans, work)
   real(kind(1.d0)), pointer :: work_(:)
   integer :: ictxt,np,me,err_act
   logical,parameter    :: debug=.false., debugprt=.false.
-  external mpi_wtime
   character(len=20)   :: name
 
   interface psb_baseprc_aply

@@ -63,8 +63,7 @@ subroutine psb_cdren(trans,iperm,desc_a,info)
   integer                       :: i,j,np,me, n_col, kh, nh
   integer                       :: dectype
   integer                       :: ictxt,n_row, int_err(5), err_act
-  real(kind(1.d0))              :: time(10), mpi_wtime, real_err(6)
-  external mpi_wtime
+  real(kind(1.d0))              :: time(10), real_err(6)
   logical, parameter            :: debug=.false.
   character(len=20)             :: name
 
@@ -73,7 +72,7 @@ subroutine psb_cdren(trans,iperm,desc_a,info)
   call psb_erractionsave(err_act)
   name = 'psb_dcren'
 
-  time(1) = mpi_wtime()
+  time(1) = psb_wtime()
 
   ictxt   = psb_cd_get_context(desc_a)
   dectype = psb_cd_get_dectype(desc_a)
@@ -207,7 +206,7 @@ subroutine psb_cdren(trans,iperm,desc_a,info)
   endif
 
 
-  time(4) = mpi_wtime()
+  time(4) = psb_wtime()
   time(4) = time(4) - time(3)
   if (debug) then 
     call psb_amx(ictxt, time(4))
