@@ -77,6 +77,17 @@ module psb_penv_mod
          & psb_hrcvs, psb_lrcvs
   end interface
 
+  interface psb_max
+    module procedure psb_imaxs, psb_imaxv, psb_imaxm,&
+         & psb_dmaxs, psb_dmaxv, psb_dmaxm
+  end interface
+
+
+  interface psb_min
+    module procedure psb_imins, psb_iminv, psb_iminm,&
+         & psb_dmins, psb_dminv, psb_dminm
+  end interface
+
 
   interface psb_amx
     module procedure psb_iamxs, psb_iamxv, psb_iamxm,&
@@ -95,7 +106,6 @@ module psb_penv_mod
          & psb_dsums, psb_dsumv, psb_dsumm,&
          & psb_zsums, psb_zsumv, psb_zsumm
   end interface
-
 
   
   interface gebs2d
@@ -482,6 +492,371 @@ contains
   end subroutine psb_lbcasts
 
 
+
+  subroutine psb_imaxs(ictxt,dat,root)
+    use mpi
+    integer, intent(in)              :: ictxt
+    integer, intent(inout)  :: dat
+    integer, intent(in), optional    :: root
+    integer :: root_, dat_
+    integer :: iam, np, icomm
+    
+
+    call psb_info(ictxt,iam,np)
+    call psb_get_mpicomm(ictxt,icomm)
+
+    if (present(root)) then 
+      root_ = root
+    else
+      root_ = -1
+    endif
+    if (root_ == -1) then 
+      call mpi_allreduce(dat,dat_,1,mpi_integer,mpi_max,icomm)
+      dat = dat_
+    else
+      call mpi_reduce(dat,dat_,1,mpi_integer,mpi_max,root_,icomm)
+      dat = dat_
+    endif
+  end subroutine psb_imaxs
+  subroutine psb_imaxv(ictxt,dat,root)
+    use mpi
+    use psb_realloc_mod
+    integer, intent(in)              :: ictxt
+    integer, intent(inout)  :: dat(:)
+    integer, intent(in), optional    :: root
+    integer :: root_
+    integer, allocatable :: dat_(:)
+    integer :: iam, np, icomm, info
+    
+
+    call psb_info(ictxt,iam,np)
+    call psb_get_mpicomm(ictxt,icomm)
+
+    if (present(root)) then 
+      root_ = root
+    else
+      root_ = -1
+    endif
+    if (root_ == -1) then 
+      call psb_realloc(size(dat),dat_,info)
+      if (info ==0) call mpi_allreduce(dat_,dat,size(dat),mpi_integer,mpi_max,icomm)
+    else
+      if (iam==root_) then 
+        call psb_realloc(size(dat),dat_,info)
+        call mpi_reduce(dat_,dat,size(dat),mpi_integer,mpi_max,root_,icomm)
+      else
+        call mpi_reduce(dat,dat_,size(dat),mpi_integer,mpi_max,root_,icomm)
+      end if
+    endif
+  end subroutine psb_imaxv
+  subroutine psb_imaxm(ictxt,dat,root)
+    use mpi
+    use psb_realloc_mod
+    integer, intent(in)              :: ictxt
+    integer, intent(inout)  :: dat(:,:)
+    integer, intent(in), optional    :: root
+    integer :: root_
+    integer, allocatable :: dat_(:,:)
+    integer :: iam, np, icomm, info
+    
+
+    call psb_info(ictxt,iam,np)
+    call psb_get_mpicomm(ictxt,icomm)
+
+    if (present(root)) then 
+      root_ = root
+    else
+      root_ = -1
+    endif
+    if (root_ == -1) then 
+      call psb_realloc(size(dat,1),size(dat,2),dat_,info)
+      if (info ==0) call mpi_allreduce(dat_,dat,size(dat),mpi_integer,mpi_max,icomm)
+    else
+      if (iam==root_) then 
+        call psb_realloc(size(dat,1),size(dat,2),dat_,info)
+        call mpi_reduce(dat_,dat,size(dat),mpi_integer,mpi_max,root_,icomm)
+      else
+        call mpi_reduce(dat,dat_,size(dat),mpi_integer,mpi_max,root_,icomm)
+      end if
+    endif
+  end subroutine psb_imaxm
+  
+  subroutine psb_dmaxs(ictxt,dat,root)
+    use mpi
+    integer, intent(in)              :: ictxt
+    real(kind(1.d0)), intent(inout)  :: dat
+    integer, intent(in), optional    :: root
+    integer :: root_
+    real(kind(1.d0)) :: dat_
+    integer :: iam, np, icomm
+    
+
+    call psb_info(ictxt,iam,np)
+    call psb_get_mpicomm(ictxt,icomm)
+
+    if (present(root)) then 
+      root_ = root
+    else
+      root_ = -1
+    endif
+    if (root_ == -1) then 
+      call mpi_allreduce(dat,dat_,1,mpi_double_precision,mpi_max,icomm)
+      dat = dat_
+    else
+      call mpi_reduce(dat,dat_,1,mpi_double_precision,mpi_max,root_,icomm)
+      dat = dat_
+    endif
+  end subroutine psb_dmaxs
+  subroutine psb_dmaxv(ictxt,dat,root)
+    use mpi
+    use psb_realloc_mod
+    integer, intent(in)              :: ictxt
+    real(kind(1.d0)), intent(inout)  :: dat(:)
+    integer, intent(in), optional    :: root
+    integer :: root_
+    real(kind(1.d0)), allocatable :: dat_(:)
+    integer :: iam, np, icomm, info
+    
+
+    call psb_info(ictxt,iam,np)
+    call psb_get_mpicomm(ictxt,icomm)
+
+    if (present(root)) then 
+      root_ = root
+    else
+      root_ = -1
+    endif
+    if (root_ == -1) then 
+      call psb_realloc(size(dat),dat_,info)
+      dat_ = dat
+      if (info ==0) call mpi_allreduce(dat_,dat,size(dat),mpi_double_precision,mpi_max,icomm)
+    else
+      if (iam==root_) then 
+        call psb_realloc(size(dat),dat_,info)
+        dat_ = dat
+        call mpi_reduce(dat_,dat,size(dat),mpi_double_precision,mpi_max,root_,icomm)
+      else
+        call mpi_reduce(dat,dat_,size(dat),mpi_double_precision,mpi_max,root_,icomm)
+      end if
+    endif
+  end subroutine psb_dmaxv
+  subroutine psb_dmaxm(ictxt,dat,root)
+    use mpi
+    use psb_realloc_mod
+    integer, intent(in)              :: ictxt
+    real(kind(1.d0)), intent(inout)  :: dat(:,:)
+    integer, intent(in), optional    :: root
+    integer :: root_
+    real(kind(1.d0)), allocatable :: dat_(:,:)
+    integer :: iam, np, icomm, info
+    
+
+    call psb_info(ictxt,iam,np)
+    call psb_get_mpicomm(ictxt,icomm)
+
+    if (present(root)) then 
+      root_ = root
+    else
+      root_ = -1
+    endif
+    if (root_ == -1) then 
+      call psb_realloc(size(dat,1),size(dat,2),dat_,info)
+      dat_ = dat
+      if (info ==0) call mpi_allreduce(dat_,dat,size(dat),mpi_double_precision,mpi_max,icomm)
+    else
+      if (iam==root_) then 
+        call psb_realloc(size(dat,1),size(dat,2),dat_,info)
+        dat_ = dat
+        call mpi_reduce(dat_,dat,size(dat),mpi_double_precision,mpi_max,root_,icomm)
+      else
+        call mpi_reduce(dat,dat_,size(dat),mpi_double_precision,mpi_max,root_,icomm)
+      end if
+    endif
+  end subroutine psb_dmaxm
+  
+  
+  subroutine psb_imins(ictxt,dat,root)
+    use mpi
+    integer, intent(in)              :: ictxt
+    integer, intent(inout)  :: dat
+    integer, intent(in), optional    :: root
+    integer :: root_, dat_
+    integer :: iam, np, icomm
+    
+
+    call psb_info(ictxt,iam,np)
+    call psb_get_mpicomm(ictxt,icomm)
+
+    if (present(root)) then 
+      root_ = root
+    else
+      root_ = -1
+    endif
+    if (root_ == -1) then 
+      call mpi_allreduce(dat,dat_,1,mpi_integer,mpi_min,icomm)
+      dat = dat_
+    else
+      call mpi_reduce(dat,dat_,1,mpi_integer,mpi_min,root_,icomm)
+      dat = dat_
+    endif
+  end subroutine psb_imins
+  subroutine psb_iminv(ictxt,dat,root)
+    use mpi
+    use psb_realloc_mod
+    integer, intent(in)              :: ictxt
+    integer, intent(inout)  :: dat(:)
+    integer, intent(in), optional    :: root
+    integer :: root_
+    integer, allocatable :: dat_(:)
+    integer :: iam, np, icomm, info
+    
+
+    call psb_info(ictxt,iam,np)
+    call psb_get_mpicomm(ictxt,icomm)
+
+    if (present(root)) then 
+      root_ = root
+    else
+      root_ = -1
+    endif
+    if (root_ == -1) then 
+      call psb_realloc(size(dat),dat_,info)
+      if (info ==0) call mpi_allreduce(dat_,dat,size(dat),mpi_integer,mpi_min,icomm)
+    else
+      if (iam==root_) then 
+        call psb_realloc(size(dat),dat_,info)
+        call mpi_reduce(dat_,dat,size(dat),mpi_integer,mpi_min,root_,icomm)
+      else
+        call mpi_reduce(dat,dat_,size(dat),mpi_integer,mpi_min,root_,icomm)
+      end if
+    endif
+  end subroutine psb_iminv
+  subroutine psb_iminm(ictxt,dat,root)
+    use mpi
+    use psb_realloc_mod
+    integer, intent(in)              :: ictxt
+    integer, intent(inout)  :: dat(:,:)
+    integer, intent(in), optional    :: root
+    integer :: root_
+    integer, allocatable :: dat_(:,:)
+    integer :: iam, np, icomm, info
+    
+
+    call psb_info(ictxt,iam,np)
+    call psb_get_mpicomm(ictxt,icomm)
+
+    if (present(root)) then 
+      root_ = root
+    else
+      root_ = -1
+    endif
+    if (root_ == -1) then 
+      call psb_realloc(size(dat,1),size(dat,2),dat_,info)
+      if (info ==0) call mpi_allreduce(dat_,dat,size(dat),mpi_integer,mpi_min,icomm)
+    else
+      if (iam==root_) then 
+        call psb_realloc(size(dat,1),size(dat,2),dat_,info)
+        call mpi_reduce(dat_,dat,size(dat),mpi_integer,mpi_min,root_,icomm)
+      else
+        call mpi_reduce(dat,dat_,size(dat),mpi_integer,mpi_min,root_,icomm)
+      end if
+    endif
+  end subroutine psb_iminm
+  
+  subroutine psb_dmins(ictxt,dat,root)
+    use mpi
+    integer, intent(in)              :: ictxt
+    real(kind(1.d0)), intent(inout)  :: dat
+    integer, intent(in), optional    :: root
+    integer :: root_
+    real(kind(1.d0)) :: dat_
+    integer :: iam, np, icomm
+    
+
+    call psb_info(ictxt,iam,np)
+    call psb_get_mpicomm(ictxt,icomm)
+
+    if (present(root)) then 
+      root_ = root
+    else
+      root_ = -1
+    endif
+    if (root_ == -1) then 
+      call mpi_allreduce(dat,dat_,1,mpi_double_precision,mpi_min,icomm)
+      dat = dat_
+    else
+      call mpi_reduce(dat,dat_,1,mpi_double_precision,mpi_min,root_,icomm)
+      dat = dat_
+    endif
+  end subroutine psb_dmins
+  subroutine psb_dminv(ictxt,dat,root)
+    use mpi
+    use psb_realloc_mod
+    integer, intent(in)              :: ictxt
+    real(kind(1.d0)), intent(inout)  :: dat(:)
+    integer, intent(in), optional    :: root
+    integer :: root_
+    real(kind(1.d0)), allocatable :: dat_(:)
+    integer :: iam, np, icomm, info
+    
+
+    call psb_info(ictxt,iam,np)
+    call psb_get_mpicomm(ictxt,icomm)
+
+    if (present(root)) then 
+      root_ = root
+    else
+      root_ = -1
+    endif
+    if (root_ == -1) then 
+      call psb_realloc(size(dat),dat_,info)
+      dat_ = dat
+      if (info ==0) call mpi_allreduce(dat_,dat,size(dat),mpi_double_precision,mpi_min,icomm)
+    else
+      if (iam==root_) then 
+        call psb_realloc(size(dat),dat_,info)
+        dat_ = dat
+        call mpi_reduce(dat_,dat,size(dat),mpi_double_precision,mpi_min,root_,icomm)
+      else
+        call mpi_reduce(dat,dat_,size(dat),mpi_double_precision,mpi_min,root_,icomm)
+      end if
+    endif
+  end subroutine psb_dminv
+  subroutine psb_dminm(ictxt,dat,root)
+    use mpi
+    use psb_realloc_mod
+    integer, intent(in)              :: ictxt
+    real(kind(1.d0)), intent(inout)  :: dat(:,:)
+    integer, intent(in), optional    :: root
+    integer :: root_
+    real(kind(1.d0)), allocatable :: dat_(:,:)
+    integer :: iam, np, icomm, info
+    
+
+    call psb_info(ictxt,iam,np)
+    call psb_get_mpicomm(ictxt,icomm)
+
+    if (present(root)) then 
+      root_ = root
+    else
+      root_ = -1
+    endif
+    if (root_ == -1) then 
+      call psb_realloc(size(dat,1),size(dat,2),dat_,info)
+      dat_ = dat
+      if (info ==0) call mpi_allreduce(dat_,dat,size(dat),mpi_double_precision,mpi_min,icomm)
+    else
+      if (iam==root_) then 
+        call psb_realloc(size(dat,1),size(dat,2),dat_,info)
+        dat_ = dat
+        call mpi_reduce(dat_,dat,size(dat),mpi_double_precision,mpi_min,root_,icomm)
+      else
+        call mpi_reduce(dat,dat_,size(dat),mpi_double_precision,mpi_min,root_,icomm)
+      end if
+    endif
+  end subroutine psb_dminm
+  
+  
   subroutine psb_iamxs(ictxt,dat,root,ia)
     integer, intent(in)              :: ictxt
     integer, intent(inout)  :: dat

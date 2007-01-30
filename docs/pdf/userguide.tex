@@ -35,7 +35,9 @@
 
 \newcounter{subroutine}[subsection]
 \newcounter{example}[subroutine]
-\newcommand{\subroutine}[2]{\clearpage%
+\makeatletter
+\def\subroutine{\@ifstar{\@subroutine}{\clearpage\@subroutine}}%
+\def\@subroutine#1#2{%
 \stepcounter{subroutine}%
       \section*{\flushleft #1---#2 \endflushleft}%
       \addcontentsline{toc}{subsection}{#1}%
@@ -47,7 +49,6 @@
       \markright{#1}}%
 \newcommand{\examplename}{Example}
 \newcommand{\syntaxname}{Syntax}
-\makeatletter
 \def\syntax{\@ifstar{\@ssyntax}{\@syntax}}%
 \def\@syntax{\section*{\syntaxname}%
      \@ssyntax}%

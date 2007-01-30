@@ -2,6 +2,148 @@
 \label{sec:util}
 
 
+\subroutine{PSB\_HBIO\_MOD}{Input/Output in Harwell-Boeing format}
+
+\subroutine*{hb\_read}{Read a sparse matrix from a file}
+\syntax{call hb\_read}{a, iret, iunit, filename, b, mtitle}
+ 
+\begin{description}
+\item[\bf  On Entry ]
+\item[filename] The name of the file to be read.\\
+Type:{\bf optional}.\\
+Specified as: a character variable containing a valid file name, or
+\verb|-|, in which case the default input unit  5 (i.e. standard input
+in Unix jargon) is used. Default: \verb|-|. 
+\item[iunit] The Fortran file unit number.\\
+Type:{\bf optional}.\\
+Specified as: an integer value. Only meaningful if filename is not \verb|-|.
+\end{description}
+
+\begin{description}
+\item[\bf On Return]
+\item[a] the sparse matrix read from file.\\
+Type:{\bf required}.\\
+Specified as: a structured data of type \spdata.
+\item[b] Rigth hand side.\\
+Type: {\bf Optional} \\
+An  array of type real or complex, rank 1 and having the ALLOCATABLE
+attribute; will be allocated and filled in if the input file contains
+a right hand side. 
+\item[mtitle] Matrix title.\\
+Type: {\bf Optional} \\
+A charachter variable of length 72 holding a copy of the
+matrix title as specified by the Harwell-Boeing format and contained
+in the input file.
+\item[iret] Error code.\\
+Type: {\bf required} \\
+An integer value; 0 means no error has been detected. 
+\end{description}
+
+
+
+\subroutine*{hb\_write}{Write a sparse matrix to a  file}
+\syntax{call hb\_write}{a, iret, iunit, filename, key, rhs, mtitle}
+
+
+
+\begin{description}
+\item[\bf  On Entry ]
+\item[a] the sparse matrix to be written.\\
+Type:{\bf required}.\\
+Specified as: a structured data of type \spdata.
+\item[b] Rigth hand side.\\
+Type: {\bf Optional} \\
+An  array of type real or complex, rank 1 and having the ALLOCATABLE
+attribute; will be allocated and filled in if the input file contains
+a right hand side. 
+\item[filename] The name of the file to be written to.\\
+Type:{\bf optional}.\\
+Specified as: a character variable containing a valid file name, or
+\verb|-|, in which case the default output unit  6 (i.e. standard output
+in Unix jargon) is used. Default: \verb|-|. 
+\item[iunit] The Fortran file unit number.\\
+Type:{\bf optional}.\\
+Specified as: an integer value. Only meaningful if filename is not \verb|-|.
+\item[key] Matrix key.\\
+Type: {\bf Optional} \\
+A charachter variable of length 8 holding the
+matrix key as specified by the Harwell-Boeing format and to be
+written to file.
+\item[mtitle] Matrix title.\\
+Type: {\bf Optional} \\
+A charachter variable of length 72 holding the
+matrix title as specified by the Harwell-Boeing format and to be
+written to file.
+\end{description}
+
+\begin{description}
+\item[\bf On Return]
+\item[iret] Error code.\\
+Type: {\bf required} \\
+An integer value; 0 means no error has been detected. 
+\end{description}
+
+
+
+
+\subroutine{PSB\_MMIO\_MOD}{Input/Output in MatrixMarket format}
+
+\subroutine*{mm\_mat\_read}{Read a sparse matrix from a file}
+\syntax{call mm\_mat\_read}{a, iret, iunit, filename}
+
+\begin{description}
+\item[\bf  On Entry ]
+\item[filename] The name of the file to be read.\\
+Type:{\bf optional}.\\
+Specified as: a character variable containing a valid file name, or
+\verb|-|, in which case the default input unit  5 (i.e. standard input
+in Unix jargon) is used. Default: \verb|-|. 
+\item[iunit] The Fortran file unit number.\\
+Type:{\bf optional}.\\
+Specified as: an integer value. Only meaningful if filename is not \verb|-|.
+\end{description}
+
+\begin{description}
+\item[\bf On Return]
+\item[a] the sparse matrix read from file.\\
+Type:{\bf required}.\\
+Specified as: a structured data of type \spdata.
+\item[iret] Error code.\\
+Type: {\bf required} \\
+An integer value; 0 means no error has been detected. 
+\end{description}
+
+
+
+\subroutine*{mm\_mat\_write}{Write a sparse matrix to a  file}
+\syntax{call mm\_mat\_write}{a, mtitle, iret, iunit, filename}
+\begin{description}
+\item[\bf  On Entry ]
+\item[a] the sparse matrix to be written.\\
+Type:{\bf required}.\\
+Specified as: a structured data of type \spdata.
+\item[mtitle] Matrix title.\\
+Type: {\bf required} \\
+A charachter variable holding a descriptive title for the matrix to be
+ written to file.
+\item[filename] The name of the file to be written to.\\
+Type:{\bf optional}.\\
+Specified as: a character variable containing a valid file name, or
+\verb|-|, in which case the default output unit  6 (i.e. standard output
+in Unix jargon) is used. Default: \verb|-|. 
+\item[iunit] The Fortran file unit number.\\
+Type:{\bf optional}.\\
+Specified as: an integer value. Only meaningful if filename is not \verb|-|.
+\end{description}
+
+\begin{description}
+\item[\bf On Return]
+\item[iret] Error code.\\
+Type: {\bf required} \\
+An integer value; 0 means no error has been detected. 
+\end{description}
+
+
 
 %%% Local Variables: 
 %%% mode: latex

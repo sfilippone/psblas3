@@ -292,6 +292,96 @@ Type, rank and size must agree on all processes.
 
 
 
+\subroutine{psb\_max}{Global maximum}
+
+\syntax{call psb\_max}{icontxt, dat, root}
+
+This subroutine implements a maximum valuereduction
+operation based on the underlying communication library. 
+\begin{description}
+\item[\bf  On Entry ]
+\item[icontxt] the communication context identifying the virtual
+  parallel machine.\\
+Scope:{\bf global}.\\
+Type:{\bf required}.\\
+Specified as: an integer variable.
+\item[dat] The local contribution to the global maximum.\\
+Scope:{\bf local}.\\
+Type:{\bf required}.\\
+Specified as: an integer or  real variable, which may be a
+scalar, or a rank 1 or 2 array. \
+Type, rank and size must agree on all processes.
+\item[root] Process to hold the final maximum, or $-1$ to make it available
+  on all processes.\\
+Scope:{\bf global}.\\
+Type:{\bf optional}.\\
+Specified as: an integer value $-1<= root <= np-1$, default -1. \\
+\end{description}
+
+
+\begin{description}
+\item[\bf On Return]
+\item[dat] On destination process(es), the result of the maximum operation.\\
+Scope:{\bf global}.\\
+Type:{\bf required}.\\
+Specified as: an integer or  real variable, which may be a
+scalar, or a rank 1 or 2 array. \
+Type, rank and size must agree on all processes.
+\end{description}
+
+
+\section*{Notes}
+\begin{enumerate}
+\item The \verb|dat| argument is both input and output, and its
+  value may be changed even on processes different from the final
+  result destination.
+\end{enumerate}
+
+\subroutine{psb\_min}{Global minimum}
+
+\syntax{call psb\_min}{icontxt, dat, root}
+
+This subroutine implements a minimum value reduction
+operation based on the underlying communication library. 
+\begin{description}
+\item[\bf  On Entry ]
+\item[icontxt] the communication context identifying the virtual
+  parallel machine.\\
+Scope:{\bf global}.\\
+Type:{\bf required}.\\
+Specified as: an integer variable.
+\item[dat] The local contribution to the global minimum.\\
+Scope:{\bf local}.\\
+Type:{\bf required}.\\
+Specified as: an integer  or real variable, which may be a
+scalar, or a rank 1 or 2 array. \
+Type, rank and size must agree on all processes.
+\item[root] Process to hold the final value, or $-1$ to make it available
+  on all processes.\\
+Scope:{\bf global}.\\
+Type:{\bf optional}.\\
+Specified as: an integer value $-1<= root <= np-1$, default -1. \\
+\end{description}
+
+
+\begin{description}
+\item[\bf On Return]
+\item[dat] On destination process(es), the result of the minimum operation.\\
+Scope:{\bf global}.\\
+Type:{\bf required}.\\
+Specified as: an integer  or  real variable, which may be a
+scalar, or a rank 1 or 2 array. \\
+Type, rank and size must agree on all processes.
+\end{description}
+
+
+\section*{Notes}
+\begin{enumerate}
+\item The \verb|dat| argument is both input and output, and its
+  value may be changed even on processes different from the final
+  result destination.
+\end{enumerate}
+
 \subroutine{psb\_amx}{Global maximum absolute value}
 
 \syntax{call psb\_amx}{icontxt, dat, root}
@@ -311,7 +401,7 @@ Type:{\bf required}.\\
 Specified as: an integer, real or complex variable, which may be a
 scalar, or a rank 1 or 2 array. \
 Type, rank and size must agree on all processes.
-\item[root] Process to hold the final sum, or $-1$ to make it available
+\item[root] Process to hold the final value, or $-1$ to make it available
   on all processes.\\
 Scope:{\bf global}.\\
 Type:{\bf optional}.\\
@@ -356,7 +446,7 @@ Type:{\bf required}.\\
 Specified as: an integer, real or complex variable, which may be a
 scalar, or a rank 1 or 2 array. \
 Type, rank and size must agree on all processes.
-\item[root] Process to hold the final sum, or $-1$ to make it available
+\item[root] Process to hold the final value, or $-1$ to make it available
   on all processes.\\
 Scope:{\bf global}.\\
 Type:{\bf optional}.\\

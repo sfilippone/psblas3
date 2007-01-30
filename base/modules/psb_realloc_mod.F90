@@ -75,8 +75,8 @@ Contains
     use psb_error_mod
 
     ! ...Subroutine Arguments  
-    Integer,allocatable,intent(in)  :: vin(:)
-    Integer,allocatable,intent(out) :: vout(:)
+    Integer,allocatable, intent(in)  :: vin(:)
+    Integer,allocatable, intent(out) :: vout(:)
     integer         :: info
     ! ...Local Variables
 
@@ -122,7 +122,8 @@ Contains
     use psb_error_mod
 
     ! ...Subroutine Arguments  
-    Integer,allocatable :: vin(:,:),vout(:,:)
+    Integer, allocatable, intent(in)  :: vin(:,:)
+    Integer, allocatable, intent(out) :: vout(:,:)
     integer         :: info
     ! ...Local Variables
 
@@ -170,7 +171,8 @@ Contains
     use psb_error_mod
 
     ! ...Subroutine Arguments  
-    real(kind(1.d0)),allocatable :: vin(:),vout(:)
+    real(kind(1.d0)), allocatable, intent(in)  :: vin(:)
+    real(kind(1.d0)), allocatable, intent(out) :: vout(:)
     integer         :: info
     ! ...Local Variables
 
@@ -216,7 +218,8 @@ Contains
     use psb_error_mod
 
     ! ...Subroutine Arguments  
-    real(kind(1.d0)),allocatable :: vin(:,:),vout(:,:)
+    real(kind(1.d0)), allocatable, intent(in)  :: vin(:,:)
+    real(kind(1.d0)), allocatable, intent(out) :: vout(:,:)
     integer         :: info
     ! ...Local Variables
 
@@ -264,7 +267,8 @@ Contains
     use psb_error_mod
 
     ! ...Subroutine Arguments  
-    complex(kind(1.d0)),allocatable :: vin(:),vout(:)
+    complex(kind(1.d0)), allocatable, intent(in)  :: vin(:)
+    complex(kind(1.d0)), allocatable, intent(out) :: vout(:)
     integer         :: info
     ! ...Local Variables
 
@@ -310,7 +314,8 @@ Contains
     use psb_error_mod
 
     ! ...Subroutine Arguments  
-    complex(kind(1.d0)),allocatable :: vin(:,:),vout(:,:)
+    complex(kind(1.d0)), allocatable, intent(in)  :: vin(:,:)
+    complex(kind(1.d0)), allocatable, intent(out) :: vout(:,:)
     integer         :: info
     ! ...Local Variables
 

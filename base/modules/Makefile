@@ -20,7 +20,7 @@ INCDIRS = -I .
 psb_realloc_mod.o : psb_error_mod.o 
 psb_spmat_type.o : psb_realloc_mod.o psb_error_mod.o psb_const_mod.o psb_string_mod.o
 psb_error_mod.o: psb_const_mod.o
-psb_penv_mod.o: psb_const_mod.o psb_error_mod.o
+psb_penv_mod.o: psb_const_mod.o psb_error_mod.o psb_realloc_mod.o
 psi_mod.o: psb_penv_mod.o psb_error_mod.o psb_desc_type.o
 psb_desc_type.o: psb_const_mod.o psb_error_mod.o psb_penv_mod.o
 psb_check_mod.o: psb_desc_type.o

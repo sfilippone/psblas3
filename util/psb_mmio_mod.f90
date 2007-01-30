@@ -148,13 +148,13 @@ contains
 
 
 
-  subroutine dmm_mat_write(a,mtitle,iret,eiout,filename)
+  subroutine dmm_mat_write(a,mtitle,iret,iunit,filename)
     use psb_base_mod
     implicit none
     type(psb_dspmat_type), intent(in)  :: a
     integer, intent(out)        :: iret
     character(len=*), intent(in) :: mtitle
-    integer, optional, intent(in)          :: eiout
+    integer, optional, intent(in)          :: iunit
     character(len=*), optional, intent(in) :: filename
     integer                     :: iout
 
@@ -165,16 +165,16 @@ contains
       if (filename=='-') then 
         iout=6
       else
-        if (present(eiout)) then 
-          iout = eiout
+        if (present(iunit)) then 
+          iout = iunit
         else
           iout=99
         endif
         open(iout,file=filename, err=901, action='WRITE')
       endif
     else 
-      if (present(eiout)) then 
-        iout = eiout   
+      if (present(iunit)) then 
+        iout = iunit   
       else
         iout=6
       endif
@@ -330,13 +330,13 @@ contains
 
 
 
-  subroutine zmm_mat_write(a,mtitle,iret,eiout,filename)
+  subroutine zmm_mat_write(a,mtitle,iret,iunit,filename)
     use psb_base_mod
     implicit none
     type(psb_zspmat_type), intent(in)  :: a
     integer, intent(out)        :: iret
     character(len=*), intent(in) :: mtitle
-    integer, optional, intent(in)          :: eiout
+    integer, optional, intent(in)          :: iunit
     character(len=*), optional, intent(in) :: filename
     integer                     :: iout
 
@@ -347,16 +347,16 @@ contains
       if (filename=='-') then 
         iout=6
       else
-        if (present(eiout)) then 
-          iout = eiout
+        if (present(iunit)) then 
+          iout = iunit
         else
           iout=99
         endif
         open(iout,file=filename, err=901, action='WRITE')
       endif
     else 
-      if (present(eiout)) then 
-        iout = eiout   
+      if (present(iunit)) then 
+        iout = iunit   
       else
         iout=6
       endif

@@ -179,13 +179,13 @@ contains
 
 
 
-  subroutine dhb_write(a,iret,eiout,filename,key,rhs,mtitle)
+  subroutine dhb_write(a,iret,iunit,filename,key,rhs,mtitle)
     use psb_base_mod
     implicit none
     type(psb_dspmat_type), intent(in)  :: a
     integer, intent(out)        :: iret
     character(len=*), optional, intent(in) :: mtitle
-    integer, optional, intent(in)          :: eiout
+    integer, optional, intent(in)          :: iunit
     character(len=*), optional, intent(in) :: filename
     character(len=*), optional, intent(in) :: key
     real(kind(1.d0)), optional             :: rhs(:)
@@ -213,16 +213,16 @@ contains
       if (filename=='-') then 
         iout=6
       else
-        if (present(eiout)) then 
-          iout = eiout
+        if (present(iunit)) then 
+          iout = iunit
         else
           iout=99
         endif
         open(iout,file=filename, err=901, action='WRITE')
       endif
     else 
-      if (present(eiout)) then 
-        iout = eiout   
+      if (present(iunit)) then 
+        iout = iunit   
       else
         iout=6
       endif
@@ -520,13 +520,13 @@ contains
 
 
 
-  subroutine zhb_write(a,iret,eiout,filename,key,rhs,mtitle)
+  subroutine zhb_write(a,iret,iunit,filename,key,rhs,mtitle)
     use psb_base_mod
     implicit none
     type(psb_zspmat_type), intent(in)  :: a
     integer, intent(out)        :: iret
     character(len=*), optional, intent(in) :: mtitle
-    integer, optional, intent(in)          :: eiout
+    integer, optional, intent(in)          :: iunit
     character(len=*), optional, intent(in) :: filename
     character(len=*), optional, intent(in) :: key
     complex(kind(1.d0)), optional             :: rhs(:)
@@ -554,16 +554,16 @@ contains
       if (filename=='-') then 
         iout=6
       else
-        if (present(eiout)) then 
-          iout = eiout
+        if (present(iunit)) then 
+          iout = iunit
         else
           iout=99
         endif
         open(iout,file=filename, err=901, action='WRITE')
       endif
     else 
-      if (present(eiout)) then 
-        iout = eiout   
+      if (present(iunit)) then 
+        iout = iunit   
       else
         iout=6
       endif

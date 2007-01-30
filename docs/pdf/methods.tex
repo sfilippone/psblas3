@@ -17,10 +17,12 @@ the Krylov-Subspace family methods implemented in PSBLAS-2.0.
 
 The stopping criterion is the normwise backward error, in the infinity
 norm, i.e. the iteration is stopped when 
-\[ \frac{\|r\|}{(\|A\|\|x\|+\|b\|)} < eps \]
-or
-\[ \frac{\|r_i\|}{\|b\|_2} < eps \]
-according to the value passed through the  istop argument (see later).
+\[ err = \frac{\|r_i\|}{(\|A\|\|x_i\|+\|b\|)} < eps \]
+or the 2-norm residual reduction
+\[ err = \frac{\|r_i\|}{\|b\|_2} < eps \]
+according to the value passed through the  istop argument (see
+later). In the above formulae, $x_i$ is the tentative solution and
+$r_i=b-Ax_i$ the corresponding residual at the $i$-th iteration. 
 
 
 \syntax{call psb\_krylov}{method,a,prec,b,x,eps,desc\_a,info,itmax,iter,err,itrace,istop}
@@ -74,8 +76,9 @@ Scope: {\bf global} \\
 Type: {\bf optional}\\
 \item[istop]  An integer specifying the stopping criterion.\\
 Scope: {\bf global} \\
-Type: {\bf optional}\\
-
+Type: {\bf optional}.\\
+Values: 1: use the normwise backward error, 2: use the scaled 2-norm
+of the residual. Default: 1. 
 \item[\bf On Return] 
 \item[x] The computed solution. \\
 Scope: {\bf local} \\

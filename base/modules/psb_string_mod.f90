@@ -30,6 +30,7 @@
 !!$  
 module psb_string_mod
 
+  public tolower, toupper, touppers
   interface tolower
     module procedure tolowerc
   end interface
@@ -42,13 +43,15 @@ module psb_string_mod
     module procedure sub_toupperc
   end interface
 
+  private
+  character(len=*), parameter   :: lcase='abcdefghijklmnopqrstuvwxyz'
+  character(len=*), parameter   :: ucase='ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+
 contains 
 
   function  tolowerc(string)
     character(len=*), intent(in)  :: string
     character(len=len(string))    :: tolowerc
-    character(len=*), parameter   :: lcase='abcdefghijklmnopqrstuvwxyz'
-    character(len=*), parameter   :: ucase='ABCDEFGHIJKLMNOPQRSTUVWXYZ'
     integer  :: i,k
 
     do i=1,len(string)
@@ -64,8 +67,6 @@ contains
   function  toupperc(string)
     character(len=*), intent(in)  :: string
     character(len=len(string))    :: toupperc
-    character(len=*), parameter :: lcase='abcdefghijklmnopqrstuvwxyz'
-    character(len=*), parameter :: ucase='ABCDEFGHIJKLMNOPQRSTUVWXYZ'
     integer  :: i,k
 
     do i=1,len(string)
@@ -81,8 +82,6 @@ contains
   subroutine   sub_toupperc(string,strout)
     character(len=*), intent(in)  :: string
     character(len=*), intent(out)  :: strout
-    character(len=*), parameter :: lcase='abcdefghijklmnopqrstuvwxyz'
-    character(len=*), parameter :: ucase='ABCDEFGHIJKLMNOPQRSTUVWXYZ'
     integer  :: i,k
 
     do i=1,len(string)
