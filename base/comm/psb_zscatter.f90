@@ -122,11 +122,7 @@ subroutine  psb_zscatterm(globx, locx, desc_a, info, iroot)
   m = psb_cd_get_global_rows(desc_a)
   n = psb_cd_get_global_cols(desc_a)
 
-  if (me == iiroot) then
-    call igebs2d(ictxt, 'all', ' ', 1, 1, k, 1)
-  else
-    call igebr2d(ictxt, 'all', ' ', 1, 1, k, 1, iiroot, 0)
-  end if
+  call psb_bcast(ictxt,k,root=iiroot)
 
   !  there should be a global check on k here!!!
 
@@ -333,12 +329,6 @@ subroutine  psb_zscatterv(globx, locx, desc_a, info, iroot)
   n = psb_cd_get_global_cols(desc_a)
 
   k = 1
-
-  if (me == iiroot) then
-    call igebs2d(ictxt, 'all', ' ', 1, 1, k, 1)
-  else
-    call igebr2d(ictxt, 'all', ' ', 1, 1, k, 1, iiroot, 0)
-  end if
 
   !  there should be a global check on k here!!!
 
