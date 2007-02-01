@@ -101,7 +101,7 @@ subroutine FCpsb_get_errverbosity(v)
 
   integer, intent(out)   :: v
 
-  call psb_get_errverbosity(v)
+  v = psb_get_errverbosity()
 
 end subroutine FCpsb_get_errverbosity
 

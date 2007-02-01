@@ -121,7 +121,6 @@ subroutine  psb_iscatterm(globx, locx, desc_a, info, iroot)
   n = psb_cd_get_global_cols(desc_a)
   
   call psb_bcast(ictxt,k,root=iiroot)
-
   !  there should be a global check on k here!!!
 
   call psb_chkglobvect(m,n,size(globx),iglobx,jglobx,desc_a,info)

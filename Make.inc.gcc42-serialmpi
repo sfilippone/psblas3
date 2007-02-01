@@ -6,37 +6,37 @@
 #######################  Section 1 #######################
 #  Define your compilers and compiler flags here         #
 ##########################################################
-IFC9=/opt/intel/fc/9.1.033
-F90=$(IFC9)/bin/ifort
-FC=$(IFC9)/bin/ifort
+F90=/usr/local/gcc42/bin/gfortran
+FC=$(F90)
 F77=$(FC)
-CC=gcc
-F90COPT=-O3 
-FCOPT=-O3 
-CCOPT=-O3
+CC=/usr/local/gcc42/bin/gcc
+F90COPT=-O3 -ggdb
+FCOPT=-O3 -ggdb
+CCOPT=-O3 -ggdb
 
 #######################  Section 2 #######################
 #  Define your linker and linker flags here              #
 ##########################################################
-F90LINK=/usr/local/mpich-ifc91/bin/mpif90 
-FLINK=/usr/local/mpich-ifc91/bin/mpif77 
-MPF90=/usr/local/mpich-ifc91/bin/mpif90 
-MPF77=/usr/local/mpich-ifc91/bin/mpif77 
-MPCC=/usr/local/mpich-ifc91/bin/mpicc 
+F90LINK=$(FC)
+FLINK=$(FC)
+MPF90=$(FC)
+MPF77=$(FC)
+MPCC=$(CC)
 
 #######################  Section 3 #######################
 #  Specify paths to libraries                            #
 ##########################################################
-BLAS=-lblas-intel -L$(HOME)/NUMERICAL/LIB
-BLACS=-lmpiblacs-intel -L$(HOME)/NUMERICAL/LIB
-
+BLAS=-lblas-gcc42 -L$(HOME)/LIB
+# No BLACS in serialMPI. But we need the fakempi.o
+#BLACS=-lmpiblacs-gcc42 -L$(HOME)/LIB
+EXTRA_COBJS=fakempi.o
 
 
 #######################  Section 4 #######################
 #  Other useful tools&defines                            #
 ##########################################################
 SLUDIR=/usr/local/SuperLU_3.0
-SLU=-lslu_lx_ifc9 -L$(SLUDIR)
+SLU=-lslu_lx_gcc42 -L$(SLUDIR)
 SLUDEF=-DHave_SLU_ -I$(SLUDIR)
 
 UMFDIR=$(HOME)/LIB/Umfpack_gcc41
@@ -51,7 +51,7 @@ LDLIBS=$(BLACS) $(SLU) $(UMF) $(BLAS) $(METIS_LIB)
 
 #  Add -DLargeFptr for 64-bit addresses
 CDEFINES=-DAdd_ $(SLUDEF) $(UMFDEF)
-FDEFINES=-DNETLIB_BLACS -DHAVE_MOVE_ALLOC
+FDEFINES=-DHAVE_MOVE_ALLOC -DSERIAL_MPI
 
 AR=ar -cur
 RANLIB=ranlib

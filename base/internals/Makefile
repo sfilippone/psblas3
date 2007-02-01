@@ -11,8 +11,7 @@ COBJS = avltree.o srcht.o
 
 MPFOBJS = psi_dswapdata.o psi_dswaptran.o psi_iswapdata.o \
 	psi_iswaptran.o psi_desc_index.o \
- 	psi_zswapdata.o psi_zswaptran.o 
-MPFOBJS2 = psi_extrct_dl.o
+ 	psi_zswapdata.o psi_zswaptran.o  psi_extrct_dl.o
 LIBDIR = ..
 MODDIR = ../modules
 INCDIRS = -I $(LIBDIR) -I $(MODDIR) -I . 
@@ -25,7 +24,6 @@ lib: mpfobjs $(FOBJS) $(FOBJS2) $(COBJS) $(MPFOBJS2)
 
 mpfobjs: psi_gthsct.o
 	(make $(MPFOBJS) F90="$(MPF90)" FC="$(MPF90)" FCOPT="$(F90COPT)")	
-	(make $(MPFOBJS2) F90="$(MPF77)" FC="$(MPF77)" FCOPT="$(FCOPT)")
 	(make $(FOBJS2) F90="$(MPF77)" FC="$(MPF77)" FCOPT="$(FCOPT)")
 clean:
 	/bin/rm -f $(MPFOBJS) $(FOBJS) $(COBJS) $(FOBJS2) $(MPFOBJS2)

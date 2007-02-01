@@ -37,6 +37,7 @@
 !    desc_a  - type(<psb_desc_type>).         The communication descriptor.
 !    info    - integer.                       Eventually returns an error code.
 subroutine psb_icdasb(desc_a,info,ext_hv)
+  use mpi
   use psb_descriptor_type
   use psb_serial_mod
   use psb_const_mod
@@ -44,8 +45,6 @@ subroutine psb_icdasb(desc_a,info,ext_hv)
   use psb_error_mod
   use psb_penv_mod
   implicit none
-
-  include 'mpif.h'
   !...Parameters....
   type(psb_desc_type), intent(inout) :: desc_a
   integer, intent(out)               :: info

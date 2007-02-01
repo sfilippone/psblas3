@@ -121,14 +121,14 @@ Subroutine psb_zsphalo(a,desc_a,blk,info,rwcnv,clcnv,outfmt)
   sdsz(:)=0
   rvsz(:)=0
   ipx = 1
+  blk%k = a%k
+  blk%m = 0 
   brvindx(ipx) = 0
   bsdindx(ipx) = 0
   counter=1
   idx = 0
   idxs = 0
   idxr = 0
-  blk%k = a%k
-  blk%m = 0 
   ! For all rows in the halo descriptor, extract and send/receive.
   Do 
     proc=desc_a%halo_index(counter)

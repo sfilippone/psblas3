@@ -28,6 +28,18 @@
 !!$  POSSIBILITY OF SUCH DAMAGE.
 !!$ 
 !!$  
+#if defined(SERIAL_MPI)
+! Provide a fake mpi module just to keep the compiler(s) happy.
+module mpi
+  integer, parameter :: mpi_success=0
+  integer, parameter :: mpi_request_null=0
+  integer, parameter :: mpi_status_size=1
+  integer, parameter :: mpi_integer=1, mpi_double_precision=3
+  integer, parameter :: mpi_double_complex=5 
+  real(kind(1.d0)), external :: mpi_wtime
+end module mpi
+#endif    
+
 module psb_penv_mod
 
 
@@ -107,6 +119,7 @@ module psb_penv_mod
          & psb_zsums, psb_zsumv, psb_zsumm
   end interface
 
+#if !defined(SERIAL_MPI)
   
   interface gebs2d
     module procedure igebs2ds, igebs2dv, igebs2dm,&
@@ -150,12 +163,13 @@ module psb_penv_mod
          &           dgamn2ds, dgamn2dv, dgamn2dm,&
          &           zgamn2ds, zgamn2dv, zgamn2dm
   end interface
+#endif    
 
-
-contains 
-
-
+#if defined(SERIAL_MPI)
+  integer, private, save :: nctxt=0
+#endif
   
+contains 
 
   subroutine psb_init(ictxt,np)
     use psb_const_mod
@@ -165,7 +179,11 @@ contains
     
     integer :: np_, npavail, iam, info
     character(len=20), parameter :: name='psb_init'
-    
+#if defined(SERIAL_MPI) 
+    ictxt = nctxt
+    nctxt = nctxt + 1
+    np_   = 1
+#else    
     call blacs_pinfo(iam, npavail)
     call blacs_get(izero, izero, ictxt)
     
@@ -176,7 +194,7 @@ contains
     endif
     
     call blacs_gridinit(ictxt, 'R', np_, ione)
-    
+#endif    
     if (present(np)) then 
       if (np_ < np) then 
         info = 2011
@@ -192,7 +210,8 @@ contains
     logical, intent(in), optional :: close
     logical  :: close_
     integer  :: nprow, npcol, myprow, mypcol
-    
+
+#if !defined(SERIAL_MPI)
     if (present(close)) then 
       close_ = close
     else
@@ -203,28 +222,34 @@ contains
       call blacs_gridexit(ictxt)
     end if
     if (close_) call blacs_exit(0)
+#endif
   end subroutine psb_exit
 
 
   subroutine psb_barrier(ictxt)
     integer, intent(in) :: ictxt
-    
+
+#if !defined(SERIAL_MPI)
     call blacs_barrier(ictxt,'All')
+#endif    
     
   end subroutine psb_barrier
 
   function psb_wtime()
+    use mpi
     real(kind(1.d0)) :: psb_wtime
-    
-    real(kind(1.d0)), external :: mpi_wtime
-    
+
     psb_wtime = mpi_wtime()
   end function psb_wtime
 
   subroutine psb_abort(ictxt)
     integer, intent(in) :: ictxt
     
+#if defined(SERIAL_MPI) 
+    stop
+#else    
     call blacs_abort(ictxt,-1)
+#endif    
     
   end subroutine psb_abort
 
@@ -235,10 +260,15 @@ contains
     integer, intent(out) :: iam, np
     integer              :: nprow, npcol, myprow, mypcol
     
+#if defined(SERIAL_MPI) 
+    iam = 0
+    np  = 1
+#else    
     call blacs_gridinfo(ictxt, nprow, npcol, myprow, mypcol)
     
     iam = myprow
     np  = nprow
+#endif    
     
   end subroutine psb_info
 
@@ -250,6 +280,7 @@ contains
 
     integer  :: iam, np, root_
 
+#if !defined(SERIAL_MPI)
     if (present(root)) then
       root_ = root
     else
@@ -263,6 +294,7 @@ contains
     else
       call gebr2d(ictxt,'A',dat,rrt=root_)
     endif
+#endif    
   end subroutine psb_ibcasts
 
   subroutine psb_ibcastv(ictxt,dat,root)
@@ -272,6 +304,7 @@ contains
 
     integer  :: iam, np, root_
 
+#if !defined(SERIAL_MPI)
     if (present(root)) then
       root_ = root
     else
@@ -285,6 +318,7 @@ contains
     else
       call gebr2d(ictxt,'A',dat,rrt=root_)
     endif
+#endif    
   end subroutine psb_ibcastv
     
   subroutine psb_ibcastm(ictxt,dat,root)
@@ -294,6 +328,7 @@ contains
 
     integer  :: iam, np, root_
 
+#if !defined(SERIAL_MPI)
     if (present(root)) then
       root_ = root
     else
@@ -307,6 +342,7 @@ contains
     else
       call gebr2d(ictxt,'A',dat,rrt=root_)
     endif
+#endif    
   end subroutine psb_ibcastm
 
 
@@ -317,6 +353,7 @@ contains
 
     integer  :: iam, np, root_
 
+#if !defined(SERIAL_MPI)
     if (present(root)) then
       root_ = root
     else
@@ -330,6 +367,7 @@ contains
     else
       call gebr2d(ictxt,'A',dat,rrt=root_)
     endif
+#endif    
   end subroutine psb_dbcasts
 
 
@@ -340,6 +378,7 @@ contains
 
     integer  :: iam, np, root_
 
+#if !defined(SERIAL_MPI)
     if (present(root)) then
       root_ = root
     else
@@ -353,6 +392,7 @@ contains
     else
       call gebr2d(ictxt,'A',dat,rrt=root_)
     endif
+#endif    
   end subroutine psb_dbcastv
     
   subroutine psb_dbcastm(ictxt,dat,root)
@@ -362,6 +402,7 @@ contains
 
     integer  :: iam, np, root_
 
+#if !defined(SERIAL_MPI)
     if (present(root)) then
       root_ = root
     else
@@ -375,6 +416,7 @@ contains
     else
       call gebr2d(ictxt,'A',dat,rrt=root_)
     endif
+#endif    
   end subroutine psb_dbcastm
     
 
@@ -385,6 +427,7 @@ contains
 
     integer  :: iam, np, root_
 
+#if !defined(SERIAL_MPI)
     if (present(root)) then
       root_ = root
     else
@@ -398,6 +441,7 @@ contains
     else
       call gebr2d(ictxt,'A',dat,rrt=root_)
     endif
+#endif    
   end subroutine psb_zbcasts
 
   subroutine psb_zbcastv(ictxt,dat,root)
@@ -407,6 +451,7 @@ contains
 
     integer  :: iam, np, root_
 
+#if !defined(SERIAL_MPI)
     if (present(root)) then
       root_ = root
     else
@@ -420,6 +465,7 @@ contains
     else
       call gebr2d(ictxt,'A',dat,rrt=root_)
     endif
+#endif    
   end subroutine psb_zbcastv
     
   subroutine psb_zbcastm(ictxt,dat,root)
@@ -429,6 +475,7 @@ contains
 
     integer  :: iam, np, root_
 
+#if !defined(SERIAL_MPI)
     if (present(root)) then
       root_ = root
     else
@@ -442,6 +489,7 @@ contains
     else
       call gebr2d(ictxt,'A',dat,rrt=root_)
     endif
+#endif    
   end subroutine psb_zbcastm
 
 
@@ -453,6 +501,7 @@ contains
 
     integer  :: iam, np, root_,icomm,length_,info
 
+#if !defined(SERIAL_MPI)
     if (present(root)) then
       root_ = root
     else
@@ -468,6 +517,7 @@ contains
     call psb_get_mpicomm(ictxt,icomm)
     
     call mpi_bcast(dat,length_,MPI_CHARACTER,root_,icomm,info)
+#endif    
 
   end subroutine psb_hbcasts
 
@@ -479,6 +529,7 @@ contains
 
     integer  :: iam, np, root_,icomm,info
 
+#if !defined(SERIAL_MPI)
     if (present(root)) then
       root_ = root
     else
@@ -488,6 +539,7 @@ contains
     call psb_info(ictxt,iam,np)
     call psb_get_mpicomm(ictxt,icomm)
     call mpi_bcast(dat,1,MPI_LOGICAL,root_,icomm,info)
+#endif    
 
   end subroutine psb_lbcasts
 
@@ -502,6 +554,7 @@ contains
     integer :: iam, np, icomm
     
 
+#if !defined(SERIAL_MPI)
     call psb_info(ictxt,iam,np)
     call psb_get_mpicomm(ictxt,icomm)
 
@@ -517,6 +570,7 @@ contains
       call mpi_reduce(dat,dat_,1,mpi_integer,mpi_max,root_,icomm)
       dat = dat_
     endif
+#endif    
   end subroutine psb_imaxs
   subroutine psb_imaxv(ictxt,dat,root)
     use mpi
@@ -528,6 +582,7 @@ contains
     integer, allocatable :: dat_(:)
     integer :: iam, np, icomm, info
     
+#if !defined(SERIAL_MPI)
 
     call psb_info(ictxt,iam,np)
     call psb_get_mpicomm(ictxt,icomm)
@@ -548,6 +603,7 @@ contains
         call mpi_reduce(dat,dat_,size(dat),mpi_integer,mpi_max,root_,icomm)
       end if
     endif
+#endif    
   end subroutine psb_imaxv
   subroutine psb_imaxm(ictxt,dat,root)
     use mpi
@@ -560,6 +616,7 @@ contains
     integer :: iam, np, icomm, info
     
 
+#if !defined(SERIAL_MPI)
     call psb_info(ictxt,iam,np)
     call psb_get_mpicomm(ictxt,icomm)
 
@@ -579,6 +636,7 @@ contains
         call mpi_reduce(dat,dat_,size(dat),mpi_integer,mpi_max,root_,icomm)
       end if
     endif
+#endif    
   end subroutine psb_imaxm
   
   subroutine psb_dmaxs(ictxt,dat,root)
@@ -591,6 +649,7 @@ contains
     integer :: iam, np, icomm
     
 
+#if !defined(SERIAL_MPI)
     call psb_info(ictxt,iam,np)
     call psb_get_mpicomm(ictxt,icomm)
 
@@ -606,6 +665,7 @@ contains
       call mpi_reduce(dat,dat_,1,mpi_double_precision,mpi_max,root_,icomm)
       dat = dat_
     endif
+#endif    
   end subroutine psb_dmaxs
   subroutine psb_dmaxv(ictxt,dat,root)
     use mpi
@@ -618,6 +678,7 @@ contains
     integer :: iam, np, icomm, info
     
 
+#if !defined(SERIAL_MPI)
     call psb_info(ictxt,iam,np)
     call psb_get_mpicomm(ictxt,icomm)
 
@@ -629,7 +690,8 @@ contains
     if (root_ == -1) then 
       call psb_realloc(size(dat),dat_,info)
       dat_ = dat
-      if (info ==0) call mpi_allreduce(dat_,dat,size(dat),mpi_double_precision,mpi_max,icomm)
+      if (info ==0) &
+           & call mpi_allreduce(dat_,dat,size(dat),mpi_double_precision,mpi_max,icomm)
     else
       if (iam==root_) then 
         call psb_realloc(size(dat),dat_,info)
@@ -639,6 +701,7 @@ contains
         call mpi_reduce(dat,dat_,size(dat),mpi_double_precision,mpi_max,root_,icomm)
       end if
     endif
+#endif    
   end subroutine psb_dmaxv
   subroutine psb_dmaxm(ictxt,dat,root)
     use mpi
@@ -650,6 +713,7 @@ contains
     real(kind(1.d0)), allocatable :: dat_(:,:)
     integer :: iam, np, icomm, info
     
+#if !defined(SERIAL_MPI)
 
     call psb_info(ictxt,iam,np)
     call psb_get_mpicomm(ictxt,icomm)
@@ -662,7 +726,8 @@ contains
     if (root_ == -1) then 
       call psb_realloc(size(dat,1),size(dat,2),dat_,info)
       dat_ = dat
-      if (info ==0) call mpi_allreduce(dat_,dat,size(dat),mpi_double_precision,mpi_max,icomm)
+      if (info ==0)&
+           & call mpi_allreduce(dat_,dat,size(dat),mpi_double_precision,mpi_max,icomm)
     else
       if (iam==root_) then 
         call psb_realloc(size(dat,1),size(dat,2),dat_,info)
@@ -672,6 +737,7 @@ contains
         call mpi_reduce(dat,dat_,size(dat),mpi_double_precision,mpi_max,root_,icomm)
       end if
     endif
+#endif    
   end subroutine psb_dmaxm
   
   
@@ -683,6 +749,7 @@ contains
     integer :: root_, dat_
     integer :: iam, np, icomm
     
+#if !defined(SERIAL_MPI)
 
     call psb_info(ictxt,iam,np)
     call psb_get_mpicomm(ictxt,icomm)
@@ -699,6 +766,7 @@ contains
       call mpi_reduce(dat,dat_,1,mpi_integer,mpi_min,root_,icomm)
       dat = dat_
     endif
+#endif    
   end subroutine psb_imins
   subroutine psb_iminv(ictxt,dat,root)
     use mpi
@@ -711,6 +779,7 @@ contains
     integer :: iam, np, icomm, info
     
 
+#if !defined(SERIAL_MPI)
     call psb_info(ictxt,iam,np)
     call psb_get_mpicomm(ictxt,icomm)
 
@@ -730,6 +799,7 @@ contains
         call mpi_reduce(dat,dat_,size(dat),mpi_integer,mpi_min,root_,icomm)
       end if
     endif
+#endif    
   end subroutine psb_iminv
   subroutine psb_iminm(ictxt,dat,root)
     use mpi
@@ -742,6 +812,7 @@ contains
     integer :: iam, np, icomm, info
     
 
+#if !defined(SERIAL_MPI)
     call psb_info(ictxt,iam,np)
     call psb_get_mpicomm(ictxt,icomm)
 
@@ -761,6 +832,7 @@ contains
         call mpi_reduce(dat,dat_,size(dat),mpi_integer,mpi_min,root_,icomm)
       end if
     endif
+#endif    
   end subroutine psb_iminm
   
   subroutine psb_dmins(ictxt,dat,root)
@@ -773,6 +845,7 @@ contains
     integer :: iam, np, icomm
     
 
+#if !defined(SERIAL_MPI)
     call psb_info(ictxt,iam,np)
     call psb_get_mpicomm(ictxt,icomm)
 
@@ -788,6 +861,7 @@ contains
       call mpi_reduce(dat,dat_,1,mpi_double_precision,mpi_min,root_,icomm)
       dat = dat_
     endif
+#endif    
   end subroutine psb_dmins
   subroutine psb_dminv(ictxt,dat,root)
     use mpi
@@ -800,6 +874,7 @@ contains
     integer :: iam, np, icomm, info
     
 
+#if !defined(SERIAL_MPI)
     call psb_info(ictxt,iam,np)
     call psb_get_mpicomm(ictxt,icomm)
 
@@ -811,7 +886,8 @@ contains
     if (root_ == -1) then 
       call psb_realloc(size(dat),dat_,info)
       dat_ = dat
-      if (info ==0) call mpi_allreduce(dat_,dat,size(dat),mpi_double_precision,mpi_min,icomm)
+      if (info ==0) &
+           & call mpi_allreduce(dat_,dat,size(dat),mpi_double_precision,mpi_min,icomm)
     else
       if (iam==root_) then 
         call psb_realloc(size(dat),dat_,info)
@@ -821,6 +897,7 @@ contains
         call mpi_reduce(dat,dat_,size(dat),mpi_double_precision,mpi_min,root_,icomm)
       end if
     endif
+#endif    
   end subroutine psb_dminv
   subroutine psb_dminm(ictxt,dat,root)
     use mpi
@@ -832,6 +909,7 @@ contains
     real(kind(1.d0)), allocatable :: dat_(:,:)
     integer :: iam, np, icomm, info
     
+#if !defined(SERIAL_MPI)
 
     call psb_info(ictxt,iam,np)
     call psb_get_mpicomm(ictxt,icomm)
@@ -844,7 +922,8 @@ contains
     if (root_ == -1) then 
       call psb_realloc(size(dat,1),size(dat,2),dat_,info)
       dat_ = dat
-      if (info ==0) call mpi_allreduce(dat_,dat,size(dat),mpi_double_precision,mpi_min,icomm)
+      if (info ==0) &
+           & call mpi_allreduce(dat_,dat,size(dat),mpi_double_precision,mpi_min,icomm)
     else
       if (iam==root_) then 
         call psb_realloc(size(dat,1),size(dat,2),dat_,info)
@@ -854,6 +933,8 @@ contains
         call mpi_reduce(dat,dat_,size(dat),mpi_double_precision,mpi_min,root_,icomm)
       end if
     endif
+#endif    
+
   end subroutine psb_dminm
   
   
@@ -865,6 +946,11 @@ contains
     
     integer   :: root_
     
+#if defined(SERIAL_MPI) 
+    if (present(ia)) then 
+      ia = 0
+    end if
+#else
     if (present(root)) then 
       root_ = root
     else
@@ -875,6 +961,7 @@ contains
     else
       call gamx2d(ictxt,'A',dat,rrt=root_) 
     endif
+#endif    
   end subroutine psb_iamxs
 
   subroutine psb_iamxv(ictxt,dat,root,ia)
@@ -886,6 +973,12 @@ contains
     integer   :: root_
     integer, allocatable :: cia(:)
     
+    
+#if defined(SERIAL_MPI) 
+    if (present(ia)) then 
+      ia = 0
+    end if
+#else
     if (present(root)) then 
       root_ = root
     else
@@ -897,6 +990,7 @@ contains
     else
       call gamx2d(ictxt,'A',dat,rrt=root_) 
     endif
+#endif    
   end subroutine psb_iamxv
 
   subroutine psb_iamxm(ictxt,dat,root,ia)
@@ -908,6 +1002,12 @@ contains
     integer   :: root_
     integer, allocatable :: cia(:,:)
     
+    
+#if defined(SERIAL_MPI) 
+    if (present(ia)) then 
+      ia = 0
+    end if
+#else
     if (present(root)) then 
       root_ = root
     else
@@ -919,6 +1019,7 @@ contains
     else
       call gamx2d(ictxt,'A',dat,rrt=root_) 
     endif
+#endif    
   end subroutine psb_iamxm
 
 
@@ -930,6 +1031,12 @@ contains
     
     integer   :: root_
     
+    
+#if defined(SERIAL_MPI) 
+    if (present(ia)) then 
+      ia = 0
+    end if
+#else
     if (present(root)) then 
       root_ = root
     else
@@ -940,6 +1047,7 @@ contains
     else
       call gamx2d(ictxt,'A',dat,rrt=root_) 
     endif
+#endif    
   end subroutine psb_damxs
 
   subroutine psb_damxv(ictxt,dat,root,ia)
@@ -951,6 +1059,12 @@ contains
     integer   :: root_
     integer, allocatable :: cia(:)
     
+    
+#if defined(SERIAL_MPI) 
+    if (present(ia)) then 
+      ia = 0
+    end if
+#else
     if (present(root)) then 
       root_ = root
     else
@@ -962,6 +1076,7 @@ contains
     else
       call gamx2d(ictxt,'A',dat,rrt=root_) 
     endif
+#endif    
   end subroutine psb_damxv
 
   subroutine psb_damxm(ictxt,dat,root,ia)
@@ -973,6 +1088,12 @@ contains
     integer   :: root_
     integer, allocatable :: cia(:,:)
     
+    
+#if defined(SERIAL_MPI) 
+    if (present(ia)) then 
+      ia = 0
+    end if
+#else
     if (present(root)) then 
       root_ = root
     else
@@ -984,6 +1105,7 @@ contains
     else
       call gamx2d(ictxt,'A',dat,rrt=root_) 
     endif
+#endif    
   end subroutine psb_damxm
 
 
@@ -995,6 +1117,12 @@ contains
     
     integer   :: root_
     
+    
+#if defined(SERIAL_MPI) 
+    if (present(ia)) then 
+      ia = 0
+    end if
+#else
     if (present(root)) then 
       root_ = root
     else
@@ -1005,6 +1133,7 @@ contains
     else
       call gamx2d(ictxt,'A',dat,rrt=root_) 
     endif
+#endif    
   end subroutine psb_zamxs
 
   subroutine psb_zamxv(ictxt,dat,root,ia)
@@ -1016,6 +1145,12 @@ contains
     integer   :: root_
     integer, allocatable :: cia(:)
     
+    
+#if defined(SERIAL_MPI) 
+    if (present(ia)) then 
+      ia = 0
+    end if
+#else
     if (present(root)) then 
       root_ = root
     else
@@ -1027,6 +1162,7 @@ contains
     else
       call gamx2d(ictxt,'A',dat,rrt=root_) 
     endif
+#endif    
   end subroutine psb_zamxv
 
   subroutine psb_zamxm(ictxt,dat,root,ia)
@@ -1038,6 +1174,12 @@ contains
     integer   :: root_
     integer, allocatable :: cia(:,:)
     
+    
+#if defined(SERIAL_MPI) 
+    if (present(ia)) then 
+      ia = 0
+    end if
+#else
     if (present(root)) then 
       root_ = root
     else
@@ -1049,6 +1191,7 @@ contains
     else
       call gamx2d(ictxt,'A',dat,rrt=root_) 
     endif
+#endif    
   end subroutine psb_zamxm
 
 
@@ -1061,6 +1204,12 @@ contains
     
     integer   :: root_
     
+    
+#if defined(SERIAL_MPI) 
+    if (present(ia)) then 
+      ia = 0
+    end if
+#else
     if (present(root)) then 
       root_ = root
     else
@@ -1071,6 +1220,7 @@ contains
     else
       call gamn2d(ictxt,'A',dat,rrt=root_) 
     endif
+#endif    
   end subroutine psb_iamns
 
   subroutine psb_iamnv(ictxt,dat,root,ia)
@@ -1082,6 +1232,12 @@ contains
     integer   :: root_
     integer, allocatable :: cia(:)
     
+    
+#if defined(SERIAL_MPI) 
+    if (present(ia)) then 
+      ia = 0
+    end if
+#else
     if (present(root)) then 
       root_ = root
     else
@@ -1093,6 +1249,7 @@ contains
     else
       call gamn2d(ictxt,'A',dat,rrt=root_) 
     endif
+#endif    
   end subroutine psb_iamnv
 
   subroutine psb_iamnm(ictxt,dat,root,ia)
@@ -1104,6 +1261,12 @@ contains
     integer   :: root_
     integer, allocatable :: cia(:,:)
     
+    
+#if defined(SERIAL_MPI) 
+    if (present(ia)) then 
+      ia = 0
+    end if
+#else
     if (present(root)) then 
       root_ = root
     else
@@ -1115,6 +1278,7 @@ contains
     else
       call gamn2d(ictxt,'A',dat,rrt=root_) 
     endif
+#endif    
   end subroutine psb_iamnm
 
 
@@ -1126,6 +1290,12 @@ contains
     
     integer   :: root_
     
+    
+#if defined(SERIAL_MPI) 
+    if (present(ia)) then 
+      ia = 0
+    end if
+#else
     if (present(root)) then 
       root_ = root
     else
@@ -1136,6 +1306,7 @@ contains
     else
       call gamn2d(ictxt,'A',dat,rrt=root_) 
     endif
+#endif    
   end subroutine psb_damns
 
   subroutine psb_damnv(ictxt,dat,root,ia)
@@ -1147,6 +1318,12 @@ contains
     integer   :: root_
     integer, allocatable :: cia(:)
     
+    
+#if defined(SERIAL_MPI) 
+    if (present(ia)) then 
+      ia = 0
+    end if
+#else
     if (present(root)) then 
       root_ = root
     else
@@ -1158,6 +1335,7 @@ contains
     else
       call gamn2d(ictxt,'A',dat,rrt=root_) 
     endif
+#endif    
   end subroutine psb_damnv
 
   subroutine psb_damnm(ictxt,dat,root,ia)
@@ -1169,6 +1347,12 @@ contains
     integer   :: root_
     integer, allocatable :: cia(:,:)
     
+    
+#if defined(SERIAL_MPI) 
+    if (present(ia)) then 
+      ia = 0
+    end if
+#else
     if (present(root)) then 
       root_ = root
     else
@@ -1180,6 +1364,7 @@ contains
     else
       call gamn2d(ictxt,'A',dat,rrt=root_) 
     endif
+#endif    
   end subroutine psb_damnm
 
 
@@ -1191,6 +1376,12 @@ contains
     
     integer   :: root_
     
+    
+#if defined(SERIAL_MPI) 
+    if (present(ia)) then 
+      ia = 0
+    end if
+#else
     if (present(root)) then 
       root_ = root
     else
@@ -1201,6 +1392,7 @@ contains
     else
       call gamn2d(ictxt,'A',dat,rrt=root_) 
     endif
+#endif    
   end subroutine psb_zamns
 
   subroutine psb_zamnv(ictxt,dat,root,ia)
@@ -1212,6 +1404,12 @@ contains
     integer   :: root_
     integer, allocatable :: cia(:)
     
+    
+#if defined(SERIAL_MPI) 
+    if (present(ia)) then 
+      ia = 0
+    end if
+#else
     if (present(root)) then 
       root_ = root
     else
@@ -1223,6 +1421,7 @@ contains
     else
       call gamn2d(ictxt,'A',dat,rrt=root_) 
     endif
+#endif    
   end subroutine psb_zamnv
 
   subroutine psb_zamnm(ictxt,dat,root,ia)
@@ -1234,6 +1433,12 @@ contains
     integer   :: root_
     integer, allocatable :: cia(:,:)
     
+    
+#if defined(SERIAL_MPI) 
+    if (present(ia)) then 
+      ia = 0
+    end if
+#else
     if (present(root)) then 
       root_ = root
     else
@@ -1245,6 +1450,7 @@ contains
     else
       call gamn2d(ictxt,'A',dat,rrt=root_) 
     endif
+#endif    
   end subroutine psb_zamnm
 
 
@@ -1256,6 +1462,7 @@ contains
     
     integer   :: root_
     
+#if !defined(SERIAL_MPI)
     if (present(root)) then 
       root_ = root
     else
@@ -1263,6 +1470,7 @@ contains
     endif
 
     call gsum2d(ictxt,'A',dat,rrt=root_) 
+#endif    
 
   end subroutine psb_isums
 
@@ -1273,6 +1481,7 @@ contains
     
     integer   :: root_
     
+#if !defined(SERIAL_MPI)
     if (present(root)) then 
       root_ = root
     else
@@ -1280,6 +1489,7 @@ contains
     endif
     
     call gsum2d(ictxt,'A',dat,rrt=root_) 
+#endif    
   end subroutine psb_isumv
 
   subroutine psb_isumm(ictxt,dat,root)
@@ -1289,6 +1499,7 @@ contains
     
     integer   :: root_
     
+#if !defined(SERIAL_MPI)
     if (present(root)) then 
       root_ = root
     else
@@ -1297,6 +1508,7 @@ contains
     endif
 
     call gsum2d(ictxt,'A',dat,rrt=root_) 
+#endif    
 
   end subroutine psb_isumm
 
@@ -1308,6 +1520,7 @@ contains
     
     integer   :: root_
     
+#if !defined(SERIAL_MPI)
     if (present(root)) then 
       root_ = root
     else
@@ -1315,6 +1528,7 @@ contains
     endif
 
     call gsum2d(ictxt,'A',dat,rrt=root_) 
+#endif    
 
   end subroutine psb_dsums
 
@@ -1325,6 +1539,7 @@ contains
     
     integer   :: root_
     
+#if !defined(SERIAL_MPI)
     if (present(root)) then 
       root_ = root
     else
@@ -1332,6 +1547,7 @@ contains
     endif
 
     call gsum2d(ictxt,'A',dat,rrt=root_) 
+#endif    
 
   end subroutine psb_dsumv
 
@@ -1342,6 +1558,7 @@ contains
     
     integer   :: root_
     
+#if !defined(SERIAL_MPI)
     if (present(root)) then 
       root_ = root
     else
@@ -1350,6 +1567,7 @@ contains
     
     call gsum2d(ictxt,'A',dat,rrt=root_) 
 
+#endif    
   end subroutine psb_dsumm
 
 
@@ -1360,6 +1578,7 @@ contains
     
     integer   :: root_
     
+#if !defined(SERIAL_MPI)
     if (present(root)) then 
       root_ = root
     else
@@ -1367,6 +1586,7 @@ contains
     endif
 
     call gsum2d(ictxt,'A',dat,rrt=root_) 
+#endif    
 
   end subroutine psb_zsums
 
@@ -1378,6 +1598,7 @@ contains
     integer   :: root_
     integer, allocatable :: cia(:)
     
+#if !defined(SERIAL_MPI)
     if (present(root)) then 
       root_ = root
     else
@@ -1385,6 +1606,7 @@ contains
     endif
 
     call gsum2d(ictxt,'A',dat,rrt=root_) 
+#endif    
 
   end subroutine psb_zsumv
 
@@ -1395,6 +1617,7 @@ contains
     
     integer   :: root_
     
+#if !defined(SERIAL_MPI)
     if (present(root)) then 
       root_ = root
     else
@@ -1403,11 +1626,13 @@ contains
     
     call gsum2d(ictxt,'A',dat,rrt=root_) 
 
+#endif    
   end subroutine psb_zsumm
 
 
 
   subroutine psb_hsnds(ictxt,dat,dst,length)
+    use psb_error_mod
     integer, intent(in)           :: ictxt
     character(len=*), intent(in)  :: dat
     integer, intent(in)           :: dst
@@ -1415,6 +1640,11 @@ contains
     integer, allocatable          :: buffer(:)
     integer :: length_, i
     
+#if defined(SERIAL_MPI) 
+    if (psb_get_errverbosity() >1) then 
+      write(0,*) "Warning: process sending a message in serial mode (to itself)"
+    endif
+#else
     if (present(length)) then 
       length_ = length
     else
@@ -1426,10 +1656,11 @@ contains
     end do
     
     call gesd2d(ictxt,buffer,dst,0) 
-
+#endif
   end subroutine psb_hsnds
 
   subroutine psb_hrcvs(ictxt,dat,src,length)
+    use psb_error_mod
     integer, intent(in)           :: ictxt
     character(len=*), intent(out)  :: dat
     integer, intent(in)           :: src
@@ -1437,6 +1668,12 @@ contains
     integer, allocatable          :: buffer(:)
     integer :: length_, i
     
+#if defined(SERIAL_MPI) 
+    if (psb_get_errverbosity() >0) then 
+      write(0,*) "Warning: process receiving a message in serial mode (to itself)"
+    endif
+    dat = ''
+#else
     if (present(length)) then 
       length_ = length
     else
@@ -1448,208 +1685,357 @@ contains
     do i=1,length_
       dat(i:i) = achar(buffer(i))
     end do
+#endif    
 
   end subroutine psb_hrcvs
 
   subroutine psb_lsnds(ictxt,dat,dst,length)
+    use psb_error_mod
     integer, intent(in)           :: ictxt
     logical, intent(in)           :: dat
     integer, intent(in)           :: dst
     integer :: i
     
+#if defined(SERIAL_MPI) 
+    if (psb_get_errverbosity() >1) then 
+      write(0,*) "Warning: process sending a message in serial mode (to itself)"
+    endif
+#else
     if (dat) then 
       i = 1
     else
       i = 0
     endif
     call gesd2d(ictxt,i,dst,0) 
+#endif    
 
   end subroutine psb_lsnds
 
   subroutine psb_lrcvs(ictxt,dat,src,length)
+    use psb_error_mod
     integer, intent(in)           :: ictxt
     logical, intent(out)          :: dat
     integer, intent(in)           :: src
     integer :: i
     
+#if defined(SERIAL_MPI) 
+    if (psb_get_errverbosity() >0) then 
+      write(0,*) "Warning: process receiving a message in serial mode (to itself)"
+    endif
+    dat = .false.
+#else
     call gerv2d(ictxt,i,src,0) 
 
     dat = (i == 1) 
+#endif    
 
   end subroutine psb_lrcvs
 
 
   subroutine psb_isnds(ictxt,dat,dst)
+    use psb_error_mod
     integer, intent(in)  :: ictxt
     integer, intent(in)  :: dat
     integer, intent(in)  :: dst
     
-
+#if defined(SERIAL_MPI) 
+    if (psb_get_errverbosity() >1) then 
+      write(0,*) "Warning: process sending a message in serial mode (to itself)"
+    endif
+#else
     call gesd2d(ictxt,dat,dst,0) 
+#endif    
 
   end subroutine psb_isnds
 
   subroutine psb_isndv(ictxt,dat,dst)
+    use psb_error_mod
     integer, intent(in)  :: ictxt
     integer, intent(in)  :: dat(:)
     integer, intent(in)  :: dst
 
+#if defined(SERIAL_MPI) 
+    if (psb_get_errverbosity() >1) then 
+      write(0,*) "Warning: process sending a message in serial mode (to itself)"
+    endif
+#else
     call gesd2d(ictxt,dat,dst,0) 
+#endif    
 
   end subroutine psb_isndv
 
   subroutine psb_isndm(ictxt,dat,dst)
+    use psb_error_mod
     integer, intent(in)  :: ictxt
     integer, intent(in)  :: dat(:,:)
     integer, intent(in)  :: dst
 
+#if defined(SERIAL_MPI) 
+    if (psb_get_errverbosity() >1) then 
+      write(0,*) "Warning: process sending a message in serial mode (to itself)"
+    endif
+#else
     call gesd2d(ictxt,dat,dst,0) 
+#endif    
 
   end subroutine psb_isndm
 
 
   subroutine psb_dsnds(ictxt,dat,dst)
+    use psb_error_mod
     integer, intent(in)  :: ictxt
     real(kind(1.d0)), intent(in)  :: dat
     integer, intent(in)  :: dst
     
+#if defined(SERIAL_MPI) 
+    if (psb_get_errverbosity() >1) then 
+      write(0,*) "Warning: process sending a message in serial mode (to itself)"
+    endif
+#else
 
     call gesd2d(ictxt,dat,dst,0) 
+#endif    
 
   end subroutine psb_dsnds
 
   subroutine psb_dsndv(ictxt,dat,dst)
+    use psb_error_mod
     integer, intent(in)  :: ictxt
     real(kind(1.d0)), intent(in)  :: dat(:)
     integer, intent(in)  :: dst
 
+#if defined(SERIAL_MPI) 
+    if (psb_get_errverbosity() >1) then 
+      write(0,*) "Warning: process sending a message in serial mode (to itself)"
+    endif
+#else
     call gesd2d(ictxt,dat,dst,0) 
+#endif    
 
   end subroutine psb_dsndv
 
   subroutine psb_dsndm(ictxt,dat,dst)
+    use psb_error_mod
     integer, intent(in)  :: ictxt
     real(kind(1.d0)), intent(in)  :: dat(:,:)
     integer, intent(in)  :: dst
 
+#if defined(SERIAL_MPI) 
+    if (psb_get_errverbosity() >1) then 
+      write(0,*) "Warning: process sending a message in serial mode (to itself)"
+    endif
+#else
     call gesd2d(ictxt,dat,dst,0) 
+#endif    
 
   end subroutine psb_dsndm
 
 
   subroutine psb_zsnds(ictxt,dat,dst)
+    use psb_error_mod
     integer, intent(in)  :: ictxt
     complex(kind(1.d0)), intent(in)  :: dat
     integer, intent(in)  :: dst
     
+#if defined(SERIAL_MPI) 
+    if (psb_get_errverbosity() >1) then 
+      write(0,*) "Warning: process sending a message in serial mode (to itself)"
+    endif
+#else
 
     call gesd2d(ictxt,dat,dst,0) 
+#endif    
 
   end subroutine psb_zsnds
   
   subroutine psb_zsndv(ictxt,dat,dst)
+    use psb_error_mod
     integer, intent(in)  :: ictxt
     complex(kind(1.d0)), intent(in)  :: dat(:)
     integer, intent(in)  :: dst
 
+#if defined(SERIAL_MPI) 
+    if (psb_get_errverbosity() >1) then 
+      write(0,*) "Warning: process sending a message in serial mode (to itself)"
+    endif
+#else
     call gesd2d(ictxt,dat,dst,0) 
+#endif    
 
   end subroutine psb_zsndv
 
   subroutine psb_zsndm(ictxt,dat,dst)
+    use psb_error_mod
     integer, intent(in)  :: ictxt
     complex(kind(1.d0)), intent(in)  :: dat(:,:)
     integer, intent(in)  :: dst
+#if defined(SERIAL_MPI) 
+    if (psb_get_errverbosity() >1) then 
+      write(0,*) "Warning: process sending a message in serial mode (to itself)"
+    endif
+#else
 
     call gesd2d(ictxt,dat,dst,0) 
+#endif    
 
   end subroutine psb_zsndm
 
 
 
   subroutine psb_ircvs(ictxt,dat,src)
+    use psb_error_mod
     integer, intent(in)  :: ictxt
     integer, intent(inout)  :: dat
     integer, intent(in)  :: src
-    
-
+#if defined(SERIAL_MPI) 
+    if (psb_get_errverbosity() >0) then 
+      write(0,*) "Warning: process receiving a message in serial mode (to itself)"
+    endif
+    dat = 0
+#else
     call gerv2d(ictxt,dat,src,0) 
+#endif    
 
   end subroutine psb_ircvs
 
   subroutine psb_ircvv(ictxt,dat,src)
+    use psb_error_mod
     integer, intent(in)  :: ictxt
     integer, intent(inout)  :: dat(:)
     integer, intent(in)  :: src
 
+#if defined(SERIAL_MPI) 
+    if (psb_get_errverbosity() >0) then 
+      write(0,*) "Warning: process receiving a message in serial mode (to itself)"
+    endif
+    dat = 0
+#else
     call gerv2d(ictxt,dat,src,0) 
+#endif    
 
   end subroutine psb_ircvv
 
   subroutine psb_ircvm(ictxt,dat,src)
+    use psb_error_mod
     integer, intent(in)  :: ictxt
     integer, intent(inout)  :: dat(:,:)
     integer, intent(in)  :: src
 
+#if defined(SERIAL_MPI) 
+    if (psb_get_errverbosity() >0) then 
+      write(0,*) "Warning: process receiving a message in serial mode (to itself)"
+    endif
+    dat = 0
+#else
+
     call gerv2d(ictxt,dat,src,0) 
+#endif    
 
   end subroutine psb_ircvm
 
 
   subroutine psb_drcvs(ictxt,dat,src)
+    use psb_error_mod
     integer, intent(in)  :: ictxt
     real(kind(1.d0)), intent(inout)  :: dat
     integer, intent(in)  :: src
     
+#if defined(SERIAL_MPI) 
+    if (psb_get_errverbosity() >0) then 
+      write(0,*) "Warning: process receiving a message in serial mode (to itself)"
+    endif
+    dat = 0
+#else
 
     call gerv2d(ictxt,dat,src,0) 
+#endif    
 
   end subroutine psb_drcvs
 
   subroutine psb_drcvv(ictxt,dat,src)
+    use psb_error_mod
     integer, intent(in)  :: ictxt
     real(kind(1.d0)), intent(inout)  :: dat(:)
     integer, intent(in)  :: src
 
+#if defined(SERIAL_MPI) 
+    if (psb_get_errverbosity() >0) then 
+      write(0,*) "Warning: process receiving a message in serial mode (to itself)"
+    endif
+    dat = 0
+#else
     call gerv2d(ictxt,dat,src,0) 
+#endif    
 
   end subroutine psb_drcvv
 
   subroutine psb_drcvm(ictxt,dat,src)
+    use psb_error_mod
     integer, intent(in)  :: ictxt
     real(kind(1.d0)), intent(inout)  :: dat(:,:)
     integer, intent(in)  :: src
 
+#if defined(SERIAL_MPI) 
+    if (psb_get_errverbosity() >0) then 
+      write(0,*) "Warning: process receiving a message in serial mode (to itself)"
+    endif
+    dat = 0
+#else
     call gerv2d(ictxt,dat,src,0) 
+#endif    
 
   end subroutine psb_drcvm
 
 
   subroutine psb_zrcvs(ictxt,dat,src)
+    use psb_error_mod
     integer, intent(in)  :: ictxt
     complex(kind(1.d0)), intent(inout)  :: dat
     integer, intent(in)  :: src
     
+#if defined(SERIAL_MPI) 
+    if (psb_get_errverbosity() >0) then 
+      write(0,*) "Warning: process receiving a message in serial mode (to itself)"
+    endif
+    dat = 0
+#else
 
     call gerv2d(ictxt,dat,src,0) 
+#endif    
 
   end subroutine psb_zrcvs
   
   subroutine psb_zrcvv(ictxt,dat,src)
+    use psb_error_mod
     integer, intent(in)  :: ictxt
     complex(kind(1.d0)), intent(inout)  :: dat(:)
     integer, intent(in)  :: src
 
+#if defined(SERIAL_MPI) 
+    if (psb_get_errverbosity() >0) then 
+      write(0,*) "Warning: process receiving a message in serial mode (to itself)"
+    endif
+    dat = 0
+#else
     call gerv2d(ictxt,dat,src,0) 
+#endif    
 
   end subroutine psb_zrcvv
 
   subroutine psb_zrcvm(ictxt,dat,src)
+    use psb_error_mod
     integer, intent(in)  :: ictxt
     complex(kind(1.d0)), intent(inout)  :: dat(:,:)
     integer, intent(in)  :: src
 
+#if defined(SERIAL_MPI) 
+    if (psb_get_errverbosity() >0) then 
+      write(0,*) "Warning: process receiving a message in serial mode (to itself)"
+    endif
+    dat = 0
+#else
     call gerv2d(ictxt,dat,src,0) 
+#endif    
 
   end subroutine psb_zrcvm
 
@@ -1658,7 +2044,7 @@ contains
 
 
 
-
+#if !defined(SERIAL_MPI)
   
   subroutine igebs2ds(ictxt,scope,dat,top)
     integer, intent(in)   :: ictxt,dat
@@ -4398,6 +4784,7 @@ contains
     end if
       
   end subroutine zgamn2dm
+#endif    
   
 
 end module psb_penv_mod

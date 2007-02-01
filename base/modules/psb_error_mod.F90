@@ -112,8 +112,10 @@ contains
     integer :: temp(2)
     integer, parameter :: ione=1
     ! Cannot use psb_amx or otherwise we have a recursion in module usage
+#if !defined(SERIAL_MPI)
     call igamx2d(ictxt, 'A', ' ', ione, ione, err, ione,&
          &temp ,temp,-ione ,-ione,-ione)
+#endif    
   end subroutine psb_errcomm
 
 
@@ -127,10 +129,11 @@ contains
 
 
   ! returns verbosity of the error message
-  subroutine psb_get_errverbosity(v)
-    integer, intent(out) :: v
-    v=verbosity_level
-  end subroutine psb_get_errverbosity
+  function psb_get_errverbosity()
+    integer :: psb_get_errverbosity
+
+    psb_get_errverbosity=verbosity_level
+  end function psb_get_errverbosity
 
 
 
@@ -203,7 +206,6 @@ contains
     integer                 ::  nprow, npcol, me, mypcol
     integer, parameter      ::  ione=1, izero=0
 
-    call blacs_gridinfo(ictxt, nprow, npcol, me, mypcol)
 
     if(error_status.gt.0) then
       if(verbosity_level.gt.1) then
@@ -214,7 +216,11 @@ contains
           call psb_errmsg(err_c, r_name, i_e_d, a_e_d,me)
           !            write(0,'(50("="))')
         end do
+#if defined(SERIAL_MPI)
+        stop 
+#else        
         call blacs_abort(ictxt,-1)
+#endif
       else
 
         call psb_errpop(err_c, r_name, i_e_d, a_e_d)
@@ -222,12 +228,20 @@ contains
         do while (error_stack%n_elems.gt.0)
           call psb_errpop(err_c, r_name, i_e_d, a_e_d)
         end do
+#if defined(SERIAL_MPI)
+        stop 
+#else        
         call blacs_abort(ictxt,-1)
+#endif
       end if
     end if
 
     if(error_status.gt.izero) then
+#if defined(SERIAL_MPI)
+        stop 
+#else        
       call blacs_abort(ictxt,err_c)
+#endif
     end if
 
 

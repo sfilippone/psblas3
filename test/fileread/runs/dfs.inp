@@ -1,5 +1,5 @@
 10                  Number of inputs
-young1r.mtx         This (and others) from: http://math.nist.gov/MatrixMarket/  or 
+lapl600x600.mtx      young1r.mtx         This (and others) from: http://math.nist.gov/MatrixMarket/  or 
 NONE                       http://www.cise.ufl.edu/research/sparse/matrices/index.html
 BICGSTAB   
 CSR
@@ -7,6 +7,6 @@ CSR
 1                   ISTOPC
 00800               ITMAX
 -1                  ITRACE
-4                   IPREC       0:NONE  1:DIAGSC  2:ILU  3: AS 4: RAS 5: ASH 6: RASH
+2                   IPREC       0:NONE  1:DIAGSC  2:ILU  
 1                   ML
 1.d-6               EPS

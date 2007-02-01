@@ -1,6 +1,6 @@
 .mod=.mod
 .fh=.fh
-.SUFFIXES: .f90 $(.mod) .F90
+.SUFFIXES: .f90 $(.mod) .F90 .F
 
 
 #######################  Section 1 #######################
@@ -78,7 +78,11 @@ $(.mod).o:
 	$(F90) $(F90COPT) $(INCDIRS) -c $<
 .f90.o:
 	$(F90) $(F90COPT) $(INCDIRS) -c $<
+.F.o:
+	$(F90) $(F90COPT) $(INCDIRS) $(FDEFINES) -c $<
 .F90.o:
+	$(F90) $(F90COPT) $(INCDIRS) $(FDEFINES) -c $<
+.F90$(.mod):
 	$(F90) $(F90COPT) $(INCDIRS) $(FDEFINES) -c $<
 
 

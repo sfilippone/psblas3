@@ -100,8 +100,10 @@ C
       DOUBLE PRECISION   HIS( 2 )
 *     ..
 *     .. External Subroutines ..
+#if !defined(SERIAL_MPI)
       EXTERNAL           BLACS_GRIDINFO, DGEBR2D, DGEBS2D,
      $                   DGERV2D, DGESD2D
+#endif    
 *     ..
 *     .. External Functions ..
       LOGICAL            LSAME
@@ -122,6 +124,8 @@ C
          TRDEST = RDEST0
          TCDEST = CDEST0
       END IF
+#if  !defined(SERIAL_MPI)
+
 *
 *     Get grid parameters.
 *
@@ -234,6 +238,7 @@ C
      $                    TRDEST, TCDEST )
          END IF
       END IF
+#endif    
 *
       RETURN
 *

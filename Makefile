@@ -1,6 +1,6 @@
 include Make.inc
-#PREC=../mld2p4
-PREC=baseprec
+PREC=../mld2p4
+#PREC=baseprec
 
 library:
 	( [ -d lib ] || mkdir lib)

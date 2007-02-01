@@ -69,12 +69,18 @@ subroutine psb_cd_inloc(v, ictxt, desc_a, info)
   call psb_info(ictxt, me, np)
   if (debug) write(*,*) 'psb_cdall: ',np,me
 
-
-  loc_row = size(v)
-  m       = loc_row
-  call psb_sum(ictxt,m)
-
+  
+  if (.false.) then 
+    loc_row = size(v)
+    m       = loc_row
+    call psb_sum(ictxt,m)
+  else
+    m = maxval(v)
+    call psb_max(ictxt,m)
+  end if
+        
   n = m
+    
   !... check m and n parameters....
   if (m < 1) then
     info = 10

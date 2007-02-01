@@ -23,15 +23,23 @@ subroutine psb_restore_coher(ictxt,isvch)
 end subroutine psb_restore_coher
 subroutine psb_get_mpicomm(ictxt,comm)
   integer :: ictxt, comm
+#if !defined(SERIAL_MPI)
   call blacs_get(ictxt,10,comm)
+#else    
+  comm = ictxt
+#endif
 end subroutine psb_get_mpicomm
 subroutine psb_get_rank(rank,ictxt,id)
   integer :: rank,ictxt, id
   integer :: blacs_pnum
+#if defined(SERIAL_MPI)
+  rank = 0
+#else
   rank =  blacs_pnum(ictxt,id,0)
+#endif    
 end subroutine psb_get_rank
 
-#ifdef ESSL_BLACS
+#if defined(ESSL_BLACS) || defined(SERIAL_MPI)
 !
 ! Need these, as they are not in the ESSL implementation 
 ! of the BLACS. 
