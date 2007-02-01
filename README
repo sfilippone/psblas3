@@ -72,7 +72,8 @@ Craig C. Douglas  na.bank@na-net.ornl.gov and
 na.cdouglas@na-net.ornl.gov;  we wrapped  it in a Fortran 95 interface
 with dynamic memory allocation. 
 
-To compile and run our software you will need 
+To compile and run our software you will need the following
+prerequisites (see also SERIAL below):
 
 1. A working version of MPI
 
@@ -95,6 +96,20 @@ To compile and run our software you will need
    These are optional, you only need to install them if you actually
    want to use them. 
 
+To install, choose a Make.inc.XXX file for your compilers, modify the
+paths to libraries to  match your installation and copy it to
+Make.inc. Then  a make will compile the library; go to the test
+directory and its subdirectories to get test programs done. 
+
+
+SERIAL: We now provide an (experimental) option to run in serial
+	mode. This has only been tested with GCC but it should work
+	with the others as well. In serial mode you don't need the
+	prereqs 1 and 2 above, and you need to use the -serialmpi
+	Make.inc. BEWARE: we only provide a minimal set of fake mpi
+	routines that is known to work with our codes; specifically, we
+	do not handle a process doing send/receives to itself, and we
+	don't handle user defined data types. 
 
 TODO:
 
