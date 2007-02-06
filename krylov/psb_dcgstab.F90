@@ -103,8 +103,10 @@ Subroutine psb_dcgstab(a,prec,b,x,eps,desc_a,info,&
   Integer            :: istop_
   Real(Kind(1.d0)) :: alpha, beta, rho, rho_old, rni, xni, bni, ani,& 
        & sigma, omega, tau, rn0, bn2
-!!$  Integer   istpb, istpe, ifctb, ifcte, imerr, irank, icomm,immb,imme
-!!$  Integer mpe_log_get_event_number,mpe_Describe_state,mpe_log_event
+#ifdef MPE_KRYLOV
+  Integer   istpb, istpe, ifctb, ifcte, imerr, irank, icomm,immb,imme
+  Integer mpe_log_get_event_number,mpe_Describe_state,mpe_log_event
+#endif
   character(len=20)             :: name
 
   info = 0
@@ -115,6 +117,21 @@ Subroutine psb_dcgstab(a,prec,b,x,eps,desc_a,info,&
   ictxt = psb_cd_get_context(desc_a)
   call psb_info(ictxt, me, np)
   if (debug) write(*,*) 'PSB_DCGSTAB: From GRIDINFO',np,me
+#ifdef MPE_KRYLOV
+  call psb_get_mpicomm(ictxt,icomm)
+  call psb_get_rank(irank,ictxt,me)
+  istpb = mpe_log_get_event_number()
+  istpe = mpe_log_get_event_number()
+  ifctb  = mpe_log_get_event_number()
+  ifcte  = mpe_log_get_event_number()
+  immb  = mpe_log_get_event_number()
+  imme  = mpe_log_get_event_number()
+  if (irank==0) then 
+    info = mpe_describe_state(istpb,istpe,"Solver","WhiteSmoke")
+    info = mpe_describe_state(ifctb,ifcte,"PREC","SteelBlue")
+    info = mpe_describe_state(immb,imme,"SPMM","DarkOrange")
+  endif
+#endif
 
   mglob = psb_cd_get_global_rows(desc_a)
   n_row = psb_cd_get_local_rows(desc_a)
@@ -125,20 +142,15 @@ Subroutine psb_dcgstab(a,prec,b,x,eps,desc_a,info,&
   Else
     istop_ = 1
   Endif
-!
-!  ISTOP_ = 1:  Normwise backward error, infinity norm 
-!  ISTOP_ = 2:  ||r||/||b||   norm 2 
-!
+  !
+  !  ISTOP_ = 1:  Normwise backward error, infinity norm 
+  !  ISTOP_ = 2:  ||r||/||b||   norm 2 
+  !
 
-!!$  If ((prec%prec < min_prec_).Or.(prec%prec > max_prec_) ) Then
-!!$     Write(0,*) 'PSB_CGSTAB: Invalid IPREC',prec%prec
-!!$     info=5002
-!!$     int_err(1)=prec%prec
-!!$     err=info
-!!$     call psb_errpush(info,name,i_err=int_err)
-!!$     goto 9999
-!!$  Endif
-  
+#ifdef MPE_KRYLOV
+  imerr = MPE_Log_event( istpb, 0, "st CGSTAB" )
+#endif
+
   if ((istop_ < 1 ).or.(istop_ > 2 ) ) then
     write(0,*) 'psb_bicgstab: invalid istop',istop_ 
     info=5001
@@ -206,7 +218,13 @@ Subroutine psb_dcgstab(a,prec,b,x,eps,desc_a,info,&
     If (itx >= litmax) Exit restart  
     it = 0      
     Call psb_geaxpby(done,b,dzero,r,desc_a,info)
+#ifdef MPE_KRYLOV
+      imerr = MPE_Log_event( immb, 0, "st SPMM" )
+#endif
     Call psb_spmm(-done,a,x,done,r,desc_a,info,work=aux)
+#ifdef MPE_KRYLOV
+      imerr = MPE_Log_event( imme, 0, "ed SPMM" )
+#endif
     Call psb_geaxpby(done,r,dzero,q,desc_a,info)
     if (info /= 0) Then 
        info=4011
@@ -285,10 +303,20 @@ Subroutine psb_dcgstab(a,prec,b,x,eps,desc_a,info,&
         Call psb_geaxpby(done,r,beta,p,desc_a,info)
       End If
 
+#ifdef MPE_KRYLOV
+      imerr = MPE_Log_event( ifctb, 0, "st PREC" )
+#endif
       Call psb_precaply(prec,p,f,desc_a,info,work=aux)
+#ifdef MPE_KRYLOV
+      imerr = MPE_Log_event( ifcte, 0, "ed PREC" )
+      imerr = MPE_Log_event( immb, 0, "st SPMM" )
+#endif
 
       Call psb_spmm(done,a,f,dzero,v,desc_a,info,&
            & work=aux)
+#ifdef MPE_KRYLOV
+      imerr = MPE_Log_event( imme, 0, "ed SPMM" )
+#endif
 
       sigma = psb_gedot(q,v,desc_a,info)
       If (sigma==dzero) Then
@@ -308,14 +336,26 @@ Subroutine psb_dcgstab(a,prec,b,x,eps,desc_a,info,&
          goto 9999
       end if
       
+#ifdef MPE_KRYLOV
+      imerr = MPE_Log_event( ifctb, 0, "st PREC" )
+#endif
       Call psb_precaply(prec,s,z,desc_a,info,work=aux)
+#ifdef MPE_KRYLOV
+      imerr = MPE_Log_event( ifcte, 0, "ed PREC" )
+#endif
       if(info.ne.0) then
          call psb_errpush(4010,name,a_err='psb_precaply')
          goto 9999
       end if
 
+#ifdef MPE_KRYLOV
+      imerr = MPE_Log_event( immb, 0, "st SPMM" )
+#endif
       Call psb_spmm(done,a,z,dzero,t,desc_a,info,&
            & work=aux)
+#ifdef MPE_KRYLOV
+      imerr = MPE_Log_event( imme, 0, "ed SPMM" )
+#endif
 
       if(info.ne.0) then
          call psb_errpush(4010,name,a_err='psb_spmm')
@@ -380,7 +420,9 @@ Subroutine psb_dcgstab(a,prec,b,x,eps,desc_a,info,&
   Call psb_gefree(wwrk,desc_a,info)
   ! restore external global coherence behaviour
   call psb_restore_coher(ictxt,isvch)
-!!$  imerr = MPE_Log_event( istpe, 0, "ed CGSTAB" )
+#ifdef MPE_KRYLOV
+  imerr = MPE_Log_event( istpe, 0, "ed CGSTAB" )
+#endif
   if(info/=0) then
      call psb_errpush(info,name)
      goto 9999
