@@ -31,8 +31,9 @@
 ! File:  imsrx.f90 
  ! Subroutine: 
  ! Parameters:
-subroutine imsrx(n,x,indx,flag)
-  integer :: n, flag
+subroutine imsrx(n,x,indx,idir,flag)
+  use psb_serial_mod
+  integer :: n,idir,flag
   integer :: x(n)
   integer :: indx(n)
 
@@ -47,12 +48,14 @@ subroutine imsrx(n,x,indx,flag)
   endif
 
   if (n==0) return
-  if (n==1) then 
-    if (flag == 0) then 
-      indx(1) = 1
-    endif
-    return
-  endif
+
+  if (flag == psb_sort_ovw_idx_) then 
+    do k=1,n
+      indx(k) = k
+    enddo
+  end if
+
+  if (n==1) return
 
   allocate(iaux(0:n+1),stat=info)
   if (info/=0) then 
@@ -60,12 +63,11 @@ subroutine imsrx(n,x,indx,flag)
     return
   endif
 
-  if (flag == 0) then 
-    do k=1,n
-      indx(k) = k
-    enddo
+  if (idir == psb_sort_up_) then 
+    call mrgsrt(n,x,iaux,iret)
+  else
+    call mrgsrtd(n,x,iaux,iret)
   end if
-  call mrgsrt(n,x,iaux,iret)
 
   if (iret /= 1) then 
     lp = iaux(0)

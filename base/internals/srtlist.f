@@ -78,6 +78,7 @@ C
 ***********************************************************************
       SUBROUTINE SRTLIST(DEP_LIST,DL_LDA,LDL,NP,dg,dgp,upd,
      +  edges,idx,ich,INFO)
+      use psb_serial_mod
       IMPLICIT NONE
       INTEGER  NP, DL_LDA, INFO
       INTEGER  DEP_LIST(DL_LDA,*), LDL(*),DG(*), DGP(*), IDX(*),
@@ -131,7 +132,7 @@ c$$$            write(0,*) 'SRTLIST Input :',i,ip
           DGP(I) = -(DG(EDGES(1,I))+DG(EDGES(2,I)))
         ENDDO
 
-        CALL ISRX(NEDGES-IST+1,DGP(IST),IDX(IST))
+        call psb_msort(dgp(ist:nedges),ix=idx(ist:nedges))
         I1 = IST         
         NCH = 0
         DO I = IST, NEDGES
@@ -156,7 +157,7 @@ c$$$            write(0,*) 'SRTLIST Input :',i,ip
           info = 30
           return
         ENDIF
-        CALL ISR(NCH,ICH)
+        call psb_msort(ich(1:nch))
         DO I=1, NCH
           ISWAP(1)        = EDGES(1,IST)
           ISWAP(2)        = EDGES(2,IST)

@@ -17,6 +17,7 @@ c=======================================================================
      *  ic, jc, diagc,
      *  index)
       use psb_realloc_mod
+      use psb_serial_mod, only: psb_msort
 c
       integer       ia(*), ja(*), diaga,
      *  ib(*), jb(*), diagb,
@@ -120,7 +121,7 @@ c
           istart=index(istart)
           index(jc(j))=0
  40     continue
-        call isr(length,jc(ic(i)))
+        call psb_msort(jc(ic(i):ic(i)+length -1))
 c$$$        write(iunit,*) length,' : ',jc(ic(i):ic(i)+length-1)
         index(i) = 0
  50   continue

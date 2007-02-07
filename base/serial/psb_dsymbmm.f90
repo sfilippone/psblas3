@@ -41,6 +41,7 @@
 subroutine psb_dsymbmm(a,b,c,info)
   use psb_spmat_type
   use psb_string_mod
+  use psb_serial_mod, only : psb_msort
   implicit none 
 
   type(psb_dspmat_type) :: a,b,c
@@ -209,7 +210,7 @@ contains
           istart=index(istart)
           index(c%ia1(j))=0
         end do
-        call isr(length,c%ia1(c%ia2(i)))
+        call psb_msort(c%ia1(c%ia2(i):c%ia2(i)+length-1))
         index(i) = 0
       end do main
 

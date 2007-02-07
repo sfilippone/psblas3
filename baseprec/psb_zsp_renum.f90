@@ -89,7 +89,7 @@ subroutine psb_zsp_renum(a,desc_a,p,atmp,info)
     !
     !  We want:  NEW(I) = OLD(PERM(I))
     ! 
-    call isrx(nnr,itmp2,p%perm)
+    call psb_msort(itmp2(1:nnr),ix=p%perm)
 
     do k=1, nnr 
       p%invperm(p%perm(k)) = k
@@ -130,7 +130,7 @@ subroutine psb_zsp_renum(a,desc_a,p,atmp,info)
             atmp%ia1(j+k-1) = p%invperm(a%ia1(jj+kk-1))
           endif
         enddo
-        call isrx(k,atmp%ia1(j:j+k-1),itmp2)
+        call psb_msort(atmp%ia1(j:j+k-1),ix=itmp2)
         do kk=1,k
           atmp%aspk(j+kk-1) = ztmp(itmp2(kk))
         enddo
@@ -254,7 +254,7 @@ subroutine psb_zsp_renum(a,desc_a,p,atmp,info)
             atmp%ia1(j+k-1) = p%invperm(a%ia1(jj+kk-1))
           endif
         enddo
-        call isrx(k,atmp%ia1(j:j+k-1),itmp2)
+        call psb_msort(atmp%ia1(j:j+k-1),ix=itmp2)
         do kk=1,k
           atmp%aspk(j+kk-1) = ztmp(itmp2(kk))
         enddo

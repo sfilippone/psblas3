@@ -436,7 +436,7 @@ Subroutine psb_dcdovr(a,desc_a,novr,desc_ov,info, extype)
 
       if (i_ovr <= novr) then 
         if (tot_elem > 1) then 
-          call imsr(tot_elem,works(idxs+1))
+          call psb_msort(works(idxs+1:idxs+tot_elem))
           lx = works(idxs+1)
           i = 1 
           j = 1

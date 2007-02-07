@@ -31,9 +31,11 @@
 ! File:  imsr.f90 
  ! Subroutine: 
  ! Parameters:
-subroutine imsr(n,x)
-  integer :: n
+subroutine imsr(n,x,idir)
+  use psb_serial_mod
+  integer :: n, idir
   integer :: x(n)
+  
   
   integer, allocatable :: iaux(:)
   
@@ -53,8 +55,11 @@ subroutine imsr(n,x)
     return
   endif
   
-
-  call mrgsrt(n,x,iaux,iret)
+  if (idir==psb_sort_up_) then 
+    call mrgsrt(n,x,iaux,iret)
+  else
+    call mrgsrtd(n,x,iaux,iret)
+  end if
   
   if (iret == 0) then 
     lp = iaux(0)

@@ -32,6 +32,7 @@ subroutine psi_crea_bnd_elem(bndel,desc_a,info)
   use psb_realloc_mod
   use psb_descriptor_type
   use psb_error_mod
+  use psb_serial_mod
   implicit none
   
   integer, allocatable :: bndel(:)
@@ -67,7 +68,7 @@ subroutine psi_crea_bnd_elem(bndel,desc_a,info)
   enddo
 
   if (i>0) then 
-    call isr(i,work)
+    call psb_msort(work(1:i))
     j=1
     irv = work(1)
     do k=2, i

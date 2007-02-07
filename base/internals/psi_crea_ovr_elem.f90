@@ -33,6 +33,7 @@ subroutine psi_crea_ovr_elem(desc_overlap,ovr_elem,info)
   use psb_realloc_mod
   use psb_error_mod
   use psb_penv_mod
+  use psb_serial_mod
   implicit none
 
   !     ...parameter arrays....      
@@ -154,7 +155,7 @@ subroutine psi_crea_ovr_elem(desc_overlap,ovr_elem,info)
       i=i+2*desc_overlap(i)+2
     enddo
     if (nel > 0) then 
-      call imsr(nel,telem(:,1))
+      call psb_msort(telem(1:nel,1))
       iel        = telem(1,1)
       telem(1,2) = 2
       ix = 1

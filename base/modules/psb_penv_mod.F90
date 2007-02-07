@@ -71,7 +71,7 @@ module psb_penv_mod
     module procedure psb_ibcasts, psb_ibcastv, psb_ibcastm,&
          & psb_dbcasts, psb_dbcastv, psb_dbcastm,&
          & psb_zbcasts, psb_zbcastv, psb_zbcastm,&
-         & psb_hbcasts, psb_lbcasts
+         & psb_hbcasts, psb_lbcasts, psb_lbcastv
   end interface
 
 
@@ -542,6 +542,29 @@ contains
 #endif    
 
   end subroutine psb_lbcasts
+
+
+  subroutine psb_lbcastv(ictxt,dat,root)
+    use mpi
+    integer, intent(in)             :: ictxt
+    logical, intent(inout)          :: dat(:)
+    integer, intent(in), optional   :: root
+
+    integer  :: iam, np, root_,icomm,info
+
+#if !defined(SERIAL_MPI)
+    if (present(root)) then
+      root_ = root
+    else
+      root_ = 0
+    endif
+
+    call psb_info(ictxt,iam,np)
+    call psb_get_mpicomm(ictxt,icomm)
+    call mpi_bcast(dat,size(dat),MPI_LOGICAL,root_,icomm,info)
+#endif    
+
+  end subroutine psb_lbcastv
 
 
 
@@ -4785,6 +4808,69 @@ contains
       
   end subroutine zgamn2dm
 #endif    
-  
 
+
+  subroutine psb_set_coher(ictxt,isvch)
+    integer :: ictxt, isvch
+    ! Ensure global coherence for convergence checks.
+#ifdef NETLIB_BLACS
+    Call blacs_get(ictxt,16,isvch)
+    Call blacs_set(ictxt,16,1)
+#endif
+#ifdef ESSL_BLACS
+    ! Do nothing: ESSL does coherence by default,
+    ! and does not handle req=16 
+#endif
+  end subroutine psb_set_coher
+  subroutine psb_restore_coher(ictxt,isvch)
+    integer :: ictxt, isvch
+    ! Ensure global coherence for convergence checks.
+#ifdef NETLIB_BLACS
+    Call blacs_set(ictxt,16,isvch)
+#endif
+#ifdef ESSL_BLACS
+    ! Do nothing: ESSL does coherence by default,
+    ! and does not handle req=16 
+#endif
+  end subroutine psb_restore_coher
+  subroutine psb_get_mpicomm(ictxt,comm)
+    integer :: ictxt, comm
+#if !defined(SERIAL_MPI)
+    call blacs_get(ictxt,10,comm)
+#else    
+    comm = ictxt
+#endif
+  end subroutine psb_get_mpicomm
+  subroutine psb_get_rank(rank,ictxt,id)
+    integer :: rank,ictxt, id
+    integer :: blacs_pnum
+#if defined(SERIAL_MPI)
+    rank = 0
+#else
+    rank =  blacs_pnum(ictxt,id,0)
+#endif    
+  end subroutine psb_get_rank
+  
+#if defined(ESSL_BLACS) || defined(SERIAL_MPI)
+  !
+  ! Need these, as they are not in the ESSL implementation 
+  ! of the BLACS. 
+  !
+  integer function krecvid(contxt,proc_to_comm,myrow)
+    integer contxt,proc_to_comm,myrow
+    
+    krecvid=32766
+    
+    return
+  end function krecvid
+  integer function ksendid(contxt,proc_to_comm,myrow)
+    integer contxt,proc_to_comm,myrow
+    
+    ksendid=32766
+    
+    return
+  end function ksendid
+#endif
+  
+  
 end module psb_penv_mod

@@ -204,7 +204,7 @@ contains
           istart=index(istart)
           index(c%ia1(j))=0
         end do
-        call isr(length,c%ia1(c%ia2(i)))
+        call psb_msort(c%ia1(c%ia2(i):c%ia2(i)+length-1))
         index(i) = 0
       end do main
 

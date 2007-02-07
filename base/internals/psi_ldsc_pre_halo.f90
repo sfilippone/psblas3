@@ -113,7 +113,8 @@ subroutine psi_ldsc_pre_halo(desc,ext_hv,info)
     idx = desc%hashv(i)
     nh  = desc%hashv(i+1) - desc%hashv(i) 
     if (nh > 1) then 
-      call imsrx(nh,desc%glb_lc(idx,1),desc%glb_lc(idx,2),1)
+      call psb_msort(desc%glb_lc(idx:idx+nh-1,1),&
+           & ix=desc%glb_lc(idx:idx+nh-1,2),flag=psb_sort_keep_idx_)
     end if
   end do
 
