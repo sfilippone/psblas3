@@ -16,7 +16,7 @@ subroutine psb_get_ovrlap(ovrel,desc,info)
 
   if (.not.psb_is_asb_desc(desc)) then
     info = 1122
-    call psb_errorpush(info,name)
+    call psb_errpush(info,name)
     goto 9999
   end if
 
