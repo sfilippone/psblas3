@@ -2,6 +2,77 @@
 \label{sec:util}
 
 
+\subroutine{}{Sorting utilities}
+
+\subroutine*{psb\_msort}{Sorting by the Merge-sort algorithm}
+\subroutine*{psb\_qsort}{Sorting by the Quicksort  algorithm}
+\syntax{call psb\_msort}{x,ix,dir,flag}
+\syntax*{call psb\_qsort}{x,ix,dir,flag}
+
+These  serial routines sort a sequence $X$ into an order consistent
+with the underlying field from which the values are drawn. The
+argument meaning is identical; the only difference is the algorithm
+used to accomplish the task (see Usage Notes below).
+\begin{description}
+\item[\bf  On Entry ]
+\item[x] The sequence to be sorted.\\
+Type:{\bf required}.\\
+Specified as: an integer array of rank 1.
+\item[ix] A vector of indices.\\
+Type:{\bf optional}.\\
+Specified as: an integer array of (at least) the same size as $X$.
+\item[dir] The desired ordering.\\
+Type:{\bf optional}.\\
+Specified as: an integer value \verb|psb_sort_up_| or
+\verb|psb_sort_down_|; default \verb|psb_sort_up_|.
+\item[flag] Whether to keep the original values in $IX$.\\
+Type:{\bf optional}.\\
+Specified as: an integer value \verb|psb_sort_ovw_idx_| or
+\verb|psb_sort_keep_idx_|; default \verb|psb_sort_ovw_idx_|.
+
+\end{description}
+
+\begin{description}
+\item[\bf On Return]
+\item[x] The sequence of values, in the chosen ordering.\\ 
+Type:{\bf required}.\\
+Specified as: an integer array of rank 1.
+\item[ix] A vector of indices.\\
+Type: {\bf Optional} \\
+An integer array of rank 1, whose entries are moved to the same
+position as the corresponding entries in $x$.
+\end{description}
+\section*{Usage notes}
+\begin{enumerate}
+\item The two routines return the items in the chosen ordering; the
+  only difference is the handling of  ties (i.e. items with an equal
+  value) in the original input. With the merge-sort algorithm ties are
+  preserved in the same order as they had in the original sequence,
+  while this is not guaranteed for quicksort
+\item If $flag = psb\_sort\_ovw\_idx\_$ then the entries in $ix(1:n)$
+  where $n$ is the size of $x$ are initialized to $ix(i) \leftarrow
+  i$; thus, upon return from the subroutine, for each
+  index $i$ we have in $ix(i)$ the position that the item $x(i)$
+  occupied in the original data sequence; otherwise the routine will
+  shuffle around whatever data the user chose for its initialization. 
+\item The two sorting algorithms have a similar $O(n \log n)$ expected
+  running time; in the average case quicksort will be the
+  fastest. However note that:
+\begin{enumerate}
+\item The worst case running time for quicksort is $O(n^2)$; the algorithm
+  implemented here follows the well-known median-of-three heuristics,
+  but the worst case may still apply;
+\item The worst case running time for merge-sort is the same as the
+  average case;
+\item Our merge-sort is implemented to take advantage of any
+  subsequence that is already in the desired ordering at the
+  beginning; this situation may be quite common when dealing with
+  indices of sparse matrix entries, accordingly it is the preferred
+  choice when a sorting is needed by other routines in the library.
+\end{enumerate}
+\end{enumerate}
+
+
 \subroutine{PSB\_HBIO\_MOD}{Input/Output in Harwell-Boeing format}
 
 \subroutine*{hb\_read}{Read a sparse matrix from a file}
