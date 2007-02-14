@@ -243,7 +243,7 @@ contains
        int_err(2) = lldx
        int_err(3) = 6
        int_err(4) = psb_n_col_
-       int_err(5) = psb_cd_get_local_cols(desc_dec)
+       int_err(5) = psb_cd_get_global_rows(desc_dec)
     else if (psb_cd_get_global_cols(desc_dec) < m) then
        info=60
        int_err(1) = 1
