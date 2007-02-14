@@ -74,7 +74,7 @@ subroutine psb_glob_to_loc2(x,y,desc_a,info,iact,owned)
   if (present(iact)) then
     act=iact
   else
-    act='A'
+    act='I'
   endif
   act = toupper(act)
   if (present(owned)) then 
@@ -198,7 +198,7 @@ subroutine psb_glob_to_loc(x,desc_a,info,iact,owned)
   if (present(iact)) then
     act=iact
   else
-    act='A'
+    act='I'
   endif
   if (present(owned)) then 
     owned_=owned
