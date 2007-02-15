@@ -8,12 +8,12 @@ F90OBJS= psb_dilu_bld.o psb_dilu_fct.o\
 	psb_dprecbld.o psb_dprecset.o \
 	psb_ddiagsc_bld.o \
 	psb_dprc_aply.o \
-	psb_dbaseprc_aply.o psb_dbjac_aply.o\
+	psb_dgen_precaply.o psb_dbjac_aply.o\
 	psb_zilu_bld.o psb_zilu_fct.o\
 	psb_zsp_renum.o\
 	psb_zprecbld.o psb_zprecset.o \
 	psb_zdiagsc_bld.o  \
-	psb_zprc_aply.o psb_zbaseprc_aply.o psb_zbjac_aply.o
+	psb_zprc_aply.o psb_zgen_precaply.o psb_zbjac_aply.o
 
 LIBMOD=psb_prec_mod$(.mod)
 LOCAL_MODS=$(MODOBJS:.o=$(.mod))
