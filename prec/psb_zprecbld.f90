@@ -114,7 +114,7 @@ subroutine psb_zprecbld(a,desc_a,p,info,upd)
   !
 
   call psb_check_def(p%iprcparm(p_type_),'base_prec',&
-       &  diagsc_,is_legal_base_prec)
+       &  diagsc_,is_legal_prec)
 
   call psb_nullify_desc(p%desc_data)
 

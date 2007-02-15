@@ -85,12 +85,12 @@ module psb_prec_type
        &  fact_names(0:2)=(/'None          ','ILU(n)        ',&
        &  'ILU(eps)      '/)
 
-  interface psb_base_precfree
-    module procedure psb_dbase_precfree, psb_zbase_precfree
+  interface psb_precfree
+    module procedure psb_d_precfree, psb_z_precfree
   end interface
 
-  interface psb_nullify_baseprec
-    module procedure psb_nullify_dbaseprec, psb_nullify_zbaseprec
+  interface psb_nullify_prec
+    module procedure psb_nullify_dprec, psb_nullify_zprec
   end interface
 
   interface psb_check_def
@@ -120,7 +120,6 @@ contains
     integer  :: ilev
     
     write(iout,*) 'Preconditioner description'
-    write(iout,*) 'Base preconditioner'
     select case(p%iprcparm(p_type_))
     case(noprec_)
       write(iout,*) 'No preconditioning'
@@ -138,7 +137,6 @@ contains
     type(psb_zprec_type), intent(in) :: p
 
     write(iout,*) 'Preconditioner description'
-    write(iout,*) 'Base preconditioner'
     select case(p%iprcparm(p_type_))
     case(noprec_)
       write(iout,*) 'No preconditioning'
@@ -151,13 +149,13 @@ contains
   end subroutine psb_zfile_prec_descr
 
 
-  function is_legal_base_prec(ip)
+  function is_legal_prec(ip)
     integer, intent(in) :: ip
-    logical             :: is_legal_base_prec
+    logical             :: is_legal_prec
 
-    is_legal_base_prec = ((ip>=noprec_).and.(ip<=bja_))
+    is_legal_prec = ((ip>=noprec_).and.(ip<=bja_))
     return
-  end function is_legal_base_prec
+  end function is_legal_prec
   function is_legal_renum(ip)
     integer, intent(in) :: ip
     logical             :: is_legal_renum
@@ -221,12 +219,17 @@ contains
     end if
   end subroutine psb_dcheck_def
 
-  subroutine psb_dbase_precfree(p,info)
+  subroutine psb_d_precfree(p,info)
     type(psb_dprec_type), intent(inout) :: p
     integer, intent(out)                :: info
-    integer :: i
+    integer             :: ictxt,me, np,err_act,i
+    character(len=20)   :: name
+    if(psb_get_errstatus().ne.0) return 
+    info=0
+    name = 'psb_precfree'
+    call psb_erractionsave(err_act)
 
-    info = 0
+    me=-1
 
     ! Actually we migh just deallocate the top level array, except 
     ! for the inner UMFPACK or SLU stuff
@@ -249,7 +252,7 @@ contains
 
     if (allocated(p%desc_data%matrix_data)) &
          & call psb_cdfree(p%desc_data,info)
-    
+
     if (allocated(p%dprcparm)) then 
       deallocate(p%dprcparm,stat=info)
     end if
@@ -265,23 +268,38 @@ contains
     if (allocated(p%iprcparm)) then 
       deallocate(p%iprcparm,stat=info)
     end if
-    call psb_nullify_baseprec(p)
-  end subroutine psb_dbase_precfree
+    call psb_nullify_prec(p)
 
-  subroutine psb_nullify_dbaseprec(p)
+    call psb_erractionrestore(err_act)
+    return
+
+9999 continue
+    call psb_erractionrestore(err_act)
+    if (err_act.eq.psb_act_abort_) then
+      call psb_error()
+      return
+    end if
+    return
+
+  end subroutine psb_d_precfree
+
+  subroutine psb_nullify_dprec(p)
     type(psb_dprec_type), intent(inout) :: p
 
 !!$    nullify(p%av,p%d,p%iprcparm,p%dprcparm,p%perm,p%invperm,p%mlia,&
 !!$         & p%nlaggr,p%base_a,p%base_desc,p%dorig,p%desc_data, p%desc_ac)
 
-  end subroutine psb_nullify_dbaseprec
+  end subroutine psb_nullify_dprec
 
-  subroutine psb_zbase_precfree(p,info)
+  subroutine psb_z_precfree(p,info)
     type(psb_zprec_type), intent(inout) :: p
     integer, intent(out)                :: info
-    integer :: i
-
-    info = 0
+    integer             :: ictxt,me, np,err_act,i
+    character(len=20)   :: name
+    if(psb_get_errstatus().ne.0) return 
+    info=0
+    name = 'psb_precfree'
+    call psb_erractionsave(err_act)
 
     if (allocated(p%d)) then 
       deallocate(p%d,stat=info)
@@ -317,14 +335,24 @@ contains
     if (allocated(p%iprcparm)) then 
       deallocate(p%iprcparm,stat=info)
     end if
-    call psb_nullify_baseprec(p)
-  end subroutine psb_zbase_precfree
+    call psb_nullify_prec(p)
+    call psb_erractionrestore(err_act)
+    return
 
-  subroutine psb_nullify_zbaseprec(p)
+9999 continue
+    call psb_erractionrestore(err_act)
+    if (err_act.eq.psb_act_abort_) then
+      call psb_error()
+      return
+    end if
+    return
+  end subroutine psb_z_precfree
+
+  subroutine psb_nullify_zprec(p)
     type(psb_zprec_type), intent(inout) :: p
 
 
-  end subroutine psb_nullify_zbaseprec
+  end subroutine psb_nullify_zprec
 
 
   function pr_to_str(iprec)
