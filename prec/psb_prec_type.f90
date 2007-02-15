@@ -35,7 +35,8 @@
 
 module psb_prec_type
 
-  use psb_base_mod
+  ! Reduces size of .mod file.
+  use psb_base_mod, only : psb_dspmat_type, psb_zspmat_type, psb_desc_type
 
   integer, parameter :: min_prec_=0, noprec_=0, diagsc_=1, bja_=2,&
        &  max_prec_=2

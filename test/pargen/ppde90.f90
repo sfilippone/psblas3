@@ -631,7 +631,8 @@ contains
     call psb_amx(ictxt,tasb)
 
     if(iam == psb_root_) then
-      write(*,'("The matrix has been generated and assembeld in ",a3," format.")')a%fida(1:3)
+      write(*,'("The matrix has been generated and assembeld in ",a3," format.")')&
+           &   a%fida(1:3)
       write(*,'("-pspins time   : ",es10.4)')tins
       write(*,'("-insert time   : ",es10.4)')t2
       write(*,'("-assembly time : ",es10.4)')tasb
