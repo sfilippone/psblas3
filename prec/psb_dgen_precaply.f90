@@ -28,7 +28,7 @@
 !!$  POSSIBILITY OF SUCH DAMAGE.
 !!$ 
 !!$  
-subroutine psb_dbaseprc_aply(alpha,prec,x,beta,y,desc_data,trans,work,info)
+subroutine psb_dgen_precaply(alpha,prec,x,beta,y,desc_data,trans,work,info)
   !
   !  Compute   Y <-  beta*Y + alpha*K^-1 X 
   !  where K is a a basic preconditioner stored in prec
@@ -145,5 +145,5 @@ subroutine psb_dbaseprc_aply(alpha,prec,x,beta,y,desc_data,trans,work,info)
   end if
   return
 
-end subroutine psb_dbaseprc_aply
+end subroutine psb_dgen_precaply
 

@@ -48,18 +48,18 @@ subroutine psb_dprc_aply(prec,x,y,desc_data,info,trans, work)
   logical,parameter    :: debug=.false., debugprt=.false.
   character(len=20)   :: name
 
-  interface psb_baseprc_aply
-     subroutine psb_dbaseprc_aply(alpha,prec,x,beta,y,desc_data,trans,work,info)
+  interface psb_gen_precaply
+     subroutine psb_dgen_precaply(alpha,prec,x,beta,y,desc_data,trans,work,info)
        use psb_base_mod
        use psb_prec_type
-       type(psb_desc_type),intent(in)      :: desc_data
+       type(psb_desc_type),intent(in)   :: desc_data
        type(psb_dprec_type), intent(in) :: prec
-       real(kind(0.d0)),intent(inout)      :: x(:), y(:)
-       real(kind(0.d0)),intent(in)         :: alpha,beta
-       character(len=1)                    :: trans
-       real(kind(0.d0)),target             :: work(:)
-       integer, intent(out)                :: info
-     end subroutine psb_dbaseprc_aply
+       real(kind(0.d0)),intent(inout)   :: x(:), y(:)
+       real(kind(0.d0)),intent(in)      :: alpha,beta
+       character(len=1)                 :: trans
+       real(kind(0.d0)),target          :: work(:)
+       integer, intent(out)             :: info
+     end subroutine psb_dgen_precaply
   end interface
 
   name='psb_prc_aply'
@@ -86,7 +86,7 @@ subroutine psb_dprc_aply(prec,x,y,desc_data,info,trans, work)
 
   end if
 
-  call psb_baseprc_aply(done,prec,x,dzero,y,desc_data,trans_,work_,info)
+  call psb_gen_precaply(done,prec,x,dzero,y,desc_data,trans_,work_,info)
 
   if (present(work)) then 
   else

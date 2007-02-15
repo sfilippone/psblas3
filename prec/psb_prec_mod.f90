@@ -81,21 +81,6 @@ module psb_prec_mod
   end interface
 
 
-!!$  interface psb_precfree
-!!$    subroutine psb_dprecfree(p,info)
-!!$      use psb_base_mod
-!!$      use psb_prec_type
-!!$      type(psb_dprec_type), intent(inout) :: p
-!!$      integer, intent(out)                :: info
-!!$    end subroutine psb_dprecfree
-!!$    subroutine psb_zprecfree(p,info)
-!!$      use psb_base_mod
-!!$      use psb_prec_type
-!!$      type(psb_zprec_type), intent(inout) :: p
-!!$      integer, intent(out)                :: info
-!!$    end subroutine psb_zprecfree
-!!$  end interface
-
   interface psb_precaply
     subroutine psb_dprc_aply(prec,x,y,desc_data,info,trans,work)
       use psb_base_mod
