@@ -71,7 +71,7 @@ subroutine psb_loc_to_glob2(x,y,desc_a,info,iact)
   if (present(iact)) then
     act=iact
   else
-    act='A'
+    act='I'
   endif
   act=toupper(act)
 
@@ -196,7 +196,7 @@ subroutine psb_loc_to_glob(x,desc_a,info,iact)
   if (present(iact)) then
     act=iact
   else
-    act='A'
+    act='I'
   endif
   act = toupper(act)
 
