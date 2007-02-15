@@ -14,7 +14,8 @@
 
 This subroutine initializes the communication descriptor associated
 with an index space. Exactly one of the  optional arguments
-\verb|parts|, \verb|vg|, \verb|vl| must be specified, thereby choosing
+\verb|parts|, \verb|vg|, \verb|vl| or \verb|nl| 
+must be specified, thereby choosing
 the specific initialization strategy:
 \begin{description}
 \item[\bf  On Entry ]
@@ -109,7 +110,7 @@ An integer value; 0 means no error has been detected.
   the sum of the sizes of the individual vectors \verb|vl| specified
   on the calling processes. The subroutine will check that each entry
   in the global index space $(1\dots mg)$ is specified exactly once. 
-\item[nl] In this case we are implying a generalize row-block
+\item[nl] In this case we are implying a generalized row-block
   distribution in which each process $I$ gets assigned a consecutive
   chunk of $N_I=nl$ global indices.
 \end{description}
@@ -124,17 +125,24 @@ An integer value; 0 means no error has been detected.
 
 \syntax{call psb\_cdins}{nz, ia, ja, desc\_a, info}
 
+This subroutine examines the edges of the graph associated with the
+discretization mesh (and isomorphic to the sparsity pattern of a
+linear system coefficient matrix), storing them as necessary into the
+communication descriptor. It automatically ignores edges that do not
+insist on the  current process, i.e. edges for which neither the starting
+nor the end vertex belong to the current process. 
+
 \begin{description}
 \item[\bf On Entry]
 \item[nz] the number of points being inserted.\\
 Scope: {\bf local}.\\
 Type: {\bf required}.\\
 Specified as: an integer value.
-\item[ia] the row indices of the points being inserted.\\
+\item[ia] the indices of the starting vertex of the edges  being inserted.\\
 Scope: {\bf local}.\\
 Type: {\bf required}.\\
 Specified as: an integer array of length $nz$.
-\item[ja] the column indices of the points being inserted.\\
+\item[ja]  the indices of the end vertex of the edges  being inserted.\\
 Scope: {\bf local}.\\
 Type: {\bf required}.\\
 Specified as: an integer array of length $nz$.
@@ -272,7 +280,7 @@ Specified as: a structured data type.
 Scope:{\bf local}.\\
 Type:{\bf required}.\\
 Specified as: a structured data of type \spdata.
-\item[nl] the number of layers desired.\\
+\item[nl] the number of additional layers desired.\\
 Scope:{\bf global}.\\
 Type:{\bf required}.\\
 Specified as: an integer value $nl\ge 0$. 
@@ -295,6 +303,20 @@ Scope: {\bf local} \\
 Type: {\bf required} \\
 An integer value; 0 means no error has been detected. 
 \end{description}
+
+\section*{Notes}
+\begin{enumerate}
+\item Specifying \verb|psb_ovt_xhal_| for the \verb|extype| argument
+  the user will obtain a descriptor for a domain partition in which
+  the additional layers are fetched as part of an (extended) halo;
+  however the index-to-process mapping is identical to that of the
+  base descriptor;
+\item Specifying \verb|psb_ovt_asov_| for the \verb|extype| argument
+  the user will obtain a descriptor with an overlapped decomposition:
+  the additional layer is aggregated to  the local subdomain (and thus
+  is an overlap), and a new halo extending beyond the last additional
+  layer is formed. 
+\end{enumerate}
 
 
 %% %
@@ -467,7 +489,9 @@ An integer value; 0 means no error has been detected.
 \item If the descriptor is in the build state, then the sparse matrix
   must also be in the build state; the action of the routine is to
   (implicitly) call \verb|psb_cdins| to add entries to the sparsity
-  pattern;
+  pattern; each sparse matrix entry implicitly defines a graph edge,
+  that is passed to the descriptor routine for the appropriate
+  processing. 
 \item If the descriptor is in the assembled state, then any entries in
   the sparse matrix that would generate additional communication
   requirements will be ignored; 
@@ -945,7 +969,8 @@ Specified as: a structured data of type \descdata.
 \item[iact] specifies action to be taken in case of range errors. 
 Scope: {\bf global} \\
 Type: {\bf optional}\\
-Specified as: a character variable  \verb|E|, \verb|W| or \verb|A|. 
+Specified as: a character variable  \verb|I|gnore, \verb|W|arning or
+\verb|A|bort, default \verb|I|gnore.
 \end{description}
 
 \begin{description}

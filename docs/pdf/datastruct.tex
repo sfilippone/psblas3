@@ -64,6 +64,9 @@ processes with which it is necessary to communicate:
 The list may contain an arbitrary number of groups; its end is marked
 by a -1.\\
 Specified as: an allocatable integer array of rank one.
+\item[{\bf ext\_index}] A list of element indices to be exchanged to
+  implement the mapping between a base descriptor and a descriptor
+  with overlap. 
 \item [{\bf ovrlap\_index}] A list of the overlap elements for the
 current process, organized in groups like the previous vector:
 \begin{enumerate}
@@ -76,7 +79,7 @@ current process, organized in groups like the previous vector:
 The list may contain an arbitrary number of groups; its end is marked
 by a -1.\\
 Specified as: an allocatable integer array  of rank one.
-\item [{\bf ovrlap\_index}] For all overlap points belonging to th
+\item [{\bf ovrlap\_elem}] For all overlap points belonging to th
 ecurrent process:
 \begin{enumerate}
 \item  Overlap point index;
@@ -90,7 +93,7 @@ global identifier of the local variable $i$.\\
 Specified as: an allocatable integer array of rank one.
 \item[{\bf glob\_to\_loc, glb\_lc, hashv}] Contain a mapping from
   global to local indices. The mapping may be stored in two different
-  ways depending on the size of the index space. 
+  formats depending on the size of the index space. 
 \end{description}
 The Fortran95 definition  for \verb|psb_desc_type| structures is 
 as follows:
@@ -99,7 +102,8 @@ as follows:
     \begin{minipage}[tl]{0.9\textwidth}
 \begin{verbatim} 
 type psb_desc_type 
-   integer, allocatable :: matrix_data(:), halo_index(:), ext_index(:)
+   integer, allocatable :: matrix_data(:), halo_index(:)
+   integer, allocatable :: ext_index(:)
    integer, allocatable :: overlap_elem(:), overlap_index(:)
    integer, allocatable :: loc_to_glob(:), glob_to_loc(:)
    integer, allocatable :: hashv(:), glb_lc(:,:)
@@ -409,6 +413,23 @@ Specified as: a structured data of type \descdata.
 \begin{description}
 \item[\bf On Return]
 \item[Function value] The number of global rows in the mesh
+\end{description}
+
+\subsubroutine{psb\_cd\_get\_global\_cols}{Get number of global cols}
+
+\syntax{nr = psb\_cd\_get\_global\_cols}{desc}
+
+\begin{description}
+\item[\bf On Entry]
+\item[desc] the communication descriptor.\\
+Scope:{\bf local}.\\
+Type:{\bf required}.\\
+Specified as: a structured data of type \descdata.
+\end{description}
+
+\begin{description}
+\item[\bf On Return]
+\item[Function value] The number of global cols in the mesh
 \end{description}
 
 
