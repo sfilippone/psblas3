@@ -537,22 +537,17 @@ contains
     if (debug) write(0,*) 'Before realloc',nd,size(a%aspk),ni1,ni2
     call psb_realloc(nd,a%aspk,info)
     if (debug) write(0,*) 'After realloc',nd,size(a%aspk),info
-!!$    call flush(0)
     if (info /= 0) return 
     if (debug) write(0,*) 'Before realloc2',ni2,allocated(a%ia2),size(a%ia2)
-!!$    call flush(0)
     call psb_realloc(ni2,a%ia2,info)
     if (info /= 0) return 
     if (debug) write(0,*) 'Before realloc3',ni1,allocated(a%ia1),size(a%ia1)
-!!$    call flush(0)
     call psb_realloc(ni1,a%ia1,info)
     if (info /= 0) return
     if (debug) write(0,*) 'Before realloc4',max(1,a%m),allocated(a%pl),size(a%pl)
-!!$    call flush(0)
     call psb_realloc(max(1,a%m),a%pl,info)
     if (info /= 0) return
     if (debug) write(0,*) 'Before realloc5',max(1,a%k),allocated(a%pr),size(a%pr)
-!!$    call flush(0)
     call psb_realloc(max(1,a%k),a%pr,info)
     if (info /= 0) return
 

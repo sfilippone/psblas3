@@ -31,7 +31,7 @@
 
 module psi_mod
 
-  use psb_descriptor_type
+!!$  use psb_descriptor_type
 
 !!$  interface 
 !!$    subroutine psi_inner_cnv(n,x,hashsize,hashmask,hashv,glb_lc)
@@ -516,7 +516,6 @@ contains
       ih  = iand(key,hashmask)
       if (ih > ubound(hashv,1) ) then 
         write(0,*) ' In inner cnv: ',ih,ubound(hashv)
-        call flush(0)
       end if
       idx = hashv(ih)
       nh  = hashv(ih+1) - hashv(ih) 

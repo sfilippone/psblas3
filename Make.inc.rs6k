@@ -49,7 +49,10 @@ LDLIBS=$(BLACS) $(SLU) $(UMF) $(BLAS) $(METIS_LIB)
 
 #  Add -DLargeFptr for 64-bit addresses
 CDEFINES=-DNoChange $(SLUDEF) $(UMFDEF) -DLargeFptr
-FDEFINES=-WF,-DESSL_BLACS -WF,-DHAVE_MOVE_ALLOC
+FDEFINES=-WF,-DESSL_BLACS 
+# Apparently there's no MOVE_ALLOC yet in XLF. 
+#-WF,-DHAVE_MOVE_ALLOC 
+
 
 AR=ar -cur
 RANLIB=ranlib

@@ -266,7 +266,6 @@ Subroutine psb_dsphalo(a,desc_a,blk,info,rwcnv,clcnv,cliprow,outfmt,data)
   if (debugprt) then 
     open(30+me)
     call psb_csprt(30+me,tmp,head='% SPHALO border SEND .')
-    call flush(30+me)
     close(30+me)
   end if
 
@@ -305,7 +304,6 @@ Subroutine psb_dsphalo(a,desc_a,blk,info,rwcnv,clcnv,cliprow,outfmt,data)
     blk%infoa(psb_nnz_)=iszr
     open(40+me)
     call psb_csprt(40+me,blk,head='% SPHALO border .')
-    call flush(40+me)
     close(40+me)
   end if
   l1  = 0
@@ -330,7 +328,6 @@ Subroutine psb_dsphalo(a,desc_a,blk,info,rwcnv,clcnv,cliprow,outfmt,data)
   if (debugprt) then 
     open(50+me)
     call psb_csprt(50+me,blk,head='% SPHALO border .')
-    call flush(50+me)
     close(50+me)
     call psb_barrier(ictxt)
   end if
