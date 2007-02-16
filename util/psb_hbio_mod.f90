@@ -29,7 +29,7 @@
 !!$ 
 !!$  
 module psb_hbio_mod
-  use psb_base_mod
+
   public hb_read, hb_write
   interface hb_read
     module procedure dhb_read, zhb_read

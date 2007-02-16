@@ -29,7 +29,6 @@
 !!$ 
 !!$  
 module psb_psblas_mod
-  use psb_comm_mod
 
   interface psb_gedot
     function psb_ddotv(x, y, desc_a,info) 

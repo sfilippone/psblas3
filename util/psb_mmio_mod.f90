@@ -29,7 +29,7 @@
 !!$ 
 !!$  
 module psb_mmio_mod
-  use psb_base_mod
+
   public mm_mat_read, mm_mat_write
   interface mm_mat_read
     module procedure dmm_mat_read, zmm_mat_read

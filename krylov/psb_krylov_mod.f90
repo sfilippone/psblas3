@@ -30,9 +30,6 @@
 !!$  
 Module psb_krylov_mod
 
-  use psb_base_mod
-  use psb_prec_mod
-
 
   interface psb_krylov
     module procedure psb_dkrylov, psb_zkrylov
@@ -183,6 +180,10 @@ contains
 
   Subroutine psb_dkrylov(method,a,prec,b,x,eps,desc_a,info,&
        &itmax,iter,err,itrace,irst,istop)
+
+    use psb_base_mod
+    use psb_prec_mod
+
     character(len=*)                   :: method
     Type(psb_dspmat_type), Intent(in)  :: a
     Type(psb_desc_type), Intent(in)    :: desc_a
@@ -260,6 +261,8 @@ contains
 
   Subroutine psb_zkrylov(method,a,prec,b,x,eps,desc_a,info,&
        &itmax,iter,err,itrace,irst,istop)
+    use psb_base_mod
+    use psb_prec_mod
     character(len=*)                   :: method
     Type(psb_zspmat_type), Intent(in)  :: a
     Type(psb_desc_type), Intent(in)    :: desc_a
