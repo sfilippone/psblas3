@@ -27,7 +27,7 @@ MPCC=mpxlc
 #  Specify paths to libraries                            #
 ##########################################################
 BLAS=-lessl
-BLACS=-lmpiblacs
+BLACS=-lblacs
 
 
 #######################  Section 4 #######################
