@@ -373,12 +373,14 @@ Contains
     integer :: psb_isize2d
     integer, allocatable, intent(in) :: vin(:,:)
     integer, optional :: dim
+    integer :: dim_
 
     if (.not.allocated(vin)) then 
       psb_isize2d = 0
     else
       if (present(dim)) then 
-        psb_isize2d = size(vin,dim=dim)
+        dim_= dim
+        psb_isize2d = size(vin,dim=dim_)
       else
         psb_isize2d = size(vin)
       end if
@@ -399,12 +401,15 @@ Contains
     integer :: psb_dsize2d
     real(kind(1.d0)), allocatable, intent(in) :: vin(:,:)
     integer, optional :: dim
+    integer :: dim_
+
 
     if (.not.allocated(vin)) then 
       psb_dsize2d = 0
     else
       if (present(dim)) then 
-        psb_dsize2d = size(vin,dim=dim)
+        dim_= dim
+        psb_dsize2d = size(vin,dim=dim_)
       else
         psb_dsize2d = size(vin)
       end if
@@ -427,12 +432,14 @@ Contains
     integer :: psb_zsize2d
     complex(kind(1.d0)), allocatable, intent(in) :: vin(:,:)
     integer, optional :: dim
+    integer :: dim_
 
     if (.not.allocated(vin)) then 
       psb_zsize2d = 0
     else
       if (present(dim)) then 
-        psb_zsize2d = size(vin,dim=dim)
+        dim_= dim
+        psb_zsize2d = size(vin,dim=dim_)
       else
         psb_zsize2d = size(vin)
       end if
