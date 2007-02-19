@@ -34,6 +34,7 @@ module psb_base_mod
   use psb_penv_mod
   use psb_descriptor_type
   use psb_serial_mod
+  use psb_comm_mod
   use psb_psblas_mod
   use psb_tools_mod
 end module psb_base_mod

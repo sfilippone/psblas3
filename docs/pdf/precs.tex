@@ -66,10 +66,11 @@ $ptype$ string as follows\footnote{The string is case-insensitive}:
 \item[DIAG] Diagonal scaling; each entry of the input vector is
   multiplied by the reciprocal of the sum of the absolute values of
   the coefficients in the corresponding row of matrix  $A$;
-\item[ILU, BJA] Precondition by the incomplete LU factorization of the
+\item[BJAC] Precondition by a  factorization of the
   block-diagonal of matrix $A$, where block boundaries are determined
   by the data allocation boundaries for each process; requires no
-  communication. Only $ILU(0)$ is currently implemented. 
+  communication. Only the incomplete factorization $ILU(0)$ is
+  currently implemented.  
 %% \item[AS] Additive Schwarz preconditioner (see~\cite{PARA04}); in this
 %%   case the user may specify additional flags through the integer
 %%   vector \verb|ir| as follows:

@@ -155,12 +155,12 @@ program pde90
   select case(iprec)
   case(noprec_)
     call psb_precset(pre,'noprec',info)
-  case(diagsc_)             
-    call psb_precset(pre,'diagsc',info)
-  case(bja_)             
-    call psb_precset(pre,'ilu',info)
+  case(diag_)             
+    call psb_precset(pre,'diag',info)
+  case(bjac_)             
+    call psb_precset(pre,'bjac',info)
   case default
-    call psb_precset(pre,'ilu',info)
+    call psb_precset(pre,'bjac',info)
   end select
 
   call psb_barrier(ictxt)

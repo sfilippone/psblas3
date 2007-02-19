@@ -128,9 +128,7 @@ An integer value; 0 means no error has been detected.
 This subroutine examines the edges of the graph associated with the
 discretization mesh (and isomorphic to the sparsity pattern of a
 linear system coefficient matrix), storing them as necessary into the
-communication descriptor. It automatically ignores edges that do not
-insist on the  current process, i.e. edges for which neither the starting
-nor the end vertex belong to the current process. 
+communication descriptor.
 
 \begin{description}
 \item[\bf On Entry]
@@ -170,7 +168,10 @@ An integer value; 0 means no error has been detected.
 \section*{Notes}
 \begin{enumerate}
 \item This routine may only be called if the descriptor is in the
-  build state
+  build state;
+\item  This routine automatically ignores edges that do not
+insist on the  current process, i.e. edges for which neither the starting
+nor the end vertex belong to the current process. 
 \end{enumerate}
 
 
