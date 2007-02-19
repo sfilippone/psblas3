@@ -28,7 +28,7 @@
 !!$  POSSIBILITY OF SUCH DAMAGE.
 !!$ 
 !!$  
-subroutine psb_zgen_precaply(alpha,prec,x,beta,y,desc_data,trans,work,info)
+subroutine psb_zgprec_aply(alpha,prec,x,beta,y,desc_data,trans,work,info)
   !
   !  Compute   Y <-  beta*Y + alpha*K^-1 X 
   !  where K is a a basic preconditioner stored in prec
@@ -95,7 +95,7 @@ subroutine psb_zgen_precaply(alpha,prec,x,beta,y,desc_data,trans,work,info)
 
     call psb_geaxpby(alpha,x,beta,y,desc_data,info)
 
-  case(diagsc_)
+  case(diag_)
     
     if (size(work) >= size(x)) then 
       ww => work
@@ -119,7 +119,7 @@ subroutine psb_zgen_precaply(alpha,prec,x,beta,y,desc_data,trans,work,info)
       end if
     end if
 
-  case(bja_)
+  case(bjac_)
 
     call psb_bjac_aply(alpha,prec,x,beta,y,desc_data,trans,work,info)
     if(info.ne.0) then
@@ -130,7 +130,7 @@ subroutine psb_zgen_precaply(alpha,prec,x,beta,y,desc_data,trans,work,info)
 
   case default
     write(0,*) 'Invalid PRE%PREC ',prec%iprcparm(p_type_),':',&
-         & min_prec_,noprec_,diagsc_,bja_
+         & min_prec_,noprec_,diag_,bjac_
   end select
 
   call psb_erractionrestore(err_act)
@@ -145,5 +145,5 @@ subroutine psb_zgen_precaply(alpha,prec,x,beta,y,desc_data,trans,work,info)
   end if
   return
 
-end subroutine psb_zgen_precaply
+end subroutine psb_zgprec_aply
 

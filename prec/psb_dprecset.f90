@@ -59,16 +59,16 @@ subroutine psb_dprecset(p,ptype,info,iv,rs,rv)
     p%iprcparm(iren_)       = 0
     p%iprcparm(jac_sweeps_) = 1
 
-  case ('DIAG','DIAGSC')
+  case ('DIAG')
     p%iprcparm(:)           = 0
-    p%iprcparm(p_type_)     = diagsc_
+    p%iprcparm(p_type_)     = diag_
     p%iprcparm(f_type_)     = f_none_
     p%iprcparm(iren_)       = 0 
     p%iprcparm(jac_sweeps_) = 1
 
-  case ('BJA','ILU') 
+  case ('BJAC') 
     p%iprcparm(:)            = 0
-    p%iprcparm(p_type_)      = bja_
+    p%iprcparm(p_type_)      = bjac_
     p%iprcparm(f_type_)      = f_ilu_n_
     p%iprcparm(iren_)        = 0
     p%iprcparm(ilu_fill_in_) = 0

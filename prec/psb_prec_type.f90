@@ -38,7 +38,7 @@ module psb_prec_type
   ! Reduces size of .mod file.
   use psb_base_mod, only : psb_dspmat_type, psb_zspmat_type, psb_desc_type
 
-  integer, parameter :: min_prec_=0, noprec_=0, diagsc_=1, bja_=2,&
+  integer, parameter :: min_prec_=0, noprec_=0, diag_=1, bjac_=2,&
        &  max_prec_=2
 
   ! Entries in iprcparm: preconditioner type, factorization type,
@@ -124,9 +124,9 @@ contains
     select case(p%iprcparm(p_type_))
     case(noprec_)
       write(iout,*) 'No preconditioning'
-    case(diagsc_)
+    case(diag_)
       write(iout,*) 'Diagonal scaling'
-    case(bja_)
+    case(bjac_)
       write(iout,*) 'Block Jacobi with: ',&
            &  fact_names(p%iprcparm(f_type_))
     end select
@@ -141,9 +141,9 @@ contains
     select case(p%iprcparm(p_type_))
     case(noprec_)
       write(iout,*) 'No preconditioning'
-    case(diagsc_)
+    case(diag_)
       write(iout,*) 'Diagonal scaling'
-    case(bja_)
+    case(bjac_)
       write(iout,*) 'Block Jacobi with: ',&
            &  fact_names(p%iprcparm(f_type_))
     end select
@@ -154,7 +154,7 @@ contains
     integer, intent(in) :: ip
     logical             :: is_legal_prec
 
-    is_legal_prec = ((ip>=noprec_).and.(ip<=bja_))
+    is_legal_prec = ((ip>=noprec_).and.(ip<=bjac_))
     return
   end function is_legal_prec
   function is_legal_renum(ip)
@@ -221,6 +221,7 @@ contains
   end subroutine psb_dcheck_def
 
   subroutine psb_d_precfree(p,info)
+    use psb_base_mod
     type(psb_dprec_type), intent(inout) :: p
     integer, intent(out)                :: info
     integer             :: ictxt,me, np,err_act,i
@@ -293,6 +294,7 @@ contains
   end subroutine psb_nullify_dprec
 
   subroutine psb_z_precfree(p,info)
+    use psb_base_mod
     type(psb_zprec_type), intent(inout) :: p
     integer, intent(out)                :: info
     integer             :: ictxt,me, np,err_act,i
@@ -364,10 +366,10 @@ contains
     select case(iprec)
     case(noprec_)
       pr_to_str='NOPREC'
-    case(diagsc_)         
-      pr_to_str='DIAGSC'
-    case(bja_)         
-      pr_to_str='BJA'
+    case(diag_)         
+      pr_to_str='DIAG'
+    case(bjac_)         
+      pr_to_str='BJAC'
     case default
       pr_to_str='???'
     end select

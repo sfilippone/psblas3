@@ -48,8 +48,8 @@ subroutine psb_zprc_aply(prec,x,y,desc_data,info,trans, work)
   logical,parameter                 :: debug=.false., debugprt=.false.
   character(len=20)   :: name
 
-  interface psb_gen_precaply
-     subroutine psb_zgen_precaply(alpha,prec,x,beta,y,desc_data,trans,work,info)
+  interface psb_gprec_aply
+     subroutine psb_zgprec_aply(alpha,prec,x,beta,y,desc_data,trans,work,info)
        use psb_base_mod
        use psb_prec_type
        type(psb_desc_type),intent(in)      :: desc_data
@@ -59,7 +59,7 @@ subroutine psb_zprc_aply(prec,x,y,desc_data,info,trans, work)
        character(len=1)                    :: trans
        complex(kind(0.d0)),target          :: work(:)
        integer, intent(out)                :: info
-     end subroutine psb_zgen_precaply
+     end subroutine psb_zgprec_aply
   end interface
 
   name='psb_prc_aply'
@@ -86,7 +86,7 @@ subroutine psb_zprc_aply(prec,x,y,desc_data,info,trans, work)
 
   end if
   
-  call psb_gen_precaply(zone,prec,x,zzero,y,desc_data,trans_, work_,info)
+  call psb_gprec_aply(zone,prec,x,zzero,y,desc_data,trans_, work_,info)
 
   if (present(work)) then 
   else

@@ -110,7 +110,7 @@ subroutine psb_dprecbld(a,desc_a,p,info,upd)
   !
 
   call psb_check_def(p%iprcparm(p_type_),'base_prec',&
-       &  diagsc_,is_legal_prec)
+       &  diag_,is_legal_prec)
 
   call psb_nullify_desc(p%desc_data)
 
@@ -125,7 +125,7 @@ subroutine psb_dprecbld(a,desc_a,p,info,upd)
       goto 9999
     end if
 
-  case (diagsc_)
+  case (diag_)
 
     call psb_diagsc_bld(a,desc_a,p,iupd,info)
     if(debug) write(0,*)me,': out of psb_diagsc_bld'
@@ -136,7 +136,7 @@ subroutine psb_dprecbld(a,desc_a,p,info,upd)
       goto 9999
     end if
 
-  case (bja_)
+  case (bjac_)
 
     call psb_check_def(p%iprcparm(iren_),'renumbering',&
          &  renum_none_,is_legal_renum)
