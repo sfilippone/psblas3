@@ -45,8 +45,8 @@ module psb_prec_type
   ! prolongation type, restriction type, renumbering algorithm,
   ! number of overlap layers, pointer to SuperLU factors, 
   ! levels of fill in for ILU(N), 
-  integer, parameter :: p_type_=1, f_type_=2, iren_=5
-  integer, parameter :: ilu_fill_in_=8, jac_sweeps_=9
+  integer, parameter :: p_type_=1, f_type_=2
+  integer, parameter :: ilu_fill_in_=8
   !Renumbering. SEE BELOW
   integer, parameter :: renum_none_=0, renum_glb_=1, renum_gps_=2
   integer, parameter :: ifpsz=10
@@ -106,16 +106,19 @@ module psb_prec_type
 contains
 
   subroutine psb_out_prec_descr(p)
+    use psb_base_mod
     type(psb_dprec_type), intent(in) :: p
     call psb_file_prec_descr(6,p)
   end subroutine psb_out_prec_descr
 
   subroutine psb_zout_prec_descr(p)
+    use psb_base_mod
     type(psb_zprec_type), intent(in) :: p
     call psb_zfile_prec_descr(6,p)
   end subroutine psb_zout_prec_descr
 
   subroutine psb_file_prec_descr(iout,p)
+    use psb_base_mod
     integer, intent(in)              :: iout
     type(psb_dprec_type), intent(in) :: p
     integer  :: ilev
@@ -134,6 +137,7 @@ contains
   end subroutine psb_file_prec_descr
 
   subroutine psb_zfile_prec_descr(iout,p)
+    use psb_base_mod
     integer, intent(in)              :: iout
     type(psb_zprec_type), intent(in) :: p
 
@@ -151,26 +155,15 @@ contains
 
 
   function is_legal_prec(ip)
+    use psb_base_mod
     integer, intent(in) :: ip
     logical             :: is_legal_prec
 
     is_legal_prec = ((ip>=noprec_).and.(ip<=bjac_))
     return
   end function is_legal_prec
-  function is_legal_renum(ip)
-    integer, intent(in) :: ip
-    logical             :: is_legal_renum
-    ! For the time being we are disabling renumbering options. 
-    is_legal_renum = (ip ==0) 
-    return
-  end function is_legal_renum
-  function is_legal_jac_sweeps(ip)
-    integer, intent(in) :: ip
-    logical             :: is_legal_jac_sweeps
-    is_legal_jac_sweeps = (ip >= 1) 
-    return
-  end function is_legal_jac_sweeps
   function is_legal_ml_fact(ip)
+    use psb_base_mod
     integer, intent(in) :: ip
     logical             :: is_legal_ml_fact
 
@@ -178,6 +171,7 @@ contains
     return
   end function is_legal_ml_fact
   function is_legal_ml_eps(ip)
+    use psb_base_mod
     real(kind(1.d0)), intent(in) :: ip
     logical             :: is_legal_ml_eps
 
@@ -187,6 +181,7 @@ contains
 
 
   subroutine psb_icheck_def(ip,name,id,is_legal)
+    use psb_base_mod
     integer, intent(inout) :: ip
     integer, intent(in)    :: id
     character(len=*), intent(in) :: name
@@ -204,6 +199,7 @@ contains
   end subroutine psb_icheck_def
 
   subroutine psb_dcheck_def(ip,name,id,is_legal)
+    use psb_base_mod
     real(kind(1.d0)), intent(inout) :: ip
     real(kind(1.d0)), intent(in)    :: id
     character(len=*), intent(in) :: name
@@ -286,6 +282,7 @@ contains
   end subroutine psb_d_precfree
 
   subroutine psb_nullify_dprec(p)
+    use psb_base_mod
     type(psb_dprec_type), intent(inout) :: p
 
 !!$    nullify(p%av,p%d,p%iprcparm,p%dprcparm,p%perm,p%invperm,p%mlia,&
@@ -352,6 +349,7 @@ contains
   end subroutine psb_z_precfree
 
   subroutine psb_nullify_zprec(p)
+    use psb_base_mod
     type(psb_zprec_type), intent(inout) :: p
 
 
@@ -359,6 +357,7 @@ contains
 
 
   function pr_to_str(iprec)
+    use psb_base_mod
 
     integer, intent(in)  :: iprec
     character(len=10)     :: pr_to_str

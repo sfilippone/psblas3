@@ -35,7 +35,7 @@ subroutine psb_dgprec_aply(alpha,prec,x,beta,y,desc_data,trans,work,info)
   ! 
 
   use psb_base_mod
-  use psb_prec_type
+  use psb_prec_mod, psb_protect_name => psb_dgprec_aply
   implicit none 
 
   type(psb_desc_type),intent(in)      :: desc_data
@@ -55,21 +55,7 @@ subroutine psb_dgprec_aply(alpha,prec,x,beta,y,desc_data,trans,work,info)
   logical,parameter                 :: debug=.false., debugprt=.false.
   character(len=20)   :: name, ch_err
 
-  interface psb_bjac_aply
-     subroutine psb_dbjac_aply(alpha,prec,x,beta,y,desc_data,trans,work,info)
-       use psb_base_mod
-       use psb_prec_type
-       type(psb_desc_type), intent(in)       :: desc_data
-       type(psb_dprec_type), intent(in)   :: prec
-       real(kind(0.d0)),intent(inout)        :: x(:), y(:)
-       real(kind(0.d0)),intent(in)           :: alpha,beta
-       character(len=1)                      :: trans
-       real(kind(0.d0)),target               :: work(:)
-       integer, intent(out)                  :: info
-     end subroutine psb_dbjac_aply
-  end interface
-
-  name='psb_baseprc_aply'
+  name='psb_dgprec_aply'
   info = 0
   call psb_erractionsave(err_act)
 

@@ -37,7 +37,7 @@ subroutine psb_zbjac_aply(alpha,prec,x,beta,y,desc_data,trans,work,info)
   ! 
 
   use psb_base_mod
-  use psb_prec_type
+  use psb_prec_mod, psb_protect_name => psb_zbjac_aply
   implicit none 
 
   type(psb_desc_type), intent(in)       :: desc_data
@@ -100,90 +100,39 @@ subroutine psb_zbjac_aply(alpha,prec,x,beta,y,desc_data,trans,work,info)
   endif
 
 
-  if (prec%iprcparm(jac_sweeps_) == 1) then 
 
 
-    select case(prec%iprcparm(f_type_))
-    case(f_ilu_n_,f_ilu_e_) 
-
-      select case(trans)
-      case('N','n')
-
-        call psb_spsm(zone,prec%av(l_pr_),x,zzero,ww,desc_data,info,&
-             & trans='N',unit=diagl,choice=psb_none_,work=aux)
-        if(info /=0) goto 9999
-        ww(1:n_row) = ww(1:n_row)*prec%d(1:n_row)
-        call psb_spsm(alpha,prec%av(u_pr_),ww,beta,y,desc_data,info,&
-             & trans='N',unit=diagu,choice=psb_none_, work=aux)
-        if(info /=0) goto 9999
-
-      case('T','t','C','c')
-        call psb_spsm(zone,prec%av(u_pr_),x,zzero,ww,desc_data,info,&
-             & trans=trans,unit=diagu,choice=psb_none_, work=aux)
-        if(info /=0) goto 9999
-        ww(1:n_row) = ww(1:n_row)*prec%d(1:n_row)
-        call psb_spsm(alpha,prec%av(l_pr_),ww,beta,y,desc_data,info,&
-             & trans=trans,unit=diagl,choice=psb_none_,work=aux)
-        if(info /=0) goto 9999
-
-      end select
-
-
-    case default
-      write(0,*) 'Unknown factorization type in bjac_aply',prec%iprcparm(f_type_)
-    end select
-    if (debugprt) write(0,*)' Y: ',y(:)
-
-  else if (prec%iprcparm(jac_sweeps_) > 1) then 
-
-    ! Note: we have to add TRANS to this one !!!!!!!!! 
-
-    if (size(prec%av) < ap_nd_) then 
-      info = 4011
-      goto 9999
-    endif
-
-    allocate(tx(n_col),ty(n_col),stat=info)
-    if (info /= 0) then 
-      call psb_errpush(4010,name,a_err='Allocate')
-      goto 9999      
-    end if
-
-    tx = zzero
-    ty = zzero
-    select case(prec%iprcparm(f_type_)) 
-    case(f_ilu_n_,f_ilu_e_) 
-      do i=1, prec%iprcparm(jac_sweeps_) 
-        !   X(k+1) = M^-1*(b-N*X(k))
-        ty(1:n_row) = x(1:n_row)
-        call psb_spmm(-zone,prec%av(ap_nd_),tx,zone,ty,&
-             &   prec%desc_data,info,work=aux)
-        if(info /=0) goto 9999
-        call psb_spsm(zone,prec%av(l_pr_),ty,zzero,ww,&
-             & prec%desc_data,info,&
-             & trans='N',unit='U',choice=psb_none_,work=aux)
-        if(info /=0) goto 9999
-        ww(1:n_row) = ww(1:n_row)*prec%d(1:n_row)
-        call psb_spsm(zone,prec%av(u_pr_),ww,zzero,tx,&
-             & prec%desc_data,info,&
-             & trans='N',unit='U',choice=psb_none_,work=aux)
-        if(info /=0) goto 9999
-      end do
-
+  select case(prec%iprcparm(f_type_))
+  case(f_ilu_n_,f_ilu_e_) 
+    
+    select case(trans)
+    case('N','n')
+      
+      call psb_spsm(zone,prec%av(l_pr_),x,zzero,ww,desc_data,info,&
+           & trans='N',unit=diagl,choice=psb_none_,work=aux)
+      if(info /=0) goto 9999
+      ww(1:n_row) = ww(1:n_row)*prec%d(1:n_row)
+      call psb_spsm(alpha,prec%av(u_pr_),ww,beta,y,desc_data,info,&
+           & trans='N',unit=diagu,choice=psb_none_, work=aux)
+      if(info /=0) goto 9999
+      
+    case('T','t','C','c')
+      call psb_spsm(zone,prec%av(u_pr_),x,zzero,ww,desc_data,info,&
+           & trans=trans,unit=diagu,choice=psb_none_, work=aux)
+      if(info /=0) goto 9999
+      ww(1:n_row) = ww(1:n_row)*prec%d(1:n_row)
+      call psb_spsm(alpha,prec%av(l_pr_),ww,beta,y,desc_data,info,&
+           & trans=trans,unit=diagl,choice=psb_none_,work=aux)
+      if(info /=0) goto 9999
+      
     end select
     
-    call psb_geaxpby(alpha,tx,beta,y,desc_data,info)
     
-
-    deallocate(tx,ty)
-
-
-  else
-
-    goto 9999
-
-  endif
-
+  case default
+    write(0,*) 'Unknown factorization type in bjac_aply',prec%iprcparm(f_type_)
+  end select
+  if (debugprt) write(0,*)' Y: ',y(:)
+  
   if (n_col <= size(work)) then 
     if ((4*n_col+n_col) <= size(work)) then 
     else

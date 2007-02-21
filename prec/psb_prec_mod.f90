@@ -122,4 +122,117 @@ module psb_prec_mod
     end subroutine psb_zprc_aply1
   end interface
 
+
+  interface psb_bjac_aply
+     subroutine psb_dbjac_aply(alpha,prec,x,beta,y,desc_data,trans,work,info)
+       use psb_base_mod
+       use psb_prec_type
+       type(psb_desc_type), intent(in)       :: desc_data
+       type(psb_dprec_type), intent(in)   :: prec
+       real(kind(0.d0)),intent(inout)        :: x(:), y(:)
+       real(kind(0.d0)),intent(in)           :: alpha,beta
+       character(len=1)                      :: trans
+       real(kind(0.d0)),target               :: work(:)
+       integer, intent(out)                  :: info
+     end subroutine psb_dbjac_aply
+     subroutine psb_zbjac_aply(alpha,prec,x,beta,y,desc_data,trans,work,info)
+       use psb_base_mod
+       use psb_prec_type
+       type(psb_desc_type), intent(in)       :: desc_data
+       type(psb_zprec_type), intent(in)   :: prec
+       complex(kind(0.d0)),intent(inout)        :: x(:), y(:)
+       complex(kind(0.d0)),intent(in)           :: alpha,beta
+       character(len=1)                      :: trans
+       complex(kind(0.d0)),target               :: work(:)
+       integer, intent(out)                  :: info
+     end subroutine psb_zbjac_aply
+  end interface
+
+  interface psb_ilu_fct
+    subroutine psb_dilu_fct(a,l,u,d,info,blck)
+      use psb_base_mod
+      integer, intent(out)                ::     info
+      type(psb_dspmat_type),intent(in)    :: a
+      type(psb_dspmat_type),intent(inout) :: l,u
+      type(psb_dspmat_type),intent(in), optional, target :: blck
+      real(kind(1.d0)), intent(inout)     ::  d(:)
+    end subroutine psb_dilu_fct
+    subroutine psb_zilu_fct(a,l,u,d,info,blck)
+      use psb_base_mod
+      integer, intent(out)                ::     info
+      type(psb_zspmat_type),intent(in)    :: a
+      type(psb_zspmat_type),intent(inout) :: l,u
+      type(psb_zspmat_type),intent(in), optional, target :: blck
+      complex(kind(1.d0)), intent(inout)     ::  d(:)
+    end subroutine psb_zilu_fct
+  end interface
+
+  interface psb_ilu_bld
+    subroutine psb_dilu_bld(a,desc_a,p,upd,info)
+      use psb_base_mod
+      use psb_prec_type
+      integer, intent(out)                      :: info
+      type(psb_dspmat_type), intent(in), target :: a
+      type(psb_dprec_type), intent(inout)    :: p
+      type(psb_desc_type), intent(in)           :: desc_a
+      character, intent(in)                     :: upd
+    end subroutine psb_dilu_bld
+    subroutine psb_zilu_bld(a,desc_a,p,upd,info)
+      use psb_base_mod
+      use psb_prec_type
+      integer, intent(out)                      :: info
+      type(psb_zspmat_type), intent(in), target :: a
+      type(psb_zprec_type), intent(inout)    :: p
+      type(psb_desc_type), intent(in)           :: desc_a
+      character, intent(in)                     :: upd
+    end subroutine psb_zilu_bld
+  end interface
+
+  interface psb_diagsc_bld
+    subroutine psb_ddiagsc_bld(a,desc_a,p,upd,info)
+      use psb_base_mod
+      use psb_prec_type
+      integer, intent(out)                      :: info
+      type(psb_dspmat_type), intent(in), target :: a
+      type(psb_dprec_type), intent(inout)    :: p
+      type(psb_desc_type), intent(in)           :: desc_a
+      character, intent(in)                     :: upd
+    end subroutine psb_ddiagsc_bld
+    subroutine psb_zdiagsc_bld(a,desc_a,p,upd,info)
+      use psb_base_mod
+      use psb_prec_type
+      integer, intent(out)                      :: info
+      type(psb_zspmat_type), intent(in), target :: a
+      type(psb_zprec_type), intent(inout)    :: p
+      type(psb_desc_type), intent(in)           :: desc_a
+      character, intent(in)                     :: upd
+    end subroutine psb_zdiagsc_bld
+  end interface
+
+  interface psb_gprec_aply
+     subroutine psb_dgprec_aply(alpha,prec,x,beta,y,desc_data,trans,work,info)
+       use psb_base_mod
+       use psb_prec_type
+       type(psb_desc_type),intent(in)   :: desc_data
+       type(psb_dprec_type), intent(in) :: prec
+       real(kind(0.d0)),intent(inout)   :: x(:), y(:)
+       real(kind(0.d0)),intent(in)      :: alpha,beta
+       character(len=1)                 :: trans
+       real(kind(0.d0)),target          :: work(:)
+       integer, intent(out)             :: info
+     end subroutine psb_dgprec_aply
+
+     subroutine psb_zgprec_aply(alpha,prec,x,beta,y,desc_data,trans,work,info)
+       use psb_base_mod
+       use psb_prec_type
+       type(psb_desc_type),intent(in)      :: desc_data
+       type(psb_zprec_type), intent(in) :: prec
+       complex(kind(0.d0)),intent(inout)   :: x(:), y(:)
+       complex(kind(0.d0)),intent(in)      :: alpha,beta
+       character(len=1)                    :: trans
+       complex(kind(0.d0)),target          :: work(:)
+       integer, intent(out)                :: info
+     end subroutine psb_zgprec_aply
+  end interface
+
 end module psb_prec_mod

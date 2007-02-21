@@ -31,7 +31,7 @@
 subroutine psb_ddiagsc_bld(a,desc_a,p,upd,info)
 
   use psb_base_mod
-  use psb_prec_type
+  use psb_prec_mod, psb_protect_name => psb_ddiagsc_bld
   Implicit None
 
   type(psb_dspmat_type), target           :: a

@@ -31,7 +31,7 @@
 subroutine psb_dprc_aply(prec,x,y,desc_data,info,trans, work)
 
   use psb_base_mod
-  use psb_prec_type
+  use psb_prec_mod, psb_protect_name => psb_dprc_aply
   implicit none
 
   type(psb_desc_type),intent(in)      :: desc_data
@@ -47,20 +47,6 @@ subroutine psb_dprc_aply(prec,x,y,desc_data,info,trans, work)
   integer :: ictxt,np,me,err_act
   logical,parameter    :: debug=.false., debugprt=.false.
   character(len=20)   :: name
-
-  interface psb_gprec_aply
-     subroutine psb_dgprec_aply(alpha,prec,x,beta,y,desc_data,trans,work,info)
-       use psb_base_mod
-       use psb_prec_type
-       type(psb_desc_type),intent(in)   :: desc_data
-       type(psb_dprec_type), intent(in) :: prec
-       real(kind(0.d0)),intent(inout)   :: x(:), y(:)
-       real(kind(0.d0)),intent(in)      :: alpha,beta
-       character(len=1)                 :: trans
-       real(kind(0.d0)),target          :: work(:)
-       integer, intent(out)             :: info
-     end subroutine psb_dgprec_aply
-  end interface
 
   name='psb_prc_aply'
   info = 0
@@ -146,7 +132,7 @@ end subroutine psb_dprc_aply
 subroutine psb_dprc_aply1(prec,x,desc_data,info,trans)
 
   use psb_base_mod
-  use psb_prec_type
+  use psb_prec_mod, psb_protect_name => psb_dprc_aply1
   implicit none
 
   type(psb_desc_type),intent(in)    :: desc_data
@@ -156,28 +142,12 @@ subroutine psb_dprc_aply1(prec,x,desc_data,info,trans)
   character(len=1), optional        :: trans
   logical,parameter                 :: debug=.false., debugprt=.false.
 
-  interface 
-    subroutine psb_dprc_aply(prec,x,y,desc_data,info,trans, work)
-      
-      use psb_base_mod
-      use psb_prec_type
-      implicit none
-      
-      type(psb_desc_type),intent(in)      :: desc_data
-      type(psb_dprec_type), intent(in)    :: prec
-      real(kind(0.d0)),intent(inout)      :: x(:), y(:)
-      integer, intent(out)                :: info
-      character(len=1), optional          :: trans
-      real(kind(0.d0)), optional, target  :: work(:)
-    end subroutine psb_dprc_aply
-  end interface
-
   ! Local variables
   character     :: trans_
   integer :: ictxt,np,me,i, err_act
   real(kind(1.d0)), pointer :: WW(:), w1(:)
   character(len=20)   :: name
-  name='psb_dprec1'
+  name='psb_dprec_aply1'
   info = 0
   call psb_erractionsave(err_act)
   

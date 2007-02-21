@@ -31,7 +31,7 @@
 subroutine psb_zprecbld(a,desc_a,p,info,upd)
 
   use psb_base_mod
-  use psb_prec_type
+  use psb_prec_mod, psb_protect_name => psb_zprecbld
   Implicit None
 
   type(psb_zspmat_type), target              :: a
@@ -43,31 +43,6 @@ subroutine psb_zprecbld(a,desc_a,p,info,upd)
 
   ! Local scalars
 
-  interface psb_diagsc_bld
-    subroutine psb_zdiagsc_bld(a,desc_data,p,upd,info)
-      use psb_base_mod
-      use psb_prec_type
-      integer, intent(out) :: info
-      type(psb_zspmat_type), intent(in), target :: a
-      type(psb_desc_type),intent(in)            :: desc_data
-      type(psb_zprec_type), intent(inout)    :: p
-      character, intent(in)                     :: upd
-    end subroutine psb_zdiagsc_bld
-  end interface
-
-  interface psb_ilu_bld
-    subroutine psb_zilu_bld(a,desc_data,p,upd,info)
-      use psb_base_mod
-      use psb_prec_type
-      integer, intent(out) :: info
-      type(psb_zspmat_type), intent(in), target :: a
-      type(psb_desc_type),intent(in)            :: desc_data
-      type(psb_zprec_type), intent(inout)    :: p
-      character, intent(in)                     :: upd
-    end subroutine psb_zilu_bld
-  end interface
-
-  ! Local scalars
   Integer      :: err, nnzero, n_row, n_col,I,j,k,ictxt,&
        & me,mycol,np,npcol,mglob,lw, mtype, nrg, nzg, err_act
   real(kind(1.d0))         :: temp, real_err(5)
@@ -142,8 +117,6 @@ subroutine psb_zprecbld(a,desc_a,p,info,upd)
 
   case (bjac_)
 
-    call psb_check_def(p%iprcparm(iren_),'renumbering',&
-         &  renum_none_,is_legal_renum)
     call psb_check_def(p%iprcparm(f_type_),'fact',&
          &  f_ilu_n_,is_legal_ml_fact)
 

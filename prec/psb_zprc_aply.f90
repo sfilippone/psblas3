@@ -31,7 +31,8 @@
 subroutine psb_zprc_aply(prec,x,y,desc_data,info,trans, work)
 
   use psb_base_mod
-  use psb_prec_type
+  use psb_prec_mod, psb_protect_name => psb_zprc_aply
+
   implicit none
 
   type(psb_desc_type),intent(in)      :: desc_data
@@ -48,21 +49,7 @@ subroutine psb_zprc_aply(prec,x,y,desc_data,info,trans, work)
   logical,parameter                 :: debug=.false., debugprt=.false.
   character(len=20)   :: name
 
-  interface psb_gprec_aply
-     subroutine psb_zgprec_aply(alpha,prec,x,beta,y,desc_data,trans,work,info)
-       use psb_base_mod
-       use psb_prec_type
-       type(psb_desc_type),intent(in)      :: desc_data
-       type(psb_zprec_type), intent(in) :: prec
-       complex(kind(0.d0)),intent(inout)   :: x(:), y(:)
-       complex(kind(0.d0)),intent(in)      :: alpha,beta
-       character(len=1)                    :: trans
-       complex(kind(0.d0)),target          :: work(:)
-       integer, intent(out)                :: info
-     end subroutine psb_zgprec_aply
-  end interface
-
-  name='psb_prc_aply'
+  name='psb_zprec_aply'
   info = 0
   call psb_erractionsave(err_act)
 
@@ -146,7 +133,7 @@ end subroutine psb_zprc_aply
 subroutine psb_zprc_aply1(prec,x,desc_data,info,trans)
 
   use psb_base_mod
-  use psb_prec_type
+  use psb_prec_mod, psb_protect_name => psb_zprc_aply1
   implicit none
 
   type(psb_desc_type),intent(in)    :: desc_data
@@ -155,22 +142,6 @@ subroutine psb_zprc_aply1(prec,x,desc_data,info,trans)
   integer, intent(out)              :: info
   character(len=1), optional        :: trans
   logical,parameter                 :: debug=.false., debugprt=.false.
-
-  interface 
-    subroutine psb_zprc_aply(prec,x,y,desc_data,info,trans, work)
-      
-      use psb_base_mod
-      use psb_prec_type
-      implicit none
-      
-      type(psb_desc_type),intent(in)      :: desc_data
-      type(psb_zprec_type), intent(in)    :: prec
-      complex(kind(0.d0)),intent(inout)   :: x(:), y(:)
-      integer, intent(out)                :: info
-      character(len=1), optional          :: trans
-      complex(kind(0.d0)), optional, target  :: work(:)
-    end subroutine psb_zprc_aply
-  end interface
 
   ! Local variables
   character     :: trans_

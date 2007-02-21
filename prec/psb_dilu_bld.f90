@@ -30,7 +30,7 @@
 !!$  
 subroutine psb_dilu_bld(a,desc_a,p,upd,info)
   use psb_base_mod
-  use psb_prec_type
+  use psb_prec_mod, psb_protect_name => psb_dilu_bld
   implicit none
   !                                                                               
   !     .. Scalar Arguments ..                                                    
@@ -53,35 +53,10 @@ subroutine psb_dilu_bld(a,desc_a,p,upd,info)
   integer :: ictxt,np,me
   character(len=20)      :: name, ch_err
 
-  interface psb_ilu_fct
-    subroutine psb_dilu_fct(a,l,u,d,info,blck)
-      use psb_base_mod
-      integer, intent(out)                ::     info
-      type(psb_dspmat_type),intent(in)    :: a
-      type(psb_dspmat_type),intent(inout) :: l,u
-      type(psb_dspmat_type),intent(in), optional, target :: blck
-      real(kind(1.d0)), intent(inout)     ::  d(:)
-    end subroutine psb_dilu_fct
-  end interface
-
-  interface psb_sp_renum
-    subroutine psb_dsp_renum(a,desc_a,p,atmp,info)
-      use psb_base_mod
-      use psb_prec_type
-      implicit none
-
-      !     .. array Arguments ..                                                     
-      type(psb_dspmat_type), intent(in)      :: a
-      type(psb_dspmat_type), intent(inout)   :: atmp
-      type(psb_dprec_type), intent(inout) :: p
-      type(psb_desc_type), intent(in)        :: desc_a
-      integer, intent(out)   :: info
-    end subroutine psb_dsp_renum
-  end interface
 
   if(psb_get_errstatus().ne.0) return 
   info=0
-  name='psb_ilu_bld'
+  name='psb_dilu_bld'
   call psb_erractionsave(err_act)
 
   ictxt=psb_cd_get_context(desc_a)
@@ -144,90 +119,29 @@ subroutine psb_dilu_bld(a,desc_a,p,upd,info)
     end if
 
   endif
+  t3 = psb_wtime()
+  ! This is where we have mo renumbering, thus no need 
+  ! for ATMP
 
-  if (p%iprcparm(iren_) > 0) then 
-
-    !
-    ! Here we allocate a full copy to hold local A and received BLK
-    !
-
-    nztota = psb_sp_get_nnzeros(a)
-    call psb_sp_all(atmp,nztota,info)
-    if(info/=0) then
-      info=4011
-      call psb_errpush(info,name)
-      goto 9999
-    end if
-
-
-    !      write(0,*) 'ILU_BLD ',nztota,nztotb,a%m
-
-    call  psb_sp_renum(a,desc_a,p,atmp,info)
-
-    if(info/=0) then
-      info=4010
-      ch_err='psb_sp_renum'
-      call psb_errpush(info,name,a_err=ch_err)
-      goto 9999
-    end if
-
-    t3 = psb_wtime()
-    if (debugprt) then 
-      call psb_barrier(ictxt)
-      open(40+me) 
-      call psb_csprt(40+me,atmp,head='% Local matrix')
-      close(40+me)
-    endif
-    if (debug) write(0,*) me,' Factoring rows ',&
-         &atmp%m,a%m,atmp%ia2(atmp%m+1)-1
-
-    !
-    ! Ok, factor the matrix.  
-    !
-    t5 = psb_wtime()
-    blck%m=0
-    call psb_ilu_fct(atmp,p%av(l_pr_),p%av(u_pr_),p%d,info)
-    if(info/=0) then
-      info=4010
-      ch_err='psb_ilu_fct'
-      call psb_errpush(info,name,a_err=ch_err)
-      goto 9999
-    end if
-
-    call psb_sp_free(atmp,info) 
-    if(info/=0) then
-      info=4010
-      ch_err='psb_sp_free'
-      call psb_errpush(info,name,a_err=ch_err)
-      goto 9999
-    end if
-
-
-  else if (p%iprcparm(iren_) == 0) then
-    t3 = psb_wtime()
-    ! This is where we have mo renumbering, thus no need 
-    ! for ATMP
-
-    if (debugprt) then 
-      open(40+me)
-      call psb_barrier(ictxt)
-      call psb_csprt(40+me,a,iv=p%desc_data%loc_to_glob,&
-           &    head='% Local matrix')
-      close(40+me)
-    endif
-
-    t5= psb_wtime()
-    if (debug) write(0,*) me,' Going for ilu_fct'
-    if (debug) call psb_barrier(ictxt)
-    call psb_ilu_fct(a,p%av(l_pr_),p%av(u_pr_),p%d,info)
-    if(info/=0) then
-      info=4010
-      ch_err='psb_ilu_fct'
-      call psb_errpush(info,name,a_err=ch_err)
-      goto 9999
-    end if
-    if (debug) write(0,*) me,' Done dilu_fct'
+  if (debugprt) then 
+    open(40+me)
+    call psb_barrier(ictxt)
+    call psb_csprt(40+me,a,iv=p%desc_data%loc_to_glob,&
+         &    head='% Local matrix')
+    close(40+me)
   endif
+
+  t5= psb_wtime()
+  if (debug) write(0,*) me,' Going for ilu_fct'
+  if (debug) call psb_barrier(ictxt)
+  call psb_ilu_fct(a,p%av(l_pr_),p%av(u_pr_),p%d,info)
+  if(info/=0) then
+    info=4010
+    ch_err='psb_ilu_fct'
+    call psb_errpush(info,name,a_err=ch_err)
+    goto 9999
+  end if
+  if (debug) write(0,*) me,' Done dilu_fct'
 
 
   if (debugprt) then 
@@ -244,8 +158,7 @@ subroutine psb_dilu_bld(a,desc_a,p,upd,info)
     call psb_csprt(80+me,p%av(u_pr_),head='% Local U factor')
 
     close(80+me)
-  endif
-
+  end if
 
   !    ierr = MPE_Log_event( ifcte, 0, "st SIMPLE" )
   t6 = psb_wtime()

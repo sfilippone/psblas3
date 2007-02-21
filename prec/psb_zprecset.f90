@@ -31,7 +31,7 @@
 subroutine psb_zprecset(p,ptype,info,iv,rs,rv)
 
   use psb_base_mod
-  use psb_prec_type
+  use psb_prec_mod, psb_protect_name => psb_zprecset
   implicit none
 
   type(psb_zprec_type), intent(inout)    :: p
@@ -57,23 +57,17 @@ subroutine psb_zprecset(p,ptype,info,iv,rs,rv)
     p%iprcparm(:)           = 0
     p%iprcparm(p_type_)     = noprec_
     p%iprcparm(f_type_)     = f_none_
-    p%iprcparm(iren_)       = 0
-    p%iprcparm(jac_sweeps_) = 1
 
   case ('DIAG')
     p%iprcparm(:)           = 0
     p%iprcparm(p_type_)     = diag_
     p%iprcparm(f_type_)     = f_none_
-    p%iprcparm(iren_)       = 0 
-    p%iprcparm(jac_sweeps_) = 1
 
   case ('BJAC') 
     p%iprcparm(:)            = 0
     p%iprcparm(p_type_)      = bjac_
     p%iprcparm(f_type_)      = f_ilu_n_
-    p%iprcparm(iren_)        = 0
     p%iprcparm(ilu_fill_in_) = 0
-    p%iprcparm(jac_sweeps_)  = 1
 
   case default
     write(0,*) 'Unknown preconditioner type request "',ptype,'"'

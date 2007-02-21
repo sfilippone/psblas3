@@ -31,7 +31,7 @@
 subroutine psb_zdiagsc_bld(a,desc_a,p,upd,info)
 
   use psb_base_mod
-  use psb_prec_type
+  use psb_prec_mod, psb_protect_name => psb_zdiagsc_bld
   Implicit None
 
   type(psb_zspmat_type), target           :: a
