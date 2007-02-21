@@ -164,7 +164,6 @@ Subroutine psb_zcdovr(a,desc_a,novr,desc_ov,info, extype)
   index_dim = size(desc_a%halo_index)
   elem_dim  = size(desc_a%halo_index)
 
-
   l_tmp_ovr_idx = novr*(3*Max(2*index_dim,1)+1)
   l_tmp_halo    = novr*(3*Size(desc_a%halo_index))
 
@@ -711,8 +710,8 @@ Subroutine psb_zcdovr(a,desc_a,novr,desc_ov,info, extype)
   !
   ! At this point we have gathered all the indices in the halo at
   ! N levels of overlap. Just call icdasb forcing to use 
-  ! the halo_index provided. This is
-  ! the same routine as gets called inside CDASB.
+  ! the halo_index provided. This is the same routine as gets 
+  ! called inside CDASB.
   !
 
   if (debug) then

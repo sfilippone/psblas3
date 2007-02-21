@@ -216,7 +216,6 @@ contains
         k=0
 
         do i=irw,lrw
-
           do j=a%ia2(i),a%ia2(i+1)-1
             k             = k + 1
             b%ia1(nzb+k)  = i

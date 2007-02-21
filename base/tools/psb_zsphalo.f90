@@ -45,12 +45,13 @@
 !*                                                                           *
 !*                                                                           *
 !*****************************************************************************
-Subroutine psb_zsphalo(a,desc_a,blk,info,rwcnv,clcnv,outfmt)
+Subroutine psb_zsphalo(a,desc_a,blk,info,rwcnv,clcnv,cliprow,outfmt,data)
 
+  use psb_const_mod
   use psb_serial_mod
   use psb_descriptor_type
   use psb_realloc_mod
-  use psb_tools_mod, only : psb_glob_to_loc, psb_loc_to_glob
+  use psb_tools_mod, psb_protect_name => psb_zsphalo
   use psb_error_mod
   use psb_penv_mod
   use mpi
@@ -58,21 +59,24 @@ Subroutine psb_zsphalo(a,desc_a,blk,info,rwcnv,clcnv,outfmt)
 
   Type(psb_zspmat_type),Intent(in)    :: a
   Type(psb_zspmat_type),Intent(inout) :: blk
-  Type(psb_desc_type),Intent(in)      :: desc_a
+  Type(psb_desc_type),Intent(in), target :: desc_a
   integer, intent(out)                :: info
-  logical, optional, intent(in)       :: rwcnv,clcnv
+  logical, optional, intent(in)       :: rwcnv,clcnv,cliprow
   character(len=5), optional          :: outfmt 
+  integer, intent(in), optional       :: data
   !     ...local scalars....
   Integer    :: np,me,counter,proc,i, &
        &     n_el_send,k,n_el_recv,ictxt, idx, r, tot_elem,&
-       &     n_elem, j, ipx,mat_recv, iszs, iszr,idxs,idxr,nz
+       &     n_elem, j, ipx,mat_recv, iszs, iszr,idxs,idxr,nz, &
+       &     nrmin,data_
   Type(psb_zspmat_type)     :: tmp
   Integer :: l1, icomm, err_act
   Integer, allocatable  :: sdid(:,:), brvindx(:),rvid(:,:), &
        & rvsz(:), bsdindx(:),sdsz(:)
-  logical :: rwcnv_,clcnv_
+  integer, pointer :: idxv(:)
+  logical :: rwcnv_,clcnv_,cliprow_
   character(len=5)  :: outfmt_
-  Logical,Parameter :: debug=.false., usea2av=.true.
+  Logical,Parameter :: debug=.false., debugprt=.false.
   real(kind(1.d0)) :: t1,t2,t3,t4,t5,t6,t7,t8,t9
   character(len=20)   :: name, ch_err
 
@@ -92,9 +96,19 @@ Subroutine psb_zsphalo(a,desc_a,blk,info,rwcnv,clcnv,outfmt)
   else
     clcnv_ = .true.
   endif
+  if (present(cliprow)) then 
+    cliprow_ = cliprow
+  else
+    cliprow_ = .false.
+  endif
+  if (present(data)) then 
+    data_ = data
+  else
+    data_ = psb_comm_halo_
+  endif
 
   if (present(outfmt)) then 
-    call touppers(outfmt,outfmt_)
+    outfmt_ =  toupper(outfmt)
   else
     outfmt_ = 'CSR'
   endif
@@ -115,30 +129,45 @@ Subroutine psb_zsphalo(a,desc_a,blk,info,rwcnv,clcnv,outfmt)
 
   If (debug) Write(0,*)'dsphalo',me
 
+  select case(data_) 
+  case(psb_comm_halo_) 
+    idxv => desc_a%halo_index
+
+  case(psb_comm_ovr_) 
+    idxv => desc_a%ovrlap_index
+
+  case(psb_comm_ext_) 
+    idxv => desc_a%ext_index
+
+  case default
+    call psb_errpush(4010,name,a_err='wrong Data selector')
+    goto 9999
+  end select
+
 
   l1  = 0
 
   sdsz(:)=0
   rvsz(:)=0
   ipx = 1
-  blk%k = a%k
-  blk%m = 0 
   brvindx(ipx) = 0
   bsdindx(ipx) = 0
   counter=1
   idx = 0
   idxs = 0
   idxr = 0
+  blk%k = a%k
+  blk%m = 0 
   ! For all rows in the halo descriptor, extract and send/receive.
   Do 
-    proc=desc_a%halo_index(counter)
+    proc=idxv(counter)
     if (proc == -1) exit
-    n_el_recv = desc_a%halo_index(counter+psb_n_elem_recv_)
+    n_el_recv = idxv(counter+psb_n_elem_recv_)
     counter   = counter+n_el_recv
-    n_el_send = desc_a%halo_index(counter+psb_n_elem_send_)
+    n_el_send = idxv(counter+psb_n_elem_send_)
     tot_elem = 0
     Do j=0,n_el_send-1
-      idx = desc_a%halo_index(counter+psb_elem_send_+j)
+      idx = idxv(counter+psb_elem_send_+j)
       n_elem = psb_sp_get_nnz_row(idx,a)
       tot_elem = tot_elem+n_elem      
     Enddo
@@ -162,11 +191,11 @@ Subroutine psb_zsphalo(a,desc_a,blk,info,rwcnv,clcnv,outfmt)
   idxr = 0
   counter = 1
   Do 
-    proc=desc_a%halo_index(counter)
+    proc=idxv(counter)
     if (proc == -1) exit
-    n_el_recv = desc_a%halo_index(counter+psb_n_elem_recv_)
+    n_el_recv = idxv(counter+psb_n_elem_recv_)
     counter   = counter+n_el_recv
-    n_el_send = desc_a%halo_index(counter+psb_n_elem_send_)
+    n_el_send = idxv(counter+psb_n_elem_send_)
 
     bsdindx(proc+1) = idxs
     idxs = idxs + sdsz(proc+1)
@@ -199,15 +228,15 @@ Subroutine psb_zsphalo(a,desc_a,blk,info,rwcnv,clcnv,outfmt)
   idx = 0
 
   Do 
-    proc=desc_a%halo_index(counter)
+    proc=idxv(counter)
     if (proc == -1) exit 
-    n_el_recv=desc_a%halo_index(counter+psb_n_elem_recv_)
+    n_el_recv=idxv(counter+psb_n_elem_recv_)
     counter=counter+n_el_recv
-    n_el_send=desc_a%halo_index(counter+psb_n_elem_send_)
+    n_el_send=idxv(counter+psb_n_elem_send_)
     tot_elem=0
 
     Do j=0,n_el_send-1
-      idx = desc_a%halo_index(counter+psb_elem_send_+j)
+      idx = idxv(counter+psb_elem_send_+j)
       n_elem = psb_sp_get_nnz_row(idx,a)
 
       call psb_sp_getblk(idx,a,tmp,info,append=.true.)
@@ -225,8 +254,6 @@ Subroutine psb_zsphalo(a,desc_a,blk,info,rwcnv,clcnv,outfmt)
     counter   = counter+n_el_send+3
   Enddo
   nz = tmp%infoa(psb_nnz_)
-!!$  call csprt(20+me,tmp,head='% SPHALO border SEND .')
-!!$  close(20+me)
 
   if (rwcnv_) call psb_loc_to_glob(tmp%ia1(1:nz),desc_a,info,iact='I')
   if (clcnv_) call psb_loc_to_glob(tmp%ia2(1:nz),desc_a,info,iact='I')
@@ -236,8 +263,11 @@ Subroutine psb_zsphalo(a,desc_a,blk,info,rwcnv,clcnv,outfmt)
     call psb_errpush(info,name,a_err=ch_err)
     goto 9999
   end if
-!!$  call csprt(30+me,tmp,head='% SPHALO border SEND .')
-!!$  close(30+me)
+  if (debugprt) then 
+    open(30+me)
+    call psb_csprt(30+me,tmp,head='% SPHALO border SEND .')
+    close(30+me)
+  end if
 
 
   call mpi_alltoallv(tmp%aspk,sdsz,bsdindx,mpi_double_complex,&
@@ -259,8 +289,9 @@ Subroutine psb_zsphalo(a,desc_a,blk,info,rwcnv,clcnv,outfmt)
   !
   ! Convert into local numbering 
   !
-  if (rwcnv_) call psb_glob_to_loc(blk%ia1(1:iszr),desc_a,info,iact='I')
+  if (rwcnv_) call psb_glob_to_loc(blk%ia1(1:iszr),desc_a,info,iact='I',owned=cliprow_)
   if (clcnv_) call psb_glob_to_loc(blk%ia2(1:iszr),desc_a,info,iact='I')
+
   if (info /= 0) then
     info=4010
     ch_err='psbglob_to_loc'
@@ -268,24 +299,38 @@ Subroutine psb_zsphalo(a,desc_a,blk,info,rwcnv,clcnv,outfmt)
     goto 9999
   end if
 
+  if (debugprt) then 
+    blk%fida='COO'
+    blk%infoa(psb_nnz_)=iszr
+    open(40+me)
+    call psb_csprt(40+me,blk,head='% SPHALO border .')
+    close(40+me)
+  end if
   l1  = 0
+  blk%m=0
+  nrmin=max(0,a%m)
   Do i=1,iszr
 !!$      write(0,*) work5(i),work6(i)
     r=(blk%ia1(i))
     k=(blk%ia2(i))
-    If (k.Gt.0) Then
+    If ((r>nrmin).and.(k>0)) Then
       l1=l1+1
       blk%aspk(l1) = blk%aspk(i)
       blk%ia1(l1) = r
       blk%ia2(l1) = k
       blk%k = max(blk%k,k)
+      blk%m = max(blk%m,r)
     End If
   Enddo
   blk%fida='COO'
   blk%infoa(psb_nnz_)=l1
-!!$  open(50+me)
-!!$  call csprt(50+me,blk,head='% SPHALO border .')
-!!$  close(50+me)
+  blk%m = blk%m - a%m
+  if (debugprt) then 
+    open(50+me)
+    call psb_csprt(50+me,blk,head='% SPHALO border .')
+    close(50+me)
+    call psb_barrier(ictxt)
+  end if
   t4 = psb_wtime()
 
   if(debug) Write(0,*)me,'End first loop',counter,l1,blk%m
@@ -308,6 +353,10 @@ Subroutine psb_zsphalo(a,desc_a,blk,info,rwcnv,clcnv,outfmt)
     ! Do nothing! 
   case default
     write(0,*) 'Error in DSPHALO : invalid outfmt "',outfmt_,'"'
+    info=4010
+    ch_err='Bad outfmt'
+    call psb_errpush(info,name,a_err=ch_err)
+    goto 9999
   end select
   t5 = psb_wtime()
 

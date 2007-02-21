@@ -55,7 +55,6 @@ Subroutine psb_dcdovr(a,desc_a,novr,desc_ov,info, extype)
   use psb_realloc_mod
   use psi_mod
   use mpi
-
   Implicit None
 
   !     .. Array Arguments ..

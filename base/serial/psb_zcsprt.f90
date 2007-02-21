@@ -74,13 +74,16 @@ subroutine psb_zcsprt(iout,a,iv,eirs,eics,head,ivr,ivc)
   if (present(head)) then 
     write(iout,'(a)') '%%MatrixMarket matrix coordinate complex general'
     write(iout,'(a,a)') '% ',head 
-    write(iout,'(a)') '%'
+    write(iout,'(a)') '%'    
+    write(iout,'(a,a)') '% ',toupper(a%fida)
   endif
 
-  if (toupper(a%fida)=='CSR') then 
+  select case(toupper(a%fida)) 
+
+  case ('CSR')
 
     write(iout,*) a%m,a%k,a%ia2(a%m+1)-1
-    
+
     if (present(iv)) then 
       do i=1, a%m
         do j=a%ia2(i),a%ia2(i+1)-1
@@ -115,7 +118,45 @@ subroutine psb_zcsprt(iout,a,iv,eirs,eics,head,ivr,ivc)
       endif
     endif
 
-  else  if (toupper(a%fida)=='COO') then 
+  case ('CSC')
+
+    write(iout,*) a%m,a%k,a%ia2(a%k+1)-1
+
+    if (present(iv)) then 
+      do i=1, a%k
+        do j=a%ia2(i),a%ia2(i+1)-1
+          write(iout,frmtr) iv(irs+a%ia1(j)),iv(ics+i),a%aspk(j)
+        enddo
+      enddo
+    else
+      if (present(ivr).and..not.present(ivc)) then 
+        do i=1, a%k
+          do j=a%ia2(i),a%ia2(i+1)-1
+            write(iout,frmtr) ivr(irs+a%ia1(j)),(ics+i),a%aspk(j)
+          enddo
+        enddo
+      else if (present(ivr).and.present(ivc)) then 
+        do i=1, a%k
+          do j=a%ia2(i),a%ia2(i+1)-1
+            write(iout,frmtr) ivr(irs+a%ia1(j)),ivc(ics+i),a%aspk(j)
+          enddo
+        enddo
+      else if (.not.present(ivr).and.present(ivc)) then 
+        do i=1, a%m
+          do j=a%ia2(i),a%ia2(i+1)-1
+            write(iout,frmtr) (irs+a%ia1(j)),ivc(ics+i),a%aspk(j)
+          enddo
+        enddo
+      else if (.not.present(ivr).and..not.present(ivc)) then 
+        do i=1, a%k
+          do j=a%ia2(i),a%ia2(i+1)-1
+            write(iout,frmtr) (irs+a%ia1(j)),(ics+i),a%aspk(j)
+          enddo
+        enddo
+      endif
+    endif
+
+  case ('COO') 
 
     if (present(ivr).and..not.present(ivc)) then 
       write(iout,*) a%m,a%k,a%infoa(psb_nnz_)
@@ -138,7 +179,8 @@ subroutine psb_zcsprt(iout,a,iv,eirs,eics,head,ivr,ivc)
         write(iout,frmtr) a%ia1(j),a%ia2(j),a%aspk(j)
       enddo
     endif
-  else
+  case default
     write(0,*) 'Feeling lazy today, format not implemented: "',a%fida,'"'
-  endif
+  end select
+  close(iout)
 end subroutine psb_zcsprt

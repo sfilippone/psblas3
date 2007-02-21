@@ -51,7 +51,7 @@ Subroutine psb_dsphalo(a,desc_a,blk,info,rwcnv,clcnv,cliprow,outfmt,data)
   use psb_serial_mod
   use psb_descriptor_type
   use psb_realloc_mod
-  use psb_tools_mod, only : psb_glob_to_loc, psb_loc_to_glob
+  use psb_tools_mod, psb_protect_name => psb_dsphalo
   use psb_error_mod
   use psb_penv_mod
   use mpi
@@ -67,8 +67,8 @@ Subroutine psb_dsphalo(a,desc_a,blk,info,rwcnv,clcnv,cliprow,outfmt,data)
   !     ...local scalars....
   Integer    :: np,me,counter,proc,i, &
        &     n_el_send,k,n_el_recv,ictxt, idx, r, tot_elem,&
-       &     n_elem, j, ipx,mat_recv, iszs, iszr,idxs,idxr,nz,nrmin,&
-       &     data_
+       &     n_elem, j, ipx,mat_recv, iszs, iszr,idxs,idxr,nz,&
+       &     nrmin,data_
   Type(psb_dspmat_type)     :: tmp
   Integer :: l1, icomm, err_act
   Integer, allocatable  :: sdid(:,:), brvindx(:),rvid(:,:), &

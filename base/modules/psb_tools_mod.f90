@@ -142,15 +142,16 @@ Module psb_tools_mod
       character(len=5), optional          :: outfmt 
       integer, intent(in), optional       :: data
     end Subroutine psb_dsphalo
-    Subroutine psb_zsphalo(a,desc_a,blk,info,rwcnv,clcnv,outfmt)
+    Subroutine psb_zsphalo(a,desc_a,blk,info,rwcnv,clcnv,cliprow,outfmt,data)
       use psb_descriptor_type
       use psb_spmat_type
       Type(psb_zspmat_type),Intent(in)    :: a
       Type(psb_zspmat_type),Intent(inout) :: blk
       Type(psb_desc_type),Intent(in)      :: desc_a
       integer, intent(out)                :: info
-      logical, optional, intent(in)       :: rwcnv,clcnv
+      logical, optional, intent(in)       :: rwcnv,clcnv,cliprow
       character(len=5), optional          :: outfmt 
+      integer, intent(in), optional       :: data
     end Subroutine psb_zsphalo
   end interface
 
