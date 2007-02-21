@@ -29,6 +29,7 @@
 !!$ 
 !!$  
 subroutine psi_crea_bnd_elem(bndel,desc_a,info)
+  use psi_mod, psb_protect_name => psi_crea_bnd_elem
   use psb_realloc_mod
   use psb_descriptor_type
   use psb_error_mod

@@ -30,6 +30,7 @@
 !!$  
 subroutine psi_dl_check(dep_list,dl_lda,np,length_dl)
 
+  use psi_mod, psb_protect_name => psi_dl_check
   use psb_const_mod
   use psb_descriptor_type
   implicit none

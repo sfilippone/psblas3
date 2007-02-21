@@ -33,6 +33,7 @@ subroutine psi_sort_dl(dep_list,l_dep_list,np,info)
   !     interface between former sort_dep_list subroutine
   !     and new srtlist
   !
+  use psi_mod, psb_protect_name => psi_sort_dl
   use psb_const_mod
   use psb_error_mod
   implicit none

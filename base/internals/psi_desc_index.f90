@@ -36,7 +36,7 @@ subroutine psi_desc_index(desc,index_in,dep_list,&
   use psb_const_mod
   use mpi
   use psb_penv_mod
-  use psi_mod, only : psi_idx_cnv
+  use psi_mod, psb_protect_name => psi_desc_index
   implicit none
 
   !    ...array parameters.....

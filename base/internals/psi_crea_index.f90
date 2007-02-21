@@ -34,6 +34,7 @@ subroutine psi_crea_index(desc_a,index_in,index_out,glob_idx,nxch,nsnd,nrcv,info
   use psb_descriptor_type
   use psb_error_mod
   use psb_penv_mod
+  use psi_mod, psb_protect_name => psi_crea_index
   implicit none
 
   type(psb_desc_type), intent(in)  :: desc_a
@@ -49,33 +50,6 @@ subroutine psi_crea_index(desc_a,index_in,index_out,glob_idx,nxch,nsnd,nrcv,info
   integer,parameter    :: root=0,no_comm=-1
   logical,parameter    :: debug=.false.
   character(len=20)    :: name
-
-
-  interface
-    subroutine psi_sort_dl(dep_list,l_dep_list,np,info)
-      integer :: np,dep_list(:,:), l_dep_list(:), info
-    end subroutine psi_sort_dl
-  end interface
-
-  interface
-    subroutine psi_dl_check(dep_list,dl_lda,np,length_dl)
-      integer  :: np,dl_lda,length_dl(0:np)
-      integer  :: dep_list(dl_lda,0:np)
-    end subroutine psi_dl_check
-  end interface
-
-  interface
-    subroutine psi_desc_index(desc,index_in,dep_list,&
-         & length_dl,nsnd,nrcv,desc_index,&
-         & isglob_in,info)
-      use psb_descriptor_type
-      type(psb_desc_type)  :: desc
-      integer              :: index_in(:),dep_list(:)
-      integer, allocatable :: desc_index(:)
-      integer :: length_dl,nsnd,nrcv,info
-      logical :: isglob_in
-    end subroutine psi_desc_index
-  end interface
 
   info = 0
   name='psi_crea_index'

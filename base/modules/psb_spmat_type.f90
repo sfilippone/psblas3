@@ -508,7 +508,7 @@ contains
       if (info /= 0) return 
       call psb_realloc(max(nnz,a%m+1,a%k+1),a%ia2,info)
       if (info /= 0) return 
-      call psb_realloc(ifc*nnz+200,a%ia1,info)
+      call psb_realloc(max(ifc*nnz+200,a%m+1,a%k+1),a%ia1,info)
       if (info /= 0) return 
     end if
     if (info /= 0) return

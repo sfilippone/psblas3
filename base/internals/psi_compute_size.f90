@@ -30,6 +30,7 @@
 !!$  
 subroutine psi_compute_size(desc_data, index_in, dl_lda, info)
 
+  use psi_mod, psb_protect_name => psi_compute_size
   use psb_const_mod
   use psb_descriptor_type
   use psb_error_mod

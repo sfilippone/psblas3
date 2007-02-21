@@ -167,8 +167,8 @@ module psb_prec_mod
     end subroutine psb_zilu_fct
   end interface
 
-  interface psb_ilu_bld
-    subroutine psb_dilu_bld(a,desc_a,p,upd,info)
+  interface psb_bjac_bld
+    subroutine psb_dbjac_bld(a,desc_a,p,upd,info)
       use psb_base_mod
       use psb_prec_type
       integer, intent(out)                      :: info
@@ -176,8 +176,8 @@ module psb_prec_mod
       type(psb_dprec_type), intent(inout)    :: p
       type(psb_desc_type), intent(in)           :: desc_a
       character, intent(in)                     :: upd
-    end subroutine psb_dilu_bld
-    subroutine psb_zilu_bld(a,desc_a,p,upd,info)
+    end subroutine psb_dbjac_bld
+    subroutine psb_zbjac_bld(a,desc_a,p,upd,info)
       use psb_base_mod
       use psb_prec_type
       integer, intent(out)                      :: info
@@ -185,7 +185,7 @@ module psb_prec_mod
       type(psb_zprec_type), intent(inout)    :: p
       type(psb_desc_type), intent(in)           :: desc_a
       character, intent(in)                     :: upd
-    end subroutine psb_zilu_bld
+    end subroutine psb_zbjac_bld
   end interface
 
   interface psb_diagsc_bld

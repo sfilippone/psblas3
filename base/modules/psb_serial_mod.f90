@@ -309,19 +309,21 @@ module psb_serial_mod
   end interface
 
   interface psb_rwextd
-     subroutine psb_drwextd(nr,a,info,b)
+     subroutine psb_drwextd(nr,a,info,b,rowscale)
        use psb_spmat_type
        integer, intent(in) :: nr
        type(psb_dspmat_type), intent(inout) :: a
        integer, intent(out)         :: info
        type(psb_dspmat_type), intent(in), optional  :: b
+       logical, intent(in), optional :: rowscale
      end subroutine psb_drwextd
-     subroutine psb_zrwextd(nr,a,info,b)
+     subroutine psb_zrwextd(nr,a,info,b,rowscale)
        use psb_spmat_type
        integer, intent(in) :: nr
        type(psb_zspmat_type), intent(inout) :: a
        integer, intent(out)         :: info
        type(psb_zspmat_type), intent(in), optional  :: b
+       logical, intent(in), optional :: rowscale
      end subroutine psb_zrwextd
   end interface
 

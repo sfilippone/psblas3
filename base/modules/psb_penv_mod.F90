@@ -168,6 +168,20 @@ module psb_penv_mod
 #if defined(SERIAL_MPI)
   integer, private, save :: nctxt=0
 #endif
+
+
+#if defined(NETLIB_BLACS)
+  interface 
+    integer function krecvid(contxt,proc_to_comm,myrow)
+      integer contxt,proc_to_comm,myrow
+    end function krecvid
+  end interface
+  interface 
+    integer function ksendid(contxt,proc_to_comm,myrow)
+      integer contxt,proc_to_comm,myrow
+    end function ksendid
+  end interface
+#endif  
   
 contains 
 

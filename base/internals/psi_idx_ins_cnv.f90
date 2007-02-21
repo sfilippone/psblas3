@@ -29,6 +29,7 @@
 !!$ 
 !!$  
 subroutine psi_idx_ins_cnv1(nv,idxin,desc,info,mask)
+  use psi_mod, psb_protect_name => psi_idx_ins_cnv1
   use psb_descriptor_type
   use psb_serial_mod
   use psb_const_mod
@@ -40,16 +41,6 @@ subroutine psi_idx_ins_cnv1(nv,idxin,desc,info,mask)
   type(psb_desc_type), intent(inout) :: desc
   integer, intent(out) :: info
   logical, intent(in), optional, target :: mask(:)
-  interface 
-    subroutine psi_idx_ins_cnv2(nv,idxin,idxout,desc,info,mask)
-      use psb_descriptor_type
-      integer, intent(in)  :: nv, idxin(:)
-      integer, intent(out) :: idxout(:)
-      type(psb_desc_type), intent(inout) :: desc
-      integer, intent(out) :: info
-      logical, intent(in), optional, target :: mask(:)
-    end subroutine psi_idx_ins_cnv2
-  end interface
   integer :: i,ictxt,row,k,mglob, nglob,err
   integer                :: np, me, isize
   integer                :: pnt_halo,nrow,ncol, nh, ip, err_act,lip,nxt
@@ -170,6 +161,7 @@ end subroutine psi_idx_ins_cnv1
 !!$  
 
 subroutine psi_idx_ins_cnv2(nv,idxin,idxout,desc,info,mask)
+  use psi_mod, psb_protect_name => psi_idx_ins_cnv2
   use psb_descriptor_type
   use psb_serial_mod
   use psb_const_mod
@@ -408,22 +400,13 @@ end subroutine psi_idx_ins_cnv2
 !!$ 
 !!$  
 subroutine psi_idx_ins_cnvs(idxin,idxout,desc,info,mask)
+  use psi_mod, psb_protect_name => psi_idx_cnvs
   use psb_descriptor_type
   integer, intent(in)  :: idxin
   integer, intent(out) :: idxout
   type(psb_desc_type), intent(inout) :: desc
   integer, intent(out) :: info
   logical, intent(in), optional, target :: mask
-  interface 
-    subroutine psi_idx_ins_cnv2(nv,idxin,idxout,desc,info,mask)
-      use psb_descriptor_type
-      integer, intent(in)  :: nv, idxin(:)
-      integer, intent(out) :: idxout(:)
-      type(psb_desc_type), intent(inout) :: desc
-      integer, intent(out) :: info
-      logical, intent(in), optional, target :: mask(:)
-    end subroutine psi_idx_ins_cnv2
-  end interface
   integer  :: iout(1) 
   logical  :: mask_
 
@@ -432,7 +415,7 @@ subroutine psi_idx_ins_cnvs(idxin,idxout,desc,info,mask)
   else
     mask_ = .true.
   endif
-  call psi_idx_ins_cnv2(1,(/idxin/),iout,desc,info,(/mask_/))
+  call psi_idx_ins_cnv(1,(/idxin/),iout,desc,info,(/mask_/))
   idxout=iout(1)
 
   return

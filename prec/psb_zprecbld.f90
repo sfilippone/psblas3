@@ -50,8 +50,7 @@ subroutine psb_zprecbld(a,desc_a,p,info,upd)
   integer      :: int_err(5)
   character    :: iupd
 
-
-  logical, parameter :: debug=.false.   
+  logical, parameter :: debug=.false.
   integer,parameter  :: iroot=0,iout=60,ilout=40
   character(len=20)   :: name, ch_err
 
@@ -120,50 +119,15 @@ subroutine psb_zprecbld(a,desc_a,p,info,upd)
     call psb_check_def(p%iprcparm(f_type_),'fact',&
          &  f_ilu_n_,is_legal_ml_fact)
 
-    if (debug) write(0,*)me, ': Calling PSB_ILU_BLD'
+    if (debug) write(0,*)me, ': Calling PSB_BJAC_BLD'
     if (debug) call psb_barrier(ictxt)
-    call psb_cdcpy(desc_a,p%desc_data,info)
+    call psb_bjac_bld(a,desc_a,p,iupd,info)
+
     if(info /= 0) then
-      info=4010
-      ch_err='psb_cdcpy'
-      call psb_errpush(info,name,a_err=ch_err)
+      call psb_errpush(4010,name,a_err='psb_bjac_bld')
       goto 9999
     end if
-    allocate(p%av(max_avsz),stat=info)
-    if(info /= 0) then
-      info=4000
-      call psb_errpush(info,name)
-      goto 9999
-    end if
-    
-    select case(p%iprcparm(f_type_))
 
-    case(f_ilu_n_,f_ilu_e_) 
-      call psb_ilu_bld(a,desc_a,p,iupd,info)
-      if(debug) write(0,*)me,': out of psb_ilu_bld'
-      if (debug) call psb_barrier(ictxt)
-      if(info /= 0) then
-        info=4010
-        ch_err='psb_ilu_bld'
-        call psb_errpush(info,name,a_err=ch_err)
-        goto 9999
-      end if
-
-    case(f_none_) 
-      write(0,*) 'Fact=None in BASEPRC_BLD Bja/ASM??'
-      info=4010
-      ch_err='Inconsistent prec  f_none_'
-      call psb_errpush(info,name,a_err=ch_err)
-      goto 9999
-
-    case default
-      write(0,*) 'Unknown factor type in baseprc_bld bja/asm: ',&
-           &p%iprcparm(f_type_)
-      info=4010
-      ch_err='Unknown f_type_'
-      call psb_errpush(info,name,a_err=ch_err)
-      goto 9999
-    end select
   case default
     info=4010
     ch_err='Unknown p_type_'

@@ -35,7 +35,7 @@ subroutine psi_ldsc_pre_halo(desc,ext_hv,info)
   use psb_error_mod
   use psb_penv_mod
   use psb_realloc_mod
-  use psi_mod, only : psi_fnd_owner
+  use psi_mod, psb_protect_name => psi_ldsc_pre_halo
   implicit none
   type(psb_desc_type), intent(inout) :: desc
   logical, intent(in)  :: ext_hv

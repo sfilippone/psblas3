@@ -30,6 +30,7 @@
 !!$  
 subroutine psi_crea_ovr_elem(desc_overlap,ovr_elem,info)
 
+  use psi_mod, psb_protect_name => psi_crea_ovr_elem
   use psb_realloc_mod
   use psb_error_mod
   use psb_penv_mod

@@ -30,16 +30,8 @@
 !!$  
 
 module psi_mod
+  use psi_gthsct_mod
 
-!!$  use psb_descriptor_type
-
-!!$  interface 
-!!$    subroutine psi_inner_cnv(n,x,hashsize,hashmask,hashv,glb_lc)
-!!$      integer, intent(in)    :: n, hashsize,hashmask,hashv(0:),glb_lc(:,:)
-!!$      integer, intent(inout) :: x(:)
-!!$    end subroutine psi_inner_cnv
-!!$  end interface
- 
   interface
      subroutine psi_compute_size(desc_data,&
           & index_in, dl_lda, info)
@@ -77,17 +69,24 @@ module psi_mod
   end interface
   
   interface
-     subroutine psi_desc_index(desc_data,index_in,dep_list,&
-          & length_dl,nsnd,nrcv,loc_to_glob,glob_to_loc,desc_index,&
-          & isglob_in,info)
-       integer :: desc_data(:),index_in(:),dep_list(:)
-       integer :: loc_to_glob(:),glob_to_loc(:)
-       integer,allocatable, intent(inout) :: desc_index(:)
-       integer :: length_dl,nsnd,nrcv,info
-       logical :: isglob_in
-     end subroutine psi_desc_index
+    subroutine psi_desc_index(desc,index_in,dep_list,&
+         & length_dl,nsnd,nrcv,desc_index,isglob_in,info)
+      use psb_descriptor_type
+      type(psb_desc_type) :: desc
+      integer         :: index_in(:),dep_list(:)
+      integer,allocatable, intent(inout)  :: desc_index(:)
+      integer         :: length_dl,nsnd,nrcv,info
+      logical         :: isglob_in
+    end subroutine psi_desc_index
   end interface
   
+  interface
+    subroutine psi_dl_check(dep_list,dl_lda,np,length_dl)
+      integer  :: np,dl_lda,length_dl(0:np)
+      integer  :: dep_list(dl_lda,0:np)
+    end subroutine psi_dl_check
+  end interface
+
   interface
      subroutine psi_sort_dl(dep_list,l_dep_list,np,info)
        integer :: np,dep_list(:,:), l_dep_list(:), info
@@ -203,61 +202,6 @@ module psi_mod
      end subroutine psi_zswaptranv
    end interface
 
-
-  interface psi_gth
-     subroutine psi_dgthm(n,k,idx,x,y)
-       integer :: n, k, idx(:)
-       real(kind(1.d0)) :: x(:,:), y(:)
-     end subroutine psi_dgthm
-     subroutine psi_dgthv(n,idx,x,y)
-       integer :: n, idx(:)
-       real(kind(1.d0)) :: x(:), y(:)
-     end subroutine psi_dgthv
-     subroutine psi_igthm(n,k,idx,x,y)
-       integer :: n, k, idx(:)
-       integer :: x(:,:), y(:)
-     end subroutine psi_igthm
-     subroutine psi_igthv(n,idx,x,y)
-       integer :: n, idx(:)
-       integer :: x(:), y(:)
-     end subroutine psi_igthv
-     subroutine psi_zgthm(n,k,idx,x,y)
-       integer :: n, k, idx(:)
-       complex(kind(1.d0)) :: x(:,:), y(:)
-     end subroutine psi_zgthm
-     subroutine psi_zgthv(n,idx,x,y)
-       integer :: n, idx(:)
-       complex(kind(1.d0)) :: x(:), y(:)
-     end subroutine psi_zgthv
-  end interface
-
-  interface psi_sct
-     subroutine psi_dsctm(n,k,idx,x,beta,y)
-       integer :: n, k, idx(:)
-       real(kind(1.d0)) :: beta, x(:), y(:,:)
-     end subroutine psi_dsctm
-     subroutine psi_dsctv(n,idx,x,beta,y)
-       integer :: n, idx(:)
-       real(kind(1.d0)) :: beta, x(:), y(:)
-     end subroutine psi_dsctv
-     subroutine psi_isctm(n,k,idx,x,beta,y)
-       integer :: n, k, idx(:)
-       integer :: beta, x(:), y(:,:)
-     end subroutine psi_isctm
-     subroutine psi_isctv(n,idx,x,beta,y)
-       integer :: n, idx(:)
-       integer :: beta, x(:), y(:)
-     end subroutine psi_isctv
-     subroutine psi_zsctm(n,k,idx,x,beta,y)
-       integer :: n, k, idx(:)
-       complex(kind(1.d0)) :: beta, x(:), y(:,:)
-     end subroutine psi_zsctm
-     subroutine psi_zsctv(n,idx,x,beta,y)
-       integer :: n, idx(:)
-       complex(kind(1.d0)) :: beta, x(:), y(:)
-     end subroutine psi_zsctv
-  end interface
-
   interface psi_cnv_dsc
     module procedure psi_cnv_dsc
   end interface
@@ -266,6 +210,13 @@ module psi_mod
     module procedure psi_inner_cnv1, psi_inner_cnv2
   end interface
 
+  interface
+    subroutine psi_extract_dep_list(desc_data,desc_str,dep_list,&
+         & length_dl,np,dl_lda,mode,info)
+      integer :: np,dl_lda,mode, info
+      integer :: desc_str(*),desc_data(*),dep_list(dl_lda,0:np),length_dl(0:np)
+    end subroutine psi_extract_dep_list
+  end interface
   interface psi_fnd_owner
      subroutine psi_fnd_owner(nv,idx,iprc,desc,info)
        use psb_descriptor_type

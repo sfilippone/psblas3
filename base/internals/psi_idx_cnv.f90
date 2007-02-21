@@ -34,6 +34,7 @@ subroutine psi_idx_cnv1(nv,idxin,desc,info,mask,owned)
   use psb_const_mod
   use psb_error_mod
   use psb_penv_mod
+  use psi_mod, psb_protect_name => psi_idx_cnv1
   implicit none
   integer, intent(in)    :: nv
   integer, intent(inout) ::  idxin(:)
@@ -41,17 +42,6 @@ subroutine psi_idx_cnv1(nv,idxin,desc,info,mask,owned)
   integer, intent(out) :: info
   logical, intent(in), optional, target :: mask(:)
   logical, intent(in), optional :: owned
-  interface 
-    subroutine psi_idx_cnv2(nv,idxin,idxout,desc,info,mask,owned)
-      use psb_descriptor_type
-      integer, intent(in)  :: nv, idxin(:)
-      integer, intent(out) :: idxout(:)
-      type(psb_desc_type), intent(in) :: desc
-      integer, intent(out) :: info
-      logical, intent(in), optional, target :: mask(:)
-      logical, intent(in), optional :: owned
-    end subroutine psi_idx_cnv2
-  end interface
   integer :: i,ictxt,row,k,mglob, nglob,err
   integer                :: np, me, isize
   integer                :: pnt_halo,nrow,ncol, nh, ip, err_act,lip,nxt
@@ -184,7 +174,7 @@ subroutine psi_idx_cnv2(nv,idxin,idxout,desc,info,mask,owned)
   use psb_const_mod
   use psb_error_mod
   use psb_penv_mod
-  use psi_mod, only : psi_inner_cnv
+  use psi_mod, psb_protect_name => psi_idx_cnv2
   implicit none
   integer, intent(in)  :: nv, idxin(:)
   integer, intent(out) :: idxout(:)
@@ -366,6 +356,8 @@ end subroutine psi_idx_cnv2
 !!$ 
 !!$  
 subroutine psi_idx_cnvs(idxin,idxout,desc,info,mask,owned)
+
+  use psi_mod, psb_protect_name => psi_idx_cnvs
   use psb_descriptor_type
   integer, intent(in)  :: idxin
   integer, intent(out) :: idxout
@@ -373,17 +365,6 @@ subroutine psi_idx_cnvs(idxin,idxout,desc,info,mask,owned)
   integer, intent(out) :: info
   logical, intent(in), optional, target :: mask
   logical, intent(in), optional :: owned
-  interface 
-    subroutine psi_idx_cnv2(nv,idxin,idxout,desc,info,mask,owned)
-      use psb_descriptor_type
-      integer, intent(in)  :: nv, idxin(:)
-      integer, intent(out) :: idxout(:)
-      type(psb_desc_type), intent(in) :: desc
-      integer, intent(out) :: info
-      logical, intent(in), optional, target :: mask(:)
-      logical, intent(in), optional :: owned
-    end subroutine psi_idx_cnv2
-  end interface
   integer  :: iout(1) 
   logical  :: mask_, owned_
 
@@ -397,7 +378,7 @@ subroutine psi_idx_cnvs(idxin,idxout,desc,info,mask,owned)
   else
     owned_ = .true.
   endif
-  call psi_idx_cnv2(1,(/idxin/),iout,desc,info,(/mask_/),owned_)
+  call psi_idx_cnv(1,(/idxin/),iout,desc,info,(/mask_/),owned_)
   idxout=iout(1)
 
   return

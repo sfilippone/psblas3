@@ -117,6 +117,7 @@ subroutine psi_extract_dep_list(desc_data,desc_str,dep_list,&
   !            desc_str list.
   !   length_dl  integer array(0:np)
   !             length_dl(i) is the length of dep_list(*,i) list
+  use psi_mod, psb_protect_name => psi_extract_dep_list
   use mpi
   use psb_penv_mod
   use psb_const_mod
@@ -128,7 +129,7 @@ subroutine psi_extract_dep_list(desc_data,desc_str,dep_list,&
 
   !     ....array parameters....
   integer ::  desc_str(*),desc_data(*),dep_list(dl_lda,0:np),length_dl(0:np)
-  integer, pointer :: itmp(:)
+  integer, allocatable :: itmp(:)
   !     .....local arrays....
   integer int_err(5)
   double precision real_err(5)

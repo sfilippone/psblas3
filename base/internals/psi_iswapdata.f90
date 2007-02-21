@@ -30,6 +30,7 @@
 !!$  
 subroutine psi_iswapdatam(flag,n,beta,y,desc_a,work,info,data)
 
+  use psi_mod, psb_protect_name => psi_iswapdatam
   use psb_error_mod
   use psb_descriptor_type
   use psb_penv_mod
@@ -49,7 +50,6 @@ subroutine psi_iswapdatam(flag,n,beta,y,desc_a,work,info,data)
        & proc_to_comm, p2ptag, icomm, p2pstat(mpi_status_size),&
        & idxs, idxr, iret, err_act, totxch, ixrec, i, idx_pt,&
        & snd_pt, rcv_pt, pnti, data_
-  integer  :: krecvid, ksendid
   integer, allocatable, dimension(:) :: bsdidx, brvidx,&
        & sdsz, rvsz, prcid, rvhd, sdhd
   integer, pointer :: d_idx(:)
@@ -442,6 +442,7 @@ end subroutine psi_iswapdatam
 !!$  
 subroutine psi_iswapdatav(flag,beta,y,desc_a,work,info,data)
 
+  use psi_mod, psb_protect_name => psi_iswapdatav
   use psb_error_mod
   use psb_descriptor_type
   use psb_penv_mod
@@ -465,7 +466,6 @@ subroutine psi_iswapdatav(flag,beta,y,desc_a,work,info,data)
   integer, allocatable, dimension(:) :: bsdidx, brvidx,&
        & sdsz, rvsz, prcid, rvhd, sdhd
   integer, pointer :: d_idx(:)
-  integer  :: krecvid, ksendid
   integer :: int_err(5)
   logical :: swap_mpi, swap_sync, swap_send, swap_recv,&
        & albf,do_send,do_recv

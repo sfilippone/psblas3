@@ -31,8 +31,13 @@
 ! File:  psb_zrwextd.f90 
 ! Subroutine: 
 ! Parameters:
-
-subroutine psb_zrwextd(nr,a,info,b)
+!
+! We have a problem here: 1. How to handle well all the formats? 
+!                         2. What should we do with rowscale? Does it only 
+!                            apply when a%fida='COO' ?????? 
+!
+!
+subroutine psb_zrwextd(nr,a,info,b,rowscale)
   use psb_spmat_type
   use psb_error_mod
   implicit none
@@ -42,39 +47,49 @@ subroutine psb_zrwextd(nr,a,info,b)
   type(psb_zspmat_type), intent(inout)           :: a
   integer,intent(out)                            :: info
   type(psb_zspmat_type), intent(in), optional    :: b
-  integer :: i,j,ja,jb,err_act
+  logical,intent(in), optional                   :: rowscale
+
+  integer :: i,j,ja,jb,err_act,nza,nzb
   character(len=20)                 :: name, ch_err
+  logical  rowscale_ 
 
   name='psb_zrwextd'
   info  = 0
   call psb_erractionsave(err_act)
 
-  if (nr > a%m) then 
+  if (present(rowscale)) then 
+    rowscale_ = rowscale
+  else
+    rowscale_ = .true.
+  end if
 
+  if (nr > a%m) then 
     if (a%fida == 'CSR') then 
       call psb_realloc(nr+1,a%ia2,info)
       if (present(b)) then 
-        jb = b%ia2(b%m+1)-1
-        call psb_realloc(size(a%ia1)+jb,a%ia1,info)
-        call psb_realloc(size(a%aspk)+jb,a%aspk,info)
-        do i=1, min(nr-a%m,b%m)
-          ! Should use spgtblk. 
-          ! Don't care for the time being.
-          a%ia2(a%m+i+1) =  a%ia2(a%m+i) + b%ia2(i+1) - b%ia2(i)
-          ja = a%ia2(a%m+i)
-          jb = b%ia2(i)
-          do 
-            if (jb >=  b%ia2(i+1)) exit
-            a%aspk(ja) = b%aspk(jb)
-            a%ia1(ja) = b%ia1(jb)
-            ja = ja + 1
-            jb = jb + 1
-          end do
-        end do
-        do j=i,nr-a%m
-          a%ia2(a%m+i+1) = a%ia2(a%m+i)
-        end do
+        nzb = psb_sp_get_nnzeros(b)
+        call psb_realloc(size(a%ia1)+nzb,a%ia1,info)
+        call psb_realloc(size(a%aspk)+nzb,a%aspk,info)
+        if (b%fida=='CSR') then 
 
+          do i=1, min(nr-a%m,b%m)
+            a%ia2(a%m+i+1) =  a%ia2(a%m+i) + b%ia2(i+1) - b%ia2(i)
+            ja = a%ia2(a%m+i)
+            jb = b%ia2(i)
+            do 
+              if (jb >=  b%ia2(i+1)) exit
+              a%aspk(ja) = b%aspk(jb)
+              a%ia1(ja) = b%ia1(jb)
+              ja = ja + 1
+              jb = jb + 1
+            end do
+          end do
+          do j=i,nr-a%m
+            a%ia2(a%m+i+1) = a%ia2(a%m+i)
+          end do
+        else 
+          write(0,*) 'Implement SPGETBLK in RWEXTD!!!!!!!'
+        endif
       else
         do i=a%m+2,nr+1
           a%ia2(i) = a%ia2(i-1)
@@ -83,7 +98,44 @@ subroutine psb_zrwextd(nr,a,info,b)
       a%m = nr
     else if (a%fida == 'COO') then 
       if (present(b)) then 
-      else
+        nza = psb_sp_get_nnzeros(a)
+        nzb = psb_sp_get_nnzeros(b)
+        call psb_sp_reall(a,nza+nzb,info)
+        if (b%fida=='COO') then 
+          if (rowscale_) then 
+            do j=1,nzb
+              if ((a%m + b%ia1(j)) <= nr) then 
+                a%ia1(nza+j)  = a%m + b%ia1(j)
+                a%ia2(nza+j)  = b%ia2(j)
+                a%aspk(nza+j) = b%aspk(j)
+              end if
+            enddo
+          else
+            do j=1,nzb
+              if ((b%ia1(j)) <= nr) then 
+                a%ia1(nza+j)  = b%ia1(j)
+                a%ia2(nza+j)  = b%ia2(j)
+                a%aspk(nza+j) = b%aspk(j)
+              endif
+            enddo
+          endif
+          a%infoa(psb_nnz_) = nza+nzb
+        else if(b%fida=='CSR') then 
+          do i=1, min(nr-a%m,b%m)
+            do 
+              jb = b%ia2(i)
+              if (jb >=  b%ia2(i+1)) exit
+              nza = nza + 1 
+              a%aspk(nza) = b%aspk(jb)
+              a%ia1(nza)  = a%m + i
+              a%ia2(nza)  = b%ia1(jb)
+              jb = jb + 1
+            end do
+          end do
+          a%infoa(psb_nnz_) = nza
+        else
+          write(0,*) 'Implement SPGETBLK in RWEXTD!!!!!!!'
+        endif
       endif
       a%m = nr
     else if (a%fida == 'JAD') then 
