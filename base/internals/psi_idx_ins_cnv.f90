@@ -400,7 +400,7 @@ end subroutine psi_idx_ins_cnv2
 !!$ 
 !!$  
 subroutine psi_idx_ins_cnvs(idxin,idxout,desc,info,mask)
-  use psi_mod, psb_protect_name => psi_idx_cnvs
+  use psi_mod, psb_protect_name => psi_idx_ins_cnvs
   use psb_descriptor_type
   integer, intent(in)  :: idxin
   integer, intent(out) :: idxout
