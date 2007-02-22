@@ -40,6 +40,7 @@
 subroutine psb_drwextd(nr,a,info,b,rowscale)
   use psb_spmat_type
   use psb_error_mod
+  use psb_string_mod
   implicit none
 
   ! Extend matrix A up to NR rows with empty ones (i.e.: all zeroes)
@@ -64,13 +65,13 @@ subroutine psb_drwextd(nr,a,info,b,rowscale)
   end if
 
   if (nr > a%m) then 
-    if (a%fida == 'CSR') then 
+    if (toupper(a%fida) == 'CSR') then 
       call psb_realloc(nr+1,a%ia2,info)
       if (present(b)) then 
         nzb = psb_sp_get_nnzeros(b)
         call psb_realloc(size(a%ia1)+nzb,a%ia1,info)
         call psb_realloc(size(a%aspk)+nzb,a%aspk,info)
-        if (b%fida=='CSR') then 
+        if (toupper(b%fida)=='CSR') then 
 
           do i=1, min(nr-a%m,b%m)
             a%ia2(a%m+i+1) =  a%ia2(a%m+i) + b%ia2(i+1) - b%ia2(i)
@@ -96,31 +97,36 @@ subroutine psb_drwextd(nr,a,info,b,rowscale)
         end do
       end if
       a%m = nr
-    else if (a%fida == 'COO') then 
+      a%k = max(a%k,b%k)
+
+    else if (toupper(a%fida) == 'COO') then 
+
       if (present(b)) then 
         nza = psb_sp_get_nnzeros(a)
         nzb = psb_sp_get_nnzeros(b)
         call psb_sp_reall(a,nza+nzb,info)
-        if (b%fida=='COO') then 
+        if (toupper(b%fida)=='COO') then 
           if (rowscale_) then 
             do j=1,nzb
               if ((a%m + b%ia1(j)) <= nr) then 
-                a%ia1(nza+j)  = a%m + b%ia1(j)
-                a%ia2(nza+j)  = b%ia2(j)
-                a%aspk(nza+j) = b%aspk(j)
+                nza = nza + 1
+                a%ia1(nza)  = a%m + b%ia1(j)
+                a%ia2(nza)  = b%ia2(j)
+                a%aspk(nza) = b%aspk(j)
               end if
             enddo
           else
             do j=1,nzb
               if ((b%ia1(j)) <= nr) then 
-                a%ia1(nza+j)  = b%ia1(j)
-                a%ia2(nza+j)  = b%ia2(j)
-                a%aspk(nza+j) = b%aspk(j)
+                nza = nza + 1
+                a%ia1(nza)  = b%ia1(j)
+                a%ia2(nza)  = b%ia2(j)
+                a%aspk(nza) = b%aspk(j)                
               endif
             enddo
           endif
-          a%infoa(psb_nnz_) = nza+nzb
-        else if(b%fida=='CSR') then 
+          a%infoa(psb_nnz_) = nza
+        else if(toupper(b%fida)=='CSR') then 
           do i=1, min(nr-a%m,b%m)
             do 
               jb = b%ia2(i)
@@ -138,6 +144,7 @@ subroutine psb_drwextd(nr,a,info,b,rowscale)
         endif
       endif
       a%m = nr
+      a%k = max(a%k,b%k)
     else if (a%fida == 'JAD') then 
        info=135
        ch_err=a%fida(1:3)
