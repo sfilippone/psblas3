@@ -127,6 +127,10 @@ module psb_spmat_type
     module procedure psb_dsp_transfer, psb_zsp_transfer
   end interface
 
+  interface psb_sp_trim
+    module procedure psb_dsp_trim, psb_zsp_trim
+  end interface
+
   interface psb_sp_trimsize
     module procedure psb_dsp_trimsize, psb_zsp_trimsize
   end interface
@@ -641,6 +645,55 @@ contains
     Return
 
   end subroutine psb_dsp_setifld
+
+
+  !
+  ! Reduce the size of A to the barest minimum necessary.
+  !
+  !
+
+
+  subroutine psb_dsp_trim(a,info)
+    use psb_string_mod
+    implicit none
+    !....Parameters...
+    Type(psb_dspmat_type), intent(inout) :: A
+    Integer, intent(out)          :: info
+    Integer           :: i1, i2, ia
+
+    !locals
+    Integer             :: nza
+    logical, parameter  :: debug=.false.
+
+    info  = 0
+    call psb_sp_trimsize(a,i1,i2,ia,info)
+    i1 = max(i1,1);  i2 = max(i2,1);  ia = max(ia,1)
+    if (info == 0) call psb_sp_reall(a,i1,i2,ia,info)
+
+    Return
+
+  End Subroutine psb_dsp_trim
+
+  subroutine psb_zsp_trim(a,info)
+    use psb_string_mod
+    implicit none
+    !....Parameters...
+    Type(psb_zspmat_type), intent(inout) :: A
+    Integer, intent(out)          :: info
+    Integer           :: i1, i2, ia
+
+    !locals
+    Integer             :: nza
+    logical, parameter  :: debug=.false.
+
+    info  = 0
+    call psb_sp_trimsize(a,i1,i2,ia,info)
+    i1 = max(i1,1);  i2 = max(i2,1);  ia = max(ia,1)
+    if (info == 0) call psb_sp_reall(a,i1,i2,ia,info)
+
+    Return
+
+  End Subroutine psb_zsp_trim
 
 
   subroutine psb_dsp_trimsize(a, i1,i2,ia,info)

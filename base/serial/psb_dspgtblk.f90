@@ -32,7 +32,6 @@
 ! Subroutine: psb_dspgtblk
 !    Gets one or more rows from a sparse matrix. 
 ! Parameters:
-
 !*****************************************************************************
 !*                                                                           *
 !* Takes a specified row from matrix A and copies into matrix B (possibly    *

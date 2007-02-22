@@ -389,10 +389,9 @@ subroutine psb_zcsdp(a, b,info,ifc,check,trans,unitd,upd,dupl)
 
     end select
 
-    if (psb_sp_getifld(psb_upd_,b,info) /= psb_upd_perm_) then
-      call psb_sp_trimsize(b,i1,i2,ia,info)
-      if (info == 0) call psb_sp_reall(b,i1,i2,ia,info)
-    endif
+
+    if (psb_sp_getifld(psb_upd_,b,info) /= psb_upd_perm_) &
+         &      call psb_sp_trim(b,info)
 
   else if (check_=='R') then
     !...Regenerating matrix    

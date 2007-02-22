@@ -191,13 +191,11 @@ subroutine psb_zbjac_bld(a,desc_a,p,upd,info)
     !    if (me==0) write(0,'(a,3(1x,g18.9))') 'renum/factor time',t3-t2,t6-t5
 
     if (psb_sp_getifld(psb_upd_,p%av(u_pr_),info) /= psb_upd_perm_) then
-      call psb_sp_trimsize(p%av(u_pr_),i1,i2,ia,info)
-      if (info == 0) call psb_sp_reall(p%av(u_pr_),i1,i2,ia,info)
+      call psb_sp_trim(p%av(u_pr_),info)
     endif
 
     if (psb_sp_getifld(psb_upd_,p%av(l_pr_),info) /= psb_upd_perm_) then
-      call psb_sp_trimsize(p%av(l_pr_),i1,i2,ia,info)
-      if (info == 0) call psb_sp_reall(p%av(l_pr_),i1,i2,ia,info)
+      call psb_sp_trim(p%av(l_pr_),info)
     endif
 
 

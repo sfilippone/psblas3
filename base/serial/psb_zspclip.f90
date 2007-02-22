@@ -28,108 +28,119 @@
 !!$  POSSIBILITY OF SUCH DAMAGE.
 !!$ 
 !!$   
-! File:  psb_dspgetrow.f90 
-! Subroutine: psb_dspgetrow
-!    Gets one or more rows from a sparse matrix. 
+! File:  psb_zspclip.f90 
+! Subroutine: psb_zspclip
+!    Creates a "clipped" copy of input matrix A. Output is always in COO. 
 ! Parameters:
 
 !*****************************************************************************
 !*                                                                           *
-!* Takes a specified row from matrix A and copies into NZ,IA,JA,VAL  in COO  *
-!* format.                                                                   *
-!*                                                                           *
 !*****************************************************************************
-subroutine psb_dspgetrow(irw,a,nz,ia,ja,val,info,iren,lrw)
+subroutine psb_zspclip(a,b,info,imin,imax,jmin,jmax,rscale,cscale)
   use psb_spmat_type
   use psb_string_mod
-  use psb_serial_mod, psb_protect_name => psb_dspgetrow
-  
-  type(psb_dspmat_type), intent(in) :: a
-  integer, intent(in)       :: irw
-  integer, intent(out)      :: nz
-  integer, intent(inout)    :: ia(:), ja(:)
-  real(kind(1.d0)),  intent(inout)    :: val(:)
-  integer, intent(in), target, optional :: iren(:)
-  integer, intent(in), optional :: lrw
-  integer, intent(out)  :: info
+  use psb_serial_mod, psb_protect_name => psb_zspclip
+  implicit none 
+  type(psb_zspmat_type), intent(in)  :: a
+  type(psb_zspmat_type), intent(out) :: b
+  integer, intent(out)               :: info
+  integer, intent(in), optional      :: imin,imax,jmin,jmax
+  logical, intent(in), optional      :: rscale,cscale
 
   integer               :: lrw_, ierr(5), err_act
-  type(psb_dspmat_type) :: b
-  integer, pointer      :: iren_(:)
+  type(psb_zspmat_type) :: tmp
   character(len=20)     :: name, ch_err
-
-
-  name='psb_sp_getrow'
+  integer      :: imin_,imax_,jmin_,jmax_
+  logical      :: rscale_,cscale_
+  integer      :: sizeb, nzb, mb, kb, ifst, ilst, nrt, nzt, i, j
+  integer, parameter :: irbk=40, inzr=16 
+  
+  name='psb_zsp_clip'
   info  = 0
   call psb_erractionsave(err_act)
   call psb_set_erraction(0)  
 
   call psb_nullify_sp(b)
+  call psb_sp_all(tmp,inzr*irbk,info)
+  
 
-  if (present(lrw)) then
-    lrw_ = lrw
+  if (present(imin)) then 
+    imin_ = imin
   else
-    lrw_ = irw
+    imin_ = 1
   endif
-  if (lrw_ < irw) then
-    write(0,*) 'SPGETROW input error: fixing lrw',irw,lrw_
-    lrw_ = irw
-  end if
-  call psb_sp_all(lrw_-irw+1,lrw_-irw+1,b,info)
-
-  if (present(iren)) then
-    call psb_sp_getblk(irw,a,b,info,iren=iren,lrw=lrw_)
+  if (present(imax)) then 
+    imax_ = imax
+  else
+    imax_ = a%m
+  endif
+  if (present(jmin)) then 
+    jmin_ = jmin
+  else
+    jmin_ = 1
+  endif
+  if (present(jmax)) then 
+    jmax_ = jmax
+  else
+    jmax_ = a%k
+  endif
+  if (present(rscale)) then 
+    rscale_ = rscale
+  else
+    rscale_ = .true.
+  endif
+  if (present(cscale)) then 
+    cscale_ = cscale
+  else
+    cscale_ = .true.
+  endif
+  
+  if (rscale_) then 
+    mb = imax_ - imin_ +1
   else 
-    call psb_sp_getblk(irw,a,b,info,lrw=lrw_)
+    mb = a%m  ! Should this be imax_ ?? 
+  endif
+  if (cscale_) then 
+    kb = jmax_ - jmin_ +1
+  else 
+    kb = a%k  ! Should this be jmax_ ?? 
+  endif
+
+
+  sizeb = psb_sp_get_nnzeros(a)
+  call psb_sp_all(mb,kb,b,sizeb,info)
+  b%fida='COO'
+  nzb = 0 
+  do i=imin_, imax_, irbk
+    nrt = min(irbk,imax_-i+1)
+    ifst = i
+    ilst = ifst + nrt - 1
+    call psb_sp_getblk(ifst,a,tmp,info,lrw=ilst)
+    nzt = psb_sp_get_nnzeros(tmp)
+    do j=1, nzt 
+      if ((jmin_ <= tmp%ia2(j)).and.(tmp%ia2(j) <= jmax_)) then 
+        nzb         = nzb + 1
+        b%aspk(nzb) = tmp%aspk(j) 
+        b%ia1(nzb)  = tmp%ia1(j) 
+        b%ia2(nzb)  = tmp%ia2(j) 
+      end if
+    end do
+  end do
+  b%infoa(psb_nnz_) = nzb 
+
+  if (rscale_) then 
+    do i=1, nzb
+      b%ia1(i) = b%ia1(i) - imin_ + 1
+    end do
   end if
-  if (info /= 0) then     
-    info=136
-    ch_err=a%fida(1:3)
-    call psb_errpush(info,name,a_err=ch_err)
-    goto 9999
+  if (cscale_) then 
+    do i=1, nzb
+      b%ia2(i) = b%ia2(i) - jmin_ + 1
+    end do
   end if
-
-  if (toupper(b%fida) /= 'COO') then 
-    info=4010
-    ch_err=a%fida(1:3)
-    call psb_errpush(info,name,a_err=ch_err)
-    goto 9999
-  endif
-
-  nz = b%infoa(psb_nnz_)
-
-  if (size(ia)>= nz) then 
-    ia(1:nz) = b%ia1(1:nz)
-  else
-    info    = 135
-    ierr(1) = 4
-    ierr(2) = size(ia)
-    call psb_errpush(info,name,i_err=ierr)
-    goto 9999
-  endif
-
-  if (size(ja)>= nz) then 
-    ja(1:nz) = b%ia2(1:nz)
-  else
-    info    = 135
-    ierr(1) = 5
-    ierr(2) = size(ja)
-    call psb_errpush(info,name,i_err=ierr)
-    goto 9999
-  endif
-
-  if (size(val)>= nz) then 
-    val(1:nz) = b%aspk(1:nz)
-  else
-    info    = 135
-    ierr(1) = 6
-    ierr(2) = size(val)
-    call psb_errpush(info,name,i_err=ierr)
-    goto 9999
-  endif
-
-
-  call psb_sp_free(b,info)
+  call psb_fixcoo(b,info) 
+  call psb_sp_trim(b,info)
+  call psb_sp_free(tmp,info)
 
   call psb_erractionrestore(err_act)
   return
@@ -142,6 +153,5 @@ subroutine psb_dspgetrow(irw,a,nz,ia,ja,val,info,iren,lrw)
   end if
   return
 
-
-end subroutine psb_dspgetrow
+end subroutine psb_zspclip
 

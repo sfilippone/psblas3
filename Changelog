@@ -1,6 +1,11 @@
 Changelog. A lot less detailed than usual, at least for past
 history. 
 
+2007/02/22: Fixed various misalignments between real and complex.
+	    Defined new psb_sp_clip routines.
+	    Fixed psb_rwextd.
+	    Changed the USE statements, minimizing size of modules and
+	    maximizing consistency checks. 
 
 2007/02/01: Merged serial version: we provide a minimal fake mpi to
 	    allow compiling and running without mpi and blacs. Only

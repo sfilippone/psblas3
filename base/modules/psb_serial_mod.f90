@@ -33,315 +33,335 @@ module psb_serial_mod
   use psb_string_mod
 
   interface psb_csdp
-     subroutine psb_dcsdp(a, b,info,ifc,check,trans,unitd,upd,dupl)
-       use psb_spmat_type
-       type(psb_dspmat_type), intent(in)   :: a
-       type(psb_dspmat_type), intent(inout)  :: b
-       integer, intent(out)        :: info
-       integer, intent(in), optional :: ifc,upd,dupl
-       character, intent(in), optional :: check,trans,unitd
-     end subroutine psb_dcsdp
-     subroutine psb_zcsdp(a, b,info,ifc,check,trans,unitd,upd,dupl)
-       use psb_spmat_type
-       type(psb_zspmat_type), intent(in)   :: a
-       type(psb_zspmat_type), intent(inout)  :: b
-       integer, intent(out)        :: info
-       integer, intent(in), optional :: ifc,upd,dupl
-       character, intent(in), optional :: check,trans,unitd
-     end subroutine psb_zcsdp
+    subroutine psb_dcsdp(a, b,info,ifc,check,trans,unitd,upd,dupl)
+      use psb_spmat_type
+      type(psb_dspmat_type), intent(in)   :: a
+      type(psb_dspmat_type), intent(inout)  :: b
+      integer, intent(out)        :: info
+      integer, intent(in), optional :: ifc,upd,dupl
+      character, intent(in), optional :: check,trans,unitd
+    end subroutine psb_dcsdp
+    subroutine psb_zcsdp(a, b,info,ifc,check,trans,unitd,upd,dupl)
+      use psb_spmat_type
+      type(psb_zspmat_type), intent(in)   :: a
+      type(psb_zspmat_type), intent(inout)  :: b
+      integer, intent(out)        :: info
+      integer, intent(in), optional :: ifc,upd,dupl
+      character, intent(in), optional :: check,trans,unitd
+    end subroutine psb_zcsdp
   end interface
 
   interface psb_csrws
-     subroutine psb_dcsrws(rw,a,info,trans)
-       use psb_spmat_type
-       type(psb_dspmat_type) :: a
-       real(kind(1.d0)), allocatable   :: rw(:) 
-       integer :: info
-       character, optional :: trans
-     end subroutine psb_dcsrws
-     subroutine psb_zcsrws(rw,a,info,trans)
-       use psb_spmat_type
-       type(psb_zspmat_type) :: a
-       complex(kind(1.d0)), allocatable :: rw(:) 
-       integer :: info
-       character, optional :: trans
-     end subroutine psb_zcsrws
+    subroutine psb_dcsrws(rw,a,info,trans)
+      use psb_spmat_type
+      type(psb_dspmat_type) :: a
+      real(kind(1.d0)), allocatable   :: rw(:) 
+      integer :: info
+      character, optional :: trans
+    end subroutine psb_dcsrws
+    subroutine psb_zcsrws(rw,a,info,trans)
+      use psb_spmat_type
+      type(psb_zspmat_type) :: a
+      complex(kind(1.d0)), allocatable :: rw(:) 
+      integer :: info
+      character, optional :: trans
+    end subroutine psb_zcsrws
   end interface
 
 
 
   interface psb_cssm
-     subroutine psb_dcssm(alpha,t,b,beta,c,info,trans,unitd,d)
-       use psb_spmat_type
-       type(psb_dspmat_type) :: t
-       real(kind(1.d0)) :: alpha, beta, b(:,:), c(:,:)
-       integer :: info
-       character, optional :: trans, unitd
-       real(kind(1.d0)), optional, target :: d(:)
-     end subroutine psb_dcssm
-     subroutine psb_dcssv(alpha,t,b,beta,c,info,trans,unitd,d)
-       use psb_spmat_type
-       type(psb_dspmat_type) :: t
-       real(kind(1.d0)) :: alpha, beta, b(:), c(:)
-       integer :: info
-       character, optional :: trans, unitd
-       real(kind(1.d0)), optional, target :: d(:)
-     end subroutine psb_dcssv
-     subroutine psb_zcssm(alpha,t,b,beta,c,info,trans,unitd,d)
-       use psb_spmat_type
-       type(psb_zspmat_type) :: t
-       complex(kind(1.d0)) :: alpha, beta, b(:,:), c(:,:)
-       integer :: info
-       character, optional :: trans, unitd
-       complex(kind(1.d0)), optional, target :: d(:)
-     end subroutine psb_zcssm
-     subroutine psb_zcssv(alpha,t,b,beta,c,info,trans,unitd,d)
-       use psb_spmat_type
-       type(psb_zspmat_type) :: t
-       complex(kind(1.d0)) :: alpha, beta, b(:), c(:)
-       integer :: info
-       character, optional :: trans, unitd
-       complex(kind(1.d0)), optional, target :: d(:)
-     end subroutine psb_zcssv
+    subroutine psb_dcssm(alpha,t,b,beta,c,info,trans,unitd,d)
+      use psb_spmat_type
+      type(psb_dspmat_type) :: t
+      real(kind(1.d0)) :: alpha, beta, b(:,:), c(:,:)
+      integer :: info
+      character, optional :: trans, unitd
+      real(kind(1.d0)), optional, target :: d(:)
+    end subroutine psb_dcssm
+    subroutine psb_dcssv(alpha,t,b,beta,c,info,trans,unitd,d)
+      use psb_spmat_type
+      type(psb_dspmat_type) :: t
+      real(kind(1.d0)) :: alpha, beta, b(:), c(:)
+      integer :: info
+      character, optional :: trans, unitd
+      real(kind(1.d0)), optional, target :: d(:)
+    end subroutine psb_dcssv
+    subroutine psb_zcssm(alpha,t,b,beta,c,info,trans,unitd,d)
+      use psb_spmat_type
+      type(psb_zspmat_type) :: t
+      complex(kind(1.d0)) :: alpha, beta, b(:,:), c(:,:)
+      integer :: info
+      character, optional :: trans, unitd
+      complex(kind(1.d0)), optional, target :: d(:)
+    end subroutine psb_zcssm
+    subroutine psb_zcssv(alpha,t,b,beta,c,info,trans,unitd,d)
+      use psb_spmat_type
+      type(psb_zspmat_type) :: t
+      complex(kind(1.d0)) :: alpha, beta, b(:), c(:)
+      integer :: info
+      character, optional :: trans, unitd
+      complex(kind(1.d0)), optional, target :: d(:)
+    end subroutine psb_zcssv
   end interface
 
   interface psb_csmm
-     subroutine psb_dcsmv(alpha,a,b,beta,c,info,trans)
-       use psb_spmat_type
-       type(psb_dspmat_type) :: a
-       real(kind(1.d0)) :: alpha, beta, b(:), c(:)
-       integer :: info
-       character, optional :: trans
-     end subroutine psb_dcsmv
-     subroutine psb_dcsmm(alpha,a,b,beta,c,info,trans)
-       use psb_spmat_type
-       type(psb_dspmat_type) :: a
-       real(kind(1.d0)) :: alpha, beta, b(:,:), c(:,:)
-       integer :: info
-       character, optional :: trans
-     end subroutine psb_dcsmm
-     subroutine psb_zcsmv(alpha,a,b,beta,c,info,trans)
-       use psb_spmat_type
-       type(psb_zspmat_type) :: a
-       complex(kind(1.d0)) :: alpha, beta, b(:), c(:)
-       integer :: info
-       character, optional :: trans
-     end subroutine psb_zcsmv
-     subroutine psb_zcsmm(alpha,a,b,beta,c,info,trans)
-       use psb_spmat_type
-       type(psb_zspmat_type) :: a
-       complex(kind(1.d0)) :: alpha, beta, b(:,:), c(:,:)
-       integer :: info
-       character, optional :: trans
-     end subroutine psb_zcsmm
+    subroutine psb_dcsmv(alpha,a,b,beta,c,info,trans)
+      use psb_spmat_type
+      type(psb_dspmat_type) :: a
+      real(kind(1.d0)) :: alpha, beta, b(:), c(:)
+      integer :: info
+      character, optional :: trans
+    end subroutine psb_dcsmv
+    subroutine psb_dcsmm(alpha,a,b,beta,c,info,trans)
+      use psb_spmat_type
+      type(psb_dspmat_type) :: a
+      real(kind(1.d0)) :: alpha, beta, b(:,:), c(:,:)
+      integer :: info
+      character, optional :: trans
+    end subroutine psb_dcsmm
+    subroutine psb_zcsmv(alpha,a,b,beta,c,info,trans)
+      use psb_spmat_type
+      type(psb_zspmat_type) :: a
+      complex(kind(1.d0)) :: alpha, beta, b(:), c(:)
+      integer :: info
+      character, optional :: trans
+    end subroutine psb_zcsmv
+    subroutine psb_zcsmm(alpha,a,b,beta,c,info,trans)
+      use psb_spmat_type
+      type(psb_zspmat_type) :: a
+      complex(kind(1.d0)) :: alpha, beta, b(:,:), c(:,:)
+      integer :: info
+      character, optional :: trans
+    end subroutine psb_zcsmm
   end interface
 
   interface psb_fixcoo
-     subroutine psb_dfixcoo(a,info,idir)
-       use psb_spmat_type
-       type(psb_dspmat_type), intent(inout) :: a
-       integer, intent(out)         :: info
-       integer, intent(in), optional :: idir
-     end subroutine psb_dfixcoo
-     subroutine psb_zfixcoo(a,info,idir)
-       use psb_spmat_type
-       type(psb_zspmat_type), intent(inout) :: a
-       integer, intent(out)         :: info
-       integer, intent(in), optional :: idir
-     end subroutine psb_zfixcoo
+    subroutine psb_dfixcoo(a,info,idir)
+      use psb_spmat_type
+      type(psb_dspmat_type), intent(inout) :: a
+      integer, intent(out)         :: info
+      integer, intent(in), optional :: idir
+    end subroutine psb_dfixcoo
+    subroutine psb_zfixcoo(a,info,idir)
+      use psb_spmat_type
+      type(psb_zspmat_type), intent(inout) :: a
+      integer, intent(out)         :: info
+      integer, intent(in), optional :: idir
+    end subroutine psb_zfixcoo
   end interface
 
   interface psb_ipcoo2csr
-     subroutine psb_dipcoo2csr(a,info,rwshr)
-       use psb_spmat_type
-       type(psb_dspmat_type), intent(inout) :: a
-       integer, intent(out)         :: info
-       logical, optional :: rwshr
-     end subroutine psb_dipcoo2csr
-     subroutine psb_zipcoo2csr(a,info,rwshr)
-       use psb_spmat_type
-       type(psb_zspmat_type), intent(inout) :: a
-       integer, intent(out)         :: info
-       logical, optional :: rwshr
-     end subroutine psb_zipcoo2csr
+    subroutine psb_dipcoo2csr(a,info,rwshr)
+      use psb_spmat_type
+      type(psb_dspmat_type), intent(inout) :: a
+      integer, intent(out)         :: info
+      logical, optional :: rwshr
+    end subroutine psb_dipcoo2csr
+    subroutine psb_zipcoo2csr(a,info,rwshr)
+      use psb_spmat_type
+      type(psb_zspmat_type), intent(inout) :: a
+      integer, intent(out)         :: info
+      logical, optional :: rwshr
+    end subroutine psb_zipcoo2csr
   end interface
 
   interface psb_ipcoo2csc
-     subroutine psb_dipcoo2csc(a,info,clshr)
-       use psb_spmat_type
-       type(psb_dspmat_type), intent(inout) :: a
-       integer, intent(out)         :: info
-       logical, optional :: clshr
-     end subroutine psb_dipcoo2csc
-     subroutine psb_zipcoo2csc(a,info,clshr)
-       use psb_spmat_type
-       type(psb_zspmat_type), intent(inout) :: a
-       integer, intent(out)         :: info
-       logical, optional :: clshr
-     end subroutine psb_zipcoo2csc
+    subroutine psb_dipcoo2csc(a,info,clshr)
+      use psb_spmat_type
+      type(psb_dspmat_type), intent(inout) :: a
+      integer, intent(out)         :: info
+      logical, optional :: clshr
+    end subroutine psb_dipcoo2csc
+    subroutine psb_zipcoo2csc(a,info,clshr)
+      use psb_spmat_type
+      type(psb_zspmat_type), intent(inout) :: a
+      integer, intent(out)         :: info
+      logical, optional :: clshr
+    end subroutine psb_zipcoo2csc
   end interface
 
   interface psb_ipcsr2coo
-     subroutine psb_dipcsr2coo(a,info)
-       use psb_spmat_type
-       type(psb_dspmat_type), intent(inout) :: a
-       integer, intent(out)         :: info
-     end subroutine psb_dipcsr2coo
-     subroutine psb_zipcsr2coo(a,info)
-       use psb_spmat_type
-       type(psb_zspmat_type), intent(inout) :: a
-       integer, intent(out)         :: info
-     end subroutine psb_zipcsr2coo
+    subroutine psb_dipcsr2coo(a,info)
+      use psb_spmat_type
+      type(psb_dspmat_type), intent(inout) :: a
+      integer, intent(out)         :: info
+    end subroutine psb_dipcsr2coo
+    subroutine psb_zipcsr2coo(a,info)
+      use psb_spmat_type
+      type(psb_zspmat_type), intent(inout) :: a
+      integer, intent(out)         :: info
+    end subroutine psb_zipcsr2coo
   end interface
 
   interface psb_csprt
-     subroutine psb_dcsprt(iout,a,iv,irs,ics,head,ivr,ivc)
-       use psb_spmat_type
-       integer, intent(in)       :: iout
-       type(psb_dspmat_type), intent(in) :: a
-       integer, intent(in), optional :: iv(:)
-       integer, intent(in), optional :: irs,ics
-       character(len=*), optional    :: head
-       integer, intent(in), optional :: ivr(:),ivc(:)
-     end subroutine psb_dcsprt
-     subroutine psb_zcsprt(iout,a,iv,irs,ics,head,ivr,ivc)
-       use psb_spmat_type
-       integer, intent(in)       :: iout
-       type(psb_zspmat_type), intent(in) :: a
-       integer, intent(in), optional :: iv(:)
-       integer, intent(in), optional :: irs,ics
-       character(len=*), optional    :: head
-       integer, intent(in), optional :: ivr(:),ivc(:)
-     end subroutine psb_zcsprt
+    subroutine psb_dcsprt(iout,a,iv,irs,ics,head,ivr,ivc)
+      use psb_spmat_type
+      integer, intent(in)       :: iout
+      type(psb_dspmat_type), intent(in) :: a
+      integer, intent(in), optional :: iv(:)
+      integer, intent(in), optional :: irs,ics
+      character(len=*), optional    :: head
+      integer, intent(in), optional :: ivr(:),ivc(:)
+    end subroutine psb_dcsprt
+    subroutine psb_zcsprt(iout,a,iv,irs,ics,head,ivr,ivc)
+      use psb_spmat_type
+      integer, intent(in)       :: iout
+      type(psb_zspmat_type), intent(in) :: a
+      integer, intent(in), optional :: iv(:)
+      integer, intent(in), optional :: irs,ics
+      character(len=*), optional    :: head
+      integer, intent(in), optional :: ivr(:),ivc(:)
+    end subroutine psb_zcsprt
   end interface
 
   interface psb_neigh
-     subroutine psb_dneigh(a,idx,neigh,n,info,lev)
-       use psb_spmat_type
-       type(psb_dspmat_type), intent(in) :: a   
-       integer, intent(in)       :: idx 
-       integer, intent(out)      :: n   
-       integer, allocatable          :: neigh(:)
-       integer, intent(out)  :: info
-       integer, optional, intent(in) :: lev 
-     end subroutine psb_dneigh
-     subroutine psb_zneigh(a,idx,neigh,n,info,lev)
-       use psb_spmat_type
-       type(psb_zspmat_type), intent(in) :: a   
-       integer, intent(in)       :: idx 
-       integer, intent(out)      :: n   
-       integer, allocatable      :: neigh(:)
-       integer, intent(out)  :: info
-       integer, optional, intent(in) :: lev 
-     end subroutine psb_zneigh
+    subroutine psb_dneigh(a,idx,neigh,n,info,lev)
+      use psb_spmat_type
+      type(psb_dspmat_type), intent(in) :: a   
+      integer, intent(in)       :: idx 
+      integer, intent(out)      :: n   
+      integer, allocatable          :: neigh(:)
+      integer, intent(out)  :: info
+      integer, optional, intent(in) :: lev 
+    end subroutine psb_dneigh
+    subroutine psb_zneigh(a,idx,neigh,n,info,lev)
+      use psb_spmat_type
+      type(psb_zspmat_type), intent(in) :: a   
+      integer, intent(in)       :: idx 
+      integer, intent(out)      :: n   
+      integer, allocatable      :: neigh(:)
+      integer, intent(out)  :: info
+      integer, optional, intent(in) :: lev 
+    end subroutine psb_zneigh
   end interface
 
   interface psb_coins
-     subroutine psb_dcoins(nz,ia,ja,val,a,imin,imax,jmin,jmax,info,gtl,rebuild)
-       use psb_spmat_type
-       integer, intent(in) :: nz, imin,imax,jmin,jmax
-       integer, intent(in) :: ia(:),ja(:)
-       real(kind(1.d0)), intent(in) :: val(:)
-       type(psb_dspmat_type), intent(inout) :: a
-       integer, intent(out) :: info
-       integer, intent(in), optional :: gtl(:)
-       logical, optional, intent(in) :: rebuild
-     end subroutine psb_dcoins
-     subroutine psb_zcoins(nz,ia,ja,val,a,imin,imax,jmin,jmax,info,gtl,rebuild)
-       use psb_spmat_type
-       integer, intent(in) :: nz, imin,imax,jmin,jmax
-       integer, intent(in) :: ia(:),ja(:)
-       complex(kind(1.d0)), intent(in) :: val(:)
-       type(psb_zspmat_type), intent(inout) :: a
-       integer, intent(out) :: info
-       integer, intent(in), optional :: gtl(:)
-       logical, optional, intent(in) :: rebuild
-     end subroutine psb_zcoins
+    subroutine psb_dcoins(nz,ia,ja,val,a,imin,imax,jmin,jmax,info,gtl,rebuild)
+      use psb_spmat_type
+      integer, intent(in) :: nz, imin,imax,jmin,jmax
+      integer, intent(in) :: ia(:),ja(:)
+      real(kind(1.d0)), intent(in) :: val(:)
+      type(psb_dspmat_type), intent(inout) :: a
+      integer, intent(out) :: info
+      integer, intent(in), optional :: gtl(:)
+      logical, optional, intent(in) :: rebuild
+    end subroutine psb_dcoins
+    subroutine psb_zcoins(nz,ia,ja,val,a,imin,imax,jmin,jmax,info,gtl,rebuild)
+      use psb_spmat_type
+      integer, intent(in) :: nz, imin,imax,jmin,jmax
+      integer, intent(in) :: ia(:),ja(:)
+      complex(kind(1.d0)), intent(in) :: val(:)
+      type(psb_zspmat_type), intent(inout) :: a
+      integer, intent(out) :: info
+      integer, intent(in), optional :: gtl(:)
+      logical, optional, intent(in) :: rebuild
+    end subroutine psb_zcoins
   end interface
 
 
   interface psb_symbmm
-     subroutine psb_dsymbmm(a,b,c,info)
-       use psb_spmat_type
-       type(psb_dspmat_type) :: a,b,c
-       integer               :: info
-     end subroutine psb_dsymbmm
-     subroutine psb_zsymbmm(a,b,c,info)
-       use psb_spmat_type
-       type(psb_zspmat_type) :: a,b,c
-       integer               :: info
-     end subroutine psb_zsymbmm
+    subroutine psb_dsymbmm(a,b,c,info)
+      use psb_spmat_type
+      type(psb_dspmat_type) :: a,b,c
+      integer               :: info
+    end subroutine psb_dsymbmm
+    subroutine psb_zsymbmm(a,b,c,info)
+      use psb_spmat_type
+      type(psb_zspmat_type) :: a,b,c
+      integer               :: info
+    end subroutine psb_zsymbmm
   end interface
 
   interface psb_numbmm
-     subroutine psb_dnumbmm(a,b,c)
-       use psb_spmat_type
-       type(psb_dspmat_type) :: a,b,c
-     end subroutine psb_dnumbmm
-     subroutine psb_znumbmm(a,b,c)
-       use psb_spmat_type
-       type(psb_zspmat_type) :: a,b,c
-     end subroutine psb_znumbmm
+    subroutine psb_dnumbmm(a,b,c)
+      use psb_spmat_type
+      type(psb_dspmat_type) :: a,b,c
+    end subroutine psb_dnumbmm
+    subroutine psb_znumbmm(a,b,c)
+      use psb_spmat_type
+      type(psb_zspmat_type) :: a,b,c
+    end subroutine psb_znumbmm
   end interface
 
   interface psb_transp
-     subroutine psb_dtransp(a,b,c,fmt)
-       use psb_spmat_type
-       type(psb_dspmat_type) :: a,b
-       integer, optional :: c
-       character(len=*), optional :: fmt
-     end subroutine psb_dtransp
-     subroutine psb_ztransp(a,b,c,fmt)
-       use psb_spmat_type
-       type(psb_zspmat_type) :: a,b
-       integer, optional :: c
-       character(len=*), optional :: fmt
-     end subroutine psb_ztransp
+    subroutine psb_dtransp(a,b,c,fmt)
+      use psb_spmat_type
+      type(psb_dspmat_type) :: a,b
+      integer, optional :: c
+      character(len=*), optional :: fmt
+    end subroutine psb_dtransp
+    subroutine psb_ztransp(a,b,c,fmt)
+      use psb_spmat_type
+      type(psb_zspmat_type) :: a,b
+      integer, optional :: c
+      character(len=*), optional :: fmt
+    end subroutine psb_ztransp
   end interface
 
   interface psb_transc
-     subroutine psb_ztransc(a,b,c,fmt)
-       use psb_spmat_type
-       type(psb_zspmat_type) :: a,b
-       integer, optional :: c
-       character(len=*), optional :: fmt
-     end subroutine psb_ztransc
+    subroutine psb_ztransc(a,b,c,fmt)
+      use psb_spmat_type
+      type(psb_zspmat_type) :: a,b
+      integer, optional :: c
+      character(len=*), optional :: fmt
+    end subroutine psb_ztransc
   end interface
 
   interface psb_rwextd
-     subroutine psb_drwextd(nr,a,info,b,rowscale)
-       use psb_spmat_type
-       integer, intent(in) :: nr
-       type(psb_dspmat_type), intent(inout) :: a
-       integer, intent(out)         :: info
-       type(psb_dspmat_type), intent(in), optional  :: b
-       logical, intent(in), optional :: rowscale
-     end subroutine psb_drwextd
-     subroutine psb_zrwextd(nr,a,info,b,rowscale)
-       use psb_spmat_type
-       integer, intent(in) :: nr
-       type(psb_zspmat_type), intent(inout) :: a
-       integer, intent(out)         :: info
-       type(psb_zspmat_type), intent(in), optional  :: b
-       logical, intent(in), optional :: rowscale
-     end subroutine psb_zrwextd
+    subroutine psb_drwextd(nr,a,info,b,rowscale)
+      use psb_spmat_type
+      integer, intent(in) :: nr
+      type(psb_dspmat_type), intent(inout) :: a
+      integer, intent(out)         :: info
+      type(psb_dspmat_type), intent(in), optional  :: b
+      logical, intent(in), optional :: rowscale
+    end subroutine psb_drwextd
+    subroutine psb_zrwextd(nr,a,info,b,rowscale)
+      use psb_spmat_type
+      integer, intent(in) :: nr
+      type(psb_zspmat_type), intent(inout) :: a
+      integer, intent(out)         :: info
+      type(psb_zspmat_type), intent(in), optional  :: b
+      logical, intent(in), optional :: rowscale
+    end subroutine psb_zrwextd
   end interface
 
   interface psb_csnmi
-     real(kind(1.d0)) function psb_dcsnmi(a,info,trans)
-       use psb_spmat_type
-       type(psb_dspmat_type), intent(in)  :: a
-       integer, intent(out)       :: info
-       character, optional        :: trans
-     end function psb_dcsnmi
-     real(kind(1.d0)) function psb_zcsnmi(a,info,trans)
-       use psb_spmat_type
-       type(psb_zspmat_type), intent(in)  :: a
-       integer, intent(out)       :: info
-       character, optional        :: trans
-     end function psb_zcsnmi
+    real(kind(1.d0)) function psb_dcsnmi(a,info,trans)
+      use psb_spmat_type
+      type(psb_dspmat_type), intent(in)  :: a
+      integer, intent(out)       :: info
+      character, optional        :: trans
+    end function psb_dcsnmi
+    real(kind(1.d0)) function psb_zcsnmi(a,info,trans)
+      use psb_spmat_type
+      type(psb_zspmat_type), intent(in)  :: a
+      integer, intent(out)       :: info
+      character, optional        :: trans
+    end function psb_zcsnmi
   end interface
 
+  interface psb_sp_clip
+    subroutine psb_dspclip(a,b,info,imin,imax,jmin,jmax,rscale,cscale)
+      use psb_spmat_type
+      implicit none 
+      type(psb_dspmat_type), intent(in)  :: a
+      type(psb_dspmat_type), intent(out) :: b
+      integer, intent(out)               :: info
+      integer, intent(in), optional      :: imin,imax,jmin,jmax
+      logical, intent(in), optional      :: rscale,cscale
+    end subroutine psb_dspclip
+    subroutine psb_zspclip(a,b,info,imin,imax,jmin,jmax,rscale,cscale)
+      use psb_spmat_type
+      implicit none 
+      type(psb_zspmat_type), intent(in)  :: a
+      type(psb_zspmat_type), intent(out) :: b
+      integer, intent(out)               :: info
+      integer, intent(in), optional      :: imin,imax,jmin,jmax
+      logical, intent(in), optional      :: rscale,cscale
+    end subroutine psb_zspclip
+  end interface
 
   interface psb_sp_getdiag
      subroutine psb_dspgtdiag(a,d,info)
