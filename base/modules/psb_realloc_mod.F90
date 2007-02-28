@@ -1213,7 +1213,7 @@ Contains
     if (allocated(vin)) then 
       call move_alloc(vin,vout)
     else if (allocated(vout)) then 
-      write(0,*) 'transfer: Clearing output'
+!!$      write(0,*) 'transfer: Clearing output'
       deallocate(vout)
     end if
 
@@ -1361,7 +1361,7 @@ Contains
     if (allocated(vin)) then 
       call move_alloc(vin,vout)
     else if (allocated(vout)) then 
-      write(0,*) 'transfer: Clearing output'
+!!$      write(0,*) 'transfer: Clearing output'
       deallocate(vout)
     end if
 #else

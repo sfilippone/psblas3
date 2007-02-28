@@ -165,7 +165,8 @@ subroutine psi_zswapdatam(flag,n,beta,y,desc_a,work,info,data)
     end if
   end if
 
-
+  idxr = max(idxr,1)
+  idxs = max(idxs,1)
   if((idxr+idxs) < size(work)) then
     sndbuf => work(1:idxs)
     rcvbuf => work(idxs+1:idxs+idxr)
@@ -580,8 +581,9 @@ subroutine psi_zswapdatav(flag,beta,y,desc_a,work,info,data)
     end if
   end if
 
-
-
+  
+  idxr = max(idxr,1)
+  idxs = max(idxs,1)
   if((idxr+idxs) < size(work)) then
     sndbuf => work(1:idxs)
     rcvbuf => work(idxs+1:idxs+idxr)

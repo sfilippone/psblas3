@@ -10,9 +10,9 @@ F90=/usr/local/gcc42/bin/gfortran
 FC=/usr/local/gcc42/bin/gfortran
 F77=$(FC)
 CC=/usr/local/gcc42/bin/gcc
-F90COPT=-O3 -ggdb
-FCOPT=-O3 -ggdb
-CCOPT=-O3 -ggdb
+F90COPT=-O3 -ggdb 
+FCOPT=-O3 -ggdb 
+CCOPT=-O3 -ggdb 
 
 #######################  Section 2 #######################
 #  Define your linker and linker flags here              #
@@ -35,7 +35,9 @@ BLACS=-lmpiblacs-gcc42 -L$(HOME)/LIB
 ##########################################################
 SLUDIR=/usr/local/SuperLU_3.0
 SLU=-lslu_lx_gcc42 -L$(SLUDIR)
-SLUDEF=-DHave_SLU_ -I$(SLUDIR)
+SLUDistDIR=/usr/local/SLUDist_2.0
+SLUDist=-lslud-bck-gcc42 -L$(SLUDistDIR) -L $(HOME)/LIB
+SLUDEF=-DHave_SLU_ -I$(SLUDIR) -DHave_SLUDist_ -I$(SLUDistDIR)
 
 UMFDIR=$(HOME)/LIB/Umfpack_gcc41
 UMF=-lumfpack -lamd -L$(UMFDIR)
@@ -45,7 +47,7 @@ UMFDEF=-DHave_UMF_ -I$(UMFDIR)
 #  check URL http://www.cs.umn.edu:~karypis
 #  
 METIS_LIB = -L$(HOME)/NUMERICAL/metis-4.0 -lmetis 
-LDLIBS=$(BLACS) $(SLU) $(UMF) $(BLAS) $(METIS_LIB)
+LDLIBS=$(BLACS) $(SLU) $(SLUDist) $(UMF) $(BLAS) $(METIS_LIB)
 
 #  Add -DLargeFptr for 64-bit addresses
 CDEFINES=-DAdd_ $(SLUDEF) $(UMFDEF)
