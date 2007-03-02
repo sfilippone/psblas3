@@ -53,7 +53,7 @@ C     Compute number of nnzero elements per row
 C     Sorting Array work
 C ........................
 
-      CALL MRGSRT(M,WORK,WORK(M+1),IRET)
+      CALL MSORT_UP(M,WORK,WORK(M+1),IRET)
       IF (IRET.EQ.0) THEN
 C     Construct IPERM Vector
         LP = WORK(M+1)

@@ -132,7 +132,7 @@ C     SCALE  = (UNITD.EQ.'L') ! meaningless
             
             
 C     .... Order with key IA1N....
-            CALL MRGSRT(NNZ,IA1N,AUX,IRET)
+            CALL MSORT_UP(NNZ,IA1N,AUX,IRET)
             IF (IRET.EQ.0) CALL REORDVN(NNZ,ARN,IA1N,IA2N,AUX)           
             
 C     .... Order with key IA2N ...
@@ -144,7 +144,7 @@ C     .... Order with key IA2N ...
                   J = J+1
                ENDDO
                NZL = J - I
-               CALL MRGSRT(NZL,IA2N(I),AUX,IRET)
+               CALL MSORT_UP(NZL,IA2N(I),AUX,IRET)
                IF (IRET.EQ.0) CALL REORDVN(NZL,ARN(I),IA1N(I),IA2N(I),
      +              AUX)
                I = J

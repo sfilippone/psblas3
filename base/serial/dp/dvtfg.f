@@ -160,7 +160,7 @@ C               FOR CURRENT GROUP
 C                                                                               
             L1 = IWORK2(LEV+1) - IWORK2(LEV)                                    
             L0 = IWORK2(LEV) - 1                                                
-            CALL MRGSRT(L1,IWORK1(IWORK2(LEV)),IPAT,IRET)                        
+            CALL MSORT_UP(L1,IWORK1(IWORK2(LEV)),IPAT,IRET)                        
             IF (IRET.EQ.0) THEN
               NP = IPAT(1)                                                        
               DO 280 L = 1, L1                                                    

@@ -3,8 +3,8 @@ include ../../../Make.inc
 # The object files
 #
 
-FOBJS  = isr.o isrx.o \
-	mrgsrt.o mrgsrtd.o isaperm.o ibsrch.o issrch.o  imsr.o imsrx.o
+FOBJS  = isr.o isrx.o msort_up.o msort_dw.o\
+	isaperm.o ibsrch.o issrch.o  imsr.o imsrx.o
 
 
 OBJS=$(FOBJS)

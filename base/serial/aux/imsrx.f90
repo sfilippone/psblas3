@@ -64,9 +64,9 @@ subroutine imsrx(n,x,indx,idir,flag)
   endif
 
   if (idir == psb_sort_up_) then 
-    call mrgsrt(n,x,iaux,iret)
+    call msort_up(n,x,iaux,iret)
   else
-    call mrgsrtd(n,x,iaux,iret)
+    call msort_dw(n,x,iaux,iret)
   end if
 
   if (iret /= 1) then 

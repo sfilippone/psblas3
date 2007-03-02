@@ -146,7 +146,7 @@ c
             if (debug) write(0,*) 'build check :',ia2n(ip1+psb_nnzt_) 
             
 c     .... order with key ia1n ...
-            call mrgsrt(nnz,ia1n,aux,iret)
+            call msort_up(nnz,ia1n,aux,iret)
             if (iret.eq.0)
      +        call zreordvn3(nnz,arn,ia1n,ia2n,aux(ipx),aux)
 c     .... order with key ia2n ...
@@ -159,7 +159,7 @@ c     .... order with key ia2n ...
                 j = j+1
               enddo
               nzl = j - i
-              call mrgsrt(nzl,ia2n(i),aux,iret)
+              call msort_up(nzl,ia2n(i),aux,iret)
               if (iret.eq.0) call zreordvn3(nzl,arn(i),ia1n(i),ia2n(i),
      +          aux(ipx+i-1),aux)
               i = j
@@ -198,7 +198,7 @@ c     ... sum the duplicated element ...
           else
             
 c     .... order with key ia1n ...
-            call mrgsrt(nnz,ia1n,aux,iret)
+            call msort_up(nnz,ia1n,aux,iret)
             if (iret.eq.0) call zreordvn(nnz,arn,ia1n,ia2n,aux)
 c     .... order with key ia2n ...
             
@@ -210,7 +210,7 @@ c     .... order with key ia2n ...
                 j = j+1
               enddo
               nzl = j - i
-              call mrgsrt(nzl,ia2n(i),aux,iret)
+              call msort_up(nzl,ia2n(i),aux,iret)
               if (iret.eq.0) call zreordvn(nzl,arn(i),ia1n(i),ia2n(i),
      +          aux)
               i = j

@@ -72,7 +72,7 @@ Subroutine psb_zfixcoo(A,INFO,idir)
 
   case(0) !  Row major order
 
-    call mrgsrt(nza,a%ia1(1),iaux(1),iret)
+    call msort_up(nza,a%ia1(1),iaux(1),iret)
     if (iret.eq.0) call zreordvn(nza,a%aspk(1),a%ia1(1),a%ia2(1),iaux(1))
     i    = 1
     j    = i
@@ -82,7 +82,7 @@ Subroutine psb_zfixcoo(A,INFO,idir)
         if (j > nza) exit
       enddo
       nzl = j - i
-      call mrgsrt(nzl,a%ia2(i),iaux(1),iret)
+      call msort_up(nzl,a%ia2(i),iaux(1),iret)
       if (iret.eq.0) &
            & call zreordvn(nzl,a%aspk(i),a%ia1(i),a%ia2(i),iaux(1))
       i = j
@@ -113,7 +113,7 @@ Subroutine psb_zfixcoo(A,INFO,idir)
 
   case(1) !  Col major order
 
-    call mrgsrt(nza,a%ia2(1),iaux(1),iret)
+    call msort_up(nza,a%ia2(1),iaux(1),iret)
     if (iret.eq.0) call zreordvn(nza,a%aspk(1),a%ia1(1),a%ia2(1),iaux(1))
     i    = 1
     j    = i
@@ -123,7 +123,7 @@ Subroutine psb_zfixcoo(A,INFO,idir)
         if (j > nza) exit
       enddo
       nzl = j - i
-      call mrgsrt(nzl,a%ia1(i),iaux(1),iret)
+      call msort_up(nzl,a%ia1(i),iaux(1),iret)
       if (iret.eq.0) &
            & call zreordvn(nzl,a%aspk(i),a%ia1(i),a%ia2(i),iaux(1))
       i = j

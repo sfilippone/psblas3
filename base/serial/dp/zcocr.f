@@ -157,7 +157,7 @@ c$$$     +        ip1,ip2,nnz,ian2(ip1+nnzt_)
 
             if (debug) write(0,*) 'Build check :',ian2(ip1+psb_nnzt_) 
 C       .... Order with key IA ...
-            CALL MRGSRT(NNZ,IA,AUX,IRET)
+            CALL MSORT_UP(NNZ,IA,AUX,IRET)
             IF (IRET.EQ.0) CALL ZREORDVN3(NNZ,AR,IA,JA,AUX(IPX),AUX)
             if (debug) then 
               do i=1, nnz-1
@@ -183,7 +183,7 @@ c$$$     +          (J.LE.NNZ))
                 J = J+1
               ENDDO
               NZL = J - I
-              CALL MRGSRT(NZL,JA(I),AUX,IRET)
+              CALL MSORT_UP(NZL,JA(I),AUX,IRET)
               IF (IRET.EQ.0) CALL ZREORDVN3(NZL,AR(I),IA(I),JA(I),
      +          AUX(IPX+I-1),AUX)
               I = J
@@ -244,7 +244,7 @@ C                    ... Sum the duplicated element ...
           ELSE
 c$$$            write(0,*) 'Going for ELSE !!!?'
 C       .... Order with key IA ...
-            CALL MRGSRT(NNZ,IA,AUX,IRET)
+            CALL MSORT_UP(NNZ,IA,AUX,IRET)
             IF (IRET.EQ.0) CALL ZREORDVN(NNZ,AR,IA,JA,AUX)
 C       .... Order with key IA2N ...
             I    = 1
@@ -260,7 +260,7 @@ c$$$     +          (J.LE.NNZ))
                 J = J+1
               ENDDO
               NZL = J - I
-              CALL MRGSRT(NZL,JA(I),AUX,IRET)
+              CALL MSORT_UP(NZL,JA(I),AUX,IRET)
               IF (IRET.EQ.0) CALL ZREORDVN(NZL,AR(I),IA(I),JA(I),AUX)
               I = J
             ENDDO
@@ -337,7 +337,7 @@ C                    ... Sum the duplicated element ...
         ELSE IF (DESCRA(1:1).EQ.'T' .AND. DESCRA(2:2).EQ.'U') THEN
 
 C       .... Order with key IA ...
-          CALL MRGSRT(NNZ,IA,AUX,IRET)
+          CALL MSORT_UP(NNZ,IA,AUX,IRET)
           IF (IRET.EQ.0) CALL ZREORDVN(NNZ,AR,IA,JA,AUX)
 C       .... Order with key IA2N ...
           I    = 1
@@ -353,7 +353,7 @@ c$$$     +          (J.LE.NNZ))
               J = J+1
             ENDDO
             NZL = J - I
-            CALL MRGSRT(NZL,JA(I),AUX,IRET)
+            CALL MSORT_UP(NZL,JA(I),AUX,IRET)
             IF (IRET.EQ.0) CALL ZREORDVN(NZL,AR(I),IA(I),JA(I),AUX)
             I = J
           ENDDO
@@ -437,7 +437,7 @@ C     ... Sum the duplicated element ...
         ELSE IF (DESCRA(1:1).EQ.'T' .AND. DESCRA(2:2).EQ.'L') THEN
 
 C       .... Order with key IA ...
-          CALL MRGSRT(NNZ,IA,AUX,IRET)
+          CALL MSORT_UP(NNZ,IA,AUX,IRET)
           IF (IRET.EQ.0) CALL ZREORDVN(NNZ,AR,IA,JA,AUX)
 C       .... Order with key IA2N ...
           I    = 1
@@ -453,7 +453,7 @@ c$$$     +          (J.LE.NNZ))
               J = J+1
             ENDDO
             NZL = J - I
-            CALL MRGSRT(NZL,JA(I),AUX,IRET)
+            CALL MSORT_UP(NZL,JA(I),AUX,IRET)
             IF (IRET.EQ.0) CALL ZREORDVN(NZL,AR(I),IA(I),JA(I),AUX)
             I = J
           ENDDO
