@@ -225,11 +225,15 @@ subroutine psi_zswapdatam(flag,n,beta,y,desc_a,work,info,data)
       nesd = d_idx(pnti+nerv+psb_n_elem_send_)
       
       if (proc_to_comm  <  me) then
-        call psb_snd(ictxt,sndbuf(snd_pt:snd_pt+n*nesd-1), proc_to_comm)
-        call psb_rcv(ictxt,rcvbuf(rcv_pt:rcv_pt+n*nerv-1), proc_to_comm)
+        if (nesd>0) call psb_snd(ictxt,&
+             & sndbuf(snd_pt:snd_pt+n*nesd-1), proc_to_comm)
+        if (nerv>0) call psb_rcv(ictxt,&
+             & rcvbuf(rcv_pt:rcv_pt+n*nerv-1), proc_to_comm)
       else if (proc_to_comm  >  me) then
-        call psb_rcv(ictxt,rcvbuf(rcv_pt:rcv_pt+n*nerv-1), proc_to_comm)
-        call psb_snd(ictxt,sndbuf(snd_pt:snd_pt+n*nesd-1), proc_to_comm)
+        if (nerv>0) call psb_rcv(ictxt,&
+             & rcvbuf(rcv_pt:rcv_pt+n*nerv-1), proc_to_comm)
+        if (nesd>0) call psb_snd(ictxt,&
+             & sndbuf(snd_pt:snd_pt+n*nesd-1), proc_to_comm)
       end if
       
       rcv_pt = rcv_pt + n*nerv
@@ -250,13 +254,13 @@ subroutine psi_zswapdatam(flag,n,beta,y,desc_a,work,info,data)
       proc_to_comm = d_idx(pnti+psb_proc_id_)
       nerv = d_idx(pnti+psb_n_elem_recv_)
       nesd = d_idx(pnti+nerv+psb_n_elem_send_)
-
-      p2ptag = krecvid(ictxt,proc_to_comm,me)
-      call psb_get_rank(prcid(i),ictxt,proc_to_comm)      
-      call mpi_irecv(rcvbuf(rcv_pt),n*nerv,&
-           & mpi_double_complex,prcid(i),&
-           & p2ptag, icomm,rvhd(i),iret)
-      
+      if (nerv > 0) then 
+        p2ptag = krecvid(ictxt,proc_to_comm,me)
+        call psb_get_rank(prcid(i),ictxt,proc_to_comm)      
+        call mpi_irecv(rcvbuf(rcv_pt),n*nerv,&
+             & mpi_double_complex,prcid(i),&
+             & p2ptag, icomm,rvhd(i),iret)
+      endif
       rcv_pt = rcv_pt + n*nerv
       snd_pt = snd_pt + n*nesd
       pnti   = pnti + nerv + nesd + 3
@@ -276,24 +280,24 @@ subroutine psi_zswapdatam(flag,n,beta,y,desc_a,work,info,data)
       nesd = d_idx(pnti+nerv+psb_n_elem_send_)
 
       p2ptag=ksendid(ictxt,proc_to_comm,me)
-
-      if (usersend) then 
-        call mpi_rsend(sndbuf(snd_pt),n*nesd,&
-             & mpi_double_complex,prcid(i),&
+      if (nesd>0) then 
+        if (usersend) then 
+          call mpi_rsend(sndbuf(snd_pt),n*nesd,&
+               & mpi_double_complex,prcid(i),&
+               & p2ptag,icomm,iret)
+        else
+          call mpi_send(sndbuf(snd_pt),n*nesd,&
+               & mpi_double_complex,prcid(i),&
              & p2ptag,icomm,iret)
-      else
-        call mpi_send(sndbuf(snd_pt),n*nesd,&
-             & mpi_double_complex,prcid(i),&
-             & p2ptag,icomm,iret)
+        end if
+        
+        if(iret /= mpi_success) then
+          int_err(1) = iret
+          info=400
+          call psb_errpush(info,name,i_err=int_err)
+          goto 9999
+        end if
       end if
-
-      if(iret /= mpi_success) then
-        int_err(1) = iret
-        info=400
-        call psb_errpush(info,name,i_err=int_err)
-        goto 9999
-      end if
-      
       rcv_pt = rcv_pt + n*nerv
       snd_pt = snd_pt + n*nesd
       pnti   = pnti + nerv + nesd + 3
@@ -310,7 +314,7 @@ subroutine psi_zswapdatam(flag,n,beta,y,desc_a,work,info,data)
 
       p2ptag = krecvid(ictxt,proc_to_comm,me)
       
-      if (proc_to_comm /= me) then
+      if ((proc_to_comm /= me).and.(nerv>0)) then
         call mpi_wait(rvhd(i),p2pstat,iret)
         if(iret /= mpi_success) then
           int_err(1) = iret
@@ -333,7 +337,8 @@ subroutine psi_zswapdatam(flag,n,beta,y,desc_a,work,info,data)
       proc_to_comm = d_idx(pnti+psb_proc_id_)
       nerv = d_idx(pnti+psb_n_elem_recv_)
       nesd = d_idx(pnti+nerv+psb_n_elem_send_)
-      call psb_snd(ictxt,sndbuf(snd_pt:snd_pt+n*nesd-1), proc_to_comm)
+      if (nesd>0) call psb_snd(ictxt,&
+           & sndbuf(snd_pt:snd_pt+n*nesd-1), proc_to_comm)
       
       rcv_pt = rcv_pt + n*nerv
       snd_pt = snd_pt + n*nesd
@@ -351,7 +356,8 @@ subroutine psi_zswapdatam(flag,n,beta,y,desc_a,work,info,data)
       proc_to_comm = d_idx(pnti+psb_proc_id_)
       nerv = d_idx(pnti+psb_n_elem_recv_)
       nesd = d_idx(pnti+nerv+psb_n_elem_send_)
-      call psb_rcv(ictxt,rcvbuf(rcv_pt:rcv_pt+n*nerv-1), proc_to_comm)
+      if (nerv>0) call psb_rcv(ictxt,&
+           & rcvbuf(rcv_pt:rcv_pt+n*nerv-1), proc_to_comm)
       rcv_pt = rcv_pt + n*nerv
       snd_pt = snd_pt + n*nesd
       pnti   = pnti + nerv + nesd + 3
@@ -450,7 +456,7 @@ subroutine psi_zswapdatav(flag,beta,y,desc_a,work,info,data)
   use psi_gthsct_mod
   use mpi
   implicit none
-
+  
   integer, intent(in)      :: flag
   integer, intent(out)     :: info
   complex(kind(1.d0))         :: y(:), beta
@@ -581,7 +587,7 @@ subroutine psi_zswapdatav(flag,beta,y,desc_a,work,info,data)
     end if
   end if
 
-  
+
   idxr = max(idxr,1)
   idxs = max(idxs,1)
   if((idxr+idxs) < size(work)) then
@@ -640,11 +646,15 @@ subroutine psi_zswapdatav(flag,beta,y,desc_a,work,info,data)
       nesd = d_idx(pnti+nerv+psb_n_elem_send_)
 
       if (proc_to_comm  <  me) then
-        call psb_snd(ictxt,sndbuf(snd_pt:snd_pt+nesd-1), proc_to_comm)
-        call psb_rcv(ictxt,rcvbuf(rcv_pt:rcv_pt+nerv-1), proc_to_comm)
+        if (nesd>0) call psb_snd(ictxt,&
+             & sndbuf(snd_pt:snd_pt+nesd-1), proc_to_comm)
+        if (nerv>0) call psb_rcv(ictxt,&
+             & rcvbuf(rcv_pt:rcv_pt+nerv-1), proc_to_comm)
       else if (proc_to_comm  >  me) then
-        call psb_rcv(ictxt,rcvbuf(rcv_pt:rcv_pt+nerv-1), proc_to_comm)
-        call psb_snd(ictxt,sndbuf(snd_pt:snd_pt+nesd-1), proc_to_comm)
+        if (nerv>0) call psb_rcv(ictxt,&
+             & rcvbuf(rcv_pt:rcv_pt+nerv-1), proc_to_comm)
+        if (nesd>0) call psb_snd(ictxt,&
+             & sndbuf(snd_pt:snd_pt+nesd-1), proc_to_comm)
       end if
       rcv_pt = rcv_pt + nerv
       snd_pt = snd_pt + nesd
@@ -663,11 +673,13 @@ subroutine psi_zswapdatav(flag,beta,y,desc_a,work,info,data)
       nerv = d_idx(pnti+psb_n_elem_recv_)
       nesd = d_idx(pnti+nerv+psb_n_elem_send_)
 
-      p2ptag = krecvid(ictxt,proc_to_comm,me)
-      call psb_get_rank(prcid(i),ictxt,proc_to_comm)      
-      call mpi_irecv(rcvbuf(rcv_pt),nerv,&
-           & mpi_double_complex,prcid(i),&
-           & p2ptag, icomm,rvhd(i),iret)
+      if (nerv>0) then 
+        p2ptag = krecvid(ictxt,proc_to_comm,me)
+        call psb_get_rank(prcid(i),ictxt,proc_to_comm)      
+        call mpi_irecv(rcvbuf(rcv_pt),nerv,&
+             & mpi_double_complex,prcid(i),&
+             & p2ptag, icomm,rvhd(i),iret)
+      endif
       rcv_pt = rcv_pt + nerv
       snd_pt = snd_pt + nesd
       pnti   = pnti + nerv + nesd + 3
@@ -687,21 +699,23 @@ subroutine psi_zswapdatav(flag,beta,y,desc_a,work,info,data)
 
       p2ptag=ksendid(ictxt,proc_to_comm,me)
 
-      if (usersend) then 
-        call mpi_rsend(sndbuf(snd_pt),nesd,&
-             & mpi_double_complex,prcid(i),&
-             & p2ptag,icomm,iret)
-      else
-        call mpi_send(sndbuf(snd_pt),nesd,&
-             & mpi_double_complex,prcid(i),&
-             & p2ptag,icomm,iret)
-      end if
+      if (nesd>0) then 
+        if (usersend) then 
+          call mpi_rsend(sndbuf(snd_pt),nesd,&
+               & mpi_double_complex,prcid(i),&
+               & p2ptag,icomm,iret)
+        else
+          call mpi_send(sndbuf(snd_pt),nesd,&
+               & mpi_double_complex,prcid(i),&
+               & p2ptag,icomm,iret)
+        end if
 
-      if(iret /= mpi_success) then
-        int_err(1) = iret
-        info=400
-        call psb_errpush(info,name,i_err=int_err)
-        goto 9999
+        if(iret /= mpi_success) then
+          int_err(1) = iret
+          info=400
+          call psb_errpush(info,name,i_err=int_err)
+          goto 9999
+        end if
       end if
       rcv_pt = rcv_pt + nerv
       snd_pt = snd_pt + nesd
@@ -717,7 +731,7 @@ subroutine psi_zswapdatav(flag,beta,y,desc_a,work,info,data)
 
       p2ptag = krecvid(ictxt,proc_to_comm,me)
 
-      if (proc_to_comm /= me) then
+      if ((proc_to_comm /= me).and.(nerv>0)) then
         call mpi_wait(rvhd(i),p2pstat,iret)
         if(iret /= mpi_success) then
           int_err(1) = iret
@@ -739,7 +753,8 @@ subroutine psi_zswapdatav(flag,beta,y,desc_a,work,info,data)
       proc_to_comm = d_idx(pnti+psb_proc_id_)
       nerv = d_idx(pnti+psb_n_elem_recv_)
       nesd = d_idx(pnti+nerv+psb_n_elem_send_)
-      call psb_snd(ictxt,sndbuf(snd_pt:snd_pt+nesd-1), proc_to_comm)
+      if (nesd>0) call psb_snd(ictxt,&
+           & sndbuf(snd_pt:snd_pt+nesd-1), proc_to_comm)
       rcv_pt = rcv_pt + nerv
       snd_pt = snd_pt + nesd
       pnti   = pnti + nerv + nesd + 3
@@ -754,7 +769,8 @@ subroutine psi_zswapdatav(flag,beta,y,desc_a,work,info,data)
       proc_to_comm = d_idx(pnti+psb_proc_id_)
       nerv = d_idx(pnti+psb_n_elem_recv_)
       nesd = d_idx(pnti+nerv+psb_n_elem_send_)
-      call psb_rcv(ictxt,rcvbuf(rcv_pt:rcv_pt+nerv-1), proc_to_comm)
+      if (nerv>0) call psb_rcv(ictxt,&
+           & rcvbuf(rcv_pt:rcv_pt+nerv-1), proc_to_comm)
       rcv_pt = rcv_pt + nerv
       snd_pt = snd_pt + nesd
       pnti   = pnti + nerv + nesd + 3
