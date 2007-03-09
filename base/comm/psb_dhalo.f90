@@ -363,6 +363,7 @@ subroutine  psb_dhalov(x,desc_a,info,alpha,work,tran,mode,data)
       end if
     end if
   else
+    aliw=.true.
     allocate(iwork(liwork),stat=info)
     if(info.ne.0) then
       info=4010
