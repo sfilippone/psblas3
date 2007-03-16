@@ -48,7 +48,7 @@ subroutine psb_zcsdp(a, b,info,ifc,check,trans,unitd,upd,dupl)
   use psb_error_mod
   use psb_spmat_type
   use psb_string_mod
-
+  use psb_serial_mod, psb_protect_name => psb_zcsdp
   implicit none
   !....Parameters...
   Type(psb_zspmat_type), intent(in)    :: A
@@ -69,14 +69,6 @@ subroutine psb_zcsdp(a, b,info,ifc,check,trans,unitd,upd,dupl)
   Integer, Parameter            :: maxtry=8
   logical, parameter            :: debug=.false.
   character(len=20)             :: name, ch_err
-
-  interface psb_cest
-    subroutine psb_cest(afmt, m,n,nnz, lia1, lia2, lar, iup, info)
-      integer, intent(in) ::  m,n,nnz,iup
-      integer, intent(out) :: lia1, lia2, lar, info
-      character, intent(inout) :: afmt*5
-    end subroutine psb_cest
-  end interface
 
   name='psb_csdp'
   info  = 0

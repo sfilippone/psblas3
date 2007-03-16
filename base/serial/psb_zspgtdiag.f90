@@ -34,9 +34,6 @@
 
 !*****************************************************************************
 !*                                                                           *
-!* Takes a specified row from matrix A and copies into matrix B (possibly    *
-!*  appending to B). Output is always COO. Input might be anything, once     *
-!* we get to actually write the code.....                                    *
 !*                                                                           *
 !*****************************************************************************
 subroutine psb_zspgtdiag(a,d,info)
@@ -45,24 +42,12 @@ subroutine psb_zspgtdiag(a,d,info)
   use psb_spmat_type
   use psb_error_mod
   use psb_const_mod
+  use psb_serial_mod, psb_protect_name => psb_zspgtdiag
   implicit none
 
   type(psb_zspmat_type), intent(in)     :: a
   complex(kind(1.d0)), intent(inout)       :: d(:) 
   integer, intent(out)                  :: info
-
-  interface psb_spgtblk
-     subroutine psb_zspgtblk(irw,a,b,info,append,iren,lrw)
-       use psb_spmat_type
-       type(psb_zspmat_type), intent(in) :: a
-       integer, intent(in)       :: irw
-       type(psb_zspmat_type), intent(inout)    :: b
-       logical, intent(in), optional :: append
-       integer, intent(in), target, optional :: iren(:)
-       integer, intent(in), optional :: lrw
-       integer, intent(out)  :: info
-     end subroutine psb_zspgtblk
-  end interface
 
   type(psb_zspmat_type)     :: tmpa
   integer :: i,j,k,nr, nz, err_act, ii, rng, irb, nrb
@@ -102,7 +87,7 @@ subroutine psb_zspgtdiag(a,d,info)
     write(0,*)'in spgtdiag'
     do i=1, rng, nrb
        irb=min(i+nrb-1,rng)
-       call psb_spgtblk(i,a,tmpa,info,lrw=irb)
+       call psb_sp_getblk(i,a,tmpa,info,lrw=irb)
        if(info.ne.0) then
           info=4010
           ch_err='psb_spgtblk'

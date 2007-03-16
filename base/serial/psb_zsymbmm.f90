@@ -41,6 +41,7 @@
 subroutine psb_zsymbmm(a,b,c,info)
   use psb_spmat_type
   use psb_string_mod
+  use psb_serial_mod, psb_protect_name => psb_zsymbmm
   implicit none 
 
   type(psb_zspmat_type) :: a,b,c
@@ -56,40 +57,14 @@ subroutine psb_zsymbmm(a,b,c,info)
     end subroutine symbmm
   end interface
 
-  interface psb_sp_getrow
-    subroutine psb_zspgetrow(irw,a,nz,ia,ja,val,info,iren,lrw)
-      use psb_spmat_type
-      type(psb_zspmat_type), intent(in) :: a
-      integer, intent(in)       :: irw
-      integer, intent(out)      :: nz
-      integer, intent(inout)    :: ia(:), ja(:)
-      complex(kind(1.d0)),  intent(inout)    :: val(:)
-      integer, intent(in), target, optional :: iren(:)
-      integer, intent(in), optional :: lrw
-      integer, intent(out)  :: info
-    end subroutine psb_zspgetrow
-  end interface
   character(len=20)         :: name, ch_err
   integer                   :: err_act
+  logical                   :: csra, csrb
   name='psb_symbmm'
   call psb_erractionsave(err_act)
 
-  select case(toupper(a%fida(1:3)))
-  case  ('CSR')
-  case default
-    info=135
-    ch_err=a%fida(1:3)
-    call psb_errpush(info,name,a_err=ch_err)
-    goto 9999
-  end select
-  select case(toupper(b%fida(1:3)))
-  case  ('CSR')
-  case default
-    info=136
-    ch_err=b%fida(1:3)
-    call psb_errpush(info,name,a_err=ch_err)
-    goto 9999
-  end select
+  csra = (toupper(a%fida(1:3))=='CSR')
+  csrb = (toupper(b%fida(1:3))=='CSR')
 
   if (b%m /= a%k) then 
     write(0,*) 'Mismatch in SYMBMM: ',a%m,a%k,b%m,b%k
@@ -100,12 +75,11 @@ subroutine psb_zsymbmm(a,b,c,info)
   endif
   nze = max(a%m+1,2*a%m)
   call psb_sp_reall(c,nze,info)
-
   !
   ! Note: we need to test whether there is a performance impact 
   !       in not using the original Douglas & Bank code. 
   !
-  if (.true.) then 
+  if (csra.and.csrb) then 
     call symbmm(a%m,a%k,b%k,a%ia2,a%ia1,0,&
          & b%ia2,b%ia1,0,&
          & c%ia2,c%ia1,0,itemp)
@@ -113,6 +87,7 @@ subroutine psb_zsymbmm(a,b,c,info)
     call inner_symbmm(a,b,c,itemp,info)
   endif
   call psb_realloc(size(c%ia1),c%aspk,info)
+
   c%pl(1) = 0
   c%pr(1) = 0
   c%m=a%m

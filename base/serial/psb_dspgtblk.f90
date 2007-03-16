@@ -61,7 +61,7 @@ subroutine psb_dspgtblk(irw,a,b,info,append,iren,lrw)
 
   name='psb_spgtblk'
   info  = 0
-  call psb_erractionsave(err_act)
+!!$  call psb_erractionsave(err_act)
 
   irw_ = irw 
   if (present(lrw)) then
@@ -79,7 +79,7 @@ subroutine psb_dspgtblk(irw,a,b,info,append,iren,lrw)
     append_=.false.
   endif
   if (present(iren)) then
-    iren_=>iren
+    iren_ => iren
   else 
     iren_ => null()
   end if
@@ -110,11 +110,12 @@ subroutine psb_dspgtblk(irw,a,b,info,append,iren,lrw)
   end if
   
   
-  call psb_erractionrestore(err_act)
+!!$  call psb_erractionrestore(err_act)
   return
   
 9999 continue
-  call psb_erractionrestore(err_act)
+!!$  call psb_erractionrestore(err_act)
+  call psb_erractionsave(err_act)
   if (err_act.eq.psb_act_abort_) then
      call psb_error()
      return
@@ -156,6 +157,7 @@ contains
       end do
 
       if (min(size(b%ia1),size(b%ia2),size(b%aspk)) < nzb+nz) then 
+!!$        write(0,*) 'Realloc in gtblk 1',size(b%ia1),size(b%ia2),size(b%aspk),nzb,nz 
         call psb_sp_reall(b,nzb+nz,iret)
       endif
 
@@ -197,6 +199,7 @@ contains
       nz = a%ia2(idx+nr) - a%ia2(idx)
 
       if (min(size(b%ia1),size(b%ia2),size(b%aspk)) < nzb+nz) then 
+!!$        write(0,*) 'Realloc in gtblk 2',size(b%ia1),size(b%ia2),size(b%aspk),nzb,nz 
         call psb_sp_reall(b,nzb+nz,iret)
       endif
       b%fida='COO'
@@ -310,6 +313,7 @@ contains
         ! Now do the copy.
         nz = jp - ip +1 
         if (size(b%ia1) < nzb+nz) then 
+!!$          write(0,*) 'Realloc in gtblk 3',size(b%ia1),size(b%ia2),size(b%aspk),nzb,nz 
           call psb_sp_reall(b,nzb+nz,iret)
         endif
         b%fida='COO'        
@@ -335,6 +339,7 @@ contains
       nz = (nza*(lrw-irw+1))/max(a%m,1)
       
       if (size(b%ia1) < nzb+nz) then 
+!!$        write(0,*) 'Realloc in gtblk 4',size(b%ia1),size(b%ia2),size(b%aspk),nzb,nz 
         call psb_sp_reall(b,nzb+nz,iret)
       endif
       
@@ -345,6 +350,7 @@ contains
             k = k + 1 
             if (k > nz) then
               nz = k 
+!!$              write(0,*) 'Realloc in gtblk 5',size(b%ia1),size(b%ia2),size(b%aspk),nzb,nz
               call psb_sp_reall(b,nzb+nz,iret)
             end if
             b%aspk(nzb+k) = a%aspk(i)
@@ -359,6 +365,7 @@ contains
             k = k + 1 
             if (k > nz) then
               nz = k 
+!!$              write(0,*) 'Realloc in gtblk 6',size(b%ia1),size(b%ia2),size(b%aspk),nzb,nz
               call psb_sp_reall(b,nzb+nz,iret)
             end if
             b%aspk(nzb+k) = a%aspk(i)

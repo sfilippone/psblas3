@@ -136,6 +136,14 @@ module psb_serial_mod
     end subroutine psb_zcsmm
   end interface
 
+  interface psb_cest
+    subroutine psb_cest(afmt, m,n,nnz, lia1, lia2, lar, iup, info)
+      integer, intent(in) ::  m,n,nnz,iup
+      integer, intent(out) :: lia1, lia2, lar, info
+      character, intent(inout) :: afmt*5
+    end subroutine psb_cest
+  end interface
+
   interface psb_fixcoo
     subroutine psb_dfixcoo(a,info,idir)
       use psb_spmat_type
@@ -417,7 +425,7 @@ module psb_serial_mod
   end interface
 
   interface psb_sp_getrow
-     subroutine psb_dspgetrow(irw,a,nz,ia,ja,val,info,iren,lrw)
+     subroutine psb_dspgetrow(irw,a,nz,ia,ja,val,info,iren,lrw,bw)
        use psb_spmat_type
        type(psb_dspmat_type), intent(in) :: a
        integer, intent(in)       :: irw
@@ -427,6 +435,7 @@ module psb_serial_mod
        integer, intent(in), target, optional :: iren(:)
        integer, intent(in), optional :: lrw
        integer, intent(out)  :: info
+       type(psb_dspmat_type), intent(inout), optional, target  :: bw
      end subroutine psb_dspgetrow
      subroutine psb_zspgetrow(irw,a,nz,ia,ja,val,info,iren,lrw)
        use psb_spmat_type

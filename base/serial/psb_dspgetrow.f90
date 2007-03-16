@@ -39,7 +39,7 @@
 !* format.                                                                   *
 !*                                                                           *
 !*****************************************************************************
-subroutine psb_dspgetrow(irw,a,nz,ia,ja,val,info,iren,lrw)
+subroutine psb_dspgetrow(irw,a,nz,ia,ja,val,info,iren,lrw,bw)
   use psb_spmat_type
   use psb_string_mod
   use psb_serial_mod, psb_protect_name => psb_dspgetrow
@@ -52,19 +52,22 @@ subroutine psb_dspgetrow(irw,a,nz,ia,ja,val,info,iren,lrw)
   integer, intent(in), target, optional :: iren(:)
   integer, intent(in), optional :: lrw
   integer, intent(out)  :: info
+  type(psb_dspmat_type), intent(inout), optional, target  :: bw
 
   integer               :: lrw_, ierr(5), err_act
-  type(psb_dspmat_type) :: b
+  type(psb_dspmat_type), target :: b
+  type(psb_dspmat_type), pointer  :: b_
+
   integer, pointer      :: iren_(:)
   character(len=20)     :: name, ch_err
 
 
-  name='psb_sp_getrow'
+  name  = 'psb_sp_getrow'
   info  = 0
-  call psb_erractionsave(err_act)
-  call psb_set_erraction(0)  
+!!$  call psb_erractionsave(err_act)
+!!$  call psb_set_erraction(0)  
 
-  call psb_nullify_sp(b)
+
 
   if (present(lrw)) then
     lrw_ = lrw
@@ -75,13 +78,26 @@ subroutine psb_dspgetrow(irw,a,nz,ia,ja,val,info,iren,lrw)
     write(0,*) 'SPGETROW input error: fixing lrw',irw,lrw_
     lrw_ = irw
   end if
-  call psb_sp_all(lrw_-irw+1,lrw_-irw+1,b,info)
-
-  if (present(iren)) then
-    call psb_sp_getblk(irw,a,b,info,iren=iren,lrw=lrw_)
-  else 
-    call psb_sp_getblk(irw,a,b,info,lrw=lrw_)
+  if (present(bw)) then 
+    b_ => bw
+  else
+    b_ => b
   end if
+
+  call psb_nullify_sp(b_)
+  if (.not.(allocated(b_%aspk).and.allocated(b_%ia1).and.&
+       & allocated(b_%ia2))) then 
+    write(0,*) 'First allocation for B in SPGETROW'
+    call psb_sp_all(lrw_-irw+1,lrw_-irw+1,b_,info)
+  end if
+  if (present(iren)) then
+    call psb_sp_getblk(irw,a,b_,info,iren=iren,lrw=lrw_)
+  else 
+    call psb_sp_getblk(irw,a,b_,info,lrw=lrw_)
+  end if
+
+    
+
   if (info /= 0) then     
     info=136
     ch_err=a%fida(1:3)
@@ -89,17 +105,17 @@ subroutine psb_dspgetrow(irw,a,nz,ia,ja,val,info,iren,lrw)
     goto 9999
   end if
 
-  if (toupper(b%fida) /= 'COO') then 
+  if (toupper(b_%fida) /= 'COO') then 
     info=4010
     ch_err=a%fida(1:3)
     call psb_errpush(info,name,a_err=ch_err)
     goto 9999
   endif
 
-  nz = b%infoa(psb_nnz_)
+  nz = b_%infoa(psb_nnz_)
 
   if (size(ia)>= nz) then 
-    ia(1:nz) = b%ia1(1:nz)
+    ia(1:nz) = b_%ia1(1:nz)
   else
     info    = 135
     ierr(1) = 4
@@ -109,7 +125,7 @@ subroutine psb_dspgetrow(irw,a,nz,ia,ja,val,info,iren,lrw)
   endif
 
   if (size(ja)>= nz) then 
-    ja(1:nz) = b%ia2(1:nz)
+    ja(1:nz) = b_%ia2(1:nz)
   else
     info    = 135
     ierr(1) = 5
@@ -119,7 +135,7 @@ subroutine psb_dspgetrow(irw,a,nz,ia,ja,val,info,iren,lrw)
   endif
 
   if (size(val)>= nz) then 
-    val(1:nz) = b%aspk(1:nz)
+    val(1:nz) = b_%aspk(1:nz)
   else
     info    = 135
     ierr(1) = 6
@@ -127,15 +143,16 @@ subroutine psb_dspgetrow(irw,a,nz,ia,ja,val,info,iren,lrw)
     call psb_errpush(info,name,i_err=ierr)
     goto 9999
   endif
+ 
 
+!!$  call psb_sp_free(b,info)
 
-  call psb_sp_free(b,info)
-
-  call psb_erractionrestore(err_act)
+!!$  call psb_erractionrestore(err_act)
   return
 
 9999 continue
-  call psb_erractionrestore(err_act)
+!!$  call psb_erractionrestore(err_act)
+  call psb_erractionsave(err_act)
   if (err_act.eq.psb_act_abort_) then
     call psb_error()
     return

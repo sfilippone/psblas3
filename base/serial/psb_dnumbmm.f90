@@ -41,27 +41,14 @@
 
 subroutine psb_dnumbmm(a,b,c)
   use psb_spmat_type
+  use psb_serial_mod, psb_protect_name => psb_dnumbmm
   implicit none
 
   type(psb_dspmat_type)         :: a,b,c
   real(kind(1.d0)), allocatable :: temp(:)
   integer                       :: info
+  logical                   :: csra, csrb
   
-  interface psb_sp_getrow
-    subroutine psb_dspgetrow(irw,a,nz,ia,ja,val,info,iren,lrw)
-      use psb_spmat_type
-      type(psb_dspmat_type), intent(in) :: a
-      integer, intent(in)       :: irw
-      integer, intent(out)      :: nz
-      integer, intent(inout)    :: ia(:), ja(:)
-      real(kind(1.d0)),  intent(inout)    :: val(:)
-      integer, intent(in), target, optional :: iren(:)
-      integer, intent(in), optional :: lrw
-      integer, intent(out)  :: info
-    end subroutine psb_dspgetrow
-  end interface
-
-
   allocate(temp(max(a%m,a%k,b%m,b%k)),stat=info)
   if (info /= 0) then
     return
@@ -71,7 +58,10 @@ subroutine psb_dnumbmm(a,b,c)
   ! Note: we still have to test about possible performance hits. 
   !
   !
-  if (.true.) then 
+  csra = (toupper(a%fida(1:3))=='CSR')
+  csrb = (toupper(b%fida(1:3))=='CSR')
+
+  if (csra.and.csrb) then 
     call numbmm(a%m,a%k,b%k,a%ia2,a%ia1,0,a%aspk,&
          & b%ia2,b%ia1,0,b%aspk,&
          & c%ia2,c%ia1,0,c%aspk,temp)
@@ -94,7 +84,7 @@ contains
     real(kind(1.d0)), allocatable :: aval(:),bval(:)
     integer  :: maxlmn,i,j,m,n,k,l,istart,length,nazr,nbzr,jj,ii,minlm,minmn,minln
     real(kind(1.d0))      :: ajj
-
+    type(psb_dspmat_type) :: w
 
     n = a%m
     m = a%k 
@@ -114,7 +104,7 @@ contains
     minmn = min(m,n)
     do  i = 1,n
 
-      call psb_sp_getrow(i,a,nazr,iarw,iacl,aval,info)
+      call psb_sp_getrow(i,a,nazr,iarw,iacl,aval,info,bw=w)
 
       do jj=1, nazr
         j=iacl(jj)
@@ -125,7 +115,7 @@ contains
             return
           
         endif
-        call psb_sp_getrow(j,b,nbzr,ibrw,ibcl,bval,info)
+        call psb_sp_getrow(j,b,nbzr,ibrw,ibcl,bval,info,bw=w)
         do k=1,nbzr
           if ((ibcl(k)<1).or.(ibcl(k)>maxlmn)) then 
             write(0,*) 'Problem in NUMBM 1:',j,k,ibcl(k),maxlmn

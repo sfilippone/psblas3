@@ -42,7 +42,7 @@ subroutine psb_dcsrws(rw,a,info,trans)
   integer                    :: info
   character, optional        :: trans
 
-  Interface dcsrws
+  Interface 
     subroutine  dcsrws(trans,m,n,fida,descra,a,ia1,ia2,&
          &                infoa,rowsum,ierror)
       integer, intent(in)        :: m,n

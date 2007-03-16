@@ -80,8 +80,8 @@ contains
   ! also changes error action to "return"
   subroutine psb_erractionsave(err_act)
     integer, intent(out) :: err_act
-    err_act=err_action
-    err_action=act_ret
+    err_act    = err_action
+    err_action = act_ret
   end subroutine psb_erractionsave
 
 
