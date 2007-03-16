@@ -32,28 +32,33 @@ How do you add a new storage format? Here is your checklist.
     the model. You may or may not be able to do it "in place";
     ipcoo2csr & friends do just that; if you can, please add it because
     it may come in handy.
-5.  You have to be able to convert it back to COOrdinate. This is
+5.  If you need to sort entries, it usually better to use imsrx than
+    isrx. This is because coefficients lists are likely to contain
+    multiple ordered sublists ("runs"), and the merge sort algorithm
+    implemented in imsrx is capable of taking advantage of them,
+    whereas the isrx quicksort cannot. 
+6.  You have to be able to convert it back to COOrdinate. This is
     usually not hard, because the code that does the MV multiply is
     already (maybe implicitly) walking through the coefficients while
     keeping track of both row and column index, thus it suffices to
     copy them as you meet them, and then call psb_fixcoo (which sorts
     and compacts the output) on the result. 
-6.  You have to embed the MV and SV codes in the infrastructure; this
+7.  You have to embed the MV and SV codes in the infrastructure; this
     is done first in the xSWMM and xSWSM routines that do a select on
     the FIDA value. Below this level you're free to do as you please. 
-7.  You have to extend the output capability of psb_Xcsprt. Again this
+8.  You have to extend the output capability of psb_Xcsprt. Again this
     is  easy for the same reasons as in 4. 
-8.  You have to extend psb_Xcsrws for DIAG preconditioner. 
-9.  Provide an UPDATE functionality, and add it to psb_update_mod;
+9.  You have to extend psb_Xcsrws for DIAG preconditioner. 
+10. Provide an UPDATE functionality, and add it to psb_update_mod;
     currently JAD is out of this. 
-10. You have to provide the query facilities used in PSB_XSPINFO
+11. You have to provide the query facilities used in PSB_XSPINFO
     (included  in base/modules/psb_spmat_type). 
-11. You have to provide the functionality to extract a block of
+12. You have to provide the functionality to extract a block of
     rows. This is used in the GETBLK/GETROW/CLIP chain (TO BE
     REVISED). GETROW is (all that is) used by the ILU factorization. 
-12. You have to provide the GETDIAG functionality. 
-13. You have to provide the functionality to NEIGH. 
+13. You have to provide the GETDIAG functionality. 
+14. You have to provide the functionality to NEIGH. 
     WATCH OUT: THIS COULD BE CHANGED TO USE GETROW!!!!
-14. RWEXTD: what do we do here? Should we switch to/from COO????? 
+15. RWEXTD: what do we do here? Should we switch to/from COO????? 
 
 Is this complete? I sure hope so.... 
