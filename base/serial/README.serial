@@ -47,7 +47,7 @@ How do you add a new storage format? Here is your checklist.
     is done first in the xSWMM and xSWSM routines that do a select on
     the FIDA value. Below this level you're free to do as you please. 
 8.  You have to extend the output capability of psb_Xcsprt. Again this
-    is  easy for the same reasons as in 4. 
+    is  easy for the same reasons as in 6. 
 9.  You have to extend psb_Xcsrws for DIAG preconditioner. 
 10. Provide an UPDATE functionality, and add it to psb_update_mod;
     currently JAD is out of this. 
