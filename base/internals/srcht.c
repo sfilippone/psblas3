@@ -160,8 +160,9 @@ int CompareKeys(void *key1, void *key2)
 void InitPairSearchTree(fptr *ftree, int *iret)
 {
   int i;
-  *iret = 0;
   PairTreePtr PTree;
+
+  *iret = 0;
   
   if ((PTree  = malloc(sizeof(PairTree)))==NULL) {
     *iret=-1; return;
