@@ -5,6 +5,7 @@
 
 #######################  Section 1 #######################
 #  Define your compilers and compiler flags here         #
+#  These seems to be valid as of XLF 10.1                #
 ##########################################################
 F90=xlf95 -qsuffix=f=f90:cpp=F90
 FC=xlf  -qsuffix=cpp=F
