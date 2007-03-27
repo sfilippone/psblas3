@@ -1,5 +1,5 @@
 include Make.inc
-#PREC=../mld2p4-dev
+#PREC=../mld2p4
 PREC=prec
 
 library:
