@@ -28,22 +28,27 @@
 !!$  POSSIBILITY OF SUCH DAMAGE.
 !!$ 
 !!$  
-subroutine psi_iswaptranm(flag,n,beta,y,desc_a,work,info,data)
+subroutine psi_zswaptranm(flag,n,beta,y,desc_a,work,info,data)
 
-  use psi_mod, psb_protect_name => psi_iswaptranm
+  use psi_mod, psb_protect_name => psi_zswaptranm
   use psb_error_mod
   use psb_descriptor_type
   use psb_penv_mod
   use psi_gthsct_mod
+#ifdef MPI_MOD
   use mpi
+#endif
   implicit none
+#ifdef MPI_H
+  include 'mpif.h'
+#endif
 
   integer, intent(in)      :: flag, n
   integer, intent(out)     :: info
-  integer          :: y(:,:), beta
-  integer, target :: work(:)
-  type(psb_desc_type),target   :: desc_a
-  integer, optional        :: data
+  complex(kind(1.d0))         :: y(:,:), beta
+  complex(kind(1.d0)), target :: work(:)
+  type(psb_desc_type),target       :: desc_a
+  integer, optional         :: data
 
   ! locals
   integer  :: ictxt, np, me, point_to_proc, nesd, nerv,&
@@ -58,7 +63,7 @@ subroutine psi_iswaptranm(flag,n,beta,y,desc_a,work,info,data)
        & albf,do_send,do_recv
   logical, parameter :: usersend=.false.
 
-  integer, pointer, dimension(:) :: sndbuf, rcvbuf
+  complex(kind(1.d0)), pointer, dimension(:) :: sndbuf, rcvbuf
   character(len=20)  :: name
 
   info = 0
@@ -205,8 +210,8 @@ subroutine psi_iswaptranm(flag,n,beta,y,desc_a,work,info,data)
 
     ! swap elements using mpi_alltoallv
     call mpi_alltoallv(rcvbuf,rvsz,brvidx,&
-         & mpi_integer,&
-         & sndbuf,sdsz,bsdidx,mpi_integer,icomm,iret)
+         & mpi_double_precision,&
+         & sndbuf,sdsz,bsdidx,mpi_double_precision,icomm,iret)
     if(iret /= mpi_success) then
       int_err(1) = iret
       info=400
@@ -256,7 +261,7 @@ subroutine psi_iswaptranm(flag,n,beta,y,desc_a,work,info,data)
         p2ptag = krecvid(ictxt,proc_to_comm,me)
         call psb_get_rank(prcid(i),ictxt,proc_to_comm)      
         call mpi_irecv(sndbuf(snd_pt),n*nesd,&
-             & mpi_integer,prcid(i),&
+             & mpi_double_complex,prcid(i),&
              & p2ptag,icomm,rvhd(i),iret)
       end if
       rcv_pt = rcv_pt + n*nerv
@@ -280,11 +285,11 @@ subroutine psi_iswaptranm(flag,n,beta,y,desc_a,work,info,data)
         p2ptag=ksendid(ictxt,proc_to_comm,me)      
         if (usersend) then 
           call mpi_rsend(rcvbuf(rcv_pt),n*nerv,&
-               & mpi_integer,prcid(i),&
+               & mpi_double_complex,prcid(i),&
                & p2ptag,icomm,iret)
         else
           call mpi_send(rcvbuf(rcv_pt),n*nerv,&
-               & mpi_integer,prcid(i),&
+               & mpi_double_complex,prcid(i),&
                & p2ptag,icomm,iret)
         end if
 
@@ -404,7 +409,7 @@ subroutine psi_iswaptranm(flag,n,beta,y,desc_a,work,info,data)
     return
   end if
   return
-end subroutine psi_iswaptranm
+end subroutine psi_zswaptranm
 
 
 !!$ 
@@ -437,20 +442,24 @@ end subroutine psi_iswaptranm
 !!$  POSSIBILITY OF SUCH DAMAGE.
 !!$ 
 !!$  
-subroutine psi_iswaptranv(flag,beta,y,desc_a,work,info,data)
+subroutine psi_zswaptranv(flag,beta,y,desc_a,work,info,data)
 
-  use psi_mod, psb_protect_name => psi_iswaptranv
   use psb_error_mod
   use psb_descriptor_type
   use psb_penv_mod
   use psi_gthsct_mod
+#ifdef MPI_MOD
   use mpi
+#endif
   implicit none
+#ifdef MPI_H
+  include 'mpif.h'
+#endif
 
-  integer, intent(in)  :: flag
-  integer, intent(out) :: info
-  integer              :: y(:), beta
-  integer, target :: work(:)
+  integer, intent(in)      :: flag
+  integer, intent(out)     :: info
+  complex(kind(1.d0))         :: y(:), beta
+  complex(kind(1.d0)), target :: work(:)
   type(psb_desc_type),target  :: desc_a
   integer, optional    :: data
 
@@ -468,7 +477,7 @@ subroutine psi_iswaptranv(flag,beta,y,desc_a,work,info,data)
        & albf,do_send,do_recv
   logical, parameter :: usersend=.false.
 
-  integer, pointer, dimension(:) :: sndbuf, rcvbuf
+  complex(kind(1.d0)), pointer, dimension(:) :: sndbuf, rcvbuf
   character(len=20)  :: name
 
   info = 0
@@ -476,6 +485,7 @@ subroutine psi_iswaptranv(flag,beta,y,desc_a,work,info,data)
   call psb_erractionsave(err_act)
 
   ictxt=psb_cd_get_context(desc_a)
+
   call psb_info(ictxt,me,np) 
   if (np == -1) then
     info = 2010
@@ -618,8 +628,8 @@ subroutine psi_iswaptranv(flag,beta,y,desc_a,work,info,data)
 
     ! swap elements using mpi_alltoallv
     call mpi_alltoallv(rcvbuf,rvsz,brvidx,&
-         & mpi_integer,&
-         & sndbuf,sdsz,bsdidx,mpi_integer,icomm,iret)
+         & mpi_double_precision,&
+         & sndbuf,sdsz,bsdidx,mpi_double_precision,icomm,iret)
     if(iret /= mpi_success) then
       int_err(1) = iret
       info=400
@@ -669,7 +679,7 @@ subroutine psi_iswaptranv(flag,beta,y,desc_a,work,info,data)
         p2ptag = krecvid(ictxt,proc_to_comm,me)
         call psb_get_rank(prcid(i),ictxt,proc_to_comm)      
         call mpi_irecv(sndbuf(snd_pt),nesd,&
-             & mpi_integer,prcid(i),&
+             & mpi_double_complex,prcid(i),&
              & p2ptag,icomm,rvhd(i),iret)
       end if
       rcv_pt = rcv_pt + nerv
@@ -693,11 +703,11 @@ subroutine psi_iswaptranv(flag,beta,y,desc_a,work,info,data)
         p2ptag=ksendid(ictxt,proc_to_comm,me)
         if (usersend) then 
           call mpi_rsend(rcvbuf(rcv_pt),nerv,&
-               & mpi_integer,prcid(i),&
+               & mpi_double_complex,prcid(i),&
                & p2ptag, icomm,iret)
         else
           call mpi_send(rcvbuf(rcv_pt),nerv,&
-               & mpi_integer,prcid(i),&
+               & mpi_double_complex,prcid(i),&
                & p2ptag, icomm,iret)
         end if
 
@@ -733,7 +743,7 @@ subroutine psi_iswaptranv(flag,beta,y,desc_a,work,info,data)
       end if
       pnti   = pnti + nerv + nesd + 3
     end do
-
+    
 
   else if (swap_send) then
 
@@ -818,4 +828,4 @@ subroutine psi_iswaptranv(flag,beta,y,desc_a,work,info,data)
     return
   end if
   return
-end subroutine psi_iswaptranv
+end subroutine psi_zswaptranv

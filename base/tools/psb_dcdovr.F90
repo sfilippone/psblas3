@@ -28,36 +28,43 @@
 !!$  POSSIBILITY OF SUCH DAMAGE.
 !!$ 
 !!$  
-! File: psb_zcdovr.f90
+! File: psb_cdovr.f90
 !
-! Subroutine: psb_zcdovr
+! Subroutine: psb_cdovr
 !    This routine takes a matrix A with its descriptor, and builds the 
 !    auxiliary descriptor corresponding to the number of overlap levels
 !    specified on input. It really is just a size estimation/allocation
-!    front end for <psb_zcdovrbld>.
+!    front end for <psb_cdovrbld>.
 ! 
 ! Parameters: 
-!    a        - type(<psb_zspmat_type>).       The input sparse matrix.
+!    a        - type(<psb_dspmat_type>).       The input sparse matrix.
 !    desc_a   - type(<psb_desc_type>).         The input communication descriptor.
 !    norv     - integer.                       The number of overlap levels.
-!    desc_ov  - type(<psb_desc_type>).         The auxiliary output communication descriptor.
+!    desc_ov  - type(<psb_desc_type>).         The auxiliary output communication 
+!                                              descriptor.
 !    info     - integer.                       Eventually returns an error code.
 !
-Subroutine psb_zcdovr(a,desc_a,novr,desc_ov,info, extype)
+Subroutine psb_dcdovr(a,desc_a,novr,desc_ov,info, extype)
 
-  use psb_tools_mod, psb_protect_name => psb_zcdovr
+  use psb_tools_mod, psb_protect_name => psb_dcdovr
+
   use psb_serial_mod
   use psb_descriptor_type
   use psb_error_mod
   use psb_penv_mod
   use psb_realloc_mod
   use psi_mod
-  use mpi
+#ifdef MPI_MOD
+    use mpi
+#endif
   Implicit None
+#ifdef MPI_H
+    include 'mpif.h'
+#endif
 
   !     .. Array Arguments ..
   integer, intent(in)                :: novr
-  Type(psb_zspmat_type), Intent(in)  :: a
+  Type(psb_dspmat_type), Intent(in)  ::  a
   Type(psb_desc_type), Intent(in)    :: desc_a
   Type(psb_desc_type), Intent(inout) :: desc_ov
   integer, intent(out)               :: info
@@ -82,7 +89,7 @@ Subroutine psb_zcdovr(a,desc_a,novr,desc_ov,info, extype)
        & counter_t,n_elem,i_ovr,jj,proc_id,isz, mglob, glx, &
        & idxr, idxs, lx, iszr, iszs, nxch, nsnd, nrcv,lidx,irsv, extype_
 
-  type(psb_zspmat_type) :: blk
+  type(psb_dspmat_type) :: blk
   Integer, allocatable  :: tmp_halo(:),tmp_ovr_idx(:), orig_ovr(:)
   Integer,allocatable   :: halo(:),works(:),workr(:),t_halo_in(:),&
        & t_halo_out(:),temp(:),maskr(:)
@@ -743,5 +750,5 @@ Subroutine psb_zcdovr(a,desc_a,novr,desc_ov,info, extype)
   end if
   Return
 
-End Subroutine psb_zcdovr
+End Subroutine psb_dcdovr
 

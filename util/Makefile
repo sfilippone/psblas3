@@ -13,7 +13,8 @@ OBJS=$(BASEOBJS) $(MODOBJ)
 LIBMOD=psb_util_mod$(.mod)
 LOCAL_MODS=$(OBJS:.o=$(.mod))
 LIBNAME=$(UTILLIBNAME)
-INCDIRS=-I.  -I$(LIBDIR)
+FINCLUDES=$(FMFLAG)$(LIBDIR) $(FMFLAG).
+
 
 lib:  $(OBJS) 
 	$(AR) $(HERE)/$(LIBNAME) $(OBJS)

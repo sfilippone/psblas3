@@ -11,9 +11,10 @@ COBJS = avltree.o srcht.o
 MPFOBJS = psi_dswapdata.o psi_dswaptran.o psi_iswapdata.o \
 	psi_iswaptran.o psi_desc_index.o \
  	psi_zswapdata.o psi_zswaptran.o  psi_extrct_dl.o
-LIBDIR = ..
-MODDIR = ../modules
-INCDIRS = -I $(LIBDIR) -I $(MODDIR) -I . 
+LIBDIR=..
+MODDIR=../modules
+FINCLUDES=$(FMFLAG)$(LIBDIR) $(FMFLAG)$(MODDIR) $(FMFLAG).
+CINCLUDES=-I. 
 
 lib: mpfobjs $(FOBJS) $(FOBJS2) $(COBJS) $(MPFOBJS2)
 	$(AR) $(LIBDIR)/$(LIBNAME) $(MPFOBJS) $(MPFOBJS2) $(FOBJS) $(FOBJS2) \

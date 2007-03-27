@@ -9,7 +9,7 @@ PSBLAS_LIB= -L$(LIBDIR) -lpsb_util -lpsb_krylov -lpsb_prec -lpsb_base
 # Compilers and such
 #
 CCOPT= -g
-INCDIRS=-I$(LIBDIR)
+FINCLUDES=$(FMFLAG)$(LIBDIR) $(FMFLAG).
 
 
 EXEDIR=./runs
@@ -21,7 +21,7 @@ ppde90: ppde90.o
 
 
 .f90.o:
-	$(MPF90) $(F90COPT) $(INCDIRS) -c $<
+	$(MPF90) $(F90COPT) $(FINCLUDES) $(FDEFINES) -c $<
 
 
 clean: 

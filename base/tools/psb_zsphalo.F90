@@ -54,8 +54,13 @@ Subroutine psb_zsphalo(a,desc_a,blk,info,rwcnv,clcnv,cliprow,outfmt,data)
   use psb_tools_mod, psb_protect_name => psb_zsphalo
   use psb_error_mod
   use psb_penv_mod
-  use mpi
+#ifdef MPI_MOD
+    use mpi
+#endif
   Implicit None
+#ifdef MPI_H
+    include 'mpif.h'
+#endif
 
   Type(psb_zspmat_type),Intent(in)    :: a
   Type(psb_zspmat_type),Intent(inout) :: blk

@@ -250,7 +250,12 @@ contains
   end subroutine psb_barrier
 
   function psb_wtime()
+#ifdef MPI_MOD
     use mpi
+#endif
+#ifdef MPI_H
+    include 'mpif.h'
+#endif
     real(kind(1.d0)) :: psb_wtime
 
     psb_wtime = mpi_wtime()
@@ -508,7 +513,12 @@ contains
 
 
   subroutine psb_hbcasts(ictxt,dat,root,length)
+#ifdef MPI_H
+    include 'mpif.h'
+#endif
+#ifdef MPI_MOD
     use mpi
+#endif
     integer, intent(in)             :: ictxt
     character(len=*), intent(inout) :: dat
     integer, intent(in), optional   :: root,length
@@ -536,7 +546,12 @@ contains
   end subroutine psb_hbcasts
 
   subroutine psb_lbcasts(ictxt,dat,root)
+#ifdef MPI_H
+    include 'mpif.h'
+#endif
+#ifdef MPI_MOD
     use mpi
+#endif
     integer, intent(in)             :: ictxt
     logical, intent(inout)          :: dat
     integer, intent(in), optional   :: root
@@ -559,7 +574,12 @@ contains
 
 
   subroutine psb_lbcastv(ictxt,dat,root)
+#ifdef MPI_MOD
     use mpi
+#endif
+#ifdef MPI_H
+    include 'mpif.h'
+#endif
     integer, intent(in)             :: ictxt
     logical, intent(inout)          :: dat(:)
     integer, intent(in), optional   :: root
@@ -583,7 +603,12 @@ contains
 
 
   subroutine psb_imaxs(ictxt,dat,root)
+#ifdef MPI_MOD
     use mpi
+#endif
+#ifdef MPI_H
+    include 'mpif.h'
+#endif
     integer, intent(in)              :: ictxt
     integer, intent(inout)  :: dat
     integer, intent(in), optional    :: root
@@ -610,8 +635,13 @@ contains
 #endif    
   end subroutine psb_imaxs
   subroutine psb_imaxv(ictxt,dat,root)
-    use mpi
     use psb_realloc_mod
+#ifdef MPI_MOD
+    use mpi
+#endif
+#ifdef MPI_H
+    include 'mpif.h'
+#endif
     integer, intent(in)              :: ictxt
     integer, intent(inout)  :: dat(:)
     integer, intent(in), optional    :: root
@@ -643,8 +673,13 @@ contains
 #endif    
   end subroutine psb_imaxv
   subroutine psb_imaxm(ictxt,dat,root)
-    use mpi
     use psb_realloc_mod
+#ifdef MPI_MOD
+    use mpi
+#endif
+#ifdef MPI_H
+    include 'mpif.h'
+#endif
     integer, intent(in)              :: ictxt
     integer, intent(inout)  :: dat(:,:)
     integer, intent(in), optional    :: root
@@ -677,7 +712,12 @@ contains
   end subroutine psb_imaxm
   
   subroutine psb_dmaxs(ictxt,dat,root)
+#ifdef MPI_MOD
     use mpi
+#endif
+#ifdef MPI_H
+    include 'mpif.h'
+#endif
     integer, intent(in)              :: ictxt
     real(kind(1.d0)), intent(inout)  :: dat
     integer, intent(in), optional    :: root
@@ -705,8 +745,13 @@ contains
 #endif    
   end subroutine psb_dmaxs
   subroutine psb_dmaxv(ictxt,dat,root)
-    use mpi
     use psb_realloc_mod
+#ifdef MPI_MOD
+    use mpi
+#endif
+#ifdef MPI_H
+    include 'mpif.h'
+#endif
     integer, intent(in)              :: ictxt
     real(kind(1.d0)), intent(inout)  :: dat(:)
     integer, intent(in), optional    :: root
@@ -741,8 +786,13 @@ contains
 #endif    
   end subroutine psb_dmaxv
   subroutine psb_dmaxm(ictxt,dat,root)
-    use mpi
     use psb_realloc_mod
+#ifdef MPI_MOD
+    use mpi
+#endif
+#ifdef MPI_H
+    include 'mpif.h'
+#endif
     integer, intent(in)              :: ictxt
     real(kind(1.d0)), intent(inout)  :: dat(:,:)
     integer, intent(in), optional    :: root
@@ -779,7 +829,12 @@ contains
   
   
   subroutine psb_imins(ictxt,dat,root)
+#ifdef MPI_MOD
     use mpi
+#endif
+#ifdef MPI_H
+    include 'mpif.h'
+#endif
     integer, intent(in)              :: ictxt
     integer, intent(inout)  :: dat
     integer, intent(in), optional    :: root
@@ -806,8 +861,13 @@ contains
 #endif    
   end subroutine psb_imins
   subroutine psb_iminv(ictxt,dat,root)
-    use mpi
     use psb_realloc_mod
+#ifdef MPI_MOD
+    use mpi
+#endif
+#ifdef MPI_H
+    include 'mpif.h'
+#endif
     integer, intent(in)              :: ictxt
     integer, intent(inout)  :: dat(:)
     integer, intent(in), optional    :: root
@@ -839,8 +899,13 @@ contains
 #endif    
   end subroutine psb_iminv
   subroutine psb_iminm(ictxt,dat,root)
-    use mpi
     use psb_realloc_mod
+#ifdef MPI_MOD
+    use mpi
+#endif
+#ifdef MPI_H
+    include 'mpif.h'
+#endif
     integer, intent(in)              :: ictxt
     integer, intent(inout)  :: dat(:,:)
     integer, intent(in), optional    :: root
@@ -873,7 +938,12 @@ contains
   end subroutine psb_iminm
   
   subroutine psb_dmins(ictxt,dat,root)
+#ifdef MPI_MOD
     use mpi
+#endif
+#ifdef MPI_H
+    include 'mpif.h'
+#endif
     integer, intent(in)              :: ictxt
     real(kind(1.d0)), intent(inout)  :: dat
     integer, intent(in), optional    :: root
@@ -901,8 +971,13 @@ contains
 #endif    
   end subroutine psb_dmins
   subroutine psb_dminv(ictxt,dat,root)
-    use mpi
     use psb_realloc_mod
+#ifdef MPI_MOD
+    use mpi
+#endif
+#ifdef MPI_H
+    include 'mpif.h'
+#endif
     integer, intent(in)              :: ictxt
     real(kind(1.d0)), intent(inout)  :: dat(:)
     integer, intent(in), optional    :: root
@@ -937,8 +1012,13 @@ contains
 #endif    
   end subroutine psb_dminv
   subroutine psb_dminm(ictxt,dat,root)
-    use mpi
     use psb_realloc_mod
+#ifdef MPI_MOD
+    use mpi
+#endif
+#ifdef MPI_H
+    include 'mpif.h'
+#endif
     integer, intent(in)              :: ictxt
     real(kind(1.d0)), intent(inout)  :: dat(:,:)
     integer, intent(in), optional    :: root

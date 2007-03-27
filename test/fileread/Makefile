@@ -5,7 +5,7 @@ include ../../Make.inc
 LIBDIR=../../lib/
 PSBLAS_LIB= -L$(LIBDIR) -lpsb_util -lpsb_krylov -lpsb_prec -lpsb_base
 
-INCDIRS=-I$(LIBDIR)
+FINCLUDES=$(FMFLAG)$(LIBDIR) $(FMFLAG).
 
 DFOBJS=getp.o  df_sample.o   
 ZFOBJS=getp.o  zf_sample.o   
@@ -23,7 +23,7 @@ zf_sample: $(ZFOBJS)
 	/bin/mv zf_sample $(EXEDIR) 
 
 .f90.o:
-	$(MPF90) $(F90COPT) $(INCDIRS) -c $<
+	$(MPF90) $(F90COPT) $(FINCLUDES) $(FDEFINES) -c $<
 
 clean: 
 	/bin/rm -f $(DFOBJS) $(ZFOBJS) \

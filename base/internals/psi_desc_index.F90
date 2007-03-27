@@ -34,10 +34,15 @@ subroutine psi_desc_index(desc,index_in,dep_list,&
   use psb_realloc_mod
   use psb_error_mod
   use psb_const_mod
+#ifdef MPI_MOD
   use mpi
+#endif
   use psb_penv_mod
   use psi_mod, psb_protect_name => psi_desc_index
   implicit none
+#ifdef MPI_H
+  include 'mpif.h'
+#endif
 
   !    ...array parameters.....
   type(psb_desc_type) :: desc

@@ -13,16 +13,29 @@ F77=$(FC)
 CC=gcc
 F90COPT=-O3 
 FCOPT=-O3 
-CCOPT=-O3
+CCOPT=-O3 
+#
+# Which flag does your compiler use  for module inclusion?
+# Most compilers use -I  but Sun uses -M 
+# FIFLAG is for INCLUDE 
+FMFLAG=-I
+FIFLAG=-I
+
 
 #######################  Section 2 #######################
 #  Define your linker and linker flags here              #
+#  Does your MPI provide mpi.mod or mpif.h?              #
+#   MPI_FINC=-DMPI_H  or MPI_FINC=-DMPI_MOD              #
+#  If necessary add MPIINCDIR                            #
 ##########################################################
 F90LINK=/usr/local/mpich-ifc91/bin/mpif90 
 FLINK=/usr/local/mpich-ifc91/bin/mpif77 
 MPF90=/usr/local/mpich-ifc91/bin/mpif90 
 MPF77=/usr/local/mpich-ifc91/bin/mpif77 
 MPCC=/usr/local/mpich-ifc91/bin/mpicc 
+MPI_FINC=-DMPI_MOD
+#$(FIFLAG)/opt/SUNWhpc/include
+
 
 #######################  Section 3 #######################
 #  Specify paths to libraries                            #
@@ -51,7 +64,7 @@ LDLIBS=$(BLACS) $(SLU) $(UMF) $(BLAS) $(METIS_LIB)
 
 #  Add -DLargeFptr for 64-bit addresses
 CDEFINES=-DAdd_ $(SLUDEF) $(UMFDEF)
-FDEFINES=-DNETLIB_BLACS -DHAVE_MOVE_ALLOC
+FDEFINES=-DNETLIB_BLACS  $(MPI_FINC) -DHAVE_MOVE_ALLOC
 
 AR=ar -cur
 RANLIB=ranlib
@@ -70,22 +83,22 @@ UTILLIBNAME=libpsb_util.a
 # Under Linux/gmake there is a rule interpreting .mod as Modula source! 
 $(.mod).o:
 	
-.f.o:
-	$(FC) $(FCOPT) $(INCDIRS)  -c $<
 .c.o:
-	$(CC) $(CCOPT) $(INCDIRS) $(CDEFINES) -c $<
+	$(CC) $(CCOPT) $(CINCLUDES) $(CDEFINES) -c $<
+.f.o:
+	$(FC) $(FCOPT) $(FINCLUDES)  -c $<
 .f$(.mod):
-	$(F90) $(FCOPT) $(INCDIRS) -c $<
+	$(FC) $(FCOPT) $(FINCLUDES) -c $<
 .f90$(.mod):
-	$(F90) $(F90COPT) $(INCDIRS) -c $<
+	$(F90) $(F90COPT) $(FINCLUDES) -c $<
 .f90.o:
-	$(F90) $(F90COPT) $(INCDIRS) -c $<
+	$(F90) $(F90COPT) $(FINCLUDES) -c $<
 .F.o:
-	$(F90) $(F90COPT) $(INCDIRS) $(FDEFINES) -c $<
+	$(FC) $(FCOPT) $(FINCLUDES) $(FDEFINES) -c $<
 .F90.o:
-	$(F90) $(F90COPT) $(INCDIRS) $(FDEFINES) -c $<
+	$(F90) $(F90COPT) $(FINCLUDES) $(FDEFINES) -c $<
 .F90$(.mod):
-	$(F90) $(F90COPT) $(INCDIRS) $(FDEFINES) -c $<
+	$(F90) $(F90COPT) $(FINCLUDES) $(FDEFINES) -c $<
 
 
 

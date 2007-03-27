@@ -54,8 +54,13 @@ Subroutine psb_dsphalo(a,desc_a,blk,info,rwcnv,clcnv,cliprow,outfmt,data)
   use psb_tools_mod, psb_protect_name => psb_dsphalo
   use psb_error_mod
   use psb_penv_mod
-  use mpi
+#ifdef MPI_MOD
+    use mpi
+#endif
   Implicit None
+#ifdef MPI_H
+    include 'mpif.h'
+#endif
 
   Type(psb_dspmat_type),Intent(in)    :: a
   Type(psb_dspmat_type),Intent(inout) :: blk

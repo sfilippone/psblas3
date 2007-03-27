@@ -38,9 +38,9 @@
 !    m       - integer.                       The number of rows.
 !    n       - integer.                       The number of columns.
 !    parts   - external subroutine.           The routine that contains the partitioning scheme.
-!    ictxt - integer.                       The communication context.
+!    ictxt - integer.                         The communication context.
 !    desc_a  - type(<psb_desc_type>).         The communication descriptor.
-!    info    - integer.                       Eventually returns an error code
+!    info    - integer.                       Error code (if any).
 subroutine psb_cdals(m, n, parts, ictxt, desc_a, info)
   use psb_error_mod
   use psb_descriptor_type

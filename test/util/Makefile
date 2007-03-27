@@ -9,7 +9,7 @@ PSBLAS_LIB= -L$(LIBDIR) -lpsb_util -lpsb_base
 #  We are using the public domain tool METIS from U. Minnesota. To get it
 #  check URL http://www.cs.umn.edu:~karypis
 #  
-INCDIRS=-I$(LIBDIR)
+FINCLUDES=$(FMFLAG)$(LIBDIR) $(FMFLAG).
 
 ZH2MOBJS=zhb2mm.o 
 DH2MOBJS=dhb2mm.o 
@@ -30,7 +30,7 @@ zmm2hb: $(ZM2HOBJS)
 	$(MPF90) -o zmm2hb   $(ZM2HOBJS) $(PSBLAS_LIB) $(LDLIBS)
 
 .f90.o:
-	$(MPF90) $(F90COPT) $(INCDIRS) -c $<
+	$(MPF90) $(F90COPT) $(FINCLUDES) $(FDEFINES) -c $<
 
 clean: 
 	/bin/rm -f $(MMHBOBJS) dhb2mm zhb2mm dmm2hb zmm2hb

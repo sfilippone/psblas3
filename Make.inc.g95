@@ -1,6 +1,6 @@
 .mod=.mod
 .fh=.fh
-.SUFFIXES: .f90 $(.mod) .F90
+.SUFFIXES: .f90 $(.mod) .F90 .F
 
 
 #######################  Section 1 #######################
@@ -12,15 +12,26 @@ F77=$(FC)
 F90COPT= -O3 
 FCOPT=-O3 
 CCOPT=-O3 
+#
+# Which flag does your compiler use  for module inclusion?
+# Most compilers use -I  but Sun uses -M 
+# FIFLAG is for INCLUDE 
+FMFLAG=-I
+FIFLAG=-I
 
 #######################  Section 2 #######################
 #  Define your linker and linker flags here              #
+#  Does your MPI provide mpi.mod or mpif.h?              #
+#   MPI_FINC=-DMPI_H  or MPI_FINC=-DMPI_MOD              #
+#  If necessary add MPIINCDIR                            #
 ##########################################################
 F90LINK=/usr/local/mpich-g95/bin/mpif90 
 FLINK=/usr/local/mpich-g95/bin/mpif77 
 MPF90=/usr/local/mpich-g95/bin/mpif90 
 MPF77=/usr/local/mpich-g95/bin/mpif77 
 MPCC=/usr/local/mpich-g95/bin/mpicc 
+MPI_FINC=-DMPI_MOD
+#$(FIFLAG)/opt/SUNWhpc/include
 
 #######################  Section 3 #######################
 #  Specify paths to libraries                            #
@@ -42,7 +53,7 @@ BLACS=-lmpiblacsg95 -L$(HOME)/LIB
 
 #  Add -DLargeFptr for 64-bit addresses
 CDEFINES=-DAdd_ $(SLUDEF) $(UMFDEF)
-FDEFINES=-DNORMAL
+FDEFINES=-DNETLIB_BLACS  $(MPI_FINC) -DHAVE_MOVE_ALLOC
 
 AR=ar -cur
 RANLIB=ranlib
@@ -52,34 +63,32 @@ RANLIB=ranlib
 #######################  Section 5 #######################
 #  Do not edit this                                      #
 ##########################################################
-LIBDIR = lib
-LIBNAME = libpsblas.a
-
-TYPEMODS =  psb_spmat_type$(.mod) psb_descriptor_type$(.mod) psb_prec_type$(.mod) psb_realloc_mod$(.mod)
-CONSTMODS = psb_const_mod$(.mod)
-BLASMODS  = $(TYPEMODS) psb_psblas_mod$(.mod) psb_comm_mod$(.mod)
-METHDMODS = psb_methd_mod$(.mod)
-TOOLSMODS = $(CONSTMODS) psi_mod$(.mod) psb_tools_mod$(.mod) psb_serial_mod$(.mod)
-PRECMODS  = psb_prec_mod$(.mod)
-ERRORMODS = psb_error_mod$(.mod)
-F90MODS= $(BLASMODS) $(PRECMODS) $(METHDMODS) $(TOOLSMODS) $(ERRORMODS) string$(.mod)
-
-MODS=$(LIBDIR)/psb_const_mod$(.mod) $(LIBDIR)/psb_spmat_type$(.mod) $(LIBDIR)/psb_realloc_mod$(.mod) \
-  $(LIBDIR)/psb_descriptor_type$(.mod)  $(LIBDIR)/psb_prec_type$(.mod) $(LIBDIR)/parts.fh \
-  $(LIBDIR)/psb_serial_mod$(.mod) $(LIBDIR)/psb_comm_mod$(.mod) $(LIBDIR)/psb_error_mod$(.mod)
+LIBDIR=lib
+BASELIBNAME=libpsb_base.a
+PRECLIBNAME=libpsb_prec.a
+METHDLIBNAME=libpsb_krylov.a
+UTILLIBNAME=libpsb_util.a
 
 # Under Linux/gmake there is a rule interpreting .mod as Modula source! 
 $(.mod).o:
 	
-.f.o:
-	$(FC) $(FCOPT) $(INCDIRS)  -c $<
 .c.o:
-	$(CC) $(CCOPT) $(INCDIRS) $(CDEFINES) -c $<
+	$(CC) $(CCOPT) $(CINCLUDES) $(CDEFINES) -c $<
+.f.o:
+	$(FC) $(FCOPT) $(FINCLUDES)  -c $<
 .f$(.mod):
-	$(F90) $(FCOPT) $(INCDIRS) -c $<
+	$(FC) $(FCOPT) $(FINCLUDES) -c $<
 .f90$(.mod):
-	$(F90) $(F90COPT) $(INCDIRS) -c $<
+	$(F90) $(F90COPT) $(FINCLUDES) -c $<
 .f90.o:
-	$(F90) $(F90COPT) $(INCDIRS) -c $<
+	$(F90) $(F90COPT) $(FINCLUDES) -c $<
+.F.o:
+	$(FC) $(FCOPT) $(FINCLUDES) $(FDEFINES) -c $<
 .F90.o:
-	$(F90) $(F90COPT) $(INCDIRS) $(FDEFINES) -c $<
+	$(F90) $(F90COPT) $(FINCLUDES) $(FDEFINES) -c $<
+.F90$(.mod):
+	$(F90) $(F90COPT) $(FINCLUDES) $(FDEFINES) -c $<
+
+
+
+

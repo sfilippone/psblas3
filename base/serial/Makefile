@@ -14,9 +14,9 @@ FOBJS = psb_cest.o psb_dcoins.o psb_dcsdp.o psb_dcsmm.o psb_dcsmv.o \
 	psb_zrwextd.o psb_zsymbmm.o psb_znumbmm.o psb_zspscal.o psb_zspclip.o\
 	psb_getifield.o psb_setifield.o psb_update_mod.o
 
-LIBDIR = ..
-MODDIR = ../modules
-INCDIRS = -I $(LIBDIR) -I $(MODDIR) -I . 
+LIBDIR=..
+MODDIR=../modules
+FINCLUDES=$(FMFLAG)$(LIBDIR) $(FMFLAG)$(MODDIR) $(FMFLAG).
 
 lib: auxd cood csrd jadd f77d dpd lib1
 	$(AR) $(LIBDIR)/$(LIBNAME) $(FOBJS)

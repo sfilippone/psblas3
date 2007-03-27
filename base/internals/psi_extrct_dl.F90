@@ -118,12 +118,17 @@ subroutine psi_extract_dep_list(desc_data,desc_str,dep_list,&
   !   length_dl  integer array(0:np)
   !             length_dl(i) is the length of dep_list(*,i) list
   use psi_mod, psb_protect_name => psi_extract_dep_list
+#ifdef MPI_MOD
   use mpi
+#endif
   use psb_penv_mod
   use psb_const_mod
   use psb_error_mod
   use psb_descriptor_type
   implicit none
+#ifdef MPI_H
+  include 'mpif.h'
+#endif
   !     ....scalar parameters...
   integer np,dl_lda,mode, info
 

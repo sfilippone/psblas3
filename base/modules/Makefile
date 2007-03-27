@@ -14,8 +14,9 @@ MODULES = psb_realloc_mod.o psb_string_mod.o psb_spmat_type.o \
 LIBMOD=psb_base_mod$(.mod)
 MPFOBJS=psb_penv_mod.o 
 OBJS = error.o psb_base_mod.o $(EXTRA_COBJS)
-LIBDIR = ..
-INCDIRS = -I . 
+LIBDIR=..
+CINCLUDES=-I. 
+FINCLUDES=$(FMFLAG)$(LIBDIR) $(FMFLAG). $(FIFLAG).
 
 
 psb_realloc_mod.o : psb_error_mod.o 
@@ -34,7 +35,7 @@ psb_base_mod.o: $(MODULES) $(MPFOBJS)
 lib:  mpfobjs $(MODULES)  $(OBJS)
 	$(AR) $(LIBDIR)/$(LIBNAME) $(MODULES) $(OBJS) $(MPFOBJS)
 	$(RANLIB) $(LIBDIR)/$(LIBNAME)
-	/bin/cp -p $(LIBMOD) ./parts.fh $(LIBDIR)
+	/bin/cp -p $(LIBMOD) $(LIBDIR)
 	/bin/cp -p *$(.mod) $(LIBDIR)
 
 
