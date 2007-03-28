@@ -32,7 +32,7 @@ MPF90=mpxlf95 -qsuffix=f=f90
 F90LINK=$(MPF90)
 FLINK=$(MPF90)
 MPF77=mpxlf95 -qfixed
-MPCC=mpxlc
+MPCC=mpcc
 MPI_FINC=-WF,-DMPI_MOD
 #$(FIFLAG)/opt/SUNWhpc/include
 
