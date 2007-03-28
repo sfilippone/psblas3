@@ -610,7 +610,7 @@ Subroutine psb_dcdovr(a,desc_a,novr,desc_ov,info, extype)
             if (debug) write(0,*) me,' CDOVRBLD: Added into t_halo_in from recv',&
                  &proc_id,n_col,idx
           else if (desc_ov%glob_to_loc(idx) < 0) Then
-            if (debug) write(0,*) me,'Wrong input to cdovrbld??',&
+            if (debug) write(0,*) me,'Wrong input to cdovrbld?',&
                  &idx,desc_ov%glob_to_loc(idx)
           End If
         End Do
