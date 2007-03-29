@@ -24,7 +24,7 @@ lib:  $(OBJS)
 	$(AR) $(HERE)/$(LIBNAME) $(OBJS)
 	$(RANLIB) $(HERE)/$(LIBNAME)
 	/bin/cp -p $(HERE)/$(LIBNAME) $(LIBDIR)
-	/bin/cp -p $(LIBMOD) $(LIBDIR)
+	/bin/cp -p $(LIBMOD) $(LOCAL_MODS) $(LIBDIR)
 
 $(F90OBJS): $(MODOBJS)
 psb_prec_mod.o: psb_prec_type.o
