@@ -255,21 +255,12 @@ contains
         read(*,*) novr
         read(*,*) afmt
 
-        ! convert strings in array
-        do i = 1, len(cmethd)
-          intbuf(i) = iachar(cmethd(i:i))
-        end do
         ! broadcast parameters to all processors
-        call psb_bcast(ictxt,intbuf(1:10))
-
-        ! broadcast parameters to all processors
+        call psb_bcast(ictxt,cmethd)
+        call psb_bcast(ictxt,afmt)
         call psb_bcast(ictxt,iprec)
         call psb_bcast(ictxt,novr)
 
-        do i = 1, len(afmt)
-          intbuf(i) = iachar(afmt(i:i))
-        end do
-        call psb_bcast(ictxt,intbuf(1:10))
 
         read(*,*) idim
         if (ip.ge.4) then
@@ -316,18 +307,10 @@ contains
         stop 1
       endif
     else
-      call psb_bcast(ictxt,intbuf(1:10))
-
-      do i = 1, 10
-        cmethd(i:i) = achar(intbuf(i))
-      end do
-
+      call psb_bcast(ictxt,cmethd)
+      call psb_bcast(ictxt,afmt)
       call psb_bcast(ictxt,iprec)
       call psb_bcast(ictxt,novr)
-      call psb_bcast(ictxt,intbuf(1:10))
-      do i = 1, 5
-        afmt(i:i) = achar(intbuf(i))
-      end do
       call psb_bcast(ictxt,intbuf(1:5))
       idim    = intbuf(1)
       istopc  = intbuf(2)
