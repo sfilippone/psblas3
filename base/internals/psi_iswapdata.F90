@@ -259,9 +259,9 @@ subroutine psi_iswapdatam(flag,n,beta,y,desc_a,work,info,data)
       proc_to_comm = d_idx(pnti+psb_proc_id_)
       nerv = d_idx(pnti+psb_n_elem_recv_)
       nesd = d_idx(pnti+nerv+psb_n_elem_send_)
+      call psb_get_rank(prcid(i),ictxt,proc_to_comm)      
       if (nerv>0) then 
         p2ptag = krecvid(ictxt,proc_to_comm,me)
-        call psb_get_rank(prcid(i),ictxt,proc_to_comm)      
         call mpi_irecv(rcvbuf(rcv_pt),n*nerv,&
              & mpi_integer,prcid(i),&
              & p2ptag, icomm,rvhd(i),iret)
@@ -683,9 +683,9 @@ subroutine psi_iswapdatav(flag,beta,y,desc_a,work,info,data)
       nerv = d_idx(pnti+psb_n_elem_recv_)
       nesd = d_idx(pnti+nerv+psb_n_elem_send_)
 
+      call psb_get_rank(prcid(i),ictxt,proc_to_comm)      
       if (nerv>0) then 
         p2ptag = krecvid(ictxt,proc_to_comm,me)
-        call psb_get_rank(prcid(i),ictxt,proc_to_comm)      
         call mpi_irecv(rcvbuf(rcv_pt),nerv,&
              & mpi_integer,prcid(i),&
              & p2ptag, icomm,rvhd(i),iret)
