@@ -55,7 +55,7 @@ subroutine psb_dspgetrow(irw,a,nz,ia,ja,val,info,iren,lrw,bw)
   type(psb_dspmat_type), intent(inout), optional, target  :: bw
 
   integer               :: lrw_, ierr(5), err_act
-  type(psb_dspmat_type), target :: b
+  type(psb_dspmat_type), target,save :: b
   type(psb_dspmat_type), pointer  :: b_
 
   integer, pointer      :: iren_(:)
@@ -87,7 +87,7 @@ subroutine psb_dspgetrow(irw,a,nz,ia,ja,val,info,iren,lrw,bw)
   call psb_nullify_sp(b_)
   if (.not.(allocated(b_%aspk).and.allocated(b_%ia1).and.&
        & allocated(b_%ia2))) then 
-    write(0,*) 'First allocation for B in SPGETROW'
+!!$    write(0,*) 'First allocation for B in SPGETROW'
     call psb_sp_all(lrw_-irw+1,lrw_-irw+1,b_,info)
   end if
   if (present(iren)) then
