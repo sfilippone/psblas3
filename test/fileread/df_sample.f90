@@ -99,7 +99,7 @@ program df_sample
   !  get parameters
   !
   call get_parms(ictxt,mtrx_file,rhs_file,cmethd,&
-       & ipart,afmt,istopc,itmax,itrace,novr,iprec,eps)
+       & ipart,afmt,istopc,itmax,itrace,ml,iprec,eps)
 
   call psb_barrier(ictxt)
   t1 = psb_wtime()  

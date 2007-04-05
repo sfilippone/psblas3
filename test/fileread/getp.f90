@@ -38,10 +38,10 @@ contains
   ! Get iteration parameters from the command line
   !
   subroutine  get_parms(ictxt,mtrx_file,rhs_file,cmethd,ipart,&
-       & afmt,istopc,itmax,itrace,novr,iprec,eps)
+       & afmt,istopc,itmax,itrace,ml,iprec,eps)
     integer      :: ictxt
     character*40 :: cmethd, mtrx_file, rhs_file
-    integer      :: iret, istopc,itmax,itrace,ipart,iprec,novr
+    integer      :: iret, istopc,itmax,itrace,ipart,iprec,ml
     character*40 :: charbuf
     real(kind(1.d0)) :: eps
     character    :: afmt*5
@@ -86,9 +86,9 @@ contains
           iprec=0
         endif
         if (ip >= 9) then
-          read(*,*) novr
+          read(*,*) ml
         else
-          novr  = 1
+          ml  = 1
         endif
         if (ip >= 10) then
           read(*,*) eps
@@ -100,7 +100,7 @@ contains
         inparms(3) = itmax
         inparms(4) = itrace
         inparms(5) = iprec
-        inparms(6) = novr
+        inparms(6) = ml
         call psb_bcast(ictxt,inparms(1:6))
         call psb_bcast(ictxt,eps)
 
@@ -108,7 +108,7 @@ contains
         write(*,'("Number of processors : ",i3)')  np
         write(*,'("Data distribution    : ",i2)')  ipart
         write(*,'("Preconditioner       : ",i2)')  iprec
-        if(iprec.gt.2) write(*,'("Overlapping levels   : ",i2)')novr
+        write(*,'("Restart parameter    : ",i2)')  ml
         write(*,'("Iterative method     : ",a40)') cmethd
         write(*,'("Storage format       : ",a3)')  afmt(1:3)
         write(*,'(" ")')
@@ -130,7 +130,7 @@ contains
       itmax  =  inparms(3) 
       itrace =  inparms(4) 
       iprec  =  inparms(5) 
-      novr     =  inparms(6) 
+      ml     =  inparms(6) 
       call psb_bcast(ictxt,eps)
 
     end if
