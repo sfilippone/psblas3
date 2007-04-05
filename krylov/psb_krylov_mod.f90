@@ -196,66 +196,30 @@ contains
     Integer, Optional, Intent(out)     :: iter
     Real(Kind(1.d0)), Optional, Intent(out) :: err
     
-    integer             :: itmax_, itrace_, irst_, istop_, iter_
-    real(kind(1.d0))    :: err_
-    
-    if (present(itmax)) then 
-      itmax_ = itmax
-    else
-      itmax_ = 1000
-    end if
-    
-    if (present(itrace)) then 
-      itrace_ = itrace
-    else
-      itrace_ = -1
-    end if
-    
-    if (present(irst)) then 
-      irst_ = irst 
-    else 
-      irst_ = 1
-    end if
-    
-    if (present(istop)) then 
-      istop_ = istop 
-    else
-      istop_ = 1
-    end if
-
-
     select case(toupper(method))
     case('CG') 
       call  psb_cg(a,prec,b,x,eps,desc_a,info,&
-         &itmax_,iter_,err_,itrace_,istop_)
+         &itmax,iter,err,itrace,istop)
     case('CGS') 
       call  psb_cgs(a,prec,b,x,eps,desc_a,info,&
-         &itmax_,iter_,err_,itrace_,istop_)
+         &itmax,iter,err,itrace,istop)
     case('BICG') 
       call  psb_bicg(a,prec,b,x,eps,desc_a,info,&
-         &itmax_,iter_,err_,itrace_,istop_)
+         &itmax,iter,err,itrace,istop)
     case('BICGSTAB') 
       call  psb_bicgstab(a,prec,b,x,eps,desc_a,info,&
-         &itmax_,iter_,err_,itrace_,istop_)
+         &itmax,iter,err,itrace,istop)
     case('RGMRES')
       call  psb_rgmres(a,prec,b,x,eps,desc_a,info,&
-         &itmax_,iter_,err_,itrace_,irst_,istop_)
+         &itmax,iter,err,itrace,irst,istop)
     case('BICGSTABL')
       call  psb_bicgstabl(a,prec,b,x,eps,desc_a,info,&
-         &itmax_,iter_,err_,itrace_,irst_,istop_)
+         &itmax,iter,err,itrace,irst,istop)
     case default
       call  psb_bicgstab(a,prec,b,x,eps,desc_a,info,&
-         &itmax_,iter_,err_,itrace_,istop_)
+         &itmax,iter,err,itrace,istop)
     end select
     
-    if (present(err)) then 
-      err = err_
-    endif
-    
-    if (present(iter)) then 
-      iter = iter_
-    endif
-
   end subroutine psb_dkrylov
 
 
@@ -275,66 +239,31 @@ contains
     Integer, Optional, Intent(out)     :: iter
     Real(Kind(1.d0)), Optional, Intent(out) :: err
     
-    integer             :: itmax_, itrace_, irst_, istop_, iter_
-    real(kind(1.d0))    :: err_
-    
-    if (present(itmax)) then 
-      itmax_ = itmax
-    else
-      itmax_ = 1000
-    end if
-    
-    if (present(itrace)) then 
-      itrace_ = itrace
-    else
-      itrace_ = -1
-    end if
-    
-    if (present(irst)) then 
-      irst_ = irst 
-    else 
-      irst_ = 1
-    end if
-    
-    if (present(istop)) then 
-      istop_ = istop 
-    else
-      istop_ = 1
-    end if
-
 
     select case(toupper(method))
 !!$    case('CG') 
 !!$      call  psb_cg(a,prec,b,x,eps,desc_a,info,&
-!!$         &itmax_,iter_,err_,itrace_,istop_)
+!!$         &itmax,iter,err,itrace,istop)
     case('CGS') 
       call  psb_cgs(a,prec,b,x,eps,desc_a,info,&
-         &itmax_,iter_,err_,itrace_,istop_)
+         &itmax,iter,err,itrace,istop)
 !!$    case('BICG') 
 !!$      call  psb_bicg(a,prec,b,x,eps,desc_a,info,&
-!!$         &itmax_,iter_,err_,itrace_,istop_)
+!!$         &itmax,iter,err,itrace,istop)
     case('BICGSTAB') 
       call  psb_bicgstab(a,prec,b,x,eps,desc_a,info,&
-         &itmax_,iter_,err_,itrace_,istop_)
+         &itmax,iter,err,itrace,istop)
 !!$    case('RGMRES')
 !!$      call  psb_rgmres(a,prec,b,x,eps,desc_a,info,&
-!!$         &itmax_,iter_,err_,itrace_,irst_,istop_)
+!!$         &itmax,iter,err,itrace,irst,istop)
 !!$    case('BICGSTABL')
 !!$      call  psb_bicgstabl(a,prec,b,x,eps,desc_a,info,&
-!!$         &itmax_,iter_,err_,itrace_,irst_,istop_)
+!!$         &itmax,iter,err,itrace,irst,istop)
     case default
       call  psb_bicgstab(a,prec,b,x,eps,desc_a,info,&
-         &itmax_,iter_,err_,itrace_,istop_)
+         &itmax,iter,err,itrace,istop)
     end select
     
-    if (present(err)) then 
-      err = err_
-    endif
-    
-    if (present(iter)) then 
-      iter = iter_
-    endif
-
   end subroutine psb_zkrylov
 
 

@@ -164,7 +164,14 @@ Subroutine psb_dgmresr(a,prec,b,x,eps,desc_a,info,&
     nl = 10 
     If (debug) Write(0,*) 'not present: irst: ',irst,nl
   Endif
-
+  if (nl <=0 ) then 
+    write(0,*) 'psb_dgmres: invalid irst ',nl
+    info=5001
+    int_err(1)=nl
+    err=info
+    call psb_errpush(info,name,i_err=int_err)
+    goto 9999
+  endif
 
   naux=4*n_col 
   Allocate(aux(naux),h(nl+1,nl+1),&
@@ -290,6 +297,7 @@ Subroutine psb_dgmresr(a,prec,b,x,eps,desc_a,info,&
       endif
 
       if (rerr < eps ) then 
+        if (debug) write(0,*) 'GMRES TRSM',i,size(h,1),nl
         call dtrsm('l','u','n','n',i,1,done,h,size(h,1),rs,nl)
         if (debug) write(0,*) 'Rebuild x-> RS:',rs(21:nl)
         do k=1, i
@@ -303,7 +311,7 @@ Subroutine psb_dgmresr(a,prec,b,x,eps,desc_a,info,&
       end If
 
     end Do inner
-    if (debug) write(0,*) 'Before DTRSM :',rs(1:nl)
+    if (debug) write(0,*) 'Before DTRSM :',rs(1:nl),i,size(h,1),nl
     call dtrsm('l','u','n','n',nl,1,done,h,size(h,1),rs,nl)
     if (debug) write(0,*) 'Rebuild x-> RS:',rs(21:nl)
     do k=1, nl
