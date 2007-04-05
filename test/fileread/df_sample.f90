@@ -271,6 +271,7 @@ program df_sample
       write(20,*) 'error indicator (infinity norm) on exit:', &
            & ' ||r||/(||a||||x||+||b||) = ',err
       write(20,*) 'max residual = ',resmx, resmxp
+      write(20,'(a8,4(2x,a20))') 'I','X(I)','R(I)','B(I)'
       do i=1,m_problem
         write(20,998) i,x_col_glob(i),r_col_glob(i),b_col_glob(i)
       enddo
