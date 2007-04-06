@@ -164,6 +164,14 @@ Subroutine psb_dcgstabl(a,prec,b,x,eps,desc_a,info,&
     nl = 1 
     If (debug) Write(0,*) 'not present: irst: ',irst,nl
   Endif
+  if (nl <=0 ) then 
+    write(0,*) 'psb_bicgstabl: invalid irst ',nl
+    info=5001
+    int_err(1)=nl
+    err=info
+    call psb_errpush(info,name,i_err=int_err)
+    goto 9999
+  endif
 
   naux=4*n_col 
   Allocate(aux(naux),gamma(0:nl),gamma1(nl),&
