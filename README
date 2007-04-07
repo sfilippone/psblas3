@@ -36,22 +36,18 @@ The library has been tested on an IBM SP2, SP4 and SP5, with XLC and XLF
 compilers, and a version of the BLACS based on MPI.
 The  setting 
  F90=xlf90 -qsuffix=f=f90
-in Make.inc.rs6k takes care of the f90 extension. 
-WARNING: xlf 8.1 introduced a performance bug, whereas a Fortan 90
-code calling a  Fortan 77 code would incur spurious array copies;
-please make sure your system has the PTF xlf 8102 installed. 
-
+in Make.inc.sp5 takes care of the f90 extension. 
 
 
 UTILITIES
-The TEST/Fileread directory contains some utilities to convert to/from
+The test/util directory contains some utilities to convert to/from
 Harwell-Boeing and MatrixMarket file formats. 
 
 
 DOCUMENTATION
 
 See userguide.pdf 
-Please consult the sample programs, especially TEST/pargen/ppde90.f90. 
+Please consult the sample programs, especially test/pargen/ppde90.f90. 
 
 
 OTHER SOFTWARE CREDITS 
