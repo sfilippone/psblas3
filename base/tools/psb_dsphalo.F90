@@ -225,6 +225,14 @@ Subroutine psb_dsphalo(a,desc_a,blk,info,rwcnv,clcnv,cliprow,outfmt,data)
   tmp%fida='COO'
   call psb_sp_setifld(psb_spmat_asb_,psb_state_,tmp,info)
 
+
+  if (debugprt) then 
+    open(20+me)
+    do i=1, psb_cd_get_local_cols(desc_a)
+      write(20+me,*) i,desc_a%loc_to_glob(i)
+    end do
+    close(20+me)
+  end if
   t2 = psb_wtime()
 
   l1  = 0

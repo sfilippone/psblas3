@@ -74,7 +74,7 @@ subroutine psb_dipcoo2csr(a,info,rwshr)
   call psb_fixcoo(a,info)
   nr  = a%m 
   nza = a%infoa(psb_nnz_)
-  allocate(iaux(nr+1),stat=info)
+  allocate(iaux(max(nr+1,1)),stat=info)
   if (info /= 0) then 
     call psb_errpush(4010,name,a_err='Allocate')
     goto 9999      
@@ -137,6 +137,7 @@ subroutine psb_dipcoo2csr(a,info,rwshr)
       if (nr < itemp(nza)) then 
         write(0,*) 'IPCOO2CSR: RWSHR=.false. : ',&
              &nr,itemp(nza),' Expect trouble!'
+        info = 12
       end if
              
 
@@ -168,6 +169,7 @@ subroutine psb_dipcoo2csr(a,info,rwshr)
       !
       if (j /= (nza+1)) then 
         write(0,*) 'IPCOO2CSR : Problem from loop :',j,nza
+        info = 13
       endif
       do 
         if (i>nr) exit

@@ -143,7 +143,7 @@ contains
       main: do  i=1,n
         istart=-1
         length=0
-        call psb_sp_getrow(i,a,nazr,iarw,iacl,aval,info,bw=w)
+        call psb_sp_getrow(i,a,nazr,iarw,iacl,aval,info)
         do jj=1, nazr
           
           j=iacl(jj)
@@ -153,7 +153,7 @@ contains
             info = 1
             return
           endif
-          call psb_sp_getrow(j,b,nbzr,ibrw,ibcl,bval,info,bw=w)
+          call psb_sp_getrow(j,b,nbzr,ibrw,ibcl,bval,info)
           do k=1,nbzr
             if ((ibcl(k)<1).or.(ibcl(k)>maxlmn)) then 
                 write(0,*) 'Problem in SYMBMM 1:',j,k,ibcl(k),maxlmn

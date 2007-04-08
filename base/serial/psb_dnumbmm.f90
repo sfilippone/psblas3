@@ -104,7 +104,7 @@ contains
     minmn = min(m,n)
     do  i = 1,n
 
-      call psb_sp_getrow(i,a,nazr,iarw,iacl,aval,info,bw=w)
+      call psb_sp_getrow(i,a,nazr,iarw,iacl,aval,info)
 
       do jj=1, nazr
         j=iacl(jj)
@@ -115,7 +115,7 @@ contains
             return
           
         endif
-        call psb_sp_getrow(j,b,nbzr,ibrw,ibcl,bval,info,bw=w)
+        call psb_sp_getrow(j,b,nbzr,ibrw,ibcl,bval,info)
         do k=1,nbzr
           if ((ibcl(k)<1).or.(ibcl(k)>maxlmn)) then 
             write(0,*) 'Problem in NUMBM 1:',j,k,ibcl(k),maxlmn
@@ -137,8 +137,6 @@ contains
         endif
       end do
     end do
-
-
 
 
   end subroutine inner_numbmm

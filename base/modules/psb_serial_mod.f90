@@ -425,28 +425,35 @@ module psb_serial_mod
   end interface
 
   interface psb_sp_getrow
-     subroutine psb_dspgetrow(irw,a,nz,ia,ja,val,info,iren,lrw,bw)
+     subroutine  psb_dspgetrow(irw,a,nz,ia,ja,val,info,iren,lrw,append,nzin)
+       ! Output is always in  COO format 
        use psb_spmat_type
-       type(psb_dspmat_type), intent(in) :: a
-       integer, intent(in)       :: irw
-       integer, intent(out)      :: nz
-       integer, intent(inout)    :: ia(:), ja(:)
-       real(kind(1.d0)),  intent(inout)    :: val(:)
-       integer, intent(in), target, optional :: iren(:)
-       integer, intent(in), optional :: lrw
-       integer, intent(out)  :: info
-       type(psb_dspmat_type), intent(inout), optional, target  :: bw
+       implicit none
+
+       type(psb_dspmat_type), intent(in)    :: a
+       integer, intent(in)                  :: irw
+       integer, intent(out)                 :: nz
+       integer, allocatable, intent(inout)  :: ia(:), ja(:)
+       real(kind(1.d0)), allocatable,  intent(inout)    :: val(:)
+       integer,intent(out)                  :: info
+       logical, intent(in), optional        :: append
+       integer, intent(in), optional        :: iren(:)
+       integer, intent(in), optional        :: lrw, nzin
      end subroutine psb_dspgetrow
-     subroutine psb_zspgetrow(irw,a,nz,ia,ja,val,info,iren,lrw)
+     subroutine  psb_zspgetrow(irw,a,nz,ia,ja,val,info,iren,lrw,append,nzin)
+       ! Output is always in  COO format 
        use psb_spmat_type
-       type(psb_zspmat_type), intent(in) :: a
-       integer, intent(in)       :: irw
-       integer, intent(out)      :: nz
-       integer, intent(inout)    :: ia(:), ja(:)
-       complex(kind(1.d0)),  intent(inout)    :: val(:)
-       integer, intent(in), target, optional :: iren(:)
-       integer, intent(in), optional :: lrw
-       integer, intent(out)  :: info
+       implicit none
+
+       type(psb_zspmat_type), intent(in)    :: a
+       integer, intent(in)                  :: irw
+       integer, intent(out)                 :: nz
+       integer, allocatable, intent(inout)  :: ia(:), ja(:)
+       complex(kind(1.d0)), allocatable,  intent(inout)    :: val(:)
+       integer,intent(out)                  :: info
+       logical, intent(in), optional        :: append
+       integer, intent(in), optional        :: iren(:)
+       integer, intent(in), optional        :: lrw, nzin
      end subroutine psb_zspgetrow
   end interface
   

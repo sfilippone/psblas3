@@ -109,7 +109,8 @@ subroutine psb_dspclip(a,b,info,imin,imax,jmin,jmax,rscale,cscale)
 
   sizeb = psb_sp_get_nnzeros(a)
   call psb_sp_all(mb,kb,b,sizeb,info)
-  b%fida='COO'
+  b%fida   = 'COO'
+  b%descra = a%descra
   nzb = 0 
   do i=imin_, imax_, irbk
     nrt = min(irbk,imax_-i+1)

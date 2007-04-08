@@ -240,10 +240,10 @@ Subroutine psb_zcdovr(a,desc_a,novr,desc_ov,info, extype)
 
       gidx = desc_ov%loc_to_glob(idx)
 
-      call psb_check_size((cntov_o+3),orig_ovr,info,pad=-1)
+      call psb_ensure_size((cntov_o+3),orig_ovr,info,pad=-1)
       if (info /= 0) then
         info=4010
-        call psb_errpush(info,name,a_err='psb_check_size')
+        call psb_errpush(info,name,a_err='psb_ensure_size')
         goto 9999
       end if
 
@@ -340,10 +340,10 @@ Subroutine psb_zcdovr(a,desc_a,novr,desc_ov,info, extype)
 
         gidx = desc_ov%loc_to_glob(idx)
 
-        call psb_check_size((counter_o+3),tmp_ovr_idx,info,pad=-1)
+        call psb_ensure_size((counter_o+3),tmp_ovr_idx,info,pad=-1)
         if (info /= 0) then
           info=4010
-          call psb_errpush(info,name,a_err='psb_check_size')
+          call psb_errpush(info,name,a_err='psb_ensure_size')
           goto 9999
         end if
 
@@ -352,10 +352,10 @@ Subroutine psb_zcdovr(a,desc_a,novr,desc_ov,info, extype)
         tmp_ovr_idx(counter_o+2)=gidx
         tmp_ovr_idx(counter_o+3)=-1
         counter_o=counter_o+3
-        call psb_check_size((counter_h+3),tmp_halo,info,pad=-1)
+        call psb_ensure_size((counter_h+3),tmp_halo,info,pad=-1)
         if (info /= 0) then
           info=4010
-          call psb_errpush(info,name,a_err='psb_check_size')
+          call psb_errpush(info,name,a_err='psb_ensure_size')
           goto 9999
         end if
 
@@ -381,10 +381,10 @@ Subroutine psb_zcdovr(a,desc_a,novr,desc_ov,info, extype)
              & write(0,*) me,i_ovr,'Out of local rows ',&
              & idx,psb_cd_get_local_rows(Desc_a)
 
-        call psb_check_size((counter_o+3),tmp_ovr_idx,info,pad=-1)
+        call psb_ensure_size((counter_o+3),tmp_ovr_idx,info,pad=-1)
         if (info /= 0) then
           info=4010
-          call psb_errpush(info,name,a_err='psb_check_size')
+          call psb_errpush(info,name,a_err='psb_ensure_size')
           goto 9999
         end if
 
@@ -400,10 +400,10 @@ Subroutine psb_zcdovr(a,desc_a,novr,desc_ov,info, extype)
         If (i_ovr <= (novr)) Then
           n_elem = psb_sp_get_nnz_row(idx,a)
 
-          call psb_check_size((idxs+tot_elem+n_elem),works,info)
+          call psb_ensure_size((idxs+tot_elem+n_elem),works,info)
           if (info /= 0) then
             info=4010
-            call psb_errpush(info,name,a_err='psb_check_size')
+            call psb_errpush(info,name,a_err='psb_ensure_size')
             goto 9999
           end if
 
@@ -516,10 +516,10 @@ Subroutine psb_zcdovr(a,desc_a,novr,desc_ov,info, extype)
       if (debug) write(0,*) 'ISZR :',iszr
 
       if (psb_is_large_desc(desc_ov)) then 
-        call psb_check_size(iszr,maskr,info)
+        call psb_ensure_size(iszr,maskr,info)
         if (info /= 0) then
           info=4010
-          call psb_errpush(info,name,a_err='psb_check_size')
+          call psb_errpush(info,name,a_err='psb_ensure_size')
           goto 9999
         end if
         call psi_idx_cnv(iszr,workr,maskr,desc_ov,info)
@@ -551,10 +551,10 @@ Subroutine psb_zcdovr(a,desc_a,novr,desc_ov,info, extype)
             !
             proc_id = temp(i) 
 
-            call psb_check_size((counter_t+3),t_halo_in,info,pad=-1)
+            call psb_ensure_size((counter_t+3),t_halo_in,info,pad=-1)
             if (info /= 0) then
               info=4010
-              call psb_errpush(info,name,a_err='psb_check_size')
+              call psb_errpush(info,name,a_err='psb_ensure_size')
               goto 9999
             end if
 
@@ -583,20 +583,20 @@ Subroutine psb_zcdovr(a,desc_a,novr,desc_ov,info, extype)
             !
             n_col=n_col+1
             proc_id=-desc_ov%glob_to_loc(idx)-np-1
-            call psb_check_size(n_col,desc_ov%loc_to_glob,info,pad=-1)
+            call psb_ensure_size(n_col,desc_ov%loc_to_glob,info,pad=-1)
             if (info /= 0) then
               info=4010
-              call psb_errpush(info,name,a_err='psb_check_size')
+              call psb_errpush(info,name,a_err='psb_ensure_size')
               goto 9999
             end if
 
             desc_ov%glob_to_loc(idx)=n_col
             desc_ov%loc_to_glob(n_col)=idx
 
-            call psb_check_size((counter_t+3),t_halo_in,info,pad=-1)
+            call psb_ensure_size((counter_t+3),t_halo_in,info,pad=-1)
             if (info /= 0) then
               info=4010
-              call psb_errpush(info,name,a_err='psb_check_size')
+              call psb_errpush(info,name,a_err='psb_ensure_size')
               goto 9999
             end if
 
@@ -663,9 +663,9 @@ Subroutine psb_zcdovr(a,desc_a,novr,desc_ov,info, extype)
     !
     desc_ov%matrix_data(psb_n_row_) = desc_a%matrix_data(psb_n_row_)
     call psb_transfer(orig_ovr,desc_ov%ovrlap_index,info)
-    call psb_check_size((counter_h+counter_t+1),tmp_halo,info,pad=-1)
+    call psb_ensure_size((counter_h+counter_t+1),tmp_halo,info,pad=-1)
     if (info /= 0) then
-      call psb_errpush(4010,name,a_err='psb_check_size')
+      call psb_errpush(4010,name,a_err='psb_ensure_size')
       goto 9999
     end if
     tmp_halo(counter_h:counter_h+counter_t-1) = t_halo_in(1:counter_t)
@@ -689,9 +689,9 @@ Subroutine psb_zcdovr(a,desc_a,novr,desc_ov,info, extype)
     !               4. n_row(ov)  current.
     !               5. n_col(ov)  current. 
     ! 
-    call psb_check_size((cntov_o+counter_o+1),orig_ovr,info,pad=-1)
+    call psb_ensure_size((cntov_o+counter_o+1),orig_ovr,info,pad=-1)
     if (info /= 0) then
-      call psb_errpush(4010,name,a_err='psb_check_size')
+      call psb_errpush(4010,name,a_err='psb_ensure_size')
       goto 9999
     end if
     orig_ovr(cntov_o:cntov_o+counter_o-1) = tmp_ovr_idx(1:counter_o)
