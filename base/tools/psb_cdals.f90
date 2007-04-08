@@ -200,19 +200,19 @@ subroutine psb_cdals(m, n, parts, ictxt, desc_a, info)
           if (prc_v(j) == me) then
             ! this point belongs to me
             k = k + 1 
-            call psb_check_size((k+1),desc_a%loc_to_glob,info,pad=-1)
+            call psb_ensure_size((k+1),desc_a%loc_to_glob,info,pad=-1)
             if (info /= 0) then
               info=4010
-              call psb_errpush(info,name,a_err='psb_check_size')
+              call psb_errpush(info,name,a_err='psb_ensure_size')
               goto 9999
             end if
             desc_a%loc_to_glob(k) = i
             call SearchInsKeyVal(desc_a%ptree,i,k,glx,info)
             if (nprocs > 1)  then
-              call psb_check_size((itmpov+3+nprocs),temp_ovrlap,info,pad=-1)
+              call psb_ensure_size((itmpov+3+nprocs),temp_ovrlap,info,pad=-1)
               if (info /= 0) then
                 info=4010
-                call psb_errpush(info,name,a_err='psb_check_size')
+                call psb_errpush(info,name,a_err='psb_ensure_size')
                 goto 9999
               end if
               itmpov = itmpov + 1
@@ -281,10 +281,10 @@ subroutine psb_cdals(m, n, parts, ictxt, desc_a, info)
             counter=counter+1
             desc_a%glob_to_loc(i) = counter
             if (nprocs > 1)  then
-              call psb_check_size((itmpov+3+nprocs),temp_ovrlap,info,pad=-1)
+              call psb_ensure_size((itmpov+3+nprocs),temp_ovrlap,info,pad=-1)
               if (info /= 0) then
                 info=4010
-                call psb_errpush(info,name,a_err='psb_check_size')
+                call psb_errpush(info,name,a_err='psb_ensure_size')
                 goto 9999
               end if
               itmpov = itmpov + 1

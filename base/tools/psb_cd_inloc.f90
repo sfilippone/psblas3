@@ -70,9 +70,9 @@ subroutine psb_cd_inloc(v, ictxt, desc_a, info)
   if (debug) write(*,*) 'psb_cdall: ',np,me
 
   
+  loc_row = size(v)
   if (.false.) then 
-    loc_row = size(v)
-    m       = loc_row
+    m = loc_row
     call psb_sum(ictxt,m)
   else
     m = maxval(v)

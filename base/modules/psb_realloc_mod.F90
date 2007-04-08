@@ -58,7 +58,7 @@ module psb_realloc_mod
          & psb_dcpy1d, psb_dcpy2d, psb_zcpy1d, psb_zcpy2d
   end Interface
 
-  Interface psb_check_size
+  Interface psb_ensure_size
     module procedure psb_icksz1d, psb_dcksz1d, psb_zcksz1d
   end Interface
 
@@ -460,7 +460,7 @@ Contains
     logical, parameter :: debug=.false.
     integer :: isz, err_act
 
-    name='psb_check_size'
+    name='psb_ensure_size'
     call psb_erractionsave(err_act)
 
     if(psb_get_errstatus().ne.0) return 
@@ -468,16 +468,13 @@ Contains
     
     If (len > psb_size(v)) Then
       isz = max((3*psb_size(v))/2,(len+1))
-      if (present(pad)) then
-        call psb_realloc(isz,v,info,pad=pad)
-      else
-        call psb_realloc(isz,v,info)
-        if (info /= 0) then
-          info=4010
-          call psb_errpush(info,name,a_err='psb_realloc')
-          goto 9999
-        end if
-      End If
+      call psb_realloc(isz,v,info,pad=pad)
+      
+      if (info /= 0) then
+        info=4010
+        call psb_errpush(info,name,a_err='psb_realloc')
+        goto 9999
+      end if
     end If
 
     call psb_erractionrestore(err_act)
@@ -510,7 +507,7 @@ Contains
     logical, parameter :: debug=.false.
     integer :: isz, err_act
 
-    name='psb_check_size'
+    name='psb_ensure_size'
     call psb_erractionsave(err_act)
 
     if(psb_get_errstatus().ne.0) return 
@@ -518,15 +515,11 @@ Contains
     
     If (len > psb_size(v)) Then
       isz = max((3*psb_size(v))/2,(len+1))
-      if (present(pad)) then
-        call psb_realloc(isz,v,info,pad=pad)
-      else
-        call psb_realloc(isz,v,info)
-        if (info /= 0) then
-          info=4010
-          call psb_errpush(info,name,a_err='psb_realloc')
-          goto 9999
-        end if
+      call psb_realloc(isz,v,info,pad=pad)
+      if (info /= 0) then
+        info=4010
+        call psb_errpush(info,name,a_err='psb_realloc')
+        goto 9999
       End If
     end If
 
@@ -560,7 +553,7 @@ Contains
     logical, parameter :: debug=.false.
     integer :: isz, err_act
 
-    name='psb_check_size'
+    name='psb_ensure_size'
     call psb_erractionsave(err_act)
 
     if(psb_get_errstatus().ne.0) return 
@@ -568,16 +561,12 @@ Contains
     
     If (len > psb_size(v)) Then
       isz = max((3*psb_size(v))/2,(len+1))
-      if (present(pad)) then
-        call psb_realloc(isz,v,info,pad=pad)
-      else
-        call psb_realloc(isz,v,info)
-        if (info /= 0) then
-          info=4010
-          call psb_errpush(info,name,a_err='psb_realloc')
-          goto 9999
-        end if
-      End If
+      call psb_realloc(isz,v,info,pad=pad)
+      if (info /= 0) then
+        info=4010
+        call psb_errpush(info,name,a_err='psb_realloc')
+        goto 9999
+      end if
     end If
 
     call psb_erractionrestore(err_act)

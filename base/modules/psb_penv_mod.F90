@@ -613,7 +613,7 @@ contains
     integer, intent(inout)  :: dat
     integer, intent(in), optional    :: root
     integer :: root_, dat_
-    integer :: iam, np, icomm
+    integer :: iam, np, icomm,info
     
 
 #if !defined(SERIAL_MPI)
@@ -626,10 +626,10 @@ contains
       root_ = -1
     endif
     if (root_ == -1) then 
-      call mpi_allreduce(dat,dat_,1,mpi_integer,mpi_max,icomm)
+      call mpi_allreduce(dat,dat_,1,mpi_integer,mpi_max,icomm,info)
       dat = dat_
     else
-      call mpi_reduce(dat,dat_,1,mpi_integer,mpi_max,root_,icomm)
+      call mpi_reduce(dat,dat_,1,mpi_integer,mpi_max,root_,icomm,info)
       dat = dat_
     endif
 #endif    
@@ -661,13 +661,15 @@ contains
     endif
     if (root_ == -1) then 
       call psb_realloc(size(dat),dat_,info)
-      if (info ==0) call mpi_allreduce(dat_,dat,size(dat),mpi_integer,mpi_max,icomm)
+      dat_=dat
+      if (info ==0) call mpi_allreduce(dat_,dat,size(dat),mpi_integer,mpi_max,icomm,info)
     else
       if (iam==root_) then 
         call psb_realloc(size(dat),dat_,info)
-        call mpi_reduce(dat_,dat,size(dat),mpi_integer,mpi_max,root_,icomm)
+        dat_=dat
+        call mpi_reduce(dat_,dat,size(dat),mpi_integer,mpi_max,root_,icomm,info)
       else
-        call mpi_reduce(dat,dat_,size(dat),mpi_integer,mpi_max,root_,icomm)
+        call mpi_reduce(dat,dat_,size(dat),mpi_integer,mpi_max,root_,icomm,info)
       end if
     endif
 #endif    
@@ -699,13 +701,15 @@ contains
     endif
     if (root_ == -1) then 
       call psb_realloc(size(dat,1),size(dat,2),dat_,info)
-      if (info ==0) call mpi_allreduce(dat_,dat,size(dat),mpi_integer,mpi_max,icomm)
+      dat_=dat
+      if (info ==0) call mpi_allreduce(dat_,dat,size(dat),mpi_integer,mpi_max,icomm,info)
     else
       if (iam==root_) then 
         call psb_realloc(size(dat,1),size(dat,2),dat_,info)
-        call mpi_reduce(dat_,dat,size(dat),mpi_integer,mpi_max,root_,icomm)
+        dat_=dat
+        call mpi_reduce(dat_,dat,size(dat),mpi_integer,mpi_max,root_,icomm,info)
       else
-        call mpi_reduce(dat,dat_,size(dat),mpi_integer,mpi_max,root_,icomm)
+        call mpi_reduce(dat,dat_,size(dat),mpi_integer,mpi_max,root_,icomm,info)
       end if
     endif
 #endif    
@@ -723,7 +727,7 @@ contains
     integer, intent(in), optional    :: root
     integer :: root_
     real(kind(1.d0)) :: dat_
-    integer :: iam, np, icomm
+    integer :: iam, np, icomm,info
     
 
 #if !defined(SERIAL_MPI)
@@ -736,10 +740,10 @@ contains
       root_ = -1
     endif
     if (root_ == -1) then 
-      call mpi_allreduce(dat,dat_,1,mpi_double_precision,mpi_max,icomm)
+      call mpi_allreduce(dat,dat_,1,mpi_double_precision,mpi_max,icomm,info)
       dat = dat_
     else
-      call mpi_reduce(dat,dat_,1,mpi_double_precision,mpi_max,root_,icomm)
+      call mpi_reduce(dat,dat_,1,mpi_double_precision,mpi_max,root_,icomm,info)
       dat = dat_
     endif
 #endif    
@@ -773,14 +777,14 @@ contains
       call psb_realloc(size(dat),dat_,info)
       dat_ = dat
       if (info ==0) &
-           & call mpi_allreduce(dat_,dat,size(dat),mpi_double_precision,mpi_max,icomm)
+           & call mpi_allreduce(dat_,dat,size(dat),mpi_double_precision,mpi_max,icomm,info)
     else
       if (iam==root_) then 
         call psb_realloc(size(dat),dat_,info)
         dat_ = dat
-        call mpi_reduce(dat_,dat,size(dat),mpi_double_precision,mpi_max,root_,icomm)
+        call mpi_reduce(dat_,dat,size(dat),mpi_double_precision,mpi_max,root_,icomm,info)
       else
-        call mpi_reduce(dat,dat_,size(dat),mpi_double_precision,mpi_max,root_,icomm)
+        call mpi_reduce(dat,dat_,size(dat),mpi_double_precision,mpi_max,root_,icomm,info)
       end if
     endif
 #endif    
@@ -814,14 +818,14 @@ contains
       call psb_realloc(size(dat,1),size(dat,2),dat_,info)
       dat_ = dat
       if (info ==0)&
-           & call mpi_allreduce(dat_,dat,size(dat),mpi_double_precision,mpi_max,icomm)
+           & call mpi_allreduce(dat_,dat,size(dat),mpi_double_precision,mpi_max,icomm,info)
     else
       if (iam==root_) then 
         call psb_realloc(size(dat,1),size(dat,2),dat_,info)
         dat_ = dat
-        call mpi_reduce(dat_,dat,size(dat),mpi_double_precision,mpi_max,root_,icomm)
+        call mpi_reduce(dat_,dat,size(dat),mpi_double_precision,mpi_max,root_,icomm,info)
       else
-        call mpi_reduce(dat,dat_,size(dat),mpi_double_precision,mpi_max,root_,icomm)
+        call mpi_reduce(dat,dat_,size(dat),mpi_double_precision,mpi_max,root_,icomm,info)
       end if
     endif
 #endif    
@@ -839,7 +843,7 @@ contains
     integer, intent(inout)  :: dat
     integer, intent(in), optional    :: root
     integer :: root_, dat_
-    integer :: iam, np, icomm
+    integer :: iam, np, icomm,info
     
 #if !defined(SERIAL_MPI)
 
@@ -852,10 +856,10 @@ contains
       root_ = -1
     endif
     if (root_ == -1) then 
-      call mpi_allreduce(dat,dat_,1,mpi_integer,mpi_min,icomm)
+      call mpi_allreduce(dat,dat_,1,mpi_integer,mpi_min,icomm,info)
       dat = dat_
     else
-      call mpi_reduce(dat,dat_,1,mpi_integer,mpi_min,root_,icomm)
+      call mpi_reduce(dat,dat_,1,mpi_integer,mpi_min,root_,icomm,info)
       dat = dat_
     endif
 #endif    
@@ -887,13 +891,15 @@ contains
     endif
     if (root_ == -1) then 
       call psb_realloc(size(dat),dat_,info)
-      if (info ==0) call mpi_allreduce(dat_,dat,size(dat),mpi_integer,mpi_min,icomm)
+      dat_=dat
+      if (info ==0) call mpi_allreduce(dat_,dat,size(dat),mpi_integer,mpi_min,icomm,info)
     else
       if (iam==root_) then 
         call psb_realloc(size(dat),dat_,info)
-        call mpi_reduce(dat_,dat,size(dat),mpi_integer,mpi_min,root_,icomm)
+        dat_=dat
+        call mpi_reduce(dat_,dat,size(dat),mpi_integer,mpi_min,root_,icomm,info)
       else
-        call mpi_reduce(dat,dat_,size(dat),mpi_integer,mpi_min,root_,icomm)
+        call mpi_reduce(dat,dat_,size(dat),mpi_integer,mpi_min,root_,icomm,info)
       end if
     endif
 #endif    
@@ -925,13 +931,15 @@ contains
     endif
     if (root_ == -1) then 
       call psb_realloc(size(dat,1),size(dat,2),dat_,info)
-      if (info ==0) call mpi_allreduce(dat_,dat,size(dat),mpi_integer,mpi_min,icomm)
+      dat_=dat
+      if (info ==0) call mpi_allreduce(dat_,dat,size(dat),mpi_integer,mpi_min,icomm,info)
     else
       if (iam==root_) then 
         call psb_realloc(size(dat,1),size(dat,2),dat_,info)
-        call mpi_reduce(dat_,dat,size(dat),mpi_integer,mpi_min,root_,icomm)
+        dat_=dat
+        call mpi_reduce(dat_,dat,size(dat),mpi_integer,mpi_min,root_,icomm,info)
       else
-        call mpi_reduce(dat,dat_,size(dat),mpi_integer,mpi_min,root_,icomm)
+        call mpi_reduce(dat,dat_,size(dat),mpi_integer,mpi_min,root_,icomm,info)
       end if
     endif
 #endif    
@@ -949,7 +957,7 @@ contains
     integer, intent(in), optional    :: root
     integer :: root_
     real(kind(1.d0)) :: dat_
-    integer :: iam, np, icomm
+    integer :: iam, np, icomm,info
     
 
 #if !defined(SERIAL_MPI)
@@ -962,10 +970,10 @@ contains
       root_ = -1
     endif
     if (root_ == -1) then 
-      call mpi_allreduce(dat,dat_,1,mpi_double_precision,mpi_min,icomm)
+      call mpi_allreduce(dat,dat_,1,mpi_double_precision,mpi_min,icomm,info)
       dat = dat_
     else
-      call mpi_reduce(dat,dat_,1,mpi_double_precision,mpi_min,root_,icomm)
+      call mpi_reduce(dat,dat_,1,mpi_double_precision,mpi_min,root_,icomm,info)
       dat = dat_
     endif
 #endif    
@@ -999,14 +1007,14 @@ contains
       call psb_realloc(size(dat),dat_,info)
       dat_ = dat
       if (info ==0) &
-           & call mpi_allreduce(dat_,dat,size(dat),mpi_double_precision,mpi_min,icomm)
+           & call mpi_allreduce(dat_,dat,size(dat),mpi_double_precision,mpi_min,icomm,info)
     else
       if (iam==root_) then 
         call psb_realloc(size(dat),dat_,info)
         dat_ = dat
-        call mpi_reduce(dat_,dat,size(dat),mpi_double_precision,mpi_min,root_,icomm)
+        call mpi_reduce(dat_,dat,size(dat),mpi_double_precision,mpi_min,root_,icomm,info)
       else
-        call mpi_reduce(dat,dat_,size(dat),mpi_double_precision,mpi_min,root_,icomm)
+        call mpi_reduce(dat,dat_,size(dat),mpi_double_precision,mpi_min,root_,icomm,info)
       end if
     endif
 #endif    
@@ -1040,14 +1048,14 @@ contains
       call psb_realloc(size(dat,1),size(dat,2),dat_,info)
       dat_ = dat
       if (info ==0) &
-           & call mpi_allreduce(dat_,dat,size(dat),mpi_double_precision,mpi_min,icomm)
+           & call mpi_allreduce(dat_,dat,size(dat),mpi_double_precision,mpi_min,icomm,info)
     else
       if (iam==root_) then 
         call psb_realloc(size(dat,1),size(dat,2),dat_,info)
         dat_ = dat
-        call mpi_reduce(dat_,dat,size(dat),mpi_double_precision,mpi_min,root_,icomm)
+        call mpi_reduce(dat_,dat,size(dat),mpi_double_precision,mpi_min,root_,icomm,info)
       else
-        call mpi_reduce(dat,dat_,size(dat),mpi_double_precision,mpi_min,root_,icomm)
+        call mpi_reduce(dat,dat_,size(dat),mpi_double_precision,mpi_min,root_,icomm,info)
       end if
     endif
 #endif    
