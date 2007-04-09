@@ -1,6 +1,8 @@
 Changelog. A lot less detailed than usual, at least for past
 history. 
 
+2007/04/08: Changed the implementation of psb_sp_getrow & friends.  
+
 2007/03/27: Merged in changes for enabling compilation on SUN.
 
 2007/02/22: Fixed various misalignments between real and complex.
