@@ -4,7 +4,7 @@ include ../../../Make.inc
 #
 
 FOBJS  = isr.o isrx.o msort_up.o msort_dw.o\
-	isaperm.o ibsrch.o issrch.o  imsr.o imsrx.o
+	isaperm.o ibsrch.o issrch.o  imsr.o imsrx.o imsru.o
 
 
 OBJS=$(FOBJS)
