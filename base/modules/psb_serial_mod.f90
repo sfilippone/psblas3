@@ -402,25 +402,27 @@ module psb_serial_mod
   end interface
 
   interface psb_sp_getblk
-     subroutine psb_dspgtblk(irw,a,b,info,append,iren,lrw)
+     subroutine psb_dspgtblk(irw,a,b,info,append,iren,lrw,srt)
        use psb_spmat_type
        type(psb_dspmat_type), intent(in) :: a
        integer, intent(in)       :: irw
        type(psb_dspmat_type), intent(inout)    :: b
+       integer, intent(out)  :: info
        logical, intent(in), optional :: append
        integer, intent(in), target, optional :: iren(:)
        integer, intent(in), optional :: lrw
-       integer, intent(out)  :: info
+       logical, intent(in), optional :: srt
      end subroutine psb_dspgtblk
-     subroutine psb_zspgtblk(irw,a,b,info,append,iren,lrw)
+     subroutine psb_zspgtblk(irw,a,b,info,append,iren,lrw,srt)
        use psb_spmat_type
        type(psb_zspmat_type), intent(in) :: a
        integer, intent(in)       :: irw
        type(psb_zspmat_type), intent(inout)    :: b
+       integer, intent(out)  :: info
        logical, intent(in), optional :: append
        integer, intent(in), target, optional :: iren(:)
        integer, intent(in), optional :: lrw
-       integer, intent(out)  :: info
+       logical, intent(in), optional :: srt
      end subroutine psb_zspgtblk
   end interface
 

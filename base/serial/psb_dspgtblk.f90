@@ -38,7 +38,7 @@
 !*  appending to B). Output is always COO. Input might be anything,          *
 !*                                                                           *
 !*****************************************************************************
-subroutine psb_dspgtblk(irw,a,b,info,append,iren,lrw)
+subroutine psb_dspgtblk(irw,a,b,info,append,iren,lrw,srt)
   ! Output is always in  COO format  into B, irrespective of 
   ! the input format 
   use psb_spmat_type
@@ -54,10 +54,11 @@ subroutine psb_dspgtblk(irw,a,b,info,append,iren,lrw)
   logical, intent(in), optional         :: append
   integer, intent(in), target, optional :: iren(:)
   integer, intent(in), optional         :: lrw
+  logical, intent(in), optional         :: srt
 
-  logical :: append_ 
-  integer :: i,j,k,ip,jp,nr,idx, nz,iret,nzb, nza, lrw_, irw_, err_act
-  character(len=20)                 :: name, ch_err
+  logical            :: append_,srt_
+  integer            :: i,j,k,ip,jp,nr,idx, nz,iret,nzb, nza, lrw_, irw_, err_act
+  character(len=20)  :: name, ch_err
 
   name='psb_spgtblk'
   info  = 0
@@ -77,6 +78,12 @@ subroutine psb_dspgtblk(irw,a,b,info,append,iren,lrw)
     append_ = append
   else
     append_ = .false.
+  endif
+
+  if (present(srt)) then
+    srt_ = srt
+  else
+    srt_ = .true.
   endif
 
 
@@ -103,7 +110,7 @@ subroutine psb_dspgtblk(irw,a,b,info,append,iren,lrw)
   b%infoa(psb_nnz_) = nzb+nz
   b%m = b%m+lrw_-irw+1
   b%k = max(b%k,a%k)
-
+  if (srt_) call psb_fixcoo(b,info)
 !!$  call psb_erractionrestore(err_act)
   return
   

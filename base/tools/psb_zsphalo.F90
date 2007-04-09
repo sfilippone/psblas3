@@ -72,12 +72,12 @@ Subroutine psb_zsphalo(a,desc_a,blk,info,rwcnv,clcnv,cliprow,outfmt,data)
   !     ...local scalars....
   Integer    :: np,me,counter,proc,i, &
        &     n_el_send,k,n_el_recv,ictxt, idx, r, tot_elem,&
-       &     n_elem, j, ipx,mat_recv, iszs, iszr,idxs,idxr,nz, &
-       &     nrmin,data_
-  Type(psb_zspmat_type)     :: tmp
+       &     n_elem, j, ipx,mat_recv, iszs, iszr,idxs,idxr,nz,&
+       &     nrmin,data_,ngtz
   Integer :: l1, icomm, err_act
   Integer, allocatable  :: sdid(:,:), brvindx(:),rvid(:,:), &
-       & rvsz(:), bsdindx(:),sdsz(:)
+       & rvsz(:), bsdindx(:),sdsz(:), iasnd(:), jasnd(:)
+  complex(kind(1.d0)), allocatable :: valsnd(:)
   integer, pointer :: idxv(:)
   logical :: rwcnv_,clcnv_,cliprow_
   character(len=5)  :: outfmt_
@@ -220,11 +220,17 @@ Subroutine psb_zsphalo(a,desc_a,blk,info,rwcnv,clcnv,cliprow,outfmt,data)
   end if
   mat_recv = iszr
   iszs=sum(sdsz)
-  call psb_nullify_sp(tmp)
-  call psb_sp_all(0,0,tmp,max(iszs,1),info)
-  tmp%fida='COO'
-  call psb_sp_setifld(psb_spmat_asb_,psb_state_,tmp,info)
+  call psb_ensure_size(max(iszs,1),iasnd,info)
+  if (info == 0) call psb_ensure_size(max(iszs,1),jasnd,info)
+  if (info == 0) call psb_ensure_size(max(iszs,1),valsnd,info)
 
+  if (debugprt) then 
+    open(20+me)
+    do i=1, psb_cd_get_local_cols(desc_a)
+      write(20+me,*) i,desc_a%loc_to_glob(i)
+    end do
+    close(20+me)
+  end if
   t2 = psb_wtime()
 
   l1  = 0
@@ -232,22 +238,23 @@ Subroutine psb_zsphalo(a,desc_a,blk,info,rwcnv,clcnv,cliprow,outfmt,data)
   counter=1
   idx = 0
 
+  tot_elem=0
   Do 
     proc=idxv(counter)
     if (proc == -1) exit 
     n_el_recv=idxv(counter+psb_n_elem_recv_)
     counter=counter+n_el_recv
     n_el_send=idxv(counter+psb_n_elem_send_)
-    tot_elem=0
 
     Do j=0,n_el_send-1
       idx = idxv(counter+psb_elem_send_+j)
       n_elem = psb_sp_get_nnz_row(idx,a)
-
-      call psb_sp_getblk(idx,a,tmp,info,append=.true.)
+      
+      call psb_sp_getrow(idx,a,ngtz,iasnd,jasnd,valsnd,info,&
+           &  append=.true.,nzin=tot_elem)
       if (info /= 0) then
         info=4010
-        ch_err='psb_sp_getblk'
+        ch_err='psb_sp_getrow'
         call psb_errpush(info,name,a_err=ch_err)
         goto 9999
       end if
@@ -258,28 +265,23 @@ Subroutine psb_zsphalo(a,desc_a,blk,info,rwcnv,clcnv,cliprow,outfmt,data)
 
     counter   = counter+n_el_send+3
   Enddo
-  nz = tmp%infoa(psb_nnz_)
+  nz = tot_elem
 
-  if (rwcnv_) call psb_loc_to_glob(tmp%ia1(1:nz),desc_a,info,iact='I')
-  if (clcnv_) call psb_loc_to_glob(tmp%ia2(1:nz),desc_a,info,iact='I')
+  if (rwcnv_) call psb_loc_to_glob(iasnd(1:nz),desc_a,info,iact='I')
+  if (clcnv_) call psb_loc_to_glob(jasnd(1:nz),desc_a,info,iact='I')
   if (info /= 0) then
     info=4010
     ch_err='psb_loc_to_glob'
     call psb_errpush(info,name,a_err=ch_err)
     goto 9999
   end if
-  if (debugprt) then 
-    open(30+me)
-    call psb_csprt(30+me,tmp,head='% SPHALO border SEND .')
-    close(30+me)
-  end if
 
 
-  call mpi_alltoallv(tmp%aspk,sdsz,bsdindx,mpi_double_complex,&
+  call mpi_alltoallv(valsnd,sdsz,bsdindx,mpi_double_complex,&
        & blk%aspk,rvsz,brvindx,mpi_double_complex,icomm,info)
-  call mpi_alltoallv(tmp%ia1,sdsz,bsdindx,mpi_integer,&
+  call mpi_alltoallv(iasnd,sdsz,bsdindx,mpi_integer,&
        & blk%ia1,rvsz,brvindx,mpi_integer,icomm,info)
-  call mpi_alltoallv(tmp%ia2,sdsz,bsdindx,mpi_integer,&
+  call mpi_alltoallv(jasnd,sdsz,bsdindx,mpi_integer,&
        & blk%ia2,rvsz,brvindx,mpi_integer,icomm,info)
   if (info /= 0) then
     info=4010
@@ -371,15 +373,9 @@ Subroutine psb_zsphalo(a,desc_a,blk,info,rwcnv,clcnv,cliprow,outfmt,data)
 !!$  write(0,'(i3,1x,a,4(1x,g14.5))') me,'DSPHALO timings:',t6-t2,t7-t6,t8-t7,t3-t8
 !!$  write(0,'(i3,1x,a,4(1x,g14.5))') me,'DSPHALO timings:',t2-t1,t3-t2,t4-t3,t5-t4
 
-  Deallocate(sdid,brvindx,rvid,bsdindx,rvsz,sdsz,stat=info)
+  Deallocate(sdid,brvindx,rvid,bsdindx,rvsz,sdsz,&
+       & iasnd,jasnd,valsnd,stat=info)
 
-  call psb_sp_free(tmp,info)
-  if (info /= 0) then
-    info=4010
-    ch_err='psb_sp_free'
-    call psb_errpush(info,name,a_err=ch_err)
-    goto 9999
-  end if
 
   call psb_erractionrestore(err_act)
   return

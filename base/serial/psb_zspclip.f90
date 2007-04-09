@@ -48,21 +48,19 @@ subroutine psb_zspclip(a,b,info,imin,imax,jmin,jmax,rscale,cscale)
   logical, intent(in), optional      :: rscale,cscale
 
   integer               :: lrw_, ierr(5), err_act
-  type(psb_zspmat_type) :: tmp
   character(len=20)     :: name, ch_err
   integer      :: imin_,imax_,jmin_,jmax_
   logical      :: rscale_,cscale_
   integer      :: sizeb, nzb, mb, kb, ifst, ilst, nrt, nzt, i, j
-  integer, parameter :: irbk=40, inzr=16 
-  
+  integer, parameter :: irbk=40
+
   name='psb_zsp_clip'
   info  = 0
   call psb_erractionsave(err_act)
   call psb_set_erraction(0)  
 
   call psb_nullify_sp(b)
-  call psb_sp_all(tmp,inzr*irbk,info)
-  
+
 
   if (present(imin)) then 
     imin_ = imin
@@ -116,16 +114,17 @@ subroutine psb_zspclip(a,b,info,imin,imax,jmin,jmax,rscale,cscale)
     nrt = min(irbk,imax_-i+1)
     ifst = i
     ilst = ifst + nrt - 1
-    call psb_sp_getblk(ifst,a,tmp,info,lrw=ilst)
-    nzt = psb_sp_get_nnzeros(tmp)
-    do j=1, nzt 
-      if ((jmin_ <= tmp%ia2(j)).and.(tmp%ia2(j) <= jmax_)) then 
+    call psb_sp_getrow(ifst,a,nzt,b%ia1,b%ia2,b%aspk,info,&
+         &  lrw=ilst, append=.true.,nzin=nzb)
+    do j=nzb+1,nzb+nzt 
+      if ((jmin_ <= b%ia2(j)).and.(b%ia2(j) <= jmax_)) then 
         nzb         = nzb + 1
-        b%aspk(nzb) = tmp%aspk(j) 
-        b%ia1(nzb)  = tmp%ia1(j) 
-        b%ia2(nzb)  = tmp%ia2(j) 
+        b%aspk(nzb) = b%aspk(j) 
+        b%ia1(nzb)  = b%ia1(j) 
+        b%ia2(nzb)  = b%ia2(j) 
       end if
     end do
+    
   end do
   b%infoa(psb_nnz_) = nzb 
 
@@ -141,7 +140,6 @@ subroutine psb_zspclip(a,b,info,imin,imax,jmin,jmax,rscale,cscale)
   end if
   call psb_fixcoo(b,info) 
   call psb_sp_trim(b,info)
-  call psb_sp_free(tmp,info)
 
   call psb_erractionrestore(err_act)
   return
