@@ -57,9 +57,7 @@ How do you add a new storage format? Here is your checklist.
     rows in psb_getrow_mod.f90. This is used in the GETBLK/GETROW/CLIP
     chain; GETROW is (all that is) used by the ILU factorization. 
 13. You have to provide the GETDIAG functionality. 
-14. You have to provide the functionality to NEIGH. 
-    WATCH OUT: THIS COULD BE CHANGED TO USE GETROW!!!!
-15. RWEXTD: what do we do here? Should we switch to/from COO?????
+14. RWEXTD: what do we do here? Should we switch to/from COO?????
     The current interface is ugly! 
 
 Is this complete? I sure hope so.... 
