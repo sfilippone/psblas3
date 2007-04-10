@@ -59,5 +59,7 @@ How do you add a new storage format? Here is your checklist.
 13. You have to provide the GETDIAG functionality. 
 14. RWEXTD: what do we do here? Should we switch to/from COO?????
     The current interface is ugly! 
+15. CSC is currently a second class citizen; it is only needed for
+    interfacing UMFPACK in the mld2p4 preconditioners. 
 
 Is this complete? I sure hope so.... 
