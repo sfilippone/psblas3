@@ -92,7 +92,6 @@ Subroutine psb_zcdovr(a,desc_a,novr,desc_ov,info, extype)
   Integer,allocatable   :: halo(:),works(:),workr(:),t_halo_in(:),&
        & t_halo_out(:),temp(:),maskr(:)
   Integer,allocatable  :: brvindx(:),rvsz(:), bsdindx(:),sdsz(:)
-
   Logical,Parameter :: debug=.false.
   character(len=20) :: name, ch_err
 
@@ -399,7 +398,6 @@ Subroutine psb_zcdovr(a,desc_a,novr,desc_ov,info, extype)
         !
         If (i_ovr <= (novr)) Then
           n_elem = psb_sp_get_nnz_row(idx,a)
-
           call psb_ensure_size((idxs+tot_elem+n_elem),works,info)
           if (info /= 0) then
             info=4010
@@ -438,20 +436,8 @@ Subroutine psb_zcdovr(a,desc_a,novr,desc_ov,info, extype)
 
       if (i_ovr <= novr) then 
         if (tot_elem > 1) then 
-          call psb_msort(works(idxs+1:idxs+tot_elem))
-          lx = works(idxs+1)
-          i = 1 
-          j = 1
-          do 
-            j = j + 1 
-            if (j > tot_elem) exit
-            if (works(idxs+j) /= lx) then 
-              i = i + 1
-              works(idxs+i) = works(idxs+j) 
-              lx = works(idxs+i) 
-            end if
-          end do
-          tot_elem = i
+          call psb_msort_unique(works(idxs+1:idxs+tot_elem),i)
+          tot_elem=i
         endif
         if (debug) write(0,*) me,'Checktmp_o_i Loop Mid2',tmp_ovr_idx(1:10)
         sdsz(proc+1) = tot_elem

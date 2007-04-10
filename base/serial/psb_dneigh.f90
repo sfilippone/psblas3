@@ -87,7 +87,7 @@ subroutine psb_dneigh(a,idx,neigh,n,info,lev)
         ntl = ntl+nn
       end if
     end do
-    call imsru(ntl,neigh(ill+1:ill+ntl),psb_sort_up_,nn)
+    call psb_msort_unique(neigh(ill+1:ill+ntl),nn)
     ifl = ill + 1
     ill = ill + nn
   end do

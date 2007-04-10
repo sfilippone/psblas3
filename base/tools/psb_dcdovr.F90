@@ -85,7 +85,7 @@ Subroutine psb_dcdovr(a,desc_a,novr,desc_ov,info, extype)
        &  ictxt, lovr, lworks,lworkr, n_row,n_col, int_err(5),&
        &  index_dim,elem_dim, l_tmp_ovr_idx,l_tmp_halo, nztot,nhalo
   Integer :: counter,counter_h, counter_o, counter_e,idx,gidx,proc,n_elem_recv,&
-       & n_elem_send,tot_recv,tot_elem,cntov_o,nz,&
+       & n_elem_send,tot_recv,tot_elem,cntov_o,&
        & counter_t,n_elem,i_ovr,jj,proc_id,isz, mglob, glx, &
        & idxr, idxs, lx, iszr, iszs, nxch, nsnd, nrcv,lidx,irsv, extype_
 
@@ -427,11 +427,9 @@ Subroutine psb_dcdovr(a,desc_a,novr,desc_ov,info, extype)
             goto 9999
           end if
 !!$          write(0,*) me,'Iteration: ',j,i_ovr
-
           Do jj=1,n_elem
             works(idxs+tot_elem+jj)=desc_ov%loc_to_glob(blk%ia2(jj))
           End Do
-
           tot_elem=tot_elem+n_elem
         End If
 
@@ -440,20 +438,8 @@ Subroutine psb_dcdovr(a,desc_a,novr,desc_ov,info, extype)
 
       if (i_ovr <= novr) then 
         if (tot_elem > 1) then 
-          call psb_msort(works(idxs+1:idxs+tot_elem))
-          lx = works(idxs+1)
-          i = 1 
-          j = 1
-          do 
-            j = j + 1 
-            if (j > tot_elem) exit
-            if (works(idxs+j) /= lx) then 
-              i = i + 1
-              works(idxs+i) = works(idxs+j) 
-              lx = works(idxs+i) 
-            end if
-          end do
-          tot_elem = i
+          call psb_msort_unique(works(idxs+1:idxs+tot_elem),i)
+          tot_elem=i
         endif
         if (debug) write(0,*) me,'Checktmp_o_i Loop Mid2',tmp_ovr_idx(1:10)
         sdsz(proc+1) = tot_elem
