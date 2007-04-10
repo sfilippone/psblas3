@@ -176,7 +176,7 @@ C     .. Scalar Arguments ..
       INTEGER           M, N,LWORK,IERROR,ldx,ldy
       CHARACTER         DIAG, TRANS
 C     .. Array Arguments ..
-      DOUBLE PRECISION  AS(*), WORK(*), X(LDX,*), Y(LDY,*)
+      DOUBLE PRECISION  AS(*), WORK(*), X(LDX,NB), Y(LDY,NB)
       INTEGER           IA(*), JA(*)
 C     .. Local Scalars ..
       DOUBLE PRECISION  ACC(nb)
@@ -316,24 +316,116 @@ c
 C
 C          .......General Not Unit, No Traspose
 C
-
-          if (beta.ne.zero) then
-            do 240 i = 1, m
-              acc(1:nb) = zero
-              do 220 j = ia(i), ia(i+1) - 1
-                acc(1:nb) = acc(1:nb) + as(j)*x(ja(j),1:nb)
- 220          continue
-              y(i,1:nb) = alpha*acc(1:nb) + beta*y(i,1:nb)
- 240        continue
-          else
-            do i = 1, m
-              acc = zero
-              do j = ia(i), ia(i+1) - 1
-                acc(1:nb) = acc(1:nb) + as(j)*x(ja(j),1:nb)
+          if (beta  == zero) then
+            if (alpha==one) then 
+              do i = 1, m
+                acc = zero
+                do j = ia(i), ia(i+1) - 1
+                  acc = acc + as(j)*x(ja(j),1:nb)
+                enddo
+                y(i,1:nb) = acc
               enddo
-              y(i,1:nb) = alpha*acc(1:nb)
-            enddo
-          endif
+            else if (alpha==-one) then 
+              do i = 1, m
+                acc = zero
+                do j = ia(i), ia(i+1) - 1
+                  acc = acc - as(j)*x(ja(j),1:nb)
+                enddo
+                y(i,1:nb) = acc
+              enddo
+            else
+              do i = 1, m
+                acc = zero
+                do j = ia(i), ia(i+1) - 1
+                  acc = acc + as(j)*x(ja(j),1:nb)
+                enddo
+                y(i,1:nb) = alpha*acc
+              enddo
+              
+            endif 
+
+          else if (beta==one) then 
+
+            if (alpha==one) then 
+              do i = 1, m
+                acc = y(i,1:nb)
+                do j = ia(i), ia(i+1) - 1
+                  acc = acc + as(j)*x(ja(j),1:nb)
+                enddo
+                y(i,1:nb) = acc
+              enddo
+            else if (alpha==-one) then 
+              do i = 1, m
+                acc = y(i,1:nb)
+                do j = ia(i), ia(i+1) - 1
+                  acc = acc - as(j)*x(ja(j),1:nb)
+                enddo
+                y(i,1:nb) = acc
+              enddo
+            else
+              do i = 1, m
+                acc = zero
+                do j = ia(i), ia(i+1) - 1
+                  acc = acc + as(j)*x(ja(j),1:nb)
+                enddo
+                y(i,1:nb) = alpha*acc + y(i,1:nb)
+              enddo
+            endif 
+
+          else if (beta==-one) then 
+
+            if (alpha==one) then 
+              do i = 1, m
+                acc = -y(i,1:nb)
+                do j = ia(i), ia(i+1) - 1
+                  acc = acc + as(j)*x(ja(j),1:nb)
+                enddo
+                y(i,1:nb) = acc
+              enddo
+            else if (alpha==-one) then 
+              do i = 1, m
+                acc = -y(i,1:nb)
+                do j = ia(i), ia(i+1) - 1
+                  acc = acc - as(j)*x(ja(j),1:nb)
+                enddo
+                y(i,1:nb) = acc
+              enddo
+            else
+              do i = 1, m
+                acc = zero
+                do j = ia(i), ia(i+1) - 1
+                  acc = acc + as(j)*x(ja(j),1:nb)
+                enddo
+                y(i,1:nb) = alpha*acc - y(i,1:nb)
+              enddo
+            endif 
+          else  
+            if (alpha==one) then 
+              do i = 1, m
+                acc = zero
+                do j = ia(i), ia(i+1) - 1
+                  acc = acc + as(j)*x(ja(j),1:nb)
+                enddo
+                y(i,1:nb) = acc + beta*y(i,1:nb)
+              enddo
+            else if (alpha==-one) then 
+              do i = 1, m
+                acc = zero
+                do j = ia(i), ia(i+1) - 1
+                  acc = acc - as(j)*x(ja(j),1:nb)
+                enddo
+                y(i,1:nb) = acc + beta*y(i,1:nb)
+              enddo
+            else
+              do i = 1, m
+                acc = zero
+                do j = ia(i), ia(i+1) - 1
+                  acc = acc + as(j)*x(ja(j),1:nb)
+                enddo
+                y(i,1:nb) = alpha*acc + beta*y(i,1:nb)
+              enddo
+            endif 
+          end if 
 c
         else if (uni) then
 c
