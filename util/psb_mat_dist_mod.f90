@@ -36,11 +36,12 @@ module psb_mat_dist_mod
 
 contains
 
+
   subroutine dmatdistf (a_glob, a, parts, ictxt, desc_a,&
-       & b_glob, b, info, inroot,fmt,nb)
+       & b_glob, b, info, inroot,fmt)
     !
     ! an utility subroutine to distribute a matrix among processors
-    ! according to a user defined data distribution, using 
+    ! according to a user defined data distribution, using
     ! sparse matrix subroutines.
     !
     !  type(d_spmat)                            :: a_glob
@@ -82,7 +83,7 @@ contains
     !     on entry: fresh variable.
     !     on exit : the updated array descriptor
     !
-    !  real(kind(1.d0)), optional      :: b_glob(:)
+    !  real(kind(1.d0)),  optional      :: b_glob(:)
     !     on entry: this contains right hand side.
     !     on exit :
     !
@@ -105,7 +106,7 @@ contains
     real(kind(1.d0)), allocatable  :: b(:)
     type (psb_desc_type)       :: desc_a
     integer, intent(out)       :: info
-    integer, optional          :: inroot,nb
+    integer, optional          :: inroot
     character(len=5), optional :: fmt
     interface 
 
@@ -119,15 +120,15 @@ contains
     end interface
 
     ! local variables
-    integer                     :: np, iam 
+    integer                     :: np, iam
     integer                     :: ircode, length_row, i_count, j_count,&
          & k_count, blockdim, root, liwork, nrow, ncol, nnzero, nrhs,&
-         & i,j,k, ll, nz, isize, iproc, nnr, err, err_act, int_err(5),nb_
-    integer, allocatable            :: iwork(:)
-    character                   :: afmt*5, atyp*5
+         & i,j,k, ll, nz, isize, iproc, nnr, err, err_act, int_err(5)
+    integer, allocatable          :: iwork(:)
+    character                     :: afmt*5, atyp*5
     integer, allocatable          :: irow(:),icol(:)
     real(kind(1.d0)), allocatable :: val(:)
-    integer, parameter          :: nbdef=30
+    integer, parameter          :: nb=30
     real(kind(1.d0))            :: t0, t1, t2, t3, t4, t5
     character(len=20)           :: name, ch_err
 
@@ -142,13 +143,7 @@ contains
     else
       root = 0
     end if
-    if (present(nb)) then
-      nb_ = max(nb,1)
-    else
-      nb_ = nbdef
-    end if
     call psb_info(ictxt, iam, np)     
-
     if (iam == root) then
       ! extract information from a_glob
       if (a_glob%fida.ne. 'CSR') then
@@ -167,13 +162,12 @@ contains
       endif
       nnzero = size(a_glob%aspk)
       nrhs   = 1
-      ! broadcast informations to other processors
     endif
-    call psb_bcast(ictxt, nrow,root)
-    call psb_bcast(ictxt, ncol,root)
-    call psb_bcast(ictxt, nnzero,root)
-    call psb_bcast(ictxt, nrhs,root)
-
+    ! broadcast informations to other processors
+    call psb_bcast(ictxt,nrow, root)
+    call psb_bcast(ictxt,ncol, root)
+    call psb_bcast(ictxt,nnzero, root)
+    call psb_bcast(ictxt,nrhs, root)
     liwork = max(np, nrow + ncol)
     allocate(iwork(liwork), stat = info)
     if (info /= 0) then
@@ -193,7 +187,6 @@ contains
       call psb_errpush(info,name,a_err=ch_err)
       goto 9999
     end if
-
     call psb_spall(a,desc_a,info,nnz=nnzero/np)
     if(info/=0) then
       info=4010
@@ -208,11 +201,10 @@ contains
       call psb_errpush(info,name,a_err=ch_err)
       goto 9999
     end if
+    isize = max(3*nb,ncol)
 
 
-    isize = ((nnzero+nrow)/nrow) * nb_
-    isize = max(isize,4*nb_) 
-    allocate(val(isize),irow(isize),icol(isize),stat=info)
+    allocate(val(nb*ncol),irow(nb*ncol),icol(nb*ncol),stat=info)
     if(info/=0) then
       info=4010
       ch_err='Allocate'
@@ -231,7 +223,7 @@ contains
         iproc   = iwork(1) 
         do 
           j_count = j_count + 1 
-          if (j_count-i_count >= nb_) exit
+          if (j_count-i_count >= nb) exit
           if (j_count > nrow) exit
           call parts(j_count,nrow,np,iwork, length_row)
           if (length_row /= 1 ) exit
@@ -248,7 +240,7 @@ contains
             call psb_sp_getrow(i,a_glob,nz,&
                  & irow,icol,val,info,nzin=ll,append=.true.)
             if (info /= 0) then            
-              if (nz > min(size(irow(ll+1:)),size(icol(ll+1:)),size(val(ll+1:)))) then 
+              if (nz >min(size(irow(ll+1:)),size(icol(ll+1:)),size(val(ll+1:)))) then 
                 write(0,*) 'Allocation failure? This should not happen!'
               end if
               call psb_errpush(info,name,a_err=ch_err)
@@ -265,8 +257,8 @@ contains
               call psb_errpush(info,name,a_err=ch_err)
               goto 9999
             end if
-            call psb_geins(nnr,(/(i,i=i_count,j_count-1)/),&
-                 & b_glob(i_count:j_count-1),b,desc_a,info)
+            call psb_geins(nnr,(/(i,i=i_count,j_count-1)/),b_glob(i_count:j_count-1),&
+                 & b,desc_a,info)
             if(info/=0) then
               info=4010
               ch_err='psb_ins'
@@ -277,11 +269,8 @@ contains
             call psb_snd(ictxt,nnr,iproc)
             call psb_snd(ictxt,ll,iproc)
             call psb_snd(ictxt,irow(1:ll),iproc)
-            call psb_rcv(ictxt,ll,iproc)
             call psb_snd(ictxt,icol(1:ll),iproc)
-            call psb_rcv(ictxt,ll,iproc)
             call psb_snd(ictxt,val(1:ll),iproc)
-            call psb_rcv(ictxt,ll,iproc)
             call psb_snd(ictxt,b_glob(i_count:j_count-1),iproc)
             call psb_rcv(ictxt,ll,iproc)
           endif
@@ -303,15 +292,10 @@ contains
 
             endif
             call psb_rcv(ictxt,irow(1:ll),root)
-            call psb_snd(ictxt,ll,root)
-
             call psb_rcv(ictxt,icol(1:ll),root)
-            call psb_snd(ictxt,ll,root)
-            
             call psb_rcv(ictxt,val(1:ll),root)
-            call psb_snd(ictxt,ll,root)
-
             call psb_rcv(ictxt,b_glob(i_count:i_count+nnr-1),root)
+            call psb_snd(ictxt,ll,root)
             call psb_spins(ll,irow,icol,val,a,desc_a,info)
             if(info/=0) then
               info=4010
@@ -327,8 +311,6 @@ contains
               call psb_errpush(info,name,a_err=ch_err)
               goto 9999
             end if
-            call psb_snd(ictxt,ll,root)
-            
           endif
         endif
 
@@ -344,7 +326,7 @@ contains
             ll = 0
             do i= i_count, i_count
               call psb_sp_getrow(i,a_glob,nz,&
-                 & irow,icol,val,info,nzin=ll,append=.true.)
+                   & irow,icol,val,info,nzin=ll,append=.true.)
               if (info /= 0) then            
                 if (nz >min(size(irow(ll+1:)),size(icol(ll+1:)),size(val(ll+1:)))) then 
                   write(0,*) 'Allocation failure? This should not happen!'
@@ -375,25 +357,19 @@ contains
             else
               call psb_snd(ictxt,ll,k_count)
               call psb_snd(ictxt,irow(1:ll),k_count)
-              call psb_rcv(ictxt,ll,k_count)
               call psb_snd(ictxt,icol(1:ll),k_count)
-              call psb_rcv(ictxt,ll,k_count)
               call psb_snd(ictxt,val(1:ll),k_count)
-              call psb_rcv(ictxt,ll,k_count)
               call psb_snd(ictxt,b_glob(i_count),k_count)
               call psb_rcv(ictxt,ll,k_count)
             endif
           else if (iam /= root) then
             if (k_count == iam) then
-
               call psb_rcv(ictxt,ll,root)
               call psb_rcv(ictxt,irow(1:ll),root)
-              call psb_snd(ictxt,ll,root)
               call psb_rcv(ictxt,icol(1:ll),root)
-              call psb_snd(ictxt,ll,root)
               call psb_rcv(ictxt,val(1:ll),root)
-              call psb_snd(ictxt,ll,root)
               call psb_rcv(ictxt,b_glob(i_count),root)
+              call psb_snd(ictxt,ll,root)
               call psb_spins(ll,irow,icol,val,a,desc_a,info)
               if(info/=0) then
                 info=4010
@@ -409,7 +385,6 @@ contains
                 call psb_errpush(info,name,a_err=ch_err)
                 goto 9999
               end if
-              call psb_snd(ictxt,ll,root)
             endif
           endif
         end do
@@ -422,6 +397,7 @@ contains
     else
       afmt = 'CSR'
     endif
+
     call psb_barrier(ictxt)
     t0 = psb_wtime()
     call psb_cdasb(desc_a,info)     
@@ -449,8 +425,6 @@ contains
       write(*,*) 'descriptor assembly: ',t1-t0
       write(*,*) 'sparse matrix assembly: ',t3-t2
     end if
-
-
 
     call psb_geasb(b,desc_a,info)     
     if(info/=0)then
@@ -485,7 +459,7 @@ contains
 
 
   subroutine dmatdistv (a_glob, a, v, ictxt, desc_a,&
-       & b_glob, b, info, inroot,fmt,nb)
+       & b_glob, b, info, inroot,fmt)
     !
     ! an utility subroutine to distribute a matrix among processors
     ! according to a user defined data distribution, using 
@@ -549,20 +523,21 @@ contains
     integer                    :: ictxt, v(:)
     type(psb_dspmat_type)      :: a
     real(kind(1.d0)), allocatable  :: b(:)
-    type (psb_desc_type)       :: desc_a
+    type(psb_desc_type)       :: desc_a
     integer, intent(out)       :: info
-    integer, optional          :: inroot,nb
+    integer, optional          :: inroot
     character(len=5), optional :: fmt
 
     integer                     :: np, iam
     integer                     :: ircode, length_row, i_count, j_count,&
          & k_count, blockdim, root, liwork, nrow, ncol, nnzero, nrhs,&
-         & i,j,k, ll, nz, isize, iproc, nnr, err, err_act, int_err(5),nb_
-    integer, allocatable            :: iwork(:)
-    character                   :: afmt*5, atyp*5
+         & i,j,k, ll, nz, isize, iproc, nnr, err, err_act, int_err(5)
+    integer, allocatable          :: iwork(:)
+    character                     :: afmt*5, atyp*5
     integer, allocatable          :: irow(:),icol(:)
     real(kind(1.d0)), allocatable :: val(:)
-    integer, parameter          :: nbdef=30
+    integer, parameter          :: nb=30
+    logical, parameter          :: newt=.true.
     real(kind(1.d0))            :: t0, t1, t2, t3, t4, t5
     character(len=20)  :: name, ch_err
 
@@ -577,16 +552,11 @@ contains
     else
       root = 0
     end if
-    if (present(nb)) then
-      nb_ = max(nb,1)    
-    else
-      nb_ = nbdef
-    end if
 
     call psb_info(ictxt, iam, np)     
     if (iam == root) then
       ! extract information from a_glob
-      if (a_glob%fida.ne. 'CSR') then
+      if (toupper(a_glob%fida) /=  'CSR') then
         info=135
         ch_err='CSR'
         call psb_errpush(info,name,a_err=ch_err)
@@ -604,7 +574,6 @@ contains
 
       nnzero = size(a_glob%aspk)
       nrhs   = 1
-      
     end if
     ! broadcast informations to other processors
     call psb_bcast(ictxt,nrow, root)
@@ -621,29 +590,6 @@ contains
       goto 9999
     endif
 
-    if (iam /= root) then 
-      allocate(a_glob%ia1(nnzero),&
-           & a_glob%ia2(nrow+1),a_glob%aspk(nnzero),a_glob%pl(1),a_glob%pr(1),stat=info)
-      
-      if(info/=0) then
-        info=4010
-        ch_err='psb_cdall'
-        call psb_errpush(info,name,a_err=ch_err)
-        goto 9999
-      end if
-      a_glob%pl=0
-      a_glob%pr=0
-    end if
-    call psb_bcast(ictxt,a_glob%m,root)
-    call psb_bcast(ictxt,a_glob%k,root)
-    call psb_bcast(ictxt,a_glob%fida,root)
-    call psb_bcast(ictxt,a_glob%descra,root)
-    call psb_bcast(ictxt,a_glob%infoa(1:psb_ifasize_),root)
-    call psb_bcast(ictxt,a_glob%ia1(1:nnzero),root)
-    call psb_bcast(ictxt,a_glob%aspk(1:nnzero),root)
-    call psb_bcast(ictxt,a_glob%ia2(1:nrow+1),root)
-    
-    
     call psb_cdall(ictxt,desc_a,info,vg=v)
     if(info/=0) then
       info=4010
@@ -666,11 +612,10 @@ contains
       call psb_errpush(info,name,a_err=ch_err)
       goto 9999
     end if
+    isize = max(3*nb,ncol)
 
 
-    isize = ((nnzero+nrow)/nrow) * nb_
-    isize = max(isize,4*nb_) 
-    allocate(val(isize),irow(isize),icol(isize),stat=info)
+    allocate(val(nb*ncol),irow(nb*ncol),icol(nb*ncol),stat=info)
     if(info/=0) then
       info=4010
       ch_err='Allocate'
@@ -687,7 +632,7 @@ contains
 
       do 
         j_count = j_count + 1 
-        if (j_count-i_count >= nb_) exit
+        if (j_count-i_count >= nb) exit
         if (j_count > nrow) exit
         if (v(j_count) /= iproc ) exit
       end do
@@ -695,9 +640,7 @@ contains
       ! now we should insert rows i_count..j_count-1
       nnr = j_count - i_count
 
-
-      if (iproc == iam) then
-        
+      if (iam == root) then
         ll = 0
         do i= i_count, j_count-1
           call psb_sp_getrow(i,a_glob,nz,&
@@ -711,23 +654,71 @@ contains
           end if
           ll = ll + nz
         end do
-        
-        call psb_spins(ll,irow,icol,val,a,desc_a,info)
-        if(info/=0) then
-          info=4010
-          ch_err='psb_spins'
-          call psb_errpush(info,name,a_err=ch_err)
-          goto 9999
-        end if
-        
-        call psb_geins(nnr,(/(i,i=i_count,j_count-1)/),b_glob(i_count:j_count-1),&
-             & b,desc_a,info)
-        if(info/=0) then
-          info=4010
-          ch_err='dsins'
-          call psb_errpush(info,name,a_err=ch_err)
-          goto 9999
-        end if
+
+        if (iproc == iam) then
+          call psb_spins(ll,irow,icol,val,a,desc_a,info)
+          if(info/=0) then
+            info=4010
+            ch_err='psb_spins'
+            call psb_errpush(info,name,a_err=ch_err)
+            goto 9999
+          end if
+
+          call psb_geins(nnr,(/(i,i=i_count,j_count-1)/),b_glob(i_count:j_count-1),&
+               & b,desc_a,info)
+          if(info/=0) then
+            info=4010
+            ch_err='dsins'
+            call psb_errpush(info,name,a_err=ch_err)
+            goto 9999
+          end if
+        else
+          call psb_snd(ictxt,nnr,iproc)
+          call psb_snd(ictxt,ll,iproc)
+          call psb_snd(ictxt,irow(1:ll),iproc)
+          call psb_snd(ictxt,icol(1:ll),iproc)
+          call psb_snd(ictxt,val(1:ll),iproc)
+          call psb_snd(ictxt,b_glob(i_count:j_count-1),iproc)
+          call psb_rcv(ictxt,ll,iproc)
+        endif
+      else if (iam /= root) then
+
+        if (iproc == iam) then
+          call psb_rcv(ictxt,nnr,root)
+          call psb_rcv(ictxt,ll,root)
+          if (ll > size(val)) then 
+            write(0,*) iam,'need to reallocate ',ll
+            deallocate(val,irow,icol)
+            allocate(val(ll),irow(ll),icol(ll),stat=info)
+            if(info/=0) then
+              info=4010
+              ch_err='Allocate'
+              call psb_errpush(info,name,a_err=ch_err)
+              goto 9999
+            end if
+          endif
+          call psb_rcv(ictxt,irow(1:ll),root)
+          call psb_rcv(ictxt,icol(1:ll),root)
+          call psb_rcv(ictxt,val(1:ll),root)
+          call psb_rcv(ictxt,b_glob(i_count:i_count+nnr-1),root)
+          call psb_snd(ictxt,ll,root)
+
+          call psb_spins(ll,irow,icol,val,a,desc_a,info)
+          if(info/=0) then
+            info=4010
+            ch_err='spins'
+            call psb_errpush(info,name,a_err=ch_err)
+            goto 9999
+          end if
+          call psb_geins(nnr,(/(i,i=i_count,i_count+nnr-1)/),&
+               & b_glob(i_count:i_count+nnr-1),b,desc_a,info)
+          if(info/=0) then
+            info=4010
+            ch_err='psdsins'
+            call psb_errpush(info,name,a_err=ch_err)
+            goto 9999
+          end if
+        endif
       endif
       i_count = j_count
 
@@ -791,7 +782,6 @@ contains
     return
 
   end subroutine dmatdistv
-
 
   subroutine zmatdistf (a_glob, a, parts, ictxt, desc_a,&
        & b_glob, b, info, inroot,fmt)
