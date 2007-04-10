@@ -1,6 +1,7 @@
 include Make.inc
-#PREC=../mld2p4
+#PREC=../mld2p4-dev
 PREC=prec
+
 
 library:
 	( [ -d lib ] || mkdir lib)
@@ -9,8 +10,7 @@ library:
 	(cd krylov; make lib)
 	(cd util; make lib )
 	@echo "====================================="
-	@echo "Compilation Successful."
-	@echo "You can now link to ./lib/libpsblas.a"
+	@echo "PSBLAS libraries Compilation Successful."
 
 clean: 
 	(cd base; make clean)
