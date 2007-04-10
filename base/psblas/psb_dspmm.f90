@@ -97,7 +97,7 @@ subroutine  psb_dspmm(alpha,a,x,beta,y,desc_a,info,&
   type(psb_dspmat_type), intent(in)        :: a
   type(psb_desc_type), intent(in)          :: desc_a
   integer, intent(out)                     :: info
-  real(kind(1.d0)), optional, target      :: work(:)
+  real(kind(1.d0)), optional, target       :: work(:)
   character, intent(in), optional          :: trans
   integer, intent(in), optional            :: k, jx, jy,doswap
 
