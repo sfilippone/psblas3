@@ -32,6 +32,10 @@ module psb_realloc_mod
   use psb_const_mod
   implicit none
   
+  !
+  ! psb_realloc will reallocate the input array to have exactly 
+  ! the size specified, possibly shortening it. 
+  !
   Interface psb_realloc
     module procedure psb_dreallocate1i
     module procedure psb_dreallocate2i
@@ -58,7 +62,12 @@ module psb_realloc_mod
          & psb_dcpy1d, psb_dcpy2d, psb_zcpy1d, psb_zcpy2d
   end Interface
 
-  Interface psb_ensure_size
+  !
+  ! psb_ensure_size will reallocate the input array if necessary
+  ! to guarantee that its size is at least as large as the 
+  ! value required, usually with some room to spare.
+  !
+  interface psb_ensure_size
     module procedure psb_icksz1d, psb_dcksz1d, psb_zcksz1d
   end Interface
 

@@ -9,10 +9,10 @@
 \syntax{call psb\_msort}{x,ix,dir,flag}
 \syntax*{call psb\_qsort}{x,ix,dir,flag}
 
-These  serial routines sort a sequence $X$ into an order consistent
-with the underlying field from which the values are drawn. The
-argument meaning is identical; the only difference is the algorithm
-used to accomplish the task (see Usage Notes below).
+These  serial routines sort a sequence $X$ into ascending or
+descending  order. The argument meaning is identical for the two
+calls; the only difference is the algorithm used to accomplish the
+task (see Usage Notes below). 
 \begin{description}
 \item[\bf  On Entry ]
 \item[x] The sequence to be sorted.\\
@@ -45,16 +45,17 @@ position as the corresponding entries in $x$.
 \section*{Usage notes}
 \begin{enumerate}
 \item The two routines return the items in the chosen ordering; the
-  only difference is the handling of  ties (i.e. items with an equal
-  value) in the original input. With the merge-sort algorithm ties are
-  preserved in the same order as they had in the original sequence,
-  while this is not guaranteed for quicksort
+  only output difference is the handling of  ties (i.e. items with an
+  equal   value) in the original input. With the merge-sort algorithm
+  ties are   preserved in the same order as they had in the original
+  sequence,   while this is not guaranteed for quicksort 
 \item If $flag = psb\_sort\_ovw\_idx\_$ then the entries in $ix(1:n)$
   where $n$ is the size of $x$ are initialized to $ix(i) \leftarrow
   i$; thus, upon return from the subroutine, for each
   index $i$ we have in $ix(i)$ the position that the item $x(i)$
-  occupied in the original data sequence; otherwise the routine will
-  shuffle around whatever data the user chose for its initialization. 
+  occupied in the original data sequence;
+\item If $flag = psb\_sort\_keep\_idx\_$  the routine will assume that
+  the entries in $ix(:)$ have already been initialized by the user;
 \item The two sorting algorithms have a similar $O(n \log n)$ expected
   running time; in the average case quicksort will be the
   fastest. However note that:
@@ -64,11 +65,12 @@ position as the corresponding entries in $x$.
   but the worst case may still apply;
 \item The worst case running time for merge-sort is the same as the
   average case;
-\item Our merge-sort is implemented to take advantage of any
-  subsequence that is already in the desired ordering at the
-  beginning; this situation may be quite common when dealing with
-  indices of sparse matrix entries, accordingly it is the preferred
-  choice when a sorting is needed by other routines in the library.
+\item The merge-sort algorithm is implemented to take advantage of 
+  subsequences that may be  already in the desired ordering at the
+  beginning; this situation is relatively common when dealing with
+  indices of sparse matrix entries, thus merge-sort  is the
+  preferred   choice when a sorting is needed by other routines in the
+  library. 
 \end{enumerate}
 \end{enumerate}
 

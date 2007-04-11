@@ -54,7 +54,7 @@ How do you add a new storage format? Here is your checklist.
 11. You have to provide the query facilities used in PSB_XSPINFO
     (included  in base/modules/psb_spmat_type). 
 12. You have to provide the functionality to extract a block of
-    rows in psb_getrow_mod.f90. This is used in the GETBLK/GETROW/CLIP
+    rows in psb_getrow_mod.f90. This is used in the GETROW/GETBLK/CLIP
     chain; GETROW is (all that is) used by the ILU factorization. 
 13. You have to provide the GETDIAG functionality. 
 14. RWEXTD: what do we do here? Should we switch to/from COO?????
