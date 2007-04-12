@@ -64,8 +64,6 @@ subroutine psb_dbjac_aply(alpha,prec,x,beta,y,desc_data,trans,work,info)
   ictxt=psb_cd_get_context(desc_data)
   call psb_info(ictxt, me, np)
 
-  diagl='U'
-  diagu='U'
 
   select case(trans)
   case('N','n')
@@ -109,20 +107,18 @@ subroutine psb_dbjac_aply(alpha,prec,x,beta,y,desc_data,trans,work,info)
     case('N','n')
 
       call psb_spsm(done,prec%av(l_pr_),x,dzero,ww,desc_data,info,&
-           & trans='N',unit=diagl,choice=psb_none_,work=aux)
+           & trans='N',unit='L',diag=prec%d,choice=psb_none_,work=aux)
       if(info /=0) goto 9999
-      ww(1:n_row) = ww(1:n_row)*prec%d(1:n_row)
       call psb_spsm(alpha,prec%av(u_pr_),ww,beta,y,desc_data,info,&
-           & trans='N',unit=diagu,choice=psb_none_, work=aux)
+           & trans='N',unit='U',choice=psb_none_, work=aux)
       if(info /=0) goto 9999
 
     case('T','t','C','c')
       call psb_spsm(done,prec%av(u_pr_),x,dzero,ww,desc_data,info,&
-           & trans=trans,unit=diagu,choice=psb_none_, work=aux)
+           & trans=trans,unit='L',diag=prec%d,choice=psb_none_, work=aux)
       if(info /=0) goto 9999
-      ww(1:n_row) = ww(1:n_row)*prec%d(1:n_row)
       call psb_spsm(alpha,prec%av(l_pr_),ww,beta,y,desc_data,info,&
-           & trans=trans,unit=diagl,choice=psb_none_,work=aux)
+           & trans=trans,unit='U',choice=psb_none_,work=aux)
       if(info /=0) goto 9999
 
     end select
@@ -157,4 +153,3 @@ subroutine psb_dbjac_aply(alpha,prec,x,beta,y,desc_data,trans,work,info)
   return
 
 end subroutine psb_dbjac_aply
-

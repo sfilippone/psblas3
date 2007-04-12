@@ -72,7 +72,7 @@
 !    work   -  real,dimension(:)(optional). Working area.
 ! 
 subroutine  psb_dspsm(alpha,a,x,beta,y,desc_a,info,&
-     & trans, unitd, choice, d, k, jx, jy, work)   
+     & trans, unitd, choice, diag, k, jx, jy, work)   
 
   use psb_spmat_type
   use psb_serial_mod
@@ -91,7 +91,7 @@ subroutine  psb_dspsm(alpha,a,x,beta,y,desc_a,info,&
   type (psb_dspmat_type), intent(in)        :: a
   type(psb_desc_type), intent(in)           :: desc_a
   integer, intent(out)                      :: info
-  real(kind(1.d0)), intent(in), optional, target      :: d(:)
+  real(kind(1.d0)), intent(in), optional, target      :: diag(:)
   real(kind(1.d0)), optional, target       :: work(:)
   character, intent(in), optional           :: trans, unitd
   integer, intent(in), optional             :: choice
@@ -216,9 +216,9 @@ subroutine  psb_dspsm(alpha,a,x,beta,y,desc_a,info,&
 
   iwork(1)=0.d0
 
-  if(present(d)) then
-    lld = size(d)
-    id => d
+  if(present(diag)) then
+    lld = size(diag)
+    id => diag
   else
     lld=1
     allocate(id(1))
@@ -301,7 +301,7 @@ subroutine  psb_dspsm(alpha,a,x,beta,y,desc_a,info,&
   end if
 
   if(aliw) deallocate(iwork)
-  if(.not.present(d)) deallocate(id)
+  if(.not.present(diag)) deallocate(id)
 
   call psb_erractionrestore(err_act)
   return  
@@ -379,7 +379,7 @@ end subroutine psb_dspsm
 !    work   -  real,dimension(:)(optional). Working area.
 ! 
 subroutine  psb_dspsv(alpha,a,x,beta,y,desc_a,info,&
-     & trans, unitd, choice, d, work)   
+     & trans, unitd, choice, diag, work)   
   use psb_spmat_type
   use psb_serial_mod
   use psb_descriptor_type
@@ -397,7 +397,7 @@ subroutine  psb_dspsv(alpha,a,x,beta,y,desc_a,info,&
   type(psb_dspmat_type), intent(in)         :: a
   type(psb_desc_type), intent(in)           :: desc_a
   integer, intent(out)                      :: info
-  real(kind(1.d0)), intent(in), optional, target    :: d(:)
+  real(kind(1.d0)), intent(in), optional, target    :: diag(:)
   real(kind(1.d0)), optional, target        :: work(:)
   character, intent(in), optional           :: trans, unitd
   integer, intent(in), optional             :: choice
@@ -510,9 +510,9 @@ subroutine  psb_dspsv(alpha,a,x,beta,y,desc_a,info,&
 
   iwork(1)=0.d0
 
-  if (present(d)) then
-    lld = size(d)
-    id => d
+  if (present(diag)) then
+    lld = size(diag)
+    id => diag
   else
     lld=1
     allocate(id(1))
@@ -594,7 +594,7 @@ subroutine  psb_dspsv(alpha,a,x,beta,y,desc_a,info,&
   end if
 
   if (aliw) deallocate(iwork)
-  if(.not.present(d)) deallocate(id)
+  if(.not.present(diag)) deallocate(id)
 
   call psb_erractionrestore(err_act)
   return  
