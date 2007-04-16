@@ -195,7 +195,13 @@ contains
     Integer, Optional, Intent(in)      :: itmax, itrace, irst,istop
     Integer, Optional, Intent(out)     :: iter
     Real(Kind(1.d0)), Optional, Intent(out) :: err
+
+    integer                            :: ictxt,me,np
+
+    ictxt=psb_cd_get_context(desc_a)
     
+    call psb_info(ictxt, me, np)
+
     select case(toupper(method))
     case('CG') 
       call  psb_cg(a,prec,b,x,eps,desc_a,info,&
@@ -216,6 +222,8 @@ contains
       call  psb_bicgstabl(a,prec,b,x,eps,desc_a,info,&
          &itmax,iter,err,itrace,irst,istop)
     case default
+      if (me==0) write(0,*) 'Unknown method ',method,&
+           & ' defaulting to BiCGSTAB'
       call  psb_bicgstab(a,prec,b,x,eps,desc_a,info,&
          &itmax,iter,err,itrace,istop)
     end select
@@ -238,6 +246,12 @@ contains
     Integer, Optional, Intent(in)      :: itmax, itrace, irst,istop
     Integer, Optional, Intent(out)     :: iter
     Real(Kind(1.d0)), Optional, Intent(out) :: err
+
+    integer                            :: ictxt,me,np
+
+    ictxt=psb_cd_get_context(desc_a)
+    
+    call psb_info(ictxt, me, np)
     
 
     select case(toupper(method))
@@ -260,6 +274,8 @@ contains
 !!$      call  psb_bicgstabl(a,prec,b,x,eps,desc_a,info,&
 !!$         &itmax,iter,err,itrace,irst,istop)
     case default
+      if (me==0) write(0,*) 'Unknown method ',method,&
+           & ' defaulting to BiCGSTAB'
       call  psb_bicgstab(a,prec,b,x,eps,desc_a,info,&
          &itmax,iter,err,itrace,istop)
     end select
