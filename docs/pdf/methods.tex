@@ -14,7 +14,7 @@ the module \verb|psb_krylov_mod|.
 \subroutine{psb\_krylov \label{krylov}}{Krylov Methods Driver Routine}
 
 This subroutine is a driver that provides a general interface for all
-the Krylov-Subspace family methods implemented in PSBLAS-2.0. 
+the Krylov-Subspace family methods implemented in PSBLAS version 2. 
 
 The stopping criterion is the normwise backward error, in the infinity
 norm, i.e. the iteration is stopped when 
@@ -31,9 +31,9 @@ $r_i=b-Ax_i$ the corresponding residual at the $i$-th iteration.
 \begin{description}
 \item[\bf On Entry]
 \item[method] a string that defines the iterative method to be
-  used. Valid values in PSBLAS-2.0 are:
+  used. Supported values are:
   \begin{description}
-  \item[CG]: the Conjugate gradient method;
+  \item[CG]: the Conjugate Gradient method;
   \item[CGS]:the Conjugate Gradient Stabilized method;
 
   \item[BICG]: the Bi-Conjugate Gradient method;

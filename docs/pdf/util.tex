@@ -80,7 +80,7 @@ module \verb|psb_util_mod|.
 
 %\subroutine{PSB\_HBIO\_MOD}{Input/Output in Harwell-Boeing format}
 
-\subroutine*{hb\_read}{Read a sparse matrix from a file in the
+\subroutine{hb\_read}{Read a sparse matrix from a file in the
   Harwell--Boeing format}
 \syntax{call hb\_read}{a, iret, iunit, filename, b, mtitle}
  
@@ -118,7 +118,7 @@ An integer value; 0 means no error has been detected.
 
 
 
-\subroutine*{hb\_write}{Write a sparse matrix to a  file in the Harwell--Boeing format}
+\subroutine{hb\_write}{Write a sparse matrix to a  file in the Harwell--Boeing format}
 \syntax{call hb\_write}{a, iret, iunit, filename, key, rhs, mtitle}
 
 
@@ -165,7 +165,7 @@ An integer value; 0 means no error has been detected.
 
 %\subroutine{PSB\_MMIO\_MOD}{Input/Output in MatrixMarket format}
 
-\subroutine*{mm\_mat\_read}{Read a sparse matrix from a file in the MatrixMarket format}
+\subroutine{mm\_mat\_read}{Read a sparse matrix from a file in the MatrixMarket format}
 \syntax{call mm\_mat\_read}{a, iret, iunit, filename}
 
 \begin{description}
@@ -192,7 +192,7 @@ An integer value; 0 means no error has been detected.
 
 
 
-\subroutine*{mm\_mat\_write}{Write a sparse matrix to a  file in the MatrixMarket format}
+\subroutine{mm\_mat\_write}{Write a sparse matrix to a  file in the MatrixMarket format}
 \syntax{call mm\_mat\_write}{a, mtitle, iret, iunit, filename}
 \begin{description}
 \item[\bf  On Entry ]
