@@ -2,10 +2,6 @@
 !!$              Parallel Sparse BLAS  v2.0
 !!$    (C) Copyright 2006 Salvatore Filippone    University of Rome Tor Vergata
 !!$                       Alfredo Buttari        University of Rome Tor Vergata
-!!$
-!!$     Contributions to this routine:
-!!$                       Daniela di Serafino    Second University of Naples
-!!$                       Pasqua D'Ambra         ICAR-CNR
 !!$ 
 !!$  Redistribution and use in source and binary forms, with or without
 !!$  modification, are permitted provided that the following conditions
@@ -67,8 +63,7 @@
 ! File:  psb_dgmresr.f90
 !
 ! Subroutine: psb_dgmres
-!    This subroutine implements the restarted GMRES method with right
-!    preconditioning.
+!    This subroutine implements the restarted GMRES method.
 !
 ! Parameters:
 !    a       -  type(<psb_dspmat_type>).     The sparse matrix containing A.
@@ -103,7 +98,7 @@ Subroutine psb_dgmresr(a,prec,b,x,eps,desc_a,info,&
   Integer, Optional, Intent(out)     :: iter
   Real(Kind(1.d0)), Optional, Intent(out) :: err
 !!$   local data
-  Real(Kind(1.d0)), allocatable, target   :: aux(:),w(:),w1(:), v(:,:)
+  Real(Kind(1.d0)), allocatable, target   :: aux(:),w(:), v(:,:)
   Real(Kind(1.d0)), allocatable   ::  c(:),s(:), h(:,:), rs(:)
   Real(Kind(1.d0)) :: rerr, scal, gm 
   Integer       ::litmax, liter, naux, m, mglob, it,k, itrace_,&
@@ -138,7 +133,7 @@ Subroutine psb_dgmresr(a,prec,b,x,eps,desc_a,info,&
   endif
 !
 !  ISTOP_ = 1:  Normwise backward error, infinity norm 
-!  ISTOP_ = 2:  ||r||/||b||, 2-norm 
+!  ISTOP_ = 2:  ||r||/||b||   norm 2 
 !
 
   if ((istop_ < 1 ).or.(istop_ > 2 ) ) then
@@ -178,24 +173,21 @@ Subroutine psb_dgmresr(a,prec,b,x,eps,desc_a,info,&
     goto 9999
   endif
 
-
   naux=4*n_col 
   Allocate(aux(naux),h(nl+1,nl+1),&
        &c(nl+1),s(nl+1),rs(nl+1), stat=info)
 
   if (info == 0) Call psb_geall(v,desc_a,info,n=nl+1)
   if (info == 0) Call psb_geall(w,desc_a,info)
-  if (info == 0) Call psb_geall(w1,desc_a,info)
   if (info == 0) Call psb_geasb(v,desc_a,info)  
   if (info == 0) Call psb_geasb(w,desc_a,info)  
-  if (info == 0) Call psb_geasb(w1,desc_a,info)
   if (info.ne.0) Then 
      info=4011 
      call psb_errpush(info,name)
      goto 9999
   End If
-  if (debug) write(0,*) 'Size of V,W,W1 ',size(v),size(v,1),&
-       &size(w),size(w,1),size(w1),size(w1,1), size(v(:,1))
+  if (debug) write(0,*) 'Size of V,W ',size(v),size(v,1),&
+       &size(w),size(w,1), size(v(:,1))
 
   ! Ensure global coherence for convergence checks.
   call psb_set_coher(ictxt,isvch)
@@ -216,11 +208,9 @@ Subroutine psb_dgmresr(a,prec,b,x,eps,desc_a,info,&
   diagu  = 'u'
   itx   = 0
   restart: Do 
-  
-    ! compute r0 = b-ax0
-    ! check convergence
-    ! compute v1 = r0/||r0||_2
-
+!!$   
+!!$   r0 = b-ax0
+!!$ 
     If (debug) Write(0,*) 'restart: ',itx,it
     it = 0      
     Call psb_geaxpby(done,b,dzero,v(:,1),desc_a,info)
@@ -229,27 +219,19 @@ Subroutine psb_dgmresr(a,prec,b,x,eps,desc_a,info,&
        call psb_errpush(info,name)
        goto 9999
     End If
-
     Call psb_spmm(-done,a,x,done,v(:,1),desc_a,info,work=aux)
-    if (info.ne.0) Then 
-       info=4011 
-       call psb_errpush(info,name)
-       goto 9999
-    End If
-
+    
+    call psb_precaply(prec,v(:,1),desc_a,info)
     rs(1) = psb_genrm2(v(:,1),desc_a,info)
     if (info.ne.0) Then 
        info=4011 
        call psb_errpush(info,name)
        goto 9999
     End If
-    scal=done/rs(1)  ! rs(1) MIGHT BE VERY SMALL - USE DSCAL TO DEAL WITH IT?
 
+    scal=done/rs(1)
     If (debug) Write(0,*) 'on entry to amax: b: ',Size(b),rs(1),scal
 
-    !
-    ! check convergence
-    !
     if (istop_ == 1) then 
       rni = psb_geamax(v(:,1),desc_a,info)
       xni = psb_geamax(x,desc_a,info)
@@ -267,27 +249,20 @@ Subroutine psb_dgmresr(a,prec,b,x,eps,desc_a,info,&
     If (rerr<=eps) Then 
       Exit restart
     End If
-
     If (itrace_ > 0) then 
       if ((mod(itx,itrace_)==0).and.(me == 0))&
            & write(*,'(a,i4,3(2x,es10.4))') 'gmres(l): ',itx,rerr
     end If
      
-    v(:,1) = v(:,1) * scal
-
     If (itx.Ge.litmax) Exit restart  
 
-    !
-    ! inner iterations
-    !
+    v(:,1) = v(:,1) * scal
+
     inner:  Do i=1,nl
       itx  = itx + 1
 
-      call psb_geaxpby(done,v(:,i),dzero,w1,desc_a,info)
-      call psb_precaply(prec,w1,desc_a,info)
-      Call psb_spmm(done,a,w1,dzero,w,desc_a,info,work=aux)
-      !
-      !********** ADD ERROR HANDLING **************
+      Call psb_spmm(done,a,v(:,i),dzero,w,desc_a,info,work=aux)
+      call psb_precaply(prec,w,desc_a,info)
 
       do k = 1, i
         h(k,i) = psb_gedot(v(:,k),w,desc_a,info)
@@ -312,57 +287,31 @@ Subroutine psb_dgmresr(a,prec,b,x,eps,desc_a,info,&
       h(i,i)  = c(i)*h(i,i)+s(i)*h(i+1,i)
             
       if (istop_ == 1) then 
-        !
-        ! build x and then compute the residual and its infinity norm
-        !
+!da modificare, la norma infinito del residuo va calcolata a parte
+        rni = abs(rs(i+1))
+        xni = psb_geamax(x,desc_a,info)
+        rerr =  rni/(ani*xni+bni)
+      else if (istop_ == 2) then 
+        rni = abs(rs(i+1))
+        rerr = rni/bn2
+      endif
+
+      if (rerr < eps ) then 
+        if (debug) write(0,*) 'GMRES TRSM',i,size(h,1),nl
         call dtrsm('l','u','n','n',i,1,done,h,size(h,1),rs,nl)
         if (debug) write(0,*) 'Rebuild x-> RS:',rs(21:nl)
         do k=1, i
           call psb_geaxpby(rs(k),v(:,k),done,x,desc_a,info)
         end do
-        call psb_geaxpby(done,b,dzero,w1,desc_a,info)
-        call psb_spmm(-done,a,x,done,w1,desc_a,info,work=aux)
-        rni = psb_geamax(w1,desc_a,info)
-        xni = psb_geamax(x,desc_a,info)
-        rerr =  rni/(ani*xni+bni)
-        !
-        !********** ADD PSBLAS ERROR HANDLING **************
-
-      else if (istop_ == 2) then 
-        !
-        ! compute the residual 2-norm as byproduct of the solution
-        ! procedure of the least-squares problem
-        !
-        rni = abs(rs(i+1))
-        rerr = rni/bn2
-
-      endif
-
-      if (rerr < eps ) then 
-
-        if (istop_ == 2) then
-          !
-          ! build x
-          !
-          call dtrsm('l','u','n','n',i,1,done,h,size(h,1),rs,nl)
-          if (debug) write(0,*) 'Rebuild x-> RS:',rs(21:nl)
-          do k=1, i
-            call psb_geaxpby(rs(k),v(:,k),done,x,desc_a,info)
-          end do
-        end if
-
         exit restart
-
       end if
-
       If (itrace_ > 0) then 
         if ((mod(itx,itrace_)==0).and.(me == 0))&
              & write(*,'(a,i4,3(2x,es10.4))') 'gmres(l): ',itx,rerr
       end If
 
     end Do inner
-
-    if (debug) write(0,*) 'Before DTRSM :',rs(1:nl)
+    if (debug) write(0,*) 'Before DTRSM :',rs(1:nl),i,size(h,1),nl
     call dtrsm('l','u','n','n',nl,1,done,h,size(h,1),rs,nl)
     if (debug) write(0,*) 'Rebuild x-> RS:',rs(21:nl)
     do k=1, nl
@@ -385,7 +334,6 @@ Subroutine psb_dgmresr(a,prec,b,x,eps,desc_a,info,&
   Deallocate(aux,h,c,s,rs, stat=info)
   Call psb_gefree(v,desc_a,info)
   Call psb_gefree(w,desc_a,info)
-  Call psb_gefree(w1,desc_a,info)
 
   ! restore external global coherence behaviour
   call psb_restore_coher(ictxt,isvch)

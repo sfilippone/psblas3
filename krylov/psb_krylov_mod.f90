@@ -222,8 +222,8 @@ contains
       call  psb_bicgstabl(a,prec,b,x,eps,desc_a,info,&
          &itmax,iter,err,itrace,irst,istop)
     case default
-      if (me==0) write(0,*) 'Unknown method ',method,&
-           & ' defaulting to BiCGSTAB'
+      if (me==0) write(0,*) 'Warning: Unknown method  ',method,&
+           & ' in PSB_KRYLOV, defaulting to BiCGSTAB'
       call  psb_bicgstab(a,prec,b,x,eps,desc_a,info,&
          &itmax,iter,err,itrace,istop)
     end select
@@ -274,8 +274,8 @@ contains
 !!$      call  psb_bicgstabl(a,prec,b,x,eps,desc_a,info,&
 !!$         &itmax,iter,err,itrace,irst,istop)
     case default
-      if (me==0) write(0,*) 'Unknown method ',method,&
-           & ' defaulting to BiCGSTAB'
+      if (me==0) write(0,*) 'Warning: Unknown method ',method,&
+           & ' in PSB_KRYLOV, defaulting to BiCGSTAB'
       call  psb_bicgstab(a,prec,b,x,eps,desc_a,info,&
          &itmax,iter,err,itrace,istop)
     end select
