@@ -346,7 +346,7 @@ contains
   !  subroutine to allocate and fill in the coefficient matrix and
   !  the rhs. 
   !
-  subroutine create_matrix(idim,a,b,t,desc_a,parts,ictxt,afmt,info)
+  subroutine create_matrix(idim,a,b,xv,desc_a,parts,ictxt,afmt,info)
     !
     !   discretize the partial diferential equation
     ! 
@@ -366,7 +366,7 @@ contains
     implicit none
     integer                        :: idim
     integer, parameter             :: nbmax=10
-    real(kind(1.d0)), allocatable  :: b(:),t(:)
+    real(kind(1.d0)), allocatable  :: b(:),xv(:)
     type(psb_desc_type)            :: desc_a
     integer                        :: ictxt, info
     character                      :: afmt*5
@@ -422,7 +422,7 @@ contains
     call psb_spall(a,desc_a,info,nnz=nnz)
     ! define  rhs from boundary conditions; also build initial guess 
     call psb_geall(b,desc_a,info)
-    call psb_geall(t,desc_a,info)
+    call psb_geall(xv,desc_a,info)
     if(info.ne.0) then
       info=4010
       ch_err='allocation rout.'
@@ -579,7 +579,7 @@ contains
           call psb_geins(1,(/ia/),zt(1:1),b,desc_a,info)
           if(info.ne.0) exit
           zt(1)=0.d0
-          call psb_geins(1,(/ia/),zt(1:1),t,desc_a,info)
+          call psb_geins(1,(/ia/),zt(1:1),xv,desc_a,info)
           if(info.ne.0) exit
         end if
       end do
@@ -622,7 +622,7 @@ contains
     end if
 
     call psb_geasb(b,desc_a,info)
-    call psb_geasb(t,desc_a,info)
+    call psb_geasb(xv,desc_a,info)
     if(info.ne.0) then
       info=4010
       ch_err='asb rout.'
