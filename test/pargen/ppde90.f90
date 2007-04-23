@@ -99,7 +99,7 @@ program pde90
 
   ! solver parameters
   integer            :: iter, itmax,ierr,itrace, methd,iprec, istopc,&
-       & iparm(20), ml, novr
+       & iparm(20), irst, novr
   real(kind(1.d0))   :: err, eps, rparm(20)
 
   ! other variables
@@ -127,7 +127,7 @@ program pde90
   !
   !  get parameters
   !
-  call get_parms(ictxt,cmethd,iprec,novr,afmt,idim,istopc,itmax,itrace,ml)
+  call get_parms(ictxt,cmethd,iprec,novr,afmt,idim,istopc,itmax,itrace,irst)
 
   !
   !  allocate and fill in the coefficient matrix, rhs and initial guess 
@@ -188,7 +188,7 @@ program pde90
   t1 = psb_wtime()  
   eps   = 1.d-9
   call psb_krylov(cmethd,a,pre,b,x,eps,desc_a,info,& 
-       & itmax=itmax,iter=iter,err=err,itrace=itrace,istop=istopc,irst=ml)     
+       & itmax=itmax,iter=iter,err=err,itrace=itrace,istop=istopc,irst=irst)     
 
   if(info.ne.0) then
     info=4010
@@ -236,10 +236,10 @@ contains
   !
   ! get iteration parameters from the command line
   !
-  subroutine  get_parms(ictxt,cmethd,iprec,novr,afmt,idim,istopc,itmax,itrace,ml)
+  subroutine  get_parms(ictxt,cmethd,iprec,novr,afmt,idim,istopc,itmax,itrace,irst)
     integer      :: ictxt
     character    :: cmethd*10, afmt*5
-    integer      :: idim, iret, istopc,itmax,itrace,ml, iprec, novr
+    integer      :: idim, iret, istopc,itmax,itrace,irst, iprec, novr
     character*40 :: charbuf
     integer      :: iargc, np, iam
     external     iargc
@@ -279,9 +279,9 @@ contains
           itrace=-1
         endif
         if (ip.ge.7) then
-          read(*,*) ml
+          read(*,*) irst
         else
-          ml=1
+          irst=1
         endif
         ! broadcast parameters to all processors    
 
@@ -289,7 +289,7 @@ contains
         intbuf(2) = istopc
         intbuf(3) = itmax
         intbuf(4) = itrace
-        intbuf(5) = ml
+        intbuf(5) = irst
         call psb_bcast(ictxt,intbuf(1:5))
 
         write(*,'("Solving matrix       : ell1")')      
@@ -316,7 +316,7 @@ contains
       istopc  = intbuf(2)
       itmax   = intbuf(3)
       itrace  = intbuf(4)
-      ml      = intbuf(5)
+      irst    = intbuf(5)
     end if
     return
 

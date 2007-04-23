@@ -289,7 +289,6 @@ Subroutine psb_dgmresr(a,prec,b,x,eps,desc_a,info,&
       call psb_precaply(prec,v(:,i),w1,desc_a,info)
       Call psb_spmm(done,a,w1,dzero,w,desc_a,info,work=aux)
       !
-      !********** ADD ERROR HANDLING **************
 
       do k = 1, i
         h(k,i) = psb_gedot(v(:,k),w,desc_a,info)
@@ -332,7 +331,6 @@ Subroutine psb_dgmresr(a,prec,b,x,eps,desc_a,info,&
         xni = psb_geamax(xt,desc_a,info)
         rerr =  rni/(ani*xni+bni)
         !
-        !********** ADD PSBLAS ERROR HANDLING **************
 
       else if (istop_ == 2) then 
         !
