@@ -356,7 +356,7 @@ contains
       !        ... coo format error ...
     case(130)
       write (0,'("there are duplicated elements in coo format")')
-      write (0,'("please set repflag flag to  2 or 3")')
+      write (0,'("and you have chosen psb_dupl_err_ ")')
     case(134)
       write (0,'("Invalid input format ",a3)')a_e_d(1:3)
     case(135)
