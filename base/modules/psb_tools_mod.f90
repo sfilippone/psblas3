@@ -688,7 +688,7 @@ contains
       else
         flag_=0
       endif
-      call psb_cdalv(vg, ictxt, desc_a, info, flag_)
+      call psb_cdalv(vg, ictxt, desc_a, info, flag=flag_)
 
     else if (present(vl)) then 
       call psb_cd_inloc(vl,ictxt,desc_a,info)

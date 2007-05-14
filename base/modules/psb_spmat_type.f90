@@ -153,7 +153,7 @@ module psb_spmat_type
     module procedure psb_dspreinit,  psb_zspreinit
   end interface
 
-  interface psb_sp_sizeof
+  interface psb_sizeof
     module procedure psb_dspsizeof,  psb_zspsizeof
   end interface
 

@@ -87,6 +87,7 @@
 #define InitPairSearchTree  initpairsearchtree_
 #define FreePairSearchTree  freepairsearchtree_
 #define ClonePairSearchTree clonepairsearchtree_
+#define SizeofPairSearchTree  sizeofpairsearchtree_
 #define SearchInsKeyVal     searchinskeyval_
 #define SearchKeyVal        searchkeyval_
 #define NPairs              npairs_
@@ -95,6 +96,7 @@
 #define InitPairSearchTree  initpairsearchtree_
 #define FreePairSearchTree  freepairsearchtree_
 #define ClonePairSearchTree clonepairsearchtree_
+#define SizeofPairSearchTree  sizeofpairsearchtree_
 #define SearchInsKeyVal     searchinskeyval_
 #define SearchKeyVal        searchkeyval_
 #define NPairs              npairs_
@@ -103,6 +105,7 @@
 #define InitPairSearchTree  initpairsearchtree
 #define FreePairSearchTree  freepairsearchtree
 #define ClonePairSearchTree clonepairsearchtree
+#define SizeofPairSearchTree  sizeofpairsearchtree
 #define SearchInsKeyVal     searchinskeyval
 #define SearchKeyVal        searchkeyval
 #define NPairs              npairs
@@ -199,6 +202,25 @@ int  NPairs(fptr *ftree)
 void KeyUpdate( void *key1, void *key2, void *data)
 {
   *((int *) data)=((KeyPairPtr) key2)->val;
+}
+
+int  SizeofPairSearchTree(fptr *ftree)   
+{
+  PairTreePtr PTree;
+  PairVectPtr current,next;
+  int sz;
+  PTree = (PairTreePtr) *ftree;
+ 
+  sz = 0;
+  if (PTree==NULL) return(sz);
+  current=PTree->PairPoolRoot;
+  
+  while (current != NULL) {
+    sz += sizeof(PairVect);
+    next=current->next;
+    current=next;
+  }
+  return(sz);
 }
 
 void  FreePairSearchTree(fptr *ftree)   

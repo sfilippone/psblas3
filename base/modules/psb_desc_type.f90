@@ -260,11 +260,46 @@ module psb_descriptor_type
      integer, allocatable :: idx_space(:)
   end type psb_desc_type
 
+  interface psb_sizeof
+    module procedure psb_cd_sizeof
+  end interface
 
   integer, private, save :: cd_large_threshold=psb_default_large_threshold 
 
 
 contains 
+  
+  function psb_cd_sizeof(desc)
+    implicit none
+    !....Parameters...
+
+    Type(psb_desc_type), intent(in) :: desc
+    Integer                      :: psb_cd_sizeof
+    !locals
+    logical, parameter  :: debug=.false.
+    integer :: val
+    integer, external :: SizeofPairSearchTree
+
+    val = 0
+    if (allocated(desc%matrix_data))  val = val + 4*size(desc%matrix_data)
+    if (allocated(desc%halo_index))   val = val + 4*size(desc%halo_index)
+    if (allocated(desc%ext_index))    val = val + 4*size(desc%ext_index)
+    if (allocated(desc%bnd_elem))     val = val + 4*size(desc%bnd_elem)
+    if (allocated(desc%ovrlap_index)) val = val + 4*size(desc%ovrlap_index)
+    if (allocated(desc%ovrlap_elem))  val = val + 4*size(desc%ovrlap_elem)
+    if (allocated(desc%loc_to_glob))  val = val + 4*size(desc%loc_to_glob)    
+    if (allocated(desc%glob_to_loc))  val = val + 4*size(desc%glob_to_loc)
+    if (allocated(desc%hashv))        val = val + 4*size(desc%hashv)
+    if (allocated(desc%glb_lc))       val = val + 4*size(desc%glb_lc)
+    if (allocated(desc%lprm))         val = val + 4*size(desc%lprm)
+    if (allocated(desc%idx_space))    val = val + 4*size(desc%idx_space)
+    if (allocated(desc%ptree))        val = val + 4*size(desc%ptree) +&
+         &                                  SizeofPairSearchTree(desc%ptree)
+    
+    psb_cd_sizeof = val
+  end function psb_cd_sizeof
+    
+
 
   subroutine psb_cd_set_large_threshold(ith)
     integer, intent(in) :: ith

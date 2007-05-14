@@ -178,7 +178,7 @@ subroutine psb_dspins(nz,ia,ja,val,a,desc_a,info,rebuild)
     end if
     nrow = psb_cd_get_local_rows(desc_a)
     ncol = psb_cd_get_local_cols(desc_a)
-
+    
   else if (psb_is_asb_desc(desc_a)) then 
 
     if (psb_is_large_desc(desc_a)) then 

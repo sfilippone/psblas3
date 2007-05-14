@@ -63,7 +63,7 @@ program df_sample
 
   ! solver paramters
   integer            :: iter, itmax, ierr, itrace, ircode, ipart,&
-       & methd, istopc, iprec, ml
+       & methd, istopc, iprec, ml,amatsize,precsize,descsize
   real(kind(1.d0))   :: err, eps
 
   character(len=5)   :: afmt
@@ -242,6 +242,12 @@ program df_sample
   call psb_genrm2s(resmx,r_col,desc_a,info)
   call psb_geamaxs(resmxp,r_col,desc_a,info)
 
+  amatsize = psb_sizeof(a)
+  descsize = psb_sizeof(desc_a)
+  precsize = psb_prec_sizeof(pre)
+  call psb_sum(ictxt,amatsize)
+  call psb_sum(ictxt,descsize)
+  call psb_sum(ictxt,precsize)
   if (amroot) then 
     call psb_prec_descr(6,pre)
     write(*,'("Matrix: ",a)')mtrx_file
@@ -254,6 +260,9 @@ program df_sample
     write(*,'("Total time           : ",es10.4)')t2+tprec
     write(*,'("Residual norm 2   = ",es10.4)')resmx
     write(*,'("Residual norm inf = ",es10.4)')resmxp
+    write(*,'("Total memory occupation for A:      ",i10)')amatsize
+    write(*,'("Total memory occupation for DESC_A: ",i10)')descsize
+    write(*,'("Total memory occupation for PRE:    ",i10)')precsize
   end if
 
   allocate(x_col_glob(m_problem),r_col_glob(m_problem),stat=ierr)

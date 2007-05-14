@@ -103,6 +103,10 @@ module psb_prec_type
          &  psb_zout_prec_descr, psb_zfile_prec_descr
   end interface
 
+  interface psb_prec_sizeof
+    module procedure psb_dprec_sizeof, psb_zprec_sizeof
+  end interface
+
 contains
 
   subroutine psb_out_prec_descr(p)
@@ -374,5 +378,53 @@ contains
     end select
 
   end function pr_to_str
+
+
+  function psb_dprec_sizeof(prec)
+    use psb_base_mod
+    type(psb_dprec_type), intent(in) :: prec
+    integer             :: psb_dprec_sizeof
+    integer             :: val,i
+    
+    val = 0
+    if (allocated(prec%iprcparm)) val = val + 4 * size(prec%iprcparm)
+    if (allocated(prec%dprcparm)) val = val + 8 * size(prec%dprcparm)
+    if (allocated(prec%d))        val = val + 8 * size(prec%d)
+    if (allocated(prec%perm))     val = val + 4 * size(prec%perm)
+    if (allocated(prec%invperm))  val = val + 4 * size(prec%invperm)
+                                  val = val + psb_sizeof(prec%desc_data)
+    if (allocated(prec%av))  then 
+      do i=1,size(prec%av)
+        val = val + psb_sizeof(prec%av(i))
+      end do
+    end if
+    
+    psb_dprec_sizeof = val 
+    
+  end function psb_dprec_sizeof
+
+  function psb_zprec_sizeof(prec)
+    use psb_base_mod
+    type(psb_zprec_type), intent(in) :: prec
+    integer             :: psb_zprec_sizeof
+    integer             :: val,i
+    
+    val = 0
+    if (allocated(prec%iprcparm)) val = val + 4 * size(prec%iprcparm)
+    if (allocated(prec%dprcparm)) val = val + 8 * size(prec%dprcparm)
+    if (allocated(prec%d))        val = val + 16 * size(prec%d)
+    if (allocated(prec%perm))     val = val + 4 * size(prec%perm)
+    if (allocated(prec%invperm))  val = val + 4 * size(prec%invperm)
+                                  val = val + psb_sizeof(prec%desc_data)
+    if (allocated(prec%av))  then 
+      do i=1,size(prec%av)
+        val = val + psb_sizeof(prec%av(i))
+      end do
+    end if
+    
+    psb_zprec_sizeof = val 
+    
+  end function psb_zprec_sizeof
+    
 
 end module psb_prec_type
