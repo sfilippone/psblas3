@@ -36,7 +36,8 @@
 module psb_prec_type
 
   ! Reduces size of .mod file.
-  use psb_base_mod, only : psb_dspmat_type, psb_zspmat_type, psb_desc_type
+  use psb_base_mod, only : psb_dspmat_type, psb_zspmat_type, psb_desc_type,&
+       & psb_sizeof
 
   integer, parameter :: min_prec_=0, noprec_=0, diag_=1, bjac_=2,&
        &  max_prec_=2
@@ -103,7 +104,7 @@ module psb_prec_type
          &  psb_zout_prec_descr, psb_zfile_prec_descr
   end interface
 
-  interface psb_prec_sizeof
+  interface psb_sizeof
     module procedure psb_dprec_sizeof, psb_zprec_sizeof
   end interface
 

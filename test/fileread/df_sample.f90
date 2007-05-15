@@ -244,7 +244,7 @@ program df_sample
 
   amatsize = psb_sizeof(a)
   descsize = psb_sizeof(desc_a)
-  precsize = psb_prec_sizeof(pre)
+  precsize = psb_sizeof(pre)
   call psb_sum(ictxt,amatsize)
   call psb_sum(ictxt,descsize)
   call psb_sum(ictxt,precsize)
