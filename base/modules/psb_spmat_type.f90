@@ -370,6 +370,7 @@ contains
       return
     Endif
     if (debug) write(0,*) 'SPALL : NNZ ',nnz,a%m,a%k
+    call psb_nullify_sp(a)
     call psb_sp_reall(a,nnz,info)
 
     a%pl(1)=0
@@ -398,6 +399,7 @@ contains
     integer  :: nnz
 
     INFO  = 0
+    call psb_nullify_sp(a)
     nnz = 2*max(1,m,k)
     if (debug) write(0,*) 'SPALL : NNZ ',nnz,a%m,a%k
     a%m=max(0,m)
@@ -431,6 +433,7 @@ contains
       info=45
       return
     endif
+    call psb_nullify_sp(a)
     if (debug) write(0,*) 'spall : nnz ',nnz,a%m,a%k
     a%m=max(0,m)
     a%k=max(0,k)
@@ -459,7 +462,7 @@ contains
     logical, parameter  :: debug=.false.
 
     info  = 0
-
+    call psb_nullify_sp(a)
     call psb_sp_reall(a, ni1,ni2,nd,info)
 
     a%pl(1)=0
@@ -923,6 +926,7 @@ contains
       info=45
       return
     Endif
+    call psb_nullify_sp(a)
     if (debug) write(0,*) 'SPALL : NNZ ',nnz,a%m,a%k
     call psb_sp_reall(a,nnz,info)
 
@@ -953,6 +957,7 @@ contains
 
     INFO  = 0
     nnz = 2*max(1,m,k)
+    call psb_nullify_sp(a)
     if (debug) write(0,*) 'SPALL : NNZ ',nnz,a%m,a%k
     a%m=max(0,m)
     a%k=max(0,k)
@@ -985,6 +990,7 @@ contains
       info=45
       return
     endif
+    call psb_nullify_sp(a)
     if (debug) write(0,*) 'spall : nnz ',nnz,a%m,a%k
     a%m=max(0,m)
     a%k=max(0,k)
@@ -1014,6 +1020,7 @@ contains
 
     info  = 0
 
+    call psb_nullify_sp(a)
     call psb_sp_reall(a, ni1,ni2,nd,info)
 
     a%pl(1)=0
