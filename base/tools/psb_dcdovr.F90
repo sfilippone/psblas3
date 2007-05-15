@@ -196,7 +196,7 @@ Subroutine psb_dcdovr(a,desc_a,novr,desc_ov,info, extype)
     goto 9999      
   end if
 
-
+  call psb_nullify_sp(blk)
   call psb_sp_all(blk,max(lworks,lworkr),info)
   if (info /= 0) then
     info=4010
