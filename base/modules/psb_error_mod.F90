@@ -81,7 +81,7 @@ contains
   subroutine psb_erractionsave(err_act)
     integer, intent(out) :: err_act
     err_act    = err_action
-    err_action = act_ret
+    err_action = psb_act_ret_
   end subroutine psb_erractionsave
 
 
