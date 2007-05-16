@@ -486,6 +486,7 @@ contains
     character(len=20)  :: name
 
     name='psb_msort'
+    call psb_erractionsave(err_act)
 
     if (present(dir)) then 
       dir_ = dir
@@ -538,14 +539,13 @@ contains
     integer, intent(inout)           :: x(:) 
     integer, intent(out)             :: nout
     integer, optional, intent(in)    :: dir
-!!$    , flag
-!!$    integer, optional, intent(inout) :: ix(:)
     
     integer  :: dir_, flag_, n, err_act
     
     character(len=20)  :: name
 
-    name='psb_msort'
+    name='psb_msort_u'
+    call psb_erractionsave(err_act)
 
     if (present(dir)) then 
       dir_ = dir
@@ -562,28 +562,8 @@ contains
       
     n = size(x)
  
-!!$    if (present(ix)) then 
-!!$      if (size(ix) < n) then 
-!!$        call psb_errpush(35,name,i_err=(/2,size(ix),0,0,0/))
-!!$        goto 9999
-!!$      end if
-!!$      if (present(flag)) then 
-!!$        flag_ = flag
-!!$      else 
-!!$        flag_ = psb_sort_ovw_idx_
-!!$      end if
-!!$      select case(flag_) 
-!!$      case( psb_sort_ovw_idx_, psb_sort_keep_idx_)
-!!$        ! OK keep going
-!!$      case default
-!!$        call psb_errpush(30,name,i_err=(/4,flag_,0,0,0/))
-!!$        goto 9999
-!!$      end select
-!!$
-!!$      call imsrx(n,x,ix,dir_,flag_)
-!!$    else
-      call imsru(n,x,dir_,nout)
-!!$    end if
+    call imsru(n,x,dir_,nout)
+      
 
 9999 continue 
     if (err_act.eq.psb_act_abort_) then
@@ -605,6 +585,7 @@ contains
     character(len=20)  :: name
 
     name='psb_qsort'
+    call psb_erractionsave(err_act)
 
     if (present(dir)) then 
       dir_ = dir

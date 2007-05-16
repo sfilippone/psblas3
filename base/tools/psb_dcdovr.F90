@@ -39,7 +39,7 @@
 ! Parameters: 
 !    a        - type(<psb_dspmat_type>).       The input sparse matrix.
 !    desc_a   - type(<psb_desc_type>).         The input communication descriptor.
-!    norv     - integer.                       The number of overlap levels.
+!    novr     - integer.                       The number of overlap levels.
 !    desc_ov  - type(<psb_desc_type>).         The auxiliary output communication 
 !                                              descriptor.
 !    info     - integer.                       Eventually returns an error code.

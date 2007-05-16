@@ -57,9 +57,9 @@ subroutine psb_cdins(nz,ia,ja,desc_a,info,ila,jla)
 
   !LOCALS.....
 
-  integer :: i,ictxt,row,k,dectype,mglob, nglob,err
+  integer :: i,ictxt,k,dectype,mglob, nglob,err
   integer                :: np, me, isize
-  integer                :: pnt_halo,nrow,ncol, nh, ip,jp, err_act,lip,ljp,nxt
+  integer                :: nrow,ncol, err_act
   logical, parameter     :: debug=.false.
   integer, parameter     :: relocsz=200
   integer, allocatable   :: ila_(:), jla_(:)

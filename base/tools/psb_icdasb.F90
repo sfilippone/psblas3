@@ -56,12 +56,10 @@ subroutine psb_icdasb(desc_a,info,ext_hv)
   logical, intent(in), optional      :: ext_hv
 
   !....Locals....
-  integer          ::  int_err(5), itemp(2)
+  integer          ::  int_err(5)
   integer,allocatable ::  ovrlap_index(:),halo_index(:), ext_index(:)
 
-  integer          ::  i,j,err,np,me,lovrlap,lhalo,nhalo,novrlap,max_size,&
-       & max_halo,n_col,ldesc_halo, ldesc_ovrlap, dectype, err_act, &
-       & key, ih, nh, idx, nk,icomm,hsize
+  integer          ::  i,j,np,me, n_col, dectype, err_act, icomm
   integer                       :: ictxt,n_row
   logical                       :: ext_hv_
   logical, parameter            :: debug=.false., debugwrt=.false.
