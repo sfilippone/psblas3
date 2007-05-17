@@ -16,18 +16,15 @@ other compiler/operating systems please let us know.
 
 LINUX:
 
-There finally exist a GNU Fortran 95 implementation: we are using the
-development snapshots from GCC 3.5.0, later 4.1 and 4.2  since July
-2004, and it appears  to work. The 4.2 version of GNU compilers is now
-our reference platform; the official 4.2.0 release is due pretty
-soon. It now includes  support for ALLOCATABLES. 
-
+On Linux we work with the GCC compiler; note that we require version
+4.2.0 (or later) as it contains support for ALLOCATABLEs (as specified
+in TR15581). 
 
 The Lahey version we got access to (6.0 and 6.1) seems to suffer from
 spurious extra copies problem; this is most apparent in the matrix
 build process.  
 
-For the Intel compilers, we recommend moving to version 9; previous
+For the Intel compilers, we recommend version 9.1; previous
 versions of the library have been compiled with version 7 and 8 of
 ifort. 
 
@@ -85,7 +82,7 @@ prerequisites (see also SERIAL below):
    This is not necessary to compile our library, but the test program
    in test/Fileread assumes you have it installed.  
 
-5. For our preconditioners we include interfaces to the following
+5. For the multilevel  preconditioners we include interfaces to the following
    software  packages:
    --  SuperLU 3.0        http://crd.lbl.gov/~xiaoye/SuperLU/
    --  UMFPACK 4.4        http://www.cise.ufl.edu/research/sparse/umfpack/ 
@@ -102,12 +99,13 @@ SERIAL: We now provide an (experimental) option to run in serial
 	mode. This has only been tested with GCC but it should work
 	with the others as well. In serial mode you don't need the
 	prereqs 1 and 2 above, and you need to use the -serialmpi
-	Make.inc. BEWARE: we only provide a minimal set of fake mpi
+	Make.inc. BEWARE: we only provide a VERY minimal set of fake mpi
 	routines that is known to work with our codes; specifically, we
-	do not handle a process doing send/receives to itself, and we
-	don't handle user defined data types. 
+	do not handle a process doing send/receives to itself, neither
+	do we handle user defined data types. 
 
 TODO:
+Fix all reamining bugs. Bugs? We dont' have any ! ;-)
 
 The PSBLAS team. 
 

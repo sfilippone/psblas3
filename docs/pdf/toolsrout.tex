@@ -1142,9 +1142,44 @@ An integer value; 0 means no error has been detected.
 \item When \verb|append=.true.|  the output arrays are reallocated as
   necessary;
 \item The row and column indices are returned in the local numbering
-  scheme; if the global numbering is desired, the user may emply the
+  scheme; if the global numbering is desired, the user may employ the
   \verb|psb_loc_to_glob| routine on the output.
 \end{enumerate}
+
+
+
+
+
+\subroutine{psb\_sizeof}{Memory occupation}
+
+This function computes the memory occupation of a PSBLAS object.
+
+
+\syntax{psb\_sizeof}{a}
+\syntax*{psb\_sizeof}{desc\_a}
+\syntax*{psb\_sizeof}{prec}
+
+\begin{description}
+\item[\bf On Entry]
+\item[a] A sparse matrix
+$A$. \\ 
+Scope: {\bf local} \\
+Type: {\bf required}\\
+Specified as: a structured data of type \spdata.
+\item[desc\_a] Communication descriptor.\\
+Scope: {\bf local} \\
+Type: {\bf required}\\
+Specified as: a structured data of type \descdata.
+\item[prec] 
+Scope: {\bf local} \\
+Type: {\bf required}\\
+Specified as: a preconditioner data structure \precdata.
+\item[\bf On Return] 
+\item[Function value] The memory occupation of the object specified in
+  the calling sequence, in bytes.\\
+Scope: {\bf local} \\
+Returned  as: an integer number.
+\end{description}
 
 
 
