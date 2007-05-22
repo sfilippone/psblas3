@@ -54,7 +54,7 @@ module psb_error_mod
     integer,dimension(5)     ::   i_err_data=0        !  array of integer data to complete the error msg
     !     real(kind(1.d0))(dim=10) ::   r_err_data=0.d0    !  array of real data to complete the error msg
     !     complex(dim=10)          ::   c_err_data=0.c0    !  array of complex data to complete the error msg
-    character(len=20)        ::   a_err_data=''       !  array of character data to complete the error msg
+    character(len=40)        ::   a_err_data=''       !  array of character data to complete the error msg
     type(psb_errstack_node), pointer :: next              !  pointer to the next element in the stack
 
   end type psb_errstack_node
@@ -175,7 +175,8 @@ contains
   subroutine psb_errpop(err_c, r_name, i_e_d, a_e_d)
 
     integer, intent(out)             ::  err_c
-    character(len=20), intent(out)        ::  r_name, a_e_d
+    character(len=20), intent(out)        ::  r_name
+    character(len=40), intent(out)        ::  a_e_d
     integer, intent(out)             ::  i_e_d(5)
 
     type(psb_errstack_node), pointer     ::  old_node
@@ -201,7 +202,8 @@ contains
 
     integer, intent(in)     ::  ictxt
     integer                 ::  err_c
-    character(len=20)       ::  r_name, a_e_d
+    character(len=20)       ::  r_name
+    character(len=40)       ::  a_e_d
     integer                 ::  i_e_d(5)
     integer                 ::  nprow, npcol, me, mypcol
     integer, parameter      ::  ione=1, izero=0
@@ -252,7 +254,8 @@ contains
   subroutine psb_serror()
 
     integer                 ::  err_c
-    character(len=20)       ::  r_name, a_e_d
+    character(len=20)       ::  r_name
+    character(len=40)       ::  a_e_d
     integer                 ::  i_e_d(5)
     integer, parameter      ::  ione=1, izero=0
 
@@ -283,7 +286,8 @@ contains
   subroutine psb_errmsg(err_c, r_name, i_e_d, a_e_d,me)
 
     integer, intent(in)              ::  err_c
-    character(len=20), intent(in)    ::  r_name, a_e_d
+    character(len=20), intent(in)    ::  r_name
+    character(len=40), intent(in)    ::  a_e_d
     integer, intent(in)              ::  i_e_d(5)
     integer, optional                ::  me
 

@@ -1,6 +1,8 @@
 Changelog. A lot less detailed than usual, at least for past
 history. 
 
+2007/05/22: Defined psb_precinit. 
+
 2007/05/15: Defined psb_sizeof.
 
 2007/05/15: Merged in various fixes coming from tests on SP5 and

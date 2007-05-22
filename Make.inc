@@ -10,9 +10,9 @@ F90=/usr/local/gcc42/bin/gfortran
 FC=/usr/local/gcc42/bin/gfortran
 F77=$(FC)
 CC=/usr/local/gcc42/bin/gcc
-F90COPT=-O3 -ggdb -pg
-FCOPT=-O3 -ggdb  -pg
-CCOPT=-O3 -ggdb  -pg
+F90COPT=-O3 
+FCOPT=-O3   
+CCOPT=-O3   
 #
 # Which flag does your compiler use  for module inclusion?
 # Most compilers use -I  but Sun uses -M 
@@ -26,7 +26,7 @@ FIFLAG=-I
 #   MPI_FINC=-DMPI_H  or MPI_FINC=-DMPI_MOD              #
 #  If necessary add an include dir                       #
 ##########################################################
-F90LINK=/usr/local/mpich-gcc42/bin/mpif90 
+F90LINK=/usr/local/mpich-gcc42/bin/mpif90 -pg
 FLINK=/usr/local/mpich-gcc42/bin/mpif77 
 MPF90=/usr/local/mpich-gcc42/bin/mpif90 
 MPF77=/usr/local/mpich-gcc42/bin/mpif77 	

@@ -203,13 +203,13 @@ program df_sample
   igsmth=-1
   select case(iprec)
   case(noprec_)
-    call psb_precset(pre,'noprec',info)
+    call psb_precinit(pre,'noprec',info)
   case(diag_)             
-    call psb_precset(pre,'diag',info)
+    call psb_precinit(pre,'diag',info)
   case(bjac_)             
-    call psb_precset(pre,'bjac',info)
+    call psb_precinit(pre,'bjac',info)
   case default
-    call psb_precset(pre,'bjac',info)
+    call psb_precinit(pre,'bjac',info)
   end select
 
   ! building the preconditioner

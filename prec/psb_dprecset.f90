@@ -28,52 +28,78 @@
 !!$  POSSIBILITY OF SUCH DAMAGE.
 !!$ 
 !!$  
-subroutine psb_dprecset(p,ptype,info,iv,rs,rv)
+subroutine psb_dprecseti(p,what,val,info)
 
   use psb_base_mod
-  use psb_prec_mod, psb_protect_name => psb_dprecset
+  use psb_prec_mod, psb_protect_name => psb_dprecseti
   implicit none
   type(psb_dprec_type), intent(inout)    :: p
-  character(len=*), intent(in)           :: ptype
+  integer                                :: what, val 
   integer, intent(out)                   :: info
-  integer, optional, intent(in)          :: iv(:)
-  real(kind(1.d0)), optional, intent(in) :: rs
-  real(kind(1.d0)), optional, intent(in) :: rv(:)
-
-  character(len=len(ptype))              :: typeup
-  integer                                :: isz, err, nlev_, ilev_, i
 
   info = 0
 
+  select case(what)
+  case (f_type_) 
+    if (p%iprcparm(p_type_) /= bjac_) then 
+      write(0,*) 'WHAT is invalid for current preconditioner ',p%iprcparm(p_type_),&
+           & 'ignoring user specification'
+      return
+    endif
+    p%iprcparm(f_type_)     = val
 
-  call psb_realloc(ifpsz,p%iprcparm,info)
-  if (info == 0) call psb_realloc(dfpsz,p%dprcparm,info)
-  if (info /= 0) return
-  p%iprcparm(:) = 0
-
-  select case(toupper(ptype(1:len_trim(ptype))))
-  case ('NONE','NOPREC') 
-    p%iprcparm(:)           = 0
-    p%iprcparm(p_type_)     = noprec_
-    p%iprcparm(f_type_)     = f_none_
-
-  case ('DIAG')
-    p%iprcparm(:)           = 0
-    p%iprcparm(p_type_)     = diag_
-    p%iprcparm(f_type_)     = f_none_
-
-  case ('BJAC') 
-    p%iprcparm(:)            = 0
-    p%iprcparm(p_type_)      = bjac_
-    p%iprcparm(f_type_)      = f_ilu_n_
-    p%iprcparm(ilu_fill_in_) = 0
-
+  case (ilu_fill_in_) 
+    if ((p%iprcparm(p_type_) /= bjac_).or.(p%iprcparm(f_type_) /= f_ilu_n_)) then 
+      write(0,*) 'WHAT is invalid for current preconditioner ',p%iprcparm(p_type_),&
+           & 'ignoring user specification'
+      return
+    endif
+    p%iprcparm(ilu_fill_in_) = val
+ 
   case default
-    write(0,*) 'Unknown preconditioner type request "',ptype,'"'
-    err = 2
+    write(0,*) 'WHAT is invalid, ignoring user specification'
 
   end select
+  return
 
-  info = err
+end subroutine psb_dprecseti
 
-end subroutine psb_dprecset
+
+subroutine psb_dprecsetd(p,what,val,info)
+
+  use psb_base_mod
+  use psb_prec_mod, psb_protect_name => psb_dprecsetd
+  implicit none
+  type(psb_dprec_type), intent(inout)    :: p
+  integer                                :: what
+  real(kind(1.d0))                       :: val 
+  integer, intent(out)                   :: info
+
+!
+!  This will have to be changed if/when we put together an ILU(eps)
+!  factorization.
+!
+  select case(what)
+!!$  case (f_type_) 
+!!$    if (p%iprcparm(p_type_) /= bjac_) then 
+!!$      write(0,*) 'WHAT is invalid for current preconditioner ',p%iprcparm(p_type_),&
+!!$           & 'ignoring user specification'
+!!$      return
+!!$    endif
+!!$    p%iprcparm(f_type_)     = val
+!!$
+!!$  case (ilu_fill_in_) 
+!!$    if ((p%iprcparm(p_type_) /= bjac_).or.(p%iprcparm(f_type_) /= f_ilu_n_)) then 
+!!$      write(0,*) 'WHAT is invalid for current preconditioner ',p%iprcparm(p_type_),&
+!!$           & 'ignoring user specification'
+!!$      return
+!!$    endif
+!!$    p%iprcparm(ilu_fill_in_) = val
+ 
+  case default
+    write(0,*) 'WHAT is invalid, ignoring user specification'
+
+  end select
+  return
+
+end subroutine psb_dprecsetd
