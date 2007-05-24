@@ -119,7 +119,7 @@ Subroutine psb_dsphalo(a,desc_a,blk,info,rwcnv,clcnv,cliprow,outfmt,data)
   endif
 
   ictxt = psb_cd_get_context(desc_a)
-  icomm = psb_get_mpic(desc_a)
+  icomm = psb_cd_get_mpic(desc_a)
 
   Call psb_info(ictxt, me, np)
 
