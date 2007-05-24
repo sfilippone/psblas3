@@ -193,9 +193,9 @@ subroutine psb_cdrep(m, ictxt, desc_a, info)
   desc_a%matrix_data(psb_n_)        = n
   desc_a%matrix_data(psb_n_row_)    = m
   desc_a%matrix_data(psb_n_col_)    = n
-  desc_a%matrix_data(psb_dec_type_) = psb_desc_bld_
   desc_a%matrix_data(psb_ctxt_)     = ictxt
   call psb_get_mpicomm(ictxt,desc_a%matrix_data(psb_mpi_c_))
+  desc_a%matrix_data(psb_dec_type_) = psb_desc_bld_
 
   do i=1,m
     desc_a%glob_to_loc(i) = i

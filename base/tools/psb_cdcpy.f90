@@ -97,18 +97,7 @@ subroutine psb_cdcpy(desc_in, desc_out, info)
         info=4000
         goto 9999
       endif
-      if (.true.) then 
-        call ClonePairSearchTree(desc_in%ptree,desc_out%ptree)
-      else
-        call InitPairSearchTree(desc_out%ptree,info)
-        do idx=1, psb_cd_get_local_cols(desc_out)
-          gidx = desc_out%loc_to_glob(idx)
-          call SearchInsKeyVal(desc_out%ptree,gidx,idx,lidx,info)        
-          if (lidx /= idx) then 
-            write(0,*) 'Warning from cdcpy: mismatch in PTREE ',idx,lidx
-          endif
-        enddo
-      end if
+      call ClonePairSearchTree(desc_in%ptree,desc_out%ptree)
     end if
   end if
 

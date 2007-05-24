@@ -479,11 +479,13 @@ contains
 
     ictxt = psb_cd_get_context(desc)
 
+    if (debug) write(0,*)'Entered CDSETBLD',ictxt
     ! check on blacs grid 
     call psb_info(ictxt, me, np)
-    if (debug) write(0,*) me,'Entered CDCPY'
+    if (debug) write(0,*) me,'Entered CDSETBLD'
 
     if (psb_is_large_desc(desc)) then 
+      if (debug) write(0,*) me,'SET_BLD: alocating ptree'
       if (.not.allocated(desc%ptree)) then 
         allocate(desc%ptree(2),stat=info)
         if (info /= 0) then 
@@ -502,6 +504,7 @@ contains
     end if
     desc%matrix_data(psb_dec_type_) = psb_desc_bld_ 
 
+    if (debug) write(0,*) me,'SET_BLD: done'
     call psb_erractionrestore(err_act)
     return
 

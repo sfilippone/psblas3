@@ -86,21 +86,7 @@ subroutine psb_cdtransfer(desc_in, desc_out, info)
   if (info == 0)  call psb_transfer( desc_in%idx_space   ,    desc_out%idx_space    , info)
   if (info == 0)  call psb_transfer( desc_in%hashv       ,    desc_out%hashv        , info)
   if (info == 0)  call psb_transfer( desc_in%glb_lc      ,    desc_out%glb_lc       , info)
-  ! Why doesn't transfer work below? Dunno..... 
   if (info == 0)  call psb_transfer( desc_in%ptree       ,    desc_out%ptree        , info)
-  if (.false.) then
-    if (info == 0) then 
-      if (allocated(desc_in%ptree)) then 
-        allocate(desc_out%ptree(2),stat=info)
-        if (info /= 0) then 
-          info=4000
-          goto 9999
-        endif
-        desc_out%ptree(1:2) = desc_in%ptree(1:2)
-        deallocate(desc_in%ptree,stat=info)
-      end if
-    end if
-  endif
   if (info /= 0) then
     info = 4010
     call psb_errpush(info,name)

@@ -147,6 +147,11 @@ subroutine psb_cdalv(v, ictxt, desc_a, info, flag)
     goto 9999
   endif
 
+  desc_a%matrix_data(psb_m_)        = m
+  desc_a%matrix_data(psb_n_)        = n
+  ! This has to be set BEFORE any call to SET_BLD
+  desc_a%matrix_data(psb_ctxt_)     = ictxt
+  call psb_get_mpicomm(ictxt,desc_a%matrix_data(psb_mpi_c_))
 
   if (debug) write(*,*) 'PSB_CDALL:  starting main loop' ,info
   counter = 0
@@ -352,10 +357,6 @@ subroutine psb_cdalv(v, ictxt, desc_a, info, flag)
   end if
   desc_a%ext_index(:) = -1
 
-  desc_a%matrix_data(psb_m_)        = m
-  desc_a%matrix_data(psb_n_)        = n
-  desc_a%matrix_data(psb_ctxt_)     = ictxt
-  call psb_get_mpicomm(ictxt,desc_a%matrix_data(psb_mpi_c_))
 
 
   call psb_erractionrestore(err_act)
