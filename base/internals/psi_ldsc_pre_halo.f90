@@ -54,10 +54,10 @@ subroutine psi_ldsc_pre_halo(desc,ext_hv,info)
   name = 'psi_ldsc_pre_halo'
   call psb_erractionsave(err_act)
 
-  ictxt   = psb_cd_get_context(desc)
-  n_row   = psb_cd_get_local_rows(desc)
-  n_col   = psb_cd_get_local_cols(desc)
-  call psb_get_mpicomm(ictxt,icomm )
+  ictxt = psb_cd_get_context(desc)
+  icomm = psb_cd_get_mpic(desc)
+  n_row = psb_cd_get_local_rows(desc)
+  n_col = psb_cd_get_local_cols(desc)
 
   ! check on blacs grid 
   call psb_info(ictxt, me, np)

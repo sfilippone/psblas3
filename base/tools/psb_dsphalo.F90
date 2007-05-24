@@ -119,6 +119,7 @@ Subroutine psb_dsphalo(a,desc_a,blk,info,rwcnv,clcnv,cliprow,outfmt,data)
   endif
 
   ictxt = psb_cd_get_context(desc_a)
+  icomm = psb_get_mpic(desc_a)
 
   Call psb_info(ictxt, me, np)
 
@@ -182,7 +183,6 @@ Subroutine psb_dsphalo(a,desc_a,blk,info,rwcnv,clcnv,cliprow,outfmt,data)
 
     counter   = counter+n_el_send+3
   Enddo
-  call psb_get_mpicomm(ictxt,icomm)
 
   call mpi_alltoall(sdsz,1,mpi_integer,rvsz,1,mpi_integer,icomm,info)
   if (info /= 0) then

@@ -57,9 +57,9 @@ subroutine psi_fnd_owner(nv,idx,iprc,desc,info)
   call psb_erractionsave(err_act)
 
   ictxt   = psb_cd_get_context(desc)
+  icomm   = psb_cd_get_mpic(desc)
   n_row   = psb_cd_get_local_rows(desc)
   n_col   = psb_cd_get_local_cols(desc)
-  call psb_get_mpicomm(ictxt,icomm )
 
 
   ! check on blacs grid 

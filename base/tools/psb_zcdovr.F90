@@ -99,8 +99,8 @@ Subroutine psb_zcdovr(a,desc_a,novr,desc_ov,info, extype)
   info  = 0
   call psb_erractionsave(err_act)
 
-  ictxt=psb_cd_get_context(desc_a)
-
+  ictxt = psb_cd_get_context(desc_a)
+  icomm = psb_cd_get_mpic(desc_a)
   Call psb_info(ictxt, me, np)
 
   If(debug) Write(0,*)'in psb_cdovr',novr
@@ -141,7 +141,7 @@ Subroutine psb_zcdovr(a,desc_a,novr,desc_ov,info, extype)
     return
   endif
 
-  call psb_get_mpicomm(ictxt,icomm )
+
 
   If(debug)then 
     Write(0,*)'BEGIN cdovr',me,nhalo

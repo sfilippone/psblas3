@@ -70,7 +70,8 @@ subroutine psi_dswapdatam(flag,n,beta,y,desc_a,work,info,data)
   name='psi_swap_data'
   call psb_erractionsave(err_act)
 
-  ictxt=psb_cd_get_context(desc_a)
+  ictxt = psb_cd_get_context(desc_a)
+  icomm = psb_cd_get_mpic(desc_a)
   call psb_info(ictxt,me,np) 
   if (np == -1) then
     info = 2010
@@ -84,8 +85,6 @@ subroutine psi_dswapdatam(flag,n,beta,y,desc_a,work,info,data)
     goto 9999
   endif
 
-
-  icomm = desc_a%matrix_data(psb_mpi_c_)
 
   swap_mpi  = iand(flag,psb_swap_mpi_)  /= 0
   swap_sync = iand(flag,psb_swap_sync_) /= 0

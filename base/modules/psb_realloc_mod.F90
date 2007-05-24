@@ -621,7 +621,7 @@ Contains
     else
       lb_ = 1
     endif
-    if ((len<0).or.(len>25*1024*1024)) then 
+    if ((len<0)) then 
       err=2025
       call psb_errpush(err,name,i_err=(/len,0,0,0,0/))
       goto 9999
@@ -697,7 +697,7 @@ Contains
     else
       lb_ = 1
     endif
-    if ((len<0).or.(len>25*1024*1024)) then 
+    if ((len<0)) then 
       err=2025
       call psb_errpush(err,name,i_err=(/len,0,0,0,0/))
       goto 9999
@@ -770,7 +770,7 @@ Contains
     else
       lb_ = 1
     endif
-    if ((len<0).or.(len>25*1024*1024)) then 
+    if ((len<0)) then 
       err=2025
       call psb_errpush(err,name,i_err=(/len,0,0,0,0/))
       goto 9999
