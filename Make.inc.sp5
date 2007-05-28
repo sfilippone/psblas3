@@ -40,7 +40,7 @@ MPI_FINC=-WF,-DMPI_MOD
 #  Specify paths to libraries                            #
 ##########################################################
 BLAS=-lessl
-BLACS=-lblacs
+BLACS=-lblacssmp
 
 
 #######################  Section 4 #######################
@@ -63,7 +63,7 @@ LDLIBS=$(BLACS) $(SLU) $(UMF) $(BLAS) $(METIS_LIB)
 #  Add -DLargeFptr for 64-bit addresses
 CDEFINES=-DNoChange $(SLUDEF) $(UMFDEF) -DLargeFptr
 FDEFINES=-WF,-DESSL_BLACS  $(MPI_FINC)
-# Apparently there's no MOVE_ALLOC yet in XLF. 
+# There's no MOVE_ALLOC yet in XLF 10.1.
 #-WF,-DHAVE_MOVE_ALLOC 
 
 
