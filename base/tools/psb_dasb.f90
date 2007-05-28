@@ -100,9 +100,8 @@ subroutine psb_dasb(x, desc_a, info)
   if (i1sz < ncol) then
     call psb_realloc(ncol,i2sz,x,info)
     if (info /= 0) then
-      info=2025
-      int_err(1)=ncol
-      call psb_errpush(info,name,i_err=int_err)
+      info=4010
+      call psb_errpush(info,name,a_err='psb_realloc')
       goto 9999
     endif
   endif
@@ -215,9 +214,8 @@ subroutine psb_dasbv(x, desc_a, info)
   if (i1sz < ncol) then
     call psb_realloc(ncol,x,info)
     if (info /= 0) then           
-      info=2025
-      int_err(1)=ncol
-      call psb_errpush(info,name,i_err=int_err)
+      info=4010
+      call psb_errpush(info,name,a_err='psb_realloc')
       goto 9999
     endif
   endif

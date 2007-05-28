@@ -141,9 +141,9 @@ subroutine psb_cdalv(v, ictxt, desc_a, info, flag)
     desc_a%matrix_data(psb_desc_size_) = psb_desc_normal_
   end if
   if (info /= 0) then     
-    info=2025
-    int_err(1)=m
-    call psb_errpush(info,name,i_err=int_err)
+    info=4025
+    int_err(1)=2*m+psb_mdata_size_
+    call psb_errpush(info,name,i_err=int_err,a_err='integer')
     goto 9999
   endif
 
@@ -194,9 +194,9 @@ subroutine psb_cdalv(v, ictxt, desc_a, info, flag)
          & desc_a%ptree(2),stat=info)  
     if (info == 0) call InitPairSearchTree(desc_a%ptree,info)
     if (info /= 0) then
-      info=2025
+      info=4025
       int_err(1)=loc_col
-      call psb_errpush(info,name,i_err=int_err)
+      call psb_errpush(info,name,i_err=int_err,a_err='integer')
       goto 9999
     end if
 
@@ -259,9 +259,9 @@ subroutine psb_cdalv(v, ictxt, desc_a, info, flag)
     allocate(desc_a%loc_to_glob(loc_col),&
          &desc_a%lprm(1),stat=info)  
     if (info /= 0) then
-      info=2025
+      info=4025
       int_err(1)=loc_col
-      call psb_errpush(info,name,i_err=int_err)
+      call psb_errpush(info,name,i_err=int_err,a_err='integer')
       goto 9999
     end if
 
@@ -296,9 +296,9 @@ subroutine psb_cdalv(v, ictxt, desc_a, info, flag)
   if (debug) write(*,*) 'PSB_CDALL: Ov len',l_ov_ix,l_ov_el
   allocate(ov_idx(l_ov_ix),ov_el(l_ov_el), stat=info)
   if (info /= 0) then
-    info=2025
+    info=4025
     int_err(1)=l_ov_ix
-    call psb_errpush(info,name,i_err=int_err)
+    call psb_errpush(info,name,i_err=int_err,a_err='integer')
     goto 9999
   end if
 
@@ -343,7 +343,7 @@ subroutine psb_cdalv(v, ictxt, desc_a, info, flag)
 
   call psb_realloc(1,desc_a%halo_index, info)
   if (info /= psb_no_err_) then
-    info=2025
+    info=4010
     call psb_errpush(err,name,a_err='psb_realloc')
     Goto 9999
   end if
@@ -351,7 +351,7 @@ subroutine psb_cdalv(v, ictxt, desc_a, info, flag)
 
   call psb_realloc(1,desc_a%ext_index, info)
   if (info /= psb_no_err_) then
-    info=2025
+    info=4010
     call psb_errpush(err,name,a_err='psb_realloc')
     Goto 9999
   end if

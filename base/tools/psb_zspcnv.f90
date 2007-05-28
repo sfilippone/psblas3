@@ -160,9 +160,9 @@ subroutine psb_zspcnv(a,b,desc_a,info)
   call psb_sp_all(b,ia1_size,ia2_size,aspk_size,info)
   allocate(work_dcsdp(l_dcsdp),stat=info)
   if (info /= 0) then
-    info=2025
+    info=4025
     int_err(1)=l_dcsdp
-    call psb_errpush(info, name, i_err=int_err)
+    call psb_errpush(info, name, i_err=int_err,a_err='real(kind(1.d0))')
     goto 9999
   endif
 

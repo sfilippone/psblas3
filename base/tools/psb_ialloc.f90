@@ -105,9 +105,9 @@ subroutine psb_ialloc(x, desc_a, info, n)
     n_col = max(1,psb_cd_get_local_cols(desc_a))
     allocate(x(n_col,n_),stat=info)
     if (info /= 0) then
-      info=4010
-      ch_err='allocate'
-      call psb_errpush(info,name,a_err=ch_err)
+      info=4025
+      int_err(1)=n_col*n_
+      call psb_errpush(info,name,int_err,a_err='integer')
       goto 9999
     endif
     do j=1,n_
@@ -119,9 +119,9 @@ subroutine psb_ialloc(x, desc_a, info, n)
     n_row = max(1,psb_cd_get_local_rows(desc_a))
     allocate(x(n_row,n_),stat=info)
     if (info /= 0) then
-      info=4010
-      ch_err='allocate'
-      call psb_errpush(info,name,a_err=ch_err)
+      info=4025
+      int_err(1)=n_row*n_
+      call psb_errpush(info,name,int_err,a_err='integer')
       goto 9999
     endif
     do j = 1, n_
@@ -205,7 +205,7 @@ subroutine psb_iallocv(x, desc_a, info,n)
   integer             :: ictxt, n_
   integer             :: int_err(5)
   logical, parameter  :: debug=.false. 
-  character(len=20)   :: name
+  character(len=20)   :: name, ch_err
 
   if(psb_get_errstatus() /= 0) return 
   info=0
@@ -236,18 +236,18 @@ subroutine psb_iallocv(x, desc_a, info,n)
     n_col = max(1,psb_cd_get_local_cols(desc_a))
     allocate(x(n_col),stat=info)
     if (info.ne.0) then
-      info=2025
+      info=4025
       int_err(1)=n_col
-      call psb_errpush(info,name,int_err)
+      call psb_errpush(info,name,int_err,a_err='integer')
       goto 9999
     endif
   else if (psb_is_bld_desc(desc_a)) then
     n_row = max(1,psb_cd_get_local_rows(desc_a))
     allocate(x(n_row),stat=info)
     if (info.ne.0) then
-      info=2025
+      info=4025
       int_err(1)=n_row
-      call psb_errpush(info,name,int_err)
+      call psb_errpush(info,name,int_err,a_err='integer')
       goto 9999
     endif
   endif

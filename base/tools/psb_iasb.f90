@@ -98,9 +98,9 @@ subroutine psb_iasb(x, desc_a, info)
   if (i1sz.lt.ncol) then
     call psb_realloc(ncol,i2sz,x,info)
     if (info /= 0) then
-      info=2025
-      int_err(1)=ncol
-      call psb_errpush(info,name,int_err)
+      info=4025
+      int_err(1)=ncol*i2sz
+      call psb_errpush(info,name,int_err,a_err='integer')
       goto 9999
     endif
   endif
@@ -210,9 +210,9 @@ subroutine psb_iasbv(x, desc_a, info)
   if (i1sz.lt.ncol) then
     call psb_realloc(ncol,x,info)
     if (info /= 0) then           
-      info=2025
+      info=4025
       int_err(1)=ncol
-      call psb_errpush(info,name,int_err)
+      call psb_errpush(info,name,int_err,a_err='integer')
       goto 9999
     endif
   endif  

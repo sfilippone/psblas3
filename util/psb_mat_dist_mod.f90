@@ -171,9 +171,9 @@ contains
     liwork = max(np, nrow + ncol)
     allocate(iwork(liwork), stat = info)
     if (info /= 0) then
-      info=2025
+      info=4025
       int_err(1)=liwork
-      call psb_errpush(info,name,i_err=int_err)
+      call psb_errpush(info,name,i_err=int_err,a_err='integer')
       goto 9999
     endif
     if (iam == root) then
@@ -583,10 +583,9 @@ contains
     liwork = max(np, nrow + ncol)
     allocate(iwork(liwork), stat = info)
     if (info /= 0) then
-      write(0,*) 'matdist allocation failed'
-      info=2025
+      info=4025
       int_err(1)=liwork
-      call psb_errpush(info,name,i_err=int_err)
+      call psb_errpush(info,name,i_err=int_err,a_err='integer')
       goto 9999
     endif
 
@@ -917,9 +916,9 @@ contains
     liwork = max(np, nrow + ncol)
     allocate(iwork(liwork), stat = info)
     if (info /= 0) then
-      info=2025
+      info=4025
       int_err(1)=liwork
-      call psb_errpush(info,name,i_err=int_err)
+      call psb_errpush(info,name,i_err=int_err,a_err='integer')
       goto 9999
     endif
     if (iam == root) then
@@ -1330,9 +1329,9 @@ contains
     allocate(iwork(liwork), stat = info)
     if (info /= 0) then
       write(0,*) 'matdist allocation failed'
-      info=2025
+      info=4025
       int_err(1)=liwork
-      call psb_errpush(info,name,i_err=int_err)
+      call psb_errpush(info,name,i_err=int_err,a_err='integer')
       goto 9999
     endif
 

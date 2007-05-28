@@ -171,9 +171,9 @@ subroutine psb_cd_inloc(v, ictxt, desc_a, info)
     desc_a%matrix_data(psb_desc_size_) = psb_desc_normal_
   end if
   if (info /= 0) then     
-    info=2025
-    int_err(1)=m
-    call psb_errpush(info,name,i_err=int_err)
+    info=4025
+    int_err(1)=2*m+psb_mdata_size_
+    call psb_errpush(info,name,i_err=int_err,a_err='integer')
     goto 9999
   endif
 
@@ -224,9 +224,9 @@ subroutine psb_cd_inloc(v, ictxt, desc_a, info)
          & desc_a%ptree(2),stat=info)  
     if (info == 0) call InitPairSearchTree(desc_a%ptree,info)
     if (info /= 0) then
-      info=2025
+      info=4025
       int_err(1)=loc_col
-      call psb_errpush(info,name,i_err=int_err)
+      call psb_errpush(info,name,i_err=int_err,a_err='integer')
       goto 9999
     end if
 
@@ -289,9 +289,9 @@ subroutine psb_cd_inloc(v, ictxt, desc_a, info)
     allocate(desc_a%loc_to_glob(loc_col),&
          &desc_a%lprm(1),stat=info)  
     if (info /= 0) then
-      info=2025
+      info=4025
       int_err(1)=loc_col
-      call psb_errpush(info,name,i_err=int_err)
+      call psb_errpush(info,name,i_err=int_err,a_err='integer')
       goto 9999
     end if
 
@@ -326,9 +326,9 @@ subroutine psb_cd_inloc(v, ictxt, desc_a, info)
   if (debug) write(*,*) 'PSB_CDALL: Ov len',l_ov_ix,l_ov_el
   allocate(ov_idx(l_ov_ix),ov_el(l_ov_el), stat=info)
   if (info /= 0) then
-    info=2025
-    int_err(1)=l_ov_ix
-    call psb_errpush(info,name,i_err=int_err)
+    info=4025
+    int_err(1)=l_ov_ix+l_ov_el
+    call psb_errpush(info,name,i_err=int_err,a_err='integer')
     goto 9999
   end if
 
@@ -372,18 +372,13 @@ subroutine psb_cd_inloc(v, ictxt, desc_a, info)
   call psb_cd_set_bld(desc_a,info)
 
   call psb_realloc(1,desc_a%halo_index, info)
-  if (info /= psb_no_err_) then
-    info=2025
-    call psb_errpush(err,name,a_err='psb_realloc')
+  if (info == 0)   call psb_realloc(1,desc_a%ext_index, info)
+  if (info /= 0) then
+    info=4010
+    call psb_errpush(info,name,a_err='psb_realloc')
     Goto 9999
   end if
   desc_a%halo_index(:) = -1
-  call psb_realloc(1,desc_a%ext_index, info)
-  if (info /= psb_no_err_) then
-    info=2025
-    call psb_errpush(err,name,a_err='psb_realloc')
-    Goto 9999
-  end if
   desc_a%ext_index(:) = -1
 
   call psb_erractionrestore(err_act)

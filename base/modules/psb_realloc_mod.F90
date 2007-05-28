@@ -622,8 +622,8 @@ Contains
       lb_ = 1
     endif
     if ((len<0)) then 
-      err=2025
-      call psb_errpush(err,name,i_err=(/len,0,0,0,0/))
+      err=4025
+      call psb_errpush(err,name,i_err=(/len,0,0,0,0/),a_err='integer')
       goto 9999
     end if
     ub_ = lb_+len-1
@@ -634,8 +634,8 @@ Contains
       If ((dim /= len).or.(lbi /= lb_))  Then
         Allocate(tmp(lb_:ub_),stat=info)
         if (info /= 0) then
-          err=4000
-          call psb_errpush(err,name)
+          err=4025
+          call psb_errpush(err,name,i_err=(/len,0,0,0,0/),a_err='integer')
           goto 9999
         end if
         tmp(lb_:lb_-1+min(len,dim))=rrax(lbi:lbi-1+min(len,dim))
@@ -645,8 +645,8 @@ Contains
       dim = 0
       allocate(rrax(lb_:ub_),stat=info)
       if (info /= 0) then
-        err=4000
-        call psb_errpush(err,name)
+        err=4025
+        call psb_errpush(err,name,i_err=(/len,0,0,0,0/),a_err='integer')
         goto 9999
       end if
     endif
@@ -698,8 +698,8 @@ Contains
       lb_ = 1
     endif
     if ((len<0)) then 
-      err=2025
-      call psb_errpush(err,name,i_err=(/len,0,0,0,0/))
+      err=4025
+      call psb_errpush(err,name,i_err=(/len,0,0,0,0/),a_err='real(kind(1.d0))')
       goto 9999
     end if
     ub_ = lb_ + len-1
@@ -710,8 +710,8 @@ Contains
       If ((dim /= len).or.(lbi /= lb_))  Then
         Allocate(tmp(lb_:ub_),stat=info)
         if (info /= 0) then
-          err=4000
-          call psb_errpush(err,name)
+          err=4025
+          call psb_errpush(err,name,i_err=(/len,0,0,0,0/),a_err='real(kind(1.d0))')
           goto 9999
         end if
         tmp(lb_:lb_-1+min(len,dim))=rrax(lbi:lbi-1+min(len,dim))
@@ -721,8 +721,8 @@ Contains
       dim = 0
       Allocate(rrax(lb_:ub_),stat=info)
       if (info /= 0) then
-        err=4000
-        call psb_errpush(err,name)
+        err=4025
+        call psb_errpush(err,name,i_err=(/len,0,0,0,0/),a_err='real(kind(1.d0))')
         goto 9999
       end if
     endif
@@ -771,8 +771,8 @@ Contains
       lb_ = 1
     endif
     if ((len<0)) then 
-      err=2025
-      call psb_errpush(err,name,i_err=(/len,0,0,0,0/))
+      err=4025
+      call psb_errpush(err,name,i_err=(/len,0,0,0,0/),a_err='complex(kind(1.d0))')
       goto 9999
     end if
     ub_ = lb_+len-1
@@ -783,8 +783,8 @@ Contains
       If ((dim /= len).or.(lbi /= lb_))  Then
         Allocate(tmp(lb_:ub_),stat=info)
         if (info /= 0) then
-          err=4000
-          call psb_errpush(err,name)
+          err=4025
+          call psb_errpush(err,name,i_err=(/len,0,0,0,0/),a_err='complex(kind(1.d0))')
           goto 9999
         end if
         tmp(lb_:lb_-1+min(len,dim))=rrax(lbi:lbi-1+min(len,dim))
@@ -794,8 +794,8 @@ Contains
       dim = 0
       Allocate(rrax(lb_:ub_),stat=info)
       if (info /= 0) then
-        err=4000
-        call psb_errpush(err,name)
+        err=4025
+        call psb_errpush(err,name,i_err=(/len,0,0,0,0/),a_err='complex(kind(1.d0))')
         goto 9999
       end if
     endif
@@ -851,6 +851,18 @@ Contains
     ub1_ = lb1_ + len1 -1
     ub2_ = lb2_ + len2 -1
 
+    if (len1 < 0) then
+      err=4025
+      call psb_errpush(err,name,i_err=(/len1,0,0,0,0/),a_err='real(kind(1.d0))')
+      goto 9999
+    end if
+    if (len2 < 0) then
+      err=4025
+      call psb_errpush(err,name,i_err=(/len2,0,0,0,0/),a_err='real(kind(1.d0))')
+      goto 9999
+    end if
+
+
     if (allocated(rrax)) then 
       dim  = size(rrax,1)
       lbi1 = lbound(rrax,1)
@@ -860,8 +872,8 @@ Contains
            &  .or.(lbi2 /= lb2_)) Then
         Allocate(tmp(lb1_:ub1_,lb2_:ub2_),stat=info)
         if (info /= 0) then
-          err=4000
-          call psb_errpush(err,name)
+          err=4025
+          call psb_errpush(err,name,i_err=(/len1*len2,0,0,0,0/),a_err='real(kind(1.d0))')
           goto 9999
         end if
         tmp(lb1_:lb1_-1+min(len1,dim),lb2_:lb2_-1+min(len2,dim2)) = &
@@ -873,8 +885,8 @@ Contains
       dim2 = 0
       Allocate(rrax(lb1_:ub1_,lb2_:ub2_),stat=info)
       if (info /= 0) then
-        err=4000
-        call psb_errpush(err,name)
+        err=4025
+        call psb_errpush(err,name,i_err=(/len1*len2,0,0,0,0/),a_err='real(kind(1.d0))')
         goto 9999
       end if
     endif
@@ -931,6 +943,18 @@ Contains
     ub1_ = lb1_ + len1 -1
     ub2_ = lb2_ + len2 -1
 
+    if (len1 < 0) then
+      err=4025
+      call psb_errpush(err,name,i_err=(/len1,0,0,0,0/),a_err='complex(kind(1.d0))')
+      goto 9999
+    end if
+    if (len2 < 0) then
+      err=4025
+      call psb_errpush(err,name,i_err=(/len2,0,0,0,0/),a_err='complex(kind(1.d0))')
+      goto 9999
+    end if
+
+
     if (allocated(rrax)) then 
       dim  = size(rrax,1)
       lbi1 = lbound(rrax,1)
@@ -940,8 +964,8 @@ Contains
            &  .or.(lbi2 /= lb2_)) Then
         Allocate(tmp(lb1_:ub1_,lb2_:ub2_),stat=info)
         if (info /= 0) then
-          err=4000
-          call psb_errpush(err,name)
+          err=4025
+          call psb_errpush(err,name,i_err=(/len1*len2,0,0,0,0/),a_err='complex(kind(1.d0))')
           goto 9999
         end if
         tmp(lb1_:lb1_-1+min(len1,dim),lb2_:lb2_-1+min(len2,dim2)) = &
@@ -953,8 +977,8 @@ Contains
       dim2 = 0
       Allocate(rrax(lb1_:ub1_,lb2_:ub2_),stat=info)
       if (info /= 0) then
-        err=4000
-        call psb_errpush(err,name)
+        err=4025
+        call psb_errpush(err,name,i_err=(/len1*len2,0,0,0,0/),a_err='complex(kind(1.d0))')
         goto 9999
       end if
     endif
@@ -1010,6 +1034,17 @@ Contains
     ub1_ = lb1_ + len1 -1
     ub2_ = lb2_ + len2 -1
 
+    if (len1 < 0) then
+      err=4025
+      call psb_errpush(err,name,i_err=(/len1,0,0,0,0/),a_err='integer')
+      goto 9999
+    end if
+    if (len2 < 0) then
+      err=4025
+      call psb_errpush(err,name,i_err=(/len2,0,0,0,0/),a_err='integer')
+      goto 9999
+    end if
+
     if (allocated(rrax)) then 
       dim  = size(rrax,1)
       lbi1 = lbound(rrax,1)
@@ -1019,8 +1054,8 @@ Contains
            &  .or.(lbi2 /= lb2_)) Then
         Allocate(tmp(lb1_:ub1_,lb2_:ub2_),stat=info)
         if (info /= 0) then
-          err=4000
-          call psb_errpush(err,name)
+          err=4025
+          call psb_errpush(err,name,i_err=(/len1*len2,0,0,0,0/),a_err='integer')
           goto 9999
         end if
         tmp(lb1_:lb1_-1+min(len1,dim),lb2_:lb2_-1+min(len2,dim2)) = &
@@ -1032,8 +1067,8 @@ Contains
       dim2 = 0
       Allocate(rrax(lb1_:ub1_,lb2_:ub2_),stat=info)
       if (info /= 0) then
-        err=4000
-        call psb_errpush(err,name)
+        err=4025
+        call psb_errpush(err,name,i_err=(/len1*len2,0,0,0,0/),a_err='integer')
         goto 9999
       end if
     endif

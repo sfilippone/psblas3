@@ -176,12 +176,10 @@ subroutine psb_cdrep(m, ictxt, desc_a, info)
   ! allocate work vector
   allocate(desc_a%glob_to_loc(m),desc_a%matrix_data(psb_mdata_size_),&
        &   desc_a%loc_to_glob(m),desc_a%lprm(1),stat=info)
-!!$       &   desc_a%ovrlap_index(1),desc_a%ovrlap_elem(1),&
-!!$       &   desc_a%halo_index(1),desc_a%bnd_elem(1),stat=info)
   if (info /= 0) then     
-    info=2025
-    int_err(1)=m
-    call psb_errpush(info,name,i_err=int_err)
+    info=4025
+    int_err(1)=2*m+psb_mdata_size_+1
+    call psb_errpush(info,name,i_err=int_err,a_err='integer')
     goto 9999
   endif
   ! If the index space is replicated there's no point in having 
