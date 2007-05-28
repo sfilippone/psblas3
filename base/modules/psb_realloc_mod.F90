@@ -658,6 +658,7 @@ Contains
     return
 
 9999 continue
+    info = err
     call psb_erractionrestore(err_act)
 
     if (err_act.eq.psb_act_ret_) then
@@ -733,6 +734,7 @@ Contains
     return
 
 9999 continue
+    info = err
     call psb_erractionrestore(err_act)
 
     if (err_act.eq.psb_act_ret_) then
@@ -806,6 +808,7 @@ Contains
     return
 
 9999 continue
+    info = err
     call psb_erractionrestore(err_act)
 
     if (err_act.eq.psb_act_ret_) then
@@ -852,7 +855,7 @@ Contains
     ub2_ = lb2_ + len2 -1
 
     if (len1 < 0) then
-      err=4025
+      err=4025 
       call psb_errpush(err,name,i_err=(/len1,0,0,0,0/),a_err='real(kind(1.d0))')
       goto 9999
     end if
@@ -898,6 +901,7 @@ Contains
     return
 
 9999 continue
+    info = err
     call psb_erractionrestore(err_act)
 
     if (err_act.eq.psb_act_ret_) then
@@ -991,6 +995,7 @@ Contains
     return
 
 9999 continue
+    info = err
     call psb_erractionrestore(err_act)
 
     if (err_act.eq.psb_act_ret_) then
@@ -1081,6 +1086,7 @@ Contains
     return
 
 9999 continue
+    info = err
     call psb_erractionrestore(err_act)
 
     if (err_act.eq.psb_act_ret_) then

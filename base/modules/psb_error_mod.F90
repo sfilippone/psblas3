@@ -465,7 +465,7 @@ contains
     case(4013)
       write (0,'("Error from call to subroutine ",a," ",i0)')a_e_d,i_e_d(1)
     case(4025)
-      write (0,'("Error on allocation request for ",i0," items of type ")')i_e_d(1),a_e_d
+      write (0,'("Error on allocation request for ",i0," items of type ",a)')i_e_d(1),a_e_d
     case(4110)
       write (0,'("Error ",i0," from call to an external package in subroutine ",a)')i_e_d(1),a_e_d
     case (5001)
