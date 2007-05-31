@@ -22,20 +22,24 @@ the specific initialization strategy:
 \item[icontxt] the communication context.\\
 Scope:{\bf global}.\\
 Type:{\bf required}.\\
+Intent: {\bf in}.\\
 Specified as: an integer value.
 \item[vg] Data allocation: each index $i\in \{1\dots mg\}$ is allocated
   to process $vg(i)$.
 Scope:{\bf global}.\\
 Type:{\bf optional}.\\
+Intent: {\bf in}.\\
 Specified as: an integer array. 
 \item[flag] Specifies whether entries in $vg$ are zero- or one-based.
 Scope:{\bf global}.\\
 Type:{\bf optional}.\\
+Intent: {\bf in}.\\
 Specified as: an integer value $0,1$, default $0$.
 
 \item[mg] the (global) number of rows of the problem.\\
 Scope:{\bf global}.\\
 Type:{\bf optional}.\\
+Intent: {\bf in}.\\
 Specified as: an integer value. It is required if \verb|parts| is
 specified. 
 \item[parts] the subroutine that defines the partitioning scheme.\\
@@ -46,11 +50,13 @@ Specified as: a subroutine.
   calling process. 
 Scope:{\bf local}.\\
 Type:{\bf optional}.\\
+Intent: {\bf in}.\\
 Specified as: an integer array. 
 \item[nl] Data allocation: in a generalized block-row distribution the
   number of indices belonging to the current process. 
 Scope:{\bf local}.\\
 Type:{\bf optional}.\\
+Intent: {\bf in}.\\
 Specified as: an integer value. 
 \end{description}
 
@@ -59,10 +65,12 @@ Specified as: an integer value.
 \item[desc\_a] the communication descriptor.\\
 Scope:{\bf local}.\\
 Type:{\bf required}.\\
+Intent: {\bf out}.\\
 Specified as: a structured data of type \descdata.
 \item[info] Error code.\\
 Scope: {\bf local} \\
 Type: {\bf required} \\
+Intent: {\bf out}.\\
 An integer value; 0 means no error has been detected. 
 \end{description}
 
@@ -135,14 +143,17 @@ communication descriptor.
 \item[nz] the number of points being inserted.\\
 Scope: {\bf local}.\\
 Type: {\bf required}.\\
+Intent: {\bf in}.\\
 Specified as: an integer value.
 \item[ia] the indices of the starting vertex of the edges  being inserted.\\
 Scope: {\bf local}.\\
 Type: {\bf required}.\\
+Intent: {\bf in}.\\
 Specified as: an integer array of length $nz$.
 \item[ja]  the indices of the end vertex of the edges  being inserted.\\
 Scope: {\bf local}.\\
 Type: {\bf required}.\\
+Intent: {\bf in}.\\
 Specified as: an integer array of length $nz$.
 %% \item[is] the row offset.\\
 %% Scope:{\bf local}.\\
@@ -159,10 +170,12 @@ Specified as: an integer array of length $nz$.
 \item[desc\_a] the updated communication descriptor.\\
 Scope:{\bf local}.\\
 Type:{\bf required}.\\
+Intent: {\bf inout}.\\
 Specified as: a structured data of type \descdata.
 \item[info] Error code.\\
 Scope: {\bf local} \\
 Type: {\bf required} \\
+Intent: {\bf out}.\\
 An integer value; 0 means no error has been detected. 
 \end{description}
 \section*{Notes}
@@ -188,14 +201,21 @@ nor the end vertex belong to the current process.
 \item[desc\_a] the communication descriptor.\\
 Scope:{\bf local}.\\
 Type:{\bf required}.\\
+Intent: {\bf inout}.\\
 Specified as: a structured data of type \descdata.
 \end{description}
 
 \begin{description}
 \item[\bf On Return]
+\item[desc\_a] the communication descriptor.\\
+Scope:{\bf local}.\\
+Type:{\bf required}.\\
+Intent: {\bf inout}.\\
+Specified as: a structured data of type \descdata.
 \item[info] Error code.\\
 Scope: {\bf local} \\
 Type: {\bf required} \\
+Intent: {\bf out}.\\
 An integer value; 0 means no error has been detected. 
 %\item[arg] 
 \end{description}
@@ -212,13 +232,14 @@ An integer value; 0 means no error has been detected.
 %
 \subroutine{psb\_cdcpy}{Copies a communication descriptor}
 
-\syntax{call psb\_cdcpy}{desc\_out, desc\_a, info}
+\syntax{call psb\_cdcpy}{desc\_in, desc\_out, info}
 
 \begin{description}
 \item[\bf On Entry]
-\item[desc\_a] the communication descriptor.\\
+\item[desc\_in] the communication descriptor.\\
 Scope:{\bf local}.\\
 Type:{\bf required}.\\
+Intent: {\bf in}.\\
 Specified as: a structured data of type \descdata.
 
 \end{description}
@@ -228,10 +249,12 @@ Specified as: a structured data of type \descdata.
 \item[desc\_out] the communication descriptor copy.\\
 Scope:{\bf local}.\\
 Type:{\bf required}.\\
+Intent: {\bf out}.\\
 Specified as: a structured data of type \descdata.
 \item[info] Error code.\\
 Scope: {\bf local} \\
 Type: {\bf required} \\
+Intent: {\bf out}.\\
 An integer value; 0 means no error has been detected. 
 \end{description}
 
@@ -248,6 +271,7 @@ An integer value; 0 means no error has been detected.
 \item[desc\_a] the communication descriptor to be freed.\\
 Scope:{\bf local}.\\
 Type:{\bf required}.\\
+Intent: {\bf inout}.\\
 Specified as: a structured data of type \descdata.
 \end{description}
 
@@ -256,6 +280,7 @@ Specified as: a structured data of type \descdata.
 \item[info] Error code.\\
 Scope: {\bf local} \\
 Type: {\bf required} \\
+Intent: {\bf out}.\\
 An integer value; 0 means no error has been detected. 
 \end{description}
 
@@ -276,18 +301,22 @@ through the input sparse matrix \verb|a|.
 \item[a] A sparse matrix
 Scope:{\bf local}.\\
 Type:{\bf required}.\\
+Intent: {\bf in}.\\
 Specified as: a structured data type.
 \item[desc\_a] the communication descriptor.\\
 Scope:{\bf local}.\\
 Type:{\bf required}.\\
+Intent: {\bf in}.\\
 Specified as: a structured data of type \spdata.
 \item[nl] the number of additional layers desired.\\
 Scope:{\bf global}.\\
 Type:{\bf required}.\\
+Intent: {\bf in}.\\
 Specified as: an integer value $nl\ge 0$. 
 \item[extype] the kind of estension required.\\
 Scope:{\bf global}.\\
 Type:{\bf optional }.\\
+Intent: {\bf in}.\\
 Specified as: an integer value
 \verb|psb_ovt_xhal_|, \verb|psb_ovt_asov_|, default: \verb|psb_ovt_xhal_|
 
@@ -298,10 +327,12 @@ Specified as: an integer value
 \item[desc\_out] the extended communication descriptor.\\
 Scope:{\bf local}.\\
 Type:{\bf required}.\\
+Intent: {\bf inout}.\\
 Specified as: a structured data of type \descdata.
 \item[info] Error code.\\
 Scope: {\bf local} \\
 Type: {\bf required} \\
+Intent: {\bf out}.\\
 An integer value; 0 means no error has been detected. 
 \end{description}
 
@@ -394,11 +425,13 @@ An integer value; 0 means no error has been detected.
 \item[desc\_a] the communication descriptor.\\
 Scope:{\bf local}.\\
 Type:{\bf required}.\\
+Intent: {\bf in}.\\
 Specified as: a structured data of type \descdata.
 \item[nnz] An estimate of the number of nonzeroes in the local
   part of the assembled matrix.\\ 
 Scope: {\bf global}.\\
 Type: {\bf optional}.\\
+Intent: {\bf in}.\\
 Specified as: an integer value. 
 \end{description}
 
@@ -407,10 +440,12 @@ Specified as: an integer value.
 \item[a] the matrix to be allocated.\\
 Scope:{\bf local}\\
 Type:{\bf required}\\
+Intent: {\bf out}.\\
 Specified as: a structured data of type \spdata.
 \item[info] Error code.\\
 Scope: {\bf local} \\
 Type: {\bf required} \\
+Intent: {\bf out}.\\
 An integer value; 0 means no error has been detected. 
 \end{description}
 \section*{Notes}
@@ -438,22 +473,27 @@ An integer value; 0 means no error has been detected.
 \item[nz] the number of elements to be inserted.\\
 Scope:{\bf local}.\\
 Type:{\bf required}.\\
+Intent: {\bf in}.\\
 Specified as: an integer scalar.
 \item[ia] the row indices of the elements to be inserted.\\
 Scope:{\bf local}.\\
 Type:{\bf required}.\\
+Intent: {\bf in}.\\
 Specified as: an integer array of size $nz$.
 \item[ja] the column indices of the elements to be inserted.\\
 Scope:{\bf local}.\\
 Type:{\bf required}.\\
+Intent: {\bf in}.\\
 Specified as: an integer array of size $nz$.
 \item[val] the elements to be inserted.\\
 Scope:{\bf local}.\\
 Type:{\bf required}.\\
+Intent: {\bf in}.\\
 Specified as: an array of size $nz$.
 \item[desc\_a] The communication descriptor.\\
 Scope: {\bf local}. \\
 Type: {\bf required}.\\
+Intent: {\bf inout}.\\
 Specified as: a variable of type \descdata.\\
 %% \item[is] the starting row on matrix $a$.\\
 %% Scope:{\bf local}.\\
@@ -470,14 +510,17 @@ Specified as: a variable of type \descdata.\\
 \item[a] the matrix into which elements will be inserted.\\
 Scope:{\bf local}\\
 Type:{\bf required}\\
+Intent: {\bf inout}.\\
 Specified as: a structured data of type \spdata.
 \item[desc\_a] The communication descriptor.\\
 Scope: {\bf local}. \\
 Type: {\bf required}.\\
+Intent: {\bf inout}.\\
 Specified as: a variable of type \descdata.\\
 \item[info] Error code.\\
 Scope: {\bf local} \\
 Type: {\bf required} \\
+Intent: {\bf out}.\\
 An integer value; 0 means no error has been detected. 
 \end{description}
 
@@ -512,18 +555,22 @@ An integer value; 0 means no error has been detected.
 \item[desc\_a] the communication descriptor.\\
 Scope:{\bf local}.\\
 Type:{\bf required}.\\
+Intent: {\bf in}.\\
 Specified as: a structured data of type \descdata.
 \item[afmt] the storage format for the sparse matrix.\\
 Scope: {\bf global}.\\
 Type: {\bf optional}.\\
+Intent: {\bf in}.\\
 Specified as: an array of characters. Defalt:  'CSR'.
 \item[upd] Provide for updates to the matrix coefficients.\\
 Scope: {\bf global}.\\
 Type: {\bf optional}.\\
+Intent: {\bf in}.\\
 Specified as: integer, possible values: \verb|psb_upd_srch_|, \verb|psb_upd_perm_|
 \item[dupl] How to handle duplicate coefficients.\\
 Scope: {\bf global}.\\
 Type: {\bf optional}.\\
+Intent: {\bf in}.\\
 Specified as: integer, possible values: \verb|psb_dupl_ovwrt_|,
 \verb|psb_dupl_add_|, \verb|psb_dupl_err_|.
 \end{description}
@@ -533,10 +580,12 @@ Specified as: integer, possible values: \verb|psb_dupl_ovwrt_|,
 \item[a] the matrix to be assembled.\\
 Scope:{\bf local}\\
 Type:{\bf required}\\
+Intent: {\bf inout}.\\
 Specified as: a structured data of type \spdata.
 \item[info] Error code.\\
 Scope: {\bf local} \\
 Type: {\bf required} \\
+Intent: {\bf out}.\\
 An integer value; 0 means no error has been detected. 
 \end{description}
 
@@ -603,10 +652,12 @@ An integer value; 0 means no error has been detected.
 \item[a] the matrix to be freed.\\
 Scope:{\bf local}\\
 Type:{\bf required}\\
+Intent: {\bf inout}.\\
 Specified as: a structured data of type \spdata.
 \item[desc\_a] the communication descriptor.\\
 Scope:{\bf local}.\\
 Type:{\bf required}.\\
+Intent: {\bf in}.\\
 Specified as: a structured data of type \descdata.
 \end{description}
 
@@ -615,6 +666,7 @@ Specified as: a structured data of type \descdata.
 \item[info] Error code.\\
 Scope: {\bf local} \\
 Type: {\bf required} \\
+Intent: {\bf out}.\\
 An integer value; 0 means no error has been detected. 
 \end{description}
 
@@ -633,14 +685,17 @@ An integer value; 0 means no error has been detected.
 \item[a] the matrix to be reinitialized.\\
 Scope:{\bf local}\\
 Type:{\bf required}\\
+Intent: {\bf inout}.\\
 Specified as: a structured data of type \spdata.
 \item[desc\_a] the communication descriptor.\\
 Scope:{\bf local}.\\
 Type:{\bf required}.\\
+Intent: {\bf in}.\\
 Specified as: a structured data of type \descdata.
 \item[clear] Choose whether to zero out matrix coefficients\\
 Scope:{\bf local}.\\
 Type:{\bf optional}.\\
+Intent: {\bf in}.\\
 Default: true.
 \end{description}
 
@@ -649,6 +704,7 @@ Default: true.
 \item[info] Error code.\\
 Scope: {\bf local} \\
 Type: {\bf required} \\
+Intent: {\bf out}.\\
 An integer value; 0 means no error has been detected. 
 \end{description}
 \section*{Notes}
@@ -718,10 +774,12 @@ An integer value; 0 means no error has been detected.
 \item[desc\_a] The communication descriptor.\\
 Scope: {\bf local} \\
 Type: {\bf required}\\
+Intent: {\bf in}.\\
 Specified as: a variable of type \descdata.\\
 \item[n] The number of columns of the dense matrix to be allocated.\\
 Scope: {\bf local} \\
 Type: {\bf optional}\\
+Intent: {\bf in}.\\
 Specified as: Integer scalar, default $1$. It is ignored if $x$ is a
 rank-1 array. 
 \end{description}
@@ -731,11 +789,13 @@ rank-1 array.
 \item[x] The dense matrix to be allocated.\\
 Scope: {\bf local} \\
 Type: {\bf required}\\
+Intent: {\bf out}.\\
 Specified as: a rank one or two array with the ALLOCATABLE
 attribute, of type real, complex or integer.\\
 \item[info] Error code.\\
 Scope: {\bf local} \\
 Type: {\bf required} \\
+Intent: {\bf out}.\\
 An integer value; 0 means no error has been detected. 
 \end{description}
 
@@ -752,25 +812,30 @@ An integer value; 0 means no error has been detected.
 \item[m] Number of rows in $val$  to be inserted.\\
 Scope:{\bf local}.\\
 Type:{\bf required}.\\
+Intent: {\bf in}.\\
 Specified as: an integer value.
 \item[irw] Indices of the rows to be inserted. Specifically, row $i$
   of $val$ will be inserted into the local row corresponding to the
   global row index $irw(i)$.
 Scope:{\bf local}.\\
 Type:{\bf required}.\\
+Intent: {\bf in}.\\
 Specified as: an integer array.
 \item[val] the dense submatrix to be inserted.\\
 Scope:{\bf local}.\\
 Type:{\bf required}.\\
+Intent: {\bf in}.\\
 Specified as: a rank 1 or 2  array.
 Specified as: an integer value.
 \item[desc\_a] the communication descriptor.\\
 Scope:{\bf local}.\\
 Type:{\bf required}.\\
+Intent: {\bf in}.\\
 Specified as: a structured data of type \descdata.
 \item[dupl] How to handle duplicate coefficients.\\
 Scope: {\bf global}.\\
 Type: {\bf optional}.\\
+Intent: {\bf in}.\\
 Specified as: integer, possible values: \verb|psb_dupl_ovwrt_|,
 \verb|psb_dupl_add_|.
 \end{description}
@@ -780,11 +845,13 @@ Specified as: integer, possible values: \verb|psb_dupl_ovwrt_|,
 \item[x] the output dense matrix.\\
 Scope: {\bf local} \\
 Type: {\bf required}\\
+Intent: {\bf inout}.\\
 Specified as: a rank one or two array with the ALLOCATABLE
 attribute, of type real, complex or integer.\\
 \item[info] Error code.\\
 Scope: {\bf local} \\
 Type: {\bf required} \\
+Intent: {\bf out}.\\
 An integer value; 0 means no error has been detected. 
 \end{description}
 
@@ -808,6 +875,7 @@ An integer value; 0 means no error has been detected.
 \item[desc\_a] The communication descriptor.\\
 Scope: {\bf local} \\
 Type: {\bf required}\\
+Intent: {\bf in}.\\
 Specified as: a variable of type \descdata.\\
 \end{description}
 
@@ -816,11 +884,13 @@ Specified as: a variable of type \descdata.\\
 \item[x] The dense matrix to be assembled.\\
 Scope: {\bf local} \\
 Type: {\bf required}\\
+Intent: {\bf inout}.\\
 Specified as: a rank one or two array with the ALLOCATABLE
 attribute, of type real, complex or integer.\\
 \item[info] Error code.\\
 Scope: {\bf local} \\
 Type: {\bf required} \\
+Intent: {\bf out}.\\
 An integer value; 0 means no error has been detected. 
 \end{description}
 %
@@ -836,12 +906,14 @@ An integer value; 0 means no error has been detected.
   be freed.\\
 Scope: {\bf local} \\
 Type: {\bf required}\\
+Intent: {\bf inout}.\\
 Specified as: a rank one or two array with the ALLOCATABLE
 attribute, of type real, complex or integer.\\
 
 \item[desc\_a] The communication descriptor.\\
 Scope: {\bf local} \\
 Type: {\bf required}\\
+Intent: {\bf in}.\\
 Specified as: a variable of type \descdata.\\
 \end{description}
 
@@ -850,6 +922,7 @@ Specified as: a variable of type \descdata.\\
 \item[info] Error code.\\
 Scope: {\bf local} \\
 Type: {\bf required} \\
+Intent: {\bf out}.\\
 An integer value; 0 means no error has been detected. 
 \end{description}
 
@@ -866,18 +939,22 @@ An integer value; 0 means no error has been detected.
 \item[trans] A character that specifies whether to permute $A$  or $A^T$.\\
 Scope: {\bf local} \\
 Type: {\bf required}\\
+Intent: {\bf in}.\\
 Specified as: a single character with value 'N' for $A$ or 'T' for $A^T$.\\
 \item[iperm] An integer array containing permutation information.\\
 Scope: {\bf local} \\
 Type: {\bf required}\\
+Intent: {\bf in}.\\
 Specified as: an integer one-dimensional array.\\
 \item[x] The dense matrix to be permuted.\\
 Scope: {\bf local} \\
 Type: {\bf required}\\
+Intent: {\bf inout}.\\
 Specified as: a one or two dimensional array.\\
 \item[desc\_a] The communication descriptor.\\
 Scope: {\bf local} \\
 Type: {\bf required}\\
+Intent: {\bf in}.\\
 Specified as: a variable of type \descdata.\\
 \end{description}
 
@@ -886,6 +963,7 @@ Specified as: a variable of type \descdata.\\
 \item[info] Error code.\\
 Scope: {\bf local} \\
 Type: {\bf required} \\
+Intent: {\bf out}.\\
 An integer value; 0 means no error has been detected. 
 \end{description}
 
@@ -903,19 +981,23 @@ An integer value; 0 means no error has been detected.
 \item[x] An integer vector of indices to be converted.\\
 Scope: {\bf local} \\
 Type: {\bf required}\\
+Intent: {\bf in, inout}.\\
 Specified as: a rank one integer array.\\
 \item[desc\_a] the communication descriptor.\\
 Scope:{\bf local}.\\
 Type:{\bf required}.\\
+Intent: {\bf in}.\\
 Specified as: a structured data of type \descdata.
 \item[iact] specifies action to be taken in case of range errors. 
 Scope: {\bf global} \\
 Type: {\bf optional}\\
+Intent: {\bf in}.\\
 Specified as: a character variable  \verb|I|gnore, \verb|W|arning or
 \verb|A|bort, default \verb|I|gnore.
 \item[owned] Specfies valid range of input 
 Scope: {\bf global} \\
 Type: {\bf optional}\\
+Intent: {\bf in}.\\
 If true, then only indices strictly owned by the current process are
 considered valid, if false then halo indices are also
 accepted. Default: false. 
@@ -927,16 +1009,19 @@ accepted. Default: false.
   then $x$ is overwritten with the translated integer indices. 
 Scope: {\bf global} \\
 Type: {\bf required}\\
+Intent: {\bf inout}.\\
 Specified as: a rank one integer array.
 \item[y] If $y$ is  present,
   then $y$ is overwritten with the translated integer indices, and $x$
   is left unchanged. 
 Scope: {\bf global} \\
 Type: {\bf optional}\\
+Intent: {\bf out}.\\
 Specified as: a rank one integer array.
 \item[info] Error code.\\
 Scope: {\bf local} \\
 Type: {\bf required} \\
+Intent: {\bf out}.\\
 An integer value; 0 means no error has been detected. 
 \end{description}
 
@@ -962,14 +1047,17 @@ An integer value; 0 means no error has been detected.
 \item[x] An integer vector of indices to be converted.\\
 Scope: {\bf local} \\
 Type: {\bf required}\\
+Intent: {\bf in, inout}.\\
 Specified as: a rank one integer array.\\
 \item[desc\_a] the communication descriptor.\\
 Scope:{\bf local}.\\
 Type:{\bf required}.\\
+Intent: {\bf in}.\\
 Specified as: a structured data of type \descdata.
 \item[iact] specifies action to be taken in case of range errors. 
 Scope: {\bf global} \\
 Type: {\bf optional}\\
+Intent: {\bf in}.\\
 Specified as: a character variable  \verb|I|gnore, \verb|W|arning or
 \verb|A|bort, default \verb|I|gnore.
 \end{description}
@@ -980,16 +1068,19 @@ Specified as: a character variable  \verb|I|gnore, \verb|W|arning or
   then $x$ is overwritten with the translated integer indices. 
 Scope: {\bf global} \\
 Type: {\bf required}\\
+Intent: {\bf inout}.\\
 Specified as: a rank one integer array.
 \item[y] If $y$ is not present,
   then $y$ is overwritten with the translated integer indices, and $x$
   is left unchanged. 
 Scope: {\bf global} \\
 Type: {\bf optional}\\
+Intent: {\bf out}.\\
 Specified as: a rank one integer array.
 \item[info] Error code.\\
 Scope: {\bf local} \\
 Type: {\bf required} \\
+Intent: {\bf out}.\\
 An integer value; 0 means no error has been detected. 
 \end{description}
 
@@ -1008,6 +1099,7 @@ An integer value; 0 means no error has been detected.
 \item[desc] the communication descriptor.\\
 Scope:{\bf local}.\\
 Type:{\bf required}.\\
+Intent: {\bf in}.\\
 Specified as: a structured data of type \descdata.
 \end{description}
 
@@ -1017,11 +1109,13 @@ Specified as: a structured data of type \descdata.
   local numbering.\\
 Scope: {\bf local} \\
 Type: {\bf required}\\
+Intent: {\bf out}.\\
 Specified as: a rank one array with the ALLOCATABLE
 attribute, of type integer.\\
 \item[info] Error code.\\
 Scope: {\bf local} \\
 Type: {\bf required} \\
+Intent: {\bf out}.\\
 An integer value; 0 means no error has been detected. 
 \end{description}
 
@@ -1043,6 +1137,7 @@ An integer value; 0 means no error has been detected.
 \item[desc] the communication descriptor.\\
 Scope:{\bf local}.\\
 Type:{\bf required}.\\
+Intent: {\bf in}.\\
 Specified as: a structured data of type \descdata.
 \end{description}
 
@@ -1052,11 +1147,13 @@ Specified as: a structured data of type \descdata.
   local numbering.\\
 Scope: {\bf local} \\
 Type: {\bf required}\\
+Intent: {\bf out}.\\
 Specified as: a rank one array with the ALLOCATABLE
 attribute, of type integer.\\
 \item[info] Error code.\\
 Scope: {\bf local} \\
 Type: {\bf required} \\
+Intent: {\bf out}.\\
 An integer value; 0 means no error has been detected. 
 \end{description}
 
@@ -1080,23 +1177,28 @@ An integer value; 0 means no error has been detected.
 \item[row] The (first) row to be extracted.\\
 Scope:{\bf local}\\
 Type:{\bf required}\\
+Intent: {\bf in}.\\
 Specified as: an integer $>0$.
 \item[a] the matrix from  which to get rows.\\
 Scope:{\bf local}\\
 Type:{\bf required}\\
+Intent: {\bf in}.\\
 Specified as: a structured data of type \spdata.
 \item[append] Whether to append or overwrite existing output.\\
 Scope:{\bf local}\\
 Type:{\bf optional}\\
+Intent: {\bf in}.\\
 Specified as: a logical value default: false (overwrite).
 \item[nzin] Input size to be appended to.\\
 Scope:{\bf local}\\
 Type:{\bf optional}\\
+Intent: {\bf in}.\\
 Specified as: an integer $>0$. When append is true, specifies how many
 entries in the output vectors are already filled. 
 \item[lrw] The last  row to be extracted.\\
 Scope:{\bf local}\\
 Type:{\bf optional}\\
+Intent: {\bf in}.\\
 Specified as: an integer $>0$, default: $row$.
 
 %% \item[is] the starting row on matrix $a$.\\
@@ -1114,22 +1216,27 @@ Specified as: an integer $>0$, default: $row$.
 \item[nz] the number of elements returned by this call.\\
 Scope:{\bf local}.\\
 Type:{\bf required}.\\
+Intent: {\bf out}.\\
 Returned  as: an integer scalar.
 \item[ia] the row indices.\\
 Scope:{\bf local}.\\
 Type:{\bf required}.\\
+Intent: {\bf inout}.\\
 Specified as: an integer array with the \verb|ALLOCATABLE| attribute.
 \item[ja] the column indices of the elements to be inserted.\\
 Scope:{\bf local}.\\
 Type:{\bf required}.\\
+Intent: {\bf inout}.\\
 Specified as: an integer array with the \verb|ALLOCATABLE| attribute.
 \item[val] the elements to be inserted.\\
 Scope:{\bf local}.\\
 Type:{\bf required}.\\
+Intent: {\bf inout}.\\
 Specified as: a real  array with the \verb|ALLOCATABLE| attribute.
 \item[info] Error code.\\
 Scope: {\bf local} \\
 Type: {\bf required} \\
+Intent: {\bf out}.\\
 An integer value; 0 means no error has been detected. 
 \end{description}
 
@@ -1165,14 +1272,17 @@ This function computes the memory occupation of a PSBLAS object.
 $A$. \\ 
 Scope: {\bf local} \\
 Type: {\bf required}\\
+Intent: {\bf in}.\\
 Specified as: a structured data of type \spdata.
 \item[desc\_a] Communication descriptor.\\
 Scope: {\bf local} \\
 Type: {\bf required}\\
+Intent: {\bf in}.\\
 Specified as: a structured data of type \descdata.
 \item[prec] 
 Scope: {\bf local} \\
 Type: {\bf required}\\
+Intent: {\bf in}.\\
 Specified as: a preconditioner data structure \precdata.
 \item[\bf On Return] 
 \item[Function value] The memory occupation of the object specified in

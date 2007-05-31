@@ -41,21 +41,25 @@ Long Precision Complex & psb\_halo \\
 \item[x] global dense matrix $x$.\\
 Scope: {\bf local} \\
 Type: {\bf required} \\
+Intent: {\bf inout}.\\
 Specified as:  a rank one or two array with the TARGET attribute
 containing numbers of type specified in
 Table~\ref{tab:f90halo}.
 \item[desc\_a] contains data structures for communications.\\
 Scope: {\bf local} \\
 Type: {\bf required}\\
+Intent: {\bf in}.\\
 Specified as: a structured data of type \descdata.
 \item[alpha] the scalar $\alpha$.\\
 Scope: {\bf global} \\
 Type: {\bf optional} \\
+Intent: {\bf in}.\\
 Default: $alpha = 1 $\\	
 Specified as: a number of the data type indicated in Table~\ref{tab:f90halo}.
 \item[work] the work array. \\
 Scope: {\bf local} \\
 Type: {\bf optional}\\
+Intent: {\bf inout}.\\
 Specified as: a rank one array of the same type of $x$ with the
 POINTER attribute.
 \item[data] index list selector.\\
@@ -70,12 +74,14 @@ index list on which to base the data exchange.
 \item[x] global dense result matrix $x$.\\
 Scope: {\bf local} \\
 Type: {\bf required} \\
+Intent: {\bf inout}.\\
 Returned as:  a rank one or two array 
 containing numbers of type specified in
 Table~\ref{tab:f90halo}.
 \item[info] the local portion of result submatrix $y$.\\
 Scope: {\bf local} \\
 Type: {\bf required} \\
+Intent: {\bf out}.\\
 An integer value that contains an error code. 
 \end{description}
 \begin{figure}[h] \begin{center}
@@ -183,12 +189,14 @@ Long Precision Complex & psb\_ovrl \\
 \item[x] global dense matrix $x$.\\
 Scope: {\bf local} \\
 Type: {\bf required} \\
+Intent: {\bf inout}.\\
 Specified as:  a rank one or two array 
 containing numbers of type specified in
 Table~\ref{tab:f90ovrl}.
 \item[desc\_a] contains data structures for communications.\\
 Scope: {\bf local} \\
 Type: {\bf required}\\
+Intent: {\bf in}.\\
 Specified as: a structured data of type \descdata.
 \item[update] Update operator. \\
 \begin{description}
@@ -198,24 +206,28 @@ Specified as: a structured data of type \descdata.
 %% \item[update = psb\_square\_root\_] square root update $\sqrt{P_a}$;
 \end{description}
 Scope: {\bf global} \\
+Intent: {\bf in}.\\
 Default: $update\_type = psb\_avg\_ $\\	
 Scope: {\bf global} \\
 Specified as: a integer variable.
 \item[work] the work array. \\
 Scope: {\bf local} \\
 Type: {\bf optional}\\
+Intent: {\bf inout}.\\
 Specified as: a one dimensional array of the same type of $x$.
 
 \item[\bf On Return] 
 \item[x] global dense result matrix $x$.\\
 Scope: {\bf local} \\
 Type: {\bf required} \\
+Intent: {\bf inout}.\\
 Specified as: an  array of rank one or two
 containing numbers of type specified in
 Table~\ref{tab:f90ovrl}.
 \item[info] Error code.\\
 Scope: {\bf local} \\
 Type: {\bf required} \\
+Intent: {\bf out}.\\
 An integer value; 0 means no error has been detected. 
 \end{description}
 
@@ -333,7 +345,7 @@ process.
 \[ glob\_x \leftarrow collect(loc\_x_i) \]
 where:
 \begin{description}
-\item[$glob\_x$] is the global submatrix $glob\_x_{iy:iy+m-1,jy:jy+n-1}$
+\item[$glob\_x$] is the global submatrix $glob\_x_{1:m,1:n}$
 \item[$loc\_x_i$] is the local portion of global dense matrix on
 process $i$.
 \item[$collect$] is the collect function.
@@ -353,10 +365,8 @@ Long Precision Complex & psb\_gather \\
 \caption{Data types\label{tab:gather}}
 \end{table}
 
-\syntax{call psb\_gather}{glob\_x, loc\_x, desc\_a, info, 
-  root, iglobx, jglobx, ilocx, jlocx, k}
-\syntax{call psb\_gather}{glob\_x, loc\_x, desc\_a, info, 
-  root, iglobx, ilocx}
+\syntax{call psb\_gather}{glob\_x, loc\_x, desc\_a, info, root}
+\syntax{call psb\_gather}{glob\_x, loc\_x, desc\_a, info, root}
 
 \begin{description}
 \item[\bf On Entry]
@@ -364,49 +374,54 @@ Long Precision Complex & psb\_gather \\
 $glob\_x$. \\
 Scope: {\bf local} \\
 Type: {\bf required}\\
+Intent: {\bf in}.\\
 Specified as: a rank one or two array containing numbers of the type
 indicated in Table~\ref{tab:gather}.
 \item[desc\_a] contains data structures for communications.\\
 Scope: {\bf local} \\
 Type: {\bf required}\\
+Intent: {\bf in}.\\
 Specified as: a structured data of type \descdata.
 \item[root]  The process that holds the global copy. If $root=-1$ all
   the processes will have a copy of the global vector.\\
 Scope: {\bf global} \\
 Type: {\bf optional}\\
-Specified as: an integer variable $-1\le ix\le np-1$, default $-1$. 
-\item[iglobx]  Row index to define a submatrix in glob\_x into which
-  gather the local pieces.\\
-Scope: {\bf global} \\
-Type: {\bf optional}\\
-Specified as: an integer variable $1\le ix\le matrix\_data(psb\_m\_)$. 
-\item[jglobx]  Column index to define a submatrix in glob\_x into which
-  gather the local pieces.\\
-Scope: {\bf global} \\
-Type: {\bf optional}\\
-Specified as: an integer variable. 
-\item[ilocx]  Row index to define a submatrix in loc\_x that has to
-  be gathered into glob\_x.\\
-Scope: {\bf local} \\
-Type: {\bf optional}\\
-Specified as: an integer variable. 
-\item[jlocx]  Columns index to define a submatrix in loc\_x that has
-  to be gathered into glob\_x.\\
-Scope: {\bf global} \\
-Type: {\bf optional}\\
-Specified as: an integer variable.
-\item[k]  The number of columns to gather.\\
-Scope: {\bf global} \\
-Type: {\bf optional}\\
-Specified as: an integer variable. 
+Intent: {\bf in}.\\
+Specified as: an integer variable $-1\le root\le np-1$, default $-1$. 
+%% \item[iglobx]  Row index to define a submatrix in glob\_x into which
+%%   gather the local pieces.\\
+%% Scope: {\bf global} \\
+%% Type: {\bf optional}\\
+%% Specified as: an integer variable $1\le ix\le matrix\_data(psb\_m\_)$. 
+%% \item[jglobx]  Column index to define a submatrix in glob\_x into which
+%%   gather the local pieces.\\
+%% Scope: {\bf global} \\
+%% Type: {\bf optional}\\
+%% Specified as: an integer variable. 
+%% \item[ilocx]  Row index to define a submatrix in loc\_x that has to
+%%   be gathered into glob\_x.\\
+%% Scope: {\bf local} \\
+%% Type: {\bf optional}\\
+%% Specified as: an integer variable. 
+%% \item[jlocx]  Columns index to define a submatrix in loc\_x that has
+%%   to be gathered into glob\_x.\\
+%% Scope: {\bf global} \\
+%% Type: {\bf optional}\\
+%% Specified as: an integer variable.
+%% \item[k]  The number of columns to gather.\\
+%% Scope: {\bf global} \\
+%% Type: {\bf optional}\\
+%% Specified as: an integer variable. 
 \item[\bf On Return] 
 \item[glob\_x] The array where the local parts must be gathered.\\
 Scope: {\bf global} \\
 Type: {\bf required}\\
+Intent: {\bf out}.\\
 Specified as: a rank one or two array.
 \item[info] Error code.\\
 Scope: {\bf local} \\
 Type: {\bf required} \\
+Intent: {\bf out}.\\
 An integer value; 0 means no error has been detected. 
 \end{description}
 
@@ -421,10 +436,10 @@ An integer value; 0 means no error has been detected.
 These subroutines scatters the portions of global dense matrix owned
 by a process to all the processes in the processes grid.
 
-\[ loc\_x_i \leftarrow scatter(glob\_x_i) \]
+\[ loc\_x_i \leftarrow scatter(glob\_x) \]
 where:
 \begin{description}
-\item[$glob\_x$] is the global submatrix $glob\_x_{iy:iy+m-1,jy:jy+n-1}$
+\item[$glob\_x$] is the global matrix $glob\_x_{1:m,1:n}$
 \item[$loc\_x_i$] is the local portion of global dense matrix on
 process $i$.
 \item[$scatter$] is the scatter function.
@@ -444,60 +459,63 @@ Long Precision Complex & psb\_scatter \\
 \caption{Data types\label{tab:scatter}}
 \end{table}
 
-\syntax{call psb\_scatter}{glob\_x, loc\_x, desc\_a, info, 
-  root, iglobx, jglobx, ilocx, jlocx, k}
-\syntax{call psb\_scatter}{glob\_x, loc\_x, desc\_a, info, 
-  root, iglobx, ilocx}
+\syntax{call psb\_scatter}{glob\_x, loc\_x, desc\_a, info, root}
+\syntax{call psb\_scatter}{glob\_x, loc\_x, desc\_a, info, root}
 
 \begin{description}
 \item[\bf On Entry]
 \item[glob\_x] The array that must be scattered into local pieces.\\
 Scope: {\bf global} \\
 Type: {\bf required}\\
+Intent: {\bf in}.\\
 Specified as: a rank one or two array.
 \item[desc\_a] contains data structures for communications.\\
 Scope: {\bf local} \\
 Type: {\bf required}\\
+Intent: {\bf in}.\\
 Specified as: a structured data of type \descdata.
 \item[root]  The process that holds the global copy. If $root=-1$ all
   the processes have a copy of the global vector.\\
 Scope: {\bf global} \\
 Type: {\bf optional}\\
-Specified as: an integer variable $-1\le ix\le np-1$, default $-1$. 
-\item[iglobx]  Row index to define a submatrix in glob\_x that has to
-  be scattered into local pieces.\\
-Scope: {\bf global} \\
-Type: {\bf optional}\\
-Specified as: an integer variable $1\le ix\le matrix\_data(psb\_m\_)$. 
-\item[jglobx]  Column index to define a submatrix in glob\_x that has to
-  be scattered into local pieces.\\
-Scope: {\bf global} \\
-Type: {\bf optional}\\
-Specified as: an integer variable. 
-\item[ilocx]  Row index to define a submatrix in loc\_x into which
-  scatter the local piece of glob\_x.\\
-Scope: {\bf local} \\
-Type: {\bf optional}\\
-Specified as: an integer variable. 
-\item[jlocx]  Columns index to define a submatrix in loc\_x into which
-  scatter the local piece of glob\_x.\\
-Scope: {\bf global} \\
-Type: {\bf optional}\\
-Specified as: an integer variable.
-\item[k]  The number of columns to scatter.\\
-Scope: {\bf global} \\
-Type: {\bf optional}\\
-Specified as: an integer variable. 
+Intent: {\bf in}.\\
+Specified as: an integer variable $-1\le root\le np-1$, default $-1$. 
+%% \item[iglobx]  Row index to define a submatrix in glob\_x that has to
+%%   be scattered into local pieces.\\
+%% Scope: {\bf global} \\
+%% Type: {\bf optional}\\
+%% Specified as: an integer variable $1\le ix\le matrix\_data(psb\_m\_)$. 
+%% \item[jglobx]  Column index to define a submatrix in glob\_x that has to
+%%   be scattered into local pieces.\\
+%% Scope: {\bf global} \\
+%% Type: {\bf optional}\\
+%% Specified as: an integer variable. 
+%% \item[ilocx]  Row index to define a submatrix in loc\_x into which
+%%   scatter the local piece of glob\_x.\\
+%% Scope: {\bf local} \\
+%% Type: {\bf optional}\\
+%% Specified as: an integer variable. 
+%% \item[jlocx]  Columns index to define a submatrix in loc\_x into which
+%%   scatter the local piece of glob\_x.\\
+%% Scope: {\bf global} \\
+%% Type: {\bf optional}\\
+%% Specified as: an integer variable.
+%% \item[k]  The number of columns to scatter.\\
+%% Scope: {\bf global} \\
+%% Type: {\bf optional}\\
+%% Specified as: an integer variable. 
 \item[\bf On Return] 
 \item[loc\_x] the local portion of global dense matrix
 $glob\_x$. \\
 Scope: {\bf local} \\
 Type: {\bf required}\\
+Intent: {\bf out}.\\
 Specified as: a rank one or two array containing numbers of the type
 indicated in Table~\ref{tab:scatter}.
 \item[info] Error code.\\
 Scope: {\bf local} \\
 Type: {\bf required} \\
+Intent: {\bf out}.\\
 An integer value; 0 means no error has been detected. 
 \end{description}
 

@@ -125,10 +125,12 @@ Aborting...
 \item[err\_c] the error code\\
 Scope: {\bf local} \\
 Type: {\bf required}\\
+Intent: {\bf in}.\\
 Specified as: an integer.
 \item[r\_name] the soutine where the error has been caught.\\
 Scope: {\bf local} \\
 Type: {\bf required}\\
+Intent: {\bf in}.\\
 Specified as: a string.\\
 \item[i\_err] addional info for error code\\
 Scope: {\bf local} \\
@@ -149,6 +151,7 @@ Specified as: a string.\\
 \item[icontxt] the communication context.\\
 Scope: {\bf global} \\
 Type: {\bf optional}\\
+Intent: {\bf in}.\\
 Specified as: an integer.
 \end{description}
 
@@ -163,6 +166,7 @@ Specified as: an integer.
 \item[v] the verbosity level\\
 Scope: {\bf global}\\
 Type: {\bf required}\\
+Intent: {\bf in}.\\
 Specified as: an integer.
 \end{description}
 
@@ -176,6 +180,7 @@ Specified as: an integer.
 \item[err\_act] the type of action.\\
 Scope: {\bf global} \\
 Type: {\bf required}\\
+Intent: {\bf in}.\\
 Specified as: an integer.
 \end{description}
 
@@ -190,10 +195,12 @@ Specified as: an integer.
 \item[icontxt] the communication context.\\
 Scope: {\bf global} \\
 Type: {\bf required}\\
+Intent: {\bf in}.\\
 Specified as: an integer.
 \item[err] the error code to be communicated\\
 Scope: {\bf global} \\
 Type: {\bf required}\\
+Intent: {\bf inout}.\\
 Specified as: an integer.\\
 \end{description}
 

@@ -3,7 +3,7 @@ subroutine psb_get_ovrlap(ovrel,desc,info)
   use psb_realloc_mod
   use psb_error_mod
   implicit none 
-  integer, allocatable            :: ovrel(:)
+  integer, allocatable, intent(out) :: ovrel(:)
   type(psb_desc_type), intent(in) :: desc
   integer, intent(out)            :: info
 

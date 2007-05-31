@@ -39,27 +39,32 @@ Long Precision Complex & psb\_geaxpby \\
 \item[alpha] the scalar $\alpha$.\\
 Scope: {\bf global} \\
 Type: {\bf required} \\
+Intent: {\bf in}.\\
 Specified as: a number of the data type indicated in Table~\ref{tab:f90axpby}.
 \item[x] the local portion of global dense matrix
 $x$.\\
 Scope: {\bf local} \\
 Type: {\bf required} \\
+Intent: {\bf in}.\\
 Specified as: a rank one or two array 
 containing numbers of type 
 specified in Table~\ref{tab:f90axpby}.  The rank of $x$ must be the same of $y$. 
 \item[beta] the scalar $\beta$.\\
 Scope: {\bf global} \\
 Type: {\bf required} \\
+Intent: {\bf in}.\\
 Specified as: a number of the data type indicated in Table~\ref{tab:f90axpby}.
 \item[y] the local portion of the global dense matrix
 $y$. \\
 Scope: {\bf local} \\
 Type: {\bf required} \\
+Intent: {\bf inout}.\\
 Specified as:  a rank one or two array containing numbers of the type 
 indicated in Table~\ref{tab:f90axpby}.  The rank of $y$ must be the same of $x$. 
 \item[desc\_a] contains data structures for communications.\\
 Scope: {\bf local} \\
 Type: {\bf required}\\
+Intent: {\bf in}.\\
 Specified as: a structured data of type \descdata.
 %% \item[n] number of columns in dense submatrices $x$ and $y$.\\
 %% Scope: {\bf global} \\
@@ -86,11 +91,13 @@ Specified as: a structured data of type \descdata.
 \item[y] the local portion of result submatrix $y$.\\
 Scope: {\bf local} \\
 Type: {\bf required} \\
+Intent: {\bf inout}.\\
 Specified as: a rank one or two array containing numbers of the type
 indicated in Table~\ref{tab:f90axpby}.
 \item[info] Error code.\\
 Scope: {\bf local} \\
 Type: {\bf required} \\
+Intent: {\bf out}.\\
 An integer value; 0 means no error has been detected. 
 \end{description}
 
@@ -140,6 +147,7 @@ $x$.\\
 %% local subarray used, based on $jx$ and the field $matrix\_data$ of $desc\_a$ . \\
 Scope: {\bf local} \\
 Type: {\bf required} \\
+Intent: {\bf in}.\\
 Specified as: an array of rank one or two
 containing numbers of type specified in
 Table~\ref{tab:f90dot}. The rank of $x$ must be the same of $y$. 
@@ -149,12 +157,14 @@ $y$. \\
 %% local subarray used, based on $iy, jy$ and the field $matrix\_data$ of $desc\_a$ . \\
 Scope: {\bf local} \\
 Type: {\bf required} \\
+Intent: {\bf in}.\\
 Specified as: an array of rank one or two
 containing numbers of type specified in
 Table~\ref{tab:f90dot}. The rank of $y$ must be the same of $x$. 
 \item[desc\_a] contains data structures for communications.\\
 Scope: {\bf local} \\
 Type: {\bf required}\\
+Intent: {\bf in}.\\
 Specified as: a structured data of type \descdata.
 %% \item[jx]  the column index of global dense matrix $x$,
 %% identifying the column of subvector $x$.\\
@@ -175,6 +185,7 @@ Specified as: a number of the data type indicated in Table~\ref{tab:f90dot}.
 \item[info] Error code.\\
 Scope: {\bf local} \\
 Type: {\bf required} \\
+Intent: {\bf out}.\\
 An integer value; 0 means no error has been detected. 
 \end{description}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -214,6 +225,7 @@ Long Precision Complex & psb\_gedots \\
 $x$. \\
 Scope: {\bf local} \\
 Type: {\bf required} \\
+Intent: {\bf in}.\\
 Specified as: an array of rank one or two
 containing numbers of type specified in
 Table~\ref{tab:f90mdot}. The rank of $x$ must be the same of $y$. 
@@ -221,21 +233,25 @@ Table~\ref{tab:f90mdot}. The rank of $x$ must be the same of $y$.
 $y$. \\
 Scope: {\bf local} \\
 Type: {\bf required} \\
+Intent: {\bf in}.\\
 Specified as: an array of rank one or two
 containing numbers of type specified in
 Table~\ref{tab:f90mdot}. The rank of $y$ must be the same of $x$. 
 \item[desc\_a] contains data structures for communications.\\
 Scope: {\bf local} \\
 Type: {\bf required}\\
+Intent: {\bf in}.\\
 Specified as: a structured data of type \descdata.
 \item[\bf On Return] 
 \item[res] is the dot product of subvectors $x$ and $y$.\\
 Scope: {\bf global} \\
+Intent: {\bf out}.\\
 Specified as: a number or a rank-one array  of the data type indicated
 in Table~\ref{tab:f90dot}. 
 \item[info] Error code.\\
 Scope: {\bf local} \\
 Type: {\bf required} \\
+Intent: {\bf out}.\\
 An integer value; 0 means no error has been detected. 
 \end{description}
 
@@ -286,12 +302,14 @@ $x$. %% This function computes the location of the first element of
 \\
 Scope: {\bf local} \\
 Type: {\bf required} \\
+Intent: {\bf in}.\\
 Specified as:  a rank one or two array  
 containing numbers of type specified in
 Table~\ref{tab:f90amax}.
 \item[desc\_a] contains data structures for communications.\\
 Scope: {\bf local} \\
 Type: {\bf required}\\
+Intent: {\bf in}.\\
 Specified as: a structured data of type \descdata.
 %% \item[jx]  the column index of global dense matrix $x$,
 %% identifying the column of subvector $x$.\\
@@ -307,6 +325,7 @@ Specified as: a long precision real number.
 \item[info] Error code.\\
 Scope: {\bf local} \\
 Type: {\bf required} \\
+Intent: {\bf out}.\\
 An integer value; 0 means no error has been detected. 
 \end{description}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -342,20 +361,24 @@ Long Precision Real &Long Precision Complex & psb\_geamaxs\\
 $x$. \\
 Scope: {\bf local} \\
 Type: {\bf required} \\
+Intent: {\bf in}.\\
 Specified as: a rank one or two array 
 containing numbers of type specified in
 Table~\ref{tab:f90mamax}. 
 \item[desc\_a] contains data structures for communications.\\
 Scope: {\bf local} \\
 Type: {\bf required}\\
+Intent: {\bf in}.\\
 Specified as: a structured data of type \descdata.
 \item[\bf On Return] 
 \item[res] is the infinity norm of the columns of $x$.\\
 Scope: {\bf global} \\
+Intent: {\bf out}.\\
 Specified as: a number or a rank-one array  of long precision real numbers. 
 \item[info] Error code.\\
 Scope: {\bf local} \\
 Type: {\bf required} \\
+Intent: {\bf out}.\\
 An integer value; 0 means no error has been detected. 
 \end{description}
 
@@ -400,12 +423,14 @@ $x$. %% This function computes the location of the first element of
 \\
 Scope: {\bf local} \\
 Type: {\bf required} \\
+Intent: {\bf in}.\\
 Specified as: a rank one or two array 
 containing numbers of type specified in
 Table~\ref{tab:f90asum}.
 \item[desc\_a] contains data structures for communications.\\
 Scope: {\bf local} \\
 Type: {\bf required}\\
+Intent: {\bf in}.\\
 Specified as: a structured data of type \descdata.
 
 \item[\bf On Return] 
@@ -415,6 +440,7 @@ Specified as: a long precision real  number.
 \item[info] Error code.\\
 Scope: {\bf local} \\
 Type: {\bf required} \\
+Intent: {\bf out}.\\
 An integer value; 0 means no error has been detected. 
 \end{description}
 
@@ -456,21 +482,25 @@ $x$. %% This function computes the location of the first element of
 \\
 Scope: {\bf local} \\
 Type: {\bf required} \\
+Intent: {\bf in}.\\
 Specified as: a rank one or two array 
 containing numbers of type specified in
 Table~\ref{tab:f90asums}.
 \item[desc\_a] contains data structures for communications.\\
 Scope: {\bf local} \\
 Type: {\bf required}\\
+Intent: {\bf in}.\\
 Specified as: a structured data of type \descdata.
 
 \item[\bf On Return] 
 \item[res] contains the 1-norm of (the columns of) $x$.\\
 Scope: {\bf global} \\
+Intent: {\bf out}.\\
 Specified as: a long precision real  number.
 \item[info] Error code.\\
 Scope: {\bf local} \\
 Type: {\bf required} \\
+Intent: {\bf out}.\\
 An integer value; 0 means no error has been detected. 
 \end{description}
 
@@ -519,12 +549,14 @@ $x$.%%  This function computes the location of the first element of
 \\
 Scope: {\bf local} \\
 Type: {\bf required} \\
+Intent: {\bf in}.\\
 Specified as:  a rank one or two array 
 containing numbers of type specified in
 Table~\ref{tab:f90nrm2}.
 \item[desc\_a] contains data structures for communications.\\
 Scope: {\bf local} \\
 Type: {\bf required}\\
+Intent: {\bf in}.\\
 Specified as: a structured data of type \descdata.
 %% \item[jx]  the column index of global dense matrix $x$,
 %% identifying the column of subvector $x$.\\
@@ -541,6 +573,7 @@ Specified as: a long precision real number.
 \item[info] Error code.\\
 Scope: {\bf local} \\
 Type: {\bf required} \\
+Intent: {\bf out}.\\
 An integer value; 0 means no error has been detected. 
 \end{description}
 
@@ -584,21 +617,25 @@ $x$. %% This function computes the location of the first element of
 \\
 Scope: {\bf local} \\
 Type: {\bf required} \\
+Intent: {\bf in}.\\
 Specified as: a rank one or two array 
 containing numbers of type specified in
 Table~\ref{tab:f90nrm2s}.
 \item[desc\_a] contains data structures for communications.\\
 Scope: {\bf local} \\
 Type: {\bf required}\\
+Intent: {\bf in}.\\
 Specified as: a structured data of type \descdata.
 
 \item[\bf On Return] 
 \item[res] contains the 1-norm of (the columns of) $x$.\\
 Scope: {\bf global} \\
+Intent: {\bf out}.\\
 Specified as: a long precision real  number.
 \item[info] Error code.\\
 Scope: {\bf local} \\
 Type: {\bf required} \\
+Intent: {\bf out}.\\
 An integer value; 0 means no error has been detected. 
 \end{description}
 
@@ -643,10 +680,12 @@ Long Precision Complex & psb\_spnrmi \\
 $A$. \\   
 Scope: {\bf local} \\
 Type: {\bf required}\\
+Intent: {\bf in}.\\
 Specified as: a structured data of type \spdata.
 \item[desc\_a] contains data structures for communications.\\
 Scope: {\bf local} \\
 Type: {\bf required}\\
+Intent: {\bf in}.\\
 Specified as: a structured data of type \descdata.
 \item[\bf On Return] 
 \item[Function value] is the infinity-norm of sparse submatrix $A$.\\
@@ -655,6 +694,7 @@ Specified as: a long precision real number.
 \item[info] Error code.\\
 Scope: {\bf local} \\
 Type: {\bf required} \\
+Intent: {\bf out}.\\
 An integer value; 0 means no error has been detected. 
 \end{description}
 
@@ -714,12 +754,14 @@ trans, work}
 \item[alpha] the scalar $\alpha$.\\
 Scope: {\bf global} \\
 Type: {\bf required}\\
+Intent: {\bf in}.\\
 Specified as: a number of the data type indicated in
 Table~\ref{tab:f90spmm}. 
 \item[a] the local portion of the sparse matrix
 $A$. \\ 
 Scope: {\bf local} \\
 Type: {\bf required}\\
+Intent: {\bf in}.\\
 Specified as: a structured data of type \spdata.
 \item[x] the local portion of global dense matrix
 $x$. %% This subroutine computes the location of the first element of
@@ -727,12 +769,14 @@ $x$. %% This subroutine computes the location of the first element of
 \\
 Scope: {\bf local} \\
 Type: {\bf required} \\
+Intent: {\bf in}.\\
 Specified as:  a rank one or two array
 containing numbers of type specified in
 Table~\ref{tab:f90spmm}.  The rank of $x$ must be the same of $y$. 
 \item[beta] the scalar $\beta$.\\
 Scope: {\bf global} \\
 Type: {\bf required} \\
+Intent: {\bf in}.\\
 Specified as: a number of the data type indicated in Table~\ref{tab:f90spmm}.
 \item[y] the local portion of global dense matrix
 $y$. %% This subroutine computes the location of the first element of
@@ -740,12 +784,14 @@ $y$. %% This subroutine computes the location of the first element of
 \\
 Scope: {\bf local} \\
 Type: {\bf required} \\
+Intent: {\bf inout}.\\
 Specified as:  a rank one or two array 
 containing numbers of type specified in
 Table~\ref{tab:f90spmm}. The rank of $y$ must be the same of $x$. 
 \item[desc\_a] contains data structures for communications.\\
 Scope: {\bf local} \\
 Type: {\bf required}\\
+Intent: {\bf in}.\\
 Specified as: a structured data of type \descdata.
 \item[trans] indicate what kind of operation to perform.
 \begin{description}
@@ -757,6 +803,7 @@ Specified as: a structured data of type \descdata.
 \end{description}
 Scope: {\bf global} \\
 Type: {\bf optional}\\	
+Intent: {\bf in}.\\
 Default: $trans = N$\\	
 Specified as: a character variable.
 %% \item[k] number of columns in dense submatrices $x$ and $y$. \\
@@ -780,6 +827,7 @@ Specified as: a character variable.
 \item[work]  work array.\\
 Scope: {\bf local} \\
 Type: {\bf optional}\\	
+Intent: {\bf inout}.\\
 Specified as: a rank one array of the same type of $x$ and $y$ with
 the TARGET attribute. 
 
@@ -787,12 +835,14 @@ the TARGET attribute.
 \item[y] the local portion of result submatrix $y$.\\
 Scope: {\bf local} \\
 Type: {\bf required} \\
+Intent: {\bf inout}.\\
 Specified as: an array of rank one or two
 containing numbers of type specified in
 Table~\ref{tab:f90spmm}.
 \item[info] Error code.\\
 Scope: {\bf local} \\
 Type: {\bf required} \\
+Intent: {\bf out}.\\
 An integer value; 0 means no error has been detected. 
 \end{description}
 
@@ -854,12 +904,14 @@ Long Precision Complex & psb\_spsm \\
 \item[alpha] the scalar $\alpha$.\\
 Scope: {\bf global} \\
 Type: {\bf required}\\
+Intent: {\bf in}.\\
 Specified as: a number of the data type indicated in
 Table~\ref{tab:f90spsm}.
 \item[t] the global portion of the sparse matrix
 $T$.  \\ 
 Scope: {\bf local} \\
 Type: {\bf required}\\
+Intent: {\bf in}.\\
 Specified as: a structured data type specified in
 \S~\ref{sec:datastruct}.
 \item[x] the local portion of global dense matrix
@@ -868,12 +920,14 @@ $x$. %% This subroutine computes the location of the first element of
 \\
 Scope: {\bf local} \\
 Type: {\bf required} \\
+Intent: {\bf in}.\\
 Specified as:  a rank one or two array 
 containing numbers of type specified in
 Table~\ref{tab:f90spsm}.  The rank of $x$ must be the same of $y$. 
 \item[beta] the scalar $\beta$.\\
 Scope: {\bf global} \\
 Type: {\bf required} \\
+Intent: {\bf in}.\\
 Specified as: a number of the data type indicated in Table~\ref{tab:f90spsm}.
 \item[y] the local portion of global dense matrix
 $y$. %% This subroutine computes the location of the first element of
@@ -881,12 +935,14 @@ $y$. %% This subroutine computes the location of the first element of
 \\
 Scope: {\bf local} \\
 Type: {\bf required} \\
+Intent: {\bf inout}.\\
 Specified as:  a rank one or two array 
 containing numbers of type specified in
 Table~\ref{tab:f90spsm}. The rank of $y$ must be the same of $x$. 
 \item[desc\_a] contains data structures for communications.\\
 Scope: {\bf local} \\
 Type: {\bf required}\\
+Intent: {\bf in}.\\
 Specified as: a structured data of type \descdata.
 \item[trans] specify with {\em unitd} the operation to perform.
 \begin{description}
@@ -896,6 +952,7 @@ Specified as: a structured data of type \descdata.
 \end{description}
 Scope: {\bf global} \\
 Type: {\bf optional}\\	
+Intent: {\bf in}.\\
 Default: $trans = N$\\	
 Specified as: a character variable.
 \item[unitd] specify with {\em trans} the operation to perform.
@@ -906,6 +963,7 @@ Specified as: a character variable.
 \end{description}
 Scope: {\bf global} \\
 Type: {\bf optional}\\	
+Intent: {\bf in}.\\
 Default: $unitd = U$\\	
 Specified as: a character variable.
 \item[choice] specifies the update of overlap elements to be performed
@@ -918,17 +976,20 @@ Specified as: a character variable.
 \end{description}
 Scope: {\bf global} \\
 Type: {\bf optional}\\	
+Intent: {\bf in}.\\
 Default: \verb|psb_avg_|\\	
 Specified as: an integer variable.
 \item[diag] the diagonal scaling matrix.\\
 Scope: {\bf local} \\
 Type: {\bf optional}\\	
+Intent: {\bf in}.\\
 Default: $diag(1) = 1 (no scaling)$\\	
 Specified as: a rank one  array containing numbers of the type
 indicated in Table~\ref{tab:f90spsm}.
 \item[work] a work array. \\
 Scope: {\bf local} \\
 Type: {\bf optional}\\	
+Intent: {\bf inout}.\\
 Specified as: a rank one array of the same type of $x$ with the
 TARGET attribute. 
 
@@ -939,12 +1000,14 @@ $y$. %% This subroutine computes the location of the first element of
 \\
 Scope: {\bf local} \\
 Type: {\bf required} \\
+Intent: {\bf inout}.\\
 Specified as: an array of rank one or two
 containing numbers of type specified in
 Table~\ref{tab:f90spsm}.
 \item[info] Error code.\\
 Scope: {\bf local} \\
 Type: {\bf required} \\
+Intent: {\bf out}.\\
 An integer value; 0 means no error has been detected. 
 \end{description}
 

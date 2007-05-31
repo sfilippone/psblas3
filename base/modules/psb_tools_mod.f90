@@ -590,7 +590,7 @@ Module psb_tools_mod
     subroutine psb_get_ovrlap(ovrel,desc,info)
       use psb_descriptor_type
       implicit none 
-      integer, allocatable            :: ovrel(:)
+      integer, allocatable, intent(out) :: ovrel(:)
       type(psb_desc_type), intent(in) :: desc
       integer, intent(out)            :: info
     end subroutine psb_get_ovrlap
@@ -604,7 +604,7 @@ contains
     use psb_descriptor_type
     use psi_mod
     implicit none 
-    integer, allocatable            :: bndel(:)
+    integer, allocatable, intent(out) :: bndel(:)
     type(psb_desc_type), intent(in) :: desc
     integer, intent(out)            :: info
 

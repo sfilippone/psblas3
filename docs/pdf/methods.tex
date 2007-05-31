@@ -45,63 +45,77 @@ $r_i=b-Ax_i$ the corresponding residual at the $i$-th iteration.
 $A$. \\
 Scope: {\bf local} \\
 Type: {\bf required}\\
+Intent: {\bf in}.\\
 Specified as: a structured data of type \spdata.
 \item[prec] The data structure containing the preconditioner.\\
 Scope: {\bf local} \\
 Type: {\bf required}\\
+Intent: {\bf in}.\\
 Specified as: a structured data of type \precdata.
 \item[b] The RHS vector. \\
 Scope: {\bf local} \\
 Type: {\bf required}\\
+Intent: {\bf in}.\\
 Specified as: a rank one array.
 \item[x] The initial guess. \\
 Scope: {\bf local} \\
 Type: {\bf required}\\
+Intent: {\bf inout}.\\
 Specified as: a rank one array.
 \item[eps] The stopping tolerance. \\
 Scope: {\bf global} \\
 Type: {\bf required}\\
+Intent: {\bf in}.\\
 Specified as: a real number. 
 \item[desc\_a] contains data structures for communications.\\
 Scope: {\bf local} \\
 Type: {\bf required}\\
+Intent: {\bf in}.\\
 Specified as: a structured data of type \descdata.
 \item[itmax]  The maximum number of iterations to perform.\\
 Scope: {\bf global} \\
 Type: {\bf optional}\\
+Intent: {\bf in}.\\
 Default: $itmax = 1000$.\\
 Specified as: an integer variable $itmax \ge 1$.
 \item[itrace] If $>0$  print out an informational message about
   convergence  every $itrace$ iterations.\\ 
 Scope: {\bf global} \\
 Type: {\bf optional}\\
+Intent: {\bf in}.\\
 \item[irst]  An integer specifying the restart parameter.\\
 Scope: {\bf global} \\
 Type: {\bf optional}.\\
+Intent: {\bf in}.\\
 Values: $irst>0$. This is employed for the BiCGSTABL or RGMRES
 methods, otherwise it is ignored. 
 
 \item[istop]  An integer specifying the stopping criterion.\\
 Scope: {\bf global} \\
 Type: {\bf optional}.\\
+Intent: {\bf in}.\\
 Values: 1: use the normwise backward error, 2: use the scaled 2-norm
 of the residual. Default: 1. 
 \item[\bf On Return] 
 \item[x] The computed solution. \\
 Scope: {\bf local} \\
 Type: {\bf required}\\
+Intent: {\bf inout}.\\
 Specified as: a rank one array.
 \item[iter]  The number of iterations performed.\\
 Scope: {\bf global} \\
 Type: {\bf optional}\\
+Intent: {\bf out}.\\
 Returned  as: an integer variable.
 \item[err]  The convergence estimate on exit.\\
 Scope: {\bf global} \\
 Type: {\bf optional}\\
+Intent: {\bf out}.\\
 Returned  as: a real number.
 \item[info] Error code.\\
 Scope: {\bf local} \\
 Type: {\bf required} \\
+Intent: {\bf out}.\\
 An integer value; 0 means no error has been detected. 
 \end{description}
 

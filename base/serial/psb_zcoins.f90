@@ -449,12 +449,12 @@ contains
     implicit none 
 
     integer, intent(in) :: nz, imin,imax,jmin,jmax,nzl,maxsz
-    integer, intent(in) :: ia(*),ja(*)
+    integer, intent(in) :: ia(:),ja(:)
     integer, intent(inout) :: nza
-    complex(kind(1.d0)), intent(in) :: val(*)
-    complex(kind(1.d0)), intent(inout) :: aspk(*)
+    complex(kind(1.d0)), intent(in) :: val(:)
+    complex(kind(1.d0)), intent(inout) :: aspk(:)
     integer, intent(out) :: info
-    integer, intent(in), optional  :: ng,gtl(*)
+    integer, intent(in), optional  :: ng,gtl(:)
     integer  :: i,ir,ic
 
     if (present(gtl)) then 
@@ -522,12 +522,12 @@ contains
     implicit none 
 
     integer, intent(in) :: nz, imin,imax,jmin,jmax,maxsz
-    integer, intent(in) :: ia(*),ja(*)
-    integer, intent(inout) :: nza,ia1(*),ia2(*)
-    complex(kind(1.d0)), intent(in) :: val(*)
-    complex(kind(1.d0)), intent(inout) :: aspk(*)
+    integer, intent(in) :: ia(:),ja(:)
+    integer, intent(inout) :: nza,ia1(:),ia2(:)
+    complex(kind(1.d0)), intent(in)    :: val(:)
+    complex(kind(1.d0)), intent(inout) :: aspk(:)
     integer, intent(out) :: info
-    integer, intent(in), optional  :: ng,gtl(*)
+    integer, intent(in), optional  :: ng,gtl(:)
     integer :: i,ir,ic
 
     info = 0

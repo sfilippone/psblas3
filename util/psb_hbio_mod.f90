@@ -47,7 +47,7 @@ contains
     integer, intent(out)                   :: iret
     integer, optional, intent(in)          :: iunit
     character(len=*), optional, intent(in) :: filename
-    real(kind(1.d0)), optional, pointer    :: b(:) 
+    real(kind(1.d0)), optional, allocatable :: b(:) 
     character(len=72), optional, intent(out) :: mtitle
 
     character  :: rhstype,type*3,key*8
@@ -106,13 +106,8 @@ contains
         if (valcrd.gt.0) read (infile,fmt=valfmt) (a%aspk(i),i=1,nnzero)
 
         if (present(b)  .and. (rhscrd.gt.0)) then
-          if (associated(b)) then 
-            if (size(b) < nrow) deallocate(b)
-          endif
-          if (.not.associated(b)) then 
-            allocate(b(nrow),stat=info)
-          endif
-          read (infile,fmt=rhsfmt) (b(i),i=1,nrow)
+          call psb_ensure_size(nrow,b,info)
+          if (info == 0) read (infile,fmt=rhsfmt) (b(i),i=1,nrow)
         endif
 
       else if (tolower(type(2:2)) == 's') then 
@@ -125,13 +120,8 @@ contains
         if (valcrd.gt.0) read (infile,fmt=valfmt) (a%aspk(i),i=1,nnzero)
 
         if (present(b)  .and. (rhscrd.gt.0)) then
-          if (associated(b)) then 
-            if (size(b) < nrow) deallocate(b)
-          endif
-          if (.not.associated(b)) then 
-            allocate(b(nrow),stat=info)
-          endif
-          read (infile,fmt=rhsfmt) (b(i),i=1,nrow)
+          call psb_ensure_size(nrow,b,info)
+          if (info == 0) read (infile,fmt=rhsfmt) (b(i),i=1,nrow)
         endif
 
         call psb_ipcsr2coo(a,ircode)
@@ -306,7 +296,7 @@ contains
     integer, intent(out)                   :: iret
     integer, optional, intent(in)          :: iunit
     character(len=*), optional, intent(in) :: filename
-    real(kind(1.d0)), optional, pointer    :: b(:) 
+    real(kind(1.d0)), optional, allocatable  :: b(:) 
     character(len=72), optional, intent(out) :: mtitle
 
     character  :: rhstype,type*3,key*8
@@ -365,13 +355,8 @@ contains
         if (valcrd.gt.0) read (infile,fmt=valfmt) (a%aspk(i),i=1,nnzero)
 
         if (present(b)  .and. (rhscrd.gt.0)) then
-          if (associated(b)) then 
-            if (size(b) < nrow) deallocate(b)
-          endif
-          if (.not.associated(b)) then 
-            allocate(b(nrow),stat=info)
-          endif
-          read (infile,fmt=rhsfmt) (b(i),i=1,nrow)
+          call psb_ensure_size(nrow,b,info)
+          if (info == 0) read (infile,fmt=rhsfmt) (b(i),i=1,nrow)
         endif
 
       else if (tolower(type(2:2)) == 's') then 
@@ -394,13 +379,8 @@ contains
         if (valcrd.gt.0) read (infile,fmt=valfmt) (a%aspk(i),i=1,nnzero)
 
         if (present(b)  .and. (rhscrd.gt.0)) then
-          if (associated(b)) then 
-            if (size(b) < nrow) deallocate(b)
-          endif
-          if (.not.associated(b)) then 
-            allocate(b(nrow),stat=info)
-          endif
-          read (infile,fmt=rhsfmt) (b(i),i=1,nrow)
+          call psb_ensure_size(nrow,b,info)
+          if (info == 0) read (infile,fmt=rhsfmt) (b(i),i=1,nrow)
         endif
         
 
@@ -455,13 +435,8 @@ contains
         if (valcrd.gt.0) read (infile,fmt=valfmt) (a%aspk(i),i=1,nnzero)
 
         if (present(b)  .and. (rhscrd.gt.0)) then
-          if (associated(b)) then 
-            if (size(b) < nrow) deallocate(b)
-          endif
-          if (.not.associated(b)) then 
-            allocate(b(nrow),stat=info)
-          endif
-          read (infile,fmt=rhsfmt) (b(i),i=1,nrow)
+          call psb_ensure_size(nrow,b,info)
+          if (info == 0) read (infile,fmt=rhsfmt) (b(i),i=1,nrow)
         endif
         
         call psb_ipcsr2coo(a,ircode)

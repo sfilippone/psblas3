@@ -30,13 +30,10 @@ module  \verb|psb_prec_mod|.
 
 \begin{description}
 \item[\bf On Entry]
-\item[prec] 
-Scope: {\bf local} \\
-Type: {\bf required}\\
-Specified as: a preconditioner data structure \precdata.
 \item[ptype] the type of preconditioner. 
 Scope: {\bf global} \\
 Type: {\bf required}\\
+Intent: {\bf in}.\\
 Specified as: a character string, see usage notes.
 %% \item[iv] integer parameters for the precondtioner. 
 %% Scope: {\bf global} \\
@@ -48,9 +45,15 @@ Specified as: a character string, see usage notes.
 %% Specified as: a long precision real number.
 \item[\bf On Exit]
 
+\item[prec] 
+Scope: {\bf local} \\
+Type: {\bf required}\\
+Intent: {\bf inout}.\\
+Specified as: a preconditioner data structure \precdata.
 \item[info] 
 Scope: {\bf global} \\
 Type: {\bf required}\\
+Intent: {\bf out}.\\
 Error code: if no error, 0 is returned.
 \end{description}
 \subsection*{Usage Notes}
@@ -153,14 +156,22 @@ $ptype$ string as follows\footnote{The string is case-insensitive}:
 \item[a] the system sparse matrix.
 Scope: {\bf local} \\
 Type: {\bf required}\\
+Intent: {\bf in}, target.\\
 Specified as: a sparse matrix data structure \spdata.
+\item[prec] the preconditioner.\\
+Scope: {\bf local} \\
+Type: {\bf required}\\
+Intent: {\bf inout}.\\
+Specified as: an already initialized precondtioner data structure \precdata\\
 \item[desc\_a] the problem communication descriptor. 
 Scope: {\bf local} \\
 Type: {\bf required}\\
+Intent: {\bf in}, target.\\
 Specified as: a communication descriptor data structure \descdata.
 \item[upd] 
 Scope: {\bf global} \\
 Type: {\bf optional}\\
+Intent: {\bf in}.\\
 Specified as: a character.
 \end{description}
 
@@ -169,10 +180,12 @@ Specified as: a character.
 \item[prec] the preconditioner.\\
 Scope: {\bf local} \\
 Type: {\bf required}\\
+Intent: {\bf inout}.\\
 Specified as: a precondtioner data structure \precdata\\
 \item[info] Error code.\\
 Scope: {\bf local} \\
 Type: {\bf required} \\
+Intent: {\bf out}.\\
 An integer value; 0 means no error has been detected. 
 \end{description}
 
@@ -188,22 +201,27 @@ An integer value; 0 means no error has been detected.
 \item[prec] the preconditioner.
 Scope: {\bf local} \\
 Type: {\bf required}\\
+Intent: {\bf in}.\\
 Specified as: a preconditioner data structure \precdata.
 \item[x] the source vector.
 Scope: {\bf local} \\
-Type: {\bf require}\\
+Type: {\bf required}\\
+Intent: {\bf inout}.\\
 Specified as: a double precision array.
 \item[desc\_a] the problem communication descriptor.
 Scope: {\bf local} \\
 Type: {\bf required}\\
+Intent: {\bf in}.\\
 Specified as: a communication data structure \descdata.
 \item[trans] 
 Scope: {\bf } \\
 Type: {\bf optional}\\
+Intent: {\bf in}.\\
 Specified as: a character.
 \item[work] an optional work space
 Scope: {\bf local} \\
 Type: {\bf optional}\\
+Intent: {\bf inout}.\\
 Specified as: a double precision array.
 \end{description}
 
@@ -212,10 +230,12 @@ Specified as: a double precision array.
 \item[y] the destination vector.
 Scope: {\bf local} \\
 Type: {\bf required}\\
+Intent: {\bf inout}.\\
 Specified as: a double precision array.
 \item[info] Error code.\\
 Scope: {\bf local} \\
 Type: {\bf required} \\
+Intent: {\bf out}.\\
 An integer value; 0 means no error has been detected. 
 \end{description}
 
@@ -230,6 +250,7 @@ An integer value; 0 means no error has been detected.
 \item[prec] the preconditioner.
 Scope: {\bf local} \\
 Type: {\bf required}\\
+Intent: {\bf in}.\\
 Specified as: a preconditioner data structure \precdata.
 \end{description}
 
