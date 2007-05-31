@@ -125,8 +125,8 @@ contains
 
     type(psb_zspmat_type)          :: a,b
     integer                        :: m,ma,mb,l1,l2,info
-    integer, dimension(*)          :: lia1,lia2,uia1,uia2
-    complex(kind(1.d0)), dimension(*) :: laspk,uaspk,d
+    integer, dimension(:)          :: lia1,lia2,uia1,uia2
+    complex(kind(1.d0)), dimension(:) :: laspk,uaspk,d
 
     integer :: i,j,k,l,low1,low2,kk,jj,ll, irb, ktrw,err_act
     complex(kind(1.d0)) :: dia,temp
