@@ -1889,18 +1889,19 @@ contains
 
   end subroutine psb_isndv
 
-  subroutine psb_isndm(ictxt,dat,dst)
+  subroutine psb_isndm(ictxt,dat,dst,m)
     use psb_error_mod
     integer, intent(in)  :: ictxt
     integer, intent(in)  :: dat(:,:)
     integer, intent(in)  :: dst
+    integer, intent(in), optional :: m
 
 #if defined(SERIAL_MPI) 
     if (psb_get_errverbosity() >1) then 
       write(0,*) "Warning: process sending a message in serial mode (to itself)"
     endif
 #else
-    call gesd2d(ictxt,dat,dst,0) 
+    call gesd2d(ictxt,dat,dst,0,m) 
 #endif    
 
   end subroutine psb_isndm
@@ -1939,18 +1940,20 @@ contains
 
   end subroutine psb_dsndv
 
-  subroutine psb_dsndm(ictxt,dat,dst)
+  subroutine psb_dsndm(ictxt,dat,dst,m)
     use psb_error_mod
     integer, intent(in)  :: ictxt
     real(kind(1.d0)), intent(in)  :: dat(:,:)
     integer, intent(in)  :: dst
+    integer, intent(in), optional :: m
+
 
 #if defined(SERIAL_MPI) 
     if (psb_get_errverbosity() >1) then 
       write(0,*) "Warning: process sending a message in serial mode (to itself)"
     endif
 #else
-    call gesd2d(ictxt,dat,dst,0) 
+    call gesd2d(ictxt,dat,dst,0,m) 
 #endif    
 
   end subroutine psb_dsndm
@@ -1989,18 +1992,20 @@ contains
 
   end subroutine psb_zsndv
 
-  subroutine psb_zsndm(ictxt,dat,dst)
+  subroutine psb_zsndm(ictxt,dat,dst,m)
     use psb_error_mod
     integer, intent(in)  :: ictxt
     complex(kind(1.d0)), intent(in)  :: dat(:,:)
     integer, intent(in)  :: dst
+    integer, intent(in), optional :: m
+
 #if defined(SERIAL_MPI) 
     if (psb_get_errverbosity() >1) then 
       write(0,*) "Warning: process sending a message in serial mode (to itself)"
     endif
 #else
 
-    call gesd2d(ictxt,dat,dst,0) 
+    call gesd2d(ictxt,dat,dst,0,m) 
 #endif    
 
   end subroutine psb_zsndm
@@ -2040,11 +2045,13 @@ contains
 
   end subroutine psb_ircvv
 
-  subroutine psb_ircvm(ictxt,dat,src)
+  subroutine psb_ircvm(ictxt,dat,src,m)
     use psb_error_mod
     integer, intent(in)  :: ictxt
     integer, intent(inout)  :: dat(:,:)
     integer, intent(in)  :: src
+    integer, intent(in), optional :: m
+
 
 #if defined(SERIAL_MPI) 
     if (psb_get_errverbosity() >0) then 
@@ -2053,7 +2060,7 @@ contains
     dat = 0
 #else
 
-    call gerv2d(ictxt,dat,src,0) 
+    call gerv2d(ictxt,dat,src,0,m) 
 #endif    
 
   end subroutine psb_ircvm
@@ -2094,11 +2101,13 @@ contains
 
   end subroutine psb_drcvv
 
-  subroutine psb_drcvm(ictxt,dat,src)
+  subroutine psb_drcvm(ictxt,dat,src,m)
     use psb_error_mod
     integer, intent(in)  :: ictxt
     real(kind(1.d0)), intent(inout)  :: dat(:,:)
     integer, intent(in)  :: src
+    integer, intent(in), optional :: m
+
 
 #if defined(SERIAL_MPI) 
     if (psb_get_errverbosity() >0) then 
@@ -2106,7 +2115,7 @@ contains
     endif
     dat = 0
 #else
-    call gerv2d(ictxt,dat,src,0) 
+    call gerv2d(ictxt,dat,src,0,m) 
 #endif    
 
   end subroutine psb_drcvm
@@ -2147,11 +2156,13 @@ contains
 
   end subroutine psb_zrcvv
 
-  subroutine psb_zrcvm(ictxt,dat,src)
+  subroutine psb_zrcvm(ictxt,dat,src,m)
     use psb_error_mod
     integer, intent(in)  :: ictxt
     complex(kind(1.d0)), intent(inout)  :: dat(:,:)
     integer, intent(in)  :: src
+    integer, intent(in), optional :: m
+
 
 #if defined(SERIAL_MPI) 
     if (psb_get_errverbosity() >0) then 
@@ -2159,7 +2170,7 @@ contains
     endif
     dat = 0
 #else
-    call gerv2d(ictxt,dat,src,0) 
+    call gerv2d(ictxt,dat,src,0,m) 
 #endif    
 
   end subroutine psb_zrcvm

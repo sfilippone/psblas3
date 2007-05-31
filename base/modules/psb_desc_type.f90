@@ -102,7 +102,7 @@ module psb_descriptor_type
   !  This is the most important data structure: it holds all the data 
   !  necessary to organize data exchange. The pattern of communication 
   !  among processes depends not only on the allocation of portions of 
-  !  the index space to the various processes, but also on the undelying
+  !  the index space to the various processes, but also on the underlying
   !  mesh discretization pattern. Thus building a communication descriptor is
   !  very much linked to building a sparse matrix (since the matrix sparsity 
   !  pattern embodies the topology of the discretization graph).
