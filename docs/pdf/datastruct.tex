@@ -92,8 +92,7 @@ Specified as: an allocatable integer array of rank one.
 global identifier of the local variable $i$.\\
 Specified as: an allocatable integer array of rank one.
 \item[{\bf glob\_to\_loc, glb\_lc, hashv}] Contain a mapping from
-  global to local indices. The mapping may be stored in two different
-  formats depending on the size of the index space. 
+  global to local indices. 
 \end{description}
 The Fortran95 definition  for \verb|psb_desc_type| structures is 
 as follows:
@@ -129,6 +128,15 @@ state, which can take the following values:
   the associated sparse matrix, such as matrix-vector products, are
   only possible   in this state.
 \end{description}
+The global to local index  mapping may be stored in two different
+formats: the first is simpler but more expensive, as it requires on
+each process an amount of memory proportional to the global size of
+the index space; the second is more complex, but only requires memory
+proportional to the local index space size. The choice is made at the
+time of the initialization according to a threshold; this threshold
+may be queried and set using the functions in
+sec.~\ref{sec:dataquery}. 
+
 \subsubsection{Named Constants}
 \label{sec:cd_constants}
 \begin{description}
@@ -152,7 +160,6 @@ state, which can take the following values:
 %% \item[psb\_desc\_bld\_] State of the descriptor: build, must be
 %%   assembled before computational use.
 \end{description}
-
 
 
 \subsection{Sparse Matrix data structure}
@@ -454,6 +461,31 @@ Specified as: a structured data of type \descdata.
 \item[Function value] The communication context.
 \end{description}
 
+
+\subsubroutine{psb\_cd\_get\_large\_threshold}{Get threshold for
+  index mapping switch}
+\syntax{ith = psb\_cd\_get\_large\_threshold}{}
+
+\begin{description}
+\item[\bf On Return]
+\item[Function value] The current value for the size threshold. 
+
+\end{description}
+
+
+
+\subsubroutine{psb\_cd\_set\_large\_threshold}{Set threshold for
+  index mapping switch}
+\syntax{call psb\_cd\_set\_large\_threshold}{ith}
+
+\begin{description}
+\item[\bf On Entry]
+\item[ith] the new threshold for communication descriptors.\\
+Scope: {\bf global}.\\
+Type: {\bf required}.\\
+Intent: {\bf in}.\\
+Specified as: an integer value greater than zero.
+\end{description}
 
 
 \subsubroutine{psb\_sp\_get\_nrows}{Get number of  rows in a sparse matrix}

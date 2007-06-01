@@ -50,9 +50,10 @@
 \newcommand{\examplename}{Example}
 \newcommand{\syntaxname}{Syntax}
 \def\syntax{\@ifstar{\@ssyntax}{\@syntax}}%
-\def\@syntax{\section*{\syntaxname}%
+\def\@syntax{\nobreak\section*{\syntaxname}%
      \@ssyntax}%
 \def\@ssyntax#1#2{%
+  \nobreak
    \setbox\@tempboxa\hbox{#1\ {\em $($#2$)$}}%
    \ifdim \wd\@tempboxa >\hsize
         \setbox\@tempboxa\hbox{\em $($#2$)$}
