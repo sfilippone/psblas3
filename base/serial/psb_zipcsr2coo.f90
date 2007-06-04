@@ -63,10 +63,11 @@ Subroutine psb_zipcsr2coo(a,info)
 
   nr  = a%m 
   nza = a%ia2(nr+1) - 1
-  allocate(iaux(nza),stat=info)
-  if (info /=0) then 
-    write(0,*) 'Failed allocation ',info, nza
-    return
+  allocate(iaux(max(nza,1)),stat=info)
+  if (info /= 0) then 
+    info=4025
+    call psb_errpush(info,name,a_err='integer',i_err=(/max(nza,1),0,0,0,0/))
+    goto 9999      
   end if
 !!$  write(0,*) 'ipcsr2coo ',a%m      
   call psb_transfer(a%ia2,itemp,info)

@@ -74,7 +74,12 @@ subroutine psb_dipcoo2csc(a,info,clshr)
   call psb_fixcoo(a,info,idir=1)
   nc  = a%k
   nza = a%infoa(psb_nnz_)
-  allocate(iaux(nc+1))
+  allocate(iaux(max(nc+1,1)),stat=info)
+  if (info /= 0) then 
+    info=4025
+    call psb_errpush(info,name,a_err='integer',i_err=(/max(nc+1,1),0,0,0,0/))
+    goto 9999      
+  end if
   if(debug) write(0,*)'DIPCOO2CSC: out of fixcoo',nza,nc,size(a%ia2),size(iaux)
 
   call psb_transfer(a%ia2,itemp,info)

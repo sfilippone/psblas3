@@ -74,9 +74,10 @@ subroutine psb_zipcoo2csr(a,info,rwshr)
   call psb_fixcoo(a,info)
   nr  = a%m 
   nza = a%infoa(psb_nnz_)
-  allocate(iaux(nr+1),stat=info)
+  allocate(iaux(max(nr+1,1)),stat=info)
   if (info /= 0) then 
-    call psb_errpush(4010,name,a_err='Allocate')
+    info=4025
+    call psb_errpush(info,name,a_err='integer',i_err=(/max(nr+1,1),0,0,0,0/))
     goto 9999      
   end if
 
