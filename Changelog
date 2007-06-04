@@ -1,6 +1,10 @@
 Changelog. A lot less detailed than usual, at least for past
 history. 
 
+2007/06/04: Fixed implementation of fctint and coins: assume size
+	    arrays caused troubles on some compilers. Documentation of
+	    set_large_threshold. 
+
 2007/05/22: Defined psb_precinit. 
 
 2007/05/15: Defined psb_sizeof.
