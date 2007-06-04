@@ -546,7 +546,7 @@ contains
     integer                              :: lrw,info
     integer, optional                    :: iren(:)
     integer  :: nzin_, nza, idx,ip,jp,i,j,k, nzt
-    logical, parameter :: debug=.true.
+    logical, parameter :: debug=.false.
 
     nza = a%infoa(psb_nnz_)
     if (a%pl(1) /= 0) then
