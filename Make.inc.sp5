@@ -45,6 +45,7 @@ BLACS=-lblacssmp
 
 #######################  Section 4 #######################
 #  Other useful tools&defines                            #
+#  SLU and UMF need only be set when using MLD2P4        #
 ##########################################################
 #SLUDIR=/usr/local/SuperLU_3.0
 #SLU=-lslu -L$(SLUDIR)

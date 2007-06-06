@@ -45,14 +45,15 @@ EXTRA_COBJS=fakempi.o
 
 #######################  Section 4 #######################
 #  Other useful tools&defines                            #
+#  SLU and UMF need only be set when using MLD2P4        #
 ##########################################################
-SLUDIR=/usr/local/SuperLU_3.0
-SLU=-lslu_lx_gcc42 -L$(SLUDIR)
-SLUDEF=-DHave_SLU_ -I$(SLUDIR)
+#SLUDIR=/usr/local/SuperLU_3.0
+#SLU=-lslu_lx_gcc42 -L$(SLUDIR)
+#SLUDEF=-DHave_SLU_ -I$(SLUDIR)
 
-UMFDIR=$(HOME)/LIB/Umfpack_gcc41
-UMF=-lumfpack -lamd -L$(UMFDIR)
-UMFDEF=-DHave_UMF_ -I$(UMFDIR)
+#UMFDIR=$(HOME)/LIB/Umfpack_gcc41
+#UMF=-lumfpack -lamd -L$(UMFDIR)
+#UMFDEF=-DHave_UMF_ -I$(UMFDIR)
 #
 #  We are using the public domain tool METIS from U. Minnesota. To get it
 #  check URL http://www.cs.umn.edu:~karypis
