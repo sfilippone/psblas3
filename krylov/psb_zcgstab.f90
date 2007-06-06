@@ -140,6 +140,19 @@ Subroutine psb_zcgstab(a,prec,b,x,eps,desc_a,info,&
     goto 9999
   endif
 
+  call psb_chkvect(mglob,1,size(x,1),1,1,desc_a,info)
+  if(info /= 0) then
+    info=4010
+    call psb_errpush(info,name,a_err='psb_chkvect on X')
+    goto 9999
+  end if
+  call psb_chkvect(mglob,1,size(b,1),1,1,desc_a,info)
+  if(info /= 0) then
+    info=4010    
+    call psb_errpush(info,name,a_err='psb_chkvect on B')
+    goto 9999
+  end if
+
   naux=6*n_col 
   allocate(aux(naux),stat=info)
   if (info==0) call psb_geall(wwrk,desc_a,info,n=8)

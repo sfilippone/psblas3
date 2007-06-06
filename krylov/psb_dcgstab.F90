@@ -160,6 +160,19 @@ Subroutine psb_dcgstab(a,prec,b,x,eps,desc_a,info,&
     goto 9999
   endif
 
+  call psb_chkvect(mglob,1,size(x,1),1,1,desc_a,info)
+  if(info /= 0) then
+    info=4010
+    call psb_errpush(info,name,a_err='psb_chkvect on X')
+    goto 9999
+  end if
+  call psb_chkvect(mglob,1,size(b,1),1,1,desc_a,info)
+  if(info /= 0) then
+    info=4010    
+    call psb_errpush(info,name,a_err='psb_chkvect on B')
+    goto 9999
+  end if
+
   naux=6*n_col 
   allocate(aux(naux),stat=info)
   if (info == 0) call psb_geall(wwrk,desc_a,info,n=8)
@@ -326,12 +339,12 @@ Subroutine psb_dcgstab(a,prec,b,x,eps,desc_a,info,&
       If (debug) Write(0,*) 'Bi-CGSTAB SIGMA:',sigma
       alpha = rho/sigma
       Call psb_geaxpby(done,r,dzero,s,desc_a,info)
-      if(info.ne.0) then
+      if(info /= 0) then
          call psb_errpush(4010,name,a_err='psb_geaxpby')
          goto 9999
       end if
       Call psb_geaxpby(-alpha,v,done,s,desc_a,info)
-      if(info.ne.0) then
+      if(info /= 0) then
          call psb_errpush(4010,name,a_err='psb_geaxpby')
          goto 9999
       end if
@@ -343,7 +356,7 @@ Subroutine psb_dcgstab(a,prec,b,x,eps,desc_a,info,&
 #ifdef MPE_KRYLOV
       imerr = MPE_Log_event( ifcte, 0, "ed PREC" )
 #endif
-      if(info.ne.0) then
+      if(info /= 0) then
          call psb_errpush(4010,name,a_err='psb_precaply')
          goto 9999
       end if
@@ -357,7 +370,7 @@ Subroutine psb_dcgstab(a,prec,b,x,eps,desc_a,info,&
       imerr = MPE_Log_event( imme, 0, "ed SPMM" )
 #endif
 
-      if(info.ne.0) then
+      if(info /= 0) then
          call psb_errpush(4010,name,a_err='psb_spmm')
          goto 9999
       end if
