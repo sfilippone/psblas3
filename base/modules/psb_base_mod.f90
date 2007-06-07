@@ -30,9 +30,9 @@
 !!$  
 module psb_base_mod
   use psb_string_mod
-  use psb_check_mod
   use psb_error_mod
   use psb_penv_mod
+  use psb_check_mod
   use psb_descriptor_type
   use psb_serial_mod
   use psb_comm_mod
