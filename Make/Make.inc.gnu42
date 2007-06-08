@@ -6,10 +6,11 @@
 #######################  Section 1 #######################
 #  Define your compilers and compiler flags here         #
 ##########################################################
-F90=/usr/local/gcc42/bin/gfortran
-FC=/usr/local/gcc42/bin/gfortran
+GNU42BIN=/usr/local/gcc42/bin
+F90=$(GNU42BIN)/gfortran
+FC=$(GNU42BIN)/gfortran
 F77=$(FC)
-CC=/usr/local/gcc42/bin/gcc
+CC=$(GNU42BIN)/gcc
 F90COPT=-O3 
 FCOPT=-O3   
 CCOPT=-O3   
@@ -26,11 +27,13 @@ FIFLAG=-I
 #   MPI_FINC=-DMPI_H  or MPI_FINC=-DMPI_MOD              #
 #  If necessary add an include dir                       #
 ##########################################################
-F90LINK=/usr/local/mpich-gcc42/bin/mpif90 
-FLINK=/usr/local/mpich-gcc42/bin/mpif77 
-MPF90=/usr/local/mpich-gcc42/bin/mpif90 
-MPF77=/usr/local/mpich-gcc42/bin/mpif77 	
-MPCC=/usr/local/mpich-gcc42/bin/mpicc 
+MPIDIR=/usr/local/mpich-gcc42
+MPIBIN=$(MPIDIR)/bin
+F90LINK=$(MPIBIN)/mpif90 
+FLINK=$(MPIBIN)/mpif77 
+MPF90=$(MPIBIN)/mpif90 
+MPF77=$(MPIBIN)/mpif77 	
+MPCC=$(MPIBIN)/mpicc 
 MPI_FINC=-DMPI_MOD
 #$(FIFLAG)/opt/SUNWhpc/include
 

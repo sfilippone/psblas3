@@ -28,11 +28,13 @@ FIFLAG=-I
 #   MPI_FINC=-DMPI_H  or MPI_FINC=-DMPI_MOD              #
 #  If necessary add MPIINCDIR                            #
 ##########################################################
-F90LINK=/usr/local/mpich-ifc91/bin/mpif90 
-FLINK=/usr/local/mpich-ifc91/bin/mpif77 
-MPF90=/usr/local/mpich-ifc91/bin/mpif90 
-MPF77=/usr/local/mpich-ifc91/bin/mpif77 
-MPCC=/usr/local/mpich-ifc91/bin/mpicc 
+MPIDIR=/usr/local/mpich-if91
+MPIBIN=$(MPIDIR)/bin
+F90LINK=$(MPIBIN)/mpif90 
+FLINK=$(MPIBIN)/mpif77 
+MPF90=$(MPIBIN)/mpif90 
+MPF77=$(MPIBIN)/mpif77 
+MPCC=$(MPIBIN)/mpicc 
 MPI_FINC=-DMPI_MOD
 #$(FIFLAG)/opt/SUNWhpc/include
 
