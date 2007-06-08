@@ -78,7 +78,7 @@ program pde90
   implicit none
 
   ! input parameters
-  character :: cmethd*10, prec*10, afmt*5
+  character :: cmethd*10, ptype*10, afmt*5
   integer      :: idim, iret
 
   ! miscellaneous 
@@ -88,7 +88,7 @@ program pde90
 
   ! sparse matrix and preconditioner
   type(psb_dspmat_type) :: a,  l, u, h
-  type(psb_dprec_type)  :: pre
+  type(psb_dprec_type)  :: prec
   ! descriptor
   type(psb_desc_type)   :: desc_a, desc_a_out
   ! dense matrices
@@ -98,14 +98,13 @@ program pde90
   integer            :: ictxt, iam, np
 
   ! solver parameters
-  integer            :: iter, itmax,ierr,itrace, methd,iprec, istopc,&
-       & iparm(20), irst, novr
+  integer            :: iter, itmax,ierr,itrace, methd, istopc,&
+       & iparm(20), irst
   real(kind(1.d0))   :: err, eps, rparm(20)
 
   ! other variables
   integer            :: i,info
   integer            :: internal, m,ii
-  character(len=10)  :: ptype
   character(len=20)  :: name,ch_err
 
   if(psb_get_errstatus().ne.0) goto 9999
@@ -127,7 +126,7 @@ program pde90
   !
   !  get parameters
   !
-  call get_parms(ictxt,cmethd,iprec,novr,afmt,idim,istopc,itmax,itrace,irst)
+  call get_parms(ictxt,cmethd,ptype,afmt,idim,istopc,itmax,itrace,irst)
 
   !
   !  allocate and fill in the coefficient matrix, rhs and initial guess 
@@ -151,21 +150,12 @@ program pde90
   !  prepare the preconditioner.
   !  
 
-  if(iam == psb_root_) write(0,'("Setting preconditioner to : ",a)')pr_to_str(iprec)
-  select case(iprec)
-  case(noprec_)
-    call psb_precinit(pre,'noprec',info)
-  case(diag_)             
-    call psb_precinit(pre,'diag',info)
-  case(bjac_)             
-    call psb_precinit(pre,'bjac',info)
-  case default
-    call psb_precinit(pre,'bjac',info)
-  end select
+  if(iam == psb_root_) write(0,'("Setting preconditioner to : ",a)')ptype
+  call psb_precinit(prec,ptype,info)
 
   call psb_barrier(ictxt)
   t1 = psb_wtime()
-  call psb_precbld(a,desc_a,pre,info)
+  call psb_precbld(a,desc_a,prec,info)
   if(info.ne.0) then
     info=4010
     ch_err='psb_precbld'
@@ -187,7 +177,7 @@ program pde90
   call psb_barrier(ictxt)
   t1 = psb_wtime()  
   eps   = 1.d-9
-  call psb_krylov(cmethd,a,pre,b,x,eps,desc_a,info,& 
+  call psb_krylov(cmethd,a,prec,b,x,eps,desc_a,info,& 
        & itmax=itmax,iter=iter,err=err,itrace=itrace,istop=istopc,irst=irst)     
 
   if(info.ne.0) then
@@ -216,7 +206,7 @@ program pde90
   call psb_gefree(b,desc_a,info)
   call psb_gefree(x,desc_a,info)
   call psb_spfree(a,desc_a,info)
-  call psb_precfree(pre,info)
+  call psb_precfree(prec,info)
   call psb_cdfree(desc_a,info)
   if(info.ne.0) then
     info=4010
@@ -236,11 +226,12 @@ contains
   !
   ! get iteration parameters from the command line
   !
-  subroutine  get_parms(ictxt,cmethd,iprec,novr,afmt,idim,istopc,itmax,itrace,irst)
+  subroutine  get_parms(ictxt,cmethd,ptype,afmt,idim,istopc,itmax,itrace,irst)
     integer      :: ictxt
-    character    :: cmethd*10, afmt*5
-    integer      :: idim, iret, istopc,itmax,itrace,irst, iprec, novr
-    character*40 :: charbuf
+    character(len=10) :: cmethd, ptype
+    character(len=5)  :: afmt
+    integer      :: idim, iret, istopc,itmax,itrace,irst
+    character(len=40) :: charbuf
     integer      :: iargc, np, iam
     external     iargc
     integer      :: intbuf(10), ip
@@ -251,15 +242,13 @@ contains
       read(*,*) ip
       if (ip.ge.3) then
         read(*,*) cmethd
-        read(*,*) iprec
-        read(*,*) novr
+        read(*,*) ptype
         read(*,*) afmt
 
         ! broadcast parameters to all processors
         call psb_bcast(ictxt,cmethd)
         call psb_bcast(ictxt,afmt)
-        call psb_bcast(ictxt,iprec)
-        call psb_bcast(ictxt,novr)
+        call psb_bcast(ictxt,ptype)
 
 
         read(*,*) idim
@@ -296,9 +285,8 @@ contains
         write(*,'("Grid dimensions      : ",i4,"x",i4,"x",i4)')idim,idim,idim
         write(*,'("Number of processors : ",i0)')np
         write(*,'("Data distribution    : BLOCK")')
-        write(*,'("Preconditioner       : ",a)')pr_to_str(iprec)
-        if(iprec.gt.2) write(*,'("Overlapping levels   : ",i0)')novr
-        write(*,'("Iterative method     : ",a)')cmethd
+        write(*,'("Preconditioner       : ",a)') ptype
+        write(*,'("Iterative method     : ",a)') cmethd
         write(*,'(" ")')
       else
         ! wrong number of parameter, print an error message and exit
@@ -309,8 +297,7 @@ contains
     else
       call psb_bcast(ictxt,cmethd)
       call psb_bcast(ictxt,afmt)
-      call psb_bcast(ictxt,iprec)
-      call psb_bcast(ictxt,novr)
+      call psb_bcast(ictxt,ptype)
       call psb_bcast(ictxt,intbuf(1:5))
       idim    = intbuf(1)
       istopc  = intbuf(2)
@@ -330,15 +317,15 @@ contains
     write(iout,*)' usage:  pde90 methd prec dim &
          &[istop itmax itrace]'  
     write(iout,*)' where:'
-    write(iout,*)'     methd:    cgstab tfqmr cgs' 
-    write(iout,*)'     prec :    ilu diagsc none'
+    write(iout,*)'     methd:    cgstab cgs rgmres bicgstabl' 
+    write(iout,*)'     prec :    bjac diag none'
     write(iout,*)'     dim       number of points along each axis'
     write(iout,*)'               the size of the resulting linear '
     write(iout,*)'               system is dim**3'
-    write(iout,*)'     istop     stopping criterion  1, 2 or 3 [1]  '
+    write(iout,*)'     istop     stopping criterion  1, 2  '
     write(iout,*)'     itmax     maximum number of iterations [500] '
-    write(iout,*)'     itrace    0  (no tracing, default) or '  
-    write(iout,*)'               >= 0 do tracing every itrace'
+    write(iout,*)'     itrace    <=0  (no tracing, default) or '  
+    write(iout,*)'               >= 1 do tracing every itrace'
     write(iout,*)'               iterations ' 
   end subroutine pr_usage
 

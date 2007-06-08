@@ -29,20 +29,19 @@
 !!$ 
 !!$  
 Module getp
-  use psb_base_mod
   public get_parms
-  public pr_usage
 
 contains
   !
   ! Get iteration parameters from the command line
   !
-  subroutine  get_parms(ictxt,mtrx_file,rhs_file,cmethd,ipart,&
-       & afmt,istopc,itmax,itrace,ml,iprec,eps)
+  subroutine  get_parms(ictxt,mtrx_file,rhs_file,cmethd,ptype,ipart,&
+       & afmt,istopc,itmax,itrace,irst,eps)
+    use psb_base_mod
     integer      :: ictxt
-    character*40 :: cmethd, mtrx_file, rhs_file
-    integer      :: iret, istopc,itmax,itrace,ipart,iprec,ml
-    character*40 :: charbuf
+    character(len=40) :: cmethd, mtrx_file, rhs_file, ptype
+    integer      :: iret, istopc,itmax,itrace,ipart,irst
+    character(len=40) :: charbuf
     real(kind(1.d0)) :: eps
     character    :: afmt*5
     integer      :: np, iam
@@ -52,45 +51,42 @@ contains
     if (iam==0) then
       ! Read Input Parameters
       read(*,*) ip
-      if (ip >= 3) then
+      if (ip >= 5) then
         read(*,*) mtrx_file
         read(*,*) rhs_file
         read(*,*) cmethd
+        read(*,*) ptype
         read(*,*) afmt
 
 
         call psb_bcast(ictxt,mtrx_file)
         call psb_bcast(ictxt,rhs_file)
         call psb_bcast(ictxt,cmethd)
+        call psb_bcast(ictxt,ptype)
         call psb_bcast(ictxt,afmt)
 
         read(*,*) ipart
-        if (ip >= 5) then
+        if (ip >= 7) then
           read(*,*) istopc
         else
           istopc=1        
         endif
-        if (ip >= 6) then
+        if (ip >= 8) then
           read(*,*) itmax
         else
           itmax=500
         endif
-        if (ip >= 7) then
+        if (ip >= 9) then
           read(*,*) itrace
         else
           itrace=-1
         endif
-        if (ip >= 8) then
-          read(*,*) iprec
-        else
-          iprec=0
-        endif
-        if (ip >= 9) then
-          read(*,*) ml
-        else
-          ml  = 1
-        endif
         if (ip >= 10) then
+          read(*,*) irst
+        else
+          irst  = 1
+        endif
+        if (ip >= 11) then
           read(*,*) eps
         else
           eps=1.d-6
@@ -99,22 +95,21 @@ contains
         inparms(2) = istopc
         inparms(3) = itmax
         inparms(4) = itrace
-        inparms(5) = iprec
-        inparms(6) = ml
-        call psb_bcast(ictxt,inparms(1:6))
+        inparms(5) = irst
+        call psb_bcast(ictxt,inparms(1:5))
         call psb_bcast(ictxt,eps)
 
-        write(*,'("Solving matrix       : ",a40)') mtrx_file      
-        write(*,'("Number of processors : ",i3)')  np
-        write(*,'("Data distribution    : ",i2)')  ipart
-        write(*,'("Preconditioner       : ",i2)')  iprec
-        write(*,'("Restart parameter    : ",i2)')  ml
-        write(*,'("Iterative method     : ",a40)') cmethd
-        write(*,'("Storage format       : ",a3)')  afmt(1:3)
+        write(*,'("Solving matrix       : ",a)')  mtrx_file      
+        write(*,'("Number of processors : ",i3)') np
+        write(*,'("Data distribution    : ",i2)') ipart
+        write(*,'("Iterative method     : ",a)')  cmethd
+        write(*,'("Preconditioner       : ",a)')  ptype
+        write(*,'("Restart parameter    : ",i2)') irst
+        write(*,'("Storage format       : ",a)')  afmt(1:3)
         write(*,'(" ")')
       else
-        call pr_usage(0)
-        call psb_exit(ictxt)
+        write(0,*) 'Wrong format for input file'
+        call psb_abort(ictxt)
         stop 1
       end if
     else
@@ -122,35 +117,19 @@ contains
       call psb_bcast(ictxt,mtrx_file)
       call psb_bcast(ictxt,rhs_file)
       call psb_bcast(ictxt,cmethd)
+      call psb_bcast(ictxt,ptype)
       call psb_bcast(ictxt,afmt)
 
-      call psb_bcast(ictxt,inparms(1:6))
+      call psb_bcast(ictxt,inparms(1:5))
       ipart  =  inparms(1) 
       istopc =  inparms(2) 
       itmax  =  inparms(3) 
       itrace =  inparms(4) 
-      iprec  =  inparms(5) 
-      ml     =  inparms(6) 
+      irst   =  inparms(5) 
       call psb_bcast(ictxt,eps)
 
     end if
 
   end subroutine get_parms
 
-  subroutine pr_usage(iout)
-    integer iout
-    write(iout, *) ' Number of parameters is incorrect!'
-    write(iout, *) ' Use: hb_sample mtrx_file methd prec [ptype &
-         &itmax istopc itrace]' 
-    write(iout, *) ' Where:'
-    write(iout, *) '     mtrx_file      is stored in HB format'
-    write(iout, *) '     methd          may be: CGSTAB '
-    write(iout, *) '     ptype          Partition strategy default 0'
-    write(iout, *) '                    0: BLOCK partition '
-    write(iout, *) '     itmax          Max iterations [500]        '
-    write(iout, *) '     istopc         Stopping criterion [1]      '
-    write(iout, *) '     itrace         0  (no tracing, default) or '
-    write(iout, *) '                    >= 0 do tracing every ITRACE'
-    write(iout, *) '                    iterations ' 
-  end subroutine pr_usage
 end module getp

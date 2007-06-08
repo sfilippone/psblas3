@@ -1,12 +1,11 @@
 7                      Number of entries below this
-BICGSTAB               Iterative method BICGSTAB CGS  BICG BICGSTABL
-2                      Preconditioner 2=ILU 1=DIAGSC 0=NONE 
-2                      Number ov overlapping levels
-COO                    A Storage format CSR COO JAD 
-20                     Domain size (acutal sistem is this**3)
+BICGSTAB               Iterative method BICGSTAB CGS  BICG BICGSTABL RGMRES
+BJAC                   Preconditioner NONE  DIAG  BJAC 
+CSR                    A Storage format CSR COO JAD 
+20                     Domain size (acutal system is this**3)
 1                      Stopping criterion
 80                     MAXIT
 00                     ITRACE
-02                     ML
+02                     IRST    restart for RGMRES  and BiCGSTABL
 
 

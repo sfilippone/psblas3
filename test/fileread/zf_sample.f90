@@ -37,15 +37,13 @@ program zf_sample
   implicit none
 
   ! input parameters
-  character*40 :: cmethd, mtrx_file, rhs_file
-  character*80 :: charbuf
+  character(len=40) :: cmethd, ptype, mtrx_file, rhs_file
 
   ! sparse matrices
   type(psb_zspmat_type) :: a, aux_a
 
   ! preconditioner data
-  type(psb_zprec_type)  :: pre
-  integer               :: igsmth, matop, novr
+  type(psb_zprec_type)  :: prec
 
   ! dense matrices
   complex(kind(1.d0)), allocatable, target ::  aux_b(:,:), d(:)
@@ -62,7 +60,7 @@ program zf_sample
 
   ! solver paramters
   integer            :: iter, itmax, ierr, itrace, ircode, ipart,&
-       & methd, istopc, iprec, ml,amatsize,precsize,descsize
+       & methd, istopc, irst,amatsize,precsize,descsize
   real(kind(1.d0))   :: err, eps
 
   character(len=5)   :: afmt
@@ -77,7 +75,6 @@ program zf_sample
   integer :: nrhs, nrow, n_row, dim, nv, ne
   integer, allocatable :: ivg(:), ipv(:)
 
-  
 
   call psb_init(ictxt)
   call psb_info(ictxt,iam,np)
@@ -98,8 +95,8 @@ program zf_sample
   !
   !  get parameters
   !
-  call get_parms(ictxt,mtrx_file,rhs_file,cmethd,&
-       & ipart,afmt,istopc,itmax,itrace,ml,iprec,eps)
+  call get_parms(ictxt,mtrx_file,rhs_file,cmethd,ptype,&
+       & ipart,afmt,istopc,itmax,itrace,irst,eps)
 
   call psb_barrier(ictxt)
   t1 = psb_wtime()  
@@ -193,28 +190,13 @@ program zf_sample
      write(*,'(" ")')
   end if
 
-  !
-  !  prepare the preconditioning matrix. note the availability
-  !  of optional parameters
-  !
+  ! 
 
-  ! zero initial guess.
-  matop=1
-  igsmth=-1
-  select case(iprec)
-  case(noprec_)
-    call psb_precinit(pre,'noprec',info)
-  case(diag_)             
-    call psb_precinit(pre,'diag',info)
-  case(bjac_)             
-    call psb_precinit(pre,'bjac',info)
-  case default
-    call psb_precinit(pre,'bjac',info)
-  end select
+  call psb_precinit(prec,ptype,info)
 
   ! building the preconditioner
   t1 = psb_wtime()
-  call psb_precbld(a,desc_a,pre,info)
+  call psb_precbld(a,desc_a,prec,info)
   tprec = psb_wtime()-t1
   if (info /= 0) then
      call psb_errpush(4010,name,a_err='psb_precbld')
@@ -232,8 +214,8 @@ program zf_sample
   iparm = 0
   call psb_barrier(ictxt)
   t1 = psb_wtime()
-  call psb_krylov(cmethd,a,pre,b_col,x_col,eps,desc_a,info,& 
-       & itmax=itmax,iter=iter,err=err,itrace=itrace,istop=istopc,irst=ml)     
+  call psb_krylov(cmethd,a,prec,b_col,x_col,eps,desc_a,info,& 
+       & itmax=itmax,iter=iter,err=err,itrace=itrace,istop=istopc,irst=irst)     
   call psb_barrier(ictxt)
   t2 = psb_wtime() - t1
   call psb_amx(ictxt,t2)
@@ -244,12 +226,12 @@ program zf_sample
 
   amatsize = psb_sizeof(a)
   descsize = psb_sizeof(desc_a)
-  precsize = psb_sizeof(pre)
+  precsize = psb_sizeof(prec)
   call psb_sum(ictxt,amatsize)
   call psb_sum(ictxt,descsize)
   call psb_sum(ictxt,precsize)
   if (amroot) then 
-    call psb_prec_descr(6,pre)
+    call psb_prec_descr(6,prec)
     write(*,'("Matrix: ",a)')mtrx_file
     write(*,'("Computed solution on ",i8," processors")')np
     write(*,'("Iterations to convergence: ",i6)')iter
@@ -262,15 +244,15 @@ program zf_sample
     write(*,'("Residual norm inf = ",es10.4)')resmxp
     write(*,'("Total memory occupation for A:      ",i10)')amatsize
     write(*,'("Total memory occupation for DESC_A: ",i10)')descsize
-    write(*,'("Total memory occupation for PRE:    ",i10)')precsize
+    write(*,'("Total memory occupation for PREC:   ",i10)')precsize
   end if
 
   allocate(x_col_glob(m_problem),r_col_glob(m_problem),stat=ierr)
   if (ierr.ne.0) then 
     write(0,*) 'allocation error: no data collection'
   else
-    call psb_gather(x_col_glob,x_col,desc_a,info,iroot=0)
-    call psb_gather(r_col_glob,r_col,desc_a,info,iroot=0)
+    call psb_gather(x_col_glob,x_col,desc_a,info,root=0)
+    call psb_gather(r_col_glob,r_col,desc_a,info,root=0)
     if (amroot) then
       write(0,'(" ")')
       write(0,'("Saving x on file")')
@@ -286,14 +268,14 @@ program zf_sample
       enddo
     end if
   end if
-998 format(i8,4(2x,g20.14))
+998 format(i8,6(1x,g11.5))
 993 format(i6,4(1x,e12.6))
 
   
   call psb_gefree(b_col, desc_a,info)
   call psb_gefree(x_col, desc_a,info)
   call psb_spfree(a, desc_a,info)
-  call psb_precfree(pre,info)
+  call psb_precfree(prec,info)
   call psb_cdfree(desc_a,info)
 
 9999 continue
