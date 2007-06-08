@@ -44,7 +44,7 @@ module psb_descriptor_type
   !
   !     Communication, prolongation & restriction
   !
-  integer, parameter :: psb_nohalo_=0,  psb_halo_=4
+  integer, parameter :: psb_nohalo_=0,  psb_halo_=1
   integer, parameter :: psb_none_=0,  psb_sum_=1
   integer, parameter :: psb_avg_=2,  psb_square_root_=3
   integer, parameter :: psb_swap_send_=1, psb_swap_recv_=2
