@@ -9,9 +9,9 @@ ACM Trans. on Math. Software, 26(4), Dec. 2000, pp. 527-550.
 PLATFORMS: 
 
 The compilation process relies on the choice of an appropriate
-Make.inc file; we have tested with AIX XLF, Intel ifc/Linux, Lahey
-F95/Linux,  Nag f95/Linux, GNU Fortran/Linux. If you succeed in compiling with 
-other compiler/operating systems please let us know. 
+Make.inc file; we have tested with AIX XLF, Intel ifort/Linux,  Nag
+f95/Linux, GNU Fortran/Linux, Sun Forte 6.2. If you succeed in
+compiling with  other compiler/operating systems please let us know. 
 
 
 LINUX:
@@ -20,17 +20,14 @@ On Linux we work with the GCC compiler; note that we require version
 4.2.0 (or later) as it contains support for ALLOCATABLEs (as specified
 in TR15581). 
 
-The Lahey version we got access to (6.0 and 6.1) seems to suffer from
-spurious extra copies problem; this is most apparent in the matrix
-build process.  
-
 For the Intel compilers, we recommend version 9.1; previous
 versions of the library have been compiled with version 7 and 8 of
 ifort. 
 
 IBM SP.
-The library has been tested on an IBM SP2, SP4 and SP5, with XLC and XLF
-compilers, and a version of the BLACS based on MPI.
+The library has been tested on an IBM SP5, with XLC and XLF 
+version 10.1 and the IBM ESSL/PESSL versions of the BLAS and the
+BLACS. 
 The  setting 
  F90=xlf90 -qsuffix=f=f90
 in Make.inc.sp5 takes care of the f90 extension. 
@@ -82,13 +79,6 @@ prerequisites (see also SERIAL below):
    This is not necessary to compile our library, but the test program
    in test/Fileread assumes you have it installed.  
 
-5. For the multilevel  preconditioners we include interfaces to the following
-   software  packages:
-   --  SuperLU 3.0        http://crd.lbl.gov/~xiaoye/SuperLU/
-   --  UMFPACK 4.4        http://www.cise.ufl.edu/research/sparse/umfpack/ 
-   These are optional, you only need to install them if you actually
-   want to use them. 
-
 To install, choose a Make.inc.XXX file for your compilers, modify the
 paths to libraries to  match your installation and copy it to
 Make.inc. Then  a make will compile the library; go to the test
@@ -116,11 +106,19 @@ Credits for version 2.0:
 Salvatore  Filippone
 Alfredo    Buttari
 
-The MD2P4 multilevel parallel preconditioners contained in directory
-src/prec were developed with the contribution of:  
+
+In a sister package we are going to provide a library of  multilevel
+parallel preconditioners that were developed with the contribution of:  
 Pasqua     D'Ambra
 Daniela    di Serafino
-They are still in an early experimental stage, use at your own risk!
+
+In that package we will provide interfaces to the following software
+packages: 
+   --  SuperLU 3.0        http://crd.lbl.gov/~xiaoye/SuperLU/
+   --  UMFPACK 4.4        http://www.cise.ufl.edu/research/sparse/umfpack/ 
+These are optional, you only need to install them if you actually want
+to use them.  
+The MLD2P4 package will be published soon, watch this space!. 
 
 Credits for version 1.0:
 Salvatore  Filippone

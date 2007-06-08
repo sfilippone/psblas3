@@ -49,7 +49,9 @@ BLACS=-lblacssmp
 ##########################################################
 #SLUDIR=/usr/local/SuperLU_3.0
 #SLU=-lslu -L$(SLUDIR)
-#SLUDEF=-DHave_SLU_ -I$(SLUDIR)
+#SLUDistDIR=/usr/local/SLUDist_2.0
+#SLUDist=-lslud -L$(SLUDistDIR) -L $(HOME)/LIB
+#SLUDEF=-DHave_SLU_ -I$(SLUDIR) -DHave_SLUDist_ -I$(SLUDistDIR)
 
 #UMFDIR=$(HOME)/LIB/Umfpack
 #UMF=-lumfpack -lamd -L$(UMFDIR)

@@ -51,7 +51,9 @@ BLACS=-lmpiblacs-intel -L$(HOME)/NUMERICAL/LIB
 ##########################################################
 #SLUDIR=/usr/local/SuperLU_3.0
 #SLU=-lslu_lx_ifc9 -L$(SLUDIR)
-#SLUDEF=-DHave_SLU_ -I$(SLUDIR)
+#SLUDistDIR=/usr/local/SLUDist_2.0
+#SLUDist=-lslud-ifc9 -L$(SLUDistDIR) -L $(HOME)/LIB
+#SLUDEF=-DHave_SLU_ -I$(SLUDIR) -DHave_SLUDist_ -I$(SLUDistDIR)
 
 #UMFDIR=$(HOME)/LIB/Umfpack_gcc41
 #UMF=-lumfpack -lamd -L$(UMFDIR)

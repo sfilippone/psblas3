@@ -10,9 +10,9 @@ F90=/usr/local/gcc42/bin/gfortran
 FC=/usr/local/gcc42/bin/gfortran
 F77=$(FC)
 CC=/usr/local/gcc42/bin/gcc
-F90COPT=-O3 
-FCOPT=-O3   
-CCOPT=-O3   
+F90COPT=-O3 -pg
+FCOPT=-O3   -pg
+CCOPT=-O3   -pg
 #
 # Which flag does your compiler use  for module inclusion?
 # Most compilers use -I  but Sun uses -M 
