@@ -45,10 +45,12 @@ BLACS=-lmpiblacsg95 -L$(HOME)/LIB
 #  SLU and UMF need only be set when using MLD2P4        #
 ##########################################################
 #SLUDIR=/usr/local/SuperLU_3.0
-#SLU=-lslu_lx_gfort -L$(SLUDIR)
-#SLUDEF=-DHave_SLU_ -I$(SLUDIR)
+#SLU=-lslu_lx_g95 -L$(SLUDIR)
+#SLUDistDIR=/usr/local/SLUDist_2.0
+#SLUDist=-lslud-g95 -L$(SLUDistDIR) -L $(HOME)/LIB
+#SLUDEF=-DHave_SLU_ -I$(SLUDIR) -DHave_SLUDist_ -I$(SLUDistDIR)
 
-#UMFDIR=$(HOME)/LIB/Umfpack_gcc41
+#UMFDIR=$(HOME)/LIB/Umfpack_g95
 #UMF=-lumfpack -lamd -L$(UMFDIR)
 #UMFDEF=-DHave_UMF_ -I$(UMFDIR)
 
