@@ -10,9 +10,9 @@ F90=/usr/local/gcc42/bin/gfortran
 FC=/usr/local/gcc42/bin/gfortran
 F77=$(FC)
 CC=/usr/local/gcc42/bin/gcc
-F90COPT=-O3 -ggdb -pg
-FCOPT=-O3 -ggdb  -pg
-CCOPT=-O3 -ggdb  -pg
+F90COPT=-O3 
+FCOPT=-O3   
+CCOPT=-O3   
 #
 # Which flag does your compiler use  for module inclusion?
 # Most compilers use -I  but Sun uses -M 
@@ -48,7 +48,7 @@ BLACS=-lmpiblacs-gcc42 -L$(HOME)/LIB
 #SLUDIR=/usr/local/SuperLU_3.0
 #SLU=-lslu_lx_gcc42 -L$(SLUDIR)
 #SLUDistDIR=/usr/local/SLUDist_2.0
-#SLUDist=-lslud-bck-gcc42 -L$(SLUDistDIR) -L $(HOME)/LIB
+#SLUDist=-lslud-gcc42 -L$(SLUDistDIR) -L $(HOME)/LIB
 #SLUDEF=-DHave_SLU_ -I$(SLUDIR) -DHave_SLUDist_ -I$(SLUDistDIR)
 #
 #UMFDIR=$(HOME)/LIB/Umfpack_gcc41
