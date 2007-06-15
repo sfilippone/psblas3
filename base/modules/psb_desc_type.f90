@@ -81,7 +81,7 @@ module psb_descriptor_type
   integer, parameter :: psb_cd_ovl_asb_=psb_cd_ovl_bld_+1
   integer, parameter :: psb_hash_bits=14
   integer, parameter :: psb_hash_size=2**psb_hash_bits, psb_hash_mask=psb_hash_size-1
-  integer, parameter :: psb_default_large_threshold=4*1024*1024   ! to be reviewed
+  integer, parameter :: psb_default_large_threshold=512*1024   ! to be reviewed
   integer, parameter :: psb_hpnt_nentries_=7
 
   !
