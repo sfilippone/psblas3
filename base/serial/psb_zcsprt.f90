@@ -157,30 +157,36 @@ subroutine psb_zcsprt(iout,a,iv,eirs,eics,head,ivr,ivc)
     endif
 
   case ('COO') 
-
-    if (present(ivr).and..not.present(ivc)) then 
+    if(present(iv)) then 
       write(iout,*) a%m,a%k,a%infoa(psb_nnz_)
       do j=1,a%infoa(psb_nnz_)
-        write(iout,frmtr) ivr(a%ia1(j)),a%ia2(j),a%aspk(j)
+        write(iout,frmtr) iv(a%ia1(j)),iv(a%ia2(j)),a%aspk(j)
       enddo
-    else if (present(ivr).and.present(ivc)) then 
-      write(iout,*) a%m,a%k,a%infoa(psb_nnz_)
-      do j=1,a%infoa(psb_nnz_)
-        write(iout,frmtr) ivr(a%ia1(j)),ivc(a%ia2(j)),a%aspk(j)
-      enddo
-    else if (.not.present(ivr).and.present(ivc)) then 
-      write(iout,*) a%m,a%k,a%infoa(psb_nnz_)
-      do j=1,a%infoa(psb_nnz_)
-        write(iout,frmtr) a%ia1(j),ivc(a%ia2(j)),a%aspk(j)
-      enddo
-    else if (.not.present(ivr).and..not.present(ivc)) then 
-      write(iout,*) a%m,a%k,a%infoa(psb_nnz_)
-      do j=1,a%infoa(psb_nnz_)
-        write(iout,frmtr) a%ia1(j),a%ia2(j),a%aspk(j)
-      enddo
+    else      
+      if (present(ivr).and..not.present(ivc)) then 
+        write(iout,*) a%m,a%k,a%infoa(psb_nnz_)
+        do j=1,a%infoa(psb_nnz_)
+          write(iout,frmtr) ivr(a%ia1(j)),a%ia2(j),a%aspk(j)
+        enddo
+      else if (present(ivr).and.present(ivc)) then 
+        write(iout,*) a%m,a%k,a%infoa(psb_nnz_)
+        do j=1,a%infoa(psb_nnz_)
+          write(iout,frmtr) ivr(a%ia1(j)),ivc(a%ia2(j)),a%aspk(j)
+        enddo
+      else if (.not.present(ivr).and.present(ivc)) then 
+        write(iout,*) a%m,a%k,a%infoa(psb_nnz_)
+        do j=1,a%infoa(psb_nnz_)
+          write(iout,frmtr) a%ia1(j),ivc(a%ia2(j)),a%aspk(j)
+        enddo
+      else if (.not.present(ivr).and..not.present(ivc)) then 
+        write(iout,*) a%m,a%k,a%infoa(psb_nnz_)
+        do j=1,a%infoa(psb_nnz_)
+          write(iout,frmtr) a%ia1(j),a%ia2(j),a%aspk(j)
+        enddo
+      endif
     endif
   case default
     write(0,*) 'Feeling lazy today, format not implemented: "',a%fida,'"'
   end select
-  close(iout)
+
 end subroutine psb_zcsprt
