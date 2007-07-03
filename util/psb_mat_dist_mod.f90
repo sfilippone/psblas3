@@ -201,10 +201,11 @@ contains
       call psb_errpush(info,name,a_err=ch_err)
       goto 9999
     end if
-    isize = max(3*nb,ncol)
 
 
-    allocate(val(nb*ncol),irow(nb*ncol),icol(nb*ncol),stat=info)
+
+    isize = 3*nb*max(((nnzero+nrow)/nrow),nb)
+    allocate(val(isize),irow(isize),icol(isize),stat=info)
     if(info/=0) then
       info=4010
       ch_err='Allocate'
@@ -611,10 +612,10 @@ contains
       call psb_errpush(info,name,a_err=ch_err)
       goto 9999
     end if
-    isize = max(3*nb,ncol)
 
+    isize = 3*nb*max(((nnzero+nrow)/nrow),nb)
+    allocate(val(isize),irow(isize),icol(isize),stat=info)
 
-    allocate(val(nb*ncol),irow(nb*ncol),icol(nb*ncol),stat=info)
     if(info/=0) then
       info=4010
       ch_err='Allocate'
@@ -946,10 +947,10 @@ contains
       call psb_errpush(info,name,a_err=ch_err)
       goto 9999
     end if
-    isize = max(3*nb,ncol)
 
+    isize = 3*nb*max(((nnzero+nrow)/nrow),nb)
+    allocate(val(isize),irow(isize),icol(isize),stat=info)
 
-    allocate(val(nb*ncol),irow(nb*ncol),icol(nb*ncol),stat=info)
     if(info/=0) then
       info=4010
       ch_err='Allocate'
@@ -1357,10 +1358,10 @@ contains
       call psb_errpush(info,name,a_err=ch_err)
       goto 9999
     end if
-    isize = max(3*nb,ncol)
 
+    isize = 3*nb*max(((nnzero+nrow)/nrow),nb)
+    allocate(val(isize),irow(isize),icol(isize),stat=info)
 
-    allocate(val(nb*ncol),irow(nb*ncol),icol(nb*ncol),stat=info)
     if(info/=0) then
       info=4010
       ch_err='Allocate'
