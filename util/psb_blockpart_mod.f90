@@ -38,9 +38,9 @@ contains
 
     implicit none
 
-    integer  global_indx, n, np
-    integer  nv
-    integer  pv(*)
+    integer, intent(in)  ::  global_indx, n, np
+    integer, intent(out) ::  nv
+    integer, intent(out) ::  pv(*)
     integer  dim_block
     integer  ib1, ib2, ipv
 
