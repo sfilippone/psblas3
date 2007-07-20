@@ -107,7 +107,7 @@ module psb_descriptor_type
   !  very much linked to building a sparse matrix (since the matrix sparsity 
   !  pattern embodies the topology of the discretization graph).
   !  
-  !  Most general info about the descriptor is stored in the matrix_dataq
+  !  Most general info about the descriptor is stored in the matrix_data
   !  component, including the STATE which can be  PSB_DESC_BLD_, 
   !  PSB_DESC_ASB_ or PSB_DESC_REPL_. 
   !  Upon allocation with PSB_CDALL the descriptor enters the BLD state;
@@ -153,8 +153,8 @@ module psb_descriptor_type
   !        will thus be N_COL + N_GLOB
   !   ii.  If the global index space is very large (larger than the threshold value
   !        which may be set by the user), then it is not advisable to have such an 
-  !        array; thus we only record the global indices that do have a 
-  !        local counterpart. Thus the local storage will be proportional to 
+  !        array. In this case we only record the global indices that do have a 
+  !        local counterpart, so that the local storage will be proportional to 
   !        N_COL. During the build phase we keep the known global indices in an 
   !        AVL tree data structure whose pointer is stored in ptree(:), so that we 
   !        can do both search and insertions in log time. At assembly time, we move 
@@ -205,7 +205,7 @@ module psb_descriptor_type
   !     as we go about building the sparse matrix pattern, and we want the build 
   !     phase to be loosely synchronized. Thus we record the indices we have to ask 
   !     for, and at the time we call PSB_CDASB we match all the requests to figure 
-  !     out who should be sending what. 
+  !     out who should be sending what to whom.
   !     However this implies that we know who owns the indices; if we are in the 
   !     LARGE case (as described above) this is actually only true for the OVERLAP list 
   !     that is filled in at CDALL time, and not for the HALO; thus the HALO list 
