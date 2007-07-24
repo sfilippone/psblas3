@@ -73,7 +73,7 @@ subroutine psb_dprc_aply(prec,x,y,desc_data,info,trans, work)
   end if
 
   call psb_gprec_aply(done,prec,x,dzero,y,desc_data,trans_,work_,info)
-
+  call psb_ovrl(y,desc_data,info,update=psb_avg_)
   if (present(work)) then 
   else
     deallocate(work_)
