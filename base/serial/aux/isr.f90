@@ -31,6 +31,7 @@
 
 subroutine isr(n,x,dir)
   use psb_serial_mod
+  implicit none
   !
   !  Quicksort.
   !  Adapted from a number of sources, including Don Knuth's TAOCP.
@@ -40,8 +41,9 @@ subroutine isr(n,x,dir)
   integer ::  x(n)
   !     ..
   !     .. Local Scalars ..
-  integer i, j, xx, ilx, iux, istp, piv, lpiv
-  integer it1, n1, n2
+  integer :: xx, xk, piv, xt
+  integer i, j, ilx, iux, istp, lpiv
+  integer n1, n2
 
   integer, parameter :: maxstack=64,nparms=3,ithrs=16
   integer            :: istack(nparms,maxstack)
@@ -77,29 +79,29 @@ subroutine isr(n,x,dir)
         lpiv = (i+j)/2
         piv  = x(lpiv)
         if (piv < x(i)) then
-          it1 = x(i)
+          xt = x(i)
           x(i) = x(lpiv)
-          x(lpiv) = it1
+          x(lpiv) = xt
           piv = x(lpiv)
         endif
         if (piv > x(j)) then
-          it1 = x(j)
+          xt = x(j)
           x(j) = x(lpiv)
-          x(lpiv) = it1
+          x(lpiv) = xt
           piv = x(lpiv)
         endif
         if (piv < x(i)) then
-          it1 = x(i)
+          xt = x(i)
           x(i) = x(lpiv)
-          x(lpiv) = it1
+          x(lpiv) = xt
           piv = x(lpiv)
         endif
         !
         !     now piv is correct;  place it into first location
 
-        it1 = x(i)
+        xt = x(i)
         x(i) = x(lpiv)
-        x(lpiv) = it1
+        x(lpiv) = xt
 
         i = ilx - 1 
         j = iux + 1 
@@ -113,19 +115,19 @@ subroutine isr(n,x,dir)
           !
           !     Ensure finite termination for next loop
           !
-          it1  = xk
+          xt  = xk
           x(i) = piv
           in_up2:do 
             j = j - 1
             xk = x(j)
             if (xk <= piv) exit in_up2
           end do in_up2
-          x(i) = it1  
+          x(i) = xt  
 
           if (j > i) then
-            it1  = x(i)
+            xt  = x(i)
             x(i) = x(j)
-            x(j) = it1 
+            x(j) = xt 
           else
             exit outer_up
           end if
@@ -202,29 +204,29 @@ subroutine isr(n,x,dir)
         lpiv = (i+j)/2
         piv  = x(lpiv)
         if (piv > x(i)) then
-          it1 = x(i)
+          xt = x(i)
           x(i) = x(lpiv)
-          x(lpiv) = it1
+          x(lpiv) = xt
           piv = x(lpiv)
         endif
         if (piv < x(j)) then
-          it1 = x(j)
+          xt = x(j)
           x(j) = x(lpiv)
-          x(lpiv) = it1
+          x(lpiv) = xt
           piv = x(lpiv)
         endif
         if (piv > x(i)) then
-          it1 = x(i)
+          xt = x(i)
           x(i) = x(lpiv)
-          x(lpiv) = it1
+          x(lpiv) = xt
           piv = x(lpiv)
         endif
         !
         !     now piv is correct;  place it into first location
 
-        it1 = x(i)
+        xt = x(i)
         x(i) = x(lpiv)
-        x(lpiv) = it1
+        x(lpiv) = xt
 
         i = ilx - 1 
         j = iux + 1 
@@ -238,19 +240,19 @@ subroutine isr(n,x,dir)
           !
           !     Ensure finite termination for next loop
           !
-          it1  = xk
+          xt  = xk
           x(i) = piv
           in_dw2:do 
             j = j - 1
             xk = x(j)
             if (xk >= piv) exit in_dw2
           end do in_dw2
-          x(i) = it1  
+          x(i) = xt  
 
           if (j > i) then
-            it1  = x(i)
+            xt  = x(i)
             x(i) = x(j)
-            x(j) = it1 
+            x(j) = xt 
           else
             exit outer_dw
           end if
@@ -311,6 +313,8 @@ subroutine isr(n,x,dir)
 contains
 
   subroutine iisr_up(n,x)
+    implicit none
+
     integer :: n
     integer :: x(n)
     integer :: i,j
@@ -332,6 +336,7 @@ contains
   end subroutine iisr_up
 
   subroutine iisr_dw(n,x)
+    implicit none
     integer :: n
     integer :: x(n)
     integer :: i,j

@@ -29,6 +29,7 @@ C POSSIBILITY OF SUCH DAMAGE.
 C
 C 
       subroutine ibsrch(ipos,key,n,v)
+      implicit none
       integer ipos, key, n
       integer v(n)
       

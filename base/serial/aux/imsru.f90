@@ -33,6 +33,7 @@
  ! Parameters:
 subroutine imsru(n,x,idir,nout)
   use psb_serial_mod
+  implicit none
   integer :: n, idir,nout
   integer :: x(n)
   

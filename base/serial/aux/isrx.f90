@@ -30,6 +30,7 @@
 !!$  
 subroutine isrx(n,x,indx,dir,flag)
   use psb_serial_mod
+  implicit none
   !
   !  Quicksort with indices into original positions.
   !  Adapted from a number of sources, including Don Knuth's TAOCP.
@@ -39,8 +40,9 @@ subroutine isrx(n,x,indx,dir,flag)
   integer ::  x(n), indx(n)
   !     ..
   !     .. Local Scalars ..
-  integer i, j, ii, xx, ilx, iux, istp, piv, lpiv
-  integer it1, it2, n1, n2
+  integer :: xx, piv, xk, xt
+  integer i, j, ii, ilx, iux, istp, lpiv
+  integer ixt, n1, n2
 
   integer, parameter :: maxstack=64,nparms=3,ithrs=16
   integer            :: istack(nparms,maxstack)
@@ -88,40 +90,40 @@ subroutine isrx(n,x,indx,dir,flag)
         lpiv = (i+j)/2
         piv  = x(lpiv)
         if (piv < x(i)) then
-          it1        = x(i)
-          it2        = indx(i)
+          xt        = x(i)
+          ixt        = indx(i)
           x(i)       = x(lpiv)
           indx(i)    = indx(lpiv)
-          x(lpiv)    = it1
-          indx(lpiv) = it2
+          x(lpiv)    = xt
+          indx(lpiv) = ixt
           piv        = x(lpiv)
         endif
         if (piv > x(j)) then
-          it1        = x(j)
-          it2        = indx(j)
+          xt        = x(j)
+          ixt        = indx(j)
           x(j)       = x(lpiv)
           indx(j)    = indx(lpiv)
-          x(lpiv)    = it1
-          indx(lpiv) = it2
+          x(lpiv)    = xt
+          indx(lpiv) = ixt
           piv        = x(lpiv)
         endif
         if (piv < x(i)) then
-          it1        = x(i)
-          it2        = indx(i)
+          xt        = x(i)
+          ixt        = indx(i)
           x(i)       = x(lpiv)
           indx(i)    = indx(lpiv)
-          x(lpiv)    = it1
-          indx(lpiv) = it2
+          x(lpiv)    = xt
+          indx(lpiv) = ixt
           piv        = x(lpiv)
         endif
         !
         !     now piv is correct;  place it into first location
-        it1        = x(i)
-        it2        = indx(i)
+        xt        = x(i)
+        ixt        = indx(i)
         x(i)       = x(lpiv)
         indx(i)    = indx(lpiv)
-        x(lpiv)    = it1
-        indx(lpiv) = it2
+        x(lpiv)    = xt
+        indx(lpiv) = ixt
         piv        = x(lpiv)
 
         i = ilx - 1 
@@ -136,22 +138,22 @@ subroutine isrx(n,x,indx,dir,flag)
           !
           !     Ensure finite termination for next loop
           !
-          it1  = xk
+          xt  = xk
           x(i) = piv
           in_up2:do 
             j = j - 1
             xk = x(j)
             if (xk <= piv) exit in_up2
           end do in_up2
-          x(i) = it1  
+          x(i) = xt  
 
           if (j > i) then
-            it1     = x(i)
-            it2     = indx(i)
+            xt     = x(i)
+            ixt     = indx(i)
             x(i)    = x(j)
             indx(i) = indx(j)
-            x(j)    = it1 
-            indx(j) = it2  
+            x(j)    = xt 
+            indx(j) = ixt  
           else
             exit outer_up
           end if
@@ -229,40 +231,40 @@ subroutine isrx(n,x,indx,dir,flag)
         lpiv = (i+j)/2
         piv  = x(lpiv)
         if (piv > x(i)) then
-          it1        = x(i)
-          it2        = indx(i)
+          xt        = x(i)
+          ixt        = indx(i)
           x(i)       = x(lpiv)
           indx(i)    = indx(lpiv)
-          x(lpiv)    = it1
-          indx(lpiv) = it2
+          x(lpiv)    = xt
+          indx(lpiv) = ixt
           piv        = x(lpiv)
         endif
         if (piv < x(j)) then
-          it1        = x(j)
-          it2        = indx(j)
+          xt        = x(j)
+          ixt        = indx(j)
           x(j)       = x(lpiv)
           indx(j)    = indx(lpiv)
-          x(lpiv)    = it1
-          indx(lpiv) = it2
+          x(lpiv)    = xt
+          indx(lpiv) = ixt
           piv        = x(lpiv)
         endif
         if (piv > x(i)) then
-          it1        = x(i)
-          it2        = indx(i)
+          xt        = x(i)
+          ixt        = indx(i)
           x(i)       = x(lpiv)
           indx(i)    = indx(lpiv)
-          x(lpiv)    = it1
-          indx(lpiv) = it2
+          x(lpiv)    = xt
+          indx(lpiv) = ixt
           piv        = x(lpiv)
         endif
         !
         !     now piv is correct;  place it into first location
-        it1        = x(i)
-        it2        = indx(i)
+        xt        = x(i)
+        ixt        = indx(i)
         x(i)       = x(lpiv)
         indx(i)    = indx(lpiv)
-        x(lpiv)    = it1
-        indx(lpiv) = it2
+        x(lpiv)    = xt
+        indx(lpiv) = ixt
         piv        = x(lpiv)
 
         i = ilx - 1 
@@ -277,22 +279,22 @@ subroutine isrx(n,x,indx,dir,flag)
           !
           !     Ensure finite termination for next loop
           !
-          it1  = xk
+          xt  = xk
           x(i) = piv
           in_dw2:do 
             j = j - 1
             xk = x(j)
             if (xk >= piv) exit in_dw2
           end do in_dw2
-          x(i) = it1  
+          x(i) = xt  
 
           if (j > i) then
-            it1     = x(i)
-            it2     = indx(i)
+            xt     = x(i)
+            ixt     = indx(i)
             x(i)    = x(j)
             indx(i) = indx(j)
-            x(j)    = it1 
-            indx(j) = it2  
+            x(j)    = xt  
+            indx(j) = ixt  
           else
             exit outer_dw
           end if
@@ -353,6 +355,7 @@ subroutine isrx(n,x,indx,dir,flag)
 contains
 
   subroutine iisrx_up(n,x,indx)
+    implicit none
     integer :: n
     integer :: x(n)
     integer :: indx(n)
@@ -378,6 +381,7 @@ contains
   end subroutine iisrx_up
 
   subroutine iisrx_dw(n,x,indx)
+    implicit none
     integer :: n
     integer :: x(n)
     integer :: indx(n)

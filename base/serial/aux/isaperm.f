@@ -45,6 +45,8 @@ C
 *                                                                     *
 ***********************************************************************
       LOGICAL FUNCTION ISAPERM(N,IP)               
+      implicit none
+
 C     .. Scalar Arguments ..                                                    
       INTEGER N                                                                 
 C     ..                                                                        

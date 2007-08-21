@@ -68,6 +68,7 @@
 !
 !
 subroutine msort_up(n,k,l,iret)
+  implicit none
   integer n, iret
   integer k(n),l(0:n+1)
   !

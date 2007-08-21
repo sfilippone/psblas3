@@ -33,6 +33,7 @@
  ! Parameters:
 subroutine imsrx(n,x,indx,idir,flag)
   use psb_serial_mod
+  implicit none
   integer :: n,idir,flag
   integer :: x(n)
   integer :: indx(n)
