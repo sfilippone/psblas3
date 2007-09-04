@@ -95,7 +95,6 @@ Subroutine psb_dcgstab(a,prec,b,x,eps,desc_a,info,&
   Real(Kind(1.d0)) :: rerr
   Integer       :: litmax, naux, m, mglob, it,itrace_,&
        & np,me, n_row, n_col
-  Character     ::diagl, diagu
   Logical, Parameter :: debug = .false.
   Logical, Parameter :: exchange=.True., noexchange=.False., debug1 = .False.
   Integer, Parameter :: irmax = 8
@@ -204,9 +203,6 @@ Subroutine psb_dcgstab(a,prec,b,x,eps,desc_a,info,&
      itrace_ = 0
   End If
   
-  diagl = 'U'
-  diagu = 'U'
-
   ! Ensure global coherence for convergence checks.
   call psb_set_coher(ictxt,isvch)
 

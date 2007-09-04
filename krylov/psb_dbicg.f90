@@ -98,7 +98,6 @@ subroutine psb_dbicg(a,prec,b,x,eps,desc_a,info,&
   real(kind(1.d0)) ::rerr
   integer       ::litmax, liter, naux, m, mglob, it, itrace_,&
        & np,me, n_row, n_col, istop_, err_act
-  character     ::diagl, diagu
   logical, parameter :: debug = .false.
   logical, parameter :: exchange=.true., noexchange=.false.  
   integer, parameter :: irmax = 8
@@ -198,8 +197,6 @@ subroutine psb_dbicg(a,prec,b,x,eps,desc_a,info,&
     itrace_ = 0
   end if
 
-  diagl  = 'u'
-  diagu  = 'u'
   itx   = 0
   
   if (istop_ == 1) then 

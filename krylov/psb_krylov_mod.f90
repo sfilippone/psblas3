@@ -127,7 +127,6 @@ Module psb_krylov_mod
          &itmax,iter,err,itrace,irst,istop)
       use psb_base_mod
       use psb_prec_mod
-!!$  parameters 
       Type(psb_dspmat_type), Intent(in)  :: a
       Type(psb_desc_type), Intent(in)    :: desc_a
       type(psb_dprec_type), intent(in)   :: prec 
@@ -139,6 +138,21 @@ Module psb_krylov_mod
       Integer, Optional, Intent(out)     :: iter
       Real(Kind(1.d0)), Optional, Intent(out) :: err
     end subroutine psb_dgmresr
+    Subroutine psb_zgmresr(a,prec,b,x,eps,desc_a,info,&
+         &itmax,iter,err,itrace,irst,istop)
+      use psb_base_mod
+      use psb_prec_mod
+      Type(psb_zspmat_type), Intent(in)  :: a
+      Type(psb_desc_type), Intent(in)    :: desc_a
+      type(psb_zprec_type), intent(in)   :: prec 
+      complex(Kind(1.d0)), Intent(in)    :: b(:)
+      complex(Kind(1.d0)), Intent(inout) :: x(:)
+      Real(Kind(1.d0)), Intent(in)       :: eps
+      integer, intent(out)               :: info
+      Integer, Optional, Intent(in)      :: itmax, itrace, irst,istop
+      Integer, Optional, Intent(out)     :: iter
+      Real(Kind(1.d0)), Optional, Intent(out) :: err
+    end subroutine psb_zgmresr
   end interface
 
   interface psb_cgs
@@ -146,7 +160,6 @@ Module psb_krylov_mod
          &itmax,iter,err,itrace,istop)
       use psb_base_mod
       use psb_prec_mod
-!!$  parameters 
       type(psb_dspmat_type), intent(in)  :: a
       type(psb_desc_type), intent(in)    :: desc_a 
       type(psb_dprec_type), intent(in)   :: prec 
@@ -266,10 +279,10 @@ contains
 !!$         &itmax,iter,err,itrace,istop)
     case('BICGSTAB') 
       call  psb_bicgstab(a,prec,b,x,eps,desc_a,info,&
-         &itmax,iter,err,itrace,istop)
-!!$    case('RGMRES')
-!!$      call  psb_rgmres(a,prec,b,x,eps,desc_a,info,&
-!!$         &itmax,iter,err,itrace,irst,istop)
+           & itmax,iter,err,itrace,istop)
+    case('RGMRES')
+      call  psb_rgmres(a,prec,b,x,eps,desc_a,info,&
+           & itmax,iter,err,itrace,irst,istop)
 !!$    case('BICGSTABL')
 !!$      call  psb_bicgstabl(a,prec,b,x,eps,desc_a,info,&
 !!$         &itmax,iter,err,itrace,irst,istop)

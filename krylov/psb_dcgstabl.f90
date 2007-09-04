@@ -103,7 +103,6 @@ Subroutine psb_dcgstabl(a,prec,b,x,eps,desc_a,info,&
   Real(Kind(1.d0)) :: rerr
   Integer       :: litmax, naux, m, mglob, it, itrace_,&
        & np,me, n_row, n_col, nl, err_act
-  Character     ::diagl, diagu
   Logical, Parameter :: exchange=.True., noexchange=.False.  
   Integer, Parameter :: irmax = 8
   Integer            :: itx, i, isvch, ich, ictxt,istop_,j, int_err(5)
@@ -233,8 +232,6 @@ Subroutine psb_dcgstabl(a,prec,b,x,eps,desc_a,info,&
      goto 9999
   End If
 
-  diagl  = 'u'
-  diagu  = 'u'
   itx   = 0
   restart: Do 
 !!$   

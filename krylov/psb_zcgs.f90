@@ -95,7 +95,6 @@ Subroutine psb_zcgs(a,prec,b,x,eps,desc_a,info,&
   Real(Kind(1.d0)) :: rerr
   Integer       :: litmax, naux, m, mglob, it, itrace_,int_err(5),&
        & np,me, n_row, n_col,istop_, err_act
-  Character     ::diagl, diagu
   Logical, Parameter :: exchange=.True., noexchange=.False.  
   Integer, Parameter :: irmax = 8
   Integer            :: itx, i, isvch, ictxt
@@ -196,8 +195,6 @@ Subroutine psb_zcgs(a,prec,b,x,eps,desc_a,info,&
   ! Ensure global coherence for convergence checks.
   call psb_set_coher(ictxt,isvch)
   
-  diagl  = 'u'
-  diagu  = 'u'
   itx   = 0
 
   if (istop_ == 1) then 
