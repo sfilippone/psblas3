@@ -1,6 +1,8 @@
 Changelog. A lot less detailed than usual, at least for past
 history. 
 
+2007/09/04: Implemented RGMRES for complex data.
+
 2007/06/04: Fixed implementation of fctint and coins: assume size
 	    arrays caused troubles on some compilers. Documentation of
 	    set_large_threshold. 
