@@ -118,10 +118,10 @@ Subroutine psb_zgmresr(a,prec,b,x,eps,desc_a,info,&
   character(len=20)          :: name
 
   info = 0
-  name = 'psb_dgmres'
+  name = 'psb_zgmres'
   call psb_erractionsave(err_act)
 
-  If (debug) Write(0,*) 'entering psb_dgmres'
+  If (debug) Write(0,*) 'entering psb_zgmres'
   ictxt = psb_cd_get_context(desc_a)
   Call psb_info(ictxt, me, np)
 
