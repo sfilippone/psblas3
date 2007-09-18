@@ -316,7 +316,7 @@ Subroutine psb_zgmresr(a,prec,b,x,eps,desc_a,info,&
       rti  = h(i,i)
       rti1 = h(i+1,i) 
       call zrotg(rti,rti1,tmp,s(i))
-      c(i) = cmplx(tmp,zzero)
+      c(i) = cmplx(tmp,dzero)
       call zrot(1,h(i,i),1,h(i+1,i),1,real(c(i)),s(i))
       h(i+1,i) = zzero
       call zrot(1,rs(i),1,rs(i+1),1,real(c(i)),s(i))
