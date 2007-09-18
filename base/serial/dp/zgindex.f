@@ -28,7 +28,7 @@ C ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 C POSSIBILITY OF SUCH DAMAGE.
 C
 C 
-      SUBROUTINE ZGINDEX(M,N_BLOCKS,A,IA1,IA2,ARN,KA,IA,JA, INFON,
+      SUBROUTINE ZGINDEX(M,N_BLOCKS,A,IA1,IA2,infoa,ARN,KA,IA,JA, INFON,
      +  LARN,LKA,LJA,IPERM,WORK, LWORK, SIZE_REQ, IERROR)
 
       use psb_const_mod
@@ -43,12 +43,12 @@ C     ... Array arguments ...
 
       complex(kind(1.d0))  A(*), ARN(*)
       INTEGER          IA1(*), IA2(*), KA(*), 
-     +  IA(3,*), IPERM(*), JA(*), WORK(*),INFON(*)
+     +  IA(3,*), IPERM(*), JA(*), WORK(*),INFON(*), infoa(*)
       
 C     .... Local scalars ...
       INTEGER          I, J, BLOCK, ROW, COL, POINT_AR, POINT_JA, IP1,
      +  IP2, IPX, NNZ, DIM_BLOCK, LIMIT, IPW,COUNT, IPC,CHECK_FLAG,
-     +  ERR_ACT
+     +  ERR_ACT, ix, regen_flag
       LOGICAL          CSR
 c     .. Local Arrays ..
       CHARACTER*20       NAME
@@ -61,6 +61,8 @@ c     .. Local Arrays ..
       POINT_AR = 1
       POINT_JA = 0
       call psb_getifield(check_flag,psb_dupl_,infon,psb_ifasize_,ierror)
+      call psb_getifield(regen_flag,psb_upd_,infon,psb_ifasize_,ierror)
+
 
       IF ((LARN.LT.POINT_AR).OR.(LKA.LT.POINT_AR)) THEN
         IERROR = 60
@@ -71,8 +73,8 @@ c     .. Local Arrays ..
         GOTO 9999
       ENDIF
 
-      NNZ = IA2(M + 1) - 1
-      COUNT            = 0
+      NNZ    = IA2(M + 1) - 1
+      COUNT  = 0
 
 C     .... Invert Permutation Matrix...
       IF (IPERM(1).NE.0) THEN
@@ -81,7 +83,9 @@ C     .... Invert Permutation Matrix...
         ENDDO
       ENDIF
 
-      IF ( (LKA .GE.( SIZE_REQ ))  
+      size_Req=0
+
+      IF ( (regen_flag == psb_upd_perm_)
      +  .AND. (LWORK .GE. (M + NNZ+2))) THEN
 C     
 C     Prepare for smart regeneration
@@ -98,19 +102,25 @@ C
         KA(IP1+PSB_NNZT_)    = NNZ
         KA(IP1+PSB_NNZ_)     = 0
         KA(IP1+PSB_ICHK_)    = NNZ+CHECK_FLAG
-        I                = M+2
-        IPX              = IA2(I+PSB_IP2_)
 
+        if (infoa(psb_upd_pnt_) > 0) then 
+          I                    = infoa(psb_upd_pnt_)
+          IPX                  = IA2(I+PSB_IP2_)
 C     Invert permutation for smart regeneration
-
-        DO I = 1, NNZ
-          WORK(IPW + IA2(IPX + I -1) - 1) = I
-        ENDDO
-
+          
+          DO I = 1, NNZ
+            WORK(IPW + IA2(IPX + I -1) - 1) = I
+          ENDDO
+        else
+          ! No permutation available before, set identity.
+          DO I = 1, NNZ
+            WORK(IPW + I  - 1) = I
+          ENDDO
+        endif
 C     Construct JAD matrix...
 
         DO BLOCK = 1, N_BLOCKS
-          COL = 1
+          COL       = 1
           DIM_BLOCK = IA(1,BLOCK+1)-IA(1,BLOCK)
 c$$$  write(0,*) 'ZGINDEX: BLOCK LOOP ',block,n_blocks,dim_block
           if (dim_block .gt. PSB_MAXJDROWS_) then 
@@ -270,9 +280,19 @@ C     ... For each nnzero elements belonging to current row ...
           ENDDO
         ENDDO
         
+        IA(2,N_BLOCKS+1) = POINT_JA
+        KA(IP1 + PSB_ZERO_) = COUNT
+        
+        IF (POINT_AR.GE.IP1) THEN
+          SIZE_REQ=NNZ+COUNT
+        ELSE
+          SIZE_REQ=0
+        ENDIF        
         
       ELSE
 c$$$  c      write(*,*)'inizio a ciclare sui blocchi'
+        IP1 = LKA - PSB_ZERO_ 
+
         DO BLOCK = 1, N_BLOCKS
           COL = 1
           DIM_BLOCK = IA(1,BLOCK+1)-IA(1,BLOCK)
@@ -415,16 +435,15 @@ C     ... For each nnzero elements belonging to current row ...
         
         
         
+        IA(2,N_BLOCKS+1) = POINT_JA
         
+        IF (POINT_AR.GE.lka) THEN
+          SIZE_REQ=NNZ+COUNT
+        ELSE
+          SIZE_REQ=0
+        ENDIF        
       ENDIF
-      IA(2,N_BLOCKS+1) = POINT_JA
-      KA(IP1 + PSB_ZERO_) = COUNT
 
-      IF(POINT_AR.GE.IP1) THEN
-        SIZE_REQ=NNZ+COUNT
-      ELSE
-        SIZE_REQ=0
-      ENDIF
       infon(1)=point_ar-1
 
       CALL FCPSB_ERRACTIONRESTORE(ERR_ACT)

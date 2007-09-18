@@ -161,8 +161,9 @@ C             IERROR > 0   error
 C
 C
       SUBROUTINE ZCRCR(TRANS,M,N,UNITD,D,DESCRA,A,IA1,IA2,INFOA,IP1,
-     *                 DESCRN,AN,IAN1,IAN2,INFON,IP2,LAN,LIAN1,LIAN2,
-     *                 WORK,LWORK,IERROR)
+     *  DESCRN,AN,IAN1,IAN2,INFON,IP2,LAN,LIAN1,LIAN2,
+     *  WORK,LWORK,IERROR)
+      use psb_string_mod
       IMPLICIT NONE                                                      
 C
 C     .. Scalar Arguments ..
@@ -171,12 +172,13 @@ C     .. Scalar Arguments ..
 C     .. Array Arguments ..
       complex(kind(1.d0))  A(*), AN(*), D(*), WORK(LWORK)
       INTEGER          IA1(*), IA2(*), IAN1(*), IAN2(*), IP1(*), IP2(*),
-     *                 INFOA(*), INFON(*)
+     *  INFOA(*), INFON(*)
       CHARACTER        DESCRA*11, DESCRN*11
 C     .. Local Scalars ..
       INTEGER          I, J, ERR_ACT
       LOGICAL          EXIT
 c     .. Local Arrays ..
+      character  idescra*11
       CHARACTER*20       NAME
       INTEGER            INT_VAL(5)
 
@@ -192,65 +194,66 @@ C
 C
 C       Check for argument errors
 C
-      IF(((DESCRA(1:1) .EQ. 'S' .OR. DESCRA(1:1) .EQ. 'H' .OR.
-     &   DESCRA(1:1) .EQ. 'A') .AND. (UNITD .NE. 'B'))  .OR.
-     &   (.NOT.((DESCRA(3:3).EQ.'N').OR.(DESCRA(3:3).EQ.'L').OR.
-     +  (DESCRA(3:3).EQ.'U'))) .OR.
-     +  TRANS.NE.'N') THEN
-         IERROR = 20
+      idescra=toupper(descra)
+      IF(((IDESCRA(1:1) .EQ. 'S' .OR. IDESCRA(1:1) .EQ. 'H' .OR.
+     &  IDESCRA(1:1) .EQ. 'A') .AND. (toupper(UNITD) .NE. 'B'))  .OR.
+     &  (.NOT.((IDESCRA(3:3).EQ.'N').OR.(IDESCRA(3:3).EQ.'L').OR.
+     +  (IDESCRA(3:3).EQ.'U'))) .OR.
+     +  toupper(TRANS).NE.'N') THEN
+        IERROR = 20
       ENDIF
       IF(LAN.LT.(IA2(M+1)-1)) THEN
-         IF     (LAN.LE.0) THEN
-            EXIT=.TRUE.
-            AN(1) = DBLE(IA2(M+1)-1)
-         ELSE
-            IERROR = 21
-         ENDIF
+        IF     (LAN.LE.0) THEN
+          EXIT=.TRUE.
+          AN(1) = DBLE(IA2(M+1)-1)
+        ELSE
+          IERROR = 21
+        ENDIF
       ENDIF
       IF(LIAN1.LT.(IA2(M+1)-1)) THEN
-         IF     (LAN.LE.0) THEN
-            EXIT=.TRUE.
-            IAN1(1) = IA2(M+1)-1
-         ELSE
-            IERROR = 22
-         ENDIF
+        IF     (LAN.LE.0) THEN
+          EXIT=.TRUE.
+          IAN1(1) = IA2(M+1)-1
+        ELSE
+          IERROR = 22
+        ENDIF
       ENDIF
       IF(LIAN2.LT.(M+1)) THEN
-         IF     (LAN.LE.0) THEN
-            EXIT=.TRUE.
-            IAN2(1) = M+1
-         ELSE
-            IERROR = 23
-         ENDIF
+        IF     (LAN.LE.0) THEN
+          EXIT=.TRUE.
+          IAN2(1) = M+1
+        ELSE
+          IERROR = 23
+        ENDIF
       ENDIF
-      IF ((DESCRA(1:1) .EQ. 'S' .OR. DESCRA(1:1) .EQ. 'H' .OR.
-     &     DESCRA(1:1) .EQ. 'A') .AND. (UNITD .EQ. 'B')) THEN
-         IF (LWORK.LT.M) THEN
-            IF     (LWORK.LE.0) THEN
-               EXIT=.TRUE.
-            ELSE
-               IERROR = 25
-            ENDIF
-            WORK(1) = DBLE(M)
-         ENDIF
+      IF ((IDESCRA(1:1) .EQ. 'S' .OR. IDESCRA(1:1) .EQ. 'H' .OR.
+     &  IDESCRA(1:1) .EQ. 'A') .AND. (toupper(UNITD) .EQ. 'B')) THEN
+        IF (LWORK.LT.M) THEN
+          IF     (LWORK.LE.0) THEN
+            EXIT=.TRUE.
+          ELSE
+            IERROR = 25
+          ENDIF
+          WORK(1) = DBLE(M)
+        ENDIF
       ELSE
-         IF (LWORK.LT.0) THEN
-            WORK(1) = 0.D0
-         ENDIF
+        IF (LWORK.LT.0) THEN
+          WORK(1) = 0.D0
+        ENDIF
       ENDIF
 C
 C     Error handling
 C
-        IF(IERROR.NE.0) THEN
-           CALL FCPSB_ERRPUSH(IERROR,NAME,INT_VAL)
-           GOTO 9999
-        END IF
+      IF(IERROR.NE.0) THEN
+        CALL FCPSB_ERRPUSH(IERROR,NAME,INT_VAL)
+        GOTO 9999
+      END IF
 
       IF (EXIT)    goto 9998
 C
 C     Set DESCRN, IP1, IP2
 C
-      DESCRN(1:3) = DESCRA(1:3)
+      DESCRN(1:3) = IDESCRA(1:3)
 
       IP1(1)=0
       IP2(1)=0
@@ -258,38 +261,38 @@ C
 C     Compute output matrix
 C
       DO 20 I = 1, M+1
-         IAN2(I) = IA2(I)
+        IAN2(I) = IA2(I)
  20   CONTINUE
-      IF ((DESCRA(1:1) .EQ. 'S' .OR. DESCRA(1:1) .EQ. 'H' .OR.
-     &     DESCRA(1:1) .EQ. 'A') .AND. (UNITD .EQ. 'B')) THEN
-         DO 30 I = 1, M
-            WORK(I) = DBLE(DSQRT(ABS(D(I))))
- 30      CONTINUE
-         DO 40 I = 1, M
-            DO 50 J = IA2(I), IA2(I+1)-1
-               AN(J)   = WORK(I) * A(J) * WORK(IA1(J))
-               IAN1(J) = IA1(J)
- 50         CONTINUE
- 40      CONTINUE
-      ELSE IF (UNITD .EQ. 'L') THEN
-            DO 60 I = 1, M
-               DO 70 J = IA2(I), IA2(I+1)-1
-                  AN(J)   = D(I) * A(J)
-                  IAN1(J) = IA1(J)
- 70            CONTINUE
- 60         CONTINUE
-      ELSE IF (UNITD .EQ. 'R') THEN
-            DO 80 I = 1, M
-               DO 90 J = IA2(I), IA2(I+1)-1
-                  AN(J)   = A(J) * D(IA1(J))
-                  IAN1(J) = IA1(J)
- 90            CONTINUE
- 80         CONTINUE
-      ELSE IF (UNITD .EQ. 'U') THEN
-         DO 100 J = 1, IA2(M+1)-1
-            AN(J)   = A(J)
+      IF ((IDESCRA(1:1) .EQ. 'S' .OR. IDESCRA(1:1) .EQ. 'H' .OR.
+     &  IDESCRA(1:1) .EQ. 'A') .AND. (toupper(UNITD) .EQ. 'B')) THEN
+        DO 30 I = 1, M
+          WORK(I) = DBLE(DSQRT(ABS(D(I))))
+ 30     CONTINUE
+        DO 40 I = 1, M
+          DO 50 J = IA2(I), IA2(I+1)-1
+            AN(J)   = WORK(I) * A(J) * WORK(IA1(J))
             IAN1(J) = IA1(J)
- 100     CONTINUE
+ 50       CONTINUE
+ 40     CONTINUE
+      ELSE IF (toupper(UNITD) .EQ. 'L') THEN
+        DO 60 I = 1, M
+          DO 70 J = IA2(I), IA2(I+1)-1
+            AN(J)   = D(I) * A(J)
+            IAN1(J) = IA1(J)
+ 70       CONTINUE
+ 60     CONTINUE
+      ELSE IF (toupper(UNITD) .EQ. 'R') THEN
+        DO 80 I = 1, M
+          DO 90 J = IA2(I), IA2(I+1)-1
+            AN(J)   = A(J) * D(IA1(J))
+            IAN1(J) = IA1(J)
+ 90       CONTINUE
+ 80     CONTINUE
+      ELSE IF (toupper(UNITD) .EQ. 'U') THEN
+        DO 100 J = 1, IA2(M+1)-1
+          AN(J)   = A(J)
+          IAN1(J) = IA1(J)
+ 100    CONTINUE
       ENDIF
 
  9998 CONTINUE
@@ -300,8 +303,8 @@ C
       CALL FCPSB_ERRACTIONRESTORE(ERR_ACT)
 
       IF ( ERR_ACT .NE. 0 ) THEN 
-         CALL FCPSB_SERROR()
-         RETURN
+        CALL FCPSB_SERROR()
+        RETURN
       ENDIF
 
       RETURN

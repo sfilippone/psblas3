@@ -140,9 +140,44 @@ module psb_serial_mod
     subroutine psb_cest(afmt, m,n,nnz, lia1, lia2, lar, iup, info)
       integer, intent(in) ::  m,n,nnz,iup
       integer, intent(out) :: lia1, lia2, lar, info
-      character, intent(inout) :: afmt*5
+      character(len=*), intent(inout) :: afmt
     end subroutine psb_cest
   end interface
+
+  interface psb_spcnv
+    subroutine psb_dspcnv2(ain, a, info, afmt, upd, dupl)
+      use psb_spmat_type
+      type(psb_dspmat_type), intent (in)     :: ain
+      type(psb_dspmat_type), intent (out)    :: a
+      integer, intent(out)                   :: info
+      integer,optional, intent(in)           :: dupl, upd
+      character(len=*), optional, intent(in) :: afmt
+    end subroutine psb_dspcnv2
+    subroutine psb_dspcnv1(a, info, afmt, upd, dupl)
+      use psb_spmat_type
+      type(psb_dspmat_type), intent (inout)   :: a
+      integer, intent(out)                    :: info
+      integer,optional, intent(in)            :: dupl, upd
+      character(len=*), optional, intent(in)  :: afmt
+    end subroutine psb_dspcnv1
+    subroutine psb_zspcnv2(ain, a, info, afmt, upd, dupl)
+      use psb_spmat_type
+      type(psb_zspmat_type), intent (in)     :: ain
+      type(psb_zspmat_type), intent (out)    :: a
+      integer, intent(out)                   :: info
+      integer,optional, intent(in)           :: dupl, upd
+      character(len=*), optional, intent(in) :: afmt
+    end subroutine psb_zspcnv2
+    subroutine psb_zspcnv1(a, info, afmt, upd, dupl)
+      use psb_spmat_type
+      type(psb_zspmat_type), intent (inout)   :: a
+      integer, intent(out)                    :: info
+      integer,optional, intent(in)            :: dupl, upd
+      character(len=*), optional, intent(in)  :: afmt
+    end subroutine psb_zspcnv1
+  end interface
+
+
 
   interface psb_fixcoo
     subroutine psb_dfixcoo(a,info,idir)
@@ -466,10 +501,13 @@ module psb_serial_mod
     module procedure imsort_u
   end interface
   interface psb_qsort
-    module procedure iqsort
+    module procedure iqsort, dqsort, zqsort
   end interface
 
-  integer, parameter :: psb_sort_up_=1, psb_sort_down_=-1
+  integer, parameter :: psb_sort_up_=1,  psb_sort_down_=-1
+  integer, parameter :: psb_lsort_up_=2, psb_lsort_down_=-2
+  integer, parameter :: psb_asort_up_=3, psb_asort_down_=-3
+  integer, parameter :: psb_alsort_up_=4, psb_alsort_down_=-4
   integer, parameter :: psb_sort_ovw_idx_=0, psb_sort_keep_idx_=1
 
 contains
@@ -587,43 +625,59 @@ contains
     name='psb_qsort'
     call psb_erractionsave(err_act)
 
+    if (present(flag)) then 
+      flag_ = flag
+    else 
+      flag_ = psb_sort_ovw_idx_
+    end if
+    select case(flag_) 
+    case( psb_sort_ovw_idx_, psb_sort_keep_idx_)
+      ! OK keep going
+    case default
+      call psb_errpush(30,name,i_err=(/4,flag_,0,0,0/))
+      goto 9999
+    end select
+    
     if (present(dir)) then 
       dir_ = dir
     else
       dir_= psb_sort_up_
     end if
+
+    n = size(x)
+
     select case(dir_) 
     case( psb_sort_up_, psb_sort_down_)
+      if (present(ix)) then 
+        if (size(ix) < n) then 
+          call psb_errpush(35,name,i_err=(/2,size(ix),0,0,0/))
+          goto 9999
+        end if
+        
+        call isrx(n,x,ix,dir_,flag_)
+      else
+        call isr(n,x,dir_)
+      end if
+      
+    case( psb_asort_up_, psb_asort_down_)
       ! OK keep going
+      if (present(ix)) then 
+        if (size(ix) < n) then 
+          call psb_errpush(35,name,i_err=(/2,size(ix),0,0,0/))
+          goto 9999
+        end if
+        
+        call iasrx(n,x,ix,dir_,flag_)
+      else
+        call iasr(n,x,dir_)
+      end if
+      
     case default
       call psb_errpush(30,name,i_err=(/3,dir_,0,0,0/))
       goto 9999
     end select
       
-    n = size(x)
- 
-    if (present(ix)) then 
-      if (size(ix) < n) then 
-        call psb_errpush(35,name,i_err=(/2,size(ix),0,0,0/))
-        goto 9999
-      end if
-      if (present(flag)) then 
-        flag_ = flag
-      else 
-        flag_ = psb_sort_ovw_idx_
-      end if
-      select case(flag_) 
-      case( psb_sort_ovw_idx_, psb_sort_keep_idx_)
-        ! OK keep going
-      case default
-        call psb_errpush(30,name,i_err=(/4,flag_,0,0,0/))
-        goto 9999
-      end select
-
-      call isrx(n,x,ix,dir_,flag_)
-    else
-      call isr(n,x,dir_)
-    end if
+    
 
 9999 continue 
     if (err_act.eq.psb_act_abort_) then
@@ -633,6 +687,169 @@ contains
   end subroutine iqsort
 
 
+  subroutine dqsort(x,ix,dir,flag)
+    use psb_error_mod
+    implicit none 
+    real(kind(1.d0)), intent(inout)  :: x(:) 
+    integer, optional, intent(in)    :: dir, flag
+    integer, optional, intent(inout) :: ix(:)
+    
+    integer  :: dir_, flag_, n, err_act
+    
+    character(len=20)  :: name
+
+    name='psb_qsort'
+    call psb_erractionsave(err_act)
+
+    if (present(flag)) then 
+      flag_ = flag
+    else 
+      flag_ = psb_sort_ovw_idx_
+    end if
+    select case(flag_) 
+    case( psb_sort_ovw_idx_, psb_sort_keep_idx_)
+      ! OK keep going
+    case default
+      call psb_errpush(30,name,i_err=(/4,flag_,0,0,0/))
+      goto 9999
+    end select
+    
+    if (present(dir)) then 
+      dir_ = dir
+    else
+      dir_= psb_sort_up_
+    end if
+
+    n = size(x)
+
+    select case(dir_) 
+    case( psb_sort_up_, psb_sort_down_)
+      if (present(ix)) then 
+        if (size(ix) < n) then 
+          call psb_errpush(35,name,i_err=(/2,size(ix),0,0,0/))
+          goto 9999
+        end if
+        
+        call dsrx(n,x,ix,dir_,flag_)
+      else
+        call dsr(n,x,dir_)
+      end if
+      
+    case( psb_asort_up_, psb_asort_down_)
+      ! OK keep going
+      if (present(ix)) then 
+        if (size(ix) < n) then 
+          call psb_errpush(35,name,i_err=(/2,size(ix),0,0,0/))
+          goto 9999
+        end if
+        
+        call dasrx(n,x,ix,dir_,flag_)
+      else
+        call dasr(n,x,dir_)
+      end if
+      
+    case default
+      call psb_errpush(30,name,i_err=(/3,dir_,0,0,0/))
+      goto 9999
+    end select
+      
+    
+
+9999 continue 
+    if (err_act.eq.psb_act_abort_) then
+      call psb_error()
+      return
+    end if
+  end subroutine dqsort
+
+
+  subroutine zqsort(x,ix,dir,flag)
+    use psb_error_mod
+    implicit none 
+    complex(kind(1.d0)), intent(inout)  :: x(:) 
+    integer, optional, intent(in)    :: dir, flag
+    integer, optional, intent(inout) :: ix(:)
+    
+    integer  :: dir_, flag_, n, err_act
+    
+    character(len=20)  :: name
+
+    name='psb_qsort'
+    call psb_erractionsave(err_act)
+
+    if (present(flag)) then 
+      flag_ = flag
+    else 
+      flag_ = psb_sort_ovw_idx_
+    end if
+    select case(flag_) 
+    case( psb_sort_ovw_idx_, psb_sort_keep_idx_)
+      ! OK keep going
+    case default
+      call psb_errpush(30,name,i_err=(/4,flag_,0,0,0/))
+      goto 9999
+    end select
+    
+    if (present(dir)) then 
+      dir_ = dir
+    else
+      dir_= psb_lsort_up_
+    end if
+
+    n = size(x)
+
+    select case(dir_) 
+    case( psb_lsort_up_, psb_lsort_down_)
+      if (present(ix)) then 
+        if (size(ix) < n) then 
+          call psb_errpush(35,name,i_err=(/2,size(ix),0,0,0/))
+          goto 9999
+        end if
+        
+        call zlsrx(n,x,ix,dir_,flag_)
+      else
+        call zlsr(n,x,dir_)
+      end if
+      
+    case( psb_alsort_up_, psb_alsort_down_)
+      ! OK keep going
+      if (present(ix)) then 
+        if (size(ix) < n) then 
+          call psb_errpush(35,name,i_err=(/2,size(ix),0,0,0/))
+          goto 9999
+        end if
+        
+        call zalsrx(n,x,ix,dir_,flag_)
+      else
+        call zalsr(n,x,dir_)
+      end if
+
+    case( psb_asort_up_, psb_asort_down_)
+      ! OK keep going
+      if (present(ix)) then 
+        if (size(ix) < n) then 
+          call psb_errpush(35,name,i_err=(/2,size(ix),0,0,0/))
+          goto 9999
+        end if
+        
+        call zasrx(n,x,ix,dir_,flag_)
+      else
+        call zasr(n,x,dir_)
+      end if
+      
+    case default
+      call psb_errpush(30,name,i_err=(/3,dir_,0,0,0/))
+      goto 9999
+    end select
+      
+    
+
+9999 continue 
+    if (err_act.eq.psb_act_abort_) then
+      call psb_error()
+      return
+    end if
+  end subroutine zqsort
 
 end module psb_serial_mod
 

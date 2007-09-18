@@ -121,6 +121,7 @@ C
 C                                                                        
       SUBROUTINE DCSRRP(TRANS,M,N,DESCRA,JA,IA,                          
      +   P,WORK,LWORK,IERROR)
+      use psb_string_mod
       IMPLICIT NONE                                                      
 C     .. Scalar Arguments ..
       INTEGER          LWORK, M, N, IERROR
@@ -143,7 +144,8 @@ C
       IERROR = 0
       CALL FCPSB_ERRACTIONSAVE(ERR_ACT)
 
-      IF (DESCRA(1:1).EQ.'S' .OR. DESCRA(1:1).EQ.'T') THEN
+      IF (toupper(DESCRA(1:1)).EQ.'S' .OR.
+     +   toupper(DESCRA(1:1)).EQ.'T') THEN
          IERROR=3023
          CALL FCPSB_ERRPUSH(IERROR,NAME,INT_VAL)
          GOTO 9999

@@ -31,6 +31,7 @@
 Module psb_tools_mod
   use psb_const_mod
   use psb_gps_mod
+  use psb_spmat_type
 
   interface  psb_geall
     ! 2-D double precision version
@@ -447,7 +448,7 @@ Module psb_tools_mod
       type(psb_desc_type), intent(in)         :: desc_a
       integer, intent(out)                    :: info
       integer,optional, intent(in)            :: dupl, upd
-      character, optional, intent(in)         :: afmt*5
+      character(len=*), optional, intent(in)  :: afmt
     end subroutine psb_dspasb
     subroutine psb_zspasb(a,desc_a, info, afmt, upd, dupl)
       use psb_descriptor_type
@@ -456,32 +457,33 @@ Module psb_tools_mod
       type(psb_desc_type), intent(in)         :: desc_a
       integer, intent(out)                    :: info
       integer,optional, intent(in)            :: dupl, upd
-      character, optional, intent(in)         :: afmt*5
+      character(len=*), optional, intent(in)  :: afmt
     end subroutine psb_zspasb
   end interface
 
 
-  interface psb_spcnv
-    subroutine psb_dspcnv(a,b,desc_a,info)
-      use psb_descriptor_type
-      use psb_spmat_type
-      type(psb_dspmat_type), intent(in)   :: a
-      type(psb_dspmat_type), intent(out)  :: b
-      type(psb_desc_type), intent(in)     :: desc_a
-      integer, intent(out)                :: info
-    end subroutine psb_dspcnv
-    subroutine psb_zspcnv(a,b,desc_a,info)
-      use psb_descriptor_type
-      use psb_spmat_type
-      type(psb_zspmat_type), intent(in)   :: a
-      type(psb_zspmat_type), intent(out)  :: b
-      type(psb_desc_type), intent(in)     :: desc_a
-      integer, intent(out)                :: info
-    end subroutine psb_zspcnv
-  end interface
+!!$  interface psb_spcnv
+!!$    subroutine psb_dspcnv(a,b,desc_a,info)
+!!$      use psb_descriptor_type
+!!$      use psb_spmat_type
+!!$      type(psb_dspmat_type), intent(in)   :: a
+!!$      type(psb_dspmat_type), intent(out)  :: b
+!!$      type(psb_desc_type), intent(in)     :: desc_a
+!!$      integer, intent(out)                :: info
+!!$    end subroutine psb_dspcnv
+!!$    subroutine psb_zspcnv(a,b,desc_a,info)
+!!$      use psb_descriptor_type
+!!$      use psb_spmat_type
+!!$      type(psb_zspmat_type), intent(in)   :: a
+!!$      type(psb_zspmat_type), intent(out)  :: b
+!!$      type(psb_desc_type), intent(in)     :: desc_a
+!!$      integer, intent(out)                :: info
+!!$    end subroutine psb_zspcnv
+!!$  end interface
 
 
   interface psb_spfree
+    module procedure psb_dsp_free, psb_zsp_free
     subroutine psb_dspfree(a, desc_a,info)
       use psb_descriptor_type
       use psb_spmat_type

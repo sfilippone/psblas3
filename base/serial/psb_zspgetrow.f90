@@ -87,21 +87,19 @@ subroutine psb_zspgetrow(irw,a,nz,ia,ja,val,info,iren,lrw,append,nzin)
     nzin_ = 0
   endif
 
-  if (toupper(a%fida) == 'CSR') then 
-     call csr_getrow(irw_,a,nz,ia,ja,val,nzin_,append_,lrw_,info,iren)
-     
-  else if (toupper(a%fida) == 'COO') then 
-     call coo_getrow(irw_,a,nz,ia,ja,val,nzin_,append_,lrw_,info,iren)
-     
-  else if (toupper(a%fida) == 'JAD') then 
-     call jad_getrow(irw_,a,nz,ia,ja,val,nzin_,append_,lrw_,info,iren)
-
-  else
-     info=136
-     ch_err=a%fida(1:3)
-     call psb_errpush(info,name,a_err=ch_err)
-     goto 9999
-  end if
+  select case (tolower(a%fida))
+  case ('csr')
+    call csr_getrow(irw_,a,nz,ia,ja,val,nzin_,append_,lrw_,info,iren)
+  case ('coo')
+    call coo_getrow(irw_,a,nz,ia,ja,val,nzin_,append_,lrw_,info,iren)
+  case ('jad')
+    call jad_getrow(irw_,a,nz,ia,ja,val,nzin_,append_,lrw_,info,iren)
+  case default
+    info=136
+    ch_err=a%fida(1:3)
+    call psb_errpush(info,name,a_err=ch_err)
+    goto 9999
+  end select
   
   if (info /= 0) goto 9999
 !!$  call psb_erractionrestore(err_act)

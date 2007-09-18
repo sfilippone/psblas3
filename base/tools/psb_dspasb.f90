@@ -60,12 +60,12 @@ subroutine psb_dspasb(a,desc_a, info, afmt, upd, dupl)
   type(psb_desc_type), intent(in)         :: desc_a
   integer, intent(out)                    :: info
   integer,optional, intent(in)            :: dupl, upd
-  character, optional, intent(in)         :: afmt*5
+  character(len=*), optional, intent(in)         :: afmt
   !....Locals....
   integer               :: int_err(5)
   type(psb_dspmat_type) :: atemp
   integer               :: np,me,n_col,iout, err_act
-  integer               :: dscstate, spstate
+  integer               :: spstate
   integer               :: upd_, dupl_
   integer               :: ictxt,n_row
   logical, parameter    :: debug=.false., debugwrt=.false.
@@ -77,7 +77,6 @@ subroutine psb_dspasb(a,desc_a, info, afmt, upd, dupl)
   call psb_erractionsave(err_act)
 
   ictxt    = psb_cd_get_context(desc_a)
-  dscstate = psb_cd_get_dectype(desc_a)
   n_row    = psb_cd_get_local_rows(desc_a)
   n_col    = psb_cd_get_local_cols(desc_a)
 
@@ -89,9 +88,9 @@ subroutine psb_dspasb(a,desc_a, info, afmt, upd, dupl)
     goto 9999
   endif
 
-  if (.not.psb_is_asb_dec(dscstate)) then 
+  if (.not.psb_is_asb_desc(desc_a)) then 
     info = 600
-    int_err(1) = dscstate
+    int_err(1) = psb_cd_get_dectype(desc_a)
     call psb_errpush(info,name)
     goto 9999
   endif
@@ -105,121 +104,21 @@ subroutine psb_dspasb(a,desc_a, info, afmt, upd, dupl)
     !
     ! First case: we come from a fresh build. 
     ! 
+
     n_row = psb_cd_get_local_rows(desc_a)
     n_col = psb_cd_get_local_cols(desc_a)
-
-
-    !
-    ! Second step: handle the local matrix part. 
-    !
-    if (present(upd)) then 
-      upd_=upd
-    else
-      upd_ = psb_upd_dflt_
-    endif
-
-    if (present(dupl)) then
-      select case(dupl) 
-      case (psb_dupl_ovwrt_,psb_dupl_add_,psb_dupl_err_)
-        dupl_ = dupl
-      case default
-        dupl_ =  psb_dupl_def_
-      end select
-    else
-      dupl_ =  psb_dupl_def_
-    endif
-
     a%m = n_row
     a%k = n_col
+  end if
 
-    call psb_sp_clone(a,atemp,info)
-    if(info /= psb_no_err_) then
-      info=4010
-      ch_err='psb_sp_clone'
-      call psb_errpush(info,name,a_err=ch_err)
-      goto 9999
-      ! convert to user requested format after the temp copy
-    end if
+  call psb_spcnv(a,info,afmt=afmt,upd=upd,dupl=dupl)
 
-    if (present(afmt)) then
-      a%fida = afmt
-    else 
-      a%fida = '???'
-    endif
-
-    if (debugwrt) then
-      iout = 30+me
-      open(iout)
-      call psb_csprt(iout,atemp,head='Input mat')
-      close(iout)
-    endif
-
-    ! Do the real conversion into the requested storage format
-    ! result is put in A
-    call psb_csdp(atemp,a,info,ifc=2,upd=upd_,dupl=dupl_)
-
-    IF (debug) WRITE (*, *) me,'   ASB:  From DCSDP',info,' ',A%FIDA
-    if (info /= psb_no_err_) then    
-      info=4010
-      ch_err='psb_csdp'
-      call psb_errpush(info,name,a_err=ch_err)
-      goto 9999
-    endif
-
-    if (debugwrt) then
-      iout = 60+me
-      open(iout)
-      call psb_csprt(iout,a,head='Output mat')
-      close(iout)
-    endif
-
-    call psb_sp_free(atemp,info)
-
-
-  else if (spstate == psb_spmat_upd_) then
-    !
-    ! Second  case: we come from an update loop.
-    ! 
-
-
-    ! Right now, almost nothing to be done, but this 
-    ! may change in the future
-    ! as we revise the implementation of the update routine. 
-    call psb_sp_all(atemp,1,info)
-    atemp%m=a%m
-    atemp%k=a%k
-    ! check on allocation
-    if (info /= psb_no_err_) then    
-      info=4010
-      ch_err='psb_sp_all'
-      call psb_errpush(info,name,a_err=ch_err)
-      goto 9999
-    endif
-
-    call psb_csdp(atemp,a,info,check='R')
-    ! check on error retuned by dcsdp
-    if (info /= psb_no_err_) then
-      info = 4010
-      ch_err='psb_csdp90'
-      call psb_errpush(info,name,a_err=ch_err)
-      goto 9999
-    end if
-
-    call psb_sp_free(atemp,info)
-    if (info /= psb_no_err_) then
-      info = 4010
-      ch_err='sp_free'
-      call psb_errpush(info,name,a_err=ch_err)
-      goto 9999
-    end if
-
-  else
-
-    info = 600
-    call psb_errpush(info,name)
+  IF (debug) WRITE (*, *) me,'   ASB:  From DCSDP',info,' ',A%FIDA
+  if (info /= psb_no_err_) then    
+    info=4010
+    ch_err='psb_spcnv'
+    call psb_errpush(info,name,a_err=ch_err)
     goto 9999
-    if (debug) write(0,*) 'Sparse matrix state:',spstate,psb_spmat_bld_,psb_spmat_upd_
-
   endif
 
   call psb_erractionrestore(err_act)

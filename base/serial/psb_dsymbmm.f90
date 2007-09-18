@@ -93,6 +93,7 @@ subroutine psb_dsymbmm(a,b,c,info)
   c%k=b%k
   c%fida='CSR'
   c%descra='GUN'
+  
   deallocate(itemp) 
   call psb_erractionrestore(err_act)
   return

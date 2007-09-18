@@ -34,6 +34,7 @@ C
 
       use psb_const_mod
       use psb_spmat_type
+      use psb_string_mod
       IMPLICIT NONE
 
 C
@@ -63,8 +64,8 @@ C
       IERROR = 0
       CALL FCPSB_ERRACTIONSAVE(ERR_ACT)
 
-      IF (TRANS.EQ.'N') THEN
-        SCALE  = (UNITD.EQ.'L') ! meaningless
+      IF (toupper(TRANS).EQ.'N') THEN
+        SCALE  = (toupper(UNITD).EQ.'L') ! meaningless
         IP1(1) = 0
         IP2(1) = 0
         NNZ = IA2(M+1)-1
@@ -90,7 +91,7 @@ C
           GOTO 9999
         END IF
         
-        IF (DESCRA(1:1).EQ.'G') THEN
+        IF (toupper(DESCRA(1:1)).EQ.'G') THEN
 C        ... Construct COO Representation...
           ELEM = 1
 
@@ -103,7 +104,8 @@ C        ... Construct COO Representation...
             ENDDO
           ENDDO
           INFON(psb_nnz_) = IA2(M+1)-1
-        ELSE IF (DESCRA(1:1).EQ.'S' .AND. DESCRA(2:2).EQ.'U') THEN
+        ELSE IF (toupper(DESCRA(1:1)).EQ.'S' .AND.
+     +      toupper(DESCRA(2:2)).EQ.'U') THEN
 
           DO 20 K = 1, M
             IP2(K) = K
@@ -113,14 +115,16 @@ C        ... Construct COO Representation...
           call fcpsb_errpush(ierror,name,int_val)
           goto 9999
 C
-        ELSE IF (DESCRA(1:1).EQ.'T' .AND. DESCRA(2:2).EQ.'U') THEN
+        ELSE IF (toupper(DESCRA(1:1)).EQ.'T' .AND.
+     +      toupper(DESCRA(2:2)).EQ.'U') THEN
 
 C
           ierror = 3021
           call fcpsb_errpush(ierror,name,int_val)
           goto 9999
 
-        ELSE IF (DESCRA(1:1).EQ.'T' .AND. DESCRA(2:2).EQ.'L') THEN
+        ELSE IF (toupper(DESCRA(1:1)).EQ.'T' .AND.
+     +      toupper(DESCRA(2:2)).EQ.'L') THEN
 
           ierror = 3021
           call fcpsb_errpush(ierror,name,int_val)
@@ -128,7 +132,7 @@ C
 
         END IF
 C
-      ELSE IF (TRANS.NE.'N') THEN
+      ELSE IF (toupper(TRANS).NE.'N') THEN
 C
 C           TO DO
 C     

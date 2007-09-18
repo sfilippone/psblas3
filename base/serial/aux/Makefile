@@ -3,8 +3,12 @@ include ../../../Make.inc
 # The object files
 #
 
-FOBJS  = isr.o isrx.o msort_up.o msort_dw.o\
-	isaperm.o ibsrch.o issrch.o  imsr.o imsrx.o imsru.o
+FOBJS  = isr.o isrx.o iasr.o iasrx.o msort_up.o msort_dw.o\
+	isaperm.o ibsrch.o issrch.o  imsr.o imsrx.o imsru.o\
+	dsr.o dsrx.o dasr.o dasrx.o \
+	zlcmp_mod.o zlsr.o zlsrx.o  \
+	zalcmp_mod.o zalsr.o zalsrx.o \
+	zacmp_mod.o zasr.o zasrx.o 
 
 
 OBJS=$(FOBJS)
@@ -26,9 +30,12 @@ default: lib
 lib: $(OBJS)
 	$(AR) $(LIBDIR)/$(LIBNAME) $(OBJS)
 	$(RANLIB) $(LIBDIR)/$(LIBNAME)
+zlsr.o  zlsrx.o:  zlcmp_mod.o
+zalsr.o zalsrx.o: zalcmp_mod.o
+zasr.o  zasrx.o:  zacmp_mod.o
 
 clean: 
-	/bin/rm -f $(OBJS)
+	/bin/rm -f $(OBJS) *$(.mod)
 
 veryclean: clean
 

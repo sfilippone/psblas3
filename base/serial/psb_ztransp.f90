@@ -36,11 +36,11 @@ subroutine psb_ztransp(a,b,c,fmt)
   use psb_spmat_type
   use psb_tools_mod
   use psb_string_mod
-  use psb_realloc_mod
-  use psb_serial_mod, only : psb_ipcoo2csr, psb_ipcsr2coo, psb_fixcoo, psb_csdp
+  use psb_serial_mod, psb_protect_name => psb_ztransp
   implicit none
 
-  type(psb_zspmat_type)      :: a,b
+  type(psb_zspmat_type), intent(inout) :: a
+  type(psb_zspmat_type), intent(out)   :: b
   integer, optional          :: c
   character(len=*), optional :: fmt
 
@@ -60,51 +60,21 @@ subroutine psb_ztransp(a,b,c,fmt)
     fmt_='CSR'
   endif
 
-  if (.true.) then 
-    if (allocated(b%aspk)) call psb_sp_free(b,info)
-    b%fida   = 'COO'
-    b%descra = 'GUN'
-    call psb_csdp(a,b,info)
-!!$    write(0,*) 'Check from CSDP',b%m,b%k,b%fida,b%descra,b%infoa(psb_nnz_)
-    if (info /= 0) then 
-      write(0,*) 'transp: info from CSDP ',info
-      return
-    end if
-  else
-    if (allocated(b%aspk)) call psb_sp_free(b,info)
-    call psb_sp_clone(a,b,info)
-    
-    if (b%fida=='CSR') then 
-      call psb_ipcsr2coo(b,info)
-    else if (b%fida=='COO') then 
-      ! do nothing 
-    else
-      write(0,*) 'Unimplemented case in TRANSP '
-    endif
-  endif
-
+  call psb_nullify_sp(b)
+  
+  call psb_spcnv(a,b,info,afmt='coo')
+  
+  if (info /= 0) then 
+    write(0,*) 'transp: info from CSDP ',info
+    return
+  end if
   call psb_transfer(b%ia1,itmp,info)
   call psb_transfer(b%ia2,b%ia1,info)
   call psb_transfer(itmp,b%ia2,info)
 
   b%m = a%k 
   b%k = a%m
-
-  if (fmt_=='CSR') then 
-    call psb_ipcoo2csr(b,info)
-    b%fida='CSR'
-  else if (fmt_=='COO') then 
-    call psb_fixcoo(b,info)
-    b%fida='COO'
-  else
-    call psb_nullify_sp(tmp)
-    call psb_sp_clone(b,tmp,info)
-    b%fida=fmt_
-    call psb_csdp(tmp,b,info)
-    !!!!!! ADD HERE ERRPUSH!!! 
-    call psb_sp_free(tmp,info)
-
-  endif
+  call psb_spcnv(b,info,afmt=fmt_)
 
   return
 end subroutine psb_ztransp

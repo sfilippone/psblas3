@@ -32,10 +32,12 @@
 ! Subroutine: 
 ! Parameters:
 
-Subroutine psb_dfixcoo(A,INFO,idir)
+subroutine psb_dfixcoo(a,info,idir)
   use psb_spmat_type
   use psb_const_mod
   use psb_string_mod
+  use psb_serial_mod, psb_protect_name => psb_dfixcoo
+  use psb_error_mod
   implicit none
 
   !....Parameters...
@@ -45,11 +47,14 @@ Subroutine psb_dfixcoo(A,INFO,idir)
 
   integer, allocatable :: iaux(:)
   !locals
-  Integer              :: nza, nzl,iret,idir_
-  integer              :: i,j, irw, icl
+  Integer              :: nza, nzl,iret,idir_, dupl_
+  integer              :: i,j, irw, icl, err_act
   logical, parameter   :: debug=.false.
+  character(len=20)    :: name = 'psb_fixcoo'
 
   info  = 0
+  call psb_erractionsave(err_act)
+
   if(debug) write(0,*)'fixcoo: ',size(a%ia1),size(a%ia2)
   if (toupper(a%fida) /= 'COO') then 
     write(0,*) 'Fixcoo Invalid input ',a%fida
@@ -62,8 +67,10 @@ Subroutine psb_dfixcoo(A,INFO,idir)
     idir_ = 0
   endif
 
-  nza = a%infoa(psb_nnz_)
+  nza = psb_sp_getifld(psb_nnz_,a,info)
   if (nza < 2) return
+
+  dupl_ = psb_sp_getifld(psb_dupl_,a,info)
 
   allocate(iaux(nza+2),stat=info) 
   if (info /= 0) return
@@ -92,22 +99,61 @@ Subroutine psb_dfixcoo(A,INFO,idir)
     irw = a%ia1(i)
     icl = a%ia2(i)
     j = 1
-    do 
-      j = j + 1
-      if (j > nza) exit
-      if ((a%ia1(j) == irw).and.(a%ia2(j) == icl)) then 
-        a%aspk(i) = a%aspk(i) + a%aspk(j)
-      else
-        i = i+1
-        a%aspk(i) = a%aspk(j)
-        a%ia1(i) = a%ia1(j)
-        a%ia2(i) = a%ia2(j)
-        irw = a%ia1(i) 
-        icl = a%ia2(i) 
-      endif
-    enddo
-    a%infoa(psb_nnz_) = i    
-    a%infoa(psb_srtd_) = psb_isrtdcoo_
+
+    select case(dupl_)
+    case(psb_dupl_ovwrt_)
+
+      do 
+        j = j + 1
+        if (j > nza) exit
+        if ((a%ia1(j) == irw).and.(a%ia2(j) == icl)) then 
+          a%aspk(i) = a%aspk(j)
+        else
+          i = i+1
+          a%aspk(i) = a%aspk(j)
+          a%ia1(i) = a%ia1(j)
+          a%ia2(i) = a%ia2(j)
+          irw = a%ia1(i) 
+          icl = a%ia2(i) 
+        endif
+      enddo
+
+    case(psb_dupl_add_)
+
+      do 
+        j = j + 1
+        if (j > nza) exit
+        if ((a%ia1(j) == irw).and.(a%ia2(j) == icl)) then 
+          a%aspk(i) = a%aspk(i) + a%aspk(j)
+        else
+          i = i+1
+          a%aspk(i) = a%aspk(j)
+          a%ia1(i) = a%ia1(j)
+          a%ia2(i) = a%ia2(j)
+          irw = a%ia1(i) 
+          icl = a%ia2(i) 
+        endif
+      enddo
+
+    case(psb_dupl_err_)
+      do 
+        j = j + 1
+        if (j > nza) exit
+        if ((a%ia1(j) == irw).and.(a%ia2(j) == icl)) then 
+          call psb_errpush(130,name)          
+          goto 9999
+        else
+          i = i+1
+          a%aspk(i) = a%aspk(j)
+          a%ia1(i) = a%ia1(j)
+          a%ia2(i) = a%ia2(j)
+          irw = a%ia1(i) 
+          icl = a%ia2(i) 
+        endif
+      enddo
+
+    end select
+
 
     if(debug) write(0,*)'FIXCOO: end second loop'
 
@@ -133,28 +179,79 @@ Subroutine psb_dfixcoo(A,INFO,idir)
     irw = a%ia1(i)
     icl = a%ia2(i)
     j = 1
-    do 
-      j = j + 1
-      if (j > nza) exit
-      if ((a%ia1(j) == irw).and.(a%ia2(j) == icl)) then 
-        a%aspk(i) = a%aspk(i) + a%aspk(j)
-      else
-        i = i+1
-        a%aspk(i) = a%aspk(j)
-        a%ia1(i) = a%ia1(j)
-        a%ia2(i) = a%ia2(j)
-        irw = a%ia1(i) 
-        icl = a%ia2(i) 
-      endif
-    enddo
-    a%infoa(psb_nnz_) = i    
-    a%infoa(psb_srtd_) = psb_isrtdcoo_
 
+
+    select case(dupl_)
+    case(psb_dupl_ovwrt_)
+      do 
+        j = j + 1
+        if (j > nza) exit
+        if ((a%ia1(j) == irw).and.(a%ia2(j) == icl)) then 
+          a%aspk(i) = a%aspk(j)
+        else
+          i = i+1
+          a%aspk(i) = a%aspk(j)
+          a%ia1(i) = a%ia1(j)
+          a%ia2(i) = a%ia2(j)
+          irw = a%ia1(i) 
+          icl = a%ia2(i) 
+        endif
+      enddo
+
+    case(psb_dupl_add_)
+      do 
+        j = j + 1
+        if (j > nza) exit
+        if ((a%ia1(j) == irw).and.(a%ia2(j) == icl)) then 
+          a%aspk(i) = a%aspk(i) + a%aspk(j)
+        else
+          i = i+1
+          a%aspk(i) = a%aspk(j)
+          a%ia1(i) = a%ia1(j)
+          a%ia2(i) = a%ia2(j)
+          irw = a%ia1(i) 
+          icl = a%ia2(i) 
+        endif
+      enddo
+
+    case(psb_dupl_err_)
+      do 
+        j = j + 1
+        if (j > nza) exit
+        if ((a%ia1(j) == irw).and.(a%ia2(j) == icl)) then 
+          call psb_errpush(130,name)
+          goto 9999
+        else
+          i = i+1
+          a%aspk(i) = a%aspk(j)
+          a%ia1(i) = a%ia1(j)
+          a%ia2(i) = a%ia2(j)
+          irw = a%ia1(i) 
+          icl = a%ia2(i) 
+        endif
+      enddo
+    end select
     if(debug) write(0,*)'FIXCOO: end second loop'
   case default
     write(0,*) 'Fixcoo: unknown direction ',idir_
   end select
-  a%infoa(psb_upd_) = psb_upd_srch_
+
+  call psb_sp_setifld(psb_isrtdcoo_,psb_srtd_,a,info)
+  call psb_sp_setifld(i,psb_nnz_,a,info)
+  call psb_sp_setifld(psb_spmat_asb_,psb_state_,a,info)
+  call psb_sp_setifld(psb_upd_srch_,psb_upd_,a,info)
+
   deallocate(iaux)
+
+  call psb_erractionrestore(err_act)
   return
+
+9999 continue
+  call psb_erractionrestore(err_act)
+  if (err_act.eq.psb_act_abort_) then
+    call psb_error()
+    return
+  end if
+  return
+
 end Subroutine psb_dfixcoo

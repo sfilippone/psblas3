@@ -38,7 +38,7 @@ subroutine psb_dcoins(nz,ia,ja,val,a,imin,imax,jmin,jmax,info,gtl,rebuild)
   use psb_realloc_mod
   use psb_string_mod
   use psb_error_mod
-  use psb_serial_mod, only : psb_csdp
+  use psb_serial_mod, psb_protect_name => psb_dcoins
   use psb_update_mod
   implicit none 
 
@@ -156,8 +156,12 @@ subroutine psb_dcoins(nz,ia,ja,val,a,imin,imax,jmin,jmax,info,gtl,rebuild)
       case (psb_upd_perm_)
         ip1 = psb_sp_getifld(psb_upd_pnt_,a,info)      
         nzl = psb_sp_getifld(psb_del_bnd_,a,info)      
-        nza = a%ia2(ip1+psb_nnz_)
-
+        select case(ufida)
+        case ('JAD')
+          nza = a%ia1(ip1+psb_nnz_)
+        case default
+          nza = a%ia2(ip1+psb_nnz_)
+        end select
 
         call psb_inner_upd(nz,ia,ja,val,nza,a%aspk,size(a%aspk),&
              & imin,imax,jmin,jmax,nzl,info,gtl,ng)
@@ -172,11 +176,17 @@ subroutine psb_dcoins(nz,ia,ja,val,a,imin,imax,jmin,jmax,info,gtl,rebuild)
             write(0,*) 'PSB_COINS: update discarded items '
           end if
         end if
-        a%ia2(ip1+psb_nnz_) = nza
+
+        select case(ufida)
+        case ('JAD')
+          a%ia1(ip1+psb_nnz_) = nza
+        case default
+          a%ia2(ip1+psb_nnz_) = nza
+        end select
 
         if (debug) write(0,*) 'From COINS(UPD) : NZA:',nza
 
-      case (psb_upd_dflt_, psb_upd_srch_)
+      case (psb_upd_srch_)
 
         call  psb_srch_upd(nz,ia,ja,val,nza,a,&
              & imin,imax,jmin,jmax,nzl,info,gtl,ng)
@@ -187,8 +197,7 @@ subroutine psb_dcoins(nz,ia,ja,val,a,imin,imax,jmin,jmax,info,gtl,rebuild)
                  &  'COINS: Going through rebuild_ fingers crossed!'
             irst = info
             call psb_nullify_sp(tmp)
-            tmp%fida='COO'
-            call psb_csdp(a,tmp,info)
+            call psb_spcnv(a,tmp,info,afmt='coo')
             if(info /= izero) then
               info=4010
               ch_err='psb_csdp'
@@ -349,7 +358,7 @@ subroutine psb_dcoins(nz,ia,ja,val,a,imin,imax,jmin,jmax,info,gtl,rebuild)
 
         if (debug) write(0,*) 'From COINS(UPD) : NZA:',nza
 
-      case (psb_upd_dflt_, psb_upd_srch_)
+      case (psb_upd_srch_)
 
         call  psb_srch_upd(nz,ia,ja,val,nza,a,&
              & imin,imax,jmin,jmax,nzl,info)
@@ -360,8 +369,7 @@ subroutine psb_dcoins(nz,ia,ja,val,a,imin,imax,jmin,jmax,info,gtl,rebuild)
                  &  'COINS: Going through rebuild_ fingers crossed!'
             irst = info
             call psb_nullify_sp(tmp)
-            tmp%fida='COO'
-            call psb_csdp(a,tmp,info)
+            call psb_spcnv(a,tmp,info,afmt='coo')
             call psb_sp_setifld(psb_spmat_bld_,psb_state_,tmp,info)
             if (debug) then
               write(0,*) 'COINS  Rebuild: size',tmp%infoa(psb_nnz_) ,irst            
@@ -429,7 +437,6 @@ subroutine psb_dcoins(nz,ia,ja,val,a,imin,imax,jmin,jmax,info,gtl,rebuild)
   endif
 
 
-  return
 
   call psb_erractionrestore(err_act)
   return

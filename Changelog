@@ -1,6 +1,12 @@
 Changelog. A lot less detailed than usual, at least for past
 history. 
 
+2007/09/14: Second round of serial changes: merged into trunk, fixed
+	    JAD regeneration and srch_upd now works.           
+
+2007/09/10: First round of serial changes: implemented serial
+	    psb_spcnv unifying multiple functionalities.
+
 2007/09/04: Implemented RGMRES for complex data.
 
 2007/06/04: Fixed implementation of fctint and coins: assume size

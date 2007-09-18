@@ -35,7 +35,7 @@
 subroutine psb_zipcoo2csc(a,info,clshr)
   use psb_spmat_type
   use psb_const_mod
-  use psb_serial_mod, only : psb_fixcoo
+  use psb_serial_mod, psb_protect_name => psb_zipcoo2csc
   use psb_error_mod
   use psb_string_mod
   use psb_realloc_mod
@@ -49,7 +49,7 @@ subroutine psb_zipcoo2csc(a,info,clshr)
   integer, allocatable :: iaux(:), itemp(:)
   !locals
   logical             :: clshr_
-  Integer             :: nza, i,j,irw, idl,err_act,nc,icl
+  Integer             :: nza, nr, i,j, idl,err_act,nc,icl
   Integer, Parameter  :: maxtry=8
   logical, parameter  :: debug=.false.
   character(len=20)   :: name
@@ -106,7 +106,6 @@ subroutine psb_zipcoo2csc(a,info,clshr)
   else
 
     if (clshr_) then 
-      
       
       j = 1
       i = 1

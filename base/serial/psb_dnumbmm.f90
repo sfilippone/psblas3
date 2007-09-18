@@ -71,6 +71,7 @@ subroutine psb_dnumbmm(a,b,c)
       write(0,*) 'Error ',info,' from inner numbmm'
     end if
   end if
+  call psb_sp_setifld(psb_spmat_asb_,psb_state_,c,info)
   deallocate(temp) 
   return
 

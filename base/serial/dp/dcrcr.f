@@ -163,6 +163,7 @@ C
       SUBROUTINE DCRCR(TRANS,M,N,UNITD,D,DESCRA,A,IA1,IA2,INFOA,IP1,
      *                 DESCRN,AN,IAN1,IAN2,INFON,IP2,LAN,LIAN1,LIAN2,
      *                 WORK,LWORK,IERROR)
+      use psb_string_mod
       IMPLICIT NONE                                                      
 C
 C     .. Scalar Arguments ..
@@ -177,6 +178,7 @@ C     .. Local Scalars ..
       INTEGER          I, J, ERR_ACT
       LOGICAL          EXIT
 c     .. Local Arrays ..
+      character        idescra*11
       CHARACTER*20       NAME
       INTEGER            INT_VAL(5)
 
@@ -192,11 +194,12 @@ C
 C
 C       Check for argument errors
 C
-      IF(((DESCRA(1:1) .EQ. 'S' .OR. DESCRA(1:1) .EQ. 'H' .OR.
-     &   DESCRA(1:1) .EQ. 'A') .AND. (UNITD .NE. 'B'))  .OR.
-     &   (.NOT.((DESCRA(3:3).EQ.'N').OR.(DESCRA(3:3).EQ.'L').OR.
-     +  (DESCRA(3:3).EQ.'U'))) .OR.
-     +  TRANS.NE.'N') THEN
+      idescra=toupper(descra)
+      IF(((idescra(1:1) .EQ. 'S' .OR. idescra(1:1) .EQ. 'H' .OR.
+     &   idescra(1:1) .EQ. 'A') .AND. (toupper(unitd) .NE. 'B'))  .OR.
+     &   (.NOT.((idescra(3:3).EQ.'N').OR.(idescra(3:3).EQ.'L').OR.
+     +  (idescra(3:3).EQ.'U'))) .OR.
+     +  toupper(TRANS).NE.'N') THEN
          IERROR = 20
       ENDIF
       IF(LAN.LT.(IA2(M+1)-1)) THEN
@@ -223,8 +226,8 @@ C
             IERROR = 23
          ENDIF
       ENDIF
-      IF ((DESCRA(1:1) .EQ. 'S' .OR. DESCRA(1:1) .EQ. 'H' .OR.
-     &     DESCRA(1:1) .EQ. 'A') .AND. (UNITD .EQ. 'B')) THEN
+      IF ((idescra(1:1) .EQ. 'S' .OR. idescra(1:1) .EQ. 'H' .OR.
+     &     idescra(1:1) .EQ. 'A') .AND. (toupper(UNITD) .EQ. 'B')) THEN
          IF (LWORK.LT.M) THEN
             IF     (LWORK.LE.0) THEN
                EXIT=.TRUE.
@@ -250,7 +253,7 @@ C
 C
 C     Set DESCRN, IP1, IP2
 C
-      DESCRN(1:3) = DESCRA(1:3)
+      DESCRN(1:3) = idescra(1:3)
 
       IP1(1)=0
       IP2(1)=0
@@ -260,8 +263,8 @@ C
       DO 20 I = 1, M+1
          IAN2(I) = IA2(I)
  20   CONTINUE
-      IF ((DESCRA(1:1) .EQ. 'S' .OR. DESCRA(1:1) .EQ. 'H' .OR.
-     &     DESCRA(1:1) .EQ. 'A') .AND. (UNITD .EQ. 'B')) THEN
+      IF ((idescra(1:1) .EQ. 'S' .OR. idescra(1:1) .EQ. 'H' .OR.
+     &     idescra(1:1) .EQ. 'A') .AND. (toupper(UNITD) .EQ. 'B')) THEN
          DO 30 I = 1, M
             WORK(I) = DSQRT(D(I))
  30      CONTINUE
@@ -271,21 +274,21 @@ C
                IAN1(J) = IA1(J)
  50         CONTINUE
  40      CONTINUE
-      ELSE IF (UNITD .EQ. 'L') THEN
+      ELSE IF (toupper(UNITD) .EQ. 'L') THEN
             DO 60 I = 1, M
                DO 70 J = IA2(I), IA2(I+1)-1
                   AN(J)   = D(I) * A(J)
                   IAN1(J) = IA1(J)
  70            CONTINUE
  60         CONTINUE
-      ELSE IF (UNITD .EQ. 'R') THEN
+      ELSE IF (toupper(UNITD) .EQ. 'R') THEN
             DO 80 I = 1, M
                DO 90 J = IA2(I), IA2(I+1)-1
                   AN(J)   = A(J) * D(IA1(J))
                   IAN1(J) = IA1(J)
  90            CONTINUE
  80         CONTINUE
-      ELSE IF (UNITD .EQ. 'U') THEN
+      ELSE IF (toupper(UNITD) .EQ. 'U') THEN
          DO 100 J = 1, IA2(M+1)-1
             AN(J)   = A(J)
             IAN1(J) = IA1(J)

@@ -116,6 +116,7 @@ C
 C
       SUBROUTINE DJADRP(TRANS,M,N,DESCRA,JA,IA,
      +   P,WORK,LWORK,IERROR)
+      use psb_string_mod
       IMPLICIT NONE                                                      
 C     .. Scalar Arguments ..
       INTEGER          LWORK, M, N, IERROR
@@ -146,7 +147,7 @@ C
       PIA    = PNG + 1
       PJA    = PIA + 3*(IA(PNG)+1)
 
-      IF (DESCRA(1:1).EQ.'G') THEN
+      IF (toupper(DESCRA(1:1)).EQ.'G') THEN
          CALL DJADRP1(TRANS,M,N,DESCRA,IA(PNG),
      +      JA,IA(PIA),IA(PJA),P,WORK,LWORK*2)
       ELSE

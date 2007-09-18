@@ -28,19 +28,20 @@
 !!$  POSSIBILITY OF SUCH DAMAGE.
 !!$ 
 !!$  
-subroutine psb_cest(afmt, m,n,nnz, lia1, lia2, lar, iup, info)
+subroutine psb_cest(afmt,m,n,nnz, lia1, lia2, lar, iup,info)
 
   use psb_error_mod
   use psb_const_mod
   use psb_string_mod
   use psb_spmat_type
+
   implicit none
 
   !     .. scalar arguments ..
   integer, intent(in) ::  m,n,nnz,iup
   integer, intent(out) :: lia1, lia2, lar, info
+  character(len=*), intent(inout)  ::  afmt
   !     .. array arguments..
-  character(len=5)  ::  afmt
   integer           ::  int_val(5), err_act
   character(len=20) ::  name
 
@@ -50,18 +51,20 @@ subroutine psb_cest(afmt, m,n,nnz, lia1, lia2, lar, iup, info)
   if (afmt == '???') then 
     afmt = psb_fidef_
   endif
+  
+  afmt = toupper(afmt)
 
   select case(iup)
   case (psb_upd_perm_)
-    if (toupper(afmt) == 'JAD') then 
-      lia1 = 2*(nnz + nnz/5) +1000
-      lia2 = 2*(nnz + nnz/5) +1000 +m
-      lar = nnz + nnz/5
-    else if (toupper(afmt) == 'COO') then 
+    if (afmt == 'JAD') then 
+      lia1 = 2*(nnz) + 1000
+      lia2 = (3*nnz)/2 + 1000 + m
+      lar  = (3*nnz)/2 
+    else if (afmt == 'COO') then 
       lia1 = nnz
       lia2 = 2*nnz + 1000
       lar = nnz
-    else if(toupper(afmt) == 'CSR') then
+    else if(afmt  == 'CSR') then
       lia1 = nnz
       lia2 = 2*nnz + 1000 + m + 1
       lar = nnz
@@ -71,17 +74,17 @@ subroutine psb_cest(afmt, m,n,nnz, lia1, lia2, lar, iup, info)
       goto 9999
     endif
 
-  case (psb_upd_dflt_, psb_upd_srch_)
+  case (psb_upd_srch_)
 
-    if (toupper(afmt) == 'JAD') then 
-      lia1 = nnz + nnz/5
-      lia2 = nnz + nnz/5
-      lar = nnz + nnz/5
-    else if (toupper(afmt) == 'COO') then 
+    if (afmt == 'JAD') then 
+      lia1 = (3*nnz)/2 
+      lia2 = (3*nnz)/2 
+      lar  = (3*nnz)/2 
+    else if (afmt == 'COO') then 
       lia1 = nnz
       lia2 = nnz
       lar = nnz
-    else if(toupper(afmt) == 'CSR') then
+    else if(afmt == 'CSR') then
       lia1 = nnz
       lia2 = max(nnz,m+1)
       lar = nnz

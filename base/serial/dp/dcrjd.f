@@ -61,6 +61,7 @@ C     IAN2,INFON, IP1, IP2
 C   
       use psb_const_mod
       use psb_spmat_type
+      use psb_string_mod
       IMPLICIT NONE
 
 C
@@ -69,9 +70,9 @@ C     .. Scalar Arguments ..
      *     SIZE_REQ, IERROR
       CHARACTER          TRANS,UNITD
 C     .. Array Arguments ..
-      DOUBLE PRECISION   AR(*), ARN(*), D(*), AUX(LAUX)
-      INTEGER            IA1(*), IA2(*), INFO(*), IAN1(*), IAN2(*),
-     *  INFON(*), IP1(*), IP2(*)
+      DOUBLE PRECISION   AR(*), ARN(LARN), D(*), AUX(LAUX)
+      INTEGER            IA1(*), IA2(*), INFO(*), IAN1(LIAN1),
+     +  IAN2(LIAN2), INFON(*), IP1(*), IP2(*)
       CHARACTER          DESCRA*11, DESCRN*11
 C     .. Local Scalars ..
       INTEGER            IOFF, ISTROW, NJA, NZ, PIA,
@@ -103,10 +104,10 @@ C
          GOTO 9999
       ENDIF
 
-      IF (TRANS.EQ.'N') THEN
+      IF (toupper(TRANS).EQ.'N') THEN
 C
         NJA    = 3*M
-        SCALE  = (UNITD.EQ.'L') ! meaningless
+        SCALE  = (toupper(UNITD).EQ.'L') ! meaningless
         IOFF   = 5
 C
 C        SET THE VALUES OF POINTERS TO VECTOR IAN2 AND AUX
@@ -115,7 +116,7 @@ C
         PIA    = PNG + 1
         PJA    = PIA + 3*(M+2)
 
-        IF (DESCRA(1:1).EQ.'G') THEN
+        IF (toupper(DESCRA(1:1)).EQ.'G') THEN
 
 C
 C        CHECK ON DIMENSION OF IAN2 AND AUX
@@ -169,10 +170,11 @@ C
           ENDIF
 
           LJA = LIAN2-PJA
-          CALL DGINDEX(M,IAN2(PNG),AR,IA1,IA2,ARN,IAN1,IAN2(PIA), 
-     +         IAN2(PJA), INFON, LARN,LIAN1,
-     +         LJA,IP1, AUX, LAUX*2, SIZE_REQ,IERROR)
-
+          CALL DGINDEX(M,IAN2(PNG),AR,IA1,IA2,info,
+     +      ARN,IAN1,IAN2(PIA), IAN2(PJA), INFON,
+     +      LARN,LIAN1, LJA,IP1,
+     +      AUX, LAUX*2, SIZE_REQ,IERROR)
+          
           IF (IERROR.NE.0) THEN
              CALL FCPSB_ERRPUSH(IERROR,NAME,INT_VAL)
              GOTO 9999
@@ -182,7 +184,8 @@ C
           DESCRN(2:2) = 'U'
           DESCRN(3:3) = 'N'
 
-        ELSE IF (DESCRA(1:1).EQ.'S' .AND. DESCRA(2:2).EQ.'U') THEN
+        ELSE IF (toupper(DESCRA(1:1)).EQ.'S' .AND.
+     +      toupper(DESCRA(2:2)).EQ.'U') THEN
 C
           ISTROW = 1
           NZ     = 2*(IA2(M+1)-1) - M
@@ -218,13 +221,13 @@ c$$$            CALL DVSMR(M,AR,IA1,IA2,IAN2(PNG),AUX(IWLEN),IP1,IP2,
 c$$$     *                 IAN2(PIA),IAN2(PJA),IAN1,ARN,AUX(IWORK1),
 c$$$     *                 AUX(IWORK2),NJA,IER,SCALE)
 C
-        ELSE IF (DESCRA(1:1).EQ.'T') THEN
+        ELSE IF (toupper(DESCRA(1:1)).EQ.'T') THEN
 C
 C  Only unit diagonal so far for triangular matrices. 
 C
 
 
-          IF (DESCRA(3:3).NE.'U') THEN 
+          IF (toupper(DESCRA(3:3)).NE.'U') THEN 
             IERROR=3022
             CALL FCPSB_ERRPUSH(IERROR,NAME,INT_VAL)
             GOTO 9999
@@ -273,8 +276,7 @@ c$$$                write(0,*) "error 2",ierrv(1)
           ENDIF
           
           DESCRN(1:1) = 'T'
-          DESCRN(2:2) = DESCRA(2:2)
-          DESCRN(3:3) = DESCRA(3:3)
+          DESCRN(2:3) = toupper(DESCRA(2:3))
 
         END IF
 C
@@ -288,7 +290,7 @@ C
         LIAN2   = 3*M + 10
         LAUX2   = 4*M + 2
 C
-      ELSE IF (TRANS.NE.'N') THEN
+      ELSE IF (toupper(TRANS).NE.'N') THEN
 C
 C           TO BE DONE
 C

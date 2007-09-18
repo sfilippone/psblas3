@@ -38,6 +38,7 @@ Subroutine psb_dipcsr2coo(a,info)
   use psb_error_mod
   use psb_string_mod
   use psb_realloc_mod
+  use psb_serial_mod, psb_protect_name => psb_dipcsr2coo
   implicit none
 
   !....Parameters...
@@ -86,6 +87,7 @@ Subroutine psb_dipcsr2coo(a,info)
   a%infoa(psb_upd_) = psb_upd_srch_
 
   deallocate(itemp)
+  call psb_fixcoo(a,info) 
 
   call psb_erractionrestore(err_act)
   return

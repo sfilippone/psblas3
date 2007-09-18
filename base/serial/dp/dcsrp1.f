@@ -118,6 +118,7 @@ C
      +   P,WORK,IWORK,LWORK,IERROR)
       use psb_const_mod
       use psb_spmat_type
+      use psb_string_mod
       IMPLICIT NONE
 C     .. Scalar Arguments ..
       INTEGER          LWORK,M, N, IERROR
@@ -140,14 +141,14 @@ C
       IERROR = 0
       CALL FCPSB_ERRACTIONSAVE(ERR_ACT)
 
-      IF(TRANS.EQ.'N') THEN
+      IF(toupper(TRANS).EQ.'N') THEN
          DO 30 I=1,M
             DO 10 J=IA(I),IA(I+1)-1
                JA(J) = P(JA(J))
  10         CONTINUE
  30      CONTINUE
          WORK(1) = 0.D0
-      ELSE IF(TRANS.EQ.'T') THEN
+      ELSE IF(toupper(TRANS).EQ.'T') THEN
 C
 C        LWORK refers here to INTEGER IWORK (alias for WORK)
 C

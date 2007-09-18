@@ -36,7 +36,7 @@ subroutine psb_dipcoo2csr(a,info,rwshr)
   use psb_spmat_type
   use psb_const_mod
   use psb_realloc_mod
-  use psb_serial_mod, only : psb_fixcoo
+  use psb_serial_mod, psb_protect_name => psb_dipcoo2csr
   use psb_error_mod
   use psb_string_mod
   implicit none

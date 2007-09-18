@@ -117,16 +117,6 @@ subroutine psb_dspalloc(a, desc_a, info, nnz)
     goto 9999
   end if
 
-  ! set permutation matrices
-  a%pl(1)=0
-  a%pr(1)=0
-  ! set infoa fields
-  a%fida   = 'COO'
-  a%descra = 'GUN'
-  a%infoa(psb_nnz_)  = 0
-  a%infoa(psb_srtd_) = 0
-  a%infoa(psb_state_) = psb_spmat_bld_
-
   if (debug) write(0,*) 'spall: ',  &
        & psb_cd_get_dectype(desc_a),psb_desc_bld_
 

@@ -41,6 +41,7 @@ subroutine psb_drwextd(nr,a,info,b,rowscale)
   use psb_spmat_type
   use psb_error_mod
   use psb_string_mod
+  use psb_serial_mod, psb_protect_name => psb_drwextd
   implicit none
 
   ! Extend matrix A up to NR rows with empty ones (i.e.: all zeroes)
@@ -66,11 +67,11 @@ subroutine psb_drwextd(nr,a,info,b,rowscale)
 
   if (nr > a%m) then 
     if (toupper(a%fida) == 'CSR') then 
-      call psb_realloc(nr+1,a%ia2,info)
+      call psb_ensure_size(nr+1,a%ia2,info)
       if (present(b)) then 
         nzb = psb_sp_get_nnzeros(b)
-        call psb_realloc(size(a%ia1)+nzb,a%ia1,info)
-        call psb_realloc(size(a%aspk)+nzb,a%aspk,info)
+        call psb_ensure_size(size(a%ia1)+nzb,a%ia1,info)
+        call psb_ensure_size(size(a%aspk)+nzb,a%aspk,info)
         if (toupper(b%fida)=='CSR') then 
 
           do i=1, min(nr-a%m,b%m)

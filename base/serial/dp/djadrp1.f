@@ -102,6 +102,7 @@ C
 C
       SUBROUTINE DJADRP1(TRANS,M,N,DESCRA,NG,KA,IA,JA,
      +   P,IWORK,LWORK,IERROR)
+      use psb_string_mod
       IMPLICIT NONE                                                      
 C     .. Scalar Arguments ..
       INTEGER          LWORK,M, N, NG, IERROR
@@ -125,7 +126,7 @@ C
       IERROR = 0
       CALL FCPSB_ERRACTIONSAVE(ERR_ACT)
 
-      IF(TRANS.EQ.'N') THEN
+      IF(toupper(TRANS).EQ.'N') THEN
         IF (DEBUG) WRITE(0,*)'DJADRP1:',NG
         DO IPG = 1, NG                                                    
           DO  K = IA(2,IPG), IA(3,IPG)-1                                   
@@ -143,7 +144,7 @@ C        Permute CSR
         ENDDO
         
         IWORK(1) = 0
-      ELSE IF(TRANS.EQ.'T') THEN
+      ELSE IF(toupper(TRANS).EQ.'T') THEN
 C
 C        LWORK refers here to INTEGER IWORK (alias for WORK)
 C
