@@ -83,7 +83,7 @@ subroutine psb_dspcnv2(a, b,info,afmt,upd,dupl)
   check_ = 'N'
   trans_ = 'N'
   unitd_ = 'U'
-  allocate(work(max(size(a%ia1),size(a%ia2))+max(a%m,b%m)+1000),stat=info)
+  allocate(work(max(size(a%ia1),size(a%ia2))+a%m+1000),stat=info)
 
   if (info /= 0) then
     info=2040
