@@ -64,7 +64,7 @@ module psb_spmat_type
   ! ----------------------------------
   ! Null         Build      psb_sp_all
   ! Build        Build      psb_coins
-  ! Build        Assembeld  psb_spcnv
+  ! Build        Assembled  psb_spcnv
   ! Assembled    Assembled  psb_spcnv
   ! Assembled    Update     psb_sp_reinit
   ! Update       Update     psb_coins
