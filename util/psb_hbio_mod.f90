@@ -124,7 +124,7 @@ contains
           if (info == 0) read (infile,fmt=rhsfmt) (b(i),i=1,nrow)
         endif
 
-        call psb_ipcsr2coo(a,ircode)
+        call psb_spcnv(a,ircode,afmt='csr')
         if (ircode /= 0)   goto 993  
 
         call psb_sp_reall(a,2*nnzero,ircode)
@@ -139,7 +139,7 @@ contains
           end if
         end do
         a%infoa(psb_nnz_) = nzr
-        call psb_ipcoo2csr(a,ircode)
+        call psb_spcnv(a,ircode,afmt='csr')
         if (ircode /= 0)   goto 993
 
       else
@@ -384,7 +384,7 @@ contains
         endif
         
 
-        call psb_ipcsr2coo(a,ircode)
+        call psb_spcnv(a,ircode,afmt='coo')
         if (ircode /= 0) then
           write(0,*) 'ipcsr2coo ',ircode
           goto 993  
@@ -408,7 +408,7 @@ contains
           end if
         end do
         a%infoa(psb_nnz_) = nzr
-        call psb_ipcoo2csr(a,ircode)
+        call psb_spcnv(a,ircode,afmt='csr')
         if (ircode /= 0) then
           write(0,*) 'ipcoo2csr ',ircode
           goto 993  
@@ -439,7 +439,7 @@ contains
           if (info == 0) read (infile,fmt=rhsfmt) (b(i),i=1,nrow)
         endif
         
-        call psb_ipcsr2coo(a,ircode)
+        call psb_spcnv(a,ircode,afmt='coo')
         if (ircode /= 0) then
           write(0,*) 'ipcsr2coo ',ircode
           goto 993  
@@ -462,7 +462,7 @@ contains
           end if
         end do
         a%infoa(psb_nnz_) = nzr
-        call psb_ipcoo2csr(a,ircode)
+        call psb_spcnv(a,ircode,afmt='csr')
         if (ircode /= 0) then
           write(0,*) 'ipcoo2csr ',ircode
           goto 993  

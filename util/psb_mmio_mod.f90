@@ -100,7 +100,7 @@ contains
         read(infile,fmt=*,end=902) a%ia1(i),a%ia2(i),a%aspk(i)
       end do
       a%infoa(psb_nnz_) = nnzero
-      call psb_ipcoo2csr(a,ircode)
+      call psb_spcnv(a,ircode,afmt='csr')
 
     else if ((tolower(type) == 'real').and.(tolower(sym) == 'symmetric')) then
       ! we are generally working with non-symmetric matrices, so
@@ -123,7 +123,7 @@ contains
         end if
       end do
       a%infoa(psb_nnz_) = nzr
-      call psb_ipcoo2csr(a,ircode)
+      call psb_spcnv(a,ircode,afmt='csr')
 
     else
       write(0,*) 'read_matrix: matrix type not yet supported'
@@ -259,7 +259,7 @@ contains
       end do
       a%infoa(psb_nnz_) = nnzero
       
-      call psb_ipcoo2csr(a,ircode)
+      call psb_spcnv(a,ircode,afmt='csr')
 
     else if ((tolower(type) == 'complex').and.(tolower(sym) == 'symmetric')) then
       ! we are generally working with non-symmetric matrices, so
@@ -283,7 +283,7 @@ contains
         end if
       end do
       a%infoa(psb_nnz_) = nzr
-      call psb_ipcoo2csr(a,ircode)
+      call psb_spcnv(a,ircode,afmt='csr')
 
     else if ((tolower(type) == 'complex').and.(tolower(sym) == 'hermitian')) then
       ! we are generally working with non-symmetric matrices, so
@@ -307,7 +307,7 @@ contains
         end if
       end do
       a%infoa(psb_nnz_) = nzr
-      call psb_ipcoo2csr(a,ircode)
+      call psb_spcnv(a,ircode,afmt='csr')
 
     else
       write(0,*) 'read_matrix: matrix type not yet supported'
