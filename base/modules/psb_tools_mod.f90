@@ -280,7 +280,7 @@ Module psb_tools_mod
       use psb_descriptor_type
       integer, intent(in)                ::  m
       type(psb_desc_type), intent(in)    ::  desc_a
-      real(kind(1.d0)),intent(inout)           ::  x(:)
+      real(kind(1.d0)),intent(inout)     ::  x(:)
       integer, intent(in)                ::  irw(:)
       real(kind(1.d0)), intent(in)       ::  val(:)
       integer, intent(out)               ::  info
@@ -460,27 +460,6 @@ Module psb_tools_mod
       character(len=*), optional, intent(in)  :: afmt
     end subroutine psb_zspasb
   end interface
-
-
-!!$  interface psb_spcnv
-!!$    subroutine psb_dspcnv(a,b,desc_a,info)
-!!$      use psb_descriptor_type
-!!$      use psb_spmat_type
-!!$      type(psb_dspmat_type), intent(in)   :: a
-!!$      type(psb_dspmat_type), intent(out)  :: b
-!!$      type(psb_desc_type), intent(in)     :: desc_a
-!!$      integer, intent(out)                :: info
-!!$    end subroutine psb_dspcnv
-!!$    subroutine psb_zspcnv(a,b,desc_a,info)
-!!$      use psb_descriptor_type
-!!$      use psb_spmat_type
-!!$      type(psb_zspmat_type), intent(in)   :: a
-!!$      type(psb_zspmat_type), intent(out)  :: b
-!!$      type(psb_desc_type), intent(in)     :: desc_a
-!!$      integer, intent(out)                :: info
-!!$    end subroutine psb_zspcnv
-!!$  end interface
-
 
   interface psb_spfree
     module procedure psb_dsp_free, psb_zsp_free
