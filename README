@@ -1,4 +1,4 @@
-This directory contains  the PSBLAS library, version 2.1.0
+This directory contains  the PSBLAS library, version 2.1.1
 
  
 Version 1.0 of the library was described in:
@@ -17,10 +17,10 @@ compiling with  other compiler/operating systems please let us know.
 LINUX:
 
 On Linux we work with the GCC compiler; note that we require version
-4.2.0 (or later) as it contains support for ALLOCATABLEs (as specified
-in TR15581). 
+4.2.0 (or later) as it contains support for ALLOCATABLEs (as
+specified  in TR15581). 
 
-For the Intel compilers, we recommend version 9.1; previous
+For the Intel compilers, we recommend version 9.1 or later; previous
 versions of the library have been compiled with version 7 and 8 of
 ifort. 
 
