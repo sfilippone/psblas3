@@ -84,6 +84,8 @@ subroutine psi_ldsc_pre_halo(desc,ext_hv,info)
     goto 9999
   end if
 
+  ! Build a hashed table of sorted lists to search for 
+  ! indices.
   desc%hashv(0:psb_hash_size) = 0
   do i=1, nk
     key = desc%loc_to_glob(i)
@@ -119,6 +121,8 @@ subroutine psi_ldsc_pre_halo(desc,ext_hv,info)
   end do
 
   if (.not.ext_hv) then
+    ! Here we do not know yet who owns what, so we have 
+    ! to call fnd_owner.
     nh = (n_col-n_row)
     if (nh > 0) then 
       Allocate(helem(nh),stat=info)
