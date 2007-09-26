@@ -28,10 +28,10 @@
 !!$  POSSIBILITY OF SUCH DAMAGE.
 !!$ 
 !!$  
-function lsame(a,b)
+function psb_lsame(a,b)
   use psb_string_mod
-  logical :: lsame
+  logical :: psb_lsame
   character(len=1) :: a, b 
   
-  lsame = (tolower(a) == tolower(b))
-end function lsame
+  psb_lsame = (tolower(a) == tolower(b))
+end function psb_lsame

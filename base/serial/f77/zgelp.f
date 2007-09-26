@@ -104,8 +104,8 @@ C     .. Local Arrays..
       INTEGER           INT_VAL
 C     .. Intrinsic Functions ..
       INTRINSIC         DBLE
-      logical     lsame
-      external    lsame
+      logical     psb_lsame
+      external    psb_lsame
 
       character*20      name
 c
@@ -118,8 +118,8 @@ C
       IERROR = 0
       CALL FCPSB_ERRACTIONSAVE(ERR_ACT)
 
-      isnotran = lsame(trans,'N')
-      istran   = lsame(trans,'T') .or. lsame(trans,'C')
+      isnotran = psb_lsame(trans,'N')
+      istran   = psb_lsame(trans,'T') .or. psb_lsame(trans,'C')
       IF     (M.LT.0) THEN
          IERROR = 7
       ELSE IF(N.LT.0) THEN

@@ -106,8 +106,8 @@ C
 #endif    
 *     ..
 *     .. External Functions ..
-      LOGICAL            LSAME
-      EXTERNAL           LSAME
+      LOGICAL            PSB_LSAME
+      EXTERNAL           PSB_LSAME
 *     ..
 *     .. Intrinsic Functions ..
       INTRINSIC          MOD
@@ -133,8 +133,8 @@ C
 *
 *     Figure scope-dependant variables, or report illegal scope
 *
-      RSCOPE = LSAME( SCOPE, 'R' )
-      CSCOPE = LSAME( SCOPE, 'C' )
+      RSCOPE = PSB_LSAME( SCOPE, 'R' )
+      CSCOPE = PSB_LSAME( SCOPE, 'C' )
 *
       IF( RSCOPE ) THEN
          IF( BCAST ) THEN
@@ -152,7 +152,7 @@ C
          END IF
          NP = NPROW
          MYDIST = MOD( NPROW + MYROW - TRDEST, NPROW )
-      ELSE IF( LSAME( SCOPE, 'A' ) ) THEN
+      ELSE IF( PSB_LSAME( SCOPE, 'A' ) ) THEN
          NP = NPROW * NPCOL
          IAM = MYROW*NPCOL + MYCOL
          DEST = TRDEST*NPCOL + TCDEST

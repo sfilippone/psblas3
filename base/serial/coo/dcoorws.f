@@ -41,11 +41,11 @@ C     .. Array Arguments ..
 C     .. Local scalars ..
       INTEGER I, J, NNZ, K
       DOUBLE PRECISION  SUM
-      logical lsame
-      external lsame
+      logical psb_lsame
+      external psb_lsame
 
       NNZ = INFOA(1)
-      IF (lsame(TRANS,'N')) THEN
+      IF (psb_lsame(TRANS,'N')) THEN
         DO I=1, M 
           ROWSUM(I) = 0.0D0
         ENDDO
@@ -66,7 +66,7 @@ C     .. Local scalars ..
           I = J 
         ENDDO
         
-      ELSE IF (lsame(TRANS,'T').OR.lsame(TRANS,'C')) THEN
+      ELSE IF (psb_lsame(TRANS,'T').OR.psb_lsame(TRANS,'C')) THEN
         DO J = 1, N
           ROWSUM(J) = 0.0D0
         ENDDO
