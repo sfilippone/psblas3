@@ -35,12 +35,6 @@
 !*  This routine does the retrieval of remote matrix rows.                   *
 !*  Note that retrieval is done through GTBLK, therefore it should work      *
 !*  for any format.                                                          *
-!*  Currently the output is BLK%FIDA='CSR' but it would take little          *
-!*  work to change that; the pieces are transferred in COO format            *
-!*  thus we would only need a DCSDP at the end to exit in whatever format    *
-!*  is needed.                                                               *
-!*  But I'm feeling soooooo lazy today......                                 *
-!*                                                                           *
 !*                                                                           *
 !*                                                                           *
 !*                                                                           *
