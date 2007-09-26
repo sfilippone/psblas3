@@ -36,6 +36,10 @@
 ! Parameters: 
 !    desc_a  - type(<psb_desc_type>).         The communication descriptor.
 !    info    - integer.                       Eventually returns an error code.
+!    ext_hv  - logical                        Essentially this distinguishes a call 
+!                                             coming from the build of an extended
+!                                             halo descriptor with respect to a "normal"
+!                                             call. 
 subroutine psb_icdasb(desc_a,info,ext_hv)
   use psb_descriptor_type
   use psb_serial_mod
