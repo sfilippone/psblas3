@@ -30,16 +30,19 @@
 !!$  
 ! File: psb_dgelp.f90
 !
+!  WARNING: This routine should be changed and moved to the serial part 
+!           i.e. taking out the descriptor. 
+!
+!
 ! Subroutine: psb_dgelp
-!    ???????????
+!             Apply a left permutation to a dense matrix
 !
 ! Parameters:
 ! trans    - character. 
 ! iperm    - integer.
 ! x        - real, dimension(:,:).
-! info     - integer.                 Eventually returns an error code.
+! info     - integer.                 Return code.
 subroutine psb_dgelp(trans,iperm,x,desc_a,info)
-  !....assembly dense matrix x .....
   use psb_descriptor_type
   use psb_serial_mod
   use psb_const_mod
@@ -174,16 +177,20 @@ end subroutine psb_dgelp
 !!$  POSSIBILITY OF SUCH DAMAGE.
 !!$ 
 !!$  
+!
+!  WARNING: This routine should be changed and moved to the serial part 
+!           i.e. taking out the descriptor. 
+!
+!
 ! Subroutine: psb_dgelpv
-!    ???????????
+!             Apply a left permutation to a dense matrix
 !
 ! Parameters:
 ! trans    - character. 
 ! iperm    - integer.
 ! x        - real, dimension(:).
-! info     - integer.                 Eventually returns an error code.
+! info     - integer.                 Return code.
 subroutine psb_dgelpv(trans,iperm,x,desc_a,info)
-  !....assembly dense matrix x .....
   use psb_descriptor_type
   use psb_serial_mod
   use psb_const_mod
