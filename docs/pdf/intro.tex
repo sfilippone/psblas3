@@ -389,18 +389,31 @@ The PSBLAS librarary is based on the Single Program Multiple Data
 computation performs the same actions on a chunk of data. Parallelism
 is thus data-driven. 
 
-Because of this structure, practically all subroutines \emph{must} be
+Because of this structure, many subroutines coordinate their action
+across the various processes, thus providing an implicit
+synchronization point, and therefore \emph{must} be
 called simultaneously by all processes participating in the
-computation, i.e each subroutine call acts implicitly as a
-synchronization point. The exceptions to this rule are:
-\begin{itemize}
-\item The insertion routines \verb|psb_cdins|, \verb|psb_spins| and
-  \verb|psb_geins|;
-\item The error handling routines.
-\end{itemize}
-In particular, as per the discussion in the previous section, the
-insertion routines may be called a different number of times on each
-process, depending on  the data distribution chosen by the user. 
+computation. This is certainly true for the data allocation and
+assembly routines, for  all the computational routines and for some of
+the tools routines.
+
+However there are many cases where no synchronization, and indeed no
+communication among processes, is implied; for instance, all the routines in
+sec.~\ref{sec:dataquery} are only acting on the local data structures,
+and thus may be called independently. The most important case is that
+of the coefficient insertion routines: since the number of
+coefficients in the sparse and dense matrices varies among the
+processors, and since the user is free to choose an arbitrary order in
+builiding the matrix entries, these routines cannot imply a
+synchronization. 
+
+Throughout this user's guide each subroutine will be clearly indicated
+as:
+\begin{description}
+\item[Synchronous:] must be called simultaneously by all the
+  processes in the relevant communication context;
+\item[Asynchronous:] may be called in a totally independent manner.
+\end{description}
 
 %%% Local Variables: 
 %%% mode: latex

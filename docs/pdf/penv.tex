@@ -9,6 +9,7 @@
 This subroutine initializes the PSBLAS parallel environment, defining
 a virtual parallel machine.
 \begin{description}
+\item[Type:] Synchronous.
 \item[\bf  On Entry ]
 \item[np] Number of processes in the PSBLAS virtual parallel machine.\\
 Scope: {\bf global}.\\
@@ -46,6 +47,7 @@ Specified as: an integer variable.
 This subroutine returns information about  the PSBLAS parallel environment, defining
 a virtual parallel machine.
 \begin{description}
+\item[Type:] Asynchronous.
 \item[\bf  On Entry ]
 \item[icontxt] the communication context identifying the virtual
   parallel machine.\\
@@ -89,6 +91,7 @@ Specified as: an integer variable. \
 
 This subroutine exits from the  PSBLAS parallel virtual  machine.
 \begin{description}
+\item[Type:] Synchronous.
 \item[\bf  On Entry ]
 \item[icontxt] the communication context identifying the virtual
   parallel machine.\\
@@ -110,7 +113,7 @@ Specified as: a logical  variable, default value: true.
   \verb|psb_info| has returned with $iam=-1$; indeed, it it is the only
   routine that may be called with argument \verb|icontxt| in this
   situation.
-\item If the user wants to use multiple communication contexts in the
+\item If the user whishes to use multiple communication contexts in the
   same program, this routine may be called multiple times to
   selectively close the contexts with \verb|close=.false.|, while on
   the last call it should be called with \verb|close=.true.| to
@@ -124,6 +127,7 @@ Specified as: a logical  variable, default value: true.
 
 This subroutine returns the MPI communicator associated with a PSBLAS context
 \begin{description}
+\item[Type:] Asynchronous.
 \item[\bf  On Entry ]
 \item[icontxt] the communication context identifying the virtual
   parallel machine.\\
@@ -148,6 +152,7 @@ Intent: {\bf out}.\\
 
 This subroutine returns the MPI rank of the  PSBLAS process $id$
 \begin{description}
+\item[Type:] Asynchronous.
 \item[\bf  On Entry ]
 \item[icontxt] the communication context identifying the virtual
   parallel machine.\\
@@ -180,6 +185,7 @@ Intent: {\bf out}.\\
 This function returns a wall clock timer. The resolution of the timer
 is dependent on the underlying parallel environment implementation.
 \begin{description}
+\item[Type:] Asynchronous.
 \item[\bf  On Exit ]
 \item[Function value] the elapsed time in seconds.\\
 Returned  as: a  \verb|real(kind(1.d0))|  integer variable.
@@ -190,10 +196,10 @@ Returned  as: a  \verb|real(kind(1.d0))|  integer variable.
 
 \syntax{call psb\_barrier}{icontxt}
 
-This subroutine acts as a synchronization point for  the  PSBLAS
-parallel virtual  machine. As such, it must be called by all
-participating processes. 
+This subroutine acts as an explicit synchronization point for  the  PSBLAS
+parallel virtual  machine. 
 \begin{description}
+\item[Type:] Synchronous.
 \item[\bf  On Entry ]
 \item[icontxt] the communication context identifying the virtual
   parallel machine.\\
@@ -210,6 +216,7 @@ Specified as: an integer variable.
 
 This subroutine aborts computation on the parallel virtual machine. 
 \begin{description}
+\item[Type:] Asynchronous.
 \item[\bf  On Entry ]
 \item[icontxt] the communication context identifying the virtual
   parallel machine.\\
@@ -230,6 +237,7 @@ Specified as: an integer variable.
 This subroutine implements a broadcast operation based on the
 underlying communication library. 
 \begin{description}
+\item[Type:] Synchronous.
 \item[\bf  On Entry ]
 \item[icontxt] the communication context identifying the virtual
   parallel machine.\\
@@ -271,6 +279,7 @@ Type, rank and size must agree on all processes.
 This subroutine implements a sum reduction  operation based on the
 underlying communication library. 
 \begin{description}
+\item[Type:] Synchronous.
 \item[\bf  On Entry ]
 \item[icontxt] the communication context identifying the virtual
   parallel machine.\\
@@ -321,6 +330,7 @@ Type, rank and size must agree on all processes.
 This subroutine implements a maximum valuereduction
 operation based on the underlying communication library. 
 \begin{description}
+\item[Type:] Synchronous.
 \item[\bf  On Entry ]
 \item[icontxt] the communication context identifying the virtual
   parallel machine.\\
@@ -370,6 +380,7 @@ Type, rank and size must agree on all processes.
 This subroutine implements a minimum value reduction
 operation based on the underlying communication library. 
 \begin{description}
+\item[Type:] Synchronous.
 \item[\bf  On Entry ]
 \item[icontxt] the communication context identifying the virtual
   parallel machine.\\
@@ -419,6 +430,7 @@ Type, rank and size must agree on all processes.
 This subroutine implements a maximum absolute value reduction
 operation based on the underlying communication library. 
 \begin{description}
+\item[Type:] Synchronous.
 \item[\bf  On Entry ]
 \item[icontxt] the communication context identifying the virtual
   parallel machine.\\
@@ -468,6 +480,7 @@ Type, rank and size must agree on all processes.
 This subroutine implements a minimum absolute value reduction
 operation based on the underlying communication library. 
 \begin{description}
+\item[Type:] Synchronous.
 \item[\bf  On Entry ]
 \item[icontxt] the communication context identifying the virtual
   parallel machine.\\
@@ -517,6 +530,7 @@ Type, rank and size must agree on all processes.
 
 This subroutine sends a packet of data to a destination.
 \begin{description}
+\item[Type:] Synchronous: see usage notes. 
 \item[\bf  On Entry ]
 \item[icontxt] the communication context identifying the virtual
   parallel machine.\\
@@ -552,12 +566,20 @@ same value on sending and receiving processes.
 \item[\bf On Return]
 \end{description}
 
+\section*{Notes}
+\begin{enumerate}
+\item This subroutine implies a synchronization, but only between the
+  calling process and the destination  process $dst$.
+\end{enumerate}
+
+
 \subroutine{psb\_rcv}{Receive data}
 
 \syntax{call psb\_rcv}{icontxt, dat, src, m}
 
 This subroutine receives a packet of data to a destination.
 \begin{description}
+\item[Type:] Synchronous: see usage notes.
 \item[\bf  On Entry ]
 \item[icontxt] the communication context identifying the virtual
   parallel machine.\\
@@ -593,3 +615,8 @@ Type and  rank must agree on sender and receiver process; if $m$ is
 not specified, size must agree as well. 
 \end{description}
 
+\section*{Notes}
+\begin{enumerate}
+\item This subroutine implies a synchronization, but only between the
+  calling process and the source  process $src$.
+\end{enumerate}

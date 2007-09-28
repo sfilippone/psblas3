@@ -1,6 +1,6 @@
 include ../../Make.inc
 
-FOBJS = psb_dallc.o psb_dasb.o psb_dcsrp.o psb_cdprt.o \
+FOBJS = psb_dallc.o psb_dasb.o psb_cdprt.o \
 	psb_dfree.o psb_dins.o \
 	psb_cdals.o psb_cdalv.o psb_cd_inloc.o psb_cdcpy.o \
 	psb_cdfree.o psb_cdins.o  \

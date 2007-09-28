@@ -495,6 +495,23 @@ module psb_serial_mod
   end interface
 
 
+
+  interface psb_csrp
+    subroutine psb_dcsrp(trans,iperm,a, info)
+      use psb_spmat_type
+      type(psb_dspmat_type), intent(inout)  ::  a
+      integer, intent(inout)                :: iperm(:), info
+      character, intent(in)                 :: trans
+    end subroutine psb_dcsrp
+    subroutine psb_zcsrp(trans,iperm,a, info)
+      use psb_spmat_type
+      type(psb_zspmat_type), intent(inout)  ::  a
+      integer, intent(inout)                :: iperm(:), info
+      character, intent(in)                 :: trans
+    end subroutine psb_zcsrp
+  end interface
+
+
   interface psb_gelp
     ! 2-D version
     subroutine psb_dgelp(trans,iperm,x,info)

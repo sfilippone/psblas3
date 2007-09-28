@@ -19,6 +19,7 @@ must be specified, thereby choosing
 the specific initialization strategy:
 \begin{description}
 \item[\bf  On Entry ]
+\item[Type:] Synchronous.
 \item[icontxt] the communication context.\\
 Scope:{\bf global}.\\
 Type:{\bf required}.\\
@@ -139,6 +140,7 @@ linear system coefficient matrix), storing them as necessary into the
 communication descriptor.
 
 \begin{description}
+\item[Type:] Asynchronous.
 \item[\bf On Entry]
 \item[nz] the number of points being inserted.\\
 Scope: {\bf local}.\\
@@ -197,6 +199,7 @@ nor the end vertex belong to the current process.
 \syntax{call psb\_cdasb}{desc\_a, info}
 
 \begin{description}
+\item[Type:] Synchronous.
 \item[\bf On Entry]
 \item[desc\_a] the communication descriptor.\\
 Scope:{\bf local}.\\
@@ -235,6 +238,7 @@ An integer value; 0 means no error has been detected.
 \syntax{call psb\_cdcpy}{desc\_in, desc\_out, info}
 
 \begin{description}
+\item[Type:] Asynchronous.
 \item[\bf On Entry]
 \item[desc\_in] the communication descriptor.\\
 Scope:{\bf local}.\\
@@ -267,6 +271,7 @@ An integer value; 0 means no error has been detected.
 \syntax{call psb\_cdfree}{desc\_a, info}
 
 \begin{description}
+\item[Type:] Synchronous.
 \item[\bf On Entry]
 \item[desc\_a] the communication descriptor to be freed.\\
 Scope:{\bf local}.\\
@@ -297,6 +302,7 @@ This subroutine builds an extended communication descriptor, based on
 the input descriptor \verb|desc_a| and on the stencil specified
 through the input sparse matrix \verb|a|. 
 \begin{description}
+\item[Type:] Synchronous.
 \item[\bf On Entry]
 \item[a] A sparse matrix
 Scope:{\bf local}.\\
@@ -360,6 +366,7 @@ An integer value; 0 means no error has been detected.
 
 %% \begin{description}
 %% \item[\bf On Entry]
+%% \item[Type:] Asynchronous.
 %% \item[trans] A character that specifies whether to permute $A$  or $A^T$.\\
 %% Scope: {\bf local} \\
 %% Type: {\bf required}\\
@@ -393,6 +400,7 @@ An integer value; 0 means no error has been detected.
 %% \syntax{call psb\_cdprt}{iout, desc\_a, glob, short}
 
 %% \begin{description}
+%% \item[Type:] Asynchronous.
 %% \item[\bf On Entry]
 %% \item[iout] An integer that defines the output unit.
 %% Scope: {\bf local} \\
@@ -421,6 +429,7 @@ An integer value; 0 means no error has been detected.
 \syntax{call psb\_spall}{a, desc\_a, info, nnz}
 
 \begin{description}
+\item[Type:] Synchronous.
 \item[\bf On Entry]
 \item[desc\_a] the communication descriptor.\\
 Scope:{\bf local}.\\
@@ -469,6 +478,7 @@ An integer value; 0 means no error has been detected.
 \syntax{call psb\_spins}{nz, ia, ja, val, a, desc\_a, info}
 
 \begin{description}
+\item[Type:] Asynchronous.
 \item[\bf On Entry]
 \item[nz] the number of elements to be inserted.\\
 Scope:{\bf local}.\\
@@ -536,6 +546,8 @@ An integer value; 0 means no error has been detected.
   pattern; each sparse matrix entry implicitly defines a graph edge,
   that is passed to the descriptor routine for the appropriate
   processing. 
+\item Any coefficients from matrix rows not assigned to the calling
+  process are silently ignored;
 \item If the descriptor is in the assembled state, then any entries in
   the sparse matrix that would generate additional communication
   requirements will be ignored; 
@@ -551,6 +563,7 @@ An integer value; 0 means no error has been detected.
 \syntax{call psb\_spasb}{a, desc\_a, info, afmt, upd, dupl}
 
 \begin{description}
+\item[Type:] Synchronous.
 \item[\bf On Entry]
 \item[desc\_a] the communication descriptor.\\
 Scope:{\bf local}.\\
@@ -648,6 +661,7 @@ An integer value; 0 means no error has been detected.
 \syntax{call psb\_spfree}{a, desc\_a, info}
 
 \begin{description}
+\item[Type:] Synchronous.
 \item[\bf On Entry]
 \item[a] the matrix to be freed.\\
 Scope:{\bf local}\\
@@ -681,6 +695,7 @@ An integer value; 0 means no error has been detected.
 \syntax{call psb\_sprn}{a, decsc\_a, info, clear}
 
 \begin{description}
+\item[Type:] Synchronous.
 \item[\bf On Entry]
 \item[a] the matrix to be reinitialized.\\
 Scope:{\bf local}\\
@@ -731,7 +746,7 @@ An integer value; 0 means no error has been detected.
 %% %
 %% \subroutine{psb\_csrp}{Applies a right permutation to a sparse matrix}
 
-%% \syntax{call psb\_csrp}{trans, iperm, a, desc\_a, info}
+%% \syntax{call psb\_csrp}{trans, iperm, a, info}
 
 %% \begin{description}
 %% \item[\bf On Entry]
@@ -747,12 +762,6 @@ An integer value; 0 means no error has been detected.
 %% Scope: {\bf local} \\
 %% Type: {\bf required}\\
 %% Specified as: a \spdata variable.\\
-%% \item[desc\_a] The communication descriptor of type \descdata.\\
-%% Scope: {\bf local} \\
-%% Type: {\bf required}\\
-%% Specified as: a variable of type \descdata.\\
-%% \end{description}
-
 %% \begin{description}
 %% \item[\bf On Return]
 %% \item[info] Error code.\\
@@ -770,6 +779,7 @@ An integer value; 0 means no error has been detected.
 \syntax{call psb\_geall}{x, desc\_a, info, n}
 
 \begin{description}
+\item[Type:] Synchronous.
 \item[\bf On Entry]
 \item[desc\_a] The communication descriptor.\\
 Scope: {\bf local} \\
@@ -808,6 +818,7 @@ An integer value; 0 means no error has been detected.
 \syntax{call psb\_geins}{m, irw, val, x, desc\_a, info,dupl}
 
 \begin{description}
+\item[Type:] Asynchronous.
 \item[\bf On Entry]
 \item[m] Number of rows in $val$  to be inserted.\\
 Scope:{\bf local}.\\
@@ -871,6 +882,7 @@ An integer value; 0 means no error has been detected.
 \syntax{call psb\_geasb}{x, desc\_a, info}
 
 \begin{description}
+\item[Type:] Synchronous.
 \item[\bf On Entry]
 \item[desc\_a] The communication descriptor.\\
 Scope: {\bf local} \\
@@ -901,6 +913,7 @@ An integer value; 0 means no error has been detected.
 \syntax{call psb\_gefree}{x, desc\_a, info}
 
 \begin{description}
+\item[Type:] Synchronous.
 \item[\bf On Entry]
 \item[x] The dense matrix to
   be freed.\\
@@ -932,9 +945,10 @@ An integer value; 0 means no error has been detected.
 %
 \subroutine{psb\_gelp}{Applies a left permutation to a dense matrix}
 
-\syntax{call psb\_gelp}{trans, iperm, x, desc\_a, info}
+\syntax{call psb\_gelp}{trans, iperm, x, info}
 
 \begin{description}
+\item[Type:] Asynchronous.
 \item[\bf On Entry]
 \item[trans] A character that specifies whether to permute $A$  or $A^T$.\\
 Scope: {\bf local} \\
@@ -951,11 +965,6 @@ Scope: {\bf local} \\
 Type: {\bf required}\\
 Intent: {\bf inout}.\\
 Specified as: a one or two dimensional array.\\
-\item[desc\_a] The communication descriptor.\\
-Scope: {\bf local} \\
-Type: {\bf required}\\
-Intent: {\bf in}.\\
-Specified as: a variable of type \descdata.\\
 \end{description}
 
 \begin{description}
@@ -977,6 +986,7 @@ An integer value; 0 means no error has been detected.
 \syntax*{call psb\_glob\_to\_loc}{x, desc\_a, info, iact,owned}
 
 \begin{description}
+\item[Type:] Asynchronous.
 \item[\bf On Entry]
 \item[x] An integer vector of indices to be converted.\\
 Scope: {\bf local} \\
@@ -1043,6 +1053,7 @@ An integer value; 0 means no error has been detected.
 \syntax*{call psb\_loc\_to\_glob}{x, desc\_a, info, iact}
 
 \begin{description}
+\item[Type:] Asynchronous.
 \item[\bf On Entry]
 \item[x] An integer vector of indices to be converted.\\
 Scope: {\bf local} \\
@@ -1095,6 +1106,7 @@ An integer value; 0 means no error has been detected.
 \syntax{call psb\_get\_boundary}{bndel, desc, info}
 
 \begin{description}
+\item[Type:] Asynchronous.
 \item[\bf On Entry]
 \item[desc] the communication descriptor.\\
 Scope:{\bf local}.\\
@@ -1133,6 +1145,7 @@ An integer value; 0 means no error has been detected.
 \syntax{call psb\_get\_overlap}{ovrel, desc, info}
 
 \begin{description}
+\item[Type:] Asynchronous.
 \item[\bf On Entry]
 \item[desc] the communication descriptor.\\
 Scope:{\bf local}.\\
@@ -1173,6 +1186,7 @@ An integer value; 0 means no error has been detected.
   nzin, lrw}
 
 \begin{description}
+\item[Type:] Asynchronous.
 \item[\bf On Entry]
 \item[row] The (first) row to be extracted.\\
 Scope:{\bf local}\\
@@ -1267,6 +1281,7 @@ This function computes the memory occupation of a PSBLAS object.
 \syntax*{psb\_sizeof}{prec}
 
 \begin{description}
+\item[Type:] Asynchronous.
 \item[\bf On Entry]
 \item[a] A sparse matrix
 $A$. \\ 

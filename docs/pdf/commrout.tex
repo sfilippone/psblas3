@@ -37,6 +37,7 @@ Long Precision Complex & psb\_halo \\
 \syntax*{call psb\_halo}{x, desc\_a, info, alpha, work, data}
 
 \begin{description}
+\item[Type:] Synchronous.
 \item[\bf On Entry]
 \item[x] global dense matrix $x$.\\
 Scope: {\bf local} \\
@@ -185,6 +186,7 @@ Long Precision Complex & psb\_ovrl \\
 \syntax*{call psb\_ovrl}{x, desc\_a, info, update=update\_type, work=work} 
 
 \begin{description}
+\item[Type:] Synchronous.
 \item[\bf On Entry]
 \item[x] global dense matrix $x$.\\
 Scope: {\bf local} \\
@@ -369,6 +371,7 @@ Long Precision Complex & psb\_gather \\
 \syntax{call psb\_gather}{glob\_x, loc\_x, desc\_a, info, root}
 
 \begin{description}
+\item[Type:] Synchronous.
 \item[\bf On Entry]
 \item[loc\_x] the local portion of global dense matrix
 $glob\_x$. \\
@@ -463,6 +466,7 @@ Long Precision Complex & psb\_scatter \\
 \syntax{call psb\_scatter}{glob\_x, loc\_x, desc\_a, info, root}
 
 \begin{description}
+\item[Type:] Synchronous.
 \item[\bf On Entry]
 \item[glob\_x] The array that must be scattered into local pieces.\\
 Scope: {\bf global} \\

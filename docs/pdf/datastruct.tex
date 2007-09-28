@@ -367,6 +367,7 @@ research.
 \syntax{nr = psb\_cd\_get\_local\_rows}{desc}
 
 \begin{description}
+\item[Type:] Asynchronous.
 \item[\bf On Entry]
 \item[desc] the communication descriptor.\\
 Scope: {\bf local}.\\
@@ -390,6 +391,7 @@ Specified as: a structured data of type \descdata.
 
 \begin{description}
 \item[\bf On Entry]
+\item[Type:] Asynchronous.
 \item[desc] the communication descriptor.\\
 Scope: {\bf local}.\\
 Type: {\bf required}.\\
@@ -413,6 +415,7 @@ Specified as: a structured data of type \descdata.
 
 \begin{description}
 \item[\bf On Entry]
+\item[Type:] Asynchronous.
 \item[desc] the communication descriptor.\\
 Scope: {\bf local}.\\
 Type: {\bf required}.\\
@@ -430,6 +433,7 @@ Specified as: a structured data of type \descdata.
 \syntax{nr = psb\_cd\_get\_global\_cols}{desc}
 
 \begin{description}
+\item[Type:] Asynchronous.
 \item[\bf On Entry]
 \item[desc] the communication descriptor.\\
 Scope: {\bf local}.\\
@@ -448,6 +452,7 @@ Specified as: a structured data of type \descdata.
 \syntax{ictxt = psb\_cd\_get\_context}{desc}
 
 \begin{description}
+\item[Type:] Asynchronous.
 \item[\bf On Entry]
 \item[desc] the communication descriptor.\\
 Scope: {\bf local}.\\
@@ -467,6 +472,7 @@ Specified as: a structured data of type \descdata.
 \syntax{ith = psb\_cd\_get\_large\_threshold}{}
 
 \begin{description}
+\item[Type:] Asynchronous.
 \item[\bf On Return]
 \item[Function value] The current value for the size threshold. 
 
@@ -479,6 +485,7 @@ Specified as: a structured data of type \descdata.
 \syntax{call psb\_cd\_set\_large\_threshold}{ith}
 
 \begin{description}
+\item[Type:] Asynchronous.
 \item[\bf On Entry]
 \item[ith] the new threshold for communication descriptors.\\
 Scope: {\bf global}.\\
@@ -486,13 +493,16 @@ Type: {\bf required}.\\
 Intent: {\bf in}.\\
 Specified as: an integer value greater than zero.
 \end{description}
-
+Note: the threshold value is only queried by the library at the time a
+call to \verb|psb_cdall| is executed, therefore changing the threshold
+has no effect on communication descriptors that have already been initialized.
 
 \subsubroutine{psb\_sp\_get\_nrows}{Get number of  rows in a sparse matrix}
 
 \syntax{nr = psb\_sp\_get\_nrows}{a}
 
 \begin{description}
+\item[Type:] Asynchronous.
 \item[\bf On Entry]
 \item[a] the sparse matrix\\
 Scope: {\bf local}\\
@@ -512,6 +522,7 @@ Specified as: a structured data of type \spdata.
 \syntax{nr = psb\_sp\_get\_ncols}{a}
 
 \begin{description}
+\item[Type:] Asynchronous.
 \item[\bf On Entry]
 \item[a] the sparse matrix\\
 Scope: {\bf local}\\
@@ -531,6 +542,7 @@ Specified as: a structured data of type \spdata.
 \syntax{nr = psb\_sp\_get\_nnzeros}{a}
 
 \begin{description}
+\item[Type:] Asynchronous.
 \item[\bf On Entry]
 \item[a] the sparse matrix\\
 Scope: {\bf local}\\

@@ -30,8 +30,6 @@
 !!$  
 ! File: psb_zcsrp.f90
 !
-!  WARNING: This routine should be changed and moved to the serial part 
-!           i.e. taking out the descriptor. 
 !
 ! Subroutine: psb_zcsrp
 !    Apply a right permutation to a sparse matrix, i.e. permute the column 
@@ -43,13 +41,10 @@
 !    iperm   - integer, dimension(:)            A permutation vector; its size 
 !                                               must be either N_ROW or N_COL
 !    a       - type(<psb_zspmat_type).          The matrix to be permuted
-!    desc_a  - type(<psb_desc_type>).           The communication descriptor.
 !    info    - integer.                         Eventually returns an error code
-subroutine psb_zcsrp(trans,iperm,a, desc_a, info)
-  use psb_descriptor_type
-  use psb_serial_mod
+subroutine psb_zcsrp(trans,iperm,a, info)
+  use psb_serial_mod, psb_protect_name => psb_zcsrp
   use psb_const_mod
-  use psb_penv_mod
   !  implicit none
 
   interface 
@@ -76,7 +71,6 @@ subroutine psb_zcsrp(trans,iperm,a, desc_a, info)
 
   !...parameters....
   type(psb_zspmat_type), intent(inout)  ::  a
-  type(psb_desc_type), intent(in)       ::  desc_a
   integer, intent(inout)                :: iperm(:), info
   character, intent(in)                 :: trans
   !....locals....
@@ -92,31 +86,13 @@ subroutine psb_zcsrp(trans,iperm,a, desc_a, info)
 
   time(1) = psb_wtime()
 
-  ictxt   = psb_cd_get_context(desc_a)
-  dectype = psb_cd_get_dectype(desc_a)
-  n_row   = psb_cd_get_local_rows(desc_a)
-  n_col   = psb_cd_get_local_cols(desc_a)
+  n_row   = psb_get_sp_nrows(a)
+  n_col   = psb_get_sp_ncols(a)
 
   if(psb_get_errstatus() /= 0) return 
   info=0
   call psb_erractionsave(err_act)
   name = 'psd_csrp'
-
-  ! check on blacs grid 
-  call psb_info(ictxt, me, np)
-  if (np == -1) then
-    info = 2010
-    call psb_errpush(info,name)
-    goto 9999
-  endif
-
-
-  if (.not.psb_is_asb_desc(desc_a)) then 
-    info = 600
-    int_err(1) = dectype
-    call psb_errpush(info,name,int_err)
-    goto 9999
-  endif
 
   ipsize = size(iperm)
   if (.not.((ipsize == n_col).or.(ipsize == n_row) )) then 
@@ -161,7 +137,6 @@ subroutine psb_zcsrp(trans,iperm,a, desc_a, info)
   ! fix glob_to_loc/loc_to_glob  mappings, then indices lists
   ! hmm, maybe we should just move all of this onto a different level,
   ! have a specialized subroutine, and do it in the solver context???? 
-  if (debug) write(0,*) 'spasb: calling dcsrp',size(work_dcsdp)
   call zcsrp(trans,n_row,n_col,a%fida,a%descra,a%ia1,a%ia2,a%infoa,&
        & ipt,work_dcsdp,size(work_dcsdp),info)
   if(info /= psb_no_err_) then
@@ -175,11 +150,6 @@ subroutine psb_zcsrp(trans,iperm,a, desc_a, info)
 
   time(4) = psb_wtime()
   time(4) = time(4) - time(3)
-  if (debug) then 
-    call psb_amx(ictxt, time(4))
-
-    write (*, *) '         comm structs assembly: ', time(4)*1.d-3
-  end if
 
   call psb_erractionrestore(err_act)
   return

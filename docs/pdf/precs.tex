@@ -29,6 +29,7 @@ module  \verb|psb_prec_mod|.
 \syntax{call psb\_precinit}{prec, ptype, info}
 
 \begin{description}
+\item[Type:] Asynchronous.
 \item[\bf On Entry]
 \item[ptype] the type of preconditioner. 
 Scope: {\bf global} \\
@@ -152,6 +153,7 @@ $ptype$ string as follows\footnote{The string is case-insensitive}:
 \syntax{call psb\_precbld}{a, desc\_a, prec, info, upd}
 
 \begin{description}
+\item[Type:] Synchronous.
 \item[\bf On Entry]
 \item[a] the system sparse matrix.
 Scope: {\bf local} \\
@@ -197,6 +199,7 @@ An integer value; 0 means no error has been detected.
 \syntax*{call psb\_precaply}{prec,x,desc\_a,info,trans}
 
 \begin{description}
+\item[Type:] Synchronous.
 \item[\bf On Entry]
 \item[prec] the preconditioner.
 Scope: {\bf local} \\
@@ -246,6 +249,7 @@ An integer value; 0 means no error has been detected.
 \syntax{call psb\_prec\_descr}{prec}
 
 \begin{description}
+\item[Type:] Asynchronous.
 \item[\bf On Entry]
 \item[prec] the preconditioner.
 Scope: {\bf local} \\

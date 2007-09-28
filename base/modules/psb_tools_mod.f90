@@ -159,18 +159,6 @@ Module psb_tools_mod
   end interface
 
 
-  interface psb_csrp
-    subroutine psb_dcsrp(trans,iperm,a, desc_a, info)
-      use psb_descriptor_type
-      use psb_spmat_type
-      type(psb_dspmat_type), intent(inout)  ::  a
-      type(psb_desc_type), intent(in)       ::  desc_a
-      integer, intent(inout)                :: iperm(:), info
-      character, intent(in)                 :: trans
-    end subroutine psb_dcsrp
-  end interface
-
-
   interface psb_cdprt
     subroutine psb_cdprt(iout,desc_p,glob,short)
       use psb_const_mod

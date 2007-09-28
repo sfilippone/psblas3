@@ -121,6 +121,7 @@ Aborting...
 \syntax{call psb\_errpush}{err\_c, r\_name, i\_err, a\_err}
 
 \begin{description}
+\item[Type:] Asynchronous.
 \item[\bf On Entry]
 \item[err\_c] the error code\\
 Scope: {\bf local} \\
@@ -147,6 +148,7 @@ Specified as: a string.\\
 \syntax{call psb\_error}{icontxt}
 
 \begin{description}
+\item[Type:] Asynchronous.
 \item[\bf On Entry]
 \item[icontxt] the communication context.\\
 Scope: {\bf global} \\
@@ -162,6 +164,7 @@ Specified as: an integer.
 \syntax{call psb\_set\_errverbosity}{v}
 
 \begin{description}
+\item[Type:] Asynchronous.
 \item[\bf On Entry]
 \item[v] the verbosity level\\
 Scope: {\bf global}\\
@@ -176,6 +179,7 @@ Specified as: an integer.
 \syntax{call psb\_set\_erraction}{err\_act}
 
 \begin{description}
+\item[Type:] Asynchronous.
 \item[\bf On Entry]
 \item[err\_act] the type of action.\\
 Scope: {\bf global} \\
@@ -186,23 +190,23 @@ Specified as: an integer.
 
 
 
-\subroutine{psb\_errcomm}{Error communication routine}
+%% \subroutine{psb\_errcomm}{Error communication routine}
 
-\syntax{call psb\_errcomm}{icontxt, err}
+%% \syntax{call psb\_errcomm}{icontxt, err}
 
-\begin{description}
-\item[\bf On Entry]
-\item[icontxt] the communication context.\\
-Scope: {\bf global} \\
-Type: {\bf required}\\
-Intent: {\bf in}.\\
-Specified as: an integer.
-\item[err] the error code to be communicated\\
-Scope: {\bf global} \\
-Type: {\bf required}\\
-Intent: {\bf inout}.\\
-Specified as: an integer.\\
-\end{description}
+%% \begin{description}
+%% \item[\bf On Entry]
+%% \item[icontxt] the communication context.\\
+%% Scope: {\bf global} \\
+%% Type: {\bf required}\\
+%% Intent: {\bf in}.\\
+%% Specified as: an integer.
+%% \item[err] the error code to be communicated\\
+%% Scope: {\bf global} \\
+%% Type: {\bf required}\\
+%% Intent: {\bf inout}.\\
+%% Specified as: an integer.\\
+%% \end{description}
 
 %%% Local Variables: 
 %%% mode: latex

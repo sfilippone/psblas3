@@ -85,6 +85,7 @@ module \verb|psb_util_mod|.
 \syntax{call hb\_read}{a, iret, iunit, filename, b, mtitle}
  
 \begin{description}
+\item[Type:] Asynchronous.
 \item[\bf  On Entry ]
 \item[filename] The name of the file to be read.\\
 Type:{\bf optional}.\\
@@ -124,6 +125,7 @@ An integer value; 0 means no error has been detected.
 
 
 \begin{description}
+\item[Type:] Asynchronous.
 \item[\bf  On Entry ]
 \item[a] the sparse matrix to be written.\\
 Type:{\bf required}.\\
@@ -169,6 +171,7 @@ An integer value; 0 means no error has been detected.
 \syntax{call mm\_mat\_read}{a, iret, iunit, filename}
 
 \begin{description}
+\item[Type:] Asynchronous.
 \item[\bf  On Entry ]
 \item[filename] The name of the file to be read.\\
 Type:{\bf optional}.\\
@@ -195,6 +198,7 @@ An integer value; 0 means no error has been detected.
 \subroutine{mm\_mat\_write}{Write a sparse matrix to a  file in the MatrixMarket format}
 \syntax{call mm\_mat\_write}{a, mtitle, iret, iunit, filename}
 \begin{description}
+\item[Type:] Asynchronous.
 \item[\bf  On Entry ]
 \item[a] the sparse matrix to be written.\\
 Type:{\bf required}.\\
