@@ -31,13 +31,13 @@
 ! File: psb_cdalv.f90
 !
 ! Subroutine: psb_cdalv
-!    Allocate descriptor
-!    and checks correctness of PARTS subroutine
+!    Allocate descriptor with a local vector V containing the list 
+!    of indices that are assigned to the current process. The global size 
+!    is equal to the largest index found on any process. 
 ! 
 ! Parameters: 
-!    m       - integer.                       The number of rows.
 !    v       - integer, dimension(:).         The array containg the partitioning scheme.
-!    ictxt - integer.                       The communication context.
+!    ictxt - integer.                         The communication context.
 !    desc_a  - type(<psb_desc_type>).         The communication descriptor.
 !    info    - integer.                       Eventually returns an error code
 subroutine psb_cd_inloc(v, ictxt, desc_a, info)

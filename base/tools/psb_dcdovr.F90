@@ -33,8 +33,7 @@
 ! Subroutine: psb_cdovr
 !    This routine takes a matrix A with its descriptor, and builds the 
 !    auxiliary descriptor corresponding to the number of overlap levels
-!    specified on input. It really is just a size estimation/allocation
-!    front end for <psb_cdovrbld>.
+!    specified on input. 
 ! 
 ! Parameters: 
 !    a        - type(<psb_dspmat_type>).       The input sparse matrix.
@@ -42,7 +41,22 @@
 !    novr     - integer.                       The number of overlap levels.
 !    desc_ov  - type(<psb_desc_type>).         The auxiliary output communication 
 !                                              descriptor.
-!    info     - integer.                       Eventually returns an error code.
+!    info     - integer.                       Return code.
+!    extype   - integer.                       Choice of type of overlap:
+!                               psb_ovt_xhal_: build a descriptor with an extended 
+!                                              stencil, i.e. enlarge the existing 
+!                                              halo by novr additional layers.
+!                               psb_ovt_asov_: build a descriptor suitable 
+!                                              for Additive Schwarz preconditioner.
+!                                              This last choice implies that: 
+!                                              a. The novr halo layers are added to
+!                                                 the overlap;
+!                                              b. The novr layers are also copied to 
+!                                                 the ext_ structure to provide 
+!                                                 the mapping between the base 
+!                                                 descriptor and the overlapped one.
+!                                              c. The (novr+1) layer becomes the new 
+!                                                 halo.
 !
 Subroutine psb_dcdovr(a,desc_a,novr,desc_ov,info, extype)
 
@@ -670,7 +684,7 @@ Subroutine psb_dcdovr(a,desc_a,novr,desc_ov,info, extype)
     ! Build an overlapped descriptor for Additive Schwarz 
     !  with overlap enlargement; we need the overlap, 
     !  the (new) halo and the mapping into the new index space. 
-    ! Here we need: 1. (orig_ovr + t_ovr_idx -> ovrlap
+    ! Here we need: 1. (orig_ovr + t_ovr_idx) -> ovrlap
     !               2. (tmp_halo) -> ext
     !               3. (t_halo_in) -> halo 
     !               4. n_row(ov)  current.

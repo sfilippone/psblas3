@@ -31,16 +31,17 @@
 ! File: psb_cdalv.f90
 !
 ! Subroutine: psb_cdalv
-!    Allocate descriptor
-!    and checks correctness of PARTS subroutine
+!    Allocate descriptor by means of a global map vector V: index I 
+!    is assigned to process V(I). It is assumed that V is identical 
+!    on all calling processes.
+!    
 ! 
 ! Parameters: 
-!    m       - integer.                       The number of rows.
 !    v       - integer, dimension(:).         The array containg the partitioning scheme.
-!    ictxt - integer.                       The communication context.
+!    ictxt - integer.                         The communication context.
 !    desc_a  - type(<psb_desc_type>).         The communication descriptor.
-!    info    - integer.                       Eventually returns an error code
-!    flag    - integer.                       ???
+!    info    - integer.                       Return code
+!    flag    - integer.                       Are V's contents 0- or 1-based?
 subroutine psb_cdalv(v, ictxt, desc_a, info, flag)
   use psb_descriptor_type
   use psb_serial_mod

@@ -30,16 +30,32 @@
 !!$  
 ! File: psb_zsphalo.f90
 !
-!*****************************************************************************
-!*                                                                           *
-!*  This routine does the retrieval of remote matrix rows.                   *
-!*  Note that retrieval is done through GTBLK, therefore it should work      *
-!*  for any format.                                                          *
-!*                                                                           *
-!*                                                                           *
-!*                                                                           *
-!*****************************************************************************
-Subroutine psb_zsphalo(a,desc_a,blk,info,rwcnv,clcnv,cliprow,outfmt,data)
+! Subroutine: psb_zsphalo
+!  This routine does the retrieval of remote matrix rows.                   
+!  Note that retrieval is done through GTBLK, therefore it should work      
+!  for any matrix format in A; as for the output, default is CSR. 
+!    
+! 
+! Parameters: 
+!    a        - type(psb_zspmat_type)     The local part of input matrix A
+!    desc_a   - type(<psb_desc_type>).    The communication descriptor.
+!    blck     - type(psb_zspmat_type)     The local part of output matrix BLCK
+!    info     - integer.                  Return code
+!    rowcnv   - logical                   Should row/col indices be converted
+!    colcnv   - logical                   to/from global numbering when sent/received?
+!                                         default is .TRUE.
+!    rowscale - logical                   Should row/col indices on output be remapped
+!    colscale - logical                   from MIN:MAX  to 1:(MAX-MIN+1) ? 
+!                                         default is .FALSE. 
+!                                         (commmon use is ROWSCALE=.TRUE., COLSCALE=.FALSE.)
+!    data     - integer                   Which index list in desc_a should be used to retrieve
+!                                         rows, default psb_comm_halo_ (i.e.: use halo_index)
+!                                         other value psb_comm_ext_, no longer accepting 
+!                                         psb_comm_ovrl_, perhaps should be reinstated in the future. 
+!
+!
+Subroutine psb_zsphalo(a,desc_a,blk,info,rowcnv,colcnv,&
+     &  rowscale,colscale,outfmt,data)
 
   use psb_const_mod
   use psb_serial_mod
@@ -60,20 +76,20 @@ Subroutine psb_zsphalo(a,desc_a,blk,info,rwcnv,clcnv,cliprow,outfmt,data)
   Type(psb_zspmat_type),Intent(inout) :: blk
   Type(psb_desc_type),Intent(in), target :: desc_a
   integer, intent(out)                :: info
-  logical, optional, intent(in)       :: rwcnv,clcnv,cliprow
+  logical, optional, intent(in)       :: rowcnv,colcnv,rowscale,colscale
   character(len=5), optional          :: outfmt 
   integer, intent(in), optional       :: data
   !     ...local scalars....
   Integer    :: np,me,counter,proc,i, &
        &     n_el_send,k,n_el_recv,ictxt, idx, r, tot_elem,&
        &     n_elem, j, ipx,mat_recv, iszs, iszr,idxs,idxr,nz,&
-       &     nrmin,data_,ngtz
+       &     irmin,icmin,irmax,icmax,data_,ngtz
   Integer :: l1, icomm, err_act
   Integer, allocatable  :: sdid(:,:), brvindx(:),rvid(:,:), &
        & rvsz(:), bsdindx(:),sdsz(:), iasnd(:), jasnd(:)
   complex(kind(1.d0)), allocatable :: valsnd(:)
   integer, pointer :: idxv(:)
-  logical :: rwcnv_,clcnv_,cliprow_
+  logical :: rowcnv_,colcnv_,rowscale_,colscale_
   character(len=5)  :: outfmt_
   Logical,Parameter :: debug=.false., debugprt=.false.
   real(kind(1.d0)) :: t1,t2,t3,t4,t5,t6,t7,t8,t9
@@ -85,20 +101,25 @@ Subroutine psb_zsphalo(a,desc_a,blk,info,rwcnv,clcnv,cliprow,outfmt,data)
   call psb_erractionsave(err_act)
 
   if(debug) write(0,*)'Inside DSPHALO'
-  if (present(rwcnv)) then 
-    rwcnv_ = rwcnv
+  if (present(rowcnv)) then 
+    rowcnv_ = rowcnv
   else
-    rwcnv_ = .true.
+    rowcnv_ = .true.
   endif
-  if (present(clcnv)) then 
-    clcnv_ = clcnv
+  if (present(colcnv)) then 
+    colcnv_ = colcnv
   else
-    clcnv_ = .true.
+    colcnv_ = .true.
   endif
-  if (present(cliprow)) then 
-    cliprow_ = cliprow
+  if (present(rowscale)) then 
+    rowscale_ = rowscale
   else
-    cliprow_ = .false.
+    rowscale_ = .false.
+  endif
+  if (present(colscale)) then 
+    colscale_ = colscale
+  else
+    colscale_ = .false.
   endif
   if (present(data)) then 
     data_ = data
@@ -133,12 +154,12 @@ Subroutine psb_zsphalo(a,desc_a,blk,info,rwcnv,clcnv,cliprow,outfmt,data)
   case(psb_comm_halo_) 
     idxv => desc_a%halo_index
 
-  case(psb_comm_ovr_) 
-    idxv => desc_a%ovrlap_index
-
   case(psb_comm_ext_) 
     idxv => desc_a%ext_index
 
+!!$  case(psb_comm_ovr_) 
+!!$    idxv => desc_a%ovrlap_index
+!!$  ! Do not accept OVRLAP_INDEX any longer. 
   case default
     call psb_errpush(4010,name,a_err='wrong Data selector')
     goto 9999
@@ -261,8 +282,8 @@ Subroutine psb_zsphalo(a,desc_a,blk,info,rwcnv,clcnv,cliprow,outfmt,data)
   Enddo
   nz = tot_elem
 
-  if (rwcnv_) call psb_loc_to_glob(iasnd(1:nz),desc_a,info,iact='I')
-  if (clcnv_) call psb_loc_to_glob(jasnd(1:nz),desc_a,info,iact='I')
+  if (rowcnv_) call psb_loc_to_glob(iasnd(1:nz),desc_a,info,iact='I')
+  if (colcnv_) call psb_loc_to_glob(jasnd(1:nz),desc_a,info,iact='I')
   if (info /= 0) then
     info=4010
     ch_err='psb_loc_to_glob'
@@ -290,8 +311,8 @@ Subroutine psb_zsphalo(a,desc_a,blk,info,rwcnv,clcnv,cliprow,outfmt,data)
   !
   ! Convert into local numbering 
   !
-  if (rwcnv_) call psb_glob_to_loc(blk%ia1(1:iszr),desc_a,info,iact='I',owned=cliprow_)
-  if (clcnv_) call psb_glob_to_loc(blk%ia2(1:iszr),desc_a,info,iact='I')
+  if (rowcnv_) call psb_glob_to_loc(blk%ia1(1:iszr),desc_a,info,iact='I')
+  if (colcnv_) call psb_glob_to_loc(blk%ia2(1:iszr),desc_a,info,iact='I')
 
   if (info /= 0) then
     info=4010
@@ -309,23 +330,42 @@ Subroutine psb_zsphalo(a,desc_a,blk,info,rwcnv,clcnv,cliprow,outfmt,data)
   end if
   l1  = 0
   blk%m=0
-  nrmin=max(0,a%m)
+  !
+  irmin = huge(irmin)
+  icmin = huge(icmin)
+  irmax = 0
+  icmax = 0
   Do i=1,iszr
-!!$      write(0,*) work5(i),work6(i)
     r=(blk%ia1(i))
     k=(blk%ia2(i))
-    If ((r>nrmin).and.(k>0)) Then
+    ! Just in case some of the conversions were out-of-range
+    If ((r>0).and.(k>0)) Then
       l1=l1+1
       blk%aspk(l1) = blk%aspk(i)
-      blk%ia1(l1) = r
+      blk%ia1(l1) = r 
       blk%ia2(l1) = k
-      blk%k = max(blk%k,k)
-      blk%m = max(blk%m,r)
+      irmin = min(irmin,r)
+      irmax = max(irmax,r)
+      icmin = min(icmin,k)
+      icmax = max(icmax,k)
     End If
   Enddo
-  blk%fida='COO'
-  blk%infoa(psb_nnz_)=l1
-  blk%m = blk%m - a%m
+  if (rowscale_) then 
+    blk%m = irmax-irmin+1
+    blk%ia1(1:l1) = blk%ia1(1:l1) - irmin + 1
+  else
+    blk%m = irmax
+  end if
+  if (colscale_) then 
+    blk%k = icmax-icmin+1
+    blk%ia2(1:l1) = blk%ia2(1:l1) - icmin + 1
+  else
+    blk%k = icmax
+  end if
+
+  blk%fida            = 'COO'
+  blk%infoa(psb_nnz_) = l1
+
   if (debugprt) then 
     open(50+me)
     call psb_csprt(50+me,blk,head='% SPHALO border .')
@@ -336,32 +376,16 @@ Subroutine psb_zsphalo(a,desc_a,blk,info,rwcnv,clcnv,cliprow,outfmt,data)
 
   if(debug) Write(0,*)me,'End first loop',counter,l1,blk%m
 
-  !
-  ! Combined sort & conversion to CSR. 
-  !
-  if(debug) write(0,*) me,'Calling ipcoo2csr from dsphalo ',blk%m,blk%k,l1,blk%ia2(2)
-
-  select case(outfmt_)
-  case ('CSR') 
-    call psb_ipcoo2csr(blk,info,rwshr=.true.)
-    if (info /= 0) then
-      info=4010
-      ch_err='psb_ipcoo2csr'
-      call psb_errpush(info,name,a_err=ch_err)
-      goto 9999
-    end if
-  case('COO')
-    ! Do nothing! 
-  case default
-    write(0,*) 'Error in DSPHALO : invalid outfmt "',outfmt_,'"'
+  ! Do we expect any duplicates to appear???? 
+  call psb_spcnv(blk,info,afmt=outfmt_,dupl=psb_dupl_add_)
+  if (info /= 0) then
     info=4010
-    ch_err='Bad outfmt'
+    ch_err='psb_spcnv'
     call psb_errpush(info,name,a_err=ch_err)
     goto 9999
-  end select
+  end if
+
   t5 = psb_wtime()
-
-
 
 !!$  write(0,'(i3,1x,a,4(1x,i14))') me,'DSPHALO sizes:',iszr,iszs
 !!$  write(0,'(i3,1x,a,4(1x,g14.5))') me,'DSPHALO timings:',t6-t2,t7-t6,t8-t7,t3-t8

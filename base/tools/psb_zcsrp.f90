@@ -30,13 +30,18 @@
 !!$  
 ! File: psb_zcsrp.f90
 !
+!  WARNING: This routine should be changed and moved to the serial part 
+!           i.e. taking out the descriptor. 
+!
 ! Subroutine: psb_zcsrp
 !    Apply a right permutation to a sparse matrix, i.e. permute the column 
 !    indices. 
 ! 
 ! Parameters: 
-!    trans   - character.                       Whether iperm or its transpose should be applied
-!    iperm   - integer, pointer, dimension(:).  A permutation vector; its size must be either N_ROW or N_COL
+!    trans   - character.                       Whether iperm or its transpose 
+!                                               should be applied
+!    iperm   - integer, dimension(:)            A permutation vector; its size 
+!                                               must be either N_ROW or N_COL
 !    a       - type(<psb_zspmat_type).          The matrix to be permuted
 !    desc_a  - type(<psb_desc_type>).           The communication descriptor.
 !    info    - integer.                         Eventually returns an error code

@@ -38,7 +38,10 @@
 !    ia       - integer,dimension(:).          The row indices of the points.
 !    ja       - integer,dimension(:).          The column indices of the points.
 !    desc_a   - type(<psb_desc_type>).         The communication descriptor to be freed.
-!    info     - integer.                       Eventually returns an error code.
+!    info     - integer.                       Return code.
+!    ila      - integer,dimension(:).          The row indices in local numbering
+!    jla      - integer,dimension(:).          The col indices in local numbering
+!
 subroutine psb_cdins(nz,ia,ja,desc_a,info,ila,jla)
 
   use psb_descriptor_type

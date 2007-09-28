@@ -37,7 +37,8 @@
 ! Parameters: 
 !    m       - integer.                       The number of rows.
 !    n       - integer.                       The number of columns.
-!    parts   - external subroutine.           The routine that contains the partitioning scheme.
+!    parts   - external subroutine.           The routine that contains the 
+!                                                 partitioning scheme.
 !    ictxt - integer.                         The communication context.
 !    desc_a  - type(<psb_desc_type>).         The communication descriptor.
 !    info    - integer.                       Error code (if any).

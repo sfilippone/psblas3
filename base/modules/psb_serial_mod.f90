@@ -493,6 +493,40 @@ module psb_serial_mod
        integer, intent(in), optional        :: lrw, nzin
      end subroutine psb_zspgetrow
   end interface
+
+
+  interface psb_gelp
+    ! 2-D version
+    subroutine psb_dgelp(trans,iperm,x,info)
+      real(kind(1.d0)), intent(inout)      ::  x(:,:)
+      integer, intent(in)                  ::  iperm(:)
+      integer, intent(out)                 ::  info
+      character, intent(in)                :: trans
+    end subroutine psb_dgelp
+    ! 1-D version
+    subroutine psb_dgelpv(trans,iperm,x,info)
+      real(kind(1.d0)), intent(inout)    ::  x(:)
+      integer, intent(in)                  ::  iperm(:)
+      integer, intent(out)                 ::  info
+      character, intent(in)              :: trans
+    end subroutine psb_dgelpv
+    ! 2-D version
+    subroutine psb_zgelp(trans,iperm,x,info)
+      complex(kind(1.d0)), intent(inout)      ::  x(:,:)
+      integer, intent(in)                  ::  iperm(:)
+      integer, intent(out)                 ::  info
+      character, intent(in)                :: trans
+    end subroutine psb_zgelp
+    ! 1-D version
+    subroutine psb_zgelpv(trans,iperm,x,info)
+      complex(kind(1.d0)), intent(inout)    ::  x(:)
+      integer, intent(in)                  ::  iperm(:)
+      integer, intent(out)                 ::  info
+      character, intent(in)              :: trans
+    end subroutine psb_zgelpv
+  end interface
+
+
   
   interface psb_msort
     module procedure imsort

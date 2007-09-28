@@ -34,9 +34,10 @@
 !   Transfers data and allocation from in to out (just like MOVE_ALLOC). 
 ! 
 ! Parameters: 
-!    desc_in  - type(<psb_desc_type>).         The communication descriptor to be transferred.
+!    desc_in  - type(<psb_desc_type>).         The communication descriptor to be 
+!                                               transferred.
 !    desc_out - type(<psb_desc_type>).         The output communication descriptor.
-!    info     - integer.                       Eventually returns an error code.
+!    info     - integer.                       Return code.
 subroutine psb_cdtransfer(desc_in, desc_out, info)
 
   use psb_descriptor_type
@@ -75,18 +76,31 @@ subroutine psb_cdtransfer(desc_in, desc_out, info)
   endif
 
   call psb_transfer( desc_in%matrix_data ,    desc_out%matrix_data  , info)
-  if (info == 0)  call psb_transfer( desc_in%halo_index  ,    desc_out%halo_index   , info)
-  if (info == 0)  call psb_transfer( desc_in%bnd_elem    ,    desc_out%bnd_elem     , info)
-  if (info == 0)  call psb_transfer( desc_in%ovrlap_elem ,    desc_out%ovrlap_elem  , info)
-  if (info == 0)  call psb_transfer( desc_in%ovrlap_index,    desc_out%ovrlap_index , info)
-  if (info == 0)  call psb_transfer( desc_in%ext_index   ,    desc_out%ext_index    , info)
-  if (info == 0)  call psb_transfer( desc_in%loc_to_glob ,    desc_out%loc_to_glob  , info)
-  if (info == 0)  call psb_transfer( desc_in%glob_to_loc ,    desc_out%glob_to_loc  , info)
-  if (info == 0)  call psb_transfer( desc_in%lprm        ,    desc_out%lprm         , info)
-  if (info == 0)  call psb_transfer( desc_in%idx_space   ,    desc_out%idx_space    , info)
-  if (info == 0)  call psb_transfer( desc_in%hashv       ,    desc_out%hashv        , info)
-  if (info == 0)  call psb_transfer( desc_in%glb_lc      ,    desc_out%glb_lc       , info)
-  if (info == 0)  call psb_transfer( desc_in%ptree       ,    desc_out%ptree        , info)
+  if (info == 0)  &
+       & call psb_transfer( desc_in%halo_index  ,    desc_out%halo_index   , info)
+  if (info == 0)  &
+       & call psb_transfer( desc_in%bnd_elem    ,    desc_out%bnd_elem     , info)
+  if (info == 0)  &
+       & call psb_transfer( desc_in%ovrlap_elem ,    desc_out%ovrlap_elem  , info)
+  if (info == 0)  &
+       & call psb_transfer( desc_in%ovrlap_index,    desc_out%ovrlap_index , info)
+  if (info == 0)  &
+       & call psb_transfer( desc_in%ext_index   ,    desc_out%ext_index    , info)
+  if (info == 0)  &
+       & call psb_transfer( desc_in%loc_to_glob ,    desc_out%loc_to_glob  , info)
+  if (info == 0)  &
+       & call psb_transfer( desc_in%glob_to_loc ,    desc_out%glob_to_loc  , info)
+  if (info == 0)  &
+       & call psb_transfer( desc_in%lprm        ,    desc_out%lprm         , info)
+  if (info == 0)  &
+       & call psb_transfer( desc_in%idx_space   ,    desc_out%idx_space    , info)
+  if (info == 0)  &
+       & call psb_transfer( desc_in%hashv       ,    desc_out%hashv        , info)
+  if (info == 0)  &
+       & call psb_transfer( desc_in%glb_lc      ,    desc_out%glb_lc       , info)
+  if (info == 0)  &
+       & call psb_transfer( desc_in%ptree       ,    desc_out%ptree        , info)
+
   if (info /= 0) then
     info = 4010
     call psb_errpush(info,name)

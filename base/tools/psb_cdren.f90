@@ -29,14 +29,18 @@
 !!$ 
 !!$  
 ! File: psb_cdren.f90
-!
+!  
+!  WARNING: this routine is almost certainly obsolete. Must be reviewed.
+! 
 ! Subroutine: psb_cdren
 !    Updates a communication descriptor according to a renumbering scheme.
 ! 
 ! Parameters: 
-!    trans    - character.                     Whether iperm or its transpose should be applied.
+!    trans    - character.                     Whether iperm or its transpose 
+!                                              should be applied.
 !    iperm    - integer,dimension(:).          The renumbering scheme.
-!    desc_a   - type(<psb_desc_type>).         The communication descriptor to be updated.
+!    desc_a   - type(<psb_desc_type>).         The communication descriptor
+!                                              to be updated.
 !    info     - integer.                       Eventually returns an error code.
 !
 subroutine psb_cdren(trans,iperm,desc_a,info)

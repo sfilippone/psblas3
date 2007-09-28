@@ -38,6 +38,7 @@
 !    desc_p        - type(<psb_desc_type>).  The communication descriptor to be printed.
 !    glob          - logical(otpional).      Wheter to print out global or local data.
 !    short         - logical(optional).      Used to choose a verbose output.
+!
 subroutine psb_cdprt(iout,desc_p,glob,short)
   use psb_const_mod
   use psb_descriptor_type

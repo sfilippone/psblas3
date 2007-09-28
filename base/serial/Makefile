@@ -12,7 +12,8 @@ FOBJS = psb_cest.o psb_dcoins.o psb_dcsmm.o psb_dcsmv.o \
 	psb_zfixcoo.o psb_zipcoo2csr.o psb_zipcsr2coo.o psb_zipcoo2csc.o \
 	psb_zcoins.o psb_zcsprt.o psb_zneigh.o psb_ztransp.o psb_ztransc.o\
 	psb_zrwextd.o psb_zsymbmm.o psb_znumbmm.o psb_zspscal.o psb_zspclip.o\
-	psb_getifield.o psb_setifield.o psb_update_mod.o psb_getrow_mod.o
+	psb_getifield.o psb_setifield.o psb_update_mod.o psb_getrow_mod.o\
+	psb_dgelp.o psb_zgelp.o
 
 LIBDIR=..
 MODDIR=../modules

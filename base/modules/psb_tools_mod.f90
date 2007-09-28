@@ -132,25 +132,27 @@ Module psb_tools_mod
   end interface
 
   interface psb_sphalo
-    Subroutine psb_dsphalo(a,desc_a,blk,info,rwcnv,clcnv,cliprow,outfmt,data)
+    Subroutine psb_dsphalo(a,desc_a,blk,info,rowcnv,colcnv,&
+         & rowscale,colscale,outfmt,data)
       use psb_descriptor_type
       use psb_spmat_type
       Type(psb_dspmat_type),Intent(in)    :: a
       Type(psb_dspmat_type),Intent(inout) :: blk
       Type(psb_desc_type),Intent(in),target :: desc_a
       integer, intent(out)                :: info
-      logical, optional, intent(in)       :: rwcnv,clcnv,cliprow
+      logical, optional, intent(in)       :: rowcnv,colcnv,rowscale,colscale
       character(len=5), optional          :: outfmt 
       integer, intent(in), optional       :: data
     end Subroutine psb_dsphalo
-    Subroutine psb_zsphalo(a,desc_a,blk,info,rwcnv,clcnv,cliprow,outfmt,data)
+    Subroutine psb_zsphalo(a,desc_a,blk,info,rowcnv,colcnv,&
+         & rowscale,colscale,outfmt,data)
       use psb_descriptor_type
       use psb_spmat_type
       Type(psb_zspmat_type),Intent(in)    :: a
       Type(psb_zspmat_type),Intent(inout) :: blk
       Type(psb_desc_type),Intent(in)      :: desc_a
       integer, intent(out)                :: info
-      logical, optional, intent(in)       :: rwcnv,clcnv,cliprow
+      logical, optional, intent(in)       :: rowcnv,colcnv,rowscale,colscale
       character(len=5), optional          :: outfmt 
       integer, intent(in), optional       :: data
     end Subroutine psb_zsphalo
@@ -224,42 +226,6 @@ Module psb_tools_mod
       type(psb_desc_type), intent(in) :: desc_a
       integer                         :: info
     end subroutine psb_zfreev
-  end interface
-
-
-  interface psb_gelp
-    ! 2-D version
-    subroutine psb_dgelp(trans,iperm,x,desc_a,info)
-      use psb_descriptor_type
-      type(psb_desc_type), intent(in)      ::  desc_a
-      real(kind(1.d0)), intent(inout)      ::  x(:,:)
-      integer, intent(inout)               ::  iperm(:),info
-      character, intent(in)                :: trans
-    end subroutine psb_dgelp
-    ! 1-D version
-    subroutine psb_dgelpv(trans,iperm,x,desc_a,info)
-      use psb_descriptor_type
-      type(psb_desc_type), intent(in) ::  desc_a
-      real(kind(1.d0)), intent(inout)    ::  x(:)
-      integer, intent(inout)             ::  iperm(:), info
-      character, intent(in)              :: trans
-    end subroutine psb_dgelpv
-    ! 2-D version
-    subroutine psb_zgelp(trans,iperm,x,desc_a,info)
-      use psb_descriptor_type
-      type(psb_desc_type), intent(in)      ::  desc_a
-      complex(kind(1.d0)), intent(inout)      ::  x(:,:)
-      integer, intent(inout)               ::  iperm(:),info
-      character, intent(in)                :: trans
-    end subroutine psb_zgelp
-    ! 1-D version
-    subroutine psb_zgelpv(trans,iperm,x,desc_a,info)
-      use psb_descriptor_type
-      type(psb_desc_type), intent(in) ::  desc_a
-      complex(kind(1.d0)), intent(inout)    ::  x(:)
-      integer, intent(inout)             ::  iperm(:), info
-      character, intent(in)              :: trans
-    end subroutine psb_zgelpv
   end interface
 
 

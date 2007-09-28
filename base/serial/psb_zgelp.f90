@@ -30,9 +30,6 @@
 !!$  
 ! File: psb_zgelp.f90
 !
-!  WARNING: This routine should be changed and moved to the serial part 
-!           i.e. taking out the descriptor. 
-!
 !
 ! Subroutine: psb_zgelp
 !             Apply a left permutation to a dense matrix
@@ -42,23 +39,21 @@
 ! iperm    - integer.
 ! x        - real, dimension(:,:).
 ! info     - integer.                 Return code.
-subroutine psb_zgelp(trans,iperm,x,desc_a,info)
-  use psb_descriptor_type
-  use psb_serial_mod
+subroutine psb_zgelp(trans,iperm,x,info)
+  use psb_serial_mod, psb_protect_name => psb_zgelp
   use psb_const_mod
-  use psb_psblas_mod
   use psb_error_mod
-  use psb_penv_mod
   implicit none
 
-  type(psb_desc_type), intent(in)      ::  desc_a
   complex(kind(1.d0)), intent(inout)      ::  x(:,:)
-  integer, intent(inout)               ::  iperm(:),info
+  integer, intent(in)                  ::  iperm(:)
+  integer, intent(out)                 ::  info
   character, intent(in)                :: trans
 
   ! local variables
   integer                  :: ictxt,np,me,nrow,ncol
-  complex(kind(1.d0)),pointer ::  dtemp(:)
+  complex(kind(1.d0)),allocatable ::  dtemp(:)
+  integer, allocatable     :: itemp(:)
   integer                  :: int_err(5), i1sz, i2sz, i, err_act
   real(kind(1.d0)),parameter    :: one=1
   logical, parameter :: debug=.false.
@@ -88,46 +83,34 @@ subroutine psb_zgelp(trans,iperm,x,desc_a,info)
   info=0
   call psb_erractionsave(err_act)
 
-  ictxt   = psb_cd_get_context(desc_a)
-  nrow    = psb_cd_get_local_rows(desc_a)
-  ncol    = psb_cd_get_local_cols(desc_a)
   i1sz    = size(x,dim=1)
   i2sz    = size(x,dim=2)
 
-  call psb_info(ictxt, me, np)
-
-  if (debug) write(*,*) 'asb start: ',np,me,&
-       & psb_cd_get_dectype(desc_a)
-  !     ....verify blacs grid correctness..
-  if (np == -1) then
-    info = 2010
+  if (debug) write(*,*) 'gelp: ',i1sz,i2sz
+  allocate(dtemp(i1sz),itemp(size(iperm)),stat=info)
+  if (info /= 0) then
+    info=2040
     call psb_errpush(info,name)
     goto 9999
-  else if (.not.psb_is_asb_desc(desc_a)) then
-    info = 3110
-    call psb_errpush(info,name)
-    goto 9999
-  endif
-
-
-  if (.not.isaperm(i1sz,iperm)) then
+  end if
+  itemp(:) = iperm(:) 
+  
+  if (.not.isaperm(i1sz,itemp)) then
     info = 70
     int_err(1) = 1      
     call psb_errpush(info,name,i_err=int_err)
     goto 9999
   endif
 
-  if (debug) write(*,*) 'asb: ',i1sz,i2sz,nrow,ncol
-  allocate(dtemp(i1sz),stat=info)
 
-  call zgelp(trans,i1sz,i2sz,iperm,x,i1sz,dtemp,i1sz,info)
+  call zgelp(trans,i1sz,i2sz,itemp,x,i1sz,dtemp,i1sz,info)
   if(info.ne.0) then
     info=4010
     ch_err='zgelp'
     call psb_errpush(info,name,a_err=ch_err)
   end if
 
-  deallocate(dtemp)
+  deallocate(dtemp,itemp)
 
   call psb_erractionrestore(err_act)
   return
@@ -189,24 +172,22 @@ end subroutine psb_zgelp
 ! iperm    - integer.
 ! x        - real, dimension(:).
 ! info     - integer.                 Return code.
-subroutine psb_zgelpv(trans,iperm,x,desc_a,info)
-  use psb_descriptor_type
-  use psb_serial_mod
+subroutine psb_zgelpv(trans,iperm,x,info)
+  use psb_serial_mod, psb_protect_name => psb_zgelpv
   use psb_const_mod
-  use psb_psblas_mod
   use psb_error_mod
-  use psb_penv_mod
   implicit none
 
-  type(psb_desc_type), intent(in)    ::  desc_a
   complex(kind(1.d0)), intent(inout) ::  x(:)
-  integer, intent(inout)             ::  iperm(:), info
+  integer, intent(in)                  ::  iperm(:)
+  integer, intent(out)                 ::  info
   character, intent(in)              ::  trans
 
   ! local variables
   integer :: ictxt,np,me
   integer :: int_err(5), i1sz,nrow,ncol, i, err_act
-  complex(kind(1.d0)),pointer ::  dtemp(:)
+  complex(kind(1.d0)),allocatable  ::  dtemp(:)
+  integer, allocatable     :: itemp(:)
   real(kind(1.d0)),parameter    :: one=1
   logical, parameter :: debug=.false.
 
@@ -237,35 +218,25 @@ subroutine psb_zgelpv(trans,iperm,x,desc_a,info)
 
   i1sz = size(x)
 
-  ictxt   = psb_cd_get_context(desc_a)
-  nrow    = psb_cd_get_local_rows(desc_a)
-  ncol    = psb_cd_get_local_cols(desc_a)
 
-  call psb_info(ictxt, me, np)
-
-  !     ....verify blacs grid correctness..
-  if (np == -1) then
-    info = 2010
+  if (debug) write(*,*) 'gelp: ',i1sz
+  allocate(dtemp(i1sz),itemp(size(iperm)),stat=info)
+  if (info /= 0) then
+    info=2040
     call psb_errpush(info,name)
     goto 9999
-  else if (.not.psb_is_asb_desc(desc_a)) then
-    info = 3110
-    call psb_errpush(info,name)
-    goto 9999
-  endif
-
-  if (debug) write(0,*) 'calling isaperm ',i1sz,size(iperm),trans
-
-  if (.not.isaperm(i1sz,iperm)) then
+  end if
+  itemp(:) = iperm(:) 
+  
+  if (.not.isaperm(i1sz,itemp)) then
     info = 70
     int_err(1) = 1      
     call psb_errpush(info,name,i_err=int_err)
     goto 9999
   endif
 
-  allocate(dtemp(i1sz),stat=info)
 
-  call zgelp(trans,i1sz,1,iperm,x,i1sz,dtemp,i1sz,info)
+  call zgelp(trans,i1sz,1,itemp,x,i1sz,dtemp,i1sz,info)
   if(info.ne.0) then
     info=4010
     ch_err='zgelp'
