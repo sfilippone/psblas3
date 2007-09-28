@@ -28,7 +28,7 @@ How do you add a new storage format? Here is your checklist.
 4.  You have to be able to generate it. For our purposes, the minimum
     effort that still meets the requirements is the ability to convert
     to/from COOrdinate; the relevant code (properly encapsulated in
-    subroutines) should be added into psb_Xcsdp; you can take Xcocr as
+    subroutines) should be added into psb_spcnv; you can take Xcocr as
     the model. You may or may not be able to do it "in place";
     ipcoo2csr & friends do just that; if you can, please add it because
     it may come in handy.
