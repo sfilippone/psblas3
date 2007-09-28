@@ -1,4 +1,4 @@
-!!$ 
+!!$  
 !!$              Parallel Sparse BLAS  v2.0
 !!$    (C) Copyright 2006 Salvatore Filippone    University of Rome Tor Vergata
 !!$                       Alfredo Buttari        University of Rome Tor Vergata
@@ -79,32 +79,28 @@ program pde90
 
   ! input parameters
   character :: cmethd*10, ptype*10, afmt*5
-  integer      :: idim, iret
+  integer      :: idim
 
   ! miscellaneous 
-  integer              :: iargc,convert_descr,dim, check_descr
   real(kind(1.d0)), parameter :: one = 1.d0
-  real(kind(1.d0)) :: t1, t2, tprec, tsolve, t3, t4 
+  real(kind(1.d0)) :: t1, t2, tprec 
 
   ! sparse matrix and preconditioner
-  type(psb_dspmat_type) :: a,  l, u, h
+  type(psb_dspmat_type) :: a
   type(psb_dprec_type)  :: prec
   ! descriptor
-  type(psb_desc_type)   :: desc_a, desc_a_out
+  type(psb_desc_type)   :: desc_a
   ! dense matrices
-  real(kind(1.d0)), allocatable :: b(:), x(:), d(:),ld(:)
-  integer, allocatable :: work(:)
+  real(kind(1.d0)), allocatable :: b(:), x(:)
   ! blacs parameters
   integer            :: ictxt, iam, np
 
   ! solver parameters
-  integer            :: iter, itmax,ierr,itrace, methd, istopc,&
-       & iparm(20), irst
-  real(kind(1.d0))   :: err, eps, rparm(20)
+  integer            :: iter, itmax,itrace, istopc, irst
+  real(kind(1.d0))   :: err, eps
 
   ! other variables
-  integer            :: i,info
-  integer            :: internal, m,ii
+  integer            :: info
   character(len=20)  :: name,ch_err
 
   if(psb_get_errstatus().ne.0) goto 9999
@@ -230,8 +226,7 @@ contains
     integer      :: ictxt
     character(len=10) :: cmethd, ptype
     character(len=5)  :: afmt
-    integer      :: idim, iret, istopc,itmax,itrace,irst
-    character(len=40) :: charbuf
+    integer      :: idim, istopc,itmax,itrace,irst
     integer      :: iargc, np, iam
     external     iargc
     integer      :: intbuf(10), ip
@@ -368,8 +363,8 @@ contains
     end interface   ! local variables
     type(psb_dspmat_type)    :: a
     real(kind(1.d0))         :: zt(nbmax),glob_x,glob_y,glob_z
-    integer                  :: m,n,nnz,glob_row,j
-    integer                  :: x,y,z,counter,ia,i,indx_owner
+    integer                  :: m,n,nnz,glob_row
+    integer                  :: x,y,z,ia,indx_owner
     integer                  :: np, iam
     integer                  :: element
     integer                  :: nv, inv
@@ -383,8 +378,7 @@ contains
     real(kind(1.d0))   :: t1, t2, t3, tins, tasb
     real(kind(1.d0))   :: a1, a2, a3, a4, b1, b2, b3 
     external           :: a1, a2, a3, a4, b1, b2, b3
-    integer            :: nb, ir1, ir2, ipr, err_act
-    logical            :: own
+    integer            :: err_act
     ! common area
 
     character(len=20)  :: name, ch_err
