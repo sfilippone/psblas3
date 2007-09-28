@@ -407,26 +407,44 @@ contains
 
   integer function psb_cd_get_local_rows(desc)
     type(psb_desc_type), intent(in) :: desc
-    
-    psb_cd_get_local_rows = desc%matrix_data(psb_n_row_)
+
+    if (psb_is_ok_desc(desc)) then 
+      psb_cd_get_local_rows = desc%matrix_data(psb_n_row_)
+    else
+      psb_cd_get_local_rows = -1
+    endif
   end function psb_cd_get_local_rows
 
   integer function psb_cd_get_local_cols(desc)
     type(psb_desc_type), intent(in) :: desc
     
-    psb_cd_get_local_cols = desc%matrix_data(psb_n_col_)
+    if (psb_is_ok_desc(desc)) then 
+      psb_cd_get_local_cols = desc%matrix_data(psb_n_col_)
+    else
+      psb_cd_get_local_cols = -1
+    endif
   end function psb_cd_get_local_cols
 
   integer function psb_cd_get_global_rows(desc)
     type(psb_desc_type), intent(in) :: desc
     
-    psb_cd_get_global_rows = desc%matrix_data(psb_m_)
+    if (psb_is_ok_desc(desc)) then 
+      psb_cd_get_global_rows = desc%matrix_data(psb_m_)
+    else
+      psb_cd_get_global_rows = -1
+    endif
+
   end function psb_cd_get_global_rows
 
   integer function psb_cd_get_global_cols(desc)
     type(psb_desc_type), intent(in) :: desc
     
-    psb_cd_get_global_cols = desc%matrix_data(psb_n_)
+    if (psb_is_ok_desc(desc)) then 
+      psb_cd_get_global_cols = desc%matrix_data(psb_n_)
+    else
+      psb_cd_get_global_cols = -1
+    endif
+
   end function psb_cd_get_global_cols
 
   integer function psb_cd_get_context(desc)
