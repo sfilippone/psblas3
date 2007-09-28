@@ -1,6 +1,10 @@
 Changelog. A lot less detailed than usual, at least for past
 history. 
 
+2007/09/28: Moved gelp and csrp to serial. Changed interface to
+    	    sphalo: the new one makes more sense.
+            Updated documentation. 
+
 2007/09/14: Second round of serial changes: merged into trunk, fixed
 	    JAD regeneration and srch_upd now works.           
 
