@@ -106,7 +106,7 @@ subroutine psb_zdiagsc_bld(a,desc_a,p,upd,info)
       call psb_errpush(info,name)
       goto 9999
     end if
-    call  psb_gelp('n',a%pl,p%d,desc_a,info)
+    call  psb_gelp('n',a%pl,p%d,info)
     if(info /= 0) then
       info=4010
       ch_err='psb_zgelp'
