@@ -27,7 +27,21 @@
 !!$  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 !!$  POSSIBILITY OF SUCH DAMAGE.
 !!$ 
-!!$  
+!!$ 
+!
+! File: psi_crea_bnd_elem.f90
+!
+! Subroutine: psi_crea_bnd_elem
+!    Extracts a list of boundary indices. If no boundary is present in 
+!    the distribution the output vector is put in the unallocated state,
+!    otherwise its size is equal to the number of boundary indices on the 
+!    current (calling) process. 
+! 
+! Parameters: 
+!    bndel(:) - integer, allocatable      Array containing the output list              
+!    desc_a   - type(<psb_desc_type>).    The communication descriptor.        
+!    info     - integer.                  return code.
+! 
 subroutine psi_crea_bnd_elem(bndel,desc_a,info)
   use psi_mod, psb_protect_name => psi_crea_bnd_elem
   use psb_realloc_mod
@@ -68,21 +82,7 @@ subroutine psi_crea_bnd_elem(bndel,desc_a,info)
     j  = j + 1 + ns + 1 + nr + 1
   enddo
 
-  if (i>0) then 
-    call psb_msort(work(1:i))
-    j=1
-    irv = work(1)
-    do k=2, i
-      if (work(k) /= irv) then
-        irv = work(k)
-        j = j + 1 
-        work(j) = work(k)
-      endif
-    enddo
-  else 
-    j = 0
-  endif
-
+  call psb_msort_unique(work(1:i),j)
 
   if (.true.) then 
     if (j>0) then 

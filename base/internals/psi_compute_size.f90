@@ -28,6 +28,9 @@
 !!$  POSSIBILITY OF SUCH DAMAGE.
 !!$ 
 !!$  
+!
+! Compute maximum data exchange size; small utility for assembly of descriptors.
+!
 subroutine psi_compute_size(desc_data, index_in, dl_lda, info)
 
   use psi_mod, psb_protect_name => psi_compute_size

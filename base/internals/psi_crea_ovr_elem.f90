@@ -28,6 +28,19 @@
 !!$  POSSIBILITY OF SUCH DAMAGE.
 !!$ 
 !!$  
+!
+! File: psi_crea_ovr_elem.f90
+!
+! Subroutine: psi_crea_ovr_elem
+!   Creates the overlap_elem list: for each overlap index, store the index and 
+!   the number of processes sharing it (minimum: 2). List is ended by -1.
+!   See also description in base/modules/psb_desc_type.f90
+! 
+! Parameters: 
+!    ovr_elem(:) - integer, allocatable      Array containing the output list              
+!    desc_a   - type(<psb_desc_type>).    The communication descriptor.        
+!    info     - integer.                  return code.
+! 
 subroutine psi_crea_ovr_elem(desc_overlap,ovr_elem,info)
 
   use psi_mod, psb_protect_name => psi_crea_ovr_elem
@@ -133,7 +146,8 @@ subroutine psi_crea_ovr_elem(desc_overlap,ovr_elem,info)
     ovr_elem(pnt_new_elem)=-1
     call freepairsearchtree(pairtree)
 
-  else
+  else if (.not.usetree)  then 
+
 
     insize = size(desc_overlap)
     insize = max(1,(insize+1)/2)

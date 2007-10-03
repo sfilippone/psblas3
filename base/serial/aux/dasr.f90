@@ -32,7 +32,7 @@
 subroutine dasr(n,x,dir)
   use psb_serial_mod
   implicit none
-      !
+  !
   !  Quicksort on absolute value.
   !  Adapted from a number of sources, including Don Knuth's TAOCP.
   !

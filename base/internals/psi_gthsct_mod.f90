@@ -28,6 +28,14 @@
 !!$  POSSIBILITY OF SUCH DAMAGE.
 !!$ 
 !!$  
+! File: psi_gthsct_mod.f90
+!
+! Module: psi_gth_scr_mod
+!   Provides pack/unpack routines for usage in the data exchange.
+!   The unpack routines take a BETA argument to have a unified treatment of 
+!   simple receives with overwriting, and receives with sum (for overlap)
+! 
+!
 module psi_gthsct_mod
 
   interface psi_gth
@@ -46,6 +54,7 @@ contains
 
   subroutine psi_dgthm(n,k,idx,x,y)
 
+    use psb_const_mod
     implicit none
 
     integer :: n, k, idx(:)
@@ -66,6 +75,7 @@ contains
 
   subroutine psi_dgthv(n,idx,x,y)
 
+    use psb_const_mod
     implicit none
 
     integer :: n, idx(:)
@@ -83,6 +93,7 @@ contains
 
   subroutine psi_dsctm(n,k,idx,x,beta,y)
 
+    use psb_const_mod
     implicit none
 
     integer :: n, k, idx(:)
@@ -91,7 +102,7 @@ contains
     ! Locals
     integer :: i, j, pt
 
-    if (beta.eq.0.d0) then
+    if (beta == dzero) then
       pt=0
       do j=1,k
         do i=1,n
@@ -99,7 +110,7 @@ contains
           y(idx(i),j) = x(pt)
         end do
       end do
-    else if (beta.eq.1.d0) then
+    else if (beta == done) then
       pt=0
       do j=1,k
         do i=1,n
@@ -120,6 +131,7 @@ contains
 
   subroutine psi_dsctv(n,idx,x,beta,y)
 
+    use psb_const_mod
     implicit none
 
     integer :: n, k, idx(:)
@@ -128,11 +140,11 @@ contains
     ! Locals
     integer :: i, j, pt
 
-    if (beta.eq.0.d0) then
+    if (beta == dzero) then
       do i=1,n
         y(idx(i)) = x(i)
       end do
-    else if (beta.eq.1.d0) then
+    else if (beta == done) then
       do i=1,n
         y(idx(i)) = y(idx(i))+x(i)
       end do
@@ -146,6 +158,7 @@ contains
 
   subroutine psi_igthm(n,k,idx,x,y)
 
+    use psb_const_mod
     implicit none
 
     integer :: n, k, idx(:)
@@ -167,6 +180,7 @@ contains
 
   subroutine psi_igthv(n,idx,x,y)
 
+    use psb_const_mod
     implicit none
 
     integer :: n, idx(:)
@@ -185,6 +199,7 @@ contains
 
   subroutine psi_isctm(n,k,idx,x,beta,y)
 
+    use psb_const_mod
     implicit none
 
     integer :: n, k, idx(:)
@@ -193,7 +208,7 @@ contains
     ! Locals
     integer :: i, j, pt
 
-    if (beta.eq.0.d0) then
+    if (beta == izero) then
       pt=0
       do j=1,k
         do i=1,n
@@ -201,7 +216,7 @@ contains
           y(idx(i),j) = x(pt)
         end do
       end do
-    else if (beta.eq.1.d0) then
+    else if (beta == ione) then
       pt=0
       do j=1,k
         do i=1,n
@@ -222,6 +237,7 @@ contains
 
   subroutine psi_isctv(n,idx,x,beta,y)
 
+    use psb_const_mod
     implicit none
 
     integer :: n, k, idx(:)
@@ -230,11 +246,11 @@ contains
     ! Locals
     integer :: i, j, pt
 
-    if (beta.eq.0.d0) then
+    if (beta == izero) then
       do i=1,n
         y(idx(i)) = x(i)
       end do
-    else if (beta.eq.1.d0) then
+    else if (beta == ione) then
       do i=1,n
         y(idx(i)) = y(idx(i))+x(i)
       end do
@@ -248,6 +264,7 @@ contains
 
   subroutine psi_zgthm(n,k,idx,x,y)
 
+    use psb_const_mod
     implicit none
 
     integer :: n, k, idx(:)
@@ -269,6 +286,7 @@ contains
 
   subroutine psi_zgthv(n,idx,x,y)
 
+    use psb_const_mod
     implicit none
 
     integer :: n, idx(:)
@@ -285,6 +303,7 @@ contains
 
   subroutine psi_zsctm(n,k,idx,x,beta,y)
 
+    use psb_const_mod
     implicit none
 
     integer :: n, k, idx(:)
@@ -293,7 +312,7 @@ contains
     ! Locals
     integer :: i, j, pt
 
-    if (beta.eq.0.d0) then
+    if (beta == zzero) then
       pt=0
       do j=1,k
         do i=1,n
@@ -301,7 +320,7 @@ contains
           y(idx(i),j) = x(pt)
         end do
       end do
-    else if (beta.eq.1.d0) then
+    else if (beta == zone) then
       pt=0
       do j=1,k
         do i=1,n
@@ -323,6 +342,7 @@ contains
 
   subroutine psi_zsctv(n,idx,x,beta,y)
 
+    use psb_const_mod
     implicit none
 
     integer :: n, k, idx(:)
@@ -331,11 +351,11 @@ contains
     ! Locals
     integer :: i, j, pt
 
-    if (beta.eq.0.d0) then
+    if (beta == zzero) then
       do i=1,n
         y(idx(i)) = x(i)
       end do
-    else if (beta.eq.1.d0) then
+    else if (beta == zone) then
       do i=1,n
         y(idx(i)) = y(idx(i))+x(i)
       end do

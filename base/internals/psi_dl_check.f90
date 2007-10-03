@@ -28,6 +28,21 @@
 !!$  POSSIBILITY OF SUCH DAMAGE.
 !!$ 
 !!$  
+!
+! File: psi_dl_check.f90
+!
+! Subroutine: psi_dl_check
+!   Make sure a dependency list is symmetric, i.e. if process i depends on j
+!   then process j should depend on i (even if the data to be sent in one of the
+!   directions happens to be empty)
+! 
+! Parameters: 
+!    dep_list(:,:) - integer             Initial dependency lists
+!    dl_lda        - integer             Allocated size of dep_list
+!    np            - integer             Total number of processes.
+!    length_dl(:)  - integer             Items in dependency lists; updated on 
+!                                        exit
+! 
 subroutine psi_dl_check(dep_list,dl_lda,np,length_dl)
 
   use psi_mod, psb_protect_name => psi_dl_check
@@ -40,11 +55,10 @@ subroutine psi_dl_check(dep_list,dl_lda,np,length_dl)
   ! locals
   integer  :: proc, proc2, i, j
 
-  ! ...i must order communication in in halo
 
-  ! ...if in dep_list of process i there is j
-  !     and in dep_list of process j there isn't i,
-  !     add to it process i...
+  ! ...if j is in  dep_list of process i 
+  !     and i is not in dep_list of process j 
+  !     fix it.
 
   do proc=0,np-1
     i=1

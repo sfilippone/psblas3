@@ -2,6 +2,7 @@ include ../../Make.inc
 
 FOBJS = psi_compute_size.o psi_crea_bnd_elem.o psi_crea_index.o \
         psi_crea_ovr_elem.o psi_dl_check.o \
+	psi_gthsct_mod.o \
 	psi_sort_dl.o \
 	psi_ldsc_pre_halo.o\
 	psi_sort_dl.o psi_idx_cnv.o psi_idx_ins_cnv.o psi_fnd_owner.o
@@ -22,7 +23,7 @@ lib: mpfobjs $(FOBJS) $(FOBJS2) $(COBJS) $(MPFOBJS2)
 	$(RANLIB) $(LIBDIR)/$(LIBNAME)
 
 
-mpfobjs: 
+mpfobjs: psi_gthsct_mod.o 
 	(make $(MPFOBJS) F90="$(MPF90)" FC="$(MPF90)" FCOPT="$(F90COPT)")	
 	(make $(FOBJS2) F90="$(MPF77)" FC="$(MPF77)" FCOPT="$(FCOPT)")
 clean:

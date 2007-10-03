@@ -33,13 +33,13 @@ module psb_const_mod
   !
   !     Handy & miscellaneous constants
   !
-  integer, parameter :: ione=1, izero=0
-  integer, parameter :: itwo=2, ithree=3,mone=-1, psb_root_=0
-  real(kind(1.d0)), parameter :: psb_colrow_=0.33, psb_percent_=0.7
-  real(kind(1.d0)), parameter :: dzero=0.d0, done=1.d0
+  integer, parameter             :: izero=0, ione=1
+  integer, parameter             :: itwo=2, ithree=3,mone=-1, psb_root_=0
+  real(kind(1.d0)), parameter    :: psb_colrow_=0.33, psb_percent_=0.7
+  real(kind(1.d0)), parameter    :: dzero=0.d0, done=1.d0
   complex(kind(1.d0)), parameter :: zzero=(0.d0,0.0d0)
   complex(kind(1.d0)), parameter :: zone=(1.d0,0.0d0)
-  real(kind(1.d0)), parameter :: epstol=1.d-32
+  real(kind(1.d0)), parameter    :: epstol=1.d-32
 
   character, parameter :: psb_all_='A',  psb_topdef_=' '
 

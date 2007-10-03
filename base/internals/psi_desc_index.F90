@@ -230,17 +230,11 @@ subroutine psi_desc_index(desc,index_in,dep_list,&
     desc_index(i) = nerv
     call psi_idx_cnv(nerv,sndbuf(bsdindx(proc+1)+1:bsdindx(proc+1)+nerv),&
          &  desc_index(i+1:i+nerv),desc,info)
-!!$    do j=1, nerv
-!!$      desc_index(i+j) = glob_to_loc(sndbuf(bsdindx(proc+1)+j))
-!!$    end do
     i = i + nerv + 1 
     nesd = rvsz(proc+1) 
     desc_index(i) = nesd
     call psi_idx_cnv(nesd,rcvbuf(brvindx(proc+1)+1:brvindx(proc+1)+nesd),&
          &  desc_index(i+1:i+nesd),desc,info)
-!!$    do j=1, nesd
-!!$      desc_index(i+j) = glob_to_loc(rcvbuf(brvindx(proc+1)+j))
-!!$    end do
     i = i + nesd + 1 
   end do
   desc_index(i) = - 1 

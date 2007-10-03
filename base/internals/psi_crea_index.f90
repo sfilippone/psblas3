@@ -28,6 +28,75 @@
 !!$  POSSIBILITY OF SUCH DAMAGE.
 !!$ 
 !!$  
+!
+!
+! File: psi_crea_index.f90
+!
+! Subroutine: psb_crea_index
+!    Converts a list of data exchanges from build format to assembled format. 
+!    See below for a description of the formats.
+!
+! Parameters:
+! desc_a       - type(psb_desc_type)   The descriptor; in this context only the index 
+!                                       mapping parts are used.
+! index_in(:)  - integer               The index list, build format  
+! index_out(:) - integer, allocatable  The index list, assembled format
+! glob_idx     - logical               Whether the input indices are in local or global
+!                                      numbering; the global numbering is used when 
+!                                      converting the overlap exchange lists.
+! nxch         - integer               The number of data exchanges on the calling process
+! nsnd         - integer               Total send buffer size       on the calling process
+! nrcv         - integer               Total receive buffer size    on the calling process
+!
+!
+! The format of the index lists. Copied from base/modules/psb_desc_type
+!
+!  7. The data exchange is based on lists of local indices to be exchanged; all the 
+!     lists have the same format, as follows:
+!     the list is  composed of variable dimension blocks, one for each process to 
+!     communicate with; each block contains indices of local elements to be 
+!     exchanged. We do choose the order of communications:  do not change 
+!     the sequence of blocks unless you know what you're doing, or you'll 
+!     risk a deadlock. NOTE: This is the format when the state is PSB_ASB_.
+!     See below for BLD. The end-of-list is marked with a -1. 
+!
+!  notation        stored in		          explanation
+!  --------------- --------------------------- -----------------------------------
+!  process_id      index_v(p+proc_id_)      identifier of process with which 
+!                                                data is  exchanged.
+!  n_elements_recv index_v(p+n_elem_recv_)  number of elements to receive.
+!  elements_recv   index_v(p+elem_recv_+i)  indexes of local elements to
+!					          receive. these are stored in the
+!					          array from location p+elem_recv_ to
+!					          location p+elem_recv_+
+!						  index_v(p+n_elem_recv_)-1.
+!  n_elements_send index_v(p+n_elem_send_)  number of elements to send.
+!  elements_send   index_v(p+elem_send_+i)  indexes of local elements to
+!					          send. these are stored in the
+!					          array from location p+elem_send_ to
+!					          location p+elem_send_+
+!						  index_v(p+n_elem_send_)-1.
+!
+!     This organization is valid for both halo and overlap indices; overlap entries
+!     need to be updated to ensure that a variable at a given global index 
+!     (assigned to multiple processes) has the same value. The way to resolve the 
+!     issue is to exchange the data and then sum (or average) the values. See
+!     psb_ovrl subroutine. 
+!  
+!  8. When the descriptor is in the BLD state the INDEX vectors contains only 
+!     the indices to be received, organized as  a sequence 
+!     of entries of the form (proc,N,(lx1,lx2,...,lxn)) with owning process,
+!     number of indices (most often N=1), list of local indices. 
+!     This is because we only know the list of halo indices to be received 
+!     as we go about building the sparse matrix pattern, and we want the build 
+!     phase to be loosely synchronized. Thus we record the indices we have to ask 
+!     for, and at the time we call PSB_CDASB we match all the requests to figure 
+!     out who should be sending what to whom.
+!     However this implies that we know who owns the indices; if we are in the 
+!     LARGE case (as described above) this is actually only true for the OVERLAP list 
+!     that is filled in at CDALL time, and not for the HALO; thus the HALO list 
+!     is rebuilt during the CDASB process (in the psi_ldsc_pre_halo subroutine). 
+!  
 subroutine psi_crea_index(desc_a,index_in,index_out,glob_idx,nxch,nsnd,nrcv,info)
 
   use psb_realloc_mod
@@ -76,10 +145,6 @@ subroutine psi_crea_index(desc_a,index_in,index_out,glob_idx,nxch,nsnd,nrcv,info
 
   ! ...extract dependence list (ordered list of identifer process
   !    which every process must communcate with...
-!!$  write(0,*) me,name,' Size of desc_in ',size(index_in)
-!!$  if (size(index_in)>0) then 
-!!$    write(0,*) me,name,'first item ',index_in(1)
-!!$  end if
   if (debug) write(*,*) 'crea_halo: calling extract_dep_list'
   mode = 1
 
@@ -95,19 +160,18 @@ subroutine psi_crea_index(desc_a,index_in,index_out,glob_idx,nxch,nsnd,nrcv,info
   ! ...now process root contains dependence list of all processes...
   if (debug) write(0,*) 'crea_index: root sorting dep list'
 
-  ! ....i must order communication in in halo
   call psi_dl_check(dep_list,max(1,dl_lda),np,length_dl)
 
-  ! ....now i can sort dependence list......
+  ! ....now i can sort dependency lists.
   call psi_sort_dl(dep_list,length_dl,np,info)
   if(info /= 0) then
     call psb_errpush(4010,name,a_err='psi_sort_dl')
     goto 9999
   end if
 
-  ! ...create desc_halo array.....
   if(debug) write(0,*)'in psi_crea_index calling psi_desc_index',&
        & size(index_out)
+  ! Do the actual format conversion. 
   call psi_desc_index(desc_a,index_in,dep_list(1:,me),&
        & length_dl(me),nsnd,nrcv, index_out,glob_idx,info)
   if(debug) write(0,*)'out of  psi_desc_index',&
