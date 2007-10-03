@@ -34,7 +34,7 @@
 !   This subroutine scatters a global matrix locally owned by one process
 !   into pieces that are local to alle the processes.
 !
-! Parameters:
+! Arguments:
 !   globx     -  integer,dimension(:,:).          The global matrix to scatter.
 !   locx      -  integer,dimension(:,:).          The local piece of the ditributed matrix.
 !   desc_a    -  type(<psb_desc_type>).        The communication descriptor.
@@ -261,7 +261,7 @@ end subroutine psb_iscatterm
 !   This subroutine scatters a global vector locally owned by one process
 !   into pieces that are local to alle the processes.
 !
-! Parameters:
+! Arguments:
 !   globx     -  integer,dimension(:).            The global vector to scatter.
 !   locx      -  integer,dimension(:).            The local piece of the ditributed vector.
 !   desc_a    -  type(<psb_desc_type>).        The communication descriptor.

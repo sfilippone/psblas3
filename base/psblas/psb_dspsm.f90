@@ -54,7 +54,7 @@
 !  sub( X ) is a distributed
 !  vector and T is a M-by-M distributed triangular matrix.
 !
-! Parameters:   
+! Arguments:   
 !    alpha  -  real.                        The scalar alpha.
 !    a      -  type(<psb_dspmat_type>).     The sparse matrix containing A.
 !    x      -  real,dimension(:,:).         The input vector containing the entries of sub( X ).
@@ -364,7 +364,7 @@ end subroutine psb_dspsm
 !  X is a distributed
 !  vector and T is a M-by-M distributed triangular matrix.
 !
-! Parameters:   
+! Arguments:   
 !    alpha  -  real.                        The scalar alpha.
 !    a      -  type(<psb_dspmat_type>).     The sparse matrix containing A.
 !    x      -  real,dimension(:).           The input vector containing the entries of X.

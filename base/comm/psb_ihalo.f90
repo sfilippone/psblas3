@@ -35,7 +35,7 @@
 !   This subroutine performs the exchange of the halo elements in a 
 !    distributed dense matrix between all the processes.
 !
-! Parameters:
+! Arguments:
 !   x         -  integer,dimension(:,:).       The local part of the dense matrix.
 !   desc_a    -  type(<psb_desc_type>).        The communication descriptor.
 !   info      -  integer.                      Eventually returns an error code.
@@ -252,7 +252,7 @@ end subroutine psb_ihalom
 !   This subroutine performs the exchange of the halo elements in a 
 !    distributed dense matrix between all the processes.
 !
-! Parameters:
+! Arguments:
 !   x         -  integer,dimension(:).         The local part of the dense matrix.
 !   desc_a    -  type(<psb_desc_type>).        The communication descriptor.
 !   info      -  integer.                      Eventually returns an error code.

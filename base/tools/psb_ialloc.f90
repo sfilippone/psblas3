@@ -34,7 +34,7 @@
 !    Allocates dense integer matrix for PSBLAS routines
 !    The descriptor may be in either the build or assembled state.
 ! 
-! Parameters: 
+! Arguments: 
 !    x      - the matrix to be allocated.
 !    desc_a - the communication descriptor.
 !    info   - possibly returns an error code
@@ -181,7 +181,7 @@ end subroutine psb_ialloc
 !    Allocates dense matrix for PSBLAS routines
 !    The descriptor may be in either the build or assembled state.
 ! 
-! Parameters: 
+! Arguments: 
 !    m      - integer.                  The number of rows.
 !    x      - integer,dimension(:).     The matrix to be allocated.
 !    desc_a - type(<psb_desc_type>).    The communication descriptor.

@@ -33,7 +33,7 @@
 ! Subroutine: psb_zspasb
 !    Assemble sparse matrix
 ! 
-! Parameters: 
+! Arguments: 
 !    a        - type(<psb_zspmat_type>).          The sparse matrix to be assembled
 !    desc_a   - type(<psb_desc_type>).            The communication descriptor.
 !    info     - integer.                     return code.

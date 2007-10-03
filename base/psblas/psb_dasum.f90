@@ -37,7 +37,7 @@
 !
 !    where sub( X ) denotes X(1:N,JX:).
 !
-! Parameters:
+! Arguments:
 !    x      -  real,dimension(:,:).       The input vector.
 !    desc_a -  type(<psb_desc_type>).     The communication descriptor.
 !    info   -  integer.                   Eventually returns an error code.
@@ -182,7 +182,7 @@ end function psb_dasum
 !
 !    norm1 := sum(X(i))
 !
-! Parameters:
+! Arguments:
 !    x      -  real,dimension(:).       The input vector.
 !    desc_a -  type(<psb_desc_type>).     The communication descriptor.
 !    info   -  integer.                   Eventually returns an error code.
@@ -319,7 +319,7 @@ end function psb_dasumv
 !
 !    norm1 := sum(X(i))
 !
-! Parameters:
+! Arguments:
 !    res    -  real.                      The result.
 !    x      -  real,dimension(:).         The input vector.
 !    desc_a -  type(<psb_desc_type>).     The communication descriptor.

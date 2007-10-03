@@ -30,7 +30,7 @@
 !!$  
 ! File:  psb_drwextd.f90 
 ! Subroutine: 
-! Parameters:
+! Arguments:
 !
 ! We have a problem here: 1. How to handle well all the formats? 
 !                         2. What should we do with rowscale? Does it only 

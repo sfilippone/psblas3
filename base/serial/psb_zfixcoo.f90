@@ -30,7 +30,7 @@
 !!$  
 ! File:  psb_zfixcoo.f90 
 ! Subroutine: 
-! Parameters:
+! Arguments:
 
 Subroutine psb_zfixcoo(a,info,idir)
   use psb_spmat_type

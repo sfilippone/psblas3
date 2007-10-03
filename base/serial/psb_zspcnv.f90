@@ -34,7 +34,7 @@
 !    This subroutine performs the assembly of
 !    the local part of a sparse distributed matrix
 !
-! Parameters:
+! Arguments:
 !   a      -  type(<psb_spmat_type>).         The input matrix to be assembled.
 !   b      -  type(<psb_spmat_type>).         The assembled output matrix.
 !   info   -  integer.                        Eventually returns an error code.

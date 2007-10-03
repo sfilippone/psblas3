@@ -35,7 +35,7 @@
 !    Apply a right permutation to a sparse matrix, i.e. permute the column 
 !    indices. 
 ! 
-! Parameters: 
+! Arguments: 
 !    trans   - character.                       Whether iperm or its transpose 
 !                                               should be applied
 !    iperm   - integer, dimension(:)            A permutation vector; its size 

@@ -33,7 +33,7 @@
 ! Subroutine: psb_cdasb
 !   Assemble the psblas communications descriptor.
 ! 
-! Parameters: 
+! Arguments: 
 !    desc_a  - type(<psb_desc_type>).         The communication descriptor.
 !    info    - integer.                       return code.
 !    ext_hv  - logical                        Essentially this distinguishes a call 

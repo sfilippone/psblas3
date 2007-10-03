@@ -33,7 +33,7 @@
 ! Subroutine: psb_dgatherm
 !   This subroutine gathers pieces of a distributed dense matrix into a local one.
 !
-! Parameters:
+! Arguments:
 !   globx     -  real,dimension(:,:).          The local matrix into which gather 
 !                                                the distributed pieces.
 !   locx      -  real,dimension(:,:).          The local piece of the distributed 
@@ -204,7 +204,7 @@ end subroutine psb_dgatherm
 ! Subroutine: psb_dgatherv
 !   This subroutine gathers pieces of a distributed dense vector into a local one.
 !
-! Parameters:
+! Arguments:
 !   globx     -  real,dimension(:).            The local vector into which gather the 
 !                                                  distributed pieces.
 !   locx      -  real,dimension(:).            The local piece of the ditributed

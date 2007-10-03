@@ -62,7 +62,7 @@
 !  alpha and beta are scalars, and sub( X ) and sub( Y ) are distributed
 !  vectors and A is a M-by-N distributed matrix.
 !
-! Parameters:   
+! Arguments:   
 !    alpha  -  real.                        The scalar alpha.
 !    a      -  type(<psb_zspmat_type>).     The sparse matrix containing A.
 !    x      -  real,dimension(:,:).         The input vector containing the entries of sub( X ).
@@ -396,7 +396,7 @@ end subroutine psb_zspmm
 !  alpha and beta are scalars, and X and Y are distributed
 !  vectors and A is a M-by-N distributed matrix.
 !
-! Parameters:   
+! Arguments:   
 !    alpha  -  real.                        The scalar alpha.
 !    a      -  type(<psb_zspmat_type>).     The sparse matrix containing A.
 !    x      -  real,dimension(:).           The input vector containing the entries of X.

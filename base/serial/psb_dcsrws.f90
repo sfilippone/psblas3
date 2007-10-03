@@ -30,7 +30,7 @@
 !!$  
 ! File:  psb_dcsrws.f90 
 ! Subroutine: 
-! Parameters:
+! Arguments:
 
 subroutine psb_dcsrws(rw,a,info,trans)
   use psb_spmat_type

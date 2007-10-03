@@ -30,7 +30,7 @@
 !!$  
 ! File:  psb_zsymbmm.f90 
 ! Subroutine: 
-! Parameters:
+! Arguments:
 !
 !
 ! Note: This subroutine performs the symbolic product of two sparse matrices.

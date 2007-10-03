@@ -30,7 +30,7 @@
 !!$  
 ! File:  psb_dfixcoo.f90 
 ! Subroutine: 
-! Parameters:
+! Arguments:
 
 subroutine psb_dfixcoo(a,info,idir)
   use psb_spmat_type

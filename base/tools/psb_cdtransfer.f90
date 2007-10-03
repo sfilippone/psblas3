@@ -35,7 +35,7 @@
 !   the IN arg is empty (and deallocated) upon exit. 
 !
 ! 
-! Parameters: 
+! Arguments: 
 !    desc_in  - type(<psb_desc_type>).         The communication descriptor to be 
 !                                               transferred.
 !    desc_out - type(<psb_desc_type>).         The output communication descriptor.

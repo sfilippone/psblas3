@@ -36,7 +36,7 @@
 !   then process j should depend on i (even if the data to be sent in one of the
 !   directions happens to be empty)
 ! 
-! Parameters: 
+! Arguments: 
 !    dep_list(:,:) - integer             Initial dependency lists
 !    dl_lda        - integer             Allocated size of dep_list
 !    np            - integer             Total number of processes.

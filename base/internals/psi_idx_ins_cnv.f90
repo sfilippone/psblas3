@@ -28,6 +28,25 @@
 !!$  POSSIBILITY OF SUCH DAMAGE.
 !!$ 
 !!$  
+!
+! File: psi_idx_ins_cnv.f90
+!
+! Subroutine: psi_idx_ins_cnv1
+!   Converts a bunch of indices from global to local numbering. 
+!   This routine is called while the descriptor is in the build state;
+!   the idea is that if an index is not yet marked as local, it is a new 
+!   connection to another process, i.e. a new entry into the halo. 
+!   But we still need the mask, because we have to take out the column indices 
+!   corresponding to row indices we do not own (see psb_cdins for how this is used). 
+! 
+! Arguments: 
+!    nv        - integer                   Number of indices required 
+!    idxin(:)  - integer                   Required indices, overwritten on output
+!                                          output is negative for masked entries
+!    desc      - type(<psb_desc_type>).    The communication descriptor.        
+!    info      - integer.                  return code.
+!    mask(:)   - logical, optional         Only do the conversion for specific indices.
+!    
 subroutine psi_idx_ins_cnv1(nv,idxin,desc,info,mask)
   use psi_mod, psb_protect_name => psi_idx_ins_cnv1
   use psb_descriptor_type
@@ -159,7 +178,25 @@ end subroutine psi_idx_ins_cnv1
 !!$  POSSIBILITY OF SUCH DAMAGE.
 !!$ 
 !!$  
-
+!
+! File: psi_idx_ins_cnv.f90
+!
+! Subroutine: psi_idx_ins_cnv2
+!   Converts a bunch of indices from global to local numbering. 
+!   This routine is called while the descriptor is in the build state;
+!   the idea is that if an index is not yet marked as local, it is a new 
+!   connection to another process, i.e. a new entry into the halo. 
+!   But we still need the mask, because we have to take out the column indices 
+!   corresponding to row indices we do not own (see psb_cdins for how this is used). 
+! 
+! Arguments: 
+!    nv        - integer                   Number of indices required 
+!    idxin(:)  - integer                   Required indices
+!    idxout(:) - integer                   Output values (negative for masked entries)
+!    desc      - type(<psb_desc_type>).    The communication descriptor.        
+!    info      - integer.                  return code.
+!    mask(:)   - logical, optional         Only do the conversion for specific indices.
+!    
 subroutine psi_idx_ins_cnv2(nv,idxin,idxout,desc,info,mask)
   use psi_mod, psb_protect_name => psi_idx_ins_cnv2
   use psb_descriptor_type
@@ -399,6 +436,24 @@ end subroutine psi_idx_ins_cnv2
 !!$  POSSIBILITY OF SUCH DAMAGE.
 !!$ 
 !!$  
+!
+! File: psi_idx_ins_cnv.f90
+!
+! Subroutine: psi_idx_ins_cnvs
+!   Converts an index  from global to local numbering. 
+!   This routine is called while the descriptor is in the build state;
+!   the idea is that if an index is not yet marked as local, it is a new 
+!   connection to another process, i.e. a new entry into the halo. 
+!   But we still need the mask, because we have to take out the column indices 
+!   corresponding to row indices we do not own (see psb_cdins for how this is used). 
+! 
+! Arguments: 
+!    idxin     - integer                   Required index s
+!    idxout    - integer                   Output value  (negative for masked entries)
+!    desc      - type(<psb_desc_type>).    The communication descriptor.        
+!    info      - integer.                  return code.
+!    mask      - logical, optional         Only do the conversion for specific indices.
+!    
 subroutine psi_idx_ins_cnvs(idxin,idxout,desc,info,mask)
   use psi_mod, psb_protect_name => psi_idx_ins_cnvs
   use psb_descriptor_type

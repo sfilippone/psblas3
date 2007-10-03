@@ -33,7 +33,7 @@
 ! Subroutine: psb_cdcpy
 !   Produces a clone of a descriptor.
 ! 
-! Parameters: 
+! Arguments: 
 !    desc_in  - type(<psb_desc_type>).         The communication descriptor to be cloned.
 !    desc_out - type(<psb_desc_type>).         The output communication descriptor.
 !    info     - integer.                       Return code.

@@ -30,7 +30,7 @@
 !!$  
 ! File:  psb_dcssv.f90 
 ! Subroutine: 
-! Parameters:
+! Arguments:
 
 subroutine psb_dcssv(alpha,t,b,beta,c,info,trans,unitd,d)
   use psb_spmat_type

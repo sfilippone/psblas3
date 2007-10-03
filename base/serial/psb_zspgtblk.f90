@@ -31,7 +31,7 @@
 ! File:  psb_zspgtblk.f90 
 ! Subroutine: psb_zspgtblk
 !    Gets one or more rows from a sparse matrix. 
-! Parameters:
+! Arguments:
 !*****************************************************************************
 !*                                                                           *
 !* Takes a specified row from matrix A and copies into matrix B (possibly    *

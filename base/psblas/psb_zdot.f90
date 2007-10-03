@@ -39,7 +39,7 @@
 !
 !    sub( Y ) denotes Y(:,JY).
 !
-! Parameters:
+! Arguments:
 !    x      -  real,dimension(:,:).       The input vector containing the entries of sub( X ).
 !    y      -  real,dimension(:,:).       The input vector containing the entries of sub( Y ).
 !    desc_a -  type(<psb_desc_type>).     The communication descriptor.
@@ -195,7 +195,7 @@ end function psb_zdot
 !
 !    dot := X**T * Y
 !
-! Parameters:
+! Arguments:
 !    x      -  real,dimension(:).         The input vector containing the entries of X.
 !    y      -  real,dimension(:).         The input vector containing the entries of Y.
 !    desc_a -  type(<psb_desc_type>).     The communication descriptor.
@@ -332,7 +332,7 @@ end function psb_zdotv
 !
 !    dot := X**T * Y
 !
-! Parameters:
+! Arguments:
 !    res    -  real.                      The result.
 !    x      -  real,dimension(:).         The input vector containing the entries of X.
 !    y      -  real,dimension(:).         The input vector containing the entries of Y.
@@ -472,7 +472,7 @@ end subroutine psb_zdotvs
 !
 !    sub( Y ) denotes Y(:,JY).
 !
-! Parameters:
+! Arguments:
 !    res    -  real.                      The result.
 !    x      -  real,dimension(:,:).       The input vector containing the entries of sub( X ).
 !    y      -  real,dimension(:,:).       The input vector containing the entries of sub( Y ).

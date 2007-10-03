@@ -30,7 +30,7 @@
 !!$  
 ! File:  psb_ztransp.f90 
 ! Subroutine: 
-! Parameters:
+! Arguments:
 
 subroutine psb_ztransp(a,b,c,fmt)
   use psb_spmat_type

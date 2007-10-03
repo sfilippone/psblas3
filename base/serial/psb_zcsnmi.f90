@@ -30,7 +30,7 @@
 !!$  
 ! File:  psb_zcsnmi.f90 
 ! Subroutine: 
-! Parameters:
+! Arguments:
 
 real(kind(1.d0)) function psb_zcsnmi(a,info,trans)
 

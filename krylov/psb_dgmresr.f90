@@ -70,7 +70,7 @@
 !    This subroutine implements the restarted GMRES method with right
 !    preconditioning.
 !
-! Parameters:
+! Arguments:
 !    a       -  type(<psb_dspmat_type>).     The sparse matrix containing A.
 !    prec    -  type(<psb_prec_type>).       The data structure containing the preconditioner.
 !    b       -  real,dimension(:).           The right hand side.

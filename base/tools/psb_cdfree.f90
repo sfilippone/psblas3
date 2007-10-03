@@ -33,7 +33,7 @@
 ! Subroutine: psb_cdfree
 !   Frees a descriptor data structure.
 ! 
-! Parameters: 
+! Arguments: 
 !    desc_a   - type(<psb_desc_type>).         The communication descriptor to be freed.
 !    info     - integer.                       return code.
 subroutine psb_cdfree(desc_a,info)

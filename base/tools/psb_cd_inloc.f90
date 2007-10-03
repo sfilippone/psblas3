@@ -35,7 +35,7 @@
 !    of indices that are assigned to the current process. The global size 
 !    is equal to the largest index found on any process. 
 ! 
-! Parameters: 
+! Arguments: 
 !    v       - integer, dimension(:).         The array containg the partitioning scheme.
 !    ictxt - integer.                         The communication context.
 !    desc_a  - type(<psb_desc_type>).         The communication descriptor.

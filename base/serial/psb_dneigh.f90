@@ -30,7 +30,7 @@
 !!$  
 ! File:  psb_dneigh.f90 
 ! Subroutine: 
-! Parameters:
+! Arguments:
 
 subroutine psb_dneigh(a,idx,neigh,n,info,lev)
 

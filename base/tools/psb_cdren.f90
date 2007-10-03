@@ -35,7 +35,7 @@
 ! Subroutine: psb_cdren
 !    Updates a communication descriptor according to a renumbering scheme.
 ! 
-! Parameters: 
+! Arguments: 
 !    trans    - character.                     Whether iperm or its transpose 
 !                                              should be applied.
 !    iperm    - integer,dimension(:).          The renumbering scheme.

@@ -27,7 +27,22 @@
 !!$  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 !!$  POSSIBILITY OF SUCH DAMAGE.
 !!$ 
-!!$  
+!!$ 
+!
+! File: psi_fnd_owner.f90
+!
+! Subroutine: psi_fnd_owner
+!   Figure out who owns  global indices. 
+! 
+! Arguments: 
+!    nv       - integer                   Number of indices required on  the calling
+!                                         process 
+!    idx(:)   - integer                   Required indices on the calling process
+!    iprc(:)  - integer, allocatable      Output: process identifiers for the corresponding
+!                                         indices
+!    desc_a   - type(<psb_desc_type>).    The communication descriptor.        
+!    info     - integer.                  return code.
+! 
 subroutine psi_fnd_owner(nv,idx,iprc,desc,info)
   use psb_descriptor_type
   use psb_serial_mod
@@ -80,10 +95,20 @@ subroutine psi_fnd_owner(nv,idx,iprc,desc,info)
     write(0,*) 'Invalid input descriptor in psi_fnd_owner'
   end if
 
+  !
+  ! The basic idea is very simple. 
+  ! First we figure out the total number of requests.
+  ! Second we build the aggregate list of requests (with psb_amx)
+  ! Third, we figure out locally whether we own the indices (whoever is 
+  ! asking for them) and build our part of the reply (we shift process 
+  !  indices so that they're 1-based)
+  ! Fourth, we do a psb_amx on the replies so that we have everybody's answers
+  ! Fifth, we extract the answers for our local query, and shift back the 
+  ! process indices to 0-based.
 
   Allocate(hidx(np+1),hsz(np),stat=info)
   if (info /= 0) then 
-    call psb_errpush(4010,name,a_err='Allocate')
+    call psb_errpush(4010,name,a_err='Allocate') 
     goto 9999      
   end if
   hsz       = 0

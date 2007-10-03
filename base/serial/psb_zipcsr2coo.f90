@@ -30,7 +30,7 @@
 !!$  
 ! File:  psb_zipcsr2coo.f90 
 ! Subroutine: 
-! Parameters:
+! Arguments:
 
 Subroutine psb_zipcsr2coo(a,info)
   use psb_spmat_type

@@ -28,6 +28,61 @@
 !!$  POSSIBILITY OF SUCH DAMAGE.
 !!$ 
 !!$  
+!
+! File: psi_Xswaptran.F90
+!
+! Subroutine: psi_Xswaptranm
+!   Does the data exchange among processes. This is similar to Xswapdata, but
+!   the list is read "in reverse", i.e. indices that are normally SENT are used 
+!   for the RECEIVE part and vice-versa. This is the basic data exchange operation
+!   for doing the product of a sparse matrix by a vector. 
+!   Essentially this is doing a variable all-to-all data exchange
+!   (ALLTOALLV in MPI parlance), but 
+!   it is capable of pruning empty exchanges, which are very likely in out 
+!   application environment. All the variants have the same structure 
+!   In all these subroutines X may be:    I    Integer
+!                                         D    real(kind(1.d0))
+!                                         Z    complex(kind(1.d0))
+!   Basically the operation is as follows: on each process, we identify 
+!   sections SND(Y) and RCV(Y); then we do a SEND(PACK(SND(Y)));
+!   then we receive, and we do an update with Y = UNPACK(RCV(Y)) + BETA * Y 
+!   but only on the elements involved in the UNPACK operation. 
+!   Thus: for halo data exchange, the receive section is confined in the 
+!   halo indices, and BETA=0, whereas for overlap exchange the receive section 
+!   is scattered in the owned indices, and BETA=1.
+! 
+! Arguments: 
+!    flag     - integer                 Choose the algorithm for data exchange: 
+!                                       this is chosen through bit fields. 
+!                                        swap_mpi  = iand(flag,psb_swap_mpi_)  /= 0
+!                                        swap_sync = iand(flag,psb_swap_sync_) /= 0
+!                                        swap_send = iand(flag,psb_swap_send_) /= 0
+!                                        swap_recv = iand(flag,psb_swap_recv_) /= 0
+!                                       if (swap_mpi):  use underlying MPI_ALLTOALLV.
+!                                       if (swap_sync): use PSB_SND and PSB_RCV in 
+!                                                       synchronized pairs
+!                                       if (swap_send .and. swap_recv): use mpi_irecv 
+!                                                       and mpi_send
+!                                       if (swap_send): use psb_snd (but need another 
+!                                                       call with swap_recv to complete)
+!                                       if (swap_recv): use psb_rcv (completing a 
+!                                                       previous call with swap_send)
+!
+!
+!    n        - integer                 Number of columns in Y               
+!    beta     - X                       Choose overwrite or sum. 
+!    y(:,:)   - X                       The data area                        
+!    desc_a   - type(<psb_desc_type>).  The communication descriptor.        
+!    work(:)  - X                       Buffer space. If not sufficient, will do 
+!                                       our own internal allocation.
+!    info     - integer.                return code.
+!    data     - integer                 which list is to be used to exchange data
+!                                       default psb_comm_halo_
+!                                       psb_comm_halo_    use halo_index
+!                                       psb_comm_ext_     use ext_index 
+!                                       psb_comm_ovrl_    use ovrl_index
+!
+!
 subroutine psi_dswaptranm(flag,n,beta,y,desc_a,work,info,data)
 
   use psi_mod, psb_protect_name => psi_dswaptranm
@@ -442,6 +497,61 @@ end subroutine psi_dswaptranm
 !!$  POSSIBILITY OF SUCH DAMAGE.
 !!$ 
 !!$  
+!
+! File: psi_Xswaptran.F90
+!
+! Subroutine: psi_Xswaptranv
+!   Does the data exchange among processes. This is similar to Xswapdata, but
+!   the list is read "in reverse", i.e. indices that are normally SENT are used 
+!   for the RECEIVE part and vice-versa. This is the basic data exchange operation
+!   for doing the product of a sparse matrix by a vector. 
+!   Essentially this is doing a variable all-to-all data exchange
+!   (ALLTOALLV in MPI parlance), but 
+!   it is capable of pruning empty exchanges, which are very likely in out 
+!   application environment. All the variants have the same structure 
+!   In all these subroutines X may be:    I    Integer
+!                                         D    real(kind(1.d0))
+!                                         Z    complex(kind(1.d0))
+!   Basically the operation is as follows: on each process, we identify 
+!   sections SND(Y) and RCV(Y); then we do a SEND(PACK(SND(Y)));
+!   then we receive, and we do an update with Y = UNPACK(RCV(Y)) + BETA * Y 
+!   but only on the elements involved in the UNPACK operation. 
+!   Thus: for halo data exchange, the receive section is confined in the 
+!   halo indices, and BETA=0, whereas for overlap exchange the receive section 
+!   is scattered in the owned indices, and BETA=1.
+! 
+! Arguments: 
+!    flag     - integer                 Choose the algorithm for data exchange: 
+!                                       this is chosen through bit fields. 
+!                                        swap_mpi  = iand(flag,psb_swap_mpi_)  /= 0
+!                                        swap_sync = iand(flag,psb_swap_sync_) /= 0
+!                                        swap_send = iand(flag,psb_swap_send_) /= 0
+!                                        swap_recv = iand(flag,psb_swap_recv_) /= 0
+!                                       if (swap_mpi):  use underlying MPI_ALLTOALLV.
+!                                       if (swap_sync): use PSB_SND and PSB_RCV in 
+!                                                       synchronized pairs
+!                                       if (swap_send .and. swap_recv): use mpi_irecv 
+!                                                       and mpi_send
+!                                       if (swap_send): use psb_snd (but need another 
+!                                                       call with swap_recv to complete)
+!                                       if (swap_recv): use psb_rcv (completing a 
+!                                                       previous call with swap_send)
+!
+!
+!    n        - integer                 Number of columns in Y               
+!    beta     - X                       Choose overwrite or sum. 
+!    y(:)     - X                       The data area                        
+!    desc_a   - type(<psb_desc_type>).  The communication descriptor.        
+!    work(:)  - X                       Buffer space. If not sufficient, will do 
+!                                       our own internal allocation.
+!    info     - integer.                return code.
+!    data     - integer                 which list is to be used to exchange data
+!                                       default psb_comm_halo_
+!                                       psb_comm_halo_    use halo_index
+!                                       psb_comm_ext_     use ext_index 
+!                                       psb_comm_ovrl_    use ovrl_index
+!
+!
 subroutine psi_dswaptranv(flag,beta,y,desc_a,work,info,data)
 
   use psi_mod, psb_protect_name => psi_dswaptranv

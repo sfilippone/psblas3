@@ -33,7 +33,7 @@
 ! Subroutine: psb_cdins
 !   Takes as input a cloud of points and updates the descriptor accordingly.
 ! 
-! Parameters: 
+! Arguments: 
 !    nz       - integer.                       The number of points to insert.
 !    ia       - integer,dimension(:).          The row indices of the points.
 !    ja       - integer,dimension(:).          The column indices of the points.

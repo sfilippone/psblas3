@@ -37,7 +37,7 @@
 !
 !    where sub( X ) denotes X(:,JX).
 !
-! Parameters:
+! Arguments:
 !    x      -  real,dimension(:,:).       The input vector containing the entries of sub( X ).
 !    desc_a -  type(<psb_desc_type>).     The communication descriptor.
 !    info   -  integer.                   Eventually returns an error code.
@@ -175,7 +175,7 @@ end function psb_znrm2
 !
 !    norm2 := sqrt ( X**T * X)
 !
-! Parameters:
+! Arguments:
 !    x      -  real,dimension(:).         The input vector containing the entries of X.
 !    desc_a -  type(<psb_desc_type>).     The communication descriptor.
 !    info   -  integer.                   Eventually returns an error code.
@@ -309,7 +309,7 @@ end function psb_znrm2v
 !
 !    norm2 := sqrt ( X**T * X)
 !
-! Parameters:
+! Arguments:
 !    res    -  real.                      The result.
 !    x      -  real,dimension(:).         The input vector containing the entries of X.
 !    desc_a -  type(<psb_desc_type>).     The communication descriptor.

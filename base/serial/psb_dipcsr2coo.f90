@@ -30,7 +30,7 @@
 !!$  
 ! File:  psb_dipcsr2coo.f90 
 ! Subroutine: 
-! Parameters:
+! Arguments:
 
 Subroutine psb_dipcsr2coo(a,info)
   use psb_spmat_type

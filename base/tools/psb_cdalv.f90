@@ -36,7 +36,7 @@
 !    on all calling processes.
 !    
 ! 
-! Parameters: 
+! Arguments: 
 !    v       - integer, dimension(:).         The array containg the partitioning scheme.
 !    ictxt - integer.                         The communication context.
 !    desc_a  - type(<psb_desc_type>).         The communication descriptor.

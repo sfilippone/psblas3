@@ -31,7 +31,7 @@
 ! File:  psb_zspclip.f90 
 ! Subroutine: psb_zspclip
 !    Creates a "clipped" copy of input matrix A. Output is always in COO. 
-! Parameters:
+! Arguments:
 
 !*****************************************************************************
 !*                                                                           *

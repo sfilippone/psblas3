@@ -32,7 +32,7 @@
 ! Subroutine: msort_up
 !   This subroutine sorts an integer array into ascending order.
 !
-! Parameters:
+! Arguments:
 !   n         -  integer                   Input: size of the array 
 !   k         -  integer(*)                input: array of keys to be sorted
 !   l         -  integer(0:n+1)           output: link list 

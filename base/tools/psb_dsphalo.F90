@@ -36,7 +36,7 @@
 !  for any matrix format in A; as for the output, default is CSR. 
 !    
 ! 
-! Parameters: 
+! Arguments: 
 !    a        - type(psb_dspmat_type)   The local part of input matrix A
 !    desc_a   - type(<psb_desc_type>).  The communication descriptor.
 !    blck     - type(psb_dspmat_type)   The local part of output matrix BLCK
@@ -49,10 +49,10 @@
 !                                       default is .FALSE. 
 !                                       (commmon use is ROWSCALE=.TRUE., COLSCALE=.FALSE.)
 !    data     - integer                 Which index list in desc_a should be used to retrieve
-!                                       rows, default psb_comm_halo_ (i.e.: use halo_index)
-!                                       other value psb_comm_ext_, no longer accepting 
-!                                       psb_comm_ovrl_, perhaps should be reinstated in 
-!                                       the future. 
+!                                       rows, default psb_comm_halo_
+!                                       psb_comm_halo_    use halo_index
+!                                       psb_comm_ext_     use ext_index 
+!                                       psb_comm_ovrl_  DISABLED for this routine.
 !
 !
 Subroutine psb_dsphalo(a,desc_a,blk,info,rowcnv,colcnv,&

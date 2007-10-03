@@ -421,6 +421,14 @@ contains
     integer, intent(inout) :: x(:)
 
     integer :: i, ih, key, idx,nh,tmp,lb,ub,lm
+    !
+    ! When a large descriptor is assembled the indices 
+    ! are kept in a (hashed) list of ordered lists. 
+    ! Thus we first hash the index, then we do a binary search on the 
+    ! ordered sublist. The hashing is based on the low-order bits 
+    ! for a width of psb_hash_bits 
+    !
+    
     do i=1, n
       key = x(i) 
       ih  = iand(key,hashmask)
@@ -460,6 +468,13 @@ contains
     integer, intent(out) :: y(:)
 
     integer :: i, ih, key, idx,nh,tmp,lb,ub,lm
+    !
+    ! When a large descriptor is assembled the indices 
+    ! are kept in a (hashed) list of ordered lists. 
+    ! Thus we first hash the index, then we do a binary search on the 
+    ! ordered sublist. The hashing is based on the low-order bits 
+    ! for a width of psb_hash_bits 
+    !
     
     do i=1, n
       key = x(i) 

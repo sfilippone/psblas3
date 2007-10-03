@@ -30,7 +30,7 @@
 !!$  
 ! File:  psb_dnumbmm.f90 
 ! Subroutine: 
-! Parameters:
+! Arguments:
 !
 !
 ! Note: This subroutine performs the numerical product of two sparse matrices.

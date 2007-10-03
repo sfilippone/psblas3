@@ -33,7 +33,7 @@
 !    are assumed to be in global numbering and are converted on the fly. 
 !    Row indices not belonging to the current process are silently discarded.
 ! 
-! Parameters: 
+! Arguments: 
 !    m       - integer.        Number of rows of submatrix belonging to 
 !                              val to be inserted.
 !    irw(:)  - integer          Row indices of rows of val (global numbering)
@@ -217,7 +217,7 @@ end subroutine psb_iinsvi
 !    are assumed to be in global numbering and are converted on the fly. 
 !    Row indices not belonging to the current process are silently discarded.
 ! 
-! Parameters: 
+! Arguments: 
 !    m       - integer.        Number of rows of submatrix belonging to 
 !                              val to be inserted.
 !    irw(:)   - integer          Row indices of rows of val (global numbering)

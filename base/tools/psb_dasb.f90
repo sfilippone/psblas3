@@ -37,7 +37,7 @@
 !    allowing for the halo indices, reallocating if necessary. 
 !    We also call the halo routine for good measure.
 ! 
-! Parameters: 
+! Arguments: 
 !    x(:,:)  - real,allocatable        The matrix to be assembled.
 !    desc_a  - type(<psb_desc_type>).  The communication descriptor.
 !    info    - integer.                return code
@@ -170,7 +170,7 @@ end subroutine psb_dasb
 !    allowing for the halo indices, reallocating if necessary. 
 !    We also call the halo routine for good measure.
 ! 
-! Parameters: 
+! Arguments: 
 !    x(:)    - real,allocatable        The matrix to be assembled.
 !    desc_a  - type(<psb_desc_type>).  The communication descriptor.
 !    info    - integer.                Return code

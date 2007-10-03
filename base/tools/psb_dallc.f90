@@ -35,7 +35,7 @@
 !    Allocates dense matrix for PSBLAS routines. 
 !    The descriptor may be in either the build or assembled state.
 ! 
-! Parameters: 
+! Arguments: 
 !    x      - the matrix to be allocated.
 !    desc_a - the communication descriptor.
 !    info   - Return code
@@ -184,7 +184,7 @@ end subroutine psb_dalloc
 !    Allocates dense matrix for PSBLAS routines. 
 !    The descriptor may be in either the build or assembled state.
 ! 
-! Parameters: 
+! Arguments: 
 !    x      - the matrix to be allocated.
 !    desc_a - the communication descriptor.
 !    info   - return code

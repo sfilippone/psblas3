@@ -35,7 +35,7 @@
 !    auxiliary descriptor corresponding to the number of overlap levels
 !    specified on input. 
 ! 
-! Parameters: 
+! Arguments: 
 !    a        - type(<psb_dspmat_type>).       The input sparse matrix.
 !    desc_a   - type(<psb_desc_type>).         The input communication descriptor.
 !    novr     - integer.                       The number of overlap levels.

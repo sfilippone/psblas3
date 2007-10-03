@@ -36,7 +36,7 @@
 !    Converts a list of data exchanges from build format to assembled format. 
 !    See below for a description of the formats.
 !
-! Parameters:
+! Arguments:
 ! desc_a       - type(psb_desc_type)   The descriptor; in this context only the index 
 !                                       mapping parts are used.
 ! index_in(:)  - integer               The index list, build format  

@@ -30,7 +30,7 @@
 !!$  
 ! File:  psb_zcsmm.f90 
 ! Subroutine: 
-! Parameters:
+! Arguments:
 subroutine psb_zcsmm(alpha,a,b,beta,c,info,trans)
   use psb_spmat_type
   use psb_error_mod

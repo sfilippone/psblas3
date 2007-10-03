@@ -36,7 +36,7 @@
 !   the number of processes sharing it (minimum: 2). List is ended by -1.
 !   See also description in base/modules/psb_desc_type.f90
 ! 
-! Parameters: 
+! Arguments: 
 !    ovr_elem(:) - integer, allocatable      Array containing the output list              
 !    desc_a   - type(<psb_desc_type>).    The communication descriptor.        
 !    info     - integer.                  return code.

@@ -37,7 +37,7 @@
 !
 !    where sub( X ) denotes X(1:N,JX:).
 !
-! Parameters:
+! Arguments:
 !    x      -  real,dimension(:,:).       The input vector.
 !    desc_a -  type(<psb_desc_type>).     The communication descriptor.
 !    info   -  integer.                   Eventually returns an error code.
@@ -167,7 +167,7 @@ end function psb_zamax
 !
 !    normi := max(abs(X(i))  
 !
-! Parameters:
+! Arguments:
 !    x      -  real,dimension(:).         The input vector.
 !    desc_a -  type(<psb_desc_type>).     The communication descriptor.
 !    info   -  integer.                   Eventually returns an error code.
@@ -293,7 +293,7 @@ end function psb_zamaxv
 !
 !    where sub( X ) denotes X(1:N,JX:).
 !
-! Parameters:
+! Arguments:
 !    res    -  real.                      The result.
 !    x      -  real,dimension(:,:).       The input vector.
 !    desc_a -  type(<psb_desc_type>).     The communication descriptor.
@@ -419,7 +419,7 @@ end subroutine psb_zamaxvs
 !
 !    normi := max(abs(X(i))  
 !
-! Parameters:
+! Arguments:
 !    res    -  real.                      The result.
 !    x      -  real,dimension(:).         The input vector.
 !    desc_a -  type(<psb_desc_type>).     The communication descriptor.

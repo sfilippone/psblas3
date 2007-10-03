@@ -34,7 +34,7 @@
 !   This subroutine performs the exchange of the overlap elements in a 
 !   distributed dense matrix between all the processes.
 !
-! Parameters:
+! Arguments:
 !   x           -  real,dimension(:,:).         The local part of the dense matrix.
 !   desc_a      -  type(<psb_desc_type>).       The communication descriptor.
 !   info        -  integer.                     A return code.
@@ -254,7 +254,7 @@ end subroutine psb_dovrlm
 !   This subroutine performs the exchange of the overlap elements in a 
 !   distributed dense vector between all the processes.
 !
-! Parameters:
+! Arguments:
 !   x           -  real,dimension(:).          The local part of the dense vector.
 !   desc_a      -  type(<psb_desc_type>).        The communication descriptor.
 !   info        -  integer.                      Eventually returns an error code.

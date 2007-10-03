@@ -35,7 +35,7 @@
 !
 !    normi := max(abs(sum(A(i,j))))                                                                                   
 !
-! Parameters:
+! Arguments:
 !    a      -  type(<psb_dspmat_type>).   The sparse matrix containing A.
 !    desc_a -  type(<psb_desc_type>).     The communication descriptor.
 !    info   -  integer.                   Eventually returns an error code.

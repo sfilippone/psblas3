@@ -31,7 +31,7 @@
 ! File:  psb_dspgetrow.f90 
 ! Subroutine: psb_dspgetrow
 !    Gets one or more rows from a sparse matrix. 
-! Parameters:
+! Arguments:
 !*****************************************************************************
 !*                                                                           *
 !*                                                                           *

@@ -30,7 +30,7 @@
 !!$  
 ! File:  psb_zcssv.f90 
 ! Subroutine: 
-! Parameters:
+! Arguments:
 
 subroutine psb_zcssv(alpha,t,b,beta,c,info,trans,unitd,d)
   use psb_spmat_type

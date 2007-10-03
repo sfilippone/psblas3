@@ -34,7 +34,7 @@
 ! Subroutine: psb_dgelp
 !             Apply a left permutation to a dense matrix
 !
-! Parameters:
+! Arguments:
 ! trans    - character. 
 ! iperm    - integer.
 ! x        - real, dimension(:,:).
@@ -164,7 +164,7 @@ end subroutine psb_dgelp
 ! Subroutine: psb_dgelpv
 !             Apply a left permutation to a dense matrix
 !
-! Parameters:
+! Arguments:
 ! trans    - character. 
 ! iperm    - integer.
 ! x        - real, dimension(:).

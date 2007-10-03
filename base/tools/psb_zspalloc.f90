@@ -33,7 +33,7 @@
 ! Subroutine: psb_zspalloc
 !    Allocate sparse matrix structure for psblas routines.
 ! 
-! Parameters: 
+! Arguments: 
 !    a        - type(<psb_zspmat_type>).       The sparse matrix to be allocated.      
 !    desc_a   - type(<psb_desc_type>).         The communication descriptor to be updated.
 !    info     - integer.                       Return code.

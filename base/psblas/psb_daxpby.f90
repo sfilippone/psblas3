@@ -39,7 +39,7 @@
 !
 !    sub( Y ) denotes Y(:,JY).
 !
-! Parameters:
+! Arguments:
 !    alpha  -  real.                      The scalar used to multiply each component of sub( X ).
 !    x      -  real,dimension(:,:).       The input vector containing the entries of sub( X ).
 !    beta   -  real.                      The scalar used to multiply each component of sub( Y ).
@@ -195,7 +195,7 @@ end subroutine psb_daxpby
 !
 !    Y := beta * Y + alpha * X
 !
-! Parameters:
+! Arguments:
 !    alpha  -  real.                      The scalar used to multiply each component of X.
 !    x      -  real,dimension(:).         The input vector containing the entries of X.
 !    beta   -  real.                      The scalar used to multiply each component of Y.

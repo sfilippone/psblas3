@@ -36,7 +36,7 @@
 !    ignored. 
 !    If desc_a is in the build state this routine implies a call to psb_cdins. 
 ! 
-! Parameters: 
+! Arguments: 
 !    nz       - integer.                      The number of points to insert.
 !    ia(:)    - integer                       The row indices of the coefficients.
 !    ja(:)    - integer                       The column indices of the coefficients.

@@ -34,7 +34,7 @@
 !    Performs global to local index translation. If an index does not belong
 !    to the current process, a negative value is returned (see also iact).
 ! 
-! Parameters: 
+! Arguments: 
 !    x(:)     - integer                   Array containing the indices to be translated.
 !    y(:)     - integer                   Array containing the translated indices.
 !    desc_a   - type(<psb_desc_type>).    The communication descriptor.        
@@ -160,7 +160,7 @@ end subroutine psb_glob_to_loc2
 !    Performs global to local index translation. If an index does not belong
 !    to the current process, a negative value is returned (see also iact).
 ! 
-! Parameters: 
+! Arguments: 
 !    x(:)     - integer                   Array containing the indices to be translated.
 !                                         overwritten on output with the result.  
 !    desc_a   - type(<psb_desc_type>).    The communication descriptor.        

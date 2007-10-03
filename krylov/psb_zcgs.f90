@@ -57,7 +57,7 @@
 !
 ! Subroutine: psb_zcgs
 !
-! Parameters:
+! Arguments:
 !    a       -  type(<psb_zspmat_type>).     The sparse matrix containing A.
 !    prec    -  type(<psb_prec_type>).       The data structure containing the preconditioner.
 !    b       -  real,dimension(:).           The right hand side.

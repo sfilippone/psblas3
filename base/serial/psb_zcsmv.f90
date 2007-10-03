@@ -30,7 +30,7 @@
 !!$  
 ! File:  psb_zcsmv.f90 
 ! Subroutine: 
-! Parameters:
+! Arguments:
 
 subroutine psb_zcsmv(alpha,a,b,beta,c,info,trans)
   use psb_spmat_type

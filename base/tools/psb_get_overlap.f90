@@ -36,7 +36,7 @@
 !    otherwise its size is equal to the number of overlap indices on the 
 !    current (calling) process. 
 ! 
-! Parameters: 
+! Arguments: 
 !    ovrel(:) - integer, allocatable      Array containing the output list              
 !    desc_a   - type(<psb_desc_type>).    The communication descriptor.        
 !    info     - integer.                  return code.

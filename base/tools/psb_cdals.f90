@@ -34,7 +34,7 @@
 !    Allocate descriptor
 !    and checks correctness of PARTS subroutine
 ! 
-! Parameters: 
+! Arguments: 
 !    m       - integer.                       The number of rows.
 !    n       - integer.                       The number of columns.
 !    parts   - external subroutine.           The routine that contains the 

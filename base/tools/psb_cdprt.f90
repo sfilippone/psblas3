@@ -33,7 +33,7 @@
 ! Subroutine: psb_cdprt
 !    Prints the descriptor to an output file
 ! 
-! Parameters: 
+! Arguments: 
 !    iout          - integer.                The output unit to print to.
 !    desc_p        - type(<psb_desc_type>).  The communication descriptor to be printed.
 !    glob          - logical(otpional).      Wheter to print out global or local data.

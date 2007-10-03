@@ -33,7 +33,7 @@
 ! Subroutine: psb_zgatherm
 !   This subroutine gathers pieces of a distributed dense matrix into a local one.
 !
-! Parameters:
+! Arguments:
 !   globx     -  cplx,dimension(:,:).          The local matrix into which gather 
 !                                                  the distributed pieces.
 !   locx      -  cplx,dimension(:,:).          The local piece of the distributed 
@@ -206,7 +206,7 @@ end subroutine psb_zgatherm
 ! Subroutine: psb_zgatherv
 !   This subroutine gathers pieces of a distributed dense vector into a local one.
 !
-! Parameters:
+! Arguments:
 !   globx     -  cplx,dimension(:).            The local vector into which gather 
 !                                                  the distributed pieces.
 !   locx      -  cplx,dimension(:).            The local piece of the distributed 
