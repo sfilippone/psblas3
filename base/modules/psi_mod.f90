@@ -30,7 +30,6 @@
 !!$  
 
 module psi_mod
-  use psi_gthsct_mod
 
   interface
      subroutine psi_compute_size(desc_data,&
