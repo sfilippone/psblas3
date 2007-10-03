@@ -31,16 +31,21 @@
 ! File: psb_zspasb.f90
 !
 ! Subroutine: psb_zspasb
-!    Assembly sparse matrix and set psblas communications
-!    structures.
+!    Assemble sparse matrix
 ! 
 ! Parameters: 
-!    a        - type(<psb_zspmat_type>).          The sparse matrix to be allocated.      
-!    desc_a   - type(<psb_desc_type>).            The communication descriptor to be updated.
-!    info     - integer.                          Eventually returns an error code.
-!    afmt     - character,dimension(5)(optional). The output format.
-!    up       - character(optional).              ???
-!    dup      - integer(optional).                ???
+!    a        - type(<psb_zspmat_type>).          The sparse matrix to be assembled
+!    desc_a   - type(<psb_desc_type>).            The communication descriptor.
+!    info     - integer.                     return code.
+!    afmt     - character(optional)          The desired output storage format.
+!    upd      - character(optional).         How will the matrix be updated? 
+!                                            psb_upd_srch_    Simple strategy  
+!                                            psb_upd_perm_    Permutation(more memory)
+!    dupl     - integer(optional).           Duplicate coefficient handling:
+!                                            psb_dupl_ovwrt_     overwrite
+!                                            psb_dupl_add_       add 
+!                                            psb_dupl_err_       raise an error. 
+! 
 !
 subroutine psb_zspasb(a,desc_a, info, afmt, upd, dupl)
 
@@ -113,7 +118,7 @@ subroutine psb_zspasb(a,desc_a, info, afmt, upd, dupl)
 
   call psb_spcnv(a,info,afmt=afmt,upd=upd,dupl=dupl)
 
-  IF (debug) WRITE (*, *) me,'   ASB:  From DCSDP',info,' ',A%FIDA
+  IF (debug) WRITE (*, *) me,'   ASB:  From spcnv',info,' ',A%FIDA
   if (info /= psb_no_err_) then    
     info=4010
     ch_err='psb_spcnv'

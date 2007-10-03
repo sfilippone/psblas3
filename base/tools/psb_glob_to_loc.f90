@@ -31,14 +31,19 @@
 ! File: psb_glob_to_loc.f90
 !
 ! Subroutine: psb_glob_to_loc2
-!    Performs global to local indexes translation
+!    Performs global to local index translation. If an index does not belong
+!    to the current process, a negative value is returned (see also iact).
 ! 
 ! Parameters: 
-!    x        - integer, dimension(:).    Array containing the indices to be translated.
-!    y        - integer, dimension(:).    Array containing the translated indices.
+!    x(:)     - integer                   Array containing the indices to be translated.
+!    y(:)     - integer                   Array containing the translated indices.
 !    desc_a   - type(<psb_desc_type>).    The communication descriptor.        
-!    info     - integer.                  Eventually returns an error code.
-!    iact     - integer(optional).        A character defining the behaviour of this subroutine when is found an index not belonging to the calling process
+!    info     - integer.                  return code.
+!    iact     - character, optional       A character defining the behaviour on 
+!                                         an index not belonging to the calling process
+!                                         'I'gnore, 'W'arning, 'A'bort
+!    owned    - logical, optional         When .true. limits the input to indices strictly
+!                                         owned by the process, i.e. excludes halo.
 !
 subroutine psb_glob_to_loc2(x,y,desc_a,info,iact,owned)
 
@@ -152,13 +157,19 @@ end subroutine psb_glob_to_loc2
 !!$ 
 !!$  
 ! Subroutine: psb_glob_to_loc
-!    Performs global to local indexes translation
+!    Performs global to local index translation. If an index does not belong
+!    to the current process, a negative value is returned (see also iact).
 ! 
 ! Parameters: 
-!    x        - integer, dimension(:).    Array containing the indices to be translated.
+!    x(:)     - integer                   Array containing the indices to be translated.
+!                                         overwritten on output with the result.  
 !    desc_a   - type(<psb_desc_type>).    The communication descriptor.        
-!    info     - integer.                  Eventually returns an error code.
-!    iact     - integer(optional).        A character defining the behaviour of this subroutine when is found an index not belonging to the calling process
+!    info     - integer.                  return code.
+!    iact     - character, optional       A character defining the behaviour on 
+!                                         an index not belonging to the calling process
+!                                         'I'gnore, 'W'arning, 'A'bort
+!    owned    - logical, optional         When .true. limits the input to indices strictly
+!                                         owned by the process, i.e. excludes halo.
 !
 subroutine psb_glob_to_loc(x,desc_a,info,iact,owned)
 
@@ -239,70 +250,6 @@ subroutine psb_glob_to_loc(x,desc_a,info,iact,owned)
     call psb_error()
   end if
   return
-
-contains 
-
-  subroutine inlbsrch(ipos,key,n,v)
-    implicit none
-    integer ipos, key, n
-    integer v(n)
-
-    integer lb, ub, m
-
-
-    lb = 1 
-    ub = n
-    ipos = -1 
-
-    do 
-      if (lb > ub) return
-      m = (lb+ub)/2
-      if (key.eq.v(m))  then
-        ipos = m 
-        return
-      else if (key.lt.v(m))  then
-        ub = m-1
-      else 
-        lb = m + 1
-      end if
-    enddo
-    return
-  end subroutine inlbsrch
-
-  subroutine inner_cnv(n,x,hashsize,hashmask,hashv,glb_lc)
-    integer :: n, hashsize,hashmask,x(:), hashv(0:),glb_lc(:,:)
-    integer :: i, ih, key, idx,nh,tmp,lb,ub,lm
-    do i=1, n
-      key = x(i) 
-      ih  = iand(key,hashmask)
-      idx = hashv(ih)
-      nh  = hashv(ih+1) - hashv(ih) 
-      if (nh > 0) then 
-        tmp = -1 
-        lb = idx
-        ub = idx+nh-1
-        do 
-          if (lb>ub) exit
-          lm = (lb+ub)/2
-          if (key==glb_lc(lm,1)) then 
-            tmp = lm
-            exit
-          else if (key<glb_lc(lm,1)) then 
-            ub = lm - 1
-          else
-            lb = lm + 1
-          end if
-        end do
-      else 
-        tmp = -1
-      end if
-      if (tmp > 0) then 
-        x(i) = glb_lc(tmp,2)
-      else         
-        x(i) = tmp 
-      end if
-    end do
-  end subroutine inner_cnv
 
 end subroutine psb_glob_to_loc
 

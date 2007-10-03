@@ -37,21 +37,22 @@
 !    
 ! 
 ! Parameters: 
-!    a        - type(psb_dspmat_type)     The local part of input matrix A
-!    desc_a   - type(<psb_desc_type>).    The communication descriptor.
-!    blck     - type(psb_dspmat_type)     The local part of output matrix BLCK
-!    info     - integer.                  Return code
-!    rowcnv   - logical                   Should row/col indices be converted
-!    colcnv   - logical                   to/from global numbering when sent/received?
-!                                         default is .TRUE.
-!    rowscale - logical                   Should row/col indices on output be remapped
-!    colscale - logical                   from MIN:MAX  to 1:(MAX-MIN+1) ? 
-!                                         default is .FALSE. 
-!                                         (commmon use is ROWSCALE=.TRUE., COLSCALE=.FALSE.)
-!    data     - integer                   Which index list in desc_a should be used to retrieve
-!                                         rows, default psb_comm_halo_ (i.e.: use halo_index)
-!                                         other value psb_comm_ext_, no longer accepting 
-!                                         psb_comm_ovrl_, perhaps should be reinstated in the future. 
+!    a        - type(psb_dspmat_type)   The local part of input matrix A
+!    desc_a   - type(<psb_desc_type>).  The communication descriptor.
+!    blck     - type(psb_dspmat_type)   The local part of output matrix BLCK
+!    info     - integer.                Return code
+!    rowcnv   - logical                 Should row/col indices be converted
+!    colcnv   - logical                 to/from global numbering when sent/received?
+!                                       default is .TRUE.
+!    rowscale - logical                 Should row/col indices on output be remapped
+!    colscale - logical                 from MIN:MAX  to 1:(MAX-MIN+1) ? 
+!                                       default is .FALSE. 
+!                                       (commmon use is ROWSCALE=.TRUE., COLSCALE=.FALSE.)
+!    data     - integer                 Which index list in desc_a should be used to retrieve
+!                                       rows, default psb_comm_halo_ (i.e.: use halo_index)
+!                                       other value psb_comm_ext_, no longer accepting 
+!                                       psb_comm_ovrl_, perhaps should be reinstated in 
+!                                       the future. 
 !
 !
 Subroutine psb_dsphalo(a,desc_a,blk,info,rowcnv,colcnv,&

@@ -36,8 +36,9 @@
 ! Parameters: 
 !    a        - type(<psb_zspmat_type>).       The sparse matrix to be allocated.      
 !    desc_a   - type(<psb_desc_type>).         The communication descriptor to be updated.
-!    info     - integer.                       Possibly returns an error code.
+!    info     - integer.                       Return code.
 !    nnz      - integer(optional).             The number of nonzeroes in the matrix.
+!                                              (local, user estimate)
 !
 subroutine psb_zspalloc(a, desc_a, info, nnz)
 
@@ -56,8 +57,8 @@ subroutine psb_zspalloc(a, desc_a, info, nnz)
   integer, optional, intent(in)      :: nnz
 
   !locals
-  integer             :: ictxt
-  integer             :: np,me,loc_row,&
+  integer             :: ictxt, dectype
+  integer             :: np,me,loc_row,loc_col,&
        &  length_ia1,length_ia2, err_act,m,n
   integer             :: int_err(5)
   logical, parameter  :: debug=.false.
@@ -68,7 +69,9 @@ subroutine psb_zspalloc(a, desc_a, info, nnz)
   call psb_erractionsave(err_act)
   name = 'psb_zspalloc'
 
-  ictxt = psb_cd_get_context(desc_a)
+  ictxt   = psb_cd_get_context(desc_a)
+  dectype = psb_cd_get_dectype(desc_a)
+
   call psb_info(ictxt, me, np)
   !     ....verify blacs grid correctness..
   if (np == -1) then
@@ -77,14 +80,9 @@ subroutine psb_zspalloc(a, desc_a, info, nnz)
     goto 9999
   endif
 
-  !
-  ! hmm, not a good idea, not all compilers can rely on any given
-  ! value for non initialized pointers. let's avoid this,
-  ! and just rely on documentation. 
-  ! check if psdalloc is already called for this matrix
 
-  ! set fields in desc_a%matrix_data....
   loc_row = psb_cd_get_local_rows(desc_a)
+  loc_col = psb_cd_get_local_cols(desc_a)
   m       = psb_cd_get_global_rows(desc_a)
   n       = psb_cd_get_global_cols(desc_a)
 
@@ -100,14 +98,13 @@ subroutine psb_zspalloc(a, desc_a, info, nnz)
     length_ia1=nnz
     length_ia2=nnz
   else 
-    length_ia1=max(1,4*loc_row)
-    length_ia2=max(1,4*loc_row)
+    length_ia1=max(1,5*loc_row)
   endif
 
   if (debug) write(*,*) 'allocating size:',length_ia1
 
   !....allocate aspk, ia1, ia2.....
-  call psb_sp_all(loc_row,loc_row,a,length_ia1,info)
+  call psb_sp_all(loc_row,loc_col,a,length_ia1,info)
   if(info /= 0) then
     info=4010
     ch_err='sp_all'

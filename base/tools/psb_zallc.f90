@@ -33,6 +33,7 @@
 !
 ! Function: psb_zalloc
 !    Allocates dense matrix for PSBLAS routines
+!    The descriptor may be in either the build or assembled state.
 ! 
 ! Parameters: 
 !    x      - the matrix to be allocated.
@@ -179,6 +180,7 @@ end subroutine psb_zalloc
 !
 ! Function: psb_zallocv
 !    Allocates dense matrix for PSBLAS routines
+!    The descriptor may be in either the build or assembled state.
 ! 
 ! Parameters: 
 !    x      - the matrix to be allocated.

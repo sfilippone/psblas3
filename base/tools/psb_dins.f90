@@ -29,16 +29,21 @@
 !!$ 
 !!$  
 ! Subroutine: psb_dinsvi
-!    Insert dense submatrix to dense matrix.
+!    Insert dense submatrix to dense matrix. Note: the row indices in IRW 
+!    are assumed to be in global numbering and are converted on the fly. 
+!    Row indices not belonging to the current process are silently discarded.
 ! 
 ! Parameters: 
 !    m       - integer.        Number of rows of submatrix belonging to 
 !                              val to be inserted.
-!    irw    - integer(:)       Row indices of rows of val (global numbering)
-!    val    - real, dimension(:).   The source dense submatrix.  
-!    x       - real, dimension(:).   The destination dense matrix.  
+!    irw(:)  - integer          Row indices of rows of val (global numbering)
+!    val(:)  - real                  The source dense submatrix.  
+!    x(:)    - real                  The destination dense matrix.  
 !    desc_a  - type(<psb_desc_type>).         The communication descriptor.
-!    info    - integer.                       Eventually returns an error code
+!    info    - integer.                       return code
+!    dupl    - integer               What to do with duplicates: 
+!                                     psb_dupl_ovwrt_    overwrite
+!                                     psb_dupl_add_      add         
 subroutine psb_dinsvi(m, irw, val, x, desc_a, info, dupl)
   !....insert dense submatrix to dense matrix .....
   use psb_const_mod
@@ -74,11 +79,6 @@ subroutine psb_dinsvi(m, irw, val, x, desc_a, info, dupl)
   call psb_erractionsave(err_act)
   name = 'psb_dinsvi'
 
-!!$  if (.not.allocated(desc_a%glob_to_loc)) then
-!!$    info=3110
-!!$    call psb_errpush(info,name)
-!!$    return
-!!$  end if
   if ((.not.allocated(desc_a%matrix_data))) then
     int_err(1)=3110
     call psb_errpush(info,name)
@@ -132,7 +132,7 @@ subroutine psb_dinsvi(m, irw, val, x, desc_a, info, dupl)
   else
     dupl_ = psb_dupl_ovwrt_
   endif
-  
+
   call psi_idx_cnv(m,irw,irl,desc_a,info,owned=.true.)
 
   select case(dupl_) 
@@ -214,15 +214,21 @@ end subroutine psb_dinsvi
 !!$ 
 !!$  
 ! Subroutine: psb_dinsi
+!    Insert dense submatrix to dense matrix. Note: the row indices in IRW 
+!    are assumed to be in global numbering and are converted on the fly. 
+!    Row indices not belonging to the current process are silently discarded.
 ! 
 ! Parameters: 
-!    m       - integer.        Number of rows of submatrix belonging to 
+!    m        - integer.        Number of rows of submatrix belonging to 
 !                              val to be inserted.
-!    irw    - integer(:)       Row indices of rows of val (global numbering)
-!    val    - real, dimension(:,:).   The source dense submatrix.  
-!    x       - real, dimension(:,:).   The destination dense matrix.  
-!    desc_a  - type(<psb_desc_type>).         The communication descriptor.
-!    info    - integer.                       Eventually returns an error code
+!    irw(:)   - integer          Row indices of rows of val (global numbering)
+!    val(:,:) - real                    The source dense submatrix.  
+!    x(:,:)   - real                    The destination dense matrix.  
+!    desc_a   - type(<psb_desc_type>).         The communication descriptor.
+!    info     - integer.                       return code
+!    dupl    - integer               What to do with duplicates: 
+!                                     psb_dupl_ovwrt_    overwrite
+!                                     psb_dupl_add_      add         
 subroutine psb_dinsi(m, irw, val, x, desc_a, info, dupl)
   !....insert dense submatrix to dense matrix .....
   use psb_descriptor_type
@@ -259,11 +265,6 @@ subroutine psb_dinsi(m, irw, val, x, desc_a, info, dupl)
   call psb_erractionsave(err_act)
   name = 'psb_dinsi'
 
-!!$  if (.not.allocated(desc_a%glob_to_loc)) then
-!!$    info=3110
-!!$    call psb_errpush(info,name)
-!!$    return
-!!$  end if
   if ((.not.allocated(desc_a%matrix_data))) then
     int_err(1)=3110
     call psb_errpush(info,name)

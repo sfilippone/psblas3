@@ -32,6 +32,7 @@
 !
 ! Function: psb_ialloc
 !    Allocates dense integer matrix for PSBLAS routines
+!    The descriptor may be in either the build or assembled state.
 ! 
 ! Parameters: 
 !    x      - the matrix to be allocated.
@@ -178,6 +179,7 @@ end subroutine psb_ialloc
 !!$  
 ! Function: psb_iallocv
 !    Allocates dense matrix for PSBLAS routines
+!    The descriptor may be in either the build or assembled state.
 ! 
 ! Parameters: 
 !    m      - integer.                  The number of rows.

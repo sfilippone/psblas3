@@ -31,7 +31,9 @@
 ! File: psb_cdtransfer.f90
 !
 ! Subroutine: psb_cdtransfer
-!   Transfers data and allocation from in to out (just like MOVE_ALLOC). 
+!   Transfers data and allocation from in to out; behaves like MOVE_ALLOC, i.e.
+!   the IN arg is empty (and deallocated) upon exit. 
+!
 ! 
 ! Parameters: 
 !    desc_in  - type(<psb_desc_type>).         The communication descriptor to be 

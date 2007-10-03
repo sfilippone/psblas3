@@ -32,12 +32,13 @@
 ! File: psb_dallc.f90
 !
 ! Function: psb_dalloc
-!    Allocates dense matrix for PSBLAS routines
+!    Allocates dense matrix for PSBLAS routines. 
+!    The descriptor may be in either the build or assembled state.
 ! 
 ! Parameters: 
 !    x      - the matrix to be allocated.
 !    desc_a - the communication descriptor.
-!    info   - possibly returns an error code
+!    info   - Return code
 !    n      - optional number of columns.
 subroutine psb_dalloc(x, desc_a, info, n)
   !....allocate dense  matrix for psblas routines.....
@@ -178,13 +179,15 @@ end subroutine psb_dalloc
 !!$ 
 !!$  
 !
+!
 ! Function: psb_dallocv
-!    Allocates dense matrix for PSBLAS routines
+!    Allocates dense matrix for PSBLAS routines. 
+!    The descriptor may be in either the build or assembled state.
 ! 
 ! Parameters: 
 !    x      - the matrix to be allocated.
 !    desc_a - the communication descriptor.
-!    info   - possibly returns an error code
+!    info   - return code
 subroutine psb_dallocv(x, desc_a,info,n)
   !....allocate sparse matrix structure for psblas routines.....
   use psb_descriptor_type

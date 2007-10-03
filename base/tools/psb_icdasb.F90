@@ -31,15 +31,16 @@
 ! File: psb_cdasb.f90
 !
 ! Subroutine: psb_cdasb
-!   Assembly the psblas communications descriptor.
+!   Assemble the psblas communications descriptor.
 ! 
 ! Parameters: 
 !    desc_a  - type(<psb_desc_type>).         The communication descriptor.
-!    info    - integer.                       Eventually returns an error code.
+!    info    - integer.                       return code.
 !    ext_hv  - logical                        Essentially this distinguishes a call 
 !                                             coming from the build of an extended
 !                                             halo descriptor with respect to a "normal"
 !                                             call. 
+!
 subroutine psb_icdasb(desc_a,info,ext_hv)
   use psb_descriptor_type
   use psb_serial_mod
@@ -117,17 +118,21 @@ subroutine psb_icdasb(desc_a,info,ext_hv)
       call psb_errpush(info,name,i_err=int_err)
       goto 9999
     endif
-
+    ! Trim size of loc_to_glob component.
     call psb_realloc(psb_cd_get_local_cols(desc_a),desc_a%loc_to_glob,info)
 
+    ! If large index space, we have to pre-process and rebuild
+    ! the list of halo indices as if it was in small index space    
     if (psb_is_large_desc(desc_a)) then 
       call psi_ldsc_pre_halo(desc_a,ext_hv_,info)
     end if
 
+    ! Take out the lists for ovrlap, halo and ext...
     call psb_transfer(desc_a%ovrlap_index,ovrlap_index,info)
     call psb_transfer(desc_a%halo_index,halo_index,info)
     call psb_transfer(desc_a%ext_index,ext_index,info)
 
+    ! Then convert and put them back where they belong.    
     call psi_cnv_dsc(halo_index,ovrlap_index,ext_index,desc_a,info) 
     if (info /= 0) then
       call psb_errpush(4010,name,a_err='psi_cnv_dsc')
@@ -141,8 +146,8 @@ subroutine psb_icdasb(desc_a,info,ext_hv)
       call psb_errpush(info,name)
       goto 9999
     end if
-    ! Finally, cleanup the AVL tree, as it is really only needed 
-    ! when building. 
+    ! Finally, cleanup the AVL tree of indices, if any, as it is
+    ! only needed while in the build state.
     if (allocated(desc_a%ptree)) then 
       call FreePairSearchTree(desc_a%ptree)   
       deallocate(desc_a%ptree,stat=info)
@@ -152,7 +157,7 @@ subroutine psb_icdasb(desc_a,info,ext_hv)
         goto 9999
       end if
     end if
-    ! Ok, register into MATRIX_DATA &  free temporary work areas
+    ! Ok, register into MATRIX_DATA 
     desc_a%matrix_data(psb_dec_type_) = psb_desc_asb_
   else
     info = 600

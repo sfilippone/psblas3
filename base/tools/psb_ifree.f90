@@ -34,7 +34,7 @@
 !    frees a dense integer matrix structure
 ! 
 ! Parameters: 
-!    x        - integer, pointer, dimension(:,:).    The dense matrix to be freed.
+!    x(:,:)   - integer, allocatable                 The dense matrix to be freed.
 !    desc_a   - type(<psb_desc_type>).               The communication descriptor.
 !    info     - integer.                             Eventually returns an error code
 subroutine psb_ifree(x, desc_a, info)
@@ -139,7 +139,7 @@ end subroutine psb_ifree
 !    frees a dense integer matrix structure
 ! 
 ! Parameters: 
-!    x        - integer, pointer, dimension(:).      The dense matrix to be freed.
+!    x(:)     - integer, allocatable                 The dense matrix to be freed.
 !    desc_a   - type(<psb_desc_type>).               The communication descriptor.
 !    info     - integer.                             Eventually returns an error code
 subroutine psb_ifreev(x, desc_a,info)

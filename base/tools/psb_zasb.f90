@@ -32,11 +32,15 @@
 !
 ! Subroutine: psb_zasb
 !    Assembles a dense matrix for PSBLAS routines
+!    Since the allocation may have been called with the desciptor 
+!    in the build state we make sure that X has a number of rows 
+!    allowing for the halo indices, reallocating if necessary. 
+!    We also call the halo routine for good measure.
 ! 
 ! Parameters: 
-!    x       - real,pointer(dim=2).    The matrix to be assembled.
+!    x(:,:)  - complex, allocatable    The matrix to be assembled.
 !    desc_a  - type(<psb_desc_type>).  The communication descriptor.
-!    info    - integer.                Eventually returns an error code
+!    info    - integer.                return code
 subroutine psb_zasb(x, desc_a, info)
   !....assembly dense matrix x .....
   use psb_descriptor_type
@@ -158,11 +162,15 @@ end subroutine psb_zasb
 !!$  
 ! Subroutine: psb_zasb
 !    Assembles a dense matrix for PSBLAS routines
+!    Since the allocation may have been called with the desciptor 
+!    in the build state we make sure that X has a number of rows 
+!    allowing for the halo indices, reallocating if necessary. 
+!    We also call the halo routine for good measure.
 ! 
 ! Parameters: 
-!    x       - real,pointer(dim=1).    The matrix to be assembled.
+!    x(:)    - complex, allocatable    The matrix to be assembled.
 !    desc_a  - type(<psb_desc_type>).  The communication descriptor.
-!    info    - integer.                Eventually returns an error code
+!    info    - integer.                Return  code
 subroutine psb_zasbv(x, desc_a, info)
   !....assembly dense matrix x .....
   use psb_descriptor_type

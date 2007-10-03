@@ -31,18 +31,21 @@
 ! File: psb_dspins.f90
 !
 ! Subroutine: psb_dspins
-!    Takes a cloud of points and inserts them into a sparse matrix.
+!    Takes a cloud of coefficients and inserts them into a sparse matrix.
+!    Note: coefficients with a row index not belonging to the current process are
+!    ignored. 
+!    If desc_a is in the build state this routine implies a call to psb_cdins. 
 ! 
 ! Parameters: 
-!    nz       - integer.                          The number of points to insert.
-!    ia       - integer,dimension(:).             The row indices of the points.
-!    ja       - integer,dimension(:).             The column indices of the points.
-!    val      - real,dimension(:).                The values of the points to be inserted.
-!    a        - type(<psb_dspmat_type>).          The sparse destination matrix.      
-!    desc_a   - type(<psb_desc_type>).            The communication descriptor.
-!    info     - integer.                          Error code
-!    rebuild  - logical                           Allows to reopen a matrix under
-!                                                 certain circumstances.
+!    nz       - integer.                      The number of points to insert.
+!    ia(:)    - integer                       The row indices of the coefficients.
+!    ja(:)    - integer                       The column indices of the coefficients.
+!    val(:)   - real                          The values of the coefficients to be inserted.
+!    a        - type(<psb_dspmat_type>).      The sparse destination matrix.      
+!    desc_a   - type(<psb_desc_type>).        The communication descriptor.
+!    info     - integer.                      Error code
+!    rebuild  - logical                       Allows to reopen a matrix under
+!                                             certain circumstances.
 !
 subroutine psb_dspins(nz,ia,ja,val,a,desc_a,info,rebuild)
 

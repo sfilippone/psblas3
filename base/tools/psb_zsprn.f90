@@ -31,12 +31,15 @@
 ! File: psb_zsprn.f90
 !
 ! Subroutine: psb_zsprn
-!    Reinit sparse matrix structure for psblas routines.
+!    Reinit sparse matrix structure for psblas routines: on output the matrix 
+!    is in the update state.
 ! 
 ! Parameters: 
-!    a        - type(<psb_zspmat_type>).          The sparse matrix to be reinitiated.      
-!    desc_a   - type(<psb_desc_type>).            The communication descriptor.
-!    info     - integer.                          Eventually returns an error code.
+!    a        - type(<psb_zspmat_type>).        The sparse matrix to be reinitiated.      
+!    desc_a   - type(<psb_desc_type>).          The communication descriptor.
+!    info     - integer.                        Return code.
+!    clear    - logical, optional               Whether the coefficients should be zeroed
+!                                               default .true.          
 !
 Subroutine psb_zsprn(a, desc_a,info,clear)
 

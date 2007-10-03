@@ -31,14 +31,17 @@
 ! File: psb_loc_to_glob.f90
 !
 ! Subroutine: psb_loc_to_glob2
-!    Performs local to global indexes translation
+!    Performs local to global index translation. If an index is out of range
+!    a negative value is returned (see also iact).
 ! 
 ! Parameters: 
-!    x        - integer, dimension(:).    Array containing the indices to be translated.
-!    y        - integer, dimension(:).    Array containing the indices to be translated.
+!    x(:)     - integer                   Array containing the indices to be translated.
+!    y(:)     - integer                   Array containing the translated indices.
 !    desc_a   - type(<psb_desc_type>).    The communication descriptor.        
-!    info     - integer.                  Eventually returns an error code.
-!    iact     - integer(optional).        A character defining the behaviour of this subroutine when is found an index not belonging to the calling process
+!    info     - integer.                  return code.
+!    iact     - character, optional       A character defining the behaviour on 
+!                                         an out of range index 
+!                                         'I'gnore, 'W'arning, 'A'bort
 !
 subroutine psb_loc_to_glob2(x,y,desc_a,info,iact)
 
@@ -100,9 +103,8 @@ subroutine psb_loc_to_glob2(x,y,desc_a,info,iact)
 
   if (info /= 0) then
     select case(act)
-    case('E')
-      call psb_erractionrestore(err_act)
-      return
+    case('E','I')
+      ! do nothing
     case('W')
       write(0,'("Error ",i5," in subroutine glob_to_loc")') info
     case('A')
@@ -158,13 +160,17 @@ end subroutine psb_loc_to_glob2
 !!$ 
 !!$  
 ! Subroutine: psb_loc_to_glob
-!    Performs local to global indexes translation
+!    Performs local to global index translation. If an index is out of range
+!    a negative value is returned (see also iact).
 ! 
 ! Parameters: 
-!    x        - integer, dimension(:).    Array containing the indices to be translated.
+!    x(:)     - integer                   Array containing the indices to be translated.
+!                                         Overwritten on output. 
 !    desc_a   - type(<psb_desc_type>).    The communication descriptor.        
-!    info     - integer.                  Eventually returns an error code.
-!    iact     - integer(optional).        A character defining the behaviour of this subroutine when is found an index not belonging to the calling process
+!    info     - integer.                  return code.
+!    iact     - character, optional       A character defining the behaviour on 
+!                                         an out of range index 
+!                                         'I'gnore, 'W'arning, 'A'bort
 !
 subroutine psb_loc_to_glob(x,desc_a,info,iact)
 
@@ -223,9 +229,9 @@ subroutine psb_loc_to_glob(x,desc_a,info,iact)
 
   if (info /= 0) then
     select case(act)
-    case('E')
-      call psb_erractionrestore(err_act)
-      return
+    case('E','I')
+!!$      call psb_erractionrestore(err_act)
+!!$      return
     case('W')
       write(0,'("Error ",i5," in subroutine glob_to_loc")') info
     case('A')

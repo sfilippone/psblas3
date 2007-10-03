@@ -35,7 +35,7 @@
 ! 
 ! Parameters: 
 !    desc_a   - type(<psb_desc_type>).         The communication descriptor to be freed.
-!    info     - integer.                       Eventually returns an error code.
+!    info     - integer.                       return code.
 subroutine psb_cdfree(desc_a,info)
   !...free descriptor structure...
   use psb_descriptor_type
