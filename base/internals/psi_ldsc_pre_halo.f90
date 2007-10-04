@@ -28,6 +28,25 @@
 !!$  POSSIBILITY OF SUCH DAMAGE.
 !!$ 
 !!$  
+!
+! File: psi_ldsc_pre_halo.f90
+!
+! Subroutine: psi_ldsc_pre_halo
+!   Build initial versions of data exchange lists.
+!   When the descriptor is for a large index space, we cannot build 
+!   the data exchange lists "on-the-fly", but we also want to keep using the 
+!   same format conversion routines we use in the small index space case, 
+!   hence this adapter routine.
+!   Since it also convers the AVL tree data structure into the hashed list 
+!   of ordered lists, it may be called to do just that; perhaps we should 
+!   cut away that functionality and put it somewhere else...
+!   
+! 
+! Arguments: 
+!    desc     - type(<psb_desc_type>).    The communication descriptor.        
+!    ext_hv   - logical                   Should we work on the halo_index.
+!    info     - integer.                  return code.
+!
 subroutine psi_ldsc_pre_halo(desc,ext_hv,info)
   use psb_descriptor_type
   use psb_serial_mod

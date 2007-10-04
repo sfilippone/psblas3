@@ -35,12 +35,13 @@
 !   into pieces that are local to alle the processes.
 !
 ! Arguments:
-!   globx     -  complex,dimension(:,:).          The global matrix to scatter.
-!   locx      -  complex,dimension(:,:).          The local piece of the ditributed matrix.
+!   globx     -  complex,dimension(:,:).       The global matrix to scatter.
+!   locx      -  complex,dimension(:,:).       The local piece of the distributed matrix.
 !   desc_a    -  type(<psb_desc_type>).        The communication descriptor.
 !   info      -  integer.                      Error code.
-!   iroot     -  integer(optional).            The process that owns the global matrix. If -1 all
-!                                              the processes have a copy. Default -1
+!   iroot     -  integer(optional).            The process that owns the global matrix. 
+!                                              If -1 all the processes have a copy. 
+!                                              Default -1
 subroutine  psb_zscatterm(globx, locx, desc_a, info, iroot)
 
   use psb_descriptor_type
@@ -269,7 +270,7 @@ end subroutine psb_zscatterm
 !   globx     -  complex,dimension(:).         The global vector to scatter.
 !   locx      -  complex,dimension(:).         The local piece of the ditributed vector.
 !   desc_a    -  type(<psb_desc_type>).        The communication descriptor.
-!   info      -  integer.                      Eventually returns an error code.
+!   info      -  integer.                      Return code
 !   iroot     -  integer(optional).            The process that owns the global vector. If -1 all
 !                                              the processes have a copy.
 !

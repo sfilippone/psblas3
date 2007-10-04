@@ -32,15 +32,17 @@
 !
 ! Subroutine: psb_cdins
 !   Takes as input a cloud of points and updates the descriptor accordingly.
+!   Note: entries with a row index not belonging to the current process are 
+!         ignored (see usage of ila_ as mask in the call to psb_idx_ins_cnv).
 ! 
 ! Arguments: 
 !    nz       - integer.                       The number of points to insert.
-!    ia       - integer,dimension(:).          The row indices of the points.
-!    ja       - integer,dimension(:).          The column indices of the points.
+!    ia(:)    - integer                        The row indices of the points.
+!    ja(:)    - integer                        The column indices of the points.
 !    desc_a   - type(<psb_desc_type>).         The communication descriptor to be freed.
 !    info     - integer.                       Return code.
-!    ila      - integer,dimension(:).          The row indices in local numbering
-!    jla      - integer,dimension(:).          The col indices in local numbering
+!    ila(:)   - integer, optional              The row indices in local numbering
+!    jla(:)   - integer, optional              The col indices in local numbering
 !
 subroutine psb_cdins(nz,ia,ja,desc_a,info,ila,jla)
 

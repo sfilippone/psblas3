@@ -41,7 +41,8 @@
 !    desc     - type(<psb_desc_type>).    The communication descriptor.        
 !    info     - integer.                  return code.
 !    mask(:)  - logical, optional         Only do the conversion for specific indices.
-!    owned    - logical,optional          Restrict to local indices, no halo (default false)
+!    owned    - logical,optional          Restrict to local indices, no halo 
+!                                         (default false)
 subroutine psi_idx_cnv1(nv,idxin,desc,info,mask,owned)
   use psb_descriptor_type
   use psb_serial_mod
@@ -195,7 +196,8 @@ end subroutine psi_idx_cnv1
 !    desc      - type(<psb_desc_type>).    The communication descriptor.        
 !    info      - integer.                  return code.
 !    mask(:)   - logical, optional         Only do the conversion for specific indices.
-!    owned     - logical,optional          Restrict to local indices, no halo (default false)
+!    owned     - logical,optional          Restrict to local indices, no halo
+!                                          (default false)
 subroutine psi_idx_cnv2(nv,idxin,idxout,desc,info,mask,owned)
   use psb_descriptor_type
   use psb_serial_mod
@@ -416,7 +418,8 @@ end subroutine psi_idx_cnv2
 !    desc      - type(<psb_desc_type>).    The communication descriptor.        
 !    info      - integer.                  return code.
 !    mask      - logical, optional         Only do the conversion if true.
-!    owned     - logical,optional          Restrict to local indices, no halo (default false)
+!    owned     - logical,optional          Restrict to local indices, no halo 
+!                                          (default false)
 subroutine psi_idx_cnvs(idxin,idxout,desc,info,mask,owned)
 
   use psi_mod, psb_protect_name => psi_idx_cnvs

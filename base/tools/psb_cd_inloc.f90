@@ -189,7 +189,19 @@ subroutine psb_cd_inloc(v, ictxt, desc_a, info)
   itmpov  = 0
   temp_ovrlap(:) = -1
 
+  !
+  ! We have to decide whether we have a "large" index space.
+  !
   if (psb_cd_choose_large_state(ictxt,m)) then 
+    !
+    ! Yes, we do have a large index space. Therefore we are 
+    ! keeping on the local process a map of only the global 
+    ! indices ending up here; this map is stored in an AVL
+    ! tree during the build stage, so as to guarantee log-time
+    ! serch and insertion of new items. At assembly time it 
+    ! is transferred to a series of ordered linear lists, 
+    ! hashed by the low order bits of the entries.
+    !
     do i=1,m
 
       if (((tmpgidx(i,1)-flag_) > np-1).or.((tmpgidx(i,1)-flag_) < 0)) then
@@ -252,6 +264,16 @@ subroutine psb_cd_inloc(v, ictxt, desc_a, info)
     endif
 
   else 
+
+    !
+    ! No, we don't have a large index space. Therefore we can  
+    ! afford to keep on the local process a map of all global 
+    ! indices; for those we know are here we immediately store 
+    ! the corresponding local index, for the others we encode 
+    ! the index of the process owning them, so that during the 
+    ! insertion phase we can use the information to build the 
+    ! data exchange lists "on-the-fly".
+    !
 
     do i=1,m
 

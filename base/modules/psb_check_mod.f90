@@ -62,7 +62,7 @@ contains
   !  jx       - integer.               X's global column index, which points to the beginning 
   !                                    of the dense submatrix which is to be operated on.      
   !  desc_dec - integer,dimension(:).  Is the matrix_data array.
-  !  info     - integer.               Eventually returns an error code.
+  !  info     - integer.               Return code
   !  iix      - integer(optional).     The local rows starting index of the submatrix.
   !  jjx      - integer(optional).     The local columns starting index of the submatrix.
   subroutine psb_chkvect( m, n, lldx, ix, jx, desc_dec, info, iix, jjx)
@@ -188,7 +188,7 @@ contains
   !  jx       - integer.               X's global column index, which points to the beginning 
   !                                    of the dense submatrix which is to be operated on.      
   !  desc_dec - integer,dimension(:).  Is the matrix_data array.
-  !  info     - integer.               Eventually returns an error code.
+  !  info     - integer.               Return code
   !
   subroutine psb_chkglobvect( m, n, lldx, ix, jx, desc_dec, info)
 
@@ -309,7 +309,7 @@ contains
   !  ja       - integer.               a's global column index, which points to the beginning 
   !                                    of the submatrix which is to be operated on.      
   !  desc_dec - integer,dimension(:).  Is the matrix_data array.
-  !  info     - integer.               Eventually returns an error code.
+  !  info     - integer.               Return code
   !  iia      - integer(optional).     The local rows starting index of the submatrix.
   !  jja      - integer(optional).     The local columns starting index of the submatrix.
   !

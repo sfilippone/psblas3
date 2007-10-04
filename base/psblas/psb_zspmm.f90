@@ -69,7 +69,7 @@
 !    beta   -  real.                        The scalar beta.
 !    y      -  real,dimension(:,:).         The input vector containing the entries of sub( Y ).
 !    desc_a -  type(<psb_desc_type>).       The communication descriptor.
-!    info   -  integer.                     Eventually returns an error code.
+!    info   -  integer.                     Return code
 !    trans  -  character(optional).         Whether A or A'. If not present 'N' is assumed.
 !    k      -  integer(optional).           The number of right-hand sides.
 !    jx     -  integer(optional).           The column offset for sub( X ). If not present 1 is assumed.
@@ -403,7 +403,7 @@ end subroutine psb_zspmm
 !    beta   -  real.                        The scalar beta.
 !    y      -  real,dimension(:.         The input vector containing the entries of Y.
 !    desc_a -  type(<psb_desc_type>).       The communication descriptor.
-!    info   -  integer.                     Eventually returns an error code.
+!    info   -  integer.                     Return code
 !    trans  -  character(optional).         Whether A or A'. If not present 'N' is assumed.
 !    work   -  real,dimension(:)(optional). Working area.
 !    doswap -  integer(optional).           Whether to performe halo updates.

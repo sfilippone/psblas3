@@ -38,13 +38,13 @@
 ! Arguments:
 !   x         -  integer,dimension(:,:).       The local part of the dense matrix.
 !   desc_a    -  type(<psb_desc_type>).        The communication descriptor.
-!   info      -  integer.                      Eventually returns an error code.
-!   alpha     -  real(optional).               ???.
+!   info      -  integer.                      Return code
+!   alpha     -  real(optional).               Scale factor.
 !   jx        -  integer(optional).            The starting column of the global matrix. 
 !   ik        -  integer(optional).            The number of columns to gather. 
-!   work      -  integer(optional).            A working area.
-!   tran      -  character(optional).          ???.
-!   mode      -  integer(optional).
+!   work      -  real(optional).               Work  area.
+!   tran      -  character(optional).          Transpose exchange.
+!   mode      -  integer(optional).            Communication mode (see Swapdata)
 !
 subroutine  psb_ihalom(x,desc_a,info,alpha,jx,ik,work,tran,mode,data)
   use psb_descriptor_type
@@ -255,11 +255,13 @@ end subroutine psb_ihalom
 ! Arguments:
 !   x         -  integer,dimension(:).         The local part of the dense matrix.
 !   desc_a    -  type(<psb_desc_type>).        The communication descriptor.
-!   info      -  integer.                      Eventually returns an error code.
-!   alpha     -  real(optional).               ???.
-!   work      -  integer(optional).            A working area.
-!   tran      -  character(optional).          ???.
-!   mode      -  integer(optional).
+!   info      -  integer.                      Return code
+!   alpha     -  real(optional).               Scale factor.
+!   jx        -  integer(optional).            The starting column of the global matrix. 
+!   ik        -  integer(optional).            The number of columns to gather. 
+!   work      -  real(optional).               Work  area.
+!   tran      -  character(optional).          Transpose exchange.
+!   mode      -  integer(optional).            Communication mode (see Swapdata)
 !
 subroutine  psb_ihalov(x,desc_a,info,alpha,work,tran,mode,data)
   use psb_descriptor_type

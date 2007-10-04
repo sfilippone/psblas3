@@ -40,7 +40,7 @@
 ! Arguments:
 !    x      -  real,dimension(:,:).       The input vector containing the entries of sub( X ).
 !    desc_a -  type(<psb_desc_type>).     The communication descriptor.
-!    info   -  integer.                   Eventually returns an error code.
+!    info   -  integer.                   Return code
 !    jx     -  integer(optional).         The column offset for sub( X ).
 !
 function psb_znrm2(x, desc_a, info, jx)  
@@ -178,7 +178,7 @@ end function psb_znrm2
 ! Arguments:
 !    x      -  real,dimension(:).         The input vector containing the entries of X.
 !    desc_a -  type(<psb_desc_type>).     The communication descriptor.
-!    info   -  integer.                   Eventually returns an error code.
+!    info   -  integer.                   Return code
 !
 function psb_znrm2v(x, desc_a, info)  
   use psb_descriptor_type
@@ -313,7 +313,7 @@ end function psb_znrm2v
 !    res    -  real.                      The result.
 !    x      -  real,dimension(:).         The input vector containing the entries of X.
 !    desc_a -  type(<psb_desc_type>).     The communication descriptor.
-!    info   -  integer.                   Eventually returns an error code.
+!    info   -  integer.                   Return code
 !
 subroutine psb_znrm2vs(res, x, desc_a, info)
   use psb_descriptor_type

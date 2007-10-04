@@ -39,7 +39,7 @@
 !   locx      -  real,dimension(:,:).          The local piece of the distributed 
 !                                                matrix to be gathered.
 !   desc_a    -  type(<psb_desc_type>).        The communication descriptor.
-!   info      -  integer.                      Error code.
+!   info      -  integer.                      Return code.
 !   iroot     -  integer.                      The process that has to own the 
 !                                              global matrix. If -1 all
 !                                              the processes will have a copy.
@@ -210,8 +210,8 @@ end subroutine psb_dgatherm
 !   locx      -  real,dimension(:).            The local piece of the ditributed
 !                                                  vector to be gathered.
 !   desc_a    -  type(<psb_desc_type>).        The communication descriptor.
-!   info      -  integer.                      Error code.
-!   iroot     -  integer.                      The process that has to own the 
+!   info      -  integer.                      Return code.
+!   root      -  integer.                      The process that has to own the 
 !                                              global matrix. If -1 all
 !                                              the processes will have a copy.
 !

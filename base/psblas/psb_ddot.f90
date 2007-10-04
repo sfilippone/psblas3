@@ -43,7 +43,7 @@
 !    x      -  real,dimension(:,:).       The input vector containing the entries of sub( X ).
 !    y      -  real,dimension(:,:).       The input vector containing the entries of sub( Y ).
 !    desc_a -  type(<psb_desc_type>).     The communication descriptor.
-!    info   -  integer.                   Eventually returns an error code.
+!    info   -  integer.                   Return code
 !    jx     -  integer(optional).         The column offset for sub( X ).
 !    jy     -  integer(optional).         The column offset for sub( Y ).
 !
@@ -200,7 +200,7 @@ end function psb_ddot
 !    x      -  real,dimension(:).         The input vector containing the entries of X.
 !    y      -  real,dimension(:).         The input vector containing the entries of Y.
 !    desc_a -  type(<psb_desc_type>).     The communication descriptor.
-!    info   -  integer.                   Eventually returns an error code.
+!    info   -  integer.                   Return code
 !
 function psb_ddotv(x, y,desc_a, info)  
   use psb_descriptor_type
@@ -338,7 +338,7 @@ end function psb_ddotv
 !    x      -  real,dimension(:).         The input vector containing the entries of X.
 !    y      -  real,dimension(:).         The input vector containing the entries of Y.
 !    desc_a -  type(<psb_desc_type>).     The communication descriptor.
-!    info   -  integer.                   Eventually returns an error code.
+!    info   -  integer.                   Return code
 !
 subroutine psb_ddotvs(res, x, y,desc_a, info)  
   use psb_descriptor_type
@@ -479,7 +479,7 @@ end subroutine psb_ddotvs
 !    x      -  real,dimension(:,:).       The input vector containing the entries of sub( X ).
 !    y      -  real,dimension(:,:).       The input vector containing the entries of sub( Y ).
 !    desc_a -  type(<psb_desc_type>).     The communication descriptor.
-!    info   -  integer.                   Eventually returns an error code.
+!    info   -  integer.                   Return code
 !
 subroutine psb_dmdots(res, x, y, desc_a, info)  
   use psb_descriptor_type

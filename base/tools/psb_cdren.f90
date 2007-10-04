@@ -41,7 +41,7 @@
 !    iperm    - integer,dimension(:).          The renumbering scheme.
 !    desc_a   - type(<psb_desc_type>).         The communication descriptor
 !                                              to be updated.
-!    info     - integer.                       Eventually returns an error code.
+!    info     - integer.                       Return code
 !
 subroutine psb_cdren(trans,iperm,desc_a,info)
   use psb_descriptor_type

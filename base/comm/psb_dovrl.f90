@@ -35,13 +35,16 @@
 !   distributed dense matrix between all the processes.
 !
 ! Arguments:
-!   x           -  real,dimension(:,:).         The local part of the dense matrix.
-!   desc_a      -  type(<psb_desc_type>).       The communication descriptor.
-!   info        -  integer.                     A return code.
-!   jx          -  integer(optional).           The starting column of the global matrix
-!   ik          -  integer(optional).           The number of columns to gather. 
-!   work        -  real(optional).              A work area.
-!   update -  integer(optional).            ???.
+!   x(:,:)      -  real                      The local part of the dense matrix.
+!   desc_a      -  type(<psb_desc_type>).    The communication descriptor.
+!   info        -  integer.                  Return code.
+!   jx          -  integer(optional).        The starting column of the global matrix
+!   ik          -  integer(optional).        The number of columns to gather. 
+!   work        -  real(optional).           A work area.
+!   update      -  integer(optional).        Type of update:
+!                                            psb_none_   do nothing
+!                                            psb_sum_    sum of overlaps
+!                                            psb_avg_    average of overlaps
 !
 subroutine  psb_dovrlm(x,desc_a,info,jx,ik,work,update)
   use psb_descriptor_type
@@ -215,11 +218,6 @@ subroutine  psb_dovrlm(x,desc_a,info,jx,ik,work,update)
   return
 end subroutine psb_dovrlm
 
-
-
-
-
-
 !!$ 
 !!$              Parallel Sparse BLAS  v2.0
 !!$    (C) Copyright 2006 Salvatore Filippone    University of Rome Tor Vergata
@@ -255,11 +253,14 @@ end subroutine psb_dovrlm
 !   distributed dense vector between all the processes.
 !
 ! Arguments:
-!   x           -  real,dimension(:).          The local part of the dense vector.
-!   desc_a      -  type(<psb_desc_type>).        The communication descriptor.
-!   info        -  integer.                      Eventually returns an error code.
-!   work        -  real(optional).               A working area.
-!   update -  integer(optional).            ???.
+!   x(:)        -  real                      The local part of the dense vector.
+!   desc_a      -  type(<psb_desc_type>).    The communication descriptor.
+!   info        -  integer.                  Return code.
+!   work        -  real(optional).           A work area.
+!   update      -  integer(optional).        Type of update:
+!                                            psb_none_   do nothing
+!                                            psb_sum_    sum of overlaps
+!                                            psb_avg_    average of overlaps
 !
 subroutine  psb_dovrlv(x,desc_a,info,work,update)
   use psb_descriptor_type

@@ -40,7 +40,7 @@
 ! Arguments:
 !    x      -  real,dimension(:,:).       The input vector.
 !    desc_a -  type(<psb_desc_type>).     The communication descriptor.
-!    info   -  integer.                   Eventually returns an error code.
+!    info   -  integer.                   Return code
 !    jx     -  integer(optional).         The column offset.
 !
 function psb_damax (x,desc_a, info, jx)
@@ -167,7 +167,7 @@ end function psb_damax
 ! Arguments:
 !    x      -  real,dimension(:).         The input vector.
 !    desc_a -  type(<psb_desc_type>).     The communication descriptor.
-!    info   -  integer.                   Eventually returns an error code.
+!    info   -  integer.                   Return code
 !
 function psb_damaxv (x,desc_a, info)
   use psb_penv_mod
@@ -289,7 +289,7 @@ end function psb_damaxv
 !    res    -  real.                      The result.
 !    x      -  real,dimension(:,:).       The input vector.
 !    desc_a -  type(<psb_desc_type>).     The communication descriptor.
-!    info   -  integer.                   Eventually returns an error code.
+!    info   -  integer.                   Return code
 !    jx     -  integer(optional).         The column offset.
 !
 subroutine psb_damaxvs (res,x,desc_a, info)
@@ -411,7 +411,7 @@ end subroutine psb_damaxvs
 !    res    -  real.                      The result.
 !    x      -  real,dimension(:).         The input vector.
 !    desc_a -  type(<psb_desc_type>).     The communication descriptor.
-!    info   -  integer.                   Eventually returns an error code.
+!    info   -  integer.                   Return code
 !
 subroutine psb_dmamaxs (res,x,desc_a, info,jx)
   use psb_penv_mod

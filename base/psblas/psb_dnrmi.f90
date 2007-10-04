@@ -38,7 +38,7 @@
 ! Arguments:
 !    a      -  type(<psb_dspmat_type>).   The sparse matrix containing A.
 !    desc_a -  type(<psb_desc_type>).     The communication descriptor.
-!    info   -  integer.                   Eventually returns an error code.
+!    info   -  integer.                   Return code
 !
 function psb_dnrmi(a,desc_a,info)  
   use psb_descriptor_type

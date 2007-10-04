@@ -77,7 +77,7 @@
 !    x       -  real,dimension(:).           The vector of unknowns.
 !    eps     -  real.                        The error tolerance.
 !    desc_a  -  type(<psb_desc_type>).       The communication descriptor.
-!    info    -  integer.                     Eventually returns an error code.
+!    info    -  integer.                     Return code
 !    itmax   -  integer(optional).           The maximum number of iterations.
 !    iter    -  integer(optional).           The number of iterations performed.
 !    err     -  real(optional).              The error on return.
