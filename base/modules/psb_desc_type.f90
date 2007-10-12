@@ -208,8 +208,10 @@ module psb_descriptor_type
   !     out who should be sending what to whom.
   !     However this implies that we know who owns the indices; if we are in the 
   !     LARGE case (as described above) this is actually only true for the OVERLAP list 
-  !     that is filled in at CDALL time, and not for the HALO; thus the HALO list 
-  !     is rebuilt during the CDASB process (in the psi_ldsc_pre_halo subroutine). 
+  !     that is filled in at CDALL time, and not for the HALO (remember: we do not have 
+  !     the space to encode the owning process index in the GLOB_TO_LOC mapping); thus 
+  !     the HALO list is rebuilt during the CDASB process 
+  !     (in the psi_ldsc_pre_halo subroutine). 
   !  
   !  9. Yet another twist comes about when building an extended descriptor with 
   !     the psb_cdbldext subroutine. In this case we are reaching out 
