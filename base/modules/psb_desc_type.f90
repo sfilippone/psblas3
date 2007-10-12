@@ -200,7 +200,7 @@ module psb_descriptor_type
   !  8. When the descriptor is in the BLD state the INDEX vectors contains only 
   !     the indices to be received, organized as  a sequence 
   !     of entries of the form (proc,N,(lx1,lx2,...,lxn)) with owning process,
-  !     number of indices (most often N=1), list of local indices. 
+  !     number of indices (most often but not necessarily N=1), list of local indices.  
   !     This is because we only know the list of halo indices to be received 
   !     as we go about building the sparse matrix pattern, and we want the build 
   !     phase to be loosely synchronized. Thus we record the indices we have to ask 
