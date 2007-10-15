@@ -1,6 +1,10 @@
 Changelog. A lot less detailed than usual, at least for past
 history. 
 
+2007/10/15: Repackaged the sorting routines in a submodule of their
+	    own, while adding some heap managing utilities for the
+	    benefit of the multilevel preconditioners. 
+
 2007/09/28: Moved gelp and csrp to serial. Changed interface to
     	    sphalo: the new one makes more sense.
             Updated documentation. 
