@@ -483,7 +483,7 @@ Contains
         if (present(addsz)) then 
           isz = len+max(1,addsz)
         else
-          isz = len+1
+          isz = max(len+10, int(1.25*len))
         endif
       endif
       call psb_realloc(isz,v,info,pad=pad)
@@ -539,7 +539,7 @@ Contains
         if (present(addsz)) then 
           isz = len+max(1,addsz)
         else
-          isz = len+1
+          isz = max(len+10, int(1.25*len))
         endif
       endif
 
@@ -595,7 +595,7 @@ Contains
         if (present(addsz)) then 
           isz = len+max(1,addsz)
         else
-          isz = len+1
+          isz = max(len+10, int(1.25*len))
         endif
       endif
       call psb_realloc(isz,v,info,pad=pad)
