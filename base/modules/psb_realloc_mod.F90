@@ -456,7 +456,7 @@ Contains
   end function psb_zsize2d
 
 
-  Subroutine psb_icksz1d(len,v,info,pad)
+  Subroutine psb_icksz1d(len,v,info,pad,addsz,newsz)
     use psb_error_mod
 
     ! ...Subroutine Arguments  
@@ -464,6 +464,7 @@ Contains
     Integer,allocatable, intent(inout) :: v(:)
     integer         :: info
     integer, optional, intent(in) :: pad
+    integer, optional, intent(in) :: addsz,newsz
     ! ...Local Variables
     character(len=20)  :: name
     logical, parameter :: debug=.false.
@@ -476,7 +477,15 @@ Contains
     info=0
     
     If (len > psb_size(v)) Then
-      isz = max((3*psb_size(v))/2,(len+1))
+      if (present(newsz)) then 
+        isz = (max(len+1,newsz))
+      else
+        if (present(addsz)) then 
+          isz = len+max(1,addsz)
+        else
+          isz = len+1
+        endif
+      endif
       call psb_realloc(isz,v,info,pad=pad)
       
       if (info /= 0) then
@@ -503,13 +512,14 @@ Contains
   End Subroutine psb_icksz1d
 
 
-  Subroutine psb_dcksz1d(len,v,info,pad)
+  Subroutine psb_dcksz1d(len,v,info,pad,addsz,newsz)
     use psb_error_mod
 
     ! ...Subroutine Arguments  
     Integer,Intent(in)                 :: len
     real(kind(1.d0)),allocatable, intent(inout) :: v(:)
     integer         :: info
+    integer, optional, intent(in)          :: addsz,newsz
     real(kind(1.d0)), optional, intent(in) :: pad
     ! ...Local Variables
     character(len=20)  :: name
@@ -523,7 +533,16 @@ Contains
     info=0
     
     If (len > psb_size(v)) Then
-      isz = max((3*psb_size(v))/2,(len+1))
+      if (present(newsz)) then 
+        isz = (max(len+1,newsz))
+      else
+        if (present(addsz)) then 
+          isz = len+max(1,addsz)
+        else
+          isz = len+1
+        endif
+      endif
+
       call psb_realloc(isz,v,info,pad=pad)
       if (info /= 0) then
         info=4010
@@ -549,14 +568,15 @@ Contains
   End Subroutine psb_dcksz1d
 
 
-  Subroutine psb_zcksz1d(len,v,info,pad)
+  Subroutine psb_zcksz1d(len,v,info,pad,addsz,newsz)
     use psb_error_mod
 
     ! ...Subroutine Arguments  
-    Integer,Intent(in)                 :: len
+    Integer,Intent(in)                             :: len
     complex(kind(1.d0)),allocatable, intent(inout) :: v(:)
-    integer         :: info
-    complex(kind(1.d0)), optional, intent(in) :: pad
+    integer                                        :: info
+    integer, optional, intent(in)                  :: addsz,newsz
+    complex(kind(1.d0)), optional, intent(in)      :: pad
     ! ...Local Variables
     character(len=20)  :: name
     logical, parameter :: debug=.false.
@@ -569,7 +589,15 @@ Contains
     info=0
     
     If (len > psb_size(v)) Then
-      isz = max((3*psb_size(v))/2,(len+1))
+      if (present(newsz)) then 
+        isz = (max(len+1,newsz))
+      else
+        if (present(addsz)) then 
+          isz = len+max(1,addsz)
+        else
+          isz = len+1
+        endif
+      endif
       call psb_realloc(isz,v,info,pad=pad)
       if (info /= 0) then
         info=4010
