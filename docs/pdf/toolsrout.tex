@@ -1270,7 +1270,6 @@ An integer value; 0 means no error has been detected.
 
 
 
-
 \subroutine{psb\_sizeof}{Memory occupation}
 
 This function computes the memory occupation of a PSBLAS object.
@@ -1305,6 +1304,85 @@ Specified as: a preconditioner data structure \precdata.
 Scope: {\bf local} \\
 Returned  as: an integer number.
 \end{description}
+
+
+\subroutine{}{Sorting utilities}
+
+\subroutine*{psb\_msort}{Sorting by the Merge-sort algorithm}
+\subroutine*{psb\_qsort}{Sorting by the Quicksort  algorithm}
+\subroutine*{psb\_hsort}{Sorting by the Heapsort  algorithm}
+\syntax{call psb\_msort}{x,ix,dir,flag}
+\syntax*{call psb\_qsort}{x,ix,dir,flag}
+\syntax*{call psb\_hsort}{x,ix,dir,flag}
+
+These  serial routines sort a sequence $X$ into ascending or
+descending  order. The argument meaning is identical for the three
+calls; the only difference is the algorithm used to accomplish the
+task (see Usage Notes below). 
+\begin{description}
+\item[Type:] Asynchronous.
+\item[\bf  On Entry ]
+\item[x] The sequence to be sorted.\\
+Type:{\bf required}.\\
+Specified as: an integer, real or complex  array of rank 1.
+\item[ix] A vector of indices.\\
+Type:{\bf optional}.\\
+Specified as: an integer array of (at least) the same size as $X$.
+\item[dir] The desired ordering.\\
+Type:{\bf optional}.\\
+Specified as: an integer value: \verb|psb_sort_up_|,
+\verb|psb_sort_down_|, \verb|psb_asort_up_|, \verb|psb_asort_down_|;
+default \verb|psb_sort_up_|. 
+\item[flag] Whether to keep the original values in $IX$.\\
+Type:{\bf optional}.\\
+Specified as: an integer value \verb|psb_sort_ovw_idx_| or
+\verb|psb_sort_keep_idx_|; default \verb|psb_sort_ovw_idx_|.
+
+\end{description}
+
+\begin{description}
+\item[\bf On Return]
+\item[x] The sequence of values, in the chosen ordering.\\ 
+Type:{\bf required}.\\
+Specified as: an integer, real or complex array of rank 1.
+\item[ix] A vector of indices.\\
+Type: {\bf Optional} \\
+An integer array of rank 1, whose entries are moved to the same
+position as the corresponding entries in $x$.
+\end{description}
+\section*{Usage notes}
+\begin{enumerate}
+\item The sorting can be performed in the up/down direction; for
+  complex data the sorting must be done on the absolute values;
+\item The routines return the items in the chosen ordering; the
+  output difference is the handling of  ties (i.e. items with an
+  equal   value) in the original input. With the merge-sort algorithm
+  ties are   preserved in the same order as they had in the original
+  sequence,  while this is not guaranteed for quicksort;
+\item If $flag = psb\_sort\_ovw\_idx\_$ then the entries in $ix(1:n)$
+  where $n$ is the size of $x$ are initialized to $ix(i) \leftarrow
+  i$; thus, upon return from the subroutine, for each
+  index $i$ we have in $ix(i)$ the position that the item $x(i)$
+  occupied in the original data sequence;
+\item If $flag = psb\_sort\_keep\_idx\_$  the routine will assume that
+  the entries in $ix(:)$ have already been initialized by the user;
+\item The three sorting algorithms have a similar $O(n \log n)$ expected
+  running time; in the average case quicksort will be the
+  fastest and merge-sort the slowest. However note that:
+\begin{enumerate}
+\item The worst case running time for quicksort is $O(n^2)$; the algorithm
+  implemented here follows the well-known median-of-three heuristics,
+  but the worst case may still apply;
+\item The worst case running time for merge-sort and heap-sort is
+  $O(n\log n)$  as the average case;
+\item The merge-sort algorithm is implemented to take advantage of 
+  subsequences that may be already in the desired ordering prior to
+  the subroutine call; this situation is relatively common when
+  dealing with groups of indices of sparse matrix entries, thus
+  merge-sort is often the preferred  choice when a sorting is needed
+  by other routines in the library. 
+\end{enumerate}
+\end{enumerate}
 
 
 

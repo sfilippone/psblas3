@@ -209,7 +209,13 @@ contains
     Integer, Optional, Intent(out)     :: iter
     Real(Kind(1.d0)), Optional, Intent(out) :: err
 
-    integer                            :: ictxt,me,np
+    integer                            :: ictxt,me,np,err_act
+    character(len=20)             :: name
+
+    info = 0
+    name = 'psb_krylov'
+    call psb_erractionsave(err_act)
+
 
     ictxt=psb_cd_get_context(desc_a)
     
@@ -240,6 +246,21 @@ contains
       call  psb_bicgstab(a,prec,b,x,eps,desc_a,info,&
          &itmax,iter,err,itrace,istop)
     end select
+
+    if(info/=0) then
+      call psb_errpush(info,name)
+      goto 9999
+    end if
+    
+    call psb_erractionrestore(err_act)
+    return
+    
+9999 continue
+    call psb_erractionrestore(err_act)
+    if (err_act.eq.psb_act_abort_) then
+      call psb_error(ictxt)
+      return
+    end if
     
   end subroutine psb_dkrylov
 
@@ -260,7 +281,13 @@ contains
     Integer, Optional, Intent(out)     :: iter
     Real(Kind(1.d0)), Optional, Intent(out) :: err
 
-    integer                            :: ictxt,me,np
+    integer                            :: ictxt,me,np,err_act
+    character(len=20)             :: name
+
+    info = 0
+    name = 'psb_krylov'
+    call psb_erractionsave(err_act)
+
 
     ictxt=psb_cd_get_context(desc_a)
     
@@ -292,9 +319,23 @@ contains
       call  psb_bicgstab(a,prec,b,x,eps,desc_a,info,&
          &itmax,iter,err,itrace,istop)
     end select
+
+    if(info/=0) then
+      call psb_errpush(info,name)
+      goto 9999
+    end if
+    
+    call psb_erractionrestore(err_act)
+    return
+    
+9999 continue
+    call psb_erractionrestore(err_act)
+    if (err_act.eq.psb_act_abort_) then
+      call psb_error(ictxt)
+      return
+    end if
     
   end subroutine psb_zkrylov
-
 
 
 end module psb_krylov_mod

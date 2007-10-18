@@ -31,6 +31,10 @@
 module psb_sort_mod
 
 
+  ! 
+  !  The up/down constant are defined in pairs having 
+  !  opposite values. We make use of this fact in the heapsort routine.
+  !
   integer, parameter :: psb_sort_up_=1,      psb_sort_down_=-1
   integer, parameter :: psb_lsort_up_=2,     psb_lsort_down_=-2
   integer, parameter :: psb_asort_up_=3,     psb_asort_down_=-3
@@ -59,7 +63,7 @@ module psb_sort_mod
   end type psb_dcomplex_idx_heap
 
   interface psb_msort
-    module procedure imsort
+    module procedure imsort, dmsort, zamsort
   end interface
 
   interface psb_msort_unique
@@ -68,6 +72,10 @@ module psb_sort_mod
 
   interface psb_qsort
     module procedure iqsort, dqsort, zqsort
+  end interface
+
+  interface psb_hsort
+    module procedure ihsort, dhsort, zhsort
   end interface
 
   interface psb_init_heap
@@ -156,6 +164,126 @@ contains
       return
     end if
   end subroutine imsort
+
+
+  subroutine dmsort(x,ix,dir,flag)
+    use psb_error_mod
+    implicit none 
+    real(kind(1.d0)), intent(inout)  :: x(:) 
+    integer, optional, intent(in)    :: dir, flag
+    integer, optional, intent(inout) :: ix(:)
+    
+    integer  :: dir_, flag_, n, err_act
+    
+    character(len=20)  :: name
+
+    name='psb_msort'
+    call psb_erractionsave(err_act)
+
+    if (present(dir)) then 
+      dir_ = dir
+    else
+      dir_= psb_sort_up_
+    end if
+    select case(dir_) 
+    case( psb_sort_up_, psb_sort_down_)
+      ! OK keep going
+    case default
+      call psb_errpush(30,name,i_err=(/3,dir_,0,0,0/))
+      goto 9999
+    end select
+      
+    n = size(x)
+ 
+    if (present(ix)) then 
+      if (size(ix) < n) then 
+        call psb_errpush(35,name,i_err=(/2,size(ix),0,0,0/))
+        goto 9999
+      end if
+      if (present(flag)) then 
+        flag_ = flag
+      else 
+        flag_ = psb_sort_ovw_idx_
+      end if
+      select case(flag_) 
+      case( psb_sort_ovw_idx_, psb_sort_keep_idx_)
+        ! OK keep going
+      case default
+        call psb_errpush(30,name,i_err=(/4,flag_,0,0,0/))
+        goto 9999
+      end select
+
+      call dmsrx(n,x,ix,dir_,flag_)
+    else
+      call dmsr(n,x,dir_)
+    end if
+
+9999 continue 
+    if (err_act.eq.psb_act_abort_) then
+      call psb_error()
+      return
+    end if
+  end subroutine dmsort
+
+  subroutine zamsort(x,ix,dir,flag)
+    use psb_error_mod
+    implicit none 
+    complex(kind(1.d0)), intent(inout)  :: x(:) 
+    integer, optional, intent(in)    :: dir, flag
+    integer, optional, intent(inout) :: ix(:)
+    
+    integer  :: dir_, flag_, n, err_act
+    
+    character(len=20)  :: name
+
+    name='psb_msort'
+    call psb_erractionsave(err_act)
+
+    if (present(dir)) then 
+      dir_ = dir
+    else
+      dir_= psb_asort_up_
+    end if
+    select case(dir_) 
+    case( psb_asort_up_, psb_asort_down_)
+      ! OK keep going
+    case default
+      call psb_errpush(30,name,i_err=(/3,dir_,0,0,0/))
+      goto 9999
+    end select
+      
+    n = size(x)
+ 
+    if (present(ix)) then 
+      if (size(ix) < n) then 
+        call psb_errpush(35,name,i_err=(/2,size(ix),0,0,0/))
+        goto 9999
+      end if
+      if (present(flag)) then 
+        flag_ = flag
+      else 
+        flag_ = psb_sort_ovw_idx_
+      end if
+      select case(flag_) 
+      case( psb_sort_ovw_idx_, psb_sort_keep_idx_)
+        ! OK keep going
+      case default
+        call psb_errpush(30,name,i_err=(/4,flag_,0,0,0/))
+        goto 9999
+      end select
+
+      call zamsrx(n,x,ix,dir_,flag_)
+    else
+      call zamsr(n,x,dir_)
+    end if
+
+9999 continue 
+    if (err_act.eq.psb_act_abort_) then
+      call psb_error()
+      return
+    end if
+  end subroutine zamsort
+
 
   subroutine imsort_u(x,nout,dir)
     use psb_error_mod
@@ -439,6 +567,332 @@ contains
 
 
 
+
+  subroutine ihsort(x,ix,dir,flag)
+    use psb_error_mod
+    implicit none 
+    integer, intent(inout)           :: x(:) 
+    integer, optional, intent(in)    :: dir, flag
+    integer, optional, intent(inout) :: ix(:)
+    
+    integer  :: dir_, flag_, n, i, l, err_act,info
+    integer  :: key
+    integer  :: index
+    
+    character(len=20)  :: name
+
+    name='psb_hsort'
+    call psb_erractionsave(err_act)
+
+    if (present(flag)) then 
+      flag_ = flag
+    else 
+      flag_ = psb_sort_ovw_idx_
+    end if
+    select case(flag_) 
+    case( psb_sort_ovw_idx_, psb_sort_keep_idx_)
+      ! OK keep going
+    case default
+      call psb_errpush(30,name,i_err=(/4,flag_,0,0,0/))
+      goto 9999
+    end select
+    
+    if (present(dir)) then 
+      dir_ = dir
+    else
+      dir_= psb_sort_up_
+    end if
+    
+    select case(dir_)
+    case(psb_sort_up_,psb_sort_down_,psb_asort_up_,psb_asort_down_) 
+      ! OK
+    case default
+      call psb_errpush(30,name,i_err=(/3,dir_,0,0,0/))
+      goto 9999
+    end select
+
+    n = size(x)
+
+    !
+    ! Dirty trick to sort with heaps: if we want 
+    ! to sort in place upwards, first we set up a heap so that
+    ! we can easily get the LARGEST element, then we take it out 
+    ! and put it in the last entry, and so on. 
+    ! So,  we invert dir_!
+    !
+    dir_ = -dir_ 
+    
+    if (present(ix)) then 
+      if (size(ix) < n) then 
+        call psb_errpush(35,name,i_err=(/2,size(ix),0,0,0/))
+        goto 9999
+      end if
+      if (flag_==psb_sort_ovw_idx_) then 
+        do i=1, n
+          ix(i) = i
+        end do
+      end if
+      l = 0
+      do i=1, n 
+        key   = x(i)
+        index = ix(i)
+        call psi_insert_int_idx_heap(key,index,l,x,ix,dir_,info)
+        if (l /= i) then 
+          write(0,*) 'Mismatch while heapifying ! '
+        end if
+      end do
+      do i=n, 2, -1 
+        call psi_int_idx_heap_get_first(key,index,l,x,ix,dir_,info)
+        if (l /= i-1) then 
+          write(0,*) 'Mismatch while pulling out of heap ',l,i
+        end if
+        x(i)  = key
+        ix(i) = index
+      end do
+    else if (.not.present(ix)) then 
+      l = 0
+      do i=1, n 
+        key   = x(i)
+        call psi_insert_int_heap(key,l,x,dir_,info)
+        if (l /= i) then 
+          write(0,*) 'Mismatch while heapifying ! ',l,i
+        end if
+      end do
+      do i=n, 2, -1 
+        call psi_int_heap_get_first(key,l,x,dir_,info)
+        if (l /= i-1) then 
+          write(0,*) 'Mismatch while pulling out of heap ',l,i
+        end if
+        x(i)  = key
+      end do        
+    end if
+    
+
+9999 continue 
+    if (err_act.eq.psb_act_abort_) then
+      call psb_error()
+      return
+    end if
+  end subroutine ihsort
+
+
+  subroutine dhsort(x,ix,dir,flag)
+    use psb_error_mod
+    implicit none 
+    real(kind(1.d0)), intent(inout)  :: x(:) 
+    integer, optional, intent(in)    :: dir, flag
+    integer, optional, intent(inout) :: ix(:)
+    
+    integer          :: dir_, flag_, n, i, l, err_act,info
+    real(kind(1.d0)) :: key
+    integer          :: index
+    
+    character(len=20)  :: name
+
+    name='psb_hsort'
+    call psb_erractionsave(err_act)
+
+    if (present(flag)) then 
+      flag_ = flag
+    else 
+      flag_ = psb_sort_ovw_idx_
+    end if
+    select case(flag_) 
+    case( psb_sort_ovw_idx_, psb_sort_keep_idx_)
+      ! OK keep going
+    case default
+      call psb_errpush(30,name,i_err=(/4,flag_,0,0,0/))
+      goto 9999
+    end select
+    
+    if (present(dir)) then 
+      dir_ = dir
+    else
+      dir_= psb_sort_up_
+    end if
+    
+    select case(dir_)
+    case(psb_sort_up_,psb_sort_down_,psb_asort_up_,psb_asort_down_) 
+      ! OK
+    case default
+      call psb_errpush(30,name,i_err=(/3,dir_,0,0,0/))
+      goto 9999
+    end select
+
+    n = size(x)
+
+    !
+    ! Dirty trick to sort with heaps: if we want 
+    ! to sort in place upwards, first we set up a heap so that
+    ! we can easily get the LARGEST element, then we take it out 
+    ! and put it in the last entry, and so on. 
+    ! So,  we invert dir_!
+    !
+    dir_ = -dir_ 
+    
+    if (present(ix)) then 
+      if (size(ix) < n) then 
+        call psb_errpush(35,name,i_err=(/2,size(ix),0,0,0/))
+        goto 9999
+      end if
+      if (flag_==psb_sort_ovw_idx_) then 
+        do i=1, n
+          ix(i) = i
+        end do
+      end if
+      l = 0
+      do i=1, n 
+        key   = x(i)
+        index = ix(i)
+        call psi_insert_double_idx_heap(key,index,l,x,ix,dir_,info)
+        if (l /= i) then 
+          write(0,*) 'Mismatch while heapifying ! '
+        end if
+      end do
+      do i=n, 2, -1 
+        call psi_double_idx_heap_get_first(key,index,l,x,ix,dir_,info)
+        if (l /= i-1) then 
+          write(0,*) 'Mismatch while pulling out of heap ',l,i
+        end if
+        x(i)  = key
+        ix(i) = index
+      end do
+    else if (.not.present(ix)) then 
+      l = 0
+      do i=1, n 
+        key   = x(i)
+        call psi_insert_double_heap(key,l,x,dir_,info)
+        if (l /= i) then 
+          write(0,*) 'Mismatch while heapifying ! ',l,i
+        end if
+      end do
+      do i=n, 2, -1 
+        call psi_double_heap_get_first(key,l,x,dir_,info)
+        if (l /= i-1) then 
+          write(0,*) 'Mismatch while pulling out of heap ',l,i
+        end if
+        x(i)  = key
+      end do        
+    end if
+    
+
+9999 continue 
+    if (err_act.eq.psb_act_abort_) then
+      call psb_error()
+      return
+    end if
+  end subroutine dhsort
+
+
+  subroutine zhsort(x,ix,dir,flag)
+    use psb_error_mod
+    implicit none 
+    complex(kind(1.d0)), intent(inout) :: x(:) 
+    integer, optional, intent(in)      :: dir, flag
+    integer, optional, intent(inout)   :: ix(:)
+    
+    integer             :: dir_, flag_, n, i, l, err_act,info
+    complex(kind(1.d0)) :: key
+    integer             :: index
+    
+    character(len=20)  :: name
+
+    name='psb_hsort'
+    call psb_erractionsave(err_act)
+
+    if (present(flag)) then 
+      flag_ = flag
+    else 
+      flag_ = psb_sort_ovw_idx_
+    end if
+    select case(flag_) 
+    case( psb_sort_ovw_idx_, psb_sort_keep_idx_)
+      ! OK keep going
+    case default
+      call psb_errpush(30,name,i_err=(/4,flag_,0,0,0/))
+      goto 9999
+    end select
+    
+    if (present(dir)) then 
+      dir_ = dir
+    else
+      dir_= psb_asort_up_
+    end if
+    
+    select case(dir_)
+    case(psb_asort_up_,psb_asort_down_) 
+      ! OK
+    case default
+      call psb_errpush(30,name,i_err=(/3,dir_,0,0,0/))
+      goto 9999
+    end select
+    
+    n = size(x)
+
+    !
+    ! Dirty trick to sort with heaps: if we want 
+    ! to sort in place upwards, first we set up a heap so that
+    ! we can easily get the LARGEST element, then we take it out 
+    ! and put it in the last entry, and so on. 
+    ! So,  we invert dir_!
+    !
+    dir_ = -dir_ 
+    
+    if (present(ix)) then 
+      if (size(ix) < n) then 
+        call psb_errpush(35,name,i_err=(/2,size(ix),0,0,0/))
+        goto 9999
+      end if
+      if (flag_==psb_sort_ovw_idx_) then 
+        do i=1, n
+          ix(i) = i
+        end do
+      end if
+      l = 0
+      do i=1, n 
+        key   = x(i)
+        index = ix(i)
+        call psi_insert_dcomplex_idx_heap(key,index,l,x,ix,dir_,info)
+        if (l /= i) then 
+          write(0,*) 'Mismatch while heapifying ! '
+        end if
+      end do
+      do i=n, 2, -1 
+        call psi_dcomplex_idx_heap_get_first(key,index,l,x,ix,dir_,info)
+        if (l /= i-1) then 
+          write(0,*) 'Mismatch while pulling out of heap ',l,i
+        end if
+        x(i)  = key
+        ix(i) = index
+      end do
+    else if (.not.present(ix)) then 
+      l = 0
+      do i=1, n 
+        key   = x(i)
+        call psi_insert_dcomplex_heap(key,l,x,dir_,info)
+        if (l /= i) then 
+          write(0,*) 'Mismatch while heapifying ! ',l,i
+        end if
+      end do
+      do i=n, 2, -1 
+        call psi_dcomplex_heap_get_first(key,l,x,dir_,info)
+        if (l /= i-1) then 
+          write(0,*) 'Mismatch while pulling out of heap ',l,i
+        end if
+        x(i)  = key
+      end do        
+    end if
+    
+
+9999 continue 
+    if (err_act.eq.psb_act_abort_) then
+      call psb_error()
+      return
+    end if
+  end subroutine zhsort
+
+
+
   function  psb_howmany_int_heap(heap)
     implicit none 
     type(psb_int_heap), intent(in) :: heap
@@ -513,84 +967,14 @@ contains
       return
     endif
 
-    heap%last = heap%last + 1
-    call psb_ensure_size(heap%last,heap%keys,info,addsz=psb_heap_resize)
+    heap%last = heap%last 
+    call psb_ensure_size(heap%last+1,heap%keys,info,addsz=psb_heap_resize)
     if (info /= 0) then 
       write(0,*) 'Memory allocation failure in heap_insert'
       info = -5
       return
     end if
-
-    i            = heap%last
-    heap%keys(i) = key
-    
-    select case(heap%dir)
-    case (psb_sort_up_)
-
-      do 
-        if (i<=1) exit
-        i2 = i/2
-        if (heap%keys(i) < heap%keys(i2)) then 
-          temp          = heap%keys(i)
-          heap%keys(i)  = heap%keys(i2)
-          heap%keys(i2) = temp
-          i             = i2
-        else
-          exit
-        end if
-      end do
-      
-          
-    case (psb_sort_down_)
-
-      do 
-        if (i<=1) exit
-        i2 = i/2
-        if (heap%keys(i) > heap%keys(i2)) then 
-          temp          = heap%keys(i)
-          heap%keys(i)  = heap%keys(i2)
-          heap%keys(i2) = temp
-          i             = i2
-        else
-          exit
-        end if
-      end do
-
-    case (psb_asort_up_)
-
-      do 
-        if (i<=1) exit
-        i2 = i/2
-        if (abs(heap%keys(i)) < abs(heap%keys(i2))) then 
-          temp          = heap%keys(i)
-          heap%keys(i)  = heap%keys(i2)
-          heap%keys(i2) = temp
-          i             = i2
-        else
-          exit
-        end if
-      end do
-      
-          
-    case (psb_asort_down_)
-
-      do 
-        if (i<=1) exit
-        i2 = i/2
-        if (abs(heap%keys(i)) > abs(heap%keys(i2))) then 
-          temp          = heap%keys(i)
-          heap%keys(i)  = heap%keys(i2)
-          heap%keys(i2) = temp
-          i             = i2
-        else
-          exit
-        end if
-      end do
-      
-
-    case default
-      write(0,*) 'Invalid direction in heap ',heap%dir
-    end select
+    call  psi_insert_int_heap(key,heap%last,heap%keys,heap%dir,info)
 
     return
   end subroutine psb_insert_int_heap
@@ -607,111 +991,8 @@ contains
 
     
     info = 0
-    if (heap%last <= 0) then 
-      key  = 0
-      info = -1
-      return
-    endif
 
-    key          = heap%keys(1)
-    heap%keys(1) = heap%keys(heap%last)
-    heap%last    = heap%last - 1
-    last         = heap%last
-
-    select case(heap%dir)
-    case (psb_sort_up_)
-
-      i = 1
-      do 
-        if (i > (last/2)) exit
-        if ( (heap%keys(2*i) < heap%keys(2*i+1)) .or.&
-             & (2*i == last)) then 
-          j = 2*i
-        else
-          j = 2*i + 1
-        end if
-
-        if (heap%keys(i) > heap%keys(j)) then 
-          temp          = heap%keys(i)
-          heap%keys(i)  = heap%keys(j)
-          heap%keys(j)  = temp
-          i             = j 
-        else
-          exit
-        end if
-      end do
-      
-          
-    case (psb_sort_down_)
-
-      i = 1
-      do 
-        if (i > (last/2)) exit
-        if ( (heap%keys(2*i) > heap%keys(2*i+1)) .or.&
-             & (2*i == last)) then 
-          j = 2*i
-        else
-          j = 2*i + 1
-        end if
-
-        if (heap%keys(i) < heap%keys(j)) then 
-          temp          = heap%keys(i)
-          heap%keys(i)  = heap%keys(j)
-          heap%keys(j)  = temp
-          i             = j 
-        else
-          exit
-        end if
-      end do
-
-    case (psb_asort_up_)
-
-      i = 1
-      do 
-        if (i > (last/2)) exit
-        if ( (abs(heap%keys(2*i)) < abs(heap%keys(2*i+1))) .or.&
-             & (2*i == last)) then 
-          j = 2*i
-        else
-          j = 2*i + 1
-        end if
-
-        if (abs(heap%keys(i)) > abs(heap%keys(j))) then 
-          temp          = heap%keys(i)
-          heap%keys(i)  = heap%keys(j)
-          heap%keys(j)  = temp
-          i             = j 
-        else
-          exit
-        end if
-      end do
-      
-          
-    case (psb_asort_down_)
-
-      i = 1
-      do 
-        if (i > (last/2)) exit
-        if ( (abs(heap%keys(2*i)) > abs(heap%keys(2*i+1))) .or.&
-             & (2*i == last)) then 
-          j = 2*i
-        else
-          j = 2*i + 1
-        end if
-        
-        if (abs(heap%keys(i)) < abs(heap%keys(j))) then 
-          temp          = heap%keys(i)
-          heap%keys(i)  = heap%keys(j)
-          heap%keys(j)  = temp
-          i             = j 
-        else
-          exit
-        end if
-      end do
-
-    case default
-      write(0,*) 'Invalid direction in heap ',heap%dir
-    end select
+    call psi_int_heap_get_first(key,heap%last,heap%keys,heap%dir,info)
 
     return
   end subroutine psb_int_heap_get_first
@@ -798,99 +1079,17 @@ contains
       return
     endif
 
-    heap%last = heap%last + 1
-    call psb_ensure_size(heap%last,heap%keys,info,addsz=psb_heap_resize)
+    call psb_ensure_size(heap%last+1,heap%keys,info,addsz=psb_heap_resize)
     if (info == 0) &
-         & call psb_ensure_size(heap%last,heap%idxs,info,addsz=psb_heap_resize)
+         & call psb_ensure_size(heap%last+1,heap%idxs,info,addsz=psb_heap_resize)
     if (info /= 0) then 
       write(0,*) 'Memory allocation failure in heap_insert'
       info = -5
       return
     end if
     
-    i            = heap%last
-    heap%keys(i) = key
-    heap%idxs(i) = index
-
-    select case(heap%dir)
-    case (psb_sort_up_)
-
-      do 
-        if (i<=1) exit
-        i2 = i/2
-        if (heap%keys(i) < heap%keys(i2)) then 
-          itemp         = heap%idxs(i)
-          heap%idxs(i)  = heap%idxs(i2)
-          heap%idxs(i2) = itemp
-          temp          = heap%keys(i)
-          heap%keys(i)  = heap%keys(i2)
-          heap%keys(i2) = temp 
-          i             = i2
-        else
-          exit
-        end if
-      end do
-      
-          
-    case (psb_sort_down_)
-
-      do 
-        if (i<=1) exit
-        i2 = i/2
-        if (heap%keys(i) > heap%keys(i2)) then 
-          itemp         = heap%idxs(i)
-          heap%idxs(i)  = heap%idxs(i2)
-          heap%idxs(i2) = itemp
-          temp          = heap%keys(i)
-          heap%keys(i)  = heap%keys(i2)
-          heap%keys(i2) = temp 
-          i             = i2
-        else
-          exit
-        end if
-      end do
-      
-    case (psb_asort_up_)
-
-      do 
-        if (i<=1) exit
-        i2 = i/2
-        if (abs(heap%keys(i)) < abs(heap%keys(i2))) then 
-          itemp         = heap%idxs(i)
-          heap%idxs(i)  = heap%idxs(i2)
-          heap%idxs(i2) = itemp
-          temp          = heap%keys(i)
-          heap%keys(i)  = heap%keys(i2)
-          heap%keys(i2) = temp
-          i             = i2
-        else
-          exit
-        end if
-      end do
-      
-          
-    case (psb_asort_down_)
-
-      do 
-        if (i<=1) exit
-        i2 = i/2
-        if (abs(heap%keys(i)) > abs(heap%keys(i2))) then 
-          itemp         = heap%idxs(i)
-          heap%idxs(i)  = heap%idxs(i2)
-          heap%idxs(i2) = itemp
-          temp          = heap%keys(i)
-          heap%keys(i)  = heap%keys(i2)
-          heap%keys(i2) = temp 
-          i             = i2
-        else
-          exit
-        end if
-      end do
-      
-
-    case default
-      write(0,*) 'Invalid direction in heap ',heap%dir
-    end select
+    call psi_insert_double_idx_heap(key,index,&
+         & heap%last,heap%keys,heap%idxs,heap%dir,info)
 
     return
   end subroutine psb_insert_double_idx_heap
@@ -907,125 +1106,9 @@ contains
 
     
     info = 0
-    if (heap%last <= 0) then 
-      key  = 0
-      info = -1
-      return
-    endif
 
-    key          = heap%keys(1)
-    index        = heap%idxs(1)
-    heap%keys(1) = heap%keys(heap%last)
-    heap%idxs(1) = heap%idxs(heap%last)
-    heap%last    = heap%last - 1
-    last         = heap%last
-
-    select case(heap%dir)
-    case (psb_sort_up_)
-
-      i = 1
-      do 
-        if (i > (last/2)) exit
-        if ( (heap%keys(2*i) < heap%keys(2*i+1)) .or.&
-             & (2*i == last)) then 
-          j = 2*i
-        else
-          j = 2*i + 1
-        end if
-
-        if (heap%keys(i) > heap%keys(j)) then 
-          itemp         = heap%idxs(i)
-          heap%idxs(i)  = heap%idxs(j)
-          heap%idxs(j)  = itemp
-          temp          = heap%keys(i)
-          heap%keys(i)  = heap%keys(j)
-          heap%keys(j)  = temp 
-          i             = j 
-        else
-          exit
-        end if
-      end do
-      
-          
-    case (psb_sort_down_)
-
-      i = 1
-      do 
-        if (i > (last/2)) exit
-        if ( (heap%keys(2*i) > heap%keys(2*i+1)) .or.&
-             & (2*i == last)) then 
-          j = 2*i
-        else
-          j = 2*i + 1
-        end if
-
-        if (heap%keys(i) < heap%keys(j)) then 
-          itemp         = heap%idxs(i)
-          heap%idxs(i)  = heap%idxs(j)
-          heap%idxs(j)  = itemp
-          temp          = heap%keys(i)
-          heap%keys(i)  = heap%keys(j)
-          heap%keys(j)  = temp 
-          i             = j 
-        else
-          exit
-        end if
-      end do
-
-    case (psb_asort_up_)
-
-      i = 1
-      do 
-        if (i > (last/2)) exit
-        if ( (abs(heap%keys(2*i)) < abs(heap%keys(2*i+1))) .or.&
-             & (2*i == last)) then 
-          j = 2*i
-        else
-          j = 2*i + 1
-        end if
-
-        if (abs(heap%keys(i)) > abs(heap%keys(j))) then 
-          itemp         = heap%idxs(i)
-          heap%idxs(i)  = heap%idxs(j)
-          heap%idxs(j)  = itemp
-          temp          = heap%keys(i)
-          heap%keys(i)  = heap%keys(j)
-          heap%keys(j)  = temp 
-          i             = j 
-        else
-          exit
-        end if
-      end do
-      
-          
-    case (psb_asort_down_)
-
-      i = 1
-      do 
-        if (i > (last/2)) exit
-        if ( (abs(heap%keys(2*i)) > abs(heap%keys(2*i+1))) .or.&
-             & (2*i == last)) then 
-          j = 2*i
-        else
-          j = 2*i + 1
-        end if
-
-        if (abs(heap%keys(i)) < abs(heap%keys(j))) then 
-          itemp         = heap%idxs(i)
-          heap%idxs(i)  = heap%idxs(j)
-          heap%idxs(j)  = itemp
-          temp          = heap%keys(i)
-          heap%keys(i)  = heap%keys(j)
-          heap%keys(j)  = temp 
-          i             = j 
-        else
-          exit
-        end if
-      end do
-
-    case default
-      write(0,*) 'Invalid direction in heap ',heap%dir
-    end select
+    call psi_double_idx_heap_get_first(key,index,&
+         & heap%last,heap%keys,heap%idxs,heap%dir,info)
 
     return
   end subroutine psb_double_idx_heap_get_first
@@ -1110,99 +1193,17 @@ contains
       return
     endif
 
-    heap%last = heap%last + 1
-    call psb_ensure_size(heap%last,heap%keys,info,addsz=psb_heap_resize)
+    call psb_ensure_size(heap%last+1,heap%keys,info,addsz=psb_heap_resize)
     if (info == 0) &
-         & call psb_ensure_size(heap%last,heap%idxs,info,addsz=psb_heap_resize)
+         & call psb_ensure_size(heap%last+1,heap%idxs,info,addsz=psb_heap_resize)
     if (info /= 0) then 
       write(0,*) 'Memory allocation failure in heap_insert'
       info = -5
       return
     end if
-    
-    i            = heap%last
-    heap%keys(i) = key
-    heap%idxs(i) = index
 
-    select case(heap%dir)
-    case (psb_sort_up_)
-
-      do 
-        if (i<=1) exit
-        i2 = i/2
-        if (heap%keys(i) < heap%keys(i2)) then 
-          itemp         = heap%idxs(i)
-          heap%idxs(i)  = heap%idxs(i2)
-          heap%idxs(i2) = itemp
-          temp          = heap%keys(i)
-          heap%keys(i)  = heap%keys(i2)
-          heap%keys(i2) = temp 
-          i             = i2
-        else
-          exit
-        end if
-      end do
-      
-          
-    case (psb_sort_down_)
-
-      do 
-        if (i<=1) exit
-        i2 = i/2
-        if (heap%keys(i) > heap%keys(i2)) then 
-          itemp         = heap%idxs(i)
-          heap%idxs(i)  = heap%idxs(i2)
-          heap%idxs(i2) = itemp
-          temp          = heap%keys(i)
-          heap%keys(i)  = heap%keys(i2)
-          heap%keys(i2) = temp 
-          i             = i2
-        else
-          exit
-        end if
-      end do
-      
-    case (psb_asort_up_)
-
-      do 
-        if (i<=1) exit
-        i2 = i/2
-        if (abs(heap%keys(i)) < abs(heap%keys(i2))) then 
-          itemp         = heap%idxs(i)
-          heap%idxs(i)  = heap%idxs(i2)
-          heap%idxs(i2) = itemp
-          temp          = heap%keys(i)
-          heap%keys(i)  = heap%keys(i2)
-          heap%keys(i2) = temp
-          i             = i2
-        else
-          exit
-        end if
-      end do
-      
-          
-    case (psb_asort_down_)
-
-      do 
-        if (i<=1) exit
-        i2 = i/2
-        if (abs(heap%keys(i)) > abs(heap%keys(i2))) then 
-          itemp         = heap%idxs(i)
-          heap%idxs(i)  = heap%idxs(i2)
-          heap%idxs(i2) = itemp
-          temp          = heap%keys(i)
-          heap%keys(i)  = heap%keys(i2)
-          heap%keys(i2) = temp 
-          i             = i2
-        else
-          exit
-        end if
-      end do
-      
-
-    case default
-      write(0,*) 'Invalid direction in heap ',heap%dir
-    end select
+    call psi_insert_int_idx_heap(key,index,&
+         & heap%last,heap%keys,heap%idxs,heap%dir,info)
 
     return
   end subroutine psb_insert_int_idx_heap
@@ -1219,125 +1220,9 @@ contains
 
     
     info = 0
-    if (heap%last <= 0) then 
-      key  = 0
-      info = -1
-      return
-    endif
-
-    key          = heap%keys(1)
-    index        = heap%idxs(1)
-    heap%keys(1) = heap%keys(heap%last)
-    heap%idxs(1) = heap%idxs(heap%last)
-    heap%last    = heap%last - 1
-    last         = heap%last
-
-    select case(heap%dir)
-    case (psb_sort_up_)
-
-      i = 1
-      do 
-        if (i > (last/2)) exit
-        if ( (heap%keys(2*i) < heap%keys(2*i+1)) .or.&
-             & (2*i == last)) then 
-          j = 2*i
-        else
-          j = 2*i + 1
-        end if
-
-        if (heap%keys(i) > heap%keys(j)) then 
-          itemp         = heap%idxs(i)
-          heap%idxs(i)  = heap%idxs(j)
-          heap%idxs(j)  = itemp
-          temp          = heap%keys(i)
-          heap%keys(i)  = heap%keys(j)
-          heap%keys(j)  = temp 
-          i             = j 
-        else
-          exit
-        end if
-      end do
-      
-          
-    case (psb_sort_down_)
-
-      i = 1
-      do 
-        if (i > (last/2)) exit
-        if ( (heap%keys(2*i) > heap%keys(2*i+1)) .or.&
-             & (2*i == last)) then 
-          j = 2*i
-        else
-          j = 2*i + 1
-        end if
-
-        if (heap%keys(i) < heap%keys(j)) then 
-          itemp         = heap%idxs(i)
-          heap%idxs(i)  = heap%idxs(j)
-          heap%idxs(j)  = itemp
-          temp          = heap%keys(i)
-          heap%keys(i)  = heap%keys(j)
-          heap%keys(j)  = temp 
-          i             = j 
-        else
-          exit
-        end if
-      end do
-
-    case (psb_asort_up_)
-
-      i = 1
-      do 
-        if (i > (last/2)) exit
-        if ( (abs(heap%keys(2*i)) < abs(heap%keys(2*i+1))) .or.&
-             & (2*i == last)) then 
-          j = 2*i
-        else
-          j = 2*i + 1
-        end if
-
-        if (abs(heap%keys(i)) > abs(heap%keys(j))) then 
-          itemp         = heap%idxs(i)
-          heap%idxs(i)  = heap%idxs(j)
-          heap%idxs(j)  = itemp
-          temp          = heap%keys(i)
-          heap%keys(i)  = heap%keys(j)
-          heap%keys(j)  = temp 
-          i             = j 
-        else
-          exit
-        end if
-      end do
-      
-          
-    case (psb_asort_down_)
-
-      i = 1
-      do 
-        if (i > (last/2)) exit
-        if ( (abs(heap%keys(2*i)) > abs(heap%keys(2*i+1))) .or.&
-             & (2*i == last)) then 
-          j = 2*i
-        else
-          j = 2*i + 1
-        end if
-
-        if (abs(heap%keys(i)) < abs(heap%keys(j))) then 
-          itemp         = heap%idxs(i)
-          heap%idxs(i)  = heap%idxs(j)
-          heap%idxs(j)  = itemp
-          temp          = heap%keys(i)
-          heap%keys(i)  = heap%keys(j)
-          heap%keys(j)  = temp 
-          i             = j 
-        else
-          exit
-        end if
-      end do
-
-    case default
-      write(0,*) 'Invalid direction in heap ',heap%dir
-    end select
+    
+    call psi_int_idx_heap_get_first(key,index,&
+         & heap%last,heap%keys,heap%idxs,heap%dir,info)
 
     return
   end subroutine psb_int_idx_heap_get_first
@@ -1425,100 +1310,17 @@ contains
       return
     endif
 
-    heap%last = heap%last + 1
-    call psb_ensure_size(heap%last,heap%keys,info,addsz=psb_heap_resize)
+    call psb_ensure_size(heap%last+1,heap%keys,info,addsz=psb_heap_resize)
     if (info == 0) &
-         & call psb_ensure_size(heap%last,heap%idxs,info,addsz=psb_heap_resize)
+         & call psb_ensure_size(heap%last+1,heap%idxs,info,addsz=psb_heap_resize)
     if (info /= 0) then 
       write(0,*) 'Memory allocation failure in heap_insert'
       info = -5
       return
     end if
+    call psi_insert_dcomplex_idx_heap(key,index,&
+         & heap%last,heap%keys,heap%idxs,heap%dir,info)
     
-    i            = heap%last
-    heap%keys(i) = key
-    heap%idxs(i) = index
-
-    select case(heap%dir)
-!!$    case (psb_sort_up_)
-!!$
-!!$      do 
-!!$        if (i<=1) exit
-!!$        i2 = i/2
-!!$        if (heap%keys(i) < heap%keys(i2)) then 
-!!$          itemp         = heap%idxs(i)
-!!$          heap%idxs(i)  = heap%idxs(i2)
-!!$          heap%idxs(i2) = itemp
-!!$          temp          = heap%keys(i)
-!!$          heap%keys(i)  = heap%keys(i2)
-!!$          heap%keys(i2) = temp 
-!!$          i             = i2
-!!$        else
-!!$          exit
-!!$        end if
-!!$      end do
-!!$      
-!!$          
-!!$    case (psb_sort_down_)
-!!$
-!!$      do 
-!!$        if (i<=1) exit
-!!$        i2 = i/2
-!!$        if (heap%keys(i) > heap%keys(i2)) then 
-!!$          itemp         = heap%idxs(i)
-!!$          heap%idxs(i)  = heap%idxs(i2)
-!!$          heap%idxs(i2) = itemp
-!!$          temp          = heap%keys(i)
-!!$          heap%keys(i)  = heap%keys(i2)
-!!$          heap%keys(i2) = temp 
-!!$          i             = i2
-!!$        else
-!!$          exit
-!!$        end if
-!!$      end do
-      
-    case (psb_asort_up_)
-
-      do 
-        if (i<=1) exit
-        i2 = i/2
-        if (abs(heap%keys(i)) < abs(heap%keys(i2))) then 
-          itemp         = heap%idxs(i)
-          heap%idxs(i)  = heap%idxs(i2)
-          heap%idxs(i2) = itemp
-          temp          = heap%keys(i)
-          heap%keys(i)  = heap%keys(i2)
-          heap%keys(i2) = temp
-          i             = i2
-        else
-          exit
-        end if
-      end do
-      
-          
-    case (psb_asort_down_)
-
-      do 
-        if (i<=1) exit
-        i2 = i/2
-        if (abs(heap%keys(i)) > abs(heap%keys(i2))) then 
-          itemp         = heap%idxs(i)
-          heap%idxs(i)  = heap%idxs(i2)
-          heap%idxs(i2) = itemp
-          temp          = heap%keys(i)
-          heap%keys(i)  = heap%keys(i2)
-          heap%keys(i2) = temp 
-          i             = i2
-        else
-          exit
-        end if
-      end do
-      
-
-    case default
-      write(0,*) 'Invalid direction in heap ',heap%dir
-    end select
-
     return
   end subroutine psb_insert_dcomplex_idx_heap
 
@@ -1534,91 +1336,211 @@ contains
 
     
     info = 0
-    if (heap%last <= 0) then 
+
+    
+    call psi_dcomplex_idx_heap_get_first(key,index,&
+         & heap%last,heap%keys,heap%idxs,heap%dir,info)
+
+    return
+  end subroutine psb_dcomplex_idx_heap_get_first
+
+
+  
+  !
+  ! These are packaged so that they can be used to implement 
+  ! a heapsort, should the need arise
+  !
+  
+  
+  subroutine psi_insert_int_heap(key,last,heap,dir,info)
+    implicit none 
+
+    !  
+    ! Input: 
+    !   key:  the new value
+    !   last: pointer to the last occupied element in heap
+    !   heap: the heap
+    !   dir:  sorting direction
+
+    integer, intent(in)     :: key,dir
+    integer, intent(inout)  :: heap(:),last
+    integer, intent(out)    :: info
+    integer                 :: i, i2
+    integer                 :: temp
+
+    info = 0
+    if (last < 0) then 
+      write(0,*) 'Invalid last in heap ',last
+      info = last
+      return
+    endif
+    last    = last + 1
+    if (last > size(heap)) then 
+      write(0,*) 'out of bounds '
+      info = -1
+      return
+    end if
+    i       = last
+    heap(i) = key
+    
+    select case(dir)
+    case (psb_sort_up_)
+
+      do 
+        if (i<=1) exit
+        i2 = i/2
+        if (heap(i) < heap(i2)) then 
+          temp     = heap(i)
+          heap(i)  = heap(i2)
+          heap(i2) = temp
+          i        = i2
+        else
+          exit
+        end if
+      end do
+      
+          
+    case (psb_sort_down_)
+
+      do 
+        if (i<=1) exit
+        i2 = i/2
+        if (heap(i) > heap(i2)) then 
+          temp     = heap(i)
+          heap(i)  = heap(i2)
+          heap(i2) = temp
+          i        = i2
+        else
+          exit
+        end if
+      end do
+
+    case (psb_asort_up_)
+
+      do 
+        if (i<=1) exit
+        i2 = i/2
+        if (abs(heap(i)) < abs(heap(i2))) then 
+          temp     = heap(i)
+          heap(i)  = heap(i2)
+          heap(i2) = temp
+          i        = i2
+        else
+          exit
+        end if
+      end do
+      
+          
+    case (psb_asort_down_)
+
+      do 
+        if (i<=1) exit
+        i2 = i/2
+        if (abs(heap(i)) > abs(heap(i2))) then 
+          temp     = heap(i)
+          heap(i)  = heap(i2)
+          heap(i2) = temp
+          i        = i2
+        else
+          exit
+        end if
+      end do
+      
+
+    case default
+      write(0,*) 'Invalid direction in heap ',dir
+    end select
+
+    return
+  end subroutine psi_insert_int_heap
+
+
+  subroutine psi_int_heap_get_first(key,last,heap,dir,info)
+    implicit none 
+
+    integer, intent(inout)  :: key,last
+    integer, intent(in)     :: dir
+    integer, intent(inout)  :: heap(:)
+    integer, intent(out)    :: info
+    
+    integer                 :: i, i2,j
+    integer                 :: temp
+
+    
+    info = 0
+    if (last <= 0) then 
       key  = 0
       info = -1
       return
     endif
 
-    key          = heap%keys(1)
-    index        = heap%idxs(1)
-    heap%keys(1) = heap%keys(heap%last)
-    heap%idxs(1) = heap%idxs(heap%last)
-    heap%last    = heap%last - 1
-    last         = heap%last
+    key     = heap(1)
+    heap(1) = heap(last)
+    last    = last - 1
 
-    select case(heap%dir)
-!!$    case (psb_sort_up_)
-!!$
-!!$      i = 1
-!!$      do 
-!!$        if (i > (last/2)) exit
-!!$        if ( (heap%keys(2*i) < heap%keys(2*i+1)) .or.&
-!!$             & (2*i == last)) then 
-!!$          j = 2*i
-!!$        else
-!!$          j = 2*i + 1
-!!$        end if
-!!$
-!!$        if (heap%keys(i) > heap%keys(j)) then 
-!!$          itemp         = heap%idxs(i)
-!!$          heap%idxs(i)  = heap%idxs(j)
-!!$          heap%idxs(j)  = itemp
-!!$          temp          = heap%keys(i)
-!!$          heap%keys(i)  = heap%keys(j)
-!!$          heap%keys(j)  = temp 
-!!$          i             = j 
-!!$        else
-!!$          exit
-!!$        end if
-!!$      end do
-!!$      
-!!$          
-!!$    case (psb_sort_down_)
-!!$
-!!$      i = 1
-!!$      do 
-!!$        if (i > (last/2)) exit
-!!$        if ( (heap%keys(2*i) > heap%keys(2*i+1)) .or.&
-!!$             & (2*i == last)) then 
-!!$          j = 2*i
-!!$        else
-!!$          j = 2*i + 1
-!!$        end if
-!!$
-!!$        if (heap%keys(i) < heap%keys(j)) then 
-!!$          itemp         = heap%idxs(i)
-!!$          heap%idxs(i)  = heap%idxs(j)
-!!$          heap%idxs(j)  = itemp
-!!$          temp          = heap%keys(i)
-!!$          heap%keys(i)  = heap%keys(j)
-!!$          heap%keys(j)  = temp 
-!!$          i             = j 
-!!$        else
-!!$          exit
-!!$        end if
-!!$      end do
-
-    case (psb_asort_up_)
+    select case(dir)
+    case (psb_sort_up_)
 
       i = 1
       do 
         if (i > (last/2)) exit
-        if ( (abs(heap%keys(2*i)) < abs(heap%keys(2*i+1))) .or.&
+        if ( (heap(2*i) < heap(2*i+1)) .or.&
              & (2*i == last)) then 
           j = 2*i
         else
           j = 2*i + 1
         end if
 
-        if (abs(heap%keys(i)) > abs(heap%keys(j))) then 
-          itemp         = heap%idxs(i)
-          heap%idxs(i)  = heap%idxs(j)
-          heap%idxs(j)  = itemp
-          temp          = heap%keys(i)
-          heap%keys(i)  = heap%keys(j)
-          heap%keys(j)  = temp 
-          i             = j 
+        if (heap(i) > heap(j)) then 
+          temp     = heap(i)
+          heap(i)  = heap(j)
+          heap(j)  = temp
+          i        = j 
+        else
+          exit
+        end if
+      end do
+      
+          
+    case (psb_sort_down_)
+
+      i = 1
+      do 
+        if (i > (last/2)) exit
+        if ( (heap(2*i) > heap(2*i+1)) .or.&
+             & (2*i == last)) then 
+          j = 2*i
+        else
+          j = 2*i + 1
+        end if
+
+        if (heap(i) < heap(j)) then 
+          temp     = heap(i)
+          heap(i)  = heap(j)
+          heap(j)  = temp
+          i        = j 
+        else
+          exit
+        end if
+      end do
+
+    case (psb_asort_up_)
+
+      i = 1
+      do 
+        if (i > (last/2)) exit
+        if ( (abs(heap(2*i)) < abs(heap(2*i+1))) .or.&
+             & (2*i == last)) then 
+          j = 2*i
+        else
+          j = 2*i + 1
+        end if
+
+        if (abs(heap(i)) > abs(heap(j))) then 
+          temp     = heap(i)
+          heap(i)  = heap(j)
+          heap(j)  = temp
+          i        = j 
         else
           exit
         end if
@@ -1630,32 +1552,1265 @@ contains
       i = 1
       do 
         if (i > (last/2)) exit
-        if ( (abs(heap%keys(2*i)) > abs(heap%keys(2*i+1))) .or.&
+        if ( (abs(heap(2*i)) > abs(heap(2*i+1))) .or.&
              & (2*i == last)) then 
           j = 2*i
         else
           j = 2*i + 1
         end if
-
-        if (abs(heap%keys(i)) < abs(heap%keys(j))) then 
-          itemp         = heap%idxs(i)
-          heap%idxs(i)  = heap%idxs(j)
-          heap%idxs(j)  = itemp
-          temp          = heap%keys(i)
-          heap%keys(i)  = heap%keys(j)
-          heap%keys(j)  = temp 
-          i             = j 
+        
+        if (abs(heap(i)) < abs(heap(j))) then 
+          temp     = heap(i)
+          heap(i)  = heap(j)
+          heap(j)  = temp
+          i        = j 
         else
           exit
         end if
       end do
 
     case default
-      write(0,*) 'Invalid direction in heap ',heap%dir
+      write(0,*) 'Invalid direction in heap ',dir
     end select
 
     return
-  end subroutine psb_dcomplex_idx_heap_get_first
+  end subroutine psi_int_heap_get_first
+
+
+  
+  
+  subroutine psi_insert_double_heap(key,last,heap,dir,info)
+    implicit none 
+
+    !  
+    ! Input: 
+    !   key:  the new value
+    !   last: pointer to the last occupied element in heap
+    !   heap: the heap
+    !   dir:  sorting direction
+
+    real(kind(1.d0)), intent(in)    :: key
+    integer, intent(in)             :: dir
+    real(kind(1.d0)), intent(inout) :: heap(:)
+    integer, intent(inout)          :: last
+    integer, intent(out)            :: info
+    integer                         :: i, i2
+    real(kind(1.d0))                :: temp
+
+    info = 0
+    if (last < 0) then 
+      write(0,*) 'Invalid last in heap ',last
+      info = last
+      return
+    endif
+    last    = last + 1
+    if (last > size(heap)) then 
+      write(0,*) 'out of bounds '
+      info = -1
+      return
+    end if
+    i       = last
+    heap(i) = key
+    
+    select case(dir)
+    case (psb_sort_up_)
+
+      do 
+        if (i<=1) exit
+        i2 = i/2
+        if (heap(i) < heap(i2)) then 
+          temp     = heap(i)
+          heap(i)  = heap(i2)
+          heap(i2) = temp
+          i        = i2
+        else
+          exit
+        end if
+      end do
+      
+          
+    case (psb_sort_down_)
+
+      do 
+        if (i<=1) exit
+        i2 = i/2
+        if (heap(i) > heap(i2)) then 
+          temp     = heap(i)
+          heap(i)  = heap(i2)
+          heap(i2) = temp
+          i        = i2
+        else
+          exit
+        end if
+      end do
+
+    case (psb_asort_up_)
+
+      do 
+        if (i<=1) exit
+        i2 = i/2
+        if (abs(heap(i)) < abs(heap(i2))) then 
+          temp     = heap(i)
+          heap(i)  = heap(i2)
+          heap(i2) = temp
+          i        = i2
+        else
+          exit
+        end if
+      end do
+      
+          
+    case (psb_asort_down_)
+
+      do 
+        if (i<=1) exit
+        i2 = i/2
+        if (abs(heap(i)) > abs(heap(i2))) then 
+          temp     = heap(i)
+          heap(i)  = heap(i2)
+          heap(i2) = temp
+          i        = i2
+        else
+          exit
+        end if
+      end do
+      
+
+    case default
+      write(0,*) 'Invalid direction in heap ',dir
+    end select
+
+    return
+  end subroutine psi_insert_double_heap
+
+
+  subroutine psi_double_heap_get_first(key,last,heap,dir,info)
+    implicit none 
+
+    real(kind(1.d0)), intent(inout) :: key
+    integer, intent(inout)          :: last
+    integer, intent(in)             :: dir
+    real(kind(1.d0)), intent(inout) :: heap(:)
+    integer, intent(out)            :: info
+    
+    integer                 :: i, i2,j
+    real(kind(1.d0))        :: temp
+
+    
+    info = 0
+    if (last <= 0) then 
+      key  = 0
+      info = -1
+      return
+    endif
+
+    key     = heap(1)
+    heap(1) = heap(last)
+    last    = last - 1
+
+    select case(dir)
+    case (psb_sort_up_)
+
+      i = 1
+      do 
+        if (i > (last/2)) exit
+        if ( (heap(2*i) < heap(2*i+1)) .or.&
+             & (2*i == last)) then 
+          j = 2*i
+        else
+          j = 2*i + 1
+        end if
+
+        if (heap(i) > heap(j)) then 
+          temp     = heap(i)
+          heap(i)  = heap(j)
+          heap(j)  = temp
+          i        = j 
+        else
+          exit
+        end if
+      end do
+      
+          
+    case (psb_sort_down_)
+
+      i = 1
+      do 
+        if (i > (last/2)) exit
+        if ( (heap(2*i) > heap(2*i+1)) .or.&
+             & (2*i == last)) then 
+          j = 2*i
+        else
+          j = 2*i + 1
+        end if
+
+        if (heap(i) < heap(j)) then 
+          temp     = heap(i)
+          heap(i)  = heap(j)
+          heap(j)  = temp
+          i        = j 
+        else
+          exit
+        end if
+      end do
+
+    case (psb_asort_up_)
+
+      i = 1
+      do 
+        if (i > (last/2)) exit
+        if ( (abs(heap(2*i)) < abs(heap(2*i+1))) .or.&
+             & (2*i == last)) then 
+          j = 2*i
+        else
+          j = 2*i + 1
+        end if
+
+        if (abs(heap(i)) > abs(heap(j))) then 
+          temp     = heap(i)
+          heap(i)  = heap(j)
+          heap(j)  = temp
+          i        = j 
+        else
+          exit
+        end if
+      end do
+      
+          
+    case (psb_asort_down_)
+
+      i = 1
+      do 
+        if (i > (last/2)) exit
+        if ( (abs(heap(2*i)) > abs(heap(2*i+1))) .or.&
+             & (2*i == last)) then 
+          j = 2*i
+        else
+          j = 2*i + 1
+        end if
+        
+        if (abs(heap(i)) < abs(heap(j))) then 
+          temp     = heap(i)
+          heap(i)  = heap(j)
+          heap(j)  = temp
+          i        = j 
+        else
+          exit
+        end if
+      end do
+
+    case default
+      write(0,*) 'Invalid direction in heap ',dir
+    end select
+
+    return
+  end subroutine psi_double_heap_get_first
+
+
+  
+  
+  subroutine psi_insert_dcomplex_heap(key,last,heap,dir,info)
+    implicit none 
+
+    !  
+    ! Input: 
+    !   key:  the new value
+    !   last: pointer to the last occupied element in heap
+    !   heap: the heap
+    !   dir:  sorting direction
+
+    complex(kind(1.d0)), intent(in)    :: key
+    integer, intent(in)                :: dir
+    complex(kind(1.d0)), intent(inout) :: heap(:)
+    integer, intent(inout)             :: last
+    integer, intent(out)               :: info
+    integer                            :: i, i2
+    complex(kind(1.d0))                :: temp
+
+    info = 0
+    if (last < 0) then 
+      write(0,*) 'Invalid last in heap ',last
+      info = last
+      return
+    endif
+    last    = last + 1
+    if (last > size(heap)) then 
+      write(0,*) 'out of bounds '
+      info = -1
+      return
+    end if
+    i       = last
+    heap(i) = key
+    
+    select case(dir)
+!!$    case (psb_sort_up_)
+!!$
+!!$      do 
+!!$        if (i<=1) exit
+!!$        i2 = i/2
+!!$        if (heap(i) < heap(i2)) then 
+!!$          temp     = heap(i)
+!!$          heap(i)  = heap(i2)
+!!$          heap(i2) = temp
+!!$          i        = i2
+!!$        else
+!!$          exit
+!!$        end if
+!!$      end do
+!!$      
+!!$          
+!!$    case (psb_sort_down_)
+!!$
+!!$      do 
+!!$        if (i<=1) exit
+!!$        i2 = i/2
+!!$        if (heap(i) > heap(i2)) then 
+!!$          temp     = heap(i)
+!!$          heap(i)  = heap(i2)
+!!$          heap(i2) = temp
+!!$          i        = i2
+!!$        else
+!!$          exit
+!!$        end if
+!!$      end do
+
+    case (psb_asort_up_)
+
+      do 
+        if (i<=1) exit
+        i2 = i/2
+        if (abs(heap(i)) < abs(heap(i2))) then 
+          temp     = heap(i)
+          heap(i)  = heap(i2)
+          heap(i2) = temp
+          i        = i2
+        else
+          exit
+        end if
+      end do
+      
+          
+    case (psb_asort_down_)
+
+      do 
+        if (i<=1) exit
+        i2 = i/2
+        if (abs(heap(i)) > abs(heap(i2))) then 
+          temp     = heap(i)
+          heap(i)  = heap(i2)
+          heap(i2) = temp
+          i        = i2
+        else
+          exit
+        end if
+      end do
+      
+
+    case default
+      write(0,*) 'Invalid direction in heap ',dir
+    end select
+
+    return
+  end subroutine psi_insert_dcomplex_heap
+
+
+  subroutine psi_dcomplex_heap_get_first(key,last,heap,dir,info)
+    implicit none 
+
+    complex(kind(1.d0)), intent(inout) :: key
+    integer, intent(inout)             :: last
+    integer, intent(in)                :: dir
+    complex(kind(1.d0)), intent(inout) :: heap(:)
+    integer, intent(out)               :: info
+    
+    integer                    :: i, i2,j
+    complex(kind(1.d0))        :: temp
+
+    
+    info = 0
+    if (last <= 0) then 
+      key  = 0
+      info = -1
+      return
+    endif
+
+    key     = heap(1)
+    heap(1) = heap(last)
+    last    = last - 1
+
+    select case(dir)
+!!$    case (psb_sort_up_)
+!!$
+!!$      i = 1
+!!$      do 
+!!$        if (i > (last/2)) exit
+!!$        if ( (heap(2*i) < heap(2*i+1)) .or.&
+!!$             & (2*i == last)) then 
+!!$          j = 2*i
+!!$        else
+!!$          j = 2*i + 1
+!!$        end if
+!!$
+!!$        if (heap(i) > heap(j)) then 
+!!$          temp     = heap(i)
+!!$          heap(i)  = heap(j)
+!!$          heap(j)  = temp
+!!$          i        = j 
+!!$        else
+!!$          exit
+!!$        end if
+!!$      end do
+!!$      
+!!$          
+!!$    case (psb_sort_down_)
+!!$
+!!$      i = 1
+!!$      do 
+!!$        if (i > (last/2)) exit
+!!$        if ( (heap(2*i) > heap(2*i+1)) .or.&
+!!$             & (2*i == last)) then 
+!!$          j = 2*i
+!!$        else
+!!$          j = 2*i + 1
+!!$        end if
+!!$
+!!$        if (heap(i) < heap(j)) then 
+!!$          temp     = heap(i)
+!!$          heap(i)  = heap(j)
+!!$          heap(j)  = temp
+!!$          i        = j 
+!!$        else
+!!$          exit
+!!$        end if
+!!$      end do
+
+    case (psb_asort_up_)
+
+      i = 1
+      do 
+        if (i > (last/2)) exit
+        if ( (abs(heap(2*i)) < abs(heap(2*i+1))) .or.&
+             & (2*i == last)) then 
+          j = 2*i
+        else
+          j = 2*i + 1
+        end if
+
+        if (abs(heap(i)) > abs(heap(j))) then 
+          temp     = heap(i)
+          heap(i)  = heap(j)
+          heap(j)  = temp
+          i        = j 
+        else
+          exit
+        end if
+      end do
+      
+          
+    case (psb_asort_down_)
+
+      i = 1
+      do 
+        if (i > (last/2)) exit
+        if ( (abs(heap(2*i)) > abs(heap(2*i+1))) .or.&
+             & (2*i == last)) then 
+          j = 2*i
+        else
+          j = 2*i + 1
+        end if
+        
+        if (abs(heap(i)) < abs(heap(j))) then 
+          temp     = heap(i)
+          heap(i)  = heap(j)
+          heap(j)  = temp
+          i        = j 
+        else
+          exit
+        end if
+      end do
+
+    case default
+      write(0,*) 'Invalid direction in heap ',dir
+    end select
+
+    return
+  end subroutine psi_dcomplex_heap_get_first
+
+
+
+
+  subroutine psi_insert_int_idx_heap(key,index,last,heap,idxs,dir,info)
+
+    implicit none 
+    !  
+    ! Input: 
+    !   key:  the new value
+    !   index: the new index
+    !   last: pointer to the last occupied element in heap
+    !   heap: the heap
+    !   idxs: the indices
+    !   dir:  sorting direction
+
+    integer, intent(in)     :: key
+    integer, intent(in)     :: index,dir
+    integer, intent(inout)  :: heap(:),last
+    integer, intent(inout)  :: idxs(:)
+    integer, intent(out)    :: info
+    integer                 :: i, i2, itemp
+    integer                 :: temp 
+    
+    info = 0
+    if (last < 0) then 
+      write(0,*) 'Invalid last in heap ',last
+      info = last
+      return
+    endif
+
+    last    = last + 1
+    if (last > size(heap)) then 
+      write(0,*) 'out of bounds '
+      info = -1
+      return
+    end if
+      
+    i       = last
+    heap(i) = key
+    idxs(i) = index
+
+    select case(dir)
+    case (psb_sort_up_)
+
+      do 
+        if (i<=1) exit
+        i2 = i/2
+        if (heap(i) < heap(i2)) then 
+          itemp    = idxs(i)
+          idxs(i)  = idxs(i2)
+          idxs(i2) = itemp
+          temp     = heap(i)
+          heap(i)  = heap(i2)
+          heap(i2) = temp 
+          i        = i2
+        else
+          exit
+        end if
+      end do
+      
+          
+    case (psb_sort_down_)
+
+      do 
+        if (i<=1) exit
+        i2 = i/2
+        if (heap(i) > heap(i2)) then 
+          itemp    = idxs(i)
+          idxs(i)  = idxs(i2)
+          idxs(i2) = itemp
+          temp     = heap(i)
+          heap(i)  = heap(i2)
+          heap(i2) = temp 
+          i        = i2
+        else
+          exit
+        end if
+      end do
+      
+    case (psb_asort_up_)
+
+      do 
+        if (i<=1) exit
+        i2 = i/2
+        if (abs(heap(i)) < abs(heap(i2))) then 
+          itemp    = idxs(i)
+          idxs(i)  = idxs(i2)
+          idxs(i2) = itemp
+          temp     = heap(i)
+          heap(i)  = heap(i2)
+          heap(i2) = temp
+          i        = i2
+        else
+          exit
+        end if
+      end do
+      
+          
+    case (psb_asort_down_)
+
+      do 
+        if (i<=1) exit
+        i2 = i/2
+        if (abs(heap(i)) > abs(heap(i2))) then 
+          itemp    = idxs(i)
+          idxs(i)  = idxs(i2)
+          idxs(i2) = itemp
+          temp     = heap(i)
+          heap(i)  = heap(i2)
+          heap(i2) = temp 
+          i        = i2
+        else
+          exit
+        end if
+      end do
+      
+
+    case default
+      write(0,*) 'Invalid direction in heap ',dir
+    end select
+
+    return
+  end subroutine psi_insert_int_idx_heap
+
+  subroutine psi_int_idx_heap_get_first(key,index,last,heap,idxs,dir,info)
+    implicit none 
+
+    integer, intent(inout) :: heap(:)
+    integer, intent(out)   :: index,info
+    integer, intent(inout) :: last,idxs(:)
+    integer, intent(in)    :: dir
+    integer, intent(out)   :: key
+    
+    integer                :: i, i2, j,itemp
+    integer                :: temp
+
+    info = 0
+    if (last <= 0) then 
+      key   = 0
+      index = 0
+      info  = -1
+      return
+    endif
+
+    key     = heap(1)
+    index   = idxs(1)
+    heap(1) = heap(last)
+    idxs(1) = idxs(last)
+    last    = last - 1
+
+    select case(dir)
+    case (psb_sort_up_)
+
+      i = 1
+      do 
+        if (i > (last/2)) exit
+        if ( (heap(2*i) < heap(2*i+1)) .or.&
+             & (2*i == last)) then 
+          j = 2*i
+        else
+          j = 2*i + 1
+        end if
+
+        if (heap(i) > heap(j)) then 
+          itemp    = idxs(i)
+          idxs(i)  = idxs(j)
+          idxs(j)  = itemp
+          temp     = heap(i)
+          heap(i)  = heap(j)
+          heap(j)  = temp 
+          i        = j 
+        else
+          exit
+        end if
+      end do
+      
+          
+    case (psb_sort_down_)
+
+      i = 1
+      do 
+        if (i > (last/2)) exit
+        if ( (heap(2*i) > heap(2*i+1)) .or.&
+             & (2*i == last)) then 
+          j = 2*i
+        else
+          j = 2*i + 1
+        end if
+
+        if (heap(i) < heap(j)) then 
+          itemp    = idxs(i)
+          idxs(i)  = idxs(j)
+          idxs(j)  = itemp
+          temp     = heap(i)
+          heap(i)  = heap(j)
+          heap(j)  = temp 
+          i        = j 
+        else
+          exit
+        end if
+      end do
+
+    case (psb_asort_up_)
+
+      i = 1
+      do 
+        if (i > (last/2)) exit
+        if ( (abs(heap(2*i)) < abs(heap(2*i+1))) .or.&
+             & (2*i == last)) then 
+          j = 2*i
+        else
+          j = 2*i + 1
+        end if
+
+        if (abs(heap(i)) > abs(heap(j))) then 
+          itemp    = idxs(i)
+          idxs(i)  = idxs(j)
+          idxs(j)  = itemp
+          temp     = heap(i)
+          heap(i)  = heap(j)
+          heap(j)  = temp 
+          i        = j 
+        else
+          exit
+        end if
+      end do
+      
+          
+    case (psb_asort_down_)
+
+      i = 1
+      do 
+        if (i > (last/2)) exit
+        if ( (abs(heap(2*i)) > abs(heap(2*i+1))) .or.&
+             & (2*i == last)) then 
+          j = 2*i
+        else
+          j = 2*i + 1
+        end if
+
+        if (abs(heap(i)) < abs(heap(j))) then 
+          itemp    = idxs(i)
+          idxs(i)  = idxs(j)
+          idxs(j)  = itemp
+          temp     = heap(i)
+          heap(i)  = heap(j)
+          heap(j)  = temp 
+          i        = j 
+        else
+          exit
+        end if
+      end do
+
+    case default
+      write(0,*) 'Invalid direction in heap ',dir
+    end select
+
+    return
+  end subroutine psi_int_idx_heap_get_first
+
+  subroutine psi_insert_double_idx_heap(key,index,last,heap,idxs,dir,info)
+
+    implicit none 
+    !  
+    ! Input: 
+    !   key:  the new value
+    !   index: the new index
+    !   last: pointer to the last occupied element in heap
+    !   heap: the heap
+    !   idxs: the indices
+    !   dir:  sorting direction
+
+    real(kind(1.d0)), intent(in)     :: key
+    integer, intent(in)              :: index,dir
+    real(kind(1.d0)), intent(inout)  :: heap(:)
+    integer, intent(inout)           :: idxs(:),last
+    integer, intent(out)             :: info
+    integer                          :: i, i2, itemp
+    real(kind(1.d0))                 :: temp 
+    
+    info = 0
+    if (last < 0) then 
+      write(0,*) 'Invalid last in heap ',last
+      info = last
+      return
+    endif
+
+    last    = last + 1
+    if (last > size(heap)) then 
+      write(0,*) 'out of bounds '
+      info = -1
+      return
+    end if
+      
+    i       = last
+    heap(i) = key
+    idxs(i) = index
+
+    select case(dir)
+    case (psb_sort_up_)
+
+      do 
+        if (i<=1) exit
+        i2 = i/2
+        if (heap(i) < heap(i2)) then 
+          itemp    = idxs(i)
+          idxs(i)  = idxs(i2)
+          idxs(i2) = itemp
+          temp     = heap(i)
+          heap(i)  = heap(i2)
+          heap(i2) = temp 
+          i        = i2
+        else
+          exit
+        end if
+      end do
+      
+          
+    case (psb_sort_down_)
+
+      do 
+        if (i<=1) exit
+        i2 = i/2
+        if (heap(i) > heap(i2)) then 
+          itemp    = idxs(i)
+          idxs(i)  = idxs(i2)
+          idxs(i2) = itemp
+          temp     = heap(i)
+          heap(i)  = heap(i2)
+          heap(i2) = temp 
+          i        = i2
+        else
+          exit
+        end if
+      end do
+      
+    case (psb_asort_up_)
+
+      do 
+        if (i<=1) exit
+        i2 = i/2
+        if (abs(heap(i)) < abs(heap(i2))) then 
+          itemp    = idxs(i)
+          idxs(i)  = idxs(i2)
+          idxs(i2) = itemp
+          temp     = heap(i)
+          heap(i)  = heap(i2)
+          heap(i2) = temp
+          i        = i2
+        else
+          exit
+        end if
+      end do
+      
+          
+    case (psb_asort_down_)
+
+      do 
+        if (i<=1) exit
+        i2 = i/2
+        if (abs(heap(i)) > abs(heap(i2))) then 
+          itemp    = idxs(i)
+          idxs(i)  = idxs(i2)
+          idxs(i2) = itemp
+          temp     = heap(i)
+          heap(i)  = heap(i2)
+          heap(i2) = temp 
+          i        = i2
+        else
+          exit
+        end if
+      end do
+      
+
+    case default
+      write(0,*) 'Invalid direction in heap ',dir
+    end select
+
+    return
+  end subroutine psi_insert_double_idx_heap
+
+  subroutine psi_double_idx_heap_get_first(key,index,last,heap,idxs,dir,info)
+    implicit none 
+
+    real(kind(1.d0)), intent(inout) :: heap(:)
+    integer, intent(out)            :: index,info
+    integer, intent(inout)          :: last,idxs(:)
+    integer, intent(in)             :: dir
+    real(kind(1.d0)), intent(out)   :: key
+    
+    integer                         :: i, i2, j,itemp
+    real(kind(1.d0))                :: temp
+
+    info = 0
+    if (last <= 0) then 
+      key   = 0
+      index = 0
+      info  = -1
+      return
+    endif
+
+    key     = heap(1)
+    index   = idxs(1)
+    heap(1) = heap(last)
+    idxs(1) = idxs(last)
+    last    = last - 1
+
+    select case(dir)
+    case (psb_sort_up_)
+
+      i = 1
+      do 
+        if (i > (last/2)) exit
+        if ( (heap(2*i) < heap(2*i+1)) .or.&
+             & (2*i == last)) then 
+          j = 2*i
+        else
+          j = 2*i + 1
+        end if
+
+        if (heap(i) > heap(j)) then 
+          itemp    = idxs(i)
+          idxs(i)  = idxs(j)
+          idxs(j)  = itemp
+          temp     = heap(i)
+          heap(i)  = heap(j)
+          heap(j)  = temp 
+          i        = j 
+        else
+          exit
+        end if
+      end do
+      
+          
+    case (psb_sort_down_)
+
+      i = 1
+      do 
+        if (i > (last/2)) exit
+        if ( (heap(2*i) > heap(2*i+1)) .or.&
+             & (2*i == last)) then 
+          j = 2*i
+        else
+          j = 2*i + 1
+        end if
+
+        if (heap(i) < heap(j)) then 
+          itemp    = idxs(i)
+          idxs(i)  = idxs(j)
+          idxs(j)  = itemp
+          temp     = heap(i)
+          heap(i)  = heap(j)
+          heap(j)  = temp 
+          i        = j 
+        else
+          exit
+        end if
+      end do
+
+    case (psb_asort_up_)
+
+      i = 1
+      do 
+        if (i > (last/2)) exit
+        if ( (abs(heap(2*i)) < abs(heap(2*i+1))) .or.&
+             & (2*i == last)) then 
+          j = 2*i
+        else
+          j = 2*i + 1
+        end if
+
+        if (abs(heap(i)) > abs(heap(j))) then 
+          itemp    = idxs(i)
+          idxs(i)  = idxs(j)
+          idxs(j)  = itemp
+          temp     = heap(i)
+          heap(i)  = heap(j)
+          heap(j)  = temp 
+          i        = j 
+        else
+          exit
+        end if
+      end do
+      
+          
+    case (psb_asort_down_)
+
+      i = 1
+      do 
+        if (i > (last/2)) exit
+        if ( (abs(heap(2*i)) > abs(heap(2*i+1))) .or.&
+             & (2*i == last)) then 
+          j = 2*i
+        else
+          j = 2*i + 1
+        end if
+
+        if (abs(heap(i)) < abs(heap(j))) then 
+          itemp    = idxs(i)
+          idxs(i)  = idxs(j)
+          idxs(j)  = itemp
+          temp     = heap(i)
+          heap(i)  = heap(j)
+          heap(j)  = temp 
+          i        = j 
+        else
+          exit
+        end if
+      end do
+
+    case default
+      write(0,*) 'Invalid direction in heap ',dir
+    end select
+
+    return
+  end subroutine psi_double_idx_heap_get_first
+
+
+  subroutine psi_insert_dcomplex_idx_heap(key,index,last,heap,idxs,dir,info)
+
+    implicit none 
+    !  
+    ! Input: 
+    !   key:  the new value
+    !   index: the new index
+    !   last: pointer to the last occupied element in heap
+    !   heap: the heap
+    !   idxs: the indices
+    !   dir:  sorting direction
+
+    complex(kind(1.d0)), intent(in)    :: key
+    integer, intent(in)                :: index,dir
+    complex(kind(1.d0)), intent(inout) :: heap(:)
+    integer, intent(inout)             :: idxs(:),last
+    integer, intent(out)               :: info
+    integer                            :: i, i2, itemp
+    complex(kind(1.d0))                :: temp 
+    
+    info = 0
+    if (last < 0) then 
+      write(0,*) 'Invalid last in heap ',last
+      info = last
+      return
+    endif
+
+    last    = last + 1
+    if (last > size(heap)) then 
+      write(0,*) 'out of bounds '
+      info = -1
+      return
+    end if
+      
+    i       = last
+    heap(i) = key
+    idxs(i) = index
+
+    select case(dir)
+!!$    case (psb_sort_up_)
+!!$
+!!$      do 
+!!$        if (i<=1) exit
+!!$        i2 = i/2
+!!$        if (heap(i) < heap(i2)) then 
+!!$          itemp    = idxs(i)
+!!$          idxs(i)  = idxs(i2)
+!!$          idxs(i2) = itemp
+!!$          temp     = heap(i)
+!!$          heap(i)  = heap(i2)
+!!$          heap(i2) = temp 
+!!$          i        = i2
+!!$        else
+!!$          exit
+!!$        end if
+!!$      end do
+!!$      
+!!$          
+!!$    case (psb_sort_down_)
+!!$
+!!$      do 
+!!$        if (i<=1) exit
+!!$        i2 = i/2
+!!$        if (heap(i) > heap(i2)) then 
+!!$          itemp    = idxs(i)
+!!$          idxs(i)  = idxs(i2)
+!!$          idxs(i2) = itemp
+!!$          temp     = heap(i)
+!!$          heap(i)  = heap(i2)
+!!$          heap(i2) = temp 
+!!$          i        = i2
+!!$        else
+!!$          exit
+!!$        end if
+!!$      end do
+      
+    case (psb_asort_up_)
+
+      do 
+        if (i<=1) exit
+        i2 = i/2
+        if (abs(heap(i)) < abs(heap(i2))) then 
+          itemp    = idxs(i)
+          idxs(i)  = idxs(i2)
+          idxs(i2) = itemp
+          temp     = heap(i)
+          heap(i)  = heap(i2)
+          heap(i2) = temp
+          i        = i2
+        else
+          exit
+        end if
+      end do
+      
+          
+    case (psb_asort_down_)
+
+      do 
+        if (i<=1) exit
+        i2 = i/2
+        if (abs(heap(i)) > abs(heap(i2))) then 
+          itemp    = idxs(i)
+          idxs(i)  = idxs(i2)
+          idxs(i2) = itemp
+          temp     = heap(i)
+          heap(i)  = heap(i2)
+          heap(i2) = temp 
+          i        = i2
+        else
+          exit
+        end if
+      end do
+      
+
+    case default
+      write(0,*) 'Invalid direction in heap ',dir
+    end select
+
+    return
+  end subroutine psi_insert_dcomplex_idx_heap
+
+  subroutine psi_dcomplex_idx_heap_get_first(key,index,last,heap,idxs,dir,info)
+    implicit none 
+
+    complex(kind(1.d0)), intent(inout) :: heap(:)
+    integer, intent(out)               :: index,info
+    integer, intent(inout)             :: last,idxs(:)
+    integer, intent(in)                :: dir
+    complex(kind(1.d0)), intent(out)   :: key
+    
+    integer                            :: i, i2, j, itemp
+    complex(kind(1.d0))                :: temp
+
+    info = 0
+    if (last <= 0) then 
+      key   = 0
+      index = 0
+      info  = -1
+      return
+    endif
+
+    key     = heap(1)
+    index   = idxs(1)
+    heap(1) = heap(last)
+    idxs(1) = idxs(last)
+    last    = last - 1
+
+    select case(dir)
+!!$    case (psb_sort_up_)
+!!$
+!!$      i = 1
+!!$      do 
+!!$        if (i > (last/2)) exit
+!!$        if ( (heap(2*i) < heap(2*i+1)) .or.&
+!!$             & (2*i == last)) then 
+!!$          j = 2*i
+!!$        else
+!!$          j = 2*i + 1
+!!$        end if
+!!$
+!!$        if (heap(i) > heap(j)) then 
+!!$          itemp    = idxs(i)
+!!$          idxs(i)  = idxs(j)
+!!$          idxs(j)  = itemp
+!!$          temp     = heap(i)
+!!$          heap(i)  = heap(j)
+!!$          heap(j)  = temp 
+!!$          i        = j 
+!!$        else
+!!$          exit
+!!$        end if
+!!$      end do
+!!$      
+!!$          
+!!$    case (psb_sort_down_)
+!!$
+!!$      i = 1
+!!$      do 
+!!$        if (i > (last/2)) exit
+!!$        if ( (heap(2*i) > heap(2*i+1)) .or.&
+!!$             & (2*i == last)) then 
+!!$          j = 2*i
+!!$        else
+!!$          j = 2*i + 1
+!!$        end if
+!!$
+!!$        if (heap(i) < heap(j)) then 
+!!$          itemp    = idxs(i)
+!!$          idxs(i)  = idxs(j)
+!!$          idxs(j)  = itemp
+!!$          temp     = heap(i)
+!!$          heap(i)  = heap(j)
+!!$          heap(j)  = temp 
+!!$          i        = j 
+!!$        else
+!!$          exit
+!!$        end if
+!!$      end do
+
+    case (psb_asort_up_)
+
+      i = 1
+      do 
+        if (i > (last/2)) exit
+        if ( (abs(heap(2*i)) < abs(heap(2*i+1))) .or.&
+             & (2*i == last)) then 
+          j = 2*i
+        else
+          j = 2*i + 1
+        end if
+
+        if (abs(heap(i)) > abs(heap(j))) then 
+          itemp    = idxs(i)
+          idxs(i)  = idxs(j)
+          idxs(j)  = itemp
+          temp     = heap(i)
+          heap(i)  = heap(j)
+          heap(j)  = temp 
+          i        = j 
+        else
+          exit
+        end if
+      end do
+      
+          
+    case (psb_asort_down_)
+
+      i = 1
+      do 
+        if (i > (last/2)) exit
+        if ( (abs(heap(2*i)) > abs(heap(2*i+1))) .or.&
+             & (2*i == last)) then 
+          j = 2*i
+        else
+          j = 2*i + 1
+        end if
+
+        if (abs(heap(i)) < abs(heap(j))) then 
+          itemp    = idxs(i)
+          idxs(i)  = idxs(j)
+          idxs(j)  = itemp
+          temp     = heap(i)
+          heap(i)  = heap(j)
+          heap(j)  = temp 
+          i        = j 
+        else
+          exit
+        end if
+      end do
+
+    case default
+      write(0,*) 'Invalid direction in heap ',dir
+    end select
+
+    return
+  end subroutine psi_dcomplex_idx_heap_get_first
+
 
 
 end module psb_sort_mod
