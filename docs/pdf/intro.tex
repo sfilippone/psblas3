@@ -11,8 +11,10 @@ dense matrix operations.  The current implementation of PSBLAS
 addresses a distributed memory execution model operating with message
 passing. 
 
-The PSBLAS library is internally implemented in a mixture of
-Fortran~77 and Fortran~95~\cite{metcalf} programming languages. 
+The PSBLAS library is internally implemented in
+ the Fortran~95~\cite{metcalf} programming language, with reuse and/or
+ adaptation of some existing Fortran~77 software, and a handful of C
+ routines. 
 A similar approach has been advocated by a number of authors,
 e.g.~\cite{machiels}.  Moreover, the Fortran~95 facilities for dynamic
 memory management and interface overloading greatly enhance the
@@ -70,7 +72,7 @@ structures of the serial kernels is available to the parallel
 version. The overall design and parallelization strategy have been
 influenced by the structure of the ScaLAPACK parallel
 library.  The layered structure of the PSBLAS library
-is shown in figure~\ref{fig:psblas} ; lower layers of the library
+is shown in figure~\ref{fig:psblas}; lower layers of the library
 indicate an encapsulation relationship with upper layers. The ongoing
 discussion focuses on the Fortran~95 layer immediately below the
 application layer.
@@ -92,7 +94,7 @@ user does not need to delve into their details (see Sec.~\ref{sec:parenv}).
 %% grid and store internally for further use. 
 
 \begin{figure}[h] \begin{center}
-\includegraphics[scale=0.45]{figures/psblas}
+\rotatebox{-90}{\includegraphics[scale=0.65]{figures/psblas}}
 \end{center}
 \caption{PSBLAS library components hierarchy.\label{fig:psblas}}
 \end{figure}
@@ -173,7 +175,12 @@ another domain such that there is a boundary point which {\em depends\/}
 on it. Whenever performing a computational step, such as a
 matrix-vector product, the values associated with halo points are
 requested from other domains. A boundary point of a given 
-domain is a halo point for (at least) another domain; therefore
+domain is usually a halo point for some other domain\footnote{This is
+  the normal situation when the pattern of the sparse matrix is
+  symmetric, which is equivalent to say that the interaction between
+  two variables is reciprocal. If the matrix pattern is non-symmetric
+  we may have one-way interactions, and these could cause a situation
+  in which a boundary point is not a halo point for its neighbour.}; therefore
 the cardinality of the boundary points set denotes the amount of data
  sent to other domains. 
 \item[Overlap.] An overlap point is a boundary point assigned to
@@ -182,8 +189,8 @@ has to be replicated for each assignment.
 \end{description}
 Overlap points do not usually exist in the basic data
 distribution, but they are a feature of Domain Decomposition
-Schwarz preconditioners which we are in the process of including in
-our distribution~\cite{PARA04,APNUM06}. 
+Schwarz preconditioners which we are the subject of related research
+work~\cite{2007c,2007d}.  
 
 We denote the sets of  internal, boundary and halo points for a given
 subdomain  by $\cal I$, $\cal B$ and $\cal H$.
