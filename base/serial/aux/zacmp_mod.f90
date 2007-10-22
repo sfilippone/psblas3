@@ -18,26 +18,26 @@ contains
     complex(kind(1.d0)), intent(in) :: a,b
     logical :: zalt
     
-    zalt = ((abs(real(a))+abs(aimag(a))) < (abs(real(b))+abs(aimag(b))))
+    zalt = (abs(a) < abs(b))
   end function zalt
   function zale(a,b)
     complex(kind(1.d0)), intent(in) :: a,b
     logical :: zale
     
-    zale = ((abs(real(a))+abs(aimag(a))) <= (abs(real(b))+abs(aimag(b))))
+    zale = (abs(a) <= abs(b))
   end function zale
 
   function zagt(a,b)
     complex(kind(1.d0)), intent(in) :: a,b
     logical :: zagt
     
-    zagt = ((abs(real(a))+abs(aimag(a))) > (abs(real(b))+abs(aimag(b))))
+    zagt = (abs(a) > abs(b))
   end function zagt
   function zage(a,b)
     complex(kind(1.d0)), intent(in) :: a,b
     logical :: zage
     
-    zage = ((abs(real(a))+abs(aimag(a))) >= (abs(real(b))+abs(aimag(b))))
+    zage = (abs(a) >= abs(b))
   end function zage
 
 end module zacmp_mod
