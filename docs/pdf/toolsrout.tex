@@ -11,6 +11,7 @@
 \syntax*{call psb\_cdall}{icontxt, desc\_a, info,vg=vg,flag=flag}
 \syntax*{call psb\_cdall}{icontxt, desc\_a, info,vl=vl}
 \syntax*{call psb\_cdall}{icontxt, desc\_a, info,nl=nl}
+\syntax*{call psb\_cdall}{icontxt, desc\_a, info,mg=mg,repl=.true.}
 
 This subroutine initializes the communication descriptor associated
 with an index space. Exactly one of the  optional arguments
@@ -41,8 +42,8 @@ Specified as: an integer value $0,1$, default $0$.
 Scope:{\bf global}.\\
 Type:{\bf optional}.\\
 Intent: {\bf in}.\\
-Specified as: an integer value. It is required if \verb|parts| is
-specified. 
+Specified as: an integer value. It is required if \verb|parts| or
+\verb|repl| is specified. 
 \item[parts] the subroutine that defines the partitioning scheme.\\
 Scope:{\bf global}.\\
 Type:{\bf required}.\\
@@ -59,6 +60,12 @@ Scope:{\bf local}.\\
 Type:{\bf optional}.\\
 Intent: {\bf in}.\\
 Specified as: an integer value. 
+\item[repl] Data allocation: build a replicated index space (i.e. all
+  processes own all indices).
+Scope:{\bf global}.\\
+Type:{\bf optional}.\\
+Intent: {\bf in}.\\
+Specified as: the logical value \verb|.true.|
 \end{description}
 
 \begin{description}
@@ -122,6 +129,9 @@ An integer value; 0 means no error has been detected.
 \item[nl] In this case we are implying a generalized row-block
   distribution in which each process $I$ gets assigned a consecutive
   chunk of $N_I=nl$ global indices.
+\item[repl] In this case we are asking to replicate all indices on
+  all processes. This is a special purpose data allocation that is
+  useful in the construction of some multilevel preconditioners.
 \end{description}
 \item On exit from this routine the descriptor is in the build state
 \end{enumerate}

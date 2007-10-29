@@ -291,15 +291,6 @@ Module psb_tools_mod
     module procedure psb_cdall
   end interface
 
-  interface psb_cdrep
-    subroutine psb_cdrep(m, ictxt, desc_a,info)
-      use psb_descriptor_type
-      Integer, intent(in)               :: m,ictxt
-      Type(psb_desc_type), intent(out)  :: desc_a
-      integer, intent(out)              :: info
-    end subroutine psb_cdrep
-  end interface
-
   interface psb_cdasb
     module procedure psb_cdasb
   end interface
@@ -547,7 +538,7 @@ contains
 
   end subroutine psb_get_boundary
 
-  subroutine psb_cdall(ictxt, desc_a, info,mg,ng,parts,vg,vl,flag,nl)
+  subroutine psb_cdall(ictxt, desc_a, info,mg,ng,parts,vg,vl,flag,nl,repl)
     use psb_descriptor_type
     use psb_serial_mod
     use psb_const_mod
@@ -557,10 +548,11 @@ contains
     include 'parts.fh'
     Integer, intent(in)               :: mg,ng,ictxt, vg(:), vl(:),nl
     integer, intent(in)               :: flag
+    logical, intent(in)               :: repl
     integer, intent(out)              :: info
     type(psb_desc_type), intent(out)  :: desc_a
 
-    optional :: mg,ng,parts,vg,vl,flag,nl
+    optional :: mg,ng,parts,vg,vl,flag,nl,repl
 
     interface 
       subroutine psb_cdals(m, n, parts, ictxt, desc_a, info)
@@ -584,6 +576,12 @@ contains
         integer, intent(out)              :: info
         type(psb_desc_type), intent(out)  :: desc_a
       end subroutine psb_cd_inloc
+      subroutine psb_cdrep(m, ictxt, desc_a,info)
+        use psb_descriptor_type
+        Integer, intent(in)               :: m,ictxt
+        Type(psb_desc_type), intent(out)  :: desc_a
+        integer, intent(out)              :: info
+      end subroutine psb_cdrep
     end interface
     character(len=20)   :: name, char_err
     integer :: err_act, n_, flag_, i, me, np, nlp
@@ -598,9 +596,10 @@ contains
 
     call psb_info(ictxt, me, np)
 
-    if (count((/ present(vg),present(vl),present(parts),present(nl) /)) /= 1) then 
+    if (count((/ present(vg),present(vl),&
+         &  present(parts),present(nl), present(repl) /)) /= 1) then 
       info=581
-      call psb_errpush(info,name,a_err=" vg, vl, parts, nl")
+      call psb_errpush(info,name,a_err=" vg, vl, parts, nl, repl")
       goto 999 
     endif
 
@@ -616,6 +615,19 @@ contains
         n_ = mg 
       endif
       call  psb_cdals(mg, n_, parts, ictxt, desc_a, info)
+
+    else if (present(repl)) then 
+      if (.not.present(mg)) then 
+        info=581
+        call psb_errpush(info,name)
+        goto 999 
+      end if
+      if (.not.repl) then 
+        info=581
+        call psb_errpush(info,name)
+        goto 999 
+      end if
+      call  psb_cdrep(mg, ictxt, desc_a, info)
 
     else if (present(vg)) then 
       if (present(flag)) then 
