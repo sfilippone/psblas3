@@ -113,8 +113,11 @@ Specified as: a logical  variable, default value: true.
   \verb|psb_info| has returned with $iam=-1$; indeed, it it is the only
   routine that may be called with argument \verb|icontxt| in this
   situation.
+\item A call to this routine with \verb|close=.true.| implies a call
+  to \verb|MPI_Finalize|, after which no parallel routine may be called.
 \item If the user whishes to use multiple communication contexts in the
-  same program, this routine may be called multiple times to
+  same program, or to enter and exit multiple times into the parallel
+  environment, this routine may be called to 
   selectively close the contexts with \verb|close=.false.|, while on
   the last call it should be called with \verb|close=.true.| to
   shutdown in a clean way the entire parallel environment.
