@@ -11,9 +11,9 @@ F90=$(GNU42BIN)/gfortran
 FC=$(GNU42BIN)/gfortran
 F77=$(FC)
 CC=$(GNU42BIN)/gcc
-F90COPT=-O3 
-FCOPT=-O3   
-CCOPT=-O3   
+F90COPT=-O3 -march=native
+FCOPT=-O3   -march=native
+CCOPT=-O3   -march=native
 #
 # Which flag does your compiler use  for module inclusion?
 # Most compilers use -I  but Sun uses -M 
