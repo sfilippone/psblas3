@@ -320,7 +320,7 @@ contains
     implicit none
     integer, intent(in) :: ictxt,m
     !locals
-    integer             :: np,me, isz, err_act,idx,gidx,lidx
+    integer             :: np,me
 
     call psb_info(ictxt, me, np)
     ! 
@@ -335,7 +335,8 @@ contains
   
   subroutine psb_nullify_desc(desc)
     type(psb_desc_type), intent(inout) :: desc
-    
+    ! We have nothing left to do here.
+    ! Perhaps we should delete this subroutine? 
   end subroutine psb_nullify_desc
 
   logical function psb_is_ok_desc(desc)
@@ -488,9 +489,9 @@ contains
     type(psb_desc_type), intent(inout) :: desc
     integer                            :: info
     !locals
-    integer             :: np,me,ictxt, isz, err_act,idx,gidx,lidx
+    integer             :: np,me,ictxt, err_act,idx,gidx,lidx
     logical, parameter  :: debug=.false.,debugprt=.false.
-    character(len=20)   :: name, char_err
+    character(len=20)   :: name
     if (debug) write(0,*) me,'Entered CDCPY'
     if (psb_get_errstatus() /= 0) return 
     info = 0

@@ -25,7 +25,7 @@ c
      *  index(*)
       integer, allocatable :: ic(:),jc(:)
       integer       :: nze, info
-      integer, save :: iunit=11
+c$$$      integer, save :: iunit=11
 c
 c       symbolic matrix multiply c=a*b
 c

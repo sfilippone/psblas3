@@ -63,8 +63,8 @@ subroutine psi_ldsc_pre_halo(desc,ext_hv,info)
   integer,allocatable :: helem(:),hproc(:)
   integer,allocatable :: tmphl(:)
 
-  integer          ::  i,j,err,np,me,lhalo,nhalo,&
-       & n_col, err_act,  key, ih, nh, idx, nk,icomm,hsize
+  integer          ::  i,j,np,me,lhalo,nhalo,&
+       & n_col, err_act,  key, ih, nh, idx, nk,icomm
   integer             :: ictxt,n_row
   logical, parameter  :: debug=.false., debugwrt=.false.
   character(len=20)   :: name,ch_err

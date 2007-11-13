@@ -137,10 +137,9 @@ subroutine psi_extract_dep_list(desc_data,desc_str,dep_list,&
   integer, allocatable :: itmp(:)
   !     .....local arrays....
   integer int_err(5)
-  double precision real_err(5)
 
   !     .....local scalars...
-  integer i,nprow,npcol,me,mycol,pointer_dep_list,proc,j,err_act
+  integer i,me,nprow,pointer_dep_list,proc,j,err_act
   integer ictxt, err, icomm
   logical, parameter :: debug=.false.
   character  name*20

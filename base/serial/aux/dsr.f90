@@ -41,7 +41,7 @@ subroutine dsr(n,x,dir)
   real(kind(1.d0)) ::  x(n)
   !     ..
   !     .. Local Scalars ..
-  real(kind(1.d0)) :: xx, piv, xt, xk
+  real(kind(1.d0)) :: piv, xt, xk
   integer i, j, ilx, iux, istp, lpiv
   integer n1, n2
 

@@ -45,9 +45,8 @@ subroutine psb_ztransc(a,b,c,fmt)
   character(len=*), optional :: fmt
 
   character(len=5)           :: fmt_
-  integer                    :: c_, info, nz,i
+  integer                    :: c_, info, i
   integer, allocatable       :: itmp(:)
-  type(psb_zspmat_type)      :: tmp
 
   if (present(c)) then 
     c_=c

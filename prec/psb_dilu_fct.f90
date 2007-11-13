@@ -45,9 +45,7 @@ subroutine psb_dilu_fct(a,l,u,d,info,blck)
   type(psb_dspmat_type),intent(in), optional, target :: blck
   real(kind(1.d0)), intent(inout)     ::  d(:)
   !     .. Local Scalars ..
-  real(kind(1.d0)) ::  dia, temp
-  integer   ::  i, j, jj, k, kk, l1, l2, ll, low1, low2,m,ma,err_act
-  
+  integer   ::  l1,l2,m,err_act  
   type(psb_dspmat_type), pointer  :: blck_
   character(len=20)   :: name, ch_err
   logical, parameter :: debug=.false.

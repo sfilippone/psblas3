@@ -47,8 +47,8 @@ subroutine psb_dspclip(a,b,info,imin,imax,jmin,jmax,rscale,cscale)
   integer, intent(in), optional      :: imin,imax,jmin,jmax
   logical, intent(in), optional      :: rscale,cscale
 
-  integer               :: lrw_, ierr(5), err_act
-  character(len=20)     :: name, ch_err
+  integer               :: err_act
+  character(len=20)     :: name
   integer      :: imin_,imax_,jmin_,jmax_
   logical      :: rscale_,cscale_
   integer      :: sizeb, nzb, mb, kb, ifst, ilst, nrt, nzt, i, j

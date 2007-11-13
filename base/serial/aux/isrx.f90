@@ -40,8 +40,8 @@ subroutine isrx(n,x,indx,dir,flag)
   integer ::  x(n), indx(n)
   !     ..
   !     .. Local Scalars ..
-  integer :: xx, piv, xk, xt
-  integer i, j, ii, ilx, iux, istp, lpiv
+  integer :: piv, xk, xt
+  integer i, j, ilx, iux, istp, lpiv
   integer ixt, n1, n2
 
   integer, parameter :: maxstack=64,nparms=3,ithrs=16

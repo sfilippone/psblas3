@@ -58,7 +58,7 @@ subroutine psb_cdals(m, n, parts, ictxt, desc_a, info)
 
   !locals
   Integer             :: counter,i,j,np,me,loc_row,err,loc_col,nprocs,&
-       & l_ov_ix,l_ov_el,idx, err_act, itmpov, k, ns, glx, mth 
+       & l_ov_ix,l_ov_el,idx, err_act, itmpov, k, glx 
   integer             :: int_err(5),exch(3)
   integer, allocatable  :: prc_v(:), temp_ovrlap(:), ov_idx(:),ov_el(:)
   logical, parameter  :: debug=.false.

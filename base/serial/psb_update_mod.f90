@@ -176,7 +176,7 @@ contains
 
     logical, parameter :: debug=.false.
     integer  :: i,ir,ic, ilr, ilc, ip, &
-         & i1,i2,nc,lb,ub,m,nnz,dupl
+         & i1,i2,nc,lb,ub,m,dupl
 
     info = 0
 
@@ -403,7 +403,7 @@ contains
     integer, intent(out) :: info
     integer, intent(in), optional  :: ng,gtl(*)
     integer  :: i,ir,ic, ilr, ilc, ip, &
-         & i1,i2,nc,lb,ub,m,nnz,dupl,isrt
+         & i1,i2,nc,nnz,dupl
     logical, parameter :: debug=.false.
 
     info = 0
@@ -451,6 +451,9 @@ contains
                   i1 = i1 - 1
                 end do
                 ilr = ir
+              else
+                i1 = 1
+                i2 = 1
               end if
               nc = i2-i1+1
               call issrch(ip,ic,nc,a%ia2(i1:i2))
@@ -489,6 +492,9 @@ contains
                   i1 = i1 - 1
                 end do
                 ilr = ir
+              else
+                i1 = 1
+                i2 = 1
               end if
               nc = i2-i1+1
               call issrch(ip,ic,nc,a%ia2(i1:i2))
@@ -535,6 +541,9 @@ contains
                 i1 = i1 - 1
               end do
               ilr = ir
+            else
+              i1 = 1
+              i2 = 1
             end if
             nc = i2-i1+1
             call issrch(ip,ic,nc,a%ia2(i1:i2))
@@ -568,6 +577,9 @@ contains
                 i1 = i1 - 1
               end do
               ilr = ir
+            else
+              i1 = 1
+              i2 = 1
             end if
             nc = i2-i1+1
             call issrch(ip,ic,nc,a%ia2(i1:i2))
@@ -610,8 +622,8 @@ contains
     integer, pointer     :: ia1(:), ia2(:), ia3(:),&
          & ja_(:), ka_(:)
     integer, allocatable :: indices(:), blks(:), rows(:) 
-    integer  :: png, pia, pja, ipx, blk, rb, row, k_pt, npg, col, ngr, nzin_,&
-         & i,j,k,nr,dupl, ii, ir, ic
+    integer  :: png, pia, pja, ipx, blk, rb, row, k_pt, npg, col, ngr,&
+         & i,j,nr,dupl, ii, ir, ic
 
     info = 0
     dupl = psb_sp_getifld(psb_dupl_,a,info)
@@ -846,7 +858,7 @@ contains
     integer, intent(in), optional  :: ng,gtl(*)
 
     integer  :: i,ir,ic, ilr, ilc, ip, &
-         & i1,i2,nc,lb,ub,m,nnz,dupl
+         & i1,i2,nc,lb,ub,m,dupl
 
     logical, parameter :: debug=.false.
     info = 0
@@ -1066,7 +1078,7 @@ contains
     integer, intent(out) :: info
     integer, intent(in), optional  :: ng,gtl(*)
     integer  :: i,ir,ic, ilr, ilc, ip, &
-         & i1,i2,nc,lb,ub,m,nnz,dupl,isrt
+         & i1,i2,nc,nnz,dupl
     logical, parameter :: debug=.false.
 
     info = 0
@@ -1114,6 +1126,9 @@ contains
                   i1 = i1 - 1
                 end do
                 ilr = ir
+              else
+                i1 = 1
+                i2 = 1
               end if
               nc = i2-i1+1
               call issrch(ip,ic,nc,a%ia2(i1:i2))
@@ -1151,6 +1166,9 @@ contains
                   i1 = i1 - 1
                 end do
                 ilr = ir
+              else
+                i1 = 1
+                i2 = 1
               end if
               nc = i2-i1+1
               call issrch(ip,ic,nc,a%ia2(i1:i2))
@@ -1195,6 +1213,9 @@ contains
                 i1 = i1 - 1
               end do
               ilr = ir
+            else
+              i1 = 1
+              i2 = 1
             end if
             nc = i2-i1+1
             call issrch(ip,ic,nc,a%ia2(i1:i2))
@@ -1229,6 +1250,9 @@ contains
                 i1 = i1 - 1
               end do
               ilr = ir
+            else
+              i1 = 1
+              i2 = 1
             end if
             nc = i2-i1+1
             call issrch(ip,ic,nc,a%ia2(i1:i2))
@@ -1275,8 +1299,8 @@ contains
     integer, pointer     :: ia1(:), ia2(:), ia3(:),&
          & ja_(:), ka_(:)
     integer, allocatable :: indices(:), blks(:), rows(:) 
-    integer  :: png, pia, pja, ipx, blk, rb, row, k_pt, npg, col, ngr, nzin_,&
-         & i,j,k,nr,dupl, ii, ir, ic
+    integer  :: png, pia, pja, ipx, blk, rb, row, k_pt, npg, col, ngr,&
+         & i,j,nr,dupl, ii, ir, ic
 
     info = 0
     dupl = psb_sp_getifld(psb_dupl_,a,info)

@@ -329,20 +329,22 @@ void SearchInsKeyVal(fptr *ftree, int *key, int *val, int *res, int *iret)
      
 }
 
-
+#define USECACHE 0
 void SearchKeyVal(fptr *ftree, int *key, int *res, int *iret)
 {
   PairTreePtr PTree;
   KeyPair node; 
   AVLNodePtr noderes;
   KeyPairPtr result;
+#if USECACHE
   int i,sv[2];
   int info;
+#endif
   
   *iret = 0;
   
   PTree = (PairTreePtr) *ftree;
-#if 0
+#if USECACHE
   for (i=0; i<CACHESIZE; i++) {
     if (PTree->cache[0][i] == *key) { 
       *res=PTree->cache[1][i];
@@ -365,7 +367,7 @@ void SearchKeyVal(fptr *ftree, int *key, int *res, int *iret)
   } else {
     result = (KeyPairPtr) noderes->key;
     *res = result->val;
-#if 0
+#if USECACHE
     for (i=CACHESIZE-1; i>0; i--) {
       PTree->cache[0][i]=PTree->cache[0][i-1];
       PTree->cache[0][i]=PTree->cache[1][i-1];
@@ -384,7 +386,7 @@ void SearchKeyVal(fptr *ftree, int *key, int *res, int *iret)
 void PairTreeVisit(AVLNodePtr current, PairTreePtr PTree)
 {
   KeyPairPtr node,inode; 
-  int info,i;
+  int info;
     
   if (current==NULL) return;
   inode = (KeyPairPtr) current->key;
@@ -402,8 +404,7 @@ void PairTreeVisit(AVLNodePtr current, PairTreePtr PTree)
 void  ClonePairSearchTree(fptr *ftreein, fptr *ftreeout)   
 {
   PairTreePtr PTreein, PTreeout;
-  int i,j;
-  AVLNodePtr nodept;
+  int i;
 
   PTreein = (PairTreePtr) *ftreein;
   

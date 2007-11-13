@@ -99,7 +99,7 @@ subroutine  psb_zspsm(alpha,a,x,beta,y,desc_a,info,&
 
   ! locals
   integer                  :: ictxt, np, me,&
-       & err_act, n, iix, jjx, ia, ja, iia, jja, lldx,lldy, lchoice,&
+       & err_act, iix, jjx, ia, ja, iia, jja, lldx,lldy, lchoice,&
        & ix, iy, ik, ijx, ijy, i, lld, int_err(5),&
        & m, nrow, ncol, liwork, llwork, iiy, jjy
 
@@ -407,7 +407,7 @@ subroutine  psb_zspsv(alpha,a,x,beta,y,desc_a,info,&
 
   ! locals
   integer                  :: ictxt, np, me, &
-       & err_act, n, iix, jjx, ia, ja, iia, jja, lldx,lldy, lchoice,&
+       & err_act, iix, jjx, ia, ja, iia, jja, lldx,lldy, lchoice,&
        & ix, iy, ik, jx, jy, i, lld, int_err(5),&
        & m, nrow, ncol, liwork, llwork, iiy, jjy
 

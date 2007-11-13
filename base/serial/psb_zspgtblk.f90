@@ -57,12 +57,11 @@ subroutine psb_zspgtblk(irw,a,b,info,append,iren,lrw,srt)
   logical, intent(in), optional         :: srt
 
   logical            :: append_,srt_
-  integer            :: i,j,k,ip,jp,nr,idx, nz,iret,nzb, nza, lrw_, irw_, err_act
-  character(len=20)  :: name, ch_err
+  integer            :: nz,nzb, lrw_, irw_
+  character(len=20)  :: name
 
   name='psb_spgtblk'
   info  = 0
-!!$  call psb_erractionsave(err_act)
 
   irw_ = irw 
   if (present(lrw)) then
@@ -111,18 +110,7 @@ subroutine psb_zspgtblk(irw,a,b,info,append,iren,lrw,srt)
   b%m = b%m+lrw_-irw+1
   b%k = max(b%k,a%k)
   if (srt_) call psb_fixcoo(b,info)
-!!$  call psb_erractionrestore(err_act)
   return
   
-9999 continue
-!!$  call psb_erractionrestore(err_act)
-  call psb_erractionsave(err_act)
-  if (err_act.eq.psb_act_abort_) then
-     call psb_error()
-     return
-  end if
-  return
-
-
 end subroutine psb_zspgtblk
 

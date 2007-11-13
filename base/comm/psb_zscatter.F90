@@ -296,9 +296,9 @@ subroutine  psb_zscatterv(globx, locx, desc_a, info, iroot)
 
   ! locals
   integer                  :: int_err(5), ictxt, np, me, &
-       & err_act, m, n, i, j, idx, nrow, iiroot, iglobx, jglobx,&
+       & err_act, m, n, i, j, idx, nrow, iglobx, jglobx,&
        & ilocx, jlocx, lda_locx, lda_globx, root, k, icomm, myrank,&
-       & rootrank, c, pos, ilx, jlx
+       & rootrank, pos, ilx, jlx
   complex(kind(1.d0)), allocatable  :: scatterv(:)
   integer, allocatable              :: displ(:), l_t_g_all(:), all_dim(:)
   character(len=20)        :: name, ch_err

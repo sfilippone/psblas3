@@ -67,7 +67,7 @@ subroutine psb_cdren(trans,iperm,desc_a,info)
   integer                       :: i,j,np,me, n_col, kh, nh
   integer                       :: dectype
   integer                       :: ictxt,n_row, int_err(5), err_act
-  real(kind(1.d0))              :: time(10), real_err(6)
+  real(kind(1.d0))              :: time(10)
   logical, parameter            :: debug=.false.
   character(len=20)             :: name
 

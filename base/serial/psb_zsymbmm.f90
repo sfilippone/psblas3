@@ -57,7 +57,7 @@ subroutine psb_zsymbmm(a,b,c,info)
     end subroutine symbmm
   end interface
 
-  character(len=20)         :: name, ch_err
+  character(len=20)         :: name
   integer                   :: err_act
   logical                   :: csra, csrb
   name='psb_symbmm'
@@ -112,7 +112,7 @@ contains
     integer               :: index(:),info
     integer, allocatable  :: iarw(:), iacl(:),ibrw(:),ibcl(:)
     complex(kind(1.d0)), allocatable :: aval(:),bval(:)
-    integer  :: maxlmn,i,j,m,n,k,l,istart,length,nazr,nbzr,jj,ii,minlm,minmn
+    integer  :: maxlmn,i,j,m,n,k,l,istart,length,nazr,nbzr,jj,minlm,minmn
 
 
     n = a%m

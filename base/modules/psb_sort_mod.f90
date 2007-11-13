@@ -28,6 +28,18 @@
 !!$  POSSIBILITY OF SUCH DAMAGE.
 !!$ 
 !!$  
+!
+!  The merge-sort and quicksort routines are implemented in the
+!  serial/aux directory
+!  References:
+!  D. Knuth
+!  The Art of Computer Programming, vol. 3
+!  Addison-Wesley
+!  
+!  Aho, Hopcroft, Ullman
+!  Data Structures and Algorithms
+!  Addison-Wesley
+!
 module psb_sort_mod
 
 
@@ -292,7 +304,7 @@ contains
     integer, intent(out)             :: nout
     integer, optional, intent(in)    :: dir
     
-    integer  :: dir_, flag_, n, err_act
+    integer  :: dir_, n, err_act
     
     character(len=20)  :: name
 
@@ -958,8 +970,7 @@ contains
     integer, intent(in)               :: key
     type(psb_int_heap), intent(inout) :: heap
     integer, intent(out)              :: info
-    integer                           :: i, i2
-    integer                           :: temp
+
     info = 0
     if (heap%last < 0) then 
       write(0,*) 'Invalid last in heap ',heap%last
@@ -985,10 +996,6 @@ contains
 
     type(psb_int_heap), intent(inout) :: heap
     integer, intent(out)              :: key,info
-    
-    integer                           :: i, i2, last,j
-    integer                           :: temp
-
     
     info = 0
 
@@ -1070,8 +1077,7 @@ contains
     integer, intent(in)               :: index
     type(psb_double_idx_heap), intent(inout) :: heap
     integer, intent(out)              :: info
-    integer                           :: i, i2, itemp
-    real(kind(1.d0))                  :: temp 
+
     info = 0
     if (heap%last < 0) then 
       write(0,*) 'Invalid last in heap ',heap%last
@@ -1100,10 +1106,6 @@ contains
     type(psb_double_idx_heap), intent(inout) :: heap
     integer, intent(out)              :: index,info
     real(kind(1.d0)), intent(out)     :: key
-    
-    integer                           :: i, i2, last,j,itemp
-    real(kind(1.d0))                  :: temp
-
     
     info = 0
 
@@ -1184,8 +1186,7 @@ contains
     integer, intent(in)                   :: index
     type(psb_int_idx_heap), intent(inout) :: heap
     integer, intent(out)                  :: info
-    integer                               :: i, i2, itemp
-    integer                               :: temp 
+
     info = 0
     if (heap%last < 0) then 
       write(0,*) 'Invalid last in heap ',heap%last
@@ -1214,10 +1215,6 @@ contains
     type(psb_int_idx_heap), intent(inout) :: heap
     integer, intent(out)                  :: index,info
     integer, intent(out)                  :: key
-    
-    integer                               :: i, i2, last,j,itemp
-    integer                               :: temp
-
     
     info = 0
     
@@ -1301,8 +1298,7 @@ contains
     integer, intent(in)                        :: index
     type(psb_dcomplex_idx_heap), intent(inout) :: heap
     integer, intent(out)                       :: info
-    integer                                    :: i, i2, itemp
-    complex(kind(1.d0))                        :: temp 
+
     info = 0
     if (heap%last < 0) then 
       write(0,*) 'Invalid last in heap ',heap%last
@@ -1331,12 +1327,8 @@ contains
     integer, intent(out)                       :: index,info
     complex(kind(1.d0)), intent(out)           :: key
     
-    integer                                    :: i, i2, last,j,itemp
-    complex(kind(1.d0))                        :: temp
-
     
     info = 0
-
     
     call psi_dcomplex_idx_heap_get_first(key,index,&
          & heap%last,heap%keys,heap%idxs,heap%dir,info)
@@ -1463,7 +1455,7 @@ contains
     integer, intent(inout)  :: heap(:)
     integer, intent(out)    :: info
     
-    integer                 :: i, i2,j
+    integer                 :: i, j
     integer                 :: temp
 
     
@@ -1693,7 +1685,7 @@ contains
     real(kind(1.d0)), intent(inout) :: heap(:)
     integer, intent(out)            :: info
     
-    integer                 :: i, i2,j
+    integer                 :: i, j
     real(kind(1.d0))        :: temp
 
     
@@ -1923,7 +1915,7 @@ contains
     complex(kind(1.d0)), intent(inout) :: heap(:)
     integer, intent(out)               :: info
     
-    integer                    :: i, i2,j
+    integer                    :: i, j
     complex(kind(1.d0))        :: temp
 
     
@@ -2169,7 +2161,7 @@ contains
     integer, intent(in)    :: dir
     integer, intent(out)   :: key
     
-    integer                :: i, i2, j,itemp
+    integer                :: i, j,itemp
     integer                :: temp
 
     info = 0
@@ -2426,7 +2418,7 @@ contains
     integer, intent(in)             :: dir
     real(kind(1.d0)), intent(out)   :: key
     
-    integer                         :: i, i2, j,itemp
+    integer                         :: i, j,itemp
     real(kind(1.d0))                :: temp
 
     info = 0
@@ -2684,7 +2676,7 @@ contains
     integer, intent(in)                :: dir
     complex(kind(1.d0)), intent(out)   :: key
     
-    integer                            :: i, i2, j, itemp
+    integer                            :: i, j, itemp
     complex(kind(1.d0))                :: temp
 
     info = 0

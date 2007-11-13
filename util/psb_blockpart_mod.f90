@@ -42,7 +42,6 @@ contains
     integer, intent(out) ::  nv
     integer, intent(out) ::  pv(*)
     integer  dim_block
-    integer  ib1, ib2, ipv
 
     dim_block = (n + np - 1)/np
     nv = 1  

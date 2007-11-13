@@ -42,8 +42,8 @@ C
 
 C
 C     .. Scalar Arguments ..
-      INTEGER            LARN, LAUX, LAUX2, LIAN1, LIAN2, M, 
-     +  N, IUPDUP, IERROR
+      INTEGER            LARN, LAUX, LIAN1, LIAN2, M, 
+     +  N, IERROR
       CHARACTER          TRANS,UNITD
 C     .. Array Arguments ..
       DOUBLE PRECISION   AR(*), ARN(*), D(*)

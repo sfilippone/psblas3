@@ -56,7 +56,7 @@ subroutine psb_dspgetrow(irw,a,nz,ia,ja,val,info,iren,lrw,append,nzin)
   integer, intent(in), optional        :: lrw, nzin
 
   logical :: append_ 
-  integer :: i,j,k,ip,jp,nr,idx,iret,nzin_, nza, lrw_, irw_, err_act
+  integer :: nzin_, lrw_, irw_, err_act
   character(len=20)                 :: name, ch_err
 
   name='psb_spgetrow'

@@ -210,7 +210,6 @@ C     .. Local Scalars ..
       LOGICAL          LP, RP
 C     .. Local Array..
       INTEGER           INT_VAL(5)
-      DOUBLE PRECISION  REAL_VAL(5)
       CHARACTER*30      STRINGS(2)
       CHARACTER         NAME*30
 C     .. Parameters ..

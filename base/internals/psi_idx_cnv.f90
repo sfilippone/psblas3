@@ -57,13 +57,13 @@ subroutine psi_idx_cnv1(nv,idxin,desc,info,mask,owned)
   integer, intent(out) :: info
   logical, intent(in), optional, target :: mask(:)
   logical, intent(in), optional :: owned
-  integer :: i,ictxt,row,k,mglob, nglob,err
-  integer                :: np, me, isize
-  integer                :: pnt_halo,nrow,ncol, nh, ip, err_act,lip,nxt
+  integer :: ictxt,mglob, nglob
+  integer                :: np, me
+  integer                :: nrow,ncol, err_act
   integer, allocatable   :: idxout(:)
   logical, parameter     :: debug=.false.
   integer, parameter     :: relocsz=200
-  character(len=20)      :: name,ch_err
+  character(len=20)      :: name
   logical, pointer       :: mask_(:)
   logical                :: owned_
 
@@ -212,12 +212,12 @@ subroutine psi_idx_cnv2(nv,idxin,idxout,desc,info,mask,owned)
   integer, intent(out) :: info
   logical, intent(in), optional, target :: mask(:)
   logical, intent(in), optional :: owned
-  integer :: i,ictxt,row,k,mglob, nglob,err
-  integer                :: np, me, isize
-  integer                :: pnt_halo,nrow,ncol, nh, ip, err_act,lip,nxt
+  integer :: i,ictxt,mglob, nglob
+  integer                :: np, me
+  integer                :: nrow,ncol, ip, err_act,lip
   logical, parameter     :: debug=.false.
   integer, parameter     :: relocsz=200
-  character(len=20)      :: name,ch_err
+  character(len=20)      :: name
   logical, pointer       :: mask_(:)
   logical                :: owned_
 
@@ -323,8 +323,7 @@ subroutine psi_idx_cnv2(nv,idxin,idxout,desc,info,mask,owned)
       if (.not.allocated(desc%hashv)) then 
         write(0,*) 'Inconsistent input to inner_cnv'
       end if
-      call psi_inner_cnv(nv,idxin,idxout,psb_hash_size,psb_hash_mask,&
-           & desc%hashv,desc%glb_lc)
+      call psi_inner_cnv(nv,idxin,idxout,psb_hash_mask,desc%hashv,desc%glb_lc)
     end if
 
   else

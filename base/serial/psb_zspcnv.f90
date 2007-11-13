@@ -63,8 +63,7 @@ subroutine psb_zspcnv2(a, b,info,afmt,upd,dupl)
   type(psb_zspmat_type)         :: temp_a
   Integer                       :: nzr, ntry, ifc_, ia1_size,&
        & ia2_size, aspk_size,size_req,n_row,n_col,upd_,dupl_
-  integer                       :: ip1, ip2, nnz, iflag, ichk, nnzt,&
-       & ipc, i, count, err_act, i1, i2, ia
+  integer                       :: err_act
   character                     :: check_,trans_,unitd_
   character(len=5)              :: afmt_
   Integer, Parameter            :: maxtry=8
@@ -389,11 +388,10 @@ subroutine psb_zspcnv1(a, info, afmt, upd, dupl)
 
   integer               :: int_err(5)
   type(psb_zspmat_type) :: atemp
-  integer               :: np,me,n_col,iout, err_act
+  integer               :: err_act
   integer               :: spstate
   integer               :: upd_, dupl_
-  integer               :: ictxt,n_row
-  logical, parameter    :: debug=.false., debugwrt=.false.
+  logical, parameter    :: debug=.false.
   character(len=20)     :: name, ch_err
 
   info = 0
@@ -471,30 +469,16 @@ subroutine psb_zspcnv1(a, info, afmt, upd, dupl)
       ! convert to user requested format after the temp copy
     end if
 
-    if (debugwrt) then
-      iout = 30+me
-      open(iout)
-      call psb_csprt(iout,atemp,head='Input mat')
-      close(iout)
-    endif
-
     ! Do the real conversion into the requested storage format
     ! result is put in A
     call psb_spcnv(atemp,a,info,afmt=afmt,upd=upd,dupl=dupl)
 
-    IF (debug) WRITE (*, *) me,'   ASB:  From SPCNV',info,' ',A%FIDA
+    IF (debug) WRITE (*, *) '   ASB:  From SPCNV',info,' ',A%FIDA
     if (info /= psb_no_err_) then    
       info=4010
       ch_err='psb_csdp'
       call psb_errpush(info,name,a_err=ch_err)
       goto 9999
-    endif
-
-    if (debugwrt) then
-      iout = 60+me
-      open(iout)
-      call psb_csprt(iout,a,head='Output mat')
-      close(iout)
     endif
 
     call psb_sp_free(atemp,info)

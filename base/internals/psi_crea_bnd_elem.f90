@@ -55,7 +55,7 @@ subroutine psi_crea_bnd_elem(bndel,desc_a,info)
   integer, intent(out) :: info
 
   integer, allocatable :: work(:)
-  integer :: i, j, nr, ns, k, irv, err_act
+  integer :: i, j, nr, ns, k, err_act
   character(len=20)    :: name
 
   info = 0

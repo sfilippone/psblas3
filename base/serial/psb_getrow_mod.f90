@@ -140,7 +140,7 @@ contains
     logical, intent(in)                  :: append
     integer                              :: lrw,info
     integer, optional                    :: iren(:)
-    integer  :: nzin_, nza, idx,ip,jp,i,j,k, nzt
+    integer  :: nzin_, nza, idx,ip,jp,i,k, nzt
     logical, parameter :: debug=.false.
 
     nza = a%infoa(psb_nnz_)
@@ -545,7 +545,7 @@ contains
     logical, intent(in)                  :: append
     integer                              :: lrw,info
     integer, optional                    :: iren(:)
-    integer  :: nzin_, nza, idx,ip,jp,i,j,k, nzt
+    integer  :: nzin_, nza, idx,ip,jp,i,k, nzt
     logical, parameter :: debug=.false.
 
     nza = a%infoa(psb_nnz_)

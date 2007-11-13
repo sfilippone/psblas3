@@ -104,7 +104,7 @@ subroutine  psb_dspmm(alpha,a,x,beta,y,desc_a,info,&
   ! locals
   integer                  :: ictxt, np, me,&
        & err_act, n, iix, jjx, ia, ja, iia, jja, ix, iy, ik, ijx, ijy,&
-       & idoswap, m, nrow, ncol, lldx, lldy, liwork, llwork, iiy, jjy,&
+       & idoswap, m, nrow, ncol, lldx, lldy, liwork, iiy, jjy,&
        & i, ib, ib1
   integer, parameter       :: nb=4
   real(kind(1.d0)),pointer :: xp(:,:), yp(:,:), iwork(:)
@@ -441,11 +441,11 @@ subroutine  psb_dspmv(alpha,a,x,beta,y,desc_a,info,&
 
   ! locals
   integer                  :: ictxt, np, me,&
-       & err_act, n, iix, jjx, ia, ja, iia, jja, ix, iy, ik, ijx, ijy,&
-       & idoswap, m, nrow, ncol, lldx, lldy, liwork, llwork, jx, jy, iiy, jjy,&
-       & i, ib, ib1
+       & err_act, n, iix, jjx, ia, ja, iia, jja, ix, iy, ik, &
+       & idoswap, m, nrow, ncol, lldx, lldy, liwork, jx, jy, iiy, jjy,&
+       & ib
   integer, parameter       :: nb=4
-  real(kind(1.d0)),pointer :: tmpx(:), iwork(:), xp(:), yp(:)
+  real(kind(1.d0)),pointer :: iwork(:), xp(:), yp(:)
   character                :: itrans
   character(len=20)        :: name, ch_err
   logical                  :: aliw

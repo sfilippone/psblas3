@@ -57,7 +57,7 @@ subroutine psb_dasb(x, desc_a, info)
 
   ! local variables
   integer :: ictxt,np,me,nrow,ncol, err_act
-  integer :: int_err(5), i1sz, i2sz
+  integer :: i1sz, i2sz
   real(kind(1.d0)),parameter    :: one=1
   logical, parameter :: debug=.false.
   character(len=20)   :: name, ch_err

@@ -134,11 +134,10 @@ contains
     use psb_base_mod
     integer       :: nparts
     integer       :: ia1(:), ia2(:)
-    integer       :: n, i, ib, ii,numflag,nedc,wgflag
+    integer       :: n, i,numflag,nedc,wgflag
     character(len=5)     :: fida
     integer, parameter :: nb=512
     real(kind(1.d0)), parameter :: seed=12345.d0
-    real(kind(1.d0)) :: XV(NB)
     integer          :: iopt(10),idummy(2),jdummy(2)
     interface 
       subroutine METIS_PartGraphRecursive(n,ixadj,iadj,ivwg,iajw,&

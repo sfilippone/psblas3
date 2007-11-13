@@ -41,7 +41,7 @@ subroutine isr(n,x,dir)
   integer ::  x(n)
   !     ..
   !     .. Local Scalars ..
-  integer :: xx, xk, piv, xt
+  integer :: xk, piv, xt
   integer i, j, ilx, iux, istp, lpiv
   integer n1, n2
 

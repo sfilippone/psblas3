@@ -59,8 +59,8 @@ function psb_zasum (x,desc_a, info, jx)
   real(kind(1.d0))                  :: psb_zasum
 
   ! locals
-  integer                  :: int_err(5), ictxt, np, npcol, me, mycol,&
-       & err_act, n, iix, jjx, temp(2), ix, ijx, m, i
+  integer                  :: ictxt, np, me, &
+       & err_act, iix, jjx, ix, ijx, m, i
   real(kind(1.d0))         :: asum, dzasum
   character(len=20)        :: name, ch_err
   complex(kind(1.d0))      :: cmax
@@ -208,7 +208,7 @@ function psb_zasumv (x,desc_a, info)
 
   ! locals
   integer                  :: ictxt, np, me,&
-       & err_act, n, iix, jjx, jx, ix, ijx, m, i
+       & err_act, iix, jjx, jx, ix, m, i
   real(kind(1.d0))         :: asum, dzasum
   character(len=20)        :: name, ch_err
   complex(kind(1.d0))      :: cmax
@@ -352,7 +352,7 @@ subroutine psb_zasumvs (res,x,desc_a, info)
 
   ! locals
   integer                  :: ictxt, np, me,&
-       & err_act, n, iix, jjx, ix, jx, ijx, m, i
+       & err_act, iix, jjx, ix, jx, m, i
   real(kind(1.d0))         :: asum, dzasum
   character(len=20)        :: name, ch_err
   complex(kind(1.d0))      :: cmax

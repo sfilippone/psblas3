@@ -93,12 +93,11 @@ Subroutine psb_zcgs(a,prec,b,x,eps,desc_a,info,&
   Complex(Kind(1.d0)), Pointer  :: ww(:), q(:),&
        & r(:), p(:), v(:), s(:), z(:), f(:), rt(:),qt(:),uv(:)
   Real(Kind(1.d0)) :: rerr
-  Integer       :: litmax, naux, m, mglob, it, itrace_,int_err(5),&
+  Integer       :: litmax, naux, mglob, it, itrace_,int_err(5),&
        & np,me, n_row, n_col,istop_, err_act
   Logical, Parameter :: exchange=.True., noexchange=.False.  
   Integer, Parameter :: irmax = 8
-  Integer            :: itx, i, isvch, ictxt
-  Logical            :: do_renum_left
+  Integer            :: itx, isvch, ictxt
   Logical, Parameter :: debug = .false.
   Real(Kind(1.d0)) :: rni, xni, bni, ani,bn2
   complex(Kind(1.d0)) :: alpha, beta, rho, rho_old, sigma 

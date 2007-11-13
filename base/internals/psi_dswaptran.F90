@@ -106,9 +106,9 @@ subroutine psi_dswaptranm(flag,n,beta,y,desc_a,work,info,data)
   integer, optional        :: data
 
   ! locals
-  integer  :: ictxt, np, me, point_to_proc, nesd, nerv,&
+  integer  :: ictxt, np, me, nesd, nerv,&
        & proc_to_comm, p2ptag, icomm, p2pstat(mpi_status_size),&
-       & idxs, idxr, iret, err_act, totxch, ixrec, i, idx_pt,&
+       & idxs, idxr, iret, err_act, totxch, i, idx_pt,&
        & snd_pt, rcv_pt, pnti
   integer, allocatable, dimension(:) :: bsdidx, brvidx,&
        & sdsz, rvsz, prcid, rvhd, sdhd
@@ -575,9 +575,9 @@ subroutine psi_dswaptranv(flag,beta,y,desc_a,work,info,data)
   integer, optional    :: data
 
   ! locals
-  integer  :: ictxt, np, me, point_to_proc, nesd, nerv,&
+  integer  :: ictxt, np, me, nesd, nerv,&
        & proc_to_comm, p2ptag, icomm, p2pstat(mpi_status_size),&
-       & idxs, idxr, iret, err_act, totxch, ixrec, i, &
+       & idxs, idxr, iret, err_act, totxch, i, &
        & idx_pt, snd_pt, rcv_pt, n, pnti
 
   integer, allocatable, dimension(:) :: bsdidx, brvidx,&

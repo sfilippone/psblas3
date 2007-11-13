@@ -79,7 +79,7 @@ contains
     complex(kind(1.d0))      :: temp(:)
     integer, allocatable  :: iarw(:), iacl(:),ibrw(:),ibcl(:)
     complex(kind(1.d0)), allocatable :: aval(:),bval(:)
-    integer  :: maxlmn,i,j,m,n,k,l,istart,length,nazr,nbzr,jj,ii,minlm,minmn,minln
+    integer  :: maxlmn,i,j,m,n,k,l,nazr,nbzr,jj,minlm,minmn,minln
     complex(kind(1.d0))      :: ajj
 
 

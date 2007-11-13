@@ -146,9 +146,9 @@ subroutine psb_zprc_aply1(prec,x,desc_data,info,trans)
 
   ! Local variables
   character     :: trans_
-  integer :: ictxt,np,me,i, isz, err_act, int_err(5)
+  integer :: ictxt,np,me, err_act
   complex(kind(1.d0)), pointer :: WW(:), w1(:)
-  character(len=20)   :: name, ch_err
+  character(len=20)   :: name
   name='psb_zprec1'
   info = 0
   call psb_erractionsave(err_act)

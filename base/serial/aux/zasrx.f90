@@ -42,8 +42,8 @@ subroutine zasrx(n,x,indx,dir,flag)
   integer ::  indx(n)
   !     ..
   !     .. Local Scalars ..
-  complex(kind(1.d0)) :: xx, piv, xk, xt
-  integer i, j, ii, ilx, iux, istp, lpiv
+  complex(kind(1.d0)) :: piv, xk, xt
+  integer i, j, ilx, iux, istp, lpiv
   integer ixt, n1, n2
 
   integer, parameter :: maxstack=64,nparms=3,ithrs=16

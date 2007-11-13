@@ -126,7 +126,6 @@ C     .. Array Arguments ..
       COMPLEX*16 A(*),B(LDB,*),C(LDC,*),WORK(*)
 C     .. Local Array ..
       INTEGER    INT_VAL(5), ERR_ACT
-      COMPLEX*16 Z_VAL(5)
       CHARACTER*30 NAME,  STRINGS(2)
 C     .. External Subroutines ..
       EXTERNAL      ZCSRMM

@@ -68,7 +68,7 @@ subroutine psb_iinsvi(m, irw, val, x, desc_a, info, dupl)
   integer, optional, intent(in)   ::  dupl
 
   !locals.....
-  integer                :: ictxt,i,loc_row,glob_row,&
+  integer                :: ictxt,i,&
        & loc_rows,loc_cols,mglob,err_act, int_err(5)
   integer                :: np, me, dupl_
   integer, allocatable   :: irl(:)
@@ -253,7 +253,7 @@ subroutine psb_iinsi(m, irw, val, x, desc_a, info, dupl)
   integer, optional, intent(in)   ::  dupl
 
   !locals.....
-  integer                :: ictxt,i,loc_row,glob_row,j,n,&
+  integer                :: ictxt,i,loc_row,j,n,&
        & loc_rows,loc_cols,mglob,err_act, int_err(5)
   integer                :: np,me,dupl_
   integer, allocatable   :: irl(:)

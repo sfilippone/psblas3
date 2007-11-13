@@ -45,9 +45,8 @@ subroutine psb_dtransp(a,b,c,fmt)
   character(len=*), optional :: fmt
 
   character(len=5)           :: fmt_
-  integer  ::c_, info, nz 
+  integer  ::c_, info 
   integer, allocatable  :: itmp(:)
-  type(psb_dspmat_type)      :: tmp
 
   if (present(c)) then 
     c_=c

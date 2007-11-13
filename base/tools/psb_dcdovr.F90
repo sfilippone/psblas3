@@ -95,13 +95,13 @@ Subroutine psb_dcdovr(a,desc_a,novr,desc_ov,info, extype)
   integer   icomm, err_act
 
   !     .. Local Scalars ..
-  Integer ::  i, j, k, np, me,m,nnzero,&
+  Integer ::  i, j, np, me,m,nnzero,&
        &  ictxt, lovr, lworks,lworkr, n_row,n_col, int_err(5),&
        &  index_dim,elem_dim, l_tmp_ovr_idx,l_tmp_halo, nztot,nhalo
   Integer :: counter,counter_h, counter_o, counter_e,idx,gidx,proc,n_elem_recv,&
        & n_elem_send,tot_recv,tot_elem,cntov_o,&
-       & counter_t,n_elem,i_ovr,jj,proc_id,isz, mglob, glx, &
-       & idxr, idxs, lx, iszr, iszs, nxch, nsnd, nrcv,lidx,irsv, extype_
+       & counter_t,n_elem,i_ovr,jj,proc_id,isz, &
+       & idxr, idxs, iszr, iszs, nxch, nsnd, nrcv,lidx, extype_
 
   type(psb_dspmat_type) :: blk
   Integer, allocatable  :: tmp_halo(:),tmp_ovr_idx(:), orig_ovr(:)
@@ -233,6 +233,7 @@ Subroutine psb_dcdovr(a,desc_a,novr,desc_ov,info, extype)
   tmp_halo(:)            = -1
   counter_e              = 1
   tot_recv               = 0
+  counter_t              = 1
   counter_h              = 1
   counter_o              = 1
   cntov_o                = 1

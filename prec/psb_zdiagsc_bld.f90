@@ -42,11 +42,10 @@ subroutine psb_zdiagsc_bld(a,desc_a,p,upd,info)
 
 
   ! Local scalars
-  Integer      :: err, n_row, n_col,I,j,k,ictxt,&
-       & me,np,mglob,lw, err_act
+  Integer      :: err, n_row, n_col,I,ictxt,&
+       & me,np,mglob,err_act
   complex(kind(1.d0)),pointer :: gd(:), work(:)
   integer      :: int_err(5)
-  character    :: iupd
 
   logical, parameter :: debug=.false.   
   integer,parameter  :: iroot=0,iout=60,ilout=40

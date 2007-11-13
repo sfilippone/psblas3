@@ -51,9 +51,9 @@ subroutine psb_dgelp(trans,iperm,x,info)
   character, intent(in)                :: trans
 
   ! local variables
-  integer                  :: ictxt,np, me,nrow,ncol
+  integer                  :: ictxt
   real(kind(1.d0)),allocatable  :: dtemp(:)
-  integer                  :: int_err(5), i1sz, i2sz, dectype, i, err_act
+  integer                  :: int_err(5), i1sz, i2sz, err_act
   integer, allocatable     :: itemp(:)
   real(kind(1.d0)),parameter    :: one=1
   logical, parameter :: debug=.false.
@@ -181,8 +181,8 @@ subroutine psb_dgelpv(trans,iperm,x,info)
   character, intent(in)              ::  trans
 
   ! local variables
-  integer :: ictxt,np,me
-  integer :: int_err(5), i1sz,nrow,ncol,dectype, err_act
+  integer :: ictxt
+  integer :: int_err(5), i1sz, err_act
   real(kind(1.d0)),allocatable  ::  dtemp(:)
   integer, allocatable     :: itemp(:)
   real(kind(1.d0)),parameter    :: one=1

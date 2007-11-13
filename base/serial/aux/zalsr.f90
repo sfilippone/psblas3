@@ -42,7 +42,7 @@ subroutine zalsr(n,x,dir)
   complex(kind(1.d0)) ::  x(n)
   !     ..
   !     .. Local Scalars ..
-  complex(kind(1.d0)) :: xx, xk, piv, xt
+  complex(kind(1.d0)) :: xk, piv, xt
   integer i, j, ilx, iux, istp, lpiv
   integer n1, n2
 

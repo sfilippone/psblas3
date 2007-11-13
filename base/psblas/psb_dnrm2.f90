@@ -58,7 +58,7 @@ function psb_dnrm2(x, desc_a, info, jx)
 
   ! locals
   integer                  :: ictxt, np, me,&
-       & err_act, n, iix, jjx, ndim, ix, ijx, i, m, id 
+       & err_act, iix, jjx, ndim, ix, ijx, i, m, id 
   real(kind(1.d0))         :: nrm2, dnrm2, dd
   external dcombnrm2
   character(len=20)        :: name, ch_err
@@ -195,7 +195,7 @@ function psb_dnrm2v(x, desc_a, info)
 
   ! locals
   integer                  :: ictxt, np, me,&
-       & err_act, n, iix, jjx, ndim, ix, jx, ijx, i, m, id 
+       & err_act, iix, jjx, ndim, ix, jx, i, m, id 
   real(kind(1.d0))         :: nrm2, dnrm2, dd
   external dcombnrm2
   character(len=20)        :: name, ch_err
@@ -330,7 +330,7 @@ subroutine psb_dnrm2vs(res, x, desc_a, info)
 
   ! locals
   integer                  :: ictxt, np, me,&
-       & err_act, n, iix, jjx, ndim, ix, jx, ijx, i, m, id 
+       & err_act, iix, jjx, ndim, ix, jx, i, m, id 
   real(kind(1.d0))         :: nrm2, dnrm2, dd
   external dcombnrm2
   character(len=20)        :: name, ch_err

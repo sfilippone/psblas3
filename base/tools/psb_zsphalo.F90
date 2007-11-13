@@ -92,7 +92,7 @@ Subroutine psb_zsphalo(a,desc_a,blk,info,rowcnv,colcnv,&
   logical :: rowcnv_,colcnv_,rowscale_,colscale_
   character(len=5)  :: outfmt_
   Logical,Parameter :: debug=.false., debugprt=.false.
-  real(kind(1.d0)) :: t1,t2,t3,t4,t5,t6,t7,t8,t9
+  real(kind(1.d0)) :: t1,t2,t3,t4,t5
   character(len=20)   :: name, ch_err
 
   if(psb_get_errstatus() /= 0) return 

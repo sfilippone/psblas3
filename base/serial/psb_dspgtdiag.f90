@@ -50,8 +50,8 @@ subroutine psb_dspgtdiag(a,d,info)
   integer, intent(out)                  :: info
 
   type(psb_dspmat_type)     :: tmpa
-  integer :: i,j,k,nr, nz, err_act, ii, rng, irb, nrb
-  character(len=20)                 :: name, ch_err
+  integer :: i,j, err_act, ii, rng, irb, nrb
+  character(len=20)         :: name, ch_err
 
   name='psb_dspgtdiag'
   info  = 0

@@ -50,7 +50,7 @@ Subroutine psb_zipcsr2coo(a,info)
   integer              :: i,j,err_act
   logical, parameter   :: debug=.false.
   integer, allocatable :: iaux(:), itemp(:)
-  character(len=20)    :: name, ch_err
+  character(len=20)    :: name
 
   name='psb_zipcsr2coo'
   info  = 0

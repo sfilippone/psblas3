@@ -105,15 +105,15 @@ Subroutine psb_zgmresr(a,prec,b,x,eps,desc_a,info,&
 !!$   local data
   complex(Kind(1.d0)), allocatable, target   :: aux(:),w(:),w1(:), v(:,:)
   complex(Kind(1.d0)), allocatable   ::  c(:),s(:), h(:,:), rs(:),rst(:),xt(:)
-  Real(Kind(1.d0)) :: rerr, gm,tmp
+  Real(Kind(1.d0)) :: rerr, tmp
   complex(kind(1.d0)) :: rti, rti1, scal
-  Integer       ::litmax, liter, naux, m, mglob, it,k, itrace_,&
+  Integer       ::litmax, naux, mglob, it,k, itrace_,&
        & np,me, n_row, n_col, nl, int_err(5)
   Logical, Parameter :: exchange=.True., noexchange=.False.
   Integer, Parameter :: irmax = 8
-  Integer            :: itx, i, isvch, ich, ictxt,istop_, err_act
+  Integer            :: itx, i, isvch, ictxt,istop_, err_act
   Logical, Parameter :: debug = .false.
-  Real(Kind(1.d0)) :: rni, xni, bni, ani,bn2, dt
+  Real(Kind(1.d0)) :: rni, xni, bni, ani,bn2
   real(kind(1.d0)), external :: dznrm2
   character(len=20)          :: name
 

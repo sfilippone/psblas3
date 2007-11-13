@@ -217,7 +217,7 @@ subroutine  psb_zaxpbyv(alpha, x, beta,y,desc_a,info)
 
   ! locals
   integer                  :: ictxt, np, me,&
-       & err_act, n, iix, jjx, ix, iy, ijx, m, iiy, in, jjy
+       & err_act, iix, jjx, ix, iy, m, iiy, jjy
   character(len=20)        :: name, ch_err
   logical, parameter :: debug=.false.
 

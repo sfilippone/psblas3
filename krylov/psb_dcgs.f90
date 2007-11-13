@@ -93,15 +93,15 @@ Subroutine psb_dcgs(a,prec,b,x,eps,desc_a,info,&
   Real(Kind(1.d0)), Pointer  :: ww(:), q(:),&
        & r(:), p(:), v(:), s(:), z(:), f(:), rt(:),qt(:),uv(:)
   Real(Kind(1.d0)) :: rerr
-  Integer       :: litmax, naux, m, mglob, it, itrace_,int_err(5),&
+  Integer       :: litmax, naux, mglob, it, itrace_,int_err(5),&
        & np,me, n_row, n_col,istop_, err_act
   Logical, Parameter :: exchange=.True., noexchange=.False.  
   Integer, Parameter :: irmax = 8
-  Integer            :: itx, i, isvch, ich, ictxt
+  Integer            :: itx, isvch, ictxt
   Logical, Parameter :: debug = .false.
   Real(Kind(1.d0)) :: alpha, beta, rho, rho_old, rni, xni, bni, ani,bn2,& 
        & sigma 
-  character(len=20)             :: name,ch_err
+  character(len=20)             :: name
 
   info = 0
   name = 'psb_dcgs'

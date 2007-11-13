@@ -123,8 +123,7 @@ subroutine psi_desc_index(desc,index_in,dep_list,&
   integer :: j,me,np,i,proc
   !    ...parameters...
   integer :: ictxt
-  integer :: no_comm,err
-  parameter (no_comm=-1)
+  integer, parameter  :: no_comm=-1
   !     ...local arrays..
   integer,allocatable  :: brvindx(:),rvsz(:),&
        & bsdindx(:),sdsz(:), sndbuf(:), rcvbuf(:)

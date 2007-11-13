@@ -60,13 +60,13 @@ subroutine psi_idx_ins_cnv1(nv,idxin,desc,info,mask)
   type(psb_desc_type), intent(inout) :: desc
   integer, intent(out) :: info
   logical, intent(in), optional, target :: mask(:)
-  integer :: i,ictxt,row,k,mglob, nglob,err
-  integer                :: np, me, isize
-  integer                :: pnt_halo,nrow,ncol, nh, ip, err_act,lip,nxt
+  integer :: ictxt,mglob, nglob
+  integer                :: np, me
+  integer                :: nrow,ncol, err_act
   integer, allocatable   :: idxout(:)
   logical, parameter     :: debug=.false.
   integer, parameter     :: relocsz=200
-  character(len=20)      :: name,ch_err
+  character(len=20)      :: name
   logical, pointer       :: mask_(:)
 
   info = 0
@@ -211,9 +211,9 @@ subroutine psi_idx_ins_cnv2(nv,idxin,idxout,desc,info,mask)
   type(psb_desc_type), intent(inout) :: desc
   integer, intent(out) :: info
   logical, intent(in), optional, target :: mask(:)
-  integer :: i,ictxt,row,k,mglob, nglob,err
+  integer :: i,ictxt,k,mglob, nglob
   integer                :: np, me, isize
-  integer                :: pnt_halo,nrow,ncol, nh, ip, err_act,lip,nxt,il1
+  integer                :: pnt_halo,nrow,ncol, nh, ip, err_act,lip,nxt
   logical, parameter     :: debug=.false.
   integer, parameter     :: relocsz=200
   character(len=20)      :: name,ch_err

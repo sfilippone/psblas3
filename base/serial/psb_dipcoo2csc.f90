@@ -49,7 +49,7 @@ subroutine psb_dipcoo2csc(a,info,clshr)
   integer, allocatable :: iaux(:), itemp(:)
   !locals
   logical             :: clshr_
-  Integer             :: nza, nr, i,j, idl,err_act,nc,icl
+  Integer             :: nza, i,j, idl,err_act,nc,icl
   Integer, Parameter  :: maxtry=8
   logical, parameter  :: debug=.false.
   character(len=20)   :: name

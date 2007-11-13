@@ -246,7 +246,7 @@ AVLTreePtr GetAVLTree()
 
 int AVLTreeInit(AVLTreePtr Tree)
 {
-  AVLTVectPtr current;
+  /* AVLTVectPtr current; */
   if (Tree==NULL) {
     fprintf(stderr,"Cannot initialize a NULL Tree pointer\n");
     return(-1);

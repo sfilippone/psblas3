@@ -583,7 +583,7 @@ contains
         integer, intent(out)              :: info
       end subroutine psb_cdrep
     end interface
-    character(len=20)   :: name, char_err
+    character(len=20)   :: name
     integer :: err_act, n_, flag_, i, me, np, nlp
     integer, allocatable :: itmpsz(:) 
 

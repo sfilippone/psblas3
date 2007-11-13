@@ -56,12 +56,12 @@ subroutine psi_crea_ovr_elem(desc_overlap,ovr_elem,info)
   integer, intent(out) :: info
 
   !     ...local scalars...
-  integer :: i,pnt_new_elem,ret,j,iret
+  integer :: i,pnt_new_elem,ret,j
   integer :: dim_ovr_elem
   integer :: pairtree(2)
 
   !     ...external function...
-  integer  :: psi_exist_ovr_elem,dim
+  integer  :: psi_exist_ovr_elem
   external :: psi_exist_ovr_elem
 
   integer  :: nel, ip, ix, iel, insize, err_act

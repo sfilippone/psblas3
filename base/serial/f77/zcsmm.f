@@ -176,7 +176,6 @@ C     .. Local Scalars ..
       LOGICAL           LP, RP
 C     .. Local Array..
       INTEGER    INT_VAL(5)
-      COMPLEX*16 Z_VAL(5)
       CHARACTER*30 NAME,  STRINGS(2)
 C     .. Parameters ..
       COMPLEX*16 ZERO

@@ -56,7 +56,7 @@ subroutine psb_dsymbmm(a,b,c,info)
       integer, allocatable :: ic(:),jc(:)
     end subroutine symbmm 
   end interface
-  character(len=20)     :: name, ch_err
+  character(len=20)     :: name
   integer               :: err_act
   logical               :: csra, csrb
   name='psb_symbmm'
@@ -113,8 +113,7 @@ contains
     integer               :: index(:),info
     integer, allocatable  :: iarw(:), iacl(:),ibrw(:),ibcl(:)
     real(kind(1.d0)), allocatable :: aval(:),bval(:)
-    integer  :: maxlmn,i,j,m,n,k,l,istart,length,nazr,nbzr,jj,ii,minlm,minmn
-    type(psb_dspmat_type) :: w
+    integer  :: maxlmn,i,j,m,n,k,l,istart,length,nazr,nbzr,jj,minlm,minmn
 
 
     n = a%m

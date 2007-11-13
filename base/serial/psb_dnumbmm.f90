@@ -83,9 +83,8 @@ contains
     real(kind(1.d0))      :: temp(:)
     integer, allocatable  :: iarw(:), iacl(:),ibrw(:),ibcl(:)
     real(kind(1.d0)), allocatable :: aval(:),bval(:)
-    integer  :: maxlmn,i,j,m,n,k,l,istart,length,nazr,nbzr,jj,ii,minlm,minmn,minln
+    integer  :: maxlmn,i,j,m,n,k,l,nazr,nbzr,jj,minlm,minmn,minln
     real(kind(1.d0))      :: ajj
-    type(psb_dspmat_type) :: w
 
     n = a%m
     m = a%k 

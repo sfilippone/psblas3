@@ -20,6 +20,11 @@ ppde90: ppde90.o
 	/bin/mv ppde90 $(EXEDIR)
 
 
+thsrt: thsrt.o  
+	$(F90LINK) thsrt.o  -o thsrt $(PSBLAS_LIB) $(LDLIBS)
+	/bin/mv thsrt $(EXEDIR)
+
+
 .f90.o:
 	$(MPF90) $(F90COPT) $(FINCLUDES) $(FDEFINES) -c $<
 

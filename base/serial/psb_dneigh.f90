@@ -47,10 +47,9 @@ subroutine psb_dneigh(a,idx,neigh,n,info,lev)
   integer, allocatable              :: neigh(:) ! the neighbours
   integer, optional                 :: lev ! level of neighbours to find
 
-  integer, allocatable   :: tmpn(:)
-  integer :: lev_, dim, i, j, k, r, c, brow,nl, ifl,ill,&
-       & elem_pt, ii, n1, col_idx, ne, err_act, nn, nidx,ntl
-  character(len=20)                 :: name, ch_err
+  integer :: lev_, i, nl, ifl,ill,&
+       & n1, err_act, nn, nidx,ntl
+  character(len=20)                 :: name
   integer, allocatable :: ia(:), ja(:)
   real(kind(1.d0)), allocatable :: val(:)
 
@@ -67,8 +66,11 @@ subroutine psb_dneigh(a,idx,neigh,n,info,lev)
   end if
 
   call psb_sp_getrow(idx,a,n,ia,ja,val,info)
-
-  call psb_realloc(n,neigh,info)
+  if (info == 0) call psb_realloc(n,neigh,info)
+  if (info /= 0) then 
+    call psb_errpush(4000,name)
+    goto 9999
+  end if
   neigh(1:n) = ja(1:n)
   ifl = 1
   ill = n
@@ -77,12 +79,20 @@ subroutine psb_dneigh(a,idx,neigh,n,info,lev)
   do nl = 2, lev_ 
     n1 = ill - ifl + 1
     call psb_ensure_size(ill+n1*n1,neigh,info)
+    if (info /= 0) then 
+      call psb_errpush(4000,name)
+      goto 9999
+    end if
     ntl = 0
     do i=ifl,ill
       nidx=neigh(i)
       if ((nidx.ne.idx).and.(nidx.gt.0).and.(nidx.le.a%m)) then
         call psb_sp_getrow(nidx,a,nn,ia,ja,val,info)
-        call psb_ensure_size(ill+ntl+nn,neigh,info)
+        if (info==0) call psb_ensure_size(ill+ntl+nn,neigh,info)
+        if (info /= 0) then 
+          call psb_errpush(4000,name)
+          goto 9999
+        end if        
         neigh(ill+ntl+1:ill+ntl+nn)=ja(1:nn)
         ntl = ntl+nn
       end if

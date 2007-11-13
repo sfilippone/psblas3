@@ -82,7 +82,7 @@ contains
     real(kind(1.d0)) :: x(:), y(:)
 
     ! Locals
-    integer :: i, j
+    integer :: i
 
     do i=1,n
       y(i)=x(idx(i))
@@ -134,11 +134,11 @@ contains
     use psb_const_mod
     implicit none
 
-    integer :: n, k, idx(:)
+    integer :: n, idx(:)
     real(kind(1.d0)) :: beta, x(:), y(:)
 
     ! Locals
-    integer :: i, j, pt
+    integer :: i
 
     if (beta == dzero) then
       do i=1,n
@@ -187,7 +187,7 @@ contains
     integer :: x(:), y(:)
 
     ! Locals
-    integer :: i, j
+    integer :: i
 
     do i=1,n
       y(i)=x(idx(i))
@@ -240,11 +240,11 @@ contains
     use psb_const_mod
     implicit none
 
-    integer :: n, k, idx(:)
+    integer :: n, idx(:)
     integer :: beta, x(:), y(:)
 
     ! Locals
-    integer :: i, j, pt
+    integer :: i
 
     if (beta == izero) then
       do i=1,n
@@ -293,7 +293,7 @@ contains
     complex(kind(1.d0)) :: x(:), y(:)
 
     ! Locals
-    integer :: i, j
+    integer :: i
 
     do i=1,n
       y(i)=x(idx(i))
@@ -345,11 +345,11 @@ contains
     use psb_const_mod
     implicit none
 
-    integer :: n, k, idx(:)
+    integer :: n, idx(:)
     complex(kind(1.d0)) :: beta, x(:), y(:)
 
     ! Locals
-    integer :: i, j, pt
+    integer :: i
 
     if (beta == zzero) then
       do i=1,n

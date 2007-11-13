@@ -41,7 +41,7 @@ subroutine iasr(n,x,dir)
   integer ::  x(n)
   !     ..
   !     .. Local Scalars ..
-  integer :: xx, piv, xt, xk
+  integer :: piv, xt, xk
   integer i, j, ilx, iux, istp, lpiv
   integer n1, n2
 

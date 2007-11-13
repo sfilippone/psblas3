@@ -63,7 +63,7 @@ subroutine psb_glob_to_loc2(x,y,desc_a,info,iact,owned)
   logical, intent(in),  optional     :: owned
 
   !....locals....
-  integer                            ::  n, i, tmp
+  integer                            ::  n
   character                          ::  act
   integer                            ::  int_err(5), err_act
   real(kind(1.d0))                   ::  real_val
@@ -189,11 +189,10 @@ subroutine psb_glob_to_loc(x,desc_a,info,iact,owned)
   character, intent(in), optional  :: iact
 
   !....locals....
-  integer                          :: n, i, tmp, nk, key, idx, ih, nh, lb, ub, lm
+  integer                          :: n
   character                        :: act
-  integer                          :: int_err(5), err_act, dectype
-  real(kind(1.d0))                 :: real_val, t0, t1,t2
-  logical                            :: owned_
+  integer                          :: err_act, dectype
+  logical                          :: owned_
   integer, parameter               :: zero=0
   character(len=20)   :: name
   integer             :: ictxt, iam, np

@@ -38,10 +38,7 @@ subroutine imsru(n,x,idir,nout)
   integer :: x(n)
   
   
-  integer, allocatable :: iaux(:)
-  
-  integer :: iswap, iret, info, lp, k
-  integer :: lswap
+  integer :: k
 
   nout = 0 
   if (n<0) then 

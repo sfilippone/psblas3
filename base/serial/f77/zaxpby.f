@@ -36,7 +36,6 @@ C
       complex(kind(1.d0)) alpha, beta
       integer i, j
       integer int_err(5)
-      double precision real_err(5)
       character  name*20
       name='zaxpby'
 

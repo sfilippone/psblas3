@@ -96,8 +96,8 @@ Subroutine psb_dcg(a,prec,b,x,eps,desc_a,info,&
   real(kind(1.d0))    ::rerr
   real(kind(1.d0))    ::alpha, beta, rho, rho_old, rni, xni, bni, ani,bn2,& 
        & sigma
-  integer         :: litmax, liter, istop_, naux, m, mglob, it, itx, itrace_,&
-       & np,me, n_col, isvch, ich, ictxt, n_row,err_act, int_err(5)
+  integer         :: litmax, istop_, naux, mglob, it, itx, itrace_,&
+       & np,me, n_col, isvch, ictxt, n_row,err_act, int_err(5)
   logical, parameter :: exchange=.true., noexchange=.false.  
   character(len=20)             :: name
 

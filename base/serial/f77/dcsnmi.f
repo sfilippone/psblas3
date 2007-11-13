@@ -107,7 +107,6 @@ C     .. Local Scalars..
       INTEGER           ERR_ACT
 C     .. Local Array..
       INTEGER           INT_VAL(5)
-      DOUBLE PRECISION  REAL_VAL(5)
 C     .. External Subroutines ..
       DOUBLE PRECISION  DCRNRMI, DJDNRMI, DCOONRMI
       EXTERNAL          DCRNRMI, DJDNRMI, DCOONRMI

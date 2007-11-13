@@ -67,7 +67,6 @@ subroutine  psb_daxpby(alpha, x, beta,y,desc_a,info, n, jx, jy)
   ! locals
   integer                  :: ictxt, np, me,&
        & err_act, iix, jjx, ix, iy, ijx, ijy, m, iiy, in, jjy
-  real(kind(1.d0)),pointer :: tmpx(:)
   character(len=20)        :: name, ch_err
 
   name='psb_dgeaxpby'
@@ -219,7 +218,7 @@ subroutine  psb_daxpbyv(alpha, x, beta,y,desc_a,info)
 
   ! locals
   integer                  :: ictxt, np, me,&
-       & err_act, n, iix, jjx, ix, iy, ijx, m, iiy, in, jjy
+       & err_act, iix, jjx, ix, iy, m, iiy, jjy
   character(len=20)        :: name, ch_err
   logical, parameter :: debug=.false.
 

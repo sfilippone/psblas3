@@ -77,15 +77,15 @@ contains
     character(len=*)                      :: filename
     integer, optional                     :: inroot
     integer, parameter          :: infile = 2
-    integer                     :: info, root, nprow, npcol, myprow, mypcol
+    integer                     :: info, root, np,  me
 
     if (present(inroot)) then
       root = inroot
     else
       root = 0
     end if
-    call psb_info(ictxt, myprow, nprow)    
-    if (myprow == root) then
+    call psb_info(ictxt, me, np)    
+    if (me == root) then
       write(*, '("Reading matrix...")')      ! open input file
       call mm_mat_read(a,info,infile,filename)
       if (info /= 0) then 
@@ -105,7 +105,7 @@ contains
     character                             :: filename*(*)
     integer, optional                     :: inroot
     integer, parameter   :: infile = 2
-    integer              :: nrow, ncol, i,root, nprow, npcol, myprow, mypcol, ircode, j
+    integer              :: nrow, ncol, i,root, np,  me,  ircode, j
     character            :: mmheader*15, fmt*15, object*10, type*10, sym*15,&
          & line*1024
     real(kind(1.0d0)), allocatable  :: b(:,:)
@@ -114,8 +114,8 @@ contains
     else
       root = 0
     end if
-    call psb_info(ictxt, myprow, nprow)    
-    if (myprow == root) then
+    call psb_info(ictxt, me, np)    
+    if (me == root) then
       write(*, '("Reading rhs...")')      ! open input file
       open(infile,file=filename, status='old', err=901, action="read")
       read(infile,fmt=*, end=902) mmheader, object, fmt, type, sym
@@ -165,15 +165,15 @@ contains
     character(len=*)                      :: filename
     integer, optional                     :: inroot
     integer, parameter          :: infile = 2
-    integer                     :: info, root, nprow, npcol, myprow, mypcol
+    integer                     :: info, root, np,  me
 
     if (present(inroot)) then
       root = inroot
     else
       root = 0
     end if
-    call psb_info(ictxt, myprow, nprow)
-    if (myprow == root) then
+    call psb_info(ictxt, me, np)
+    if (me == root) then
       write(*, '("Reading matrix...")')      ! open input file
       call mm_mat_read(a,info,infile,filename)
       if (info /= 0) then 
@@ -193,7 +193,7 @@ contains
     character                             :: filename*(*)
     integer, optional                     :: inroot
     integer, parameter   :: infile = 2
-    integer              :: nrow, ncol, i,root, nprow, npcol, myprow, mypcol, ircode, j
+    integer              :: nrow, ncol, i,root, np,  me,  ircode, j
     character            :: mmheader*15, fmt*15, object*10, type*10, sym*15,&
          & line*1024
     real(kind(1.d0))     :: bre, bim 
@@ -203,8 +203,8 @@ contains
     else
       root = 0
     end if
-    call psb_info(ictxt, myprow, nprow)
-    if (myprow == root) then
+    call psb_info(ictxt, me, np)
+    if (me == root) then
       write(*, '("Reading rhs...")')      ! open input file
       open(infile,file=filename, status='old', err=901, action="read")
       read(infile,fmt=*, end=902) mmheader, object, fmt, type, sym

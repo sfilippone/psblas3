@@ -62,13 +62,13 @@ subroutine psb_cdins(nz,ia,ja,desc_a,info,ila,jla)
 
   !LOCALS.....
 
-  integer :: i,ictxt,k,dectype,mglob, nglob,err
-  integer                :: np, me, isize
+  integer :: ictxt,dectype,mglob, nglob
+  integer                :: np, me
   integer                :: nrow,ncol, err_act
   logical, parameter     :: debug=.false.
   integer, parameter     :: relocsz=200
   integer, allocatable   :: ila_(:), jla_(:)
-  character(len=20)      :: name,ch_err
+  character(len=20)      :: name
 
   info = 0
   name = 'psb_cdins'

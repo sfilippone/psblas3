@@ -126,7 +126,6 @@ contains
     use psb_base_mod
     integer, intent(in)              :: iout
     type(psb_dprec_type), intent(in) :: p
-    integer  :: ilev
     
     write(iout,*) 'Preconditioner description'
     select case(p%iprcparm(p_type_))
@@ -225,7 +224,7 @@ contains
     use psb_base_mod
     type(psb_dprec_type), intent(inout) :: p
     integer, intent(out)                :: info
-    integer             :: ictxt,me, np,err_act,i
+    integer             :: me, err_act,i
     character(len=20)   :: name
     if(psb_get_errstatus().ne.0) return 
     info=0
@@ -299,7 +298,7 @@ contains
     use psb_base_mod
     type(psb_zprec_type), intent(inout) :: p
     integer, intent(out)                :: info
-    integer             :: ictxt,me, np,err_act,i
+    integer             :: err_act,i
     character(len=20)   :: name
     if(psb_get_errstatus().ne.0) return 
     info=0

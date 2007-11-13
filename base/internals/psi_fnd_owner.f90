@@ -62,10 +62,10 @@ subroutine psi_fnd_owner(nv,idx,iprc,desc,info)
 
   integer,allocatable :: hsz(:),hidx(:),helem(:),hproc(:)
 
-  integer          ::  i,j,err,n_row,n_col, err_act,ih,nh,icomm,hsize
+  integer          ::  i,n_row,n_col, err_act,ih,icomm,hsize
   integer             :: ictxt,np,me
   logical, parameter  :: debug=.false., debugwrt=.false.
-  character(len=20)   :: name,ch_err
+  character(len=20)   :: name
 
   info = 0
   name = 'psi_fnd_owner'

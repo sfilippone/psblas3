@@ -41,8 +41,8 @@ subroutine dsrx(n,x,indx,dir,flag)
   integer ::  indx(n)
   !     ..
   !     .. Local Scalars ..
-  real(kind(1.d0)) :: xx, piv, xk, xt
-  integer i, j, ii, ilx, iux, istp, lpiv
+  real(kind(1.d0)) :: piv, xk, xt
+  integer i, j, ilx, iux, istp, lpiv
   integer ixt, n1, n2
 
   integer, parameter :: maxstack=64,nparms=3,ithrs=16

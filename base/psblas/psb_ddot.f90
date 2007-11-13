@@ -62,7 +62,7 @@ function psb_ddot(x, y,desc_a, info, jx, jy)
 
   ! locals
   integer                  :: ictxt, np, me,&
-       & err_act, n, iix, jjx, ix, ijx, iy, ijy, iiy, jjy, i, m, j, k
+       & err_act, iix, jjx, ix, ijx, iy, ijy, iiy, jjy, i, m
   real(kind(1.D0))         :: dot_local
   real(kind(1.d0))         :: ddot
   character(len=20)        :: name, ch_err
@@ -215,8 +215,8 @@ function psb_ddotv(x, y,desc_a, info)
   real(kind(1.D0))                 :: psb_ddotv
 
   ! locals
-  integer                  :: int_err(5), ictxt, np, me,&
-       & err_act, n, iix, jjx, ix, jx, iy, jy, iiy, jjy, i, m, j, k
+  integer                  :: ictxt, np, me,&
+       & err_act, iix, jjx, ix, jx, iy, jy, iiy, jjy, i, m
   real(kind(1.D0))         :: dot_local
   real(kind(1.d0))         :: ddot
   character(len=20)        :: name, ch_err
@@ -353,8 +353,8 @@ subroutine psb_ddotvs(res, x, y,desc_a, info)
   integer, intent(out)             :: info
 
   ! locals
-  integer                  :: int_err(5), ictxt, np, me,&
-       & err_act, n, iix, jjx, ix, ijx, iy, ijy, iiy, jjy, i, m, j, k
+  integer                  :: ictxt, np, me,&
+       & err_act, iix, jjx, ix, iy,  iiy, jjy, i, m
   real(kind(1.D0))         :: dot_local
   real(kind(1.d0))         :: ddot
   character(len=20)        :: name, ch_err
@@ -494,8 +494,8 @@ subroutine psb_dmdots(res, x, y, desc_a, info)
   integer, intent(out)             :: info
 
   ! locals
-  integer                  :: int_err(5), ictxt, np, me,&
-       & err_act, n, iix, jjx, ix, ijx, iy, ijy, iiy, jjy, i, m, j, k
+  integer                  :: ictxt, np, me,&
+       & err_act, iix, jjx, ix, iy, iiy, jjy, i, m, j, k
   real(kind(1.d0)),allocatable  :: dot_local(:)
   real(kind(1.d0))         :: ddot
   character(len=20)        :: name, ch_err
@@ -598,8 +598,8 @@ subroutine psb_ddot2v(res, x, y,w,z,desc_a, info)
   integer, intent(out)             :: info
 
   ! locals
-  integer                  :: int_err(5), ictxt, np, me,&
-       & err_act, n, iix, jjx, ix, ijx, iy, ijy, iiy, jjy, i, m, j, k
+  integer                  :: ictxt, np, me,&
+       & err_act, iix, jjx, ix, iy, iiy, jjy, i, m 
   real(kind(1.D0))         :: dot_local(2)
   real(kind(1.d0))         :: ddot
   character(len=20)        :: name, ch_err

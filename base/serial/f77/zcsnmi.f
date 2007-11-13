@@ -75,7 +75,6 @@ C     .. Array Arguments ..
       COMPLEX*16        A(*)
 C     .. Local Array..
       INTEGER           INT_VAL(5), ERR_ACT
-      DOUBLE PRECISION  REAL_VAL(5)
       CHARACTER*30      NAME, STRINGS(2)
 C     .. External Subroutines ..
       DOUBLE PRECISION  ZCRNRMI, ZCOONRMI

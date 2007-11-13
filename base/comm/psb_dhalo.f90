@@ -279,7 +279,7 @@ subroutine  psb_dhalov(x,desc_a,info,alpha,work,tran,mode,data)
 
   ! locals
   integer                  :: ictxt, np, me,&
-       & err_act, m, n, iix, jjx, ix, ijx, nrow, imode, i,&
+       & err_act, m, n, iix, jjx, ix, ijx, nrow, imode,&
        & err, liwork,data_
   real(kind(1.d0)),pointer :: iwork(:)
   character                :: ltran

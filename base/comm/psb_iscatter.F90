@@ -291,7 +291,7 @@ subroutine  psb_iscatterv(globx, locx, desc_a, info, iroot)
 
   ! locals
   integer                  :: int_err(5), ictxt, np, me, &
-       & err_act, m, n, i, j, idx, nrow, iiroot, iglobx, jglobx,&
+       & err_act, m, n, i, j, idx, nrow, iglobx, jglobx,&
        & ilocx, jlocx, lda_locx, lda_globx, root, k, icomm, myrank,&
        & rootrank, pos, ilx, jlx
   integer, allocatable  :: scatterv(:)

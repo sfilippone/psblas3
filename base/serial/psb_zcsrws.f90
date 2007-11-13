@@ -55,7 +55,7 @@ subroutine psb_zcsrws(rw,a,info,trans)
   end interface
 
   character :: trans_
-  integer   :: m,n,k,err_act
+  integer   :: m,k,err_act
   character(len=20) :: name
 
   name='psb_zcsrws'

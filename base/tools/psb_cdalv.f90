@@ -57,7 +57,7 @@ subroutine psb_cdalv(v, ictxt, desc_a, info, flag)
 
   !locals
   Integer             :: counter,i,j,np,me,loc_row,err,&
-       & loc_col,nprocs,m,n,itmpov, k,glx,gidx,gle,&
+       & loc_col,nprocs,m,n,itmpov, k,glx,&
        & l_ov_ix,l_ov_el,idx, flag_, err_act
   integer             :: int_err(5),exch(3)
   Integer, allocatable  :: temp_ovrlap(:), ov_idx(:),ov_el(:)

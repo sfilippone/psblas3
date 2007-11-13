@@ -99,7 +99,7 @@ subroutine  psb_dspsm(alpha,a,x,beta,y,desc_a,info,&
 
   ! locals
   integer                  :: int_err(5), ictxt, np, me,&
-       & err_act, n, iix, jjx, ia, ja, iia, jja, lldx,lldy, lchoice,&
+       & err_act, iix, jjx, ia, ja, iia, jja, lldx,lldy, lchoice,&
        & ix, iy, ik, ijx, ijy, i, lld,&
        & m, nrow, ncol, liwork, llwork, iiy, jjy
 
@@ -404,7 +404,7 @@ subroutine  psb_dspsv(alpha,a,x,beta,y,desc_a,info,&
 
   ! locals
   integer                  :: int_err(5), ictxt, np, me,&
-       & err_act, n, iix, jjx, ia, ja, iia, jja, lldx,lldy, lchoice,&
+       & err_act, iix, jjx, ia, ja, iia, jja, lldx,lldy, lchoice,&
        & ix, iy, ik, jx, jy, i, lld,&
        & m, nrow, ncol, liwork, llwork, iiy, jjy
 

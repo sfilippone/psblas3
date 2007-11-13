@@ -93,12 +93,12 @@ Subroutine psb_dcgstab(a,prec,b,x,eps,desc_a,info,&
   Real(Kind(1.d0)), Pointer  :: q(:),&
        & r(:), p(:), v(:), s(:), t(:), z(:), f(:)
   Real(Kind(1.d0)) :: rerr
-  Integer       :: litmax, naux, m, mglob, it,itrace_,&
+  Integer       :: litmax, naux, mglob, it,itrace_,&
        & np,me, n_row, n_col
   Logical, Parameter :: debug = .false.
   Logical, Parameter :: exchange=.True., noexchange=.False., debug1 = .False.
   Integer, Parameter :: irmax = 8
-  Integer            :: itx, i, isvch, ictxt, err_act, int_err(5),ii
+  Integer            :: itx, isvch, ictxt, err_act, int_err(5)
   Integer            :: istop_
   Real(Kind(1.d0)) :: alpha, beta, rho, rho_old, rni, xni, bni, ani,& 
        & sigma, omega, tau, rn0, bn2

@@ -22,10 +22,10 @@ contains
     type(psb_dspmat_type), intent(inout)    :: a
     integer                              :: info
 
-    integer :: i,j, k, ip1,ip2,nnz,iflag,ichk,nnzt
+    integer :: i, ip1,ip2,nnz,iflag,ichk,nnzt
     real(kind(1.d0)), allocatable  :: work(:)
     integer :: err_act
-    character(len=20)             :: name, ch_err
+    character(len=20)  :: name
     logical, parameter :: debug=.false.
 
     name='psb_spcnv'
@@ -121,10 +121,10 @@ contains
     type(psb_dspmat_type), intent(inout)    :: a
     integer                              :: info
 
-    integer :: i,j, k, ip1,ip2,nnz,iflag,ichk,nnzt
+    integer :: i, ip1,ip2,nnz,iflag,ichk,nnzt
     real(kind(1.d0)), allocatable  :: work(:)
     integer :: err_act
-    character(len=20)             :: name, ch_err
+    character(len=20)  :: name
     logical, parameter :: debug=.false.
 
     name='psb_spcnv'
@@ -220,10 +220,10 @@ contains
     type(psb_dspmat_type), intent(inout)    :: a
     integer                              :: info
 
-    integer :: i,j, k, ip1,ip2,nnz,iflag,ichk,nnzt
+    integer :: i, ip1,ip2,nnz,iflag,ichk,nnzt
     real(kind(1.d0)), allocatable  :: work(:)
     integer :: err_act
-    character(len=20)             :: name, ch_err
+    character(len=20)  :: name
     logical, parameter :: debug=.false.
 
     name='psb_spcnv'
@@ -321,10 +321,10 @@ contains
     type(psb_zspmat_type), intent(inout)    :: a
     integer                              :: info
 
-    integer :: i,j, k, ip1,ip2,nnz,iflag,ichk,nnzt
+    integer :: i, ip1,ip2,nnz,iflag,ichk,nnzt
     complex(kind(1.d0)), allocatable  :: work(:)
     integer :: err_act
-    character(len=20)             :: name, ch_err
+    character(len=20)  :: name
     logical, parameter :: debug=.false.
 
     name='psb_spcnv'
@@ -420,10 +420,10 @@ contains
     type(psb_zspmat_type), intent(inout)    :: a
     integer                              :: info
 
-    integer :: i,j, k, ip1,ip2,nnz,iflag,ichk,nnzt
+    integer :: i, ip1,ip2,nnz,iflag,ichk,nnzt
     complex(kind(1.d0)), allocatable  :: work(:)
     integer :: err_act
-    character(len=20)             :: name, ch_err
+    character(len=20)  :: name
     logical, parameter :: debug=.false.
 
     name='psb_spcnv'
@@ -519,10 +519,10 @@ contains
     type(psb_zspmat_type), intent(inout)    :: a
     integer                              :: info
 
-    integer :: i,j, k, ip1,ip2,nnz,iflag,ichk,nnzt
+    integer :: i, ip1,ip2,nnz,iflag,ichk,nnzt
     complex(kind(1.d0)), allocatable  :: work(:)
     integer :: err_act
-    character(len=20)             :: name, ch_err
+    character(len=20)  :: name
     logical, parameter :: debug=.false.
 
     name='psb_spcnv'

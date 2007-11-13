@@ -51,7 +51,7 @@ subroutine psb_zcoins(nz,ia,ja,val,a,imin,imax,jmin,jmax,info,gtl,rebuild)
   logical, intent(in), optional        :: rebuild
 
   character(len=5)     :: ufida
-  integer              :: i,j,ir,ic,nr,nc, ng, nza, isza,spstate, nnz,&
+  integer              :: ng, nza, isza,spstate, &
        & ip1, nzl, err_act, int_err(5), iupd, irst
   logical, parameter   :: debug=.false.
   logical              :: rebuild_

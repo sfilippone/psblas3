@@ -101,14 +101,14 @@ Subroutine psb_dcgstabl(a,prec,b,x,eps,desc_a,info,&
        & s(:), t(:), z(:), f(:), gamma(:), gamma1(:), gamma2(:), taum(:,:), sigma(:)
 
   Real(Kind(1.d0)) :: rerr
-  Integer       :: litmax, naux, m, mglob, it, itrace_,&
+  Integer       :: litmax, naux, mglob, it, itrace_,&
        & np,me, n_row, n_col, nl, err_act
   Logical, Parameter :: exchange=.True., noexchange=.False.  
   Integer, Parameter :: irmax = 8
-  Integer            :: itx, i, isvch, ich, ictxt,istop_,j, int_err(5)
+  Integer            :: itx, i, isvch, ictxt,istop_,j, int_err(5)
   Logical, Parameter :: debug = .False.
   Real(Kind(1.d0)) :: alpha, beta, rho, rho_old, rni, xni, bni, ani,bn2,& 
-       & omega, tau 
+       & omega
   character(len=20)             :: name
 
   info = 0

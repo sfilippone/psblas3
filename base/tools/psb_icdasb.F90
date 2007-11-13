@@ -64,11 +64,11 @@ subroutine psb_icdasb(desc_a,info,ext_hv)
   integer          ::  int_err(5)
   integer,allocatable ::  ovrlap_index(:),halo_index(:), ext_index(:)
 
-  integer          ::  i,j,np,me, n_col, dectype, err_act, icomm
+  integer          ::  i,np,me, n_col, dectype, err_act, icomm
   integer                       :: ictxt,n_row
   logical                       :: ext_hv_
   logical, parameter            :: debug=.false., debugwrt=.false.
-  character(len=20)             :: name,ch_err
+  character(len=20)             :: name
 
   info = 0
   int_err(1) = 0

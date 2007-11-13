@@ -51,10 +51,10 @@ subroutine psb_zgelp(trans,iperm,x,info)
   character, intent(in)                :: trans
 
   ! local variables
-  integer                  :: ictxt,np,me,nrow,ncol
+  integer                  :: ictxt
   complex(kind(1.d0)),allocatable ::  dtemp(:)
   integer, allocatable     :: itemp(:)
-  integer                  :: int_err(5), i1sz, i2sz, i, err_act
+  integer                  :: int_err(5), i1sz, i2sz, err_act
   real(kind(1.d0)),parameter    :: one=1
   logical, parameter :: debug=.false.
 
@@ -184,8 +184,8 @@ subroutine psb_zgelpv(trans,iperm,x,info)
   character, intent(in)              ::  trans
 
   ! local variables
-  integer :: ictxt,np,me
-  integer :: int_err(5), i1sz,nrow,ncol, i, err_act
+  integer :: ictxt
+  integer :: int_err(5), i1sz, err_act
   complex(kind(1.d0)),allocatable  ::  dtemp(:)
   integer, allocatable     :: itemp(:)
   real(kind(1.d0)),parameter    :: one=1

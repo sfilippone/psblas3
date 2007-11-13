@@ -62,7 +62,7 @@ function psb_zdot(x, y,desc_a, info, jx, jy)
 
   ! locals
   integer                  :: ictxt, np, me,&
-       & err_act, n, iix, jjx, ix, ijx, iy, ijy, iiy, jjy, i, m, j, k
+       & err_act, iix, jjx, ix, ijx, iy, ijy, iiy, jjy, i, m
   complex(kind(1.D0))         :: dot_local
   complex(kind(1.d0))         :: zdotc
   character(len=20)        :: name, ch_err
@@ -215,7 +215,7 @@ function psb_zdotv(x, y,desc_a, info)
 
   ! locals
   integer                  :: ictxt, np, me,&
-       & err_act, n, iix, jjx, ix, jx, iy, jy, iiy, jjy, i, m, j, k
+       & err_act, iix, jjx, ix, jx, iy, jy, iiy, jjy, i, m
   complex(kind(1.D0))         :: dot_local
   complex(kind(1.d0))         :: zdotc
   character(len=20)        :: name, ch_err
@@ -353,7 +353,7 @@ subroutine psb_zdotvs(res, x, y,desc_a, info)
 
   ! locals
   integer                  :: ictxt, np, me,&
-       & err_act, n, iix, jjx, ix, ijx, iy, ijy, iiy, jjy, i, m, j, k
+       & err_act, iix, jjx, ix, iy, iiy, jjy, i, m
   complex(kind(1.D0))         :: dot_local
   complex(kind(1.d0))         :: zdotc
   character(len=20)        :: name, ch_err
@@ -493,7 +493,7 @@ subroutine psb_zmdots(res, x, y, desc_a, info)
 
   ! locals
   integer                  :: ictxt, np, me,&
-       & err_act, n, iix, jjx, ix, ijx, iy, ijy, iiy, jjy, i, m, j, k
+       & err_act, iix, jjx, ix, iy, iiy, jjy, i, m, j, k
   complex(kind(1.d0)),allocatable  :: dot_local(:)
   complex(kind(1.d0))         :: zdotc
   character(len=20)        :: name, ch_err

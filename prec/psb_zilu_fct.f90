@@ -45,7 +45,7 @@ subroutine psb_zilu_fct(a,l,u,d,info,blck)
   type(psb_zspmat_type),intent(in), optional, target :: blck
   complex(kind(1.d0)), intent(inout)     ::  d(:)
   !     .. Local Scalars ..
-  integer   ::  i, j, jj, k, kk, l1, l2, ll, low1, low2,m,ma,err_act  
+  integer   ::  l1, l2,m,err_act  
   type(psb_zspmat_type), pointer  :: blck_
   character(len=20)   :: name, ch_err
   name='psb_zcsrlu'

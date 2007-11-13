@@ -48,7 +48,7 @@ subroutine psb_zspscal(a,d,info)
   integer, intent(out)                 :: info
   complex(kind(1.d0)), intent(in)         :: d(:) 
 
-  integer :: i,j,k,nr, nz,err_act
+  integer :: i,j, err_act
   character(len=20)                 :: name, ch_err
 
   name='psb_zspscal'

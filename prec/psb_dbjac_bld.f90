@@ -42,14 +42,13 @@ subroutine psb_dbjac_bld(a,desc_a,p,upd,info)
   character, intent(in)                     :: upd
 
   !     .. Local Scalars ..                                                       
-  integer  ::    i, j, jj, k, kk, m
+  integer  ::    i, m
   integer  ::    int_err(5)
   character ::        trans, unitd
-  type(psb_dspmat_type) :: blck, atmp
+  type(psb_dspmat_type) :: atmp
   real(kind(1.d0)) :: t1,t2,t3,t4,t5,t6, t7, t8
   logical, parameter :: debugprt=.false., debug=.false., aggr_dump=.false.
-  integer   nztota, nztotb, nztmp, nzl, nnr, ir, err_act,&
-       & n_row, nrow_a,n_col, nhalo, ind, iind, i1,i2,ia
+  integer   nztota,  err_act, n_row, nrow_a,n_col, nhalo
   integer :: ictxt,np,me
   character(len=20)      :: name, ch_err
 

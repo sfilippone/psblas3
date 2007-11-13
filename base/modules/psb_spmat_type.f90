@@ -696,10 +696,9 @@ contains
     !....Parameters...
     Type(psb_dspmat_type), intent(inout) :: A
     Integer, intent(out)          :: info
-    Integer           :: i1, i2, ia
 
     !locals
-    Integer             :: nza
+    Integer           :: i1, i2, ia
     logical, parameter  :: debug=.false.
 
     info  = 0
@@ -717,10 +716,8 @@ contains
     !....Parameters...
     Type(psb_zspmat_type), intent(inout) :: A
     Integer, intent(out)          :: info
-    Integer           :: i1, i2, ia
-
     !locals
-    Integer             :: nza
+    Integer           :: i1, i2, ia
     logical, parameter  :: debug=.false.
 
     info  = 0
@@ -1395,7 +1392,7 @@ contains
     integer, intent(out)              :: ires, info
     integer, intent(in), optional     :: iaux
 
-    integer :: i,j,k,ip,jp,nr,irw,nz, err_act, row, ipx, pia, pja, rb,idx, nc
+    integer :: j,ip,jp,nr,irw,nz, err_act, row, ipx, pia, pja, rb,idx, nc
     integer, pointer :: ia1(:), ia2(:), ia3(:), ja(:)
     character(len=20)                 :: name, ch_err
 
@@ -1555,7 +1552,7 @@ contains
     integer, intent(out)              :: ires, info
     integer, intent(in), optional     :: iaux
 
-    integer :: i,j,k,ip,jp,nr,irw,nz, err_act, row, ipx, pia, pja, rb,idx, nc
+    integer :: j,ip,jp,nr,irw,nz, err_act, row, ipx, pia, pja, rb,idx, nc
     integer, pointer :: ia1(:), ia2(:), ia3(:), ja(:)
     character(len=20)                 :: name, ch_err
 

@@ -50,7 +50,7 @@ subroutine psb_zspgtdiag(a,d,info)
   integer, intent(out)                  :: info
 
   type(psb_zspmat_type)     :: tmpa
-  integer :: i,j,k,nr, nz, err_act, ii, rng, irb, nrb
+  integer :: i,j, err_act, ii, rng, irb, nrb
   character(len=20)                 :: name, ch_err
 
   name='psb_zspgtdiag'

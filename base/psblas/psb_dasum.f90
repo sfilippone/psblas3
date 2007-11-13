@@ -59,7 +59,7 @@ function psb_dasum (x,desc_a, info, jx)
   real(kind(1.d0))                  :: psb_dasum
 
   ! locals
-  integer           :: ictxt, np, me, err_act, n, &
+  integer           :: ictxt, np, me, err_act, &
        &      iix, jjx, ix, ijx, m, i
   real(kind(1.d0))  :: asum, dasum
   character(len=20) :: name, ch_err
@@ -202,7 +202,7 @@ function psb_dasumv (x,desc_a, info)
   real(kind(1.d0))                  :: psb_dasumv
 
   ! locals
-  integer                  :: ictxt, np, me, err_act, n, iix, jjx, jx, ix, ijx, m, i
+  integer                  :: ictxt, np, me, err_act, iix, jjx, jx, ix, m, i
   real(kind(1.d0))         :: asum, dasum
   character(len=20)        :: name, ch_err
 
@@ -340,7 +340,7 @@ subroutine psb_dasumvs (res,x,desc_a, info)
   integer, intent(out)              :: info
 
   ! locals
-  integer                  :: ictxt, np, me, err_act, n, iix, jjx, ix, jx, ijx, m, i
+  integer                  :: ictxt, np, me, err_act, iix, jjx, ix, jx, m, i
   real(kind(1.d0))         :: asum, dasum
   character(len=20)        :: name, ch_err
 

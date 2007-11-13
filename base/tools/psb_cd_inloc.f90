@@ -54,7 +54,7 @@ subroutine psb_cd_inloc(v, ictxt, desc_a, info)
 
   !locals
   Integer             :: counter,i,j,np,me,loc_row,err,&
-       & loc_col,nprocs,n,itmpov, k,glx,gidx,gle,&
+       & loc_col,nprocs,n,itmpov, k,glx,&
        & l_ov_ix,l_ov_el,idx, flag_, err_act,m
   integer             :: int_err(5),exch(3)
   Integer, allocatable  :: temp_ovrlap(:), ov_idx(:),ov_el(:),tmpgidx(:,:)

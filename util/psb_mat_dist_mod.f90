@@ -121,11 +121,11 @@ contains
 
     ! local variables
     integer                     :: np, iam
-    integer                     :: ircode, length_row, i_count, j_count,&
-         & k_count, blockdim, root, liwork, nrow, ncol, nnzero, nrhs,&
-         & i,j,k, ll, nz, isize, iproc, nnr, err, err_act, int_err(5)
+    integer                     :: length_row, i_count, j_count,&
+         & k_count, root, liwork, nrow, ncol, nnzero, nrhs,&
+         & i, ll, nz, isize, iproc, nnr, err, err_act, int_err(5)
     integer, allocatable          :: iwork(:)
-    character                     :: afmt*5, atyp*5
+    character                     :: afmt*5
     integer, allocatable          :: irow(:),icol(:)
     real(kind(1.d0)), allocatable :: val(:)
     integer, parameter          :: nb=30
@@ -530,11 +530,11 @@ contains
     character(len=5), optional :: fmt
 
     integer                     :: np, iam
-    integer                     :: ircode, length_row, i_count, j_count,&
-         & k_count, blockdim, root, liwork, nrow, ncol, nnzero, nrhs,&
-         & i,j,k, ll, nz, isize, iproc, nnr, err, err_act, int_err(5)
+    integer                     :: i_count, j_count,&
+         & root, liwork, nrow, ncol, nnzero, nrhs,&
+         & i, ll, nz, isize, iproc, nnr, err, err_act, int_err(5)
     integer, allocatable          :: iwork(:)
-    character                     :: afmt*5, atyp*5
+    character                     :: afmt*5
     integer, allocatable          :: irow(:),icol(:)
     real(kind(1.d0)), allocatable :: val(:)
     integer, parameter          :: nb=30
@@ -867,11 +867,11 @@ contains
 
     ! local variables
     integer                     :: np, iam
-    integer                     :: ircode, length_row, i_count, j_count,&
-         & k_count, blockdim, root, liwork, nrow, ncol, nnzero, nrhs,&
-         & i,j,k, ll, nz, isize, iproc, nnr, err, err_act, int_err(5)
+    integer                     :: length_row, i_count, j_count,&
+         & k_count, root, liwork, nrow, ncol, nnzero, nrhs,&
+         & i, ll, nz, isize, iproc, nnr, err, err_act, int_err(5)
     integer, allocatable            :: iwork(:)
-    character                   :: afmt*5, atyp*5
+    character                   :: afmt*5
     integer, allocatable          :: irow(:),icol(:)
     complex(kind(1.d0)), allocatable :: val(:)
     integer, parameter          :: nb=30
@@ -1275,11 +1275,11 @@ contains
     character(len=5), optional :: fmt
 
     integer                     :: np, iam
-    integer                     :: ircode, length_row, i_count, j_count,&
-         & k_count, blockdim, root, liwork, nrow, ncol, nnzero, nrhs,&
-         & i,j,k, ll, nz, isize, iproc, nnr, err, err_act, int_err(5)
+    integer                     :: i_count, j_count,&
+         & root, liwork, nrow, ncol, nnzero, nrhs,&
+         & i,ll, nz, isize, iproc, nnr, err, err_act, int_err(5)
     integer, allocatable            :: iwork(:)
-    character                   :: afmt*5, atyp*5
+    character                   :: afmt*5
     integer, allocatable          :: irow(:),icol(:)
     complex(kind(1.d0)), allocatable :: val(:)
     integer, parameter          :: nb=30

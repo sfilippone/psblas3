@@ -634,7 +634,7 @@ Contains
     integer, optional, intent(in) :: lb
     ! ...Local Variables
     Integer,allocatable  :: tmp(:)
-    Integer :: dim, err_act, err,i,lb_, lbi, ub_
+    Integer :: dim, err_act, err,lb_, lbi, ub_
     character(len=20)  :: name
     logical, parameter :: debug=.false.
 
@@ -712,7 +712,7 @@ Contains
 
     ! ...Local Variables
     Real(kind(1.d0)),allocatable  :: tmp(:)
-    Integer :: dim,err_act,err,m, lb_, lbi,ub_
+    Integer :: dim,err_act,err, lb_, lbi,ub_
     character(len=20)  :: name
     logical, parameter :: debug=.false.
 
@@ -787,7 +787,7 @@ Contains
 
     ! ...Local Variables
     complex(kind(1.d0)),allocatable  :: tmp(:)
-    Integer :: dim,err_act,err,i,lb_,ub_,lbi
+    Integer :: dim,err_act,err,lb_,ub_,lbi
     character(len=20)  :: name
     logical, parameter :: debug=.false.
 
@@ -862,7 +862,7 @@ Contains
     ! ...Local Variables
 
     Real(kind(1.d0)),allocatable  :: tmp(:,:)
-    Integer :: dim,err_act,err,i, m, dim2,lb1_, lb2_, ub1_, ub2_,&
+    Integer :: dim,err_act,err, dim2,lb1_, lb2_, ub1_, ub2_,&
          & lbi1, lbi2
     character(len=20)  :: name
 
@@ -955,7 +955,7 @@ Contains
     ! ...Local Variables
 
     complex(kind(1.d0)),allocatable  :: tmp(:,:)
-    Integer :: dim,err_act,err,i, m, dim2,lb1_, lb2_, ub1_, ub2_,&
+    Integer :: dim,err_act,err,dim2,lb1_, lb2_, ub1_, ub2_,&
          & lbi1, lbi2
     character(len=20)  :: name
 
@@ -1047,7 +1047,7 @@ Contains
 
     ! ...Local Variables
     integer,allocatable  :: tmp(:,:)
-    Integer :: dim,err_act,err,i, m, dim2,lb1_, lb2_, ub1_, ub2_,&
+    Integer :: dim,err_act,err, dim2,lb1_, lb2_, ub1_, ub2_,&
          & lbi1, lbi2
     character(len=20)  :: name
 

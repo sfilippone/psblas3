@@ -310,10 +310,9 @@ contains
     integer, intent(out)  :: info
 
     !     ....local scalars....      
-    integer  :: i,np,me,proc, max_index
+    integer  :: np,me
     integer  :: ictxt, err_act,nxch,nsnd,nrcv
     !     ...local array...
-    integer  :: int_err(5)
     integer, allocatable  :: idx_out(:)
 
     !     ...parameters
@@ -416,8 +415,8 @@ contains
 
 
 
-  subroutine psi_inner_cnv1(n,x,hashsize,hashmask,hashv,glb_lc)
-    integer, intent(in)    :: n, hashsize,hashmask,hashv(0:),glb_lc(:,:)
+  subroutine psi_inner_cnv1(n,x,hashmask,hashv,glb_lc)
+    integer, intent(in)    :: n,hashmask,hashv(0:),glb_lc(:,:)
     integer, intent(inout) :: x(:)
 
     integer :: i, ih, key, idx,nh,tmp,lb,ub,lm
@@ -462,8 +461,8 @@ contains
   end subroutine psi_inner_cnv1
 
 
-  subroutine psi_inner_cnv2(n,x,y,hashsize,hashmask,hashv,glb_lc)
-    integer, intent(in)  :: n, hashsize,hashmask,hashv(0:),glb_lc(:,:)
+  subroutine psi_inner_cnv2(n,x,y,hashmask,hashv,glb_lc)
+    integer, intent(in)  :: n, hashmask,hashv(0:),glb_lc(:,:)
     integer, intent(in)  :: x(:)
     integer, intent(out) :: y(:)
 

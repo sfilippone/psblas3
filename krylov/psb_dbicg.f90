@@ -96,12 +96,12 @@ subroutine psb_dbicg(a,prec,b,x,eps,desc_a,info,&
        & r(:), p(:), zt(:), pt(:), z(:), rt(:),qt(:)
   integer           :: int_err(5)
   real(kind(1.d0)) ::rerr
-  integer       ::litmax, liter, naux, m, mglob, it, itrace_,&
+  integer       ::litmax, naux, mglob, it, itrace_,&
        & np,me, n_row, n_col, istop_, err_act
   logical, parameter :: debug = .false.
   logical, parameter :: exchange=.true., noexchange=.false.  
   integer, parameter :: irmax = 8
-  integer            :: itx, i, isvch, ictxt
+  integer            :: itx, isvch, ictxt
   real(kind(1.d0)) :: alpha, beta, rho, rho_old, rni, xni, bni, ani,& 
        & sigma,bn2
   character(len=20)             :: name,ch_err

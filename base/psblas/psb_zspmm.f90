@@ -435,9 +435,9 @@ subroutine  psb_zspmv(alpha,a,x,beta,y,desc_a,info,&
 
   ! locals
   integer                  :: ictxt, np, me,&
-       & err_act, n, iix, jjx, ia, ja, iia, jja, ix, iy, ik, ijx, ijy,&
+       & err_act, n, iix, jjx, ia, ja, iia, jja, ix, iy, ik, &
        & idoswap, m, nrow, ncol, lldx, lldy, liwork, jx, jy, iiy, jjy,&
-       & i, ib, ib1
+       & ib
   integer, parameter       :: nb=4
   complex(kind(1.d0)),pointer :: iwork(:), xp(:), yp(:)
   character                :: itrans

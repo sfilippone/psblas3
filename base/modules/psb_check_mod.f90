@@ -78,7 +78,7 @@ contains
 
     !  locals
     integer           :: err_act, int_err(5)
-    character(len=20) :: name, ch_err
+    character(len=20) :: name
 
     if(psb_get_errstatus() /= 0) return 
     info=0
@@ -203,7 +203,7 @@ contains
 
     !  locals
     integer           :: err_act, int_err(5)
-    character(len=20) :: name, ch_err
+    character(len=20) :: name
 
     if(psb_get_errstatus() /= 0) return 
     info=0
@@ -327,7 +327,7 @@ contains
 
     !  locals
     integer           :: err_act, int_err(5)
-    character(len=20) :: name, ch_err
+    character(len=20) :: name
 
     if(psb_get_errstatus() /= 0) return 
     info=0
