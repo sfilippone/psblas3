@@ -37,7 +37,8 @@ subroutine psb_zprc_aply(prec,x,y,desc_data,info,trans, work)
 
   type(psb_desc_type),intent(in)      :: desc_data
   type(psb_zprec_type), intent(in)    :: prec
-  complex(kind(0.d0)),intent(inout)   :: x(:), y(:)
+  complex(kind(0.d0)),intent(in)      :: x(:)
+  complex(kind(0.d0)),intent(inout)   :: y(:)
   integer, intent(out)                :: info
   character(len=1), optional          :: trans
   complex(kind(0.d0)), optional, target  :: work(:)

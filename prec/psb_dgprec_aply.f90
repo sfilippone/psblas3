@@ -38,13 +38,14 @@ subroutine psb_dgprec_aply(alpha,prec,x,beta,y,desc_data,trans,work,info)
   use psb_prec_mod, psb_protect_name => psb_dgprec_aply
   implicit none 
 
-  type(psb_desc_type),intent(in)      :: desc_data
+  type(psb_desc_type),intent(in)   :: desc_data
   type(psb_dprec_type), intent(in) :: prec
-  real(kind(0.d0)),intent(inout)      :: x(:), y(:)
-  real(kind(0.d0)),intent(in)         :: alpha,beta
-  character(len=1)                    :: trans
-  real(kind(0.d0)),target             :: work(:)
-  integer, intent(out)                :: info
+  real(kind(0.d0)),intent(in)      :: x(:)
+  real(kind(0.d0)),intent(inout)   :: y(:)
+  real(kind(0.d0)),intent(in)      :: alpha,beta
+  character(len=1)                 :: trans
+  real(kind(0.d0)),target          :: work(:)
+  integer, intent(out)             :: info
 
   ! Local variables
   integer :: n_row,int_err(5)

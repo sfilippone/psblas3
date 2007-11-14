@@ -118,7 +118,8 @@ module psb_prec_mod
       use psb_prec_type
       type(psb_desc_type),intent(in)    :: desc_data
       type(psb_dprec_type), intent(in)  :: prec
-      real(kind(0.d0)),intent(inout)    :: x(:), y(:)
+      real(kind(0.d0)),intent(in)       :: x(:)
+      real(kind(0.d0)),intent(inout)    :: y(:)
       integer, intent(out)              :: info
       character(len=1), optional        :: trans
       real(kind(0.d0)),intent(inout), optional, target :: work(:)
@@ -137,7 +138,8 @@ module psb_prec_mod
       use psb_prec_type
       type(psb_desc_type),intent(in)    :: desc_data
       type(psb_zprec_type), intent(in)  :: prec
-      complex(kind(0.d0)),intent(inout) :: x(:), y(:)
+      complex(kind(0.d0)),intent(in)    :: x(:)
+      complex(kind(0.d0)),intent(inout) :: y(:)
       integer, intent(out)              :: info
       character(len=1), optional        :: trans
       complex(kind(0.d0)),intent(inout), optional, target :: work(:)
@@ -158,24 +160,26 @@ module psb_prec_mod
      subroutine psb_dbjac_aply(alpha,prec,x,beta,y,desc_data,trans,work,info)
        use psb_base_mod
        use psb_prec_type
-       type(psb_desc_type), intent(in)       :: desc_data
-       type(psb_dprec_type), intent(in)   :: prec
-       real(kind(0.d0)),intent(inout)        :: x(:), y(:)
-       real(kind(0.d0)),intent(in)           :: alpha,beta
-       character(len=1)                      :: trans
-       real(kind(0.d0)),target               :: work(:)
-       integer, intent(out)                  :: info
+       type(psb_desc_type), intent(in)   :: desc_data
+       type(psb_dprec_type), intent(in)  :: prec
+       real(kind(0.d0)),intent(in)       :: x(:)
+       real(kind(0.d0)),intent(inout)    :: y(:)
+       real(kind(0.d0)),intent(in)       :: alpha,beta
+       character(len=1)                  :: trans
+       real(kind(0.d0)),target           :: work(:)
+       integer, intent(out)              :: info
      end subroutine psb_dbjac_aply
      subroutine psb_zbjac_aply(alpha,prec,x,beta,y,desc_data,trans,work,info)
        use psb_base_mod
        use psb_prec_type
-       type(psb_desc_type), intent(in)       :: desc_data
+       type(psb_desc_type), intent(in)    :: desc_data
        type(psb_zprec_type), intent(in)   :: prec
-       complex(kind(0.d0)),intent(inout)        :: x(:), y(:)
-       complex(kind(0.d0)),intent(in)           :: alpha,beta
-       character(len=1)                      :: trans
-       complex(kind(0.d0)),target               :: work(:)
-       integer, intent(out)                  :: info
+       complex(kind(0.d0)),intent(in)     :: x(:)
+       complex(kind(0.d0)),intent(inout)  :: y(:)
+       complex(kind(0.d0)),intent(in)     :: alpha,beta
+       character(len=1)                   :: trans
+       complex(kind(0.d0)),target         :: work(:)
+       integer, intent(out)               :: info
      end subroutine psb_zbjac_aply
   end interface
 
@@ -246,7 +250,8 @@ module psb_prec_mod
        use psb_prec_type
        type(psb_desc_type),intent(in)   :: desc_data
        type(psb_dprec_type), intent(in) :: prec
-       real(kind(0.d0)),intent(inout)   :: x(:), y(:)
+       real(kind(0.d0)),intent(in)      :: x(:)
+       real(kind(0.d0)),intent(inout)   :: y(:)
        real(kind(0.d0)),intent(in)      :: alpha,beta
        character(len=1)                 :: trans
        real(kind(0.d0)),target          :: work(:)
@@ -256,13 +261,14 @@ module psb_prec_mod
      subroutine psb_zgprec_aply(alpha,prec,x,beta,y,desc_data,trans,work,info)
        use psb_base_mod
        use psb_prec_type
-       type(psb_desc_type),intent(in)      :: desc_data
-       type(psb_zprec_type), intent(in) :: prec
-       complex(kind(0.d0)),intent(inout)   :: x(:), y(:)
-       complex(kind(0.d0)),intent(in)      :: alpha,beta
-       character(len=1)                    :: trans
-       complex(kind(0.d0)),target          :: work(:)
-       integer, intent(out)                :: info
+       type(psb_desc_type),intent(in)     :: desc_data
+       type(psb_zprec_type), intent(in)   :: prec
+       complex(kind(0.d0)),intent(in)     :: x(:)
+       complex(kind(0.d0)),intent(inout)  :: y(:)
+       complex(kind(0.d0)),intent(in)     :: alpha,beta
+       character(len=1)                   :: trans
+       complex(kind(0.d0)),target         :: work(:)
+       integer, intent(out)               :: info
      end subroutine psb_zgprec_aply
   end interface
 
