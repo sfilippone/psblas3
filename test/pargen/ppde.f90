@@ -227,8 +227,7 @@ contains
     integer      :: ictxt
     character(len=*) :: kmethd, ptype, afmt
     integer      :: idim, istopc,itmax,itrace,irst
-    integer      :: iargc, np, iam
-    external     iargc
+    integer      :: np, iam
     integer      :: intbuf(10), ip
 
     call psb_info(ictxt, iam, np)

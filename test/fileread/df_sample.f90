@@ -37,7 +37,7 @@ program df_sample
   implicit none
 
   ! input parameters
-  character(len=40) :: cmethd, ptype, mtrx_file, rhs_file
+  character(len=40) :: kmethd, ptype, mtrx_file, rhs_file
 
   ! sparse matrices
   type(psb_dspmat_type) :: a, aux_a
@@ -95,7 +95,7 @@ program df_sample
   !
   !  get parameters
   !
-  call get_parms(ictxt,mtrx_file,rhs_file,cmethd,ptype,&
+  call get_parms(ictxt,mtrx_file,rhs_file,kmethd,ptype,&
        & ipart,afmt,istopc,itmax,itrace,irst,eps)
 
   call psb_barrier(ictxt)
@@ -214,7 +214,7 @@ program df_sample
   iparm = 0
   call psb_barrier(ictxt)
   t1 = psb_wtime()
-  call psb_krylov(cmethd,a,prec,b_col,x_col,eps,desc_a,info,& 
+  call psb_krylov(kmethd,a,prec,b_col,x_col,eps,desc_a,info,& 
        & itmax=itmax,iter=iter,err=err,itrace=itrace,istop=istopc,irst=irst)     
   call psb_barrier(ictxt)
   t2 = psb_wtime() - t1

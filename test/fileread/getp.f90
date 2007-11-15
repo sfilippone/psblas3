@@ -35,11 +35,11 @@ contains
   !
   ! Get iteration parameters from the command line
   !
-  subroutine  get_parms(ictxt,mtrx_file,rhs_file,cmethd,ptype,ipart,&
+  subroutine  get_parms(ictxt,mtrx_file,rhs_file,kmethd,ptype,ipart,&
        & afmt,istopc,itmax,itrace,irst,eps)
     use psb_base_mod
     integer      :: ictxt
-    character(len=40) :: cmethd, mtrx_file, rhs_file, ptype
+    character(len=40) :: kmethd, mtrx_file, rhs_file, ptype
     integer      :: iret, istopc,itmax,itrace,ipart,irst
     character(len=40) :: charbuf
     real(kind(1.d0)) :: eps
@@ -54,14 +54,14 @@ contains
       if (ip >= 5) then
         read(*,*) mtrx_file
         read(*,*) rhs_file
-        read(*,*) cmethd
+        read(*,*) kmethd
         read(*,*) ptype
         read(*,*) afmt
 
 
         call psb_bcast(ictxt,mtrx_file)
         call psb_bcast(ictxt,rhs_file)
-        call psb_bcast(ictxt,cmethd)
+        call psb_bcast(ictxt,kmethd)
         call psb_bcast(ictxt,ptype)
         call psb_bcast(ictxt,afmt)
 
@@ -102,7 +102,7 @@ contains
         write(*,'("Solving matrix       : ",a)')  mtrx_file      
         write(*,'("Number of processors : ",i3)') np
         write(*,'("Data distribution    : ",i2)') ipart
-        write(*,'("Iterative method     : ",a)')  cmethd
+        write(*,'("Iterative method     : ",a)')  kmethd
         write(*,'("Preconditioner       : ",a)')  ptype
         write(*,'("Restart parameter    : ",i2)') irst
         write(*,'("Storage format       : ",a)')  afmt(1:3)
@@ -116,7 +116,7 @@ contains
       ! Receive Parameters
       call psb_bcast(ictxt,mtrx_file)
       call psb_bcast(ictxt,rhs_file)
-      call psb_bcast(ictxt,cmethd)
+      call psb_bcast(ictxt,kmethd)
       call psb_bcast(ictxt,ptype)
       call psb_bcast(ictxt,afmt)
 
