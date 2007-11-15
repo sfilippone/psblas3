@@ -62,8 +62,8 @@
 !
 ! In this sample program the index space of the discretized
 ! computational domain is first numbered sequentially in a standard way, 
-! then the corresponding vector is distributed according to an HPF BLOCK
-! distribution directive.
+! then the corresponding vector is distributed according to a BLOCK
+! data distribution.
 !
 ! Boundary conditions are set in a very simple way, by adding 
 ! equations of the form
@@ -78,7 +78,7 @@ program ppde
   implicit none
 
   ! input parameters
-  character :: cmethd*10, ptype*10, afmt*5
+  character :: kmethd*10, ptype*10, afmt*5
   integer      :: idim
 
   ! miscellaneous 
@@ -122,7 +122,7 @@ program ppde
   !
   !  get parameters
   !
-  call get_parms(ictxt,cmethd,ptype,afmt,idim,istopc,itmax,itrace,irst)
+  call get_parms(ictxt,kmethd,ptype,afmt,idim,istopc,itmax,itrace,irst)
 
   !
   !  allocate and fill in the coefficient matrix, rhs and initial guess 
@@ -169,11 +169,11 @@ program ppde
   !
   ! iterative method parameters 
   !
-  if(iam == psb_root_) write(*,'("Calling iterative method ",a)')cmethd
+  if(iam == psb_root_) write(*,'("Calling iterative method ",a)')kmethd
   call psb_barrier(ictxt)
   t1 = psb_wtime()  
   eps   = 1.d-9
-  call psb_krylov(cmethd,a,prec,b,x,eps,desc_a,info,& 
+  call psb_krylov(kmethd,a,prec,b,x,eps,desc_a,info,& 
        & itmax=itmax,iter=iter,err=err,itrace=itrace,istop=istopc,irst=irst)     
 
   if(info.ne.0) then
@@ -222,9 +222,9 @@ contains
   !
   ! get iteration parameters from the command line
   !
-  subroutine  get_parms(ictxt,cmethd,ptype,afmt,idim,istopc,itmax,itrace,irst)
+  subroutine  get_parms(ictxt,kmethd,ptype,afmt,idim,istopc,itmax,itrace,irst)
     integer      :: ictxt
-    character(len=10) :: cmethd, ptype
+    character(len=10) :: kmethd, ptype
     character(len=5)  :: afmt
     integer      :: idim, istopc,itmax,itrace,irst
     integer      :: iargc, np, iam
@@ -236,12 +236,12 @@ contains
     if (iam==0) then
       read(*,*) ip
       if (ip.ge.3) then
-        read(*,*) cmethd
+        read(*,*) kmethd
         read(*,*) ptype
         read(*,*) afmt
 
         ! broadcast parameters to all processors
-        call psb_bcast(ictxt,cmethd)
+        call psb_bcast(ictxt,kmethd)
         call psb_bcast(ictxt,afmt)
         call psb_bcast(ictxt,ptype)
 
@@ -281,7 +281,7 @@ contains
         write(*,'("Number of processors : ",i0)')np
         write(*,'("Data distribution    : BLOCK")')
         write(*,'("Preconditioner       : ",a)') ptype
-        write(*,'("Iterative method     : ",a)') cmethd
+        write(*,'("Iterative method     : ",a)') kmethd
         write(*,'(" ")')
       else
         ! wrong number of parameter, print an error message and exit
@@ -290,7 +290,7 @@ contains
         stop 1
       endif
     else
-      call psb_bcast(ictxt,cmethd)
+      call psb_bcast(ictxt,kmethd)
       call psb_bcast(ictxt,afmt)
       call psb_bcast(ictxt,ptype)
       call psb_bcast(ictxt,intbuf(1:5))
