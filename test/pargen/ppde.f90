@@ -78,8 +78,9 @@ program ppde
   implicit none
 
   ! input parameters
-  character :: kmethd*10, ptype*10, afmt*5
-  integer      :: idim
+  character(len=20) :: kmethd, ptype
+  character(len=5)  :: afmt
+  integer   :: idim
 
   ! miscellaneous 
   real(kind(1.d0)), parameter :: one = 1.d0
@@ -224,8 +225,7 @@ contains
   !
   subroutine  get_parms(ictxt,kmethd,ptype,afmt,idim,istopc,itmax,itrace,irst)
     integer      :: ictxt
-    character(len=10) :: kmethd, ptype
-    character(len=5)  :: afmt
+    character(len=*) :: kmethd, ptype, afmt
     integer      :: idim, istopc,itmax,itrace,irst
     integer      :: iargc, np, iam
     external     iargc
