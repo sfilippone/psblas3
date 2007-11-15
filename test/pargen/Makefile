@@ -15,22 +15,16 @@ FINCLUDES=$(FMFLAG)$(LIBDIR) $(FMFLAG).
 EXEDIR=./runs
 
 
-ppde90: ppde90.o  
-	$(F90LINK) ppde90.o  -o ppde90 $(PSBLAS_LIB) $(LDLIBS)
-	/bin/mv ppde90 $(EXEDIR)
-
-
-thsrt: thsrt.o  
-	$(F90LINK) thsrt.o  -o thsrt $(PSBLAS_LIB) $(LDLIBS)
-	/bin/mv thsrt $(EXEDIR)
-
+ppde: ppde.o  
+	$(F90LINK) ppde.o  -o ppde $(PSBLAS_LIB) $(LDLIBS)
+	/bin/mv ppde $(EXEDIR)
 
 .f90.o:
 	$(MPF90) $(F90COPT) $(FINCLUDES) $(FDEFINES) -c $<
 
 
 clean: 
-	/bin/rm -f ppde90.o   $(EXEDIR)/ppde90 
+	/bin/rm -f ppde.o   $(EXEDIR)/ppde 
 verycleanlib: 
 	(cd ../..; make veryclean)
 lib:

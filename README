@@ -29,8 +29,8 @@ The library has been tested on an IBM SP5, with XLC and XLF
 version 10.1 and the IBM ESSL/PESSL versions of the BLAS and the
 BLACS. 
 The  setting 
- F90=xlf90 -qsuffix=f=f90
-in Make.inc.sp5 takes care of the f90 extension. 
+F90=xlf95 -qsuffix=f=f90:cpp=F90
+in Make.inc.sp5 takes care of the f90/F90 extensions. 
 
 
 UTILITIES
@@ -41,7 +41,7 @@ Harwell-Boeing and MatrixMarket file formats.
 DOCUMENTATION
 
 See userguide.pdf 
-Please consult the sample programs, especially test/pargen/ppde90.f90. 
+Please consult the sample programs, especially test/pargen/ppde.f90. 
 
 
 OTHER SOFTWARE CREDITS 

@@ -28,9 +28,9 @@
 !!$  POSSIBILITY OF SUCH DAMAGE.
 !!$ 
 !!$  
-! File: ppde90.f90
+! File: ppde.f90
 !
-! Program: ppde90
+! Program: ppde
 ! This sample program shows how to build and solve a sparse linear
 !
 ! The program  solves a linear system based on the partial differential
@@ -70,7 +70,7 @@
 !
 !   u(x,y) = rhs(x,y)
 !
-program pde90
+program ppde
   use psb_base_mod
   use psb_prec_mod
   use psb_krylov_mod
@@ -622,7 +622,7 @@ contains
     end if
     return
   end subroutine create_matrix
-end program pde90
+end program ppde
 !
 ! functions parametrizing the differential equation 
 !  
