@@ -92,7 +92,7 @@ subroutine  psb_igatherm(globx, locx, desc_a, info, iroot)
     root = -1
   end if
   if (root==-1) then
-    iiroot=0
+    iiroot = psb_root_
   else 
     iiroot = root
   endif

@@ -82,7 +82,7 @@ contains
     if (present(inroot)) then
       root = inroot
     else
-      root = 0
+      root = psb_root_
     end if
     call psb_info(ictxt, me, np)    
     if (me == root) then
@@ -112,7 +112,7 @@ contains
     if (present(inroot)) then
       root = inroot
     else
-      root = 0
+      root = psb_root_
     end if
     call psb_info(ictxt, me, np)    
     if (me == root) then
@@ -170,7 +170,7 @@ contains
     if (present(inroot)) then
       root = inroot
     else
-      root = 0
+      root = psb_root_
     end if
     call psb_info(ictxt, me, np)
     if (me == root) then
@@ -201,7 +201,7 @@ contains
     if (present(inroot)) then
       root = inroot
     else
-      root = 0
+      root = psb_root_
     end if
     call psb_info(ictxt, me, np)
     if (me == root) then

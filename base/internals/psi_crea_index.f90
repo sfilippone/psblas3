@@ -70,7 +70,7 @@ subroutine psi_crea_index(desc_a,index_in,index_out,glob_idx,nxch,nsnd,nrcv,info
   integer    :: ictxt, me, np, mode, err_act, dl_lda
   !         ...parameters...
   integer, allocatable :: dep_list(:,:), length_dl(:)
-  integer,parameter    :: root=0,no_comm=-1
+  integer,parameter    :: root=psb_root_,no_comm=-1
   logical,parameter    :: debug=.false.
   character(len=20)    :: name
 

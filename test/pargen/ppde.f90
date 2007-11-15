@@ -104,7 +104,7 @@ program ppde
   integer            :: info
   character(len=20)  :: name,ch_err
 
-  if(psb_get_errstatus().ne.0) goto 9999
+  if(psb_get_errstatus() /= 0) goto 9999
   info=0
   name='pde90'
   call psb_set_errverbosity(2)
@@ -133,7 +133,7 @@ program ppde
   t1 = psb_wtime()
   call create_matrix(idim,a,b,x,desc_a,part_block,ictxt,afmt,info)  
   t2 = psb_wtime() - t1
-  if(info.ne.0) then
+  if(info /= 0) then
     info=4010
     ch_err='create_matrix'
     call psb_errpush(info,name,a_err=ch_err)
@@ -141,8 +141,8 @@ program ppde
   end if
 
   call psb_amx(ictxt,t2)
-  if (iam == 0) write(*,'("Overall matrix creation time : ",es10.4)')t2
-  if (iam == 0) write(*,'(" ")')
+  if (iam == psb_root_) write(*,'("Overall matrix creation time : ",es10.4)')t2
+  if (iam == psb_root_) write(*,'(" ")')
   !
   !  prepare the preconditioner.
   !  
@@ -153,7 +153,7 @@ program ppde
   call psb_barrier(ictxt)
   t1 = psb_wtime()
   call psb_precbld(a,desc_a,prec,info)
-  if(info.ne.0) then
+  if(info /= 0) then
     info=4010
     ch_err='psb_precbld'
     call psb_errpush(info,name,a_err=ch_err)
@@ -164,8 +164,8 @@ program ppde
 
   call psb_amx(ictxt,tprec)
 
-  if (iam == 0) write(*,'("Preconditioner time : ",es10.4)')tprec
-  if (iam == 0) write(*,'(" ")')
+  if (iam == psb_root_) write(*,'("Preconditioner time : ",es10.4)')tprec
+  if (iam == psb_root_) write(*,'(" ")')
 
   !
   ! iterative method parameters 
@@ -177,7 +177,7 @@ program ppde
   call psb_krylov(kmethd,a,prec,b,x,eps,desc_a,info,& 
        & itmax=itmax,iter=iter,err=err,itrace=itrace,istop=istopc,irst=irst)     
 
-  if(info.ne.0) then
+  if(info /= 0) then
     info=4010
     ch_err='solver routine'
     call psb_errpush(info,name,a_err=ch_err)
@@ -188,7 +188,7 @@ program ppde
   t2 = psb_wtime() - t1
   call psb_amx(ictxt,t2)
 
-  if (iam == 0) then
+  if (iam == psb_root_) then
     write(*,'(" ")')
     write(*,'("Time to solve matrix          : ",es10.4)')t2
     write(*,'("Time per iteration            : ",es10.4)')t2/iter
@@ -205,7 +205,7 @@ program ppde
   call psb_spfree(a,desc_a,info)
   call psb_precfree(prec,info)
   call psb_cdfree(desc_a,info)
-  if(info.ne.0) then
+  if(info /= 0) then
     info=4010
     ch_err='free routine'
     call psb_errpush(info,name,a_err=ch_err)
@@ -403,7 +403,7 @@ contains
     ! define  rhs from boundary conditions; also build initial guess 
     call psb_geall(b,desc_a,info)
     call psb_geall(xv,desc_a,info)
-    if(info.ne.0) then
+    if(info /= 0) then
       info=4010
       ch_err='allocation rout.'
       call psb_errpush(info,name,a_err=ch_err)
@@ -416,7 +416,7 @@ contains
     ! 
     allocate(val(20*nbmax),irow(20*nbmax),&
          &icol(20*nbmax),prv(np),stat=info)
-    if (info.ne.0 ) then 
+    if (info /= 0 ) then 
       info=4000
       call psb_errpush(info,name)
       goto 9999
@@ -554,13 +554,13 @@ contains
 
           t3 = psb_wtime()
           call psb_spins(element-1,irow,icol,val,a,desc_a,info)
-          if(info.ne.0) exit
+          if(info /= 0) exit
           tins = tins + (psb_wtime()-t3)
           call psb_geins(1,(/ia/),zt(1:1),b,desc_a,info)
-          if(info.ne.0) exit
+          if(info /= 0) exit
           zt(1)=0.d0
           call psb_geins(1,(/ia/),zt(1:1),xv,desc_a,info)
-          if(info.ne.0) exit
+          if(info /= 0) exit
         end if
       end do
     end do
@@ -568,7 +568,7 @@ contains
     call psb_barrier(ictxt)    
     t2 = psb_wtime()-t1
 
-    if(info.ne.0) then
+    if(info /= 0) then
       info=4010
       ch_err='insert rout.'
       call psb_errpush(info,name,a_err=ch_err)
@@ -582,7 +582,7 @@ contains
     call psb_spasb(a,desc_a,info,dupl=psb_dupl_err_,afmt=afmt)
     call psb_barrier(ictxt)
     tasb = psb_wtime()-t1
-    if(info.ne.0) then
+    if(info /= 0) then
       info=4010
       ch_err='asb rout.'
       call psb_errpush(info,name,a_err=ch_err)
@@ -603,7 +603,7 @@ contains
 
     call psb_geasb(b,desc_a,info)
     call psb_geasb(xv,desc_a,info)
-    if(info.ne.0) then
+    if(info /= 0) then
       info=4010
       ch_err='asb rout.'
       call psb_errpush(info,name,a_err=ch_err)

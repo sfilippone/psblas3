@@ -98,8 +98,8 @@ subroutine  psb_zscatterm(globx, locx, desc_a, info, iroot)
   else
     root = -1
   end if
-  if (root==-1) then
-    iiroot=0
+  if (root == -1) then
+    iiroot = psb_root_
   endif
 
 

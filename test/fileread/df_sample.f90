@@ -55,8 +55,6 @@ program df_sample
   type(psb_desc_type):: desc_a
 
   integer            :: ictxt, iam, np
-  logical            :: amroot
-  integer, parameter :: root=0
 
   ! solver paramters
   integer            :: iter, itmax, ierr, itrace, ircode, ipart,&
@@ -84,11 +82,10 @@ program df_sample
     call psb_exit(ictxt)
     stop
   endif
-  amroot = (iam==root)
 
 
   name='df_sample'
-  if(psb_get_errstatus().ne.0) goto 9999
+  if(psb_get_errstatus() /= 0) goto 9999
   info=0
   call psb_set_errverbosity(2)
   call psb_set_erraction(0)
@@ -103,7 +100,7 @@ program df_sample
   ! read the input matrix to be processed and (possibly) the rhs 
   nrhs = 1
 
-  if (amroot) then
+  if (iam==psb_root_) then
     call read_mat(mtrx_file, aux_a, ictxt)
 
     m_problem = aux_a%m
@@ -147,7 +144,7 @@ program df_sample
   ! switch over different partition types
   if (ipart.eq.0) then 
     call psb_barrier(ictxt)
-    if (amroot) write(*,'("Partition type: block")')
+    if (iam==psb_root_) write(*,'("Partition type: block")')
     allocate(ivg(m_problem),ipv(np))
     do i=1,m_problem
       call part_block(i,m_problem,np,ipv,nv)
@@ -156,19 +153,19 @@ program df_sample
     call psb_matdist(aux_a, a, ivg, ictxt, &
          & desc_a,b_col_glob,b_col,info,fmt=afmt)
   else if (ipart.eq.2) then 
-    if (amroot) then 
+    if (iam==psb_root_) then 
       write(*,'("Partition type: graph")')
       write(*,'(" ")')
       !      write(0,'("Build type: graph")')
       call build_mtpart(aux_a%m,aux_a%fida,aux_a%ia1,aux_a%ia2,np)
     endif
     call psb_barrier(ictxt)
-    call distr_mtpart(root,ictxt)
+    call distr_mtpart(psb_root_,ictxt)
     call getv_mtpart(ivg)
     call psb_matdist(aux_a, a, ivg, ictxt, &
          & desc_a,b_col_glob,b_col,info,fmt=afmt)
   else 
-    if (amroot) write(*,'("Partition type: block")')
+    if (iam==psb_root_) write(*,'("Partition type: block")')
     call psb_matdist(aux_a, a, part_block, ictxt, &
          & desc_a,b_col_glob,b_col,info,fmt=afmt)
   end if
@@ -184,7 +181,7 @@ program df_sample
 
   call psb_amx(ictxt, t2)
 
-  if (amroot) then
+  if (iam==psb_root_) then
     write(*,'(" ")')
     write(*,'("Time to read and partition matrix : ",es10.4)')t2
     write(*,'(" ")')
@@ -206,7 +203,7 @@ program df_sample
 
   call psb_amx(ictxt, tprec)
 
-  if(amroot) then
+  if(iam==psb_root_) then
     write(*,'("Preconditioner time: ",es10.4)')tprec
     write(*,'(" ")')
   end if
@@ -231,7 +228,7 @@ program df_sample
   call psb_sum(ictxt,amatsize)
   call psb_sum(ictxt,descsize)
   call psb_sum(ictxt,precsize)
-  if (amroot) then 
+  if (iam==psb_root_) then 
     call psb_prec_descr(6,prec)
     write(*,'("Matrix: ",a)')mtrx_file
     write(*,'("Computed solution on ",i8," processors")')np
@@ -249,12 +246,12 @@ program df_sample
   end if
 
   allocate(x_col_glob(m_problem),r_col_glob(m_problem),stat=ierr)
-  if (ierr.ne.0) then 
+  if (ierr /= 0) then 
     write(0,*) 'allocation error: no data collection'
   else
-    call psb_gather(x_col_glob,x_col,desc_a,info,root=0)
-    call psb_gather(r_col_glob,r_col,desc_a,info,root=0)
-    if (amroot) then
+    call psb_gather(x_col_glob,x_col,desc_a,info,root=psb_root_)
+    call psb_gather(r_col_glob,r_col,desc_a,info,root=psb_root_)
+    if (iam==psb_root_) then
       write(0,'(" ")')
       write(0,'("Saving x on file")')
       write(20,*) 'matrix: ',mtrx_file

@@ -48,7 +48,7 @@ subroutine psb_zdiagsc_bld(a,desc_a,p,upd,info)
   integer      :: int_err(5)
 
   logical, parameter :: debug=.false.   
-  integer,parameter  :: iroot=0,iout=60,ilout=40
+  integer,parameter  :: iroot=psb_root_,iout=60,ilout=40
   character(len=20)   :: name, ch_err
 
   if(psb_get_errstatus().ne.0) return 

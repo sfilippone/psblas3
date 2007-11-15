@@ -41,7 +41,8 @@ end module mpi
 #endif    
 
 module psb_penv_mod
-
+  
+  use psb_const_mod
 
   interface psb_init
     module procedure  psb_init
@@ -303,7 +304,7 @@ contains
     if (present(root)) then
       root_ = root
     else
-      root_ = 0
+      root_ = psb_root_
     endif
 
     call psb_info(ictxt,iam,np)
@@ -327,7 +328,7 @@ contains
     if (present(root)) then
       root_ = root
     else
-      root_ = 0
+      root_ = psb_root_
     endif
 
     call psb_info(ictxt,iam,np)
@@ -351,7 +352,7 @@ contains
     if (present(root)) then
       root_ = root
     else
-      root_ = 0
+      root_ = psb_root_
     endif
 
     call psb_info(ictxt,iam,np)
@@ -376,7 +377,7 @@ contains
     if (present(root)) then
       root_ = root
     else
-      root_ = 0
+      root_ = psb_root_
     endif
 
     call psb_info(ictxt,iam,np)
@@ -401,7 +402,7 @@ contains
     if (present(root)) then
       root_ = root
     else
-      root_ = 0
+      root_ = psb_root_
     endif
 
     call psb_info(ictxt,iam,np)
@@ -425,7 +426,7 @@ contains
     if (present(root)) then
       root_ = root
     else
-      root_ = 0
+      root_ = psb_root_
     endif
 
     call psb_info(ictxt,iam,np)
@@ -450,7 +451,7 @@ contains
     if (present(root)) then
       root_ = root
     else
-      root_ = 0
+      root_ = psb_root_
     endif
 
     call psb_info(ictxt,iam,np)
@@ -474,7 +475,7 @@ contains
     if (present(root)) then
       root_ = root
     else
-      root_ = 0
+      root_ = psb_root_
     endif
 
     call psb_info(ictxt,iam,np)
@@ -498,7 +499,7 @@ contains
     if (present(root)) then
       root_ = root
     else
-      root_ = 0
+      root_ = psb_root_
     endif
 
     call psb_info(ictxt,iam,np)
@@ -529,7 +530,7 @@ contains
     if (present(root)) then
       root_ = root
     else
-      root_ = 0
+      root_ = psb_root_
     endif
     if (present(length)) then
       length_ = length
@@ -562,7 +563,7 @@ contains
     if (present(root)) then
       root_ = root
     else
-      root_ = 0
+      root_ = psb_root_
     endif
 
     call psb_info(ictxt,iam,np)
@@ -590,7 +591,7 @@ contains
     if (present(root)) then
       root_ = root
     else
-      root_ = 0
+      root_ = psb_root_
     endif
 
     call psb_info(ictxt,iam,np)
