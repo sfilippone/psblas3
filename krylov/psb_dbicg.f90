@@ -60,21 +60,36 @@
 !    This subroutine implements the BiCG method.
 !
 ! Arguments:
-!    a       -  type(<psb_dspmat_type>).     The sparse matrix containing A.
-!    prec    -  type(<psb_prec_type>).       The data structure containing the preconditioner.
-!    b       -  real,dimension(:).           The right hand side.
-!    x       -  real,dimension(:).           The vector of unknowns.
-!    eps     -  real.                        The error tolerance.
-!    desc_a  -  type(<psb_desc_type>).       The communication descriptor.
-!    info    -  integer.                     Return code
-!    itmax   -  integer(optional).           The maximum number of iterations.
-!    iter    -  integer(optional).           The number of iterations performed.
-!    err     -  real(optional).              The error on return.
-!    itrace  -  integer(optional).           The unit to write messages onto.
-!    istop   -  integer(optional).           The stopping criterium.
 !
-subroutine psb_dbicg(a,prec,b,x,eps,desc_a,info,&
-     &itmax,iter,err, itrace,istop)
+!    a      -  type(<psb_dspmat_type>)      Input: sparse matrix containing A.
+!    prec   -  type(<psb_dprec_type>)       Input: preconditioner
+!    b      -  real,dimension(:)            Input: vector containing the
+!                                           right hand side B
+!    x      -  real,dimension(:)            Input/Output: vector containing the
+!                                           initial guess and final solution X.
+!    eps    -  real                         Input: Stopping tolerance; the iteration is
+!                                           stopped when the error estimate
+!                                           |err| <= eps
+!    desc_a -  type(<psb_desc_type>).       Input: The communication descriptor.
+!    info   -  integer.                     Output: Return code
+!
+!    itmax  -  integer(optional)            Input: maximum number of iterations to be
+!                                           performed.
+!    iter   -  integer(optional)            Output: how many iterations have been
+!                                           performed.
+!    err    -  real   (optional)            Output: error estimate on exit
+!    itrace -  integer(optional)            Input: print an informational message
+!                                           with the error estimate every itrace
+!                                           iterations
+!    istop  -  integer(optional)            Input: stopping criterion, or how
+!                                           to estimate the error. 
+!                                           1: err =  |r|/|b|
+!                                           2: err =  |r|/(|a||x|+|b|)
+!                                           where r is the (preconditioned, recursive
+!                                           estimate of) residual 
+! 
+!
+subroutine psb_dbicg(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,istop)
   use psb_base_mod
   use psb_prec_mod
   implicit none
@@ -168,11 +183,11 @@ subroutine psb_dbicg(a,prec,b,x,eps,desc_a,info,&
   if (info == 0) call psb_geall(wwrk,desc_a,info,n=9)
   if (info == 0) call psb_geasb(wwrk,desc_a,info)  
   if(info.ne.0) then
-     info=4011
-     ch_err='psb_asb'
-     err=info
-     call psb_errpush(info,name,a_err=ch_err)
-     goto 9999
+    info=4011
+    ch_err='psb_asb'
+    err=info
+    call psb_errpush(info,name,a_err=ch_err)
+    goto 9999
   end if
 
   q  => wwrk(:,1)
@@ -198,21 +213,21 @@ subroutine psb_dbicg(a,prec,b,x,eps,desc_a,info,&
   end if
 
   itx   = 0
-  
+
   if (istop_ == 1) then 
-     ani = psb_spnrmi(a,desc_a,info)
-     bni = psb_geamax(b,desc_a,info)
+    ani = psb_spnrmi(a,desc_a,info)
+    bni = psb_geamax(b,desc_a,info)
   else if (istop_ == 2) then 
-     bn2 = psb_genrm2(b,desc_a,info)
+    bn2 = psb_genrm2(b,desc_a,info)
   endif
- 
+
   if(info.ne.0) then
-     info=4011
-     err=info
-     call psb_errpush(info,name,a_err=ch_err)
-     goto 9999
+    info=4011
+    err=info
+    call psb_errpush(info,name,a_err=ch_err)
+    goto 9999
   end if
-  
+
   restart: do 
 !!$   
 !!$   r0 = b-ax0
@@ -224,9 +239,9 @@ subroutine psb_dbicg(a,prec,b,x,eps,desc_a,info,&
     if (debug) write(0,*) me,' Done spmm',info
     if (info == 0) call psb_geaxpby(done,r,dzero,rt,desc_a,info)
     if(info.ne.0) then
-       info=4011
-       call psb_errpush(info,name)
-       goto 9999
+      info=4011
+      call psb_errpush(info,name)
+      goto 9999
     end if
 
     rho = dzero
@@ -238,9 +253,9 @@ subroutine psb_dbicg(a,prec,b,x,eps,desc_a,info,&
       rni = psb_genrm2(r,desc_a,info)
     endif
     if(info.ne.0) then
-       info=4011
-       call psb_errpush(info,name)
-       goto 9999
+      info=4011
+      call psb_errpush(info,name)
+      goto 9999
     end if
 
     if (istop_ == 1) then 
@@ -251,11 +266,11 @@ subroutine psb_dbicg(a,prec,b,x,eps,desc_a,info,&
     endif
 
     if(info.ne.0) then
-       info=4011
-       call psb_errpush(info,name)
-       goto 9999
+      info=4011
+      call psb_errpush(info,name)
+      goto 9999
     end if
-    
+
     if (rerr<=eps) then 
       exit restart
     end if
@@ -336,7 +351,7 @@ subroutine psb_dbicg(a,prec,b,x,eps,desc_a,info,&
   If (itrace_ > 0) then 
     if (me == 0) write(*,'(a,i4,3(2x,es10.4))') 'bicg: ',itx,rerr
   end If
-  
+
   if (present(err)) err=rerr
   if (present(iter)) iter = itx
   if (rerr>eps) then
@@ -352,8 +367,8 @@ subroutine psb_dbicg(a,prec,b,x,eps,desc_a,info,&
   call psb_restore_coher(ictxt,isvch)
 
   if(info/=0) then
-     call psb_errpush(info,name)
-     goto 9999
+    call psb_errpush(info,name)
+    goto 9999
   end if
 
   call psb_erractionrestore(err_act)
@@ -362,8 +377,8 @@ subroutine psb_dbicg(a,prec,b,x,eps,desc_a,info,&
 9999 continue
   call psb_erractionrestore(err_act)
   if (err_act.eq.psb_act_abort_) then
-     call psb_error()
-     return
+    call psb_error()
+    return
   end if
   return
 

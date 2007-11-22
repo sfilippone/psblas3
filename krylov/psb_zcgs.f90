@@ -56,23 +56,43 @@
 ! File:  psb_zcgs.f90
 !
 ! Subroutine: psb_zcgs
-!
+!    Implements the Conjugate Gradient Squared method.
+!    
 ! Arguments:
-!    a       -  type(<psb_zspmat_type>).     The sparse matrix containing A.
-!    prec    -  type(<psb_prec_type>).       The data structure containing the preconditioner.
-!    b       -  real,dimension(:).           The right hand side.
-!    x       -  real,dimension(:).           The vector of unknowns.
-!    eps     -  real.                        The error tolerance.
-!    desc_a  -  type(<psb_desc_type>).       The communication descriptor.
-!    info    -  integer.                     Return code
-!    itmax   -  integer(optional).           The maximum number of iterations.
-!    iter    -  integer(optional).           The number of iterations performed.
-!    err     -  real(optional).              The error on return.
-!    itrace  -  integer(optional).           The unit to write messages onto.
-!    istop   -  integer(optional).           The stopping criterium.
 !
-Subroutine psb_zcgs(a,prec,b,x,eps,desc_a,info,&
-     &itmax,iter,err,itrace,istop)
+!    methd  -  character                    The specific method; can take the values:
+!                                           CGS
+!                                           BICGSTAB
+!                                           RGMRES
+!                                           
+!    a      -  type(<psb_zspmat_type>)      Input: sparse matrix containing A.
+!    prec   -  type(<psb_zprec_type>)       Input: preconditioner
+!    b      -  complex,dimension(:)         Input: vector containing the
+!                                           right hand side B
+!    x      -  complex,dimension(:)         Input/Output: vector containing the
+!                                           initial guess and final solution X.
+!    eps    -  real                         Input: Stopping tolerance; the iteration is
+!                                           stopped when the error estimate
+!                                           |err| <= eps
+!    desc_a -  type(<psb_desc_type>).       Input: The communication descriptor.
+!    info   -  integer.                     Output: Return code
+!
+!    itmax  -  integer(optional)            Input: maximum number of iterations to be
+!                                           performed.
+!    iter   -  integer(optional)            Output: how many iterations have been
+!                                           performed.
+!    err    -  real   (optional)            Output: error estimate on exit
+!    itrace -  integer(optional)            Input: print an informational message
+!                                           with the error estimate every itrace
+!                                           iterations
+!    istop  -  integer(optional)            Input: stopping criterion, or how
+!                                           to estimate the error. 
+!                                           1: err =  |r|/|b|
+!                                           2: err =  |r|/(|a||x|+|b|)
+!                                           where r is the (preconditioned, recursive
+!                                           estimate of) residual 
+!
+Subroutine psb_zcgs(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,istop)
   use psb_base_mod
   use psb_prec_mod
   implicit none
@@ -123,17 +143,17 @@ Subroutine psb_zcgs(a,prec,b,x,eps,desc_a,info,&
   Else
     istop_ = 1
   Endif
-!
-!  istop_ = 1:  normwise backward error, infinity norm 
-!  istop_ = 2:  ||r||/||b||   norm 2 
-!
+  !
+  !  istop_ = 1:  normwise backward error, infinity norm 
+  !  istop_ = 2:  ||r||/||b||   norm 2 
+  !
 !!$
 !!$  If ((prec%prec < 0).Or.(prec%prec > 6) ) Then
 !!$     Write(0,*) 'f90_cgstab: invalid iprec',prec%prec
 !!$     If (Present(ierr)) ierr=-1
 !!$     Return
 !!$  Endif
-  
+
   if ((istop_ < 1 ).or.(istop_ > 2 ) ) then
     write(0,*) 'psb_cgs: invalid istop',istop_ 
     info=5001
@@ -161,9 +181,9 @@ Subroutine psb_zcgs(a,prec,b,x,eps,desc_a,info,&
   if (info == 0) Call psb_geall(wwrk,desc_a,info,n=11)
   if (info == 0) Call psb_geasb(wwrk,desc_a,info)  
   if (info.ne.0) Then 
-     info=4011 
-     call psb_errpush(info,name)
-     goto 9999
+    info=4011 
+    call psb_errpush(info,name)
+    goto 9999
   End If
 
   q  => wwrk(:,1)
@@ -186,14 +206,14 @@ Subroutine psb_zcgs(a,prec,b,x,eps,desc_a,info,&
   Endif
 
   If (Present(itrace)) Then
-     itrace_ = itrace
+    itrace_ = itrace
   Else
-     itrace_ = 0
+    itrace_ = 0
   End If
 
   ! Ensure global coherence for convergence checks.
   call psb_set_coher(ictxt,isvch)
-  
+
   itx   = 0
 
   if (istop_ == 1) then 
@@ -203,9 +223,9 @@ Subroutine psb_zcgs(a,prec,b,x,eps,desc_a,info,&
     bn2 = psb_genrm2(b,desc_a,info)
   endif
   if(info/=0)then
-     info=4011
-     call psb_errpush(info,name)
-     goto 9999
+    info=4011
+    call psb_errpush(info,name)
+    goto 9999
   end if
 
   restart: Do 
@@ -218,11 +238,11 @@ Subroutine psb_zcgs(a,prec,b,x,eps,desc_a,info,&
     Call psb_spmm(-zone,a,x,zone,r,desc_a,info,work=aux)
     Call psb_geaxpby(zone,r,zzero,rt,desc_a,info)
     if(info/=0)then
-       info=4011
-       call psb_errpush(info,name)
-       goto 9999
+      info=4011
+      call psb_errpush(info,name)
+      goto 9999
     end if
-    
+
     rho = zzero
     If (debug) Write(*,*) 'on entry to amax: b: ',Size(b)
 
@@ -235,11 +255,11 @@ Subroutine psb_zcgs(a,prec,b,x,eps,desc_a,info,&
       rerr = rni/bn2
     endif
     if(info/=0)then
-       info=4011
-       call psb_errpush(info,name)
-       goto 9999
+      info=4011
+      call psb_errpush(info,name)
+      goto 9999
     end if
-    
+
     If (rerr<=eps) Then 
       Exit restart
     End If
@@ -255,7 +275,7 @@ Subroutine psb_zcgs(a,prec,b,x,eps,desc_a,info,&
       rho_old = rho    
       rho = psb_gedot(rt,r,desc_a,info)
       If (rho==zzero) Then
-         If (debug) Write(0,*) 'cgs iteration breakdown r',rho
+        If (debug) Write(0,*) 'cgs iteration breakdown r',rho
         Exit iteration
       Endif
 
@@ -278,27 +298,27 @@ Subroutine psb_zcgs(a,prec,b,x,eps,desc_a,info,&
 
       sigma = psb_gedot(rt,v,desc_a,info)
       If (sigma==zzero) Then
-         If (debug) Write(0,*) 'cgs iteration breakdown s1', sigma
-         Exit iteration
+        If (debug) Write(0,*) 'cgs iteration breakdown s1', sigma
+        Exit iteration
       Endif
-      
+
       alpha = rho/sigma
 
       Call psb_geaxpby(zone,uv,zzero,q,desc_a,info)
       Call psb_geaxpby(-alpha,v,zone,q,desc_a,info)
       Call psb_geaxpby(zone,uv,zzero,s,desc_a,info)
       Call psb_geaxpby(zone,q,zone,s,desc_a,info)
-      
+
       Call psb_precaply(prec,s,z,desc_a,info,work=aux)
 
       Call psb_geaxpby(alpha,z,zone,x,desc_a,info)
 
       Call psb_spmm(zone,a,z,zzero,qt,desc_a,info,&
            & work=aux)
-      
+
       Call psb_geaxpby(-alpha,qt,zone,r,desc_a,info)
-      
-     
+
+
       if (istop_ == 1) then 
         rni = psb_geamax(r,desc_a,info)
         xni = psb_geamax(x,desc_a,info)
@@ -317,7 +337,7 @@ Subroutine psb_zcgs(a,prec,b,x,eps,desc_a,info,&
         if ((mod(itx,itrace_)==0).and.(me == 0))&
              & write(*,'(a,i4,3(2x,es10.4))') 'cgs: ',itx,rerr
       end If
-      
+
     End Do iteration
   End Do restart
   If (itrace_ > 0) then 
@@ -338,8 +358,8 @@ Subroutine psb_zcgs(a,prec,b,x,eps,desc_a,info,&
   call psb_restore_coher(ictxt,isvch)
 
   if(info/=0) then
-     call psb_errpush(info,name)
-     goto 9999
+    call psb_errpush(info,name)
+    goto 9999
   end if
 
   call psb_erractionrestore(err_act)
@@ -348,8 +368,8 @@ Subroutine psb_zcgs(a,prec,b,x,eps,desc_a,info,&
 9999 continue
   call psb_erractionrestore(err_act)
   if (err_act.eq.psb_act_abort_) then
-     call psb_error()
-     return
+    call psb_error()
+    return
   end if
   return
 

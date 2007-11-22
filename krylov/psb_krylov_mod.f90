@@ -36,72 +36,72 @@ Module psb_krylov_mod
   end interface
 
   interface psb_cg
-     subroutine psb_dcg(a,prec,b,x,eps,&
-	  & desc_a,info,itmax,iter,err,itrace,istop)
-       use psb_base_mod
-       use psb_prec_mod
-       type(psb_dspmat_type), intent(in)  :: a
-       type(psb_desc_type), intent(in)    :: desc_a
-       real(kind(1.d0)), intent(in)       :: b(:)
-       real(kind(1.d0)), intent(inout)    :: x(:)
-       real(kind(1.d0)), intent(in)       :: eps
-       type(psb_dprec_type), intent(in)   :: prec
-       integer, intent(out)               :: info
-       integer, optional, intent(in)      :: itmax, itrace,istop
-       integer, optional, intent(out)     :: iter
-       real(kind(1.d0)), optional, intent(out) :: err
-     end subroutine psb_dcg
+    subroutine psb_dcg(a,prec,b,x,eps,&
+         & desc_a,info,itmax,iter,err,itrace,istop)
+      use psb_base_mod
+      use psb_prec_mod
+      type(psb_dspmat_type), intent(in)  :: a
+      type(psb_desc_type), intent(in)    :: desc_a
+      real(kind(1.d0)), intent(in)       :: b(:)
+      real(kind(1.d0)), intent(inout)    :: x(:)
+      real(kind(1.d0)), intent(in)       :: eps
+      type(psb_dprec_type), intent(in)   :: prec
+      integer, intent(out)               :: info
+      integer, optional, intent(in)      :: itmax, itrace,istop
+      integer, optional, intent(out)     :: iter
+      real(kind(1.d0)), optional, intent(out) :: err
+    end subroutine psb_dcg
   end interface
 
   interface psb_bicg
-     subroutine psb_dbicg(a,prec,b,x,eps,&
-	  & desc_a,info,itmax,iter,err,itrace,istop)
-       use psb_base_mod
-       use psb_prec_mod
-       type(psb_dspmat_type), intent(in)  :: a
-       type(psb_desc_type), intent(in)    :: desc_a
-       real(kind(1.d0)), intent(in)       :: b(:)
-       real(kind(1.d0)), intent(inout)    :: x(:)
-       real(kind(1.d0)), intent(in)       :: eps
-       type(psb_dprec_type), intent(in)   :: prec
-       integer, intent(out)               :: info
-       integer, optional, intent(in)      :: itmax, itrace,istop
-       integer, optional, intent(out)     :: iter
-       real(kind(1.d0)), optional, intent(out) :: err
-     end subroutine psb_dbicg
+    subroutine psb_dbicg(a,prec,b,x,eps,&
+         & desc_a,info,itmax,iter,err,itrace,istop)
+      use psb_base_mod
+      use psb_prec_mod
+      type(psb_dspmat_type), intent(in)  :: a
+      type(psb_desc_type), intent(in)    :: desc_a
+      real(kind(1.d0)), intent(in)       :: b(:)
+      real(kind(1.d0)), intent(inout)    :: x(:)
+      real(kind(1.d0)), intent(in)       :: eps
+      type(psb_dprec_type), intent(in)   :: prec
+      integer, intent(out)               :: info
+      integer, optional, intent(in)      :: itmax, itrace,istop
+      integer, optional, intent(out)     :: iter
+      real(kind(1.d0)), optional, intent(out) :: err
+    end subroutine psb_dbicg
   end interface
 
   interface psb_bicgstab
-     subroutine psb_dcgstab(a,prec,b,x,eps,&
-	  & desc_a,info,itmax,iter,err,itrace,istop)
-       use psb_base_mod
-       use psb_prec_mod
-       type(psb_dspmat_type), intent(in)  :: a
-       type(psb_desc_type), intent(in)    :: desc_a
-       real(kind(1.d0)), intent(in)       :: b(:)
-       real(kind(1.d0)), intent(inout)    :: x(:)
-       real(kind(1.d0)), intent(in)       :: eps
-       type(psb_dprec_type), intent(in)   :: prec
-       integer, intent(out)               :: info
-       integer, optional, intent(in)      :: itmax, itrace,istop
-       integer, optional, intent(out)     :: iter
-       real(kind(1.d0)), optional, intent(out) :: err
-     end subroutine psb_dcgstab
-     subroutine psb_zcgstab(a,prec,b,x,eps,&
-	  & desc_a,info,itmax,iter,err,itrace,istop)
-       use psb_base_mod
-       use psb_prec_mod
-       type(psb_zspmat_type), intent(in)  :: a
-       type(psb_desc_type), intent(in)    :: desc_a
-       complex(kind(1.d0)), intent(in)       :: b(:)
-       complex(kind(1.d0)), intent(inout)    :: x(:)
-       real(kind(1.d0)), intent(in)       :: eps
-       type(psb_zprec_type), intent(in)   :: prec
-       integer, intent(out)               :: info
-       integer, optional, intent(in)      :: itmax, itrace,istop
-       integer, optional, intent(out)     :: iter
-       real(kind(1.d0)), optional, intent(out) :: err
-     end subroutine psb_zcgstab
+    subroutine psb_dcgstab(a,prec,b,x,eps,&
+         & desc_a,info,itmax,iter,err,itrace,istop)
+      use psb_base_mod
+      use psb_prec_mod
+      type(psb_dspmat_type), intent(in)  :: a
+      type(psb_desc_type), intent(in)    :: desc_a
+      real(kind(1.d0)), intent(in)       :: b(:)
+      real(kind(1.d0)), intent(inout)    :: x(:)
+      real(kind(1.d0)), intent(in)       :: eps
+      type(psb_dprec_type), intent(in)   :: prec
+      integer, intent(out)               :: info
+      integer, optional, intent(in)      :: itmax, itrace,istop
+      integer, optional, intent(out)     :: iter
+      real(kind(1.d0)), optional, intent(out) :: err
+    end subroutine psb_dcgstab
+    subroutine psb_zcgstab(a,prec,b,x,eps,&
+         & desc_a,info,itmax,iter,err,itrace,istop)
+      use psb_base_mod
+      use psb_prec_mod
+      type(psb_zspmat_type), intent(in)  :: a
+      type(psb_desc_type), intent(in)    :: desc_a
+      complex(kind(1.d0)), intent(in)       :: b(:)
+      complex(kind(1.d0)), intent(inout)    :: x(:)
+      real(kind(1.d0)), intent(in)       :: eps
+      type(psb_zprec_type), intent(in)   :: prec
+      integer, intent(out)               :: info
+      integer, optional, intent(in)      :: itmax, itrace,istop
+      integer, optional, intent(out)     :: iter
+      real(kind(1.d0)), optional, intent(out) :: err
+    end subroutine psb_zcgstab
   end interface
 
   interface psb_bicgstabl
@@ -171,25 +171,70 @@ Module psb_krylov_mod
       integer, optional, intent(out)     :: iter
       real(kind(1.d0)), optional, intent(out) :: err
     end subroutine psb_dcgs
-     subroutine psb_zcgs(a,prec,b,x,eps,&
-	  & desc_a,info,itmax,iter,err,itrace,istop)
-       use psb_base_mod
-       use psb_prec_mod
-       type(psb_zspmat_type), intent(in)  :: a
-       type(psb_desc_type), intent(in)    :: desc_a
-       complex(kind(1.d0)), intent(in)       :: b(:)
-       complex(kind(1.d0)), intent(inout)    :: x(:)
-       real(kind(1.d0)), intent(in)       :: eps
-       type(psb_zprec_type), intent(in)   :: prec
-       integer, intent(out)               :: info
-       integer, optional, intent(in)      :: itmax, itrace,istop
-       integer, optional, intent(out)     :: iter
-       real(kind(1.d0)), optional, intent(out) :: err
-     end subroutine psb_zcgs
+    subroutine psb_zcgs(a,prec,b,x,eps,&
+         & desc_a,info,itmax,iter,err,itrace,istop)
+      use psb_base_mod
+      use psb_prec_mod
+      type(psb_zspmat_type), intent(in)  :: a
+      type(psb_desc_type), intent(in)    :: desc_a
+      complex(kind(1.d0)), intent(in)       :: b(:)
+      complex(kind(1.d0)), intent(inout)    :: x(:)
+      real(kind(1.d0)), intent(in)       :: eps
+      type(psb_zprec_type), intent(in)   :: prec
+      integer, intent(out)               :: info
+      integer, optional, intent(in)      :: itmax, itrace,istop
+      integer, optional, intent(out)     :: iter
+      real(kind(1.d0)), optional, intent(out) :: err
+    end subroutine psb_zcgs
   end interface
-  
-contains
 
+contains
+  !
+  ! File: psb_krylov_mod.f90
+  !
+  ! Subroutine: psb_dkrylov
+  ! 
+  !    Front-end for the Krylov subspace iterations, real version
+  !    
+  ! Arguments:
+  !
+  !    methd  -  character                    The specific method; can take the values:
+  !                                           CG
+  !                                           CGS
+  !                                           BICG
+  !                                           BICGSTAB
+  !                                           BICGSTABL
+  !                                           RGMRES
+  !                                           
+  !    a      -  type(<psb_dspmat_type>)      Input: sparse matrix containing A.
+  !    prec   -  type(<psb_dprec_type>)       Input: preconditioner
+  !    b      -  real,dimension(:)            Input: vector containing the
+  !                                           right hand side B
+  !    x      -  real,dimension(:)            Input/Output: vector containing the
+  !                                           initial guess and final solution X.
+  !    eps    -  real                         Input: Stopping tolerance; the iteration is
+  !                                           stopped when the error estimate
+  !                                           |err| <= eps
+  !    desc_a -  type(<psb_desc_type>).       Input: The communication descriptor.
+  !    info   -  integer.                     Output: Return code
+  !
+  !    itmax  -  integer(optional)            Input: maximum number of iterations to be
+  !                                           performed.
+  !    iter   -  integer(optional)            Output: how many iterations have been
+  !                                           performed.
+  !    err    -  real   (optional)            Output: error estimate on exit
+  !    itrace -  integer(optional)            Input: print an informational message
+  !                                           with the error estimate every itrace
+  !                                           iterations
+  !    irst   -  integer(optional)            Input: restart parameter for RGMRES and 
+  !                                           BICGSTAB(L) methods
+  !    istop  -  integer(optional)            Input: stopping criterion, or how
+  !                                           to estimate the error. 
+  !                                           1: err =  |r|/|b|
+  !                                           2: err =  |r|/(|a||x|+|b|)
+  !                                           where r is the (preconditioned, recursive
+  !                                           estimate of) residual 
+  ! 
 
   Subroutine psb_dkrylov(method,a,prec,b,x,eps,desc_a,info,&
        &itmax,iter,err,itrace,irst,istop)
@@ -218,53 +263,96 @@ contains
 
 
     ictxt=psb_cd_get_context(desc_a)
-    
+
     call psb_info(ictxt, me, np)
 
     select case(toupper(method))
     case('CG') 
       call  psb_cg(a,prec,b,x,eps,desc_a,info,&
-         &itmax,iter,err,itrace,istop)
+           &itmax,iter,err,itrace,istop)
     case('CGS') 
       call  psb_cgs(a,prec,b,x,eps,desc_a,info,&
-         &itmax,iter,err,itrace,istop)
+           &itmax,iter,err,itrace,istop)
     case('BICG') 
       call  psb_bicg(a,prec,b,x,eps,desc_a,info,&
-         &itmax,iter,err,itrace,istop)
+           &itmax,iter,err,itrace,istop)
     case('BICGSTAB') 
       call  psb_bicgstab(a,prec,b,x,eps,desc_a,info,&
-         &itmax,iter,err,itrace,istop)
+           &itmax,iter,err,itrace,istop)
     case('RGMRES')
       call  psb_rgmres(a,prec,b,x,eps,desc_a,info,&
-         &itmax,iter,err,itrace,irst,istop)
+           &itmax,iter,err,itrace,irst,istop)
     case('BICGSTABL')
       call  psb_bicgstabl(a,prec,b,x,eps,desc_a,info,&
-         &itmax,iter,err,itrace,irst,istop)
+           &itmax,iter,err,itrace,irst,istop)
     case default
       if (me==0) write(0,*) 'Warning: Unknown method  ',method,&
            & ' in PSB_KRYLOV, defaulting to BiCGSTAB'
       call  psb_bicgstab(a,prec,b,x,eps,desc_a,info,&
-         &itmax,iter,err,itrace,istop)
+           &itmax,iter,err,itrace,istop)
     end select
 
     if(info/=0) then
       call psb_errpush(info,name)
       goto 9999
     end if
-    
+
     call psb_erractionrestore(err_act)
     return
-    
+
 9999 continue
     call psb_erractionrestore(err_act)
     if (err_act.eq.psb_act_abort_) then
       call psb_error(ictxt)
       return
     end if
-    
+
   end subroutine psb_dkrylov
 
 
+  !
+  ! File: psb_krylov_mod.f90
+  !
+  ! Subroutine: psb_zkrylov
+  ! 
+  !    Front-end for the Krylov subspace iterations, complexversion
+  !    
+  ! Arguments:
+  !
+  !    methd  -  character                    The specific method; can take the values:
+  !                                           CGS
+  !                                           BICGSTAB
+  !                                           RGMRES
+  !                                           
+  !    a      -  type(<psb_zspmat_type>)      Input: sparse matrix containing A.
+  !    prec   -  type(<psb_zprec_type>)       Input: preconditioner
+  !    b      -  complex,dimension(:)         Input: vector containing the
+  !                                           right hand side B
+  !    x      -  complex,dimension(:)         Input/Output: vector containing the
+  !                                           initial guess and final solution X.
+  !    eps    -  real                         Input: Stopping tolerance; the iteration is
+  !                                           stopped when the error estimate
+  !                                           |err| <= eps
+  !    desc_a -  type(<psb_desc_type>).       Input: The communication descriptor.
+  !    info   -  integer.                     Output: Return code
+  !
+  !    itmax  -  integer(optional)            Input: maximum number of iterations to be
+  !                                           performed.
+  !    iter   -  integer(optional)            Output: how many iterations have been
+  !                                           performed.
+  !    err    -  real   (optional)            Output: error estimate on exit
+  !    itrace -  integer(optional)            Input: print an informational message
+  !                                           with the error estimate every itrace
+  !                                           iterations
+  !    irst   -  integer(optional)            Input: restart parameter for RGMRES and 
+  !                                           BICGSTAB(L) methods
+  !    istop  -  integer(optional)            Input: stopping criterion, or how
+  !                                           to estimate the error. 
+  !                                           1: err =  |r|/|b|
+  !                                           2: err =  |r|/(|a||x|+|b|)
+  !                                           where r is the (preconditioned, recursive
+  !                                           estimate of) residual 
+  ! 
   Subroutine psb_zkrylov(method,a,prec,b,x,eps,desc_a,info,&
        &itmax,iter,err,itrace,irst,istop)
     use psb_base_mod
@@ -290,9 +378,9 @@ contains
 
 
     ictxt=psb_cd_get_context(desc_a)
-    
+
     call psb_info(ictxt, me, np)
-    
+
 
     select case(toupper(method))
 !!$    case('CG') 
@@ -300,7 +388,7 @@ contains
 !!$         &itmax,iter,err,itrace,istop)
     case('CGS') 
       call  psb_cgs(a,prec,b,x,eps,desc_a,info,&
-         &itmax,iter,err,itrace,istop)
+           &itmax,iter,err,itrace,istop)
 !!$    case('BICG') 
 !!$      call  psb_bicg(a,prec,b,x,eps,desc_a,info,&
 !!$         &itmax,iter,err,itrace,istop)
@@ -317,24 +405,24 @@ contains
       if (me==0) write(0,*) 'Warning: Unknown method ',method,&
            & ' in PSB_KRYLOV, defaulting to BiCGSTAB'
       call  psb_bicgstab(a,prec,b,x,eps,desc_a,info,&
-         &itmax,iter,err,itrace,istop)
+           &itmax,iter,err,itrace,istop)
     end select
 
     if(info/=0) then
       call psb_errpush(info,name)
       goto 9999
     end if
-    
+
     call psb_erractionrestore(err_act)
     return
-    
+
 9999 continue
     call psb_erractionrestore(err_act)
     if (err_act.eq.psb_act_abort_) then
       call psb_error(ictxt)
       return
     end if
-    
+
   end subroutine psb_zkrylov
 
 

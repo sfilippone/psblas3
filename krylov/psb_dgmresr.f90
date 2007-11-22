@@ -70,23 +70,39 @@
 !    This subroutine implements the restarted GMRES method with right
 !    preconditioning.
 !
-! Arguments:
-!    a       -  type(<psb_dspmat_type>).     The sparse matrix containing A.
-!    prec    -  type(<psb_prec_type>).       The data structure containing the preconditioner.
-!    b       -  real,dimension(:).           The right hand side.
-!    x       -  real,dimension(:).           The vector of unknowns.
-!    eps     -  real.                        The error tolerance.
-!    desc_a  -  type(<psb_desc_type>).       The communication descriptor.
-!    info    -  integer.                     Return code
-!    itmax   -  integer(optional).           The maximum number of iterations.
-!    iter    -  integer(optional).           The number of iterations performed.
-!    err     -  real(optional).              The error on return.
-!    itrace  -  integer(optional).           The unit to write messages onto.
-!    irst    -  integer(optional).           The restart value.
-!    istop   -  integer(optional).           The stopping criterium.
 !
-Subroutine psb_dgmresr(a,prec,b,x,eps,desc_a,info,&
-     &itmax,iter,err,itrace,irst,istop)
+! Arguments:
+!
+!    a      -  type(<psb_dspmat_type>)      Input: sparse matrix containing A.
+!    prec   -  type(<psb_dprec_type>)       Input: preconditioner
+!    b      -  real,dimension(:)            Input: vector containing the
+!                                           right hand side B
+!    x      -  real,dimension(:)            Input/Output: vector containing the
+!                                           initial guess and final solution X.
+!    eps    -  real                         Input: Stopping tolerance; the iteration is
+!                                           stopped when the error estimate
+!                                           |err| <= eps
+!    desc_a -  type(<psb_desc_type>).       Input: The communication descriptor.
+!    info   -  integer.                     Output: Return code
+!
+!    itmax  -  integer(optional)            Input: maximum number of iterations to be
+!                                           performed.
+!    iter   -  integer(optional)            Output: how many iterations have been
+!                                           performed.
+!    err    -  real   (optional)            Output: error estimate on exit
+!    itrace -  integer(optional)            Input: print an informational message
+!                                           with the error estimate every itrace
+!                                           iterations
+!    irst   -  integer(optional)            Input: restart parameter
+!                                           
+!    istop  -  integer(optional)            Input: stopping criterion, or how
+!                                           to estimate the error. 
+!                                           1: err =  |r|/|b|
+!                                           2: err =  |r|/(|a||x|+|b|)
+!                                           where r is the (preconditioned, recursive
+!                                           estimate of) residual 
+! 
+Subroutine psb_dgmresr(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,irst,istop)
   use psb_base_mod
   use psb_prec_mod
   implicit none
