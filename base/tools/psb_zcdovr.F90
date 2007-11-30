@@ -76,12 +76,12 @@ Subroutine psb_zcdovr(a,desc_a,novr,desc_ov,info, extype)
 #endif
 
   !     .. Array Arguments ..
-  integer, intent(in)                :: novr
-  Type(psb_zspmat_type), Intent(in)  :: a
-  Type(psb_desc_type), Intent(in)    :: desc_a
-  Type(psb_desc_type), Intent(inout) :: desc_ov
-  integer, intent(out)               :: info
-  integer, intent(in),optional       :: extype
+  integer, intent(in)               :: novr
+  Type(psb_zspmat_type), Intent(in) :: a
+  Type(psb_desc_type), Intent(in)   :: desc_a
+  Type(psb_desc_type), Intent(out)  :: desc_ov
+  integer, intent(out)              :: info
+  integer, intent(in),optional      :: extype
 
   interface 
     subroutine psb_icdasb(desc_a,info,ext_hv)

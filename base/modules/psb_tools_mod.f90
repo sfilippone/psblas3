@@ -337,22 +337,22 @@ Module psb_tools_mod
     Subroutine psb_dcdovr(a,desc_a,novr,desc_ov,info,extype)
       use psb_descriptor_type
       Use psb_spmat_type
-      integer, intent(in)                :: novr
-      Type(psb_dspmat_type), Intent(in)  ::  a
-      Type(psb_desc_type), Intent(in)    :: desc_a
-      Type(psb_desc_type), Intent(inout) :: desc_ov
-      integer, intent(out)               :: info
-      integer, intent(in),optional       :: extype
+      integer, intent(in)               :: novr
+      Type(psb_dspmat_type), Intent(in) :: a
+      Type(psb_desc_type), Intent(in)   :: desc_a
+      Type(psb_desc_type), Intent(out)  :: desc_ov
+      integer, intent(out)              :: info
+      integer, intent(in),optional      :: extype
     end Subroutine psb_dcdovr
     Subroutine psb_zcdovr(a,desc_a,novr,desc_ov,info,extype)
       use psb_descriptor_type
       Use psb_spmat_type
-      integer, intent(in)                :: novr
-      Type(psb_zspmat_type), Intent(in)  ::  a
-      Type(psb_desc_type), Intent(in)    :: desc_a
-      Type(psb_desc_type), Intent(inout) :: desc_ov
-      integer, intent(out)               :: info
-      integer, intent(in),optional       :: extype
+      integer, intent(in)               :: novr
+      Type(psb_zspmat_type), Intent(in) :: a
+      Type(psb_desc_type), Intent(in)   :: desc_a
+      Type(psb_desc_type), Intent(out)  :: desc_ov
+      integer, intent(out)              :: info
+      integer, intent(in),optional      :: extype
     end Subroutine psb_zcdovr
   end interface
 
