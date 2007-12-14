@@ -42,8 +42,8 @@ MPI_FINC=-DMPI_MOD
 #######################  Section 3 #######################
 #  Specify paths to libraries                            #
 ##########################################################
-BLAS=-lblas-intel -L$(HOME)/NUMERICAL/LIB
-BLACS=-lmpiblacs-intel -L$(HOME)/NUMERICAL/LIB
+BLAS=-lblas-ifort91 -L$(HOME)/LIB
+BLACS=-lmpiblacs-ifort91 -L$(HOME)/LIB
 
 
 
