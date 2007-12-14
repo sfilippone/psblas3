@@ -28,7 +28,7 @@ FIFLAG=-I
 #   MPI_FINC=-DMPI_H  or MPI_FINC=-DMPI_MOD              #
 #  If necessary add MPIINCDIR                            #
 ##########################################################
-MPIDIR=/usr/local/mpich-if91
+MPIDIR=/usr/local/mpich-ifc91
 MPIBIN=$(MPIDIR)/bin
 F90LINK=$(MPIBIN)/mpif90 
 FLINK=$(MPIBIN)/mpif77 
