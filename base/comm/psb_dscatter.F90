@@ -39,7 +39,8 @@
 !   locx      -  real,dimension(:,:).          The local piece of the ditributed matrix.
 !   desc_a    -  type(<psb_desc_type>).        The communication descriptor.
 !   info      -  integer.                      Error code.
-!   iroot     -  integer(optional).            The process that owns the global matrix. If -1 all
+!   iroot     -  integer(optional).            The process that owns the global matrix.
+!                                              If -1 all
 !                                              the processes have a copy. Default -1.
 !
 subroutine  psb_dscatterm(globx, locx, desc_a, info, iroot)
