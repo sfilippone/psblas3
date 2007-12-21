@@ -32,6 +32,7 @@ C
      *     IP1,DESCRN,ARN,IA1N,IA2N,INFON,IP2,LARN,LIA1N,
      *     LIA2N,AUX,LAUX,IERROR)      
       use psb_const_mod
+      use psb_error_mod
       IMPLICIT NONE
 C     
 C     .. Scalar Arguments ..
@@ -45,21 +46,23 @@ C     .. Array Arguments ..
       CHARACTER          DESCRA*11, DESCRN*11
 C     .. Local Scalars .. 
       INTEGER            PIA, PJA, PNG, ERR_ACT
-      logical     debug
-      parameter   (debug=.false.)
+      integer         :: debug_level, debug_unit
 c     .. Local Arrays ..
       CHARACTER*20       NAME
       INTEGER            INT_VAL(5)
 
-      NAME = 'DJDCO\0'
+      NAME = 'DJDCO'
       IERROR = 0
       CALL FCPSB_ERRACTIONSAVE(ERR_ACT)
+      debug_unit  = psb_get_debug_unit()
+      debug_level = psb_get_debug_level()
             
       PNG = IA2(1)
       PIA = IA2(2)
       PJA = IA2(3)
 
-       if(debug) write(*,*) 'On entry to DJDCO: NNZ LAUX ',
+      if (debug_level >= psb_debug_serial_)
+     +  write(debug_unit,*)  trim(name),': On entry NNZ LAUX ',
      +     info(1),laux,larn,lia1n,lia2n
       
       CALL DJDCOX(TRANS,M,N,DESCRA,AR,IA2(PIA),IA2(PJA),

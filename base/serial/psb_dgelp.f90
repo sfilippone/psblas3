@@ -56,7 +56,7 @@ subroutine psb_dgelp(trans,iperm,x,info)
   integer                  :: int_err(5), i1sz, i2sz, err_act
   integer, allocatable     :: itemp(:)
   real(kind(1.d0)),parameter    :: one=1
-  logical, parameter :: debug=.false.
+  integer              :: debug_level, debug_unit
 
   interface dgelp
     subroutine dgelp(trans,m,n,p,b,ldb,work,lwork,ierror)
@@ -82,11 +82,15 @@ subroutine psb_dgelp(trans,iperm,x,info)
   if(psb_get_errstatus() /= 0) return 
   info=0
   call psb_erractionsave(err_act)
+  debug_unit  = psb_get_debug_unit()
+  debug_level = psb_get_debug_level()
 
   i1sz    = size(x,dim=1)
   i2sz    = size(x,dim=2)
 
-  if (debug) write(*,*) 'gelp: ',i1sz,i2sz
+  if (debug_level >= psb_debug_serial_)&
+       & write(debug_unit,*)  trim(name),': size',i1sz,i2sz
+
   allocate(dtemp(i1sz),itemp(size(iperm)),stat=info)
   if (info /= 0) then
     info=2040
@@ -186,7 +190,7 @@ subroutine psb_dgelpv(trans,iperm,x,info)
   real(kind(1.d0)),allocatable  ::  dtemp(:)
   integer, allocatable     :: itemp(:)
   real(kind(1.d0)),parameter    :: one=1
-  logical, parameter :: debug=.false.
+  integer              :: debug_level, debug_unit
 
   interface dgelp
     subroutine dgelp(trans,m,n,p,b,ldb,work,lwork,ierror)
@@ -212,10 +216,13 @@ subroutine psb_dgelpv(trans,iperm,x,info)
   if(psb_get_errstatus() /= 0) return 
   info=0
   call psb_erractionsave(err_act)
+  debug_unit  = psb_get_debug_unit()
+  debug_level = psb_get_debug_level()
 
   i1sz = size(x)
 
-  if (debug) write(*,*) 'gelp: ',i1sz
+  if (debug_level >= psb_debug_serial_)&
+       & write(debug_unit,*)  trim(name),': size',i1sz
   allocate(dtemp(i1sz),itemp(size(iperm)),stat=info)
   if (info /= 0) then
     info=2040

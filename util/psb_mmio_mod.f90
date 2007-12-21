@@ -51,7 +51,6 @@ contains
     character(1024)      :: line
     integer        :: nrow, ncol, nnzero
     integer        :: ircode, i,nzr,infile
-    logical, parameter :: debug=.false.
 
     iret = 0
 
@@ -81,15 +80,12 @@ contains
       iret=909
       return
     end if
-    if (debug) write(*,*) mmheader,':', object, ':',fmt,':', type,':', sym
 
     do 
       read(infile,fmt='(a)') line
       if (line(1:1) /= '%')  exit
     end do
-    if (debug) write(*,*) 'Line on input : "',line,'"'
     read(line,fmt=*) nrow,ncol,nnzero
-    if (debug) write(*,*) 'Out: ',nrow,ncol,nnzero
     
     if ((tolower(type) == 'real').and.(tolower(sym) == 'general')) then
       call psb_sp_all(nrow,ncol,a,nnzero,ircode)
@@ -207,8 +203,6 @@ contains
     integer        :: nrow, ncol, nnzero
     integer        :: ircode, i,nzr,infile
     real(kind(1.d0))   :: are, aim
-    logical, parameter :: debug=.false.
-    
 
     iret = 0
 
@@ -238,15 +232,12 @@ contains
       iret=909
       return
     end if
-    if (debug) write(*,*) mmheader,':', object, ':',fmt,':', type,':', sym
 
     do 
       read(infile,fmt='(a)') line
       if (line(1:1) /= '%')  exit
     end do
-    if (debug) write(*,*) 'Line on input : "',line,'"'
     read(line,fmt=*) nrow,ncol,nnzero
-    if (debug) write(*,*) 'Out: ',nrow,ncol,nnzero
     
     if ((tolower(type) == 'complex').and.(tolower(sym) == 'general')) then
       call psb_sp_all(nrow,ncol,a,nnzero,ircode)

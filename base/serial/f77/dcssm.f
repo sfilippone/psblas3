@@ -196,6 +196,7 @@ C
      +   PL,FIDT,DESCRT,T,IT1,IT2,INFOT,PR,
      +   B,LDB,BETA,C,LDC,WORK,LWORK,IERROR)
 C     .. Scalar Arguments ..
+      use psb_error_mod
       IMPLICIT NONE
       DOUBLE PRECISION ALPHA, BETA
       INTEGER          N, LDB, LDC, M, LWORK, IERROR
@@ -211,11 +212,11 @@ C     .. Local Scalars ..
 C     .. Local Array..
       INTEGER           INT_VAL(5)
       CHARACTER*30      STRINGS(2)
-      CHARACTER         NAME*30
+      CHARACTER         NAME*20
+      integer         :: debug_level, debug_unit
+
 C     .. Parameters ..
       PARAMETER        (ZERO=0.D0)
-      LOGICAL           DEBUG
-      PARAMETER         (DEBUG=.FALSE.)
 C     .. External Subroutines ..
       EXTERNAL         DSWSM, DLPUPD
 C     .. Intrinsic Functions ..
@@ -225,10 +226,12 @@ C
 C       Check for argument errors
 C
       IERROR = 0
-      NAME = 'DCSSM\0'
+      NAME = 'DCSSM'
       CALL FCPSB_ERRACTIONSAVE(ERR_ACT)
+      debug_unit  = psb_get_debug_unit()
+      debug_level = psb_get_debug_level()
 
-      IF     (M.LT.0) THEN
+      IF (M.LT.0) THEN
          IERROR = 10
          INT_VAL(1) = 2
          INT_VAL(2) = M
@@ -299,6 +302,9 @@ C
 C
 C        Both right and left permutations required
 C
+        if (debug_level >= psb_debug_serial_comp_)
+     +    write(debug_unit,*) trim(name),': RP LP ',m,n,ierror
+
          CALL DLPUPD(M,N,PR,B,LDB,BETA,WORK,M)
          CALL DSWSM(TRANS,M,N,ALPHA,UNITD,D,FIDT,DESCRT,T,IT1,IT2,      
      &      INFOT,WORK,M,ZERO,WORK(P),M,WORK(P+LWORKB),LWORK,IERROR)
@@ -314,7 +320,9 @@ C
 C
 C        Only right permutation required
 C
-c$$$        write(0,*) 'DCSSM: RP'
+        if (debug_level >= psb_debug_serial_comp_)
+     +    write(debug_unit,*) trim(name),': RP NLP ',m,n,ierror
+
          CALL DLPUPD(M,N,PR,B,LDB,BETA,WORK,M)
          CALL DSWSM(TRANS,M,N,ALPHA,UNITD,D,FIDT,DESCRT,T,IT1,IT2,      
      &      INFOT,WORK,M,ZERO,C,LDC,WORK(P),LWORK,IERROR)
@@ -330,7 +338,8 @@ c$$$        write(0,*) 'DCSSM: RP'
 C
 C        Only left permutation required
 C
-c$$$        write(0,*) 'DCSSM: LP'
+        if (debug_level >= psb_debug_serial_comp_)
+     +    write(debug_unit,*) trim(name),': NRP LP ',m,n,ierror
          CALL DSWSM(TRANS,M,N,ALPHA,UNITD,D,FIDT,DESCRT,T,IT1,IT2,      
      &              INFOT,B,LDB,BETA,WORK,M,WORK(P),LWORK,IERROR)
          LWORKS = IDINT(WORK(P))
@@ -345,8 +354,8 @@ c$$$        write(0,*) 'DCSSM: LP'
 C
 C        Only triangular systems solver required
 C
-        if (debug) write(*,*) 'DCSSM ',m,n
-        if (debug) write(*,*) 'DCSSM ',m,n,ierror
+        if (debug_level >= psb_debug_serial_comp_)
+     +    write(debug_unit,*) trim(name),': NRP NLP ',m,n,ierror
          CALL DSWSM(TRANS,M,N,ALPHA,UNITD,D,FIDT,DESCRT,T,IT1,IT2,      
      &           INFOT,B,LDB,BETA,C,LDC,WORK,LWORK,IERROR)
          LWORKS = IDINT(WORK(1))

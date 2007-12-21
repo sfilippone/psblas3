@@ -39,7 +39,7 @@
 ! 
 ! Arguments: 
 !    x(:,:)  - integer,allocatable                The matrix to be assembled.
-!    desc_a  - type(<psb_desc_type>).             The communication descriptor.
+!    desc_a  - type(psb_desc_type).             The communication descriptor.
 !    info    - integer.                           return code
 subroutine psb_iasb(x, desc_a, info)
   !....assembly dense matrix x .....
@@ -58,26 +58,28 @@ subroutine psb_iasb(x, desc_a, info)
   ! local variables
   integer :: ictxt,np,me,nrow,ncol,err_act
   integer :: int_err(5), i1sz, i2sz
-  logical, parameter :: debug=.false.
-  character(len=20)   :: name
+  integer              :: debug_level, debug_unit
+  character(len=20)    :: name,ch_err
 
   if(psb_get_errstatus() /= 0) return 
   info=0
-  name='psb_iasb'
+  name='psb_igeasb_m'
   call psb_erractionsave(err_act)
+  debug_unit  = psb_get_debug_unit()
+  debug_level = psb_get_debug_level()
 
   if ((.not.allocated(desc_a%matrix_data))) then
-     info=3110
-     call psb_errpush(info,name)
-     return
+    info=3110
+    call psb_errpush(info,name)
+    goto 9999
   endif
-
   ictxt   = psb_cd_get_context(desc_a)
 
   call psb_info(ictxt, me, np)
 
 
-  if (debug) write(*,*) 'asb start: ',np,me,&
+  if (debug_level >= psb_debug_ext_) &
+       & write(debug_unit,*) me,' ',trim(name),': start: ',np,&
        & psb_cd_get_dectype(desc_a)
   !     ....verify blacs grid correctness..
   if (np == -1) then
@@ -85,7 +87,8 @@ subroutine psb_iasb(x, desc_a, info)
     call psb_errpush(info,name)
     goto 9999
   else if (.not.psb_is_asb_desc(desc_a)) then
-    if (debug) write(*,*) 'asb error ',&
+    if (debug_level >= psb_debug_ext_) &
+         & write(debug_unit,*) me,' ',trim(name),' error ',&
          & psb_cd_get_dectype(desc_a)
     info = 3110
     call psb_errpush(info,name)
@@ -98,19 +101,28 @@ subroutine psb_iasb(x, desc_a, info)
   ncol  = psb_cd_get_local_cols(desc_a)
   i1sz = size(x,dim=1)
   i2sz = size(x,dim=2)
-  if (debug) write(*,*) 'asb: ',i1sz,i2sz,nrow,ncol
-  if (i1sz.lt.ncol) then
+  if (debug_level >= psb_debug_ext_) &
+       & write(debug_unit,*) me,' ',trim(name),': ',i1sz,i2sz,nrow,ncol
+
+  if (i1sz < ncol) then
     call psb_realloc(ncol,i2sz,x,info)
     if (info /= 0) then
-      info=4025
-      int_err(1)=ncol*i2sz
-      call psb_errpush(info,name,int_err,a_err='integer')
+      info=4010
+      call psb_errpush(info,name,a_err='psb_realloc')
       goto 9999
     endif
   endif
   
   ! ..update halo elements..
-  call psb_halo(x,desc_a,info,alpha=done)
+  call psb_halo(x,desc_a,info)
+  if(info /= 0) then
+    info=4010
+    ch_err='psb_halo'
+    call psb_errpush(info,name,a_err=ch_err)
+    goto 9999
+  end if
+  if (debug_level >= psb_debug_ext_) &
+       & write(debug_unit,*) me,' ',trim(name),': end'
 
   call psb_erractionrestore(err_act)
   return
@@ -166,7 +178,7 @@ end subroutine psb_iasb
 ! 
 ! Arguments: 
 !    x(:)    - integer,allocatable                The matrix to be assembled.
-!    desc_a  - type(<psb_desc_type>).             The communication descriptor.
+!    desc_a  - type(psb_desc_type).             The communication descriptor.
 !    info    - integer.                           return code
 subroutine psb_iasbv(x, desc_a, info)
   !....assembly dense matrix x .....
@@ -183,18 +195,18 @@ subroutine psb_iasbv(x, desc_a, info)
   integer, intent(out)                ::  info
 
   ! local variables
-  integer :: ictxt,np,me, err_act
-  integer :: int_err(5), i1sz,nrow,ncol
-  logical, parameter :: debug=.false.
-  character(len=20)   :: name
+  integer :: ictxt,np,me
+  integer :: int_err(5), i1sz,nrow,ncol, err_act
+  integer              :: debug_level, debug_unit
+  character(len=20)    :: name,ch_err
 
-  if(psb_get_errstatus().ne.0) return 
-  info=0
-  call psb_erractionsave(err_act)
-  name = 'psb_iasbv'
-  
-  
+  info = 0
+  int_err(1) = 0
+  name = 'psb_igeasb_v'
+
   ictxt   = psb_cd_get_context(desc_a)
+  debug_unit  = psb_get_debug_unit()
+  debug_level = psb_get_debug_level()
 
   call psb_info(ictxt, me, np)
 
@@ -211,22 +223,30 @@ subroutine psb_iasbv(x, desc_a, info)
 
   nrow = psb_cd_get_local_rows(desc_a)
   ncol = psb_cd_get_local_cols(desc_a)
-
-  if (debug) write(*,*) name,' sizes: ',nrow,ncol
+  if (debug_level >= psb_debug_ext_) &
+       & write(debug_unit,*) me,' ',trim(name),': sizes: ',nrow,ncol
   i1sz = size(x)
-  if (debug) write(*,*) 'dasb: sizes ',i1sz,ncol
-  if (i1sz.lt.ncol) then
+  if (debug_level >= psb_debug_ext_) &
+       & write(debug_unit,*) me,' ',trim(name),': sizes ',i1sz,ncol
+  if (i1sz < ncol) then
     call psb_realloc(ncol,x,info)
     if (info /= 0) then           
-      info=4025
-      int_err(1)=ncol
-      call psb_errpush(info,name,int_err,a_err='integer')
+      info=4010
+      call psb_errpush(info,name,a_err='psb_realloc')
       goto 9999
     endif
   endif  
   
   ! ..update halo elements..
-  call psb_halo(x,desc_a,info,alpha=done)
+  call psb_halo(x,desc_a,info)
+  if(info /= 0) then
+    info=4010
+    ch_err='f90_pshalo'
+    call psb_errpush(info,name,a_err=ch_err)
+    goto 9999
+  end if
+  if (debug_level >= psb_debug_ext_) &
+       & write(debug_unit,*) me,' ',trim(name),': end'
 
   call psb_erractionrestore(err_act)
   return

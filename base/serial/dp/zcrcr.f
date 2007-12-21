@@ -188,7 +188,7 @@ C     .. Intrinsic Functions ..
 C     .. Executable Statements ..
 C
       EXIT=.FALSE.
-      NAME = 'DCOCO\0'
+      NAME = 'ZCRCR'
       IERROR = 0
       CALL FCPSB_ERRACTIONSAVE(ERR_ACT)
 C

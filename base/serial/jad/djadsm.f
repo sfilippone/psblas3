@@ -30,6 +30,9 @@ C
 C 
       SUBROUTINE DJADSM(TRANST,M,N,VDIAG,TDIAG,PERMQ,ALPHA,DESCRA,
      +   AR,JA,IA,PERMP,B,LDB,BETA,C,LDC,WORK)
+      use psb_error_mod
+      use psb_string_mod
+      implicit none
 C
 C
 C     .. Scalar Arguments ..
@@ -44,15 +47,16 @@ C     .. Local Scalars ..
       INTEGER           PIA, PJA, PNG
       INTEGER           I, K, ERR_ACT
       CHARACTER         UPLO,UNITD
-      logical debug
-      parameter (debug=.false.)
+      integer        :: debug_level, debug_unit
       CHARACTER*20      NAME
-      INTEGER           INT_VAL(5)
+      INTEGER           INT_VAL(5),ierror
 C     .. Executable Statements ..
 C
-      NAME = 'DJADSM\0'
+      NAME = 'DJADSM'
       IERROR = 0
       CALL FCPSB_ERRACTIONSAVE(ERR_ACT)
+      debug_unit  = psb_get_debug_unit()
+      debug_level = psb_get_debug_level()
 
       IF((ALPHA.NE.1.D0) .OR. (BETA.NE.0.D0))then
          IERROR=5
@@ -60,8 +64,10 @@ C
          GOTO 9999
       ENDIF
       UPLO = '?'
-      IF (DESCRA(1:1).EQ.'T' .AND. DESCRA(2:2).EQ.'U') UPLO = 'U'
-      IF (DESCRA(1:1).EQ.'T' .AND. DESCRA(2:2).EQ.'L') UPLO = 'L'
+      IF (toupper(DESCRA(1:1)).EQ.'T' .AND.
+     +  toupper(DESCRA(2:2)).EQ.'U') UPLO = 'U'
+      IF (toupper(DESCRA(1:1)).EQ.'T' .AND.
+     +  toupper(DESCRA(2:2)).EQ.'L') UPLO = 'L'
 C
       IF (UPLO.EQ.'?') THEN
          IERROR=5
@@ -69,7 +75,7 @@ C
          GOTO 9999
       END IF
 
-      IF (DESCRA(3:3).NE.'U') THEN
+      IF (toupper(DESCRA(3:3)).NE.'U') THEN
          IERROR=5
          CALL FCPSB_ERRPUSH(IERROR,NAME,INT_VAL)
          GOTO 9999
@@ -78,10 +84,12 @@ C
 C
 C        B = INV(A)*B  OR B=INV(A')*B
 C
-      if (debug) write(0,*) 'DJADSM : ',m,n,' ',tdiag
+      if (debug_level >= psb_debug_serial_comp_)
+     +  write(debug_unit,*) trim(name),': entry',m,n
 
-      IF (TDIAG.EQ.'R') THEN
-        if (debug) write(0,*) 'DJADSM : Right Scale',m,n
+      IF (toupper(TDIAG).EQ.'R') THEN
+        if (debug_level >= psb_debug_serial_comp_)
+     +    write(debug_unit,*) trim(name),': Right Scale'
         DO  I = 1, N
           DO  K = 1, M
             B(K,I) = B(K,I)*VDIAG(K)
@@ -104,21 +112,16 @@ C
       END IF
 
 
-      if (debug) then 
-        write(0,*) 'Check from DJADSM'
-        do k=1,m
-          write(0,*) k, b(k,1),c(k,1)
-        enddo
-      endif
-
-      IF (TDIAG.EQ.'L') THEN
+      IF (toupper(TDIAG).EQ.'L') THEN
+        if (debug_level >= psb_debug_serial_comp_)
+     +    write(debug_unit,*) trim(name),': Left Scale'
          DO I = 1, N
             DO K = 1, M
                C(K,I) = C(K,I)*VDIAG(K)
             ENDDO
          ENDDO
       END IF
-c      write(*,*) 'exit djadsm'
+
       CALL FCPSB_ERRACTIONRESTORE(ERR_ACT)
       RETURN
 

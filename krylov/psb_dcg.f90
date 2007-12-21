@@ -62,32 +62,31 @@
 !
 ! Arguments:
 !
-!    a      -  type(<psb_dspmat_type>)      Input: sparse matrix containing A.
-!    prec   -  type(<psb_dprec_type>)       Input: preconditioner
-!    b      -  real,dimension(:)            Input: vector containing the
-!                                           right hand side B
-!    x      -  real,dimension(:)            Input/Output: vector containing the
-!                                           initial guess and final solution X.
-!    eps    -  real                         Input: Stopping tolerance; the iteration is
-!                                           stopped when the error estimate
-!                                           |err| <= eps
-!    desc_a -  type(<psb_desc_type>).       Input: The communication descriptor.
-!    info   -  integer.                     Output: Return code
+!    a      -  type(psb_dspmat_type)      Input: sparse matrix containing A.
+!    prec   -  type(psb_dprec_type)       Input: preconditioner
+!    b      -  real,dimension(:)          Input: vector containing the
+!                                         right hand side B
+!    x      -  real,dimension(:)          Input/Output: vector containing the
+!                                         initial guess and final solution X.
+!    eps    -  real                       Input: Stopping tolerance; the iteration is
+!                                         stopped when the error estimate |err| <= eps
+!    desc_a -  type(psb_desc_type).       Input: The communication descriptor.
+!    info   -  integer.                   Output: Return code
 !
-!    itmax  -  integer(optional)            Input: maximum number of iterations to be
-!                                           performed.
-!    iter   -  integer(optional)            Output: how many iterations have been
-!                                           performed.
-!    err    -  real   (optional)            Output: error estimate on exit
-!    itrace -  integer(optional)            Input: print an informational message
-!                                           with the error estimate every itrace
-!                                           iterations
-!    istop  -  integer(optional)            Input: stopping criterion, or how
-!                                           to estimate the error. 
-!                                           1: err =  |r|/|b|
-!                                           2: err =  |r|/(|a||x|+|b|)
-!                                           where r is the (preconditioned, recursive
-!                                           estimate of) residual 
+!    itmax  -  integer(optional)          Input: maximum number of iterations to be
+!                                         performed.
+!    iter   -  integer(optional)          Output: how many iterations have been
+!                                         performed.
+!    err    -  real   (optional)          Output: error estimate on exit
+!    itrace -  integer(optional)          Input: print an informational message
+!                                         with the error estimate every itrace
+!                                         iterations
+!    istop  -  integer(optional)          Input: stopping criterion, or how
+!                                         to estimate the error. 
+!                                         1: err =  |r|/|b|
+!                                         2: err =  |r|/(|a||x|+|b|)
+!                                         where r is the (preconditioned, recursive
+!                                         estimate of) residual 
 ! 
 !
 Subroutine psb_dcg(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,istop)
@@ -121,10 +120,10 @@ Subroutine psb_dcg(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,istop)
   name = 'psb_dcg'
   call psb_erractionsave(err_act)
 
-
   ictxt = psb_cd_get_context(desc_a)
 
   call psb_info(ictxt, me, np)
+
 
   mglob = psb_cd_get_global_rows(desc_a)
   n_row = psb_cd_get_local_rows(desc_a)
@@ -139,12 +138,6 @@ Subroutine psb_dcg(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,istop)
   !  ISTOP_ = 1:  Normwise backward error, infinity norm 
   !  ISTOP_ = 2:  ||r||/||b||   norm 2 
   !
-
-!!$  If ((prec%prec < min_prec_).Or.(prec%prec > max_prec_) ) Then
-!!$    Write(0,*) 'F90_CG: Invalid IPREC',prec%prec
-!!$    If (Present(ierr)) ierr=-1
-!!$    Return
-!!$  Endif
 
   if ((istop_ < 1 ).or.(istop_ > 2 ) ) then
     write(0,*) 'psb_cg: invalid istop',istop_ 

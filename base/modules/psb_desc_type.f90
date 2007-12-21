@@ -29,12 +29,10 @@
 !!$ 
 !!$  
 !
-!	Module to   define desc_a,
-!      structure for coomunications.
 !
-! Typedef: psb_desc_type
+! package: psb_descriptor_type
 !    Defines a communication descriptor
-
+!
 
 module psb_descriptor_type
   use psb_const_mod
@@ -98,7 +96,23 @@ module psb_descriptor_type
   
   
   !
-  !  DESC data structure. 
+  !  type: psb_desc_type
+  !  
+  !  Communication Descriptor data structure.
+  !|  type psb_desc_type
+  !|     integer, allocatable :: matrix_data(:)
+  !|     integer, allocatable :: halo_index(:), ext_index(:)
+  !|     integer, allocatable :: bnd_elem(:)
+  !|     integer, allocatable :: ovrlap_index(:)
+  !|     integer, allocatable :: ovrlap_elem(:)
+  !|     integer, allocatable :: loc_to_glob(:)
+  !|     integer, allocatable :: glob_to_loc (:)
+  !|     integer, allocatable :: hashv(:), glb_lc(:,:), ptree(:)
+  !|     integer, allocatable :: lprm(:)
+  !|     integer, allocatable :: idx_space(:)
+  !|  end type psb_desc_type
+  !
+  !  
   !  This is the most important data structure: it holds all the data 
   !  necessary to organize data exchange. The pattern of communication 
   !  among processes depends not only on the allocation of portions of 
@@ -174,22 +188,22 @@ module psb_descriptor_type
   !     risk a deadlock. NOTE: This is the format when the state is PSB_ASB_.
   !     See below for BLD. The end-of-list is marked with a -1. 
   !
-  !  notation        stored in		          explanation
-  !  --------------- --------------------------- -----------------------------------
-  !  process_id      index_v(p+proc_id_)      identifier of process with which 
-  !                                                data is  exchanged.
-  !  n_elements_recv index_v(p+n_elem_recv_)  number of elements to receive.
-  !  elements_recv   index_v(p+elem_recv_+i)  indexes of local elements to
-  !					          receive. these are stored in the
-  !					          array from location p+elem_recv_ to
-  !					          location p+elem_recv_+
-  !						  index_v(p+n_elem_recv_)-1.
-  !  n_elements_send index_v(p+n_elem_send_)  number of elements to send.
-  !  elements_send   index_v(p+elem_send_+i)  indexes of local elements to
-  !					          send. these are stored in the
-  !					          array from location p+elem_send_ to
-  !					          location p+elem_send_+
-  !						  index_v(p+n_elem_send_)-1.
+  !|  notation        stored in                   explanation
+  !|  --------------- --------------------------- -----------------------------------
+  !|  process_id      index_v(p+proc_id_)      identifier of process with which 
+  !|                                                data is  exchanged.
+  !|  n_elements_recv index_v(p+n_elem_recv_)  number of elements to receive.
+  !|  elements_recv   index_v(p+elem_recv_+i)  indexes of local elements to
+  !|                                              receive. these are stored in the
+  !|                                              array from location p+elem_recv_ to
+  !|                                              location p+elem_recv_+
+  !|                                              index_v(p+n_elem_recv_)-1.
+  !|  n_elements_send index_v(p+n_elem_send_)  number of elements to send.
+  !|  elements_send   index_v(p+elem_send_+i)  indexes of local elements to
+  !|                                              send. these are stored in the
+  !|                                              array from location p+elem_send_ to
+  !|                                              location p+elem_send_+
+  !|                                              index_v(p+n_elem_send_)-1.
   !
   !     This organization is valid for both halo and overlap indices; overlap entries
   !     need to be updated to ensure that a variable at a given global index 
@@ -234,9 +248,7 @@ module psb_descriptor_type
   !
   ! 10. ovrlap_elem contains a list of overlap indices together with their degree
   !     of overlap, i.e. the number of processes "owning" them.
-  ! 
-  !
-  !  Yes, it is complex, but it does the following:
+  ! It is complex, but it does the following:
   !  1. Allows a purely local matrix/stencil buildup phase, requiring only 
   !     one synch point at the end (CDASB)
   !  2. Takes shortcuts when the problem size is not too large (the default threshold
@@ -248,7 +260,6 @@ module psb_descriptor_type
   !
   !
   !
-
   type psb_desc_type
      integer, allocatable :: matrix_data(:)
      integer, allocatable :: halo_index(:), ext_index(:)
@@ -278,7 +289,6 @@ contains
     Type(psb_desc_type), intent(in) :: desc
     Integer                      :: psb_cd_sizeof
     !locals
-    logical, parameter  :: debug=.false.
     integer :: val
     integer, external :: SizeofPairSearchTree
 

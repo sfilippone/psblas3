@@ -31,13 +31,19 @@
 module psb_error_mod
 
   integer, parameter, public :: psb_act_ret_=0, psb_act_abort_=1, psb_no_err_=0
+  integer, parameter, public :: psb_debug_ext_=1, psb_debug_outer_=2
+  integer, parameter, public :: psb_debug_comp_=3, psb_debug_inner_=4
+  integer, parameter, public :: psb_debug_serial_=8, psb_debug_serial_comp_=9
   !
   !     Error handling 
   !
   public psb_errpush, psb_error, psb_get_errstatus,&
        & psb_get_errverbosity, psb_set_errverbosity,psb_errcomm, &
        & psb_erractionsave, psb_erractionrestore, &
-       & psb_get_erraction, psb_set_erraction
+       & psb_get_erraction, psb_set_erraction, &
+       & psb_get_debug_level, psb_set_debug_level,&
+       & psb_get_debug_unit, psb_set_debug_unit,&
+       & psb_get_serial_debug_level, psb_set_serial_debug_level
 
   interface psb_error
     module procedure psb_serror
@@ -49,29 +55,37 @@ module psb_error_mod
 
   type psb_errstack_node
 
-    integer                  ::   err_code=0          !  the error code
-    character(len=20)        ::   routine=''          !  the name of the routine generating the error
-    integer,dimension(5)     ::   i_err_data=0        !  array of integer data to complete the error msg
+    !  the error code
+    integer                  ::   err_code=0         
+    !  the name of the routine generating the error
+    character(len=20)        ::   routine=''       
+    !  array of integer data to complete the error msg   
+    integer,dimension(5)     ::   i_err_data=0     
     !     real(kind(1.d0))(dim=10) ::   r_err_data=0.d0    !  array of real data to complete the error msg
     !     complex(dim=10)          ::   c_err_data=0.c0    !  array of complex data to complete the error msg
-    character(len=40)        ::   a_err_data=''       !  array of character data to complete the error msg
-    type(psb_errstack_node), pointer :: next              !  pointer to the next element in the stack
+    !  array of character data to complete the error msg
+    character(len=40)        ::   a_err_data=''      
+    !  pointer to the next element in the stack 
+    type(psb_errstack_node), pointer :: next         
 
   end type psb_errstack_node
 
 
   type psb_errstack
 
-    type(psb_errstack_node), pointer :: top => null()     !  pointer to the top element of the stack
-    integer                          :: n_elems=0         !  number of entries in the stack
+    !  pointer to the top element of the stack
+    type(psb_errstack_node), pointer :: top => null()    
+    !  number of entries in the stack
+    integer                          :: n_elems=0        
 
   end type psb_errstack
 
 
-  type(psb_errstack),save  :: error_stack                       !  the PSBLAS-2.0 error stack
-  integer,save             :: error_status=0                    !  the error status (maybe not here)
-  integer,save             :: verbosity_level=1                 !  the verbosity level (maybe not here)
-  integer,save             :: err_action=1
+  type(psb_errstack), save :: error_stack         !  the PSBLAS-2.0 error stack
+  integer, save            :: error_status=0      !  the error status (maybe not here)
+  integer, save            :: verbosity_level=1   !  the verbosity level (maybe not here)
+  integer, save            :: err_action=1
+  integer, save            :: debug_level=0, debug_unit=0, serial_debug_level=0
 
 contains
 
@@ -103,6 +117,49 @@ contains
     integer, intent(in) :: err_act
     err_action=err_act
   end subroutine psb_erractionrestore
+
+
+  function  psb_get_debug_level()
+    integer :: psb_get_debug_level
+    psb_get_debug_level = debug_level
+  end function psb_get_debug_level
+
+  subroutine psb_set_debug_level(level)
+    integer, intent(in) :: level
+    if (level >= 0) then
+      debug_level = level
+    else
+      debug_level = 0
+    end if
+  end subroutine psb_set_debug_level
+
+  function  psb_get_debug_unit()
+    integer :: psb_get_debug_unit
+    psb_get_debug_unit = debug_unit
+  end function psb_get_debug_unit
+
+  subroutine psb_set_debug_unit(unit)
+    integer, intent(in) :: unit
+    if (unit >= 0) then
+      debug_unit = unit
+    else
+      debug_unit = 0
+    end if
+  end subroutine psb_set_debug_unit
+
+  function  psb_get_serial_debug_level()
+    integer :: psb_get_serial_debug_level
+    psb_get_serial_debug_level = serial_debug_level
+  end function psb_get_serial_debug_level
+
+  subroutine psb_set_serial_debug_level(level)
+    integer, intent(in) :: level
+    if (level >= 0) then
+      serial_debug_level = level
+    else
+      serial_debug_level = 0
+    end if
+  end subroutine psb_set_serial_debug_level
 
 
   ! checks wether an error has occurred on one of the porecesses in the execution pool
@@ -452,10 +509,16 @@ contains
       write (0,'("local index is: ",i0," and global index is:",i0)')i_e_d(1:2)
     case(3110)
       write (0,'("Before you call this routine, you must assembly sparse matrix")')
+    case(3111)
+      write (0,'("Before you call this routine, you must initialize the preconditioner")')
+    case(3112)
+      write (0,'("Before you call this routine, you must build the preconditioner")')
     case(3111:3999)
       write(0,'("miscellaneus error. code: ",i0)')err_c
     case(4000)
       write(0,'("Allocation/deallocation error")')
+    case(4001)
+      write(0,'("Internal error: ",a)')a_e_d
     case(4010)
       write (0,'("Error from call to subroutine ",a)')a_e_d
     case(4011)

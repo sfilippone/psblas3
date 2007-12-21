@@ -36,7 +36,7 @@
 !
 ! Arguments:
 !   x         -  real,dimension(:,:).          The local part of the dense matrix.
-!   desc_a    -  type(<psb_desc_type>).        The communication descriptor.
+!   desc_a    -  type(psb_desc_type).        The communication descriptor.
 !   info      -  integer.                      return code.
 !   alpha     -  real(optional).               Scale factor.
 !   jx        -  integer(optional).            The starting column of the global matrix. 
@@ -252,7 +252,7 @@ end subroutine psb_dhalom
 !
 ! Arguments:
 !   x         -  real,dimension(:).            The local part of the dense vector.
-!   desc_a    -  type(<psb_desc_type>).        The communication descriptor.
+!   desc_a    -  type(psb_desc_type).        The communication descriptor.
 !   info      -  integer.                      Return code
 !   alpha     -  real(optional).               Scale factor.
 !   work      -  real(optional).               Work  area.

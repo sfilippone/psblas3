@@ -42,7 +42,6 @@ subroutine imsru(n,x,idir,nout)
 
   nout = 0 
   if (n<0) then 
-!!$    write(0,*) 'Error: IMSR: N<0'
     return
   endif
 

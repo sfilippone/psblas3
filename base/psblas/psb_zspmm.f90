@@ -64,11 +64,11 @@
 !
 ! Arguments:   
 !    alpha  -  real.                        The scalar alpha.
-!    a      -  type(<psb_zspmat_type>).     The sparse matrix containing A.
+!    a      -  type(psb_zspmat_type).     The sparse matrix containing A.
 !    x      -  real,dimension(:,:).         The input vector containing the entries of sub( X ).
 !    beta   -  real.                        The scalar beta.
 !    y      -  real,dimension(:,:).         The input vector containing the entries of sub( Y ).
-!    desc_a -  type(<psb_desc_type>).       The communication descriptor.
+!    desc_a -  type(psb_desc_type).       The communication descriptor.
 !    info   -  integer.                     Return code
 !    trans  -  character(optional).         Whether A or A'. If not present 'N' is assumed.
 !    k      -  integer(optional).           The number of right-hand sides.
@@ -398,11 +398,11 @@ end subroutine psb_zspmm
 !
 ! Arguments:   
 !    alpha  -  real.                        The scalar alpha.
-!    a      -  type(<psb_zspmat_type>).     The sparse matrix containing A.
+!    a      -  type(psb_zspmat_type).     The sparse matrix containing A.
 !    x      -  real,dimension(:).           The input vector containing the entries of X.
 !    beta   -  real.                        The scalar beta.
 !    y      -  real,dimension(:.         The input vector containing the entries of Y.
-!    desc_a -  type(<psb_desc_type>).       The communication descriptor.
+!    desc_a -  type(psb_desc_type).       The communication descriptor.
 !    info   -  integer.                     Return code
 !    trans  -  character(optional).         Whether A or A'. If not present 'N' is assumed.
 !    work   -  real,dimension(:)(optional). Working area.
@@ -443,11 +443,14 @@ subroutine  psb_zspmv(alpha,a,x,beta,y,desc_a,info,&
   character                :: itrans
   character(len=20)        :: name, ch_err
   logical                  :: aliw
+  integer                  :: debug_level, debug_unit
 
   name='psb_zspmv'
   if(psb_get_errstatus() /= 0) return 
   info=0
   call psb_erractionsave(err_act)
+  debug_unit  = psb_get_debug_unit()
+  debug_level = psb_get_debug_level()
 
   ictxt=psb_cd_get_context(desc_a)
   call psb_info(ictxt, me, np)
@@ -467,9 +470,9 @@ subroutine  psb_zspmv(alpha,a,x,beta,y,desc_a,info,&
   ib = 1
 
   if (present(doswap)) then
-     idoswap = doswap
+    idoswap = doswap
   else
-     idoswap = 1
+    idoswap = 1
   endif
 
   if (present(trans)) then     
@@ -481,7 +484,7 @@ subroutine  psb_zspmv(alpha,a,x,beta,y,desc_a,info,&
       goto 9999
     end if
   else
-     itrans = 'N'
+    itrans = 'N'
   endif
 
   m    = psb_cd_get_global_rows(desc_a)
@@ -496,18 +499,17 @@ subroutine  psb_zspmv(alpha,a,x,beta,y,desc_a,info,&
   liwork= 2*ncol
   if (a%pr(1) /= 0) liwork = liwork + n * ik
   if (a%pl(1) /= 0) liwork = liwork + m * ik
-  !  write(0,*)'---->>>',work(1)
- if (present(work)) then
+
+  if (present(work)) then
     if (size(work) >= liwork) then
-        aliw =.false.
+      aliw =.false.
     else
-        aliw=.true.
+      aliw=.true.
     endif
   else
-        aliw=.true.
+    aliw=.true.
   end if
 
-        aliw=.true.
   if (aliw) then
     allocate(iwork(liwork),stat=info)
     if(info /= 0) then
@@ -517,136 +519,153 @@ subroutine  psb_zspmv(alpha,a,x,beta,y,desc_a,info,&
       goto 9999
     end if
   else
-     iwork => work
+    iwork => work
   endif
 
-
+  if (debug_level >= psb_debug_comp_) &
+       & write(debug_unit,*) me,' ',trim(name),' Allocated work ', info
   ! checking for matrix correctness
   call psb_chkmat(m,n,ia,ja,desc_a,info,iia,jja)
   if(info /= 0) then
-     info=4010
-     ch_err='psb_chkmat'
-     call psb_errpush(info,name,a_err=ch_err)
-     goto 9999
+    info=4010
+    ch_err='psb_chkmat'
+    call psb_errpush(info,name,a_err=ch_err)
+    goto 9999
   end if
 
-
+  if (debug_level >= psb_debug_comp_) &
+       & write(debug_unit,*) me,' ',trim(name),' Checkmat ', info
   if (itrans == 'N') then
-     !  Matrix is not transposed
-     if((ja /= ix).or.(ia /= iy)) then
-        ! this case is not yet implemented
-        info = 3030
-        call psb_errpush(info,name)
-        goto 9999
-     end if
+    !  Matrix is not transposed
+    if((ja /= ix).or.(ia /= iy)) then
+      ! this case is not yet implemented
+      info = 3030
+      call psb_errpush(info,name)
+      goto 9999
+    end if
 
-     ! checking for vectors correctness
-     call psb_chkvect(n,ik,size(x),ix,jx,desc_a,info,iix,jjx)
-     if (info == 0) &
-          & call psb_chkvect(m,ik,size(y),iy,jy,desc_a,info,iiy,jjy)
-     if(info /= 0) then
-        info=4010
-        ch_err='psb_chkvect'
-        call psb_errpush(info,name,a_err=ch_err)
-        goto 9999
-     end if
+    ! checking for vectors correctness
+    call psb_chkvect(n,ik,size(x),ix,jx,desc_a,info,iix,jjx)
+    if (info == 0) &
+         & call psb_chkvect(m,ik,size(y),iy,jy,desc_a,info,iiy,jjy)
+    if(info /= 0) then
+      info=4010
+      ch_err='psb_chkvect'
+      call psb_errpush(info,name,a_err=ch_err)
+      goto 9999
+    end if
 
-     if((iix /= 1).or.(iiy /= 1)) then
-        ! this case is not yet implemented
-        info = 3040
-        call psb_errpush(info,name)
-        goto 9999
-     end if
+    if((iix /= 1).or.(iiy /= 1)) then
+      ! this case is not yet implemented
+      info = 3040
+      call psb_errpush(info,name)
+      goto 9999
+    end if
 
-     if (idoswap == 0) then
-        x(nrow+1:ncol)=zzero
-     else
-        call psi_swapdata(ior(psb_swap_send_,psb_swap_recv_),&
-             & zzero,x,desc_a,iwork,info,data=psb_comm_halo_)
-     end if
+    if (idoswap == 0) then
+      x(nrow+1:ncol)=zzero
+    else
+      call psi_swapdata(ior(psb_swap_send_,psb_swap_recv_),&
+           & zzero,x,desc_a,iwork,info,data=psb_comm_halo_)
+    end if
 
-     !  local Matrix-vector product
-      call psb_csmm(alpha,a,x(iix:lldx),beta,y(iiy:lldy),info)
+    !  local Matrix-vector product
+    call psb_csmm(alpha,a,x(iix:lldx),beta,y(iiy:lldy),info)
 
-     if(info /= 0) then
-        info = 4011
-        call psb_errpush(info,name)
-        goto 9999
-     end if
+    if(info /= 0) then
+      info = 4011
+      call psb_errpush(info,name)
+      goto 9999
+    end if
 
   else
-     !  Matrix is transposed
-     if((ja /= iy).or.(ia /= ix)) then
-        ! this case is not yet implemented
-        info = 3030
-        call psb_errpush(info,name)
-        goto 9999
-     end if
+    !  Matrix is transposed
+    if((ja /= iy).or.(ia /= ix)) then
+      ! this case is not yet implemented
+      info = 3030
+      call psb_errpush(info,name)
+      goto 9999
+    end if
 
-     if(desc_a%ovrlap_elem(1) /= -1) then
-        info = 3070
-        call psb_errpush(info,name)
-        goto 9999
-     end if
+    if(desc_a%ovrlap_elem(1) /= -1) then
+      info = 3070
+      call psb_errpush(info,name)
+      goto 9999
+    end if
 
-     ! checking for vectors correctness
-     call psb_chkvect(m,ik,size(x),ix,jx,desc_a,info,iix,jjx)
-     if (info == 0)&
-          & call psb_chkvect(n,ik,size(y),iy,jy,desc_a,info,iiy,jjy)
-     if(info /= 0) then
-        info=4010
-        ch_err='psb_chkvect'
-        call psb_errpush(info,name,a_err=ch_err)
-        goto 9999
-     end if
+    ! checking for vectors correctness
+    call psb_chkvect(m,ik,size(x),ix,jx,desc_a,info,iix,jjx)
+    if (info == 0)&
+         & call psb_chkvect(n,ik,size(y),iy,jy,desc_a,info,iiy,jjy)
+    if(info /= 0) then
+      info=4010
+      ch_err='psb_chkvect'
+      call psb_errpush(info,name,a_err=ch_err)
+      goto 9999
+    end if
 
-     if((iix /= 1).or.(iiy /= 1)) then
-        ! this case is not yet implemented
-        info = 3040
-        call psb_errpush(info,name)
-        goto 9999
-     end if
+    if((iix /= 1).or.(iiy /= 1)) then
+      ! this case is not yet implemented
+      info = 3040
+      call psb_errpush(info,name)
+      goto 9999
+    end if
 
-     xp => x(iix:lldx)
-     yp => y(iiy:lldy)
+    xp => x(iix:lldx)
+    yp => y(iiy:lldy)
 
-     yp(nrow+1:ncol)=zzero
+    yp(nrow+1:ncol)=zzero
+    if (debug_level >= psb_debug_comp_) &
+         & write(debug_unit,*) me,' ',trim(name),' checkvect ', info
+    !  local Matrix-vector product
+    call psb_csmm(alpha,a,xp,beta,yp,info,trans=itrans)
 
-     !  local Matrix-vector product
-     call psb_csmm(alpha,a,xp,beta,yp,info,trans=itrans)
+    if(info /= 0) then
+      info = 4010
+      ch_err='zcsmm'
+      call psb_errpush(info,name,a_err=ch_err)
+      goto 9999
+    end if
 
-     if(info /= 0) then
-        info = 4010
-        ch_err='dcsmm'
-        call psb_errpush(info,name,a_err=ch_err)
-        goto 9999
-     end if
-
-     if(idoswap /= 0)&
-          & call psi_swaptran(ior(psb_swap_send_,psb_swap_recv_),&
-          & zone,yp,desc_a,iwork,info)
-     if(info /= 0) then
-        info = 4010
-        ch_err='PSI_dSwapTran'
-        call psb_errpush(info,name,a_err=ch_err)
-        goto 9999
-     end if
+    if(idoswap /= 0)&
+         & call psi_swaptran(ior(psb_swap_send_,psb_swap_recv_),&
+         & zone,yp,desc_a,iwork,info)
+    if (debug_level >= psb_debug_comp_) &
+         & write(debug_unit,*) me,' ',trim(name),' swaptran ', info
+    if(info /= 0) then
+      info = 4010
+      ch_err='PSI_dSwapTran'
+      call psb_errpush(info,name,a_err=ch_err)
+      goto 9999
+    end if
 
   end if
 
-  if(aliw) deallocate(iwork)
+  if (aliw) deallocate(iwork,stat=info)
+  if (debug_level >= psb_debug_comp_) &
+       & write(debug_unit,*) me,' ',trim(name),' deallocat ',aliw, info
+  if(info /= 0) then
+    info = 4010
+    ch_err='Deallocate iwork'
+    call psb_errpush(info,name,a_err=ch_err)
+    goto 9999
+  end if
+
   nullify(iwork)
 
   call psb_erractionrestore(err_act)
-
+  if (debug_level >= psb_debug_comp_) then 
+    call psb_barrier(ictxt)
+    write(debug_unit,*) me,' ',trim(name),' Returning '
+  endif
   return  
 
 9999 continue
   call psb_erractionrestore(err_act)
 
   if (err_act == psb_act_abort_) then
-     call psb_error(ictxt)
-     return
+    call psb_error(ictxt)
+    return
   end if
   return
 end subroutine psb_zspmv

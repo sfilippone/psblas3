@@ -44,7 +44,7 @@
 !    x      -  real,dimension(:,:).       The input vector containing the entries of sub( X ).
 !    beta   -  real.                      The scalar used to multiply each component of sub( Y ).
 !    y      -  real,dimension(:,:).       The input vector containing the entries of sub( Y ).
-!    desc_a -  type(<psb_desc_type>).     The communication descriptor.
+!    desc_a -  type(psb_desc_type).     The communication descriptor.
 !    info   -  integer.                   Return code
 !    jx     -  integer(optional).         The column offset for sub( X ).
 !    jy     -  integer(optional).         The column offset for sub( Y ).
@@ -199,7 +199,7 @@ end subroutine psb_daxpby
 !    x      -  real,dimension(:).         The input vector containing the entries of X.
 !    beta   -  real.                      The scalar used to multiply each component of Y.
 !    y      -  real,dimension(:).         The input vector containing the entries of Y.
-!    desc_a -  type(<psb_desc_type>).     The communication descriptor.
+!    desc_a -  type(psb_desc_type).     The communication descriptor.
 !    info   -  integer.                   Return code
 !
 subroutine  psb_daxpbyv(alpha, x, beta,y,desc_a,info)
@@ -220,7 +220,6 @@ subroutine  psb_daxpbyv(alpha, x, beta,y,desc_a,info)
   integer                  :: ictxt, np, me,&
        & err_act, iix, jjx, ix, iy, m, iiy, jjy
   character(len=20)        :: name, ch_err
-  logical, parameter :: debug=.false.
 
   name='psb_dgeaxpby'
   if(psb_get_errstatus().ne.0) return 

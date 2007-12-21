@@ -28,20 +28,17 @@
 !!$  POSSIBILITY OF SUCH DAMAGE.
 !!$ 
 !!$  
-! File:  psb_dcsdp.f90 
+! File:  psb_dspcnv.f90 
 !
-! Subroutine: psb_dcsdp
-!    This subroutine performs the assembly of
-!    the local part of a sparse distributed matrix
+! Subroutine: psb_dspcnv2
+!    This subroutine converts the storage format of a matrix.
 !
 ! Arguments:
-!   a      -  type(<psb_spmat_type>).         The input matrix to be assembled.
-!   b      -  type(<psb_spmat_type>).         The assembled output matrix.
+! 
+!   a      -  type(psb_spmat_type), input     The input matrix to be converted.
+!   b      -  type(psb_spmat_type), output    The assembled output matrix.
 !   info   -  integer.                        Return code
-!   ifc    -  integer(optional).              ???
-!   check  -  character(optional).            ???
-!   trans  -  character(optional).            ???
-!   unitd  -  character(optional).            ???
+!   afmt   -  character, optional             The desired storage format 
 !
 subroutine psb_dspcnv2(a, b,info,afmt,upd,dupl)
   use psb_const_mod
@@ -67,12 +64,14 @@ subroutine psb_dspcnv2(a, b,info,afmt,upd,dupl)
   character                     :: check_,trans_,unitd_
   character(len=5)              :: afmt_
   Integer, Parameter            :: maxtry=8
-  logical, parameter            :: debug=.false.
+  integer                       :: debug_level, debug_unit
   character(len=20)             :: name, ch_err
 
-  name='psb_spcnv'
+  name='psb_spcnv2'
   info  = 0
   call psb_erractionsave(err_act)
+  debug_unit  = psb_get_debug_unit()
+  debug_level = psb_get_debug_level()
 
   ntry=0
   
@@ -128,7 +127,6 @@ subroutine psb_dspcnv2(a, b,info,afmt,upd,dupl)
   b%k=a%k
   b%fida=afmt_
   size_req = psb_sp_get_nnzeros(a)
-  if (debug) write(0,*) 'DCSDP : size_req 1:',size_req
   !
   n_row=b%m 
   n_col=b%k
@@ -167,6 +165,9 @@ subroutine psb_dspcnv2(a, b,info,afmt,upd,dupl)
   b%pr(:)  = 0
 
   b%descra = a%descra
+  if (debug_level >= psb_debug_serial_) &
+       & write(debug_unit,*) trim(name),': size_req 1:',&
+       & size_req, trans_,upd_,dupl_,b%fida,b%descra
 
   select case (tolower(a%fida))
 
@@ -205,12 +206,13 @@ subroutine psb_dspcnv2(a, b,info,afmt,upd,dupl)
         endif
 
         ntry = ntry + 1
-        if (debug) then 
-          write(0,*) 'On out from dcrjad ',nzr,info
+        if (debug_level >= psb_debug_serial_) then 
+          write(debug_unit,*) trim(name),' On out from dcrjad ',nzr,info
         end if
         if (nzr == 0) exit
         if (ntry > maxtry ) then 
-          write(0,*) 'Tried reallocating for DCRJAD for ',maxtry,': giving up now.'
+          write(debug_unit,*) trim(name),&
+               & ' Tried reallocating for DCRJAD for ',maxtry,': giving up now.'
           info=2040
           call psb_errpush(info,name)
           goto 9999
@@ -232,7 +234,8 @@ subroutine psb_dspcnv2(a, b,info,afmt,upd,dupl)
       end if
 
     case ('coo')
-      if (debug) write(0,*) 'Calling CRCO ',a%descra
+      if (debug_level >= psb_debug_serial_) &
+           & write(debug_unit,*) trim(name),' Calling CRCO ',a%descra
       call dcrco(trans_, a%m, a%k, unitd_, d, a%descra, a%aspk,&
            & a%ia1, a%ia2, a%infoa, b%pl, b%descra, b%aspk, b%ia1,&
            & b%ia2, b%infoa, b%pr, size(b%aspk), size(b%ia1),&
@@ -301,13 +304,13 @@ subroutine psb_dspcnv2(a, b,info,afmt,upd,dupl)
         end if
 
         ntry = ntry + 1
-        if (debug) then 
-          write(0,*) 'On out from dcrjad ',nzr,info
+        if (debug_level >= psb_debug_serial_) then 
+          write(debug_unit,*) trim(name),' On out from dcrjad ',nzr,info
         end if
         if (nzr == 0) exit
         if (ntry > maxtry ) then 
-          write(0,*) 'Tried reallocating for DCRJAD for ',maxtry,&
-               & ': giving up now.'
+          write(debug_unit,*) trim(name),' Tried reallocating for DCRJAD for ',&
+               & maxtry,': giving up now.'
           info=2040
           call psb_errpush(info,name)
           goto 9999
@@ -366,6 +369,16 @@ subroutine psb_dspcnv2(a, b,info,afmt,upd,dupl)
 end subroutine psb_dspcnv2
 
 
+!
+! Subroutine: psb_dspcnv1
+!    This subroutine converts in place the storage format of a matrix.
+!
+! Arguments:
+! 
+!   a      -  type(psb_spmat_type), inout     The input matrix to be converted.
+!   info   -  integer.                        Return code
+!   afmt   -  character, optional             The desired storage format 
+!
 subroutine psb_dspcnv1(a, info, afmt, upd, dupl)
 
   use psb_spmat_type
@@ -391,13 +404,15 @@ subroutine psb_dspcnv1(a, info, afmt, upd, dupl)
   integer               :: err_act
   integer               :: spstate
   integer               :: upd_, dupl_
-  logical, parameter    :: debug=.false.
+  integer              :: debug_level, debug_unit
   character(len=20)     :: name, ch_err
 
   info = 0
   int_err(1)=0
-  name = 'psb_spcnv'
+  name = 'psb_spcnv1'
   call psb_erractionsave(err_act)
+  debug_unit  = psb_get_debug_unit()
+  debug_level = psb_get_debug_level()
 
   if (present(upd)) then 
     call psb_sp_setifld(upd,psb_upd_,a,info)    
@@ -431,10 +446,14 @@ subroutine psb_dspcnv1(a, info, afmt, upd, dupl)
   if (info /= 0) then 
     goto 9999
   endif
-  if (debug) write(0,*) 'Sparse matrix state:',spstate,psb_spmat_bld_,psb_spmat_upd_
+  if (debug_level >= psb_debug_serial_) &
+       & write(debug_unit,*) trim(name),': Sparse matrix state:',&
+       & spstate,psb_spmat_bld_,psb_spmat_upd_
   if (spstate /= psb_spmat_upd_) then 
     ! Should we first figure out if we can do it in place? 
-    if (debug) write(0,*) 'Update:',upd_,psb_upd_srch_,psb_upd_perm_
+    if (debug_level >= psb_debug_serial_) &
+         & write(debug_unit,*) trim(name),&
+         & ': Update:',upd_,psb_upd_srch_,psb_upd_perm_
     if (upd_ == psb_upd_srch_) then 
       if (present(afmt)) then 
         select case (tolower(a%fida))
@@ -473,7 +492,10 @@ subroutine psb_dspcnv1(a, info, afmt, upd, dupl)
     ! result is put in A
     call psb_spcnv(atemp,a,info,afmt=afmt,upd=upd,dupl=dupl)
 
-    IF (debug) WRITE (*, *) '   ASB:  From SPCNV',info,' ',A%FIDA
+    if (debug_level >= psb_debug_serial_)&
+         & write(debug_unit, *) trim(name),&
+         & ':  From SPCNV',info,' ',a%fida
+
     if (info /= psb_no_err_) then    
       info=4010
       ch_err='psb_csdp'
@@ -501,8 +523,6 @@ subroutine psb_dspcnv1(a, info, afmt, upd, dupl)
       goto 9999
     end select
     
-    
-    ! check on error retuned by dcsdp
     if (info /= psb_no_err_) then
       info = 4010
       ch_err='xx_regen'
@@ -515,7 +535,9 @@ subroutine psb_dspcnv1(a, info, afmt, upd, dupl)
     info = 600
     call psb_errpush(info,name)
     goto 9999
-    if (debug) write(0,*) 'Sparse matrix state:',spstate,psb_spmat_bld_,psb_spmat_upd_
+    if (debug_level >= psb_debug_serial_)&
+         & write(debug_unit,*) trim(name),&
+         & 'Sparse matrix state:',spstate,psb_spmat_bld_,psb_spmat_upd_
 
   endif
 

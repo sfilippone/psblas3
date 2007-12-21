@@ -64,11 +64,11 @@
 !
 ! Arguments:   
 !    alpha  -  real.                        The scalar alpha.
-!    a      -  type(<psb_dspmat_type>).     The sparse matrix containing A.
+!    a      -  type(psb_dspmat_type).     The sparse matrix containing A.
 !    x      -  real,dimension(:,:).         The input vector containing the entries of sub( X ).
 !    beta   -  real.                        The scalar beta.
 !    y      -  real,dimension(:,:).         The input vector containing the entries of sub( Y ).
-!    desc_a -  type(<psb_desc_type>).       The communication descriptor.
+!    desc_a -  type(psb_desc_type).       The communication descriptor.
 !    info   -  integer.                     Return code
 !    trans  -  character(optional).         Whether A or A'. If not present 'N' is assumed.
 !    k      -  integer(optional).           The number of right-hand sides.
@@ -404,11 +404,11 @@ end subroutine psb_dspmm
 !
 ! Arguments:   
 !    alpha  -  real.                        The scalar alpha.
-!    a      -  type(<psb_dspmat_type>).     The sparse matrix containing A.
+!    a      -  type(psb_dspmat_type).     The sparse matrix containing A.
 !    x      -  real,dimension(:).           The input vector containing the entries of X.
 !    beta   -  real.                        The scalar beta.
 !    y      -  real,dimension(:.         The input vector containing the entries of Y.
-!    desc_a -  type(<psb_desc_type>).       The communication descriptor.
+!    desc_a -  type(psb_desc_type).       The communication descriptor.
 !    info   -  integer.                     Return code
 !    trans  -  character(optional).         Whether A or A'. If not present 'N' is assumed.
 !    work   -  real,dimension(:)(optional). Working area.
@@ -449,15 +449,16 @@ subroutine  psb_dspmv(alpha,a,x,beta,y,desc_a,info,&
   character                :: itrans
   character(len=20)        :: name, ch_err
   logical                  :: aliw
-  logical, parameter       :: debug=.false.
+  integer                  :: debug_level, debug_unit
 
   name='psb_dspmv'
   if(psb_get_errstatus() /= 0) return 
   info=0
   call psb_erractionsave(err_act)
+  debug_unit  = psb_get_debug_unit()
+  debug_level = psb_get_debug_level()
 
   ictxt=psb_cd_get_context(desc_a)
-
   call psb_info(ictxt, me, np)
   if (np == -1) then
     info = 2010
@@ -509,7 +510,7 @@ subroutine  psb_dspmv(alpha,a,x,beta,y,desc_a,info,&
   liwork= 2*ncol
   if (a%pr(1) /= 0) liwork = liwork + n * ik
   if (a%pl(1) /= 0) liwork = liwork + m * ik
-  !  write(0,*)'---->>>',work(1)
+
   if (present(work)) then
     if (size(work) >= liwork) then
       aliw =.false.
@@ -520,7 +521,6 @@ subroutine  psb_dspmv(alpha,a,x,beta,y,desc_a,info,&
     aliw=.true.
   end if
 
-  aliw=.true.
   if (aliw) then
     allocate(iwork(liwork),stat=info)
     if(info /= 0) then
@@ -533,7 +533,8 @@ subroutine  psb_dspmv(alpha,a,x,beta,y,desc_a,info,&
     iwork => work
   endif
 
-  if (debug) write(0,*) me,name,' Allocated work ', info
+  if (debug_level >= psb_debug_comp_) &
+       & write(debug_unit,*) me,' ',trim(name),' Allocated work ', info
   ! checking for matrix correctness
   call psb_chkmat(m,n,ia,ja,desc_a,info,iia,jja)
   if(info /= 0) then
@@ -543,7 +544,8 @@ subroutine  psb_dspmv(alpha,a,x,beta,y,desc_a,info,&
     goto 9999
   end if
 
-  if (debug) write(0,*) me,name,' Checkmat ', info
+  if (debug_level >= psb_debug_comp_) &
+       & write(debug_unit,*) me,' ',trim(name),' Checkmat ', info
   if (itrans == 'N') then
     !  Matrix is not transposed
     if((ja /= ix).or.(ia /= iy)) then
@@ -624,10 +626,12 @@ subroutine  psb_dspmv(alpha,a,x,beta,y,desc_a,info,&
     yp => y(iiy:lldy)
 
     yp(nrow+1:ncol)=dzero
-    if (debug) write(0,*) me,name,' checkvect ', info
+    if (debug_level >= psb_debug_comp_) &
+         & write(debug_unit,*) me,' ',trim(name),' checkvect ', info
     !  local Matrix-vector product
     call psb_csmm(alpha,a,xp,beta,yp,info,trans=itrans)
-    if (debug) write(0,*) me,name,' csmm ', info
+    if (debug_level >= psb_debug_comp_) &
+         & write(debug_unit,*) me,' ',trim(name),' csmm ', info
     if(info /= 0) then
       info = 4010
       ch_err='dcsmm'
@@ -638,7 +642,8 @@ subroutine  psb_dspmv(alpha,a,x,beta,y,desc_a,info,&
     if(idoswap /= 0)&
          & call psi_swaptran(ior(psb_swap_send_,psb_swap_recv_),&
          & done,yp,desc_a,iwork,info)
-    if (debug) write(0,*) me,name,' swaptran ', info
+    if (debug_level >= psb_debug_comp_) &
+         & write(debug_unit,*) me,' ',trim(name),' swaptran ', info
     if(info /= 0) then
       info = 4010
       ch_err='PSI_dSwapTran'
@@ -649,7 +654,8 @@ subroutine  psb_dspmv(alpha,a,x,beta,y,desc_a,info,&
   end if
 
   if (aliw) deallocate(iwork,stat=info)
-  if (debug) write(0,*) me,name,' deallocat ',aliw, info
+  if (debug_level >= psb_debug_comp_) &
+       & write(debug_unit,*) me,' ',trim(name),' deallocat ',aliw, info
   if(info /= 0) then
     info = 4010
     ch_err='Deallocate iwork'
@@ -660,8 +666,10 @@ subroutine  psb_dspmv(alpha,a,x,beta,y,desc_a,info,&
   nullify(iwork)
 
   call psb_erractionrestore(err_act)
-  if (debug) call psb_barrier(ictxt)
-  if (debug) write(0,*) me,name,' Returning '
+  if (debug_level >= psb_debug_comp_) then 
+    call psb_barrier(ictxt)
+    write(debug_unit,*) me,' ',trim(name),' Returning '
+  endif
   return  
 
 9999 continue

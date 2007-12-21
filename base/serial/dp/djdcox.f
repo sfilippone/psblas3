@@ -38,6 +38,7 @@ C
 
       use psb_const_mod
       use psb_string_mod
+      use psb_error_mod
       IMPLICIT NONE
 
 C     
@@ -54,8 +55,7 @@ C     .. Local Scalars ..
       INTEGER            IPX, IPG, NNZ, K, ROW, 
      *  I, J, NZL, IRET, ERR_ACT
       LOGICAL            SCALE
-      logical     debug
-      parameter   (debug=.false.)
+      integer              :: debug_level, debug_unit
 c     .. Local Arrays ..
       CHARACTER*20       NAME
       INTEGER            INT_VAL(5)
@@ -63,9 +63,11 @@ c     .. Local Arrays ..
 C     
 C     .. Executable Statements ..
 C     
-      NAME = 'DJDCOX\0'
+      NAME = 'DJDCOX'
       IERROR = 0
       CALL FCPSB_ERRACTIONSAVE(ERR_ACT)
+      debug_unit  = psb_get_debug_unit()
+      debug_level = psb_get_debug_level()
 
       IF (toupper(TRANS).EQ.'N') THEN
 C     SCALE  = (UNITD.EQ.'L') ! meaningless
@@ -80,8 +82,8 @@ C     SCALE  = (UNITD.EQ.'L') ! meaningless
         
         NNZ = JA(IA(2,NG+1)-1 +1)-1
         
-        if (debug) then 
-          write(0,*) 'On entry to DJDCOX: NNZ LAUX ',
+        if (debug_level >= psb_debug_serial_) then 
+          write(debug_unit,*) trim(name),': On entry NNZ LAUX ',
      +      nnz,laux,larn,lia1n,lia2n
         endif
         IF (LAUX.LT.NNZ+2) THEN

@@ -40,7 +40,7 @@
 !    idx(:)   - integer                   Required indices on the calling process
 !    iprc(:)  - integer, allocatable      Output: process identifiers for the corresponding
 !                                         indices
-!    desc_a   - type(<psb_desc_type>).    The communication descriptor.        
+!    desc_a   - type(psb_desc_type).    The communication descriptor.        
 !    info     - integer.                  return code.
 ! 
 subroutine psi_fnd_owner(nv,idx,iprc,desc,info)
@@ -64,7 +64,6 @@ subroutine psi_fnd_owner(nv,idx,iprc,desc,info)
 
   integer          ::  i,n_row,n_col, err_act,ih,icomm,hsize
   integer             :: ictxt,np,me
-  logical, parameter  :: debug=.false., debugwrt=.false.
   character(len=20)   :: name
 
   info = 0
@@ -92,20 +91,13 @@ subroutine psi_fnd_owner(nv,idx,iprc,desc,info)
   endif
 
   if (.not.(psb_is_ok_desc(desc))) then 
-    write(0,*) 'Invalid input descriptor in psi_fnd_owner'
+    call psb_errpush(4010,name,a_err='invalid desc')
+    goto 9999      
   end if
 
   !
   ! The basic idea is very simple. 
   ! First we figure out the total number of requests.
-  ! Second we build the aggregate list of requests (with psb_amx)
-  ! Third, we figure out locally whether we own the indices (whoever is 
-  ! asking for them) and build our part of the reply (we shift process 
-  !  indices so that they're 1-based)
-  ! Fourth, we do a psb_amx on the replies so that we have everybody's answers
-  ! Fifth, we extract the answers for our local query, and shift back the 
-  ! process indices to 0-based.
-
   Allocate(hidx(np+1),hsz(np),stat=info)
   if (info /= 0) then 
     call psb_errpush(4010,name,a_err='Allocate') 
@@ -124,12 +116,16 @@ subroutine psi_fnd_owner(nv,idx,iprc,desc,info)
     call psb_errpush(4010,name,a_err='Allocate')
     goto 9999      
   end if
+  ! Second we build the aggregate list of requests (with psb_amx)
   helem(:) = 0 
   ih = hidx(me+1)
   do i=1, hsz(me+1) 
     helem(ih+i-1) = idx(i) 
   end do
   call psb_amx(ictxt,helem,info)
+  ! Third, we figure out locally whether we own the indices (whoever is 
+  ! asking for them) and build our part of the reply (we shift process 
+  !  indices so that they're 1-based)
   call psi_idx_cnv(hsize,helem,desc,info,owned=.true.)
   if (info /= 0) then 
     call psb_errpush(4010,name,a_err='psi_idx_cnv')
@@ -144,8 +140,11 @@ subroutine psi_fnd_owner(nv,idx,iprc,desc,info)
     end if
   end do
 
+  ! Fourth, we do a psb_amx on the replies so that we have everybody's answers
   call psb_amx(ictxt,hproc,info)
 
+  ! Fifth, we extract the answers for our local query, and shift back the 
+  ! process indices to 0-based.
   if (nv > 0) then 
     call psb_realloc(nv,iprc,info)
     ih = hidx(me+1)

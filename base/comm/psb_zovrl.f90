@@ -36,7 +36,7 @@
 !
 ! Arguments:
 !   x(:,:)      -  complex                   The local part of the dense matrix.
-!   desc_a      -  type(<psb_desc_type>).    The communication descriptor.
+!   desc_a      -  type(psb_desc_type).    The communication descriptor.
 !   info        -  integer.                  Return code.
 !   jx          -  integer(optional).        The starting column of the global matrix
 !   ik          -  integer(optional).        The number of columns to gather. 
@@ -253,7 +253,7 @@ end subroutine psb_zovrlm
 !
 ! Arguments:
 !   x(:)        -  complex                   The local part of the dense vector.
-!   desc_a      -  type(<psb_desc_type>).    The communication descriptor.
+!   desc_a      -  type(psb_desc_type).    The communication descriptor.
 !   info        -  integer.                  Return code.
 !   work        -  real(optional).           A work area.
 !   update      -  integer(optional).        Type of update:

@@ -38,7 +38,7 @@
 ! 
 ! Arguments: 
 !    a        - type(psb_dspmat_type)   The local part of input matrix A
-!    desc_a   - type(<psb_desc_type>).  The communication descriptor.
+!    desc_a   - type(psb_desc_type).  The communication descriptor.
 !    blck     - type(psb_dspmat_type)   The local part of output matrix BLCK
 !    info     - integer.                Return code
 !    rowcnv   - logical                 Should row/col indices be converted
@@ -89,19 +89,22 @@ Subroutine psb_dsphalo(a,desc_a,blk,info,rowcnv,colcnv,&
   Integer, allocatable  :: sdid(:,:), brvindx(:),rvid(:,:), &
        & rvsz(:), bsdindx(:),sdsz(:), iasnd(:), jasnd(:)
   real(kind(1.d0)), allocatable :: valsnd(:)
-  integer, pointer :: idxv(:)
-  logical :: rowcnv_,colcnv_,rowscale_,colscale_
+  integer, pointer  :: idxv(:)
+  logical           :: rowcnv_,colcnv_,rowscale_,colscale_
   character(len=5)  :: outfmt_
-  Logical,Parameter :: debug=.false., debugprt=.false.
-  real(kind(1.d0)) :: t1,t2,t3,t4,t5
-  character(len=20)   :: name, ch_err
+  integer           :: debug_level, debug_unit
+  character(len=20) :: name, ch_err
 
   if(psb_get_errstatus() /= 0) return 
   info=0
   name='psb_dsphalo'
   call psb_erractionsave(err_act)
+  debug_unit  = psb_get_debug_unit()
+  debug_level = psb_get_debug_level()
 
-  if(debug) write(0,*)'Inside DSPHALO'
+  if (debug_level >= psb_debug_outer_) &
+       & write(debug_unit,*) me,' ',trim(name),': Start'
+
   if (present(rowcnv)) then 
     rowcnv_ = rowcnv
   else
@@ -139,7 +142,6 @@ Subroutine psb_dsphalo(a,desc_a,blk,info,rowcnv,colcnv,&
 
   Call psb_info(ictxt, me, np)
 
-  t1 = psb_wtime()
   Allocate(sdid(np,3),rvid(np,3),brvindx(np+1),&
        & rvsz(np),sdsz(np),bsdindx(np+1),stat=info)
 
@@ -149,8 +151,8 @@ Subroutine psb_dsphalo(a,desc_a,blk,info,rowcnv,colcnv,&
     goto 9999
   end if
 
-  If (debug) Write(0,*)'dsphalo',me
-
+  If (debug_level >= psb_debug_outer_)&
+       & write(debug_unit,*) me,' ',trim(name),': Data selector',data_
   select case(data_) 
   case(psb_comm_halo_) 
     idxv => desc_a%halo_index
@@ -158,9 +160,9 @@ Subroutine psb_dsphalo(a,desc_a,blk,info,rowcnv,colcnv,&
   case(psb_comm_ext_) 
     idxv => desc_a%ext_index
 
-!!$  case(psb_comm_ovr_) 
-!!$    idxv => desc_a%ovrlap_index
-!!$  ! Do not accept OVRLAP_INDEX any longer. 
+! !$  case(psb_comm_ovr_) 
+! !$    idxv => desc_a%ovrlap_index
+! Do not accept OVRLAP_INDEX any longer. 
   case default
     call psb_errpush(4010,name,a_err='wrong Data selector')
     goto 9999
@@ -227,7 +229,9 @@ Subroutine psb_dsphalo(a,desc_a,blk,info,rowcnv,colcnv,&
 
   iszr=sum(rvsz)
   call psb_sp_reall(blk,max(iszr,1),info)
-  if(debug)  write(0,*)me,'SPHALO Sizes:',size(blk%ia1),size(blk%ia2)
+  if (debug_level >= psb_debug_outer_)&
+       & write(debug_unit,*) me,' ',trim(name),': Sizes:',size(blk%ia1),size(blk%ia2),&
+       & ' Send:',sdsz(:),' Receive:',rvsz(:)
   if (info /= 0) then
     info=4010
     ch_err='psb_sp_reall'
@@ -239,15 +243,6 @@ Subroutine psb_dsphalo(a,desc_a,blk,info,rowcnv,colcnv,&
   call psb_ensure_size(max(iszs,1),iasnd,info)
   if (info == 0) call psb_ensure_size(max(iszs,1),jasnd,info)
   if (info == 0) call psb_ensure_size(max(iszs,1),valsnd,info)
-
-  if (debugprt) then 
-    open(20+me)
-    do i=1, psb_cd_get_local_cols(desc_a)
-      write(20+me,*) i,desc_a%loc_to_glob(i)
-    end do
-    close(20+me)
-  end if
-  t2 = psb_wtime()
 
   l1  = 0
   ipx = 1
@@ -306,9 +301,6 @@ Subroutine psb_dsphalo(a,desc_a,blk,info,rowcnv,colcnv,&
     goto 9999
   end if
 
-  t3 = psb_wtime()
-
-
   !
   ! Convert into local numbering 
   !
@@ -322,13 +314,6 @@ Subroutine psb_dsphalo(a,desc_a,blk,info,rowcnv,colcnv,&
     goto 9999
   end if
 
-  if (debugprt) then 
-    blk%fida='COO'
-    blk%infoa(psb_nnz_)=iszr
-    open(40+me)
-    call psb_csprt(40+me,blk,head='% SPHALO border .')
-    close(40+me)
-  end if
   l1  = 0
   blk%m=0
   !
@@ -367,15 +352,10 @@ Subroutine psb_dsphalo(a,desc_a,blk,info,rowcnv,colcnv,&
   blk%fida            = 'COO'
   blk%infoa(psb_nnz_) = l1
 
-  if (debugprt) then 
-    open(50+me)
-    call psb_csprt(50+me,blk,head='% SPHALO border .')
-    close(50+me)
-    call psb_barrier(ictxt)
-  end if
-  t4 = psb_wtime()
 
-  if(debug) Write(0,*)me,'End first loop',counter,l1,blk%m
+  if (debug_level >= psb_debug_outer_)&
+       & write(debug_unit,*) me,' ',trim(name),&
+       & ': End data exchange',counter,l1,blk%m
 
   ! Do we expect any duplicates to appear???? 
   call psb_spcnv(blk,info,afmt=outfmt_,dupl=psb_dupl_add_)
@@ -386,15 +366,10 @@ Subroutine psb_dsphalo(a,desc_a,blk,info,rowcnv,colcnv,&
     goto 9999
   end if
 
-  t5 = psb_wtime()
-
-!!$  write(0,'(i3,1x,a,4(1x,i14))') me,'DSPHALO sizes:',iszr,iszs
-!!$  write(0,'(i3,1x,a,4(1x,g14.5))') me,'DSPHALO timings:',t6-t2,t7-t6,t8-t7,t3-t8
-!!$  write(0,'(i3,1x,a,4(1x,g14.5))') me,'DSPHALO timings:',t2-t1,t3-t2,t4-t3,t5-t4
-
   Deallocate(sdid,brvindx,rvid,bsdindx,rvsz,sdsz,&
        & iasnd,jasnd,valsnd,stat=info)
-
+  if (debug_level >= psb_debug_outer_)&
+       & write(debug_unit,*) me,' ',trim(name),': Done'
 
   call psb_erractionrestore(err_act)
   return

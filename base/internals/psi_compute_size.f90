@@ -52,11 +52,13 @@ subroutine psi_compute_size(desc_data, index_in, dl_lda, info)
   integer, allocatable :: counter_recv(:), counter_dl(:)
 
   !     ...parameters
-  logical, parameter :: debug=.false.
+  integer            :: debug_level, debug_unit
   character(len=20)  :: name
 
   name='psi_compute_size'
   call psb_get_erraction(err_act)
+  debug_unit  = psb_get_debug_unit()
+  debug_level = psb_get_debug_level()
 
   info = 0
   ictxt = desc_data(psb_ctxt_)
@@ -113,8 +115,8 @@ subroutine psi_compute_size(desc_data, index_in, dl_lda, info)
   !     computing max global value of dl_lda
   call psb_amx(ictxt, dl_lda)
 
-  if (debug) then 
-    write(0,*) 'psi_compute_size: ',dl_lda
+  if (debug_level>=psb_debug_inner_) then 
+    write(debug_unit,*) me,' ',trim(name),': ',dl_lda
   endif
 
   call psb_erractionrestore(err_act)

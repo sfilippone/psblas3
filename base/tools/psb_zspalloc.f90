@@ -34,8 +34,8 @@
 !    Allocate sparse matrix structure for psblas routines.
 ! 
 ! Arguments: 
-!    a        - type(<psb_zspmat_type>).       The sparse matrix to be allocated.      
-!    desc_a   - type(<psb_desc_type>).         The communication descriptor to be updated.
+!    a        - type(psb_zspmat_type).       The sparse matrix to be allocated.      
+!    desc_a   - type(psb_desc_type).         The communication descriptor to be updated.
 !    info     - integer.                       Return code.
 !    nnz      - integer(optional).             The number of nonzeroes in the matrix.
 !                                              (local, user estimate)
@@ -61,13 +61,15 @@ subroutine psb_zspalloc(a, desc_a, info, nnz)
   integer             :: np,me,loc_row,loc_col,&
        &  length_ia1,length_ia2, err_act,m,n
   integer             :: int_err(5)
-  logical, parameter  :: debug=.false.
+  integer             :: debug_level, debug_unit
   character(len=20)   :: name, ch_err
 
   if(psb_get_errstatus() /= 0) return 
   info=0
   call psb_erractionsave(err_act)
-  name = 'psb_zspalloc'
+  name = 'psb_zspall'
+  debug_unit  = psb_get_debug_unit()
+  debug_level = psb_get_debug_level()
 
   ictxt   = psb_cd_get_context(desc_a)
   dectype = psb_cd_get_dectype(desc_a)
@@ -101,7 +103,8 @@ subroutine psb_zspalloc(a, desc_a, info, nnz)
     length_ia1=max(1,5*loc_row)
   endif
 
-  if (debug) write(*,*) 'allocating size:',length_ia1
+  if (debug_level >= psb_debug_ext_) &
+       & write(debug_unit,*) me,' ',trim(name),':allocating size:',length_ia1
 
   !....allocate aspk, ia1, ia2.....
   call psb_sp_all(loc_row,loc_col,a,length_ia1,info)
@@ -112,7 +115,8 @@ subroutine psb_zspalloc(a, desc_a, info, nnz)
     goto 9999
   end if
 
-  if (debug) write(0,*) 'spall: ',  &
+  if (debug_level >= psb_debug_ext_) &
+       & write(debug_unit,*) me,' ',trim(name),': ',  &
        & psb_cd_get_dectype(desc_a),psb_desc_bld_
 
   return

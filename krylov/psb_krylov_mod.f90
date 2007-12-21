@@ -28,6 +28,10 @@
 !!$  POSSIBILITY OF SUCH DAMAGE.
 !!$ 
 !!$  
+!
+! File: psb_krylov_mod.f90
+!  Interfaces for Krylov subspace iterative methods.
+!
 Module psb_krylov_mod
 
 
@@ -189,9 +193,6 @@ Module psb_krylov_mod
   end interface
 
 contains
-  !
-  ! File: psb_krylov_mod.f90
-  !
   ! Subroutine: psb_dkrylov
   ! 
   !    Front-end for the Krylov subspace iterations, real version
@@ -206,16 +207,16 @@ contains
   !                                           BICGSTABL
   !                                           RGMRES
   !                                           
-  !    a      -  type(<psb_dspmat_type>)      Input: sparse matrix containing A.
-  !    prec   -  type(<psb_dprec_type>)       Input: preconditioner
+  !    a      -  type(psb_dspmat_type)      Input: sparse matrix containing A.
+  !    prec   -  type(psb_dprec_type)       Input: preconditioner
   !    b      -  real,dimension(:)            Input: vector containing the
   !                                           right hand side B
   !    x      -  real,dimension(:)            Input/Output: vector containing the
   !                                           initial guess and final solution X.
   !    eps    -  real                         Input: Stopping tolerance; the iteration is
-  !                                           stopped when the error estimate
-  !                                           |err| <= eps
-  !    desc_a -  type(<psb_desc_type>).       Input: The communication descriptor.
+  !                                           stopped when the error
+  !                                           estimate  |err| <= eps
+  !    desc_a -  type(psb_desc_type).       Input: The communication descriptor.
   !    info   -  integer.                     Output: Return code
   !
   !    itmax  -  integer(optional)            Input: maximum number of iterations to be
@@ -236,8 +237,7 @@ contains
   !                                           estimate of) residual 
   ! 
 
-  Subroutine psb_dkrylov(method,a,prec,b,x,eps,desc_a,info,&
-       &itmax,iter,err,itrace,irst,istop)
+  Subroutine psb_dkrylov(method,a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,irst,istop)
 
     use psb_base_mod
     use psb_prec_mod
@@ -311,8 +311,6 @@ contains
 
 
   !
-  ! File: psb_krylov_mod.f90
-  !
   ! Subroutine: psb_zkrylov
   ! 
   !    Front-end for the Krylov subspace iterations, complexversion
@@ -324,16 +322,17 @@ contains
   !                                           BICGSTAB
   !                                           RGMRES
   !                                           
-  !    a      -  type(<psb_zspmat_type>)      Input: sparse matrix containing A.
-  !    prec   -  type(<psb_zprec_type>)       Input: preconditioner
+  !    a      -  type(psb_zspmat_type)      Input: sparse matrix containing A.
+  !    prec   -  type(psb_zprec_type)       Input: preconditioner
   !    b      -  complex,dimension(:)         Input: vector containing the
   !                                           right hand side B
   !    x      -  complex,dimension(:)         Input/Output: vector containing the
   !                                           initial guess and final solution X.
   !    eps    -  real                         Input: Stopping tolerance; the iteration is
-  !                                           stopped when the error estimate
-  !                                           |err| <= eps
-  !    desc_a -  type(<psb_desc_type>).       Input: The communication descriptor.
+  !                                           stopped when the error
+  !                                           estimate |err| <= eps
+  !                                           
+  !    desc_a -  type(psb_desc_type).       Input: The communication descriptor.
   !    info   -  integer.                     Output: Return code
   !
   !    itmax  -  integer(optional)            Input: maximum number of iterations to be
@@ -353,8 +352,7 @@ contains
   !                                           where r is the (preconditioned, recursive
   !                                           estimate of) residual 
   ! 
-  Subroutine psb_zkrylov(method,a,prec,b,x,eps,desc_a,info,&
-       &itmax,iter,err,itrace,irst,istop)
+  Subroutine psb_zkrylov(method,a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,irst,istop)
     use psb_base_mod
     use psb_prec_mod
     character(len=*)                   :: method

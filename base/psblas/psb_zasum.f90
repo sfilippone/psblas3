@@ -39,7 +39,7 @@
 !
 ! Arguments:
 !    x      -  real,dimension(:,:).       The input vector.
-!    desc_a -  type(<psb_desc_type>).     The communication descriptor.
+!    desc_a -  type(psb_desc_type).     The communication descriptor.
 !    info   -  integer.                   Return code
 !    jx     -  integer(optional).         The column offset.
 !
@@ -189,7 +189,7 @@ end function psb_zasum
 !
 ! Arguments:
 !    x      -  real,dimension(:).       The input vector.
-!    desc_a -  type(<psb_desc_type>).     The communication descriptor.
+!    desc_a -  type(psb_desc_type).     The communication descriptor.
 !    info   -  integer.                   Return code
 !
 function psb_zasumv (x,desc_a, info)
@@ -333,7 +333,7 @@ end function psb_zasumv
 ! Arguments:
 !    res    -  real.                      The result.
 !    x      -  real,dimension(:).         The input vector.
-!    desc_a -  type(<psb_desc_type>).     The communication descriptor.
+!    desc_a -  type(psb_desc_type).     The communication descriptor.
 !    info   -  integer.                   Return code
 !    jx     -  integer(optional).         The column offset.
 !

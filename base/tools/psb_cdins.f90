@@ -39,7 +39,7 @@
 !    nz       - integer.                       The number of points to insert.
 !    ia(:)    - integer                        The row indices of the points.
 !    ja(:)    - integer                        The column indices of the points.
-!    desc_a   - type(<psb_desc_type>).         The communication descriptor to be freed.
+!    desc_a   - type(psb_desc_type).         The communication descriptor to be freed.
 !    info     - integer.                       Return code.
 !    ila(:)   - integer, optional              The row indices in local numbering
 !    jla(:)   - integer, optional              The col indices in local numbering

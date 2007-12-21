@@ -36,10 +36,10 @@
 !    specified on input. 
 ! 
 ! Arguments: 
-!    a        - type(<psb_zspmat_type>).       The input sparse matrix.
-!    desc_a   - type(<psb_desc_type>).         The input communication descriptor.
+!    a        - type(psb_zspmat_type).       The input sparse matrix.
+!    desc_a   - type(psb_desc_type).         The input communication descriptor.
 !    novr     - integer.                       The number of overlap levels.
-!    desc_ov  - type(<psb_desc_type>).         The auxiliary output communication 
+!    desc_ov  - type(psb_desc_type).         The auxiliary output communication 
 !                                              descriptor.
 !    info     - integer.                       Return code.
 !    extype   - integer.                       Choice of type of overlap:
@@ -55,8 +55,8 @@
 !                                                 the ext_ structure to provide 
 !                                                 the mapping between the base 
 !                                                 descriptor and the overlapped one.
-!                                              c. The (novr+1) layer becomes the new 
-!                                                 halo.
+!                                              c. The (novr+1)-th layer becomes the
+!                                                 new halo.
 !
 Subroutine psb_zcdovr(a,desc_a,novr,desc_ov,info, extype)
 
@@ -107,18 +107,21 @@ Subroutine psb_zcdovr(a,desc_a,novr,desc_ov,info, extype)
   Integer,allocatable   :: halo(:),works(:),workr(:),t_halo_in(:),&
        & t_halo_out(:),temp(:),maskr(:)
   Integer,allocatable  :: brvindx(:),rvsz(:), bsdindx(:),sdsz(:)
-  Logical,Parameter :: debug=.false.
-  character(len=20) :: name, ch_err
+  integer              :: debug_level, debug_unit
+  character(len=20)    :: name, ch_err
 
-  name='psb_cdovr'
+  name='psb_zcdovr'
   info  = 0
   call psb_erractionsave(err_act)
+  debug_unit  = psb_get_debug_unit()
+  debug_level = psb_get_debug_level()
 
   ictxt = psb_cd_get_context(desc_a)
   icomm = psb_cd_get_mpic(desc_a)
   Call psb_info(ictxt, me, np)
 
-  If(debug) Write(0,*)'in psb_cdovr',novr
+  If (debug_level >= psb_debug_outer_) &
+       & Write(debug_unit,*) me,' ',trim(name),': start',novr
 
   if (present(extype)) then
     extype_ = extype
@@ -131,7 +134,6 @@ Subroutine psb_zcdovr(a,desc_a,novr,desc_ov,info, extype)
   n_col  = psb_cd_get_local_cols(desc_a)
   nhalo  = n_col-m
 
-  If(debug) Write(0,*)'IN CDOVR1',novr ,m,nnzero,n_col
   if (novr<0) then
     info=10
     int_err(1)=1
@@ -140,7 +142,8 @@ Subroutine psb_zcdovr(a,desc_a,novr,desc_ov,info, extype)
     goto 9999
   endif
 
-  if (debug) write(0,*) 'Calling desccpy'
+  if (debug_level >= psb_debug_outer_) &
+       & write(debug_unit,*) me,' ',trim(name),':Calling desccpy'
   call psb_cdcpy(desc_a,desc_ov,info)
   if (info /= 0) then
     info=4010
@@ -148,7 +151,8 @@ Subroutine psb_zcdovr(a,desc_a,novr,desc_ov,info, extype)
     call psb_errpush(info,name,a_err=ch_err)
     goto 9999
   end if
-  if (debug) write(0,*) 'From desccpy'
+  if (debug_level >= psb_debug_outer_) &
+       & write(debug_unit,*) me,' ',trim(name),':From desccpy'
   if (novr==0) then 
     !
     ! Just copy the input.  
@@ -158,8 +162,8 @@ Subroutine psb_zcdovr(a,desc_a,novr,desc_ov,info, extype)
 
 
 
-  If(debug)then 
-    Write(0,*)'BEGIN cdovr',me,nhalo
+  If (debug_level >= psb_debug_outer_)then 
+    Write(debug_unit,*) me,' ',trim(name),':BEGIN ',nhalo
     call psb_barrier(ictxt)
   endif
 
@@ -178,7 +182,8 @@ Subroutine psb_zcdovr(a,desc_a,novr,desc_ov,info, extype)
     call psb_errpush(info,name)
     goto 9999
   endif
-  If(debug)Write(0,*)'ovr_est done',me,novr,lovr
+  If (debug_level >= psb_debug_outer_)&
+       & Write(debug_unit,*) me,' ',trim(name),':ovr_est done',novr,lovr
 
   index_dim = size(desc_a%halo_index)
   elem_dim  = size(desc_a%halo_index)
@@ -186,12 +191,10 @@ Subroutine psb_zcdovr(a,desc_a,novr,desc_ov,info, extype)
   l_tmp_ovr_idx = novr*(3*Max(2*index_dim,1)+1)
   l_tmp_halo    = novr*(3*Size(desc_a%halo_index))
 
-!!$  write(0,*) 'Size of desc_ov ',    desc_ov%matrix_data(psb_desc_size_), &
-!!$       & psb_desc_normal_,psb_desc_large_
   call psb_cd_set_bld(desc_ov,info)
 
-  If(debug) then
-    Write(0,*)'Start cdovrbld',me,lworks,lworkr
+  If (debug_level >= psb_debug_outer_) then
+    Write(debug_unit,*) me,' ',trim(name),':Start',lworks,lworkr
     call psb_barrier(ictxt)
   endif
 
@@ -295,7 +298,8 @@ Subroutine psb_zcdovr(a,desc_a,novr,desc_ov,info, extype)
   !
   Do i_ovr = 1, novr
 
-    if (debug) write(0,*) me,'Running on overlap level ',i_ovr,' of ',novr
+    if (debug_level >= psb_debug_outer_) &
+         & write(debug_unit,*) me,' ',trim(name),':Running on overlap level ',i_ovr,' of ',novr
 
     !
     ! At this point, halo contains a valid halo corresponding to the
@@ -326,7 +330,8 @@ Subroutine psb_zcdovr(a,desc_a,novr,desc_ov,info, extype)
         goto 9999
       end If
       tot_recv=tot_recv+n_elem_recv
-      if (debug) write(0,*) me,' CDOVRBLD tot_recv:',proc,n_elem_recv,tot_recv
+      if (debug_level >= psb_debug_outer_) &
+           & write(debug_unit,*) me,' ',trim(name),': tot_recv:',proc,n_elem_recv,tot_recv
       !
       !
       ! The format of the halo vector exists in two forms: 1. Temporary 
@@ -381,7 +386,8 @@ Subroutine psb_zcdovr(a,desc_a,novr,desc_ov,info, extype)
         counter_h=counter_h+3
 
       Enddo
-      if (debug) write(0,*) me,'Checktmp_o_i Loop Mid1',tmp_ovr_idx(1:10)
+      if (debug_level >= psb_debug_outer_) &
+           & write(debug_unit,*) me,' ',trim(name),':Checktmp_o_i Loop Mid1',tmp_ovr_idx(1:10)
       counter   = counter+n_elem_recv
 
       !
@@ -392,7 +398,7 @@ Subroutine psb_zcdovr(a,desc_a,novr,desc_ov,info, extype)
         idx = halo(counter+psb_elem_send_+j)
         gidx = desc_ov%loc_to_glob(idx)
         if (idx > psb_cd_get_local_rows(Desc_a)) &
-             & write(0,*) me,i_ovr,'Out of local rows ',&
+             & write(debug_unit,*) me,' ',trim(name),':Out of local rows ',i_ovr,&
              & idx,psb_cd_get_local_rows(Desc_a)
 
         call psb_ensure_size((counter_o+3),tmp_ovr_idx,info,pad=-1)
@@ -422,7 +428,8 @@ Subroutine psb_zcdovr(a,desc_a,novr,desc_ov,info, extype)
 
           If((n_elem) > size(blk%ia2)) Then
             isz = max((3*size(blk%ia2))/2,(n_elem))
-            if (debug) write(0,*) me,'Realloc blk',isz
+            if (debug_level >= psb_debug_outer_) &
+                 & write(debug_unit,*) me,'Realloc blk',isz
             call psb_sp_reall(blk,isz,info)
             if (info /= 0) then
               info=4010
@@ -439,7 +446,6 @@ Subroutine psb_zcdovr(a,desc_a,novr,desc_ov,info, extype)
             call psb_errpush(info,name,a_err=ch_err)
             goto 9999
           end if
-!!$          write(0,*) me,'Iteration: ',j,i_ovr
           Do jj=1,n_elem
             works(idxs+tot_elem+jj)=desc_ov%loc_to_glob(blk%ia2(jj))
           End Do
@@ -454,14 +460,17 @@ Subroutine psb_zcdovr(a,desc_a,novr,desc_ov,info, extype)
           call psb_msort_unique(works(idxs+1:idxs+tot_elem),i)
           tot_elem=i
         endif
-        if (debug) write(0,*) me,'Checktmp_o_i Loop Mid2',tmp_ovr_idx(1:10)
+        if (debug_level >= psb_debug_outer_) &
+             & write(debug_unit,*) me,' ',trim(name),':Checktmp_o_i Loop Mid2',tmp_ovr_idx(1:10)
         sdsz(proc+1) = tot_elem
         idxs         = idxs + tot_elem
       end if
       counter   = counter+n_elem_send+3
-      if (debug) write(0,*) me,'Checktmp_o_i Loop End',tmp_ovr_idx(1:10)
+      if (debug_level >= psb_debug_outer_) &
+           & write(debug_unit,*) me,' ',trim(name),':Checktmp_o_i Loop End',tmp_ovr_idx(1:10)
     Enddo
-    if (debug) write(0,*)me,'End phase 1 CDOVRBLD', m, n_col, tot_recv
+    if (debug_level >= psb_debug_outer_) &
+         & write(debug_unit,*) me,' ',trim(name),':End phase 1', m, n_col, tot_recv
 
     if (i_ovr <= novr) then
       ! 
@@ -514,7 +523,8 @@ Subroutine psb_zcdovr(a,desc_a,novr,desc_ov,info, extype)
         goto 9999
       end if
 
-      if (debug) write(0,*) 'ISZR :',iszr
+      if (debug_level >= psb_debug_outer_) &
+           & write(debug_unit,*) me,' ',trim(name),': ISZR :',iszr
 
       if (psb_is_large_desc(desc_ov)) then 
         call psb_ensure_size(iszr,maskr,info)
@@ -564,8 +574,6 @@ Subroutine psb_zcdovr(a,desc_a,novr,desc_ov,info, extype)
             t_halo_in(counter_t+2)=lidx
             t_halo_in(counter_t+3)=-1
             counter_t=counter_t+3
-            if (.false.) write(0,*) me,' CDOVRBLD: Added t_halo_in ',&
-                 &proc_id,lidx,idx
           endif
         end Do
         n_col   = psb_cd_get_local_cols(desc_ov)
@@ -606,10 +614,12 @@ Subroutine psb_zcdovr(a,desc_a,novr,desc_ov,info, extype)
             t_halo_in(counter_t+2)=n_col
             t_halo_in(counter_t+3)=-1
             counter_t=counter_t+3
-            if (debug) write(0,*) me,' CDOVRBLD: Added into t_halo_in from recv',&
+            if (debug_level >= psb_debug_outer_) &
+                 & write(debug_unit,*) me,' ',trim(name),': Added into t_halo_in from recv',&
                  &proc_id,n_col,idx
           else if (desc_ov%glob_to_loc(idx) < 0) Then
-            if (debug) write(0,*) me,'Wrong input to cdovrbld?',&
+            if (debug_level >= psb_debug_outer_) &
+                 & write(debug_unit,*) me,' ',trim(name),':Wrong input to cdovrbld?',&
                  &idx,desc_ov%glob_to_loc(idx)
           End If
         End Do
@@ -630,25 +640,23 @@ Subroutine psb_zcdovr(a,desc_a,novr,desc_ov,info, extype)
     If (i_ovr < (novr)) Then
 
 
-      if (debug) write(0,*) me,'Checktmp_o_i 1',tmp_ovr_idx(1:10)
-      if (debug) write(0,*) me,'Calling Crea_Halo'
+      if (debug_level >= psb_debug_outer_) then
+         write(debug_unit,*) me,' ',trim(name),':Checktmp_o_i 1',tmp_ovr_idx(1:10)      
+         write(debug_unit,*) me,' ',trim(name),':Calling Crea_index'
+       end if
 
       call psi_crea_index(desc_ov,t_halo_in,t_halo_out,.false.,&
            & nxch,nsnd,nrcv,info)
-
-      if (debug) then 
-        write(0,*) me,'Done Crea_Index'
+      
+      if (debug_level >= psb_debug_outer_) then 
+        write(debug_unit,*) me,' ',trim(name),':Done Crea_Index'
         call psb_barrier(ictxt)
       end if
-      if (debug) write(0,*) me,'Checktmp_o_i 2',tmp_ovr_idx(1:10)
-      if (debug) write(0,*) me,'Done Crea_Halo'
       call psb_transfer(t_halo_out,halo,info)
       !
       ! At this point we have built the halo necessary for I_OVR+1.
       !
     End If
-    if (debug) write(0,*) me,'Checktmp_o_i ',tmp_ovr_idx(1:10)
-
   End Do
 
 
@@ -720,16 +728,13 @@ Subroutine psb_zcdovr(a,desc_a,novr,desc_ov,info, extype)
   ! called inside CDASB.
   !
 
-  if (debug) then
-    write(0,*) 'psb_cdovrbld: converting indexes'
+  if (debug_level >= psb_debug_outer_) then
+    write(debug_unit,*) me,' ',trim(name),': converting indexes'
     call psb_barrier(ictxt)
   end if
+
   call psb_icdasb(desc_ov,info,ext_hv=.true.)
 
-  if (debug) then 
-    write(0,*) me,'Done CDASB'
-    call psb_barrier(ictxt)
-  end if
 
   if (info == 0) call psb_sp_free(blk,info)
   if (info /= 0) then
@@ -737,6 +742,9 @@ Subroutine psb_zcdovr(a,desc_a,novr,desc_ov,info, extype)
     call psb_errpush(4013,name,a_err=ch_err,i_err=(/info,0,0,0,0/))
     goto 9999
   end if
+
+  if (debug_level >= psb_debug_outer_) &
+       & write(debug_unit,*) me,' ',trim(name),': end'
 
   call psb_erractionrestore(err_act)
   return

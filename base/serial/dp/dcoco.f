@@ -33,7 +33,7 @@ c
       subroutine dcoco(trans,m,n,unitd,d,descra,ar,ia1,ia2,info,
      *  p1,descrn,arn,ia1n,ia2n,infon,p2,larn,lia1n,
      *  lia2n,aux,laux,ierror)
-
+      use psb_error_mod
       use psb_const_mod
       use psb_spmat_type
       use psb_string_mod
@@ -55,8 +55,7 @@ c     .. local scalars ..
       integer            elem_in, elem_out
       logical            scale
       integer max_nnzero
-      logical     debug
-      parameter   (debug=.false.)
+      integer              :: debug_level, debug_unit
 c     .. local arrays ..
       character*20       name
       integer            int_val(5)
@@ -69,9 +68,11 @@ c     .. external subroutines ..
 c     .. executable statements ..
 c
 
-      name = 'dcoco\0'
+      name = 'dcoco'
       ierror = 0
       call fcpsb_erractionsave(err_act)
+      debug_unit  = psb_get_debug_unit()
+      debug_level = psb_get_debug_level()
 
       call psb_getifield(check_flag,psb_dupl_,infon,psb_ifasize_,ierror)
       
@@ -81,8 +82,8 @@ c
         p2(1) = 0
 
         call psb_getifield(nnz,psb_nnz_,info,psb_ifasize_,ierror) 
-        if (debug) then 
-          write(*,*) 'on entry to dcoco: nnz laux ',
+        if (debug_level >= psb_debug_serial_) then 
+          write(debug_unit,*) trim(name),': on entry nnz laux ',
      +      nnz,laux,larn,lia1n,lia2n
         endif
         if (laux.lt.nnz+2) then
@@ -119,14 +120,16 @@ c
 c
 c     sort COO data structure
 c     
-          if (debug) write(*,*)'first sort',nnz
+          if (debug_level >= psb_debug_serial_)
+     +      write(debug_unit,*) trim(name),': first sort',nnz
           do k=1, nnz
             arn(k)  = ar(k)
             ia1n(k) = ia1(k)
             ia2n(k) = ia2(k)
           enddo
           
-          if (debug) write(*,*)'second sort'            
+          if (debug_level >= psb_debug_serial_)
+     +      write(debug_unit,*)  trim(name),': second sort'            
 
           if ((lia2n.ge.(2*nnz+psb_ireg_flgs_+1))
      +      .and.(laux.ge.2*(2+nnz))) then 
@@ -145,7 +148,9 @@ c
             ia2n(ip1+psb_nnzt_)  = nnz
             ia2n(ip1+psb_nnz_)   = 0
             ia2n(ip1+psb_ichk_)  = nnz+check_flag
-            if (debug) write(0,*) 'build check :',ia2n(ip1+psb_nnzt_) 
+            if (debug_level >= psb_debug_serial_)
+     +        write(debug_unit,*)  trim(name),
+     +        ': build check :',ia2n(ip1+psb_nnzt_) 
             
 c     .... order with key ia1n ...
             call msort_up(nnz,ia1n,aux,iret)
@@ -183,7 +188,7 @@ c     ... error, there are duplicated elements ...
 c     ... insert only the first duplicated element ...
                   ia2n(ip2+aux(ipx+elem_in-1)-1) = elem_out
                 else if (check_flag.eq.psb_dupl_add_) then
-c     ... add the duplicated element ...
+c     ... sum the duplicated element ...
                   arn(elem_out) = arn(elem_out) + arn(elem_in)
                   ia2n(ip2+aux(ipx+elem_in-1)-1) = elem_out
                 end if
@@ -230,7 +235,7 @@ c     ... error, there are duplicated elements ...
                 else if (check_flag.eq.psb_dupl_ovwrt_) then
 c     ... insert only the first duplicated element ...
                 else if (check_flag.eq.psb_dupl_add_) then
-c     ... add the duplicated element ...
+c     ... sum the duplicated element ...
                   arn(elem_out) = arn(elem_out) + arn(elem_in)
                 end if
               else
@@ -244,7 +249,9 @@ c     ... add the duplicated element ...
           infon(psb_nnz_)  = elem_out
           infon(psb_srtd_) = psb_isrtdcoo_
           
-          if (debug) write(*,*)'done rebuild COO',infon(1)
+          if (debug_level >= psb_debug_serial_)
+     +      write(debug_unit,*)  trim(name),
+     +      ': done rebuild COO',infon(1)
           
         else if (toupper(descra(1:1)).eq.'S' .and.
      +      toupper(descra(2:2)).eq.'U') then

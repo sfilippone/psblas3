@@ -28,9 +28,9 @@
 !!$  POSSIBILITY OF SUCH DAMAGE.
 !!$ 
 !!$  
-! File: psb_daxpby.f90
+! File: psb_zaxpby.f90
 !
-! Subroutine: psb_daxpby
+! Subroutine: psb_zaxpby
 !    Adds one distributed matrix to another,
 !
 !    sub( Y ) := beta * sub( Y ) + alpha * sub( X )
@@ -40,14 +40,14 @@
 !    sub( Y ) denotes Y(:,JY).
 !
 ! Arguments:
-!    alpha  -  real.                      The scalar used to multiply each component of sub( X ).
-!    x      -  real,dimension(:,:).       The input vector containing the entries of sub( X ).
-!    beta   -  real.                      The scalar used to multiply each component of sub( Y ).
-!    y      -  real,dimension(:,:).       The input vector containing the entries of sub( Y ).
-!    desc_a -  type(<psb_desc_type>).     The communication descriptor.
-!    info   -  integer.                   Return code
-!    jx     -  integer(optional).         The column offset for sub( X ).
-!    jy     -  integer(optional).         The column offset for sub( Y ).
+!    alpha  -  complex,input        The scalar used to multiply each component of X
+!    x(:,:) -  complex,input        The input vector containing the entries of X
+!    beta   -  real,input           The scalar used to multiply each component of Y
+!    y(:,:) -  real,inout           The input vector Y
+!    desc_a -  type(psb_desc_type)  The communication descriptor.
+!    info   -  integer              Return code
+!    jx     -  integer(optional)    The column offset for X 
+!    jy     -  integer(optional)    The column offset for Y 
 !
 subroutine  psb_zaxpby(alpha, x, beta,y,desc_a,info, n, jx, jy)
   use psb_descriptor_type
@@ -188,18 +188,19 @@ end subroutine psb_zaxpby
 !!$ 
 !!$  
 !
-! Subroutine: psb_dgeaxpbyv
+! Subroutine: psb_zgeaxpbyv
 !    Adds one distributed matrix to another,
 !
 !    Y := beta * Y + alpha * X
 !
 ! Arguments:
-!    alpha  -  real.                      The scalar used to multiply each component of X.
-!    x      -  real,dimension(:).         The input vector containing the entries of X.
-!    beta   -  real.                      The scalar used to multiply each component of Y.
-!    y      -  real,dimension(:).         The input vector containing the entries of Y.
-!    desc_a -  type(<psb_desc_type>).     The communication descriptor.
-!    info   -  integer.                   Return code
+!    alpha  -  complex,input        The scalar used to multiply each component of X
+!    x(:)   -  complex,input        The input vector containing the entries of X
+!    beta   -  real,input           The scalar used to multiply each component of Y
+!    y(:)   -  real,inout           The input vector Y
+!    desc_a -  type(psb_desc_type)  The communication descriptor.
+!    info   -  integer              Return code
+!
 !
 subroutine  psb_zaxpbyv(alpha, x, beta,y,desc_a,info)
   use psb_descriptor_type

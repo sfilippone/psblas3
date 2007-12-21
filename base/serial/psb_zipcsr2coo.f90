@@ -48,11 +48,9 @@ Subroutine psb_zipcsr2coo(a,info)
   !locals
   Integer              :: nza, nr
   integer              :: i,j,err_act
-  logical, parameter   :: debug=.false.
   integer, allocatable :: iaux(:), itemp(:)
-  character(len=20)    :: name
+  character(len=20)    :: name='psb_zipcsr2coo'
 
-  name='psb_zipcsr2coo'
   info  = 0
   call psb_erractionsave(err_act)
 

@@ -188,18 +188,20 @@ C     .. Intrinsic Functions ..
 C     .. Executable Statements ..
 C
       EXIT=.FALSE.
-      NAME = 'DCOCO\0'
+      NAME = 'DCRCR'
       IERROR = 0
       CALL FCPSB_ERRACTIONSAVE(ERR_ACT)
 C
 C       Check for argument errors
 C
       idescra=toupper(descra)
-      IF(((idescra(1:1) .EQ. 'S' .OR. idescra(1:1) .EQ. 'H' .OR.
-     &   idescra(1:1) .EQ. 'A') .AND. (toupper(unitd) .NE. 'B'))  .OR.
+      IF (((idescra(1:1) .EQ. 'S' .OR. idescra(1:1) .EQ. 'H' .OR.
+     &  idescra(1:1) .EQ. 'A') .AND. (toupper(unitd) .NE. 'B'))
+     +  .OR.
      &   (.NOT.((idescra(3:3).EQ.'N').OR.(idescra(3:3).EQ.'L').OR.
-     +  (idescra(3:3).EQ.'U'))) .OR.
-     +  toupper(TRANS).NE.'N') THEN
+     +       (idescra(3:3).EQ.'U')))
+     +  .OR.
+     +   toupper(TRANS).NE.'N') THEN
          IERROR = 20
       ENDIF
       IF(LAN.LT.(IA2(M+1)-1)) THEN

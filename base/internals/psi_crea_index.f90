@@ -71,12 +71,14 @@ subroutine psi_crea_index(desc_a,index_in,index_out,glob_idx,nxch,nsnd,nrcv,info
   !         ...parameters...
   integer, allocatable :: dep_list(:,:), length_dl(:)
   integer,parameter    :: root=psb_root_,no_comm=-1
-  logical,parameter    :: debug=.false.
+  integer              :: debug_level, debug_unit
   character(len=20)    :: name
 
   info = 0
   name='psi_crea_index'
   call psb_erractionsave(err_act)
+  debug_unit  = psb_get_debug_unit()
+  debug_level = psb_get_debug_level()
 
   ictxt = psb_cd_get_context(desc_a)
   call psb_info(ictxt,me,np)
@@ -99,7 +101,8 @@ subroutine psi_crea_index(desc_a,index_in,index_out,glob_idx,nxch,nsnd,nrcv,info
 
   ! ...extract dependence list (ordered list of identifer process
   !    which every process must communcate with...
-  if (debug) write(*,*) 'crea_halo: calling extract_dep_list'
+  if (debug_level >= psb_debug_inner_) &
+       & write(debug_unit,*) me,' ',trim(name),': calling extract_dep_list'
   mode = 1
 
   call psi_extract_dep_list(desc_a%matrix_data,index_in,&
@@ -109,10 +112,12 @@ subroutine psi_crea_index(desc_a,index_in,index_out,glob_idx,nxch,nsnd,nrcv,info
     goto 9999
   end if
 
-  if (debug) write(0,*) 'crea_index: from extract_dep_list',&
+  if (debug_level >= psb_debug_inner_) &
+       & write(debug_unit,*) me,' ',trim(name),': from extract_dep_list',&
        &     me,length_dl(0),index_in(1), ':',dep_list(:length_dl(me),me)
   ! ...now process root contains dependence list of all processes...
-  if (debug) write(0,*) 'crea_index: root sorting dep list'
+  if (debug_level >= psb_debug_inner_) &
+       & write(debug_unit,*) me,' ',trim(name),': root sorting dep list'
 
   call psi_dl_check(dep_list,max(1,dl_lda),np,length_dl)
 
@@ -123,12 +128,14 @@ subroutine psi_crea_index(desc_a,index_in,index_out,glob_idx,nxch,nsnd,nrcv,info
     goto 9999
   end if
 
-  if(debug) write(0,*)'in psi_crea_index calling psi_desc_index',&
+  if(debug_level >= psb_debug_inner_)&
+       & write(debug_unit,*) me,' ',trim(name),': calling psi_desc_index',&
        & size(index_out)
   ! Do the actual format conversion. 
   call psi_desc_index(desc_a,index_in,dep_list(1:,me),&
        & length_dl(me),nsnd,nrcv, index_out,glob_idx,info)
-  if(debug) write(0,*)'out of  psi_desc_index',&
+  if(debug_level >= psb_debug_inner_) &
+       & write(debug_unit,*) me,' ',trim(name),': out of  psi_desc_index',&
        & size(index_out)
   nxch = length_dl(me)
   if(info /= 0) then
@@ -137,6 +144,9 @@ subroutine psi_crea_index(desc_a,index_in,index_out,glob_idx,nxch,nsnd,nrcv,info
   end if
 
   deallocate(dep_list,length_dl)
+  if(debug_level >= psb_debug_inner_) &
+       & write(debug_unit,*) me,' ',trim(name),': done'
+
   call psb_erractionrestore(err_act)
   return
 

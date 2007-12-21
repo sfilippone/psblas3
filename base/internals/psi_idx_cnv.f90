@@ -38,7 +38,7 @@
 ! Arguments: 
 !    nv       - integer                   Number of indices required 
 !    idxin(:) - integer                   Required indices,   overwritten on output.
-!    desc     - type(<psb_desc_type>).    The communication descriptor.        
+!    desc     - type(psb_desc_type).    The communication descriptor.        
 !    info     - integer.                  return code.
 !    mask(:)  - logical, optional         Only do the conversion for specific indices.
 !    owned    - logical,optional          Restrict to local indices, no halo 
@@ -61,7 +61,6 @@ subroutine psi_idx_cnv1(nv,idxin,desc,info,mask,owned)
   integer                :: np, me
   integer                :: nrow,ncol, err_act
   integer, allocatable   :: idxout(:)
-  logical, parameter     :: debug=.false.
   integer, parameter     :: relocsz=200
   character(len=20)      :: name
   logical, pointer       :: mask_(:)
@@ -183,7 +182,6 @@ end subroutine psi_idx_cnv1
 !!$ 
 !!$  
 !
-! File: psi_idx_cnv.f90
 !
 ! Subroutine: psi_idx_cnv2
 !   Converts a bunch of indices from global to local numbering. 
@@ -193,7 +191,7 @@ end subroutine psi_idx_cnv1
 !    nv        - integer                   Number of indices required 
 !    idxin(:)  - integer                   Required indices
 !    idxout(:) - integer                   Output values, negative for invalid input.
-!    desc      - type(<psb_desc_type>).    The communication descriptor.        
+!    desc      - type(psb_desc_type).    The communication descriptor.        
 !    info      - integer.                  return code.
 !    mask(:)   - logical, optional         Only do the conversion for specific indices.
 !    owned     - logical,optional          Restrict to local indices, no halo
@@ -215,7 +213,6 @@ subroutine psi_idx_cnv2(nv,idxin,idxout,desc,info,mask,owned)
   integer :: i,ictxt,mglob, nglob
   integer                :: np, me
   integer                :: nrow,ncol, ip, err_act,lip
-  logical, parameter     :: debug=.false.
   integer, parameter     :: relocsz=200
   character(len=20)      :: name
   logical, pointer       :: mask_(:)
@@ -405,7 +402,6 @@ end subroutine psi_idx_cnv2
 !!$ 
 !!$  
 !
-! File: psi_idx_cnv.f90
 !
 ! Subroutine: psi_idx_cnvs
 !   Converts an index from global to local numbering. 
@@ -414,7 +410,7 @@ end subroutine psi_idx_cnv2
 ! Arguments: 
 !    idxin     - integer                   Required index   
 !    idxout    - integer                   Output value, negative for invalid input.
-!    desc      - type(<psb_desc_type>).    The communication descriptor.        
+!    desc      - type(psb_desc_type).    The communication descriptor.        
 !    info      - integer.                  return code.
 !    mask      - logical, optional         Only do the conversion if true.
 !    owned     - logical,optional          Restrict to local indices, no halo 

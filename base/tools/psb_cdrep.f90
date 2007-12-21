@@ -118,16 +118,19 @@ subroutine psb_cdrep(m, ictxt, desc_a, info)
   !locals
   Integer             :: i,np,me,err,n,err_act
   integer             :: int_err(5),exch(2), thalo(1), tovr(1), text(1)
-  logical, parameter  :: debug=.false.
+  integer              :: debug_level, debug_unit
   character(len=20)   :: name
 
   if(psb_get_errstatus() /= 0) return 
   info=0
   err=0
   name = 'psb_cdrep'
+  debug_unit  = psb_get_debug_unit()
+  debug_level = psb_get_debug_level()
 
   call psb_info(ictxt, me, np)
-  if (debug) write(*,*) 'psb_cdrep: ',np,me
+  if (debug_level >= psb_debug_ext_) &
+       & write(debug_unit,*) me,' ',trim(name),': ',np
 
   n = m
   !... check m and n parameters....
@@ -146,7 +149,8 @@ subroutine psb_cdrep(m, ictxt, desc_a, info)
     goto 9999
   end if
 
-  if (debug) write(*,*) 'psb_dscall:  doing global checks'  
+  if (debug_level >= psb_debug_ext_) &
+       & write(debug_unit,*) me,' ',trim(name),':  doing global checks'  
   !global check on m and n parameters
   if (me == psb_root_) then
     exch(1)=m
@@ -212,6 +216,9 @@ subroutine psb_cdrep(m, ictxt, desc_a, info)
   end if
   
   desc_a%matrix_data(psb_dec_type_) = psb_desc_repl_
+
+  if (debug_level >= psb_debug_ext_) &
+       & write(debug_unit,*) me,' ',trim(name),': end'
 
   call psb_erractionrestore(err_act)
   return

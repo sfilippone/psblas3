@@ -316,11 +316,14 @@ contains
     integer, allocatable  :: idx_out(:)
 
     !     ...parameters
+    integer :: debug_level, debug_unit
     logical, parameter :: debug=.false.
     character(len=20)  :: name
 
     name='psi_bld_cdesc'
     call psb_get_erraction(err_act)
+    debug_level = psb_get_debug_level()
+    debug_unit  = psb_get_debug_unit()
 
     info = 0
     ictxt = cdesc%matrix_data(psb_ctxt_)
@@ -334,7 +337,7 @@ contains
 
 
     ! first the halo index
-    if (debug) write(0,*) me,'Calling crea_index on halo'
+    if (debug_level>0) write(debug_unit,*) me,'Calling crea_index on halo'
     call psi_crea_index(cdesc,halo_in, idx_out,.false.,nxch,nsnd,nrcv,info)
     if(info /= 0) then
       call psb_errpush(4010,name,a_err='psi_crea_index')
@@ -345,12 +348,12 @@ contains
     cdesc%matrix_data(psb_thal_snd_) = nsnd
     cdesc%matrix_data(psb_thal_rcv_) = nrcv 
     
-    if (debug) write(0,*) me,'Done crea_index on halo'
-    if (debug) write(0,*) me,'Calling crea_index on ext'
+    if (debug_level>0) write(debug_unit,*) me,'Done crea_index on halo'
+    if (debug_level>0) write(debug_unit,*) me,'Calling crea_index on ext'
 
 
     ! then ext index
-    if (debug) write(0,*) me,'Calling crea_index on ext'
+    if (debug_level>0) write(debug_unit,*) me,'Calling crea_index on ext'
     call psi_crea_index(cdesc,ext_in, idx_out,.false.,nxch,nsnd,nrcv,info)
     if(info /= 0) then
       call psb_errpush(4010,name,a_err='psi_crea_index')
@@ -361,8 +364,8 @@ contains
     cdesc%matrix_data(psb_text_snd_) = nsnd
     cdesc%matrix_data(psb_text_rcv_) = nrcv 
     
-    if (debug) write(0,*) me,'Done crea_index on ext'
-    if (debug) write(0,*) me,'Calling crea_index on ovrlap'
+    if (debug_level>0) write(debug_unit,*) me,'Done crea_index on ext'
+    if (debug_level>0) write(debug_unit,*) me,'Calling crea_index on ovrlap'
 
     ! then the overlap index
 
@@ -381,10 +384,10 @@ contains
     cdesc%matrix_data(psb_tovr_snd_) = nsnd
     cdesc%matrix_data(psb_tovr_rcv_) = nrcv 
 
-    if (debug) write(0,*) me,'Calling crea_ovr_elem'
+    if (debug_level>0) write(debug_unit,*) me,'Calling crea_ovr_elem'
     ! next  ovrlap_elem 
     call psi_crea_ovr_elem(cdesc%ovrlap_index,cdesc%ovrlap_elem,info)
-    if (debug) write(0,*) me,'Done crea_ovr_elem'
+    if (debug_level>0) write(debug_unit,*) me,'Done crea_ovr_elem'
     if(info /= 0) then
       call psb_errpush(4010,name,a_err='psi_crea_ovr_elem')
       goto 9999
@@ -398,7 +401,7 @@ contains
       call psb_errpush(4010,name,a_err='psi_crea_bnd_elem')
       goto 9999
     end if
-    if (debug) write(0,*) me,'Done crea_bnd_elem'
+    if (debug_level>0) write(debug_unit,*) me,'Done crea_bnd_elem'
 
     call psb_erractionrestore(err_act)
     return

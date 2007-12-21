@@ -72,7 +72,7 @@ module psb_penv_mod
     module procedure psb_ibcasts, psb_ibcastv, psb_ibcastm,&
          & psb_dbcasts, psb_dbcastv, psb_dbcastm,&
          & psb_zbcasts, psb_zbcastv, psb_zbcastm,&
-         & psb_hbcasts, psb_lbcasts, psb_lbcastv, psb_hbcastv1
+         & psb_hbcasts, psb_lbcasts, psb_lbcastv
   end interface
 
 
@@ -545,39 +545,6 @@ contains
 #endif    
 
   end subroutine psb_hbcasts
-
-  subroutine psb_hbcastv1(ictxt,dat,root,length)
-#ifdef MPI_H
-    include 'mpif.h'
-#endif
-#ifdef MPI_MOD
-    use mpi
-#endif
-    integer, intent(in)             :: ictxt
-    character(len=1), intent(inout) :: dat(:)
-    integer, intent(in), optional   :: root,length
-
-    integer  :: iam, np, root_,icomm,length_,info
-
-#if !defined(SERIAL_MPI)
-    if (present(root)) then
-      root_ = root
-    else
-      root_ =  psb_root_
-    endif
-    if (present(length)) then
-      length_ = length
-    else
-      length_ = size(dat)
-    endif
-
-    call psb_info(ictxt,iam,np)
-    call psb_get_mpicomm(ictxt,icomm)
-    
-    call mpi_bcast(dat,length_,MPI_CHARACTER,root_,icomm,info)
-#endif    
-
-  end subroutine psb_hbcastv1
 
   subroutine psb_lbcasts(ictxt,dat,root)
 #ifdef MPI_H

@@ -43,7 +43,7 @@
 !   
 ! 
 ! Arguments: 
-!    desc     - type(<psb_desc_type>).    The communication descriptor.        
+!    desc     - type(psb_desc_type).    The communication descriptor.        
 !    ext_hv   - logical                   Should we work on the halo_index.
 !    info     - integer.                  return code.
 !
@@ -66,7 +66,6 @@ subroutine psi_ldsc_pre_halo(desc,ext_hv,info)
   integer          ::  i,j,np,me,lhalo,nhalo,&
        & n_col, err_act,  key, ih, nh, idx, nk,icomm
   integer             :: ictxt,n_row
-  logical, parameter  :: debug=.false., debugwrt=.false.
   character(len=20)   :: name,ch_err
 
   info = 0

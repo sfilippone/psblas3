@@ -42,7 +42,7 @@
 ! Arguments:
 !    x      -  real,dimension(:,:).       The input vector containing the entries of sub( X ).
 !    y      -  real,dimension(:,:).       The input vector containing the entries of sub( Y ).
-!    desc_a -  type(<psb_desc_type>).     The communication descriptor.
+!    desc_a -  type(psb_desc_type).     The communication descriptor.
 !    info   -  integer.                   Return code
 !    jx     -  integer(optional).         The column offset for sub( X ).
 !    jy     -  integer(optional).         The column offset for sub( Y ).
@@ -199,7 +199,7 @@ end function psb_ddot
 ! Arguments:
 !    x      -  real,dimension(:).         The input vector containing the entries of X.
 !    y      -  real,dimension(:).         The input vector containing the entries of Y.
-!    desc_a -  type(<psb_desc_type>).     The communication descriptor.
+!    desc_a -  type(psb_desc_type).     The communication descriptor.
 !    info   -  integer.                   Return code
 !
 function psb_ddotv(x, y,desc_a, info)  
@@ -337,7 +337,7 @@ end function psb_ddotv
 !    res    -  real.                      The result.
 !    x      -  real,dimension(:).         The input vector containing the entries of X.
 !    y      -  real,dimension(:).         The input vector containing the entries of Y.
-!    desc_a -  type(<psb_desc_type>).     The communication descriptor.
+!    desc_a -  type(psb_desc_type).     The communication descriptor.
 !    info   -  integer.                   Return code
 !
 subroutine psb_ddotvs(res, x, y,desc_a, info)  
@@ -478,7 +478,7 @@ end subroutine psb_ddotvs
 !    res    -  real.                      The result.
 !    x      -  real,dimension(:,:).       The input vector containing the entries of sub( X ).
 !    y      -  real,dimension(:,:).       The input vector containing the entries of sub( Y ).
-!    desc_a -  type(<psb_desc_type>).     The communication descriptor.
+!    desc_a -  type(psb_desc_type).     The communication descriptor.
 !    info   -  integer.                   Return code
 !
 subroutine psb_dmdots(res, x, y, desc_a, info)  

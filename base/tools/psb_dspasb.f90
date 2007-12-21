@@ -34,8 +34,8 @@
 !    Assemble sparse matrix
 !
 ! Arguments: 
-!    a        - type(<psb_dspmat_type>).     The sparse matrix to be allocated.      
-!    desc_a   - type(<psb_desc_type>).       The communication descriptor.
+!    a        - type(psb_dspmat_type).     The sparse matrix to be allocated.      
+!    desc_a   - type(psb_desc_type).       The communication descriptor.
 !    info     - integer.                     return code.
 !    afmt     - character(optional)          The desired output storage format.
 !    upd      - character(optional).         How will the matrix be updated? 
@@ -70,13 +70,15 @@ subroutine psb_dspasb(a,desc_a, info, afmt, upd, dupl)
   integer               :: np,me,n_col, err_act
   integer               :: spstate
   integer               :: ictxt,n_row
-  logical, parameter    :: debug=.false., debugwrt=.false.
+  integer              :: debug_level, debug_unit
   character(len=20)     :: name, ch_err
 
   info = 0
   int_err(1)=0
   name = 'psb_spasb'
   call psb_erractionsave(err_act)
+  debug_unit  = psb_get_debug_unit()
+  debug_level = psb_get_debug_level()
 
   ictxt    = psb_cd_get_context(desc_a)
   n_row    = psb_cd_get_local_rows(desc_a)
@@ -97,7 +99,9 @@ subroutine psb_dspasb(a,desc_a, info, afmt, upd, dupl)
     goto 9999
   endif
 
-  if (debug) Write (*, *) '   Begin matrix assembly...'
+  if (debug_level >= psb_debug_ext_)&
+       & write(debug_unit, *) me,' ',trim(name),&
+       & '   Begin matrix assembly...'
 
   !check on errors encountered in psdspins
 
@@ -115,7 +119,9 @@ subroutine psb_dspasb(a,desc_a, info, afmt, upd, dupl)
 
   call psb_spcnv(a,info,afmt=afmt,upd=upd,dupl=dupl)
 
-  IF (debug) WRITE (*, *) me,'   ASB:  From SPCNV',info,' ',A%FIDA
+  IF (debug_level >= psb_debug_ext_)&
+       & write(debug_unit, *) me,' ',trim(name),':  From SPCNV',&
+       & info,' ',A%FIDA
   if (info /= psb_no_err_) then    
     info=4010
     ch_err='psb_spcnv'

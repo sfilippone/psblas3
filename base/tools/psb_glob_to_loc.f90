@@ -37,7 +37,7 @@
 ! Arguments: 
 !    x(:)     - integer                   Array containing the indices to be translated.
 !    y(:)     - integer                   Array containing the translated indices.
-!    desc_a   - type(<psb_desc_type>).    The communication descriptor.        
+!    desc_a   - type(psb_desc_type).    The communication descriptor.        
 !    info     - integer.                  return code.
 !    iact     - character, optional       A character defining the behaviour on 
 !                                         an index not belonging to the calling process
@@ -63,12 +63,11 @@ subroutine psb_glob_to_loc2(x,y,desc_a,info,iact,owned)
   logical, intent(in),  optional     :: owned
 
   !....locals....
-  integer                            ::  n
-  character                          ::  act
-  integer                            ::  int_err(5), err_act
-  real(kind(1.d0))                   ::  real_val
+  integer                            :: n
+  character                          :: act
+  integer                            :: int_err(5), err_act
   logical                            :: owned_
-  integer, parameter                 ::  zero=0
+  integer, parameter                 :: zero=0
   character(len=20)   :: name
 
   if(psb_get_errstatus() /= 0) return 
@@ -88,9 +87,7 @@ subroutine psb_glob_to_loc2(x,y,desc_a,info,iact,owned)
     owned_=.false.
   end if
     
-  int_err=0
-  real_val = 0.d0
-
+  int_err  = 0
   n = size(x)
   call psi_idx_cnv(n,x,y,desc_a,info,owned=owned_)
 
@@ -163,7 +160,7 @@ end subroutine psb_glob_to_loc2
 ! Arguments: 
 !    x(:)     - integer                   Array containing the indices to be translated.
 !                                         overwritten on output with the result.  
-!    desc_a   - type(<psb_desc_type>).    The communication descriptor.        
+!    desc_a   - type(psb_desc_type).    The communication descriptor.        
 !    info     - integer.                  return code.
 !    iact     - character, optional       A character defining the behaviour on 
 !                                         an index not belonging to the calling process

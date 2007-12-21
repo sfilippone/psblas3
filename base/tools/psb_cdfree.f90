@@ -34,7 +34,7 @@
 !   Frees a descriptor data structure.
 ! 
 ! Arguments: 
-!    desc_a   - type(<psb_desc_type>).         The communication descriptor to be freed.
+!    desc_a   - type(psb_desc_type).         The communication descriptor to be freed.
 !    info     - integer.                       return code.
 subroutine psb_cdfree(desc_a,info)
   !...free descriptor structure...

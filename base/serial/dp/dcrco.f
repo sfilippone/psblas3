@@ -35,6 +35,7 @@ C
       use psb_const_mod
       use psb_spmat_type
       use psb_string_mod
+      use psb_error_mod
       IMPLICIT NONE
 
 C
@@ -54,23 +55,27 @@ C     .. Local Scalars ..
 c     .. Local Arrays ..
       CHARACTER*20       NAME
       INTEGER            INT_VAL(5)
-      logical, parameter :: debug=.false.
+      integer              :: debug_level, debug_unit
 C     .. External Subroutines ..
       EXTERNAL           MAX_NNZERO
 C     .. Executable Statements ..
 C
 
-      NAME = 'DCRCO\0'
+      NAME = 'DCRCO'
       IERROR = 0
       CALL FCPSB_ERRACTIONSAVE(ERR_ACT)
+      debug_unit  = psb_get_debug_unit()
+      debug_level = psb_get_debug_level()
 
       IF (toupper(TRANS).EQ.'N') THEN
          SCALE  = (toupper(UNITD).EQ.'L') ! meaningless
          IP1(1) = 0
          IP2(1) = 0
          NNZ = IA2(M+1)-1
-         if (debug) write(0,*) 'CRCO: ',m,n,nnz,' : ',
-     +     descra,' : ',descrn
+         if (debug_level >= psb_debug_serial_)
+     +     write(debug_unit,*) trim(name),': entry',m,n,nnz,
+     +     ' : ',descra,' : ',descrn
+
          IF (LARN.LT.NNZ) THEN
           IERROR = 60
           INT_VAL(1) = 18
@@ -106,7 +111,10 @@ C        ... Construct COO Representation...
                ENDDO
             ENDDO
             INFON(psb_nnz_) = elem
-            if (debug) write(0,*) 'CRCO endloop',m,elem
+
+            if (debug_level >= psb_debug_serial_)
+     +        write(debug_unit,*)  trim(name),': endloop',m,elem
+
          ELSE IF (toupper(DESCRA(1:1)).EQ.'S' .AND.
      +        toupper(DESCRA(2:2)).EQ.'U') THEN
 

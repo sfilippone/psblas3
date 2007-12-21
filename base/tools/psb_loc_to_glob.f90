@@ -37,7 +37,7 @@
 ! Arguments: 
 !    x(:)     - integer                   Array containing the indices to be translated.
 !    y(:)     - integer                   Array containing the translated indices.
-!    desc_a   - type(<psb_desc_type>).    The communication descriptor.        
+!    desc_a   - type(psb_desc_type).    The communication descriptor.        
 !    info     - integer.                  return code.
 !    iact     - character, optional       A character defining the behaviour on 
 !                                         an out of range index 
@@ -62,7 +62,6 @@ subroutine psb_loc_to_glob2(x,y,desc_a,info,iact)
   integer                            ::  n, i, tmp
   character                          ::  act
   integer                            ::  int_err(5), err_act
-  real(kind(1.d0))                   ::  real_val
   integer, parameter                 ::  zero=0
   character(len=20)   :: name
 
@@ -77,8 +76,6 @@ subroutine psb_loc_to_glob2(x,y,desc_a,info,iact)
     act='I'
   endif
   act=toupper(act)
-
-  real_val = 0.d0
 
   n=size(x)
   do i=1,n
@@ -166,7 +163,7 @@ end subroutine psb_loc_to_glob2
 ! Arguments: 
 !    x(:)     - integer                   Array containing the indices to be translated.
 !                                         Overwritten on output. 
-!    desc_a   - type(<psb_desc_type>).    The communication descriptor.        
+!    desc_a   - type(psb_desc_type).    The communication descriptor.        
 !    info     - integer.                  return code.
 !    iact     - character, optional       A character defining the behaviour on 
 !                                         an out of range index 
@@ -190,7 +187,6 @@ subroutine psb_loc_to_glob(x,desc_a,info,iact)
   integer                            ::  n ,i, tmp, err_act
   character                          ::  act
   integer                            ::  int_err(5)
-  real(kind(1.d0))                   ::  real_val
   integer, parameter                 ::  zero=0
   character(len=20)   :: name
 
@@ -205,8 +201,6 @@ subroutine psb_loc_to_glob(x,desc_a,info,iact)
     act='I'
   endif
   act = toupper(act)
-
-  real_val = 0.d0
 
   n=size(x)
   do i=1,n

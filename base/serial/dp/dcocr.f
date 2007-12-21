@@ -34,8 +34,9 @@ C
       SUBROUTINE DCOCR(TRANS,M,N,UNITD,D,DESCRA,AR,JA,IA,INFO,
      *  P1,DESCRN,ARN,IAN1,IAN2,INFON,P2,LARN,LIAN1,
      *  LIAN2,AUX,LAUX,IERROR)
-
+      
       use psb_const_mod
+      use psb_error_mod
       use psb_spmat_type
       use psb_string_mod
       IMPLICIT NONE
@@ -57,12 +58,11 @@ C     .. Local Scalars ..
       integer            elem, elem_csr,regen_flag
       logical            scale
       integer            max_nnzero
-      logical     debug
-      parameter   (debug=.false.)
       integer, allocatable :: itmp(:)
 c     .. local arrays ..
       character*20       name
       integer            int_val(5)
+      integer         :: debug_level, debug_unit
 
 c
 C     ...Common variables...
@@ -72,9 +72,11 @@ C     .. External Subroutines ..
 C     .. Executable Statements ..
 C
 
-      NAME = 'DCOCR\0'
+      NAME = 'DCOCR'
       IERROR = 0
       CALL FCPSB_ERRACTIONSAVE(ERR_ACT)
+      debug_unit  = psb_get_debug_unit()
+      debug_level = psb_get_debug_level()
 
       call psb_getifield(check_flag,psb_dupl_,infon,psb_ifasize_,ierror)
       call psb_getifield(regen_flag,psb_upd_,infon,psb_ifasize_,ierror)
@@ -84,10 +86,9 @@ C
         SCALE  = (toupper(UNITD).EQ.'L') ! meaningless
         P1(1) = 0
         P2(1) = 0
-
         nnz = info(1)
-        if (debug) then 
-          write(0,*) 'On entry to DCOCR: NNZ LAUX ',
+        if (debug_level >= psb_debug_serial_) then 
+          write(debug_unit,*) trim(name),': On entry  NNZ LAUX ',
      +      nnz,laux,larn,lian1,lian2
         endif
         IF (LAUX.LT.NNZ+2) THEN
@@ -139,10 +140,9 @@ C
 C
 C        Sort COO data structure
 C
-          if (debug) write(0,*)'First sort',nnz
-c$$$          write(0,*) 'DCOCR Sizes ',lian2,((m+1)+nnz+psb_ireg_flgs_+1),
-c$$$     +      m+1,nnz,psb_ireg_flgs_,
-c$$$     +      laux,2*(2+nnz)
+          if (debug_level >= psb_debug_serial_)
+     +      write(debug_unit,*) trim(name),': First sort',nnz
+
           if ((regen_flag==psb_upd_perm_).and.
      +      (lian2.ge.((m+1)+nnz+psb_ireg_flgs_+1))
      +      .and.(laux.ge.2*(2+nnz))) then 
@@ -162,17 +162,22 @@ c
             ian2(ip1+psb_nnz_)   = 0
             ian2(ip1+psb_ichk_)  = nnz+check_flag
 
-            if (debug) write(0,*) 'Build check :',ian2(ip1+psb_nnzt_) 
+            if (debug_level >= psb_debug_serial_)
+     +        write(debug_unit,*)  trim(name),
+     +        ': Build check :',ian2(ip1+psb_nnzt_) 
+
 C       .... Order with key IA ...
             call msort_up(nnz,itmp,aux,iret)
             if (iret.eq.0) call reordvn3(nnz,arn,itmp,ian1,aux(ipx),aux)
-            if (debug) then 
+            if (debug_level >= psb_debug_serial_) then 
               do i=1, nnz-1
                 if (itmp(i).gt.itmp(i+1)) then 
-                  write(0,*) 'Sorting error:',i,itmp(i),itmp(i+1)
+                  write(debug_unit,*)  trim(name),
+     +              'Sorting error:',i,itmp(i),itmp(i+1)
                 endif
               enddo
-              write(0,*) 'nnz :',m,nnz,itmp(nnz),ian1(nnz)
+              write(debug_unit,*)  trim(name),
+     +          'nnz :',m,nnz,itmp(nnz),ian1(nnz)
             endif
 
 C       .... Order with key JA ...
@@ -200,7 +205,10 @@ c        ... Insert first element ...
             do row = 1, itmp(1)
               ian2(row) = 1
             enddo
-            if (debug) write(0,*)'Rebuild CSR',ia(1),elem_csr
+            if (debug_level >= psb_debug_serial_)
+     +        write(debug_unit,*)  trim(name),
+     +        ': Rebuild CSR',ia(1),elem_csr
+
             ian1(elem_csr) = ian1(elem)
             arn(elem_csr)  = arn(elem)
             ian2(ip2+aux(ipx+elem-1)-1) = elem_csr
@@ -233,14 +241,10 @@ c                    ... error, there are duplicated elements ...
 c                    ... insert only the last duplicated element ...
                     arn(elem_csr-1) = arn(elem)
                     ian2(ip2+aux(ipx+elem-1)-1) = elem_csr-1
-                    if (debug) write(0,*) 'duplicated overwrite perm ',
-     +                elem_csr-1,elem
                   else if (check_flag.eq.psb_dupl_add_) then 
 c                    ... sum the duplicated element ...
                     arn(elem_csr-1) = arn(elem_csr-1) + arn(elem)
                     ian2(ip2+aux(ipx+elem-1)-1) = elem_csr-1
-                    if (debug) write(0,*) 'duplicated add perm ',
-     +                elem_csr-1,elem
                   end if
                 endif
                 elem = elem + 1
@@ -280,7 +284,10 @@ C        ... Insert first element ...
             do row = 1, itmp(1)
               ian2(row) = 1
             enddo
-            if (debug) write(0,*)'Rebuild CSR',ia(1),elem_csr
+            if (debug_level >= psb_debug_serial_)
+     +        write(debug_unit,*)  trim(name),
+     +        ': Rebuild CSR',ia(1),elem_csr
+
             ian1(elem_csr) = ian1(elem)
             arn(elem_csr)  = arn(elem)
             elem = elem+1
@@ -309,13 +316,9 @@ c     ... error, there are duplicated elements ...
                   else if (check_flag.eq.psb_dupl_ovwrt_) then
 c                    ... insert only the last duplicated element ...
                     arn(elem_csr-1) = arn(elem)
-                    if (debug) write(0,*) 'Duplicated overwrite srch',
-     +                elem_csr-1,elem
                   else if (check_flag.eq.psb_dupl_add_) then 
 c                    ... sum the duplicated element ...
                     arn(elem_csr-1) = arn(elem_csr-1) + arn(elem)
-                    if (debug) write(0,*) 'Duplicated add srch',
-     +                elem_csr-1,elem
                   end if
                 endif
                 elem = elem + 1
@@ -324,13 +327,9 @@ c                    ... sum the duplicated element ...
             enddo
           endif
 
-          if (debug) write(0,*)'Done Rebuild CSR',
+          if (debug_level >= psb_debug_serial_)
+     +      write(debug_unit,*)  trim(name),': Done Rebuild CSR',
      +      ian2(m+1),ia(elem)
-c$$$          if (debug) then 
-c$$$            do i=ian2(m+1), nnz
-c$$$              write(0,*) 'Overflow check :',ia(i),ja(i),ar(i)
-c$$$            enddo
-c$$$          endif
 
         ELSE IF (toupper(DESCRA(1:1)).EQ.'S' .AND.
      +      toupper(DESCRA(2:2)).EQ.'U') THEN
@@ -341,7 +340,6 @@ c$$$          endif
 
         else if (toupper(DESCRA(1:1)).EQ.'T' .AND.
      +      toupper(DESCRA(2:2)).EQ.'U') THEN
-
 
             call msort_up(nnz,itmp,aux,iret)
             if (iret.eq.0) call reordvn(nnz,arn,itmp,ian1,aux)
@@ -371,7 +369,10 @@ C        ... Insert first element ...
             do row = 1, itmp(1)
               ian2(row) = 1
             enddo
-            if (debug) write(0,*)'Rebuild CSR',ia(1),elem_csr
+            if (debug_level >= psb_debug_serial_)
+     +        write(debug_unit,*)  trim(name),
+     +        ': Rebuild CSR',ia(1),elem_csr
+
             ian1(elem_csr) = ian1(elem)
             arn(elem_csr)  = arn(elem)
             elem = elem+1
@@ -400,13 +401,9 @@ c     ... error, there are duplicated elements ...
                   else if (check_flag.eq.psb_dupl_ovwrt_) then
 c                    ... insert only the last duplicated element ...
                     arn(elem_csr-1) = arn(elem)
-                    if (debug) write(0,*) 'Duplicated overwrite srch',
-     +                elem_csr-1,elem
                   else if (check_flag.eq.psb_dupl_add_) then 
 c                    ... sum the duplicated element ...
                     arn(elem_csr-1) = arn(elem_csr-1) + arn(elem)
-                    if (debug) write(0,*) 'Duplicated add srch',
-     +                elem_csr-1,elem
                   end if
                 endif
                 elem = elem + 1
@@ -436,8 +433,6 @@ C       .... Order with key JA ...
               i = j
             enddo
 
-
-
 C        ... Construct CSR Representation...
             elem = 1
             elem_csr = 1
@@ -445,7 +440,10 @@ C        ... Insert first element ...
             do row = 1, itmp(1)
               ian2(row) = 1
             enddo
-            if (debug) write(0,*)'Rebuild CSR',ia(1),elem_csr
+            if (debug_level >= psb_debug_serial_)
+     +        write(debug_unit,*)  trim(name),
+     +        ': Rebuild CSR',ia(1),elem_csr
+
             ian1(elem_csr) = ian1(elem)
             arn(elem_csr)  = arn(elem)
             elem = elem+1
@@ -474,13 +472,9 @@ c     ... error, there are duplicated elements ...
                   else if (check_flag.eq.psb_dupl_ovwrt_) then
 c                    ... insert only the last duplicated element ...
                     arn(elem_csr-1) = arn(elem)
-                    if (debug) write(0,*) 'Duplicated overwrite srch',
-     +                elem_csr-1,elem
                   else if (check_flag.eq.psb_dupl_add_) then 
 c                    ... sum the duplicated element ...
                     arn(elem_csr-1) = arn(elem_csr-1) + arn(elem)
-                    if (debug) write(0,*) 'Duplicated add srch',
-     +                elem_csr-1,elem
                   end if
                 endif
                 elem = elem + 1
@@ -488,13 +482,9 @@ c                    ... sum the duplicated element ...
               ian2(row+1) = elem_csr
             enddo
           
-          if (debug) write(0,*)'Done Rebuild CSR',
-     +      ian2(m+1),ia(elem)
-          if (debug) then 
-            do i=ian2(m+1), nnz
-              write(0,*) 'Overflow check :',ia(i),ja(i),ar(i)
-            enddo
-          endif
+          if (debug_level >= psb_debug_serial_)
+     +        write(debug_unit,*)  trim(name),': Done Rebuild CSR',
+     +        ian2(m+1),ia(elem)
 
 
         end if

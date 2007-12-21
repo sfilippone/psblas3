@@ -58,7 +58,6 @@ contains
     character(len=*), parameter :: fmt10='(a72,a8,/,5i14,/,a3,11x,4i14,/,2a16,2a20)'
     character(len=*), parameter :: fmt11='(a1,13x,2i14)'
     character(len=*), parameter :: fmt111='(1x,a8,1x,i8,1x,a10)'
-    logical, parameter :: debug=.false.
 
     iret = 0
 
@@ -307,7 +306,6 @@ contains
     character(len=*), parameter :: fmt10='(a72,a8,/,5i14,/,a3,11x,4i14,/,2a16,2a20)'
     character(len=*), parameter :: fmt11='(a1,13x,2i14)'
     character(len=*), parameter :: fmt111='(1x,a8,1x,i8,1x,a10)'
-    logical, parameter :: debug=.false.
 
     iret = 0
 

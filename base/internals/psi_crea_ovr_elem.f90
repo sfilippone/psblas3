@@ -38,7 +38,7 @@
 ! 
 ! Arguments: 
 !    ovr_elem(:) - integer, allocatable      Array containing the output list              
-!    desc_a   - type(<psb_desc_type>).    The communication descriptor.        
+!    desc_a   - type(psb_desc_type).    The communication descriptor.        
 !    info     - integer.                  return code.
 ! 
 subroutine psi_crea_ovr_elem(desc_overlap,ovr_elem,info)
@@ -84,6 +84,8 @@ subroutine psi_crea_ovr_elem(desc_overlap,ovr_elem,info)
 
   if (usetree)  then 
 
+    !
+    ! This is now here just for historical reasons. 
     !
     ! While running through the column indices exchanged with other procs
     ! we have to record them in overlap_elem.  We do this by maintaining  
@@ -148,7 +150,7 @@ subroutine psi_crea_ovr_elem(desc_overlap,ovr_elem,info)
 
   else if (.not.usetree)  then 
 
-
+    ! Simple alternative. 
     insize = size(desc_overlap)
     insize = max(1,(insize+1)/2)
     allocate(telem(insize,2),stat=info)

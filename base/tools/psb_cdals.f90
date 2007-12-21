@@ -28,9 +28,9 @@
 !!$  POSSIBILITY OF SUCH DAMAGE.
 !!$ 
 !!$  
-! File: psb_cdall.f90
+! File: psb_cdals.f90
 !
-! Subroutine: psb_cdall
+! Subroutine: psb_cdals
 !    Allocate descriptor
 !    and checks correctness of PARTS subroutine
 ! 
@@ -40,7 +40,7 @@
 !    parts   - external subroutine.           The routine that contains the 
 !                                                 partitioning scheme.
 !    ictxt - integer.                         The communication context.
-!    desc_a  - type(<psb_desc_type>).         The communication descriptor.
+!    desc_a  - type(psb_desc_type).         The communication descriptor.
 !    info    - integer.                       Error code (if any).
 subroutine psb_cdals(m, n, parts, ictxt, desc_a, info)
   use psb_error_mod
@@ -57,21 +57,25 @@ subroutine psb_cdals(m, n, parts, ictxt, desc_a, info)
   integer, intent(out)                :: info
 
   !locals
-  Integer             :: counter,i,j,np,me,loc_row,err,loc_col,nprocs,&
+  Integer              :: counter,i,j,np,me,loc_row,err,loc_col,nprocs,&
        & l_ov_ix,l_ov_el,idx, err_act, itmpov, k, glx 
-  integer             :: int_err(5),exch(3)
+  integer              :: int_err(5),exch(3)
   integer, allocatable  :: prc_v(:), temp_ovrlap(:), ov_idx(:),ov_el(:)
-  logical, parameter  :: debug=.false.
-  character(len=20)   :: name
+  integer              :: debug_level, debug_unit
+  character(len=20)    :: name
 
   if(psb_get_errstatus() /= 0) return 
   info=0
   err=0
   name = 'psb_cdall'
   call psb_erractionsave(err_act)
+  debug_unit  = psb_get_debug_unit()
+  debug_level = psb_get_debug_level()
+  
 
   call psb_info(ictxt, me, np)
-  if (debug) write(*,*) 'psb_cdall: ',np,me
+  if (debug_level >= psb_debug_ext_) &
+       & write(debug_unit,*) me,' ',trim(name),': ',np
   !     ....verify blacs grid correctness..
 
   !... check m and n parameters....
@@ -92,7 +96,8 @@ subroutine psb_cdals(m, n, parts, ictxt, desc_a, info)
   endif
 
 
-  if (debug) write(*,*) 'psb_cdall:  doing global checks'  
+  if (debug_level >= psb_debug_ext_) &
+       & write(debug_unit,*) me,' ',trim(name),':  doing global checks'  
   !global check on m and n parameters
   if (me == psb_root_) then
     exch(1)=m
@@ -142,7 +147,8 @@ subroutine psb_cdals(m, n, parts, ictxt, desc_a, info)
   call psb_get_mpicomm(ictxt,desc_a%matrix_data(psb_mpi_c_))
 
 
-  if (debug) write(*,*) 'PSB_CDALL:  starting main loop' ,info
+  if (debug_level >= psb_debug_ext_) &
+       & write(debug_unit,*) me,' ',trim(name),':  starting main loop' ,info
   counter = 0
   itmpov  = 0
   temp_ovrlap(:) = -1
@@ -350,10 +356,12 @@ subroutine psb_cdals(m, n, parts, ictxt, desc_a, info)
   end if
 
   ! check on parts function
-  if (debug) write(*,*) 'PSB_CDALL:  End main loop:' ,loc_row,itmpov,info
+  if (debug_level >= psb_debug_ext_) &
+       & write(debug_unit,*) me,' ',trim(name),':  End main loop:' ,loc_row,itmpov,info
 
 
-  if (debug) write(*,*) 'PSB_CDALL:  error check:' ,err
+  if (debug_level >= psb_debug_ext_) &
+       & write(debug_unit,*) me,' ',trim(name),':  error check:' ,err
 
   l_ov_ix=0
   l_ov_el=0
@@ -371,7 +379,8 @@ subroutine psb_cdals(m, n, parts, ictxt, desc_a, info)
   l_ov_ix = l_ov_ix+3  
   l_ov_el = l_ov_el+3
 
-  if (debug) write(*,*) 'PSB_CDALL: Ov len',l_ov_ix,l_ov_el
+  if (debug_level >= psb_debug_ext_) &
+       & write(debug_unit,*) me,' ',trim(name),': Ov len',l_ov_ix,l_ov_el
   allocate(ov_idx(l_ov_ix),ov_el(l_ov_el), stat=info)
   if (info /= psb_no_err_) then
     info=4010
@@ -430,6 +439,8 @@ subroutine psb_cdals(m, n, parts, ictxt, desc_a, info)
   desc_a%halo_index(:) = -1
   desc_a%ext_index(:) = -1
 
+  if (debug_level >= psb_debug_ext_) &
+       & write(debug_unit,*) me,' ',trim(name),': end'
 
   call psb_erractionrestore(err_act)
   return

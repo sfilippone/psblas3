@@ -26,11 +26,14 @@ contains
     real(kind(1.d0)), allocatable  :: work(:)
     integer :: err_act
     character(len=20)  :: name
-    logical, parameter :: debug=.false.
+    integer            :: debug_level, debug_unit
+
 
     name='psb_spcnv'
     info = 0
     call psb_erractionsave(err_act)
+    debug_unit  = psb_get_debug_unit()
+    debug_level = psb_get_debug_level()
 
 
     !
@@ -47,19 +50,21 @@ contains
         goto 9999
       end if
 
-      if (debug) write(0,*) 'Regeneration with psb_upd_perm_'
+      if (debug_level >= psb_debug_serial_)&
+           & write(debug_unit,*)  trim(name),'Regeneration with psb_upd_perm_'
       ip1   = psb_sp_getifld(psb_upd_pnt_,a,info) 
       ip2   = a%ia2(ip1+psb_ip2_)
       nnz   = a%ia2(ip1+psb_nnz_)
       iflag = a%ia2(ip1+psb_iflag_)
       ichk  = a%ia2(ip1+psb_ichk_)
       nnzt  = a%ia2(ip1+psb_nnzt_)
-      if (debug) write(*,*) 'Regeneration start: ',&
+      if (debug_level >= psb_debug_serial_) &
+           & write(debug_unit,*)  trim(name),'Regeneration start: ',&
            &   a%infoa(psb_upd_),psb_upd_perm_,nnz,nnzt ,iflag,info
 
       if ((ichk/=nnzt+iflag).or.(nnz/=nnzt)) then               
         info = 8889
-        write(*,*) 'Regeneration start error: ',&
+        write(debug_unit,*) trim(name),'Regeneration start error: ',&
              &   a%infoa(psb_upd_),psb_upd_perm_,nnz,nnzt ,iflag,ichk    
         call psb_errpush(info,name)
         goto 9999
@@ -89,7 +94,9 @@ contains
 
     case(psb_upd_srch_)
       ! Nothing to be done  here. 
-      if (debug) write(0,*) 'Going through on regeneration with psb_upd_srch_'
+      if (debug_level >= psb_debug_serial_)&
+           & write(debug_unit,*)  trim(name),&
+           & 'Going through on regeneration with psb_upd_srch_'
     case default
       ! Wrong value
       info = 8888
@@ -125,11 +132,14 @@ contains
     real(kind(1.d0)), allocatable  :: work(:)
     integer :: err_act
     character(len=20)  :: name
-    logical, parameter :: debug=.false.
+    integer            :: debug_level, debug_unit
+
 
     name='psb_spcnv'
     info = 0
     call psb_erractionsave(err_act)
+    debug_unit  = psb_get_debug_unit()
+    debug_level = psb_get_debug_level()
 
 
     !
@@ -146,19 +156,21 @@ contains
         goto 9999
       end if
 
-      if (debug) write(0,*) 'Regeneration with psb_upd_perm_'
+      if (debug_level >= psb_debug_serial_)&
+           & write(debug_unit,*)  trim(name),'Regeneration with psb_upd_perm_'
       ip1   = psb_sp_getifld(psb_upd_pnt_,a,info) 
       ip2   = a%ia2(ip1+psb_ip2_)
       nnz   = a%ia2(ip1+psb_nnz_)
       iflag = a%ia2(ip1+psb_iflag_)
       ichk  = a%ia2(ip1+psb_ichk_)
       nnzt  = a%ia2(ip1+psb_nnzt_)
-      if (debug) write(*,*) 'Regeneration start: ',&
+      if (debug_level >= psb_debug_serial_)&
+           & write(debug_unit,*) trim(name),'Regeneration start: ',&
            &   a%infoa(psb_upd_),psb_upd_perm_,nnz,nnzt ,iflag,info
 
       if ((ichk/=nnzt+iflag).or.(nnz/=nnzt)) then               
         info = 8889
-        write(*,*) 'Regeneration start error: ',&
+        write(debug_unit,*) trim(name),'Regeneration start error: ',&
              &   a%infoa(psb_upd_),psb_upd_perm_,nnz,nnzt ,iflag,ichk    
         call psb_errpush(info,name)
         goto 9999
@@ -188,7 +200,9 @@ contains
 
     case(psb_upd_srch_)
       ! Nothing to be done  here. 
-      if (debug) write(0,*) 'Going through on regeneration with psb_upd_srch_'
+      if (debug_level >= psb_debug_serial_) &
+           & write(debug_unit,*) trim(name),&
+           & 'Going through on regeneration with psb_upd_srch_'
     case default
       ! Wrong value
       info = 8888
@@ -224,11 +238,13 @@ contains
     real(kind(1.d0)), allocatable  :: work(:)
     integer :: err_act
     character(len=20)  :: name
-    logical, parameter :: debug=.false.
+    integer            :: debug_level, debug_unit
 
     name='psb_spcnv'
     info = 0
     call psb_erractionsave(err_act)
+    debug_unit  = psb_get_debug_unit()
+    debug_level = psb_get_debug_level()
 
 
     !
@@ -245,19 +261,21 @@ contains
         goto 9999
       end if
 
-      if (debug) write(0,*) 'Regeneration with psb_upd_perm_'
+      if (debug_level >= psb_debug_serial_)&
+           & write(debug_unit,*) trim(name),'Regeneration with psb_upd_perm_'
       ip1   = psb_sp_getifld(psb_upd_pnt_,a,info) 
       ip2   = a%ia1(ip1+psb_ip2_)
       nnz   = a%ia1(ip1+psb_nnz_)
       iflag = a%ia1(ip1+psb_iflag_)
       ichk  = a%ia1(ip1+psb_ichk_)
       nnzt  = a%ia1(ip1+psb_nnzt_)
-      if (debug) write(*,*) 'Regeneration start: ',&
+      if (debug_level >= psb_debug_serial_)&
+           & write(debug_unit,*) trim(name),'Regeneration start: ',&
            &   a%infoa(psb_upd_),psb_upd_perm_,nnz,nnzt ,iflag,info
 
       if ((ichk/=nnzt+iflag).or.(nnz/=nnzt)) then               
         info = 8889
-        write(*,*) 'Regeneration start error: ',&
+        write(debug_unit,*) trim(name),'Regeneration start error: ',&
              &   a%infoa(psb_upd_),psb_upd_perm_,nnz,nnzt ,iflag,ichk    
         call psb_errpush(info,name)
         goto 9999
@@ -287,7 +305,9 @@ contains
 
     case(psb_upd_srch_)
       ! Nothing to be done  here. 
-      if (debug) write(0,*) 'Going through on regeneration with psb_upd_srch_'
+      if (debug_level >= psb_debug_serial_)&
+           & write(debug_unit,*) trim(name),&
+           & 'Going through on regeneration with psb_upd_srch_'
     case default
       ! Wrong value
       info = 8888
@@ -325,11 +345,13 @@ contains
     complex(kind(1.d0)), allocatable  :: work(:)
     integer :: err_act
     character(len=20)  :: name
-    logical, parameter :: debug=.false.
-
+    integer            :: debug_level, debug_unit
+  
     name='psb_spcnv'
     info = 0
     call psb_erractionsave(err_act)
+    debug_unit  = psb_get_debug_unit()
+    debug_level = psb_get_debug_level()
 
 
     !
@@ -346,19 +368,21 @@ contains
         goto 9999
       end if
 
-      if (debug) write(0,*) 'Regeneration with psb_upd_perm_'
+      if (debug_level >= psb_debug_serial_) &
+           & write(debug_unit,*)  trim(name),'Regeneration with psb_upd_perm_'
       ip1   = psb_sp_getifld(psb_upd_pnt_,a,info) 
       ip2   = a%ia2(ip1+psb_ip2_)
       nnz   = a%ia2(ip1+psb_nnz_)
       iflag = a%ia2(ip1+psb_iflag_)
       ichk  = a%ia2(ip1+psb_ichk_)
       nnzt  = a%ia2(ip1+psb_nnzt_)
-      if (debug) write(*,*) 'Regeneration start: ',&
+      if (debug_level >= psb_debug_serial_)&
+           &  write(debug_unit,*) trim(name),'Regeneration start: ',&
            &   a%infoa(psb_upd_),psb_upd_perm_,nnz,nnzt ,iflag,info
 
       if ((ichk/=nnzt+iflag).or.(nnz/=nnzt)) then               
         info = 8889
-        write(*,*) 'Regeneration start error: ',&
+        write(debug_unit,*) trim(name),'Regeneration start error: ',&
              &   a%infoa(psb_upd_),psb_upd_perm_,nnz,nnzt ,iflag,ichk    
         call psb_errpush(info,name)
         goto 9999
@@ -388,7 +412,9 @@ contains
 
     case(psb_upd_srch_)
       ! Nothing to be done  here. 
-      if (debug) write(0,*) 'Going through on regeneration with psb_upd_srch_'
+      if (debug_level >= psb_debug_serial_) &
+           & write(debug_unit,*) trim(name),&
+           & 'Going through on regeneration with psb_upd_srch_'
     case default
       ! Wrong value
       info = 8888
@@ -424,12 +450,13 @@ contains
     complex(kind(1.d0)), allocatable  :: work(:)
     integer :: err_act
     character(len=20)  :: name
-    logical, parameter :: debug=.false.
+    integer            :: debug_level, debug_unit
 
     name='psb_spcnv'
     info = 0
     call psb_erractionsave(err_act)
-
+    debug_unit  = psb_get_debug_unit()
+    debug_level = psb_get_debug_level()
 
     !
     !   dupl_ and upd_ fields should not be changed. 
@@ -445,19 +472,21 @@ contains
         goto 9999
       end if
 
-      if (debug) write(0,*) 'Regeneration with psb_upd_perm_'
+      if (debug_level >= psb_debug_serial_) &
+           & write(debug_unit,*) trim(name),'Regeneration with psb_upd_perm_'
       ip1   = psb_sp_getifld(psb_upd_pnt_,a,info) 
       ip2   = a%ia2(ip1+psb_ip2_)
       nnz   = a%ia2(ip1+psb_nnz_)
       iflag = a%ia2(ip1+psb_iflag_)
       ichk  = a%ia2(ip1+psb_ichk_)
       nnzt  = a%ia2(ip1+psb_nnzt_)
-      if (debug) write(*,*) 'Regeneration start: ',&
+      if (debug_level >= psb_debug_serial_)&
+           & write(debug_unit,*) trim(name),'Regeneration start: ',&
            &   a%infoa(psb_upd_),psb_upd_perm_,nnz,nnzt ,iflag,info
 
       if ((ichk/=nnzt+iflag).or.(nnz/=nnzt)) then               
         info = 8889
-        write(*,*) 'Regeneration start error: ',&
+        write(debug_unit,*) trim(name),'Regeneration start error: ',&
              &   a%infoa(psb_upd_),psb_upd_perm_,nnz,nnzt ,iflag,ichk    
         call psb_errpush(info,name)
         goto 9999
@@ -487,7 +516,9 @@ contains
 
     case(psb_upd_srch_)
       ! Nothing to be done  here. 
-      if (debug) write(0,*) 'Going through on regeneration with psb_upd_srch_'
+      if (debug_level >= psb_debug_serial_)&
+           &  write(debug_unit,*) trim(name),&
+           & 'Going through on regeneration with psb_upd_srch_'
     case default
       ! Wrong value
       info = 8888
@@ -523,11 +554,13 @@ contains
     complex(kind(1.d0)), allocatable  :: work(:)
     integer :: err_act
     character(len=20)  :: name
-    logical, parameter :: debug=.false.
+    integer            :: debug_level, debug_unit
 
     name='psb_spcnv'
     info = 0
     call psb_erractionsave(err_act)
+    debug_unit  = psb_get_debug_unit()
+    debug_level = psb_get_debug_level()
 
 
     !
@@ -544,20 +577,22 @@ contains
         goto 9999
       end if
 
-      if (debug) write(0,*) 'Regeneration with psb_upd_perm_'
+      if (debug_level >= psb_debug_serial_) &
+           & write(debug_unit,*) trim(name),'Regeneration with psb_upd_perm_'
       ip1   = psb_sp_getifld(psb_upd_pnt_,a,info) 
       ip2   = a%ia1(ip1+psb_ip2_)
       nnz   = a%ia1(ip1+psb_nnz_)
       iflag = a%ia1(ip1+psb_iflag_)
       ichk  = a%ia1(ip1+psb_ichk_)
       nnzt  = a%ia1(ip1+psb_nnzt_)
-      if (debug) write(*,*) 'Regeneration start: ',&
-           &   a%infoa(psb_upd_),psb_upd_perm_,nnz,nnzt ,iflag,info
+      if (debug_level >= psb_debug_serial_) &
+           & write(debug_unit,*) trim(name),'Regeneration start: ',&
+           & a%infoa(psb_upd_),psb_upd_perm_,nnz,nnzt ,iflag,info
 
       if ((ichk/=nnzt+iflag).or.(nnz/=nnzt)) then               
         info = 8889
-        write(*,*) 'Regeneration start error: ',&
-             &   a%infoa(psb_upd_),psb_upd_perm_,nnz,nnzt ,iflag,ichk    
+        write(debug_unit,*) trim(name),'Regeneration start error: ',&
+             & a%infoa(psb_upd_),psb_upd_perm_,nnz,nnzt ,iflag,ichk    
         call psb_errpush(info,name)
         goto 9999
       endif
@@ -586,7 +621,9 @@ contains
 
     case(psb_upd_srch_)
       ! Nothing to be done  here. 
-      if (debug) write(0,*) 'Going through on regeneration with psb_upd_srch_'
+      if (debug_level >= psb_debug_serial_) &
+           & write(debug_unit,*) trim(name),&
+           & 'Going through on regeneration with psb_upd_srch_'
     case default
       ! Wrong value
       info = 8888

@@ -28,13 +28,14 @@
 !!$  POSSIBILITY OF SUCH DAMAGE.
 !!$ 
 !!$  
-! File: psb_cdasb.f90
+! File: psb_icdasb.f90
 !
-! Subroutine: psb_cdasb
-!   Assemble the psblas communications descriptor.
+! Subroutine: psb_icdasb
+!   Assemble the psblas communications descriptor: inner part.
+!   The user callable routine is defined in the psb_tools_mod module.
 ! 
 ! Arguments: 
-!    desc_a  - type(<psb_desc_type>).         The communication descriptor.
+!    desc_a  - type(psb_desc_type).         The communication descriptor.
 !    info    - integer.                       return code.
 !    ext_hv  - logical                        Essentially this distinguishes a call 
 !                                             coming from the build of an extended
@@ -64,17 +65,19 @@ subroutine psb_icdasb(desc_a,info,ext_hv)
   integer          ::  int_err(5)
   integer,allocatable ::  ovrlap_index(:),halo_index(:), ext_index(:)
 
-  integer          ::  i,np,me, n_col, dectype, err_act, icomm
-  integer                       :: ictxt,n_row
-  logical                       :: ext_hv_
-  logical, parameter            :: debug=.false., debugwrt=.false.
-  character(len=20)             :: name
+  integer             ::  i,np,me, n_col, dectype, err_act, icomm
+  integer             :: ictxt,n_row
+  logical             :: ext_hv_
+  integer             :: debug_level, debug_unit
+  character(len=20)   :: name
 
   info = 0
   int_err(1) = 0
   name = 'psb_cdasb'
 
   call psb_erractionsave(err_act)
+  debug_unit  = psb_get_debug_unit()
+  debug_level = psb_get_debug_level()
 
   ictxt   = psb_cd_get_context(desc_a)
   dectype = psb_cd_get_dectype(desc_a)
@@ -102,10 +105,12 @@ subroutine psb_icdasb(desc_a,info,ext_hv)
   else
     ext_hv_ = .false.
   end if
-  if (debug) write (0, *) '   Begin matrix assembly...'
+  if (debug_level >= psb_debug_ext_) &
+       & write(debug_unit, *) me,' ',trim(name),': start'
 
   if (psb_is_bld_desc(desc_a)) then 
-    if (debug) write(0,*) 'psb_cdasb: Checking rows insertion'
+    if (debug_level >= psb_debug_ext_) &
+         & write(debug_unit,*) me,' ',trim(name),': Checking rows insertion'
     ! check if all local row are inserted
     do i=1,psb_cd_get_local_cols(desc_a)
       if (desc_a%loc_to_glob(i) < 0) then
@@ -124,6 +129,8 @@ subroutine psb_icdasb(desc_a,info,ext_hv)
     ! If large index space, we have to pre-process and rebuild
     ! the list of halo indices as if it was in small index space    
     if (psb_is_large_desc(desc_a)) then 
+      if (debug_level >= psb_debug_ext_) &
+           & write(debug_unit,*) me,' ',trim(name),': Large descriptor, calling ldsc_pre_halo'
       call psi_ldsc_pre_halo(desc_a,ext_hv_,info)
     end if
 
@@ -132,6 +139,8 @@ subroutine psb_icdasb(desc_a,info,ext_hv)
     call psb_transfer(desc_a%halo_index,halo_index,info)
     call psb_transfer(desc_a%ext_index,ext_index,info)
 
+    if (debug_level >= psb_debug_ext_) &
+         & write(debug_unit,*) me,' ',trim(name),': Final conversion'
     ! Then convert and put them back where they belong.    
     call psi_cnv_dsc(halo_index,ovrlap_index,ext_index,desc_a,info) 
     if (info /= 0) then
@@ -163,9 +172,10 @@ subroutine psb_icdasb(desc_a,info,ext_hv)
     info = 600
     call psb_errpush(info,name)
     goto 9999
-    if (debug) write(0,*) 'dectype 2 :',psb_cd_get_dectype(desc_a),&
-         &psb_desc_bld_,psb_desc_asb_,psb_desc_upd_
   endif
+
+  if (debug_level >= psb_debug_ext_) &
+       & write(debug_unit,*) me,' ',trim(name),': Done'
 
   call psb_erractionrestore(err_act)
   return

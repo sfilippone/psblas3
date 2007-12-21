@@ -118,6 +118,7 @@ C
 C
       SUBROUTINE DCSRP(TRANS,M,N,FIDA,DESCRA,IA1,IA2,INFOA,
      +  P,WORK,LWORK,IERROR)
+      use psb_error_mod
       IMPLICIT NONE                                                      
 C     .. Scalar Arguments ..
       INTEGER          LWORK, M, N, IERROR
@@ -130,9 +131,7 @@ C     .. Array Arguments ..
       CHARACTER        DESCRA*11, FIDA*5
 C     .. External Subroutines ..
       EXTERNAL          DCSRRP
-      logical          debug
-      parameter        (debug=.false.)
-
+      integer         :: debug_level, debug_unit
       CHARACTER*20      NAME
 C
 C     .. Executable Statements ..
@@ -140,7 +139,9 @@ C
 C
 C     Check on M, N, TRANS
 C
-      NAME = 'DCSRP\0'
+      NAME = 'DCSRP'
+      debug_unit  = psb_get_debug_unit()
+      debug_level = psb_get_debug_level()
       IERROR = 0
       CALL FCPSB_ERRACTIONSAVE(ERR_ACT)
 
@@ -167,14 +168,15 @@ C
 C
 C     Switching on FIDA
 C
-c$$$      write(0,*) 'DCSRP FORMAT: ',fida
       IF  (FIDA(1:3).EQ.'CSR') THEN
 C
 C        Permuting CSR structure
 C
          CALL DCSRRP(TRANS,M,N,DESCRA,IA1,IA2,P,WORK,LWORK)
       ELSE IF (FIDA(1:3).EQ.'JAD') THEN
-        if (debug) write(0,*) 'Calling djadrp',m,p(1),lwork
+        if (debug_level >= psb_debug_serial_comp_)
+     +    write(debug_unit,*)  trim(name),
+     +    ': Calling djadrp',m,p(1),lwork
          CALL DJADRP(TRANS,M,N,DESCRA,IA1,IA2,P,WORK,LWORK)
       ELSE
 C

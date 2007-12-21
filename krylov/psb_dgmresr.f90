@@ -70,37 +70,35 @@
 !    This subroutine implements the restarted GMRES method with right
 !    preconditioning.
 !
-!
 ! Arguments:
 !
-!    a      -  type(<psb_dspmat_type>)      Input: sparse matrix containing A.
-!    prec   -  type(<psb_dprec_type>)       Input: preconditioner
-!    b      -  real,dimension(:)            Input: vector containing the
-!                                           right hand side B
-!    x      -  real,dimension(:)            Input/Output: vector containing the
-!                                           initial guess and final solution X.
-!    eps    -  real                         Input: Stopping tolerance; the iteration is
-!                                           stopped when the error estimate
-!                                           |err| <= eps
-!    desc_a -  type(<psb_desc_type>).       Input: The communication descriptor.
-!    info   -  integer.                     Output: Return code
+!    a      -  type(psb_dspmat_type)      Input: sparse matrix containing A.
+!    prec   -  type(psb_dprec_type)       Input: preconditioner
+!    b      -  real,dimension(:)          Input: vector containing the
+!                                         right hand side B
+!    x      -  real,dimension(:)          Input/Output: vector containing the
+!                                         initial guess and final solution X.
+!    eps    -  real                       Input: Stopping tolerance; the iteration is
+!                                         stopped when the error estimate |err| <= eps
+!    desc_a -  type(psb_desc_type).       Input: The communication descriptor.
+!    info   -  integer.                   Output: Return code
 !
-!    itmax  -  integer(optional)            Input: maximum number of iterations to be
-!                                           performed.
-!    iter   -  integer(optional)            Output: how many iterations have been
-!                                           performed.
-!    err    -  real   (optional)            Output: error estimate on exit
-!    itrace -  integer(optional)            Input: print an informational message
-!                                           with the error estimate every itrace
-!                                           iterations
-!    irst   -  integer(optional)            Input: restart parameter
-!                                           
-!    istop  -  integer(optional)            Input: stopping criterion, or how
-!                                           to estimate the error. 
-!                                           1: err =  |r|/|b|
-!                                           2: err =  |r|/(|a||x|+|b|)
-!                                           where r is the (preconditioned, recursive
-!                                           estimate of) residual 
+!    itmax  -  integer(optional)          Input: maximum number of iterations to be
+!                                         performed.
+!    iter   -  integer(optional)          Output: how many iterations have been
+!                                         performed.
+!    err    -  real   (optional)          Output: error estimate on exit
+!    itrace -  integer(optional)          Input: print an informational message
+!                                         with the error estimate every itrace
+!                                         iterations
+!    irst   -  integer(optional)          Input: restart parameter
+!                                         
+!    istop  -  integer(optional)          Input: stopping criterion, or how
+!                                         to estimate the error. 
+!                                         1: err =  |r|/|b|
+!                                         2: err =  |r|/(|a||x|+|b|)
+!                                         where r is the (preconditioned, recursive
+!                                         estimate of) residual 
 ! 
 Subroutine psb_dgmresr(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,irst,istop)
   use psb_base_mod
@@ -127,7 +125,7 @@ Subroutine psb_dgmresr(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,irst,ist
   Logical, Parameter :: exchange=.True., noexchange=.False., use_drot=.true.
   Integer, Parameter :: irmax = 8
   Integer            :: itx, i, isvch, ictxt,istop_, err_act
-  Logical, Parameter :: debug = .false.
+  integer            :: debug_level, debug_unit
   Real(Kind(1.d0)) :: rni, xni, bni, ani,bn2, dt
   real(kind(1.d0)), external :: dnrm2
   character(len=20)          :: name
@@ -135,12 +133,13 @@ Subroutine psb_dgmresr(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,irst,ist
   info = 0
   name = 'psb_dgmres'
   call psb_erractionsave(err_act)
+  debug_unit  = psb_get_debug_unit()
+  debug_level = psb_get_debug_level()
 
-  If (debug) Write(0,*) 'entering psb_dgmres'
   ictxt = psb_cd_get_context(desc_a)
   Call psb_info(ictxt, me, np)
-
-  If (debug) Write(0,*) 'psb_dgmres: from gridinfo',np,me
+  if (debug_level >= psb_debug_ext_)&
+       & write(debug_unit,*) me,' ',trim(name),': from psb_info',np
 
   mglob = psb_cd_get_global_rows(desc_a)
   n_row = psb_cd_get_local_rows(desc_a)
@@ -157,7 +156,6 @@ Subroutine psb_dgmresr(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,irst,ist
 !
 
   if ((istop_ < 1 ).or.(istop_ > 2 ) ) then
-    write(0,*) 'psb_dgmres: invalid istop',istop_ 
     info=5001
     int_err(1)=istop_
     err=info
@@ -172,20 +170,23 @@ Subroutine psb_dgmresr(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,irst,ist
   Endif
 
   If (Present(itrace)) Then
-     itrace_ = itrace
+    itrace_ = itrace
   Else
-     itrace_ = 0
+    itrace_ = 0
   End If
   
   If (Present(irst)) Then
     nl = irst
-    If (debug) Write(0,*) 'present: irst: ',irst,nl
+    If (debug_level >= psb_debug_ext_) &
+         & write(debug_unit,*) me,' ',trim(name),&
+         & ' present: irst: ',irst,nl
   Else
     nl = 10 
-    If (debug) Write(0,*) 'not present: irst: ',irst,nl
+    If (debug_level >= psb_debug_ext_) &
+         & write(debug_unit,*) me,' ',trim(name),&
+         & ' not present: irst: ',irst,nl
   Endif
   if (nl <=0 ) then 
-    write(0,*) 'psb_dgmres: invalid irst ',nl
     info=5001
     int_err(1)=nl
     err=info
@@ -220,12 +221,14 @@ Subroutine psb_dgmresr(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,irst,ist
   if (info == 0) Call psb_geasb(w1,desc_a,info)
   if (info == 0) Call psb_geasb(xt,desc_a,info)
   if (info.ne.0) Then 
-     info=4011 
-     call psb_errpush(info,name)
-     goto 9999
+    info=4011 
+    call psb_errpush(info,name)
+    goto 9999
   End If
-  if (debug) write(0,*) 'Size of V,W,W1 ',size(v),size(v,1),&
-       &size(w),size(w,1),size(w1),size(w1,1), size(v(:,1))
+  if (debug_level >= psb_debug_ext_) &
+       & write(debug_unit,*) me,' ',trim(name),&
+       & ' Size of V,W,W1 ',size(v),size(v,1),&
+       & size(w),size(w,1),size(w1),size(w1,1), size(v(:,1))
 
   ! Ensure global coherence for convergence checks.
   call psb_set_coher(ictxt,isvch)
@@ -237,9 +240,9 @@ Subroutine psb_dgmresr(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,irst,ist
     bn2 = psb_genrm2(b,desc_a,info)
   endif
   if (info.ne.0) Then 
-     info=4011 
-     call psb_errpush(info,name)
-     goto 9999
+    info=4011 
+    call psb_errpush(info,name)
+    goto 9999
   End If
 
   itx   = 0
@@ -249,32 +252,36 @@ Subroutine psb_dgmresr(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,irst,ist
     ! check convergence
     ! compute v1 = r0/||r0||_2
 
-    If (debug) Write(0,*) 'restart: ',itx,it
+    If (debug_level >= psb_debug_ext_) &
+         & write(debug_unit,*) me,' ',trim(name),&
+         & ' restart: ',itx,it
     it = 0      
     Call psb_geaxpby(done,b,dzero,v(:,1),desc_a,info)
     if (info.ne.0) Then 
-       info=4011 
-       call psb_errpush(info,name)
-       goto 9999
+      info=4011 
+      call psb_errpush(info,name)
+      goto 9999
     End If
 
     Call psb_spmm(-done,a,x,done,v(:,1),desc_a,info,work=aux)
     if (info.ne.0) Then 
-       info=4011 
-       call psb_errpush(info,name)
-       goto 9999
+      info=4011 
+      call psb_errpush(info,name)
+      goto 9999
     End If
 
     rs(1) = psb_genrm2(v(:,1),desc_a,info)
     rs(2:) = dzero
     if (info.ne.0) Then 
-       info=4011 
-       call psb_errpush(info,name)
-       goto 9999
+      info=4011 
+      call psb_errpush(info,name)
+      goto 9999
     End If
     scal=done/rs(1)  ! rs(1) MIGHT BE VERY SMALL - USE DSCAL TO DEAL WITH IT?
 
-    If (debug) Write(0,*) 'on entry to amax: b: ',Size(b),rs(1),scal
+    If (debug_level >= psb_debug_ext_) &
+         & write(debug_unit,*) me,' ',trim(name),&
+         & ' on entry to amax: b: ',Size(b),rs(1),scal
 
     !
     ! check convergence
@@ -288,9 +295,9 @@ Subroutine psb_dgmresr(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,irst,ist
       rerr = rni/bn2
     endif
     if (info.ne.0) Then 
-       info=4011 
-       call psb_errpush(info,name)
-       goto 9999
+      info=4011 
+      call psb_errpush(info,name)
+      goto 9999
     End If
     
     If (rerr<=eps) Then 
@@ -343,7 +350,8 @@ Subroutine psb_dgmresr(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,irst,ist
           h(k,i)   = -s(k-1)*dt + c(k-1)*h(k,i)
         enddo
         gm =  safe_dn2(h(i,i),h(i+1,i))
-        if (debug) write(0,*) 'GM : ',gm
+        if (debug_level >= psb_debug_ext_) &
+             & write(debug_unit,*) me,' ',trim(name),' GM : ',gm
         gm = max(gm,epstol)
 
         c(i) = h(i,i)/gm
@@ -359,7 +367,9 @@ Subroutine psb_dgmresr(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,irst,ist
         rst = rs
         xt = dzero
         call dtrsm('l','u','n','n',i,1,done,h,size(h,1),rst,size(rst,1))
-        if (debug) write(0,*) 'Rebuild x-> RS:',rst(1:nl)
+        if (debug_level >= psb_debug_ext_) &
+             & write(debug_unit,*) me,' ',trim(name),&
+             & ' Rebuild x-> RS:',rst(1:nl)
         do k=1, i
           call psb_geaxpby(rst(k),v(:,k),done,xt,desc_a,info)
         end do
@@ -391,7 +401,9 @@ Subroutine psb_dgmresr(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,irst,ist
           ! build x
           !
           call dtrsm('l','u','n','n',i,1,done,h,size(h,1),rs,size(rs,1))
-          if (debug) write(0,*) 'Rebuild x-> RS:',rs(21:nl)
+          if (debug_level >= psb_debug_ext_) &
+               & write(debug_unit,*) me,' ',trim(name),&
+               & ' Rebuild x-> RS:',rs(1:nl)
           w1 = dzero 
           do k=1, i
             call psb_geaxpby(rs(k),v(:,k),done,w1,desc_a,info)
@@ -418,7 +430,9 @@ Subroutine psb_dgmresr(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,irst,ist
       ! build x
       !
       call dtrsm('l','u','n','n',nl,1,done,h,size(h,1),rs,size(rs,1))
-      if (debug) write(0,*) 'Rebuild x-> RS:',rs(21:nl)
+      if (debug_level >= psb_debug_ext_) &
+           & write(debug_unit,*) me,' ',trim(name),&
+           & ' Rebuild x-> RS:',rs(1:nl)
       w1 = dzero 
       do k=1, nl
         call psb_geaxpby(rs(k),v(:,k),done,w1,desc_a,info)
@@ -435,7 +449,7 @@ Subroutine psb_dgmresr(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,irst,ist
   If (Present(err)) err=rerr
   If (Present(iter)) iter = itx
   If ((rerr>eps).and. (me == 0))  Then
-    Write(0,*) 'gmresr(l) failed to converge to ',eps,&
+    write(debug_unit,*) 'gmresr(l) failed to converge to ',eps,&
          & ' in ',itx,' iterations  '
   End If
 
@@ -450,9 +464,9 @@ Subroutine psb_dgmresr(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,irst,ist
   call psb_restore_coher(ictxt,isvch)
 
   if (info /= 0) then
-     info=4011
-     call psb_errpush(info,name)
-     goto 9999
+    info=4011
+    call psb_errpush(info,name)
+    goto 9999
   end if
 
   call psb_erractionrestore(err_act)
@@ -461,8 +475,8 @@ Subroutine psb_dgmresr(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,irst,ist
 9999 continue
   call psb_erractionrestore(err_act)
   if (err_act.eq.psb_act_abort_) then
-     call psb_error()
-     return
+    call psb_error()
+    return
   end if
   return
 

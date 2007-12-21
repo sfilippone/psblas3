@@ -34,6 +34,7 @@ C
       SUBROUTINE DVTFG (UPLO,M,JA,IA,NG,IPA,IPAT,KLEN,IWORK1,IWORK2,            
      *  IWORK3)                                                 
       use psb_string_mod
+      use psb_error_mod
       implicit none
 C     .. Scalar Arguments ..                                                    
       INTEGER           M, NG                                                   
@@ -45,10 +46,12 @@ C     .. Local Scalars ..
       INTEGER           I, J, L, L0, L1, LEV, NP, iret
 C     .. Intrinsic Functions ..                                                 
       INTRINSIC         MAX                                                     
-      logical debug
-      parameter (debug=.false.)
+      integer           :: debug_level, debug_unit
+      character(len=20) :: name='DVTFG'
 C     .. Executable Statements ..                                               
 C                                                                               
+      debug_unit  = psb_get_debug_unit()
+      debug_level = psb_get_debug_level()
       NG = 0                                                                    
 C                                                                               
 C     CHECK ON THE NUMBERS OF THE ELEMENTS OF THE MATRIX                        
@@ -152,7 +155,9 @@ C
         DO 260 L = 1, L1                                                       
           IPA(L) = IWORK3(L)                                            
  260    CONTINUE                                                               
-        if (debug) write(0,*) 'DVTFG: Group ',1,':',(ipa(l),l=1,l1)
+        if (debug_level >= psb_debug_serial_)
+     +    write(debug_unit,*)  trim(name),
+     +    ': Group ',1,':',(ipa(l),l=1,l1)
         DO 360 LEV = 2, NG                                                     
 C                                                                               
 C           LOOP ON GROUPS                                                      
@@ -177,8 +182,9 @@ C
               IPA(L0+L) = IWORK3(L0+L)
  320        CONTINUE                                                            
           ENDIF
-          if (debug) write(0,*) 'DVTFG: Group ',lev,
-     +      ':',(ipa(l0+l),l=1,l1)
+        if (debug_level >= psb_debug_serial_)
+     +    write(debug_unit,*)  trim(name),
+     +    ': Group ',lev,':',(ipa(l0+l),l=1,l1)
  360    CONTINUE                                                               
 C                                                                               
 C        IPAT = IPA-1                                                           

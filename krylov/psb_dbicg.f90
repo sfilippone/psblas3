@@ -61,16 +61,15 @@
 !
 ! Arguments:
 !
-!    a      -  type(<psb_dspmat_type>)      Input: sparse matrix containing A.
-!    prec   -  type(<psb_dprec_type>)       Input: preconditioner
+!    a      -  type(psb_dspmat_type)      Input: sparse matrix containing A.
+!    prec   -  type(psb_dprec_type)       Input: preconditioner
 !    b      -  real,dimension(:)            Input: vector containing the
 !                                           right hand side B
 !    x      -  real,dimension(:)            Input/Output: vector containing the
 !                                           initial guess and final solution X.
 !    eps    -  real                         Input: Stopping tolerance; the iteration is
-!                                           stopped when the error estimate
-!                                           |err| <= eps
-!    desc_a -  type(<psb_desc_type>).       Input: The communication descriptor.
+!                                           stopped when the error estimate |err| <= eps
+!    desc_a -  type(psb_desc_type).       Input: The communication descriptor.
 !    info   -  integer.                     Output: Return code
 !
 !    itmax  -  integer(optional)            Input: maximum number of iterations to be
@@ -113,7 +112,7 @@ subroutine psb_dbicg(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,istop)
   real(kind(1.d0)) ::rerr
   integer       ::litmax, naux, mglob, it, itrace_,&
        & np,me, n_row, n_col, istop_, err_act
-  logical, parameter :: debug = .false.
+  integer            :: debug_level, debug_unit
   logical, parameter :: exchange=.true., noexchange=.false.  
   integer, parameter :: irmax = 8
   integer            :: itx, isvch, ictxt
@@ -124,11 +123,13 @@ subroutine psb_dbicg(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,istop)
   info = 0
   name = 'psb_dbicg'
   call psb_erractionsave(err_act)
+  debug_unit  = psb_get_debug_unit()
+  debug_level = psb_get_debug_level()
 
-  if (debug) write(*,*) 'entering psb_dbicg'
   ictxt = psb_cd_get_context(desc_a)
   call psb_info(ictxt, me, np)
-  if (debug) write(*,*) 'psb_dbicg: from gridinfo',np,me
+  if (debug_level >= psb_debug_ext_)&
+       & write(debug_unit,*) me,' ',trim(name),': from psb_info',np
 
   mglob = psb_cd_get_global_rows(desc_a)
   n_row = psb_cd_get_local_rows(desc_a)
@@ -147,15 +148,8 @@ subroutine psb_dbicg(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,istop)
   !  istop_ = 1:  normwise backward error, infinity norm 
   !  istop_ = 2:  ||r||/||b||   norm 2 
   !
-!!$
-!!$  if ((prec%prec < min_prec_).or.(prec%prec > max_prec_) ) then
-!!$    write(0,*) 'f90_bicg: invalid iprec',prec%prec
-!!$    if (present(ierr)) ierr=-1
-!!$    return
-!!$  endif
 
   if ((istop_ < 1 ).or.(istop_ > 2 ) ) then
-    write(0,*) 'psb_bicg: invalid istop',istop_ 
     info=5001
     int_err=istop_
     err=info
@@ -236,7 +230,8 @@ subroutine psb_dbicg(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,istop)
     it = 0      
     call psb_geaxpby(done,b,dzero,r,desc_a,info)
     if (info == 0) call psb_spmm(-done,a,x,done,r,desc_a,info,work=aux)
-    if (debug) write(0,*) me,' Done spmm',info
+    if (debug_level >= psb_debug_ext_)&
+         & write(debug_unit,*) me,' ',trim(name),' Done spmm',info
     if (info == 0) call psb_geaxpby(done,r,dzero,rt,desc_a,info)
     if(info.ne.0) then
       info=4011
@@ -245,7 +240,8 @@ subroutine psb_dbicg(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,istop)
     end if
 
     rho = dzero
-    if (debug) write(*,*) 'on entry to amax: b: ',size(b)
+    if (debug_level >= psb_debug_ext_)&
+         & write(debug_unit,*) me,' ',trim(name),'on entry to amax: b: ',size(b)
     if (istop_ == 1) then 
       rni = psb_geamax(r,desc_a,info)
       xni = psb_geamax(x,desc_a,info)
@@ -283,7 +279,8 @@ subroutine psb_dbicg(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,istop)
     iteration:  do 
       it   = it + 1
       itx = itx + 1
-      if (debug) write(*,*) 'iteration: ',itx
+      if (debug_level >= psb_debug_ext_) &
+           & write(debug_unit,*) me,' ',trim(name),'iteration: ',itx
 
       call psb_precaply(prec,r,z,desc_a,info,work=aux)
       call psb_precaply(prec,rt,zt,desc_a,info,trans='t',work=aux)
@@ -291,7 +288,9 @@ subroutine psb_dbicg(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,istop)
       rho_old = rho    
       rho = psb_gedot(rt,z,desc_a,info)
       if (rho==dzero) then
-        if (debug) write(0,*) 'bicg itxation breakdown r',rho
+        if (debug_level >= psb_debug_ext_) &
+             & write(debug_unit,*) me,' ',trim(name),&
+             & ' iteration breakdown r',rho
         exit iteration
       endif
 
@@ -311,7 +310,9 @@ subroutine psb_dbicg(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,istop)
 
       sigma = psb_gedot(pt,q,desc_a,info)
       if (sigma==dzero) then
-        if (debug) write(0,*) 'cgs iteration breakdown s1', sigma
+        if (debug_level >= psb_debug_ext_) &
+             & write(debug_unit,*) me,' ',trim(name),&
+             & ' iteration breakdown s1', sigma
         exit iteration
       endif
 
@@ -355,7 +356,7 @@ subroutine psb_dbicg(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,istop)
   if (present(err)) err=rerr
   if (present(iter)) iter = itx
   if (rerr>eps) then
-    write(0,*) 'bicg failed to converge to ',eps,&
+    write(debug_unit,*) 'bicg failed to converge to ',eps,&
          & ' in ',itx,' iterations  '
   end if
 

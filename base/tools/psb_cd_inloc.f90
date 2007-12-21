@@ -28,9 +28,9 @@
 !!$  POSSIBILITY OF SUCH DAMAGE.
 !!$ 
 !!$  
-! File: psb_cdalv.f90
+! File: psb_cd_inloc.f90
 !
-! Subroutine: psb_cdalv
+! Subroutine: psb_cd_inloc
 !    Allocate descriptor with a local vector V containing the list 
 !    of indices that are assigned to the current process. The global size 
 !    is equal to the largest index found on any process. 
@@ -38,7 +38,7 @@
 ! Arguments: 
 !    v       - integer, dimension(:).         The array containg the partitioning scheme.
 !    ictxt - integer.                         The communication context.
-!    desc_a  - type(<psb_desc_type>).         The communication descriptor.
+!    desc_a  - type(psb_desc_type).         The communication descriptor.
 !    info    - integer.                       Eventually returns an error code
 subroutine psb_cd_inloc(v, ictxt, desc_a, info)
   use psb_descriptor_type
@@ -56,18 +56,21 @@ subroutine psb_cd_inloc(v, ictxt, desc_a, info)
   Integer             :: counter,i,j,np,me,loc_row,err,&
        & loc_col,nprocs,n,itmpov, k,glx,&
        & l_ov_ix,l_ov_el,idx, flag_, err_act,m
-  integer             :: int_err(5),exch(3)
-  Integer, allocatable  :: temp_ovrlap(:), ov_idx(:),ov_el(:),tmpgidx(:,:)
-  logical, parameter  :: debug=.false.
-  character(len=20)   :: name
+  integer              :: int_err(5),exch(3)
+  Integer, allocatable :: temp_ovrlap(:), ov_idx(:),ov_el(:),tmpgidx(:,:)
+  integer              :: debug_level, debug_unit
+  character(len=20)    :: name
 
   if(psb_get_errstatus() /= 0) return 
   info=0
   err=0
   name = 'psb_cd_inloc'
+  debug_unit  = psb_get_debug_unit()
+  debug_level = psb_get_debug_level()
 
   call psb_info(ictxt, me, np)
-  if (debug) write(*,*) 'psb_cdall: ',np,me
+  if (debug_level >= psb_debug_ext_) &
+       & write(debug_unit,*) me,' ',trim(name),': start',np
 
   
   loc_row = size(v)
@@ -117,7 +120,8 @@ subroutine psb_cd_inloc(v, ictxt, desc_a, info)
     call psb_cd_set_large_threshold(exch(3))
   endif
 
-  if (debug) write(*,*) 'psb_cdall:  doing global checks'  
+  if (debug_level >= psb_debug_ext_) &
+       & write(debug_unit,*) me,' ',trim(name),':  doing global checks'  
   allocate(tmpgidx(m,2),stat=info) 
   if (info /=0) then 
     info=4000
@@ -184,7 +188,8 @@ subroutine psb_cd_inloc(v, ictxt, desc_a, info)
   call psb_get_mpicomm(ictxt,desc_a%matrix_data(psb_mpi_c_))
 
 
-  if (debug) write(*,*) 'PSB_CDALL:  starting main loop' ,info
+  if (debug_level >= psb_debug_ext_) &
+       & write(debug_unit,*) me,' ',trim(name),':  starting main loop' ,info
   counter = 0
   itmpov  = 0
   temp_ovrlap(:) = -1
@@ -221,13 +226,15 @@ subroutine psb_cd_inloc(v, ictxt, desc_a, info)
 
     loc_row=counter
     ! check on parts function
-    if (debug) write(*,*) 'PSB_CDALL:  End main loop:' ,loc_row,itmpov,info
+    if (debug_level >= psb_debug_ext_) &
+         & write(debug_unit,*) me,' ',trim(name),':  End main loop:' ,loc_row,itmpov,info
 
     if (info /= 0) then 
       call psb_errpush(info,name,i_err=int_err)
       goto 9999
     end if
-    if (debug) write(*,*) 'PSB_CDALL:  error check:' ,err
+    if (debug_level >= psb_debug_ext_) &
+         & write(debug_unit,*) me,' ',trim(name),':  error check:' ,err
 
     ! estimate local cols number 
     loc_col = min(2*loc_row,m)
@@ -297,13 +304,15 @@ subroutine psb_cd_inloc(v, ictxt, desc_a, info)
 
     loc_row=counter
     ! check on parts function
-    if (debug) write(*,*) 'PSB_CDALL:  End main loop:' ,loc_row,itmpov,info
+    if (debug_level >= psb_debug_ext_) &
+         & write(debug_unit,*) me,' ',trim(name),':  End main loop:' ,loc_row,itmpov,info
 
     if (info /= 0) then 
       call psb_errpush(info,name,i_err=int_err)
       goto 9999
     end if
-    if (debug) write(*,*) 'PSB_CDALL:  error check:' ,err
+    if (debug_level >= psb_debug_ext_) &
+         & write(debug_unit,*) me,' ',trim(name),':  error check:' ,err
 
     ! estimate local cols number 
     loc_col = min(2*loc_row,m)
@@ -345,7 +354,8 @@ subroutine psb_cd_inloc(v, ictxt, desc_a, info)
   l_ov_ix = l_ov_ix+3  
   l_ov_el = l_ov_el+3
 
-  if (debug) write(*,*) 'PSB_CDALL: Ov len',l_ov_ix,l_ov_el
+  if (debug_level >= psb_debug_ext_) &
+       & write(debug_unit,*) me,' ',trim(name),': Ov len',l_ov_ix,l_ov_el
   allocate(ov_idx(l_ov_ix),ov_el(l_ov_el), stat=info)
   if (info /= 0) then
     info=4025
@@ -402,6 +412,8 @@ subroutine psb_cd_inloc(v, ictxt, desc_a, info)
   end if
   desc_a%halo_index(:) = -1
   desc_a%ext_index(:) = -1
+  if (debug_level >= psb_debug_ext_) &
+       & write(debug_unit,*) me,' ',trim(name),': end'
 
   call psb_erractionrestore(err_act)
   return

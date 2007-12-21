@@ -42,7 +42,7 @@
 ! Arguments:
 !    x      -  real,dimension(:,:).       The input vector containing the entries of sub( X ).
 !    y      -  real,dimension(:,:).       The input vector containing the entries of sub( Y ).
-!    desc_a -  type(<psb_desc_type>).     The communication descriptor.
+!    desc_a -  type(psb_desc_type).     The communication descriptor.
 !    info   -  integer.                   Return code
 !    jx     -  integer(optional).         The column offset for sub( X ).
 !    jy     -  integer(optional).         The column offset for sub( Y ).
@@ -198,7 +198,7 @@ end function psb_zdot
 ! Arguments:
 !    x      -  real,dimension(:).         The input vector containing the entries of X.
 !    y      -  real,dimension(:).         The input vector containing the entries of Y.
-!    desc_a -  type(<psb_desc_type>).     The communication descriptor.
+!    desc_a -  type(psb_desc_type).     The communication descriptor.
 !    info   -  integer.                   Return code
 !
 function psb_zdotv(x, y,desc_a, info)  
@@ -336,7 +336,7 @@ end function psb_zdotv
 !    res    -  real.                      The result.
 !    x      -  real,dimension(:).         The input vector containing the entries of X.
 !    y      -  real,dimension(:).         The input vector containing the entries of Y.
-!    desc_a -  type(<psb_desc_type>).     The communication descriptor.
+!    desc_a -  type(psb_desc_type).     The communication descriptor.
 !    info   -  integer.                   Return code
 !
 subroutine psb_zdotvs(res, x, y,desc_a, info)  
@@ -476,7 +476,7 @@ end subroutine psb_zdotvs
 !    res    -  real.                      The result.
 !    x      -  real,dimension(:,:).       The input vector containing the entries of sub( X ).
 !    y      -  real,dimension(:,:).       The input vector containing the entries of sub( Y ).
-!    desc_a -  type(<psb_desc_type>).     The communication descriptor.
+!    desc_a -  type(psb_desc_type).     The communication descriptor.
 !    info   -  integer.                   Return code
 !
 subroutine psb_zmdots(res, x, y, desc_a, info)  

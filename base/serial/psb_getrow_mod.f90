@@ -129,6 +129,7 @@ contains
 
     use psb_spmat_type
     use psb_const_mod
+    use psb_error_mod
     implicit none
 
     type(psb_dspmat_type), intent(in)    :: a
@@ -141,17 +142,21 @@ contains
     integer                              :: lrw,info
     integer, optional                    :: iren(:)
     integer  :: nzin_, nza, idx,ip,jp,i,k, nzt
-    logical, parameter :: debug=.false.
+    integer  :: debug_level, debug_unit
+    character(len=20) :: name='coo_dspgtrow'
+
+    debug_unit  = psb_get_debug_unit()
+    debug_level = psb_get_debug_level()
 
     nza = a%infoa(psb_nnz_)
     if (a%pl(1) /= 0) then
-      write(0,*) 'Fatal error in SPGTROW: do not feed a permuted mat so far!'
+      write(debug_unit,*) 'Fatal error in SPGTROW: do not feed a permuted mat so far!'
       idx = -1 
     else
       idx = irw
     endif
     if (idx<0) then 
-      write(0,*) ' spgtrow Error : idx no good ',idx
+      write(debug_unit,*) ' spgtrow Error : idx no good ',idx
       return
     end if
 
@@ -163,13 +168,16 @@ contains
 
     if (a%infoa(psb_srtd_) == psb_isrtdcoo_) then 
       ! In this case we can do a binary search. 
-      if (debug) write(0,*) 'coo_getrow: srtdcoo '
+      if (debug_level >= psb_debug_serial_)&
+           & write(debug_unit,*) trim(name), ': srtdcoo '
       do
         call ibsrch(ip,irw,nza,a%ia1)
         if (ip /= -1) exit
         irw = irw + 1
         if (irw > lrw) then
-          write(0,*) 'Warning : did not find any rows. Is this an error? ',irw,lrw,idx
+          write(debug_unit,*)  trim(name),&
+               & 'Warning : did not find any rows. Is this an error? ',&
+               & irw,lrw,idx
           exit
         end if
       end do
@@ -192,7 +200,8 @@ contains
         if (jp /= -1) exit
         lrw = lrw - 1
         if (irw > lrw) then
-          write(0,*) 'Warning : did not find any rows. Is this an error?'
+          write(debug_unit,*) trim(name),&
+               & 'Warning : did not find any rows. Is this an error?'
           exit
         end if
       end do
@@ -208,7 +217,8 @@ contains
           end if
         end do
       end if
-      if (debug) write(0,*) 'coo_getrow: ip jp',ip,jp,nza
+      if (debug_level >= psb_debug_serial_) &
+           & write(debug_unit,*)  trim(name),': ip jp',ip,jp,nza
       if ((ip /= -1) .and.(jp /= -1)) then 
         ! Now do the copy.
         nz = jp - ip +1 
@@ -238,9 +248,10 @@ contains
       end if
 
     else
-      if (debug) write(0,*) 'coo_getrow: unsorted '
+      if (debug_level >= psb_debug_serial_) &
+           & write(debug_unit,*)  trim(name),': unsorted '
+
       nzt = (nza*(lrw-irw+1))/max(a%m,1)
-      
       call psb_ensure_size(nzin_+nzt,ia,info)
       if (info==0) call psb_ensure_size(nzin_+nzt,ja,info)
       if (info==0) call psb_ensure_size(nzin_+nzt,val,info)
@@ -293,6 +304,7 @@ contains
 
     use psb_spmat_type
     use psb_const_mod
+    
     implicit none
 
     type(psb_dspmat_type), intent(in), target :: a
@@ -424,6 +436,7 @@ contains
 
     use psb_spmat_type
     use psb_const_mod
+    use psb_error_mod
     implicit none
 
     type(psb_zspmat_type), intent(in)    :: a
@@ -438,6 +451,10 @@ contains
 
     integer :: idx,i,j, k, nr, row_idx, nzin_
     integer, allocatable  :: indices(:)
+    integer             :: debug_level, debug_unit
+
+    debug_unit  = psb_get_debug_unit()
+    debug_level = psb_get_debug_level()
 
     if (append) then 
       nzin_ = nzin
@@ -522,7 +539,8 @@ contains
         enddo
       end if
       if (a%pr(1) /= 0) then
-        write(0,*) 'Feeling lazy today, Right Permutation will have to wait'
+        write(debug_unit,*)&
+             & 'Feeling lazy today, Right Permutation will have to wait'
       endif
 
     endif
@@ -534,6 +552,7 @@ contains
 
     use psb_spmat_type
     use psb_const_mod
+    use psb_error_mod
     implicit none
 
     type(psb_zspmat_type), intent(in)    :: a
@@ -546,17 +565,23 @@ contains
     integer                              :: lrw,info
     integer, optional                    :: iren(:)
     integer  :: nzin_, nza, idx,ip,jp,i,k, nzt
-    logical, parameter :: debug=.false.
+    integer           :: debug_level, debug_unit
+    character(len=20) :: name='coo_zspgtrow'
+
+    debug_unit  = psb_get_debug_unit()
+    debug_level = psb_get_debug_level()
 
     nza = a%infoa(psb_nnz_)
     if (a%pl(1) /= 0) then
-      write(0,*) 'Fatal error in SPGTROW: do not feed a permuted mat so far!'
+      write(debug_unit,*) trim(name),&
+           & 'Fatal error: do not feed a permuted mat so far!'
       idx = -1 
     else
       idx = irw
     endif
     if (idx<0) then 
-      write(0,*) ' spgtrow Error : idx no good ',idx
+      write(debug_unit,*)  trim(name),&
+           &' Error : idx no good ',idx
       return
     end if
 
@@ -568,13 +593,16 @@ contains
 
     if (a%infoa(psb_srtd_) == psb_isrtdcoo_) then 
       ! In this case we can do a binary search. 
-      if (debug) write(0,*) 'coo_getrow: srtdcoo '
+      if (debug_level >= psb_debug_serial_) &
+           & write(debug_unit,*)  trim(name),': srtdcoo '
       do
         call ibsrch(ip,irw,nza,a%ia1)
         if (ip /= -1) exit
         irw = irw + 1
         if (irw > lrw) then
-          write(0,*) 'Warning : did not find any rows. Is this an error? ',irw,lrw,idx
+          write(debug_unit,*) trim(name),&
+               & 'Warning : did not find any rows. Is this an error? ',&
+               & irw,lrw,idx
           exit
         end if
       end do
@@ -597,7 +625,8 @@ contains
         if (jp /= -1) exit
         lrw = lrw - 1
         if (irw > lrw) then
-          write(0,*) 'Warning : did not find any rows. Is this an error?'
+          write(debug_unit,*)  trim(name),&
+               & 'Warning : did not find any rows. Is this an error?'
           exit
         end if
       end do
@@ -613,7 +642,8 @@ contains
           end if
         end do
       end if
-      if (debug) write(0,*) 'coo_getrow: ip jp',ip,jp,nza
+      if (debug_level >= psb_debug_serial_) &
+           & write(debug_unit,*)  trim(name),': ip jp',ip,jp,nza
       if ((ip /= -1) .and.(jp /= -1)) then 
         ! Now do the copy.
         nz = jp - ip +1 
@@ -643,7 +673,8 @@ contains
       end if
 
     else
-      if (debug) write(0,*) 'coo_getrow: unsorted '
+      if (debug_level >= psb_debug_serial_) &
+           & write(debug_unit,*) trim(name),': unsorted '
       nzt = (nza*(lrw-irw+1))/max(a%m,1)
       
       call psb_ensure_size(nzin_+nzt,ia,info)

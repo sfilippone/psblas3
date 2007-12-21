@@ -56,11 +56,11 @@
 !
 ! Arguments:   
 !    alpha  -  real.                        The scalar alpha.
-!    a      -  type(<psb_zspmat_type>).     The sparse matrix containing A.
+!    a      -  type(psb_zspmat_type).     The sparse matrix containing A.
 !    x      -  real,dimension(:,:).         The input vector containing the entries of sub( X ).
 !    beta   -  real.                        The scalar beta.
 !    y      -  real,dimension(:,:).         The input vector containing the entries of sub( Y ).
-!    desc_a -  type(<psb_desc_type>).       The communication descriptor.
+!    desc_a -  type(psb_desc_type).       The communication descriptor.
 !    info   -  integer.                     Return code
 !    trans  -  character(optional).         Whether A or A'. If not present 'N' is assumed.
 !    unitd  -  character(optional).         Specify some type of operation with the diagonal matrix D.
@@ -369,11 +369,11 @@ end subroutine psb_zspsm
 !
 ! Arguments:   
 !    alpha  -  real.                        The scalar alpha.
-!    a      -  type(<psb_zspmat_type>).     The sparse matrix containing A.
+!    a      -  type(psb_zspmat_type).     The sparse matrix containing A.
 !    x      -  real,dimension(:).           The input vector containing the entries of X.
 !    beta   -  real.                        The scalar beta.
 !    y      -  real,dimension(:).           The input vector containing the entries of Y.
-!    desc_a -  type(<psb_desc_type>).       The communication descriptor.
+!    desc_a -  type(psb_desc_type).       The communication descriptor.
 !    info   -  integer.                     Return code
 !    trans  -  character(optional).         Whether A or A'. If not present 'N' is assumed.
 !    unitd  -  character(optional).         Specify some type of operation with the diagonal matrix D.

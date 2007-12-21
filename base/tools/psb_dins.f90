@@ -39,7 +39,7 @@
 !    irw(:)  - integer          Row indices of rows of val (global numbering)
 !    val(:)  - real                  The source dense submatrix.  
 !    x(:)    - real                  The destination dense matrix.  
-!    desc_a  - type(<psb_desc_type>).         The communication descriptor.
+!    desc_a  - type(psb_desc_type).         The communication descriptor.
 !    info    - integer.                       return code
 !    dupl    - integer               What to do with duplicates: 
 !                                     psb_dupl_ovwrt_    overwrite
@@ -224,7 +224,7 @@ end subroutine psb_dinsvi
 !    irw(:)   - integer          Row indices of rows of val (global numbering)
 !    val(:,:) - real                    The source dense submatrix.  
 !    x(:,:)   - real                    The destination dense matrix.  
-!    desc_a   - type(<psb_desc_type>).         The communication descriptor.
+!    desc_a   - type(psb_desc_type).         The communication descriptor.
 !    info     - integer.                       return code
 !    dupl    - integer               What to do with duplicates: 
 !                                     psb_dupl_ovwrt_    overwrite

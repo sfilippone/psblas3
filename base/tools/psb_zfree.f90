@@ -35,7 +35,7 @@
 ! 
 ! Arguments: 
 !    x(:,:)   - complex, allocatable          The dense matrix to be freed.
-!    desc_a   - type(<psb_desc_type>).        The communication descriptor.
+!    desc_a   - type(psb_desc_type).        The communication descriptor.
 !    info     - integer.                      Return code
 subroutine psb_zfree(x, desc_a, info)
   !...free dense matrix structure...
@@ -110,7 +110,7 @@ end subroutine psb_zfree
 ! 
 ! Arguments: 
 !    x(:)     - complex, allocatable        The dense matrix to be freed.
-!    desc_a   - type(<psb_desc_type>).      The communication descriptor.
+!    desc_a   - type(psb_desc_type).      The communication descriptor.
 !    info     - integer.                    Return code
 subroutine psb_zfreev(x, desc_a, info)
   !...free dense matrix structure...

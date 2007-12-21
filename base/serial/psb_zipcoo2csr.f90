@@ -51,16 +51,19 @@ subroutine psb_zipcoo2csr(a,info,rwshr)
   logical             :: rwshr_
   Integer             :: nza, nr, i,j,irw, idl,err_act
   Integer, Parameter  :: maxtry=8
-  logical, parameter  :: debug=.false.
+  integer              :: debug_level, debug_unit
   character(len=20)   :: name
 
   name='psb_ipcoo2csr'
   info  = 0
   call psb_erractionsave(err_act)
+  debug_unit  = psb_get_debug_unit()
+  debug_level = psb_get_debug_level()
 
-  if(debug) write(0,*)'Inside ipcoo2csr ',a%fida,a%m
+  if (debug_level >= psb_debug_serial_)&
+       & write(debug_unit,*) trim(name),': start',a%fida,a%m
   if (toupper(a%fida) /= 'COO') then 
-    write(0,*) 'ipcoo2csr Invalid input ',a%fida
+    write(debug_unit,*) trim(name),': Invalid input ',a%fida
     info = -1
     call psb_errpush(info,name)
     goto 9999
@@ -81,7 +84,9 @@ subroutine psb_zipcoo2csr(a,info,rwshr)
     goto 9999      
   end if
 
-  if(debug) write(0,*)'DIPCOO2CSR: out of fixcoo',nza,nr,size(a%ia2),size(iaux)
+  if (debug_level >= psb_debug_serial_)&
+       & write(debug_unit,*) trim(name),&
+       & ': out of fixcoo',nza,nr,size(a%ia2),size(iaux)
 
   call psb_transfer(a%ia1,itemp,info)
   call psb_transfer(a%ia2,a%ia1,info)
@@ -120,13 +125,12 @@ subroutine psb_zipcoo2csr(a,info,rwshr)
           irw = itemp(j) 
           i = i + 1
           if (i>nr) then 
-            write(0,*) 'IPCOO2CSR: RWSHR=.true. : ',&
+            write(debug_unit,*) trim(name),': RWSHR=.true. : ',&
              & i, nr,' Expect trouble!'
             exit
           end if
         endif
       enddo 
-!      write(0,*) 'Exit from loop',j,nza,i
       do 
         if (i>=nr+1) exit
         a%ia2(i+1) = j
@@ -136,8 +140,9 @@ subroutine psb_zipcoo2csr(a,info,rwshr)
     else
       
       if (nr < itemp(nza)) then 
-        write(0,*) 'IPCOO2CSR: RWSHR=.false. : ',&
+        write(debug_unit,*) trim(name),': RWSHR=.false. : ',&
              &nr,itemp(nza),' Expect trouble!'
+        info = 12
       end if
              
 
@@ -149,7 +154,8 @@ subroutine psb_zipcoo2csr(a,info,rwshr)
         inner: do 
           if (i >= irw) exit inner
           if (i>nr) then 
-            write(0,*) 'Strange situation: i>nr ',i,nr,j,nza,irw,idl
+            write(debug_unit,*) trim(name),&
+                 & 'Strange situation: i>nr ',i,nr,j,nza,irw,idl
             exit outer
           end if
           a%ia2(i+1) = a%ia2(i) 
@@ -168,7 +174,8 @@ subroutine psb_zipcoo2csr(a,info,rwshr)
       ! Cleanup empty rows at the end
       !
       if (j /= (nza+1)) then 
-        write(0,*) 'IPCOO2CSR : Problem from loop :',j,nza
+        write(debug_unit,*) trim(name),': Problem from loop :',j,nza
+        info = 13
       endif
       do 
         if (i>nr) exit
@@ -180,11 +187,17 @@ subroutine psb_zipcoo2csr(a,info,rwshr)
 
   end if
 
-!!$  write(0,*) 'IPcoo2csr end loop ',i,nr,a%ia2(nr+1),nza
   a%fida='CSR'
   a%infoa(psb_upd_) = psb_upd_srch_
 
-  deallocate(itemp)
+  deallocate(itemp,stat=info)
+  if (info /= 0) then 
+    info=4010
+    call psb_errpush(info,name,a_err='deallocate')
+    goto 9999      
+  end if
+  if (debug_level >= psb_debug_serial_)&
+       & write(debug_unit,*)  trim(name),': end'
   call psb_erractionrestore(err_act)
   return
 

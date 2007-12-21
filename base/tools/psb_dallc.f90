@@ -55,14 +55,13 @@ subroutine psb_dalloc(x, desc_a, info, n)
   integer,intent(out)                   :: info
   integer, optional, intent(in)         :: n
 
-
   !locals
   integer             :: np,me,err,n_col,n_row,i,j,err_act
   integer             :: ictxt,n_
   integer             :: int_err(5), exch(3)
   character(len=20)   :: name
 
-  name='psb_dallc'
+  name='psb_dgeall_m'
   if(psb_get_errstatus() /= 0) return 
   info=0
   err=0
@@ -207,13 +206,15 @@ subroutine psb_dallocv(x, desc_a,info,n)
   !locals
   integer             :: np,me,n_col,n_row,i,err_act
   integer             :: ictxt, int_err(5)
-  logical, parameter  :: debug=.false. 
+  integer              :: debug_level, debug_unit
   character(len=20)   :: name
 
   if(psb_get_errstatus() /= 0) return 
   info=0
-  name='psb_dallcv'
+  name='psb_dgeall_v'
   call psb_erractionsave(err_act)
+  debug_unit  = psb_get_debug_unit()
+  debug_level = psb_get_debug_level()
 
   ictxt=psb_cd_get_context(desc_a)
 
@@ -261,7 +262,9 @@ subroutine psb_dallocv(x, desc_a,info,n)
       x(i) = 0.0d0
     end do
   else
-    write(0,*) 'Did not allocate anything because of dectype',psb_cd_get_dectype(desc_a)
+    if (debug_level > psb_debug_ext_) &
+         & write(debug_unit,*) me,name,&
+         & ': Did not allocate anything because of dectype',psb_cd_get_dectype(desc_a)
   endif
 
   call psb_erractionrestore(err_act)

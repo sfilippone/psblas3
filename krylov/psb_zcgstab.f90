@@ -61,37 +61,31 @@
 !    
 ! Arguments:
 !
-!    methd  -  character                    The specific method; can take the values:
-!                                           CGS
-!                                           BICGSTAB
-!                                           RGMRES
-!                                           
-!    a      -  type(<psb_zspmat_type>)      Input: sparse matrix containing A.
-!    prec   -  type(<psb_zprec_type>)       Input: preconditioner
-!    b      -  complex,dimension(:)         Input: vector containing the
-!                                           right hand side B
-!    x      -  complex,dimension(:)         Input/Output: vector containing the
-!                                           initial guess and final solution X.
-!    eps    -  real                         Input: Stopping tolerance; the iteration is
-!                                           stopped when the error estimate
-!                                           |err| <= eps
-!    desc_a -  type(<psb_desc_type>).       Input: The communication descriptor.
-!    info   -  integer.                     Output: Return code
+!    a      -  type(psb_zspmat_type)      Input: sparse matrix containing A.
+!    prec   -  type(psb_zprec_type)       Input: preconditioner
+!    b      -  complex,dimension(:)       Input: vector containing the
+!                                         right hand side B
+!    x      -  complex,dimension(:)       Input/Output: vector containing the
+!                                         initial guess and final solution X.
+!    eps    -  real                       Input: Stopping tolerance; the iteration is
+!                                         stopped when the error estimate |err| <= eps
+!    desc_a -  type(psb_desc_type).       Input: The communication descriptor.
+!    info   -  integer.                   Output: Return code
 !
-!    itmax  -  integer(optional)            Input: maximum number of iterations to be
-!                                           performed.
-!    iter   -  integer(optional)            Output: how many iterations have been
-!                                           performed.
-!    err    -  real   (optional)            Output: error estimate on exit
-!    itrace -  integer(optional)            Input: print an informational message
-!                                           with the error estimate every itrace
-!                                           iterations
-!    istop  -  integer(optional)            Input: stopping criterion, or how
-!                                           to estimate the error. 
-!                                           1: err =  |r|/|b|
-!                                           2: err =  |r|/(|a||x|+|b|)
-!                                           where r is the (preconditioned, recursive
-!                                           estimate of) residual 
+!    itmax  -  integer(optional)          Input: maximum number of iterations to be
+!                                         performed.
+!    iter   -  integer(optional)          Output: how many iterations have been
+!                                         performed.
+!    err    -  real   (optional)          Output: error estimate on exit
+!    itrace -  integer(optional)          Input: print an informational message
+!                                         with the error estimate every itrace
+!                                         iterations
+!    istop  -  integer(optional)          Input: stopping criterion, or how
+!                                         to estimate the error. 
+!                                         1: err =  |r|/|b|
+!                                         2: err =  |r|/(|a||x|+|b|)
+!                                         where r is the (preconditioned, recursive
+!                                         estimate of) residual 
 !
 Subroutine psb_zcgstab(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,istop)
   use psb_base_mod
@@ -115,7 +109,7 @@ Subroutine psb_zcgstab(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,istop)
   Real(Kind(1.d0)) :: rerr
   Integer          :: litmax, naux, mglob, it,itrace_,&
        & np,me, n_row, n_col
-  Logical, Parameter :: debug = .false.
+  integer            :: debug_level, debug_unit
   Logical, Parameter :: exchange=.True., noexchange=.False., debug1 = .False.
   Integer, Parameter :: irmax = 8
   Integer            :: itx, isvch, ictxt, err_act, int_err(5)
@@ -129,11 +123,12 @@ Subroutine psb_zcgstab(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,istop)
   info = 0
   name = 'psb_zcgstab'
   call psb_erractionsave(err_act)
-
-  If (debug) Write(*,*) 'Entering PSB_ZCGSTAB',present(istop)
+  debug_unit  = psb_get_debug_unit()
+  debug_level = psb_get_debug_level()
   ictxt = psb_cd_get_context(desc_a)
-  CALL psb_info(ictxt, me, np)
-  if (debug) write(*,*) 'PSB_ZCGSTAB: From GRIDINFO',np,me
+  call psb_info(ictxt, me, np)
+  if (debug_level >= psb_debug_ext_)&
+       & write(debug_unit,*) me,' ',trim(name),': from psb_info',np
 
   mglob = psb_cd_get_global_rows(desc_a)
   n_row = psb_cd_get_local_rows(desc_a)
@@ -150,7 +145,6 @@ Subroutine psb_zcgstab(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,istop)
 !
   
   if ((istop_ < 1 ).or.(istop_ > 2 ) ) then
-    write(0,*) 'psb_bicgstab: invalid istop',istop_ 
     info=5001
     int_err(1)=istop_
     err=info
@@ -202,7 +196,6 @@ Subroutine psb_zcgstab(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,istop)
      itrace_ = 0
   End If
   
-
   ! Ensure global coherence for convergence checks.
   call psb_set_coher(ictxt,isvch)
 
@@ -236,7 +229,9 @@ Subroutine psb_zcgstab(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,istop)
     End If
     
     rho = zzero
-    If (debug) Write(*,*) 'On entry to AMAX: B: ',Size(b)
+    If (debug_level >= psb_debug_ext_) &
+         & write(debug_unit,*) me,' ',trim(name),&
+         & ' On entry to AMAX: B: ',Size(b)
     
     !
     !   Must always provide norm of R into RNI below for first check on 
@@ -258,6 +253,9 @@ Subroutine psb_zcgstab(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,istop)
       rn0 = rni
     End If
     If (rn0 == 0.d0 ) Then 
+      If (itrace_ > 0 ) Then 
+        If (me == 0) Write(*,*) 'BiCGSTAB: ',itx,rn0
+      Endif
       Exit restart
     End If
     
@@ -278,20 +276,26 @@ Subroutine psb_zcgstab(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,istop)
     End If
 
     If (itrace_ > 0) then 
-      if ((mod(itx,itrace_)==0).and.(me == 0))&
+      if (((itx==0).or.(mod(itx,itrace_)==0)).and.(me == 0)) &
            & write(*,'(a,i4,3(2x,es10.4))') 'bicgstab: ',itx,rerr
     end If
 
     iteration:  Do 
       it   = it + 1
       itx = itx + 1
-      If (debug) Write(*,*) 'Iteration: ',itx
-
+      If (debug_level >= psb_debug_ext_)&
+           & write(debug_unit,*) me,' ',trim(name),&
+           & ' Iteration: ',itx
       rho_old = rho    
       rho = psb_gedot(q,r,desc_a,info)
 
+      If (debug_level >= psb_debug_ext_) &
+           & write(debug_unit,*) me,' ',trim(name),&
+           & ' RHO:',rho
       If (rho==zzero) Then
-         If (debug) Write(0,*) 'Bi-CGSTAB Itxation breakdown R',rho
+         If (debug_level >= psb_debug_ext_) &
+              & write(debug_unit,*) me,' ',trim(name),&
+              & ' Iteration breakdown R',rho
         Exit iteration
       Endif
 
@@ -310,24 +314,28 @@ Subroutine psb_zcgstab(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,istop)
 
       sigma = psb_gedot(q,v,desc_a,info)
       If (sigma==zzero) Then
-         If (debug) Write(0,*) 'Bi-CGSTAB Iteration breakdown S1', sigma
+         If (debug_level >= psb_debug_ext_) &
+              & write(debug_unit,*) me,' ',trim(name),&
+              & ' Iteration breakdown S1', sigma
          Exit iteration
       Endif
-      
+      If (debug_level >= psb_debug_ext_) &
+           & write(debug_unit,*) me,' ',trim(name),&
+           & ' SIGMA:',sigma
       alpha = rho/sigma
       Call psb_geaxpby(zone,r,zzero,s,desc_a,info)
-      if(info.ne.0) then
+      if(info /= 0) then
          call psb_errpush(4010,name,a_err='psb_geaxpby')
          goto 9999
       end if
       Call psb_geaxpby(-alpha,v,zone,s,desc_a,info)
-      if(info.ne.0) then
+      if(info /= 0) then
          call psb_errpush(4010,name,a_err='psb_geaxpby')
          goto 9999
       end if
       
       Call psb_precaply(prec,s,z,desc_a,info,work=aux)
-      if(info.ne.0) then
+      if(info /= 0) then
          call psb_errpush(4010,name,a_err='psb_precaply')
          goto 9999
       end if
@@ -335,14 +343,16 @@ Subroutine psb_zcgstab(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,istop)
       Call psb_spmm(zone,a,z,zzero,t,desc_a,info,&
            & work=aux)
 
-      if(info.ne.0) then
+      if(info /= 0) then
          call psb_errpush(4010,name,a_err='psb_spmm')
          goto 9999
       end if
       
       sigma = psb_gedot(t,t,desc_a,info)
       If (sigma==zzero) Then
-         If (debug) Write(0,*) 'BI-CGSTAB ITERATION BREAKDOWN S2', sigma
+         If (debug_level >= psb_debug_ext_) &
+              & write(debug_unit,*) me,' ',trim(name),&
+              & ' Iteration breakdown S2', sigma
         Exit iteration
       Endif
       
@@ -350,7 +360,9 @@ Subroutine psb_zcgstab(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,istop)
       omega = tau/sigma
       
       If (omega==zzero) Then
-         If (debug) Write(0,*) 'BI-CGSTAB ITERATION BREAKDOWN O',omega
+         If (debug_level >= psb_debug_ext_) &
+              & write(debug_unit,*) me,' ',trim(name),&
+              & ' Iteration breakdown O',omega
         Exit iteration
       Endif
 
@@ -373,22 +385,24 @@ Subroutine psb_zcgstab(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,istop)
       End If
       
       If (itx.Ge.litmax) Exit restart
-      If (itrace_ > 0) then 
-        if ((mod(itx,itrace_)==0).and.(me == 0))&
-             & write(*,'(a,i4,3(2x,es10.4))') 'bicgstab: ',itx,rerr
-      end If
 
+      If (itrace_ > 0) then 
+        if ((mod(itx,itrace_)==0).and.(me == 0)) &
+             & write(*,'(a,i4,3(2x,es10.4))') &
+             & 'bicgstab: ',itx,rerr
+      Endif
+      
     End Do iteration
   End Do restart
   If (itrace_ > 0) then 
     if (me == 0) write(*,'(a,i4,3(2x,es10.4))') 'bicgstab: ',itx,rerr
-  end If
-
+  Endif
+  
   If (Present(err)) err=rerr
   If (Present(iter)) iter = itx
   If (rerr>eps) Then
-    Write(0,*) 'BI-cgstab failed to converge to ',eps,&
-         & ' in ',itx,' iterations.  '
+    write(debug_unit,*) 'BI-CGSTAB failed to converge to ',EPS,&
+         & ' in ',ITX,' iterations. '
   End If
 
   Deallocate(aux)

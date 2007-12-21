@@ -29,9 +29,9 @@
 !!$ 
 !!$  
 !
-! File: psi_Xswapdata.F90
+! File: psi_zswapdata.F90
 !
-! Subroutine: psi_Xswapdatam
+! Subroutine: psi_zswapdatam
 !   Does the data exchange among processes. Essentially this is doing 
 !   a variable all-to-all data exchange (ALLTOALLV in MPI parlance), but 
 !   it is capable of pruning empty exchanges, which are very likely in out 
@@ -68,7 +68,7 @@
 !    n        - integer                 Number of columns in Y               
 !    beta     - X                       Choose overwrite or sum. 
 !    y(:,:)   - X                       The data area                        
-!    desc_a   - type(<psb_desc_type>).  The communication descriptor.        
+!    desc_a   - type(psb_desc_type).  The communication descriptor.        
 !    work(:)  - X                       Buffer space. If not sufficient, will do 
 !                                       our own internal allocation.
 !    info     - integer.                return code.
@@ -503,9 +503,8 @@ end subroutine psi_zswapdatam
 !!$ 
 !!$  
 !
-! File: psi_Xswapdata.F90
 !
-! Subroutine: psi_Xswapdatav
+! Subroutine: psi_zswapdatav
 !   Does the data exchange among processes. Essentially this is doing 
 !   a variable all-to-all data exchange (ALLTOALLV in MPI parlance), but 
 !   it is capable of pruning empty exchanges, which are very likely in out 
@@ -542,7 +541,7 @@ end subroutine psi_zswapdatam
 !    n        - integer                 Number of columns in Y               
 !    beta     - X                       Choose overwrite or sum. 
 !    y(:)     - X                       The data area                        
-!    desc_a   - type(<psb_desc_type>).  The communication descriptor.        
+!    desc_a   - type(psb_desc_type).  The communication descriptor.        
 !    work(:)  - X                       Buffer space. If not sufficient, will do 
 !                                       our own internal allocation.
 !    info     - integer.                return code.

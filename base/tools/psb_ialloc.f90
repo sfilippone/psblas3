@@ -184,7 +184,7 @@ end subroutine psb_ialloc
 ! Arguments: 
 !    m      - integer.                  The number of rows.
 !    x      - integer,dimension(:).     The matrix to be allocated.
-!    desc_a - type(<psb_desc_type>).    The communication descriptor.
+!    desc_a - type(psb_desc_type).    The communication descriptor.
 !    info   - integer.                  Eventually returns an error code
 subroutine psb_iallocv(x, desc_a, info,n)
   !....allocate sparse matrix structure for psblas routines.....
@@ -203,16 +203,17 @@ subroutine psb_iallocv(x, desc_a, info,n)
   integer, optional, intent(in)     :: n
 
   !locals
-  integer             :: np,me,n_col,n_row,err_act
-  integer             :: ictxt
-  integer             :: int_err(5)
-  logical, parameter  :: debug=.false. 
+  integer             :: np,me,n_col,n_row,i,err_act
+  integer             :: ictxt, int_err(5)
+  integer              :: debug_level, debug_unit
   character(len=20)   :: name
 
   if(psb_get_errstatus() /= 0) return 
   info=0
-  name='psb_iallocv'
+  name='psb_igeall_v'
   call psb_erractionsave(err_act)
+  debug_unit  = psb_get_debug_unit()
+  debug_level = psb_get_debug_level()
 
   ictxt=psb_cd_get_context(desc_a)
 
@@ -252,6 +253,13 @@ subroutine psb_iallocv(x, desc_a, info,n)
       call psb_errpush(info,name,int_err,a_err='integer')
       goto 9999
     endif
+    do i=1,n_row
+      x(i) = 0.0d0
+    end do
+  else
+    if (debug_level > psb_debug_ext_) &
+         & write(debug_unit,*) me,name,&
+         & ': Did not allocate anything because of dectype',psb_cd_get_dectype(desc_a)
   endif
 
   x = 0

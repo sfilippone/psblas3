@@ -49,15 +49,19 @@ Subroutine psb_zfixcoo(a,info,idir)
   !locals
   Integer              :: nza, nzl,iret,idir_, dupl_
   integer              :: i,j, irw, icl, err_act
-  logical, parameter   :: debug=.false.
+  integer              :: debug_level, debug_unit
   character(len=20)    :: name = 'psb_fixcoo'
 
   info  = 0
   call psb_erractionsave(err_act)
+  debug_unit  = psb_get_debug_unit()
+  debug_level = psb_get_debug_level()
 
-  if(debug) write(0,*)'fixcoo: ',size(a%ia1),size(a%ia2)
+  if(debug_level >= psb_debug_serial_) &
+       & write(debug_unit,*)  trim(name),': start ',&
+       & size(a%ia1),size(a%ia2)
   if (toupper(a%fida) /= 'COO') then 
-    write(0,*) 'Fixcoo Invalid input ',a%fida
+    write(debug_unit,*) 'Fixcoo Invalid input ',a%fida
     info = -1
     return
   end if
@@ -155,7 +159,8 @@ Subroutine psb_zfixcoo(a,info,idir)
     end select
 
 
-    if(debug) write(0,*)'FIXCOO: end second loop'
+    if(debug_level >= psb_debug_serial_)&
+         & write(debug_unit,*)  trim(name),': end second loop'
 
   case(1) !  Col major order
 
@@ -231,9 +236,10 @@ Subroutine psb_zfixcoo(a,info,idir)
         endif
       enddo
     end select
-    if(debug) write(0,*)'FIXCOO: end second loop'
+    if (debug_level >= psb_debug_serial_)&
+         & write(debug_unit,*)  trim(name),': end second loop'
   case default
-    write(0,*) 'Fixcoo: unknown direction ',idir_
+    write(debug_unit,*) trim(name),': unknown direction ',idir_
   end select
 
   call psb_sp_setifld(psb_isrtdcoo_,psb_srtd_,a,info)

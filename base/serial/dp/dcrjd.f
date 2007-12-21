@@ -78,8 +78,6 @@ C     .. Local Scalars ..
       INTEGER            IOFF, ISTROW, NJA, NZ, PIA,
      +  PJA, PNG, K, MAX_NG, NG, LJA, ERR_ACT
       LOGICAL            SCALE
-      logical  debug
-      parameter (debug=.false.)
       CHARACTER          UPLO
       INTEGER MAX_NNZERO
 c     .. Local Arrays ..

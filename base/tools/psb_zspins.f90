@@ -37,15 +37,15 @@
 !    If desc_a is in the build state this routine implies a call to psb_cdins. 
 ! 
 ! Arguments: 
-!    nz       - integer.                      The number of points to insert.
-!    ia(:)    - integer                       The row indices of the coefficients.
-!    ja(:)    - integer                       The column indices of the coefficients.
-!    val(:)   - complex                       The values of the coefficients to be inserted.
-!    a        - type(<psb_dspmat_type>).      The sparse destination matrix.      
-!    desc_a   - type(<psb_desc_type>).        The communication descriptor.
-!    info     - integer.                      Error code
-!    rebuild  - logical                       Allows to reopen a matrix under
-!                                             certain circumstances.
+!    nz       - integer.                    The number of points to insert.
+!    ia(:)    - integer                     The row indices of the coefficients.
+!    ja(:)    - integer                     The column indices of the coefficients.
+!    val(:)   - complex                     The values of the coefficients to be inserted.
+!    a        - type(psb_dspmat_type).      The sparse destination matrix.      
+!    desc_a   - type(psb_desc_type).        The communication descriptor.
+!    info     - integer.                    Error code
+!    rebuild  - logical                     Allows to reopen a matrix under
+!                                           certain circumstances.
 !
 subroutine psb_zspins(nz,ia,ja,val,a,desc_a,info,rebuild)
 

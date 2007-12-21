@@ -131,12 +131,15 @@ subroutine psi_desc_index(desc,index_in,dep_list,&
   integer :: ihinsz,ntot,k,err_act,nidx,&
        & idxr, idxs, iszs, iszr, nesd, nerv, icomm
 
-  logical,parameter :: debug=.false., usempi=.true.
-  character(len=20)  :: name
+  logical,parameter :: usempi=.true.
+  integer              :: debug_level, debug_unit
+  character(len=20) :: name
 
   info = 0
   name='psi_desc_index'
   call psb_erractionsave(err_act)
+  debug_unit  = psb_get_debug_unit()
+  debug_level = psb_get_debug_level()
 
   ictxt = psb_cd_get_context(desc)
   icomm = psb_cd_get_mpic(desc)
@@ -147,8 +150,8 @@ subroutine psi_desc_index(desc,index_in,dep_list,&
     goto 9999
   endif
 
-  if (debug) then 
-    write(0,*) me,'start desc_index'
+  if (debug_level >= psb_debug_inner_) then 
+    write(debug_unit,*) me,' ',trim(name),': start'
     call psb_barrier(ictxt)
   endif
 
@@ -203,8 +206,8 @@ subroutine psi_desc_index(desc,index_in,dep_list,&
   if ((iszs /= idxs).or.(iszr /= idxr)) then 
     write(0,*) 'strange results?', iszs,idxs,iszr,idxr
   end if
-  if (debug) then 
-    write(0,*) me,'computed sizes ',iszr,iszs
+  if (debug_level >= psb_debug_inner_) then 
+    write(debug_unit,*) me,' ',trim(name),': computed sizes ',iszr,iszs
     call psb_barrier(ictxt)
   endif
 
@@ -223,8 +226,8 @@ subroutine psi_desc_index(desc,index_in,dep_list,&
     goto 9999
   end if
 
-  if (debug) then 
-    write(0,*) me,'computed allocated workspace ',iszr,iszs
+  if (debug_level >= psb_debug_inner_) then 
+    write(debug_unit,*) me,' ',trim(name),': computed allocated workspace ',iszr,iszs
     call psb_barrier(ictxt)
   endif
   allocate(sndbuf(iszs),rcvbuf(iszr),stat=info)
@@ -264,8 +267,8 @@ subroutine psi_desc_index(desc,index_in,dep_list,&
     i = i + nerv + 1 
   end do
 
-  if (debug) then 
-    write(0,*) me,' prepared send buffer '
+  if (debug_level >= psb_debug_inner_) then 
+    write(debug_unit,*) me,' ',trim(name),': prepared send buffer '
     call psb_barrier(ictxt)
   endif
   !
@@ -317,8 +320,8 @@ subroutine psi_desc_index(desc,index_in,dep_list,&
     goto 9999
   end if
 
-  if (debug) then 
-    write(0,*) me,'end desc_index'
+  if (debug_level >= psb_debug_inner_) then 
+    write(debug_unit,*) me,' ',trim(name),': done'
     call psb_barrier(ictxt)
   endif
 

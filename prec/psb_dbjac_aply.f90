@@ -53,7 +53,7 @@ subroutine psb_dbjac_aply(alpha,prec,x,beta,y,desc_data,trans,work,info)
   integer :: n_row,n_col
   real(kind(1.d0)), pointer :: ww(:), aux(:)
   integer :: ictxt,np,me, err_act, int_err(5)
-  logical,parameter                 :: debug=.false., debugprt=.false.
+  logical,parameter   :: debug=.false., debugprt=.false.
   character(len=20)   :: name, ch_err
 
   name='psb_bjac_aply'

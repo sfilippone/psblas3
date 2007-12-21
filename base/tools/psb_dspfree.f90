@@ -34,8 +34,8 @@
 !    Frees a sparse matrix structure.
 ! 
 ! Arguments: 
-!    a        - type(<psb_dspmat_type>).          The sparse matrix to be freed.      
-!    desc_a   - type(<psb_desc_type>).            The communication descriptor.
+!    a        - type(psb_dspmat_type).          The sparse matrix to be freed.      
+!    desc_a   - type(psb_desc_type).            The communication descriptor.
 !    info     - integer.                          return code.
 !
 subroutine psb_dspfree(a, desc_a,info)
@@ -48,9 +48,9 @@ subroutine psb_dspfree(a, desc_a,info)
   implicit none
 
   !....parameters...
-  type(psb_desc_type), intent(in) :: desc_a
-  type(psb_dspmat_type), intent(inout)       ::a
-  integer, intent(out)        :: info
+  type(psb_desc_type), intent(in)      :: desc_a
+  type(psb_dspmat_type), intent(inout) :: a
+  integer, intent(out)                 :: info
   !...locals....
   integer             :: ictxt,err_act
   character(len=20)   :: name

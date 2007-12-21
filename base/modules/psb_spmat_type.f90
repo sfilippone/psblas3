@@ -28,18 +28,16 @@
 !!$  POSSIBILITY OF SUCH DAMAGE.
 !!$ 
 !!$  
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-!!	Module to   define D_SPMAT, structure   !!
-!!      for sparse matrix.                      !!
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!
+! package: psb_spmat_type
+!          Data structure(s) for sparse matrices
+!
 module psb_spmat_type
   use psb_error_mod
   use psb_realloc_mod
   use psb_const_mod
   implicit none 
-  ! Typedef: psb_dspmat_type
-  !    Contains a sparse matrix
-
+  !
   !
   !     Queries into spmat%info
   !     
@@ -55,22 +53,40 @@ module psb_spmat_type
   integer, parameter :: psb_dupl_=11,  psb_upd_=12
   integer, parameter :: psb_ifasize_=16
   !
-  !
-  ! Possible matrix states.
+  ! Types: psb_dspmat_type, psb_zspmat_type
+  ! 
+  !|  type psb_dspmat_type
+  !|    integer     :: m, k              ! Row & column size 
+  !|    character(len=5) :: fida         ! Storage format: CSR,COO etc.
+  !|    character(len=11) :: descra      ! Matrix type: encodes general, triang. 
+  !|    integer     :: infoa(psb_ifasize_)  ! Additional integer info 
+  !|    real(kind(1.d0)), allocatable  :: aspk(:)  ! Coefficients
+  !|    integer, allocatable :: ia1(:), ia2(:)     ! Row/column indices encoded
+  !|    integer, allocatable :: pl(:), pr(:)       ! Row/column permutation
+  !|  end type psb_dspmat_type
+  !|  type psb_zspmat_type
+  !|    integer     :: m, k
+  !|    character(len=5) :: fida
+  !|    character(len=11) :: descra
+  !|    integer     :: infoa(psb_ifasize_)
+  !|    complex(kind(1.d0)), allocatable  :: aspk(:)
+  !|    integer, allocatable  :: ia1(:), ia2(:)
+  !|    integer, allocatable  :: pl(:), pr(:)
+  !|  end type psb_zspmat_type
   !
   ! A sparse matrix can move between states according to the 
   ! following state transition table. 
-  ! In           Out        Routine
-  ! ----------------------------------
-  ! Null         Build      psb_sp_all
-  ! Build        Build      psb_coins
-  ! Build        Assembled  psb_spcnv
-  ! Assembled    Assembled  psb_spcnv
-  ! Assembled    Update     psb_sp_reinit
-  ! Update       Update     psb_coins
-  ! Update       Assembled  psb_spcnv
-  ! *            unchanged  psb_sp_reall 
-  ! Assembled    Null       psb_sp_free
+  !| In           Out        Routine
+  !| ----------------------------------
+  !| Null         Build      psb_sp_all
+  !| Build        Build      psb_coins
+  !| Build        Assembled  psb_spcnv
+  !| Assembled    Assembled  psb_spcnv
+  !| Assembled    Update     psb_sp_reinit
+  !| Update       Update     psb_coins
+  !| Update       Assembled  psb_spcnv
+  !| *            unchanged  psb_sp_reall 
+  !| Assembled    Null       psb_sp_free
   ! 
   ! Note that psb_spcnv is overloaded in two flavours,
   ! psb_spcnv(a,info)   
@@ -81,7 +97,7 @@ module psb_spmat_type
   !  
   integer, parameter :: psb_spmat_null_=0, psb_spmat_bld_=1
   integer, parameter :: psb_spmat_asb_=2, psb_spmat_upd_=4
-  
+
   integer, parameter :: psb_ireg_flgs_=10, psb_ip2_=0
   integer, parameter :: psb_iflag_=2, psb_ichk_=3
   integer, parameter :: psb_nnzt_=4, psb_zero_=5,psb_ipc_=6
@@ -105,35 +121,21 @@ module psb_spmat_type
 
 
   type psb_dspmat_type
-    ! Rows & columns 
     integer     :: m, k
-    ! Identify the representation method. Es: CSR, JAD, ...
     character(len=5) :: fida
-    ! describe some chacteristics of sparse matrix
     character(len=11) :: descra
-    ! Contains some additional informations on sparse matrix
     integer     :: infoa(psb_ifasize_)
-    ! Contains sparse matrix coefficients
     real(kind(1.d0)), allocatable  :: aspk(:)
-    ! Contains indeces that describes sparse matrix structure
     integer, allocatable :: ia1(:), ia2(:)
-    ! Permutations matrix
     integer, allocatable :: pl(:), pr(:)
   end type psb_dspmat_type
   type psb_zspmat_type
-    ! Rows & columns 
     integer     :: m, k
-    ! Identify the representation method. Es: CSR, JAD, ...
     character(len=5) :: fida
-    ! describe some chacteristics of sparse matrix
     character(len=11) :: descra
-    ! Contains some additional informations on sparse matrix
     integer     :: infoa(psb_ifasize_)
-    ! Contains sparse matrix coefficients
     complex(kind(1.d0)), allocatable  :: aspk(:)
-    ! Contains indeces that describes sparse matrix structure
     integer, allocatable  :: ia1(:), ia2(:)
-    ! Permutations matrix
     integer, allocatable  :: pl(:), pr(:)
   end type psb_zspmat_type
 
@@ -243,12 +245,12 @@ contains
 
     return
   end function psb_get_zsp_ncols
-  
+
 
   integer function psb_get_dsp_nnzeros(a)
     type(psb_dspmat_type), intent(in) :: a  
     integer :: ires,info
-    
+
     call psb_sp_info(psb_nztotreq_,a,ires,info)
     if (info == 0) then 
       psb_get_dsp_nnzeros = ires
@@ -260,7 +262,7 @@ contains
   integer function psb_get_zsp_nnzeros(a)
     type(psb_zspmat_type), intent(in) :: a  
     integer :: ires,info
-    
+
     call psb_sp_info(psb_nztotreq_,a,ires,info)
     if (info == 0) then 
       psb_get_zsp_nnzeros = ires
@@ -272,7 +274,7 @@ contains
   integer function psb_get_dsp_nzsize(a)
     type(psb_dspmat_type), intent(in) :: a  
     integer :: ires,info
-    
+
     call psb_sp_info(psb_nzsizereq_,a,ires,info)
     if (info == 0) then 
       psb_get_dsp_nzsize = ires
@@ -284,7 +286,7 @@ contains
   integer function psb_get_zsp_nzsize(a)
     type(psb_zspmat_type), intent(in) :: a  
     integer :: ires,info
-    
+
     call psb_sp_info(psb_nzsizereq_,a,ires,info)
     if (info == 0) then 
       psb_get_zsp_nzsize = ires
@@ -298,7 +300,7 @@ contains
     integer, intent(in)               :: ir
     type(psb_dspmat_type), intent(in) :: a  
     integer :: ires,info
-    
+
     call psb_sp_info(psb_nzrowreq_,a,ires,info,iaux=ir)
     if (info == 0) then 
       psb_get_dsp_nnz_row = ires
@@ -310,7 +312,7 @@ contains
     integer, intent(in)               :: ir
     type(psb_zspmat_type), intent(in) :: a  
     integer :: ires,info
-    
+
     call psb_sp_info(psb_nzrowreq_,a,ires,info,iaux=ir)
     if (info == 0) then 
       psb_get_zsp_nnz_row = ires
@@ -347,7 +349,7 @@ contains
     logical, parameter  :: debug=.false.
     logical             :: clear_
     character(len=20)   :: name
-    
+
     info = 0
     name = 'psb_sp_reinit'
 
@@ -356,7 +358,7 @@ contains
     else
       clear_ = .true.
     end if
-    
+
     select case(psb_sp_getifld(psb_state_,a,info))
     case(psb_spmat_asb_) 
 
@@ -628,7 +630,7 @@ contains
   End Subroutine psb_dspclone
 
 
-  
+
   ! Will be changed to use MOVE_ALLOC 
   subroutine psb_dsp_transfer(a, b,info)
     implicit none
@@ -636,9 +638,6 @@ contains
     Type(psb_dspmat_type), intent(inout)  :: A
     Type(psb_dspmat_type), intent(inout)  :: B
     Integer, intent(out)                  :: info
-
-    !locals
-    logical, parameter  :: debug=.false.
 
     info  = 0
 
@@ -668,16 +667,13 @@ contains
     Type(psb_dspmat_type), intent(inout) :: A
     Integer, intent(in)          :: field,val
     Integer, intent(out)         :: info
-    
-    !locals
-    logical, parameter  :: debug=.false.
+
     info  = 0
 
-!!$    call psb_realloc(psb_ifasize_,a%infoa,info)
-    
+
     if (info == 0) &
          & call psb_setifield(val,field,a%infoa,psb_ifasize_,info)
-    
+
 
     Return
 
@@ -699,7 +695,6 @@ contains
 
     !locals
     Integer           :: i1, i2, ia
-    logical, parameter  :: debug=.false.
 
     info  = 0
     call psb_sp_trimsize(a,i1,i2,ia,info)
@@ -718,7 +713,6 @@ contains
     Integer, intent(out)          :: info
     !locals
     Integer           :: i1, i2, ia
-    logical, parameter  :: debug=.false.
 
     info  = 0
     call psb_sp_trimsize(a,i1,i2,ia,info)
@@ -739,7 +733,6 @@ contains
 
     !locals
     Integer             :: nza
-    logical, parameter  :: debug=.false.
 
     info  = 0
     if (psb_sp_getifld(psb_upd_,a,info) == psb_upd_perm_) then 
@@ -775,7 +768,7 @@ contains
     Return
 
   End Subroutine psb_dsp_trimsize
-  
+
   function psb_dsp_getifld(field,a,info)
     implicit none
     !....Parameters...
@@ -786,7 +779,6 @@ contains
     Integer, intent(out)         :: info
 
     !locals
-    logical, parameter  :: debug=.false.
     integer :: val
 
     info  = 0
@@ -799,7 +791,7 @@ contains
     endif
 
     call psb_getifield(val,field,a%infoa,psb_ifasize_,info)
-    
+
     psb_dsp_getifld = val
     Return
 
@@ -813,11 +805,10 @@ contains
     Integer                      :: psb_dspsizeof
 
     !locals
-    logical, parameter  :: debug=.false.
     integer :: val
 
     val   = 4*size(a%infoa)
-    
+
     if (allocated(a%aspk)) then 
       val = val + 8 * size(a%aspk)
     endif
@@ -835,7 +826,7 @@ contains
       val = val + 4 * size(a%pr)
     endif
 
-    
+
     psb_dspsizeof = val
     Return
 
@@ -848,7 +839,6 @@ contains
     Type(psb_dspmat_type), intent(inout)  :: A
     Integer, intent(out)        :: info
     !locals
-    logical, parameter  :: debug=.false.
     integer             :: iret
     info  = 0
 
@@ -902,10 +892,9 @@ contains
     logical, intent(in), optional        :: clear
 
     !locals
-    logical, parameter  :: debug=.false.
     logical             :: clear_
     character(len=20)   :: name
-    
+
     info = 0
     name = 'psb_sp_reinit'
 
@@ -914,7 +903,7 @@ contains
     else
       clear_ = .true.
     end if
-    
+
     select case(psb_sp_getifld(psb_state_,a,info))
     case(psb_spmat_asb_) 
 
@@ -1078,8 +1067,6 @@ contains
     Integer, intent(in)                   :: ni1,ni2,nz
     Integer, intent(inout)                :: info
 
-    !locals
-    logical, parameter  :: debug=.false.
 
     info  = 0
     call psb_realloc(nz,a%aspk,info)
@@ -1112,9 +1099,6 @@ contains
     !
     Integer, intent(in), optional :: ifc
     integer                       :: ifc_
-
-    !locals
-    logical, parameter  :: debug=.false.
 
     info  = 0
     if (nnz.lt.0) then
@@ -1154,10 +1138,6 @@ contains
     Type(psb_zspmat_type), intent(out)  :: B
     Integer, intent(out)                :: info
 
-    !locals
-
-    logical, parameter  :: debug=.false.
-
 
     INFO  = 0
     call psb_nullify_sp(b)
@@ -1191,9 +1171,6 @@ contains
     Type(psb_zspmat_type), intent(inout)  :: B
     Integer, intent(out)                  :: info
 
-    !locals
-    logical, parameter  :: debug=.false.
-
     info  = 0
 
     call psb_transfer( a%aspk,     b%aspk  , info)
@@ -1221,17 +1198,13 @@ contains
     Integer, intent(in)          :: field,val
     Integer, intent(out)         :: info
 
-    !locals
-    logical, parameter  :: debug=.false.
 
     info  = 0
 
 
-!!$    call psb_realloc(psb_ifasize_,a%infoa,info)
-    
     if (info == 0) &
          & call psb_setifield(val,field,a%infoa,psb_ifasize_,info)
-    
+
 
     Return
 
@@ -1247,7 +1220,6 @@ contains
 
     !locals
     Integer             :: nza
-    logical, parameter  :: debug=.false.
 
     info  = 0
     if (psb_sp_getifld(psb_upd_,a,info) == psb_upd_perm_) then 
@@ -1294,7 +1266,6 @@ contains
     Integer, intent(out)         :: info
 
     !locals
-    logical, parameter  :: debug=.false.
     integer :: val
 
     info  = 0
@@ -1307,7 +1278,7 @@ contains
     endif
 
     call psb_getifield(val,field,a%infoa,psb_ifasize_,info)
-    
+
     psb_zsp_getifld = val
     Return
 
@@ -1321,11 +1292,10 @@ contains
     Integer                      :: psb_zspsizeof
 
     !locals
-    logical, parameter  :: debug=.false.
     integer :: val
 
     val   = 4*size(a%infoa)
-    
+
     if (allocated(a%aspk)) then 
       val = val + 16 * size(a%aspk)
     endif
@@ -1342,8 +1312,8 @@ contains
     if (allocated(a%pr)) then 
       val = val + 4 * size(a%pr)
     endif
-    
-    
+
+
     psb_zspsizeof = val
     Return
 
@@ -1357,8 +1327,6 @@ contains
     !....Parameters...
     Type(psb_zspmat_type), intent(inout)  :: A
     Integer, intent(out)        :: info
-    !locals
-    logical, parameter  :: debug=.false.
 
     info  = 0
 

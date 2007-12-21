@@ -153,6 +153,8 @@ C
 C
       SUBROUTINE DSWSM(TRANS,M,N,ALPHA,UNITD,D,FIDT,DESCRT,T,IT1,IT2, 
      &                 INFOT,B,LDB,BETA,C,LDC,WORK,LWORK,IERROR)
+      use psb_error_mod
+      implicit none
 C     .. Scalar Arguments ..
       INTEGER           M, N, LDB, LDC, LWORK, IERROR
       CHARACTER         UNITD, TRANS
@@ -167,16 +169,16 @@ C     .. Parameters ..
       PARAMETER        (ONE=1)
 C     .. External Subroutines ..
       EXTERNAL         DCSRSM, DCOPY
-      LOGICAL           DEBUG
-      PARAMETER         (DEBUG=.FALSE.)
-
+      integer          debug_level, debug_unit, err_act, int_val(5)
       CHARACTER*20      NAME
 
 C     .. Executable Statements ..
 
-      NAME = 'DSWSM\0'
+      NAME = 'DSWSM'
       IERROR = 0
       CALL FCPSB_ERRACTIONSAVE(ERR_ACT)
+      debug_unit  = psb_get_debug_unit()
+      debug_level = psb_get_debug_level()
 
 C
 C     Check for identity matrix
@@ -186,7 +188,8 @@ C
          GOTO 9998
       ENDIF
 
-      if (debug) write(*,*) 'DSWSM ',m,n,ierror,' ',unitd
+      if (debug_level >= psb_debug_serial_comp_)
+     +  write(debug_unit,*) trim(name),': entry ',m,n,ierror,' ',unitd
 C
 C     Switching on FIDT: proper sparse BLAS routine is selected
 C     according to data structure

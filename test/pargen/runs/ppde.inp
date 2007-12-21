@@ -5,7 +5,7 @@ CSR                    Storage format for matrix A:  CSR COO JAD
 60                     Domain size (acutal system is this**3)
 1                      Stopping criterion
 80                     MAXIT
-01                     ITRACE
+-1                     ITRACE
 20                     IRST    restart for RGMRES  and BiCGSTABL
 
 

@@ -30,9 +30,8 @@ C
 C 
       SUBROUTINE DCOOSM(TRANST,M,N,UNITD,D,ALPHA,DESCRA,A,IA,JA,INFOA,
      *                  B,LDB,BETA,C,LDC,WORK,LWORK,IERROR)
+      use psb_error_mod
       IMPLICIT NONE
-      LOGICAL           DEBUG
-      PARAMETER         (DEBUG=.FALSE.)
       DOUBLE PRECISION  ALPHA, BETA
       INTEGER           LDB, LDC, LWORK, M, N, IERROR
       CHARACTER         UNITD, TRANST
@@ -43,18 +42,21 @@ C
       CHARACTER         DIAG, UPLO
       INTRINSIC         DBLE, IDINT
       CHARACTER*20      NAME
+      integer              :: debug_level, debug_unit
 
-      NAME = 'DCOOSM\0'
+      NAME = 'ZCOOSM\0'
       IERROR = 0
       CALL FCPSB_ERRACTIONSAVE(ERR_ACT)
+      debug_unit  = psb_get_debug_unit()
+      debug_level = psb_get_debug_level()
 
       IF((ALPHA.NE.1.D0) .OR. (BETA.NE.0.D0))then
          IERROR=5
          CALL FCPSB_ERRPUSH(IERROR,NAME,INT_VAL)
          GOTO 9999
       ENDIF
-      if (debug) write(*,*) 'DCOOSM ',m
-      if (debug) write(*,*) 'DCOOSM ',m,ierror
+      if (debug_level >= psb_debug_serial_comp_)
+     +  write(debug_unit,*) trim(name),':' ,m,ierror
       
       UPLO = '?'
       IF (DESCRA(1:1).EQ.'T' .AND. DESCRA(2:2).EQ.'U') UPLO = 'U'

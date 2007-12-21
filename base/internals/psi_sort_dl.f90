@@ -41,20 +41,23 @@ subroutine psi_sort_dl(dep_list,l_dep_list,np,info)
   integer :: np,dep_list(:,:), l_dep_list(:)
   integer :: idg, iupd, idgp, iedges, iidx, iich,ndgmx, isz, err_act
   integer :: i, info
-  integer, allocatable   :: work(:)
-  logical, parameter :: debug=.false.
-  character(len=20)        :: name
+  integer, allocatable :: work(:)
+  integer              :: debug_level, debug_unit
+  character(len=20)    :: name
   
   name='psi_sort_dl'
   if(psb_get_errstatus() /= 0) return 
   info=0
   call psb_erractionsave(err_act)
+  debug_unit  = psb_get_debug_unit()
+  debug_level = psb_get_debug_level()
   
   info = 0
   ndgmx = 0
   do i=1,np
      ndgmx = ndgmx + l_dep_list(i)
-     if (debug) write(0,*) i,l_dep_list(i)
+     if (debug_level >= psb_debug_inner_)&
+          & write(debug_unit,*) name,': ',i,l_dep_list(i)
   enddo
   idg = 1
   iupd = idg+np
@@ -63,7 +66,8 @@ subroutine psi_sort_dl(dep_list,l_dep_list,np,info)
   iidx = iedges + 2*ndgmx
   iich = iidx + ndgmx
   isz = iich + ndgmx
-  if (debug)write(0,*) 'psi_sort_dl: ndgmx ',ndgmx,isz
+  if (debug_level >= psb_debug_inner_)&
+       & write(debug_unit,*) name,': ndgmx ',ndgmx,isz
   
   allocate(work(isz))
   ! call srtlist(dep_list, dl_lda, l_dep_list, np, info)

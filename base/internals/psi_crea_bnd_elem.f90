@@ -39,7 +39,7 @@
 ! 
 ! Arguments: 
 !    bndel(:) - integer, allocatable      Array containing the output list              
-!    desc_a   - type(<psb_desc_type>).    The communication descriptor.        
+!    desc_a   - type(psb_desc_type).    The communication descriptor.        
 !    info     - integer.                  return code.
 ! 
 subroutine psi_crea_bnd_elem(bndel,desc_a,info)

@@ -40,7 +40,7 @@
 !                                               should be applied
 !    iperm   - integer, dimension(:)            A permutation vector; its size 
 !                                               must be either N_ROW or N_COL
-!    a       - type(<psb_dspmat_type).          The matrix to be permuted
+!    a       - type(psb_dspmat_type).          The matrix to be permuted
 !    info    - integer.                         Eventually returns an error code
 subroutine psb_dcsrp(trans,iperm,a, info)
   use psb_serial_mod, psb_protect_name => psb_dcsrp
@@ -80,11 +80,6 @@ subroutine psb_dcsrp(trans,iperm,a, info)
   real(kind(1.d0)), allocatable         ::  work_dcsdp(:)
   integer                               ::  n_row,err_act, int_err(5)
   character(len=20)                     ::  name, char_err
-
-  real(kind(1.d0))                      ::  time(10)
-  logical, parameter :: debug=.false.
-
-  time(1) = psb_wtime()
 
   n_row   = psb_get_sp_nrows(a)
   n_col   = psb_get_sp_ncols(a)
@@ -146,10 +141,13 @@ subroutine psb_dcsrp(trans,iperm,a, info)
     goto 9999
   end if
 
-  deallocate(ipt,work_dcsdp)
-
-  time(4) = psb_wtime()
-  time(4) = time(4) - time(3)
+  deallocate(ipt,work_dcsdp,stat=info)
+  if(info /= psb_no_err_) then
+    info=4010
+    char_err='Deallocate'
+    call psb_errpush(info,name,a_err=char_err)
+    goto 9999
+  end if
 
   call psb_erractionrestore(err_act)
   return

@@ -35,8 +35,8 @@
 !    is in the update state.
 ! 
 ! Arguments: 
-!    a        - type(<psb_zspmat_type>).        The sparse matrix to be reinitiated.      
-!    desc_a   - type(<psb_desc_type>).          The communication descriptor.
+!    a        - type(psb_zspmat_type).        The sparse matrix to be reinitiated.      
+!    desc_a   - type(psb_desc_type).          The communication descriptor.
 !    info     - integer.                        Return code.
 !    clear    - logical, optional               Whether the coefficients should be zeroed
 !                                               default .true.          
@@ -58,8 +58,8 @@ Subroutine psb_zsprn(a, desc_a,info,clear)
   logical, intent(in), optional        :: clear
 
   !locals
-  Integer             :: ictxt, np,me,err,err_act
-  logical, parameter  :: debug=.false.
+  Integer             :: ictxt,np,me,err,err_act
+  integer             :: debug_level, debug_unit
   integer             :: int_err(5)
   character(len=20)   :: name
   logical             :: clear_
@@ -69,13 +69,14 @@ Subroutine psb_zsprn(a, desc_a,info,clear)
   int_err(1)=0
   name = 'psb_zsprn'
   call psb_erractionsave(err_act)
+  debug_unit  = psb_get_debug_unit()
+  debug_level = psb_get_debug_level()
 
   ictxt = psb_cd_get_context(desc_a)
   call psb_info(ictxt, me, np)
-  if (debug) &
-       &write(*,*) 'starting spalloc ',ictxt,np,me
+  if (debug_level >= psb_debug_outer_) &
+       & write(debug_unit,*) me,' ',trim(name),': start '
 
-  
   if (psb_is_bld_desc(desc_a)) then
     ! Should do nothing, we are called redundantly
     return
@@ -94,6 +95,8 @@ Subroutine psb_zsprn(a, desc_a,info,clear)
   call psb_sp_reinit(a,info,clear=clear_)
 
   if (info /= 0) goto 9999
+  if (debug_level >= psb_debug_outer_) &
+       & write(debug_unit,*) me,' ',trim(name),': done'
 
   call psb_erractionrestore(err_act)
   return

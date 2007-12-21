@@ -32,10 +32,20 @@
 ! Subroutine: psb_dspgetrow
 !    Gets one or more rows from a sparse matrix. 
 ! Arguments:
-!*****************************************************************************
-!*                                                                           *
-!*                                                                           *
-!*****************************************************************************
+!  irw     - integer, input               The row to be extracted
+!  a       - type(psb_dspmat_type),input  The sparse matrix
+!  nz      - integer, output              The number of entries
+!  ia(:)   - integer, allocatable, inout  The output row indices
+!  ja(:)   - integer, allocatable, inout  The output col indices
+!  val(:)  - real, allocatable,inout      The coefficients
+!  info    - integer, output              Error code
+!  iren(:) - integer, input,optional      Renumbering of indices
+!  lrw     - integer, input,optional      Extract rows irw:lrw, default lrw=irw
+!  append  - logical, input,optional      Should we append to already existing
+!                                         partial output?
+!  nzin    - integer, input, optional     If appending, how many entries were already
+!                                         occupied.
+!
 subroutine psb_dspgetrow(irw,a,nz,ia,ja,val,info,iren,lrw,append,nzin)
   ! Output is always in  COO format 
   use psb_spmat_type

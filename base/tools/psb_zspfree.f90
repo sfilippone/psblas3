@@ -34,8 +34,8 @@
 !    Frees a sparse matrix structure.
 ! 
 ! Arguments: 
-!    a        - type(<psb_zspmat_type>).          The sparse matrix to be freed.      
-!    desc_a   - type(<psb_desc_type>).            The communication descriptor.
+!    a        - type(psb_zspmat_type).          The sparse matrix to be freed.      
+!    desc_a   - type(psb_desc_type).            The communication descriptor.
 !    info     - integer.                          return code.
 !
 subroutine psb_zspfree(a, desc_a,info)

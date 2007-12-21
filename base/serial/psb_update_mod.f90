@@ -164,6 +164,7 @@ contains
     use psb_realloc_mod
     use psb_string_mod
     use psb_serial_mod
+    use psb_error_mod
     implicit none 
 
     type(psb_dspmat_type), intent(inout) :: a
@@ -174,14 +175,16 @@ contains
     integer, intent(out) :: info
     integer, intent(in), optional  :: ng,gtl(*)
 
-    logical, parameter :: debug=.false.
+    integer  :: debug_level, debug_unit
+    character(len=20)    :: name='d_csr_srch_upd'
     integer  :: i,ir,ic, ilr, ilc, ip, &
          & i1,i2,nc,lb,ub,m,dupl
 
     info = 0
+    debug_unit  = psb_get_debug_unit()
+    debug_level = psb_get_debug_level()
 
     dupl = psb_sp_getifld(psb_dupl_,a,info)
-
 
     if (present(gtl)) then 
       if (.not.present(ng)) then 
@@ -213,8 +216,10 @@ contains
                 if (ip>0) then 
                   a%aspk(i1+ip-1) = val(i)
                 else
-                  if (debug) &
-                       & write(0,*)'Was searching ',ic,' in: ',i1,i2,' : ',a%ia1(i1:i2-1)
+                  if (debug_level >= psb_debug_serial_) &
+                       & write(debug_unit,*) trim(name),&
+                       & ': Was searching ',ic,' in: ',i1,i2,&
+                       & ' : ',a%ia1(i1:i2-1)
                   info = i
                   return
                 end if
@@ -227,7 +232,6 @@ contains
                 do
                   if (lb > ub) exit
                   m = (lb+ub)/2
-!!$              write(0,*) 'Debug: ',lb,m,ub
                   if (ic == a%ia1(m))  then
                     ip   = m 
                     lb   = ub + 1
@@ -241,15 +245,19 @@ contains
                 if (ip>0) then 
                   a%aspk(ip) = val(i)                
                 else
-                  if (debug) write(0,*)'Was searching ',ic,&
-                       & ' in: ',i1,i2,' : ',a%ia1(i1:i2-1)
+                  if (debug_level >= psb_debug_serial_) &
+                       & write(debug_unit,*) trim(name),&
+                       & ': Was searching ',ic,' in: ',i1,i2,&
+                       & ' : ',a%ia1(i1:i2-1)
                   info = i
                   return
                 end if
 
               end if
             else
-              if (debug) write(0,*) 'Discarding row that does not belong to us.'
+              if (debug_level >= psb_debug_serial_) &
+                   & write(debug_unit,*) trim(name),&
+                   & ': Discarding row that does not belong to us.'
             end if
           end if
         end do
@@ -268,25 +276,30 @@ contains
               i1 = a%ia2(ir)
               i2 = a%ia2(ir+1)
               nc = i2-i1
-!!$              write(0,*) 'ir ic ',ir,ic,i1,i2,a%m,a%k
               call issrch(ip,ic,nc,a%ia1(i1:i2-1))
               if (ip>0) then 
                 a%aspk(i1+ip-1) = a%aspk(i1+ip-1) + val(i)
               else
-                if (debug) write(0,*)'Was searching ',ic,&
-                     & ' in: ',i1,i2,' : ',a%ia1(i1:i2-1)
+                  if (debug_level >= psb_debug_serial_) &
+                       & write(debug_unit,*) trim(name),&
+                       & ': Was searching ',ic,' in: ',i1,i2,&
+                       & ' : ',a%ia1(i1:i2-1)
                 info = i
                 return
               end if
             else
-              if (debug) write(0,*) 'Discarding row that does not belong to us.'
+              if (debug_level >= psb_debug_serial_) &
+                   & write(debug_unit,*) trim(name),&
+                   & ': Discarding row that does not belong to us.'
             end if
           end if
         end do
 
       case default
         info = -3
-        if (debug) write(0,*) 'Duplicate handling: ',dupl
+        if (debug_level >= psb_debug_serial_) &
+             & write(debug_unit,*) trim(name),&
+             & ': Duplicate handling: ',dupl
       end select
 
     else
@@ -314,21 +327,21 @@ contains
               if (ip>0) then 
                 a%aspk(i1+ip-1) = val(i)
               else
-                if (debug) write(0,*)'Was searching ',ic,&
-                     & ' in: ',i1,i2,' : ',a%ia1(i1:i2-1)
+                  if (debug_level >= psb_debug_serial_) &
+                       & write(debug_unit,*) trim(name),&
+                       & ': Was searching ',ic,' in: ',i1,i2,&
+                       & ' : ',a%ia1(i1:i2-1)
                 info = i
                 return
               end if
 
             else
-!!$ 
               ip = -1
               lb = i1
               ub = i2-1
               do
                 if (lb > ub) exit
                 m = (lb+ub)/2
-!!$              write(0,*) 'Debug: ',lb,m,ub
                 if (ic == a%ia1(m))  then
                   ip   = m 
                   lb   = ub + 1
@@ -342,14 +355,18 @@ contains
               if (ip>0) then 
                 a%aspk(ip) = val(i)                
               else
-                if (debug) write(0,*)'Was searching ',ic,&
-                     & ' in: ',i1,i2,' : ',a%ia1(i1:i2-1)
+                  if (debug_level >= psb_debug_serial_) &
+                       & write(debug_unit,*) trim(name),&
+                       & ': Was searching ',ic,' in: ',i1,i2,&
+                       & ' : ',a%ia1(i1:i2-1)
                 info = i
                 return
               end if
             end if
           else
-            if (debug) write(0,*) 'Discarding row that does not belong to us.'
+            if (debug_level >= psb_debug_serial_) &
+                 & write(debug_unit,*) trim(name),&
+                 & ': Discarding row that does not belong to us.'
           end if
 
         end do
@@ -373,13 +390,17 @@ contains
               return
             end if
           else
-            if (debug) write(0,*) 'Discarding row that does not belong to us.'
+            if (debug_level >= psb_debug_serial_) &
+                 & write(debug_unit,*) trim(name),&
+                 & ': Discarding row that does not belong to us.'
           end if
         end do
 
       case default
         info = -3
-        if (debug) write(0,*) 'Duplicate handling: ',dupl
+        if (debug_level >= psb_debug_serial_) &
+             & write(debug_unit,*) trim(name),&
+             & ': Duplicate handling: ',dupl
       end select
     end if
 
@@ -404,10 +425,12 @@ contains
     integer, intent(in), optional  :: ng,gtl(*)
     integer  :: i,ir,ic, ilr, ilc, ip, &
          & i1,i2,nc,nnz,dupl
-    logical, parameter :: debug=.false.
+    integer              :: debug_level, debug_unit
+    character(len=20)    :: name='d_coo_srch_upd'
 
     info = 0
-
+    debug_unit  = psb_get_debug_unit()
+    debug_level = psb_get_debug_level()
     dupl = psb_sp_getifld(psb_dupl_,a,info)
 
     if (psb_sp_getifld(psb_srtd_,a,info) /= psb_isrtdcoo_) then 
@@ -464,7 +487,9 @@ contains
                 return
               end if
             else
-              if (debug) write(0,*) 'Discarding row does not belong'
+            if (debug_level >= psb_debug_serial_) &
+                 & write(debug_unit,*) trim(name),&
+                 & ': Discarding row that does not belong to us.'
             endif
           end if
         end do
@@ -505,15 +530,18 @@ contains
                 return
               end if
             else
-              if (debug) write(0,*) 'Discarding row does not belong'
-
+              if (debug_level >= psb_debug_serial_) &
+                   & write(debug_unit,*) trim(name),&
+                   & ': Discarding row that does not belong to us.'              
             end if
           end if
         end do
 
       case default
         info = -3
-        if (debug) write(0,*) 'Duplicate handling: ',dupl
+        if (debug_level >= psb_debug_serial_) &
+             & write(debug_unit,*) trim(name),&
+             & ': Duplicate handling: ',dupl
       end select
 
     else
@@ -594,7 +622,9 @@ contains
 
       case default
         info = -3
-        if (debug) write(0,*) 'Duplicate handling: ',dupl
+        if (debug_level >= psb_debug_serial_) &
+             & write(debug_unit,*) trim(name),&
+             & ': Duplicate handling: ',dupl
       end select
 
     end if
@@ -860,11 +890,14 @@ contains
     integer  :: i,ir,ic, ilr, ilc, ip, &
          & i1,i2,nc,lb,ub,m,dupl
 
-    logical, parameter :: debug=.false.
+    integer  :: debug_level, debug_unit
+    character(len=20)    :: name='z_csr_srch_upd'
+
     info = 0
+    debug_unit  = psb_get_debug_unit()
+    debug_level = psb_get_debug_level()
 
     dupl = psb_sp_getifld(psb_dupl_,a,info)
-
 
     if (present(gtl)) then 
       if (.not.present(ng)) then 
@@ -884,7 +917,7 @@ contains
           ic = ja(i) 
           if ((ir >=1).and.(ir<=ng).and.(ic>=1).and.(ic<=ng)) then 
             ir = gtl(ir)
-            ic = gtl(ic) 
+            ic = gtl(ic)
             if ((ir > 0).and.(ir <= a%m)) then 
               i1 = a%ia2(ir)
               i2 = a%ia2(ir+1)
@@ -896,7 +929,10 @@ contains
                 if (ip>0) then 
                   a%aspk(i1+ip-1) = val(i)
                 else
-                  write(0,*)'Was searching ',ic,' in: ',i1,i2,' : ',a%ia1(i1:i2-1)
+                  if (debug_level >= psb_debug_serial_) &
+                       & write(debug_unit,*) trim(name),&
+                       & ': Was searching ',ic,' in: ',i1,i2,&
+                       & ' : ',a%ia1(i1:i2-1)
                   info = i
                   return
                 end if
@@ -909,7 +945,6 @@ contains
                 do
                   if (lb > ub) exit
                   m = (lb+ub)/2
-!!$              write(0,*) 'Debug: ',lb,m,ub
                   if (ic == a%ia1(m))  then
                     ip   = m 
                     lb   = ub + 1
@@ -923,16 +958,20 @@ contains
                 if (ip>0) then 
                   a%aspk(ip) = val(i)                
                 else
-                  write(0,*)'Was searching ',ic,' in: ',i1,i2,' : ',a%ia1(i1:i2-1)
+                  if (debug_level >= psb_debug_serial_) &
+                       & write(debug_unit,*) trim(name),&
+                       & ': Was searching ',ic,' in: ',i1,i2,&
+                       & ' : ',a%ia1(i1:i2-1)
                   info = i
                   return
                 end if
 
               end if
             else
-              if (debug) write(0,*) 'Discarding row does not belong'
-            endif
-
+              if (debug_level >= psb_debug_serial_) &
+                   & write(debug_unit,*) trim(name),&
+                   & ': Discarding row that does not belong to us.'
+            end if
           end if
         end do
 
@@ -945,7 +984,7 @@ contains
           ic = ja(i) 
           if ((ir >=1).and.(ir<=ng).and.(ic>=1).and.(ic<=ng)) then 
             ir = gtl(ir)
-            ic = gtl(ic) 
+            ic = gtl(ic)
             if ((ir > 0).and.(ir <= a%m)) then 
               i1 = a%ia2(ir)
               i2 = a%ia2(ir+1)
@@ -954,18 +993,26 @@ contains
               if (ip>0) then 
                 a%aspk(i1+ip-1) = a%aspk(i1+ip-1) + val(i)
               else
+                  if (debug_level >= psb_debug_serial_) &
+                       & write(debug_unit,*) trim(name),&
+                       & ': Was searching ',ic,' in: ',i1,i2,&
+                       & ' : ',a%ia1(i1:i2-1)
                 info = i
                 return
               end if
             else
-              if (debug) write(0,*) 'Discarding row does not belong'
-            endif
+              if (debug_level >= psb_debug_serial_) &
+                   & write(debug_unit,*) trim(name),&
+                   & ': Discarding row that does not belong to us.'
+            end if
           end if
         end do
 
       case default
         info = -3
-        if (debug) write(0,*) 'Duplicate handling: ',dupl
+        if (debug_level >= psb_debug_serial_) &
+             & write(debug_unit,*) trim(name),&
+             & ': Duplicate handling: ',dupl
       end select
 
     else
@@ -980,7 +1027,9 @@ contains
         do i=1, nz
           ir = ia(i)
           ic = ja(i) 
+
           if ((ir > 0).and.(ir <= a%m)) then 
+
             i1 = a%ia2(ir)
             i2 = a%ia2(ir+1)
             nc=i2-i1
@@ -991,20 +1040,21 @@ contains
               if (ip>0) then 
                 a%aspk(i1+ip-1) = val(i)
               else
-                write(0,*)'Was searching ',ic,' in: ',i1,i2,' : ',a%ia1(i1:i2-1)
+                  if (debug_level >= psb_debug_serial_) &
+                       & write(debug_unit,*) trim(name),&
+                       & ': Was searching ',ic,' in: ',i1,i2,&
+                       & ' : ',a%ia1(i1:i2-1)
                 info = i
                 return
               end if
 
             else
-!!$ 
               ip = -1
               lb = i1
               ub = i2-1
               do
                 if (lb > ub) exit
                 m = (lb+ub)/2
-!!$              write(0,*) 'Debug: ',lb,m,ub
                 if (ic == a%ia1(m))  then
                   ip   = m 
                   lb   = ub + 1
@@ -1018,15 +1068,20 @@ contains
               if (ip>0) then 
                 a%aspk(ip) = val(i)                
               else
-                write(0,*)'Was searching ',ic,' in: ',i1,i2,' : ',a%ia1(i1:i2-1)
+                  if (debug_level >= psb_debug_serial_) &
+                       & write(debug_unit,*) trim(name),&
+                       & ': Was searching ',ic,' in: ',i1,i2,&
+                       & ' : ',a%ia1(i1:i2-1)
                 info = i
                 return
               end if
-
             end if
           else
-            if (debug) write(0,*) 'Discarding row does not belong'
-          endif
+            if (debug_level >= psb_debug_serial_) &
+                 & write(debug_unit,*) trim(name),&
+                 & ': Discarding row that does not belong to us.'
+          end if
+
         end do
 
       case(psb_dupl_add_)
@@ -1048,13 +1103,17 @@ contains
               return
             end if
           else
-            if (debug) write(0,*) 'Discarding row does not belong'
-          endif
+            if (debug_level >= psb_debug_serial_) &
+                 & write(debug_unit,*) trim(name),&
+                 & ': Discarding row that does not belong to us.'
+          end if
         end do
 
       case default
         info = -3
-        if (debug) write(0,*) 'Duplicate handling: ',dupl
+        if (debug_level >= psb_debug_serial_) &
+             & write(debug_unit,*) trim(name),&
+             & ': Duplicate handling: ',dupl
       end select
     end if
 
@@ -1079,10 +1138,13 @@ contains
     integer, intent(in), optional  :: ng,gtl(*)
     integer  :: i,ir,ic, ilr, ilc, ip, &
          & i1,i2,nc,nnz,dupl
-    logical, parameter :: debug=.false.
+    integer              :: debug_level, debug_unit
+    character(len=20)    :: name='z_coo_srch_upd'
+
 
     info = 0
-
+    debug_unit  = psb_get_debug_unit()
+    debug_level = psb_get_debug_level()
     dupl = psb_sp_getifld(psb_dupl_,a,info)
 
     if (psb_sp_getifld(psb_srtd_,a,info) /= psb_isrtdcoo_) then 
@@ -1110,8 +1172,8 @@ contains
           ic = ja(i) 
           if ((ir >=1).and.(ir<=ng).and.(ic>=1).and.(ic<=ng)) then 
             ir = gtl(ir)
-            ic = gtl(ic) 
             if ((ir > 0).and.(ir <= a%m)) then 
+              ic = gtl(ic) 
               if (ir /= ilr) then 
                 call ibsrch(i1,ir,nnz,a%ia1)
                 i2 = i1
@@ -1139,7 +1201,9 @@ contains
                 return
               end if
             else
-              if (debug) write(0,*) 'Discarding row does not belong'
+            if (debug_level >= psb_debug_serial_) &
+                 & write(debug_unit,*) trim(name),&
+                 & ': Discarding row that does not belong to us.'
             endif
           end if
         end do
@@ -1152,6 +1216,7 @@ contains
             ir = gtl(ir)
             ic = gtl(ic) 
             if ((ir > 0).and.(ir <= a%m)) then 
+
               if (ir /= ilr) then 
                 call ibsrch(i1,ir,nnz,a%ia1)
                 i2 = i1
@@ -1179,14 +1244,18 @@ contains
                 return
               end if
             else
-              if (debug) write(0,*) 'Discarding row does not belong'
-            endif
+              if (debug_level >= psb_debug_serial_) &
+                   & write(debug_unit,*) trim(name),&
+                   & ': Discarding row that does not belong to us.'              
+            end if
           end if
         end do
 
       case default
         info = -3
-        if (debug) write(0,*) 'Duplicate handling: ',dupl
+        if (debug_level >= psb_debug_serial_) &
+             & write(debug_unit,*) trim(name),&
+             & ': Duplicate handling: ',dupl
       end select
 
     else
@@ -1199,6 +1268,7 @@ contains
           ir = ia(i)
           ic = ja(i) 
           if ((ir > 0).and.(ir <= a%m)) then 
+
             if (ir /= ilr) then 
               call ibsrch(i1,ir,nnz,a%ia1)
               i2 = i1
@@ -1225,9 +1295,7 @@ contains
               info = i 
               return
             end if
-          else
-            if (debug) write(0,*) 'Discarding row does not belong'
-          endif
+          end if
         end do
 
       case(psb_dupl_add_)
@@ -1236,6 +1304,7 @@ contains
           ir = ia(i)
           ic = ja(i) 
           if ((ir > 0).and.(ir <= a%m)) then 
+
             if (ir /= ilr) then 
               call ibsrch(i1,ir,nnz,a%ia1)
               i2 = i1
@@ -1262,14 +1331,14 @@ contains
               info = i 
               return
             end if
-          else
-            if (debug) write(0,*) 'Discarding row does not belong'
-          endif
+          end if
         end do
 
       case default
         info = -3
-        if (debug) write(0,*) 'Duplicate handling: ',dupl
+        if (debug_level >= psb_debug_serial_) &
+             & write(debug_unit,*) trim(name),&
+             & ': Duplicate handling: ',dupl
       end select
 
     end if

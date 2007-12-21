@@ -38,7 +38,7 @@
 !                                                  the distributed pieces.
 !   locx      -  cplx,dimension(:,:).          The local piece of the distributed 
 !                                                  matrix to be gathered.
-!   desc_a    -  type(<psb_desc_type>).        The communication descriptor.
+!   desc_a    -  type(psb_desc_type).        The communication descriptor.
 !   info      -  integer.                      Error code.
 !   iroot     -  integer.                      The process that has to own the 
 !                                              global matrix. If -1 all
@@ -211,7 +211,7 @@ end subroutine psb_zgatherm
 !                                                  the distributed pieces.
 !   locx      -  cplx,dimension(:).            The local piece of the distributed 
 !                                                  vector to be gathered.
-!   desc_a    -  type(<psb_desc_type>).        The communication descriptor.
+!   desc_a    -  type(psb_desc_type).        The communication descriptor.
 !   info      -  integer.                      Error code.
 !   iroot     -  integer.                      The process that has to own the 
 !                                              global matrix. If -1 all

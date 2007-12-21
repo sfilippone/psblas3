@@ -28,9 +28,9 @@
 !!$  POSSIBILITY OF SUCH DAMAGE.
 !!$ 
 !!$  
-! File: psb_damax.f90
+! File: psb_zamax.f90
 !
-! Function: psb_damax
+! Function: psb_zamax
 !    Searches the absolute max of X.
 !
 !    normi := max(abs(sub(X)(i))  
@@ -38,8 +38,8 @@
 !    where sub( X ) denotes X(1:N,JX:).
 !
 ! Arguments:
-!    x      -  real,dimension(:,:).       The input vector.
-!    desc_a -  type(<psb_desc_type>).     The communication descriptor.
+!    x      -  complex,dimension(:,:).    The input vector.
+!    desc_a -  type(psb_desc_type).       The communication descriptor.
 !    info   -  integer.                   Return code
 !    jx     -  integer(optional).         The column offset.
 !
@@ -169,7 +169,7 @@ end function psb_zamax
 !
 ! Arguments:
 !    x      -  real,dimension(:).         The input vector.
-!    desc_a -  type(<psb_desc_type>).     The communication descriptor.
+!    desc_a -  type(psb_desc_type).     The communication descriptor.
 !    info   -  integer.                   Return code
 !
 function psb_zamaxv (x,desc_a, info)
@@ -296,7 +296,7 @@ end function psb_zamaxv
 ! Arguments:
 !    res    -  real.                      The result.
 !    x      -  real,dimension(:,:).       The input vector.
-!    desc_a -  type(<psb_desc_type>).     The communication descriptor.
+!    desc_a -  type(psb_desc_type).     The communication descriptor.
 !    info   -  integer.                   Return code
 !    jx     -  integer(optional).         The column offset.
 !
@@ -422,7 +422,7 @@ end subroutine psb_zamaxvs
 ! Arguments:
 !    res    -  real.                      The result.
 !    x      -  real,dimension(:).         The input vector.
-!    desc_a -  type(<psb_desc_type>).     The communication descriptor.
+!    desc_a -  type(psb_desc_type).     The communication descriptor.
 !    info   -  integer.                   Return code
 !
 subroutine psb_zmamaxs (res,x,desc_a, info,jx)

@@ -58,7 +58,9 @@ subroutine psb_dspgtdiag(a,d,info)
   call psb_erractionsave(err_act)
 
   if (size(d) < min(a%k,a%m)) then 
-    write(0,*) 'Insufficient space in DSPGTDIAG ', size(d),min(a%m,a%k)
+    info=35
+    call psb_errpush(info,name,i_err=(/2,size(d),0,0,0/))
+    goto 9999
   end if
   d(:) = 0.d0
   if (a%fida == 'CSR') then 

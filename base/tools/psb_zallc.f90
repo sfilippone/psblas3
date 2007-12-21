@@ -32,13 +32,13 @@
 ! File: psb_zallc.f90
 !
 ! Function: psb_zalloc
-!    Allocates dense matrix for PSBLAS routines
+!    Allocates dense matrix for PSBLAS routines. 
 !    The descriptor may be in either the build or assembled state.
 ! 
 ! Arguments: 
 !    x      - the matrix to be allocated.
 !    desc_a - the communication descriptor.
-!    info   - possibly returns an error code
+!    info   - Return code
 !    n      - optional number of columns.
 subroutine psb_zalloc(x, desc_a, info, n)
   !....allocate dense  matrix for psblas routines.....
@@ -52,7 +52,7 @@ subroutine psb_zalloc(x, desc_a, info, n)
   !....parameters...
   complex(kind(1.d0)), allocatable, intent(out) :: x(:,:)
   type(psb_desc_type), intent(in)       :: desc_a
-  integer                               :: info
+  integer,intent(out)                   :: info
   integer, optional, intent(in)         :: n
 
   !locals
@@ -61,7 +61,7 @@ subroutine psb_zalloc(x, desc_a, info, n)
   integer             :: int_err(5),exch(3)
   character(len=20)   :: name
 
-  name='psb_zallc'
+  name='psb_zgeall_m'
   if(psb_get_errstatus() /= 0) return 
   info=0
   err=0
@@ -185,7 +185,7 @@ end subroutine psb_zalloc
 ! Arguments: 
 !    x      - the matrix to be allocated.
 !    desc_a - the communication descriptor.
-!    info   - possibly returns an error code
+!    info   - return code
 subroutine psb_zallocv(x, desc_a,info,n)
   !....allocate sparse matrix structure for psblas routines.....
   use psb_descriptor_type
@@ -199,19 +199,21 @@ subroutine psb_zallocv(x, desc_a,info,n)
   !....parameters...
   complex(kind(1.d0)), allocatable, intent(out) :: x(:)
   type(psb_desc_type), intent(in) :: desc_a
-  integer                         :: info
-  integer, optional, intent(in)         :: n
+  integer,intent(out)             :: info
+  integer, optional, intent(in)   :: n
 
   !locals
   integer             :: np,me,n_col,n_row,i,err_act
   integer             :: ictxt, int_err(5)
-  logical, parameter  :: debug=.false. 
+  integer              :: debug_level, debug_unit
   character(len=20)   :: name
 
   if(psb_get_errstatus() /= 0) return 
   info=0
-  name='psb_zallcv'
+  name='psb_zgeall_v'
   call psb_erractionsave(err_act)
+  debug_unit  = psb_get_debug_unit()
+  debug_level = psb_get_debug_level()
 
   ictxt=psb_cd_get_context(desc_a)
 
@@ -223,7 +225,6 @@ subroutine psb_zallocv(x, desc_a,info,n)
     goto 9999
   endif
 
-  if (debug) write(0,*) 'dall: is_ok?',psb_is_ok_desc(desc_a)
   !... check m and n parameters....
   if (.not.psb_is_ok_desc(desc_a)) then 
     info = 3110
@@ -259,6 +260,10 @@ subroutine psb_zallocv(x, desc_a,info,n)
     do i=1,n_row
       x(i) = 0.0d0
     end do
+  else
+    if (debug_level > psb_debug_ext_) &
+         & write(debug_unit,*) me,name,&
+         & ': Did not allocate anything because of dectype',psb_cd_get_dectype(desc_a)
   endif
 
   call psb_erractionrestore(err_act)

@@ -34,8 +34,8 @@
 !   Produces a clone of a descriptor.
 ! 
 ! Arguments: 
-!    desc_in  - type(<psb_desc_type>).         The communication descriptor to be cloned.
-!    desc_out - type(<psb_desc_type>).         The output communication descriptor.
+!    desc_in  - type(psb_desc_type).         The communication descriptor to be cloned.
+!    desc_out - type(psb_desc_type).         The output communication descriptor.
 !    info     - integer.                       Return code.
 subroutine psb_cdcpy(desc_in, desc_out, info)
 
@@ -55,9 +55,12 @@ subroutine psb_cdcpy(desc_in, desc_out, info)
 
   !locals
   integer             :: np,me,ictxt, err_act
-  logical, parameter  :: debug=.false.,debugprt=.false.
+  integer             :: debug_level, debug_unit
   character(len=20)   :: name
-  if (debug) write(0,*) me,'Entered CDCPY'
+
+  debug_unit  = psb_get_debug_unit()
+  debug_level = psb_get_debug_level()
+
   if (psb_get_errstatus() /= 0) return 
   info = 0
   call psb_erractionsave(err_act)
@@ -67,15 +70,13 @@ subroutine psb_cdcpy(desc_in, desc_out, info)
 
   ! check on blacs grid 
   call psb_info(ictxt, me, np)
-  if (debug) write(0,*) me,'Entered CDCPY'
+  if (debug_level >= psb_debug_ext_) &
+       & write(debug_unit,*) me,' ',trim(name),': Entered'
   if (np == -1) then
     info = 2010
     call psb_errpush(info,name)
     goto 9999
   endif
-!!$  call psb_cdfree(desc_out,info)
-
-!!$  call psb_nullify_desc(desc_out)
 
   call psb_safe_cpy(desc_in%matrix_data,desc_out%matrix_data,info)
   if (info == 0)   call psb_safe_cpy(desc_in%halo_index,desc_out%halo_index,info)
@@ -106,6 +107,8 @@ subroutine psb_cdcpy(desc_in, desc_out, info)
     call psb_errpush(info,name)
     goto 9999
   endif
+  if (debug_level >= psb_debug_ext_) &
+       & write(debug_unit,*) me,' ',trim(name),': Done'
 
   call psb_erractionrestore(err_act)
   return

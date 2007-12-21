@@ -80,7 +80,6 @@ subroutine isrx(n,x,indx,dir,flag)
         ilx  = istack(1,istp)
         iux  = istack(2,istp)
         istp = istp - 1
-        !$$$            write(0,*) 'Debug 1: ',ilx,iux
         !
         !       Choose a pivot with median-of-three heuristics, leave it 
         !       in the LPIV location
@@ -221,7 +220,6 @@ subroutine isrx(n,x,indx,dir,flag)
         ilx  = istack(1,istp)
         iux  = istack(2,istp)
         istp = istp - 1
-        !$$$            write(0,*) 'Debug 1: ',ilx,iux
         !
         !       Choose a pivot with median-of-three heuristics, leave it 
         !       in the LPIV location

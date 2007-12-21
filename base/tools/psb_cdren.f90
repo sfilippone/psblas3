@@ -39,7 +39,7 @@
 !    trans    - character.                     Whether iperm or its transpose 
 !                                              should be applied.
 !    iperm    - integer,dimension(:).          The renumbering scheme.
-!    desc_a   - type(<psb_desc_type>).         The communication descriptor
+!    desc_a   - type(psb_desc_type).         The communication descriptor
 !                                              to be updated.
 !    info     - integer.                       Return code
 !
@@ -64,19 +64,18 @@ subroutine psb_cdren(trans,iperm,desc_a,info)
   character, intent(in)                 :: trans
   integer, intent(out)                  :: info
   !....locals....
-  integer                       :: i,j,np,me, n_col, kh, nh
-  integer                       :: dectype
-  integer                       :: ictxt,n_row, int_err(5), err_act
-  real(kind(1.d0))              :: time(10)
-  logical, parameter            :: debug=.false.
-  character(len=20)             :: name
+  integer              :: i,j,np,me, n_col, kh, nh
+  integer              :: dectype
+  integer              :: ictxt,n_row, int_err(5), err_act
+  integer              :: debug_level, debug_unit
+  character(len=20)    :: name
 
   if(psb_get_errstatus() /= 0) return 
   info=0
   call psb_erractionsave(err_act)
   name = 'psb_dcren'
-
-  time(1) = psb_wtime()
+  debug_unit  = psb_get_debug_unit()
+  debug_level = psb_get_debug_level()
 
   ictxt   = psb_cd_get_context(desc_a)
   dectype = psb_cd_get_dectype(desc_a)
@@ -107,15 +106,14 @@ subroutine psb_cdren(trans,iperm,desc_a,info)
     endif
   endif
 
-  if (debug) write (*, *) '   begin matrix assembly...'
 
   !check on errors encountered in psdspins
 
   if ((iperm(1) /= 0))   then 
 
-    if (debug) write(0,*) 'spasb: here we go with ',iperm(1) 
-    deallocate(desc_a%lprm)
-    allocate(desc_a%lprm(n_col))
+    if (debug_level >= psb_debug_ext_) &
+         & write(debug_unit,*) me,' ',trim(name),': here we go with ',iperm(1) 
+    call psb_ensure_size(n_col,desc_a%lprm,info)
     if (toupper(trans) == 'N') then 
       do i=1, n_row
         desc_a%lprm(iperm(i)) = i
@@ -135,18 +133,21 @@ subroutine psb_cdren(trans,iperm,desc_a,info)
     ! fix glob_to_loc/loc_to_glob  mappings, then indices lists
     ! hmm, maybe we should just moe all of this onto a different level,
     ! have a specialized subroutine, and do it in the solver context???? 
-    if (debug) write(0,*) 'spasb: renumbering glob_to_loc'
+    if (debug_level >= psb_debug_ext_) &
+         & write(debug_unit,*) me,' ',trim(name),': renumbering glob_to_loc'
     do i=1, n_col
       desc_a%glob_to_loc(desc_a%loc_to_glob(desc_a%lprm(i))) = i  
     enddo
-    if (debug) write(0,*) 'spasb: renumbering loc_to_glob'
+    if (debug_level >= psb_debug_ext_) &
+         & write(debug_unit,*) me,' ',trim(name),': renumbering loc_to_glob'
     do i=1,psb_cd_get_global_rows(desc_a) 
       j = desc_a%glob_to_loc(i)
       if (j>0) then 
         desc_a%loc_to_glob(j) = i
       endif
     enddo
-    if (debug) write(0,*) 'spasb: renumbering halo_index'
+    if (debug_level >= psb_debug_ext_) &
+         & write(debug_unit,*) me,' ',trim(name),': renumbering halo_index'
     i=1
     kh=desc_a%halo_index(i)
     do while (kh /= -1) 
@@ -165,7 +166,8 @@ subroutine psb_cdren(trans,iperm,desc_a,info)
       i = i + nh + 1
       kh=desc_a%halo_index(i)
     enddo
-    if (debug) write(0,*) 'spasb: renumbering ovrlap_index'
+    if (debug_level >= psb_debug_ext_) &
+         & write(debug_unit,*) me,' ',trim(name),': renumbering ovrlap_index'
     i=1
     kh=desc_a%ovrlap_index(i)
     do while (kh /= -1) 
@@ -178,7 +180,8 @@ subroutine psb_cdren(trans,iperm,desc_a,info)
       i = i + nh + 1
       kh=desc_a%ovrlap_index(i)
     enddo
-    if (debug) write(0,*) 'spasb: renumbering ovrlap_elem'
+    if (debug_level >= psb_debug_ext_) &
+         & write(debug_unit,*) me,' ',trim(name),': renumbering ovrlap_elem'
     i = 1
     kh=desc_a%ovrlap_elem(i)
     do while (kh /= -1)          
@@ -187,36 +190,14 @@ subroutine psb_cdren(trans,iperm,desc_a,info)
       i = i+2
       kh=desc_a%ovrlap_elem(i)         
     enddo
-    if (debug) write(0,*) 'spasb: done renumbering'
-    if (debug) then
-      write(60+me,*) 'n_row ',n_row,' n_col',n_col, ' trans: ',trans
-      do i=1,n_col
-        write(60+me,*)i, ' lprm ', desc_a%lprm(i), ' iperm',iperm(i)
-      enddo
-      i=1
-      kh = desc_a%halo_index(i)
-      do while (kh /= -1) 
-        write(60+me,*) i, kh 
-        i = i+1
-        kh = desc_a%halo_index(i)
-      enddo
-      close(60+me)
-    end if
-
-!!$    iperm(1) = 0
+    if (debug_level >= psb_debug_ext_) &
+         & write(debug_unit,*) me,' ',trim(name),': done renumbering'
   else 
-!!$    allocate(desc_a%lprm(1))
-!!$    desc_a%lprm(1) = 0       
+    if (debug_level >= psb_debug_ext_) &
+         & write(debug_unit,*) me,' ',trim(name),': nothing to be done'
   endif
-
-
-  time(4) = psb_wtime()
-  time(4) = time(4) - time(3)
-  if (debug) then 
-    call psb_amx(ictxt, time(4))
-
-    write (*, *) '         comm structs assembly: ', time(4)*1.d-3
-  end if
+  if (debug_level >= psb_debug_ext_) &
+       & write(debug_unit,*) me,' ',trim(name),': end'
 
   call psb_erractionrestore(err_act)
   return

@@ -114,8 +114,6 @@ C     .. Local Scalars ..
       INTEGER          I, K, IPG, ERR_ACT
 C     .. Intrinsic Functions ..
       INTRINSIC         DBLE
-      LOGICAL DEBUG
-      PARAMETER (DEBUG=.FALSE.)
 C     .. Local Arrays ..
       CHARACTER*20       NAME
       INTEGER            INT_VAL(5)
@@ -127,7 +125,6 @@ C
       CALL FCPSB_ERRACTIONSAVE(ERR_ACT)
 
       IF(toupper(TRANS).EQ.'N') THEN
-        IF (DEBUG) WRITE(0,*)'DJADRP1:',NG
         DO IPG = 1, NG                                                    
           DO  K = IA(2,IPG), IA(3,IPG)-1                                   
             DO  I = JA(K), JA(K+1) - 1                                    

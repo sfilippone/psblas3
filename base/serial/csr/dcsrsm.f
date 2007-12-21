@@ -38,8 +38,6 @@ C
       CHARACTER         DESCRA*11
       INTEGER           I, K
       CHARACTER         DIAG, UPLO
-      LOGICAL DEBUG
-      PARAMETER (DEBUG=.FALSE.)
 C     .. Local Arrays ..
       CHARACTER*20       NAME
       INTEGER            INT_VAL(5), err_Act
@@ -96,13 +94,6 @@ C     .. Local Arrays ..
          CALL FCPSB_ERRPUSH(4012,NAME,INT_VAL)
          GOTO 9999
       END IF
-
-      if (debug) then 
-        write(0,*) 'Check from DCSRSM'
-        do k=1,m
-          write(0,*) k, b(k,1),c(k,1)
-        enddo
-      endif
 
       IF (UNITD.EQ.'L') THEN
          DO 45 I = 1, N

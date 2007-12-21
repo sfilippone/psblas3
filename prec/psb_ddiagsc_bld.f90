@@ -44,7 +44,6 @@ subroutine psb_ddiagsc_bld(a,desc_a,p,upd,info)
   ! Local scalars
   Integer      :: err, n_row, n_col,I,ictxt,&
        & me,np,mglob, err_act
-  real(kind(1.d0)),allocatable  :: gd(:), work(:)
   integer      :: int_err(5)
 
   logical, parameter :: debug=.false.   
@@ -77,13 +76,19 @@ subroutine psb_ddiagsc_bld(a,desc_a,p,upd,info)
     goto 9999
   end if
 
-  call psb_csrws(p%d,a,info,trans='N')
+  !
+  ! Retrieve the diagonal entries of the matrix A
+  !
+  call psb_sp_getdiag(a,p%d,info)
   if(info /= 0) then
     info=4010
-    ch_err='psb_csrws'
+    ch_err='psb_sp_getdiag'
     call psb_errpush(info,name,a_err=ch_err)
     goto 9999
   end if
+  !
+  ! Copy into p%desc_data the descriptor associated to A
+  !
   call psb_cdcpy(desc_a,p%desc_Data,info)
   if (info /= 0) then
     call psb_errpush(4010,name,a_err='psb_cdcpy')
@@ -91,25 +96,25 @@ subroutine psb_ddiagsc_bld(a,desc_a,p,upd,info)
   end if
 
   if (debug) write(ilout+me,*) 'VDIAG ',n_row
+  !
+  ! The i-th diagonal entry of the preconditioner is set to one if the
+  ! corresponding entry a_ii of the sparse matrix A is zero; otherwise 
+  ! it is set to one/a_ii
+  !
   do i=1,n_row
-    if (p%d(i).eq.dzero) then
+    if (p%d(i) == dzero) then
       p%d(i) = done
     else
       p%d(i) = done/p%d(i)
     endif
 
     if (debug) write(ilout+me,*) i,desc_a%loc_to_glob(i), p%d(i)
-    if (p%d(i).lt.0.d0) then
-      write(0,*) me,'Negative RWS? ',i,p%d(i)
-    endif
   end do
+
   if (a%pl(1) /= 0) then
-    allocate(work(n_row),stat=info)
-    if (info /= 0) then
-      info=4000
-      call psb_errpush(info,name)
-      goto 9999
-    end if
+    !
+    ! Apply the same row permutation as in the sparse matrix A
+    !
     call  psb_gelp('n',a%pl,p%d,info)
     if(info /= 0) then
       info=4010
@@ -117,33 +122,8 @@ subroutine psb_ddiagsc_bld(a,desc_a,p,upd,info)
       call psb_errpush(info,name,a_err=ch_err)
       goto 9999
     end if
-
-    deallocate(work)
   endif
 
-  if (debug) then
-    allocate(gd(mglob),stat=info)       
-    if (info /= 0) then 
-      call psb_errpush(4010,name,a_err='Allocate')
-      goto 9999      
-    end if
-
-    call  psb_gather(gd, p%d, desc_a, info, root=iroot)
-    if(info /= 0) then
-      info=4010
-      ch_err='psb_dgatherm'
-      call psb_errpush(info,name,a_err=ch_err)
-      goto 9999
-    end if
-
-    if (me.eq.iroot) then
-      write(iout+np,*) 'VDIAG CHECK ',mglob
-      do i=1,mglob
-        write(iout+np,*) i,gd(i)
-      enddo
-    endif
-    deallocate(gd)
-  endif
   if (debug) write(*,*) 'Preconditioner DIAG computed OK'
 
 

@@ -35,6 +35,7 @@ C
       use psb_const_mod
       use psb_spmat_type
       use psb_string_mod
+      use psb_error_mod
       IMPLICIT NONE
 
 C
@@ -54,21 +55,27 @@ C     .. Local Scalars ..
 c     .. Local Arrays ..
       CHARACTER*20       NAME
       INTEGER            INT_VAL(5)
-
+      integer              :: debug_level, debug_unit
 C     .. External Subroutines ..
       EXTERNAL           MAX_NNZERO
 C     .. Executable Statements ..
 C
 
-      NAME = 'ZCRCO\0'
+      NAME = 'ZCRCO'
       IERROR = 0
       CALL FCPSB_ERRACTIONSAVE(ERR_ACT)
+      debug_unit  = psb_get_debug_unit()
+      debug_level = psb_get_debug_level()
 
       IF (toupper(TRANS).EQ.'N') THEN
         SCALE  = (toupper(UNITD).EQ.'L') ! meaningless
         IP1(1) = 0
         IP2(1) = 0
         NNZ = IA2(M+1)-1
+        if (debug_level >= psb_debug_serial_)
+     +    write(debug_unit,*) trim(name),': entry',m,n,nnz,
+     +    ' : ',descra,' : ',descrn
+
         IF (LARN.LT.NNZ) THEN
           IERROR = 60
           INT_VAL(1) = 18
@@ -93,17 +100,20 @@ C
         
         IF (toupper(DESCRA(1:1)).EQ.'G') THEN
 C        ... Construct COO Representation...
-          ELEM = 1
+          ELEM = 0
 
           DO ROW = 1, M
             DO J = IA2(ROW), IA2(ROW+1)-1
+              ELEM = ELEM + 1
               IAN1(ELEM) = ROW
               IAN2(ELEM) = IA1(J)
               ARN(ELEM) = AR(J)
-              ELEM = ELEM + 1
             ENDDO
           ENDDO
-          INFON(psb_nnz_) = IA2(M+1)-1
+          INFON(psb_nnz_) = elem
+
+          if (debug_level >= psb_debug_serial_)
+     +      write(debug_unit,*)  trim(name),': endloop',m,elem
         ELSE IF (toupper(DESCRA(1:1)).EQ.'S' .AND.
      +      toupper(DESCRA(2:2)).EQ.'U') THEN
 

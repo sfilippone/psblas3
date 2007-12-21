@@ -37,10 +37,9 @@
 ! Arguments:
 !   globx     -  real,dimension(:,:).          The global matrix to scatter.
 !   locx      -  real,dimension(:,:).          The local piece of the ditributed matrix.
-!   desc_a    -  type(<psb_desc_type>).        The communication descriptor.
+!   desc_a    -  type(psb_desc_type).        The communication descriptor.
 !   info      -  integer.                      Error code.
-!   iroot     -  integer(optional).            The process that owns the global matrix.
-!                                              If -1 all
+!   iroot     -  integer(optional).            The process that owns the global matrix. If -1 all
 !                                              the processes have a copy. Default -1.
 !
 subroutine  psb_dscatterm(globx, locx, desc_a, info, iroot)
@@ -267,7 +266,7 @@ end subroutine psb_dscatterm
 ! Arguments:
 !   globx     -  real,dimension(:).            The global vector to scatter.
 !   locx      -  real,dimension(:).            The local piece of the ditributed vector.
-!   desc_a    -  type(<psb_desc_type>).        The communication descriptor.
+!   desc_a    -  type(psb_desc_type).        The communication descriptor.
 !   info      -  integer.                      Error code.
 !   iroot     -  integer(optional).            The process that owns the global vector. If -1 all
 !                                              the processes have a copy.

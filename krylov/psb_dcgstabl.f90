@@ -68,34 +68,33 @@
 !
 ! Arguments:
 !
-!    a      -  type(<psb_dspmat_type>)      Input: sparse matrix containing A.
-!    prec   -  type(<psb_dprec_type>)       Input: preconditioner
-!    b      -  real,dimension(:)            Input: vector containing the
-!                                           right hand side B
-!    x      -  real,dimension(:)            Input/Output: vector containing the
-!                                           initial guess and final solution X.
-!    eps    -  real                         Input: Stopping tolerance; the iteration is
-!                                           stopped when the error estimate
-!                                           |err| <= eps
-!    desc_a -  type(<psb_desc_type>).       Input: The communication descriptor.
-!    info   -  integer.                     Output: Return code
+!    a      -  type(psb_dspmat_type)      Input: sparse matrix containing A.
+!    prec   -  type(psb_dprec_type)       Input: preconditioner
+!    b      -  real,dimension(:)          Input: vector containing the
+!                                         right hand side B
+!    x      -  real,dimension(:)          Input/Output: vector containing the
+!                                         initial guess and final solution X.
+!    eps    -  real                       Input: Stopping tolerance; the iteration is
+!                                         stopped when the error estimate |err| <= eps
+!    desc_a -  type(psb_desc_type).       Input: The communication descriptor.
+!    info   -  integer.                   Output: Return code
 !
-!    itmax  -  integer(optional)            Input: maximum number of iterations to be
-!                                           performed.
-!    iter   -  integer(optional)            Output: how many iterations have been
-!                                           performed.
-!    err    -  real   (optional)            Output: error estimate on exit
-!    itrace -  integer(optional)            Input: print an informational message
-!                                           with the error estimate every itrace
-!                                           iterations
-!    irst   -  integer(optional)            Input: restart parameter L 
+!    itmax  -  integer(optional)          Input: maximum number of iterations to be
+!                                         performed.
+!    iter   -  integer(optional)          Output: how many iterations have been
+!                                         performed.
+!    err    -  real   (optional)          Output: error estimate on exit
+!    itrace -  integer(optional)          Input: print an informational message
+!                                         with the error estimate every itrace
+!                                         iterations
+!    irst   -  integer(optional)          Input: restart parameter L 
 !
-!    istop  -  integer(optional)            Input: stopping criterion, or how
-!                                           to estimate the error. 
-!                                           1: err =  |r|/|b|
-!                                           2: err =  |r|/(|a||x|+|b|)
-!                                           where r is the (preconditioned, recursive
-!                                           estimate of) residual 
+!    istop  -  integer(optional)          Input: stopping criterion, or how
+!                                         to estimate the error. 
+!                                         1: err =  |r|/|b|
+!                                         2: err =  |r|/(|a||x|+|b|)
+!                                         where r is the (preconditioned, recursive
+!                                         estimate of) residual 
 ! 
 !
 !
@@ -126,7 +125,7 @@ Subroutine psb_dcgstabl(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,irst,is
   Logical, Parameter :: exchange=.True., noexchange=.False.  
   Integer, Parameter :: irmax = 8
   Integer            :: itx, i, isvch, ictxt,istop_,j, int_err(5)
-  Logical, Parameter :: debug = .False.
+  integer            :: debug_level, debug_unit
   Real(Kind(1.d0)) :: alpha, beta, rho, rho_old, rni, xni, bni, ani,bn2,& 
        & omega
   character(len=20)             :: name
@@ -134,12 +133,14 @@ Subroutine psb_dcgstabl(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,irst,is
   info = 0
   name = 'psb_dcgstabl'
   call psb_erractionsave(err_act)
+  debug_unit  = psb_get_debug_unit()
+  debug_level = psb_get_debug_level()
 
-  If (debug) Write(0,*) 'entering psb_dbicgstabl'
   ictxt = psb_cd_get_context(desc_a)
   Call psb_info(ictxt, me, np)
+  if (debug_level >= psb_debug_ext_)&
+       & write(debug_unit,*) me,' ',trim(name),': from psb_info',np
 
-  If (debug) Write(0,*) 'psb_dbicgstabl: from gridinfo',np,me
 
   mglob = psb_cd_get_global_rows(desc_a)
   n_row = psb_cd_get_local_rows(desc_a)
@@ -156,7 +157,6 @@ Subroutine psb_dcgstabl(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,irst,is
 !
 
   if ((istop_ < 1 ).or.(istop_ > 2 ) ) then
-    write(0,*) 'psb_bicgstabl: invalid istop',istop_ 
     info=5001
     int_err=istop_
     err=info
@@ -178,13 +178,16 @@ Subroutine psb_dcgstabl(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,irst,is
   
   If (Present(irst)) Then
     nl = irst
-    If (debug) Write(0,*) 'present: irst: ',irst,nl
+    If (debug_level >= psb_debug_ext_) &
+         & write(debug_unit,*) me,' ',trim(name),&
+         & 'present: irst: ',irst,nl
   Else
     nl = 1 
-    If (debug) Write(0,*) 'not present: irst: ',irst,nl
+    If (debug_level >= psb_debug_ext_) &
+         & write(debug_unit,*) me,' ',trim(name),&
+         & ' not present: irst: ',irst,nl
   Endif
   if (nl <=0 ) then 
-    write(0,*) 'psb_bicgstabl: invalid irst ',nl
     info=5001
     int_err(1)=nl
     err=info
@@ -257,7 +260,8 @@ Subroutine psb_dcgstabl(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,irst,is
 !!$   
 !!$   r0 = b-ax0
 !!$ 
-    If (debug) Write(0,*) 'restart: ',itx,it
+    If (debug_level >= psb_debug_ext_) &
+         & write(debug_unit,*) me,' ',trim(name),' restart: ',itx,it
     If (itx.Ge.litmax) Exit restart  
     it = 0      
     Call psb_geaxpby(done,b,dzero,r,desc_a,info)
@@ -278,7 +282,9 @@ Subroutine psb_dcgstabl(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,irst,is
     alpha = dzero
     omega = done 
 
-    If (debug) Write(0,*) 'on entry to amax: b: ',Size(b)
+    If (debug_level >= psb_debug_ext_) &
+         & write(debug_unit,*) me,' ',trim(name),&
+         & ' on entry to amax: b: ',Size(b)
 
     if (istop_ == 1) then 
       rni = psb_geamax(r,desc_a,info)
@@ -306,32 +312,45 @@ Subroutine psb_dcgstabl(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,irst,is
       it   = it + nl
       itx  = itx + nl
       rho = -omega*rho 
-      If (debug) Write(0,*) 'iteration: ',itx, rho,rh(1,0)
+      If (debug_level >= psb_debug_ext_) &
+           & write(debug_unit,*) me,' ',trim(name),&
+           & ' iteration: ',itx, rho,rh(1,0)
 
       Do j = 0, nl -1 
-        If (debug) Write(0,*) 'bicg part:  ',j, nl
+        If (debug_level >= psb_debug_ext_) &
+             & write(debug_unit,*) me,' ',trim(name),'bicg part:  ',j, nl
         rho_old = rho
         rho = psb_gedot(rh(:,j),rt0,desc_a,info)
         If (rho==dzero) Then
-          If (debug) Write(0,*) 'bi-cgstab iteration breakdown r',rho
+          If (debug_level >= psb_debug_ext_) &
+               & write(debug_unit,*) me,' ',trim(name),&
+               & ' bi-cgstab iteration breakdown r',rho
           Exit iteration
         Endif
         beta = alpha*rho/rho_old 
-        If (debug) Write(0,*) 'bicg part:  ',alpha,beta,rho,rho_old
+        If (debug_level >= psb_debug_ext_) &
+             & write(debug_unit,*) me,' ',trim(name),&
+             & ' bicg part:  ',alpha,beta,rho,rho_old
         rho_old = rho
         Call psb_geaxpby(done,rh(:,0:j),-beta,uh(:,0:j),desc_a,info)
-        If (debug) Write(0,*) 'bicg part:  ',rh(1,0),beta
+        If (debug_level >= psb_debug_ext_) &
+             & write(debug_unit,*) me,' ',trim(name),&
+             & ' bicg part:  ',rh(1,0),beta
         Call psb_spmm(done,a,uh(:,j),dzero,uh(:,j+1),desc_a,info,work=aux)
 
         call psb_precaply(prec,uh(:,j+1),desc_a,info)
 
         gamma(j) = psb_gedot(uh(:,j+1),rt0,desc_a,info)
         If (gamma(j)==dzero) Then
-          If (debug) Write(0,*) 'bi-cgstab iteration breakdown s2',gamma(j)
+          If (debug_level >= psb_debug_ext_) &
+               & write(debug_unit,*) me,' ',trim(name),&
+               & ' bi-cgstab iteration breakdown s2',gamma(j)
           Exit iteration
         Endif
         alpha = rho/gamma(j)
-        If (debug) Write(0,*) 'bicg part: alpha=r/g ',alpha,rho,gamma(j)
+        If (debug_level >= psb_debug_ext_) &
+             & write(debug_unit,*) me,' ',trim(name),&
+             & ' bicg part: alpha=r/g ',alpha,rho,gamma(j)
 
         Call psb_geaxpby(-alpha,uh(:,1:j+1),done,rh(:,0:j),desc_a,info)        
         Call psb_geaxpby(alpha,uh(:,0),done,x,desc_a,info)
@@ -342,17 +361,20 @@ Subroutine psb_dcgstabl(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,irst,is
       Enddo
       
       Do j=1, nl 
-        If (debug) Write(0,*) 'mod g-s part:  ',j, nl,rh(1,0)
+        If (debug_level >= psb_debug_ext_) &
+             & write(debug_unit,*) me,' ',trim(name),&
+             & ' mod g-s part:  ',j, nl,rh(1,0)
         Do i=1, j-1 
           taum(i,j) = psb_gedot(rh(:,i),rh(:,j),desc_a,info)
           taum(i,j) = taum(i,j)/sigma(i) 
           Call psb_geaxpby(-taum(i,j),rh(:,i),done,rh(:,j),desc_a,info)        
         Enddo        
-        If (debug) Write(0,*) 'mod g-s part:  dot prod '
         sigma(j)  = psb_gedot(rh(:,j),rh(:,j),desc_a,info)
         gamma1(j) = psb_gedot(rh(:,0),rh(:,j),desc_a,info)
-        If (debug) Write(0,*) 'mod g-s part: gamma1 ', &
-             &gamma1(j), sigma(j)
+        If (debug_level >= psb_debug_ext_) &
+             & write(debug_unit,*) me,' ',trim(name),&
+             & ' mod g-s part: gamma1 ',gamma1(j), sigma(j)
+
         gamma1(j) = gamma1(j)/sigma(j)
       Enddo
       
@@ -365,7 +387,9 @@ Subroutine psb_dcgstabl(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,irst,is
           gamma(j) = gamma(j) - taum(j,i) * gamma(i) 
         Enddo
       Enddo
-      If (debug) Write(0,*) 'first solve: ', gamma(:)
+      If (debug_level >= psb_debug_ext_) &
+           & write(debug_unit,*) me,' ',trim(name),&
+           & ' first solve: ', gamma(:)
       
       Do j=1,nl-1
         gamma2(j) = gamma(j+1)
@@ -373,7 +397,9 @@ Subroutine psb_dcgstabl(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,irst,is
           gamma2(j) = gamma2(j) + taum(j,i) * gamma(i+1) 
         Enddo
       Enddo
-      If (debug) Write(0,*) 'second solve: ', gamma(:)
+      If (debug_level >= psb_debug_ext_) &
+           & write(debug_unit,*) me,' ',trim(name),&
+           & ' second solve: ', gamma(:)
       
       Call psb_geaxpby(gamma(1),rh(:,0),done,x,desc_a,info)        
       Call psb_geaxpby(-gamma1(nl),rh(:,nl),done,rh(:,0),desc_a,info)        
@@ -413,7 +439,7 @@ Subroutine psb_dcgstabl(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,irst,is
   If (Present(err)) err=rerr
   If (Present(iter)) iter = itx
   If (rerr>eps) Then
-    Write(0,*) 'bi-cgstabl failed to converge to ',eps,&
+    write(debug_unit,*) 'bi-cgstabl failed to converge to ',eps,&
          & ' in ',itx,' iterations  '
   End If
 

@@ -43,7 +43,7 @@
 !    nv        - integer                   Number of indices required 
 !    idxin(:)  - integer                   Required indices, overwritten on output
 !                                          output is negative for masked entries
-!    desc      - type(<psb_desc_type>).    The communication descriptor.        
+!    desc      - type(psb_desc_type).    The communication descriptor.        
 !    info      - integer.                  return code.
 !    mask(:)   - logical, optional         Only do the conversion for specific indices.
 !    
@@ -64,7 +64,6 @@ subroutine psi_idx_ins_cnv1(nv,idxin,desc,info,mask)
   integer                :: np, me
   integer                :: nrow,ncol, err_act
   integer, allocatable   :: idxout(:)
-  logical, parameter     :: debug=.false.
   integer, parameter     :: relocsz=200
   character(len=20)      :: name
   logical, pointer       :: mask_(:)
@@ -179,7 +178,6 @@ end subroutine psi_idx_ins_cnv1
 !!$ 
 !!$  
 !
-! File: psi_idx_ins_cnv.f90
 !
 ! Subroutine: psi_idx_ins_cnv2
 !   Converts a bunch of indices from global to local numbering. 
@@ -193,7 +191,7 @@ end subroutine psi_idx_ins_cnv1
 !    nv        - integer                   Number of indices required 
 !    idxin(:)  - integer                   Required indices
 !    idxout(:) - integer                   Output values (negative for masked entries)
-!    desc      - type(<psb_desc_type>).    The communication descriptor.        
+!    desc      - type(psb_desc_type).    The communication descriptor.        
 !    info      - integer.                  return code.
 !    mask(:)   - logical, optional         Only do the conversion for specific indices.
 !    
@@ -214,7 +212,6 @@ subroutine psi_idx_ins_cnv2(nv,idxin,idxout,desc,info,mask)
   integer :: i,ictxt,k,mglob, nglob
   integer                :: np, me, isize
   integer                :: pnt_halo,nrow,ncol, nh, ip, err_act,lip,nxt
-  logical, parameter     :: debug=.false.
   integer, parameter     :: relocsz=200
   character(len=20)      :: name,ch_err
   logical, pointer       :: mask_(:)
@@ -293,7 +290,6 @@ subroutine psi_idx_ins_cnv2(nv,idxin,idxout,desc,info,mask)
             if (ncol > isize) then 
               nh = ncol + max(nv,relocsz)
               call psb_realloc(nh,desc%loc_to_glob,info,pad=-1)
-              if (debug) write(0,*) 'done realloc ',nh
               if (info /= 0) then
                 info=1
                 ch_err='psb_realloc'
@@ -346,9 +342,6 @@ subroutine psi_idx_ins_cnv2(nv,idxin,idxout,desc,info,mask)
           if (ncol > isize) then 
             nh = ncol + max(nv,relocsz)
             call psb_realloc(nh,desc%loc_to_glob,info,pad=-1)
-            if (me==0) then 
-              if (debug) write(0,*) 'done realloc ',nh
-            end if
             if (info /= 0) then
               info=3
               ch_err='psb_realloc'
@@ -437,7 +430,6 @@ end subroutine psi_idx_ins_cnv2
 !!$ 
 !!$  
 !
-! File: psi_idx_ins_cnv.f90
 !
 ! Subroutine: psi_idx_ins_cnvs
 !   Converts an index  from global to local numbering. 
@@ -450,7 +442,7 @@ end subroutine psi_idx_ins_cnv2
 ! Arguments: 
 !    idxin     - integer                   Required index s
 !    idxout    - integer                   Output value  (negative for masked entries)
-!    desc      - type(<psb_desc_type>).    The communication descriptor.        
+!    desc      - type(psb_desc_type).    The communication descriptor.        
 !    info      - integer.                  return code.
 !    mask      - logical, optional         Only do the conversion for specific indices.
 !    

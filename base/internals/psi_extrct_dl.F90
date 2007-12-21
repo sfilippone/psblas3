@@ -141,11 +141,13 @@ subroutine psi_extract_dep_list(desc_data,desc_str,dep_list,&
   !     .....local scalars...
   integer i,me,nprow,pointer_dep_list,proc,j,err_act
   integer ictxt, err, icomm
-  logical, parameter :: debug=.false.
+  integer              :: debug_level, debug_unit
   character  name*20
   name='psi_extrct_dl'
 
   call psb_erractionsave(err_act)
+  debug_unit  = psb_get_debug_unit()
+  debug_level = psb_get_debug_level()
 
   info = 0
   ictxt = desc_data(psb_ctxt_)
@@ -156,11 +158,13 @@ subroutine psi_extract_dep_list(desc_data,desc_str,dep_list,&
     length_dl(i) = 0
   enddo
   i=1
-  if (debug) write(0,*) 'extract: info ',info,desc_data(psb_dec_type_)
+  if (debug_level >= psb_debug_inner_)&
+       & write(debug_unit,*) me,' ',trim(name),': start ',info,desc_data(psb_dec_type_)
   pointer_dep_list=1
   if (psb_is_bld_dec(desc_data(psb_dec_type_))) then 
     do while (desc_str(i) /= -1)
-      if (debug) write(0,*) me,' extract: looping ',i,&
+      if (debug_level >= psb_debug_inner_)&
+           & write(debug_unit,*) me,' ',trim(name),' : looping ',i,&
            &    desc_str(i),desc_str(i+1),desc_str(i+2)
 
       !        ...with different decomposition type we have different
@@ -169,7 +173,8 @@ subroutine psi_extract_dep_list(desc_data,desc_str,dep_list,&
         !           ..if number of element to be exchanged !=0
         proc=desc_str(i)
         if ((proc < 0).or.(proc.ge.nprow)) then
-          if (debug) write(0,*) 'extract error ',i,desc_str(i)
+          if (debug_level >= psb_debug_inner_)&
+               & write(debug_unit,*) me,' ',trim(name),': error ',i,desc_str(i)
           info = 9999
           int_err(1) = i
           int_err(2) = desc_str(i)
@@ -203,7 +208,8 @@ subroutine psi_extract_dep_list(desc_data,desc_str,dep_list,&
     enddo
   else if (psb_is_upd_dec(desc_data(psb_dec_type_))) then
     do while (desc_str(i) /= -1)
-      if (debug) write(0,*) 'extract: looping ',i,desc_str(i)
+      if (debug_level >= psb_debug_inner_) &
+           & write(debug_unit,*) me,' ',trim(name),': looping ',i,desc_str(i)
 
       !        ...with different decomposition type we have different
       !           structure of indices  lists............................
@@ -240,7 +246,6 @@ subroutine psi_extract_dep_list(desc_data,desc_str,dep_list,&
       i=i+desc_str(i+1)+2
     enddo
   else
-    write(0,*) 'invalid dec_type',desc_data(psb_dec_type_)
     info = 2020
     goto 9999
   endif
@@ -249,7 +254,8 @@ subroutine psi_extract_dep_list(desc_data,desc_str,dep_list,&
 
   !     ... check for errors...
 998 continue 
-  if (debug) write(0,*) 'extract: info ',info
+  if (debug_level >= psb_debug_inner_)&
+       & write(debug_unit,*) me,' ',trim(name),': info ',info
   err = info
 
   if (err /= 0) goto 9999
@@ -257,11 +263,18 @@ subroutine psi_extract_dep_list(desc_data,desc_str,dep_list,&
   call psb_sum(ictxt,length_dl(0:np))
   call psb_get_mpicomm(ictxt,icomm )
   allocate(itmp(dl_lda),stat=info)
-  if (info /= 0) goto 9999
+  if (info /= 0) then 
+    info=4000
+    goto 9999
+  endif
   itmp(1:dl_lda) = dep_list(1:dl_lda,me)
   call mpi_allgather(itmp,dl_lda,mpi_integer,&
        & dep_list,dl_lda,mpi_integer,icomm,info)
-  deallocate(itmp)
+  deallocate(itmp,stat=info)
+  if (info /= 0) then 
+    info=4000
+    goto 9999
+  endif
 
   call psb_erractionrestore(err_act)
   return

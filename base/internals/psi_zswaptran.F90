@@ -29,9 +29,9 @@
 !!$ 
 !!$  
 !
-! File: psi_Xswaptran.F90
+! File: psi_zswaptran.F90
 !
-! Subroutine: psi_Xswaptranm
+! Subroutine: psi_zswaptranm
 !   Does the data exchange among processes. This is similar to Xswapdata, but
 !   the list is read "in reverse", i.e. indices that are normally SENT are used 
 !   for the RECEIVE part and vice-versa. This is the basic data exchange operation
@@ -72,7 +72,7 @@
 !    n        - integer                 Number of columns in Y               
 !    beta     - X                       Choose overwrite or sum. 
 !    y(:,:)   - X                       The data area                        
-!    desc_a   - type(<psb_desc_type>).  The communication descriptor.        
+!    desc_a   - type(psb_desc_type).  The communication descriptor.        
 !    work(:)  - X                       Buffer space. If not sufficient, will do 
 !                                       our own internal allocation.
 !    info     - integer.                return code.
@@ -498,9 +498,8 @@ end subroutine psi_zswaptranm
 !!$ 
 !!$  
 !
-! File: psi_Xswaptran.F90
 !
-! Subroutine: psi_Xswaptranv
+! Subroutine: psi_zswaptranv
 !   Does the data exchange among processes. This is similar to Xswapdata, but
 !   the list is read "in reverse", i.e. indices that are normally SENT are used 
 !   for the RECEIVE part and vice-versa. This is the basic data exchange operation
@@ -541,7 +540,7 @@ end subroutine psi_zswaptranm
 !    n        - integer                 Number of columns in Y               
 !    beta     - X                       Choose overwrite or sum. 
 !    y(:)     - X                       The data area                        
-!    desc_a   - type(<psb_desc_type>).  The communication descriptor.        
+!    desc_a   - type(psb_desc_type).  The communication descriptor.        
 !    work(:)  - X                       Buffer space. If not sufficient, will do 
 !                                       our own internal allocation.
 !    info     - integer.                return code.
