@@ -513,7 +513,7 @@ contains
       write (0,'("Before you call this routine, you must initialize the preconditioner")')
     case(3112)
       write (0,'("Before you call this routine, you must build the preconditioner")')
-    case(3111:3999)
+    case(3113:3999)
       write(0,'("miscellaneus error. code: ",i0)')err_c
     case(4000)
       write(0,'("Allocation/deallocation error")')
