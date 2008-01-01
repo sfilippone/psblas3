@@ -49,7 +49,7 @@ module psb_descriptor_type
   integer, parameter :: psb_swap_sync_=4, psb_swap_mpi_=8
 
   integer, parameter :: psb_no_comm_=-1
-  integer, parameter :: psb_comm_halo_=0, psb_comm_ovr_=1, psb_comm_ext_=2
+  integer, parameter :: psb_comm_halo_=1, psb_comm_ovr_=2, psb_comm_ext_=3
   integer, parameter :: psb_ovt_xhal_ = 123, psb_ovt_asov_=psb_ovt_xhal_+1
 
   !
