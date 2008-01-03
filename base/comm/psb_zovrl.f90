@@ -45,8 +45,24 @@
 !                                            psb_none_   do nothing
 !                                            psb_sum_    sum of overlaps
 !                                            psb_avg_    average of overlaps
+!   mode        -  integer(optional).        Choose the algorithm for data exchange: 
+!                                       this is chosen through bit fields. 
+!                                        swap_mpi  = iand(flag,psb_swap_mpi_)  /= 0
+!                                        swap_sync = iand(flag,psb_swap_sync_) /= 0
+!                                        swap_send = iand(flag,psb_swap_send_) /= 0
+!                                        swap_recv = iand(flag,psb_swap_recv_) /= 0
+!                                       if (swap_mpi):  use underlying MPI_ALLTOALLV.
+!                                       if (swap_sync): use PSB_SND and PSB_RCV in 
+!                                                       synchronized pairs
+!                                       if (swap_send .and. swap_recv): use mpi_irecv 
+!                                                       and mpi_send
+!                                       if (swap_send): use psb_snd (but need another 
+!                                                       call with swap_recv to complete)
+!                                       if (swap_recv): use psb_rcv (completing a 
+!                                                       previous call with swap_send)
 !
-subroutine  psb_zovrlm(x,desc_a,info,jx,ik,work,update)
+!
+subroutine  psb_zovrlm(x,desc_a,info,jx,ik,work,update,mode)
   use psb_descriptor_type
   use psb_const_mod
   use psi_mod
@@ -60,7 +76,7 @@ subroutine  psb_zovrlm(x,desc_a,info,jx,ik,work,update)
   type(psb_desc_type), intent(in)           :: desc_a
   integer, intent(out)                      :: info
   complex(kind(1.d0)), optional, target        :: work(:)
-  integer, intent(in), optional             :: update,jx,ik
+  integer, intent(in), optional             :: update,jx,ik,mode
 
   ! locals
   integer                  :: int_err(5), ictxt, np, me, &
@@ -115,9 +131,13 @@ subroutine  psb_zovrlm(x,desc_a,info,jx,ik,work,update)
   else
     iupdate = psb_avg_
   endif
-
   do_update = (iupdate /= psb_none_)
-  imode = IOR(psb_swap_send_,psb_swap_recv_)
+  if (present(mode)) then 
+    imode = mode
+  else
+    imode = IOR(psb_swap_send_,psb_swap_recv_)
+  endif
+
 
   ! check vector correctness
   call psb_chkvect(m,1,size(x,1),ix,ijx,desc_a,info,iix,jjx)
@@ -260,9 +280,25 @@ end subroutine psb_zovrlm
 !                                            psb_none_   do nothing
 !                                            psb_sum_    sum of overlaps
 !                                            psb_avg_    average of overlaps
+!   mode        -  integer(optional).        Choose the algorithm for data exchange: 
+!                                       this is chosen through bit fields. 
+!                                        swap_mpi  = iand(flag,psb_swap_mpi_)  /= 0
+!                                        swap_sync = iand(flag,psb_swap_sync_) /= 0
+!                                        swap_send = iand(flag,psb_swap_send_) /= 0
+!                                        swap_recv = iand(flag,psb_swap_recv_) /= 0
+!                                       if (swap_mpi):  use underlying MPI_ALLTOALLV.
+!                                       if (swap_sync): use PSB_SND and PSB_RCV in 
+!                                                       synchronized pairs
+!                                       if (swap_send .and. swap_recv): use mpi_irecv 
+!                                                       and mpi_send
+!                                       if (swap_send): use psb_snd (but need another 
+!                                                       call with swap_recv to complete)
+!                                       if (swap_recv): use psb_rcv (completing a 
+!                                                       previous call with swap_send)
 !
 !
-subroutine  psb_zovrlv(x,desc_a,info,work,update)
+!
+subroutine  psb_zovrlv(x,desc_a,info,work,update,mode)
   use psb_descriptor_type
   use psi_mod
   use psb_const_mod
@@ -272,11 +308,11 @@ subroutine  psb_zovrlv(x,desc_a,info,work,update)
   use psb_penv_mod
   implicit none
 
-  complex(kind(1.d0)), intent(inout), target   :: x(:)
-  type(psb_desc_type), intent(in)           :: desc_a
-  integer, intent(out)                      :: info
-  complex(kind(1.d0)), optional, target        :: work(:)
-  integer, intent(in), optional             :: update
+  complex(kind(1.d0)), intent(inout), target :: x(:)
+  type(psb_desc_type), intent(in)            :: desc_a
+  integer, intent(out)                       :: info
+  complex(kind(1.d0)), optional, target      :: work(:)
+  integer, intent(in), optional              :: update,mode
 
   ! locals
   integer                  :: int_err(5), ictxt, np, me, &
@@ -317,9 +353,13 @@ subroutine  psb_zovrlv(x,desc_a,info,work,update)
   else
     iupdate = psb_none_
   endif
-
   do_update = (iupdate /= psb_none_)
-  imode = IOR(psb_swap_send_,psb_swap_recv_)
+  if (present(mode)) then 
+    imode = mode
+  else
+    imode = IOR(psb_swap_send_,psb_swap_recv_)
+  endif
+
 
   ! check vector correctness
   call psb_chkvect(m,1,size(x),ix,ijx,desc_a,info,iix,jjx)
