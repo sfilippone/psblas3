@@ -28,6 +28,7 @@
 !!$  POSSIBILITY OF SUCH DAMAGE.
 !!$ 
 !!$  
+!
 ! File:  psb_zovrl.f90
 !
 ! Subroutine: psb_zovrlm
@@ -47,18 +48,18 @@
 !                                            psb_avg_    average of overlaps
 !   mode        -  integer(optional).        Choose the algorithm for data exchange: 
 !                                       this is chosen through bit fields. 
-!                                        swap_mpi  = iand(flag,psb_swap_mpi_)  /= 0
-!                                        swap_sync = iand(flag,psb_swap_sync_) /= 0
-!                                        swap_send = iand(flag,psb_swap_send_) /= 0
-!                                        swap_recv = iand(flag,psb_swap_recv_) /= 0
-!                                       if (swap_mpi):  use underlying MPI_ALLTOALLV.
-!                                       if (swap_sync): use PSB_SND and PSB_RCV in 
+!                                       - swap_mpi  = iand(flag,psb_swap_mpi_)  /= 0
+!                                       - swap_sync = iand(flag,psb_swap_sync_) /= 0
+!                                       - swap_send = iand(flag,psb_swap_send_) /= 0
+!                                       - swap_recv = iand(flag,psb_swap_recv_) /= 0
+!                                       - if (swap_mpi):  use underlying MPI_ALLTOALLV.
+!                                       - if (swap_sync): use PSB_SND and PSB_RCV in 
 !                                                       synchronized pairs
-!                                       if (swap_send .and. swap_recv): use mpi_irecv 
+!                                       - if (swap_send .and. swap_recv): use mpi_irecv 
 !                                                       and mpi_send
-!                                       if (swap_send): use psb_snd (but need another 
+!                                       - if (swap_send): use psb_snd (but need another 
 !                                                       call with swap_recv to complete)
-!                                       if (swap_recv): use psb_rcv (completing a 
+!                                       - if (swap_recv): use psb_rcv (completing a 
 !                                                       previous call with swap_send)
 !
 !
@@ -267,6 +268,7 @@ end subroutine psb_zovrlm
 !!$  POSSIBILITY OF SUCH DAMAGE.
 !!$ 
 !!$  
+!
 ! Subroutine: psb_zovrlv
 !   This subroutine performs the exchange of the overlap elements in a 
 !    distributed dense vector between all the processes.
@@ -282,20 +284,19 @@ end subroutine psb_zovrlm
 !                                            psb_avg_    average of overlaps
 !   mode        -  integer(optional).        Choose the algorithm for data exchange: 
 !                                       this is chosen through bit fields. 
-!                                        swap_mpi  = iand(flag,psb_swap_mpi_)  /= 0
-!                                        swap_sync = iand(flag,psb_swap_sync_) /= 0
-!                                        swap_send = iand(flag,psb_swap_send_) /= 0
-!                                        swap_recv = iand(flag,psb_swap_recv_) /= 0
-!                                       if (swap_mpi):  use underlying MPI_ALLTOALLV.
-!                                       if (swap_sync): use PSB_SND and PSB_RCV in 
+!                                       - swap_mpi  = iand(flag,psb_swap_mpi_)  /= 0
+!                                       - swap_sync = iand(flag,psb_swap_sync_) /= 0
+!                                       - swap_send = iand(flag,psb_swap_send_) /= 0
+!                                       - swap_recv = iand(flag,psb_swap_recv_) /= 0
+!                                       - if (swap_mpi):  use underlying MPI_ALLTOALLV.
+!                                       - if (swap_sync): use PSB_SND and PSB_RCV in 
 !                                                       synchronized pairs
-!                                       if (swap_send .and. swap_recv): use mpi_irecv 
+!                                       - if (swap_send .and. swap_recv): use mpi_irecv 
 !                                                       and mpi_send
-!                                       if (swap_send): use psb_snd (but need another 
+!                                       - if (swap_send): use psb_snd (but need another 
 !                                                       call with swap_recv to complete)
-!                                       if (swap_recv): use psb_rcv (completing a 
+!                                       - if (swap_recv): use psb_rcv (completing a 
 !                                                       previous call with swap_send)
-!
 !
 !
 subroutine  psb_zovrlv(x,desc_a,info,work,update,mode)
