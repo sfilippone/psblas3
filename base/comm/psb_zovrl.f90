@@ -81,10 +81,10 @@ subroutine  psb_zovrlm(x,desc_a,info,jx,ik,work,update,mode)
 
   ! locals
   integer                  :: int_err(5), ictxt, np, me, &
-       & err_act, m, n, iix, jjx, ix, ijx, nrow, ncol, k, maxk, iupdate,&
-       & imode, err, liwork, i
+       & err_act, m, n, iix, jjx, ix, ijx, nrow, ncol, k, maxk, update_,&
+       & mode_, err, liwork, i
   complex(kind(1.d0)),pointer :: iwork(:), xp(:,:)
-  logical                  :: do_update
+  logical                  :: do_swap
   character(len=20)        :: name, ch_err
   logical                  :: aliw
 
@@ -128,17 +128,17 @@ subroutine  psb_zovrlm(x,desc_a,info,jx,ik,work,update,mode)
   end if
 
   if (present(update)) then 
-    iupdate = update
+    update_ = update
   else
-    iupdate = psb_avg_
-  endif
-  do_update = (iupdate /= psb_none_)
-  if (present(mode)) then 
-    imode = mode
-  else
-    imode = IOR(psb_swap_send_,psb_swap_recv_)
+    update_ = psb_avg_
   endif
 
+  if (present(mode)) then 
+    mode_ = mode
+  else
+    mode_ = IOR(psb_swap_send_,psb_swap_recv_)
+  endif
+  do_swap = (mode_ /= 0)
 
   ! check vector correctness
   call psb_chkvect(m,1,size(x,1),ix,ijx,desc_a,info,iix,jjx)
@@ -161,8 +161,8 @@ subroutine  psb_zovrlm(x,desc_a,info,jx,ik,work,update,mode)
   liwork=ncol
   if (present(work)) then
     if(size(work).ge.liwork) then
-      aliw=.false.
       iwork => work
+      aliw=.false.
     else
       aliw=.true.
       allocate(iwork(liwork),stat=info)
@@ -185,9 +185,9 @@ subroutine  psb_zovrlm(x,desc_a,info,jx,ik,work,update,mode)
   end if
 
   ! exchange overlap elements
-  if(do_update) then
+  if(do_swap) then
     xp => x(iix:size(x,1),jjx:jjx+k-1)
-    call psi_swapdata(imode,k,zone,xp,&
+    call psi_swapdata(mode_,k,zone,xp,&
          & desc_a,iwork,info,data=psb_comm_ovr_)
   end if
 
@@ -198,7 +198,7 @@ subroutine  psb_zovrlm(x,desc_a,info,jx,ik,work,update,mode)
 
   i=1
   ! switch on update type
-  select case (iupdate)
+  select case (update_)
   case(psb_square_root_)
     do while(desc_a%ovrlap_elem(i).ne.-ione)
       x(desc_a%ovrlap_elem(i+psb_ovrlp_elem_),:) =&
@@ -218,7 +218,7 @@ subroutine  psb_zovrlm(x,desc_a,info,jx,ik,work,update,mode)
   case default 
     ! wrong value for choice argument
     info = 70
-    int_err=(/10,iupdate,0,0,0/)
+    int_err=(/10,update_,0,0,0/)
     call psb_errpush(info,name,i_err=int_err)
     goto 9999
   end select
@@ -317,10 +317,10 @@ subroutine  psb_zovrlv(x,desc_a,info,work,update,mode)
 
   ! locals
   integer                  :: int_err(5), ictxt, np, me, &
-       & err_act, m, n, iix, jjx, ix, ijx, nrow, ncol, k, iupdate,&
-       & imode, err, liwork, i
+       & err_act, m, n, iix, jjx, ix, ijx, nrow, ncol, k, update_,&
+       & mode_, err, liwork, i
   complex(kind(1.d0)),pointer :: iwork(:)
-  logical                  :: do_update
+  logical                  :: do_swap
   character(len=20)        :: name, ch_err
   logical                  :: aliw
 
@@ -350,17 +350,17 @@ subroutine  psb_zovrlv(x,desc_a,info,work,update,mode)
   k = 1
 
   if (present(update)) then 
-    iupdate = update
+    update_ = update
   else
-    iupdate = psb_none_
-  endif
-  do_update = (iupdate /= psb_none_)
-  if (present(mode)) then 
-    imode = mode
-  else
-    imode = IOR(psb_swap_send_,psb_swap_recv_)
+    update_ = psb_avg_
   endif
 
+  if (present(mode)) then 
+    mode_ = mode
+  else
+    mode_ = IOR(psb_swap_send_,psb_swap_recv_)
+  endif
+  do_swap = (mode_ /= 0)
 
   ! check vector correctness
   call psb_chkvect(m,1,size(x),ix,ijx,desc_a,info,iix,jjx)
@@ -383,8 +383,8 @@ subroutine  psb_zovrlv(x,desc_a,info,work,update,mode)
   liwork=ncol
   if (present(work)) then
     if(size(work).ge.liwork) then
-      aliw=.false.
       iwork => work
+      aliw=.false.
     else
       aliw=.true.
       allocate(iwork(liwork),stat=info)
@@ -407,9 +407,8 @@ subroutine  psb_zovrlv(x,desc_a,info,work,update,mode)
   end if
 
   ! exchange overlap elements
-
-  if(do_update) then
-    call psi_swapdata(imode,zone,x(iix:size(x)),&
+  if(do_swap) then
+    call psi_swapdata(mode_,zone,x(iix:size(x)),&
          & desc_a,iwork,info,data=psb_comm_ovr_)
   end if
 
@@ -420,7 +419,7 @@ subroutine  psb_zovrlv(x,desc_a,info,work,update,mode)
 
   i=1
   ! switch on update type
-  select case (iupdate)
+  select case (update_)
   case(psb_square_root_)
     do while(desc_a%ovrlap_elem(i).ne.-ione)
       x(desc_a%ovrlap_elem(i+psb_ovrlp_elem_)) =&
@@ -440,7 +439,7 @@ subroutine  psb_zovrlv(x,desc_a,info,work,update,mode)
   case default 
     ! wrong value for choice argument
     info = 70
-    int_err=(/10,iupdate,0,0,0/)
+    int_err=(/10,update_,0,0,0/)
     call psb_errpush(info,name,i_err=int_err)
     goto 9999
   end select
