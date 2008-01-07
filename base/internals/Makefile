@@ -4,7 +4,7 @@ FOBJS = psi_compute_size.o psi_crea_bnd_elem.o psi_crea_index.o \
         psi_crea_ovr_elem.o psi_dl_check.o \
 	psi_gthsct_mod.o \
 	psi_sort_dl.o \
-	psi_ldsc_pre_halo.o\
+	psi_ldsc_pre_halo.o psi_bld_tmphalo.o psi_bld_hash.o\
 	psi_sort_dl.o psi_idx_cnv.o psi_idx_ins_cnv.o psi_fnd_owner.o
 FOBJS2 = psi_exist_ovr_elem.o psi_list_search.o srtlist.o 
 COBJS = avltree.o srcht.o

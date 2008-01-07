@@ -235,6 +235,22 @@ module psi_mod
        integer, intent(out) :: info
      end subroutine psi_ldsc_pre_halo
    end interface
+  
+  interface psi_bld_hash
+     subroutine psi_bld_hash(desc,info)
+       use psb_descriptor_type
+       type(psb_desc_type), intent(inout) :: desc
+       integer, intent(out) :: info
+     end subroutine psi_bld_hash
+   end interface
+  
+  interface psi_bld_tmphalo
+     subroutine psi_bld_tmphalo(desc,info)
+       use psb_descriptor_type
+       type(psb_desc_type), intent(inout) :: desc
+       integer, intent(out) :: info
+     end subroutine psi_bld_tmphalo
+   end interface
 
   interface psi_idx_cnv
      subroutine psi_idx_cnv1(nv,idxin,desc,info,mask,owned)

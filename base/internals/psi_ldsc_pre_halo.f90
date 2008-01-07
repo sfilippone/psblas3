@@ -92,96 +92,21 @@ subroutine psi_ldsc_pre_halo(desc,ext_hv,info)
     goto 9999
   end if
 
-
-  nk = n_col
-  call psb_realloc(nk,2,desc%glb_lc,info) 
-  if (info ==0) call psb_realloc(psb_hash_size+1,desc%hashv,info,lb=0)
+  call psi_bld_hash(desc,info)
   if (info /= 0) then 
-    ch_err='psb_realloc'
+    ch_err='psi_bld_hash'
     call psb_errpush(info,name,a_err=ch_err)
     goto 9999
   end if
-
-  ! Build a hashed table of sorted lists to search for 
-  ! indices.
-  desc%hashv(0:psb_hash_size) = 0
-  do i=1, nk
-    key = desc%loc_to_glob(i)
-    ih  = iand(key,psb_hash_mask) 
-    desc%hashv(ih) = desc%hashv(ih) + 1
-  end do
-  nh = desc%hashv(0) 
-  idx = 1
-  do i=1, psb_hash_size
-    desc%hashv(i-1) = idx
-    idx = idx + nh
-    nh = desc%hashv(i)
-  end do
-  do i=1, nk
-    key = desc%loc_to_glob(i)
-    ih  = iand(key,psb_hash_mask)
-    idx = desc%hashv(ih) 
-    desc%glb_lc(idx,1) = key
-    desc%glb_lc(idx,2) = i
-    desc%hashv(ih) = desc%hashv(ih) + 1
-  end do
-  do i = psb_hash_size, 1, -1 
-    desc%hashv(i) = desc%hashv(i-1)
-  end do
-  desc%hashv(0) = 1
-  do i=0, psb_hash_size-1 
-    idx = desc%hashv(i)
-    nh  = desc%hashv(i+1) - desc%hashv(i) 
-    if (nh > 1) then 
-      call psb_msort(desc%glb_lc(idx:idx+nh-1,1),&
-           & ix=desc%glb_lc(idx:idx+nh-1,2),flag=psb_sort_keep_idx_)
-    end if
-  end do
-
   if (.not.ext_hv) then
-    ! Here we do not know yet who owns what, so we have 
-    ! to call fnd_owner.
-    nh = (n_col-n_row)
-    if (nh > 0) then 
-      Allocate(helem(nh),stat=info)
-      if (info /= 0) then 
-        call psb_errpush(4010,name,a_err='Allocate')
-        goto 9999      
-      end if
-
-      do i=1, nh
-        helem(i) = desc%loc_to_glob(n_row+i)
-      end do
-
-      call psi_fnd_owner(nh,helem,hproc,desc,info)
-      allocate(tmphl((3*((n_col-n_row)+1)+1)),stat=info)
-      if (info /= 0) then 
-        call psb_errpush(4010,name,a_err='Allocate')
-        goto 9999      
-      end if
-      j  = 1
-      do i=1,nh
-        tmphl(j+0) = hproc(i)
-        if (tmphl(j+0)<0) then 
-          write(0,*) 'Unrecoverable error: missing proc from asb'
-        end if
-        tmphl(j+1) = 1
-        tmphl(j+2) = n_row+i
-        j          = j + 3
-      end do
-      tmphl(j) = -1
-      lhalo = j
-      nhalo = (lhalo-1)/3
-    else 
-      allocate(tmphl(1),stat=info) 
-      if (info /= 0) then 
-        call psb_errpush(4010,name,a_err='Allocate')
-        goto 9999      
-      end if
-      tmphl=-1
-    endif
-    call psb_transfer(tmphl,desc%halo_index,info)
+    call psi_bld_tmphalo(desc,info)
+    if (info /= 0) then 
+      ch_err='psi_bld_tmphalo'
+      call psb_errpush(info,name,a_err=ch_err)
+      goto 9999
+    end if
   end if
+
   call psb_erractionrestore(err_act)
   return
 

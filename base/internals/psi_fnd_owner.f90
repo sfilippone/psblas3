@@ -35,13 +35,13 @@
 !   Figure out who owns  global indices. 
 ! 
 ! Arguments: 
-!    nv       - integer                   Number of indices required on  the calling
-!                                         process 
-!    idx(:)   - integer                   Required indices on the calling process
-!    iprc(:)  - integer, allocatable      Output: process identifiers for the corresponding
-!                                         indices
+!    nv       - integer                 Number of indices required on  the calling
+!                                       process 
+!    idx(:)   - integer                 Required indices on the calling process
+!    iprc(:)  - integer, allocatable    Output: process identifiers for the corresponding
+!                                       indices
 !    desc_a   - type(psb_desc_type).    The communication descriptor.        
-!    info     - integer.                  return code.
+!    info     - integer.                return code.
 ! 
 subroutine psi_fnd_owner(nv,idx,iprc,desc,info)
   use psb_descriptor_type
@@ -54,7 +54,7 @@ subroutine psi_fnd_owner(nv,idx,iprc,desc,info)
   
   implicit none 
   integer, intent(in) :: nv
-  integer, intent(in) ::  idx(:)
+  integer, intent(in) :: idx(:)
   integer, allocatable, intent(out) ::  iprc(:)
   type(psb_desc_type), intent(in) :: desc
   integer, intent(out) :: info
