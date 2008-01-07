@@ -38,10 +38,10 @@
 !    where sub( X ) denotes X(1:N,JX:).
 !
 ! Arguments:
-!    x      -  real,dimension(:,:).       The input vector.
+!    x(:,:) -  real                     The input vector.
 !    desc_a -  type(psb_desc_type).     The communication descriptor.
-!    info   -  integer.                   Return code
-!    jx     -  integer(optional).         The column offset.
+!    info   -  integer.                 Return code
+!    jx     -  integer(optional).       The column offset.
 !
 function psb_dasum (x,desc_a, info, jx)
 
@@ -177,13 +177,14 @@ end function psb_dasum
 !!$  POSSIBILITY OF SUCH DAMAGE.
 !!$ 
 !!$  
+!
 ! Function: psb_dasumv 
 !    Computes norm1 of X
 !
 !    norm1 := sum(X(i))
 !
 ! Arguments:
-!    x      -  real,dimension(:).       The input vector.
+!    x(:)   -  real                     The input vector.
 !    desc_a -  type(psb_desc_type).     The communication descriptor.
 !    info   -  integer.                   Return code
 !
@@ -314,19 +315,20 @@ end function psb_dasumv
 !!$  POSSIBILITY OF SUCH DAMAGE.
 !!$ 
 !!$  
-! Subroutine: psb_dasum vs
+!
+! Subroutine: psb_dasumvs
 !    Computes norm1 of X
 !
 !    norm1 := sum(X(i))
 !
 ! Arguments:
-!    res    -  real.                      The result.
-!    x      -  real,dimension(:).         The input vector.
+!    res    -  real                       The result.
+!    x(:)   -  real                       The input vector.
 !    desc_a -  type(psb_desc_type).     The communication descriptor.
 !    info   -  integer.                   Return code
 !    jx     -  integer(optional).         The column offset.
 !
-subroutine psb_dasumvs (res,x,desc_a, info)
+subroutine psb_dasumvs(res,x,desc_a, info)
   use psb_serial_mod
   use psb_descriptor_type
   use psb_check_mod

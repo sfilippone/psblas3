@@ -33,19 +33,19 @@
 ! Function: psb_zdot
 !    psb_zdot forms the dot product of two distributed vectors,
 !
-!    dot := sub( X )**T * sub( Y )
+!    dot := sub( X )**C * sub( Y )
 !
 !    where sub( X ) denotes X(:,JX)
 !
 !    sub( Y ) denotes Y(:,JY).
 !
 ! Arguments:
-!    x      -  real,dimension(:,:).       The input vector containing the entries of sub( X ).
-!    y      -  real,dimension(:,:).       The input vector containing the entries of sub( Y ).
-!    desc_a -  type(psb_desc_type).     The communication descriptor.
-!    info   -  integer.                   Return code
-!    jx     -  integer(optional).         The column offset for sub( X ).
-!    jy     -  integer(optional).         The column offset for sub( Y ).
+!    x(:,:) -  complex               The input vector containing the entries of sub( X ).
+!    y(:,:) -  complex               The input vector containing the entries of sub( Y ).
+!    desc_a -  type(psb_desc_type).  The communication descriptor.
+!    info   -  integer.              Return code
+!    jx     -  integer(optional).    The column offset for sub( X ).
+!    jy     -  integer(optional).    The column offset for sub( Y ).
 !
 function psb_zdot(x, y,desc_a, info, jx, jy)  
   use psb_descriptor_type
@@ -189,17 +189,18 @@ end function psb_zdot
 !!$  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 !!$  POSSIBILITY OF SUCH DAMAGE.
 !!$ 
-!!$  
+!!$
+! 
 ! Function: psb_zdotv
-!    psb_zdot forms the dot product of two distributed vectors,
+!    psb_zdotv forms the dot product of two distributed vectors,
 !
-!    dot := X**T * Y
+!    dot := X**C * Y
 !
 ! Arguments:
-!    x      -  real,dimension(:).         The input vector containing the entries of X.
-!    y      -  real,dimension(:).         The input vector containing the entries of Y.
-!    desc_a -  type(psb_desc_type).     The communication descriptor.
-!    info   -  integer.                   Return code
+!    x(:)   -  complex               The input vector containing the entries of X.
+!    y(:)   -  complex               The input vector containing the entries of Y.
+!    desc_a -  type(psb_desc_type).  The communication descriptor.
+!    info   -  integer.              Return code
 !
 function psb_zdotv(x, y,desc_a, info)  
   use psb_descriptor_type
@@ -326,18 +327,19 @@ end function psb_zdotv
 !!$  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 !!$  POSSIBILITY OF SUCH DAMAGE.
 !!$ 
-!!$  
+!!$
+!  
 ! Subroutine: psb_zdotvs
-!    psb_zdot forms the dot product of two distributed vectors,
+!    psb_zdotvs forms the dot product of two distributed vectors,
 !
-!    dot := X**T * Y
+!    res := X**C * Y
 !
 ! Arguments:
-!    res    -  real.                      The result.
-!    x      -  real,dimension(:).         The input vector containing the entries of X.
-!    y      -  real,dimension(:).         The input vector containing the entries of Y.
-!    desc_a -  type(psb_desc_type).     The communication descriptor.
-!    info   -  integer.                   Return code
+!    res    -  complex.             The result.
+!    x(:)   -  complex              The input vector containing the entries of X.
+!    y(:)   -  complex              The input vector containing the entries of Y.
+!    desc_a -  type(psb_desc_type). The communication descriptor.
+!    info   -  integer.             Return code
 !
 subroutine psb_zdotvs(res, x, y,desc_a, info)  
   use psb_descriptor_type
@@ -462,22 +464,19 @@ end subroutine psb_zdotvs
 !!$  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 !!$  POSSIBILITY OF SUCH DAMAGE.
 !!$ 
-!!$  
-! Subroutine: psb_dmdots
-!    psb_zdot forms the dot product of two distributed vectors,
+!!$
 !
-!    dot := sub( X )**T * sub( Y )
+! Subroutine: psb_zmdots
+!    psb_zmdots forms the dot product of multiple distributed vectors,
 !
-!    where sub( X ) denotes X(:,JX)
-!
-!    sub( Y ) denotes Y(:,JY).
+!    res(i) := ( X(:,i) )**C * ( Y(:,i) )
 !
 ! Arguments:
-!    res    -  real.                      The result.
-!    x      -  real,dimension(:,:).       The input vector containing the entries of sub( X ).
-!    y      -  real,dimension(:,:).       The input vector containing the entries of sub( Y ).
-!    desc_a -  type(psb_desc_type).     The communication descriptor.
-!    info   -  integer.                   Return code
+!    res(:) -  complex.             The result.
+!    x(:)   -  complex              The input vector containing the entries of sub( X ).
+!    y(:)   -  complex              The input vector containing the entries of sub( Y ).
+!    desc_a -  type(psb_desc_type). The communication descriptor.
+!    info   -  integer.             Return code
 !
 subroutine psb_zmdots(res, x, y, desc_a, info)  
   use psb_descriptor_type

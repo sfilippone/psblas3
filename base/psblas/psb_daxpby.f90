@@ -40,14 +40,14 @@
 !    sub( Y ) denotes Y(:,JY).
 !
 ! Arguments:
-!    alpha  -  real.                      The scalar used to multiply each component of sub( X ).
-!    x      -  real,dimension(:,:).       The input vector containing the entries of sub( X ).
-!    beta   -  real.                      The scalar used to multiply each component of sub( Y ).
-!    y      -  real,dimension(:,:).       The input vector containing the entries of sub( Y ).
-!    desc_a -  type(psb_desc_type).     The communication descriptor.
-!    info   -  integer.                   Return code
-!    jx     -  integer(optional).         The column offset for sub( X ).
-!    jy     -  integer(optional).         The column offset for sub( Y ).
+!    alpha  -  real                 The scalar alpha
+!    x(:,:) -  real                 The input vector containing the entries of ( X ).
+!    beta   -  real                 The scalar beta
+!    y(:,:) -  real                 The input vector containing the entries of ( Y ).
+!    desc_a -  type(psb_desc_type). The communication descriptor.
+!    info   -  integer.             Return code
+!    jx     -  integer(optional).   The column offset for sub( X ).
+!    jy     -  integer(optional).   The column offset for sub( Y ).
 !
 subroutine  psb_daxpby(alpha, x, beta,y,desc_a,info, n, jx, jy)
   use psb_descriptor_type
@@ -189,18 +189,19 @@ end subroutine psb_daxpby
 !!$ 
 !!$  
 !
-! Subroutine: psb_dgeaxpbyv
+! Subroutine: psb_daxpbyv
 !    Adds one distributed matrix to another,
 !
 !    Y := beta * Y + alpha * X
 !
 ! Arguments:
-!    alpha  -  real.                      The scalar used to multiply each component of X.
-!    x      -  real,dimension(:).         The input vector containing the entries of X.
-!    beta   -  real.                      The scalar used to multiply each component of Y.
-!    y      -  real,dimension(:).         The input vector containing the entries of Y.
-!    desc_a -  type(psb_desc_type).     The communication descriptor.
-!    info   -  integer.                   Return code
+!    alpha  -  real                 The scalar alpha
+!    x(:)   -  real                 The input vector containing the entries of ( X ).
+!    beta   -  real                 The scalar beta
+!    y(:)   -  real                 The input vector containing the entries of ( Y ).
+!    desc_a -  type(psb_desc_type). The communication descriptor.
+!    info   -  integer.             Return code
+!
 !
 subroutine  psb_daxpbyv(alpha, x, beta,y,desc_a,info)
   use psb_descriptor_type

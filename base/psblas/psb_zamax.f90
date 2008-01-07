@@ -38,10 +38,10 @@
 !    where sub( X ) denotes X(1:N,JX:).
 !
 ! Arguments:
-!    x      -  complex,dimension(:,:).    The input vector.
-!    desc_a -  type(psb_desc_type).       The communication descriptor.
-!    info   -  integer.                   Return code
-!    jx     -  integer(optional).         The column offset.
+!    x(:,:) -  complex               The input vector.
+!    desc_a -  type(psb_desc_type).  The communication descriptor.
+!    info   -  integer.              Return code
+!    jx     -  integer(optional).    The column offset.
 !
 function psb_zamax (x,desc_a, info, jx)
   use psb_penv_mod 
@@ -161,16 +161,17 @@ end function psb_zamax
 !!$  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 !!$  POSSIBILITY OF SUCH DAMAGE.
 !!$ 
-!!$  
+!!$
+!
 ! Function: psb_zamaxv
 !    Searches the absolute max of X.
 !
 !    normi := max(abs(X(i))  
 !
 ! Arguments:
-!    x      -  real,dimension(:).         The input vector.
-!    desc_a -  type(psb_desc_type).     The communication descriptor.
-!    info   -  integer.                   Return code
+!    x(:)   -  complex               The input vector.
+!    desc_a -  type(psb_desc_type).  The communication descriptor.
+!    info   -  integer.              Return code
 !
 function psb_zamaxv (x,desc_a, info)
   use psb_penv_mod
@@ -180,7 +181,7 @@ function psb_zamaxv (x,desc_a, info)
   use psb_error_mod
   implicit none
 
-  real(kind(1.d0)), intent(in)      :: x(:)
+  complex(kind(1.d0)), intent(in)   :: x(:)
   type(psb_desc_type), intent(in)   :: desc_a
   integer, intent(out)              :: info
   real(kind(1.d0))                  :: psb_zamaxv
@@ -294,13 +295,13 @@ end function psb_zamaxv
 !    where sub( X ) denotes X(1:N,JX:).
 !
 ! Arguments:
-!    res    -  real.                      The result.
-!    x      -  real,dimension(:,:).       The input vector.
-!    desc_a -  type(psb_desc_type).     The communication descriptor.
-!    info   -  integer.                   Return code
-!    jx     -  integer(optional).         The column offset.
+!    res    -  real                 The result.
+!    x(:,:) -  complex              The input vector.
+!    desc_a -  type(psb_desc_type). The communication descriptor.
+!    info   -  integer.             Return code
+!    jx     -  integer(optional).   The column offset.
 !
-subroutine psb_zamaxvs (res,x,desc_a, info)
+subroutine psb_zamaxvs(res,x,desc_a, info)
   use psb_penv_mod
   use psb_serial_mod
   use psb_descriptor_type
@@ -308,7 +309,7 @@ subroutine psb_zamaxvs (res,x,desc_a, info)
   use psb_error_mod
   implicit none
 
-  real(kind(1.d0)), intent(in)      :: x(:)
+  complex(kind(1.d0)), intent(in)   :: x(:)
   type(psb_desc_type), intent(in)   :: desc_a
   integer, intent(out)              :: info
   real(kind(1.D0)), intent(out)     :: res
@@ -420,12 +421,12 @@ end subroutine psb_zamaxvs
 !    normi := max(abs(X(i))  
 !
 ! Arguments:
-!    res    -  real.                      The result.
-!    x      -  real,dimension(:).         The input vector.
-!    desc_a -  type(psb_desc_type).     The communication descriptor.
-!    info   -  integer.                   Return code
+!    res(:) -  real.                The result.
+!    x(:,:) -  complex              The input vector.
+!    desc_a -  type(psb_desc_type). The communication descriptor.
+!    info   -  integer.             Return code
 !
-subroutine psb_zmamaxs (res,x,desc_a, info,jx)
+subroutine psb_zmamaxs(res,x,desc_a, info,jx)
   use psb_penv_mod
   use psb_serial_mod
   use psb_descriptor_type
@@ -433,11 +434,11 @@ subroutine psb_zmamaxs (res,x,desc_a, info,jx)
   use psb_error_mod
   implicit none
 
-  real(kind(1.d0)), intent(in)      :: x(:,:)
+  complex(kind(1.d0)), intent(in)   :: x(:,:)
   type(psb_desc_type), intent(in)   :: desc_a
   integer, intent(out)              :: info
   integer, optional, intent(in)     :: jx
-  real(kind(1.d0)), intent(out) :: res(:)
+  real(kind(1.d0)), intent(out)     :: res(:)
 
   ! locals
   integer                  :: ictxt, np, me,&

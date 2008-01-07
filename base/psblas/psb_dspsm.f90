@@ -55,21 +55,23 @@
 !  vector and T is a M-by-M distributed triangular matrix.
 !
 ! Arguments:   
-!    alpha  -  real.                        The scalar alpha.
-!    a      -  type(psb_dspmat_type).     The sparse matrix containing A.
-!    x      -  real,dimension(:,:).         The input vector containing the entries of sub( X ).
-!    beta   -  real.                        The scalar beta.
-!    y      -  real,dimension(:,:).         The input vector containing the entries of sub( Y ).
-!    desc_a -  type(psb_desc_type).       The communication descriptor.
-!    info   -  integer.                     Return code
-!    trans  -  character(optional).         Whether A or A'. If not present 'N' is assumed.
-!    unitd  -  character(optional).         Specify some type of operation with the diagonal matrix D.
-!    choice -  integer(optional).           The kind of update to perform on overlap elements.
-!    d      -  real,dimension(:)(optional). Matrix for diagonal scaling.
-!    k      -  integer(optional).           The number of right-hand sides.
-!    jx     -  integer(optional).           The column offset for sub( X ). If not present 1 is assumed.
-!    jy     -  integer(optional).           The column offset for sub( Y ). If not present 1 is assumed.
-!    work   -  real,dimension(:)(optional). Working area.
+!    alpha   -  real                   The scalar alpha.
+!    a       -  type(psb_zspmat_type). The sparse matrix containing A.
+!    x(:,:)  -  real                   The input vector containing the entries of ( X ).
+!    beta    -  real                   The scalar beta.
+!    y(:,:)  -  real                   The input vector containing the entries of ( Y ).
+!    desc_a  -  type(psb_desc_type).   The communication descriptor.
+!    info    -  integer.               Return code
+!    trans   -  character(optional).   Whether A or A'. If not present 'N' is assumed.
+!    unitd   -  character(optional).   Specify some type of operation with
+!                                      the diagonal matrix D.
+!    choice  -  integer(optional).     The kind of update to perform on overlap elements.
+!    d(:)    -  real  , optional       Matrix for diagonal scaling.
+!    k       -  integer(optional).     The number of right-hand sides.
+!    jx      -  integer(optional).     The column offset for ( X ). Default: 1
+!    jy      -  integer(optional).     The column offset for ( Y ). Default: 1 
+!    work(:) -  real  , optional       Working area.
+!
 ! 
 subroutine  psb_dspsm(alpha,a,x,beta,y,desc_a,info,&
      & trans, unitd, choice, diag, k, jx, jy, work)   
@@ -345,8 +347,9 @@ end subroutine psb_dspsm
 !!$  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 !!$  POSSIBILITY OF SUCH DAMAGE.
 !!$ 
-!!$  
-! Subroutine: psb_dspsmv
+!!$
+!
+! Subroutine: psb_dspsv
 !  Performs one of the distributed matrix-vector operations
 !
 !     Y := alpha * Pr * A-1 * Pc * X + beta * Y,   or
@@ -364,19 +367,21 @@ end subroutine psb_dspsm
 !  X is a distributed
 !  vector and T is a M-by-M distributed triangular matrix.
 !
+!
 ! Arguments:   
-!    alpha  -  real.                        The scalar alpha.
-!    a      -  type(psb_dspmat_type).     The sparse matrix containing A.
-!    x      -  real,dimension(:).           The input vector containing the entries of X.
-!    beta   -  real.                        The scalar beta.
-!    y      -  real,dimension(:).           The input vector containing the entries of Y.
-!    desc_a -  type(psb_desc_type).       The communication descriptor.
-!    info   -  integer.                     Return code
-!    trans  -  character(optional).         Whether A or A'. If not present 'N' is assumed.
-!    unitd  -  character(optional).         Specify some type of operation with the diagonal matrix D.
-!    choice -  integer(optional).           The kind of update to perform on overlap elements.
-!    d      -  real,dimension(:)(optional). Matrix for diagonal scaling.
-!    work   -  real,dimension(:)(optional). Working area.
+!    alpha   -  real                   The scalar alpha.
+!    a       -  type(psb_zspmat_type). The sparse matrix containing A.
+!    x(:)    -  real                   The input vector containing the entries of ( X ).
+!    beta    -  real                   The scalar beta.
+!    y(:)    -  real                   The input vector containing the entries of ( Y ).
+!    desc_a  -  type(psb_desc_type).   The communication descriptor.
+!    info    -  integer.               Return code
+!    trans   -  character(optional).   Whether A or A'. If not present 'N' is assumed.
+!    unitd   -  character(optional).   Specify some type of operation with
+!                                      the diagonal matrix D.
+!    choice  -  integer(optional).     The kind of update to perform on overlap elements.
+!    d(:)    -  real  , optional       Matrix for diagonal scaling.
+!    work(:) -  real  , optional       Working area.
 ! 
 subroutine  psb_dspsv(alpha,a,x,beta,y,desc_a,info,&
      & trans, unitd, choice, diag, work)   

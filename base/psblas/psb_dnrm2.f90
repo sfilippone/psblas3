@@ -38,10 +38,10 @@
 !    where sub( X ) denotes X(:,JX).
 !
 ! Arguments:
-!    x      -  real,dimension(:,:).       The input vector containing the entries of sub( X ).
+!    x      -  real,dimension(:,:).     The input vector containing the entries of X.
 !    desc_a -  type(psb_desc_type).     The communication descriptor.
 !    info   -  integer.                   Return code
-!    jx     -  integer(optional).         The column offset for sub( X ).
+!    jx     -  integer(optional).         The column offset for X .
 !
 function psb_dnrm2(x, desc_a, info, jx)  
   use psb_descriptor_type
@@ -170,7 +170,8 @@ end function psb_dnrm2
 !!$  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 !!$  POSSIBILITY OF SUCH DAMAGE.
 !!$ 
-!!$  
+!!$
+!
 ! Function: psb_dnrm2
 !    Forms the norm2 of a distributed vector,
 !
@@ -304,11 +305,12 @@ end function psb_dnrm2v
 !!$  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 !!$  POSSIBILITY OF SUCH DAMAGE.
 !!$ 
-!!$  
-! Subroutine: psb_dnrm2
+!!$
+!
+! Subroutine: psb_dnrm2vs
 !    Forms the norm2 of a distributed vector,
 !
-!    norm2 := sqrt ( X**T * X)
+!    res := sqrt ( X**T * X)
 !
 ! Arguments:
 !    res    -  real.                      The result.

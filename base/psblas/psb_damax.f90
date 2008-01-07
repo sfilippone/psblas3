@@ -38,7 +38,7 @@
 !    where sub( X ) denotes X(1:N,JX:).
 !
 ! Arguments:
-!    x      -  real,dimension(:,:).       The input vector.
+!    x(:,:) -  real                       The input vector.
 !    desc_a -  type(psb_desc_type).     The communication descriptor.
 !    info   -  integer.                   Return code
 !    jx     -  integer(optional).         The column offset.
@@ -159,13 +159,14 @@ end function psb_damax
 !!$  POSSIBILITY OF SUCH DAMAGE.
 !!$ 
 !!$  
+!
 ! Function: psb_damaxv
 !    Searches the absolute max of X.
 !
 !    normi := max(abs(X(i))  
 !
 ! Arguments:
-!    x      -  real,dimension(:).         The input vector.
+!    x(:)   -  real                       The input vector.
 !    desc_a -  type(psb_desc_type).     The communication descriptor.
 !    info   -  integer.                   Return code
 !
@@ -287,7 +288,7 @@ end function psb_damaxv
 !
 ! Arguments:
 !    res    -  real.                      The result.
-!    x      -  real,dimension(:,:).       The input vector.
+!    x(:,:) -  real                       The input vector.
 !    desc_a -  type(psb_desc_type).     The communication descriptor.
 !    info   -  integer.                   Return code
 !    jx     -  integer(optional).         The column offset.
@@ -408,10 +409,10 @@ end subroutine psb_damaxvs
 !    normi := max(abs(X(i))  
 !
 ! Arguments:
-!    res    -  real.                      The result.
-!    x      -  real,dimension(:).         The input vector.
+!    res(:) -  real                     The result.
+!    x(:,:) -  real                     The input vector.
 !    desc_a -  type(psb_desc_type).     The communication descriptor.
-!    info   -  integer.                   Return code
+!    info   -  integer.                 Return code
 !
 subroutine psb_dmamaxs (res,x,desc_a, info,jx)
   use psb_penv_mod

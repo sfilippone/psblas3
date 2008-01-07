@@ -58,6 +58,7 @@ subroutine  psb_zhalom(x,desc_a,info,alpha,jx,ik,work,tran,mode,data)
   use psb_check_mod
   use psb_realloc_mod
   use psb_error_mod
+  use psb_string_mod
   use psb_penv_mod
   implicit none
 
@@ -283,6 +284,7 @@ subroutine  psb_zhalov(x,desc_a,info,alpha,work,tran,mode,data)
   use psb_check_mod
   use psb_realloc_mod
   use psb_error_mod
+  use psb_string_mod
   use psb_penv_mod
   implicit none
 

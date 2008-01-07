@@ -78,14 +78,6 @@ module psb_psblas_mod
       type(psb_desc_type), intent(in)    :: desc_a
       integer, intent(out)               :: info
     end subroutine psb_dmdots
-
-    subroutine psb_ddot2v(res, x, y,w,z,desc_a, info)  
-      use psb_descriptor_type
-      real(kind(1.d0)), intent(in)     :: x(:), y(:),w(:), z(:)
-      real(kind(1.d0)), intent(out)    :: res(:)
-      type(psb_desc_type), intent(in)  :: desc_a
-      integer, intent(out)             :: info
-    end subroutine psb_ddot2v
     subroutine  psb_zdotvs(res,x, y, desc_a, info) 
       use psb_descriptor_type
       complex(kind(1.d0)), intent(out)      :: res

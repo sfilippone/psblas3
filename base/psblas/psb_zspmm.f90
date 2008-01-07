@@ -37,45 +37,29 @@
 !
 !     sub( Y ) := alpha * Pr * A' * Pr * sub( X )  + beta * sub( Y ),
 !
-!     where:
+!     
 !
-!        sub( X ) denotes *if* TRANS = 'N',
+!        sub( X ) denotes:  X(1:N,JX:JX+K-1),
 !
-!                       X(1:N,JX:JX+K-1),
-!
-!                     *else*
-!
-!                       X(1:M,JX:JX+K-1).
-!
-!                     *end if*
-!
-!        sub( Y ) denotes *if* trans = 'N',
-!
-!                       Y(1:M,JY:JY+K-1),
-!
-!                     *else*
-!
-!                       Y(1:N,JY:JY+K-1)
-!
-!                     *end* *if*
+!        sub( Y ) denotes:  Y(1:M,JY:JY+K-1),
 !
 !  alpha and beta are scalars, and sub( X ) and sub( Y ) are distributed
 !  vectors and A is a M-by-N distributed matrix.
 !
 ! Arguments:   
-!    alpha  -  real.                        The scalar alpha.
-!    a      -  type(psb_zspmat_type).     The sparse matrix containing A.
-!    x      -  real,dimension(:,:).         The input vector containing the entries of sub( X ).
-!    beta   -  real.                        The scalar beta.
-!    y      -  real,dimension(:,:).         The input vector containing the entries of sub( Y ).
-!    desc_a -  type(psb_desc_type).       The communication descriptor.
-!    info   -  integer.                     Return code
-!    trans  -  character(optional).         Whether A or A'. If not present 'N' is assumed.
-!    k      -  integer(optional).           The number of right-hand sides.
-!    jx     -  integer(optional).           The column offset for sub( X ). If not present 1 is assumed.
-!    jy     -  integer(optional).           The column offset for sub( Y ). If not present 1 is assumed.
-!    work   -  real,dimension(:)(optional). Working area.
-!    doswap -  integer(optional).           Whether to performe halo updates.
+!    alpha   -  complex                The scalar alpha.
+!    a       -  type(psb_zspmat_type). The sparse matrix containing A.
+!    x(:,:)  -  complex                The input vector containing the entries of ( X ).
+!    beta    -  complex                The scalar beta.
+!    y(:,:)  -  complex                The input vector containing the entries of ( Y ).
+!    desc_a  -  type(psb_desc_type).   The communication descriptor.
+!    info    -  integer.               Return code
+!    trans   -  character(optional).   Whether A or A'. Default: 'N' 
+!    k       -  integer(optional).     The number of right-hand sides.
+!    jx      -  integer(optional).     The column offset for ( X ). Default:  1
+!    jy      -  integer(optional).     The column offset for ( Y ). Default:  1
+!    work(:) -  complex,(optional).    Working area.
+!    doswap  -  integer(optional).     Whether to performe halo updates.
 ! 
 subroutine  psb_zspmm(alpha,a,x,beta,y,desc_a,info,&
      & trans, k, jx, jy, work, doswap)   
@@ -156,7 +140,8 @@ subroutine  psb_zspmm(alpha,a,x,beta,y,desc_a,info,&
   endif
 
   if (present(trans)) then     
-    if ( (toupper(trans) == 'N').or.(toupper(trans) == 'T').or. (toupper(trans) == 'C')) then
+    if ( (toupper(trans) == 'N').or.(toupper(trans) == 'T').or.&
+         & (toupper(trans) == 'C')) then
       itrans = toupper(trans)
     else
       info = 70
@@ -385,8 +370,9 @@ end subroutine psb_zspmm
 !!$  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 !!$  POSSIBILITY OF SUCH DAMAGE.
 !!$ 
-!!$  
-! Subroutine: psb_zspmmv
+!!$
+!
+! Subroutine: psb_zspmv
 !     Performs one of the distributed matrix-vector operations
 !
 !     Y := alpha * Pr * A * Pc * X  + beta * Y,  or
@@ -397,16 +383,16 @@ end subroutine psb_zspmm
 !  vectors and A is a M-by-N distributed matrix.
 !
 ! Arguments:   
-!    alpha  -  real.                        The scalar alpha.
-!    a      -  type(psb_zspmat_type).     The sparse matrix containing A.
-!    x      -  real,dimension(:).           The input vector containing the entries of X.
-!    beta   -  real.                        The scalar beta.
-!    y      -  real,dimension(:.         The input vector containing the entries of Y.
-!    desc_a -  type(psb_desc_type).       The communication descriptor.
-!    info   -  integer.                     Return code
-!    trans  -  character(optional).         Whether A or A'. If not present 'N' is assumed.
-!    work   -  real,dimension(:)(optional). Working area.
-!    doswap -  integer(optional).           Whether to performe halo updates.
+!    alpha   -  complex                The scalar alpha.
+!    a       -  type(psb_zspmat_type). The sparse matrix containing A.
+!    x(:)    -  complex                The input vector containing the entries of ( X ).
+!    beta    -  complex                The scalar beta.
+!    y(:)    -  complex                The input vector containing the entries of ( Y ).
+!    desc_a  -  type(psb_desc_type).   The communication descriptor.
+!    info    -  integer.               Return code
+!    trans   -  character(optional).   Whether A or A'. Default:  'N' 
+!    work(:) -  complex,(optional).    Working area.
+!    doswap  -  integer(optional).     Whether to performe halo updates.
 ! 
 subroutine  psb_zspmv(alpha,a,x,beta,y,desc_a,info,&
      & trans, work, doswap)   
@@ -476,7 +462,8 @@ subroutine  psb_zspmv(alpha,a,x,beta,y,desc_a,info,&
   endif
 
   if (present(trans)) then     
-    if ( (toupper(trans) == 'N').or.(toupper(trans) == 'T') .or.(toupper(trans) == 'C')) then
+    if ( (toupper(trans) == 'N').or.(toupper(trans) == 'T') .or.&
+         & (toupper(trans) == 'C')) then
       itrans = toupper(trans)
     else
       info = 70

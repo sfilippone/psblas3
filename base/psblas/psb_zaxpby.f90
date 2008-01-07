@@ -188,7 +188,7 @@ end subroutine psb_zaxpby
 !!$ 
 !!$  
 !
-! Subroutine: psb_zgeaxpbyv
+! Subroutine: psb_zaxpbyv
 !    Adds one distributed matrix to another,
 !
 !    Y := beta * Y + alpha * X

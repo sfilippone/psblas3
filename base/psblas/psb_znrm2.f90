@@ -38,10 +38,10 @@
 !    where sub( X ) denotes X(:,JX).
 !
 ! Arguments:
-!    x      -  real,dimension(:,:).       The input vector containing the entries of sub( X ).
-!    desc_a -  type(psb_desc_type).     The communication descriptor.
-!    info   -  integer.                   Return code
-!    jx     -  integer(optional).         The column offset for sub( X ).
+!    x(:,:) -  complex              The input vector containing the entries of sub( X ).
+!    desc_a -  type(psb_desc_type). The communication descriptor.
+!    info   -  integer.             Return code
+!    jx     -  integer(optional).   The column offset for sub( X ).
 !
 function psb_znrm2(x, desc_a, info, jx)  
   use psb_descriptor_type
@@ -169,16 +169,17 @@ end function psb_znrm2
 !!$  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 !!$  POSSIBILITY OF SUCH DAMAGE.
 !!$ 
-!!$  
+!!$
+!
 ! Function: psb_znrm2
 !    Forms the norm2 of a distributed vector,
 !
 !    norm2 := sqrt ( X**T * X)
 !
 ! Arguments:
-!    x      -  real,dimension(:).         The input vector containing the entries of X.
-!    desc_a -  type(psb_desc_type).     The communication descriptor.
-!    info   -  integer.                   Return code
+!    x(:)   -  complex               The input vector containing the entries of X.
+!    desc_a -  type(psb_desc_type).  The communication descriptor.
+!    info   -  integer.              Return code
 !
 function psb_znrm2v(x, desc_a, info)  
   use psb_descriptor_type
@@ -303,17 +304,18 @@ end function psb_znrm2v
 !!$  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 !!$  POSSIBILITY OF SUCH DAMAGE.
 !!$ 
-!!$  
-! Subroutine: psb_znrm2
+!!$
+!
+! Subroutine: psb_znrm2vs
 !    Forms the norm2 of a distributed vector,
 !
 !    norm2 := sqrt ( X**T * X)
 !
 ! Arguments:
-!    res    -  real.                      The result.
-!    x      -  real,dimension(:).         The input vector containing the entries of X.
-!    desc_a -  type(psb_desc_type).     The communication descriptor.
-!    info   -  integer.                   Return code
+!    res    -  real                  The result.
+!    x(:)   -  complex               The input vector containing the entries of X.
+!    desc_a -  type(psb_desc_type).  The communication descriptor.
+!    info   -  integer.              Return code
 !
 subroutine psb_znrm2vs(res, x, desc_a, info)
   use psb_descriptor_type

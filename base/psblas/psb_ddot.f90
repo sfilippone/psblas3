@@ -40,12 +40,12 @@
 !    sub( Y ) denotes Y(:,JY).
 !
 ! Arguments:
-!    x      -  real,dimension(:,:).       The input vector containing the entries of sub( X ).
-!    y      -  real,dimension(:,:).       The input vector containing the entries of sub( Y ).
-!    desc_a -  type(psb_desc_type).     The communication descriptor.
-!    info   -  integer.                   Return code
-!    jx     -  integer(optional).         The column offset for sub( X ).
-!    jy     -  integer(optional).         The column offset for sub( Y ).
+!    x(:,:) -  real                 The input vector containing the entries of ( X ).
+!    y(:,:) -  real                 The input vector containing the entries of ( Y ).
+!    desc_a -  type(psb_desc_type). The communication descriptor.
+!    info   -  integer.             Return code
+!    jx     -  integer(optional).   The column offset for sub( X ).
+!    jy     -  integer(optional).   The column offset for sub( Y ).
 !
 function psb_ddot(x, y,desc_a, info, jx, jy)  
   use psb_descriptor_type
@@ -190,17 +190,18 @@ end function psb_ddot
 !!$  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 !!$  POSSIBILITY OF SUCH DAMAGE.
 !!$ 
-!!$  
+!!$
+!
 ! Function: psb_ddotv
-!    psb_ddot forms the dot product of two distributed vectors,
+!    psb_ddotv forms the dot product of two distributed vectors,
 !
 !    dot := X**T * Y
 !
 ! Arguments:
-!    x      -  real,dimension(:).         The input vector containing the entries of X.
-!    y      -  real,dimension(:).         The input vector containing the entries of Y.
-!    desc_a -  type(psb_desc_type).     The communication descriptor.
-!    info   -  integer.                   Return code
+!    x(:)   -  real                  The input vector containing the entries of X.
+!    y(:)   -  real                  The input vector containing the entries of Y.
+!    desc_a -  type(psb_desc_type).  The communication descriptor.
+!    info   -  integer.              Return code
 !
 function psb_ddotv(x, y,desc_a, info)  
   use psb_descriptor_type
@@ -327,18 +328,19 @@ end function psb_ddotv
 !!$  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 !!$  POSSIBILITY OF SUCH DAMAGE.
 !!$ 
-!!$  
+!!$
+!
 ! Subroutine: psb_ddotvs
-!    psb_ddot forms the dot product of two distributed vectors,
+!    psb_ddotvs forms the dot product of two distributed vectors,
 !
 !    dot := X**T * Y
 !
 ! Arguments:
-!    res    -  real.                      The result.
-!    x      -  real,dimension(:).         The input vector containing the entries of X.
-!    y      -  real,dimension(:).         The input vector containing the entries of Y.
+!    res    -  real                     The result.
+!    x(:)   -  real                     The input vector containing the entries of X.
+!    y(:)   -  real                     The input vector containing the entries of Y.
 !    desc_a -  type(psb_desc_type).     The communication descriptor.
-!    info   -  integer.                   Return code
+!    info   -  integer.                 Return code
 !
 subroutine psb_ddotvs(res, x, y,desc_a, info)  
   use psb_descriptor_type
@@ -464,22 +466,19 @@ end subroutine psb_ddotvs
 !!$  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 !!$  POSSIBILITY OF SUCH DAMAGE.
 !!$ 
-!!$  
+!!$
+!
 ! Subroutine: psb_dmdots
-!    psb_ddot forms the dot product of two distributed vectors,
+!    psb_dmdots forms the dot product of multiple distributed vectors,
 !
-!    dot := sub( X )**T * sub( Y )
-!
-!    where sub( X ) denotes X(:,JX)
-!
-!    sub( Y ) denotes Y(:,JY).
+!    res(i) := ( X(:,i) )**T * ( Y(:,i) )
 !
 ! Arguments:
-!    res    -  real.                      The result.
-!    x      -  real,dimension(:,:).       The input vector containing the entries of sub( X ).
-!    y      -  real,dimension(:,:).       The input vector containing the entries of sub( Y ).
-!    desc_a -  type(psb_desc_type).     The communication descriptor.
-!    info   -  integer.                   Return code
+!    res(:) -  real.                The result.
+!    x(:,:) -  real                 The input vector containing the entries of ( X ).
+!    y(:,:) -  real                 The input vector containing the entries of ( Y ).
+!    desc_a -  type(psb_desc_type). The communication descriptor.
+!    info   -  integer.             Return code
 !
 subroutine psb_dmdots(res, x, y, desc_a, info)  
   use psb_descriptor_type
@@ -583,103 +582,4 @@ subroutine psb_dmdots(res, x, y, desc_a, info)
   end if
   return
 end subroutine psb_dmdots
-
-
-subroutine psb_ddot2v(res, x, y,w,z,desc_a, info)  
-  use psb_descriptor_type
-  use psb_check_mod
-  use psb_error_mod
-  use psb_penv_mod
-  implicit none
-
-  real(kind(1.d0)), intent(in)     :: x(:), y(:),w(:), z(:)
-  real(kind(1.d0)), intent(out)    :: res(:)
-  type(psb_desc_type), intent(in)  :: desc_a
-  integer, intent(out)             :: info
-
-  ! locals
-  integer                  :: ictxt, np, me,&
-       & err_act, iix, jjx, ix, iy, iiy, jjy, i, m 
-  real(kind(1.D0))         :: dot_local(2)
-  real(kind(1.d0))         :: ddot
-  character(len=20)        :: name, ch_err
-
-  name='psb_ddot'
-  if(psb_get_errstatus().ne.0) return 
-  info=0
-  call psb_erractionsave(err_act)
-
-  ictxt=psb_cd_get_context(desc_a)
-
-  call psb_info(ictxt, me, np)
-  if (np == -ione) then
-    info = 2010
-    call psb_errpush(info,name)
-    goto 9999
-  endif
-
-  ix = ione
-  iy = ione
-  m = psb_cd_get_global_rows(desc_a)
-
-  ! check vector correctness
-  call psb_chkvect(m,ione,size(x,1),ix,ix,desc_a,info,iix,jjx)
-  if (info == 0) &
-       & call psb_chkvect(m,ione,size(y,1),iy,iy,desc_a,info,iiy,jjy)
-  if(info.ne.0) then
-    info=4010
-    ch_err='psb_chkvect'
-    call psb_errpush(info,name,a_err=ch_err)
-    goto 9999
-  end if
-
-  if ((iix.ne.ione).or.(iiy.ne.ione)) then
-    info=3040
-    call psb_errpush(info,name)
-    goto 9999
-  end if
-
-  if(m.ne.0) then
-    if(psb_cd_get_local_rows(desc_a).gt.0) then
-      dot_local(1) = ddot(psb_cd_get_local_rows(desc_a),&
-           & x,ione,y,ione)
-      dot_local(2) = ddot(psb_cd_get_local_rows(desc_a),&
-           & w,ione,z,ione)
-      ! adjust dot_local because overlapped elements are computed more than once
-      i=1
-      do while (desc_a%ovrlap_elem(i).ne.-ione)
-        dot_local(1) = dot_local(1) -&
-             & (desc_a%ovrlap_elem(i+1)-1)/desc_a%ovrlap_elem(i+1)*&
-             & x(desc_a%ovrlap_elem(i))*&
-             & y(desc_a%ovrlap_elem(i))
-        dot_local(2) = dot_local(2) -&
-             & (desc_a%ovrlap_elem(i+1)-1)/desc_a%ovrlap_elem(i+1)*&
-             & w(desc_a%ovrlap_elem(i))*&
-             & z(desc_a%ovrlap_elem(i))
-        i = i+2
-      end do
-    else
-      dot_local=0.d0
-    end if
-  else
-    dot_local=0.d0
-  end if
-
-  ! compute global sum
-  call psb_sum(ictxt, dot_local)
-
-  res(1:2) = dot_local(1:2)
-
-  call psb_erractionrestore(err_act)
-  return  
-
-9999 continue
-  call psb_erractionrestore(err_act)
-
-  if (err_act.eq.psb_act_abort_) then
-    call psb_error(ictxt)
-    return
-  end if
-  return
-end subroutine psb_ddot2v
 

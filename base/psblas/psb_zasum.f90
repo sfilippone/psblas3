@@ -38,10 +38,10 @@
 !    where sub( X ) denotes X(1:N,JX:).
 !
 ! Arguments:
-!    x      -  real,dimension(:,:).       The input vector.
-!    desc_a -  type(psb_desc_type).     The communication descriptor.
-!    info   -  integer.                   Return code
-!    jx     -  integer(optional).         The column offset.
+!    x(:,:) -  complex                The input vector.
+!    desc_a -  type(psb_desc_type).   The communication descriptor.
+!    info   -  integer.               Return code
+!    jx     -  integer(optional).     The column offset.
 !
 function psb_zasum (x,desc_a, info, jx)
 
@@ -52,7 +52,7 @@ function psb_zasum (x,desc_a, info, jx)
   use psb_penv_mod
   implicit none
 
-  complex(kind(1.d0)), intent(in)      :: x(:,:)
+  complex(kind(1.d0)), intent(in)   :: x(:,:)
   type(psb_desc_type), intent(in)   :: desc_a
   integer, intent(out)              :: info
   integer, optional, intent(in)     :: jx
@@ -181,18 +181,19 @@ end function psb_zasum
 !!$  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 !!$  POSSIBILITY OF SUCH DAMAGE.
 !!$ 
-!!$  
+!!$
+!
 ! Function: psb_zasumv 
 !    Computes norm1 of X
 !
 !    norm1 := sum(X(i))
 !
 ! Arguments:
-!    x      -  real,dimension(:).       The input vector.
-!    desc_a -  type(psb_desc_type).     The communication descriptor.
-!    info   -  integer.                   Return code
+!    x(:)   -  complex               The input vector.
+!    desc_a -  type(psb_desc_type).  The communication descriptor.
+!    info   -  integer.              Return code
 !
-function psb_zasumv (x,desc_a, info)
+function psb_zasumv(x,desc_a, info)
 
   use psb_serial_mod
   use psb_descriptor_type
@@ -201,7 +202,7 @@ function psb_zasumv (x,desc_a, info)
   use psb_penv_mod
   implicit none
 
-  complex(kind(1.d0)), intent(in)      :: x(:)
+  complex(kind(1.d0)), intent(in)   :: x(:)
   type(psb_desc_type), intent(in)   :: desc_a
   integer, intent(out)              :: info
   real(kind(1.d0))                  :: psb_zasumv
@@ -324,20 +325,21 @@ end function psb_zasumv
 !!$  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 !!$  POSSIBILITY OF SUCH DAMAGE.
 !!$ 
-!!$  
-! Subroutine: psb_zasum vs
+!!$
+!
+! Subroutine: psb_zasumvs
 !    Computes norm1 of X
 !
 !    norm1 := sum(X(i))
 !
 ! Arguments:
-!    res    -  real.                      The result.
-!    x      -  real,dimension(:).         The input vector.
-!    desc_a -  type(psb_desc_type).     The communication descriptor.
-!    info   -  integer.                   Return code
-!    jx     -  integer(optional).         The column offset.
+!    res    -  real.                 The result.
+!    x(:)   -  complex               The input vector.
+!    desc_a -  type(psb_desc_type).  The communication descriptor.
+!    info   -  integer.              Return code
+!    jx     -  integer(optional).    The column offset.
 !
-subroutine psb_zasumvs (res,x,desc_a, info)
+subroutine psb_zasumvs(res,x,desc_a, info)
   use psb_serial_mod
   use psb_descriptor_type
   use psb_check_mod
@@ -345,7 +347,7 @@ subroutine psb_zasumvs (res,x,desc_a, info)
   use psb_penv_mod
   implicit none
 
-  complex(kind(1.d0)), intent(in)      :: x(:)
+  complex(kind(1.d0)), intent(in)   :: x(:)
   real(kind(1.d0)), intent(out)     :: res
   type(psb_desc_type), intent(in)   :: desc_a
   integer, intent(out)              :: info

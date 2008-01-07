@@ -31,9 +31,9 @@
 ! File: psb_dnrmi.f90
 !
 ! Function: psb_dnrmi
-!    Forms the approximated norm of a sparse matrix,                                                                  
+!    Forms the approximated norm of a sparse matrix,       
 !
-!    normi := max(abs(sum(A(i,j))))                                                                                   
+!    normi := max(abs(sum(A(i,j))))                                                 
 !
 ! Arguments:
 !    a      -  type(psb_dspmat_type).   The sparse matrix containing A.
