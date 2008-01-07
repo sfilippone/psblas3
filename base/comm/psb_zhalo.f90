@@ -74,7 +74,7 @@ subroutine  psb_zhalom(x,desc_a,info,alpha,jx,ik,work,tran,mode,data)
        & err_act, m, n, iix, jjx, ix, ijx, k, maxk, nrow, imode, i,&
        & err, liwork,data_
   complex(kind(1.d0)),pointer :: iwork(:), xp(:,:)
-  character                :: ltran
+  character                :: tran_
   character(len=20)        :: name, ch_err
   logical                  :: aliw
 
@@ -117,9 +117,9 @@ subroutine  psb_zhalom(x,desc_a,info,alpha,jx,ik,work,tran,mode,data)
   end if
 
   if (present(tran)) then     
-    ltran = tran
+    tran_ = toupper(tran)
   else
-    ltran = 'N'
+    tran_ = 'N'
   endif
   if (present(mode)) then 
     imode = mode
@@ -187,12 +187,16 @@ subroutine  psb_zhalom(x,desc_a,info,alpha,jx,ik,work,tran,mode,data)
 
   ! exchange halo elements
   xp => x(iix:size(x,1),jjx:jjx+k-1)
-  if(ltran.eq.'N') then
+  if(tran_ == 'N') then
     call psi_swapdata(imode,k,zzero,xp,&
          & desc_a,iwork,info,data=data_)
-  else if((ltran.eq.'T').or.(ltran.eq.'H')) then
+  else if((tran_ == 'T').or.(tran_ == 'C')) then
     call psi_swaptran(imode,k,zone,xp,&
          &desc_a,iwork,info)
+  else
+    info = 4001
+    call psb_errpush(info,name,a_err='invalid tran')
+    goto 9999      
   end if
 
   if(info.ne.0) then
@@ -210,7 +214,7 @@ subroutine  psb_zhalom(x,desc_a,info,alpha,jx,ik,work,tran,mode,data)
 9999 continue
   call psb_erractionrestore(err_act)
 
-  if (err_act.eq.psb_act_abort_) then
+  if (err_act == psb_act_abort_) then
     call psb_error(ictxt)
     return
   end if
@@ -294,7 +298,7 @@ subroutine  psb_zhalov(x,desc_a,info,alpha,work,tran,mode,data)
   integer                  :: ictxt, np, me, err_act, &
        & m, n, iix, jjx, ix, ijx, nrow, imode, err, liwork,data_
   complex(kind(1.d0)),pointer :: iwork(:)
-  character                :: ltran
+  character                :: tran_
   character(len=20)        :: name, ch_err
   logical                  :: aliw
 
@@ -321,9 +325,9 @@ subroutine  psb_zhalov(x,desc_a,info,alpha,work,tran,mode,data)
   nrow = psb_cd_get_local_rows(desc_a)
 
   if (present(tran)) then     
-    ltran = tran
+    tran_ = toupper(tran)
   else
-    ltran = 'N'
+    tran_ = 'N'
   endif
   if (present(mode)) then 
     imode = mode
@@ -387,12 +391,16 @@ subroutine  psb_zhalov(x,desc_a,info,alpha,work,tran,mode,data)
   end if
 
   ! exchange halo elements
-  if(ltran.eq.'N') then
+  if(tran_ == 'N') then
     call psi_swapdata(imode,zzero,x(iix:size(x)),&
          & desc_a,iwork,info,data=data_)
-  else if((ltran.eq.'T').or.(ltran.eq.'H')) then
+  else if((tran_ == 'T').or.(tran_ == 'C')) then
     call psi_swaptran(imode,zone,x(iix:size(x)),&
          & desc_a,iwork,info)
+  else
+    info = 4001
+    call psb_errpush(info,name,a_err='invalid tran')
+    goto 9999      
   end if
 
   if(info.ne.0) then
@@ -410,7 +418,7 @@ subroutine  psb_zhalov(x,desc_a,info,alpha,work,tran,mode,data)
 9999 continue
   call psb_erractionrestore(err_act)
 
-  if (err_act.eq.psb_act_abort_) then
+  if (err_act == psb_act_abort_) then
     call psb_error(ictxt)
     return
   end if

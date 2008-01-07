@@ -231,7 +231,7 @@ subroutine  psb_dovrlm(x,desc_a,info,jx,ik,work,update,mode)
 9999 continue
   call psb_erractionrestore(err_act)
 
-  if (err_act.eq.psb_act_abort_) then
+  if (err_act == psb_act_abort_) then
     call psb_error(ictxt)
     return
   end if
@@ -454,7 +454,7 @@ subroutine  psb_dovrlv(x,desc_a,info,work,update,mode)
 9999 continue
   call psb_erractionrestore(err_act)
 
-  if (err_act.eq.psb_act_abort_) then
+  if (err_act == psb_act_abort_) then
     call psb_error(ictxt)
     return
   end if

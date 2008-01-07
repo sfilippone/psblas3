@@ -75,7 +75,7 @@ subroutine  psb_ihalom(x,desc_a,info,alpha,jx,ik,work,tran,mode,data)
        & err_act, m, n, iix, jjx, ix, ijx, nrow, k, maxk, liwork,&
        & imode, err,data_
   integer, pointer         :: xp(:,:), iwork(:)
-  character                :: ltran
+  character                :: tran_
   character(len=20)        :: name, ch_err
   logical                  :: aliw
 
@@ -118,9 +118,9 @@ subroutine  psb_ihalom(x,desc_a,info,alpha,jx,ik,work,tran,mode,data)
   end if
 
   if (present(tran)) then     
-    ltran = tran
+    tran_ = toupper(tran)
   else
-    ltran = 'N'
+    tran_ = 'N'
   endif
 
   if (present(data)) then     
@@ -191,12 +191,16 @@ subroutine  psb_ihalom(x,desc_a,info,alpha,jx,ik,work,tran,mode,data)
 
   xp => x(iix:size(x,1),jjx:jjx+k-1)
   ! exchange halo elements
-  if(ltran.eq.'N') then
-    call psi_swapdata(imode,k,0,xp,&
+  if(tran_ == 'N') then
+    call psi_swapdata(imode,k,izero,xp,&
          & desc_a,iwork,info,data=data_)
-  else if((ltran.eq.'T').or.(ltran.eq.'H')) then
-    call psi_swaptran(imode,k,1,xp,&
+  else if((tran_ == 'T').or.(tran_ == 'C')) then
+    call psi_swaptran(imode,k,ione,xp,&
          & desc_a,iwork,info)
+  else
+    info = 4001
+    call psb_errpush(info,name,a_err='invalid tran')
+    goto 9999      
   end if
 
   if(info.ne.0) then
@@ -213,7 +217,7 @@ subroutine  psb_ihalom(x,desc_a,info,alpha,jx,ik,work,tran,mode,data)
 9999 continue
   call psb_erractionrestore(err_act)
 
-  if (err_act.eq.psb_act_abort_) then
+  if (err_act == psb_act_abort_) then
     call psb_error(ictxt)
     return
   end if
@@ -298,7 +302,7 @@ subroutine  psb_ihalov(x,desc_a,info,alpha,work,tran,mode,data)
        & err_act, m, n, iix, jjx, ix, ijx, nrow, imode,&
        & err, liwork, data_
   integer,pointer          :: iwork(:)
-  character                :: ltran
+  character                :: tran_
   character(len=20)        :: name, ch_err
   logical                  :: aliw
 
@@ -327,9 +331,9 @@ subroutine  psb_ihalov(x,desc_a,info,alpha,work,tran,mode,data)
 
 
   if (present(tran)) then     
-    ltran = tran
+    tran_ = toupper(tran)
   else
-    ltran = 'N'
+    tran_ = 'N'
   endif
   if (present(data)) then     
     data_ = data
@@ -392,12 +396,16 @@ subroutine  psb_ihalov(x,desc_a,info,alpha,work,tran,mode,data)
   end if
 
   ! exchange halo elements
-  if(ltran.eq.'N') then
-    call psi_swapdata(imode,0,x(iix:size(x)),&
+  if(tran_ == 'N') then
+    call psi_swapdata(imode,izero,x(iix:size(x)),&
          & desc_a,iwork,info,data=data_)
-  else if((ltran.eq.'T').or.(ltran.eq.'H')) then
-    call psi_swaptran(imode,1,x(iix:size(x)),&
+  else if((tran_ == 'T').or.(tran_ == 'C')) then
+    call psi_swaptran(imode,ione,x(iix:size(x)),&
          & desc_a,iwork,info)
+  else
+    info = 4001
+    call psb_errpush(info,name,a_err='invalid tran')
+    goto 9999      
   end if
 
   if(info.ne.0) then
@@ -414,7 +422,7 @@ subroutine  psb_ihalov(x,desc_a,info,alpha,work,tran,mode,data)
 9999 continue
   call psb_erractionrestore(err_act)
 
-  if (err_act.eq.psb_act_abort_) then
+  if (err_act == psb_act_abort_) then
     call psb_error(ictxt)
     return
   end if
