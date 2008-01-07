@@ -44,6 +44,12 @@
 !   work      -  complex(optional).            Work  area.
 !   tran      -  character(optional).          Transpose exchange.
 !   mode      -  integer(optional).            Communication mode (see Swapdata)
+!   data     - integer                 Which index list in desc_a should be used
+!                                      to retrieve rows, default psb_comm_halo_
+!                                       psb_comm_halo_    use halo_index
+!                                       psb_comm_ext_     use ext_index 
+!                                       psb_comm_ovrl_    use ovrl_index
+!
 !
 subroutine  psb_zhalom(x,desc_a,info,alpha,jx,ik,work,tran,mode,data)
   use psb_descriptor_type
@@ -259,6 +265,12 @@ end subroutine psb_zhalom
 !   work      -  complex(optional).            Work  area.
 !   tran      -  character(optional).          Transpose exchange.
 !   mode      -  integer(optional).            Communication mode (see Swapdata)
+!   data     - integer                 Which index list in desc_a should be used
+!                                      to retrieve rows, default psb_comm_halo_
+!                                       psb_comm_halo_    use halo_index
+!                                       psb_comm_ext_     use ext_index 
+!                                       psb_comm_ovrl_    use ovrl_index
+!
 !
 subroutine  psb_zhalov(x,desc_a,info,alpha,work,tran,mode,data)
   use psb_descriptor_type
