@@ -35,12 +35,11 @@
 !   The user callable routine is defined in the psb_tools_mod module.
 ! 
 ! Arguments: 
-!    desc_a  - type(psb_desc_type).         The communication descriptor.
-!    info    - integer.                       return code.
-!    ext_hv  - logical                        Essentially this distinguishes a call 
-!                                             coming from the build of an extended
-!                                             halo descriptor with respect to a "normal"
-!                                             call. 
+!    desc_a  - type(psb_desc_type).    The communication descriptor.
+!    info    - integer.                return code.
+!    ext_hv  - logical                 Essentially this distinguishes a call 
+!                                      coming from the build of an extended
+!                                      halo descriptor with respect to a normal call. 
 !
 subroutine psb_icdasb(desc_a,info,ext_hv)
   use psb_descriptor_type
