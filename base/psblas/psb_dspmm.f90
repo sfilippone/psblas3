@@ -141,12 +141,9 @@ subroutine  psb_dspmm(alpha,a,x,beta,y,desc_a,info,&
   endif
 
   if (present(trans)) then     
-    if ( (toupper(trans) == 'N').or.(toupper(trans) == 'T')) then
+    if ( (toupper(trans) == 'N').or.(toupper(trans) == 'T')&
+         & .or.(toupper(trans) == 'C')) then
       itrans = toupper(trans)
-    else if (toupper(trans) == 'C') then
-      info = 3020
-      call psb_errpush(info,name)
-      goto 9999
     else
       info = 70
       call psb_errpush(info,name)
@@ -157,7 +154,7 @@ subroutine  psb_dspmm(alpha,a,x,beta,y,desc_a,info,&
   endif
 
   m    = psb_cd_get_global_rows(desc_a)
-  n    = psb_cd_get_global_cols(desc_a)
+  n    = psb_cd_get_global_cols(desc_a) 
   nrow = psb_cd_get_local_rows(desc_a)
   ncol = psb_cd_get_local_cols(desc_a)
 
@@ -467,12 +464,9 @@ subroutine  psb_dspmv(alpha,a,x,beta,y,desc_a,info,&
   endif
 
   if (present(trans)) then     
-    if ( (toupper(trans) == 'N').or.(toupper(trans) == 'T')) then
+    if ( (toupper(trans) == 'N').or.(toupper(trans) == 'T')&
+         & .or. (toupper(trans) == 'C')) then 
       itrans = toupper(trans)
-    else if (toupper(trans) == 'C') then
-      info = 3020
-      call psb_errpush(info,name)
-      goto 9999
     else
       info = 70
       call psb_errpush(info,name)
