@@ -460,7 +460,7 @@ subroutine  psb_dspmv(alpha,a,x,beta,y,desc_a,info,&
   if (present(doswap)) then
     doswap_ = doswap
   else
-    doswap_ = 1
+    doswap_ = .true.
   endif
 
   if (present(trans)) then     
