@@ -348,7 +348,8 @@ module psb_psblas_mod
        type(psb_desc_type), intent(in)      :: desc_a
        character, optional, intent(in)      :: trans
        real(kind(1.d0)), optional, intent(inout),target :: work(:)
-       integer, optional, intent(in)        :: k, jx, jy,doswap
+       integer, optional, intent(in)        :: k, jx, jy
+       logical, optional, intent(in)        :: doswap
        integer, intent(out)                 :: info
      end subroutine psb_dspmm
      subroutine psb_dspmv(alpha, a, x, beta, y,&
@@ -362,7 +363,7 @@ module psb_psblas_mod
        type(psb_desc_type), intent(in)      :: desc_a
        character, optional, intent(in)      :: trans
        real(kind(1.d0)), optional, intent(inout),target :: work(:)
-       integer, optional, intent(in)        :: doswap
+       logical, optional, intent(in)        :: doswap
        integer, intent(out)                 :: info
      end subroutine psb_dspmv
      subroutine psb_zspmm(alpha, a, x, beta, y, desc_a, info,&
@@ -376,7 +377,8 @@ module psb_psblas_mod
        type(psb_desc_type), intent(in)      :: desc_a
        character, optional, intent(in)      :: trans
        complex(kind(1.d0)), optional, intent(inout),target :: work(:)
-       integer, optional, intent(in)        :: k, jx, jy,doswap
+       integer, optional, intent(in)        :: k, jx, jy
+       logical, optional, intent(in)        :: doswap
        integer, intent(out)                 :: info
      end subroutine psb_zspmm
      subroutine psb_zspmv(alpha, a, x, beta, y,&
@@ -390,7 +392,7 @@ module psb_psblas_mod
        type(psb_desc_type), intent(in)      :: desc_a
        character, optional, intent(in)      :: trans
        complex(kind(1.d0)), optional, intent(inout),target :: work(:)
-       integer, optional, intent(in)        :: doswap
+       logical, optional, intent(in)        :: doswap
        integer, intent(out)                 :: info
      end subroutine psb_zspmv
   end interface

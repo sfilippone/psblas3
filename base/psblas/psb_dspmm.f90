@@ -59,7 +59,7 @@
 !    jx      -  integer(optional).     The column offset for ( X ). Default:  1
 !    jy      -  integer(optional).     The column offset for ( Y ). Default:  1
 !    work(:) -  real,(optional).       Working area.
-!    doswap  -  integer(optional).     Whether to performe halo updates.
+!    doswap  -  logical(optional).     Whether to performe halo updates.
 ! 
 subroutine  psb_dspmm(alpha,a,x,beta,y,desc_a,info,&
      & trans, k, jx, jy, work, doswap)   
@@ -83,18 +83,19 @@ subroutine  psb_dspmm(alpha,a,x,beta,y,desc_a,info,&
   integer, intent(out)                     :: info
   real(kind(1.d0)), optional, target       :: work(:)
   character, intent(in), optional          :: trans
-  integer, intent(in), optional            :: k, jx, jy,doswap
+  integer, intent(in), optional            :: k, jx, jy
+  logical, intent(in), optional            :: doswap
 
   ! locals
   integer                  :: ictxt, np, me,&
        & err_act, n, iix, jjx, ia, ja, iia, jja, ix, iy, ik, ijx, ijy,&
-       & idoswap, m, nrow, ncol, lldx, lldy, liwork, iiy, jjy,&
+       & m, nrow, ncol, lldx, lldy, liwork, iiy, jjy,&
        & i, ib, ib1
   integer, parameter       :: nb=4
   real(kind(1.d0)),pointer :: xp(:,:), yp(:,:), iwork(:)
-  character                :: itrans
+  character                :: trans_
   character(len=20)        :: name, ch_err
-  logical                  :: aliw
+  logical                  :: aliw, doswap_
 
   name='psb_dspmm'
   if(psb_get_errstatus() /= 0) return 
@@ -128,9 +129,9 @@ subroutine  psb_dspmm(alpha,a,x,beta,y,desc_a,info,&
   endif
 
   if (present(doswap)) then
-    idoswap = doswap
+    doswap_ = doswap
   else
-    idoswap = 1
+    doswap_ = .true.
   endif
 
   if (present(k)) then     
@@ -141,23 +142,22 @@ subroutine  psb_dspmm(alpha,a,x,beta,y,desc_a,info,&
   endif
 
   if (present(trans)) then     
-    if ( (toupper(trans) == 'N').or.(toupper(trans) == 'T')&
-         & .or.(toupper(trans) == 'C')) then
-      itrans = toupper(trans)
-    else
-      info = 70
-      call psb_errpush(info,name)
-      goto 9999
-    end if
+    trans_ = toupper(trans)
   else
-    itrans = 'N'
+    trans_ = 'N'
   endif
+  if ( (trans_ == 'N').or.(trans_ == 'T')&
+       & .or.(trans_ == 'C')) then
+  else
+    info = 70
+    call psb_errpush(info,name)
+    goto 9999
+  end if
 
   m    = psb_cd_get_global_rows(desc_a)
   n    = psb_cd_get_global_cols(desc_a) 
   nrow = psb_cd_get_local_rows(desc_a)
   ncol = psb_cd_get_local_cols(desc_a)
-
   lldx = size(x,1)
   lldy = size(y,1)
 
@@ -199,7 +199,7 @@ subroutine  psb_dspmm(alpha,a,x,beta,y,desc_a,info,&
   end if
 
 
-  if (itrans == 'N') then
+  if (trans_ == 'N') then
     !  Matrix is not transposed
     if((ja /= ix).or.(ia /= iy)) then
       ! this case is not yet implemented
@@ -229,7 +229,7 @@ subroutine  psb_dspmm(alpha,a,x,beta,y,desc_a,info,&
 
     ib1=min(nb,ik)
     xp => x(iix:lldx,jjx:jjx+ib1-1)
-    if(idoswap > 0)&
+    if (doswap_)&
          & call psi_swapdata(ior(psb_swap_send_,psb_swap_recv_),&
          & ib1,dzero,xp,desc_a,iwork,info)
 
@@ -238,7 +238,7 @@ subroutine  psb_dspmm(alpha,a,x,beta,y,desc_a,info,&
       ib=ib1
       ib1 = max(0,min(nb,(ik)-(i-1+ib)))
       xp => x(iix:lldx,jjx+i+ib-1:jjx+i+ib+ib1-2)
-      if((ib1 > 0).and.(idoswap > 0))&
+      if ((ib1 > 0).and.(doswap_)) &
            & call psi_swapdata(psb_swap_send_,ib1,&
            & dzero,xp,desc_a,iwork,info)
 
@@ -246,11 +246,11 @@ subroutine  psb_dspmm(alpha,a,x,beta,y,desc_a,info,&
 
       !  local Matrix-vector product
       call psb_csmm(alpha,a,x(iix:lldx,jjx:jjx+ib-1),&
-           & beta,y(iiy:lldy,jjy:jjy+ib-1),info,trans=itrans)
+           & beta,y(iiy:lldy,jjy:jjy+ib-1),info,trans=trans_)
 
       if(info /= 0) exit blk
 
-      if((ib1 > 0).and.(idoswap > 0))&
+      if((ib1 > 0).and.(doswap_))&
            & call psi_swapdata(psb_swap_send_,ib1,&
            & dzero,xp,desc_a,iwork,info)
 
@@ -301,7 +301,7 @@ subroutine  psb_dspmm(alpha,a,x,beta,y,desc_a,info,&
     !  local Matrix-vector product
 
     call psb_csmm(alpha,a,x(iix:lldx,jjx:jjx+ik-1),&
-         & beta,y(iiy:lldy,jjy:jjy+ik-1),info,trans=itrans)
+         & beta,y(iiy:lldy,jjy:jjy+ik-1),info,trans=trans_)
 
     if(info /= 0) then
       info = 4010
@@ -311,7 +311,7 @@ subroutine  psb_dspmm(alpha,a,x,beta,y,desc_a,info,&
     end if
 
     yp => y(iiy:lldy,jjy:jjy+ik-1)
-    if (idoswap/=0)&
+    if (doswap_) &
          & call psi_swaptran(ior(psb_swap_send_,psb_swap_recv_),&
          & ik,done,yp,desc_a,iwork,info)
 
@@ -394,7 +394,7 @@ end subroutine psb_dspmm
 !    info    -  integer.               Return code
 !    trans   -  character(optional).   Whether A or A'. Default: 'N' 
 !    work(:) -  real,(optional).       Working area.
-!    doswap  -  integer(optional).     Whether to performe halo updates.
+!    doswap  -  logical(optional).     Whether to performe halo updates.
 ! 
 subroutine  psb_dspmv(alpha,a,x,beta,y,desc_a,info,&
      & trans, work, doswap)   
@@ -419,18 +419,18 @@ subroutine  psb_dspmv(alpha,a,x,beta,y,desc_a,info,&
   integer, intent(out)                     :: info
   real(kind(1.d0)), optional, target      :: work(:)
   character, intent(in), optional          :: trans
-  integer, intent(in), optional            :: doswap
+  logical, intent(in), optional            :: doswap
 
   ! locals
   integer                  :: ictxt, np, me,&
        & err_act, n, iix, jjx, ia, ja, iia, jja, ix, iy, ik, &
-       & idoswap, m, nrow, ncol, lldx, lldy, liwork, jx, jy, iiy, jjy,&
+       & m, nrow, ncol, lldx, lldy, liwork, jx, jy, iiy, jjy,&
        & ib
   integer, parameter       :: nb=4
   real(kind(1.d0)),pointer :: iwork(:), xp(:), yp(:)
-  character                :: itrans
+  character                :: trans_
   character(len=20)        :: name, ch_err
-  logical                  :: aliw
+  logical                  :: aliw, doswap_
   integer                  :: debug_level, debug_unit
 
   name='psb_dspmv'
@@ -458,29 +458,28 @@ subroutine  psb_dspmv(alpha,a,x,beta,y,desc_a,info,&
   ib = 1
 
   if (present(doswap)) then
-    idoswap = doswap
+    doswap_ = doswap
   else
-    idoswap = 1
+    doswap_ = 1
   endif
 
   if (present(trans)) then     
-    if ( (toupper(trans) == 'N').or.(toupper(trans) == 'T')&
-         & .or. (toupper(trans) == 'C')) then 
-      itrans = toupper(trans)
-    else
-      info = 70
-      call psb_errpush(info,name)
-      goto 9999
-    end if
+    trans_ = toupper(trans)
   else
-    itrans = 'N'
+    trans_ = 'N'
   endif
+  if ( (trans_ == 'N').or.(trans_ == 'T')&
+       & .or.(trans_ == 'C')) then
+  else
+    info = 70
+    call psb_errpush(info,name)
+    goto 9999
+  end if
 
   m    = psb_cd_get_global_rows(desc_a)
   n    = psb_cd_get_global_cols(desc_a)
   nrow = psb_cd_get_local_rows(desc_a)
   ncol = psb_cd_get_local_cols(desc_a)
-
   lldx = size(x)
   lldy = size(y)
 
@@ -525,7 +524,7 @@ subroutine  psb_dspmv(alpha,a,x,beta,y,desc_a,info,&
 
   if (debug_level >= psb_debug_comp_) &
        & write(debug_unit,*) me,' ',trim(name),' Checkmat ', info
-  if (itrans == 'N') then
+  if (trans_ == 'N') then
     !  Matrix is not transposed
     if((ja /= ix).or.(ia /= iy)) then
       ! this case is not yet implemented
@@ -552,9 +551,7 @@ subroutine  psb_dspmv(alpha,a,x,beta,y,desc_a,info,&
       goto 9999
     end if
 
-    if (idoswap == 0) then
-      x(nrow+1:ncol)=dzero
-    else
+    if (doswap_) then
       call psi_swapdata(ior(psb_swap_send_,psb_swap_recv_),&
            & dzero,x,desc_a,iwork,info,data=psb_comm_halo_)
     end if
@@ -608,7 +605,7 @@ subroutine  psb_dspmv(alpha,a,x,beta,y,desc_a,info,&
     if (debug_level >= psb_debug_comp_) &
          & write(debug_unit,*) me,' ',trim(name),' checkvect ', info
     !  local Matrix-vector product
-    call psb_csmm(alpha,a,xp,beta,yp,info,trans=itrans)
+    call psb_csmm(alpha,a,xp,beta,yp,info,trans=trans_)
     if (debug_level >= psb_debug_comp_) &
          & write(debug_unit,*) me,' ',trim(name),' csmm ', info
     if(info /= 0) then
@@ -618,7 +615,7 @@ subroutine  psb_dspmv(alpha,a,x,beta,y,desc_a,info,&
       goto 9999
     end if
 
-    if(idoswap /= 0)&
+    if (doswap_)&
          & call psi_swaptran(ior(psb_swap_send_,psb_swap_recv_),&
          & done,yp,desc_a,iwork,info)
     if (debug_level >= psb_debug_comp_) &
