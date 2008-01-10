@@ -77,16 +77,21 @@
 !                                         performed.
 !    iter   -  integer(optional)          Output: how many iterations have been
 !                                         performed.
-!    err    -  real   (optional)          Output: error estimate on exit
+!                                         performed.
+!    err    -  real   (optional)          Output: error estimate on exit. If the
+!                                         denominator of the estimate is exactly
+!                                         0, it is changed into 1. 
 !    itrace -  integer(optional)          Input: print an informational message
 !                                         with the error estimate every itrace
 !                                         iterations
 !    istop  -  integer(optional)          Input: stopping criterion, or how
 !                                         to estimate the error. 
-!                                         1: err =  |r|/|b|
-!                                         2: err =  |r|/(|a||x|+|b|)
+!                                         1: err =  |r|/|b|; here the iteration is
+!                                            stopped when  |r| <= eps * |b|
+!                                         2: err =  |r|/(|a||x|+|b|);  here the iteration is
+!                                            stopped when  |r| <= eps * (|a||x|+|b|)
 !                                         where r is the (preconditioned, recursive
-!                                         estimate of) residual 
+!                                         estimate of) residual. 
 ! 
 !
 Subroutine psb_dcg(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,istop)
@@ -108,12 +113,12 @@ Subroutine psb_dcg(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,istop)
 !!$   Local data
   real(kind(1.d0)), allocatable, target   :: aux(:), wwrk(:,:)
   real(kind(1.d0)), pointer  :: q(:), p(:), r(:), z(:), w(:)
-  real(kind(1.d0))    ::rerr
   real(kind(1.d0))    ::alpha, beta, rho, rho_old, rni, xni, bni, ani,bn2,& 
        & sigma
   integer         :: litmax, istop_, naux, mglob, it, itx, itrace_,&
        & np,me, n_col, isvch, ictxt, n_row,err_act, int_err(5)
   logical, parameter :: exchange=.true., noexchange=.false.  
+  real(kind(1.d0))   :: errnum, errden
   character(len=20)             :: name
 
   info = 0
@@ -216,6 +221,8 @@ Subroutine psb_dcg(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,istop)
     else if (istop_ == 2) then 
       bn2 = psb_genrm2(b,desc_a,info)
     endif
+    errnum = dzero
+    errden = done
     if (info.ne.0) then 
       info=4011
       call psb_errpush(info,name)
@@ -254,33 +261,43 @@ Subroutine psb_dcg(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,istop)
       call psb_geaxpby(-alpha,q,done,r,desc_a,info)
 
 
-      if (istop_ == 1) Then 
+      if (istop_ == 1) then 
         rni = psb_geamax(r,desc_a,info)
         xni = psb_geamax(x,desc_a,info)
-        rerr =  rni/(ani*xni+bni)
-      Else  If (istop_ == 2) Then 
-
+        errnum = rni
+        errden = (ani*xni+bni)
+      else  if (istop_ == 2) then 
         rni = psb_genrm2(r,desc_a,info)
-        rerr = rni/bn2
-      Endif
-      if (rerr<=eps) exit restart
+        errnum = rni
+        errden = bn2
+      endif
+      if (errnum <= eps*errden) then 
+        exit restart
+      end if
 
       if (itx>= litmax) exit restart 
 
       If (itrace_ > 0) then 
         if ((mod(itx,itrace_)==0).and.(me == 0))&
-             & write(*,'(a,i4,3(2x,es10.4))') 'cg: ',itx,rerr
+             & write(*,'(a,i4,3(2x,es10.4))') 'cg: ',itx,errnum,eps*errden
       end If
     end do iteration
   end do restart
   If (itrace_ > 0) then 
-    if (me == 0) write(*,'(a,i4,3(2x,es10.4))') 'cg: ',itx,rerr
+    if (me == 0) write(*,'(a,i4,3(2x,es10.4))') 'cg: ',itx,errnum,eps*errden
   end If
 
-  if (present(err)) err=rerr
+  If (Present(err)) then 
+    if (errden /= dzero) then 
+      err = errnum/errden
+    else
+      err = errnum
+    end if
+  end If
+
   if (present(iter)) iter = itx
-  if (rerr>eps) then
-    write(0,*) 'CG Failed to converge to ',eps,&
+  If ((errnum > eps*errden).and.(me==0)) Then
+    write(0,*) 'CG Failed to converge to ',eps*errden,&
          & ' in ',litmax,' iterations '
     info=itx
   end if

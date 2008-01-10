@@ -83,19 +83,23 @@
 !                                         performed.
 !    iter   -  integer(optional)          Output: how many iterations have been
 !                                         performed.
-!    err    -  real   (optional)          Output: error estimate on exit
+!                                         performed.
+!    err    -  real   (optional)          Output: error estimate on exit. If the
+!                                         denominator of the estimate is exactly
+!                                         0, it is changed into 1. 
 !    itrace -  integer(optional)          Input: print an informational message
 !                                         with the error estimate every itrace
 !                                         iterations
-!    irst   -  integer(optional)          Input: restart parameter L 
-!
 !    istop  -  integer(optional)          Input: stopping criterion, or how
 !                                         to estimate the error. 
-!                                         1: err =  |r|/|b|
-!                                         2: err =  |r|/(|a||x|+|b|)
+!                                         1: err =  |r|/|b|; here the iteration is
+!                                            stopped when  |r| <= eps * |b|
+!                                         2: err =  |r|/(|a||x|+|b|);  here the iteration is
+!                                            stopped when  |r| <= eps * (|a||x|+|b|)
 !                                         where r is the (preconditioned, recursive
-!                                         estimate of) residual 
-! 
+!                                         estimate of) residual. 
+!    irst   -  integer(optional)          Input: restart parameter L 
+!
 !
 !
 Subroutine psb_dcgstabl(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,irst,istop)
@@ -119,7 +123,6 @@ Subroutine psb_dcgstabl(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,irst,is
   Real(Kind(1.d0)), Pointer  :: ww(:), q(:), r(:), rt0(:), p(:), v(:), &
        & s(:), t(:), z(:), f(:), gamma(:), gamma1(:), gamma2(:), taum(:,:), sigma(:)
 
-  Real(Kind(1.d0)) :: rerr
   Integer       :: litmax, naux, mglob, it, itrace_,&
        & np,me, n_row, n_col, nl, err_act
   Logical, Parameter :: exchange=.True., noexchange=.False.  
@@ -128,6 +131,7 @@ Subroutine psb_dcgstabl(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,irst,is
   integer            :: debug_level, debug_unit
   Real(Kind(1.d0)) :: alpha, beta, rho, rho_old, rni, xni, bni, ani,bn2,& 
        & omega
+  real(kind(1.d0))   :: errnum, errden
   character(len=20)             :: name
 
   info = 0
@@ -249,6 +253,8 @@ Subroutine psb_dcgstabl(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,irst,is
   else if (istop_ == 2) then 
     bn2 = psb_genrm2(b,desc_a,info)
   endif
+  errnum = dzero
+  errden = done
   if (info.ne.0) Then 
      info=4011 
      call psb_errpush(info,name)
@@ -289,10 +295,12 @@ Subroutine psb_dcgstabl(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,irst,is
     if (istop_ == 1) then 
       rni = psb_geamax(r,desc_a,info)
       xni = psb_geamax(x,desc_a,info)
-      rerr =  rni/(ani*xni+bni)
+      errnum = rni
+      errden = (ani*xni+bni)
     else if (istop_ == 2) then 
       rni = psb_genrm2(r,desc_a,info)
-      rerr = rni/bn2
+      errnum = rni
+      errden = bn2
     endif
     if (info.ne.0) Then 
        info=4011 
@@ -300,12 +308,12 @@ Subroutine psb_dcgstabl(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,irst,is
        goto 9999
     End If
 
-    If (rerr<=eps) Then 
+    If (errnum <= eps*errden) Then 
       Exit restart
     End If
     If (itrace_ > 0) then 
       if ((mod(itx,itrace_)==0).and.(me == 0))&
-           & write(*,'(a,i4,3(2x,es10.4))') 'bicgstab(l): ',itx,rerr
+           & write(*,'(a,i4,3(2x,es10.4))') 'bicgstab(l): ',itx,errnum,eps*errden
     end If
      
     iteration:  Do 
@@ -414,32 +422,40 @@ Subroutine psb_dcgstabl(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,irst,is
       if (istop_ == 1) then 
         rni = psb_geamax(rh(:,0),desc_a,info)
         xni = psb_geamax(x,desc_a,info)
-        rerr =  rni/(ani*xni+bni)
+        errnum = rni
+        errden = (ani*xni+bni)
       else  if (istop_ == 2) then 
         rni = psb_genrm2(rh(:,0),desc_a,info)
-        rerr = rni/bn2
+        errnum = rni
+        errden = bn2
       endif
 
-      If (rerr<=eps) Then 
+      If (errnum <= eps*errden) Then 
         Exit restart
       End If
       If (itx.Ge.litmax) Exit restart
 
       If (itrace_ > 0) then 
         if ((mod(itx,itrace_)==0).and.(me == 0))&
-             & write(*,'(a,i4,3(2x,es10.4))') 'bicgstab(l): ',itx,rerr
+             & write(*,'(a,i4,3(2x,es10.4))') 'bicgstab(l): ',itx,errnum,eps*errden
       end If
       
     End Do iteration
   End Do restart
 
   If (itrace_ > 0) then 
-    if (me == 0) write(*,'(a,i4,3(2x,es10.4))') 'bicgstab(l): ',itx,rerr
+    if (me == 0) write(*,'(a,i4,3(2x,es10.4))') 'bicgstab(l): ',itx,errnum,eps*errden
   end If
-  If (Present(err)) err=rerr
+  If (Present(err)) then 
+    if (errden /= dzero) then 
+      err = errnum/errden
+    else
+      err = errnum
+    end if
+  end If
   If (Present(iter)) iter = itx
-  If (rerr>eps) Then
-    write(debug_unit,*) 'bi-cgstabl failed to converge to ',eps,&
+  If ((errnum > eps*errden).and.(me==0)) Then
+    write(debug_unit,*) 'bi-cgstabl failed to converge to ',eps*errden,&
          & ' in ',itx,' iterations  '
   End If
 

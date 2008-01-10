@@ -87,18 +87,23 @@
 !                                         performed.
 !    iter   -  integer(optional)          Output: how many iterations have been
 !                                         performed.
-!    err    -  real   (optional)          Output: error estimate on exit
+!                                         performed.
+!    err    -  real   (optional)          Output: error estimate on exit. If the
+!                                         denominator of the estimate is exactly
+!                                         0, it is changed into 1. 
 !    itrace -  integer(optional)          Input: print an informational message
 !                                         with the error estimate every itrace
 !                                         iterations
-!    irst   -  integer(optional)          Input: restart parameter
-!                                         
 !    istop  -  integer(optional)          Input: stopping criterion, or how
 !                                         to estimate the error. 
-!                                         1: err =  |r|/|b|
-!                                         2: err =  |r|/(|a||x|+|b|)
+!                                         1: err =  |r|/|b|; here the iteration is
+!                                            stopped when  |r| <= eps * |b|
+!                                         2: err =  |r|/(|a||x|+|b|);  here the iteration is
+!                                            stopped when  |r| <= eps * (|a||x|+|b|)
 !                                         where r is the (preconditioned, recursive
-!                                         estimate of) residual 
+!                                         estimate of) residual. 
+!    irst   -  integer(optional)          Input: restart parameter
+!                                         
 ! 
 Subroutine psb_drgmres(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,irst,istop)
   use psb_base_mod
@@ -119,7 +124,7 @@ Subroutine psb_drgmres(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,irst,ist
 !!$   local data
   Real(Kind(1.d0)), allocatable, target   :: aux(:),w(:),w1(:), v(:,:)
   Real(Kind(1.d0)), allocatable   ::  c(:),s(:), h(:,:), rs(:),rst(:),xt(:)
-  Real(Kind(1.d0)) :: rerr, scal, gm, rti, rti1
+  Real(Kind(1.d0)) :: scal, gm, rti, rti1
   Integer       ::litmax, naux, mglob, it,k, itrace_,&
        & np,me, n_row, n_col, nl, int_err(5)
   Logical, Parameter :: exchange=.True., noexchange=.False., use_drot=.true.
@@ -128,6 +133,7 @@ Subroutine psb_drgmres(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,irst,ist
   integer            :: debug_level, debug_unit
   Real(Kind(1.d0)) :: rni, xni, bni, ani,bn2, dt
   real(kind(1.d0)), external :: dnrm2
+  real(kind(1.d0))   :: errnum, errden
   character(len=20)          :: name
 
   info = 0
@@ -239,6 +245,8 @@ Subroutine psb_drgmres(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,irst,ist
   else if (istop_ == 2) then 
     bn2 = psb_genrm2(b,desc_a,info)
   endif
+  errnum = dzero
+  errden = done
   if (info.ne.0) Then 
     info=4011 
     call psb_errpush(info,name)
@@ -289,10 +297,12 @@ Subroutine psb_drgmres(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,irst,ist
     if (istop_ == 1) then 
       rni = psb_geamax(v(:,1),desc_a,info)
       xni = psb_geamax(x,desc_a,info)
-      rerr =  rni/(ani*xni+bni)
+      errnum = rni
+      errden = (ani*xni+bni)
     else if (istop_ == 2) then 
       rni = psb_genrm2(v(:,1),desc_a,info)
-      rerr = rni/bn2
+      errnum = rni
+      errden = bn2
     endif
     if (info.ne.0) Then 
       info=4011 
@@ -300,13 +310,13 @@ Subroutine psb_drgmres(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,irst,ist
       goto 9999
     End If
     
-    If (rerr<=eps) Then 
+    If (errnum <= eps*errden) Then 
       Exit restart
     End If
 
     If (itrace_ > 0) then 
       if ((mod(itx,itrace_)==0).and.(me == 0))&
-           & write(*,'(a,i4,3(2x,es10.4))') 'gmres(l): ',itx,rerr
+           & write(*,'(a,i4,3(2x,es10.4))') 'gmres(l): ',itx,errnum,eps*errden
     end If
      
     v(:,1) = v(:,1) * scal
@@ -379,7 +389,8 @@ Subroutine psb_drgmres(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,irst,ist
         call psb_spmm(-done,a,xt,done,w1,desc_a,info,work=aux)
         rni = psb_geamax(w1,desc_a,info)
         xni = psb_geamax(xt,desc_a,info)
-        rerr =  rni/(ani*xni+bni)
+        errnum = rni
+        errden = (ani*xni+bni)
         !
 
       else if (istop_ == 2) then 
@@ -388,12 +399,12 @@ Subroutine psb_drgmres(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,irst,ist
         ! procedure of the least-squares problem
         !
         rni = abs(rs(i+1))
-        rerr = rni/bn2
-
+        errnum = rni
+        errden = bn2
       endif
 
-      if (rerr < eps ) then 
-        
+      If (errnum <= eps*errden) Then 
+
         if (istop_ == 1) then 
           x = xt 
         else if (istop_ == 2) then
@@ -418,7 +429,7 @@ Subroutine psb_drgmres(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,irst,ist
 
       If (itrace_ > 0) then 
         if ((mod(itx,itrace_)==0).and.(me == 0))&
-             & write(*,'(a,i4,3(2x,es10.4))') 'gmres(l): ',itx,rerr
+             & write(*,'(a,i4,3(2x,es10.4))') 'gmres(l): ',itx,errnum,eps*errden
       end If
 
     end Do inner
@@ -443,13 +454,20 @@ Subroutine psb_drgmres(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,irst,ist
      
   End Do restart
   If (itrace_ > 0) then 
-    if (me == 0) write(*,'(a,i4,3(2x,es10.4))') 'gmres(l): ',itx,rerr
+    if (me == 0) write(*,'(a,i4,3(2x,es10.4))') 'gmres(l): ',itx,errnum,eps*errden
   end If
 
-  If (Present(err)) err=rerr
+  If (Present(err)) then 
+    if (errden /= dzero) then 
+      err = errnum/errden
+    else
+      err = errnum
+    end if
+  end If
+
   If (Present(iter)) iter = itx
-  If ((rerr>eps).and. (me == 0))  Then
-    write(debug_unit,*) 'gmresr(l) failed to converge to ',eps,&
+  If ((errnum > eps*errden).and.(me==0)) Then
+    write(debug_unit,*) 'gmresr(l) failed to converge to ',eps*errden,&
          & ' in ',itx,' iterations  '
   End If
 
