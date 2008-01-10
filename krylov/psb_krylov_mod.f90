@@ -127,7 +127,7 @@ Module psb_krylov_mod
   end interface
 
   interface psb_rgmres
-    Subroutine psb_dgmresr(a,prec,b,x,eps,desc_a,info,&
+    Subroutine psb_drgmres(a,prec,b,x,eps,desc_a,info,&
          &itmax,iter,err,itrace,irst,istop)
       use psb_base_mod
       use psb_prec_mod
@@ -141,8 +141,8 @@ Module psb_krylov_mod
       Integer, Optional, Intent(in)      :: itmax, itrace, irst,istop
       Integer, Optional, Intent(out)     :: iter
       Real(Kind(1.d0)), Optional, Intent(out) :: err
-    end subroutine psb_dgmresr
-    Subroutine psb_zgmresr(a,prec,b,x,eps,desc_a,info,&
+    end subroutine psb_drgmres
+    Subroutine psb_zrgmres(a,prec,b,x,eps,desc_a,info,&
          &itmax,iter,err,itrace,irst,istop)
       use psb_base_mod
       use psb_prec_mod
@@ -156,7 +156,7 @@ Module psb_krylov_mod
       Integer, Optional, Intent(in)      :: itmax, itrace, irst,istop
       Integer, Optional, Intent(out)     :: iter
       Real(Kind(1.d0)), Optional, Intent(out) :: err
-    end subroutine psb_zgmresr
+    end subroutine psb_zrgmres
   end interface
 
   interface psb_cgs

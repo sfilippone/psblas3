@@ -64,19 +64,19 @@
 !!$ C                                                                      C
 !!$ C                                                                      C
 !!$ CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
-! File:  psb_dgmresr.f90
+! File:  psb_zrgmres.f90
 !
-! Subroutine: psb_dgmres
+! Subroutine: psb_zrgmres
 !    This subroutine implements the restarted GMRES method with right
 !    preconditioning.
 !
 ! Arguments:
 !
-!    a      -  type(psb_dspmat_type)      Input: sparse matrix containing A.
-!    prec   -  type(psb_dprec_type)       Input: preconditioner
-!    b      -  real,dimension(:)          Input: vector containing the
+!    a      -  type(psb_zspmat_type)      Input: sparse matrix containing A.
+!    prec   -  type(psb_zprec_type)       Input: preconditioner
+!    b      -  complex,dimension(:)       Input: vector containing the
 !                                         right hand side B
-!    x      -  real,dimension(:)          Input/Output: vector containing the
+!    x      -  complex,dimension(:)       Input/Output: vector containing the
 !                                         initial guess and final solution X.
 !    eps    -  real                       Input: Stopping tolerance; the iteration is
 !                                         stopped when the error estimate |err| <= eps
@@ -91,7 +91,7 @@
 !    itrace -  integer(optional)          Input: print an informational message
 !                                         with the error estimate every itrace
 !                                         iterations
-!    irst   -  integer(optional)          Input: restart parameter
+!    irst   -  integer(optional)          Input: restart parameter 
 !                                         
 !    istop  -  integer(optional)          Input: stopping criterion, or how
 !                                         to estimate the error. 
@@ -99,39 +99,40 @@
 !                                         2: err =  |r|/(|a||x|+|b|)
 !                                         where r is the (preconditioned, recursive
 !                                         estimate of) residual 
-! 
-Subroutine psb_dgmresr(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,irst,istop)
+!
+Subroutine psb_zrgmres(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,irst,istop)
   use psb_base_mod
   use psb_prec_mod
   implicit none
 
 !!$  Parameters 
-  Type(psb_dspmat_type), Intent(in)  :: a
-  Type(psb_dprec_type), Intent(in)   :: prec 
+  Type(psb_zspmat_type), Intent(in)  :: a
+  Type(psb_zprec_type), Intent(in)   :: prec 
   Type(psb_desc_type), Intent(in)    :: desc_a
-  Real(Kind(1.d0)), Intent(in)       :: b(:)
-  Real(Kind(1.d0)), Intent(inout)    :: x(:)
+  complex(Kind(1.d0)), Intent(in)       :: b(:)
+  complex(Kind(1.d0)), Intent(inout)    :: x(:)
   Real(Kind(1.d0)), Intent(in)       :: eps
   integer, intent(out)               :: info
   Integer, Optional, Intent(in)      :: itmax, itrace, irst,istop
   Integer, Optional, Intent(out)     :: iter
   Real(Kind(1.d0)), Optional, Intent(out) :: err
 !!$   local data
-  Real(Kind(1.d0)), allocatable, target   :: aux(:),w(:),w1(:), v(:,:)
-  Real(Kind(1.d0)), allocatable   ::  c(:),s(:), h(:,:), rs(:),rst(:),xt(:)
-  Real(Kind(1.d0)) :: rerr, scal, gm, rti, rti1
+  complex(Kind(1.d0)), allocatable, target   :: aux(:),w(:),w1(:), v(:,:)
+  complex(Kind(1.d0)), allocatable   ::  c(:),s(:), h(:,:), rs(:),rst(:),xt(:)
+  Real(Kind(1.d0)) :: rerr, tmp
+  complex(kind(1.d0)) :: rti, rti1, scal
   Integer       ::litmax, naux, mglob, it,k, itrace_,&
        & np,me, n_row, n_col, nl, int_err(5)
-  Logical, Parameter :: exchange=.True., noexchange=.False., use_drot=.true.
+  Logical, Parameter :: exchange=.True., noexchange=.False.
   Integer, Parameter :: irmax = 8
   Integer            :: itx, i, isvch, ictxt,istop_, err_act
   integer            :: debug_level, debug_unit
-  Real(Kind(1.d0)) :: rni, xni, bni, ani,bn2, dt
-  real(kind(1.d0)), external :: dnrm2
+  Real(Kind(1.d0)) :: rni, xni, bni, ani,bn2
+  real(kind(1.d0)), external :: dznrm2
   character(len=20)          :: name
 
   info = 0
-  name = 'psb_dgmres'
+  name = 'psb_zgmres'
   call psb_erractionsave(err_act)
   debug_unit  = psb_get_debug_unit()
   debug_level = psb_get_debug_level()
@@ -150,10 +151,10 @@ Subroutine psb_dgmresr(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,irst,ist
   else
     istop_ = 1
   endif
-!
-!  ISTOP_ = 1:  Normwise backward error, infinity norm 
-!  ISTOP_ = 2:  ||r||/||b||, 2-norm 
-!
+  !
+  !  ISTOP_ = 1:  Normwise backward error, infinity norm 
+  !  ISTOP_ = 2:  ||r||/||b||, 2-norm 
+  !
 
   if ((istop_ < 1 ).or.(istop_ > 2 ) ) then
     info=5001
@@ -174,7 +175,7 @@ Subroutine psb_dgmresr(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,irst,ist
   Else
     itrace_ = 0
   End If
-  
+
   If (Present(irst)) Then
     nl = irst
     If (debug_level >= psb_debug_ext_) &
@@ -247,7 +248,7 @@ Subroutine psb_dgmresr(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,irst,ist
 
   itx   = 0
   restart: Do 
-  
+
     ! compute r0 = b-ax0
     ! check convergence
     ! compute v1 = r0/||r0||_2
@@ -256,14 +257,14 @@ Subroutine psb_dgmresr(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,irst,ist
          & write(debug_unit,*) me,' ',trim(name),&
          & ' restart: ',itx,it
     it = 0      
-    Call psb_geaxpby(done,b,dzero,v(:,1),desc_a,info)
+    Call psb_geaxpby(zone,b,zzero,v(:,1),desc_a,info)
     if (info.ne.0) Then 
       info=4011 
       call psb_errpush(info,name)
       goto 9999
     End If
 
-    Call psb_spmm(-done,a,x,done,v(:,1),desc_a,info,work=aux)
+    Call psb_spmm(-zone,a,x,zone,v(:,1),desc_a,info,work=aux)
     if (info.ne.0) Then 
       info=4011 
       call psb_errpush(info,name)
@@ -271,7 +272,7 @@ Subroutine psb_dgmresr(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,irst,ist
     End If
 
     rs(1) = psb_genrm2(v(:,1),desc_a,info)
-    rs(2:) = dzero
+    rs(2:) = zzero
     if (info.ne.0) Then 
       info=4011 
       call psb_errpush(info,name)
@@ -299,7 +300,7 @@ Subroutine psb_dgmresr(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,irst,ist
       call psb_errpush(info,name)
       goto 9999
     End If
-    
+
     If (rerr<=eps) Then 
       Exit restart
     End If
@@ -308,7 +309,7 @@ Subroutine psb_dgmresr(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,irst,ist
       if ((mod(itx,itrace_)==0).and.(me == 0))&
            & write(*,'(a,i4,3(2x,es10.4))') 'gmres(l): ',itx,rerr
     end If
-     
+
     v(:,1) = v(:,1) * scal
 
     If (itx.Ge.litmax) Exit restart  
@@ -321,62 +322,45 @@ Subroutine psb_dgmresr(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,irst,ist
       itx  = itx + 1
 
       call psb_precaply(prec,v(:,i),w1,desc_a,info)
-      Call psb_spmm(done,a,w1,dzero,w,desc_a,info,work=aux)
+      Call psb_spmm(zone,a,w1,zzero,w,desc_a,info,work=aux)
       !
 
       do k = 1, i
         h(k,i) = psb_gedot(v(:,k),w,desc_a,info)
-        call psb_geaxpby(-h(k,i),v(:,k),done,w,desc_a,info)
+        call psb_geaxpby(-h(k,i),v(:,k),zone,w,desc_a,info)
       end do
       h(i+1,i) = psb_genrm2(w,desc_a,info)
       scal=done/h(i+1,i)
-      call psb_geaxpby(scal,w,dzero,v(:,i+1),desc_a,info)
-      if (use_drot) then 
-        do k=2,i
-          call drot(1,h(k-1,i),1,h(k,i),1,c(k-1),s(k-1))
-        enddo
-        
-        rti  = h(i,i)
-        rti1 = h(i+1,i) 
-        call drotg(rti,rti1,c(i),s(i))
-        call drot(1,h(i,i),1,h(i+1,i),1,c(i),s(i))
-        h(i+1,i) = dzero
-        call drot(1,rs(i),1,rs(i+1),1,c(i),s(i))
+      call psb_geaxpby(scal,w,zzero,v(:,i+1),desc_a,info)
+      do k=2,i
+        call zrot(1,h(k-1,i),1,h(k,i),1,real(c(k-1)),s(k-1))
+      enddo
 
-      else
-        do k=2,i
-          dt       = h(k-1,i)
-          h(k-1,i) =  c(k-1)*dt + s(k-1)*h(k,i)
-          h(k,i)   = -s(k-1)*dt + c(k-1)*h(k,i)
-        enddo
-        gm =  safe_dn2(h(i,i),h(i+1,i))
-        if (debug_level >= psb_debug_ext_) &
-             & write(debug_unit,*) me,' ',trim(name),' GM : ',gm
-        gm = max(gm,epstol)
+      rti  = h(i,i)
+      rti1 = h(i+1,i) 
+      call zrotg(rti,rti1,tmp,s(i))
+      c(i) = cmplx(tmp,dzero)
+      call zrot(1,h(i,i),1,h(i+1,i),1,real(c(i)),s(i))
+      h(i+1,i) = zzero
+      call zrot(1,rs(i),1,rs(i+1),1,real(c(i)),s(i))
 
-        c(i) = h(i,i)/gm
-        s(i) = h(i+1,i)/gm
-        rs(i+1) = -s(i)*rs(i)
-        rs(i)   = c(i)*rs(i)
-        h(i,i)  = c(i)*h(i,i)+s(i)*h(i+1,i)
-      endif
       if (istop_ == 1) then 
         !
         ! build x and then compute the residual and its infinity norm
         !
         rst = rs
-        xt = dzero
-        call dtrsm('l','u','n','n',i,1,done,h,size(h,1),rst,size(rst,1))
+        xt = zzero
+        call ztrsm('l','u','n','n',i,1,zone,h,size(h,1),rst,size(rst,1))
         if (debug_level >= psb_debug_ext_) &
              & write(debug_unit,*) me,' ',trim(name),&
              & ' Rebuild x-> RS:',rst(1:nl)
         do k=1, i
-          call psb_geaxpby(rst(k),v(:,k),done,xt,desc_a,info)
+          call psb_geaxpby(rst(k),v(:,k),zone,xt,desc_a,info)
         end do
         call psb_precaply(prec,xt,desc_a,info)
-        call psb_geaxpby(done,x,done,xt,desc_a,info)
-        call psb_geaxpby(done,b,dzero,w1,desc_a,info)
-        call psb_spmm(-done,a,xt,done,w1,desc_a,info,work=aux)
+        call psb_geaxpby(zone,x,zone,xt,desc_a,info)
+        call psb_geaxpby(zone,b,zzero,w1,desc_a,info)
+        call psb_spmm(-zone,a,xt,zone,w1,desc_a,info,work=aux)
         rni = psb_geamax(w1,desc_a,info)
         xni = psb_geamax(xt,desc_a,info)
         rerr =  rni/(ani*xni+bni)
@@ -393,23 +377,23 @@ Subroutine psb_dgmresr(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,irst,ist
       endif
 
       if (rerr < eps ) then 
-        
+
         if (istop_ == 1) then 
           x = xt 
         else if (istop_ == 2) then
           !
           ! build x
           !
-          call dtrsm('l','u','n','n',i,1,done,h,size(h,1),rs,size(rs,1))
+          call ztrsm('l','u','n','n',i,1,zone,h,size(h,1),rs,size(rs,1))
           if (debug_level >= psb_debug_ext_) &
                & write(debug_unit,*) me,' ',trim(name),&
                & ' Rebuild x-> RS:',rs(1:nl)
-          w1 = dzero 
+          w1 = zzero 
           do k=1, i
-            call psb_geaxpby(rs(k),v(:,k),done,w1,desc_a,info)
+            call psb_geaxpby(rs(k),v(:,k),zone,w1,desc_a,info)
           end do
           call psb_precaply(prec,w1,w,desc_a,info)
-          call psb_geaxpby(done,w,done,x,desc_a,info)
+          call psb_geaxpby(zone,w,zone,x,desc_a,info)
         end if
 
         exit restart
@@ -429,18 +413,18 @@ Subroutine psb_dgmresr(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,irst,ist
       !
       ! build x
       !
-      call dtrsm('l','u','n','n',nl,1,done,h,size(h,1),rs,size(rs,1))
+      call ztrsm('l','u','n','n',nl,1,zone,h,size(h,1),rs,size(rs,1))
       if (debug_level >= psb_debug_ext_) &
            & write(debug_unit,*) me,' ',trim(name),&
            & ' Rebuild x-> RS:',rs(1:nl)
-      w1 = dzero 
+      w1 = zzero 
       do k=1, nl
-        call psb_geaxpby(rs(k),v(:,k),done,w1,desc_a,info)
+        call psb_geaxpby(rs(k),v(:,k),zone,w1,desc_a,info)
       end do
       call psb_precaply(prec,w1,w,desc_a,info)
-      call psb_geaxpby(done,w,done,x,desc_a,info)
+      call psb_geaxpby(zone,w,zone,x,desc_a,info)
     end if
-     
+
   End Do restart
   If (itrace_ > 0) then 
     if (me == 0) write(*,'(a,i4,3(2x,es10.4))') 'gmres(l): ',itx,rerr
@@ -449,7 +433,7 @@ Subroutine psb_dgmresr(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,irst,ist
   If (Present(err)) err=rerr
   If (Present(iter)) iter = itx
   If ((rerr>eps).and. (me == 0))  Then
-    write(debug_unit,*) 'gmresr(l) failed to converge to ',eps,&
+    write(debug_unit,*) 'rgmres(l) failed to converge to ',eps,&
          & ' in ',itx,' iterations  '
   End If
 
@@ -482,21 +466,122 @@ Subroutine psb_dgmresr(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,irst,ist
 
 
 contains
-  function safe_dn2(a,b)
-    real(kind(1.d0)), intent(in) :: a, b
-    real(kind(1.d0))  :: safe_dn2
-    real(kind(1.d0))  :: t
-    
-    t = max(abs(a),abs(b))
-    if (t==0.d0) then 
-      safe_dn2 = 0.d0
+
+  subroutine zrot( n, cx, incx, cy, incy, c, s )
+    !
+    !  -- lapack auxiliary routine (version 3.0) --
+    !     univ. of tennessee, univ. of california berkeley, nag ltd.,
+    !     courant institute, argonne national lab, and rice university
+    !     october 31, 1992
+    !
+    !     .. scalar arguments ..
+    integer            incx, incy, n
+    real(kind(1.d0))    c
+    complex(kind(1.d0))   s
+    !     ..
+    !     .. array arguments ..
+    complex(kind(1.d0)) cx( * ), cy( * )
+    !     ..
+    !
+    !  purpose
+    !  =======
+    !
+    !  zrot   applies a plane rotation, where the cos (c) is real and the
+    !  sin (s) is complex, and the vectors cx and cy are complex.
+    !
+    !  arguments
+    !  =========
+    !
+    !  n       (input) integer
+    !          the number of elements in the vectors cx and cy.
+    !
+    !  cx      (input/output) complex*16 array, dimension (n)
+    !          on input, the vector x.
+    !          on output, cx is overwritten with c*x + s*y.
+    !
+    !  incx    (input) integer
+    !          the increment between successive values of cy.  incx <> 0.
+    !
+    !  cy      (input/output) complex*16 array, dimension (n)
+    !          on input, the vector y.
+    !          on output, cy is overwritten with -conjg(s)*x + c*y.
+    !
+    !  incy    (input) integer
+    !          the increment between successive values of cy.  incx <> 0.
+    !
+    !  c       (input) double precision
+    !  s       (input) complex*16
+    !          c and s define a rotation
+    !             [  c          s  ]
+    !             [ -conjg(s)   c  ]
+    !          where c*c + s*conjg(s) = 1.0.
+    !
+    ! =====================================================================
+    !
+    !     .. local scalars ..
+    integer            i, ix, iy
+    complex(kind(1.d0))         stemp
+    !     ..
+    !     .. intrinsic functions ..
+    intrinsic          dconjg
+    !     ..
+    !     .. executable statements ..
+    !
+    if( n.le.0 ) return
+    if( incx.eq.1 .and. incy.eq.1 ) then 
+      !
+      !     code for both increments equal to 1
+      !
+      do  i = 1, n
+        stemp = c*cx(i) + s*cy(i)
+        cy(i) = c*cy(i) - dconjg(s)*cx(i)
+        cx(i) = stemp
+      end do
     else
-      safe_dn2 = t * sqrt(abs(a/t)**2 + abs(b/t)**2)
-    endif
+      !
+      !     code for unequal increments or equal increments not equal to 1
+      !
+      ix = 1
+      iy = 1
+      if( incx.lt.0 )ix = ( -n+1 )*incx + 1
+      if( incy.lt.0 )iy = ( -n+1 )*incy + 1
+      do  i = 1, n
+        stemp  = c*cx(ix) + s*cy(iy)
+        cy(iy) = c*cy(iy) - dconjg(s)*cx(ix)
+        cx(ix) = stemp
+        ix = ix + incx
+        iy = iy + incy
+      end do
+    end if
     return
-  end function safe_dn2
-    
+    return
+  end subroutine zrot
+  !
+  !
+  subroutine zrotg(ca,cb,c,s)
+    complex(kind(1.d0)) ca,cb,s
+    real(kind(1.d0)) c
+    real(kind(1.d0)) norm,scale
+    complex(kind(1.d0)) alpha
+    !
+    if (cdabs(ca) == 0.0d0) then 
+      !
+      c = 0.0d0
+      s = (1.0d0,0.0d0)
+      ca = cb
+      return
+    end if
+    !
 
-End Subroutine psb_dgmresr
+    scale = cdabs(ca) + cdabs(cb)
+    norm = scale*dsqrt((cdabs(ca/dcmplx(scale,0.0d0)))**2 +&
+         &   (cdabs(cb/dcmplx(scale,0.0d0)))**2)
+    alpha = ca /cdabs(ca)
+    c = cdabs(ca) / norm
+    s = alpha * dconjg(cb) / norm
+    ca = alpha * norm
+    !
 
-
+    return
+  end subroutine zrotg
+End Subroutine psb_zrgmres
