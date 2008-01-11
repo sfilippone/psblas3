@@ -96,6 +96,7 @@
 subroutine psb_dbicg(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,istop)
   use psb_base_mod
   use psb_prec_mod
+  use psb_krylov_mod, psb_protect_name => psb_dbicg
   implicit none
 
 !!$  parameters 
@@ -124,6 +125,7 @@ subroutine psb_dbicg(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,istop)
        & sigma,bn2
   real(kind(1.d0))   :: errnum, errden
   character(len=20)             :: name,ch_err
+  character(len=*), parameter :: methdname='BiCG'
 
   info = 0
   name = 'psb_dbicg'
@@ -181,7 +183,7 @@ subroutine psb_dbicg(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,istop)
   allocate(aux(naux),stat=info)
   if (info == 0) call psb_geall(wwrk,desc_a,info,n=9)
   if (info == 0) call psb_geasb(wwrk,desc_a,info)  
-  if(info.ne.0) then
+  if(info /= 0) then
     info=4011
     ch_err='psb_asb'
     err=info
@@ -222,7 +224,7 @@ subroutine psb_dbicg(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,istop)
   errnum = dzero
   errden = done
 
-  if(info.ne.0) then
+  if(info /= 0) then
     info=4011
     err=info
     call psb_errpush(info,name,a_err=ch_err)
@@ -233,14 +235,14 @@ subroutine psb_dbicg(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,istop)
 !!$   
 !!$   r0 = b-ax0
 !!$ 
-    if (itx.ge.litmax) exit restart  
+    if (itx >= litmax) exit restart  
     it = 0      
     call psb_geaxpby(done,b,dzero,r,desc_a,info)
     if (info == 0) call psb_spmm(-done,a,x,done,r,desc_a,info,work=aux)
     if (debug_level >= psb_debug_ext_)&
          & write(debug_unit,*) me,' ',trim(name),' Done spmm',info
     if (info == 0) call psb_geaxpby(done,r,dzero,rt,desc_a,info)
-    if(info.ne.0) then
+    if(info /= 0) then
       info=4011
       call psb_errpush(info,name)
       goto 9999
@@ -255,7 +257,7 @@ subroutine psb_dbicg(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,istop)
     else if (istop_ == 2) then 
       rni = psb_genrm2(r,desc_a,info)
     endif
-    if(info.ne.0) then
+    if(info /= 0) then
       info=4011
       call psb_errpush(info,name)
       goto 9999
@@ -270,20 +272,16 @@ subroutine psb_dbicg(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,istop)
       errden = bn2
     endif
 
-    if(info.ne.0) then
+    if(info /= 0) then
       info=4011
       call psb_errpush(info,name)
       goto 9999
     end if
 
-    if (errnum <= eps*errden) Then 
-      exit restart
-    end if
-    If (itrace_ > 0) then 
-      if ((mod(itx,itrace_)==0).and.(me == 0))&
-           & write(*,'(a,i4,3(2x,es10.4))') 'bicg: ',itx,errnum,eps*errden
-    end If
+    if (errnum <= eps*errden) exit restart
 
+    if (itrace_ > 0) &
+         & call log_conv(methdname,me,itx,itrace_,errnum,errden,eps)
 
     iteration:  do 
       it   = it + 1
@@ -343,21 +341,19 @@ subroutine psb_dbicg(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,istop)
         errnum = rni
         errden = bn2
       endif
-      If (errnum <= eps*errden) Then 
-        exit restart
-      end if
 
-      if (itx.ge.litmax) exit restart
+      if (errnum <= eps*errden) exit restart
 
-      If (itrace_ > 0) then 
-        if ((mod(itx,itrace_)==0).and.(me == 0))&
-             & write(*,'(a,i4,3(2x,es10.4))') 'bicg: ',itx,errnum,eps*errden
-      end If
+      if (itx >= litmax) exit restart
+
+      if (itrace_ > 0) &
+           & call log_conv(methdname,me,itx,itrace_,errnum,errden,eps)
+
     end do iteration
   end do restart
-  If (itrace_ > 0) then 
-    if (me == 0) write(*,'(a,i4,3(2x,es10.4))') 'bicg: ',itx,errnum,eps*errden
-  end If
+
+  if (itrace_ > 0) &
+       &  call log_conv(methdname,me,itx,1,errnum,errden,eps)
 
   if (present(err)) then 
     if (errden /= dzero) then 
@@ -368,29 +364,25 @@ subroutine psb_dbicg(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,istop)
   end if
 
   if (present(iter)) iter = itx
-  If ((errnum > eps*errden).and.(me==0)) Then
-    write(debug_unit,*) 'bicg failed to converge to ',eps*errden,&
-         & ' in ',itx,' iterations  '
-  end if
 
+  if (errnum > eps*errden) &
+       & call end_log(methdname,me,itx,errnum,errden,eps)
 
-  deallocate(aux)
-  call psb_gefree(wwrk,desc_a,info)
-
-  ! restore external global coherence behaviour
-  call psb_restore_coher(ictxt,isvch)
-
-  if(info/=0) then
+  deallocate(aux,  stat=info)
+  if (info == 0) call psb_gefree(wwrk,desc_a,info)
+  if (info/=0) then
     call psb_errpush(info,name)
     goto 9999
   end if
+  ! restore external global coherence behaviour
+  call psb_restore_coher(ictxt,isvch)
 
   call psb_erractionrestore(err_act)
   return
 
 9999 continue
   call psb_erractionrestore(err_act)
-  if (err_act.eq.psb_act_abort_) then
+  if (err_act == psb_act_abort_) then
     call psb_error()
     return
   end if

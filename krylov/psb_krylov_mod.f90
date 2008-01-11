@@ -423,6 +423,32 @@ contains
 
   end subroutine psb_zkrylov
 
+  subroutine log_conv(methdname,me,itx,itrace,errnum,errden,eps)
+    character(len=*), intent(in) :: methdname
+    integer, intent(in)          :: me, itx, itrace
+    real(kind(1.d0)), intent(in) :: errnum, errden, eps
+    character(len=*), parameter  :: fmt='(a,i4,3(2x,es10.4))'
+    
+    if ((mod(itx,itrace)==0).and.(me == 0)) then 
+      write(*,fmt) methdname//': ',itx,errnum,eps*errden
+    Endif
+    
+  end subroutine log_conv
+  subroutine end_log(methdname,me,itx,errnum,errden,eps)
+    character(len=*), intent(in) :: methdname
+    integer, intent(in)          :: me, itx
+    real(kind(1.d0)), intent(in) :: errnum, errden, eps
+    character(len=*), parameter  :: fmt='(a,2x,es10.4,1x,a,1x,i4,1x,a)'
+    character(len=*), parameter  :: fmt1='(a,3(2x,es10.4))'
+    
+    if (me==0) then 
+      write(*,fmt) methdname//' failed to converge to ',eps,&
+           & ' in ',ITX,' iterations. '
+      write(*,fmt1) 'Last iteration convergence indicators: ',&
+           & errnum,eps*errden,errnum/errden
+    end if
+  end subroutine end_log
+
 
 end module psb_krylov_mod
 

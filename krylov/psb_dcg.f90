@@ -94,9 +94,10 @@
 !                                         estimate of) residual. 
 ! 
 !
-Subroutine psb_dcg(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,istop)
+subroutine psb_dcg(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,istop)
   use psb_base_mod
   use psb_prec_mod
+  use psb_krylov_mod, psb_protect_name => psb_dcg
   implicit none
 
 !!$  Parameters 
@@ -119,7 +120,8 @@ Subroutine psb_dcg(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,istop)
        & np,me, n_col, isvch, ictxt, n_row,err_act, int_err(5)
   logical, parameter :: exchange=.true., noexchange=.false.  
   real(kind(1.d0))   :: errnum, errden
-  character(len=20)             :: name
+  character(len=20)           :: name
+  character(len=*), parameter :: methdname='CG'
 
   info = 0
   name = 'psb_dcg'
@@ -170,7 +172,7 @@ Subroutine psb_dcg(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,istop)
   allocate(aux(naux), stat=info)
   if (info == 0) call psb_geall(wwrk,desc_a,info,n=5)
   if (info == 0) call psb_geasb(wwrk,desc_a,info)  
-  if (info.ne.0) then 
+  if (info /= 0) then 
     info=4011
     call psb_errpush(info,name)
     goto 9999
@@ -208,7 +210,7 @@ Subroutine psb_dcg(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,istop)
     it = 0
     call psb_geaxpby(done,b,dzero,r,desc_a,info)
     call psb_spmm(-done,a,x,done,r,desc_a,info,work=aux)
-    if (info.ne.0) then 
+    if (info /= 0) then 
       info=4011
       call psb_errpush(info,name)
       goto 9999
@@ -223,7 +225,7 @@ Subroutine psb_dcg(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,istop)
     endif
     errnum = dzero
     errden = done
-    if (info.ne.0) then 
+    if (info /= 0) then 
       info=4011
       call psb_errpush(info,name)
       goto 9999
@@ -234,7 +236,7 @@ Subroutine psb_dcg(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,istop)
       it   = it + 1
       itx = itx + 1
 
-      Call psb_precaply(prec,r,z,desc_a,info,work=aux)
+      call psb_precaply(prec,r,z,desc_a,info,work=aux)
       rho_old = rho
       rho     = psb_gedot(r,z,desc_a,info)
 
@@ -271,54 +273,47 @@ Subroutine psb_dcg(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,istop)
         errnum = rni
         errden = bn2
       endif
-      if (errnum <= eps*errden) then 
-        exit restart
-      end if
 
+      if (errnum <= eps*errden) exit restart
       if (itx>= litmax) exit restart 
 
-      If (itrace_ > 0) then 
-        if ((mod(itx,itrace_)==0).and.(me == 0))&
-             & write(*,'(a,i4,3(2x,es10.4))') 'cg: ',itx,errnum,eps*errden
-      end If
+      if (itrace_ > 0) &
+           & call log_conv(methdname,me,itx,itrace_,errnum,errden,eps)
+
     end do iteration
   end do restart
-  If (itrace_ > 0) then 
-    if (me == 0) write(*,'(a,i4,3(2x,es10.4))') 'cg: ',itx,errnum,eps*errden
-  end If
 
-  If (Present(err)) then 
+  if (itrace_ > 0) &
+       & call log_conv(methdname,me,itx,1,errnum,errden,eps)
+
+  if (present(err)) then 
     if (errden /= dzero) then 
       err = errnum/errden
     else
       err = errnum
     end if
-  end If
-
-  if (present(iter)) iter = itx
-  If ((errnum > eps*errden).and.(me==0)) Then
-    write(0,*) 'CG Failed to converge to ',eps*errden,&
-         & ' in ',litmax,' iterations '
-    info=itx
   end if
 
-  deallocate(aux)
+  if (present(iter)) iter = itx
+
+  if (errnum > eps*errden) &
+       & call end_log(methdname,me,itx,errnum,errden,eps)
+
   call psb_gefree(wwrk,desc_a,info)
-
-  ! restore external global coherence behaviour
-  call psb_restore_coher(ictxt,isvch)
-
-  if (info.ne.0) then 
+  if (info /= 0) then 
     call psb_errpush(info,name)
     goto 9999
   end if
+
+  ! restore external global coherence behaviour
+  call psb_restore_coher(ictxt,isvch)
 
   call psb_erractionrestore(err_act)
   return
 
 9999 continue
   call psb_erractionrestore(err_act)
-  if (err_act.eq.psb_act_abort_) then
+  if (err_act == psb_act_abort_) then
     call psb_error()
     return
   end if

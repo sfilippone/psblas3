@@ -107,6 +107,7 @@
 Subroutine psb_zrgmres(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,irst,istop)
   use psb_base_mod
   use psb_prec_mod
+  use psb_krylov_mod, psb_protect_name => psb_zrgmres
   implicit none
 
 !!$  Parameters 
@@ -134,7 +135,8 @@ Subroutine psb_zrgmres(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,irst,ist
   Real(Kind(1.d0)) :: rni, xni, bni, ani,bn2
   real(kind(1.d0)), external :: dznrm2
   real(kind(1.d0))   :: errnum, errden
-  character(len=20)          :: name
+  character(len=20)           :: name
+  character(len=*), parameter :: methdname='RGMRES'
 
   info = 0
   name = 'psb_zgmres'
@@ -169,29 +171,29 @@ Subroutine psb_zrgmres(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,irst,ist
     goto 9999
   endif
 
-  If (Present(itmax)) Then 
+  if (present(itmax)) then 
     litmax = itmax
-  Else
+  else
     litmax = 1000
-  Endif
+  endif
 
-  If (Present(itrace)) Then
+  if (present(itrace)) then
     itrace_ = itrace
-  Else
+  else
     itrace_ = 0
-  End If
+  end if
 
-  If (Present(irst)) Then
+  if (present(irst)) then
     nl = irst
-    If (debug_level >= psb_debug_ext_) &
+    if (debug_level >= psb_debug_ext_) &
          & write(debug_unit,*) me,' ',trim(name),&
          & ' present: irst: ',irst,nl
-  Else
+  else
     nl = 10 
-    If (debug_level >= psb_debug_ext_) &
+    if (debug_level >= psb_debug_ext_) &
          & write(debug_unit,*) me,' ',trim(name),&
          & ' not present: irst: ',irst,nl
-  Endif
+  endif
   if (nl <=0 ) then 
     info=5001
     int_err(1)=nl
@@ -215,7 +217,7 @@ Subroutine psb_zrgmres(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,irst,ist
 
 
   naux=4*n_col 
-  Allocate(aux(naux),h(nl+1,nl+1),&
+  allocate(aux(naux),h(nl+1,nl+1),&
        &c(nl+1),s(nl+1),rs(nl+1), rst(nl+1),stat=info)
 
   if (info == 0) Call psb_geall(v,desc_a,info,n=nl+1)
@@ -226,11 +228,11 @@ Subroutine psb_zrgmres(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,irst,ist
   if (info == 0) Call psb_geasb(w,desc_a,info)  
   if (info == 0) Call psb_geasb(w1,desc_a,info)
   if (info == 0) Call psb_geasb(xt,desc_a,info)
-  if (info.ne.0) Then 
+  if (info /= 0) then 
     info=4011 
     call psb_errpush(info,name)
     goto 9999
-  End If
+  end if
   if (debug_level >= psb_debug_ext_) &
        & write(debug_unit,*) me,' ',trim(name),&
        & ' Size of V,W,W1 ',size(v),size(v,1),&
@@ -247,11 +249,11 @@ Subroutine psb_zrgmres(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,irst,ist
   endif
   errnum = dzero
   errden = done
-  if (info.ne.0) Then 
+  if (info /= 0) then 
     info=4011 
     call psb_errpush(info,name)
     goto 9999
-  End If
+  end if
 
   itx   = 0
   restart: Do 
@@ -260,19 +262,19 @@ Subroutine psb_zrgmres(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,irst,ist
     ! check convergence
     ! compute v1 = r0/||r0||_2
 
-    If (debug_level >= psb_debug_ext_) &
+    if (debug_level >= psb_debug_ext_) &
          & write(debug_unit,*) me,' ',trim(name),&
          & ' restart: ',itx,it
     it = 0      
-    Call psb_geaxpby(zone,b,zzero,v(:,1),desc_a,info)
-    if (info.ne.0) Then 
+    call psb_geaxpby(zone,b,zzero,v(:,1),desc_a,info)
+    if (info /= 0) then 
       info=4011 
       call psb_errpush(info,name)
       goto 9999
-    End If
+    end if
 
-    Call psb_spmm(-zone,a,x,zone,v(:,1),desc_a,info,work=aux)
-    if (info.ne.0) Then 
+    call psb_spmm(-zone,a,x,zone,v(:,1),desc_a,info,work=aux)
+    if (info /= 0) Then 
       info=4011 
       call psb_errpush(info,name)
       goto 9999
@@ -280,14 +282,14 @@ Subroutine psb_zrgmres(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,irst,ist
 
     rs(1) = psb_genrm2(v(:,1),desc_a,info)
     rs(2:) = zzero
-    if (info.ne.0) Then 
+    if (info /= 0) Then 
       info=4011 
       call psb_errpush(info,name)
       goto 9999
-    End If
+    end if
     scal=done/rs(1)  ! rs(1) MIGHT BE VERY SMALL - USE DSCAL TO DEAL WITH IT?
 
-    If (debug_level >= psb_debug_ext_) &
+    if (debug_level >= psb_debug_ext_) &
          & write(debug_unit,*) me,' ',trim(name),&
          & ' on entry to amax: b: ',Size(b),rs(1),scal
 
@@ -304,24 +306,20 @@ Subroutine psb_zrgmres(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,irst,ist
       errnum = rni
       errden = bn2
     endif
-    if (info.ne.0) Then 
+    if (info /= 0) then 
       info=4011 
       call psb_errpush(info,name)
       goto 9999
-    End If
+    end if
 
-    If (errnum <= eps*errden) Then 
-      Exit restart
-    End If
+    if (errnum <= eps*errden) exit restart
 
-    If (itrace_ > 0) then 
-      if ((mod(itx,itrace_)==0).and.(me == 0))&
-           & write(*,'(a,i4,3(2x,es10.4))') 'gmres(l): ',itx,errnum,eps*errden
-    end If
+    if (itrace_ > 0) &
+         & call log_conv(methdname,me,itx,itrace_,errnum,errden,eps)
 
     v(:,1) = v(:,1) * scal
 
-    If (itx.Ge.litmax) Exit restart  
+    if (itx >= litmax) exit restart  
 
     !
     ! inner iterations
@@ -410,12 +408,10 @@ Subroutine psb_zrgmres(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,irst,ist
 
       end if
 
-      If (itrace_ > 0) then 
-        if ((mod(itx,itrace_)==0).and.(me == 0))&
-             & write(*,'(a,i4,3(2x,es10.4))') 'gmres(l): ',itx,errnum,eps*errden
-      end If
+      if (itrace_ > 0) &
+           & call log_conv(methdname,me,itx,itrace_,errnum,errden,eps)
 
-    end Do inner
+    end do inner
 
     if (istop_ == 1) then 
       x = xt 
@@ -435,46 +431,41 @@ Subroutine psb_zrgmres(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,irst,ist
       call psb_geaxpby(zone,w,zone,x,desc_a,info)
     end if
 
-  End Do restart
-  If (itrace_ > 0) then 
-    if (me == 0) write(*,'(a,i4,3(2x,es10.4))') 'gmres(l): ',itx,errnum,eps*errden
-  end If
+  end do restart
+  if (itrace_ > 0) &
+       & call log_conv(methdname,me,itx,1,errnum,errden,eps)
 
-  If (Present(err)) then 
+  if (present(err)) then 
     if (errden /= dzero) then 
       err = errnum/errden
     else
       err = errnum
     end if
-  end If
-  If (Present(iter)) iter = itx
-  If ((errnum > eps*errden).and.(me==0)) Then
-    write(debug_unit,*) 'rgmres(l) failed to converge to ',eps*errden,&
-         & ' in ',itx,' iterations  '
-  End If
+  end if
+  if (present(iter)) iter = itx
+  if (errnum > eps*errden) &
+       & call end_log(methdname,me,itx,errnum,errden,eps)
 
-
-  Deallocate(aux,h,c,s,rs,rst, stat=info)
-  Call psb_gefree(v,desc_a,info)
-  Call psb_gefree(w,desc_a,info)
-  Call psb_gefree(w1,desc_a,info)
-  Call psb_gefree(xt,desc_a,info)
-
-  ! restore external global coherence behaviour
-  call psb_restore_coher(ictxt,isvch)
-
+  deallocate(aux,h,c,s,rs,rst, stat=info)
+  if (info == 0) call psb_gefree(v,desc_a,info)
+  if (info == 0) call psb_gefree(w,desc_a,info)
+  if (info == 0) call psb_gefree(w1,desc_a,info)
+  if (info == 0) call psb_gefree(xt,desc_a,info)
   if (info /= 0) then
     info=4011
     call psb_errpush(info,name)
     goto 9999
   end if
 
+  ! restore external global coherence behaviour
+  call psb_restore_coher(ictxt,isvch)
+
   call psb_erractionrestore(err_act)
   return
 
 9999 continue
   call psb_erractionrestore(err_act)
-  if (err_act.eq.psb_act_abort_) then
+  if (err_act == psb_act_abort_) then
     call psb_error()
     return
   end if
@@ -544,7 +535,7 @@ contains
     !     .. executable statements ..
     !
     if( n.le.0 ) return
-    if( incx.eq.1 .and. incy.eq.1 ) then 
+    if( incx == 1 .and. incy == 1 ) then 
       !
       !     code for both increments equal to 1
       !
