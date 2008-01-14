@@ -234,7 +234,7 @@ contains
 
     if (iam==0) then
       read(*,*) ip
-      if (ip.ge.3) then
+      if (ip >= 3) then
         read(*,*) kmethd
         read(*,*) ptype
         read(*,*) afmt
@@ -246,22 +246,22 @@ contains
 
 
         read(*,*) idim
-        if (ip.ge.4) then
+        if (ip >= 4) then
           read(*,*) istopc
         else
           istopc=1        
         endif
-        if (ip.ge.5) then
+        if (ip >= 5) then
           read(*,*) itmax
         else
           itmax=500
         endif
-        if (ip.ge.6) then
+        if (ip >= 6) then
           read(*,*) itrace
         else
           itrace=-1
         endif
-        if (ip.ge.7) then
+        if (ip >= 7) then
           read(*,*) irst
         else
           irst=1

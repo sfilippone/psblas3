@@ -142,7 +142,7 @@ program zf_sample
   end if
 
   ! switch over different partition types
-  if (ipart.eq.0) then 
+  if (ipart == 0) then 
      call psb_barrier(ictxt)
      if (iam==psb_root_) write(*,'("Partition type: block")')
      allocate(ivg(m_problem),ipv(np))
@@ -152,7 +152,7 @@ program zf_sample
      enddo
      call psb_matdist(aux_a, a, ivg, ictxt, &
           & desc_a,b_col_glob,b_col,info,fmt=afmt)
-  else if (ipart.eq.2) then 
+  else if (ipart == 2) then 
     if (iam==psb_root_) then 
       write(*,'("Partition type: graph")')
       write(*,'(" ")')
