@@ -151,53 +151,59 @@ module psi_mod
 
 
   interface psi_swaptran
-    subroutine psi_dswaptranm(flag,n,beta,y,desc_a,work,info)
+    subroutine psi_dswaptranm(flag,n,beta,y,desc_a,work,info,data)
       use psb_descriptor_type
       integer, intent(in)  :: flag, n
       integer, intent(out) :: info
       real(kind(1.d0))     :: y(:,:), beta
       real(kind(1.d0)),target     :: work(:)
       type(psb_desc_type), target  :: desc_a
+      integer, optional    :: data
     end subroutine psi_dswaptranm
-    subroutine psi_dswaptranv(flag,beta,y,desc_a,work,info)
+    subroutine psi_dswaptranv(flag,beta,y,desc_a,work,info,data)
       use psb_descriptor_type
       integer, intent(in)  :: flag
       integer, intent(out) :: info
       real(kind(1.d0))     :: y(:), beta
       real(kind(1.d0)),target     :: work(:)
       type(psb_desc_type), target  :: desc_a
+      integer, optional    :: data
     end subroutine psi_dswaptranv
-    subroutine psi_iswaptranm(flag,n,beta,y,desc_a,work,info)
+    subroutine psi_iswaptranm(flag,n,beta,y,desc_a,work,info,data)
       use psb_descriptor_type
       integer, intent(in)  :: flag, n
       integer, intent(out) :: info
       integer              :: y(:,:), beta
       integer,target               :: work(:)
       type(psb_desc_type), target  :: desc_a
+      integer, optional    :: data
     end subroutine psi_iswaptranm
-    subroutine psi_iswaptranv(flag,beta,y,desc_a,work,info)
+    subroutine psi_iswaptranv(flag,beta,y,desc_a,work,info,data)
       use psb_descriptor_type
       integer, intent(in)  :: flag
       integer, intent(out) :: info
       integer              :: y(:), beta
       integer,target               :: work(:)
       type(psb_desc_type), target  :: desc_a
+      integer, optional    :: data
     end subroutine psi_iswaptranv
-    subroutine psi_zswaptranm(flag,n,beta,y,desc_a,work,info)
+    subroutine psi_zswaptranm(flag,n,beta,y,desc_a,work,info,data)
       use psb_descriptor_type
       integer, intent(in)  :: flag, n
       integer, intent(out) :: info
       complex(kind(1.d0))     :: y(:,:), beta
       complex(kind(1.d0)),target   :: work(:)
       type(psb_desc_type), target  :: desc_a
+      integer, optional    :: data
     end subroutine psi_zswaptranm
-    subroutine psi_zswaptranv(flag,beta,y,desc_a,work,info)
+    subroutine psi_zswaptranv(flag,beta,y,desc_a,work,info,data)
       use psb_descriptor_type
       integer, intent(in)  :: flag
       integer, intent(out) :: info
       complex(kind(1.d0))     :: y(:), beta
       complex(kind(1.d0)),target   :: work(:)       
       type(psb_desc_type), target  :: desc_a
+      integer, optional    :: data
     end subroutine psi_zswaptranv
   end interface
 

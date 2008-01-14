@@ -109,7 +109,7 @@ subroutine psi_zswaptranm(flag,n,beta,y,desc_a,work,info,data)
   integer  :: ictxt, np, me, nesd, nerv,&
        & proc_to_comm, p2ptag, icomm, p2pstat(mpi_status_size),&
        & idxs, idxr, iret, err_act, totxch, i, idx_pt,&
-       & snd_pt, rcv_pt, pnti
+       & snd_pt, rcv_pt, pnti, data_
   integer, allocatable, dimension(:) :: bsdidx, brvidx,&
        & sdsz, rvsz, prcid, rvhd, sdhd
   integer, pointer :: d_idx(:)
@@ -149,29 +149,34 @@ subroutine psi_zswaptranm(flag,n,beta,y,desc_a,work,info,data)
   do_recv = swap_mpi .or. swap_sync .or. swap_recv
 
   if(present(data)) then
-    if(data == psb_comm_halo_) then
-      d_idx => desc_a%halo_index
-      totxch = desc_a%matrix_data(psb_thal_xch_)
-      idxr   = desc_a%matrix_data(psb_thal_rcv_)
-      idxs   = desc_a%matrix_data(psb_thal_snd_)
-
-    else if(data == psb_comm_ovr_) then
-      d_idx => desc_a%ovrlap_index
-      totxch = desc_a%matrix_data(psb_tovr_xch_)
-      idxr   = desc_a%matrix_data(psb_tovr_rcv_)
-      idxs   = desc_a%matrix_data(psb_tovr_snd_)
-    else
-      d_idx => desc_a%halo_index
-      totxch = desc_a%matrix_data(psb_thal_xch_)
-      idxr   = desc_a%matrix_data(psb_thal_rcv_)
-      idxs   = desc_a%matrix_data(psb_thal_snd_)
-    end if
+    data_ = data
   else
+    data_ = psb_comm_halo_
+  end if
+
+  select case(data_) 
+  case(psb_comm_halo_) 
     d_idx => desc_a%halo_index
     totxch = desc_a%matrix_data(psb_thal_xch_)
     idxr   = desc_a%matrix_data(psb_thal_rcv_)
     idxs   = desc_a%matrix_data(psb_thal_snd_)
-  end if
+
+  case(psb_comm_ovr_) 
+    d_idx => desc_a%ovrlap_index
+    totxch = desc_a%matrix_data(psb_tovr_xch_)
+    idxr   = desc_a%matrix_data(psb_tovr_rcv_)
+    idxs   = desc_a%matrix_data(psb_tovr_snd_)
+
+  case(psb_comm_ext_) 
+    d_idx => desc_a%ext_index
+    totxch = desc_a%matrix_data(psb_text_xch_)
+    idxr   = desc_a%matrix_data(psb_text_rcv_)
+    idxs   = desc_a%matrix_data(psb_text_snd_)
+  case default
+    call psb_errpush(4010,name,a_err='wrong Data selector')
+    goto 9999
+  end select
+
   idxr = idxr * n
   idxs = idxs * n
 
@@ -577,7 +582,7 @@ subroutine psi_zswaptranv(flag,beta,y,desc_a,work,info,data)
   integer  :: ictxt, np, me, nesd, nerv,&
        & proc_to_comm, p2ptag, icomm, p2pstat(mpi_status_size),&
        & idxs, idxr, iret, err_act, totxch,  i, &
-       & idx_pt, snd_pt, rcv_pt, n, pnti
+       & idx_pt, snd_pt, rcv_pt, n, pnti, data_
 
   integer, allocatable, dimension(:) :: bsdidx, brvidx,&
        & sdsz, rvsz, prcid, rvhd, sdhd
@@ -620,30 +625,33 @@ subroutine psi_zswaptranv(flag,beta,y,desc_a,work,info,data)
   do_recv = swap_mpi .or. swap_sync .or. swap_recv
 
   if(present(data)) then
-    if(data == psb_comm_halo_) then
-      d_idx => desc_a%halo_index
-      totxch = desc_a%matrix_data(psb_thal_xch_)
-      idxr   = desc_a%matrix_data(psb_thal_rcv_)
-      idxs   = desc_a%matrix_data(psb_thal_snd_)
-
-    else if(data == psb_comm_ovr_) then
-      d_idx => desc_a%ovrlap_index
-      totxch = desc_a%matrix_data(psb_tovr_xch_)
-      idxr   = desc_a%matrix_data(psb_tovr_rcv_)
-      idxs   = desc_a%matrix_data(psb_tovr_snd_)
-    else
-      d_idx => desc_a%halo_index
-      totxch = desc_a%matrix_data(psb_thal_xch_)
-      idxr   = desc_a%matrix_data(psb_thal_rcv_)
-      idxs   = desc_a%matrix_data(psb_thal_snd_)
-    end if
+    data_ = data
   else
+    data_ = psb_comm_halo_
+  end if
+
+  select case(data_) 
+  case(psb_comm_halo_) 
     d_idx => desc_a%halo_index
     totxch = desc_a%matrix_data(psb_thal_xch_)
     idxr   = desc_a%matrix_data(psb_thal_rcv_)
     idxs   = desc_a%matrix_data(psb_thal_snd_)
-  end if
 
+  case(psb_comm_ovr_) 
+    d_idx => desc_a%ovrlap_index
+    totxch = desc_a%matrix_data(psb_tovr_xch_)
+    idxr   = desc_a%matrix_data(psb_tovr_rcv_)
+    idxs   = desc_a%matrix_data(psb_tovr_snd_)
+
+  case(psb_comm_ext_) 
+    d_idx => desc_a%ext_index
+    totxch = desc_a%matrix_data(psb_text_xch_)
+    idxr   = desc_a%matrix_data(psb_text_rcv_)
+    idxs   = desc_a%matrix_data(psb_text_snd_)
+  case default
+    call psb_errpush(4010,name,a_err='wrong Data selector')
+    goto 9999
+  end select
 
   idxr = idxr * n
   idxs = idxs * n
