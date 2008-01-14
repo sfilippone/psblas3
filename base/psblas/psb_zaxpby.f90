@@ -70,7 +70,7 @@ subroutine  psb_zaxpby(alpha, x, beta,y,desc_a,info, n, jx, jy)
   character(len=20)        :: name, ch_err
 
   name='psb_dgeaxpby'
-  if(psb_get_errstatus().ne.0) return 
+  if(psb_get_errstatus() /= 0) return 
   info=0
   call psb_erractionsave(err_act)
 
@@ -97,8 +97,8 @@ subroutine  psb_zaxpby(alpha, x, beta,y,desc_a,info, n, jx, jy)
   endif
 
   if (present(n)) then
-    if(((ijx+n).le.size(x,2)).and.&
-         & ((ijy+n).le.size(y,2))) then 
+    if(((ijx+n) <= size(x,2)).and.&
+         & ((ijy+n) <= size(y,2))) then 
       in = n
     else
       in = min(size(x,2),size(y,2))
@@ -107,7 +107,7 @@ subroutine  psb_zaxpby(alpha, x, beta,y,desc_a,info, n, jx, jy)
     in = min(size(x,2),size(y,2))
   endif
 
-  if(ijx.ne.ijy) then
+  if(ijx /= ijy) then
     info=3050
     call psb_errpush(info,name)
     goto 9999
@@ -119,21 +119,21 @@ subroutine  psb_zaxpby(alpha, x, beta,y,desc_a,info, n, jx, jy)
   call psb_chkvect(m,ione,size(x,1),ix,ijx,desc_a,info,iix,jjx)
   if (info == 0) &
        & call psb_chkvect(m,ione,size(y,1),iy,ijy,desc_a,info,iiy,jjy)
-  if(info.ne.0) then
+  if(info /= 0) then
     info=4010
     ch_err='psb_chkvect'
     call psb_errpush(info,name,a_err=ch_err)
     goto 9999
   end if
 
-  if ((iix.ne.ione).or.(iiy.ne.ione)) then
+  if ((iix /= ione).or.(iiy /= ione)) then
     info=3040
     call psb_errpush(info,name)
     goto 9999
   end if
 
-  if ((in.ne.0)) then
-    if(psb_cd_get_local_rows(desc_a).gt.0) then
+  if ((in /= 0)) then
+    if(psb_cd_get_local_rows(desc_a) > 0) then
       call zaxpby(psb_cd_get_local_cols(desc_a),in,&
            & alpha,x(iix,jjx),size(x,1),beta,&
            & y(iiy,jjy),size(y,1),info)
@@ -146,7 +146,7 @@ subroutine  psb_zaxpby(alpha, x, beta,y,desc_a,info, n, jx, jy)
 9999 continue
   call psb_erractionrestore(err_act)
 
-  if (err_act.eq.psb_act_abort_) then
+  if (err_act == psb_act_abort_) then
     call psb_error(ictxt)
     return
   end if
@@ -223,7 +223,7 @@ subroutine  psb_zaxpbyv(alpha, x, beta,y,desc_a,info)
   logical, parameter :: debug=.false.
 
   name='psb_dgeaxpby'
-  if(psb_get_errstatus().ne.0) return 
+  if(psb_get_errstatus() /= 0) return 
   info=0
   call psb_erractionsave(err_act)
 
@@ -243,26 +243,26 @@ subroutine  psb_zaxpbyv(alpha, x, beta,y,desc_a,info)
 
   ! check vector correctness
   call psb_chkvect(m,ione,size(x),ix,ione,desc_a,info,iix,jjx)
-  if(info.ne.0) then
+  if(info /= 0) then
     info=4010
     ch_err='psb_chkvect 1'
     call psb_errpush(info,name,a_err=ch_err)
     goto 9999
   end if
   call psb_chkvect(m,ione,size(y),iy,ione,desc_a,info,iiy,jjy)
-  if(info.ne.0) then
+  if(info /= 0) then
     info=4010
     ch_err='psb_chkvect 2'
     call psb_errpush(info,name,a_err=ch_err)
     goto 9999
   end if
 
-  if ((iix.ne.ione).or.(iiy.ne.ione)) then
+  if ((iix /= ione).or.(iiy /= ione)) then
     info=3040
     call psb_errpush(info,name)
   end if
 
-  if(psb_cd_get_local_rows(desc_a).gt.0) then
+  if(psb_cd_get_local_rows(desc_a) > 0) then
     call zaxpby(psb_cd_get_local_cols(desc_a),ione,&
          & alpha,x,size(x),beta,&
          & y,size(y),info)
@@ -274,7 +274,7 @@ subroutine  psb_zaxpbyv(alpha, x, beta,y,desc_a,info)
 9999 continue
   call psb_erractionrestore(err_act)
 
-  if (err_act.eq.psb_act_abort_) then
+  if (err_act == psb_act_abort_) then
     call psb_error(ictxt)
     return
   end if

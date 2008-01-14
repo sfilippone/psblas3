@@ -674,14 +674,15 @@ contains
 
   subroutine psb_cdasb(desc_a,info)
     use psb_descriptor_type
-    interface 
-      subroutine psb_icdasb(desc_a,info,ext_hv)
-        use psb_descriptor_type
-        Type(psb_desc_type), intent(inout) :: desc_a
-        integer, intent(out)               :: info
-        logical, intent(in),optional       :: ext_hv
-      end subroutine psb_icdasb
-    end interface
+
+  interface 
+    subroutine psb_icdasb(desc_a,info,ext_hv)
+      use psb_descriptor_type
+      Type(psb_desc_type), intent(inout) :: desc_a
+      integer, intent(out)               :: info
+      logical, intent(in),optional       :: ext_hv
+    end subroutine psb_icdasb
+  end interface
 
     Type(psb_desc_type), intent(inout) :: desc_a
     integer, intent(out)               :: info

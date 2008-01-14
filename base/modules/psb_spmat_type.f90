@@ -365,7 +365,7 @@ contains
       if (clear_) a%aspk(:) = dzero
 
       if (psb_sp_getifld(psb_upd_,a,info)==psb_upd_perm_) then 
-        if(a%fida(1:3).eq.'JAD') then
+        if(a%fida(1:3) == 'JAD') then
           a%ia1(a%infoa(psb_upd_pnt_)+psb_nnz_) = 0
         else
           a%ia2(a%infoa(psb_upd_pnt_)+psb_nnz_) = 0
@@ -397,7 +397,7 @@ contains
     logical, parameter  :: debug=.false.
 
     info  = 0
-    if (nnz.lt.0) then
+    if (nnz < 0) then
       info=45
       return
     Endif
@@ -463,7 +463,7 @@ contains
     logical, parameter  :: debug=.false.
 
     info  = 0
-    if (nnz.lt.0) then
+    if (nnz < 0) then
       info=45
       return
     endif
@@ -534,7 +534,7 @@ contains
     logical, parameter  :: debug=.false.
 
     info  = 0
-    if (nnz.lt.0) then
+    if (nnz < 0) then
       info=45
       return
     endif
@@ -910,7 +910,7 @@ contains
       if (clear_) a%aspk(:) = zzero
 
       if (psb_sp_getifld(psb_upd_,a,info)==psb_upd_perm_) then 
-        if(a%fida(1:3).eq.'JAD') then
+        if(a%fida(1:3) == 'JAD') then
           a%ia1(a%infoa(psb_upd_pnt_)+psb_nnz_) = 0
         else
           a%ia2(a%infoa(psb_upd_pnt_)+psb_nnz_) = 0
@@ -942,7 +942,7 @@ contains
     logical, parameter  :: debug=.false.
 
     info  = 0
-    if (nnz.lt.0) then
+    if (nnz < 0) then
       info=45
       return
     Endif
@@ -1008,7 +1008,7 @@ contains
     logical, parameter  :: debug=.false.
 
     info  = 0
-    if (nnz.lt.0) then
+    if (nnz < 0) then
       info=45
       return
     endif
@@ -1101,7 +1101,7 @@ contains
     integer                       :: ifc_
 
     info  = 0
-    if (nnz.lt.0) then
+    if (nnz < 0) then
       info=45
       return
     endif
@@ -1450,14 +1450,14 @@ contains
         nz=0
         blkfnd: do
           j=j+1
-          if(ia1(j).eq.idx) then
+          if(ia1(j) == idx) then
             nz=nz+ia3(j)-ia2(j)
             ipx = ia1(j)         ! the first row index of the block
             rb  = idx-ipx        ! the row offset within the block
             row = ia3(j)+rb
             nz  = nz+ja(row+1)-ja(row)
             exit blkfnd
-          else if(ia1(j).gt.idx) then
+          else if(ia1(j) > idx) then
             nz=nz+ia3(j-1)-ia2(j-1)
             ipx = ia1(j-1)         ! the first row index of the block
             rb  = idx-ipx          ! the row offset within the block
@@ -1500,7 +1500,7 @@ contains
 
 9999 continue
     call psb_erractionrestore(err_act)
-    if (err_act.eq.psb_act_abort_) then
+    if (err_act == psb_act_abort_) then
       call psb_error()
       return
     end if
@@ -1605,14 +1605,14 @@ contains
         nz=0
         blkfnd: do
           j=j+1
-          if(ia1(j).eq.idx) then
+          if(ia1(j) == idx) then
             nz=nz+ia3(j)-ia2(j)
             ipx = ia1(j)         ! the first row index of the block
             rb  = idx-ipx        ! the row offset within the block
             row = ia3(j)+rb
             nz  = nz+ja(row+1)-ja(row)
             exit blkfnd
-          else if(ia1(j).gt.idx) then
+          else if(ia1(j) > idx) then
             nz=nz+ia3(j-1)-ia2(j-1)
             ipx = ia1(j-1)         ! the first row index of the block
             rb  = idx-ipx          ! the row offset within the block
@@ -1655,7 +1655,7 @@ contains
 
 9999 continue
     call psb_erractionrestore(err_act)
-    if (err_act.eq.psb_act_abort_) then
+    if (err_act == psb_act_abort_) then
       call psb_error()
       return
     end if

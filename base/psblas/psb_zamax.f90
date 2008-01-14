@@ -67,7 +67,7 @@ function psb_zamax (x,desc_a, info, jx)
   cabs1( zdum ) = abs( dble( zdum ) ) + abs( dimag( zdum ) )
 
   name='psb_zamax'
-  if(psb_get_errstatus().ne.0) return 
+  if(psb_get_errstatus() /= 0) return 
   info=0
   call psb_erractionsave(err_act)
 
@@ -92,21 +92,21 @@ function psb_zamax (x,desc_a, info, jx)
   m = psb_cd_get_global_rows(desc_a)
 
   call psb_chkvect(m,1,size(x,1),ix,ijx,desc_a,info,iix,jjx)
-  if(info.ne.0) then
+  if(info /= 0) then
      info=4010
      ch_err='psb_chkvect'
      call psb_errpush(info,name,a_err=ch_err)
      goto 9999
   end if
 
-  if (iix.ne.1) then
+  if (iix /= 1) then
      info=3040
      call psb_errpush(info,name)
      goto 9999
   end if
 
   ! compute local max
-  if ((psb_cd_get_local_rows(desc_a).gt.0).and.(m.ne.0)) then
+  if ((psb_cd_get_local_rows(desc_a) > 0).and.(m /= 0)) then
      imax=izamax(psb_cd_get_local_rows(desc_a)-iix+1,x(iix,jjx),1)
      amax=cabs1(x(iix+imax-1,jjx))
   end if
@@ -122,7 +122,7 @@ function psb_zamax (x,desc_a, info, jx)
 9999 continue
   call psb_erractionrestore(err_act)
 
-  if (err_act.eq.psb_act_abort_) then
+  if (err_act == psb_act_abort_) then
      call psb_error(ictxt)
      return
   end if
@@ -197,7 +197,7 @@ function psb_zamaxv (x,desc_a, info)
   cabs1( zdum ) = abs( dble( zdum ) ) + abs( dimag( zdum ) )
 
   name='psb_zamaxv'
-  if(psb_get_errstatus().ne.0) return 
+  if(psb_get_errstatus() /= 0) return 
   info=0
   call psb_erractionsave(err_act)
 
@@ -218,21 +218,21 @@ function psb_zamaxv (x,desc_a, info)
   m = psb_cd_get_global_rows(desc_a)
 
   call psb_chkvect(m,1,size(x,1),ix,jx,desc_a,info,iix,jjx)
-  if(info.ne.0) then
+  if(info /= 0) then
      info=4010
      ch_err='psb_chkvect'
      call psb_errpush(info,name,a_err=ch_err)
      goto 9999
   end if
 
-  if (iix.ne.1) then
+  if (iix /= 1) then
      info=3040
      call psb_errpush(info,name)
      goto 9999
   end if
 
   ! compute local max
-  if ((psb_cd_get_local_rows(desc_a).gt.0).and.(m.ne.0)) then
+  if ((psb_cd_get_local_rows(desc_a) > 0).and.(m /= 0)) then
      imax=izamax(psb_cd_get_local_rows(desc_a)-iix+1,x(iix),1)
      cmax=(x(iix+imax-1))
      amax=cabs1(cmax)
@@ -249,7 +249,7 @@ function psb_zamaxv (x,desc_a, info)
 9999 continue
   call psb_erractionrestore(err_act)
 
-  if (err_act.eq.psb_act_abort_) then
+  if (err_act == psb_act_abort_) then
      call psb_error(ictxt)
      return
   end if
@@ -325,7 +325,7 @@ subroutine psb_zamaxvs(res,x,desc_a, info)
   cabs1( zdum ) = abs( dble( zdum ) ) + abs( dimag( zdum ) )
 
   name='psb_zamaxvs'
-  if(psb_get_errstatus().ne.0) return 
+  if(psb_get_errstatus() /= 0) return 
   info=0
   call psb_erractionsave(err_act)
 
@@ -345,21 +345,21 @@ subroutine psb_zamaxvs(res,x,desc_a, info)
 
   m = psb_cd_get_global_rows(desc_a)
   call psb_chkvect(m,1,size(x,1),ix,ijx,desc_a,info,iix,jjx)
-  if(info.ne.0) then
+  if(info /= 0) then
      info=4010
      ch_err='psb_chkvect'
      call psb_errpush(info,name,a_err=ch_err)
      goto 9999
   end if
 
-  if (iix.ne.1) then
+  if (iix /= 1) then
      info=3040
      call psb_errpush(info,name)
      goto 9999
   end if
 
   ! compute local max
-  if ((psb_cd_get_local_rows(desc_a).gt.0).and.(m.ne.0)) then
+  if ((psb_cd_get_local_rows(desc_a) > 0).and.(m /= 0)) then
      imax=izamax(psb_cd_get_local_rows(desc_a)-iix+1,x(iix),1)
      cmax=(x(iix+imax-1))
      amax=cabs1(cmax)
@@ -376,7 +376,7 @@ subroutine psb_zamaxvs(res,x,desc_a, info)
 9999 continue
   call psb_erractionrestore(err_act)
 
-  if (err_act.eq.psb_act_abort_) then
+  if (err_act == psb_act_abort_) then
      call psb_error(ictxt)
      return
   end if
@@ -451,7 +451,7 @@ subroutine psb_zmamaxs(res,x,desc_a, info,jx)
   cabs1( zdum ) = abs( dble( zdum ) ) + abs( dimag( zdum ) )
 
   name='psb_zmamaxs'
-  if (psb_get_errstatus().ne.0) return 
+  if (psb_get_errstatus() /= 0) return 
   info=0
   call psb_erractionsave(err_act)
 
@@ -477,21 +477,21 @@ subroutine psb_zmamaxs(res,x,desc_a, info,jx)
   k  = min(size(x,2),size(res,1))
 
   call psb_chkvect(m,1,size(x,1),ix,ijx,desc_a,info,iix,jjx)
-  if(info.ne.0) then
+  if(info /= 0) then
      info=4010
      ch_err='psb_chkvect'
      call psb_errpush(info,name,a_err=ch_err)
      goto 9999
   end if
 
-  if (iix.ne.1) then
+  if (iix /= 1) then
      info=3040
      call psb_errpush(info,name)
      goto 9999
   end if
 
   ! compute local max
-  if ((psb_cd_get_local_rows(desc_a).gt.0).and.(m.ne.0)) then
+  if ((psb_cd_get_local_rows(desc_a) > 0).and.(m /= 0)) then
      do i=1,k
         imax=izamax(psb_cd_get_local_rows(desc_a)-iix+1,x(iix,jjx+i-1),1)
         cmax=(x(iix+imax-1,jjx+i-1))
@@ -508,7 +508,7 @@ subroutine psb_zmamaxs(res,x,desc_a, info,jx)
 9999 continue
   call psb_erractionrestore(err_act)
 
-  if (err_act.eq.psb_act_abort_) then
+  if (err_act == psb_act_abort_) then
      call psb_error(ictxt)
      return
   end if

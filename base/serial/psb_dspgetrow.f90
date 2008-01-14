@@ -118,7 +118,7 @@ subroutine psb_dspgetrow(irw,a,nz,ia,ja,val,info,iren,lrw,append,nzin)
 9999 continue
 !!$  call psb_erractionrestore(err_act)
   call psb_erractionsave(err_act)
-  if (err_act.eq.psb_act_abort_) then
+  if (err_act == psb_act_abort_) then
      call psb_error()
      return
   end if

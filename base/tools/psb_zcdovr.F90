@@ -228,17 +228,16 @@ Subroutine psb_zcdovr(a,desc_a,novr,desc_ov,info, extype)
     call psb_errpush(4010,name,a_err='Allocate')
     goto 9999      
   end if
-  halo(:)                = desc_a%halo_index(:)
-  desc_ov%ovrlap_elem(:) = -1
-  tmp_ovr_idx(:)         = -1
-  orig_ovr(:)            = -1
-  tmp_halo(:)            = -1
-  counter_e              = 1
-  tot_recv               = 0
-  counter_t              = 1
-  counter_h              = 1
-  counter_o              = 1
-  cntov_o                = 1
+  halo(:)        = desc_a%halo_index(:)
+  tmp_ovr_idx(:) = -1
+  orig_ovr(:)    = -1
+  tmp_halo(:)    = -1
+  counter_e      = 1
+  tot_recv       = 0
+  counter_t      = 1
+  counter_h      = 1
+  counter_o      = 1
+  cntov_o        = 1
   ! Init overlap with desc_a%ovrlap (if any) 
   counter = 1
   Do While (desc_a%ovrlap_index(counter) /= -1)

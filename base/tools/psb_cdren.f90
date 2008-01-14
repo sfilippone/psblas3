@@ -181,15 +181,13 @@ subroutine psb_cdren(trans,iperm,desc_a,info)
       kh=desc_a%ovrlap_index(i)
     enddo
     if (debug_level >= psb_debug_ext_) &
-         & write(debug_unit,*) me,' ',trim(name),': renumbering ovrlap_elem'
-    i = 1
-    kh=desc_a%ovrlap_elem(i)
-    do while (kh /= -1)          
-      desc_a%ovrlap_elem(i) = &
-           &desc_a%lprm(desc_a%ovrlap_elem(i))
-      i = i+2
-      kh=desc_a%ovrlap_elem(i)         
-    enddo
+         & write(debug_unit,*) me,' ',&
+         & trim(name),': renumbering ovrlap_elem'
+
+    do i=1, size(desc_a%ovrlap_elem,1)
+      desc_a%ovrlap_elem(i,1) = desc_a%lprm(desc_a%ovrlap_elem(i,1))
+    end do
+
     if (debug_level >= psb_debug_ext_) &
          & write(debug_unit,*) me,' ',trim(name),': done renumbering'
   else 

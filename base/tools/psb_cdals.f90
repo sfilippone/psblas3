@@ -48,6 +48,7 @@ subroutine psb_cdals(m, n, parts, ictxt, desc_a, info)
   use psb_realloc_mod
   use psb_serial_mod
   use psb_const_mod
+  use psi_mod
   use psb_penv_mod
   implicit None
   include 'parts.fh'
@@ -60,7 +61,7 @@ subroutine psb_cdals(m, n, parts, ictxt, desc_a, info)
   Integer              :: counter,i,j,np,me,loc_row,err,loc_col,nprocs,&
        & l_ov_ix,l_ov_el,idx, err_act, itmpov, k, glx 
   integer              :: int_err(5),exch(3)
-  integer, allocatable  :: prc_v(:), temp_ovrlap(:), ov_idx(:),ov_el(:)
+  integer, allocatable  :: prc_v(:), temp_ovrlap(:)
   integer              :: debug_level, debug_unit
   character(len=20)    :: name
 
@@ -363,59 +364,9 @@ subroutine psb_cdals(m, n, parts, ictxt, desc_a, info)
   if (debug_level >= psb_debug_ext_) &
        & write(debug_unit,*) me,' ',trim(name),':  error check:' ,err
 
-  l_ov_ix=0
-  l_ov_el=0
-  i = 1
-  do while (temp_ovrlap(i) /= -1) 
-    idx = temp_ovrlap(i)
-    i=i+1
-    nprocs = temp_ovrlap(i)
-    i = i + 1
-    l_ov_ix = l_ov_ix+3*(nprocs-1)
-    l_ov_el = l_ov_el + 2
-    i = i + nprocs     
-  enddo
 
-  l_ov_ix = l_ov_ix+3  
-  l_ov_el = l_ov_el+3
-
-  if (debug_level >= psb_debug_ext_) &
-       & write(debug_unit,*) me,' ',trim(name),': Ov len',l_ov_ix,l_ov_el
-  allocate(ov_idx(l_ov_ix),ov_el(l_ov_el), stat=info)
-  if (info /= psb_no_err_) then
-    info=4010
-    err=info
-    call psb_errpush(err,name,a_err='psb_realloc')
-    goto 9999
-  end if
-
-  l_ov_ix=0
-  l_ov_el=0
-  i = 1
-  do while (temp_ovrlap(i) /= -1) 
-    idx = temp_ovrlap(i)
-    i   = i+1
-    nprocs = temp_ovrlap(i)
-    ov_el(l_ov_el+1)  = idx
-    ov_el(l_ov_el+2)  = nprocs
-    l_ov_el           = l_ov_el+2
-    do j=1, nprocs
-      if (temp_ovrlap(i+j) /= me) then
-        ov_idx(l_ov_ix+1) = temp_ovrlap(i+j)
-        ov_idx(l_ov_ix+2) = 1
-        ov_idx(l_ov_ix+3) = idx
-        l_ov_ix = l_ov_ix+3
-      endif
-    enddo
-    i = i + nprocs +1
-  enddo
-  l_ov_el         = l_ov_el + 1
-  ov_el(l_ov_el)  = -1
-  l_ov_ix         = l_ov_ix + 1
-  ov_idx(l_ov_ix) = -1
-
-  call psb_transfer(ov_idx,desc_a%ovrlap_index,info) 
-  if (info == 0) call psb_transfer(ov_el,desc_a%ovrlap_elem,info)
+  call psi_bld_tmpovrl(temp_ovrlap,desc_a,info)
+  
   if (info == 0) deallocate(prc_v,temp_ovrlap,stat=info)
   if (info /= psb_no_err_) then 
     info=4000

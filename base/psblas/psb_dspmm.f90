@@ -90,17 +90,21 @@ subroutine  psb_dspmm(alpha,a,x,beta,y,desc_a,info,&
   integer                  :: ictxt, np, me,&
        & err_act, n, iix, jjx, ia, ja, iia, jja, ix, iy, ik, ijx, ijy,&
        & m, nrow, ncol, lldx, lldy, liwork, iiy, jjy,&
-       & i, ib, ib1
+       & i, ib, ib1, ip, idx
   integer, parameter       :: nb=4
-  real(kind(1.d0)),pointer :: xp(:,:), yp(:,:), iwork(:)
+  real(kind(1.d0)), pointer     :: xp(:,:), yp(:,:), iwork(:)
+  real(kind(1.d0)), allocatable :: wrkt(:,:)
   character                :: trans_
   character(len=20)        :: name, ch_err
   logical                  :: aliw, doswap_
+  integer                  :: debug_level, debug_unit
 
   name='psb_dspmm'
   if(psb_get_errstatus() /= 0) return 
   info=0
   call psb_erractionsave(err_act)
+  debug_unit  = psb_get_debug_unit()
+  debug_level = psb_get_debug_level()
 
   ictxt=psb_cd_get_context(desc_a)
 
@@ -155,7 +159,7 @@ subroutine  psb_dspmm(alpha,a,x,beta,y,desc_a,info,&
   end if
 
   m    = psb_cd_get_global_rows(desc_a)
-  n    = psb_cd_get_global_cols(desc_a) 
+  n    = psb_cd_get_global_cols(desc_a)
   nrow = psb_cd_get_local_rows(desc_a)
   ncol = psb_cd_get_local_cols(desc_a)
   lldx = size(x,1)
@@ -163,8 +167,7 @@ subroutine  psb_dspmm(alpha,a,x,beta,y,desc_a,info,&
 
   ! check for presence/size of a work area
   liwork= 2*ncol
-  if (a%pr(1) /= 0) liwork = liwork + n * ik
-  if (a%pl(1) /= 0) liwork = liwork + m * ik
+
   if (present(work)) then
     if (size(work) >= liwork) then
       aliw =.false.
@@ -264,6 +267,7 @@ subroutine  psb_dspmm(alpha,a,x,beta,y,desc_a,info,&
     end if
 
   else
+
     !  Matrix is transposed
     if((ja /= iy).or.(ia /= ix)) then
       ! this case is not yet implemented
@@ -272,11 +276,6 @@ subroutine  psb_dspmm(alpha,a,x,beta,y,desc_a,info,&
       goto 9999
     end if
 
-    if(desc_a%ovrlap_elem(1) /= -1) then
-      info = 3070
-      call psb_errpush(info,name)
-      goto 9999
-    end if
 
     ! checking for vectors correctness
     call psb_chkvect(m,ik,size(x,1),ix,ijx,desc_a,info,iix,jjx)
@@ -296,35 +295,54 @@ subroutine  psb_dspmm(alpha,a,x,beta,y,desc_a,info,&
       goto 9999
     end if
 
-    y(iiy+nrow+1-1:iiy+ncol,1:ik)=dzero
-
-    !  local Matrix-vector product
-
-    call psb_csmm(alpha,a,x(iix:lldx,jjx:jjx+ik-1),&
-         & beta,y(iiy:lldy,jjy:jjy+ik-1),info,trans=trans_)
-
-    if(info /= 0) then
-      info = 4010
-      ch_err='csmm'
+    !
+    ! Non-empty overlap, need a buffer to hold
+    ! the entries updated with average operator.
+    ! 
+    allocate(wrkt(ncol,ik),stat=info)
+    if (info /= 0) then 
+      info=4010
+      ch_err='Allocate'
       call psb_errpush(info,name,a_err=ch_err)
       goto 9999
     end if
 
-    yp => y(iiy:lldy,jjy:jjy+ik-1)
-    if (doswap_) &
-         & call psi_swaptran(ior(psb_swap_send_,psb_swap_recv_),&
-         & ik,done,yp,desc_a,iwork,info)
+    
+    !
+    wrkt(1:nrow,1:ik)      = x(1:nrow,1:ik)      
+    wrkt(nrow+1:ncol,1:ik) = dzero
+    y(nrow+1:ncol,1:ik)    = dzero
+    call psi_ovrl_upd(wrkt,desc_a,psb_avg_,info)
 
+    call psb_csmm(alpha,a,wrkt(:,1:ik),beta,y(:,1:ik),info,trans=trans_)
+    if (debug_level >= psb_debug_comp_) &
+         & write(debug_unit,*) me,' ',trim(name),' csmm ', info
     if(info /= 0) then
       info = 4010
-      ch_err='PSI_dSwapTran'
+      ch_err='psb_csmm'
       call psb_errpush(info,name,a_err=ch_err)
       goto 9999
+    end if
+
+    if (doswap_)then 
+      call psi_swaptran(ior(psb_swap_send_,psb_swap_recv_),&
+           & ik,done,y(:,1:ik),desc_a,iwork,info)
+      if (info == 0) call psi_swapdata(ior(psb_swap_send_,psb_swap_recv_),&
+           & ik,done,y(:,1:ik),desc_a,iwork,info,data=psb_comm_ovr_)
+
+      if (debug_level >= psb_debug_comp_) &
+           & write(debug_unit,*) me,' ',trim(name),' swaptran ', info
+      if(info /= 0) then
+        info = 4010
+        ch_err='PSI_dSwapTran'
+        call psb_errpush(info,name,a_err=ch_err)
+        goto 9999
+      end if
     end if
 
   end if
 
-  if(aliw) deallocate(iwork)
+  if (aliw) deallocate(iwork)
   nullify(iwork)
 
   call psb_erractionrestore(err_act)
@@ -417,7 +435,7 @@ subroutine  psb_dspmv(alpha,a,x,beta,y,desc_a,info,&
   type(psb_dspmat_type), intent(in)        :: a
   type(psb_desc_type), intent(in)          :: desc_a
   integer, intent(out)                     :: info
-  real(kind(1.d0)), optional, target      :: work(:)
+  real(kind(1.d0)), optional, target       :: work(:)
   character, intent(in), optional          :: trans
   logical, intent(in), optional            :: doswap
 
@@ -425,7 +443,7 @@ subroutine  psb_dspmv(alpha,a,x,beta,y,desc_a,info,&
   integer                  :: ictxt, np, me,&
        & err_act, n, iix, jjx, ia, ja, iia, jja, ix, iy, ik, &
        & m, nrow, ncol, lldx, lldy, liwork, jx, jy, iiy, jjy,&
-       & ib
+       & ib, ip, idx
   integer, parameter       :: nb=4
   real(kind(1.d0)),pointer :: iwork(:), xp(:), yp(:)
   character                :: trans_
@@ -486,8 +504,6 @@ subroutine  psb_dspmv(alpha,a,x,beta,y,desc_a,info,&
   iwork => null()
   ! check for presence/size of a work area
   liwork= 2*ncol
-  if (a%pr(1) /= 0) liwork = liwork + n * ik
-  if (a%pl(1) /= 0) liwork = liwork + m * ik
 
   if (present(work)) then
     if (size(work) >= liwork) then
@@ -574,12 +590,6 @@ subroutine  psb_dspmv(alpha,a,x,beta,y,desc_a,info,&
       goto 9999
     end if
 
-    if(desc_a%ovrlap_elem(1) /= -1) then
-      info = 3070
-      call psb_errpush(info,name)
-      goto 9999
-    end if
-
     ! checking for vectors correctness
     call psb_chkvect(m,ik,size(x),ix,jx,desc_a,info,iix,jjx)
     if (info == 0)&
@@ -598,33 +608,45 @@ subroutine  psb_dspmv(alpha,a,x,beta,y,desc_a,info,&
       goto 9999
     end if
 
-    xp => x(iix:lldx)
-    yp => y(iiy:lldy)
+    xp => x(1:lldx)
+    yp => y(1:lldy)
 
-    yp(nrow+1:ncol)=dzero
-    if (debug_level >= psb_debug_comp_) &
-         & write(debug_unit,*) me,' ',trim(name),' checkvect ', info
+    !
+    ! Non-empty overlap, need a buffer to hold
+    ! the entries updated with average operator.
+    ! 
+    iwork(1:nrow)      = x(1:nrow)
+    iwork(nrow+1:ncol) = dzero
+    yp(nrow+1:ncol)    = dzero
+    call psi_ovrl_upd(iwork,desc_a,psb_avg_,info)
+    
     !  local Matrix-vector product
-    call psb_csmm(alpha,a,xp,beta,yp,info,trans=trans_)
+    call psb_csmm(alpha,a,iwork,beta,yp,info,trans=trans_)
     if (debug_level >= psb_debug_comp_) &
          & write(debug_unit,*) me,' ',trim(name),' csmm ', info
-    if(info /= 0) then
+
+    if (info /= 0) then
       info = 4010
-      ch_err='dcsmm'
+      ch_err='psb_csmm'
       call psb_errpush(info,name,a_err=ch_err)
       goto 9999
     end if
+    
+    if (doswap_) then
+      call psi_swaptran(ior(psb_swap_send_,psb_swap_recv_),&
+           & done,yp,desc_a,iwork,info)
 
-    if (doswap_)&
-         & call psi_swaptran(ior(psb_swap_send_,psb_swap_recv_),&
-         & done,yp,desc_a,iwork,info)
-    if (debug_level >= psb_debug_comp_) &
-         & write(debug_unit,*) me,' ',trim(name),' swaptran ', info
-    if(info /= 0) then
-      info = 4010
-      ch_err='PSI_dSwapTran'
-      call psb_errpush(info,name,a_err=ch_err)
-      goto 9999
+      if (info == 0) call psi_swapdata(ior(psb_swap_send_,psb_swap_recv_),&
+           & done,yp,desc_a,iwork,info,data=psb_comm_ovr_)
+      
+      if (debug_level >= psb_debug_comp_) &
+           & write(debug_unit,*) me,' ',trim(name),' swaptran ', info
+      if(info /= 0) then
+        info = 4010
+        ch_err='PSI_dSwapTran'
+        call psb_errpush(info,name,a_err=ch_err)
+        goto 9999
+      end if
     end if
 
   end if

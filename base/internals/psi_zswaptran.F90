@@ -89,7 +89,7 @@ subroutine psi_zswaptranm(flag,n,beta,y,desc_a,work,info,data)
   use psb_error_mod
   use psb_descriptor_type
   use psb_penv_mod
-  use psi_gthsct_mod
+!!$  use psi_gthsct_mod
 #ifdef MPI_MOD
   use mpi
 #endif
@@ -553,10 +553,11 @@ end subroutine psi_zswaptranm
 !
 subroutine psi_zswaptranv(flag,beta,y,desc_a,work,info,data)
 
+  use psi_mod, psb_protect_name => psi_zswaptranv
   use psb_error_mod
   use psb_descriptor_type
   use psb_penv_mod
-  use psi_gthsct_mod
+!!$  use psi_gthsct_mod
 #ifdef MPI_MOD
   use mpi
 #endif

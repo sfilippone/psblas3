@@ -239,7 +239,7 @@ subroutine psb_dallocv(x, desc_a,info,n)
   if (psb_is_asb_desc(desc_a).or.psb_is_upd_desc(desc_a)) then
     n_col = max(1,psb_cd_get_local_cols(desc_a))
     allocate(x(n_col),stat=info)
-    if (info.ne.0) then
+    if (info /= 0) then
       info=4025
       int_err(1)=n_col
       call psb_errpush(info,name,int_err,a_err='real(kind(1.d0))')
@@ -252,7 +252,7 @@ subroutine psb_dallocv(x, desc_a,info,n)
   else if (psb_is_bld_desc(desc_a)) then
     n_row = max(1,psb_cd_get_local_rows(desc_a))
     allocate(x(n_row),stat=info)
-    if (info.ne.0) then
+    if (info /= 0) then
       info=4025
       int_err(1)=n_row
       call psb_errpush(info,name,int_err,a_err='real(kind(1.d0))')

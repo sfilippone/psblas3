@@ -96,7 +96,7 @@ Contains
     name='psb_cpy1d'
     call psb_erractionsave(err_act)
 
-    if(psb_get_errstatus().ne.0) return 
+    if(psb_get_errstatus() /= 0) return 
     info = 0
     if (allocated(vin)) then 
       isz = size(vin)
@@ -118,7 +118,7 @@ Contains
 9999 continue
     call psb_erractionrestore(err_act)
 
-    if (err_act.eq.psb_act_ret_) then
+    if (err_act == psb_act_ret_) then
       return
     else
       call psb_error()
@@ -143,7 +143,7 @@ Contains
     name='psb_cpy1d'
     call psb_erractionsave(err_act)
 
-    if(psb_get_errstatus().ne.0) return 
+    if(psb_get_errstatus() /= 0) return 
     info = 0
     if (allocated(vin)) then 
       isz1 = size(vin,1)
@@ -167,7 +167,7 @@ Contains
 9999 continue
     call psb_erractionrestore(err_act)
 
-    if (err_act.eq.psb_act_ret_) then
+    if (err_act == psb_act_ret_) then
       return
     else
       call psb_error()
@@ -192,7 +192,7 @@ Contains
     name='psb_cpy1d'
     call psb_erractionsave(err_act)
 
-    if(psb_get_errstatus().ne.0) return 
+    if(psb_get_errstatus() /= 0) return 
     info = 0
     if (allocated(vin)) then 
       isz = size(vin)
@@ -214,7 +214,7 @@ Contains
 9999 continue
     call psb_erractionrestore(err_act)
 
-    if (err_act.eq.psb_act_ret_) then
+    if (err_act == psb_act_ret_) then
       return
     else
       call psb_error()
@@ -239,7 +239,7 @@ Contains
     name='psb_cpy1d'
     call psb_erractionsave(err_act)
 
-    if(psb_get_errstatus().ne.0) return 
+    if(psb_get_errstatus() /= 0) return 
     info = 0
     if (allocated(vin)) then 
       isz1 = size(vin,1)
@@ -263,7 +263,7 @@ Contains
 9999 continue
     call psb_erractionrestore(err_act)
 
-    if (err_act.eq.psb_act_ret_) then
+    if (err_act == psb_act_ret_) then
       return
     else
       call psb_error()
@@ -288,7 +288,7 @@ Contains
     name='psb_cpy1d'
     call psb_erractionsave(err_act)
 
-    if(psb_get_errstatus().ne.0) return 
+    if(psb_get_errstatus() /= 0) return 
     info = 0
     if (allocated(vin)) then 
       isz = size(vin)
@@ -310,7 +310,7 @@ Contains
 9999 continue
     call psb_erractionrestore(err_act)
 
-    if (err_act.eq.psb_act_ret_) then
+    if (err_act == psb_act_ret_) then
       return
     else
       call psb_error()
@@ -335,7 +335,7 @@ Contains
     name='psb_cpy1d'
     call psb_erractionsave(err_act)
 
-    if(psb_get_errstatus().ne.0) return 
+    if(psb_get_errstatus() /= 0) return 
     info = 0
     if (allocated(vin)) then 
       isz1 = size(vin,1)
@@ -359,7 +359,7 @@ Contains
 9999 continue
     call psb_erractionrestore(err_act)
 
-    if (err_act.eq.psb_act_ret_) then
+    if (err_act == psb_act_ret_) then
       return
     else
       call psb_error()
@@ -473,7 +473,7 @@ Contains
     name='psb_ensure_size'
     call psb_erractionsave(err_act)
 
-    if(psb_get_errstatus().ne.0) return 
+    if(psb_get_errstatus() /= 0) return 
     info=0
     
     If (len > psb_size(v)) Then
@@ -501,7 +501,7 @@ Contains
 9999 continue
     call psb_erractionrestore(err_act)
 
-    if (err_act.eq.psb_act_ret_) then
+    if (err_act == psb_act_ret_) then
       return
     else
       call psb_error()
@@ -529,7 +529,7 @@ Contains
     name='psb_ensure_size'
     call psb_erractionsave(err_act)
 
-    if(psb_get_errstatus().ne.0) return 
+    if(psb_get_errstatus() /= 0) return 
     info=0
     
     If (len > psb_size(v)) Then
@@ -557,7 +557,7 @@ Contains
 9999 continue
     call psb_erractionrestore(err_act)
 
-    if (err_act.eq.psb_act_ret_) then
+    if (err_act == psb_act_ret_) then
       return
     else
       call psb_error()
@@ -585,7 +585,7 @@ Contains
     name='psb_ensure_size'
     call psb_erractionsave(err_act)
 
-    if(psb_get_errstatus().ne.0) return 
+    if(psb_get_errstatus() /= 0) return 
     info=0
     
     If (len > psb_size(v)) Then
@@ -612,7 +612,7 @@ Contains
 9999 continue
     call psb_erractionrestore(err_act)
 
-    if (err_act.eq.psb_act_ret_) then
+    if (err_act == psb_act_ret_) then
       return
     else
       call psb_error()
@@ -642,7 +642,7 @@ Contains
     call psb_erractionsave(err_act)
 
     if (debug) write(0,*) 'reallocate I',len
-    if (psb_get_errstatus().ne.0) return 
+    if (psb_get_errstatus() /= 0) return 
     info=0
     if (present(lb)) then
       lb_ = lb
@@ -689,7 +689,7 @@ Contains
     info = err
     call psb_erractionrestore(err_act)
 
-    if (err_act.eq.psb_act_ret_) then
+    if (err_act == psb_act_ret_) then
       return
     else
       call psb_error()
@@ -765,7 +765,7 @@ Contains
     info = err
     call psb_erractionrestore(err_act)
 
-    if (err_act.eq.psb_act_ret_) then
+    if (err_act == psb_act_ret_) then
       return
     else
       call psb_error()
@@ -839,7 +839,7 @@ Contains
     info = err
     call psb_erractionrestore(err_act)
 
-    if (err_act.eq.psb_act_ret_) then
+    if (err_act == psb_act_ret_) then
       return
     else
       call psb_error()
@@ -932,7 +932,7 @@ Contains
     info = err
     call psb_erractionrestore(err_act)
 
-    if (err_act.eq.psb_act_ret_) then
+    if (err_act == psb_act_ret_) then
       return
     else
       call psb_error()
@@ -1026,7 +1026,7 @@ Contains
     info = err
     call psb_erractionrestore(err_act)
 
-    if (err_act.eq.psb_act_ret_) then
+    if (err_act == psb_act_ret_) then
       return
     else
       call psb_error()
@@ -1117,7 +1117,7 @@ Contains
     info = err
     call psb_erractionrestore(err_act)
 
-    if (err_act.eq.psb_act_ret_) then
+    if (err_act == psb_act_ret_) then
       return
     else
       call psb_error()
@@ -1140,7 +1140,7 @@ Contains
     name='psb_dreallocate2i'
     call psb_erractionsave(err_act)
 
-    if(psb_get_errstatus().ne.0) return 
+    if(psb_get_errstatus() /= 0) return 
     info=0
     call psb_dreallocate1i(len,rrax,info,pad=pad)
     if (info /= 0) then
@@ -1160,7 +1160,7 @@ Contains
 9999 continue
     call psb_erractionrestore(err_act)
 
-    if (err_act.eq.psb_act_ret_) then
+    if (err_act == psb_act_ret_) then
       return
     else
       call psb_error()
@@ -1211,7 +1211,7 @@ Contains
 9999 continue
     call psb_erractionrestore(err_act)
 
-    if (err_act.eq.psb_act_ret_) then
+    if (err_act == psb_act_ret_) then
       return
     else
       call psb_error()
@@ -1260,7 +1260,7 @@ Contains
 9999 continue
     call psb_erractionrestore(err_act)
 
-    if (err_act.eq.psb_act_ret_) then
+    if (err_act == psb_act_ret_) then
       return
     else
       call psb_error()

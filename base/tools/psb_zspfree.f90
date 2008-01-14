@@ -55,7 +55,7 @@ subroutine psb_zspfree(a, desc_a,info)
   integer             :: ictxt, err_act
   character(len=20)   :: name
 
-  if(psb_get_errstatus().ne.0) return 
+  if(psb_get_errstatus() /= 0) return 
   info=0
   name = 'psb_zspfree'
   call psb_erractionsave(err_act)

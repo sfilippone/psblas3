@@ -222,7 +222,7 @@ contains
     new_node%next       => error_stack%top
     error_stack%top     => new_node
     error_stack%n_elems = error_stack%n_elems+1
-    if(error_status.eq.0) error_status=1
+    if(error_status == 0) error_status=1
     nullify(new_node)
 
   end subroutine psb_errpush
@@ -246,7 +246,7 @@ contains
     old_node   => error_stack%top
     error_stack%top  => old_node%next
     error_stack%n_elems = error_stack%n_elems - 1
-    if(error_stack%n_elems.eq.0) error_status=0
+    if(error_stack%n_elems == 0) error_status=0
 
     deallocate(old_node)
 
@@ -266,10 +266,10 @@ contains
     integer, parameter      ::  ione=1, izero=0
 
 
-    if(error_status.gt.0) then
-      if(verbosity_level.gt.1) then
+    if(error_status > 0) then
+      if(verbosity_level > 1) then
 
-        do while (error_stack%n_elems.gt.izero)
+        do while (error_stack%n_elems > izero)
           write(0,'(50("="))')
           call psb_errpop(err_c, r_name, i_e_d, a_e_d)
           call psb_errmsg(err_c, r_name, i_e_d, a_e_d,me)
@@ -284,7 +284,7 @@ contains
 
         call psb_errpop(err_c, r_name, i_e_d, a_e_d)
         call psb_errmsg(err_c, r_name, i_e_d, a_e_d,me)
-        do while (error_stack%n_elems.gt.0)
+        do while (error_stack%n_elems > 0)
           call psb_errpop(err_c, r_name, i_e_d, a_e_d)
         end do
 #if defined(SERIAL_MPI)
@@ -295,7 +295,7 @@ contains
       end if
     end if
 
-    if(error_status.gt.izero) then
+    if(error_status > izero) then
 #if defined(SERIAL_MPI)
         stop 
 #else        
@@ -316,10 +316,10 @@ contains
     integer                 ::  i_e_d(5)
     integer, parameter      ::  ione=1, izero=0
 
-    if(error_status.gt.0) then
-      if(verbosity_level.gt.1) then
+    if(error_status > 0) then
+      if(verbosity_level > 1) then
 
-        do while (error_stack%n_elems.gt.izero)
+        do while (error_stack%n_elems > izero)
           write(0,'(50("="))')
           call psb_errpop(err_c, r_name, i_e_d, a_e_d)
           call psb_errmsg(err_c, r_name, i_e_d, a_e_d)
@@ -330,7 +330,7 @@ contains
 
         call psb_errpop(err_c, r_name, i_e_d, a_e_d)
         call psb_errmsg(err_c, r_name, i_e_d, a_e_d)
-        do while (error_stack%n_elems.gt.0)
+        do while (error_stack%n_elems > 0)
           call psb_errpop(err_c, r_name, i_e_d, a_e_d)
         end do
       end if

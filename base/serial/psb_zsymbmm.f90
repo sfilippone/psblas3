@@ -100,7 +100,7 @@ subroutine psb_zsymbmm(a,b,c,info)
 
 9999 continue
   call psb_erractionrestore(err_act)
-  if (err_act.eq.psb_act_abort_) then
+  if (err_act == psb_act_abort_) then
      call psb_error()
      return
   end if
@@ -155,7 +155,7 @@ contains
             if ((ibcl(k)<1).or.(ibcl(k)>maxlmn)) then 
                 write(0,*) 'Problem in SYMBMM 1:',j,k,ibcl(k),maxlmn
             else
-              if(index(ibcl(k)).eq.0) then
+              if(index(ibcl(k)) == 0) then
                 index(ibcl(k))=istart
                 istart=ibcl(k)
                 length=length+1

@@ -100,10 +100,10 @@ subroutine  psb_dspsm(alpha,a,x,beta,y,desc_a,info,&
   integer, intent(in), optional             :: k, jx, jy
 
   ! locals
-  integer                  :: int_err(5), ictxt, np, me,&
-       & err_act, iix, jjx, ia, ja, iia, jja, lldx,lldy, lchoice,&
+  integer                  :: ictxt, np, me,&
+       & err_act, iix, jjx, ia, ja, iia, jja, lldx,lldy, choice_,&
        & ix, iy, ik, ijx, ijy, i, lld,&
-       & m, nrow, ncol, liwork, llwork, iiy, jjy
+       & m, nrow, ncol, liwork, llwork, iiy, jjy, idx, ndm
 
   character                :: lunitd
   integer, parameter       :: nb=4
@@ -113,7 +113,7 @@ subroutine  psb_dspsm(alpha,a,x,beta,y,desc_a,info,&
   logical                  :: aliw
 
   name='psb_dspsm'
-  if(psb_get_errstatus().ne.0) return 
+  if(psb_get_errstatus() /= 0) return 
   info=0
   call psb_erractionsave(err_act)
 
@@ -152,9 +152,9 @@ subroutine  psb_dspsm(alpha,a,x,beta,y,desc_a,info,&
   endif
 
   if (present(choice)) then     
-    lchoice = choice
+    choice_ = choice
   else
-    lchoice = psb_avg_
+    choice_ = psb_avg_
   endif
 
   if (present(unitd)) then     
@@ -165,7 +165,7 @@ subroutine  psb_dspsm(alpha,a,x,beta,y,desc_a,info,&
 
   if (present(trans)) then     
     itrans = toupper(trans)
-    if((itrans.eq.'N').or.(itrans.eq.'T').or.  (itrans.eq.'C')) then
+    if((itrans == 'N').or.(itrans == 'T').or.  (itrans == 'C')) then
       ! OK 
     else
       info = 70
@@ -179,11 +179,10 @@ subroutine  psb_dspsm(alpha,a,x,beta,y,desc_a,info,&
   m    = psb_cd_get_global_rows(desc_a)
   nrow = psb_cd_get_local_rows(desc_a)
   ncol = psb_cd_get_local_cols(desc_a)
-
   lldx = size(x,1)
   lldy = size(y,1)
 
-  if((lldx.lt.ncol).or.(lldy.lt.ncol)) then
+  if((lldx < ncol).or.(lldy < ncol)) then
     info=3010
     call psb_errpush(info,name)
     goto 9999
@@ -206,7 +205,7 @@ subroutine  psb_dspsm(alpha,a,x,beta,y,desc_a,info,&
 
   if (aliw) then
     allocate(iwork(liwork),stat=info)
-    if(info.ne.0) then
+    if(info /= 0) then
       info=4010
       ch_err='psb_realloc'
       call psb_errpush(info,name,a_err=ch_err)
@@ -234,24 +233,24 @@ subroutine  psb_dspsm(alpha,a,x,beta,y,desc_a,info,&
        & call psb_chkvect(m,ik,size(x,1),ix,ijx,desc_a,info,iix,jjx)
   if (info == 0) &
        & call psb_chkvect(m,ik,size(y,1),iy,ijy,desc_a,info,iiy,jjy)
-  if(info.ne.0) then
+  if(info /= 0) then
     info=4010
     ch_err='psb_chkvect/mat'
     call psb_errpush(info,name,a_err=ch_err)
     goto 9999
   end if
 
-  if(ja.ne.ix) then
+  if(ja /= ix) then
     ! this case is not yet implemented
     info = 3030
   end if
 
-  if((iix.ne.1).or.(iiy.ne.1)) then
+  if((iix /= 1).or.(iiy /= 1)) then
     ! this case is not yet implemented
     info = 3040
   end if
 
-  if(info.ne.0) then
+  if(info /= 0) then
     call psb_errpush(info,name)
     goto 9999
   end if
@@ -261,7 +260,7 @@ subroutine  psb_dspsm(alpha,a,x,beta,y,desc_a,info,&
   yp => y(iiy:lldy,jjy:jjy+ik-1)
   call psb_cssm(alpha,a,xp,beta,yp,info,unitd=lunitd,d=id,trans=itrans)
 
-  if(info.ne.0) then
+  if(info /= 0) then
     info = 4010
     ch_err='dcssm'
     call psb_errpush(info,name,a_err=ch_err)
@@ -269,37 +268,16 @@ subroutine  psb_dspsm(alpha,a,x,beta,y,desc_a,info,&
   end if
 
   ! update overlap elements
-  if(lchoice.gt.0) then
+  if (choice_ > 0) then
 
     call psi_swapdata(ior(psb_swap_send_,psb_swap_recv_),ik,&
-         & done,yp,desc_a,iwork,info)
+         & done,yp,desc_a,iwork,info,data=psb_comm_ovr_)
 
-    i=0
-    ! switch on update type
-    select case (lchoice)
-    case(psb_square_root_)
-      do while(desc_a%ovrlap_elem(i).ne.-ione)
-        y(desc_a%ovrlap_elem(i+psb_ovrlp_elem_),:) =&
-             & y(desc_a%ovrlap_elem(i+psb_ovrlp_elem_),:)/&
-             & sqrt(real(desc_a%ovrlap_elem(i+psb_n_dom_ovr_)))
-        i = i+2
-      end do
-    case(psb_avg_)
-      do while(desc_a%ovrlap_elem(i).ne.-ione)
-        y(desc_a%ovrlap_elem(i+psb_ovrlp_elem_),:) =&
-             & y(desc_a%ovrlap_elem(i+psb_ovrlp_elem_),:)/&
-             & real(desc_a%ovrlap_elem(i+psb_n_dom_ovr_))
-        i = i+2
-      end do
-    case(psb_sum_)
-      ! do nothing
-    case default 
-      ! wrong value for choice argument
-      info = 70
-      int_err=(/10,lchoice,0,0,0/)
-      call psb_errpush(info,name,i_err=int_err)
+    if (info == 0) call psi_ovrl_upd(yp,desc_a,choice_,info)
+    if (info /= 0) then
+      call psb_errpush(4010,name,a_err='Inner updates')
       goto 9999
-    end select
+    end if
   end if
 
   if(aliw) deallocate(iwork)
@@ -311,7 +289,7 @@ subroutine  psb_dspsm(alpha,a,x,beta,y,desc_a,info,&
 9999 continue
   call psb_erractionrestore(err_act)
 
-  if (err_act.eq.psb_act_abort_) then
+  if (err_act == psb_act_abort_) then
     call psb_error(ictxt)
     return
   end if
@@ -408,10 +386,10 @@ subroutine  psb_dspsv(alpha,a,x,beta,y,desc_a,info,&
   integer, intent(in), optional             :: choice
 
   ! locals
-  integer                  :: int_err(5), ictxt, np, me,&
-       & err_act, iix, jjx, ia, ja, iia, jja, lldx,lldy, lchoice,&
+  integer                  :: ictxt, np, me, &
+       & err_act, iix, jjx, ia, ja, iia, jja, lldx,lldy, choice_,&
        & ix, iy, ik, jx, jy, i, lld,&
-       & m, nrow, ncol, liwork, llwork, iiy, jjy
+       & m, nrow, ncol, liwork, llwork, iiy, jjy, idx, ndm
 
   character                :: lunitd
   integer, parameter       :: nb=4
@@ -421,7 +399,7 @@ subroutine  psb_dspsv(alpha,a,x,beta,y,desc_a,info,&
   logical                  :: aliw
 
   name='psb_dspsv'
-  if(psb_get_errstatus().ne.0) return 
+  if(psb_get_errstatus() /= 0) return 
   info=0
   call psb_erractionsave(err_act)
 
@@ -444,9 +422,9 @@ subroutine  psb_dspsv(alpha,a,x,beta,y,desc_a,info,&
   jy= 1
 
   if (present(choice)) then     
-    lchoice = choice
+    choice_ = choice
   else
-    lchoice = psb_avg_
+    choice_ = psb_avg_
   endif
 
   if (present(unitd)) then     
@@ -457,12 +435,8 @@ subroutine  psb_dspsv(alpha,a,x,beta,y,desc_a,info,&
 
   if (present(trans)) then     
     itrans = toupper(trans)
-    if((itrans.eq.'N').or.(itrans.eq.'T')) then
+    if((itrans == 'N').or.(itrans == 'T').or.(itrans == 'C')) then
       ! Ok
-    else if (itrans.eq.'C') then
-      info = 3020
-      call psb_errpush(info,name)
-      goto 9999
     else
       info = 70
       call psb_errpush(info,name)
@@ -475,11 +449,10 @@ subroutine  psb_dspsv(alpha,a,x,beta,y,desc_a,info,&
   m    = psb_cd_get_global_rows(desc_a)
   nrow = psb_cd_get_local_rows(desc_a)
   ncol = psb_cd_get_local_cols(desc_a)
-
   lldx = size(x)
   lldy = size(y)
 
-  if((lldx.lt.ncol).or.(lldy.lt.ncol)) then
+  if((lldx < ncol).or.(lldy < ncol)) then
     info=3010
     call psb_errpush(info,name)
     goto 9999
@@ -488,8 +461,6 @@ subroutine  psb_dspsv(alpha,a,x,beta,y,desc_a,info,&
   iwork => null()
   ! check for presence/size of a work area
   liwork= 2*ncol
-  if (a%pr(1) /= 0) llwork = liwork + m * ik
-  if (a%pl(1) /= 0) llwork = llwork + m * ik
 
   if (present(work)) then     
     if (size(work) >= liwork) then 
@@ -503,7 +474,7 @@ subroutine  psb_dspsv(alpha,a,x,beta,y,desc_a,info,&
 
   if (aliw) then 
     allocate(iwork(liwork),stat=info)
-    if(info.ne.0) then
+    if(info /= 0) then
       info=4010
       ch_err='psb_realloc'
       call psb_errpush(info,name,a_err=ch_err)
@@ -531,24 +502,24 @@ subroutine  psb_dspsv(alpha,a,x,beta,y,desc_a,info,&
        & call psb_chkvect(m,ik,size(x),ix,jx,desc_a,info,iix,jjx)
   if (info == 0)&
        & call psb_chkvect(m,ik,size(y),iy,jy,desc_a,info,iiy,jjy)
-  if(info.ne.0) then
+  if(info /= 0) then
     info=4010
     ch_err='psb_chkvect/mat'
     call psb_errpush(info,name,a_err=ch_err)
     goto 9999
   end if
 
-  if(ja.ne.ix) then
+  if(ja /= ix) then
     ! this case is not yet implemented
     info = 3030
   end if
 
-  if((iix.ne.1).or.(iiy.ne.1)) then
+  if((iix /= 1).or.(iiy /= 1)) then
     ! this case is not yet implemented
     info = 3040
   end if
 
-  if(info.ne.0) then
+  if(info /= 0) then
     call psb_errpush(info,name)
     goto 9999
   end if
@@ -558,7 +529,7 @@ subroutine  psb_dspsv(alpha,a,x,beta,y,desc_a,info,&
   yp => y(iiy:lldy)
   call psb_cssm(alpha,a,xp,beta,yp,info,unitd=lunitd,d=id,trans=itrans)
 
-  if(info.ne.0) then
+  if(info /= 0) then
     info = 4010
     ch_err='dcssm'
     call psb_errpush(info,name,a_err=ch_err)
@@ -566,36 +537,16 @@ subroutine  psb_dspsv(alpha,a,x,beta,y,desc_a,info,&
   end if
 
   ! update overlap elements
-  if(lchoice.gt.0) then
+  if (choice_ > 0) then
     call psi_swapdata(ior(psb_swap_send_,psb_swap_recv_),&
-         & done,yp,desc_a,iwork,info)
+         & done,yp,desc_a,iwork,info,data=psb_comm_ovr_)
 
-    i=0
-    ! switch on update type
-    select case (lchoice)
-    case(psb_square_root_)
-      do while(desc_a%ovrlap_elem(i).ne.-ione)
-        y(desc_a%ovrlap_elem(i+psb_ovrlp_elem_)) =&
-             & y(desc_a%ovrlap_elem(i+psb_ovrlp_elem_))/&
-             & sqrt(real(desc_a%ovrlap_elem(i+psb_n_dom_ovr_)))
-        i = i+2
-      end do
-    case(psb_avg_)
-      do while(desc_a%ovrlap_elem(i).ne.-ione)
-        y(desc_a%ovrlap_elem(i+psb_ovrlp_elem_)) =&
-             & y(desc_a%ovrlap_elem(i+psb_ovrlp_elem_))/&
-             & real(desc_a%ovrlap_elem(i+psb_n_dom_ovr_))
-        i = i+2
-      end do
-    case(psb_sum_)
-      ! do nothing
-    case default 
-      ! wrong value for choice argument
-      info = 70
-      int_err=(/10,lchoice,0,0,0/)
-      call psb_errpush(info,name,i_err=int_err)
+
+    if (info == 0) call psi_ovrl_upd(yp,desc_a,choice_,info)
+    if (info /= 0) then
+      call psb_errpush(4010,name,a_err='Inner updates')
       goto 9999
-    end select
+    end if
   end if
 
   if (aliw) deallocate(iwork)
@@ -607,7 +558,7 @@ subroutine  psb_dspsv(alpha,a,x,beta,y,desc_a,info,&
 9999 continue
   call psb_erractionrestore(err_act)
 
-  if (err_act.eq.psb_act_abort_) then
+  if (err_act == psb_act_abort_) then
     call psb_error(ictxt)
     return
   end if

@@ -164,7 +164,7 @@ subroutine psb_zrwextd(nr,a,info,b,rowscale)
 
 9999 continue
   call psb_erractionrestore(err_act)
-  if (err_act.eq.psb_act_abort_) then
+  if (err_act == psb_act_abort_) then
      call psb_error()
      return
   end if

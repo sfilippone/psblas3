@@ -139,7 +139,7 @@ subroutine psi_idx_ins_cnv1(nv,idxin,desc,info,mask)
 9999 continue
   call psb_erractionrestore(err_act)
 
-  if (err_act.eq.psb_act_ret_) then
+  if (err_act == psb_act_ret_) then
     return
   else
     call psb_error(ictxt)
@@ -332,7 +332,7 @@ subroutine psi_idx_ins_cnv2(nv,idxin,idxout,desc,info,mask)
           cycle
         endif
         k  = desc%glob_to_loc(ip)
-        if (k.lt.-np) then
+        if (k < -np) then
           k    = k + np
           k    = - k - 1
           ncol = ncol + 1      
@@ -352,7 +352,7 @@ subroutine psi_idx_ins_cnv2(nv,idxin,idxout,desc,info,mask)
           endif
           desc%loc_to_glob(ncol) = ip
           isize = size(desc%halo_index)
-          if ((pnt_halo+3).gt.isize) then
+          if ((pnt_halo+3) > isize) then
             nh = isize + max(nv,relocsz)
             call psb_realloc(nh,desc%halo_index,info,pad=-1)
             if (info /= 0) then
@@ -390,7 +390,7 @@ subroutine psi_idx_ins_cnv2(nv,idxin,idxout,desc,info,mask)
 9999 continue
   call psb_erractionrestore(err_act)
 
-  if (err_act.eq.psb_act_ret_) then
+  if (err_act == psb_act_ret_) then
     return
   else
     call psb_error(ictxt)

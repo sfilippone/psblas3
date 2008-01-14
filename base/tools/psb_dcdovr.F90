@@ -229,17 +229,16 @@ Subroutine psb_dcdovr(a,desc_a,novr,desc_ov,info, extype)
     call psb_errpush(4010,name,a_err='Allocate')
     goto 9999      
   end if
-  halo(:)                = desc_a%halo_index(:)
-  desc_ov%ovrlap_elem(:) = -1
-  tmp_ovr_idx(:)         = -1
-  orig_ovr(:)            = -1
-  tmp_halo(:)            = -1
-  counter_e              = 1
-  tot_recv               = 0
-  counter_t              = 1
-  counter_h              = 1
-  counter_o              = 1
-  cntov_o                = 1
+  halo(:)         = desc_a%halo_index(:)
+  tmp_ovr_idx(:)  = -1
+  orig_ovr(:)     = -1
+  tmp_halo(:)     = -1
+  counter_e       = 1
+  tot_recv        = 0
+  counter_t       = 1
+  counter_h       = 1
+  counter_o       = 1
+  cntov_o         = 1
   ! Init overlap with desc_a%ovrlap (if any) 
   counter = 1
   Do While (desc_a%ovrlap_index(counter) /= -1)
@@ -388,7 +387,8 @@ Subroutine psb_dcdovr(a,desc_a,novr,desc_ov,info, extype)
 
       Enddo
       if (debug_level >= psb_debug_outer_) &
-           & write(debug_unit,*) me,' ',trim(name),':Checktmp_o_i Loop Mid1',tmp_ovr_idx(1:10)
+           & write(debug_unit,*) me,' ',trim(name),&
+           & ':Checktmp_o_i Loop Mid1',tmp_ovr_idx(1:10)
       counter   = counter+n_elem_recv
 
       !
@@ -462,16 +462,19 @@ Subroutine psb_dcdovr(a,desc_a,novr,desc_ov,info, extype)
           tot_elem=i
         endif
         if (debug_level >= psb_debug_outer_) &
-             & write(debug_unit,*) me,' ',trim(name),':Checktmp_o_i Loop Mid2',tmp_ovr_idx(1:10)
+             & write(debug_unit,*) me,' ',trim(name),&
+             & ':Checktmp_o_i Loop Mid2',tmp_ovr_idx(1:10)
         sdsz(proc+1) = tot_elem
         idxs         = idxs + tot_elem
       end if
       counter   = counter+n_elem_send+3
       if (debug_level >= psb_debug_outer_) &
-           & write(debug_unit,*) me,' ',trim(name),':Checktmp_o_i Loop End',tmp_ovr_idx(1:10)
+           & write(debug_unit,*) me,' ',trim(name),&
+           & ':Checktmp_o_i Loop End',tmp_ovr_idx(1:10)
     Enddo
     if (debug_level >= psb_debug_outer_) &
-         & write(debug_unit,*) me,' ',trim(name),':End phase 1', m, n_col, tot_recv
+         & write(debug_unit,*) me,' ',trim(name),&
+         & ':End phase 1', m, n_col, tot_recv
 
     if (i_ovr <= novr) then
       ! 
@@ -549,7 +552,7 @@ Subroutine psb_dcdovr(a,desc_a,novr,desc_ov,info, extype)
         ! owned the rows from the beginning!
         !
         call psi_fnd_owner(iszs,works,temp,desc_a,info)
-        n_col=psb_cd_get_local_cols(desc_ov)
+        n_col = psb_cd_get_local_cols(desc_ov)
 
         do i=1,iszs
           idx = works(i)

@@ -708,13 +708,13 @@ contains
           j=0
           blkfnd_gtl: do
             j=j+1
-            if(ia1(j).eq.indices(i)) then
+            if(ia1(j) == indices(i)) then
               blks(i)=j
               ipx = ia1(j)         ! the first row index of the block
               rb  = indices(i)-ipx   ! the row offset within the block
               row = ia3(j)+rb
               exit blkfnd_gtl
-            else if(ia1(j).gt.indices(i)) then
+            else if(ia1(j) > indices(i)) then
               blks(i)=j-1
               ipx = ia1(j-1)         ! the first row index of the block
               rb  = indices(i)-ipx   ! the row offset within the block
@@ -800,13 +800,13 @@ contains
           j=0
           blkfnd: do
             j=j+1
-            if(ia1(j).eq.indices(i)) then
+            if(ia1(j) == indices(i)) then
               blks(i)=j
               ipx = ia1(j)         ! the first row index of the block
               rb  = indices(i)-ipx   ! the row offset within the block
               row = ia3(j)+rb
               exit blkfnd
-            else if(ia1(j).gt.indices(i)) then
+            else if(ia1(j) > indices(i)) then
               blks(i)=j-1
               ipx = ia1(j-1)         ! the first row index of the block
               rb  = indices(i)-ipx   ! the row offset within the block
@@ -1424,13 +1424,13 @@ contains
           j=0
           blkfnd_gtl: do
             j=j+1
-            if(ia1(j).eq.indices(i)) then
+            if(ia1(j) == indices(i)) then
               blks(i)=j
               ipx = ia1(j)         ! the first row index of the block
               rb  = indices(i)-ipx   ! the row offset within the block
               row = ia3(j)+rb
               exit blkfnd_gtl
-            else if(ia1(j).gt.indices(i)) then
+            else if(ia1(j) > indices(i)) then
               blks(i)=j-1
               ipx = ia1(j-1)         ! the first row index of the block
               rb  = indices(i)-ipx   ! the row offset within the block
@@ -1516,13 +1516,13 @@ contains
           j=0
           blkfnd: do
             j=j+1
-            if(ia1(j).eq.indices(i)) then
+            if(ia1(j) == indices(i)) then
               blks(i)=j
               ipx = ia1(j)         ! the first row index of the block
               rb  = indices(i)-ipx   ! the row offset within the block
               row = ia3(j)+rb
               exit blkfnd
-            else if(ia1(j).gt.indices(i)) then
+            else if(ia1(j) > indices(i)) then
               blks(i)=j-1
               ipx = ia1(j-1)         ! the first row index of the block
               rb  = indices(i)-ipx   ! the row offset within the block

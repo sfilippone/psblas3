@@ -47,6 +47,7 @@ subroutine psb_cdalv(v, ictxt, desc_a, info, flag)
   use psb_serial_mod
   use psb_const_mod
   use psb_error_mod
+  use psi_mod
   use psb_penv_mod
   implicit None
   !....Parameters...
@@ -60,7 +61,7 @@ subroutine psb_cdalv(v, ictxt, desc_a, info, flag)
        & loc_col,nprocs,m,n,itmpov, k,glx,&
        & l_ov_ix,l_ov_el,idx, flag_, err_act
   integer             :: int_err(5),exch(3)
-  Integer, allocatable  :: temp_ovrlap(:), ov_idx(:),ov_el(:)
+  Integer, allocatable  :: temp_ovrlap(:)
   integer              :: debug_level, debug_unit
   character(len=20)   :: name
 
@@ -230,15 +231,6 @@ subroutine psb_cdalv(v, ictxt, desc_a, info, flag)
         call SearchInsKeyVal(desc_a%ptree,i,k,glx,info)
       endif
     enddo
-    if (k /= loc_row) then 
-      write(0,*) 'Large cd init: ',k,loc_row
-    end if
-
-    if (info /= 0) then 
-      info=4000
-      call psb_errpush(info,name)
-      goto 9999
-    endif
 
   else 
 
@@ -301,66 +293,15 @@ subroutine psb_cdalv(v, ictxt, desc_a, info, flag)
     desc_a%loc_to_glob(:) = -1
     do i=1,m
       k = desc_a%glob_to_loc(i) 
-      if (k.gt.0) then 
+      if (k > 0) then 
         desc_a%loc_to_glob(k) = i
       endif
     enddo
 
   end if
+  
+  call psi_bld_tmpovrl(temp_ovrlap,desc_a,info)
 
-  l_ov_ix=0
-  l_ov_el=0
-  i = 1
-  do while (temp_ovrlap(i) /= -1) 
-    idx = temp_ovrlap(i)
-    i=i+1
-    nprocs = temp_ovrlap(i)
-    i = i + 1
-    l_ov_ix = l_ov_ix+3*(nprocs-1)
-    l_ov_el = l_ov_el + 2
-    i = i + nprocs     
-  enddo
-
-  l_ov_ix = l_ov_ix+3  
-  l_ov_el = l_ov_el+3
-
-  if (debug_level >= psb_debug_ext_) &
-       & write(debug_unit,*) me,' ',trim(name),': Ov len',l_ov_ix,l_ov_el
-  allocate(ov_idx(l_ov_ix),ov_el(l_ov_el), stat=info)
-  if (info /= 0) then
-    info=4025
-    int_err(1)=l_ov_ix
-    call psb_errpush(info,name,i_err=int_err,a_err='integer')
-    goto 9999
-  end if
-
-  l_ov_ix=0
-  l_ov_el=0
-  i = 1
-  do while (temp_ovrlap(i) /= -1) 
-    idx = temp_ovrlap(i)
-    i   = i+1
-    nprocs = temp_ovrlap(i)
-    ov_el(l_ov_el+1)  = idx
-    ov_el(l_ov_el+2)  = nprocs
-    l_ov_el           = l_ov_el+2
-    do j=1, nprocs
-      if (temp_ovrlap(i+j) /= me) then
-        ov_idx(l_ov_ix+1) = temp_ovrlap(i+j)
-        ov_idx(l_ov_ix+2) = 1
-        ov_idx(l_ov_ix+3) = idx
-        l_ov_ix = l_ov_ix+3
-      endif
-    enddo
-    i = i + nprocs +1
-  enddo
-  l_ov_el         = l_ov_el + 1
-  ov_el(l_ov_el)  = -1
-  l_ov_ix         = l_ov_ix + 1
-  ov_idx(l_ov_ix) = -1
-
-  call psb_transfer(ov_idx,desc_a%ovrlap_index,info) 
-  if (info == 0) call psb_transfer(ov_el,desc_a%ovrlap_elem,info)
   deallocate(temp_ovrlap,stat=info)
   if (info /= 0) then 
     info=4000

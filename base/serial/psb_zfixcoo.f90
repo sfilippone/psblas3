@@ -84,17 +84,17 @@ Subroutine psb_zfixcoo(a,info,idir)
   case(0) !  Row major order
 
     call msort_up(nza,a%ia1(1),iaux(1),iret)
-    if (iret.eq.0) call zreordvn(nza,a%aspk(1),a%ia1(1),a%ia2(1),iaux(1))
+    if (iret == 0) call zreordvn(nza,a%aspk(1),a%ia1(1),a%ia2(1),iaux(1))
     i    = 1
     j    = i
-    do while (i.le.nza)
-      do while ((a%ia1(j).eq.a%ia1(i)))
+    do while (i <= nza)
+      do while ((a%ia1(j) == a%ia1(i)))
         j = j+1
         if (j > nza) exit
       enddo
       nzl = j - i
       call msort_up(nzl,a%ia2(i),iaux(1),iret)
-      if (iret.eq.0) &
+      if (iret == 0) &
            & call zreordvn(nzl,a%aspk(i),a%ia1(i),a%ia2(i),iaux(1))
       i = j
     enddo
@@ -165,17 +165,17 @@ Subroutine psb_zfixcoo(a,info,idir)
   case(1) !  Col major order
 
     call msort_up(nza,a%ia2(1),iaux(1),iret)
-    if (iret.eq.0) call zreordvn(nza,a%aspk(1),a%ia1(1),a%ia2(1),iaux(1))
+    if (iret == 0) call zreordvn(nza,a%aspk(1),a%ia1(1),a%ia2(1),iaux(1))
     i    = 1
     j    = i
-    do while (i.le.nza)
-      do while ((a%ia2(j).eq.a%ia2(i)))
+    do while (i <= nza)
+      do while ((a%ia2(j) == a%ia2(i)))
         j = j+1
         if (j > nza) exit
       enddo
       nzl = j - i
       call msort_up(nzl,a%ia1(i),iaux(1),iret)
-      if (iret.eq.0) &
+      if (iret == 0) &
            & call zreordvn(nzl,a%aspk(i),a%ia1(i),a%ia2(i),iaux(1))
       i = j
     enddo
@@ -254,7 +254,7 @@ Subroutine psb_zfixcoo(a,info,idir)
 
 9999 continue
   call psb_erractionrestore(err_act)
-  if (err_act.eq.psb_act_abort_) then
+  if (err_act == psb_act_abort_) then
     call psb_error()
     return
   end if

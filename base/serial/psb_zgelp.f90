@@ -104,7 +104,7 @@ subroutine psb_zgelp(trans,iperm,x,info)
 
 
   call zgelp(trans,i1sz,i2sz,itemp,x,i1sz,dtemp,i1sz,info)
-  if(info.ne.0) then
+  if(info /= 0) then
     info=4010
     ch_err='zgelp'
     call psb_errpush(info,name,a_err=ch_err)
@@ -237,7 +237,7 @@ subroutine psb_zgelpv(trans,iperm,x,info)
 
 
   call zgelp(trans,i1sz,1,itemp,x,i1sz,dtemp,i1sz,info)
-  if(info.ne.0) then
+  if(info /= 0) then
     info=4010
     ch_err='zgelp'
     call psb_errpush(info,name,a_err=ch_err)

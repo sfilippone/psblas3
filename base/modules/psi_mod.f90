@@ -32,41 +32,41 @@
 module psi_mod
 
   interface
-     subroutine psi_compute_size(desc_data,&
-          & index_in, dl_lda, info)
-       integer  :: info, dl_lda
-       integer  :: desc_data(:), index_in(:)
-     end subroutine psi_compute_size
+    subroutine psi_compute_size(desc_data,&
+         & index_in, dl_lda, info)
+      integer  :: info, dl_lda
+      integer  :: desc_data(:), index_in(:)
+    end subroutine psi_compute_size
   end interface
 
   interface
-     subroutine psi_crea_bnd_elem(bndel,desc_a,info)
-       use psb_descriptor_type
-       integer, allocatable            :: bndel(:)
-       type(psb_desc_type), intent(in) :: desc_a
-       integer, intent(out)            :: info
-     end subroutine psi_crea_bnd_elem
+    subroutine psi_crea_bnd_elem(bndel,desc_a,info)
+      use psb_descriptor_type
+      integer, allocatable            :: bndel(:)
+      type(psb_desc_type), intent(in) :: desc_a
+      integer, intent(out)            :: info
+    end subroutine psi_crea_bnd_elem
   end interface
 
   interface
-     subroutine psi_crea_index(desc_a,index_in,index_out,glob_idx,nxch,nsnd,nrcv,info)
-       use psb_descriptor_type
-       type(psb_desc_type), intent(in)     :: desc_a
-       integer, intent(out)                :: info,nxch,nsnd,nrcv
-       integer, intent(in)                 :: index_in(:)
-       integer, allocatable, intent(inout) :: index_out(:)
-       logical                             :: glob_idx
-     end subroutine psi_crea_index
+    subroutine psi_crea_index(desc_a,index_in,index_out,glob_idx,nxch,nsnd,nrcv,info)
+      use psb_descriptor_type
+      type(psb_desc_type), intent(in)     :: desc_a
+      integer, intent(out)                :: info,nxch,nsnd,nrcv
+      integer, intent(in)                 :: index_in(:)
+      integer, allocatable, intent(inout) :: index_out(:)
+      logical                             :: glob_idx
+    end subroutine psi_crea_index
   end interface
 
   interface
-     subroutine psi_crea_ovr_elem(desc_overlap,ovr_elem,info)
-       integer :: desc_overlap(:)
-       integer, allocatable, intent(inout) :: ovr_elem(:)
-       integer, intent(out)                :: info
-     end subroutine psi_crea_ovr_elem
+    subroutine psi_crea_ovr_elem(me,desc_overlap,ovr_elem,info)
+      integer, intent(in)               :: me, desc_overlap(:)
+      integer, allocatable, intent(out) :: ovr_elem(:,:)
+      integer, intent(out)              :: info
+    end subroutine psi_crea_ovr_elem
   end interface
-  
+
   interface
     subroutine psi_desc_index(desc,index_in,dep_list,&
          & length_dl,nsnd,nrcv,desc_index,isglob_in,info)
@@ -78,7 +78,7 @@ module psi_mod
       logical         :: isglob_in
     end subroutine psi_desc_index
   end interface
-  
+
   interface
     subroutine psi_dl_check(dep_list,dl_lda,np,length_dl)
       integer  :: np,dl_lda,length_dl(0:np)
@@ -87,126 +87,118 @@ module psi_mod
   end interface
 
   interface
-     subroutine psi_sort_dl(dep_list,l_dep_list,np,info)
-       integer :: np,dep_list(:,:), l_dep_list(:), info
-     end subroutine psi_sort_dl
+    subroutine psi_sort_dl(dep_list,l_dep_list,np,info)
+      integer :: np,dep_list(:,:), l_dep_list(:), info
+    end subroutine psi_sort_dl
   end interface
 
   interface psi_swapdata
-     subroutine psi_dswapdatam(flag,n,beta,y,desc_a,work,info,data)
-       use psb_descriptor_type
-       integer, intent(in)  :: flag, n
-       integer, intent(out) :: info
-       real(kind(1.d0))     :: y(:,:), beta
-       real(kind(1.d0)),target      :: work(:)
-       type(psb_desc_type), target  :: desc_a
-       integer, optional    :: data
-     end subroutine psi_dswapdatam
-     subroutine psi_dswapdatav(flag,beta,y,desc_a,work,info,data)
-       use psb_descriptor_type
-       integer, intent(in)  :: flag
-       integer, intent(out) :: info
-       real(kind(1.d0))     :: y(:), beta 
-       real(kind(1.d0)),target      :: work(:)
-       type(psb_desc_type), target  :: desc_a
-       integer, optional    :: data
-     end subroutine psi_dswapdatav
-     subroutine psi_iswapdatam(flag,n,beta,y,desc_a,work,info,data)
-       use psb_descriptor_type
-       integer, intent(in)  :: flag, n
-       integer, intent(out) :: info
-       integer              :: y(:,:), beta
-       integer, target              :: work(:)
-       type(psb_desc_type), target  :: desc_a
-       integer, optional    :: data
-     end subroutine psi_iswapdatam
-     subroutine psi_iswapdatav(flag,beta,y,desc_a,work,info,data)
-       use psb_descriptor_type
-       integer, intent(in)  :: flag
-       integer, intent(out) :: info
-       integer              :: y(:), beta
-       integer, target              :: work(:)
-       type(psb_desc_type), target  :: desc_a
-       integer, optional    :: data
-     end subroutine psi_iswapdatav
-     subroutine psi_zswapdatam(flag,n,beta,y,desc_a,work,info,data)
-       use psb_descriptor_type
-       integer, intent(in)  :: flag, n
-       integer, intent(out) :: info
-       complex(kind(1.d0))     :: y(:,:), beta
-       complex(kind(1.d0)),target   :: work(:)
-       type(psb_desc_type), target  :: desc_a
-       integer, optional    :: data
-     end subroutine psi_zswapdatam
-     subroutine psi_zswapdatav(flag,beta,y,desc_a,work,info,data)
-       use psb_descriptor_type
-       integer, intent(in)  :: flag
-       integer, intent(out) :: info
-       complex(kind(1.d0))     :: y(:), beta
-       complex(kind(1.d0)),target   :: work(:)
-       type(psb_desc_type), target  :: desc_a
-       integer, optional    :: data
-     end subroutine psi_zswapdatav
+    subroutine psi_dswapdatam(flag,n,beta,y,desc_a,work,info,data)
+      use psb_descriptor_type
+      integer, intent(in)  :: flag, n
+      integer, intent(out) :: info
+      real(kind(1.d0))     :: y(:,:), beta
+      real(kind(1.d0)),target      :: work(:)
+      type(psb_desc_type), target  :: desc_a
+      integer, optional    :: data
+    end subroutine psi_dswapdatam
+    subroutine psi_dswapdatav(flag,beta,y,desc_a,work,info,data)
+      use psb_descriptor_type
+      integer, intent(in)  :: flag
+      integer, intent(out) :: info
+      real(kind(1.d0))     :: y(:), beta 
+      real(kind(1.d0)),target      :: work(:)
+      type(psb_desc_type), target  :: desc_a
+      integer, optional    :: data
+    end subroutine psi_dswapdatav
+    subroutine psi_iswapdatam(flag,n,beta,y,desc_a,work,info,data)
+      use psb_descriptor_type
+      integer, intent(in)  :: flag, n
+      integer, intent(out) :: info
+      integer              :: y(:,:), beta
+      integer, target              :: work(:)
+      type(psb_desc_type), target  :: desc_a
+      integer, optional    :: data
+    end subroutine psi_iswapdatam
+    subroutine psi_iswapdatav(flag,beta,y,desc_a,work,info,data)
+      use psb_descriptor_type
+      integer, intent(in)  :: flag
+      integer, intent(out) :: info
+      integer              :: y(:), beta
+      integer, target              :: work(:)
+      type(psb_desc_type), target  :: desc_a
+      integer, optional    :: data
+    end subroutine psi_iswapdatav
+    subroutine psi_zswapdatam(flag,n,beta,y,desc_a,work,info,data)
+      use psb_descriptor_type
+      integer, intent(in)  :: flag, n
+      integer, intent(out) :: info
+      complex(kind(1.d0))     :: y(:,:), beta
+      complex(kind(1.d0)),target   :: work(:)
+      type(psb_desc_type), target  :: desc_a
+      integer, optional    :: data
+    end subroutine psi_zswapdatam
+    subroutine psi_zswapdatav(flag,beta,y,desc_a,work,info,data)
+      use psb_descriptor_type
+      integer, intent(in)  :: flag
+      integer, intent(out) :: info
+      complex(kind(1.d0))     :: y(:), beta
+      complex(kind(1.d0)),target   :: work(:)
+      type(psb_desc_type), target  :: desc_a
+      integer, optional    :: data
+    end subroutine psi_zswapdatav
   end interface
 
 
   interface psi_swaptran
-     subroutine psi_dswaptranm(flag,n,beta,y,desc_a,work,info)
-       use psb_descriptor_type
-       integer, intent(in)  :: flag, n
-       integer, intent(out) :: info
-       real(kind(1.d0))     :: y(:,:), beta
-       real(kind(1.d0)),target     :: work(:)
-       type(psb_desc_type), target  :: desc_a
-     end subroutine psi_dswaptranm
-     subroutine psi_dswaptranv(flag,beta,y,desc_a,work,info)
-       use psb_descriptor_type
-       integer, intent(in)  :: flag
-       integer, intent(out) :: info
-       real(kind(1.d0))     :: y(:), beta
-       real(kind(1.d0)),target     :: work(:)
-       type(psb_desc_type), target  :: desc_a
-     end subroutine psi_dswaptranv
-     subroutine psi_iswaptranm(flag,n,beta,y,desc_a,work,info)
-       use psb_descriptor_type
-       integer, intent(in)  :: flag, n
-       integer, intent(out) :: info
-       integer              :: y(:,:), beta
-       integer,target               :: work(:)
-       type(psb_desc_type), target  :: desc_a
-     end subroutine psi_iswaptranm
-     subroutine psi_iswaptranv(flag,beta,y,desc_a,work,info)
-       use psb_descriptor_type
-       integer, intent(in)  :: flag
-       integer, intent(out) :: info
-       integer              :: y(:), beta
-       integer,target               :: work(:)
-       type(psb_desc_type), target  :: desc_a
-     end subroutine psi_iswaptranv
-     subroutine psi_zswaptranm(flag,n,beta,y,desc_a,work,info)
-       use psb_descriptor_type
-       integer, intent(in)  :: flag, n
-       integer, intent(out) :: info
-       complex(kind(1.d0))     :: y(:,:), beta
-       complex(kind(1.d0)),target   :: work(:)
-       type(psb_desc_type), target  :: desc_a
-     end subroutine psi_zswaptranm
-     subroutine psi_zswaptranv(flag,beta,y,desc_a,work,info)
-       use psb_descriptor_type
-       integer, intent(in)  :: flag
-       integer, intent(out) :: info
-       complex(kind(1.d0))     :: y(:), beta
-       complex(kind(1.d0)),target   :: work(:)       
-       type(psb_desc_type), target  :: desc_a
-     end subroutine psi_zswaptranv
-   end interface
-
-  interface psi_cnv_dsc
-    module procedure psi_cnv_dsc
-  end interface
-
-  interface psi_inner_cnv
-    module procedure psi_inner_cnv1, psi_inner_cnv2
+    subroutine psi_dswaptranm(flag,n,beta,y,desc_a,work,info)
+      use psb_descriptor_type
+      integer, intent(in)  :: flag, n
+      integer, intent(out) :: info
+      real(kind(1.d0))     :: y(:,:), beta
+      real(kind(1.d0)),target     :: work(:)
+      type(psb_desc_type), target  :: desc_a
+    end subroutine psi_dswaptranm
+    subroutine psi_dswaptranv(flag,beta,y,desc_a,work,info)
+      use psb_descriptor_type
+      integer, intent(in)  :: flag
+      integer, intent(out) :: info
+      real(kind(1.d0))     :: y(:), beta
+      real(kind(1.d0)),target     :: work(:)
+      type(psb_desc_type), target  :: desc_a
+    end subroutine psi_dswaptranv
+    subroutine psi_iswaptranm(flag,n,beta,y,desc_a,work,info)
+      use psb_descriptor_type
+      integer, intent(in)  :: flag, n
+      integer, intent(out) :: info
+      integer              :: y(:,:), beta
+      integer,target               :: work(:)
+      type(psb_desc_type), target  :: desc_a
+    end subroutine psi_iswaptranm
+    subroutine psi_iswaptranv(flag,beta,y,desc_a,work,info)
+      use psb_descriptor_type
+      integer, intent(in)  :: flag
+      integer, intent(out) :: info
+      integer              :: y(:), beta
+      integer,target               :: work(:)
+      type(psb_desc_type), target  :: desc_a
+    end subroutine psi_iswaptranv
+    subroutine psi_zswaptranm(flag,n,beta,y,desc_a,work,info)
+      use psb_descriptor_type
+      integer, intent(in)  :: flag, n
+      integer, intent(out) :: info
+      complex(kind(1.d0))     :: y(:,:), beta
+      complex(kind(1.d0)),target   :: work(:)
+      type(psb_desc_type), target  :: desc_a
+    end subroutine psi_zswaptranm
+    subroutine psi_zswaptranv(flag,beta,y,desc_a,work,info)
+      use psb_descriptor_type
+      integer, intent(in)  :: flag
+      integer, intent(out) :: info
+      complex(kind(1.d0))     :: y(:), beta
+      complex(kind(1.d0)),target   :: work(:)       
+      type(psb_desc_type), target  :: desc_a
+    end subroutine psi_zswaptranv
   end interface
 
   interface
@@ -217,100 +209,138 @@ module psi_mod
     end subroutine psi_extract_dep_list
   end interface
   interface psi_fnd_owner
-     subroutine psi_fnd_owner(nv,idx,iprc,desc,info)
-       use psb_descriptor_type
-       integer, intent(in) :: nv
-       integer, intent(in) ::  idx(:)
-       integer, allocatable, intent(out) ::  iprc(:)
-       type(psb_desc_type), intent(in) :: desc
-       integer, intent(out) :: info
-     end subroutine psi_fnd_owner
-   end interface
-  
+    subroutine psi_fnd_owner(nv,idx,iprc,desc,info)
+      use psb_descriptor_type
+      integer, intent(in) :: nv
+      integer, intent(in) ::  idx(:)
+      integer, allocatable, intent(out) ::  iprc(:)
+      type(psb_desc_type), intent(in) :: desc
+      integer, intent(out) :: info
+    end subroutine psi_fnd_owner
+  end interface
+
   interface psi_ldsc_pre_halo
-     subroutine psi_ldsc_pre_halo(desc,ext_hv,info)
-       use psb_descriptor_type
-       type(psb_desc_type), intent(inout) :: desc
-       logical, intent(in)  :: ext_hv
-       integer, intent(out) :: info
-     end subroutine psi_ldsc_pre_halo
-   end interface
-  
+    subroutine psi_ldsc_pre_halo(desc,ext_hv,info)
+      use psb_descriptor_type
+      type(psb_desc_type), intent(inout) :: desc
+      logical, intent(in)  :: ext_hv
+      integer, intent(out) :: info
+    end subroutine psi_ldsc_pre_halo
+  end interface
+
   interface psi_bld_hash
-     subroutine psi_bld_hash(desc,info)
-       use psb_descriptor_type
-       type(psb_desc_type), intent(inout) :: desc
-       integer, intent(out) :: info
-     end subroutine psi_bld_hash
-   end interface
-  
+    subroutine psi_bld_hash(desc,info)
+      use psb_descriptor_type
+      type(psb_desc_type), intent(inout) :: desc
+      integer, intent(out) :: info
+    end subroutine psi_bld_hash
+  end interface
+
   interface psi_bld_tmphalo
-     subroutine psi_bld_tmphalo(desc,info)
-       use psb_descriptor_type
-       type(psb_desc_type), intent(inout) :: desc
-       integer, intent(out) :: info
-     end subroutine psi_bld_tmphalo
-   end interface
+    subroutine psi_bld_tmphalo(desc,info)
+      use psb_descriptor_type
+      type(psb_desc_type), intent(inout) :: desc
+      integer, intent(out) :: info
+    end subroutine psi_bld_tmphalo
+  end interface
+
+
+  interface psi_bld_tmpovrl
+    subroutine psi_bld_tmpovrl(iv,desc,info)
+      use psb_descriptor_type
+      integer, intent(in)  :: iv(:)
+      type(psb_desc_type), intent(inout) :: desc
+      integer, intent(out) :: info
+    end subroutine psi_bld_tmpovrl
+  end interface
+
 
   interface psi_idx_cnv
-     subroutine psi_idx_cnv1(nv,idxin,desc,info,mask,owned)
-       use psb_descriptor_type
-       integer, intent(in)    :: nv
-       integer, intent(inout) ::  idxin(:)
-       type(psb_desc_type), intent(in) :: desc
-       integer, intent(out) :: info
-       logical, intent(in), optional, target :: mask(:)
-       logical, intent(in), optional :: owned
-     end subroutine psi_idx_cnv1
-     subroutine psi_idx_cnv2(nv,idxin,idxout,desc,info,mask,owned)
-       use psb_descriptor_type
-       integer, intent(in)  :: nv, idxin(:)
-       integer, intent(out) :: idxout(:)
-       type(psb_desc_type), intent(in) :: desc
-       integer, intent(out) :: info
-       logical, intent(in), optional, target :: mask(:)
-       logical, intent(in), optional :: owned
-     end subroutine psi_idx_cnv2
-     subroutine psi_idx_cnvs(idxin,idxout,desc,info,mask,owned)
-       use psb_descriptor_type
-       integer, intent(in)  :: idxin
-       integer, intent(out) :: idxout
-       type(psb_desc_type), intent(in) :: desc
-       integer, intent(out) :: info
-       logical, intent(in), optional, target :: mask
-       logical, intent(in), optional :: owned
-     end subroutine psi_idx_cnvs
+    subroutine psi_idx_cnv1(nv,idxin,desc,info,mask,owned)
+      use psb_descriptor_type
+      integer, intent(in)    :: nv
+      integer, intent(inout) ::  idxin(:)
+      type(psb_desc_type), intent(in) :: desc
+      integer, intent(out) :: info
+      logical, intent(in), optional, target :: mask(:)
+      logical, intent(in), optional :: owned
+    end subroutine psi_idx_cnv1
+    subroutine psi_idx_cnv2(nv,idxin,idxout,desc,info,mask,owned)
+      use psb_descriptor_type
+      integer, intent(in)  :: nv, idxin(:)
+      integer, intent(out) :: idxout(:)
+      type(psb_desc_type), intent(in) :: desc
+      integer, intent(out) :: info
+      logical, intent(in), optional, target :: mask(:)
+      logical, intent(in), optional :: owned
+    end subroutine psi_idx_cnv2
+    subroutine psi_idx_cnvs(idxin,idxout,desc,info,mask,owned)
+      use psb_descriptor_type
+      integer, intent(in)  :: idxin
+      integer, intent(out) :: idxout
+      type(psb_desc_type), intent(in) :: desc
+      integer, intent(out) :: info
+      logical, intent(in), optional, target :: mask
+      logical, intent(in), optional :: owned
+    end subroutine psi_idx_cnvs
   end interface
 
   interface psi_idx_ins_cnv
-     subroutine psi_idx_ins_cnv1(nv,idxin,desc,info,mask)
-       use psb_descriptor_type
-       integer, intent(in)    :: nv
-       integer, intent(inout) ::  idxin(:)
-       type(psb_desc_type), intent(inout) :: desc
-       integer, intent(out) :: info
-       logical, intent(in), optional, target :: mask(:)
-     end subroutine psi_idx_ins_cnv1
-     subroutine psi_idx_ins_cnv2(nv,idxin,idxout,desc,info,mask)
-       use psb_descriptor_type
-       integer, intent(in)  :: nv, idxin(:)
-       integer, intent(out) :: idxout(:)
-       type(psb_desc_type), intent(inout) :: desc
-       integer, intent(out) :: info
-       logical, intent(in), optional, target :: mask(:)
-     end subroutine psi_idx_ins_cnv2
-     subroutine psi_idx_ins_cnvs(idxin,idxout,desc,info,mask)
-       use psb_descriptor_type
-       integer, intent(in)  :: idxin
-       integer, intent(out) :: idxout
-       type(psb_desc_type), intent(inout) :: desc
-       integer, intent(out) :: info
-       logical, intent(in), optional, target :: mask
-     end subroutine psi_idx_ins_cnvs
+    subroutine psi_idx_ins_cnv1(nv,idxin,desc,info,mask)
+      use psb_descriptor_type
+      integer, intent(in)    :: nv
+      integer, intent(inout) ::  idxin(:)
+      type(psb_desc_type), intent(inout) :: desc
+      integer, intent(out) :: info
+      logical, intent(in), optional, target :: mask(:)
+    end subroutine psi_idx_ins_cnv1
+    subroutine psi_idx_ins_cnv2(nv,idxin,idxout,desc,info,mask)
+      use psb_descriptor_type
+      integer, intent(in)  :: nv, idxin(:)
+      integer, intent(out) :: idxout(:)
+      type(psb_desc_type), intent(inout) :: desc
+      integer, intent(out) :: info
+      logical, intent(in), optional, target :: mask(:)
+    end subroutine psi_idx_ins_cnv2
+    subroutine psi_idx_ins_cnvs(idxin,idxout,desc,info,mask)
+      use psb_descriptor_type
+      integer, intent(in)  :: idxin
+      integer, intent(out) :: idxout
+      type(psb_desc_type), intent(inout) :: desc
+      integer, intent(out) :: info
+      logical, intent(in), optional, target :: mask
+    end subroutine psi_idx_ins_cnvs
   end interface
 
+  interface psi_cnv_dsc
+    module procedure psi_cnv_dsc
+  end interface
+
+  interface psi_inner_cnv
+    module procedure psi_inner_cnv1, psi_inner_cnv2
+  end interface
+
+  interface psi_ovrl_upd
+    module procedure psi_iovrl_updr1, psi_iovrl_updr2,&
+         & psi_dovrl_updr1, psi_dovrl_updr2, &
+         & psi_zovrl_updr1, psi_zovrl_updr2
+  end interface
+
+  interface psi_gth
+    module procedure psi_igthm, psi_igthv,&
+         & psi_dgthm, psi_dgthv,&
+         & psi_zgthm, psi_zgthv
+  end interface
+
+  interface psi_sct
+    module procedure psi_isctm, psi_isctv,&
+         & psi_dsctm, psi_dsctv,&
+         & psi_zsctm, psi_zsctv
+  end interface
+
+
 contains
-  
+
   subroutine psi_cnv_dsc(halo_in,ovrlap_in,ext_in,cdesc, info)
 
     use psb_const_mod
@@ -321,13 +351,13 @@ contains
     implicit none
 
     !     ....scalars parameters....
-    integer, intent(in)  :: halo_in(:), ovrlap_in(:),ext_in(:)
+    integer, intent(in)                :: halo_in(:), ovrlap_in(:),ext_in(:)
     type(psb_desc_type), intent(inout) :: cdesc
-    integer, intent(out)  :: info
+    integer, intent(out)               :: info
 
     !     ....local scalars....      
     integer  :: np,me
-    integer  :: ictxt, err_act,nxch,nsnd,nrcv
+    integer  :: ictxt, err_act,nxch,nsnd,nrcv,j,k
     !     ...local array...
     integer, allocatable  :: idx_out(:)
 
@@ -363,7 +393,7 @@ contains
     cdesc%matrix_data(psb_thal_xch_) = nxch
     cdesc%matrix_data(psb_thal_snd_) = nsnd
     cdesc%matrix_data(psb_thal_rcv_) = nrcv 
-    
+
     if (debug_level>0) write(debug_unit,*) me,'Done crea_index on halo'
     if (debug_level>0) write(debug_unit,*) me,'Calling crea_index on ext'
 
@@ -379,12 +409,11 @@ contains
     cdesc%matrix_data(psb_text_xch_) = nxch
     cdesc%matrix_data(psb_text_snd_) = nsnd
     cdesc%matrix_data(psb_text_rcv_) = nrcv 
-    
+
     if (debug_level>0) write(debug_unit,*) me,'Done crea_index on ext'
     if (debug_level>0) write(debug_unit,*) me,'Calling crea_index on ovrlap'
 
     ! then the overlap index
-
     call psi_crea_index(cdesc,ovrlap_in, idx_out,.true.,nxch,nsnd,nrcv,info)
     if(info /= 0) then
       call psb_errpush(4010,name,a_err='psi_crea_index')
@@ -402,7 +431,7 @@ contains
 
     if (debug_level>0) write(debug_unit,*) me,'Calling crea_ovr_elem'
     ! next  ovrlap_elem 
-    call psi_crea_ovr_elem(cdesc%ovrlap_index,cdesc%ovrlap_elem,info)
+    call psi_crea_ovr_elem(me,cdesc%ovrlap_index,cdesc%ovrlap_elem,info)
     if (debug_level>0) write(debug_unit,*) me,'Done crea_ovr_elem'
     if(info /= 0) then
       call psb_errpush(4010,name,a_err='psi_crea_ovr_elem')
@@ -446,7 +475,7 @@ contains
     ! ordered sublist. The hashing is based on the low-order bits 
     ! for a width of psb_hash_bits 
     !
-    
+
     do i=1, n
       key = x(i) 
       ih  = iand(key,hashmask)
@@ -493,7 +522,7 @@ contains
     ! ordered sublist. The hashing is based on the low-order bits 
     ! for a width of psb_hash_bits 
     !
-    
+
     do i=1, n
       key = x(i) 
       ih  = iand(key,hashmask)
@@ -528,5 +557,716 @@ contains
       end if
     end do
   end subroutine psi_inner_cnv2
+
+  subroutine  psi_dovrl_updr1(x,desc_a,update,info)
+    use psb_descriptor_type
+    use psb_const_mod
+    use psb_error_mod
+    use psb_penv_mod
+    implicit none
+
+    real(kind(1.d0)), intent(inout), target :: x(:)
+    type(psb_desc_type), intent(in)         :: desc_a
+    integer, intent(in)                     :: update
+    integer, intent(out)                    :: info
+
+    ! locals
+    integer           :: ictxt, np, me, err_act, i, idx, ndm
+    character(len=20) :: name, ch_err
+
+    name='psi_dovrl_updr1'
+    if (psb_get_errstatus() /= 0) return 
+    info = 0
+    call psb_erractionsave(err_act)
+    ictxt = psb_cd_get_context(desc_a)
+    call psb_info(ictxt, me, np)
+    if (np == -1) then
+      info = 2010
+      call psb_errpush(info,name)
+      goto 9999
+    endif
+
+    ! switch on update type
+    select case (update)
+    case(psb_square_root_)
+      do i=1,size(desc_a%ovrlap_elem,1)
+        idx = desc_a%ovrlap_elem(i,1)
+        ndm = desc_a%ovrlap_elem(i,2)
+        x(idx) = x(idx)/sqrt(real(ndm))
+      end do
+    case(psb_avg_)
+      do i=1,size(desc_a%ovrlap_elem,1)
+        idx = desc_a%ovrlap_elem(i,1)
+        ndm = desc_a%ovrlap_elem(i,2)
+        x(idx) = x(idx)/real(ndm)
+      end do
+    case(psb_sum_)
+      ! do nothing
+
+    case default 
+      ! wrong value for choice argument
+      info = 70
+      call psb_errpush(info,name,i_err=(/3,update,0,0,0/))
+      goto 9999
+    end select
+
+    call psb_erractionrestore(err_act)
+    return  
+
+9999 continue
+    call psb_erractionrestore(err_act)
+
+    if (err_act == psb_act_abort_) then
+      call psb_error(ictxt)
+      return
+    end if
+    return
+  end subroutine psi_dovrl_updr1
+
+
+  subroutine  psi_dovrl_updr2(x,desc_a,update,info)
+    use psb_descriptor_type
+    use psb_const_mod
+    use psb_error_mod
+    use psb_penv_mod
+    implicit none
+
+    real(kind(1.d0)), intent(inout), target :: x(:,:)
+    type(psb_desc_type), intent(in)         :: desc_a
+    integer, intent(in)                     :: update
+    integer, intent(out)                    :: info
+
+    ! locals
+    integer           :: ictxt, np, me, err_act, i, idx, ndm
+    character(len=20) :: name, ch_err
+
+    name='psi_dovrl_updr2'
+    if (psb_get_errstatus() /= 0) return 
+    info = 0
+    call psb_erractionsave(err_act)
+    ictxt = psb_cd_get_context(desc_a)
+    call psb_info(ictxt, me, np)
+    if (np == -1) then
+      info = 2010
+      call psb_errpush(info,name)
+      goto 9999
+    endif
+
+    ! switch on update type
+    select case (update)
+    case(psb_square_root_)
+      do i=1,size(desc_a%ovrlap_elem,1)
+        idx = desc_a%ovrlap_elem(i,1)
+        ndm = desc_a%ovrlap_elem(i,2)
+        x(idx,:) = x(idx,:)/sqrt(real(ndm))
+      end do
+    case(psb_avg_)
+      do i=1,size(desc_a%ovrlap_elem,1)
+        idx = desc_a%ovrlap_elem(i,1)
+        ndm = desc_a%ovrlap_elem(i,2)
+        x(idx,:) = x(idx,:)/real(ndm)
+      end do
+    case(psb_sum_)
+      ! do nothing
+
+    case default 
+      ! wrong value for choice argument
+      info = 70
+      call psb_errpush(info,name,i_err=(/3,update,0,0,0/))
+      goto 9999
+    end select
+
+    call psb_erractionrestore(err_act)
+    return  
+
+9999 continue
+    call psb_erractionrestore(err_act)
+
+    if (err_act == psb_act_abort_) then
+      call psb_error(ictxt)
+      return
+    end if
+    return
+  end subroutine psi_dovrl_updr2
+
+  subroutine  psi_zovrl_updr1(x,desc_a,update,info)
+    use psb_descriptor_type
+    use psb_const_mod
+    use psb_error_mod
+    use psb_penv_mod
+    implicit none
+
+    complex(kind(1.d0)), intent(inout), target :: x(:)
+    type(psb_desc_type), intent(in)         :: desc_a
+    integer, intent(in)                     :: update
+    integer, intent(out)                    :: info
+
+    ! locals
+    integer           :: ictxt, np, me, err_act, i, idx, ndm
+    character(len=20) :: name, ch_err
+
+    name='psi_zovrl_updr1'
+    if (psb_get_errstatus() /= 0) return 
+    info = 0
+    call psb_erractionsave(err_act)
+    ictxt = psb_cd_get_context(desc_a)
+    call psb_info(ictxt, me, np)
+    if (np == -1) then
+      info = 2010
+      call psb_errpush(info,name)
+      goto 9999
+    endif
+
+    ! switch on update type
+    select case (update)
+    case(psb_square_root_)
+      do i=1,size(desc_a%ovrlap_elem,1)
+        idx = desc_a%ovrlap_elem(i,1)
+        ndm = desc_a%ovrlap_elem(i,2)
+        x(idx) = x(idx)/sqrt(real(ndm))
+      end do
+    case(psb_avg_)
+      do i=1,size(desc_a%ovrlap_elem,1)
+        idx = desc_a%ovrlap_elem(i,1)
+        ndm = desc_a%ovrlap_elem(i,2)
+        x(idx) = x(idx)/real(ndm)
+      end do
+    case(psb_sum_)
+      ! do nothing
+
+    case default 
+      ! wrong value for choice argument
+      info = 70
+      call psb_errpush(info,name,i_err=(/3,update,0,0,0/))
+      goto 9999
+    end select
+
+    call psb_erractionrestore(err_act)
+    return  
+
+9999 continue
+    call psb_erractionrestore(err_act)
+
+    if (err_act == psb_act_abort_) then
+      call psb_error(ictxt)
+      return
+    end if
+    return
+  end subroutine psi_zovrl_updr1
+
+
+  subroutine  psi_zovrl_updr2(x,desc_a,update,info)
+    use psb_descriptor_type
+    use psb_const_mod
+    use psb_error_mod
+    use psb_penv_mod
+    implicit none
+
+    complex(kind(1.d0)), intent(inout), target :: x(:,:)
+    type(psb_desc_type), intent(in)         :: desc_a
+    integer, intent(in)                     :: update
+    integer, intent(out)                    :: info
+
+    ! locals
+    integer           :: ictxt, np, me, err_act, i, idx, ndm
+    character(len=20) :: name, ch_err
+
+    name='psi_zovrl_updr2'
+    if (psb_get_errstatus() /= 0) return 
+    info = 0
+    call psb_erractionsave(err_act)
+    ictxt = psb_cd_get_context(desc_a)
+    call psb_info(ictxt, me, np)
+    if (np == -1) then
+      info = 2010
+      call psb_errpush(info,name)
+      goto 9999
+    endif
+
+    ! switch on update type
+    select case (update)
+    case(psb_square_root_)
+      do i=1,size(desc_a%ovrlap_elem,1)
+        idx = desc_a%ovrlap_elem(i,1)
+        ndm = desc_a%ovrlap_elem(i,2)
+        x(idx,:) = x(idx,:)/sqrt(real(ndm))
+      end do
+    case(psb_avg_)
+      do i=1,size(desc_a%ovrlap_elem,1)
+        idx = desc_a%ovrlap_elem(i,1)
+        ndm = desc_a%ovrlap_elem(i,2)
+        x(idx,:) = x(idx,:)/real(ndm)
+      end do
+    case(psb_sum_)
+      ! do nothing
+
+    case default 
+      ! wrong value for choice argument
+      info = 70
+      call psb_errpush(info,name,i_err=(/3,update,0,0,0/))
+      goto 9999
+    end select
+
+    call psb_erractionrestore(err_act)
+    return  
+
+9999 continue
+    call psb_erractionrestore(err_act)
+
+    if (err_act == psb_act_abort_) then
+      call psb_error(ictxt)
+      return
+    end if
+    return
+  end subroutine psi_zovrl_updr2
+
+  subroutine  psi_iovrl_updr1(x,desc_a,update,info)
+    use psb_descriptor_type
+    use psb_const_mod
+    use psb_error_mod
+    use psb_penv_mod
+    implicit none
+
+    integer, intent(inout), target   :: x(:)
+    type(psb_desc_type), intent(in)  :: desc_a
+    integer, intent(in)              :: update
+    integer, intent(out)             :: info
+
+    ! locals
+    integer           :: ictxt, np, me, err_act, i, idx, ndm
+    character(len=20) :: name, ch_err
+
+    name='psi_iovrl_updr1'
+    if (psb_get_errstatus() /= 0) return 
+    info = 0
+    call psb_erractionsave(err_act)
+    ictxt = psb_cd_get_context(desc_a)
+    call psb_info(ictxt, me, np)
+    if (np == -1) then
+      info = 2010
+      call psb_errpush(info,name)
+      goto 9999
+    endif
+
+    ! switch on update type
+    select case (update)
+      ! Square root does not make sense here
+!!$    case(psb_square_root_)
+!!$      do i=1,size(desc_a%ovrlap_elem,1)
+!!$        idx = desc_a%ovrlap_elem(i,1)
+!!$        ndm = desc_a%ovrlap_elem(i,2)
+!!$        x(idx) = x(idx)/sqrt(real(ndm))
+!!$      end do
+    case(psb_avg_)
+      do i=1,size(desc_a%ovrlap_elem,1)
+        idx = desc_a%ovrlap_elem(i,1)
+        ndm = desc_a%ovrlap_elem(i,2)
+        x(idx) = x(idx)/real(ndm)
+      end do
+    case(psb_sum_)
+      ! do nothing
+
+    case default 
+      ! wrong value for choice argument
+      info = 70
+      call psb_errpush(info,name,i_err=(/3,update,0,0,0/))
+      goto 9999
+    end select
+
+    call psb_erractionrestore(err_act)
+    return  
+
+9999 continue
+    call psb_erractionrestore(err_act)
+
+    if (err_act == psb_act_abort_) then
+      call psb_error(ictxt)
+      return
+    end if
+    return
+  end subroutine psi_iovrl_updr1
+
+
+  subroutine  psi_iovrl_updr2(x,desc_a,update,info)
+    use psb_descriptor_type
+    use psb_const_mod
+    use psb_error_mod
+    use psb_penv_mod
+    implicit none
+
+    integer, intent(inout), target   :: x(:,:)
+    type(psb_desc_type), intent(in)  :: desc_a
+    integer, intent(in)              :: update
+    integer, intent(out)             :: info
+
+    ! locals
+    integer           :: ictxt, np, me, err_act, i, idx, ndm
+    character(len=20) :: name, ch_err
+
+    name='psi_iovrl_updr2'
+    if (psb_get_errstatus() /= 0) return 
+    info = 0
+    call psb_erractionsave(err_act)
+    ictxt = psb_cd_get_context(desc_a)
+    call psb_info(ictxt, me, np)
+    if (np == -1) then
+      info = 2010
+      call psb_errpush(info,name)
+      goto 9999
+    endif
+
+    ! switch on update type
+    select case (update)
+      ! Square root does not make sense here
+!!$    case(psb_square_root_)
+!!$      do i=1,size(desc_a%ovrlap_elem,1)
+!!$        idx = desc_a%ovrlap_elem(i,1)
+!!$        ndm = desc_a%ovrlap_elem(i,2)
+!!$        x(idx,:) = x(idx,:)/sqrt(real(ndm))
+!!$      end do
+    case(psb_avg_)
+      do i=1,size(desc_a%ovrlap_elem,1)
+        idx = desc_a%ovrlap_elem(i,1)
+        ndm = desc_a%ovrlap_elem(i,2)
+        x(idx,:) = x(idx,:)/real(ndm)
+      end do
+    case(psb_sum_)
+      ! do nothing
+
+    case default 
+      ! wrong value for choice argument
+      info = 70
+      call psb_errpush(info,name,i_err=(/3,update,0,0,0/))
+      goto 9999
+    end select
+
+    call psb_erractionrestore(err_act)
+    return  
+
+9999 continue
+    call psb_erractionrestore(err_act)
+
+    if (err_act == psb_act_abort_) then
+      call psb_error(ictxt)
+      return
+    end if
+    return
+  end subroutine psi_iovrl_updr2
+
+
+  subroutine psi_dgthm(n,k,idx,x,y)
+
+    use psb_const_mod
+    implicit none
+
+    integer :: n, k, idx(:)
+    real(kind(1.d0)) :: x(:,:), y(:)
+
+    ! Locals
+    integer :: i, j, pt
+
+    pt=0
+    do j=1,k
+      do i=1,n
+        pt=pt+1
+        y(pt)=x(idx(i),j)
+      end do
+    end do
+
+  end subroutine psi_dgthm
+
+  subroutine psi_dgthv(n,idx,x,y)
+
+    use psb_const_mod
+    implicit none
+
+    integer :: n, idx(:)
+    real(kind(1.d0)) :: x(:), y(:)
+
+    ! Locals
+    integer :: i
+
+    do i=1,n
+      y(i)=x(idx(i))
+    end do
+
+  end subroutine psi_dgthv
+
+
+  subroutine psi_dsctm(n,k,idx,x,beta,y)
+
+    use psb_const_mod
+    implicit none
+
+    integer :: n, k, idx(:)
+    real(kind(1.d0)) :: beta, x(:), y(:,:)
+
+    ! Locals
+    integer :: i, j, pt
+
+    if (beta == dzero) then
+      pt=0
+      do j=1,k
+        do i=1,n
+          pt=pt+1
+          y(idx(i),j) = x(pt)
+        end do
+      end do
+    else if (beta == done) then
+      pt=0
+      do j=1,k
+        do i=1,n
+          pt=pt+1
+          y(idx(i),j) = y(idx(i),j)+x(pt)
+        end do
+      end do
+    else
+      pt=0
+      do j=1,k
+        do i=1,n
+          pt=pt+1
+          y(idx(i),j) = beta*y(idx(i),j)+x(pt)
+        end do
+      end do
+    end if
+  end subroutine psi_dsctm
+
+  subroutine psi_dsctv(n,idx,x,beta,y)
+
+    use psb_const_mod
+    implicit none
+
+    integer :: n, idx(:)
+    real(kind(1.d0)) :: beta, x(:), y(:)
+
+    ! Locals
+    integer :: i
+
+    if (beta == dzero) then
+      do i=1,n
+        y(idx(i)) = x(i)
+      end do
+    else if (beta == done) then
+      do i=1,n
+        y(idx(i)) = y(idx(i))+x(i)
+      end do
+    else
+      do i=1,n
+        y(idx(i)) = beta*y(idx(i))+x(i)
+      end do
+    end if
+  end subroutine psi_dsctv
+
+
+  subroutine psi_igthm(n,k,idx,x,y)
+
+    use psb_const_mod
+    implicit none
+
+    integer :: n, k, idx(:)
+    integer :: x(:,:), y(:)
+
+    ! Locals
+    integer :: i, j, pt
+
+    pt=0
+    do j=1,k
+      do i=1,n
+        pt=pt+1
+        y(pt)=x(idx(i),j)
+      end do
+    end do
+
+  end subroutine psi_igthm
+
+
+  subroutine psi_igthv(n,idx,x,y)
+
+    use psb_const_mod
+    implicit none
+
+    integer :: n, idx(:)
+    integer :: x(:), y(:)
+
+    ! Locals
+    integer :: i
+
+    do i=1,n
+      y(i)=x(idx(i))
+    end do
+
+  end subroutine psi_igthv
+
+
+
+  subroutine psi_isctm(n,k,idx,x,beta,y)
+
+    use psb_const_mod
+    implicit none
+
+    integer :: n, k, idx(:)
+    integer :: beta, x(:), y(:,:)
+
+    ! Locals
+    integer :: i, j, pt
+
+    if (beta == izero) then
+      pt=0
+      do j=1,k
+        do i=1,n
+          pt=pt+1
+          y(idx(i),j) = x(pt)
+        end do
+      end do
+    else if (beta == ione) then
+      pt=0
+      do j=1,k
+        do i=1,n
+          pt=pt+1
+          y(idx(i),j) = y(idx(i),j)+x(pt)
+        end do
+      end do
+    else
+      pt=0
+      do j=1,k
+        do i=1,n
+          pt=pt+1
+          y(idx(i),j) = beta*y(idx(i),j)+x(pt)
+        end do
+      end do
+    end if
+  end subroutine psi_isctm
+
+  subroutine psi_isctv(n,idx,x,beta,y)
+
+    use psb_const_mod
+    implicit none
+
+    integer :: n, idx(:)
+    integer :: beta, x(:), y(:)
+
+    ! Locals
+    integer :: i
+
+    if (beta == izero) then
+      do i=1,n
+        y(idx(i)) = x(i)
+      end do
+    else if (beta == ione) then
+      do i=1,n
+        y(idx(i)) = y(idx(i))+x(i)
+      end do
+    else
+      do i=1,n
+        y(idx(i)) = beta*y(idx(i))+x(i)
+      end do
+    end if
+  end subroutine psi_isctv
+
+
+  subroutine psi_zgthm(n,k,idx,x,y)
+
+    use psb_const_mod
+    implicit none
+
+    integer :: n, k, idx(:)
+    complex(kind(1.d0)) :: x(:,:), y(:)
+
+    ! Locals
+    integer :: i, j, pt
+
+    pt=0
+    do j=1,k
+      do i=1,n
+        pt=pt+1
+        y(pt)=x(idx(i),j)
+      end do
+    end do
+
+  end subroutine psi_zgthm
+
+
+  subroutine psi_zgthv(n,idx,x,y)
+
+    use psb_const_mod
+    implicit none
+
+    integer :: n, idx(:)
+    complex(kind(1.d0)) :: x(:), y(:)
+
+    ! Locals
+    integer :: i
+
+    do i=1,n
+      y(i)=x(idx(i))
+    end do
+
+  end subroutine psi_zgthv
+
+  subroutine psi_zsctm(n,k,idx,x,beta,y)
+
+    use psb_const_mod
+    implicit none
+
+    integer :: n, k, idx(:)
+    complex(kind(1.d0)) :: beta, x(:), y(:,:)
+
+    ! Locals
+    integer :: i, j, pt
+
+    if (beta == zzero) then
+      pt=0
+      do j=1,k
+        do i=1,n
+          pt=pt+1
+          y(idx(i),j) = x(pt)
+        end do
+      end do
+    else if (beta == zone) then
+      pt=0
+      do j=1,k
+        do i=1,n
+          pt=pt+1
+          y(idx(i),j) = y(idx(i),j)+x(pt)
+        end do
+      end do
+    else
+      pt=0
+      do j=1,k
+        do i=1,n
+          pt=pt+1
+          y(idx(i),j) = beta*y(idx(i),j)+x(pt)
+        end do
+      end do
+    end if
+  end subroutine psi_zsctm
+
+
+  subroutine psi_zsctv(n,idx,x,beta,y)
+
+    use psb_const_mod
+    implicit none
+
+    integer :: n, idx(:)
+    complex(kind(1.d0)) :: beta, x(:), y(:)
+
+    ! Locals
+    integer :: i
+
+    if (beta == zzero) then
+      do i=1,n
+        y(idx(i)) = x(i)
+      end do
+    else if (beta == zone) then
+      do i=1,n
+        y(idx(i)) = y(idx(i))+x(i)
+      end do
+    else
+      do i=1,n
+        y(idx(i)) = beta*y(idx(i))+x(i)
+      end do
+    end if
+  end subroutine psi_zsctv
+
 
 end module psi_mod

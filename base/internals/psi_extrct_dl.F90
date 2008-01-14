@@ -172,7 +172,7 @@ subroutine psi_extract_dep_list(desc_data,desc_str,dep_list,&
       if ((desc_str(i+1) /= 0).or.(desc_str(i+2) /= 0)) then
         !           ..if number of element to be exchanged !=0
         proc=desc_str(i)
-        if ((proc < 0).or.(proc.ge.nprow)) then
+        if ((proc < 0).or.(proc >= nprow)) then
           if (debug_level >= psb_debug_inner_)&
                & write(debug_unit,*) me,' ',trim(name),': error ',i,desc_str(i)
           info = 9999
@@ -196,7 +196,7 @@ subroutine psi_extract_dep_list(desc_data,desc_str,dep_list,&
             pointer_dep_list=pointer_dep_list+1
           endif
         else if (mode == 0) then
-          if (pointer_dep_list.gt.dl_lda) then
+          if (pointer_dep_list > dl_lda) then
             info = 4000
             goto 998
           endif
@@ -227,7 +227,7 @@ subroutine psi_extract_dep_list(desc_data,desc_str,dep_list,&
           enddo
           if (j == pointer_dep_list) then
             !                 ...if not found.....
-            if (pointer_dep_list.gt.dl_lda) then
+            if (pointer_dep_list > dl_lda) then
               info = 4000
               goto 998
             endif
@@ -235,7 +235,7 @@ subroutine psi_extract_dep_list(desc_data,desc_str,dep_list,&
             pointer_dep_list=pointer_dep_list+1
           endif
         else if (mode == 0) then
-          if (pointer_dep_list.gt.dl_lda) then
+          if (pointer_dep_list > dl_lda) then
             info = 4000
             goto 998
           endif

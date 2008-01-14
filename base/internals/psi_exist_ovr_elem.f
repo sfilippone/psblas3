@@ -52,7 +52,7 @@ C    ELEM_SEARCHED.....:point's  Local index identifier to be searched.
 
       IMPLICIT NONE
 C     ...Array Parameters....
-      INTEGER OVR_ELEM(*)
+      INTEGER OVR_ELEM(dim_list,*)
 
 C     ....Scalars parameters....
       INTEGER DIM_LIST,ELEM_SEARCHED
@@ -61,10 +61,10 @@ C     ...Local Scalars....
       INTEGER I
 
       I=1
-      DO WHILE ((I.LE.DIM_LIST).AND.(OVR_ELEM(I).NE.ELEM_SEARCHED))
-         I=I+2
+      DO WHILE ((I.LE.DIM_LIST).AND.(OVR_ELEM(I,1).NE.ELEM_SEARCHED))
+         I=I+1
       ENDDO
-      IF ((I.LE.DIM_LIST).AND.(OVR_ELEM(I).EQ.ELEM_SEARCHED)) THEN
+      IF ((I.LE.DIM_LIST).AND.(OVR_ELEM(I,1).EQ.ELEM_SEARCHED)) THEN
          PSI_EXIST_OVR_ELEM=I
       ELSE
          PSI_EXIST_OVR_ELEM=-1

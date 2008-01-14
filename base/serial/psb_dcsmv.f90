@@ -76,8 +76,8 @@ subroutine psb_dcsmv(alpha,a,b,beta,c,info,trans)
   deallocate(work)
   call psb_erractionrestore(err_act)
 
-  if(info.ne.0) then
-     if (err_act.eq.psb_act_abort_) then
+  if(info /= 0) then
+     if (err_act == psb_act_abort_) then
         call psb_error()
         return
      end if

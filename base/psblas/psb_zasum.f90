@@ -60,7 +60,7 @@ function psb_zasum (x,desc_a, info, jx)
 
   ! locals
   integer                  :: ictxt, np, me, &
-       & err_act, iix, jjx, ix, ijx, m, i
+       & err_act, iix, jjx, ix, ijx, m, i, idx, ndm
   real(kind(1.d0))         :: asum, dzasum
   character(len=20)        :: name, ch_err
   complex(kind(1.d0))      :: cmax
@@ -69,7 +69,7 @@ function psb_zasum (x,desc_a, info, jx)
   cabs1( zdum ) = abs( dble( zdum ) ) + abs( dimag( zdum ) )
 
   name='psb_zasum'
-  if(psb_get_errstatus().ne.0) return 
+  if(psb_get_errstatus() /= 0) return 
   info=0
   call psb_erractionsave(err_act)
 
@@ -95,32 +95,29 @@ function psb_zasum (x,desc_a, info, jx)
 
   ! check vector correctness
   call psb_chkvect(m,1,size(x,1),ix,ijx,desc_a,info,iix,jjx)
-  if(info.ne.0) then
+  if(info /= 0) then
     info=4010
     ch_err='psb_chkvect'
     call psb_errpush(info,name,a_err=ch_err)
     goto 9999
   end if
 
-  if (iix.ne.1) then
+  if (iix /= 1) then
     info=3040
     call psb_errpush(info,name)
     goto 9999
   end if
 
   ! compute local max
-  if ((m.ne.0)) then
-    if(psb_cd_get_local_rows(desc_a).gt.0) then
+  if ((m /= 0)) then
+    if(psb_cd_get_local_rows(desc_a) > 0) then
       asum=dzasum(psb_cd_get_local_rows(desc_a)-iix+1,x(iix,jjx),ione)
 
       ! adjust asum because overlapped elements are computed more than once
-      i=1
-      do while (desc_a%ovrlap_elem(i).ne.-ione)
-        cmax = x(desc_a%ovrlap_elem(i)-iix+1,jjx)
-        asum = asum -&
-             & (desc_a%ovrlap_elem(i+1)-1)/desc_a%ovrlap_elem(i+1)*&
-             &  cabs1(cmax)
-        i = i+2
+      do i=1,size(desc_a%ovrlap_elem,1)
+        idx  = desc_a%ovrlap_elem(i,1)
+        ndm  = desc_a%ovrlap_elem(i,2)
+        asum = asum - (real(ndm-1)/real(ndm))*cabs1(x(idx,jjx))
       end do
 
       ! compute global sum
@@ -144,7 +141,7 @@ function psb_zasum (x,desc_a, info, jx)
 9999 continue
   call psb_erractionrestore(err_act)
 
-  if (err_act.eq.psb_act_abort_) then
+  if (err_act == psb_act_abort_) then
      call psb_error(ictxt)
      return
   end if
@@ -209,7 +206,7 @@ function psb_zasumv(x,desc_a, info)
 
   ! locals
   integer                  :: ictxt, np, me,&
-       & err_act, iix, jjx, jx, ix, m, i
+       & err_act, iix, jjx, jx, ix, m, i, idx, ndm
   real(kind(1.d0))         :: asum, dzasum
   character(len=20)        :: name, ch_err
   complex(kind(1.d0))      :: cmax
@@ -218,7 +215,7 @@ function psb_zasumv(x,desc_a, info)
   cabs1( zdum ) = abs( dble( zdum ) ) + abs( dimag( zdum ) )
 
   name='psb_zasumv'
-  if(psb_get_errstatus().ne.0) return 
+  if(psb_get_errstatus() /= 0) return 
   info=0
   call psb_erractionsave(err_act)
 
@@ -240,32 +237,29 @@ function psb_zasumv(x,desc_a, info)
 
   ! check vector correctness
   call psb_chkvect(m,1,size(x),ix,jx,desc_a,info,iix,jjx)
-  if(info.ne.0) then
+  if(info /= 0) then
     info=4010
     ch_err='psb_chkvect'
     call psb_errpush(info,name,a_err=ch_err)
     goto 9999
   end if
 
-  if (iix.ne.1) then
+  if (iix /= 1) then
     info=3040
     call psb_errpush(info,name)
     goto 9999
   end if
 
   ! compute local max
-  if ((m.ne.0)) then
-    if(psb_cd_get_local_rows(desc_a).gt.0) then
+  if ((m /= 0)) then
+    if(psb_cd_get_local_rows(desc_a) > 0) then
       asum=dzasum(psb_cd_get_local_rows(desc_a),x,ione)
 
       ! adjust asum because overlapped elements are computed more than once
-      i=1
-      do while (desc_a%ovrlap_elem(i).ne.-ione)
-        cmax = x(desc_a%ovrlap_elem(i))
-        asum = asum -&
-             & (desc_a%ovrlap_elem(i+1)-1)/desc_a%ovrlap_elem(i+1)*&
-             & cabs1(cmax)
-        i = i+2
+      do i=1,size(desc_a%ovrlap_elem,1)
+        idx  = desc_a%ovrlap_elem(i,1)
+        ndm  = desc_a%ovrlap_elem(i,2)
+        asum = asum - (real(ndm-1)/real(ndm))*cabs1(x(idx))
       end do
 
       ! compute global sum
@@ -288,7 +282,7 @@ function psb_zasumv(x,desc_a, info)
 9999 continue
   call psb_erractionrestore(err_act)
 
-  if (err_act.eq.psb_act_abort_) then
+  if (err_act == psb_act_abort_) then
     call psb_error(ictxt)
     return
   end if
@@ -354,7 +348,7 @@ subroutine psb_zasumvs(res,x,desc_a, info)
 
   ! locals
   integer                  :: ictxt, np, me,&
-       & err_act, iix, jjx, ix, jx, m, i
+       & err_act, iix, jjx, ix, jx, m, i, idx, ndm
   real(kind(1.d0))         :: asum, dzasum
   character(len=20)        :: name, ch_err
   complex(kind(1.d0))      :: cmax
@@ -363,7 +357,7 @@ subroutine psb_zasumvs(res,x,desc_a, info)
   cabs1( zdum ) = abs( dble( zdum ) ) + abs( dimag( zdum ) )
 
   name='psb_zasumvs'
-  if(psb_get_errstatus().ne.0) return 
+  if(psb_get_errstatus() /= 0) return 
   info=0
   call psb_erractionsave(err_act)
 
@@ -382,34 +376,32 @@ subroutine psb_zasumvs(res,x,desc_a, info)
   jx = 1
 
   m = psb_cd_get_global_rows(desc_a)
+
   ! check vector correctness
   call psb_chkvect(m,1,size(x),ix,jx,desc_a,info,iix,jjx)
-  if(info.ne.0) then
+  if(info /= 0) then
     info=4010
     ch_err='psb_chkvect'
     call psb_errpush(info,name,a_err=ch_err)
     goto 9999
   end if
 
-  if (iix.ne.1) then
+  if (iix /= 1) then
     info=3040
     call psb_errpush(info,name)
     goto 9999
   end if
 
   ! compute local max
-  if ((m.ne.0)) then
-    if(psb_cd_get_local_rows(desc_a).gt.0) then
+  if ((m /= 0)) then
+    if(psb_cd_get_local_rows(desc_a) > 0) then
       asum=dzasum(psb_cd_get_local_rows(desc_a),x,ione)
 
       ! adjust asum because overlapped elements are computed more than once
-      i=1
-      do while (desc_a%ovrlap_elem(i).ne.-ione)
-        cmax = x(desc_a%ovrlap_elem(i))
-        asum = asum -&
-             & (desc_a%ovrlap_elem(i+1)-1)/desc_a%ovrlap_elem(i+1)*&
-             & cabs1(cmax)
-        i = i+2
+      do i=1,size(desc_a%ovrlap_elem,1)
+        idx  = desc_a%ovrlap_elem(i,1)
+        ndm  = desc_a%ovrlap_elem(i,2)
+        asum = asum - (real(ndm-1)/real(ndm))*cabs1(x(idx))
       end do
 
       ! compute global sum
@@ -433,7 +425,7 @@ subroutine psb_zasumvs(res,x,desc_a, info)
 9999 continue
   call psb_erractionrestore(err_act)
 
-  if (err_act.eq.psb_act_abort_) then
+  if (err_act == psb_act_abort_) then
     call psb_error(ictxt)
     return
   end if

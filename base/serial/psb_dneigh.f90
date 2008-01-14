@@ -86,7 +86,7 @@ subroutine psb_dneigh(a,idx,neigh,n,info,lev)
     ntl = 0
     do i=ifl,ill
       nidx=neigh(i)
-      if ((nidx.ne.idx).and.(nidx.gt.0).and.(nidx.le.a%m)) then
+      if ((nidx /= idx).and.(nidx > 0).and.(nidx <= a%m)) then
         call psb_sp_getrow(nidx,a,nn,ia,ja,val,info)
         if (info==0) call psb_ensure_size(ill+ntl+nn,neigh,info)
         if (info /= 0) then 
@@ -109,7 +109,7 @@ subroutine psb_dneigh(a,idx,neigh,n,info,lev)
   
 9999 continue
   call psb_erractionrestore(err_act)
-  if (err_act.eq.psb_act_abort_) then
+  if (err_act == psb_act_abort_) then
      call psb_error()
      return
   end if

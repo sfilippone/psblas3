@@ -89,7 +89,7 @@ subroutine psb_zspgtdiag(a,d,info)
     do i=1, rng, nrb
        irb=min(i+nrb-1,rng)
        call psb_sp_getblk(i,a,tmpa,info,lrw=irb)
-       if(info.ne.0) then
+       if(info /= 0) then
           info=4010
           ch_err='psb_spgtblk'
           call psb_errpush(info,name,a_err=ch_err)
@@ -112,7 +112,7 @@ subroutine psb_zspgtdiag(a,d,info)
  
 9999 continue
  call psb_erractionrestore(err_act)
- if (err_act.eq.psb_act_abort_) then
+ if (err_act == psb_act_abort_) then
     call psb_error()
     return
  end if

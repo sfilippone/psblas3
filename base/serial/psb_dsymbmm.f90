@@ -100,7 +100,7 @@ subroutine psb_dsymbmm(a,b,c,info)
 
 9999 continue
   call psb_erractionrestore(err_act)
-  if (err_act.eq.psb_act_abort_) then
+  if (err_act == psb_act_abort_) then
      call psb_error()
      return
   end if
@@ -160,7 +160,7 @@ contains
                 info=2
                 return
             else
-              if(index(ibcl(k)).eq.0) then
+              if(index(ibcl(k)) == 0) then
                 index(ibcl(k))=istart
                 istart=ibcl(k)
                 length=length+1

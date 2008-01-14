@@ -80,7 +80,7 @@ subroutine  psb_zhalom(x,desc_a,info,alpha,jx,ik,work,tran,mode,data)
   logical                  :: aliw
 
   name='psb_zhalom'
-  if(psb_get_errstatus().ne.0) return 
+  if(psb_get_errstatus() /= 0) return 
   info=0
   call psb_erractionsave(err_act)
 
@@ -108,7 +108,7 @@ subroutine  psb_zhalom(x,desc_a,info,alpha,jx,ik,work,tran,mode,data)
   maxk=size(x,2)-ijx+1
 
   if(present(ik)) then
-    if(ik.gt.maxk) then
+    if(ik > maxk) then
       k=maxk
     else
       k=ik
@@ -136,23 +136,23 @@ subroutine  psb_zhalom(x,desc_a,info,alpha,jx,ik,work,tran,mode,data)
 
   ! check vector correctness
   call psb_chkvect(m,1,size(x,1),ix,ijx,desc_a,info,iix,jjx)
-  if(info.ne.0) then
+  if(info /= 0) then
     info=4010
     ch_err='psb_chkvect'
     call psb_errpush(info,name,a_err=ch_err)
   end if
 
-  if (iix.ne.1) then
+  if (iix /= 1) then
     info=3040
     call psb_errpush(info,name)
   end if
 
   err=info
   call psb_errcomm(ictxt,err)
-  if(err.ne.0) goto 9999
+  if(err /= 0) goto 9999
 
   if(present(alpha)) then
-    if(alpha.ne.1.d0) then
+    if(alpha /= 1.d0) then
       do i=0, k-1
         call zscal(nrow,alpha,x(1,jjx+i),1)
       end do
@@ -161,13 +161,13 @@ subroutine  psb_zhalom(x,desc_a,info,alpha,jx,ik,work,tran,mode,data)
 
   liwork=nrow
   if (present(work)) then
-    if(size(work).ge.liwork) then
+    if(size(work) >= liwork) then
       aliw=.false.
       iwork => work
     else
       aliw=.true.
       allocate(iwork(liwork),stat=info)
-      if(info.ne.0) then
+      if(info /= 0) then
         info=4010
         ch_err='psb_realloc'
         call psb_errpush(info,name,a_err=ch_err)
@@ -178,7 +178,7 @@ subroutine  psb_zhalom(x,desc_a,info,alpha,jx,ik,work,tran,mode,data)
     aliw=.true.
     allocate(iwork(liwork),stat=info)
 
-    if(info.ne.0) then
+    if(info /= 0) then
       info=4010
       ch_err='psb_realloc'
       call psb_errpush(info,name,a_err=ch_err)
@@ -200,7 +200,7 @@ subroutine  psb_zhalom(x,desc_a,info,alpha,jx,ik,work,tran,mode,data)
     goto 9999      
   end if
 
-  if(info.ne.0) then
+  if(info /= 0) then
     ch_err='PSI_zswapdata'
     call psb_errpush(4010,name,a_err=ch_err)
     goto 9999
@@ -305,7 +305,7 @@ subroutine  psb_zhalov(x,desc_a,info,alpha,work,tran,mode,data)
   logical                  :: aliw
 
   name='psb_zhalov'
-  if(psb_get_errstatus().ne.0) return 
+  if(psb_get_errstatus() /= 0) return 
   info=0
   call psb_erractionsave(err_act)
 
@@ -345,36 +345,36 @@ subroutine  psb_zhalov(x,desc_a,info,alpha,work,tran,mode,data)
 
   ! check vector correctness
   call psb_chkvect(m,1,size(x,1),ix,ijx,desc_a,info,iix,jjx)
-  if(info.ne.0) then
+  if(info /= 0) then
     info=4010
     ch_err='psb_chkvect'
     call psb_errpush(info,name,a_err=ch_err)
   end if
 
-  if (iix.ne.1) then
+  if (iix /= 1) then
     info=3040
     call psb_errpush(info,name)
   end if
 
   err=info
   call psb_errcomm(ictxt,err)
-  if(err.ne.0) goto 9999
+  if(err /= 0) goto 9999
 
   if(present(alpha)) then
-    if(alpha.ne.1.d0) then
+    if(alpha /= 1.d0) then
       call zscal(nrow,alpha,x,ione)
     end if
   end if
 
   liwork=nrow
   if (present(work)) then
-    if(size(work).ge.liwork) then
+    if(size(work) >= liwork) then
       aliw=.false.
       iwork => work
     else
       aliw=.true.
       allocate(iwork(liwork),stat=info)
-      if(info.ne.0) then
+      if(info /= 0) then
         info=4010
         ch_err='psb_realloc'
         call psb_errpush(info,name,a_err=ch_err)
@@ -384,7 +384,7 @@ subroutine  psb_zhalov(x,desc_a,info,alpha,work,tran,mode,data)
   else
     aliw=.true.
     allocate(iwork(liwork),stat=info)
-    if(info.ne.0) then
+    if(info /= 0) then
       info=4010
       ch_err='psb_realloc'
       call psb_errpush(info,name,a_err=ch_err)
@@ -405,7 +405,7 @@ subroutine  psb_zhalov(x,desc_a,info,alpha,work,tran,mode,data)
     goto 9999      
   end if
 
-  if(info.ne.0) then
+  if(info /= 0) then
     ch_err='PSI_dSwap...'
     call psb_errpush(4010,name,a_err=ch_err)
     goto 9999

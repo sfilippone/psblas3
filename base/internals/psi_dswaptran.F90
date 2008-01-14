@@ -89,7 +89,7 @@ subroutine psi_dswaptranm(flag,n,beta,y,desc_a,work,info,data)
   use psb_error_mod
   use psb_descriptor_type
   use psb_penv_mod
-  use psi_gthsct_mod
+!!$  use psi_gthsct_mod
 #ifdef MPI_MOD
   use mpi
 #endif
@@ -557,7 +557,7 @@ subroutine psi_dswaptranv(flag,beta,y,desc_a,work,info,data)
   use psb_error_mod
   use psb_descriptor_type
   use psb_penv_mod
-  use psi_gthsct_mod
+!!$  use psi_gthsct_mod
 #ifdef MPI_MOD
   use mpi
 #endif

@@ -171,7 +171,7 @@ contains
     end if
 
 9999 continue 
-    if (err_act.eq.psb_act_abort_) then
+    if (err_act == psb_act_abort_) then
       call psb_error()
       return
     end if
@@ -231,7 +231,7 @@ contains
     end if
 
 9999 continue 
-    if (err_act.eq.psb_act_abort_) then
+    if (err_act == psb_act_abort_) then
       call psb_error()
       return
     end if
@@ -290,7 +290,7 @@ contains
     end if
 
 9999 continue 
-    if (err_act.eq.psb_act_abort_) then
+    if (err_act == psb_act_abort_) then
       call psb_error()
       return
     end if
@@ -330,7 +330,7 @@ contains
       
 
 9999 continue 
-    if (err_act.eq.psb_act_abort_) then
+    if (err_act == psb_act_abort_) then
       call psb_error()
       return
     end if
@@ -406,7 +406,7 @@ contains
     
 
 9999 continue 
-    if (err_act.eq.psb_act_abort_) then
+    if (err_act == psb_act_abort_) then
       call psb_error()
       return
     end if
@@ -482,7 +482,7 @@ contains
     
 
 9999 continue 
-    if (err_act.eq.psb_act_abort_) then
+    if (err_act == psb_act_abort_) then
       call psb_error()
       return
     end if
@@ -571,7 +571,7 @@ contains
     
 
 9999 continue 
-    if (err_act.eq.psb_act_abort_) then
+    if (err_act == psb_act_abort_) then
       call psb_error()
       return
     end if
@@ -681,7 +681,7 @@ contains
     
 
 9999 continue 
-    if (err_act.eq.psb_act_abort_) then
+    if (err_act == psb_act_abort_) then
       call psb_error()
       return
     end if
@@ -789,7 +789,7 @@ contains
     
 
 9999 continue 
-    if (err_act.eq.psb_act_abort_) then
+    if (err_act == psb_act_abort_) then
       call psb_error()
       return
     end if
@@ -897,7 +897,7 @@ contains
     
 
 9999 continue 
-    if (err_act.eq.psb_act_abort_) then
+    if (err_act == psb_act_abort_) then
       call psb_error()
       return
     end if

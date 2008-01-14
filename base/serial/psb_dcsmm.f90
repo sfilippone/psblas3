@@ -80,7 +80,7 @@ subroutine psb_dcsmm(alpha,a,b,beta,c,info,trans)
        & b,lb,beta,c,lc,work,iwsz,info)
   
 
-  if (info.ne.0) then
+  if (info /= 0) then
     info = 4010
     ch_err='Serial csmm'
     call psb_errpush(info,name,a_err=ch_err)
@@ -90,7 +90,7 @@ subroutine psb_dcsmm(alpha,a,b,beta,c,info,trans)
   end if
   deallocate(work,stat=info)
 
-  if (info.ne.0) then
+  if (info /= 0) then
     info = 4010
     ch_err='Deallocate'
     call psb_errpush(info,name,a_err=ch_err)

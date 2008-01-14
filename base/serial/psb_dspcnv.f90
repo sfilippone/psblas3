@@ -360,7 +360,7 @@ subroutine psb_dspcnv2(a, b,info,afmt,upd,dupl)
 
 9999 continue
   call psb_erractionrestore(err_act)
-  if (err_act.eq.psb_act_abort_) then
+  if (err_act == psb_act_abort_) then
     call psb_error()
     return
   end if
@@ -550,7 +550,7 @@ subroutine psb_dspcnv1(a, info, afmt, upd, dupl)
 
 9999 continue
   call psb_erractionrestore(err_act)
-  if (err_act.eq.psb_act_abort_) then
+  if (err_act == psb_act_abort_) then
     call psb_error()
     return
   end if

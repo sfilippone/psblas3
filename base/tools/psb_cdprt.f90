@@ -129,13 +129,12 @@ subroutine psb_cdprt(iout,desc_p,glob,short)
     enddo
 
     write(iout,*) 'Ovrlap_elem'
-    counter      = 1
-    Do
-      idx=desc_p%ovrlap_elem(counter)
-      if (idx == -1) exit
-      n_elem_recv=desc_p%ovrlap_elem(counter+1)
-      if (.not.lshort) write(iout,*) idx,n_elem_Recv
-      counter   = counter+2
+
+    Do  counter = 1,size(desc_p%ovrlap_elem,1)
+      idx         = desc_p%ovrlap_elem(counter,1)
+      n_elem_recv = desc_p%ovrlap_elem(counter,2)
+      proc        = desc_p%ovrlap_elem(counter,3)
+      if (.not.lshort) write(iout,*) idx,n_elem_Recv,proc
     enddo
 
   else if (lglob) then 
@@ -236,15 +235,13 @@ subroutine psb_cdprt(iout,desc_p,glob,short)
     enddo
 
     write(iout,*) 'Ovrlap_elem'
-    counter      = 1
-    if (.not.lshort) then 
-      Do
-        idx=desc_p%ovrlap_elem(counter)
-        if (idx == -1) exit
-        n_elem_recv=desc_p%ovrlap_elem(counter+1)
-        write(iout,*) desc_p%loc_to_glob(idx),idx,n_elem_Recv
-        counter   = counter+2
-      enddo
-    endif
+
+    Do  counter = 1,size(desc_p%ovrlap_elem,1)
+      idx         = desc_p%ovrlap_elem(counter,1)
+      n_elem_recv = desc_p%ovrlap_elem(counter,2)
+      proc        = desc_p%ovrlap_elem(counter,3)
+      if (.not.lshort) write(iout,*) idx,desc_p%loc_to_glob(idx),n_elem_Recv,proc
+    enddo
+
   end if
 end subroutine psb_cdprt

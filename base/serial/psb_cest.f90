@@ -108,7 +108,7 @@ subroutine psb_cest(afmt,m,n,nnz, lia1, lia2, lar, iup,info)
 9999 continue
   call psb_erractionrestore(err_act)
 
-  if ( err_act .ne. 0 ) then 
+  if ( err_act /= 0 ) then 
      call psb_error()
      return
   endif

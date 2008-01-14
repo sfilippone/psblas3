@@ -89,7 +89,7 @@ subroutine  psb_dscatterm(globx, locx, desc_a, info, iroot)
 
   if (present(iroot)) then
      root = iroot
-     if((root.lt.-1).or.(root.gt.np)) then
+     if((root < -1).or.(root > np)) then
         info=30
         int_err(1:2)=(/5,root/)
         call psb_errpush(info,name,i_err=int_err)
@@ -317,7 +317,7 @@ subroutine  psb_dscatterv(globx, locx, desc_a, info, iroot)
 
   if (present(iroot)) then
      root = iroot
-     if((root.lt.-1).or.(root.gt.np)) then
+     if((root < -1).or.(root > np)) then
         info=30
         int_err(1:2)=(/5,root/)
         call psb_errpush(info,name,i_err=int_err)

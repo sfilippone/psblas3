@@ -60,7 +60,7 @@ function psb_znrmi(a,desc_a,info)
   character(len=20)        :: name, ch_err
 
   name='psb_znrmi'
-  if(psb_get_errstatus().ne.0) return 
+  if(psb_get_errstatus() /= 0) return 
   info=0
   call psb_erractionsave(err_act)
 
@@ -79,27 +79,27 @@ function psb_znrmi(a,desc_a,info)
   n = psb_cd_get_global_cols(desc_a)
 
   call psb_chkmat(m,n,ia,ja,desc_a,info,iia,jja)
-  if(info.ne.0) then
+  if(info /= 0) then
     info=4010
     ch_err='psb_chkmat'
     call psb_errpush(info,name,a_err=ch_err)
     goto 9999
   end if
 
-  if ((iia.ne.1).or.(jja.ne.1)) then
+  if ((iia /= 1).or.(jja /= 1)) then
     info=3040
     call psb_errpush(info,name)
     goto 9999
   end if
 
-  if ((m.ne.0).and.(n.ne.0)) then
+  if ((m /= 0).and.(n /= 0)) then
     mdim = psb_cd_get_local_rows(desc_a)
     ndim = psb_cd_get_local_cols(desc_a)
     nrmi = zcsnmi('N',mdim,ndim,a%fida,&
          & a%descra,a%aspk,a%ia1,a%ia2,&
          & a%infoa,info)
 
-    if(info.ne.0) then
+    if(info /= 0) then
       info=4010
       ch_err='dcsnmi'
       call psb_errpush(info,name,a_err=ch_err)
@@ -120,7 +120,7 @@ function psb_znrmi(a,desc_a,info)
 9999 continue
   call psb_erractionrestore(err_act)
 
-  if (err_act.eq.psb_act_abort_) then
+  if (err_act == psb_act_abort_) then
     call psb_error(ictxt)
     return
   end if

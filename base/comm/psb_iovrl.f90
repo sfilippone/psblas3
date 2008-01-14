@@ -28,14 +28,14 @@
 !!$  POSSIBILITY OF SUCH DAMAGE.
 !!$ 
 !!$  
-! File:  psb_dovrl.f90
+! File:  psb_iovrl.f90
 !
-! Subroutine: psb_dovrlm
+! Subroutine: psb_iovrlm
 !   This subroutine performs the exchange of the overlap elements in a 
 !   distributed dense matrix between all the processes.
 !
 ! Arguments:
-!   x(:,:)      -  real                      The local part of the dense matrix.
+!   x(:,:)      -  integer                   The local part of the dense matrix.
 !   desc_a      -  type(psb_desc_type).    The communication descriptor.
 !   info        -  integer.                  Return code.
 !   jx          -  integer(optional).        The starting column of the global matrix
@@ -62,7 +62,7 @@
 !                                                       previous call with swap_send)
 !
 !
-subroutine  psb_dovrlm(x,desc_a,info,jx,ik,work,update,mode)
+subroutine  psb_iovrlm(x,desc_a,info,jx,ik,work,update,mode)
   use psb_descriptor_type
   use psb_const_mod
   use psi_mod
@@ -72,22 +72,22 @@ subroutine  psb_dovrlm(x,desc_a,info,jx,ik,work,update,mode)
   use psb_penv_mod
   implicit none
 
-  real(kind(1.d0)), intent(inout), target   :: x(:,:)
-  type(psb_desc_type), intent(in)           :: desc_a
-  integer, intent(out)                      :: info
-  real(kind(1.d0)), optional, target        :: work(:)
-  integer, intent(in), optional             :: update,jx,ik,mode
+  integer, intent(inout), target  :: x(:,:)
+  type(psb_desc_type), intent(in) :: desc_a
+  integer, intent(out)            :: info
+  integer, optional, target       :: work(:)
+  integer, intent(in), optional   :: update,jx,ik,mode
 
   ! locals
   integer                  :: ictxt, np, me, &
        & err_act, m, n, iix, jjx, ix, ijx, nrow, ncol, k, maxk, update_,&
        & mode_, err, liwork
-  real(kind(1.d0)),pointer :: iwork(:), xp(:,:)
-  logical                  :: do_swap
-  character(len=20)        :: name, ch_err
-  logical                  :: aliw
+  integer,  pointer  :: iwork(:), xp(:,:)
+  logical            :: do_swap
+  character(len=20)  :: name, ch_err
+  logical            :: aliw
 
-  name='psb_dovrlm'
+  name='psb_iovrlm'
   if(psb_get_errstatus() /= 0) return 
   info=0
   call psb_erractionsave(err_act)
@@ -167,7 +167,6 @@ subroutine  psb_dovrlm(x,desc_a,info,jx,ik,work,update,mode)
   else
     aliw=.true.
   end if
-
   if (aliw) then 
     allocate(iwork(liwork),stat=info)
     if(info /= 0) then
@@ -176,12 +175,12 @@ subroutine  psb_dovrlm(x,desc_a,info,jx,ik,work,update,mode)
       goto 9999
     end if
   else
-      iwork => work    
+    iwork => work    
   end if
   ! exchange overlap elements
   if(do_swap) then
     xp => x(iix:size(x,1),jjx:jjx+k-1)
-    call psi_swapdata(mode_,k,done,xp,&
+    call psi_swapdata(mode_,k,ione,xp,&
          & desc_a,iwork,info,data=psb_comm_ovr_)
   end if
   if (info == 0) call psi_ovrl_upd(xp,desc_a,update_,info)
@@ -204,7 +203,7 @@ subroutine  psb_dovrlm(x,desc_a,info,jx,ik,work,update,mode)
     return
   end if
   return
-end subroutine psb_dovrlm
+end subroutine psb_iovrlm
 
 !!$ 
 !!$              Parallel Sparse BLAS  v2.0
@@ -237,20 +236,20 @@ end subroutine psb_dovrlm
 !!$ 
 !!$  
 !
-! Subroutine: psb_dovrlv
+! Subroutine: psb_iovrlv
 !   This subroutine performs the exchange of the overlap elements in a 
 !   distributed dense vector between all the processes.
 !
 ! Arguments:
-!   x(:)        -  real                      The local part of the dense vector.
+!   x(:)        -  integer                 The local part of the dense vector.
 !   desc_a      -  type(psb_desc_type).    The communication descriptor.
-!   info        -  integer.                  Return code.
-!   work        -  real(optional).           A work area.
-!   update      -  integer(optional).        Type of update:
-!                                            psb_none_   do nothing
-!                                            psb_sum_    sum of overlaps
-!                                            psb_avg_    average of overlaps
-!   mode        -  integer(optional).        Choose the algorithm for data exchange: 
+!   info        -  integer.                Return code.
+!   work        -  real(optional).         A work area.
+!   update      -  integer(optional).      Type of update:
+!                                          psb_none_   do nothing
+!                                          psb_sum_    sum of overlaps
+!                                          psb_avg_    average of overlaps
+!   mode        -  integer(optional).      Choose the algorithm for data exchange: 
 !                                       this is chosen through bit fields. 
 !                                       - swap_mpi  = iand(flag,psb_swap_mpi_)  /= 0
 !                                       - swap_sync = iand(flag,psb_swap_sync_) /= 0
@@ -268,7 +267,7 @@ end subroutine psb_dovrlm
 !
 !
 !
-subroutine  psb_dovrlv(x,desc_a,info,work,update,mode)
+subroutine  psb_iovrlv(x,desc_a,info,work,update,mode)
   use psb_descriptor_type
   use psi_mod
   use psb_const_mod
@@ -278,22 +277,22 @@ subroutine  psb_dovrlv(x,desc_a,info,work,update,mode)
   use psb_penv_mod
   implicit none
 
-  real(kind(1.d0)), intent(inout), target   :: x(:)
-  type(psb_desc_type), intent(in)           :: desc_a
-  integer, intent(out)                      :: info
-  real(kind(1.d0)), optional, target        :: work(:)
-  integer, intent(in), optional             :: update,mode
+  integer, intent(inout), target  :: x(:)
+  type(psb_desc_type), intent(in) :: desc_a
+  integer, intent(out)            :: info
+  integer, optional, target       :: work(:)
+  integer, intent(in), optional   :: update,mode
 
   ! locals
   integer                  :: ictxt, np, me, &
        & err_act, m, n, iix, jjx, ix, ijx, nrow, ncol, k, update_,&
        & mode_, err, liwork
-  real(kind(1.d0)),pointer :: iwork(:)
+  integer,pointer          :: iwork(:)
   logical                  :: do_swap
   character(len=20)        :: name, ch_err
   logical                  :: aliw
 
-  name='psb_dovrlv'
+  name='psb_iovrlv'
   if(psb_get_errstatus() /= 0) return 
   info=0
   call psb_erractionsave(err_act)
@@ -372,7 +371,7 @@ subroutine  psb_dovrlv(x,desc_a,info,work,update,mode)
 
   ! exchange overlap elements
   if (do_swap) then
-    call psi_swapdata(mode_,done,x(:),&
+    call psi_swapdata(mode_,ione,x(:),&
          & desc_a,iwork,info,data=psb_comm_ovr_)
   end if
   if (info == 0) call psi_ovrl_upd(x,desc_a,update_,info)
@@ -395,4 +394,4 @@ subroutine  psb_dovrlv(x,desc_a,info,work,update,mode)
     return
   end if
   return
-end subroutine psb_dovrlv
+end subroutine psb_iovrlv

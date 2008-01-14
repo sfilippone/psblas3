@@ -351,7 +351,7 @@ contains
         j=0
         blkfnd: do
           j=j+1
-          if(ia1(j).eq.indices(i)) then
+          if(ia1(j) == indices(i)) then
             blks(i)=j
             nz=nz+ia3(j)-ia2(j)
             ipx = ia1(j)         ! the first row index of the block
@@ -359,7 +359,7 @@ contains
             row = ia3(j)+rb
             nz  = nz+ja_(row+1)-ja_(row)
             exit blkfnd
-          else if(ia1(j).gt.indices(i)) then
+          else if(ia1(j) > indices(i)) then
             blks(i)=j-1
             nz=nz+ia3(j-1)-ia2(j-1)
             ipx = ia1(j-1)         ! the first row index of the block
@@ -775,7 +775,7 @@ contains
         j=0
         blkfnd: do
           j=j+1
-          if(ia1(j).eq.indices(i)) then
+          if(ia1(j) == indices(i)) then
             blks(i)=j
             nz=nz+ia3(j)-ia2(j)
             ipx = ia1(j)         ! the first row index of the block
@@ -783,7 +783,7 @@ contains
             row = ia3(j)+rb
             nz  = nz+ja_(row+1)-ja_(row)
             exit blkfnd
-          else if(ia1(j).gt.indices(i)) then
+          else if(ia1(j) > indices(i)) then
             blks(i)=j-1
             nz=nz+ia3(j-1)-ia2(j-1)
             ipx = ia1(j-1)         ! the first row index of the block

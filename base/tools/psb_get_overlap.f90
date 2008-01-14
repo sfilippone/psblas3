@@ -63,14 +63,9 @@ subroutine psb_get_ovrlap(ovrel,desc,info)
     goto 9999
   end if
 
-  i=0
-  j=1
-  do while(desc%ovrlap_elem(j) /= -1) 
-    i  = i +1 
-    j  = j + 2
-  enddo
+  if (allocated(desc%ovrlap_elem) ) then 
 
-  if (i > 0) then 
+    i=size(desc%ovrlap_elem,1) 
 
     allocate(ovrel(i),stat=info)
     if (info /= 0 ) then 
@@ -78,14 +73,10 @@ subroutine psb_get_ovrlap(ovrel,desc,info)
       call psb_errpush(info,name)
       goto 9999
     end if
-    
-    i=0
-    j=1
-    do while(desc%ovrlap_elem(j) /= -1) 
-      i  = i +1 
-      ovrel(i) = desc%ovrlap_elem(j) 
-      j  = j + 2
-    enddo
+
+    do j=1,i
+      ovrel(j) = desc%ovrlap_elem(j,1)       
+    end do
 
   else
 
@@ -104,7 +95,7 @@ subroutine psb_get_ovrlap(ovrel,desc,info)
 
 9999 continue
   call psb_erractionrestore(err_act)
-  if (err_act.eq.psb_act_abort_) then
+  if (err_act == psb_act_abort_) then
     call psb_error()
     return
   end if

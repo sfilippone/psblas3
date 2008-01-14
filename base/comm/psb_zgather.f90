@@ -66,7 +66,7 @@ subroutine  psb_zgatherm(globx, locx, desc_a, info, iroot)
   character(len=20)        :: name, ch_err
 
   name='psb_zgatherm'
-  if(psb_get_errstatus().ne.0) return 
+  if(psb_get_errstatus() /= 0) return 
   info=0
   call psb_erractionsave(err_act)
 
@@ -82,7 +82,7 @@ subroutine  psb_zgatherm(globx, locx, desc_a, info, iroot)
 
   if (present(iroot)) then
     root = iroot
-    if((root.lt.-1).or.(root.gt.np)) then
+    if((root < -1).or.(root > np)) then
       info=30
       int_err(1:2)=(/5,root/)
       call psb_errpush(info,name,i_err=int_err)
@@ -121,37 +121,38 @@ subroutine  psb_zgatherm(globx, locx, desc_a, info, iroot)
   call psb_chkglobvect(m,n,size(globx,1),iglobx,jglobx,desc_a,info)
   if (info == 0) &
        & call psb_chkvect(m,n,size(locx,1),ilocx,jlocx,desc_a,info,ilx,jlx)
-  if(info.ne.0) then
+  if(info /= 0) then
     info=4010
     ch_err='psb_chk(glob)vect'
     call psb_errpush(info,name,a_err=ch_err)
     goto 9999
   end if
 
-  if ((ilx.ne.1).or.(iglobx.ne.1)) then
+  if ((ilx /= 1).or.(iglobx /= 1)) then
     info=3040
     call psb_errpush(info,name)
     goto 9999
   end if
-  
+
   globx(:,:)=0.d0
 
   do j=1,k
-     do i=1,psb_cd_get_local_rows(desc_a)
-        idx = desc_a%loc_to_glob(i)
-        globx(idx,jglobx+j-1) = locx(i,jlx+j-1)
-     end do
-     ! adjust overlapped elements
-     i=1
-     do while (desc_a%ovrlap_elem(i).ne.-1)
-        idx=desc_a%ovrlap_elem(i+psb_ovrlp_elem_)
-        idx=desc_a%loc_to_glob(idx)
-        globx(idx,jglobx+j-1) = &
-             & globx(idx,jglobx+j-1)/desc_a%ovrlap_elem(i+psb_n_dom_ovr_)
-        i=i+2
-     end do
+    do i=1,psb_cd_get_local_rows(desc_a)
+      idx = desc_a%loc_to_glob(i)
+      globx(idx,jglobx+j-1) = locx(i,jlx+j-1)
+    end do
   end do
 
+  do j=1,k
+    ! adjust overlapped elements
+    do i=1, size(desc_a%ovrlap_elem,1)
+      if (me /= desc_a%ovrlap_elem(i,3)) then 
+        idx = desc_a%ovrlap_elem(i,1)
+        idx = desc_a%loc_to_glob(idx)
+        globx(idx,jglobx+j-1) = zzero
+      end if
+    end do
+  end do
   call psb_sum(ictxt,globx(1:m,jglobx:jglobx+k-1),root=root)
 
   call psb_erractionrestore(err_act)
@@ -160,9 +161,9 @@ subroutine  psb_zgatherm(globx, locx, desc_a, info, iroot)
 9999 continue
   call psb_erractionrestore(err_act)
 
-  if (err_act.eq.psb_act_abort_) then
-     call psb_error(ictxt)
-     return
+  if (err_act == psb_act_abort_) then
+    call psb_error(ictxt)
+    return
   end if
   return
 
@@ -240,7 +241,7 @@ subroutine  psb_zgatherv(globx, locx, desc_a, info, iroot)
   character(len=20)        :: name, ch_err
 
   name='psb_zgatherv'
-  if(psb_get_errstatus().ne.0) return 
+  if(psb_get_errstatus() /= 0) return 
   info=0
   call psb_erractionsave(err_act)
 
@@ -256,7 +257,7 @@ subroutine  psb_zgatherv(globx, locx, desc_a, info, iroot)
 
   if (present(iroot)) then
     root = iroot
-    if((root.lt.-1).or.(root.gt.np)) then
+    if((root < -1).or.(root > np)) then
       info=30
       int_err(1:2)=(/5,root/)
       call psb_errpush(info,name,i_err=int_err)
@@ -285,14 +286,14 @@ subroutine  psb_zgatherv(globx, locx, desc_a, info, iroot)
   call psb_chkglobvect(m,n,size(globx),iglobx,jglobx,desc_a,info)
   if (info == 0) &
        & call psb_chkvect(m,n,size(locx),ilocx,jlocx,desc_a,info,ilx,jlx)
-  if(info.ne.0) then
+  if(info /= 0) then
     info=4010
     ch_err='psb_chk(glob)vect'
     call psb_errpush(info,name,a_err=ch_err)
     goto 9999
   end if
 
-  if ((ilx.ne.1).or.(iglobx.ne.1)) then
+  if ((ilx /= 1).or.(iglobx /= 1)) then
     info=3040
     call psb_errpush(info,name)
     goto 9999
@@ -305,15 +306,15 @@ subroutine  psb_zgatherv(globx, locx, desc_a, info, iroot)
     globx(idx) = locx(i)
   end do
   ! adjust overlapped elements
-  i=1
-  do while (desc_a%ovrlap_elem(i).ne.-1)
-    idx=desc_a%ovrlap_elem(i+psb_ovrlp_elem_)
-    idx=desc_a%loc_to_glob(idx)
-    globx(idx) = globx(idx)/desc_a%ovrlap_elem(i+psb_n_dom_ovr_)
-    i=i+2
+  do i=1, size(desc_a%ovrlap_elem,1)
+    if (me /= desc_a%ovrlap_elem(i,3)) then 
+      idx = desc_a%ovrlap_elem(i,1)
+      idx = desc_a%loc_to_glob(idx)
+      globx(idx) = dzero
+    end if
   end do
-
   call psb_sum(ictxt,globx(1:m),root=root)
+  
 
   call psb_erractionrestore(err_act)
   return  
@@ -321,7 +322,7 @@ subroutine  psb_zgatherv(globx, locx, desc_a, info, iroot)
 9999 continue
   call psb_erractionrestore(err_act)
 
-  if (err_act.eq.psb_act_abort_) then
+  if (err_act == psb_act_abort_) then
     call psb_error(ictxt)
     return
   end if

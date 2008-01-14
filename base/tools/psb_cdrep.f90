@@ -179,7 +179,8 @@ subroutine psb_cdrep(m, ictxt, desc_a, info)
   !count local rows number
   ! allocate work vector
   allocate(desc_a%glob_to_loc(m),desc_a%matrix_data(psb_mdata_size_),&
-       &   desc_a%loc_to_glob(m),desc_a%lprm(1),stat=info)
+       &   desc_a%loc_to_glob(m),desc_a%lprm(1),&
+       &   desc_a%ovrlap_elem(0,3),stat=info)
   if (info /= 0) then     
     info=4025
     int_err(1)=2*m+psb_mdata_size_+1

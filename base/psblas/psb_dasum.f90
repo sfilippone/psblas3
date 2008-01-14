@@ -60,12 +60,12 @@ function psb_dasum (x,desc_a, info, jx)
 
   ! locals
   integer           :: ictxt, np, me, err_act, &
-       &      iix, jjx, ix, ijx, m, i
+       &      iix, jjx, ix, ijx, m, i, idx, ndm
   real(kind(1.d0))  :: asum, dasum
   character(len=20) :: name, ch_err
 
   name='psb_dasum'
-  if(psb_get_errstatus().ne.0) return 
+  if(psb_get_errstatus() /= 0) return 
   info=0
   call psb_erractionsave(err_act)
 
@@ -91,31 +91,29 @@ function psb_dasum (x,desc_a, info, jx)
 
   ! check vector correctness
   call psb_chkvect(m,1,size(x,1),ix,ijx,desc_a,info,iix,jjx)
-  if(info.ne.0) then
+  if(info /= 0) then
     info=4010
     ch_err='psb_chkvect'
     call psb_errpush(info,name,a_err=ch_err)
     goto 9999
   end if
 
-  if (iix.ne.1) then
+  if (iix /= 1) then
     info=3040
     call psb_errpush(info,name)
     goto 9999
   end if
 
   ! compute local max
-  if ((m.ne.0)) then
-    if(psb_cd_get_local_rows(desc_a).gt.0) then
+  if ((m /= 0)) then
+    if(psb_cd_get_local_rows(desc_a) > 0) then
       asum=dasum(psb_cd_get_local_rows(desc_a)-iix+1,x(iix,jjx),ione)
 
       ! adjust asum because overlapped elements are computed more than once
-      i=1
-      do while (desc_a%ovrlap_elem(i).ne.-ione)
-        asum = asum -&
-             & (desc_a%ovrlap_elem(i+1)-1)/desc_a%ovrlap_elem(i+1)*&
-             & abs(x(desc_a%ovrlap_elem(i)-iix+1,jjx))
-        i = i+2
+      do i=1,size(desc_a%ovrlap_elem,1)
+        idx  = desc_a%ovrlap_elem(i,1)
+        ndm  = desc_a%ovrlap_elem(i,2)
+        asum = asum - (real(ndm-1)/real(ndm))*abs(x(idx,jjx))
       end do
 
       ! compute global sum
@@ -139,7 +137,7 @@ function psb_dasum (x,desc_a, info, jx)
 9999 continue
   call psb_erractionrestore(err_act)
 
-  if (err_act.eq.psb_act_abort_) then
+  if (err_act == psb_act_abort_) then
     call psb_error(ictxt)
     return
   end if
@@ -203,12 +201,12 @@ function psb_dasumv (x,desc_a, info)
   real(kind(1.d0))                  :: psb_dasumv
 
   ! locals
-  integer                  :: ictxt, np, me, err_act, iix, jjx, jx, ix, m, i
-  real(kind(1.d0))         :: asum, dasum
-  character(len=20)        :: name, ch_err
+  integer            :: ictxt, np, me, err_act, iix, jjx, jx, ix, m, i, idx, ndm
+  real(kind(1.d0))   :: asum, dasum
+  character(len=20)  :: name, ch_err
 
   name='psb_dasumv'
-  if(psb_get_errstatus().ne.0) return 
+  if(psb_get_errstatus() /= 0) return 
   info=0
   call psb_erractionsave(err_act)
 
@@ -230,31 +228,28 @@ function psb_dasumv (x,desc_a, info)
 
   ! check vector correctness
   call psb_chkvect(m,1,size(x),ix,jx,desc_a,info,iix,jjx)
-  if(info.ne.0) then
+  if(info /= 0) then
     info=4010
     ch_err='psb_chkvect'
     call psb_errpush(info,name,a_err=ch_err)
     goto 9999
   end if
 
-  if (iix.ne.1) then
+  if (iix /= 1) then
     info=3040
     call psb_errpush(info,name)
     goto 9999
   end if
 
   ! compute local max
-  if ((m.ne.0)) then
-    if(psb_cd_get_local_rows(desc_a).gt.0) then
+  if ((m /= 0)) then
+    if(psb_cd_get_local_rows(desc_a) > 0) then
       asum=dasum(psb_cd_get_local_rows(desc_a),x,ione)
-
       ! adjust asum because overlapped elements are computed more than once
-      i=1
-      do while (desc_a%ovrlap_elem(i).ne.-ione)
-        asum = asum -&
-             & (desc_a%ovrlap_elem(i+1)-1)/desc_a%ovrlap_elem(i+1)*&
-             & abs(x(desc_a%ovrlap_elem(i)))
-        i = i+2
+      do i=1,size(desc_a%ovrlap_elem,1)
+        idx  = desc_a%ovrlap_elem(i,1)
+        ndm  = desc_a%ovrlap_elem(i,2)
+        asum = asum - (real(ndm-1)/real(ndm))*abs(x(idx))
       end do
 
       ! compute global sum
@@ -277,7 +272,7 @@ function psb_dasumv (x,desc_a, info)
 9999 continue
   call psb_erractionrestore(err_act)
 
-  if (err_act.eq.psb_act_abort_) then
+  if (err_act == psb_act_abort_) then
     call psb_error(ictxt)
     return
   end if
@@ -342,12 +337,12 @@ subroutine psb_dasumvs(res,x,desc_a, info)
   integer, intent(out)              :: info
 
   ! locals
-  integer                  :: ictxt, np, me, err_act, iix, jjx, ix, jx, m, i
-  real(kind(1.d0))         :: asum, dasum
-  character(len=20)        :: name, ch_err
+  integer            :: ictxt, np, me, err_act, iix, jjx, ix, jx, m, i, idx, ndm
+  real(kind(1.d0))   :: asum, dasum
+  character(len=20)  :: name, ch_err
 
   name='psb_dasumvs'
-  if(psb_get_errstatus().ne.0) return 
+  if(psb_get_errstatus() /= 0) return 
   info=0
   call psb_erractionsave(err_act)
 
@@ -369,31 +364,29 @@ subroutine psb_dasumvs(res,x,desc_a, info)
 
   ! check vector correctness
   call psb_chkvect(m,1,size(x),ix,jx,desc_a,info,iix,jjx)
-  if(info.ne.0) then
+  if(info /= 0) then
     info=4010
     ch_err='psb_chkvect'
     call psb_errpush(info,name,a_err=ch_err)
     goto 9999
   end if
 
-  if (iix.ne.1) then
+  if (iix /= 1) then
     info=3040
     call psb_errpush(info,name)
     goto 9999
   end if
 
   ! compute local max
-  if ((m.ne.0)) then
-    if(psb_cd_get_local_rows(desc_a).gt.0) then
+  if ((m /= 0)) then
+    if(psb_cd_get_local_rows(desc_a) > 0) then
       asum=dasum(psb_cd_get_local_rows(desc_a),x,ione)
 
       ! adjust asum because overlapped elements are computed more than once
-      i=1
-      do while (desc_a%ovrlap_elem(i).ne.-ione)
-        asum = asum -&
-             & (desc_a%ovrlap_elem(i+1)-1)/desc_a%ovrlap_elem(i+1)*&
-             & abs(x(desc_a%ovrlap_elem(i)))
-        i = i+2
+      do i=1,size(desc_a%ovrlap_elem,1)
+        idx  = desc_a%ovrlap_elem(i,1)
+        ndm  = desc_a%ovrlap_elem(i,2)
+        asum = asum - (real(ndm-1)/real(ndm))*abs(x(idx))
       end do
 
       ! compute global sum
@@ -417,12 +410,9 @@ subroutine psb_dasumvs(res,x,desc_a, info)
 9999 continue
   call psb_erractionrestore(err_act)
 
-  if (err_act.eq.psb_act_abort_) then
+  if (err_act == psb_act_abort_) then
     call psb_error(ictxt)
     return
   end if
   return
 end subroutine psb_dasumvs
-
-
-

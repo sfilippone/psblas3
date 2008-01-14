@@ -65,7 +65,7 @@ subroutine psi_dl_check(dep_list,dl_lda,np,length_dl)
     outer: do 
       if (i >length_dl(proc)) exit outer
       proc2=dep_list(i,proc)
-      if (proc2.ne.-1) then
+      if (proc2 /= -1) then
         ! ...search proc in proc2's dep_list....
         j=1
         p2loop:do 

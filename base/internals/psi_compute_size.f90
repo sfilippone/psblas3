@@ -84,9 +84,9 @@ subroutine psi_compute_size(desc_data, index_in, dl_lda, info)
 
   !     ....verify local correctness of halo_in....
   i=1
-  do while (index_in(i).ne.-1)
+  do while (index_in(i) /= -1)
     proc=index_in(i)
-    if ((proc.gt.np-1).or.(proc.lt.0)) then
+    if ((proc > np-1).or.(proc < 0)) then
       info = 115
       int_err(1) = 11
       int_err(2) = proc
@@ -108,8 +108,8 @@ subroutine psi_compute_size(desc_data, index_in, dl_lda, info)
   dl_lda=0
 
   do i=0,np-1
-    if (counter_recv(i).gt.max_index) max_index = counter_recv(i)
-    if (counter_dl(i).eq.1) dl_lda = dl_lda+1
+    if (counter_recv(i) > max_index) max_index = counter_recv(i)
+    if (counter_dl(i) == 1) dl_lda = dl_lda+1
   enddo
 
   !     computing max global value of dl_lda

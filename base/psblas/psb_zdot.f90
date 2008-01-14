@@ -61,14 +61,14 @@ function psb_zdot(x, y,desc_a, info, jx, jy)
   complex(kind(1.D0))              :: psb_zdot
 
   ! locals
-  integer                  :: ictxt, np, me,&
+  integer                  :: ictxt, np, me, idx, ndm,&
        & err_act, iix, jjx, ix, ijx, iy, ijy, iiy, jjy, i, m
   complex(kind(1.D0))         :: dot_local
   complex(kind(1.d0))         :: zdotc
   character(len=20)        :: name, ch_err
 
   name='psb_zdot'
-  if(psb_get_errstatus().ne.0) return 
+  if(psb_get_errstatus() /= 0) return 
   info=0
   call psb_erractionsave(err_act)
 
@@ -94,7 +94,7 @@ function psb_zdot(x, y,desc_a, info, jx, jy)
     ijy = ione
   endif
 
-  if(ijx.ne.ijy) then
+  if(ijx /= ijy) then
     info=3050
     call psb_errpush(info,name)
     goto 9999
@@ -106,31 +106,28 @@ function psb_zdot(x, y,desc_a, info, jx, jy)
   call psb_chkvect(m,ione,size(x,1),ix,ijx,desc_a,info,iix,jjx)
   if (info == 0) &
        & call psb_chkvect(m,ione,size(y,1),iy,ijy,desc_a,info,iiy,jjy)
-  if(info.ne.0) then
+  if(info /= 0) then
     info=4010
     ch_err='psb_chkvect'
     call psb_errpush(info,name,a_err=ch_err)
     goto 9999
   end if
 
-  if ((iix.ne.ione).or.(iiy.ne.ione)) then
+  if ((iix /= ione).or.(iiy /= ione)) then
     info=3040
     call psb_errpush(info,name)
     goto 9999
   end if
 
-  if(m.ne.0) then
-    if(psb_cd_get_local_rows(desc_a).gt.0) then
+  if(m /= 0) then
+    if(psb_cd_get_local_rows(desc_a) > 0) then
       dot_local = zdotc(psb_cd_get_local_rows(desc_a),&
            & x(iix,jjx),ione,y(iiy,jjy),ione)
       ! adjust dot_local because overlapped elements are computed more than once
-      i=1
-      do while (desc_a%ovrlap_elem(i).ne.-ione)
-        dot_local = dot_local -&
-             & (desc_a%ovrlap_elem(i+1)-1)/desc_a%ovrlap_elem(i+1)*&
-             & conjg(x(iix+desc_a%ovrlap_elem(i)-1,jjx))*&
-             & y(iiy+desc_a%ovrlap_elem(i)-1,jjy)
-        i = i+2
+      do i=1,size(desc_a%ovrlap_elem,1)
+        idx  = desc_a%ovrlap_elem(i,1)
+        ndm  = desc_a%ovrlap_elem(i,2)
+        dot_local = dot_local - (real(ndm-1)/real(ndm))*(conjg(x(idx,jjx))*y(idx,jjy))
       end do
     else
       dot_local=0.d0
@@ -150,7 +147,7 @@ function psb_zdot(x, y,desc_a, info, jx, jy)
 9999 continue
   call psb_erractionrestore(err_act)
 
-  if (err_act.eq.psb_act_abort_) then
+  if (err_act == psb_act_abort_) then
     call psb_error(ictxt)
     return
   end if
@@ -215,14 +212,14 @@ function psb_zdotv(x, y,desc_a, info)
   complex(kind(1.D0))              :: psb_zdotv
 
   ! locals
-  integer                  :: ictxt, np, me,&
+  integer                  :: ictxt, np, me, idx, ndm,&
        & err_act, iix, jjx, ix, jx, iy, jy, iiy, jjy, i, m
   complex(kind(1.D0))         :: dot_local
   complex(kind(1.d0))         :: zdotc
   character(len=20)        :: name, ch_err
 
   name='psb_zdot'
-  if(psb_get_errstatus().ne.0) return 
+  if(psb_get_errstatus() /= 0) return 
   info=0
   call psb_erractionsave(err_act)
 
@@ -245,31 +242,28 @@ function psb_zdotv(x, y,desc_a, info)
   call psb_chkvect(m,ione,size(x,1),ix,jx,desc_a,info,iix,jjx)
   if (info == 0)&
        & call psb_chkvect(m,ione,size(y,1),iy,jy,desc_a,info,iiy,jjy)
-  if(info.ne.0) then
+  if(info /= 0) then
     info=4010
     ch_err='psb_chkvect'
     call psb_errpush(info,name,a_err=ch_err)
     goto 9999
   end if
 
-  if ((iix.ne.ione).or.(iiy.ne.ione)) then
+  if ((iix /= ione).or.(iiy /= ione)) then
     info=3040
     call psb_errpush(info,name)
     goto 9999
   end if
 
-  if(m.ne.0) then
-    if(psb_cd_get_local_rows(desc_a).gt.0) then
+  if(m /= 0) then
+    if(psb_cd_get_local_rows(desc_a) > 0) then
       dot_local = zdotc(psb_cd_get_local_rows(desc_a),&
            & x,ione,y,ione)
       ! adjust dot_local because overlapped elements are computed more than once
-      i=1
-      do while (desc_a%ovrlap_elem(i).ne.-ione)
-        dot_local = dot_local -&
-             & (desc_a%ovrlap_elem(i+1)-1)/desc_a%ovrlap_elem(i+1)*&
-             & conjg(x(desc_a%ovrlap_elem(i)))*&
-             & y(desc_a%ovrlap_elem(i))
-        i = i+2
+      do i=1,size(desc_a%ovrlap_elem,1)
+        idx  = desc_a%ovrlap_elem(i,1)
+        ndm  = desc_a%ovrlap_elem(i,2)
+        dot_local = dot_local - (real(ndm-1)/real(ndm))*(conjg(x(idx))*y(idx))
       end do
     else
       dot_local=0.d0
@@ -289,7 +283,7 @@ function psb_zdotv(x, y,desc_a, info)
 9999 continue
   call psb_erractionrestore(err_act)
 
-  if (err_act.eq.psb_act_abort_) then
+  if (err_act == psb_act_abort_) then
     call psb_error(ictxt)
     return
   end if
@@ -354,14 +348,14 @@ subroutine psb_zdotvs(res, x, y,desc_a, info)
   integer, intent(out)             :: info
 
   ! locals
-  integer                  :: ictxt, np, me,&
+  integer                  :: ictxt, np, me, idx, ndm,&
        & err_act, iix, jjx, ix, iy, iiy, jjy, i, m
   complex(kind(1.D0))         :: dot_local
   complex(kind(1.d0))         :: zdotc
   character(len=20)        :: name, ch_err
 
   name='psb_zdot'
-  if(psb_get_errstatus().ne.0) return 
+  if(psb_get_errstatus() /= 0) return 
   info=0
   call psb_erractionsave(err_act)
 
@@ -381,31 +375,28 @@ subroutine psb_zdotvs(res, x, y,desc_a, info)
   call psb_chkvect(m,ione,size(x,1),ix,ix,desc_a,info,iix,jjx)
   if (info == 0) &
        & call psb_chkvect(m,ione,size(y,1),iy,iy,desc_a,info,iiy,jjy)
-  if(info.ne.0) then
+  if(info /= 0) then
     info=4010
     ch_err='psb_chkvect'
     call psb_errpush(info,name,a_err=ch_err)
     goto 9999
   end if
 
-  if ((iix.ne.ione).or.(iiy.ne.ione)) then
+  if ((iix /= ione).or.(iiy /= ione)) then
     info=3040
     call psb_errpush(info,name)
     goto 9999
   end if
 
-  if(m.ne.0) then
-    if(psb_cd_get_local_rows(desc_a).gt.0) then
+  if(m /= 0) then
+    if(psb_cd_get_local_rows(desc_a) > 0) then
       dot_local = zdotc(psb_cd_get_local_rows(desc_a),&
            & x,ione,y,ione)
       ! adjust dot_local because overlapped elements are computed more than once
-      i=1
-      do while (desc_a%ovrlap_elem(i).ne.-ione)
-        dot_local = dot_local -&
-             & (desc_a%ovrlap_elem(i+1)-1)/desc_a%ovrlap_elem(i+1)*&
-             & conjg(x(desc_a%ovrlap_elem(i)))*&
-             & y(desc_a%ovrlap_elem(i))
-        i = i+2
+      do i=1,size(desc_a%ovrlap_elem,1)
+        idx  = desc_a%ovrlap_elem(i,1)
+        ndm  = desc_a%ovrlap_elem(i,2)
+        dot_local = dot_local - (real(ndm-1)/real(ndm))*(conjg(x(idx))*y(idx))
       end do
     else
       dot_local=0.d0
@@ -425,7 +416,7 @@ subroutine psb_zdotvs(res, x, y,desc_a, info)
 9999 continue
   call psb_erractionrestore(err_act)
 
-  if (err_act.eq.psb_act_abort_) then
+  if (err_act == psb_act_abort_) then
     call psb_error(ictxt)
     return
   end if
@@ -491,14 +482,14 @@ subroutine psb_zmdots(res, x, y, desc_a, info)
   integer, intent(out)             :: info
 
   ! locals
-  integer                  :: ictxt, np, me,&
+  integer                  :: ictxt, np, me, idx, ndm,&
        & err_act, iix, jjx, ix, iy, iiy, jjy, i, m, j, k
   complex(kind(1.d0)),allocatable  :: dot_local(:)
   complex(kind(1.d0))         :: zdotc
   character(len=20)        :: name, ch_err
 
   name='psb_zmdots'
-  if(psb_get_errstatus().ne.0) return 
+  if(psb_get_errstatus() /= 0) return 
   info=0
   call psb_erractionsave(err_act)
 
@@ -518,21 +509,21 @@ subroutine psb_zmdots(res, x, y, desc_a, info)
 
   ! check vector correctness
   call psb_chkvect(m,ione,size(x,1),ix,ix,desc_a,info,iix,jjx)
-  if(info.ne.0) then
+  if(info /= 0) then
     info=4010
     ch_err='psb_chkvect'
     call psb_errpush(info,name,a_err=ch_err)
     goto 9999
   end if
   call psb_chkvect(m,ione,size(y,1),iy,iy,desc_a,info,iiy,jjy)
-  if(info.ne.0) then
+  if(info /= 0) then
     info=4010
     ch_err='psb_chkvect'
     call psb_errpush(info,name,a_err=ch_err)
     goto 9999
   end if
 
-  if ((ix.ne.ione).or.(iy.ne.ione)) then
+  if ((ix /= ione).or.(iy /= ione)) then
     info=3040
     call psb_errpush(info,name)
     goto 9999
@@ -541,20 +532,17 @@ subroutine psb_zmdots(res, x, y, desc_a, info)
   k = min(size(x,2),size(y,2))
   allocate(dot_local(k))
 
-  if(m.ne.0) then
-    if(psb_cd_get_local_rows(desc_a).gt.0) then
+  if(m /= 0) then
+    if(psb_cd_get_local_rows(desc_a) > 0) then
       do j=1,k
         dot_local(j) = zdotc(psb_cd_get_local_rows(desc_a),&
              & x(1,j),ione,y(1,j),ione)
         ! adjust dot_local because overlapped elements are computed more than once
-        i=1
-        do while (desc_a%ovrlap_elem(i).ne.-ione)
-          dot_local(j) = dot_local(j) -&
-               & (desc_a%ovrlap_elem(i+1)-1)/desc_a%ovrlap_elem(i+1)*&
-               & conjg(x(desc_a%ovrlap_elem(i)-1,j))*&
-               & y(desc_a%ovrlap_elem(i)-1,j)
-          i = i+2
-        end do
+      end do
+      do i=1,size(desc_a%ovrlap_elem,1)
+        idx  = desc_a%ovrlap_elem(i,1)
+        ndm  = desc_a%ovrlap_elem(i,2)
+        dot_local(1:k) = dot_local(1:k) - (real(ndm-1)/real(ndm))*(conjg(x(idx,1:k))*y(idx,1:k))
       end do
     else
       dot_local(:)=0.d0
@@ -568,14 +556,13 @@ subroutine psb_zmdots(res, x, y, desc_a, info)
 
   res(1:k) = dot_local(1:k)
 
-
   call psb_erractionrestore(err_act)
   return  
 
 9999 continue
   call psb_erractionrestore(err_act)
 
-  if (err_act.eq.psb_act_abort_) then
+  if (err_act == psb_act_abort_) then
     call psb_error(ictxt)
     return
   end if
