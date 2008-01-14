@@ -82,7 +82,7 @@ contains
 
     read (infile,fmt=fmt10) mtitle,key,totcrd,ptrcrd,indcrd,valcrd,rhscrd,&
          & type,nrow,ncol,nnzero,neltvl,ptrfmt,indfmt,valfmt,rhsfmt
-    if (rhscrd.gt.0) read(infile,fmt=fmt11)rhstype,nrhs,nrhsix
+    if (rhscrd > 0) read(infile,fmt=fmt11)rhstype,nrhs,nrhsix
 
     call psb_sp_all(a,nnzero,nrow+1,nnzero,ircode)
     if (ircode /= 0 ) then 
@@ -102,9 +102,9 @@ contains
 
         read (infile,fmt=ptrfmt) (a%ia2(i),i=1,nrow+1)
         read (infile,fmt=indfmt) (a%ia1(i),i=1,nnzero)
-        if (valcrd.gt.0) read (infile,fmt=valfmt) (a%aspk(i),i=1,nnzero)
+        if (valcrd > 0) read (infile,fmt=valfmt) (a%aspk(i),i=1,nnzero)
 
-        if (present(b)  .and. (rhscrd.gt.0)) then
+        if (present(b)  .and. (rhscrd > 0)) then
           call psb_ensure_size(nrow,b,info)
           if (info == 0) read (infile,fmt=rhsfmt) (b(i),i=1,nrow)
         endif
@@ -116,9 +116,9 @@ contains
 
         read (infile,fmt=ptrfmt) (a%ia2(i),i=1,nrow+1)
         read (infile,fmt=indfmt) (a%ia1(i),i=1,nnzero)
-        if (valcrd.gt.0) read (infile,fmt=valfmt) (a%aspk(i),i=1,nnzero)
+        if (valcrd > 0) read (infile,fmt=valfmt) (a%aspk(i),i=1,nnzero)
 
-        if (present(b)  .and. (rhscrd.gt.0)) then
+        if (present(b)  .and. (rhscrd > 0)) then
           call psb_ensure_size(nrow,b,info)
           if (info == 0) read (infile,fmt=rhsfmt) (b(i),i=1,nrow)
         endif
@@ -237,17 +237,17 @@ contains
       neltvl = 0 
 
       ptrcrd = (nrow+1)/jptr
-      if (mod(nrow+1,jptr).gt.0) ptrcrd = ptrcrd + 1
+      if (mod(nrow+1,jptr) > 0) ptrcrd = ptrcrd + 1
       indcrd = nnzero/jind
-      if (mod(nnzero,jind).gt.0) indcrd = indcrd + 1
+      if (mod(nnzero,jind) > 0) indcrd = indcrd + 1
       valcrd = nnzero/jval
-      if (mod(nnzero,jval).gt.0) valcrd = valcrd + 1
+      if (mod(nnzero,jval) > 0) valcrd = valcrd + 1
       if (present(rhs)) then 
         if (size(rhs)<nrow) then 
           rhscrd = 0
         else
           rhscrd = nrow/jrhs
-          if (mod(nrow,jrhs).gt.0) rhscrd = rhscrd + 1
+          if (mod(nrow,jrhs) > 0) rhscrd = rhscrd + 1
         endif
         nrhs = 1
       else
@@ -262,11 +262,11 @@ contains
       
       write (iout,fmt=fmt10) mtitle_,key_,totcrd,ptrcrd,indcrd,valcrd,rhscrd,&
            &  type,nrow,ncol,nnzero,neltvl,ptrfmt,indfmt,valfmt,rhsfmt
-      if (rhscrd.gt.0) write (iout,fmt=fmt11) rhstype,nrhs,nrhsix
+      if (rhscrd > 0) write (iout,fmt=fmt11) rhstype,nrhs,nrhsix
       write (iout,fmt=ptrfmt) (a%ia2(i),i=1,nrow+1)
       write (iout,fmt=indfmt) (a%ia1(i),i=1,nnzero)
-      if (valcrd.gt.0) write (iout,fmt=valfmt) (a%aspk(i),i=1,nnzero)
-      if (rhscrd.gt.0) write (iout,fmt=rhsfmt) (rhs(i),i=1,nrow)
+      if (valcrd > 0) write (iout,fmt=valfmt) (a%aspk(i),i=1,nnzero)
+      if (rhscrd > 0) write (iout,fmt=rhsfmt) (rhs(i),i=1,nrow)
 
 
     else
@@ -330,7 +330,7 @@ contains
 
     read (infile,fmt=fmt10) mtitle,key,totcrd,ptrcrd,indcrd,valcrd,rhscrd,&
          & type,nrow,ncol,nnzero,neltvl,ptrfmt,indfmt,valfmt,rhsfmt
-    if (rhscrd.gt.0) read(infile,fmt=fmt11)rhstype,nrhs,nrhsix
+    if (rhscrd > 0) read(infile,fmt=fmt11)rhstype,nrhs,nrhsix
 
 
     if (tolower(type(1:1)) == 'c') then 
@@ -350,9 +350,9 @@ contains
 
         read (infile,fmt=ptrfmt) (a%ia2(i),i=1,nrow+1)
         read (infile,fmt=indfmt) (a%ia1(i),i=1,nnzero)
-        if (valcrd.gt.0) read (infile,fmt=valfmt) (a%aspk(i),i=1,nnzero)
+        if (valcrd > 0) read (infile,fmt=valfmt) (a%aspk(i),i=1,nnzero)
 
-        if (present(b)  .and. (rhscrd.gt.0)) then
+        if (present(b)  .and. (rhscrd > 0)) then
           call psb_ensure_size(nrow,b,info)
           if (info == 0) read (infile,fmt=rhsfmt) (b(i),i=1,nrow)
         endif
@@ -374,9 +374,9 @@ contains
 
         read (infile,fmt=ptrfmt) (a%ia2(i),i=1,nrow+1)
         read (infile,fmt=indfmt) (a%ia1(i),i=1,nnzero)
-        if (valcrd.gt.0) read (infile,fmt=valfmt) (a%aspk(i),i=1,nnzero)
+        if (valcrd > 0) read (infile,fmt=valfmt) (a%aspk(i),i=1,nnzero)
 
-        if (present(b)  .and. (rhscrd.gt.0)) then
+        if (present(b)  .and. (rhscrd > 0)) then
           call psb_ensure_size(nrow,b,info)
           if (info == 0) read (infile,fmt=rhsfmt) (b(i),i=1,nrow)
         endif
@@ -430,9 +430,9 @@ contains
 
         read (infile,fmt=ptrfmt) (a%ia2(i),i=1,nrow+1)
         read (infile,fmt=indfmt) (a%ia1(i),i=1,nnzero)
-        if (valcrd.gt.0) read (infile,fmt=valfmt) (a%aspk(i),i=1,nnzero)
+        if (valcrd > 0) read (infile,fmt=valfmt) (a%aspk(i),i=1,nnzero)
 
-        if (present(b)  .and. (rhscrd.gt.0)) then
+        if (present(b)  .and. (rhscrd > 0)) then
           call psb_ensure_size(nrow,b,info)
           if (info == 0) read (infile,fmt=rhsfmt) (b(i),i=1,nrow)
         endif
@@ -559,17 +559,17 @@ contains
       nnzero = a%ia2(nrow+1)-1
       neltvl = 0 
       ptrcrd = (nrow+1)/jptr
-      if (mod(nrow+1,jptr).gt.0) ptrcrd = ptrcrd + 1
+      if (mod(nrow+1,jptr) > 0) ptrcrd = ptrcrd + 1
       indcrd = nnzero/jind
-      if (mod(nnzero,jind).gt.0) indcrd = indcrd + 1
+      if (mod(nnzero,jind) > 0) indcrd = indcrd + 1
       valcrd = nnzero/jval
-      if (mod(nnzero,jval).gt.0) valcrd = valcrd + 1
+      if (mod(nnzero,jval) > 0) valcrd = valcrd + 1
       if (present(rhs)) then 
         if (size(rhs)<nrow) then 
           rhscrd = 0
         else
           rhscrd = nrow/jrhs
-          if (mod(nrow,jrhs).gt.0) rhscrd = rhscrd + 1
+          if (mod(nrow,jrhs) > 0) rhscrd = rhscrd + 1
         endif
         nrhs = 1
       else
@@ -583,11 +583,11 @@ contains
       
       write (iout,fmt=fmt10) mtitle_,key_,totcrd,ptrcrd,indcrd,valcrd,rhscrd,&
            &  type,nrow,ncol,nnzero,neltvl,ptrfmt,indfmt,valfmt,rhsfmt
-      if (rhscrd.gt.0) write (iout,fmt=fmt11) rhstype,nrhs,nrhsix
+      if (rhscrd > 0) write (iout,fmt=fmt11) rhstype,nrhs,nrhsix
       write (iout,fmt=ptrfmt) (a%ia2(i),i=1,nrow+1)
       write (iout,fmt=indfmt) (a%ia1(i),i=1,nnzero)
-      if (valcrd.gt.0) write (iout,fmt=valfmt) (a%aspk(i),i=1,nnzero)
-      if (rhscrd.gt.0) write (iout,fmt=rhsfmt) (rhs(i),i=1,nrow)
+      if (valcrd > 0) write (iout,fmt=valfmt) (a%aspk(i),i=1,nnzero)
+      if (rhscrd > 0) write (iout,fmt=rhsfmt) (rhs(i),i=1,nrow)
 
 
     else

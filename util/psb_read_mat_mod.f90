@@ -120,7 +120,7 @@ contains
       open(infile,file=filename, status='old', err=901, action="read")
       read(infile,fmt=*, end=902) mmheader, object, fmt, type, sym
       write(0,*)'obj fmt',object, fmt
-      if ( (object .ne. 'matrix').or.(fmt.ne.'array')) then
+      if ( (object /= 'matrix').or.(fmt /= 'array')) then
         write(0,*) 'read_rhs: input file type not yet supported'
         call psb_abort(ictxt)
       end if
@@ -209,7 +209,7 @@ contains
       open(infile,file=filename, status='old', err=901, action="read")
       read(infile,fmt=*, end=902) mmheader, object, fmt, type, sym
 !!$      write(0,*)'obj fmt',object, fmt
-      if ( (object .ne. 'matrix').or.(fmt.ne.'array')) then
+      if ( (object /= 'matrix').or.(fmt /= 'array')) then
         write(0,*) 'read_rhs: input file type not yet supported'
         call psb_abort(ictxt)
       end if

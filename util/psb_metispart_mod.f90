@@ -154,8 +154,8 @@ contains
 	    & ' failure.'
        return
     endif
-    if (nparts.gt.1) then
-      if (toupper(fida).eq.'CSR') then 
+    if (nparts > 1) then
+      if (toupper(fida) == 'CSR') then 
         iopt(1) = 0
         numflag  = 1
         wgflag   = 0

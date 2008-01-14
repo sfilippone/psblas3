@@ -146,7 +146,7 @@ contains
     call psb_info(ictxt, iam, np)     
     if (iam == root) then
       ! extract information from a_glob
-      if (a_glob%fida.ne. 'CSR') then
+      if (a_glob%fida /=  'CSR') then
         info=135
         ch_err='CSR'
         call psb_errpush(info,name,a_err=ch_err)
@@ -215,11 +215,11 @@ contains
 
     i_count   = 1
 
-    do while (i_count.le.nrow)
+    do while (i_count <= nrow)
 
       call parts(i_count,nrow,np,iwork, length_row)
 
-      if (length_row.eq.1) then 
+      if (length_row == 1) then 
         j_count = i_count 
         iproc   = iwork(1) 
         do 
@@ -450,7 +450,7 @@ contains
 
 9999 continue
     call psb_erractionrestore(err_act)
-    if (err_act.eq.psb_act_abort_) then
+    if (err_act == psb_act_abort_) then
       call psb_error(ictxt)
       return
     end if
@@ -775,7 +775,7 @@ contains
 
 9999 continue
     call psb_erractionrestore(err_act)
-    if (err_act.eq.psb_act_abort_) then
+    if (err_act == psb_act_abort_) then
       call psb_error(ictxt)
       return
     end if
@@ -892,7 +892,7 @@ contains
     call psb_info(ictxt, iam, np)     
     if (iam == root) then
       ! extract information from a_glob
-      if (a_glob%fida.ne. 'CSR') then
+      if (a_glob%fida /=  'CSR') then
         info=135
         ch_err='CSR'
         call psb_errpush(info,name,a_err=ch_err)
@@ -960,11 +960,11 @@ contains
 
     i_count   = 1
 
-    do while (i_count.le.nrow)
+    do while (i_count <= nrow)
 
       call parts(i_count,nrow,np,iwork, length_row)
 
-      if (length_row.eq.1) then 
+      if (length_row == 1) then 
         j_count = i_count 
         iproc   = iwork(1) 
         do 
@@ -1195,7 +1195,7 @@ contains
 
 9999 continue
     call psb_erractionrestore(err_act)
-    if (err_act.eq.psb_act_abort_) then
+    if (err_act == psb_act_abort_) then
       call psb_error(ictxt)
       return
     end if
@@ -1521,7 +1521,7 @@ contains
 
 9999 continue
     call psb_erractionrestore(err_act)
-    if (err_act.eq.psb_act_abort_) then
+    if (err_act == psb_act_abort_) then
       call psb_error(ictxt)
       return
     end if
