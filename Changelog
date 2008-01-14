@@ -1,6 +1,8 @@
 Changelog. A lot less detailed than usual, at least for past
 history. 
 
+2008/01/14: Merged changes for handling of transpose vs. overlap.
+	
 2008/01/10: Changed name of GMRESR into RGMRES for consistency.
 	
 2007/12/21: Merged in debug infrastructure, internal and html docs. 
