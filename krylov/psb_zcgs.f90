@@ -174,7 +174,7 @@ Subroutine psb_zcgs(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,istop)
   Allocate(aux(naux),stat=info)
   if (info == 0) Call psb_geall(wwrk,desc_a,info,n=11)
   if (info == 0) Call psb_geasb(wwrk,desc_a,info)  
-  if (info.ne.0) Then 
+  if (info /= 0) Then 
      info=4011 
      call psb_errpush(info,name)
      goto 9999

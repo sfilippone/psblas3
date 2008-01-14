@@ -534,7 +534,7 @@ contains
     !     ..
     !     .. executable statements ..
     !
-    if( n.le.0 ) return
+    if( n <= 0 ) return
     if( incx == 1 .and. incy == 1 ) then 
       !
       !     code for both increments equal to 1
@@ -550,8 +550,8 @@ contains
       !
       ix = 1
       iy = 1
-      if( incx.lt.0 )ix = ( -n+1 )*incx + 1
-      if( incy.lt.0 )iy = ( -n+1 )*incy + 1
+      if( incx < 0 )ix = ( -n+1 )*incx + 1
+      if( incy < 0 )iy = ( -n+1 )*incy + 1
       do  i = 1, n
         stemp  = c*cx(ix) + s*cy(iy)
         cy(iy) = c*cy(iy) - dconjg(s)*cx(ix)
