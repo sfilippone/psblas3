@@ -46,7 +46,6 @@ subroutine psb_dprc_aply(prec,x,y,desc_data,info,trans, work)
   character     :: trans_ 
   real(kind(1.d0)), pointer :: work_(:)
   integer :: ictxt,np,me,err_act
-  logical,parameter    :: debug=.false., debugprt=.false.
   character(len=20)   :: name
 
   name='psb_prc_aply'
@@ -74,7 +73,10 @@ subroutine psb_dprc_aply(prec,x,y,desc_data,info,trans, work)
   end if
 
   call psb_gprec_aply(done,prec,x,dzero,y,desc_data,trans_,work_,info)
+
+  ! If the original distribution has an overlap we should fix that. 
   call psb_ovrl(y,desc_data,info,update=psb_avg_)
+
   if (present(work)) then 
   else
     deallocate(work_)
@@ -85,7 +87,7 @@ subroutine psb_dprc_aply(prec,x,y,desc_data,info,trans, work)
 
 9999 continue
   call psb_erractionrestore(err_act)
-  if (err_act.eq.psb_act_abort_) then
+  if (err_act == psb_act_abort_) then
     call psb_error()
     return
   end if
@@ -141,7 +143,6 @@ subroutine psb_dprc_aply1(prec,x,desc_data,info,trans)
   real(kind(0.d0)),intent(inout)    :: x(:)
   integer, intent(out)              :: info
   character(len=1), optional        :: trans
-  logical,parameter                 :: debug=.false., debugprt=.false.
 
   ! Local variables
   character     :: trans_
@@ -156,7 +157,7 @@ subroutine psb_dprc_aply1(prec,x,desc_data,info,trans)
   ictxt=desc_data%matrix_data(psb_ctxt_)
   call psb_info(ictxt, me, np)
   if (present(trans)) then 
-    trans_=trans
+    trans_=toupper(trans)
   else
     trans_='N'
   end if
@@ -166,7 +167,6 @@ subroutine psb_dprc_aply1(prec,x,desc_data,info,trans)
     call psb_errpush(4010,name,a_err='Allocate')
     goto 9999      
   end if
-  if (debug) write(0,*) 'Prc_aply1 Size(x) ',size(x), size(ww),size(w1)
   call psb_dprc_aply(prec,x,ww,desc_data,info,trans_,work=w1)
   if(info /=0) goto 9999
   x(:) = ww(:)
@@ -178,7 +178,7 @@ subroutine psb_dprc_aply1(prec,x,desc_data,info,trans)
 9999 continue
   call psb_errpush(info,name)
   call psb_erractionrestore(err_act)
-  if (err_act.eq.psb_act_abort_) then
+  if (err_act == psb_act_abort_) then
      call psb_error()
      return
   end if

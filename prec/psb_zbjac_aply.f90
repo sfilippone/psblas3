@@ -53,20 +53,23 @@ subroutine psb_zbjac_aply(alpha,prec,x,beta,y,desc_data,trans,work,info)
   integer :: n_row,n_col
   complex(kind(1.d0)), pointer :: ww(:), aux(:)
   integer :: ictxt,np,me, err_act, int_err(5)
-  logical,parameter                 :: debug=.false., debugprt=.false.
-  character(len=20)   :: name, ch_err
+  integer            :: debug_level, debug_unit
+  character          :: trans_
+  character(len=20)  :: name, ch_err
 
   name='psb_bjac_aply'
   info = 0
   call psb_erractionsave(err_act)
-
-  ictxt=psb_cd_get_context(desc_data)
+  debug_unit  = psb_get_debug_unit()
+  debug_level = psb_get_debug_level()
+  ictxt       = psb_cd_get_context(desc_data)
   call psb_info(ictxt, me, np)
 
-
-  select case(trans)
-  case('N','n')
-  case('T','t','C','c')
+  
+  trans_ = toupper(trans)
+  select case(trans_)
+  case('N','T','C')
+    ! Ok
   case default
     call psb_errpush(40,name)
     goto 9999
@@ -97,37 +100,36 @@ subroutine psb_zbjac_aply(alpha,prec,x,beta,y,desc_data,trans,work,info)
   endif
 
 
-
-
   select case(prec%iprcparm(f_type_))
   case(f_ilu_n_,f_ilu_e_) 
-    
-    select case(trans)
-    case('N','n')
-      
+
+    select case(trans_)
+    case('N')
+
       call psb_spsm(zone,prec%av(l_pr_),x,zzero,ww,desc_data,info,&
-           & trans='N',unit='L',diag=prec%d,choice=psb_none_,work=aux)
+           & trans=trans_,unit='L',diag=prec%d,choice=psb_none_,work=aux)
       if(info /=0) goto 9999
       call psb_spsm(alpha,prec%av(u_pr_),ww,beta,y,desc_data,info,&
-           & trans='N',unit='U',choice=psb_none_, work=aux)
+           & trans=trans_,unit='U',choice=psb_none_, work=aux)
       if(info /=0) goto 9999
-      
-    case('T','t','C','c')
+
+    case('T','C')
       call psb_spsm(zone,prec%av(u_pr_),x,zzero,ww,desc_data,info,&
-           & trans=trans,unit='L',diag=prec%d,choice=psb_none_, work=aux)
+           & trans=trans_,unit='L',diag=prec%d,choice=psb_none_, work=aux)
       if(info /=0) goto 9999
       call psb_spsm(alpha,prec%av(l_pr_),ww,beta,y,desc_data,info,&
-           & trans=trans,unit='U',choice=psb_none_,work=aux)
+           & trans=trans_,unit='U',choice=psb_none_,work=aux)
       if(info /=0) goto 9999
-      
+
     end select
     
     
   case default
-    write(0,*) 'Unknown factorization type in bjac_aply',prec%iprcparm(f_type_)
+    info = 4001
+    call psb_errpush(info,name,a_err='Invalid factorization')
+    goto 9999
   end select
-  if (debugprt) write(0,*)' Y: ',y(:)
-  
+
   if (n_col <= size(work)) then 
     if ((4*n_col+n_col) <= size(work)) then 
     else
@@ -144,11 +146,10 @@ subroutine psb_zbjac_aply(alpha,prec,x,beta,y,desc_data,trans,work,info)
 9999 continue
   call psb_errpush(info,name,i_err=int_err,a_err=ch_err)
   call psb_erractionrestore(err_act)
-  if (err_act.eq.psb_act_abort_) then
+  if (err_act == psb_act_abort_) then
     call psb_error()
     return
   end if
   return
 
 end subroutine psb_zbjac_aply
-

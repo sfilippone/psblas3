@@ -47,13 +47,12 @@ subroutine psb_zbjac_bld(a,desc_a,p,upd,info)
   character ::        trans, unitd
   type(psb_zspmat_type) ::  atmp
   real(kind(1.d0)) :: t1,t2,t3,t4,t5,t6, t7, t8
-  logical, parameter :: debugprt=.false., debug=.false., aggr_dump=.false.
   integer   nztota,  err_act, n_row, nrow_a,n_col, nhalo
   integer :: ictxt,np,me
   character(len=20)      :: name, ch_err
 
 
-  if(psb_get_errstatus().ne.0) return 
+  if(psb_get_errstatus() /= 0) return 
   info=0
   name='psb_zbjac_bld'
   call psb_erractionsave(err_act)
@@ -106,12 +105,9 @@ subroutine psb_zbjac_bld(a,desc_a,p,upd,info)
         goto 9999
       end if
     endif
-!!$  call psb_csprt(50+me,a,head='% (A)')    
 
     nrow_a = psb_cd_get_local_rows(desc_a)
     nztota = psb_sp_get_nnzeros(a)
-    if (debug) write(0,*)me,': out get_nnzeros',nztota
-    if (debug) call psb_barrier(ictxt)
 
     n_col  = psb_cd_get_local_cols(desc_a)
     nhalo  = n_col-nrow_a
@@ -146,17 +142,6 @@ subroutine psb_zbjac_bld(a,desc_a,p,upd,info)
     ! This is where we have mo renumbering, thus no need 
     ! for ATMP
 
-    if (debugprt) then 
-      open(40+me)
-      call psb_barrier(ictxt)
-      call psb_csprt(40+me,a,iv=p%desc_data%loc_to_glob,&
-           &    head='% Local matrix')
-      close(40+me)
-    endif
-
-    t5= psb_wtime()
-    if (debug) write(0,*) me,' Going for ilu_fct'
-    if (debug) call psb_barrier(ictxt)
     call psb_ilu_fct(a,p%av(l_pr_),p%av(u_pr_),p%d,info)
     if(info/=0) then
       info=4010
@@ -164,30 +149,6 @@ subroutine psb_zbjac_bld(a,desc_a,p,upd,info)
       call psb_errpush(info,name,a_err=ch_err)
       goto 9999
     end if
-    if (debug) write(0,*) me,' Done dilu_fct'
-
-
-    if (debugprt) then 
-      !
-      ! Print out the factors on file.
-      !
-      open(80+me)
-
-      call psb_csprt(80+me,p%av(l_pr_),head='% Local L factor')
-      write(80+me,*) '% Diagonal: ',p%av(l_pr_)%m
-      do i=1,p%av(l_pr_)%m
-        write(80+me,*) i,i,p%d(i)
-      enddo
-      call psb_csprt(80+me,p%av(u_pr_),head='% Local U factor')
-
-      close(80+me)
-    end if
-
-    !    ierr = MPE_Log_event( ifcte, 0, "st SIMPLE" )
-    t6 = psb_wtime()
-    !
-    !    write(0,'(i3,1x,a,3(1x,g18.9))') me,'renum/factor time',t3-t2,t6-t5
-    !    if (me==0) write(0,'(a,3(1x,g18.9))') 'renum/factor time',t3-t2,t6-t5
 
     if (psb_sp_getifld(psb_upd_,p%av(u_pr_),info) /= psb_upd_perm_) then
       call psb_sp_trim(p%av(u_pr_),info)
@@ -199,15 +160,12 @@ subroutine psb_zbjac_bld(a,desc_a,p,upd,info)
 
 
   case(f_none_) 
-    write(0,*) 'Fact=None in BASEPRC_BLD Bja/ASM??'
     info=4010
     ch_err='Inconsistent prec  f_none_'
     call psb_errpush(info,name,a_err=ch_err)
     goto 9999
 
   case default
-    write(0,*) 'Unknown factor type in baseprc_bld bja/asm: ',&
-         &p%iprcparm(f_type_)
     info=4010
     ch_err='Unknown f_type_'
     call psb_errpush(info,name,a_err=ch_err)
@@ -215,13 +173,12 @@ subroutine psb_zbjac_bld(a,desc_a,p,upd,info)
   end select
 
 
-  if (debug) write(0,*) me,'End of ilu_bld'
   call psb_erractionrestore(err_act)
   return
 
 9999 continue
   call psb_erractionrestore(err_act)
-  if (err_act.eq.psb_act_abort_) then
+  if (err_act == psb_act_abort_) then
     call psb_error()
     return
   end if

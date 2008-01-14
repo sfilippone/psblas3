@@ -42,39 +42,35 @@ subroutine psb_zprecbld(a,desc_a,p,info,upd)
 
 
   ! Local scalars
-
   Integer      :: err, n_row, n_col,ictxt,&
        & me,np,mglob, err_act
   integer      :: int_err(5)
-  character    :: iupd
+  character    :: upd_
 
-  logical, parameter :: debug=.false.
   integer,parameter  :: iroot=psb_root_,iout=60,ilout=40
   character(len=20)   :: name, ch_err
 
-  if(psb_get_errstatus().ne.0) return 
+  if(psb_get_errstatus() /= 0) return 
   info=0
   err=0
   call psb_erractionsave(err_act)
   name = 'psb_precbld'
 
-  if (debug) write(0,*) 'Entering precbld',P%prec,desc_a%matrix_data(:)
   info = 0
   int_err(1) = 0
   ictxt = psb_cd_get_context(desc_a)
 
-  if (debug) write(0,*) 'Preconditioner psb_info'
   call psb_info(ictxt, me, np)
 
   if (present(upd)) then 
-    if (debug) write(0,*) 'UPD ', upd
-    if ((upd.eq.'F').or.(upd.eq.'T')) then
-      iupd=upd
-    else
-      iupd='F'
-    endif
+    upd_ = toupper(upd)
   else
-    iupd='F'
+    upd_='F'
+  endif
+  if ((upd_ == 'F').or.(upd_ == 'T')) then
+    ! ok
+  else
+    upd_='F'
   endif
   n_row   = psb_cd_get_local_rows(desc_a)
   n_col   = psb_cd_get_local_cols(desc_a)
@@ -103,8 +99,7 @@ subroutine psb_zprecbld(a,desc_a,p,info,upd)
 
   case (diag_)
 
-    call psb_diagsc_bld(a,desc_a,p,iupd,info)
-    if(debug) write(0,*)me,': out of psb_diagsc_bld'
+    call psb_diagsc_bld(a,desc_a,p,upd_,info)
     if(info /= 0) then
       info=4010
       ch_err='psb_diagsc_bld'
@@ -117,9 +112,7 @@ subroutine psb_zprecbld(a,desc_a,p,info,upd)
     call psb_check_def(p%iprcparm(f_type_),'fact',&
          &  f_ilu_n_,is_legal_ml_fact)
 
-    if (debug) write(0,*)me, ': Calling PSB_BJAC_BLD'
-    if (debug) call psb_barrier(ictxt)
-    call psb_bjac_bld(a,desc_a,p,iupd,info)
+    call psb_bjac_bld(a,desc_a,p,upd_,info)
 
     if(info /= 0) then
       call psb_errpush(4010,name,a_err='psb_bjac_bld')
@@ -139,7 +132,7 @@ subroutine psb_zprecbld(a,desc_a,p,info,upd)
 
 9999 continue
   call psb_erractionrestore(err_act)
-  if (err_act.eq.psb_act_abort_) then
+  if (err_act == psb_act_abort_) then
     call psb_error()
     return
   end if

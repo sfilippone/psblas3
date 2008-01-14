@@ -226,7 +226,7 @@ contains
     integer, intent(out)                :: info
     integer             :: me, err_act,i
     character(len=20)   :: name
-    if(psb_get_errstatus().ne.0) return 
+    if(psb_get_errstatus() /= 0) return 
     info=0
     name = 'psb_precfree'
     call psb_erractionsave(err_act)
@@ -277,7 +277,7 @@ contains
 
 9999 continue
     call psb_erractionrestore(err_act)
-    if (err_act.eq.psb_act_abort_) then
+    if (err_act == psb_act_abort_) then
       call psb_error()
       return
     end if
@@ -300,7 +300,7 @@ contains
     integer, intent(out)                :: info
     integer             :: err_act,i
     character(len=20)   :: name
-    if(psb_get_errstatus().ne.0) return 
+    if(psb_get_errstatus() /= 0) return 
     info=0
     name = 'psb_precfree'
     call psb_erractionsave(err_act)
@@ -345,7 +345,7 @@ contains
 
 9999 continue
     call psb_erractionrestore(err_act)
-    if (err_act.eq.psb_act_abort_) then
+    if (err_act == psb_act_abort_) then
       call psb_error()
       return
     end if

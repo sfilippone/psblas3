@@ -46,17 +46,15 @@ subroutine psb_ddiagsc_bld(a,desc_a,p,upd,info)
        & me,np,mglob, err_act
   integer      :: int_err(5)
 
-  logical, parameter :: debug=.false.   
   integer,parameter  :: iroot=psb_root_,iout=60,ilout=40
   character(len=20)   :: name, ch_err
 
-  if(psb_get_errstatus().ne.0) return 
+  if(psb_get_errstatus() /= 0) return 
   info=0
   err=0
   call psb_erractionsave(err_act)
   name = 'psb_diagsc_bld'
 
-  if (debug) write(0,*) 'Entering diagsc_bld'
   info = 0
   int_err(1) = 0
   ictxt = psb_cd_get_context(desc_a)
@@ -64,10 +62,8 @@ subroutine psb_ddiagsc_bld(a,desc_a,p,upd,info)
   n_col = psb_cd_get_local_cols(desc_a)
   mglob = psb_cd_get_global_rows(desc_a)
 
-  if (debug) write(0,*) 'Preconditioner Blacs_gridinfo'
   call psb_info(ictxt, me, np)
 
-  if (debug) write(0,*) 'Precond: Diagonal scaling'
   ! diagonal scaling
 
   call psb_realloc(n_col,p%d,info)
@@ -95,7 +91,6 @@ subroutine psb_ddiagsc_bld(a,desc_a,p,upd,info)
     goto 9999
   end if
 
-  if (debug) write(ilout+me,*) 'VDIAG ',n_row
   !
   ! The i-th diagonal entry of the preconditioner is set to one if the
   ! corresponding entry a_ii of the sparse matrix A is zero; otherwise 
@@ -107,8 +102,6 @@ subroutine psb_ddiagsc_bld(a,desc_a,p,upd,info)
     else
       p%d(i) = done/p%d(i)
     endif
-
-    if (debug) write(ilout+me,*) i,desc_a%loc_to_glob(i), p%d(i)
   end do
 
   if (a%pl(1) /= 0) then
@@ -124,15 +117,12 @@ subroutine psb_ddiagsc_bld(a,desc_a,p,upd,info)
     end if
   endif
 
-  if (debug) write(*,*) 'Preconditioner DIAG computed OK'
-
-
   call psb_erractionrestore(err_act)
   return
 
 9999 continue
   call psb_erractionrestore(err_act)
-  if (err_act.eq.psb_act_abort_) then
+  if (err_act == psb_act_abort_) then
     call psb_error()
     return
   end if

@@ -48,7 +48,6 @@ subroutine psb_dilu_fct(a,l,u,d,info,blck)
   integer   ::  l1,l2,m,err_act  
   type(psb_dspmat_type), pointer  :: blck_
   character(len=20)   :: name, ch_err
-  logical, parameter :: debug=.false.
   name='psb_dcsrlu'
   info = 0
   call psb_erractionsave(err_act)
@@ -66,7 +65,7 @@ subroutine psb_dilu_fct(a,l,u,d,info,blck)
 
     call psb_nullify_sp(blck_)  ! Why do we need this? Who knows.... 
     call psb_sp_all(0,0,blck_,1,info)
-    if(info.ne.0) then
+    if(info /= 0) then
        info=4010
        ch_err='psb_sp_all'
        call psb_errpush(info,name,a_err=ch_err)
@@ -76,10 +75,9 @@ subroutine psb_dilu_fct(a,l,u,d,info,blck)
     blck_%m=0
   endif
 
-!!$  write(0,*) 'ilu_fct: ',size(l%ia2),size(u%ia2),a%m,blck_%m
   call psb_dilu_fctint(m,a%m,a,blck_%m,blck_,&
        & d,l%aspk,l%ia1,l%ia2,u%aspk,u%ia1,u%ia2,l1,l2,info)
-  if(info.ne.0) then
+  if(info /= 0) then
      info=4010
      ch_err='psb_dilu_fctint'
      call psb_errpush(info,name,a_err=ch_err)
@@ -100,7 +98,7 @@ subroutine psb_dilu_fct(a,l,u,d,info,blck)
     blck_ => null() 
   else
     call psb_sp_free(blck_,info)
-    if(info.ne.0) then
+    if(info /= 0) then
        info=4010
        ch_err='psb_sp_free'
        call psb_errpush(info,name,a_err=ch_err)
@@ -114,7 +112,7 @@ subroutine psb_dilu_fct(a,l,u,d,info,blck)
 
 9999 continue
   call psb_erractionrestore(err_act)
-  if (err_act.eq.psb_act_abort_) then
+  if (err_act == psb_act_abort_) then
      call psb_error()
      return
   end if
@@ -133,37 +131,34 @@ contains
     integer :: i,j,k,l,low1,low2,kk,jj,ll, irb, ktrw,err_act
     real(kind(1.d0)) :: dia,temp
     integer, parameter :: nrb=16
-    logical,parameter  :: debug=.false.
     type(psb_dspmat_type) :: trw
     integer             :: int_err(5) 
     character(len=20)   :: name, ch_err
 
     name='psb_dilu_fctint'
-    if(psb_get_errstatus().ne.0) return 
+    if(psb_get_errstatus() /= 0) return 
     info=0
     call psb_erractionsave(err_act)
     call psb_nullify_sp(trw)
     trw%m=0
     trw%k=0
-    if(debug) write(0,*)'LUINT Allocating TRW'
+
     call psb_sp_all(trw,1,info)
-    if(info.ne.0) then
+    if(info /= 0) then
       info=4010
       ch_err='psb_sp_all'
       call psb_errpush(info,name,a_err=ch_err)
       goto 9999
     end if
-    if(debug) write(0,*)'LUINT Done  Allocating TRW'
+
     lia2(1) = 1
     uia2(1) = 1
     l1=0
     l2=0
     m = ma+mb
-    if(debug) write(0,*)'In DCSRLU Begin cycle',m,ma,mb
 
     do i = 1, ma
-      if(debug) write(0,*)'LUINT: Loop index ',i,ma
-      d(i) = 0.d0
+      d(i) = dzero
 
       !
       ! Here we take a fast shortcut if possible, otherwise 
@@ -192,7 +187,7 @@ contains
         if ((mod(i,nrb) == 1).or.(nrb==1)) then 
           irb = min(ma-i+1,nrb)
           call psb_sp_getblk(i,a,trw,info,lrw=i+irb-1)
-          if(info.ne.0) then
+          if(info /= 0) then
             info=4010
             ch_err='psb_sp_getblk'
             call psb_errpush(info,name,a_err=ch_err)
@@ -295,7 +290,7 @@ contains
         call psb_errpush(info,name,i_err=int_err,a_err=ch_err)
         goto 9999
       else
-        dia = 1.d0/dia
+        dia = done/dia
       end if
       d(i) = dia
       ! write(6,*)'diag(',i,')=',d(i)
@@ -306,19 +301,19 @@ contains
     enddo
 
     do i = ma+1, m
-      d(i) = 0.d0
+      d(i) = dzero
 
 
       if (b%fida=='CSR') then 
 
         do j = b%ia2(i-ma), b%ia2(i-ma+1) - 1
           k = b%ia1(j)
-          !           if (me.eq.2)  write(0,*)'ecco k=',k
+          !           if (me == 2)  write(0,*)'ecco k=',k
           if ((k < i).and.(k >= 1)) then
             l1 = l1 + 1
             laspk(l1) = b%aspk(j)
             lia1(l1) = k
-            !              if(me.eq.2) write(0,*)'scrivo l'
+            !              if(me == 2) write(0,*)'scrivo l'
           else if (k == i) then
             d(i) = b%aspk(j)
           else if ((k > i).and.(k <= m)) then
@@ -334,7 +329,7 @@ contains
         if ((mod((i-ma),nrb) == 1).or.(nrb==1)) then 
           irb = min(m-i+1,nrb)
           call psb_sp_getblk(i-ma,b,trw,info,lrw=i-ma+irb-1)
-          if(info.ne.0) then
+          if(info /= 0) then
             info=4010
             ch_err='psb_sp_getblk'
             call psb_errpush(info,name,a_err=ch_err)
@@ -435,7 +430,7 @@ contains
         call psb_errpush(info,name,i_err=int_err,a_err=ch_err)
         goto 9999
       else
-        dia = 1.d0/dia
+        dia = done/dia
       end if
       d(i) = dia
       !     Scale row i of upper triangle
@@ -445,20 +440,19 @@ contains
     enddo
 
     call psb_sp_free(trw,info)
-    if(info.ne.0) then
+    if(info /= 0) then
       info=4010
       ch_err='psb_sp_free'
       call psb_errpush(info,name,a_err=ch_err)
       goto 9999
     end if
-    if(debug) write(0,*)'Leaving ilu_fct'
 
     call psb_erractionrestore(err_act)
     return
 
 9999 continue
     call psb_erractionrestore(err_act)
-    if (err_act.eq.psb_act_abort_) then
+    if (err_act == psb_act_abort_) then
       call psb_error()
       return
     end if

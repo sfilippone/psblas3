@@ -50,9 +50,8 @@ subroutine psb_dgprec_aply(alpha,prec,x,beta,y,desc_data,trans,work,info)
   ! Local variables
   integer :: n_row,int_err(5)
   real(kind(1.d0)), pointer :: ww(:)
-  character     ::diagl, diagu
+  character     :: trans_
   integer :: ictxt,np,me, err_act
-  logical,parameter                 :: debug=.false., debugprt=.false.
   character(len=20)   :: name, ch_err
 
   name='psb_dgprec_aply'
@@ -62,12 +61,11 @@ subroutine psb_dgprec_aply(alpha,prec,x,beta,y,desc_data,trans,work,info)
   ictxt=desc_data%matrix_data(psb_ctxt_)
   call psb_info(ictxt, me, np)
 
-  diagl='U'
-  diagu='U'
+  trans_ = toupper(trans)
 
-  select case(trans)
-  case('N','n')
-  case('T','t','C','c')
+  select case(trans_)
+  case('N')
+  case('T','C')
   case default
     info=40
     int_err(1)=6
@@ -108,15 +106,16 @@ subroutine psb_dgprec_aply(alpha,prec,x,beta,y,desc_data,trans,work,info)
   case(bjac_)
 
     call psb_bjac_aply(alpha,prec,x,beta,y,desc_data,trans,work,info)
-    if(info.ne.0) then
+    if(info /= 0) then
       info=4010
       ch_err='psb_bjac_aply'
       goto 9999
     end if
 
   case default
-    write(0,*) 'Invalid PRE%PREC ',prec%iprcparm(p_type_),':',&
-         & min_prec_,noprec_,diag_,bjac_
+    info = 4001
+    call psb_errpush(info,name,a_err='Invalid prectype')
+    goto 9999
   end select
 
   call psb_erractionrestore(err_act)
@@ -125,7 +124,7 @@ subroutine psb_dgprec_aply(alpha,prec,x,beta,y,desc_data,trans,work,info)
 9999 continue
   call psb_errpush(info,name,i_err=int_err,a_err=ch_err)
   call psb_erractionrestore(err_act)
-  if (err_act.eq.psb_act_abort_) then
+  if (err_act == psb_act_abort_) then
     call psb_error()
     return
   end if
