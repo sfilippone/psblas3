@@ -93,7 +93,7 @@ subroutine  psb_dspmm(alpha,a,x,beta,y,desc_a,info,&
        & i, ib, ib1, ip, idx
   integer, parameter       :: nb=4
   real(kind(1.d0)), pointer     :: xp(:,:), yp(:,:), iwork(:)
-  real(kind(1.d0)), allocatable :: wrkt(:,:)
+  real(kind(1.d0)), allocatable :: xvsave(:,:)
   character                :: trans_
   character(len=20)        :: name, ch_err
   logical                  :: aliw, doswap_
@@ -299,30 +299,20 @@ subroutine  psb_dspmm(alpha,a,x,beta,y,desc_a,info,&
     ! Non-empty overlap, need a buffer to hold
     ! the entries updated with average operator.
     ! 
-    allocate(wrkt(ncol,ik),stat=info)
-    if (info /= 0) then 
-      info=4010
-      ch_err='Allocate'
-      call psb_errpush(info,name,a_err=ch_err)
-      goto 9999
-    end if
-
-    
-    !
-    wrkt(1:nrow,1:ik)      = x(1:nrow,1:ik)      
-    wrkt(nrow+1:ncol,1:ik) = dzero
+    call psi_ovrl_save(x(:,1:ik),xvsave,desc_a,info)
+    if (info == 0) call psi_ovrl_upd(x,desc_a,psb_avg_,info)
     y(nrow+1:ncol,1:ik)    = dzero
-    call psi_ovrl_upd(wrkt,desc_a,psb_avg_,info)
 
-    call psb_csmm(alpha,a,wrkt(:,1:ik),beta,y(:,1:ik),info,trans=trans_)
+    if (info == 0) call psb_csmm(alpha,a,x(:,1:ik),beta,y(:,1:ik),info,trans=trans_)
     if (debug_level >= psb_debug_comp_) &
          & write(debug_unit,*) me,' ',trim(name),' csmm ', info
-    if(info /= 0) then
+    if (info /= 0) then
       info = 4010
       ch_err='psb_csmm'
       call psb_errpush(info,name,a_err=ch_err)
       goto 9999
     end if
+    if (info == 0) call psi_ovrl_restore(x,xvsave,desc_a,info)
 
     if (doswap_)then 
       call psi_swaptran(ior(psb_swap_send_,psb_swap_recv_),&
@@ -445,7 +435,8 @@ subroutine  psb_dspmv(alpha,a,x,beta,y,desc_a,info,&
        & m, nrow, ncol, lldx, lldy, liwork, jx, jy, iiy, jjy,&
        & ib, ip, idx
   integer, parameter       :: nb=4
-  real(kind(1.d0)),pointer :: iwork(:), xp(:), yp(:)
+  real(kind(1.d0)), pointer :: iwork(:), xp(:), yp(:)
+  real(kind(1.d0)), allocatable :: xvsave(:)
   character                :: trans_
   character(len=20)        :: name, ch_err
   logical                  :: aliw, doswap_
@@ -615,16 +606,17 @@ subroutine  psb_dspmv(alpha,a,x,beta,y,desc_a,info,&
     ! Non-empty overlap, need a buffer to hold
     ! the entries updated with average operator.
     ! 
-    iwork(1:nrow)      = x(1:nrow)
-    iwork(nrow+1:ncol) = dzero
-    yp(nrow+1:ncol)    = dzero
-    call psi_ovrl_upd(iwork,desc_a,psb_avg_,info)
+    call psi_ovrl_save(x,xvsave,desc_a,info)
+    if (info == 0) call psi_ovrl_upd(x,desc_a,psb_avg_,info)
+    yp(nrow+1:ncol) = dzero
     
     !  local Matrix-vector product
-    call psb_csmm(alpha,a,iwork,beta,yp,info,trans=trans_)
+    if (info == 0) call psb_csmm(alpha,a,x,beta,yp,info,trans=trans_)
+
     if (debug_level >= psb_debug_comp_) &
          & write(debug_unit,*) me,' ',trim(name),' csmm ', info
 
+    if (info == 0) call psi_ovrl_restore(x,xvsave,desc_a,info)
     if (info /= 0) then
       info = 4010
       ch_err='psb_csmm'
@@ -635,7 +627,6 @@ subroutine  psb_dspmv(alpha,a,x,beta,y,desc_a,info,&
     if (doswap_) then
       call psi_swaptran(ior(psb_swap_send_,psb_swap_recv_),&
            & done,yp,desc_a,iwork,info)
-
       if (info == 0) call psi_swapdata(ior(psb_swap_send_,psb_swap_recv_),&
            & done,yp,desc_a,iwork,info,data=psb_comm_ovr_)
       

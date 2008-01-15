@@ -332,6 +332,18 @@ module psi_mod
          & psi_zovrl_updr1, psi_zovrl_updr2
   end interface
 
+  interface psi_ovrl_save
+    module procedure  psi_iovrl_saver1, psi_iovrl_saver2,&
+         & psi_dovrl_saver1, psi_dovrl_saver2,&
+         & psi_zovrl_saver1, psi_zovrl_saver2
+  end interface
+
+  interface psi_ovrl_restore
+    module procedure  psi_iovrl_restrr1, psi_iovrl_restrr2,&
+         & psi_dovrl_restrr1, psi_dovrl_restrr2,&
+         & psi_zovrl_restrr1, psi_zovrl_restrr2
+  end interface
+
   interface psi_gth
     module procedure psi_igthm, psi_igthv,&
          & psi_dgthm, psi_dgthv,&
@@ -958,6 +970,656 @@ contains
     end if
     return
   end subroutine psi_iovrl_updr2
+
+
+
+  subroutine  psi_dovrl_saver1(x,xs,desc_a,info)
+    use psb_descriptor_type
+    use psb_const_mod
+    use psb_error_mod
+    use psb_realloc_mod
+    use psb_penv_mod
+    implicit none
+
+    real(kind(1.d0)), intent(inout)  :: x(:)
+    real(kind(1.d0)), allocatable    :: xs(:)
+    type(psb_desc_type), intent(in)  :: desc_a
+    integer, intent(out)             :: info
+
+    ! locals
+    integer           :: ictxt, np, me, err_act, i, idx, isz
+    character(len=20) :: name, ch_err
+
+    name='psi_dovrl_saver1'
+    if (psb_get_errstatus() /= 0) return 
+    info = 0
+    call psb_erractionsave(err_act)
+    ictxt = psb_cd_get_context(desc_a)
+    call psb_info(ictxt, me, np)
+    if (np == -1) then
+      info = 2010
+      call psb_errpush(info,name)
+      goto 9999
+    endif
+
+    isz = size(desc_a%ovrlap_elem,1)
+    call psb_realloc(isz,xs,info) 
+    if (info /= 0) then 
+      info = 4000
+      call psb_errpush(info,name)
+      goto 9999
+    endif
+
+    do i=1, isz
+      idx   = desc_a%ovrlap_elem(i,1)
+      xs(i) = x(idx)
+    end do
+
+    call psb_erractionrestore(err_act)
+    return  
+
+9999 continue
+    call psb_erractionrestore(err_act)
+
+    if (err_act == psb_act_abort_) then
+      call psb_error(ictxt)
+      return
+    end if
+    return
+  end subroutine psi_dovrl_saver1
+
+  subroutine  psi_dovrl_restrr1(x,xs,desc_a,info)
+    use psb_descriptor_type
+    use psb_const_mod
+    use psb_error_mod
+    use psb_penv_mod
+    implicit none
+
+    real(kind(1.d0)), intent(inout)  :: x(:)
+    real(kind(1.d0))                 :: xs(:)
+    type(psb_desc_type), intent(in)  :: desc_a
+    integer, intent(out)             :: info
+
+    ! locals
+    integer           :: ictxt, np, me, err_act, i, idx, isz
+    character(len=20) :: name, ch_err
+
+    name='psi_dovrl_restrr1'
+    if (psb_get_errstatus() /= 0) return 
+    info = 0
+    call psb_erractionsave(err_act)
+    ictxt = psb_cd_get_context(desc_a)
+    call psb_info(ictxt, me, np)
+    if (np == -1) then
+      info = 2010
+      call psb_errpush(info,name)
+      goto 9999
+    endif
+
+    isz = size(desc_a%ovrlap_elem,1)
+
+    do i=1, isz
+      idx    = desc_a%ovrlap_elem(i,1)
+      x(idx) = xs(i) 
+    end do
+
+    call psb_erractionrestore(err_act)
+    return  
+
+9999 continue
+    call psb_erractionrestore(err_act)
+
+    if (err_act == psb_act_abort_) then
+      call psb_error(ictxt)
+      return
+    end if
+    return
+  end subroutine psi_dovrl_restrr1
+
+
+  subroutine  psi_dovrl_saver2(x,xs,desc_a,info)
+    use psb_descriptor_type
+    use psb_const_mod
+    use psb_error_mod
+    use psb_realloc_mod
+    use psb_penv_mod
+    implicit none
+
+    real(kind(1.d0)), intent(inout)  :: x(:,:)
+    real(kind(1.d0)), allocatable    :: xs(:,:)
+    type(psb_desc_type), intent(in)  :: desc_a
+    integer, intent(out)             :: info
+
+    ! locals
+    integer           :: ictxt, np, me, err_act, i, idx, isz, nc
+    character(len=20) :: name, ch_err
+
+    name='psi_dovrl_saver2'
+    if (psb_get_errstatus() /= 0) return 
+    info = 0
+    call psb_erractionsave(err_act)
+    ictxt = psb_cd_get_context(desc_a)
+    call psb_info(ictxt, me, np)
+    if (np == -1) then
+      info = 2010
+      call psb_errpush(info,name)
+      goto 9999
+    endif
+
+    isz = size(desc_a%ovrlap_elem,1)
+    nc  = size(x,2)
+    call psb_realloc(isz,nc,xs,info) 
+    if (info /= 0) then 
+      info = 4000
+      call psb_errpush(info,name)
+      goto 9999
+    endif
+
+    do i=1, isz
+      idx     = desc_a%ovrlap_elem(i,1)
+      xs(i,:) = x(idx,:)
+    end do
+
+    call psb_erractionrestore(err_act)
+    return  
+
+9999 continue
+    call psb_erractionrestore(err_act)
+
+    if (err_act == psb_act_abort_) then
+      call psb_error(ictxt)
+      return
+    end if
+    return
+  end subroutine psi_dovrl_saver2
+
+  subroutine  psi_dovrl_restrr2(x,xs,desc_a,info)
+    use psb_descriptor_type
+    use psb_const_mod
+    use psb_error_mod
+    use psb_penv_mod
+    implicit none
+
+    real(kind(1.d0)), intent(inout)  :: x(:,:)
+    real(kind(1.d0))                 :: xs(:,:)
+    type(psb_desc_type), intent(in)  :: desc_a
+    integer, intent(out)             :: info
+
+    ! locals
+    integer           :: ictxt, np, me, err_act, i, idx, isz
+    character(len=20) :: name, ch_err
+
+    name='psi_dovrl_restrr2'
+    if (psb_get_errstatus() /= 0) return 
+    info = 0
+    call psb_erractionsave(err_act)
+    ictxt = psb_cd_get_context(desc_a)
+    call psb_info(ictxt, me, np)
+    if (np == -1) then
+      info = 2010
+      call psb_errpush(info,name)
+      goto 9999
+    endif
+    
+    if (size(x,2) /= size(xs,2)) then 
+      info = 4001
+      call psb_errpush(info,name, a_err='Mismacth columns X vs XS')
+      goto 9999
+    endif
+      
+    
+    isz = size(desc_a%ovrlap_elem,1)
+
+    do i=1, isz
+      idx      = desc_a%ovrlap_elem(i,1)
+      x(idx,:) = xs(i,:) 
+    end do
+
+    call psb_erractionrestore(err_act)
+    return  
+
+9999 continue
+    call psb_erractionrestore(err_act)
+
+    if (err_act == psb_act_abort_) then
+      call psb_error(ictxt)
+      return
+    end if
+    return
+  end subroutine psi_dovrl_restrr2
+
+
+
+  subroutine  psi_zovrl_saver1(x,xs,desc_a,info)
+    use psb_descriptor_type
+    use psb_const_mod
+    use psb_error_mod
+    use psb_realloc_mod
+    use psb_penv_mod
+    implicit none
+
+    complex(kind(1.d0)), intent(inout)  :: x(:)
+    complex(kind(1.d0)), allocatable    :: xs(:)
+    type(psb_desc_type), intent(in)  :: desc_a
+    integer, intent(out)             :: info
+
+    ! locals
+    integer           :: ictxt, np, me, err_act, i, idx, isz
+    character(len=20) :: name, ch_err
+
+    name='psi_zovrl_saver1'
+    if (psb_get_errstatus() /= 0) return 
+    info = 0
+    call psb_erractionsave(err_act)
+    ictxt = psb_cd_get_context(desc_a)
+    call psb_info(ictxt, me, np)
+    if (np == -1) then
+      info = 2010
+      call psb_errpush(info,name)
+      goto 9999
+    endif
+
+    isz = size(desc_a%ovrlap_elem,1)
+    call psb_realloc(isz,xs,info) 
+    if (info /= 0) then 
+      info = 4000
+      call psb_errpush(info,name)
+      goto 9999
+    endif
+
+    do i=1, isz
+      idx   = desc_a%ovrlap_elem(i,1)
+      xs(i) = x(idx)
+    end do
+
+    call psb_erractionrestore(err_act)
+    return  
+
+9999 continue
+    call psb_erractionrestore(err_act)
+
+    if (err_act == psb_act_abort_) then
+      call psb_error(ictxt)
+      return
+    end if
+    return
+  end subroutine psi_zovrl_saver1
+
+  subroutine  psi_zovrl_restrr1(x,xs,desc_a,info)
+    use psb_descriptor_type
+    use psb_const_mod
+    use psb_error_mod
+    use psb_penv_mod
+    implicit none
+    
+    complex(kind(1.d0)), intent(inout)  :: x(:)
+    complex(kind(1.d0))                 :: xs(:)
+    type(psb_desc_type), intent(in)  :: desc_a
+    integer, intent(out)             :: info
+
+    ! locals
+    integer           :: ictxt, np, me, err_act, i, idx, isz
+    character(len=20) :: name, ch_err
+
+    name='psi_zovrl_restrr1'
+    if (psb_get_errstatus() /= 0) return 
+    info = 0
+    call psb_erractionsave(err_act)
+    ictxt = psb_cd_get_context(desc_a)
+    call psb_info(ictxt, me, np)
+    if (np == -1) then
+      info = 2010
+      call psb_errpush(info,name)
+      goto 9999
+    endif
+
+    isz = size(desc_a%ovrlap_elem,1)
+
+    do i=1, isz
+      idx    = desc_a%ovrlap_elem(i,1)
+      x(idx) = xs(i) 
+    end do
+
+    call psb_erractionrestore(err_act)
+    return  
+
+9999 continue
+    call psb_erractionrestore(err_act)
+
+    if (err_act == psb_act_abort_) then
+      call psb_error(ictxt)
+      return
+    end if
+    return
+  end subroutine psi_zovrl_restrr1
+
+
+  subroutine  psi_zovrl_saver2(x,xs,desc_a,info)
+    use psb_descriptor_type
+    use psb_const_mod
+    use psb_error_mod
+    use psb_realloc_mod
+    use psb_penv_mod
+    implicit none
+
+    complex(kind(1.d0)), intent(inout)  :: x(:,:)
+    complex(kind(1.d0)), allocatable    :: xs(:,:)
+    type(psb_desc_type), intent(in)  :: desc_a
+    integer, intent(out)             :: info
+
+    ! locals
+    integer           :: ictxt, np, me, err_act, i, idx, isz, nc
+    character(len=20) :: name, ch_err
+
+    name='psi_zovrl_saver2'
+    if (psb_get_errstatus() /= 0) return 
+    info = 0
+    call psb_erractionsave(err_act)
+    ictxt = psb_cd_get_context(desc_a)
+    call psb_info(ictxt, me, np)
+    if (np == -1) then
+      info = 2010
+      call psb_errpush(info,name)
+      goto 9999
+    endif
+
+    isz = size(desc_a%ovrlap_elem,1)
+    nc  = size(x,2)
+    call psb_realloc(isz,nc,xs,info) 
+    if (info /= 0) then 
+      info = 4000
+      call psb_errpush(info,name)
+      goto 9999
+    endif
+
+    do i=1, isz
+      idx     = desc_a%ovrlap_elem(i,1)
+      xs(i,:) = x(idx,:)
+    end do
+
+    call psb_erractionrestore(err_act)
+    return  
+
+9999 continue
+    call psb_erractionrestore(err_act)
+
+    if (err_act == psb_act_abort_) then
+      call psb_error(ictxt)
+      return
+    end if
+    return
+  end subroutine psi_zovrl_saver2
+
+  subroutine  psi_zovrl_restrr2(x,xs,desc_a,info)
+    use psb_descriptor_type
+    use psb_const_mod
+    use psb_error_mod
+    use psb_penv_mod
+    implicit none
+
+    complex(kind(1.d0)), intent(inout)  :: x(:,:)
+    complex(kind(1.d0))                 :: xs(:,:)
+    type(psb_desc_type), intent(in)  :: desc_a
+    integer, intent(out)             :: info
+
+    ! locals
+    integer           :: ictxt, np, me, err_act, i, idx, isz
+    character(len=20) :: name, ch_err
+
+    name='psi_zovrl_restrr2'
+    if (psb_get_errstatus() /= 0) return 
+    info = 0
+    call psb_erractionsave(err_act)
+    ictxt = psb_cd_get_context(desc_a)
+    call psb_info(ictxt, me, np)
+    if (np == -1) then
+      info = 2010
+      call psb_errpush(info,name)
+      goto 9999
+    endif
+    
+    if (size(x,2) /= size(xs,2)) then 
+      info = 4001
+      call psb_errpush(info,name, a_err='Mismacth columns X vs XS')
+      goto 9999
+    endif
+      
+    
+    isz = size(desc_a%ovrlap_elem,1)
+
+    do i=1, isz
+      idx      = desc_a%ovrlap_elem(i,1)
+      x(idx,:) = xs(i,:) 
+    end do
+
+    call psb_erractionrestore(err_act)
+    return  
+
+9999 continue
+    call psb_erractionrestore(err_act)
+
+    if (err_act == psb_act_abort_) then
+      call psb_error(ictxt)
+      return
+    end if
+    return
+  end subroutine psi_zovrl_restrr2
+
+
+  subroutine  psi_iovrl_saver1(x,xs,desc_a,info)
+    use psb_descriptor_type
+    use psb_const_mod
+    use psb_error_mod
+    use psb_realloc_mod
+    use psb_penv_mod
+    implicit none
+
+    integer, intent(inout)  :: x(:)
+    integer, allocatable    :: xs(:)
+    type(psb_desc_type), intent(in)  :: desc_a
+    integer, intent(out)             :: info
+
+    ! locals
+    integer           :: ictxt, np, me, err_act, i, idx, isz
+    character(len=20) :: name, ch_err
+
+    name='psi_iovrl_saver1'
+    if (psb_get_errstatus() /= 0) return 
+    info = 0
+    call psb_erractionsave(err_act)
+    ictxt = psb_cd_get_context(desc_a)
+    call psb_info(ictxt, me, np)
+    if (np == -1) then
+      info = 2010
+      call psb_errpush(info,name)
+      goto 9999
+    endif
+
+    isz = size(desc_a%ovrlap_elem,1)
+    call psb_realloc(isz,xs,info) 
+    if (info /= 0) then 
+      info = 4000
+      call psb_errpush(info,name)
+      goto 9999
+    endif
+
+    do i=1, isz
+      idx   = desc_a%ovrlap_elem(i,1)
+      xs(i) = x(idx)
+    end do
+
+    call psb_erractionrestore(err_act)
+    return  
+
+9999 continue
+    call psb_erractionrestore(err_act)
+
+    if (err_act == psb_act_abort_) then
+      call psb_error(ictxt)
+      return
+    end if
+    return
+  end subroutine psi_iovrl_saver1
+
+  subroutine  psi_iovrl_restrr1(x,xs,desc_a,info)
+    use psb_descriptor_type
+    use psb_const_mod
+    use psb_error_mod
+    use psb_penv_mod
+    implicit none
+
+    integer, intent(inout)  :: x(:)
+    integer                 :: xs(:)
+    type(psb_desc_type), intent(in)  :: desc_a
+    integer, intent(out)             :: info
+
+    ! locals
+    integer           :: ictxt, np, me, err_act, i, idx, isz
+    character(len=20) :: name, ch_err
+
+    name='psi_iovrl_restrr1'
+    if (psb_get_errstatus() /= 0) return 
+    info = 0
+    call psb_erractionsave(err_act)
+    ictxt = psb_cd_get_context(desc_a)
+    call psb_info(ictxt, me, np)
+    if (np == -1) then
+      info = 2010
+      call psb_errpush(info,name)
+      goto 9999
+    endif
+
+    isz = size(desc_a%ovrlap_elem,1)
+
+    do i=1, isz
+      idx    = desc_a%ovrlap_elem(i,1)
+      x(idx) = xs(i) 
+    end do
+
+    call psb_erractionrestore(err_act)
+    return  
+
+9999 continue
+    call psb_erractionrestore(err_act)
+
+    if (err_act == psb_act_abort_) then
+      call psb_error(ictxt)
+      return
+    end if
+    return
+  end subroutine psi_iovrl_restrr1
+
+
+  subroutine  psi_iovrl_saver2(x,xs,desc_a,info)
+    use psb_descriptor_type
+    use psb_const_mod
+    use psb_error_mod
+    use psb_realloc_mod
+    use psb_penv_mod
+    implicit none
+
+    integer, intent(inout)  :: x(:,:)
+    integer, allocatable    :: xs(:,:)
+    type(psb_desc_type), intent(in)  :: desc_a
+    integer, intent(out)             :: info
+
+    ! locals
+    integer           :: ictxt, np, me, err_act, i, idx, isz, nc
+    character(len=20) :: name, ch_err
+
+    name='psi_iovrl_saver2'
+    if (psb_get_errstatus() /= 0) return 
+    info = 0
+    call psb_erractionsave(err_act)
+    ictxt = psb_cd_get_context(desc_a)
+    call psb_info(ictxt, me, np)
+    if (np == -1) then
+      info = 2010
+      call psb_errpush(info,name)
+      goto 9999
+    endif
+
+    isz = size(desc_a%ovrlap_elem,1)
+    nc  = size(x,2)
+    call psb_realloc(isz,nc,xs,info) 
+    if (info /= 0) then 
+      info = 4000
+      call psb_errpush(info,name)
+      goto 9999
+    endif
+
+    do i=1, isz
+      idx     = desc_a%ovrlap_elem(i,1)
+      xs(i,:) = x(idx,:)
+    end do
+
+    call psb_erractionrestore(err_act)
+    return  
+
+9999 continue
+    call psb_erractionrestore(err_act)
+
+    if (err_act == psb_act_abort_) then
+      call psb_error(ictxt)
+      return
+    end if
+    return
+  end subroutine psi_iovrl_saver2
+
+  subroutine  psi_iovrl_restrr2(x,xs,desc_a,info)
+    use psb_descriptor_type
+    use psb_const_mod
+    use psb_error_mod
+    use psb_penv_mod
+    implicit none
+
+    integer, intent(inout)  :: x(:,:)
+    integer                 :: xs(:,:)
+    type(psb_desc_type), intent(in)  :: desc_a
+    integer, intent(out)             :: info
+
+    ! locals
+    integer           :: ictxt, np, me, err_act, i, idx, isz
+    character(len=20) :: name, ch_err
+
+    name='psi_iovrl_restrr2'
+    if (psb_get_errstatus() /= 0) return 
+    info = 0
+    call psb_erractionsave(err_act)
+    ictxt = psb_cd_get_context(desc_a)
+    call psb_info(ictxt, me, np)
+    if (np == -1) then
+      info = 2010
+      call psb_errpush(info,name)
+      goto 9999
+    endif
+    
+    if (size(x,2) /= size(xs,2)) then 
+      info = 4001
+      call psb_errpush(info,name, a_err='Mismacth columns X vs XS')
+      goto 9999
+    endif
+      
+    
+    isz = size(desc_a%ovrlap_elem,1)
+
+    do i=1, isz
+      idx      = desc_a%ovrlap_elem(i,1)
+      x(idx,:) = xs(i,:) 
+    end do
+
+    call psb_erractionrestore(err_act)
+    return  
+
+9999 continue
+    call psb_erractionrestore(err_act)
+
+    if (err_act == psb_act_abort_) then
+      call psb_error(ictxt)
+      return
+    end if
+    return
+  end subroutine psi_iovrl_restrr2
 
 
   subroutine psi_dgthm(n,k,idx,x,y)
