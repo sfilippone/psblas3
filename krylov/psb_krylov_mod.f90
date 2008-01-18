@@ -488,9 +488,10 @@ contains
 
 
   
-  subroutine psb_d_init_conv(stopc,trace,a,b,eps,desc_a,stopdat,info)
+  subroutine psb_d_init_conv(methdname,stopc,trace,a,b,eps,desc_a,stopdat,info)
     use psb_base_mod
     implicit none 
+    character(len=*), intent(in)      :: methdname
     integer, intent(in)               :: stopc, trace
     type(psb_dspmat_type), intent(in) :: a
     real(kind(1.d0)), intent(in)      :: b(:), eps
@@ -499,6 +500,10 @@ contains
     integer, intent(out)              :: info
     
     integer                           :: ictxt, me, np, err_act
+    character(len=*), parameter       :: fmt='(a18,1x,A4,3(2x,A10))'
+    integer, parameter                :: outlen=18 
+    character(len=len(methdname))     :: mname
+    character(len=outlen)             :: outname
     character(len=20)                 :: name
 
     info = 0
@@ -537,8 +542,14 @@ contains
     stopdat%values(eps_)    = eps
     stopdat%values(errnum_) = dzero
     stopdat%values(errden_) = done
-
     
+    if (stopdat%controls(trace_) > 0) then
+      if (me == 0) then 
+        mname = adjustl(trim(methdname))
+        write(outname,'(a)') mname(1:min(len_trim(mname),outlen-1))//':'
+        write(*,fmt) adjustl(outname),'Iter','Conv. Ind.','Epsilon'
+      endif
+    end if
     call psb_erractionrestore(err_act)
     return
 
@@ -551,9 +562,10 @@ contains
    
   end subroutine psb_d_init_conv
   
-  subroutine psb_z_init_conv(stopc,trace,a,b,eps,desc_a,stopdat,info)
+  subroutine psb_z_init_conv(methdname,stopc,trace,a,b,eps,desc_a,stopdat,info)
     use psb_base_mod
     implicit none 
+    character(len=*), intent(in)      :: methdname
     integer, intent(in)               :: stopc, trace
     type(psb_zspmat_type), intent(in) :: a
     complex(kind(1.d0)), intent(in)   :: b(:)
@@ -563,6 +575,10 @@ contains
     integer, intent(out)              :: info
     
     integer                           :: ictxt, me, np, err_act
+    character(len=*), parameter       :: fmt='(a18,1x,A4,3(2x,A10))'
+    integer, parameter                :: outlen=18 
+    character(len=len(methdname))     :: mname
+    character(len=outlen)             :: outname
     character(len=20)                 :: name
 
     info = 0
@@ -603,6 +619,13 @@ contains
     stopdat%values(errden_) = done
 
     
+    if (stopdat%controls(trace_) > 0) then
+      if (me == 0) then 
+        mname = adjustl(trim(methdname))
+        write(outname,'(a)') mname(1:min(len_trim(mname),outlen-1))//':'
+        write(*,fmt) adjustl(outname),'Iter','Conv. Ind.','Epsilon'
+      endif
+    end if
     call psb_erractionrestore(err_act)
     return
 
@@ -629,7 +652,10 @@ contains
 
     integer                         :: ictxt, me, np, err_act
     real(kind(1.d0))                :: errnum, errden 
-    character(len=*), parameter     :: fmt='(a,i4,3(2x,es10.4))'
+    character(len=*), parameter     :: fmt='(a18,1x,i4,3(2x,es10.4))'
+    integer, parameter              :: outlen=18 
+    character(len=len(methdname))   :: mname
+    character(len=outlen)           :: outname
     character(len=20)               :: name
 
     info = 0
@@ -673,11 +699,13 @@ contains
     if (((stopdat%controls(trace_) > 0).and.(mod(it,stopdat%controls(trace_))==0))&
          & .or.psb_d_check_conv) then 
       if (me == 0) then 
+        mname = adjustl(trim(methdname))
+        write(outname,'(a)') mname(1:min(len_trim(mname),outlen-1))//':'
         if (stopdat%values(errden_) > dzero ) then 
-          write(*,fmt) trim(methdname)//': ',it,&
+          write(*,fmt) adjustl(outname),it,&
                & stopdat%values(errnum_)/stopdat%values(errden_),stopdat%values(eps_)
         else
-          write(*,fmt) trim(methdname)//': ',it,&
+          write(*,fmt) adjustl(outname),it,&
                & stopdat%values(errnum_),stopdat%values(eps_)
         end if
       Endif
@@ -710,7 +738,10 @@ contains
 
     integer                         :: ictxt, me, np, err_act
     real(kind(1.d0))                :: errnum, errden 
-    character(len=*), parameter     :: fmt='(a,i4,3(2x,es10.4))'
+    character(len=*), parameter     :: fmt='(a18,1x,i4,3(2x,es10.4))'
+    integer, parameter              :: outlen=18 
+    character(len=len(methdname))   :: mname
+    character(len=outlen)           :: outname
     character(len=20)               :: name
 
     info = 0
@@ -754,11 +785,13 @@ contains
     if (((stopdat%controls(trace_) > 0).and.(mod(it,stopdat%controls(trace_))==0))&
          & .or.psb_z_check_conv) then 
       if (me == 0) then 
+        mname = adjustl(trim(methdname))
+        write(outname,'(a)') mname(1:min(len_trim(mname),outlen-1))//':'
         if (stopdat%values(errden_) > dzero ) then 
-          write(*,fmt) trim(methdname)//': ',it,&
+          write(*,fmt) adjustl(outname),it,&
                & stopdat%values(errnum_)/stopdat%values(errden_),stopdat%values(eps_)
         else
-          write(*,fmt) trim(methdname)//': ',it,&
+          write(*,fmt) adjustl(outname),it,&
                & stopdat%values(errnum_),stopdat%values(eps_)
         end if
       Endif
@@ -812,7 +845,7 @@ contains
       if (errnum > eps) then 
         
         if (me==0) then 
-          write(*,fmt) methdname//' failed to converge to ',eps,&
+          write(*,fmt) trim(methdname)//' failed to converge to ',eps,&
                & ' in ',it,' iterations. '
           write(*,fmt1) 'Last iteration convergence indicator: ',&
                & errnum
@@ -823,7 +856,7 @@ contains
       if (errnum > eps) then 
         
         if (me==0) then 
-          write(*,fmt) methdname//' failed to converge to ',eps,&
+          write(*,fmt) trim(methdname)//' failed to converge to ',eps,&
                & ' in ',it,' iterations. '
           write(*,fmt1) 'Last iteration convergence indicator: ',&
                & errnum/errden
