@@ -34,6 +34,7 @@
 !
 Module psb_krylov_mod
 
+  public 
 
   interface psb_krylov
     module procedure psb_dkrylov, psb_zkrylov
@@ -191,6 +192,30 @@ Module psb_krylov_mod
       real(kind(1.d0)), optional, intent(out) :: err
     end subroutine psb_zcgs
   end interface
+
+
+
+  interface psb_init_conv
+    module procedure psb_d_init_conv, psb_z_init_conv
+  end interface
+
+  interface psb_check_conv
+    module procedure psb_d_check_conv, psb_z_check_conv
+  end interface
+
+  interface psb_end_conv
+    module procedure psb_end_conv
+  end interface
+
+  integer, parameter, private :: bni_=1, rni_=2, ani_=3, xni_=4, bn2_=5, xn2_=6
+  integer, parameter, private :: errnum_=7, errden_=8, eps_=9, rn2_=10
+  integer, parameter, private :: stopc_=1, trace_=2 
+  integer, parameter, private :: ivsz_=16
+  type psb_itconv_type
+    private
+    integer          :: controls(ivsz_)
+    real(kind(1.d0)) :: values(ivsz_)
+  end type psb_itconv_type
 
 contains
   ! Subroutine: psb_dkrylov
@@ -424,17 +449,24 @@ contains
   end subroutine psb_zkrylov
 
   subroutine log_conv(methdname,me,itx,itrace,errnum,errden,eps)
+    use psb_base_mod
     character(len=*), intent(in) :: methdname
     integer, intent(in)          :: me, itx, itrace
     real(kind(1.d0)), intent(in) :: errnum, errden, eps
     character(len=*), parameter  :: fmt='(a,i4,3(2x,es10.4))'
     
-    if ((mod(itx,itrace)==0).and.(me == 0)) then 
-      write(*,fmt) methdname//': ',itx,errnum,eps*errden
+    if (me == 0) then 
+      if (errden > dzero ) then 
+        write(*,fmt) methdname//': ',itx,errnum/errden,eps
+      else
+        write(*,fmt) methdname//': ',itx,errnum,eps
+      end if
     Endif
     
   end subroutine log_conv
+
   subroutine end_log(methdname,me,itx,errnum,errden,eps)
+    use psb_base_mod
     character(len=*), intent(in) :: methdname
     integer, intent(in)          :: me, itx
     real(kind(1.d0)), intent(in) :: errnum, errden, eps
@@ -444,10 +476,373 @@ contains
     if (me==0) then 
       write(*,fmt) methdname//' failed to converge to ',eps,&
            & ' in ',ITX,' iterations. '
-      write(*,fmt1) 'Last iteration convergence indicators: ',&
-           & errnum,eps*errden,errnum/errden
+      if (errden > dzero) then 
+        write(*,fmt1) 'Last iteration convergence indicator: ',&
+             & errnum/errden
+      else
+        write(*,fmt1) 'Last iteration convergence indicator: ',&
+             & errnum/errden
+      endif
     end if
   end subroutine end_log
+
+
+  
+  subroutine psb_d_init_conv(stopc,trace,a,b,eps,desc_a,stopdat,info)
+    use psb_base_mod
+    implicit none 
+    integer, intent(in)               :: stopc, trace
+    type(psb_dspmat_type), intent(in) :: a
+    real(kind(1.d0)), intent(in)      :: b(:), eps
+    type(psb_desc_type), intent(in)   :: desc_a
+    type(psb_itconv_type)             :: stopdat
+    integer, intent(out)              :: info
+    
+    integer                           :: ictxt, me, np, err_act
+    character(len=20)                 :: name
+
+    info = 0
+    name = 'psb_init_conv'
+    call psb_erractionsave(err_act)
+
+
+    ictxt=psb_cd_get_context(desc_a)
+
+    call psb_info(ictxt, me, np)
+    
+    stopdat%controls(:) = 0
+    stopdat%values(:)   = 0.0d0
+
+    stopdat%controls(stopc_) = stopc
+    stopdat%controls(trace_) = trace
+    
+    select case(stopdat%controls(stopc_))
+    case (1) 
+      stopdat%values(ani_) = psb_spnrmi(a,desc_a,info)
+      if (info == 0) stopdat%values(bni_) = psb_geamax(b,desc_a,info)
+
+    case (2) 
+      stopdat%values(bn2_) = psb_genrm2(b,desc_a,info)
+
+    case default
+      info=5001
+      call psb_errpush(info,name,i_err=(/stopc,0,0,0,0/))
+      goto 9999      
+    end select
+    if (info /= 0) then
+      call psb_errpush(4001,name,a_err="Init conv check data")
+      goto 9999
+    end if
+    
+    stopdat%values(eps_)    = eps
+    stopdat%values(errnum_) = dzero
+    stopdat%values(errden_) = done
+
+    
+    call psb_erractionrestore(err_act)
+    return
+
+9999 continue
+    call psb_erractionrestore(err_act)
+    if (err_act == psb_act_abort_) then
+      call psb_error(ictxt)
+      return
+    end if
+   
+  end subroutine psb_d_init_conv
+  
+  subroutine psb_z_init_conv(stopc,trace,a,b,eps,desc_a,stopdat,info)
+    use psb_base_mod
+    implicit none 
+    integer, intent(in)               :: stopc, trace
+    type(psb_zspmat_type), intent(in) :: a
+    complex(kind(1.d0)), intent(in)   :: b(:)
+    real(kind(1.d0)), intent(in)      :: eps
+    type(psb_desc_type), intent(in)   :: desc_a
+    type(psb_itconv_type)             :: stopdat
+    integer, intent(out)              :: info
+    
+    integer                           :: ictxt, me, np, err_act
+    character(len=20)                 :: name
+
+    info = 0
+    name = 'psb_init_conv'
+    call psb_erractionsave(err_act)
+
+
+    ictxt=psb_cd_get_context(desc_a)
+
+    call psb_info(ictxt, me, np)
+    
+    stopdat%controls(:) = 0
+    stopdat%values(:)   = 0.0d0
+
+    stopdat%controls(stopc_) = stopc
+    stopdat%controls(trace_) = trace
+    
+    select case(stopdat%controls(stopc_))
+    case (1) 
+      stopdat%values(ani_) = psb_spnrmi(a,desc_a,info)
+      if (info == 0) stopdat%values(bni_) = psb_geamax(b,desc_a,info)
+
+    case (2) 
+      stopdat%values(bn2_) = psb_genrm2(b,desc_a,info)
+
+    case default
+      info=5001
+      call psb_errpush(info,name,i_err=(/stopc,0,0,0,0/))
+      goto 9999      
+    end select
+    if (info /= 0) then
+      call psb_errpush(4001,name,a_err="Init conv check data")
+      goto 9999
+    end if
+    
+    stopdat%values(eps_)    = eps
+    stopdat%values(errnum_) = dzero
+    stopdat%values(errden_) = done
+
+    
+    call psb_erractionrestore(err_act)
+    return
+
+9999 continue
+    call psb_erractionrestore(err_act)
+    if (err_act == psb_act_abort_) then
+      call psb_error(ictxt)
+      return
+    end if
+   
+  end subroutine psb_z_init_conv
+    
+
+  function psb_d_check_conv(methdname,it,x,r,desc_a,stopdat,info)
+    use psb_base_mod
+    implicit none 
+    character(len=*), intent(in)    :: methdname
+    integer, intent(in)             :: it
+    real(kind(1.d0)), intent(in)    :: x(:), r(:)
+    type(psb_desc_type), intent(in) :: desc_a
+    type(psb_itconv_type)           :: stopdat
+    logical                         :: psb_d_check_conv
+    integer, intent(out)            :: info
+
+    integer                         :: ictxt, me, np, err_act
+    real(kind(1.d0))                :: errnum, errden 
+    character(len=*), parameter     :: fmt='(a,i4,3(2x,es10.4))'
+    character(len=20)               :: name
+
+    info = 0
+    name = 'psb_check_conv'
+    call psb_erractionsave(err_act)
+
+    ictxt = psb_cd_get_context(desc_a)
+    call psb_info(ictxt,me,np)
+    psb_d_check_conv = .false. 
+    
+    select case(stopdat%controls(stopc_)) 
+    case(1)
+      stopdat%values(rni_) = psb_geamax(r,desc_a,info)
+      if (info == 0) stopdat%values(xni_) = psb_geamax(x,desc_a,info)
+      stopdat%values(errnum_) = stopdat%values(rni_)
+      stopdat%values(errden_) = &
+           & (stopdat%values(ani_)*stopdat%values(xni_)+stopdat%values(bni_))
+    case(2)
+      stopdat%values(rn2_)  = psb_genrm2(r,desc_a,info)
+      stopdat%values(errnum_) = stopdat%values(rn2_)
+      stopdat%values(errden_) = stopdat%values(bn2_)
+
+    case default
+      info=4001
+      call psb_errpush(info,name,a_err="Control data in stopdat messed up!")
+      goto 9999      
+    end select
+    if (info /= 0) then 
+       info=4011
+       call psb_errpush(info,name)
+       goto 9999
+    end if
+    
+    if (stopdat%values(errden_) == dzero) then 
+      psb_d_check_conv = (stopdat%values(errnum_) <= stopdat%values(eps_))
+    else
+      psb_d_check_conv = &
+           & (stopdat%values(errnum_) <= stopdat%values(eps_)*stopdat%values(errden_))
+    end if
+    
+    if (((stopdat%controls(trace_) > 0).and.(mod(it,stopdat%controls(trace_))==0))&
+         & .or.psb_d_check_conv) then 
+      if (me == 0) then 
+        if (stopdat%values(errden_) > dzero ) then 
+          write(*,fmt) trim(methdname)//': ',it,&
+               & stopdat%values(errnum_)/stopdat%values(errden_),stopdat%values(eps_)
+        else
+          write(*,fmt) trim(methdname)//': ',it,&
+               & stopdat%values(errnum_),stopdat%values(eps_)
+        end if
+      Endif
+
+    end if
+
+    call psb_erractionrestore(err_act)
+    return
+
+9999 continue
+    call psb_erractionrestore(err_act)
+    if (err_act == psb_act_abort_) then
+      call psb_error(ictxt)
+      return
+    end if
+    
+  end function psb_d_check_conv
+
+
+  function psb_z_check_conv(methdname,it,x,r,desc_a,stopdat,info)
+    use psb_base_mod
+    implicit none 
+    character(len=*), intent(in)    :: methdname
+    integer, intent(in)             :: it
+    complex(kind(1.d0)), intent(in) :: x(:), r(:)
+    type(psb_desc_type), intent(in) :: desc_a
+    type(psb_itconv_type)           :: stopdat
+    logical                         :: psb_z_check_conv
+    integer, intent(out)            :: info
+
+    integer                         :: ictxt, me, np, err_act
+    real(kind(1.d0))                :: errnum, errden 
+    character(len=*), parameter     :: fmt='(a,i4,3(2x,es10.4))'
+    character(len=20)               :: name
+
+    info = 0
+    name = 'psb_check_conv'
+    call psb_erractionsave(err_act)
+
+    ictxt = psb_cd_get_context(desc_a)
+    call psb_info(ictxt,me,np)
+    psb_z_check_conv = .false. 
+    
+    select case(stopdat%controls(stopc_)) 
+    case(1)
+      stopdat%values(rni_) = psb_geamax(r,desc_a,info)
+      if (info == 0) stopdat%values(xni_) = psb_geamax(x,desc_a,info)
+      stopdat%values(errnum_) = stopdat%values(rni_)
+      stopdat%values(errden_) = &
+           & (stopdat%values(ani_)*stopdat%values(xni_)+stopdat%values(bni_))
+    case(2)
+      stopdat%values(rn2_)  = psb_genrm2(r,desc_a,info)
+      stopdat%values(errnum_) = stopdat%values(rn2_)
+      stopdat%values(errden_) = stopdat%values(bn2_)
+
+    case default
+      info=4001
+      call psb_errpush(info,name,a_err="Control data in stopdat messed up!")
+      goto 9999      
+    end select
+    if (info /= 0) then 
+       info=4011
+       call psb_errpush(info,name)
+       goto 9999
+    end if
+    
+    if (stopdat%values(errden_) == dzero) then 
+      psb_z_check_conv = (stopdat%values(errnum_) <= stopdat%values(eps_))
+    else
+      psb_z_check_conv = &
+           & (stopdat%values(errnum_) <= stopdat%values(eps_)*stopdat%values(errden_))
+    end if
+    
+    if (((stopdat%controls(trace_) > 0).and.(mod(it,stopdat%controls(trace_))==0))&
+         & .or.psb_z_check_conv) then 
+      if (me == 0) then 
+        if (stopdat%values(errden_) > dzero ) then 
+          write(*,fmt) trim(methdname)//': ',it,&
+               & stopdat%values(errnum_)/stopdat%values(errden_),stopdat%values(eps_)
+        else
+          write(*,fmt) trim(methdname)//': ',it,&
+               & stopdat%values(errnum_),stopdat%values(eps_)
+        end if
+      Endif
+
+    end if
+
+    call psb_erractionrestore(err_act)
+    return
+
+9999 continue
+    call psb_erractionrestore(err_act)
+    if (err_act == psb_act_abort_) then
+      call psb_error(ictxt)
+      return
+    end if
+    
+  end function psb_z_check_conv
+
+  subroutine psb_end_conv(methdname,it,desc_a,stopdat,info,err,iter)
+    use psb_base_mod
+    implicit none 
+    character(len=*), intent(in)    :: methdname
+    integer, intent(in)             :: it
+    type(psb_desc_type), intent(in) :: desc_a
+    type(psb_itconv_type)           :: stopdat
+    integer, intent(out)            :: info
+    real(kind(1.d0)), optional, intent(out) :: err
+    integer, optional, intent(out)  :: iter
+
+    integer                         :: ictxt, me, np, err_act
+    real(kind(1.d0))                :: errnum, errden, eps
+    character(len=*), parameter     :: fmt='(a,2x,es10.4,1x,a,1x,i4,1x,a)'
+    character(len=*), parameter     :: fmt1='(a,3(2x,es10.4))'    
+    character(len=20)               :: name
+
+    info = 0
+    name = 'psb_end_conv'
+    call psb_erractionsave(err_act)
+
+    ictxt = psb_cd_get_context(desc_a)
+    call psb_info(ictxt,me,np)
+    
+    if (present(iter)) iter = it
+    
+    errnum = stopdat%values(errnum_) 
+    errden = stopdat%values(errden_) 
+    eps    = stopdat%values(eps_) 
+    
+
+    if (errden == dzero) then 
+      if (errnum > eps) then 
+        
+        if (me==0) then 
+          write(*,fmt) methdname//' failed to converge to ',eps,&
+               & ' in ',it,' iterations. '
+          write(*,fmt1) 'Last iteration convergence indicator: ',&
+               & errnum
+        end if
+      end if
+      if (present(err)) err=errnum
+    else
+      if (errnum > eps) then 
+        
+        if (me==0) then 
+          write(*,fmt) methdname//' failed to converge to ',eps,&
+               & ' in ',it,' iterations. '
+          write(*,fmt1) 'Last iteration convergence indicator: ',&
+               & errnum/errden
+        end if
+      endif
+      if (present(err)) err=errnum/errden
+    end if
+
+    call psb_erractionrestore(err_act)
+    return
+
+9999 continue
+    call psb_erractionrestore(err_act)
+    if (err_act == psb_act_abort_) then
+      call psb_error(ictxt)
+      return
+    end if
+    
+  end subroutine psb_end_conv
 
 
 end module psb_krylov_mod

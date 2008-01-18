@@ -114,18 +114,19 @@ subroutine psb_dcg(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,istop)
 !!$   Local data
   real(kind(1.d0)), allocatable, target   :: aux(:), wwrk(:,:)
   real(kind(1.d0)), pointer  :: q(:), p(:), r(:), z(:), w(:)
-  real(kind(1.d0))    ::alpha, beta, rho, rho_old, rni, xni, bni, ani,bn2,& 
-       & sigma
-  integer         :: litmax, istop_, naux, mglob, it, itx, itrace_,&
+  real(kind(1.d0))   :: alpha, beta, rho, rho_old, sigma
+  integer            :: itmax_, istop_, naux, mglob, it, itx, itrace_,&
        & np,me, n_col, isvch, ictxt, n_row,err_act, int_err(5)
-  logical, parameter :: exchange=.true., noexchange=.false.  
-  real(kind(1.d0))   :: errnum, errden
+  integer            :: debug_level, debug_unit
+  type(psb_itconv_type)       :: stopdat
   character(len=20)           :: name
   character(len=*), parameter :: methdname='CG'
 
   info = 0
   name = 'psb_dcg'
   call psb_erractionsave(err_act)
+  debug_unit  = psb_get_debug_unit()
+  debug_level = psb_get_debug_level()
 
   ictxt = psb_cd_get_context(desc_a)
 
@@ -141,30 +142,12 @@ subroutine psb_dcg(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,istop)
   else
     istop_ = 1
   endif
-  !
-  !  ISTOP_ = 1:  Normwise backward error, infinity norm 
-  !  ISTOP_ = 2:  ||r||/||b||   norm 2 
-  !
-
-  if ((istop_ < 1 ).or.(istop_ > 2 ) ) then
-    write(0,*) 'psb_cg: invalid istop',istop_ 
-    info=5001
-    int_err(1)=istop_
-    err=info
-    call psb_errpush(info,name,i_err=int_err)
-    goto 9999
-  endif
 
   call psb_chkvect(mglob,1,size(x,1),1,1,desc_a,info)
-  if(info /= 0) then
-    info=4010
-    call psb_errpush(info,name,a_err='psb_chkvect on X')
-    goto 9999
-  end if
-  call psb_chkvect(mglob,1,size(b,1),1,1,desc_a,info)
+  if (info == 0) call psb_chkvect(mglob,1,size(b,1),1,1,desc_a,info)
   if(info /= 0) then
     info=4010    
-    call psb_errpush(info,name,a_err='psb_chkvect on B')
+    call psb_errpush(info,name,a_err='psb_chkvect on X/B')
     goto 9999
   end if
 
@@ -186,9 +169,9 @@ subroutine psb_dcg(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,istop)
 
 
   if (present(itmax)) then 
-    litmax = itmax
+    itmax_ = itmax
   else
-    litmax = 1000
+    itmax_ = 1000
   endif
 
   if (present(itrace)) then
@@ -206,10 +189,11 @@ subroutine psb_dcg(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,istop)
 !!$   
 !!$    r0 = b-Ax0
 !!$   
-    if (itx>= litmax) exit restart 
+    if (itx>= itmax_) exit restart 
+
     it = 0
     call psb_geaxpby(done,b,dzero,r,desc_a,info)
-    call psb_spmm(-done,a,x,done,r,desc_a,info,work=aux)
+    if (info == 0) call psb_spmm(-done,a,x,done,r,desc_a,info,work=aux)
     if (info /= 0) then 
       info=4011
       call psb_errpush(info,name)
@@ -217,22 +201,15 @@ subroutine psb_dcg(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,istop)
     end if
 
     rho = dzero
-    if (istop_ == 1) then 
-      ani = psb_spnrmi(a,desc_a,info)
-      bni = psb_geamax(b,desc_a,info)
-    else if (istop_ == 2) then 
-      bn2 = psb_genrm2(b,desc_a,info)
-    endif
-    errnum = dzero
-    errden = done
-    if (info /= 0) then 
-      info=4011
-      call psb_errpush(info,name)
+    
+    call psb_init_conv(istop_,itrace_,a,b,eps,desc_a,stopdat,info)
+    if (info /= 0) Then 
+      call psb_errpush(4011,name)
       goto 9999
-    end if
-
+    End If
 
     iteration:  do 
+
       it   = it + 1
       itx = itx + 1
 
@@ -244,7 +221,9 @@ subroutine psb_dcg(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,istop)
         call psb_geaxpby(done,z,dzero,p,desc_a,info)
       else
         if (rho_old==dzero) then
-          write(0,*) 'CG Iteration breakdown'
+          if (debug_level >= psb_debug_ext_)&
+               & write(debug_unit,*) me,' ',trim(name),&
+               & ': CG Iteration breakdown rho'
           exit iteration
         endif
         beta = rho/rho_old
@@ -254,7 +233,9 @@ subroutine psb_dcg(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,istop)
       call psb_spmm(done,a,p,dzero,q,desc_a,info,work=aux)
       sigma = psb_gedot(p,q,desc_a,info)
       if (sigma==dzero) then
-        write(0,*) 'CG Iteration breakdown'
+          if (debug_level >= psb_debug_ext_)&
+               & write(debug_unit,*) me,' ',trim(name),&
+               & ': CG Iteration breakdown sigma'
         exit iteration
       endif
 
@@ -262,42 +243,16 @@ subroutine psb_dcg(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,istop)
       call psb_geaxpby(alpha,p,done,x,desc_a,info)
       call psb_geaxpby(-alpha,q,done,r,desc_a,info)
 
-
-      if (istop_ == 1) then 
-        rni = psb_geamax(r,desc_a,info)
-        xni = psb_geamax(x,desc_a,info)
-        errnum = rni
-        errden = (ani*xni+bni)
-      else  if (istop_ == 2) then 
-        rni = psb_genrm2(r,desc_a,info)
-        errnum = rni
-        errden = bn2
-      endif
-
-      if (errnum <= eps*errden) exit restart
-      if (itx>= litmax) exit restart 
-
-      if (itrace_ > 0) &
-           & call log_conv(methdname,me,itx,itrace_,errnum,errden,eps)
+      if (psb_check_conv(methdname,itx,x,r,desc_a,stopdat,info)) exit restart
+      if (info /= 0) Then 
+        call psb_errpush(4011,name)
+        goto 9999
+      End If
 
     end do iteration
   end do restart
 
-  if (itrace_ > 0) &
-       & call log_conv(methdname,me,itx,1,errnum,errden,eps)
-
-  if (present(err)) then 
-    if (errden /= dzero) then 
-      err = errnum/errden
-    else
-      err = errnum
-    end if
-  end if
-
-  if (present(iter)) iter = itx
-
-  if (errnum > eps*errden) &
-       & call end_log(methdname,me,itx,errnum,errden,eps)
+  call psb_end_conv(methdname,itx,desc_a,stopdat,info,err,iter)
 
   call psb_gefree(wwrk,desc_a,info)
   if (info /= 0) then 

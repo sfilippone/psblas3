@@ -115,13 +115,10 @@ subroutine psb_zcgstab(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,istop)
   Integer          :: litmax, naux, mglob, it,itrace_,&
        & np,me, n_row, n_col
   integer            :: debug_level, debug_unit
-  Logical, Parameter :: exchange=.True., noexchange=.False., debug1 = .False.
-  Integer, Parameter :: irmax = 8
-  Integer            :: itx, isvch, ictxt, err_act, int_err(5)
+  Integer            :: itx, isvch, ictxt, err_act
   Integer            :: istop_
   complex(Kind(1.d0)) :: alpha, beta, rho, rho_old, sigma, omega, tau
-  Real(Kind(1.d0))   :: rni, xni, bni, ani, rn0, bn2
-  real(kind(1.d0))   :: errnum, errden
+  type(psb_itconv_type) :: stopdat
 !!$  Integer   istpb, istpe, ifctb, ifcte, imerr, irank, icomm,immb,imme
 !!$  Integer mpe_log_get_event_number,mpe_Describe_state,mpe_log_event
   character(len=20)           :: name
@@ -146,18 +143,6 @@ subroutine psb_zcgstab(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,istop)
   Else
     istop_ = 1
   Endif
-!
-!  ISTOP = 1:  Normwise backward error, infinity norm 
-!  ISTOP = 2:  ||r||/||b||   norm 2 
-!
-  
-  if ((istop_ < 1 ).or.(istop_ > 2 ) ) then
-    info=5001
-    int_err(1)=istop_
-    err=info
-    call psb_errpush(info,name,i_err=int_err)
-    goto 9999
-  endif
 
   call psb_chkvect(mglob,1,size(x,1),1,1,desc_a,info)
   if(info /= 0) then
@@ -208,17 +193,13 @@ subroutine psb_zcgstab(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,istop)
 
   itx   = 0
 
-  If (istop_ == 1) Then 
-    ani = psb_spnrmi(a,desc_a,info)
-    bni = psb_geamax(b,desc_a,info)
-  Else If (istop_ == 2) Then 
-    bn2 = psb_genrm2(b,desc_a,info)
-  Endif
+  
+  call psb_init_conv(istop_,itrace_,a,b,eps,desc_a,stopdat,info)
   if (info /= 0) Then 
-     info=4011
-     call psb_errpush(info,name)
+     call psb_errpush(4011,name)
      goto 9999
   End If
+
 
   restart: Do 
 !!$   
@@ -227,8 +208,8 @@ subroutine psb_zcgstab(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,istop)
     if (itx >= litmax) exit restart  
     it = 0      
     call psb_geaxpby(zone,b,zzero,r,desc_a,info)
-    call psb_spmm(-zone,a,x,zone,r,desc_a,info,work=aux)
-    call psb_geaxpby(zone,r,zzero,q,desc_a,info)
+    if (info == 0) call psb_spmm(-zone,a,x,zone,r,desc_a,info,work=aux)
+    if (info == 0) call psb_geaxpby(zone,r,zzero,q,desc_a,info)
     if (info /= 0) then 
        info=4011
        call psb_errpush(info,name)
@@ -240,46 +221,13 @@ subroutine psb_zcgstab(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,istop)
          & write(debug_unit,*) me,' ',trim(name),&
          & ' On entry to AMAX: B: ',Size(b)
     
-    !
-    !   Must always provide norm of R into RNI below for first check on 
-    !   residual
-    !
-    if (istop_ == 1) then 
-      rni = psb_geamax(r,desc_a,info)
-      xni = psb_geamax(x,desc_a,info)
-    else if (istop_ == 2) then 
-      rni = psb_genrm2(r,desc_a,info)
-    endif
-    errnum = dzero
-    errden = done
-    if (info /= 0) then 
-       info=4011
-       call psb_errpush(info,name)
-       goto 9999
-    end if
 
-    if (itx == 0) then 
-      rn0 = rni
-    end if
-    if (rn0 == 0.d0 ) exit restart
-    
-    if (istop_ == 1) then 
-      xni  = psb_geamax(x,desc_a,info)
-      errnum = rni
-      errden = (ani*xni+bni)
-    else  if (istop_ == 2) then 
-      errnum = rni
-      errden = bn2
-    endif
-    if (info /= 0) then 
-       info=4011
-       call psb_errpush(info,name)
-       goto 9999
-    end if
-
-    if (errnum <= eps*errden) exit restart
-    if (itrace_ > 0) &
-         & call log_conv(methdname,me,itx,itrace_,errnum,errden,eps)
+    ! Perhaps we already satisfy the convergence criterion...
+    if (psb_check_conv(methdname,itx,x,r,desc_a,stopdat,info)) exit restart
+    if (info /= 0) Then 
+      call psb_errpush(4011,name)
+      goto 9999
+    End If
 
     iteration:  Do 
       it   = it + 1
@@ -287,8 +235,9 @@ subroutine psb_zcgstab(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,istop)
       If (debug_level >= psb_debug_ext_)&
            & write(debug_unit,*) me,' ',trim(name),&
            & ' Iteration: ',itx
+
       rho_old = rho    
-      rho = psb_gedot(q,r,desc_a,info)
+      rho     = psb_gedot(q,r,desc_a,info)
 
       if (rho==zzero) then
          if (debug_level >= psb_debug_ext_) &
@@ -302,47 +251,40 @@ subroutine psb_zcgstab(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,istop)
       else
         beta = (rho/rho_old)*(alpha/omega)
         call psb_geaxpby(-omega,v,zone,p,desc_a,info)
-        call psb_geaxpby(zone,r,beta,p,desc_a,info)
+        if (info == 0) call psb_geaxpby(zone,r,beta,p,desc_a,info)
       end if
 
-      call psb_precaply(prec,p,f,desc_a,info,work=aux)
+      if (info == 0) call psb_precaply(prec,p,f,desc_a,info,work=aux)
 
-      call psb_spmm(zone,a,f,zzero,v,desc_a,info,&
+      if (info == 0) call psb_spmm(zone,a,f,zzero,v,desc_a,info,&
            & work=aux)
 
-      sigma = psb_gedot(q,v,desc_a,info)
+      if (info == 0) sigma = psb_gedot(q,v,desc_a,info)
+      if (info /= 0) then
+         call psb_errpush(4010,name,a_err='First step')
+         goto 9999
+      end if
+      
       if (sigma==zzero) then
          if (debug_level >= psb_debug_ext_) &
               & write(debug_unit,*) me,' ',trim(name),&
               & ' Iteration breakdown S1', sigma
          exit iteration
       endif
+      
       if (debug_level >= psb_debug_ext_) &
            & write(debug_unit,*) me,' ',trim(name),&
            & ' SIGMA:',sigma
       alpha = rho/sigma
-      call psb_geaxpby(zone,r,zzero,s,desc_a,info)
-      if (info /= 0) then
-         call psb_errpush(4010,name,a_err='psb_geaxpby')
-         goto 9999
-      end if
-      call psb_geaxpby(-alpha,v,zone,s,desc_a,info)
-      if (info /= 0) then
-         call psb_errpush(4010,name,a_err='psb_geaxpby')
-         goto 9999
-      end if
-      
-      call psb_precaply(prec,s,z,desc_a,info,work=aux)
-      if (info /= 0) then
-         call psb_errpush(4010,name,a_err='psb_precaply')
-         goto 9999
-      end if
 
-      call psb_spmm(zone,a,z,zzero,t,desc_a,info,&
+      call psb_geaxpby(zone,r,zzero,s,desc_a,info)
+      if (info == 0) call psb_geaxpby(-alpha,v,zone,s,desc_a,info)
+      if (info == 0) call psb_precaply(prec,s,z,desc_a,info,work=aux)
+      if (info == 0) call psb_spmm(zone,a,z,zzero,t,desc_a,info,&
            & work=aux)
 
       if (info /= 0) then
-         call psb_errpush(4010,name,a_err='psb_spmm')
+         call psb_errpush(4010,name,a_err='Second step ')
          goto 9999
       end if
       
@@ -354,7 +296,7 @@ subroutine psb_zcgstab(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,istop)
         exit iteration
       endif
       
-      tau  = psb_gedot(t,s,desc_a,info)
+      tau   = psb_gedot(t,s,desc_a,info)
       omega = tau/sigma
       
       if (omega==zzero) then
@@ -364,43 +306,26 @@ subroutine psb_zcgstab(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,istop)
         exit iteration
       endif
 
-      call psb_geaxpby(alpha,f,zone,x,desc_a,info)
-      call psb_geaxpby(omega,z,zone,x,desc_a,info)
-      call psb_geaxpby(zone,s,zzero,r,desc_a,info)
-      call psb_geaxpby(-omega,t,zone,r,desc_a,info)
+      if (info == 0) call psb_geaxpby(alpha,f,zone,x,desc_a,info)
+      if (info == 0) call psb_geaxpby(omega,z,zone,x,desc_a,info)
+      if (info == 0) call psb_geaxpby(zone,s,zzero,r,desc_a,info)
+      if (info == 0) call psb_geaxpby(-omega,t,zone,r,desc_a,info)
+
+      if (info /= 0) then
+         call psb_errpush(4010,name,a_err='X update ')
+         goto 9999
+      end if
       
-      if (istop_ == 1) then 
-        rni = psb_geamax(r,desc_a,info)
-        xni = psb_geamax(x,desc_a,info)
-        errnum = rni
-        errden = (ani*xni+bni)
-      else  if (istop_ == 2) then 
-        rni = psb_genrm2(r,desc_a,info)
-        errnum = rni
-        errden = bn2
-      endif
-      
-      if (errnum <= eps*errden) exit restart
-      if (itx >= litmax) exit restart
-      if (itrace_ > 0) &
-           & call log_conv(methdname,me,itx,itrace_,errnum,errden,eps)
-      
+      if (psb_check_conv(methdname,itx,x,r,desc_a,stopdat,info)) exit restart
+      if (info /= 0) Then 
+        call psb_errpush(4011,name)
+        goto 9999
+      End If
+
     end do iteration
   end do restart
 
-  if (itrace_ > 0) &
-       & call log_conv(methdname,me,itx,1,errnum,errden,eps)
-  
-  if (present(err)) then 
-    if (errden /= dzero) then 
-      err = errnum/errden
-    else
-      err = errnum
-    end if
-  end if
-  if (present(iter)) iter = itx
-  if (errnum > eps*errden) &
-       & call end_log(methdname,me,itx,errnum,errden,eps)
+  call psb_end_conv(methdname,itx,desc_a,stopdat,info,err,iter)
 
   deallocate(aux,stat=info)
   if (info == 0) call psb_gefree(wwrk,desc_a,info)
