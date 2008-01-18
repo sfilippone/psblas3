@@ -39,7 +39,6 @@ module psb_const_mod
   complex(kind(1.d0)), parameter :: zzero=(0.d0,0.0d0)
   complex(kind(1.d0)), parameter :: zone=(1.d0,0.0d0)
   real(kind(1.d0)), parameter    :: epstol=1.d-32, psb_percent_=0.7
-
-  character, parameter :: psb_all_='A',  psb_topdef_=' '
+  character, parameter           :: psb_all_='A',  psb_topdef_=' '
 
 end module psb_const_mod
