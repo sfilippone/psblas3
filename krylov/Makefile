@@ -4,10 +4,11 @@ include ../Make.inc
 HERE=.
 LIBDIR=../lib
 
-OBJS=psb_krylov_mod.o psb_dcgstab.o psb_dcg.o psb_dcgs.o \
+MODOBJS= psb_krylov_mod.o
+F90OBJS= psb_dcgstab.o psb_dcg.o psb_dcgs.o \
 	psb_dbicg.o psb_dcgstabl.o psb_drgmres.o\
 	psb_zcgstab.o psb_zcgs.o psb_zrgmres.o
-
+OBJS=$(F90OBJS) $(MODOBJS)
 
 LIBMOD=psb_krylov_mod$(.mod)
 LOCAL_MODS=$(LIBMOD)
@@ -21,6 +22,7 @@ lib:  $(OBJS)
 	/bin/cp -p $(HERE)/$(LIBNAME) $(LIBDIR)
 	/bin/cp -p $(LIBMOD) $(LIBDIR)
 
+$(F90OBJS): $(MODOBJS)
 $(OBJS): $(LIBDIR)/psb_prec_mod$(.mod)
 veryclean: clean
 	/bin/rm -f $(HERE)/$(LIBNAME)
