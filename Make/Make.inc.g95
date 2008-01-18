@@ -42,21 +42,17 @@ BLACS=-lmpiblacsg95 -L$(HOME)/LIB
 
 #######################  Section 4 #######################
 #  Other useful tools&defines                            #
-#  SLU and UMF need only be set when using MLD2P4        #
 ##########################################################
-#SLUDIR=/usr/local/SuperLU_3.0
-#SLU=-lslu_lx_g95 -L$(SLUDIR)
-#SLUDistDIR=/usr/local/SLUDist_2.0
-#SLUDist=-lslud-g95 -L$(SLUDistDIR) -L $(HOME)/LIB
-#SLUDEF=-DHave_SLU_ -I$(SLUDIR) -DHave_SLUDist_ -I$(SLUDistDIR)
-
-#UMFDIR=$(HOME)/LIB/Umfpack_g95
-#UMF=-lumfpack -lamd -L$(UMFDIR)
-#UMFDEF=-DHave_UMF_ -I$(UMFDIR)
+#
+#  We are using the public domain tool METIS from U. Minnesota. To get it
+#  check URL http://www.cs.umn.edu:~karypis
+#  
+METIS_LIB = -L$(HOME)/NUMERICAL/metis-4.0 -lmetis 
+PSBLDLIBS=$(BLACS) $(BLAS) $(METIS_LIB)
 
 #  Add -DLargeFptr for 64-bit addresses
-CDEFINES=-DAdd_ $(SLUDEF) $(UMFDEF)
-FDEFINES=-DNETLIB_BLACS  $(MPI_FINC) -DHAVE_MOVE_ALLOC
+PSBCDEFINES=-DAdd_ 
+PSBFDEFINES=-DNETLIB_BLACS  $(MPI_FINC) -DHAVE_MOVE_ALLOC
 
 AR=ar -cur
 RANLIB=ranlib
@@ -71,6 +67,9 @@ BASELIBNAME=libpsb_base.a
 PRECLIBNAME=libpsb_prec.a
 METHDLIBNAME=libpsb_krylov.a
 UTILLIBNAME=libpsb_util.a
+
+CDEFINES=$(PSBCDEFINES)
+FDEFINES=$(PSBFDEFINES)
 
 # Under Linux/gmake there is a rule interpreting .mod as Modula source! 
 $(.mod).o:

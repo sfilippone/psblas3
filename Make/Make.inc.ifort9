@@ -21,7 +21,6 @@ CCOPT=-O3
 FMFLAG=-I
 FIFLAG=-I
 
-
 #######################  Section 2 #######################
 #  Define your linker and linker flags here              #
 #  Does your MPI provide mpi.mod or mpif.h?              #
@@ -38,7 +37,6 @@ MPCC=$(MPIBIN)/mpicc
 MPI_FINC=-DMPI_MOD
 #$(FIFLAG)/opt/SUNWhpc/include
 
-
 #######################  Section 3 #######################
 #  Specify paths to libraries                            #
 ##########################################################
@@ -49,28 +47,19 @@ BLACS=-lmpiblacs-ifort91 -L$(HOME)/LIB
 
 #######################  Section 4 #######################
 #  Other useful tools&defines                            #
-#  SLU and UMF need only be set when using MLD2P4        #
 ##########################################################
-#SLUDIR=/usr/local/SuperLU_3.0
-#SLU=-lslu_lx_ifc9 -L$(SLUDIR)
-#SLUDistDIR=/usr/local/SLUDist_2.0
-#SLUDist=-lslud-ifc9 -L$(SLUDistDIR) -L $(HOME)/LIB
-#SLUDEF=-DHave_SLU_ -I$(SLUDIR) -DHave_SLUDist_ -I$(SLUDistDIR)
-
-#UMFDIR=$(HOME)/LIB/Umfpack_gcc41
-#UMF=-lumfpack -lamd -L$(UMFDIR)
-#UMFDEF=-DHave_UMF_ -I$(UMFDIR)
 #
 #  We are using the public domain tool METIS from U. Minnesota. To get it
 #  check URL http://www.cs.umn.edu:~karypis
 #  
 METIS_LIB = -L$(HOME)/NUMERICAL/metis-4.0 -lmetis 
-LDLIBS=$(BLACS) $(SLU) $(UMF) $(BLAS) $(METIS_LIB)
+PSBLDLIBS=$(BLACS) $(BLAS) $(METIS_LIB)
 
-#  Add -DLargeFptr for 64-bit addresses 
+#  Add -DLargeFptr for 64-bit addresses
 #   Note: MOVE_ALLOC is only on Intel Fortran 9.1, NOT on 9.0
-CDEFINES=-DAdd_ $(SLUDEF) $(UMFDEF)
-FDEFINES=-DNETLIB_BLACS  $(MPI_FINC) -DHAVE_MOVE_ALLOC
+PSBCDEFINES=-DAdd_ 
+PSBFDEFINES=-DNETLIB_BLACS  $(MPI_FINC) -DHAVE_MOVE_ALLOC
+
 
 AR=ar -cur
 RANLIB=ranlib
@@ -85,6 +74,9 @@ BASELIBNAME=libpsb_base.a
 PRECLIBNAME=libpsb_prec.a
 METHDLIBNAME=libpsb_krylov.a
 UTILLIBNAME=libpsb_util.a
+
+CDEFINES=$(PSBCDEFINES)
+FDEFINES=$(PSBFDEFINES)
 
 # Under Linux/gmake there is a rule interpreting .mod as Modula source! 
 $(.mod).o:

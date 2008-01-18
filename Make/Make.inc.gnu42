@@ -25,7 +25,7 @@ FIFLAG=-I
 #  Define your linker and linker flags here              #
 #  Does your MPI provide mpi.mod or mpif.h?              #
 #   MPI_FINC=-DMPI_H  or MPI_FINC=-DMPI_MOD              #
-#  If necessary add an include dir                       #
+#  If necessary add MPIINCDIR                            #
 ##########################################################
 MPIDIR=/usr/local/mpich-gcc42
 MPIBIN=$(MPIDIR)/bin
@@ -46,27 +46,18 @@ BLACS=-lmpiblacs-gcc42 -L$(HOME)/LIB
 
 #######################  Section 4 #######################
 #  Other useful tools&defines                            #
-#  SLU and UMF need only be set when using MLD2P4        #
 ##########################################################
-#SLUDIR=/usr/local/SuperLU_3.0
-#SLU=-lslu_lx_gcc42 -L$(SLUDIR)
-#SLUDistDIR=/usr/local/SLUDist_2.0
-#SLUDist=-lslud-gcc42 -L$(SLUDistDIR) -L $(HOME)/LIB
-#SLUDEF=-DHave_SLU_ -I$(SLUDIR) -DHave_SLUDist_ -I$(SLUDistDIR)
-#
-#UMFDIR=$(HOME)/LIB/Umfpack_gcc41
-#UMF=-lumfpack -lamd -L$(UMFDIR)
-#UMFDEF=-DHave_UMF_ -I$(UMFDIR)
 #
 #  We are using the public domain tool METIS from U. Minnesota. To get it
 #  check URL http://www.cs.umn.edu:~karypis
 #  
 METIS_LIB = -L$(HOME)/NUMERICAL/metis-4.0 -lmetis 
-LDLIBS=$(BLACS) $(SLU) $(SLUDist) $(UMF) $(BLAS) $(METIS_LIB)
+PSBLDLIBS=$(BLACS) $(BLAS) $(METIS_LIB)
 
 #  Add -DLargeFptr for 64-bit addresses
-CDEFINES=-DAdd_ $(SLUDEF) $(UMFDEF)
-FDEFINES=-DNETLIB_BLACS  $(MPI_FINC) -DHAVE_MOVE_ALLOC
+PSBCDEFINES=-DAdd_ 
+PSBFDEFINES=-DNETLIB_BLACS  $(MPI_FINC) -DHAVE_MOVE_ALLOC
+
 
 AR=ar -cur
 RANLIB=ranlib
@@ -82,6 +73,9 @@ PRECLIBNAME=libpsb_prec.a
 METHDLIBNAME=libpsb_krylov.a
 UTILLIBNAME=libpsb_util.a
 
+CDEFINES=$(PSBCDEFINES)
+FDEFINES=$(PSBFDEFINES)
+
 # Under Linux/gmake there is a rule interpreting .mod as Modula source! 
 $(.mod).o:
 	
@@ -90,13 +84,13 @@ $(.mod).o:
 .f.o:
 	$(FC) $(FCOPT) $(FINCLUDES)  -c $<
 .f$(.mod):
-	$(F90) $(FCOPT) $(FINCLUDES) -c $<
+	$(FC) $(FCOPT) $(FINCLUDES) -c $<
 .f90$(.mod):
 	$(F90) $(F90COPT) $(FINCLUDES) -c $<
 .f90.o:
 	$(F90) $(F90COPT) $(FINCLUDES) -c $<
 .F.o:
-	$(F90) $(F90COPT) $(FINCLUDES) $(FDEFINES) -c $<
+	$(FC) $(FCOPT) $(FINCLUDES) $(FDEFINES) -c $<
 .F90.o:
 	$(F90) $(F90COPT) $(FINCLUDES) $(FDEFINES) -c $<
 .F90$(.mod):
