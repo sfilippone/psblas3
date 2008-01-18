@@ -209,7 +209,7 @@ Module psb_krylov_mod
 
   integer, parameter, private :: bni_=1, rni_=2, ani_=3, xni_=4, bn2_=5, xn2_=6
   integer, parameter, private :: errnum_=7, errden_=8, eps_=9, rn2_=10
-  integer, parameter, private :: stopc_=1, trace_=2 
+  integer, parameter, private :: stopc_=1, trace_=2, itmax_=3
   integer, parameter, private :: ivsz_=16
   type psb_itconv_type
     private
@@ -448,51 +448,87 @@ contains
 
   end subroutine psb_zkrylov
 
+  subroutine log_header(methdname)
+    use psb_base_mod
+    implicit none 
+    character(len=*), intent(in)   :: methdname
+    character(len=*), parameter    :: fmt='(a18,1x,a4,3(2x,a10))'
+    integer, parameter             :: outlen=18 
+    character(len=len(methdname))  :: mname
+    character(len=outlen)          :: outname
+    
+    mname = adjustl(trim(methdname))
+    write(outname,'(a)') mname(1:min(len_trim(mname),outlen-1))//':'
+    write(*,fmt) adjustl(outname),'Iter','Conv. Ind.','Epsilon'
+    
+  end subroutine log_header
+
+
   subroutine log_conv(methdname,me,itx,itrace,errnum,errden,eps)
     use psb_base_mod
-    character(len=*), intent(in) :: methdname
-    integer, intent(in)          :: me, itx, itrace
-    real(kind(1.d0)), intent(in) :: errnum, errden, eps
-    character(len=*), parameter  :: fmt='(a,i4,3(2x,es10.4))'
-    
-    if (me == 0) then 
+    implicit none 
+    character(len=*), intent(in)  :: methdname
+    integer, intent(in)           :: me, itx, itrace
+    real(kind(1.d0)), intent(in)  :: errnum, errden, eps
+    character(len=*), parameter   :: fmt='(a18,1x,i4,3(2x,es10.4))'
+    integer, parameter            :: outlen=18 
+    character(len=len(methdname)) :: mname
+    character(len=outlen)         :: outname
+
+    if ((mod(itx,itrace) == 0).and.(me==0)) then 
+      mname = adjustl(trim(methdname))
+      write(outname,'(a)') mname(1:min(len_trim(mname),outlen-1))//':'
       if (errden > dzero ) then 
-        write(*,fmt) methdname//': ',itx,errnum/errden,eps
+        write(*,fmt) adjustl(outname),itx,errnum/errden,eps
       else
-        write(*,fmt) methdname//': ',itx,errnum,eps
+        write(*,fmt) adjustl(outname),itx,errnum,eps
       end if
-    Endif
+    endif
     
   end subroutine log_conv
 
-  subroutine end_log(methdname,me,itx,errnum,errden,eps)
+  subroutine log_end(methdname,me,it,errnum,errden,eps,err,iter)
     use psb_base_mod
+    implicit none 
     character(len=*), intent(in) :: methdname
-    integer, intent(in)          :: me, itx
+    integer, intent(in)          :: me, it
     real(kind(1.d0)), intent(in) :: errnum, errden, eps
+    real(kind(1.d0)), optional, intent(out) :: err
+    integer, optional, intent(out)  :: iter
+
     character(len=*), parameter  :: fmt='(a,2x,es10.4,1x,a,1x,i4,1x,a)'
     character(len=*), parameter  :: fmt1='(a,3(2x,es10.4))'
     
-    if (me==0) then 
-      write(*,fmt) methdname//' failed to converge to ',eps,&
-           & ' in ',ITX,' iterations. '
-      if (errden > dzero) then 
-        write(*,fmt1) 'Last iteration convergence indicator: ',&
-             & errnum/errden
-      else
-        write(*,fmt1) 'Last iteration convergence indicator: ',&
-             & errnum/errden
+    if (errden == dzero) then 
+      if (errnum > eps) then         
+        if (me==0) then 
+          write(*,fmt) trim(methdname)//' failed to converge to ',eps,&
+               & ' in ',it,' iterations. '
+          write(*,fmt1) 'Last iteration convergence indicator: ',&
+               & errnum
+        end if
+      end if
+      if (present(err)) err=errnum
+    else
+      if (errnum/errden > eps) then         
+        if (me==0) then 
+          write(*,fmt) trim(methdname)//' failed to converge to ',eps,&
+               & ' in ',it,' iterations. '
+          write(*,fmt1) 'Last iteration convergence indicator: ',&
+               & errnum/errden
+        end if
       endif
+      if (present(err)) err=errnum/errden
     end if
-  end subroutine end_log
+    if (present(iter)) iter = it
 
-
+  end subroutine log_end
   
-  subroutine psb_d_init_conv(methdname,stopc,trace,a,b,eps,desc_a,stopdat,info)
+  subroutine psb_d_init_conv(methdname,stopc,trace,itmax,a,b,eps,desc_a,stopdat,info)
     use psb_base_mod
     implicit none 
     character(len=*), intent(in)      :: methdname
-    integer, intent(in)               :: stopc, trace
+    integer, intent(in)               :: stopc, trace,itmax
     type(psb_dspmat_type), intent(in) :: a
     real(kind(1.d0)), intent(in)      :: b(:), eps
     type(psb_desc_type), intent(in)   :: desc_a
@@ -500,10 +536,6 @@ contains
     integer, intent(out)              :: info
     
     integer                           :: ictxt, me, np, err_act
-    character(len=*), parameter       :: fmt='(a18,1x,A4,3(2x,A10))'
-    integer, parameter                :: outlen=18 
-    character(len=len(methdname))     :: mname
-    character(len=outlen)             :: outname
     character(len=20)                 :: name
 
     info = 0
@@ -520,6 +552,7 @@ contains
 
     stopdat%controls(stopc_) = stopc
     stopdat%controls(trace_) = trace
+    stopdat%controls(itmax_) = itmax
     
     select case(stopdat%controls(stopc_))
     case (1) 
@@ -543,13 +576,9 @@ contains
     stopdat%values(errnum_) = dzero
     stopdat%values(errden_) = done
     
-    if (stopdat%controls(trace_) > 0) then
-      if (me == 0) then 
-        mname = adjustl(trim(methdname))
-        write(outname,'(a)') mname(1:min(len_trim(mname),outlen-1))//':'
-        write(*,fmt) adjustl(outname),'Iter','Conv. Ind.','Epsilon'
-      endif
-    end if
+    if ((stopdat%controls(trace_) > 0).and. (me == 0))&
+         &  call log_header(methdname) 
+
     call psb_erractionrestore(err_act)
     return
 
@@ -562,11 +591,11 @@ contains
    
   end subroutine psb_d_init_conv
   
-  subroutine psb_z_init_conv(methdname,stopc,trace,a,b,eps,desc_a,stopdat,info)
+  subroutine psb_z_init_conv(methdname,stopc,trace,itmax,a,b,eps,desc_a,stopdat,info)
     use psb_base_mod
     implicit none 
     character(len=*), intent(in)      :: methdname
-    integer, intent(in)               :: stopc, trace
+    integer, intent(in)               :: stopc, trace, itmax
     type(psb_zspmat_type), intent(in) :: a
     complex(kind(1.d0)), intent(in)   :: b(:)
     real(kind(1.d0)), intent(in)      :: eps
@@ -575,10 +604,6 @@ contains
     integer, intent(out)              :: info
     
     integer                           :: ictxt, me, np, err_act
-    character(len=*), parameter       :: fmt='(a18,1x,A4,3(2x,A10))'
-    integer, parameter                :: outlen=18 
-    character(len=len(methdname))     :: mname
-    character(len=outlen)             :: outname
     character(len=20)                 :: name
 
     info = 0
@@ -595,6 +620,7 @@ contains
 
     stopdat%controls(stopc_) = stopc
     stopdat%controls(trace_) = trace
+    stopdat%controls(itmax_) = itmax
     
     select case(stopdat%controls(stopc_))
     case (1) 
@@ -618,14 +644,9 @@ contains
     stopdat%values(errnum_) = dzero
     stopdat%values(errden_) = done
 
-    
-    if (stopdat%controls(trace_) > 0) then
-      if (me == 0) then 
-        mname = adjustl(trim(methdname))
-        write(outname,'(a)') mname(1:min(len_trim(mname),outlen-1))//':'
-        write(*,fmt) adjustl(outname),'Iter','Conv. Ind.','Epsilon'
-      endif
-    end if
+    if ((stopdat%controls(trace_) > 0).and. (me == 0))&
+         &  call log_header(methdname) 
+
     call psb_erractionrestore(err_act)
     return
 
@@ -651,11 +672,6 @@ contains
     integer, intent(out)            :: info
 
     integer                         :: ictxt, me, np, err_act
-    real(kind(1.d0))                :: errnum, errden 
-    character(len=*), parameter     :: fmt='(a18,1x,i4,3(2x,es10.4))'
-    integer, parameter              :: outlen=18 
-    character(len=len(methdname))   :: mname
-    character(len=outlen)           :: outname
     character(len=20)               :: name
 
     info = 0
@@ -664,6 +680,7 @@ contains
 
     ictxt = psb_cd_get_context(desc_a)
     call psb_info(ictxt,me,np)
+
     psb_d_check_conv = .false. 
     
     select case(stopdat%controls(stopc_)) 
@@ -674,7 +691,7 @@ contains
       stopdat%values(errden_) = &
            & (stopdat%values(ani_)*stopdat%values(xni_)+stopdat%values(bni_))
     case(2)
-      stopdat%values(rn2_)  = psb_genrm2(r,desc_a,info)
+      stopdat%values(rn2_)    = psb_genrm2(r,desc_a,info)
       stopdat%values(errnum_) = stopdat%values(rn2_)
       stopdat%values(errden_) = stopdat%values(bn2_)
 
@@ -695,21 +712,13 @@ contains
       psb_d_check_conv = &
            & (stopdat%values(errnum_) <= stopdat%values(eps_)*stopdat%values(errden_))
     end if
+
+    psb_d_check_conv = (psb_d_check_conv.or.(stopdat%controls(itmax_) <= it))
     
     if (((stopdat%controls(trace_) > 0).and.(mod(it,stopdat%controls(trace_))==0))&
          & .or.psb_d_check_conv) then 
-      if (me == 0) then 
-        mname = adjustl(trim(methdname))
-        write(outname,'(a)') mname(1:min(len_trim(mname),outlen-1))//':'
-        if (stopdat%values(errden_) > dzero ) then 
-          write(*,fmt) adjustl(outname),it,&
-               & stopdat%values(errnum_)/stopdat%values(errden_),stopdat%values(eps_)
-        else
-          write(*,fmt) adjustl(outname),it,&
-               & stopdat%values(errnum_),stopdat%values(eps_)
-        end if
-      Endif
-
+      call log_conv(methdname,me,it,1,stopdat%values(errnum_),&
+           & stopdat%values(errden_),stopdat%values(eps_))
     end if
 
     call psb_erractionrestore(err_act)
@@ -737,11 +746,6 @@ contains
     integer, intent(out)            :: info
 
     integer                         :: ictxt, me, np, err_act
-    real(kind(1.d0))                :: errnum, errden 
-    character(len=*), parameter     :: fmt='(a18,1x,i4,3(2x,es10.4))'
-    integer, parameter              :: outlen=18 
-    character(len=len(methdname))   :: mname
-    character(len=outlen)           :: outname
     character(len=20)               :: name
 
     info = 0
@@ -781,21 +785,13 @@ contains
       psb_z_check_conv = &
            & (stopdat%values(errnum_) <= stopdat%values(eps_)*stopdat%values(errden_))
     end if
+
+    psb_z_check_conv = (psb_z_check_conv.or.(stopdat%controls(itmax_) <= it))
     
     if (((stopdat%controls(trace_) > 0).and.(mod(it,stopdat%controls(trace_))==0))&
          & .or.psb_z_check_conv) then 
-      if (me == 0) then 
-        mname = adjustl(trim(methdname))
-        write(outname,'(a)') mname(1:min(len_trim(mname),outlen-1))//':'
-        if (stopdat%values(errden_) > dzero ) then 
-          write(*,fmt) adjustl(outname),it,&
-               & stopdat%values(errnum_)/stopdat%values(errden_),stopdat%values(eps_)
-        else
-          write(*,fmt) adjustl(outname),it,&
-               & stopdat%values(errnum_),stopdat%values(eps_)
-        end if
-      Endif
-
+      call log_conv(methdname,me,it,1,stopdat%values(errnum_),&
+           & stopdat%values(errden_),stopdat%values(eps_))
     end if
 
     call psb_erractionrestore(err_act)
@@ -829,52 +825,18 @@ contains
 
     info = 0
     name = 'psb_end_conv'
-    call psb_erractionsave(err_act)
 
     ictxt = psb_cd_get_context(desc_a)
     call psb_info(ictxt,me,np)
     
-    if (present(iter)) iter = it
     
     errnum = stopdat%values(errnum_) 
     errden = stopdat%values(errden_) 
     eps    = stopdat%values(eps_) 
-    
 
-    if (errden == dzero) then 
-      if (errnum > eps) then 
+    call log_end(methdname,me,it,errnum,errden,eps,err,iter)
+
         
-        if (me==0) then 
-          write(*,fmt) trim(methdname)//' failed to converge to ',eps,&
-               & ' in ',it,' iterations. '
-          write(*,fmt1) 'Last iteration convergence indicator: ',&
-               & errnum
-        end if
-      end if
-      if (present(err)) err=errnum
-    else
-      if (errnum > eps) then 
-        
-        if (me==0) then 
-          write(*,fmt) trim(methdname)//' failed to converge to ',eps,&
-               & ' in ',it,' iterations. '
-          write(*,fmt1) 'Last iteration convergence indicator: ',&
-               & errnum/errden
-        end if
-      endif
-      if (present(err)) err=errnum/errden
-    end if
-
-    call psb_erractionrestore(err_act)
-    return
-
-9999 continue
-    call psb_erractionrestore(err_act)
-    if (err_act == psb_act_abort_) then
-      call psb_error(ictxt)
-      return
-    end if
-    
   end subroutine psb_end_conv
 
 

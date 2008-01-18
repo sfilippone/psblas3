@@ -112,7 +112,7 @@ subroutine psb_zcgstab(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,istop)
   Complex(Kind(1.d0)), allocatable, target   :: aux(:),wwrk(:,:)
   Complex(Kind(1.d0)), Pointer  :: q(:),&
        & r(:), p(:), v(:), s(:), t(:), z(:), f(:)
-  Integer          :: litmax, naux, mglob, it,itrace_,&
+  Integer          :: itmax_, naux, mglob, it,itrace_,&
        & np,me, n_row, n_col
   integer            :: debug_level, debug_unit
   Integer            :: itx, isvch, ictxt, err_act
@@ -177,9 +177,9 @@ subroutine psb_zcgstab(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,istop)
   Z => WWRK(:,8)
 
   if (present(itmax)) then 
-    litmax = itmax
+    itmax_ = itmax
   else
-    litmax = 1000
+    itmax_ = 1000
   endif
 
   if (present(itrace)) then
@@ -194,7 +194,7 @@ subroutine psb_zcgstab(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,istop)
   itx   = 0
 
   
-  call psb_init_conv(methdname,istop_,itrace_,a,b,eps,desc_a,stopdat,info)
+  call psb_init_conv(methdname,istop_,itrace_,itmax_,a,b,eps,desc_a,stopdat,info)
   if (info /= 0) Then 
      call psb_errpush(4011,name)
      goto 9999
@@ -205,7 +205,7 @@ subroutine psb_zcgstab(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,istop)
 !!$   
 !!$   r0 = b-Ax0
 !!$ 
-    if (itx >= litmax) exit restart  
+    if (itx >= itmax_) exit restart  
     it = 0      
     call psb_geaxpby(zone,b,zzero,r,desc_a,info)
     if (info == 0) call psb_spmm(-zone,a,x,zone,r,desc_a,info,work=aux)

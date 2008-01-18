@@ -124,7 +124,7 @@ Subroutine psb_dcgstabl(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,irst,is
   Real(Kind(1.d0)), Pointer  :: ww(:), q(:), r(:), rt0(:), p(:), v(:), &
        & s(:), t(:), z(:), f(:), gamma(:), gamma1(:), gamma2(:), taum(:,:), sigma(:)
 
-  Integer       :: litmax, naux, mglob, it, itrace_,&
+  Integer       :: itmax_, naux, mglob, it, itrace_,&
        & np,me, n_row, n_col, nl, err_act
   Logical, Parameter :: exchange=.True., noexchange=.False.  
   Integer, Parameter :: irmax = 8
@@ -160,9 +160,9 @@ Subroutine psb_dcgstabl(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,irst,is
   endif
 
   if (present(itmax)) then 
-    litmax = itmax
+    itmax_ = itmax
   else
-    litmax = 1000
+    itmax_ = 1000
   endif
 
   if (present(itrace)) then
@@ -234,7 +234,7 @@ Subroutine psb_dcgstabl(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,irst,is
   call psb_set_coher(ictxt,isvch)
 
 
-  call psb_init_conv(methdname,istop_,itrace_,a,b,eps,desc_a,stopdat,info)
+  call psb_init_conv(methdname,istop_,itrace_,itmax_,a,b,eps,desc_a,stopdat,info)
   if (info /= 0) Then 
      call psb_errpush(4011,name)
      goto 9999
@@ -247,7 +247,7 @@ Subroutine psb_dcgstabl(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,irst,is
 !!$ 
     if (debug_level >= psb_debug_ext_) &
          & write(debug_unit,*) me,' ',trim(name),' restart: ',itx,it
-    if (itx >= litmax) exit restart  
+    if (itx >= itmax_) exit restart  
 
     it = 0      
     call psb_geaxpby(done,b,dzero,r,desc_a,info)

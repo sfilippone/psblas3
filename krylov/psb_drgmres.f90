@@ -254,6 +254,7 @@ subroutine psb_drgmres(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,irst,ist
     call psb_errpush(info,name)
     goto 9999
   end if
+  if ((itrace_ > 0).and.(me==0)) call log_header(methdname)
 
   itx   = 0
   restart: do 
@@ -452,17 +453,7 @@ subroutine psb_drgmres(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,irst,ist
   if (itrace_ > 0) &
        & call log_conv(methdname,me,itx,1,errnum,errden,eps)
 
-  if (present(err)) then 
-    if (errden /= dzero) then 
-      err = errnum/errden
-    else
-      err = errnum
-    end if
-  end if
-
-  if (present(iter)) iter = itx
-  if (errnum > eps*errden) &
-       & call end_log(methdname,me,itx,errnum,errden,eps)
+  call log_end(methdname,me,itx,errnum,errden,eps,err=err,iter=iter)
 
   deallocate(aux,h,c,s,rs,rst, stat=info)
   if (info == 0) call psb_gefree(v,desc_a,info)
