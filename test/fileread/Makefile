@@ -4,6 +4,7 @@ include ../../Make.inc
 #
 LIBDIR=../../lib/
 PSBLAS_LIB= -L$(LIBDIR) -lpsb_util -lpsb_krylov -lpsb_prec -lpsb_base
+LDLIBS=$(PSBLDLIBS)
 
 FINCLUDES=$(FMFLAG)$(LIBDIR) $(FMFLAG).
 
