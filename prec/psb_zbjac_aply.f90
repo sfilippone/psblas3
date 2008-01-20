@@ -113,9 +113,17 @@ subroutine psb_zbjac_aply(alpha,prec,x,beta,y,desc_data,trans,work,info)
            & trans=trans_,unit='U',choice=psb_none_, work=aux)
       if(info /=0) goto 9999
 
-    case('T','C')
+    case('T')
       call psb_spsm(zone,prec%av(u_pr_),x,zzero,ww,desc_data,info,&
            & trans=trans_,unit='L',diag=prec%d,choice=psb_none_, work=aux)
+      if(info /=0) goto 9999
+      call psb_spsm(alpha,prec%av(l_pr_),ww,beta,y,desc_data,info,&
+           & trans=trans_,unit='U',choice=psb_none_,work=aux)
+      if(info /=0) goto 9999
+
+    case('C')
+      call psb_spsm(zone,prec%av(u_pr_),x,zzero,ww,desc_data,info,&
+           & trans=trans_,unit='L',diag=conjg(prec%d),choice=psb_none_, work=aux)
       if(info /=0) goto 9999
       call psb_spsm(alpha,prec%av(l_pr_),ww,beta,y,desc_data,info,&
            & trans=trans_,unit='U',choice=psb_none_,work=aux)
