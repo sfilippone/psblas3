@@ -28,7 +28,7 @@ lib:  $(OBJS)
 
 $(OBJS): $(LIBDIR)/psb_base_mod$(.mod)
 $(F90OBJS): psb_prec_mod$(.mod)
-psb_prec_mod.o: psb_prec_type.o
+psb_prec_mod$(.mod):  psb_prec_type$(.mod)
 
 veryclean: clean
 	/bin/rm -f $(LIBNAME)
