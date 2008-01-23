@@ -715,8 +715,8 @@ contains
 
     psb_d_check_conv = (psb_d_check_conv.or.(stopdat%controls(itmax_) <= it))
     
-    if (((stopdat%controls(trace_) > 0).and.(mod(it,stopdat%controls(trace_))==0))&
-         & .or.psb_d_check_conv) then 
+    if ( (stopdat%controls(trace_) > 0).and.&
+         & ((mod(it,stopdat%controls(trace_))==0).or.psb_d_check_conv)) then 
       call log_conv(methdname,me,it,1,stopdat%values(errnum_),&
            & stopdat%values(errden_),stopdat%values(eps_))
     end if
@@ -788,8 +788,8 @@ contains
 
     psb_z_check_conv = (psb_z_check_conv.or.(stopdat%controls(itmax_) <= it))
     
-    if (((stopdat%controls(trace_) > 0).and.(mod(it,stopdat%controls(trace_))==0))&
-         & .or.psb_z_check_conv) then 
+    if ( (stopdat%controls(trace_) > 0).and.&
+         & ((mod(it,stopdat%controls(trace_))==0).or.psb_z_check_conv)) then 
       call log_conv(methdname,me,it,1,stopdat%values(errnum_),&
            & stopdat%values(errden_),stopdat%values(eps_))
     end if
