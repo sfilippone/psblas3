@@ -81,12 +81,12 @@ subroutine psb_zprecbld(a,desc_a,p,info,upd)
   ! ALso should define symbolic names for the preconditioners. 
   !
 
-  call psb_check_def(p%iprcparm(p_type_),'base_prec',&
+  call psb_check_def(p%iprcparm(psb_p_type_),'base_prec',&
        &  psb_diag_,is_legal_prec)
 
   call psb_nullify_desc(p%desc_data)
 
-  select case(p%iprcparm(p_type_)) 
+  select case(p%iprcparm(psb_p_type_)) 
   case (psb_noprec_)
     ! Do nothing. 
     call psb_cdcpy(desc_a,p%desc_data,info)
@@ -109,8 +109,8 @@ subroutine psb_zprecbld(a,desc_a,p,info,upd)
 
   case (psb_bjac_)
 
-    call psb_check_def(p%iprcparm(f_type_),'fact',&
-         &  f_ilu_n_,is_legal_ml_fact)
+    call psb_check_def(p%iprcparm(psb_f_type_),'fact',&
+         &  psb_f_ilu_n_,is_legal_ml_fact)
 
     call psb_bjac_bld(a,desc_a,p,upd_,info)
 
@@ -121,7 +121,7 @@ subroutine psb_zprecbld(a,desc_a,p,info,upd)
 
   case default
     info=4010
-    ch_err='Unknown p_type_'
+    ch_err='Unknown psb_p_type_'
     call psb_errpush(info,name,a_err=ch_err)
     goto 9999
 

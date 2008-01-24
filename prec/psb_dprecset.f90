@@ -40,21 +40,21 @@ subroutine psb_dprecseti(p,what,val,info)
   info = 0
 
   select case(what)
-  case (f_type_) 
-    if (p%iprcparm(p_type_) /= psb_bjac_) then 
-      write(0,*) 'WHAT is invalid for current preconditioner ',p%iprcparm(p_type_),&
+  case (psb_f_type_) 
+    if (p%iprcparm(psb_p_type_) /= psb_bjac_) then 
+      write(0,*) 'WHAT is invalid for current preconditioner ',p%iprcparm(psb_p_type_),&
            & 'ignoring user specification'
       return
     endif
-    p%iprcparm(f_type_)     = val
+    p%iprcparm(psb_f_type_)     = val
 
-  case (ilu_fill_in_) 
-    if ((p%iprcparm(p_type_) /= psb_bjac_).or.(p%iprcparm(f_type_) /= f_ilu_n_)) then 
-      write(0,*) 'WHAT is invalid for current preconditioner ',p%iprcparm(p_type_),&
+  case (psb_ilu_fill_in_) 
+    if ((p%iprcparm(psb_p_type_) /= psb_bjac_).or.(p%iprcparm(psb_f_type_) /= psb_f_ilu_n_)) then 
+      write(0,*) 'WHAT is invalid for current preconditioner ',p%iprcparm(psb_p_type_),&
            & 'ignoring user specification'
       return
     endif
-    p%iprcparm(ilu_fill_in_) = val
+    p%iprcparm(psb_ilu_fill_in_) = val
  
   case default
     write(0,*) 'WHAT is invalid, ignoring user specification'
@@ -80,21 +80,21 @@ subroutine psb_dprecsetd(p,what,val,info)
 !  factorization.
 !
   select case(what)
-!!$  case (f_type_) 
-!!$    if (p%iprcparm(p_type_) /= bjac_) then 
-!!$      write(0,*) 'WHAT is invalid for current preconditioner ',p%iprcparm(p_type_),&
+!!$  case (psb_f_type_) 
+!!$    if (p%iprcparm(psb_p_type_) /= psb_bjac_) then 
+!!$      write(0,*) 'WHAT is invalid for current preconditioner ',p%iprcparm(psb_p_type_),&
 !!$           & 'ignoring user specification'
 !!$      return
 !!$    endif
-!!$    p%iprcparm(f_type_)     = val
+!!$    p%iprcparm(psb_f_type_)     = val
 !!$
-!!$  case (ilu_fill_in_) 
-!!$    if ((p%iprcparm(p_type_) /= bjac_).or.(p%iprcparm(f_type_) /= f_ilu_n_)) then 
-!!$      write(0,*) 'WHAT is invalid for current preconditioner ',p%iprcparm(p_type_),&
+!!$  case (psb_ilu_fill_in_) 
+!!$    if ((p%iprcparm(psb_p_type_) /= psb_bjac_).or.(p%iprcparm(psb_f_type_) /= psb_f_ilu_n_)) then 
+!!$      write(0,*) 'WHAT is invalid for current preconditioner ',p%iprcparm(psb_p_type_),&
 !!$           & 'ignoring user specification'
 !!$      return
 !!$    endif
-!!$    p%iprcparm(ilu_fill_in_) = val
+!!$    p%iprcparm(psb_ilu_fill_in_) = val
  
   case default
     write(0,*) 'WHAT is invalid, ignoring user specification'

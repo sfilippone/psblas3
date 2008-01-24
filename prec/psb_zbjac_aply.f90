@@ -100,32 +100,32 @@ subroutine psb_zbjac_aply(alpha,prec,x,beta,y,desc_data,trans,work,info)
   endif
 
 
-  select case(prec%iprcparm(f_type_))
-  case(f_ilu_n_,f_ilu_e_) 
+  select case(prec%iprcparm(psb_f_type_))
+  case(psb_f_ilu_n_) 
 
     select case(trans_)
     case('N')
 
-      call psb_spsm(zone,prec%av(l_pr_),x,zzero,ww,desc_data,info,&
+      call psb_spsm(zone,prec%av(psb_l_pr_),x,zzero,ww,desc_data,info,&
            & trans=trans_,unit='L',diag=prec%d,choice=psb_none_,work=aux)
       if(info /=0) goto 9999
-      call psb_spsm(alpha,prec%av(u_pr_),ww,beta,y,desc_data,info,&
+      call psb_spsm(alpha,prec%av(psb_u_pr_),ww,beta,y,desc_data,info,&
            & trans=trans_,unit='U',choice=psb_none_, work=aux)
       if(info /=0) goto 9999
 
     case('T')
-      call psb_spsm(zone,prec%av(u_pr_),x,zzero,ww,desc_data,info,&
+      call psb_spsm(zone,prec%av(psb_u_pr_),x,zzero,ww,desc_data,info,&
            & trans=trans_,unit='L',diag=prec%d,choice=psb_none_, work=aux)
       if(info /=0) goto 9999
-      call psb_spsm(alpha,prec%av(l_pr_),ww,beta,y,desc_data,info,&
+      call psb_spsm(alpha,prec%av(psb_l_pr_),ww,beta,y,desc_data,info,&
            & trans=trans_,unit='U',choice=psb_none_,work=aux)
       if(info /=0) goto 9999
 
     case('C')
-      call psb_spsm(zone,prec%av(u_pr_),x,zzero,ww,desc_data,info,&
+      call psb_spsm(zone,prec%av(psb_u_pr_),x,zzero,ww,desc_data,info,&
            & trans=trans_,unit='L',diag=conjg(prec%d),choice=psb_none_, work=aux)
       if(info /=0) goto 9999
-      call psb_spsm(alpha,prec%av(l_pr_),ww,beta,y,desc_data,info,&
+      call psb_spsm(alpha,prec%av(psb_l_pr_),ww,beta,y,desc_data,info,&
            & trans=trans_,unit='U',choice=psb_none_,work=aux)
       if(info /=0) goto 9999
 

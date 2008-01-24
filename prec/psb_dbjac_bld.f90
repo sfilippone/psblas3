@@ -81,12 +81,12 @@ subroutine psb_dbjac_bld(a,desc_a,p,upd,info)
   end if
 
 
-  select case(p%iprcparm(f_type_))
+  select case(p%iprcparm(psb_f_type_))
 
-  case(f_ilu_n_,f_ilu_e_) 
+  case(psb_f_ilu_n_) 
 
     if (allocated(p%av)) then 
-      if (size(p%av) < bp_ilu_avsz) then 
+      if (size(p%av) < psb_bp_ilu_avsz) then 
         do i=1,size(p%av) 
           call psb_sp_free(p%av(i),info)
           if (info /= 0) then 
@@ -99,7 +99,7 @@ subroutine psb_dbjac_bld(a,desc_a,p,upd,info)
       endif
     end if
     if (.not.allocated(p%av)) then 
-      allocate(p%av(max_avsz),stat=info)
+      allocate(p%av(psb_max_avsz),stat=info)
       if (info /= 0) then
         call psb_errpush(4000,name)
         goto 9999
@@ -112,12 +112,12 @@ subroutine psb_dbjac_bld(a,desc_a,p,upd,info)
     n_col  = psb_cd_get_local_cols(desc_a)
     nhalo  = n_col-nrow_a
     n_row  = p%desc_data%matrix_data(psb_n_row_)
-    p%av(l_pr_)%m  = n_row
-    p%av(l_pr_)%k  = n_row
-    p%av(u_pr_)%m  = n_row
-    p%av(u_pr_)%k  = n_row
-    call psb_sp_all(n_row,n_row,p%av(l_pr_),nztota,info)
-    if (info == 0) call psb_sp_all(n_row,n_row,p%av(u_pr_),nztota,info)
+    p%av(psb_l_pr_)%m  = n_row
+    p%av(psb_l_pr_)%k  = n_row
+    p%av(psb_u_pr_)%m  = n_row
+    p%av(psb_u_pr_)%k  = n_row
+    call psb_sp_all(n_row,n_row,p%av(psb_l_pr_),nztota,info)
+    if (info == 0) call psb_sp_all(n_row,n_row,p%av(psb_u_pr_),nztota,info)
     if(info/=0) then
       info=4010
       ch_err='psb_sp_all'
@@ -142,7 +142,7 @@ subroutine psb_dbjac_bld(a,desc_a,p,upd,info)
     ! This is where we have mo renumbering, thus no need 
     ! for ATMP
 
-    call psb_ilu_fct(a,p%av(l_pr_),p%av(u_pr_),p%d,info)
+    call psb_ilu_fct(a,p%av(psb_l_pr_),p%av(psb_u_pr_),p%d,info)
     if(info/=0) then
       info=4010
       ch_err='psb_ilu_fct'
@@ -150,24 +150,24 @@ subroutine psb_dbjac_bld(a,desc_a,p,upd,info)
       goto 9999
     end if
 
-    if (psb_sp_getifld(psb_upd_,p%av(u_pr_),info) /= psb_upd_perm_) then
-      call psb_sp_trim(p%av(u_pr_),info)
+    if (psb_sp_getifld(psb_upd_,p%av(psb_u_pr_),info) /= psb_upd_perm_) then
+      call psb_sp_trim(p%av(psb_u_pr_),info)
     endif
 
-    if (psb_sp_getifld(psb_upd_,p%av(l_pr_),info) /= psb_upd_perm_) then
-      call psb_sp_trim(p%av(l_pr_),info)
+    if (psb_sp_getifld(psb_upd_,p%av(psb_l_pr_),info) /= psb_upd_perm_) then
+      call psb_sp_trim(p%av(psb_l_pr_),info)
     endif
 
 
-  case(f_none_) 
+  case(psb_f_none_) 
     info=4010
-    ch_err='Inconsistent prec  f_none_'
+    ch_err='Inconsistent prec  psb_f_none_'
     call psb_errpush(info,name,a_err=ch_err)
     goto 9999
 
   case default
     info=4010
-    ch_err='Unknown f_type_'
+    ch_err='Unknown psb_f_type_'
     call psb_errpush(info,name,a_err=ch_err)
     goto 9999
   end select

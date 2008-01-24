@@ -46,20 +46,19 @@ module psb_prec_type
   ! prolongation type, restriction type, renumbering algorithm,
   ! number of overlap layers, pointer to SuperLU factors, 
   ! levels of fill in for ILU(N), 
-  integer, parameter :: p_type_=1, f_type_=2
-  integer, parameter :: ilu_fill_in_=8
+  integer, parameter :: psb_p_type_=1, psb_f_type_=2
+  integer, parameter :: psb_ilu_fill_in_=8
   !Renumbering. SEE BELOW
-  integer, parameter :: renum_none_=0, renum_glb_=1, renum_gps_=2
-  integer, parameter :: ifpsz=10
+  integer, parameter :: psb_renum_none_=0, psb_renum_glb_=1, psb_renum_gps_=2
+  integer, parameter :: psb_ifpsz=10
   ! Entries in dprcparm: ILU(E) epsilon, smoother omega
-  integer, parameter :: fact_eps_=1
-  integer, parameter :: dfpsz=4
+  integer, parameter :: psb_fact_eps_=1
+  integer, parameter :: psb_dfpsz=4
   ! Factorization types: none, ILU(N), ILU(E)
-  integer, parameter :: f_none_=0,f_ilu_n_=1,f_ilu_e_=2
+  integer, parameter :: psb_f_none_=0,psb_f_ilu_n_=1
   ! Fields for sparse matrices ensembles: 
-  integer, parameter :: l_pr_=1, u_pr_=2, bp_ilu_avsz=2
-  integer, parameter :: ap_nd_=3, ac_=4, sm_pr_t_=5, sm_pr_=6
-  integer, parameter :: smth_avsz=6, max_avsz=smth_avsz 
+  integer, parameter :: psb_l_pr_=1, psb_u_pr_=2, psb_bp_ilu_avsz=2
+  integer, parameter :: psb_max_avsz=psb_bp_ilu_avsz
 
 
   type psb_dprec_type
@@ -128,14 +127,14 @@ contains
     type(psb_dprec_type), intent(in) :: p
     
     write(iout,*) 'Preconditioner description'
-    select case(p%iprcparm(p_type_))
+    select case(p%iprcparm(psb_p_type_))
     case(psb_noprec_)
       write(iout,*) 'No preconditioning'
     case(psb_diag_)
       write(iout,*) 'Diagonal scaling'
     case(psb_bjac_)
       write(iout,*) 'Block Jacobi with: ',&
-           &  fact_names(p%iprcparm(f_type_))
+           &  fact_names(p%iprcparm(psb_f_type_))
     end select
     
   end subroutine psb_file_prec_descr
@@ -146,14 +145,14 @@ contains
     type(psb_zprec_type), intent(in) :: p
 
     write(iout,*) 'Preconditioner description'
-    select case(p%iprcparm(p_type_))
+    select case(p%iprcparm(psb_p_type_))
     case(psb_noprec_)
       write(iout,*) 'No preconditioning'
     case(psb_diag_)
       write(iout,*) 'Diagonal scaling'
     case(psb_bjac_)
       write(iout,*) 'Block Jacobi with: ',&
-           &  fact_names(p%iprcparm(f_type_))
+           &  fact_names(p%iprcparm(psb_f_type_))
     end select
   end subroutine psb_zfile_prec_descr
 
@@ -163,7 +162,7 @@ contains
     integer, intent(in) :: ip
     logical             :: is_legal_prec
 
-    is_legal_prec = ((ip>=noprec_).and.(ip<=bjac_))
+    is_legal_prec = ((ip>=psb_noprec_).and.(ip<=psb_bjac_))
     return
   end function is_legal_prec
   function is_legal_ml_fact(ip)
@@ -171,7 +170,7 @@ contains
     integer, intent(in) :: ip
     logical             :: is_legal_ml_fact
 
-    is_legal_ml_fact = ((ip>=f_ilu_n_).and.(ip<=f_ilu_e_))
+    is_legal_ml_fact = (ip==psb_f_ilu_n_)
     return
   end function is_legal_ml_fact
   function is_legal_ml_eps(ip)

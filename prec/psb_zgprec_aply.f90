@@ -74,7 +74,7 @@ subroutine psb_zgprec_aply(alpha,prec,x,beta,y,desc_data,trans,work,info)
      goto 9999
   end select
 
-  select case(prec%iprcparm(p_type_))
+  select case(prec%iprcparm(psb_p_type_))
 
   case(psb_noprec_)
 

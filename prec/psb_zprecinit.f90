@@ -40,27 +40,27 @@ subroutine psb_zprecinit(p,ptype,info)
 
   info = 0
   
-  call psb_realloc(ifpsz,p%iprcparm,info)
-  if (info == 0) call psb_realloc(dfpsz,p%dprcparm,info)
+  call psb_realloc(psb_ifpsz,p%iprcparm,info)
+  if (info == 0) call psb_realloc(psb_dfpsz,p%dprcparm,info)
   if (info /= 0) return
   p%iprcparm(:) = 0
 
   select case(toupper(ptype(1:len_trim(ptype))))
   case ('NONE','NOPREC') 
     p%iprcparm(:)           = 0
-    p%iprcparm(p_type_)     = psb_noprec_
-    p%iprcparm(f_type_)     = f_none_
+    p%iprcparm(psb_p_type_)     = psb_noprec_
+    p%iprcparm(psb_f_type_)     = psb_f_none_
 
   case ('DIAG')
     p%iprcparm(:)           = 0
-    p%iprcparm(p_type_)     = psb_diag_
-    p%iprcparm(f_type_)     = f_none_
+    p%iprcparm(psb_p_type_)     = psb_diag_
+    p%iprcparm(psb_f_type_)     = psb_f_none_
 
   case ('BJAC') 
     p%iprcparm(:)            = 0
-    p%iprcparm(p_type_)      = psb_bjac_
-    p%iprcparm(f_type_)      = f_ilu_n_
-    p%iprcparm(ilu_fill_in_) = 0
+    p%iprcparm(psb_p_type_)      = psb_bjac_
+    p%iprcparm(psb_f_type_)      = psb_f_ilu_n_
+    p%iprcparm(psb_ilu_fill_in_) = 0
 
   case default
     write(0,*) 'Unknown preconditioner type request "',ptype,'"'
