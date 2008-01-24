@@ -47,10 +47,11 @@ BLACS=$(HOME)/LIB/libblacs_MPI-SUN4SOL2-0.a $(HOME)/LIB/libblacsCinit_MPI-SUN4SO
 #  Other useful tools&defines                            #
 ##########################################################
 #
-#  We are using the public domain tool METIS from U. Minnesota. To get it
-#  check URL http://www.cs.umn.edu:~karypis
+#  The examples can make use of METIS from U. Minnesota. 
+#  http://www.cs.umn.edu:~karypis
+#  but it's optional
 #  
-METIS_LIB = -L$(HOME)/NUMERICAL/metis-4.0 -lmetis 
+#METIS_LIB = -L$(HOME)/NUMERICAL/metis-4.0 -lmetis 
 PSBLDLIBS=$(BLACS) $(BLAS) $(METIS_LIB)
 
 #  Add -DLargeFptr for 64-bit addresses
@@ -58,6 +59,7 @@ PSBLDLIBS=$(BLACS) $(BLAS) $(METIS_LIB)
 # -DHAVE_MOVE_ALLOC
 PSBCDEFINES=-DAdd_ 
 PSBFDEFINES=-DNETLIB_BLACS  $(MPI_FINC) 
+# -DHAVE_METIS
 
 AR=ar -cur
 RANLIB=ranlib

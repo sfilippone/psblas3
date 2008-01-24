@@ -139,6 +139,8 @@ contains
     integer, parameter :: nb=512
     real(kind(1.d0)), parameter :: seed=12345.d0
     integer          :: iopt(10),idummy(2),jdummy(2)
+
+#if defined(HAVE_METIS)
     interface 
       subroutine METIS_PartGraphRecursive(n,ixadj,iadj,ivwg,iajw,&
            & wgflag,numflag,nparts,iopt,nedc,part)
@@ -176,7 +178,10 @@ contains
         graph_vect(i) = 0
       enddo
     endif
-    
+#else
+    write(0,*) 'Warning: METIS was not configured at PSBLAS compile time !'
+#endif
+
     return
 
   end subroutine build_mtpart 

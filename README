@@ -1,4 +1,4 @@
-This directory contains  the PSBLAS library, version 2.1.1
+This directory contains  the PSBLAS library, version 2.2
 
  
 Version 1.0 of the library was described in:
@@ -78,8 +78,8 @@ prerequisites (see also SERIAL below):
 
 4. We have had good results with  the METIS library, from 
    http://www-users.cs.umn.edu/~karypis/metis/metis/main.html 
-   This is not necessary to compile our library, but the test program
-   in test/Fileread assumes you have it installed.  
+   This is optional: it is  used in the util and test/fileread
+   directories if you define the HAVE_METIS directive.
 
 To install, choose a Make.inc.XXX file in directory Make that fits
 your compilers, modify the paths to libraries to  match your
