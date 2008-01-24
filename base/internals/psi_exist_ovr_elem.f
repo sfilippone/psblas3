@@ -51,11 +51,11 @@ C
 C    ELEM_SEARCHED.....:point's  Local index identifier to be searched.
 
       IMPLICIT NONE
-C     ...Array Parameters....
-      INTEGER OVR_ELEM(dim_list,*)
 
 C     ....Scalars parameters....
       INTEGER DIM_LIST,ELEM_SEARCHED
+C     ...Array Parameters....
+      INTEGER OVR_ELEM(DIM_LIST,*)
       
 C     ...Local Scalars....
       INTEGER I
