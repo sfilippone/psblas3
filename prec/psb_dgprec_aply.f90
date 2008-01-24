@@ -75,11 +75,11 @@ subroutine psb_dgprec_aply(alpha,prec,x,beta,y,desc_data,trans,work,info)
 
   select case(prec%iprcparm(p_type_))
 
-  case(noprec_)
+  case(psb_noprec_)
 
     call psb_geaxpby(alpha,x,beta,y,desc_data,info)
 
-  case(diag_)
+  case(psb_diag_)
     
     if (size(work) >= size(x)) then 
       ww => work
@@ -103,9 +103,9 @@ subroutine psb_dgprec_aply(alpha,prec,x,beta,y,desc_data,trans,work,info)
       end if
     end if
 
-  case(bjac_)
+  case(psb_bjac_)
 
-    call psb_bjac_aply(alpha,prec,x,beta,y,desc_data,trans,work,info)
+    call psb_bjac_aply(alpha,prec,x,beta,y,desc_data,trans_,work,info)
     if(info /= 0) then
       info=4010
       ch_err='psb_bjac_aply'

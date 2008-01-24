@@ -39,8 +39,8 @@ module psb_prec_type
   use psb_base_mod, only : psb_dspmat_type, psb_zspmat_type, psb_desc_type,&
        & psb_sizeof
 
-  integer, parameter :: min_prec_=0, noprec_=0, diag_=1, bjac_=2,&
-       &  max_prec_=2
+  integer, parameter :: psb_min_prec_=0, psb_noprec_=0, psb_diag_=1, &
+       & psb_bjac_=2, psb_max_prec_=2
 
   ! Entries in iprcparm: preconditioner type, factorization type,
   ! prolongation type, restriction type, renumbering algorithm,
@@ -129,11 +129,11 @@ contains
     
     write(iout,*) 'Preconditioner description'
     select case(p%iprcparm(p_type_))
-    case(noprec_)
+    case(psb_noprec_)
       write(iout,*) 'No preconditioning'
-    case(diag_)
+    case(psb_diag_)
       write(iout,*) 'Diagonal scaling'
-    case(bjac_)
+    case(psb_bjac_)
       write(iout,*) 'Block Jacobi with: ',&
            &  fact_names(p%iprcparm(f_type_))
     end select
@@ -147,11 +147,11 @@ contains
 
     write(iout,*) 'Preconditioner description'
     select case(p%iprcparm(p_type_))
-    case(noprec_)
+    case(psb_noprec_)
       write(iout,*) 'No preconditioning'
-    case(diag_)
+    case(psb_diag_)
       write(iout,*) 'Diagonal scaling'
-    case(bjac_)
+    case(psb_bjac_)
       write(iout,*) 'Block Jacobi with: ',&
            &  fact_names(p%iprcparm(f_type_))
     end select
@@ -367,11 +367,11 @@ contains
     character(len=10)     :: pr_to_str
 
     select case(iprec)
-    case(noprec_)
+    case(psb_noprec_)
       pr_to_str='NOPREC'
-    case(diag_)         
+    case(psb_diag_)         
       pr_to_str='DIAG'
-    case(bjac_)         
+    case(psb_bjac_)         
       pr_to_str='BJAC'
     case default
       pr_to_str='???'

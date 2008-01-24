@@ -76,11 +76,11 @@ subroutine psb_zgprec_aply(alpha,prec,x,beta,y,desc_data,trans,work,info)
 
   select case(prec%iprcparm(p_type_))
 
-  case(noprec_)
+  case(psb_noprec_)
 
     call psb_geaxpby(alpha,x,beta,y,desc_data,info)
 
-  case(diag_)
+  case(psb_diag_)
     
     if (size(work) >= size(x)) then 
       ww => work
@@ -93,7 +93,11 @@ subroutine psb_zgprec_aply(alpha,prec,x,beta,y,desc_data,trans,work,info)
     end if
 
     n_row=desc_data%matrix_data(psb_n_row_)
-    ww(1:n_row) = x(1:n_row)*prec%d(1:n_row)
+    if (trans_=='C') then 
+      ww(1:n_row) = x(1:n_row)*conjg(prec%d(1:n_row))
+    else
+      ww(1:n_row) = x(1:n_row)*prec%d(1:n_row)
+    endif
     call psb_geaxpby(alpha,ww,beta,y,desc_data,info)
 
     if (size(work) < size(x)) then 
@@ -104,9 +108,9 @@ subroutine psb_zgprec_aply(alpha,prec,x,beta,y,desc_data,trans,work,info)
       end if
     end if
 
-  case(bjac_)
+  case(psb_bjac_)
 
-    call psb_bjac_aply(alpha,prec,x,beta,y,desc_data,trans,work,info)
+    call psb_bjac_aply(alpha,prec,x,beta,y,desc_data,trans_,work,info)
     if(info /= 0) then
        info=4010
        ch_err='psb_bjac_aply'

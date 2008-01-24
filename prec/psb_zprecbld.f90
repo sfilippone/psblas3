@@ -82,12 +82,12 @@ subroutine psb_zprecbld(a,desc_a,p,info,upd)
   !
 
   call psb_check_def(p%iprcparm(p_type_),'base_prec',&
-       &  diag_,is_legal_prec)
+       &  psb_diag_,is_legal_prec)
 
   call psb_nullify_desc(p%desc_data)
 
   select case(p%iprcparm(p_type_)) 
-  case (noprec_)
+  case (psb_noprec_)
     ! Do nothing. 
     call psb_cdcpy(desc_a,p%desc_data,info)
     if(info /= 0) then
@@ -97,7 +97,7 @@ subroutine psb_zprecbld(a,desc_a,p,info,upd)
       goto 9999
     end if
 
-  case (diag_)
+  case (psb_diag_)
 
     call psb_diagsc_bld(a,desc_a,p,upd_,info)
     if(info /= 0) then
@@ -107,7 +107,7 @@ subroutine psb_zprecbld(a,desc_a,p,info,upd)
       goto 9999
     end if
 
-  case (bjac_)
+  case (psb_bjac_)
 
     call psb_check_def(p%iprcparm(f_type_),'fact',&
          &  f_ilu_n_,is_legal_ml_fact)

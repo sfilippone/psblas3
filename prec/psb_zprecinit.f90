@@ -48,17 +48,17 @@ subroutine psb_zprecinit(p,ptype,info)
   select case(toupper(ptype(1:len_trim(ptype))))
   case ('NONE','NOPREC') 
     p%iprcparm(:)           = 0
-    p%iprcparm(p_type_)     = noprec_
+    p%iprcparm(p_type_)     = psb_noprec_
     p%iprcparm(f_type_)     = f_none_
 
   case ('DIAG')
     p%iprcparm(:)           = 0
-    p%iprcparm(p_type_)     = diag_
+    p%iprcparm(p_type_)     = psb_diag_
     p%iprcparm(f_type_)     = f_none_
 
   case ('BJAC') 
     p%iprcparm(:)            = 0
-    p%iprcparm(p_type_)      = bjac_
+    p%iprcparm(p_type_)      = psb_bjac_
     p%iprcparm(f_type_)      = f_ilu_n_
     p%iprcparm(ilu_fill_in_) = 0
 

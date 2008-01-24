@@ -41,7 +41,7 @@ subroutine psb_zprecseti(p,what,val,info)
 
   select case(what)
   case (f_type_) 
-    if (p%iprcparm(p_type_) /= bjac_) then 
+    if (p%iprcparm(p_type_) /= psb_bjac_) then 
       write(0,*) 'WHAT is invalid for current preconditioner ',p%iprcparm(p_type_),&
            & 'ignoring user specification'
       return
@@ -49,7 +49,7 @@ subroutine psb_zprecseti(p,what,val,info)
     p%iprcparm(f_type_)     = val
 
   case (ilu_fill_in_) 
-    if ((p%iprcparm(p_type_) /= bjac_).or.(p%iprcparm(f_type_) /= f_ilu_n_)) then 
+    if ((p%iprcparm(p_type_) /= psb_bjac_).or.(p%iprcparm(f_type_) /= f_ilu_n_)) then 
       write(0,*) 'WHAT is invalid for current preconditioner ',p%iprcparm(p_type_),&
            & 'ignoring user specification'
       return
