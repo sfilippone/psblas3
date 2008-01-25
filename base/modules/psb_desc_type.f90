@@ -56,7 +56,7 @@ module psb_descriptor_type
   integer, parameter :: psb_ovt_xhal_ = 123, psb_ovt_asov_=psb_ovt_xhal_+1
 
   !
-  !     Entries and values in desc%matrix_data
+  ! Entries and values in desc%matrix_data
   !
   integer, parameter :: psb_dec_type_=1, psb_m_=2,psb_n_=3
   integer, parameter :: psb_n_row_=4,  psb_n_col_=5,psb_ctxt_=6
@@ -80,6 +80,9 @@ module psb_descriptor_type
   integer, parameter :: psb_desc_large_=psb_desc_normal_+1
   integer, parameter :: psb_cd_ovl_bld_=3399
   integer, parameter :: psb_cd_ovl_asb_=psb_cd_ovl_bld_+1
+  !
+  ! Constants for hashing into desc%hashv(:) and desc%glb_lc(:,:)
+  !
   integer, parameter :: psb_hash_bits=14
   integer, parameter :: psb_hash_size=2**psb_hash_bits, psb_hash_mask=psb_hash_size-1
   integer, parameter :: psb_default_large_threshold=512*1024   ! to be reviewed
