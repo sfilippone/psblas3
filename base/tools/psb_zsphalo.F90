@@ -350,7 +350,16 @@ Subroutine psb_zsphalo(a,desc_a,blk,info,rowcnv,colcnv,&
 
   blk%fida            = 'COO'
   blk%infoa(psb_nnz_) = l1
-
+  call psb_ensure_size(1,blk%pl,info)
+  if (info == 0) call psb_ensure_size(1,blk%pr,info)
+  if (info /= 0) then 
+    info=4010
+    ch_err='psb_ensure_size'
+    call psb_errpush(info,name,a_err=ch_err)
+    goto 9999
+  end if
+  blk%pl = 0
+  blk%pr = 0
 
   if (debug_level >= psb_debug_outer_)&
        & write(debug_unit,*) me,' ',trim(name),&

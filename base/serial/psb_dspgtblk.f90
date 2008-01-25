@@ -98,14 +98,11 @@ subroutine psb_dspgtblk(irw,a,b,info,append,iren,lrw,srt)
  
   call psb_sp_getrow(irw,a,nz,b%ia1,b%ia2,b%aspk,info,iren=iren,&
        & lrw=lrw_,append=append_,nzin=nzb)
-  if (.not.allocated(b%pl)) then 
-    allocate(b%pl(1),stat=info)
-    b%pl = 0
-  endif
-  if (.not.allocated(b%pr)) then 
-    allocate(b%pr(1),stat=info)
-    b%pr = 0
-  endif
+  if (info == 0) call psb_ensure_size(1,b%pl,info)
+  if (info == 0) call psb_ensure_size(1,b%pr,info)
+  if (info /= 0) return
+  b%pl = 0
+  b%pr = 0
   b%infoa(psb_nnz_) = nzb+nz
   b%m = b%m+lrw_-irw+1
   b%k = max(b%k,a%k)

@@ -18,7 +18,7 @@ CINCLUDES=-I.
 FINCLUDES=$(FMFLAG)$(LIBDIR) $(FMFLAG). $(FIFLAG).
 
 
-lib:  mpfobjs $(MODULES)  $(OBJS)
+lib:  mpfobjs  $(MODULES)  $(OBJS)  $(LIBMOD)
 	$(AR) $(LIBDIR)/$(LIBNAME) $(MODULES) $(OBJS) $(MPFOBJS)
 	$(RANLIB) $(LIBDIR)/$(LIBNAME)
 	/bin/cp -p $(LIBMOD) $(LIBDIR)
@@ -36,8 +36,7 @@ psb_sort_mod.o: psb_error_mod.o psb_realloc_mod.o
 psb_methd_mod.o: psb_serial_mod.o psb_desc_type.o psb_prec_type.o
 psb_tools_mod.o: psb_spmat_type.o psb_desc_type.o psi_mod.o psb_gps_mod.o
 psb_gps_mod.o:	psb_realloc_mod.o
-psb_base_mod.o: $(MODULES) mpfobjs
-
+$(LIBMOD): $(MODULES:.o:$(.mod))
 
 
 mpfobjs: 

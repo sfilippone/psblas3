@@ -81,6 +81,7 @@ contains
 
       if (idx<0) then 
         write(0,*) ' spgtrow Error : idx no good ',idx
+        info = 2
         return
       end if
       nr = lrw - irw + 1 
@@ -157,6 +158,7 @@ contains
     endif
     if (idx<0) then 
       write(debug_unit,*) ' spgtrow Error : idx no good ',idx
+      info = 2
       return
     end if
 
@@ -582,6 +584,7 @@ contains
     if (idx<0) then 
       write(debug_unit,*)  trim(name),&
            &' Error : idx no good ',idx
+      info = 2
       return
     end if
 

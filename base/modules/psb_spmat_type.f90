@@ -405,8 +405,8 @@ contains
     call psb_nullify_sp(a)
     call psb_sp_reall(a,nnz,info)
 
-    a%pl(1)=0
-    a%pr(1)=0
+    a%pl(:)=0
+    a%pr(:)=0
     ! set INFOA fields
     a%fida   = 'COO'
     a%descra = 'GUN'
@@ -439,8 +439,8 @@ contains
     a%k=max(0,k)
     call psb_sp_reall(a,nnz,info)
 
-    a%pl(1)=0
-    a%pr(1)=0
+    a%pl(:)=0
+    a%pr(:)=0
     ! set INFOA fields
     a%fida   = 'COO'
     a%descra = 'GUN'
@@ -473,8 +473,8 @@ contains
     a%k=max(0,k)
     call psb_sp_reall(a,nnz,info)
     if (debug) write(0,*) 'Check in ALLOCATE ',info,allocated(a%pl),allocated(a%pr)
-    a%pl(1)=0
-    a%pr(1)=0
+    a%pl(:)=0
+    a%pr(:)=0
     ! set infoa fields
     a%fida   = 'COO'
     a%descra = 'GUN'
@@ -500,8 +500,8 @@ contains
     call psb_nullify_sp(a)
     call psb_sp_reall(a, ni1,ni2,nd,info)
 
-    a%pl(1)=0
-    a%pr(1)=0
+    a%pl(:)=0
+    a%pr(:)=0
     ! set INFOA fields
     a%fida   = 'COO'
     a%descra = 'GUN'
@@ -950,8 +950,8 @@ contains
     if (debug) write(0,*) 'SPALL : NNZ ',nnz,a%m,a%k
     call psb_sp_reall(a,nnz,info)
 
-    a%pl(1)=0
-    a%pr(1)=0
+    a%pl(:)=0
+    a%pr(:)=0
     ! set INFOA fields
     a%fida   = 'COO'
     a%descra = 'GUN'
@@ -984,8 +984,8 @@ contains
     a%k=max(0,k)
     call psb_sp_reall(a,nnz,info)
 
-    a%pl(1)=0
-    a%pr(1)=0
+    a%pl(:)=0
+    a%pr(:)=0
     ! set INFOA fields
     a%fida   = 'COO'
     a%descra = 'GUN'
@@ -1018,8 +1018,8 @@ contains
     a%k=max(0,k)
     call psb_sp_reall(a,nnz,info)
 
-    a%pl(1)=0
-    a%pr(1)=0
+    a%pl(:)=0
+    a%pr(:)=0
     ! set infoa fields
     a%fida   = 'COO'
     a%descra = 'GUN'
@@ -1046,8 +1046,8 @@ contains
     call psb_nullify_sp(a)
     call psb_sp_reall(a, ni1,ni2,nd,info)
 
-    a%pl(1)=0
-    a%pr(1)=0
+    a%pl(:)=0
+    a%pr(:)=0
     ! set INFOA fields
     a%fida   = 'COO'
     a%descra = 'GUN'
