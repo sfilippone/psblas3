@@ -107,7 +107,7 @@ module psb_descriptor_type
   !|     integer, allocatable :: halo_index(:), ext_index(:)
   !|     integer, allocatable :: bnd_elem(:)
   !|     integer, allocatable :: ovrlap_index(:)
-  !|     integer, allocatable :: ovrlap_elem(:)
+  !|     integer, allocatable :: ovrlap_elem(:,:)
   !|     integer, allocatable :: loc_to_glob(:)
   !|     integer, allocatable :: glob_to_loc (:)
   !|     integer, allocatable :: hashv(:), glb_lc(:,:), ptree(:)
