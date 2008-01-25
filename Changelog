@@ -1,6 +1,13 @@
 Changelog. A lot less detailed than usual, at least for past
 history. 
 
+2008/01/25: Various changes to variables controlling conditional
+	    compilation on the Fortran side: removed NETLIB_BLACS, now
+	    HAVE_METIS HAVE_ESSL_BLACS HAVE_KSENDID.
+	    Files impacted: Make.inc.XXX, base/modules/psb_penv_mod,
+	    util/psb_metispart_mod
+	
+	
 2008/01/18: Centralized convergence checks. Still partial for RGMRES. 	
 	
 2008/01/14: Merged changes for handling of transpose vs. overlap.
