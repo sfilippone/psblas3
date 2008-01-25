@@ -55,10 +55,10 @@ BLACS=$(HOME)/LIB/libblacs_MPI-SUN4SOL2-0.a $(HOME)/LIB/libblacsCinit_MPI-SUN4SO
 PSBLDLIBS=$(BLACS) $(BLAS) $(METIS_LIB)
 
 #  Add -DLargeFptr for 64-bit addresses
-#  SUN compiler does not have MOVE_ALLOC. 
-# -DHAVE_MOVE_ALLOC
 PSBCDEFINES=-DAdd_ 
-PSBFDEFINES=-DNETLIB_BLACS  $(MPI_FINC) 
+#  SUN compiler does not have MOVE_ALLOC. 
+PSBFDEFINES=-DHAVE_KSENDID  $(MPI_FINC) 
+# -DHAVE_MOVE_ALLOC
 # -DHAVE_METIS
 
 AR=ar -cur
