@@ -171,7 +171,7 @@ module psb_penv_mod
 #endif
 
 
-#if defined(NETLIB_BLACS)
+#if defined(HAVE_KSENDID)
   interface 
     integer function krecvid(contxt,proc_to_comm,myrow)
       integer contxt,proc_to_comm,myrow
@@ -4957,11 +4957,10 @@ contains
   subroutine psb_set_coher(ictxt,isvch)
     integer :: ictxt, isvch
     ! Ensure global coherence for convergence checks.
-#ifdef NETLIB_BLACS
+#if !defined(HAVE_ESSL_BLACS)
     Call blacs_get(ictxt,16,isvch)
     Call blacs_set(ictxt,16,1)
-#endif
-#ifdef ESSL_BLACS
+#else
     ! Do nothing: ESSL does coherence by default,
     ! and does not handle req=16 
 #endif
@@ -4969,10 +4968,9 @@ contains
   subroutine psb_restore_coher(ictxt,isvch)
     integer :: ictxt, isvch
     ! Ensure global coherence for convergence checks.
-#ifdef NETLIB_BLACS
+#if !defined(HAVE_ESSL_BLACS)
     Call blacs_set(ictxt,16,isvch)
-#endif
-#ifdef ESSL_BLACS
+#else
     ! Do nothing: ESSL does coherence by default,
     ! and does not handle req=16 
 #endif
@@ -4995,7 +4993,7 @@ contains
 #endif    
   end subroutine psb_get_rank
   
-#if defined(ESSL_BLACS) || defined(SERIAL_MPI)
+#if (!defined(HAVE_KSENDID)) || defined(SERIAL_MPI)
   !
   ! Need these, as they are not in the ESSL implementation 
   ! of the BLACS. 
