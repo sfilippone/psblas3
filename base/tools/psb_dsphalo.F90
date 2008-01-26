@@ -228,7 +228,7 @@ Subroutine psb_dsphalo(a,desc_a,blk,info,rowcnv,colcnv,&
   Enddo
 
   iszr=sum(rvsz)
-  call psb_sp_reall(blk,max(iszr,1),info)
+  call psb_sp_all(blk,max(iszr,1),info)
   if (debug_level >= psb_debug_outer_)&
        & write(debug_unit,*) me,' ',trim(name),': Sizes:',size(blk%ia1),size(blk%ia2),&
        & ' Send:',sdsz(:),' Receive:',rvsz(:)
