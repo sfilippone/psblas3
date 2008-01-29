@@ -74,9 +74,6 @@ subroutine psb_dprc_aply(prec,x,y,desc_data,info,trans, work)
 
   call psb_gprec_aply(done,prec,x,dzero,y,desc_data,trans_,work_,info)
 
-  ! If the original distribution has an overlap we should fix that. 
-  call psb_ovrl(y,desc_data,info,update=psb_avg_)
-
   if (present(work)) then 
   else
     deallocate(work_)

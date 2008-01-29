@@ -50,6 +50,7 @@
 !                                       psb_comm_halo_    use halo_index
 !                                       psb_comm_ext_     use ext_index 
 !                                       psb_comm_ovrl_    use ovrl_index
+!                                       psb_comm_mov_     use ovr_mst_idx
 !
 !
 subroutine  psb_ihalom(x,desc_a,info,alpha,jx,ik,work,tran,mode,data)
@@ -278,6 +279,7 @@ end subroutine psb_ihalom
 !                                       psb_comm_halo_    use halo_index
 !                                       psb_comm_ext_     use ext_index 
 !                                       psb_comm_ovrl_    use ovrl_index
+!                                       psb_comm_mov_     use ovr_mst_idx
 !
 !
 subroutine  psb_ihalov(x,desc_a,info,alpha,work,tran,mode,data)

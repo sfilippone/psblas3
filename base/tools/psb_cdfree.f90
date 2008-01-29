@@ -155,6 +155,14 @@ subroutine psb_cdfree(desc_a,info)
   end if
 
   !deallocate ovrlap_index  field
+  deallocate(desc_a%ovr_mst_idx,stat=info)
+  if (info /= 0) then
+    info=2055
+    call psb_errpush(info,name)
+    goto 9999
+  end if
+
+
   deallocate(desc_a%lprm,stat=info)
   if (info /= 0) then 
     info=2057

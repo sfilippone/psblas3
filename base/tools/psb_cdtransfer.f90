@@ -89,6 +89,8 @@ subroutine psb_cdtransfer(desc_in, desc_out, info)
   if (info == 0)  &
        & call psb_transfer( desc_in%ovrlap_index,    desc_out%ovrlap_index , info)
   if (info == 0)  &
+       & call psb_transfer( desc_in%ovr_mst_idx ,    desc_out%ovr_mst_idx  , info)
+  if (info == 0)  &
        & call psb_transfer( desc_in%ext_index   ,    desc_out%ext_index    , info)
   if (info == 0)  &
        & call psb_transfer( desc_in%loc_to_glob ,    desc_out%loc_to_glob  , info)

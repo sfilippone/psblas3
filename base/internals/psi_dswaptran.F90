@@ -81,6 +81,7 @@
 !                                       psb_comm_halo_    use halo_index
 !                                       psb_comm_ext_     use ext_index 
 !                                       psb_comm_ovrl_    use ovrl_index
+!                                       psb_comm_mov_     use ovr_mst_idx
 !
 !
 subroutine psi_dswaptranm(flag,n,beta,y,desc_a,work,info,data)
@@ -172,6 +173,12 @@ subroutine psi_dswaptranm(flag,n,beta,y,desc_a,work,info,data)
     totxch = desc_a%matrix_data(psb_text_xch_)
     idxr   = desc_a%matrix_data(psb_text_rcv_)
     idxs   = desc_a%matrix_data(psb_text_snd_)
+
+  case(psb_comm_mov_) 
+    d_idx => desc_a%ovr_mst_idx
+    totxch = desc_a%matrix_data(psb_tmov_xch_)
+    idxr   = desc_a%matrix_data(psb_tmov_rcv_)
+    idxs   = desc_a%matrix_data(psb_tmov_snd_)
   case default
     call psb_errpush(4010,name,a_err='wrong Data selector')
     goto 9999
@@ -554,6 +561,7 @@ end subroutine psi_dswaptranm
 !                                       psb_comm_halo_    use halo_index
 !                                       psb_comm_ext_     use ext_index 
 !                                       psb_comm_ovrl_    use ovrl_index
+!                                       psb_comm_mov_     use ovr_mst_idx
 !
 !
 subroutine psi_dswaptranv(flag,beta,y,desc_a,work,info,data)
@@ -649,6 +657,12 @@ subroutine psi_dswaptranv(flag,beta,y,desc_a,work,info,data)
     totxch = desc_a%matrix_data(psb_text_xch_)
     idxr   = desc_a%matrix_data(psb_text_rcv_)
     idxs   = desc_a%matrix_data(psb_text_snd_)
+
+  case(psb_comm_mov_) 
+    d_idx => desc_a%ovr_mst_idx
+    totxch = desc_a%matrix_data(psb_tmov_xch_)
+    idxr   = desc_a%matrix_data(psb_tmov_rcv_)
+    idxs   = desc_a%matrix_data(psb_tmov_snd_)
   case default
     write(0,*) 'Really wrong?? ',data_, psb_comm_halo_, psb_comm_ovr_, psb_comm_ext_
     call psb_errpush(4010,name,a_err='wrong Data selector')

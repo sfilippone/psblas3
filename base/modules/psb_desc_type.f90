@@ -46,13 +46,15 @@ module psb_descriptor_type
   ! For overlap update. 
   integer, parameter :: psb_none_=0,  psb_sum_=1
   integer, parameter :: psb_avg_=2,  psb_square_root_=3
-  integer, parameter :: psb_zero_=999
+  integer, parameter :: psb_setzero_=4
+
   ! The following are bit fields. 
   integer, parameter :: psb_swap_send_=1, psb_swap_recv_=2
   integer, parameter :: psb_swap_sync_=4, psb_swap_mpi_=8
 
   integer, parameter :: psb_no_comm_=-1
-  integer, parameter :: psb_comm_halo_=1, psb_comm_ovr_=2, psb_comm_ext_=3
+  integer, parameter :: psb_comm_halo_=1, psb_comm_ovr_=2
+  integer, parameter :: psb_comm_ext_=3,  psb_comm_mov_=4
   integer, parameter :: psb_ovt_xhal_ = 123, psb_ovt_asov_=psb_ovt_xhal_+1
 
   !
@@ -71,7 +73,10 @@ module psb_descriptor_type
   integer, parameter :: psb_text_xch_=17
   integer, parameter :: psb_text_snd_=18
   integer, parameter :: psb_text_rcv_=19
-  integer, parameter :: psb_mdata_size_=20
+  integer, parameter :: psb_tmov_xch_=20
+  integer, parameter :: psb_tmov_snd_=21
+  integer, parameter :: psb_tmov_rcv_=22
+  integer, parameter :: psb_mdata_size_=24
   integer, parameter :: psb_desc_asb_=3099
   integer, parameter :: psb_desc_bld_=psb_desc_asb_+1
   integer, parameter :: psb_desc_repl_=3199
@@ -111,6 +116,7 @@ module psb_descriptor_type
   !|     integer, allocatable :: bnd_elem(:)
   !|     integer, allocatable :: ovrlap_index(:)
   !|     integer, allocatable :: ovrlap_elem(:,:)
+  !|     integer, allocatable :: ovr_mst_idx(:)
   !|     integer, allocatable :: loc_to_glob(:)
   !|     integer, allocatable :: glob_to_loc (:)
   !|     integer, allocatable :: hashv(:), glb_lc(:,:), ptree(:)
@@ -253,7 +259,14 @@ module psb_descriptor_type
   !     it only contains the end-of-list marker -1). 
   !
   ! 10. ovrlap_elem contains a list of overlap indices together with their degree
-  !     of overlap, i.e. the number of processes "owning" them.
+  !     of overlap, i.e. the number of processes "owning" the, and the "master"
+  !     process whose value has to be considered authoritative when the need arises.
+  !     
+  ! 11. ovr_mst_idx is a list defining a retrieve of a copy of the values for
+  !     overlap entries from their respecitve "master" processes by means of
+  !     an halo exchange call. This is used for those cases where there is
+  !     an overlap in the base data distribution.
+  !
   ! It is complex, but it does the following:
   !  1. Allows a purely local matrix/stencil buildup phase, requiring only 
   !     one synch point at the end (CDASB)
@@ -272,6 +285,7 @@ module psb_descriptor_type
      integer, allocatable :: bnd_elem(:)
      integer, allocatable :: ovrlap_index(:)
      integer, allocatable :: ovrlap_elem(:,:)
+     integer, allocatable :: ovr_mst_idx(:)
      integer, allocatable :: loc_to_glob(:)
      integer, allocatable :: glob_to_loc (:)
      integer, allocatable :: hashv(:), glb_lc(:,:), ptree(:)
@@ -305,6 +319,7 @@ contains
     if (allocated(desc%bnd_elem))     val = val + 4*size(desc%bnd_elem)
     if (allocated(desc%ovrlap_index)) val = val + 4*size(desc%ovrlap_index)
     if (allocated(desc%ovrlap_elem))  val = val + 4*size(desc%ovrlap_elem)
+    if (allocated(desc%ovr_mst_idx))  val = val + 4*size(desc%ovr_mst_idx)
     if (allocated(desc%loc_to_glob))  val = val + 4*size(desc%loc_to_glob)    
     if (allocated(desc%glob_to_loc))  val = val + 4*size(desc%glob_to_loc)
     if (allocated(desc%hashv))        val = val + 4*size(desc%hashv)

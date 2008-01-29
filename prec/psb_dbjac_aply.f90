@@ -122,13 +122,15 @@ subroutine psb_dbjac_aply(alpha,prec,x,beta,y,desc_data,trans,work,info)
       if(info /=0) goto 9999
 
     end select
-
+    
 
   case default
     info = 4001
     call psb_errpush(info,name,a_err='Invalid factorization')
     goto 9999
   end select
+
+  call psb_halo(y,desc_data,info,data=psb_comm_mov_)
 
   if (n_col <= size(work)) then 
     if ((4*n_col+n_col) <= size(work)) then 

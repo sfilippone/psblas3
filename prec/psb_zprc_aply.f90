@@ -76,7 +76,6 @@ subroutine psb_zprc_aply(prec,x,y,desc_data,info,trans, work)
   call psb_gprec_aply(zone,prec,x,zzero,y,desc_data,trans_,work_,info)
 
   ! If the original distribution has an overlap we should fix that. 
-  call psb_ovrl(y,desc_data,info,update=psb_avg_)
 
   if (present(work)) then 
   else

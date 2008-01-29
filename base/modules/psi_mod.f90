@@ -377,7 +377,7 @@ contains
     integer  :: np,me
     integer  :: ictxt, err_act,nxch,nsnd,nrcv,j,k
     !     ...local array...
-    integer, allocatable  :: idx_out(:)
+    integer, allocatable  :: idx_out(:), tmp_mst_idx(:)
 
     !     ...parameters
     integer :: debug_level, debug_unit
@@ -403,7 +403,7 @@ contains
     ! first the halo index
     if (debug_level>0) write(debug_unit,*) me,'Calling crea_index on halo'
     call psi_crea_index(cdesc,halo_in, idx_out,.false.,nxch,nsnd,nrcv,info)
-    if(info /= 0) then
+    if (info /= 0) then
       call psb_errpush(4010,name,a_err='psi_crea_index')
       goto 9999
     end if
@@ -419,7 +419,7 @@ contains
     ! then ext index
     if (debug_level>0) write(debug_unit,*) me,'Calling crea_index on ext'
     call psi_crea_index(cdesc,ext_in, idx_out,.false.,nxch,nsnd,nrcv,info)
-    if(info /= 0) then
+    if (info /= 0) then
       call psb_errpush(4010,name,a_err='psi_crea_index')
       goto 9999
     end if
@@ -433,12 +433,12 @@ contains
 
     ! then the overlap index
     call psi_crea_index(cdesc,ovrlap_in, idx_out,.true.,nxch,nsnd,nrcv,info)
-    if(info /= 0) then
+    if (info /= 0) then
       call psb_errpush(4010,name,a_err='psi_crea_index')
       goto 9999
     end if
     call psb_transfer(idx_out,cdesc%ovrlap_index,info)
-    if(info /= 0) then
+    if (info /= 0) then
       call psb_errpush(4010,name,a_err='psb_transfer')
       goto 9999
     end if
@@ -447,20 +447,39 @@ contains
     cdesc%matrix_data(psb_tovr_snd_) = nsnd
     cdesc%matrix_data(psb_tovr_rcv_) = nrcv 
 
-    if (debug_level>0) write(debug_unit,*) me,'Calling crea_ovr_elem'
     ! next  ovrlap_elem 
+    if (debug_level>0) write(debug_unit,*) me,'Calling crea_ovr_elem'
     call psi_crea_ovr_elem(me,cdesc%ovrlap_index,cdesc%ovrlap_elem,info)
     if (debug_level>0) write(debug_unit,*) me,'Done crea_ovr_elem'
-    if(info /= 0) then
+    if (info /= 0) then
       call psb_errpush(4010,name,a_err='psi_crea_ovr_elem')
       goto 9999
     end if
+    ! Extract ovr_mst_idx from ovrlap_elem 
+    if (debug_level>0) write(debug_unit,*) me,'Calling bld_ovr_mst'
+    call psi_bld_ovr_mst(me,cdesc%ovrlap_elem,tmp_mst_idx,info)
+    if (info == 0) call psi_crea_index(cdesc,&
+         & tmp_mst_idx,idx_out,.false.,nxch,nsnd,nrcv,info)
+    if (debug_level>0) write(debug_unit,*) me,'Done crea_indx'
+    if (info /= 0) then
+      call psb_errpush(4010,name,a_err='psi_bld_ovr_mst')
+      goto 9999
+    end if
+    call psb_transfer(idx_out,cdesc%ovr_mst_idx,info)
+    if (info /= 0) then
+      call psb_errpush(4010,name,a_err='psb_transfer')
+      goto 9999
+    end if
+
+    cdesc%matrix_data(psb_tmov_xch_) = nxch
+    cdesc%matrix_data(psb_tmov_snd_) = nsnd
+    cdesc%matrix_data(psb_tmov_rcv_) = nrcv 
 
     ! finally bnd_elem
     call psi_crea_bnd_elem(idx_out,cdesc,info)
     if (info == 0) call psb_transfer(idx_out,cdesc%bnd_elem,info)
 
-    if(info /= 0) then
+    if (info /= 0) then
       call psb_errpush(4010,name,a_err='psi_crea_bnd_elem')
       goto 9999
     end if
@@ -618,6 +637,12 @@ contains
         ndm = desc_a%ovrlap_elem(i,2)
         x(idx) = x(idx)/real(ndm)
       end do
+    case(psb_setzero_)
+      do i=1,size(desc_a%ovrlap_elem,1)
+        idx = desc_a%ovrlap_elem(i,1)
+        if (me /= desc_a%ovrlap_elem(i,3))&
+             & x(idx) = dzero
+      end do
     case(psb_sum_)
       ! do nothing
 
@@ -684,6 +709,12 @@ contains
         ndm = desc_a%ovrlap_elem(i,2)
         x(idx,:) = x(idx,:)/real(ndm)
       end do
+    case(psb_setzero_)
+      do i=1,size(desc_a%ovrlap_elem,1)
+        idx = desc_a%ovrlap_elem(i,1)
+        if (me /= desc_a%ovrlap_elem(i,3))&
+             & x(idx,:) = dzero
+      end do
     case(psb_sum_)
       ! do nothing
 
@@ -748,6 +779,12 @@ contains
         idx = desc_a%ovrlap_elem(i,1)
         ndm = desc_a%ovrlap_elem(i,2)
         x(idx) = x(idx)/real(ndm)
+      end do
+    case(psb_setzero_)
+      do i=1,size(desc_a%ovrlap_elem,1)
+        idx = desc_a%ovrlap_elem(i,1)
+        if (me /= desc_a%ovrlap_elem(i,3))&
+             & x(idx) = zzero
       end do
     case(psb_sum_)
       ! do nothing
@@ -815,6 +852,12 @@ contains
         ndm = desc_a%ovrlap_elem(i,2)
         x(idx,:) = x(idx,:)/real(ndm)
       end do
+    case(psb_setzero_)
+      do i=1,size(desc_a%ovrlap_elem,1)
+        idx = desc_a%ovrlap_elem(i,1)
+        if (me /= desc_a%ovrlap_elem(i,3))&
+             & x(idx,:) = zzero
+      end do
     case(psb_sum_)
       ! do nothing
 
@@ -880,6 +923,12 @@ contains
         idx = desc_a%ovrlap_elem(i,1)
         ndm = desc_a%ovrlap_elem(i,2)
         x(idx) = x(idx)/real(ndm)
+      end do
+    case(psb_setzero_)
+      do i=1,size(desc_a%ovrlap_elem,1)
+        idx = desc_a%ovrlap_elem(i,1)
+        if (me /= desc_a%ovrlap_elem(i,3))&
+             & x(idx) = izero
       end do
     case(psb_sum_)
       ! do nothing
@@ -947,6 +996,12 @@ contains
         idx = desc_a%ovrlap_elem(i,1)
         ndm = desc_a%ovrlap_elem(i,2)
         x(idx,:) = x(idx,:)/real(ndm)
+      end do
+    case(psb_setzero_)
+      do i=1,size(desc_a%ovrlap_elem,1)
+        idx = desc_a%ovrlap_elem(i,1)
+        if (me /= desc_a%ovrlap_elem(i,3))&
+             & x(idx,:) = izero
       end do
     case(psb_sum_)
       ! do nothing
@@ -1935,6 +1990,59 @@ contains
       end do
     end if
   end subroutine psi_zsctv
+  
+  subroutine psi_bld_ovr_mst(me,ovrlap_elem,mst_idx,info)
+    use psb_const_mod
+    use psb_error_mod
+    use psb_penv_mod
+    use psb_descriptor_type
+    use psb_realloc_mod
+    implicit none
 
+    !     ....scalars parameters....
+    integer, intent(in)               :: me, ovrlap_elem(:,:)
+    integer, allocatable, intent(out) :: mst_idx(:) 
+    integer, intent(out)              :: info
+
+    integer  :: i, j, proc, nov,isz, ip, err_act, idx
+    character(len=20)  :: name
+
+    name='psi_bld_ovr_mst'
+    call psb_get_erraction(err_act)
+
+    nov = size(ovrlap_elem,1)
+    isz = 3*nov+1
+    call psb_realloc(isz,mst_idx,info) 
+    if (info /= 0) then
+      call psb_errpush(4001,name,a_err='reallocate')
+      goto 9999
+    end if
+    mst_idx = -1
+    j = 1
+    do i=1, nov
+      proc = ovrlap_elem(i,3)
+      if (me /= proc) then 
+        idx = ovrlap_elem(i,1)
+        mst_idx(j+0) = proc
+        mst_idx(j+1) = 1
+        mst_idx(j+2) = idx
+        j = j + 3
+      end if
+    end do
+    mst_idx(j) = -1 
+
+    call psb_erractionrestore(err_act)
+    return  
+
+9999 continue
+    call psb_erractionrestore(err_act)
+
+    if (err_act == psb_act_abort_) then
+      call psb_error()
+      return
+    end if
+    return
+
+  end subroutine psi_bld_ovr_mst
 
 end module psi_mod

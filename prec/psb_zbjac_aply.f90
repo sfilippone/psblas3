@@ -138,6 +138,8 @@ subroutine psb_zbjac_aply(alpha,prec,x,beta,y,desc_data,trans,work,info)
     goto 9999
   end select
 
+  call psb_halo(y,desc_data,info,data=psb_comm_mov_)
+
   if (n_col <= size(work)) then 
     if ((4*n_col+n_col) <= size(work)) then 
     else
