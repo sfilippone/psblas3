@@ -208,8 +208,8 @@ Subroutine psb_dcgstabl(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,irst,is
      goto 9999
   end if
   if (info == 0) Call psb_geall(wwrk,desc_a,info,n=10)
-  if (info == 0) Call psb_geall(uh,desc_a,info,n=nl+1)
-  if (info == 0) Call psb_geall(rh,desc_a,info,n=nl+1)
+  if (info == 0) Call psb_geall(uh,desc_a,info,n=nl+1,lb=0)
+  if (info == 0) Call psb_geall(rh,desc_a,info,n=nl+1,lb=0)
   if (info == 0) Call psb_geasb(wwrk,desc_a,info)  
   if (info == 0) Call psb_geasb(uh,desc_a,info)  
   if (info == 0) Call psb_geasb(rh,desc_a,info)  
@@ -385,7 +385,7 @@ Subroutine psb_dcgstabl(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,irst,is
   if (info == 0) call psb_gefree(wwrk,desc_a,info)
   if (info == 0) call psb_gefree(uh,desc_a,info)
   if (info == 0) call psb_gefree(rh,desc_a,info)
-  if(info/=0) then
+  if (info/=0) then
      call psb_errpush(info,name)
      goto 9999
   end if

@@ -35,13 +35,13 @@ Module psb_tools_mod
 
   interface  psb_geall
     ! 2-D double precision version
-    subroutine psb_dalloc(x, desc_a, info, n)
+    subroutine psb_dalloc(x, desc_a, info, n, lb)
       use psb_descriptor_type
       implicit none
       real(kind(1.d0)), allocatable, intent(out) :: x(:,:)
       type(psb_desc_type), intent(in) :: desc_a
       integer,intent(out)             :: info
-      integer, optional, intent(in)   :: n
+      integer, optional, intent(in)   :: n, lb
     end subroutine psb_dalloc
     ! 1-D double precision version
     subroutine psb_dallocv(x, desc_a,info,n)
@@ -52,12 +52,12 @@ Module psb_tools_mod
       integer, optional, intent(in)   :: n
     end subroutine psb_dallocv
     ! 2-D integer version
-    subroutine psb_ialloc(x, desc_a, info,n)
+    subroutine psb_ialloc(x, desc_a, info,n, lb)
       use psb_descriptor_type
       integer, allocatable, intent(out)                 :: x(:,:)
       type(psb_desc_type), intent(in)  :: desc_a
       integer, intent(out)             :: info
-      integer, optional, intent(in)    :: n
+      integer, optional, intent(in)    :: n, lb
     end subroutine psb_ialloc
     subroutine psb_iallocv(x, desc_a,info,n)
       use psb_descriptor_type
@@ -66,16 +66,16 @@ Module psb_tools_mod
       integer                         :: info
       integer, optional, intent(in)   :: n
     end subroutine psb_iallocv
-    ! 2-D double precision version
-    subroutine psb_zalloc(x, desc_a, info, n)
+    ! 2-D double complex version
+    subroutine psb_zalloc(x, desc_a, info, n, lb)
       use psb_descriptor_type
       implicit none
       complex(kind(1.d0)), allocatable, intent(out)    :: x(:,:)
       type(psb_desc_type), intent(in) :: desc_a
       integer                         :: info
-      integer, optional, intent(in)   :: n
+      integer, optional, intent(in)   :: n, lb
     end subroutine psb_zalloc
-    ! 1-D double precision version
+    ! 1-D double complex version
     subroutine psb_zallocv(x, desc_a,info,n)
       use psb_descriptor_type
       complex(kind(1.d0)), allocatable, intent(out)    :: x(:)

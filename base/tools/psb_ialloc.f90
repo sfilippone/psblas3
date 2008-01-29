@@ -39,11 +39,13 @@
 !    desc_a - the communication descriptor.
 !    info   - possibly returns an error code
 !    n      - optional number of columns.
-subroutine psb_ialloc(x, desc_a, info, n)
+!    lb     - optional lower bound on column indices
+subroutine psb_ialloc(x, desc_a, info, n, lb)
   !....allocate dense  matrix for psblas routines.....
   use psb_descriptor_type
   use psb_const_mod
   use psb_error_mod
+  use psb_realloc_mod
   use psb_penv_mod
 
   implicit none
@@ -52,18 +54,19 @@ subroutine psb_ialloc(x, desc_a, info, n)
   integer, allocatable, intent(out) :: x(:,:)
   type(psb_desc_type), intent(in)   :: desc_a
   integer, intent(out)              :: info
-  integer, optional, intent(in)     :: n
-
+  integer, optional, intent(in)     :: n, lb
 
   !locals
-  integer             :: np,me,n_col,n_row,i,j,err_act
+  integer             :: np,me,err,nr,i,j,err_act
   integer             :: ictxt,n_
   integer             :: int_err(5), exch(3)
   character(len=20)   :: name
 
+  name='psb_geall'
   if(psb_get_errstatus() /= 0) return 
   info=0
-  name='psb_ialloc'
+  err=0
+  int_err(1)=0
   call psb_erractionsave(err_act)
   
   ictxt=psb_cd_get_context(desc_a)
@@ -103,34 +106,24 @@ subroutine psb_ialloc(x, desc_a, info, n)
 
   !....allocate x .....
   if (psb_is_asb_desc(desc_a).or.psb_is_upd_desc(desc_a)) then
-    n_col = max(1,psb_cd_get_local_cols(desc_a))
-    allocate(x(n_col,n_),stat=info)
-    if (info /= 0) then
-      info=4025
-      int_err(1)=n_col*n_
-      call psb_errpush(info,name,int_err,a_err='integer')
-      goto 9999
-    endif
-    do j=1,n_
-      do i=1,n_col
-        x(i,j) = 0
-      end do
-    end do
+    nr = max(1,psb_cd_get_local_cols(desc_a))
   else if (psb_is_bld_desc(desc_a)) then
-    n_row = max(1,psb_cd_get_local_rows(desc_a))
-    allocate(x(n_row,n_),stat=info)
-    if (info /= 0) then
-      info=4025
-      int_err(1)=n_row*n_
-      call psb_errpush(info,name,int_err,a_err='integer')
-      goto 9999
-    endif
-    do j = 1, n_
-      do i=1,n_row
-        x(i,j) = 0
-      end do
-    end do
+    nr = max(1,psb_cd_get_local_rows(desc_a))
+  else
+    info = 4001
+    call psb_errpush(info,name,int_err,a_err='Invalid desc_a')
+    goto 9999
   endif
+  
+  call psb_realloc(nr,n_,x,info,lb2=lb)
+  if (info /= 0) then
+    info=4025
+    int_err(1)=nr*n_
+    call psb_errpush(info,name,int_err,a_err='integer')
+    goto 9999
+  endif
+  
+  x(:,:) = izero
 
   call psb_erractionrestore(err_act)
   return
@@ -182,10 +175,9 @@ end subroutine psb_ialloc
 !    The descriptor may be in either the build or assembled state.
 ! 
 ! Arguments: 
-!    m      - integer.                  The number of rows.
-!    x      - integer,dimension(:).     The matrix to be allocated.
-!    desc_a - type(psb_desc_type).    The communication descriptor.
-!    info   - integer.                  Eventually returns an error code
+!    x(:)   - the matrix to be allocated.
+!    desc_a - the communication descriptor.
+!    info   - return code
 subroutine psb_iallocv(x, desc_a, info,n)
   !....allocate sparse matrix structure for psblas routines.....
   use psb_descriptor_type
@@ -210,7 +202,7 @@ subroutine psb_iallocv(x, desc_a, info,n)
 
   if(psb_get_errstatus() /= 0) return 
   info=0
-  name='psb_igeall_v'
+  name='psb_geall'
   call psb_erractionsave(err_act)
   debug_unit  = psb_get_debug_unit()
   debug_level = psb_get_debug_level()
@@ -236,33 +228,24 @@ subroutine psb_iallocv(x, desc_a, info,n)
 
   !....allocate x .....
   if (psb_is_asb_desc(desc_a).or.psb_is_upd_desc(desc_a)) then
-    n_col = max(1,psb_cd_get_local_cols(desc_a))
-    allocate(x(n_col),stat=info)
-    if (info /= 0) then
-      info=4025
-      int_err(1)=n_col
-      call psb_errpush(info,name,int_err,a_err='integer')
-      goto 9999
-    endif
+    nr = max(1,psb_cd_get_local_cols(desc_a))
   else if (psb_is_bld_desc(desc_a)) then
-    n_row = max(1,psb_cd_get_local_rows(desc_a))
-    allocate(x(n_row),stat=info)
-    if (info /= 0) then
-      info=4025
-      int_err(1)=n_row
-      call psb_errpush(info,name,int_err,a_err='integer')
-      goto 9999
-    endif
-    do i=1,n_row
-      x(i) = 0.0d0
-    end do
+    nr = max(1,psb_cd_get_local_rows(desc_a))
   else
-    if (debug_level > psb_debug_ext_) &
-         & write(debug_unit,*) me,name,&
-         & ': Did not allocate anything because of dectype',psb_cd_get_dectype(desc_a)
+    info = 4001
+    call psb_errpush(info,name,int_err,a_err='Invalid desc_a')
+    goto 9999
   endif
-
-  x = 0
+  
+  call psb_realloc(nr,x,info)
+  if (info /= 0) then
+    info=4025
+    int_err(1)=nr
+    call psb_errpush(info,name,int_err,a_err='integer')
+    goto 9999
+  endif
+  
+  x(:) = izero
 
   call psb_erractionrestore(err_act)
   return
