@@ -786,7 +786,7 @@ An integer value; 0 means no error has been detected.
 %
 \subroutine{psb\_geall}{Allocates a dense matrix}
 
-\syntax{call psb\_geall}{x, desc\_a, info, n}
+\syntax{call psb\_geall}{x, desc\_a, info, n, lb}
 
 \begin{description}
 \item[Type:] Synchronous.
@@ -800,7 +800,13 @@ Specified as: a variable of type \descdata.\\
 Scope: {\bf local} \\
 Type: {\bf optional}\\
 Intent: {\bf in}.\\
-Specified as: Integer scalar, default $1$. It is ignored if $x$ is a
+Specified as: Integer scalar, default $1$. It is not a valid argument  if $x$ is a
+rank-1 array. 
+\item[lb] The lower bound for the column index range of the dense matrix to be allocated.\\
+Scope: {\bf local} \\
+Type: {\bf optional}\\
+Intent: {\bf in}.\\
+Specified as: Integer scalar, default $1$. It is not a valid argument if $x$ is a
 rank-1 array. 
 \end{description}
 
