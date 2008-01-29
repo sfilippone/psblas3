@@ -195,7 +195,7 @@ subroutine psb_zallocv(x, desc_a,info,n)
   integer, optional, intent(in)   :: n
 
   !locals
-  integer             :: np,me,n_col,n_row,i,err_act
+  integer             :: np,me,nr,i,err_act
   integer             :: ictxt, int_err(5)
   integer              :: debug_level, debug_unit
   character(len=20)   :: name
