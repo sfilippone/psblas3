@@ -7,7 +7,8 @@ LIBDIR=../lib
 MODOBJS= psb_krylov_mod.o
 F90OBJS= psb_dcgstab.o psb_dcg.o psb_dcgs.o \
 	psb_dbicg.o psb_dcgstabl.o psb_drgmres.o\
-	psb_zcgstab.o psb_zcgs.o psb_zrgmres.o
+	psb_zcgstab.o psb_zcg.o psb_zcgs.o  \
+	psb_zbicg.o psb_zcgstabl.o psb_zrgmres.o
 OBJS=$(F90OBJS) $(MODOBJS)
 
 LIBMOD=psb_krylov_mod$(.mod)

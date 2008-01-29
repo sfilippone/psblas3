@@ -60,19 +60,19 @@
 !!$ C                                                                      C
 !!$ C                                                                      C
 !!$ CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
-! File:  psb_dcgstabl.f90
+! File:  psb_zcgstabl.f90
 !
-! Subroutine: psb_dcgstabl
+! Subroutine: psb_zcgstabl
 !   Implements the BICGSTAB(L) method
 !
 !
 ! Arguments:
 !
-!    a      -  type(psb_dspmat_type)      Input: sparse matrix containing A.
-!    prec   -  type(psb_dprec_type)       Input: preconditioner
-!    b      -  real,dimension(:)          Input: vector containing the
+!    a      -  type(psb_zspmat_type)      Input: sparse matrix containing A.
+!    prec   -  type(psb_zprec_type)       Input: preconditioner
+!    b(:)   -  complex                    Input: vector containing the
 !                                         right hand side B
-!    x      -  real,dimension(:)          Input/Output: vector containing the
+!    x(:)   -  complex                    Input/Output: vector containing the
 !                                         initial guess and final solution X.
 !    eps    -  real                       Input: Stopping tolerance; the iteration is
 !                                         stopped when the error estimate |err| <= eps
@@ -94,34 +94,34 @@
 !                                         to estimate the error. 
 !                                         1: err =  |r|/|b|; here the iteration is
 !                                            stopped when  |r| <= eps * |b|
-!                                         2: err =  |r|/(|a||x|+|b|);  here the iteration is
-!                                            stopped when  |r| <= eps * (|a||x|+|b|)
+!                                         2: err =  |r|/(|a||x|+|b|);  here the iteration
+!                                            is stopped when  |r| <= eps * (|a||x|+|b|)
 !                                         where r is the (preconditioned, recursive
 !                                         estimate of) residual. 
 !    irst   -  integer(optional)          Input: restart parameter L 
 !
 !
 !
-Subroutine psb_dcgstabl(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,irst,istop)
+Subroutine psb_zcgstabl(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,irst,istop)
   use psb_base_mod
   use psb_prec_mod
-  use psb_krylov_mod, psb_protect_name => psb_dcgstabl
+  use psb_krylov_mod, psb_protect_name => psb_zcgstabl
   implicit none
 
 !!$  parameters 
-  Type(psb_dspmat_type), Intent(in)  :: a
-  Type(psb_dprec_type), Intent(in)   :: prec 
+  Type(psb_zspmat_type), Intent(in)  :: a
+  Type(psb_zprec_type), Intent(in)   :: prec 
   Type(psb_desc_type), Intent(in)    :: desc_a
-  Real(Kind(1.d0)), Intent(in)       :: b(:)
-  Real(Kind(1.d0)), Intent(inout)    :: x(:)
+  complex(Kind(1.d0)), Intent(in)    :: b(:)
+  complex(Kind(1.d0)), Intent(inout) :: x(:)
   Real(Kind(1.d0)), Intent(in)       :: eps
   integer, intent(out)               :: info
   Integer, Optional, Intent(in)      :: itmax, itrace, irst,istop
   Integer, Optional, Intent(out)     :: iter
   Real(Kind(1.d0)), Optional, Intent(out) :: err
 !!$   local data
-  Real(Kind(1.d0)), allocatable, target   :: aux(:),wwrk(:,:),uh(:,:), rh(:,:)
-  Real(Kind(1.d0)), Pointer  :: ww(:), q(:), r(:), rt0(:), p(:), v(:), &
+  complex(Kind(1.d0)), allocatable, target   :: aux(:),wwrk(:,:),uh(:,:), rh(:,:)
+  complex(Kind(1.d0)), Pointer  :: ww(:), q(:), r(:), rt0(:), p(:), v(:), &
        & s(:), t(:), z(:), f(:), gamma(:), gamma1(:), gamma2(:), taum(:,:), sigma(:)
 
   Integer       :: itmax_, naux, mglob, it, itrace_,&
@@ -130,14 +130,14 @@ Subroutine psb_dcgstabl(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,irst,is
   Integer, Parameter :: irmax = 8
   Integer            :: itx, i, isvch, ictxt,istop_,j, int_err(5)
   integer            :: debug_level, debug_unit
-  Real(Kind(1.d0)) :: alpha, beta, rho, rho_old, rni, xni, bni, ani,bn2,& 
+  complex(Kind(1.d0)) :: alpha, beta, rho, rho_old, rni, xni, bni, ani,bn2,& 
        & omega
   type(psb_itconv_type)        :: stopdat
   character(len=20)            :: name
   character(len=*), parameter  :: methdname='BiCGStab(L)'
 
   info = 0
-  name = 'psb_dcgstabl'
+  name = 'psb_zcgstabl'
   call psb_erractionsave(err_act)
   debug_unit  = psb_get_debug_unit()
   debug_level = psb_get_debug_level()
@@ -249,23 +249,23 @@ Subroutine psb_dcgstabl(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,irst,is
     if (itx >= itmax_) exit restart  
 
     it = 0      
-    call psb_geaxpby(done,b,dzero,r,desc_a,info)
-    if (info == 0) call psb_spmm(-done,a,x,done,r,desc_a,info,work=aux)
+    call psb_geaxpby(zone,b,zzero,r,desc_a,info)
+    if (info == 0) call psb_spmm(-zone,a,x,zone,r,desc_a,info,work=aux)
     
     if (info == 0) call psb_precaply(prec,r,desc_a,info)
 
-    if (info == 0) call psb_geaxpby(done,r,dzero,rt0,desc_a,info)
-    if (info == 0) call psb_geaxpby(done,r,dzero,rh(:,0),desc_a,info)
-    if (info == 0) call psb_geaxpby(dzero,r,dzero,uh(:,0),desc_a,info)
+    if (info == 0) call psb_geaxpby(zone,r,zzero,rt0,desc_a,info)
+    if (info == 0) call psb_geaxpby(zone,r,zzero,rh(:,0),desc_a,info)
+    if (info == 0) call psb_geaxpby(zzero,r,zzero,uh(:,0),desc_a,info)
     if (info /= 0) then 
        info=4011 
        call psb_errpush(info,name)
        goto 9999
     end if
    
-    rho   = done
-    alpha = dzero
-    omega = done 
+    rho   = zone
+    alpha = zzero
+    omega = zone 
 
     if (debug_level >= psb_debug_ext_) &
          & write(debug_unit,*) me,' ',trim(name),&
@@ -292,7 +292,7 @@ Subroutine psb_dcgstabl(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,irst,is
 
         rho_old = rho
         rho = psb_gedot(rh(:,j),rt0,desc_a,info)
-        if (rho==dzero) then
+        if (rho==zzero) then
           if (debug_level >= psb_debug_ext_) &
                & write(debug_unit,*) me,' ',trim(name),&
                & ' bi-cgstab iteration breakdown r',rho
@@ -301,14 +301,14 @@ Subroutine psb_dcgstabl(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,irst,is
 
         beta = alpha*rho/rho_old 
         rho_old = rho
-        call psb_geaxpby(done,rh(:,0:j),-beta,uh(:,0:j),desc_a,info)
-        call psb_spmm(done,a,uh(:,j),dzero,uh(:,j+1),desc_a,info,work=aux)
+        call psb_geaxpby(zone,rh(:,0:j),-beta,uh(:,0:j),desc_a,info)
+        call psb_spmm(zone,a,uh(:,j),zzero,uh(:,j+1),desc_a,info,work=aux)
 
         call psb_precaply(prec,uh(:,j+1),desc_a,info)
 
         gamma(j) = psb_gedot(uh(:,j+1),rt0,desc_a,info)
 
-        if (gamma(j)==dzero) then
+        if (gamma(j)==zzero) then
           if (debug_level >= psb_debug_ext_) &
                & write(debug_unit,*) me,' ',trim(name),&
                & ' bi-cgstab iteration breakdown s2',gamma(j)
@@ -319,9 +319,9 @@ Subroutine psb_dcgstabl(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,irst,is
              & write(debug_unit,*) me,' ',trim(name),&
              & ' bicg part: alpha=r/g ',alpha,rho,gamma(j)
 
-        call psb_geaxpby(-alpha,uh(:,1:j+1),done,rh(:,0:j),desc_a,info)        
-        call psb_geaxpby(alpha,uh(:,0),done,x,desc_a,info)
-        call psb_spmm(done,a,rh(:,j),dzero,rh(:,j+1),desc_a,info,work=aux)
+        call psb_geaxpby(-alpha,uh(:,1:j+1),zone,rh(:,0:j),desc_a,info)        
+        call psb_geaxpby(alpha,uh(:,0),zone,x,desc_a,info)
+        call psb_spmm(zone,a,rh(:,j),zzero,rh(:,j+1),desc_a,info,work=aux)
 
         call psb_precaply(prec,rh(:,j+1),desc_a,info)
                 
@@ -335,7 +335,7 @@ Subroutine psb_dcgstabl(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,irst,is
         do i=1, j-1 
           taum(i,j) = psb_gedot(rh(:,i),rh(:,j),desc_a,info)
           taum(i,j) = taum(i,j)/sigma(i) 
-          call psb_geaxpby(-taum(i,j),rh(:,i),done,rh(:,j),desc_a,info)        
+          call psb_geaxpby(-taum(i,j),rh(:,i),zone,rh(:,j),desc_a,info)        
         enddo        
         sigma(j)  = psb_gedot(rh(:,j),rh(:,j),desc_a,info)
         gamma1(j) = psb_gedot(rh(:,0),rh(:,j),desc_a,info)
@@ -359,14 +359,14 @@ Subroutine psb_dcgstabl(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,irst,is
         enddo
       enddo
       
-      call psb_geaxpby(gamma(1),rh(:,0),done,x,desc_a,info)        
-      call psb_geaxpby(-gamma1(nl),rh(:,nl),done,rh(:,0),desc_a,info)        
-      call psb_geaxpby(-gamma(nl),uh(:,nl),done,uh(:,0),desc_a,info)        
+      call psb_geaxpby(gamma(1),rh(:,0),zone,x,desc_a,info)        
+      call psb_geaxpby(-gamma1(nl),rh(:,nl),zone,rh(:,0),desc_a,info)        
+      call psb_geaxpby(-gamma(nl),uh(:,nl),zone,uh(:,0),desc_a,info)        
 
       do j=1, nl-1
-        call psb_geaxpby(-gamma(j),uh(:,j),done,uh(:,0),desc_a,info)        
-        call psb_geaxpby(gamma2(j),rh(:,j),done,x,desc_a,info)        
-        call psb_geaxpby(-gamma1(j),rh(:,j),done,rh(:,0),desc_a,info)        
+        call psb_geaxpby(-gamma(j),uh(:,j),zone,uh(:,0),desc_a,info)        
+        call psb_geaxpby(gamma2(j),rh(:,j),zone,x,desc_a,info)        
+        call psb_geaxpby(-gamma1(j),rh(:,j),zone,rh(:,0),desc_a,info)        
       enddo
       
       if (psb_check_conv(methdname,itx,x,rh(:,0),desc_a,stopdat,info)) exit restart
@@ -402,6 +402,6 @@ Subroutine psb_dcgstabl(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,irst,is
   end if
   return
 
-End Subroutine psb_dcgstabl
+End Subroutine psb_zcgstabl
 
 

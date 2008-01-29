@@ -190,7 +190,6 @@ Subroutine psb_zcgs(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,istop)
   
   itx   = 0
 
-  
   call psb_init_conv(methdname,istop_,itrace_,itmax_,a,b,eps,desc_a,stopdat,info)
   if (info /= 0) Then 
      call psb_errpush(4011,name)

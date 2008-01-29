@@ -56,6 +56,21 @@ Module psb_krylov_mod
       integer, optional, intent(out)     :: iter
       real(kind(1.d0)), optional, intent(out) :: err
     end subroutine psb_dcg
+    subroutine psb_zcg(a,prec,b,x,eps,&
+         & desc_a,info,itmax,iter,err,itrace,istop)
+      use psb_base_mod
+      use psb_prec_mod
+      type(psb_zspmat_type), intent(in)  :: a
+      type(psb_desc_type), intent(in)    :: desc_a
+      complex(kind(1.d0)), intent(in)    :: b(:)
+      complex(kind(1.d0)), intent(inout) :: x(:)
+      real(kind(1.d0)), intent(in)       :: eps
+      type(psb_zprec_type), intent(in)   :: prec
+      integer, intent(out)               :: info
+      integer, optional, intent(in)      :: itmax, itrace,istop
+      integer, optional, intent(out)     :: iter
+      real(kind(1.d0)), optional, intent(out) :: err
+    end subroutine psb_zcg
   end interface
 
   interface psb_bicg
@@ -74,6 +89,21 @@ Module psb_krylov_mod
       integer, optional, intent(out)     :: iter
       real(kind(1.d0)), optional, intent(out) :: err
     end subroutine psb_dbicg
+    subroutine psb_zbicg(a,prec,b,x,eps,&
+         & desc_a,info,itmax,iter,err,itrace,istop)
+      use psb_base_mod
+      use psb_prec_mod
+      type(psb_zspmat_type), intent(in)  :: a
+      type(psb_desc_type), intent(in)    :: desc_a
+      complex(kind(1.d0)), intent(in)       :: b(:)
+      complex(kind(1.d0)), intent(inout)    :: x(:)
+      real(kind(1.d0)), intent(in)       :: eps
+      type(psb_zprec_type), intent(in)   :: prec
+      integer, intent(out)               :: info
+      integer, optional, intent(in)      :: itmax, itrace,istop
+      integer, optional, intent(out)     :: iter
+      real(kind(1.d0)), optional, intent(out) :: err
+    end subroutine psb_zbicg
   end interface
 
   interface psb_bicgstab
@@ -125,6 +155,21 @@ Module psb_krylov_mod
       Integer, Optional, Intent(out)     :: iter
       Real(Kind(1.d0)), Optional, Intent(out) :: err
     end subroutine psb_dcgstabl
+    Subroutine psb_zcgstabl(a,prec,b,x,eps,desc_a,info,&
+         &itmax,iter,err,itrace,irst,istop)
+      use psb_base_mod
+      use psb_prec_mod
+      Type(psb_zspmat_type), Intent(in)  :: a
+      Type(psb_desc_type), Intent(in)    :: desc_a
+      type(psb_zprec_type), intent(in)   :: prec 
+      complex(Kind(1.d0)), Intent(in)    :: b(:)
+      complex(Kind(1.d0)), Intent(inout) :: x(:)
+      Real(Kind(1.d0)), Intent(in)       :: eps
+      integer, intent(out)               :: info
+      Integer, Optional, Intent(in)      :: itmax, itrace, irst,istop
+      Integer, Optional, Intent(out)     :: iter
+      Real(Kind(1.d0)), Optional, Intent(out) :: err
+    end subroutine psb_zcgstabl
   end interface
 
   interface psb_rgmres
@@ -406,24 +451,24 @@ contains
 
 
     select case(toupper(method))
-!!$    case('CG') 
-!!$      call  psb_cg(a,prec,b,x,eps,desc_a,info,&
-!!$         &itmax,iter,err,itrace,istop)
+    case('CG') 
+      call  psb_cg(a,prec,b,x,eps,desc_a,info,&
+         &itmax,iter,err,itrace,istop)
     case('CGS') 
       call  psb_cgs(a,prec,b,x,eps,desc_a,info,&
            &itmax,iter,err,itrace,istop)
-!!$    case('BICG') 
-!!$      call  psb_bicg(a,prec,b,x,eps,desc_a,info,&
-!!$         &itmax,iter,err,itrace,istop)
+    case('BICG') 
+      call  psb_bicg(a,prec,b,x,eps,desc_a,info,&
+         &itmax,iter,err,itrace,istop)
     case('BICGSTAB') 
       call  psb_bicgstab(a,prec,b,x,eps,desc_a,info,&
            & itmax,iter,err,itrace,istop)
     case('RGMRES')
       call  psb_rgmres(a,prec,b,x,eps,desc_a,info,&
            & itmax,iter,err,itrace,irst,istop)
-!!$    case('BICGSTABL')
-!!$      call  psb_bicgstabl(a,prec,b,x,eps,desc_a,info,&
-!!$         &itmax,iter,err,itrace,irst,istop)
+    case('BICGSTABL')
+      call  psb_bicgstabl(a,prec,b,x,eps,desc_a,info,&
+         &itmax,iter,err,itrace,irst,istop)
     case default
       if (me==0) write(0,*) 'Warning: Unknown method ',method,&
            & ' in PSB_KRYLOV, defaulting to BiCGSTAB'
