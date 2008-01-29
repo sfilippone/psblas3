@@ -24,7 +24,7 @@ lib:  $(OBJS)
 	/bin/cp -p $(LIBMOD) $(LIBDIR)
 
 $(F90OBJS): $(MODOBJS)
-$(OBJS): $(LIBDIR)/psb_prec_mod$(.mod)
+$(OBJS): $(LIBDIR)/psb_prec_mod$(.mod)  $(LIBDIR)/psb_base_mod$(.mod)
 veryclean: clean
 	/bin/rm -f $(HERE)/$(LIBNAME)
 
