@@ -408,6 +408,9 @@ Module psb_tools_mod
 
   interface psb_spfree
     module procedure psb_dsp_free, psb_zsp_free
+  end interface
+
+  interface psb_spfree
     subroutine psb_dspfree(a, desc_a,info)
       use psb_descriptor_type
       use psb_spmat_type
