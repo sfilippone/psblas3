@@ -145,13 +145,11 @@ subroutine psi_fnd_owner(nv,idx,iprc,desc,info)
 
   ! Fifth, we extract the answers for our local query, and shift back the 
   ! process indices to 0-based.
-  if (nv > 0) then 
-    call psb_realloc(nv,iprc,info)
-    ih = hidx(me+1)
-    do i=1, hsz(me+1) 
-      iprc(i) = hproc(ih+i-1) - 1 
-    end do 
-  end if
+  call psb_realloc(nv,iprc,info)
+  ih = hidx(me+1)
+  do i=1, hsz(me+1) 
+    iprc(i) = hproc(ih+i-1) - 1 
+  end do
   call psb_erractionrestore(err_act)
   return
 
