@@ -281,11 +281,12 @@ module psb_descriptor_type
   !
   type psb_desc_type
      integer, allocatable :: matrix_data(:)
-     integer, allocatable :: halo_index(:), ext_index(:)
-     integer, allocatable :: bnd_elem(:)
+     integer, allocatable :: halo_index(:)
+     integer, allocatable :: ext_index(:)
      integer, allocatable :: ovrlap_index(:)
      integer, allocatable :: ovrlap_elem(:,:)
      integer, allocatable :: ovr_mst_idx(:)
+     integer, allocatable :: bnd_elem(:)
      integer, allocatable :: loc_to_glob(:)
      integer, allocatable :: glob_to_loc (:)
      integer, allocatable :: hashv(:), glb_lc(:,:), ptree(:)
