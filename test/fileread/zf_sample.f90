@@ -232,7 +232,7 @@ program zf_sample
     write(*,'("Matrix: ",a)')mtrx_file
     write(*,'("Computed solution on ",i8," processors")')np
     write(*,'("Iterations to convergence: ",i6)')iter
-    write(*,'("Error indicator on exit: ",f7.2)')err
+    write(*,'("Error estimate on exit: ",f7.2)')err
     write(*,'("Time to buil prec.   : ",es10.4)')tprec
     write(*,'("Time to solve matrix : ",es10.4)')t2
     write(*,'("Time per iteration   : ",es10.4)')t2/(iter)
@@ -256,7 +256,7 @@ program zf_sample
       write(20,*) 'matrix: ',mtrx_file
       write(20,*) 'computed solution on ',np,' processors.'
       write(20,*) 'iterations to convergence: ',iter
-      write(20,*) 'error indicator (infinity norm) on exit:', &
+      write(20,*) 'error estimate (infinity norm) on exit:', &
            & ' ||r||/(||a||||x||+||b||) = ',err
       write(20,*) 'max residual = ',resmx, resmxp
       write(20,'(a8,4(2x,a20))') 'I','X(I)','R(I)','B(I)'
