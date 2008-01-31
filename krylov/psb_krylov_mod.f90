@@ -356,8 +356,8 @@ contains
       call  psb_bicgstabl(a,prec,b,x,eps,desc_a,info,&
            &itmax,iter,err,itrace,irst,istop)
     case default
-      if (me==0) write(0,*) 'Warning: Unknown method  ',method,&
-           & ' in PSB_KRYLOV, defaulting to BiCGSTAB'
+      if (me==0) write(0,*) trim(name),': Warning: Unknown method  ',method,&
+           & ', defaulting to BiCGSTAB'
       call  psb_bicgstab(a,prec,b,x,eps,desc_a,info,&
            &itmax,iter,err,itrace,istop)
     end select
@@ -470,8 +470,8 @@ contains
       call  psb_bicgstabl(a,prec,b,x,eps,desc_a,info,&
          &itmax,iter,err,itrace,irst,istop)
     case default
-      if (me==0) write(0,*) 'Warning: Unknown method ',method,&
-           & ' in PSB_KRYLOV, defaulting to BiCGSTAB'
+      if (me==0) write(0,*) trim(name),': Warning: Unknown method  ',method,&
+           & ', defaulting to BiCGSTAB'
       call  psb_bicgstab(a,prec,b,x,eps,desc_a,info,&
            &itmax,iter,err,itrace,istop)
     end select
@@ -497,14 +497,14 @@ contains
     use psb_base_mod
     implicit none 
     character(len=*), intent(in)   :: methdname
-    character(len=*), parameter    :: fmt='(a18,1x,a4,3(2x,a10))'
+    character(len=*), parameter    :: fmt='(a18,1x,a4,3(2x,a15))'
     integer, parameter             :: outlen=18 
     character(len=len(methdname))  :: mname
     character(len=outlen)          :: outname
     
     mname = adjustl(trim(methdname))
     write(outname,'(a)') mname(1:min(len_trim(mname),outlen-1))//':'
-    write(*,fmt) adjustl(outname),'Iter','Conv. Ind.','Epsilon'
+    write(*,fmt) adjustl(outname),'Iteration','Error Estimate','Tolerance'
     
   end subroutine log_header
 
@@ -515,7 +515,7 @@ contains
     character(len=*), intent(in)  :: methdname
     integer, intent(in)           :: me, itx, itrace
     real(kind(1.d0)), intent(in)  :: errnum, errden, eps
-    character(len=*), parameter   :: fmt='(a18,1x,i4,3(2x,es10.4))'
+    character(len=*), parameter   :: fmt='(a18,1x,i4,3(2x,es15.9))'
     integer, parameter            :: outlen=18 
     character(len=len(methdname)) :: mname
     character(len=outlen)         :: outname
@@ -541,15 +541,15 @@ contains
     real(kind(1.d0)), optional, intent(out) :: err
     integer, optional, intent(out)  :: iter
 
-    character(len=*), parameter  :: fmt='(a,2x,es10.4,1x,a,1x,i4,1x,a)'
-    character(len=*), parameter  :: fmt1='(a,3(2x,es10.4))'
+    character(len=*), parameter  :: fmt='(a,2x,es15.9,1x,a,1x,i4,1x,a)'
+    character(len=*), parameter  :: fmt1='(a,3(2x,es15.9))'
     
     if (errden == dzero) then 
       if (errnum > eps) then         
         if (me==0) then 
           write(*,fmt) trim(methdname)//' failed to converge to ',eps,&
                & ' in ',it,' iterations. '
-          write(*,fmt1) 'Last iteration convergence indicator: ',&
+          write(*,fmt1) 'Last iteration error estimate: ',&
                & errnum
         end if
       end if
@@ -559,7 +559,7 @@ contains
         if (me==0) then 
           write(*,fmt) trim(methdname)//' failed to converge to ',eps,&
                & ' in ',it,' iterations. '
-          write(*,fmt1) 'Last iteration convergence indicator: ',&
+          write(*,fmt1) 'Last iteration error estimate: ',&
                & errnum/errden
         end if
       endif
@@ -864,8 +864,6 @@ contains
 
     integer                         :: ictxt, me, np, err_act
     real(kind(1.d0))                :: errnum, errden, eps
-    character(len=*), parameter     :: fmt='(a,2x,es10.4,1x,a,1x,i4,1x,a)'
-    character(len=*), parameter     :: fmt1='(a,3(2x,es10.4))'    
     character(len=20)               :: name
 
     info = 0
