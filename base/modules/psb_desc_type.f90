@@ -51,7 +51,7 @@ module psb_descriptor_type
   ! The following are bit fields. 
   integer, parameter :: psb_swap_send_=1, psb_swap_recv_=2
   integer, parameter :: psb_swap_sync_=4, psb_swap_mpi_=8
-
+  ! Choice among lists on which to base data exchange
   integer, parameter :: psb_no_comm_=-1
   integer, parameter :: psb_comm_halo_=1, psb_comm_ovr_=2
   integer, parameter :: psb_comm_ext_=3,  psb_comm_mov_=4
