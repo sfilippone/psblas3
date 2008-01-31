@@ -155,34 +155,11 @@ subroutine psi_dswaptranm(flag,n,beta,y,desc_a,work,info,data)
     data_ = psb_comm_halo_
   end if
 
-  select case(data_) 
-  case(psb_comm_halo_) 
-    d_idx => desc_a%halo_index
-    totxch = desc_a%matrix_data(psb_thal_xch_)
-    idxr   = desc_a%matrix_data(psb_thal_rcv_)
-    idxs   = desc_a%matrix_data(psb_thal_snd_)
-
-  case(psb_comm_ovr_) 
-    d_idx => desc_a%ovrlap_index
-    totxch = desc_a%matrix_data(psb_tovr_xch_)
-    idxr   = desc_a%matrix_data(psb_tovr_rcv_)
-    idxs   = desc_a%matrix_data(psb_tovr_snd_)
-
-  case(psb_comm_ext_) 
-    d_idx => desc_a%ext_index
-    totxch = desc_a%matrix_data(psb_text_xch_)
-    idxr   = desc_a%matrix_data(psb_text_rcv_)
-    idxs   = desc_a%matrix_data(psb_text_snd_)
-
-  case(psb_comm_mov_) 
-    d_idx => desc_a%ovr_mst_idx
-    totxch = desc_a%matrix_data(psb_tmov_xch_)
-    idxr   = desc_a%matrix_data(psb_tmov_rcv_)
-    idxs   = desc_a%matrix_data(psb_tmov_snd_)
-  case default
-    call psb_errpush(4010,name,a_err='wrong Data selector')
+  call psb_cd_get_list(data_,desc_a,d_idx,totxch,idxr,idxs,info) 
+  if (info /= 0) then 
+    call psb_errpush(4001,name,a_err='psb_cd_get_list')
     goto 9999
-  end select
+  end if
 
   idxr = idxr * n
   idxs = idxs * n
@@ -632,42 +609,17 @@ subroutine psi_dswaptranv(flag,beta,y,desc_a,work,info,data)
   do_send = swap_mpi .or. swap_sync .or. swap_send
   do_recv = swap_mpi .or. swap_sync .or. swap_recv
 
-  if(present(data)) then
-    write(0,*) 'External data present: ',data
+  if (present(data)) then
     data_ = data
   else
     data_ = psb_comm_halo_
   end if
 
-  select case(data_) 
-  case(psb_comm_halo_) 
-    d_idx => desc_a%halo_index
-    totxch = desc_a%matrix_data(psb_thal_xch_)
-    idxr   = desc_a%matrix_data(psb_thal_rcv_)
-    idxs   = desc_a%matrix_data(psb_thal_snd_)
-
-  case(psb_comm_ovr_) 
-    d_idx => desc_a%ovrlap_index
-    totxch = desc_a%matrix_data(psb_tovr_xch_)
-    idxr   = desc_a%matrix_data(psb_tovr_rcv_)
-    idxs   = desc_a%matrix_data(psb_tovr_snd_)
-
-  case(psb_comm_ext_) 
-    d_idx => desc_a%ext_index
-    totxch = desc_a%matrix_data(psb_text_xch_)
-    idxr   = desc_a%matrix_data(psb_text_rcv_)
-    idxs   = desc_a%matrix_data(psb_text_snd_)
-
-  case(psb_comm_mov_) 
-    d_idx => desc_a%ovr_mst_idx
-    totxch = desc_a%matrix_data(psb_tmov_xch_)
-    idxr   = desc_a%matrix_data(psb_tmov_rcv_)
-    idxs   = desc_a%matrix_data(psb_tmov_snd_)
-  case default
-    write(0,*) 'Really wrong?? ',data_, psb_comm_halo_, psb_comm_ovr_, psb_comm_ext_
-    call psb_errpush(4010,name,a_err='wrong Data selector')
+  call psb_cd_get_list(data_,desc_a,d_idx,totxch,idxr,idxs,info) 
+  if (info /= 0) then 
+    call psb_errpush(4001,name,a_err='psb_cd_get_list')
     goto 9999
-  end select
+  end if
 
   idxr = idxr * n
   idxs = idxs * n
@@ -716,7 +668,6 @@ subroutine psi_dswaptranv(flag,beta,y,desc_a,work,info,data)
       goto 9999
     end if
   end if
-
 
 
   idxr = max(idxr,1)

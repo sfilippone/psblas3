@@ -297,7 +297,8 @@ module psb_descriptor_type
   interface psb_sizeof
     module procedure psb_cd_sizeof
   end interface
-
+  
+  
   integer, private, save :: cd_large_threshold=psb_default_large_threshold 
 
 
@@ -571,5 +572,74 @@ contains
     end if
     return
   end subroutine psb_cd_set_bld
-    
+
+
+  subroutine psb_cd_get_list(data,desc,ipnt,totxch,idxr,idxs,info)
+    use psb_const_mod
+    use psb_error_mod
+    use psb_penv_mod
+
+    implicit none
+    integer, intent(in)          :: data
+    integer, pointer             :: ipnt(:)
+    type(psb_desc_type), target  :: desc
+    integer, intent(out)         :: totxch,idxr,idxs,info
+
+    !locals
+    integer             :: np,me,ictxt,err_act
+    logical, parameter  :: debug=.false.,debugprt=.false.
+    character(len=20), parameter  :: name='psb_cd_get_list'
+
+    info = 0
+    call psb_erractionsave(err_act)
+
+    ictxt = psb_cd_get_context(desc)
+
+    call psb_info(ictxt, me, np)
+
+    select case(data) 
+    case(psb_comm_halo_) 
+      ipnt   => desc%halo_index
+      totxch = desc%matrix_data(psb_thal_xch_)
+      idxr   = desc%matrix_data(psb_thal_rcv_)
+      idxs   = desc%matrix_data(psb_thal_snd_)
+
+    case(psb_comm_ovr_) 
+      ipnt   => desc%ovrlap_index
+      totxch = desc%matrix_data(psb_tovr_xch_)
+      idxr   = desc%matrix_data(psb_tovr_rcv_)
+      idxs   = desc%matrix_data(psb_tovr_snd_)
+
+    case(psb_comm_ext_) 
+      ipnt   => desc%ext_index
+      totxch = desc%matrix_data(psb_text_xch_)
+      idxr   = desc%matrix_data(psb_text_rcv_)
+      idxs   = desc%matrix_data(psb_text_snd_)
+
+    case(psb_comm_mov_) 
+      ipnt   => desc%ovr_mst_idx
+      totxch = desc%matrix_data(psb_tmov_xch_)
+      idxr   = desc%matrix_data(psb_tmov_rcv_)
+      idxs   = desc%matrix_data(psb_tmov_snd_)
+
+    case default
+      info=4010
+      call psb_errpush(info,name,a_err='wrong Data selector')
+      goto 9999
+    end select
+    call psb_erractionrestore(err_act)
+    return
+
+9999 continue
+    call psb_erractionrestore(err_act)
+
+    if (err_act == psb_act_ret_) then
+      return
+    else
+      call psb_error(ictxt)
+    end if
+    return
+  end subroutine psb_cd_get_list
+
+
 end module psb_descriptor_type
