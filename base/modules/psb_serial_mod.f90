@@ -33,6 +33,11 @@ module psb_serial_mod
   use psb_string_mod
   use psb_sort_mod
 
+  use psi_serial_mod, &
+       & psb_gth => psi_gth,&
+       & psb_sct => psi_sct
+
+
   interface psb_csdp
     subroutine psb_dcsdp(a, b,info,ifc,check,trans,unitd,upd,dupl)
       use psb_spmat_type

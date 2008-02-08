@@ -28,8 +28,10 @@
 !!$  POSSIBILITY OF SUCH DAMAGE.
 !!$ 
 !!$  
-
 module psi_mod
+
+  use psi_serial_mod
+
 
   interface
     subroutine psi_compute_size(desc_data,&
@@ -111,6 +113,20 @@ module psi_mod
       type(psb_desc_type), target  :: desc_a
       integer, optional    :: data
     end subroutine psi_dswapdatav
+    subroutine psi_dswapidxm(ictxt,icomm,flag,n,beta,y,idx,totxch,totsnd,totrcv,work,info)
+      integer, intent(in)  :: ictxt,icomm,flag, n
+      integer, intent(out) :: info
+      real(kind(1.d0))     :: y(:,:), beta
+      real(kind(1.d0)),target :: work(:)
+      integer, intent(in)  :: idx(:),totxch,totsnd,totrcv
+    end subroutine psi_dswapidxm
+    subroutine psi_dswapidxv(ictxt,icomm,flag,beta,y,idx,totxch,totsnd,totrcv,work,info)
+      integer, intent(in)  :: ictxt,icomm,flag
+      integer, intent(out) :: info
+      real(kind(1.d0))     :: y(:), beta
+      real(kind(1.d0)),target :: work(:)
+      integer, intent(in)  :: idx(:),totxch,totsnd,totrcv
+    end subroutine psi_dswapidxv
     subroutine psi_iswapdatam(flag,n,beta,y,desc_a,work,info,data)
       use psb_descriptor_type
       integer, intent(in)  :: flag, n
@@ -129,6 +145,20 @@ module psi_mod
       type(psb_desc_type), target  :: desc_a
       integer, optional    :: data
     end subroutine psi_iswapdatav
+    subroutine psi_iswapidxm(ictxt,icomm,flag,n,beta,y,idx,totxch,totsnd,totrcv,work,info)
+      integer, intent(in)  :: ictxt,icomm,flag, n
+      integer, intent(out) :: info
+      integer              :: y(:,:), beta
+      integer,target       :: work(:)
+      integer, intent(in)  :: idx(:),totxch,totsnd,totrcv
+    end subroutine psi_iswapidxm
+    subroutine psi_iswapidxv(ictxt,icomm,flag,beta,y,idx,totxch,totsnd,totrcv,work,info)
+      integer, intent(in)  :: ictxt,icomm,flag
+      integer, intent(out) :: info
+      integer              :: y(:), beta
+      integer,target :: work(:)
+      integer, intent(in)  :: idx(:),totxch,totsnd,totrcv
+    end subroutine psi_iswapidxv
     subroutine psi_zswapdatam(flag,n,beta,y,desc_a,work,info,data)
       use psb_descriptor_type
       integer, intent(in)  :: flag, n
@@ -147,6 +177,20 @@ module psi_mod
       type(psb_desc_type), target  :: desc_a
       integer, optional    :: data
     end subroutine psi_zswapdatav
+    subroutine psi_zswapidxm(ictxt,icomm,flag,n,beta,y,idx,totxch,totsnd,totrcv,work,info)
+      integer, intent(in)  :: ictxt,icomm,flag, n
+      integer, intent(out) :: info
+      complex(kind(1.d0))     :: y(:,:), beta
+      complex(kind(1.d0)),target :: work(:)
+      integer, intent(in)  :: idx(:),totxch,totsnd,totrcv
+    end subroutine psi_zswapidxm
+    subroutine psi_zswapidxv(ictxt,icomm,flag,beta,y,idx,totxch,totsnd,totrcv,work,info)
+      integer, intent(in)  :: ictxt,icomm,flag
+      integer, intent(out) :: info
+      complex(kind(1.d0))     :: y(:), beta
+      complex(kind(1.d0)),target :: work(:)
+      integer, intent(in)  :: idx(:),totxch,totsnd,totrcv
+    end subroutine psi_zswapidxv
   end interface
 
 
@@ -169,6 +213,20 @@ module psi_mod
       type(psb_desc_type), target  :: desc_a
       integer, optional    :: data
     end subroutine psi_dswaptranv
+    subroutine psi_dtranidxm(ictxt,icomm,flag,n,beta,y,idx,totxch,totsnd,totrcv,work,info)
+      integer, intent(in)  :: ictxt,icomm,flag, n
+      integer, intent(out) :: info
+      real(kind(1.d0))     :: y(:,:), beta
+      real(kind(1.d0)),target :: work(:)
+      integer, intent(in)  :: idx(:),totxch,totsnd,totrcv
+    end subroutine psi_dtranidxm
+    subroutine psi_dtranidxv(ictxt,icomm,flag,beta,y,idx,totxch,totsnd,totrcv,work,info)
+      integer, intent(in)  :: ictxt,icomm,flag
+      integer, intent(out) :: info
+      real(kind(1.d0))     :: y(:), beta
+      real(kind(1.d0)),target :: work(:)
+      integer, intent(in)  :: idx(:),totxch,totsnd,totrcv
+    end subroutine psi_dtranidxv
     subroutine psi_iswaptranm(flag,n,beta,y,desc_a,work,info,data)
       use psb_descriptor_type
       integer, intent(in)  :: flag, n
@@ -187,6 +245,20 @@ module psi_mod
       type(psb_desc_type), target  :: desc_a
       integer, optional    :: data
     end subroutine psi_iswaptranv
+    subroutine psi_itranidxm(ictxt,icomm,flag,n,beta,y,idx,totxch,totsnd,totrcv,work,info)
+      integer, intent(in)  :: ictxt,icomm,flag, n
+      integer, intent(out) :: info
+      integer              :: y(:,:), beta
+      integer, target      :: work(:)
+      integer, intent(in)  :: idx(:),totxch,totsnd,totrcv
+    end subroutine psi_itranidxm
+    subroutine psi_itranidxv(ictxt,icomm,flag,beta,y,idx,totxch,totsnd,totrcv,work,info)
+      integer, intent(in)  :: ictxt,icomm,flag
+      integer, intent(out) :: info
+      integer              :: y(:), beta
+      integer, target      :: work(:)
+      integer, intent(in)  :: idx(:),totxch,totsnd,totrcv
+    end subroutine psi_itranidxv
     subroutine psi_zswaptranm(flag,n,beta,y,desc_a,work,info,data)
       use psb_descriptor_type
       integer, intent(in)  :: flag, n
@@ -205,6 +277,20 @@ module psi_mod
       type(psb_desc_type), target  :: desc_a
       integer, optional    :: data
     end subroutine psi_zswaptranv
+    subroutine psi_ztranidxm(ictxt,icomm,flag,n,beta,y,idx,totxch,totsnd,totrcv,work,info)
+      integer, intent(in)  :: ictxt,icomm,flag, n
+      integer, intent(out) :: info
+      complex(kind(1.d0))     :: y(:,:), beta
+      complex(kind(1.d0)), target :: work(:)
+      integer, intent(in)  :: idx(:),totxch,totsnd,totrcv
+    end subroutine psi_ztranidxm
+    subroutine psi_ztranidxv(ictxt,icomm,flag,beta,y,idx,totxch,totsnd,totrcv,work,info)
+      integer, intent(in)  :: ictxt,icomm,flag
+      integer, intent(out) :: info
+      complex(kind(1.d0))     :: y(:), beta
+      complex(kind(1.d0)), target :: work(:)
+      integer, intent(in)  :: idx(:),totxch,totsnd,totrcv
+    end subroutine psi_ztranidxv
   end interface
 
   interface
@@ -342,18 +428,6 @@ module psi_mod
     module procedure  psi_iovrl_restrr1, psi_iovrl_restrr2,&
          & psi_dovrl_restrr1, psi_dovrl_restrr2,&
          & psi_zovrl_restrr1, psi_zovrl_restrr2
-  end interface
-
-  interface psi_gth
-    module procedure psi_igthm, psi_igthv,&
-         & psi_dgthm, psi_dgthv,&
-         & psi_zgthm, psi_zgthv
-  end interface
-
-  interface psi_sct
-    module procedure psi_isctm, psi_isctv,&
-         & psi_dsctm, psi_dsctv,&
-         & psi_zsctm, psi_zsctv
   end interface
 
 
@@ -1677,319 +1751,319 @@ contains
   end subroutine psi_iovrl_restrr2
 
 
-  subroutine psi_dgthm(n,k,idx,x,y)
-
-    use psb_const_mod
-    implicit none
-
-    integer :: n, k, idx(:)
-    real(kind(1.d0)) :: x(:,:), y(:)
-
-    ! Locals
-    integer :: i, j, pt
-
-    pt=0
-    do j=1,k
-      do i=1,n
-        pt=pt+1
-        y(pt)=x(idx(i),j)
-      end do
-    end do
-
-  end subroutine psi_dgthm
-
-  subroutine psi_dgthv(n,idx,x,y)
-
-    use psb_const_mod
-    implicit none
-
-    integer :: n, idx(:)
-    real(kind(1.d0)) :: x(:), y(:)
-
-    ! Locals
-    integer :: i
-
-    do i=1,n
-      y(i)=x(idx(i))
-    end do
-
-  end subroutine psi_dgthv
-
-
-  subroutine psi_dsctm(n,k,idx,x,beta,y)
-
-    use psb_const_mod
-    implicit none
-
-    integer :: n, k, idx(:)
-    real(kind(1.d0)) :: beta, x(:), y(:,:)
-
-    ! Locals
-    integer :: i, j, pt
-
-    if (beta == dzero) then
-      pt=0
-      do j=1,k
-        do i=1,n
-          pt=pt+1
-          y(idx(i),j) = x(pt)
-        end do
-      end do
-    else if (beta == done) then
-      pt=0
-      do j=1,k
-        do i=1,n
-          pt=pt+1
-          y(idx(i),j) = y(idx(i),j)+x(pt)
-        end do
-      end do
-    else
-      pt=0
-      do j=1,k
-        do i=1,n
-          pt=pt+1
-          y(idx(i),j) = beta*y(idx(i),j)+x(pt)
-        end do
-      end do
-    end if
-  end subroutine psi_dsctm
-
-  subroutine psi_dsctv(n,idx,x,beta,y)
-
-    use psb_const_mod
-    implicit none
-
-    integer :: n, idx(:)
-    real(kind(1.d0)) :: beta, x(:), y(:)
-
-    ! Locals
-    integer :: i
-
-    if (beta == dzero) then
-      do i=1,n
-        y(idx(i)) = x(i)
-      end do
-    else if (beta == done) then
-      do i=1,n
-        y(idx(i)) = y(idx(i))+x(i)
-      end do
-    else
-      do i=1,n
-        y(idx(i)) = beta*y(idx(i))+x(i)
-      end do
-    end if
-  end subroutine psi_dsctv
-
-
-  subroutine psi_igthm(n,k,idx,x,y)
-
-    use psb_const_mod
-    implicit none
-
-    integer :: n, k, idx(:)
-    integer :: x(:,:), y(:)
-
-    ! Locals
-    integer :: i, j, pt
-
-    pt=0
-    do j=1,k
-      do i=1,n
-        pt=pt+1
-        y(pt)=x(idx(i),j)
-      end do
-    end do
-
-  end subroutine psi_igthm
-
-
-  subroutine psi_igthv(n,idx,x,y)
-
-    use psb_const_mod
-    implicit none
-
-    integer :: n, idx(:)
-    integer :: x(:), y(:)
-
-    ! Locals
-    integer :: i
-
-    do i=1,n
-      y(i)=x(idx(i))
-    end do
-
-  end subroutine psi_igthv
-
-
-
-  subroutine psi_isctm(n,k,idx,x,beta,y)
-
-    use psb_const_mod
-    implicit none
-
-    integer :: n, k, idx(:)
-    integer :: beta, x(:), y(:,:)
-
-    ! Locals
-    integer :: i, j, pt
-
-    if (beta == izero) then
-      pt=0
-      do j=1,k
-        do i=1,n
-          pt=pt+1
-          y(idx(i),j) = x(pt)
-        end do
-      end do
-    else if (beta == ione) then
-      pt=0
-      do j=1,k
-        do i=1,n
-          pt=pt+1
-          y(idx(i),j) = y(idx(i),j)+x(pt)
-        end do
-      end do
-    else
-      pt=0
-      do j=1,k
-        do i=1,n
-          pt=pt+1
-          y(idx(i),j) = beta*y(idx(i),j)+x(pt)
-        end do
-      end do
-    end if
-  end subroutine psi_isctm
-
-  subroutine psi_isctv(n,idx,x,beta,y)
-
-    use psb_const_mod
-    implicit none
-
-    integer :: n, idx(:)
-    integer :: beta, x(:), y(:)
-
-    ! Locals
-    integer :: i
-
-    if (beta == izero) then
-      do i=1,n
-        y(idx(i)) = x(i)
-      end do
-    else if (beta == ione) then
-      do i=1,n
-        y(idx(i)) = y(idx(i))+x(i)
-      end do
-    else
-      do i=1,n
-        y(idx(i)) = beta*y(idx(i))+x(i)
-      end do
-    end if
-  end subroutine psi_isctv
-
-
-  subroutine psi_zgthm(n,k,idx,x,y)
-
-    use psb_const_mod
-    implicit none
-
-    integer :: n, k, idx(:)
-    complex(kind(1.d0)) :: x(:,:), y(:)
-
-    ! Locals
-    integer :: i, j, pt
-
-    pt=0
-    do j=1,k
-      do i=1,n
-        pt=pt+1
-        y(pt)=x(idx(i),j)
-      end do
-    end do
-
-  end subroutine psi_zgthm
-
-
-  subroutine psi_zgthv(n,idx,x,y)
-
-    use psb_const_mod
-    implicit none
-
-    integer :: n, idx(:)
-    complex(kind(1.d0)) :: x(:), y(:)
-
-    ! Locals
-    integer :: i
-
-    do i=1,n
-      y(i)=x(idx(i))
-    end do
-
-  end subroutine psi_zgthv
-
-  subroutine psi_zsctm(n,k,idx,x,beta,y)
-
-    use psb_const_mod
-    implicit none
-
-    integer :: n, k, idx(:)
-    complex(kind(1.d0)) :: beta, x(:), y(:,:)
-
-    ! Locals
-    integer :: i, j, pt
-
-    if (beta == zzero) then
-      pt=0
-      do j=1,k
-        do i=1,n
-          pt=pt+1
-          y(idx(i),j) = x(pt)
-        end do
-      end do
-    else if (beta == zone) then
-      pt=0
-      do j=1,k
-        do i=1,n
-          pt=pt+1
-          y(idx(i),j) = y(idx(i),j)+x(pt)
-        end do
-      end do
-    else
-      pt=0
-      do j=1,k
-        do i=1,n
-          pt=pt+1
-          y(idx(i),j) = beta*y(idx(i),j)+x(pt)
-        end do
-      end do
-    end if
-  end subroutine psi_zsctm
-
-
-  subroutine psi_zsctv(n,idx,x,beta,y)
-
-    use psb_const_mod
-    implicit none
-
-    integer :: n, idx(:)
-    complex(kind(1.d0)) :: beta, x(:), y(:)
-
-    ! Locals
-    integer :: i
-
-    if (beta == zzero) then
-      do i=1,n
-        y(idx(i)) = x(i)
-      end do
-    else if (beta == zone) then
-      do i=1,n
-        y(idx(i)) = y(idx(i))+x(i)
-      end do
-    else
-      do i=1,n
-        y(idx(i)) = beta*y(idx(i))+x(i)
-      end do
-    end if
-  end subroutine psi_zsctv
+!!$  subroutine psi_dgthzm(n,k,idx,x,y)
+!!$
+!!$    use psb_const_mod
+!!$    implicit none
+!!$
+!!$    integer :: n, k, idx(:)
+!!$    real(kind(1.d0)) :: x(:,:), y(:)
+!!$
+!!$    ! Locals
+!!$    integer :: i, j, pt
+!!$
+!!$    pt=0
+!!$    do j=1,k
+!!$      do i=1,n
+!!$        pt=pt+1
+!!$        y(pt)=x(idx(i),j)
+!!$      end do
+!!$    end do
+!!$
+!!$  end subroutine psi_dgthzm
+!!$
+!!$  subroutine psi_dgthzv(n,idx,x,y)
+!!$
+!!$    use psb_const_mod
+!!$    implicit none
+!!$
+!!$    integer :: n, idx(:)
+!!$    real(kind(1.d0)) :: x(:), y(:)
+!!$
+!!$    ! Locals
+!!$    integer :: i
+!!$
+!!$    do i=1,n
+!!$      y(i)=x(idx(i))
+!!$    end do
+!!$
+!!$  end subroutine psi_dgthzv
+!!$
+!!$
+!!$  subroutine psi_dsctm(n,k,idx,x,beta,y)
+!!$
+!!$    use psb_const_mod
+!!$    implicit none
+!!$
+!!$    integer :: n, k, idx(:)
+!!$    real(kind(1.d0)) :: beta, x(:), y(:,:)
+!!$
+!!$    ! Locals
+!!$    integer :: i, j, pt
+!!$
+!!$    if (beta == dzero) then
+!!$      pt=0
+!!$      do j=1,k
+!!$        do i=1,n
+!!$          pt=pt+1
+!!$          y(idx(i),j) = x(pt)
+!!$        end do
+!!$      end do
+!!$    else if (beta == done) then
+!!$      pt=0
+!!$      do j=1,k
+!!$        do i=1,n
+!!$          pt=pt+1
+!!$          y(idx(i),j) = y(idx(i),j)+x(pt)
+!!$        end do
+!!$      end do
+!!$    else
+!!$      pt=0
+!!$      do j=1,k
+!!$        do i=1,n
+!!$          pt=pt+1
+!!$          y(idx(i),j) = beta*y(idx(i),j)+x(pt)
+!!$        end do
+!!$      end do
+!!$    end if
+!!$  end subroutine psi_dsctm
+!!$
+!!$  subroutine psi_dsctv(n,idx,x,beta,y)
+!!$
+!!$    use psb_const_mod
+!!$    implicit none
+!!$
+!!$    integer :: n, idx(:)
+!!$    real(kind(1.d0)) :: beta, x(:), y(:)
+!!$
+!!$    ! Locals
+!!$    integer :: i
+!!$
+!!$    if (beta == dzero) then
+!!$      do i=1,n
+!!$        y(idx(i)) = x(i)
+!!$      end do
+!!$    else if (beta == done) then
+!!$      do i=1,n
+!!$        y(idx(i)) = y(idx(i))+x(i)
+!!$      end do
+!!$    else
+!!$      do i=1,n
+!!$        y(idx(i)) = beta*y(idx(i))+x(i)
+!!$      end do
+!!$    end if
+!!$  end subroutine psi_dsctv
+!!$
+!!$
+!!$  subroutine psi_igthzm(n,k,idx,x,y)
+!!$
+!!$    use psb_const_mod
+!!$    implicit none
+!!$
+!!$    integer :: n, k, idx(:)
+!!$    integer :: x(:,:), y(:)
+!!$
+!!$    ! Locals
+!!$    integer :: i, j, pt
+!!$
+!!$    pt=0
+!!$    do j=1,k
+!!$      do i=1,n
+!!$        pt=pt+1
+!!$        y(pt)=x(idx(i),j)
+!!$      end do
+!!$    end do
+!!$
+!!$  end subroutine psi_igthzm
+!!$
+!!$
+!!$  subroutine psi_igthzv(n,idx,x,y)
+!!$
+!!$    use psb_const_mod
+!!$    implicit none
+!!$
+!!$    integer :: n, idx(:)
+!!$    integer :: x(:), y(:)
+!!$
+!!$    ! Locals
+!!$    integer :: i
+!!$
+!!$    do i=1,n
+!!$      y(i)=x(idx(i))
+!!$    end do
+!!$
+!!$  end subroutine psi_igthzv
+!!$
+!!$
+!!$
+!!$  subroutine psi_isctm(n,k,idx,x,beta,y)
+!!$
+!!$    use psb_const_mod
+!!$    implicit none
+!!$
+!!$    integer :: n, k, idx(:)
+!!$    integer :: beta, x(:), y(:,:)
+!!$
+!!$    ! Locals
+!!$    integer :: i, j, pt
+!!$
+!!$    if (beta == izero) then
+!!$      pt=0
+!!$      do j=1,k
+!!$        do i=1,n
+!!$          pt=pt+1
+!!$          y(idx(i),j) = x(pt)
+!!$        end do
+!!$      end do
+!!$    else if (beta == ione) then
+!!$      pt=0
+!!$      do j=1,k
+!!$        do i=1,n
+!!$          pt=pt+1
+!!$          y(idx(i),j) = y(idx(i),j)+x(pt)
+!!$        end do
+!!$      end do
+!!$    else
+!!$      pt=0
+!!$      do j=1,k
+!!$        do i=1,n
+!!$          pt=pt+1
+!!$          y(idx(i),j) = beta*y(idx(i),j)+x(pt)
+!!$        end do
+!!$      end do
+!!$    end if
+!!$  end subroutine psi_isctm
+!!$
+!!$  subroutine psi_isctv(n,idx,x,beta,y)
+!!$
+!!$    use psb_const_mod
+!!$    implicit none
+!!$
+!!$    integer :: n, idx(:)
+!!$    integer :: beta, x(:), y(:)
+!!$
+!!$    ! Locals
+!!$    integer :: i
+!!$
+!!$    if (beta == izero) then
+!!$      do i=1,n
+!!$        y(idx(i)) = x(i)
+!!$      end do
+!!$    else if (beta == ione) then
+!!$      do i=1,n
+!!$        y(idx(i)) = y(idx(i))+x(i)
+!!$      end do
+!!$    else
+!!$      do i=1,n
+!!$        y(idx(i)) = beta*y(idx(i))+x(i)
+!!$      end do
+!!$    end if
+!!$  end subroutine psi_isctv
+!!$
+!!$
+!!$  subroutine psi_zgthzm(n,k,idx,x,y)
+!!$
+!!$    use psb_const_mod
+!!$    implicit none
+!!$
+!!$    integer :: n, k, idx(:)
+!!$    complex(kind(1.d0)) :: x(:,:), y(:)
+!!$
+!!$    ! Locals
+!!$    integer :: i, j, pt
+!!$
+!!$    pt=0
+!!$    do j=1,k
+!!$      do i=1,n
+!!$        pt=pt+1
+!!$        y(pt)=x(idx(i),j)
+!!$      end do
+!!$    end do
+!!$
+!!$  end subroutine psi_zgthzm
+!!$
+!!$
+!!$  subroutine psi_zgthzv(n,idx,x,y)
+!!$
+!!$    use psb_const_mod
+!!$    implicit none
+!!$
+!!$    integer :: n, idx(:)
+!!$    complex(kind(1.d0)) :: x(:), y(:)
+!!$
+!!$    ! Locals
+!!$    integer :: i
+!!$
+!!$    do i=1,n
+!!$      y(i)=x(idx(i))
+!!$    end do
+!!$
+!!$  end subroutine psi_zgthzv
+!!$
+!!$  subroutine psi_zsctm(n,k,idx,x,beta,y)
+!!$
+!!$    use psb_const_mod
+!!$    implicit none
+!!$
+!!$    integer :: n, k, idx(:)
+!!$    complex(kind(1.d0)) :: beta, x(:), y(:,:)
+!!$
+!!$    ! Locals
+!!$    integer :: i, j, pt
+!!$
+!!$    if (beta == zzero) then
+!!$      pt=0
+!!$      do j=1,k
+!!$        do i=1,n
+!!$          pt=pt+1
+!!$          y(idx(i),j) = x(pt)
+!!$        end do
+!!$      end do
+!!$    else if (beta == zone) then
+!!$      pt=0
+!!$      do j=1,k
+!!$        do i=1,n
+!!$          pt=pt+1
+!!$          y(idx(i),j) = y(idx(i),j)+x(pt)
+!!$        end do
+!!$      end do
+!!$    else
+!!$      pt=0
+!!$      do j=1,k
+!!$        do i=1,n
+!!$          pt=pt+1
+!!$          y(idx(i),j) = beta*y(idx(i),j)+x(pt)
+!!$        end do
+!!$      end do
+!!$    end if
+!!$  end subroutine psi_zsctm
+!!$
+!!$
+!!$  subroutine psi_zsctv(n,idx,x,beta,y)
+!!$
+!!$    use psb_const_mod
+!!$    implicit none
+!!$
+!!$    integer :: n, idx(:)
+!!$    complex(kind(1.d0)) :: beta, x(:), y(:)
+!!$
+!!$    ! Locals
+!!$    integer :: i
+!!$
+!!$    if (beta == zzero) then
+!!$      do i=1,n
+!!$        y(idx(i)) = x(i)
+!!$      end do
+!!$    else if (beta == zone) then
+!!$      do i=1,n
+!!$        y(idx(i)) = y(idx(i))+x(i)
+!!$      end do
+!!$    else
+!!$      do i=1,n
+!!$        y(idx(i)) = beta*y(idx(i))+x(i)
+!!$      end do
+!!$    end if
+!!$  end subroutine psi_zsctv
   
   subroutine psi_bld_ovr_mst(me,ovrlap_elem,mst_idx,info)
     use psb_const_mod

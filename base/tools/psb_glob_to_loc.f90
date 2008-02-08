@@ -249,3 +249,38 @@ subroutine psb_glob_to_loc(x,desc_a,info,iact,owned)
 
 end subroutine psb_glob_to_loc
 
+subroutine psb_glob_to_loc2s(x,y,desc_a,info,iact,owned)
+  use psb_descriptor_type
+  use psb_tools_mod, psb_protect_name => psb_glob_to_loc2s
+  implicit none 
+  type(psb_desc_type), intent(in)    ::  desc_a
+  integer,intent(in)                 ::  x
+  integer,intent(out)                ::  y  
+  integer, intent(out)               ::  info
+  character, intent(in), optional    ::  iact
+  logical, intent(in),  optional     :: owned
+
+  integer  :: iv1(1), iv2(1)
+
+  iv1(1) = x
+  call psb_glob_to_loc(iv1,iv2,desc_a,info,iact,owned)
+  y      = iv2(1)
+end subroutine psb_glob_to_loc2s
+
+subroutine psb_glob_to_locs(x,desc_a,info,iact,owned)
+  use psb_descriptor_type
+  use psb_tools_mod, psb_protect_name => psb_glob_to_locs
+  implicit none 
+  type(psb_desc_type), intent(in)    ::  desc_a
+  integer,intent(inout)              ::  x  
+  integer, intent(out)               ::  info
+  character, intent(in), optional    ::  iact
+  logical, intent(in),  optional     :: owned
+  integer  :: iv1(1)
+
+  iv1(1) = x
+  call psb_glob_to_loc(iv1,desc_a,info,iact,owned)
+  x      = iv1(1)
+
+end subroutine psb_glob_to_locs
+

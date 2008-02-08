@@ -78,11 +78,11 @@ Subroutine psb_dcdovr(a,desc_a,novr,desc_ov,info, extype)
 
   !     .. Array Arguments ..
   integer, intent(in)               :: novr
-  Type(psb_dspmat_type), Intent(in) ::  a
-  Type(psb_desc_type), Intent(in)   :: desc_a
-  Type(psb_desc_type), Intent(out)  :: desc_ov
-  integer, intent(out)              :: info
-  integer, intent(in),optional      :: extype
+  Type(psb_dspmat_type), Intent(in)       ::  a
+  Type(psb_desc_type), Intent(in), target :: desc_a
+  Type(psb_desc_type), Intent(out)        :: desc_ov
+  integer, intent(out)                    :: info
+  integer, intent(in),optional            :: extype
 
   interface 
     subroutine psb_icdasb(desc_a,info,ext_hv)
@@ -192,7 +192,8 @@ Subroutine psb_dcdovr(a,desc_a,novr,desc_ov,info, extype)
   l_tmp_ovr_idx = novr*(3*Max(2*index_dim,1)+1)
   l_tmp_halo    = novr*(3*Size(desc_a%halo_index))
 
-  call psb_cd_set_bld(desc_ov,info)
+  call psb_cd_set_ovl_bld(desc_ov,info)
+  desc_ov%base_desc => desc_a
 
   If (debug_level >= psb_debug_outer_) then
     Write(debug_unit,*) me,' ',trim(name),':Start',lworks,lworkr
@@ -229,16 +230,16 @@ Subroutine psb_dcdovr(a,desc_a,novr,desc_ov,info, extype)
     call psb_errpush(4010,name,a_err='Allocate')
     goto 9999      
   end if
-  halo(:)         = desc_a%halo_index(:)
-  tmp_ovr_idx(:)  = -1
-  orig_ovr(:)     = -1
-  tmp_halo(:)     = -1
-  counter_e       = 1
-  tot_recv        = 0
-  counter_t       = 1
-  counter_h       = 1
-  counter_o       = 1
-  cntov_o         = 1
+  halo(:)        = desc_a%halo_index(:)
+  tmp_ovr_idx(:) = -1
+  orig_ovr(:)    = -1
+  tmp_halo(:)    = -1
+  counter_e      = 1
+  tot_recv       = 0
+  counter_t      = 1
+  counter_h      = 1
+  counter_o      = 1
+  cntov_o        = 1
   ! Init overlap with desc_a%ovrlap (if any) 
   counter = 1
   Do While (desc_a%ovrlap_index(counter) /= -1)
@@ -739,6 +740,7 @@ Subroutine psb_dcdovr(a,desc_a,novr,desc_ov,info, extype)
 
   call psb_icdasb(desc_ov,info,ext_hv=.true.)
 
+  call psb_cd_set_ovl_asb(desc_ov,info)
 
   if (info == 0) call psb_sp_free(blk,info)
   if (info /= 0) then

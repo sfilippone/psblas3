@@ -30,7 +30,6 @@
 !!$  
 Module psb_tools_mod
   use psb_const_mod
-  use psb_gps_mod
   use psb_spmat_type
 
   interface  psb_geall
@@ -337,22 +336,22 @@ Module psb_tools_mod
     Subroutine psb_dcdovr(a,desc_a,novr,desc_ov,info,extype)
       use psb_descriptor_type
       Use psb_spmat_type
-      integer, intent(in)               :: novr
-      Type(psb_dspmat_type), Intent(in) :: a
-      Type(psb_desc_type), Intent(in)   :: desc_a
-      Type(psb_desc_type), Intent(out)  :: desc_ov
-      integer, intent(out)              :: info
-      integer, intent(in),optional      :: extype
+      integer, intent(in)                     :: novr
+      Type(psb_dspmat_type), Intent(in)       :: a
+      Type(psb_desc_type), Intent(in), target :: desc_a
+      Type(psb_desc_type), Intent(out)        :: desc_ov
+      integer, intent(out)                    :: info
+      integer, intent(in),optional            :: extype
     end Subroutine psb_dcdovr
     Subroutine psb_zcdovr(a,desc_a,novr,desc_ov,info,extype)
       use psb_descriptor_type
       Use psb_spmat_type
-      integer, intent(in)               :: novr
-      Type(psb_zspmat_type), Intent(in) :: a
-      Type(psb_desc_type), Intent(in)   :: desc_a
-      Type(psb_desc_type), Intent(out)  :: desc_ov
-      integer, intent(out)              :: info
-      integer, intent(in),optional      :: extype
+      integer, intent(in)                     :: novr
+      Type(psb_zspmat_type), Intent(in)       :: a
+      Type(psb_desc_type), Intent(in), target :: desc_a
+      Type(psb_desc_type), Intent(out)        :: desc_ov
+      integer, intent(out)                    :: info
+      integer, intent(in),optional            :: extype
     end Subroutine psb_zcdovr
   end interface
 
@@ -490,6 +489,27 @@ Module psb_tools_mod
       logical, intent(in),  optional     :: owned
       character, intent(in), optional    ::  iact
     end subroutine psb_glob_to_loc
+    subroutine psb_glob_to_loc2s(x,y,desc_a,info,iact,owned)
+      use psb_descriptor_type
+      implicit none 
+      type(psb_desc_type), intent(in)    ::  desc_a
+      integer,intent(in)                 ::  x
+      integer,intent(out)                ::  y  
+      integer, intent(out)               ::  info
+      character, intent(in), optional    ::  iact
+      logical, intent(in),  optional     :: owned
+
+    end subroutine psb_glob_to_loc2s
+
+    subroutine psb_glob_to_locs(x,desc_a,info,iact,owned)
+      use psb_descriptor_type
+      implicit none 
+      type(psb_desc_type), intent(in)    ::  desc_a
+      integer,intent(inout)              ::  x  
+      integer, intent(out)               ::  info
+      character, intent(in), optional    ::  iact
+      logical, intent(in),  optional     :: owned
+    end subroutine psb_glob_to_locs
   end interface
 
   interface psb_loc_to_glob
@@ -508,8 +528,25 @@ Module psb_tools_mod
       integer, intent(out)               ::  info
       character, intent(in), optional    ::  iact
     end subroutine psb_loc_to_glob
-  end interface
+    subroutine psb_loc_to_glob2s(x,y,desc_a,info,iact)
+      use psb_descriptor_type
+      implicit none 
+      type(psb_desc_type), intent(in)    ::  desc_a
+      integer,intent(in)                 ::  x
+      integer,intent(out)                ::  y  
+      integer, intent(out)               ::  info
+      character, intent(in), optional    ::  iact
+      
+    end subroutine psb_loc_to_glob2s    
+    subroutine psb_loc_to_globs(x,desc_a,info,iact)
+      use psb_descriptor_type
+      type(psb_desc_type), intent(in)    ::  desc_a
+      integer,intent(inout)              ::  x  
+      integer, intent(out)               ::  info
+      character, intent(in), optional    ::  iact
+    end subroutine psb_loc_to_globs
 
+  end interface
 
   interface psb_get_boundary
     module procedure psb_get_boundary
@@ -606,6 +643,8 @@ contains
       goto 999 
     endif
 
+    desc_a%base_desc => null() 
+
     if (present(parts)) then 
       if (.not.present(mg)) then 
         info=581
@@ -678,20 +717,21 @@ contains
   subroutine psb_cdasb(desc_a,info)
     use psb_descriptor_type
 
-  interface 
-    subroutine psb_icdasb(desc_a,info,ext_hv)
-      use psb_descriptor_type
-      Type(psb_desc_type), intent(inout) :: desc_a
-      integer, intent(out)               :: info
-      logical, intent(in),optional       :: ext_hv
-    end subroutine psb_icdasb
-  end interface
+    interface 
+      subroutine psb_icdasb(desc_a,info,ext_hv)
+        use psb_descriptor_type
+        Type(psb_desc_type), intent(inout) :: desc_a
+        integer, intent(out)               :: info
+        logical, intent(in),optional       :: ext_hv
+      end subroutine psb_icdasb
+    end interface
 
     Type(psb_desc_type), intent(inout) :: desc_a
     integer, intent(out)               :: info
 
     call psb_icdasb(desc_a,info,ext_hv=.false.)
   end subroutine psb_cdasb
+
 
 
 end module psb_tools_mod

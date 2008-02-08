@@ -55,8 +55,13 @@ module psb_descriptor_type
   integer, parameter :: psb_no_comm_=-1
   integer, parameter :: psb_comm_halo_=1, psb_comm_ovr_=2
   integer, parameter :: psb_comm_ext_=3,  psb_comm_mov_=4
-  integer, parameter :: psb_ovt_xhal_ = 123, psb_ovt_asov_=psb_ovt_xhal_+1
-
+  ! Types of mapping between descriptors.
+  integer, parameter :: psb_map_xhal_        = 123
+  integer, parameter :: psb_map_asov_        = psb_map_xhal_+1
+  integer, parameter :: psb_map_aggr_        = psb_map_asov_+1 
+  integer, parameter :: psb_map_gen_linear_  = psb_map_aggr_+1 
+  
+  integer, parameter :: psb_ovt_xhal_ = psb_map_xhal_, psb_ovt_asov_=psb_map_asov_
   !
   ! Entries and values in desc%matrix_data
   !
@@ -81,10 +86,12 @@ module psb_descriptor_type
   integer, parameter :: psb_desc_bld_=psb_desc_asb_+1
   integer, parameter :: psb_desc_repl_=3199
   integer, parameter :: psb_desc_upd_=psb_desc_bld_+1
-  integer, parameter :: psb_desc_normal_=3299
-  integer, parameter :: psb_desc_large_=psb_desc_normal_+1
+  ! these two are reserved for descriptors which are
+  ! "overlap-extensions" of base descriptors. 
   integer, parameter :: psb_cd_ovl_bld_=3399
   integer, parameter :: psb_cd_ovl_asb_=psb_cd_ovl_bld_+1
+  integer, parameter :: psb_desc_normal_=3299
+  integer, parameter :: psb_desc_large_=psb_desc_normal_+1
   !
   ! Constants for hashing into desc%hashv(:) and desc%glb_lc(:,:)
   !
@@ -292,18 +299,44 @@ module psb_descriptor_type
      integer, allocatable :: hashv(:), glb_lc(:,:), ptree(:)
      integer, allocatable :: lprm(:)
      integer, allocatable :: idx_space(:)
+     type(psb_desc_type), pointer :: base_desc => null()
   end type psb_desc_type
 
   interface psb_sizeof
     module procedure psb_cd_sizeof
   end interface
+
+  interface psb_is_ok_desc
+    module procedure psb_is_ok_desc
+  end interface
+
+  interface psb_is_asb_desc
+    module procedure psb_is_asb_desc
+  end interface
+
+  interface psb_is_upd_desc
+    module procedure psb_is_upd_desc
+  end interface
+
+  interface psb_is_ovl_desc
+    module procedure psb_is_ovl_desc
+  end interface
+
+  interface psb_is_bld_desc
+    module procedure psb_is_bld_desc
+  end interface
+
+  interface psb_is_large_desc
+    module procedure psb_is_large_desc
+  end interface
   
+
   
   integer, private, save :: cd_large_threshold=psb_default_large_threshold 
 
 
 contains 
-  
+
   function psb_cd_sizeof(desc)
     implicit none
     !....Parameters...
@@ -401,6 +434,13 @@ contains
 
   end function psb_is_upd_desc
 
+  logical function psb_is_ovl_desc(desc)
+    type(psb_desc_type), intent(in) :: desc
+
+    psb_is_ovl_desc = psb_is_ovl_dec(psb_cd_get_dectype(desc))
+
+  end function psb_is_ovl_desc
+
 
   logical function psb_is_asb_desc(desc)
     type(psb_desc_type), intent(in) :: desc
@@ -414,6 +454,7 @@ contains
     integer :: dectype
 
     psb_is_ok_dec = ((dectype == psb_desc_asb_).or.(dectype == psb_desc_bld_).or.&
+         &(dectype == psb_cd_ovl_asb_).or.(dectype == psb_cd_ovl_bld_).or.&
          &(dectype == psb_desc_upd_).or.&
          &(dectype== psb_desc_repl_))
   end function psb_is_ok_dec
@@ -421,7 +462,7 @@ contains
   logical function psb_is_bld_dec(dectype)
     integer :: dectype
 
-    psb_is_bld_dec = (dectype == psb_desc_bld_)
+    psb_is_bld_dec = (dectype == psb_desc_bld_).or.(dectype == psb_cd_ovl_bld_)
   end function psb_is_bld_dec
 
   logical function psb_is_upd_dec(dectype)          
@@ -436,9 +477,17 @@ contains
     integer :: dectype
 
     psb_is_asb_dec = (dectype == psb_desc_asb_).or.&
-         & (dectype== psb_desc_repl_)
+         & (dectype== psb_desc_repl_).or.(dectype == psb_cd_ovl_asb_)
 
   end function psb_is_asb_dec
+
+  logical function psb_is_ovl_dec(dectype)          
+    integer :: dectype
+
+    psb_is_ovl_dec = (dectype == psb_cd_ovl_bld_).or.&
+         & (dectype == psb_cd_ovl_asb_)
+
+  end function psb_is_ovl_dec
 
 
   integer function psb_cd_get_local_rows(desc)
@@ -573,6 +622,61 @@ contains
     return
   end subroutine psb_cd_set_bld
 
+  subroutine psb_cd_set_ovl_asb(desc,info)
+    !
+    ! Change state of a descriptor into ovl_build. 
+    implicit none
+    type(psb_desc_type), intent(inout) :: desc
+    integer                            :: info
+
+    
+    if (psb_is_asb_desc(desc)) desc%matrix_data(psb_dec_type_) = psb_cd_ovl_asb_ 
+
+  end subroutine psb_cd_set_ovl_asb
+
+  subroutine psb_cd_set_ovl_bld(desc,info)
+    !
+    ! Change state of a descriptor into ovl_build. 
+    implicit none
+    type(psb_desc_type), intent(inout) :: desc
+    integer                            :: info
+
+    call psb_cd_set_bld(desc,info) 
+    if (info == 0) desc%matrix_data(psb_dec_type_) = psb_cd_ovl_bld_ 
+
+  end subroutine psb_cd_set_ovl_bld
+    
+    
+  subroutine psb_get_xch_idx(idx,totxch,totsnd,totrcv)
+    implicit none 
+    integer, intent(in)  :: idx(:)
+    integer, intent(out) :: totxch,totsnd,totrcv
+
+    integer :: ip, nerv, nesd
+    character(len=20), parameter  :: name='psb_get_xch_idx'    
+
+    totxch = 0
+    totsnd = 0
+    totrcv = 0
+    ip     = 1
+
+    do 
+      if (ip > size(idx)) then 
+        write(0,*) trim(name),': Warning: out of size of input vector '
+        exit
+      end if
+      if (idx(ip) == -1) exit
+      totxch = totxch+1
+      nerv   = idx(ip+psb_n_elem_recv_)
+      nesd   = idx(ip+nerv+psb_n_elem_send_)
+      totsnd = totsnd + nesd
+      totrcv = totrcv + nerv
+      ip     = ip+nerv+nesd+3
+    end do
+
+  end subroutine psb_get_xch_idx
+  
+
 
   subroutine psb_cd_get_list(data,desc,ipnt,totxch,idxr,idxs,info)
     use psb_const_mod
@@ -600,33 +704,30 @@ contains
     select case(data) 
     case(psb_comm_halo_) 
       ipnt   => desc%halo_index
-      totxch = desc%matrix_data(psb_thal_xch_)
-      idxr   = desc%matrix_data(psb_thal_rcv_)
-      idxs   = desc%matrix_data(psb_thal_snd_)
-
     case(psb_comm_ovr_) 
       ipnt   => desc%ovrlap_index
-      totxch = desc%matrix_data(psb_tovr_xch_)
-      idxr   = desc%matrix_data(psb_tovr_rcv_)
-      idxs   = desc%matrix_data(psb_tovr_snd_)
-
     case(psb_comm_ext_) 
       ipnt   => desc%ext_index
-      totxch = desc%matrix_data(psb_text_xch_)
-      idxr   = desc%matrix_data(psb_text_rcv_)
-      idxs   = desc%matrix_data(psb_text_snd_)
-
+      if (.not.associated(desc%base_desc)) then
+        write(0,*) trim(name),&
+             & ': Warning: trying to get ext_index on a descriptor ',&
+             & 'which does not have a base_desc!'
+      end if
+      if (.not.psb_is_ovl_desc(desc)) then
+        write(0,*) trim(name),&
+             & ': Warning: trying to get ext_index on a descriptor ',&
+             & 'which is not overlap-extended!'
+      end if
     case(psb_comm_mov_) 
       ipnt   => desc%ovr_mst_idx
-      totxch = desc%matrix_data(psb_tmov_xch_)
-      idxr   = desc%matrix_data(psb_tmov_rcv_)
-      idxs   = desc%matrix_data(psb_tmov_snd_)
-
     case default
       info=4010
       call psb_errpush(info,name,a_err='wrong Data selector')
       goto 9999
     end select
+    call psb_get_xch_idx(ipnt,totxch,idxs,idxr)
+      
+
     call psb_erractionrestore(err_act)
     return
 

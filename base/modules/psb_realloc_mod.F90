@@ -57,9 +57,14 @@ module psb_realloc_mod
     module procedure psb_ztransfer2d
   end interface
 
+  Interface psb_safe_ab_cpy
+    module procedure psb_i_ab_cpy1d,psb_i_ab_cpy2d, &
+         & psb_d_ab_cpy1d, psb_d_ab_cpy2d, psb_z_ab_cpy1d, psb_z_ab_cpy2d
+  end Interface
+
   Interface psb_safe_cpy
-    module procedure psb_icpy1d,psb_icpy2d, &
-         & psb_dcpy1d, psb_dcpy2d, psb_zcpy1d, psb_zcpy2d
+    module procedure psb_i_cpy1d,psb_i_cpy2d, &
+         & psb_d_cpy1d, psb_d_cpy2d, psb_z_cpy1d, psb_z_cpy2d
   end Interface
 
   !
@@ -80,7 +85,7 @@ module psb_realloc_mod
   
 Contains
 
-  subroutine psb_icpy1d(vin,vout,info) 
+  subroutine psb_i_ab_cpy1d(vin,vout,info) 
     use psb_error_mod
 
     ! ...Subroutine Arguments  
@@ -93,7 +98,7 @@ Contains
     character(len=20)  :: name, char_err
     logical, parameter :: debug=.false.
 
-    name='psb_cpy1d'
+    name='psb_safe_ab_cpy'
     call psb_erractionsave(err_act)
 
     if(psb_get_errstatus() /= 0) return 
@@ -125,9 +130,9 @@ Contains
     end if
     return
 
-  end subroutine psb_icpy1d
+  end subroutine psb_i_ab_cpy1d
 
-  subroutine psb_icpy2d(vin,vout,info) 
+  subroutine psb_i_ab_cpy2d(vin,vout,info) 
     use psb_error_mod
 
     ! ...Subroutine Arguments  
@@ -140,7 +145,7 @@ Contains
     character(len=20)  :: name, char_err
     logical, parameter :: debug=.false.
 
-    name='psb_cpy1d'
+    name='psb_safe_ab_cpy'
     call psb_erractionsave(err_act)
 
     if(psb_get_errstatus() /= 0) return 
@@ -174,9 +179,9 @@ Contains
     end if
     return
 
-  end subroutine psb_icpy2d
+  end subroutine psb_i_ab_cpy2d
   
-  subroutine psb_dcpy1d(vin,vout,info) 
+  subroutine psb_d_ab_cpy1d(vin,vout,info) 
     use psb_error_mod
 
     ! ...Subroutine Arguments  
@@ -189,7 +194,7 @@ Contains
     character(len=20)  :: name, char_err
     logical, parameter :: debug=.false.
 
-    name='psb_cpy1d'
+    name='psb_safe_ab_cpy'
     call psb_erractionsave(err_act)
 
     if(psb_get_errstatus() /= 0) return 
@@ -221,9 +226,9 @@ Contains
     end if
     return
 
-  end subroutine psb_dcpy1d
+  end subroutine psb_d_ab_cpy1d
   
-  subroutine psb_dcpy2d(vin,vout,info) 
+  subroutine psb_d_ab_cpy2d(vin,vout,info) 
     use psb_error_mod
 
     ! ...Subroutine Arguments  
@@ -236,7 +241,7 @@ Contains
     character(len=20)  :: name, char_err
     logical, parameter :: debug=.false.
 
-    name='psb_cpy1d'
+    name='psb_safe_ab_cpy'
     call psb_erractionsave(err_act)
 
     if(psb_get_errstatus() /= 0) return 
@@ -270,9 +275,9 @@ Contains
     end if
     return
 
-  end subroutine psb_dcpy2d
+  end subroutine psb_d_ab_cpy2d
   
-  subroutine psb_zcpy1d(vin,vout,info) 
+  subroutine psb_z_ab_cpy1d(vin,vout,info) 
     use psb_error_mod
 
     ! ...Subroutine Arguments  
@@ -285,7 +290,7 @@ Contains
     character(len=20)  :: name, char_err
     logical, parameter :: debug=.false.
 
-    name='psb_cpy1d'
+    name='psb_safe_ab_cpy'
     call psb_erractionsave(err_act)
 
     if(psb_get_errstatus() /= 0) return 
@@ -317,9 +322,9 @@ Contains
     end if
     return
 
-  end subroutine psb_zcpy1d
+  end subroutine psb_z_ab_cpy1d
   
-  subroutine psb_zcpy2d(vin,vout,info) 
+  subroutine psb_z_ab_cpy2d(vin,vout,info) 
     use psb_error_mod
 
     ! ...Subroutine Arguments  
@@ -332,7 +337,7 @@ Contains
     character(len=20)  :: name, char_err
     logical, parameter :: debug=.false.
 
-    name='psb_cpy1d'
+    name='psb_safe_ab_cpy'
     call psb_erractionsave(err_act)
 
     if(psb_get_errstatus() /= 0) return 
@@ -366,7 +371,285 @@ Contains
     end if
     return
 
-  end subroutine psb_zcpy2d
+  end subroutine psb_z_ab_cpy2d
+
+
+  subroutine psb_i_cpy1d(vin,vout,info) 
+    use psb_error_mod
+
+    ! ...Subroutine Arguments  
+    Integer, intent(in)               :: vin(:)
+    Integer, allocatable, intent(out) :: vout(:)
+    integer         :: info
+    ! ...Local Variables
+
+    Integer :: isz,err_act,lb
+    character(len=20)  :: name, char_err
+    logical, parameter :: debug=.false.
+
+    name='psb_safe_cpy'
+    call psb_erractionsave(err_act)
+
+    if(psb_get_errstatus() /= 0) return 
+    info = 0
+    isz = size(vin)
+    lb  = lbound(vin,1)
+    call psb_realloc(isz,vout,info,lb=lb)
+    if (info /= 0) then     
+      info=4010
+      char_err='psb_realloc'
+      call psb_errpush(info,name,a_err=char_err)
+      goto 9999
+    else
+      vout(:) = vin(:)
+    endif
+
+    call psb_erractionrestore(err_act)
+    return
+
+9999 continue
+    call psb_erractionrestore(err_act)
+
+    if (err_act == psb_act_ret_) then
+      return
+    else
+      call psb_error()
+    end if
+    return
+
+  end subroutine psb_i_cpy1d
+
+  subroutine psb_i_cpy2d(vin,vout,info) 
+    use psb_error_mod
+
+    ! ...Subroutine Arguments  
+    Integer, intent(in)               :: vin(:,:)
+    Integer, allocatable, intent(out) :: vout(:,:)
+    integer         :: info
+    ! ...Local Variables
+
+    Integer :: isz1, isz2,err_act, lb1, lb2
+    character(len=20)  :: name, char_err
+    logical, parameter :: debug=.false.
+
+    name='psb_safe_cpy'
+    call psb_erractionsave(err_act)
+
+    if(psb_get_errstatus() /= 0) return 
+    info = 0
+    isz1 = size(vin,1)
+    isz2 = size(vin,2)
+    lb1  = lbound(vin,1)
+    lb2  = lbound(vin,2)
+    call psb_realloc(isz1,isz2,vout,info,lb1=lb1,lb2=lb2)
+    if (info /= 0) then     
+      info=4010
+      char_err='psb_realloc'
+      call psb_errpush(info,name,a_err=char_err)
+      goto 9999
+    else
+      vout(:,:) = vin(:,:)
+    endif
+
+    call psb_erractionrestore(err_act)
+    return
+
+9999 continue
+    call psb_erractionrestore(err_act)
+
+    if (err_act == psb_act_ret_) then
+      return
+    else
+      call psb_error()
+    end if
+    return
+
+  end subroutine psb_i_cpy2d
+  
+  subroutine psb_d_cpy1d(vin,vout,info) 
+    use psb_error_mod
+
+    ! ...Subroutine Arguments  
+    real(kind(1.d0)), intent(in)               :: vin(:)
+    real(kind(1.d0)), allocatable, intent(out) :: vout(:)
+    integer         :: info
+    ! ...Local Variables
+
+    Integer :: isz,err_act,lb
+    character(len=20)  :: name, char_err
+    logical, parameter :: debug=.false.
+
+    name='psb_safe_cpy'
+    call psb_erractionsave(err_act)
+
+    if(psb_get_errstatus() /= 0) return 
+    info = 0
+    isz = size(vin)
+    lb  = lbound(vin,1)
+    call psb_realloc(isz,vout,info,lb=lb)
+    if (info /= 0) then     
+      info=4010
+      char_err='psb_realloc'
+      call psb_errpush(info,name,a_err=char_err)
+      goto 9999
+    else
+      vout(:) = vin(:)
+    endif
+
+    call psb_erractionrestore(err_act)
+    return
+
+9999 continue
+    call psb_erractionrestore(err_act)
+
+    if (err_act == psb_act_ret_) then
+      return
+    else
+      call psb_error()
+    end if
+    return
+
+  end subroutine psb_d_cpy1d
+  
+  subroutine psb_d_cpy2d(vin,vout,info) 
+    use psb_error_mod
+
+    ! ...Subroutine Arguments  
+    real(kind(1.d0)), intent(in)               :: vin(:,:)
+    real(kind(1.d0)), allocatable, intent(out) :: vout(:,:)
+    integer         :: info
+    ! ...Local Variables
+
+    Integer :: isz1, isz2,err_act, lb1, lb2 
+    character(len=20)  :: name, char_err
+    logical, parameter :: debug=.false.
+
+    name='psb_safe_cpy'
+    call psb_erractionsave(err_act)
+
+    if(psb_get_errstatus() /= 0) return 
+    info = 0
+    isz1 = size(vin,1)
+    isz2 = size(vin,2)
+    lb1  = lbound(vin,1)
+    lb2  = lbound(vin,2)
+    call psb_realloc(isz1,isz2,vout,info,lb1=lb1,lb2=lb2)
+    if (info /= 0) then     
+      info=4010
+      char_err='psb_realloc'
+      call psb_errpush(info,name,a_err=char_err)
+      goto 9999
+    else
+      vout(:,:) = vin(:,:)
+    endif
+
+    call psb_erractionrestore(err_act)
+    return
+
+9999 continue
+    call psb_erractionrestore(err_act)
+
+    if (err_act == psb_act_ret_) then
+      return
+    else
+      call psb_error()
+    end if
+    return
+
+  end subroutine psb_d_cpy2d
+  
+  subroutine psb_z_cpy1d(vin,vout,info) 
+    use psb_error_mod
+
+    ! ...Subroutine Arguments  
+    complex(kind(1.d0)), intent(in)               :: vin(:)
+    complex(kind(1.d0)), allocatable, intent(out) :: vout(:)
+    integer         :: info
+    ! ...Local Variables
+
+    Integer :: isz,err_act,lb
+    character(len=20)  :: name, char_err
+    logical, parameter :: debug=.false.
+
+    name='psb_safe_cpy'
+    call psb_erractionsave(err_act)
+
+    if(psb_get_errstatus() /= 0) return 
+    info = 0
+    isz = size(vin)
+    lb  = lbound(vin,1)
+    call psb_realloc(isz,vout,info,lb=lb)
+    if (info /= 0) then     
+      info=4010
+      char_err='psb_realloc'
+      call psb_errpush(info,name,a_err=char_err)
+      goto 9999
+    else
+      vout(:) = vin(:)
+    endif
+
+    call psb_erractionrestore(err_act)
+    return
+
+9999 continue
+    call psb_erractionrestore(err_act)
+
+    if (err_act == psb_act_ret_) then
+      return
+    else
+      call psb_error()
+    end if
+    return
+
+  end subroutine psb_z_cpy1d
+  
+  subroutine psb_z_cpy2d(vin,vout,info) 
+    use psb_error_mod
+
+    ! ...Subroutine Arguments  
+    complex(kind(1.d0)), intent(in)               :: vin(:,:)
+    complex(kind(1.d0)), allocatable, intent(out) :: vout(:,:)
+    integer         :: info
+    ! ...Local Variables
+
+    Integer :: isz1, isz2,err_act, lb1, lb2 
+    character(len=20)  :: name, char_err
+    logical, parameter :: debug=.false.
+
+    name='psb_safe_cpy'
+    call psb_erractionsave(err_act)
+
+    if(psb_get_errstatus() /= 0) return 
+    info = 0
+    isz1 = size(vin,1)
+    isz2 = size(vin,2)
+    lb1  = lbound(vin,1)
+    lb2  = lbound(vin,2)
+    call psb_realloc(isz1,isz2,vout,info,lb1=lb1,lb2=lb2)
+    if (info /= 0) then     
+      info=4010
+      char_err='psb_realloc'
+      call psb_errpush(info,name,a_err=char_err)
+      goto 9999
+    else
+      vout(:,:) = vin(:,:)
+    endif
+
+    call psb_erractionrestore(err_act)
+    return
+
+9999 continue
+    call psb_erractionrestore(err_act)
+
+    if (err_act == psb_act_ret_) then
+      return
+    else
+      call psb_error()
+    end if
+    return
+
+  end subroutine psb_z_cpy2d
+
   
   function psb_isize1d(vin)
     integer :: psb_isize1d

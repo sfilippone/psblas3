@@ -77,11 +77,11 @@ Subroutine psb_zcdovr(a,desc_a,novr,desc_ov,info, extype)
 
   !     .. Array Arguments ..
   integer, intent(in)               :: novr
-  Type(psb_zspmat_type), Intent(in) :: a
-  Type(psb_desc_type), Intent(in)   :: desc_a
-  Type(psb_desc_type), Intent(out)  :: desc_ov
-  integer, intent(out)              :: info
-  integer, intent(in),optional      :: extype
+  Type(psb_zspmat_type), Intent(in)       ::  a
+  Type(psb_desc_type), Intent(in), target :: desc_a
+  Type(psb_desc_type), Intent(out)        :: desc_ov
+  integer, intent(out)                    :: info
+  integer, intent(in),optional            :: extype
 
   interface 
     subroutine psb_icdasb(desc_a,info,ext_hv)
@@ -191,7 +191,8 @@ Subroutine psb_zcdovr(a,desc_a,novr,desc_ov,info, extype)
   l_tmp_ovr_idx = novr*(3*Max(2*index_dim,1)+1)
   l_tmp_halo    = novr*(3*Size(desc_a%halo_index))
 
-  call psb_cd_set_bld(desc_ov,info)
+  call psb_cd_set_ovl_bld(desc_ov,info)
+  desc_ov%base_desc => desc_a
 
   If (debug_level >= psb_debug_outer_) then
     Write(debug_unit,*) me,' ',trim(name),':Start',lworks,lworkr
@@ -386,7 +387,8 @@ Subroutine psb_zcdovr(a,desc_a,novr,desc_ov,info, extype)
 
       Enddo
       if (debug_level >= psb_debug_outer_) &
-           & write(debug_unit,*) me,' ',trim(name),':Checktmp_o_i Loop Mid1',tmp_ovr_idx(1:10)
+           & write(debug_unit,*) me,' ',trim(name),&
+           & ':Checktmp_o_i Loop Mid1',tmp_ovr_idx(1:10)
       counter   = counter+n_elem_recv
 
       !
@@ -460,16 +462,19 @@ Subroutine psb_zcdovr(a,desc_a,novr,desc_ov,info, extype)
           tot_elem=i
         endif
         if (debug_level >= psb_debug_outer_) &
-             & write(debug_unit,*) me,' ',trim(name),':Checktmp_o_i Loop Mid2',tmp_ovr_idx(1:10)
+             & write(debug_unit,*) me,' ',trim(name),&
+             & ':Checktmp_o_i Loop Mid2',tmp_ovr_idx(1:10)
         sdsz(proc+1) = tot_elem
         idxs         = idxs + tot_elem
       end if
       counter   = counter+n_elem_send+3
       if (debug_level >= psb_debug_outer_) &
-           & write(debug_unit,*) me,' ',trim(name),':Checktmp_o_i Loop End',tmp_ovr_idx(1:10)
+           & write(debug_unit,*) me,' ',trim(name),&
+           & ':Checktmp_o_i Loop End',tmp_ovr_idx(1:10)
     Enddo
     if (debug_level >= psb_debug_outer_) &
-         & write(debug_unit,*) me,' ',trim(name),':End phase 1', m, n_col, tot_recv
+         & write(debug_unit,*) me,' ',trim(name),&
+         & ':End phase 1', m, n_col, tot_recv
 
     if (i_ovr <= novr) then
       ! 
@@ -734,6 +739,7 @@ Subroutine psb_zcdovr(a,desc_a,novr,desc_ov,info, extype)
 
   call psb_icdasb(desc_ov,info,ext_hv=.true.)
 
+  call psb_cd_set_ovl_asb(desc_ov,info)
 
   if (info == 0) call psb_sp_free(blk,info)
   if (info /= 0) then

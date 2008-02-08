@@ -3,9 +3,8 @@ include ../../Make.inc
 MODULES = psb_realloc_mod.o psb_string_mod.o psb_spmat_type.o \
 	psb_desc_type.o psb_spsb_mod.o  psb_sort_mod.o\
 	psb_serial_mod.o psb_tools_mod.o \
-	psb_error_mod.o \
-	psb_const_mod.o \
-	psb_comm_mod.o psb_psblas_mod.o psi_mod.o \
+	psb_error_mod.o psb_const_mod.o psb_inter_desc_type.o \
+	psb_comm_mod.o psb_psblas_mod.o psi_serial_mod.o psi_mod.o \
 	psb_check_mod.o psb_gps_mod.o
 
 #	psb_methd_mod.o psb_prec_type.o  psb_prec_mod.o blacs_env.o
@@ -28,16 +27,18 @@ psb_realloc_mod.o : psb_error_mod.o
 psb_spmat_type.o : psb_realloc_mod.o psb_error_mod.o psb_const_mod.o psb_string_mod.o
 psb_error_mod.o: psb_const_mod.o
 psb_penv_mod.o: psb_const_mod.o psb_error_mod.o psb_realloc_mod.o
-psi_mod.o: psb_penv_mod.o psb_error_mod.o psb_desc_type.o  psb_const_mod.o
+psi_serial_mod.o: psb_const_mod.o
+psi_mod.o: psb_penv_mod.o psb_error_mod.o psb_desc_type.o psb_const_mod.o psi_serial_mod.o
 psb_desc_type.o: psb_const_mod.o psb_error_mod.o psb_penv_mod.o
+psb_inter_desc_type.o: psb_desc_type.o psb_spmat_type.o psb_error_mod.o psb_serial_mod.o psb_comm_mod.o
 psb_check_mod.o: psb_desc_type.o
-psb_serial_mod: psb_spmat_type.o psb_string_mod.o psb_sort_mod.o
+psb_serial_mod.o: psb_spmat_type.o psb_string_mod.o psb_sort_mod.o psi_serial_mod.o
 psb_sort_mod.o: psb_error_mod.o psb_realloc_mod.o
 psb_methd_mod.o: psb_serial_mod.o psb_desc_type.o psb_prec_type.o
-psb_tools_mod.o: psb_spmat_type.o psb_desc_type.o psi_mod.o psb_gps_mod.o
+psb_tools_mod.o: psb_spmat_type.o psb_desc_type.o psi_mod.o psb_gps_mod.o psb_inter_desc_type.o
 psb_gps_mod.o:	psb_realloc_mod.o
-$(LIBMOD): $(MODULES:.o:$(.mod))
 
+psb_base_mod.o: $(MODULES)
 
 mpfobjs: 
 	(make $(MPFOBJS) F90="$(MPF90)" FC="$(MPF90)" FCOPT="$(F90COPT)")

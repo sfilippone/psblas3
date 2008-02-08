@@ -40,7 +40,7 @@
 !                                         D    real(kind(1.d0))
 !                                         Z    complex(kind(1.d0))
 !   Basically the operation is as follows: on each process, we identify 
-!   sections SND(Y) and RCV(Y); then we do a SEND(PACK(SND(Y)));
+!   sections SND(Y) and RCV(Y); then we do a send on (PACK(SND(Y)));
 !   then we receive, and we do an update with Y = UNPACK(RCV(Y)) + BETA * Y 
 !   but only on the elements involved in the UNPACK operation. 
 !   Thus: for halo data exchange, the receive section is confined in the 
@@ -86,7 +86,6 @@ subroutine psi_zswapdatam(flag,n,beta,y,desc_a,work,info,data)
   use psb_error_mod
   use psb_descriptor_type
   use psb_penv_mod
-!!$  use psi_gthsct_mod
 #ifdef MPI_MOD
   use mpi
 #endif
@@ -103,19 +102,8 @@ subroutine psi_zswapdatam(flag,n,beta,y,desc_a,work,info,data)
   integer, optional        :: data
 
   ! locals
-  integer  :: ictxt, np, me, nesd, nerv,&
-       & proc_to_comm, p2ptag, icomm, p2pstat(mpi_status_size),&
-       & idxs, idxr, iret, err_act, totxch, i, idx_pt,&
-       & snd_pt, rcv_pt, pnti, data_
-  integer, allocatable, dimension(:) :: bsdidx, brvidx,&
-       & sdsz, rvsz, prcid, rvhd, sdhd
+  integer  :: ictxt, np, me, icomm, idxs, idxr, totxch, data_, err_act
   integer, pointer :: d_idx(:)
-  integer :: int_err(5)
-  logical :: swap_mpi, swap_sync, swap_send, swap_recv,&
-       & albf,do_send,do_recv
-  logical, parameter :: usersend=.false.
-
-  complex(kind(1.d0)), pointer, dimension(:) :: sndbuf, rcvbuf
   character(len=20)  :: name
 
   info = 0
@@ -124,7 +112,6 @@ subroutine psi_zswapdatam(flag,n,beta,y,desc_a,work,info,data)
 
   ictxt = psb_cd_get_context(desc_a)
   icomm = psb_cd_get_mpic(desc_a)
-
   call psb_info(ictxt,me,np) 
   if (np == -1) then
     info = 2010
@@ -138,13 +125,6 @@ subroutine psi_zswapdatam(flag,n,beta,y,desc_a,work,info,data)
     goto 9999
   endif
 
-  swap_mpi  = iand(flag,psb_swap_mpi_)  /= 0
-  swap_sync = iand(flag,psb_swap_sync_) /= 0
-  swap_send = iand(flag,psb_swap_send_) /= 0
-  swap_recv = iand(flag,psb_swap_recv_) /= 0
-  do_send = swap_mpi .or. swap_sync .or. swap_send
-  do_recv = swap_mpi .or. swap_sync .or. swap_recv
-
   if(present(data)) then
     data_ = data
   else
@@ -157,8 +137,78 @@ subroutine psi_zswapdatam(flag,n,beta,y,desc_a,work,info,data)
     goto 9999
   end if
 
-  idxr = idxr * n
-  idxs = idxs * n
+
+  call psi_swapdata(ictxt,icomm,flag,n,beta,y,d_idx,totxch,idxs,idxr,work,info)
+  if (info /= 0) goto 9999
+
+  call psb_erractionrestore(err_act)
+  return
+
+9999 continue
+  call psb_erractionrestore(err_act)
+  if (err_act == psb_act_abort_) then
+    call psb_error(ictxt)
+    return
+  end if
+  return
+end subroutine psi_zswapdatam
+
+subroutine psi_zswapidxm(ictxt,icomm,flag,n,beta,y,idx,totxch,totsnd,totrcv,work,info)
+
+  use psi_mod, psb_protect_name => psi_zswapidxm
+  use psb_error_mod
+  use psb_descriptor_type
+  use psb_penv_mod
+#ifdef MPI_MOD
+  use mpi
+#endif
+  implicit none
+#ifdef MPI_H
+  include 'mpif.h'
+#endif
+
+  integer, intent(in)      :: ictxt,icomm,flag,n
+  integer, intent(out)     :: info
+  complex(kind(1.d0))         :: y(:,:), beta
+  complex(kind(1.d0)), target :: work(:)
+  integer, intent(in)      :: idx(:),totxch,totsnd, totrcv
+
+  ! locals
+  integer  :: np, me, nesd, nerv,&
+       & proc_to_comm, p2ptag, p2pstat(mpi_status_size),&
+       & iret, err_act, i, idx_pt, totsnd_, totrcv_,&
+       & snd_pt, rcv_pt, pnti, data_
+  integer, allocatable, dimension(:) :: bsdidx, brvidx,&
+       & sdsz, rvsz, prcid, rvhd, sdhd
+  integer :: int_err(5)
+  logical :: swap_mpi, swap_sync, swap_send, swap_recv,&
+       & albf,do_send,do_recv
+  logical, parameter :: usersend=.false.
+
+  complex(kind(1.d0)), pointer, dimension(:) :: sndbuf, rcvbuf
+  character(len=20)  :: name
+
+  info = 0
+  name='psi_swap_data'
+  call psb_erractionsave(err_act)
+
+  call psb_info(ictxt,me,np) 
+  if (np == -1) then
+    info = 2010
+    call psb_errpush(info,name)
+    goto 9999
+  endif
+
+  swap_mpi  = iand(flag,psb_swap_mpi_)  /= 0
+  swap_sync = iand(flag,psb_swap_sync_) /= 0
+  swap_send = iand(flag,psb_swap_send_) /= 0
+  swap_recv = iand(flag,psb_swap_recv_) /= 0
+
+  do_send = swap_mpi .or. swap_sync .or. swap_send
+  do_recv = swap_mpi .or. swap_sync .or. swap_recv
+
+  totrcv_ = totrcv * n
+  totsnd_ = totsnd * n
 
   if (swap_mpi) then 
     allocate(sdsz(0:np-1), rvsz(0:np-1), bsdidx(0:np-1),&
@@ -180,9 +230,9 @@ subroutine psi_zswapdatam(flag,n,beta,y,desc_a,work,info,data)
     snd_pt = 1
     rcv_pt = 1
     do i=1, totxch
-      proc_to_comm = d_idx(pnti+psb_proc_id_)
-      nerv = d_idx(pnti+psb_n_elem_recv_)
-      nesd = d_idx(pnti+nerv+psb_n_elem_send_)
+      proc_to_comm = idx(pnti+psb_proc_id_)
+      nerv = idx(pnti+psb_n_elem_recv_)
+      nesd = idx(pnti+nerv+psb_n_elem_send_)
       call psb_get_rank(prcid(proc_to_comm),ictxt,proc_to_comm)
 
       brvidx(proc_to_comm) = rcv_pt
@@ -190,7 +240,7 @@ subroutine psi_zswapdatam(flag,n,beta,y,desc_a,work,info,data)
 
       bsdidx(proc_to_comm) = snd_pt
       sdsz(proc_to_comm)   = n*nesd
-      
+
       rcv_pt = rcv_pt + n*nerv
       snd_pt = snd_pt + n*nesd
       pnti   = pnti + nerv + nesd + 3
@@ -205,14 +255,14 @@ subroutine psi_zswapdatam(flag,n,beta,y,desc_a,work,info,data)
     end if
   end if
 
-  idxr = max(idxr,1)
-  idxs = max(idxs,1)
-  if((idxr+idxs) < size(work)) then
-    sndbuf => work(1:idxs)
-    rcvbuf => work(idxs+1:idxs+idxr)
+  totrcv_ = max(totrcv_,1)
+  totsnd_ = max(totsnd_,1)
+  if((totrcv_+totsnd_) < size(work)) then
+    sndbuf => work(1:totsnd_)
+    rcvbuf => work(totsnd_+1:totsnd_+totrcv_)
     albf=.false.
   else
-    allocate(sndbuf(idxs),rcvbuf(idxr), stat=info)
+    allocate(sndbuf(totsnd_),rcvbuf(totrcv_), stat=info)
     if(info /= 0) then
       call psb_errpush(4000,name)
       goto 9999
@@ -226,10 +276,10 @@ subroutine psi_zswapdatam(flag,n,beta,y,desc_a,work,info,data)
     pnti   = 1
     snd_pt = 1
     do i=1, totxch
-      nerv = d_idx(pnti+psb_n_elem_recv_)
-      nesd = d_idx(pnti+nerv+psb_n_elem_send_)
+      nerv = idx(pnti+psb_n_elem_recv_)
+      nesd = idx(pnti+nerv+psb_n_elem_send_)
       idx_pt = 1+pnti+nerv+psb_n_elem_send_
-      call psi_gth(nesd,n,d_idx(idx_pt:idx_pt+nesd-1),&
+      call psi_gth(nesd,n,idx(idx_pt:idx_pt+nesd-1),&
            & y,sndbuf(snd_pt:snd_pt+n*nesd-1))
       snd_pt = snd_pt + n*nesd
       pnti   = pnti + nerv + nesd + 3
@@ -260,10 +310,10 @@ subroutine psi_zswapdatam(flag,n,beta,y,desc_a,work,info,data)
     snd_pt = 1
     rcv_pt = 1
     do i=1, totxch
-      proc_to_comm = d_idx(pnti+psb_proc_id_)
-      nerv = d_idx(pnti+psb_n_elem_recv_)
-      nesd = d_idx(pnti+nerv+psb_n_elem_send_)
-      
+      proc_to_comm = idx(pnti+psb_proc_id_)
+      nerv = idx(pnti+psb_n_elem_recv_)
+      nesd = idx(pnti+nerv+psb_n_elem_send_)
+
       if (proc_to_comm  <  me) then
         if (nesd>0) call psb_snd(ictxt,&
              & sndbuf(snd_pt:snd_pt+n*nesd-1), proc_to_comm)
@@ -274,8 +324,13 @@ subroutine psi_zswapdatam(flag,n,beta,y,desc_a,work,info,data)
              & rcvbuf(rcv_pt:rcv_pt+n*nerv-1), proc_to_comm)
         if (nesd>0) call psb_snd(ictxt,&
              & sndbuf(snd_pt:snd_pt+n*nesd-1), proc_to_comm)
+      else if (proc_to_comm == me) then 
+        if (nesd /= nerv) then 
+          write(0,*) 'Fatal error in swapdata: mismatch on self sendf',nerv,nesd
+        end if
+        rcvbuf(rcv_pt:rcv_pt+n*nerv-1) = sndbuf(snd_pt:snd_pt+n*nesd-1)
       end if
-      
+
       rcv_pt = rcv_pt + n*nerv
       snd_pt = snd_pt + n*nesd
       pnti   = pnti + nerv + nesd + 3
@@ -286,21 +341,21 @@ subroutine psi_zswapdatam(flag,n,beta,y,desc_a,work,info,data)
   else if (swap_send .and. swap_recv) then
 
     ! First I post all the non blocking receives
-    
+
     pnti   = 1
     snd_pt = 1
     rcv_pt = 1
     do i=1, totxch
-      proc_to_comm = d_idx(pnti+psb_proc_id_)
-      nerv = d_idx(pnti+psb_n_elem_recv_)
-      nesd = d_idx(pnti+nerv+psb_n_elem_send_)
+      proc_to_comm = idx(pnti+psb_proc_id_)
+      nerv = idx(pnti+psb_n_elem_recv_)
+      nesd = idx(pnti+nerv+psb_n_elem_send_)
       call psb_get_rank(prcid(i),ictxt,proc_to_comm)      
-      if (nerv > 0) then 
+      if ((nerv>0).and.(proc_to_comm/=me)) then 
         p2ptag = krecvid(ictxt,proc_to_comm,me)
         call mpi_irecv(rcvbuf(rcv_pt),n*nerv,&
              & mpi_double_complex,prcid(i),&
              & p2ptag, icomm,rvhd(i),iret)
-      endif
+      end if
       rcv_pt = rcv_pt + n*nerv
       snd_pt = snd_pt + n*nesd
       pnti   = pnti + nerv + nesd + 3
@@ -315,12 +370,12 @@ subroutine psi_zswapdatam(flag,n,beta,y,desc_a,work,info,data)
     snd_pt = 1
     rcv_pt = 1
     do i=1, totxch
-      proc_to_comm = d_idx(pnti+psb_proc_id_)
-      nerv = d_idx(pnti+psb_n_elem_recv_)
-      nesd = d_idx(pnti+nerv+psb_n_elem_send_)
+      proc_to_comm = idx(pnti+psb_proc_id_)
+      nerv = idx(pnti+psb_n_elem_recv_)
+      nesd = idx(pnti+nerv+psb_n_elem_send_)
 
       p2ptag=ksendid(ictxt,proc_to_comm,me)
-      if (nesd>0) then 
+      if ((nesd>0).and.(proc_to_comm/=me)) then 
         if (usersend) then 
           call mpi_rsend(sndbuf(snd_pt),n*nesd,&
                & mpi_double_complex,prcid(i),&
@@ -330,7 +385,7 @@ subroutine psi_zswapdatam(flag,n,beta,y,desc_a,work,info,data)
                & mpi_double_complex,prcid(i),&
              & p2ptag,icomm,iret)
         end if
-        
+
         if(iret /= mpi_success) then
           int_err(1) = iret
           info=400
@@ -348,9 +403,9 @@ subroutine psi_zswapdatam(flag,n,beta,y,desc_a,work,info,data)
 
     pnti   = 1
     do i=1, totxch
-      proc_to_comm = d_idx(pnti+psb_proc_id_)
-      nerv = d_idx(pnti+psb_n_elem_recv_)
-      nesd = d_idx(pnti+nerv+psb_n_elem_send_)
+      proc_to_comm = idx(pnti+psb_proc_id_)
+      nerv = idx(pnti+psb_n_elem_recv_)
+      nesd = idx(pnti+nerv+psb_n_elem_send_)
 
       p2ptag = krecvid(ictxt,proc_to_comm,me)
       
@@ -362,10 +417,15 @@ subroutine psi_zswapdatam(flag,n,beta,y,desc_a,work,info,data)
           call psb_errpush(info,name,i_err=int_err)
           goto 9999
         end if
+      else if (proc_to_comm == me) then 
+        if (nesd /= nerv) then 
+          write(0,*) 'Fatal error in swapdata: mismatch on self sendf',nerv,nesd
+        end if
+        rcvbuf(rcv_pt:rcv_pt+n*nerv-1) = sndbuf(snd_pt:snd_pt+n*nesd-1)
       end if
       pnti   = pnti + nerv + nesd + 3
     end do
-    
+
 
   else if (swap_send) then
 
@@ -374,9 +434,9 @@ subroutine psi_zswapdatam(flag,n,beta,y,desc_a,work,info,data)
     snd_pt = 1
     rcv_pt = 1
     do i=1, totxch
-      proc_to_comm = d_idx(pnti+psb_proc_id_)
-      nerv = d_idx(pnti+psb_n_elem_recv_)
-      nesd = d_idx(pnti+nerv+psb_n_elem_send_)
+      proc_to_comm = idx(pnti+psb_proc_id_)
+      nerv = idx(pnti+psb_n_elem_recv_)
+      nesd = idx(pnti+nerv+psb_n_elem_send_)
       if (nesd>0) call psb_snd(ictxt,&
            & sndbuf(snd_pt:snd_pt+n*nesd-1), proc_to_comm)
       
@@ -393,9 +453,9 @@ subroutine psi_zswapdatam(flag,n,beta,y,desc_a,work,info,data)
     snd_pt = 1
     rcv_pt = 1
     do i=1, totxch
-      proc_to_comm = d_idx(pnti+psb_proc_id_)
-      nerv = d_idx(pnti+psb_n_elem_recv_)
-      nesd = d_idx(pnti+nerv+psb_n_elem_send_)
+      proc_to_comm = idx(pnti+psb_proc_id_)
+      nerv = idx(pnti+psb_n_elem_recv_)
+      nesd = idx(pnti+nerv+psb_n_elem_send_)
       if (nerv>0) call psb_rcv(ictxt,&
            & rcvbuf(rcv_pt:rcv_pt+n*nerv-1), proc_to_comm)
       rcv_pt = rcv_pt + n*nerv
@@ -414,11 +474,11 @@ subroutine psi_zswapdatam(flag,n,beta,y,desc_a,work,info,data)
     snd_pt = 1
     rcv_pt = 1
     do i=1, totxch
-      proc_to_comm = d_idx(pnti+psb_proc_id_)
-      nerv = d_idx(pnti+psb_n_elem_recv_)
-      nesd = d_idx(pnti+nerv+psb_n_elem_send_)
+      proc_to_comm = idx(pnti+psb_proc_id_)
+      nerv = idx(pnti+psb_n_elem_recv_)
+      nesd = idx(pnti+nerv+psb_n_elem_send_)
       idx_pt = 1+pnti+psb_n_elem_recv_
-      call psi_sct(nerv,n,d_idx(idx_pt:idx_pt+nerv-1),&
+      call psi_sct(nerv,n,idx(idx_pt:idx_pt+nerv-1),&
            & rcvbuf(rcv_pt:rcv_pt+n*nerv-1),beta,y)      
       rcv_pt = rcv_pt + n*nerv
       snd_pt = snd_pt + n*nesd
@@ -454,39 +514,8 @@ subroutine psi_zswapdatam(flag,n,beta,y,desc_a,work,info,data)
     return
   end if
   return
-end subroutine psi_zswapdatam
+end subroutine psi_zswapidxm
 
-
-!!$ 
-!!$              Parallel Sparse BLAS  v2.0
-!!$    (C) Copyright 2006 Salvatore Filippone    University of Rome Tor Vergata
-!!$                       Alfredo Buttari        University of Rome Tor Vergata
-!!$ 
-!!$  Redistribution and use in source and binary forms, with or without
-!!$  modification, are permitted provided that the following conditions
-!!$  are met:
-!!$    1. Redistributions of source code must retain the above copyright
-!!$       notice, this list of conditions and the following disclaimer.
-!!$    2. Redistributions in binary form must reproduce the above copyright
-!!$       notice, this list of conditions, and the following disclaimer in the
-!!$       documentation and/or other materials provided with the distribution.
-!!$    3. The name of the PSBLAS group or the names of its contributors may
-!!$       not be used to endorse or promote products derived from this
-!!$       software without specific written permission.
-!!$ 
-!!$  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
-!!$  ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
-!!$  TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
-!!$  PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE PSBLAS GROUP OR ITS CONTRIBUTORS
-!!$  BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
-!!$  CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
-!!$  SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
-!!$  INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
-!!$  CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
-!!$  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-!!$  POSSIBILITY OF SUCH DAMAGE.
-!!$ 
-!!$  
 !
 !
 ! Subroutine: psi_zswapdatav
@@ -544,7 +573,6 @@ subroutine psi_zswapdatav(flag,beta,y,desc_a,work,info,data)
   use psb_error_mod
   use psb_descriptor_type
   use psb_penv_mod
-!!$  use psi_gthsct_mod
 #ifdef MPI_MOD
   use mpi
 #endif
@@ -552,7 +580,7 @@ subroutine psi_zswapdatav(flag,beta,y,desc_a,work,info,data)
 #ifdef MPI_H
   include 'mpif.h'
 #endif
-  
+
   integer, intent(in)      :: flag
   integer, intent(out)     :: info
   complex(kind(1.d0))         :: y(:), beta
@@ -561,20 +589,8 @@ subroutine psi_zswapdatav(flag,beta,y,desc_a,work,info,data)
   integer, optional        :: data
 
   ! locals
-  integer  :: ictxt, np, me, nesd, nerv,&
-       & proc_to_comm, p2ptag, icomm, p2pstat(mpi_status_size),&
-       & idxs, idxr, iret, err_act, totxch, i, &
-       & idx_pt, snd_pt, rcv_pt, n, pnti, data_
-
-  integer, allocatable, dimension(:) :: bsdidx, brvidx,&
-       & sdsz, rvsz, prcid, rvhd, sdhd
+  integer  :: ictxt, np, me, icomm, idxs, idxr, totxch, data_, err_act
   integer, pointer :: d_idx(:)
-  integer :: int_err(5)
-  logical :: swap_mpi, swap_sync, swap_send, swap_recv,&
-       & albf,do_send,do_recv
-  logical, parameter :: usersend=.false.
-
-  complex(kind(1.d0)), pointer, dimension(:) :: sndbuf, rcvbuf
   character(len=20)  :: name
 
   info = 0
@@ -595,16 +611,7 @@ subroutine psi_zswapdatav(flag,beta,y,desc_a,work,info,data)
     goto 9999
   endif
 
-  icomm = desc_a%matrix_data(psb_mpi_c_)
-  n=1
-
-
-  swap_mpi  = iand(flag,psb_swap_mpi_) /= 0
-  swap_sync = iand(flag,psb_swap_sync_) /= 0
-  swap_send = iand(flag,psb_swap_send_) /= 0
-  swap_recv = iand(flag,psb_swap_recv_) /= 0
-  do_send = swap_mpi .or. swap_sync .or. swap_send
-  do_recv = swap_mpi .or. swap_sync .or. swap_recv
+  icomm = psb_cd_get_mpic(desc_a)
 
   if(present(data)) then
     data_ = data
@@ -618,8 +625,80 @@ subroutine psi_zswapdatav(flag,beta,y,desc_a,work,info,data)
     goto 9999
   end if
 
-  idxr = idxr * n
-  idxs = idxs * n
+  call psi_swapdata(ictxt,icomm,flag,beta,y,d_idx,totxch,idxs,idxr,work,info)
+  if (info /= 0) goto 9999
+
+  call psb_erractionrestore(err_act)
+  return
+
+9999 continue
+  call psb_erractionrestore(err_act)
+  if (err_act == psb_act_abort_) then
+    call psb_error(ictxt)
+    return
+  end if
+  return
+end subroutine psi_zswapdatav
+
+
+subroutine psi_zswapidxv(ictxt,icomm,flag,beta,y,idx,totxch,totsnd,totrcv,work,info)
+
+  use psi_mod, psb_protect_name => psi_zswapidxv
+  use psb_error_mod
+  use psb_descriptor_type
+  use psb_penv_mod
+#ifdef MPI_MOD
+  use mpi
+#endif
+  implicit none
+#ifdef MPI_H
+  include 'mpif.h'
+#endif
+
+  integer, intent(in)      :: ictxt,icomm,flag
+  integer, intent(out)     :: info
+  complex(kind(1.d0))         :: y(:), beta
+  complex(kind(1.d0)), target :: work(:)
+  integer, intent(in)      :: idx(:),totxch,totsnd, totrcv
+
+  ! locals
+  integer  :: np, me, nesd, nerv,&
+       & proc_to_comm, p2ptag, p2pstat(mpi_status_size),&
+       & iret, err_act,  i, totsnd_, totrcv_,&
+       & idx_pt, snd_pt, rcv_pt, n, pnti, data_
+
+  integer, allocatable, dimension(:) :: bsdidx, brvidx,&
+       & sdsz, rvsz, prcid, rvhd, sdhd
+  integer :: int_err(5)
+  logical :: swap_mpi, swap_sync, swap_send, swap_recv,&
+       & albf,do_send,do_recv
+  logical, parameter :: usersend=.false.
+
+  complex(kind(1.d0)), pointer, dimension(:) :: sndbuf, rcvbuf
+  character(len=20)  :: name
+
+  info = 0
+  name='psi_swap_datav'
+  call psb_erractionsave(err_act)
+
+  call psb_info(ictxt,me,np) 
+  if (np == -1) then
+    info = 2010
+    call psb_errpush(info,name)
+    goto 9999
+  endif
+
+  n=1
+
+  swap_mpi  = iand(flag,psb_swap_mpi_)  /= 0
+  swap_sync = iand(flag,psb_swap_sync_) /= 0
+  swap_send = iand(flag,psb_swap_send_) /= 0
+  swap_recv = iand(flag,psb_swap_recv_) /= 0
+  do_send = swap_mpi .or. swap_sync .or. swap_send
+  do_recv = swap_mpi .or. swap_sync .or. swap_recv
+
+  totrcv_ = totrcv * n
+  totsnd_ = totsnd * n
 
   if (swap_mpi) then 
     allocate(sdsz(0:np-1), rvsz(0:np-1), bsdidx(0:np-1),&
@@ -640,9 +719,9 @@ subroutine psi_zswapdatav(flag,beta,y,desc_a,work,info,data)
     snd_pt = 1
     rcv_pt = 1
     do i=1, totxch
-      proc_to_comm = d_idx(pnti+psb_proc_id_)
-      nerv = d_idx(pnti+psb_n_elem_recv_)
-      nesd = d_idx(pnti+nerv+psb_n_elem_send_)
+      proc_to_comm = idx(pnti+psb_proc_id_)
+      nerv = idx(pnti+psb_n_elem_recv_)
+      nesd = idx(pnti+nerv+psb_n_elem_send_)
       call psb_get_rank(prcid(proc_to_comm),ictxt,proc_to_comm)
 
       brvidx(proc_to_comm) = rcv_pt
@@ -666,14 +745,14 @@ subroutine psi_zswapdatav(flag,beta,y,desc_a,work,info,data)
   end if
 
 
-  idxr = max(idxr,1)
-  idxs = max(idxs,1)
-  if((idxr+idxs) < size(work)) then
-    sndbuf => work(1:idxs)
-    rcvbuf => work(idxs+1:idxs+idxr)
+  totrcv_ = max(totrcv_,1)
+  totsnd_ = max(totsnd_,1)
+  if((totrcv_+totsnd_) < size(work)) then
+    sndbuf => work(1:totsnd_)
+    rcvbuf => work(totsnd_+1:totsnd_+totrcv_)
     albf=.false.
   else
-    allocate(sndbuf(idxs),rcvbuf(idxr), stat=info)
+    allocate(sndbuf(totsnd_),rcvbuf(totrcv_), stat=info)
     if(info /= 0) then
       call psb_errpush(4000,name)
       goto 9999
@@ -688,10 +767,10 @@ subroutine psi_zswapdatav(flag,beta,y,desc_a,work,info,data)
     pnti   = 1
     snd_pt = 1
     do i=1, totxch
-      nerv = d_idx(pnti+psb_n_elem_recv_)
-      nesd = d_idx(pnti+nerv+psb_n_elem_send_)
+      nerv = idx(pnti+psb_n_elem_recv_)
+      nesd = idx(pnti+nerv+psb_n_elem_send_)
       idx_pt = 1+pnti+nerv+psb_n_elem_send_
-      call psi_gth(nesd,d_idx(idx_pt:idx_pt+nesd-1),&
+      call psi_gth(nesd,idx(idx_pt:idx_pt+nesd-1),&
            & y,sndbuf(snd_pt:snd_pt+nesd-1))
       snd_pt = snd_pt + nesd 
       pnti   = pnti + nerv + nesd + 3
@@ -719,9 +798,9 @@ subroutine psi_zswapdatav(flag,beta,y,desc_a,work,info,data)
     snd_pt = 1
     rcv_pt = 1
     do i=1, totxch
-      proc_to_comm = d_idx(pnti+psb_proc_id_)
-      nerv = d_idx(pnti+psb_n_elem_recv_)
-      nesd = d_idx(pnti+nerv+psb_n_elem_send_)
+      proc_to_comm = idx(pnti+psb_proc_id_)
+      nerv = idx(pnti+psb_n_elem_recv_)
+      nesd = idx(pnti+nerv+psb_n_elem_send_)
 
       if (proc_to_comm  <  me) then
         if (nesd>0) call psb_snd(ictxt,&
@@ -733,6 +812,11 @@ subroutine psi_zswapdatav(flag,beta,y,desc_a,work,info,data)
              & rcvbuf(rcv_pt:rcv_pt+nerv-1), proc_to_comm)
         if (nesd>0) call psb_snd(ictxt,&
              & sndbuf(snd_pt:snd_pt+nesd-1), proc_to_comm)
+      else if (proc_to_comm ==  me) then
+        if (nesd /= nerv) then 
+          write(0,*) 'Fatal error in swapdata: mismatch on self sendf',nerv,nesd
+        end if
+        rcvbuf(rcv_pt:rcv_pt+nerv-1) = sndbuf(snd_pt:snd_pt+nesd-1)
       end if
       rcv_pt = rcv_pt + nerv
       snd_pt = snd_pt + nesd
@@ -747,16 +831,17 @@ subroutine psi_zswapdatav(flag,beta,y,desc_a,work,info,data)
     snd_pt = 1
     rcv_pt = 1
     do i=1, totxch
-      proc_to_comm = d_idx(pnti+psb_proc_id_)
-      nerv = d_idx(pnti+psb_n_elem_recv_)
-      nesd = d_idx(pnti+nerv+psb_n_elem_send_)
+      proc_to_comm = idx(pnti+psb_proc_id_)
+      nerv = idx(pnti+psb_n_elem_recv_)
+      nesd = idx(pnti+nerv+psb_n_elem_send_)
+
       call psb_get_rank(prcid(i),ictxt,proc_to_comm)      
-      if (nerv>0) then 
+      if ((nerv>0).and.(proc_to_comm /= me)) then 
         p2ptag = krecvid(ictxt,proc_to_comm,me)
         call mpi_irecv(rcvbuf(rcv_pt),nerv,&
              & mpi_double_complex,prcid(i),&
              & p2ptag, icomm,rvhd(i),iret)
-      endif
+      end if
       rcv_pt = rcv_pt + nerv
       snd_pt = snd_pt + nesd
       pnti   = pnti + nerv + nesd + 3
@@ -770,13 +855,13 @@ subroutine psi_zswapdatav(flag,beta,y,desc_a,work,info,data)
     snd_pt = 1
     rcv_pt = 1
     do i=1, totxch
-      proc_to_comm = d_idx(pnti+psb_proc_id_)
-      nerv = d_idx(pnti+psb_n_elem_recv_)
-      nesd = d_idx(pnti+nerv+psb_n_elem_send_)
+      proc_to_comm = idx(pnti+psb_proc_id_)
+      nerv = idx(pnti+psb_n_elem_recv_)
+      nesd = idx(pnti+nerv+psb_n_elem_send_)
 
       p2ptag=ksendid(ictxt,proc_to_comm,me)
 
-      if (nesd>0) then 
+      if ((nesd>0).and.(proc_to_comm /= me)) then 
         if (usersend) then 
           call mpi_rsend(sndbuf(snd_pt),nesd,&
                & mpi_double_complex,prcid(i),&
@@ -802,9 +887,9 @@ subroutine psi_zswapdatav(flag,beta,y,desc_a,work,info,data)
 
     pnti   = 1
     do i=1, totxch
-      proc_to_comm = d_idx(pnti+psb_proc_id_)
-      nerv = d_idx(pnti+psb_n_elem_recv_)
-      nesd = d_idx(pnti+nerv+psb_n_elem_send_)
+      proc_to_comm = idx(pnti+psb_proc_id_)
+      nerv = idx(pnti+psb_n_elem_recv_)
+      nesd = idx(pnti+nerv+psb_n_elem_send_)
 
       p2ptag = krecvid(ictxt,proc_to_comm,me)
 
@@ -816,6 +901,11 @@ subroutine psi_zswapdatav(flag,beta,y,desc_a,work,info,data)
           call psb_errpush(info,name,i_err=int_err)
           goto 9999
         end if
+      else if (proc_to_comm == me) then 
+        if (nesd /= nerv) then 
+          write(0,*) 'Fatal error in swapdata: mismatch on self sendf',nerv,nesd
+        end if
+        rcvbuf(rcv_pt:rcv_pt+nerv-1) = sndbuf(snd_pt:snd_pt+nesd-1)
       end if
       pnti   = pnti + nerv + nesd + 3
     end do
@@ -827,9 +917,9 @@ subroutine psi_zswapdatav(flag,beta,y,desc_a,work,info,data)
     snd_pt = 1
     rcv_pt = 1
     do i=1, totxch
-      proc_to_comm = d_idx(pnti+psb_proc_id_)
-      nerv = d_idx(pnti+psb_n_elem_recv_)
-      nesd = d_idx(pnti+nerv+psb_n_elem_send_)
+      proc_to_comm = idx(pnti+psb_proc_id_)
+      nerv = idx(pnti+psb_n_elem_recv_)
+      nesd = idx(pnti+nerv+psb_n_elem_send_)
       if (nesd>0) call psb_snd(ictxt,&
            & sndbuf(snd_pt:snd_pt+nesd-1), proc_to_comm)
       rcv_pt = rcv_pt + nerv
@@ -843,9 +933,9 @@ subroutine psi_zswapdatav(flag,beta,y,desc_a,work,info,data)
     snd_pt = 1
     rcv_pt = 1
     do i=1, totxch
-      proc_to_comm = d_idx(pnti+psb_proc_id_)
-      nerv = d_idx(pnti+psb_n_elem_recv_)
-      nesd = d_idx(pnti+nerv+psb_n_elem_send_)
+      proc_to_comm = idx(pnti+psb_proc_id_)
+      nerv = idx(pnti+psb_n_elem_recv_)
+      nesd = idx(pnti+nerv+psb_n_elem_send_)
       if (nerv>0) call psb_rcv(ictxt,&
            & rcvbuf(rcv_pt:rcv_pt+nerv-1), proc_to_comm)
       rcv_pt = rcv_pt + nerv
@@ -855,18 +945,17 @@ subroutine psi_zswapdatav(flag,beta,y,desc_a,work,info,data)
 
   end if
 
-
   if (do_recv) then 
 
     pnti   = 1
     snd_pt = 1
     rcv_pt = 1
     do i=1, totxch
-      proc_to_comm = d_idx(pnti+psb_proc_id_)
-      nerv = d_idx(pnti+psb_n_elem_recv_)
-      nesd = d_idx(pnti+nerv+psb_n_elem_send_)
+      proc_to_comm = idx(pnti+psb_proc_id_)
+      nerv = idx(pnti+psb_n_elem_recv_)
+      nesd = idx(pnti+nerv+psb_n_elem_send_)
       idx_pt = 1+pnti+psb_n_elem_recv_
-      call psi_sct(nerv,d_idx(idx_pt:idx_pt+nerv-1),&
+      call psi_sct(nerv,idx(idx_pt:idx_pt+nerv-1),&
            & rcvbuf(rcv_pt:rcv_pt+nerv-1),beta,y)
       rcv_pt = rcv_pt + nerv
       snd_pt = snd_pt + nesd
@@ -901,4 +990,4 @@ subroutine psi_zswapdatav(flag,beta,y,desc_a,work,info,data)
     return
   end if
   return
-end subroutine psi_zswapdatav
+end subroutine psi_zswapidxv

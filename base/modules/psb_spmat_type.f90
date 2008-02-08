@@ -610,11 +610,11 @@ contains
 
     INFO  = 0
     call psb_nullify_sp(b)
-    call psb_safe_cpy(a%aspk,b%aspk,info)
-    if (info == 0) call psb_safe_cpy(a%ia1,b%ia1,info)
-    if (info == 0) call psb_safe_cpy(a%ia2,b%ia2,info)
-    if (info == 0) call psb_safe_cpy(a%pl,b%pl,info)
-    if (info == 0) call psb_safe_cpy(a%pr,b%pr,info)
+    call psb_safe_ab_cpy(a%aspk,b%aspk,info)
+    if (info == 0) call psb_safe_ab_cpy(a%ia1,b%ia1,info)
+    if (info == 0) call psb_safe_ab_cpy(a%ia2,b%ia2,info)
+    if (info == 0) call psb_safe_ab_cpy(a%pl,b%pl,info)
+    if (info == 0) call psb_safe_ab_cpy(a%pr,b%pr,info)
     if (info /= 0) then
       info=2023
       return
@@ -1141,11 +1141,11 @@ contains
 
     INFO  = 0
     call psb_nullify_sp(b)
-    call psb_safe_cpy(a%aspk,b%aspk,info)
-    if (info == 0) call psb_safe_cpy(a%ia1,b%ia1,info)
-    if (info == 0) call psb_safe_cpy(a%ia2,b%ia2,info)
-    if (info == 0) call psb_safe_cpy(a%pl,b%pl,info)
-    if (info == 0) call psb_safe_cpy(a%pr,b%pr,info)
+    call psb_safe_ab_cpy(a%aspk,b%aspk,info)
+    if (info == 0) call psb_safe_ab_cpy(a%ia1,b%ia1,info)
+    if (info == 0) call psb_safe_ab_cpy(a%ia2,b%ia2,info)
+    if (info == 0) call psb_safe_ab_cpy(a%pl,b%pl,info)
+    if (info == 0) call psb_safe_ab_cpy(a%pr,b%pr,info)
     if (info /= 0) then
       info=2023
       return

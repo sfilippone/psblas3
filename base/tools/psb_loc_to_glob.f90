@@ -249,3 +249,36 @@ subroutine psb_loc_to_glob(x,desc_a,info,iact)
 
 end subroutine psb_loc_to_glob
 
+subroutine psb_loc_to_glob2s(x,y,desc_a,info,iact)
+  use psb_descriptor_type
+  use psb_tools_mod, psb_protect_name => psb_loc_to_glob2s
+  implicit none 
+  type(psb_desc_type), intent(in)    ::  desc_a
+  integer,intent(in)                 ::  x
+  integer,intent(out)                ::  y  
+  integer, intent(out)               ::  info
+  character, intent(in), optional    ::  iact
+
+  integer  :: iv1(1), iv2(1)
+
+  iv1(1) = x
+  call psb_loc_to_glob(iv1,iv2,desc_a,info,iact)
+  y      = iv2(1)
+end subroutine psb_loc_to_glob2s
+
+subroutine psb_loc_to_globs(x,desc_a,info,iact)
+  use psb_descriptor_type
+  use psb_tools_mod, psb_protect_name => psb_loc_to_globs
+  implicit none 
+  type(psb_desc_type), intent(in)    ::  desc_a
+  integer,intent(inout)              ::  x  
+  integer, intent(out)               ::  info
+  character, intent(in), optional    ::  iact
+  integer  :: iv1(1)
+
+  iv1(1) = x
+  call psb_loc_to_glob(iv1,desc_a,info,iact)
+  x      = iv1(1)
+
+end subroutine psb_loc_to_globs
+
