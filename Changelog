@@ -1,6 +1,12 @@
 Changelog. A lot less detailed than usual, at least for past
 history. 
 
+2008/02/08: Merged changes from intermesh branch: we now have an
+	    inter_desc_type object. Currently we only implement the
+	    version needed for aggregation algorithms in the algebraic
+	    multigrid preconditioners, but we'll define more general
+	    (linear) maps soon enough. 
+
 2008/01/25: Various changes to variables controlling conditional
 	    compilation on the Fortran side: removed NETLIB_BLACS, now
 	    HAVE_METIS HAVE_ESSL_BLACS HAVE_KSENDID.
