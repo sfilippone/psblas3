@@ -28,15 +28,15 @@
 !!$  POSSIBILITY OF SUCH DAMAGE.
 !!$ 
 !!$  
-! File: psb_cdovr.f90
+! File: psb_zcdbldext.f90
 !
-! Subroutine: psb_cdovr
+! Subroutine: psb_zcdbldext
 !    This routine takes a matrix A with its descriptor, and builds the 
 !    auxiliary descriptor corresponding to the number of overlap levels
 !    specified on input. 
 ! 
 ! Arguments: 
-!    a        - type(psb_dspmat_type).       The input sparse matrix.
+!    a        - type(psb_zspmat_type).       The input sparse matrix.
 !    desc_a   - type(psb_desc_type).         The input communication descriptor.
 !    novr     - integer.                       The number of overlap levels.
 !    desc_ov  - type(psb_desc_type).         The auxiliary output communication 
@@ -58,10 +58,9 @@
 !                                              c. The (novr+1)-th layer becomes the
 !                                                 new halo.
 !
-Subroutine psb_dcdovr(a,desc_a,novr,desc_ov,info, extype)
+Subroutine psb_zcdbldext(a,desc_a,novr,desc_ov,info, extype)
 
-  use psb_tools_mod, psb_protect_name => psb_dcdovr
-
+  use psb_tools_mod, psb_protect_name => psb_zcdbldext
   use psb_serial_mod
   use psb_descriptor_type
   use psb_error_mod
@@ -69,16 +68,16 @@ Subroutine psb_dcdovr(a,desc_a,novr,desc_ov,info, extype)
   use psb_realloc_mod
   use psi_mod
 #ifdef MPI_MOD
-  use mpi
+    use mpi
 #endif
   Implicit None
 #ifdef MPI_H
-  include 'mpif.h'
+    include 'mpif.h'
 #endif
 
   !     .. Array Arguments ..
   integer, intent(in)               :: novr
-  Type(psb_dspmat_type), Intent(in)       ::  a
+  Type(psb_zspmat_type), Intent(in)       ::  a
   Type(psb_desc_type), Intent(in), target :: desc_a
   Type(psb_desc_type), Intent(out)        :: desc_ov
   integer, intent(out)                    :: info
@@ -103,7 +102,7 @@ Subroutine psb_dcdovr(a,desc_a,novr,desc_ov,info, extype)
        & counter_t,n_elem,i_ovr,jj,proc_id,isz, &
        & idxr, idxs, iszr, iszs, nxch, nsnd, nrcv,lidx, extype_
 
-  type(psb_dspmat_type) :: blk
+  type(psb_zspmat_type) :: blk
   Integer, allocatable  :: tmp_halo(:),tmp_ovr_idx(:), orig_ovr(:)
   Integer,allocatable   :: halo(:),works(:),workr(:),t_halo_in(:),&
        & t_halo_out(:),temp(:),maskr(:)
@@ -111,7 +110,7 @@ Subroutine psb_dcdovr(a,desc_a,novr,desc_ov,info, extype)
   integer              :: debug_level, debug_unit
   character(len=20)    :: name, ch_err
 
-  name='psb_dcdovr'
+  name='psb_zcdbldext'
   info  = 0
   call psb_erractionsave(err_act)
   debug_unit  = psb_get_debug_unit()
@@ -553,7 +552,7 @@ Subroutine psb_dcdovr(a,desc_a,novr,desc_ov,info, extype)
         ! owned the rows from the beginning!
         !
         call psi_fnd_owner(iszs,works,temp,desc_a,info)
-        n_col = psb_cd_get_local_cols(desc_ov)
+        n_col=psb_cd_get_local_cols(desc_ov)
 
         do i=1,iszs
           idx = works(i)
@@ -588,7 +587,7 @@ Subroutine psb_dcdovr(a,desc_a,novr,desc_ov,info, extype)
         Do i=1,iszr
           idx=workr(i)
           if (idx <1) then 
-            write(0,*) me,'Error in CDOVRBLD level',i_ovr,' : ',idx,i,iszr
+            write(0,*) me,'Error in CDBLDEXTBLD level',i_ovr,' : ',idx,i,iszr
           else  If (desc_ov%glob_to_loc(idx) < -np) Then
             !
             ! This is a new index. Assigning a local index as
@@ -624,7 +623,7 @@ Subroutine psb_dcdovr(a,desc_a,novr,desc_ov,info, extype)
                  &proc_id,n_col,idx
           else if (desc_ov%glob_to_loc(idx) < 0) Then
             if (debug_level >= psb_debug_outer_) &
-                 & write(debug_unit,*) me,' ',trim(name),':Wrong input to cdovrbld?',&
+                 & write(debug_unit,*) me,' ',trim(name),':Wrong input to cdbldextbld?',&
                  &idx,desc_ov%glob_to_loc(idx)
           End If
         End Do
@@ -691,7 +690,7 @@ Subroutine psb_dcdovr(a,desc_a,novr,desc_ov,info, extype)
       call psb_errpush(4010,name,a_err='deallocate')
       goto 9999
     end if
-
+    
   case(psb_ovt_asov_)
     !
     ! Build an overlapped descriptor for Additive Schwarz 
@@ -763,5 +762,5 @@ Subroutine psb_dcdovr(a,desc_a,novr,desc_ov,info, extype)
   end if
   Return
 
-End Subroutine psb_dcdovr
+End Subroutine psb_zcdbldext
 

@@ -333,7 +333,7 @@ Module psb_tools_mod
 
 
   interface psb_cdbldext
-    Subroutine psb_dcdovr(a,desc_a,novr,desc_ov,info,extype)
+    Subroutine psb_dcdbldext(a,desc_a,novr,desc_ov,info,extype)
       use psb_descriptor_type
       Use psb_spmat_type
       integer, intent(in)                     :: novr
@@ -342,8 +342,8 @@ Module psb_tools_mod
       Type(psb_desc_type), Intent(out)        :: desc_ov
       integer, intent(out)                    :: info
       integer, intent(in),optional            :: extype
-    end Subroutine psb_dcdovr
-    Subroutine psb_zcdovr(a,desc_a,novr,desc_ov,info,extype)
+    end Subroutine psb_dcdbldext
+    Subroutine psb_zcdbldext(a,desc_a,novr,desc_ov,info,extype)
       use psb_descriptor_type
       Use psb_spmat_type
       integer, intent(in)                     :: novr
@@ -352,7 +352,7 @@ Module psb_tools_mod
       Type(psb_desc_type), Intent(out)        :: desc_ov
       integer, intent(out)                    :: info
       integer, intent(in),optional            :: extype
-    end Subroutine psb_zcdovr
+    end Subroutine psb_zcdbldext
   end interface
 
   interface psb_cdren
