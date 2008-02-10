@@ -318,7 +318,6 @@ contains
         i_count = j_count
 
       else
-        write(0,*) iam,'unexpected turn'
         ! here processors are counted 1..np
         do j_count = 1, length_row
           k_count = iwork(j_count)
@@ -1063,7 +1062,6 @@ contains
         i_count = j_count
 
       else
-        write(0,*) iam,'unexpected turn'
         ! here processors are counted 1..np
         do j_count = 1, length_row
           k_count = iwork(j_count)
