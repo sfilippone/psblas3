@@ -200,7 +200,7 @@ subroutine psb_zspins(nz,ia,ja,val,a,desc_a,info,rebuild)
       nrow = psb_cd_get_local_rows(desc_a)
       ncol = psb_cd_get_local_cols(desc_a)
 
-      call psb_coins(nz,ia,ja,val,a,1,nrow,1,ncol,&
+      call psb_coins(nz,ila,jla,val,a,1,nrow,1,ncol,&
            & info,rebuild=rebuild_)
       if (info /= 0) then
         info=4010
