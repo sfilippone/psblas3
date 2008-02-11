@@ -1,6 +1,7 @@
 !!$ 
-!!$              Parallel Sparse BLAS  v2.0
-!!$    (C) Copyright 2006 Salvatore Filippone    University of Rome Tor Vergata
+!!$              Parallel Sparse BLAS  version 2.2
+!!$    (C) Copyright 2006/2007/2008
+!!$                       Salvatore Filippone    University of Rome Tor Vergata
 !!$                       Alfredo Buttari        University of Rome Tor Vergata
 !!$ 
 !!$  Redistribution and use in source and binary forms, with or without
@@ -296,8 +297,9 @@ subroutine  psb_zspsm(alpha,a,x,beta,y,desc_a,info,&
 end subroutine psb_zspsm
      
 !!$ 
-!!$              Parallel Sparse BLAS  v2.0
-!!$    (C) Copyright 2006 Salvatore Filippone    University of Rome Tor Vergata
+!!$              Parallel Sparse BLAS  version 2.2
+!!$    (C) Copyright 2006/2007/2008
+!!$                       Salvatore Filippone    University of Rome Tor Vergata
 !!$                       Alfredo Buttari        University of Rome Tor Vergata
 !!$ 
 !!$  Redistribution and use in source and binary forms, with or without

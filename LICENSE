@@ -1,7 +1,6 @@
-  
-              Parallel Sparse BLAS  v2.1
-    (C) Copyright 2006/2007
-		       Salvatore Filippone    University of Rome Tor Vergata
+              Parallel Sparse BLAS  v2.2
+    (C) Copyright 2006/2007/2008
+                       Salvatore Filippone    University of Rome Tor Vergata
                        Alfredo Buttari        University of Rome Tor Vergata
  
   Redistribution and use in source and binary forms, with or without

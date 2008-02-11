@@ -1,6 +1,7 @@
 !!$ 
-!!$              Parallel Sparse BLAS  v2.0
-!!$    (C) Copyright 2006 Salvatore Filippone    University of Rome Tor Vergata
+!!$              Parallel Sparse BLAS  version 2.2
+!!$    (C) Copyright 2006/2007/2008
+!!$                       Salvatore Filippone    University of Rome Tor Vergata
 !!$                       Alfredo Buttari        University of Rome Tor Vergata
 !!$ 
 !!$  Redistribution and use in source and binary forms, with or without
@@ -98,8 +99,9 @@ end subroutine psb_dprc_aply
 !!$                    MD2P4
 !!$    Multilevel Domain Decomposition Parallel Preconditioner Package for PSBLAS
 !!$                      for 
-!!$              Parallel Sparse BLAS  v2.0
-!!$    (C) Copyright 2006 Salvatore Filippone    University of Rome Tor Vergata
+!!$              Parallel Sparse BLAS  version 2.2
+!!$    (C) Copyright 2006/2007/2008
+!!$                       Salvatore Filippone    University of Rome Tor Vergata
 !!$                       Alfredo Buttari        University of Rome Tor Vergata
 !!$                       Daniela di Serafino    Second University of Naples
 !!$                       Pasqua D'Ambra         ICAR-CNR                      

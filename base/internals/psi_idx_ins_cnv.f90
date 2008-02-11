@@ -1,6 +1,7 @@
 !!$ 
-!!$              Parallel Sparse BLAS  v2.0
-!!$    (C) Copyright 2006 Salvatore Filippone    University of Rome Tor Vergata
+!!$              Parallel Sparse BLAS  version 2.2
+!!$    (C) Copyright 2006/2007/2008
+!!$                       Salvatore Filippone    University of Rome Tor Vergata
 !!$                       Alfredo Buttari        University of Rome Tor Vergata
 !!$ 
 !!$  Redistribution and use in source and binary forms, with or without
@@ -148,8 +149,9 @@ subroutine psi_idx_ins_cnv1(nv,idxin,desc,info,mask)
 
 end subroutine psi_idx_ins_cnv1
 !!$ 
-!!$              Parallel Sparse BLAS  v2.0
-!!$    (C) Copyright 2006 Salvatore Filippone    University of Rome Tor Vergata
+!!$              Parallel Sparse BLAS  version 2.2
+!!$    (C) Copyright 2006/2007/2008
+!!$                       Salvatore Filippone    University of Rome Tor Vergata
 !!$                       Alfredo Buttari        University of Rome Tor Vergata
 !!$ 
 !!$  Redistribution and use in source and binary forms, with or without
@@ -400,8 +402,9 @@ subroutine psi_idx_ins_cnv2(nv,idxin,idxout,desc,info,mask)
 
 end subroutine psi_idx_ins_cnv2
 !!$ 
-!!$              Parallel Sparse BLAS  v2.0
-!!$    (C) Copyright 2006 Salvatore Filippone    University of Rome Tor Vergata
+!!$              Parallel Sparse BLAS  version 2.2
+!!$    (C) Copyright 2006/2007/2008
+!!$                       Salvatore Filippone    University of Rome Tor Vergata
 !!$                       Alfredo Buttari        University of Rome Tor Vergata
 !!$ 
 !!$  Redistribution and use in source and binary forms, with or without
