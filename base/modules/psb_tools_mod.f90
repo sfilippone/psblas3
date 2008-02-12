@@ -701,6 +701,7 @@ contains
       call psb_cd_inloc((/(i,i=nlp+1,nlp+nl)/),ictxt,desc_a,info)
 
     endif
+    if (info /= 0) goto 999
     call psb_erractionrestore(err_act)
     return
 
