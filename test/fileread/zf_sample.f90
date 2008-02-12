@@ -89,7 +89,6 @@ program zf_sample
   if(psb_get_errstatus() /= 0) goto 9999
   info=0
   call psb_set_errverbosity(2)
-  call psb_set_erraction(0)
   !
   !  get parameters
   !
