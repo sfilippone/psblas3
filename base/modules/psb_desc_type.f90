@@ -534,27 +534,57 @@ contains
   end function psb_cd_get_global_cols
 
   integer function psb_cd_get_context(desc)
+    use psb_error_mod
     type(psb_desc_type), intent(in) :: desc
-    
-    psb_cd_get_context = desc%matrix_data(psb_ctxt_)
+    if (allocated(desc%matrix_data)) then 
+      psb_cd_get_context = desc%matrix_data(psb_ctxt_)
+    else
+      psb_cd_get_context = -1
+      call psb_errpush(1122,'psb_cd_get_context')
+      call psb_error()
+    end if
+      
   end function psb_cd_get_context
 
   integer function psb_cd_get_dectype(desc)
+    use psb_error_mod
     type(psb_desc_type), intent(in) :: desc
     
-    psb_cd_get_dectype = desc%matrix_data(psb_dec_type_)
+    if (allocated(desc%matrix_data)) then 
+      psb_cd_get_dectype = desc%matrix_data(psb_dec_type_)
+    else
+      psb_cd_get_dectype = -1
+      call psb_errpush(1122,'psb_cd_get_dectype')
+      call psb_error()
+    end if
+      
   end function psb_cd_get_dectype
 
   integer function psb_cd_get_size(desc)
+    use psb_error_mod
     type(psb_desc_type), intent(in) :: desc
     
-    psb_cd_get_size = desc%matrix_data(psb_desc_size_)
+    if (allocated(desc%matrix_data)) then 
+      psb_cd_get_size = desc%matrix_data(psb_desc_size_)
+    else
+      psb_cd_get_size = -1
+      call psb_errpush(1122,'psb_cd_get_size')
+      call psb_error()
+    end if
+
   end function psb_cd_get_size
 
   integer function psb_cd_get_mpic(desc)
+    use psb_error_mod
     type(psb_desc_type), intent(in) :: desc
-    
-    psb_cd_get_mpic = desc%matrix_data(psb_mpi_c_)
+    if (allocated(desc%matrix_data)) then 
+      psb_cd_get_mpic = desc%matrix_data(psb_mpi_c_)
+    else
+      psb_cd_get_mpic = -1
+      call psb_errpush(1122,'psb_cd_get_mpic')
+      call psb_error()
+    end if
+
   end function psb_cd_get_mpic
 
 
