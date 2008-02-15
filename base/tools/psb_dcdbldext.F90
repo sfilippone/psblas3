@@ -272,7 +272,7 @@ Subroutine psb_dcdbldext(a,desc_a,novr,desc_ov,info, extype)
       orig_ovr(cntov_o+3)=-1
       cntov_o=cntov_o+3
     end Do
-    counter=counter+n_elem_recv+n_elem_send+2
+    counter=counter+n_elem_recv+n_elem_send+3
   end Do
 
 
