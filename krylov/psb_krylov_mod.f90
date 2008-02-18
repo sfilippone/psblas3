@@ -389,8 +389,11 @@ contains
   ! Arguments:
   !
   !    methd  -  character                    The specific method; can take the values:
+  !                                           CG
   !                                           CGS
+  !                                           BICG
   !                                           BICGSTAB
+  !                                           BICGSTABL
   !                                           RGMRES
   !                                           
   !    a      -  type(psb_zspmat_type)      Input: sparse matrix containing A.
