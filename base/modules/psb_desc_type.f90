@@ -61,7 +61,7 @@ module psb_descriptor_type
   integer, parameter :: psb_map_asov_        = psb_map_xhal_+1
   integer, parameter :: psb_map_aggr_        = psb_map_asov_+1 
   integer, parameter :: psb_map_gen_linear_  = psb_map_aggr_+1 
-  
+
   integer, parameter :: psb_ovt_xhal_ = psb_map_xhal_, psb_ovt_asov_=psb_map_asov_
   !
   ! Entries and values in desc%matrix_data
@@ -112,8 +112,8 @@ module psb_descriptor_type
   integer, parameter :: psb_elem_send_=3, psb_n_ovrlp_elem_=1
   integer, parameter :: psb_ovrlp_elem_to_=2, psb_ovrlp_elem_=0
   integer, parameter :: psb_n_dom_ovr_=1
-  
-  
+
+
   !
   !  type: psb_desc_type
   !  
@@ -288,19 +288,19 @@ module psb_descriptor_type
   !
   !
   type psb_desc_type
-     integer, allocatable :: matrix_data(:)
-     integer, allocatable :: halo_index(:)
-     integer, allocatable :: ext_index(:)
-     integer, allocatable :: ovrlap_index(:)
-     integer, allocatable :: ovrlap_elem(:,:)
-     integer, allocatable :: ovr_mst_idx(:)
-     integer, allocatable :: bnd_elem(:)
-     integer, allocatable :: loc_to_glob(:)
-     integer, allocatable :: glob_to_loc (:)
-     integer, allocatable :: hashv(:), glb_lc(:,:), ptree(:)
-     integer, allocatable :: lprm(:)
-     integer, allocatable :: idx_space(:)
-     type(psb_desc_type), pointer :: base_desc => null()
+    integer, allocatable :: matrix_data(:)
+    integer, allocatable :: halo_index(:)
+    integer, allocatable :: ext_index(:)
+    integer, allocatable :: ovrlap_index(:)
+    integer, allocatable :: ovrlap_elem(:,:)
+    integer, allocatable :: ovr_mst_idx(:)
+    integer, allocatable :: bnd_elem(:)
+    integer, allocatable :: loc_to_glob(:)
+    integer, allocatable :: glob_to_loc (:)
+    integer, allocatable :: hashv(:), glb_lc(:,:), ptree(:)
+    integer, allocatable :: lprm(:)
+    integer, allocatable :: idx_space(:)
+    type(psb_desc_type), pointer :: base_desc => null()
   end type psb_desc_type
 
   interface psb_sizeof
@@ -330,9 +330,39 @@ module psb_descriptor_type
   interface psb_is_large_desc
     module procedure psb_is_large_desc
   end interface
-  
 
-  
+
+  interface psb_cdcpy
+    module procedure psb_cdcpy
+!!$    subroutine psb_cdcpy(desc_in, desc_out, info)
+!!$      use psb_descriptor_type
+!!$      type(psb_desc_type), intent(in)  :: desc_in
+!!$      type(psb_desc_type), intent(out) :: desc_out
+!!$      integer, intent(out)             :: info
+!!$    end subroutine psb_cdcpy
+  end interface
+
+  interface psb_cdtransfer
+    module procedure psb_cdtransfer
+!!$    subroutine psb_cdtransfer(desc_in, desc_out, info)
+!!$      use psb_descriptor_type
+!!$      type(psb_desc_type), intent(inout) :: desc_in
+!!$      type(psb_desc_type), intent(inout)   :: desc_out
+!!$      integer, intent(out)               :: info
+!!$    end subroutine psb_cdtransfer
+  end interface
+
+
+  interface psb_cdfree
+    module procedure psb_cdfree
+!!$    subroutine psb_cdfree(desc_a,info)
+!!$      use psb_descriptor_type
+!!$      type(psb_desc_type), intent(inout) :: desc_a
+!!$      integer, intent(out)               :: info
+!!$    end subroutine psb_cdfree
+  end interface
+
+
   integer, private, save :: cd_large_threshold=psb_default_large_threshold 
 
 
@@ -364,10 +394,10 @@ contains
     if (allocated(desc%idx_space))    val = val + 4*size(desc%idx_space)
     if (allocated(desc%ptree))        val = val + 4*size(desc%ptree) +&
          &                                  SizeofPairSearchTree(desc%ptree)
-    
+
     psb_cd_sizeof = val
   end function psb_cd_sizeof
-    
+
 
 
   subroutine psb_cd_set_large_threshold(ith)
@@ -399,7 +429,7 @@ contains
          & (m > psb_cd_get_large_threshold()) .and. &
          & (np > 2)
   end function psb_cd_choose_large_state
-  
+
   subroutine psb_nullify_desc(desc)
     type(psb_desc_type), intent(inout) :: desc
     ! We have nothing left to do here.
@@ -503,7 +533,7 @@ contains
 
   integer function psb_cd_get_local_cols(desc)
     type(psb_desc_type), intent(in) :: desc
-    
+
     if (psb_is_ok_desc(desc)) then 
       psb_cd_get_local_cols = desc%matrix_data(psb_n_col_)
     else
@@ -513,7 +543,7 @@ contains
 
   integer function psb_cd_get_global_rows(desc)
     type(psb_desc_type), intent(in) :: desc
-    
+
     if (psb_is_ok_desc(desc)) then 
       psb_cd_get_global_rows = desc%matrix_data(psb_m_)
     else
@@ -524,7 +554,7 @@ contains
 
   integer function psb_cd_get_global_cols(desc)
     type(psb_desc_type), intent(in) :: desc
-    
+
     if (psb_is_ok_desc(desc)) then 
       psb_cd_get_global_cols = desc%matrix_data(psb_n_)
     else
@@ -543,13 +573,12 @@ contains
       call psb_errpush(1122,'psb_cd_get_context')
       call psb_error()
     end if
-      
   end function psb_cd_get_context
 
   integer function psb_cd_get_dectype(desc)
     use psb_error_mod
     type(psb_desc_type), intent(in) :: desc
-    
+
     if (allocated(desc%matrix_data)) then 
       psb_cd_get_dectype = desc%matrix_data(psb_dec_type_)
     else
@@ -563,7 +592,7 @@ contains
   integer function psb_cd_get_size(desc)
     use psb_error_mod
     type(psb_desc_type), intent(in) :: desc
-    
+
     if (allocated(desc%matrix_data)) then 
       psb_cd_get_size = desc%matrix_data(psb_desc_size_)
     else
@@ -577,6 +606,7 @@ contains
   integer function psb_cd_get_mpic(desc)
     use psb_error_mod
     type(psb_desc_type), intent(in) :: desc
+
     if (allocated(desc%matrix_data)) then 
       psb_cd_get_mpic = desc%matrix_data(psb_mpi_c_)
     else
@@ -617,6 +647,9 @@ contains
     ! check on blacs grid 
     call psb_info(ictxt, me, np)
     if (debug) write(0,*) me,'Entered CDSETBLD'
+    if (psb_is_asb_desc(desc)) then 
+!!$      write(0,*) 'Warning: doing setbld on an assembled descriptor'
+    end if
 
     if (psb_is_large_desc(desc)) then 
       if (debug) write(0,*) me,'SET_BLD: alocating ptree'
@@ -660,7 +693,7 @@ contains
     type(psb_desc_type), intent(inout) :: desc
     integer                            :: info
 
-    
+
     if (psb_is_asb_desc(desc)) desc%matrix_data(psb_dec_type_) = psb_cd_ovl_asb_ 
 
   end subroutine psb_cd_set_ovl_asb
@@ -676,8 +709,8 @@ contains
     if (info == 0) desc%matrix_data(psb_dec_type_) = psb_cd_ovl_bld_ 
 
   end subroutine psb_cd_set_ovl_bld
-    
-    
+
+
   subroutine psb_get_xch_idx(idx,totxch,totsnd,totrcv)
     implicit none 
     integer, intent(in)  :: idx(:)
@@ -706,7 +739,7 @@ contains
     end do
 
   end subroutine psb_get_xch_idx
-  
+
 
 
   subroutine psb_cd_get_list(data,desc,ipnt,totxch,idxr,idxs,info)
@@ -757,7 +790,7 @@ contains
       goto 9999
     end select
     call psb_get_xch_idx(ipnt,totxch,idxs,idxr)
-      
+
 
     call psb_erractionrestore(err_act)
     return
@@ -772,6 +805,559 @@ contains
     end if
     return
   end subroutine psb_cd_get_list
+
+  !
+  ! Subroutine: psb_cdfree
+  !   Frees a descriptor data structure.
+  ! 
+  ! Arguments: 
+  !    desc_a   - type(psb_desc_type).         The communication descriptor to be freed.
+  !    info     - integer.                       return code.
+  subroutine psb_cdfree(desc_a,info)
+    !...free descriptor structure...
+    use psb_const_mod
+    use psb_error_mod
+    use psb_penv_mod
+    implicit none
+    !....parameters...
+    type(psb_desc_type), intent(inout) :: desc_a
+    integer, intent(out)               :: info
+    !...locals....
+    integer             :: ictxt,np,me, err_act
+    character(len=20)   :: name
+
+    if(psb_get_errstatus() /= 0) return 
+    info=0
+    call psb_erractionsave(err_act)
+    name = 'psb_cdfree'
+
+
+    if (.not.allocated(desc_a%matrix_data)) then
+      info=295
+      call psb_errpush(info,name)
+      return
+    end if
+
+    ictxt=psb_cd_get_context(desc_a)
+
+    call psb_info(ictxt, me, np)
+    !     ....verify blacs grid correctness..
+    if (np == -1) then
+      info = 2010
+      call psb_errpush(info,name)
+      goto 9999
+    endif
+
+    !...deallocate desc_a....
+    if(.not.allocated(desc_a%loc_to_glob)) then
+      info=296
+      call psb_errpush(info,name)
+      goto 9999
+    end if
+
+    !deallocate loc_to_glob  field
+    deallocate(desc_a%loc_to_glob,stat=info)
+    if (info /= 0) then
+      info=2051
+      call psb_errpush(info,name)
+      goto 9999
+    end if
+
+    if (.not.psb_is_large_desc(desc_a)) then 
+      if (.not.allocated(desc_a%glob_to_loc)) then
+        info=297
+        call psb_errpush(info,name)
+        goto 9999
+      end if
+
+      !deallocate glob_to_loc field
+      deallocate(desc_a%glob_to_loc,stat=info)
+      if (info /= 0) then
+        info=2052
+        call psb_errpush(info,name)
+        goto 9999
+      end if
+    endif
+
+    if (.not.allocated(desc_a%halo_index)) then
+      info=298
+      call psb_errpush(info,name)
+      goto 9999
+    end if
+
+    !deallocate halo_index field
+    deallocate(desc_a%halo_index,stat=info)
+    if (info /= 0) then
+      info=2053
+      call psb_errpush(info,name)
+      goto 9999
+    end if
+
+    if (.not.allocated(desc_a%bnd_elem)) then
+!!$    info=296
+!!$    call psb_errpush(info,name)
+!!$    goto 9999
+!!$  end if
+    else
+      !deallocate halo_index field
+      deallocate(desc_a%bnd_elem,stat=info)
+      if (info /= 0) then
+        info=2054
+        call psb_errpush(info,name)
+        goto 9999
+      end if
+    end if
+
+    if (.not.allocated(desc_a%ovrlap_index)) then
+      info=299
+      call psb_errpush(info,name)
+      goto 9999
+    end if
+
+    !deallocate ovrlap_index  field
+    deallocate(desc_a%ovrlap_index,stat=info)
+    if (info /= 0) then
+      info=2055
+      call psb_errpush(info,name)
+      goto 9999
+    end if
+
+    !deallocate ovrlap_elem  field
+    deallocate(desc_a%ovrlap_elem,stat=info)
+    if (info /= 0) then 
+      info=2056
+      call psb_errpush(info,name)
+      goto 9999
+    end if
+
+    !deallocate ovrlap_index  field
+    deallocate(desc_a%ovr_mst_idx,stat=info)
+    if (info /= 0) then
+      info=2055
+      call psb_errpush(info,name)
+      goto 9999
+    end if
+
+
+    deallocate(desc_a%lprm,stat=info)
+    if (info /= 0) then 
+      info=2057
+      call psb_errpush(info,name)
+      goto 9999
+    end if
+
+    if (allocated(desc_a%hashv)) then 
+      deallocate(desc_a%hashv,stat=info)
+      if (info /= 0) then 
+        info=2058
+        call psb_errpush(info,name)
+        goto 9999
+      end if
+    end if
+
+    if (allocated(desc_a%glb_lc)) then 
+      deallocate(desc_a%glb_lc,stat=info)
+      if (info /= 0) then 
+        info=2059
+        call psb_errpush(info,name)
+        goto 9999
+      end if
+    end if
+
+    if (allocated(desc_a%ptree)) then 
+      call FreePairSearchTree(desc_a%ptree)   
+      deallocate(desc_a%ptree,stat=info)
+      if (info /= 0) then 
+        info=2059
+        call psb_errpush(info,name)
+        goto 9999
+      end if
+    end if
+
+
+
+    if (allocated(desc_a%idx_space)) then 
+      deallocate(desc_a%idx_space,stat=info)
+      if (info /= 0) then 
+        info=2056
+        call psb_errpush(info,name)
+        goto 9999
+      end if
+    end if
+
+    deallocate(desc_a%matrix_data)
+
+    call psb_nullify_desc(desc_a)
+
+    call psb_erractionrestore(err_act)
+    return
+
+9999 continue
+    call psb_erractionrestore(err_act)
+
+    if (err_act == psb_act_ret_) then
+      return
+    else
+      call psb_error(ictxt)
+    end if
+    return
+
+  end subroutine psb_cdfree
+  !
+  ! Subroutine: psb_cdcpy
+  !   Produces a clone of a descriptor.
+  ! 
+  ! Arguments: 
+  !    desc_in  - type(psb_desc_type).         The communication descriptor to be cloned.
+  !    desc_out - type(psb_desc_type).         The output communication descriptor.
+  !    info     - integer.                       Return code.
+  subroutine psb_cdcpy(desc_in, desc_out, info)
+
+    use psb_realloc_mod
+    use psb_const_mod
+    use psb_error_mod
+    use psb_penv_mod
+
+    implicit none
+    !....parameters...
+
+    type(psb_desc_type), intent(in)  :: desc_in
+    type(psb_desc_type), intent(out) :: desc_out
+    integer, intent(out)             :: info
+
+    !locals
+    integer             :: np,me,ictxt, err_act
+    integer             :: debug_level, debug_unit
+    character(len=20)   :: name
+
+    debug_unit  = psb_get_debug_unit()
+    debug_level = psb_get_debug_level()
+
+    if (psb_get_errstatus() /= 0) return 
+    info = 0
+    call psb_erractionsave(err_act)
+    name = 'psb_cdcpy'
+
+    ictxt = psb_cd_get_context(desc_in)
+
+    ! check on blacs grid 
+    call psb_info(ictxt, me, np)
+    if (debug_level >= psb_debug_ext_) &
+         & write(debug_unit,*) me,' ',trim(name),': Entered'
+    if (np == -1) then
+      info = 2010
+      call psb_errpush(info,name)
+      goto 9999
+    endif
+
+    call psb_safe_ab_cpy(desc_in%matrix_data,desc_out%matrix_data,info)
+    if (info == 0)   call psb_safe_ab_cpy(desc_in%halo_index,desc_out%halo_index,info)
+    if (info == 0)   call psb_safe_ab_cpy(desc_in%ext_index,desc_out%ext_index,info)
+    if (info == 0)   call psb_safe_ab_cpy(desc_in%ovrlap_index,desc_out%ovrlap_index,info)
+    if (info == 0)   call psb_safe_ab_cpy(desc_in%bnd_elem,desc_out%bnd_elem,info)
+    if (info == 0)   call psb_safe_ab_cpy(desc_in%ovrlap_elem,desc_out%ovrlap_elem,info)
+    if (info == 0)   call psb_safe_ab_cpy(desc_in%ovr_mst_idx,desc_out%ovr_mst_idx,info)
+    if (info == 0)   call psb_safe_ab_cpy(desc_in%loc_to_glob,desc_out%loc_to_glob,info)
+    if (info == 0)   call psb_safe_ab_cpy(desc_in%glob_to_loc,desc_out%glob_to_loc,info)
+    if (info == 0)   call psb_safe_ab_cpy(desc_in%lprm,desc_out%lprm,info)
+    if (info == 0)   call psb_safe_ab_cpy(desc_in%idx_space,desc_out%idx_space,info)
+    if (info == 0)   call psb_safe_ab_cpy(desc_in%hashv,desc_out%hashv,info)
+    if (info == 0)   call psb_safe_ab_cpy(desc_in%glb_lc,desc_out%glb_lc,info)
+
+    if (info == 0) then 
+      if (allocated(desc_in%ptree)) then 
+        allocate(desc_out%ptree(2),stat=info)
+        if (info /= 0) then 
+          info=4000
+          goto 9999
+        endif
+        call ClonePairSearchTree(desc_in%ptree,desc_out%ptree)
+      end if
+    end if
+
+    if (info /= 0) then
+      info = 4010
+      call psb_errpush(info,name)
+      goto 9999
+    endif
+    if (debug_level >= psb_debug_ext_) &
+         & write(debug_unit,*) me,' ',trim(name),': Done'
+
+    call psb_erractionrestore(err_act)
+    return
+
+9999 continue
+    call psb_erractionrestore(err_act)
+
+    if (err_act == psb_act_ret_) then
+      return
+    else
+      call psb_error(ictxt)
+    end if
+    return
+
+  end subroutine psb_cdcpy
+  !
+  ! Subroutine: psb_cdtransfer
+  !   Transfers data and allocation from in to out; behaves like MOVE_ALLOC, i.e.
+  !   the IN arg is empty (and deallocated) upon exit. 
+  !
+  ! 
+  ! Arguments: 
+  !    desc_in  - type(psb_desc_type).         The communication descriptor to be 
+  !                                               transferred.
+  !    desc_out - type(psb_desc_type).         The output communication descriptor.
+  !    info     - integer.                       Return code.
+  subroutine psb_cdtransfer(desc_in, desc_out, info)
+
+    use psb_realloc_mod
+    use psb_const_mod
+    use psb_error_mod
+    use psb_penv_mod
+
+    implicit none
+    !....parameters...
+
+    type(psb_desc_type), intent(inout)  :: desc_in
+    type(psb_desc_type), intent(inout)  :: desc_out
+    integer, intent(out)                :: info
+
+    !locals
+    integer             :: np,me,ictxt, err_act
+    integer              :: debug_level, debug_unit
+    character(len=20)   :: name
+
+    if (psb_get_errstatus()/=0) return 
+    info = 0
+    call psb_erractionsave(err_act)
+    name = 'psb_cdtransfer'
+    debug_unit  = psb_get_debug_unit()
+    debug_level = psb_get_debug_level()
+
+    ictxt=psb_cd_get_context(desc_in)
+
+    call psb_info(ictxt, me, np)
+    if (debug_level >= psb_debug_outer_)&
+         &  write(debug_unit,*) me,' ',trim(name),': start.'
+    if (np == -1) then
+      info = 2010
+      call psb_errpush(info,name)
+      goto 9999
+    endif
+
+    call psb_transfer( desc_in%matrix_data ,    desc_out%matrix_data  , info)
+    if (info == 0)  &
+         & call psb_transfer( desc_in%halo_index  ,    desc_out%halo_index   , info)
+    if (info == 0)  &
+         & call psb_transfer( desc_in%bnd_elem    ,    desc_out%bnd_elem     , info)
+    if (info == 0)  &
+         & call psb_transfer( desc_in%ovrlap_elem ,    desc_out%ovrlap_elem  , info)
+    if (info == 0)  &
+         & call psb_transfer( desc_in%ovrlap_index,    desc_out%ovrlap_index , info)
+    if (info == 0)  &
+         & call psb_transfer( desc_in%ovr_mst_idx ,    desc_out%ovr_mst_idx  , info)
+    if (info == 0)  &
+         & call psb_transfer( desc_in%ext_index   ,    desc_out%ext_index    , info)
+    if (info == 0)  &
+         & call psb_transfer( desc_in%loc_to_glob ,    desc_out%loc_to_glob  , info)
+    if (info == 0)  &
+         & call psb_transfer( desc_in%glob_to_loc ,    desc_out%glob_to_loc  , info)
+    if (info == 0)  &
+         & call psb_transfer( desc_in%lprm        ,    desc_out%lprm         , info)
+    if (info == 0)  &
+         & call psb_transfer( desc_in%idx_space   ,    desc_out%idx_space    , info)
+    if (info == 0)  &
+         & call psb_transfer( desc_in%hashv       ,    desc_out%hashv        , info)
+    if (info == 0)  &
+         & call psb_transfer( desc_in%glb_lc      ,    desc_out%glb_lc       , info)
+    if (info == 0)  &
+         & call psb_transfer( desc_in%ptree       ,    desc_out%ptree        , info)
+
+    if (info /= 0) then
+      info = 4010
+      call psb_errpush(info,name)
+      goto 9999
+    endif
+    if (debug_level >= psb_debug_ext_) &
+         & write(debug_unit,*) me,' ',trim(name),': end'
+
+    call psb_erractionrestore(err_act)
+    return
+
+9999 continue
+    call psb_erractionrestore(err_act)
+
+    if (err_act == psb_act_ret_) then
+      return
+    else
+      call psb_error(ictxt)
+    end if
+    return
+
+  end subroutine psb_cdtransfer
+
+
+
+  Subroutine psb_cd_get_recv_idx(tmp,desc,data,info,toglob)
+
+    use psb_error_mod
+    use psb_penv_mod
+    use psb_realloc_mod
+    Implicit None
+    integer, allocatable, intent(out)       :: tmp(:)
+    integer, intent(in)                     :: data
+    Type(psb_desc_type), Intent(in), target :: desc
+    integer, intent(out)                    :: info
+    logical, intent(in)                     :: toglob
+
+    !     .. Local Scalars ..
+    Integer ::  incnt, outcnt, j, np, me, ictxt, l_tmp,&
+         & idx, gidx, proc, n_elem_send, n_elem_recv
+    Integer, pointer   :: idxlist(:) 
+    integer              :: debug_level, debug_unit, err_act
+    character(len=20)    :: name
+
+    name  = 'psb_cd_get_recv_idx'
+    info  = 0
+    call psb_erractionsave(err_act)
+    debug_unit  = psb_get_debug_unit()
+    debug_level = psb_get_debug_level()
+
+    ictxt = psb_cd_get_context(desc)
+    call psb_info(ictxt, me, np)
+    
+    select case(data)
+    case(psb_comm_halo_)
+      idxlist => desc%halo_index
+    case(psb_comm_ovr_)
+      idxlist => desc%ovrlap_index
+    case(psb_comm_ext_)
+      idxlist => desc%ext_index
+    case(psb_comm_mov_)
+      idxlist => desc%ovr_mst_idx
+      write(0,*) 'Warning: unusual request getidx on ovr_mst_idx'
+    case default
+      info=4010
+      call psb_errpush(info,name,a_err='wrong Data selector')
+      goto 9999
+    end select
+    
+    l_tmp = 3*size(idxlist)
+
+    allocate(tmp(l_tmp),stat=info)
+    if (info /= 0) then 
+      info = 4010
+      call psb_errpush(4010,name,a_err='Allocate')
+      goto 9999      
+    end if
+      
+    incnt  = 1
+    outcnt = 1
+    tmp(:) = -1
+    Do While (idxlist(incnt) /= -1)
+      proc        = idxlist(incnt+psb_proc_id_)
+      n_elem_recv = idxlist(incnt+psb_n_elem_recv_)
+      n_elem_send = idxlist(incnt+n_elem_recv+psb_n_elem_send_)
+
+      Do j=0,n_elem_recv-1
+        idx = idxlist(incnt+psb_elem_recv_+j)
+        call psb_ensure_size((outcnt+3),tmp,info,pad=-1)
+        if (info /= 0) then
+          info=4010
+          call psb_errpush(info,name,a_err='psb_ensure_size')
+          goto 9999
+        end if
+        if (toglob) then
+          If(idx > Size(desc%loc_to_glob)) then 
+            info=-3
+            call psb_errpush(info,name)
+            goto 9999
+          endif
+          gidx = desc%loc_to_glob(idx)
+          tmp(outcnt)   = proc
+          tmp(outcnt+1) = 1
+          tmp(outcnt+2) = gidx
+          tmp(outcnt+3) = -1
+        else
+          tmp(outcnt)   = proc
+          tmp(outcnt+1) = 1
+          tmp(outcnt+2) = idx
+          tmp(outcnt+3) = -1
+        end if
+        outcnt            = outcnt+3
+      end Do
+      incnt = incnt+n_elem_recv+n_elem_send+3
+    end Do
+    
+    call psb_erractionrestore(err_act)
+    return
+
+9999 continue
+    call psb_erractionrestore(err_act)
+    if (err_act == psb_act_abort_) then
+      call psb_error(ictxt)
+      return
+    end if
+    Return
+
+  end Subroutine psb_cd_get_recv_idx
+
+  Subroutine psb_cd_reinit(desc,info)
+
+    use psb_error_mod
+    use psb_penv_mod
+    use psb_realloc_mod
+    Implicit None
+
+    !     .. Array Arguments ..
+    Type(psb_desc_type), Intent(inout) :: desc
+    integer, intent(out)               :: info
+
+    integer   icomm, err_act
+
+    !     .. Local Scalars ..
+    Integer ::  np, me, ictxt
+    Integer, allocatable :: tmp_halo(:),tmp_ext(:), tmp_ovr(:)
+    integer              :: debug_level, debug_unit
+    character(len=20)    :: name, ch_err
+
+    name='psb_cd_reinit'
+    info  = 0
+    call psb_erractionsave(err_act)
+    debug_unit  = psb_get_debug_unit()
+    debug_level = psb_get_debug_level()
+
+    ictxt = psb_cd_get_context(desc)
+    icomm = psb_cd_get_mpic(desc)
+    Call psb_info(ictxt, me, np)
+    if (debug_level >= psb_debug_outer_) &
+         & write(debug_unit,*) me,' ',trim(name),': start'
+
+    call psb_cd_get_recv_idx(tmp_ovr,desc,psb_comm_ovr_,info,toglob=.true.)
+    call psb_cd_get_recv_idx(tmp_halo,desc,psb_comm_halo_,info,toglob=.false.)    
+    call psb_cd_get_recv_idx(tmp_ext,desc,psb_comm_ext_,info,toglob=.false.)        
+
+    call psb_transfer(tmp_ovr,desc%ovrlap_index,info)
+    call psb_transfer(tmp_halo,desc%halo_index,info)
+    call psb_transfer(tmp_ext,desc%ext_index,info)
+    call psb_cd_set_bld(desc,info)
+
+    if (debug_level >= psb_debug_outer_) &
+         & write(debug_unit,*) me,' ',trim(name),': end'
+
+    call psb_erractionrestore(err_act)
+    return
+
+9999 continue
+    call psb_erractionrestore(err_act)
+    if (err_act == psb_act_abort_) then
+      call psb_error(ictxt)
+      return
+    end if
+    Return
+
+  End Subroutine psb_cd_reinit
+
 
 
 end module psb_descriptor_type

@@ -41,9 +41,9 @@
 !    parts   - external subroutine.           The routine that contains the 
 !                                                 partitioning scheme.
 !    ictxt - integer.                         The communication context.
-!    desc_a  - type(psb_desc_type).         The communication descriptor.
+!    desc  - type(psb_desc_type).         The communication descriptor.
 !    info    - integer.                       Error code (if any).
-subroutine psb_cdals(m, n, parts, ictxt, desc_a, info)
+subroutine psb_cdals(m, n, parts, ictxt, desc, info)
   use psb_error_mod
   use psb_descriptor_type
   use psb_realloc_mod
@@ -55,7 +55,7 @@ subroutine psb_cdals(m, n, parts, ictxt, desc_a, info)
   include 'parts.fh'
   !....Parameters...
   Integer, intent(in)                 :: M,N,ictxt
-  Type(psb_desc_type), intent(out)    :: desc_a
+  Type(psb_desc_type), intent(out)    :: desc
   integer, intent(out)                :: info
 
   !locals
@@ -122,18 +122,18 @@ subroutine psb_cdals(m, n, parts, ictxt, desc_a, info)
     call psb_cd_set_large_threshold(exch(3))
   endif
 
-  call psb_nullify_desc(desc_a)
+  call psb_nullify_desc(desc)
 
   !count local rows number
   ! allocate work vector
   if (psb_cd_choose_large_state(ictxt,m)) then 
-    allocate(desc_a%matrix_data(psb_mdata_size_),&
+    allocate(desc%matrix_data(psb_mdata_size_),&
          & temp_ovrlap(m),prc_v(np),stat=info)
-    desc_a%matrix_data(psb_desc_size_) = psb_desc_large_
+    desc%matrix_data(psb_desc_size_) = psb_desc_large_
   else
-    allocate(desc_a%glob_to_loc(m),desc_a%matrix_data(psb_mdata_size_),&
+    allocate(desc%glob_to_loc(m),desc%matrix_data(psb_mdata_size_),&
          & temp_ovrlap(m),prc_v(np),stat=info)
-    desc_a%matrix_data(psb_desc_size_) = psb_desc_normal_
+    desc%matrix_data(psb_desc_size_) = psb_desc_normal_
   end if
   if (info /= 0) then     
     info=4025
@@ -142,11 +142,11 @@ subroutine psb_cdals(m, n, parts, ictxt, desc_a, info)
     call psb_errpush(err,name,int_err,a_err='integer')
     goto 9999
   endif
-  desc_a%matrix_data(psb_m_)        = m
-  desc_a%matrix_data(psb_n_)        = n
+  desc%matrix_data(psb_m_)        = m
+  desc%matrix_data(psb_n_)        = n
   ! This has to be set BEFORE any call to SET_BLD
-  desc_a%matrix_data(psb_ctxt_)     = ictxt
-  call psb_get_mpicomm(ictxt,desc_a%matrix_data(psb_mpi_c_))
+  desc%matrix_data(psb_ctxt_)     = ictxt
+  call psb_get_mpicomm(ictxt,desc%matrix_data(psb_mpi_c_))
 
 
   if (debug_level >= psb_debug_ext_) &
@@ -168,9 +168,9 @@ subroutine psb_cdals(m, n, parts, ictxt, desc_a, info)
     ! hashed by the low order bits of the entries.
     !
     loc_col = (m+np-1)/np
-    allocate(desc_a%loc_to_glob(loc_col), desc_a%lprm(1),&
-         & desc_a%ptree(2),stat=info)  
-    if (info == 0) call InitPairSearchTree(desc_a%ptree,info)
+    allocate(desc%loc_to_glob(loc_col), desc%lprm(1),&
+         & desc%ptree(2),stat=info)  
+    if (info == 0) call InitPairSearchTree(desc%ptree,info)
     if (info /= 0) then
       info=4025
       int_err(1)=loc_col
@@ -179,8 +179,8 @@ subroutine psb_cdals(m, n, parts, ictxt, desc_a, info)
     end if
 
     ! set LOC_TO_GLOB array to all "-1" values
-    desc_a%lprm(1) = 0
-    desc_a%loc_to_glob(:) = -1
+    desc%lprm(1) = 0
+    desc%loc_to_glob(:) = -1
     k = 0
     do i=1,m
       if (info == 0) then
@@ -226,14 +226,14 @@ subroutine psb_cdals(m, n, parts, ictxt, desc_a, info)
           if (prc_v(j) == me) then
             ! this point belongs to me
             k = k + 1 
-            call psb_ensure_size((k+1),desc_a%loc_to_glob,info,pad=-1)
+            call psb_ensure_size((k+1),desc%loc_to_glob,info,pad=-1)
             if (info /= 0) then
               info=4010
               call psb_errpush(info,name,a_err='psb_ensure_size')
               goto 9999
             end if
-            desc_a%loc_to_glob(k) = i
-            call SearchInsKeyVal(desc_a%ptree,i,k,glx,info)
+            desc%loc_to_glob(k) = i
+            call SearchInsKeyVal(desc%ptree,i,k,glx,info)
             if (nprocs > 1)  then
               call psb_ensure_size((itmpov+3+nprocs),temp_ovrlap,info,pad=-1)
               if (info /= 0) then
@@ -304,7 +304,7 @@ subroutine psb_cdals(m, n, parts, ictxt, desc_a, info)
             end if
           end do
         endif
-        desc_a%glob_to_loc(i) = -(np+prc_v(1)+1)
+        desc%glob_to_loc(i) = -(np+prc_v(1)+1)
         j=1
         do 
           if (j > nprocs) exit
@@ -315,7 +315,7 @@ subroutine psb_cdals(m, n, parts, ictxt, desc_a, info)
           if (prc_v(j) == me) then
             ! this point belongs to me
             counter=counter+1
-            desc_a%glob_to_loc(i) = counter
+            desc%glob_to_loc(i) = counter
             if (nprocs > 1)  then
               call psb_ensure_size((itmpov+3+nprocs),temp_ovrlap,info,pad=-1)
               if (info /= 0) then
@@ -338,20 +338,20 @@ subroutine psb_cdals(m, n, parts, ictxt, desc_a, info)
     loc_row=counter
     loc_col=min(2*loc_row,m)
 
-    allocate(desc_a%loc_to_glob(loc_col),&
-         &desc_a%lprm(1),stat=info)  
+    allocate(desc%loc_to_glob(loc_col),&
+         &desc%lprm(1),stat=info)  
     if (info /= 0) then 
       call psb_errpush(4010,name,a_err='Allocate')
       goto 9999      
     end if
 
     ! set LOC_TO_GLOB array to all "-1" values
-    desc_a%lprm(1) = 0
-    desc_a%loc_to_glob(:) = -1
+    desc%lprm(1) = 0
+    desc%loc_to_glob(:) = -1
     do i=1,m
-      k = desc_a%glob_to_loc(i) 
+      k = desc%glob_to_loc(i) 
       if (k > 0) then 
-        desc_a%loc_to_glob(k) = i
+        desc%loc_to_glob(k) = i
       endif
     enddo
 
@@ -366,7 +366,7 @@ subroutine psb_cdals(m, n, parts, ictxt, desc_a, info)
        & write(debug_unit,*) me,' ',trim(name),':  error check:' ,err
 
 
-  call psi_bld_tmpovrl(temp_ovrlap,desc_a,info)
+  call psi_bld_tmpovrl(temp_ovrlap,desc,info)
   
   if (info == 0) deallocate(prc_v,temp_ovrlap,stat=info)
   if (info /= psb_no_err_) then 
@@ -376,20 +376,22 @@ subroutine psb_cdals(m, n, parts, ictxt, desc_a, info)
     Goto 9999
   endif
 
-  ! set fields in desc_a%MATRIX_DATA....
-  desc_a%matrix_data(psb_n_row_)  = loc_row
-  desc_a%matrix_data(psb_n_col_)  = loc_row
-  call psb_cd_set_bld(desc_a,info)
+  ! set fields in desc%MATRIX_DATA....
+  desc%matrix_data(psb_n_row_)  = loc_row
+  desc%matrix_data(psb_n_col_)  = loc_row
 
-  call psb_realloc(1,desc_a%halo_index, info)
-  if (info == 0) call psb_realloc(1,desc_a%ext_index, info)
+  call psb_realloc(1,desc%halo_index, info)
+  if (info == 0) call psb_realloc(1,desc%ext_index, info)
   if (info /= 0) then
     info=4010
     call psb_errpush(info,name,a_err='psb_realloc')
     Goto 9999
   end if
-  desc_a%halo_index(:) = -1
-  desc_a%ext_index(:) = -1
+  desc%halo_index(:) = -1
+  desc%ext_index(:) = -1
+
+  call psb_cd_set_bld(desc,info)
+
 
   if (debug_level >= psb_debug_ext_) &
        & write(debug_unit,*) me,' ',trim(name),': end'

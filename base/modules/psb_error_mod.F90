@@ -85,7 +85,7 @@ module psb_error_mod
   type(psb_errstack), save :: error_stack         !  the PSBLAS-2.0 error stack
   integer, save            :: error_status=0      !  the error status (maybe not here)
   integer, save            :: verbosity_level=1   !  the verbosity level (maybe not here)
-  integer, save            :: err_action=1
+  integer, save            :: err_action=psb_act_abort_
   integer, save            :: debug_level=0, debug_unit=0, serial_debug_level=0
 
 contains

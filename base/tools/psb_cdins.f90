@@ -45,14 +45,14 @@
 !    ila(:)   - integer, optional              The row indices in local numbering
 !    jla(:)   - integer, optional              The col indices in local numbering
 !
-subroutine psb_cdins(nz,ia,ja,desc_a,info,ila,jla)
-
+subroutine psb_cdinsrc(nz,ia,ja,desc_a,info,ila,jla)
   use psb_descriptor_type
   use psb_serial_mod
   use psb_const_mod
   use psb_error_mod
   use psb_penv_mod
   use psi_mod
+  use psb_tools_mod, psb_protect_name => psb_cdinsrc
   implicit none
 
   !....PARAMETERS...
@@ -90,11 +90,13 @@ subroutine psb_cdins(nz,ia,ja,desc_a,info,ila,jla)
     goto 9999
   endif
 
-  if (nz <= 0) then 
+  if (nz < 0) then 
     info = 1111
     call psb_errpush(info,name)
     goto 9999
   end if
+  if (nz == 0) return 
+
   if (size(ia) < nz) then 
     info = 1111
     call psb_errpush(info,name)
@@ -122,22 +124,23 @@ subroutine psb_cdins(nz,ia,ja,desc_a,info,ila,jla)
   end if
 
   if (present(ila).and.present(jla)) then 
+!!$    call psi_idx_cnv(nz,ia,ila,desc_a,info,owned=.true.)
+!!$    call psi_idx_ins_cnv(nz,ja,jla,desc_a,info,mask=(ila(1:nz)>0))
     call psi_idx_cnv(nz,ia,ila,desc_a,info,owned=.true.)
-    call psi_idx_ins_cnv(nz,ja,jla,desc_a,info,mask=(ila(1:nz)>0))
-
+    call psb_cdins(nz,ja,desc_a,info,jla=jla,mask=(ila(1:nz)>0))
   else
     if (present(ila).or.present(jla)) then 
       write(0,*) 'Inconsistent call : ',present(ila),present(jla)
     endif
-    allocate(ila_(nz),jla_(nz),stat=info)
+    allocate(ila_(nz),stat=info)
     if (info /= 0) then 
       info = 4000
       call psb_errpush(info,name)
       goto 9999
     end if
     call psi_idx_cnv(nz,ia,ila_,desc_a,info,owned=.true.)
-    call psi_idx_ins_cnv(nz,ja,jla_,desc_a,info,mask=(ila_(1:nz)>0))
-    deallocate(ila_,jla_)
+    call psb_cdins(nz,ja,desc_a,info,mask=(ila_(1:nz)>0))
+    deallocate(ila_)
   end if
 
   call psb_erractionrestore(err_act)
@@ -153,5 +156,129 @@ subroutine psb_cdins(nz,ia,ja,desc_a,info,ila,jla)
   end if
   return
 
-end subroutine psb_cdins
+end subroutine psb_cdinsrc
+
+!
+! Subroutine: psb_cdinsc
+!   Takes as input a list of indices points and updates the descriptor accordingly.
+!   The optional argument mask may be used to control which indices are actually
+!   used. 
+! 
+! Arguments: 
+!    nz       - integer.                       The number of points to insert.
+!    ja(:)    - integer                        The column indices of the points.
+!    desc     - type(psb_desc_type).         The communication descriptor 
+!    info     - integer.                       Return code.
+!    jla(:)   - integer, optional              The col indices in local numbering
+!    mask(:)  - logical, optional, target
+!
+subroutine psb_cdinsc(nz,ja,desc,info,jla,mask)
+  
+  use psb_descriptor_type
+  use psb_serial_mod
+  use psb_const_mod
+  use psb_error_mod
+  use psb_penv_mod
+  use psi_mod
+  use psb_tools_mod, psb_protect_name => psb_cdinsc
+  implicit none
+
+  !....PARAMETERS...
+  Type(psb_desc_type), intent(inout) :: desc
+  Integer, intent(in)                :: nz,ja(:)
+  integer, intent(out)               :: info
+  integer, optional, intent(out)     :: jla(:)
+  logical, optional, target, intent(in) :: mask(:) 
+
+  !LOCALS.....
+
+  integer :: ictxt,dectype,mglob, nglob
+  integer                :: np, me
+  integer                :: nrow,ncol, err_act
+  logical, parameter     :: debug=.false.
+  integer, parameter     :: relocsz=200
+  integer, allocatable   :: ila_(:), jla_(:)
+  logical, allocatable, target  :: mask__(:) 
+  logical, pointer       :: mask_(:) 
+  character(len=20)      :: name
+
+  info = 0
+  name = 'psb_cdins'
+  call psb_erractionsave(err_act)
+
+  ictxt   = psb_cd_get_context(desc)
+  dectype = psb_cd_get_dectype(desc)
+  mglob   = psb_cd_get_global_rows(desc)
+  nglob   = psb_cd_get_global_cols(desc)
+  nrow    = psb_cd_get_local_rows(desc)
+  ncol    = psb_cd_get_local_cols(desc)
+
+  call psb_info(ictxt, me, np)
+
+  if (.not.psb_is_bld_desc(desc)) then 
+    info = 3110
+    call psb_errpush(info,name)
+    goto 9999
+  endif
+
+  if (nz < 0) then 
+    info = 1111
+    call psb_errpush(info,name)
+    goto 9999
+  end if
+  if (nz == 0) return 
+
+  if (size(ja) < nz) then 
+    info = 1111
+    call psb_errpush(info,name)
+    goto 9999
+  end if
+
+  if (present(jla)) then 
+    if (size(jla) < nz) then 
+      info = 1111
+      call psb_errpush(info,name)
+      goto 9999
+    end if
+  end if
+  if (present(mask)) then 
+    if (size(mask) < nz) then 
+      info = 1111
+      call psb_errpush(info,name)
+      goto 9999
+    end if
+    mask_ => mask
+  else
+    allocate(mask__(nz))
+    mask_ => mask__
+    mask_ = .true.
+  end if
+
+  if (present(jla)) then 
+    call psi_idx_ins_cnv(nz,ja,jla,desc,info,mask=mask_)
+  else
+    allocate(jla_(nz),stat=info)
+    if (info /= 0) then 
+      info = 4000
+      call psb_errpush(info,name)
+      goto 9999
+    end if
+    call psi_idx_ins_cnv(nz,ja,jla_,desc,info,mask=mask_)
+    deallocate(jla_)
+  end if
+
+  call psb_erractionrestore(err_act)
+  return
+
+9999 continue
+  call psb_erractionrestore(err_act)
+
+  if (err_act == psb_act_ret_) then
+    return
+  else
+    call psb_error(ictxt)
+  end if
+  return
+
+end subroutine psb_cdinsc
 

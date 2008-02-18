@@ -295,41 +295,22 @@ Module psb_tools_mod
     module procedure psb_cdasb
   end interface
 
-  interface psb_cdcpy
-    subroutine psb_cdcpy(desc_in, desc_out, info)
-      use psb_descriptor_type
-      type(psb_desc_type), intent(in)  :: desc_in
-      type(psb_desc_type), intent(out) :: desc_out
-      integer, intent(out)             :: info
-    end subroutine psb_cdcpy
-  end interface
-
-  interface psb_cdtransfer
-    subroutine psb_cdtransfer(desc_in, desc_out, info)
-      use psb_descriptor_type
-      type(psb_desc_type), intent(inout) :: desc_in
-      type(psb_desc_type), intent(inout)   :: desc_out
-      integer, intent(out)               :: info
-    end subroutine psb_cdtransfer
-  end interface
-
-
-  interface psb_cdfree
-    subroutine psb_cdfree(desc_a,info)
-      use psb_descriptor_type
-      type(psb_desc_type), intent(inout) :: desc_a
-      integer, intent(out)               :: info
-    end subroutine psb_cdfree
-  end interface
-
   interface psb_cdins
-    subroutine psb_cdins(nz,ia,ja,desc_a,info,ila,jla)
+    subroutine psb_cdinsrc(nz,ia,ja,desc_a,info,ila,jla)
       use psb_descriptor_type
       type(psb_desc_type), intent(inout) :: desc_a
       integer, intent(in)                :: nz,ia(:),ja(:)
       integer, intent(out)               :: info
       integer, optional, intent(out)     :: ila(:), jla(:)
-    end subroutine psb_cdins
+    end subroutine psb_cdinsrc
+    subroutine psb_cdinsc(nz,ja,desc,info,jla,mask)
+      use psb_descriptor_type
+      type(psb_desc_type), intent(inout) :: desc
+      integer, intent(in)                :: nz,ja(:)
+      integer, intent(out)               :: info
+      integer, optional, intent(out)     :: jla(:)
+      logical, optional, target, intent(in) :: mask(:)
+    end subroutine psb_cdinsc
   end interface
 
 
@@ -354,13 +335,23 @@ Module psb_tools_mod
       integer, intent(out)                    :: info
       integer, intent(in),optional            :: extype
     end Subroutine psb_zcdbldext
+    Subroutine psb_cd_lstext(desc_a,in_list,desc_ov,info, mask,extype)
+      use psb_descriptor_type
+      Implicit None
+      Type(psb_desc_type), Intent(in), target :: desc_a
+      integer, intent(in)                     :: in_list(:)
+      Type(psb_desc_type), Intent(out)        :: desc_ov
+      integer, intent(out)                    :: info
+      logical, intent(in), optional, target   :: mask(:)
+      integer, intent(in),optional            :: extype
+    end Subroutine psb_cd_lstext
   end interface
 
   interface psb_cdren
     subroutine psb_cdren(trans,iperm,desc_a,info)
       use psb_descriptor_type
-      type(psb_desc_type), intent(inout)    ::  desc_a
-      integer, intent(inout)                ::  iperm(:)
+      type(psb_desc_type), intent(inout)    :: desc_a
+      integer, intent(inout)                :: iperm(:)
       character, intent(in)                 :: trans
       integer, intent(out)                  :: info
     end subroutine psb_cdren
@@ -579,7 +570,7 @@ contains
 
   end subroutine psb_get_boundary
 
-  subroutine psb_cdall(ictxt, desc_a, info,mg,ng,parts,vg,vl,flag,nl,repl)
+  subroutine psb_cdall(ictxt, desc, info,mg,ng,parts,vg,vl,flag,nl,repl)
     use psb_descriptor_type
     use psb_serial_mod
     use psb_const_mod
@@ -591,36 +582,36 @@ contains
     integer, intent(in)               :: flag
     logical, intent(in)               :: repl
     integer, intent(out)              :: info
-    type(psb_desc_type), intent(out)  :: desc_a
+    type(psb_desc_type), intent(out)  :: desc
 
     optional :: mg,ng,parts,vg,vl,flag,nl,repl
 
     interface 
-      subroutine psb_cdals(m, n, parts, ictxt, desc_a, info)
+      subroutine psb_cdals(m, n, parts, ictxt, desc, info)
         use psb_descriptor_type
         include 'parts.fh'
         Integer, intent(in)                 :: m,n,ictxt
-        Type(psb_desc_type), intent(out)    :: desc_a
+        Type(psb_desc_type), intent(out)    :: desc
         integer, intent(out)                :: info
       end subroutine psb_cdals
-      subroutine psb_cdalv(v, ictxt, desc_a, info, flag)
+      subroutine psb_cdalv(v, ictxt, desc, info, flag)
         use psb_descriptor_type
         Integer, intent(in)               :: ictxt, v(:)
         integer, intent(in), optional     :: flag
         integer, intent(out)              :: info
-        Type(psb_desc_type), intent(out)  :: desc_a
+        Type(psb_desc_type), intent(out)  :: desc
       end subroutine psb_cdalv
-      subroutine psb_cd_inloc(v, ictxt, desc_a, info)
+      subroutine psb_cd_inloc(v, ictxt, desc, info)
         use psb_descriptor_type
         implicit None
         Integer, intent(in)               :: ictxt, v(:)
         integer, intent(out)              :: info
-        type(psb_desc_type), intent(out)  :: desc_a
+        type(psb_desc_type), intent(out)  :: desc
       end subroutine psb_cd_inloc
-      subroutine psb_cdrep(m, ictxt, desc_a,info)
+      subroutine psb_cdrep(m, ictxt, desc,info)
         use psb_descriptor_type
         Integer, intent(in)               :: m,ictxt
-        Type(psb_desc_type), intent(out)  :: desc_a
+        Type(psb_desc_type), intent(out)  :: desc
         integer, intent(out)              :: info
       end subroutine psb_cdrep
     end interface
@@ -630,7 +621,7 @@ contains
 
 
 
-    if(psb_get_errstatus() /= 0) return 
+    if (psb_get_errstatus() /= 0) return 
     info=0
     name = 'psb_cdall'
     call psb_erractionsave(err_act)
@@ -644,7 +635,7 @@ contains
       goto 999 
     endif
 
-    desc_a%base_desc => null() 
+    desc%base_desc => null() 
 
     if (present(parts)) then 
       if (.not.present(mg)) then 
@@ -657,7 +648,7 @@ contains
       else
         n_ = mg 
       endif
-      call  psb_cdals(mg, n_, parts, ictxt, desc_a, info)
+      call  psb_cdals(mg, n_, parts, ictxt, desc, info)
 
     else if (present(repl)) then 
       if (.not.present(mg)) then 
@@ -670,7 +661,7 @@ contains
         call psb_errpush(info,name)
         goto 999 
       end if
-      call  psb_cdrep(mg, ictxt, desc_a, info)
+      call  psb_cdrep(mg, ictxt, desc, info)
 
     else if (present(vg)) then 
       if (present(flag)) then 
@@ -678,10 +669,10 @@ contains
       else
         flag_=0
       endif
-      call psb_cdalv(vg, ictxt, desc_a, info, flag=flag_)
+      call psb_cdalv(vg, ictxt, desc, info, flag=flag_)
 
     else if (present(vl)) then 
-      call psb_cd_inloc(vl,ictxt,desc_a,info)
+      call psb_cd_inloc(vl,ictxt,desc,info)
 
     else if (present(nl)) then 
       allocate(itmpsz(0:np-1),stat=info)
@@ -698,10 +689,12 @@ contains
       do i=0, me-1
         nlp = nlp + itmpsz(i)
       end do
-      call psb_cd_inloc((/(i,i=nlp+1,nlp+nl)/),ictxt,desc_a,info)
+      call psb_cd_inloc((/(i,i=nlp+1,nlp+nl)/),ictxt,desc,info)
 
     endif
+
     if (info /= 0) goto 999
+
     call psb_erractionrestore(err_act)
     return
 
@@ -716,22 +709,22 @@ contains
 
   end subroutine psb_cdall
 
-  subroutine psb_cdasb(desc_a,info)
+  subroutine psb_cdasb(desc,info)
     use psb_descriptor_type
 
     interface 
-      subroutine psb_icdasb(desc_a,info,ext_hv)
+      subroutine psb_icdasb(desc,info,ext_hv)
         use psb_descriptor_type
-        Type(psb_desc_type), intent(inout) :: desc_a
+        Type(psb_desc_type), intent(inout) :: desc
         integer, intent(out)               :: info
         logical, intent(in),optional       :: ext_hv
       end subroutine psb_icdasb
     end interface
 
-    Type(psb_desc_type), intent(inout) :: desc_a
+    Type(psb_desc_type), intent(inout) :: desc
     integer, intent(out)               :: info
 
-    call psb_icdasb(desc_a,info,ext_hv=.false.)
+    call psb_icdasb(desc,info,ext_hv=.false.)
   end subroutine psb_cdasb
 
 

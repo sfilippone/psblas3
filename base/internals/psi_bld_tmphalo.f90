@@ -91,7 +91,7 @@ subroutine psi_bld_tmphalo(desc,info)
   ! Here we do not know yet who owns what, so we have 
   ! to call fnd_owner.
   nh = (n_col-n_row)
-  if (nh > 0) then 
+  if (nh >= 0) then 
     Allocate(helem(nh),stat=info)
     if (info /= 0) then 
       call psb_errpush(4010,name,a_err='Allocate')

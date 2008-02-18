@@ -476,7 +476,8 @@ contains
 
 
     ! first the halo index
-    if (debug_level>0) write(debug_unit,*) me,'Calling crea_index on halo'
+    if (debug_level>0) write(debug_unit,*) me,'Calling crea_index on halo',&
+         & size(halo_in)
     call psi_crea_index(cdesc,halo_in, idx_out,.false.,nxch,nsnd,nrcv,info)
     if (info /= 0) then
       call psb_errpush(4010,name,a_err='psi_crea_index')

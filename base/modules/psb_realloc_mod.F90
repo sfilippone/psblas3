@@ -102,7 +102,10 @@ Contains
     name='psb_safe_ab_cpy'
     call psb_erractionsave(err_act)
 
-    if(psb_get_errstatus() /= 0) return 
+    if(psb_get_errstatus() /= 0) then 
+      info = 4010
+      goto 9999
+    end if
     info = 0
     if (allocated(vin)) then 
       isz = size(vin)
@@ -149,7 +152,10 @@ Contains
     name='psb_safe_ab_cpy'
     call psb_erractionsave(err_act)
 
-    if(psb_get_errstatus() /= 0) return 
+    if(psb_get_errstatus() /= 0) then 
+      info = 4010
+      goto 9999
+    end if
     info = 0
     if (allocated(vin)) then 
       isz1 = size(vin,1)
@@ -198,7 +204,10 @@ Contains
     name='psb_safe_ab_cpy'
     call psb_erractionsave(err_act)
 
-    if(psb_get_errstatus() /= 0) return 
+    if(psb_get_errstatus() /= 0) then 
+      info = 4010
+      goto 9999
+    end if
     info = 0
     if (allocated(vin)) then 
       isz = size(vin)
@@ -245,7 +254,10 @@ Contains
     name='psb_safe_ab_cpy'
     call psb_erractionsave(err_act)
 
-    if(psb_get_errstatus() /= 0) return 
+    if(psb_get_errstatus() /= 0) then 
+      info = 4010
+      goto 9999
+    end if
     info = 0
     if (allocated(vin)) then 
       isz1 = size(vin,1)
@@ -294,7 +306,10 @@ Contains
     name='psb_safe_ab_cpy'
     call psb_erractionsave(err_act)
 
-    if(psb_get_errstatus() /= 0) return 
+    if(psb_get_errstatus() /= 0) then 
+      info = 4010
+      goto 9999
+    end if
     info = 0
     if (allocated(vin)) then 
       isz = size(vin)
@@ -341,7 +356,10 @@ Contains
     name='psb_safe_ab_cpy'
     call psb_erractionsave(err_act)
 
-    if(psb_get_errstatus() /= 0) return 
+    if(psb_get_errstatus() /= 0) then 
+      info = 4010
+      goto 9999
+    end if
     info = 0
     if (allocated(vin)) then 
       isz1 = size(vin,1)
@@ -391,7 +409,10 @@ Contains
     name='psb_safe_cpy'
     call psb_erractionsave(err_act)
 
-    if(psb_get_errstatus() /= 0) return 
+    if(psb_get_errstatus() /= 0) then 
+      info = 4010
+      goto 9999
+    end if
     info = 0
     isz = size(vin)
     lb  = lbound(vin,1)
@@ -436,7 +457,10 @@ Contains
     name='psb_safe_cpy'
     call psb_erractionsave(err_act)
 
-    if(psb_get_errstatus() /= 0) return 
+    if(psb_get_errstatus() /= 0) then 
+      info = 4010
+      goto 9999
+    end if
     info = 0
     isz1 = size(vin,1)
     isz2 = size(vin,2)
@@ -483,7 +507,10 @@ Contains
     name='psb_safe_cpy'
     call psb_erractionsave(err_act)
 
-    if(psb_get_errstatus() /= 0) return 
+    if(psb_get_errstatus() /= 0) then 
+      info = 4010
+      goto 9999
+    end if
     info = 0
     isz = size(vin)
     lb  = lbound(vin,1)
@@ -528,7 +555,11 @@ Contains
     name='psb_safe_cpy'
     call psb_erractionsave(err_act)
 
-    if(psb_get_errstatus() /= 0) return 
+    if(psb_get_errstatus() /= 0) then 
+      info = 4010
+      goto 9999
+    end if
+
     info = 0
     isz1 = size(vin,1)
     isz2 = size(vin,2)
@@ -575,7 +606,10 @@ Contains
     name='psb_safe_cpy'
     call psb_erractionsave(err_act)
 
-    if(psb_get_errstatus() /= 0) return 
+    if(psb_get_errstatus() /= 0) then 
+      info = 4010
+      goto 9999
+    end if
     info = 0
     isz = size(vin)
     lb  = lbound(vin,1)
@@ -620,7 +654,10 @@ Contains
     name='psb_safe_cpy'
     call psb_erractionsave(err_act)
 
-    if(psb_get_errstatus() /= 0) return 
+    if(psb_get_errstatus() /= 0) then 
+      info = 4010
+      goto 9999
+    end if
     info = 0
     isz1 = size(vin,1)
     isz2 = size(vin,2)
@@ -757,7 +794,10 @@ Contains
     name='psb_ensure_size'
     call psb_erractionsave(err_act)
 
-    if(psb_get_errstatus() /= 0) return 
+    if(psb_get_errstatus() /= 0) then 
+      info = 4010
+      goto 9999
+    end if
     info=0
     
     If (len > psb_size(v)) Then
@@ -813,7 +853,10 @@ Contains
     name='psb_ensure_size'
     call psb_erractionsave(err_act)
 
-    if(psb_get_errstatus() /= 0) return 
+    if(psb_get_errstatus() /= 0) then 
+      info = 4010
+      goto 9999
+    end if
     info=0
     
     If (len > psb_size(v)) Then
@@ -869,7 +912,10 @@ Contains
     name='psb_ensure_size'
     call psb_erractionsave(err_act)
 
-    if(psb_get_errstatus() /= 0) return 
+    if(psb_get_errstatus() /= 0) then 
+      info = 4010
+      goto 9999
+    end if
     info=0
     
     If (len > psb_size(v)) Then
@@ -926,7 +972,10 @@ Contains
     call psb_erractionsave(err_act)
 
     if (debug) write(0,*) 'reallocate I',len
-    if (psb_get_errstatus() /= 0) return 
+    if(psb_get_errstatus() /= 0) then 
+      info = 4010
+      goto 9999
+    end if
     info=0
     if (present(lb)) then
       lb_ = lb
@@ -1424,7 +1473,10 @@ Contains
     name='psb_dreallocate2i'
     call psb_erractionsave(err_act)
 
-    if(psb_get_errstatus() /= 0) return 
+    if(psb_get_errstatus() /= 0) then 
+      info = 4010
+      goto 9999
+    end if
     info=0
     call psb_dreallocate1i(len,rrax,info,pad=pad)
     if (info /= 0) then

@@ -1,7 +1,6 @@
 !!$ 
-!!$              Parallel Sparse BLAS  version 2.2
-!!$    (C) Copyright 2006/2007/2008
-!!$                       Salvatore Filippone    University of Rome Tor Vergata
+!!$              Parallel Sparse BLAS  v2.0
+!!$    (C) Copyright 2006 Salvatore Filippone    University of Rome Tor Vergata
 !!$                       Alfredo Buttari        University of Rome Tor Vergata
 !!$ 
 !!$  Redistribution and use in source and binary forms, with or without
@@ -31,9 +30,9 @@
 !!$  
 !
 !
-! File: psi_desc_index.f90
+! File: psi_inter_desc_index.f90
 !
-! Subroutine: psi_desc_index
+! Subroutine: psi_inter_desc_index
 !    Converts a list of data exchanges from build format to assembled format. 
 !    See below for a description of the formats.
 !
@@ -98,7 +97,7 @@
 !     is rebuilt during the CDASB process (in the psi_ldsc_pre_halo subroutine). 
 !
 !
-subroutine psi_desc_index(desc,index_in,dep_list,&
+subroutine psi_inter_desc_index(desc,index_in,dep_list,&
      & length_dl,nsnd,nrcv,desc_index,isglob_in,info)
   use psb_descriptor_type
   use psb_realloc_mod
@@ -108,7 +107,7 @@ subroutine psi_desc_index(desc,index_in,dep_list,&
   use mpi
 #endif
   use psb_penv_mod
-  use psi_mod, psb_protect_name => psi_desc_index
+  use psi_mod, psb_protect_name => psi_inter_desc_index
   implicit none
 #ifdef MPI_H
   include 'mpif.h'
@@ -137,7 +136,7 @@ subroutine psi_desc_index(desc,index_in,dep_list,&
   character(len=20) :: name
 
   info = 0
-  name='psi_desc_index'
+  name='psi_inter_desc_index'
   call psb_erractionsave(err_act)
   debug_unit  = psb_get_debug_unit()
   debug_level = psb_get_debug_level()
@@ -205,8 +204,7 @@ subroutine psi_desc_index(desc,index_in,dep_list,&
   nrcv = iszs  
 
   if ((iszs /= idxs).or.(iszr /= idxr)) then 
-    write(0,*) me, trim(name),': Warning: strange results?', &
-         & iszs,idxs,iszr,idxr
+    write(0,*) 'strange results?', iszs,idxs,iszr,idxr
   end if
   if (debug_level >= psb_debug_inner_) then 
     write(debug_unit,*) me,' ',trim(name),': computed sizes ',iszr,iszs
@@ -214,12 +212,15 @@ subroutine psi_desc_index(desc,index_in,dep_list,&
   endif
 
   ntot = (3*(count((sdsz>0).or.(rvsz>0)))+ iszs + iszr) + 1
-
-  if (ntot > psb_size(desc_index)) then 
-    call psb_realloc(ntot,desc_index,info) 
+  if (allocated(desc_index)) then 
+    nidx = size(desc_index)
+  else
+    nidx = 0 
   endif
-!!$  call psb_ensure_size(ntot,desc_index,info)
 
+  if (nidx < ntot) then 
+    call psb_realloc(ntot,desc_index,info)
+  endif
   if (info /= 0) then 
     call psb_errpush(4010,name,a_err='psb_realloc')
     goto 9999
@@ -242,7 +243,7 @@ subroutine psi_desc_index(desc,index_in,dep_list,&
   i = 1
   do 
     if (i > ihinsz) then 
-!!$      write(0,*) me,' did not find index_in end??? ',i,ihinsz
+      write(0,*) me,' did not find index_in end??? ',i,ihinsz
       exit
     end if
     if (index_in(i) == -1) exit
@@ -334,4 +335,4 @@ subroutine psi_desc_index(desc,index_in,dep_list,&
     return
   end if
   return
-end subroutine psi_desc_index
+end subroutine psi_inter_desc_index

@@ -29,7 +29,7 @@
 !!$  POSSIBILITY OF SUCH DAMAGE.
 !!$ 
 !!$  
-subroutine psb_cdrep(m, ictxt, desc_a, info)
+subroutine psb_cdrep(m, ictxt, desc, info)
 
   !  Purpose
   !  =======
@@ -49,8 +49,8 @@ subroutine psb_cdrep(m, ictxt, desc_a, info)
   !
   ! OUTPUT
   !=========
-  ! desc_a   : TYPEDESC
-  ! desc_a OUTPUT FIELDS:
+  ! desc   : TYPEDESC
+  ! desc OUTPUT FIELDS:
   !
   ! MATRIX_DATA   : Pointer to integer Array 
   !                contains some
@@ -100,7 +100,7 @@ subroutine psb_cdrep(m, ictxt, desc_a, info)
   !                  List is terminated with -1.
   !                  
   !
-  ! END OF desc_a OUTPUT FIELDS
+  ! END OF desc OUTPUT FIELDS
   !
   !
 
@@ -114,7 +114,7 @@ subroutine psb_cdrep(m, ictxt, desc_a, info)
   !....Parameters...
   Integer, intent(in)               :: m,ictxt
   integer, intent(out)              :: info
-  Type(psb_desc_type), intent(out)  :: desc_a
+  Type(psb_desc_type), intent(out)  :: desc
 
   !locals
   Integer             :: i,np,me,err,n,err_act
@@ -174,14 +174,14 @@ subroutine psb_cdrep(m, ictxt, desc_a, info)
   end if
 
 
-  call psb_nullify_desc(desc_a)
+  call psb_nullify_desc(desc)
 
 
   !count local rows number
   ! allocate work vector
-  allocate(desc_a%glob_to_loc(m),desc_a%matrix_data(psb_mdata_size_),&
-       &   desc_a%loc_to_glob(m),desc_a%lprm(1),&
-       &   desc_a%ovrlap_elem(0,3),stat=info)
+  allocate(desc%glob_to_loc(m),desc%matrix_data(psb_mdata_size_),&
+       &   desc%loc_to_glob(m),desc%lprm(1),&
+       &   desc%ovrlap_elem(0,3),stat=info)
   if (info /= 0) then     
     info=4025
     int_err(1)=2*m+psb_mdata_size_+1
@@ -190,34 +190,34 @@ subroutine psb_cdrep(m, ictxt, desc_a, info)
   endif
   ! If the index space is replicated there's no point in not having 
   ! the full map on the current process. 
-  desc_a%matrix_data(psb_desc_size_) = psb_desc_normal_
+  desc%matrix_data(psb_desc_size_) = psb_desc_normal_
   
 
-  desc_a%matrix_data(psb_m_)        = m
-  desc_a%matrix_data(psb_n_)        = n
-  desc_a%matrix_data(psb_n_row_)    = m
-  desc_a%matrix_data(psb_n_col_)    = n
-  desc_a%matrix_data(psb_ctxt_)     = ictxt
-  call psb_get_mpicomm(ictxt,desc_a%matrix_data(psb_mpi_c_))
-  desc_a%matrix_data(psb_dec_type_) = psb_desc_bld_
+  desc%matrix_data(psb_m_)        = m
+  desc%matrix_data(psb_n_)        = n
+  desc%matrix_data(psb_n_row_)    = m
+  desc%matrix_data(psb_n_col_)    = n
+  desc%matrix_data(psb_ctxt_)     = ictxt
+  call psb_get_mpicomm(ictxt,desc%matrix_data(psb_mpi_c_))
+  desc%matrix_data(psb_dec_type_) = psb_desc_bld_
 
   do i=1,m
-    desc_a%glob_to_loc(i) = i
-    desc_a%loc_to_glob(i) = i
+    desc%glob_to_loc(i) = i
+    desc%loc_to_glob(i) = i
   enddo
 
   tovr  = -1 
   thalo = -1
   text  = -1
-  desc_a%lprm(:)         = 0
+  desc%lprm(:)         = 0
 
-  call psi_cnv_dsc(thalo,tovr,text,desc_a,info)
+  call psi_cnv_dsc(thalo,tovr,text,desc,info)
   if (info /= 0) then
     call psb_errpush(4010,name,a_err='psi_cvn_dsc')
     goto 9999
   end if
   
-  desc_a%matrix_data(psb_dec_type_) = psb_desc_repl_
+  desc%matrix_data(psb_dec_type_) = psb_desc_repl_
 
   if (debug_level >= psb_debug_ext_) &
        & write(debug_unit,*) me,' ',trim(name),': end'

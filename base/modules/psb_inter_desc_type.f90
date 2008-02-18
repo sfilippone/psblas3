@@ -65,7 +65,8 @@ module psb_inter_descriptor_type
   type psb_inter_desc_type 
     integer, allocatable :: itd_data(:)
     type(psb_desc_type), pointer :: desc_1=>null(), desc_2=>null()
-    integer, allocatable :: exch_fw_idx(:), exch_bk_idx(:)        
+    integer, allocatable :: exch_fw_idx(:), exch_bk_idx(:)
+    type(psb_desc_type)  :: desc_ext_1, desc_ext_2
     type(psb_d_map_type) :: dmap
     type(psb_z_map_type) :: zmap
   end type psb_inter_desc_type
@@ -245,12 +246,14 @@ contains
     if (allocated(desc%itd_data))    val = val + 4*size(desc%itd_data)
     if (allocated(desc%exch_fw_idx)) val = val + 4*size(desc%exch_fw_idx)
     if (allocated(desc%exch_bk_idx)) val = val + 4*size(desc%exch_bk_idx)
+    val = val + psb_sizeof(desc%desc_ext_1)
+    val = val + psb_sizeof(desc%desc_ext_2)
     val = val + psb_sizeof(desc%dmap)
     val = val + psb_sizeof(desc%zmap)
     psb_itd_sizeof = val 
   end function psb_itd_sizeof
   
-  function psb_d_inter_desc(map_kind,desc1, desc2, map_fw, map_bk, idx_fw, idx_bk)
+  function psb_d_inter_desc(map_kind,desc1,desc2,map_fw,map_bk,idx_fw,idx_bk)
     use psb_serial_mod
     use psi_mod
     implicit none 
@@ -313,7 +316,7 @@ contains
     case (psb_map_aggr_)
       ! OK
     case default
-      write(0,*) 'Bad mapp kind into psb_inter_desc ',map_kind
+      write(0,*) 'Bad map kind into psb_inter_desc ',map_kind
       info = 1
     end select    
     
@@ -409,7 +412,7 @@ contains
     case (psb_map_aggr_)
       ! OK
     case default
-      write(0,*) 'Bad mapp kind into psb_inter_desc ',map_kind
+      write(0,*) 'Bad map kind into psb_inter_desc ',map_kind
       info = 1
     end select    
     
@@ -487,8 +490,18 @@ contains
 
     select case(map_kind)
     case(psb_map_aggr_)
-      ! Ok, we just need to call a halo update and a matrix-vector product. 
+      ! Ok, we just need to call a halo update on the base desc
+      ! and a matrix-vector product. 
       call psb_halo(x,desc%desc_1,info,work=work)
+      if (info == 0) call psb_csmm(alpha,desc%dmap%map_fw,x,beta,y,info)
+        
+      if (info /= 0) then 
+        write(0,*) trim(name),' Error from inner routines',info
+        info = -1
+      end if
+
+    case(psb_map_gen_linear_)
+      call psb_halo(x,desc%desc_ext_1,info,work=work)
       if (info == 0) call psb_csmm(alpha,desc%dmap%map_fw,x,beta,y,info)
         
       if (info /= 0) then 
@@ -557,6 +570,15 @@ contains
         info = -1
       end if
       
+
+    case(psb_map_gen_linear_)
+      call psb_halo(x,desc%desc_ext_2,info,work=work)
+      if (info == 0) call psb_csmm(alpha,desc%dmap%map_bk,x,beta,y,info)
+        
+      if (info /= 0) then 
+        write(0,*) trim(name),' Error from inner routines',info
+        info = -1
+      end if
       
     case default
       write(0,*) trim(name),' Invalid descriptor inupt'
@@ -618,6 +640,14 @@ contains
         info = -1
       end if
       
+    case(psb_map_gen_linear_)
+      call psb_halo(x,desc%desc_ext_1,info,work=work)
+      if (info == 0) call psb_csmm(alpha,desc%zmap%map_fw,x,beta,y,info)
+        
+      if (info /= 0) then 
+        write(0,*) trim(name),' Error from inner routines',info
+        info = -1
+      end if
       
     case default
       write(0,*) trim(name),' Invalid descriptor inupt'
@@ -679,6 +709,15 @@ contains
         info = -1
       end if
       
+
+    case(psb_map_gen_linear_)
+      call psb_halo(x,desc%desc_ext_2,info,work=work)
+      if (info == 0) call psb_csmm(alpha,desc%zmap%map_bk,x,beta,y,info)
+        
+      if (info /= 0) then 
+        write(0,*) trim(name),' Error from inner routines',info
+        info = -1
+      end if
       
     case default
       write(0,*) trim(name),' Invalid descriptor inupt'

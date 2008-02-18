@@ -435,11 +435,12 @@ contains
     INFO  = 0
     call psb_nullify_sp(a)
     nnz = 2*max(1,m,k)
-    if (debug) write(0,*) 'SPALL : NNZ ',nnz,a%m,a%k
     a%m=max(0,m)
     a%k=max(0,k)
+    if (debug) write(0,*) 'SPALL : NNZ ',nnz,a%m,a%k
     call psb_sp_reall(a,nnz,info)
-
+    if (debug) write(0,*) 'Check in ALLOCATE ',info,allocated(a%pl),allocated(a%pr)
+    if (info /= 0) return
     a%pl(:)=0
     a%pr(:)=0
     ! set INFOA fields

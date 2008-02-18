@@ -40,10 +40,10 @@
 ! Arguments: 
 !    v       - integer, dimension(:).         The array containg the partitioning scheme.
 !    ictxt - integer.                         The communication context.
-!    desc_a  - type(psb_desc_type).         The communication descriptor.
+!    desc  - type(psb_desc_type).         The communication descriptor.
 !    info    - integer.                       Return code
 !    flag    - integer.                       Are V's contents 0- or 1-based?
-subroutine psb_cdalv(v, ictxt, desc_a, info, flag)
+subroutine psb_cdalv(v, ictxt, desc, info, flag)
   use psb_descriptor_type
   use psb_serial_mod
   use psb_const_mod
@@ -55,7 +55,7 @@ subroutine psb_cdalv(v, ictxt, desc_a, info, flag)
   Integer, intent(in)               :: ictxt, v(:)
   integer, intent(in), optional     :: flag
   integer, intent(out)              :: info
-  type(psb_desc_type), intent(out)  :: desc_a
+  type(psb_desc_type), intent(out)  :: desc
 
   !locals
   Integer             :: counter,i,j,np,me,loc_row,err,&
@@ -120,7 +120,7 @@ subroutine psb_cdalv(v, ictxt, desc_a, info, flag)
     call psb_cd_set_large_threshold(exch(3))
   endif
 
-  call psb_nullify_desc(desc_a)
+  call psb_nullify_desc(desc)
 
   if (present(flag)) then
     flag_=flag
@@ -138,13 +138,13 @@ subroutine psb_cdalv(v, ictxt, desc_a, info, flag)
   !count local rows number
   ! allocate work vector
   if (psb_cd_choose_large_state(ictxt,m)) then 
-    allocate(desc_a%matrix_data(psb_mdata_size_),&
+    allocate(desc%matrix_data(psb_mdata_size_),&
          &temp_ovrlap(m),stat=info)
-    desc_a%matrix_data(psb_desc_size_) = psb_desc_large_
+    desc%matrix_data(psb_desc_size_) = psb_desc_large_
   else
-    allocate(desc_a%glob_to_loc(m),desc_a%matrix_data(psb_mdata_size_),&
+    allocate(desc%glob_to_loc(m),desc%matrix_data(psb_mdata_size_),&
          &temp_ovrlap(m),stat=info)
-    desc_a%matrix_data(psb_desc_size_) = psb_desc_normal_
+    desc%matrix_data(psb_desc_size_) = psb_desc_normal_
   end if
   if (info /= 0) then     
     info=4025
@@ -153,11 +153,11 @@ subroutine psb_cdalv(v, ictxt, desc_a, info, flag)
     goto 9999
   endif
 
-  desc_a%matrix_data(psb_m_)        = m
-  desc_a%matrix_data(psb_n_)        = n
+  desc%matrix_data(psb_m_)        = m
+  desc%matrix_data(psb_n_)        = n
   ! This has to be set BEFORE any call to SET_BLD
-  desc_a%matrix_data(psb_ctxt_)     = ictxt
-  call psb_get_mpicomm(ictxt,desc_a%matrix_data(psb_mpi_c_))
+  desc%matrix_data(psb_ctxt_)     = ictxt
+  call psb_get_mpicomm(ictxt,desc%matrix_data(psb_mpi_c_))
 
   if (debug_level >= psb_debug_ext_) &
        & write(debug_unit,*) me,' ',trim(name),':  starting main loop' ,info
@@ -211,9 +211,9 @@ subroutine psb_cdalv(v, ictxt, desc_a, info, flag)
     ! estimate local cols number 
     loc_col = min(2*loc_row,m)
 
-    allocate(desc_a%loc_to_glob(loc_col), desc_a%lprm(1),&
-         & desc_a%ptree(2),stat=info)  
-    if (info == 0) call InitPairSearchTree(desc_a%ptree,info)
+    allocate(desc%loc_to_glob(loc_col), desc%lprm(1),&
+         & desc%ptree(2),stat=info)  
+    if (info == 0) call InitPairSearchTree(desc%ptree,info)
     if (info /= 0) then
       info=4025
       int_err(1)=loc_col
@@ -222,14 +222,14 @@ subroutine psb_cdalv(v, ictxt, desc_a, info, flag)
     end if
 
     ! set LOC_TO_GLOB array to all "-1" values
-    desc_a%lprm(1) = 0
-    desc_a%loc_to_glob(:) = -1
+    desc%lprm(1) = 0
+    desc%loc_to_glob(:) = -1
     k = 0
     do i=1,m
       if ((v(i)-flag_) == me) then
         k = k + 1 
-        desc_a%loc_to_glob(k) = i
-        call SearchInsKeyVal(desc_a%ptree,i,k,glx,info)
+        desc%loc_to_glob(k) = i
+        call SearchInsKeyVal(desc%ptree,i,k,glx,info)
       endif
     enddo
 
@@ -258,9 +258,9 @@ subroutine psb_cdalv(v, ictxt, desc_a, info, flag)
       if ((v(i)-flag_) == me) then
         ! this point belongs to me
         counter=counter+1
-        desc_a%glob_to_loc(i) = counter
+        desc%glob_to_loc(i) = counter
       else
-        desc_a%glob_to_loc(i) = -(np+(v(i)-flag_)+1)
+        desc%glob_to_loc(i) = -(np+(v(i)-flag_)+1)
       end if
     enddo
 
@@ -280,8 +280,8 @@ subroutine psb_cdalv(v, ictxt, desc_a, info, flag)
     ! estimate local cols number 
     loc_col = min(2*loc_row,m)
 
-    allocate(desc_a%loc_to_glob(loc_col),&
-         &desc_a%lprm(1),stat=info)  
+    allocate(desc%loc_to_glob(loc_col),&
+         &desc%lprm(1),stat=info)  
     if (info /= 0) then
       info=4025
       int_err(1)=loc_col
@@ -290,18 +290,18 @@ subroutine psb_cdalv(v, ictxt, desc_a, info, flag)
     end if
 
     ! set LOC_TO_GLOB array to all "-1" values
-    desc_a%lprm(1) = 0
-    desc_a%loc_to_glob(:) = -1
+    desc%lprm(1) = 0
+    desc%loc_to_glob(:) = -1
     do i=1,m
-      k = desc_a%glob_to_loc(i) 
+      k = desc%glob_to_loc(i) 
       if (k > 0) then 
-        desc_a%loc_to_glob(k) = i
+        desc%loc_to_glob(k) = i
       endif
     enddo
 
   end if
   
-  call psi_bld_tmpovrl(temp_ovrlap,desc_a,info)
+  call psi_bld_tmpovrl(temp_ovrlap,desc,info)
 
   deallocate(temp_ovrlap,stat=info)
   if (info /= 0) then 
@@ -310,27 +310,27 @@ subroutine psb_cdalv(v, ictxt, desc_a, info, flag)
     goto 9999
   endif
 
-  ! set fields in desc_a%MATRIX_DATA....
-  desc_a%matrix_data(psb_n_row_)  = loc_row
-  desc_a%matrix_data(psb_n_col_)  = loc_row
-  call psb_cd_set_bld(desc_a,info)
+  ! set fields in desc%MATRIX_DATA....
+  desc%matrix_data(psb_n_row_)  = loc_row
+  desc%matrix_data(psb_n_col_)  = loc_row
 
-  call psb_realloc(1,desc_a%halo_index, info)
+  call psb_realloc(1,desc%halo_index, info)
   if (info /= psb_no_err_) then
     info=4010
     call psb_errpush(err,name,a_err='psb_realloc')
     Goto 9999
   end if
-  desc_a%halo_index(:) = -1
+  desc%halo_index(:) = -1
 
-  call psb_realloc(1,desc_a%ext_index, info)
+  call psb_realloc(1,desc%ext_index, info)
   if (info /= psb_no_err_) then
     info=4010
     call psb_errpush(err,name,a_err='psb_realloc')
     Goto 9999
   end if
-  desc_a%ext_index(:) = -1
+  desc%ext_index(:) = -1
 
+  call psb_cd_set_bld(desc,info)
 
   if (debug_level >= psb_debug_ext_) &
        & write(debug_unit,*) me,' ',trim(name),': end'
