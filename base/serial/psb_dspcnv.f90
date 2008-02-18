@@ -405,7 +405,7 @@ subroutine psb_dspcnv1(a, info, afmt, upd, dupl)
   integer               :: err_act
   integer               :: spstate
   integer               :: upd_, dupl_
-  integer              :: debug_level, debug_unit
+  integer               :: debug_level, debug_unit
   character(len=20)     :: name, ch_err
 
   info = 0

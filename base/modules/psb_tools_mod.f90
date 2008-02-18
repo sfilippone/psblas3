@@ -430,6 +430,16 @@ Module psb_tools_mod
       integer, intent(out)                 :: info
       logical, intent(in), optional        :: rebuild
     end subroutine psb_dspins
+    subroutine psb_dspins_2desc(nz,ia,ja,val,a,desc_ar,desc_ac,info)
+      use psb_descriptor_type
+      use psb_spmat_type
+      type(psb_desc_type), intent(in)      :: desc_ar
+      type(psb_desc_type), intent(inout)   :: desc_ac
+      type(psb_dspmat_type), intent(inout) :: a
+      integer, intent(in)                  :: nz,ia(:),ja(:)
+      real(kind(1.d0)), intent(in)         :: val(:)
+      integer, intent(out)                 :: info
+    end subroutine psb_dspins_2desc
     subroutine psb_zspins(nz,ia,ja,val,a,desc_a,info,rebuild)
       use psb_descriptor_type
       use psb_spmat_type

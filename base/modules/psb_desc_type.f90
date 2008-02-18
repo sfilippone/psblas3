@@ -352,6 +352,9 @@ module psb_descriptor_type
 !!$    end subroutine psb_cdtransfer
   end interface
 
+  interface psb_cd_reinit
+    module procedure psb_cd_reinit
+  end interface
 
   interface psb_cdfree
     module procedure psb_cdfree
