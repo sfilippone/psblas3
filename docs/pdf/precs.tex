@@ -75,77 +75,7 @@ $ptype$ string as follows\footnote{The string is case-insensitive}:
   by the data allocation boundaries for each process; requires no
   communication. Only the incomplete factorization $ILU(0)$ is
   currently implemented.  
-%% \item[AS] Additive Schwarz preconditioner (see~\cite{PARA04}); in this
-%%   case the user may specify additional flags through the integer
-%%   vector \verb|ir| as follows:
-%% \begin{description}
-%% \item[$iv(1)$] Number of overlap levels, an integer $novr>=0$, default
-%%   $novr=1$.  
-%% \item[$iv(2)$] Restriction operator, legal values: \verb|psb_halo_|,
-%%   \verb|psb_none_|; default: \verb|psb_halo_|
-%% \item[$iv(3)$] Prolongation operator, legal values: \verb|psb_none_|,
-%%   \verb|psb_sum_|, \verb|psb_avg_|, default: \verb|psb_none_|
-%% \item[$iv(4)$] Factorization type, legal values: \verb|f_ilu_n_|,
-%%   \verb|f_slu_|, \verb|f_umf_|, default: \verb|f_ilu_n_|.
-%% \end{description}
-%% Note that the default corresponds to a Restricted Additive Schwarz
-%% preconditioner with $ILU(0)$ and 1 level of overlap.
-%% \item[2L] Second level of a multilevel preconditioner, see below
-%% \end{description}
-%% If a multilevel preconditioner is desired, the user should call
-%% \verb|psb_precset| twice, the first time  choosing an AS variant, and
-%% a second time specifying 
-%% $ptype=2L$ with the following optional parameters in $iv$ (see
-%% also~\cite{APNUM06,DD2}): 
-%% \begin{description}
-%% \item[$iv(1)$] Type of multilevel correction, legal values: \verb|no_ml_|,
-%%   \verb|add_ml_prec_|, \verb|mult_ml_prec_|,
-%%   default: \verb|mult_ml_prec_|;
-%% \item[$iv(2)$] Aggregation algorithm, legal values: \verb|loc_aggr_|;
-%% \item[$iv(3)$] Smoother type, legal values: \verb|no_smth_|,
-%%   \verb|smth_omg_|, default: \verb|smth_omg_|;
-%% \item[$iv(4)$] Coarse matrix allocation, legal values:
-%%   \verb|mat_distr_|, \verb|mat_repl_|, default: \verb|mat_distr_|
-%% \item[$iv(5)$] Smoother position, legal values: \verb|pre_smooth_|,
-%%   \verb|post_smooth_|, \verb|smooth_both_|, default:
-%%   \verb|post_smooth_|
-%% \item[$iv(6)$] Factorization type (for coarse matrix), legal values: \verb|f_ilu_n_|,
-%%   \verb|f_slu_|, \verb|f_umf_|, default: \verb|f_ilu_n_|;
-%% \item[$iv(7)$] Number of Jacobi sweeps for coarse system correction,
-%%   default 1.
-%% \item[$rs$] Set the smoother parameter $\omega$ a user defined value;
-%%   default: esitimate with the infinity norm of matrix $A$.
 \end{description}
-%% The 2-level preconditioners are based on the idea of building a
-%% coarse-space approximation $A_C$ of the matrix $A$; given a set $W_C$
-%% of coarse vertices, with size $n_C$, and a suitable restriction
-%% operator $R_C \in \Re^{n_C \times n}$, $A_C$ is defined as 
-%% \[
-%% A_C=R_C A R_C^T .
-%% \]
-%% The prolongator $R_C^T$ is built with the smoothed aggregation technique,
-%% in which we start from a tentative prolongator that simply maps
-%% fine-level entries onto their aggregates $P_C$; if the user chooses
-%% \verb|no_smth_| this is the prolongator used, otherwise it is
-%% multiplied by a smoother \[ S = I - \omega D^{-1} A \], where $D$ is
-%% the diagonal of $A$ and  $\omega$ may be imposed by the user or
-%% estimated internally.   
-%% The coarse space correction may be added to the fine level solution
-%% \verb|add_ml_prec_|
-%% \[
-%% M_{2L-A}^{-1} = M_{C}^{-1} + M_{1L}^{-1}. 
-%% \]
-%% or it can be composed  in a multiplicative framework
-%% (\verb|mult_ml_prec_|)as a pre-smoothed correction (\verb|pre_smooth_|)
-%% \[
-%% M_{2L-H1}^{-1} = M_{C}^{-1} + \left( I - M_{C}^{-1}A \right) M_{1L}^{-1}, 
-%% \]
-%% post-smoothed correction (\verb|post_smooth_|)
-%% \[
-%% M_{2L-H2}^{-1} = M_{1L}^{-1} + \left( I - M_{1L}^{-1}A \right) M_{C}^{-1}. 
-%% \]
-%% or two-sided for symmetric matrices (\verb|smooth_both_|).
-
 
 
 \subroutine{psb\_precbld}{Builds a preconditioner}

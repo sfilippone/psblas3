@@ -79,15 +79,17 @@ current process, organized in groups like the previous vector:
 The list may contain an arbitrary number of groups; its end is marked
 by a -1.\\
 Specified as: an allocatable integer array  of rank one.
+\item [{\bf ovr\_mst\_idx}] A list to retrieve the value of each
+  overlap element from the respective master process.\\
+Specified as: an allocatable integer array of rank one.
 \item [{\bf ovrlap\_elem}] For all overlap points belonging to th
 ecurrent process:
 \begin{enumerate}
-\item  Overlap point index;
-\item  Number of processes sharing that overlap points;
+\item Overlap point index;
+\item Number of processes sharing that overlap points;
+\item Index of a ``master'' process: 
 \end{enumerate}
-The list may contain an arbitrary number of groups; its end is marked
-by a -1.\\
-Specified as: an allocatable integer array of rank one.
+Specified as: an allocatable integer array of rank two.
 \item[{\bf loc\_to\_glob}] each element $i$ of this array contains
 global identifier of the local variable $i$.\\
 Specified as: an allocatable integer array of rank one.
@@ -103,7 +105,9 @@ as follows:
 type psb_desc_type 
    integer, allocatable :: matrix_data(:), halo_index(:)
    integer, allocatable :: ext_index(:)
-   integer, allocatable :: overlap_elem(:), overlap_index(:)
+   integer, allocatable :: ovrlap_elem(:,:)
+   integer, allocatable :: ovrlap_index(:)
+   integer, allocatable :: ovr_mst_idx(:)
    integer, allocatable :: loc_to_glob(:), glob_to_loc(:)
    integer, allocatable :: hashv(:), glb_lc(:,:)
 end type psb_desc_type 
@@ -145,6 +149,15 @@ sec.~\ref{sec:dataquery}.
 \item[psb\_halo\_]  Fetch halo elements from neighbouring processes;
 \item[psb\_sum\_] Sum overlapped elements
 \item[psb\_avg\_] Average overlapped elements
+\item[psb\_comm\_halo\_] Exchange data based on the \verb|halo_index|
+  list;
+\item[psb\_comm\_ext\_] Exchange data based on the \verb|ext_index|
+  list;
+\item[psb\_comm\_ovr\_] Exchange data based on the \verb|ovrlap_index|
+  list;
+\item[psb\_comm\_mov\_] Exchange data based on the \verb|ovr_mst_idx|
+  list;
+
 %% \item[psb\_square\_root\_] Update with the square root of the average
 %%   of overlapped elements;
 %% \item[psb\_dec\_type\_] Entry holding decomposition type (in \verb|desc_a%matrix_data|)
