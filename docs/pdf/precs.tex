@@ -80,7 +80,7 @@ $ptype$ string as follows\footnote{The string is case-insensitive}:
 
 \subroutine{psb\_precbld}{Builds a preconditioner}
 
-\syntax{call psb\_precbld}{a, desc\_a, prec, info, upd}
+\syntax{call psb\_precbld}{a, desc\_a, prec, info}
 
 \begin{description}
 \item[Type:] Synchronous.
@@ -100,11 +100,11 @@ Scope: {\bf local} \\
 Type: {\bf required}\\
 Intent: {\bf in}, target.\\
 Specified as: a communication descriptor data structure \descdata.
-\item[upd] 
-Scope: {\bf global} \\
-Type: {\bf optional}\\
-Intent: {\bf in}.\\
-Specified as: a character.
+%% \item[upd] 
+%% Scope: {\bf global} \\
+%% Type: {\bf optional}\\
+%% Intent: {\bf in}.\\
+%% Specified as: a character.
 \end{description}
 
 \begin{description}
