@@ -105,10 +105,7 @@ program ppde
   integer            :: info
   character(len=20)  :: name,ch_err
 
-  if(psb_get_errstatus() /= 0) goto 9999
   info=0
-  name='pde90'
-  call psb_set_errverbosity(2)
 
 
   call psb_init(ictxt)
@@ -119,6 +116,9 @@ program ppde
     call psb_exit(ictxt)
     stop
   endif
+  if(psb_get_errstatus() /= 0) goto 9999
+  name='pde90'
+  call psb_set_errverbosity(2)
 
   !
   !  get parameters
