@@ -450,6 +450,16 @@ Module psb_tools_mod
       integer, intent(out)                 :: info
       logical, intent(in), optional        :: rebuild
     end subroutine psb_zspins
+    subroutine psb_zspins_2desc(nz,ia,ja,val,a,desc_ar,desc_ac,info)
+      use psb_descriptor_type
+      use psb_spmat_type
+      type(psb_desc_type), intent(in)      :: desc_ar
+      type(psb_desc_type), intent(inout)   :: desc_ac
+      type(psb_zspmat_type), intent(inout) :: a
+      integer, intent(in)                  :: nz,ia(:),ja(:)
+      complex(kind(1.d0)), intent(in)      :: val(:)
+      integer, intent(out)                 :: info
+    end subroutine psb_zspins_2desc
   end interface
 
 
@@ -564,6 +574,17 @@ Module psb_tools_mod
     end subroutine psb_get_ovrlap
   end interface
 
+  interface psb_linmap_init
+    module procedure psb_dlinmap_init, psb_zlinmap_init
+  end interface
+
+  interface psb_linmap_ins
+    module procedure psb_dlinmap_ins, psb_zlinmap_ins
+  end interface
+
+  interface psb_linmap_asb
+    module procedure psb_dlinmap_asb, psb_zlinmap_asb
+  end interface
 
 
 contains
@@ -736,6 +757,139 @@ contains
 
     call psb_icdasb(desc,info,ext_hv=.false.)
   end subroutine psb_cdasb
+
+
+  subroutine psb_dlinmap_init(a_map,cd_xt,descin,descout)
+    use psb_spmat_type
+    use psb_descriptor_type
+    use psb_serial_mod
+    use psb_penv_mod
+    use psb_error_mod
+    implicit none 
+    type(psb_dspmat_type), intent(out) :: a_map
+    type(psb_desc_type), intent(out)   :: cd_xt
+    type(psb_desc_type), intent(in)    :: descin, descout 
+
+    integer :: nrow_in, nrow_out, ncol_in, info, ictxt
+
+    ictxt = psb_cd_get_context(descin)
+    call psb_cdcpy(descin,cd_xt,info)
+    if (info ==0) call psb_cd_reinit(cd_xt,info)
+    if (info /= 0) then 
+      write(0,*) 'Error on reinitialising the extension map'
+      call psb_error(ictxt)
+      call psb_abort(ictxt)
+      stop
+    end if
+
+    nrow_in  = psb_cd_get_local_rows(cd_xt)
+    ncol_in  = psb_cd_get_local_cols(cd_xt)
+    nrow_out = psb_cd_get_local_rows(descout)
+
+    call psb_sp_all(nrow_out,ncol_in,a_map,info)
+
+  end subroutine psb_dlinmap_init
+
+  subroutine psb_dlinmap_ins(nz,ir,ic,val,a_map,cd_xt,descin,descout)
+    use psb_spmat_type
+    use psb_descriptor_type
+    implicit none 
+    integer, intent(in)                  :: nz
+    integer, intent(in)                  :: ir(:),ic(:)
+    real(kind(1.d0)), intent(in)         :: val(:)
+    type(psb_dspmat_type), intent(inout) :: a_map
+    type(psb_desc_type), intent(inout)   :: cd_xt
+    type(psb_desc_type), intent(in)      :: descin, descout 
+    integer :: info
+    call psb_spins(nz,ir,ic,val,a_map,descout,cd_xt,info)
+
+  end subroutine psb_dlinmap_ins
+
+  subroutine psb_dlinmap_asb(a_map,cd_xt,descin,descout)
+    use psb_spmat_type
+    use psb_descriptor_type
+    use psb_serial_mod
+    implicit none 
+    type(psb_dspmat_type), intent(inout) :: a_map
+    type(psb_desc_type), intent(inout)   :: cd_xt
+    type(psb_desc_type), intent(in)      :: descin, descout 
+
+    integer :: nrow_in, nrow_out, ncol_in, info, ictxt
+
+    ictxt = psb_cd_get_context(descin)
+
+    call psb_cdasb(cd_xt,info)
+    a_map%k = psb_cd_get_local_cols(cd_xt)
+    call psb_spcnv(a_map,info,afmt='CSR')
+
+  end subroutine psb_dlinmap_asb
+
+  subroutine psb_zlinmap_init(a_map,cd_xt,descin,descout)
+    use psb_spmat_type
+    use psb_descriptor_type
+    use psb_serial_mod
+    use psb_penv_mod
+    use psb_error_mod
+    implicit none 
+    type(psb_zspmat_type), intent(out) :: a_map
+    type(psb_desc_type), intent(out)   :: cd_xt
+    type(psb_desc_type), intent(in)    :: descin, descout 
+
+    integer :: nrow_in, nrow_out, ncol_in, info, ictxt
+
+    ictxt = psb_cd_get_context(descin)
+
+    call psb_cdcpy(descin,cd_xt,info)
+    if (info ==0) call psb_cd_reinit(cd_xt,info)
+    if (info /= 0) then 
+      write(0,*) 'Error on reinitialising the extension map'
+      call psb_error(ictxt)
+      call psb_abort(ictxt)
+      stop
+    end if
+
+    nrow_in  = psb_cd_get_local_rows(cd_xt)
+    ncol_in  = psb_cd_get_local_cols(cd_xt)
+    nrow_out = psb_cd_get_local_rows(descout)
+
+    call psb_sp_all(nrow_out,ncol_in,a_map,info)
+
+  end subroutine psb_zlinmap_init
+
+  subroutine psb_zlinmap_ins(nz,ir,ic,val,a_map,cd_xt,descin,descout)
+    use psb_spmat_type
+    use psb_descriptor_type
+    implicit none 
+    integer, intent(in)                  :: nz
+    integer, intent(in)                  :: ir(:),ic(:)
+    complex(kind(1.d0)), intent(in)      :: val(:)
+    type(psb_zspmat_type), intent(inout) :: a_map
+    type(psb_desc_type), intent(inout)   :: cd_xt
+    type(psb_desc_type), intent(in)      :: descin, descout 
+    integer :: info
+
+    call psb_spins(nz,ir,ic,val,a_map,descout,cd_xt,info)
+
+  end subroutine psb_zlinmap_ins
+
+  subroutine psb_zlinmap_asb(a_map,cd_xt,descin,descout)
+    use psb_spmat_type
+    use psb_descriptor_type
+    use psb_serial_mod
+    implicit none 
+    type(psb_zspmat_type), intent(inout) :: a_map
+    type(psb_desc_type), intent(inout)   :: cd_xt
+    type(psb_desc_type), intent(in)      :: descin, descout 
+
+    integer :: nrow_in, nrow_out, ncol_in, info, ictxt
+
+    ictxt = psb_cd_get_context(descin)
+
+    call psb_cdasb(cd_xt,info)
+    a_map%k = psb_cd_get_local_cols(cd_xt)
+    call psb_spcnv(a_map,info,afmt='CSR')
+
+  end subroutine psb_zlinmap_asb
 
 
 

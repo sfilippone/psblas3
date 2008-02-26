@@ -240,3 +240,164 @@ subroutine psb_zspins(nz,ia,ja,val,a,desc_a,info,rebuild)
 
 end subroutine psb_zspins
 
+
+subroutine psb_zspins_2desc(nz,ia,ja,val,a,desc_ar,desc_ac,info)
+  use psb_tools_mod, psb_protect_name => psb_zspins_2desc
+  use psb_descriptor_type
+  use psb_spmat_type
+  use psb_serial_mod
+  use psb_const_mod
+  use psb_error_mod
+  use psb_penv_mod
+  implicit none
+
+  !....parameters...
+  type(psb_desc_type), intent(in)      :: desc_ar
+  type(psb_desc_type), intent(inout)   :: desc_ac
+  type(psb_zspmat_type), intent(inout) :: a
+  integer, intent(in)                  :: nz,ia(:),ja(:)
+  complex(kind(1.d0)), intent(in)         :: val(:)
+  integer, intent(out)                 :: info
+  !locals.....
+
+  integer :: nrow, err_act, ncol, spstate
+  integer                :: ictxt,np,me
+  logical, parameter     :: debug=.false.
+  integer, parameter     :: relocsz=200
+  integer, allocatable   :: ila(:),jla(:)
+  character(len=20)  :: name, ch_err
+
+  info = 0
+  name = 'psb_zspins'
+  call psb_erractionsave(err_act)
+
+
+  ictxt = psb_cd_get_context(desc_ar)
+
+  call psb_info(ictxt, me, np)
+
+  if (.not.psb_is_ok_desc(desc_ar)) then 
+    info = 3110
+    call psb_errpush(info,name)
+    goto 9999
+  endif
+  if (.not.psb_is_ok_desc(desc_ac)) then 
+    info = 3110
+    call psb_errpush(info,name)
+    goto 9999
+  endif
+
+  if (nz < 0) then 
+    info = 1111
+    call psb_errpush(info,name)
+    goto 9999
+  end if
+  if (size(ia) < nz) then 
+    info = 1111
+    call psb_errpush(info,name)
+    goto 9999
+  end if
+
+  if (size(ja) < nz) then 
+    info = 1111
+    call psb_errpush(info,name)
+    goto 9999
+  end if
+  if (size(val) < nz) then 
+    info = 1111
+    call psb_errpush(info,name)
+    goto 9999
+  end if
+  if (nz==0) return
+
+  spstate = a%infoa(psb_state_)
+  if (psb_is_bld_desc(desc_ac)) then 
+
+    allocate(ila(nz),jla(nz),stat=info)
+    if (info /= 0) then
+      ch_err='allocate'
+      call psb_errpush(4013,name,a_err=ch_err,i_err=(/info,0,0,0,0/))
+      goto 9999
+    end if
+        ila(1:nz) = ia(1:nz)
+
+    call psb_glob_to_loc(ia(1:nz),ila(1:nz),desc_ar,info,iact='I',owned=.true.)
+
+    call psb_cdins(nz,ja,desc_ac,info,jla=jla, mask=(ila(1:nz)>0))
+
+    if (info /= 0) then
+      ch_err='psb_cdins'
+      call psb_errpush(4013,name,a_err=ch_err,i_err=(/info,0,0,0,0/))
+      goto 9999
+    end if
+
+    nrow = psb_cd_get_local_rows(desc_ar)
+    ncol = psb_cd_get_local_cols(desc_ac)
+
+    call psb_coins(nz,ila,jla,val,a,1,nrow,1,ncol,info)
+    if (info /= 0) then
+      info=4010
+      ch_err='psb_coins'
+      call psb_errpush(info,name,a_err=ch_err)
+      goto 9999
+    end if
+
+  else if (psb_is_asb_desc(desc_ac)) then 
+
+    write(0,*) 'Why are you calling me on an assembled desc_ac?'
+!!$    if (psb_is_large_desc(desc_a)) then 
+!!$
+!!$      allocate(ila(nz),jla(nz),stat=info)
+!!$      if (info /= 0) then
+!!$        ch_err='allocate'
+!!$        call psb_errpush(4013,name,a_err=ch_err,i_err=(/info,0,0,0,0/))
+!!$        goto 9999
+!!$      end if
+!!$
+!!$      ila(1:nz) = ia(1:nz)
+!!$      jla(1:nz) = ja(1:nz)
+!!$      call psb_glob_to_loc(ila(1:nz),desc_a,info,iact='I')
+!!$      call psb_glob_to_loc(jla(1:nz),desc_a,info,iact='I')
+!!$      nrow = psb_cd_get_local_rows(desc_a)
+!!$      ncol = psb_cd_get_local_cols(desc_a)
+!!$
+!!$      call psb_coins(nz,ila,jla,val,a,1,nrow,1,ncol,&
+!!$           & info,rebuild=rebuild_)
+!!$      if (info /= 0) then
+!!$        info=4010
+!!$        ch_err='psb_coins'
+!!$        call psb_errpush(info,name,a_err=ch_err)
+!!$        goto 9999
+!!$      end if
+!!$
+!!$    else
+!!$      nrow = psb_cd_get_local_rows(desc_a)
+!!$      ncol = psb_cd_get_local_cols(desc_a)
+!!$      call psb_coins(nz,ia,ja,val,a,1,nrow,1,ncol,&
+!!$           & info,gtl=desc_a%glob_to_loc,rebuild=rebuild_)
+!!$      if (info /= 0) then
+!!$        info=4010
+!!$        ch_err='psb_coins'
+!!$        call psb_errpush(info,name,a_err=ch_err)
+!!$        goto 9999
+!!$      end if
+!!$    end if
+  else
+    info = 1122
+    call psb_errpush(info,name)
+    goto 9999
+  end if
+
+  call psb_erractionrestore(err_act)
+  return
+
+9999 continue
+  call psb_erractionrestore(err_act)
+  if (err_act == psb_act_abort_) then
+    call psb_error(ictxt)
+    return
+  end if
+  return
+
+end subroutine psb_zspins_2desc
+

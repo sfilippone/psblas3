@@ -36,8 +36,8 @@
 !    to different spaces.
 !
 module psb_inter_descriptor_type
-  use psb_spmat_type
-  use psb_descriptor_type
+  use psb_spmat_type, only : psb_dspmat_type, psb_zspmat_type
+  use psb_descriptor_type, only : psb_desc_type
   
   
 
@@ -66,7 +66,7 @@ module psb_inter_descriptor_type
     integer, allocatable :: itd_data(:)
     type(psb_desc_type), pointer :: desc_1=>null(), desc_2=>null()
     integer, allocatable :: exch_fw_idx(:), exch_bk_idx(:)
-    type(psb_desc_type)  :: desc_ext_1, desc_ext_2
+    type(psb_desc_type)  :: desc_fw, desc_bk
     type(psb_d_map_type) :: dmap
     type(psb_z_map_type) :: zmap
   end type psb_inter_desc_type
@@ -97,6 +97,9 @@ module psb_inter_descriptor_type
          & psb_d_map_sizeof, psb_z_map_sizeof
   end interface
 
+  interface psb_linmap
+    module procedure  psb_d_apply_linmap, psb_z_apply_linmap
+  end interface
 
 contains
  
@@ -177,6 +180,8 @@ contains
 
 
   logical function psb_is_asb_inter_desc(desc)
+    use psb_descriptor_type
+    implicit none 
     type(psb_inter_desc_type), intent(in) :: desc
 
     psb_is_asb_inter_desc = .false.
@@ -189,6 +194,8 @@ contains
   end function psb_is_asb_inter_desc
 
   logical function psb_is_ok_inter_desc(desc)
+    use psb_descriptor_type
+    implicit none 
     type(psb_inter_desc_type), intent(in) :: desc
 
     psb_is_ok_inter_desc = .false.
@@ -209,6 +216,7 @@ contains
 
 
   function psb_d_map_sizeof(map)
+    use psb_spmat_type
     implicit none
     type(psb_d_map_type), intent(in) :: map
     Integer                      :: psb_d_map_sizeof
@@ -222,6 +230,7 @@ contains
   end function psb_d_map_sizeof
 
   function psb_z_map_sizeof(map)
+    use psb_spmat_type
     implicit none
     type(psb_z_map_type), intent(in) :: map
     Integer                      :: psb_z_map_sizeof
@@ -235,8 +244,9 @@ contains
   end function psb_z_map_sizeof
 
   function psb_itd_sizeof(desc)
-    
-    implicit none
+    use psb_spmat_type
+    use psb_descriptor_type
+    implicit none 
     type(psb_inter_desc_type), intent(in) :: desc
     Integer                      :: psb_itd_sizeof
     integer :: val
@@ -246,14 +256,16 @@ contains
     if (allocated(desc%itd_data))    val = val + 4*size(desc%itd_data)
     if (allocated(desc%exch_fw_idx)) val = val + 4*size(desc%exch_fw_idx)
     if (allocated(desc%exch_bk_idx)) val = val + 4*size(desc%exch_bk_idx)
-    val = val + psb_sizeof(desc%desc_ext_1)
-    val = val + psb_sizeof(desc%desc_ext_2)
+    val = val + psb_sizeof(desc%desc_fw)
+    val = val + psb_sizeof(desc%desc_bk)
     val = val + psb_sizeof(desc%dmap)
     val = val + psb_sizeof(desc%zmap)
     psb_itd_sizeof = val 
   end function psb_itd_sizeof
   
   function psb_d_inter_desc(map_kind,desc1,desc2,map_fw,map_bk,idx_fw,idx_bk)
+    use psb_spmat_type
+    use psb_descriptor_type
     use psb_serial_mod
     use psi_mod
     implicit none 
@@ -299,6 +311,8 @@ contains
   end function psb_d_inter_desc
   
   function psb_d_inter_desc_noidx(map_kind,desc1, desc2, map_fw, map_bk)
+    use psb_spmat_type
+    use psb_descriptor_type
     use psb_serial_mod
     use psi_mod
     implicit none 
@@ -350,6 +364,8 @@ contains
   end function psb_d_inter_desc_noidx
 
   function psb_z_inter_desc(map_kind,desc1, desc2, map_fw, map_bk, idx_fw, idx_bk)
+    use psb_spmat_type
+    use psb_descriptor_type
     use psb_serial_mod
     use psi_mod
     implicit none 
@@ -395,6 +411,8 @@ contains
   end function psb_z_inter_desc
   
   function psb_z_inter_desc_noidx(map_kind,desc1, desc2, map_fw, map_bk)
+    use psb_spmat_type
+    use psb_descriptor_type
     use psb_serial_mod
     use psi_mod
     implicit none 
@@ -454,6 +472,8 @@ contains
   ! due to exch_fw_idx
   !
   subroutine psb_d_forward_map(alpha,x,beta,y,desc,info,work)
+    use psb_spmat_type
+    use psb_descriptor_type
     use psb_comm_mod
     use psb_serial_mod
     use psi_mod
@@ -501,8 +521,9 @@ contains
       end if
 
     case(psb_map_gen_linear_)
-      call psb_halo(x,desc%desc_ext_1,info,work=work)
-      if (info == 0) call psb_csmm(alpha,desc%dmap%map_fw,x,beta,y,info)
+
+      call psb_linmap(alpha,x,beta,y,desc%dmap%map_fw,&
+           & desc%desc_fw,desc%desc_1,desc%desc_2)
         
       if (info /= 0) then 
         write(0,*) trim(name),' Error from inner routines',info
@@ -525,6 +546,8 @@ contains
   ! due to exch_bk_idx
   !
   subroutine psb_d_backward_map(alpha,x,beta,y,desc,info,work)
+    use psb_spmat_type
+    use psb_descriptor_type
     use psb_comm_mod
     use psb_serial_mod
     use psi_mod
@@ -572,9 +595,8 @@ contains
       
 
     case(psb_map_gen_linear_)
-      call psb_halo(x,desc%desc_ext_2,info,work=work)
-      if (info == 0) call psb_csmm(alpha,desc%dmap%map_bk,x,beta,y,info)
-        
+      call psb_linmap(alpha,x,beta,y,desc%dmap%map_bk,&
+           & desc%desc_bk,desc%desc_2,desc%desc_1)
       if (info /= 0) then 
         write(0,*) trim(name),' Error from inner routines',info
         info = -1
@@ -595,6 +617,8 @@ contains
   ! due to exch_fw_idx
   !
   subroutine psb_z_forward_map(alpha,x,beta,y,desc,info,work)
+    use psb_spmat_type
+    use psb_descriptor_type
     use psb_comm_mod
     use psb_serial_mod
     use psi_mod
@@ -641,8 +665,8 @@ contains
       end if
       
     case(psb_map_gen_linear_)
-      call psb_halo(x,desc%desc_ext_1,info,work=work)
-      if (info == 0) call psb_csmm(alpha,desc%zmap%map_fw,x,beta,y,info)
+      call psb_linmap(alpha,x,beta,y,desc%zmap%map_fw,&
+           & desc%desc_fw,desc%desc_1,desc%desc_2)
         
       if (info /= 0) then 
         write(0,*) trim(name),' Error from inner routines',info
@@ -664,6 +688,8 @@ contains
   ! due to exch_bk_idx
   !
   subroutine psb_z_backward_map(alpha,x,beta,y,desc,info,work)
+    use psb_spmat_type
+    use psb_descriptor_type
     use psb_comm_mod
     use psb_serial_mod
     use psi_mod
@@ -711,8 +737,8 @@ contains
       
 
     case(psb_map_gen_linear_)
-      call psb_halo(x,desc%desc_ext_2,info,work=work)
-      if (info == 0) call psb_csmm(alpha,desc%zmap%map_bk,x,beta,y,info)
+      call psb_linmap(alpha,x,beta,y,desc%zmap%map_bk,&
+           & desc%desc_bk,desc%desc_1,desc%desc_2)
         
       if (info /= 0) then 
         write(0,*) trim(name),' Error from inner routines',info
@@ -726,6 +752,63 @@ contains
     end select
 
   end subroutine psb_z_backward_map
+
+
+
+  subroutine psb_d_apply_linmap(alpha,x,beta,y,a_map,cd_xt,descin,descout)
+    use psb_spmat_type
+    use psb_descriptor_type
+    use psb_comm_mod
+    use psb_serial_mod
+    use psi_mod
+    implicit none 
+    real(kind(1.d0)), intent(in)      :: alpha,beta
+    real(kind(1.d0)), intent(inout)   :: x(:),y(:)
+    type(psb_dspmat_type), intent(in) :: a_map
+    type(psb_desc_type), intent(in)   :: cd_xt,descin, descout 
+
+    integer :: nrt, nct, info
+    real(kind(1.d0)), allocatable :: tmp(:)
+
+    nrt = psb_cd_get_local_rows(cd_xt)
+    nct = psb_cd_get_local_cols(cd_xt)
+    allocate(tmp(nct),stat=info)
+    if (info == 0) tmp(1:nrt) = x(1:nrt)
+    if (info == 0) call psb_halo(tmp,cd_xt,info) 
+    if (info == 0) call psb_csmm(alpha,a_map,tmp,beta,y,info)
+    if (info /= 0) then 
+      write(0,*) 'Error in apply_map'
+    endif
+    
+  end subroutine psb_d_apply_linmap
+
+
+  subroutine psb_z_apply_linmap(alpha,x,beta,y,a_map,cd_xt,descin,descout)
+    use psb_spmat_type
+    use psb_descriptor_type
+    use psb_comm_mod
+    use psb_serial_mod
+    use psi_mod
+    implicit none 
+    complex(kind(1.d0)), intent(in)      :: alpha,beta
+    complex(kind(1.d0)), intent(inout)   :: x(:),y(:)
+    type(psb_zspmat_type), intent(in) :: a_map
+    type(psb_desc_type), intent(in)   :: cd_xt,descin, descout 
+
+    integer :: nrt, nct, info
+    complex(kind(1.d0)), allocatable :: tmp(:)
+
+    nrt = psb_cd_get_local_rows(cd_xt)
+    nct = psb_cd_get_local_cols(cd_xt)
+    allocate(tmp(nct),stat=info)
+    if (info == 0) tmp(1:nrt) = x(1:nrt)
+    if (info == 0) call psb_halo(tmp,cd_xt,info) 
+    if (info == 0) call psb_csmm(alpha,a_map,tmp,beta,y,info)
+    if (info /= 0) then 
+      write(0,*) 'Error in apply_map'
+    endif
+    
+  end subroutine psb_z_apply_linmap
 
 
 end module psb_inter_descriptor_type
