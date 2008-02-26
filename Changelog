@@ -1,6 +1,11 @@
 Changelog. A lot less detailed than usual, at least for past
 history. 
 
+2008/02/26: New psb_linmap_init, psb_linmap_ins, psb_linmap_asb for a
+	    general linear operator mapping among index spaces.
+	
+2008/02/18: Branched off for  Version 2.2
+
 2008/02/08: Merged changes from intermesh branch: we now have an
 	    inter_desc_type object. Currently we only implement the
 	    version needed for aggregation algorithms in the algebraic
