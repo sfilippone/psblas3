@@ -84,7 +84,7 @@
 
 #define  POOLSIZE  4096
 #define  CACHESIZE 16
-#ifdef Add_
+#ifdef LowerUnderscore
 #define InitPairSearchTree  initpairsearchtree_
 #define FreePairSearchTree  freepairsearchtree_
 #define ClonePairSearchTree clonepairsearchtree_
@@ -93,7 +93,7 @@
 #define SearchKeyVal        searchkeyval_
 #define NPairs              npairs_
 #endif
-#ifdef AddDouble_
+#ifdef LowerDoubleUnderscore
 #define InitPairSearchTree  initpairsearchtree_
 #define FreePairSearchTree  freepairsearchtree_
 #define ClonePairSearchTree clonepairsearchtree_
@@ -102,7 +102,7 @@
 #define SearchKeyVal        searchkeyval_
 #define NPairs              npairs_
 #endif
-#ifdef NoChange
+#ifdef LowerCase
 #define InitPairSearchTree  initpairsearchtree
 #define FreePairSearchTree  freepairsearchtree
 #define ClonePairSearchTree clonepairsearchtree
@@ -110,6 +110,33 @@
 #define SearchInsKeyVal     searchinskeyval
 #define SearchKeyVal        searchkeyval
 #define NPairs              npairs
+#endif
+#ifdef UpperUnderscore
+#define InitPairSearchTree  INITPAIRSEARCHTREE_
+#define FreePairSearchTree  FREEPAIRSEARCHTREE_
+#define ClonePairSearchTree CLONEPAIRSEARCHTREE_
+#define SizeofPairSearchTree  SIZEOFPAIRSEARCHTREE_
+#define SearchInsKeyVal     SEARCHINSKEYVAL_
+#define SearchKeyVal        SEARCHKEYVAL_
+#define NPairs              NPAIRS_
+#endif
+#ifdef UpperDoubleUnderscore
+#define InitPairSearchTree  INITPAIRSEARCHTREE_
+#define FreePairSearchTree  FREEPAIRSEARCHTREE_
+#define ClonePairSearchTree CLONEPAIRSEARCHTREE_
+#define SizeofPairSearchTree  SIZEOFPAIRSEARCHTREE_
+#define SearchInsKeyVal     SEARCHINSKEYVAL_
+#define SearchKeyVal        SEARCHKEYVAL_
+#define NPairs              NPAIRS_
+#endif
+#ifdef UpperCase
+#define InitPairSearchTree  INITPAIRSEARCHTREE
+#define FreePairSearchTree  FREEPAIRSEARCHTREE
+#define ClonePairSearchTree CLONEPAIRSEARCHTREE
+#define SizeofPairSearchTree  SIZEOFPAIRSEARCHTREE
+#define SearchInsKeyVal     SEARCHINSKEYVAL
+#define SearchKeyVal        SEARCHKEYVAL
+#define NPairs              NPAIRS
 #endif
 
 

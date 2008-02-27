@@ -57,7 +57,7 @@ BLACS=-lmpiblacs-gcc42 -L$(HOME)/LIB
 PSBLDLIBS=$(BLACS) $(BLAS) $(METIS_LIB)
 
 #  Add -DLargeFptr for 64-bit addresses
-PSBCDEFINES=-DAdd_ 
+PSBCDEFINES=-DLowerUnderscore 
 # 
 PSBFDEFINES=-DHAVE_KSENDID  $(MPI_FINC) -DHAVE_MOVE_ALLOC
 # -DHAVE_METIS

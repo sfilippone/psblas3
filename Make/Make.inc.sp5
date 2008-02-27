@@ -1,4 +1,4 @@
-.mod=.mod
+ .mod=.mod
 .fh=.fh
 .SUFFIXES:
 .SUFFIXES: .f90 .F90 $(.mod)  .F .f .c .o
@@ -55,7 +55,7 @@ BLACS=-lblacssmp
 PSBLDLIBS=$(BLACS) $(BLAS) $(METIS_LIB)
 
 #  Add -DLargeFptr for 64-bit addresses
-PSBCDEFINES=-DNoChange -DLargeFptr
+PSBCDEFINES=-DLowerCase -DLargeFptr
 #
 PSBFDEFINES=-WF,-DHAVE_ESSL_BLACS  $(MPI_FINC)
 # There's no MOVE_ALLOC yet in XLF 10.1.

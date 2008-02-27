@@ -58,7 +58,7 @@ BLACS=-lmpiblacs-ifort91 -L$(HOME)/LIB
 PSBLDLIBS=$(BLACS) $(BLAS) $(METIS_LIB)
 
 #  Add -DLargeFptr for 64-bit addresses
-PSBCDEFINES=-DAdd_ 
+PSBCDEFINES=-DLowerUnderscore 
 #
 #   Note: MOVE_ALLOC is only on Intel Fortran 9.1, NOT on 9.0
 PSBFDEFINES=-DHAVE_KSENDID  $(MPI_FINC) -DHAVE_MOVE_ALLOC
