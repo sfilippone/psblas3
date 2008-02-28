@@ -17,8 +17,7 @@ dnl then  : ./configure VAR=VAL
 dnl then  : ./configure --help=short
 dnl then  : ./configure --help
 
-dnl OPEN QUESTIONS: 
-dnl To detect an installed instance of PSBLAS in order for MLD2P4 to be installed: the PSBLAS modules get this task difficult to accomplish!
+dnl the PSBLAS modules get this task difficult to accomplish!
 dnl SEE  : --module-path --include-path
 
 dnl NOTE : There is no cross compilation support.
@@ -39,7 +38,7 @@ dnl NOTE : odd configurations like ifc + gcc still await in the mist of the unkn
 ###############################################################################
 
 # NOTE: the literal for version (the second argument to AC_INIT should be a literal!)
-AC_INIT([PSBLAS],0.0, salvatore.filippone@uniroma2.it)
+AC_INIT([PSBLAS],2.2, salvatore.filippone@uniroma2.it)
 
 # VERSION is the file containing the PSBLAS version code
 # FIXME
@@ -310,58 +309,66 @@ dnl if true ; then
  if test "X$psblas_cv_fc" == "Xgcc" ; then
  # note that no space should be placed around the equality symbol in assignations
  # Note : 'native' is valid _only_ on GCC/x86  (32/64 bits)
-   CCOPT="-O3  $CCOPT" 
- else
-  if test "X$psblas_cv_fc" == X"xlf" ; then
+   CCOPT="-O3  $CCOPT"
+ elif test "X$psblas_cv_fc" == X"xlf" ; then
    # XL compiler : consider using -qarch=auto
-     CCOPT="-O3 $CCOPT"
-   else
+     CCOPT="-O3 -qarch=auto $CCOPT"
+ elif test "X$psblas_cv_fc" == X"pg" ; then
    # other compilers ..
-     CCOPT="-O3 $CCOPT"
+     CCOPT="-fast $CCOPT"
   # NOTE : PG & Sun use -fast instead -O3
-  fi
+ elif test "X$psblas_cv_fc" == X"sun" ; then
+   # other compilers ..
+     CCOPT="-fast $CCOPT"
+  # NOTE : PG & Sun use -fast instead -O3
+ else 
+     CCOPT="-fast $CCOPT"
  fi
- else
+else
  CCOPT="${CFLAGS}"
 fi
- CFLAGS="${CCOPT}"
+CFLAGS="${CCOPT}"
 
 if test "X$FFLAGS" == "X" ; then
  if test "X$psblas_cv_fc" == "Xgcc" ; then
  # note that no space should be placed around the equality symbol in assignations
  # Note : 'native' is valid _only_ on GCC/x86  (32/64 bits)
    FCOPT="-O3  $FCOPT"
- else
-  if test "X$psblas_cv_fc" == X"xlf" ; then
+ elif test "X$psblas_cv_fc" == X"xlf" ; then
    # XL compiler : consider using -qarch=auto
-     FCOPT="-O3 $FCOPT"
-   else
+     FCOPT="-O3 -qarch=auto $FCOPT"
+ elif test "X$psblas_cv_fc" == X"pg" ; then
    # other compilers ..
-     FCOPT="-O3 $FCOPT"
+     FCOPT="-fast $FCOPT"
   # NOTE : PG & Sun use -fast instead -O3
-  fi
+ elif test "X$psblas_cv_fc" == X"sun" ; then
+   # other compilers ..
+     FCOPT="-fast $FCOPT"
+  # NOTE : PG & Sun use -fast instead -O3
+ else 
+     FCOPT="-fast $FCOPT"
  fi
- else
+else
  FCOPT="${FFLAGS}"
 fi
- FFLAGS="${FCOPT}"
+FFLAGS="${FCOPT}"
 
 if test "X$FCFLAGS" == "X" ; then
  if test "X$psblas_cv_fc" == "Xgcc" ; then
  # note that no space should be placed around the equality symbol in assignations
  # Note : 'native' is valid _only_ on GCC/x86  (32/64 bits)
- F90COPT="-O3  $F90COPT"
- else
-  if test "X$psblas_cv_fc" == X"xlf" ; then
+   F90COPT="-O3  $F90COPT"
+ elif test "X$psblas_cv_fc" == X"xlf" ; then
    # XL compiler : consider using -qarch=auto
-   F90COPT="-O3 $F90COPT"
-   else
+     F90COPT="-O3 -qarch=auto $F90COPT"
+ elif test "X$psblas_cv_fc" == X"pgf77" ; then
    # other compilers ..
-   F90COPT="-O3 $F90COPT"
+     F90COPT="-fast $F90COPT"
   # NOTE : PG & Sun use -fast instead -O3
-  fi
+ else 
+     F90COPT="-fast $F90COPT"
  fi
- else
+else
  F90COPT="${FCFLAGS}"
 fi
 FCFLAGS="${F90COPT}"
