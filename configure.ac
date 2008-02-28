@@ -1,0 +1,737 @@
+dnl $Id$
+
+dnl
+dnl Michele Martone's proposal for a transition towards the GNU build system for the PSBLAS library
+dnl
+
+dnl Process this file with autoconf to produce a configure script.
+dnl
+dnl usage : aclocal -I config/ && autoconf && ./configure && make 
+
+dnl then  : VAR=VAL ./configure
+
+dnl In some configurations (AIX) the next line is needed:
+dnl MPIFC=mpxlf95 ./configure
+
+dnl then  : ./configure VAR=VAL 
+dnl then  : ./configure --help=short
+dnl then  : ./configure --help
+
+dnl OPEN QUESTIONS: 
+dnl To detect an installed instance of PSBLAS in order for MLD2P4 to be installed: the PSBLAS modules get this task difficult to accomplish!
+dnl SEE  : --module-path --include-path
+
+dnl NOTE : There is no cross compilation support.
+
+dnl NOTE : missing ifort and kl* library handling..
+dnl NOTE : odd configurations like ifc + gcc still await in the mist of the unknown
+
+
+###############################################################################
+###############################################################################
+# 
+#  This script is used by the PSBLAS to determine the compilers, linkers, and
+# libraries to build its libraries executable code.
+#  Its behaviour is driven on the compiler it finds or it is dictated to work
+# with.
+#
+###############################################################################
+###############################################################################
+
+# NOTE: the literal for version (the second argument to AC_INIT should be a literal!)
+AC_INIT([PSBLAS],0.0, salvatore.filippone@uniroma2.it)
+
+# VERSION is the file containing the PSBLAS version code
+# FIXME
+psblas_cv_version="`cat VERSION`"
+
+# A sample source file
+AC_CONFIG_SRCDIR([base/modules/psb_base_mod.f90])
+dnl AC_CONFIG_AUX_DIR(config)
+
+# Our custom M4 macros are in the 'config' directory
+AC_CONFIG_MACRO_DIR([config])
+AC_MSG_NOTICE([
+--------------------------------------------------------------------------------
+	Welcome to the $PACKAGE_NAME $psblas_cv_version configure Script.
+
+	This creates Make.inc, but if you read carefully the
+	documentation, you can make your own by hand for your needs.
+
+	Be sure to specify the library paths of your interest. Examples:
+        ./configure CFLAGS=-L/some/directory/LIB         <- will force CFLAGS
+        CFLAGS=-L/some/directory/LIB ./configure         <- will force CFLAGS
+        ./configure --with-cflags=-L/some/directory/LIB  <- will append to CFLAGS
+        FC=mpif90 F77=$FC CC=mpicc ./configure           <- will force FC,CC,F77
+        FLINK=gcc FLINK=gcc ./configure                  <- will force FLINK,F90LINK
+
+	See /configure --help=short fore more info.
+--------------------------------------------------------------------------------
+		])
+###############################################################################
+# Compilers detection: FC,F77,CC should be set, if found.
+###############################################################################
+
+# Note that the following line won't save from troubles.
+# AC_PROG_FC([mpxlf95 mpxlf90 mpxlf pgf95 pgf90 mpif95 mpif90 gfortran f95 f90 ifc])
+AC_PROG_FC([xlf95 xlf90 xlf pgf95 pgf90 ifort ifc  gfortran])
+#AC_PROG_FC
+AC_PROG_F77([xlf pgf77 ifort ifc  gfortran])
+AC_PROG_CC([xlc pgcc icc gcc ])
+dnl AC_PROG_CXX
+
+dnl AC_PROG_F90 doesn't exist, at the time of writing this !
+dnl AC_PROG_F90
+
+# Sanity checks, although redundant (useful when debugging this configure.ac)!
+if test "X$FC" == "X" ; then
+	AC_MSG_ERROR([Problem : No Fortran compiler specified nor found!])
+fi
+
+if test "X$CC" == "X" ; then
+	AC_MSG_ERROR([Problem : No C compiler specified nor found!])
+fi
+###############################################################################
+#			Suitable MPI compilers detection
+###############################################################################
+# Note: Someday we will contemplate a fake MPI - configured version of PSBLAS
+###############################################################################
+
+#Note : we miss the name of the Intel C compiler
+
+AC_LANG([C])
+if test "X$MPICC" = "X" ; then
+    # This is our MPICC compiler preference: it will override ACX_MPI's first try.
+    AC_CHECK_PROGS([MPICC],[mpxlc mpcc pgcc mpicc])
+fi
+ACX_MPI([], [AC_MSG_ERROR([[Cannot find any suitable MPI implementation for C]])])
+
+AC_LANG(Fortran 77)
+if test "X$MPIF77" = "X" ; then
+    # This is our MPIFC compiler preference: it will override ACX_MPI's first try.
+    AC_CHECK_PROGS([MPIF77],[mpxlf mpif77 pgf77 mpf77 ifc])
+fi
+ACX_MPI([], [AC_MSG_ERROR([[Cannot find any suitable MPI implementation for Fortran 77]])])
+
+AC_LANG([Fortran])
+
+if test "X$MPIFC" = "X" ; then
+    # This is our MPIFC compiler preference: it will override ACX_MPI's first try.
+    AC_CHECK_PROGS([MPIFC],[mpxlf95 mpxlf90 mpif95 mpif90 pgf95 pg90 mpf95 mpf90 ifc ])
+fi
+
+ACX_MPI([], [AC_MSG_ERROR([[Cannot find any suitable MPI implementation for Fortran]])])
+
+# We leave a default language for the next checks.
+dnl AC_LANG([Fortran 77])
+AC_LANG([C])
+
+dnl Now on, MPIFC should be set, as MPIF77 and MPICC
+
+###############################################################################
+# Sanity checks, although redundant (useful when debugging this configure.ac)!
+###############################################################################
+
+if test "X$MPIFC" == "X" ; then
+	AC_MSG_ERROR([Problem : No MPI Fortran compiler specified nor found!])
+fi
+
+if test "X$MPICC" == "X" ; then
+	AC_MSG_ERROR([Problem : No MPI C compiler specified nor found!])
+fi
+
+###############################################################################
+# 			FLAGS and LIBS user customization
+###############################################################################
+
+dnl NOTE : no spaces before the comma, and no brackets before the second argument!
+PAC_ARG_WITH_FLAGS(ccflags,CCFLAGS)
+PAC_ARG_WITH_FLAGS(cflags,CFLAGS)
+PAC_ARG_WITH_FLAGS(fflags,FFLAGS)
+#PAC_ARG_WITH_FLAGS(ldflags,LDFLAGS)
+PAC_ARG_WITH_LIBS
+PAC_ARG_WITH_FLAGS(clibs,CLIBS)
+PAC_ARG_WITH_FLAGS(flibs,FLIBS)
+
+dnl candidates for removal:
+PAC_ARG_WITH_FLAGS(library-path,LIBRARYPATH)
+PAC_ARG_WITH_FLAGS(include-path,INCLUDEPATH)
+PAC_ARG_WITH_FLAGS(module-path,MODULE_PATH)
+
+# we just gave the user the chance to append values to these variables
+
+###############################################################################
+
+dnl  Library oriented Autotools facilities (we don't care about this for now)
+dnl AC_PROG_LIBTOOL
+dnl AM_MAINTAINER_MODE
+AC_PROG_RANLIB
+dnl system's ranlib will be found, too
+
+AM_INIT_AUTOMAKE
+dnl Specify required version of autoconf.
+AC_PREREQ(2.59)
+
+
+###############################################################################
+#	Compiler identification (sadly, it is necessary)
+###############################################################################
+psblas_cv_fc=""
+
+dnl Do we use gfortran & co ? Compiler identification.
+dnl NOTE : in /autoconf/autoconf/fortran.m4 there are plenty of better tests!
+
+PAC_CHECK_HAVE_GFORTRAN(
+		psblas_cv_fc="gcc",
+	[]
+)
+
+#
+# Test for TR 15581, aka allocatables extensions.
+#
+PAC_FORTRAN_TEST_TR15581( 
+	[AC_MSG_RESULT([yes.])],
+        [AC_MSG_ERROR([no.
+ Sorry, cannot build PSBLAS without support for TR15581. 
+ Please get a Fortran compiler that supports it, e.g. GNU Fortran 4.2.])]
+)
+
+if test x"$psblas_cv_fc" == "x" ; then
+ if eval "$MPIFC -qversion | grep XL 2>/dev/null" ; then
+	psblas_cv_fc="xlf"
+	# Some configurations of the XLF want "-WF," prepended to -D.. flags.
+	# TODO : discover the exact conditions when the usage of -WF is needed.
+	psblas_cv_define_prepend="-WF,"
+ # Note : there coule be problems with old xlf compiler versions ( <10.1 )
+ # since (as far as it is known to us) -WF, is not used in earlier versions.
+ # More problems could be undocumented yet.
+ else
+  # Sun compiler detection
+  if eval "$MPIFC -V | grep Sun 2>/dev/null" ; then
+	psblas_cv_fc="sun"
+  else
+   # Portland group compiler detection
+   if eval "$MPIFC -V | grep Portland 2>/dev/null" ; then
+	psblas_cv_fc="pg"
+   else
+    # Intel compiler identification
+    if eval "$MPIFC -V 2>&1 | grep Intel.*Fortran.*Compiler 2>/dev/null" ; then
+     psblas_cv_fc="ifc"
+    else
+     psblas_cv_fc=""
+     # unsupported MPI Fortran compiler
+     AC_MSG_ERROR([[Unknown compiler ! Make sure your Fortran compiler is specified as compatible in the documentation!]])
+    fi
+   fi
+  fi
+ fi
+fi
+# TODO : SEE _AC_PROG_FC_V
+# TODO : AC_MSG_ERROR(see "$ac_cv_prog_FC_fc")
+# AC_MSG_NOTICE( "ac_cv_prog_FC_fc : $ac_cv_prog_FC_fc")
+###############################################################################
+
+###############################################################################
+#	Linking, symbol mangling, and misc tests
+###############################################################################
+
+# Note : This is functional to Make.inc rules and structure (see below).
+AC_LANG([C])
+AC_CHECK_SIZEOF(void *)
+# Define for platforms with 64 bit (void *     ) pointers
+if test X"$ac_cv_sizeof_void_p" == X"8" ; then
+  CDEFINES="-DLargeFptr $CDEFINES"
+fi
+AC_LANG([Fortran])
+__AC_FC_NAME_MANGLING
+AC_LANG([C])
+dnl AC_MSG_NOTICE([Fortran name mangling: $ac_cv_fc_mangling])
+[pac_fc_case=${ac_cv_fc_mangling%%,*}]
+[pac_fc_under=${ac_cv_fc_mangling#*,}]
+[pac_fc_sec_under=${pac_fc_under#*,}]
+[pac_fc_sec_under=${pac_fc_sec_under# }]
+[pac_fc_under=${pac_fc_under%%,*}]
+[pac_fc_under=${pac_fc_under# }]
+AC_MSG_CHECKING([defines for C/Fortran name interfaces])
+if test "x$pac_fc_case" == "xlower case"; then
+   if test "x$pac_fc_under" == "xunderscore"; then
+      if test "x$pac_fc_sec_under" == "xno extra underscore"; then 
+          pac_f_c_names="-DLowerUnderscore"
+      elif test "x$pac_fc_sec_under" == "xextra underscore"; then
+          pac_f_c_names="-DLowerDoubleUnderscore"
+      else
+          pac_f_c_names="-DUNKNOWN"
+dnl  AC_MSG_NOTICE([Fortran name mangling extra underscore unknown case])	
+      fi
+   elif test "x$pac_fc_under" == "xno underscore"; then
+      pac_f_c_names="-DLowerCase"
+   else		       
+      pac_f_c_names="-DUNKNOWN"
+dnl  AC_MSG_NOTICE([Fortran name mangling underscore unknown case])	
+   fi
+elif test "x$pac_fc_case" == "xupper case"; then
+   if test "x$pac_fc_under" == "xunderscore"; then
+      if test "x$pac_fc_sec_under" == "xno extra underscore"; then 
+          pac_f_c_names="-DUpperUnderscore"
+      elif test "x$pac_fc_sec_under" == "xextra underscore"; then
+          pac_f_c_names="-DUpperDoubleUnderscore"
+      else
+          pac_f_c_names="-DUNKNOWN"
+dnl  AC_MSG_NOTICE([Fortran name mangling extra underscore unknown case])	
+      fi
+   elif test "x$pac_fc_under" == "xno underscore"; then
+      pac_f_c_names="-DUpperCase"
+   else		       
+      pac_f_c_names="-DUNKNOWN"
+dnl  AC_MSG_NOTICE([Fortran name mangling underscore unknown case])	
+   fi
+dnl  AC_MSG_NOTICE([Fortran name mangling UPPERCASE not handled])	
+else
+   pac_f_c_names="-DUNKNOWN"   
+dnl   AC_MSG_NOTICE([Fortran name mangling unknown case])	
+fi
+CDEFINES="$pac_f_c_names $CDEFINES"
+
+AC_MSG_RESULT([ $pac_f_c_names ])
+
+###############################################################################
+# 			Make.inc generation logic
+###############################################################################
+
+# Note : This script is sensitive to FFLAGS, FCFLAGS, CFLAGS variables.
+# Note : We cannot be sure whether ./configure test programs will use these *FLAGS.
+
+dnl  Note: CFLAGS == '' is a rare condition, but we provide mechanism, not policy.
+dnl  So we prefer:
+
+if test "X$CFLAGS" == "X" ; then
+dnl over
+dnl if true ; then
+ if test "X$psblas_cv_fc" == "Xgcc" ; then
+ # note that no space should be placed around the equality symbol in assignations
+ # Note : 'native' is valid _only_ on GCC/x86  (32/64 bits)
+   CCOPT="-O3  $CCOPT" 
+ else
+  if test "X$psblas_cv_fc" == X"xlf" ; then
+   # XL compiler : consider using -qarch=auto
+     CCOPT="-O3 $CCOPT"
+   else
+   # other compilers ..
+     CCOPT="-O3 $CCOPT"
+  # NOTE : PG & Sun use -fast instead -O3
+  fi
+ fi
+ else
+ CCOPT="${CFLAGS}"
+fi
+ CFLAGS="${CCOPT}"
+
+if test "X$FFLAGS" == "X" ; then
+ if test "X$psblas_cv_fc" == "Xgcc" ; then
+ # note that no space should be placed around the equality symbol in assignations
+ # Note : 'native' is valid _only_ on GCC/x86  (32/64 bits)
+   FCOPT="-O3  $FCOPT"
+ else
+  if test "X$psblas_cv_fc" == X"xlf" ; then
+   # XL compiler : consider using -qarch=auto
+     FCOPT="-O3 $FCOPT"
+   else
+   # other compilers ..
+     FCOPT="-O3 $FCOPT"
+  # NOTE : PG & Sun use -fast instead -O3
+  fi
+ fi
+ else
+ FCOPT="${FFLAGS}"
+fi
+ FFLAGS="${FCOPT}"
+
+if test "X$FCFLAGS" == "X" ; then
+ if test "X$psblas_cv_fc" == "Xgcc" ; then
+ # note that no space should be placed around the equality symbol in assignations
+ # Note : 'native' is valid _only_ on GCC/x86  (32/64 bits)
+ F90COPT="-O3  $F90COPT"
+ else
+  if test "X$psblas_cv_fc" == X"xlf" ; then
+   # XL compiler : consider using -qarch=auto
+   F90COPT="-O3 $F90COPT"
+   else
+   # other compilers ..
+   F90COPT="-O3 $F90COPT"
+  # NOTE : PG & Sun use -fast instead -O3
+  fi
+ fi
+ else
+ F90COPT="${FCFLAGS}"
+fi
+FCFLAGS="${F90COPT}"
+
+# COPT,FCOPT, F90COPT are aliases for FFLAGS,CFLAGS,FCFLAGS .
+
+##############################################################################
+# Compilers variables selection 
+##############################################################################
+if true ; then
+ if test "X$psblas_cv_fc" == X"xlf" ; then
+  # WARNING : this is EVIL : specifying a pathname prefixed compiler will be ignored!
+  # But this is necessary since :
+  #  - if called from some script, xlf could behave strangely
+  #  - it is not said that mpxlf95 gets chosen by the configure script.
+    F90="xlf95   -qsuffix=f=f90:cpp=F90"
+ #  F90="xlf95"
+  MPF90="mpxlf95 -qsuffix=f=f90:cpp=F90"
+#    FC="xlf"
+
+# Note : this gives problems in base/serial/aux/isaperm.f
+# FC="mpxlf     -qsuffix=f=f90:cpp=F90" 
+
+# Note : this is the cure
+     FC="xlf     -qsuffix=f=f:cpp=F"
+     # Note : maybe we will want xlf -qsuffix=cpp=F
+
+    F77="xlf"
+  MPF77="mpxlf95 -qfixed  -qsuffix=f=f:cpp=F"
+     CC="xlc"
+   MPCC="mpcc"
+ #MPFCC="mpxlc"
+  # Note : -qfixed should be not specified in the environment FFLAGS or things will break.
+  #        This fact should be documented somewhere.
+ else 
+  # We really think about the GCC here but this is our idea for other compilers, too.
+  # If the user wishes to, she should specify MPICC, MPIF77 after ./configure.
+  # Note: this behavious should be documented.
+    F90=${FC}
+  MPF90=${MPIFC}
+     FC=${FC}
+  MPF77=${MPIFC}
+     CC=${CC}
+   MPCC=${MPICC}
+ fi
+fi
+
+##############################################################################
+# Choice of our compilers, needed by Make.inc
+##############################################################################
+if test "X$FLINK" == "X" ; then
+   FLINK=${MPF77}
+fi
+
+if test "X$F90LINK" == "X" ; then
+   F90LINK=${MPF90}
+fi
+##############################################################################
+##############################################################################
+#			Include flags
+##############################################################################
+AX_F90_MODULE_EXTENSION
+AX_F90_MODULE_FLAG
+MODEXT=".$ax_f90_modext"
+FMFLAG="$ax_f90_modflag"
+FIFLAG=-I
+
+###############################################################################
+
+###############################################################################
+# NOTE :
+# Missing stuff : 
+# 		In the case the detected fortran compiler is ifort, icc or gcc
+#		should be valid options.
+#		The same for pg (Portland Group compilers).
+###############################################################################
+
+
+###############################################################################
+# Custom test : do we have a module or include for MPI Fortran interface?
+
+PAC_FORTRAN_CHECK_HAVE_MPI_MOD(
+	[FDEFINES="$psblas_cv_define_prepend-DMPI_MOD $FDEFINES"],
+	[FDEFINES="$psblas_cv_define_prepend-DMPI_H $FDEFINES"]
+)
+
+# Custom test : do we have move_alloc ?
+PAC_FORTRAN_HAVE_MOVE_ALLOC(
+	[FDEFINES="$psblas_cv_define_prepend-DHAVE_MOVE_ALLOC $FDEFINES"],
+	
+)
+
+###############################################################################
+#	Additional pathname stuff (yes, it is redundant and confusing...)
+###############################################################################
+
+# -I
+if test x"$INCLUDEPATH" != "x" ; then
+	FINCLUDES="$FINCLUDES $INCLUDEPATH"
+	CINCLUDES="$CINCLUDES $INCLUDEPATH"
+fi
+
+# -L
+if test x"$LIBRARYPATH" != "x" ; then
+	FINCLUDES="$FINCLUDES $LIBRARYPATH"
+fi
+
+# -I
+if test x"$MODULE_PATH" != "x" ; then
+	FINCLUDES="$FINCLUDES $MODULE_PATH"
+fi
+
+###############################################################################
+#	Parachute rules for ar and ranlib ... (could cause problems)
+###############################################################################
+
+if test "X$AR" == "X" ; then
+  AR="ar"
+fi
+
+if test "X$RANLIB" == "X" ; then
+  RANLIB="ranlib"
+fi
+
+# This should be portable
+AR="${AR} -cur"
+
+
+###############################################################################
+#		BLAS  library presence checks
+###############################################################################
+
+# Note : The libmkl.a (Intel Math Kernel Library) library could be used, too.
+# It is sufficient to specify it as -lmkl in the CLIBS or FLIBS or LIBS 
+# and specify its path adjusting -L/path in CFLAGS.
+
+# Right now it is a matter of user's taste when linking custom applications.
+# But PSBLAS examples could take advantage of these libraries, too.
+
+AC_LANG([C])
+ACX_BLAS([], [AC_MSG_ERROR([[Cannot find BLAS library, specify a path using --with-blas=DIR/LIB (for example --with-blas=/usr/path/lib/libcxml.a)]])])
+
+
+###############################################################################
+#		BLACS library presence checks
+###############################################################################
+save_FC="$FC";
+save_CC="$CC";
+FC="$MPIFC";
+CC="$MPICC";
+PAC_CHECK_BLACS
+FC="$save_FC";
+CC="$save_CC";
+
+
+###############################################################################
+#		METIS, SuperLU, SuperLU_Dist UMFPack libraries presence checks
+###############################################################################
+
+# Note : also SuperLUStat,superlu_gridexit,.. 
+# Note : SuperLU_Dist produces superlu.a by default..
+# Note : THESE WERE NOT TESTED
+#AC_CHECK_LIB(superlu,[superlu_malloc_dist],psblas_cv_have_superludist=yes,psblas_cv_have_superludist=no)
+#AC_CHECK_LIB(superlu,[superlu_malloc],psblas_cv_have_superlu=yes,psblas_cv_have_superlu=no)
+# Note : also umfdi_local_search, ...
+#AC_CHECK_LIB(umf,umfpack_di_solve,psblas_cv_have_umfpack=yes,psblas_cv_have_umfpack=no,[amd])
+
+AC_ARG_WITH(metis, AC_HELP_STRING([--with-metis=LIB], [Specify -lMETISLIBNAME or the absolute library filename.]),
+        [psblas_cv_metis=$withval],
+        [psblas_cv_metis=''])
+
+
+if test "x$psblas_cv_metis" != "x" ; then
+	AC_CHECK_LIB("m",METIS_PartGraphRecursive, psblas_cv_have_metis=yes; METIS_LIBS="$psblas_cv_metis", psblas_cv_have_metis=no,["$psblas_cv_metis"])
+else
+	save_LIBS="$LIBS";
+	LIBS="-lm $LIBS";	
+	AC_CHECK_LIB(metis,METIS_PartGraphRecursive,psblas_cv_have_metis=yes;METIS_LIBS="-lmetis", psblas_cv_have_metis=no)
+	LIBS="$save_LIBS";	
+fi
+if test "x$psblas_cv_have_metis" == "xyes" ; then
+  FDEFINES="$FDEFINES $psblas_cv_define_prepend-DHAVE_METIS"
+fi
+
+
+
+# Note  : We would like to detect PSBLAS, but this is complicated by the
+#         module symbols mangling rules, which are compiler specific !
+#
+#	  Moreover, the PSBLAS doesn't have an installer, currently.
+
+###############################################################################
+#		Library target directory and archive files.
+###############################################################################
+
+LIBDIR=lib
+BASELIBNAME=libpsb_base.a
+PRECLIBNAME=libpsb_prec.a
+METHDLIBNAME=libpsb_krylov.a
+
+# Note: psb_util code will be compiled conditionally for METIS functionalities.. using HAVE_METIS
+UTILLIBNAME=libpsb_util.a
+
+
+###############################################################################
+# Variable substitutions : the Make.inc.in will have these @VARIABLES@
+# substituted.
+
+AC_SUBST(FDEFINES)
+AC_SUBST(CDEFINES)
+AC_SUBST(BASELIBNAME)
+AC_SUBST(F90)
+AC_SUBST(F90COPT)
+AC_SUBST(MPF90)
+AC_SUBST(MPF77)
+AC_SUBST(MPCC)
+AC_SUBST(FCOPT)
+AC_SUBST(CCOPT)
+AC_SUBST(FIFLAG)
+AC_SUBST(FMFLAG)
+AC_SUBST(MODEXT)
+AC_SUBST(MPIF77)
+AC_SUBST(FLINK)
+AC_SUBST(F90LINK)
+AC_SUBST(LIBS)
+AC_SUBST(AR)
+AC_SUBST(RANLIB)
+AC_SUBST(MPIFC)
+AC_SUBST(MPIFCC)
+
+AC_SUBST(BLAS_LIBS)
+AC_SUBST(BLACS_LIBS)
+AC_SUBST(METIS_LIBS)
+
+AC_SUBST(CINCLUDES)
+AC_SUBST(FINCLUDES)
+
+if test "X$psblas_cv_fc" == "Xgcc" ; then
+PSBLASRULES='
+PSBLDLIBS=$(BLACS) $(BLAS) $(METIS_LIB) $(LIBS)
+CDEFINES=$(PSBCDEFINES)
+FDEFINES=$(PSBFDEFINES)
+# Warning : these rules are only valid with GNU make!
+
+%.o: %.c
+	$(CC) $(F90COPT) $(CINCLUDES) $(CDEFINES)  -c $<
+%.o: %.f
+	$(FC) $(FCOPT) $(FINCLUDES)  -c $<
+%$(.mod): %.f
+	$(FC) $(FCOPT) $(FINCLUDES)  -c $<
+%.o: %.f90
+	$(F90) $(F90COPT) $(FINCLUDES)  -c $<
+%$(.mod): %.f90
+	$(F90) $(F90COPT) $(FINCLUDES)  -c $<
+%.o: %.F
+	$(FC) $(FCOPT) $(FINCLUDES) $(FDEFINES)  -c $<
+%$(.mod): %.F
+	$(FC) $(FCOPT) $(FINCLUDES) $(FDEFINES)  -c $<
+%.o: %.F90
+	$(F90) $(F90COPT) $(FINCLUDES) $(FDEFINES)  -c $<
+%$(.mod): %.F90
+	$(F90) $(F90COPT) $(FINCLUDES) $(FDEFINES) -c $<'
+
+else
+
+PSBLASRULES='
+PSBLDLIBS=$(BLACS) $(BLAS) $(METIS_LIB) $(LIBS)
+CDEFINES=$(PSBCDEFINES)
+FDEFINES=$(PSBFDEFINES)
+
+# These should be portable rules, arent they?
+.c.o:
+	$(CC) $(CCOPT) $(CINCLUDES) $(CDEFINES) -c $<
+.f.o:
+	$(FC) $(FCOPT) $(FINCLUDES)  -c $<
+.f$(.mod):
+	$(F90) $(FCOPT) $(FINCLUDES) -c $<
+.f90$(.mod):
+	$(F90) $(F90COPT) $(FINCLUDES) -c $<
+.f90.o:
+	$(F90) $(F90COPT) $(FINCLUDES) -c $<
+.F.o:
+	$(FC)  $(FCOPT)   $(FINCLUDES) $(FDEFINES) -c $<
+.F$(.mod):
+	$(FC)  $(FCOPT)   $(FINCLUDES) $(FDEFINES) -c $<
+.F90.o:
+	$(F90) $(F90COPT) $(FINCLUDES) $(FDEFINES) -c $<
+.F90$(.mod):
+	$(F90) $(F90COPT) $(FINCLUDES) $(FDEFINES) -c $<'
+
+fi
+AC_SUBST(PSBLASRULES)
+AC_SUBST(LIBDIR)
+AC_SUBST(BASELIBNAME)
+AC_SUBST(PRECLIBNAME)
+AC_SUBST(METHDLIBNAME)
+AC_SUBST(UTILLIBNAME)
+
+###############################################################################
+# the following files will be created by Automake
+
+AC_CONFIG_FILES([Make.inc])
+AC_OUTPUT()
+#AC_OUTPUT(Make.inc Makefile)
+###############################################################################
+
+dnl Please note that brackets around variable identifiers are absolutely needed for compatibility..
+AC_MSG_NOTICE([
+	${PACKAGE_NAME} ${psblas_cv_version} has been configured as follows:
+
+   	MPF90                 : ${MPF90}
+	MPF77                 : ${MPF77}
+	MPICC                 : ${MPICC}
+dnl	F90LINK               : ${F90LINK}
+	FLINK                 : ${FLINK}
+
+	FDEFINES              : ${FDEFINES}
+	CDEFINES              : ${CDEFINES}
+	CFLAGS                : ${CFLAGS}
+	FFLAGS                : ${FFLAGS}
+	FCFLAGS               : ${FCFLAGS}
+	MODEXT                : ${MODEXT}
+	FMFLAG                : ${FMFLAG}
+dnl	F90COPT               : ${F90COPT}
+dnl	FCOPT                 : ${FCOPT}
+dnl	CCOPT                 : ${CCOPT}
+
+dnl	ESSL/PESSL            : ${psblas_cv_have_essl} / ${psblas_cv_have_pessl}
+
+	BLAS                  : ${BLAS_LIBS}
+	BLACS                 : ${BLACS_LIBS}
+
+	METIS detected        : ${psblas_cv_have_metis}
+dnl	SuperLU detected      : ${psblas_cv_have_superlu}
+dnl	SuperLU_Dist detected : ${psblas_cv_have_superludist}
+dnl	UMFPack detected      : ${psblas_cv_have_umfpack}
+dnl	F90                   : ${F90}
+dnl	FC                    : ${FC}
+dnl	CC                    : ${CC}
+dnl	F77                   : ${F77}
+dnl	FMFLAG                : ${FMFLAG}
+dnl	FIFLAG                : ${FIFLAG}
+
+dnl 	MPICXX                : ${MPICXX}
+dnl	MPIF77                : ${MPIF77}
+dnl	MPIFC                 : ${MPIFC}
+dnl	MPIF90                : ${MPIF90}
+dnl	MPCC                  : ${MPCC}
+dnl	AR                    : ${AR}
+dnl	RANLIB                : ${RANLIB}
+        LIBS                  : ${LIBS}
+dnl FIXME : CLIBS seems an useless variable..
+dnl FIXME : FLIBS seems an useless variable..
+dnl FIXME :  LIBS seems an useless variable..
+dnl	CLIBS                 : ${CLIBS}
+dnl	FLIBS                 : ${CLIBS}
+dnl	 LIBS                 : ${LIBS}
+
+dnl Note : we should use LDLIBS sooner or later!
+	LDLIBS                : ${LDLIBS}
+
+	LIBRARYPATH           : ${LIBRARYPATH}
+	INCLUDEPATH           : ${INCLUDEPATH}
+	MODULE_PATH            : ${MODULE_PATH}
+
+	If you are satisfied, run 'make' to build ${PACKAGE_NAME} and its documentation; otherwise
+	type  ./configure --help=short for a complete list of configure options specific to ${PACKAGE_NAME}.
+dnl	To install the program and its documentation, run 'make install' if you are root,
+dnl	or run 'su -c "make install"' if you are not root.
+])
+
+###############################################################################
+

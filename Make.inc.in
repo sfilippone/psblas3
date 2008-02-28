@@ -1,0 +1,54 @@
+
+# This is Make.inc file generated automatically by the PSBLAS configure script.
+# It should be ready to use, included by Makefile.
+# If it gives problems, consider editing it.
+
+# These lines are quite portable.
+.mod=@MODEXT@
+.fh=.fh
+.SUFFIXES: .f90 $(.mod) .F90 .F
+
+
+# The following ones are the variables used by the PSBLAS make scripts.
+
+F90=@F90@
+FC=@FC@
+CC=@CC@
+#F77=@F77@
+F90COPT=@F90COPT@
+FCOPT=@FCOPT@
+CCOPT=@CCOPT@
+FMFLAG=@FMFLAG@
+FIFLAG=@FIFLAG@
+
+# These three should be always set!
+MPF90=@MPF90@
+MPF77=@MPF77@
+MPCC=@MPCC@
+
+F90LINK=$(MPF90)
+FLINK=$(MPF77)
+
+LIBS=@LIBS@
+
+# BLAS, BLACS and METIS libraries.
+BLAS=@BLAS_LIBS@
+BLACS=@BLACS_LIBS@
+METIS_LIB=@METIS_LIBS@
+
+PSBFDEFINES=@FDEFINES@
+PSBCDEFINES=@CDEFINES@
+AR=@AR@
+RANLIB=@RANLIB@
+CFLAGS=@CFLAGS@
+FFLAGS=@FFLAGS@
+
+
+LIBDIR=@LIBDIR@
+BASELIBNAME=@BASELIBNAME@
+PRECLIBNAME=@PRECLIBNAME@
+METHDLIBNAME=@METHDLIBNAME@
+UTILLIBNAME=@UTILLIBNAME@
+
+@PSBLASRULES@
+

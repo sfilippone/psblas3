@@ -81,9 +81,30 @@ prerequisites (see also SERIAL below):
    This is optional: it is  used in the util and test/fileread
    directories if you define the HAVE_METIS directive.
 
-To install, choose a Make.inc.XXX file in directory Make that fits
-your compilers, modify the paths to libraries to  match your
-installation and copy it to Make.inc in the top directory. 
+We offer an experimental configure script: if everything works well,
+it will generate a Make.inc file suitable for building the library. 
+The script is capable of recognizing the needed libraries with their
+default names; if they are in unusual places consider adding the paths
+with --with-lib, or explicitly specify the names in --with-blas and
+friends.
+Please note that a common way for the configure script to fail is to
+specify inconsistent MPI vs. plain compilers, either directly or
+indirectly via environment variables; e.g. specifying the Intel
+compiler with FC=ifort and the default MPIFC=mpif90 which points to
+GNU Fortran 4.1. The best way to avoid this situation is (in our
+opinion) to use the environment modules package (see
+http://modules.sourceforge.net/), and load the relevant variables with
+(e.g.)  
+module load gnu42 mpich 
+This will delegate to the modules setup to make sure that the version
+of mpich in use is the one compiled with the gnu42 compilers. 
+After the configure script has completed you can always tweak the
+Make.inc  file yourself. 
+
+As a backup alternative, you can  choose a Make.inc.XXX file in
+directory Make that fits your compilers, modify the paths to libraries
+to  match your installation and copy it to Make.inc in the top
+directory. 
 Then run 
  make 
 to  compile the library; go to the test directory and its
@@ -106,6 +127,9 @@ The PSBLAS team.
 
 
 Contact: Salvatore Filippone     salvatore.filippone@uniroma2.it
+
+Credits for version 2.2:
+Michele Martone contributed the configure machinery. 
 
 Credits for version 2.0:
 Salvatore  Filippone
