@@ -313,6 +313,9 @@ dnl if true ; then
  elif test "X$psblas_cv_fc" == X"xlf" ; then
    # XL compiler : consider using -qarch=auto
      CCOPT="-O3 -qarch=auto $CCOPT"
+ elif test "X$psblas_cv_fc" == X"ifc" ; then
+   # other compilers ..
+     CCOPT="-O3 $CCOPT"
  elif test "X$psblas_cv_fc" == X"pg" ; then
    # other compilers ..
      CCOPT="-fast $CCOPT"
@@ -322,7 +325,7 @@ dnl if true ; then
      CCOPT="-fast $CCOPT"
   # NOTE : PG & Sun use -fast instead -O3
  else 
-     CCOPT="-fast $CCOPT"
+     CCOPT="-O2 $CCOPT"
  fi
 else
  CCOPT="${CFLAGS}"
@@ -337,6 +340,9 @@ if test "X$FFLAGS" == "X" ; then
  elif test "X$psblas_cv_fc" == X"xlf" ; then
    # XL compiler : consider using -qarch=auto
      FCOPT="-O3 -qarch=auto $FCOPT"
+ elif test "X$psblas_cv_fc" == X"ifc" ; then
+   # other compilers ..
+     FCOPT="-O3 $FCOPT"
  elif test "X$psblas_cv_fc" == X"pg" ; then
    # other compilers ..
      FCOPT="-fast $FCOPT"
@@ -346,7 +352,7 @@ if test "X$FFLAGS" == "X" ; then
      FCOPT="-fast $FCOPT"
   # NOTE : PG & Sun use -fast instead -O3
  else 
-     FCOPT="-fast $FCOPT"
+     FCOPT="-O2 $FCOPT"
  fi
 else
  FCOPT="${FFLAGS}"
@@ -361,12 +367,18 @@ if test "X$FCFLAGS" == "X" ; then
  elif test "X$psblas_cv_fc" == X"xlf" ; then
    # XL compiler : consider using -qarch=auto
      F90COPT="-O3 -qarch=auto $F90COPT"
- elif test "X$psblas_cv_fc" == X"pgf77" ; then
+ elif test "X$psblas_cv_fc" == X"ifc" ; then
+   # other compilers ..
+     F90COPT="-O3 $F90COPT"
+ elif test "X$psblas_cv_fc" == X"pg" ; then
+   # other compilers ..
+     F90COPT="-fast $F90COPT"
+ elif test "X$psblas_cv_fc" == X"sun" ; then
    # other compilers ..
      F90COPT="-fast $F90COPT"
   # NOTE : PG & Sun use -fast instead -O3
  else 
-     F90COPT="-fast $F90COPT"
+     F90COPT="-O2 $F90COPT"
  fi
 else
  F90COPT="${FCFLAGS}"
