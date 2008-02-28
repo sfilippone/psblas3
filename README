@@ -101,11 +101,20 @@ of mpich in use is the one compiled with the gnu42 compilers.
 After the configure script has completed you can always tweak the
 Make.inc  file yourself. 
 
+An annoying problem exists with some versions of MPICH: the configure
+script will set -DMPI_MOD, which is to say, the MPI call interfaces
+will be resolved by using the MPI Fortran module. However usage of the
+module may cause compilation to fail if coupled with the debugging
+option -g, because the compiler complains that it cannot find any
+matching interface. 
+The solution: either take out the -g option, or, if you really need to
+debug, force -DMPI_H in place of -DMPI_MOD.
+
+
 As a backup alternative, you can  choose a Make.inc.XXX file in
 directory Make that fits your compilers, modify the paths to libraries
 to  match your installation and copy it to Make.inc in the top
-directory. 
-Then run 
+directory. Then run 
  make 
 to  compile the library; go to the test directory and its
 subdirectories to get test programs done.   
