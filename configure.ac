@@ -239,7 +239,7 @@ AC_LANG([C])
 AC_CHECK_SIZEOF(void *)
 # Define for platforms with 64 bit (void *     ) pointers
 if test X"$ac_cv_sizeof_void_p" == X"8" ; then
-  CDEFINES="-DLargeFptr $CDEFINES"
+  CDEFINES="-DPtr64Bits $CDEFINES"
 fi
 AC_LANG([Fortran])
 __AC_FC_NAME_MANGLING

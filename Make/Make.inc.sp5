@@ -54,8 +54,8 @@ BLACS=-lblacssmp
 #METIS_LIB = -L$(HOME)/NUMERICAL/metis-4.0 -lmetis 
 PSBLDLIBS=$(BLACS) $(BLAS) $(METIS_LIB)
 
-#  Add -DLargeFptr for 64-bit addresses
-PSBCDEFINES=-DLowerCase -DLargeFptr
+#  Add -DPtr64Bits if needed
+PSBCDEFINES=-DLowerCase -DPtr64Bits
 #
 PSBFDEFINES=-WF,-DHAVE_ESSL_BLACS  $(MPI_FINC)
 # There's no MOVE_ALLOC yet in XLF 10.1.

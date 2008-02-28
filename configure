@@ -6479,7 +6479,7 @@ _ACEOF
 
 # Define for platforms with 64 bit (void *     ) pointers
 if test X"$ac_cv_sizeof_void_p" == X"8" ; then
-  CDEFINES="-DLargeFptr $CDEFINES"
+  CDEFINES="-DPtr64Bits $CDEFINES"
 fi
 ac_ext=${ac_fc_srcext-f}
 ac_compile='$FC -c $FCFLAGS $ac_fcflags_srcext conftest.$ac_ext >&5'

@@ -164,8 +164,8 @@ typedef struct pairtree {
   AVLTreePtr  tree;
 } PairTree;
 
-#ifdef LargeFptr
-typedef long long fptr;  /* 32-bit by default */
+#ifdef Ptr64Bits
+typedef long long fptr;  
 #else
 typedef int fptr;  /* 32-bit by default */
 #endif
