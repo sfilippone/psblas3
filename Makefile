@@ -1,6 +1,7 @@
 include Make.inc
 
 library:
+	(if test ! -d lib ; then mkdir lib; fi)
 	(cd base; make lib)
 	(cd prec; make lib )
 	(cd krylov; make lib)
