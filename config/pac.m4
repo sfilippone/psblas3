@@ -69,7 +69,7 @@ ac_exeext=''
 ac_ext='f'
 ac_link='${MPIFC-$FC} -o conftest${ac_exeext} $FFLAGS $LDFLAGS conftest.$ac_ext $LIBS 1>&5'
 dnl Warning : square brackets are EVIL!
-[AC_MSG_CHECKING([for MOVE_ALLOC intrinsic])
+[AC_MSG_CHECKING([for Fortran MOVE_ALLOC intrinsic])
 cat > conftest.$ac_ext <<EOF
            program test_move_alloc
                integer, allocatable :: a(:), b(:)
@@ -328,7 +328,7 @@ dnl Depending on the compiler flags, this could cause a conftest.mod file to app
 dnl in the present directory, or in another, or with another name. So be warned!
 dnl
 dnl @author Michele Martone <michele.martone@uniroma2.it>
-dnl
+dnl @author Salvatore Filippone <salvatore.filippone@uniroma2.it>
 AC_DEFUN(PAC_FORTRAN_TEST_TR15581,
 ac_exeext=''
 ac_ext='f90'
@@ -393,9 +393,56 @@ program testtr15581
 end program testtr15581
 EOF
 if AC_TRY_EVAL(ac_link) && test -s conftest${ac_exeext}; then
+  AC_MSG_RESULT([yes])
   ifelse([$1], , :, [
   $1])
 else
+  AC_MSG_RESULT([no])
+  echo "configure: failed program was:" >&AC_FD_CC
+  cat conftest.$ac_ext >&AC_FD_CC
+ifelse([$2], , , [  
+  $2
+])dnl
+fi
+cd ..
+rm -fr tmpdir_$i])
+dnl @synopsis PAC_FORTRAN_TEST_VOLATILE( [ACTION-IF-FOUND [, ACTION-IF-NOT-FOUND]])
+dnl
+dnl Will try to compile and link a program checking the VOLATILE Fortran support.
+dnl
+dnl Will use MPIFC, otherwise '$FC'.
+dnl
+dnl If the test passes, will execute ACTION-IF-FOUND. Otherwise, ACTION-IF-NOT-FOUND.
+dnl Note : This file will be likely to induce the compiler to create a module file
+dnl (for a module called conftest).
+dnl Depending on the compiler flags, this could cause a conftest.mod file to appear
+dnl in the present directory, or in another, or with another name. So be warned!
+dnl
+dnl @author Michele Martone <michele.martone@uniroma2.it>
+dnl @author Salvatore Filippone <salvatore.filippone@uniroma2.it>
+AC_DEFUN(PAC_FORTRAN_TEST_VOLATILE,
+ac_exeext=''
+ac_ext='f90'
+ac_link='${MPIFC-$FC} -o conftest${ac_exeext} $FCFLAGS $LDFLAGS conftest.$ac_ext $LIBS 1>&5'
+dnl Warning : square brackets are EVIL!
+[AC_MSG_CHECKING([support for Fortran VOLATILE])
+i=0
+while test \( -f tmpdir_$i \) -o \( -d tmpdir_$i \) ; do
+  i=`expr $i + 1`
+done
+mkdir tmpdir_$i
+cd tmpdir_$i
+cat > conftest.$ac_ext <<EOF
+program conftest
+  integer, volatile :: i, j
+end program conftest
+EOF
+if AC_TRY_EVAL(ac_link) && test -s conftest${ac_exeext}; then
+  AC_MSG_RESULT([yes])
+  ifelse([$1], , :, [
+  $1])
+else
+  AC_MSG_RESULT([no])
   echo "configure: failed program was:" >&AC_FD_CC
   cat conftest.$ac_ext >&AC_FD_CC
 ifelse([$2], , , [  
@@ -418,6 +465,7 @@ dnl Depending on the compiler flags, this could cause a conftest.mod file to app
 dnl in the present directory, or in another, or with another name. So be warned!
 dnl
 dnl @author Michele Martone <michele.martone@uniroma2.it>
+dnl @author Salvatore Filippone <salvatore.filippone@uniroma2.it>
 dnl
 AC_DEFUN(PAC_CHECK_BLACS,
 [AC_ARG_WITH(blacs, AC_HELP_STRING([--with-blacs=LIB], [Specify BLACSLIBNAME or -lBLACSLIBNAME or the absolute library filename.]),

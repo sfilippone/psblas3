@@ -5369,24 +5369,25 @@ if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
   (exit $ac_status); } && test -s conftest${ac_exeext}; then
-
-  { echo "$as_me:$LINENO: result: yes." >&5
-echo "${ECHO_T}yes." >&6; }
+  { echo "$as_me:$LINENO: result: yes" >&5
+echo "${ECHO_T}yes" >&6; }
+  :
 else
+  { echo "$as_me:$LINENO: result: no" >&5
+echo "${ECHO_T}no" >&6; }
   echo "configure: failed program was:" >&5
   cat conftest.$ac_ext >&5
 
-  { { echo "$as_me:$LINENO: error: no.
- Sorry, cannot build PSBLAS without support for TR15581.
+  { { echo "$as_me:$LINENO: error: Sorry, cannot build PSBLAS without support for TR15581.
  Please get a Fortran compiler that supports it, e.g. GNU Fortran 4.2." >&5
-echo "$as_me: error: no.
- Sorry, cannot build PSBLAS without support for TR15581.
+echo "$as_me: error: Sorry, cannot build PSBLAS without support for TR15581.
  Please get a Fortran compiler that supports it, e.g. GNU Fortran 4.2." >&2;}
    { (exit 1); exit 1; }; }
 
 fi
 cd ..
 rm -fr tmpdir_$i
+
 
 if test x"$psblas_cv_fc" == "x" ; then
  if eval "$MPIFC -qversion | grep XL 2>/dev/null" ; then
@@ -7132,8 +7133,8 @@ rm -f conftest*
 ac_exeext=''
 ac_ext='f'
 ac_link='${MPIFC-$FC} -o conftest${ac_exeext} $FFLAGS $LDFLAGS conftest.$ac_ext $LIBS 1>&5'
-{ echo "$as_me:$LINENO: checking for MOVE_ALLOC intrinsic" >&5
-echo $ECHO_N "checking for MOVE_ALLOC intrinsic... $ECHO_C" >&6; }
+{ echo "$as_me:$LINENO: checking for Fortran MOVE_ALLOC intrinsic" >&5
+echo $ECHO_N "checking for Fortran MOVE_ALLOC intrinsic... $ECHO_C" >&6; }
 cat > conftest.$ac_ext <<EOF
            program test_move_alloc
                integer, allocatable :: a(:), b(:)
@@ -7159,6 +7160,40 @@ echo "${ECHO_T}no" >&6; }
   cat conftest.$ac_ext >&5
 fi
 rm -f conftest*
+
+ac_exeext=''
+ac_ext='f90'
+ac_link='${MPIFC-$FC} -o conftest${ac_exeext} $FCFLAGS $LDFLAGS conftest.$ac_ext $LIBS 1>&5'
+{ echo "$as_me:$LINENO: checking support for Fortran VOLATILE" >&5
+echo $ECHO_N "checking support for Fortran VOLATILE... $ECHO_C" >&6; }
+i=0
+while test \( -f tmpdir_$i \) -o \( -d tmpdir_$i \) ; do
+  i=`expr $i + 1`
+done
+mkdir tmpdir_$i
+cd tmpdir_$i
+cat > conftest.$ac_ext <<EOF
+program conftest
+  integer, volatile :: i, j
+end program conftest
+EOF
+if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
+  (eval $ac_link) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } && test -s conftest${ac_exeext}; then
+  { echo "$as_me:$LINENO: result: yes" >&5
+echo "${ECHO_T}yes" >&6; }
+
+  FDEFINES="$psblas_cv_define_prepend-DHAVE_VOLATILE $FDEFINES"
+else
+  { echo "$as_me:$LINENO: result: no" >&5
+echo "${ECHO_T}no" >&6; }
+  echo "configure: failed program was:" >&5
+  cat conftest.$ac_ext >&5
+fi
+cd ..
+rm -fr tmpdir_$i
 
 ###############################################################################
 #	Additional pathname stuff (yes, it is redundant and confusing...)

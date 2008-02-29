@@ -192,6 +192,9 @@ subroutine psi_dtranidxm(ictxt,icomm,flag,n,beta,y,idx,totxch,totsnd,totrcv,work
   logical, parameter :: usersend=.false.
 
   real(kind(1.d0)), pointer, dimension(:) :: sndbuf, rcvbuf
+#ifdef HAVE_VOLATILE
+  volatile :: sndbuf, rcvbuf
+#endif
   character(len=20)  :: name
 
   info = 0

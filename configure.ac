@@ -189,11 +189,11 @@ PAC_CHECK_HAVE_GFORTRAN(
 # Test for TR 15581, aka allocatables extensions.
 #
 PAC_FORTRAN_TEST_TR15581( 
-	[AC_MSG_RESULT([yes.])],
-        [AC_MSG_ERROR([no.
- Sorry, cannot build PSBLAS without support for TR15581. 
+	[],
+        [AC_MSG_ERROR([Sorry, cannot build PSBLAS without support for TR15581. 
  Please get a Fortran compiler that supports it, e.g. GNU Fortran 4.2.])]
 )
+
 
 if test x"$psblas_cv_fc" == "x" ; then
  if eval "$MPIFC -qversion | grep XL 2>/dev/null" ; then
@@ -471,6 +471,10 @@ PAC_FORTRAN_CHECK_HAVE_MPI_MOD(
 PAC_FORTRAN_HAVE_MOVE_ALLOC(
 	[FDEFINES="$psblas_cv_define_prepend-DHAVE_MOVE_ALLOC $FDEFINES"],
 	
+)
+
+PAC_FORTRAN_TEST_VOLATILE( 
+	[FDEFINES="$psblas_cv_define_prepend-DHAVE_VOLATILE $FDEFINES"],
 )
 
 ###############################################################################

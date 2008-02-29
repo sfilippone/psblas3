@@ -192,6 +192,9 @@ subroutine psi_itranidxm(ictxt,icomm,flag,n,beta,y,idx,totxch,totsnd,totrcv,work
   logical, parameter :: usersend=.false.
 
   integer, pointer, dimension(:) :: sndbuf, rcvbuf
+#ifdef HAVE_VOLATILE
+  volatile :: sndbuf, rcvbuf
+#endif
   character(len=20)  :: name
 
   info = 0
@@ -679,6 +682,9 @@ subroutine psi_itranidxv(ictxt,icomm,flag,beta,y,idx,totxch,totsnd,totrcv,work,i
   logical, parameter :: usersend=.false.
 
   integer, pointer, dimension(:) :: sndbuf, rcvbuf
+#ifdef HAVE_VOLATILE
+  volatile :: sndbuf, rcvbuf
+#endif
   character(len=20)  :: name
 
   info = 0
