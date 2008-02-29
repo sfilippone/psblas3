@@ -4957,10 +4957,10 @@ contains
 
   subroutine psb_set_coher(ictxt,isvch)
     integer :: ictxt, isvch
-    ! Ensure global coherence for convergence checks.
+    ! Ensure global repeatability for convergence checks.
 #if !defined(HAVE_ESSL_BLACS)
-    Call blacs_get(ictxt,16,isvch)
-    Call blacs_set(ictxt,16,1)
+    Call blacs_get(ictxt,15,isvch)
+    Call blacs_set(ictxt,15,1)
 #else
     ! Do nothing: ESSL does coherence by default,
     ! and does not handle req=16 
@@ -4970,10 +4970,10 @@ contains
     integer :: ictxt, isvch
     ! Ensure global coherence for convergence checks.
 #if !defined(HAVE_ESSL_BLACS)
-    Call blacs_set(ictxt,16,isvch)
+    Call blacs_set(ictxt,15,isvch)
 #else
     ! Do nothing: ESSL does coherence by default,
-    ! and does not handle req=16 
+    ! and does not handle req=15
 #endif
   end subroutine psb_restore_coher
   subroutine psb_get_mpicomm(ictxt,comm)
