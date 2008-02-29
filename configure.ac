@@ -445,7 +445,7 @@ fi
 AX_F90_MODULE_EXTENSION
 AX_F90_MODULE_FLAG
 MODEXT=".$ax_f90_modext"
-FMFLAG="$ax_f90_modflag"
+FMFLAG="${ax_f90_modflag%%[ ]*}"
 FIFLAG=-I
 
 ###############################################################################

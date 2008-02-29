@@ -7081,7 +7081,7 @@ fi
 { echo "$as_me:$LINENO: result: $ax_f90_modflag" >&5
 echo "${ECHO_T}$ax_f90_modflag" >&6; }
 MODEXT=".$ax_f90_modext"
-FMFLAG="$ax_f90_modflag"
+FMFLAG="${ax_f90_modflag%% *}"
 FIFLAG=-I
 
 ###############################################################################
