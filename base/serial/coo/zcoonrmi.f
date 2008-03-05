@@ -29,8 +29,9 @@ C ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 C POSSIBILITY OF SUCH DAMAGE.
 C
 C     ... Compute Infinity norm for sparse matrix in CSR Format ...
-      DOUBLE PRECISION FUNCTION ZCOONRMI(TRANS,M,N,DESCRA,A,IA1,IA2,
+      real(psb_dpk_) FUNCTION ZCOONRMI(TRANS,M,N,DESCRA,A,IA1,IA2,
      +   INFOA,IERROR)
+      use psb_const_mod
       IMPLICIT NONE
 C     .. Scalar Arguments ..
       INTEGER           M,N, IERROR
@@ -38,10 +39,10 @@ C     .. Scalar Arguments ..
 C     .. Array Arguments ..
       INTEGER           IA1(*),IA2(*),INFOA(*)
       CHARACTER         DESCRA*11
-      COMPLEX*16        A(*)
+      complex(psb_dpk_)        A(*)
 C     .. Local scalars ..
       INTEGER I, J, K, NNZ
-      DOUBLE PRECISION NRMI, SUM
+      real(psb_dpk_) NRMI, SUM
 
       NRMI = 0.0
       NNZ  = INFOA(1)

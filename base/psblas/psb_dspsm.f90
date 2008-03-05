@@ -88,14 +88,14 @@ subroutine  psb_dspsm(alpha,a,x,beta,y,desc_a,info,&
   use psb_penv_mod
   implicit none
 
-  real(kind(1.D0)), intent(in)              :: alpha, beta
-  real(kind(1.d0)), intent(in), target      :: x(:,:)
-  real(kind(1.d0)), intent(inout), target   :: y(:,:)
+  real(psb_dpk_), intent(in)              :: alpha, beta
+  real(psb_dpk_), intent(in), target      :: x(:,:)
+  real(psb_dpk_), intent(inout), target   :: y(:,:)
   type (psb_dspmat_type), intent(in)        :: a
   type(psb_desc_type), intent(in)           :: desc_a
   integer, intent(out)                      :: info
-  real(kind(1.d0)), intent(in), optional, target      :: diag(:)
-  real(kind(1.d0)), optional, target       :: work(:)
+  real(psb_dpk_), intent(in), optional, target      :: diag(:)
+  real(psb_dpk_), optional, target       :: work(:)
   character, intent(in), optional           :: trans, unitd
   integer, intent(in), optional             :: choice
   integer, intent(in), optional             :: k, jx, jy
@@ -108,7 +108,7 @@ subroutine  psb_dspsm(alpha,a,x,beta,y,desc_a,info,&
 
   character                :: lunitd
   integer, parameter       :: nb=4
-  real(kind(1.d0)),pointer :: iwork(:), xp(:,:), yp(:,:), id(:)
+  real(psb_dpk_),pointer :: iwork(:), xp(:,:), yp(:,:), id(:)
   character                :: itrans
   character(len=20)        :: name, ch_err
   logical                  :: aliw
@@ -376,14 +376,14 @@ subroutine  psb_dspsv(alpha,a,x,beta,y,desc_a,info,&
   use psb_penv_mod
   implicit none 
 
-  real(kind(1.D0)), intent(in)              :: alpha, beta
-  real(kind(1.d0)), intent(in), target      :: x(:)
-  real(kind(1.d0)), intent(inout), target   :: y(:)
+  real(psb_dpk_), intent(in)              :: alpha, beta
+  real(psb_dpk_), intent(in), target      :: x(:)
+  real(psb_dpk_), intent(inout), target   :: y(:)
   type(psb_dspmat_type), intent(in)         :: a
   type(psb_desc_type), intent(in)           :: desc_a
   integer, intent(out)                      :: info
-  real(kind(1.d0)), intent(in), optional, target    :: diag(:)
-  real(kind(1.d0)), optional, target        :: work(:)
+  real(psb_dpk_), intent(in), optional, target    :: diag(:)
+  real(psb_dpk_), optional, target        :: work(:)
   character, intent(in), optional           :: trans, unitd
   integer, intent(in), optional             :: choice
 
@@ -395,7 +395,7 @@ subroutine  psb_dspsv(alpha,a,x,beta,y,desc_a,info,&
 
   character                :: lunitd
   integer, parameter       :: nb=4
-  real(kind(1.d0)),pointer :: iwork(:), xp(:), yp(:), id(:)
+  real(psb_dpk_),pointer :: iwork(:), xp(:), yp(:), id(:)
   character                :: itrans
   character(len=20)        :: name, ch_err
   logical                  :: aliw

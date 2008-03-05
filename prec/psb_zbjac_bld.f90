@@ -47,7 +47,7 @@ subroutine psb_zbjac_bld(a,desc_a,p,upd,info)
   integer  ::    int_err(5)
   character ::        trans, unitd
   type(psb_zspmat_type) ::  atmp
-  real(kind(1.d0)) :: t1,t2,t3,t4,t5,t6, t7, t8
+  real(psb_dpk_) :: t1,t2,t3,t4,t5,t6, t7, t8
   integer   nztota,  err_act, n_row, nrow_a,n_col, nhalo
   integer :: ictxt,np,me
   character(len=20)      :: name, ch_err

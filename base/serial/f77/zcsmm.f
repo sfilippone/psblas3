@@ -192,25 +192,22 @@ C
 C
       SUBROUTINE ZCSMM(TRANS,M,N,K,ALPHA,PL,FIDA,DESCRA,A,IA1,IA2,   
      &                 INFOA,PR,B,LDB,BETA,C,LDC,WORK,LWORK,IERROR)
+      use psb_const_mod
       IMPLICIT NONE
 C     .. Scalar Arguments ..
       INTEGER    M,N,K,LDB,LDC,LWORK, IERROR
       CHARACTER  TRANS
-      COMPLEX*16 ALPHA,BETA
+      complex(psb_dpk_) ALPHA,BETA
 C     .. Array Arguments ..
       INTEGER    IA1(*),IA2(*),INFOA(*),PL(*),PR(*)
       CHARACTER  DESCRA*11, FIDA*5
-      COMPLEX*16 A(*),B(LDB,*),C(LDC,*),WORK(*)
+      complex(psb_dpk_) A(*),B(LDB,*),C(LDC,*),WORK(*)
 C     .. Local Scalars ..
       INTEGER           LWORKM,  LWORKB, LWORKC, LWORKS, P, ERR_ACT
       LOGICAL           LP, RP
 C     .. Local Array..
       INTEGER    INT_VAL(5)
       CHARACTER*30 NAME,  STRINGS(2)
-C     .. Parameters ..
-      COMPLEX*16 ZERO
-      INTEGER    IONE
-      PARAMETER  (ZERO=(0.D0, 0.D0), IONE=1)
 C     .. External Subroutines ..
       EXTERNAL          ZSWMM, ZLPUPD, XERBLA
 C     .. Intrinsic Functions ..
@@ -296,9 +293,9 @@ C
 C        Both right and left permutation required
 C
          P=LWORKB+1
-         CALL ZLPUPD(K,N,PR,B,LDB,ZERO,WORK,K)
+         CALL ZLPUPD(K,N,PR,B,LDB,ZZERO,WORK,K)
          CALL ZSWMM(TRANS,M,N,K,ALPHA,FIDA,DESCRA,A,IA1,IA2,INFOA,  
-     &           WORK,K,ZERO,WORK(P),M,WORK(P+LWORKC),LWORKS,IERROR)
+     &           WORK,K,ZZERO,WORK(P),M,WORK(P+LWORKC),LWORKS,IERROR)
          LWORKS = IDINT(DBLE(WORK(P+LWORKC)))
          IF(IERROR .NE. 0) THEN
             IF (IERROR.EQ.3010) THEN
@@ -313,7 +310,7 @@ C
 C        Only right permutation required
 C
          P=LWORKB+1
-         CALL ZLPUPD(K,N,PR,B,LDB,ZERO,WORK,K)
+         CALL ZLPUPD(K,N,PR,B,LDB,ZZERO,WORK,K)
          CALL ZSWMM(TRANS,M,N,K,ALPHA,FIDA,DESCRA,A,IA1,IA2,INFOA,  
      &           WORK,K,BETA,C,LDC,WORK(P),LWORKS,IERROR)
          LWORKS = IDINT(DBLE(WORK(P)))
@@ -330,7 +327,7 @@ C        Only left permutation required
 C
          P=LWORKC+1
          CALL ZSWMM(TRANS,M,N,K,ALPHA,FIDA,DESCRA,A,IA1,IA2,INFOA,  
-     &           B,LDB,ZERO,WORK,M,WORK(P),LWORKS,IERROR)
+     &           B,LDB,ZZERO,WORK,M,WORK(P),LWORKS,IERROR)
          LWORKS = IDINT(DBLE(WORK(P)))
          IF(IERROR .NE. 0) THEN
             IF (IERROR.EQ.3010) THEN

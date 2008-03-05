@@ -136,14 +136,13 @@ C             Unchanged on exit.
 C
       SUBROUTINE ZCSRMM(TRANSA,M,K,N,ALPHA,DESCRA,AR,
      *                  JA,IA,B,LDB,BETA,C,LDC,WORK,LWORK)
-C
-C
+      use psb_const_mod
 C     .. Scalar Arguments ..
-      COMPLEX*16 ALPHA, BETA
+      complex(psb_dpk_) ALPHA, BETA
       INTEGER    K, LDB, LDC, M, N, LWORK
       CHARACTER  TRANSA
 C     .. Array Arguments ..
-      COMPLEX*16 AR(*), B(LDB,*), C(LDC,*),  WORK(*)
+      complex(psb_dpk_) AR(*), B(LDB,*), C(LDC,*),  WORK(*)
       INTEGER    IA(*), JA(*)
       CHARACTER  DESCRA*11
 C     .. Local Scalars ..

@@ -76,13 +76,13 @@ subroutine  psb_zspmm(alpha,a,x,beta,y,desc_a,info,&
   use psb_penv_mod
   implicit none
 
-  complex(kind(1.D0)), intent(in)             :: alpha, beta
-  complex(kind(1.d0)), intent(inout), target  :: x(:,:)
-  complex(kind(1.d0)), intent(inout), target  :: y(:,:)
+  complex(psb_dpk_), intent(in)             :: alpha, beta
+  complex(psb_dpk_), intent(inout), target  :: x(:,:)
+  complex(psb_dpk_), intent(inout), target  :: y(:,:)
   type(psb_zspmat_type), intent(in)        :: a
   type(psb_desc_type), intent(in)          :: desc_a
   integer, intent(out)                     :: info
-  complex(kind(1.d0)), optional, target      :: work(:)
+  complex(psb_dpk_), optional, target      :: work(:)
   character, intent(in), optional          :: trans
   integer, intent(in), optional            :: k, jx, jy
   logical, intent(in), optional            :: doswap
@@ -93,8 +93,8 @@ subroutine  psb_zspmm(alpha,a,x,beta,y,desc_a,info,&
        & m, nrow, ncol, lldx, lldy, liwork, iiy, jjy,&
        & i, ib, ib1, ip, idx
   integer, parameter               :: nb=4
-  complex(kind(1.d0)), pointer     :: xp(:,:), yp(:,:), iwork(:)
-  complex(kind(1.d0)), allocatable :: xvsave(:,:)
+  complex(psb_dpk_), pointer     :: xp(:,:), yp(:,:), iwork(:)
+  complex(psb_dpk_), allocatable :: xvsave(:,:)
   character                        :: trans_
   character(len=20)                :: name, ch_err
   logical                          :: aliw, doswap_
@@ -421,13 +421,13 @@ subroutine  psb_zspmv(alpha,a,x,beta,y,desc_a,info,&
   use psb_penv_mod
   implicit none
 
-  complex(kind(1.D0)), intent(in)             :: alpha, beta
-  complex(kind(1.d0)), intent(inout), target  :: x(:)
-  complex(kind(1.d0)), intent(inout), target  :: y(:)
+  complex(psb_dpk_), intent(in)             :: alpha, beta
+  complex(psb_dpk_), intent(inout), target  :: x(:)
+  complex(psb_dpk_), intent(inout), target  :: y(:)
   type(psb_zspmat_type), intent(in)        :: a
   type(psb_desc_type), intent(in)          :: desc_a
   integer, intent(out)                     :: info
-  complex(kind(1.d0)), optional, target    :: work(:)
+  complex(psb_dpk_), optional, target    :: work(:)
   character, intent(in), optional          :: trans
   logical, intent(in), optional            :: doswap
 
@@ -437,8 +437,8 @@ subroutine  psb_zspmv(alpha,a,x,beta,y,desc_a,info,&
        & m, nrow, ncol, lldx, lldy, liwork, jx, jy, iiy, jjy,&
        & ib, ip, idx
   integer, parameter           :: nb=4
-  complex(kind(1.d0)), pointer :: iwork(:), xp(:), yp(:)
-  complex(kind(1.d0)), allocatable :: xvsave(:)  
+  complex(psb_dpk_), pointer :: iwork(:), xp(:), yp(:)
+  complex(psb_dpk_), allocatable :: xvsave(:)  
   character                    :: trans_
   character(len=20)            :: name, ch_err
   logical                      :: aliw, doswap_

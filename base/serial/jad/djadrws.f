@@ -39,9 +39,9 @@ C     .. Scalar Arguments ..
       CHARACTER         TRANS
 C     .. Array Arguments ..
       INTEGER           KA(*),JA(*),IA(3,*),INFOA(*)
-      DOUBLE PRECISION  A(*), rowsum(*)
+      real(psb_dpk_)  A(*), rowsum(*)
 C     ... Local Scalars ..
-      DOUBLE PRECISION NRMI
+      real(psb_dpk_) NRMI
       INTEGER I, IR, K, IPG, NPG, IPX
 
       NRMI = 0.0

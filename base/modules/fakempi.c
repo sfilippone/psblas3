@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include <string.h>
 
-#ifdef LowerUndescore
+#ifdef LowerUnderscore
 #define mpi_wtime       mpi_wtime_
 #define mpi_send        mpi_send_
 #define mpi_irecv       mpi_irecv_
@@ -12,7 +12,7 @@
 #define mpi_allgather   mpi_allgather_
 #define mpi_allgatherv  mpi_allgatherv_
 #endif
-#ifdef LowerDoubleUndescore
+#ifdef LowerDoubleUnderscore
 #define mpi_wtime       mpi_wtime__
 #define mpi_send        mpi_send__
 #define mpi_irecv       mpi_irecv__
@@ -32,7 +32,7 @@
 #define mpi_allgather   mpi_allgather
 #define mpi_allgatherv  mpi_allgatherv
 #endif
-#ifdef UpperUndescore
+#ifdef UpperUnderscore
 #define mpi_wtime       MPI_WTIME_
 #define mpi_send        MPI_SEND_
 #define mpi_irecv       MPI_IRECV_
@@ -42,7 +42,7 @@
 #define mpi_allgather   MPI_ALLGATHER_
 #define mpi_allgatherv  MPI_ALLGATHERV_
 #endif
-#ifdef UpperDoubleUndescore
+#ifdef UpperDoubleUnderscore 
 #define mpi_wtime       MPI_WTIME__
 #define mpi_send        MPI_SEND__
 #define mpi_irecv       MPI_IRECV__

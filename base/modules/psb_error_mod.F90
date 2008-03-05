@@ -62,7 +62,7 @@ module psb_error_mod
     character(len=20)        ::   routine=''       
     !  array of integer data to complete the error msg   
     integer,dimension(5)     ::   i_err_data=0     
-    !     real(kind(1.d0))(dim=10) ::   r_err_data=0.d0    !  array of real data to complete the error msg
+    !     real(psb_dpk_)(dim=10) ::   r_err_data=0.d0    !  array of real data to complete the error msg
     !     complex(dim=10)          ::   c_err_data=0.c0    !  array of complex data to complete the error msg
     !  array of character data to complete the error msg
     character(len=40)        ::   a_err_data=''      

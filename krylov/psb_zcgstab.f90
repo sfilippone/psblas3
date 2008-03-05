@@ -102,23 +102,23 @@ subroutine psb_zcgstab(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,istop)
   Type(psb_zspmat_type), Intent(in)  :: a
   Type(psb_zprec_type), Intent(in)   :: prec 
   Type(psb_desc_type), Intent(in)    :: desc_a
-  Complex(Kind(1.d0)), Intent(in)       :: b(:)
-  Complex(Kind(1.d0)), Intent(inout)    :: x(:)
-  Real(Kind(1.d0)), Intent(in)       :: eps
+  Complex(psb_dpk_), Intent(in)       :: b(:)
+  Complex(psb_dpk_), Intent(inout)    :: x(:)
+  Real(psb_dpk_), Intent(in)       :: eps
   integer, intent(out)               :: info
   Integer, Optional, Intent(in)      :: itmax, itrace, istop
   Integer, Optional, Intent(out)     :: iter
-  Real(Kind(1.d0)), Optional, Intent(out) :: err
+  Real(psb_dpk_), Optional, Intent(out) :: err
 !!$   Local data
-  Complex(Kind(1.d0)), allocatable, target   :: aux(:),wwrk(:,:)
-  Complex(Kind(1.d0)), Pointer  :: q(:),&
+  Complex(psb_dpk_), allocatable, target   :: aux(:),wwrk(:,:)
+  Complex(psb_dpk_), Pointer  :: q(:),&
        & r(:), p(:), v(:), s(:), t(:), z(:), f(:)
   Integer          :: itmax_, naux, mglob, it,itrace_,&
        & np,me, n_row, n_col
   integer            :: debug_level, debug_unit
   Integer            :: itx, isvch, ictxt, err_act
   Integer            :: istop_
-  complex(Kind(1.d0)) :: alpha, beta, rho, rho_old, sigma, omega, tau
+  complex(psb_dpk_) :: alpha, beta, rho, rho_old, sigma, omega, tau
   type(psb_itconv_type) :: stopdat
 !!$  Integer   istpb, istpe, ifctb, ifcte, imerr, irank, icomm,immb,imme
 !!$  Integer mpe_log_get_event_number,mpe_Describe_state,mpe_log_event

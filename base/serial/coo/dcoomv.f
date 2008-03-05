@@ -167,18 +167,19 @@ C
 ***********************************************************************
       SUBROUTINE DCOOMV (TRANS,DIAG,M,N,ALPHA,AS,IA,JA,INFOA,X,
      +  BETA,Y,WORK,IERROR)
+      use psb_const_mod
 C     .. Parameters ..
-      DOUBLE PRECISION  ONE, ZERO
+      real(psb_dpk_)  ONE, ZERO
       PARAMETER         (ONE=1.0D0,ZERO=0.0D0)
 C     .. Scalar Arguments ..
-      DOUBLE PRECISION  ALPHA, BETA
+      real(psb_dpk_)  ALPHA, BETA
       INTEGER           M, N, IERROR
       CHARACTER         DIAG, TRANS
 C     .. Array Arguments ..
-      DOUBLE PRECISION  AS(*), WORK(*), X(*), Y(*)
+      real(psb_dpk_)  AS(*), WORK(*), X(*), Y(*)
       INTEGER           IA(*), JA(*),infoa(*)
 C     .. Local Scalars ..
-      DOUBLE PRECISION  ACC,  TX
+      real(psb_dpk_)  ACC,  TX
       INTEGER           I, J, K, NNZ, IR, JC
       LOGICAL           SYM, TRA, UNI
 C     .. Executable Statements ..

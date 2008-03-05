@@ -39,11 +39,11 @@ subroutine zasrx(n,x,indx,dir,flag)
   !
   !     .. Scalar Arguments ..
   integer, intent(in) :: n, dir, flag
-  complex(kind(1.d0)) ::  x(n)
+  complex(psb_dpk_) ::  x(n)
   integer ::  indx(n)
   !     ..
   !     .. Local Scalars ..
-  complex(kind(1.d0)) :: piv, xk, xt
+  complex(psb_dpk_) :: piv, xk, xt
   integer i, j, ilx, iux, istp, lpiv
   integer ixt, n1, n2
 
@@ -359,10 +359,10 @@ contains
     use zacmp_mod
     implicit none
     integer :: n
-    complex(kind(1.d0)) :: x(n)
+    complex(psb_dpk_) :: x(n)
     integer :: indx(n)
     integer :: i,j,ix
-    complex(kind(1.d0)) :: xx
+    complex(psb_dpk_) :: xx
 
     do j=n-1,1,-1
       if (x(j+1) < x(j)) then
@@ -386,10 +386,10 @@ contains
     use zacmp_mod
     implicit none
     integer :: n
-    complex(kind(1.d0)) :: x(n)
+    complex(psb_dpk_) :: x(n)
     integer :: indx(n)
     integer :: i,j,ix
-    complex(kind(1.d0)) :: xx
+    complex(psb_dpk_) :: xx
 
     do j=n-1,1,-1
       if (x(j+1) > x(j)) then

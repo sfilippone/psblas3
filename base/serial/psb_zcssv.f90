@@ -39,13 +39,13 @@ subroutine psb_zcssv(alpha,t,b,beta,c,info,trans,unitd,d)
   implicit none
 
   type(psb_zspmat_type) :: t
-  complex(kind(1.d0))      :: alpha, beta, b(:), c(:)
+  complex(psb_dpk_)      :: alpha, beta, b(:), c(:)
   integer               :: info
   character, optional   :: trans, unitd
-  complex(kind(1.d0)), optional, target :: d(:)
+  complex(psb_dpk_), optional, target :: d(:)
   
-  complex(kind(1.d0)), allocatable :: work(:)
-  complex(kind(1.d0)), pointer :: ddl(:)
+  complex(psb_dpk_), allocatable :: work(:)
+  complex(psb_dpk_), pointer :: ddl(:)
   character :: lt, lu
   integer   :: iwsz,m,n,lb,lc,err_act
   character(len=20) :: name

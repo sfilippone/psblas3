@@ -37,15 +37,15 @@ subroutine psb_dprc_aply(prec,x,y,desc_data,info,trans, work)
 
   type(psb_desc_type),intent(in)      :: desc_data
   type(psb_dprec_type), intent(in)    :: prec
-  real(kind(0.d0)),intent(in)         :: x(:)
-  real(kind(0.d0)),intent(inout)      :: y(:)
+  real(psb_dpk_),intent(in)         :: x(:)
+  real(psb_dpk_),intent(inout)      :: y(:)
   integer, intent(out)                :: info
   character(len=1), optional          :: trans
-  real(kind(0.d0)), optional, target  :: work(:)
+  real(psb_dpk_), optional, target  :: work(:)
 
   ! Local variables
   character     :: trans_ 
-  real(kind(1.d0)), pointer :: work_(:)
+  real(psb_dpk_), pointer :: work_(:)
   integer :: ictxt,np,me,err_act
   character(len=20)   :: name
 
@@ -139,14 +139,14 @@ subroutine psb_dprc_aply1(prec,x,desc_data,info,trans)
 
   type(psb_desc_type),intent(in)    :: desc_data
   type(psb_dprec_type), intent(in)  :: prec
-  real(kind(0.d0)),intent(inout)    :: x(:)
+  real(psb_dpk_),intent(inout)    :: x(:)
   integer, intent(out)              :: info
   character(len=1), optional        :: trans
 
   ! Local variables
   character     :: trans_
   integer :: ictxt,np,me, err_act
-  real(kind(1.d0)), pointer :: WW(:), w1(:)
+  real(psb_dpk_), pointer :: WW(:), w1(:)
   character(len=20)   :: name
   name='psb_dprec_aply1'
   info = 0

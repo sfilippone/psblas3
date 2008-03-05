@@ -45,7 +45,7 @@ c     .. scalar arguments ..
      +  m, n, ierror
       character          trans,unitd
 c     .. array arguments ..
-      double precision   ar(*), arn(*), d(*)
+      real(psb_dpk_)   ar(*), arn(*), d(*)
       integer            aux(0:laux-1)
       integer            ia1(*), ia2(*), info(*), ia1n(*), ia2n(*),
      *  infon(*), p1(*), p2(*)

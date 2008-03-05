@@ -61,7 +61,7 @@ module psb_spmat_type
   !|    character(len=5) :: fida         ! Storage format: CSR,COO etc.
   !|    character(len=11) :: descra      ! Matrix type: encodes general, triang. 
   !|    integer     :: infoa(psb_ifasize_)  ! Additional integer info 
-  !|    real(kind(1.d0)), allocatable  :: aspk(:)  ! Coefficients
+  !|    real(psb_dpk_), allocatable  :: aspk(:)  ! Coefficients
   !|    integer, allocatable :: ia1(:), ia2(:)     ! Row/column indices encoded
   !|    integer, allocatable :: pl(:), pr(:)       ! Row/column permutation
   !|  end type psb_dspmat_type
@@ -70,7 +70,7 @@ module psb_spmat_type
   !|    character(len=5) :: fida
   !|    character(len=11) :: descra
   !|    integer     :: infoa(psb_ifasize_)
-  !|    complex(kind(1.d0)), allocatable  :: aspk(:)
+  !|    complex(psb_dpk_), allocatable  :: aspk(:)
   !|    integer, allocatable  :: ia1(:), ia2(:)
   !|    integer, allocatable  :: pl(:), pr(:)
   !|  end type psb_zspmat_type
@@ -126,7 +126,7 @@ module psb_spmat_type
     character(len=5) :: fida
     character(len=11) :: descra
     integer     :: infoa(psb_ifasize_)
-    real(kind(1.d0)), allocatable  :: aspk(:)
+    real(psb_dpk_), allocatable  :: aspk(:)
     integer, allocatable :: ia1(:), ia2(:)
     integer, allocatable :: pl(:), pr(:)
   end type psb_dspmat_type
@@ -135,7 +135,7 @@ module psb_spmat_type
     character(len=5) :: fida
     character(len=11) :: descra
     integer     :: infoa(psb_ifasize_)
-    complex(kind(1.d0)), allocatable  :: aspk(:)
+    complex(psb_dpk_), allocatable  :: aspk(:)
     integer, allocatable  :: ia1(:), ia2(:)
     integer, allocatable  :: pl(:), pr(:)
   end type psb_zspmat_type
@@ -809,23 +809,23 @@ contains
     !locals
     integer :: val
 
-    val   = 4*size(a%infoa)
+    val   = psb_sizeof_int*size(a%infoa)
 
     if (allocated(a%aspk)) then 
-      val = val + 8 * size(a%aspk)
+      val = val + psb_sizeof_dp  * size(a%aspk)
     endif
 
     if (allocated(a%ia1)) then 
-      val = val + 4 * size(a%ia1)
+      val = val + psb_sizeof_int * size(a%ia1)
     endif
     if (allocated(a%ia2)) then 
-      val = val + 4 * size(a%ia2)
+      val = val + psb_sizeof_int * size(a%ia2)
     endif
     if (allocated(a%pl)) then 
-      val = val + 4 * size(a%pl)
+      val = val + psb_sizeof_int * size(a%pl)
     endif
     if (allocated(a%pr)) then 
-      val = val + 4 * size(a%pr)
+      val = val + psb_sizeof_int * size(a%pr)
     endif
 
 
@@ -1296,23 +1296,23 @@ contains
     !locals
     integer :: val
 
-    val   = 4*size(a%infoa)
+    val   = psb_sizeof_int*size(a%infoa)
 
     if (allocated(a%aspk)) then 
-      val = val + 16 * size(a%aspk)
+      val = val + 2 * psb_sizeof_dp * size(a%aspk)
     endif
 
     if (allocated(a%ia1)) then 
-      val = val + 4 * size(a%ia1)
+      val = val + psb_sizeof_int * size(a%ia1)
     endif
     if (allocated(a%ia2)) then 
-      val = val + 4 * size(a%ia2)
+      val = val + psb_sizeof_int * size(a%ia2)
     endif
     if (allocated(a%pl)) then 
-      val = val + 4 * size(a%pl)
+      val = val + psb_sizeof_int * size(a%pl)
     endif
     if (allocated(a%pr)) then 
-      val = val + 4 * size(a%pr)
+      val = val + psb_sizeof_int * size(a%pr)
     endif
 
 

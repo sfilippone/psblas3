@@ -167,20 +167,21 @@ C
 ***********************************************************************
       SUBROUTINE DCSRMV2(TRANS,DIAG,M,N,ALPHA,AS,JA,IA,X,LDX,
      +  BETA,Y,LDY, WORK,LWORK,IERROR)
+      use psb_const_mod
       integer  nb
       parameter (nb=2)
 C     .. Parameters ..
-      DOUBLE PRECISION  ONE, ZERO
+      real(psb_dpk_)  ONE, ZERO
       PARAMETER         (ONE=1.0D0,ZERO=0.0D0)
 C     .. Scalar Arguments ..
-      DOUBLE PRECISION  ALPHA, BETA
+      real(psb_dpk_)  ALPHA, BETA
       INTEGER           M, N,LWORK,IERROR,ldx,ldy
       CHARACTER         DIAG, TRANS
 C     .. Array Arguments ..
-      DOUBLE PRECISION  AS(*), WORK(*), X(LDX,NB), Y(LDY,NB)
+      real(psb_dpk_)  AS(*), WORK(*), X(LDX,NB), Y(LDY,NB)
       INTEGER           IA(*), JA(*)
 C     .. Local Scalars ..
-      DOUBLE PRECISION  ACC(nb)
+      real(psb_dpk_)  ACC(nb)
       INTEGER           I, J, K, NCOLA, NROWA
       LOGICAL           SYM, TRA, UNI
 C     .. Executable Statements ..

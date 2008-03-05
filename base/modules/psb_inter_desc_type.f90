@@ -479,14 +479,14 @@ contains
     use psi_mod
     implicit none 
     type(psb_inter_desc_type), intent(in) :: desc
-    real(kind(1.d0)), intent(in)     :: alpha,beta
-    real(kind(1.d0)), intent(inout)  :: x(:)
-    real(kind(1.d0)), intent(out)    :: y(:)
+    real(psb_dpk_), intent(in)     :: alpha,beta
+    real(psb_dpk_), intent(inout)  :: x(:)
+    real(psb_dpk_), intent(out)    :: y(:)
     integer, intent(out)             :: info 
-    real(kind(1.d0)), optional       :: work(:)
+    real(psb_dpk_), optional       :: work(:)
 
     !
-    real(kind(1.d0)), allocatable :: xt(:)
+    real(psb_dpk_), allocatable :: xt(:)
     integer                       :: itsz, i, j,totxch,totsnd,totrcv,&
          &  map_kind, map_data
     character(len=20), parameter  :: name='psb_forward_map'
@@ -553,14 +553,14 @@ contains
     use psi_mod
     implicit none 
     type(psb_inter_desc_type), intent(in) :: desc
-    real(kind(1.d0)), intent(in)     :: alpha,beta
-    real(kind(1.d0)), intent(inout)  :: x(:)
-    real(kind(1.d0)), intent(out)    :: y(:)
+    real(psb_dpk_), intent(in)     :: alpha,beta
+    real(psb_dpk_), intent(inout)  :: x(:)
+    real(psb_dpk_), intent(out)    :: y(:)
     integer, intent(out)             :: info 
-    real(kind(1.d0)), optional       :: work(:)
+    real(psb_dpk_), optional       :: work(:)
 
     !
-    real(kind(1.d0)), allocatable :: xt(:)
+    real(psb_dpk_), allocatable :: xt(:)
     integer                       :: itsz, i, j,totxch,totsnd,totrcv,&
          & map_kind, map_data
     character(len=20), parameter  :: name='psb_backward_map'
@@ -624,14 +624,14 @@ contains
     use psi_mod
     implicit none 
     type(psb_inter_desc_type), intent(in) :: desc
-    complex(kind(1.d0)), intent(in)       :: alpha,beta
-    complex(kind(1.d0)), intent(inout)    :: x(:)
-    complex(kind(1.d0)), intent(out)      :: y(:)
+    complex(psb_dpk_), intent(in)       :: alpha,beta
+    complex(psb_dpk_), intent(inout)    :: x(:)
+    complex(psb_dpk_), intent(out)      :: y(:)
     integer, intent(out)                  :: info 
-    complex(kind(1.d0)), optional         :: work(:)
+    complex(psb_dpk_), optional         :: work(:)
 
     !
-    complex(kind(1.d0)), allocatable :: xt(:)
+    complex(psb_dpk_), allocatable :: xt(:)
     integer                       :: itsz, i, j,totxch,totsnd,totrcv,&
          & map_kind, map_data
     character(len=20), parameter  :: name='psb_forward_map'
@@ -695,14 +695,14 @@ contains
     use psi_mod
     implicit none 
     type(psb_inter_desc_type), intent(in) :: desc
-    complex(kind(1.d0)), intent(in)       :: alpha,beta
-    complex(kind(1.d0)), intent(inout)    :: x(:)
-    complex(kind(1.d0)), intent(out)      :: y(:)
+    complex(psb_dpk_), intent(in)       :: alpha,beta
+    complex(psb_dpk_), intent(inout)    :: x(:)
+    complex(psb_dpk_), intent(out)      :: y(:)
     integer, intent(out)                  :: info 
-    complex(kind(1.d0)), optional         :: work(:)
+    complex(psb_dpk_), optional         :: work(:)
 
     !
-    complex(kind(1.d0)), allocatable :: xt(:)
+    complex(psb_dpk_), allocatable :: xt(:)
     integer                       :: itsz, i, j,totxch,totsnd,totrcv,&
          & map_kind, map_data
     character(len=20), parameter  :: name='psb_backward_map'

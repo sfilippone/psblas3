@@ -52,16 +52,16 @@ function psb_zamax (x,desc_a, info, jx)
   use psb_error_mod
   implicit none
 
-  complex(kind(1.d0)), intent(in)      :: x(:,:)
+  complex(psb_dpk_), intent(in)      :: x(:,:)
   type(psb_desc_type), intent(in)   :: desc_a
   integer, intent(out)              :: info
   integer, optional, intent(in)     :: jx
-  real(kind(1.d0))                  :: psb_zamax
+  real(psb_dpk_)                  :: psb_zamax
 
   ! locals
   integer                  :: ictxt, np, me,&
        & err_act, iix, jjx, ix, ijx, m, imax, izamax
-  real(kind(1.d0))         :: amax
+  real(psb_dpk_)         :: amax
   character(len=20)        :: name, ch_err
   double complex    ::         zdum
   double precision  ::  cabs1
@@ -183,16 +183,16 @@ function psb_zamaxv (x,desc_a, info)
   use psb_error_mod
   implicit none
 
-  complex(kind(1.d0)), intent(in)   :: x(:)
+  complex(psb_dpk_), intent(in)   :: x(:)
   type(psb_desc_type), intent(in)   :: desc_a
   integer, intent(out)              :: info
-  real(kind(1.d0))                  :: psb_zamaxv
+  real(psb_dpk_)                  :: psb_zamaxv
 
   ! locals
   integer                  :: ictxt, np, me,&
        & err_act, iix, jjx, jx, ix, m, imax, izamax
-  real(kind(1.d0))         :: amax
-  complex(kind(1.d0))      :: cmax
+  real(psb_dpk_)         :: amax
+  complex(psb_dpk_)      :: cmax
   character(len=20)        :: name, ch_err
   double complex    ::         zdum
   double precision  ::  cabs1
@@ -312,17 +312,17 @@ subroutine psb_zamaxvs(res,x,desc_a, info)
   use psb_error_mod
   implicit none
 
-  complex(kind(1.d0)), intent(in)   :: x(:)
+  complex(psb_dpk_), intent(in)   :: x(:)
   type(psb_desc_type), intent(in)   :: desc_a
   integer, intent(out)              :: info
-  real(kind(1.D0)), intent(out)     :: res
+  real(psb_dpk_), intent(out)     :: res
 
   ! locals
   integer                  :: ictxt, np, me,&
        & err_act, iix, jjx, ix, ijx, m, imax, izamax
-  real(kind(1.d0))         :: amax
+  real(psb_dpk_)         :: amax
   character(len=20)        :: name, ch_err
-  complex(kind(1.d0))      :: cmax
+  complex(psb_dpk_)      :: cmax
   double complex    ::         zdum
   double precision  ::  cabs1
   cabs1( zdum ) = abs( dble( zdum ) ) + abs( dimag( zdum ) )
@@ -438,18 +438,18 @@ subroutine psb_zmamaxs(res,x,desc_a, info,jx)
   use psb_error_mod
   implicit none
 
-  complex(kind(1.d0)), intent(in)   :: x(:,:)
+  complex(psb_dpk_), intent(in)   :: x(:,:)
   type(psb_desc_type), intent(in)   :: desc_a
   integer, intent(out)              :: info
   integer, optional, intent(in)     :: jx
-  real(kind(1.d0)), intent(out)     :: res(:)
+  real(psb_dpk_), intent(out)     :: res(:)
 
   ! locals
   integer                  :: ictxt, np, me,&
        & err_act, iix, jjx, ix, ijx, m, imax, i, k, izamax
-  real(kind(1.d0))         :: amax
+  real(psb_dpk_)         :: amax
   character(len=20)        :: name, ch_err
-  complex(kind(1.d0))      :: cmax
+  complex(psb_dpk_)      :: cmax
   double complex    ::         zdum
   double precision  ::  cabs1
   cabs1( zdum ) = abs( dble( zdum ) ) + abs( dimag( zdum ) )

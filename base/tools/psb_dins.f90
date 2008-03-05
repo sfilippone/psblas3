@@ -62,8 +62,8 @@ subroutine psb_dinsvi(m, irw, val, x, desc_a, info, dupl)
   !....parameters...
   integer, intent(in)                ::  m
   integer, intent(in)                ::  irw(:)
-  real(kind(1.d0)), intent(in)       ::  val(:)
-  real(kind(1.d0)), intent(inout)    ::  x(:)
+  real(psb_dpk_), intent(in)       ::  val(:)
+  real(psb_dpk_), intent(inout)    ::  x(:)
   type(psb_desc_type), intent(in)    ::  desc_a
   integer, intent(out)               ::  info
   integer, optional, intent(in)      ::  dupl
@@ -249,8 +249,8 @@ subroutine psb_dinsi(m, irw, val, x, desc_a, info, dupl)
   !....parameters...
   integer, intent(in)                ::  m
   integer, intent(in)                ::  irw(:)
-  real(kind(1.d0)), intent(in)       ::  val(:,:)
-  real(kind(1.d0)), intent(inout)    ::  x(:,:)
+  real(psb_dpk_), intent(in)       ::  val(:,:)
+  real(psb_dpk_), intent(inout)    ::  x(:,:)
   type(psb_desc_type), intent(in)    ::  desc_a
   integer, intent(out)               ::  info
   integer, optional, intent(in)      ::  dupl

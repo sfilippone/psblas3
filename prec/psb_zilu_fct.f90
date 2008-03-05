@@ -44,7 +44,7 @@ subroutine psb_zilu_fct(a,l,u,d,info,blck)
   type(psb_zspmat_type),intent(in)    :: a
   type(psb_zspmat_type),intent(inout) :: l,u
   type(psb_zspmat_type),intent(in), optional, target :: blck
-  complex(kind(1.d0)), intent(inout)     ::  d(:)
+  complex(psb_dpk_), intent(inout)     ::  d(:)
   !     .. Local Scalars ..
   integer   ::  l1, l2,m,err_act  
   type(psb_zspmat_type), pointer  :: blck_
@@ -127,10 +127,10 @@ contains
     type(psb_zspmat_type)          :: a,b
     integer                        :: m,ma,mb,l1,l2,info
     integer, dimension(:)          :: lia1,lia2,uia1,uia2
-    complex(kind(1.d0)), dimension(:) :: laspk,uaspk,d
+    complex(psb_dpk_), dimension(:) :: laspk,uaspk,d
 
     integer :: i,j,k,l,low1,low2,kk,jj,ll, irb, ktrw,err_act
-    complex(kind(1.d0)) :: dia,temp
+    complex(psb_dpk_) :: dia,temp
     integer, parameter :: nrb=16
     type(psb_zspmat_type) :: trw
     integer             :: int_err(5) 

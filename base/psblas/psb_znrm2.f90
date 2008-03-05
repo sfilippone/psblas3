@@ -51,16 +51,16 @@ function psb_znrm2(x, desc_a, info, jx)
   use psb_penv_mod
   implicit none
 
-  complex(kind(1.d0)), intent(in)      ::  x(:,:)
+  complex(psb_dpk_), intent(in)      ::  x(:,:)
   type(psb_desc_type), intent(in)   :: desc_a
   integer, intent(in), optional     :: jx
   integer, intent(out)              :: info
-  real(kind(1.D0))                  :: psb_znrm2
+  real(psb_dpk_)                  :: psb_znrm2
 
   ! locals
   integer                  :: ictxt, np, me,&
        & err_act, iix, jjx, ndim, ix, ijx, i, m, id, idx, ndm
-  real(kind(1.d0))         :: nrm2, dznrm2, dd
+  real(psb_dpk_)         :: nrm2, dznrm2, dd
 
   external dcombnrm2
   character(len=20)        :: name, ch_err
@@ -187,15 +187,15 @@ function psb_znrm2v(x, desc_a, info)
   use psb_penv_mod
   implicit none
 
-  complex(kind(1.d0)), intent(in)   :: x(:)
+  complex(psb_dpk_), intent(in)   :: x(:)
   type(psb_desc_type), intent(in)   :: desc_a
   integer, intent(out)              :: info
-  real(kind(1.D0))                  :: psb_znrm2v
+  real(psb_dpk_)                  :: psb_znrm2v
 
   ! locals
   integer                  :: ictxt, np, me,&
        & err_act, iix, jjx, ndim, ix, jx, i, m, id, idx, ndm
-  real(kind(1.d0))         :: nrm2, dznrm2, dd
+  real(psb_dpk_)         :: nrm2, dznrm2, dd
 
   external dcombnrm2
   character(len=20)        :: name, ch_err
@@ -319,15 +319,15 @@ subroutine psb_znrm2vs(res, x, desc_a, info)
   use psb_penv_mod
   implicit none
 
-  complex(kind(1.d0)), intent(in)   :: x(:)
-  real(kind(1.d0)), intent(out)     :: res
+  complex(psb_dpk_), intent(in)   :: x(:)
+  real(psb_dpk_), intent(out)     :: res
   type(psb_desc_type), intent(in)   :: desc_a
   integer, intent(out)              :: info
 
   ! locals
   integer                  :: ictxt, np, me,&
        & err_act, iix, jjx, ndim, ix, jx, i, m, id, idx, ndm
-  real(kind(1.d0))         :: nrm2, dznrm2, dd
+  real(psb_dpk_)         :: nrm2, dznrm2, dd
 
   external dcombnrm2
   character(len=20)        :: name, ch_err

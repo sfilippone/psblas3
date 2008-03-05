@@ -38,11 +38,11 @@ subroutine psb_zcsmv(alpha,a,b,beta,c,info,trans)
   implicit none 
 
   type(psb_zspmat_type) :: a
-  complex(kind(1.d0))      :: alpha, beta, b(:), c(:)
+  complex(psb_dpk_)      :: alpha, beta, b(:), c(:)
   integer               :: info
   character, optional   :: trans
   
-  complex(kind(1.d0)), allocatable :: work(:)
+  complex(psb_dpk_), allocatable :: work(:)
   character :: trans_
   integer   :: iwsz,m,n,k,lb,lc, err_act
   character(len=20)  :: name

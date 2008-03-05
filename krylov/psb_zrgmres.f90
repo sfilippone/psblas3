@@ -115,27 +115,27 @@ Subroutine psb_zrgmres(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,irst,ist
   Type(psb_zspmat_type), Intent(in)  :: a
   Type(psb_zprec_type), Intent(in)   :: prec 
   Type(psb_desc_type), Intent(in)    :: desc_a
-  complex(Kind(1.d0)), Intent(in)       :: b(:)
-  complex(Kind(1.d0)), Intent(inout)    :: x(:)
-  Real(Kind(1.d0)), Intent(in)       :: eps
+  complex(psb_dpk_), Intent(in)       :: b(:)
+  complex(psb_dpk_), Intent(inout)    :: x(:)
+  Real(psb_dpk_), Intent(in)       :: eps
   integer, intent(out)               :: info
   Integer, Optional, Intent(in)      :: itmax, itrace, irst,istop
   Integer, Optional, Intent(out)     :: iter
-  Real(Kind(1.d0)), Optional, Intent(out) :: err
+  Real(psb_dpk_), Optional, Intent(out) :: err
 !!$   local data
-  complex(Kind(1.d0)), allocatable, target   :: aux(:),w(:),w1(:), v(:,:)
-  complex(Kind(1.d0)), allocatable   ::  c(:),s(:), h(:,:), rs(:),rst(:),xt(:)
-  Real(Kind(1.d0)) :: tmp
-  complex(kind(1.d0)) :: rti, rti1, scal
+  complex(psb_dpk_), allocatable, target   :: aux(:),w(:),w1(:), v(:,:)
+  complex(psb_dpk_), allocatable   ::  c(:),s(:), h(:,:), rs(:),rst(:),xt(:)
+  Real(psb_dpk_) :: tmp
+  complex(psb_dpk_) :: rti, rti1, scal
   Integer       ::litmax, naux, mglob, it,k, itrace_,&
        & np,me, n_row, n_col, nl, int_err(5)
   Logical, Parameter :: exchange=.True., noexchange=.False.
   Integer, Parameter :: irmax = 8
   Integer            :: itx, i, isvch, ictxt,istop_, err_act
   integer            :: debug_level, debug_unit
-  Real(Kind(1.d0)) :: rni, xni, bni, ani,bn2
-  real(kind(1.d0)), external :: dznrm2
-  real(kind(1.d0))   :: errnum, errden
+  Real(psb_dpk_) :: rni, xni, bni, ani,bn2
+  real(psb_dpk_), external :: dznrm2
+  real(psb_dpk_)   :: errnum, errden
   character(len=20)           :: name
   character(len=*), parameter :: methdname='RGMRES'
 
@@ -476,11 +476,11 @@ contains
     !
     !     .. scalar arguments ..
     integer            incx, incy, n
-    real(kind(1.d0))    c
-    complex(kind(1.d0))   s
+    real(psb_dpk_)    c
+    complex(psb_dpk_)   s
     !     ..
     !     .. array arguments ..
-    complex(kind(1.d0)) cx( * ), cy( * )
+    complex(psb_dpk_) cx( * ), cy( * )
     !     ..
     !
     !  purpose
@@ -520,7 +520,7 @@ contains
     !
     !     .. local scalars ..
     integer            i, ix, iy
-    complex(kind(1.d0))         stemp
+    complex(psb_dpk_)         stemp
     !     ..
     !     .. intrinsic functions ..
     intrinsic          dconjg
@@ -559,10 +559,10 @@ contains
   !
   !
   subroutine zrotg(ca,cb,c,s)
-    complex(kind(1.d0)) ca,cb,s
-    real(kind(1.d0)) c
-    real(kind(1.d0)) norm,scale
-    complex(kind(1.d0)) alpha
+    complex(psb_dpk_) ca,cb,s
+    real(psb_dpk_) c
+    real(psb_dpk_) norm,scale
+    complex(psb_dpk_) alpha
     !
     if (cdabs(ca) == 0.0d0) then 
       !

@@ -71,7 +71,7 @@ C     .. Scalar Arguments ..
      *     SIZE_REQ, IERROR
       CHARACTER          TRANS,UNITD
 C     .. Array Arguments ..
-      DOUBLE PRECISION   AR(*), ARN(LARN), D(*), AUX(LAUX)
+      real(psb_dpk_)   AR(*), ARN(LARN), D(*), AUX(LAUX)
       INTEGER            IA1(*), IA2(*), INFO(*), IAN1(LIAN1),
      +  IAN2(LIAN2), INFON(*), IP1(*), IP2(*)
       CHARACTER          DESCRA*11, DESCRN*11

@@ -52,16 +52,16 @@ function psb_damax (x,desc_a, info, jx)
   use psb_error_mod
   implicit none
 
-  real(kind(1.d0)), intent(in)      :: x(:,:)
+  real(psb_dpk_), intent(in)      :: x(:,:)
   type(psb_desc_type), intent(in)   :: desc_a
   integer, intent(out)              :: info
   integer, optional, intent(in)     :: jx
-  real(kind(1.d0))                  :: psb_damax
+  real(psb_dpk_)                  :: psb_damax
 
   ! locals
   integer                  :: ictxt, np, me,&
        & err_act, iix, jjx, ix, ijx, m, imax, idamax
-  real(kind(1.d0))         :: amax
+  real(psb_dpk_)         :: amax
   character(len=20)        :: name, ch_err
 
   name='psb_damax'
@@ -180,15 +180,15 @@ function psb_damaxv (x,desc_a, info)
   use psb_error_mod
   implicit none
 
-  real(kind(1.d0)), intent(in)      :: x(:)
+  real(psb_dpk_), intent(in)      :: x(:)
   type(psb_desc_type), intent(in)   :: desc_a
   integer, intent(out)              :: info
-  real(kind(1.d0))                  :: psb_damaxv
+  real(psb_dpk_)                  :: psb_damaxv
 
   ! locals
   integer                  :: ictxt, np, me,&
        & err_act, iix, jjx, jx, ix, m, imax, idamax
-  real(kind(1.d0))         :: amax
+  real(psb_dpk_)         :: amax
   character(len=20)        :: name, ch_err
 
   name='psb_damaxv'
@@ -304,15 +304,15 @@ subroutine psb_damaxvs (res,x,desc_a, info)
   use psb_error_mod
   implicit none
 
-  real(kind(1.d0)), intent(in)      :: x(:)
+  real(psb_dpk_), intent(in)      :: x(:)
   type(psb_desc_type), intent(in)   :: desc_a
   integer, intent(out)              :: info
-  real(kind(1.D0)), intent(out)     :: res
+  real(psb_dpk_), intent(out)     :: res
 
   ! locals
   integer                  :: ictxt, np, me,&
        & err_act, iix, jjx, ix, ijx, m, imax, idamax
-  real(kind(1.d0))         :: amax
+  real(psb_dpk_)         :: amax
   character(len=20)        :: name, ch_err
 
   name='psb_damaxvs'
@@ -426,16 +426,16 @@ subroutine psb_dmamaxs (res,x,desc_a, info,jx)
   use psb_error_mod
   implicit none
 
-  real(kind(1.d0)), intent(in)      :: x(:,:)
+  real(psb_dpk_), intent(in)      :: x(:,:)
   type(psb_desc_type), intent(in)   :: desc_a
   integer, intent(out)              :: info
   integer, optional, intent(in)     :: jx
-  real(kind(1.d0)), intent(out) :: res(:)
+  real(psb_dpk_), intent(out) :: res(:)
 
   ! locals
   integer                  :: ictxt, np, me,&
        & err_act, iix, jjx, ix, ijx, m, imax, i, k, idamax
-  real(kind(1.d0))         :: amax
+  real(psb_dpk_)         :: amax
   character(len=20)        :: name, ch_err
 
   name='psb_dmamaxs'

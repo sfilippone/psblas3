@@ -154,16 +154,17 @@ C
 C
       SUBROUTINE DSWSM(TRANS,M,N,ALPHA,UNITD,D,FIDT,DESCRT,T,IT1,IT2, 
      &                 INFOT,B,LDB,BETA,C,LDC,WORK,LWORK,IERROR)
+      use psb_const_mod
       use psb_error_mod
       implicit none
 C     .. Scalar Arguments ..
       INTEGER           M, N, LDB, LDC, LWORK, IERROR
       CHARACTER         UNITD, TRANS
-      DOUBLE PRECISION  ALPHA, BETA
+      real(psb_dpk_)  ALPHA, BETA
 C     .. Array Arguments ..
       INTEGER           IT1(*), IT2(*), INFOT(*)
       CHARACTER         DESCRT*11, FIDT*5
-      DOUBLE PRECISION  T(*), B(LDB,*), C(LDC,*), D(*), WORK(*)
+      real(psb_dpk_)  T(*), B(LDB,*), C(LDC,*), D(*), WORK(*)
 C     .. Local Scalars ..
       INTEGER           ONE
 C     .. Parameters ..

@@ -74,17 +74,17 @@ subroutine  psb_zovrlm(x,desc_a,info,jx,ik,work,update,mode)
   use psb_penv_mod
   implicit none
 
-  complex(kind(1.d0)), intent(inout), target   :: x(:,:)
+  complex(psb_dpk_), intent(inout), target   :: x(:,:)
   type(psb_desc_type), intent(in)           :: desc_a
   integer, intent(out)                      :: info
-  complex(kind(1.d0)), optional, target        :: work(:)
+  complex(psb_dpk_), optional, target        :: work(:)
   integer, intent(in), optional             :: update,jx,ik,mode
 
   ! locals
   integer                  :: ictxt, np, me, &
        & err_act, m, n, iix, jjx, ix, ijx, nrow, ncol, k, maxk, update_,&
        & mode_, err, liwork
-  complex(kind(1.d0)),pointer :: iwork(:), xp(:,:)
+  complex(psb_dpk_),pointer :: iwork(:), xp(:,:)
   logical                  :: do_swap
   character(len=20)        :: name, ch_err
   logical                  :: aliw
@@ -278,17 +278,17 @@ subroutine  psb_zovrlv(x,desc_a,info,work,update,mode)
   use psb_penv_mod
   implicit none
 
-  complex(kind(1.d0)), intent(inout), target :: x(:)
+  complex(psb_dpk_), intent(inout), target :: x(:)
   type(psb_desc_type), intent(in)            :: desc_a
   integer, intent(out)                       :: info
-  complex(kind(1.d0)), optional, target      :: work(:)
+  complex(psb_dpk_), optional, target      :: work(:)
   integer, intent(in), optional              :: update,mode
 
   ! locals
   integer                  :: ictxt, np, me, &
        & err_act, m, n, iix, jjx, ix, ijx, nrow, ncol, k, update_,&
        & mode_, err, liwork
-  complex(kind(1.d0)),pointer :: iwork(:)
+  complex(psb_dpk_),pointer :: iwork(:)
   logical                  :: do_swap
   character(len=20)        :: name, ch_err
   logical                  :: aliw

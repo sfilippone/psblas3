@@ -43,7 +43,7 @@ contains
     character(len=40) :: kmethd, mtrx_file, rhs_file, ptype
     integer      :: iret, istopc,itmax,itrace,ipart,irst
     character(len=40) :: charbuf
-    real(kind(1.d0)) :: eps
+    real(psb_dpk_) :: eps
     character    :: afmt*5
     integer      :: np, iam
     integer      :: inparms(40), ip 

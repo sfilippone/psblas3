@@ -37,13 +37,13 @@ subroutine zamsr(n,x,idir)
   implicit none
 
   integer :: n, idir
-  complex(kind(1.d0)) :: x(n)
+  complex(psb_dpk_) :: x(n)
   
   
   integer, allocatable :: iaux(:)
   
   integer :: lswap, iret, info, lp, k
-  complex(kind(1.d0)) :: swap
+  complex(psb_dpk_) :: swap
 
   if (n<0) then 
 !!$    write(0,*) 'Error: IMSR: N<0'

@@ -52,7 +52,7 @@ subroutine psb_zneigh(a,idx,neigh,n,info,lev)
        &  n1, err_act, nn, nidx,ntl
   character(len=20)                 :: name
   integer, allocatable :: ia(:), ja(:)
-  complex(kind(1.d0)), allocatable :: val(:)
+  complex(psb_dpk_), allocatable :: val(:)
 
   name='psb_zneigh'
   info  = 0

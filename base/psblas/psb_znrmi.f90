@@ -52,12 +52,12 @@ function psb_znrmi(a,desc_a,info)
   type(psb_zspmat_type), intent(in)   :: a
   integer, intent(out)                :: info
   type(psb_desc_type), intent(in)     :: desc_a
-  real(kind(1.d0))                    :: psb_znrmi
+  real(psb_dpk_)                    :: psb_znrmi
 
   ! locals
   integer                  :: ictxt, np, me,&
        & err_act, n, iia, jja, ia, ja, mdim, ndim, m
-  real(kind(1.d0))         :: nrmi, zcsnmi
+  real(psb_dpk_)         :: nrmi, zcsnmi
   character(len=20)        :: name, ch_err
 
   name='psb_znrmi'

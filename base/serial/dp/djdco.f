@@ -40,7 +40,7 @@ C     .. Scalar Arguments ..
       INTEGER            LARN, LAUX, LIA1N, LIA2N, M, N, IERROR
       CHARACTER          TRANS
 C     .. Array Arguments ..
-      DOUBLE PRECISION   AR(*), ARN(*)
+      real(psb_dpk_)   AR(*), ARN(*)
       INTEGER            AUX(0:LAUX-1),IPERM(*)
       INTEGER            IA1(*), IA2(*), INFO(*), IA1N(*), 
      *     IA2N(*), INFON(*), IP1(*), IP2(*)

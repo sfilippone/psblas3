@@ -192,8 +192,8 @@ Contains
     use psb_error_mod
 
     ! ...Subroutine Arguments  
-    real(kind(1.d0)), allocatable, intent(in)  :: vin(:)
-    real(kind(1.d0)), allocatable, intent(out) :: vout(:)
+    real(psb_dpk_), allocatable, intent(in)  :: vin(:)
+    real(psb_dpk_), allocatable, intent(out) :: vout(:)
     integer         :: info
     ! ...Local Variables
 
@@ -242,8 +242,8 @@ Contains
     use psb_error_mod
 
     ! ...Subroutine Arguments  
-    real(kind(1.d0)), allocatable, intent(in)  :: vin(:,:)
-    real(kind(1.d0)), allocatable, intent(out) :: vout(:,:)
+    real(psb_dpk_), allocatable, intent(in)  :: vin(:,:)
+    real(psb_dpk_), allocatable, intent(out) :: vout(:,:)
     integer         :: info
     ! ...Local Variables
 
@@ -294,8 +294,8 @@ Contains
     use psb_error_mod
 
     ! ...Subroutine Arguments  
-    complex(kind(1.d0)), allocatable, intent(in)  :: vin(:)
-    complex(kind(1.d0)), allocatable, intent(out) :: vout(:)
+    complex(psb_dpk_), allocatable, intent(in)  :: vin(:)
+    complex(psb_dpk_), allocatable, intent(out) :: vout(:)
     integer         :: info
     ! ...Local Variables
 
@@ -344,8 +344,8 @@ Contains
     use psb_error_mod
 
     ! ...Subroutine Arguments  
-    complex(kind(1.d0)), allocatable, intent(in)  :: vin(:,:)
-    complex(kind(1.d0)), allocatable, intent(out) :: vout(:,:)
+    complex(psb_dpk_), allocatable, intent(in)  :: vin(:,:)
+    complex(psb_dpk_), allocatable, intent(out) :: vout(:,:)
     integer         :: info
     ! ...Local Variables
 
@@ -495,8 +495,8 @@ Contains
     use psb_error_mod
 
     ! ...Subroutine Arguments  
-    real(kind(1.d0)), intent(in)               :: vin(:)
-    real(kind(1.d0)), allocatable, intent(out) :: vout(:)
+    real(psb_dpk_), intent(in)               :: vin(:)
+    real(psb_dpk_), allocatable, intent(out) :: vout(:)
     integer         :: info
     ! ...Local Variables
 
@@ -543,8 +543,8 @@ Contains
     use psb_error_mod
 
     ! ...Subroutine Arguments  
-    real(kind(1.d0)), intent(in)               :: vin(:,:)
-    real(kind(1.d0)), allocatable, intent(out) :: vout(:,:)
+    real(psb_dpk_), intent(in)               :: vin(:,:)
+    real(psb_dpk_), allocatable, intent(out) :: vout(:,:)
     integer         :: info
     ! ...Local Variables
 
@@ -594,8 +594,8 @@ Contains
     use psb_error_mod
 
     ! ...Subroutine Arguments  
-    complex(kind(1.d0)), intent(in)               :: vin(:)
-    complex(kind(1.d0)), allocatable, intent(out) :: vout(:)
+    complex(psb_dpk_), intent(in)               :: vin(:)
+    complex(psb_dpk_), allocatable, intent(out) :: vout(:)
     integer         :: info
     ! ...Local Variables
 
@@ -642,8 +642,8 @@ Contains
     use psb_error_mod
 
     ! ...Subroutine Arguments  
-    complex(kind(1.d0)), intent(in)               :: vin(:,:)
-    complex(kind(1.d0)), allocatable, intent(out) :: vout(:,:)
+    complex(psb_dpk_), intent(in)               :: vin(:,:)
+    complex(psb_dpk_), allocatable, intent(out) :: vout(:,:)
     integer         :: info
     ! ...Local Variables
 
@@ -719,7 +719,7 @@ Contains
   
   function psb_dsize1d(vin)
     integer :: psb_dsize1d
-    real(kind(1.d0)), allocatable, intent(in) :: vin(:)
+    real(psb_dpk_), allocatable, intent(in) :: vin(:)
     
     if (.not.allocated(vin)) then 
       psb_dsize1d = 0
@@ -729,7 +729,7 @@ Contains
   end function psb_dsize1d
   function psb_dsize2d(vin,dim)
     integer :: psb_dsize2d
-    real(kind(1.d0)), allocatable, intent(in) :: vin(:,:)
+    real(psb_dpk_), allocatable, intent(in) :: vin(:,:)
     integer, optional :: dim
     integer :: dim_
 
@@ -749,7 +749,7 @@ Contains
   
   function psb_zsize1d(vin)
     integer :: psb_zsize1d
-    complex(kind(1.d0)), allocatable, intent(in) :: vin(:)
+    complex(psb_dpk_), allocatable, intent(in) :: vin(:)
     
     if (.not.allocated(vin)) then 
       psb_zsize1d = 0
@@ -760,7 +760,7 @@ Contains
 
   function psb_zsize2d(vin,dim)
     integer :: psb_zsize2d
-    complex(kind(1.d0)), allocatable, intent(in) :: vin(:,:)
+    complex(psb_dpk_), allocatable, intent(in) :: vin(:,:)
     integer, optional :: dim
     integer :: dim_
 
@@ -841,10 +841,10 @@ Contains
 
     ! ...Subroutine Arguments  
     Integer,Intent(in)                 :: len
-    real(kind(1.d0)),allocatable, intent(inout) :: v(:)
+    real(psb_dpk_),allocatable, intent(inout) :: v(:)
     integer         :: info
     integer, optional, intent(in)          :: addsz,newsz
-    real(kind(1.d0)), optional, intent(in) :: pad
+    real(psb_dpk_), optional, intent(in) :: pad
     ! ...Local Variables
     character(len=20)  :: name
     logical, parameter :: debug=.false.
@@ -900,10 +900,10 @@ Contains
 
     ! ...Subroutine Arguments  
     Integer,Intent(in)                             :: len
-    complex(kind(1.d0)),allocatable, intent(inout) :: v(:)
+    complex(psb_dpk_),allocatable, intent(inout) :: v(:)
     integer                                        :: info
     integer, optional, intent(in)                  :: addsz,newsz
-    complex(kind(1.d0)), optional, intent(in)      :: pad
+    complex(psb_dpk_), optional, intent(in)      :: pad
     ! ...Local Variables
     character(len=20)  :: name
     logical, parameter :: debug=.false.
@@ -1038,13 +1038,13 @@ Contains
 
     ! ...Subroutine Arguments  
     Integer,Intent(in) :: len
-    Real(kind(1.d0)),allocatable, intent(inout) :: rrax(:)
+    Real(psb_dpk_),allocatable, intent(inout) :: rrax(:)
     integer :: info
-    real(kind(1.d0)), optional, intent(in) :: pad
+    real(psb_dpk_), optional, intent(in) :: pad
     integer, optional, intent(in) :: lb
 
     ! ...Local Variables
-    Real(kind(1.d0)),allocatable  :: tmp(:)
+    Real(psb_dpk_),allocatable  :: tmp(:)
     Integer :: dim,err_act,err, lb_, lbi,ub_
     character(len=20)  :: name
     logical, parameter :: debug=.false.
@@ -1061,7 +1061,7 @@ Contains
     endif
     if ((len<0)) then 
       err=4025
-      call psb_errpush(err,name,i_err=(/len,0,0,0,0/),a_err='real(kind(1.d0))')
+      call psb_errpush(err,name,i_err=(/len,0,0,0,0/),a_err='real(psb_dpk_)')
       goto 9999
     end if
     ub_ = lb_ + len-1
@@ -1073,7 +1073,7 @@ Contains
         Allocate(tmp(lb_:ub_),stat=info)
         if (info /= 0) then
           err=4025
-          call psb_errpush(err,name,i_err=(/len,0,0,0,0/),a_err='real(kind(1.d0))')
+          call psb_errpush(err,name,i_err=(/len,0,0,0,0/),a_err='real(psb_dpk_)')
           goto 9999
         end if
         tmp(lb_:lb_-1+min(len,dim))=rrax(lbi:lbi-1+min(len,dim))
@@ -1084,7 +1084,7 @@ Contains
       Allocate(rrax(lb_:ub_),stat=info)
       if (info /= 0) then
         err=4025
-        call psb_errpush(err,name,i_err=(/len,0,0,0,0/),a_err='real(kind(1.d0))')
+        call psb_errpush(err,name,i_err=(/len,0,0,0,0/),a_err='real(psb_dpk_)')
         goto 9999
       end if
     endif
@@ -1113,13 +1113,13 @@ Contains
 
     ! ...Subroutine Arguments  
     Integer,Intent(in) :: len
-    complex(kind(1.d0)),allocatable, intent(inout):: rrax(:)
+    complex(psb_dpk_),allocatable, intent(inout):: rrax(:)
     integer :: info
-    complex(kind(1.d0)), optional, intent(in) :: pad
+    complex(psb_dpk_), optional, intent(in) :: pad
     integer, optional, intent(in) :: lb
 
     ! ...Local Variables
-    complex(kind(1.d0)),allocatable  :: tmp(:)
+    complex(psb_dpk_),allocatable  :: tmp(:)
     Integer :: dim,err_act,err,lb_,ub_,lbi
     character(len=20)  :: name
     logical, parameter :: debug=.false.
@@ -1135,7 +1135,7 @@ Contains
     endif
     if ((len<0)) then 
       err=4025
-      call psb_errpush(err,name,i_err=(/len,0,0,0,0/),a_err='complex(kind(1.d0))')
+      call psb_errpush(err,name,i_err=(/len,0,0,0,0/),a_err='complex(psb_dpk_)')
       goto 9999
     end if
     ub_ = lb_+len-1
@@ -1147,7 +1147,7 @@ Contains
         Allocate(tmp(lb_:ub_),stat=info)
         if (info /= 0) then
           err=4025
-          call psb_errpush(err,name,i_err=(/len,0,0,0,0/),a_err='complex(kind(1.d0))')
+          call psb_errpush(err,name,i_err=(/len,0,0,0,0/),a_err='complex(psb_dpk_)')
           goto 9999
         end if
         tmp(lb_:lb_-1+min(len,dim))=rrax(lbi:lbi-1+min(len,dim))
@@ -1158,7 +1158,7 @@ Contains
       Allocate(rrax(lb_:ub_),stat=info)
       if (info /= 0) then
         err=4025
-        call psb_errpush(err,name,i_err=(/len,0,0,0,0/),a_err='complex(kind(1.d0))')
+        call psb_errpush(err,name,i_err=(/len,0,0,0,0/),a_err='complex(psb_dpk_)')
         goto 9999
       end if
     endif
@@ -1187,14 +1187,14 @@ Contains
     use psb_error_mod
     ! ...Subroutine Arguments  
     Integer,Intent(in) :: len1,len2
-    Real(kind(1.d0)),allocatable :: rrax(:,:)
+    Real(psb_dpk_),allocatable :: rrax(:,:)
     integer :: info
-    real(kind(1.d0)), optional, intent(in) :: pad
+    real(psb_dpk_), optional, intent(in) :: pad
     Integer,Intent(in), optional  :: lb1,lb2
 
     ! ...Local Variables
 
-    Real(kind(1.d0)),allocatable  :: tmp(:,:)
+    Real(psb_dpk_),allocatable  :: tmp(:,:)
     Integer :: dim,err_act,err, dim2,lb1_, lb2_, ub1_, ub2_,&
          & lbi1, lbi2
     character(len=20)  :: name
@@ -1217,12 +1217,12 @@ Contains
 
     if (len1 < 0) then
       err=4025 
-      call psb_errpush(err,name,i_err=(/len1,0,0,0,0/),a_err='real(kind(1.d0))')
+      call psb_errpush(err,name,i_err=(/len1,0,0,0,0/),a_err='real(psb_dpk_)')
       goto 9999
     end if
     if (len2 < 0) then
       err=4025
-      call psb_errpush(err,name,i_err=(/len2,0,0,0,0/),a_err='real(kind(1.d0))')
+      call psb_errpush(err,name,i_err=(/len2,0,0,0,0/),a_err='real(psb_dpk_)')
       goto 9999
     end if
 
@@ -1237,7 +1237,7 @@ Contains
         Allocate(tmp(lb1_:ub1_,lb2_:ub2_),stat=info)
         if (info /= 0) then
           err=4025
-          call psb_errpush(err,name,i_err=(/len1*len2,0,0,0,0/),a_err='real(kind(1.d0))')
+          call psb_errpush(err,name,i_err=(/len1*len2,0,0,0,0/),a_err='real(psb_dpk_)')
           goto 9999
         end if
         tmp(lb1_:lb1_-1+min(len1,dim),lb2_:lb2_-1+min(len2,dim2)) = &
@@ -1250,7 +1250,7 @@ Contains
       Allocate(rrax(lb1_:ub1_,lb2_:ub2_),stat=info)
       if (info /= 0) then
         err=4025
-        call psb_errpush(err,name,i_err=(/len1*len2,0,0,0,0/),a_err='real(kind(1.d0))')
+        call psb_errpush(err,name,i_err=(/len1*len2,0,0,0,0/),a_err='real(psb_dpk_)')
         goto 9999
       end if
     endif
@@ -1280,14 +1280,14 @@ Contains
     use psb_error_mod
     ! ...Subroutine Arguments  
     Integer,Intent(in) :: len1,len2
-    complex(kind(1.d0)),allocatable :: rrax(:,:)
+    complex(psb_dpk_),allocatable :: rrax(:,:)
     integer :: info
-    complex(kind(1.d0)), optional, intent(in) :: pad
+    complex(psb_dpk_), optional, intent(in) :: pad
     Integer,Intent(in), optional  :: lb1,lb2
 
     ! ...Local Variables
 
-    complex(kind(1.d0)),allocatable  :: tmp(:,:)
+    complex(psb_dpk_),allocatable  :: tmp(:,:)
     Integer :: dim,err_act,err,dim2,lb1_, lb2_, ub1_, ub2_,&
          & lbi1, lbi2
     character(len=20)  :: name
@@ -1310,12 +1310,12 @@ Contains
 
     if (len1 < 0) then
       err=4025
-      call psb_errpush(err,name,i_err=(/len1,0,0,0,0/),a_err='complex(kind(1.d0))')
+      call psb_errpush(err,name,i_err=(/len1,0,0,0,0/),a_err='complex(psb_dpk_)')
       goto 9999
     end if
     if (len2 < 0) then
       err=4025
-      call psb_errpush(err,name,i_err=(/len2,0,0,0,0/),a_err='complex(kind(1.d0))')
+      call psb_errpush(err,name,i_err=(/len2,0,0,0,0/),a_err='complex(psb_dpk_)')
       goto 9999
     end if
 
@@ -1330,7 +1330,7 @@ Contains
         Allocate(tmp(lb1_:ub1_,lb2_:ub2_),stat=info)
         if (info /= 0) then
           err=4025
-          call psb_errpush(err,name,i_err=(/len1*len2,0,0,0,0/),a_err='complex(kind(1.d0))')
+          call psb_errpush(err,name,i_err=(/len1*len2,0,0,0,0/),a_err='complex(psb_dpk_)')
           goto 9999
         end if
         tmp(lb1_:lb1_-1+min(len1,dim),lb2_:lb2_-1+min(len2,dim2)) = &
@@ -1343,7 +1343,7 @@ Contains
       Allocate(rrax(lb1_:ub1_,lb2_:ub2_),stat=info)
       if (info /= 0) then
         err=4025
-        call psb_errpush(err,name,i_err=(/len1*len2,0,0,0,0/),a_err='complex(kind(1.d0))')
+        call psb_errpush(err,name,i_err=(/len1*len2,0,0,0,0/),a_err='complex(psb_dpk_)')
         goto 9999
       end if
     endif
@@ -1513,7 +1513,7 @@ Contains
     ! ...Subroutine Arguments  
     Integer,Intent(in) :: len
     Integer,allocatable, intent(inout)  :: rrax(:),y(:)
-    Real(Kind(1.d0)),allocatable, intent(inout) :: z(:)
+    Real(psb_dpk_),allocatable, intent(inout) :: z(:)
     integer :: info
     character(len=20)  :: name
     integer :: err_act, err
@@ -1562,7 +1562,7 @@ Contains
     ! ...Subroutine Arguments  
     Integer,Intent(in) :: len
     Integer,allocatable, intent(inout) :: rrax(:),y(:)
-    complex(Kind(1.d0)),allocatable, intent(inout) :: z(:)
+    complex(psb_dpk_),allocatable, intent(inout) :: z(:)
     integer :: info
     character(len=20)  :: name
     integer :: err_act, err
@@ -1606,7 +1606,7 @@ Contains
 
   Subroutine psb_dtransfer1d(vin,vout,info)
     use psb_error_mod
-    real(kind(1.d0)), allocatable, intent(inout) :: vin(:),vout(:)
+    real(psb_dpk_), allocatable, intent(inout) :: vin(:),vout(:)
     integer, intent(out) :: info 
     !
     ! 
@@ -1646,7 +1646,7 @@ Contains
 
   Subroutine psb_dtransfer2d(vin,vout,info)
     use psb_error_mod
-    real(kind(1.d0)), allocatable, intent(inout) :: vin(:,:),vout(:,:)
+    real(psb_dpk_), allocatable, intent(inout) :: vin(:,:),vout(:,:)
     integer, intent(out) :: info 
     !
     ! 
@@ -1685,7 +1685,7 @@ Contains
 
   Subroutine psb_ztransfer1d(vin,vout,info)
     use psb_error_mod
-    complex(kind(1.d0)), allocatable, intent(inout) :: vin(:),vout(:)
+    complex(psb_dpk_), allocatable, intent(inout) :: vin(:),vout(:)
     integer, intent(out) :: info 
     !
     ! 
@@ -1721,7 +1721,7 @@ Contains
 
   Subroutine psb_ztransfer2d(vin,vout,info)
     use psb_error_mod
-    complex(kind(1.d0)), allocatable, intent(inout) :: vin(:,:),vout(:,:)
+    complex(psb_dpk_), allocatable, intent(inout) :: vin(:,:),vout(:,:)
     integer, intent(out) :: info 
     !
     ! 

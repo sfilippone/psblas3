@@ -73,7 +73,7 @@ subroutine psb_dprecsetd(p,what,val,info)
   implicit none
   type(psb_dprec_type), intent(inout)    :: p
   integer                                :: what
-  real(kind(1.d0))                       :: val 
+  real(psb_dpk_)                       :: val 
   integer, intent(out)                   :: info
 
 !

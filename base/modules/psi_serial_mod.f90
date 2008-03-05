@@ -105,7 +105,7 @@ contains
     implicit none
 
     integer :: n, idx(:)
-    real(kind(1.d0)) :: x(:), y(:), alpha, beta
+    real(psb_dpk_) :: x(:), y(:), alpha, beta
 
     ! Locals
     integer :: i
@@ -155,7 +155,7 @@ contains
     implicit none
 
     integer :: n, idx(:)
-    complex(kind(1.d0)) :: x(:), y(:),alpha,beta
+    complex(psb_dpk_) :: x(:), y(:),alpha,beta
 
     ! Locals
     integer :: i
@@ -208,7 +208,7 @@ contains
     implicit none
 
     integer :: n, k, idx(:)
-    real(kind(1.d0)) :: x(:,:), y(:)
+    real(psb_dpk_) :: x(:,:), y(:)
 
     ! Locals
     integer :: i, j, pt
@@ -252,7 +252,7 @@ contains
     implicit none
 
     integer :: n, k, idx(:)
-    complex(kind(1.d0)) :: x(:,:), y(:)
+    complex(psb_dpk_) :: x(:,:), y(:)
 
     ! Locals
     integer :: i, j, pt
@@ -273,7 +273,7 @@ contains
     implicit none
 
     integer :: n, idx(:)
-    real(kind(1.d0)) :: x(:), y(:)
+    real(psb_dpk_) :: x(:), y(:)
 
     ! Locals
     integer :: i
@@ -307,7 +307,7 @@ contains
     implicit none
 
     integer :: n, idx(:)
-    complex(kind(1.d0)) :: x(:), y(:)
+    complex(psb_dpk_) :: x(:), y(:)
 
     ! Locals
     integer :: i
@@ -325,7 +325,7 @@ contains
     implicit none
 
     integer :: n, k, idx(:)
-    real(kind(1.d0)) :: beta, x(:), y(:,:)
+    real(psb_dpk_) :: beta, x(:), y(:,:)
 
     ! Locals
     integer :: i, j, pt
@@ -363,7 +363,7 @@ contains
     implicit none
 
     integer :: n, idx(:)
-    real(kind(1.d0)) :: beta, x(:), y(:)
+    real(psb_dpk_) :: beta, x(:), y(:)
 
     ! Locals
     integer :: i
@@ -456,7 +456,7 @@ contains
     implicit none
 
     integer :: n, k, idx(:)
-    complex(kind(1.d0)) :: beta, x(:), y(:,:)
+    complex(psb_dpk_) :: beta, x(:), y(:,:)
 
     ! Locals
     integer :: i, j, pt
@@ -495,7 +495,7 @@ contains
     implicit none
 
     integer :: n, idx(:)
-    complex(kind(1.d0)) :: beta, x(:), y(:)
+    complex(psb_dpk_) :: beta, x(:), y(:)
 
     ! Locals
     integer :: i

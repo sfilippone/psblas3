@@ -42,7 +42,7 @@ C     ... Scalar arguments ...
 
 C     ... Array arguments ...
 
-      DOUBLE PRECISION A(*), ARN(LARN)
+      real(psb_dpk_) A(*), ARN(LARN)
       INTEGER          IA1(*), IA2(*), KA(LKA), 
      +  IA(3,*), IPERM(*), JA(LJA), WORK(*),INFON(*), infoa(*)
       

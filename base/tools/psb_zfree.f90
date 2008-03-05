@@ -47,7 +47,7 @@ subroutine psb_zfree(x, desc_a, info)
   implicit none
 
   !....parameters...
-  complex(kind(1.d0)),allocatable, intent(inout)    :: x(:,:)
+  complex(psb_dpk_),allocatable, intent(inout)    :: x(:,:)
   type(psb_desc_type), intent(in) :: desc_a
   integer                     :: info
 
@@ -122,7 +122,7 @@ subroutine psb_zfreev(x, desc_a, info)
 
   implicit none
   !....parameters...
-  complex(kind(1.d0)),allocatable, intent(inout)    :: x(:)
+  complex(psb_dpk_),allocatable, intent(inout)    :: x(:)
   type(psb_desc_type), intent(in) :: desc_a
   integer                     :: info
 

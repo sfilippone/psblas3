@@ -68,9 +68,10 @@
 !
 !
 subroutine dmsort_up(n,k,l,iret)
+  use psb_const_mod
   implicit none
   integer n, iret
-  real(kind(1.d0))  k(n)
+  real(psb_dpk_)  k(n)
   integer l(0:n+1)
   !
   integer p,q,s,t

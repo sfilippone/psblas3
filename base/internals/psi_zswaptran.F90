@@ -42,8 +42,8 @@
 !   it is capable of pruning empty exchanges, which are very likely in out 
 !   application environment. All the variants have the same structure 
 !   In all these subroutines X may be:    I    Integer
-!                                         D    real(kind(1.d0))
-!                                         Z    complex(kind(1.d0))
+!                                         D    real(psb_dpk_)
+!                                         Z    complex(psb_dpk_)
 !   Basically the operation is as follows: on each process, we identify 
 !   sections SND(Y) and RCV(Y); then we do a SEND(PACK(SND(Y)));
 !   then we receive, and we do an update with Y = UNPACK(RCV(Y)) + BETA * Y 
@@ -101,8 +101,8 @@ subroutine psi_zswaptranm(flag,n,beta,y,desc_a,work,info,data)
 
   integer, intent(in)      :: flag, n
   integer, intent(out)     :: info
-  complex(kind(1.d0))         :: y(:,:), beta
-  complex(kind(1.d0)), target :: work(:)
+  complex(psb_dpk_)         :: y(:,:), beta
+  complex(psb_dpk_), target :: work(:)
   type(psb_desc_type),target       :: desc_a
   integer, optional         :: data
 
@@ -175,8 +175,8 @@ subroutine psi_ztranidxm(ictxt,icomm,flag,n,beta,y,idx,totxch,totsnd,totrcv,work
 
   integer, intent(in)      :: ictxt,icomm,flag,n
   integer, intent(out)     :: info
-  complex(kind(1.d0))         :: y(:,:), beta
-  complex(kind(1.d0)), target :: work(:)
+  complex(psb_dpk_)         :: y(:,:), beta
+  complex(psb_dpk_), target :: work(:)
   integer, intent(in)      :: idx(:),totxch,totsnd, totrcv
 
   ! locals
@@ -191,7 +191,7 @@ subroutine psi_ztranidxm(ictxt,icomm,flag,n,beta,y,idx,totxch,totsnd,totrcv,work
        & albf,do_send,do_recv
   logical, parameter :: usersend=.false.
 
-  complex(kind(1.d0)), pointer, dimension(:) :: sndbuf, rcvbuf
+  complex(psb_dpk_), pointer, dimension(:) :: sndbuf, rcvbuf
 #ifdef HAVE_VOLATILE
   volatile :: sndbuf, rcvbuf
 #endif
@@ -531,8 +531,8 @@ end subroutine psi_ztranidxm
 !   it is capable of pruning empty exchanges, which are very likely in out 
 !   application environment. All the variants have the same structure 
 !   In all these subroutines X may be:    I    Integer
-!                                         D    real(kind(1.d0))
-!                                         Z    complex(kind(1.d0))
+!                                         D    real(psb_dpk_)
+!                                         Z    complex(psb_dpk_)
 !   Basically the operation is as follows: on each process, we identify 
 !   sections SND(Y) and RCV(Y); then we do a SEND(PACK(SND(Y)));
 !   then we receive, and we do an update with Y = UNPACK(RCV(Y)) + BETA * Y 
@@ -590,8 +590,8 @@ subroutine psi_zswaptranv(flag,beta,y,desc_a,work,info,data)
 
   integer, intent(in)      :: flag
   integer, intent(out)     :: info
-  complex(kind(1.d0))         :: y(:), beta
-  complex(kind(1.d0)), target :: work(:)
+  complex(psb_dpk_)         :: y(:), beta
+  complex(psb_dpk_), target :: work(:)
   type(psb_desc_type),target  :: desc_a
   integer, optional    :: data
 
@@ -665,8 +665,8 @@ subroutine psi_ztranidxv(ictxt,icomm,flag,beta,y,idx,totxch,totsnd,totrcv,work,i
 
   integer, intent(in)      :: ictxt,icomm,flag
   integer, intent(out)     :: info
-  complex(kind(1.d0))         :: y(:), beta
-  complex(kind(1.d0)), target :: work(:)
+  complex(psb_dpk_)         :: y(:), beta
+  complex(psb_dpk_), target :: work(:)
   integer, intent(in)      :: idx(:),totxch,totsnd, totrcv
 
   ! locals
@@ -681,7 +681,7 @@ subroutine psi_ztranidxv(ictxt,icomm,flag,beta,y,idx,totxch,totsnd,totrcv,work,i
        & albf,do_send,do_recv
   logical, parameter :: usersend=.false.
 
-  complex(kind(1.d0)), pointer, dimension(:) :: sndbuf, rcvbuf
+  complex(psb_dpk_), pointer, dimension(:) :: sndbuf, rcvbuf
 #ifdef HAVE_VOLATILE
   volatile :: sndbuf, rcvbuf
 #endif

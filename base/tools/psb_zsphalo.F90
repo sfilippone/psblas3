@@ -88,7 +88,7 @@ Subroutine psb_zsphalo(a,desc_a,blk,info,rowcnv,colcnv,&
   Integer :: l1, icomm, err_act
   Integer, allocatable  :: sdid(:,:), brvindx(:),rvid(:,:), &
        & rvsz(:), bsdindx(:),sdsz(:), iasnd(:), jasnd(:)
-  complex(kind(1.d0)), allocatable :: valsnd(:)
+  complex(psb_dpk_), allocatable :: valsnd(:)
   integer, pointer :: idxv(:)
   logical :: rowcnv_,colcnv_,rowscale_,colscale_
   character(len=5)  :: outfmt_

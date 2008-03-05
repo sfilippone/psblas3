@@ -46,7 +46,7 @@ subroutine psb_znumbmm(a,b,c)
   implicit none
 
   type(psb_zspmat_type)         :: a,b,c
-  complex(kind(1.d0)), allocatable :: temp(:)
+  complex(psb_dpk_), allocatable :: temp(:)
   integer                       :: info
   logical                   :: csra, csrb
   
@@ -77,11 +77,11 @@ contains
   subroutine inner_numbmm(a,b,c,temp,info)
     type(psb_zspmat_type) :: a,b,c
     integer               :: info
-    complex(kind(1.d0))      :: temp(:)
+    complex(psb_dpk_)      :: temp(:)
     integer, allocatable  :: iarw(:), iacl(:),ibrw(:),ibcl(:)
-    complex(kind(1.d0)), allocatable :: aval(:),bval(:)
+    complex(psb_dpk_), allocatable :: aval(:),bval(:)
     integer  :: maxlmn,i,j,m,n,k,l,nazr,nbzr,jj,minlm,minmn,minln
-    complex(kind(1.d0))      :: ajj
+    complex(psb_dpk_)      :: ajj
 
 
     n = a%m

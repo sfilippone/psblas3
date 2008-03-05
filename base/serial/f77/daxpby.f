@@ -30,11 +30,12 @@ C POSSIBILITY OF SUCH DAMAGE.
 C
 C 
       subroutine  daxpby(m, n, alpha, X, lldx, beta, Y, lldy, info)
-      double precision one, zero
+      use psb_const_mod
+      real(psb_dpk_) one, zero
       parameter  (one=1.d0,zero=0.d0)
       integer n, m, lldx, lldy, info
-      double precision X(lldx,*), Y(lldy,*)
-      double precision alpha, beta
+      real(psb_dpk_) X(lldx,*), Y(lldy,*)
+      real(psb_dpk_) alpha, beta
       integer i, j
       integer int_err(5)
       character  name*20

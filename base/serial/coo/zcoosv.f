@@ -34,14 +34,15 @@ C  "right" place, i.e. the last in its row for Lower and the first
 C  for Upper. 
 C
       SUBROUTINE ZCOOSV (UPLO,TRANS,DIAG,N,AS,IA,JA,INFOA,B,X,IERROR)
+      use psb_const_mod
       use psb_error_mod
-      COMPLEX*16         ZERO
+      complex(psb_dpk_)         ZERO
       PARAMETER         (ZERO=(0.0D0,0.0D0))
       INTEGER           N,IERROR
       CHARACTER         DIAG, TRANS, UPLO
-      COMPLEX*16        AS(*), B(*), X(*)
+      complex(psb_dpk_)        AS(*), B(*), X(*)
       INTEGER           IA(*), JA(*),INFOA(*)
-      COMPLEX*16        ACC
+      complex(psb_dpk_)        ACC
       INTEGER           I, J, K, NNZ, II, JJ
       LOGICAL           LOW, TRA, UNI
       integer           :: debug_level, debug_unit

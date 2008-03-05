@@ -112,7 +112,7 @@ contains
     type(psb_zspmat_type) :: a,b,c
     integer               :: index(:),info
     integer, allocatable  :: iarw(:), iacl(:),ibrw(:),ibcl(:)
-    complex(kind(1.d0)), allocatable :: aval(:),bval(:)
+    complex(psb_dpk_), allocatable :: aval(:),bval(:)
     integer  :: maxlmn,i,j,m,n,k,l,istart,length,nazr,nbzr,jj,minlm,minmn
 
 

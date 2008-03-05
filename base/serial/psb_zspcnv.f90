@@ -56,8 +56,8 @@ subroutine psb_zspcnv2(a, b,info,afmt,upd,dupl)
   character(len=*), optional, intent(in) :: afmt
 
   !...Locals...
-  complex(kind(1.d0))              :: d(1)
-  complex(kind(1.d0)), allocatable :: work(:)
+  complex(psb_dpk_)              :: d(1)
+  complex(psb_dpk_), allocatable :: work(:)
   type(psb_zspmat_type)         :: temp_a
   Integer                       :: nzr, ntry, ifc_, ia1_size,&
        & ia2_size, aspk_size,size_req,n_row,n_col,upd_,dupl_

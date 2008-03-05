@@ -34,6 +34,7 @@ C  Compute level numbers for the triangular matrix.
 C                                                                               
       SUBROUTINE DVTFG (UPLO,M,JA,IA,NG,IPA,IPAT,KLEN,IWORK1,IWORK2,            
      *  IWORK3)                                                 
+      use psb_const_mod
       use psb_string_mod
       use psb_error_mod
       implicit none

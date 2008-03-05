@@ -101,6 +101,7 @@ C                ROWSUM(N) in other cases ('T' or 'C' options).
 C
       SUBROUTINE  ZCSRWS(TRANS,M,N,FIDA,DESCRA,A,IA1,IA2,
      &  INFOA,ROWSUM,IERROR)
+      use psb_const_mod
       IMPLICIT NONE
 C     .. Scalar Arguments ..
       INTEGER           M,N, IERROR
@@ -108,14 +109,10 @@ C     .. Scalar Arguments ..
 C     .. Array Arguments ..
       INTEGER           IA1(*),IA2(*),INFOA(*)
       CHARACTER         DESCRA*11, FIDA*5
-      COMPLEX*16        A(*), ROWSUM(*)
+      complex(psb_dpk_)        A(*), ROWSUM(*)
 C     .. Local Array..
       INTEGER           INT_VAL(5), ERR_ACT
       CHARACTER*30      NAME,STRINGS(2)
-C     .. Parameters ..
-      DOUBLE PRECISION  ZERO
-      INTEGER           IONE
-      PARAMETER         (ZERO=0.D0,IONE=1)
 C     .. Intrinsic Functions ..
       INTRINSIC         DBLE, IDINT
 C     .. Executable Statements ..

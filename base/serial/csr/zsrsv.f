@@ -29,13 +29,14 @@ C ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 C POSSIBILITY OF SUCH DAMAGE.
 C
       SUBROUTINE ZSRSV (UPLO,TRANS,DIAG,N,AS,JA,IA,B,X)
-      COMPLEX*16 ZERO
+      use psb_const_mod
+      complex(psb_dpk_) ZERO
       PARAMETER  (ZERO = (0.0D0, 0.0D0))
       INTEGER    N
       CHARACTER  DIAG, TRANS, UPLO
-      COMPLEX*16 AS(*), B(*), X(*)
+      complex(psb_dpk_) AS(*), B(*), X(*)
       INTEGER    IA(*), JA(*)
-      COMPLEX*16 ACC
+      complex(psb_dpk_) ACC
       INTEGER    I, J, K
       LOGICAL    LOW, TRA, COTRA, UNI
       UNI = (DIAG.EQ.'U')

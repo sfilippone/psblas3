@@ -32,14 +32,20 @@
 
 module psb_const_mod
   !
+  ! This must be the kind parameter corresponding to MPI_DOUBLE_PRECISION.
+  !
+  integer, parameter           :: psb_dpk_ = kind(1.d0)
+  integer                      :: psb_sizeof_dp, psb_sizeof_int
+
+  !
   !     Handy & miscellaneous constants
   !
-  integer, parameter             :: izero=0, ione=1
-  integer, parameter             :: itwo=2, ithree=3,mone=-1, psb_root_=0
-  real(kind(1.d0)), parameter    :: dzero=0.d0, done=1.d0
-  complex(kind(1.d0)), parameter :: zzero=(0.d0,0.0d0)
-  complex(kind(1.d0)), parameter :: zone=(1.d0,0.0d0)
-  real(kind(1.d0)), parameter    :: epstol=1.d-32, psb_percent_=0.7
-  character, parameter           :: psb_all_='A',  psb_topdef_=' '
+  integer, parameter           :: izero=0, ione=1
+  integer, parameter           :: itwo=2, ithree=3,mone=-1, psb_root_=0
+  real(psb_dpk_), parameter    :: dzero=0.d0, done=1.d0
+  complex(psb_dpk_), parameter :: zzero=(0.d0,0.0d0)
+  complex(psb_dpk_), parameter :: zone=(1.d0,0.0d0)
+  real(psb_dpk_), parameter    :: epstol=1.d-32, psb_percent_=0.7
+  character, parameter         :: psb_all_='A',  psb_topdef_=' '
 
 end module psb_const_mod

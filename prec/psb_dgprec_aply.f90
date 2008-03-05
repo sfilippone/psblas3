@@ -41,16 +41,16 @@ subroutine psb_dgprec_aply(alpha,prec,x,beta,y,desc_data,trans,work,info)
 
   type(psb_desc_type),intent(in)   :: desc_data
   type(psb_dprec_type), intent(in) :: prec
-  real(kind(0.d0)),intent(in)      :: x(:)
-  real(kind(0.d0)),intent(inout)   :: y(:)
-  real(kind(0.d0)),intent(in)      :: alpha,beta
+  real(psb_dpk_),intent(in)      :: x(:)
+  real(psb_dpk_),intent(inout)   :: y(:)
+  real(psb_dpk_),intent(in)      :: alpha,beta
   character(len=1)                 :: trans
-  real(kind(0.d0)),target          :: work(:)
+  real(psb_dpk_),target          :: work(:)
   integer, intent(out)             :: info
 
   ! Local variables
   integer :: n_row,int_err(5)
-  real(kind(1.d0)), pointer :: ww(:)
+  real(psb_dpk_), pointer :: ww(:)
   character     :: trans_
   integer :: ictxt,np,me, err_act
   character(len=20)   :: name, ch_err

@@ -16,6 +16,7 @@ c=======================================================================
      *  ib, jb, diagb,
      *  ic, jc, diagc,
      *  index)
+      use psb_const_mod
       use psb_realloc_mod
       use psb_serial_mod, only: psb_msort
 c
@@ -135,12 +136,13 @@ c$$$      write(0,*) 'SYMBMM: on exit',ic(n+1)-1,jc(ic(n+1)-1)
      *  ib, jb, diagb, b,
      *  ic, jc, diagc, c,
      *  temp)
+      use psb_const_mod
 c
       integer       ia(*), ja(*), diaga,
      *  ib(*), jb(*), diagb,
      *  ic(*), jc(*), diagc 
 c
-      real(kind(1.d0))          a(*), b(*), c(*), temp(*),ajj
+      real(psb_dpk_)          a(*), b(*), c(*), temp(*),ajj
 c
 c       numeric matrix multiply c=a*b
 c
@@ -204,11 +206,12 @@ c$$$     +    write(0,*) ' NUMBMM: Fixing row ',i,ic(i),ic(i+1)-1
      *  ic, jc, diagc, c,
      *  temp)
 c
+      use psb_const_mod
       integer       ia(*), ja(*), diaga,
      *  ib(*), jb(*), diagb,
      *  ic(*), jc(*), diagc 
 c
-      complex(kind(1.d0))       a(*), b(*), c(*), temp(*),ajj
+      complex(psb_dpk_)       a(*), b(*), c(*), temp(*),ajj
 c
 c       numeric matrix multiply c=a*b
 c

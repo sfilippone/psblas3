@@ -60,7 +60,7 @@ subroutine psb_dspgetrow(irw,a,nz,ia,ja,val,info,iren,lrw,append,nzin)
   integer, intent(in)                  :: irw
   integer, intent(out)                 :: nz
   integer, allocatable, intent(inout)  :: ia(:), ja(:)
-  real(kind(1.d0)), allocatable,  intent(inout)    :: val(:)
+  real(psb_dpk_), allocatable,  intent(inout)    :: val(:)
   integer,intent(out)                  :: info
   logical, intent(in), optional        :: append
   integer, intent(in), optional        :: iren(:)

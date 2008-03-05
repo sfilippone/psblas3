@@ -83,17 +83,18 @@ C
 ***********************************************************************       
       SUBROUTINE DJADMV4(DIAG,NROW,NCOL,ALPHA,NG,A,KA,JA,IA,
      +  X,LDX,BETA,Y,LDY,IERROR)
+      use psb_const_mod
       IMPLICIT NONE
       INTEGER           IA(3,*),KA(*),JA(*),NCOL,NROW,NG,LDX,LDY,IERROR
-      DOUBLE PRECISION  A(*),X(LDX,*),Y(LDY,*),ALPHA,BETA
+      real(psb_dpk_)  A(*),X(LDX,*),Y(LDY,*),ALPHA,BETA
       CHARACTER         DIAG                                                   
-      DOUBLE PRECISION  ZERO
+      real(psb_dpk_)  ZERO
       PARAMETER         (ZERO=0.0D0)                                           
       INTEGER           I, K, IPX, IPG, I0, IN
       INTEGER           NPG
       integer           nb
       parameter         (nb=4)
-      DOUBLE PRECISION  Y0(NB), Y1(NB), Y2(NB), Y3(NB), Y4(NB),
+      real(psb_dpk_)  Y0(NB), Y1(NB), Y2(NB), Y3(NB), Y4(NB),
      +  Y5(NB), Y6(NB), Y7(NB), Y8(NB), Y9(NB), Y10(NB), Y11(NB),
      +  Y12(NB), Y13(NB), Y14(NB), Y15(NB)
 c      .. Executable Statements ..                                              

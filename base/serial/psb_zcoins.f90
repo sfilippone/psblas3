@@ -45,7 +45,7 @@ subroutine psb_zcoins(nz,ia,ja,val,a,imin,imax,jmin,jmax,info,gtl,rebuild)
 
   integer, intent(in)                  :: nz, imin,imax,jmin,jmax
   integer, intent(in)                  :: ia(:),ja(:)
-  complex(kind(1.d0)), intent(in)         :: val(:)
+  complex(psb_dpk_), intent(in)         :: val(:)
   type(psb_zspmat_type), intent(inout) :: a
   integer, intent(out)                 :: info
   integer, intent(in), optional        :: gtl(:)
@@ -458,8 +458,8 @@ contains
     integer, intent(in) :: nz, imin,imax,jmin,jmax,nzl,maxsz
     integer, intent(in) :: ia(:),ja(:)
     integer, intent(inout) :: nza
-    complex(kind(1.d0)), intent(in) :: val(:)
-    complex(kind(1.d0)), intent(inout) :: aspk(:)
+    complex(psb_dpk_), intent(in) :: val(:)
+    complex(psb_dpk_), intent(inout) :: aspk(:)
     integer, intent(out) :: info
     integer, intent(in), optional  :: ng,gtl(:)
     integer  :: i,ir,ic
@@ -531,8 +531,8 @@ contains
     integer, intent(in) :: nz, imin,imax,jmin,jmax,maxsz
     integer, intent(in) :: ia(:),ja(:)
     integer, intent(inout) :: nza,ia1(:),ia2(:)
-    complex(kind(1.d0)), intent(in)    :: val(:)
-    complex(kind(1.d0)), intent(inout) :: aspk(:)
+    complex(psb_dpk_), intent(in)    :: val(:)
+    complex(psb_dpk_), intent(inout) :: aspk(:)
     integer, intent(out) :: info
     integer, intent(in), optional  :: ng,gtl(:)
     integer :: i,ir,ic

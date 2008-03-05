@@ -141,14 +141,15 @@ C
 C
       SUBROUTINE DSWMM(TRANS,M,N,K,ALPHA,FIDA,DESCRA,A,IA1,IA2,         &
      &                 INFOA,B,LDB,BETA,C,LDC,WORK,LWORK,IERROR)
+      use psb_const_mod
 C     .. Scalar Arguments ..
       INTEGER       M,N,K,LDB,LDC,LWORK,IERROR
       CHARACTER     TRANS
-      DOUBLE PRECISION  ALPHA,BETA
+      real(psb_dpk_)  ALPHA,BETA
 C     .. Array Arguments ..
       INTEGER       IA1(*),IA2(*),INFOA(*), INT_VAL(5)
       CHARACTER     DESCRA*11, FIDA*5
-      DOUBLE PRECISION  A(*),B(LDB,*),C(LDC,*),WORK(*)
+      real(psb_dpk_)  A(*),B(LDB,*),C(LDC,*),WORK(*)
 C     .. External Subroutines ..
       EXTERNAL      DCSRMM
 

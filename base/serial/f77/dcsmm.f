@@ -197,11 +197,11 @@ C
 C     .. Scalar Arguments ..
       INTEGER           M,N,K,LDB,LDC,LWORK, IERROR
       CHARACTER         TRANS
-      DOUBLE PRECISION  ALPHA,BETA
+      real(psb_dpk_)  ALPHA,BETA
 C     .. Array Arguments ..
       INTEGER           IA1(*),IA2(*),INFOA(*),PL(*),PR(*)
       CHARACTER         DESCRA*11, FIDA*5
-      DOUBLE PRECISION  A(*),B(LDB,*),C(LDC,*),WORK(*)
+      real(psb_dpk_)  A(*),B(LDB,*),C(LDC,*),WORK(*)
 C     .. Local Scalars ..
       INTEGER           LWORKM,  LWORKB, LWORKC, LWORKS, P, ERR_ACT
       LOGICAL           LP, RP

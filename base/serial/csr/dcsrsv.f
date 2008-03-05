@@ -30,13 +30,14 @@ C POSSIBILITY OF SUCH DAMAGE.
 C
 C 
       SUBROUTINE DCSRSV(UPLO,TRANS,DIAG,N,AS,JA,IA,B,X,IERROR)
-      DOUBLE PRECISION   ZERO
+      use psb_const_mod
+      real(psb_dpk_)   ZERO
       PARAMETER         (ZERO=0.0D0)
       INTEGER           N, IERROR
       CHARACTER         DIAG, TRANS, UPLO
-      DOUBLE PRECISION  AS(*), B(*), X(*)
+      real(psb_dpk_)  AS(*), B(*), X(*)
       INTEGER           IA(*), JA(*)
-      DOUBLE PRECISION  ACC
+      real(psb_dpk_)  ACC
       INTEGER           I, J, K
       LOGICAL           LOW, TRA, UNI
       UNI = (DIAG.EQ.'U')

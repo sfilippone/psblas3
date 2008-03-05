@@ -43,16 +43,16 @@ subroutine psb_zbjac_aply(alpha,prec,x,beta,y,desc_data,trans,work,info)
 
   type(psb_desc_type), intent(in)    :: desc_data
   type(psb_zprec_type), intent(in)   :: prec
-  complex(kind(0.d0)),intent(in)     :: x(:)
-  complex(kind(0.d0)),intent(inout)  :: y(:)
-  complex(kind(0.d0)),intent(in)     :: alpha,beta
+  complex(psb_dpk_),intent(in)     :: x(:)
+  complex(psb_dpk_),intent(inout)  :: y(:)
+  complex(psb_dpk_),intent(in)     :: alpha,beta
   character(len=1)                   :: trans
-  complex(kind(0.d0)),target         :: work(:)
+  complex(psb_dpk_),target         :: work(:)
   integer, intent(out)               :: info
 
   ! Local variables
   integer :: n_row,n_col
-  complex(kind(1.d0)), pointer :: ww(:), aux(:)
+  complex(psb_dpk_), pointer :: ww(:), aux(:)
   integer :: ictxt,np,me, err_act, int_err(5)
   integer            :: debug_level, debug_unit
   character          :: trans_

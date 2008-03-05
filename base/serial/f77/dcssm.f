@@ -197,18 +197,19 @@ C
      +   PL,FIDT,DESCRT,T,IT1,IT2,INFOT,PR,
      +   B,LDB,BETA,C,LDC,WORK,LWORK,IERROR)
 C     .. Scalar Arguments ..
+      use psb_const_mod
       use psb_error_mod
       IMPLICIT NONE
-      DOUBLE PRECISION ALPHA, BETA
+      real(psb_dpk_) ALPHA, BETA
       INTEGER          N, LDB, LDC, M, LWORK, IERROR
       CHARACTER        UNITD, TRANS
 C     .. Array Arguments ..
-      DOUBLE PRECISION T(*), B(LDB,*), C(LDC,*), D(*), WORK(*)
+      real(psb_dpk_) T(*), B(LDB,*), C(LDC,*), D(*), WORK(*)
       INTEGER          IT1(*), IT2(*), INFOT(*), PL(*), PR(*)
       CHARACTER        DESCRT*11, FIDT*5
 C     .. Local Scalars ..
       INTEGER          LWORKM, LWORKB, LWORKS, P, ERR_ACT
-      DOUBLE PRECISION ZERO
+      real(psb_dpk_) ZERO
       LOGICAL          LP, RP
 C     .. Local Array..
       INTEGER           INT_VAL(5)

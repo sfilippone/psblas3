@@ -113,7 +113,7 @@ contains
     type(psb_dspmat_type) :: a,b,c
     integer               :: index(:),info
     integer, allocatable  :: iarw(:), iacl(:),ibrw(:),ibcl(:)
-    real(kind(1.d0)), allocatable :: aval(:),bval(:)
+    real(psb_dpk_), allocatable :: aval(:),bval(:)
     integer  :: maxlmn,i,j,m,n,k,l,istart,length,nazr,nbzr,jj,minlm,minmn
 
 

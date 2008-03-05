@@ -37,14 +37,15 @@ c
 *
       SUBROUTINE DCOOMM(TRANSA,M,K,N,ALPHA,DESCRA,AR,
      *   IA,JA,INFOA,B,LDB,BETA,C,LDC,WORK,LWORK,IERROR)
+      use psb_const_mod
 C
 C
 C     .. Scalar Arguments ..
-      DOUBLE PRECISION  ALPHA, BETA
+      real(psb_dpk_)  ALPHA, BETA
       INTEGER           K, LDB, LDC, M, N, LWORK, IERROR
       CHARACTER         TRANSA
 C     .. Array Arguments ..
-      DOUBLE PRECISION  AR(*), B(LDB,*), C(LDC,*),  WORK(*)
+      real(psb_dpk_)  AR(*), B(LDB,*), C(LDC,*),  WORK(*)
       INTEGER           IA(*), JA(*),INFOA(*)
       CHARACTER         DESCRA*11
 C     .. Local Scalars ..

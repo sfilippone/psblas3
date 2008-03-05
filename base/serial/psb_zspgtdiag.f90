@@ -47,7 +47,7 @@ subroutine psb_zspgtdiag(a,d,info)
   implicit none
 
   type(psb_zspmat_type), intent(in)     :: a
-  complex(kind(1.d0)), intent(inout)       :: d(:) 
+  complex(psb_dpk_), intent(inout)       :: d(:) 
   integer, intent(out)                  :: info
 
   type(psb_zspmat_type)     :: tmpa

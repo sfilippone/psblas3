@@ -55,17 +55,17 @@ function psb_ddot(x, y,desc_a, info, jx, jy)
   use psb_penv_mod
   implicit none
 
-  real(kind(1.d0)), intent(in)     :: x(:,:), y(:,:)
+  real(psb_dpk_), intent(in)     :: x(:,:), y(:,:)
   type(psb_desc_type), intent(in)  :: desc_a
   integer, intent(in), optional    :: jx, jy
   integer, intent(out)             :: info
-  real(kind(1.D0))                 :: psb_ddot
+  real(psb_dpk_)                 :: psb_ddot
 
   ! locals
   integer                  :: ictxt, np, me, idx, ndm,&
        & err_act, iix, jjx, ix, ijx, iy, ijy, iiy, jjy, i, m
-  real(kind(1.D0))         :: dot_local
-  real(kind(1.d0))         :: ddot
+  real(psb_dpk_)         :: dot_local
+  real(psb_dpk_)         :: ddot
   character(len=20)        :: name, ch_err
 
   name='psb_ddot'
@@ -208,16 +208,16 @@ function psb_ddotv(x, y,desc_a, info)
   use psb_penv_mod
   implicit none
 
-  real(kind(1.d0)), intent(in)     :: x(:), y(:)
+  real(psb_dpk_), intent(in)     :: x(:), y(:)
   type(psb_desc_type), intent(in)  :: desc_a
   integer, intent(out)             :: info
-  real(kind(1.D0))                 :: psb_ddotv
+  real(psb_dpk_)                 :: psb_ddotv
 
   ! locals
   integer                  :: ictxt, np, me, idx, ndm,&
        & err_act, iix, jjx, ix, jx, iy, jy, iiy, jjy, i, m
-  real(kind(1.D0))         :: dot_local
-  real(kind(1.d0))         :: ddot
+  real(psb_dpk_)         :: dot_local
+  real(psb_dpk_)         :: ddot
   character(len=20)        :: name, ch_err
 
   name='psb_ddot'
@@ -345,16 +345,16 @@ subroutine psb_ddotvs(res, x, y,desc_a, info)
   use psb_penv_mod
   implicit none
 
-  real(kind(1.d0)), intent(in)     :: x(:), y(:)
-  real(kind(1.d0)), intent(out)    :: res
+  real(psb_dpk_), intent(in)     :: x(:), y(:)
+  real(psb_dpk_), intent(out)    :: res
   type(psb_desc_type), intent(in)  :: desc_a
   integer, intent(out)             :: info
 
   ! locals
   integer                  :: ictxt, np, me, idx, ndm,&
        & err_act, iix, jjx, ix, iy,  iiy, jjy, i, m
-  real(kind(1.D0))         :: dot_local
-  real(kind(1.d0))         :: ddot
+  real(psb_dpk_)         :: dot_local
+  real(psb_dpk_)         :: ddot
   character(len=20)        :: name, ch_err
 
   name='psb_ddot'
@@ -480,16 +480,16 @@ subroutine psb_dmdots(res, x, y, desc_a, info)
   use psb_penv_mod
   implicit none
 
-  real(kind(1.d0)), intent(in)     :: x(:,:), y(:,:)
-  real(kind(1.d0)), intent(out)    :: res(:)
+  real(psb_dpk_), intent(in)     :: x(:,:), y(:,:)
+  real(psb_dpk_), intent(out)    :: res(:)
   type(psb_desc_type), intent(in)  :: desc_a
   integer, intent(out)             :: info
 
   ! locals
   integer                  :: ictxt, np, me, idx, ndm,&
        & err_act, iix, jjx, ix, iy, iiy, jjy, i, m, j, k
-  real(kind(1.d0)),allocatable  :: dot_local(:)
-  real(kind(1.d0))         :: ddot
+  real(psb_dpk_),allocatable  :: dot_local(:)
+  real(psb_dpk_)         :: ddot
   character(len=20)        :: name, ch_err
 
   name='psb_dmdots'

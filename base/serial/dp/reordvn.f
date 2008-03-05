@@ -30,11 +30,12 @@ C POSSIBILITY OF SUCH DAMAGE.
 C
 C 
       subroutine reordvn(nnz,ar,ia1,ia2,idx)
+      use psb_const_mod
       integer nnz
       integer ia1(*),ia2(*),idx(0:*)
-      double precision ar(*)
+      real(psb_dpk_) ar(*)
       integer lp, kk, swapia1, swapia2, lswap
-      double precision swapar
+      real(psb_dpk_) swapar
 
       LP = IDX(0)
       KK = 1
@@ -65,6 +66,7 @@ C        ... Swap of vectors IA2, IA1, AR ...
       return
       end
       subroutine ireordv2(nnz,ia1,ia2,idx)
+      use psb_const_mod
       integer nnz
       integer ia1(*),ia2(*),idx(0:*)
       integer lp, kk, swapia1, swapia2, lswap
@@ -95,6 +97,7 @@ C        ... Swap of vectors IA2, IA1 ..
       return
       end
       subroutine ireordv1(nnz,ia1,idx)
+      use psb_const_mod
       integer nnz
       integer ia1(*),idx(0:*)
       integer lp, kk, swapia1, lswap
@@ -122,11 +125,12 @@ C        ... Swap of vectors IA2, IA1, AR ...
       return
       end
       subroutine reordvn3(nnz,ar,ia1,ia2,ia3,idx)
+      use psb_const_mod
       integer nnz
       integer ia1(*),ia2(*),ia3(*),idx(0:*)
-      double precision ar(*)
+      real(psb_dpk_) ar(*)
       integer lp, kk, swapia1, swapia2, swapia3,lswap
-      double precision swapar
+      real(psb_dpk_) swapar
 
       LP = IDX(0)
       KK = 1
@@ -159,13 +163,13 @@ C        ... Swap of vectors IA2, IA1, AR ...
  800  CONTINUE
       return
       end
-
       subroutine zreordvn(nnz,ar,ia1,ia2,idx)
+      use psb_const_mod
       integer nnz
       integer ia1(*),ia2(*),idx(0:*)
-      complex*16 ar(*)
+      complex(psb_dpk_) ar(*)
       integer lp, kk, swapia1, swapia2, lswap
-      complex*16 swapar
+      complex(psb_dpk_) swapar
 
       LP = IDX(0)
       KK = 1
@@ -196,11 +200,12 @@ C        ... Swap of vectors IA2, IA1, AR ...
       return
       end
       subroutine zreordvn3(nnz,ar,ia1,ia2,ia3,idx)
+      use psb_const_mod
       integer nnz
       integer ia1(*),ia2(*),ia3(*),idx(0:*)
-      complex*16 ar(*)
+      complex(psb_dpk_) ar(*)
       integer lp, kk, swapia1, swapia2, swapia3,lswap
-      complex*16 swapar
+      complex(psb_dpk_) swapar
 
       LP = IDX(0)
       KK = 1

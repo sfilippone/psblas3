@@ -146,14 +146,15 @@ C
 C
       SUBROUTINE ZSWMM(TRANS,M,N,K,ALPHA,FIDA,DESCRA,A,IA1,IA2,
      &                 INFOA,B,LDB,BETA,C,LDC,WORK,LWORK,IERROR)
+      use psb_const_mod
 C     .. Scalar Arguments ..
       INTEGER    M,N,K,LDB,LDC,LWORK,IERROR
       CHARACTER  TRANS
-      COMPLEX*16 ALPHA,BETA
+      complex(psb_dpk_) ALPHA,BETA
 C     .. Array Arguments ..
       INTEGER    IA1(*),IA2(*),INFOA(*)
       CHARACTER  DESCRA*11, FIDA*5
-      COMPLEX*16 A(*),B(LDB,*),C(LDC,*),WORK(*)
+      complex(psb_dpk_) A(*),B(LDB,*),C(LDC,*),WORK(*)
 C     .. Local Array ..
       INTEGER    INT_VAL(5), ERR_ACT
       CHARACTER*30 NAME,  STRINGS(2)

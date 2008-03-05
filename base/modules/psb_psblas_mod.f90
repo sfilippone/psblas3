@@ -34,30 +34,30 @@ module psb_psblas_mod
   interface psb_gedot
     function psb_ddotv(x, y, desc_a,info) 
       use psb_descriptor_type
-      real(kind(1.d0))                   :: psb_ddotv
-      real(kind(1.d0)), intent(in)       :: x(:), y(:)
+      real(psb_dpk_)                   :: psb_ddotv
+      real(psb_dpk_), intent(in)       :: x(:), y(:)
       type(psb_desc_type), intent(in)    :: desc_a
       integer, intent(out)               :: info
     end function psb_ddotv
     function psb_ddot(x, y, desc_a, info, jx, jy) 
       use psb_descriptor_type
-      real(kind(1.d0))                   :: psb_ddot
-      real(kind(1.d0)), intent(in)       :: x(:,:), y(:,:)
+      real(psb_dpk_)                   :: psb_ddot
+      real(psb_dpk_), intent(in)       :: x(:,:), y(:,:)
       type(psb_desc_type), intent(in)    :: desc_a
       integer, optional, intent(in)      :: jx, jy
       integer, intent(out)               :: info
     end function psb_ddot
     function psb_zdotv(x, y, desc_a,info) 
       use psb_descriptor_type
-      complex(kind(1.d0))                :: psb_zdotv
-      complex(kind(1.d0)), intent(in)    :: x(:), y(:)
+      complex(psb_dpk_)                :: psb_zdotv
+      complex(psb_dpk_), intent(in)    :: x(:), y(:)
       type(psb_desc_type), intent(in)    :: desc_a
       integer, intent(out)               :: info
     end function psb_zdotv
     function psb_zdot(x, y, desc_a, info, jx, jy) 
       use psb_descriptor_type
-      complex(kind(1.d0))                :: psb_zdot
-      complex(kind(1.d0)), intent(in)    :: x(:,:), y(:,:)
+      complex(psb_dpk_)                :: psb_zdot
+      complex(psb_dpk_), intent(in)    :: x(:,:), y(:,:)
       type(psb_desc_type), intent(in)    :: desc_a
       integer, optional, intent(in)      :: jx, jy
       integer, intent(out)               :: info
@@ -67,29 +67,29 @@ module psb_psblas_mod
   interface psb_gedots
     subroutine  psb_ddotvs(res,x, y, desc_a, info) 
       use psb_descriptor_type
-      real(kind(1.d0)), intent(out)      :: res
-      real(kind(1.d0)), intent(in)       :: x(:), y(:)
+      real(psb_dpk_), intent(out)      :: res
+      real(psb_dpk_), intent(in)       :: x(:), y(:)
       type(psb_desc_type), intent(in)    :: desc_a
       integer, intent(out)               :: info
     end subroutine psb_ddotvs
     subroutine  psb_dmdots(res,x, y, desc_a,info) 
       use psb_descriptor_type
-      real(kind(1.d0)), intent(out)      :: res(:)
-      real(kind(1.d0)), intent(in)       :: x(:,:), y(:,:)
+      real(psb_dpk_), intent(out)      :: res(:)
+      real(psb_dpk_), intent(in)       :: x(:,:), y(:,:)
       type(psb_desc_type), intent(in)    :: desc_a
       integer, intent(out)               :: info
     end subroutine psb_dmdots
     subroutine  psb_zdotvs(res,x, y, desc_a, info) 
       use psb_descriptor_type
-      complex(kind(1.d0)), intent(out)      :: res
-      complex(kind(1.d0)), intent(in)       :: x(:), y(:)
+      complex(psb_dpk_), intent(out)      :: res
+      complex(psb_dpk_), intent(in)       :: x(:), y(:)
       type(psb_desc_type), intent(in)    :: desc_a
       integer, intent(out)               :: info
     end subroutine psb_zdotvs
     subroutine  psb_zmdots(res,x, y, desc_a,info) 
       use psb_descriptor_type
-      complex(kind(1.d0)), intent(out)      :: res(:)
-      complex(kind(1.d0)), intent(in)       :: x(:,:), y(:,:)
+      complex(psb_dpk_), intent(out)      :: res(:)
+      complex(psb_dpk_), intent(in)       :: x(:,:), y(:,:)
       type(psb_desc_type), intent(in)    :: desc_a
       integer, intent(out)               :: info
     end subroutine psb_zmdots
@@ -99,18 +99,18 @@ module psb_psblas_mod
      subroutine psb_daxpbyv(alpha, x, beta, y,&
 	  & desc_a, info)
        use psb_descriptor_type
-       real(kind(1.d0)), intent (in)       ::  x(:)
-       real(kind(1.d0)), intent (inout)    ::  y(:)
-       real(kind(1.d0)), intent (in)       :: alpha, beta
+       real(psb_dpk_), intent (in)       ::  x(:)
+       real(psb_dpk_), intent (inout)    ::  y(:)
+       real(psb_dpk_), intent (in)       :: alpha, beta
        type(psb_desc_type), intent (in)    :: desc_a
        integer, intent(out)                :: info
      end subroutine psb_daxpbyv
      subroutine psb_daxpby(alpha, x, beta, y,&
 	  & desc_a, info, n, jx, jy)
        use psb_descriptor_type
-       real(kind(1.d0)), intent (in)       ::  x(:,:)
-       real(kind(1.d0)), intent (inout)    ::  y(:,:)
-       real(kind(1.d0)), intent (in)       ::  alpha, beta
+       real(psb_dpk_), intent (in)       ::  x(:,:)
+       real(psb_dpk_), intent (inout)    ::  y(:,:)
+       real(psb_dpk_), intent (in)       ::  alpha, beta
        type(psb_desc_type), intent (in)    :: desc_a
        integer, optional :: n, jx, jy
        integer, intent(out)                :: info
@@ -118,18 +118,18 @@ module psb_psblas_mod
      subroutine psb_zaxpbyv(alpha, x, beta, y,&
 	  & desc_a, info)
        use psb_descriptor_type
-       complex(kind(1.d0)), intent (in)       ::  x(:)
-       complex(kind(1.d0)), intent (inout)    ::  y(:)
-       complex(kind(1.d0)), intent (in)       :: alpha, beta
+       complex(psb_dpk_), intent (in)       ::  x(:)
+       complex(psb_dpk_), intent (inout)    ::  y(:)
+       complex(psb_dpk_), intent (in)       :: alpha, beta
        type(psb_desc_type), intent (in)    :: desc_a
        integer, intent(out)                :: info
      end subroutine psb_zaxpbyv
      subroutine psb_zaxpby(alpha, x, beta, y,&
 	  & desc_a, info, n, jx, jy)
        use psb_descriptor_type
-       complex(kind(1.d0)), intent (in)       ::  x(:,:)
-       complex(kind(1.d0)), intent (inout)    ::  y(:,:)
-       complex(kind(1.d0)), intent (in)       ::  alpha, beta
+       complex(psb_dpk_), intent (in)       ::  x(:,:)
+       complex(psb_dpk_), intent (inout)    ::  y(:,:)
+       complex(psb_dpk_), intent (in)       ::  alpha, beta
        type(psb_desc_type), intent (in)    :: desc_a
        integer, optional :: n, jx, jy
        integer, intent(out)                :: info
@@ -139,31 +139,31 @@ module psb_psblas_mod
   interface psb_geamax
      function psb_damax(x, desc_a, info, jx)
        use psb_descriptor_type
-       real(kind(1.d0))   psb_damax
-       real(kind(1.d0)), intent (in)       :: x(:,:)
+       real(psb_dpk_)   psb_damax
+       real(psb_dpk_), intent (in)       :: x(:,:)
        type(psb_desc_type), intent (in)    :: desc_a
        integer, optional, intent (in)      :: jx
        integer, intent(out)                :: info
      end function psb_damax
      function psb_damaxv(x, desc_a,info)
        use psb_descriptor_type
-       real(kind(1.d0)) psb_damaxv
-       real(kind(1.d0)), intent (in)       :: x(:)
+       real(psb_dpk_) psb_damaxv
+       real(psb_dpk_), intent (in)       :: x(:)
        type(psb_desc_type), intent (in)    :: desc_a
        integer, intent(out)                :: info
      end function psb_damaxv
      function psb_zamax(x, desc_a, info, jx)
        use psb_descriptor_type
-       real(kind(1.d0))   psb_zamax
-       complex(kind(1.d0)), intent (in)       :: x(:,:)
+       real(psb_dpk_)   psb_zamax
+       complex(psb_dpk_), intent (in)       :: x(:,:)
        type(psb_desc_type), intent (in)    :: desc_a
        integer, optional, intent (in)      :: jx
        integer, intent(out)                :: info
      end function psb_zamax
      function psb_zamaxv(x, desc_a,info)
        use psb_descriptor_type
-       real(kind(1.d0)) psb_zamaxv
-       complex(kind(1.d0)), intent (in)       :: x(:)
+       real(psb_dpk_) psb_zamaxv
+       complex(psb_dpk_), intent (in)       :: x(:)
        type(psb_desc_type), intent (in)    :: desc_a
        integer, intent(out)                :: info
      end function psb_zamaxv
@@ -172,30 +172,30 @@ module psb_psblas_mod
   interface psb_geamaxs
      subroutine  psb_damaxvs(res,x,desc_a,info)
        use psb_descriptor_type
-       real(kind(1.d0)), intent (out)      :: res
-       real(kind(1.d0)), intent (in)       :: x(:)
+       real(psb_dpk_), intent (out)      :: res
+       real(psb_dpk_), intent (in)       :: x(:)
        type(psb_desc_type), intent (in) :: desc_a
        integer, intent(out)               :: info
      end subroutine psb_damaxvs
      subroutine  psb_dmamax(res,x,desc_a,info,jx)
        use psb_descriptor_type
-       real(kind(1.d0)), intent (out)      :: res(:)
-       real(kind(1.d0)), intent (in)       :: x(:,:)
+       real(psb_dpk_), intent (out)      :: res(:)
+       real(psb_dpk_), intent (in)       :: x(:,:)
        type(psb_desc_type), intent (in)    :: desc_a
        integer, intent(out)                :: info
        integer, optional                   :: jx
      end subroutine psb_dmamax
      subroutine  psb_zamaxvs(res,x,desc_a,info)
        use psb_descriptor_type
-       real(kind(1.d0)), intent (out)      :: res
-       complex(kind(1.d0)), intent (in)       :: x(:)
+       real(psb_dpk_), intent (out)      :: res
+       complex(psb_dpk_), intent (in)       :: x(:)
        type(psb_desc_type), intent (in) :: desc_a
        integer, intent(out)               :: info
      end subroutine psb_zamaxvs
      subroutine  psb_zmamax(res,x,desc_a,info,jx)
        use psb_descriptor_type
-       real(kind(1.d0)), intent (out)      :: res(:)
-       complex(kind(1.d0)), intent (in)       :: x(:,:)
+       real(psb_dpk_), intent (out)      :: res(:)
+       complex(psb_dpk_), intent (in)       :: x(:,:)
        type(psb_desc_type), intent (in)    :: desc_a
        integer, intent(out)                :: info
        integer, optional                   :: jx
@@ -205,31 +205,31 @@ module psb_psblas_mod
   interface psb_geasum
      function psb_dasum(x, desc_a, info, jx)
        use psb_descriptor_type
-       real(kind(1.d0))   psb_dasum
-       real(kind(1.d0)), intent (in)       :: x(:,:)
+       real(psb_dpk_)   psb_dasum
+       real(psb_dpk_), intent (in)       :: x(:,:)
        type(psb_desc_type), intent (in)    :: desc_a
        integer, optional, intent (in)      :: jx
        integer, intent(out)                :: info
      end function psb_dasum
      function psb_dasumv(x, desc_a, info)
        use psb_descriptor_type
-       real(kind(1.d0)) psb_dasumv
-       real(kind(1.d0)), intent (in)       :: x(:)
+       real(psb_dpk_) psb_dasumv
+       real(psb_dpk_), intent (in)       :: x(:)
        type(psb_desc_type), intent (in)    :: desc_a
        integer, intent(out)                :: info
      end function psb_dasumv
      function psb_zasum(x, desc_a, info, jx)
        use psb_descriptor_type
-       real(kind(1.d0))   psb_zasum
-       complex(kind(1.d0)), intent (in)       :: x(:,:)
+       real(psb_dpk_)   psb_zasum
+       complex(psb_dpk_), intent (in)       :: x(:,:)
        type(psb_desc_type), intent (in)    :: desc_a
        integer, optional, intent (in)      :: jx
        integer, intent(out)                :: info
      end function psb_zasum
      function psb_zasumv(x, desc_a, info)
        use psb_descriptor_type
-       real(kind(1.d0)) psb_zasumv
-       complex(kind(1.d0)), intent (in)       :: x(:)
+       real(psb_dpk_) psb_zasumv
+       complex(psb_dpk_), intent (in)       :: x(:)
        type(psb_desc_type), intent (in)    :: desc_a
        integer, intent(out)                :: info
      end function psb_zasumv
@@ -238,29 +238,29 @@ module psb_psblas_mod
   interface psb_geasums
      subroutine  psb_dasumvs(res,x,desc_a,info)
        use psb_descriptor_type
-       real(kind(1.d0)), intent (out)      :: res
-       real(kind(1.d0)), intent (in)       :: x(:)
+       real(psb_dpk_), intent (out)      :: res
+       real(psb_dpk_), intent (in)       :: x(:)
        type(psb_desc_type), intent (in)    :: desc_a
        integer, intent(out)                :: info
      end subroutine psb_dasumvs
      subroutine  psb_dmasum(res,x,desc_a,info)
        use psb_descriptor_type
-       real(kind(1.d0)), intent (out)      :: res(:)
-       real(kind(1.d0)), intent (in)       :: x(:,:)
+       real(psb_dpk_), intent (out)      :: res(:)
+       real(psb_dpk_), intent (in)       :: x(:,:)
        type(psb_desc_type), intent (in)    :: desc_a
        integer, intent(out)                :: info
      end subroutine psb_dmasum
      subroutine  psb_zasumvs(res,x,desc_a,info)
        use psb_descriptor_type
-       real(kind(1.d0)), intent (out)      :: res
-       complex(kind(1.d0)), intent (in)       :: x(:)
+       real(psb_dpk_), intent (out)      :: res
+       complex(psb_dpk_), intent (in)       :: x(:)
        type(psb_desc_type), intent (in)    :: desc_a
        integer, intent(out)                :: info
      end subroutine psb_zasumvs
      subroutine  psb_zmasum(res,x,desc_a,info)
        use psb_descriptor_type
-       real(kind(1.d0)), intent (out)      :: res(:)
-       complex(kind(1.d0)), intent (in)       :: x(:,:)
+       real(psb_dpk_), intent (out)      :: res(:)
+       complex(psb_dpk_), intent (in)       :: x(:,:)
        type(psb_desc_type), intent (in)    :: desc_a
        integer, intent(out)                :: info
      end subroutine psb_zmasum
@@ -270,31 +270,31 @@ module psb_psblas_mod
   interface psb_genrm2
      function psb_dnrm2(x, desc_a, info, jx)
        use psb_descriptor_type
-       real(kind(1.d0))   psb_dnrm2
-       real(kind(1.d0)), intent (in)       :: x(:,:)
+       real(psb_dpk_)   psb_dnrm2
+       real(psb_dpk_), intent (in)       :: x(:,:)
        type(psb_desc_type), intent (in)    :: desc_a
        integer, optional, intent (in)      :: jx
        integer, intent(out)                :: info
      end function psb_dnrm2
      function psb_dnrm2v(x, desc_a, info)
        use psb_descriptor_type
-       real(kind(1.d0)) psb_dnrm2v
-       real(kind(1.d0)), intent (in)       :: x(:)
+       real(psb_dpk_) psb_dnrm2v
+       real(psb_dpk_), intent (in)       :: x(:)
        type(psb_desc_type), intent (in)    :: desc_a
        integer, intent(out)                :: info
      end function psb_dnrm2v
      function psb_znrm2(x, desc_a, info, jx)
        use psb_descriptor_type
-       real(kind(1.d0))   psb_znrm2
-       complex(kind(1.d0)), intent (in)       :: x(:,:)
+       real(psb_dpk_)   psb_znrm2
+       complex(psb_dpk_), intent (in)       :: x(:,:)
        type(psb_desc_type), intent (in)    :: desc_a
        integer, optional, intent (in)      :: jx
        integer, intent(out)                :: info
      end function psb_znrm2
      function psb_znrm2v(x, desc_a, info)
        use psb_descriptor_type
-       real(kind(1.d0)) psb_znrm2v
-       complex(kind(1.d0)), intent (in)       :: x(:)
+       real(psb_dpk_) psb_znrm2v
+       complex(psb_dpk_), intent (in)       :: x(:)
        type(psb_desc_type), intent (in)    :: desc_a
        integer, intent(out)                :: info
      end function psb_znrm2v
@@ -303,15 +303,15 @@ module psb_psblas_mod
   interface psb_genrm2s
      subroutine  psb_dnrm2vs(res,x,desc_a,info)
        use psb_descriptor_type
-       real(kind(1.d0)), intent (out)      :: res
-       real(kind(1.d0)), intent (in)       :: x(:)
+       real(psb_dpk_), intent (out)      :: res
+       real(psb_dpk_), intent (in)       :: x(:)
        type(psb_desc_type), intent (in)    :: desc_a
        integer, intent(out)                :: info
      end subroutine psb_dnrm2vs
      subroutine  psb_znrm2vs(res,x,desc_a,info)
        use psb_descriptor_type
-       real(kind(1.d0)), intent (out)      :: res
-       complex(kind(1.d0)), intent (in)       :: x(:)
+       real(psb_dpk_), intent (out)      :: res
+       complex(psb_dpk_), intent (in)       :: x(:)
        type(psb_desc_type), intent (in)    :: desc_a
        integer, intent(out)                :: info
      end subroutine psb_znrm2vs
@@ -322,7 +322,7 @@ module psb_psblas_mod
      function psb_dnrmi(a, desc_a,info)
        use psb_serial_mod
        use psb_descriptor_type
-       real(kind(1.d0))                    :: psb_dnrmi
+       real(psb_dpk_)                    :: psb_dnrmi
        type (psb_dspmat_type), intent (in) :: a
        type (psb_desc_type), intent (in)   :: desc_a
        integer, intent(out)                :: info
@@ -330,7 +330,7 @@ module psb_psblas_mod
      function psb_znrmi(a, desc_a,info)
        use psb_serial_mod
        use psb_descriptor_type
-       real(kind(1.d0))                    :: psb_znrmi
+       real(psb_dpk_)                    :: psb_znrmi
        type (psb_zspmat_type), intent (in) :: a
        type (psb_desc_type), intent (in)   :: desc_a
        integer, intent(out)                :: info
@@ -343,12 +343,12 @@ module psb_psblas_mod
        use psb_serial_mod
        use psb_descriptor_type
        type (psb_dspmat_type), intent(in)   :: a
-       real(kind(1.d0)), intent(inout)      :: x(:,:)
-       real(kind(1.d0)), intent(inout)      :: y(:,:)
-       real(kind(1.d0)), intent(in)         :: alpha, beta
+       real(psb_dpk_), intent(inout)      :: x(:,:)
+       real(psb_dpk_), intent(inout)      :: y(:,:)
+       real(psb_dpk_), intent(in)         :: alpha, beta
        type(psb_desc_type), intent(in)      :: desc_a
        character, optional, intent(in)      :: trans
-       real(kind(1.d0)), optional, intent(inout),target :: work(:)
+       real(psb_dpk_), optional, intent(inout),target :: work(:)
        integer, optional, intent(in)        :: k, jx, jy
        logical, optional, intent(in)        :: doswap
        integer, intent(out)                 :: info
@@ -358,12 +358,12 @@ module psb_psblas_mod
        use psb_serial_mod
        use psb_descriptor_type
        type (psb_dspmat_type), intent(in)   :: a
-       real(kind(1.d0)), intent(inout)      :: x(:)
-       real(kind(1.d0)), intent(inout)      :: y(:)
-       real(kind(1.d0)), intent(in)         :: alpha, beta
+       real(psb_dpk_), intent(inout)      :: x(:)
+       real(psb_dpk_), intent(inout)      :: y(:)
+       real(psb_dpk_), intent(in)         :: alpha, beta
        type(psb_desc_type), intent(in)      :: desc_a
        character, optional, intent(in)      :: trans
-       real(kind(1.d0)), optional, intent(inout),target :: work(:)
+       real(psb_dpk_), optional, intent(inout),target :: work(:)
        logical, optional, intent(in)        :: doswap
        integer, intent(out)                 :: info
      end subroutine psb_dspmv
@@ -372,12 +372,12 @@ module psb_psblas_mod
        use psb_serial_mod
        use psb_descriptor_type
        type (psb_zspmat_type), intent(in)   :: a
-       complex(kind(1.d0)), intent(inout)      :: x(:,:)
-       complex(kind(1.d0)), intent(inout)      :: y(:,:)
-       complex(kind(1.d0)), intent(in)         :: alpha, beta
+       complex(psb_dpk_), intent(inout)      :: x(:,:)
+       complex(psb_dpk_), intent(inout)      :: y(:,:)
+       complex(psb_dpk_), intent(in)         :: alpha, beta
        type(psb_desc_type), intent(in)      :: desc_a
        character, optional, intent(in)      :: trans
-       complex(kind(1.d0)), optional, intent(inout),target :: work(:)
+       complex(psb_dpk_), optional, intent(inout),target :: work(:)
        integer, optional, intent(in)        :: k, jx, jy
        logical, optional, intent(in)        :: doswap
        integer, intent(out)                 :: info
@@ -387,12 +387,12 @@ module psb_psblas_mod
        use psb_serial_mod
        use psb_descriptor_type
        type (psb_zspmat_type), intent(in)   :: a
-       complex(kind(1.d0)), intent(inout)      :: x(:)
-       complex(kind(1.d0)), intent(inout)      :: y(:)
-       complex(kind(1.d0)), intent(in)         :: alpha, beta
+       complex(psb_dpk_), intent(inout)      :: x(:)
+       complex(psb_dpk_), intent(inout)      :: y(:)
+       complex(psb_dpk_), intent(in)         :: alpha, beta
        type(psb_desc_type), intent(in)      :: desc_a
        character, optional, intent(in)      :: trans
-       complex(kind(1.d0)), optional, intent(inout),target :: work(:)
+       complex(psb_dpk_), optional, intent(inout),target :: work(:)
        logical, optional, intent(in)        :: doswap
        integer, intent(out)                 :: info
      end subroutine psb_zspmv
@@ -405,14 +405,14 @@ module psb_psblas_mod
        use psb_serial_mod
        use psb_descriptor_type
        type (psb_dspmat_type), intent(in)     :: t
-       real(kind(1.d0)), intent(in)           :: x(:,:)
-       real(kind(1.d0)), intent(inout)        :: y(:,:)
-       real(kind(1.d0)), intent(in)           :: alpha, beta
+       real(psb_dpk_), intent(in)           :: x(:,:)
+       real(psb_dpk_), intent(inout)        :: y(:,:)
+       real(psb_dpk_), intent(in)           :: alpha, beta
        type(psb_desc_type), intent(in)     :: desc_a
        character, optional, intent(in)        :: trans, unit
        integer, optional, intent(in)          :: n, jx, jy
        integer, optional, intent(in)          :: choice
-       real(kind(1.d0)), optional, intent(in),target :: work(:), diag(:)
+       real(psb_dpk_), optional, intent(in),target :: work(:), diag(:)
        integer, intent(out)               :: info
      end subroutine psb_dspsm
      subroutine psb_dspsv(alpha, t, x, beta, y,&
@@ -421,13 +421,13 @@ module psb_psblas_mod
        use psb_serial_mod
        use psb_descriptor_type
        type (psb_dspmat_type), intent(in)     :: t
-       real(kind(1.d0)), intent(in)           :: x(:)
-       real(kind(1.d0)), intent(inout)        :: y(:)
-       real(kind(1.d0)), intent(in)           :: alpha, beta
+       real(psb_dpk_), intent(in)           :: x(:)
+       real(psb_dpk_), intent(inout)        :: y(:)
+       real(psb_dpk_), intent(in)           :: alpha, beta
        type(psb_desc_type), intent(in)        :: desc_a
        character, optional, intent(in)        :: trans, unit
        integer, optional, intent(in)          :: choice
-       real(kind(1.d0)), optional, intent(in),target :: work(:), diag(:)
+       real(psb_dpk_), optional, intent(in),target :: work(:), diag(:)
        integer, intent(out)                   :: info
      end subroutine psb_dspsv
      subroutine psb_zspsm(alpha, t, x, beta, y,&
@@ -436,14 +436,14 @@ module psb_psblas_mod
        use psb_serial_mod
        use psb_descriptor_type
        type (psb_zspmat_type), intent(in)     :: t
-       complex(kind(1.d0)), intent(in)           :: x(:,:)
-       complex(kind(1.d0)), intent(inout)        :: y(:,:)
-       complex(kind(1.d0)), intent(in)           :: alpha, beta
+       complex(psb_dpk_), intent(in)           :: x(:,:)
+       complex(psb_dpk_), intent(inout)        :: y(:,:)
+       complex(psb_dpk_), intent(in)           :: alpha, beta
        type(psb_desc_type), intent(in)     :: desc_a
        character, optional, intent(in)        :: trans, unit
        integer, optional, intent(in)          :: n, jx, jy
        integer, optional, intent(in)          :: choice
-       complex(kind(1.d0)), optional, intent(in),target :: work(:), diag(:)
+       complex(psb_dpk_), optional, intent(in),target :: work(:), diag(:)
        integer, intent(out)               :: info
      end subroutine psb_zspsm
      subroutine psb_zspsv(alpha, t, x, beta, y,&
@@ -452,13 +452,13 @@ module psb_psblas_mod
        use psb_serial_mod
        use psb_descriptor_type
        type (psb_zspmat_type), intent(in)     :: t
-       complex(kind(1.d0)), intent(in)           :: x(:)
-       complex(kind(1.d0)), intent(inout)        :: y(:)
-       complex(kind(1.d0)), intent(in)           :: alpha, beta
+       complex(psb_dpk_), intent(in)           :: x(:)
+       complex(psb_dpk_), intent(inout)        :: y(:)
+       complex(psb_dpk_), intent(in)           :: alpha, beta
        type(psb_desc_type), intent(in)        :: desc_a
        character, optional, intent(in)        :: trans, unit
        integer, optional, intent(in)          :: choice
-       complex(kind(1.d0)), optional, intent(in),target :: work(:), diag(:)
+       complex(psb_dpk_), optional, intent(in),target :: work(:), diag(:)
        integer, intent(out)                   :: info
      end subroutine psb_zspsv
   end interface

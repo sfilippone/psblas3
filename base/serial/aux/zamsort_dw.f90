@@ -71,7 +71,7 @@ subroutine zamsort_dw(n,k,l,iret)
   use zacmp_mod
   implicit none
   integer n, iret
-  complex(kind(1.d0)) :: k(n)
+  complex(psb_dpk_) :: k(n)
   integer l(0:n+1)
   !
   integer p,q,s,t

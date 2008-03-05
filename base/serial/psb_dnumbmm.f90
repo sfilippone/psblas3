@@ -46,7 +46,7 @@ subroutine psb_dnumbmm(a,b,c)
   implicit none
 
   type(psb_dspmat_type)         :: a,b,c
-  real(kind(1.d0)), allocatable :: temp(:)
+  real(psb_dpk_), allocatable :: temp(:)
   integer                       :: info
   logical                   :: csra, csrb
   
@@ -81,11 +81,11 @@ contains
   subroutine inner_numbmm(a,b,c,temp,info)
     type(psb_dspmat_type) :: a,b,c
     integer               :: info
-    real(kind(1.d0))      :: temp(:)
+    real(psb_dpk_)      :: temp(:)
     integer, allocatable  :: iarw(:), iacl(:),ibrw(:),ibcl(:)
-    real(kind(1.d0)), allocatable :: aval(:),bval(:)
+    real(psb_dpk_), allocatable :: aval(:),bval(:)
     integer  :: maxlmn,i,j,m,n,k,l,nazr,nbzr,jj,minlm,minmn,minln
-    real(kind(1.d0))      :: ajj
+    real(psb_dpk_)      :: ajj
 
     n = a%m
     m = a%k 

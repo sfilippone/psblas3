@@ -63,7 +63,7 @@ subroutine psb_zspins(nz,ia,ja,val,a,desc_a,info,rebuild)
   type(psb_desc_type), intent(inout)   :: desc_a
   type(psb_zspmat_type), intent(inout) :: a
   integer, intent(in)                  :: nz,ia(:),ja(:)
-  complex(kind(1.d0)), intent(in)      :: val(:)
+  complex(psb_dpk_), intent(in)      :: val(:)
   integer, intent(out)                 :: info
   logical, intent(in), optional        :: rebuild
   !locals.....

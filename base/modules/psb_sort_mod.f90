@@ -42,7 +42,7 @@
 !  Addison-Wesley
 !
 module psb_sort_mod
-
+  use psb_const_mod
 
   ! 
   !  The up/down constant are defined in pairs having 
@@ -66,12 +66,12 @@ module psb_sort_mod
   end type psb_int_idx_heap
   type psb_double_idx_heap
     integer              :: last, dir
-    real(kind(1.d0)), allocatable :: keys(:)
+    real(psb_dpk_), allocatable :: keys(:)
     integer, allocatable          :: idxs(:)
   end type psb_double_idx_heap
   type psb_dcomplex_idx_heap
     integer              :: last, dir
-    complex(kind(1.d0)), allocatable :: keys(:)
+    complex(psb_dpk_), allocatable :: keys(:)
     integer, allocatable             :: idxs(:)
   end type psb_dcomplex_idx_heap
 
@@ -182,7 +182,7 @@ contains
   subroutine dmsort(x,ix,dir,flag)
     use psb_error_mod
     implicit none 
-    real(kind(1.d0)), intent(inout)  :: x(:) 
+    real(psb_dpk_), intent(inout)  :: x(:) 
     integer, optional, intent(in)    :: dir, flag
     integer, optional, intent(inout) :: ix(:)
     
@@ -241,7 +241,7 @@ contains
   subroutine zamsort(x,ix,dir,flag)
     use psb_error_mod
     implicit none 
-    complex(kind(1.d0)), intent(inout)  :: x(:) 
+    complex(psb_dpk_), intent(inout)  :: x(:) 
     integer, optional, intent(in)    :: dir, flag
     integer, optional, intent(inout) :: ix(:)
     
@@ -417,7 +417,7 @@ contains
   subroutine dqsort(x,ix,dir,flag)
     use psb_error_mod
     implicit none 
-    real(kind(1.d0)), intent(inout)  :: x(:) 
+    real(psb_dpk_), intent(inout)  :: x(:) 
     integer, optional, intent(in)    :: dir, flag
     integer, optional, intent(inout) :: ix(:)
     
@@ -493,7 +493,7 @@ contains
   subroutine zqsort(x,ix,dir,flag)
     use psb_error_mod
     implicit none 
-    complex(kind(1.d0)), intent(inout)  :: x(:) 
+    complex(psb_dpk_), intent(inout)  :: x(:) 
     integer, optional, intent(in)    :: dir, flag
     integer, optional, intent(inout) :: ix(:)
     
@@ -692,12 +692,12 @@ contains
   subroutine dhsort(x,ix,dir,flag)
     use psb_error_mod
     implicit none 
-    real(kind(1.d0)), intent(inout)  :: x(:) 
+    real(psb_dpk_), intent(inout)  :: x(:) 
     integer, optional, intent(in)    :: dir, flag
     integer, optional, intent(inout) :: ix(:)
     
     integer          :: dir_, flag_, n, i, l, err_act,info
-    real(kind(1.d0)) :: key
+    real(psb_dpk_) :: key
     integer          :: index
     
     character(len=20)  :: name
@@ -800,12 +800,12 @@ contains
   subroutine zhsort(x,ix,dir,flag)
     use psb_error_mod
     implicit none 
-    complex(kind(1.d0)), intent(inout) :: x(:) 
+    complex(psb_dpk_), intent(inout) :: x(:) 
     integer, optional, intent(in)      :: dir, flag
     integer, optional, intent(inout)   :: ix(:)
     
     integer             :: dir_, flag_, n, i, l, err_act,info
-    complex(kind(1.d0)) :: key
+    complex(psb_dpk_) :: key
     integer             :: index
     
     character(len=20)  :: name
@@ -1074,7 +1074,7 @@ contains
     use psb_realloc_mod
     implicit none 
 
-    real(kind(1.d0)), intent(in)      :: key
+    real(psb_dpk_), intent(in)      :: key
     integer, intent(in)               :: index
     type(psb_double_idx_heap), intent(inout) :: heap
     integer, intent(out)              :: info
@@ -1106,7 +1106,7 @@ contains
 
     type(psb_double_idx_heap), intent(inout) :: heap
     integer, intent(out)              :: index,info
-    real(kind(1.d0)), intent(out)     :: key
+    real(psb_dpk_), intent(out)     :: key
     
     info = 0
 
@@ -1295,7 +1295,7 @@ contains
     use psb_realloc_mod
     implicit none 
 
-    complex(kind(1.d0)), intent(in)            :: key
+    complex(psb_dpk_), intent(in)            :: key
     integer, intent(in)                        :: index
     type(psb_dcomplex_idx_heap), intent(inout) :: heap
     integer, intent(out)                       :: info
@@ -1326,7 +1326,7 @@ contains
 
     type(psb_dcomplex_idx_heap), intent(inout) :: heap
     integer, intent(out)                       :: index,info
-    complex(kind(1.d0)), intent(out)           :: key
+    complex(psb_dpk_), intent(out)           :: key
     
     
     info = 0
@@ -1582,13 +1582,13 @@ contains
     !   heap: the heap
     !   dir:  sorting direction
 
-    real(kind(1.d0)), intent(in)    :: key
+    real(psb_dpk_), intent(in)    :: key
     integer, intent(in)             :: dir
-    real(kind(1.d0)), intent(inout) :: heap(:)
+    real(psb_dpk_), intent(inout) :: heap(:)
     integer, intent(inout)          :: last
     integer, intent(out)            :: info
     integer                         :: i, i2
-    real(kind(1.d0))                :: temp
+    real(psb_dpk_)                :: temp
 
     info = 0
     if (last < 0) then 
@@ -1680,14 +1680,14 @@ contains
   subroutine psi_double_heap_get_first(key,last,heap,dir,info)
     implicit none 
 
-    real(kind(1.d0)), intent(inout) :: key
+    real(psb_dpk_), intent(inout) :: key
     integer, intent(inout)          :: last
     integer, intent(in)             :: dir
-    real(kind(1.d0)), intent(inout) :: heap(:)
+    real(psb_dpk_), intent(inout) :: heap(:)
     integer, intent(out)            :: info
     
     integer                 :: i, j
-    real(kind(1.d0))        :: temp
+    real(psb_dpk_)        :: temp
 
     
     info = 0
@@ -1812,13 +1812,13 @@ contains
     !   heap: the heap
     !   dir:  sorting direction
 
-    complex(kind(1.d0)), intent(in)    :: key
+    complex(psb_dpk_), intent(in)    :: key
     integer, intent(in)                :: dir
-    complex(kind(1.d0)), intent(inout) :: heap(:)
+    complex(psb_dpk_), intent(inout) :: heap(:)
     integer, intent(inout)             :: last
     integer, intent(out)               :: info
     integer                            :: i, i2
-    complex(kind(1.d0))                :: temp
+    complex(psb_dpk_)                :: temp
 
     info = 0
     if (last < 0) then 
@@ -1910,14 +1910,14 @@ contains
   subroutine psi_dcomplex_heap_get_first(key,last,heap,dir,info)
     implicit none 
 
-    complex(kind(1.d0)), intent(inout) :: key
+    complex(psb_dpk_), intent(inout) :: key
     integer, intent(inout)             :: last
     integer, intent(in)                :: dir
-    complex(kind(1.d0)), intent(inout) :: heap(:)
+    complex(psb_dpk_), intent(inout) :: heap(:)
     integer, intent(out)               :: info
     
     integer                    :: i, j
-    complex(kind(1.d0))        :: temp
+    complex(psb_dpk_)        :: temp
 
     
     info = 0
@@ -2301,13 +2301,13 @@ contains
     !   idxs: the indices
     !   dir:  sorting direction
 
-    real(kind(1.d0)), intent(in)     :: key
+    real(psb_dpk_), intent(in)     :: key
     integer, intent(in)              :: index,dir
-    real(kind(1.d0)), intent(inout)  :: heap(:)
+    real(psb_dpk_), intent(inout)  :: heap(:)
     integer, intent(inout)           :: idxs(:),last
     integer, intent(out)             :: info
     integer                          :: i, i2, itemp
-    real(kind(1.d0))                 :: temp 
+    real(psb_dpk_)                 :: temp 
     
     info = 0
     if (last < 0) then 
@@ -2413,14 +2413,14 @@ contains
   subroutine psi_double_idx_heap_get_first(key,index,last,heap,idxs,dir,info)
     implicit none 
 
-    real(kind(1.d0)), intent(inout) :: heap(:)
+    real(psb_dpk_), intent(inout) :: heap(:)
     integer, intent(out)            :: index,info
     integer, intent(inout)          :: last,idxs(:)
     integer, intent(in)             :: dir
-    real(kind(1.d0)), intent(out)   :: key
+    real(psb_dpk_), intent(out)   :: key
     
     integer                         :: i, j,itemp
-    real(kind(1.d0))                :: temp
+    real(psb_dpk_)                :: temp
 
     info = 0
     if (last <= 0) then 
@@ -2559,13 +2559,13 @@ contains
     !   idxs: the indices
     !   dir:  sorting direction
 
-    complex(kind(1.d0)), intent(in)    :: key
+    complex(psb_dpk_), intent(in)    :: key
     integer, intent(in)                :: index,dir
-    complex(kind(1.d0)), intent(inout) :: heap(:)
+    complex(psb_dpk_), intent(inout) :: heap(:)
     integer, intent(inout)             :: idxs(:),last
     integer, intent(out)               :: info
     integer                            :: i, i2, itemp
-    complex(kind(1.d0))                :: temp 
+    complex(psb_dpk_)                :: temp 
     
     info = 0
     if (last < 0) then 
@@ -2671,14 +2671,14 @@ contains
   subroutine psi_dcomplex_idx_heap_get_first(key,index,last,heap,idxs,dir,info)
     implicit none 
 
-    complex(kind(1.d0)), intent(inout) :: heap(:)
+    complex(psb_dpk_), intent(inout) :: heap(:)
     integer, intent(out)               :: index,info
     integer, intent(inout)             :: last,idxs(:)
     integer, intent(in)                :: dir
-    complex(kind(1.d0)), intent(out)   :: key
+    complex(psb_dpk_), intent(out)   :: key
     
     integer                            :: i, j, itemp
-    complex(kind(1.d0))                :: temp
+    complex(psb_dpk_)                :: temp
 
     info = 0
     if (last <= 0) then 

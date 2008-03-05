@@ -66,7 +66,7 @@ subroutine psb_dcoins(nz,ia,ja,val,a,imin,imax,jmin,jmax,info,gtl,rebuild)
 
   integer, intent(in)                  :: nz, imin,imax,jmin,jmax
   integer, intent(in)                  :: ia(:),ja(:)
-  real(kind(1.d0)), intent(in)         :: val(:)
+  real(psb_dpk_), intent(in)         :: val(:)
   type(psb_dspmat_type), intent(inout) :: a
   integer, intent(out)                 :: info
   integer, intent(in), optional        :: gtl(:)
@@ -489,8 +489,8 @@ contains
     integer, intent(in) :: nz, imin,imax,jmin,jmax,nzl,maxsz
     integer, intent(in) :: ia(:),ja(:)
     integer, intent(inout) :: nza
-    real(kind(1.d0)), intent(in) :: val(:)
-    real(kind(1.d0)), intent(inout) :: aspk(:)
+    real(psb_dpk_), intent(in) :: val(:)
+    real(psb_dpk_), intent(inout) :: aspk(:)
     integer, intent(out) :: info
     integer, intent(in), optional  :: ng,gtl(:)
     integer  :: i,ir,ic
@@ -561,8 +561,8 @@ contains
     integer, intent(in) :: nz, imin,imax,jmin,jmax,maxsz
     integer, intent(in) :: ia(:),ja(:)
     integer, intent(inout) :: nza,ia1(:),ia2(:)
-    real(kind(1.d0)), intent(in) :: val(:)
-    real(kind(1.d0)), intent(inout) :: aspk(:)
+    real(psb_dpk_), intent(in) :: val(:)
+    real(psb_dpk_), intent(inout) :: aspk(:)
     integer, intent(out) :: info
     integer, intent(in), optional  :: ng,gtl(:)
     integer :: i,ir,ic

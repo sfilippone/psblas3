@@ -84,11 +84,11 @@ contains
     !     on entry: fresh variable.
     !     on exit : the updated array descriptor
     !
-    !  real(kind(1.d0)),  optional      :: b_glob(:)
+    !  real(psb_dpk_),  optional      :: b_glob(:)
     !     on entry: this contains right hand side.
     !     on exit :
     !
-    !  real(kind(1.d0)), allocatable, optional      :: b(:)
+    !  real(psb_dpk_), allocatable, optional      :: b(:)
     !     on entry: fresh variable.
     !     on exit : this will contain the local right hand side.
     !
@@ -101,10 +101,10 @@ contains
 
     ! parameters
     type(psb_dspmat_type)      :: a_glob
-    real(kind(1.d0))           :: b_glob(:)
+    real(psb_dpk_)           :: b_glob(:)
     integer                    :: ictxt
     type(psb_dspmat_type)      :: a
-    real(kind(1.d0)), allocatable  :: b(:)
+    real(psb_dpk_), allocatable  :: b(:)
     type (psb_desc_type)       :: desc_a
     integer, intent(out)       :: info
     integer, optional          :: inroot
@@ -128,9 +128,9 @@ contains
     integer, allocatable          :: iwork(:)
     character                     :: afmt*5
     integer, allocatable          :: irow(:),icol(:)
-    real(kind(1.d0)), allocatable :: val(:)
+    real(psb_dpk_), allocatable :: val(:)
     integer, parameter          :: nb=30
-    real(kind(1.d0))            :: t0, t1, t2, t3, t4, t5
+    real(psb_dpk_)            :: t0, t1, t2, t3, t4, t5
     character(len=20)           :: name, ch_err
 
     info = 0
@@ -505,11 +505,11 @@ contains
     !     on entry: fresh variable.
     !     on exit : the updated array descriptor
     !
-    !  real(kind(1.d0)),  optional      :: b_glob(:)
+    !  real(psb_dpk_),  optional      :: b_glob(:)
     !     on entry: this contains right hand side.
     !     on exit :
     !
-    !  real(kind(1.d0)), allocatable, optional      :: b(:)
+    !  real(psb_dpk_), allocatable, optional      :: b(:)
     !     on entry: fresh variable.
     !     on exit : this will contain the local right hand side.
     !
@@ -520,10 +520,10 @@ contains
     use psb_base_mod
     implicit none   ! parameters
     type(psb_dspmat_type)      :: a_glob
-    real(kind(1.d0))           :: b_glob(:)
+    real(psb_dpk_)           :: b_glob(:)
     integer                    :: ictxt, v(:)
     type(psb_dspmat_type)      :: a
-    real(kind(1.d0)), allocatable  :: b(:)
+    real(psb_dpk_), allocatable  :: b(:)
     type(psb_desc_type)       :: desc_a
     integer, intent(out)       :: info
     integer, optional          :: inroot
@@ -536,10 +536,10 @@ contains
     integer, allocatable          :: iwork(:)
     character                     :: afmt*5
     integer, allocatable          :: irow(:),icol(:)
-    real(kind(1.d0)), allocatable :: val(:)
+    real(psb_dpk_), allocatable :: val(:)
     integer, parameter          :: nb=30
     logical, parameter          :: newt=.true.
-    real(kind(1.d0))            :: t0, t1, t2, t3, t4, t5
+    real(psb_dpk_)            :: t0, t1, t2, t3, t4, t5
     character(len=20)  :: name, ch_err
 
     info = 0
@@ -829,11 +829,11 @@ contains
     !     on entry: fresh variable.
     !     on exit : the updated array descriptor
     !
-    !  real(kind(1.d0)),  optional      :: b_glob(:)
+    !  real(psb_dpk_),  optional      :: b_glob(:)
     !     on entry: this contains right hand side.
     !     on exit :
     !
-    !  real(kind(1.d0)), allocatable, optional      :: b(:)
+    !  real(psb_dpk_), allocatable, optional      :: b(:)
     !     on entry: fresh variable.
     !     on exit : this will contain the local right hand side.
     !
@@ -846,10 +846,10 @@ contains
 
     ! parameters
     type(psb_zspmat_type)      :: a_glob
-    complex(kind(1.d0))        :: b_glob(:)
+    complex(psb_dpk_)        :: b_glob(:)
     integer                    :: ictxt
     type(psb_zspmat_type)      :: a
-    complex(kind(1.d0)), allocatable  :: b(:)
+    complex(psb_dpk_), allocatable  :: b(:)
     type (psb_desc_type)       :: desc_a
     integer, intent(out)       :: info
     integer, optional          :: inroot
@@ -873,9 +873,9 @@ contains
     integer, allocatable            :: iwork(:)
     character                   :: afmt*5
     integer, allocatable          :: irow(:),icol(:)
-    complex(kind(1.d0)), allocatable :: val(:)
+    complex(psb_dpk_), allocatable :: val(:)
     integer, parameter          :: nb=30
-    real(kind(1.d0))            :: t0, t1, t2, t3, t4, t5
+    real(psb_dpk_)            :: t0, t1, t2, t3, t4, t5
     character(len=20)           :: name, ch_err
 
     info = 0
@@ -1249,11 +1249,11 @@ contains
     !     on entry: fresh variable.
     !     on exit : the updated array descriptor
     !
-    !  real(kind(1.d0)),  optional      :: b_glob(:)
+    !  real(psb_dpk_),  optional      :: b_glob(:)
     !     on entry: this contains right hand side.
     !     on exit :
     !
-    !  real(kind(1.d0)), allocatable, optional      :: b(:)
+    !  real(psb_dpk_), allocatable, optional      :: b(:)
     !     on entry: fresh variable.
     !     on exit : this will contain the local right hand side.
     !
@@ -1264,10 +1264,10 @@ contains
     use psb_base_mod
     implicit none   ! parameters
     type(psb_zspmat_type)      :: a_glob
-    complex(kind(1.d0))        :: b_glob(:)
+    complex(psb_dpk_)        :: b_glob(:)
     integer                    :: ictxt, v(:)
     type(psb_zspmat_type)      :: a
-    complex(kind(1.d0)), allocatable  :: b(:)
+    complex(psb_dpk_), allocatable  :: b(:)
     type(psb_desc_type)       :: desc_a
     integer, intent(out)       :: info
     integer, optional          :: inroot
@@ -1280,10 +1280,10 @@ contains
     integer, allocatable            :: iwork(:)
     character                   :: afmt*5
     integer, allocatable          :: irow(:),icol(:)
-    complex(kind(1.d0)), allocatable :: val(:)
+    complex(psb_dpk_), allocatable :: val(:)
     integer, parameter          :: nb=30
     logical, parameter          :: newt=.true.
-    real(kind(1.d0))            :: t0, t1, t2, t3, t4, t5
+    real(psb_dpk_)            :: t0, t1, t2, t3, t4, t5
     character(len=20)  :: name, ch_err
 
     info = 0

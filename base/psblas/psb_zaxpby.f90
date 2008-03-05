@@ -61,9 +61,9 @@ subroutine  psb_zaxpby(alpha, x, beta,y,desc_a,info, n, jx, jy)
   integer, intent(in), optional   :: n, jx, jy
   integer, intent(out)            :: info
   type(psb_desc_type), intent(in) :: desc_a
-  complex(kind(1.D0)), intent(in)    :: alpha, beta
-  complex(kind(1.D0)), intent(in)    :: x(:,:)
-  complex(kind(1.D0)), intent(inout) :: y(:,:)
+  complex(psb_dpk_), intent(in)    :: alpha, beta
+  complex(psb_dpk_), intent(in)    :: x(:,:)
+  complex(psb_dpk_), intent(inout) :: y(:,:)
 
   ! locals
   integer                  :: ictxt, np, me,&
@@ -214,9 +214,9 @@ subroutine  psb_zaxpbyv(alpha, x, beta,y,desc_a,info)
 
   integer, intent(out)            :: info
   type(psb_desc_type), intent(in) :: desc_a
-  complex(kind(1.D0)), intent(in)    :: alpha, beta
-  complex(kind(1.D0)), intent(in)    :: x(:)
-  complex(kind(1.D0)), intent(inout) :: y(:)
+  complex(psb_dpk_), intent(in)    :: alpha, beta
+  complex(psb_dpk_), intent(in)    :: x(:)
+  complex(psb_dpk_), intent(inout) :: y(:)
 
   ! locals
   integer                  :: ictxt, np, me,&

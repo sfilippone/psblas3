@@ -125,7 +125,7 @@ C     .. Scalar Arguments ..
       INTEGER          LWORK,M, N, IERROR
       CHARACTER        TRANS
 C     .. Array Arguments ..
-      DOUBLE PRECISION WORK(*)
+      real(psb_dpk_) WORK(*)
       INTEGER          JA(*), IA(*), P(*), IWORK(*)
       CHARACTER        DESCRA*11
 C     .. Local Scalars ..

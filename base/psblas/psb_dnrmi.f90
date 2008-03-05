@@ -52,12 +52,12 @@ function psb_dnrmi(a,desc_a,info)
   type(psb_dspmat_type), intent(in)   :: a
   integer, intent(out)                :: info
   type(psb_desc_type), intent(in)     :: desc_a
-  real(kind(1.d0))                    :: psb_dnrmi
+  real(psb_dpk_)                    :: psb_dnrmi
 
   ! locals
   integer                  :: ictxt, np, me,&
        & err_act, n, iia, jja, ia, ja, mdim, ndim, m
-  real(kind(1.d0))         :: nrmi, dcsnmi
+  real(psb_dpk_)         :: nrmi, dcsnmi
   character(len=20)        :: name, ch_err
 
   name='psb_dnrmi'

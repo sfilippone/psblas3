@@ -48,7 +48,7 @@ C     .. Scalar Arguments ..
      +  N, IUPDUP, IERROR
       CHARACTER          TRANS,UNITD
 C     .. Array Arguments ..
-      complex(kind(1.d0))   AR(*), ARN(*), D(*)
+      complex(psb_dpk_)   AR(*), ARN(*), D(*)
       INTEGER            AUX(0:LAUX-1)
       INTEGER            JA(*), IA(*), INFO(*), IAN1(*), IAN2(*),
      *  INFON(*), P1(*), P2(*)

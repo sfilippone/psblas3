@@ -41,7 +41,7 @@ C     ... Scalar arguments ...
 
 C     ... Array arguments ...
 
-      complex(kind(1.d0)) A(*), ARN(*), WORK(*)
+      complex(psb_dpk_) A(*), ARN(*), WORK(*)
       INTEGER          IA1(*), IA2(*), KA(*), 
      +  IA(3,*), IPERM(M), JA(*)
       

@@ -69,8 +69,9 @@ prerequisites (see also SERIAL below):
 
 1. A working version of MPI
 
-2. The MPI version of the BLACS  from
-   http://www.netlib.org/blacs/index.html
+2. The MPI version of the BLACS; some systems (e.g. IBM SP) provide
+   a specific version, otherwise you can find it at
+   http://www.netlib.org/blacs/index.html 
 
 3. A version of the BLAS; if you don't have a specific version for
    your platform you may try ATLAS available from
@@ -78,14 +79,14 @@ prerequisites (see also SERIAL below):
 
 4. We have had good results with  the METIS library, from 
    http://www-users.cs.umn.edu/~karypis/metis/metis/main.html 
-   This is optional: it is  used in the util and test/fileread
-   directories if you define the HAVE_METIS directive.
+   This is optional; it is  used in the util and test/fileread
+   directories but only if you define the HAVE_METIS directive.
 
 We offer an experimental configure script: if everything works well,
 it will generate a Make.inc file suitable for building the library. 
 The script is capable of recognizing the needed libraries with their
 default names; if they are in unusual places consider adding the paths
-with --with-lib, or explicitly specify the names in --with-blas and
+with --with-lib, or explicitly specifying the names in --with-blas and
 friends.
 Please note that a common way for the configure script to fail is to
 specify inconsistent MPI vs. plain compilers, either directly or
@@ -105,16 +106,18 @@ An annoying problem exists with some versions of MPICH: the configure
 script will set -DMPI_MOD, which is to say, the MPI call interfaces
 will be resolved by using the MPI Fortran module. However usage of the
 module may cause compilation to fail if coupled with the debugging
-option -g, because the compiler complains that it cannot find any
+option -ggdb, because the compiler complains that it cannot find any
 matching interface. 
-The solution: either take out the -g option, or, if you really need to
-debug, force -DMPI_H in place of -DMPI_MOD.
+The solution: either take out the -ggdb option, or, if you really need
+to debug, force -DMPI_H in place of -DMPI_MOD.
 
 
-As a backup alternative, you can  choose a Make.inc.XXX file in
+As a backup alternative, you can always choose a Make.inc.XXX file in
 directory Make that fits your compilers, modify the paths to libraries
 to  match your installation and copy it to Make.inc in the top
-directory. Then run 
+directory. 
+
+After you have Make.inc fixed,  run 
  make 
 to  compile the library; go to the test directory and its
 subdirectories to get test programs done.   
@@ -131,6 +134,8 @@ SERIAL: We now provide an (experimental) option to run in serial
 
 TODO:
 Fix all reamining bugs. Bugs? We dont' have any ! ;-)
+Work on a single precision version if there is sufficient demand for
+it.
 
 The PSBLAS team. 
 
@@ -145,8 +150,9 @@ Salvatore  Filippone
 Alfredo    Buttari
 
 
-In a sister package we are going to provide a library of  multilevel
-parallel preconditioners that were developed with the contribution of:  
+In a sister package called MLD2P4 we are going to provide a library of
+more sophisticated preconditioners, including parallel multilevel ones
+that were  developed with the contribution of:  
 Pasqua     D'Ambra
 Daniela    di Serafino
 

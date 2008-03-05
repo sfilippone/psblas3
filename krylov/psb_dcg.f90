@@ -105,17 +105,17 @@ subroutine psb_dcg(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,istop)
   Type(psb_dspmat_type), Intent(in)  :: a
   Type(psb_dprec_type), Intent(in)   :: prec 
   Type(psb_desc_type), Intent(in)    :: desc_a
-  Real(Kind(1.d0)), Intent(in)       :: b(:)
-  Real(Kind(1.d0)), Intent(inout)    :: x(:)
-  Real(Kind(1.d0)), Intent(in)       :: eps
+  Real(psb_dpk_), Intent(in)       :: b(:)
+  Real(psb_dpk_), Intent(inout)    :: x(:)
+  Real(psb_dpk_), Intent(in)       :: eps
   integer, intent(out)               :: info
   Integer, Optional, Intent(in)      :: itmax, itrace, istop
   Integer, Optional, Intent(out)     :: iter
-  Real(Kind(1.d0)), Optional, Intent(out) :: err
+  Real(psb_dpk_), Optional, Intent(out) :: err
 !!$   Local data
-  real(kind(1.d0)), allocatable, target   :: aux(:), wwrk(:,:)
-  real(kind(1.d0)), pointer  :: q(:), p(:), r(:), z(:), w(:)
-  real(kind(1.d0))   :: alpha, beta, rho, rho_old, sigma
+  real(psb_dpk_), allocatable, target   :: aux(:), wwrk(:,:)
+  real(psb_dpk_), pointer  :: q(:), p(:), r(:), z(:), w(:)
+  real(psb_dpk_)   :: alpha, beta, rho, rho_old, sigma
   integer            :: itmax_, istop_, naux, mglob, it, itx, itrace_,&
        & np,me, n_col, isvch, ictxt, n_row,err_act, int_err(5)
   integer            :: debug_level, debug_unit

@@ -53,7 +53,7 @@ subroutine psb_zalloc(x, desc_a, info, n, lb)
   implicit none
 
   !....parameters...
-  complex(kind(1.d0)), allocatable, intent(out) :: x(:,:)
+  complex(psb_dpk_), allocatable, intent(out) :: x(:,:)
   type(psb_desc_type), intent(in)       :: desc_a
   integer,intent(out)                   :: info
   integer, optional, intent(in)         :: n, lb
@@ -121,7 +121,7 @@ subroutine psb_zalloc(x, desc_a, info, n, lb)
   if (info /= 0) then
     info=4025
     int_err(1)=nr*n_
-    call psb_errpush(info,name,int_err,a_err='complex(kind(1.d0))')
+    call psb_errpush(info,name,int_err,a_err='complex(psb_dpk_)')
     goto 9999
   endif
   
@@ -191,7 +191,7 @@ subroutine psb_zallocv(x, desc_a,info,n)
   implicit none
 
   !....parameters...
-  complex(kind(1.d0)), allocatable, intent(out) :: x(:)
+  complex(psb_dpk_), allocatable, intent(out) :: x(:)
   type(psb_desc_type), intent(in) :: desc_a
   integer,intent(out)             :: info
   integer, optional, intent(in)   :: n
@@ -243,7 +243,7 @@ subroutine psb_zallocv(x, desc_a,info,n)
   if (info /= 0) then
     info=4025
     int_err(1)=nr
-    call psb_errpush(info,name,int_err,a_err='complex(kind(1.d0))')
+    call psb_errpush(info,name,int_err,a_err='complex(psb_dpk_)')
     goto 9999
   endif
   

@@ -94,8 +94,9 @@ C
 C     Notes
 C     =====
 C
-      DOUBLE PRECISION FUNCTION DCSNMI(TRANS,M,N,FIDA,DESCRA,A,IA1,IA2,
+      real(psb_dpk_) FUNCTION DCSNMI(TRANS,M,N,FIDA,DESCRA,A,IA1,IA2,
      &                 INFOA,IERROR)
+      use psb_const_mod
       IMPLICIT NONE
 C     .. Scalar Arguments ..
       INTEGER           M,N, IERROR
@@ -103,13 +104,13 @@ C     .. Scalar Arguments ..
 C     .. Array Arguments ..
       INTEGER           IA1(*),IA2(*),INFOA(*)
       CHARACTER         DESCRA*11, FIDA*5
-      DOUBLE PRECISION  A(*)
+      real(psb_dpk_)  A(*)
 C     .. Local Scalars..
       INTEGER           ERR_ACT
 C     .. Local Array..
       INTEGER           INT_VAL(5)
 C     .. External Subroutines ..
-      DOUBLE PRECISION  DCRNRMI, DJDNRMI, DCOONRMI
+      real(psb_dpk_)  DCRNRMI, DJDNRMI, DCOONRMI
       EXTERNAL          DCRNRMI, DJDNRMI, DCOONRMI
 C     .. Intrinsic Functions ..
       INTRINSIC         DBLE, IDINT

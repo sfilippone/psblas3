@@ -48,7 +48,7 @@ contains
     integer, intent(out)                   :: iret
     integer, optional, intent(in)          :: iunit
     character(len=*), optional, intent(in) :: filename
-    real(kind(1.d0)), optional, allocatable :: b(:) 
+    real(psb_dpk_), optional, allocatable :: b(:) 
     character(len=72), optional, intent(out) :: mtitle
 
     character  :: rhstype,type*3,key*8
@@ -178,7 +178,7 @@ contains
     integer, optional, intent(in)          :: iunit
     character(len=*), optional, intent(in) :: filename
     character(len=*), optional, intent(in) :: key
-    real(kind(1.d0)), optional             :: rhs(:)
+    real(psb_dpk_), optional             :: rhs(:)
     integer                     :: iout
 
     character(len=*), parameter::  ptrfmt='(10I8)',indfmt='(10I8)'
@@ -296,7 +296,7 @@ contains
     integer, intent(out)                   :: iret
     integer, optional, intent(in)          :: iunit
     character(len=*), optional, intent(in) :: filename
-    real(kind(1.d0)), optional, allocatable  :: b(:) 
+    real(psb_dpk_), optional, allocatable  :: b(:) 
     character(len=72), optional, intent(out) :: mtitle
 
     character  :: rhstype,type*3,key*8
@@ -503,7 +503,7 @@ contains
     integer, optional, intent(in)          :: iunit
     character(len=*), optional, intent(in) :: filename
     character(len=*), optional, intent(in) :: key
-    complex(kind(1.d0)), optional             :: rhs(:)
+    complex(psb_dpk_), optional             :: rhs(:)
     integer                     :: iout
 
     character(len=*), parameter::  ptrfmt='(10I8)',indfmt='(10I8)'

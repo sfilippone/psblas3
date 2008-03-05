@@ -47,7 +47,7 @@ subroutine psb_dspgtdiag(a,d,info)
   implicit none
 
   type(psb_dspmat_type), intent(in)     :: a
-  real(kind(1.d0)), intent(inout)       :: d(:) 
+  real(psb_dpk_), intent(inout)       :: d(:) 
   integer, intent(out)                  :: info
 
   type(psb_dspmat_type)     :: tmpa

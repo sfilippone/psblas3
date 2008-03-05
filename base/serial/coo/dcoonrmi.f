@@ -30,8 +30,9 @@ C POSSIBILITY OF SUCH DAMAGE.
 C
 C 
 C     ... Compute Infinity norm for sparse matrix in CSR Format ...
-      DOUBLE PRECISION FUNCTION DCOONRMI(TRANS,M,N,DESCRA,A,IA1,IA2,
+      real(psb_dpk_) FUNCTION DCOONRMI(TRANS,M,N,DESCRA,A,IA1,IA2,
      +   INFOA,IERROR)
+      use psb_const_mod
       IMPLICIT NONE
 C     .. Scalar Arguments ..
       INTEGER           M,N, IERROR
@@ -39,10 +40,10 @@ C     .. Scalar Arguments ..
 C     .. Array Arguments ..
       INTEGER           IA1(*),IA2(*),INFOA(*)
       CHARACTER         DESCRA*11
-      DOUBLE PRECISION  A(*)
+      real(psb_dpk_)  A(*)
 C     .. Local scalars ..
       INTEGER I, J, K, NNZ
-      DOUBLE PRECISION NRMI, SUM
+      real(psb_dpk_) NRMI, SUM
 
       IERROR=0
       NRMI = 0.0

@@ -53,18 +53,18 @@ function psb_zasum (x,desc_a, info, jx)
   use psb_penv_mod
   implicit none
 
-  complex(kind(1.d0)), intent(in)   :: x(:,:)
+  complex(psb_dpk_), intent(in)   :: x(:,:)
   type(psb_desc_type), intent(in)   :: desc_a
   integer, intent(out)              :: info
   integer, optional, intent(in)     :: jx
-  real(kind(1.d0))                  :: psb_zasum
+  real(psb_dpk_)                  :: psb_zasum
 
   ! locals
   integer                  :: ictxt, np, me, &
        & err_act, iix, jjx, ix, ijx, m, i, idx, ndm
-  real(kind(1.d0))         :: asum, dzasum
+  real(psb_dpk_)         :: asum, dzasum
   character(len=20)        :: name, ch_err
-  complex(kind(1.d0))      :: cmax
+  complex(psb_dpk_)      :: cmax
   double complex    ::         zdum
   double precision  ::  cabs1
   cabs1( zdum ) = abs( dble( zdum ) ) + abs( dimag( zdum ) )
@@ -201,17 +201,17 @@ function psb_zasumv(x,desc_a, info)
   use psb_penv_mod
   implicit none
 
-  complex(kind(1.d0)), intent(in)   :: x(:)
+  complex(psb_dpk_), intent(in)   :: x(:)
   type(psb_desc_type), intent(in)   :: desc_a
   integer, intent(out)              :: info
-  real(kind(1.d0))                  :: psb_zasumv
+  real(psb_dpk_)                  :: psb_zasumv
 
   ! locals
   integer                  :: ictxt, np, me,&
        & err_act, iix, jjx, jx, ix, m, i, idx, ndm
-  real(kind(1.d0))         :: asum, dzasum
+  real(psb_dpk_)         :: asum, dzasum
   character(len=20)        :: name, ch_err
-  complex(kind(1.d0))      :: cmax
+  complex(psb_dpk_)      :: cmax
   double complex    ::         zdum
   double precision  ::  cabs1
   cabs1( zdum ) = abs( dble( zdum ) ) + abs( dimag( zdum ) )
@@ -344,17 +344,17 @@ subroutine psb_zasumvs(res,x,desc_a, info)
   use psb_penv_mod
   implicit none
 
-  complex(kind(1.d0)), intent(in)   :: x(:)
-  real(kind(1.d0)), intent(out)     :: res
+  complex(psb_dpk_), intent(in)   :: x(:)
+  real(psb_dpk_), intent(out)     :: res
   type(psb_desc_type), intent(in)   :: desc_a
   integer, intent(out)              :: info
 
   ! locals
   integer                  :: ictxt, np, me,&
        & err_act, iix, jjx, ix, jx, m, i, idx, ndm
-  real(kind(1.d0))         :: asum, dzasum
+  real(psb_dpk_)         :: asum, dzasum
   character(len=20)        :: name, ch_err
-  complex(kind(1.d0))      :: cmax
+  complex(psb_dpk_)      :: cmax
   double complex    ::         zdum
   double precision  ::  cabs1
   cabs1( zdum ) = abs( dble( zdum ) ) + abs( dimag( zdum ) )

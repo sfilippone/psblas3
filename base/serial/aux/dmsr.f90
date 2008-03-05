@@ -37,13 +37,13 @@ subroutine dmsr(n,x,idir)
   implicit none
 
   integer :: n, idir
-  real(kind(1.d0)) :: x(n)
+  real(psb_dpk_) :: x(n)
   
   
   integer, allocatable :: iaux(:)
   
   integer :: lswap, iret, info, lp, k
-  real(kind(1.d0)) :: swap
+  real(psb_dpk_) :: swap
 
   if (n<0) then 
 !!$    write(0,*) 'Error: IMSR: N<0'

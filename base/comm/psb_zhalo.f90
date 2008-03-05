@@ -64,11 +64,11 @@ subroutine  psb_zhalom(x,desc_a,info,alpha,jx,ik,work,tran,mode,data)
   use psb_penv_mod
   implicit none
 
-  complex(kind(1.d0)), intent(inout), target   :: x(:,:)
+  complex(psb_dpk_), intent(inout), target   :: x(:,:)
   type(psb_desc_type), intent(in)           :: desc_a
   integer, intent(out)                      :: info
-  complex(kind(1.d0)), intent(in), optional    :: alpha
-  complex(kind(1.d0)), optional, target        :: work(:)
+  complex(psb_dpk_), intent(in), optional    :: alpha
+  complex(psb_dpk_), optional, target        :: work(:)
   integer, intent(in), optional             :: mode,jx,ik,data
   character, intent(in), optional           :: tran
 
@@ -76,7 +76,7 @@ subroutine  psb_zhalom(x,desc_a,info,alpha,jx,ik,work,tran,mode,data)
   integer                  :: ictxt, np, me, &
        & err_act, m, n, iix, jjx, ix, ijx, k, maxk, nrow, imode, i,&
        & err, liwork,data_
-  complex(kind(1.d0)),pointer :: iwork(:), xp(:,:)
+  complex(psb_dpk_),pointer :: iwork(:), xp(:,:)
   character                :: tran_
   character(len=20)        :: name, ch_err
   logical                  :: aliw
@@ -292,18 +292,18 @@ subroutine  psb_zhalov(x,desc_a,info,alpha,work,tran,mode,data)
   use psb_penv_mod
   implicit none
 
-  complex(kind(1.d0)), intent(inout)           :: x(:)
+  complex(psb_dpk_), intent(inout)           :: x(:)
   type(psb_desc_type), intent(in)           :: desc_a
   integer, intent(out)                      :: info
-  complex(kind(1.d0)), intent(in), optional    :: alpha
-  complex(kind(1.d0)), target, optional        :: work(:)
+  complex(psb_dpk_), intent(in), optional    :: alpha
+  complex(psb_dpk_), target, optional        :: work(:)
   integer, intent(in), optional             :: mode,data
   character, intent(in), optional           :: tran
 
   ! locals
   integer                  :: ictxt, np, me, err_act, &
        & m, n, iix, jjx, ix, ijx, nrow, imode, err, liwork,data_
-  complex(kind(1.d0)),pointer :: iwork(:)
+  complex(psb_dpk_),pointer :: iwork(:)
   character                :: tran_
   character(len=20)        :: name, ch_err
   logical                  :: aliw

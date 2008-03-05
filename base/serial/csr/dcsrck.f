@@ -89,12 +89,13 @@ C             IERROR > 0 error in integrity check
 
       SUBROUTINE DCSRCK(TRANS,M,N,DESCRA,A,IA1,IA2,                       
      +   WORK,LWORK,IERROR)
+      use psb_const_mod
       IMPLICIT NONE                                                     
 C     .. Scalar Arguments ..
       INTEGER          LWORK,M, N, IERROR
       CHARACTER        TRANS
 C     .. Array Arguments ..
-      DOUBLE PRECISION A(*), WORK(*)
+      real(psb_dpk_) A(*), WORK(*)
       INTEGER          IA1(*), IA2(*)
       CHARACTER        DESCRA*11
 C     .. Local Scalars ..

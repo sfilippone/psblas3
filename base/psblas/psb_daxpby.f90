@@ -61,9 +61,9 @@ subroutine  psb_daxpby(alpha, x, beta,y,desc_a,info, n, jx, jy)
   integer, intent(in), optional   :: n, jx, jy
   integer, intent(out)            :: info
   type(psb_desc_type), intent(in) :: desc_a
-  real(kind(1.D0)), intent(in)    :: alpha, beta
-  real(kind(1.D0)), intent(in)    :: x(:,:)
-  real(kind(1.D0)), intent(inout) :: y(:,:)
+  real(psb_dpk_), intent(in)    :: alpha, beta
+  real(psb_dpk_), intent(in)    :: x(:,:)
+  real(psb_dpk_), intent(inout) :: y(:,:)
 
   ! locals
   integer                  :: ictxt, np, me,&
@@ -215,9 +215,9 @@ subroutine  psb_daxpbyv(alpha, x, beta,y,desc_a,info)
 
   integer, intent(out)            :: info
   type(psb_desc_type), intent(in) :: desc_a
-  real(kind(1.D0)), intent(in)    :: alpha, beta
-  real(kind(1.D0)), intent(in)    :: x(:)
-  real(kind(1.D0)), intent(inout) :: y(:)
+  real(psb_dpk_), intent(in)    :: alpha, beta
+  real(psb_dpk_), intent(in)    :: x(:)
+  real(psb_dpk_), intent(inout) :: y(:)
 
   ! locals
   integer                  :: ictxt, np, me,&

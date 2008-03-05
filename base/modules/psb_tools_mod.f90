@@ -38,7 +38,7 @@ Module psb_tools_mod
     subroutine psb_dalloc(x, desc_a, info, n, lb)
       use psb_descriptor_type
       implicit none
-      real(kind(1.d0)), allocatable, intent(out) :: x(:,:)
+      real(psb_dpk_), allocatable, intent(out) :: x(:,:)
       type(psb_desc_type), intent(in) :: desc_a
       integer,intent(out)             :: info
       integer, optional, intent(in)   :: n, lb
@@ -46,7 +46,7 @@ Module psb_tools_mod
     ! 1-D double precision version
     subroutine psb_dallocv(x, desc_a,info,n)
       use psb_descriptor_type
-      real(kind(1.d0)), allocatable, intent(out)       :: x(:)
+      real(psb_dpk_), allocatable, intent(out)       :: x(:)
       type(psb_desc_type), intent(in) :: desc_a
       integer,intent(out)             :: info
       integer, optional, intent(in)   :: n
@@ -70,7 +70,7 @@ Module psb_tools_mod
     subroutine psb_zalloc(x, desc_a, info, n, lb)
       use psb_descriptor_type
       implicit none
-      complex(kind(1.d0)), allocatable, intent(out)    :: x(:,:)
+      complex(psb_dpk_), allocatable, intent(out)    :: x(:,:)
       type(psb_desc_type), intent(in) :: desc_a
       integer                         :: info
       integer, optional, intent(in)   :: n, lb
@@ -78,7 +78,7 @@ Module psb_tools_mod
     ! 1-D double complex version
     subroutine psb_zallocv(x, desc_a,info,n)
       use psb_descriptor_type
-      complex(kind(1.d0)), allocatable, intent(out)    :: x(:)
+      complex(psb_dpk_), allocatable, intent(out)    :: x(:)
       type(psb_desc_type), intent(in) :: desc_a
       integer                         :: info
       integer, optional, intent(in)   :: n
@@ -91,14 +91,14 @@ Module psb_tools_mod
     subroutine psb_dasb(x, desc_a, info)
       use psb_descriptor_type
       type(psb_desc_type), intent(in) ::  desc_a
-      real(kind(1.d0)), allocatable, intent(inout)       ::  x(:,:)
+      real(psb_dpk_), allocatable, intent(inout)       ::  x(:,:)
       integer, intent(out)            ::  info
     end subroutine psb_dasb
     ! 1-D double precision version
     subroutine psb_dasbv(x, desc_a, info)
       use psb_descriptor_type
       type(psb_desc_type), intent(in) ::  desc_a
-      real(kind(1.d0)), allocatable, intent(inout)   ::  x(:)
+      real(psb_dpk_), allocatable, intent(inout)   ::  x(:)
       integer, intent(out)        ::  info
     end subroutine psb_dasbv
     ! 2-D integer version
@@ -119,14 +119,14 @@ Module psb_tools_mod
     subroutine psb_zasb(x, desc_a, info)
       use psb_descriptor_type
       type(psb_desc_type), intent(in) ::  desc_a
-      complex(kind(1.d0)), allocatable, intent(inout)       ::  x(:,:)
+      complex(psb_dpk_), allocatable, intent(inout)       ::  x(:,:)
       integer, intent(out)            ::  info
     end subroutine psb_zasb
     ! 1-D double precision version
     subroutine psb_zasbv(x, desc_a, info)
       use psb_descriptor_type
       type(psb_desc_type), intent(in) ::  desc_a
-      complex(kind(1.d0)), allocatable, intent(inout)   ::  x(:)
+      complex(psb_dpk_), allocatable, intent(inout)   ::  x(:)
       integer, intent(out)        ::  info
     end subroutine psb_zasbv
   end interface
@@ -175,14 +175,14 @@ Module psb_tools_mod
     ! 2-D double precision version
     subroutine psb_dfree(x, desc_a, info)
       use psb_descriptor_type
-      real(kind(1.d0)),allocatable, intent(inout)        :: x(:,:)
+      real(psb_dpk_),allocatable, intent(inout)        :: x(:,:)
       type(psb_desc_type), intent(in) :: desc_a
       integer                         :: info
     end subroutine psb_dfree
     ! 1-D double precision version
     subroutine psb_dfreev(x, desc_a, info)
       use psb_descriptor_type
-      real(kind(1.d0)),allocatable, intent(inout)        :: x(:)
+      real(psb_dpk_),allocatable, intent(inout)        :: x(:)
       type(psb_desc_type), intent(in) :: desc_a
       integer                         :: info
     end subroutine psb_dfreev
@@ -203,14 +203,14 @@ Module psb_tools_mod
     ! 2-D double precision version
     subroutine psb_zfree(x, desc_a, info)
       use psb_descriptor_type
-      complex(kind(1.d0)),allocatable, intent(inout)        :: x(:,:)
+      complex(psb_dpk_),allocatable, intent(inout)        :: x(:,:)
       type(psb_desc_type), intent(in) :: desc_a
       integer                         :: info
     end subroutine psb_zfree
     ! 1-D double precision version
     subroutine psb_zfreev(x, desc_a, info)
       use psb_descriptor_type
-      complex(kind(1.d0)),allocatable, intent(inout)        :: x(:)
+      complex(psb_dpk_),allocatable, intent(inout)        :: x(:)
       type(psb_desc_type), intent(in) :: desc_a
       integer                         :: info
     end subroutine psb_zfreev
@@ -223,9 +223,9 @@ Module psb_tools_mod
       use psb_descriptor_type
       integer, intent(in)                ::  m
       type(psb_desc_type), intent(in)    ::  desc_a
-      real(kind(1.d0)),intent(inout)           ::  x(:,:)
+      real(psb_dpk_),intent(inout)           ::  x(:,:)
       integer, intent(in)                ::  irw(:)
-      real(kind(1.d0)), intent(in)       ::  val(:,:)
+      real(psb_dpk_), intent(in)       ::  val(:,:)
       integer, intent(out)               ::  info
       integer, optional, intent(in)      ::  dupl
     end subroutine psb_dinsi
@@ -234,9 +234,9 @@ Module psb_tools_mod
       use psb_descriptor_type
       integer, intent(in)                ::  m
       type(psb_desc_type), intent(in)    ::  desc_a
-      real(kind(1.d0)),intent(inout)     ::  x(:)
+      real(psb_dpk_),intent(inout)     ::  x(:)
       integer, intent(in)                ::  irw(:)
-      real(kind(1.d0)), intent(in)       ::  val(:)
+      real(psb_dpk_), intent(in)       ::  val(:)
       integer, intent(out)               ::  info
       integer, optional, intent(in)      ::  dupl
     end subroutine psb_dinsvi
@@ -267,9 +267,9 @@ Module psb_tools_mod
       use psb_descriptor_type
       integer, intent(in)              ::  m
       type(psb_desc_type), intent(in)  ::  desc_a
-      complex(kind(1.d0)),intent(inout)      ::  x(:,:)
+      complex(psb_dpk_),intent(inout)      ::  x(:,:)
       integer, intent(in)              ::  irw(:)
-      complex(kind(1.d0)), intent(in)  ::  val(:,:)
+      complex(psb_dpk_), intent(in)  ::  val(:,:)
       integer, intent(out)             ::  info
       integer, optional, intent(in)    ::  dupl
     end subroutine psb_zinsi
@@ -278,9 +278,9 @@ Module psb_tools_mod
       use psb_descriptor_type
       integer, intent(in)              ::  m
       type(psb_desc_type), intent(in)  ::  desc_a
-      complex(kind(1.d0)),intent(inout)      ::  x(:)
+      complex(psb_dpk_),intent(inout)      ::  x(:)
       integer, intent(in)              ::  irw(:)
-      complex(kind(1.d0)), intent(in)  ::  val(:)
+      complex(psb_dpk_), intent(in)  ::  val(:)
       integer, intent(out)             ::  info
       integer, optional, intent(in)    ::  dupl
     end subroutine psb_zinsvi
@@ -426,7 +426,7 @@ Module psb_tools_mod
       type(psb_desc_type), intent(inout)   :: desc_a
       type(psb_dspmat_type), intent(inout) :: a
       integer, intent(in)                  :: nz,ia(:),ja(:)
-      real(kind(1.d0)), intent(in)         :: val(:)
+      real(psb_dpk_), intent(in)         :: val(:)
       integer, intent(out)                 :: info
       logical, intent(in), optional        :: rebuild
     end subroutine psb_dspins
@@ -446,7 +446,7 @@ Module psb_tools_mod
       type(psb_desc_type), intent(inout)   :: desc_a
       type(psb_zspmat_type), intent(inout) :: a
       integer, intent(in)                  :: nz,ia(:),ja(:)
-      complex(kind(1.d0)), intent(in)      :: val(:)
+      complex(psb_dpk_), intent(in)      :: val(:)
       integer, intent(out)                 :: info
       logical, intent(in), optional        :: rebuild
     end subroutine psb_zspins

@@ -31,10 +31,11 @@ C
 C 
       SUBROUTINE ZCSRSM(TRANST,M,N,UNITD,D,ALPHA,DESCRA,A,JA,IA,
      *                  B,LDB,BETA,C,LDC,WORK,LWORK)
-      COMPLEX*16 ALPHA, BETA
+      use psb_const_mod
+      complex(psb_dpk_) ALPHA, BETA
       INTEGER    LDB, LDC, LWORK, M, N
       CHARACTER  UNITD, TRANST
-      COMPLEX*16 A(*), B(LDB,*), C(LDC,*), D(*), WORK(*)
+      complex(psb_dpk_) A(*), B(LDB,*), C(LDC,*), D(*), WORK(*)
       INTEGER    IA(*), JA(*)
       CHARACTER  DESCRA*11
       INTEGER    I, K

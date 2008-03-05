@@ -57,8 +57,8 @@ subroutine  psb_dscatterm(globx, locx, desc_a, info, iroot)
   include 'mpif.h'
 #endif
 
-  real(kind(1.d0)), intent(out)    :: locx(:,:)
-  real(kind(1.d0)), intent(in)     :: globx(:,:)
+  real(psb_dpk_), intent(out)    :: locx(:,:)
+  real(psb_dpk_), intent(in)     :: globx(:,:)
   type(psb_desc_type), intent(in)  :: desc_a
   integer, intent(out)             :: info
   integer, intent(in), optional    :: iroot
@@ -69,7 +69,7 @@ subroutine  psb_dscatterm(globx, locx, desc_a, info, iroot)
        & err_act, m, n, i, j, idx, nrow, iiroot, iglobx, jglobx,&
        & ilocx, jlocx, lda_locx, lda_globx, lock, globk, icomm, k, maxk, root, ilx,&
        & jlx, myrank, rootrank, c, pos
-  real(kind(1.d0)), allocatable  :: scatterv(:)
+  real(psb_dpk_), allocatable  :: scatterv(:)
   integer, allocatable           :: displ(:), l_t_g_all(:), all_dim(:)
   character(len=20)        :: name, ch_err
 
@@ -286,8 +286,8 @@ subroutine  psb_dscatterv(globx, locx, desc_a, info, iroot)
   include 'mpif.h'
 #endif
 
-  real(kind(1.d0)), intent(out)    :: locx(:)
-  real(kind(1.d0)), intent(in)     :: globx(:)
+  real(psb_dpk_), intent(out)    :: locx(:)
+  real(psb_dpk_), intent(in)     :: globx(:)
   type(psb_desc_type), intent(in)  :: desc_a
   integer, intent(out)             :: info
   integer, intent(in), optional    :: iroot
@@ -298,7 +298,7 @@ subroutine  psb_dscatterv(globx, locx, desc_a, info, iroot)
        & err_act, m, n, i, j, idx, nrow, iglobx, jglobx,&
        & ilocx, jlocx, lda_locx, lda_globx, root, k, icomm, myrank,&
        & rootrank, pos, ilx, jlx
-  real(kind(1.d0)), allocatable  :: scatterv(:)
+  real(psb_dpk_), allocatable  :: scatterv(:)
   integer, allocatable           :: displ(:), l_t_g_all(:), all_dim(:)
   character(len=20)        :: name, ch_err
 

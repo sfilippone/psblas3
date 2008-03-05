@@ -113,16 +113,16 @@ Subroutine psb_dcgstabl(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,irst,is
   Type(psb_dspmat_type), Intent(in)  :: a
   Type(psb_dprec_type), Intent(in)   :: prec 
   Type(psb_desc_type), Intent(in)    :: desc_a
-  Real(Kind(1.d0)), Intent(in)       :: b(:)
-  Real(Kind(1.d0)), Intent(inout)    :: x(:)
-  Real(Kind(1.d0)), Intent(in)       :: eps
+  Real(psb_dpk_), Intent(in)       :: b(:)
+  Real(psb_dpk_), Intent(inout)    :: x(:)
+  Real(psb_dpk_), Intent(in)       :: eps
   integer, intent(out)               :: info
   Integer, Optional, Intent(in)      :: itmax, itrace, irst,istop
   Integer, Optional, Intent(out)     :: iter
-  Real(Kind(1.d0)), Optional, Intent(out) :: err
+  Real(psb_dpk_), Optional, Intent(out) :: err
 !!$   local data
-  Real(Kind(1.d0)), allocatable, target   :: aux(:),wwrk(:,:),uh(:,:), rh(:,:)
-  Real(Kind(1.d0)), Pointer  :: ww(:), q(:), r(:), rt0(:), p(:), v(:), &
+  Real(psb_dpk_), allocatable, target   :: aux(:),wwrk(:,:),uh(:,:), rh(:,:)
+  Real(psb_dpk_), Pointer  :: ww(:), q(:), r(:), rt0(:), p(:), v(:), &
        & s(:), t(:), z(:), f(:), gamma(:), gamma1(:), gamma2(:), taum(:,:), sigma(:)
 
   Integer       :: itmax_, naux, mglob, it, itrace_,&
@@ -131,7 +131,7 @@ Subroutine psb_dcgstabl(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,irst,is
   Integer, Parameter :: irmax = 8
   Integer            :: itx, i, isvch, ictxt,istop_,j, int_err(5)
   integer            :: debug_level, debug_unit
-  Real(Kind(1.d0)) :: alpha, beta, rho, rho_old, rni, xni, bni, ani,bn2,& 
+  Real(psb_dpk_) :: alpha, beta, rho, rho_old, rni, xni, bni, ani,bn2,& 
        & omega
   type(psb_itconv_type)        :: stopdat
   character(len=20)            :: name

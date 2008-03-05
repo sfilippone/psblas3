@@ -31,6 +31,7 @@ C
 C 
       SUBROUTINE DJADSM(TRANST,M,N,VDIAG,TDIAG,PERMQ,ALPHA,DESCRA,
      +   AR,JA,IA,PERMP,B,LDB,BETA,C,LDC,WORK)
+      use psb_const_mod
       use psb_error_mod
       use psb_string_mod
       implicit none
@@ -39,9 +40,9 @@ C
 C     .. Scalar Arguments ..
       INTEGER           LDB, LDC, M, N
       CHARACTER         TDIAG, TRANST
-      DOUBLE PRECISION  ALPHA, BETA
+      real(psb_dpk_)  ALPHA, BETA
 C     .. Array Arguments ..
-      DOUBLE PRECISION  AR(*), B(LDB,*), C(LDC,*), VDIAG(*), WORK(*)
+      real(psb_dpk_)  AR(*), B(LDB,*), C(LDC,*), VDIAG(*), WORK(*)
       INTEGER           IA(*), JA(*), PERMP(*), PERMQ(*)
       CHARACTER         DESCRA*11
 C     .. Local Scalars ..

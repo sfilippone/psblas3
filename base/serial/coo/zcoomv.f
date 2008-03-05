@@ -166,18 +166,19 @@ C
 ***********************************************************************
       SUBROUTINE ZCOOMV (TRANS,DIAG,M,N,ALPHA,AS,IA,JA,INFOA,X,
      +   BETA,Y,WORK)
+      use psb_const_mod
 C     .. Parameters ..
-      COMPLEX*16         ONE, ZERO
+      complex(psb_dpk_)         ONE, ZERO
       PARAMETER         (ONE=(1.0D0,0.0D0),ZERO=(0.0D0,0.0D0))
 C     .. Scalar Arguments ..
-      COMPLEX*16       ALPHA, BETA
+      complex(psb_dpk_)       ALPHA, BETA
       INTEGER           M, N
       CHARACTER         DIAG, TRANS
 C     .. Array Arguments ..
-      COMPLEX*16        AS(*), WORK(*), X(*), Y(*)
+      complex(psb_dpk_)        AS(*), WORK(*), X(*), Y(*)
       INTEGER           IA(*), JA(*),infoa(*)
 C     .. Local Scalars ..
-      COMPLEX*16        ACC,  TX
+      complex(psb_dpk_)        ACC,  TX
       INTEGER           I, J, K, NCOLA, NROWA,DUM, NNZ, IR, JC
       LOGICAL           SYM, TRA, UNI
 C     .. Executable Statements ..

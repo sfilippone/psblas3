@@ -30,6 +30,7 @@
 !!$ 
 !!$  
 module psb_serial_mod
+  use psb_const_mod
   use psb_spmat_type
   use psb_string_mod
   use psb_sort_mod
@@ -62,14 +63,14 @@ module psb_serial_mod
     subroutine psb_dcsrws(rw,a,info,trans)
       use psb_spmat_type
       type(psb_dspmat_type) :: a
-      real(kind(1.d0)), allocatable   :: rw(:) 
+      real(psb_dpk_), allocatable   :: rw(:) 
       integer :: info
       character, optional :: trans
     end subroutine psb_dcsrws
     subroutine psb_zcsrws(rw,a,info,trans)
       use psb_spmat_type
       type(psb_zspmat_type) :: a
-      complex(kind(1.d0)), allocatable :: rw(:) 
+      complex(psb_dpk_), allocatable :: rw(:) 
       integer :: info
       character, optional :: trans
     end subroutine psb_zcsrws
@@ -81,34 +82,34 @@ module psb_serial_mod
     subroutine psb_dcssm(alpha,t,b,beta,c,info,trans,unitd,d)
       use psb_spmat_type
       type(psb_dspmat_type) :: t
-      real(kind(1.d0)) :: alpha, beta, b(:,:), c(:,:)
+      real(psb_dpk_) :: alpha, beta, b(:,:), c(:,:)
       integer :: info
       character, optional :: trans, unitd
-      real(kind(1.d0)), optional, target :: d(:)
+      real(psb_dpk_), optional, target :: d(:)
     end subroutine psb_dcssm
     subroutine psb_dcssv(alpha,t,b,beta,c,info,trans,unitd,d)
       use psb_spmat_type
       type(psb_dspmat_type) :: t
-      real(kind(1.d0)) :: alpha, beta, b(:), c(:)
+      real(psb_dpk_) :: alpha, beta, b(:), c(:)
       integer :: info
       character, optional :: trans, unitd
-      real(kind(1.d0)), optional, target :: d(:)
+      real(psb_dpk_), optional, target :: d(:)
     end subroutine psb_dcssv
     subroutine psb_zcssm(alpha,t,b,beta,c,info,trans,unitd,d)
       use psb_spmat_type
       type(psb_zspmat_type) :: t
-      complex(kind(1.d0)) :: alpha, beta, b(:,:), c(:,:)
+      complex(psb_dpk_) :: alpha, beta, b(:,:), c(:,:)
       integer :: info
       character, optional :: trans, unitd
-      complex(kind(1.d0)), optional, target :: d(:)
+      complex(psb_dpk_), optional, target :: d(:)
     end subroutine psb_zcssm
     subroutine psb_zcssv(alpha,t,b,beta,c,info,trans,unitd,d)
       use psb_spmat_type
       type(psb_zspmat_type) :: t
-      complex(kind(1.d0)) :: alpha, beta, b(:), c(:)
+      complex(psb_dpk_) :: alpha, beta, b(:), c(:)
       integer :: info
       character, optional :: trans, unitd
-      complex(kind(1.d0)), optional, target :: d(:)
+      complex(psb_dpk_), optional, target :: d(:)
     end subroutine psb_zcssv
   end interface
 
@@ -116,28 +117,28 @@ module psb_serial_mod
     subroutine psb_dcsmv(alpha,a,b,beta,c,info,trans)
       use psb_spmat_type
       type(psb_dspmat_type) :: a
-      real(kind(1.d0)) :: alpha, beta, b(:), c(:)
+      real(psb_dpk_) :: alpha, beta, b(:), c(:)
       integer :: info
       character, optional :: trans
     end subroutine psb_dcsmv
     subroutine psb_dcsmm(alpha,a,b,beta,c,info,trans)
       use psb_spmat_type
       type(psb_dspmat_type) :: a
-      real(kind(1.d0)) :: alpha, beta, b(:,:), c(:,:)
+      real(psb_dpk_) :: alpha, beta, b(:,:), c(:,:)
       integer :: info
       character, optional :: trans
     end subroutine psb_dcsmm
     subroutine psb_zcsmv(alpha,a,b,beta,c,info,trans)
       use psb_spmat_type
       type(psb_zspmat_type) :: a
-      complex(kind(1.d0)) :: alpha, beta, b(:), c(:)
+      complex(psb_dpk_) :: alpha, beta, b(:), c(:)
       integer :: info
       character, optional :: trans
     end subroutine psb_zcsmv
     subroutine psb_zcsmm(alpha,a,b,beta,c,info,trans)
       use psb_spmat_type
       type(psb_zspmat_type) :: a
-      complex(kind(1.d0)) :: alpha, beta, b(:,:), c(:,:)
+      complex(psb_dpk_) :: alpha, beta, b(:,:), c(:,:)
       integer :: info
       character, optional :: trans
     end subroutine psb_zcsmm
@@ -291,7 +292,7 @@ module psb_serial_mod
       use psb_spmat_type
       integer, intent(in) :: nz, imin,imax,jmin,jmax
       integer, intent(in) :: ia(:),ja(:)
-      real(kind(1.d0)), intent(in) :: val(:)
+      real(psb_dpk_), intent(in) :: val(:)
       type(psb_dspmat_type), intent(inout) :: a
       integer, intent(out) :: info
       integer, intent(in), optional :: gtl(:)
@@ -301,7 +302,7 @@ module psb_serial_mod
       use psb_spmat_type
       integer, intent(in) :: nz, imin,imax,jmin,jmax
       integer, intent(in) :: ia(:),ja(:)
-      complex(kind(1.d0)), intent(in) :: val(:)
+      complex(psb_dpk_), intent(in) :: val(:)
       type(psb_zspmat_type), intent(inout) :: a
       integer, intent(out) :: info
       integer, intent(in), optional :: gtl(:)
@@ -378,13 +379,13 @@ module psb_serial_mod
   end interface
 
   interface psb_csnmi
-    real(kind(1.d0)) function psb_dcsnmi(a,info,trans)
+    real(psb_dpk_) function psb_dcsnmi(a,info,trans)
       use psb_spmat_type
       type(psb_dspmat_type), intent(in)  :: a
       integer, intent(out)       :: info
       character, optional        :: trans
     end function psb_dcsnmi
-    real(kind(1.d0)) function psb_zcsnmi(a,info,trans)
+    real(psb_dpk_) function psb_zcsnmi(a,info,trans)
       use psb_spmat_type
       type(psb_zspmat_type), intent(in)  :: a
       integer, intent(out)       :: info
@@ -417,13 +418,13 @@ module psb_serial_mod
      subroutine psb_dspgtdiag(a,d,info)
        use psb_spmat_type
        type(psb_dspmat_type), intent(in)     :: a
-       real(kind(1.d0)), intent(inout) :: d(:) 
+       real(psb_dpk_), intent(inout) :: d(:) 
        integer, intent(out)  :: info
      end subroutine psb_dspgtdiag
      subroutine psb_zspgtdiag(a,d,info)
        use psb_spmat_type
        type(psb_zspmat_type), intent(in)     :: a
-       complex(kind(1.d0)), intent(inout) :: d(:) 
+       complex(psb_dpk_), intent(inout) :: d(:) 
        integer, intent(out)  :: info
      end subroutine psb_zspgtdiag
   end interface
@@ -432,13 +433,13 @@ module psb_serial_mod
      subroutine psb_dspscal(a,d,info)
        use psb_spmat_type
        type(psb_dspmat_type), intent(inout) :: a
-       real(kind(1.d0)), intent(in) :: d(:) 
+       real(psb_dpk_), intent(in) :: d(:) 
        integer, intent(out)  :: info
      end subroutine psb_dspscal
      subroutine psb_zspscal(a,d,info)
        use psb_spmat_type
        type(psb_zspmat_type), intent(inout) :: a
-       complex(kind(1.d0)), intent(in) :: d(:) 
+       complex(psb_dpk_), intent(in) :: d(:) 
        integer, intent(out)  :: info
      end subroutine psb_zspscal
   end interface
@@ -478,7 +479,7 @@ module psb_serial_mod
        integer, intent(in)                  :: irw
        integer, intent(out)                 :: nz
        integer, allocatable, intent(inout)  :: ia(:), ja(:)
-       real(kind(1.d0)), allocatable,  intent(inout)    :: val(:)
+       real(psb_dpk_), allocatable,  intent(inout)    :: val(:)
        integer,intent(out)                  :: info
        logical, intent(in), optional        :: append
        integer, intent(in), optional        :: iren(:)
@@ -493,7 +494,7 @@ module psb_serial_mod
        integer, intent(in)                  :: irw
        integer, intent(out)                 :: nz
        integer, allocatable, intent(inout)  :: ia(:), ja(:)
-       complex(kind(1.d0)), allocatable,  intent(inout)    :: val(:)
+       complex(psb_dpk_), allocatable,  intent(inout)    :: val(:)
        integer,intent(out)                  :: info
        logical, intent(in), optional        :: append
        integer, intent(in), optional        :: iren(:)
@@ -522,28 +523,32 @@ module psb_serial_mod
   interface psb_gelp
     ! 2-D version
     subroutine psb_dgelp(trans,iperm,x,info)
-      real(kind(1.d0)), intent(inout)      ::  x(:,:)
+      use psb_const_mod
+      real(psb_dpk_), intent(inout)      ::  x(:,:)
       integer, intent(in)                  ::  iperm(:)
       integer, intent(out)                 ::  info
       character, intent(in)                :: trans
     end subroutine psb_dgelp
     ! 1-D version
     subroutine psb_dgelpv(trans,iperm,x,info)
-      real(kind(1.d0)), intent(inout)    ::  x(:)
+      use psb_const_mod
+      real(psb_dpk_), intent(inout)    ::  x(:)
       integer, intent(in)                  ::  iperm(:)
       integer, intent(out)                 ::  info
       character, intent(in)              :: trans
     end subroutine psb_dgelpv
     ! 2-D version
     subroutine psb_zgelp(trans,iperm,x,info)
-      complex(kind(1.d0)), intent(inout)      ::  x(:,:)
+      use psb_const_mod
+      complex(psb_dpk_), intent(inout)      ::  x(:,:)
       integer, intent(in)                  ::  iperm(:)
       integer, intent(out)                 ::  info
       character, intent(in)                :: trans
     end subroutine psb_zgelp
     ! 1-D version
     subroutine psb_zgelpv(trans,iperm,x,info)
-      complex(kind(1.d0)), intent(inout)    ::  x(:)
+      use psb_const_mod
+      complex(psb_dpk_), intent(inout)    ::  x(:)
       integer, intent(in)                  ::  iperm(:)
       integer, intent(out)                 ::  info
       character, intent(in)              :: trans

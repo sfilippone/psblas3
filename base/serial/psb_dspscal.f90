@@ -47,7 +47,7 @@ subroutine psb_dspscal(a,d,info)
 
   type(psb_dspmat_type), intent(inout) :: a
   integer, intent(out)                 :: info
-  real(kind(1.d0)), intent(in)         :: d(:) 
+  real(psb_dpk_), intent(in)         :: d(:) 
 
   integer :: i,j,err_act
   character(len=20)                 :: name, ch_err

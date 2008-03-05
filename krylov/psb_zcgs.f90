@@ -102,22 +102,22 @@ Subroutine psb_zcgs(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,istop)
   Type(psb_zspmat_type), Intent(in)  :: a
   Type(psb_desc_type), Intent(in)    :: desc_a 
   Type(psb_zprec_type), Intent(in)   :: prec 
-  Complex(Kind(1.d0)), Intent(in)       :: b(:)
-  Complex(Kind(1.d0)), Intent(inout)    :: x(:)
-  Real(Kind(1.d0)), Intent(in)       :: eps
+  Complex(psb_dpk_), Intent(in)       :: b(:)
+  Complex(psb_dpk_), Intent(inout)    :: x(:)
+  Real(psb_dpk_), Intent(in)       :: eps
   integer, intent(out)               :: info
   Integer, Optional, Intent(in)      :: itmax, itrace,istop
   Integer, Optional, Intent(out)     :: iter
-  Real(Kind(1.d0)), Optional, Intent(out) :: err
+  Real(psb_dpk_), Optional, Intent(out) :: err
 !!$   local data
-  Complex(Kind(1.d0)), allocatable, target   :: aux(:),wwrk(:,:)
-  Complex(Kind(1.d0)), Pointer  :: ww(:), q(:),&
+  Complex(psb_dpk_), allocatable, target   :: aux(:),wwrk(:,:)
+  Complex(psb_dpk_), Pointer  :: ww(:), q(:),&
        & r(:), p(:), v(:), s(:), z(:), f(:), rt(:),qt(:),uv(:)
   Integer       :: itmax_, naux, mglob, it, itrace_,int_err(5),&
        & np,me, n_row, n_col,istop_, err_act
   Integer            :: itx, isvch, ictxt
   integer            :: debug_level, debug_unit
-  complex(Kind(1.d0))   :: alpha, beta, rho, rho_old, sigma 
+  complex(psb_dpk_)   :: alpha, beta, rho, rho_old, sigma 
   type(psb_itconv_type) :: stopdat
   character(len=20)           :: name
   character(len=*), parameter :: methdname='CGS'

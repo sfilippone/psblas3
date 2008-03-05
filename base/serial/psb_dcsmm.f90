@@ -38,11 +38,11 @@ subroutine psb_dcsmm(alpha,a,b,beta,c,info,trans)
   implicit none 
 
   type(psb_dspmat_type) :: a
-  real(kind(1.d0))      :: alpha, beta, b(:,:), c(:,:)
+  real(psb_dpk_)      :: alpha, beta, b(:,:), c(:,:)
   integer               :: info
   character, optional   :: trans
   
-  real(kind(1.d0)), allocatable :: work(:)
+  real(psb_dpk_), allocatable :: work(:)
   character                     :: trans_
   integer                       :: iwsz,m,n,k,lb,lc,err_act
   character(len=20)             :: name, ch_err

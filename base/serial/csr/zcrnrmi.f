@@ -28,8 +28,9 @@ C CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
 C ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 C POSSIBILITY OF SUCH DAMAGE.
 C
-      DOUBLE PRECISION FUNCTION ZCRNRMI(TRANS,M,N,DESCRA,A,IA1,IA2,      
+      real(psb_dpk_) FUNCTION ZCRNRMI(TRANS,M,N,DESCRA,A,IA1,IA2,      
      &   INFOA,IERROR)
+      use psb_const_mod
       IMPLICIT NONE
 C     .. Scalar Arguments ..
       INTEGER           M,N, IERROR
@@ -37,10 +38,10 @@ C     .. Scalar Arguments ..
 C     .. Array Arguments ..
       INTEGER    IA1(*),IA2(*),INFOA(*)
       CHARACTER  DESCRA*11
-      COMPLEX*16 A(*)
+      complex(psb_dpk_) A(*)
 C     .. Local scalars ..
       INTEGER I, J
-      DOUBLE PRECISION NRMI, SUM
+      real(psb_dpk_) NRMI, SUM
 
       NRMI = 0.D0
       DO I = 1, M

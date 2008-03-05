@@ -164,6 +164,7 @@ C
       SUBROUTINE DCRCR(TRANS,M,N,UNITD,D,DESCRA,A,IA1,IA2,INFOA,IP1,
      *                 DESCRN,AN,IAN1,IAN2,INFON,IP2,LAN,LIAN1,LIAN2,
      *                 WORK,LWORK,IERROR)
+      use psb_const_mod
       use psb_string_mod
       IMPLICIT NONE                                                      
 C
@@ -171,7 +172,7 @@ C     .. Scalar Arguments ..
       INTEGER          M, N, LAN, LIAN1, LIAN2, LWORK, IERROR
       CHARACTER        TRANS, UNITD
 C     .. Array Arguments ..
-      DOUBLE PRECISION A(*), AN(*), D(*), WORK(LWORK)
+      real(psb_dpk_) A(*), AN(*), D(*), WORK(LWORK)
       INTEGER          IA1(*), IA2(*), IAN1(*), IAN2(*), IP1(*), IP2(*),
      *                 INFOA(*), INFON(*)
       CHARACTER        DESCRA*11, DESCRN*11

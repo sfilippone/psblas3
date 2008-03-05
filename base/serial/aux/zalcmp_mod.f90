@@ -30,6 +30,7 @@
 !!$ 
 !!$  
 module zalcmp_mod
+  use psb_const_mod
   interface operator(<)
     module procedure zallt
   end interface
@@ -46,14 +47,16 @@ module zalcmp_mod
 contains
 
   function zallt(a,b)
-    complex(kind(1.d0)), intent(in) :: a,b
+    use psb_const_mod
+    complex(psb_dpk_), intent(in) :: a,b
     logical :: zallt
     
     zallt = (abs(real(a))<abs(real(b))).or. &
          & ((abs(real(a))==abs(real(b))).and.(abs(aimag(a))<abs(aimag(b))))
   end function zallt
   function zalle(a,b)
-    complex(kind(1.d0)), intent(in) :: a,b
+    use psb_const_mod
+    complex(psb_dpk_), intent(in) :: a,b
     logical :: zalle
     
     zalle = (abs(real(a))<abs(real(b))).or. &
@@ -61,14 +64,16 @@ contains
   end function zalle
 
   function zalgt(a,b)
-    complex(kind(1.d0)), intent(in) :: a,b
+    use psb_const_mod
+    complex(psb_dpk_), intent(in) :: a,b
     logical :: zalgt
     
     zalgt = (abs(real(a))>abs(real(b))).or. &
          & ((abs(real(a))==abs(real(b))).and.(abs(aimag(a))>abs(aimag(b))))
   end function zalgt
   function zalge(a,b)
-    complex(kind(1.d0)), intent(in) :: a,b
+    use psb_const_mod
+    complex(psb_dpk_), intent(in) :: a,b
     logical :: zalge
     
     zalge = (abs(real(a))>abs(real(b))).or. &

@@ -47,7 +47,7 @@ subroutine psb_zspscal(a,d,info)
 
   type(psb_zspmat_type), intent(inout) :: a
   integer, intent(out)                 :: info
-  complex(kind(1.d0)), intent(in)         :: d(:) 
+  complex(psb_dpk_), intent(in)         :: d(:) 
 
   integer :: i,j, err_act
   character(len=20)                 :: name, ch_err

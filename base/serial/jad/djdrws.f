@@ -32,6 +32,7 @@ C
 C     ... Compute infinity norm for sparse matrix in CSR Format ...
       SUBROUTINE DJDRWS(TRANS,M,N,DESCRA,A,JA,IA,
      +   INFOA,ROWSUM,IERROR)
+      use psb_const_mod
       IMPLICIT NONE
 C     .. Scalar Arguments ..
       INTEGER           M,N, IERROR
@@ -39,11 +40,11 @@ C     .. Scalar Arguments ..
 C     .. Array Arguments ..
       INTEGER           JA(*),IA(*),INFOA(*)
       CHARACTER         DESCRA*11
-      DOUBLE PRECISION  A(*), ROWSUM(*)
+      real(psb_dpk_)  A(*), ROWSUM(*)
 C     .. Local scalars ..
       INTEGER PNG, PIA, PJA
 C     .. External routines ..
-      DOUBLE PRECISION DJADNR
+      real(psb_dpk_) DJADNR
       EXTERNAL DJADNR
 
       IERROR = 0

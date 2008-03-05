@@ -48,7 +48,7 @@ C     .. Scalar Arguments ..
      +  N, IERROR
       CHARACTER          TRANS,UNITD
 C     .. Array Arguments ..
-      DOUBLE PRECISION   AR(*), ARN(*), D(*)
+      real(psb_dpk_)   AR(*), ARN(*), D(*)
       INTEGER            AUX(0:LAUX-1)
       INTEGER            JA(*), IA(*), INFO(*), IAN1(*), IAN2(*),
      *  INFON(*), P1(*), P2(*)

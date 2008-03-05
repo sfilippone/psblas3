@@ -37,14 +37,13 @@ c
 *     
       SUBROUTINE DCSRMM(TRANSA,M,K,N,ALPHA,DESCRA,AR,
      *  JA,IA,B,LDB,BETA,C,LDC,WORK,LWORK,IERROR)
-C     
-C     
+      use psb_const_mod
 C     .. Scalar Arguments ..
-      DOUBLE PRECISION  ALPHA, BETA
+      real(psb_dpk_)  ALPHA, BETA
       INTEGER           K, LDB, LDC, M, N, LWORK,IERROR
       CHARACTER         TRANSA
 C     .. Array Arguments ..
-      DOUBLE PRECISION  AR(*), B(LDB,*), C(LDC,*),  WORK(*)
+      real(psb_dpk_)  AR(*), B(LDB,*), C(LDC,*),  WORK(*)
       INTEGER           IA(*), JA(*)
       CHARACTER         DESCRA*11
 C     .. Local Scalars ..

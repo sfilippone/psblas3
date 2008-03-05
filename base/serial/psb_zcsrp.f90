@@ -51,10 +51,11 @@ subroutine psb_zcsrp(trans,iperm,a, info)
   interface 
     subroutine zcsrp(trans,m,n,fida,descra,ia1,ia2,&
          & infoa,p,work,lwork,ierror)
+      use psb_const_mod
       integer, intent(in)  :: m, n, lwork
       integer, intent(out) :: ierror
       character, intent(in) ::       trans
-      complex(kind(1.d0)), intent(inout) :: work(*)                     
+      complex(psb_dpk_), intent(inout) :: work(*)                     
       integer, intent(in)    :: p(*)
       integer, intent(inout) :: ia1(*), ia2(*), infoa(*) 
       character, intent(in)  :: fida*5, descra*11
@@ -77,7 +78,7 @@ subroutine psb_zcsrp(trans,iperm,a, info)
   !....locals....
   integer, allocatable                  ::  ipt(:)
   integer                               ::  i, n_col,l_dcsdp, ipsize
-  complex(kind(1.d0)), allocatable      ::  work_dcsdp(:)
+  complex(psb_dpk_), allocatable      ::  work_dcsdp(:)
   integer                               ::  n_row,err_act, int_err(5)
   character(len=20)                     ::  name, char_err
 

@@ -47,7 +47,7 @@ subroutine psb_dfree(x, desc_a, info)
   implicit none
 
   !....parameters...
-  real(kind(1.d0)),allocatable, intent(inout)  :: x(:,:)
+  real(psb_dpk_),allocatable, intent(inout)  :: x(:,:)
   type(psb_desc_type), intent(in) :: desc_a
   integer                     :: info
 
@@ -122,7 +122,7 @@ subroutine psb_dfreev(x, desc_a, info)
 
   implicit none
   !....parameters...
-  real(kind(1.d0)),allocatable, intent(inout)    :: x(:)
+  real(psb_dpk_),allocatable, intent(inout)    :: x(:)
   type(psb_desc_type), intent(in) :: desc_a
   integer, intent(out)            :: info 
   !...locals....

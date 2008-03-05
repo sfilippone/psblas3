@@ -91,12 +91,13 @@ C             IERROR < 0   fatal error
 C
 C
       SUBROUTINE ZGELP(TRANS,M,N,P,B,LDB,WORK,LWORK,IERROR)
+      use psb_const_mod
       IMPLICIT NONE                                                    
 C     .. Scalar Arguments ..
       INTEGER           LDB, M, N, LWORK, IERROR
       CHARACTER         TRANS
 C     .. Array Arguments ..
-      complex(kind(1.d0))  B(LDB,*), WORK(*)
+      complex(psb_dpk_)  B(LDB,*), WORK(*)
       INTEGER           P(*)
 C     .. Local Scalars ..
       INTEGER           I, J, ERR_ACT

@@ -12,6 +12,14 @@ All the data types and the basic subroutine interfaces are defined in
 the module \verb|psb_base_mod|; this will have to be included by every
 user subroutine that makes use of the library. 
 
+Real and complex data types are parametrized with a kind type defined
+in the library as follows: 
+\begin{description}
+\item[psb\_dpk\_] Kind parameter for long precision real and complex
+  data; corresponds to a \verb|DOUBLE PRECISION| declaration and is
+  normally 8 bytes. 
+\end{description}
+
 
 
 \subsection{Descriptor data structure}
@@ -228,7 +236,7 @@ type psb_dspmat_type
    character   :: fida(5)
    character   :: descra(10)
    integer     :: infoa(psb_ifa_size_)
-   real(kind(1.d0)), allocatable :: aspk(:)
+   real(psb_dpk_), allocatable :: aspk(:)
    integer, allocatable :: ia1(:), ia2(:)
    integer, allocatable :: pr(:), pl(:)
 end type psb_dspmat_type
@@ -336,12 +344,12 @@ research.
 
   type psb_dprec_type
     type(psb_dspmat_type), allocatable :: av(:) 
-    real(kind(1.d0)), allocatable      :: d(:)  
+    real(psb_dpk_), allocatable        :: d(:)  
     type(psb_desc_type)                :: desc_data 
     integer, allocatable               :: iprcparm(:) 
-    real(kind(1.d0)), allocatable      :: dprcparm(:) 
+    real(psb_dpk_), allocatable        :: dprcparm(:) 
     integer, allocatable               :: perm(:),  invperm(:) 
-    integer                       :: prec, base_prec
+    integer                            :: prec, base_prec
   end type psb_dprec_type
 
 \end{verbatim}

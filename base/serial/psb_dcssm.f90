@@ -39,13 +39,13 @@ subroutine psb_dcssm(alpha,t,b,beta,c,info,trans,unitd,d)
   implicit none
 
   type(psb_dspmat_type) :: t
-  real(kind(1.d0))      :: alpha, beta, b(:,:), c(:,:)
+  real(psb_dpk_)      :: alpha, beta, b(:,:), c(:,:)
   integer               :: info
   character, optional   :: trans, unitd
-  real(kind(1.d0)), optional, target :: d(:)
+  real(psb_dpk_), optional, target :: d(:)
   
-  real(kind(1.d0)), allocatable :: work(:)
-  real(kind(1.d0)), pointer :: ddl(:)
+  real(psb_dpk_), allocatable :: work(:)
+  real(psb_dpk_), pointer :: ddl(:)
   character :: lt, lu
   integer   :: iwsz,m,n,lb,lc,err_act
   character(len=20) :: name

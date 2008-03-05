@@ -32,11 +32,12 @@ C
       SUBROUTINE DCOOSM(TRANST,M,N,UNITD,D,ALPHA,DESCRA,A,IA,JA,INFOA,
      *                  B,LDB,BETA,C,LDC,WORK,LWORK,IERROR)
       use psb_error_mod
+      use psb_const_mod
       IMPLICIT NONE
-      DOUBLE PRECISION  ALPHA, BETA
+      real(psb_dpk_)  ALPHA, BETA
       INTEGER           LDB, LDC, LWORK, M, N, IERROR
       CHARACTER         UNITD, TRANST
-      DOUBLE PRECISION  A(*), B(LDB,*), C(LDC,*), D(*), WORK(*)
+      real(psb_dpk_)  A(*), B(LDB,*), C(LDC,*), D(*), WORK(*)
       INTEGER           IA(*), JA(*), INFOA(*), INT_VAL(5)
       CHARACTER         DESCRA*11
       INTEGER           I, K, ERR_ACT

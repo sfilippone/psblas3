@@ -138,7 +138,7 @@ contains
     integer       :: n, i,numflag,nedc,wgflag
     character(len=5)     :: fida
     integer, parameter :: nb=512
-    real(kind(1.d0)), parameter :: seed=12345.d0
+    real(psb_dpk_), parameter :: seed=12345.d0
     integer          :: iopt(10),idummy(2),jdummy(2)
 
 #if defined(HAVE_METIS)

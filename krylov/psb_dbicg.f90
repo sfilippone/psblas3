@@ -104,16 +104,16 @@ subroutine psb_dbicg(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,istop)
   type(psb_dspmat_type), intent(in)  :: a
   type(psb_dprec_type), intent(in)   :: prec 
   type(psb_desc_type), intent(in)    :: desc_a
-  real(kind(1.d0)), intent(in)       :: b(:)
-  real(kind(1.d0)), intent(inout)    :: x(:)
-  real(kind(1.d0)), intent(in)       :: eps
+  real(psb_dpk_), intent(in)       :: b(:)
+  real(psb_dpk_), intent(inout)    :: x(:)
+  real(psb_dpk_), intent(in)       :: eps
   integer, intent(out)               :: info
   integer, optional, intent(in)      :: itmax, itrace, istop
   integer, optional, intent(out)     :: iter
-  real(kind(1.d0)), optional, intent(out) :: err
+  real(psb_dpk_), optional, intent(out) :: err
 !!$   local data
-  real(kind(1.d0)), allocatable, target  :: aux(:),wwrk(:,:)
-  real(kind(1.d0)), pointer  :: ww(:), q(:),&
+  real(psb_dpk_), allocatable, target  :: aux(:),wwrk(:,:)
+  real(psb_dpk_), pointer  :: ww(:), q(:),&
        & r(:), p(:), zt(:), pt(:), z(:), rt(:),qt(:)
   integer           :: int_err(5)
   integer       ::itmax_, naux, mglob, it, itrace_,&
@@ -122,7 +122,7 @@ subroutine psb_dbicg(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,istop)
   logical, parameter :: exchange=.true., noexchange=.false.  
   integer, parameter :: irmax = 8
   integer            :: itx, isvch, ictxt
-  real(kind(1.d0))   :: alpha, beta, rho, rho_old, sigma
+  real(psb_dpk_)   :: alpha, beta, rho, rho_old, sigma
   type(psb_itconv_type) :: stopdat
   character(len=20)           :: name,ch_err
   character(len=*), parameter :: methdname='BiCG'

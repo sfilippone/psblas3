@@ -44,7 +44,7 @@ C     .. Scalar Arguments ..
       INTEGER            LARN, LAUX, LIAN1, LIAN2, M, N, IERROR
       CHARACTER          TRANS,UNITD
 C     .. Array Arguments ..
-      complex(kind(1.d0))   AR(*), ARN(*), D(*), AUX(LAUX)
+      complex(psb_dpk_)   AR(*), ARN(*), D(*), AUX(LAUX)
       INTEGER            IA1(*), IA2(*), INFO(*), IAN1(*), IAN2(*),
      *  INFON(*), IP1(*), IP2(*)
       CHARACTER          DESCRA*11, DESCRN*11

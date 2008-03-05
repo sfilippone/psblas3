@@ -53,8 +53,8 @@ subroutine  psb_dgatherm(globx, locx, desc_a, info, iroot)
   use psb_penv_mod
   implicit none
 
-  real(kind(1.d0)), intent(in)    :: locx(:,:)
-  real(kind(1.d0)), intent(out)   :: globx(:,:)
+  real(psb_dpk_), intent(in)    :: locx(:,:)
+  real(psb_dpk_), intent(out)   :: globx(:,:)
   type(psb_desc_type), intent(in) :: desc_a
   integer, intent(out)            :: info
   integer, intent(in), optional   :: iroot
@@ -225,8 +225,8 @@ subroutine  psb_dgatherv(globx, locx, desc_a, info, iroot)
   use psb_penv_mod
   implicit none
 
-  real(kind(1.d0)), intent(in)    :: locx(:)
-  real(kind(1.d0)), intent(out)   :: globx(:)
+  real(psb_dpk_), intent(in)    :: locx(:)
+  real(psb_dpk_), intent(out)   :: globx(:)
   type(psb_desc_type), intent(in) :: desc_a
   integer, intent(out)            :: info
   integer, intent(in), optional   :: iroot

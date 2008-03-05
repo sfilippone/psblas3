@@ -38,8 +38,8 @@
 !   it is capable of pruning empty exchanges, which are very likely in out 
 !   application environment. All the variants have the same structure 
 !   In all these subroutines X may be:    I    Integer
-!                                         D    real(kind(1.d0))
-!                                         Z    complex(kind(1.d0))
+!                                         D    real(psb_dpk_)
+!                                         Z    complex(psb_dpk_)
 !   Basically the operation is as follows: on each process, we identify 
 !   sections SND(Y) and RCV(Y); then we do a send on (PACK(SND(Y)));
 !   then we receive, and we do an update with Y = UNPACK(RCV(Y)) + BETA * Y 
@@ -528,8 +528,8 @@ end subroutine psi_iswapidxm
 !   it is capable of pruning empty exchanges, which are very likely in out 
 !   application environment. All the variants have the same structure 
 !   In all these subroutines X may be:    I    Integer
-!                                         D    real(kind(1.d0))
-!                                         Z    complex(kind(1.d0))
+!                                         D    real(psb_dpk_)
+!                                         Z    complex(psb_dpk_)
 !   Basically the operation is as follows: on each process, we identify 
 !   sections SND(Y) and RCV(Y); then we do a SEND(PACK(SND(Y)));
 !   then we receive, and we do an update with Y = UNPACK(RCV(Y)) + BETA * Y 

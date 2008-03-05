@@ -30,7 +30,7 @@ C POSSIBILITY OF SUCH DAMAGE.
 C
 C 
 C     ... Compute infinity norma for sparse matrix in CSR Format ...
-      DOUBLE PRECISION FUNCTION DJADNR(TRANS,M,N,NG,A,KA,JA,IA,
+      real(psb_dpk_) FUNCTION DJADNR(TRANS,M,N,NG,A,KA,JA,IA,
      +  INFOA,IERROR)
       use psb_const_mod
       use psb_spmat_type
@@ -40,11 +40,11 @@ C     .. Scalar Arguments ..
       CHARACTER         TRANS
 C     .. Array Arguments ..
       INTEGER           KA(*),JA(*),IA(3,*),INFOA(*)
-      DOUBLE PRECISION  A(*)
+      real(psb_dpk_)  A(*)
 C     ... Local Array ..
-      DOUBLE PRECISION NRMI_BLOCK(PSB_MAXJDROWS_)
+      real(psb_dpk_) NRMI_BLOCK(PSB_MAXJDROWS_)
 C     ... Local Scalars ..
-      DOUBLE PRECISION NRMI
+      real(psb_dpk_) NRMI
       INTEGER I, K, IPG, NPG, IPX
 
       IERROR=0

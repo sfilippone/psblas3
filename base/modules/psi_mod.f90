@@ -100,8 +100,8 @@ module psi_mod
       use psb_descriptor_type
       integer, intent(in)  :: flag, n
       integer, intent(out) :: info
-      real(kind(1.d0))     :: y(:,:), beta
-      real(kind(1.d0)),target      :: work(:)
+      real(psb_dpk_)     :: y(:,:), beta
+      real(psb_dpk_),target      :: work(:)
       type(psb_desc_type), target  :: desc_a
       integer, optional    :: data
     end subroutine psi_dswapdatam
@@ -109,23 +109,25 @@ module psi_mod
       use psb_descriptor_type
       integer, intent(in)  :: flag
       integer, intent(out) :: info
-      real(kind(1.d0))     :: y(:), beta 
-      real(kind(1.d0)),target      :: work(:)
+      real(psb_dpk_)     :: y(:), beta 
+      real(psb_dpk_),target      :: work(:)
       type(psb_desc_type), target  :: desc_a
       integer, optional    :: data
     end subroutine psi_dswapdatav
     subroutine psi_dswapidxm(ictxt,icomm,flag,n,beta,y,idx,totxch,totsnd,totrcv,work,info)
+      use psb_const_mod
       integer, intent(in)  :: ictxt,icomm,flag, n
       integer, intent(out) :: info
-      real(kind(1.d0))     :: y(:,:), beta
-      real(kind(1.d0)),target :: work(:)
+      real(psb_dpk_)     :: y(:,:), beta
+      real(psb_dpk_),target :: work(:)
       integer, intent(in)  :: idx(:),totxch,totsnd,totrcv
     end subroutine psi_dswapidxm
     subroutine psi_dswapidxv(ictxt,icomm,flag,beta,y,idx,totxch,totsnd,totrcv,work,info)
+      use psb_const_mod
       integer, intent(in)  :: ictxt,icomm,flag
       integer, intent(out) :: info
-      real(kind(1.d0))     :: y(:), beta
-      real(kind(1.d0)),target :: work(:)
+      real(psb_dpk_)     :: y(:), beta
+      real(psb_dpk_),target :: work(:)
       integer, intent(in)  :: idx(:),totxch,totsnd,totrcv
     end subroutine psi_dswapidxv
     subroutine psi_iswapdatam(flag,n,beta,y,desc_a,work,info,data)
@@ -147,6 +149,7 @@ module psi_mod
       integer, optional    :: data
     end subroutine psi_iswapdatav
     subroutine psi_iswapidxm(ictxt,icomm,flag,n,beta,y,idx,totxch,totsnd,totrcv,work,info)
+      use psb_const_mod
       integer, intent(in)  :: ictxt,icomm,flag, n
       integer, intent(out) :: info
       integer              :: y(:,:), beta
@@ -154,6 +157,7 @@ module psi_mod
       integer, intent(in)  :: idx(:),totxch,totsnd,totrcv
     end subroutine psi_iswapidxm
     subroutine psi_iswapidxv(ictxt,icomm,flag,beta,y,idx,totxch,totsnd,totrcv,work,info)
+      use psb_const_mod
       integer, intent(in)  :: ictxt,icomm,flag
       integer, intent(out) :: info
       integer              :: y(:), beta
@@ -164,8 +168,8 @@ module psi_mod
       use psb_descriptor_type
       integer, intent(in)  :: flag, n
       integer, intent(out) :: info
-      complex(kind(1.d0))     :: y(:,:), beta
-      complex(kind(1.d0)),target   :: work(:)
+      complex(psb_dpk_)     :: y(:,:), beta
+      complex(psb_dpk_),target   :: work(:)
       type(psb_desc_type), target  :: desc_a
       integer, optional    :: data
     end subroutine psi_zswapdatam
@@ -173,23 +177,25 @@ module psi_mod
       use psb_descriptor_type
       integer, intent(in)  :: flag
       integer, intent(out) :: info
-      complex(kind(1.d0))     :: y(:), beta
-      complex(kind(1.d0)),target   :: work(:)
+      complex(psb_dpk_)     :: y(:), beta
+      complex(psb_dpk_),target   :: work(:)
       type(psb_desc_type), target  :: desc_a
       integer, optional    :: data
     end subroutine psi_zswapdatav
     subroutine psi_zswapidxm(ictxt,icomm,flag,n,beta,y,idx,totxch,totsnd,totrcv,work,info)
+      use psb_const_mod
       integer, intent(in)  :: ictxt,icomm,flag, n
       integer, intent(out) :: info
-      complex(kind(1.d0))     :: y(:,:), beta
-      complex(kind(1.d0)),target :: work(:)
+      complex(psb_dpk_)     :: y(:,:), beta
+      complex(psb_dpk_),target :: work(:)
       integer, intent(in)  :: idx(:),totxch,totsnd,totrcv
     end subroutine psi_zswapidxm
     subroutine psi_zswapidxv(ictxt,icomm,flag,beta,y,idx,totxch,totsnd,totrcv,work,info)
+      use psb_const_mod
       integer, intent(in)  :: ictxt,icomm,flag
       integer, intent(out) :: info
-      complex(kind(1.d0))     :: y(:), beta
-      complex(kind(1.d0)),target :: work(:)
+      complex(psb_dpk_)     :: y(:), beta
+      complex(psb_dpk_),target :: work(:)
       integer, intent(in)  :: idx(:),totxch,totsnd,totrcv
     end subroutine psi_zswapidxv
   end interface
@@ -200,8 +206,8 @@ module psi_mod
       use psb_descriptor_type
       integer, intent(in)  :: flag, n
       integer, intent(out) :: info
-      real(kind(1.d0))     :: y(:,:), beta
-      real(kind(1.d0)),target     :: work(:)
+      real(psb_dpk_)     :: y(:,:), beta
+      real(psb_dpk_),target     :: work(:)
       type(psb_desc_type), target  :: desc_a
       integer, optional    :: data
     end subroutine psi_dswaptranm
@@ -209,23 +215,25 @@ module psi_mod
       use psb_descriptor_type
       integer, intent(in)  :: flag
       integer, intent(out) :: info
-      real(kind(1.d0))     :: y(:), beta
-      real(kind(1.d0)),target     :: work(:)
+      real(psb_dpk_)     :: y(:), beta
+      real(psb_dpk_),target     :: work(:)
       type(psb_desc_type), target  :: desc_a
       integer, optional    :: data
     end subroutine psi_dswaptranv
     subroutine psi_dtranidxm(ictxt,icomm,flag,n,beta,y,idx,totxch,totsnd,totrcv,work,info)
+      use psb_const_mod
       integer, intent(in)  :: ictxt,icomm,flag, n
       integer, intent(out) :: info
-      real(kind(1.d0))     :: y(:,:), beta
-      real(kind(1.d0)),target :: work(:)
+      real(psb_dpk_)     :: y(:,:), beta
+      real(psb_dpk_),target :: work(:)
       integer, intent(in)  :: idx(:),totxch,totsnd,totrcv
     end subroutine psi_dtranidxm
     subroutine psi_dtranidxv(ictxt,icomm,flag,beta,y,idx,totxch,totsnd,totrcv,work,info)
+      use psb_const_mod
       integer, intent(in)  :: ictxt,icomm,flag
       integer, intent(out) :: info
-      real(kind(1.d0))     :: y(:), beta
-      real(kind(1.d0)),target :: work(:)
+      real(psb_dpk_)     :: y(:), beta
+      real(psb_dpk_),target :: work(:)
       integer, intent(in)  :: idx(:),totxch,totsnd,totrcv
     end subroutine psi_dtranidxv
     subroutine psi_iswaptranm(flag,n,beta,y,desc_a,work,info,data)
@@ -247,6 +255,7 @@ module psi_mod
       integer, optional    :: data
     end subroutine psi_iswaptranv
     subroutine psi_itranidxm(ictxt,icomm,flag,n,beta,y,idx,totxch,totsnd,totrcv,work,info)
+      use psb_const_mod
       integer, intent(in)  :: ictxt,icomm,flag, n
       integer, intent(out) :: info
       integer              :: y(:,:), beta
@@ -254,6 +263,7 @@ module psi_mod
       integer, intent(in)  :: idx(:),totxch,totsnd,totrcv
     end subroutine psi_itranidxm
     subroutine psi_itranidxv(ictxt,icomm,flag,beta,y,idx,totxch,totsnd,totrcv,work,info)
+      use psb_const_mod
       integer, intent(in)  :: ictxt,icomm,flag
       integer, intent(out) :: info
       integer              :: y(:), beta
@@ -264,8 +274,8 @@ module psi_mod
       use psb_descriptor_type
       integer, intent(in)  :: flag, n
       integer, intent(out) :: info
-      complex(kind(1.d0))     :: y(:,:), beta
-      complex(kind(1.d0)),target   :: work(:)
+      complex(psb_dpk_)     :: y(:,:), beta
+      complex(psb_dpk_),target   :: work(:)
       type(psb_desc_type), target  :: desc_a
       integer, optional    :: data
     end subroutine psi_zswaptranm
@@ -273,23 +283,25 @@ module psi_mod
       use psb_descriptor_type
       integer, intent(in)  :: flag
       integer, intent(out) :: info
-      complex(kind(1.d0))     :: y(:), beta
-      complex(kind(1.d0)),target   :: work(:)       
+      complex(psb_dpk_)     :: y(:), beta
+      complex(psb_dpk_),target   :: work(:)       
       type(psb_desc_type), target  :: desc_a
       integer, optional    :: data
     end subroutine psi_zswaptranv
     subroutine psi_ztranidxm(ictxt,icomm,flag,n,beta,y,idx,totxch,totsnd,totrcv,work,info)
+      use psb_const_mod
       integer, intent(in)  :: ictxt,icomm,flag, n
       integer, intent(out) :: info
-      complex(kind(1.d0))     :: y(:,:), beta
-      complex(kind(1.d0)), target :: work(:)
+      complex(psb_dpk_)     :: y(:,:), beta
+      complex(psb_dpk_), target :: work(:)
       integer, intent(in)  :: idx(:),totxch,totsnd,totrcv
     end subroutine psi_ztranidxm
     subroutine psi_ztranidxv(ictxt,icomm,flag,beta,y,idx,totxch,totsnd,totrcv,work,info)
+      use psb_const_mod
       integer, intent(in)  :: ictxt,icomm,flag
       integer, intent(out) :: info
-      complex(kind(1.d0))     :: y(:), beta
-      complex(kind(1.d0)), target :: work(:)
+      complex(psb_dpk_)     :: y(:), beta
+      complex(psb_dpk_), target :: work(:)
       integer, intent(in)  :: idx(:),totxch,totsnd,totrcv
     end subroutine psi_ztranidxv
   end interface
@@ -678,7 +690,7 @@ contains
     use psb_penv_mod
     implicit none
 
-    real(kind(1.d0)), intent(inout), target :: x(:)
+    real(psb_dpk_), intent(inout), target :: x(:)
     type(psb_desc_type), intent(in)         :: desc_a
     integer, intent(in)                     :: update
     integer, intent(out)                    :: info
@@ -750,7 +762,7 @@ contains
     use psb_penv_mod
     implicit none
 
-    real(kind(1.d0)), intent(inout), target :: x(:,:)
+    real(psb_dpk_), intent(inout), target :: x(:,:)
     type(psb_desc_type), intent(in)         :: desc_a
     integer, intent(in)                     :: update
     integer, intent(out)                    :: info
@@ -821,7 +833,7 @@ contains
     use psb_penv_mod
     implicit none
 
-    complex(kind(1.d0)), intent(inout), target :: x(:)
+    complex(psb_dpk_), intent(inout), target :: x(:)
     type(psb_desc_type), intent(in)         :: desc_a
     integer, intent(in)                     :: update
     integer, intent(out)                    :: info
@@ -893,7 +905,7 @@ contains
     use psb_penv_mod
     implicit none
 
-    complex(kind(1.d0)), intent(inout), target :: x(:,:)
+    complex(psb_dpk_), intent(inout), target :: x(:,:)
     type(psb_desc_type), intent(in)         :: desc_a
     integer, intent(in)                     :: update
     integer, intent(out)                    :: info
@@ -1112,8 +1124,8 @@ contains
     use psb_penv_mod
     implicit none
 
-    real(kind(1.d0)), intent(inout)  :: x(:)
-    real(kind(1.d0)), allocatable    :: xs(:)
+    real(psb_dpk_), intent(inout)  :: x(:)
+    real(psb_dpk_), allocatable    :: xs(:)
     type(psb_desc_type), intent(in)  :: desc_a
     integer, intent(out)             :: info
 
@@ -1166,8 +1178,8 @@ contains
     use psb_penv_mod
     implicit none
 
-    real(kind(1.d0)), intent(inout)  :: x(:)
-    real(kind(1.d0))                 :: xs(:)
+    real(psb_dpk_), intent(inout)  :: x(:)
+    real(psb_dpk_)                 :: xs(:)
     type(psb_desc_type), intent(in)  :: desc_a
     integer, intent(out)             :: info
 
@@ -1216,8 +1228,8 @@ contains
     use psb_penv_mod
     implicit none
 
-    real(kind(1.d0)), intent(inout)  :: x(:,:)
-    real(kind(1.d0)), allocatable    :: xs(:,:)
+    real(psb_dpk_), intent(inout)  :: x(:,:)
+    real(psb_dpk_), allocatable    :: xs(:,:)
     type(psb_desc_type), intent(in)  :: desc_a
     integer, intent(out)             :: info
 
@@ -1271,8 +1283,8 @@ contains
     use psb_penv_mod
     implicit none
 
-    real(kind(1.d0)), intent(inout)  :: x(:,:)
-    real(kind(1.d0))                 :: xs(:,:)
+    real(psb_dpk_), intent(inout)  :: x(:,:)
+    real(psb_dpk_)                 :: xs(:,:)
     type(psb_desc_type), intent(in)  :: desc_a
     integer, intent(out)             :: info
 
@@ -1329,8 +1341,8 @@ contains
     use psb_penv_mod
     implicit none
 
-    complex(kind(1.d0)), intent(inout)  :: x(:)
-    complex(kind(1.d0)), allocatable    :: xs(:)
+    complex(psb_dpk_), intent(inout)  :: x(:)
+    complex(psb_dpk_), allocatable    :: xs(:)
     type(psb_desc_type), intent(in)  :: desc_a
     integer, intent(out)             :: info
 
@@ -1383,8 +1395,8 @@ contains
     use psb_penv_mod
     implicit none
     
-    complex(kind(1.d0)), intent(inout)  :: x(:)
-    complex(kind(1.d0))                 :: xs(:)
+    complex(psb_dpk_), intent(inout)  :: x(:)
+    complex(psb_dpk_)                 :: xs(:)
     type(psb_desc_type), intent(in)  :: desc_a
     integer, intent(out)             :: info
 
@@ -1433,8 +1445,8 @@ contains
     use psb_penv_mod
     implicit none
 
-    complex(kind(1.d0)), intent(inout)  :: x(:,:)
-    complex(kind(1.d0)), allocatable    :: xs(:,:)
+    complex(psb_dpk_), intent(inout)  :: x(:,:)
+    complex(psb_dpk_), allocatable    :: xs(:,:)
     type(psb_desc_type), intent(in)  :: desc_a
     integer, intent(out)             :: info
 
@@ -1488,8 +1500,8 @@ contains
     use psb_penv_mod
     implicit none
 
-    complex(kind(1.d0)), intent(inout)  :: x(:,:)
-    complex(kind(1.d0))                 :: xs(:,:)
+    complex(psb_dpk_), intent(inout)  :: x(:,:)
+    complex(psb_dpk_)                 :: xs(:,:)
     type(psb_desc_type), intent(in)  :: desc_a
     integer, intent(out)             :: info
 
@@ -1759,7 +1771,7 @@ contains
 !!$    implicit none
 !!$
 !!$    integer :: n, k, idx(:)
-!!$    real(kind(1.d0)) :: x(:,:), y(:)
+!!$    real(psb_dpk_) :: x(:,:), y(:)
 !!$
 !!$    ! Locals
 !!$    integer :: i, j, pt
@@ -1780,7 +1792,7 @@ contains
 !!$    implicit none
 !!$
 !!$    integer :: n, idx(:)
-!!$    real(kind(1.d0)) :: x(:), y(:)
+!!$    real(psb_dpk_) :: x(:), y(:)
 !!$
 !!$    ! Locals
 !!$    integer :: i
@@ -1798,7 +1810,7 @@ contains
 !!$    implicit none
 !!$
 !!$    integer :: n, k, idx(:)
-!!$    real(kind(1.d0)) :: beta, x(:), y(:,:)
+!!$    real(psb_dpk_) :: beta, x(:), y(:,:)
 !!$
 !!$    ! Locals
 !!$    integer :: i, j, pt
@@ -1836,7 +1848,7 @@ contains
 !!$    implicit none
 !!$
 !!$    integer :: n, idx(:)
-!!$    real(kind(1.d0)) :: beta, x(:), y(:)
+!!$    real(psb_dpk_) :: beta, x(:), y(:)
 !!$
 !!$    ! Locals
 !!$    integer :: i
@@ -1969,7 +1981,7 @@ contains
 !!$    implicit none
 !!$
 !!$    integer :: n, k, idx(:)
-!!$    complex(kind(1.d0)) :: x(:,:), y(:)
+!!$    complex(psb_dpk_) :: x(:,:), y(:)
 !!$
 !!$    ! Locals
 !!$    integer :: i, j, pt
@@ -1991,7 +2003,7 @@ contains
 !!$    implicit none
 !!$
 !!$    integer :: n, idx(:)
-!!$    complex(kind(1.d0)) :: x(:), y(:)
+!!$    complex(psb_dpk_) :: x(:), y(:)
 !!$
 !!$    ! Locals
 !!$    integer :: i
@@ -2008,7 +2020,7 @@ contains
 !!$    implicit none
 !!$
 !!$    integer :: n, k, idx(:)
-!!$    complex(kind(1.d0)) :: beta, x(:), y(:,:)
+!!$    complex(psb_dpk_) :: beta, x(:), y(:,:)
 !!$
 !!$    ! Locals
 !!$    integer :: i, j, pt
@@ -2047,7 +2059,7 @@ contains
 !!$    implicit none
 !!$
 !!$    integer :: n, idx(:)
-!!$    complex(kind(1.d0)) :: beta, x(:), y(:)
+!!$    complex(psb_dpk_) :: beta, x(:), y(:)
 !!$
 !!$    ! Locals
 !!$    integer :: i

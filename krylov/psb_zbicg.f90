@@ -103,16 +103,16 @@ subroutine psb_zbicg(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,istop)
   type(psb_zspmat_type), intent(in)  :: a
   type(psb_zprec_type), intent(in)   :: prec 
   type(psb_desc_type), intent(in)    :: desc_a
-  complex(kind(1.d0)), intent(in)    :: b(:)
-  complex(kind(1.d0)), intent(inout) :: x(:)
-  real(kind(1.d0)), intent(in)       :: eps
+  complex(psb_dpk_), intent(in)    :: b(:)
+  complex(psb_dpk_), intent(inout) :: x(:)
+  real(psb_dpk_), intent(in)       :: eps
   integer, intent(out)               :: info
   integer, optional, intent(in)      :: itmax, itrace, istop
   integer, optional, intent(out)     :: iter
-  real(kind(1.d0)), optional, intent(out) :: err
+  real(psb_dpk_), optional, intent(out) :: err
 !!$   local data
-  complex(kind(1.d0)), allocatable, target  :: aux(:),wwrk(:,:)
-  complex(kind(1.d0)), pointer  :: ww(:), q(:),&
+  complex(psb_dpk_), allocatable, target  :: aux(:),wwrk(:,:)
+  complex(psb_dpk_), pointer  :: ww(:), q(:),&
        & r(:), p(:), zt(:), pt(:), z(:), rt(:),qt(:)
   integer           :: int_err(5)
   integer       ::itmax_, naux, mglob, it, itrace_,&
@@ -121,7 +121,7 @@ subroutine psb_zbicg(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,istop)
   logical, parameter :: exchange=.true., noexchange=.false.  
   integer, parameter :: irmax = 8
   integer            :: itx, isvch, ictxt
-  complex(kind(1.d0))   :: alpha, beta, rho, rho_old, sigma
+  complex(psb_dpk_)   :: alpha, beta, rho, rho_old, sigma
   type(psb_itconv_type) :: stopdat
   character(len=20)           :: name,ch_err
   character(len=*), parameter :: methdname='BiCG'

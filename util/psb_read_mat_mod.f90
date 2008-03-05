@@ -50,7 +50,7 @@
 !     On Entry: BLACS context.
 !     On Exit : unchanged.
 !
-!  Real(Kind(1.D0)), Pointer, Optional  :: B(:,:)
+!  Real(psb_dpk_), Pointer, Optional  :: B(:,:)
 !     On Entry: fresh variable.
 !     On Exit:  will contain right hand side(s).
 !
@@ -197,7 +197,7 @@ contains
     integer              :: nrow, ncol, i,root, np,  me,  ircode, j
     character            :: mmheader*15, fmt*15, object*10, type*10, sym*15,&
          & line*1024
-    real(kind(1.d0))     :: bre, bim 
+    real(psb_dpk_)     :: bre, bim 
     complex(kind(1.0d0)), allocatable  :: b(:,:)
     if (present(inroot)) then
       root = inroot

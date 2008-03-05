@@ -33,7 +33,7 @@
 ! Subroutine: 
 ! Arguments:
 
-real(kind(1.d0)) function psb_dcsnmi(a,info,trans)
+real(psb_dpk_) function psb_dcsnmi(a,info,trans)
 
   use psb_spmat_type
   use psb_error_mod
@@ -44,13 +44,14 @@ real(kind(1.d0)) function psb_dcsnmi(a,info,trans)
   character, optional                :: trans
 
   interface
-     real(kind(1.d0)) function dcsnmi(trans,m,n,fida,descra,a,ia1,ia2,&
+     real(psb_dpk_) function dcsnmi(trans,m,n,fida,descra,a,ia1,ia2,&
           &                 infoa,ierror)
+       use psb_const_mod
        integer          ::  m,n, ierror
        character        ::  trans
        integer          ::  ia1(*),ia2(*),infoa(*)
        character        ::  descra*11, fida*5
-       real(kind(1.d0)) ::  a(*)
+       real(psb_dpk_) ::  a(*)
      end function dcsnmi
   end interface
 

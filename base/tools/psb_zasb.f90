@@ -53,7 +53,7 @@ subroutine psb_zasb(x, desc_a, info)
   implicit none
 
   type(psb_desc_type), intent(in) ::  desc_a
-  complex(kind(1.d0)), allocatable, intent(inout) ::  x(:,:)
+  complex(psb_dpk_), allocatable, intent(inout) ::  x(:,:)
   integer, intent(out)            ::  info
 
   ! local variables
@@ -192,7 +192,7 @@ subroutine psb_zasbv(x, desc_a, info)
   implicit none
 
   type(psb_desc_type), intent(in)                 ::  desc_a
-  complex(kind(1.d0)), allocatable, intent(inout) ::  x(:)
+  complex(psb_dpk_), allocatable, intent(inout) ::  x(:)
   integer, intent(out)        ::  info
 
   ! local variables

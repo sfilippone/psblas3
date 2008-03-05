@@ -154,14 +154,15 @@ C
 C
       SUBROUTINE ZSWSM(TRANS,M,N,ALPHA,UNITD,D,FIDT,DESCRT,T,IT1,IT2,
      &                 INFOT,B,LDB,BETA,C,LDC,WORK,LWORK,IERROR)
+      use psb_const_mod
 C     .. Scalar Arguments ..
       INTEGER    M, N, LDB, LDC, LWORK, IERROR
       CHARACTER  UNITD, TRANS
-      COMPLEX*16 ALPHA, BETA
+      complex(psb_dpk_) ALPHA, BETA
 C     .. Array Arguments ..
       INTEGER    IT1(*), IT2(*), INFOT(*)
       CHARACTER  DESCRT*11, FIDT*5
-      COMPLEX*16 T(*), B(LDB,*), C(LDC,*), D(*), WORK(*)
+      complex(psb_dpk_) T(*), B(LDB,*), C(LDC,*), D(*), WORK(*)
       integer    ERR_ACT
 C     .. Local Scalars ..
       INTEGER    ONE

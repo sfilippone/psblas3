@@ -47,10 +47,10 @@ program zf_sample
   type(psb_zprec_type)  :: prec
 
   ! dense matrices
-  complex(kind(1.d0)), allocatable, target ::  aux_b(:,:), d(:)
-  complex(kind(1.d0)), allocatable , save  :: b_col(:), x_col(:), r_col(:), &
+  complex(psb_dpk_), allocatable, target ::  aux_b(:,:), d(:)
+  complex(psb_dpk_), allocatable , save  :: b_col(:), x_col(:), r_col(:), &
        & x_col_glob(:), r_col_glob(:)
-  complex(kind(1.d0)), pointer  :: b_col_glob(:)
+  complex(psb_dpk_), pointer  :: b_col_glob(:)
 
   ! communications data structure
   type(psb_desc_type):: desc_a
@@ -60,7 +60,7 @@ program zf_sample
   ! solver paramters
   integer            :: iter, itmax, ierr, itrace, ircode, ipart,&
        & methd, istopc, irst,amatsize,precsize,descsize
-  real(kind(1.d0))   :: err, eps
+  real(psb_dpk_)   :: err, eps
 
   character(len=5)   :: afmt
   character(len=20)  :: name
@@ -69,7 +69,7 @@ program zf_sample
   ! other variables
   integer            :: i,info,j,m_problem
   integer            :: internal, m,ii,nnzero
-  real(kind(1.d0)) :: t1, t2, tprec, r_amax, b_amax,&
+  real(psb_dpk_) :: t1, t2, tprec, r_amax, b_amax,&
        &scale,resmx,resmxp
   integer :: nrhs, nrow, n_row, dim, nv, ne
   integer, allocatable :: ivg(:), ipv(:)
@@ -208,12 +208,14 @@ program zf_sample
      write(*,'(" ")')
   end if
 
+  call psb_set_debug_level(0)
   iparm = 0
   call psb_barrier(ictxt)
   t1 = psb_wtime()
   call psb_krylov(kmethd,a,prec,b_col,x_col,eps,desc_a,info,& 
        & itmax=itmax,iter=iter,err=err,itrace=itrace,istop=istopc,irst=irst)     
   call psb_barrier(ictxt)
+  call psb_set_debug_level(0)
   t2 = psb_wtime() - t1
   call psb_amx(ictxt,t2)
   call psb_geaxpby(zone,b_col,zzero,r_col,desc_a,info)

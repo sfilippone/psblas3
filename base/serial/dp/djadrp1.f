@@ -103,6 +103,7 @@ C
 C
       SUBROUTINE DJADRP1(TRANS,M,N,DESCRA,NG,KA,IA,JA,
      +   P,IWORK,LWORK,IERROR)
+      use psb_const_mod
       use psb_string_mod
       IMPLICIT NONE                                                      
 C     .. Scalar Arguments ..

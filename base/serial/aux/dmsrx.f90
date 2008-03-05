@@ -36,13 +36,13 @@ subroutine dmsrx(n,x,indx,idir,flag)
   use psb_serial_mod
   implicit none
   integer :: n,idir,flag
-  real(kind(1.d0)) :: x(n)
+  real(psb_dpk_) :: x(n)
   integer :: indx(n)
 
   integer, allocatable :: iaux(:)
 
   integer :: iret, info, lp, k,lswap, ixswap
-  real(kind(1.d0)) :: swap
+  real(psb_dpk_) :: swap
 
   if (n<0) then 
     write(0,*) 'Error: DMSRX: N<0'

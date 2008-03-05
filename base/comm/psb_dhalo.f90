@@ -64,11 +64,11 @@ subroutine  psb_dhalom(x,desc_a,info,alpha,jx,ik,work,tran,mode,data)
   use psb_penv_mod
   implicit none
 
-  real(kind(1.d0)), intent(inout), target   :: x(:,:)
+  real(psb_dpk_), intent(inout), target   :: x(:,:)
   type(psb_desc_type), intent(in)           :: desc_a
   integer, intent(out)                      :: info
-  real(kind(1.d0)), intent(in), optional    :: alpha
-  real(kind(1.d0)), optional, target        :: work(:)
+  real(psb_dpk_), intent(in), optional    :: alpha
+  real(psb_dpk_), optional, target        :: work(:)
   integer, intent(in), optional             :: mode,jx,ik,data
   character, intent(in), optional           :: tran
 
@@ -76,7 +76,7 @@ subroutine  psb_dhalom(x,desc_a,info,alpha,jx,ik,work,tran,mode,data)
   integer                  :: ictxt, np, me,&
        & err_act, m, n, iix, jjx, ix, ijx, k, maxk, nrow, imode, i,&
        & err, liwork,data_
-  real(kind(1.d0)),pointer :: iwork(:), xp(:,:)
+  real(psb_dpk_),pointer :: iwork(:), xp(:,:)
   character                :: tran_
   character(len=20)        :: name, ch_err
   logical                  :: aliw
@@ -291,11 +291,11 @@ subroutine  psb_dhalov(x,desc_a,info,alpha,work,tran,mode,data)
   use psb_penv_mod
   implicit none
 
-  real(kind(1.d0)), intent(inout)           :: x(:)
+  real(psb_dpk_), intent(inout)           :: x(:)
   type(psb_desc_type), intent(in)           :: desc_a
   integer, intent(out)                      :: info
-  real(kind(1.d0)), intent(in), optional    :: alpha
-  real(kind(1.d0)), target, optional        :: work(:)
+  real(psb_dpk_), intent(in), optional    :: alpha
+  real(psb_dpk_), target, optional        :: work(:)
   integer, intent(in), optional             :: mode,data
   character, intent(in), optional           :: tran
 
@@ -303,7 +303,7 @@ subroutine  psb_dhalov(x,desc_a,info,alpha,work,tran,mode,data)
   integer                  :: ictxt, np, me,&
        & err_act, m, n, iix, jjx, ix, ijx, nrow, imode,&
        & err, liwork,data_
-  real(kind(1.d0)),pointer :: iwork(:)
+  real(psb_dpk_),pointer :: iwork(:)
   character                :: tran_
   character(len=20)        :: name, ch_err
   logical                  :: aliw

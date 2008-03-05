@@ -87,14 +87,14 @@ subroutine  psb_zspsm(alpha,a,x,beta,y,desc_a,info,&
   use psb_penv_mod
   implicit none
 
-  complex(kind(1.D0)), intent(in)              :: alpha, beta
-  complex(kind(1.d0)), intent(in), target      :: x(:,:)
-  complex(kind(1.d0)), intent(inout), target   :: y(:,:)
+  complex(psb_dpk_), intent(in)              :: alpha, beta
+  complex(psb_dpk_), intent(in), target      :: x(:,:)
+  complex(psb_dpk_), intent(inout), target   :: y(:,:)
   type (psb_zspmat_type), intent(in)        :: a
   type(psb_desc_type), intent(in)           :: desc_a
   integer, intent(out)                      :: info
-  complex(kind(1.d0)), intent(in), optional, target      :: diag(:)
-  complex(kind(1.d0)), optional, target       :: work(:)
+  complex(psb_dpk_), intent(in), optional, target      :: diag(:)
+  complex(psb_dpk_), optional, target       :: work(:)
   character, intent(in), optional           :: trans, unitd
   integer, intent(in), optional             :: choice
   integer, intent(in), optional             :: k, jx, jy
@@ -107,7 +107,7 @@ subroutine  psb_zspsm(alpha,a,x,beta,y,desc_a,info,&
 
   character                :: lunitd
   integer, parameter       :: nb=4
-  complex(kind(1.d0)),pointer :: iwork(:), xp(:,:), yp(:,:), id(:)
+  complex(psb_dpk_),pointer :: iwork(:), xp(:,:), yp(:,:), id(:)
   character                :: itrans
   character(len=20)        :: name, ch_err
   logical                  :: aliw
@@ -375,14 +375,14 @@ subroutine  psb_zspsv(alpha,a,x,beta,y,desc_a,info,&
   use psb_penv_mod
   implicit none 
 
-  complex(kind(1.D0)), intent(in)              :: alpha, beta
-  complex(kind(1.d0)), intent(in), target      :: x(:)
-  complex(kind(1.d0)), intent(inout), target   :: y(:)
+  complex(psb_dpk_), intent(in)              :: alpha, beta
+  complex(psb_dpk_), intent(in), target      :: x(:)
+  complex(psb_dpk_), intent(inout), target   :: y(:)
   type(psb_zspmat_type), intent(in)         :: a
   type(psb_desc_type), intent(in)           :: desc_a
   integer, intent(out)                      :: info
-  complex(kind(1.d0)), intent(in), optional, target    :: diag(:)
-  complex(kind(1.d0)), optional, target      :: work(:)
+  complex(psb_dpk_), intent(in), optional, target    :: diag(:)
+  complex(psb_dpk_), optional, target      :: work(:)
   character, intent(in), optional           :: trans, unitd
   integer, intent(in), optional             :: choice
 
@@ -394,7 +394,7 @@ subroutine  psb_zspsv(alpha,a,x,beta,y,desc_a,info,&
 
   character                :: lunitd
   integer, parameter       :: nb=4
-  complex(kind(1.d0)),pointer :: iwork(:), xp(:), yp(:), id(:)
+  complex(psb_dpk_),pointer :: iwork(:), xp(:), yp(:), id(:)
   character                :: itrans
   character(len=20)        :: name, ch_err
   logical                  :: aliw

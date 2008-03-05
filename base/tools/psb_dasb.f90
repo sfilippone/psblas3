@@ -53,7 +53,7 @@ subroutine psb_dasb(x, desc_a, info)
   implicit none
 
   type(psb_desc_type), intent(in) ::  desc_a
-  real(kind(1.d0)), allocatable, intent(inout)       ::  x(:,:)
+  real(psb_dpk_), allocatable, intent(inout)       ::  x(:,:)
   integer, intent(out)            ::  info
 
   ! local variables
@@ -192,7 +192,7 @@ subroutine psb_dasbv(x, desc_a, info)
   implicit none
 
   type(psb_desc_type), intent(in) ::  desc_a
-  real(kind(1.d0)), allocatable, intent(inout)   ::  x(:)
+  real(psb_dpk_), allocatable, intent(inout)   ::  x(:)
   integer, intent(out)        ::  info
 
   ! local variables

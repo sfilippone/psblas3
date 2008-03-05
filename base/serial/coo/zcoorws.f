@@ -30,6 +30,7 @@ C POSSIBILITY OF SUCH DAMAGE.
 C
       SUBROUTINE ZCOORWS(TRANS,M,N,DESCRA,A,IA1,IA2,
      &  INFOA,ROWSUM,IERROR)
+      use psb_const_mod
       IMPLICIT NONE
 C     .. Scalar Arguments ..
       INTEGER           M,N, IERROR
@@ -37,10 +38,10 @@ C     .. Scalar Arguments ..
 C     .. Array Arguments ..
       INTEGER           IA1(*),IA2(*),INFOA(*)
       CHARACTER         DESCRA*11
-      COMPLEX*16        A(*), ROWSUM(*)
+      complex(psb_dpk_)        A(*), ROWSUM(*)
 C     .. Local scalars ..
       INTEGER I, J, NNZ, K
-      DOUBLE PRECISION  SUM
+      real(psb_dpk_)  SUM
       logical psb_lsame
       external psb_lsame
 

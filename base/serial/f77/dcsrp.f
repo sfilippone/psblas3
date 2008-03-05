@@ -119,6 +119,7 @@ C
 C
       SUBROUTINE DCSRP(TRANS,M,N,FIDA,DESCRA,IA1,IA2,INFOA,
      +  P,WORK,LWORK,IERROR)
+      use psb_const_mod
       use psb_error_mod
       IMPLICIT NONE                                                      
 C     .. Scalar Arguments ..
@@ -127,7 +128,7 @@ C     .. Scalar Arguments ..
 C     .. Local Scalars..
       INTEGER          ERR_ACT
 C     .. Array Arguments ..
-      DOUBLE PRECISION WORK(LWORK)
+      real(psb_dpk_) WORK(LWORK)
       INTEGER          IA1(*), IA2(*), INFOA(*), P(*), INT_VAL(5)
       CHARACTER        DESCRA*11, FIDA*5
 C     .. External Subroutines ..

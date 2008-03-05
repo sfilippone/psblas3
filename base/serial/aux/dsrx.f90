@@ -38,11 +38,11 @@ subroutine dsrx(n,x,indx,dir,flag)
   !
   !     .. Scalar Arguments ..
   integer, intent(in) :: n, dir, flag
-  real(kind(1.d0)) ::  x(n)
+  real(psb_dpk_) ::  x(n)
   integer ::  indx(n)
   !     ..
   !     .. Local Scalars ..
-  real(kind(1.d0)) :: piv, xk, xt
+  real(psb_dpk_) :: piv, xk, xt
   integer i, j, ilx, iux, istp, lpiv
   integer ixt, n1, n2
 
@@ -356,10 +356,10 @@ contains
   subroutine idsrx_up(n,x,indx)
     implicit none
     integer :: n
-    real(kind(1.d0)) :: x(n)
+    real(psb_dpk_) :: x(n)
     integer :: indx(n)
     integer :: i,j,ix
-    real(kind(1.d0)) :: xx
+    real(psb_dpk_) :: xx
 
     do j=n-1,1,-1
       if (x(j+1) < x(j)) then
@@ -382,10 +382,10 @@ contains
   subroutine idsrx_dw(n,x,indx)
     implicit none
     integer :: n
-    real(kind(1.d0)) :: x(n)
+    real(psb_dpk_) :: x(n)
     integer :: indx(n)
     integer :: i,j,ix
-    real(kind(1.d0)) :: xx
+    real(psb_dpk_) :: xx
 
     do j=n-1,1,-1
       if (x(j+1) > x(j)) then

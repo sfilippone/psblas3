@@ -53,16 +53,16 @@ function psb_dasum (x,desc_a, info, jx)
   use psb_penv_mod
   implicit none
 
-  real(kind(1.d0)), intent(in)      :: x(:,:)
+  real(psb_dpk_), intent(in)      :: x(:,:)
   type(psb_desc_type), intent(in)   :: desc_a
   integer, intent(out)              :: info
   integer, optional, intent(in)     :: jx
-  real(kind(1.d0))                  :: psb_dasum
+  real(psb_dpk_)                  :: psb_dasum
 
   ! locals
   integer           :: ictxt, np, me, err_act, &
        &      iix, jjx, ix, ijx, m, i, idx, ndm
-  real(kind(1.d0))  :: asum, dasum
+  real(psb_dpk_)  :: asum, dasum
   character(len=20) :: name, ch_err
 
   name='psb_dasum'
@@ -197,14 +197,14 @@ function psb_dasumv (x,desc_a, info)
   use psb_penv_mod
   implicit none
 
-  real(kind(1.d0)), intent(in)      :: x(:)
+  real(psb_dpk_), intent(in)      :: x(:)
   type(psb_desc_type), intent(in)   :: desc_a
   integer, intent(out)              :: info
-  real(kind(1.d0))                  :: psb_dasumv
+  real(psb_dpk_)                  :: psb_dasumv
 
   ! locals
   integer            :: ictxt, np, me, err_act, iix, jjx, jx, ix, m, i, idx, ndm
-  real(kind(1.d0))   :: asum, dasum
+  real(psb_dpk_)   :: asum, dasum
   character(len=20)  :: name, ch_err
 
   name='psb_dasumv'
@@ -334,14 +334,14 @@ subroutine psb_dasumvs(res,x,desc_a, info)
   use psb_penv_mod
   implicit none
 
-  real(kind(1.d0)), intent(in)      :: x(:)
-  real(kind(1.d0)), intent(out)     :: res
+  real(psb_dpk_), intent(in)      :: x(:)
+  real(psb_dpk_), intent(out)     :: res
   type(psb_desc_type), intent(in)   :: desc_a
   integer, intent(out)              :: info
 
   ! locals
   integer            :: ictxt, np, me, err_act, iix, jjx, ix, jx, m, i, idx, ndm
-  real(kind(1.d0))   :: asum, dasum
+  real(psb_dpk_)   :: asum, dasum
   character(len=20)  :: name, ch_err
 
   name='psb_dasumvs'

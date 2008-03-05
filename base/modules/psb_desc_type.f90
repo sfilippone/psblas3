@@ -382,20 +382,20 @@ contains
     integer, external :: SizeofPairSearchTree
 
     val = 0
-    if (allocated(desc%matrix_data))  val = val + 4*size(desc%matrix_data)
-    if (allocated(desc%halo_index))   val = val + 4*size(desc%halo_index)
-    if (allocated(desc%ext_index))    val = val + 4*size(desc%ext_index)
-    if (allocated(desc%bnd_elem))     val = val + 4*size(desc%bnd_elem)
-    if (allocated(desc%ovrlap_index)) val = val + 4*size(desc%ovrlap_index)
-    if (allocated(desc%ovrlap_elem))  val = val + 4*size(desc%ovrlap_elem)
-    if (allocated(desc%ovr_mst_idx))  val = val + 4*size(desc%ovr_mst_idx)
-    if (allocated(desc%loc_to_glob))  val = val + 4*size(desc%loc_to_glob)    
-    if (allocated(desc%glob_to_loc))  val = val + 4*size(desc%glob_to_loc)
-    if (allocated(desc%hashv))        val = val + 4*size(desc%hashv)
-    if (allocated(desc%glb_lc))       val = val + 4*size(desc%glb_lc)
-    if (allocated(desc%lprm))         val = val + 4*size(desc%lprm)
-    if (allocated(desc%idx_space))    val = val + 4*size(desc%idx_space)
-    if (allocated(desc%ptree))        val = val + 4*size(desc%ptree) +&
+    if (allocated(desc%matrix_data))  val = val + psb_sizeof_int*size(desc%matrix_data)
+    if (allocated(desc%halo_index))   val = val + psb_sizeof_int*size(desc%halo_index)
+    if (allocated(desc%ext_index))    val = val + psb_sizeof_int*size(desc%ext_index)
+    if (allocated(desc%bnd_elem))     val = val + psb_sizeof_int*size(desc%bnd_elem)
+    if (allocated(desc%ovrlap_index)) val = val + psb_sizeof_int*size(desc%ovrlap_index)
+    if (allocated(desc%ovrlap_elem))  val = val + psb_sizeof_int*size(desc%ovrlap_elem)
+    if (allocated(desc%ovr_mst_idx))  val = val + psb_sizeof_int*size(desc%ovr_mst_idx)
+    if (allocated(desc%loc_to_glob))  val = val + psb_sizeof_int*size(desc%loc_to_glob)    
+    if (allocated(desc%glob_to_loc))  val = val + psb_sizeof_int*size(desc%glob_to_loc)
+    if (allocated(desc%hashv))        val = val + psb_sizeof_int*size(desc%hashv)
+    if (allocated(desc%glb_lc))       val = val + psb_sizeof_int*size(desc%glb_lc)
+    if (allocated(desc%lprm))         val = val + psb_sizeof_int*size(desc%lprm)
+    if (allocated(desc%idx_space))    val = val + psb_sizeof_int*size(desc%idx_space)
+    if (allocated(desc%ptree))        val = val + psb_sizeof_int*size(desc%ptree) +&
          &                                  SizeofPairSearchTree(desc%ptree)
 
     psb_cd_sizeof = val

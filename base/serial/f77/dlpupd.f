@@ -79,12 +79,13 @@ C     All checks on argument are performed in the calling routines.
 C
 C
       SUBROUTINE DLPUPD(M,N,PERM,B,LDB,BETA,C,LDC)
+      use psb_const_mod
 C     .. Scalar Arguments ..
       INTEGER           M, N, LDB, LDC
-      DOUBLE PRECISION  BETA
+      real(psb_dpk_)  BETA
 C     .. Array Arguments ..
       INTEGER           PERM(*)
-      DOUBLE PRECISION  B(LDB,*), C(LDC,*)
+      real(psb_dpk_)  B(LDB,*), C(LDC,*)
 C     .. Local Scalars ..
       INTEGER           I,J
 C

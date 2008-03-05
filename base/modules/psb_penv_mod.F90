@@ -37,7 +37,7 @@ module mpi
   integer, parameter :: mpi_status_size=1
   integer, parameter :: mpi_integer=1, mpi_double_precision=3
   integer, parameter :: mpi_double_complex=5 
-  real(kind(1.d0)), external :: mpi_wtime
+  real(psb_dpk_), external :: mpi_wtime
 end module mpi
 #endif    
 
@@ -184,9 +184,19 @@ module psb_penv_mod
     end function ksendid
   end interface
 #endif  
-  
+  private psi_get_sizes
 contains 
 
+  subroutine psi_get_sizes()
+    use psb_const_mod
+    real(psb_dpk_) :: v(2) 
+    integer        :: iv(2)
+    
+    call psi_c_diffadd(v(1),v(2),psb_sizeof_dp)
+    call psi_c_diffadd(iv(1),iv(2),psb_sizeof_int)
+    
+  end subroutine psi_get_sizes
+  
   subroutine psb_init(ictxt,np)
     use psb_const_mod
     use psb_error_mod
@@ -218,7 +228,8 @@ contains
         call psb_error(ictxt)
       endif
     endif
-        
+    call psi_get_sizes()
+
   end subroutine psb_init
 
   subroutine psb_exit(ictxt,close)
@@ -258,7 +269,7 @@ contains
 #ifdef MPI_H
     include 'mpif.h'
 #endif
-    real(kind(1.d0)) :: psb_wtime
+    real(psb_dpk_) :: psb_wtime
 
     psb_wtime = mpi_wtime()
   end function psb_wtime
@@ -369,7 +380,7 @@ contains
 
   subroutine psb_dbcasts(ictxt,dat,root)
     integer, intent(in)      :: ictxt
-    real(kind(1.d0)), intent(inout)   :: dat
+    real(psb_dpk_), intent(inout)   :: dat
     integer, intent(in), optional :: root
 
     integer  :: iam, np, root_
@@ -394,7 +405,7 @@ contains
 
   subroutine psb_dbcastv(ictxt,dat,root)
     integer, intent(in)    :: ictxt
-    real(kind(1.d0)), intent(inout) :: dat(:)
+    real(psb_dpk_), intent(inout) :: dat(:)
     integer, intent(in), optional :: root
 
     integer  :: iam, np, root_
@@ -418,7 +429,7 @@ contains
     
   subroutine psb_dbcastm(ictxt,dat,root)
     integer, intent(in)    :: ictxt
-    real(kind(1.d0)), intent(inout) :: dat(:,:)
+    real(psb_dpk_), intent(inout) :: dat(:,:)
     integer, intent(in), optional :: root
 
     integer  :: iam, np, root_
@@ -443,7 +454,7 @@ contains
 
   subroutine psb_zbcasts(ictxt,dat,root)
     integer, intent(in)      :: ictxt
-    complex(kind(1.d0)), intent(inout)   :: dat
+    complex(psb_dpk_), intent(inout)   :: dat
     integer, intent(in), optional :: root
 
     integer  :: iam, np, root_
@@ -467,7 +478,7 @@ contains
 
   subroutine psb_zbcastv(ictxt,dat,root)
     integer, intent(in)    :: ictxt
-    complex(kind(1.d0)), intent(inout) :: dat(:)
+    complex(psb_dpk_), intent(inout) :: dat(:)
     integer, intent(in), optional :: root
 
     integer  :: iam, np, root_
@@ -491,7 +502,7 @@ contains
     
   subroutine psb_zbcastm(ictxt,dat,root)
     integer, intent(in)    :: ictxt
-    complex(kind(1.d0)), intent(inout) :: dat(:,:)
+    complex(psb_dpk_), intent(inout) :: dat(:,:)
     integer, intent(in), optional :: root
 
     integer  :: iam, np, root_
@@ -755,10 +766,10 @@ contains
     include 'mpif.h'
 #endif
     integer, intent(in)              :: ictxt
-    real(kind(1.d0)), intent(inout)  :: dat
+    real(psb_dpk_), intent(inout)  :: dat
     integer, intent(in), optional    :: root
     integer :: root_
-    real(kind(1.d0)) :: dat_
+    real(psb_dpk_) :: dat_
     integer :: iam, np, icomm,info
     
 
@@ -789,10 +800,10 @@ contains
     include 'mpif.h'
 #endif
     integer, intent(in)              :: ictxt
-    real(kind(1.d0)), intent(inout)  :: dat(:)
+    real(psb_dpk_), intent(inout)  :: dat(:)
     integer, intent(in), optional    :: root
     integer :: root_
-    real(kind(1.d0)), allocatable :: dat_(:)
+    real(psb_dpk_), allocatable :: dat_(:)
     integer :: iam, np, icomm, info
     
 
@@ -830,10 +841,10 @@ contains
     include 'mpif.h'
 #endif
     integer, intent(in)              :: ictxt
-    real(kind(1.d0)), intent(inout)  :: dat(:,:)
+    real(psb_dpk_), intent(inout)  :: dat(:,:)
     integer, intent(in), optional    :: root
     integer :: root_
-    real(kind(1.d0)), allocatable :: dat_(:,:)
+    real(psb_dpk_), allocatable :: dat_(:,:)
     integer :: iam, np, icomm, info
     
 #if !defined(SERIAL_MPI)
@@ -985,10 +996,10 @@ contains
     include 'mpif.h'
 #endif
     integer, intent(in)              :: ictxt
-    real(kind(1.d0)), intent(inout)  :: dat
+    real(psb_dpk_), intent(inout)  :: dat
     integer, intent(in), optional    :: root
     integer :: root_
-    real(kind(1.d0)) :: dat_
+    real(psb_dpk_) :: dat_
     integer :: iam, np, icomm,info
     
 
@@ -1019,10 +1030,10 @@ contains
     include 'mpif.h'
 #endif
     integer, intent(in)              :: ictxt
-    real(kind(1.d0)), intent(inout)  :: dat(:)
+    real(psb_dpk_), intent(inout)  :: dat(:)
     integer, intent(in), optional    :: root
     integer :: root_
-    real(kind(1.d0)), allocatable :: dat_(:)
+    real(psb_dpk_), allocatable :: dat_(:)
     integer :: iam, np, icomm, info
     
 
@@ -1060,10 +1071,10 @@ contains
     include 'mpif.h'
 #endif
     integer, intent(in)              :: ictxt
-    real(kind(1.d0)), intent(inout)  :: dat(:,:)
+    real(psb_dpk_), intent(inout)  :: dat(:,:)
     integer, intent(in), optional    :: root
     integer :: root_
-    real(kind(1.d0)), allocatable :: dat_(:,:)
+    real(psb_dpk_), allocatable :: dat_(:,:)
     integer :: iam, np, icomm, info
     
 #if !defined(SERIAL_MPI)
@@ -1182,7 +1193,7 @@ contains
 
   subroutine psb_damxs(ictxt,dat,root,ia)
     integer, intent(in)              :: ictxt
-    real(kind(1.d0)), intent(inout)  :: dat
+    real(psb_dpk_), intent(inout)  :: dat
     integer, intent(in), optional    :: root
     integer, intent(inout), optional :: ia
     
@@ -1209,7 +1220,7 @@ contains
 
   subroutine psb_damxv(ictxt,dat,root,ia)
     integer, intent(in)              :: ictxt
-    real(kind(1.d0)), intent(inout)  :: dat(:)
+    real(psb_dpk_), intent(inout)  :: dat(:)
     integer, intent(in), optional    :: root
     integer, intent(inout), optional :: ia(:)
     
@@ -1238,7 +1249,7 @@ contains
 
   subroutine psb_damxm(ictxt,dat,root,ia)
     integer, intent(in)              :: ictxt
-    real(kind(1.d0)), intent(inout)  :: dat(:,:)
+    real(psb_dpk_), intent(inout)  :: dat(:,:)
     integer, intent(in), optional    :: root
     integer, intent(inout), optional :: ia(:,:)
     
@@ -1268,7 +1279,7 @@ contains
 
   subroutine psb_zamxs(ictxt,dat,root,ia)
     integer, intent(in)              :: ictxt
-    complex(kind(1.d0)), intent(inout)  :: dat
+    complex(psb_dpk_), intent(inout)  :: dat
     integer, intent(in), optional    :: root
     integer, intent(inout), optional :: ia
     
@@ -1295,7 +1306,7 @@ contains
 
   subroutine psb_zamxv(ictxt,dat,root,ia)
     integer, intent(in)              :: ictxt
-    complex(kind(1.d0)), intent(inout)  :: dat(:)
+    complex(psb_dpk_), intent(inout)  :: dat(:)
     integer, intent(in), optional    :: root
     integer, intent(inout), optional :: ia(:)
     
@@ -1324,7 +1335,7 @@ contains
 
   subroutine psb_zamxm(ictxt,dat,root,ia)
     integer, intent(in)              :: ictxt
-    complex(kind(1.d0)), intent(inout)  :: dat(:,:)
+    complex(psb_dpk_), intent(inout)  :: dat(:,:)
     integer, intent(in), optional    :: root
     integer, intent(inout), optional :: ia(:,:)
     
@@ -1441,7 +1452,7 @@ contains
 
   subroutine psb_damns(ictxt,dat,root,ia)
     integer, intent(in)              :: ictxt
-    real(kind(1.d0)), intent(inout)  :: dat
+    real(psb_dpk_), intent(inout)  :: dat
     integer, intent(in), optional    :: root
     integer, intent(inout), optional :: ia
     
@@ -1468,7 +1479,7 @@ contains
 
   subroutine psb_damnv(ictxt,dat,root,ia)
     integer, intent(in)              :: ictxt
-    real(kind(1.d0)), intent(inout)  :: dat(:)
+    real(psb_dpk_), intent(inout)  :: dat(:)
     integer, intent(in), optional    :: root
     integer, intent(inout), optional :: ia(:)
     
@@ -1497,7 +1508,7 @@ contains
 
   subroutine psb_damnm(ictxt,dat,root,ia)
     integer, intent(in)              :: ictxt
-    real(kind(1.d0)), intent(inout)  :: dat(:,:)
+    real(psb_dpk_), intent(inout)  :: dat(:,:)
     integer, intent(in), optional    :: root
     integer, intent(inout), optional :: ia(:,:)
     
@@ -1527,7 +1538,7 @@ contains
 
   subroutine psb_zamns(ictxt,dat,root,ia)
     integer, intent(in)              :: ictxt
-    complex(kind(1.d0)), intent(inout)  :: dat
+    complex(psb_dpk_), intent(inout)  :: dat
     integer, intent(in), optional    :: root
     integer, intent(inout), optional :: ia
     
@@ -1554,7 +1565,7 @@ contains
 
   subroutine psb_zamnv(ictxt,dat,root,ia)
     integer, intent(in)              :: ictxt
-    complex(kind(1.d0)), intent(inout)  :: dat(:)
+    complex(psb_dpk_), intent(inout)  :: dat(:)
     integer, intent(in), optional    :: root
     integer, intent(inout), optional :: ia(:)
     
@@ -1583,7 +1594,7 @@ contains
 
   subroutine psb_zamnm(ictxt,dat,root,ia)
     integer, intent(in)              :: ictxt
-    complex(kind(1.d0)), intent(inout)  :: dat(:,:)
+    complex(psb_dpk_), intent(inout)  :: dat(:,:)
     integer, intent(in), optional    :: root
     integer, intent(inout), optional :: ia(:,:)
     
@@ -1672,7 +1683,7 @@ contains
 
   subroutine psb_dsums(ictxt,dat,root)
     integer, intent(in)              :: ictxt
-    real(kind(1.d0)), intent(inout)  :: dat
+    real(psb_dpk_), intent(inout)  :: dat
     integer, intent(in), optional    :: root
     
     integer   :: root_
@@ -1691,7 +1702,7 @@ contains
 
   subroutine psb_dsumv(ictxt,dat,root)
     integer, intent(in)              :: ictxt
-    real(kind(1.d0)), intent(inout)  :: dat(:)
+    real(psb_dpk_), intent(inout)  :: dat(:)
     integer, intent(in), optional    :: root
     
     integer   :: root_
@@ -1710,7 +1721,7 @@ contains
 
   subroutine psb_dsumm(ictxt,dat,root)
     integer, intent(in)              :: ictxt
-    real(kind(1.d0)), intent(inout)  :: dat(:,:)
+    real(psb_dpk_), intent(inout)  :: dat(:,:)
     integer, intent(in), optional    :: root
     
     integer   :: root_
@@ -1730,7 +1741,7 @@ contains
 
   subroutine psb_zsums(ictxt,dat,root)
     integer, intent(in)              :: ictxt
-    complex(kind(1.d0)), intent(inout)  :: dat
+    complex(psb_dpk_), intent(inout)  :: dat
     integer, intent(in), optional    :: root
     
     integer   :: root_
@@ -1749,7 +1760,7 @@ contains
 
   subroutine psb_zsumv(ictxt,dat,root)
     integer, intent(in)              :: ictxt
-    complex(kind(1.d0)), intent(inout)  :: dat(:)
+    complex(psb_dpk_), intent(inout)  :: dat(:)
     integer, intent(in), optional    :: root
     
     integer   :: root_
@@ -1769,7 +1780,7 @@ contains
 
   subroutine psb_zsumm(ictxt,dat,root)
     integer, intent(in)              :: ictxt
-    complex(kind(1.d0)), intent(inout)  :: dat(:,:)
+    complex(psb_dpk_), intent(inout)  :: dat(:,:)
     integer, intent(in), optional    :: root
     
     integer   :: root_
@@ -1942,7 +1953,7 @@ contains
   subroutine psb_dsnds(ictxt,dat,dst)
     use psb_error_mod
     integer, intent(in)  :: ictxt
-    real(kind(1.d0)), intent(in)  :: dat
+    real(psb_dpk_), intent(in)  :: dat
     integer, intent(in)  :: dst
     
 #if defined(SERIAL_MPI) 
@@ -1959,7 +1970,7 @@ contains
   subroutine psb_dsndv(ictxt,dat,dst)
     use psb_error_mod
     integer, intent(in)  :: ictxt
-    real(kind(1.d0)), intent(in)  :: dat(:)
+    real(psb_dpk_), intent(in)  :: dat(:)
     integer, intent(in)  :: dst
 
 #if defined(SERIAL_MPI) 
@@ -1975,7 +1986,7 @@ contains
   subroutine psb_dsndm(ictxt,dat,dst,m)
     use psb_error_mod
     integer, intent(in)  :: ictxt
-    real(kind(1.d0)), intent(in)  :: dat(:,:)
+    real(psb_dpk_), intent(in)  :: dat(:,:)
     integer, intent(in)  :: dst
     integer, intent(in), optional :: m
 
@@ -1994,7 +2005,7 @@ contains
   subroutine psb_zsnds(ictxt,dat,dst)
     use psb_error_mod
     integer, intent(in)  :: ictxt
-    complex(kind(1.d0)), intent(in)  :: dat
+    complex(psb_dpk_), intent(in)  :: dat
     integer, intent(in)  :: dst
     
 #if defined(SERIAL_MPI) 
@@ -2011,7 +2022,7 @@ contains
   subroutine psb_zsndv(ictxt,dat,dst)
     use psb_error_mod
     integer, intent(in)  :: ictxt
-    complex(kind(1.d0)), intent(in)  :: dat(:)
+    complex(psb_dpk_), intent(in)  :: dat(:)
     integer, intent(in)  :: dst
 
 #if defined(SERIAL_MPI) 
@@ -2027,7 +2038,7 @@ contains
   subroutine psb_zsndm(ictxt,dat,dst,m)
     use psb_error_mod
     integer, intent(in)  :: ictxt
-    complex(kind(1.d0)), intent(in)  :: dat(:,:)
+    complex(psb_dpk_), intent(in)  :: dat(:,:)
     integer, intent(in)  :: dst
     integer, intent(in), optional :: m
 
@@ -2101,7 +2112,7 @@ contains
   subroutine psb_drcvs(ictxt,dat,src)
     use psb_error_mod
     integer, intent(in)  :: ictxt
-    real(kind(1.d0)), intent(inout)  :: dat
+    real(psb_dpk_), intent(inout)  :: dat
     integer, intent(in)  :: src
     
 #if defined(SERIAL_MPI) 
@@ -2119,7 +2130,7 @@ contains
   subroutine psb_drcvv(ictxt,dat,src)
     use psb_error_mod
     integer, intent(in)  :: ictxt
-    real(kind(1.d0)), intent(inout)  :: dat(:)
+    real(psb_dpk_), intent(inout)  :: dat(:)
     integer, intent(in)  :: src
 
 #if defined(SERIAL_MPI) 
@@ -2136,7 +2147,7 @@ contains
   subroutine psb_drcvm(ictxt,dat,src,m)
     use psb_error_mod
     integer, intent(in)  :: ictxt
-    real(kind(1.d0)), intent(inout)  :: dat(:,:)
+    real(psb_dpk_), intent(inout)  :: dat(:,:)
     integer, intent(in)  :: src
     integer, intent(in), optional :: m
 
@@ -2156,7 +2167,7 @@ contains
   subroutine psb_zrcvs(ictxt,dat,src)
     use psb_error_mod
     integer, intent(in)  :: ictxt
-    complex(kind(1.d0)), intent(inout)  :: dat
+    complex(psb_dpk_), intent(inout)  :: dat
     integer, intent(in)  :: src
     
 #if defined(SERIAL_MPI) 
@@ -2174,7 +2185,7 @@ contains
   subroutine psb_zrcvv(ictxt,dat,src)
     use psb_error_mod
     integer, intent(in)  :: ictxt
-    complex(kind(1.d0)), intent(inout)  :: dat(:)
+    complex(psb_dpk_), intent(inout)  :: dat(:)
     integer, intent(in)  :: src
 
 #if defined(SERIAL_MPI) 
@@ -2191,7 +2202,7 @@ contains
   subroutine psb_zrcvm(ictxt,dat,src,m)
     use psb_error_mod
     integer, intent(in)  :: ictxt
-    complex(kind(1.d0)), intent(inout)  :: dat(:,:)
+    complex(psb_dpk_), intent(inout)  :: dat(:,:)
     integer, intent(in)  :: src
     integer, intent(in), optional :: m
 
@@ -2293,14 +2304,15 @@ contains
 
   subroutine dgebs2ds(ictxt,scope,dat,top)
     integer, intent(in)   :: ictxt
-    real(kind(1.d0)), intent(in)   :: dat
+    real(psb_dpk_), intent(in)   :: dat
     character, intent(in) :: scope
     character, intent(in), optional  :: top
     
     interface 
       subroutine dgebs2d(ictxt,scope,top,m,n,v,ld)
+        use psb_const_mod
         integer, intent(in)   :: ictxt,m,n,ld
-        real(kind(1.d0)), intent(in)   :: v
+        real(psb_dpk_), intent(in)   :: v
         character, intent(in) :: scope, top
       end subroutine dgebs2d
     end interface
@@ -2318,14 +2330,15 @@ contains
 
   subroutine dgebs2dv(ictxt,scope,dat,top)
     integer, intent(in)   :: ictxt
-    real(kind(1.d0)), intent(in)   :: dat(:)
+    real(psb_dpk_), intent(in)   :: dat(:)
     character, intent(in) :: scope
     character, intent(in), optional  :: top
     
     interface 
       subroutine dgebs2d(ictxt,scope,top,m,n,v,ld)
+        use psb_const_mod
         integer, intent(in)   :: ictxt,m,n,ld
-        real(kind(1.d0)), intent(in)   :: v(*)
+        real(psb_dpk_), intent(in)   :: v(*)
         character, intent(in) :: scope, top
       end subroutine dgebs2d
     end interface
@@ -2344,15 +2357,16 @@ contains
 
   subroutine dgebs2dm(ictxt,scope,dat,top)
     integer, intent(in)   :: ictxt
-    real(kind(1.d0)), intent(in)   :: dat(:,:)
+    real(psb_dpk_), intent(in)   :: dat(:,:)
 
     character, intent(in) :: scope
     character, intent(in), optional  :: top
     
     interface 
       subroutine dgebs2d(ictxt,scope,top,m,n,v,ld)
+        use psb_const_mod
         integer, intent(in)   :: ictxt,m,n,ld
-        real(kind(1.d0)), intent(in)   :: v(ld,*)
+        real(psb_dpk_), intent(in)   :: v(ld,*)
         character, intent(in) :: scope, top
       end subroutine dgebs2d
     end interface
@@ -2373,14 +2387,15 @@ contains
 
   subroutine zgebs2ds(ictxt,scope,dat,top)
     integer, intent(in)   :: ictxt
-    complex(kind(1.d0)), intent(in)   :: dat
+    complex(psb_dpk_), intent(in)   :: dat
     character, intent(in) :: scope
     character, intent(in), optional  :: top
     
     interface 
       subroutine zgebs2d(ictxt,scope,top,m,n,v,ld)
+        use psb_const_mod
         integer, intent(in)   :: ictxt,m,n,ld
-        complex(kind(1.d0)), intent(in)   :: v
+        complex(psb_dpk_), intent(in)   :: v
         character, intent(in) :: scope, top
       end subroutine zgebs2d
     end interface
@@ -2398,14 +2413,15 @@ contains
 
   subroutine zgebs2dv(ictxt,scope,dat,top)
     integer, intent(in)   :: ictxt
-    complex(kind(1.d0)), intent(in)   :: dat(:)
+    complex(psb_dpk_), intent(in)   :: dat(:)
     character, intent(in) :: scope
     character, intent(in), optional  :: top
     
     interface 
       subroutine zgebs2d(ictxt,scope,top,m,n,v,ld)
+        use psb_const_mod
         integer, intent(in)   :: ictxt,m,n,ld
-        complex(kind(1.d0)), intent(in)   :: v(*)
+        complex(psb_dpk_), intent(in)   :: v(*)
         character, intent(in) :: scope, top
       end subroutine zgebs2d
     end interface
@@ -2424,15 +2440,16 @@ contains
 
   subroutine zgebs2dm(ictxt,scope,dat,top)
     integer, intent(in)   :: ictxt
-    complex(kind(1.d0)), intent(in)   :: dat(:,:)
+    complex(psb_dpk_), intent(in)   :: dat(:,:)
 
     character, intent(in) :: scope
     character, intent(in), optional  :: top
     
     interface 
       subroutine zgebs2d(ictxt,scope,top,m,n,v,ld)
+        use psb_const_mod
         integer, intent(in)   :: ictxt,m,n,ld
-        complex(kind(1.d0)), intent(in)   :: v(ld,*)
+        complex(psb_dpk_), intent(in)   :: v(ld,*)
         character, intent(in) :: scope, top
       end subroutine zgebs2d
     end interface
@@ -2455,15 +2472,16 @@ contains
 
   subroutine dgebr2ds(ictxt,scope,dat,top,rrt,crt)
     integer, intent(in)   :: ictxt
-    real(kind(1.d0)), intent(inout)   :: dat
+    real(psb_dpk_), intent(inout)   :: dat
     character, intent(in) :: scope
     character, intent(in), optional  :: top
     integer, intent(in), optional  :: rrt,crt
     
     interface 
       subroutine dgebr2d(ictxt,scope,top,m,n,v,ld,rrt,crt)
+        use psb_const_mod
         integer, intent(in)   :: ictxt,m,n,ld
-        real(kind(1.d0)), intent(inout)   :: v
+        real(psb_dpk_), intent(inout)   :: v
         character, intent(in) :: scope, top
         integer, intent(in)   :: rrt,crt
       end subroutine dgebr2d
@@ -2507,15 +2525,16 @@ contains
 
   subroutine dgebr2dv(ictxt,scope,dat,top,rrt,crt)
     integer, intent(in)   :: ictxt
-    real(kind(1.d0)), intent(inout)   :: dat(:)
+    real(psb_dpk_), intent(inout)   :: dat(:)
     character, intent(in) :: scope
     character, intent(in), optional  :: top
     integer, intent(in), optional  :: rrt,crt
 
     interface 
       subroutine dgebr2d(ictxt,scope,top,m,n,v,ld,rrt,crt)
+        use psb_const_mod
         integer, intent(in)   :: ictxt,m,n,ld
-        real(kind(1.d0)), intent(inout)   :: v(*)
+        real(psb_dpk_), intent(inout)   :: v(*)
         character, intent(in) :: scope, top
         integer, intent(in)   :: rrt,crt
       end subroutine dgebr2d
@@ -2560,7 +2579,7 @@ contains
 
   subroutine dgebr2dm(ictxt,scope,dat,top,rrt,crt)
     integer, intent(in)   :: ictxt
-    real(kind(1.d0)), intent(inout)   :: dat(:,:)
+    real(psb_dpk_), intent(inout)   :: dat(:,:)
 
     character, intent(in) :: scope
     character, intent(in), optional  :: top
@@ -2568,8 +2587,9 @@ contains
 
     interface 
       subroutine dgebr2d(ictxt,scope,top,m,n,v,ld,rrt,crt)
+        use psb_const_mod
         integer, intent(in)   :: ictxt,m,n,ld
-        real(kind(1.d0)), intent(inout)   :: v(ld,*)
+        real(psb_dpk_), intent(inout)   :: v(ld,*)
         character, intent(in) :: scope, top
         integer, intent(in)   :: rrt,crt
       end subroutine dgebr2d
@@ -2617,15 +2637,16 @@ contains
 
   subroutine zgebr2ds(ictxt,scope,dat,top,rrt,crt)
     integer, intent(in)   :: ictxt
-    complex(kind(1.d0)), intent(inout)   :: dat
+    complex(psb_dpk_), intent(inout)   :: dat
     character, intent(in) :: scope
     character, intent(in), optional  :: top
     integer, intent(in), optional  :: rrt,crt
     
     interface 
       subroutine zgebr2d(ictxt,scope,top,m,n,v,ld,rrt,crt)
+        use psb_const_mod
         integer, intent(in)   :: ictxt,m,n,ld
-        complex(kind(1.d0)), intent(inout)   :: v
+        complex(psb_dpk_), intent(inout)   :: v
         character, intent(in) :: scope, top
         integer, intent(in)   :: rrt,crt
       end subroutine zgebr2d
@@ -2668,15 +2689,16 @@ contains
 
   subroutine zgebr2dv(ictxt,scope,dat,top,rrt,crt)
     integer, intent(in)   :: ictxt
-    complex(kind(1.d0)), intent(inout)   :: dat(:)
+    complex(psb_dpk_), intent(inout)   :: dat(:)
     character, intent(in) :: scope
     character, intent(in), optional  :: top
     integer, intent(in), optional  :: rrt,crt
 
     interface 
       subroutine zgebr2d(ictxt,scope,top,m,n,v,ld,rrt,crt)
+        use psb_const_mod
         integer, intent(in)   :: ictxt,m,n,ld
-        complex(kind(1.d0)), intent(inout)   :: v(*)
+        complex(psb_dpk_), intent(inout)   :: v(*)
         character, intent(in) :: scope, top
         integer, intent(in)   :: rrt,crt
       end subroutine zgebr2d
@@ -2721,7 +2743,7 @@ contains
 
   subroutine zgebr2dm(ictxt,scope,dat,top,rrt,crt)
     integer, intent(in)   :: ictxt
-    complex(kind(1.d0)), intent(inout)   :: dat(:,:)
+    complex(psb_dpk_), intent(inout)   :: dat(:,:)
 
     character, intent(in) :: scope
     character, intent(in), optional  :: top
@@ -2729,8 +2751,9 @@ contains
 
     interface 
       subroutine zgebr2d(ictxt,scope,top,m,n,v,ld,rrt,crt)
+        use psb_const_mod
         integer, intent(in)   :: ictxt,m,n,ld
-        complex(kind(1.d0)), intent(inout)   :: v(ld,*)
+        complex(psb_dpk_), intent(inout)   :: v(ld,*)
         character, intent(in) :: scope, top
         integer, intent(in)   :: rrt,crt
       end subroutine zgebr2d
@@ -2784,6 +2807,7 @@ contains
     
     interface 
       subroutine igebr2d(ictxt,scope,top,m,n,v,ld,rrt,crt)
+        use psb_const_mod
         integer, intent(in)   :: ictxt,m,n,ld
         integer, intent(inout)   :: v
         character, intent(in) :: scope, top
@@ -2835,6 +2859,7 @@ contains
 
     interface 
       subroutine igebr2d(ictxt,scope,top,m,n,v,ld,rrt,crt)
+        use psb_const_mod
         integer, intent(in)   :: ictxt,m,n,ld
         integer, intent(inout)   :: v(*)
         character, intent(in) :: scope, top
@@ -2889,6 +2914,7 @@ contains
 
     interface 
       subroutine igebr2d(ictxt,scope,top,m,n,v,ld,rrt,crt)
+        use psb_const_mod
         integer, intent(in)   :: ictxt,m,n,ld
         integer, intent(inout)   :: v(ld,*)
         character, intent(in) :: scope, top
@@ -2937,13 +2963,14 @@ contains
 
   subroutine dgesd2ds(ictxt,dat,rdst,cdst)
     integer, intent(in)   :: ictxt
-    real(kind(1.d0)), intent(in)   :: dat
+    real(psb_dpk_), intent(in)   :: dat
     integer, intent(in)  :: rdst,cdst
     
     interface 
       subroutine dgesd2d(ictxt,m,n,v,ld,rd,cd)
+        use psb_const_mod
         integer, intent(in)   :: ictxt,m,n,ld
-        real(kind(1.d0)), intent(in)   :: v
+        real(psb_dpk_), intent(in)   :: v
         integer, intent(in)   :: rd,cd
       end subroutine dgesd2d
     end interface
@@ -2955,13 +2982,14 @@ contains
 
   subroutine dgesd2dv(ictxt,dat,rdst,cdst)
     integer, intent(in)   :: ictxt
-    real(kind(1.d0)), intent(in)   :: dat(:)
+    real(psb_dpk_), intent(in)   :: dat(:)
     integer, intent(in)  :: rdst,cdst
     
     interface 
       subroutine dgesd2d(ictxt,m,n,v,ld,rd,cd)
+        use psb_const_mod
         integer, intent(in)   :: ictxt,m,n,ld
-        real(kind(1.d0)), intent(in)   :: v(*)
+        real(psb_dpk_), intent(in)   :: v(*)
         integer, intent(in)   :: rd,cd
       end subroutine dgesd2d
     end interface
@@ -2972,15 +3000,16 @@ contains
 
   subroutine dgesd2dm(ictxt,dat,rdst,cdst,m)
     integer, intent(in)   :: ictxt
-    real(kind(1.d0)), intent(in)   :: dat(:,:)
+    real(psb_dpk_), intent(in)   :: dat(:,:)
     integer, intent(in)  :: rdst,cdst
     integer, intent(in), optional :: m
     
     integer :: m_
     interface 
       subroutine dgesd2d(ictxt,m,n,v,ld,rd,cd)
+        use psb_const_mod
         integer, intent(in)   :: ictxt,m,n,ld
-        real(kind(1.d0)), intent(in)   :: v(ld,*)
+        real(psb_dpk_), intent(in)   :: v(ld,*)
         integer, intent(in)   :: rd,cd
       end subroutine dgesd2d
     end interface
@@ -3003,6 +3032,7 @@ contains
     
     interface 
       subroutine igesd2d(ictxt,m,n,v,ld,rd,cd)
+        use psb_const_mod
         integer, intent(in)   :: ictxt,m,n,ld
         integer, intent(in)   :: v
         integer, intent(in)   :: rd,cd
@@ -3021,6 +3051,7 @@ contains
     
     interface 
       subroutine igesd2d(ictxt,m,n,v,ld,rd,cd)
+        use psb_const_mod
         integer, intent(in)   :: ictxt,m,n,ld
         integer, intent(in)   :: v(*)
         integer, intent(in)   :: rd,cd
@@ -3041,6 +3072,7 @@ contains
 
     interface 
       subroutine igesd2d(ictxt,m,n,v,ld,rd,cd)
+        use psb_const_mod
         integer, intent(in)   :: ictxt,m,n,ld
         integer, intent(in)   :: v(ld,*)
         integer, intent(in)   :: rd,cd
@@ -3061,13 +3093,14 @@ contains
 
   subroutine zgesd2ds(ictxt,dat,rdst,cdst)
     integer, intent(in)   :: ictxt
-    complex(kind(1.d0)), intent(in)   :: dat
+    complex(psb_dpk_), intent(in)   :: dat
     integer, intent(in)  :: rdst,cdst
     
     interface 
       subroutine zgesd2d(ictxt,m,n,v,ld,rd,cd)
+        use psb_const_mod
         integer, intent(in)   :: ictxt,m,n,ld
-        complex(kind(1.d0)), intent(in)   :: v
+        complex(psb_dpk_), intent(in)   :: v
         integer, intent(in)   :: rd,cd
       end subroutine zgesd2d
     end interface
@@ -3079,13 +3112,14 @@ contains
 
   subroutine zgesd2dv(ictxt,dat,rdst,cdst)
     integer, intent(in)   :: ictxt
-    complex(kind(1.d0)), intent(in)   :: dat(:)
+    complex(psb_dpk_), intent(in)   :: dat(:)
     integer, intent(in)  :: rdst,cdst
     
     interface 
       subroutine zgesd2d(ictxt,m,n,v,ld,rd,cd)
+        use psb_const_mod
         integer, intent(in)   :: ictxt,m,n,ld
-        complex(kind(1.d0)), intent(in)   :: v(*)
+        complex(psb_dpk_), intent(in)   :: v(*)
         integer, intent(in)   :: rd,cd
       end subroutine zgesd2d
     end interface
@@ -3096,7 +3130,7 @@ contains
 
   subroutine zgesd2dm(ictxt,dat,rdst,cdst,m)
     integer, intent(in)   :: ictxt
-    complex(kind(1.d0)), intent(in)   :: dat(:,:)
+    complex(psb_dpk_), intent(in)   :: dat(:,:)
     integer, intent(in)  :: rdst,cdst
     integer, intent(in), optional :: m
     
@@ -3104,8 +3138,9 @@ contains
 
     interface 
       subroutine zgesd2d(ictxt,m,n,v,ld,rd,cd)
+        use psb_const_mod
         integer, intent(in)   :: ictxt,m,n,ld
-        complex(kind(1.d0)), intent(in)   :: v(ld,*)
+        complex(psb_dpk_), intent(in)   :: v(ld,*)
         integer, intent(in)   :: rd,cd
       end subroutine zgesd2d
     end interface
@@ -3124,13 +3159,14 @@ contains
 
   subroutine dgerv2ds(ictxt,dat,rdst,cdst)
     integer, intent(in)   :: ictxt
-    real(kind(1.d0)), intent(inout)   :: dat
+    real(psb_dpk_), intent(inout)   :: dat
     integer, intent(in)  :: rdst,cdst
     
     interface 
       subroutine dgerv2d(ictxt,m,n,v,ld,rd,cd)
+        use psb_const_mod
         integer, intent(in)   :: ictxt,m,n,ld
-        real(kind(1.d0)), intent(inout)   :: v
+        real(psb_dpk_), intent(inout)   :: v
         integer, intent(in)   :: rd,cd
       end subroutine dgerv2d
     end interface
@@ -3142,13 +3178,14 @@ contains
 
   subroutine dgerv2dv(ictxt,dat,rdst,cdst)
     integer, intent(in)   :: ictxt
-    real(kind(1.d0)), intent(inout)   :: dat(:)
+    real(psb_dpk_), intent(inout)   :: dat(:)
     integer, intent(in)  :: rdst,cdst
     
     interface 
       subroutine dgerv2d(ictxt,m,n,v,ld,rd,cd)
+        use psb_const_mod
         integer, intent(in)   :: ictxt,m,n,ld
-        real(kind(1.d0)), intent(inout)   :: v(*)
+        real(psb_dpk_), intent(inout)   :: v(*)
         integer, intent(in)   :: rd,cd
       end subroutine dgerv2d
     end interface
@@ -3159,7 +3196,7 @@ contains
 
   subroutine dgerv2dm(ictxt,dat,rdst,cdst,m)
     integer, intent(in)   :: ictxt
-    real(kind(1.d0)), intent(inout)   :: dat(:,:)
+    real(psb_dpk_), intent(inout)   :: dat(:,:)
     integer, intent(in)  :: rdst,cdst
     integer, intent(in), optional :: m
     
@@ -3167,8 +3204,9 @@ contains
 
     interface 
       subroutine dgerv2d(ictxt,m,n,v,ld,rd,cd)
+        use psb_const_mod
         integer, intent(in)   :: ictxt,m,n,ld
-        real(kind(1.d0)), intent(inout)   :: v(ld,*)
+        real(psb_dpk_), intent(inout)   :: v(ld,*)
         integer, intent(in)   :: rd,cd
       end subroutine dgerv2d
     end interface
@@ -3191,6 +3229,7 @@ contains
     
     interface 
       subroutine igerv2d(ictxt,m,n,v,ld,rd,cd)
+        use psb_const_mod
         integer, intent(in)   :: ictxt,m,n,ld
         integer, intent(inout)   :: v
         integer, intent(in)   :: rd,cd
@@ -3209,6 +3248,7 @@ contains
     
     interface 
       subroutine igerv2d(ictxt,m,n,v,ld,rd,cd)
+        use psb_const_mod
         integer, intent(in)   :: ictxt,m,n,ld
         integer, intent(inout)   :: v(*)
         integer, intent(in)   :: rd,cd
@@ -3229,6 +3269,7 @@ contains
 
     interface 
       subroutine igerv2d(ictxt,m,n,v,ld,rd,cd)
+        use psb_const_mod
         integer, intent(in)   :: ictxt,m,n,ld
         integer, intent(inout)   :: v(ld,*)
         integer, intent(in)   :: rd,cd
@@ -3250,13 +3291,14 @@ contains
 
   subroutine zgerv2ds(ictxt,dat,rdst,cdst)
     integer, intent(in)   :: ictxt
-    complex(kind(1.d0)), intent(inout)   :: dat
+    complex(psb_dpk_), intent(inout)   :: dat
     integer, intent(in)  :: rdst,cdst
     
     interface 
       subroutine zgerv2d(ictxt,m,n,v,ld,rd,cd)
+        use psb_const_mod
         integer, intent(in)   :: ictxt,m,n,ld
-        complex(kind(1.d0)), intent(inout)   :: v
+        complex(psb_dpk_), intent(inout)   :: v
         integer, intent(in)   :: rd,cd
       end subroutine zgerv2d
     end interface
@@ -3268,13 +3310,14 @@ contains
 
   subroutine zgerv2dv(ictxt,dat,rdst,cdst)
     integer, intent(in)   :: ictxt
-    complex(kind(1.d0)), intent(inout)   :: dat(:)
+    complex(psb_dpk_), intent(inout)   :: dat(:)
     integer, intent(in)  :: rdst,cdst
     
     interface 
       subroutine zgerv2d(ictxt,m,n,v,ld,rd,cd)
+        use psb_const_mod
         integer, intent(in)   :: ictxt,m,n,ld
-        complex(kind(1.d0)), intent(inout)   :: v(*)
+        complex(psb_dpk_), intent(inout)   :: v(*)
         integer, intent(in)   :: rd,cd
       end subroutine zgerv2d
     end interface
@@ -3285,7 +3328,7 @@ contains
 
   subroutine zgerv2dm(ictxt,dat,rdst,cdst,m)
     integer, intent(in)   :: ictxt
-    complex(kind(1.d0)), intent(inout)   :: dat(:,:)
+    complex(psb_dpk_), intent(inout)   :: dat(:,:)
     integer, intent(in)  :: rdst,cdst
     integer, intent(in), optional :: m
     
@@ -3293,8 +3336,9 @@ contains
     
     interface 
       subroutine zgerv2d(ictxt,m,n,v,ld,rd,cd)
+        use psb_const_mod
         integer, intent(in)   :: ictxt,m,n,ld
-        complex(kind(1.d0)), intent(inout)   :: v(ld,*)
+        complex(psb_dpk_), intent(inout)   :: v(ld,*)
         integer, intent(in)   :: rd,cd
       end subroutine zgerv2d
     end interface
@@ -3314,15 +3358,16 @@ contains
 
   subroutine dgsum2ds(ictxt,scope,dat,top,rrt,crt)
     integer, intent(in)   :: ictxt
-    real(kind(1.d0)), intent(inout)   :: dat
+    real(psb_dpk_), intent(inout)   :: dat
     character, intent(in) :: scope
     character, intent(in), optional  :: top
     integer, intent(in), optional  :: rrt,crt
     
     interface 
       subroutine dgsum2d(ictxt,scope,top,m,n,v,ld,rrt,crt)
+        use psb_const_mod
         integer, intent(in)   :: ictxt,m,n,ld
-        real(kind(1.d0)), intent(inout)   :: v
+        real(psb_dpk_), intent(inout)   :: v
         character, intent(in) :: scope, top
         integer, intent(in)   :: rrt,crt
       end subroutine dgsum2d
@@ -3367,15 +3412,16 @@ contains
 
   subroutine dgsum2dv(ictxt,scope,dat,top,rrt,crt)
     integer, intent(in)   :: ictxt
-    real(kind(1.d0)), intent(inout)   :: dat(:)
+    real(psb_dpk_), intent(inout)   :: dat(:)
     character, intent(in) :: scope
     character, intent(in), optional  :: top
     integer, intent(in), optional  :: rrt,crt
 
     interface 
       subroutine dgsum2d(ictxt,scope,top,m,n,v,ld,rrt,crt)
+        use psb_const_mod
         integer, intent(in)   :: ictxt,m,n,ld
-        real(kind(1.d0)), intent(inout)   :: v(*)
+        real(psb_dpk_), intent(inout)   :: v(*)
         character, intent(in) :: scope, top
         integer, intent(in)   :: rrt,crt
       end subroutine dgsum2d
@@ -3421,7 +3467,7 @@ contains
 
   subroutine dgsum2dm(ictxt,scope,dat,top,rrt,crt)
     integer, intent(in)   :: ictxt
-    real(kind(1.d0)), intent(inout)   :: dat(:,:)
+    real(psb_dpk_), intent(inout)   :: dat(:,:)
 
     character, intent(in) :: scope
     character, intent(in), optional  :: top
@@ -3429,8 +3475,9 @@ contains
 
     interface 
       subroutine dgsum2d(ictxt,scope,top,m,n,v,ld,rrt,crt)
+        use psb_const_mod
         integer, intent(in)   :: ictxt,m,n,ld
-        real(kind(1.d0)), intent(inout)   :: v(ld,*)
+        real(psb_dpk_), intent(inout)   :: v(ld,*)
         character, intent(in) :: scope, top
         integer, intent(in)   :: rrt,crt
       end subroutine dgsum2d
@@ -3485,6 +3532,7 @@ contains
     
     interface 
       subroutine igsum2d(ictxt,scope,top,m,n,v,ld,rrt,crt)
+        use psb_const_mod
         integer, intent(in)   :: ictxt,m,n,ld
         integer, intent(inout)   :: v
         character, intent(in) :: scope, top
@@ -3538,6 +3586,7 @@ contains
 
     interface 
       subroutine igsum2d(ictxt,scope,top,m,n,v,ld,rrt,crt)
+        use psb_const_mod
         integer, intent(in)   :: ictxt,m,n,ld
         integer, intent(inout)   :: v(*)
         character, intent(in) :: scope, top
@@ -3593,6 +3642,7 @@ contains
 
     interface 
       subroutine igsum2d(ictxt,scope,top,m,n,v,ld,rrt,crt)
+        use psb_const_mod
         integer, intent(in)   :: ictxt,m,n,ld
         integer, intent(inout)   :: v(ld,*)
         character, intent(in) :: scope, top
@@ -3642,15 +3692,16 @@ contains
 
   subroutine zgsum2ds(ictxt,scope,dat,top,rrt,crt)
     integer, intent(in)   :: ictxt
-    complex(kind(1.d0)), intent(inout)   :: dat
+    complex(psb_dpk_), intent(inout)   :: dat
     character, intent(in) :: scope
     character, intent(in), optional  :: top
     integer, intent(in), optional  :: rrt,crt
     
     interface 
       subroutine zgsum2d(ictxt,scope,top,m,n,v,ld,rrt,crt)
+        use psb_const_mod
         integer, intent(in)   :: ictxt,m,n,ld
-        complex(kind(1.d0)), intent(inout)   :: v
+        complex(psb_dpk_), intent(inout)   :: v
         character, intent(in) :: scope, top
         integer, intent(in)   :: rrt,crt
       end subroutine zgsum2d
@@ -3695,15 +3746,16 @@ contains
 
   subroutine zgsum2dv(ictxt,scope,dat,top,rrt,crt)
     integer, intent(in)   :: ictxt
-    complex(kind(1.d0)), intent(inout)   :: dat(:)
+    complex(psb_dpk_), intent(inout)   :: dat(:)
     character, intent(in) :: scope
     character, intent(in), optional  :: top
     integer, intent(in), optional  :: rrt,crt
 
     interface 
       subroutine zgsum2d(ictxt,scope,top,m,n,v,ld,rrt,crt)
+        use psb_const_mod
         integer, intent(in)   :: ictxt,m,n,ld
-        complex(kind(1.d0)), intent(inout)   :: v(*)
+        complex(psb_dpk_), intent(inout)   :: v(*)
         character, intent(in) :: scope, top
         integer, intent(in)   :: rrt,crt
       end subroutine zgsum2d
@@ -3749,7 +3801,7 @@ contains
 
   subroutine zgsum2dm(ictxt,scope,dat,top,rrt,crt)
     integer, intent(in)   :: ictxt
-    complex(kind(1.d0)), intent(inout)   :: dat(:,:)
+    complex(psb_dpk_), intent(inout)   :: dat(:,:)
 
     character, intent(in) :: scope
     character, intent(in), optional  :: top
@@ -3757,8 +3809,9 @@ contains
 
     interface 
       subroutine zgsum2d(ictxt,scope,top,m,n,v,ld,rrt,crt)
+        use psb_const_mod
         integer, intent(in)   :: ictxt,m,n,ld
-        complex(kind(1.d0)), intent(inout)   :: v(ld,*)
+        complex(psb_dpk_), intent(inout)   :: v(ld,*)
         character, intent(in) :: scope, top
         integer, intent(in)   :: rrt,crt
       end subroutine zgsum2d
@@ -3807,7 +3860,7 @@ contains
 
   subroutine dgamx2ds(ictxt,scope,dat,top,ria,cia,rrt,crt)
     integer, intent(in)              :: ictxt
-    real(kind(1.d0)), intent(inout)  :: dat
+    real(psb_dpk_), intent(inout)  :: dat
     character, intent(in)            :: scope
     character, intent(in), optional  :: top
     integer, intent(in), optional    :: rrt,crt
@@ -3815,8 +3868,9 @@ contains
     
     interface 
       subroutine dgamx2d(ictxt,scope,top,m,n,v,ld,ria,cia,ldia,rrt,crt)
+        use psb_const_mod
         integer, intent(in)             :: ictxt,m,n,ld
-        real(kind(1.d0)), intent(inout) :: v
+        real(psb_dpk_), intent(inout) :: v
         character, intent(in)           :: scope, top
         integer, intent(inout)          :: ria(*),cia(*)
         integer, intent(in)             :: rrt,crt,ldia
@@ -3869,7 +3923,7 @@ contains
 
   subroutine dgamx2dv(ictxt,scope,dat,top,ria,cia,rrt,crt)
     integer, intent(in)              :: ictxt
-    real(kind(1.d0)), intent(inout)  :: dat(:)
+    real(psb_dpk_), intent(inout)  :: dat(:)
     character, intent(in)            :: scope
     character, intent(in), optional  :: top
     integer, intent(inout), optional :: ria(:),cia(:)
@@ -3877,8 +3931,9 @@ contains
 
     interface 
       subroutine dgamx2d(ictxt,scope,top,m,n,v,ld,ria,cia,ldia,rrt,crt)
+        use psb_const_mod
         integer, intent(in)             :: ictxt,m,n,ld
-        real(kind(1.d0)), intent(inout) :: v(*)
+        real(psb_dpk_), intent(inout) :: v(*)
         character, intent(in)           :: scope, top
         integer, intent(inout)          :: ria(*),cia(*)
         integer, intent(in)             :: rrt,crt,ldia
@@ -3933,7 +3988,7 @@ contains
 
   subroutine dgamx2dm(ictxt,scope,dat,top,ria,cia,rrt,crt)
     integer, intent(in)              :: ictxt
-    real(kind(1.d0)), intent(inout)  :: dat(:,:)
+    real(psb_dpk_), intent(inout)  :: dat(:,:)
     character, intent(in)            :: scope
     integer, intent(inout), optional :: ria(:,:),cia(:,:)
     character, intent(in), optional  :: top
@@ -3941,8 +3996,9 @@ contains
 
     interface 
       subroutine dgamx2d(ictxt,scope,top,m,n,v,ld,ria,cia,ldia,rrt,crt)
+        use psb_const_mod
         integer, intent(in)             :: ictxt,m,n,ld,ldia
-        real(kind(1.d0)), intent(inout) :: v(ld,*)
+        real(psb_dpk_), intent(inout) :: v(ld,*)
         integer, intent(inout)          :: ria(ldia,*),cia(ldia,*)
         character, intent(in)           :: scope, top
         integer, intent(in)             :: rrt,crt
@@ -4007,6 +4063,7 @@ contains
     
     interface 
       subroutine igamx2d(ictxt,scope,top,m,n,v,ld,ria,cia,ldia,rrt,crt)
+        use psb_const_mod
         integer, intent(in)             :: ictxt,m,n,ld
         integer, intent(inout) :: v
         character, intent(in)           :: scope, top
@@ -4069,6 +4126,7 @@ contains
 
     interface 
       subroutine igamx2d(ictxt,scope,top,m,n,v,ld,ria,cia,ldia,rrt,crt)
+        use psb_const_mod
         integer, intent(in)             :: ictxt,m,n,ld
         integer, intent(inout) :: v(*)
         character, intent(in)           :: scope, top
@@ -4133,6 +4191,7 @@ contains
 
     interface 
       subroutine igamx2d(ictxt,scope,top,m,n,v,ld,ria,cia,ldia,rrt,crt)
+        use psb_const_mod
         integer, intent(in)             :: ictxt,m,n,ld,ldia
         integer, intent(inout) :: v(ld,*)
         integer, intent(inout)          :: ria(ldia,*),cia(ldia,*)
@@ -4191,7 +4250,7 @@ contains
 
   subroutine zgamx2ds(ictxt,scope,dat,top,ria,cia,rrt,crt)
     integer, intent(in)              :: ictxt
-    complex(kind(1.d0)), intent(inout)  :: dat
+    complex(psb_dpk_), intent(inout)  :: dat
     character, intent(in)            :: scope
     character, intent(in), optional  :: top
     integer, intent(in), optional    :: rrt,crt
@@ -4199,8 +4258,9 @@ contains
     
     interface 
       subroutine zgamx2d(ictxt,scope,top,m,n,v,ld,ria,cia,ldia,rrt,crt)
+        use psb_const_mod
         integer, intent(in)             :: ictxt,m,n,ld
-        complex(kind(1.d0)), intent(inout) :: v
+        complex(psb_dpk_), intent(inout) :: v
         character, intent(in)           :: scope, top
         integer, intent(inout)          :: ria(*),cia(*)
         integer, intent(in)             :: rrt,crt,ldia
@@ -4253,7 +4313,7 @@ contains
 
   subroutine zgamx2dv(ictxt,scope,dat,top,ria,cia,rrt,crt)
     integer, intent(in)              :: ictxt
-    complex(kind(1.d0)), intent(inout)  :: dat(:)
+    complex(psb_dpk_), intent(inout)  :: dat(:)
     character, intent(in)            :: scope
     character, intent(in), optional  :: top
     integer, intent(inout), optional :: ria(:),cia(:)
@@ -4261,8 +4321,9 @@ contains
 
     interface 
       subroutine zgamx2d(ictxt,scope,top,m,n,v,ld,ria,cia,ldia,rrt,crt)
+        use psb_const_mod
         integer, intent(in)             :: ictxt,m,n,ld
-        complex(kind(1.d0)), intent(inout) :: v(*)
+        complex(psb_dpk_), intent(inout) :: v(*)
         character, intent(in)           :: scope, top
         integer, intent(inout)          :: ria(*),cia(*)
         integer, intent(in)             :: rrt,crt,ldia
@@ -4317,7 +4378,7 @@ contains
 
   subroutine zgamx2dm(ictxt,scope,dat,top,ria,cia,rrt,crt)
     integer, intent(in)              :: ictxt
-    complex(kind(1.d0)), intent(inout)  :: dat(:,:)
+    complex(psb_dpk_), intent(inout)  :: dat(:,:)
     character, intent(in)            :: scope
     integer, intent(inout), optional :: ria(:,:),cia(:,:)
     character, intent(in), optional  :: top
@@ -4325,8 +4386,9 @@ contains
 
     interface 
       subroutine zgamx2d(ictxt,scope,top,m,n,v,ld,ria,cia,ldia,rrt,crt)
+        use psb_const_mod
         integer, intent(in)             :: ictxt,m,n,ld,ldia
-        complex(kind(1.d0)), intent(inout) :: v(ld,*)
+        complex(psb_dpk_), intent(inout) :: v(ld,*)
         integer, intent(inout)          :: ria(ldia,*),cia(ldia,*)
         character, intent(in)           :: scope, top
         integer, intent(in)             :: rrt,crt
@@ -4382,7 +4444,7 @@ contains
 
   subroutine dgamn2ds(ictxt,scope,dat,top,ria,cia,rrt,crt)
     integer, intent(in)              :: ictxt
-    real(kind(1.d0)), intent(inout)  :: dat
+    real(psb_dpk_), intent(inout)  :: dat
     character, intent(in)            :: scope
     character, intent(in), optional  :: top
     integer, intent(in), optional    :: rrt,crt
@@ -4390,8 +4452,9 @@ contains
     
     interface 
       subroutine dgamn2d(ictxt,scope,top,m,n,v,ld,ria,cia,ldia,rrt,crt)
+        use psb_const_mod
         integer, intent(in)             :: ictxt,m,n,ld
-        real(kind(1.d0)), intent(inout) :: v
+        real(psb_dpk_), intent(inout) :: v
         character, intent(in)           :: scope, top
         integer, intent(inout)          :: ria(*),cia(*)
         integer, intent(in)             :: rrt,crt,ldia
@@ -4444,7 +4507,7 @@ contains
 
   subroutine dgamn2dv(ictxt,scope,dat,top,ria,cia,rrt,crt)
     integer, intent(in)              :: ictxt
-    real(kind(1.d0)), intent(inout)  :: dat(:)
+    real(psb_dpk_), intent(inout)  :: dat(:)
     character, intent(in)            :: scope
     character, intent(in), optional  :: top
     integer, intent(inout), optional :: ria(:),cia(:)
@@ -4452,8 +4515,9 @@ contains
 
     interface 
       subroutine dgamn2d(ictxt,scope,top,m,n,v,ld,ria,cia,ldia,rrt,crt)
+        use psb_const_mod
         integer, intent(in)             :: ictxt,m,n,ld
-        real(kind(1.d0)), intent(inout) :: v(*)
+        real(psb_dpk_), intent(inout) :: v(*)
         character, intent(in)           :: scope, top
         integer, intent(inout)          :: ria(*),cia(*)
         integer, intent(in)             :: rrt,crt,ldia
@@ -4508,7 +4572,7 @@ contains
 
   subroutine dgamn2dm(ictxt,scope,dat,top,ria,cia,rrt,crt)
     integer, intent(in)              :: ictxt
-    real(kind(1.d0)), intent(inout)  :: dat(:,:)
+    real(psb_dpk_), intent(inout)  :: dat(:,:)
     character, intent(in)            :: scope
     integer, intent(inout), optional :: ria(:,:),cia(:,:)
     character, intent(in), optional  :: top
@@ -4516,8 +4580,9 @@ contains
 
     interface 
       subroutine dgamn2d(ictxt,scope,top,m,n,v,ld,ria,cia,ldia,rrt,crt)
+        use psb_const_mod
         integer, intent(in)             :: ictxt,m,n,ld,ldia
-        real(kind(1.d0)), intent(inout) :: v(ld,*)
+        real(psb_dpk_), intent(inout) :: v(ld,*)
         integer, intent(inout)          :: ria(ldia,*),cia(ldia,*)
         character, intent(in)           :: scope, top
         integer, intent(in)             :: rrt,crt
@@ -4582,6 +4647,7 @@ contains
     
     interface 
       subroutine igamn2d(ictxt,scope,top,m,n,v,ld,ria,cia,ldia,rrt,crt)
+        use psb_const_mod
         integer, intent(in)             :: ictxt,m,n,ld
         integer, intent(inout) :: v
         character, intent(in)           :: scope, top
@@ -4644,6 +4710,7 @@ contains
 
     interface 
       subroutine igamn2d(ictxt,scope,top,m,n,v,ld,ria,cia,ldia,rrt,crt)
+        use psb_const_mod
         integer, intent(in)             :: ictxt,m,n,ld
         integer, intent(inout) :: v(*)
         character, intent(in)           :: scope, top
@@ -4708,6 +4775,7 @@ contains
 
     interface 
       subroutine igamn2d(ictxt,scope,top,m,n,v,ld,ria,cia,ldia,rrt,crt)
+        use psb_const_mod
         integer, intent(in)             :: ictxt,m,n,ld,ldia
         integer, intent(inout) :: v(ld,*)
         integer, intent(inout)          :: ria(ldia,*),cia(ldia,*)
@@ -4766,7 +4834,7 @@ contains
 
   subroutine zgamn2ds(ictxt,scope,dat,top,ria,cia,rrt,crt)
     integer, intent(in)              :: ictxt
-    complex(kind(1.d0)), intent(inout)  :: dat
+    complex(psb_dpk_), intent(inout)  :: dat
     character, intent(in)            :: scope
     character, intent(in), optional  :: top
     integer, intent(in), optional    :: rrt,crt
@@ -4774,8 +4842,9 @@ contains
     
     interface 
       subroutine zgamn2d(ictxt,scope,top,m,n,v,ld,ria,cia,ldia,rrt,crt)
+        use psb_const_mod
         integer, intent(in)             :: ictxt,m,n,ld
-        complex(kind(1.d0)), intent(inout) :: v
+        complex(psb_dpk_), intent(inout) :: v
         character, intent(in)           :: scope, top
         integer, intent(inout)          :: ria(*),cia(*)
         integer, intent(in)             :: rrt,crt,ldia
@@ -4828,7 +4897,7 @@ contains
 
   subroutine zgamn2dv(ictxt,scope,dat,top,ria,cia,rrt,crt)
     integer, intent(in)              :: ictxt
-    complex(kind(1.d0)), intent(inout)  :: dat(:)
+    complex(psb_dpk_), intent(inout)  :: dat(:)
     character, intent(in)            :: scope
     character, intent(in), optional  :: top
     integer, intent(inout), optional :: ria(:),cia(:)
@@ -4836,8 +4905,9 @@ contains
 
     interface 
       subroutine zgamn2d(ictxt,scope,top,m,n,v,ld,ria,cia,ldia,rrt,crt)
+        use psb_const_mod
         integer, intent(in)             :: ictxt,m,n,ld
-        complex(kind(1.d0)), intent(inout) :: v(*)
+        complex(psb_dpk_), intent(inout) :: v(*)
         character, intent(in)           :: scope, top
         integer, intent(inout)          :: ria(*),cia(*)
         integer, intent(in)             :: rrt,crt,ldia
@@ -4891,7 +4961,7 @@ contains
 
   subroutine zgamn2dm(ictxt,scope,dat,top,ria,cia,rrt,crt)
     integer, intent(in)              :: ictxt
-    complex(kind(1.d0)), intent(inout)  :: dat(:,:)
+    complex(psb_dpk_), intent(inout)  :: dat(:,:)
     character, intent(in)            :: scope
     integer, intent(inout), optional :: ria(:,:),cia(:,:)
     character, intent(in), optional  :: top
@@ -4899,8 +4969,9 @@ contains
 
     interface 
       subroutine zgamn2d(ictxt,scope,top,m,n,v,ld,ria,cia,ldia,rrt,crt)
+        use psb_const_mod
         integer, intent(in)             :: ictxt,m,n,ld,ldia
-        complex(kind(1.d0)), intent(inout) :: v(ld,*)
+        complex(psb_dpk_), intent(inout) :: v(ld,*)
         integer, intent(inout)          :: ria(ldia,*),cia(ldia,*)
         character, intent(in)           :: scope, top
         integer, intent(in)             :: rrt,crt

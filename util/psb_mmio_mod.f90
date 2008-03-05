@@ -203,7 +203,7 @@ contains
     character(1024)      :: line
     integer        :: nrow, ncol, nnzero
     integer        :: ircode, i,nzr,infile
-    real(kind(1.d0))   :: are, aim
+    real(psb_dpk_)   :: are, aim
 
     iret = 0
 

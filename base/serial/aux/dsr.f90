@@ -39,10 +39,10 @@ subroutine dsr(n,x,dir)
   !
   !     .. Scalar Arguments ..
   integer, intent(in) :: n, dir 
-  real(kind(1.d0)) ::  x(n)
+  real(psb_dpk_) ::  x(n)
   !     ..
   !     .. Local Scalars ..
-  real(kind(1.d0)) :: piv, xt, xk
+  real(psb_dpk_) :: piv, xt, xk
   integer i, j, ilx, iux, istp, lpiv
   integer n1, n2
 
@@ -314,9 +314,9 @@ contains
   subroutine disr_up(n,x)
     implicit none
     integer :: n
-    real(kind(1.d0)) :: x(n)
+    real(psb_dpk_) :: x(n)
     integer :: i,j
-    real(kind(1.d0)) :: xx
+    real(psb_dpk_) :: xx
 
     do j=n-1,1,-1
       if (x(j+1) < x(j)) then
@@ -336,9 +336,9 @@ contains
   subroutine disr_dw(n,x)
     implicit none
     integer :: n
-    real(kind(1.d0)) :: x(n)
+    real(psb_dpk_) :: x(n)
     integer :: i,j
-    real(kind(1.d0)) :: xx
+    real(psb_dpk_) :: xx
 
     do j=n-1,1,-1
       if (x(j+1) > x(j)) then

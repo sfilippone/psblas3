@@ -53,7 +53,7 @@ contains
     integer                              :: irw
     integer, intent(out)                 :: nz
     integer, allocatable, intent(inout)  :: ia(:), ja(:)
-    real(kind(1.d0)), allocatable,  intent(inout)    :: val(:)
+    real(psb_dpk_), allocatable,  intent(inout)    :: val(:)
     integer                              :: nzin
     logical, intent(in)                  :: append
     integer                              :: lrw,info
@@ -168,7 +168,7 @@ contains
     integer                              :: irw
     integer, intent(out)                 :: nz
     integer, allocatable, intent(inout)  :: ia(:), ja(:)
-    real(kind(1.d0)), allocatable,  intent(inout)    :: val(:)
+    real(psb_dpk_), allocatable,  intent(inout)    :: val(:)
     integer                              :: nzin
     logical, intent(in)                  :: append
     integer                              :: lrw,info
@@ -344,7 +344,7 @@ contains
     integer                               :: irw
     integer, intent(out)                 :: nz
     integer, allocatable, intent(inout)  :: ia(:), ja(:)
-    real(kind(1.d0)), allocatable,  intent(inout)    :: val(:)
+    real(psb_dpk_), allocatable,  intent(inout)    :: val(:)
     integer                               :: nzin
     logical, intent(in)                   :: append
     integer, optional                     :: iren(:)
@@ -476,7 +476,7 @@ contains
     integer                              :: irw
     integer, intent(out)                 :: nz
     integer, allocatable, intent(inout)  :: ia(:), ja(:)
-    complex(kind(1.d0)), allocatable,  intent(inout)    :: val(:)
+    complex(psb_dpk_), allocatable,  intent(inout)    :: val(:)
     integer                              :: nzin
     logical, intent(in)                  :: append
     integer                              :: lrw,info
@@ -592,7 +592,7 @@ contains
     integer                              :: irw
     integer, intent(out)                 :: nz
     integer, allocatable, intent(inout)  :: ia(:), ja(:)
-    complex(kind(1.d0)), allocatable,  intent(inout)    :: val(:)
+    complex(psb_dpk_), allocatable,  intent(inout)    :: val(:)
     integer                              :: nzin
     logical, intent(in)                  :: append
     integer                              :: lrw,info
@@ -769,7 +769,7 @@ contains
     integer                               :: irw
     integer, intent(out)                 :: nz
     integer, allocatable, intent(inout)  :: ia(:), ja(:)
-    complex(kind(1.d0)), allocatable,  intent(inout)    :: val(:)
+    complex(psb_dpk_), allocatable,  intent(inout)    :: val(:)
     integer                               :: nzin
     logical, intent(in)                   :: append
     integer, optional                     :: iren(:)

@@ -122,13 +122,14 @@ C
 C                                                                        
       SUBROUTINE DCSRRP(TRANS,M,N,DESCRA,JA,IA,                          
      +   P,WORK,LWORK,IERROR)
+      use psb_const_mod
       use psb_string_mod
       IMPLICIT NONE                                                      
 C     .. Scalar Arguments ..
       INTEGER          LWORK, M, N, IERROR
       CHARACTER        TRANS
 C     .. Array Arguments ..
-      DOUBLE PRECISION WORK(*)
+      real(psb_dpk_) WORK(*)
       INTEGER          JA(*), IA(*), P(*)
       CHARACTER        DESCRA*11
 C     .. Local Scalars ..

@@ -36,14 +36,15 @@ c
 *
       SUBROUTINE ZCOOMM(TRANSA,M,K,N,ALPHA,DESCRA,AR,
      *   IA,JA,INFOA,B,LDB,BETA,C,LDC,WORK,LWORK)
+      use psb_const_mod
 C
 C
 C     .. Scalar Arguments ..
-      COMPLEX*16        ALPHA, BETA
+      complex(psb_dpk_)        ALPHA, BETA
       INTEGER           K, LDB, LDC, M, N, LWORK
       CHARACTER         TRANSA
 C     .. Array Arguments ..
-      COMPLEX*16        AR(*), B(LDB,*), C(LDC,*),  WORK(*)
+      complex(psb_dpk_)        AR(*), B(LDB,*), C(LDC,*),  WORK(*)
       INTEGER           IA(*), JA(*),INFOA(*)
       CHARACTER         DESCRA*11
 C     .. Local Scalars ..

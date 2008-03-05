@@ -34,7 +34,8 @@
 !  Interfaces for Krylov subspace iterative methods.
 !
 Module psb_krylov_mod
-
+  
+  use psb_const_mod
   public 
 
   interface psb_krylov
@@ -48,14 +49,14 @@ Module psb_krylov_mod
       use psb_prec_mod
       type(psb_dspmat_type), intent(in)  :: a
       type(psb_desc_type), intent(in)    :: desc_a
-      real(kind(1.d0)), intent(in)       :: b(:)
-      real(kind(1.d0)), intent(inout)    :: x(:)
-      real(kind(1.d0)), intent(in)       :: eps
+      real(psb_dpk_), intent(in)       :: b(:)
+      real(psb_dpk_), intent(inout)    :: x(:)
+      real(psb_dpk_), intent(in)       :: eps
       type(psb_dprec_type), intent(in)   :: prec
       integer, intent(out)               :: info
       integer, optional, intent(in)      :: itmax, itrace,istop
       integer, optional, intent(out)     :: iter
-      real(kind(1.d0)), optional, intent(out) :: err
+      real(psb_dpk_), optional, intent(out) :: err
     end subroutine psb_dcg
     subroutine psb_zcg(a,prec,b,x,eps,&
          & desc_a,info,itmax,iter,err,itrace,istop)
@@ -63,14 +64,14 @@ Module psb_krylov_mod
       use psb_prec_mod
       type(psb_zspmat_type), intent(in)  :: a
       type(psb_desc_type), intent(in)    :: desc_a
-      complex(kind(1.d0)), intent(in)    :: b(:)
-      complex(kind(1.d0)), intent(inout) :: x(:)
-      real(kind(1.d0)), intent(in)       :: eps
+      complex(psb_dpk_), intent(in)    :: b(:)
+      complex(psb_dpk_), intent(inout) :: x(:)
+      real(psb_dpk_), intent(in)       :: eps
       type(psb_zprec_type), intent(in)   :: prec
       integer, intent(out)               :: info
       integer, optional, intent(in)      :: itmax, itrace,istop
       integer, optional, intent(out)     :: iter
-      real(kind(1.d0)), optional, intent(out) :: err
+      real(psb_dpk_), optional, intent(out) :: err
     end subroutine psb_zcg
   end interface
 
@@ -81,14 +82,14 @@ Module psb_krylov_mod
       use psb_prec_mod
       type(psb_dspmat_type), intent(in)  :: a
       type(psb_desc_type), intent(in)    :: desc_a
-      real(kind(1.d0)), intent(in)       :: b(:)
-      real(kind(1.d0)), intent(inout)    :: x(:)
-      real(kind(1.d0)), intent(in)       :: eps
+      real(psb_dpk_), intent(in)       :: b(:)
+      real(psb_dpk_), intent(inout)    :: x(:)
+      real(psb_dpk_), intent(in)       :: eps
       type(psb_dprec_type), intent(in)   :: prec
       integer, intent(out)               :: info
       integer, optional, intent(in)      :: itmax, itrace,istop
       integer, optional, intent(out)     :: iter
-      real(kind(1.d0)), optional, intent(out) :: err
+      real(psb_dpk_), optional, intent(out) :: err
     end subroutine psb_dbicg
     subroutine psb_zbicg(a,prec,b,x,eps,&
          & desc_a,info,itmax,iter,err,itrace,istop)
@@ -96,14 +97,14 @@ Module psb_krylov_mod
       use psb_prec_mod
       type(psb_zspmat_type), intent(in)  :: a
       type(psb_desc_type), intent(in)    :: desc_a
-      complex(kind(1.d0)), intent(in)       :: b(:)
-      complex(kind(1.d0)), intent(inout)    :: x(:)
-      real(kind(1.d0)), intent(in)       :: eps
+      complex(psb_dpk_), intent(in)       :: b(:)
+      complex(psb_dpk_), intent(inout)    :: x(:)
+      real(psb_dpk_), intent(in)       :: eps
       type(psb_zprec_type), intent(in)   :: prec
       integer, intent(out)               :: info
       integer, optional, intent(in)      :: itmax, itrace,istop
       integer, optional, intent(out)     :: iter
-      real(kind(1.d0)), optional, intent(out) :: err
+      real(psb_dpk_), optional, intent(out) :: err
     end subroutine psb_zbicg
   end interface
 
@@ -114,14 +115,14 @@ Module psb_krylov_mod
       use psb_prec_mod
       type(psb_dspmat_type), intent(in)  :: a
       type(psb_desc_type), intent(in)    :: desc_a
-      real(kind(1.d0)), intent(in)       :: b(:)
-      real(kind(1.d0)), intent(inout)    :: x(:)
-      real(kind(1.d0)), intent(in)       :: eps
+      real(psb_dpk_), intent(in)       :: b(:)
+      real(psb_dpk_), intent(inout)    :: x(:)
+      real(psb_dpk_), intent(in)       :: eps
       type(psb_dprec_type), intent(in)   :: prec
       integer, intent(out)               :: info
       integer, optional, intent(in)      :: itmax, itrace,istop
       integer, optional, intent(out)     :: iter
-      real(kind(1.d0)), optional, intent(out) :: err
+      real(psb_dpk_), optional, intent(out) :: err
     end subroutine psb_dcgstab
     subroutine psb_zcgstab(a,prec,b,x,eps,&
          & desc_a,info,itmax,iter,err,itrace,istop)
@@ -129,14 +130,14 @@ Module psb_krylov_mod
       use psb_prec_mod
       type(psb_zspmat_type), intent(in)  :: a
       type(psb_desc_type), intent(in)    :: desc_a
-      complex(kind(1.d0)), intent(in)       :: b(:)
-      complex(kind(1.d0)), intent(inout)    :: x(:)
-      real(kind(1.d0)), intent(in)       :: eps
+      complex(psb_dpk_), intent(in)       :: b(:)
+      complex(psb_dpk_), intent(inout)    :: x(:)
+      real(psb_dpk_), intent(in)       :: eps
       type(psb_zprec_type), intent(in)   :: prec
       integer, intent(out)               :: info
       integer, optional, intent(in)      :: itmax, itrace,istop
       integer, optional, intent(out)     :: iter
-      real(kind(1.d0)), optional, intent(out) :: err
+      real(psb_dpk_), optional, intent(out) :: err
     end subroutine psb_zcgstab
   end interface
 
@@ -148,13 +149,13 @@ Module psb_krylov_mod
       Type(psb_dspmat_type), Intent(in)  :: a
       Type(psb_desc_type), Intent(in)    :: desc_a
       type(psb_dprec_type), intent(in)   :: prec
-      Real(Kind(1.d0)), Intent(in)       :: b(:)
-      Real(Kind(1.d0)), Intent(inout)    :: x(:)
-      Real(Kind(1.d0)), Intent(in)       :: eps
+      Real(psb_dpk_), Intent(in)       :: b(:)
+      Real(psb_dpk_), Intent(inout)    :: x(:)
+      Real(psb_dpk_), Intent(in)       :: eps
       integer, intent(out)               :: info
       Integer, Optional, Intent(in)      :: itmax, itrace, irst,istop
       Integer, Optional, Intent(out)     :: iter
-      Real(Kind(1.d0)), Optional, Intent(out) :: err
+      Real(psb_dpk_), Optional, Intent(out) :: err
     end subroutine psb_dcgstabl
     Subroutine psb_zcgstabl(a,prec,b,x,eps,desc_a,info,&
          &itmax,iter,err,itrace,irst,istop)
@@ -163,13 +164,13 @@ Module psb_krylov_mod
       Type(psb_zspmat_type), Intent(in)  :: a
       Type(psb_desc_type), Intent(in)    :: desc_a
       type(psb_zprec_type), intent(in)   :: prec 
-      complex(Kind(1.d0)), Intent(in)    :: b(:)
-      complex(Kind(1.d0)), Intent(inout) :: x(:)
-      Real(Kind(1.d0)), Intent(in)       :: eps
+      complex(psb_dpk_), Intent(in)    :: b(:)
+      complex(psb_dpk_), Intent(inout) :: x(:)
+      Real(psb_dpk_), Intent(in)       :: eps
       integer, intent(out)               :: info
       Integer, Optional, Intent(in)      :: itmax, itrace, irst,istop
       Integer, Optional, Intent(out)     :: iter
-      Real(Kind(1.d0)), Optional, Intent(out) :: err
+      Real(psb_dpk_), Optional, Intent(out) :: err
     end subroutine psb_zcgstabl
   end interface
 
@@ -181,13 +182,13 @@ Module psb_krylov_mod
       Type(psb_dspmat_type), Intent(in)  :: a
       Type(psb_desc_type), Intent(in)    :: desc_a
       type(psb_dprec_type), intent(in)   :: prec 
-      Real(Kind(1.d0)), Intent(in)       :: b(:)
-      Real(Kind(1.d0)), Intent(inout)    :: x(:)
-      Real(Kind(1.d0)), Intent(in)       :: eps
+      Real(psb_dpk_), Intent(in)       :: b(:)
+      Real(psb_dpk_), Intent(inout)    :: x(:)
+      Real(psb_dpk_), Intent(in)       :: eps
       integer, intent(out)               :: info
       Integer, Optional, Intent(in)      :: itmax, itrace, irst,istop
       Integer, Optional, Intent(out)     :: iter
-      Real(Kind(1.d0)), Optional, Intent(out) :: err
+      Real(psb_dpk_), Optional, Intent(out) :: err
     end subroutine psb_drgmres
     Subroutine psb_zrgmres(a,prec,b,x,eps,desc_a,info,&
          &itmax,iter,err,itrace,irst,istop)
@@ -196,13 +197,13 @@ Module psb_krylov_mod
       Type(psb_zspmat_type), Intent(in)  :: a
       Type(psb_desc_type), Intent(in)    :: desc_a
       type(psb_zprec_type), intent(in)   :: prec 
-      complex(Kind(1.d0)), Intent(in)    :: b(:)
-      complex(Kind(1.d0)), Intent(inout) :: x(:)
-      Real(Kind(1.d0)), Intent(in)       :: eps
+      complex(psb_dpk_), Intent(in)    :: b(:)
+      complex(psb_dpk_), Intent(inout) :: x(:)
+      Real(psb_dpk_), Intent(in)       :: eps
       integer, intent(out)               :: info
       Integer, Optional, Intent(in)      :: itmax, itrace, irst,istop
       Integer, Optional, Intent(out)     :: iter
-      Real(Kind(1.d0)), Optional, Intent(out) :: err
+      Real(psb_dpk_), Optional, Intent(out) :: err
     end subroutine psb_zrgmres
   end interface
 
@@ -214,13 +215,13 @@ Module psb_krylov_mod
       type(psb_dspmat_type), intent(in)  :: a
       type(psb_desc_type), intent(in)    :: desc_a 
       type(psb_dprec_type), intent(in)   :: prec 
-      real(kind(1.d0)), intent(in)       :: b(:)
-      real(kind(1.d0)), intent(inout)    :: x(:)
-      real(kind(1.d0)), intent(in)       :: eps
+      real(psb_dpk_), intent(in)       :: b(:)
+      real(psb_dpk_), intent(inout)    :: x(:)
+      real(psb_dpk_), intent(in)       :: eps
       integer, intent(out)               :: info
       integer, optional, intent(in)      :: itmax, itrace,istop
       integer, optional, intent(out)     :: iter
-      real(kind(1.d0)), optional, intent(out) :: err
+      real(psb_dpk_), optional, intent(out) :: err
     end subroutine psb_dcgs
     subroutine psb_zcgs(a,prec,b,x,eps,&
          & desc_a,info,itmax,iter,err,itrace,istop)
@@ -228,14 +229,14 @@ Module psb_krylov_mod
       use psb_prec_mod
       type(psb_zspmat_type), intent(in)  :: a
       type(psb_desc_type), intent(in)    :: desc_a
-      complex(kind(1.d0)), intent(in)       :: b(:)
-      complex(kind(1.d0)), intent(inout)    :: x(:)
-      real(kind(1.d0)), intent(in)       :: eps
+      complex(psb_dpk_), intent(in)       :: b(:)
+      complex(psb_dpk_), intent(inout)    :: x(:)
+      real(psb_dpk_), intent(in)       :: eps
       type(psb_zprec_type), intent(in)   :: prec
       integer, intent(out)               :: info
       integer, optional, intent(in)      :: itmax, itrace,istop
       integer, optional, intent(out)     :: iter
-      real(kind(1.d0)), optional, intent(out) :: err
+      real(psb_dpk_), optional, intent(out) :: err
     end subroutine psb_zcgs
   end interface
 
@@ -260,7 +261,7 @@ Module psb_krylov_mod
   type psb_itconv_type
     private
     integer          :: controls(ivsz_)
-    real(kind(1.d0)) :: values(ivsz_)
+    real(psb_dpk_) :: values(ivsz_)
   end type psb_itconv_type
 
 contains
@@ -317,13 +318,13 @@ contains
     Type(psb_dspmat_type), Intent(in)  :: a
     Type(psb_desc_type), Intent(in)    :: desc_a
     type(psb_dprec_type), intent(in)   :: prec 
-    Real(Kind(1.d0)), Intent(in)       :: b(:)
-    Real(Kind(1.d0)), Intent(inout)    :: x(:)
-    Real(Kind(1.d0)), Intent(in)       :: eps
+    Real(psb_dpk_), Intent(in)       :: b(:)
+    Real(psb_dpk_), Intent(inout)    :: x(:)
+    Real(psb_dpk_), Intent(in)       :: eps
     integer, intent(out)               :: info
     Integer, Optional, Intent(in)      :: itmax, itrace, irst,istop
     Integer, Optional, Intent(out)     :: iter
-    Real(Kind(1.d0)), Optional, Intent(out) :: err
+    Real(psb_dpk_), Optional, Intent(out) :: err
 
     integer                            :: ictxt,me,np,err_act
     character(len=20)             :: name
@@ -433,13 +434,13 @@ contains
     Type(psb_zspmat_type), Intent(in)  :: a
     Type(psb_desc_type), Intent(in)    :: desc_a
     type(psb_zprec_type), intent(in)   :: prec 
-    complex(Kind(1.d0)), Intent(in)    :: b(:)
-    complex(Kind(1.d0)), Intent(inout) :: x(:)
-    Real(Kind(1.d0)), Intent(in)       :: eps
+    complex(psb_dpk_), Intent(in)    :: b(:)
+    complex(psb_dpk_), Intent(inout) :: x(:)
+    Real(psb_dpk_), Intent(in)       :: eps
     integer, intent(out)               :: info
     Integer, Optional, Intent(in)      :: itmax, itrace, irst,istop
     Integer, Optional, Intent(out)     :: iter
-    Real(Kind(1.d0)), Optional, Intent(out) :: err
+    Real(psb_dpk_), Optional, Intent(out) :: err
 
     integer                            :: ictxt,me,np,err_act
     character(len=20)             :: name
@@ -518,7 +519,7 @@ contains
     implicit none 
     character(len=*), intent(in)  :: methdname
     integer, intent(in)           :: me, itx, itrace
-    real(kind(1.d0)), intent(in)  :: errnum, errden, eps
+    real(psb_dpk_), intent(in)  :: errnum, errden, eps
     character(len=*), parameter   :: fmt='(a18,1x,i4,3(2x,es15.9))'
     integer, parameter            :: outlen=18 
     character(len=len(methdname)) :: mname
@@ -541,8 +542,8 @@ contains
     implicit none 
     character(len=*), intent(in) :: methdname
     integer, intent(in)          :: me, it
-    real(kind(1.d0)), intent(in) :: errnum, errden, eps
-    real(kind(1.d0)), optional, intent(out) :: err
+    real(psb_dpk_), intent(in) :: errnum, errden, eps
+    real(psb_dpk_), optional, intent(out) :: err
     integer, optional, intent(out)  :: iter
 
     character(len=*), parameter  :: fmt='(a,2x,es15.9,1x,a,1x,i4,1x,a)'
@@ -579,7 +580,7 @@ contains
     character(len=*), intent(in)      :: methdname
     integer, intent(in)               :: stopc, trace,itmax
     type(psb_dspmat_type), intent(in) :: a
-    real(kind(1.d0)), intent(in)      :: b(:), eps
+    real(psb_dpk_), intent(in)      :: b(:), eps
     type(psb_desc_type), intent(in)   :: desc_a
     type(psb_itconv_type)             :: stopdat
     integer, intent(out)              :: info
@@ -646,8 +647,8 @@ contains
     character(len=*), intent(in)      :: methdname
     integer, intent(in)               :: stopc, trace, itmax
     type(psb_zspmat_type), intent(in) :: a
-    complex(kind(1.d0)), intent(in)   :: b(:)
-    real(kind(1.d0)), intent(in)      :: eps
+    complex(psb_dpk_), intent(in)   :: b(:)
+    real(psb_dpk_), intent(in)      :: eps
     type(psb_desc_type), intent(in)   :: desc_a
     type(psb_itconv_type)             :: stopdat
     integer, intent(out)              :: info
@@ -714,7 +715,7 @@ contains
     implicit none 
     character(len=*), intent(in)    :: methdname
     integer, intent(in)             :: it
-    real(kind(1.d0)), intent(in)    :: x(:), r(:)
+    real(psb_dpk_), intent(in)    :: x(:), r(:)
     type(psb_desc_type), intent(in) :: desc_a
     type(psb_itconv_type)           :: stopdat
     logical                         :: psb_d_check_conv
@@ -788,7 +789,7 @@ contains
     implicit none 
     character(len=*), intent(in)    :: methdname
     integer, intent(in)             :: it
-    complex(kind(1.d0)), intent(in) :: x(:), r(:)
+    complex(psb_dpk_), intent(in) :: x(:), r(:)
     type(psb_desc_type), intent(in) :: desc_a
     type(psb_itconv_type)           :: stopdat
     logical                         :: psb_z_check_conv
@@ -863,11 +864,11 @@ contains
     type(psb_desc_type), intent(in) :: desc_a
     type(psb_itconv_type)           :: stopdat
     integer, intent(out)            :: info
-    real(kind(1.d0)), optional, intent(out) :: err
+    real(psb_dpk_), optional, intent(out) :: err
     integer, optional, intent(out)  :: iter
 
     integer                         :: ictxt, me, np, err_act
-    real(kind(1.d0))                :: errnum, errden, eps
+    real(psb_dpk_)                :: errnum, errden, eps
     character(len=20)               :: name
 
     info = 0

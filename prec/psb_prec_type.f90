@@ -37,6 +37,7 @@
 module psb_prec_type
 
   ! Reduces size of .mod file.
+  use psb_const_mod
   use psb_base_mod, only : psb_dspmat_type, psb_zspmat_type, psb_desc_type,&
        & psb_sizeof
 
@@ -64,22 +65,22 @@ module psb_prec_type
 
   type psb_dprec_type
     type(psb_dspmat_type), allocatable :: av(:) 
-    real(kind(1.d0)), allocatable      :: d(:)  
+    real(psb_dpk_), allocatable        :: d(:)  
     type(psb_desc_type)                :: desc_data 
     integer, allocatable               :: iprcparm(:) 
-    real(kind(1.d0)), allocatable      :: dprcparm(:) 
+    real(psb_dpk_), allocatable        :: dprcparm(:) 
     integer, allocatable               :: perm(:),  invperm(:) 
-    integer                       :: prec, base_prec
+    integer                            :: prec, base_prec
   end type psb_dprec_type
 
   type psb_zprec_type
     type(psb_zspmat_type), allocatable :: av(:) 
-    complex(kind(1.d0)), allocatable   :: d(:)  
+    complex(psb_dpk_), allocatable     :: d(:)  
     type(psb_desc_type)                :: desc_data 
     integer, allocatable               :: iprcparm(:) 
-    real(kind(1.d0)), allocatable      :: dprcparm(:) 
+    real(psb_dpk_), allocatable        :: dprcparm(:) 
     integer, allocatable               :: perm(:),  invperm(:) 
-    integer                       :: prec, base_prec
+    integer                            :: prec, base_prec
   end type psb_zprec_type
 
 
@@ -176,7 +177,7 @@ contains
   end function is_legal_ml_fact
   function is_legal_ml_eps(ip)
     use psb_base_mod
-    real(kind(1.d0)), intent(in) :: ip
+    real(psb_dpk_), intent(in) :: ip
     logical             :: is_legal_ml_eps
 
     is_legal_ml_eps = (ip>=0.0d0)
@@ -204,12 +205,13 @@ contains
 
   subroutine psb_dcheck_def(ip,name,id,is_legal)
     use psb_base_mod
-    real(kind(1.d0)), intent(inout) :: ip
-    real(kind(1.d0)), intent(in)    :: id
+    real(psb_dpk_), intent(inout) :: ip
+    real(psb_dpk_), intent(in)    :: id
     character(len=*), intent(in) :: name
     interface 
       function is_legal(i)
-        real(kind(1.d0)), intent(in) :: i
+        use psb_const_mod
+        real(psb_dpk_), intent(in) :: i
         logical             :: is_legal
       end function is_legal
     end interface
@@ -387,12 +389,12 @@ contains
     integer             :: val,i
     
     val = 0
-    if (allocated(prec%iprcparm)) val = val + 4 * size(prec%iprcparm)
-    if (allocated(prec%dprcparm)) val = val + 8 * size(prec%dprcparm)
-    if (allocated(prec%d))        val = val + 8 * size(prec%d)
-    if (allocated(prec%perm))     val = val + 4 * size(prec%perm)
-    if (allocated(prec%invperm))  val = val + 4 * size(prec%invperm)
-                                  val = val + psb_sizeof(prec%desc_data)
+    if (allocated(prec%iprcparm)) val = val + psb_sizeof_int * size(prec%iprcparm)
+    if (allocated(prec%dprcparm)) val = val + psb_sizeof_dp  * size(prec%dprcparm)
+    if (allocated(prec%d))        val = val + psb_sizeof_dp  * size(prec%d)
+    if (allocated(prec%perm))     val = val + psb_sizeof_int * size(prec%perm)
+    if (allocated(prec%invperm))  val = val + psb_sizeof_int * size(prec%invperm)
+    val = val + psb_sizeof(prec%desc_data)
     if (allocated(prec%av))  then 
       do i=1,size(prec%av)
         val = val + psb_sizeof(prec%av(i))
@@ -410,11 +412,11 @@ contains
     integer             :: val,i
     
     val = 0
-    if (allocated(prec%iprcparm)) val = val + 4 * size(prec%iprcparm)
-    if (allocated(prec%dprcparm)) val = val + 8 * size(prec%dprcparm)
-    if (allocated(prec%d))        val = val + 16 * size(prec%d)
-    if (allocated(prec%perm))     val = val + 4 * size(prec%perm)
-    if (allocated(prec%invperm))  val = val + 4 * size(prec%invperm)
+    if (allocated(prec%iprcparm)) val = val + psb_sizeof_int * size(prec%iprcparm)
+    if (allocated(prec%dprcparm)) val = val + psb_sizeof_dp  * size(prec%dprcparm)
+    if (allocated(prec%d))        val = val + 2 * psb_sizeof_dp * size(prec%d)
+    if (allocated(prec%perm))     val = val + psb_sizeof_int * size(prec%perm)
+    if (allocated(prec%invperm))  val = val + psb_sizeof_int * size(prec%invperm)
                                   val = val + psb_sizeof(prec%desc_data)
     if (allocated(prec%av))  then 
       do i=1,size(prec%av)

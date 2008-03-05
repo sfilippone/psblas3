@@ -39,19 +39,20 @@ subroutine psb_dcsrws(rw,a,info,trans)
   implicit none 
 
   type(psb_dspmat_type)      :: a
-  real(kind(1.d0)), allocatable   :: rw(:) 
+  real(psb_dpk_), allocatable   :: rw(:) 
   integer                    :: info
   character, optional        :: trans
 
   Interface 
     subroutine  dcsrws(trans,m,n,fida,descra,a,ia1,ia2,&
          &                infoa,rowsum,ierror)
+      use psb_const_mod
       integer, intent(in)        :: m,n
       integer, intent(out)       :: ierror
-      double precision, intent(in) :: a(*)
-      double precision, intent(out) :: rowsum(*)
-      integer, intent(in)          :: ia1(*), ia2(*), infoa(*)
-      character, intent(in)        :: descra*11,fida*5,trans*1
+      real(psb_dpk_), intent(in) :: a(*)
+      real(psb_dpk_), intent(out) :: rowsum(*)
+      integer, intent(in)        :: ia1(*), ia2(*), infoa(*)
+      character, intent(in)      :: descra*11,fida*5,trans*1
     end subroutine dcsrws
   end interface
 

@@ -54,7 +54,7 @@ contains
     integer                              :: info
 
     integer :: i, ip1,ip2,nnz,iflag,ichk,nnzt
-    real(kind(1.d0)), allocatable  :: work(:)
+    real(psb_dpk_), allocatable  :: work(:)
     integer :: err_act
     character(len=20)  :: name
     integer            :: debug_level, debug_unit
@@ -160,7 +160,7 @@ contains
     integer                              :: info
 
     integer :: i, ip1,ip2,nnz,iflag,ichk,nnzt
-    real(kind(1.d0)), allocatable  :: work(:)
+    real(psb_dpk_), allocatable  :: work(:)
     integer :: err_act
     character(len=20)  :: name
     integer            :: debug_level, debug_unit
@@ -266,7 +266,7 @@ contains
     integer                              :: info
 
     integer :: i, ip1,ip2,nnz,iflag,ichk,nnzt
-    real(kind(1.d0)), allocatable  :: work(:)
+    real(psb_dpk_), allocatable  :: work(:)
     integer :: err_act
     character(len=20)  :: name
     integer            :: debug_level, debug_unit
@@ -373,7 +373,7 @@ contains
     integer                              :: info
 
     integer :: i, ip1,ip2,nnz,iflag,ichk,nnzt
-    complex(kind(1.d0)), allocatable  :: work(:)
+    complex(psb_dpk_), allocatable  :: work(:)
     integer :: err_act
     character(len=20)  :: name
     integer            :: debug_level, debug_unit
@@ -478,7 +478,7 @@ contains
     integer                              :: info
 
     integer :: i, ip1,ip2,nnz,iflag,ichk,nnzt
-    complex(kind(1.d0)), allocatable  :: work(:)
+    complex(psb_dpk_), allocatable  :: work(:)
     integer :: err_act
     character(len=20)  :: name
     integer            :: debug_level, debug_unit
@@ -582,7 +582,7 @@ contains
     integer                              :: info
 
     integer :: i, ip1,ip2,nnz,iflag,ichk,nnzt
-    complex(kind(1.d0)), allocatable  :: work(:)
+    complex(psb_dpk_), allocatable  :: work(:)
     integer :: err_act
     character(len=20)  :: name
     integer            :: debug_level, debug_unit

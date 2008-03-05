@@ -35,14 +35,15 @@ C  "right" place, i.e. the last in its row for Lower and the first
 C  for Upper. 
 C
       SUBROUTINE DCOOSV (UPLO,TRANS,DIAG,N,AS,IA,JA,INFOA,B,X,IERROR)
+      use psb_const_mod
       use psb_error_mod
-      DOUBLE PRECISION   ZERO
+      real(psb_dpk_)   ZERO
       PARAMETER         (ZERO=0.0D0)
       INTEGER           N,IERROR
       CHARACTER         DIAG, TRANS, UPLO
-      DOUBLE PRECISION  AS(*), B(*), X(*)
+      real(psb_dpk_)  AS(*), B(*), X(*)
       INTEGER           IA(*), JA(*),INFOA(*)
-      DOUBLE PRECISION  ACC
+      real(psb_dpk_)  ACC
       INTEGER           I, J, K, NNZ, II
       LOGICAL           LOW, TRA, UNI
       integer           :: debug_level, debug_unit

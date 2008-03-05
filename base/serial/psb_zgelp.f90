@@ -46,25 +46,26 @@ subroutine psb_zgelp(trans,iperm,x,info)
   use psb_error_mod
   implicit none
 
-  complex(kind(1.d0)), intent(inout)      ::  x(:,:)
+  complex(psb_dpk_), intent(inout)      ::  x(:,:)
   integer, intent(in)                  ::  iperm(:)
   integer, intent(out)                 ::  info
   character, intent(in)                :: trans
 
   ! local variables
   integer                  :: ictxt
-  complex(kind(1.d0)),allocatable ::  dtemp(:)
+  complex(psb_dpk_),allocatable ::  dtemp(:)
   integer, allocatable     :: itemp(:)
   integer                  :: int_err(5), i1sz, i2sz, err_act
-  real(kind(1.d0)),parameter    :: one=1
+  real(psb_dpk_),parameter    :: one=1
   logical, parameter :: debug=.false.
 
   interface 
     subroutine zgelp(trans,m,n,p,b,ldb,work,lwork,ierror)
+      use psb_const_mod
       integer, intent(in)  :: ldb, m, n, lwork
       integer, intent(out) :: ierror
       character, intent(in) :: trans
-      complex(kind(1.d0)), intent(inout) ::  b(ldb,*), work(*)
+      complex(psb_dpk_), intent(inout) ::  b(ldb,*), work(*)
       integer, intent(in)  :: p(*)
     end subroutine zgelp
   end interface
@@ -180,7 +181,7 @@ subroutine psb_zgelpv(trans,iperm,x,info)
   use psb_error_mod
   implicit none
 
-  complex(kind(1.d0)), intent(inout) ::  x(:)
+  complex(psb_dpk_), intent(inout) ::  x(:)
   integer, intent(in)                  ::  iperm(:)
   integer, intent(out)                 ::  info
   character, intent(in)              ::  trans
@@ -188,17 +189,18 @@ subroutine psb_zgelpv(trans,iperm,x,info)
   ! local variables
   integer :: ictxt
   integer :: int_err(5), i1sz, err_act
-  complex(kind(1.d0)),allocatable  ::  dtemp(:)
+  complex(psb_dpk_),allocatable  ::  dtemp(:)
   integer, allocatable     :: itemp(:)
-  real(kind(1.d0)),parameter    :: one=1
+  real(psb_dpk_),parameter    :: one=1
   logical, parameter :: debug=.false.
 
   interface zgelp
     subroutine zgelp(trans,m,n,p,b,ldb,work,lwork,ierror)
+      use psb_const_mod
       integer, intent(in)  :: ldb, m, n, lwork
       integer, intent(out) :: ierror
       character, intent(in) :: trans
-      complex(kind(1.d0)), intent(inout) ::  b(*), work(*)
+      complex(psb_dpk_), intent(inout) ::  b(*), work(*)
       integer, intent(in)  :: p(*)
     end subroutine zgelp
   end interface

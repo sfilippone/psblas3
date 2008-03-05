@@ -52,8 +52,8 @@ subroutine  psb_zgatherm(globx, locx, desc_a, info, iroot)
   use psb_penv_mod
   implicit none
 
-  complex(kind(1.d0)), intent(in)    :: locx(:,:)
-  complex(kind(1.d0)), intent(out)   :: globx(:,:)
+  complex(psb_dpk_), intent(in)    :: locx(:,:)
+  complex(psb_dpk_), intent(out)   :: globx(:,:)
   type(psb_desc_type), intent(in) :: desc_a
   integer, intent(out)            :: info
   integer, intent(in), optional   :: iroot
@@ -228,8 +228,8 @@ subroutine  psb_zgatherv(globx, locx, desc_a, info, iroot)
   use psb_penv_mod
   implicit none
 
-  complex(kind(1.d0)), intent(in)    :: locx(:)
-  complex(kind(1.d0)), intent(out)   :: globx(:)
+  complex(psb_dpk_), intent(in)    :: locx(:)
+  complex(psb_dpk_), intent(out)   :: globx(:)
   type(psb_desc_type), intent(in) :: desc_a
   integer, intent(out)            :: info
   integer, intent(in), optional   :: iroot

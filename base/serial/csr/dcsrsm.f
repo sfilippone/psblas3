@@ -31,10 +31,11 @@ C
 C 
       SUBROUTINE DCSRSM(TRANST,M,N,UNITD,D,ALPHA,DESCRA,A,JA,IA,
      *                  B,LDB,BETA,C,LDC,WORK,LWORK,IERROR)
-      DOUBLE PRECISION  ALPHA, BETA
+      use psb_const_mod
+      real(psb_dpk_)  ALPHA, BETA
       INTEGER           LDB, LDC, LWORK, M, N, IERROR
       CHARACTER         UNITD, TRANST
-      DOUBLE PRECISION  A(*), B(LDB,*), C(LDC,*), D(*), WORK(*)
+      real(psb_dpk_)  A(*), B(LDB,*), C(LDC,*), D(*), WORK(*)
       INTEGER           IA(*), JA(*)
       CHARACTER         DESCRA*11
       INTEGER           I, K

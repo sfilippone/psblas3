@@ -64,7 +64,7 @@ contains
     integer, intent(in) :: nz, imin,imax,jmin,jmax,nzl
     integer, intent(in) :: ia(*),ja(*)
     integer, intent(inout) :: nza
-    real(kind(1.d0)), intent(in) :: val(*)
+    real(psb_dpk_), intent(in) :: val(*)
     integer, intent(out) :: info
     integer, intent(in), optional  :: ng,gtl(*)
 
@@ -109,7 +109,7 @@ contains
     integer, intent(in) :: nz, imin,imax,jmin,jmax,nzl
     integer, intent(in) :: ia(*),ja(*)
     integer, intent(inout) :: nza
-    complex(kind(1.d0)), intent(in) :: val(*)
+    complex(psb_dpk_), intent(in) :: val(*)
     integer, intent(out) :: info
     integer, intent(in), optional  :: ng,gtl(*)
 
@@ -172,7 +172,7 @@ contains
     integer, intent(in) :: nz, imin,imax,jmin,jmax,nzl
     integer, intent(in) :: ia(*),ja(*)
     integer, intent(inout) :: nza
-    real(kind(1.d0)), intent(in) :: val(*)
+    real(psb_dpk_), intent(in) :: val(*)
     integer, intent(out) :: info
     integer, intent(in), optional  :: ng,gtl(*)
 
@@ -421,7 +421,7 @@ contains
     integer, intent(in) :: nz, imin,imax,jmin,jmax,nzl
     integer, intent(in) :: ia(*),ja(*)
     integer, intent(inout) :: nza
-    real(kind(1.d0)), intent(in) :: val(*)
+    real(psb_dpk_), intent(in) :: val(*)
     integer, intent(out) :: info
     integer, intent(in), optional  :: ng,gtl(*)
     integer  :: i,ir,ic, ilr, ilc, ip, &
@@ -646,7 +646,7 @@ contains
     integer, intent(in) :: nz, imin,imax,jmin,jmax,nzl
     integer, intent(in) :: ia(*),ja(*)
     integer, intent(inout) :: nza
-    real(kind(1.d0)), intent(in) :: val(*)
+    real(psb_dpk_), intent(in) :: val(*)
     integer, intent(out) :: info
     integer, intent(in), optional  :: ng,gtl(*)
 
@@ -884,7 +884,7 @@ contains
     integer, intent(in) :: nz, imin,imax,jmin,jmax,nzl
     integer, intent(in) :: ia(*),ja(*)
     integer, intent(inout) :: nza
-    complex(kind(1.d0)), intent(in) :: val(*)
+    complex(psb_dpk_), intent(in) :: val(*)
     integer, intent(out) :: info
     integer, intent(in), optional  :: ng,gtl(*)
 
@@ -1134,7 +1134,7 @@ contains
     integer, intent(in) :: nz, imin,imax,jmin,jmax,nzl
     integer, intent(in) :: ia(*),ja(*)
     integer, intent(inout) :: nza
-    complex(kind(1.d0)), intent(in) :: val(*)
+    complex(psb_dpk_), intent(in) :: val(*)
     integer, intent(out) :: info
     integer, intent(in), optional  :: ng,gtl(*)
     integer  :: i,ir,ic, ilr, ilc, ip, &
@@ -1362,7 +1362,7 @@ contains
     integer, intent(in) :: nz, imin,imax,jmin,jmax,nzl
     integer, intent(in) :: ia(*),ja(*)
     integer, intent(inout) :: nza
-    complex(kind(1.d0)), intent(in) :: val(*)
+    complex(psb_dpk_), intent(in) :: val(*)
     integer, intent(out) :: info
     integer, intent(in), optional  :: ng,gtl(*)
 
