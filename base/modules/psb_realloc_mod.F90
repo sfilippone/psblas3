@@ -1628,13 +1628,13 @@ Contains
       end if
     else if (allocated(vin)) then 
       if (.not.allocated(vout)) then 
-        allocate(vout(size(vin)),stat=info)
+        allocate(vout(vout(lbound(vin,1):ubound(vin,1)),stat=info)
         if (info /= 0) return
       else
         if (size(vout) /= size(vin)) then 
           deallocate(vout,stat=info)
           if (info /= 0) return
-          allocate(vout(size(vin)),stat=info)
+          allocate(vout(vout(lbound(vin,1):ubound(vin,1)),stat=info)
           if (info /= 0) return
         end if
       end if
@@ -1778,13 +1778,13 @@ Contains
       end if
     else if (allocated(vin)) then 
       if (.not.allocated(vout)) then 
-        allocate(vout(size(vin)),stat=info)
+        allocate(vout(vout(lbound(vin,1):ubound(vin,1)),stat=info)
         if (info /= 0) return
       else
         if (size(vout) /= size(vin)) then 
           deallocate(vout,stat=info)
           if (info /= 0) return
-          allocate(vout(size(vin)),stat=info)
+          allocate(vout(vout(lbound(vin,1):ubound(vin,1)),stat=info)
           if (info /= 0) return
         end if
       end if
