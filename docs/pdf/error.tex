@@ -32,7 +32,10 @@ pushed on stack, the program execution skips to a point where the
 error condition is handled; the error condition is handled either by
 returning control to the caller routine or by calling the
 \verb|psb\_error| routine which prints the content of the error stack
-and aborts the program execution.
+and aborts the program execution, according to the choice made by the
+user with \verb|psb_set_erraction|. The default is to print the error
+and terminate the program, but the user may choose to handle the error
+explicitly. 
 
 \begin{figure}[h!]
   \begin{Sbox}
@@ -185,7 +188,8 @@ Specified as: an integer.
 Scope: {\bf global} \\
 Type: {\bf required}\\
 Intent: {\bf in}.\\
-Specified as: an integer.
+Specified as: an integer. Possible values: \verb|psb_act_ret|,
+\verb|psb_act_abort|. 
 \end{description}
 
 
