@@ -1621,26 +1621,14 @@ Contains
     end if
 
 #else      
-    
-    if (.not.allocated(vin) ) then 
-      if (allocated(vout)) then 
-        deallocate(vout,stat=info)
-      end if
-    else if (allocated(vin)) then 
-      if (.not.allocated(vout)) then 
-        allocate(vout(vout(lbound(vin,1):ubound(vin,1)),stat=info)
-        if (info /= 0) return
-      else
-        if (size(vout) /= size(vin)) then 
-          deallocate(vout,stat=info)
-          if (info /= 0) return
-          allocate(vout(vout(lbound(vin,1):ubound(vin,1)),stat=info)
-          if (info /= 0) return
-        end if
-      end if
-      vout = vin
-      deallocate(vin,stat=info)
-    end if
+    if (allocated(vout)) then 
+      deallocate(vout,stat=info)
+    end if    
+    if (.not.allocated(vin) ) return
+    allocate(vout(lbound(vin,1):ubound(vin,1)),stat=info)
+    if (info /= 0) return
+    vout = vin
+    deallocate(vin,stat=info)
 #endif
   end Subroutine psb_dtransfer1d
 
@@ -1658,28 +1646,16 @@ Contains
       deallocate(vout)
     end if
 #else
+    if (allocated(vout)) then 
+      deallocate(vout,stat=info)
+    end if    
+    if (.not.allocated(vin) ) return
     
-    if (.not.allocated(vin) ) then 
-      if (allocated(vout)) then 
-        deallocate(vout,stat=info)
-      end if
-    else if (allocated(vin)) then 
-      if (.not.allocated(vout)) then 
-        allocate(vout(lbound(vin,1):ubound(vin,1),&
-             & lbound(vin,2):ubound(vin,2)),stat=info)
-        if (info /= 0) return
-      else
-        if (size(vout) /= size(vin)) then 
-          deallocate(vout,stat=info)
-          if (info /= 0) return
-          allocate(vout(lbound(vin,1):ubound(vin,1),&
-               & lbound(vin,2):ubound(vin,2)),stat=info)
-          if (info /= 0) return
-        end if
-      end if
-      vout = vin
-      deallocate(vin,stat=info)
-    end if
+    allocate(vout(lbound(vin,1):ubound(vin,1),&
+         & lbound(vin,2):ubound(vin,2)),stat=info)
+    if (info /= 0) return
+    vout = vin
+    deallocate(vin,stat=info)
 #endif
   end Subroutine psb_dtransfer2d
 
@@ -1697,25 +1673,14 @@ Contains
       deallocate(vout)
     end if
 #else
-    if (.not.allocated(vin) ) then 
-      if (allocated(vout)) then 
-        deallocate(vout,stat=info)
-      end if
-    else if (allocated(vin)) then 
-      if (.not.allocated(vout)) then 
-        allocate(vout(size(vin)),stat=info)
-        if (info /= 0) return
-      else
-        if (size(vout) /= size(vin)) then 
-          deallocate(vout,stat=info)
-          if (info /= 0) return
-          allocate(vout(size(vin)),stat=info)
-          if (info /= 0) return
-        end if
-      end if
-      vout = vin
-      deallocate(vin,stat=info)
-    end if
+    if (allocated(vout)) then 
+      deallocate(vout,stat=info)
+    end if    
+    if (.not.allocated(vin) ) return
+    allocate(vout(lbound(vin,1):ubound(vin,1)),stat=info)
+    if (info /= 0) return
+    vout = vin
+    deallocate(vin,stat=info)
 #endif
   end Subroutine psb_ztransfer1d
 
@@ -1733,27 +1698,16 @@ Contains
       deallocate(vout)
     end if
 #else
-    if (.not.allocated(vin) ) then 
-      if (allocated(vout)) then 
-        deallocate(vout,stat=info)
-      end if
-    else if (allocated(vin)) then 
-      if (.not.allocated(vout)) then 
-        allocate(vout(lbound(vin,1):ubound(vin,1),&
-             & lbound(vin,2):ubound(vin,2)),stat=info)
-        if (info /= 0) return
-      else
-        if (size(vout) /= size(vin)) then 
-          deallocate(vout,stat=info)
-          if (info /= 0) return
-          allocate(vout(lbound(vin,1):ubound(vin,1),&
-               & lbound(vin,2):ubound(vin,2)),stat=info)
-          if (info /= 0) return
-        end if
-      end if
-      vout = vin
-      deallocate(vin,stat=info)
-    end if
+    if (allocated(vout)) then 
+      deallocate(vout,stat=info)
+    end if    
+    if (.not.allocated(vin) ) return
+    
+    allocate(vout(lbound(vin,1):ubound(vin,1),&
+         & lbound(vin,2):ubound(vin,2)),stat=info)
+    if (info /= 0) return
+    vout = vin
+    deallocate(vin,stat=info)
 #endif
   end Subroutine psb_ztransfer2d
 
@@ -1772,25 +1726,14 @@ Contains
       deallocate(vout)
     end if
 #else
-    if (.not.allocated(vin) ) then 
-      if (allocated(vout)) then 
-        deallocate(vout,stat=info)
-      end if
-    else if (allocated(vin)) then 
-      if (.not.allocated(vout)) then 
-        allocate(vout(vout(lbound(vin,1):ubound(vin,1)),stat=info)
-        if (info /= 0) return
-      else
-        if (size(vout) /= size(vin)) then 
-          deallocate(vout,stat=info)
-          if (info /= 0) return
-          allocate(vout(vout(lbound(vin,1):ubound(vin,1)),stat=info)
-          if (info /= 0) return
-        end if
-      end if
-      vout = vin
-      deallocate(vin,stat=info)
-    end if
+    if (allocated(vout)) then 
+      deallocate(vout,stat=info)
+    end if    
+    if (.not.allocated(vin) ) return
+    allocate(vout(lbound(vin,1):ubound(vin,1)),stat=info)
+    if (info /= 0) return
+    vout = vin
+    deallocate(vin,stat=info)
 #endif
   end Subroutine psb_itransfer1d
 
@@ -1808,27 +1751,16 @@ Contains
       deallocate(vout)
     end if
 #else
-    if (.not.allocated(vin) ) then 
-      if (allocated(vout)) then 
-        deallocate(vout,stat=info)
-      end if
-    else if (allocated(vin)) then 
-      if (.not.allocated(vout)) then 
-        allocate(vout(lbound(vin,1):ubound(vin,1),&
-             & lbound(vin,2):ubound(vin,2)),stat=info)
-        if (info /= 0) return
-      else
-        if (size(vout) /= size(vin)) then 
-          deallocate(vout,stat=info)
-          if (info /= 0) return
-          allocate(vout(lbound(vin,1):ubound(vin,1),&
-               & lbound(vin,2):ubound(vin,2)),stat=info)
-          if (info /= 0) return
-        end if
-      end if
-      vout = vin
-      deallocate(vin,stat=info)
-    end if
+    if (allocated(vout)) then 
+      deallocate(vout,stat=info)
+    end if    
+    if (.not.allocated(vin) ) return
+    
+    allocate(vout(lbound(vin,1):ubound(vin,1),&
+         & lbound(vin,2):ubound(vin,2)),stat=info)
+    if (info /= 0) return
+    vout = vin
+    deallocate(vin,stat=info)
 #endif
   end Subroutine psb_itransfer2d
 
