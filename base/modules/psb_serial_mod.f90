@@ -379,17 +379,19 @@ module psb_serial_mod
   end interface
 
   interface psb_csnmi
-    real(psb_dpk_) function psb_dcsnmi(a,info,trans)
+    function psb_dcsnmi(a,info,trans)
       use psb_spmat_type
       type(psb_dspmat_type), intent(in)  :: a
       integer, intent(out)       :: info
       character, optional        :: trans
+      real(psb_dpk_)             :: psb_dcsnmi
     end function psb_dcsnmi
-    real(psb_dpk_) function psb_zcsnmi(a,info,trans)
+    function psb_zcsnmi(a,info,trans)
       use psb_spmat_type
       type(psb_zspmat_type), intent(in)  :: a
       integer, intent(out)       :: info
       character, optional        :: trans
+      real(psb_dpk_)             :: psb_zcsnmi
     end function psb_zcsnmi
   end interface
 

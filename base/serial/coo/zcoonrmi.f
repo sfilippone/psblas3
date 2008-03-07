@@ -29,10 +29,11 @@ C ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 C POSSIBILITY OF SUCH DAMAGE.
 C
 C     ... Compute Infinity norm for sparse matrix in CSR Format ...
-      real(psb_dpk_) FUNCTION ZCOONRMI(TRANS,M,N,DESCRA,A,IA1,IA2,
+      FUNCTION ZCOONRMI(TRANS,M,N,DESCRA,A,IA1,IA2,
      +   INFOA,IERROR)
       use psb_const_mod
       IMPLICIT NONE
+      real(psb_dpk_) zcoonrmi
 C     .. Scalar Arguments ..
       INTEGER           M,N, IERROR
       CHARACTER         TRANS

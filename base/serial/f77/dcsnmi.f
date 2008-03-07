@@ -94,10 +94,11 @@ C
 C     Notes
 C     =====
 C
-      real(psb_dpk_) FUNCTION DCSNMI(TRANS,M,N,FIDA,DESCRA,A,IA1,IA2,
+      FUNCTION DCSNMI(TRANS,M,N,FIDA,DESCRA,A,IA1,IA2,
      &                 INFOA,IERROR)
       use psb_const_mod
       IMPLICIT NONE
+      real(psb_dpk_) dcsnmi
 C     .. Scalar Arguments ..
       INTEGER           M,N, IERROR
       CHARACTER         TRANS

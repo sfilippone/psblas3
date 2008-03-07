@@ -32,10 +32,11 @@
 module psb_spsb_mod
 
   interface
-    real(psb_dpk_) function ddot(n,dx,incx,dy,incy)
+    function ddot(n,dx,incx,dy,incy)
       use psb_const_mod
       real(psb_dpk_) :: dx(*),dy(*),dtemp
       integer          :: i,incx,incy,ix,iy,m,mp1,n
+      real(psb_dpk_)   :: ddot
     end function ddot
   end interface
 
@@ -62,14 +63,15 @@ module psb_spsb_mod
   end interface
 
   interface
-    real(psb_dpk_) function dcsnmi(trans,m,n,fida,descra,a,ia1,ia2,&
+    function dcsnmi(trans,m,n,fida,descra,a,ia1,ia2,&
          &                 infoa,ierror)
       use psb_const_mod
       integer          ::  m,n, ierror
       character        ::  trans
       integer          ::  ia1(*),ia2(*),infoa(*)
       character        ::  descra*11, fida*5
-      real(psb_dpk_) ::  a(*)
+      real(psb_dpk_)   ::  a(*)
+      real(psb_dpk_)   :: dcsnmi
     end function dcsnmi
   end interface
 

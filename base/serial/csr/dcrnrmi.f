@@ -30,10 +30,11 @@ C POSSIBILITY OF SUCH DAMAGE.
 C
 C 
 C     ... Compute Infinity norm for sparse matrix in CSR Format ...
-      real(psb_dpk_) FUNCTION DCRNRMI(TRANS,M,N,DESCRA,A,IA1,IA2,
+      FUNCTION DCRNRMI(TRANS,M,N,DESCRA,A,IA1,IA2,
      +  INFOA,IERROR)
       use psb_const_mod
       IMPLICIT NONE
+      real(psb_dpk_) dcrnrmi
 C     .. Scalar Arguments ..
       INTEGER           M,N, IERROR
       CHARACTER         TRANS

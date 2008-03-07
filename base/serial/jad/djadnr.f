@@ -30,11 +30,12 @@ C POSSIBILITY OF SUCH DAMAGE.
 C
 C 
 C     ... Compute infinity norma for sparse matrix in CSR Format ...
-      real(psb_dpk_) FUNCTION DJADNR(TRANS,M,N,NG,A,KA,JA,IA,
+      FUNCTION DJADNR(TRANS,M,N,NG,A,KA,JA,IA,
      +  INFOA,IERROR)
       use psb_const_mod
       use psb_spmat_type
       IMPLICIT NONE
+      real(psb_dpk_) djadnr
 C     .. Scalar Arguments ..
       INTEGER           M,N, IERROR, NG
       CHARACTER         TRANS
