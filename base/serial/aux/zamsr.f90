@@ -59,9 +59,9 @@ subroutine zamsr(n,x,idir)
   endif
   
   if (idir==psb_asort_up_) then 
-    call dmsort_up(n,x,iaux,iret)
+    call zamsort_up(n,x,iaux,iret)
   else
-    call dmsort_dw(n,x,iaux,iret)
+    call zamsort_dw(n,x,iaux,iret)
   end if
   
   if (iret == 0) then 
