@@ -64,12 +64,32 @@ AC_MSG_NOTICE([
         FC=mpif90 F77=$FC CC=mpicc ./configure           <- will force FC,CC,F77
         FLINK=gcc FLINK=gcc ./configure                  <- will force FLINK,F90LINK
 
-	See /configure --help=short fore more info.
+	See ./configure --help=short fore more info.
 --------------------------------------------------------------------------------
 		])
 ###############################################################################
 # Compilers detection: FC,F77,CC should be set, if found.
 ###############################################################################
+#
+# Installation. 
+#
+#
+AC_PROG_INSTALL
+
+AC_MSG_CHECKING([where to install])
+case $prefix in  
+   \/* )   eval "INSTALL_DIR=$prefix";;
+   * ) eval "INSTALL_DIR=/usr/local/psblas";;
+esac
+case $libdir in 
+   \/* )   eval "INSTALL_LIBDIR=$libdir";;
+   * ) eval "INSTALL_LIBDIR=$INSTALL_DIR/lib";;
+esac
+case $includedir in 
+   \/* )   eval "INSTALL_INCLUDEDIR=$includedir";;
+   * ) eval "INSTALL_INCLUDEDIR=$INSTALL_DIR/include";;
+esac
+AC_MSG_RESULT([$INSTALL_DIR $INSTALL_INCLUDEDIR $INSTALL_LIBDIR])
 
 # Note that the following line won't save from troubles.
 # AC_PROG_FC([mpxlf95 mpxlf90 mpxlf pgf95 pgf90 mpif95 mpif90 gfortran f95 f90 ifc])
@@ -189,11 +209,11 @@ PAC_CHECK_HAVE_GFORTRAN(
 # Test for TR 15581, aka allocatables extensions.
 #
 PAC_FORTRAN_TEST_TR15581( 
-	[],
-        [AC_MSG_ERROR([Sorry, cannot build PSBLAS without support for TR15581. 
+	[AC_MSG_RESULT([yes.])],
+        [AC_MSG_ERROR([no.
+ Sorry, cannot build PSBLAS without support for TR15581. 
  Please get a Fortran compiler that supports it, e.g. GNU Fortran 4.2.])]
 )
-
 
 if test x"$psblas_cv_fc" == "x" ; then
  if eval "$MPIFC -qversion | grep XL 2>/dev/null" ; then
@@ -614,6 +634,12 @@ AC_SUBST(AR)
 AC_SUBST(RANLIB)
 AC_SUBST(MPIFC)
 AC_SUBST(MPIFCC)
+
+AC_SUBST(INSTALL)
+AC_SUBST(INSTALL_DATA)
+AC_SUBST(INSTALL_DIR)
+AC_SUBST(INSTALL_LIBDIR)
+AC_SUBST(INSTALL_INCLUDEDIR)
 
 AC_SUBST(BLAS_LIBS)
 AC_SUBST(BLACS_LIBS)

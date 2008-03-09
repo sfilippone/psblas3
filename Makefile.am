@@ -1,5 +1,7 @@
 include Make.inc
 
+all: library 
+
 library:
 	(cd base; make lib)
 	(cd prec; make lib )
@@ -8,6 +10,12 @@ library:
 	@echo "====================================="
 	@echo "PSBLAS libraries Compilation Successful."
 
+
+install: 
+	($(INSTALL) -d $(INSTALL_DIR)/lib &&\
+	   $(INSTALL_DATA) lib/*.a  $(INSTALL_DIR)/lib)
+	($(INSTALL) -d $(INSTALL_DIR)/include && \
+	   $(INSTALL_DATA) lib/*$(.mod) $(INSTALL_DIR)/include)
 clean: 
 	(cd base; make clean)
 	(cd prec; make clean )
