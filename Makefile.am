@@ -3,6 +3,7 @@ include Make.inc
 all: library 
 
 library:
+	(if test ! -d lib ; then mkdir lib; fi)
 	(cd base; make lib)
 	(cd prec; make lib )
 	(cd krylov; make lib)
@@ -10,12 +11,11 @@ library:
 	@echo "====================================="
 	@echo "PSBLAS libraries Compilation Successful."
 
-
-install: 
-	($(INSTALL) -d $(INSTALL_DIR)/lib &&\
-	   $(INSTALL_DATA) lib/*.a  $(INSTALL_DIR)/lib)
-	($(INSTALL) -d $(INSTALL_DIR)/include && \
-	   $(INSTALL_DATA) lib/*$(.mod) $(INSTALL_DIR)/include)
+install:
+	($(INSTALL) -d $(INSTALL_LIBDIR) &&\
+	   $(INSTALL_DATA) lib/*.a  $(INSTALL_LIBDIR))
+	($(INSTALL) -d $(INSTALL_INCLUDEDIR) && \
+	   $(INSTALL_DATA) lib/*$(.mod) $(INSTALL_INCLUDEDIR))
 clean: 
 	(cd base; make clean)
 	(cd prec; make clean )
