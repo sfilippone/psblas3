@@ -20,9 +20,7 @@ On Linux we work with the GCC compiler; note that we require version
 4.2.0 (or later) as it contains support for ALLOCATABLEs (as
 specified  in TR15581). 
 
-For the Intel compilers, we recommend version 9.1 or later; previous
-versions of the library have been compiled with version 7 and 8 of
-ifort. 
+For the Intel compilers, we recommend version 9.1 or later.
 
 IBM SP.
 The library has been tested on an IBM SP5, with XLC and XLF 
