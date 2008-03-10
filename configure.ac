@@ -216,7 +216,7 @@ PAC_FORTRAN_TEST_TR15581(
 )
 
 if test x"$psblas_cv_fc" == "x" ; then
- if eval "$MPIFC -qversion | grep XL 2>/dev/null" ; then
+ if eval "$MPIFC -qversion 2>&1 | grep XL 2>/dev/null" ; then
 	psblas_cv_fc="xlf"
 	# Some configurations of the XLF want "-WF," prepended to -D.. flags.
 	# TODO : discover the exact conditions when the usage of -WF is needed.
@@ -226,11 +226,11 @@ if test x"$psblas_cv_fc" == "x" ; then
  # More problems could be undocumented yet.
  else
   # Sun compiler detection
-  if eval "$MPIFC -V | grep Sun 2>/dev/null" ; then
+  if eval "$MPIFC -V  2>&1 | grep Sun 2>/dev/null" ; then
 	psblas_cv_fc="sun"
   else
    # Portland group compiler detection
-   if eval "$MPIFC -V | grep Portland 2>/dev/null" ; then
+   if eval "$MPIFC -V  2>&1 | grep Portland 2>/dev/null" ; then
 	psblas_cv_fc="pg"
    else
     # Intel compiler identification
