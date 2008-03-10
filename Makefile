@@ -12,9 +12,9 @@ library:
 	@echo "PSBLAS libraries Compilation Successful."
 
 install:
-	($(INSTALL) -d $(INSTALL_LIBDIR) &&\
+	(./mkdir.sh  $(INSTALL_LIBDIR) &&\
 	   $(INSTALL_DATA) lib/*.a  $(INSTALL_LIBDIR))
-	($(INSTALL) -d $(INSTALL_INCLUDEDIR) && \
+	(./mkdir.sh  $(INSTALL_INCLUDEDIR) && \
 	   $(INSTALL_DATA) lib/*$(.mod) $(INSTALL_INCLUDEDIR))
 clean: 
 	(cd base; make clean)

@@ -121,6 +121,9 @@ After you have Make.inc fixed,  run
  make 
 to  compile the library; go to the test directory and its
 subdirectories to get test programs done.   
+If you specify --prefix=/path you can do make install and the
+libraries will be installed under /path/lib, while the module files
+will be installed under /path/include.
 
 
 SERIAL: We now provide an (experimental) option to run in serial
