@@ -77,8 +77,8 @@ c
 
       call psb_getifield(check_flag,psb_dupl_,infon,psb_ifasize_,ierror)
       
-      if (toupper(trans).eq.'N') then
-        scale  = (toupper(unitd).eq.'L') ! meaningless
+      if (psb_toupper(trans).eq.'N') then
+        scale  = (psb_toupper(unitd).eq.'L') ! meaningless
         p1(1) = 0
         p2(1) = 0
 
@@ -117,7 +117,7 @@ c
           goto 9999
         end if
 
-        if (toupper(descra(1:1)).eq.'G') then
+        if (psb_toupper(descra(1:1)).eq.'G') then
 c
 c     sort COO data structure
 c     
@@ -254,29 +254,29 @@ c     ... sum the duplicated element ...
      +      write(debug_unit,*)  trim(name),
      +      ': done rebuild COO',infon(1)
           
-        else if (toupper(descra(1:1)).eq.'S' .and.
-     +      toupper(descra(2:2)).eq.'U') then
+        else if (psb_toupper(descra(1:1)).eq.'S' .and.
+     +      psb_toupper(descra(2:2)).eq.'U') then
 
           ierror = 3021
           call fcpsb_errpush(ierror,name,int_val)
           goto 9999
 
-        else if (toupper(descra(1:1)).eq.'T' .and.
-     +      toupper(descra(2:2)).eq.'U') then
+        else if (psb_toupper(descra(1:1)).eq.'T' .and.
+     +      psb_toupper(descra(2:2)).eq.'U') then
           ierror = 3021
           call fcpsb_errpush(ierror,name,int_val)
           goto 9999
 
           
-        else if (toupper(descra(1:1)).eq.'T' .and.
-     +      toupper(descra(2:2)).eq.'L') then
+        else if (psb_toupper(descra(1:1)).eq.'T' .and.
+     +      psb_toupper(descra(2:2)).eq.'L') then
           ierror = 3021
           call fcpsb_errpush(ierror,name,int_val)
           goto 9999
           
         end if
 c
-      else if (toupper(trans).ne.'N') then
+      else if (psb_toupper(trans).ne.'N') then
 c
 c           to do
 c

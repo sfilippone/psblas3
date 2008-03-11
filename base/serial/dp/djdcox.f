@@ -70,7 +70,7 @@ C
       debug_unit  = psb_get_debug_unit()
       debug_level = psb_get_debug_level()
 
-      IF (toupper(TRANS).EQ.'N') THEN
+      IF (psb_toupper(TRANS).EQ.'N') THEN
 C     SCALE  = (UNITD.EQ.'L') ! meaningless
         IP1(1) = 0
         IP2(1) = 0
@@ -109,7 +109,7 @@ C     SCALE  = (UNITD.EQ.'L') ! meaningless
           INT_VAL(3) = LAUX
         ENDIF
         
-        IF (toupper(DESCRA(1:1)).EQ.'G') THEN
+        IF (psb_toupper(DESCRA(1:1)).EQ.'G') THEN
           
           DO 200 IPG = 1, NG                                                  
             DO 50 K = IA(2,IPG), IA(3,IPG)-1                                
@@ -155,8 +155,8 @@ C     .... Order with key IA2N ...
           ENDDO
           INFON(1)=nnz
           
-        ELSE IF (toupper(DESCRA(1:1)).EQ.'S' .AND.
-     +      toupper(DESCRA(2:2)).EQ.'U') THEN
+        ELSE IF (psb_toupper(DESCRA(1:1)).EQ.'S' .AND.
+     +      psb_toupper(DESCRA(2:2)).EQ.'U') THEN
 
           DO 20 K = 1, M
             IP2(K) = K
@@ -172,7 +172,7 @@ c$$$        ELSE IF (DESCRA(1:1).EQ.'T' .AND. DESCRA(2:2).EQ.'L') THEN
           
         END IF
 C     
-      ELSE IF (toupper(TRANS).NE.'N') THEN 
+      ELSE IF (psb_toupper(TRANS).NE.'N') THEN 
 C     
 C     TO DO
 C     

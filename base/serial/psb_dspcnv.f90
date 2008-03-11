@@ -170,11 +170,11 @@ subroutine psb_dspcnv2(a, b,info,afmt,upd,dupl)
        & write(debug_unit,*) trim(name),': size_req 1:',&
        & size_req, trans_,upd_,dupl_,b%fida,b%descra
 
-  select case (tolower(a%fida))
+  select case (psb_tolower(a%fida))
 
   case ('csr')
 
-    select case (tolower(b%fida))
+    select case (psb_tolower(b%fida))
 
     case ('csr')
 
@@ -255,7 +255,7 @@ subroutine psb_dspcnv2(a, b,info,afmt,upd,dupl)
 
   case ('coo','coi')
 
-    select case (tolower(b%fida))
+    select case (psb_tolower(b%fida))
 
     case ('csr')
 
@@ -457,9 +457,9 @@ subroutine psb_dspcnv1(a, info, afmt, upd, dupl)
          & ': Update:',upd_,psb_upd_srch_,psb_upd_perm_
     if (upd_ == psb_upd_srch_) then 
       if (present(afmt)) then 
-        select case (tolower(a%fida))
+        select case (psb_tolower(a%fida))
         case('coo')
-          select case(tolower(afmt))
+          select case(psb_tolower(afmt))
           case('coo') 
             call psb_fixcoo(a,info)
             goto 9998
@@ -471,7 +471,7 @@ subroutine psb_dspcnv1(a, info, afmt, upd, dupl)
             goto 9998
           end select
         case('csr')
-          select case(tolower(afmt))
+          select case(psb_tolower(afmt))
           case('coo') 
             call psb_ipcsr2coo(a,info)
             goto 9998
@@ -510,7 +510,7 @@ subroutine psb_dspcnv1(a, info, afmt, upd, dupl)
     !
     ! Second  case: we come from an update loop.
     ! 
-    select case(tolower(a%fida))
+    select case(psb_tolower(a%fida))
     case('csr')
       call csr_regen(a,info)
     case ('coo','coi')

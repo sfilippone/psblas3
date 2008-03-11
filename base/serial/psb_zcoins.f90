@@ -96,7 +96,7 @@ subroutine psb_zcoins(nz,ia,ja,val,a,imin,imax,jmin,jmax,info,gtl,rebuild)
     rebuild_ = .false.
   end if
 
-  call touppers(a%fida,ufida)
+  call psb_touppers(a%fida,ufida)
   spstate = psb_sp_getifld(psb_state_,a,info) 
 
 

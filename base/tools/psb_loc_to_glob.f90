@@ -76,7 +76,7 @@ subroutine psb_loc_to_glob2(x,y,desc_a,info,iact)
   else
     act='I'
   endif
-  act=toupper(act)
+  act=psb_toupper(act)
 
   n=size(x)
   do i=1,n
@@ -202,7 +202,7 @@ subroutine psb_loc_to_glob(x,desc_a,info,iact)
   else
     act='I'
   endif
-  act = toupper(act)
+  act = psb_toupper(act)
 
   n=size(x)
   do i=1,n

@@ -97,8 +97,8 @@ contains
     a%descra='G'
 
 
-    if (tolower(type(1:1)) == 'r') then 
-      if (tolower(type(2:2)) == 'u') then 
+    if (psb_tolower(type(1:1)) == 'r') then 
+      if (psb_tolower(type(2:2)) == 'u') then 
 
 
         read (infile,fmt=ptrfmt) (a%ia2(i),i=1,nrow+1)
@@ -110,7 +110,7 @@ contains
           if (info == 0) read (infile,fmt=rhsfmt) (b(i),i=1,nrow)
         endif
 
-      else if (tolower(type(2:2)) == 's') then 
+      else if (psb_tolower(type(2:2)) == 's') then 
 
         ! we are generally working with non-symmetric matrices, so
         ! we de-symmetrize what we are about to read
@@ -229,7 +229,7 @@ contains
       key_ = 'PSBMAT00'
     endif
 
-    if (toupper(a%fida) == 'CSR') then 
+    if (psb_toupper(a%fida) == 'CSR') then 
       
       nrow   = a%m
       ncol   = a%k
@@ -334,8 +334,8 @@ contains
     if (rhscrd > 0) read(infile,fmt=fmt11)rhstype,nrhs,nrhsix
 
 
-    if (tolower(type(1:1)) == 'c') then 
-      if (tolower(type(2:2)) == 'u') then 
+    if (psb_tolower(type(1:1)) == 'c') then 
+      if (psb_tolower(type(2:2)) == 'u') then 
 
         call psb_sp_all(a,nnzero,nrow+1,nnzero,ircode)
         
@@ -358,7 +358,7 @@ contains
           if (info == 0) read (infile,fmt=rhsfmt) (b(i),i=1,nrow)
         endif
 
-      else if (tolower(type(2:2)) == 's') then 
+      else if (psb_tolower(type(2:2)) == 's') then 
 
         ! we are generally working with non-symmetric matrices, so
         ! we de-symmetrize what we are about to read
@@ -413,7 +413,7 @@ contains
           goto 993  
         end if
 
-      else if (tolower(type(2:2)) == 'h') then 
+      else if (psb_tolower(type(2:2)) == 'h') then 
 
         ! we are generally working with non-symmetric matrices, so
         ! we de-symmetrize what we are about to read
@@ -553,7 +553,7 @@ contains
     else
       key_ = 'PSBMAT00'
     endif
-    if (toupper(a%fida) == 'CSR') then 
+    if (psb_toupper(a%fida) == 'CSR') then 
       
       nrow   = a%m
       ncol   = a%k

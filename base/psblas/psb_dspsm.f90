@@ -159,13 +159,13 @@ subroutine  psb_dspsm(alpha,a,x,beta,y,desc_a,info,&
   endif
 
   if (present(unitd)) then     
-    lunitd = toupper(unitd)
+    lunitd = psb_toupper(unitd)
   else
     lunitd = 'U'
   endif
 
   if (present(trans)) then     
-    itrans = toupper(trans)
+    itrans = psb_toupper(trans)
     if((itrans == 'N').or.(itrans == 'T').or.  (itrans == 'C')) then
       ! OK 
     else
@@ -430,13 +430,13 @@ subroutine  psb_dspsv(alpha,a,x,beta,y,desc_a,info,&
   endif
 
   if (present(unitd)) then     
-    lunitd = toupper(unitd)
+    lunitd = psb_toupper(unitd)
   else
     lunitd = 'U'
   endif
 
   if (present(trans)) then     
-    itrans = toupper(trans)
+    itrans = psb_toupper(trans)
     if((itrans == 'N').or.(itrans == 'T').or.(itrans == 'C')) then
       ! Ok
     else

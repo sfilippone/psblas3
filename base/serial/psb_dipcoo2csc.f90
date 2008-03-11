@@ -63,7 +63,7 @@ subroutine psb_dipcoo2csc(a,info,clshr)
 
   if(debug_level >= psb_debug_serial_) write(debug_unit,*) &
        & trim(name),': start',a%fida,a%m
-  if (toupper(a%fida) /= 'COO') then 
+  if (psb_toupper(a%fida) /= 'COO') then 
     write(debug_unit,*)  trim(name),' Invalid input ',a%fida
     info = -1
     call psb_errpush(info,name)

@@ -66,13 +66,13 @@ subroutine psb_zrwextd(nr,a,info,b,rowscale)
   end if
 
   if (nr > a%m) then 
-    if (toupper(a%fida) == 'CSR') then 
+    if (psb_toupper(a%fida) == 'CSR') then 
       call psb_realloc(nr+1,a%ia2,info)
       if (present(b)) then 
         nzb = psb_sp_get_nnzeros(b)
         call psb_realloc(size(a%ia1)+nzb,a%ia1,info)
         call psb_realloc(size(a%aspk)+nzb,a%aspk,info)
-        if (toupper(b%fida)=='CSR') then 
+        if (psb_toupper(b%fida)=='CSR') then 
 
           do i=1, min(nr-a%m,b%m)
             a%ia2(a%m+i+1) =  a%ia2(a%m+i) + b%ia2(i+1) - b%ia2(i)
@@ -100,13 +100,13 @@ subroutine psb_zrwextd(nr,a,info,b,rowscale)
       a%m = nr
       a%k = max(a%k,b%k)
 
-    else if (toupper(a%fida) == 'COO') then 
+    else if (psb_toupper(a%fida) == 'COO') then 
 
       if (present(b)) then 
         nza = psb_sp_get_nnzeros(a)
         nzb = psb_sp_get_nnzeros(b)
         call psb_sp_reall(a,nza+nzb,info)
-        if (toupper(b%fida)=='COO') then 
+        if (psb_toupper(b%fida)=='COO') then 
           if (rowscale_) then 
             do j=1,nzb
               if ((a%m + b%ia1(j)) <= nr) then 
@@ -127,7 +127,7 @@ subroutine psb_zrwextd(nr,a,info,b,rowscale)
             enddo
           endif
           a%infoa(psb_nnz_) = nza
-        else if(toupper(b%fida)=='CSR') then 
+        else if(psb_toupper(b%fida)=='CSR') then 
           do i=1, min(nr-a%m,b%m)
             do 
               jb = b%ia2(i)

@@ -76,7 +76,7 @@ contains
 
     read(infile,fmt=*,end=902) mmheader, object, fmt, type, sym
 
-    if ( (tolower(object) /= 'matrix').or.(tolower(fmt)/='coordinate')) then
+    if ( (psb_tolower(object) /= 'matrix').or.(psb_tolower(fmt)/='coordinate')) then
       write(0,*) 'READ_MATRIX: input file type not yet supported'
       iret=909
       return
@@ -88,7 +88,7 @@ contains
     end do
     read(line,fmt=*) nrow,ncol,nnzero
     
-    if ((tolower(type) == 'real').and.(tolower(sym) == 'general')) then
+    if ((psb_tolower(type) == 'real').and.(psb_tolower(sym) == 'general')) then
       call psb_sp_all(nrow,ncol,a,nnzero,ircode)
       a%fida   = 'COO'
       a%descra = 'G'      
@@ -99,7 +99,7 @@ contains
       a%infoa(psb_nnz_) = nnzero
       call psb_spcnv(a,ircode,afmt='csr')
 
-    else if ((tolower(type) == 'real').and.(tolower(sym) == 'symmetric')) then
+    else if ((psb_tolower(type) == 'real').and.(psb_tolower(sym) == 'symmetric')) then
       ! we are generally working with non-symmetric matrices, so
       ! we de-symmetrize what we are about to read
       call psb_sp_all(nrow,ncol,a,2*nnzero,ircode)
@@ -228,7 +228,7 @@ contains
 
     read(infile,fmt=*,end=902) mmheader, object, fmt, type, sym
 
-    if ( (tolower(object) /= 'matrix').or.(tolower(fmt)/='coordinate')) then
+    if ( (psb_tolower(object) /= 'matrix').or.(psb_tolower(fmt)/='coordinate')) then
       write(0,*) 'READ_MATRIX: input file type not yet supported'
       iret=909
       return
@@ -240,7 +240,7 @@ contains
     end do
     read(line,fmt=*) nrow,ncol,nnzero
     
-    if ((tolower(type) == 'complex').and.(tolower(sym) == 'general')) then
+    if ((psb_tolower(type) == 'complex').and.(psb_tolower(sym) == 'general')) then
       call psb_sp_all(nrow,ncol,a,nnzero,ircode)
       if (ircode /= 0)   goto 993
       a%fida   = 'COO'
@@ -253,7 +253,7 @@ contains
       
       call psb_spcnv(a,ircode,afmt='csr')
 
-    else if ((tolower(type) == 'complex').and.(tolower(sym) == 'symmetric')) then
+    else if ((psb_tolower(type) == 'complex').and.(psb_tolower(sym) == 'symmetric')) then
       ! we are generally working with non-symmetric matrices, so
       ! we de-symmetrize what we are about to read
       call psb_sp_all(nrow,ncol,a,2*nnzero,ircode)
@@ -277,7 +277,7 @@ contains
       a%infoa(psb_nnz_) = nzr
       call psb_spcnv(a,ircode,afmt='csr')
 
-    else if ((tolower(type) == 'complex').and.(tolower(sym) == 'hermitian')) then
+    else if ((psb_tolower(type) == 'complex').and.(psb_tolower(sym) == 'hermitian')) then
       ! we are generally working with non-symmetric matrices, so
       ! we de-symmetrize what we are about to read
       call psb_sp_all(nrow,ncol,a,2*nnzero,ircode)

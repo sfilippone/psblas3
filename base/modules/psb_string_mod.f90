@@ -31,17 +31,17 @@
 !!$  
 module psb_string_mod
 
-  public tolower, toupper, touppers
-  interface tolower
-    module procedure tolowerc
+  public psb_tolower, psb_toupper, psb_touppers
+  interface psb_tolower
+    module procedure psb_tolowerc
   end interface
 
-  interface toupper
-    module procedure toupperc
+  interface psb_toupper
+    module procedure psb_toupperc
   end interface
 
-  interface touppers
-    module procedure sub_toupperc
+  interface psb_touppers
+    module procedure psb_sub_toupperc
   end interface
 
   private
@@ -50,37 +50,37 @@ module psb_string_mod
 
 contains 
 
-  function  tolowerc(string)
+  function  psb_tolowerc(string)
     character(len=*), intent(in)  :: string
-    character(len=len(string))    :: tolowerc
+    character(len=len(string))    :: psb_tolowerc
     integer  :: i,k
 
     do i=1,len(string)
       k = index(ucase,string(i:i))
       if (k /=0 ) then 
-        tolowerc(i:i) = lcase(k:k)
+        psb_tolowerc(i:i) = lcase(k:k)
       else          
-        tolowerc(i:i) = string(i:i)
+        psb_tolowerc(i:i) = string(i:i)
       end if
     enddo
-  end function tolowerc
+  end function psb_tolowerc
 
-  function  toupperc(string)
+  function  psb_toupperc(string)
     character(len=*), intent(in)  :: string
-    character(len=len(string))    :: toupperc
+    character(len=len(string))    :: psb_toupperc
     integer  :: i,k
 
     do i=1,len(string)
       k = index(lcase,string(i:i))
       if (k /=0 ) then 
-        toupperc(i:i) = ucase(k:k)
+        psb_toupperc(i:i) = ucase(k:k)
       else          
-        toupperc(i:i) = string(i:i)
+        psb_toupperc(i:i) = string(i:i)
       end if
     enddo
-  end function toupperc
+  end function psb_toupperc
 
-  subroutine   sub_toupperc(string,strout)
+  subroutine   psb_sub_toupperc(string,strout)
     character(len=*), intent(in)  :: string
     character(len=*), intent(out)  :: strout
     integer  :: i,k
@@ -93,6 +93,6 @@ contains
         strout(i:i) = string(i:i)
       end if
     enddo
-  end subroutine sub_toupperc
+  end subroutine psb_sub_toupperc
 
 end module psb_string_mod

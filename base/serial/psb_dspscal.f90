@@ -56,7 +56,7 @@ subroutine psb_dspscal(a,d,info)
   info  = 0
   call psb_erractionsave(err_act)
 
-  select case(toupper(a%fida(1:3)))
+  select case(psb_toupper(a%fida(1:3)))
   case  ('CSR')
 
     do i=1, a%m

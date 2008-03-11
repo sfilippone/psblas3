@@ -64,7 +64,7 @@ subroutine psb_zprecbld(a,desc_a,p,info,upd)
   call psb_info(ictxt, me, np)
 
   if (present(upd)) then 
-    upd_ = toupper(upd)
+    upd_ = psb_toupper(upd)
   else
     upd_='F'
   endif

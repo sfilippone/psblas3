@@ -59,8 +59,8 @@ subroutine psb_dnumbmm(a,b,c)
   ! Note: we still have to test about possible performance hits. 
   !
   !
-  csra = (toupper(a%fida(1:3))=='CSR')
-  csrb = (toupper(b%fida(1:3))=='CSR')
+  csra = (psb_toupper(a%fida(1:3))=='CSR')
+  csrb = (psb_toupper(b%fida(1:3))=='CSR')
 
   if (csra.and.csrb) then 
     call numbmm(a%m,a%k,b%k,a%ia2,a%ia1,0,a%aspk,&

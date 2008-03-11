@@ -103,10 +103,10 @@ C
          GOTO 9999
       ENDIF
 
-      IF (toupper(TRANS).EQ.'N') THEN
+      IF (psb_toupper(TRANS).EQ.'N') THEN
 C
         NJA    = 3*M
-        SCALE  = (toupper(UNITD).EQ.'L') ! meaningless
+        SCALE  = (psb_toupper(UNITD).EQ.'L') ! meaningless
         IOFF   = 5
 C
 C        SET THE VALUES OF POINTERS TO VECTOR IAN2 AND AUX
@@ -115,7 +115,7 @@ C
         PIA    = PNG + 1
         PJA    = PIA + 3*(M+2)
 
-        IF (toupper(DESCRA(1:1)).EQ.'G') THEN
+        IF (psb_toupper(DESCRA(1:1)).EQ.'G') THEN
 
 C
 C        CHECK ON DIMENSION OF IAN2 AND AUX
@@ -183,8 +183,8 @@ C
           DESCRN(2:2) = 'U'
           DESCRN(3:3) = 'N'
 
-        ELSE IF (toupper(DESCRA(1:1)).EQ.'S' .AND.
-     +      toupper(DESCRA(2:2)).EQ.'U') THEN
+        ELSE IF (psb_toupper(DESCRA(1:1)).EQ.'S' .AND.
+     +      psb_toupper(DESCRA(2:2)).EQ.'U') THEN
 C
           ISTROW = 1
           NZ     = 2*(IA2(M+1)-1) - M
@@ -220,13 +220,13 @@ c$$$            CALL DVSMR(M,AR,IA1,IA2,IAN2(PNG),AUX(IWLEN),IP1,IP2,
 c$$$     *                 IAN2(PIA),IAN2(PJA),IAN1,ARN,AUX(IWORK1),
 c$$$     *                 AUX(IWORK2),NJA,IER,SCALE)
 C
-        ELSE IF (toupper(DESCRA(1:1)).EQ.'T') THEN
+        ELSE IF (psb_toupper(DESCRA(1:1)).EQ.'T') THEN
 C
 C  Only unit diagonal so far for triangular matrices. 
 C
 
 
-          IF (toupper(DESCRA(3:3)).NE.'U') THEN 
+          IF (psb_toupper(DESCRA(3:3)).NE.'U') THEN 
             IERROR=3022
             CALL FCPSB_ERRPUSH(IERROR,NAME,INT_VAL)
             GOTO 9999
@@ -275,7 +275,7 @@ c$$$                write(0,*) "error 2",ierrv(1)
           ENDIF
           
           DESCRN(1:1) = 'T'
-          DESCRN(2:3) = toupper(DESCRA(2:3))
+          DESCRN(2:3) = psb_toupper(DESCRA(2:3))
 
         END IF
 C
@@ -289,7 +289,7 @@ C
         LIAN2   = 3*M + 10
         LAUX2   = 4*M + 2
 C
-      ELSE IF (toupper(TRANS).NE.'N') THEN
+      ELSE IF (psb_toupper(TRANS).NE.'N') THEN
 C
 C           TO BE DONE
 C

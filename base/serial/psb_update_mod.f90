@@ -76,7 +76,7 @@ contains
         return
       endif
     end if
-    select case(tolower(a%fida))
+    select case(psb_tolower(a%fida))
     case ('csr') 
       call  csr_srch_upd(nz,ia,ja,val,nza,a,&
            & imin,imax,jmin,jmax,nzl,info,gtl,ng)
@@ -121,7 +121,7 @@ contains
         return
       endif
 
-      select case(toupper(a%fida))
+      select case(psb_toupper(a%fida))
       case ('CSR') 
 !!$      write(0,*) 'Calling csr_srch_upd'
         call  csr_srch_upd(nz,ia,ja,val,nza,a,&
@@ -137,7 +137,7 @@ contains
 
       end select
     else
-      select case(toupper(a%fida))
+      select case(psb_toupper(a%fida))
       case ('CSR') 
 !!$      write(0,*) 'Calling csr_srch_upd'
         call  csr_srch_upd(nz,ia,ja,val,nza,a,&

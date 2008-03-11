@@ -66,10 +66,10 @@ C
          GOTO 9999
       ENDIF
       UPLO = '?'
-      IF (toupper(DESCRA(1:1)).EQ.'T' .AND.
-     +  toupper(DESCRA(2:2)).EQ.'U') UPLO = 'U'
-      IF (toupper(DESCRA(1:1)).EQ.'T' .AND.
-     +  toupper(DESCRA(2:2)).EQ.'L') UPLO = 'L'
+      IF (psb_toupper(DESCRA(1:1)).EQ.'T' .AND.
+     +  psb_toupper(DESCRA(2:2)).EQ.'U') UPLO = 'U'
+      IF (psb_toupper(DESCRA(1:1)).EQ.'T' .AND.
+     +  psb_toupper(DESCRA(2:2)).EQ.'L') UPLO = 'L'
 C
       IF (UPLO.EQ.'?') THEN
          IERROR=5
@@ -77,7 +77,7 @@ C
          GOTO 9999
       END IF
 
-      IF (toupper(DESCRA(3:3)).NE.'U') THEN
+      IF (psb_toupper(DESCRA(3:3)).NE.'U') THEN
          IERROR=5
          CALL FCPSB_ERRPUSH(IERROR,NAME,INT_VAL)
          GOTO 9999
@@ -89,7 +89,7 @@ C
       if (debug_level >= psb_debug_serial_comp_)
      +  write(debug_unit,*) trim(name),': entry',m,n
 
-      IF (toupper(TDIAG).EQ.'R') THEN
+      IF (psb_toupper(TDIAG).EQ.'R') THEN
         if (debug_level >= psb_debug_serial_comp_)
      +    write(debug_unit,*) trim(name),': Right Scale'
         DO  I = 1, N
@@ -114,7 +114,7 @@ C
       END IF
 
 
-      IF (toupper(TDIAG).EQ.'L') THEN
+      IF (psb_toupper(TDIAG).EQ.'L') THEN
         if (debug_level >= psb_debug_serial_comp_)
      +    write(debug_unit,*) trim(name),': Left Scale'
          DO I = 1, N

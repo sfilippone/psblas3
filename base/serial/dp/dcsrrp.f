@@ -146,8 +146,8 @@ C
       IERROR = 0
       CALL FCPSB_ERRACTIONSAVE(ERR_ACT)
 
-      IF (toupper(DESCRA(1:1)).EQ.'S' .OR.
-     +   toupper(DESCRA(1:1)).EQ.'T') THEN
+      IF (psb_toupper(DESCRA(1:1)).EQ.'S' .OR.
+     +   psb_toupper(DESCRA(1:1)).EQ.'T') THEN
          IERROR=3023
          CALL FCPSB_ERRPUSH(IERROR,NAME,INT_VAL)
          GOTO 9999

@@ -61,7 +61,7 @@ Subroutine psb_zfixcoo(a,info,idir)
   if(debug_level >= psb_debug_serial_) &
        & write(debug_unit,*)  trim(name),': start ',&
        & size(a%ia1),size(a%ia2)
-  if (toupper(a%fida) /= 'COO') then 
+  if (psb_toupper(a%fida) /= 'COO') then 
     write(debug_unit,*) 'Fixcoo Invalid input ',a%fida
     info = -1
     return

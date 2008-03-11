@@ -115,14 +115,14 @@ subroutine psb_cdren(trans,iperm,desc_a,info)
     if (debug_level >= psb_debug_ext_) &
          & write(debug_unit,*) me,' ',trim(name),': here we go with ',iperm(1) 
     call psb_ensure_size(n_col,desc_a%lprm,info)
-    if (toupper(trans) == 'N') then 
+    if (psb_toupper(trans) == 'N') then 
       do i=1, n_row
         desc_a%lprm(iperm(i)) = i
       enddo
       do i=n_row+1,n_col
         desc_a%lprm(i) = i
       enddo
-    else if (toupper(trans) == 'T') then 
+    else if (psb_toupper(trans) == 'T') then 
       do i=1, n_row
         desc_a%lprm(i) = iperm(i)
       enddo

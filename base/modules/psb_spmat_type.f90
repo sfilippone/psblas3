@@ -744,7 +744,7 @@ contains
       ia = size(a%aspk)
       return
     endif
-    select case(tolower(a%fida))
+    select case(psb_tolower(a%fida))
     case('csr')
       nza = a%ia2(a%m+1)-1
       ia  = nza
@@ -1231,7 +1231,7 @@ contains
       ia = size(a%aspk)
       return
     endif
-    select case(tolower(a%fida))
+    select case(psb_tolower(a%fida))
     case('csr')
       nza = a%ia2(a%m+1)-1
       ia  = nza
@@ -1373,14 +1373,14 @@ contains
 
     if (ireq == psb_nztotreq_) then 
       ! The number of nonzeroes
-      if (toupper(a%fida) == 'CSR') then 
+      if (psb_toupper(a%fida) == 'CSR') then 
         nr   = a%m
         ires = a%ia2(nr+1)-1
-      else if ((toupper(a%fida) == 'COO').or.(toupper(a%fida) == 'COI')) then 
+      else if ((psb_toupper(a%fida) == 'COO').or.(psb_toupper(a%fida) == 'COI')) then 
         ires = a%infoa(psb_nnz_)
-      else if (toupper(a%fida) == 'JAD') then 
+      else if (psb_toupper(a%fida) == 'JAD') then 
         ires = a%infoa(psb_nnz_)
-      else if (toupper(a%fida) == 'CSC') then 
+      else if (psb_toupper(a%fida) == 'CSC') then 
         nc   = a%k
         ires = a%ia2(nc+1)-1
       else
@@ -1404,9 +1404,9 @@ contains
         ires = 0
         return
       endif
-      if (toupper(a%fida) == 'CSR') then 
+      if (psb_toupper(a%fida) == 'CSR') then 
         ires = a%ia2(irw+1)-a%ia2(irw)
-      else if ((toupper(a%fida) == 'COO').or.(toupper(a%fida) == 'COI')) then 
+      else if ((psb_toupper(a%fida) == 'COO').or.(psb_toupper(a%fida) == 'COI')) then 
 
         if (a%infoa(psb_srtd_) == psb_isrtdcoo_) then 
           ! In this case we can do a binary search. 
@@ -1439,7 +1439,7 @@ contains
 !!$      do i=1, a%infoa(psb_nnz_) 
 !!$        if (a%ia1(i) == irw) ires = ires + 1
 !!$      enddo
-      else if (toupper(a%fida) == 'JAD') then 
+      else if (psb_toupper(a%fida) == 'JAD') then 
         pia = a%ia2(2) ! points to the beginning of ia(3,png)
         pja = a%ia2(3) ! points to the beginning of ja(:)
         ja  => a%ia2(pja:)             ! the array containing the pointers to ka and aspk
@@ -1478,11 +1478,11 @@ contains
       end if
 
     else  if (ireq == psb_nzsizereq_) then 
-      if (toupper(a%fida) == 'CSR') then 
+      if (psb_toupper(a%fida) == 'CSR') then 
         ires = size(a%aspk)
-      else if ((toupper(a%fida) == 'COO').or.(toupper(a%fida) == 'COI')) then 
+      else if ((psb_toupper(a%fida) == 'COO').or.(psb_toupper(a%fida) == 'COI')) then 
         ires = size(a%aspk)
-      else if (toupper(a%fida) == 'JAD') then 
+      else if (psb_toupper(a%fida) == 'JAD') then 
         ires = a%infoa(psb_nnz_)
       else
         ires=-1
@@ -1533,14 +1533,14 @@ contains
 
     if (ireq == psb_nztotreq_) then 
       ! The number of nonzeroes
-      if (toupper(a%fida) == 'CSR') then 
+      if (psb_toupper(a%fida) == 'CSR') then 
         nr   = a%m
         ires = a%ia2(nr+1)-1
-      else if ((toupper(a%fida) == 'COO').or.(toupper(a%fida) == 'COI')) then 
+      else if ((psb_toupper(a%fida) == 'COO').or.(psb_toupper(a%fida) == 'COI')) then 
         ires = a%infoa(psb_nnz_)
-      else if (toupper(a%fida) == 'JAD') then 
+      else if (psb_toupper(a%fida) == 'JAD') then 
         ires = a%infoa(psb_nnz_)
-      else if (toupper(a%fida) == 'CSC') then 
+      else if (psb_toupper(a%fida) == 'CSC') then 
         nc   = a%k
         ires = a%ia2(nc+1)-1
       else
@@ -1559,9 +1559,9 @@ contains
         return
       endif
       irw = iaux
-      if (toupper(a%fida) == 'CSR') then 
+      if (psb_toupper(a%fida) == 'CSR') then 
         ires = a%ia2(irw+1)-a%ia2(irw)
-      else if ((toupper(a%fida) == 'COO').or.(toupper(a%fida) == 'COI')) then 
+      else if ((psb_toupper(a%fida) == 'COO').or.(psb_toupper(a%fida) == 'COI')) then 
 
         if (a%infoa(psb_srtd_) == psb_isrtdcoo_) then 
           ! In this case we can do a binary search. 
@@ -1594,7 +1594,7 @@ contains
 !!$      do i=1, a%infoa(psb_nnz_) 
 !!$        if (a%ia1(i) == irw) ires = ires + 1
 !!$      enddo
-      else if (toupper(a%fida) == 'JAD') then 
+      else if (psb_toupper(a%fida) == 'JAD') then 
         pia = a%ia2(2) ! points to the beginning of ia(3,png)
         pja = a%ia2(3) ! points to the beginning of ja(:)
         ja  => a%ia2(pja:)             ! the array containing the pointers to ka and aspk
@@ -1633,11 +1633,11 @@ contains
       end if
 
     else  if (ireq == psb_nzsizereq_) then 
-      if (toupper(a%fida) == 'CSR') then 
+      if (psb_toupper(a%fida) == 'CSR') then 
         ires = size(a%aspk)
-      else if ((toupper(a%fida) == 'COO').or.(toupper(a%fida) == 'COI')) then 
+      else if ((psb_toupper(a%fida) == 'COO').or.(psb_toupper(a%fida) == 'COI')) then 
         ires = size(a%aspk)
-      else if (toupper(a%fida) == 'JAD') then 
+      else if (psb_toupper(a%fida) == 'JAD') then 
         ires = a%infoa(psb_nnz_)
       else
         ires=-1

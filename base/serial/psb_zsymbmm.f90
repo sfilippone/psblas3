@@ -64,8 +64,8 @@ subroutine psb_zsymbmm(a,b,c,info)
   name='psb_symbmm'
   call psb_erractionsave(err_act)
 
-  csra = (toupper(a%fida(1:3))=='CSR')
-  csrb = (toupper(b%fida(1:3))=='CSR')
+  csra = (psb_toupper(a%fida(1:3))=='CSR')
+  csrb = (psb_toupper(b%fida(1:3))=='CSR')
 
   if (b%m /= a%k) then 
     write(0,*) 'Mismatch in SYMBMM: ',a%m,a%k,b%m,b%k

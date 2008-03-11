@@ -55,7 +55,7 @@ subroutine psb_ztransp(a,b,c,fmt)
     c_=1
   endif
   if (present(fmt)) then 
-    fmt_ = toupper(fmt)
+    fmt_ = psb_toupper(fmt)
   else 
     fmt_='CSR'
   endif

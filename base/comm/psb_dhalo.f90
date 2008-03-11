@@ -120,7 +120,7 @@ subroutine  psb_dhalom(x,desc_a,info,alpha,jx,ik,work,tran,mode,data)
   end if
 
   if (present(tran)) then     
-    tran_ = toupper(tran)
+    tran_ = psb_toupper(tran)
   else
     tran_ = 'N'
   endif
@@ -331,7 +331,7 @@ subroutine  psb_dhalov(x,desc_a,info,alpha,work,tran,mode,data)
   nrow = psb_cd_get_local_rows(desc_a)
 
   if (present(tran)) then     
-    tran_ = toupper(tran)
+    tran_ = psb_toupper(tran)
   else
     tran_ = 'N'
   endif

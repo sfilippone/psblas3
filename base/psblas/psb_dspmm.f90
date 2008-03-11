@@ -147,7 +147,7 @@ subroutine  psb_dspmm(alpha,a,x,beta,y,desc_a,info,&
   endif
 
   if (present(trans)) then     
-    trans_ = toupper(trans)
+    trans_ = psb_toupper(trans)
   else
     trans_ = 'N'
   endif
@@ -475,7 +475,7 @@ subroutine  psb_dspmv(alpha,a,x,beta,y,desc_a,info,&
   endif
 
   if (present(trans)) then     
-    trans_ = toupper(trans)
+    trans_ = psb_toupper(trans)
   else
     trans_ = 'N'
   endif

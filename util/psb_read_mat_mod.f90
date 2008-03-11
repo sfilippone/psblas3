@@ -133,7 +133,7 @@ contains
 
       read(line,fmt=*)nrow,ncol
       
-      if ((tolower(type) == 'real').and.(tolower(sym) == 'general')) then
+      if ((psb_tolower(type) == 'real').and.(psb_tolower(sym) == 'general')) then
         allocate(b(nrow,ncol),stat = ircode)
         if (ircode /= 0)   goto 993
         read(infile,fmt=*,end=902) ((b(i,j), i=1,nrow),j=1,ncol)
@@ -222,7 +222,7 @@ contains
 
       read(line,fmt=*)nrow,ncol
       
-      if ((tolower(type) == 'complex').and.(tolower(sym) == 'general')) then
+      if ((psb_tolower(type) == 'complex').and.(psb_tolower(sym) == 'general')) then
         allocate(b(nrow,ncol),stat = ircode)
         if (ircode /= 0)   goto 993
         do j=1, ncol

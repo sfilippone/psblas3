@@ -81,7 +81,7 @@ subroutine psb_glob_to_loc2(x,y,desc_a,info,iact,owned)
   else
     act='I'
   endif
-  act = toupper(act)
+  act = psb_toupper(act)
   if (present(owned)) then 
     owned_=owned
   else
@@ -215,7 +215,7 @@ subroutine psb_glob_to_loc(x,desc_a,info,iact,owned)
     owned_=.false.
   end if
 
-  act = toupper(act)
+  act = psb_toupper(act)
 
   n = size(x)
   call psi_idx_cnv(n,x,desc_a,info,owned=owned_)

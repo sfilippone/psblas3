@@ -158,7 +158,7 @@ contains
        return
     endif
     if (nparts > 1) then
-      if (toupper(fida) == 'CSR') then 
+      if (psb_toupper(fida) == 'CSR') then 
         iopt(1) = 0
         numflag  = 1
         wgflag   = 0

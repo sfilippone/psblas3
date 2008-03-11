@@ -34,5 +34,5 @@ function psb_lsame(a,b)
   logical :: psb_lsame
   character(len=1) :: a, b 
   
-  psb_lsame = (tolower(a) == tolower(b))
+  psb_lsame = (psb_tolower(a) == psb_tolower(b))
 end function psb_lsame

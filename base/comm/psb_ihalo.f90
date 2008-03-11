@@ -121,7 +121,7 @@ subroutine  psb_ihalom(x,desc_a,info,alpha,jx,ik,work,tran,mode,data)
   end if
 
   if (present(tran)) then     
-    tran_ = toupper(tran)
+    tran_ = psb_toupper(tran)
   else
     tran_ = 'N'
   endif
@@ -337,7 +337,7 @@ subroutine  psb_ihalov(x,desc_a,info,alpha,work,tran,mode,data)
 
 
   if (present(tran)) then     
-    tran_ = toupper(tran)
+    tran_ = psb_toupper(tran)
   else
     tran_ = 'N'
   endif

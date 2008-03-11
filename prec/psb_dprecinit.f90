@@ -45,7 +45,7 @@ subroutine psb_dprecinit(p,ptype,info)
   if (info /= 0) return
   p%iprcparm(:) = 0
 
-  select case(toupper(ptype(1:len_trim(ptype))))
+  select case(psb_toupper(ptype(1:len_trim(ptype))))
   case ('NONE','NOPREC') 
     p%iprcparm(:)           = 0
     p%iprcparm(psb_p_type_)     = psb_noprec_

@@ -68,8 +68,8 @@ C
       debug_unit  = psb_get_debug_unit()
       debug_level = psb_get_debug_level()
 
-      IF (toupper(TRANS).EQ.'N') THEN
-        SCALE  = (toupper(UNITD).EQ.'L') ! meaningless
+      IF (psb_toupper(TRANS).EQ.'N') THEN
+        SCALE  = (psb_toupper(UNITD).EQ.'L') ! meaningless
         IP1(1) = 0
         IP2(1) = 0
         NNZ = IA2(M+1)-1
@@ -99,7 +99,7 @@ C
           GOTO 9999
         END IF
         
-        IF (toupper(DESCRA(1:1)).EQ.'G') THEN
+        IF (psb_toupper(DESCRA(1:1)).EQ.'G') THEN
 C        ... Construct COO Representation...
           ELEM = 0
 
@@ -115,8 +115,8 @@ C        ... Construct COO Representation...
 
           if (debug_level >= psb_debug_serial_)
      +      write(debug_unit,*)  trim(name),': endloop',m,elem
-        ELSE IF (toupper(DESCRA(1:1)).EQ.'S' .AND.
-     +      toupper(DESCRA(2:2)).EQ.'U') THEN
+        ELSE IF (psb_toupper(DESCRA(1:1)).EQ.'S' .AND.
+     +      psb_toupper(DESCRA(2:2)).EQ.'U') THEN
 
           DO 20 K = 1, M
             IP2(K) = K
@@ -126,16 +126,16 @@ C        ... Construct COO Representation...
           call fcpsb_errpush(ierror,name,int_val)
           goto 9999
 C
-        ELSE IF (toupper(DESCRA(1:1)).EQ.'T' .AND.
-     +      toupper(DESCRA(2:2)).EQ.'U') THEN
+        ELSE IF (psb_toupper(DESCRA(1:1)).EQ.'T' .AND.
+     +      psb_toupper(DESCRA(2:2)).EQ.'U') THEN
 
 C
           ierror = 3021
           call fcpsb_errpush(ierror,name,int_val)
           goto 9999
 
-        ELSE IF (toupper(DESCRA(1:1)).EQ.'T' .AND.
-     +      toupper(DESCRA(2:2)).EQ.'L') THEN
+        ELSE IF (psb_toupper(DESCRA(1:1)).EQ.'T' .AND.
+     +      psb_toupper(DESCRA(2:2)).EQ.'L') THEN
 
           ierror = 3021
           call fcpsb_errpush(ierror,name,int_val)
@@ -143,7 +143,7 @@ C
 
         END IF
 C
-      ELSE IF (toupper(TRANS).NE.'N') THEN
+      ELSE IF (psb_toupper(TRANS).NE.'N') THEN
 C
 C           TO DO
 C     

@@ -98,7 +98,7 @@ subroutine psb_zspgetrow(irw,a,nz,ia,ja,val,info,iren,lrw,append,nzin)
     nzin_ = 0
   endif
 
-  select case (tolower(a%fida))
+  select case (psb_tolower(a%fida))
   case ('csr')
     call csr_getrow(irw_,a,nz,ia,ja,val,nzin_,append_,lrw_,info,iren)
   case ('coo')

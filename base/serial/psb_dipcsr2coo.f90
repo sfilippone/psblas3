@@ -55,7 +55,7 @@ Subroutine psb_dipcsr2coo(a,info)
   info  = 0
   call psb_erractionsave(err_act)
 
-  if (toupper(a%fida) /= 'CSR') then 
+  if (psb_toupper(a%fida) /= 'CSR') then 
     info = 5
     call psb_errpush(info,name)
     goto 9999

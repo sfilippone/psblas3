@@ -126,7 +126,7 @@ C
       IERROR = 0
       CALL FCPSB_ERRACTIONSAVE(ERR_ACT)
 
-      IF(toupper(TRANS).EQ.'N') THEN
+      IF(psb_toupper(TRANS).EQ.'N') THEN
         DO IPG = 1, NG                                                    
           DO  K = IA(2,IPG), IA(3,IPG)-1                                   
             DO  I = JA(K), JA(K+1) - 1                                    
@@ -143,7 +143,7 @@ C        Permute CSR
         ENDDO
         
         IWORK(1) = 0
-      ELSE IF(toupper(TRANS).EQ.'T') THEN
+      ELSE IF(psb_toupper(TRANS).EQ.'T') THEN
 C
 C        LWORK refers here to INTEGER IWORK (alias for WORK)
 C

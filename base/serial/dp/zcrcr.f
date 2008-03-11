@@ -196,12 +196,12 @@ C
 C
 C       Check for argument errors
 C
-      idescra=toupper(descra)
+      idescra=psb_toupper(descra)
       IF(((IDESCRA(1:1) .EQ. 'S' .OR. IDESCRA(1:1) .EQ. 'H' .OR.
-     &  IDESCRA(1:1) .EQ. 'A') .AND. (toupper(UNITD) .NE. 'B'))  .OR.
+     &  IDESCRA(1:1) .EQ. 'A') .AND. (psb_toupper(UNITD) .NE. 'B')).OR.
      &  (.NOT.((IDESCRA(3:3).EQ.'N').OR.(IDESCRA(3:3).EQ.'L').OR.
      +  (IDESCRA(3:3).EQ.'U'))) .OR.
-     +  toupper(TRANS).NE.'N') THEN
+     +  psb_toupper(TRANS).NE.'N') THEN
         IERROR = 20
       ENDIF
       IF(LAN.LT.(IA2(M+1)-1)) THEN
@@ -229,7 +229,7 @@ C
         ENDIF
       ENDIF
       IF ((IDESCRA(1:1) .EQ. 'S' .OR. IDESCRA(1:1) .EQ. 'H' .OR.
-     &  IDESCRA(1:1) .EQ. 'A') .AND. (toupper(UNITD) .EQ. 'B')) THEN
+     &  IDESCRA(1:1) .EQ. 'A') .AND. (psb_toupper(UNITD) .EQ. 'B')) THEN
         IF (LWORK.LT.M) THEN
           IF     (LWORK.LE.0) THEN
             EXIT=.TRUE.
@@ -266,7 +266,7 @@ C
         IAN2(I) = IA2(I)
  20   CONTINUE
       IF ((IDESCRA(1:1) .EQ. 'S' .OR. IDESCRA(1:1) .EQ. 'H' .OR.
-     &  IDESCRA(1:1) .EQ. 'A') .AND. (toupper(UNITD) .EQ. 'B')) THEN
+     &  IDESCRA(1:1) .EQ. 'A') .AND. (psb_toupper(UNITD) .EQ. 'B')) THEN
         DO 30 I = 1, M
           WORK(I) = DBLE(DSQRT(ABS(D(I))))
  30     CONTINUE
@@ -276,21 +276,21 @@ C
             IAN1(J) = IA1(J)
  50       CONTINUE
  40     CONTINUE
-      ELSE IF (toupper(UNITD) .EQ. 'L') THEN
+      ELSE IF (psb_toupper(UNITD) .EQ. 'L') THEN
         DO 60 I = 1, M
           DO 70 J = IA2(I), IA2(I+1)-1
             AN(J)   = D(I) * A(J)
             IAN1(J) = IA1(J)
  70       CONTINUE
  60     CONTINUE
-      ELSE IF (toupper(UNITD) .EQ. 'R') THEN
+      ELSE IF (psb_toupper(UNITD) .EQ. 'R') THEN
         DO 80 I = 1, M
           DO 90 J = IA2(I), IA2(I+1)-1
             AN(J)   = A(J) * D(IA1(J))
             IAN1(J) = IA1(J)
  90       CONTINUE
  80     CONTINUE
-      ELSE IF (toupper(UNITD) .EQ. 'U') THEN
+      ELSE IF (psb_toupper(UNITD) .EQ. 'U') THEN
         DO 100 J = 1, IA2(M+1)-1
           AN(J)   = A(J)
           IAN1(J) = IA1(J)

@@ -82,9 +82,9 @@ C
       call psb_getifield(check_flag,psb_dupl_,infon,psb_ifasize_,ierror)
       call psb_getifield(regen_flag,psb_upd_,infon,psb_ifasize_,ierror)
 
-      IF (toupper(TRANS).EQ.'N') THEN
+      IF (psb_toupper(TRANS).EQ.'N') THEN
 
-        SCALE  = (toupper(UNITD).EQ.'L') ! meaningless
+        SCALE  = (psb_toupper(UNITD).EQ.'L') ! meaningless
         P1(1) = 0
         P2(1) = 0
         nnz = info(1)
@@ -137,7 +137,7 @@ C
         infon(psb_upd_pnt_)  = 0
 
         
-        IF (toupper(descra(1:1)).EQ.'G') THEN
+        IF (psb_toupper(descra(1:1)).EQ.'G') THEN
 C
 C        Sort COO data structure
 C
@@ -332,15 +332,15 @@ c                    ... sum the duplicated element ...
      +      write(debug_unit,*)  trim(name),': Done Rebuild CSR',
      +      ian2(m+1),ia(elem)
 
-        ELSE IF (toupper(DESCRA(1:1)).EQ.'S' .AND.
-     +      toupper(DESCRA(2:2)).EQ.'U') THEN
+        ELSE IF (psb_toupper(DESCRA(1:1)).EQ.'S' .AND.
+     +      psb_toupper(DESCRA(2:2)).EQ.'U') THEN
 
           do 20 k = 1, m
             p2(k) = k
  20       continue
 
-        else if (toupper(DESCRA(1:1)).EQ.'T' .AND.
-     +      toupper(DESCRA(2:2)).EQ.'U') THEN
+        else if (psb_toupper(DESCRA(1:1)).EQ.'T' .AND.
+     +      psb_toupper(DESCRA(2:2)).EQ.'U') THEN
 
             call msort_up(nnz,itmp,aux,iret)
             if (iret.eq.0) call reordvn(nnz,arn,itmp,ian1,aux)
@@ -412,8 +412,8 @@ c                    ... sum the duplicated element ...
               ian2(row+1) = elem_csr
             enddo
           
-        else if (toupper(descra(1:1)).EQ.'T' .AND.
-     +        toupper(DESCRA(2:2)).EQ.'L') THEN
+        else if (psb_toupper(descra(1:1)).EQ.'T' .AND.
+     +        psb_toupper(DESCRA(2:2)).EQ.'L') THEN
 
             call msort_up(nnz,itmp,aux,iret)
             if (iret.eq.0) call reordvn(nnz,arn,itmp,ian1,aux)
@@ -490,7 +490,7 @@ c                    ... sum the duplicated element ...
 
         end if
 c
-      else if (toupper(TRANS).NE.'N') then
+      else if (psb_toupper(TRANS).NE.'N') then
 c
 c           to do
 c

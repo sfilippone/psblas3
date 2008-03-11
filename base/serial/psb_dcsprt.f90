@@ -76,10 +76,10 @@ subroutine psb_dcsprt(iout,a,iv,eirs,eics,head,ivr,ivc)
     write(iout,'(a)') '%%MatrixMarket matrix coordinate real general'
     write(iout,'(a,a)') '% ',head 
     write(iout,'(a)') '%'    
-    write(iout,'(a,a)') '% ',toupper(a%fida)
+    write(iout,'(a,a)') '% ',psb_toupper(a%fida)
   endif
 
-  select case(toupper(a%fida)) 
+  select case(psb_toupper(a%fida)) 
 
   case ('CSR')
 

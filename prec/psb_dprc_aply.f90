@@ -156,7 +156,7 @@ subroutine psb_dprc_aply1(prec,x,desc_data,info,trans)
   ictxt=desc_data%matrix_data(psb_ctxt_)
   call psb_info(ictxt, me, np)
   if (present(trans)) then 
-    trans_=toupper(trans)
+    trans_=psb_toupper(trans)
   else
     trans_='N'
   end if

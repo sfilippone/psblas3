@@ -149,7 +149,7 @@ C
       PIA    = PNG + 1
       PJA    = PIA + 3*(IA(PNG)+1)
 
-      IF (toupper(DESCRA(1:1)).EQ.'G') THEN
+      IF (psb_toupper(DESCRA(1:1)).EQ.'G') THEN
          CALL DJADRP1(TRANS,M,N,DESCRA,IA(PNG),
      +      JA,IA(PIA),IA(PJA),P,WORK,LWORK*2)
       ELSE

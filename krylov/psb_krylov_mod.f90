@@ -338,7 +338,7 @@ contains
 
     call psb_info(ictxt, me, np)
 
-    select case(toupper(method))
+    select case(psb_toupper(method))
     case('CG') 
       call  psb_cg(a,prec,b,x,eps,desc_a,info,&
            &itmax,iter,err,itrace,istop)
@@ -455,7 +455,7 @@ contains
     call psb_info(ictxt, me, np)
 
 
-    select case(toupper(method))
+    select case(psb_toupper(method))
     case('CG') 
       call  psb_cg(a,prec,b,x,eps,desc_a,info,&
          &itmax,iter,err,itrace,istop)

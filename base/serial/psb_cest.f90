@@ -53,7 +53,7 @@ subroutine psb_cest(afmt,m,n,nnz, lia1, lia2, lar, iup,info)
     afmt = psb_fidef_
   endif
   
-  afmt = toupper(afmt)
+  afmt = psb_toupper(afmt)
 
   select case(iup)
   case (psb_upd_perm_)
@@ -71,7 +71,7 @@ subroutine psb_cest(afmt,m,n,nnz, lia1, lia2, lar, iup,info)
       lar = nnz
     else
       info = 136
-      call psb_errpush(info,name,a_err=toupper(afmt))
+      call psb_errpush(info,name,a_err=psb_toupper(afmt))
       goto 9999
     endif
 
@@ -91,7 +91,7 @@ subroutine psb_cest(afmt,m,n,nnz, lia1, lia2, lar, iup,info)
       lar = nnz
     else
       info = 136
-      call psb_errpush(info,name,a_err=toupper(afmt))
+      call psb_errpush(info,name,a_err=psb_toupper(afmt))
       goto 9999
     endif
 

@@ -557,7 +557,7 @@ contains
     call psb_info(ictxt, iam, np)     
     if (iam == root) then
       ! extract information from a_glob
-      if (toupper(a_glob%fida) /=  'CSR') then
+      if (psb_toupper(a_glob%fida) /=  'CSR') then
         info=135
         ch_err='CSR'
         call psb_errpush(info,name,a_err=ch_err)
@@ -1301,7 +1301,7 @@ contains
     call psb_info(ictxt, iam, np)     
     if (iam == root) then
       ! extract information from a_glob
-      if (toupper(a_glob%fida) /=  'CSR') then
+      if (psb_toupper(a_glob%fida) /=  'CSR') then
         info=135
         ch_err='CSR'
         call psb_errpush(info,name,a_err=ch_err)

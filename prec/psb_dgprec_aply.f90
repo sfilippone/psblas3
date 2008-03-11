@@ -62,7 +62,7 @@ subroutine psb_dgprec_aply(alpha,prec,x,beta,y,desc_data,trans,work,info)
   ictxt=desc_data%matrix_data(psb_ctxt_)
   call psb_info(ictxt, me, np)
 
-  trans_ = toupper(trans)
+  trans_ = psb_toupper(trans)
 
   select case(trans_)
   case('N')

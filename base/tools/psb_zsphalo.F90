@@ -132,7 +132,7 @@ Subroutine psb_zsphalo(a,desc_a,blk,info,rowcnv,colcnv,&
   endif
 
   if (present(outfmt)) then 
-    outfmt_ =  toupper(outfmt)
+    outfmt_ =  psb_toupper(outfmt)
   else
     outfmt_ = 'CSR'
   endif
