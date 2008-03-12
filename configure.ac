@@ -680,6 +680,8 @@ PSBLASRULES='
 PSBLDLIBS=$(BLACS) $(BLAS) $(METIS_LIB) $(LIBS)
 CDEFINES=$(PSBCDEFINES)
 FDEFINES=$(PSBFDEFINES)
+$(.mod).o:
+	
 
 # These should be portable rules, arent they?
 .c.o:
