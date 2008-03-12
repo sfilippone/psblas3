@@ -75,7 +75,6 @@ UTILLIBNAME=libpsb_util.a
 CDEFINES=$(PSBCDEFINES)
 FDEFINES=$(PSBFDEFINES)
 
-# Under Linux/gmake there is a rule interpreting .mod as Modula source! 
 $(.mod).o:
 	
 .c.o:
