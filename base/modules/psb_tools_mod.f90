@@ -805,14 +805,16 @@ contains
 
   end subroutine psb_dlinmap_ins
 
-  subroutine psb_dlinmap_asb(a_map,cd_xt,descin,descout)
+  subroutine psb_dlinmap_asb(a_map,cd_xt,descin,descout,afmt)
     use psb_spmat_type
     use psb_descriptor_type
     use psb_serial_mod
     implicit none 
-    type(psb_dspmat_type), intent(inout) :: a_map
-    type(psb_desc_type), intent(inout)   :: cd_xt
-    type(psb_desc_type), intent(in)      :: descin, descout 
+    type(psb_dspmat_type), intent(inout)   :: a_map
+    type(psb_desc_type), intent(inout)     :: cd_xt
+    type(psb_desc_type), intent(in)        :: descin, descout 
+    character(len=*), optional, intent(in) :: afmt
+          
 
     integer :: nrow_in, nrow_out, ncol_in, info, ictxt
 
@@ -820,7 +822,7 @@ contains
 
     call psb_cdasb(cd_xt,info)
     a_map%k = psb_cd_get_local_cols(cd_xt)
-    call psb_spcnv(a_map,info,afmt='CSR')
+    call psb_spcnv(a_map,info,afmt=afmt)
 
   end subroutine psb_dlinmap_asb
 
@@ -872,14 +874,15 @@ contains
 
   end subroutine psb_zlinmap_ins
 
-  subroutine psb_zlinmap_asb(a_map,cd_xt,descin,descout)
+  subroutine psb_zlinmap_asb(a_map,cd_xt,descin,descout,afmt)
     use psb_spmat_type
     use psb_descriptor_type
     use psb_serial_mod
     implicit none 
-    type(psb_zspmat_type), intent(inout) :: a_map
-    type(psb_desc_type), intent(inout)   :: cd_xt
-    type(psb_desc_type), intent(in)      :: descin, descout 
+    type(psb_zspmat_type), intent(inout)   :: a_map
+    type(psb_desc_type), intent(inout)     :: cd_xt
+    type(psb_desc_type), intent(in)        :: descin, descout 
+    character(len=*), optional, intent(in) :: afmt
 
     integer :: nrow_in, nrow_out, ncol_in, info, ictxt
 
@@ -887,7 +890,7 @@ contains
 
     call psb_cdasb(cd_xt,info)
     a_map%k = psb_cd_get_local_cols(cd_xt)
-    call psb_spcnv(a_map,info,afmt='CSR')
+    call psb_spcnv(a_map,info,afmt=afmt)
 
   end subroutine psb_zlinmap_asb
 
