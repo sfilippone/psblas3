@@ -558,7 +558,7 @@ CC="$MPICC";
 PAC_CHECK_BLACS
 FC="$save_FC";
 CC="$save_CC";
-
+PAC_MAKE_IS_GNUMAKE
 
 ###############################################################################
 #		METIS, SuperLU, SuperLU_Dist UMFPack libraries presence checks
@@ -648,12 +648,13 @@ AC_SUBST(METIS_LIBS)
 AC_SUBST(CINCLUDES)
 AC_SUBST(FINCLUDES)
 
-if test "X$psblas_cv_fc" == "Xgcc" ; then
+if test "X$psblas_make_gnumake" == "Xyes" ; then
 PSBLASRULES='
 PSBLDLIBS=$(BLACS) $(BLAS) $(METIS_LIB) $(LIBS)
 CDEFINES=$(PSBCDEFINES)
 FDEFINES=$(PSBFDEFINES)
 # Warning : these rules are only valid with GNU make!
+$(.mod).o:
 
 %.o: %.c
 	$(CC) $(F90COPT) $(CINCLUDES) $(CDEFINES)  -c $<
@@ -680,7 +681,6 @@ PSBLASRULES='
 PSBLDLIBS=$(BLACS) $(BLAS) $(METIS_LIB) $(LIBS)
 CDEFINES=$(PSBCDEFINES)
 FDEFINES=$(PSBFDEFINES)
-$(.mod).o:
 	
 
 # These should be portable rules, arent they?

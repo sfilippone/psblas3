@@ -598,3 +598,20 @@ else
 fi
 ])dnl
 
+
+dnl @synopsis PAC_MAKE_IS_GNUMAKE
+dnl
+dnl @author Salvatore Filippone <salvatore.filippone@uniroma2.it>
+dnl
+define(PAC_MAKE_IS_GNUMAKE,[
+AC_MSG_CHECKING(for gnumake)
+MAKE=${MAKE:-make}
+
+if $MAKE --version 2>&1 | grep -e"GNU Make" >/dev/null; then 
+    AC_MSG_RESULT(yes)
+    psblas_make_gnumake='yes'
+else
+    AC_MSG_RESULT(no)
+    psblas_make_gnumake='no'
+fi
+])dnl
