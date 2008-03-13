@@ -655,6 +655,7 @@ CDEFINES=$(PSBCDEFINES)
 FDEFINES=$(PSBFDEFINES)
 # Warning : these rules are only valid with GNU make!
 $(.mod).o:
+	
 
 %.o: %.c
 	$(CC) $(F90COPT) $(CINCLUDES) $(CDEFINES)  -c $<
@@ -683,6 +684,8 @@ CDEFINES=$(PSBCDEFINES)
 FDEFINES=$(PSBFDEFINES)
 	
 
+$(.mod).o:
+	
 # These should be portable rules, arent they?
 .c.o:
 	$(CC) $(CCOPT) $(CINCLUDES) $(CDEFINES) -c $<

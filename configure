@@ -10037,6 +10037,20 @@ fi
 FC="$save_FC";
 CC="$save_CC";
 
+{ echo "$as_me:$LINENO: checking for gnumake" >&5
+echo $ECHO_N "checking for gnumake... $ECHO_C" >&6; }
+MAKE=${MAKE:-make}
+
+if $MAKE --version 2>&1 | grep -e"GNU Make" >/dev/null; then
+    { echo "$as_me:$LINENO: result: yes" >&5
+echo "${ECHO_T}yes" >&6; }
+    psblas_make_gnumake='yes'
+else
+    { echo "$as_me:$LINENO: result: no" >&5
+echo "${ECHO_T}no" >&6; }
+    psblas_make_gnumake='no'
+fi
+
 
 ###############################################################################
 #		METIS, SuperLU, SuperLU_Dist UMFPack libraries presence checks
@@ -10279,12 +10293,14 @@ UTILLIBNAME=libpsb_util.a
 
 
 
-if test "X$psblas_cv_fc" == "Xgcc" ; then
+if test "X$psblas_make_gnumake" == "Xyes" ; then
 PSBLASRULES='
 PSBLDLIBS=$(BLACS) $(BLAS) $(METIS_LIB) $(LIBS)
 CDEFINES=$(PSBCDEFINES)
 FDEFINES=$(PSBFDEFINES)
 # Warning : these rules are only valid with GNU make!
+$(.mod).o:
+
 
 %.o: %.c
 	$(CC) $(F90COPT) $(CINCLUDES) $(CDEFINES)  -c $<
@@ -10311,8 +10327,9 @@ PSBLASRULES='
 PSBLDLIBS=$(BLACS) $(BLAS) $(METIS_LIB) $(LIBS)
 CDEFINES=$(PSBCDEFINES)
 FDEFINES=$(PSBFDEFINES)
-$(.mod).o:
 
+
+$(.mod).o:
 
 # These should be portable rules, arent they?
 .c.o:
