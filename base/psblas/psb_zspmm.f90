@@ -249,8 +249,8 @@ subroutine  psb_zspmm(alpha,a,x,beta,y,desc_a,info,&
       if(info /= 0) exit blk
 
       !  local Matrix-vector product
-      call psb_csmm(alpha,a,x(iix:lldx,jjx:jjx+ib-1),&
-           & beta,y(iiy:lldy,jjy:jjy+ib-1),info,trans=trans_)
+      call psb_csmm(alpha,a,x(:,jjx+i-1:jjx+i+ib-1),&
+           & beta,y(:,jjy+i-1:jjy+i+ib-1),info,trans=trans_)
 
       if(info /= 0) exit blk
 
