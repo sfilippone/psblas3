@@ -266,6 +266,11 @@ contains
     integer                 ::  nprow, npcol, me, mypcol
     integer, parameter      ::  ione=1, izero=0
 
+#if defined(SERIAL_MPI)
+    me = -1
+#else        
+    call blacs_gridinfo(ictxt,nprow,npcol,me,mypcol)
+#endif
 
     if(error_status > 0) then
       if(verbosity_level > 1) then
