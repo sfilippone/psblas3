@@ -168,6 +168,7 @@ subroutine psb_cdals(m, n, parts, ictxt, desc, info)
     ! hashed by the low order bits of the entries.
     !
     loc_col = (m+np-1)/np
+    loc_col = min(2*loc_col,m)
     allocate(desc%loc_to_glob(loc_col), desc%lprm(1),&
          & desc%ptree(2),stat=info)  
     if (info == 0) call InitPairSearchTree(desc%ptree,info)
@@ -380,15 +381,16 @@ subroutine psb_cdals(m, n, parts, ictxt, desc, info)
   desc%matrix_data(psb_n_row_)  = loc_row
   desc%matrix_data(psb_n_col_)  = loc_row
 
-  call psb_realloc(1,desc%halo_index, info)
+  call psb_realloc(max(1,loc_row/2),desc%halo_index, info)
   if (info == 0) call psb_realloc(1,desc%ext_index, info)
   if (info /= 0) then
     info=4010
     call psb_errpush(info,name,a_err='psb_realloc')
     Goto 9999
   end if
-  desc%halo_index(:) = -1
-  desc%ext_index(:) = -1
+  desc%matrix_data(psb_pnt_h_) = 1
+  desc%halo_index(:)           = -1
+  desc%ext_index(:)            = -1
 
   call psb_cd_set_bld(desc,info)
 

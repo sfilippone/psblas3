@@ -66,23 +66,28 @@ module psb_descriptor_type
   !
   ! Entries and values in desc%matrix_data
   !
-  integer, parameter :: psb_dec_type_=1, psb_m_=2,psb_n_=3
-  integer, parameter :: psb_n_row_=4,  psb_n_col_=5,psb_ctxt_=6
-  integer, parameter :: psb_desc_size_=7
-  integer, parameter :: psb_mpi_c_=9
-  integer, parameter :: psb_thal_xch_=11
-  integer, parameter :: psb_thal_snd_=12
-  integer, parameter :: psb_thal_rcv_=13
-  integer, parameter :: psb_tovr_xch_=14
-  integer, parameter :: psb_tovr_snd_=15
-  integer, parameter :: psb_tovr_rcv_=16
-  integer, parameter :: psb_text_xch_=17
-  integer, parameter :: psb_text_snd_=18
-  integer, parameter :: psb_text_rcv_=19
-  integer, parameter :: psb_tmov_xch_=20
-  integer, parameter :: psb_tmov_snd_=21
-  integer, parameter :: psb_tmov_rcv_=22
-  integer, parameter :: psb_mdata_size_=24
+  integer, parameter :: psb_dec_type_  =  1
+  integer, parameter :: psb_m_         =  2
+  integer, parameter :: psb_n_         =  3
+  integer, parameter :: psb_n_row_     =  4
+  integer, parameter :: psb_n_col_     =  5
+  integer, parameter :: psb_ctxt_      =  6
+  integer, parameter :: psb_desc_size_ =  7
+  integer, parameter :: psb_mpi_c_     =  9
+  integer, parameter :: psb_pnt_h_     = 10
+  integer, parameter :: psb_thal_xch_  = 11
+  integer, parameter :: psb_thal_snd_  = 12
+  integer, parameter :: psb_thal_rcv_  = 13
+  integer, parameter :: psb_tovr_xch_  = 14
+  integer, parameter :: psb_tovr_snd_  = 15
+  integer, parameter :: psb_tovr_rcv_  = 16
+  integer, parameter :: psb_text_xch_  = 17
+  integer, parameter :: psb_text_snd_  = 18
+  integer, parameter :: psb_text_rcv_  = 19
+  integer, parameter :: psb_tmov_xch_  = 20
+  integer, parameter :: psb_tmov_snd_  = 21
+  integer, parameter :: psb_tmov_rcv_  = 22
+  integer, parameter :: psb_mdata_size_= 24
   integer, parameter :: psb_desc_asb_=3099
   integer, parameter :: psb_desc_bld_=psb_desc_asb_+1
   integer, parameter :: psb_desc_repl_=3199

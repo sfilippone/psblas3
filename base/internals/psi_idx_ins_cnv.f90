@@ -214,6 +214,7 @@ subroutine psi_idx_ins_cnv2(nv,idxin,idxout,desc,info,mask)
   integer :: i,ictxt,k,mglob, nglob
   integer                :: np, me, isize
   integer                :: pnt_halo,nrow,ncol, nh, ip, err_act,lip,nxt
+  logical                :: pnth_ok
   integer, parameter     :: relocsz=200
   character(len=20)      :: name,ch_err
   logical, pointer       :: mask_(:)
@@ -319,11 +320,26 @@ subroutine psi_idx_ins_cnv2(nv,idxin,idxout,desc,info,mask)
     if (.not.allocated(desc%halo_index)) then
       allocate(desc%halo_index(relocsz))
       desc%halo_index(:) = -1
+      desc%matrix_data(psb_pnt_h_) = 1 
     endif
-    pnt_halo=1
-    do while (desc%halo_index(pnt_halo)  /=   -1 )
-      pnt_halo = pnt_halo + 1
-    end do
+    pnt_halo = desc%matrix_data(psb_pnt_h_)
+
+    pnth_ok = .false.
+    if (desc%halo_index(pnt_halo)  ==   -1 ) then 
+      if (pnt_halo == 1) then 
+        pnth_ok = .true.
+      else if (desc%halo_index(pnt_halo-1) /=   -1 ) then 
+        pnth_ok = .true.
+      end if
+    end if
+        
+    if (.not.pnth_ok) then 
+      pnt_halo = 1
+      do while (desc%halo_index(pnt_halo)  /=   -1 )
+        pnt_halo = pnt_halo + 1
+      end do
+    end if
+
     isize = size(desc%halo_index)
 
     do i = 1, nv
@@ -377,7 +393,7 @@ subroutine psi_idx_ins_cnv2(nv,idxin,idxout,desc,info,mask)
         idxout(i) = -1
       end if
     enddo
-
+    desc%matrix_data(psb_pnt_h_) = pnt_halo 
   end if
 
   desc%matrix_data(psb_n_col_) = ncol

@@ -314,21 +314,16 @@ subroutine psb_cdalv(v, ictxt, desc, info, flag)
   desc%matrix_data(psb_n_row_)  = loc_row
   desc%matrix_data(psb_n_col_)  = loc_row
 
-  call psb_realloc(1,desc%halo_index, info)
-  if (info /= psb_no_err_) then
+  call psb_realloc(max(1,loc_row/2),desc%halo_index, info)
+  if (info == 0) call psb_realloc(1,desc%ext_index, info)
+  if (info /= 0) then
     info=4010
-    call psb_errpush(err,name,a_err='psb_realloc')
+    call psb_errpush(info,name,a_err='psb_realloc')
     Goto 9999
   end if
-  desc%halo_index(:) = -1
-
-  call psb_realloc(1,desc%ext_index, info)
-  if (info /= psb_no_err_) then
-    info=4010
-    call psb_errpush(err,name,a_err='psb_realloc')
-    Goto 9999
-  end if
-  desc%ext_index(:) = -1
+  desc%matrix_data(psb_pnt_h_) = 1
+  desc%halo_index(:)           = -1
+  desc%ext_index(:)            = -1
 
   call psb_cd_set_bld(desc,info)
 
