@@ -214,7 +214,7 @@ subroutine psi_idx_ins_cnv2(nv,idxin,idxout,desc,info,mask)
   integer :: i,ictxt,k,mglob, nglob
   integer                :: np, me, isize
   integer                :: pnt_halo,nrow,ncol, nh, ip, err_act,lip,nxt
-  logical                :: pnth_ok
+  logical                :: pnt_h_ok
   integer, parameter     :: relocsz=200
   character(len=20)      :: name,ch_err
   logical, pointer       :: mask_(:)
@@ -324,23 +324,31 @@ subroutine psi_idx_ins_cnv2(nv,idxin,idxout,desc,info,mask)
     endif
     pnt_halo = desc%matrix_data(psb_pnt_h_)
 
-    pnth_ok = .false.
-    if (desc%halo_index(pnt_halo)  ==   -1 ) then 
-      if (pnt_halo == 1) then 
-        pnth_ok = .true.
-      else if (desc%halo_index(pnt_halo-1) /=   -1 ) then 
-        pnth_ok = .true.
+    pnt_h_ok = .false.
+    isize    = size(desc%halo_index)
+    if ((1 <= pnt_halo).and.(pnt_halo <= isize)) then 
+      if (desc%halo_index(pnt_halo)  ==   -1 ) then 
+        if (pnt_halo == 1) then 
+          pnt_h_ok = .true.
+        else if (desc%halo_index(pnt_halo-1) /=   -1 ) then 
+          pnt_h_ok = .true.
+        end if
       end if
     end if
-        
-    if (.not.pnth_ok) then 
+
+    if (.not.pnt_h_ok) then 
       pnt_halo = 1
-      do while (desc%halo_index(pnt_halo)  /=   -1 )
+      do
+        if (desc%halo_index(pnt_halo) ==  -1) exit
+        if (pnt_halo == isize) exit
         pnt_halo = pnt_halo + 1
       end do
+      if (desc%halo_index(pnt_halo) /=  -1) then
+        call psb_realloc(isize+relocsz,desc%halo_index,info,pad=-1) 
+        pnt_halo = pnt_halo + 1 
+      end if
     end if
 
-    isize = size(desc%halo_index)
 
     do i = 1, nv
       if (mask_(i)) then 
