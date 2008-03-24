@@ -128,7 +128,6 @@ program ppde
   !
   !  allocate and fill in the coefficient matrix, rhs and initial guess 
   !
-  call psb_cd_set_large_threshold(128)
   call psb_barrier(ictxt)
   t1 = psb_wtime()
   call create_matrix(idim,a,b,x,desc_a,part_block,ictxt,afmt,info)  
