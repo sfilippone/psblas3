@@ -231,35 +231,42 @@ subroutine  psb_zspmm(alpha,a,x,beta,y,desc_a,info,&
     end if
 
 
-    ib1=min(nb,ik)
-    xp => x(iix:lldx,jjx:jjx+ib1-1)
-    if (doswap_)&
-         & call psi_swapdata(ior(psb_swap_send_,psb_swap_recv_),&
-         & ib1,zzero,xp,desc_a,iwork,info)
+    if (doswap_.and.(np>1)) then 
+      ib1=min(nb,ik)
+      xp => x(iix:lldx,jjx:jjx+ib1-1)
+      if (doswap_)&
+           & call psi_swapdata(ior(psb_swap_send_,psb_swap_recv_),&
+           & ib1,zzero,xp,desc_a,iwork,info)
 
 
-    blk: do i=1, ik, nb
-      ib=ib1
-      ib1 = max(0,min(nb,(ik)-(i-1+ib)))
-      xp => x(iix:lldx,jjx+i+ib-1:jjx+i+ib+ib1-2)
-      if ((ib1 > 0).and.(doswap_)) &
-           & call psi_swapdata(psb_swap_send_,ib1,&
-           & zzero,xp,desc_a,iwork,info)
+      blk: do i=1, ik, nb
+        ib=ib1
+        ib1 = max(0,min(nb,(ik)-(i-1+ib)))
+        xp => x(iix:lldx,jjx+i+ib-1:jjx+i+ib+ib1-2)
+        if ((ib1 > 0).and.(doswap_)) &
+             & call psi_swapdata(psb_swap_send_,ib1,&
+             & zzero,xp,desc_a,iwork,info)
 
-      if(info /= 0) exit blk
+        if(info /= 0) exit blk
 
-      !  local Matrix-vector product
-      call psb_csmm(alpha,a,x(:,jjx+i-1:jjx+i+ib-1),&
-           & beta,y(:,jjy+i-1:jjy+i+ib-1),info,trans=trans_)
+        !  local Matrix-vector product
+        call psb_csmm(alpha,a,x(:,jjx+i-1:jjx+i+ib-1),&
+             & beta,y(:,jjy+i-1:jjy+i+ib-1),info,trans=trans_)
 
-      if(info /= 0) exit blk
+        if(info /= 0) exit blk
 
-      if((ib1 > 0).and.(doswap_))&
-           & call psi_swapdata(psb_swap_send_,ib1,&
-           & zzero,xp,desc_a,iwork,info)
+        if((ib1 > 0).and.(doswap_))&
+             & call psi_swapdata(psb_swap_send_,ib1,&
+             & zzero,xp,desc_a,iwork,info)
 
-      if(info /= 0) exit blk
-    end do blk
+        if(info /= 0) exit blk
+      end do blk
+    else
+      if (doswap_)&
+           & call psi_swapdata(ior(psb_swap_send_,psb_swap_recv_),&
+           & ib1,zzero,x(:,1:ik),desc_a,iwork,info)
+      if (info == 0) call psb_csmm(alpha,a,x(:,1:ik),beta,y(:,1:ik),info)
+    end if
 
     if(info /= 0) then
       info = 4011
