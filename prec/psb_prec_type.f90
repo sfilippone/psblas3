@@ -53,9 +53,9 @@ module psb_prec_type
   !Renumbering. SEE BELOW
   integer, parameter :: psb_renum_none_=0, psb_renum_glb_=1, psb_renum_gps_=2
   integer, parameter :: psb_ifpsz=10
-  ! Entries in dprcparm: ILU(E) epsilon, smoother omega
+  ! Entries in rprcparm: ILU(E) epsilon, smoother omega
   integer, parameter :: psb_fact_eps_=1
-  integer, parameter :: psb_dfpsz=4
+  integer, parameter :: psb_rfpsz=4
   ! Factorization types: none, ILU(N), ILU(E)
   integer, parameter :: psb_f_none_=0,psb_f_ilu_n_=1
   ! Fields for sparse matrices ensembles: 
@@ -68,7 +68,7 @@ module psb_prec_type
     real(psb_dpk_), allocatable        :: d(:)  
     type(psb_desc_type)                :: desc_data 
     integer, allocatable               :: iprcparm(:) 
-    real(psb_dpk_), allocatable        :: dprcparm(:) 
+    real(psb_dpk_), allocatable        :: rprcparm(:) 
     integer, allocatable               :: perm(:),  invperm(:) 
     integer                            :: prec, base_prec
   end type psb_dprec_type
@@ -78,7 +78,7 @@ module psb_prec_type
     complex(psb_dpk_), allocatable     :: d(:)  
     type(psb_desc_type)                :: desc_data 
     integer, allocatable               :: iprcparm(:) 
-    real(psb_dpk_), allocatable        :: dprcparm(:) 
+    real(psb_dpk_), allocatable        :: rprcparm(:) 
     integer, allocatable               :: perm(:),  invperm(:) 
     integer                            :: prec, base_prec
   end type psb_zprec_type
@@ -257,8 +257,8 @@ contains
     if (allocated(p%desc_data%matrix_data)) &
          & call psb_cdfree(p%desc_data,info)
 
-    if (allocated(p%dprcparm)) then 
-      deallocate(p%dprcparm,stat=info)
+    if (allocated(p%rprcparm)) then 
+      deallocate(p%rprcparm,stat=info)
     end if
 
     if (allocated(p%perm)) then 
@@ -291,7 +291,7 @@ contains
     use psb_base_mod
     type(psb_dprec_type), intent(inout) :: p
 
-!!$    nullify(p%av,p%d,p%iprcparm,p%dprcparm,p%perm,p%invperm,p%mlia,&
+!!$    nullify(p%av,p%d,p%iprcparm,p%rprcparm,p%perm,p%invperm,p%mlia,&
 !!$         & p%nlaggr,p%base_a,p%base_desc,p%dorig,p%desc_data, p%desc_ac)
 
   end subroutine psb_nullify_dprec
@@ -326,8 +326,8 @@ contains
     if (allocated(p%desc_data%matrix_data)) &
          & call psb_cdfree(p%desc_data,info)
 
-    if (allocated(p%dprcparm)) then 
-      deallocate(p%dprcparm,stat=info)
+    if (allocated(p%rprcparm)) then 
+      deallocate(p%rprcparm,stat=info)
     end if
 
     if (allocated(p%perm)) then 
@@ -390,7 +390,7 @@ contains
     
     val = 0
     if (allocated(prec%iprcparm)) val = val + psb_sizeof_int * size(prec%iprcparm)
-    if (allocated(prec%dprcparm)) val = val + psb_sizeof_dp  * size(prec%dprcparm)
+    if (allocated(prec%rprcparm)) val = val + psb_sizeof_dp  * size(prec%rprcparm)
     if (allocated(prec%d))        val = val + psb_sizeof_dp  * size(prec%d)
     if (allocated(prec%perm))     val = val + psb_sizeof_int * size(prec%perm)
     if (allocated(prec%invperm))  val = val + psb_sizeof_int * size(prec%invperm)
@@ -413,7 +413,7 @@ contains
     
     val = 0
     if (allocated(prec%iprcparm)) val = val + psb_sizeof_int * size(prec%iprcparm)
-    if (allocated(prec%dprcparm)) val = val + psb_sizeof_dp  * size(prec%dprcparm)
+    if (allocated(prec%rprcparm)) val = val + psb_sizeof_dp  * size(prec%rprcparm)
     if (allocated(prec%d))        val = val + 2 * psb_sizeof_dp * size(prec%d)
     if (allocated(prec%perm))     val = val + psb_sizeof_int * size(prec%perm)
     if (allocated(prec%invperm))  val = val + psb_sizeof_int * size(prec%invperm)

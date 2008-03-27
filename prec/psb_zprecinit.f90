@@ -42,7 +42,7 @@ subroutine psb_zprecinit(p,ptype,info)
   info = 0
   
   call psb_realloc(psb_ifpsz,p%iprcparm,info)
-  if (info == 0) call psb_realloc(psb_dfpsz,p%dprcparm,info)
+  if (info == 0) call psb_realloc(psb_rfpsz,p%rprcparm,info)
   if (info /= 0) return
   p%iprcparm(:) = 0
 
