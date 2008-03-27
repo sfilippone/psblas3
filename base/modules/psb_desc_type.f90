@@ -419,7 +419,7 @@ contains
     !
     psb_cd_choose_large_state = &
          & (m > psb_cd_get_large_threshold()) .and. &
-         & (np > 0)
+         & (np > 2)
   end function psb_cd_choose_large_state
 
   subroutine psb_nullify_desc(desc)
