@@ -37,6 +37,7 @@
 
 module psb_descriptor_type
   use psb_const_mod
+  use psb_avl_mod
 
   implicit none
 
@@ -132,7 +133,7 @@ module psb_descriptor_type
   !|     integer, allocatable :: ovr_mst_idx(:)
   !|     integer, allocatable :: loc_to_glob(:)
   !|     integer, allocatable :: glob_to_loc (:)
-  !|     integer, allocatable :: hashv(:), glb_lc(:,:), ptree(:)
+  !|     integer, allocatable :: hashv(:), glb_lc(:,:)
   !|     integer, allocatable :: lprm(:)
   !|     integer, allocatable :: idx_space(:)
   !|  end type psb_desc_type
@@ -157,7 +158,7 @@ module psb_descriptor_type
   !  and is only entered by the psb_cdrep call. Currently it is only 
   !  used in the last level of some multilevel preconditioners. 
   ! 
-  !  The LOC_TO_GLOB, GLOB_TO_LOC, GLB_LC, HASHV and PTREE arrays implement the 
+  !  The LOC_TO_GLOB, GLOB_TO_LOC, GLB_LC, HASHV and AVLTREE arrays implement the 
   !  mapping between local and global indices, according to the following 
   !  guidelines:
   !
@@ -195,7 +196,7 @@ module psb_descriptor_type
   !        array. In this case we only record the global indices that do have a 
   !        local counterpart, so that the local storage will be proportional to 
   !        N_COL. During the build phase we keep the known global indices in an 
-  !        AVL tree data structure whose pointer is stored in ptree(:), so that we 
+  !        AVL tree data structure whose pointer is stored in avltree, so that we 
   !        can do both search and insertions in log time. At assembly time, we move 
   !        the information into hashv(:) and glb_lc(:,:). The idea is that 
   !        glb_lc(:,1) will hold sorted global indices, and glb_lc(:,2) the 
@@ -302,7 +303,8 @@ module psb_descriptor_type
     integer, allocatable :: bnd_elem(:)
     integer, allocatable :: loc_to_glob(:)
     integer, allocatable :: glob_to_loc (:)
-    integer, allocatable :: hashv(:), glb_lc(:,:), ptree(:)
+    integer, allocatable :: hashv(:), glb_lc(:,:)
+    type(psb_tree_int2), pointer   :: avltree => null()
     integer, allocatable :: lprm(:)
     integer, allocatable :: idx_space(:)
     type(psb_desc_type), pointer :: base_desc => null()
@@ -339,22 +341,10 @@ module psb_descriptor_type
 
   interface psb_cdcpy
     module procedure psb_cdcpy
-!!$    subroutine psb_cdcpy(desc_in, desc_out, info)
-!!$      use psb_descriptor_type
-!!$      type(psb_desc_type), intent(in)  :: desc_in
-!!$      type(psb_desc_type), intent(out) :: desc_out
-!!$      integer, intent(out)             :: info
-!!$    end subroutine psb_cdcpy
   end interface
 
   interface psb_cdtransfer
     module procedure psb_cdtransfer
-!!$    subroutine psb_cdtransfer(desc_in, desc_out, info)
-!!$      use psb_descriptor_type
-!!$      type(psb_desc_type), intent(inout) :: desc_in
-!!$      type(psb_desc_type), intent(inout)   :: desc_out
-!!$      integer, intent(out)               :: info
-!!$    end subroutine psb_cdtransfer
   end interface
 
   interface psb_cd_reinit
@@ -363,11 +353,6 @@ module psb_descriptor_type
 
   interface psb_cdfree
     module procedure psb_cdfree
-!!$    subroutine psb_cdfree(desc_a,info)
-!!$      use psb_descriptor_type
-!!$      type(psb_desc_type), intent(inout) :: desc_a
-!!$      integer, intent(out)               :: info
-!!$    end subroutine psb_cdfree
   end interface
 
 
@@ -394,14 +379,13 @@ contains
     if (allocated(desc%ovrlap_index)) val = val + psb_sizeof_int*size(desc%ovrlap_index)
     if (allocated(desc%ovrlap_elem))  val = val + psb_sizeof_int*size(desc%ovrlap_elem)
     if (allocated(desc%ovr_mst_idx))  val = val + psb_sizeof_int*size(desc%ovr_mst_idx)
-    if (allocated(desc%loc_to_glob))  val = val + psb_sizeof_int*size(desc%loc_to_glob)    
+    if (allocated(desc%loc_to_glob))  val = val + psb_sizeof_int*size(desc%loc_to_glob)
     if (allocated(desc%glob_to_loc))  val = val + psb_sizeof_int*size(desc%glob_to_loc)
     if (allocated(desc%hashv))        val = val + psb_sizeof_int*size(desc%hashv)
     if (allocated(desc%glb_lc))       val = val + psb_sizeof_int*size(desc%glb_lc)
     if (allocated(desc%lprm))         val = val + psb_sizeof_int*size(desc%lprm)
     if (allocated(desc%idx_space))    val = val + psb_sizeof_int*size(desc%idx_space)
-    if (allocated(desc%ptree))        val = val + psb_sizeof_int*size(desc%ptree) +&
-         &                                  SizeofPairSearchTree(desc%ptree)
+    if (associated(desc%avltree))     val = val + psb_sizeof(desc%avltree) 
 
     psb_cd_sizeof = val
   end function psb_cd_sizeof
@@ -435,13 +419,15 @@ contains
     !
     psb_cd_choose_large_state = &
          & (m > psb_cd_get_large_threshold()) .and. &
-         & (np > 2)
+         & (np > 0)
   end function psb_cd_choose_large_state
 
   subroutine psb_nullify_desc(desc)
     type(psb_desc_type), intent(inout) :: desc
     ! We have nothing left to do here.
     ! Perhaps we should delete this subroutine? 
+    nullify(desc%avltree,desc%base_desc)
+
   end subroutine psb_nullify_desc
 
   logical function psb_is_ok_desc(desc)
@@ -660,22 +646,18 @@ contains
     end if
 
     if (psb_is_large_desc(desc)) then 
-      if (debug) write(0,*) me,'SET_BLD: alocating ptree'
-      if (.not.allocated(desc%ptree)) then 
-        allocate(desc%ptree(2),stat=info)
-        if (info /= 0) then 
-          info=4000
-          goto 9999
-        endif
-        call InitPairSearchTree(desc%ptree,info)
+      if (debug) write(0,*) me,'SET_BLD: alocating avltree'
+      if (.not.associated(desc%avltree)) then 
+        call InitSearchTree(desc%avltree,info)
         do idx=1, psb_cd_get_local_cols(desc)
           gidx = desc%loc_to_glob(idx)
-          call SearchInsKeyVal(desc%ptree,gidx,idx,lidx,info)        
+          call SearchInsKey(desc%avltree,gidx,lidx,idx,info)        
           if (lidx /= idx) then 
-            write(0,*) 'Warning from cdset: mismatch in PTREE ',idx,lidx
+            write(0,*) 'Warning from cdset: mismatch in AVLTREE ',idx,lidx
           endif
         enddo
       end if
+      
     end if
     desc%matrix_data(psb_dec_type_) = psb_desc_bld_ 
 
@@ -972,17 +954,14 @@ contains
       end if
     end if
 
-    if (allocated(desc_a%ptree)) then 
-      call FreePairSearchTree(desc_a%ptree)   
-      deallocate(desc_a%ptree,stat=info)
+    if (associated(desc_a%avltree)) then 
+      call FreeSearchTree(desc_a%avltree,info)
       if (info /= 0) then 
-        info=2059
+        info=2060
         call psb_errpush(info,name)
         goto 9999
       end if
     end if
-
-
 
     if (allocated(desc_a%idx_space)) then 
       deallocate(desc_a%idx_space,stat=info)
@@ -1073,13 +1052,8 @@ contains
     if (info == 0)   call psb_safe_ab_cpy(desc_in%glb_lc,desc_out%glb_lc,info)
 
     if (info == 0) then 
-      if (allocated(desc_in%ptree)) then 
-        allocate(desc_out%ptree(2),stat=info)
-        if (info /= 0) then 
-          info=4000
-          goto 9999
-        endif
-        call ClonePairSearchTree(desc_in%ptree,desc_out%ptree)
+      if (associated(desc_in%avltree)) then 
+        call CloneSearchTree(desc_in%avltree,desc_out%avltree)
       end if
     end if
 
@@ -1178,9 +1152,9 @@ contains
          & call psb_transfer( desc_in%hashv       ,    desc_out%hashv        , info)
     if (info == 0)  &
          & call psb_transfer( desc_in%glb_lc      ,    desc_out%glb_lc       , info)
-    if (info == 0)  &
-         & call psb_transfer( desc_in%ptree       ,    desc_out%ptree        , info)
 
+    desc_out%avltree => desc_in%avltree; nullify(desc_in%avltree)
+    
     if (info /= 0) then
       info = 4010
       call psb_errpush(info,name)

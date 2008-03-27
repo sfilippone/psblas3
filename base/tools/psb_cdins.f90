@@ -124,8 +124,6 @@ subroutine psb_cdinsrc(nz,ia,ja,desc_a,info,ila,jla)
   end if
 
   if (present(ila).and.present(jla)) then 
-!!$    call psi_idx_cnv(nz,ia,ila,desc_a,info,owned=.true.)
-!!$    call psi_idx_ins_cnv(nz,ja,jla,desc_a,info,mask=(ila(1:nz)>0))
     call psi_idx_cnv(nz,ia,ila,desc_a,info,owned=.true.)
     call psb_cdins(nz,ja,desc_a,info,jla=jla,mask=(ila(1:nz)>0))
   else

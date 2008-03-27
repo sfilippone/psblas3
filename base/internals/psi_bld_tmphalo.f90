@@ -103,6 +103,15 @@ subroutine psi_bld_tmphalo(desc,info)
     end do
 
     call psi_fnd_owner(nh,helem,hproc,desc,info)
+    if (info /= 0) then 
+      call psb_errpush(4010,name,a_err='fnd_owner')
+      goto 9999      
+    endif
+    if (nh > size(hproc)) then 
+      info=4010
+      call psb_errpush(4010,name,a_err='nh > size(hproc)')
+      goto 9999      
+    end if
     allocate(tmphl((3*((n_col-n_row)+1)+1)),stat=info)
     if (info /= 0) then 
       call psb_errpush(4010,name,a_err='Allocate')

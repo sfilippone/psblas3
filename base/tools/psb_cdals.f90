@@ -51,6 +51,7 @@ subroutine psb_cdals(m, n, parts, ictxt, desc, info)
   use psb_const_mod
   use psi_mod
   use psb_penv_mod
+  use psb_avl_mod
   implicit None
   include 'parts.fh'
   !....Parameters...
@@ -170,8 +171,8 @@ subroutine psb_cdals(m, n, parts, ictxt, desc, info)
     loc_col = (m+np-1)/np
     loc_col = min(2*loc_col,m)
     allocate(desc%loc_to_glob(loc_col), desc%lprm(1),&
-         & desc%ptree(2),stat=info)  
-    if (info == 0) call InitPairSearchTree(desc%ptree,info)
+         & stat=info)  
+    if (info == 0) call InitSearchTree(desc%avltree,info)
     if (info /= 0) then
       info=4025
       int_err(1)=loc_col
@@ -234,7 +235,7 @@ subroutine psb_cdals(m, n, parts, ictxt, desc, info)
               goto 9999
             end if
             desc%loc_to_glob(k) = i
-            call SearchInsKeyVal(desc%ptree,i,k,glx,info)
+            call SearchInsKey(desc%avltree,i,glx,k,info)
             if (nprocs > 1)  then
               call psb_ensure_size((itmpov+3+nprocs),temp_ovrlap,info,pad=-1)
               if (info /= 0) then

@@ -204,6 +204,7 @@ subroutine psi_idx_ins_cnv2(nv,idxin,idxout,desc,info,mask)
   use psb_const_mod
   use psb_error_mod
   use psb_penv_mod
+  use psb_avl_mod
   use psi_mod
   implicit none
   integer, intent(in)  :: nv, idxin(:)
@@ -213,7 +214,7 @@ subroutine psi_idx_ins_cnv2(nv,idxin,idxout,desc,info,mask)
   logical, intent(in), optional, target :: mask(:)
   integer :: i,ictxt,k,mglob, nglob
   integer                :: np, me, isize
-  integer                :: pnt_halo,nrow,ncol, nh, ip, err_act,lip,nxt
+  integer                :: pnt_halo,nrow,ncol, nh, ip, err_act,lip,nxt,lipf
   logical                :: pnt_h_ok
   integer, parameter     :: relocsz=200
   character(len=20)      :: name,ch_err
@@ -285,7 +286,7 @@ subroutine psi_idx_ins_cnv2(nv,idxin,idxout,desc,info,mask)
         endif
         nxt = ncol + 1
 
-        call SearchInsKeyVal(desc%ptree,ip,nxt,lip,info)        
+        call SearchInsKey(desc%avltree,ip,lip,nxt,info)        
         if (info >=0) then 
           if (nxt == lip) then 
             ncol = nxt
@@ -310,6 +311,7 @@ subroutine psi_idx_ins_cnv2(nv,idxin,idxout,desc,info,mask)
           goto 9999
         end if
         idxout(i) = lip
+        info = 0
       else
         idxout(i) = -1
       end if

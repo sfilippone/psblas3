@@ -50,6 +50,7 @@ subroutine psb_cdalv(v, ictxt, desc, info, flag)
   use psb_error_mod
   use psi_mod
   use psb_penv_mod
+  use psb_avl_mod
   implicit None
   !....Parameters...
   Integer, intent(in)               :: ictxt, v(:)
@@ -212,8 +213,8 @@ subroutine psb_cdalv(v, ictxt, desc, info, flag)
     loc_col = min(2*loc_row,m)
 
     allocate(desc%loc_to_glob(loc_col), desc%lprm(1),&
-         & desc%ptree(2),stat=info)  
-    if (info == 0) call InitPairSearchTree(desc%ptree,info)
+         & stat=info)  
+    if (info == 0) call InitSearchTree(desc%avltree,info)
     if (info /= 0) then
       info=4025
       int_err(1)=loc_col
@@ -229,7 +230,7 @@ subroutine psb_cdalv(v, ictxt, desc, info, flag)
       if ((v(i)-flag_) == me) then
         k = k + 1 
         desc%loc_to_glob(k) = i
-        call SearchInsKeyVal(desc%ptree,i,k,glx,info)
+        call SearchInsKey(desc%avltree,i,glx,k,info)
       endif
     enddo
 

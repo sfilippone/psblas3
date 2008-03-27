@@ -1,6 +1,14 @@
 Changelog. A lot less detailed than usual, at least for past
 history. 
 
+2008/03/27: Merged the experimental branch for implementing the AVL tree
+            data structure in Fortran instead of relying on C and passing
+	    functions around to perform comparisons. There seems to be
+	    some performance advantage, although not very large.
+	
+2008/03/25: Merged in changes from the 2.2-maint branch re: error
+	    messages, performance bug in psi_idx_ins_cnv.
+	
 2008/02/26: New psb_linmap_init, psb_linmap_ins, psb_linmap_asb for a
 	    general linear operator mapping among index spaces.
 	

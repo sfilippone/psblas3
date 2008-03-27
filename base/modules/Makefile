@@ -2,7 +2,7 @@ include ../../Make.inc
 
 MODULES = psb_realloc_mod.o psb_string_mod.o psb_spmat_type.o \
 	psb_desc_type.o psb_spsb_mod.o  psb_sort_mod.o\
-	psb_serial_mod.o psb_tools_mod.o \
+	psb_serial_mod.o psb_tools_mod.o psb_avl_mod.o\
 	psb_error_mod.o psb_const_mod.o psb_inter_desc_type.o \
 	psb_comm_mod.o psb_psblas_mod.o psi_serial_mod.o psi_mod.o \
 	psb_check_mod.o psb_gps_mod.o
@@ -29,7 +29,7 @@ psb_error_mod.o: psb_const_mod.o
 psb_penv_mod.o: psb_const_mod.o psb_error_mod.o psb_realloc_mod.o
 psi_serial_mod.o: psb_const_mod.o psb_realloc_mod.o
 psi_mod.o: psb_penv_mod.o psb_error_mod.o psb_desc_type.o psb_const_mod.o psi_serial_mod.o
-psb_desc_type.o: psb_const_mod.o psb_error_mod.o psb_penv_mod.o psb_realloc_mod.o
+psb_desc_type.o: psb_const_mod.o psb_error_mod.o psb_penv_mod.o psb_realloc_mod.o psb_avl_mod.o
 psb_inter_desc_type.o: psb_desc_type.o psb_spmat_type.o psb_error_mod.o psb_serial_mod.o psb_comm_mod.o
 psb_check_mod.o: psb_desc_type.o
 psb_serial_mod.o: psb_spmat_type.o psb_string_mod.o psb_sort_mod.o psi_serial_mod.o

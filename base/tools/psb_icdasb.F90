@@ -49,6 +49,7 @@ subroutine psb_icdasb(desc_a,info,ext_hv)
   use psi_mod
   use psb_error_mod
   use psb_penv_mod
+  use psb_avl_mod
 #ifdef MPI_MOD
     use mpi
 #endif
@@ -109,6 +110,7 @@ subroutine psb_icdasb(desc_a,info,ext_hv)
        & write(debug_unit, *) me,' ',trim(name),': start'
 
   if (psb_is_bld_desc(desc_a)) then 
+    
     if (debug_level >= psb_debug_ext_) &
          & write(debug_unit,*) me,' ',trim(name),': Checking rows insertion'
     ! check if all local row are inserted
@@ -157,9 +159,8 @@ subroutine psb_icdasb(desc_a,info,ext_hv)
     end if
     ! Finally, cleanup the AVL tree of indices, if any, as it is
     ! only needed while in the build state.
-    if (allocated(desc_a%ptree)) then 
-      call FreePairSearchTree(desc_a%ptree)   
-      deallocate(desc_a%ptree,stat=info)
+    if (associated(desc_a%avltree)) then 
+      call FreeSearchTree(desc_a%avltree,info)   
       if (info /= 0) then 
         info=2059
         call psb_errpush(info,name)

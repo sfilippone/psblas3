@@ -204,6 +204,7 @@ subroutine psi_idx_cnv2(nv,idxin,idxout,desc,info,mask,owned)
   use psb_const_mod
   use psb_error_mod
   use psb_penv_mod
+  use psb_avl_mod
   use psi_mod, psb_protect_name => psi_idx_cnv2
   implicit none
   integer, intent(in)  :: nv, idxin(:)
@@ -214,7 +215,7 @@ subroutine psi_idx_cnv2(nv,idxin,idxout,desc,info,mask,owned)
   logical, intent(in), optional :: owned
   integer :: i,ictxt,mglob, nglob
   integer                :: np, me
-  integer                :: nrow,ncol, ip, err_act,lip
+  integer                :: nrow,ncol, ip, err_act,lip, lipf
   integer, parameter     :: relocsz=200
   character(len=20)      :: name
   logical, pointer       :: mask_(:)
@@ -300,7 +301,7 @@ subroutine psi_idx_cnv2(nv,idxin,idxout,desc,info,mask,owned)
             idxout(i) = -1
             cycle
           endif
-          call SearchKeyVal(desc%ptree,ip,lip,info)
+          call SearchKey(desc%avltree,ip,lip,info)
           if (owned_) then 
             if (lip<=nrow) then 
               idxout(i) = lip
