@@ -146,7 +146,7 @@ module psb_comm_mod
   end interface
 
 
-  interface psb_dscatter
+  interface psb_scatter
     subroutine  psb_dscatterm(globx, locx, desc_a, info, root)
       use psb_descriptor_type
       real(psb_dpk_), intent(out)    :: locx(:,:)
