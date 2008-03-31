@@ -110,6 +110,8 @@ function psb_zamax (x,desc_a, info, jx)
   if ((psb_cd_get_local_rows(desc_a) > 0).and.(m /= 0)) then
      imax=izamax(psb_cd_get_local_rows(desc_a)-iix+1,x(iix,jjx),1)
      amax=cabs1(x(iix+imax-1,jjx))
+  else 
+    amax = dzero
   end if
   
   ! compute global max
@@ -238,6 +240,8 @@ function psb_zamaxv (x,desc_a, info)
      imax=izamax(psb_cd_get_local_rows(desc_a)-iix+1,x(iix),1)
      cmax=(x(iix+imax-1))
      amax=cabs1(cmax)
+  else 
+    amax = dzero
   end if
   
   ! compute global max
@@ -366,6 +370,8 @@ subroutine psb_zamaxvs(res,x,desc_a, info)
      imax=izamax(psb_cd_get_local_rows(desc_a)-iix+1,x(iix),1)
      cmax=(x(iix+imax-1))
      amax=cabs1(cmax)
+  else 
+    amax = dzero
   end if
   
   ! compute global max
@@ -501,6 +507,8 @@ subroutine psb_zmamaxs(res,x,desc_a, info,jx)
         cmax=(x(iix+imax-1,jjx+i-1))
         res(i)=cabs1(cmax)
      end do
+  else 
+    amax = dzero
   end if
   
   ! compute global max

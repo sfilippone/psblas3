@@ -107,6 +107,8 @@ function psb_damax (x,desc_a, info, jx)
   if ((psb_cd_get_local_rows(desc_a) > 0).and.(m /= 0)) then
     imax=idamax(psb_cd_get_local_rows(desc_a)-iix+1,x(iix,jjx),1)
     amax=abs(x(iix+imax-1,jjx))
+  else 
+    amax = dzero
   end if
 
   ! compute global max
@@ -230,6 +232,8 @@ function psb_damaxv (x,desc_a, info)
   if ((psb_cd_get_local_rows(desc_a) > 0).and.(m /= 0)) then
     imax=idamax(psb_cd_get_local_rows(desc_a)-iix+1,x(iix),1)
     amax=abs(x(iix+imax-1))
+  else 
+    amax = dzero
   end if
 
   ! compute global max
@@ -354,6 +358,8 @@ subroutine psb_damaxvs (res,x,desc_a, info)
   if ((psb_cd_get_local_rows(desc_a) > 0).and.(m /= 0)) then
     imax=idamax(psb_cd_get_local_rows(desc_a)-iix+1,x(iix),1)
     amax=abs(x(iix+imax-1))
+  else 
+    amax = dzero
   end if
 
   ! compute global max
@@ -484,6 +490,8 @@ subroutine psb_dmamaxs (res,x,desc_a, info,jx)
         imax=idamax(psb_cd_get_local_rows(desc_a)-iix+1,x(iix,jjx+i-1),1)
         res(i)=abs(x(iix+imax-1,jjx+i-1))
      end do
+  else 
+    amax = dzero
   end if
   
   ! compute global max
