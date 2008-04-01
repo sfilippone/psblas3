@@ -179,7 +179,7 @@ contains
 
   end subroutine CloneSearchTree_int2
 
-  subroutine CloneAVLTree_int2(root, tree)
+  recursive subroutine CloneAVLTree_int2(root, tree)
     type(psb_treenode_int2), pointer :: root
     type(psb_tree_int2), pointer     :: tree
     integer                          :: info, key,val,next

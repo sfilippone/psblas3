@@ -57,7 +57,7 @@ C
       IERROR = 0
       CALL FCPSB_ERRACTIONSAVE(ERR_ACT)
 
-      IF (DESCRA(1:1).EQ.'G')  TRANS = TRANSA
+      TRANS = TRANSA
       IF (DESCRA(1:1).EQ.'S' .AND. DESCRA(2:2).EQ.'U') TRANS = 'U'
       IF (DESCRA(1:1).EQ.'S' .AND. DESCRA(2:2).EQ.'L') TRANS = 'L'
       IF (DESCRA(1:1).EQ.'D') THEN

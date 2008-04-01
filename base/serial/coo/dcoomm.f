@@ -60,7 +60,7 @@ C
 C
 C
       IERROR=0
-      IF (DESCRA(1:1).EQ.'G') TRANS = TRANSA
+      TRANS = TRANSA
       IF (DESCRA(1:1).EQ.'S' .AND. DESCRA(2:2).EQ.'U') TRANS = 'U'
       IF (DESCRA(1:1).EQ.'S' .AND. DESCRA(2:2).EQ.'L') TRANS = 'L'
 c
