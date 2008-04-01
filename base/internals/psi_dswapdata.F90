@@ -187,6 +187,7 @@ subroutine psi_dswapidxm(ictxt,icomm,flag,n,beta,y,idx,totxch,totsnd,totrcv,work
        & albf,do_send,do_recv
   logical, parameter :: usersend=.false.
 
+  real(psb_dpk_), allocatable, target  :: buffer(:)
   real(psb_dpk_), pointer, dimension(:) :: sndbuf, rcvbuf
 #ifdef HAVE_VOLATILE
   volatile :: sndbuf, rcvbuf
@@ -267,7 +268,10 @@ subroutine psi_dswapidxm(ictxt,icomm,flag,n,beta,y,idx,totxch,totsnd,totrcv,work
     rcvbuf => work(totsnd_+1:totsnd_+totrcv_)
     albf=.false.
   else
-    allocate(sndbuf(totsnd_),rcvbuf(totrcv_), stat=info)
+    allocate(buffer(totsnd_+totrcv_), stat=info)
+    sndbuf => buffer(1:totsnd_)
+    rcvbuf => buffer(totsnd_+1:totsnd_+totrcv_)
+
     if(info /= 0) then
       call psb_errpush(4000,name)
       goto 9999
@@ -503,11 +507,12 @@ subroutine psi_dswapidxm(ictxt,icomm,flag,n,beta,y,idx,totxch,totsnd,totrcv,work
     call psb_errpush(4000,name)
     goto 9999
   end if
-  if(albf) deallocate(sndbuf,rcvbuf,stat=info)
-  if(info /= 0) then
-    call psb_errpush(4000,name)
-    goto 9999
-  end if
+
+!!$  if(albf) deallocate(sndbuf,rcvbuf,stat=info)
+!!$  if(info /= 0) then
+!!$    call psb_errpush(4000,name)
+!!$    goto 9999
+!!$  end if
 
   call psb_erractionrestore(err_act)
   return

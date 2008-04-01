@@ -256,7 +256,7 @@ subroutine  psb_zspmm(alpha,a,x,beta,y,desc_a,info,&
         if(info /= 0) exit blk
 
         if((ib1 > 0).and.(doswap_))&
-             & call psi_swapdata(psb_swap_send_,ib1,&
+             & call psi_swapdata(psb_swap_recv_,ib1,&
              & zzero,xp,desc_a,iwork,info)
 
         if(info /= 0) exit blk
@@ -340,7 +340,15 @@ subroutine  psb_zspmm(alpha,a,x,beta,y,desc_a,info,&
 
   end if
 
-  if (aliw) deallocate(iwork)
+  if (aliw) deallocate(iwork,stat=info)
+  if (debug_level >= psb_debug_comp_) &
+       & write(debug_unit,*) me,' ',trim(name),' deallocat ',aliw, info
+  if(info /= 0) then
+    info = 4010
+    ch_err='Deallocate iwork'
+    call psb_errpush(info,name,a_err=ch_err)
+    goto 9999
+  end if
   nullify(iwork)
 
   call psb_erractionrestore(err_act)

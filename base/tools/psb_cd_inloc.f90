@@ -170,10 +170,12 @@ subroutine psb_cd_inloc(v, ictxt, desc, info)
   if (psb_cd_choose_large_state(ictxt,m)) then 
     allocate(desc%matrix_data(psb_mdata_size_),&
          &temp_ovrlap(m),stat=info)
+    desc%matrix_data(:) = 0
     desc%matrix_data(psb_desc_size_) = psb_desc_large_
   else
     allocate(desc%glob_to_loc(m),desc%matrix_data(psb_mdata_size_),&
          &temp_ovrlap(m),stat=info)
+    desc%matrix_data(:) = 0
     desc%matrix_data(psb_desc_size_) = psb_desc_normal_
   end if
   if (info /= 0) then     

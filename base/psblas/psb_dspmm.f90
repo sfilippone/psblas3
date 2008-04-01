@@ -94,7 +94,7 @@ subroutine  psb_dspmm(alpha,a,x,beta,y,desc_a,info,&
        & i, ib, ib1, ip, idx
   integer, parameter       :: nb=4
   real(psb_dpk_), pointer     :: xp(:,:), yp(:,:), iwork(:)
-  real(psb_dpk_), allocatable :: xvsave(:,:)
+  real(psb_dpk_), allocatable  :: xvsave(:,:)
   character                :: trans_
   character(len=20)        :: name, ch_err
   logical                  :: aliw, doswap_
@@ -256,7 +256,7 @@ subroutine  psb_dspmm(alpha,a,x,beta,y,desc_a,info,&
         if(info /= 0) exit blk
 
         if((ib1 > 0).and.(doswap_))&
-             & call psi_swapdata(psb_swap_send_,ib1,&
+             & call psi_swapdata(psb_swap_recv_,ib1,&
              & dzero,xp,desc_a,iwork,info)
 
         if(info /= 0) exit blk
@@ -339,7 +339,15 @@ subroutine  psb_dspmm(alpha,a,x,beta,y,desc_a,info,&
 
   end if
 
-  if (aliw) deallocate(iwork)
+  if (aliw) deallocate(iwork,stat=info)
+  if (debug_level >= psb_debug_comp_) &
+       & write(debug_unit,*) me,' ',trim(name),' deallocat ',aliw, info
+  if(info /= 0) then
+    info = 4010
+    ch_err='Deallocate iwork'
+    call psb_errpush(info,name,a_err=ch_err)
+    goto 9999
+  end if
   nullify(iwork)
 
   call psb_erractionrestore(err_act)
