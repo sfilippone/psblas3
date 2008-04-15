@@ -586,8 +586,115 @@ Module psb_tools_mod
     module procedure psb_dlinmap_asb, psb_zlinmap_asb
   end interface
 
+  interface psb_is_owned
+    module procedure psb_is_owned
+  end interface
+
+  interface psb_is_local
+    module procedure psb_is_local
+  end interface
+  
+  interface psb_owned_index
+    module procedure psb_owned_index, psb_owned_index_v
+  end interface
+
+  interface psb_local_index
+    module procedure psb_local_index, psb_local_index_v
+  end interface
 
 contains
+
+  function psb_is_owned(idx,desc)
+    use psb_descriptor_type
+    implicit none 
+    integer, intent(in) :: idx
+    type(psb_desc_type), intent(in) :: desc
+    logical :: psb_is_owned
+    logical :: res
+    integer :: info
+    
+    call psb_owned_index(res,idx,desc,info)
+    if (info /= 0) res=.false.
+    psb_is_owned = res
+  end function psb_is_owned
+
+  function psb_is_local(idx,desc)
+    use psb_descriptor_type
+    implicit none 
+    integer, intent(in) :: idx
+    type(psb_desc_type), intent(in) :: desc
+    logical :: psb_is_local
+    logical :: res
+    integer :: info
+    
+    call psb_local_index(res,idx,desc,info)
+    if (info /= 0) res=.false.
+    psb_is_local = res
+  end function psb_is_local
+
+  subroutine psb_owned_index(res,idx,desc,info)
+    use psb_descriptor_type
+    implicit none 
+    integer, intent(in) :: idx
+    type(psb_desc_type), intent(in) :: desc
+    logical, intent(out) :: res
+    integer, intent(out) :: info
+    
+    integer :: lx
+
+    call psb_glob_to_loc(idx,lx,desc,info,iact='I',owned=.true.)
+    
+    res = (lx>0)
+  end subroutine psb_owned_index
+
+  subroutine psb_owned_index_v(res,idx,desc,info)
+    use psb_descriptor_type
+    implicit none 
+    integer, intent(in) :: idx(:)
+    type(psb_desc_type), intent(in) :: desc
+    logical, intent(out) :: res(:)
+    integer, intent(out) :: info
+    integer, allocatable  :: lx(:)
+
+    allocate(lx(size(idx)),stat=info)
+    res=.false.
+    if (info /= 0) return
+    call psb_glob_to_loc(idx,lx,desc,info,iact='I',owned=.true.)
+    
+    res = (lx>0)
+  end subroutine psb_owned_index_v
+
+  subroutine psb_local_index(res,idx,desc,info)
+    use psb_descriptor_type
+    implicit none 
+    integer, intent(in) :: idx
+    type(psb_desc_type), intent(in) :: desc
+    logical, intent(out) :: res
+    integer, intent(out) :: info
+
+    integer :: lx
+
+    call psb_glob_to_loc(idx,lx,desc,info,iact='I',owned=.false.)
+    
+    res = (lx>0)
+  end subroutine psb_local_index
+  
+  subroutine psb_local_index_v(res,idx,desc,info)
+    use psb_descriptor_type
+    implicit none 
+    integer, intent(in) :: idx(:)
+    type(psb_desc_type), intent(in) :: desc
+    logical, intent(out) :: res(:)
+    integer, intent(out) :: info    
+    integer, allocatable  :: lx(:)
+
+    allocate(lx(size(idx)),stat=info)
+    res=.false.
+    if (info /= 0) return
+    call psb_glob_to_loc(idx,lx,desc,info,iact='I',owned=.false.)
+    
+    res = (lx>0)
+  end subroutine psb_local_index_v
 
   subroutine psb_get_boundary(bndel,desc,info)
     use psb_descriptor_type

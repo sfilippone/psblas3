@@ -62,11 +62,11 @@ contains
 
     type(psb_dspmat_type), intent(inout) :: a
     integer, intent(in) :: nz, imin,imax,jmin,jmax,nzl
-    integer, intent(in) :: ia(*),ja(*)
+    integer, intent(in) :: ia(:),ja(:)
     integer, intent(inout) :: nza
-    real(psb_dpk_), intent(in) :: val(*)
+    real(psb_dpk_), intent(in) :: val(:)
     integer, intent(out) :: info
-    integer, intent(in), optional  :: ng,gtl(*)
+    integer, intent(in), optional  :: ng,gtl(:)
 
     info  = 0
 
@@ -107,11 +107,11 @@ contains
 
     type(psb_zspmat_type), intent(inout) :: a
     integer, intent(in) :: nz, imin,imax,jmin,jmax,nzl
-    integer, intent(in) :: ia(*),ja(*)
+    integer, intent(in) :: ia(:),ja(:)
     integer, intent(inout) :: nza
-    complex(psb_dpk_), intent(in) :: val(*)
+    complex(psb_dpk_), intent(in) :: val(:)
     integer, intent(out) :: info
-    integer, intent(in), optional  :: ng,gtl(*)
+    integer, intent(in), optional  :: ng,gtl(:)
 
     info  = 0
 
@@ -170,11 +170,11 @@ contains
 
     type(psb_dspmat_type), intent(inout) :: a
     integer, intent(in) :: nz, imin,imax,jmin,jmax,nzl
-    integer, intent(in) :: ia(*),ja(*)
+    integer, intent(in) :: ia(:),ja(:)
     integer, intent(inout) :: nza
-    real(psb_dpk_), intent(in) :: val(*)
+    real(psb_dpk_), intent(in) :: val(:)
     integer, intent(out) :: info
-    integer, intent(in), optional  :: ng,gtl(*)
+    integer, intent(in), optional  :: ng,gtl(:)
 
     integer  :: debug_level, debug_unit
     character(len=20)    :: name='d_csr_srch_upd'
@@ -211,51 +211,20 @@ contains
               i2 = a%ia2(ir+1)
               nc=i2-i1
 
-
-              if (.true.) then 
-                call issrch(ip,ic,nc,a%ia1(i1:i2-1))    
-                if (ip>0) then 
-                  a%aspk(i1+ip-1) = val(i)
-                else
-                  if (debug_level >= psb_debug_serial_) &
-                       & write(debug_unit,*) trim(name),&
-                       & ': Was searching ',ic,' in: ',i1,i2,&
-                       & ' : ',a%ia1(i1:i2-1)
-                  info = i
-                  return
-                end if
-
+              call ibsrch(ip,ic,nc,a%ia1(i1:i2-1))    
+              if (ip>0) then 
+                a%aspk(i1+ip-1) = val(i)
               else
-!!$ 
-                ip = -1
-                lb = i1
-                ub = i2-1
-                do
-                  if (lb > ub) exit
-                  m = (lb+ub)/2
-                  if (ic == a%ia1(m))  then
-                    ip   = m 
-                    lb   = ub + 1
-                  else if (ic < a%ia1(m))  then
-                    ub = m-1
-                  else 
-                    lb = m + 1
-                  end if
-                enddo
-
-                if (ip>0) then 
-                  a%aspk(ip) = val(i)                
-                else
-                  if (debug_level >= psb_debug_serial_) &
-                       & write(debug_unit,*) trim(name),&
-                       & ': Was searching ',ic,' in: ',i1,i2,&
-                       & ' : ',a%ia1(i1:i2-1)
-                  info = i
-                  return
-                end if
-
+                if (debug_level >= psb_debug_serial_) &
+                     & write(debug_unit,*) trim(name),&
+                     & ': Was searching ',ic,' in: ',i1,i2,&
+                     & ' : ',a%ia1(i1:i2-1)
+                info = i
+                return
               end if
+
             else
+
               if (debug_level >= psb_debug_serial_) &
                    & write(debug_unit,*) trim(name),&
                    & ': Discarding row that does not belong to us.'
@@ -277,7 +246,7 @@ contains
               i1 = a%ia2(ir)
               i2 = a%ia2(ir+1)
               nc = i2-i1
-              call issrch(ip,ic,nc,a%ia1(i1:i2-1))
+              call ibsrch(ip,ic,nc,a%ia1(i1:i2-1))
               if (ip>0) then 
                 a%aspk(i1+ip-1) = a%aspk(i1+ip-1) + val(i)
               else
@@ -322,48 +291,18 @@ contains
             i2 = a%ia2(ir+1)
             nc=i2-i1
 
-
-            if (.true.) then 
-              call issrch(ip,ic,nc,a%ia1(i1:i2-1))    
-              if (ip>0) then 
-                a%aspk(i1+ip-1) = val(i)
-              else
-                  if (debug_level >= psb_debug_serial_) &
-                       & write(debug_unit,*) trim(name),&
-                       & ': Was searching ',ic,' in: ',i1,i2,&
-                       & ' : ',a%ia1(i1:i2-1)
-                info = i
-                return
-              end if
-
+            call ibsrch(ip,ic,nc,a%ia1(i1:i2-1))    
+            if (ip>0) then 
+              a%aspk(i1+ip-1) = val(i)
             else
-              ip = -1
-              lb = i1
-              ub = i2-1
-              do
-                if (lb > ub) exit
-                m = (lb+ub)/2
-                if (ic == a%ia1(m))  then
-                  ip   = m 
-                  lb   = ub + 1
-                else if (ic < a%ia1(m))  then
-                  ub = m-1
-                else 
-                  lb = m + 1
-                end if
-              enddo
-
-              if (ip>0) then 
-                a%aspk(ip) = val(i)                
-              else
-                  if (debug_level >= psb_debug_serial_) &
-                       & write(debug_unit,*) trim(name),&
-                       & ': Was searching ',ic,' in: ',i1,i2,&
-                       & ' : ',a%ia1(i1:i2-1)
-                info = i
-                return
-              end if
+              if (debug_level >= psb_debug_serial_) &
+                   & write(debug_unit,*) trim(name),&
+                   & ': Was searching ',ic,' in: ',i1,i2,&
+                   & ' : ',a%ia1(i1:i2-1)
+              info = i
+              return
             end if
+            
           else
             if (debug_level >= psb_debug_serial_) &
                  & write(debug_unit,*) trim(name),&
@@ -383,7 +322,7 @@ contains
             i1 = a%ia2(ir)
             i2 = a%ia2(ir+1)
             nc = i2-i1
-            call issrch(ip,ic,nc,a%ia1(i1:i2-1))
+            call ibsrch(ip,ic,nc,a%ia1(i1:i2-1))
             if (ip>0) then 
               a%aspk(i1+ip-1) = a%aspk(i1+ip-1) + val(i)
             else
@@ -419,11 +358,11 @@ contains
 
     type(psb_dspmat_type), intent(inout) :: a
     integer, intent(in) :: nz, imin,imax,jmin,jmax,nzl
-    integer, intent(in) :: ia(*),ja(*)
+    integer, intent(in) :: ia(:),ja(:)
     integer, intent(inout) :: nza
-    real(psb_dpk_), intent(in) :: val(*)
+    real(psb_dpk_), intent(in) :: val(:)
     integer, intent(out) :: info
-    integer, intent(in), optional  :: ng,gtl(*)
+    integer, intent(in), optional  :: ng,gtl(:)
     integer  :: i,ir,ic, ilr, ilc, ip, &
          & i1,i2,nc,nnz,dupl
     integer              :: debug_level, debug_unit
@@ -644,11 +583,11 @@ contains
 
     type(psb_dspmat_type), intent(inout), target :: a
     integer, intent(in) :: nz, imin,imax,jmin,jmax,nzl
-    integer, intent(in) :: ia(*),ja(*)
+    integer, intent(in) :: ia(:),ja(:)
     integer, intent(inout) :: nza
-    real(psb_dpk_), intent(in) :: val(*)
+    real(psb_dpk_), intent(in) :: val(:)
     integer, intent(out) :: info
-    integer, intent(in), optional  :: ng,gtl(*)
+    integer, intent(in), optional  :: ng,gtl(:)
 
     integer, pointer     :: ia1(:), ia2(:), ia3(:),&
          & ja_(:), ka_(:)
@@ -882,11 +821,11 @@ contains
 
     type(psb_zspmat_type), intent(inout) :: a
     integer, intent(in) :: nz, imin,imax,jmin,jmax,nzl
-    integer, intent(in) :: ia(*),ja(*)
+    integer, intent(in) :: ia(:),ja(:)
     integer, intent(inout) :: nza
-    complex(psb_dpk_), intent(in) :: val(*)
+    complex(psb_dpk_), intent(in) :: val(:)
     integer, intent(out) :: info
-    integer, intent(in), optional  :: ng,gtl(*)
+    integer, intent(in), optional  :: ng,gtl(:)
 
     integer  :: i,ir,ic, ilr, ilc, ip, &
          & i1,i2,nc,lb,ub,m,dupl
@@ -924,50 +863,18 @@ contains
               i2 = a%ia2(ir+1)
               nc=i2-i1
 
-
-              if (.true.) then 
-                call issrch(ip,ic,nc,a%ia1(i1:i2-1))    
-                if (ip>0) then 
-                  a%aspk(i1+ip-1) = val(i)
-                else
-                  if (debug_level >= psb_debug_serial_) &
-                       & write(debug_unit,*) trim(name),&
-                       & ': Was searching ',ic,' in: ',i1,i2,&
-                       & ' : ',a%ia1(i1:i2-1)
-                  info = i
-                  return
-                end if
-
+              call ibsrch(ip,ic,nc,a%ia1(i1:i2-1))    
+              if (ip>0) then 
+                a%aspk(i1+ip-1) = val(i)
               else
-!!$ 
-                ip = -1
-                lb = i1
-                ub = i2-1
-                do
-                  if (lb > ub) exit
-                  m = (lb+ub)/2
-                  if (ic == a%ia1(m))  then
-                    ip   = m 
-                    lb   = ub + 1
-                  else if (ic < a%ia1(m))  then
-                    ub = m-1
-                  else 
-                    lb = m + 1
-                  end if
-                enddo
-
-                if (ip>0) then 
-                  a%aspk(ip) = val(i)                
-                else
-                  if (debug_level >= psb_debug_serial_) &
-                       & write(debug_unit,*) trim(name),&
-                       & ': Was searching ',ic,' in: ',i1,i2,&
-                       & ' : ',a%ia1(i1:i2-1)
-                  info = i
-                  return
-                end if
-
+                if (debug_level >= psb_debug_serial_) &
+                     & write(debug_unit,*) trim(name),&
+                     & ': Was searching ',ic,' in: ',i1,i2,&
+                     & ' : ',a%ia1(i1:i2-1)
+                info = i
+                return
               end if
+
             else
               if (debug_level >= psb_debug_serial_) &
                    & write(debug_unit,*) trim(name),&
@@ -1035,48 +942,18 @@ contains
             i2 = a%ia2(ir+1)
             nc=i2-i1
 
-
-            if (.true.) then 
-              call issrch(ip,ic,nc,a%ia1(i1:i2-1))    
-              if (ip>0) then 
-                a%aspk(i1+ip-1) = val(i)
-              else
-                  if (debug_level >= psb_debug_serial_) &
-                       & write(debug_unit,*) trim(name),&
-                       & ': Was searching ',ic,' in: ',i1,i2,&
-                       & ' : ',a%ia1(i1:i2-1)
-                info = i
-                return
-              end if
-
+            call ibsrch(ip,ic,nc,a%ia1(i1:i2-1))    
+            if (ip>0) then 
+              a%aspk(i1+ip-1) = val(i)
             else
-              ip = -1
-              lb = i1
-              ub = i2-1
-              do
-                if (lb > ub) exit
-                m = (lb+ub)/2
-                if (ic == a%ia1(m))  then
-                  ip   = m 
-                  lb   = ub + 1
-                else if (ic < a%ia1(m))  then
-                  ub = m-1
-                else 
-                  lb = m + 1
-                end if
-              enddo
-
-              if (ip>0) then 
-                a%aspk(ip) = val(i)                
-              else
-                  if (debug_level >= psb_debug_serial_) &
-                       & write(debug_unit,*) trim(name),&
-                       & ': Was searching ',ic,' in: ',i1,i2,&
-                       & ' : ',a%ia1(i1:i2-1)
-                info = i
-                return
-              end if
+              if (debug_level >= psb_debug_serial_) &
+                   & write(debug_unit,*) trim(name),&
+                   & ': Was searching ',ic,' in: ',i1,i2,&
+                   & ' : ',a%ia1(i1:i2-1)
+              info = i
+              return
             end if
+            
           else
             if (debug_level >= psb_debug_serial_) &
                  & write(debug_unit,*) trim(name),&
@@ -1096,7 +973,7 @@ contains
             i1 = a%ia2(ir)
             i2 = a%ia2(ir+1)
             nc = i2-i1
-            call issrch(ip,ic,nc,a%ia1(i1:i2-1))
+            call ibsrch(ip,ic,nc,a%ia1(i1:i2-1))
             if (ip>0) then 
               a%aspk(i1+ip-1) = a%aspk(i1+ip-1) + val(i)
             else
@@ -1132,11 +1009,11 @@ contains
 
     type(psb_zspmat_type), intent(inout) :: a
     integer, intent(in) :: nz, imin,imax,jmin,jmax,nzl
-    integer, intent(in) :: ia(*),ja(*)
+    integer, intent(in) :: ia(:),ja(:)
     integer, intent(inout) :: nza
-    complex(psb_dpk_), intent(in) :: val(*)
+    complex(psb_dpk_), intent(in) :: val(:)
     integer, intent(out) :: info
-    integer, intent(in), optional  :: ng,gtl(*)
+    integer, intent(in), optional  :: ng,gtl(:)
     integer  :: i,ir,ic, ilr, ilc, ip, &
          & i1,i2,nc,nnz,dupl
     integer              :: debug_level, debug_unit
@@ -1360,11 +1237,11 @@ contains
 
     type(psb_zspmat_type), intent(inout), target :: a
     integer, intent(in) :: nz, imin,imax,jmin,jmax,nzl
-    integer, intent(in) :: ia(*),ja(*)
+    integer, intent(in) :: ia(:),ja(:)
     integer, intent(inout) :: nza
-    complex(psb_dpk_), intent(in) :: val(*)
+    complex(psb_dpk_), intent(in) :: val(:)
     integer, intent(out) :: info
-    integer, intent(in), optional  :: ng,gtl(*)
+    integer, intent(in), optional  :: ng,gtl(:)
 
     integer, pointer     :: ia1(:), ia2(:), ia3(:),&
          & ja_(:), ka_(:)

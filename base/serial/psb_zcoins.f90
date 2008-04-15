@@ -29,9 +29,30 @@
 !!$  POSSIBILITY OF SUCH DAMAGE.
 !!$ 
 !!$  
-! File:  psbzcoins.f90 
- ! Subroutine: 
- ! Parameters:
+! File:  psb_zcoins.f90 
+! Subroutine: psb_zcoins 
+!    Takes a cloud of coefficients and inserts them into a sparse matrix.
+!    This subroutine is the serial, inner counterpart to the outer, user-level
+!    psb_spins. 
+!    
+! Arguments:
+! 
+!   nz       - integer, input               The number of points to insert.
+!   ia(:)    - integer, input               The row indices of the coefficients.
+!   ja(:)    - integer, input               The column indices of the coefficients.
+!   val(:)   - complex, input               The values of the coefficients to be inserted.
+!   a        - type(psb_zspmat_type), inout The sparse destination matrix. 
+!   imin     - integer, input               The minimum valid row index    
+!   imax     - integer, input               The maximum valid row index                  
+!   jmin     - integer, input               The minimum valid col index    
+!   jmax     - integer, input               The maximum valid col index              
+!   info     - integer, output              Return code.                   
+!   gtl(:)   - integer, input,optional      An index mapping to be applied
+!                                           default: identity
+!   rebuild  - logical, input, optional     Rebuild in case of update
+!                                           finding a new index. Default: false.
+!                                           Not fully tested. 
+!
 subroutine psb_zcoins(nz,ia,ja,val,a,imin,imax,jmin,jmax,info,gtl,rebuild)
 
   use psb_spmat_type
@@ -54,7 +75,7 @@ subroutine psb_zcoins(nz,ia,ja,val,a,imin,imax,jmin,jmax,info,gtl,rebuild)
   character(len=5)     :: ufida
   integer              :: ng, nza, isza,spstate, &
        & ip1, nzl, err_act, int_err(5), iupd, irst
-  logical, parameter   :: debug=.false.
+  integer              :: debug_level, debug_unit
   logical              :: rebuild_
   character(len=20)    :: name, ch_err
   type(psb_zspmat_type) :: tmp
@@ -62,6 +83,8 @@ subroutine psb_zcoins(nz,ia,ja,val,a,imin,imax,jmin,jmax,info,gtl,rebuild)
   name='psb_zcoins'
   info  = 0
   call psb_erractionsave(err_act)
+  debug_unit  = psb_get_debug_unit()
+  debug_level = psb_get_debug_level()
 
   info = 0
   if (nz <= 0) then 
@@ -140,9 +163,9 @@ subroutine psb_zcoins(nz,ia,ja,val,a,imin,imax,jmin,jmax,info,gtl,rebuild)
         call psb_errpush(4013,name,a_err=ch_err,i_err=(/info,0,0,0,0/))
         goto 9999
       endif
-      if (debug) then 
+      if (debug_level >= psb_debug_serial_) then 
         if ((nza - a%infoa(psb_nnz_)) /= nz) then 
-          write(0,*) 'PSB_COINS: insert discarded items '
+          write(debug_unit,*) trim(name),': insert discarded items '
         end if
       end if
       if ((nza - psb_sp_getifld(psb_nnz_,a,info)) /= nz) then
@@ -172,9 +195,9 @@ subroutine psb_zcoins(nz,ia,ja,val,a,imin,imax,jmin,jmax,info,gtl,rebuild)
           call psb_errpush(4013,name,a_err=ch_err,i_err=(/info,0,0,0,0/))
           goto 9999
         endif
-        if (debug) then 
+        if (debug_level >= psb_debug_serial_) then 
           if ((nza - a%ia2(ip1+psb_nnz_)) /= nz) then 
-            write(0,*) 'PSB_COINS: update discarded items '
+            write(debug_unit,*) trim(name),': update discarded items '
           end if
         end if
 
@@ -185,7 +208,8 @@ subroutine psb_zcoins(nz,ia,ja,val,a,imin,imax,jmin,jmax,info,gtl,rebuild)
           a%ia2(ip1+psb_nnz_) = nza
         end select
 
-        if (debug) write(0,*) 'From COINS(UPD) : NZA:',nza
+        if (debug_level >= psb_debug_serial_) &
+             & write(debug_unit,*) trim(name),': (UPD) : NZA:',nza
 
       case (psb_upd_srch_)
 
@@ -194,8 +218,10 @@ subroutine psb_zcoins(nz,ia,ja,val,a,imin,imax,jmin,jmax,info,gtl,rebuild)
 
         if (info > 0) then 
           if (rebuild_) then 
-            if (debug)  write(0,*)&
-                 &  'COINS: Going through rebuild_ fingers crossed!'
+            if (debug_level >= psb_debug_serial_) &
+                 & write(debug_unit,*)&
+                 & trim(name),&
+                 & ': Going through rebuild_ fingers crossed!'
             irst = info
             call psb_nullify_sp(tmp)
             call psb_spcnv(a,tmp,info,afmt='coo')
@@ -206,9 +232,9 @@ subroutine psb_zcoins(nz,ia,ja,val,a,imin,imax,jmin,jmax,info,gtl,rebuild)
               goto 9999
             endif
             call psb_sp_setifld(psb_spmat_bld_,psb_state_,tmp,info)
-            if (debug) then
-              write(0,*) 'COINS  Rebuild: size',tmp%infoa(psb_nnz_) ,irst            
-            endif
+            if (debug_level >= psb_debug_serial_) &
+                 & write(debug_unit,*) trim(name),&
+                 & ':  Rebuild size',tmp%infoa(psb_nnz_) ,irst            
             call psb_sp_transfer(tmp,a,info)
             if(info /= izero) then
               info=4010
@@ -225,8 +251,9 @@ subroutine psb_zcoins(nz,ia,ja,val,a,imin,imax,jmin,jmax,info,gtl,rebuild)
               goto 9999
             endif
 
-            if (debug)  write(0,*)&
-                 &  'COINS: Reinserting',a%fida,nza,isza,irst,nz
+            if (debug_level >= psb_debug_serial_)  write(debug_unit,*)&
+                 & trim(name),': Reinserting',a%fida,nza,isza,irst,nz
+
             if ((nza+nz)>isza) then 
               call psb_sp_reall(a,max(nza+nz,int(1.5*isza)),info)
               if(info /= izero) then
@@ -245,7 +272,7 @@ subroutine psb_zcoins(nz,ia,ja,val,a,imin,imax,jmin,jmax,info,gtl,rebuild)
                 ch_err='psb_inner_ins'
                 call psb_errpush(4013,name,a_err=ch_err,i_err=(/info,0,0,0,0/))
               endif
-        
+
               call psb_sp_setifld(nza,psb_del_bnd_,a,info)
               call psb_sp_setifld(nza,psb_nnz_,a,info)
             end if
@@ -321,14 +348,13 @@ subroutine psb_zcoins(nz,ia,ja,val,a,imin,imax,jmin,jmax,info,gtl,rebuild)
 
         goto 9999
       endif
-      if (debug) then 
+      if (debug_level >= psb_debug_serial_) then 
         if ((nza - a%infoa(psb_nnz_)) /= nz) then 
-          write(0,*) 'PSB_COINS: insert discarded items '
+          write(debug_unit,*) trim(name),': insert discarded items '
         end if
       end if
       if ((nza - psb_sp_getifld(psb_nnz_,a,info)) /= nz) then
         call psb_sp_setifld(nza,psb_del_bnd_,a,info)
-!!$        write(0,*) 'Settind del_bnd_ 2: ',nza
       endif
       call psb_sp_setifld(nza,psb_nnz_,a,info)
 
@@ -350,14 +376,15 @@ subroutine psb_zcoins(nz,ia,ja,val,a,imin,imax,jmin,jmax,info,gtl,rebuild)
           goto 9999
         endif
 
-        if (debug) then 
+        if (debug_level >= psb_debug_serial_) then 
           if ((nza - a%ia2(ip1+psb_nnz_)) /= nz) then 
-            write(0,*) 'PSB_COINS: update discarded items '
+            write(debug_unit,*) trim(name),': update discarded items '
           end if
         end if
         a%ia2(ip1+psb_nnz_) = nza
 
-        if (debug) write(0,*) 'From COINS(UPD) : NZA:',nza
+        if (debug_level >= psb_debug_serial_)&
+             &  write(debug_unit,*) trim(name),':(UPD) : NZA:',nza
 
       case (psb_upd_srch_)
 
@@ -366,15 +393,17 @@ subroutine psb_zcoins(nz,ia,ja,val,a,imin,imax,jmin,jmax,info,gtl,rebuild)
 
         if (info > 0) then 
           if (rebuild_) then 
-            if (debug)  write(0,*)&
-                 &  'COINS: Going through rebuild_ fingers crossed!'
+            if (debug_level >= psb_debug_serial_) &
+                 & write(debug_unit,*)&
+                 & trim(name),&
+                 & ': Going through rebuild_ fingers crossed!'
             irst = info
             call psb_nullify_sp(tmp)
             call psb_spcnv(a,tmp,info,afmt='coo')
             call psb_sp_setifld(psb_spmat_bld_,psb_state_,tmp,info)
-            if (debug) then
-              write(0,*) 'COINS  Rebuild: size',tmp%infoa(psb_nnz_) ,irst            
-            endif
+            if (debug_level >= psb_debug_serial_) &
+                 & write(debug_unit,*) trim(name),&
+                 & ':  Rebuild size',tmp%infoa(psb_nnz_) ,irst            
             call psb_sp_transfer(tmp,a,info)
             call psb_sp_info(psb_nztotreq_,a,nza,info)
             call psb_sp_info(psb_nzsizereq_,a,isza,info)
@@ -385,8 +414,9 @@ subroutine psb_zcoins(nz,ia,ja,val,a,imin,imax,jmin,jmax,info,gtl,rebuild)
               goto 9999
             endif
 
-            if (debug)  write(0,*)&
-                 &  'COINS: Reinserting',a%fida,nza,isza
+            if (debug_level >= psb_debug_serial_) write(debug_unit,*)&
+                 & trim(name),': Reinserting',a%fida,nza,isza
+
             if ((nza+nz)>isza) then 
               call psb_sp_reall(a,max(nza+nz,int(1.5*isza)),info)
               if(info /= izero) then
@@ -405,7 +435,7 @@ subroutine psb_zcoins(nz,ia,ja,val,a,imin,imax,jmin,jmax,info,gtl,rebuild)
                 ch_err='psb_inner_ins'
                 call psb_errpush(4013,name,a_err=ch_err,i_err=(/info,0,0,0,0/))
               endif
-        
+
               call psb_sp_setifld(nza,psb_del_bnd_,a,info)
               call psb_sp_setifld(nza,psb_nnz_,a,info)
             end if
@@ -438,6 +468,7 @@ subroutine psb_zcoins(nz,ia,ja,val,a,imin,imax,jmin,jmax,info,gtl,rebuild)
   endif
 
 
+
   call psb_erractionrestore(err_act)
   return
 
@@ -463,6 +494,10 @@ contains
     integer, intent(out) :: info
     integer, intent(in), optional  :: ng,gtl(:)
     integer  :: i,ir,ic
+    character(len=20)    :: name, ch_err
+    
+
+    name='psb_inner_upd'
 
     if (present(gtl)) then 
       if (.not.present(ng)) then 
@@ -473,7 +508,7 @@ contains
         do i=1, nz 
           nza = nza + 1 
           if (nza>maxsz) then 
-            write(0,*) 'Out of bounds in INNER_UPD ',nza,maxsz
+            call psb_errpush(50,name,i_err=(/7,maxsz,5,0,nza /))
             info = -71
             return
           endif

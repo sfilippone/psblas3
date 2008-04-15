@@ -494,6 +494,10 @@ contains
     integer, intent(out) :: info
     integer, intent(in), optional  :: ng,gtl(:)
     integer  :: i,ir,ic
+    character(len=20)    :: name, ch_err
+    
+
+    name='psb_inner_upd'
 
     if (present(gtl)) then 
       if (.not.present(ng)) then 
@@ -504,6 +508,7 @@ contains
         do i=1, nz 
           nza = nza + 1 
           if (nza>maxsz) then 
+            call psb_errpush(50,name,i_err=(/7,maxsz,5,0,nza /))
             info = -71
             return
           endif

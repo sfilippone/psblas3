@@ -1058,11 +1058,6 @@ An integer value; 0 means no error has been detected.
 \item The default \verb|I|gnore means that the negative output is the
   only action taken on an out-of-range input.
 \end{enumerate}
-
-
-%
-%%   psb_loc_to_glob %%
-%
 \subroutine{psb\_loc\_to\_glob}{Local to global indices conversion}
 
 \syntax{call psb\_loc\_to\_glob}{x, y, desc\_a, info, iact}
@@ -1111,6 +1106,180 @@ Intent: {\bf out}.\\
 An integer value; 0 means no error has been detected. 
 \end{description}
 
+
+
+%
+%%   psb_loc_to_glob %%
+%
+\subroutine{psb\_is\_owned}{}
+
+\syntax{call psb\_is\_owned}{x, desc\_a}
+
+\begin{description}
+\item[Type:] Asynchronous.
+\item[\bf On Entry]
+\item[x] Integer index.\\
+Scope: {\bf local} \\
+Type: {\bf required}\\
+Intent: {\bf in}.\\
+Specified as: a scalar integer.\\
+\item[desc\_a] the communication descriptor.\\
+Scope:{\bf local}.\\
+Type:{\bf required}.\\
+Intent: {\bf in}.\\
+Specified as: a structured data of type \descdata.
+\end{description}
+
+\begin{description}
+\item[\bf On Return]
+\item[Function value] A logical mask which is true if 
+  $x$ is  owned by the current process
+Scope: {\bf local} \\
+Type: {\bf required}\\
+Intent: {\bf out}.\\
+\end{description}
+
+
+\section*{Notes}
+\begin{enumerate}
+\item This routine returns a \verb|.true.| value for an index
+  that is strictly owned by the current process, excluding the halo
+  indices
+\end{enumerate}
+
+
+\subroutine{psb\_owned\_index}{}
+
+\syntax{call psb\_owned\_index}{y, x, desc\_a, info}
+
+\begin{description}
+\item[Type:] Asynchronous.
+\item[\bf On Entry]
+\item[x] Integer indices.\\
+Scope: {\bf local} \\
+Type: {\bf required}\\
+Intent: {\bf in, inout}.\\
+Specified as: a scalar or a rank one integer array.\\
+\item[desc\_a] the communication descriptor.\\
+Scope:{\bf local}.\\
+Type:{\bf required}.\\
+Intent: {\bf in}.\\
+Specified as: a structured data of type \descdata.
+\item[iact] specifies action to be taken in case of range errors. 
+Scope: {\bf global} \\
+Type: {\bf optional}\\
+Intent: {\bf in}.\\
+Specified as: a character variable  \verb|I|gnore, \verb|W|arning or
+\verb|A|bort, default \verb|I|gnore.
+\end{description}
+
+\begin{description}
+\item[\bf On Return]
+\item[y] A logical mask which is true for all corresponding entries of
+  $x$ that are owned by the current process
+Scope: {\bf local} \\
+Type: {\bf required}\\
+Intent: {\bf out}.\\
+Specified as: a scalar or rank one logical array.
+\item[info] Error code.\\
+Scope: {\bf local} \\
+Type: {\bf required} \\
+Intent: {\bf out}.\\
+An integer value; 0 means no error has been detected. 
+\end{description}
+
+
+\section*{Notes}
+\begin{enumerate}
+\item This routine returns a \verb|.true.| value for those indices
+  that are strictly owned by the current process, excluding the halo
+  indices
+\end{enumerate}
+
+
+\subroutine{psb\_is\_local}{}
+
+\syntax{call psb\_is\_local}{x, desc\_a}
+
+\begin{description}
+\item[Type:] Asynchronous.
+\item[\bf On Entry]
+\item[x] Integer index.\\
+Scope: {\bf local} \\
+Type: {\bf required}\\
+Intent: {\bf in}.\\
+Specified as: a scalar integer.\\
+\item[desc\_a] the communication descriptor.\\
+Scope:{\bf local}.\\
+Type:{\bf required}.\\
+Intent: {\bf in}.\\
+Specified as: a structured data of type \descdata.
+\end{description}
+
+\begin{description}
+\item[\bf On Return]
+\item[Function value] A logical mask which is true if 
+  $x$ is  local to the current process
+Scope: {\bf local} \\
+Type: {\bf required}\\
+Intent: {\bf out}.\\
+\end{description}
+
+
+\section*{Notes}
+\begin{enumerate}
+\item This routine returns a \verb|.true.| value for an index
+  that is local to the current process, including the halo
+  indices
+\end{enumerate}
+
+\subroutine{psb\_local\_index}{}
+
+\syntax{call psb\_local\_index}{y, x, desc\_a, info}
+
+\begin{description}
+\item[Type:] Asynchronous.
+\item[\bf On Entry]
+\item[x] Integer indices.\\
+Scope: {\bf local} \\
+Type: {\bf required}\\
+Intent: {\bf in, inout}.\\
+Specified as: a scalar or a rank one integer array.\\
+\item[desc\_a] the communication descriptor.\\
+Scope:{\bf local}.\\
+Type:{\bf required}.\\
+Intent: {\bf in}.\\
+Specified as: a structured data of type \descdata.
+\item[iact] specifies action to be taken in case of range errors. 
+Scope: {\bf global} \\
+Type: {\bf optional}\\
+Intent: {\bf in}.\\
+Specified as: a character variable  \verb|I|gnore, \verb|W|arning or
+\verb|A|bort, default \verb|I|gnore.
+\end{description}
+
+\begin{description}
+\item[\bf On Return]
+\item[y] A logical mask which is true for all corresponding entries of
+  $x$ that are local to  the current process
+Scope: {\bf local} \\
+Type: {\bf required}\\
+Intent: {\bf out}.\\
+Specified as: a scalar or rank one logical array.
+\item[info] Error code.\\
+Scope: {\bf local} \\
+Type: {\bf required} \\
+Intent: {\bf out}.\\
+An integer value; 0 means no error has been detected. 
+\end{description}
+
+
+\section*{Notes}
+\begin{enumerate}
+\item This routine returns a \verb|.true.| value for those indices
+  that are local to  the current process, including the halo
+  indices.
+\end{enumerate}
 
 
 
