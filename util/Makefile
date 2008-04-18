@@ -23,7 +23,7 @@ lib:  $(OBJS)
 	/bin/cp -p $(LIBMOD) $(LOCAL_MODS) $(LIBDIR)
 
 
-psb_util_mod.o: $(BASEOBJ)
+psb_util_mod.o: $(BASEOBJS)
 
 veryclean: clean
 	/bin/rm -f $(HERE)/$(LIBNAME)
