@@ -350,8 +350,9 @@ subroutine psb_dspcnv2(a, b,info,afmt,upd,dupl)
 
   end select
 
-  if (psb_sp_getifld(psb_upd_,b,info) /= psb_upd_perm_) &
-       &      call psb_sp_trim(b,info)
+  if (psb_sp_getifld(psb_upd_,b,info) /= psb_upd_perm_) then 
+    call psb_sp_trim(b,info)
+  end if
 
 
   call psb_sp_setifld(psb_spmat_asb_,psb_state_,b,info)
@@ -462,18 +463,22 @@ subroutine psb_dspcnv1(a, info, afmt, upd, dupl)
           select case(psb_tolower(afmt))
           case('coo') 
             call psb_fixcoo(a,info)
+            call psb_sp_trim(a,info)
             goto 9998
           case('csr') 
             call psb_ipcoo2csr(a,info)
+            call psb_sp_trim(a,info)
             goto 9998
           case('csc')
             call psb_ipcoo2csc(a,info)
+            call psb_sp_trim(a,info)
             goto 9998
           end select
         case('csr')
           select case(psb_tolower(afmt))
           case('coo') 
             call psb_ipcsr2coo(a,info)
+            call psb_sp_trim(a,info)
             goto 9998
           end select
         end select
