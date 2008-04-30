@@ -408,6 +408,7 @@ subroutine psb_zspcnv1(a, info, afmt, upd, dupl)
   integer               :: upd_, dupl_
   integer              :: debug_level, debug_unit
   character(len=20)     :: name, ch_err
+  logical               :: inplace
 
   info = 0
   int_err(1)=0
@@ -456,6 +457,7 @@ subroutine psb_zspcnv1(a, info, afmt, upd, dupl)
     if (debug_level >= psb_debug_serial_) &
          & write(debug_unit,*) trim(name),&
          & ': Update:',upd_,psb_upd_srch_,psb_upd_perm_
+    inplace = .false.
     if (upd_ == psb_upd_srch_) then 
       if (present(afmt)) then 
         select case (psb_tolower(a%fida))
@@ -463,25 +465,31 @@ subroutine psb_zspcnv1(a, info, afmt, upd, dupl)
           select case(psb_tolower(afmt))
           case('coo') 
             call psb_fixcoo(a,info)
-            call psb_sp_trim(a,info)
-            goto 9998
+            inplace = .true.
           case('csr') 
             call psb_ipcoo2csr(a,info)
-            call psb_sp_trim(a,info)
-            goto 9998
+            inplace = .true.
           case('csc')
             call psb_ipcoo2csc(a,info)
-            call psb_sp_trim(a,info)
-            goto 9998
+            inplace = .true.
           end select
         case('csr')
           select case(psb_tolower(afmt))
           case('coo') 
             call psb_ipcsr2coo(a,info)
-            call psb_sp_trim(a,info)
-            goto 9998
+            inplace = .true.
           end select
         end select
+      end if
+      if (inplace) then 
+        if (info == 0) call psb_sp_trim(a,info)
+        if (info /= 0) then
+          info=4010
+          ch_err='inplace cnv'
+          call psb_errpush(info,name,a_err=ch_err)
+          goto 9999
+        endif
+        goto 9998
       end if
     end if
 
