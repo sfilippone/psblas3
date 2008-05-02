@@ -47,7 +47,6 @@ contains
     integer, intent(in)             :: iout
     type(psb_item_int2), intent(in) :: item
     write(iout,*) 'Value: ',item%key,item%val
-    call flush(iout)
   end subroutine psb_print_item_key_val
 end module psb_item_mod
 
