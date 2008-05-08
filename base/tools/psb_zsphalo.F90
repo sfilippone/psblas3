@@ -337,13 +337,13 @@ Subroutine psb_zsphalo(a,desc_a,blk,info,rowcnv,colcnv,&
     End If
   Enddo
   if (rowscale_) then 
-    blk%m = irmax-irmin+1
+    blk%m = max(irmax-irmin+1,0)
     blk%ia1(1:l1) = blk%ia1(1:l1) - irmin + 1
   else
     blk%m = irmax
   end if
   if (colscale_) then 
-    blk%k = icmax-icmin+1
+    blk%k = max(icmax-icmin+1,0)
     blk%ia2(1:l1) = blk%ia2(1:l1) - icmin + 1
   else
     blk%k = icmax

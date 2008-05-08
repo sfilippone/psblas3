@@ -98,7 +98,7 @@ subroutine psb_dspcnv2(a, b,info,afmt,upd,dupl)
     call psb_sp_setifld(dupl,psb_dupl_,b,info)    
   end if
   if (present(afmt)) then 
-    afmt_ = afmt
+    afmt_ = psb_tolower(afmt)
   else
     afmt_ = psb_fidef_
   end if
@@ -126,7 +126,7 @@ subroutine psb_dspcnv2(a, b,info,afmt,upd,dupl)
   !  ...matrix conversion...
   b%m=a%m
   b%k=a%k
-  b%fida=afmt_
+  b%fida=psb_tolower(afmt_)
   size_req = psb_sp_get_nnzeros(a)
   !
   n_row=b%m 
