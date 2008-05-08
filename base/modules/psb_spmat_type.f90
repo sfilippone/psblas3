@@ -751,6 +751,11 @@ contains
       ia  = nza
       i1  = nza
       i2  = a%m + 1
+    case('csc')
+      nza = a%ia2(a%k+1)-1
+      ia  = nza
+      i1  = nza
+      i2  = a%k + 1
     case('coo','coi')
       nza = a%infoa(psb_nnz_)
       i1  = nza
@@ -1238,6 +1243,11 @@ contains
       ia  = nza
       i1  = nza
       i2  = a%m + 1
+    case('csc')
+      nza = a%ia2(a%k+1)-1
+      ia  = nza
+      i1  = nza
+      i2  = a%k + 1
     case('coo','coi')
       nza = a%infoa(psb_nnz_)
       i1  = nza
