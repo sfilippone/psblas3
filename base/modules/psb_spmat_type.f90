@@ -767,7 +767,6 @@ contains
       i2 = size(a%ia2)
       ia = size(a%aspk)
     case default
-      info = -2
       i1 = size(a%ia1)
       i2 = size(a%ia2)
       ia = size(a%aspk)
@@ -1259,7 +1258,6 @@ contains
       i2 = size(a%ia2)
       ia = size(a%aspk)
     case default
-      info = -2
       i1 = size(a%ia1)
       i2 = size(a%ia2)
       ia = size(a%aspk)
