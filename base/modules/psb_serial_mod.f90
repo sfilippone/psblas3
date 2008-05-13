@@ -432,6 +432,12 @@ module psb_serial_mod
   end interface
 
   interface psb_sp_scal
+     subroutine psb_dspscals(a,d,info)
+       use psb_spmat_type
+       type(psb_dspmat_type), intent(inout) :: a
+       real(psb_dpk_), intent(in) :: d 
+       integer, intent(out)  :: info
+     end subroutine psb_dspscals
      subroutine psb_dspscal(a,d,info)
        use psb_spmat_type
        type(psb_dspmat_type), intent(inout) :: a
@@ -444,6 +450,17 @@ module psb_serial_mod
        complex(psb_dpk_), intent(in) :: d(:) 
        integer, intent(out)  :: info
      end subroutine psb_zspscal
+  end interface
+
+
+  interface psb_sp_shift
+    subroutine psb_dspshift(alpha,a,beta,b,info)
+      use psb_spmat_type
+      type(psb_dspmat_type), intent(in)  :: a
+      type(psb_dspmat_type), intent(out) :: b
+      real(psb_dpk_), intent(in)         :: alpha, beta
+      integer, intent(out)               :: info      
+    end subroutine psb_dspshift
   end interface
 
   interface psb_sp_getblk
