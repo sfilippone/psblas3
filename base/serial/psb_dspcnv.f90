@@ -489,7 +489,9 @@ subroutine psb_dspcnv1(a, info, afmt, upd, dupl)
           call psb_errpush(info,name,a_err=ch_err)
           goto 9999
         endif
-        goto 9998
+        call psb_sp_setifld(psb_spmat_asb_,psb_state_,a,info)
+        call psb_erractionrestore(err_act)
+        return
       end if
     end if
 
@@ -554,8 +556,6 @@ subroutine psb_dspcnv1(a, info, afmt, upd, dupl)
          & 'Sparse matrix state:',spstate,psb_spmat_bld_,psb_spmat_upd_
 
   endif
-
-9998 continue
 
   call psb_sp_setifld(psb_spmat_asb_,psb_state_,a,info)
 

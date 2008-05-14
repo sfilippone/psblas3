@@ -40,24 +40,6 @@ module psb_serial_mod
        & psb_sct => psi_sct
 
 
-  interface psb_csdp
-    subroutine psb_dcsdp(a, b,info,ifc,check,trans,unitd,upd,dupl)
-      use psb_spmat_type
-      type(psb_dspmat_type), intent(in)   :: a
-      type(psb_dspmat_type), intent(inout)  :: b
-      integer, intent(out)        :: info
-      integer, intent(in), optional :: ifc,upd,dupl
-      character, intent(in), optional :: check,trans,unitd
-    end subroutine psb_dcsdp
-    subroutine psb_zcsdp(a, b,info,ifc,check,trans,unitd,upd,dupl)
-      use psb_spmat_type
-      type(psb_zspmat_type), intent(in)   :: a
-      type(psb_zspmat_type), intent(inout)  :: b
-      integer, intent(out)        :: info
-      integer, intent(in), optional :: ifc,upd,dupl
-      character, intent(in), optional :: check,trans,unitd
-    end subroutine psb_zcsdp
-  end interface
 
   interface psb_csrws
     subroutine psb_dcsrws(rw,a,info,trans)
