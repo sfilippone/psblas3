@@ -29,130 +29,63 @@
 !!$  POSSIBILITY OF SUCH DAMAGE.
 !!$ 
 !!$  
-! File:  psb_zspscal.f90 
-! Subroutine: 
+! File:  psb_zspgtblk.f90 
+! Subroutine: psb_zspgtblk
+!    Gets one or more rows from a sparse matrix. 
 ! Arguments:
-
 !*****************************************************************************
 !*                                                                           *
+!* Takes a specified row from matrix A and copies into matrix B (possibly    *
+!*  appending to B). Output is always COO. Input might be anything,          *
 !*                                                                           *
 !*****************************************************************************
-subroutine psb_zspscal(a,d,info)
+subroutine psb_zspshift(alpha,a,beta,b,info)
+  ! Output is always in  COO format  into B, irrespective of 
   ! the input format 
   use psb_spmat_type
-  use psb_error_mod
   use psb_const_mod
   use psb_string_mod
+  use psb_serial_mod, psb_protect_name => psb_zspshift
+
   implicit none
 
-  type(psb_zspmat_type), intent(inout) :: a
-  integer, intent(out)                 :: info
-  complex(psb_dpk_), intent(in)         :: d(:) 
+  type(psb_zspmat_type), intent(in)  :: a
+  type(psb_zspmat_type), intent(out) :: b
+  complex(psb_dpk_), intent(in)      :: alpha, beta
+  integer, intent(out)               :: info      
 
-  integer :: i,j, err_act
-  character(len=20)                 :: name, ch_err
+  logical            :: append_,srt_
+  integer            :: i,j, err_act
+  character(len=20)  :: name
 
-  name='psb_zspscal'
+  name='psb_sp_shift'
   info  = 0
   call psb_erractionsave(err_act)
 
-  select case(psb_toupper(a%fida(1:3)))
-  case  ('CSR')
+  call psb_sp_setbld(a,b,info)
+  if (info == 0) call psb_sp_scal(b,alpha,info) 
+  do i=1,min(b%m,b%k) 
+    if (info == 0) call psb_coins(1,(/i/),(/i/),(/beta/),b,1,1,b%m,b%k,info)
+  end do
+  if (info == 0) call psb_spcnv(b,info,afmt=a%fida,dupl=psb_dupl_add_)
 
-    do i=1, a%m
-      do j=a%ia2(i),a%ia2(i+1)-1
-        a%aspk(j) = a%aspk(j) * d(i)
-      end do
-    end do
-
-  case ('COO') 
-
-    do i=1,a%infoa(psb_nnz_)
-      j=a%ia1(i)
-      a%aspk(i) = a%aspk(i) * d(j)
-    enddo
-
-  case ('JAD') 
-    info=135
-    ch_err=a%fida(1:3)
-    call psb_errpush(info,name,a_err=ch_err)
+  if (info /= 0) then 
+    call psb_errpush(4010,name,a_err='Internal call')
     goto 9999
-  case default
-    info=136
-    ch_err=a%fida(1:3)
-    call psb_errpush(info,name,a_err=ch_err)
-    goto 9999
-  end select
+  end if
 
   call psb_erractionrestore(err_act)
+
   return
 
 9999 continue
   call psb_erractionrestore(err_act)
   if (err_act == psb_act_abort_) then
-     call psb_error()
-     return
+    call psb_error()
+    return
   end if
   return
 
-end subroutine psb_zspscal
-subroutine psb_zspscals(a,d,info)
-  ! the input format 
-  use psb_spmat_type
-  use psb_error_mod
-  use psb_const_mod
-  use psb_string_mod
-  implicit none
 
-  type(psb_zspmat_type), intent(inout) :: a
-  integer, intent(out)                 :: info
-  complex(psb_dpk_), intent(in)        :: d
-
-  integer :: i,j, err_act
-  character(len=20)                 :: name, ch_err
-
-  name='psb_zspscal'
-  info  = 0
-  call psb_erractionsave(err_act)
-
-  select case(psb_toupper(a%fida(1:3)))
-  case  ('CSR')
-
-    do i=1, a%m
-      do j=a%ia2(i),a%ia2(i+1)-1
-        a%aspk(j) = a%aspk(j) * d
-      end do
-    end do
-
-  case ('COO') 
-
-    do i=1,a%infoa(psb_nnz_)
-      j=a%ia1(i)
-      a%aspk(i) = a%aspk(i) * d
-    enddo
-
-  case ('JAD') 
-    info=135
-    ch_err=a%fida(1:3)
-    call psb_errpush(info,name,a_err=ch_err)
-    goto 9999
-  case default
-    info=136
-    ch_err=a%fida(1:3)
-    call psb_errpush(info,name,a_err=ch_err)
-    goto 9999
-  end select
-
-  call psb_erractionrestore(err_act)
-  return
-
-9999 continue
-  call psb_erractionrestore(err_act)
-  if (err_act == psb_act_abort_) then
-     call psb_error()
-     return
-  end if
-  return
-
-end subroutine psb_zspscals
+end subroutine psb_zspshift
 

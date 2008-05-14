@@ -426,6 +426,12 @@ module psb_serial_mod
        real(psb_dpk_), intent(in) :: d(:) 
        integer, intent(out)  :: info
      end subroutine psb_dspscal
+     subroutine psb_zspscals(a,d,info)
+       use psb_spmat_type
+       type(psb_zspmat_type), intent(inout) :: a
+       complex(psb_dpk_), intent(in) :: d
+       integer, intent(out)  :: info
+     end subroutine psb_zspscals
      subroutine psb_zspscal(a,d,info)
        use psb_spmat_type
        type(psb_zspmat_type), intent(inout) :: a
@@ -435,6 +441,31 @@ module psb_serial_mod
   end interface
 
 
+  interface psb_sp_setbld
+    subroutine psb_dspsetbld1(a,info)
+      use psb_spmat_type
+      type(psb_dspmat_type), intent(inout) :: a
+      integer, intent(out)               :: info      
+    end subroutine psb_dspsetbld1
+    subroutine psb_dspsetbld2(a,b,info)
+      use psb_spmat_type
+      type(psb_dspmat_type), intent(in)  :: a
+      type(psb_dspmat_type), intent(out) :: b
+      integer, intent(out)               :: info      
+    end subroutine psb_dspsetbld2
+    subroutine psb_zspsetbld1(a,info)
+      use psb_spmat_type
+      type(psb_zspmat_type), intent(inout) :: a
+      integer, intent(out)               :: info      
+    end subroutine psb_zspsetbld1
+    subroutine psb_zspsetbld2(a,b,info)
+      use psb_spmat_type
+      type(psb_zspmat_type), intent(in)  :: a
+      type(psb_zspmat_type), intent(out) :: b
+      integer, intent(out)               :: info      
+    end subroutine psb_zspsetbld2
+  end interface
+
   interface psb_sp_shift
     subroutine psb_dspshift(alpha,a,beta,b,info)
       use psb_spmat_type
@@ -443,6 +474,13 @@ module psb_serial_mod
       real(psb_dpk_), intent(in)         :: alpha, beta
       integer, intent(out)               :: info      
     end subroutine psb_dspshift
+    subroutine psb_zspshift(alpha,a,beta,b,info)
+      use psb_spmat_type
+      type(psb_zspmat_type), intent(in)  :: a
+      type(psb_zspmat_type), intent(out) :: b
+      complex(psb_dpk_), intent(in)      :: alpha, beta
+      integer, intent(out)               :: info      
+    end subroutine psb_zspshift
   end interface
 
   interface psb_sp_getblk

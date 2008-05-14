@@ -62,9 +62,8 @@ subroutine psb_dspshift(alpha,a,beta,b,info)
   info  = 0
   call psb_erractionsave(err_act)
 
-  call psb_spcnv(a,b,info,afmt='COO')
+  call psb_sp_setbld(a,b,info)
   if (info == 0) call psb_sp_scal(b,alpha,info) 
-  call psb_sp_setifld(psb_spmat_bld_,psb_state_,b,info)
   do i=1,min(b%m,b%k) 
     if (info == 0) call psb_coins(1,(/i/),(/i/),(/beta/),b,1,1,b%m,b%k,info)
   end do
