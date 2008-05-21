@@ -339,6 +339,7 @@ contains
 
   Subroutine psb_dspreinit(a,info,clear)
 
+    use psb_string_mod
     Implicit None
 
     !....Parameters...
@@ -366,7 +367,7 @@ contains
       if (clear_) a%aspk(:) = dzero
 
       if (psb_sp_getifld(psb_upd_,a,info)==psb_upd_perm_) then 
-        if(a%fida(1:3) == 'JAD') then
+        if(psb_toupper(a%fida(1:3)) == 'JAD') then
           a%ia1(a%infoa(psb_upd_pnt_)+psb_nnz_) = 0
         else
           a%ia2(a%infoa(psb_upd_pnt_)+psb_nnz_) = 0
@@ -890,7 +891,7 @@ contains
   end subroutine psb_nullify_zsp
 
   Subroutine psb_zspreinit(a,info,clear)
-
+    use psb_string_mod
     Implicit None
 
     !....Parameters...
@@ -917,7 +918,7 @@ contains
       if (clear_) a%aspk(:) = zzero
 
       if (psb_sp_getifld(psb_upd_,a,info)==psb_upd_perm_) then 
-        if(a%fida(1:3) == 'JAD') then
+        if(psb_toupper(a%fida(1:3)) == 'JAD') then
           a%ia1(a%infoa(psb_upd_pnt_)+psb_nnz_) = 0
         else
           a%ia2(a%infoa(psb_upd_pnt_)+psb_nnz_) = 0
