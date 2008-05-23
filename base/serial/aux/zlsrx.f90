@@ -162,8 +162,8 @@ subroutine zlsrx(n,x,indx,dir,flag)
         end do outer_up
         if (i == ilx) then 
           if (x(i) /= piv) then
-            write(0,*) 'Should never ever get here????!!!!'
-            stop
+            call psb_errpush(4001,r_name='zlsrx',a_err='impossible pivot condition')
+            call psb_error()
           endif
           i = i + 1 
         endif
@@ -302,8 +302,8 @@ subroutine zlsrx(n,x,indx,dir,flag)
         end do outer_dw
         if (i == ilx) then 
           if (x(i) /= piv) then
-            write(0,*) 'Should never ever get here????!!!!'
-            stop
+            call psb_errpush(4001,r_name='zlsrx',a_err='impossible pivot condition')
+            call psb_error()
           endif
           i = i + 1 
         endif
