@@ -220,13 +220,9 @@ contains
     new_node%routine    = r_name
     if(present(i_err)) then
       new_node%i_err_data = i_err
-    else 
-      new_node%i_err_data = (/0,0,0,0,0/)
     end if
     if(present(a_err)) then 
       new_node%a_err_data = a_err
-    else
-      new_node%a_err_data = ''
     end if
     new_node%next       => error_stack%top
     error_stack%top     => new_node
