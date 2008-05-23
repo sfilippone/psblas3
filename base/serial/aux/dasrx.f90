@@ -343,7 +343,8 @@ subroutine dasrx(n,x,indx,dir,flag)
     endif
 
   case default
-    write(0,*) 'isrx error  dir ',dir
+    call psb_errpush(4001,r_name='dasrx',a_err='wrong dir')
+    call psb_error()
   end select
 
 

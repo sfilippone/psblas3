@@ -45,7 +45,6 @@ subroutine imsrx(n,x,indx,idir,flag)
   integer :: lswap, ixswap
 
   if (n<0) then 
-    write(0,*) 'Error: IMSRX: N<0'
     return
   endif
 
@@ -61,8 +60,8 @@ subroutine imsrx(n,x,indx,idir,flag)
 
   allocate(iaux(0:n+1),stat=info)
   if (info/=0) then 
-    write(0,*) 'IMSRX: memory allocation failed',info
-    return
+    call psb_errpush(4000,r_name='imsrx')
+    call psb_error()
   endif
 
   if (idir == psb_sort_up_) then 
@@ -96,7 +95,8 @@ subroutine imsrx(n,x,indx,idir,flag)
 
   deallocate(iaux,stat=info)
   if (info/=0) then 
-    write(0,*) 'IMSRX: memory deallocation failed',info
+    call psb_errpush(4000,r_name='imsrx')
+    call psb_error()
   endif
   return
 end subroutine imsrx

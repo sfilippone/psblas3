@@ -54,8 +54,8 @@ subroutine zamsr(n,x,idir)
   
   allocate(iaux(0:n+1),stat=info)
   if (info/=0) then 
-    write(0,*) 'IMSR: memory allocation failed',info
-    return
+    call psb_errpush(4000,r_name='zamsr')
+    call psb_error()
   endif
   
   if (idir==psb_asort_up_) then 
@@ -86,7 +86,8 @@ subroutine zamsr(n,x,idir)
 
   deallocate(iaux,stat=info)
   if (info/=0) then 
-    write(0,*) 'IMSR: memory deallocation failed',info
+    call psb_errpush(4000,r_name='zamsr')
+    call psb_error()
   endif
   return
 end subroutine zamsr

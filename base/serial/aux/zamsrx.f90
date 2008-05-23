@@ -45,7 +45,6 @@ subroutine zamsrx(n,x,indx,idir,flag)
   complex(psb_dpk_) :: swap
 
   if (n<0) then 
-    write(0,*) 'Error: DMSRX: N<0'
     return
   endif
 
@@ -61,8 +60,8 @@ subroutine zamsrx(n,x,indx,idir,flag)
 
   allocate(iaux(0:n+1),stat=info)
   if (info/=0) then 
-    write(0,*) 'DMSRX: memory allocation failed',info
-    return
+    call psb_errpush(4000,r_name='zamsrx')
+    call psb_error()
   endif
 
   if (idir == psb_asort_up_) then 
@@ -96,7 +95,8 @@ subroutine zamsrx(n,x,indx,idir,flag)
 
   deallocate(iaux,stat=info)
   if (info/=0) then 
-    write(0,*) 'DMSRX: memory deallocation failed',info
+    call psb_errpush(4000,r_name='zamsrx')
+    call psb_error()
   endif
   return
 end subroutine zamsrx

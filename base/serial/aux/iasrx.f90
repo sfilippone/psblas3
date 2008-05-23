@@ -58,7 +58,8 @@ subroutine iasrx(n,x,indx,dir,flag)
   case(psb_sort_keep_idx_)
     ! do nothing
   case default
-    write(0,*) 'Error in isrx: invalid flag',flag
+    call psb_errpush(4001,r_name='iasrx',a_err='wrong flag')
+    call psb_error()
   end select
   !
 
@@ -343,7 +344,8 @@ subroutine iasrx(n,x,indx,dir,flag)
     endif
 
   case default
-    write(0,*) 'isrx error  dir ',dir
+    call psb_errpush(4001,r_name='iasrx',a_err='wrong dir')
+    call psb_error()
   end select
 
 

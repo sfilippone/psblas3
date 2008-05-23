@@ -303,7 +303,8 @@ subroutine iasr(n,x,dir)
     endif
 
   case default
-    write(0,*) 'isr error !',dir
+    call psb_errpush(4001,r_name='iasr',a_err='wrong dir')
+    call psb_error()
   end select
 
 
