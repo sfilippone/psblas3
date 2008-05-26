@@ -449,7 +449,7 @@ contains
     case(400)
       write (0,'("MPI error:",i0)')i_e_d(1)
     case(550)
-      write (0,'("Parameter n. ",i0," must be equal on all BLACS processes. ",i0)')i_e_d(1)
+      write (0,'("Parameter n. ",i0," must be equal on all processes. ",i0)')i_e_d(1)
     case(551)
       write (0,'("Entry n. ",i0," out of ",i0," should be between 1 and ",i0," but is ",i0)')i_e_d(1),i_e_d(3),i_e_d(4),i_e_d(2)
     case(552)
