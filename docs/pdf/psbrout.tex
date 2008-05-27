@@ -26,7 +26,9 @@ dense matrix sum:
 \hline
 $x$, $y$, $\alpha$, $\beta$ & {\bf Subroutine}\\
 \hline
+Short Precision Real & psb\_geaxpby \\
 Long Precision Real & psb\_geaxpby \\
+Short Precision Complex & psb\_geaxpby \\
 Long Precision Complex & psb\_geaxpby \\
 \hline
 \end{tabular}
@@ -113,10 +115,10 @@ An integer value; 0 means no error has been detected.
 
 This function computes dot product between two vectors $x$ and
 $y$.\\
-If $x$ and $y$ are double precision real vectors
-computes dot-product as:
+If $x$ and $y$ are real vectors
+it computes dot-product as:
 \[dot \leftarrow x^T y\]
-Else if $x$ and $y$ are double precision complex vectors then computes dot-product as:
+Else if $x$ and $y$ are complex vectors then it computes dot-product as:
 \[dot \leftarrow x^H y\]
 %% where:
 %% \begin{description}
@@ -132,7 +134,9 @@ Else if $x$ and $y$ are double precision complex vectors then computes dot-produ
 \hline
 $dot$, $x$, $y$ & {\bf Function}\\
 \hline
+Short Precision Real & psb\_gedot \\
 Long Precision Real & psb\_gedot \\
+Short Precision Complex & psb\_gedot \\	
 Long Precision Complex & psb\_gedot \\	
 \hline
 \end{tabular}
@@ -213,7 +217,9 @@ is a rank one array.
 \hline
 $res$, $x$, $y$ & {\bf Subroutine}\\
 \hline
+Short Precision Real & psb\_gedots \\
 Long Precision Real & psb\_gedots \\
+Short Precision Complex & psb\_gedots \\	
 Long Precision Complex & psb\_gedots \\	
 \hline
 \end{tabular}
@@ -269,10 +275,10 @@ An integer value; 0 means no error has been detected.
 
 This function computes 
  the infinity-norm of a vector $x$.\\
-If $x$ is a double precision real  vector
-computes infinity norm as:
+If $x$ is a real  vector
+it computes infinity norm as:
 \[ amax \leftarrow \max_i |x_i|\]
-else if $x$ is a double precision complex vector then computes infinity-norm  as:
+else if $x$ is a complex vector then it computes infinity-norm  as:
 \[ amax \leftarrow \max_i {(|re(x_i)| + |im(x_i)|)}\]
 %% where:
 %% \begin{description}
@@ -288,7 +294,9 @@ else if $x$ is a double precision complex vector then computes infinity-norm  as
 \hline
 $amax$ & $x$ & {\bf Function}\\
 \hline
+Short Precision Real& Short Precision Real & psb\_geamax \\
 Long Precision Real&Long Precision Real & psb\_geamax \\
+Short Precision Real&Short Precision Complex & psb\_geamax \\
 Long Precision Real&Long Precision Complex & psb\_geamax \\
 \hline
 \end{tabular}
@@ -351,7 +359,9 @@ a  dense matrix  $x$:
 \hline
 $res$&  $x$& {\bf Subroutine}\\
 \hline
+Short Precision Real    &Short Precision Real    & psb\_geamaxs\\
 Long Precision Real    &Long Precision Real    & psb\_geamaxs\\
+Short Precision Real &Short Precision Complex & psb\_geamaxs\\	
 Long Precision Real &Long Precision Complex & psb\_geamaxs\\	
 \hline
 \end{tabular}
@@ -397,10 +407,10 @@ An integer value; 0 means no error has been detected.
 \subroutine{psb\_geasum}{1-Norm of Vector}    
 
 This function computes the 1-norm of a vector $x$.\\
-If $x$ is a double precision real vector
-computes 1-norm as:
+If $x$ is a real vector
+it computes 1-norm as:
 \[ asum \leftarrow  \|x_i\|\]
-else if $x$ is double precision complex vector then computes 1-norm  as:
+else if $x$ is a  vector then it computes 1-norm  as:
 \[ asum \leftarrow \|re(x)\|_1 + \|im(x)\|_1\]
 
 
@@ -412,7 +422,9 @@ else if $x$ is double precision complex vector then computes 1-norm  as:
 \hline
 $asum$ & $x$ & {\bf Function}\\
 \hline
+Short Precision Real&Short Precision Real & psb\_geasum \\
 Long Precision Real&Long Precision Real & psb\_geasum \\
+Short Precision Real&Short Precision Complex & psb\_geasum \\
 Long Precision Real&Long Precision Complex & psb\_geasum \\
 \hline
 \end{tabular}
@@ -457,10 +469,10 @@ This subroutine computes a series of  1-norms on the columns of
 a  dense matrix  $x$: 
 \[ res(i) \leftarrow \max_k |x(k,i)| \]
 This function computes the 1-norm of a vector $x$.\\
-If $x$ is a double precision real vector
-computes 1-norm as:
+If $x$ is a real vector 
+it computes 1-norm as:
 \[ res(i) \leftarrow  \|x_i\|\]
-else if $x$ is double precision complex vector then computes 1-norm  as:
+else if $x$ is a complex vector then it computes 1-norm  as:
 \[ res(i) \leftarrow \|re(x)\|_1 + \|im(x)\|_1\]
 
 
@@ -472,7 +484,9 @@ else if $x$ is double precision complex vector then computes 1-norm  as:
 \hline
 $res$ & $x$ & {\bf Subroutine}\\
 \hline
+Short Precision Real&Short Precision Real & psb\_geasums \\
 Long Precision Real&Long Precision Real & psb\_geasums \\
+Short Precision Real&Short Precision Complex & psb\_geasums \\
 Long Precision Real&Long Precision Complex & psb\_geasums \\
 \hline
 \end{tabular}
@@ -503,6 +517,7 @@ Specified as: a structured data of type \descdata.
 \item[res] contains the 1-norm of (the columns of) $x$.\\
 Scope: {\bf global} \\
 Intent: {\bf out}.\\
+Short as: a long precision real  number.
 Specified as: a long precision real  number.
 \item[info] Error code.\\
 Scope: {\bf local} \\
@@ -523,9 +538,9 @@ An integer value; 0 means no error has been detected.
 
 This function computes the 2-norm of a vector $x$.\\
 If $x$ is a double precision real  vector
-computes 2-norm as:
+it computes 2-norm as:
 \[ nrm2 \leftarrow \sqrt{x^T x}\]
-else if $x$ is double precision complex vector then computes 2-norm  as:
+else if $x$ is double precision complex vector then it computes 2-norm  as:
 \[ nrm2 \leftarrow \sqrt{x^H x}\]
 %% where:
 %% \begin{description}
@@ -538,7 +553,9 @@ else if $x$ is double precision complex vector then computes 2-norm  as:
 \hline
 $nrm2$ & $x$ & {\bf Function}\\
 \hline
+Short Precision Real&Short Precision Real & psb\_genrm2 \\
 Long Precision Real&Long Precision Real & psb\_genrm2 \\
+Short Precision Real&Short Precision Complex & psb\_genrm2 \\
 Long Precision Real&Long Precision Complex & psb\_genrm2 \\
 \hline
 \end{tabular}
@@ -593,11 +610,10 @@ This subroutine computes a series of  1-norms on the columns of
 a  dense matrix  $x$: 
 \[ res(i) \leftarrow \max_k |x(k,i)| \]
 This function computes the 1-norm of a vector $x$.\\
-If $x$ is a double precision real vector
-computes 1-norm as:
+If $x$ is a real vector
+it computes 1-norm as:
 \[ res(i) \leftarrow \sqrt{x^T x}\]
-
-else if $x$ is double precision complex vector then computes 1-norm  as:
+else if $x$ is a complex vector then it computes 1-norm  as:
 \[ res(i) \leftarrow \sqrt{x^H x}\]
 
 
@@ -609,7 +625,9 @@ else if $x$ is double precision complex vector then computes 1-norm  as:
 \hline
 $res$ & $x$ & {\bf Subroutine}\\
 \hline
+Short Precision Real&Short Precision Real & psb\_genrm2s \\
 Long Precision Real&Long Precision Real & psb\_genrm2s \\
+Short Precision Real&Short Precision Complex & psb\_genrm2s \\
 Long Precision Real&Long Precision Complex & psb\_genrm2s \\
 \hline
 \end{tabular}
@@ -673,7 +691,9 @@ where:
 \hline
 $A$ & {\bf Function}\\
 \hline
+Short Precision Real & psb\_spnrmi \\
 Long Precision Real & psb\_spnrmi \\
+Short Precision Complex & psb\_spnrmi \\
 Long Precision Complex & psb\_spnrmi \\
 \hline
 \end{tabular}
@@ -747,7 +767,9 @@ where:
 \hline
 $A$, $x$, $y$, $\alpha$, $\beta$ & {\bf Subroutine}\\
 \hline
+Short Precision Real & psb\_spmm \\
 Long Precision Real & psb\_spmm \\
+Short Precision Complex & psb\_spmm \\
 Long Precision Complex & psb\_spmm \\
 \hline
 \end{tabular}
@@ -900,7 +922,9 @@ trans, unit, choice, diag, work}
 \hline
 $T$, $x$, $y$, $D$, $\alpha$, $\beta$ & {\bf Subroutine}\\
 \hline
+Short Precision Real & psb\_spsm \\
 Long Precision Real & psb\_spsm \\
+Short Precision Complex & psb\_spsm \\
 Long Precision Complex & psb\_spsm \\
 \hline
 \end{tabular}

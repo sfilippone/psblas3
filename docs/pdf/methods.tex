@@ -26,7 +26,7 @@ later). In the above formulae, $x_i$ is the tentative solution and
 $r_i=b-Ax_i$ the corresponding residual at the $i$-th iteration. 
 
 
-\syntax{call psb\_krylov}{method,a,prec,b,x,eps,desc\_a,info,itmax,iter,err,itrace,irst,istop}
+\syntax{call psb\_krylov}{method,a,prec,b,x,eps,desc\_a,info,itmax,iter,err,itrace,irst,istop,cond}
 
 \begin{description}
 \item[Type:] Synchronous.
@@ -34,13 +34,13 @@ $r_i=b-Ax_i$ the corresponding residual at the $i$-th iteration.
 \item[method] a string that defines the iterative method to be
   used. Supported values are:
   \begin{description}
-  \item[CG]: the Conjugate Gradient method;
-  \item[CGS]:the Conjugate Gradient Stabilized method;
+  \item[CG:] the Conjugate Gradient method;
+  \item[CGS:] the Conjugate Gradient Stabilized method;
 
-  \item[BICG]: the Bi-Conjugate Gradient method;
-  \item[BICGSTAB]: the Bi-Conjugate Gradient Stabilized method;
-  \item[BICGSTABL]: the Bi-Conjugate Gradient Stabilized method with restarting;
-  \item[RGMRES]: the Generalized Minimal Residual method with restarting.
+  \item[BICG:] the Bi-Conjugate Gradient method;
+  \item[BICGSTAB:] the Bi-Conjugate Gradient Stabilized method;
+  \item[BICGSTABL:] the Bi-Conjugate Gradient Stabilized method with restarting;
+  \item[RGMRES:] the Generalized Minimal Residual method with restarting.
   \end{description}
 \item[a] the local portion of global sparse matrix
 $A$. \\
@@ -109,6 +109,12 @@ Type: {\bf optional}\\
 Intent: {\bf out}.\\
 Returned  as: an integer variable.
 \item[err]  The convergence estimate on exit.\\
+Scope: {\bf global} \\
+Type: {\bf optional}\\
+Intent: {\bf out}.\\
+Returned  as: a real number.
+\item[cond]  An estimate of the condition number of matrix $A$; only
+  available with the $CG$ method.\\
 Scope: {\bf global} \\
 Type: {\bf optional}\\
 Intent: {\bf out}.\\

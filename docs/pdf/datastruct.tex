@@ -15,6 +15,9 @@ user subroutine that makes use of the library.
 Real and complex data types are parametrized with a kind type defined
 in the library as follows: 
 \begin{description}
+\item[psb\_spk\_] Kind parameter for short precision real and complex
+  data; corresponds to a \verb|REAL| declaration and is
+  normally 4 bytes. 
 \item[psb\_dpk\_] Kind parameter for long precision real and complex
   data; corresponds to a \verb|DOUBLE PRECISION| declaration and is
   normally 8 bytes. 
@@ -226,11 +229,23 @@ Specified as: integer variable.
 \end{description}
 The Fortran~95 interface for distributed sparse matrices containing
 double precision real entries is defined as shown in
-figure~\ref{fig:spmattype}. 
+figure~\ref{fig:spmattype}. The definitions for single precision and
+complex data are identical except for the \verb|real| declaration and
+for the kind type parameter.
 \begin{figure}[h!]
   \begin{Sbox}
     \begin{minipage}[tl]{0.85\textwidth}
 \begin{verbatim}
+type psb_sspmat_type
+   integer     :: m, k
+   character   :: fida(5)
+   character   :: descra(10)
+   integer     :: infoa(psb_ifa_size_)
+   real(psb_spk_), allocatable :: aspk(:)
+   integer, allocatable :: ia1(:), ia2(:)
+   integer, allocatable :: pr(:), pl(:)
+end type psb_sspmat_type
+
 type psb_dspmat_type
    integer     :: m, k
    character   :: fida(5)
@@ -240,6 +255,27 @@ type psb_dspmat_type
    integer, allocatable :: ia1(:), ia2(:)
    integer, allocatable :: pr(:), pl(:)
 end type psb_dspmat_type
+
+type psb_cspmat_type
+   integer     :: m, k
+   character   :: fida(5)
+   character   :: descra(10)
+   integer     :: infoa(psb_ifa_size_)
+   complex(psb_spk_), allocatable :: aspk(:)
+   integer, allocatable :: ia1(:), ia2(:)
+   integer, allocatable :: pr(:), pl(:)
+end type psb_cspmat_type
+
+type psb_zspmat_type
+   integer     :: m, k
+   character   :: fida(5)
+   character   :: descra(10)
+   integer     :: infoa(psb_ifa_size_)
+   complex(psb_dpk_), allocatable :: aspk(:)
+   integer, allocatable :: ia1(:), ia2(:)
+   integer, allocatable :: pr(:), pl(:)
+end type psb_zspmat_type
+
 \end{verbatim}
     \end{minipage}
   \end{Sbox}
@@ -330,10 +366,10 @@ associated communication descriptor.%%  which may be different than the
 %% This data structure wants to be flexible enough to easily allow the
 %% implementation of new kind of preconditioners.
 The values contained in
-the \verb|iprcparm| and \verb|dprcparm| define tha type of
+the \verb|iprcparm| and \verb|rprcparm| define tha type of
 preconditioner along with all the parameters related to it; thus,
-\verb|iprcparm| and \verb|dprcparm| define how the other records have
-to be interpreted. This data structure is the basis of ore complex
+\verb|iprcparm| and \verb|rprcparm| define how the other records have
+to be interpreted. This data structure is the basis of more complex
 preconditioning strategies, which are the subject of further
 research. 
 \begin{figure}[h!]
@@ -342,15 +378,45 @@ research.
     \begin{minipage}[tl]{0.9\textwidth}
 \begin{verbatim}
 
+  type psb_sprec_type
+    type(psb_sspmat_type), allocatable :: av(:) 
+    real(psb_spk_), allocatable        :: d(:)  
+    type(psb_desc_type)                :: desc_data 
+    integer, allocatable               :: iprcparm(:) 
+    real(psb_spk_), allocatable        :: rprcparm(:) 
+    integer, allocatable               :: perm(:),  invperm(:) 
+    integer                            :: prec, base_prec
+  end type psb_sprec_type
+
   type psb_dprec_type
     type(psb_dspmat_type), allocatable :: av(:) 
     real(psb_dpk_), allocatable        :: d(:)  
     type(psb_desc_type)                :: desc_data 
     integer, allocatable               :: iprcparm(:) 
-    real(psb_dpk_), allocatable        :: dprcparm(:) 
+    real(psb_dpk_), allocatable        :: rprcparm(:) 
     integer, allocatable               :: perm(:),  invperm(:) 
     integer                            :: prec, base_prec
   end type psb_dprec_type
+
+  type psb_cprec_type
+    type(psb_cspmat_type), allocatable :: av(:) 
+    complex(psb_spk_), allocatable     :: d(:)  
+    type(psb_desc_type)                :: desc_data 
+    integer, allocatable               :: iprcparm(:) 
+    real(psb_spk_), allocatable        :: rprcparm(:) 
+    integer, allocatable               :: perm(:),  invperm(:) 
+    integer                            :: prec, base_prec
+  end type psb_cprec_type
+
+  type psb_zprec_type
+    type(psb_zspmat_type), allocatable :: av(:) 
+    complex(psb_dpk_), allocatable     :: d(:)  
+    type(psb_desc_type)                :: desc_data 
+    integer, allocatable               :: iprcparm(:) 
+    real(psb_dpk_), allocatable        :: rprcparm(:) 
+    integer, allocatable               :: perm(:),  invperm(:) 
+    integer                            :: prec, base_prec
+  end type psb_zprec_type
 
 \end{verbatim}
     \end{minipage}

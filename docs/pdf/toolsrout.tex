@@ -509,7 +509,8 @@ Specified as: an integer array of size $nz$.
 Scope:{\bf local}.\\
 Type:{\bf required}.\\
 Intent: {\bf in}.\\
-Specified as: an array of size $nz$.
+Specified as: an array of size $nz$. Must be of the same type and kind
+of the \verb|aspk| component of the sparse matrix $a$.
 \item[desc\_a] The communication descriptor.\\
 Scope: {\bf local}. \\
 Type: {\bf required}.\\
@@ -1544,7 +1545,7 @@ position as the corresponding entries in $x$.
   output difference is the handling of  ties (i.e. items with an
   equal   value) in the original input. With the merge-sort algorithm
   ties are   preserved in the same order as they had in the original
-  sequence,  while this is not guaranteed for quicksort;
+  sequence,  while this is not guaranteed for quicksort or heapsort;
 \item If $flag = psb\_sort\_ovw\_idx\_$ then the entries in $ix(1:n)$
   where $n$ is the size of $x$ are initialized to $ix(i) \leftarrow
   i$; thus, upon return from the subroutine, for each

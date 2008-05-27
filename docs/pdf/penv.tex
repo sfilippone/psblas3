@@ -255,7 +255,7 @@ Intent: {\bf inout}.\\
 Specified as: an integer, real or complex variable, which may be a
 scalar, or a rank 1 or 2 array, or a character or logical variable,
 which may be a scalar or rank 1 array. \
-Type, rank and size must agree on all processes.
+Type, kind, rank and size must agree on all processes.
 \item[root] Root process holding data to be broadcast.\\
 Scope: {\bf global}.\\
 Type: {\bf optional}.\\
@@ -272,7 +272,7 @@ Type: {\bf required}.\\
 Intent: {\bf inout}.\\
 Specified as: an integer, real or complex variable, which may be a
 scalar, or a rank 1 or 2 array, or a character or logical scalar. \
-Type, rank and size must agree on all processes.
+Type, kind, rank and size must agree on all processes.
 \end{description}
 
 
@@ -297,7 +297,7 @@ Type: {\bf required}.\\
 Intent: {\bf inout}.\\
 Specified as: an integer, real or complex variable, which may be a
 scalar, or a rank 1 or 2 array. \
-Type, rank and size must agree on all processes.
+Type, kind, rank and size must agree on all processes.
 \item[root] Process to hold the final sum, or $-1$ to make it available
   on all processes.\\
 Scope: {\bf global}.\\
@@ -315,7 +315,7 @@ Type: {\bf required}.\\
 Intent: {\bf inout}.\\
 Specified as: an integer, real or complex variable, which may be a
 scalar, or a rank 1 or 2 array. \\
-Type, rank and size must agree on all processes.
+Type, kind, rank and size must agree on all processes.
 \end{description}
 
 \section*{Notes}
@@ -348,7 +348,7 @@ Type: {\bf required}.\\
 Intent: {\bf inout}.\\
 Specified as: an integer or  real variable, which may be a
 scalar, or a rank 1 or 2 array. \
-Type, rank and size must agree on all processes.
+Type, kind, rank and size must agree on all processes.
 \item[root] Process to hold the final maximum, or $-1$ to make it available
   on all processes.\\
 Scope: {\bf global}.\\
@@ -366,7 +366,7 @@ Type: {\bf required}.\\
 Intent: {\bf in}.\\
 Specified as: an integer or  real variable, which may be a
 scalar, or a rank 1 or 2 array. \
-Type, rank and size must agree on all processes.
+Type, kind, rank and size must agree on all processes.
 \end{description}
 
 
@@ -398,7 +398,7 @@ Type: {\bf required}.\\
 Intent: {\bf inout}.\\
 Specified as: an integer  or real variable, which may be a
 scalar, or a rank 1 or 2 array. \
-Type, rank and size must agree on all processes.
+Type, kind, rank and size must agree on all processes.
 \item[root] Process to hold the final value, or $-1$ to make it available
   on all processes.\\
 Scope: {\bf global}.\\
@@ -416,7 +416,7 @@ Type: {\bf required}.\\
 Intent: {\bf inout}.\\
 Specified as: an integer  or  real variable, which may be a
 scalar, or a rank 1 or 2 array. \\
-Type, rank and size must agree on all processes.
+Type, kind, rank and size must agree on all processes.
 \end{description}
 
 
@@ -448,7 +448,7 @@ Type: {\bf required}.\\
 Intent: {\bf inout}.\\
 Specified as: an integer, real or complex variable, which may be a
 scalar, or a rank 1 or 2 array. \
-Type, rank and size must agree on all processes.
+Type, kind, rank and size must agree on all processes.
 \item[root] Process to hold the final value, or $-1$ to make it available
   on all processes.\\
 Scope: {\bf global}.\\
@@ -466,7 +466,7 @@ Type: {\bf required}.\\
 Intent: {\bf inout}.\\
 Specified as: an integer, real or complex variable, which may be a
 scalar, or a rank 1 or 2 array. \
-Type, rank and size must agree on all processes.
+Type, kind, rank and size must agree on all processes.
 \end{description}
 
 
@@ -498,7 +498,7 @@ Type: {\bf required}.\\
 Intent: {\bf inout}.\\
 Specified as: an integer, real or complex variable, which may be a
 scalar, or a rank 1 or 2 array. \
-Type, rank and size must agree on all processes.
+Type, kind, rank and size must agree on all processes.
 \item[root] Process to hold the final value, or $-1$ to make it available
   on all processes.\\
 Scope: {\bf global}.\\
@@ -516,7 +516,7 @@ Type: {\bf required}.\\
 Intent: {\bf inout}.\\
 Specified as: an integer, real or complex variable, which may be a
 scalar, or a rank 1 or 2 array. \\
-Type, rank and size must agree on all processes.
+Type, kind, rank and size must agree on all processes.
 \end{description}
 
 
@@ -548,7 +548,7 @@ Type: {\bf required}.\\
 Intent: {\bf in}.\\
 Specified as: an integer, real or complex variable, which may be a
 scalar, or a rank 1 or 2 array, or a character or logical scalar. \
-Type and  rank must agree on sender and receiver process; if $m$ is
+Type, kind and  rank must agree on sender and receiver process; if $m$ is
 not specified, size must agree as well. 
 \item[dst] Destination process.\\
 Scope: {\bf global}.\\
@@ -615,7 +615,7 @@ Type: {\bf required}.\\
 Intent: {\bf inout}.\\
 Specified as: an integer, real or complex variable, which may be a
 scalar, or a rank 1 or 2 array, or a character or logical scalar. \
-Type and  rank must agree on sender and receiver process; if $m$ is
+Type, kind and  rank must agree on sender and receiver process; if $m$ is
 not specified, size must agree as well. 
 \end{description}
 
