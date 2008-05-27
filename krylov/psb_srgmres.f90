@@ -129,7 +129,7 @@ subroutine psb_srgmres(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,irst,ist
   Real(psb_spk_) :: scal, gm, rti, rti1
   Integer       ::litmax, naux, mglob, it,k, itrace_,&
        & np,me, n_row, n_col, nl, int_err(5)
-  Logical, Parameter :: exchange=.True., noexchange=.False., use_drot=.true.
+  Logical, Parameter :: exchange=.True., noexchange=.False., use_srot=.true.
   Integer, Parameter :: irmax = 8
   Integer            :: itx, i, isvch, ictxt,istop_, err_act
   integer            :: debug_level, debug_unit
@@ -341,9 +341,9 @@ subroutine psb_srgmres(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,irst,ist
       h(i+1,i) = psb_genrm2(w,desc_a,info)
       scal=sone/h(i+1,i)
       call psb_geaxpby(scal,w,szero,v(:,i+1),desc_a,info)
-      if (use_drot) then 
+      if (use_srot) then 
         do k=2,i
-          call drot(1,h(k-1,i),1,h(k,i),1,c(k-1),s(k-1))
+          call srot(1,h(k-1,i),1,h(k,i),1,c(k-1),s(k-1))
         enddo
         
         rti  = h(i,i)
