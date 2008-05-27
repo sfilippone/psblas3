@@ -193,6 +193,7 @@ C
       SUBROUTINE ZCSMM(TRANS,M,N,K,ALPHA,PL,FIDA,DESCRA,A,IA1,IA2,   
      &                 INFOA,PR,B,LDB,BETA,C,LDC,WORK,LWORK,IERROR)
       use psb_const_mod
+      use psb_string_mod
       IMPLICIT NONE
 C     .. Scalar Arguments ..
       INTEGER    M,N,K,LDB,LDC,LWORK, IERROR
@@ -233,7 +234,9 @@ C
          IERROR = 10
          INT_VAL(1) = 3
          INT_VAL(2) = N
-      ELSE IF (TRANS.NE.'T' .AND. TRANS.NE.'N' .AND. TRANS.NE.'C') THEN
+      ELSE IF (psb_toupper(TRANS).NE.'T' .AND.
+     +    psb_toupper(TRANS).NE.'N' .AND.
+     +    psb_toupper(TRANS).NE.'C') THEN
          IERROR = 40
          INT_VAL(1) = 1
          STRINGS(1) = TRANS//'\0'

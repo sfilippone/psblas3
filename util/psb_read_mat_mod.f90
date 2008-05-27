@@ -60,14 +60,102 @@
 !
 module psb_read_mat_mod
   interface read_mat
-    module procedure dreadmat, zreadmat
+    module procedure sreadmat, dreadmat, creadmat, zreadmat 
   end interface
   interface read_rhs
-    module procedure dread_rhs, zread_rhs
+    module procedure sread_rhs, cread_rhs, dread_rhs, zread_rhs
   end interface
 
 
 contains
+
+  subroutine sreadmat (filename, a, ictxt, inroot)
+    use psb_base_mod
+    use psb_mmio_mod
+    implicit none
+    integer                               :: ictxt
+    type(psb_sspmat_type)                 :: a
+    character(len=*)                      :: filename
+    integer, optional                     :: inroot
+    integer, parameter          :: infile = 2
+    integer                     :: info, root, np,  me
+
+    if (present(inroot)) then
+      root = inroot
+    else
+      root = psb_root_
+    end if
+    call psb_info(ictxt, me, np)    
+    if (me == root) then
+      write(*, '("Reading matrix...")')      ! open input file
+      call mm_mat_read(a,info,infile,filename)
+      if (info /= 0) then 
+        write(0,*) 'Error return from MM_MAT_READ ',info
+        call psb_abort(ictxt)   ! Unexpected End of File
+      endif
+    end if 
+    return 
+
+  end subroutine sreadmat
+
+
+  subroutine sread_rhs (filename, b, ictxt, inroot)   
+    use psb_base_mod
+    implicit none
+    integer                               :: ictxt
+    character                             :: filename*(*)
+    integer, optional                     :: inroot
+    integer, parameter   :: infile = 2
+    integer              :: nrow, ncol, i,root, np,  me,  ircode, j
+    character            :: mmheader*15, fmt*15, object*10, type*10, sym*15,&
+         & line*1024
+    real(psb_spk_), allocatable  :: b(:,:)
+    if (present(inroot)) then
+      root = inroot
+    else
+      root = psb_root_
+    end if
+    call psb_info(ictxt, me, np)    
+    if (me == root) then
+      write(*, '("Reading rhs...")')      ! open input file
+      open(infile,file=filename, status='old', err=901, action="read")
+      read(infile,fmt=*, end=902) mmheader, object, fmt, type, sym
+      write(0,*)'obj fmt',object, fmt
+      if ( (object /= 'matrix').or.(fmt /= 'array')) then
+        write(0,*) 'read_rhs: input file type not yet supported'
+        call psb_abort(ictxt)
+      end if
+
+      do 
+         read(infile,fmt='(a)') line
+         if (line(1:1) /= '%')  exit
+      end do
+
+      read(line,fmt=*)nrow,ncol
+      
+      if ((psb_tolower(type) == 'real').and.(psb_tolower(sym) == 'general')) then
+        allocate(b(nrow,ncol),stat = ircode)
+        if (ircode /= 0)   goto 993
+        read(infile,fmt=*,end=902) ((b(i,j), i=1,nrow),j=1,ncol)
+           
+      else
+        write(0,*) 'read_rhs: rhs type not yet supported'
+        call psb_abort(ictxt)
+      end if      ! read right hand sides
+      write(*,*) 'end read_rhs'
+    end if 
+    return 
+    ! open failed
+901 write(0,*) 'read_rhs: could not open file ',&
+         & infile,' for input'
+    call psb_abort(ictxt)   ! unexpected end of file
+902 write(0,*) 'read_rhs: unexpected end of file ',infile,&
+         & ' during input'
+    call psb_abort(ictxt)   ! allocation failed
+993 write(0,*) 'read_rhs: memory allocation failure'
+    call psb_abort(ictxt)
+  end subroutine sread_rhs
+
 
   subroutine dreadmat (filename, a, ictxt, inroot)
     use psb_base_mod
@@ -109,7 +197,7 @@ contains
     integer              :: nrow, ncol, i,root, np,  me,  ircode, j
     character            :: mmheader*15, fmt*15, object*10, type*10, sym*15,&
          & line*1024
-    real(kind(1.0d0)), allocatable  :: b(:,:)
+    real(psb_dpk_), allocatable  :: b(:,:)
     if (present(inroot)) then
       root = inroot
     else
@@ -157,6 +245,99 @@ contains
   end subroutine dread_rhs
 
 
+  subroutine creadmat (filename, a, ictxt, inroot)
+    use psb_base_mod
+    use psb_mmio_mod
+    implicit none
+    integer                               :: ictxt
+    type(psb_cspmat_type)                 :: a
+    character(len=*)                      :: filename
+    integer, optional                     :: inroot
+    integer, parameter          :: infile = 2
+    integer                     :: info, root, np,  me
+
+    if (present(inroot)) then
+      root = inroot
+    else
+      root = psb_root_
+    end if
+    call psb_info(ictxt, me, np)
+    if (me == root) then
+      write(*, '("Reading matrix...")')      ! open input file
+      call mm_mat_read(a,info,infile,filename)
+      if (info /= 0) then 
+        write(0,*) 'Error return from MM_MAT_READ ',info
+        call psb_abort(ictxt)   ! Unexpected End of File
+      endif
+    end if 
+    return 
+
+  end subroutine creadmat
+
+
+  subroutine cread_rhs (filename, b, ictxt, inroot)   
+    use psb_base_mod
+    implicit none
+    integer                               :: ictxt
+    character                             :: filename*(*)
+    integer, optional                     :: inroot
+    integer, parameter   :: infile = 2
+    integer              :: nrow, ncol, i,root, np,  me,  ircode, j
+    character            :: mmheader*15, fmt*15, object*10, type*10, sym*15,&
+         & line*1024
+    real(psb_spk_)     :: bre, bim 
+    complex(psb_spk_), allocatable  :: b(:,:)
+    if (present(inroot)) then
+      root = inroot
+    else
+      root = psb_root_
+    end if
+    call psb_info(ictxt, me, np)
+    if (me == root) then
+      write(*, '("Reading rhs...")')      ! open input file
+      open(infile,file=filename, status='old', err=901, action="read")
+      read(infile,fmt=*, end=902) mmheader, object, fmt, type, sym
+!!$      write(0,*)'obj fmt',object, fmt
+      if ( (object /= 'matrix').or.(fmt /= 'array')) then
+        write(0,*) 'read_rhs: input file type not yet supported'
+        call psb_abort(ictxt)
+      end if
+
+      do 
+         read(infile,fmt='(a)') line
+         if (line(1:1) /= '%')  exit
+      end do
+
+      read(line,fmt=*)nrow,ncol
+      
+      if ((psb_tolower(type) == 'complex').and.(psb_tolower(sym) == 'general')) then
+        allocate(b(nrow,ncol),stat = ircode)
+        if (ircode /= 0)   goto 993
+        do j=1, ncol
+          do i=1, nrow
+            read(infile,fmt=*,end=902) bre,bim
+            b(i,j) = cmplx(bre,bim)
+          end do
+        end do
+      else
+        write(0,*) 'read_rhs: rhs type not yet supported'
+        call psb_abort(ictxt)
+      end if      ! read right hand sides
+      write(*,*) 'end read_rhs'
+    end if 
+    return 
+    ! open failed
+901 write(0,*) 'read_rhs: could not open file ',&
+         & infile,' for input'
+    call psb_abort(ictxt)   ! unexpected end of file
+902 write(0,*) 'read_rhs: unexpected end of file ',infile,&
+         & ' during input'
+    call psb_abort(ictxt)   ! allocation failed
+993 write(0,*) 'read_rhs: memory allocation failure'
+    call psb_abort(ictxt)
+  end subroutine cread_rhs
+
+
   subroutine zreadmat (filename, a, ictxt, inroot)
     use psb_base_mod
     use psb_mmio_mod
@@ -198,7 +379,7 @@ contains
     character            :: mmheader*15, fmt*15, object*10, type*10, sym*15,&
          & line*1024
     real(psb_dpk_)     :: bre, bim 
-    complex(kind(1.0d0)), allocatable  :: b(:,:)
+    complex(psb_dpk_), allocatable  :: b(:,:)
     if (present(inroot)) then
       root = inroot
     else
@@ -248,7 +429,6 @@ contains
 993 write(0,*) 'read_rhs: memory allocation failure'
     call psb_abort(ictxt)
   end subroutine zread_rhs
-
 
 
 end module psb_read_mat_mod

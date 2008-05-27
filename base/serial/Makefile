@@ -14,7 +14,20 @@ FOBJS = psb_cest.o psb_dcoins.o psb_dcsmm.o psb_dcsmv.o \
 	psb_zrwextd.o psb_zsymbmm.o psb_znumbmm.o psb_zspscal.o psb_zspclip.o\
 	psb_getifield.o psb_setifield.o psb_update_mod.o psb_getrow_mod.o\
 	psb_dgelp.o psb_zgelp.o psb_dcsrp.o psb_zcsrp.o\
-	psb_dspshift.o psb_dspsetbld.o psb_zspshift.o psb_zspsetbld.o
+	psb_dspshift.o psb_dspsetbld.o psb_zspshift.o psb_zspsetbld.o\
+	psb_scsprt.o psb_sspcnv.o psb_scoins.o psb_scsmm.o psb_scsmv.o \
+	psb_scssm.o psb_scssv.o psb_sneigh.o psb_sspgtblk.o psb_sspgetrow.o \
+	psb_sfixcoo.o psb_sipcsr2coo.o psb_sipcoo2csr.o  psb_sipcoo2csc.o \
+	psb_sgelp.o psb_sspgtdiag.o psb_scsnmi.o  psb_stransp.o \
+	psb_sspclip.o psb_srwextd.o psb_sspscal.o\
+	psb_snumbmm.o psb_ssymbmm.o\
+	psb_ccsprt.o psb_cspcnv.o psb_ccoins.o psb_ccsnmi.o\
+	psb_cfixcoo.o psb_cipcsr2coo.o psb_cipcoo2csr.o  psb_cipcoo2csc.o \
+	psb_cgelp.o psb_cspgtdiag.o psb_cspgtblk.o psb_cspgetrow.o\
+	psb_ccssm.o psb_ccssv.o psb_ccsmm.o psb_ccsmv.o psb_ctransp.o psb_ctransc.o\
+	psb_cspclip.o psb_crwextd.o psb_cspscal.o\
+	psb_cnumbmm.o psb_csymbmm.o psb_cneigh.o
+#
 
 LIBDIR=..
 MODDIR=../modules
@@ -27,9 +40,9 @@ lib: auxd cood csrd jadd f77d dpd lib1
 
 lib1:	$(FOBJS)
 
-psb_dcoins.o psb_zcoins.o: psb_update_mod.o
-psb_dspgetrow.o psb_zspgetrow.o: psb_getrow_mod.o
-psb_dspcnv.o pzb_zspcnv.o: psb_regen_mod.o
+psb_scoins.o psb_dcoins.o psb_zcoins.o: psb_update_mod.o
+psb_sspgetrow.o psb_dspgetrow.o psb_zspgetrow.o: psb_getrow_mod.o
+psb_sspcnv.o psb_dspcnv.o pzb_zspcnv.o: psb_regen_mod.o
 
 auxd:
 	(cd aux; make lib)

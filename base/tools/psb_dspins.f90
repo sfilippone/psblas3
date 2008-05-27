@@ -254,7 +254,7 @@ subroutine psb_dspins_2desc(nz,ia,ja,val,a,desc_ar,desc_ac,info)
   type(psb_desc_type), intent(inout)   :: desc_ac
   type(psb_dspmat_type), intent(inout) :: a
   integer, intent(in)                  :: nz,ia(:),ja(:)
-  real(kind(1.d0)), intent(in)         :: val(:)
+  real(kind=psb_dpk_), intent(in)      :: val(:)
   integer, intent(out)                 :: info
   !locals.....
 

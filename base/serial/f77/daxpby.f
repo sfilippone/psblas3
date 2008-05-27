@@ -31,8 +31,6 @@ C
 C 
       subroutine  daxpby(m, n, alpha, X, lldx, beta, Y, lldy, info)
       use psb_const_mod
-      real(psb_dpk_) one, zero
-      parameter  (one=1.d0,zero=0.d0)
       integer n, m, lldx, lldy, info
       real(psb_dpk_) X(lldx,*), Y(lldy,*)
       real(psb_dpk_) alpha, beta
@@ -76,19 +74,19 @@ C
         goto 9999
       endif
 
-      if (alpha.eq.zero) then 
-        if (beta.eq.zero) then 
+      if (alpha.eq.dzero) then 
+        if (beta.eq.dzero) then 
           do j=1, n 
             do i=1,m 
-              y(i,j) = zero
+              y(i,j) = dzero
             enddo 
           enddo
-        else if (beta.eq.one) then
+        else if (beta.eq.done) then
 c$$$
 c$$$     Do nothing! 
 c$$$            
 
-        else if (beta.eq.-one) then 
+        else if (beta.eq.-done) then 
           do j=1,n 
             do i=1,m 
               y(i,j) = - y(i,j)
@@ -102,22 +100,22 @@ c$$$
           enddo            
         endif
 
-      else if (alpha.eq.one) then
+      else if (alpha.eq.done) then
 
-        if (beta.eq.zero) then 
+        if (beta.eq.dzero) then 
           do j=1,n 
             do i=1,m 
               y(i,j) = x(i,j)
             enddo
           enddo
-        else if (beta.eq.one) then
+        else if (beta.eq.done) then
           do j=1,n 
             do i=1,m 
               y(i,j) = x(i,j) + y(i,j)
             enddo
           enddo
 
-        else if (beta.eq.-one) then 
+        else if (beta.eq.-done) then 
           do j=1,n 
             do i=1,m 
               y(i,j) = x(i,j) - y(i,j)
@@ -131,22 +129,22 @@ c$$$
           enddo            
         endif
 
-      else if (alpha.eq.-one) then 
+      else if (alpha.eq.-done) then 
 
-        if (beta.eq.zero) then 
+        if (beta.eq.dzero) then 
           do j=1,n 
             do i=1,m 
               y(i,j) = -x(i,j)
             enddo
           enddo
-        else if (beta.eq.one) then
+        else if (beta.eq.done) then
           do j=1,n 
             do i=1,m 
               y(i,j) = -x(i,j) + y(i,j)
             enddo
           enddo
 
-        else if (beta.eq.-one) then 
+        else if (beta.eq.-done) then 
           do j=1,n 
             do i=1,m 
               y(i,j) = -x(i,j) - y(i,j)
@@ -162,20 +160,20 @@ c$$$
 
       else  
 
-        if (beta.eq.zero) then 
+        if (beta.eq.dzero) then 
           do j=1,n 
             do i=1,m 
               y(i,j) = alpha*x(i,j)
             enddo
           enddo
-        else if (beta.eq.one) then
+        else if (beta.eq.done) then
           do j=1,n 
             do i=1,m 
               y(i,j) = alpha*x(i,j) + y(i,j)
             enddo
           enddo
 
-        else if (beta.eq.-one) then 
+        else if (beta.eq.-done) then 
           do j=1,n 
             do i=1,m 
               y(i,j) = alpha*x(i,j) - y(i,j)

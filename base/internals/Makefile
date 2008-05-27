@@ -8,9 +8,12 @@ FOBJS = psi_compute_size.o psi_crea_bnd_elem.o psi_crea_index.o \
 FOBJS2 = psi_exist_ovr_elem.o psi_list_search.o srtlist.o 
 #COBJS = avltree.o srcht.o
 
-MPFOBJS = psi_dswapdata.o psi_dswaptran.o psi_iswapdata.o \
-	psi_iswaptran.o psi_desc_index.o \
- 	psi_zswapdata.o psi_zswaptran.o  psi_extrct_dl.o
+MPFOBJS = psi_dswapdata.o psi_dswaptran.o\
+	psi_sswapdata.o  psi_sswaptran.o \
+	psi_iswapdata.o psi_iswaptran.o \
+	psi_cswapdata.o psi_cswaptran.o  \
+	psi_zswapdata.o psi_zswaptran.o  \
+	psi_desc_index.o psi_extrct_dl.o
 LIBDIR=..
 MODDIR=../modules
 FINCLUDES=$(FMFLAG)$(LIBDIR) $(FMFLAG)$(MODDIR) $(FMFLAG).

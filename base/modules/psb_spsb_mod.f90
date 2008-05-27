@@ -31,7 +31,7 @@
 !!$  
 module psb_spsb_mod
 
-  interface
+  interface dot
     function ddot(n,dx,incx,dy,incy)
       use psb_const_mod
       real(psb_dpk_) :: dx(*),dy(*),dtemp
@@ -40,7 +40,7 @@ module psb_spsb_mod
     end function ddot
   end interface
 
-  interface
+  interface axpby
     subroutine  daxpby(m, n, alpha, X, lldx, beta, Y, lldy, info)
       use psb_const_mod
       real(psb_dpk_) :: X(lldx,*), Y(lldy,*)
@@ -49,7 +49,7 @@ module psb_spsb_mod
     end subroutine daxpby
   end interface
 
-  interface
+  interface csmm
     subroutine dcsmm(trans,m,n,k,alpha,pl,fida,descra,a,ia1,ia2,&
          &   infoa,pr,b,ldb,beta,c,ldc,work,lwork,ierror)
       use psb_const_mod
@@ -62,7 +62,7 @@ module psb_spsb_mod
     end subroutine dcsmm
   end interface
 
-  interface
+  interface csnmi
     function dcsnmi(trans,m,n,fida,descra,a,ia1,ia2,&
          &                 infoa,ierror)
       use psb_const_mod
@@ -75,7 +75,8 @@ module psb_spsb_mod
     end function dcsnmi
   end interface
 
-  interface
+
+  interface csrp
     subroutine dcsrp(trans,m,n,fida,descra,ia1,ia2,infoa,&
          &  p,work,lwork,ierror)
       use psb_const_mod
@@ -88,7 +89,7 @@ module psb_spsb_mod
     end subroutine dcsrp
   end interface
 
-  interface
+  interface cssm
     subroutine dcssm(trans,m,n,alpha,unitd,d,&
          &   pl,fidt,descrt,t,it1,it2,infot,pr,&
          &   b,ldb,beta,c,ldc,work,lwork,ierror)
@@ -102,7 +103,8 @@ module psb_spsb_mod
     end subroutine dcssm
   end interface
 
-  interface
+
+  interface csupd
     subroutine dcsupd(m, n, fida, descra, a, ia1,&
          &  ia2, infoa, ia, ja, fidh, descrh, h, ih1, ih2,&
          &  infoh, ih, jh, flag, glob_to_loc,&
@@ -118,7 +120,7 @@ module psb_spsb_mod
     end subroutine dcsupd
   end interface
 
-  interface
+  interface gelp
     subroutine dgelp(trans,m,n,p,b,ldb,work,lwork,ierror)
       use psb_const_mod
       integer          :: ldb, m, n, lwork, ierror
@@ -128,7 +130,7 @@ module psb_spsb_mod
     end subroutine dgelp
   end interface
 
-  interface
+  interface lpupd
     subroutine dlpupd(m,n,perm,b,ldb,beta,c,ldc)
       use psb_const_mod
       integer          :: m, n, ldb, ldc
@@ -138,7 +140,7 @@ module psb_spsb_mod
     end subroutine dlpupd
   end interface
 
-  interface
+  interface swmm 
     subroutine dswmm(trans,m,n,k,alpha,fida,descra,a,ia1,ia2,&
          & infoa,b,ldb,beta,c,ldc,work,lwork,ierror)
       use psb_const_mod
@@ -152,7 +154,8 @@ module psb_spsb_mod
   end interface
 
 
-  interface
+
+  interface swprt
     subroutine dswprt(m,n,fida,descra,a,ia1,ia2,infoa,title,&
          & iout,ierror)
       use psb_const_mod
@@ -162,7 +165,7 @@ module psb_spsb_mod
     end subroutine dswprt
   end interface
 
-  interface
+  interface swsm
     subroutine dswsm(trans,m,n,alpha,unitd,d,fidt,descrt,t,it1,it2,& 
          & infot,b,ldb,beta,c,ldc,work,lwork,ierror)
       use psb_const_mod
@@ -175,7 +178,7 @@ module psb_spsb_mod
     end subroutine dswsm
   end interface
 
-  interface
+  interface symbmm
     subroutine symbmm (n, m, l, ia, ja, diaga, ib,&
          & jb, diagb, ic, jc, diagc, index)
       integer          :: ia(*), ja(*), diaga, ib(*),&

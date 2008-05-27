@@ -179,6 +179,7 @@ C
 C
       SUBROUTINE ZSRMV (TRANS,DIAG,M,N,ALPHA,AS,JA,IA,X,BETA,Y,WORK)
       use psb_const_mod
+      use psb_string_mod
 C     .. Parameters ..
       complex(psb_dpk_) ONE, ZERO
       PARAMETER (ONE=(1.0D0, 0.0D0), ZERO=(0.0D0, 0.0D0))
@@ -195,15 +196,17 @@ C     .. Local Scalars ..
       LOGICAL    SYM, TRA, COTRA, UNI
 C     .. Executable Statements ..
 C
-      UNI = DIAG.EQ.'U'
+      UNI = psb_toupper(DIAG).EQ.'U'
 C
 C     .. Not simmetric matrix
-      TRA = TRANS.EQ.'T'
-      COTRA = TRANS.EQ.'C'
+      TRA   = psb_toupper(TRANS).EQ.'T'
+      COTRA = psb_toupper(TRANS).EQ.'C'
 
 C     .. Symmetric matrix upper or lower 
-      SYM = (TRANS.EQ.'L').OR.(TRANS.EQ.'U').OR.
-     +  (TRANS.EQ.'M').OR.(TRANS.EQ.'V')
+      SYM = (psb_toupper(TRANS).EQ.'L').OR.
+     +  (psb_toupper(TRANS).EQ.'U').OR.
+     +  (psb_toupper(TRANS).EQ.'M').OR.
+     +  (psb_toupper(TRANS).EQ.'V')
 C
       IF (.NOT.(TRA.OR.COTRA)) THEN
         NROWA = M
@@ -248,7 +251,8 @@ C
           ENDIF
 
 C              Product for other elements
-          IF ((TRANS.EQ.'L').OR.(TRANS.EQ.'U')) THEN
+          IF ((psb_toupper(TRANS).EQ.'L').OR.
+     +      (psb_toupper(TRANS).EQ.'U')) THEN
             DO 80 I = 1, M
               ACC = ZERO
               DO 60 J = IA(I), IA(I+1) - 1
@@ -274,7 +278,8 @@ C
 C
 C            Check if matrix is lower or upper
 C
-          IF ((TRANS.EQ.'L').OR.(TRANS.EQ.'M')) THEN
+          IF ((psb_toupper(TRANS).EQ.'L').OR.
+     +      (psb_toupper(TRANS).EQ.'M')) THEN
 C
 C               LOWER CASE: diagonal element is the last element of row
 C               ....OK!
@@ -289,7 +294,7 @@ C               ....OK!
               ENDDO
             ENDIF
 
-            IF  (TRANS.EQ.'L') THEN
+            IF  (psb_toupper(TRANS).EQ.'L') THEN
               DO 140 I = 1, M
                 ACC = ZERO
                 DO 120 J = IA(I), IA(I+1) - 1 ! it was -2
@@ -337,7 +342,7 @@ C
                 Y(I) = ZERO
               ENDDO
             ENDIF
-            IF (TRANS.EQ.'U') THEN
+            IF (psb_toupper(TRANS).EQ.'U') THEN
               DO 200 I = 1, M
                 ACC = ZERO
                 DO 180 J = IA(I) , IA(I+1) - 1 ! removed +1

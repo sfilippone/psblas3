@@ -8,6 +8,14 @@ F90OBJS= psb_dbjac_bld.o psb_dilu_fct.o\
 	psb_ddiagsc_bld.o \
 	psb_dprc_aply.o \
 	psb_dgprec_aply.o psb_dbjac_aply.o\
+	psb_sbjac_bld.o psb_silu_fct.o\
+	psb_sprecbld.o psb_sprecset.o psb_sprecinit.o \
+	psb_sdiagsc_bld.o \
+	psb_sprc_aply.o psb_sgprec_aply.o psb_sbjac_aply.o\
+	psb_cbjac_bld.o psb_cilu_fct.o\
+	psb_cprecbld.o psb_cprecset.o psb_cprecinit.o \
+	psb_cdiagsc_bld.o  \
+	psb_cprc_aply.o psb_cgprec_aply.o psb_cbjac_aply.o\
 	psb_zbjac_bld.o psb_zilu_fct.o\
 	psb_zprecbld.o psb_zprecset.o psb_zprecinit.o \
 	psb_zdiagsc_bld.o  \
@@ -27,8 +35,10 @@ lib:  $(OBJS)
 	/bin/cp -p $(LIBMOD) $(LOCAL_MODS) $(LIBDIR)
 
 $(OBJS): $(LIBDIR)/psb_base_mod$(.mod)
-$(F90OBJS): psb_prec_mod$(.mod)
-psb_prec_mod$(.mod):  psb_prec_type$(.mod)
+
+$(F90OBJS): $(MODOBJS)
+
+psb_prec_mod.o:  psb_prec_type.o
 
 veryclean: clean
 	/bin/rm -f $(LIBNAME)

@@ -190,8 +190,9 @@ C     connection with DxxxMM                                             #
 C
 C
       SUBROUTINE DCSMM(TRANS,M,N,K,ALPHA,PL,FIDA,DESCRA,A,IA1,IA2,     
-     &   INFOA,PR,B,LDB,BETA,C,LDC,WORK,LWORK,IERROR)
+     &  INFOA,PR,B,LDB,BETA,C,LDC,WORK,LWORK,IERROR)
       use psb_const_mod
+      use psb_string_mod
       IMPLICIT NONE
 
 C     .. Scalar Arguments ..
@@ -234,7 +235,9 @@ C
         IERROR = 10
         INT_VAL(1) = 3
         INT_VAL(2) = N
-      ELSE IF (TRANS.NE.'T' .AND. TRANS.NE.'N' .AND. TRANS.NE.'C') THEN
+      ELSE IF (psb_toupper(TRANS).NE.'T' .AND.
+     +    psb_toupper(TRANS).NE.'N' .AND.
+     +    psb_toupper(TRANS).NE.'C') THEN
         IERROR = 40
         INT_VAL(1) = 1
         STRINGS(1) = TRANS//'\0'
@@ -256,8 +259,8 @@ C
 C     Error handling
 C
       IF(IERROR.NE.0) THEN
-         CALL FCPSB_ERRPUSH(IERROR,NAME,INT_VAL)
-         GOTO 9999
+        CALL FCPSB_ERRPUSH(IERROR,NAME,INT_VAL)
+        GOTO 9999
       END IF
 
 C
@@ -301,12 +304,12 @@ C
         P=LWORKB+1
         CALL DLPUPD(K,N,PR,B,LDB,DZERO,WORK,K)
         CALL DSWMM(TRANS,M,N,K,ALPHA,FIDA,DESCRA,A,IA1,IA2,INFOA,     
-     &     WORK,K,DZERO,WORK(P),M,WORK(P+LWORKC),LWORKS,IERROR)
+     &    WORK,K,DZERO,WORK(P),M,WORK(P+LWORKC),LWORKS,IERROR)
         LWORKS = IDINT(WORK(P+LWORKC))
         IF(IERROR .NE. 0) THEN
-           IERROR=4011
-           CALL FCPSB_ERRPUSH(IERROR,NAME,INT_VAL)
-           GOTO 9999
+          IERROR=4011
+          CALL FCPSB_ERRPUSH(IERROR,NAME,INT_VAL)
+          GOTO 9999
         ENDIF
         CALL DLPUPD(M,N,PL,WORK(P),M,BETA,C,LDC)
       ELSE IF(.NOT.LP .AND. RP) THEN
@@ -316,12 +319,12 @@ C
         P=LWORKB+1
         CALL DLPUPD(K,N,PR,B,LDB,DZERO,WORK,K)
         CALL DSWMM(TRANS,M,N,K,ALPHA,FIDA,DESCRA,A,IA1,IA2,INFOA,    
-     &     WORK,K,BETA,C,LDC,WORK(P),LWORKS,IERROR)
+     &    WORK,K,BETA,C,LDC,WORK(P),LWORKS,IERROR)
         LWORKS = IDINT(WORK(P))
         IF(IERROR .NE. 0) THEN
-           IERROR=4011
-           CALL FCPSB_ERRPUSH(IERROR,NAME,INT_VAL)
-           GOTO 9999
+          IERROR=4011
+          CALL FCPSB_ERRPUSH(IERROR,NAME,INT_VAL)
+          GOTO 9999
         ENDIF
       ELSE IF(.NOT.RP .AND. LP) THEN
 C
@@ -329,12 +332,12 @@ C        Only left permutation required
 C
         P=LWORKC+1
         CALL DSWMM(TRANS,M,N,K,ALPHA,FIDA,DESCRA,A,IA1,IA2,INFOA,    
-     &     B,LDB,DZERO,WORK,M,WORK(P),LWORKS,IERROR)
+     &    B,LDB,DZERO,WORK,M,WORK(P),LWORKS,IERROR)
         LWORKS = IDINT(WORK(P))
         IF(IERROR .NE. 0) THEN
-           IERROR=4011
-           CALL FCPSB_ERRPUSH(IERROR,NAME,INT_VAL)
-           GOTO 9999
+          IERROR=4011
+          CALL FCPSB_ERRPUSH(IERROR,NAME,INT_VAL)
+          GOTO 9999
         ENDIF
 
         CALL DLPUPD(M,N,PL,WORK,M,BETA,C,LDC)
@@ -343,12 +346,12 @@ C
 C        No permutations required
 C
         CALL DSWMM(TRANS,M,N,K,ALPHA,FIDA,DESCRA,A,IA1,IA2,INFOA, 
-     &     B,LDB,BETA,C,LDC,WORK,LWORKS,IERROR)
+     &    B,LDB,BETA,C,LDC,WORK,LWORKS,IERROR)
         LWORKS = IDINT(WORK(1))
         IF(IERROR .NE. 0) THEN
-           IERROR=4011
-           CALL FCPSB_ERRPUSH(IERROR,NAME,INT_VAL)
-           GOTO 9999
+          IERROR=4011
+          CALL FCPSB_ERRPUSH(IERROR,NAME,INT_VAL)
+          GOTO 9999
         ENDIF
       ENDIF
  9998 CONTINUE
@@ -365,8 +368,8 @@ C
       CALL FCPSB_ERRACTIONRESTORE(ERR_ACT)
 
       IF ( ERR_ACT .NE. 0 ) THEN 
-         CALL FCPSB_SERROR()
-         RETURN
+        CALL FCPSB_SERROR()
+        RETURN
       ENDIF
 
       RETURN

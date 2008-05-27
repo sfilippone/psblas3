@@ -135,8 +135,9 @@ C             On entry LWORK specifies the dimension of WORK
 C             Unchanged on exit.
 C
       SUBROUTINE ZCSRMM(TRANSA,M,K,N,ALPHA,DESCRA,AR,
-     *                  JA,IA,B,LDB,BETA,C,LDC,WORK,LWORK)
+     *  JA,IA,B,LDB,BETA,C,LDC,WORK,LWORK)
       use psb_const_mod
+      use psb_string_mod
 C     .. Scalar Arguments ..
       complex(psb_dpk_) ALPHA, BETA
       INTEGER    K, LDB, LDC, M, N, LWORK
@@ -160,54 +161,56 @@ C     .. Why to loose TRANSA for H, T, A matrices?
 C
       TRANS = TRANSA
 C        
-      IF ((DESCRA(1:1).EQ.'S').AND.(DESCRA(2:2).EQ.'U')) THEN
-         IF (TRANSA.EQ.'C') THEN
-            TRANS = 'V'
-         ELSE
-            TRANS = 'U'
-         ENDIF
+      IF ((psb_toupper(DESCRA(1:1)).EQ.'S').AND.
+     +  (psb_toupper(DESCRA(2:2)).EQ.'U')) THEN
+        IF (psb_toupper(TRANSA).EQ.'C') THEN
+          TRANS = 'V'
+        ELSE
+          TRANS = 'U'
+        ENDIF
       ENDIF
-      IF ((DESCRA(1:1).EQ.'S').AND.(DESCRA(2:2).EQ.'L')) THEN
-         IF (TRANSA.EQ.'C') THEN
-            TRANS = 'M'
-         ELSE
-            TRANS = 'L'
-         ENDIF
+      IF ((psb_toupper(DESCRA(1:1)).EQ.'S').AND.
+     +  (psb_toupper(DESCRA(2:2)).EQ.'L')) THEN
+        IF (psb_toupper(TRANSA).EQ.'C') THEN
+          TRANS = 'M'
+        ELSE
+          TRANS = 'L'
+        ENDIF
       ENDIF
       
 C     .. Diagonal matrix
-      IF (DESCRA(1:1).EQ.'D') THEN
+      IF (psb_toupper(DESCRA(1:1)).EQ.'D') THEN
 C        .. Diagonal matrix with unitary values
-         IF (DESCRA(3:3).EQ.'U') THEN
-            DO 40 I = 1, K
-               DO 20 J = 1, M
-                  C(J,I) = BETA*C(J,I) + ALPHA*B(J,I)
-   20          CONTINUE
-   40       CONTINUE
-            RETURN
+        IF (psb_toupper(DESCRA(3:3)).EQ.'U') THEN
+          DO 40 I = 1, K
+            DO 20 J = 1, M
+              C(J,I) = BETA*C(J,I) + ALPHA*B(J,I)
+ 20         CONTINUE
+ 40       CONTINUE
+          RETURN
 C        .. Diagonal matrix to be conjugated 
-         ELSE IF (TRANSA.EQ.'C') THEN
-            DO 80 I = 1, K
-               DO 60 J = 1, M
-                  C(J,I) = BETA*C(J,I) + ALPHA * 
-     +                     CONJG(AR(J)) * B(J,I)
-   60          CONTINUE
-   80       CONTINUE
-            RETURN
+        ELSE IF (psb_toupper(TRANSA).EQ.'C') THEN
+          DO 80 I = 1, K
+            DO 60 J = 1, M
+              C(J,I) = BETA*C(J,I) + ALPHA * 
+     +          CONJG(AR(J)) * B(J,I)
+ 60         CONTINUE
+ 80       CONTINUE
+          RETURN
 C        .. Generic diagonal matrix
-         ELSE
-            DO 91 I = 1, K
-               DO 90 J = 1, M
-                  C(J,I) = BETA*C(J,I) + ALPHA * 
-     +                     AR(J) * B(J,I)
-   90          CONTINUE
-   91       CONTINUE
-            RETURN
-         ENDIF
+        ELSE
+          DO 91 I = 1, K
+            DO 90 J = 1, M
+              C(J,I) = BETA*C(J,I) + ALPHA * 
+     +          AR(J) * B(J,I)
+ 90         CONTINUE
+ 91       CONTINUE
+          RETURN
+        ENDIF
       END IF
 C
-      IF (DESCRA(3:3).EQ.'N') DIAG = 'N'
-      IF (DESCRA(3:3).EQ.'U') DIAG = 'U'
+      IF (psb_toupper(DESCRA(3:3)).EQ.'N') DIAG = 'N'
+      IF (psb_toupper(DESCRA(3:3)).EQ.'U') DIAG = 'U'
 C
 C     C = A*B  or  C=A'*B  or  C=conjug(A')*B
 C
@@ -226,9 +229,9 @@ C        'N': Generic diagonal.
 
 C
       DO 100 I = 1, K
-         CALL ZSRMV(TRANS,DIAG,M,N,ALPHA,AR,JA,IA,B(1,I),
-     +      BETA,C(1,I),WORK)
-  100    CONTINUE
+        CALL ZSRMV(TRANS,DIAG,M,N,ALPHA,AR,JA,IA,B(1,I),
+     +    BETA,C(1,I),WORK)
+ 100  CONTINUE
       RETURN
       END
 

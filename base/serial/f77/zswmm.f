@@ -145,7 +145,9 @@ C     All checks on argument are performed in the calling routine.
 C
 C
       SUBROUTINE ZSWMM(TRANS,M,N,K,ALPHA,FIDA,DESCRA,A,IA1,IA2,
-     &                 INFOA,B,LDB,BETA,C,LDC,WORK,LWORK,IERROR)
+     &  INFOA,B,LDB,BETA,C,LDC,WORK,LWORK,IERROR)
+      use psb_const_mod
+      use psb_string_mod
       use psb_const_mod
 C     .. Scalar Arguments ..
       INTEGER    M,N,K,LDB,LDC,LWORK,IERROR
@@ -170,7 +172,7 @@ C
       IERROR = 0 
       CALL FCPSB_ERRACTIONSAVE(ERR_ACT)
       
-      IF (FIDA(1:3).EQ.'CSR') THEN
+      IF (psb_toupper(FIDA(1:3)).EQ.'CSR') THEN
 C
 C        A, IA1, IA2 --->  AR,   JA,   IA
 C                         VAL, INDX, PNTR
@@ -180,13 +182,13 @@ C        INFOA(*) not used
 C
 C     JAD format not jet implemented
 C
-      ELSE IF (FIDA(1:3).EQ.'COO') THEN
+      ELSE IF (psb_toupper(FIDA(1:3)).EQ.'COO') THEN
 C      
 C        INFOA(*) not used    
 C
         CALL  ZCOOMM(TRANS,M,N,K,ALPHA,DESCRA,A,IA1,
      +    IA2,INFOA,B,LDB,BETA,C,LDC,WORK)                         
-      ELSE IF ((FIDA(1:3).EQ.'JAD').AND.(.FALSE.)) THEN
+      ELSE IF ((psb_toupper(FIDA(1:3)).EQ.'JAD').AND.(.FALSE.)) THEN
 C      
 C        INFOA(*) not used    
 C
@@ -210,8 +212,8 @@ C
       CALL FCPSB_ERRACTIONRESTORE(ERR_ACT)
 
       IF ( ERR_ACT .NE. 0 ) THEN 
-         CALL FCPSB_SERROR()
-         RETURN
+        CALL FCPSB_SERROR()
+        RETURN
       ENDIF
 
       END

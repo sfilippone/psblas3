@@ -46,7 +46,7 @@ C
       CHARACTER*20      NAME
       integer              :: debug_level, debug_unit
 
-      NAME = 'DCOOSM\0'
+      NAME = 'ZCOOSM\0'
       IERROR = 0
       CALL FCPSB_ERRACTIONSAVE(ERR_ACT)
       debug_unit  = psb_get_debug_unit()

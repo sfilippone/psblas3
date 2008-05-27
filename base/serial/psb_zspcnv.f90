@@ -98,7 +98,7 @@ subroutine psb_zspcnv2(a, b,info,afmt,upd,dupl)
     call psb_sp_setifld(dupl,psb_dupl_,b,info)    
   end if
   if (present(afmt)) then 
-    afmt_ = psb_tolower(afmt)
+    afmt_ = psb_toupper(afmt)
   else
     afmt_ = psb_fidef_
   end if
@@ -126,7 +126,7 @@ subroutine psb_zspcnv2(a, b,info,afmt,upd,dupl)
   !  ...matrix conversion...
   b%m=a%m
   b%k=a%k
-  b%fida=psb_tolower(afmt_)
+  b%fida=psb_toupper(afmt_)
   size_req = psb_sp_get_nnzeros(a)
   !
   n_row=b%m 
@@ -170,13 +170,13 @@ subroutine psb_zspcnv2(a, b,info,afmt,upd,dupl)
        & write(debug_unit,*) trim(name),': size_req 1:',&
        & size_req, trans_,upd_,dupl_,b%fida,b%descra
 
-  select case (psb_tolower(a%fida))
+  select case (psb_toupper(a%fida))
 
-  case ('csr')
+  case ('CSR')
 
-    select case (psb_tolower(b%fida))
+    select case (psb_toupper(b%fida))
 
-    case ('csr')
+    case ('CSR')
 
       call zcrcr(trans_, a%m, a%k, unitd_, d, a%descra, a%aspk,&
            & a%ia1, a%ia2, a%infoa, b%pl, b%descra, b%aspk, b%ia1,&
@@ -191,7 +191,7 @@ subroutine psb_zspcnv2(a, b,info,afmt,upd,dupl)
         goto 9999
       end if
 
-    case ('jad')
+    case ('JAD')
 
       !...converting to JAD
       !...output matrix may not be big enough
@@ -234,7 +234,7 @@ subroutine psb_zspcnv2(a, b,info,afmt,upd,dupl)
         goto 9999
       end if
 
-    case ('coo')
+    case ('COO')
       if (debug_level >= psb_debug_serial_) &
            & write(debug_unit,*) trim(name),' Calling CRCO ',a%descra
       call zcrco(trans_, a%m, a%k, unitd_, d, a%descra, a%aspk,&
@@ -253,11 +253,11 @@ subroutine psb_zspcnv2(a, b,info,afmt,upd,dupl)
 
     end select
 
-  case ('coo','coi')
+  case ('COO','COI')
 
-    select case (psb_tolower(b%fida))
+    select case (psb_toupper(b%fida))
 
-    case ('csr')
+    case ('CSR')
 
       call zcocr(trans_, a%m, a%k, unitd_, d, a%descra, a%aspk,&
            & a%ia2, a%ia1, a%infoa, b%pl, b%descra, b%aspk, b%ia1,&
@@ -269,7 +269,7 @@ subroutine psb_zspcnv2(a, b,info,afmt,upd,dupl)
         goto 9999
       end if
 
-    case ('jad')
+    case ('JAD')
 
       call psb_sp_all(temp_a, size(b%ia1),size(b%ia2),size(b%aspk),info)
       if (info /= 0) then
@@ -326,7 +326,7 @@ subroutine psb_zspcnv2(a, b,info,afmt,upd,dupl)
 
       end do
 
-    case ('coo')
+    case ('COO')
 
       call zcoco(trans_, a%m, a%k, unitd_, d, a%descra, a%aspk,&
            & a%ia1, a%ia2, a%infoa, b%pl, b%descra, b%aspk, b%ia1,&
@@ -460,22 +460,22 @@ subroutine psb_zspcnv1(a, info, afmt, upd, dupl)
     inplace = .false.
     if (upd_ == psb_upd_srch_) then 
       if (present(afmt)) then 
-        select case (psb_tolower(a%fida))
-        case('coo')
-          select case(psb_tolower(afmt))
-          case('coo') 
+        select case (psb_toupper(a%fida))
+        case('COO')
+          select case(psb_toupper(afmt))
+          case('COO') 
             call psb_fixcoo(a,info)
             inplace = .true.
-          case('csr') 
+          case('CSR') 
             call psb_ipcoo2csr(a,info)
             inplace = .true.
-          case('csc')
+          case('CSC')
             call psb_ipcoo2csc(a,info)
             inplace = .true.
           end select
-        case('csr')
-          select case(psb_tolower(afmt))
-          case('coo') 
+        case('CSR')
+          select case(psb_toupper(afmt))
+          case('COO') 
             call psb_ipcsr2coo(a,info)
             inplace = .true.
           end select
@@ -525,12 +525,12 @@ subroutine psb_zspcnv1(a, info, afmt, upd, dupl)
     !
     ! Second  case: we come from an update loop.
     ! 
-    select case(psb_tolower(a%fida))
-    case('csr')
+    select case(psb_toupper(a%fida))
+    case('CSR')
       call csr_regen(a,info)
-    case ('coo','coi')
+    case ('COO','COI')
       call coo_regen(a,info)
-    case('jad')
+    case('JAD')
       call jad_regen(a,info)
     case default
       info=136

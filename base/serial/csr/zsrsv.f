@@ -30,6 +30,7 @@ C POSSIBILITY OF SUCH DAMAGE.
 C
       SUBROUTINE ZSRSV (UPLO,TRANS,DIAG,N,AS,JA,IA,B,X)
       use psb_const_mod
+      use psb_string_mod
       complex(psb_dpk_) ZERO
       PARAMETER  (ZERO = (0.0D0, 0.0D0))
       INTEGER    N
@@ -39,10 +40,10 @@ C
       complex(psb_dpk_) ACC
       INTEGER    I, J, K
       LOGICAL    LOW, TRA, COTRA, UNI
-      UNI = (DIAG.EQ.'U')
-      TRA = (TRANS.EQ.'T')
-      COTRA = (TRANS.EQ.'C')
-      LOW = (UPLO.EQ.'L')
+      UNI   = (psb_toupper(DIAG).EQ.'U')
+      TRA   = (psb_toupper(TRANS).EQ.'T')
+      COTRA = (psb_toupper(TRANS).EQ.'C')
+      LOW   = (psb_toupper(UPLO).EQ.'L')
       IF ((.NOT.TRA).AND.(.NOT.COTRA)) THEN
         IF (LOW) THEN
           IF (.NOT.UNI) THEN

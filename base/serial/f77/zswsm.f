@@ -155,6 +155,7 @@ C
       SUBROUTINE ZSWSM(TRANS,M,N,ALPHA,UNITD,D,FIDT,DESCRT,T,IT1,IT2,
      &                 INFOT,B,LDB,BETA,C,LDC,WORK,LWORK,IERROR)
       use psb_const_mod
+      use psb_string_mod
 C     .. Scalar Arguments ..
       INTEGER    M, N, LDB, LDC, LWORK, IERROR
       CHARACTER  UNITD, TRANS
@@ -179,7 +180,8 @@ C     .. Executable Statements ..
 C
 C     Check for identity matrix
 C
-      IF(DESCRT(1:1).EQ.'D' .AND. DESCRT(3:3).EQ.'U') THEN
+      IF(psb_toupper(DESCRT(1:1)).EQ.'D' .AND.
+     +  psb_toupper(DESCRT(3:3)).EQ.'U') THEN
          CALL ZCOPY(M,B,ONE,C,ONE)
          GOTO 9999
       ENDIF
@@ -187,7 +189,7 @@ C
 C     Switching on FIDT: proper sparse BLAS routine is selected
 C     according to data structure
 C
-      IF (FIDT(1:3).EQ.'CSR') THEN
+      IF (psb_toupper(FIDT(1:3)).EQ.'CSR') THEN
 C
 C        T, IT1, IT2 --->  AR,   JA,   IA
 C                         VAL, INDX, PNTR
@@ -195,7 +197,8 @@ C        INFOT(*) not used
 C
          CALL  ZCSRSM(TRANS,M,N,UNITD,D,ALPHA,DESCRT,T,IT1,      
      &                IT2,B,LDB,BETA,C,LDC,WORK,LWORK)
-      ELSE IF ((FIDT(1:3).EQ.'JAD').AND.(.FALSE.)) THEN
+      ELSE IF ((psb_toupper(FIDT(1:3)).EQ.'JAD')
+     +     .AND.(.FALSE.)) THEN
 C
 C        .. JAD format not yet supported
 C         

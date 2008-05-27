@@ -32,20 +32,26 @@
 
 module psb_const_mod
   !
-  ! This must be the kind parameter corresponding to MPI_DOUBLE_PRECISION.
+  ! This must be the kind parameter corresponding to MPI_DOUBLE_PRECISION
+  ! and MPI_REAL
   !
   integer, parameter           :: psb_dpk_ = kind(1.d0)
-  integer                      :: psb_sizeof_dp, psb_sizeof_int
+  integer, parameter           :: psb_spk_ = kind(1.e0)
+  integer                      :: psb_sizeof_dp, psb_sizeof_int, psb_sizeof_sp
 
   !
   !     Handy & miscellaneous constants
   !
-  integer, parameter           :: izero=0, ione=1
-  integer, parameter           :: itwo=2, ithree=3,mone=-1, psb_root_=0
-  real(psb_dpk_), parameter    :: dzero=0.d0, done=1.d0
-  complex(psb_dpk_), parameter :: zzero=(0.d0,0.0d0)
-  complex(psb_dpk_), parameter :: zone=(1.d0,0.0d0)
-  real(psb_dpk_), parameter    :: epstol=1.d-32, psb_percent_=0.7
-  character, parameter         :: psb_all_='A',  psb_topdef_=' '
+  integer, parameter             :: izero=0, ione=1
+  integer, parameter             :: itwo=2, ithree=3,mone=-1, psb_root_=0
+  real(psb_spk_), parameter      :: szero=0.e0, sone=1.e0
+  real(psb_dpk_), parameter      :: dzero=0.d0, done=1.d0
+  complex(psb_spk_), parameter   :: czero=(0.e0,0.0e0)
+  complex(psb_spk_), parameter   :: cone=(1.e0,0.0e0)
+  complex(psb_dpk_), parameter   :: zzero=(0.d0,0.0d0)
+  complex(psb_dpk_), parameter   :: zone=(1.d0,0.0d0)
+  real(psb_dpk_), parameter      :: epstol=1.d-32, psb_percent_=0.7
+  real(psb_spk_), parameter      :: s_epstol=1.e-16 ! How to choose this?
+  character, parameter           :: psb_all_='A',  psb_topdef_=' '
 
 end module psb_const_mod

@@ -19,16 +19,16 @@ ppde: ppde.o
 	$(F90LINK) ppde.o  -o ppde $(PSBLAS_LIB) $(LDLIBS)
 	/bin/mv ppde $(EXEDIR)
 
-tpde: tpde.o  
-	$(F90LINK) tpde.o -pg  -o tpde $(PSBLAS_LIB) $(LDLIBS)
-	/bin/mv tpde $(EXEDIR)
+spde: spde.o  
+	$(F90LINK) spde.o  -o spde $(PSBLAS_LIB) $(LDLIBS)
+	/bin/mv spde $(EXEDIR)
 
 .f90.o:
 	$(MPF90) $(F90COPT) $(FINCLUDES) $(FDEFINES) -c $<
 
 
 clean: 
-	/bin/rm -f ppde.o   $(EXEDIR)/ppde 
+	/bin/rm -f ppde.o spde.o  $(EXEDIR)/ppde 
 verycleanlib: 
 	(cd ../..; make veryclean)
 lib:

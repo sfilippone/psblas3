@@ -97,20 +97,20 @@ C
 C
 C        Performing left permutation and update
 C
-         DO 40 J = 1, N
-            DO 30 I = 1, M
-               C(I,J) = B(PERM(I),J) + BETA*C(I,J)
-   30       CONTINUE
-   40    CONTINUE
+        DO 40 J = 1, N
+          DO 30 I = 1, M
+            C(I,J) = B(PERM(I),J) + BETA*C(I,J)
+ 30       CONTINUE
+ 40     CONTINUE
       ELSE IF(BETA.EQ.(0.D0,0.d0)) THEN
 C
 C        Performing right or left permutation
 C
-         DO 160 J = 1, N
-            DO 150 I = 1, M
-               C(I,J) = B(PERM(I),J)
-  150       CONTINUE
-  160    CONTINUE
+        DO 160 J = 1, N
+          DO 150 I = 1, M
+            C(I,J) = B(PERM(I),J)
+ 150      CONTINUE
+ 160    CONTINUE
       ENDIF
       RETURN
       END

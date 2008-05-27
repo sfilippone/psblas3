@@ -276,6 +276,7 @@ contains
     call blacs_gridinfo(ictxt,nprow,npcol,me,mypcol)
 #endif
 
+
     if(error_status > 0) then
       if(verbosity_level > 1) then
 

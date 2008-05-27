@@ -3,7 +3,9 @@ include ../../../Make.inc
 #
 # The object files
 #
-FOBJS = dcoonrmi.o dcoomm.o dcoomv.o dcoosm.o dcoosv.o dcoorws.o\
+FOBJS = scoonrmi.o scoomm.o scoomv.o scoosm.o scoosv.o scoorws.o\
+	dcoonrmi.o dcoomm.o dcoomv.o dcoosm.o dcoosv.o dcoorws.o\
+	ccoonrmi.o ccoomm.o ccoomv.o ccoosm.o ccoosv.o ccoorws.o\
 	zcoomm.o zcoomv.o zcoonrmi.o zcoorws.o zcoosm.o zcoosv.o
 
 

@@ -84,8 +84,8 @@ We offer an experimental configure script: if everything works well,
 it will generate a Make.inc file suitable for building the library. 
 The script is capable of recognizing the needed libraries with their
 default names; if they are in unusual places consider adding the paths
-with --with-lib, or explicitly specifying the names in --with-blas and
-friends.
+with --with-lib, or explicitly specifying the names in --with-blas,
+--with-blacs etc. 
 Please note that a common way for the configure script to fail is to
 specify inconsistent MPI vs. plain compilers, either directly or
 indirectly via environment variables; e.g. specifying the Intel
@@ -99,6 +99,16 @@ This will delegate to the modules setup to make sure that the version
 of mpich in use is the one compiled with the gnu42 compilers. 
 After the configure script has completed you can always tweak the
 Make.inc  file yourself. 
+
+An annoying problem exists with some versions of MPICH: the configure
+script will set -DMPI_MOD, which is to say, the MPI call interfaces
+will be resolved by using the MPI Fortran module. However usage of the
+module may cause compilation to fail if coupled with the debugging
+option -ggdb, because the compiler complains that it cannot find any
+matching interface. 
+The solution: either take out the -ggdb option, or, if you really need
+to debug, force -DMPI_H in place of -DMPI_MOD.
+
 
 As a backup alternative, you can always choose a Make.inc.XXX file in
 directory Make that fits your compilers, modify the paths to libraries

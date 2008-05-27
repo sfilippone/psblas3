@@ -70,7 +70,7 @@ subroutine  psb_zaxpby(alpha, x, beta,y,desc_a,info, n, jx, jy)
        & err_act, iix, jjx, ix, iy, ijx, ijy, m, iiy, in, jjy
   character(len=20)        :: name, ch_err
 
-  name='psb_dgeaxpby'
+  name='psb_geaxpby'
   if(psb_get_errstatus() /= 0) return 
   info=0
   call psb_erractionsave(err_act)
@@ -224,7 +224,7 @@ subroutine  psb_zaxpbyv(alpha, x, beta,y,desc_a,info)
   character(len=20)        :: name, ch_err
   logical, parameter :: debug=.false.
 
-  name='psb_dgeaxpby'
+  name='psb_geaxpby'
   if(psb_get_errstatus() /= 0) return 
   info=0
   call psb_erractionsave(err_act)

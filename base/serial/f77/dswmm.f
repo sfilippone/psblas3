@@ -142,6 +142,7 @@ C
       SUBROUTINE DSWMM(TRANS,M,N,K,ALPHA,FIDA,DESCRA,A,IA1,IA2,         &
      &                 INFOA,B,LDB,BETA,C,LDC,WORK,LWORK,IERROR)
       use psb_const_mod
+      use psb_string_mod
 C     .. Scalar Arguments ..
       INTEGER       M,N,K,LDB,LDC,LWORK,IERROR
       CHARACTER     TRANS
@@ -165,7 +166,7 @@ C
 C     Switching on FIDA: proper sparse BLAS routine is selected
 C     according to data structure
 C
-      IF (FIDA(1:3).EQ.'CSR') THEN
+      IF (psb_toupper(FIDA(1:3)).EQ.'CSR') THEN
 C
 C        A, IA1, IA2 --->  AR,   JA,   IA
 C                         VAL, INDX, PNTR
@@ -174,14 +175,14 @@ C        INFOA(*) not used
          CALL  DCSRMM(TRANS,M,N,K,ALPHA,DESCRA,A,IA1,
      +    IA2,B,LDB,BETA,C,LDC,WORK,LWORK,IERROR)
          
-      ELSE IF (FIDA(1:3).EQ.'JAD') THEN                                  
+      ELSE IF (psb_toupper(FIDA(1:3)).EQ.'JAD') THEN                                  
 C                                                                        
 C        INFOA(*) not used                                               
 C                                                                        
          CALL  DJADMM(TRANS,M,N,K,ALPHA,DESCRA,A,IA1,
      +    IA2,B,LDB,BETA,C,LDC,WORK,IERROR)
          
-      ELSE IF (FIDA(1:3).EQ.'COO') THEN                                  
+      ELSE IF (psb_toupper(FIDA(1:3)).EQ.'COO') THEN                                  
 C                                                                        
 C                                                                        
          CALL  DCOOMM(TRANS,M,N,K,ALPHA,DESCRA,A,IA1,

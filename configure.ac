@@ -546,6 +546,9 @@ AR="${AR} -cur"
 
 AC_LANG([C])
 ACX_BLAS([], [AC_MSG_ERROR([[Cannot find BLAS library, specify a path using --with-blas=DIR/LIB (for example --with-blas=/usr/path/lib/libcxml.a)]])])
+ACX_LAPACK(
+[FDEFINES="$psblas_cv_define_prepend-DHAVE_LAPACK $FDEFINES"],
+)
 
 
 ###############################################################################
@@ -644,13 +647,14 @@ AC_SUBST(INSTALL_INCLUDEDIR)
 AC_SUBST(BLAS_LIBS)
 AC_SUBST(BLACS_LIBS)
 AC_SUBST(METIS_LIBS)
+AC_SUBST(LAPACK_LIBS)
 
 AC_SUBST(CINCLUDES)
 AC_SUBST(FINCLUDES)
 
 if test "X$psblas_make_gnumake" == "Xyes" ; then
 PSBLASRULES='
-PSBLDLIBS=$(BLACS) $(BLAS) $(METIS_LIB) $(LIBS)
+PSBLDLIBS=$(BLACS) $(LAPACK) $(BLAS) $(METIS_LIB) $(LIBS)
 CDEFINES=$(PSBCDEFINES)
 FDEFINES=$(PSBFDEFINES)
 # Warning : these rules are only valid with GNU make!
@@ -679,7 +683,7 @@ $(.mod).o:
 else
 
 PSBLASRULES='
-PSBLDLIBS=$(BLACS) $(BLAS) $(METIS_LIB) $(LIBS)
+PSBLDLIBS=$(BLACS) $(LAPACK) $(BLAS) $(METIS_LIB) $(LIBS)
 CDEFINES=$(PSBCDEFINES)
 FDEFINES=$(PSBFDEFINES)
 	

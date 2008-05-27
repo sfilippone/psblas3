@@ -234,13 +234,14 @@ program zf_sample
     write(*,'("Matrix: ",a)')mtrx_file
     write(*,'("Computed solution on ",i8," processors")')np
     write(*,'("Iterations to convergence: ",i6)')iter
-    write(*,'("Error estimate on exit: ",f7.2)')err
-    write(*,'("Time to buil prec.   : ",es10.4)')tprec
-    write(*,'("Time to solve matrix : ",es10.4)')t2
-    write(*,'("Time per iteration   : ",es10.4)')t2/(iter)
-    write(*,'("Total time           : ",es10.4)')t2+tprec
-    write(*,'("Residual norm 2   = ",es10.4)')resmx
-    write(*,'("Residual norm inf = ",es10.4)')resmxp
+    write(*,'("Error estimate on exit   : ",es10.4)') err
+    write(*,'("Time to buil prec.       : ",es10.4)')tprec
+    write(*,'("Time to solve matrix     : ",es10.4)')t2
+    write(*,'("Time per iteration       : ",es10.4)')t2/(iter)
+    write(*,'("Total time               : ",es10.4)')t2+tprec
+    write(*,'("Residual norm 2          : ",es10.4)')resmx
+    write(*,'("Residual norm inf        : ",es10.4)')resmxp
+!!$    write(*,*)"Condition number         : ",cond
     write(*,'("Total memory occupation for A:      ",i10)')amatsize
     write(*,'("Total memory occupation for DESC_A: ",i10)')descsize
     write(*,'("Total memory occupation for PREC:   ",i10)')precsize

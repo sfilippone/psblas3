@@ -44,6 +44,7 @@ end module mpi
 module psb_penv_mod
   
   use psb_const_mod
+  use psb_blacs_mod 
 
   interface psb_init
     module procedure  psb_init
@@ -73,12 +74,16 @@ module psb_penv_mod
     module procedure psb_ibcasts, psb_ibcastv, psb_ibcastm,&
          & psb_dbcasts, psb_dbcastv, psb_dbcastm,&
          & psb_zbcasts, psb_zbcastv, psb_zbcastm,&
+         & psb_sbcasts, psb_sbcastv, psb_sbcastm,&
+         & psb_cbcasts, psb_cbcastv, psb_cbcastm,&
          & psb_hbcasts, psb_hbcastv, psb_lbcasts, psb_lbcastv
   end interface
 
 
   interface psb_snd
     module procedure psb_isnds, psb_isndv, psb_isndm,&
+         & psb_ssnds, psb_ssndv, psb_ssndm,&
+         & psb_csnds, psb_csndv, psb_csndm,&
          & psb_dsnds, psb_dsndv, psb_dsndm,&
          & psb_zsnds, psb_zsndv, psb_zsndm,&
          & psb_hsnds, psb_lsnds
@@ -86,6 +91,8 @@ module psb_penv_mod
 
   interface psb_rcv
     module procedure psb_ircvs, psb_ircvv, psb_ircvm,&
+         & psb_srcvs, psb_srcvv, psb_srcvm,&
+         & psb_crcvs, psb_crcvv, psb_crcvm,&
          & psb_drcvs, psb_drcvv, psb_drcvm,&
          & psb_zrcvs, psb_zrcvv, psb_zrcvm,&
          & psb_hrcvs, psb_lrcvs
@@ -93,79 +100,42 @@ module psb_penv_mod
 
   interface psb_max
     module procedure psb_imaxs, psb_imaxv, psb_imaxm,&
+         & psb_smaxs, psb_smaxv, psb_smaxm,&
          & psb_dmaxs, psb_dmaxv, psb_dmaxm
   end interface
 
 
   interface psb_min
     module procedure psb_imins, psb_iminv, psb_iminm,&
+         & psb_smins, psb_sminv, psb_sminm,&
          & psb_dmins, psb_dminv, psb_dminm
   end interface
 
 
   interface psb_amx
     module procedure psb_iamxs, psb_iamxv, psb_iamxm,&
+         & psb_samxs, psb_samxv, psb_samxm,&
+         & psb_camxs, psb_camxv, psb_camxm,&
          & psb_damxs, psb_damxv, psb_damxm,&
          & psb_zamxs, psb_zamxv, psb_zamxm
   end interface
 
   interface psb_amn
     module procedure psb_iamns, psb_iamnv, psb_iamnm,&
+         & psb_samns, psb_samnv, psb_samnm,&
+         & psb_camns, psb_camnv, psb_camnm,&
          & psb_damns, psb_damnv, psb_damnm,&
          & psb_zamns, psb_zamnv, psb_zamnm
   end interface
 
   interface psb_sum
     module procedure psb_isums, psb_isumv, psb_isumm,&
+         & psb_ssums, psb_ssumv, psb_ssumm,&
+         & psb_csums, psb_csumv, psb_csumm,&
          & psb_dsums, psb_dsumv, psb_dsumm,&
          & psb_zsums, psb_zsumv, psb_zsumm
   end interface
 
-#if !defined(SERIAL_MPI)
-  
-  interface gebs2d
-    module procedure igebs2ds, igebs2dv, igebs2dm,&
-         &           dgebs2ds, dgebs2dv, dgebs2dm,&
-         &           zgebs2ds, zgebs2dv, zgebs2dm
-  end interface
-
-  interface gebr2d
-    module procedure igebr2ds, igebr2dv, igebr2dm,&
-         &           dgebr2ds, dgebr2dv, dgebr2dm,&
-         &           zgebr2ds, zgebr2dv, zgebr2dm    
-  end interface
-
-  interface gesd2d
-    module procedure igesd2ds, igesd2dv, igesd2dm,&
-         &           dgesd2ds, dgesd2dv, dgesd2dm,&
-         &           zgesd2ds, zgesd2dv, zgesd2dm
-  end interface
-
-  interface gerv2d
-    module procedure igerv2ds, igerv2dv, igerv2dm,&
-         &           dgerv2ds, dgerv2dv, dgerv2dm,&
-         &           zgerv2ds, zgerv2dv, zgerv2dm
-  end interface
-
-  interface gsum2d
-    module procedure igsum2ds, igsum2dv, igsum2dm,&
-         &           dgsum2ds, dgsum2dv, dgsum2dm,&
-         &           zgsum2ds, zgsum2dv, zgsum2dm
-  end interface
-
-  interface gamx2d
-    module procedure igamx2ds, igamx2dv, igamx2dm,&
-         &           dgamx2ds, dgamx2dv, dgamx2dm,&
-         &           zgamx2ds, zgamx2dv, zgamx2dm
-  end interface
-
-
-  interface gamn2d
-    module procedure igamn2ds, igamn2dv, igamn2dm,&
-         &           dgamn2ds, dgamn2dv, dgamn2dm,&
-         &           zgamn2ds, zgamn2dv, zgamn2dm
-  end interface
-#endif    
 
 #if defined(SERIAL_MPI)
   integer, private, save :: nctxt=0
@@ -189,10 +159,12 @@ contains
 
   subroutine psi_get_sizes()
     use psb_const_mod
-    real(psb_dpk_) :: v(2) 
+    real(psb_dpk_) :: dv(2) 
+    real(psb_spk_) :: sv(2) 
     integer        :: iv(2)
     
-    call psi_c_diffadd(v(1),v(2),psb_sizeof_dp)
+    call psi_c_diffadd(sv(1),sv(2),psb_sizeof_sp)
+    call psi_c_diffadd(dv(1),dv(2),psb_sizeof_dp)
     call psi_c_diffadd(iv(1),iv(2),psb_sizeof_int)
     
   end subroutine psi_get_sizes
@@ -378,6 +350,81 @@ contains
   end subroutine psb_ibcastm
 
 
+  subroutine psb_sbcasts(ictxt,dat,root)
+    integer, intent(in)      :: ictxt
+    real(psb_spk_), intent(inout)   :: dat
+    integer, intent(in), optional :: root
+
+    integer  :: iam, np, root_
+
+#if !defined(SERIAL_MPI)
+    if (present(root)) then
+      root_ = root
+    else
+      root_ = psb_root_
+    endif
+
+    call psb_info(ictxt,iam,np)
+    
+    if (iam==root_) then 
+      call gebs2d(ictxt,'A',dat)
+    else
+      call gebr2d(ictxt,'A',dat,rrt=root_)
+    endif
+#endif    
+  end subroutine psb_sbcasts
+
+
+  subroutine psb_sbcastv(ictxt,dat,root)
+    integer, intent(in)    :: ictxt
+    real(psb_spk_), intent(inout) :: dat(:)
+    integer, intent(in), optional :: root
+
+    integer  :: iam, np, root_
+
+#if !defined(SERIAL_MPI)
+    if (present(root)) then
+      root_ = root
+    else
+      root_ = psb_root_
+    endif
+
+    call psb_info(ictxt,iam,np)
+    
+    if (iam==root_) then 
+      call gebs2d(ictxt,'A',dat)
+    else
+      call gebr2d(ictxt,'A',dat,rrt=root_)
+    endif
+#endif    
+  end subroutine psb_sbcastv
+    
+  subroutine psb_sbcastm(ictxt,dat,root)
+    integer, intent(in)    :: ictxt
+    real(psb_spk_), intent(inout) :: dat(:,:)
+    integer, intent(in), optional :: root
+
+    integer  :: iam, np, root_
+
+#if !defined(SERIAL_MPI)
+    if (present(root)) then
+      root_ = root
+    else
+      root_ = psb_root_
+    endif
+
+    call psb_info(ictxt,iam,np)
+    
+    if (iam==root_) then 
+      call gebs2d(ictxt,'A',dat)
+    else
+      call gebr2d(ictxt,'A',dat,rrt=root_)
+    endif
+#endif    
+  end subroutine psb_sbcastm
+    
+
+
   subroutine psb_dbcasts(ictxt,dat,root)
     integer, intent(in)      :: ictxt
     real(psb_dpk_), intent(inout)   :: dat
@@ -451,6 +498,78 @@ contains
 #endif    
   end subroutine psb_dbcastm
     
+
+  subroutine psb_cbcasts(ictxt,dat,root)
+    integer, intent(in)      :: ictxt
+    complex(psb_spk_), intent(inout)   :: dat
+    integer, intent(in), optional :: root
+
+    integer  :: iam, np, root_
+
+#if !defined(SERIAL_MPI)
+    if (present(root)) then
+      root_ = root
+    else
+      root_ = psb_root_
+    endif
+
+    call psb_info(ictxt,iam,np)
+    
+    if (iam==root_) then 
+      call gebs2d(ictxt,'A',dat)
+    else
+      call gebr2d(ictxt,'A',dat,rrt=root_)
+    endif
+#endif    
+  end subroutine psb_cbcasts
+
+  subroutine psb_cbcastv(ictxt,dat,root)
+    integer, intent(in)    :: ictxt
+    complex(psb_spk_), intent(inout) :: dat(:)
+    integer, intent(in), optional :: root
+
+    integer  :: iam, np, root_
+
+#if !defined(SERIAL_MPI)
+    if (present(root)) then
+      root_ = root
+    else
+      root_ = psb_root_
+    endif
+
+    call psb_info(ictxt,iam,np)
+    
+    if (iam==root_) then 
+      call gebs2d(ictxt,'A',dat)
+    else
+      call gebr2d(ictxt,'A',dat,rrt=root_)
+    endif
+#endif    
+  end subroutine psb_cbcastv
+    
+  subroutine psb_cbcastm(ictxt,dat,root)
+    integer, intent(in)    :: ictxt
+    complex(psb_spk_), intent(inout) :: dat(:,:)
+    integer, intent(in), optional :: root
+
+    integer  :: iam, np, root_
+
+#if !defined(SERIAL_MPI)
+    if (present(root)) then
+      root_ = root
+    else
+      root_ = psb_root_
+    endif
+
+    call psb_info(ictxt,iam,np)
+    
+    if (iam==root_) then 
+      call gebs2d(ictxt,'A',dat)
+    else
+      call gebr2d(ictxt,'A',dat,rrt=root_)
+    endif
+#endif    
+  end subroutine psb_cbcastm
 
   subroutine psb_zbcasts(ictxt,dat,root)
     integer, intent(in)      :: ictxt
@@ -677,6 +796,7 @@ contains
     endif
 #endif    
   end subroutine psb_imaxs
+
   subroutine psb_imaxv(ictxt,dat,root)
     use psb_realloc_mod
 #ifdef MPI_MOD
@@ -717,6 +837,7 @@ contains
     endif
 #endif    
   end subroutine psb_imaxv
+
   subroutine psb_imaxm(ictxt,dat,root)
     use psb_realloc_mod
 #ifdef MPI_MOD
@@ -757,6 +878,124 @@ contains
     endif
 #endif    
   end subroutine psb_imaxm
+  
+  subroutine psb_smaxs(ictxt,dat,root)
+#ifdef MPI_MOD
+    use mpi
+#endif
+#ifdef MPI_H
+    include 'mpif.h'
+#endif
+    integer, intent(in)              :: ictxt
+    real(psb_spk_), intent(inout)  :: dat
+    integer, intent(in), optional    :: root
+    integer :: root_
+    real(psb_spk_) :: dat_
+    integer :: iam, np, icomm,info
+    
+
+#if !defined(SERIAL_MPI)
+    call psb_info(ictxt,iam,np)
+    call psb_get_mpicomm(ictxt,icomm)
+
+    if (present(root)) then 
+      root_ = root
+    else
+      root_ = -1
+    endif
+    if (root_ == -1) then 
+      call mpi_allreduce(dat,dat_,1,mpi_real,mpi_max,icomm,info)
+      dat = dat_
+    else
+      call mpi_reduce(dat,dat_,1,mpi_real,mpi_max,root_,icomm,info)
+      dat = dat_
+    endif
+#endif    
+  end subroutine psb_smaxs
+
+  subroutine psb_smaxv(ictxt,dat,root)
+    use psb_realloc_mod
+#ifdef MPI_MOD
+    use mpi
+#endif
+#ifdef MPI_H
+    include 'mpif.h'
+#endif
+    integer, intent(in)              :: ictxt
+    real(psb_spk_), intent(inout)  :: dat(:)
+    integer, intent(in), optional    :: root
+    integer :: root_
+    real(psb_spk_), allocatable :: dat_(:)
+    integer :: iam, np, icomm, info
+    
+
+#if !defined(SERIAL_MPI)
+    call psb_info(ictxt,iam,np)
+    call psb_get_mpicomm(ictxt,icomm)
+
+    if (present(root)) then 
+      root_ = root
+    else
+      root_ = -1
+    endif
+    if (root_ == -1) then 
+      call psb_realloc(size(dat),dat_,info)
+      dat_ = dat
+      if (info ==0) &
+           & call mpi_allreduce(dat_,dat,size(dat),mpi_real,mpi_max,icomm,info)
+    else
+      if (iam==root_) then 
+        call psb_realloc(size(dat),dat_,info)
+        dat_ = dat
+        call mpi_reduce(dat_,dat,size(dat),mpi_real,mpi_max,root_,icomm,info)
+      else
+        call mpi_reduce(dat,dat_,size(dat),mpi_real,mpi_max,root_,icomm,info)
+      end if
+    endif
+#endif    
+  end subroutine psb_smaxv
+
+  subroutine psb_smaxm(ictxt,dat,root)
+    use psb_realloc_mod
+#ifdef MPI_MOD
+    use mpi
+#endif
+#ifdef MPI_H
+    include 'mpif.h'
+#endif
+    integer, intent(in)              :: ictxt
+    real(psb_spk_), intent(inout)  :: dat(:,:)
+    integer, intent(in), optional    :: root
+    integer :: root_
+    real(psb_spk_), allocatable :: dat_(:,:)
+    integer :: iam, np, icomm, info
+    
+#if !defined(SERIAL_MPI)
+
+    call psb_info(ictxt,iam,np)
+    call psb_get_mpicomm(ictxt,icomm)
+
+    if (present(root)) then 
+      root_ = root
+    else
+      root_ = -1
+    endif
+    if (root_ == -1) then 
+      call psb_realloc(size(dat,1),size(dat,2),dat_,info)
+      dat_ = dat
+      if (info ==0)&
+           & call mpi_allreduce(dat_,dat,size(dat),mpi_real,mpi_max,icomm,info)
+    else
+      if (iam==root_) then 
+        call psb_realloc(size(dat,1),size(dat,2),dat_,info)
+        dat_ = dat
+        call mpi_reduce(dat_,dat,size(dat),mpi_real,mpi_max,root_,icomm,info)
+      else
+        call mpi_reduce(dat,dat_,size(dat),mpi_real,mpi_max,root_,icomm,info)
+      end if
+    endif
+#endif    
+  end subroutine psb_smaxm
   
   subroutine psb_dmaxs(ictxt,dat,root)
 #ifdef MPI_MOD
@@ -832,6 +1071,7 @@ contains
     endif
 #endif    
   end subroutine psb_dmaxv
+
   subroutine psb_dmaxm(ictxt,dat,root)
     use psb_realloc_mod
 #ifdef MPI_MOD
@@ -947,6 +1187,7 @@ contains
     endif
 #endif    
   end subroutine psb_iminv
+
   subroutine psb_iminm(ictxt,dat,root)
     use psb_realloc_mod
 #ifdef MPI_MOD
@@ -988,6 +1229,125 @@ contains
 #endif    
   end subroutine psb_iminm
   
+  subroutine psb_smins(ictxt,dat,root)
+#ifdef MPI_MOD
+    use mpi
+#endif
+#ifdef MPI_H
+    include 'mpif.h'
+#endif
+    integer, intent(in)              :: ictxt
+    real(psb_spk_), intent(inout)  :: dat
+    integer, intent(in), optional    :: root
+    integer :: root_
+    real(psb_spk_) :: dat_
+    integer :: iam, np, icomm,info
+    
+
+#if !defined(SERIAL_MPI)
+    call psb_info(ictxt,iam,np)
+    call psb_get_mpicomm(ictxt,icomm)
+
+    if (present(root)) then 
+      root_ = root
+    else
+      root_ = -1
+    endif
+    if (root_ == -1) then 
+      call mpi_allreduce(dat,dat_,1,mpi_real,mpi_min,icomm,info)
+      dat = dat_
+    else
+      call mpi_reduce(dat,dat_,1,mpi_real,mpi_min,root_,icomm,info)
+      dat = dat_
+    endif
+#endif    
+  end subroutine psb_smins
+
+  subroutine psb_sminv(ictxt,dat,root)
+    use psb_realloc_mod
+#ifdef MPI_MOD
+    use mpi
+#endif
+#ifdef MPI_H
+    include 'mpif.h'
+#endif
+    integer, intent(in)              :: ictxt
+    real(psb_spk_), intent(inout)  :: dat(:)
+    integer, intent(in), optional    :: root
+    integer :: root_
+    real(psb_spk_), allocatable :: dat_(:)
+    integer :: iam, np, icomm, info
+    
+
+#if !defined(SERIAL_MPI)
+    call psb_info(ictxt,iam,np)
+    call psb_get_mpicomm(ictxt,icomm)
+
+    if (present(root)) then 
+      root_ = root
+    else
+      root_ = -1
+    endif
+    if (root_ == -1) then 
+      call psb_realloc(size(dat),dat_,info)
+      dat_ = dat
+      if (info ==0) &
+           & call mpi_allreduce(dat_,dat,size(dat),mpi_real,mpi_min,icomm,info)
+    else
+      if (iam==root_) then 
+        call psb_realloc(size(dat),dat_,info)
+        dat_ = dat
+        call mpi_reduce(dat_,dat,size(dat),mpi_real,mpi_min,root_,icomm,info)
+      else
+        call mpi_reduce(dat,dat_,size(dat),mpi_real,mpi_min,root_,icomm,info)
+      end if
+    endif
+#endif    
+  end subroutine psb_sminv
+
+  subroutine psb_sminm(ictxt,dat,root)
+    use psb_realloc_mod
+#ifdef MPI_MOD
+    use mpi
+#endif
+#ifdef MPI_H
+    include 'mpif.h'
+#endif
+    integer, intent(in)              :: ictxt
+    real(psb_spk_), intent(inout)  :: dat(:,:)
+    integer, intent(in), optional    :: root
+    integer :: root_
+    real(psb_spk_), allocatable :: dat_(:,:)
+    integer :: iam, np, icomm, info
+    
+#if !defined(SERIAL_MPI)
+
+    call psb_info(ictxt,iam,np)
+    call psb_get_mpicomm(ictxt,icomm)
+
+    if (present(root)) then 
+      root_ = root
+    else
+      root_ = -1
+    endif
+    if (root_ == -1) then 
+      call psb_realloc(size(dat,1),size(dat,2),dat_,info)
+      dat_ = dat
+      if (info ==0) &
+           & call mpi_allreduce(dat_,dat,size(dat),mpi_real,mpi_min,icomm,info)
+    else
+      if (iam==root_) then 
+        call psb_realloc(size(dat,1),size(dat,2),dat_,info)
+        dat_ = dat
+        call mpi_reduce(dat_,dat,size(dat),mpi_real,mpi_min,root_,icomm,info)
+      else
+        call mpi_reduce(dat,dat_,size(dat),mpi_real,mpi_min,root_,icomm,info)
+      end if
+    endif
+#endif    
+
+  end subroutine psb_sminm
+  
   subroutine psb_dmins(ictxt,dat,root)
 #ifdef MPI_MOD
     use mpi
@@ -1021,6 +1381,7 @@ contains
     endif
 #endif    
   end subroutine psb_dmins
+
   subroutine psb_dminv(ictxt,dat,root)
     use psb_realloc_mod
 #ifdef MPI_MOD
@@ -1062,6 +1423,7 @@ contains
     endif
 #endif    
   end subroutine psb_dminv
+
   subroutine psb_dminm(ictxt,dat,root)
     use psb_realloc_mod
 #ifdef MPI_MOD
@@ -1190,6 +1552,90 @@ contains
 #endif    
   end subroutine psb_iamxm
 
+  subroutine psb_samxs(ictxt,dat,root,ia)
+    integer, intent(in)              :: ictxt
+    real(psb_spk_), intent(inout)  :: dat
+    integer, intent(in), optional    :: root
+    integer, intent(inout), optional :: ia
+    
+    integer   :: root_
+    
+    
+#if defined(SERIAL_MPI) 
+    if (present(ia)) then 
+      ia = 0
+    end if
+#else
+    if (present(root)) then 
+      root_ = root
+    else
+      root_ = -1
+    endif
+    if (present(ia)) then 
+      call gamx2d(ictxt,'A',dat,ria=ia,rrt=root_) 
+    else
+      call gamx2d(ictxt,'A',dat,rrt=root_) 
+    endif
+#endif    
+  end subroutine psb_samxs
+
+  subroutine psb_samxv(ictxt,dat,root,ia)
+    integer, intent(in)              :: ictxt
+    real(psb_spk_), intent(inout)  :: dat(:)
+    integer, intent(in), optional    :: root
+    integer, intent(inout), optional :: ia(:)
+    
+    integer   :: root_
+    integer, allocatable :: cia(:)
+    
+    
+#if defined(SERIAL_MPI) 
+    if (present(ia)) then 
+      ia = 0
+    end if
+#else
+    if (present(root)) then 
+      root_ = root
+    else
+      root_ = -1
+    endif
+    if (present(ia)) then 
+      allocate(cia(size(ia)))
+      call gamx2d(ictxt,'A',dat,ria=ia,cia=cia,rrt=root_) 
+    else
+      call gamx2d(ictxt,'A',dat,rrt=root_) 
+    endif
+#endif    
+  end subroutine psb_samxv
+
+  subroutine psb_samxm(ictxt,dat,root,ia)
+    integer, intent(in)              :: ictxt
+    real(psb_spk_), intent(inout)  :: dat(:,:)
+    integer, intent(in), optional    :: root
+    integer, intent(inout), optional :: ia(:,:)
+    
+    integer   :: root_
+    integer, allocatable :: cia(:,:)
+    
+    
+#if defined(SERIAL_MPI) 
+    if (present(ia)) then 
+      ia = 0
+    end if
+#else
+    if (present(root)) then 
+      root_ = root
+    else
+      root_ = -1
+    endif
+    if (present(ia)) then 
+      allocate(cia(size(ia,1),size(ia,2)))
+      call gamx2d(ictxt,'A',dat,ria=ia,cia=cia,rrt=root_) 
+    else
+      call gamx2d(ictxt,'A',dat,rrt=root_) 
+    endif
+#endif    
+  end subroutine psb_samxm
 
   subroutine psb_damxs(ictxt,dat,root,ia)
     integer, intent(in)              :: ictxt
@@ -1277,6 +1723,91 @@ contains
   end subroutine psb_damxm
 
 
+  subroutine psb_camxs(ictxt,dat,root,ia)
+    integer, intent(in)              :: ictxt
+    complex(psb_spk_), intent(inout)  :: dat
+    integer, intent(in), optional    :: root
+    integer, intent(inout), optional :: ia
+    
+    integer   :: root_
+    
+    
+#if defined(SERIAL_MPI) 
+    if (present(ia)) then 
+      ia = 0
+    end if
+#else
+    if (present(root)) then 
+      root_ = root
+    else
+      root_ = -1
+    endif
+    if (present(ia)) then 
+      call gamx2d(ictxt,'A',dat,ria=ia,rrt=root_) 
+    else
+      call gamx2d(ictxt,'A',dat,rrt=root_) 
+    endif
+#endif    
+  end subroutine psb_camxs
+
+  subroutine psb_camxv(ictxt,dat,root,ia)
+    integer, intent(in)              :: ictxt
+    complex(psb_spk_), intent(inout)  :: dat(:)
+    integer, intent(in), optional    :: root
+    integer, intent(inout), optional :: ia(:)
+    
+    integer   :: root_
+    integer, allocatable :: cia(:)
+    
+    
+#if defined(SERIAL_MPI) 
+    if (present(ia)) then 
+      ia = 0
+    end if
+#else
+    if (present(root)) then 
+      root_ = root
+    else
+      root_ = -1
+    endif
+    if (present(ia)) then 
+      allocate(cia(size(ia)))
+      call gamx2d(ictxt,'A',dat,ria=ia,cia=cia,rrt=root_) 
+    else
+      call gamx2d(ictxt,'A',dat,rrt=root_) 
+    endif
+#endif    
+  end subroutine psb_camxv
+
+  subroutine psb_camxm(ictxt,dat,root,ia)
+    integer, intent(in)              :: ictxt
+    complex(psb_spk_), intent(inout)  :: dat(:,:)
+    integer, intent(in), optional    :: root
+    integer, intent(inout), optional :: ia(:,:)
+    
+    integer   :: root_
+    integer, allocatable :: cia(:,:)
+    
+    
+#if defined(SERIAL_MPI) 
+    if (present(ia)) then 
+      ia = 0
+    end if
+#else
+    if (present(root)) then 
+      root_ = root
+    else
+      root_ = -1
+    endif
+    if (present(ia)) then 
+      allocate(cia(size(ia,1),size(ia,2))) 
+      call gamx2d(ictxt,'A',dat,ria=ia,cia=cia,rrt=root_) 
+    else
+      call gamx2d(ictxt,'A',dat,rrt=root_) 
+    endif
+#endif    
+  end subroutine psb_camxm
+
   subroutine psb_zamxs(ictxt,dat,root,ia)
     integer, intent(in)              :: ictxt
     complex(psb_dpk_), intent(inout)  :: dat
@@ -1361,7 +1892,6 @@ contains
     endif
 #endif    
   end subroutine psb_zamxm
-
 
 
   subroutine psb_iamns(ictxt,dat,root,ia)
@@ -1450,6 +1980,91 @@ contains
   end subroutine psb_iamnm
 
 
+  subroutine psb_samns(ictxt,dat,root,ia)
+    integer, intent(in)              :: ictxt
+    real(psb_spk_), intent(inout)  :: dat
+    integer, intent(in), optional    :: root
+    integer, intent(inout), optional :: ia
+    
+    integer   :: root_
+    
+    
+#if defined(SERIAL_MPI) 
+    if (present(ia)) then 
+      ia = 0
+    end if
+#else
+    if (present(root)) then 
+      root_ = root
+    else
+      root_ = -1
+    endif
+    if (present(ia)) then 
+      call gamn2d(ictxt,'A',dat,ria=ia,rrt=root_) 
+    else
+      call gamn2d(ictxt,'A',dat,rrt=root_) 
+    endif
+#endif    
+  end subroutine psb_samns
+
+  subroutine psb_samnv(ictxt,dat,root,ia)
+    integer, intent(in)              :: ictxt
+    real(psb_spk_), intent(inout)  :: dat(:)
+    integer, intent(in), optional    :: root
+    integer, intent(inout), optional :: ia(:)
+    
+    integer   :: root_
+    integer, allocatable :: cia(:)
+    
+    
+#if defined(SERIAL_MPI) 
+    if (present(ia)) then 
+      ia = 0
+    end if
+#else
+    if (present(root)) then 
+      root_ = root
+    else
+      root_ = -1
+    endif
+    if (present(ia)) then 
+      allocate(cia(size(ia)))
+      call gamn2d(ictxt,'A',dat,ria=ia,cia=cia,rrt=root_) 
+    else
+      call gamn2d(ictxt,'A',dat,rrt=root_) 
+    endif
+#endif    
+  end subroutine psb_samnv
+
+  subroutine psb_samnm(ictxt,dat,root,ia)
+    integer, intent(in)              :: ictxt
+    real(psb_spk_), intent(inout)  :: dat(:,:)
+    integer, intent(in), optional    :: root
+    integer, intent(inout), optional :: ia(:,:)
+    
+    integer   :: root_
+    integer, allocatable :: cia(:,:)
+    
+    
+#if defined(SERIAL_MPI) 
+    if (present(ia)) then 
+      ia = 0
+    end if
+#else
+    if (present(root)) then 
+      root_ = root
+    else
+      root_ = -1
+    endif
+    if (present(ia)) then 
+      allocate(cia(size(ia,1),size(ia,2)))
+      call gamn2d(ictxt,'A',dat,ria=ia,cia=cia,rrt=root_) 
+    else
+      call gamn2d(ictxt,'A',dat,rrt=root_) 
+    endif
+#endif    
+  end subroutine psb_samnm
+
   subroutine psb_damns(ictxt,dat,root,ia)
     integer, intent(in)              :: ictxt
     real(psb_dpk_), intent(inout)  :: dat
@@ -1535,6 +2150,91 @@ contains
 #endif    
   end subroutine psb_damnm
 
+
+  subroutine psb_camns(ictxt,dat,root,ia)
+    integer, intent(in)              :: ictxt
+    complex(psb_spk_), intent(inout)  :: dat
+    integer, intent(in), optional    :: root
+    integer, intent(inout), optional :: ia
+    
+    integer   :: root_
+    
+    
+#if defined(SERIAL_MPI) 
+    if (present(ia)) then 
+      ia = 0
+    end if
+#else
+    if (present(root)) then 
+      root_ = root
+    else
+      root_ = -1
+    endif
+    if (present(ia)) then 
+      call gamn2d(ictxt,'A',dat,ria=ia,rrt=root_) 
+    else
+      call gamn2d(ictxt,'A',dat,rrt=root_) 
+    endif
+#endif    
+  end subroutine psb_camns
+
+  subroutine psb_camnv(ictxt,dat,root,ia)
+    integer, intent(in)              :: ictxt
+    complex(psb_spk_), intent(inout)  :: dat(:)
+    integer, intent(in), optional    :: root
+    integer, intent(inout), optional :: ia(:)
+    
+    integer   :: root_
+    integer, allocatable :: cia(:)
+    
+    
+#if defined(SERIAL_MPI) 
+    if (present(ia)) then 
+      ia = 0
+    end if
+#else
+    if (present(root)) then 
+      root_ = root
+    else
+      root_ = -1
+    endif
+    if (present(ia)) then 
+      allocate(cia(size(ia)))
+      call gamn2d(ictxt,'A',dat,ria=ia,cia=cia,rrt=root_) 
+    else
+      call gamn2d(ictxt,'A',dat,rrt=root_) 
+    endif
+#endif    
+  end subroutine psb_camnv
+  
+  subroutine psb_camnm(ictxt,dat,root,ia)
+    integer, intent(in)              :: ictxt
+    complex(psb_spk_), intent(inout)  :: dat(:,:)
+    integer, intent(in), optional    :: root
+    integer, intent(inout), optional :: ia(:,:)
+    
+    integer   :: root_
+    integer, allocatable :: cia(:,:)
+    
+    
+#if defined(SERIAL_MPI) 
+    if (present(ia)) then 
+      ia = 0
+    end if
+#else
+    if (present(root)) then 
+      root_ = root
+    else
+      root_ = -1
+    endif
+    if (present(ia)) then 
+      allocate(cia(size(ia,1),size(ia,2))) 
+      call gamn2d(ictxt,'A',dat,ria=ia,cia=cia,rrt=root_) 
+    else
+      call gamn2d(ictxt,'A',dat,rrt=root_) 
+    endif
+#endif    
+  end subroutine psb_camnm
 
   subroutine psb_zamns(ictxt,dat,root,ia)
     integer, intent(in)              :: ictxt
@@ -1681,6 +2381,63 @@ contains
   end subroutine psb_isumm
 
 
+  subroutine psb_ssums(ictxt,dat,root)
+    integer, intent(in)              :: ictxt
+    real(psb_spk_), intent(inout)  :: dat
+    integer, intent(in), optional    :: root
+    
+    integer   :: root_
+    
+#if !defined(SERIAL_MPI)
+    if (present(root)) then 
+      root_ = root
+    else
+      root_ = -1
+    endif
+
+    call gsum2d(ictxt,'A',dat,rrt=root_) 
+#endif    
+
+  end subroutine psb_ssums
+
+  subroutine psb_ssumv(ictxt,dat,root)
+    integer, intent(in)              :: ictxt
+    real(psb_spk_), intent(inout)  :: dat(:)
+    integer, intent(in), optional    :: root
+    
+    integer   :: root_
+    
+#if !defined(SERIAL_MPI)
+    if (present(root)) then 
+      root_ = root
+    else
+      root_ = -1
+    endif
+
+    call gsum2d(ictxt,'A',dat,rrt=root_) 
+#endif    
+
+  end subroutine psb_ssumv
+
+  subroutine psb_ssumm(ictxt,dat,root)
+    integer, intent(in)              :: ictxt
+    real(psb_spk_), intent(inout)  :: dat(:,:)
+    integer, intent(in), optional    :: root
+    
+    integer   :: root_
+    
+#if !defined(SERIAL_MPI)
+    if (present(root)) then 
+      root_ = root
+    else
+      root_ = -1
+    endif
+    
+    call gsum2d(ictxt,'A',dat,rrt=root_) 
+
+#endif    
+  end subroutine psb_ssumm
+
   subroutine psb_dsums(ictxt,dat,root)
     integer, intent(in)              :: ictxt
     real(psb_dpk_), intent(inout)  :: dat
@@ -1739,6 +2496,64 @@ contains
   end subroutine psb_dsumm
 
 
+  subroutine psb_csums(ictxt,dat,root)
+    integer, intent(in)              :: ictxt
+    complex(psb_spk_), intent(inout)  :: dat
+    integer, intent(in), optional    :: root
+    
+    integer   :: root_
+    
+#if !defined(SERIAL_MPI)
+    if (present(root)) then 
+      root_ = root
+    else
+      root_ = -1
+    endif
+
+    call gsum2d(ictxt,'A',dat,rrt=root_) 
+#endif    
+
+  end subroutine psb_csums
+
+  subroutine psb_csumv(ictxt,dat,root)
+    integer, intent(in)              :: ictxt
+    complex(psb_spk_), intent(inout)  :: dat(:)
+    integer, intent(in), optional    :: root
+    
+    integer   :: root_
+    integer, allocatable :: cia(:)
+    
+#if !defined(SERIAL_MPI)
+    if (present(root)) then 
+      root_ = root
+    else
+      root_ = -1
+    endif
+
+    call gsum2d(ictxt,'A',dat,rrt=root_) 
+#endif    
+
+  end subroutine psb_csumv
+
+  subroutine psb_csumm(ictxt,dat,root)
+    integer, intent(in)              :: ictxt
+    complex(psb_spk_), intent(inout)  :: dat(:,:)
+    integer, intent(in), optional    :: root
+    
+    integer   :: root_
+    
+#if !defined(SERIAL_MPI)
+    if (present(root)) then 
+      root_ = root
+    else
+      root_ = -1
+    endif
+    
+    call gsum2d(ictxt,'A',dat,rrt=root_) 
+
+#endif    
+  end subroutine psb_csumm
+
   subroutine psb_zsums(ictxt,dat,root)
     integer, intent(in)              :: ictxt
     complex(psb_dpk_), intent(inout)  :: dat
@@ -1796,7 +2611,6 @@ contains
 
 #endif    
   end subroutine psb_zsumm
-
 
 
   subroutine psb_hsnds(ictxt,dat,dst,length)
@@ -1950,6 +2764,57 @@ contains
   end subroutine psb_isndm
 
 
+  subroutine psb_ssnds(ictxt,dat,dst)
+    use psb_error_mod
+    integer, intent(in)  :: ictxt
+    real(psb_spk_), intent(in)  :: dat
+    integer, intent(in)  :: dst
+    
+#if defined(SERIAL_MPI) 
+    if (psb_get_errverbosity() >1) then 
+      write(0,*) "Warning: process sending a message in serial mode (to itself)"
+    endif
+#else
+
+    call gesd2d(ictxt,dat,dst,0) 
+#endif    
+
+  end subroutine psb_ssnds
+
+  subroutine psb_ssndv(ictxt,dat,dst)
+    use psb_error_mod
+    integer, intent(in)  :: ictxt
+    real(psb_spk_), intent(in)  :: dat(:)
+    integer, intent(in)  :: dst
+
+#if defined(SERIAL_MPI) 
+    if (psb_get_errverbosity() >1) then 
+      write(0,*) "Warning: process sending a message in serial mode (to itself)"
+    endif
+#else
+    call gesd2d(ictxt,dat,dst,0) 
+#endif    
+
+  end subroutine psb_ssndv
+
+  subroutine psb_ssndm(ictxt,dat,dst,m)
+    use psb_error_mod
+    integer, intent(in)  :: ictxt
+    real(psb_spk_), intent(in)  :: dat(:,:)
+    integer, intent(in)  :: dst
+    integer, intent(in), optional :: m
+
+
+#if defined(SERIAL_MPI) 
+    if (psb_get_errverbosity() >1) then 
+      write(0,*) "Warning: process sending a message in serial mode (to itself)"
+    endif
+#else
+    call gesd2d(ictxt,dat,dst,0,m) 
+#endif    
+
+  end subroutine psb_ssndm
+
   subroutine psb_dsnds(ictxt,dat,dst)
     use psb_error_mod
     integer, intent(in)  :: ictxt
@@ -2001,6 +2866,57 @@ contains
 
   end subroutine psb_dsndm
 
+
+  subroutine psb_csnds(ictxt,dat,dst)
+    use psb_error_mod
+    integer, intent(in)  :: ictxt
+    complex(psb_spk_), intent(in)  :: dat
+    integer, intent(in)  :: dst
+    
+#if defined(SERIAL_MPI) 
+    if (psb_get_errverbosity() >1) then 
+      write(0,*) "Warning: process sending a message in serial mode (to itself)"
+    endif
+#else
+
+    call gesd2d(ictxt,dat,dst,0) 
+#endif    
+
+  end subroutine psb_csnds
+  
+  subroutine psb_csndv(ictxt,dat,dst)
+    use psb_error_mod
+    integer, intent(in)  :: ictxt
+    complex(psb_spk_), intent(in)  :: dat(:)
+    integer, intent(in)  :: dst
+
+#if defined(SERIAL_MPI) 
+    if (psb_get_errverbosity() >1) then 
+      write(0,*) "Warning: process sending a message in serial mode (to itself)"
+    endif
+#else
+    call gesd2d(ictxt,dat,dst,0) 
+#endif    
+
+  end subroutine psb_csndv
+
+  subroutine psb_csndm(ictxt,dat,dst,m)
+    use psb_error_mod
+    integer, intent(in)  :: ictxt
+    complex(psb_spk_), intent(in)  :: dat(:,:)
+    integer, intent(in)  :: dst
+    integer, intent(in), optional :: m
+
+#if defined(SERIAL_MPI) 
+    if (psb_get_errverbosity() >1) then 
+      write(0,*) "Warning: process sending a message in serial mode (to itself)"
+    endif
+#else
+
+    call gesd2d(ictxt,dat,dst,0,m) 
+#endif    
+
+  end subroutine psb_csndm
 
   subroutine psb_zsnds(ictxt,dat,dst)
     use psb_error_mod
@@ -2109,6 +3025,60 @@ contains
   end subroutine psb_ircvm
 
 
+  subroutine psb_srcvs(ictxt,dat,src)
+    use psb_error_mod
+    integer, intent(in)  :: ictxt
+    real(psb_spk_), intent(inout)  :: dat
+    integer, intent(in)  :: src
+    
+#if defined(SERIAL_MPI) 
+    if (psb_get_errverbosity() >0) then 
+      write(0,*) "Warning: process receiving a message in serial mode (to itself)"
+    endif
+    dat = 0
+#else
+
+    call gerv2d(ictxt,dat,src,0) 
+#endif    
+
+  end subroutine psb_srcvs
+
+  subroutine psb_srcvv(ictxt,dat,src)
+    use psb_error_mod
+    integer, intent(in)  :: ictxt
+    real(psb_spk_), intent(inout)  :: dat(:)
+    integer, intent(in)  :: src
+
+#if defined(SERIAL_MPI) 
+    if (psb_get_errverbosity() >0) then 
+      write(0,*) "Warning: process receiving a message in serial mode (to itself)"
+    endif
+    dat = 0
+#else
+    call gerv2d(ictxt,dat,src,0) 
+#endif    
+
+  end subroutine psb_srcvv
+
+  subroutine psb_srcvm(ictxt,dat,src,m)
+    use psb_error_mod
+    integer, intent(in)  :: ictxt
+    real(psb_spk_), intent(inout)  :: dat(:,:)
+    integer, intent(in)  :: src
+    integer, intent(in), optional :: m
+
+
+#if defined(SERIAL_MPI) 
+    if (psb_get_errverbosity() >0) then 
+      write(0,*) "Warning: process receiving a message in serial mode (to itself)"
+    endif
+    dat = 0
+#else
+    call gerv2d(ictxt,dat,src,0,m) 
+#endif    
+
+  end subroutine psb_srcvm
+
   subroutine psb_drcvs(ictxt,dat,src)
     use psb_error_mod
     integer, intent(in)  :: ictxt
@@ -2164,6 +3134,58 @@ contains
   end subroutine psb_drcvm
 
 
+  subroutine psb_crcvs(ictxt,dat,src)
+    use psb_error_mod
+    integer, intent(in)  :: ictxt
+    complex(psb_spk_), intent(inout)  :: dat
+    integer, intent(in)  :: src
+    
+#if defined(SERIAL_MPI) 
+    if (psb_get_errverbosity() >0) then 
+      write(0,*) "Warning: process receiving a message in serial mode (to itself)"
+    endif
+    dat = 0
+#else
+
+    call gerv2d(ictxt,dat,src,0) 
+#endif    
+
+  end subroutine psb_crcvs
+  
+  subroutine psb_crcvv(ictxt,dat,src)
+    use psb_error_mod
+    integer, intent(in)  :: ictxt
+    complex(psb_spk_), intent(inout)  :: dat(:)
+    integer, intent(in)  :: src
+
+#if defined(SERIAL_MPI) 
+    if (psb_get_errverbosity() >0) then 
+      write(0,*) "Warning: process receiving a message in serial mode (to itself)"
+    endif
+    dat = 0
+#else
+    call gerv2d(ictxt,dat,src,0) 
+#endif    
+
+  end subroutine psb_crcvv
+
+  subroutine psb_crcvm(ictxt,dat,src,m)
+    use psb_error_mod
+    integer, intent(in)  :: ictxt
+    complex(psb_spk_), intent(inout)  :: dat(:,:)
+    integer, intent(in)  :: src
+    integer, intent(in), optional :: m
+#if defined(SERIAL_MPI) 
+    if (psb_get_errverbosity() >0) then 
+      write(0,*) "Warning: process receiving a message in serial mode (to itself)"
+    endif
+    dat = 0
+#else
+    call gerv2d(ictxt,dat,src,0,m) 
+#endif    
+
+  end subroutine psb_crcvm
+
   subroutine psb_zrcvs(ictxt,dat,src)
     use psb_error_mod
     integer, intent(in)  :: ictxt
@@ -2206,7 +3228,6 @@ contains
     integer, intent(in)  :: src
     integer, intent(in), optional :: m
 
-
 #if defined(SERIAL_MPI) 
     if (psb_get_errverbosity() >0) then 
       write(0,*) "Warning: process receiving a message in serial mode (to itself)"
@@ -2217,2813 +3238,6 @@ contains
 #endif    
 
   end subroutine psb_zrcvm
-
-
-
-
-
-
-#if !defined(SERIAL_MPI)
-  
-  subroutine igebs2ds(ictxt,scope,dat,top)
-    integer, intent(in)   :: ictxt,dat
-    character, intent(in) :: scope
-    character, intent(in), optional  :: top
-    
-    character             :: top_ 
-    
-    interface 
-      subroutine igebs2d(ictxt,scope,top,m,n,v,ld)
-        integer, intent(in)   :: ictxt,m,n,ld
-        integer, intent(in)   :: v
-        character, intent(in) :: scope, top
-      end subroutine igebs2d
-    end interface
-
-    if (present(top)) then 
-      top_ = top
-    else
-      top_ = ' '
-    endif
-
-    call igebs2d(ictxt,scope,top_,1,1,dat,1)
-    
-  end subroutine igebs2ds
-
-  subroutine igebs2dv(ictxt,scope,dat,top)
-    integer, intent(in)   :: ictxt,dat(:)
-    character, intent(in) :: scope
-    character, intent(in), optional  :: top
-    
-
-    interface 
-      subroutine igebs2d(ictxt,scope,top,m,n,v,ld)
-        integer, intent(in)   :: ictxt,m,n,ld
-        integer, intent(in)   :: v(*)
-        character, intent(in) :: scope, top
-      end subroutine igebs2d
-    end interface
-
-    character :: top_ 
-
-    if (present(top)) then 
-      top_ = top
-    else
-      top_ = ' '
-    endif
-
-    call igebs2d(ictxt,scope,top_,size(dat,1),1,dat,size(dat,1))
-    
-  end subroutine igebs2dv
-
-  subroutine igebs2dm(ictxt,scope,dat,top)
-    integer, intent(in)   :: ictxt,dat(:,:)
-    character, intent(in) :: scope
-    character, intent(in), optional  :: top
-    
-    interface 
-      subroutine igebs2d(ictxt,scope,top,m,n,v,ld)
-        integer, intent(in)   :: ictxt,m,n,ld
-        integer, intent(in)   :: v(ld,*)
-        character, intent(in) :: scope, top
-      end subroutine igebs2d
-    end interface
-    character :: top_ 
-
-    if (present(top)) then 
-      top_ = top
-    else
-      top_ = ' '
-    endif
-
-    call igebs2d(ictxt,scope,top_,size(dat,1),size(dat,2),dat,size(dat,1))
-    
-  end subroutine igebs2dm
-
-
-
-  subroutine dgebs2ds(ictxt,scope,dat,top)
-    integer, intent(in)   :: ictxt
-    real(psb_dpk_), intent(in)   :: dat
-    character, intent(in) :: scope
-    character, intent(in), optional  :: top
-    
-    interface 
-      subroutine dgebs2d(ictxt,scope,top,m,n,v,ld)
-        use psb_const_mod
-        integer, intent(in)   :: ictxt,m,n,ld
-        real(psb_dpk_), intent(in)   :: v
-        character, intent(in) :: scope, top
-      end subroutine dgebs2d
-    end interface
-    character :: top_ 
-
-    if (present(top)) then 
-      top_ = top
-    else
-      top_ = ' '
-    endif
-
-    call dgebs2d(ictxt,scope,top_,1,1,dat,1)
-    
-  end subroutine dgebs2ds
-
-  subroutine dgebs2dv(ictxt,scope,dat,top)
-    integer, intent(in)   :: ictxt
-    real(psb_dpk_), intent(in)   :: dat(:)
-    character, intent(in) :: scope
-    character, intent(in), optional  :: top
-    
-    interface 
-      subroutine dgebs2d(ictxt,scope,top,m,n,v,ld)
-        use psb_const_mod
-        integer, intent(in)   :: ictxt,m,n,ld
-        real(psb_dpk_), intent(in)   :: v(*)
-        character, intent(in) :: scope, top
-      end subroutine dgebs2d
-    end interface
-
-    character :: top_ 
-
-    if (present(top)) then 
-      top_ = top
-    else
-      top_ = ' '
-    endif
-
-    call dgebs2d(ictxt,scope,top_,size(dat),1,dat,size(dat))
-    
-  end subroutine dgebs2dv
-
-  subroutine dgebs2dm(ictxt,scope,dat,top)
-    integer, intent(in)   :: ictxt
-    real(psb_dpk_), intent(in)   :: dat(:,:)
-
-    character, intent(in) :: scope
-    character, intent(in), optional  :: top
-    
-    interface 
-      subroutine dgebs2d(ictxt,scope,top,m,n,v,ld)
-        use psb_const_mod
-        integer, intent(in)   :: ictxt,m,n,ld
-        real(psb_dpk_), intent(in)   :: v(ld,*)
-        character, intent(in) :: scope, top
-      end subroutine dgebs2d
-    end interface
-
-    character :: top_ 
-
-    if (present(top)) then 
-      top_ = top
-    else
-      top_ = ' '
-    endif
-
-    call dgebs2d(ictxt,scope,top_,size(dat,1),size(dat,2),dat,size(dat,1))
-    
-  end subroutine dgebs2dm
-
-
-
-  subroutine zgebs2ds(ictxt,scope,dat,top)
-    integer, intent(in)   :: ictxt
-    complex(psb_dpk_), intent(in)   :: dat
-    character, intent(in) :: scope
-    character, intent(in), optional  :: top
-    
-    interface 
-      subroutine zgebs2d(ictxt,scope,top,m,n,v,ld)
-        use psb_const_mod
-        integer, intent(in)   :: ictxt,m,n,ld
-        complex(psb_dpk_), intent(in)   :: v
-        character, intent(in) :: scope, top
-      end subroutine zgebs2d
-    end interface
-    character :: top_ 
-
-    if (present(top)) then 
-      top_ = top
-    else
-      top_ = ' '
-    endif
-
-    call zgebs2d(ictxt,scope,top_,1,1,dat,1)
-    
-  end subroutine zgebs2ds
-
-  subroutine zgebs2dv(ictxt,scope,dat,top)
-    integer, intent(in)   :: ictxt
-    complex(psb_dpk_), intent(in)   :: dat(:)
-    character, intent(in) :: scope
-    character, intent(in), optional  :: top
-    
-    interface 
-      subroutine zgebs2d(ictxt,scope,top,m,n,v,ld)
-        use psb_const_mod
-        integer, intent(in)   :: ictxt,m,n,ld
-        complex(psb_dpk_), intent(in)   :: v(*)
-        character, intent(in) :: scope, top
-      end subroutine zgebs2d
-    end interface
-
-    character :: top_ 
-
-    if (present(top)) then 
-      top_ = top
-    else
-      top_ = ' '
-    endif
-
-    call zgebs2d(ictxt,scope,top_,size(dat),1,dat,size(dat))
-    
-  end subroutine zgebs2dv
-
-  subroutine zgebs2dm(ictxt,scope,dat,top)
-    integer, intent(in)   :: ictxt
-    complex(psb_dpk_), intent(in)   :: dat(:,:)
-
-    character, intent(in) :: scope
-    character, intent(in), optional  :: top
-    
-    interface 
-      subroutine zgebs2d(ictxt,scope,top,m,n,v,ld)
-        use psb_const_mod
-        integer, intent(in)   :: ictxt,m,n,ld
-        complex(psb_dpk_), intent(in)   :: v(ld,*)
-        character, intent(in) :: scope, top
-      end subroutine zgebs2d
-    end interface
-
-    character :: top_ 
-
-    if (present(top)) then 
-      top_ = top
-    else
-      top_ = ' '
-    endif
-
-    call zgebs2d(ictxt,scope,top_,size(dat,1),size(dat,2),dat,size(dat,1))
-    
-  end subroutine zgebs2dm
-
-
-
-
-
-  subroutine dgebr2ds(ictxt,scope,dat,top,rrt,crt)
-    integer, intent(in)   :: ictxt
-    real(psb_dpk_), intent(inout)   :: dat
-    character, intent(in) :: scope
-    character, intent(in), optional  :: top
-    integer, intent(in), optional  :: rrt,crt
-    
-    interface 
-      subroutine dgebr2d(ictxt,scope,top,m,n,v,ld,rrt,crt)
-        use psb_const_mod
-        integer, intent(in)   :: ictxt,m,n,ld
-        real(psb_dpk_), intent(inout)   :: v
-        character, intent(in) :: scope, top
-        integer, intent(in)   :: rrt,crt
-      end subroutine dgebr2d
-    end interface
-    character :: top_ 
-    integer   :: rrt_, crt_
-    integer   :: nrows,ncols,myrow,mycol
-    
-    call blacs_gridinfo(ictxt,nrows,ncols,myrow,mycol)
-    select case(scope)
-    case('R','r')
-      rrt_ = myrow
-      crt_ = 0
-    case('C','c')
-      rrt_ = 0
-      crt_ = mycol
-    case('A','a')
-      rrt_ = 0
-      crt_ = 0
-    case default
-      rrt_ = 0
-      crt_ = 0
-    end select
-
-
-    if (present(top)) then 
-      top_ = top
-    else
-      top_ = ' '
-    endif
-    if (present(rrt)) then
-      rrt_ = rrt
-    endif
-    if (present(crt)) then 
-      crt_ = crt
-    endif
-    
-    call dgebr2d(ictxt,scope,top_,1,1,dat,1,rrt_,crt_)
-    
-  end subroutine dgebr2ds
-
-  subroutine dgebr2dv(ictxt,scope,dat,top,rrt,crt)
-    integer, intent(in)   :: ictxt
-    real(psb_dpk_), intent(inout)   :: dat(:)
-    character, intent(in) :: scope
-    character, intent(in), optional  :: top
-    integer, intent(in), optional  :: rrt,crt
-
-    interface 
-      subroutine dgebr2d(ictxt,scope,top,m,n,v,ld,rrt,crt)
-        use psb_const_mod
-        integer, intent(in)   :: ictxt,m,n,ld
-        real(psb_dpk_), intent(inout)   :: v(*)
-        character, intent(in) :: scope, top
-        integer, intent(in)   :: rrt,crt
-      end subroutine dgebr2d
-    end interface
-
-    character :: top_
-    integer   :: nrows,ncols,myrow,mycol
-    integer   :: rrt_, crt_
-
-    call blacs_gridinfo(ictxt,nrows,ncols,myrow,mycol)
-    select case(scope)
-    case('R','r')
-      rrt_ = myrow
-      crt_ = 0
-    case('C','c')
-      rrt_ = 0
-      crt_ = mycol
-    case('A','a')
-      rrt_ = 0
-      crt_ = 0
-    case default
-      rrt_ = 0
-      crt_ = 0
-    end select
-
-
-    if (present(top)) then 
-      top_ = top
-    else
-      top_ = ' '
-    endif
-    if (present(rrt)) then
-      rrt_ = rrt
-    endif
-    if (present(crt)) then 
-      crt_ = crt
-    endif
-
-    call dgebr2d(ictxt,scope,top_,size(dat),1,dat,size(dat),rrt_,crt_)
-    
-  end subroutine dgebr2dv
-
-  subroutine dgebr2dm(ictxt,scope,dat,top,rrt,crt)
-    integer, intent(in)   :: ictxt
-    real(psb_dpk_), intent(inout)   :: dat(:,:)
-
-    character, intent(in) :: scope
-    character, intent(in), optional  :: top
-    integer, intent(in), optional  :: rrt,crt
-
-    interface 
-      subroutine dgebr2d(ictxt,scope,top,m,n,v,ld,rrt,crt)
-        use psb_const_mod
-        integer, intent(in)   :: ictxt,m,n,ld
-        real(psb_dpk_), intent(inout)   :: v(ld,*)
-        character, intent(in) :: scope, top
-        integer, intent(in)   :: rrt,crt
-      end subroutine dgebr2d
-    end interface
-
-    character :: top_
-    integer   :: nrows,ncols,myrow,mycol
-    integer   :: rrt_, crt_
-
-    call blacs_gridinfo(ictxt,nrows,ncols,myrow,mycol)
-    select case(scope)
-    case('R','r')
-      rrt_ = myrow
-      crt_ = 0
-    case('C','c')
-      rrt_ = 0
-      crt_ = mycol
-    case('A','a')
-      rrt_ = 0
-      crt_ = 0
-    case default
-      rrt_ = 0
-      crt_ = 0
-    end select
-
-
-    if (present(top)) then 
-      top_ = top
-    else
-      top_ = ' '
-    endif
-    if (present(rrt)) then
-      rrt_ = rrt
-    endif
-    if (present(crt)) then 
-      crt_ = crt
-    endif
-
-    call dgebr2d(ictxt,scope,top_,size(dat,1),size(dat,2),dat,size(dat,1),rrt_,crt_)
-    
-  end subroutine dgebr2dm
-
-
-
-
-  subroutine zgebr2ds(ictxt,scope,dat,top,rrt,crt)
-    integer, intent(in)   :: ictxt
-    complex(psb_dpk_), intent(inout)   :: dat
-    character, intent(in) :: scope
-    character, intent(in), optional  :: top
-    integer, intent(in), optional  :: rrt,crt
-    
-    interface 
-      subroutine zgebr2d(ictxt,scope,top,m,n,v,ld,rrt,crt)
-        use psb_const_mod
-        integer, intent(in)   :: ictxt,m,n,ld
-        complex(psb_dpk_), intent(inout)   :: v
-        character, intent(in) :: scope, top
-        integer, intent(in)   :: rrt,crt
-      end subroutine zgebr2d
-    end interface
-    character :: top_ 
-    integer   :: rrt_, crt_
-    integer   :: nrows,ncols,myrow,mycol
-
-    call blacs_gridinfo(ictxt,nrows,ncols,myrow,mycol)
-    select case(scope)
-    case('R','r')
-      rrt_ = myrow
-      crt_ = 0
-    case('C','c')
-      rrt_ = 0
-      crt_ = mycol
-    case('A','a')
-      rrt_ = 0
-      crt_ = 0
-    case default
-      rrt_ = 0
-      crt_ = 0
-    end select
-
-    if (present(top)) then 
-      top_ = top
-    else
-      top_ = ' '
-    endif
-    if (present(rrt)) then
-      rrt_ = rrt
-    endif
-    if (present(crt)) then 
-      crt_ = crt
-    endif
-    
-    call zgebr2d(ictxt,scope,top_,1,1,dat,1,rrt_,crt_)
-    
-  end subroutine zgebr2ds
-
-  subroutine zgebr2dv(ictxt,scope,dat,top,rrt,crt)
-    integer, intent(in)   :: ictxt
-    complex(psb_dpk_), intent(inout)   :: dat(:)
-    character, intent(in) :: scope
-    character, intent(in), optional  :: top
-    integer, intent(in), optional  :: rrt,crt
-
-    interface 
-      subroutine zgebr2d(ictxt,scope,top,m,n,v,ld,rrt,crt)
-        use psb_const_mod
-        integer, intent(in)   :: ictxt,m,n,ld
-        complex(psb_dpk_), intent(inout)   :: v(*)
-        character, intent(in) :: scope, top
-        integer, intent(in)   :: rrt,crt
-      end subroutine zgebr2d
-    end interface
-
-    character :: top_
-    integer   :: nrows,ncols,myrow,mycol
-    integer   :: rrt_, crt_
-
-    call blacs_gridinfo(ictxt,nrows,ncols,myrow,mycol)
-    select case(scope)
-    case('R','r')
-      rrt_ = myrow
-      crt_ = 0
-    case('C','c')
-      rrt_ = 0
-      crt_ = mycol
-    case('A','a')
-      rrt_ = 0
-      crt_ = 0
-    case default
-      rrt_ = 0
-      crt_ = 0
-    end select
-
-
-    if (present(top)) then 
-      top_ = top
-    else
-      top_ = ' '
-    endif
-    if (present(rrt)) then
-      rrt_ = rrt
-    endif
-    if (present(crt)) then 
-      crt_ = crt
-    endif
-
-    call zgebr2d(ictxt,scope,top_,size(dat),1,dat,size(dat),rrt_,crt_)
-    
-  end subroutine zgebr2dv
-
-  subroutine zgebr2dm(ictxt,scope,dat,top,rrt,crt)
-    integer, intent(in)   :: ictxt
-    complex(psb_dpk_), intent(inout)   :: dat(:,:)
-
-    character, intent(in) :: scope
-    character, intent(in), optional  :: top
-    integer, intent(in), optional  :: rrt,crt
-
-    interface 
-      subroutine zgebr2d(ictxt,scope,top,m,n,v,ld,rrt,crt)
-        use psb_const_mod
-        integer, intent(in)   :: ictxt,m,n,ld
-        complex(psb_dpk_), intent(inout)   :: v(ld,*)
-        character, intent(in) :: scope, top
-        integer, intent(in)   :: rrt,crt
-      end subroutine zgebr2d
-    end interface
-
-    character :: top_
-    integer   :: nrows,ncols,myrow,mycol
-    integer   :: rrt_, crt_
-
-    call blacs_gridinfo(ictxt,nrows,ncols,myrow,mycol)
-    select case(scope)
-    case('R','r')
-      rrt_ = myrow
-      crt_ = 0
-    case('C','c')
-      rrt_ = 0
-      crt_ = mycol
-    case('A','a')
-      rrt_ = 0
-      crt_ = 0
-    case default
-      rrt_ = 0
-      crt_ = 0
-    end select
-
-
-    if (present(top)) then 
-      top_ = top
-    else
-      top_ = ' '
-    endif
-    if (present(rrt)) then
-      rrt_ = rrt
-    endif
-    if (present(crt)) then 
-      crt_ = crt
-    endif
-
-    call zgebr2d(ictxt,scope,top_,size(dat,1),size(dat,2),dat,size(dat,1),rrt_,crt_)
-    
-  end subroutine zgebr2dm
-
-
-
-  subroutine igebr2ds(ictxt,scope,dat,top,rrt,crt)
-    integer, intent(in)   :: ictxt
-    integer, intent(inout)   :: dat
-    character, intent(in) :: scope
-    character, intent(in), optional  :: top
-    integer, intent(in), optional  :: rrt,crt
-    
-    interface 
-      subroutine igebr2d(ictxt,scope,top,m,n,v,ld,rrt,crt)
-        use psb_const_mod
-        integer, intent(in)   :: ictxt,m,n,ld
-        integer, intent(inout)   :: v
-        character, intent(in) :: scope, top
-        integer, intent(in)   :: rrt,crt
-      end subroutine igebr2d
-    end interface
-    character :: top_ 
-    integer   :: rrt_, crt_
-    integer   :: nrows,ncols,myrow,mycol
-
-    call blacs_gridinfo(ictxt,nrows,ncols,myrow,mycol)
-    select case(scope)
-    case('R','r')
-      rrt_ = myrow
-      crt_ = 0
-    case('C','c')
-      rrt_ = 0
-      crt_ = mycol
-    case('A','a')
-      rrt_ = 0
-      crt_ = 0
-    case default
-      rrt_ = 0
-      crt_ = 0
-    end select
-
-    if (present(top)) then 
-      top_ = top
-    else
-      top_ = ' '
-    endif
-    if (present(rrt)) then
-      rrt_ = rrt
-    endif
-    if (present(crt)) then 
-      crt_ = crt
-    endif
-    
-    call igebr2d(ictxt,scope,top_,1,1,dat,1,rrt_,crt_)
-    
-  end subroutine igebr2ds
-
-  subroutine igebr2dv(ictxt,scope,dat,top,rrt,crt)
-    integer, intent(in)   :: ictxt
-    integer, intent(inout)   :: dat(:)
-    character, intent(in) :: scope
-    character, intent(in), optional  :: top
-    integer, intent(in), optional  :: rrt,crt
-
-    interface 
-      subroutine igebr2d(ictxt,scope,top,m,n,v,ld,rrt,crt)
-        use psb_const_mod
-        integer, intent(in)   :: ictxt,m,n,ld
-        integer, intent(inout)   :: v(*)
-        character, intent(in) :: scope, top
-        integer, intent(in)   :: rrt,crt
-      end subroutine igebr2d
-    end interface
-
-    character :: top_
-    integer   :: nrows,ncols,myrow,mycol
-    integer   :: rrt_, crt_
-
-    call blacs_gridinfo(ictxt,nrows,ncols,myrow,mycol)
-    select case(scope)
-    case('R','r')
-      rrt_ = myrow
-      crt_ = 0
-    case('C','c')
-      rrt_ = 0
-      crt_ = mycol
-    case('A','a')
-      rrt_ = 0
-      crt_ = 0
-    case default
-      rrt_ = 0
-      crt_ = 0
-    end select
-
-
-    if (present(top)) then 
-      top_ = top
-    else
-      top_ = ' '
-    endif
-    if (present(rrt)) then
-      rrt_ = rrt
-    endif
-    if (present(crt)) then 
-      crt_ = crt
-    endif
-
-    call igebr2d(ictxt,scope,top_,size(dat),1,dat,size(dat),rrt_,crt_)
-    
-  end subroutine igebr2dv
-
-  subroutine igebr2dm(ictxt,scope,dat,top,rrt,crt)
-    integer, intent(in)   :: ictxt
-    integer, intent(inout)   :: dat(:,:)
-
-    character, intent(in) :: scope
-    character, intent(in), optional  :: top
-    integer, intent(in), optional  :: rrt,crt
-
-    interface 
-      subroutine igebr2d(ictxt,scope,top,m,n,v,ld,rrt,crt)
-        use psb_const_mod
-        integer, intent(in)   :: ictxt,m,n,ld
-        integer, intent(inout)   :: v(ld,*)
-        character, intent(in) :: scope, top
-        integer, intent(in)   :: rrt,crt
-      end subroutine igebr2d
-    end interface
-
-    character :: top_
-    integer   :: nrows,ncols,myrow,mycol
-    integer   :: rrt_, crt_
-
-    call blacs_gridinfo(ictxt,nrows,ncols,myrow,mycol)
-    select case(scope)
-    case('R','r')
-      rrt_ = myrow
-      crt_ = 0
-    case('C','c')
-      rrt_ = 0
-      crt_ = mycol
-    case('A','a')
-      rrt_ = 0
-      crt_ = 0
-    case default
-      rrt_ = 0
-      crt_ = 0
-    end select
-
-
-    if (present(top)) then 
-      top_ = top
-    else
-      top_ = ' '
-    endif
-    if (present(rrt)) then
-      rrt_ = rrt
-    endif
-    if (present(crt)) then 
-      crt_ = crt
-    endif
-
-    call igebr2d(ictxt,scope,top_,size(dat,1),size(dat,2),dat,size(dat,1),rrt_,crt_)
-    
-  end subroutine igebr2dm
-
-
-
-  subroutine dgesd2ds(ictxt,dat,rdst,cdst)
-    integer, intent(in)   :: ictxt
-    real(psb_dpk_), intent(in)   :: dat
-    integer, intent(in)  :: rdst,cdst
-    
-    interface 
-      subroutine dgesd2d(ictxt,m,n,v,ld,rd,cd)
-        use psb_const_mod
-        integer, intent(in)   :: ictxt,m,n,ld
-        real(psb_dpk_), intent(in)   :: v
-        integer, intent(in)   :: rd,cd
-      end subroutine dgesd2d
-    end interface
-
-    call dgesd2d(ictxt,1,1,dat,1,rdst,cdst)
-    
-  end subroutine dgesd2ds
-
-
-  subroutine dgesd2dv(ictxt,dat,rdst,cdst)
-    integer, intent(in)   :: ictxt
-    real(psb_dpk_), intent(in)   :: dat(:)
-    integer, intent(in)  :: rdst,cdst
-    
-    interface 
-      subroutine dgesd2d(ictxt,m,n,v,ld,rd,cd)
-        use psb_const_mod
-        integer, intent(in)   :: ictxt,m,n,ld
-        real(psb_dpk_), intent(in)   :: v(*)
-        integer, intent(in)   :: rd,cd
-      end subroutine dgesd2d
-    end interface
-
-    call dgesd2d(ictxt,size(dat),1,dat,size(dat),rdst,cdst)
-    
-  end subroutine dgesd2dv
-
-  subroutine dgesd2dm(ictxt,dat,rdst,cdst,m)
-    integer, intent(in)   :: ictxt
-    real(psb_dpk_), intent(in)   :: dat(:,:)
-    integer, intent(in)  :: rdst,cdst
-    integer, intent(in), optional :: m
-    
-    integer :: m_
-    interface 
-      subroutine dgesd2d(ictxt,m,n,v,ld,rd,cd)
-        use psb_const_mod
-        integer, intent(in)   :: ictxt,m,n,ld
-        real(psb_dpk_), intent(in)   :: v(ld,*)
-        integer, intent(in)   :: rd,cd
-      end subroutine dgesd2d
-    end interface
-
-    if (present(m)) then 
-      m_ = m
-    else
-      m_ = size(dat,1)
-    endif
-
-    call dgesd2d(ictxt,m_,size(dat,2),dat,size(dat,1),rdst,cdst)
-    
-  end subroutine dgesd2dm
-
-
-  subroutine igesd2ds(ictxt,dat,rdst,cdst)
-    integer, intent(in)   :: ictxt
-    integer, intent(in)   :: dat
-    integer, intent(in)  :: rdst,cdst
-    
-    interface 
-      subroutine igesd2d(ictxt,m,n,v,ld,rd,cd)
-        use psb_const_mod
-        integer, intent(in)   :: ictxt,m,n,ld
-        integer, intent(in)   :: v
-        integer, intent(in)   :: rd,cd
-      end subroutine igesd2d
-    end interface
-
-    call igesd2d(ictxt,1,1,dat,1,rdst,cdst)
-    
-  end subroutine igesd2ds
-
-
-  subroutine igesd2dv(ictxt,dat,rdst,cdst)
-    integer, intent(in)   :: ictxt
-    integer, intent(in)   :: dat(:)
-    integer, intent(in)  :: rdst,cdst
-    
-    interface 
-      subroutine igesd2d(ictxt,m,n,v,ld,rd,cd)
-        use psb_const_mod
-        integer, intent(in)   :: ictxt,m,n,ld
-        integer, intent(in)   :: v(*)
-        integer, intent(in)   :: rd,cd
-      end subroutine igesd2d
-    end interface
-
-    call igesd2d(ictxt,size(dat),1,dat,size(dat),rdst,cdst)
-    
-  end subroutine igesd2dv
-
-  subroutine igesd2dm(ictxt,dat,rdst,cdst,m)
-    integer, intent(in)   :: ictxt
-    integer, intent(in)   :: dat(:,:)
-    integer, intent(in)  :: rdst,cdst
-    integer, intent(in), optional :: m
-    
-    integer :: m_
-
-    interface 
-      subroutine igesd2d(ictxt,m,n,v,ld,rd,cd)
-        use psb_const_mod
-        integer, intent(in)   :: ictxt,m,n,ld
-        integer, intent(in)   :: v(ld,*)
-        integer, intent(in)   :: rd,cd
-      end subroutine igesd2d
-    end interface
-
-    if (present(m)) then 
-      m_ = m
-    else
-      m_ = size(dat,1)
-    endif
-
-    call igesd2d(ictxt,m_,size(dat,2),dat,size(dat,1),rdst,cdst)
-    
-  end subroutine igesd2dm
-
-
-
-  subroutine zgesd2ds(ictxt,dat,rdst,cdst)
-    integer, intent(in)   :: ictxt
-    complex(psb_dpk_), intent(in)   :: dat
-    integer, intent(in)  :: rdst,cdst
-    
-    interface 
-      subroutine zgesd2d(ictxt,m,n,v,ld,rd,cd)
-        use psb_const_mod
-        integer, intent(in)   :: ictxt,m,n,ld
-        complex(psb_dpk_), intent(in)   :: v
-        integer, intent(in)   :: rd,cd
-      end subroutine zgesd2d
-    end interface
-
-    call zgesd2d(ictxt,1,1,dat,1,rdst,cdst)
-    
-  end subroutine zgesd2ds
-
-
-  subroutine zgesd2dv(ictxt,dat,rdst,cdst)
-    integer, intent(in)   :: ictxt
-    complex(psb_dpk_), intent(in)   :: dat(:)
-    integer, intent(in)  :: rdst,cdst
-    
-    interface 
-      subroutine zgesd2d(ictxt,m,n,v,ld,rd,cd)
-        use psb_const_mod
-        integer, intent(in)   :: ictxt,m,n,ld
-        complex(psb_dpk_), intent(in)   :: v(*)
-        integer, intent(in)   :: rd,cd
-      end subroutine zgesd2d
-    end interface
-
-    call zgesd2d(ictxt,size(dat),1,dat,size(dat),rdst,cdst)
-    
-  end subroutine zgesd2dv
-
-  subroutine zgesd2dm(ictxt,dat,rdst,cdst,m)
-    integer, intent(in)   :: ictxt
-    complex(psb_dpk_), intent(in)   :: dat(:,:)
-    integer, intent(in)  :: rdst,cdst
-    integer, intent(in), optional :: m
-    
-    integer :: m_
-
-    interface 
-      subroutine zgesd2d(ictxt,m,n,v,ld,rd,cd)
-        use psb_const_mod
-        integer, intent(in)   :: ictxt,m,n,ld
-        complex(psb_dpk_), intent(in)   :: v(ld,*)
-        integer, intent(in)   :: rd,cd
-      end subroutine zgesd2d
-    end interface
-
-    if (present(m)) then 
-      m_ = m
-    else
-      m_ = size(dat,1)
-    endif
-
-    call zgesd2d(ictxt,m_,size(dat,2),dat,size(dat,1),rdst,cdst)
-    
-  end subroutine zgesd2dm
-
-
-
-  subroutine dgerv2ds(ictxt,dat,rdst,cdst)
-    integer, intent(in)   :: ictxt
-    real(psb_dpk_), intent(inout)   :: dat
-    integer, intent(in)  :: rdst,cdst
-    
-    interface 
-      subroutine dgerv2d(ictxt,m,n,v,ld,rd,cd)
-        use psb_const_mod
-        integer, intent(in)   :: ictxt,m,n,ld
-        real(psb_dpk_), intent(inout)   :: v
-        integer, intent(in)   :: rd,cd
-      end subroutine dgerv2d
-    end interface
-
-    call dgerv2d(ictxt,1,1,dat,1,rdst,cdst)
-    
-  end subroutine dgerv2ds
-
-
-  subroutine dgerv2dv(ictxt,dat,rdst,cdst)
-    integer, intent(in)   :: ictxt
-    real(psb_dpk_), intent(inout)   :: dat(:)
-    integer, intent(in)  :: rdst,cdst
-    
-    interface 
-      subroutine dgerv2d(ictxt,m,n,v,ld,rd,cd)
-        use psb_const_mod
-        integer, intent(in)   :: ictxt,m,n,ld
-        real(psb_dpk_), intent(inout)   :: v(*)
-        integer, intent(in)   :: rd,cd
-      end subroutine dgerv2d
-    end interface
-
-    call dgerv2d(ictxt,size(dat),1,dat,size(dat),rdst,cdst)
-    
-  end subroutine dgerv2dv
-
-  subroutine dgerv2dm(ictxt,dat,rdst,cdst,m)
-    integer, intent(in)   :: ictxt
-    real(psb_dpk_), intent(inout)   :: dat(:,:)
-    integer, intent(in)  :: rdst,cdst
-    integer, intent(in), optional :: m
-    
-    integer :: m_
-
-    interface 
-      subroutine dgerv2d(ictxt,m,n,v,ld,rd,cd)
-        use psb_const_mod
-        integer, intent(in)   :: ictxt,m,n,ld
-        real(psb_dpk_), intent(inout)   :: v(ld,*)
-        integer, intent(in)   :: rd,cd
-      end subroutine dgerv2d
-    end interface
-
-    if (present(m)) then 
-      m_ = m
-    else
-      m_ = size(dat,1)
-    endif
-
-    call dgerv2d(ictxt,m_,size(dat,2),dat,size(dat,1),rdst,cdst)
-    
-  end subroutine dgerv2dm
-
-
-  subroutine igerv2ds(ictxt,dat,rdst,cdst)
-    integer, intent(in)   :: ictxt
-    integer, intent(inout)   :: dat
-    integer, intent(in)  :: rdst,cdst
-    
-    interface 
-      subroutine igerv2d(ictxt,m,n,v,ld,rd,cd)
-        use psb_const_mod
-        integer, intent(in)   :: ictxt,m,n,ld
-        integer, intent(inout)   :: v
-        integer, intent(in)   :: rd,cd
-      end subroutine igerv2d
-    end interface
-
-    call igerv2d(ictxt,1,1,dat,1,rdst,cdst)
-    
-  end subroutine igerv2ds
-
-
-  subroutine igerv2dv(ictxt,dat,rdst,cdst)
-    integer, intent(in)   :: ictxt
-    integer, intent(inout)   :: dat(:)
-    integer, intent(in)  :: rdst,cdst
-    
-    interface 
-      subroutine igerv2d(ictxt,m,n,v,ld,rd,cd)
-        use psb_const_mod
-        integer, intent(in)   :: ictxt,m,n,ld
-        integer, intent(inout)   :: v(*)
-        integer, intent(in)   :: rd,cd
-      end subroutine igerv2d
-    end interface
-
-    call igerv2d(ictxt,size(dat),1,dat,size(dat),rdst,cdst)
-    
-  end subroutine igerv2dv
-
-  subroutine igerv2dm(ictxt,dat,rdst,cdst,m)
-    integer, intent(in)   :: ictxt
-    integer, intent(inout)   :: dat(:,:)
-    integer, intent(in)  :: rdst,cdst
-    integer, intent(in), optional :: m
-    
-    integer :: m_
-
-    interface 
-      subroutine igerv2d(ictxt,m,n,v,ld,rd,cd)
-        use psb_const_mod
-        integer, intent(in)   :: ictxt,m,n,ld
-        integer, intent(inout)   :: v(ld,*)
-        integer, intent(in)   :: rd,cd
-      end subroutine igerv2d
-    end interface
-
-
-    if (present(m)) then 
-      m_ = m
-    else
-      m_ = size(dat,1)
-    endif
-
-    call igerv2d(ictxt,m_,size(dat,2),dat,size(dat,1),rdst,cdst)
-    
-  end subroutine igerv2dm
-
-
-
-  subroutine zgerv2ds(ictxt,dat,rdst,cdst)
-    integer, intent(in)   :: ictxt
-    complex(psb_dpk_), intent(inout)   :: dat
-    integer, intent(in)  :: rdst,cdst
-    
-    interface 
-      subroutine zgerv2d(ictxt,m,n,v,ld,rd,cd)
-        use psb_const_mod
-        integer, intent(in)   :: ictxt,m,n,ld
-        complex(psb_dpk_), intent(inout)   :: v
-        integer, intent(in)   :: rd,cd
-      end subroutine zgerv2d
-    end interface
-
-    call zgerv2d(ictxt,1,1,dat,1,rdst,cdst)
-    
-  end subroutine zgerv2ds
-
-
-  subroutine zgerv2dv(ictxt,dat,rdst,cdst)
-    integer, intent(in)   :: ictxt
-    complex(psb_dpk_), intent(inout)   :: dat(:)
-    integer, intent(in)  :: rdst,cdst
-    
-    interface 
-      subroutine zgerv2d(ictxt,m,n,v,ld,rd,cd)
-        use psb_const_mod
-        integer, intent(in)   :: ictxt,m,n,ld
-        complex(psb_dpk_), intent(inout)   :: v(*)
-        integer, intent(in)   :: rd,cd
-      end subroutine zgerv2d
-    end interface
-
-    call zgerv2d(ictxt,size(dat),1,dat,size(dat),rdst,cdst)
-    
-  end subroutine zgerv2dv
-
-  subroutine zgerv2dm(ictxt,dat,rdst,cdst,m)
-    integer, intent(in)   :: ictxt
-    complex(psb_dpk_), intent(inout)   :: dat(:,:)
-    integer, intent(in)  :: rdst,cdst
-    integer, intent(in), optional :: m
-    
-    integer :: m_
-    
-    interface 
-      subroutine zgerv2d(ictxt,m,n,v,ld,rd,cd)
-        use psb_const_mod
-        integer, intent(in)   :: ictxt,m,n,ld
-        complex(psb_dpk_), intent(inout)   :: v(ld,*)
-        integer, intent(in)   :: rd,cd
-      end subroutine zgerv2d
-    end interface
-
-
-    if (present(m)) then 
-      m_ = m
-    else
-      m_ = size(dat,1)
-    endif
-
-    call zgerv2d(ictxt,m_,size(dat,2),dat,size(dat,1),rdst,cdst)
-    
-  end subroutine zgerv2dm
-
-
-
-  subroutine dgsum2ds(ictxt,scope,dat,top,rrt,crt)
-    integer, intent(in)   :: ictxt
-    real(psb_dpk_), intent(inout)   :: dat
-    character, intent(in) :: scope
-    character, intent(in), optional  :: top
-    integer, intent(in), optional  :: rrt,crt
-    
-    interface 
-      subroutine dgsum2d(ictxt,scope,top,m,n,v,ld,rrt,crt)
-        use psb_const_mod
-        integer, intent(in)   :: ictxt,m,n,ld
-        real(psb_dpk_), intent(inout)   :: v
-        character, intent(in) :: scope, top
-        integer, intent(in)   :: rrt,crt
-      end subroutine dgsum2d
-    end interface
-    character :: top_ 
-    integer   :: rrt_, crt_
-    integer   :: nrows,ncols,myrow,mycol
-
-
-    call blacs_gridinfo(ictxt,nrows,ncols,myrow,mycol)
-    select case(scope)
-    case('R','r')
-      rrt_ = myrow
-      crt_ = -1
-    case('C','c')
-      rrt_ = -1
-      crt_ = mycol
-    case('A','a')
-      rrt_ = -1
-      crt_ = -1
-    case default
-      rrt_ = -1
-      crt_ = -1
-    end select
-
-
-    if (present(top)) then 
-      top_ = top
-    else
-      top_ = ' '
-    endif
-    if (present(rrt)) then
-      rrt_ = rrt
-    endif
-    if (present(crt)) then 
-      crt_ = crt
-    endif
-    
-    call dgsum2d(ictxt,scope,top_,1,1,dat,1,rrt_,crt_)
-    
-  end subroutine dgsum2ds
-
-  subroutine dgsum2dv(ictxt,scope,dat,top,rrt,crt)
-    integer, intent(in)   :: ictxt
-    real(psb_dpk_), intent(inout)   :: dat(:)
-    character, intent(in) :: scope
-    character, intent(in), optional  :: top
-    integer, intent(in), optional  :: rrt,crt
-
-    interface 
-      subroutine dgsum2d(ictxt,scope,top,m,n,v,ld,rrt,crt)
-        use psb_const_mod
-        integer, intent(in)   :: ictxt,m,n,ld
-        real(psb_dpk_), intent(inout)   :: v(*)
-        character, intent(in) :: scope, top
-        integer, intent(in)   :: rrt,crt
-      end subroutine dgsum2d
-    end interface
-
-    character :: top_ 
-    integer   :: rrt_, crt_
-    integer   :: nrows,ncols,myrow,mycol
-
-
-    call blacs_gridinfo(ictxt,nrows,ncols,myrow,mycol)
-    select case(scope)
-    case('R','r')
-      rrt_ = myrow
-      crt_ = -1
-    case('C','c')
-      rrt_ = -1
-      crt_ = mycol
-    case('A','a')
-      rrt_ = -1
-      crt_ = -1
-    case default
-      rrt_ = -1
-      crt_ = -1
-    end select
-
-
-    if (present(top)) then 
-      top_ = top
-    else
-      top_ = ' '
-    endif
-    if (present(rrt)) then
-      rrt_ = rrt
-    endif
-    if (present(crt)) then 
-      crt_ = crt
-    endif
-
-    call dgsum2d(ictxt,scope,top_,size(dat),1,dat,size(dat),rrt_,crt_)
-    
-  end subroutine dgsum2dv
-
-  subroutine dgsum2dm(ictxt,scope,dat,top,rrt,crt)
-    integer, intent(in)   :: ictxt
-    real(psb_dpk_), intent(inout)   :: dat(:,:)
-
-    character, intent(in) :: scope
-    character, intent(in), optional  :: top
-    integer, intent(in), optional  :: rrt,crt
-
-    interface 
-      subroutine dgsum2d(ictxt,scope,top,m,n,v,ld,rrt,crt)
-        use psb_const_mod
-        integer, intent(in)   :: ictxt,m,n,ld
-        real(psb_dpk_), intent(inout)   :: v(ld,*)
-        character, intent(in) :: scope, top
-        integer, intent(in)   :: rrt,crt
-      end subroutine dgsum2d
-    end interface
-
-    character :: top_ 
-    integer   :: rrt_, crt_
-    integer   :: nrows,ncols,myrow,mycol
-
-
-    call blacs_gridinfo(ictxt,nrows,ncols,myrow,mycol)
-    select case(scope)
-    case('R','r')
-      rrt_ = myrow
-      crt_ = -1
-    case('C','c')
-      rrt_ = -1
-      crt_ = mycol
-    case('A','a')
-      rrt_ = -1
-      crt_ = -1
-    case default
-      rrt_ = -1
-      crt_ = -1
-    end select
-
-
-    if (present(top)) then 
-      top_ = top
-    else
-      top_ = ' '
-    endif
-    if (present(rrt)) then
-      rrt_ = rrt
-    endif
-    if (present(crt)) then 
-      crt_ = crt
-    endif
-
-    call dgsum2d(ictxt,scope,top_,size(dat,1),size(dat,2),dat,size(dat,1),rrt_,crt_)
-    
-  end subroutine dgsum2dm
-
-
-
-  subroutine igsum2ds(ictxt,scope,dat,top,rrt,crt)
-    integer, intent(in)   :: ictxt
-    integer, intent(inout)   :: dat
-    character, intent(in) :: scope
-    character, intent(in), optional  :: top
-    integer, intent(in), optional  :: rrt,crt
-    
-    interface 
-      subroutine igsum2d(ictxt,scope,top,m,n,v,ld,rrt,crt)
-        use psb_const_mod
-        integer, intent(in)   :: ictxt,m,n,ld
-        integer, intent(inout)   :: v
-        character, intent(in) :: scope, top
-        integer, intent(in)   :: rrt,crt
-      end subroutine igsum2d
-    end interface
-    character :: top_ 
-    integer   :: rrt_, crt_
-    integer   :: nrows,ncols,myrow,mycol
-
-
-    call blacs_gridinfo(ictxt,nrows,ncols,myrow,mycol)
-    select case(scope)
-    case('R','r')
-      rrt_ = myrow
-      crt_ = -1
-    case('C','c')
-      rrt_ = -1
-      crt_ = mycol
-    case('A','a')
-      rrt_ = -1
-      crt_ = -1
-    case default
-      rrt_ = -1
-      crt_ = -1
-    end select
-
-
-    if (present(top)) then 
-      top_ = top
-    else
-      top_ = ' '
-    endif
-    if (present(rrt)) then
-      rrt_ = rrt
-    endif
-    if (present(crt)) then 
-      crt_ = crt
-    endif
-    
-    call igsum2d(ictxt,scope,top_,1,1,dat,1,rrt_,crt_)
-    
-  end subroutine igsum2ds
-
-  subroutine igsum2dv(ictxt,scope,dat,top,rrt,crt)
-    integer, intent(in)   :: ictxt
-    integer, intent(inout)   :: dat(:)
-    character, intent(in) :: scope
-    character, intent(in), optional  :: top
-    integer, intent(in), optional  :: rrt,crt
-
-    interface 
-      subroutine igsum2d(ictxt,scope,top,m,n,v,ld,rrt,crt)
-        use psb_const_mod
-        integer, intent(in)   :: ictxt,m,n,ld
-        integer, intent(inout)   :: v(*)
-        character, intent(in) :: scope, top
-        integer, intent(in)   :: rrt,crt
-      end subroutine igsum2d
-    end interface
-
-    character :: top_ 
-    integer   :: rrt_, crt_
-    integer   :: nrows,ncols,myrow,mycol
-
-
-    call blacs_gridinfo(ictxt,nrows,ncols,myrow,mycol)
-    select case(scope)
-    case('R','r')
-      rrt_ = myrow
-      crt_ = -1
-    case('C','c')
-      rrt_ = -1
-      crt_ = mycol
-    case('A','a')
-      rrt_ = -1
-      crt_ = -1
-    case default
-      rrt_ = -1
-      crt_ = -1
-    end select
-
-
-    if (present(top)) then 
-      top_ = top
-    else
-      top_ = ' '
-    endif
-    if (present(rrt)) then
-      rrt_ = rrt
-    endif
-    if (present(crt)) then 
-      crt_ = crt
-    endif
-
-    call igsum2d(ictxt,scope,top_,size(dat),1,dat,size(dat),rrt_,crt_)
-    
-  end subroutine igsum2dv
-
-  subroutine igsum2dm(ictxt,scope,dat,top,rrt,crt)
-    integer, intent(in)   :: ictxt
-    integer, intent(inout)   :: dat(:,:)
-
-    character, intent(in) :: scope
-    character, intent(in), optional  :: top
-    integer, intent(in), optional  :: rrt,crt
-
-    interface 
-      subroutine igsum2d(ictxt,scope,top,m,n,v,ld,rrt,crt)
-        use psb_const_mod
-        integer, intent(in)   :: ictxt,m,n,ld
-        integer, intent(inout)   :: v(ld,*)
-        character, intent(in) :: scope, top
-        integer, intent(in)   :: rrt,crt
-      end subroutine igsum2d
-    end interface
-
-    character :: top_ 
-    integer   :: rrt_, crt_
-    integer   :: nrows,ncols,myrow,mycol
-
-
-    call blacs_gridinfo(ictxt,nrows,ncols,myrow,mycol)
-    select case(scope)
-    case('R','r')
-      rrt_ = myrow
-      crt_ = -1
-    case('C','c')
-      rrt_ = -1
-      crt_ = mycol
-    case('A','a')
-      rrt_ = -1
-      crt_ = -1
-    case default
-      rrt_ = -1
-      crt_ = -1
-    end select
-
-
-    if (present(top)) then 
-      top_ = top
-    else
-      top_ = ' '
-    endif
-    if (present(rrt)) then
-      rrt_ = rrt
-    endif
-    if (present(crt)) then 
-      crt_ = crt
-    endif
-
-    call igsum2d(ictxt,scope,top_,size(dat,1),size(dat,2),dat,size(dat,1),rrt_,crt_)
-    
-  end subroutine igsum2dm
-
-
-
-  subroutine zgsum2ds(ictxt,scope,dat,top,rrt,crt)
-    integer, intent(in)   :: ictxt
-    complex(psb_dpk_), intent(inout)   :: dat
-    character, intent(in) :: scope
-    character, intent(in), optional  :: top
-    integer, intent(in), optional  :: rrt,crt
-    
-    interface 
-      subroutine zgsum2d(ictxt,scope,top,m,n,v,ld,rrt,crt)
-        use psb_const_mod
-        integer, intent(in)   :: ictxt,m,n,ld
-        complex(psb_dpk_), intent(inout)   :: v
-        character, intent(in) :: scope, top
-        integer, intent(in)   :: rrt,crt
-      end subroutine zgsum2d
-    end interface
-    character :: top_ 
-    integer   :: rrt_, crt_
-    integer   :: nrows,ncols,myrow,mycol
-
-
-    call blacs_gridinfo(ictxt,nrows,ncols,myrow,mycol)
-    select case(scope)
-    case('R','r')
-      rrt_ = myrow
-      crt_ = -1
-    case('C','c')
-      rrt_ = -1
-      crt_ = mycol
-    case('A','a')
-      rrt_ = -1
-      crt_ = -1
-    case default
-      rrt_ = -1
-      crt_ = -1
-    end select
-
-
-    if (present(top)) then 
-      top_ = top
-    else
-      top_ = ' '
-    endif
-    if (present(rrt)) then
-      rrt_ = rrt
-    endif
-    if (present(crt)) then 
-      crt_ = crt
-    endif
-    
-    call zgsum2d(ictxt,scope,top_,1,1,dat,1,rrt_,crt_)
-    
-  end subroutine zgsum2ds
-
-  subroutine zgsum2dv(ictxt,scope,dat,top,rrt,crt)
-    integer, intent(in)   :: ictxt
-    complex(psb_dpk_), intent(inout)   :: dat(:)
-    character, intent(in) :: scope
-    character, intent(in), optional  :: top
-    integer, intent(in), optional  :: rrt,crt
-
-    interface 
-      subroutine zgsum2d(ictxt,scope,top,m,n,v,ld,rrt,crt)
-        use psb_const_mod
-        integer, intent(in)   :: ictxt,m,n,ld
-        complex(psb_dpk_), intent(inout)   :: v(*)
-        character, intent(in) :: scope, top
-        integer, intent(in)   :: rrt,crt
-      end subroutine zgsum2d
-    end interface
-
-    character :: top_ 
-    integer   :: rrt_, crt_
-    integer   :: nrows,ncols,myrow,mycol
-
-
-    call blacs_gridinfo(ictxt,nrows,ncols,myrow,mycol)
-    select case(scope)
-    case('R','r')
-      rrt_ = myrow
-      crt_ = -1
-    case('C','c')
-      rrt_ = -1
-      crt_ = mycol
-    case('A','a')
-      rrt_ = -1
-      crt_ = -1
-    case default
-      rrt_ = -1
-      crt_ = -1
-    end select
-
-
-    if (present(top)) then 
-      top_ = top
-    else
-      top_ = ' '
-    endif
-    if (present(rrt)) then
-      rrt_ = rrt
-    endif
-    if (present(crt)) then 
-      crt_ = crt
-    endif
-
-    call zgsum2d(ictxt,scope,top_,size(dat),1,dat,size(dat),rrt_,crt_)
-    
-  end subroutine zgsum2dv
-
-  subroutine zgsum2dm(ictxt,scope,dat,top,rrt,crt)
-    integer, intent(in)   :: ictxt
-    complex(psb_dpk_), intent(inout)   :: dat(:,:)
-
-    character, intent(in) :: scope
-    character, intent(in), optional  :: top
-    integer, intent(in), optional  :: rrt,crt
-
-    interface 
-      subroutine zgsum2d(ictxt,scope,top,m,n,v,ld,rrt,crt)
-        use psb_const_mod
-        integer, intent(in)   :: ictxt,m,n,ld
-        complex(psb_dpk_), intent(inout)   :: v(ld,*)
-        character, intent(in) :: scope, top
-        integer, intent(in)   :: rrt,crt
-      end subroutine zgsum2d
-    end interface
-
-    character :: top_ 
-    integer   :: rrt_, crt_
-    integer   :: nrows,ncols,myrow,mycol
-
-
-    call blacs_gridinfo(ictxt,nrows,ncols,myrow,mycol)
-    select case(scope)
-    case('R','r')
-      rrt_ = myrow
-      crt_ = -1
-    case('C','c')
-      rrt_ = -1
-      crt_ = mycol
-    case('A','a')
-      rrt_ = -1
-      crt_ = -1
-    case default
-      rrt_ = -1
-      crt_ = -1
-    end select
-
-
-    if (present(top)) then 
-      top_ = top
-    else
-      top_ = ' '
-    endif
-    if (present(rrt)) then
-      rrt_ = rrt
-    endif
-    if (present(crt)) then 
-      crt_ = crt
-    endif
-
-    call zgsum2d(ictxt,scope,top_,size(dat,1),size(dat,2),dat,size(dat,1),rrt_,crt_)
-    
-  end subroutine zgsum2dm
-
-
-
-
-  subroutine dgamx2ds(ictxt,scope,dat,top,ria,cia,rrt,crt)
-    integer, intent(in)              :: ictxt
-    real(psb_dpk_), intent(inout)  :: dat
-    character, intent(in)            :: scope
-    character, intent(in), optional  :: top
-    integer, intent(in), optional    :: rrt,crt
-    integer, intent(inout), optional :: ria,cia
-    
-    interface 
-      subroutine dgamx2d(ictxt,scope,top,m,n,v,ld,ria,cia,ldia,rrt,crt)
-        use psb_const_mod
-        integer, intent(in)             :: ictxt,m,n,ld
-        real(psb_dpk_), intent(inout) :: v
-        character, intent(in)           :: scope, top
-        integer, intent(inout)          :: ria(*),cia(*)
-        integer, intent(in)             :: rrt,crt,ldia
-      end subroutine dgamx2d
-    end interface
-    character :: top_ 
-    integer   :: rrt_, crt_
-    integer   :: ldia_,ria_(1),cia_(1)
-    integer   :: nrows,ncols,myrow,mycol
-
-
-    call blacs_gridinfo(ictxt,nrows,ncols,myrow,mycol)
-    select case(scope)
-    case('R','r')
-      rrt_ = myrow
-      crt_ = -1
-    case('C','c')
-      rrt_ = -1
-      crt_ = mycol
-    case('A','a')
-      rrt_ = -1
-      crt_ = -1
-    case default
-      rrt_ = -1
-      crt_ = -1
-    end select
-
-
-    if (present(top)) then 
-      top_ = top
-    else
-      top_ = ' '
-    endif
-    if (present(rrt)) then
-      rrt_ = rrt
-    endif
-    if (present(crt)) then 
-      crt_ = crt
-    endif
-    
-    if (present(ria).or.present(cia)) then 
-      call dgamx2d(ictxt,scope,top_,1,1,dat,1,ria_,cia_,1,rrt_,crt_)
-      if (present(ria)) ria=ria_(1)
-      if (present(cia)) cia=cia_(1)
-    else
-      call dgamx2d(ictxt,scope,top_,1,1,dat,1,ria_,cia_,-1,rrt_,crt_)
-    endif
-  end subroutine dgamx2ds
-
-
-  subroutine dgamx2dv(ictxt,scope,dat,top,ria,cia,rrt,crt)
-    integer, intent(in)              :: ictxt
-    real(psb_dpk_), intent(inout)  :: dat(:)
-    character, intent(in)            :: scope
-    character, intent(in), optional  :: top
-    integer, intent(inout), optional :: ria(:),cia(:)
-    integer, intent(in), optional    :: rrt,crt
-
-    interface 
-      subroutine dgamx2d(ictxt,scope,top,m,n,v,ld,ria,cia,ldia,rrt,crt)
-        use psb_const_mod
-        integer, intent(in)             :: ictxt,m,n,ld
-        real(psb_dpk_), intent(inout) :: v(*)
-        character, intent(in)           :: scope, top
-        integer, intent(inout)          :: ria(*),cia(*)
-        integer, intent(in)             :: rrt,crt,ldia
-      end subroutine dgamx2d
-    end interface
-
-    integer   :: ldia_,ria_(1),cia_(1)
-    character :: top_ 
-    integer   :: rrt_, crt_
-    integer   :: nrows,ncols,myrow,mycol
-
-
-    call blacs_gridinfo(ictxt,nrows,ncols,myrow,mycol)
-    select case(scope)
-    case('R','r')
-      rrt_ = myrow
-      crt_ = -1
-    case('C','c')
-      rrt_ = -1
-      crt_ = mycol
-    case('A','a')
-      rrt_ = -1
-      crt_ = -1
-    case default
-      rrt_ = -1
-      crt_ = -1
-    end select
-
-
-    if (present(top)) then 
-      top_ = top
-    else
-      top_ = ' '
-    endif
-    if (present(rrt)) then
-      rrt_ = rrt
-    endif
-    if (present(crt)) then 
-      crt_ = crt
-    endif
-    
-    if (present(ria).and.present(cia)) then 
-      call dgamx2d(ictxt,scope,top_,size(dat),1,dat,size(dat),&
-           &  ria,cia,min(size(ria),size(cia)),rrt_,crt_)
-    else
-      ldia_ = -1
-      call dgamx2d(ictxt,scope,top_,size(dat),1,dat,size(dat),&
-           &  ria_,cia_,ldia_,rrt_,crt_)
-    end if
-    
-  end subroutine dgamx2dv
-
-  subroutine dgamx2dm(ictxt,scope,dat,top,ria,cia,rrt,crt)
-    integer, intent(in)              :: ictxt
-    real(psb_dpk_), intent(inout)  :: dat(:,:)
-    character, intent(in)            :: scope
-    integer, intent(inout), optional :: ria(:,:),cia(:,:)
-    character, intent(in), optional  :: top
-    integer, intent(in), optional    :: rrt,crt
-
-    interface 
-      subroutine dgamx2d(ictxt,scope,top,m,n,v,ld,ria,cia,ldia,rrt,crt)
-        use psb_const_mod
-        integer, intent(in)             :: ictxt,m,n,ld,ldia
-        real(psb_dpk_), intent(inout) :: v(ld,*)
-        integer, intent(inout)          :: ria(ldia,*),cia(ldia,*)
-        character, intent(in)           :: scope, top
-        integer, intent(in)             :: rrt,crt
-      end subroutine dgamx2d
-    end interface
-
-    character :: top_ 
-    integer   :: rrt_, crt_
-    integer   :: ldia_,ria_(1,1),cia_(1,1)
-    integer   :: nrows,ncols,myrow,mycol
-
-
-    call blacs_gridinfo(ictxt,nrows,ncols,myrow,mycol)
-    select case(scope)
-    case('R','r')
-      rrt_ = myrow
-      crt_ = -1
-    case('C','c')
-      rrt_ = -1
-      crt_ = mycol
-    case('A','a')
-      rrt_ = -1
-      crt_ = -1
-    case default
-      rrt_ = -1
-      crt_ = -1
-    end select
-
-
-    if (present(top)) then 
-      top_ = top
-    else
-      top_ = ' '
-    endif
-    if (present(rrt)) then
-      rrt_ = rrt
-    endif
-    if (present(crt)) then 
-      crt_ = crt
-    endif
-
-    if (present(ria).and.present(cia)) then 
-      call dgamx2d(ictxt,scope,top_,size(dat,1),size(dat,2),dat,size(dat,1),&
-           & ria,cia,min(size(ria,1),size(cia,1)),rrt_,crt_)
-    else
-      ldia_ = -1
-      call dgamx2d(ictxt,scope,top_,size(dat,1),size(dat,2),dat,size(dat,1),&
-           & ria_,cia_,ldia_,rrt_,crt_)
-    end if
-      
-  end subroutine dgamx2dm
-
-
-
-  subroutine igamx2ds(ictxt,scope,dat,top,ria,cia,rrt,crt)
-    integer, intent(in)              :: ictxt
-    integer, intent(inout)  :: dat
-    character, intent(in)            :: scope
-    character, intent(in), optional  :: top
-    integer, intent(in), optional    :: rrt,crt
-    integer, intent(inout), optional :: ria,cia
-    
-    interface 
-      subroutine igamx2d(ictxt,scope,top,m,n,v,ld,ria,cia,ldia,rrt,crt)
-        use psb_const_mod
-        integer, intent(in)             :: ictxt,m,n,ld
-        integer, intent(inout) :: v
-        character, intent(in)           :: scope, top
-        integer, intent(inout)          :: ria(*),cia(*)
-        integer, intent(in)             :: rrt,crt,ldia
-      end subroutine igamx2d
-    end interface
-    character :: top_ 
-    integer   :: rrt_, crt_
-    integer   :: ldia_,ria_(1),cia_(1)
-    integer   :: nrows,ncols,myrow,mycol
-
-
-    call blacs_gridinfo(ictxt,nrows,ncols,myrow,mycol)
-    select case(scope)
-    case('R','r')
-      rrt_ = myrow
-      crt_ = -1
-    case('C','c')
-      rrt_ = -1
-      crt_ = mycol
-    case('A','a')
-      rrt_ = -1
-      crt_ = -1
-    case default
-      rrt_ = -1
-      crt_ = -1
-    end select
-
-
-    if (present(top)) then 
-      top_ = top
-    else
-      top_ = ' '
-    endif
-    if (present(rrt)) then
-      rrt_ = rrt
-    endif
-    if (present(crt)) then 
-      crt_ = crt
-    endif
-    
-    if (present(ria).or.present(cia)) then 
-      call igamx2d(ictxt,scope,top_,1,1,dat,1,ria_,cia_,1,rrt_,crt_)
-      if (present(ria)) ria=ria_(1)
-      if (present(cia)) cia=cia_(1)
-    else
-      call igamx2d(ictxt,scope,top_,1,1,dat,1,ria_,cia_,-1,rrt_,crt_)
-    endif
-  end subroutine igamx2ds
-
-
-  subroutine igamx2dv(ictxt,scope,dat,top,ria,cia,rrt,crt)
-    integer, intent(in)              :: ictxt
-    integer, intent(inout)  :: dat(:)
-    character, intent(in)            :: scope
-    character, intent(in), optional  :: top
-    integer, intent(inout), optional :: ria(:),cia(:)
-    integer, intent(in), optional    :: rrt,crt
-
-    interface 
-      subroutine igamx2d(ictxt,scope,top,m,n,v,ld,ria,cia,ldia,rrt,crt)
-        use psb_const_mod
-        integer, intent(in)             :: ictxt,m,n,ld
-        integer, intent(inout) :: v(*)
-        character, intent(in)           :: scope, top
-        integer, intent(inout)          :: ria(*),cia(*)
-        integer, intent(in)             :: rrt,crt,ldia
-      end subroutine igamx2d
-    end interface
-
-    integer   :: ldia_,ria_(1),cia_(1)
-    character :: top_ 
-    integer   :: rrt_, crt_
-    integer   :: nrows,ncols,myrow,mycol
-
-
-    call blacs_gridinfo(ictxt,nrows,ncols,myrow,mycol)
-    select case(scope)
-    case('R','r')
-      rrt_ = myrow
-      crt_ = -1
-    case('C','c')
-      rrt_ = -1
-      crt_ = mycol
-    case('A','a')
-      rrt_ = -1
-      crt_ = -1
-    case default
-      rrt_ = -1
-      crt_ = -1
-    end select
-
-
-    if (present(top)) then 
-      top_ = top
-    else
-      top_ = ' '
-    endif
-    if (present(rrt)) then
-      rrt_ = rrt
-    endif
-    if (present(crt)) then 
-      crt_ = crt
-    endif
-
-    if (present(ria).and.present(cia)) then 
-      call igamx2d(ictxt,scope,top_,size(dat),1,dat,size(dat),&
-           &  ria,cia,min(size(ria),size(cia)),rrt_,crt_)
-    else
-      ldia_ = -1
-      call igamx2d(ictxt,scope,top_,size(dat),1,dat,size(dat),&
-           &  ria_,cia_,ldia_,rrt_,crt_)
-    end if
-    
-  end subroutine igamx2dv
-
-  subroutine igamx2dm(ictxt,scope,dat,top,ria,cia,rrt,crt)
-    integer, intent(in)              :: ictxt
-    integer, intent(inout)  :: dat(:,:)
-    character, intent(in)            :: scope
-    integer, intent(inout), optional :: ria(:,:),cia(:,:)
-    character, intent(in), optional  :: top
-    integer, intent(in), optional    :: rrt,crt
-
-    interface 
-      subroutine igamx2d(ictxt,scope,top,m,n,v,ld,ria,cia,ldia,rrt,crt)
-        use psb_const_mod
-        integer, intent(in)             :: ictxt,m,n,ld,ldia
-        integer, intent(inout) :: v(ld,*)
-        integer, intent(inout)          :: ria(ldia,*),cia(ldia,*)
-        character, intent(in)           :: scope, top
-        integer, intent(in)             :: rrt,crt
-      end subroutine igamx2d
-    end interface
-
-    character :: top_ 
-    integer   :: rrt_, crt_
-    integer   :: ldia_,ria_(1,1),cia_(1,1)
-    integer   :: nrows,ncols,myrow,mycol
-
-
-    call blacs_gridinfo(ictxt,nrows,ncols,myrow,mycol)
-    select case(scope)
-    case('R','r')
-      rrt_ = myrow
-      crt_ = -1
-    case('C','c')
-      rrt_ = -1
-      crt_ = mycol
-    case('A','a')
-      rrt_ = -1
-      crt_ = -1
-    case default
-      rrt_ = -1
-      crt_ = -1
-    end select
-
-
-    if (present(top)) then 
-      top_ = top
-    else
-      top_ = ' '
-    endif
-    if (present(rrt)) then
-      rrt_ = rrt
-    endif
-    if (present(crt)) then 
-      crt_ = crt
-    endif
-
-    if (present(ria).and.present(cia)) then 
-      call igamx2d(ictxt,scope,top_,size(dat,1),size(dat,2),dat,size(dat,1),&
-           & ria,cia,min(size(ria,1),size(cia,1)),rrt_,crt_)
-    else
-      ldia_ = -1
-      call igamx2d(ictxt,scope,top_,size(dat,1),size(dat,2),dat,size(dat,1),&
-           & ria_,cia_,ldia_,rrt_,crt_)
-    end if
-      
-  end subroutine igamx2dm
-
-  
-
-  subroutine zgamx2ds(ictxt,scope,dat,top,ria,cia,rrt,crt)
-    integer, intent(in)              :: ictxt
-    complex(psb_dpk_), intent(inout)  :: dat
-    character, intent(in)            :: scope
-    character, intent(in), optional  :: top
-    integer, intent(in), optional    :: rrt,crt
-    integer, intent(inout), optional :: ria,cia
-    
-    interface 
-      subroutine zgamx2d(ictxt,scope,top,m,n,v,ld,ria,cia,ldia,rrt,crt)
-        use psb_const_mod
-        integer, intent(in)             :: ictxt,m,n,ld
-        complex(psb_dpk_), intent(inout) :: v
-        character, intent(in)           :: scope, top
-        integer, intent(inout)          :: ria(*),cia(*)
-        integer, intent(in)             :: rrt,crt,ldia
-      end subroutine zgamx2d
-    end interface
-    character :: top_ 
-    integer   :: rrt_, crt_
-    integer   :: ldia_,ria_(1),cia_(1)
-    integer   :: nrows,ncols,myrow,mycol
-
-
-    call blacs_gridinfo(ictxt,nrows,ncols,myrow,mycol)
-    select case(scope)
-    case('R','r')
-      rrt_ = myrow
-      crt_ = -1
-    case('C','c')
-      rrt_ = -1
-      crt_ = mycol
-    case('A','a')
-      rrt_ = -1
-      crt_ = -1
-    case default
-      rrt_ = -1
-      crt_ = -1
-    end select
-
-
-    if (present(top)) then 
-      top_ = top
-    else
-      top_ = ' '
-    endif
-    if (present(rrt)) then
-      rrt_ = rrt
-    endif
-    if (present(crt)) then 
-      crt_ = crt
-    endif
-    
-    if (present(ria).or.present(cia)) then 
-      call zgamx2d(ictxt,scope,top_,1,1,dat,1,ria_,cia_,1,rrt_,crt_)
-      if (present(ria)) ria=ria_(1)
-      if (present(cia)) cia=cia_(1)
-    else
-      call zgamx2d(ictxt,scope,top_,1,1,dat,1,ria_,cia_,-1,rrt_,crt_)
-    endif
-  end subroutine zgamx2ds
-
-
-  subroutine zgamx2dv(ictxt,scope,dat,top,ria,cia,rrt,crt)
-    integer, intent(in)              :: ictxt
-    complex(psb_dpk_), intent(inout)  :: dat(:)
-    character, intent(in)            :: scope
-    character, intent(in), optional  :: top
-    integer, intent(inout), optional :: ria(:),cia(:)
-    integer, intent(in), optional    :: rrt,crt
-
-    interface 
-      subroutine zgamx2d(ictxt,scope,top,m,n,v,ld,ria,cia,ldia,rrt,crt)
-        use psb_const_mod
-        integer, intent(in)             :: ictxt,m,n,ld
-        complex(psb_dpk_), intent(inout) :: v(*)
-        character, intent(in)           :: scope, top
-        integer, intent(inout)          :: ria(*),cia(*)
-        integer, intent(in)             :: rrt,crt,ldia
-      end subroutine zgamx2d
-    end interface
-
-    integer   :: ldia_,ria_(1),cia_(1)
-    character :: top_ 
-    integer   :: rrt_, crt_
-    integer   :: nrows,ncols,myrow,mycol
-
-
-    call blacs_gridinfo(ictxt,nrows,ncols,myrow,mycol)
-    select case(scope)
-    case('R','r')
-      rrt_ = myrow
-      crt_ = -1
-    case('C','c')
-      rrt_ = -1
-      crt_ = mycol
-    case('A','a')
-      rrt_ = -1
-      crt_ = -1
-    case default
-      rrt_ = -1
-      crt_ = -1
-    end select
-
-
-    if (present(top)) then 
-      top_ = top
-    else
-      top_ = ' '
-    endif
-    if (present(rrt)) then
-      rrt_ = rrt
-    endif
-    if (present(crt)) then 
-      crt_ = crt
-    endif
-
-    if (present(ria).and.present(cia)) then 
-      call zgamx2d(ictxt,scope,top_,size(dat),1,dat,size(dat),&
-           &  ria,cia,min(size(ria),size(cia)),rrt_,crt_)
-    else
-      ldia_ = -1
-      call zgamx2d(ictxt,scope,top_,size(dat),1,dat,size(dat),&
-           &  ria_,cia_,ldia_,rrt_,crt_)
-    end if
-    
-  end subroutine zgamx2dv
-
-  subroutine zgamx2dm(ictxt,scope,dat,top,ria,cia,rrt,crt)
-    integer, intent(in)              :: ictxt
-    complex(psb_dpk_), intent(inout)  :: dat(:,:)
-    character, intent(in)            :: scope
-    integer, intent(inout), optional :: ria(:,:),cia(:,:)
-    character, intent(in), optional  :: top
-    integer, intent(in), optional    :: rrt,crt
-
-    interface 
-      subroutine zgamx2d(ictxt,scope,top,m,n,v,ld,ria,cia,ldia,rrt,crt)
-        use psb_const_mod
-        integer, intent(in)             :: ictxt,m,n,ld,ldia
-        complex(psb_dpk_), intent(inout) :: v(ld,*)
-        integer, intent(inout)          :: ria(ldia,*),cia(ldia,*)
-        character, intent(in)           :: scope, top
-        integer, intent(in)             :: rrt,crt
-      end subroutine zgamx2d
-    end interface
-
-    character :: top_ 
-    integer   :: rrt_, crt_
-    integer   :: ldia_,ria_(1,1),cia_(1,1)
-    integer   :: nrows,ncols,myrow,mycol
-
-
-    call blacs_gridinfo(ictxt,nrows,ncols,myrow,mycol)
-    select case(scope)
-    case('R','r')
-      rrt_ = myrow
-      crt_ = -1
-    case('C','c')
-      rrt_ = -1
-      crt_ = mycol
-    case('A','a')
-      rrt_ = -1
-      crt_ = -1
-    case default
-      rrt_ = -1
-      crt_ = -1
-    end select
-
-
-    if (present(top)) then 
-      top_ = top
-    else
-      top_ = ' '
-    endif
-    if (present(rrt)) then
-      rrt_ = rrt
-    endif
-    if (present(crt)) then 
-      crt_ = crt
-    endif
-
-    if (present(ria).and.present(cia)) then 
-      call zgamx2d(ictxt,scope,top_,size(dat,1),size(dat,2),dat,size(dat,1),&
-           & ria,cia,min(size(ria,1),size(cia,1)),rrt_,crt_)
-    else
-      ldia_ = -1
-      call zgamx2d(ictxt,scope,top_,size(dat,1),size(dat,2),dat,size(dat,1),&
-           & ria_,cia_,ldia_,rrt_,crt_)
-    end if
-      
-  end subroutine zgamx2dm
-  
-
-  subroutine dgamn2ds(ictxt,scope,dat,top,ria,cia,rrt,crt)
-    integer, intent(in)              :: ictxt
-    real(psb_dpk_), intent(inout)  :: dat
-    character, intent(in)            :: scope
-    character, intent(in), optional  :: top
-    integer, intent(in), optional    :: rrt,crt
-    integer, intent(inout), optional :: ria,cia
-    
-    interface 
-      subroutine dgamn2d(ictxt,scope,top,m,n,v,ld,ria,cia,ldia,rrt,crt)
-        use psb_const_mod
-        integer, intent(in)             :: ictxt,m,n,ld
-        real(psb_dpk_), intent(inout) :: v
-        character, intent(in)           :: scope, top
-        integer, intent(inout)          :: ria(*),cia(*)
-        integer, intent(in)             :: rrt,crt,ldia
-      end subroutine dgamn2d
-    end interface
-    character :: top_ 
-    integer   :: rrt_, crt_
-    integer   :: ldia_,ria_(1),cia_(1)
-    integer   :: nrows,ncols,myrow,mycol
-
-
-    call blacs_gridinfo(ictxt,nrows,ncols,myrow,mycol)
-    select case(scope)
-    case('R','r')
-      rrt_ = myrow
-      crt_ = -1
-    case('C','c')
-      rrt_ = -1
-      crt_ = mycol
-    case('A','a')
-      rrt_ = -1
-      crt_ = -1
-    case default
-      rrt_ = -1
-      crt_ = -1
-    end select
-
-
-    if (present(top)) then 
-      top_ = top
-    else
-      top_ = ' '
-    endif
-    if (present(rrt)) then
-      rrt_ = rrt
-    endif
-    if (present(crt)) then 
-      crt_ = crt
-    endif
-    
-    if (present(ria).or.present(cia)) then 
-      call dgamn2d(ictxt,scope,top_,1,1,dat,1,ria_,cia_,1,rrt_,crt_)
-      if (present(ria)) ria=ria_(1)
-      if (present(cia)) cia=cia_(1)
-    else
-      call dgamn2d(ictxt,scope,top_,1,1,dat,1,ria_,cia_,-1,rrt_,crt_)
-    endif
-  end subroutine dgamn2ds
-
-
-  subroutine dgamn2dv(ictxt,scope,dat,top,ria,cia,rrt,crt)
-    integer, intent(in)              :: ictxt
-    real(psb_dpk_), intent(inout)  :: dat(:)
-    character, intent(in)            :: scope
-    character, intent(in), optional  :: top
-    integer, intent(inout), optional :: ria(:),cia(:)
-    integer, intent(in), optional    :: rrt,crt
-
-    interface 
-      subroutine dgamn2d(ictxt,scope,top,m,n,v,ld,ria,cia,ldia,rrt,crt)
-        use psb_const_mod
-        integer, intent(in)             :: ictxt,m,n,ld
-        real(psb_dpk_), intent(inout) :: v(*)
-        character, intent(in)           :: scope, top
-        integer, intent(inout)          :: ria(*),cia(*)
-        integer, intent(in)             :: rrt,crt,ldia
-      end subroutine dgamn2d
-    end interface
-
-    integer   :: ldia_,ria_(1),cia_(1)
-    character :: top_ 
-    integer   :: rrt_, crt_
-    integer   :: nrows,ncols,myrow,mycol
-
-
-    call blacs_gridinfo(ictxt,nrows,ncols,myrow,mycol)
-    select case(scope)
-    case('R','r')
-      rrt_ = myrow
-      crt_ = -1
-    case('C','c')
-      rrt_ = -1
-      crt_ = mycol
-    case('A','a')
-      rrt_ = -1
-      crt_ = -1
-    case default
-      rrt_ = -1
-      crt_ = -1
-    end select
-
-
-    if (present(top)) then 
-      top_ = top
-    else
-      top_ = ' '
-    endif
-    if (present(rrt)) then
-      rrt_ = rrt
-    endif
-    if (present(crt)) then 
-      crt_ = crt
-    endif
-
-    if (present(ria).and.present(cia)) then 
-      call dgamn2d(ictxt,scope,top_,size(dat),1,dat,size(dat),&
-           &  ria,cia,min(size(ria),size(cia)),rrt_,crt_)
-    else
-      ldia_ = -1
-      call dgamn2d(ictxt,scope,top_,size(dat),1,dat,size(dat),&
-           &  ria_,cia_,ldia_,rrt_,crt_)
-    end if
-    
-  end subroutine dgamn2dv
-
-  subroutine dgamn2dm(ictxt,scope,dat,top,ria,cia,rrt,crt)
-    integer, intent(in)              :: ictxt
-    real(psb_dpk_), intent(inout)  :: dat(:,:)
-    character, intent(in)            :: scope
-    integer, intent(inout), optional :: ria(:,:),cia(:,:)
-    character, intent(in), optional  :: top
-    integer, intent(in), optional    :: rrt,crt
-
-    interface 
-      subroutine dgamn2d(ictxt,scope,top,m,n,v,ld,ria,cia,ldia,rrt,crt)
-        use psb_const_mod
-        integer, intent(in)             :: ictxt,m,n,ld,ldia
-        real(psb_dpk_), intent(inout) :: v(ld,*)
-        integer, intent(inout)          :: ria(ldia,*),cia(ldia,*)
-        character, intent(in)           :: scope, top
-        integer, intent(in)             :: rrt,crt
-      end subroutine dgamn2d
-    end interface
-
-    character :: top_ 
-    integer   :: rrt_, crt_
-    integer   :: ldia_,ria_(1,1),cia_(1,1)
-    integer   :: nrows,ncols,myrow,mycol
-
-
-    call blacs_gridinfo(ictxt,nrows,ncols,myrow,mycol)
-    select case(scope)
-    case('R','r')
-      rrt_ = myrow
-      crt_ = -1
-    case('C','c')
-      rrt_ = -1
-      crt_ = mycol
-    case('A','a')
-      rrt_ = -1
-      crt_ = -1
-    case default
-      rrt_ = -1
-      crt_ = -1
-    end select
-
-
-    if (present(top)) then 
-      top_ = top
-    else
-      top_ = ' '
-    endif
-    if (present(rrt)) then
-      rrt_ = rrt
-    endif
-    if (present(crt)) then 
-      crt_ = crt
-    endif
-
-    if (present(ria).and.present(cia)) then 
-      call dgamn2d(ictxt,scope,top_,size(dat,1),size(dat,2),dat,size(dat,1),&
-           & ria,cia,min(size(ria,1),size(cia,1)),rrt_,crt_)
-    else
-      ldia_ = -1
-      call dgamn2d(ictxt,scope,top_,size(dat,1),size(dat,2),dat,size(dat,1),&
-           & ria_,cia_,ldia_,rrt_,crt_)
-    end if
-      
-  end subroutine dgamn2dm
-
-
-
-  subroutine igamn2ds(ictxt,scope,dat,top,ria,cia,rrt,crt)
-    integer, intent(in)              :: ictxt
-    integer, intent(inout)  :: dat
-    character, intent(in)            :: scope
-    character, intent(in), optional  :: top
-    integer, intent(in), optional    :: rrt,crt
-    integer, intent(inout), optional :: ria,cia
-    
-    interface 
-      subroutine igamn2d(ictxt,scope,top,m,n,v,ld,ria,cia,ldia,rrt,crt)
-        use psb_const_mod
-        integer, intent(in)             :: ictxt,m,n,ld
-        integer, intent(inout) :: v
-        character, intent(in)           :: scope, top
-        integer, intent(inout)          :: ria(*),cia(*)
-        integer, intent(in)             :: rrt,crt,ldia
-      end subroutine igamn2d
-    end interface
-    character :: top_ 
-    integer   :: rrt_, crt_
-    integer   :: ldia_,ria_(1),cia_(1)
-    integer   :: nrows,ncols,myrow,mycol
-
-
-    call blacs_gridinfo(ictxt,nrows,ncols,myrow,mycol)
-    select case(scope)
-    case('R','r')
-      rrt_ = myrow
-      crt_ = -1
-    case('C','c')
-      rrt_ = -1
-      crt_ = mycol
-    case('A','a')
-      rrt_ = -1
-      crt_ = -1
-    case default
-      rrt_ = -1
-      crt_ = -1
-    end select
-
-
-    if (present(top)) then 
-      top_ = top
-    else
-      top_ = ' '
-    endif
-    if (present(rrt)) then
-      rrt_ = rrt
-    endif
-    if (present(crt)) then 
-      crt_ = crt
-    endif
-    
-    if (present(ria).or.present(cia)) then 
-      call igamn2d(ictxt,scope,top_,1,1,dat,1,ria_,cia_,1,rrt_,crt_)
-      if (present(ria)) ria=ria_(1)
-      if (present(cia)) cia=cia_(1)
-    else
-      call igamn2d(ictxt,scope,top_,1,1,dat,1,ria_,cia_,-1,rrt_,crt_)
-    endif
-  end subroutine igamn2ds
-
-
-  subroutine igamn2dv(ictxt,scope,dat,top,ria,cia,rrt,crt)
-    integer, intent(in)              :: ictxt
-    integer, intent(inout)  :: dat(:)
-    character, intent(in)            :: scope
-    character, intent(in), optional  :: top
-    integer, intent(inout), optional :: ria(:),cia(:)
-    integer, intent(in), optional    :: rrt,crt
-
-    interface 
-      subroutine igamn2d(ictxt,scope,top,m,n,v,ld,ria,cia,ldia,rrt,crt)
-        use psb_const_mod
-        integer, intent(in)             :: ictxt,m,n,ld
-        integer, intent(inout) :: v(*)
-        character, intent(in)           :: scope, top
-        integer, intent(inout)          :: ria(*),cia(*)
-        integer, intent(in)             :: rrt,crt,ldia
-      end subroutine igamn2d
-    end interface
-
-    integer   :: ldia_,ria_(1),cia_(1)
-    character :: top_ 
-    integer   :: rrt_, crt_
-    integer   :: nrows,ncols,myrow,mycol
-
-
-    call blacs_gridinfo(ictxt,nrows,ncols,myrow,mycol)
-    select case(scope)
-    case('R','r')
-      rrt_ = myrow
-      crt_ = -1
-    case('C','c')
-      rrt_ = -1
-      crt_ = mycol
-    case('A','a')
-      rrt_ = -1
-      crt_ = -1
-    case default
-      rrt_ = -1
-      crt_ = -1
-    end select
-
-
-    if (present(top)) then 
-      top_ = top
-    else
-      top_ = ' '
-    endif
-    if (present(rrt)) then
-      rrt_ = rrt
-    endif
-    if (present(crt)) then 
-      crt_ = crt
-    endif
-
-    if (present(ria).and.present(cia)) then 
-      call igamn2d(ictxt,scope,top_,size(dat),1,dat,size(dat),&
-           &  ria,cia,min(size(ria),size(cia)),rrt_,crt_)
-    else
-      ldia_ = -1
-      call igamn2d(ictxt,scope,top_,size(dat),1,dat,size(dat),&
-           &  ria_,cia_,ldia_,rrt_,crt_)
-    end if
-    
-  end subroutine igamn2dv
-
-  subroutine igamn2dm(ictxt,scope,dat,top,ria,cia,rrt,crt)
-    integer, intent(in)              :: ictxt
-    integer, intent(inout)  :: dat(:,:)
-    character, intent(in)            :: scope
-    integer, intent(inout), optional :: ria(:,:),cia(:,:)
-    character, intent(in), optional  :: top
-    integer, intent(in), optional    :: rrt,crt
-
-    interface 
-      subroutine igamn2d(ictxt,scope,top,m,n,v,ld,ria,cia,ldia,rrt,crt)
-        use psb_const_mod
-        integer, intent(in)             :: ictxt,m,n,ld,ldia
-        integer, intent(inout) :: v(ld,*)
-        integer, intent(inout)          :: ria(ldia,*),cia(ldia,*)
-        character, intent(in)           :: scope, top
-        integer, intent(in)             :: rrt,crt
-      end subroutine igamn2d
-    end interface
-
-    character :: top_ 
-    integer   :: rrt_, crt_
-    integer   :: ldia_,ria_(1,1),cia_(1,1)
-    integer   :: nrows,ncols,myrow,mycol
-
-
-    call blacs_gridinfo(ictxt,nrows,ncols,myrow,mycol)
-    select case(scope)
-    case('R','r')
-      rrt_ = myrow
-      crt_ = -1
-    case('C','c')
-      rrt_ = -1
-      crt_ = mycol
-    case('A','a')
-      rrt_ = -1
-      crt_ = -1
-    case default
-      rrt_ = -1
-      crt_ = -1
-    end select
-
-
-    if (present(top)) then 
-      top_ = top
-    else
-      top_ = ' '
-    endif
-    if (present(rrt)) then
-      rrt_ = rrt
-    endif
-    if (present(crt)) then 
-      crt_ = crt
-    endif
-
-    if (present(ria).and.present(cia)) then 
-      call igamn2d(ictxt,scope,top_,size(dat,1),size(dat,2),dat,size(dat,1),&
-           & ria,cia,min(size(ria,1),size(cia,1)),rrt_,crt_)
-    else
-      ldia_ = -1
-      call igamn2d(ictxt,scope,top_,size(dat,1),size(dat,2),dat,size(dat,1),&
-           & ria_,cia_,ldia_,rrt_,crt_)
-    end if
-      
-  end subroutine igamn2dm
-
-  
-
-  subroutine zgamn2ds(ictxt,scope,dat,top,ria,cia,rrt,crt)
-    integer, intent(in)              :: ictxt
-    complex(psb_dpk_), intent(inout)  :: dat
-    character, intent(in)            :: scope
-    character, intent(in), optional  :: top
-    integer, intent(in), optional    :: rrt,crt
-    integer, intent(inout), optional :: ria,cia
-    
-    interface 
-      subroutine zgamn2d(ictxt,scope,top,m,n,v,ld,ria,cia,ldia,rrt,crt)
-        use psb_const_mod
-        integer, intent(in)             :: ictxt,m,n,ld
-        complex(psb_dpk_), intent(inout) :: v
-        character, intent(in)           :: scope, top
-        integer, intent(inout)          :: ria(*),cia(*)
-        integer, intent(in)             :: rrt,crt,ldia
-      end subroutine zgamn2d
-    end interface
-    character :: top_ 
-    integer   :: rrt_, crt_
-    integer   :: ldia_,ria_(1),cia_(1)
-    integer   :: nrows,ncols,myrow,mycol
-
-
-    call blacs_gridinfo(ictxt,nrows,ncols,myrow,mycol)
-    select case(scope)
-    case('R','r')
-      rrt_ = myrow
-      crt_ = -1
-    case('C','c')
-      rrt_ = -1
-      crt_ = mycol
-    case('A','a')
-      rrt_ = -1
-      crt_ = -1
-    case default
-      rrt_ = -1
-      crt_ = -1
-    end select
-
-
-    if (present(top)) then 
-      top_ = top
-    else
-      top_ = ' '
-    endif
-    if (present(rrt)) then
-      rrt_ = rrt
-    endif
-    if (present(crt)) then 
-      crt_ = crt
-    endif
-    
-    if (present(ria).or.present(cia)) then 
-      call zgamn2d(ictxt,scope,top_,1,1,dat,1,ria_,cia_,1,rrt_,crt_)
-      if (present(ria)) ria=ria_(1)
-      if (present(cia)) cia=cia_(1)
-    else
-      call zgamn2d(ictxt,scope,top_,1,1,dat,1,ria_,cia_,-1,rrt_,crt_)
-    endif
-  end subroutine zgamn2ds
-
-
-  subroutine zgamn2dv(ictxt,scope,dat,top,ria,cia,rrt,crt)
-    integer, intent(in)              :: ictxt
-    complex(psb_dpk_), intent(inout)  :: dat(:)
-    character, intent(in)            :: scope
-    character, intent(in), optional  :: top
-    integer, intent(inout), optional :: ria(:),cia(:)
-    integer, intent(in), optional    :: rrt,crt
-
-    interface 
-      subroutine zgamn2d(ictxt,scope,top,m,n,v,ld,ria,cia,ldia,rrt,crt)
-        use psb_const_mod
-        integer, intent(in)             :: ictxt,m,n,ld
-        complex(psb_dpk_), intent(inout) :: v(*)
-        character, intent(in)           :: scope, top
-        integer, intent(inout)          :: ria(*),cia(*)
-        integer, intent(in)             :: rrt,crt,ldia
-      end subroutine zgamn2d
-    end interface
-
-    integer   :: ldia_,ria_(1),cia_(1)
-    character :: top_ 
-    integer   :: rrt_, crt_
-    integer   :: nrows,ncols,myrow,mycol
-
-
-    call blacs_gridinfo(ictxt,nrows,ncols,myrow,mycol)
-    select case(scope)
-    case('R','r')
-      rrt_ = myrow
-      crt_ = -1
-    case('C','c')
-      rrt_ = -1
-      crt_ = mycol
-    case('A','a')
-      rrt_ = -1
-      crt_ = -1
-    case default
-      rrt_ = -1
-      crt_ = -1
-    end select
-
-    if (present(top)) then 
-      top_ = top
-    else
-      top_ = ' '
-    endif
-    if (present(rrt)) then
-      rrt_ = rrt
-    endif
-    if (present(crt)) then 
-      crt_ = crt
-    endif
-
-    if (present(ria).and.present(cia)) then 
-      call zgamn2d(ictxt,scope,top_,size(dat),1,dat,size(dat),&
-           &  ria,cia,min(size(ria),size(cia)),rrt_,crt_)
-    else
-      ldia_ = -1
-      call zgamn2d(ictxt,scope,top_,size(dat),1,dat,size(dat),&
-           &  ria_,cia_,ldia_,rrt_,crt_)
-    end if
-    
-  end subroutine zgamn2dv
-
-  subroutine zgamn2dm(ictxt,scope,dat,top,ria,cia,rrt,crt)
-    integer, intent(in)              :: ictxt
-    complex(psb_dpk_), intent(inout)  :: dat(:,:)
-    character, intent(in)            :: scope
-    integer, intent(inout), optional :: ria(:,:),cia(:,:)
-    character, intent(in), optional  :: top
-    integer, intent(in), optional    :: rrt,crt
-
-    interface 
-      subroutine zgamn2d(ictxt,scope,top,m,n,v,ld,ria,cia,ldia,rrt,crt)
-        use psb_const_mod
-        integer, intent(in)             :: ictxt,m,n,ld,ldia
-        complex(psb_dpk_), intent(inout) :: v(ld,*)
-        integer, intent(inout)          :: ria(ldia,*),cia(ldia,*)
-        character, intent(in)           :: scope, top
-        integer, intent(in)             :: rrt,crt
-      end subroutine zgamn2d
-    end interface
-
-    character :: top_ 
-    integer   :: rrt_, crt_
-    integer   :: ldia_,ria_(1,1),cia_(1,1)
-    integer   :: nrows,ncols,myrow,mycol
-
-
-    call blacs_gridinfo(ictxt,nrows,ncols,myrow,mycol)
-    select case(scope)
-    case('R','r')
-      rrt_ = myrow
-      crt_ = -1
-    case('C','c')
-      rrt_ = -1
-      crt_ = mycol
-    case('A','a')
-      rrt_ = -1
-      crt_ = -1
-    case default
-      rrt_ = -1
-      crt_ = -1
-    end select
-
-
-    if (present(top)) then 
-      top_ = top
-    else
-      top_ = ' '
-    endif
-    if (present(rrt)) then
-      rrt_ = rrt
-    endif
-    if (present(crt)) then 
-      crt_ = crt
-    endif
-
-    if (present(ria).and.present(cia)) then 
-      call zgamn2d(ictxt,scope,top_,size(dat,1),size(dat,2),dat,size(dat,1),&
-           & ria,cia,min(size(ria,1),size(cia,1)),rrt_,crt_)
-    else
-      ldia_ = -1
-      call zgamn2d(ictxt,scope,top_,size(dat,1),size(dat,2),dat,size(dat,1),&
-           & ria_,cia_,ldia_,rrt_,crt_)
-    end if
-      
-  end subroutine zgamn2dm
-#endif    
 
 
   subroutine psb_set_coher(ictxt,isvch)

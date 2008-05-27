@@ -32,6 +32,7 @@ C
       SUBROUTINE DCSRRWS(TRANS,M,N,DESCRA,A,IA1,IA2,
      &  INFOA,ROWSUM,IERROR)
       use psb_const_mod
+      use psb_string_mod
       IMPLICIT NONE
 C     .. Scalar Arguments ..
       INTEGER           M,N, IERROR
@@ -43,14 +44,15 @@ C     .. Array Arguments ..
 C     .. Local scalars ..
       INTEGER I, J
 
-      IF (TRANS.EQ.'N') THEN
+      IF (psb_toupper(TRANS).EQ.'N') THEN
         DO I = 1, M
           ROWSUM(I) = 0.0D0
           DO J = IA2(I), IA2(I + 1) - 1
             ROWSUM(I) = ROWSUM(I) + ABS(A(J))
           ENDDO
         ENDDO
-      ELSE IF ((TRANS.EQ.'T').OR.(TRANS.EQ.'C')) THEN
+      ELSE IF ((psb_toupper(TRANS).EQ.'T').OR.
+     +    (psb_toupper(TRANS).EQ.'C')) THEN
         DO J = 1, N
           ROWSUM(J) = 0.0D0
         ENDDO

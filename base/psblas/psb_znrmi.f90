@@ -57,7 +57,7 @@ function psb_znrmi(a,desc_a,info)
   ! locals
   integer                  :: ictxt, np, me,&
        & err_act, n, iia, jja, ia, ja, mdim, ndim, m
-  real(psb_dpk_)         :: nrmi, zcsnmi
+  real(psb_dpk_)         :: nrmi
   character(len=20)        :: name, ch_err
 
   name='psb_znrmi'
@@ -94,15 +94,11 @@ function psb_znrmi(a,desc_a,info)
   end if
 
   if ((m /= 0).and.(n /= 0)) then
-    mdim = psb_cd_get_local_rows(desc_a)
-    ndim = psb_cd_get_local_cols(desc_a)
-    nrmi = zcsnmi('N',mdim,ndim,a%fida,&
-         & a%descra,a%aspk,a%ia1,a%ia2,&
-         & a%infoa,info)
+    nrmi = psb_csnmi(a,info)
 
     if(info /= 0) then
       info=4010
-      ch_err='dcsnmi'
+      ch_err='psb_csnmi'
       call psb_errpush(info,name,a_err=ch_err)
       goto 9999
     end if

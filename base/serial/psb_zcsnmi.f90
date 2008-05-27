@@ -47,7 +47,7 @@ function psb_zcsnmi(a,info,trans)
      function zcsnmi(trans,m,n,fida,descra,a,ia1,ia2,&
           &                 infoa,ierror)
        use psb_const_mod
-       real(psb_dpk_)   ::  zcsnmi
+       real(psb_dpk_)   :: zcsnmi
        integer          ::  m,n, ierror
        character        ::  trans
        integer          ::  ia1(*),ia2(*),infoa(*)

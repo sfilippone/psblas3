@@ -197,6 +197,7 @@ C
      +  FIDT,DESCRT,T,IT1,IT2,INFOT,PR,B,LDB,BETA,C,LDC,
      +  WORK,LWORK,IERROR)
       use psb_const_mod
+      use psb_string_mod
 C     .. Scalar Arguments ..
       IMPLICIT   NONE
       complex(psb_dpk_) ALPHA, BETA
@@ -216,7 +217,7 @@ C     .. Local Array..
 C     .. Parameters ..
       PARAMETER (ZERO = (0.D0, 0.D0))
 C     .. External Subroutines ..
-      EXTERNAL   ZSWSM, ZLPUPD, XERBLA
+      EXTERNAL   ZSWSM, ZLPUPD
 C     .. Intrinsic Functions ..
       INTRINSIC        DBLE, IDINT
 C     .. Executable Statements ..
@@ -234,12 +235,16 @@ C
         IERROR = 10
         INT_VAL(1) = 3
         INT_VAL(2) = N
-      ELSE IF (TRANS.NE.'T' .AND. TRANS.NE.'N' .AND. TRANS.NE.'C') THEN
+      ELSE IF (psb_toupper(TRANS).NE.'T' .AND.
+     +    psb_toupper(TRANS).NE.'N' .AND.
+     +    psb_toupper(TRANS).NE.'C') THEN
         IERROR = 40
         INT_VAL(1) = 1
         STRINGS(1) = TRANS//'\0'
-      ELSE IF (UNITD.NE.'U' .AND. UNITD.NE.'L' .AND. UNITD.NE.'R'       &
-     &    .AND. UNITD.NE.'B') THEN
+      ELSE IF (psb_toupper(UNITD).NE.'U' .AND.
+     +    psb_toupper(UNITD).NE.'L' .AND.
+     +    psb_toupper(UNITD).NE.'R' .AND.
+     +    psb_toupper(UNITD).NE.'B') THEN
         IERROR = 40
         INT_VAL(1) = 5
         STRINGS(1) = UNITD//'\0'
@@ -261,9 +266,7 @@ C
 C     Error handling
 C
       IF(IERROR.NE.0) THEN
-        write(0,*) 'zcssm ierror',ierror
         CALL FCPSB_ERRPUSH(IERROR,NAME,INT_VAL)
-
         GOTO 9999
       ENDIF
 
@@ -369,9 +372,9 @@ C
       
 
       IF ( ERR_ACT .NE. 0 ) THEN 
-         CALL FCPSB_SERROR()
+        CALL FCPSB_SERROR()
       ENDIF
       RETURN
-         
+      
       END
 

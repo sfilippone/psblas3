@@ -95,7 +95,9 @@ C     Notes
 C     =====
 C
       FUNCTION DCSNMI(TRANS,M,N,FIDA,DESCRA,A,IA1,IA2,
-     &                 INFOA,IERROR)
+     &  INFOA,IERROR)
+      use psb_const_mod
+      use psb_string_mod
       use psb_const_mod
       IMPLICIT NONE
       real(psb_dpk_) dcsnmi
@@ -126,49 +128,49 @@ C
       CALL FCPSB_ERRACTIONSAVE(ERR_ACT)
 
       IF     (M.LT.0) THEN
-         IERROR = 10
-         INT_VAL(1) = 2
-         INT_VAL(2) = M
+        IERROR = 10
+        INT_VAL(1) = 2
+        INT_VAL(2) = M
       ELSE IF (N.LT.0) THEN
-         IERROR = 10
-         INT_VAL(1) = 3
-         INT_VAL(2) = N
+        IERROR = 10
+        INT_VAL(1) = 3
+        INT_VAL(2) = N
       ELSE IF (TRANS.NE.'T' .AND. TRANS.NE.'N' .AND. TRANS.NE.'C') THEN
-         IERROR = 40
-         INT_VAL(1) = 1
+        IERROR = 40
+        INT_VAL(1) = 1
       ENDIF
 
 C
 C     Error handling
 C
       IF(IERROR.NE.0) THEN
-         CALL FCPSB_ERRPUSH(IERROR,NAME,INT_VAL)
-         GOTO 9999
+        CALL FCPSB_ERRPUSH(IERROR,NAME,INT_VAL)
+        GOTO 9999
       ENDIF
 
 C
 C     Check for M, N, K
 C
       IF(M.LE.0 .OR. N.LE.0) THEN
-         DCSNMI = 0.D0
-         GOTO 9999
+        DCSNMI = 0.D0
+        GOTO 9999
       ENDIF
 
 C     ... Compute infinity norm for matrix A ...
-      IF (FIDA(1:3).EQ.'CSR') THEN
-         DCSNMI = DCRNRMI(TRANS,M,N,DESCRA,A,IA1,IA2,
-     +      INFOA,IERROR)
-      ELSE IF (FIDA(1:3).EQ.'JAD') THEN
-         DCSNMI = DJDNRMI(TRANS,M,N,DESCRA,A,IA1,IA2,
-     +      INFOA,IERROR)
-      ELSE IF (FIDA(1:3).EQ.'COO') THEN
-         DCSNMI = DCOONRMI(TRANS,M,N,DESCRA,A,IA1,IA2,
-     +      INFOA,IERROR)
+      IF (psb_toupper(FIDA(1:3)).EQ.'CSR') THEN
+        DCSNMI = DCRNRMI(TRANS,M,N,DESCRA,A,IA1,IA2,
+     +    INFOA,IERROR)
+      ELSE IF (psb_toupper(FIDA(1:3)).EQ.'JAD') THEN
+        DCSNMI = DJDNRMI(TRANS,M,N,DESCRA,A,IA1,IA2,
+     +    INFOA,IERROR)
+      ELSE IF (psb_toupper(FIDA(1:3)).EQ.'COO') THEN
+        DCSNMI = DCOONRMI(TRANS,M,N,DESCRA,A,IA1,IA2,
+     +    INFOA,IERROR)
       ELSE
 C
 C     This data structure not yet considered
 C
-         IERROR = 3010
+        IERROR = 3010
       ENDIF
 
       CALL FCPSB_ERRACTIONRESTORE(ERR_ACT)
@@ -178,8 +180,8 @@ C
       CALL FCPSB_ERRACTIONRESTORE(ERR_ACT)
 
       IF ( ERR_ACT .NE. 0 ) THEN 
-         CALL FCPSB_SERROR()
-         RETURN
+        CALL FCPSB_SERROR()
+        RETURN
       ENDIF
 
       RETURN

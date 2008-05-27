@@ -57,12 +57,6 @@ contains
 
     do i=1,len(string)
       psb_tolowerc(i:i) = lower1c(string(i:i))
-!!$      k = index(ucase,string(i:i))
-!!$      if (k /=0 ) then 
-!!$        psb_tolowerc(i:i) = lcase(k:k)
-!!$      else          
-!!$        psb_tolowerc(i:i) = string(i:i)
-!!$      end if
     enddo
   end function psb_tolowerc
 
@@ -73,12 +67,6 @@ contains
 
     do i=1,len(string)
       psb_toupperc(i:i) = upper1c(string(i:i))
-!!$      k = index(lcase,string(i:i))
-!!$      if (k /=0 ) then 
-!!$        psb_toupperc(i:i) = ucase(k:k)
-!!$      else          
-!!$        psb_toupperc(i:i) = string(i:i)
-!!$      end if
     enddo
   end function psb_toupperc
 

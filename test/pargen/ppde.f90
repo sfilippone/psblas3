@@ -361,12 +361,13 @@ contains
     end interface   ! local variables
     type(psb_dspmat_type)    :: a
     real(psb_dpk_)         :: zt(nbmax),glob_x,glob_y,glob_z
-    integer                  :: m,n,nnz,glob_row,loc_row
+    integer                  :: m,n,nnz,glob_row
     integer                  :: x,y,z,ia,indx_owner
     integer                  :: np, iam
     integer                  :: element
     integer, allocatable     :: irow(:),icol(:)
     real(psb_dpk_), allocatable :: val(:)
+    integer, allocatable     :: prv(:)
     ! deltah dimension of each grid cell
     ! deltat discretization time
     real(psb_dpk_)         :: deltah

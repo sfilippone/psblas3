@@ -88,9 +88,10 @@ C             IERROR > 0 error in integrity check
 
 
       SUBROUTINE DCSRCK(TRANS,M,N,DESCRA,A,IA1,IA2,                       
-     +   WORK,LWORK,IERROR)
+     +  WORK,LWORK,IERROR)
       use psb_const_mod
-      IMPLICIT NONE                                                     
+      use psb_string_mod
+      IMPLICIT NONE    
 C     .. Scalar Arguments ..
       INTEGER          LWORK,M, N, IERROR
       CHARACTER        TRANS
@@ -109,52 +110,57 @@ C      Check #1: Character descriptor have valid values
 C
       IERROR = 0
 
-      IF ((DESCRA(1:1).NE.'G').AND.(DESCRA(1:1).NE.'S').AND.
-     &   (DESCRA(1:1).NE.'H').AND.(DESCRA(1:1).NE.'T').AND.
-     &   (DESCRA(1:1).NE.'A').AND.(DESCRA(1:1).NE.'D'))  THEN
-         IERROR = 11
-         GOTO 9999
+      IF ((psb_toupper(DESCRA(1:1)).NE.'G').AND.
+     +  (psb_toupper(DESCRA(1:1)).NE.'S').AND.
+     +  (psb_toupper(DESCRA(1:1)).NE.'H').AND.
+     +  (psb_toupper(DESCRA(1:1)).NE.'T').AND.
+     +  (psb_toupper(DESCRA(1:1)).NE.'A').AND.
+     +  (psb_toupper(DESCRA(1:1)).NE.'D'))  THEN
+        IERROR = 11
+        GOTO 9999
       END IF
-      IF ((DESCRA(2:2).NE.'U').AND.(DESCRA(2:2).NE.'L')) THEN
-         IERROR = 12
-         GOTO 9999
+      IF ((psb_toupper(DESCRA(2:2)).NE.'U').AND.
+     +  (psb_toupper(DESCRA(2:2)).NE.'L')) THEN
+        IERROR = 12
+        GOTO 9999
       END IF
-      IF ((DESCRA(3:3).NE.'U').AND.(DESCRA(3:3).NE.'N')) THEN
-         IERROR = 13
-         GOTO 9999
+      IF ((psb_toupper(DESCRA(3:3)).NE.'U').AND.
+     +  (psb_toupper(DESCRA(3:3)).NE.'N')) THEN
+        IERROR = 13
+        GOTO 9999
       END IF
 C
 C      Check #2: Pointers have non decreasing order
 C
       IF (IA2(1).LE.0) THEN
-         IERROR = 14
-         GOTO 9999
+        IERROR = 14
+        GOTO 9999
       ENDIF
       
       NROW = 0
       DO 10 I = 1, M
-         IF (IA2(I) .GT. IA2(I+1)) THEN
-            NROW = NROW + 1
-         END IF
+        IF (IA2(I) .GT. IA2(I+1)) THEN
+          NROW = NROW + 1
+        END IF
  10   CONTINUE
       IF (NROW .GT. 0) THEN
-         IERROR = 15
-         GOTO 9999
+        IERROR = 15
+        GOTO 9999
       END IF
 C
 C      Check #3: Indices are within problem dimension
 C
       NIND = 0
       DO 20 I = 1, M
-         DO 30 J = IA2(I), IA2(I+1) - 1
-            IF ((IA1(J).LT.0) .OR. (IA1(J).GT.N)) THEN
-               NIND = NIND + 1
-            END IF
- 30      CONTINUE
+        DO 30 J = IA2(I), IA2(I+1) - 1
+          IF ((IA1(J).LT.0) .OR. (IA1(J).GT.N)) THEN
+            NIND = NIND + 1
+          END IF
+ 30     CONTINUE
  20   CONTINUE
       IF (NIND .GT. 0) THEN
-         IERROR = 16
-         GOTO 9999
+        IERROR = 16
+        GOTO 9999
       END IF
  9999 CONTINUE
       RETURN

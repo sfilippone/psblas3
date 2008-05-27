@@ -168,6 +168,7 @@ C
       SUBROUTINE DCSRMV4(TRANS,DIAG,M,N,ALPHA,AS,JA,IA,X,LDX,
      +  BETA,Y,LDY, WORK,LWORK,IERROR)
       use psb_const_mod
+      use psb_string_mod
       integer  nb
       parameter (nb=4)
 C     .. Parameters ..
@@ -187,11 +188,12 @@ C     .. Local Scalars ..
 C     .. Executable Statements ..
 C
       IERROR = 0
-      UNI = (DIAG.EQ.'U')
-      TRA = (TRANS.EQ.'T')
+      UNI = (psb_toupper(DIAG).EQ.'U')
+      TRA = (psb_toupper(TRANS).EQ.'T')
 
 C     Symmetric matrix upper or lower 
-      SYM = ((TRANS.EQ.'L').OR.(TRANS.EQ.'U'))
+      SYM = ((psb_toupper(TRANS).EQ.'L').OR.
+     +  (psb_toupper(TRANS).EQ.'U'))
 C
       if ( .not. tra) then
         nrowa = m

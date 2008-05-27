@@ -194,11 +194,12 @@ C     have to be performed.
 C
 C
       SUBROUTINE DCSSM(TRANS,M,N,ALPHA,UNITD,D,
-     +   PL,FIDT,DESCRT,T,IT1,IT2,INFOT,PR,
-     +   B,LDB,BETA,C,LDC,WORK,LWORK,IERROR)
+     +  PL,FIDT,DESCRT,T,IT1,IT2,INFOT,PR,
+     +  B,LDB,BETA,C,LDC,WORK,LWORK,IERROR)
 C     .. Scalar Arguments ..
       use psb_const_mod
       use psb_error_mod
+      use psb_string_mod
       IMPLICIT NONE
       real(psb_dpk_) ALPHA, BETA
       INTEGER          N, LDB, LDC, M, LWORK, IERROR
@@ -209,7 +210,6 @@ C     .. Array Arguments ..
       CHARACTER        DESCRT*11, FIDT*5
 C     .. Local Scalars ..
       INTEGER          LWORKM, LWORKB, LWORKS, P, ERR_ACT
-      real(psb_dpk_) ZERO
       LOGICAL          LP, RP
 C     .. Local Array..
       INTEGER           INT_VAL(5)
@@ -217,8 +217,7 @@ C     .. Local Array..
       CHARACTER         NAME*20
       integer         :: debug_level, debug_unit
 
-C     .. Parameters ..
-      PARAMETER        (ZERO=0.D0)
+
 C     .. External Subroutines ..
       EXTERNAL         DSWSM, DLPUPD
 C     .. Intrinsic Functions ..
@@ -234,42 +233,46 @@ C
       debug_level = psb_get_debug_level()
 
       IF (M.LT.0) THEN
-         IERROR = 10
-         INT_VAL(1) = 2
-         INT_VAL(2) = M
+        IERROR = 10
+        INT_VAL(1) = 2
+        INT_VAL(2) = M
       ELSE IF (N.LT.0) THEN
-         IERROR = 10
-         INT_VAL(1) = 3
-         INT_VAL(2) = N
-      ELSE IF (TRANS.NE.'T' .AND. TRANS.NE.'N' .AND. TRANS.NE.'C') THEN
-         IERROR = 40
-         INT_VAL(1) = 1
-         STRINGS(1) = TRANS//'\0'
-      ELSE IF (UNITD.NE.'U' .AND. UNITD.NE.'L' .AND. UNITD.NE.'R'       &
-     &      .AND. UNITD.NE.'B') THEN
-         IERROR = 40
-         INT_VAL(1) = 5
-         STRINGS(1) = UNITD//'\0'
+        IERROR = 10
+        INT_VAL(1) = 3
+        INT_VAL(2) = N
+      ELSE IF (psb_toupper(TRANS).NE.'T' .AND.
+     +    psb_toupper(TRANS).NE.'N' .AND.
+     +    psb_toupper(TRANS).NE.'C') THEN
+        IERROR = 40
+        INT_VAL(1) = 1
+        STRINGS(1) = TRANS//'\0'
+      ELSE IF (psb_toupper(UNITD).NE.'U' .AND.
+     +    psb_toupper(UNITD).NE.'L' .AND.
+     +    psb_toupper(UNITD).NE.'R' .AND.
+     +    psb_toupper(UNITD).NE.'B') THEN
+        IERROR = 40
+        INT_VAL(1) = 5
+        STRINGS(1) = UNITD//'\0'
       ELSE IF (LDB.LT.M) THEN
-         IERROR = 50
-         INT_VAL(1) = 16
-         INT_VAL(2) = 2
-         INT_VAL(3) = LDB
-         INT_VAL(4) = M
+        IERROR = 50
+        INT_VAL(1) = 16
+        INT_VAL(2) = 2
+        INT_VAL(3) = LDB
+        INT_VAL(4) = M
       ELSE IF (LDC.LT.M) THEN
-         IERROR = 50
-         INT_VAL(1) = 19
-         INT_VAL(2) = 2
-         INT_VAL(3) = LDC
-         INT_VAL(4) = M
+        IERROR = 50
+        INT_VAL(1) = 19
+        INT_VAL(2) = 2
+        INT_VAL(3) = LDC
+        INT_VAL(4) = M
       ENDIF
 
 C
 C     Error handling
 C
       IF(IERROR.NE.0) THEN
-         CALL FCPSB_ERRPUSH(IERROR,NAME,INT_VAL)
-         GOTO 9999
+        CALL FCPSB_ERRPUSH(IERROR,NAME,INT_VAL)
+        GOTO 9999
       ENDIF
 
 C
@@ -283,19 +286,19 @@ C
       IF (LP) LWORKM = LWORKM + LWORKB
       P = LWORKB+1
       IF (LWORK.LT.LWORKM) THEN
-         IERROR = 60
-         INT_VAL(1) = 21
-         INT_VAL(2) = LWORKM
-         INT_VAL(3) = LWORK
-         CALL FCPSB_ERRPUSH(IERROR,NAME,INT_VAL)
-         GOTO 9999
+        IERROR = 60
+        INT_VAL(1) = 21
+        INT_VAL(2) = LWORKM
+        INT_VAL(3) = LWORK
+        CALL FCPSB_ERRPUSH(IERROR,NAME,INT_VAL)
+        GOTO 9999
       ENDIF
       LWORKS = LWORK - LWORKM
 
 C     Check for M, N
 C
       IF (M.LE.0 .OR. N.LE.0) THEN
-         GOTO 9999
+        GOTO 9999
       ENDIF
 C
 C     Switching on xP
@@ -307,17 +310,17 @@ C
         if (debug_level >= psb_debug_serial_comp_)
      +    write(debug_unit,*) trim(name),': RP LP ',m,n,ierror
 
-         CALL DLPUPD(M,N,PR,B,LDB,BETA,WORK,M)
-         CALL DSWSM(TRANS,M,N,ALPHA,UNITD,D,FIDT,DESCRT,T,IT1,IT2,      
-     &      INFOT,WORK,M,ZERO,WORK(P),M,WORK(P+LWORKB),LWORK,IERROR)
-         LWORKS = IDINT(WORK(P+LWORKB))
-         IF(IERROR .NE. 0) THEN
-            IF (IERROR.EQ.3010) THEN
-               CALL FCPSB_ERRPUSH(IERROR,NAME,INT_VAL)
-               GOTO 9999
-            ENDIF
-         ENDIF
-         CALL DLPUPD(M,N,PL,WORK(P),M,BETA,C,LDC)
+        CALL DLPUPD(M,N,PR,B,LDB,BETA,WORK,M)
+        CALL DSWSM(TRANS,M,N,ALPHA,UNITD,D,FIDT,DESCRT,T,IT1,IT2,      
+     &    INFOT,WORK,M,DZERO,WORK(P),M,WORK(P+LWORKB),LWORK,IERROR)
+        LWORKS = IDINT(WORK(P+LWORKB))
+        IF(IERROR .NE. 0) THEN
+          IF (IERROR.EQ.3010) THEN
+            CALL FCPSB_ERRPUSH(IERROR,NAME,INT_VAL)
+            GOTO 9999
+          ENDIF
+        ENDIF
+        CALL DLPUPD(M,N,PL,WORK(P),M,BETA,C,LDC)
       ELSE IF(.NOT.LP .AND. RP) THEN
 C
 C        Only right permutation required
@@ -325,48 +328,48 @@ C
         if (debug_level >= psb_debug_serial_comp_)
      +    write(debug_unit,*) trim(name),': RP NLP ',m,n,ierror
 
-         CALL DLPUPD(M,N,PR,B,LDB,BETA,WORK,M)
-         CALL DSWSM(TRANS,M,N,ALPHA,UNITD,D,FIDT,DESCRT,T,IT1,IT2,      
-     &      INFOT,WORK,M,ZERO,C,LDC,WORK(P),LWORK,IERROR)
-         LWORKS = IDINT(WORK(P))
-         IF(IERROR .NE. 0) THEN
-            NAME = 'DCSSM\0'
-            IF (IERROR.EQ.3010) THEN
-               CALL FCPSB_ERRPUSH(IERROR,NAME,INT_VAL)
-               GOTO 9999
-            ENDIF
-         ENDIF
+        CALL DLPUPD(M,N,PR,B,LDB,BETA,WORK,M)
+        CALL DSWSM(TRANS,M,N,ALPHA,UNITD,D,FIDT,DESCRT,T,IT1,IT2,      
+     &    INFOT,WORK,M,DZERO,C,LDC,WORK(P),LWORK,IERROR)
+        LWORKS = IDINT(WORK(P))
+        IF(IERROR .NE. 0) THEN
+          NAME = 'DCSSM\0'
+          IF (IERROR.EQ.3010) THEN
+            CALL FCPSB_ERRPUSH(IERROR,NAME,INT_VAL)
+            GOTO 9999
+          ENDIF
+        ENDIF
       ELSE IF(.NOT.RP .AND. LP) THEN
 C
 C        Only left permutation required
 C
         if (debug_level >= psb_debug_serial_comp_)
      +    write(debug_unit,*) trim(name),': NRP LP ',m,n,ierror
-         CALL DSWSM(TRANS,M,N,ALPHA,UNITD,D,FIDT,DESCRT,T,IT1,IT2,      
-     &              INFOT,B,LDB,BETA,WORK,M,WORK(P),LWORK,IERROR)
-         LWORKS = IDINT(WORK(P))
-         IF(IERROR .NE. 0) THEN
-            IF (IERROR.EQ.3010) THEN
-               CALL FCPSB_ERRPUSH(IERROR,NAME,INT_VAL)
-               GOTO 9999
-            ENDIF
-         ENDIF
-         CALL DLPUPD(M,N,PL,WORK,M,BETA,C,LDC)
+        CALL DSWSM(TRANS,M,N,ALPHA,UNITD,D,FIDT,DESCRT,T,IT1,IT2,      
+     &    INFOT,B,LDB,BETA,WORK,M,WORK(P),LWORK,IERROR)
+        LWORKS = IDINT(WORK(P))
+        IF(IERROR .NE. 0) THEN
+          IF (IERROR.EQ.3010) THEN
+            CALL FCPSB_ERRPUSH(IERROR,NAME,INT_VAL)
+            GOTO 9999
+          ENDIF
+        ENDIF
+        CALL DLPUPD(M,N,PL,WORK,M,BETA,C,LDC)
       ELSE IF(.NOT.RP .AND. .NOT.LP) THEN
 C
 C        Only triangular systems solver required
 C
         if (debug_level >= psb_debug_serial_comp_)
      +    write(debug_unit,*) trim(name),': NRP NLP ',m,n,ierror
-         CALL DSWSM(TRANS,M,N,ALPHA,UNITD,D,FIDT,DESCRT,T,IT1,IT2,      
-     &           INFOT,B,LDB,BETA,C,LDC,WORK,LWORK,IERROR)
-         LWORKS = IDINT(WORK(1))
-         IF(IERROR .NE. 0) THEN
-            IF (IERROR.EQ.3010) THEN
-               CALL FCPSB_ERRPUSH(IERROR,NAME,INT_VAL)
-               GOTO 9999
-            ENDIF
-         ENDIF
+        CALL DSWSM(TRANS,M,N,ALPHA,UNITD,D,FIDT,DESCRT,T,IT1,IT2,      
+     &    INFOT,B,LDB,BETA,C,LDC,WORK,LWORK,IERROR)
+        LWORKS = IDINT(WORK(1))
+        IF(IERROR .NE. 0) THEN
+          IF (IERROR.EQ.3010) THEN
+            CALL FCPSB_ERRPUSH(IERROR,NAME,INT_VAL)
+            GOTO 9999
+          ENDIF
+        ENDIF
       ENDIF
 
 C
@@ -381,8 +384,8 @@ C
       CALL FCPSB_ERRACTIONRESTORE(ERR_ACT)
 
       IF ( ERR_ACT .NE. 0 ) THEN 
-         CALL FCPSB_SERROR()
-         RETURN
+        CALL FCPSB_SERROR()
+        RETURN
       ENDIF
 
       RETURN

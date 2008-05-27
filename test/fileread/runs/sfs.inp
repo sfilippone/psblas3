@@ -1,0 +1,12 @@
+11                  Number of inputs
+thm1000x600.mtx  young1r.mtx         This (and others) from: http://math.nist.gov/MatrixMarket/  or 
+NONE                     http://www.cise.ufl.edu/research/sparse/matrices/index.html
+BICGSTABL           Iterative method: BiCGSTAB CGS RGMRES BiCGSTABL
+BJAC                Preconditioner NONE  DIAG  BJAC  
+CSR                 Storage format CSR COO JAD 
+0                   IPART: Partition method 0: BLK   2: graph (with Metis) 
+2                   ISTOPC
+01000               ITMAX
+01                  ITRACE
+04                  IRST     (restart for RGMRES and BiCGSTABL) 
+1.d-6               EPS

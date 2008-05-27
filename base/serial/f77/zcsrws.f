@@ -102,6 +102,7 @@ C
       SUBROUTINE  ZCSRWS(TRANS,M,N,FIDA,DESCRA,A,IA1,IA2,
      &  INFOA,ROWSUM,IERROR)
       use psb_const_mod
+      use psb_string_mod
       IMPLICIT NONE
 C     .. Scalar Arguments ..
       INTEGER           M,N, IERROR
@@ -132,7 +133,9 @@ C
         IERROR = 10
         INT_VAL(1) = 3
         INT_VAL(2) = N
-      ELSE IF (TRANS.NE.'T' .AND. TRANS.NE.'N' .AND. TRANS.NE.'C') THEN
+      ELSE IF (psb_toupper(TRANS).NE.'T' .AND.
+     +    psb_toupper(TRANS).NE.'N' .AND.
+     +    psb_toupper(TRANS).NE.'C') THEN
         IERROR = 40
         INT_VAL(1) = 1
         STRINGS(1) = TRANS//'\0'
@@ -150,13 +153,13 @@ C
         GOTO 9999
       ENDIF
 
-      IF (FIDA(1:3).EQ.'CSR') THEN
+      IF (psb_toupper(FIDA(1:3)).EQ.'CSR') THEN
         CALL ZCSRRWS(TRANS,M,N,DESCRA,A,IA1,IA2,
      +    INFOA,ROWSUM,IERROR)
-      ELSE IF (FIDA(1:3).EQ.'COO') THEN
+      ELSE IF (psb_toupper(FIDA(1:3)).EQ.'COO') THEN
         CALL ZCOORWS(TRANS,M,N,DESCRA,A,IA1,IA2,
      +    INFOA,ROWSUM,IERROR)
-c$$$      ELSE IF (FIDA(1:3).EQ.'JAD') THEN
+c$$$      ELSE IF (psb_toupper(FIDA(1:3)).EQ.'JAD') THEN
 c$$$        CALL DJDRWS(TRANS,M,N,DESCRA,A,IA1,IA2,
 c$$$     +     INFOA,ROWSUM,IERROR)
       ELSE

@@ -101,7 +101,9 @@ C                ROWSUM(M) if the subroutine in called with the 'N' option
 C                ROWSUM(N) in other cases ('T' or 'C' options).
 C
       SUBROUTINE  DCSRWS(TRANS,M,N,FIDA,DESCRA,A,IA1,IA2,
-     &                 INFOA,ROWSUM,IERROR)
+     &  INFOA,ROWSUM,IERROR)
+      use psb_const_mod
+      use psb_string_mod
       use psb_const_mod
       IMPLICIT NONE
 C     .. Scalar Arguments ..
@@ -110,7 +112,7 @@ C     .. Scalar Arguments ..
 C     .. Array Arguments ..
       INTEGER           IA1(*),IA2(*),INFOA(*)
       CHARACTER         DESCRA*11, FIDA*5
-      real(psb_dpk_)  A(*), ROWSUM(*)
+      real(psb_dpk_)    A(*), ROWSUM(*)
 C     .. Local Array..
       INTEGER           INT_VAL(5), ERR_ACT
       CHARACTER*30      NAME,STRINGS(2)
@@ -123,46 +125,48 @@ C
       IERROR = 0
       NAME = 'DCSRWS\0'
       IF     (M.LT.0) THEN
-         IERROR = 10
-         INT_VAL(1) = 2
-         INT_VAL(2) = M
+        IERROR = 10
+        INT_VAL(1) = 2
+        INT_VAL(2) = M
       ELSE IF (N.LT.0) THEN
-         IERROR = 10
-         INT_VAL(1) = 3
-         INT_VAL(2) = N
-      ELSE IF (TRANS.NE.'T' .AND. TRANS.NE.'N' .AND. TRANS.NE.'C') THEN
-         IERROR = 40
-         INT_VAL(1) = 1
-         STRINGS(1) = TRANS//'\0'
+        IERROR = 10
+        INT_VAL(1) = 3
+        INT_VAL(2) = N
+      ELSE IF (psb_toupper(TRANS).NE.'T' .AND.
+     +    psb_toupper(TRANS).NE.'N' .AND.
+     +    psb_toupper(TRANS).NE.'C') THEN
+        IERROR = 40
+        INT_VAL(1) = 1
+        STRINGS(1) = TRANS//'\0'
       ENDIF
 
 C
 C     Error handling
 C
       IF(IERROR.NE.0) THEN
-         CALL FCPSB_ERRPUSH(IERROR,NAME,INT_VAL)
-         GOTO 9999
+        CALL FCPSB_ERRPUSH(IERROR,NAME,INT_VAL)
+        GOTO 9999
       ENDIF
 
       IF(M.LE.0 .OR. N.LE.0) THEN
-         GOTO 9999
+        GOTO 9999
       ENDIF
 
-      IF (FIDA(1:3).EQ.'CSR') THEN
-         CALL DCSRRWS(TRANS,M,N,DESCRA,A,IA1,IA2,
-     +      INFOA,ROWSUM,IERROR)
-      ELSE IF (FIDA(1:3).EQ.'COO') THEN
+      IF (psb_toupper(FIDA(1:3)).EQ.'CSR') THEN
+        CALL DCSRRWS(TRANS,M,N,DESCRA,A,IA1,IA2,
+     +    INFOA,ROWSUM,IERROR)
+      ELSE IF (psb_toupper(FIDA(1:3)).EQ.'COO') THEN
         CALL DCOORWS(TRANS,M,N,DESCRA,A,IA1,IA2,
-     +     INFOA,ROWSUM,IERROR)
-      ELSE IF (FIDA(1:3).EQ.'JAD') THEN
+     +    INFOA,ROWSUM,IERROR)
+      ELSE IF (psb_toupper(FIDA(1:3)).EQ.'JAD') THEN
         CALL DJDRWS(TRANS,M,N,DESCRA,A,IA1,IA2,
-     +     INFOA,ROWSUM,IERROR)
+     +    INFOA,ROWSUM,IERROR)
       ELSE
 C
 C     This data structure not yet considered
 C
-         IERROR = 3010
-         strings(1) = fida//'\0'
+        IERROR = 3010
+        strings(1) = fida//'\0'
       ENDIF
 
       CALL FCPSB_ERRACTIONRESTORE(ERR_ACT)
@@ -172,8 +176,8 @@ C
       CALL FCPSB_ERRACTIONRESTORE(ERR_ACT)
 
       IF ( ERR_ACT .NE. 0 ) THEN 
-         CALL FCPSB_SERROR()
-         RETURN
+        CALL FCPSB_SERROR()
+        RETURN
       ENDIF
 
       RETURN

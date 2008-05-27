@@ -32,83 +32,135 @@
 module psb_comm_mod
 
   interface psb_ovrl
+    subroutine  psb_sovrlm(x,desc_a,info,jx,ik,work,update,mode)
+      use psb_descriptor_type
+      real(psb_spk_), intent(inout)           :: x(:,:)
+      type(psb_desc_type), intent(in)         :: desc_a
+      integer, intent(out)                    :: info
+      real(psb_spk_), intent(inout), optional :: work(:)
+      integer, intent(in), optional           :: update,jx,ik,mode
+    end subroutine psb_sovrlm
+    subroutine  psb_sovrlv(x,desc_a,info,work,update,mode)
+      use psb_descriptor_type
+      real(psb_spk_), intent(inout)           :: x(:)
+      type(psb_desc_type), intent(in)         :: desc_a
+      integer, intent(out)                    :: info
+      real(psb_spk_), intent(inout), optional :: work(:)
+      integer, intent(in), optional           :: update,mode
+    end subroutine psb_sovrlv
     subroutine  psb_dovrlm(x,desc_a,info,jx,ik,work,update,mode)
       use psb_descriptor_type
       real(psb_dpk_), intent(inout)           :: x(:,:)
-      type(psb_desc_type), intent(in)           :: desc_a
-      integer, intent(out)                      :: info
+      type(psb_desc_type), intent(in)         :: desc_a
+      integer, intent(out)                    :: info
       real(psb_dpk_), intent(inout), optional :: work(:)
-      integer, intent(in), optional             :: update,jx,ik,mode
+      integer, intent(in), optional           :: update,jx,ik,mode
     end subroutine psb_dovrlm
     subroutine  psb_dovrlv(x,desc_a,info,work,update,mode)
       use psb_descriptor_type
       real(psb_dpk_), intent(inout)           :: x(:)
-      type(psb_desc_type), intent(in)           :: desc_a
-      integer, intent(out)                      :: info
+      type(psb_desc_type), intent(in)         :: desc_a
+      integer, intent(out)                    :: info
       real(psb_dpk_), intent(inout), optional :: work(:)
-      integer, intent(in), optional             :: update,mode
+      integer, intent(in), optional           :: update,mode
     end subroutine psb_dovrlv
     subroutine  psb_iovrlm(x,desc_a,info,jx,ik,work,update,mode)
       use psb_descriptor_type
-      integer,          intent(inout)           :: x(:,:)
-      type(psb_desc_type), intent(in)           :: desc_a
-      integer, intent(out)                      :: info
-      real(psb_dpk_), intent(inout), optional :: work(:)
-      integer, intent(in), optional             :: update,jx,ik,mode
+      integer,          intent(inout)         :: x(:,:)
+      type(psb_desc_type), intent(in)         :: desc_a
+      integer, intent(out)                    :: info
+      integer, intent(inout), optional        :: work(:)
+      integer, intent(in), optional           :: update,jx,ik,mode
     end subroutine psb_iovrlm
     subroutine  psb_iovrlv(x,desc_a,info,work,update,mode)
       use psb_descriptor_type
-      integer, intent(inout)                    :: x(:)
-      type(psb_desc_type), intent(in)           :: desc_a
-      integer, intent(out)                      :: info
-      real(psb_dpk_), intent(inout), optional :: work(:)
-      integer, intent(in), optional             :: update,mode
+      integer, intent(inout)                  :: x(:)
+      type(psb_desc_type), intent(in)         :: desc_a
+      integer, intent(out)                    :: info
+      integer, intent(inout), optional        :: work(:)
+      integer, intent(in), optional           :: update,mode
     end subroutine psb_iovrlv
+    subroutine  psb_covrlm(x,desc_a,info,jx,ik,work,update,mode)
+      use psb_descriptor_type
+      complex(psb_spk_), intent(inout)           :: x(:,:)
+      type(psb_desc_type), intent(in)            :: desc_a
+      integer, intent(out)                       :: info
+      complex(psb_spk_), intent(inout), optional :: work(:)
+      integer, intent(in), optional              :: update,jx,ik,mode
+    end subroutine psb_covrlm
+    subroutine  psb_covrlv(x,desc_a,info,work,update,mode)
+      use psb_descriptor_type
+      complex(psb_spk_), intent(inout)           :: x(:)
+      type(psb_desc_type), intent(in)            :: desc_a
+      integer, intent(out)                       :: info
+      complex(psb_spk_), intent(inout), optional :: work(:)
+      integer, intent(in), optional              :: update,mode
+    end subroutine psb_covrlv
     subroutine  psb_zovrlm(x,desc_a,info,jx,ik,work,update,mode)
       use psb_descriptor_type
-      complex(psb_dpk_), intent(inout)        :: x(:,:)
-      type(psb_desc_type), intent(in)           :: desc_a
-      integer, intent(out)                      :: info
+      complex(psb_dpk_), intent(inout)           :: x(:,:)
+      type(psb_desc_type), intent(in)            :: desc_a
+      integer, intent(out)                       :: info
       complex(psb_dpk_), intent(inout), optional :: work(:)
-      integer, intent(in), optional             :: update,jx,ik,mode
+      integer, intent(in), optional              :: update,jx,ik,mode
     end subroutine psb_zovrlm
     subroutine  psb_zovrlv(x,desc_a,info,work,update,mode)
       use psb_descriptor_type
-      complex(psb_dpk_), intent(inout)        :: x(:)
-      type(psb_desc_type), intent(in)           :: desc_a
-      integer, intent(out)                      :: info
+      complex(psb_dpk_), intent(inout)           :: x(:)
+      type(psb_desc_type), intent(in)            :: desc_a
+      integer, intent(out)                       :: info
       complex(psb_dpk_), intent(inout), optional :: work(:)
-      integer, intent(in), optional             :: update,mode
+      integer, intent(in), optional              :: update,mode
     end subroutine psb_zovrlv
   end interface
 
   interface psb_halo
+    subroutine  psb_shalom(x,desc_a,info,alpha,jx,ik,work,tran,mode,data)
+      use psb_descriptor_type
+      real(psb_spk_), intent(inout)           :: x(:,:)
+      type(psb_desc_type), intent(in)         :: desc_a
+      integer, intent(out)                    :: info
+      real(psb_spk_), intent(in), optional    :: alpha
+      real(psb_spk_), target, optional        :: work(:)
+      integer, intent(in), optional           :: mode,jx,ik,data
+      character, intent(in), optional         :: tran
+    end subroutine psb_shalom
+    subroutine  psb_shalov(x,desc_a,info,alpha,work,tran,mode,data)
+      use psb_descriptor_type
+      real(psb_spk_), intent(inout)           :: x(:)
+      type(psb_desc_type), intent(in)         :: desc_a
+      integer, intent(out)                    :: info
+      real(psb_spk_), intent(in), optional    :: alpha
+      real(psb_spk_), target, optional        :: work(:)
+      integer, intent(in), optional           :: mode,data
+      character, intent(in), optional         :: tran
+    end subroutine psb_shalov
     subroutine  psb_dhalom(x,desc_a,info,alpha,jx,ik,work,tran,mode,data)
       use psb_descriptor_type
       real(psb_dpk_), intent(inout)           :: x(:,:)
-      type(psb_desc_type), intent(in)           :: desc_a
-      integer, intent(out)                      :: info
+      type(psb_desc_type), intent(in)         :: desc_a
+      integer, intent(out)                    :: info
       real(psb_dpk_), intent(in), optional    :: alpha
       real(psb_dpk_), target, optional        :: work(:)
-      integer, intent(in), optional             :: mode,jx,ik,data
-      character, intent(in), optional           :: tran
+      integer, intent(in), optional           :: mode,jx,ik,data
+      character, intent(in), optional         :: tran
     end subroutine psb_dhalom
     subroutine  psb_dhalov(x,desc_a,info,alpha,work,tran,mode,data)
       use psb_descriptor_type
       real(psb_dpk_), intent(inout)           :: x(:)
-      type(psb_desc_type), intent(in)           :: desc_a
-      integer, intent(out)                      :: info
+      type(psb_desc_type), intent(in)         :: desc_a
+      integer, intent(out)                    :: info
       real(psb_dpk_), intent(in), optional    :: alpha
-      real(psb_dpk_), target, optional :: work(:)
-      integer, intent(in), optional             :: mode,data
-      character, intent(in), optional           :: tran
+      real(psb_dpk_), target, optional        :: work(:)
+      integer, intent(in), optional           :: mode,data
+      character, intent(in), optional         :: tran
     end subroutine psb_dhalov
     subroutine  psb_ihalom(x,desc_a,info,alpha,jx,ik,work,tran,mode,data)
       use psb_descriptor_type
       integer, intent(inout) :: x(:,:)
       type(psb_desc_type), intent(in)        :: desc_a
       integer, intent(out)                   :: info
-      real(psb_dpk_), intent(in), optional :: alpha
+      real(psb_dpk_), intent(in), optional   :: alpha
       integer, intent(inout), optional       :: work(:)
       integer, intent(in), optional          :: mode,jx,ik,data
       character, intent(in), optional        :: tran
@@ -118,30 +170,50 @@ module psb_comm_mod
       integer, intent(inout)                 :: x(:)
       type(psb_desc_type), intent(in)        :: desc_a
       integer, intent(out)                   :: info
-      real(psb_dpk_), intent(in), optional :: alpha
+      real(psb_dpk_), intent(in), optional   :: alpha
       integer, intent(inout), optional       :: work(:)
       integer, intent(in), optional          :: mode,data
       character, intent(in), optional        :: tran
     end subroutine psb_ihalov
+    subroutine  psb_chalom(x,desc_a,info,alpha,jx,ik,work,tran,mode,data)
+      use psb_descriptor_type
+      complex(psb_spk_), intent(inout)        :: x(:,:)
+      type(psb_desc_type), intent(in)         :: desc_a
+      integer, intent(out)                    :: info
+      complex(psb_spk_), intent(in), optional :: alpha
+      complex(psb_spk_), target, optional     :: work(:)
+      integer, intent(in), optional           :: mode,jx,ik,data
+      character, intent(in), optional         :: tran
+    end subroutine psb_chalom
+    subroutine  psb_chalov(x,desc_a,info,alpha,work,tran,mode,data)
+      use psb_descriptor_type
+      complex(psb_spk_), intent(inout)        :: x(:)
+      type(psb_desc_type), intent(in)         :: desc_a
+      integer, intent(out)                    :: info
+      complex(psb_spk_), intent(in), optional :: alpha
+      complex(psb_spk_), target, optional     :: work(:)
+      integer, intent(in), optional           :: mode,data
+      character, intent(in), optional         :: tran
+    end subroutine psb_chalov
     subroutine  psb_zhalom(x,desc_a,info,alpha,jx,ik,work,tran,mode,data)
       use psb_descriptor_type
       complex(psb_dpk_), intent(inout)        :: x(:,:)
-      type(psb_desc_type), intent(in)           :: desc_a
-      integer, intent(out)                      :: info
+      type(psb_desc_type), intent(in)         :: desc_a
+      integer, intent(out)                    :: info
       complex(psb_dpk_), intent(in), optional :: alpha
       complex(psb_dpk_), target, optional     :: work(:)
-      integer, intent(in), optional             :: mode,jx,ik,data
-      character, intent(in), optional           :: tran
+      integer, intent(in), optional           :: mode,jx,ik,data
+      character, intent(in), optional         :: tran
     end subroutine psb_zhalom
     subroutine  psb_zhalov(x,desc_a,info,alpha,work,tran,mode,data)
       use psb_descriptor_type
       complex(psb_dpk_), intent(inout)        :: x(:)
-      type(psb_desc_type), intent(in)           :: desc_a
-      integer, intent(out)                      :: info
+      type(psb_desc_type), intent(in)         :: desc_a
+      integer, intent(out)                    :: info
       complex(psb_dpk_), intent(in), optional :: alpha
       complex(psb_dpk_), target, optional     :: work(:)
-      integer, intent(in), optional             :: mode,data
-      character, intent(in), optional           :: tran
+      integer, intent(in), optional           :: mode,data
+      character, intent(in), optional         :: tran
     end subroutine psb_zhalov
   end interface
 
@@ -214,6 +286,22 @@ module psb_comm_mod
       integer, intent(out)            :: info
       integer, intent(in), optional   :: root
     end subroutine psb_igatherv
+    subroutine  psb_sgatherm(globx, locx, desc_a, info, root)
+      use psb_descriptor_type
+      real(psb_spk_), intent(in)    :: locx(:,:)
+      real(psb_spk_), intent(out)   :: globx(:,:)
+      type(psb_desc_type), intent(in) :: desc_a
+      integer, intent(out)            :: info
+      integer, intent(in), optional   :: root
+    end subroutine psb_sgatherm
+    subroutine  psb_sgatherv(globx, locx, desc_a, info, root)
+      use psb_descriptor_type
+      real(psb_spk_), intent(in)    :: locx(:)
+      real(psb_spk_), intent(out)   :: globx(:)
+      type(psb_desc_type), intent(in) :: desc_a
+      integer, intent(out)            :: info
+      integer, intent(in), optional   :: root
+    end subroutine psb_sgatherv
     subroutine  psb_dgatherm(globx, locx, desc_a, info, root)
       use psb_descriptor_type
       real(psb_dpk_), intent(in)    :: locx(:,:)
@@ -230,6 +318,22 @@ module psb_comm_mod
       integer, intent(out)            :: info
       integer, intent(in), optional   :: root
     end subroutine psb_dgatherv
+    subroutine  psb_cgatherm(globx, locx, desc_a, info, root)
+      use psb_descriptor_type
+      complex(psb_spk_), intent(in)  :: locx(:,:)
+      complex(psb_spk_), intent(out) :: globx(:,:)
+      type(psb_desc_type), intent(in)  :: desc_a
+      integer, intent(out)             :: info
+      integer, intent(in), optional    :: root
+    end subroutine psb_cgatherm
+    subroutine  psb_cgatherv(globx, locx, desc_a, info, root)
+      use psb_descriptor_type
+      complex(psb_spk_), intent(in)  :: locx(:)
+      complex(psb_spk_), intent(out) :: globx(:)
+      type(psb_desc_type), intent(in)  :: desc_a
+      integer, intent(out)             :: info
+      integer, intent(in), optional    :: root
+    end subroutine psb_cgatherv
     subroutine  psb_zgatherm(globx, locx, desc_a, info, root)
       use psb_descriptor_type
       complex(psb_dpk_), intent(in)  :: locx(:,:)

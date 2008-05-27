@@ -34,7 +34,21 @@ Module psb_tools_mod
   use psb_spmat_type
 
   interface  psb_geall
-    ! 2-D double precision version
+    subroutine psb_salloc(x, desc_a, info, n, lb)
+      use psb_descriptor_type
+      implicit none
+      real(psb_spk_), allocatable, intent(out) :: x(:,:)
+      type(psb_desc_type), intent(in) :: desc_a
+      integer,intent(out)             :: info
+      integer, optional, intent(in)   :: n, lb
+    end subroutine psb_salloc
+    subroutine psb_sallocv(x, desc_a,info,n)
+      use psb_descriptor_type
+      real(psb_spk_), allocatable, intent(out)       :: x(:)
+      type(psb_desc_type), intent(in) :: desc_a
+      integer,intent(out)             :: info
+      integer, optional, intent(in)   :: n
+    end subroutine psb_sallocv
     subroutine psb_dalloc(x, desc_a, info, n, lb)
       use psb_descriptor_type
       implicit none
@@ -43,7 +57,6 @@ Module psb_tools_mod
       integer,intent(out)             :: info
       integer, optional, intent(in)   :: n, lb
     end subroutine psb_dalloc
-    ! 1-D double precision version
     subroutine psb_dallocv(x, desc_a,info,n)
       use psb_descriptor_type
       real(psb_dpk_), allocatable, intent(out)       :: x(:)
@@ -51,7 +64,6 @@ Module psb_tools_mod
       integer,intent(out)             :: info
       integer, optional, intent(in)   :: n
     end subroutine psb_dallocv
-    ! 2-D integer version
     subroutine psb_ialloc(x, desc_a, info,n, lb)
       use psb_descriptor_type
       integer, allocatable, intent(out)                 :: x(:,:)
@@ -66,7 +78,21 @@ Module psb_tools_mod
       integer                         :: info
       integer, optional, intent(in)   :: n
     end subroutine psb_iallocv
-    ! 2-D double complex version
+    subroutine psb_calloc(x, desc_a, info, n, lb)
+      use psb_descriptor_type
+      implicit none
+      complex(psb_spk_), allocatable, intent(out)    :: x(:,:)
+      type(psb_desc_type), intent(in) :: desc_a
+      integer                         :: info
+      integer, optional, intent(in)   :: n, lb
+    end subroutine psb_calloc
+    subroutine psb_callocv(x, desc_a,info,n)
+      use psb_descriptor_type
+      complex(psb_spk_), allocatable, intent(out)    :: x(:)
+      type(psb_desc_type), intent(in) :: desc_a
+      integer                         :: info
+      integer, optional, intent(in)   :: n
+    end subroutine psb_callocv
     subroutine psb_zalloc(x, desc_a, info, n, lb)
       use psb_descriptor_type
       implicit none
@@ -75,7 +101,6 @@ Module psb_tools_mod
       integer                         :: info
       integer, optional, intent(in)   :: n, lb
     end subroutine psb_zalloc
-    ! 1-D double complex version
     subroutine psb_zallocv(x, desc_a,info,n)
       use psb_descriptor_type
       complex(psb_dpk_), allocatable, intent(out)    :: x(:)
@@ -87,42 +112,60 @@ Module psb_tools_mod
 
 
   interface psb_geasb
-    ! 2-D double precision version
+    subroutine psb_sasb(x, desc_a, info)
+      use psb_descriptor_type
+      type(psb_desc_type), intent(in) ::  desc_a
+      real(psb_spk_), allocatable, intent(inout)       ::  x(:,:)
+      integer, intent(out)            ::  info
+    end subroutine psb_sasb
+    subroutine psb_sasbv(x, desc_a, info)
+      use psb_descriptor_type
+      type(psb_desc_type), intent(in) ::  desc_a
+      real(psb_spk_), allocatable, intent(inout)   ::  x(:)
+      integer, intent(out)        ::  info
+    end subroutine psb_sasbv
     subroutine psb_dasb(x, desc_a, info)
       use psb_descriptor_type
       type(psb_desc_type), intent(in) ::  desc_a
       real(psb_dpk_), allocatable, intent(inout)       ::  x(:,:)
       integer, intent(out)            ::  info
     end subroutine psb_dasb
-    ! 1-D double precision version
     subroutine psb_dasbv(x, desc_a, info)
       use psb_descriptor_type
       type(psb_desc_type), intent(in) ::  desc_a
       real(psb_dpk_), allocatable, intent(inout)   ::  x(:)
       integer, intent(out)        ::  info
     end subroutine psb_dasbv
-    ! 2-D integer version
     subroutine psb_iasb(x, desc_a, info)
       use psb_descriptor_type
       type(psb_desc_type), intent(in) ::  desc_a
       integer, allocatable, intent(inout)                ::  x(:,:)
       integer, intent(out)            ::  info
     end subroutine psb_iasb
-    ! 1-D integer version
     subroutine psb_iasbv(x, desc_a, info)
       use psb_descriptor_type
       type(psb_desc_type), intent(in) ::  desc_a
       integer, allocatable, intent(inout)   ::  x(:)
       integer, intent(out)        ::  info
     end subroutine psb_iasbv
-    ! 2-D double precision version
+    subroutine psb_casb(x, desc_a, info)
+      use psb_descriptor_type
+      type(psb_desc_type), intent(in) ::  desc_a
+      complex(psb_spk_), allocatable, intent(inout)       ::  x(:,:)
+      integer, intent(out)            ::  info
+    end subroutine psb_casb
+    subroutine psb_casbv(x, desc_a, info)
+      use psb_descriptor_type
+      type(psb_desc_type), intent(in) ::  desc_a
+      complex(psb_spk_), allocatable, intent(inout)   ::  x(:)
+      integer, intent(out)        ::  info
+    end subroutine psb_casbv
     subroutine psb_zasb(x, desc_a, info)
       use psb_descriptor_type
       type(psb_desc_type), intent(in) ::  desc_a
       complex(psb_dpk_), allocatable, intent(inout)       ::  x(:,:)
       integer, intent(out)            ::  info
     end subroutine psb_zasb
-    ! 1-D double precision version
     subroutine psb_zasbv(x, desc_a, info)
       use psb_descriptor_type
       type(psb_desc_type), intent(in) ::  desc_a
@@ -132,6 +175,18 @@ Module psb_tools_mod
   end interface
 
   interface psb_sphalo
+    Subroutine psb_ssphalo(a,desc_a,blk,info,rowcnv,colcnv,&
+         & rowscale,colscale,outfmt,data)
+      use psb_descriptor_type
+      use psb_spmat_type
+      Type(psb_sspmat_type),Intent(in)    :: a
+      Type(psb_sspmat_type),Intent(inout) :: blk
+      Type(psb_desc_type),Intent(in),target :: desc_a
+      integer, intent(out)                :: info
+      logical, optional, intent(in)       :: rowcnv,colcnv,rowscale,colscale
+      character(len=5), optional          :: outfmt 
+      integer, intent(in), optional       :: data
+    end Subroutine psb_ssphalo
     Subroutine psb_dsphalo(a,desc_a,blk,info,rowcnv,colcnv,&
          & rowscale,colscale,outfmt,data)
       use psb_descriptor_type
@@ -144,6 +199,18 @@ Module psb_tools_mod
       character(len=5), optional          :: outfmt 
       integer, intent(in), optional       :: data
     end Subroutine psb_dsphalo
+    Subroutine psb_csphalo(a,desc_a,blk,info,rowcnv,colcnv,&
+         & rowscale,colscale,outfmt,data)
+      use psb_descriptor_type
+      use psb_spmat_type
+      Type(psb_cspmat_type),Intent(in)    :: a
+      Type(psb_cspmat_type),Intent(inout) :: blk
+      Type(psb_desc_type),Intent(in)      :: desc_a
+      integer, intent(out)                :: info
+      logical, optional, intent(in)       :: rowcnv,colcnv,rowscale,colscale
+      character(len=5), optional          :: outfmt 
+      integer, intent(in), optional       :: data
+    end Subroutine psb_csphalo
     Subroutine psb_zsphalo(a,desc_a,blk,info,rowcnv,colcnv,&
          & rowscale,colscale,outfmt,data)
       use psb_descriptor_type
@@ -172,42 +239,60 @@ Module psb_tools_mod
 
 
   interface psb_gefree
-    ! 2-D double precision version
+    subroutine psb_sfree(x, desc_a, info)
+      use psb_descriptor_type
+      real(psb_spk_),allocatable, intent(inout)        :: x(:,:)
+      type(psb_desc_type), intent(in) :: desc_a
+      integer                         :: info
+    end subroutine psb_sfree
+    subroutine psb_sfreev(x, desc_a, info)
+      use psb_descriptor_type
+      real(psb_spk_),allocatable, intent(inout)        :: x(:)
+      type(psb_desc_type), intent(in) :: desc_a
+      integer                         :: info
+    end subroutine psb_sfreev
     subroutine psb_dfree(x, desc_a, info)
       use psb_descriptor_type
       real(psb_dpk_),allocatable, intent(inout)        :: x(:,:)
       type(psb_desc_type), intent(in) :: desc_a
       integer                         :: info
     end subroutine psb_dfree
-    ! 1-D double precision version
     subroutine psb_dfreev(x, desc_a, info)
       use psb_descriptor_type
       real(psb_dpk_),allocatable, intent(inout)        :: x(:)
       type(psb_desc_type), intent(in) :: desc_a
       integer                         :: info
     end subroutine psb_dfreev
-    ! 2-D integer version
     subroutine psb_ifree(x, desc_a, info)
       use psb_descriptor_type
       integer,allocatable, intent(inout)                 :: x(:,:)
       type(psb_desc_type), intent(in) :: desc_a
       integer                         :: info
     end subroutine psb_ifree
-    ! 1-D integer version
     subroutine psb_ifreev(x, desc_a, info)
       use psb_descriptor_type
       integer, allocatable, intent(inout)                :: x(:)
       type(psb_desc_type), intent(in) :: desc_a
       integer                         :: info
     end subroutine psb_ifreev
-    ! 2-D double precision version
+    subroutine psb_cfree(x, desc_a, info)
+      use psb_descriptor_type
+      complex(psb_spk_),allocatable, intent(inout)        :: x(:,:)
+      type(psb_desc_type), intent(in) :: desc_a
+      integer                         :: info
+    end subroutine psb_cfree
+    subroutine psb_cfreev(x, desc_a, info)
+      use psb_descriptor_type
+      complex(psb_spk_),allocatable, intent(inout)        :: x(:)
+      type(psb_desc_type), intent(in) :: desc_a
+      integer                         :: info
+    end subroutine psb_cfreev
     subroutine psb_zfree(x, desc_a, info)
       use psb_descriptor_type
       complex(psb_dpk_),allocatable, intent(inout)        :: x(:,:)
       type(psb_desc_type), intent(in) :: desc_a
       integer                         :: info
     end subroutine psb_zfree
-    ! 1-D double precision version
     subroutine psb_zfreev(x, desc_a, info)
       use psb_descriptor_type
       complex(psb_dpk_),allocatable, intent(inout)        :: x(:)
@@ -218,7 +303,26 @@ Module psb_tools_mod
 
 
   interface psb_geins
-    ! 2-D double precision version
+    subroutine psb_sinsi(m,irw,val, x,desc_a,info,dupl)
+      use psb_descriptor_type
+      integer, intent(in)                ::  m
+      type(psb_desc_type), intent(in)    ::  desc_a
+      real(psb_spk_),intent(inout)           ::  x(:,:)
+      integer, intent(in)                ::  irw(:)
+      real(psb_spk_), intent(in)       ::  val(:,:)
+      integer, intent(out)               ::  info
+      integer, optional, intent(in)      ::  dupl
+    end subroutine psb_sinsi
+    subroutine psb_sinsvi(m,irw,val,x,desc_a,info,dupl)
+      use psb_descriptor_type
+      integer, intent(in)                ::  m
+      type(psb_desc_type), intent(in)    ::  desc_a
+      real(psb_spk_),intent(inout)     ::  x(:)
+      integer, intent(in)                ::  irw(:)
+      real(psb_spk_), intent(in)       ::  val(:)
+      integer, intent(out)               ::  info
+      integer, optional, intent(in)      ::  dupl
+    end subroutine psb_sinsvi
     subroutine psb_dinsi(m,irw,val, x,desc_a,info,dupl)
       use psb_descriptor_type
       integer, intent(in)                ::  m
@@ -229,7 +333,6 @@ Module psb_tools_mod
       integer, intent(out)               ::  info
       integer, optional, intent(in)      ::  dupl
     end subroutine psb_dinsi
-    ! 1-D double precision version
     subroutine psb_dinsvi(m,irw,val,x,desc_a,info,dupl)
       use psb_descriptor_type
       integer, intent(in)                ::  m
@@ -240,7 +343,6 @@ Module psb_tools_mod
       integer, intent(out)               ::  info
       integer, optional, intent(in)      ::  dupl
     end subroutine psb_dinsvi
-    ! 2-D double precision version
     subroutine psb_iinsi(m,irw,val, x,desc_a,info,dupl)
       use psb_descriptor_type
       integer, intent(in)              ::  m
@@ -251,7 +353,6 @@ Module psb_tools_mod
       integer, intent(out)             ::  info
       integer, optional, intent(in)    ::  dupl
     end subroutine psb_iinsi
-    ! 1-D double precision version
     subroutine psb_iinsvi(m, irw,val, x,desc_a,info,dupl)
       use psb_descriptor_type
       integer, intent(in)             ::  m
@@ -262,7 +363,26 @@ Module psb_tools_mod
       integer, intent(out)            ::  info
       integer, optional, intent(in)   ::  dupl
     end subroutine psb_iinsvi
-    ! 2-D double precision version
+    subroutine psb_cinsi(m,irw,val, x, desc_a,info,dupl)
+      use psb_descriptor_type
+      integer, intent(in)              ::  m
+      type(psb_desc_type), intent(in)  ::  desc_a
+      complex(psb_spk_),intent(inout)      ::  x(:,:)
+      integer, intent(in)              ::  irw(:)
+      complex(psb_spk_), intent(in)  ::  val(:,:)
+      integer, intent(out)             ::  info
+      integer, optional, intent(in)    ::  dupl
+    end subroutine psb_cinsi
+    subroutine psb_cinsvi(m, irw,val, x,desc_a,info,dupl)
+      use psb_descriptor_type
+      integer, intent(in)              ::  m
+      type(psb_desc_type), intent(in)  ::  desc_a
+      complex(psb_spk_),intent(inout)      ::  x(:)
+      integer, intent(in)              ::  irw(:)
+      complex(psb_spk_), intent(in)  ::  val(:)
+      integer, intent(out)             ::  info
+      integer, optional, intent(in)    ::  dupl
+    end subroutine psb_cinsvi
     subroutine psb_zinsi(m,irw,val, x, desc_a,info,dupl)
       use psb_descriptor_type
       integer, intent(in)              ::  m
@@ -273,7 +393,6 @@ Module psb_tools_mod
       integer, intent(out)             ::  info
       integer, optional, intent(in)    ::  dupl
     end subroutine psb_zinsi
-    ! 1-D double precision version
     subroutine psb_zinsvi(m, irw,val, x,desc_a,info,dupl)
       use psb_descriptor_type
       integer, intent(in)              ::  m
@@ -315,6 +434,16 @@ Module psb_tools_mod
 
 
   interface psb_cdbldext
+    Subroutine psb_scdbldext(a,desc_a,novr,desc_ov,info,extype)
+      use psb_descriptor_type
+      Use psb_spmat_type
+      integer, intent(in)                     :: novr
+      Type(psb_sspmat_type), Intent(in)       :: a
+      Type(psb_desc_type), Intent(in), target :: desc_a
+      Type(psb_desc_type), Intent(out)        :: desc_ov
+      integer, intent(out)                    :: info
+      integer, intent(in),optional            :: extype
+    end Subroutine psb_scdbldext
     Subroutine psb_dcdbldext(a,desc_a,novr,desc_ov,info,extype)
       use psb_descriptor_type
       Use psb_spmat_type
@@ -325,6 +454,16 @@ Module psb_tools_mod
       integer, intent(out)                    :: info
       integer, intent(in),optional            :: extype
     end Subroutine psb_dcdbldext
+    Subroutine psb_ccdbldext(a,desc_a,novr,desc_ov,info,extype)
+      use psb_descriptor_type
+      Use psb_spmat_type
+      integer, intent(in)                     :: novr
+      Type(psb_cspmat_type), Intent(in)       :: a
+      Type(psb_desc_type), Intent(in), target :: desc_a
+      Type(psb_desc_type), Intent(out)        :: desc_ov
+      integer, intent(out)                    :: info
+      integer, intent(in),optional            :: extype
+    end Subroutine psb_ccdbldext
     Subroutine psb_zcdbldext(a,desc_a,novr,desc_ov,info,extype)
       use psb_descriptor_type
       Use psb_spmat_type
@@ -358,6 +497,14 @@ Module psb_tools_mod
   end interface
 
   interface psb_spall
+    subroutine psb_sspalloc(a, desc_a, info, nnz)
+      use psb_descriptor_type
+      use psb_spmat_type
+      type(psb_desc_type), intent(inout) :: desc_a
+      type(psb_sspmat_type), intent(out) :: a
+      integer, intent(out)               :: info
+      integer, optional, intent(in)      :: nnz
+    end subroutine psb_sspalloc
     subroutine psb_dspalloc(a, desc_a, info, nnz)
       use psb_descriptor_type
       use psb_spmat_type
@@ -366,6 +513,14 @@ Module psb_tools_mod
       integer, intent(out)               :: info
       integer, optional, intent(in)      :: nnz
     end subroutine psb_dspalloc
+    subroutine psb_cspalloc(a, desc_a, info, nnz)
+      use psb_descriptor_type
+      use psb_spmat_type
+      type(psb_desc_type), intent(inout) :: desc_a
+      type(psb_cspmat_type), intent(out) :: a
+      integer, intent(out)               :: info
+      integer, optional, intent(in)      :: nnz
+    end subroutine psb_cspalloc
     subroutine psb_zspalloc(a, desc_a, info, nnz)
       use psb_descriptor_type
       use psb_spmat_type
@@ -377,6 +532,15 @@ Module psb_tools_mod
   end interface
 
   interface psb_spasb
+    subroutine psb_sspasb(a,desc_a, info, afmt, upd, dupl)
+      use psb_descriptor_type
+      use psb_spmat_type
+      type(psb_sspmat_type), intent (inout)   :: a
+      type(psb_desc_type), intent(in)         :: desc_a
+      integer, intent(out)                    :: info
+      integer,optional, intent(in)            :: dupl, upd
+      character(len=*), optional, intent(in)  :: afmt
+    end subroutine psb_sspasb
     subroutine psb_dspasb(a,desc_a, info, afmt, upd, dupl)
       use psb_descriptor_type
       use psb_spmat_type
@@ -386,6 +550,15 @@ Module psb_tools_mod
       integer,optional, intent(in)            :: dupl, upd
       character(len=*), optional, intent(in)  :: afmt
     end subroutine psb_dspasb
+    subroutine psb_cspasb(a,desc_a, info, afmt, upd, dupl)
+      use psb_descriptor_type
+      use psb_spmat_type
+      type(psb_cspmat_type), intent (inout)   :: a
+      type(psb_desc_type), intent(in)         :: desc_a
+      integer, intent(out)                    :: info
+      integer,optional, intent(in)            :: dupl, upd
+      character(len=*), optional, intent(in)  :: afmt
+    end subroutine psb_cspasb
     subroutine psb_zspasb(a,desc_a, info, afmt, upd, dupl)
       use psb_descriptor_type
       use psb_spmat_type
@@ -398,10 +571,17 @@ Module psb_tools_mod
   end interface
 
   interface psb_spfree
-    module procedure psb_dsp_free, psb_zsp_free
+    module procedure psb_ssp_free, psb_dsp_free, psb_zsp_free
   end interface
 
   interface psb_spfree
+    subroutine psb_sspfree(a, desc_a,info)
+      use psb_descriptor_type
+      use psb_spmat_type
+      type(psb_desc_type), intent(in) :: desc_a
+      type(psb_sspmat_type), intent(inout)       ::a
+      integer, intent(out)        :: info
+    end subroutine psb_sspfree
     subroutine psb_dspfree(a, desc_a,info)
       use psb_descriptor_type
       use psb_spmat_type
@@ -409,6 +589,13 @@ Module psb_tools_mod
       type(psb_dspmat_type), intent(inout)       ::a
       integer, intent(out)        :: info
     end subroutine psb_dspfree
+    subroutine psb_cspfree(a, desc_a,info)
+      use psb_descriptor_type
+      use psb_spmat_type
+      type(psb_desc_type), intent(in) :: desc_a
+      type(psb_cspmat_type), intent(inout)      ::a
+      integer, intent(out)        :: info
+    end subroutine psb_cspfree
     subroutine psb_zspfree(a, desc_a,info)
       use psb_descriptor_type
       use psb_spmat_type
@@ -420,6 +607,26 @@ Module psb_tools_mod
 
 
   interface psb_spins
+    subroutine psb_sspins(nz,ia,ja,val,a,desc_a,info,rebuild)
+      use psb_descriptor_type
+      use psb_spmat_type
+      type(psb_desc_type), intent(inout)   :: desc_a
+      type(psb_sspmat_type), intent(inout) :: a
+      integer, intent(in)                  :: nz,ia(:),ja(:)
+      real(psb_spk_), intent(in)           :: val(:)
+      integer, intent(out)                 :: info
+      logical, intent(in), optional        :: rebuild
+    end subroutine psb_sspins
+    subroutine psb_sspins_2desc(nz,ia,ja,val,a,desc_ar,desc_ac,info)
+      use psb_descriptor_type
+      use psb_spmat_type
+      type(psb_desc_type), intent(in)      :: desc_ar
+      type(psb_desc_type), intent(inout)   :: desc_ac
+      type(psb_sspmat_type), intent(inout) :: a
+      integer, intent(in)                  :: nz,ia(:),ja(:)
+      real(kind(1.d0)), intent(in)         :: val(:)
+      integer, intent(out)                 :: info
+    end subroutine psb_sspins_2desc
     subroutine psb_dspins(nz,ia,ja,val,a,desc_a,info,rebuild)
       use psb_descriptor_type
       use psb_spmat_type
@@ -437,9 +644,29 @@ Module psb_tools_mod
       type(psb_desc_type), intent(inout)   :: desc_ac
       type(psb_dspmat_type), intent(inout) :: a
       integer, intent(in)                  :: nz,ia(:),ja(:)
-      real(kind(1.d0)), intent(in)         :: val(:)
+      real(psb_dpk_), intent(in)           :: val(:)
       integer, intent(out)                 :: info
     end subroutine psb_dspins_2desc
+    subroutine psb_cspins(nz,ia,ja,val,a,desc_a,info,rebuild)
+      use psb_descriptor_type
+      use psb_spmat_type
+      type(psb_desc_type), intent(inout)   :: desc_a
+      type(psb_cspmat_type), intent(inout) :: a
+      integer, intent(in)                  :: nz,ia(:),ja(:)
+      complex(psb_spk_), intent(in)      :: val(:)
+      integer, intent(out)                 :: info
+      logical, intent(in), optional        :: rebuild
+    end subroutine psb_cspins
+    subroutine psb_cspins_2desc(nz,ia,ja,val,a,desc_ar,desc_ac,info)
+      use psb_descriptor_type
+      use psb_spmat_type
+      type(psb_desc_type), intent(in)      :: desc_ar
+      type(psb_desc_type), intent(inout)   :: desc_ac
+      type(psb_cspmat_type), intent(inout) :: a
+      integer, intent(in)                  :: nz,ia(:),ja(:)
+      complex(psb_spk_), intent(in)        :: val(:)
+      integer, intent(out)                 :: info
+    end subroutine psb_cspins_2desc
     subroutine psb_zspins(nz,ia,ja,val,a,desc_a,info,rebuild)
       use psb_descriptor_type
       use psb_spmat_type
@@ -457,13 +684,21 @@ Module psb_tools_mod
       type(psb_desc_type), intent(inout)   :: desc_ac
       type(psb_zspmat_type), intent(inout) :: a
       integer, intent(in)                  :: nz,ia(:),ja(:)
-      complex(kind(1.d0)), intent(in)      :: val(:)
+      complex(psb_dpk_), intent(in)        :: val(:)
       integer, intent(out)                 :: info
     end subroutine psb_zspins_2desc
   end interface
 
 
   interface psb_sprn
+    subroutine psb_ssprn(a, desc_a,info,clear)
+      use psb_descriptor_type
+      use psb_spmat_type
+      type(psb_desc_type), intent(in)      :: desc_a
+      type(psb_sspmat_type), intent(inout) :: a
+      integer, intent(out)                 :: info
+      logical, intent(in), optional        :: clear
+    end subroutine psb_ssprn
     subroutine psb_dsprn(a, desc_a,info,clear)
       use psb_descriptor_type
       use psb_spmat_type
@@ -472,6 +707,14 @@ Module psb_tools_mod
       integer, intent(out)                 :: info
       logical, intent(in), optional        :: clear
     end subroutine psb_dsprn
+    subroutine psb_csprn(a, desc_a,info,clear)
+      use psb_descriptor_type
+      use psb_spmat_type
+      type(psb_desc_type), intent(in)      :: desc_a
+      type(psb_cspmat_type), intent(inout) :: a
+      integer, intent(out)                 :: info
+      logical, intent(in), optional        :: clear
+    end subroutine psb_csprn
     subroutine psb_zsprn(a, desc_a,info,clear)
       use psb_descriptor_type
       use psb_spmat_type

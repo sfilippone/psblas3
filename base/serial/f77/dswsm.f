@@ -153,9 +153,11 @@ C     All checks on argument are performed in the calling routine.
 C
 C
       SUBROUTINE DSWSM(TRANS,M,N,ALPHA,UNITD,D,FIDT,DESCRT,T,IT1,IT2, 
-     &                 INFOT,B,LDB,BETA,C,LDC,WORK,LWORK,IERROR)
+     &  INFOT,B,LDB,BETA,C,LDC,WORK,LWORK,IERROR)
+      use psb_const_mod
       use psb_const_mod
       use psb_error_mod
+      use psb_string_mod
       implicit none
 C     .. Scalar Arguments ..
       INTEGER           M, N, LDB, LDC, LWORK, IERROR
@@ -185,9 +187,10 @@ C     .. Executable Statements ..
 C
 C     Check for identity matrix
 C
-      IF(DESCRT(1:1).EQ.'D' .AND. DESCRT(3:3).EQ.'U') THEN
-         CALL DCOPY(M,B,ONE,C,ONE)
-         GOTO 9998
+      IF(psb_toupper(DESCRT(1:1)).EQ.'D' .AND.
+     +  psb_toupper(DESCRT(3:3)).EQ.'U') THEN
+        CALL DCOPY(M,B,ONE,C,ONE)
+        GOTO 9998
       ENDIF
 
       if (debug_level >= psb_debug_serial_comp_)
@@ -196,31 +199,31 @@ C
 C     Switching on FIDT: proper sparse BLAS routine is selected
 C     according to data structure
 C
-      IF (FIDT(1:3).EQ.'CSR') THEN
+      IF (psb_toupper(FIDT(1:3)).EQ.'CSR') THEN
 C
 C        T, IT1, IT2 --->  AR,   JA,   IA
 C                         VAL, INDX, PNTR
 C        INFOT(*) not used
 C
-         CALL  DCSRSM(TRANS,M,N,UNITD,D,ALPHA,DESCRT,T,IT1,          
-     &                IT2,B,LDB,BETA,C,LDC,WORK,LWORK,IERROR)
-      ELSE IF (FIDT(1:3).EQ.'JAD') THEN
-         
-         CALL  DJADSM(TRANS,M,N,D,UNITD,0,ALPHA,DESCRT,T,IT1,IT2,
+        CALL  DCSRSM(TRANS,M,N,UNITD,D,ALPHA,DESCRT,T,IT1,          
+     &    IT2,B,LDB,BETA,C,LDC,WORK,LWORK,IERROR)
+      ELSE IF (psb_toupper(FIDT(1:3)).EQ.'JAD') THEN
+        
+        CALL  DJADSM(TRANS,M,N,D,UNITD,0,ALPHA,DESCRT,T,IT1,IT2,
      +    0,B,LDB,BETA,C,LDC,WORK)
-         
-      ELSE IF (FIDT(1:3).EQ.'COO') THEN
+        
+      ELSE IF (psb_toupper(FIDT(1:3)).EQ.'COO') THEN
         
         CALL  DCOOSM(TRANS,M,N,UNITD,D,ALPHA,DESCRT,T,IT1,IT2,INFOT,
-     +     B,LDB,BETA,C,LDC,WORK,LWORK,IERROR)
+     +    B,LDB,BETA,C,LDC,WORK,LWORK,IERROR)
         
       ELSE
 C
 C     This data structure not yet considered
 C
-         IERROR = 3010
-         CALL FCPSB_ERRPUSH(IERROR,NAME,INT_VAL)
-         GOTO 9999
+        IERROR = 3010
+        CALL FCPSB_ERRPUSH(IERROR,NAME,INT_VAL)
+        GOTO 9999
 
       END IF
 
@@ -232,8 +235,8 @@ C
       CALL FCPSB_ERRACTIONRESTORE(ERR_ACT)
 
       IF ( ERR_ACT .NE. 0 ) THEN 
-         CALL FCPSB_SERROR()
-         RETURN
+        CALL FCPSB_SERROR()
+        RETURN
       ENDIF
 
       RETURN

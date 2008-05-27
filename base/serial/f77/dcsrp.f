@@ -121,6 +121,7 @@ C
      +  P,WORK,LWORK,IERROR)
       use psb_const_mod
       use psb_error_mod
+      use psb_string_mod
       IMPLICIT NONE                                                      
 C     .. Scalar Arguments ..
       INTEGER          LWORK, M, N, IERROR
@@ -148,45 +149,47 @@ C
       CALL FCPSB_ERRACTIONSAVE(ERR_ACT)
 
       IF     (M.LE.0) THEN
-         IERROR = 1
+        IERROR = 1
       ELSE IF(N.LE.0) THEN
-         IERROR = 3
-      ELSE IF(TRANS.NE.'N' .AND. TRANS.NE.'T' .AND. TRANS.NE.'C') THEN
-         IERROR = -1
+        IERROR = 3
+      ELSE IF (psb_toupper(TRANS).NE.'T' .AND.
+     +    psb_toupper(TRANS).NE.'N' .AND.
+     +    psb_toupper(TRANS).NE.'C') THEN
+        IERROR = -1
       ENDIF
 C
 C     Error handling
 C
       IF(IERROR.LT.0) THEN
-         CALL FCPSB_ERRPUSH(IERROR,NAME,INT_VAL)
-         GOTO 9999
+        CALL FCPSB_ERRPUSH(IERROR,NAME,INT_VAL)
+        GOTO 9999
       ENDIF
 C
 C     Check for M, N, P
 C
       IF(M.LE.0 .OR. N.LE.0 .OR. P(1).EQ.0) THEN
-         GOTO 9999
+        GOTO 9999
       ENDIF
 C
 C     Switching on FIDA
 C
-      IF  (FIDA(1:3).EQ.'CSR') THEN
+      IF  (psb_toupper(FIDA(1:3)).EQ.'CSR') THEN
 C
 C        Permuting CSR structure
 C
-         CALL DCSRRP(TRANS,M,N,DESCRA,IA1,IA2,P,WORK,LWORK)
-      ELSE IF (FIDA(1:3).EQ.'JAD') THEN
+        CALL DCSRRP(TRANS,M,N,DESCRA,IA1,IA2,P,WORK,LWORK)
+      ELSE IF (psb_toupper(FIDA(1:3)).EQ.'JAD') THEN
         if (debug_level >= psb_debug_serial_comp_)
      +    write(debug_unit,*)  trim(name),
      +    ': Calling djadrp',m,p(1),lwork
-         CALL DJADRP(TRANS,M,N,DESCRA,IA1,IA2,P,WORK,LWORK)
+        CALL DJADRP(TRANS,M,N,DESCRA,IA1,IA2,P,WORK,LWORK)
       ELSE
 C
 C        This data structure not yet considered
 C
-         IERROR  = 4
-         CALL FCPSB_ERRPUSH(IERROR,NAME,INT_VAL)
-         GOTO 9999
+        IERROR  = 4
+        CALL FCPSB_ERRPUSH(IERROR,NAME,INT_VAL)
+        GOTO 9999
       ENDIF
 
       CALL FCPSB_ERRACTIONRESTORE(ERR_ACT)
@@ -196,8 +199,8 @@ C
       CALL FCPSB_ERRACTIONRESTORE(ERR_ACT)
 
       IF ( ERR_ACT .NE. 0 ) THEN 
-         CALL FCPSB_SERROR()
-         RETURN
+        CALL FCPSB_SERROR()
+        RETURN
       ENDIF
 
       RETURN

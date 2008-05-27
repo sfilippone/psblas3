@@ -60,7 +60,7 @@ program df_sample
   ! solver paramters
   integer            :: iter, itmax, ierr, itrace, ircode, ipart,&
        & methd, istopc, irst,amatsize,precsize,descsize
-  real(psb_dpk_)   :: err, eps
+  real(psb_dpk_)   :: err, eps,cond
 
   character(len=5)   :: afmt
   character(len=20)  :: name
@@ -207,12 +207,13 @@ program df_sample
     write(*,'("Preconditioner time: ",es10.4)')tprec
     write(*,'(" ")')
   end if
-
+  cond = dzero
   iparm = 0
   call psb_barrier(ictxt)
   t1 = psb_wtime()
   call psb_krylov(kmethd,a,prec,b_col,x_col,eps,desc_a,info,& 
-       & itmax=itmax,iter=iter,err=err,itrace=itrace,istop=istopc,irst=irst)     
+       & itmax=itmax,iter=iter,err=err,itrace=itrace,istop=istopc,&
+       & irst=irst,cond=cond)     
   call psb_barrier(ictxt)
   t2 = psb_wtime() - t1
 
@@ -233,13 +234,14 @@ program df_sample
     write(*,'("Matrix: ",a)')mtrx_file
     write(*,'("Computed solution on ",i8," processors")')np
     write(*,'("Iterations to convergence: ",i6)')iter
-    write(*,'("Error estimate on exit: ",f7.2)')err
-    write(*,'("Time to buil prec.   : ",es10.4)')tprec
-    write(*,'("Time to solve matrix : ",es10.4)')t2
-    write(*,'("Time per iteration   : ",es10.4)')t2/(iter)
-    write(*,'("Total time           : ",es10.4)')t2+tprec
-    write(*,'("Residual norm 2   = ",es10.4)')resmx
-    write(*,'("Residual norm inf = ",es10.4)')resmxp
+    write(*,'("Error estimate on exit   : ",es10.4)') err
+    write(*,'("Time to buil prec.       : ",es10.4)')tprec
+    write(*,'("Time to solve matrix     : ",es10.4)')t2
+    write(*,'("Time per iteration       : ",es10.4)')t2/(iter)
+    write(*,'("Total time               : ",es10.4)')t2+tprec
+    write(*,'("Residual norm 2          : ",es10.4)')resmx
+    write(*,'("Residual norm inf        : ",es10.4)')resmxp
+    write(*,*)"Condition number         : ",cond
     write(*,'("Total memory occupation for A:      ",i10)')amatsize
     write(*,'("Total memory occupation for DESC_A: ",i10)')descsize
     write(*,'("Total memory occupation for PREC:   ",i10)')precsize

@@ -168,9 +168,7 @@ C
       SUBROUTINE DCSRMV(TRANS,DIAG,M,N,ALPHA,AS,JA,IA,X,BETA,Y,
      +  WORK,LWORK,IERROR)
       use psb_const_mod
-C     .. Parameters ..
-      real(psb_dpk_)  ONE, ZERO
-      PARAMETER         (ONE=1.0D0,ZERO=0.0D0)
+      use psb_string_mod
 C     .. Scalar Arguments ..
       real(psb_dpk_)  ALPHA, BETA
       INTEGER           M, N,LWORK,IERROR
@@ -185,11 +183,12 @@ C     .. Local Scalars ..
 C     .. Executable Statements ..
 C
       IERROR = 0
-      UNI = (DIAG.EQ.'U')
-      TRA = (TRANS.EQ.'T')
+      UNI = (psb_toupper(DIAG).EQ.'U')
+      TRA = (psb_toupper(TRANS).EQ.'T')
 
 C     Symmetric matrix upper or lower 
-      SYM = ((TRANS.EQ.'L').OR.(TRANS.EQ.'U'))
+      SYM = ((psb_toupper(TRANS).EQ.'L').OR.
+     +  (psb_toupper(TRANS).EQ.'U'))
 C
       IF ( .NOT. TRA) THEN
         NROWA = M
@@ -199,10 +198,10 @@ C
         NCOLA = M
       END IF                    !(....TRA)
 
-      IF (ALPHA.EQ.ZERO) THEN
-        IF (BETA.EQ.ZERO) THEN
+      IF (ALPHA.EQ.DZERO) THEN
+        IF (BETA.EQ.DZERO) THEN
           DO I = 1, M
-            Y(I) = ZERO
+            Y(I) = DZERO
           ENDDO
         ELSE
           DO 20 I = 1, M
@@ -220,7 +219,7 @@ C              ......Symmetric with unitary diagonal.......
 C              ....OK!!
 C              To be optimized
           
-          IF (BETA.NE.ZERO) THEN
+          IF (BETA.NE.DZERO) THEN
             DO 40 I = 1, M
 C
 C                 Product for diagonal elements
@@ -235,7 +234,7 @@ C
 
 C              Product for other elements
           DO 80 I = 1, M
-            ACC = ZERO
+            ACC = DZERO
             DO 60 J = IA(I), IA(I+1) - 1
               K = JA(J)
               Y(K) = Y(K) + ALPHA*AS(J)*X(I)
@@ -248,23 +247,23 @@ C
 C
 C            Check if matrix is lower or upper
 C
-          IF (TRANS.EQ.'L') THEN
+          IF (PSB_TOUPPER(TRANS).EQ.'L') THEN
 C
 C               LOWER CASE: diagonal element is the last element of row
 C               ....OK!
 
-            IF (BETA.NE.ZERO) THEN
+            IF (BETA.NE.DZERO) THEN
               DO 100 I = 1, M
                 Y(I) = BETA*Y(I)
  100          CONTINUE
             ELSE
               DO I = 1, M
-                Y(I) = ZERO
+                Y(I) = DZERO
               ENDDO
             ENDIF
 
             DO 140 I = 1, M
-              ACC = ZERO
+              ACC = DZERO
               DO 120 J = IA(I), IA(I+1) - 1 ! it was -2
                 K = JA(J)
 C
@@ -283,18 +282,18 @@ C
 C              UPPER CASE
 C              ....OK!!
 C
-            IF (BETA.NE.ZERO) THEN
+            IF (BETA.NE.DZERO) THEN
               DO 160 I = 1, M
                 Y(I) = BETA*Y(I)
  160          CONTINUE
             ELSE
               DO I = 1, M
-                Y(I) = ZERO
+                Y(I) = DZERO
               ENDDO
             ENDIF
 
             DO 200 I = 1, M
-              ACC = ZERO
+              ACC = DZERO
               DO 180 J = IA(I) , IA(I+1) - 1 ! removed +1
                 K = JA(J)
 C
@@ -316,18 +315,18 @@ C
 C
 C          .......General Not Unit, No Traspose
 C
-          if (beta  == zero) then
-            if (alpha==one) then 
+          if (beta  == dzero) then
+            if (alpha==done) then 
               do i = 1, m
-                acc = zero
+                acc = dzero
                 do j = ia(i), ia(i+1) - 1
                   acc = acc + as(j)*x(ja(j))
                 enddo
                 y(i) = acc
               enddo
-            else if (alpha==-one) then 
+            else if (alpha==-done) then 
               do i = 1, m
-                acc = zero
+                acc = dzero
                 do j = ia(i), ia(i+1) - 1
                   acc = acc - as(j)*x(ja(j))
                 enddo
@@ -335,7 +334,7 @@ C
               enddo
             else
               do i = 1, m
-                acc = zero
+                acc = dzero
                 do j = ia(i), ia(i+1) - 1
                   acc = acc + as(j)*x(ja(j))
                 enddo
@@ -344,9 +343,9 @@ C
               
             endif 
 
-          else if (beta==one) then 
+          else if (beta==done) then 
 
-            if (alpha==one) then 
+            if (alpha==done) then 
               do i = 1, m
                 acc = y(i)
                 do j = ia(i), ia(i+1) - 1
@@ -354,7 +353,7 @@ C
                 enddo
                 y(i) = acc
               enddo
-            else if (alpha==-one) then 
+            else if (alpha==-done) then 
               do i = 1, m
                 acc = y(i)
                 do j = ia(i), ia(i+1) - 1
@@ -364,7 +363,7 @@ C
               enddo
             else
               do i = 1, m
-                acc = zero
+                acc = dzero
                 do j = ia(i), ia(i+1) - 1
                   acc = acc + as(j)*x(ja(j))
                 enddo
@@ -372,9 +371,9 @@ C
               enddo
             endif 
 
-          else if (beta==-one) then 
+          else if (beta==-done) then 
 
-            if (alpha==one) then 
+            if (alpha==done) then 
               do i = 1, m
                 acc = -y(i)
                 do j = ia(i), ia(i+1) - 1
@@ -382,7 +381,7 @@ C
                 enddo
                 y(i) = acc
               enddo
-            else if (alpha==-one) then 
+            else if (alpha==-done) then 
               do i = 1, m
                 acc = -y(i)
                 do j = ia(i), ia(i+1) - 1
@@ -392,7 +391,7 @@ C
               enddo
             else
               do i = 1, m
-                acc = zero
+                acc = dzero
                 do j = ia(i), ia(i+1) - 1
                   acc = acc + as(j)*x(ja(j))
                 enddo
@@ -400,17 +399,17 @@ C
               enddo
             endif 
           else  
-            if (alpha==one) then 
+            if (alpha==done) then 
               do i = 1, m
-                acc = zero
+                acc = dzero
                 do j = ia(i), ia(i+1) - 1
                   acc = acc + as(j)*x(ja(j))
                 enddo
                 y(i) = acc + beta*y(i)
               enddo
-            else if (alpha==-one) then 
+            else if (alpha==-done) then 
               do i = 1, m
-                acc = zero
+                acc = dzero
                 do j = ia(i), ia(i+1) - 1
                   acc = acc - as(j)*x(ja(j))
                 enddo
@@ -418,7 +417,7 @@ C
               enddo
             else
               do i = 1, m
-                acc = zero
+                acc = dzero
                 do j = ia(i), ia(i+1) - 1
                   acc = acc + as(j)*x(ja(j))
                 enddo
@@ -429,17 +428,17 @@ C
 C
         ELSE IF (UNI) THEN
 C
-          IF (BETA.NE.ZERO) THEN
+          IF (BETA.NE.DZERO) THEN
             DO 280 I = 1, M
-              ACC = ZERO
+              ACC = DZERO
               DO 260 J = IA(I), IA(I+1) - 1
                 ACC = ACC + AS(J)*X(JA(J))
  260          CONTINUE
               Y(I) = ALPHA*(ACC+X(I)) + BETA*Y(I)
  280        CONTINUE
-          ELSE                  !(BETA.EQ.ZERO)
+          ELSE                  !(BETA.EQ.DZERO)
             DO I = 1, M
-              ACC = ZERO
+              ACC = DZERO
               DO J = IA(I), IA(I+1) - 1
                 ACC = ACC + AS(J)*X(JA(J))
               ENDDO
@@ -452,24 +451,24 @@ C
 C
         IF ( .NOT. UNI) THEN
 C
-          IF (BETA.NE.ZERO) THEN
+          IF (BETA.NE.DZERO) THEN
             DO 300 I = 1, M
               Y(I) = BETA*Y(I)
  300        CONTINUE
-          ELSE                  !(BETA.EQ.ZERO)
+          ELSE                  !(BETA.EQ.DZERO)
             DO I = 1, M
-              Y(I) = ZERO
+              Y(I) = DZERO
             ENDDO
           ENDIF
 C
         ELSE IF (UNI) THEN
 C
 
-          IF (BETA.NE.ZERO) THEN
+          IF (BETA.NE.DZERO) THEN
             DO 320 I = 1, M
               Y(I) = BETA*Y(I) + ALPHA*X(I)
  320        CONTINUE
-          ELSE                  !(BETA.EQ.ZERO)
+          ELSE                  !(BETA.EQ.DZERO)
             DO I = 1, M
               Y(I) = ALPHA*X(I)
             ENDDO
@@ -478,7 +477,7 @@ C
 C
         END IF                  !....UNI
 C
-        IF (ALPHA.EQ.ONE) THEN
+        IF (ALPHA.EQ.DONE) THEN
 C
           DO 360 I = 1, N
             DO 340 J = IA(I), IA(I+1) - 1
@@ -487,7 +486,7 @@ C
  340        CONTINUE
  360      CONTINUE
 C
-        ELSE IF (ALPHA.EQ.-ONE) THEN
+        ELSE IF (ALPHA.EQ.-DONE) THEN
 C
           DO 400 I = 1, n
             DO 380 J = IA(I), IA(I+1) - 1

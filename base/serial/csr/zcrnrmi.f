@@ -29,7 +29,8 @@ C ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 C POSSIBILITY OF SUCH DAMAGE.
 C
       FUNCTION ZCRNRMI(TRANS,M,N,DESCRA,A,IA1,IA2,      
-     &   INFOA,IERROR)
+     &  INFOA,IERROR)
+      use psb_const_mod
       use psb_const_mod
       IMPLICIT NONE
       real(psb_dpk_) zcrnrmi
@@ -46,8 +47,8 @@ C     .. Local scalars ..
 
       NRMI = 0.D0
       DO I = 1, M
-         SUM = 0.D0
-         DO J = IA2(I), IA2(I+1)-1
+        SUM = 0.D0
+        DO J = IA2(I), IA2(I+1)-1
 C
 C            .. definition coerent abs
 C
@@ -55,9 +56,9 @@ C            SUM = SUM + ABS(A(J))
 C
 C            .. essl_way abs
 C
-             SUM = SUM + ABS(DBLE(A(J))) + ABS(AIMAG(A(J)))
-         ENDDO         
-         NRMI = MAX(NRMI, SUM)
+          SUM = SUM + ABS(DBLE(A(J))) + ABS(AIMAG(A(J)))
+        ENDDO         
+        NRMI = MAX(NRMI, SUM)
       ENDDO
 
       ZCRNRMI = NRMI

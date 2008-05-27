@@ -31,6 +31,7 @@ C
       SUBROUTINE ZCSRRWS(TRANS,M,N,DESCRA,A,IA1,IA2,
      &  INFOA,ROWSUM,IERROR)
       use psb_const_mod
+      use psb_string_mod
       IMPLICIT NONE
 C     .. Scalar Arguments ..
       INTEGER           M,N, IERROR
@@ -43,7 +44,7 @@ C     .. Local scalars ..
       INTEGER I, J
       real(psb_dpk_)  SUM
 
-      IF (TRANS.EQ.'N') THEN
+      IF (psb_toupper(TRANS).EQ.'N') THEN
         DO I = 1, M
           ROWSUM(I) = (0.0D0, 0.0D0)
           DO J = IA2(I), IA2(I + 1) - 1
@@ -51,7 +52,8 @@ C     .. Local scalars ..
      +        ABS(REAL(A(J))) + ABS(AIMAG(A(J)))
           ENDDO
         ENDDO
-      ELSE IF ((TRANS.EQ.'T').OR.(TRANS.EQ.'C')) THEN
+      ELSE IF ((psb_toupper(TRANS).EQ.'T').OR.
+     +    (psb_toupper(TRANS).EQ.'C')) THEN
         DO J = 1, N
           ROWSUM(J) = (0.0D0, 0.0D0)
         ENDDO
