@@ -66,7 +66,7 @@ subroutine psb_cprecseti(p,what,val,info)
 end subroutine psb_cprecseti
 
 
-subroutine psb_cprecsetd(p,what,val,info)
+subroutine psb_cprecsets(p,what,val,info)
 
   use psb_base_mod
   use psb_prec_mod, psb_protect_name => psb_cprecsetd
@@ -103,4 +103,4 @@ subroutine psb_cprecsetd(p,what,val,info)
   end select
   return
 
-end subroutine psb_cprecsetd
+end subroutine psb_cprecsets

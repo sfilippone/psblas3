@@ -154,15 +154,15 @@ module psb_prec_mod
       integer                                :: what, val 
       integer, intent(out)                   :: info
     end subroutine psb_cprecseti
-    subroutine psb_cprecsetd(prec,what,val,info)
+    subroutine psb_cprecsets(prec,what,val,info)
       use psb_base_mod
       use psb_prec_type
       implicit none
       type(psb_cprec_type), intent(inout)    :: prec
       integer                                :: what
-      real(psb_dpk_)                       :: val 
+      real(psb_spk_)                       :: val 
       integer, intent(out)                   :: info
-    end subroutine psb_cprecsetd
+    end subroutine psb_cprecsets
     subroutine psb_zprecseti(prec,what,val,info)
       use psb_base_mod
       use psb_prec_type
