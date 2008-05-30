@@ -46,7 +46,7 @@ Module psb_krylov_mod
     subroutine psb_scg(a,prec,b,x,eps,&
          & desc_a,info,itmax,iter,err,itrace,istop,cond)
       use psb_base_mod, only  : psb_desc_type, psb_sspmat_type, psb_spk_
-      use psb_prec_type, only : psb_sprec_type
+      use psb_prec_mod, only : psb_sprec_type
       type(psb_sspmat_type), intent(in)  :: a
       type(psb_desc_type), intent(in)    :: desc_a
       real(psb_spk_), intent(in)       :: b(:)
@@ -61,7 +61,7 @@ Module psb_krylov_mod
     subroutine psb_dcg(a,prec,b,x,eps,&
          & desc_a,info,itmax,iter,err,itrace,istop,cond)
       use psb_base_mod, only  : psb_desc_type, psb_dspmat_type, psb_dpk_
-      use psb_prec_type, only : psb_dprec_type
+      use psb_prec_mod, only : psb_dprec_type
       type(psb_dspmat_type), intent(in)  :: a
       type(psb_desc_type), intent(in)    :: desc_a
       real(psb_dpk_), intent(in)       :: b(:)
@@ -76,7 +76,7 @@ Module psb_krylov_mod
     subroutine psb_ccg(a,prec,b,x,eps,&
          & desc_a,info,itmax,iter,err,itrace,istop)
       use psb_base_mod, only  : psb_desc_type, psb_cspmat_type, psb_spk_
-      use psb_prec_type, only : psb_cprec_type
+      use psb_prec_mod, only : psb_cprec_type
       type(psb_cspmat_type), intent(in)  :: a
       type(psb_desc_type), intent(in)    :: desc_a
       complex(psb_spk_), intent(in)    :: b(:)
@@ -91,7 +91,7 @@ Module psb_krylov_mod
     subroutine psb_zcg(a,prec,b,x,eps,&
          & desc_a,info,itmax,iter,err,itrace,istop)
       use psb_base_mod, only  : psb_desc_type, psb_zspmat_type, psb_dpk_
-      use psb_prec_type, only : psb_zprec_type
+      use psb_prec_mod, only : psb_zprec_type
       type(psb_zspmat_type), intent(in)  :: a
       type(psb_desc_type), intent(in)    :: desc_a
       complex(psb_dpk_), intent(in)    :: b(:)
@@ -109,7 +109,7 @@ Module psb_krylov_mod
     subroutine psb_sbicg(a,prec,b,x,eps,&
          & desc_a,info,itmax,iter,err,itrace,istop)
       use psb_base_mod, only  : psb_desc_type, psb_sspmat_type, psb_spk_
-      use psb_prec_type, only : psb_sprec_type
+      use psb_prec_mod, only : psb_sprec_type
       type(psb_sspmat_type), intent(in)  :: a
       type(psb_desc_type), intent(in)    :: desc_a
       real(psb_spk_), intent(in)       :: b(:)
@@ -124,7 +124,7 @@ Module psb_krylov_mod
     subroutine psb_dbicg(a,prec,b,x,eps,&
          & desc_a,info,itmax,iter,err,itrace,istop)
       use psb_base_mod, only  : psb_desc_type, psb_dspmat_type, psb_dpk_
-      use psb_prec_type, only : psb_dprec_type
+      use psb_prec_mod, only : psb_dprec_type
       type(psb_dspmat_type), intent(in)  :: a
       type(psb_desc_type), intent(in)    :: desc_a
       real(psb_dpk_), intent(in)         :: b(:)
@@ -139,7 +139,7 @@ Module psb_krylov_mod
     subroutine psb_cbicg(a,prec,b,x,eps,&
          & desc_a,info,itmax,iter,err,itrace,istop)
       use psb_base_mod, only  : psb_desc_type, psb_cspmat_type, psb_spk_
-      use psb_prec_type, only : psb_cprec_type
+      use psb_prec_mod, only : psb_cprec_type
       type(psb_cspmat_type), intent(in)  :: a
       type(psb_desc_type), intent(in)    :: desc_a
       complex(psb_spk_), intent(in)      :: b(:)
@@ -154,7 +154,7 @@ Module psb_krylov_mod
     subroutine psb_zbicg(a,prec,b,x,eps,&
          & desc_a,info,itmax,iter,err,itrace,istop)
       use psb_base_mod, only  : psb_desc_type, psb_zspmat_type, psb_dpk_
-      use psb_prec_type, only : psb_zprec_type
+      use psb_prec_mod, only : psb_zprec_type
       type(psb_zspmat_type), intent(in)  :: a
       type(psb_desc_type), intent(in)    :: desc_a
       complex(psb_dpk_), intent(in)      :: b(:)
@@ -172,7 +172,7 @@ Module psb_krylov_mod
     subroutine psb_scgstab(a,prec,b,x,eps,&
          & desc_a,info,itmax,iter,err,itrace,istop)
       use psb_base_mod, only  : psb_desc_type, psb_sspmat_type, psb_spk_
-      use psb_prec_type, only : psb_sprec_type
+      use psb_prec_mod, only : psb_sprec_type
       type(psb_sspmat_type), intent(in)  :: a
       type(psb_desc_type), intent(in)    :: desc_a
       real(psb_spk_), intent(in)       :: b(:)
@@ -187,7 +187,7 @@ Module psb_krylov_mod
     subroutine psb_dcgstab(a,prec,b,x,eps,&
          & desc_a,info,itmax,iter,err,itrace,istop)
       use psb_base_mod, only  : psb_desc_type, psb_dspmat_type, psb_dpk_
-      use psb_prec_type, only : psb_dprec_type
+      use psb_prec_mod, only : psb_dprec_type
       type(psb_dspmat_type), intent(in)  :: a
       type(psb_desc_type), intent(in)    :: desc_a
       real(psb_dpk_), intent(in)       :: b(:)
@@ -202,7 +202,7 @@ Module psb_krylov_mod
     subroutine psb_ccgstab(a,prec,b,x,eps,&
          & desc_a,info,itmax,iter,err,itrace,istop)
       use psb_base_mod, only  : psb_desc_type, psb_cspmat_type, psb_spk_
-      use psb_prec_type, only : psb_cprec_type
+      use psb_prec_mod, only : psb_cprec_type
       type(psb_cspmat_type), intent(in)  :: a
       type(psb_desc_type), intent(in)    :: desc_a
       complex(psb_spk_), intent(in)       :: b(:)
@@ -217,7 +217,7 @@ Module psb_krylov_mod
     subroutine psb_zcgstab(a,prec,b,x,eps,&
          & desc_a,info,itmax,iter,err,itrace,istop)
       use psb_base_mod, only  : psb_desc_type, psb_zspmat_type, psb_dpk_
-      use psb_prec_type, only : psb_zprec_type
+      use psb_prec_mod, only : psb_zprec_type
       type(psb_zspmat_type), intent(in)  :: a
       type(psb_desc_type), intent(in)    :: desc_a
       complex(psb_dpk_), intent(in)       :: b(:)
@@ -235,7 +235,7 @@ Module psb_krylov_mod
     Subroutine psb_scgstabl(a,prec,b,x,eps,desc_a,info,&
          &itmax,iter,err, itrace,irst,istop)
       use psb_base_mod, only  : psb_desc_type, psb_sspmat_type, psb_spk_
-      use psb_prec_type, only : psb_sprec_type
+      use psb_prec_mod, only : psb_sprec_type
       Type(psb_sspmat_type), Intent(in)  :: a
       Type(psb_desc_type), Intent(in)    :: desc_a
       type(psb_sprec_type), intent(in)   :: prec
@@ -250,7 +250,7 @@ Module psb_krylov_mod
     Subroutine psb_dcgstabl(a,prec,b,x,eps,desc_a,info,&
          &itmax,iter,err, itrace,irst,istop)
       use psb_base_mod, only  : psb_desc_type, psb_dspmat_type, psb_dpk_
-      use psb_prec_type, only : psb_dprec_type
+      use psb_prec_mod, only : psb_dprec_type
       Type(psb_dspmat_type), Intent(in)  :: a
       Type(psb_desc_type), Intent(in)    :: desc_a
       type(psb_dprec_type), intent(in)   :: prec
@@ -265,7 +265,7 @@ Module psb_krylov_mod
     Subroutine psb_ccgstabl(a,prec,b,x,eps,desc_a,info,&
          &itmax,iter,err,itrace,irst,istop)
       use psb_base_mod, only  : psb_desc_type, psb_cspmat_type, psb_spk_
-      use psb_prec_type, only : psb_cprec_type
+      use psb_prec_mod, only : psb_cprec_type
       Type(psb_cspmat_type), Intent(in)  :: a
       Type(psb_desc_type), Intent(in)    :: desc_a
       type(psb_cprec_type), intent(in)   :: prec 
@@ -280,7 +280,7 @@ Module psb_krylov_mod
     Subroutine psb_zcgstabl(a,prec,b,x,eps,desc_a,info,&
          &itmax,iter,err,itrace,irst,istop)
       use psb_base_mod, only  : psb_desc_type, psb_zspmat_type, psb_dpk_
-      use psb_prec_type, only : psb_zprec_type
+      use psb_prec_mod, only : psb_zprec_type
       Type(psb_zspmat_type), Intent(in)  :: a
       Type(psb_desc_type), Intent(in)    :: desc_a
       type(psb_zprec_type), intent(in)   :: prec 
@@ -298,7 +298,7 @@ Module psb_krylov_mod
     Subroutine psb_srgmres(a,prec,b,x,eps,desc_a,info,&
          &itmax,iter,err,itrace,irst,istop)
       use psb_base_mod, only  : psb_desc_type, psb_sspmat_type, psb_spk_
-      use psb_prec_type, only : psb_sprec_type
+      use psb_prec_mod, only : psb_sprec_type
       Type(psb_sspmat_type), Intent(in)  :: a
       Type(psb_desc_type), Intent(in)    :: desc_a
       type(psb_sprec_type), intent(in)   :: prec 
@@ -313,7 +313,7 @@ Module psb_krylov_mod
     Subroutine psb_drgmres(a,prec,b,x,eps,desc_a,info,&
          &itmax,iter,err,itrace,irst,istop)
       use psb_base_mod, only  : psb_desc_type, psb_dspmat_type, psb_dpk_
-      use psb_prec_type, only : psb_dprec_type
+      use psb_prec_mod, only : psb_dprec_type
       Type(psb_dspmat_type), Intent(in)  :: a
       Type(psb_desc_type), Intent(in)    :: desc_a
       type(psb_dprec_type), intent(in)   :: prec 
@@ -328,7 +328,7 @@ Module psb_krylov_mod
     Subroutine psb_crgmres(a,prec,b,x,eps,desc_a,info,&
          &itmax,iter,err,itrace,irst,istop)
       use psb_base_mod, only  : psb_desc_type, psb_cspmat_type, psb_spk_
-      use psb_prec_type, only : psb_cprec_type
+      use psb_prec_mod, only : psb_cprec_type
       Type(psb_cspmat_type), Intent(in)  :: a
       Type(psb_desc_type), Intent(in)    :: desc_a
       type(psb_cprec_type), intent(in)   :: prec 
@@ -343,7 +343,7 @@ Module psb_krylov_mod
     Subroutine psb_zrgmres(a,prec,b,x,eps,desc_a,info,&
          &itmax,iter,err,itrace,irst,istop)
       use psb_base_mod, only  : psb_desc_type, psb_zspmat_type, psb_dpk_
-      use psb_prec_type, only : psb_zprec_type
+      use psb_prec_mod, only : psb_zprec_type
       Type(psb_zspmat_type), Intent(in)  :: a
       Type(psb_desc_type), Intent(in)    :: desc_a
       type(psb_zprec_type), intent(in)   :: prec 
@@ -361,7 +361,7 @@ Module psb_krylov_mod
     subroutine psb_scgs(a,prec,b,x,eps,desc_a,info,&
          &itmax,iter,err,itrace,istop)
       use psb_base_mod, only  : psb_desc_type, psb_sspmat_type, psb_spk_
-      use psb_prec_type, only : psb_sprec_type
+      use psb_prec_mod, only : psb_sprec_type
       type(psb_sspmat_type), intent(in)  :: a
       type(psb_desc_type), intent(in)    :: desc_a 
       type(psb_sprec_type), intent(in)   :: prec 
@@ -376,7 +376,7 @@ Module psb_krylov_mod
     subroutine psb_dcgs(a,prec,b,x,eps,desc_a,info,&
          &itmax,iter,err,itrace,istop)
       use psb_base_mod, only  : psb_desc_type, psb_dspmat_type, psb_dpk_
-      use psb_prec_type, only : psb_dprec_type
+      use psb_prec_mod, only : psb_dprec_type
       type(psb_dspmat_type), intent(in)  :: a
       type(psb_desc_type), intent(in)    :: desc_a 
       type(psb_dprec_type), intent(in)   :: prec 
@@ -391,7 +391,7 @@ Module psb_krylov_mod
     subroutine psb_ccgs(a,prec,b,x,eps,&
          & desc_a,info,itmax,iter,err,itrace,istop)
       use psb_base_mod, only  : psb_desc_type, psb_cspmat_type, psb_spk_
-      use psb_prec_type, only : psb_cprec_type
+      use psb_prec_mod, only : psb_cprec_type
       type(psb_cspmat_type), intent(in)  :: a
       type(psb_desc_type), intent(in)    :: desc_a
       complex(psb_spk_), intent(in)       :: b(:)
@@ -406,7 +406,7 @@ Module psb_krylov_mod
     subroutine psb_zcgs(a,prec,b,x,eps,&
          & desc_a,info,itmax,iter,err,itrace,istop)
       use psb_base_mod, only  : psb_desc_type, psb_zspmat_type, psb_dpk_
-      use psb_prec_type, only : psb_zprec_type
+      use psb_prec_mod, only : psb_zprec_type
       type(psb_zspmat_type), intent(in)  :: a
       type(psb_desc_type), intent(in)    :: desc_a
       complex(psb_dpk_), intent(in)       :: b(:)
