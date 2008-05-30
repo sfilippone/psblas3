@@ -36,9 +36,10 @@
 !    to different spaces.
 !
 module psb_inter_descriptor_type
-  use psb_spmat_type, only : psb_sspmat_type, psb_dspmat_type,&
-       & psb_cspmat_type, psb_zspmat_type
-  use psb_descriptor_type, only : psb_desc_type
+  use psb_spmat_type
+  use psb_descriptor_type
+  use psb_comm_mod, only : psb_halo
+  use psb_serial_mod, only : psb_csmm
   
   
 
@@ -200,7 +201,6 @@ contains
 
 
   logical function psb_is_asb_inter_desc(desc)
-    use psb_descriptor_type
     implicit none 
     type(psb_inter_desc_type), intent(in) :: desc
 
@@ -214,7 +214,6 @@ contains
   end function psb_is_asb_inter_desc
 
   logical function psb_is_ok_inter_desc(desc)
-    use psb_descriptor_type
     implicit none 
     type(psb_inter_desc_type), intent(in) :: desc
 
@@ -237,7 +236,6 @@ contains
 
 
   function psb_s_map_sizeof(map)
-    use psb_spmat_type
     implicit none
     type(psb_s_map_type), intent(in) :: map
     Integer                      :: psb_s_map_sizeof
@@ -251,7 +249,6 @@ contains
   end function psb_s_map_sizeof
 
   function psb_d_map_sizeof(map)
-    use psb_spmat_type
     implicit none
     type(psb_d_map_type), intent(in) :: map
     Integer                      :: psb_d_map_sizeof
@@ -265,7 +262,6 @@ contains
   end function psb_d_map_sizeof
 
   function psb_c_map_sizeof(map)
-    use psb_spmat_type
     implicit none
     type(psb_c_map_type), intent(in) :: map
     Integer                      :: psb_c_map_sizeof
@@ -279,7 +275,6 @@ contains
   end function psb_c_map_sizeof
 
   function psb_z_map_sizeof(map)
-    use psb_spmat_type
     implicit none
     type(psb_z_map_type), intent(in) :: map
     Integer                      :: psb_z_map_sizeof
@@ -293,8 +288,6 @@ contains
   end function psb_z_map_sizeof
 
   function psb_itd_sizeof(desc)
-    use psb_spmat_type
-    use psb_descriptor_type
     implicit none 
     type(psb_inter_desc_type), intent(in) :: desc
     Integer                      :: psb_itd_sizeof
@@ -313,10 +306,7 @@ contains
   end function psb_itd_sizeof
   
   function psb_s_inter_desc(map_kind,desc1,desc2,map_fw,map_bk,idx_fw,idx_bk)
-    use psb_spmat_type
-    use psb_descriptor_type
-    use psb_serial_mod
-    use psi_mod
+
     implicit none 
     type(psb_inter_desc_type)         :: psb_s_inter_desc    
     type(psb_desc_type), target       :: desc1, desc2
@@ -360,10 +350,7 @@ contains
   end function psb_s_inter_desc
   
   function psb_s_inter_desc_noidx(map_kind,desc1, desc2, map_fw, map_bk)
-    use psb_spmat_type
-    use psb_descriptor_type
-    use psb_serial_mod
-    use psi_mod
+
     implicit none 
     type(psb_inter_desc_type)         :: psb_s_inter_desc_noidx    
     type(psb_desc_type), target       :: desc1, desc2
@@ -413,10 +400,7 @@ contains
   end function psb_s_inter_desc_noidx
   
   function psb_d_inter_desc(map_kind,desc1,desc2,map_fw,map_bk,idx_fw,idx_bk)
-    use psb_spmat_type
-    use psb_descriptor_type
-    use psb_serial_mod
-    use psi_mod
+
     implicit none 
     type(psb_inter_desc_type)         :: psb_d_inter_desc    
     type(psb_desc_type), target       :: desc1, desc2
@@ -460,10 +444,7 @@ contains
   end function psb_d_inter_desc
   
   function psb_d_inter_desc_noidx(map_kind,desc1, desc2, map_fw, map_bk)
-    use psb_spmat_type
-    use psb_descriptor_type
-    use psb_serial_mod
-    use psi_mod
+
     implicit none 
     type(psb_inter_desc_type)         :: psb_d_inter_desc_noidx    
     type(psb_desc_type), target       :: desc1, desc2
@@ -513,10 +494,7 @@ contains
   end function psb_d_inter_desc_noidx
 
   function psb_c_inter_desc(map_kind,desc1, desc2, map_fw, map_bk, idx_fw, idx_bk)
-    use psb_spmat_type
-    use psb_descriptor_type
-    use psb_serial_mod
-    use psi_mod
+
     implicit none 
     type(psb_inter_desc_type)         :: psb_c_inter_desc    
     type(psb_desc_type), target       :: desc1, desc2
@@ -560,10 +538,7 @@ contains
   end function psb_c_inter_desc
   
   function psb_c_inter_desc_noidx(map_kind,desc1, desc2, map_fw, map_bk)
-    use psb_spmat_type
-    use psb_descriptor_type
-    use psb_serial_mod
-    use psi_mod
+
     implicit none 
     type(psb_inter_desc_type)         :: psb_c_inter_desc_noidx    
     type(psb_desc_type), target       :: desc1, desc2
@@ -614,10 +589,7 @@ contains
  
 
   function psb_z_inter_desc(map_kind,desc1, desc2, map_fw, map_bk, idx_fw, idx_bk)
-    use psb_spmat_type
-    use psb_descriptor_type
-    use psb_serial_mod
-    use psi_mod
+
     implicit none 
     type(psb_inter_desc_type)         :: psb_z_inter_desc    
     type(psb_desc_type), target       :: desc1, desc2
@@ -661,10 +633,7 @@ contains
   end function psb_z_inter_desc
   
   function psb_z_inter_desc_noidx(map_kind,desc1, desc2, map_fw, map_bk)
-    use psb_spmat_type
-    use psb_descriptor_type
-    use psb_serial_mod
-    use psi_mod
+
     implicit none 
     type(psb_inter_desc_type)         :: psb_z_inter_desc_noidx    
     type(psb_desc_type), target       :: desc1, desc2
@@ -722,11 +691,7 @@ contains
   ! due to exch_fw_idx
   !
   subroutine psb_s_forward_map(alpha,x,beta,y,desc,info,work)
-    use psb_spmat_type
-    use psb_descriptor_type
-    use psb_comm_mod
-    use psb_serial_mod
-    use psi_mod
+
     implicit none 
     type(psb_inter_desc_type), intent(in) :: desc
     real(psb_spk_), intent(in)     :: alpha,beta
@@ -796,11 +761,7 @@ contains
   ! due to exch_bk_idx
   !
   subroutine psb_s_backward_map(alpha,x,beta,y,desc,info,work)
-    use psb_spmat_type
-    use psb_descriptor_type
-    use psb_comm_mod
-    use psb_serial_mod
-    use psi_mod
+
     implicit none 
     type(psb_inter_desc_type), intent(in) :: desc
     real(psb_spk_), intent(in)     :: alpha,beta
@@ -867,11 +828,6 @@ contains
   ! due to exch_fw_idx
   !
   subroutine psb_d_forward_map(alpha,x,beta,y,desc,info,work)
-    use psb_spmat_type
-    use psb_descriptor_type
-    use psb_comm_mod
-    use psb_serial_mod
-    use psi_mod
     implicit none 
     type(psb_inter_desc_type), intent(in) :: desc
     real(psb_dpk_), intent(in)     :: alpha,beta
@@ -941,11 +897,7 @@ contains
   ! due to exch_bk_idx
   !
   subroutine psb_d_backward_map(alpha,x,beta,y,desc,info,work)
-    use psb_spmat_type
-    use psb_descriptor_type
-    use psb_comm_mod
-    use psb_serial_mod
-    use psi_mod
+
     implicit none 
     type(psb_inter_desc_type), intent(in) :: desc
     real(psb_dpk_), intent(in)     :: alpha,beta
@@ -1012,11 +964,7 @@ contains
   ! due to exch_fw_idx
   !
   subroutine psb_c_forward_map(alpha,x,beta,y,desc,info,work)
-    use psb_spmat_type
-    use psb_descriptor_type
-    use psb_comm_mod
-    use psb_serial_mod
-    use psi_mod
+
     implicit none 
     type(psb_inter_desc_type), intent(in) :: desc
     complex(psb_spk_), intent(in)         :: alpha,beta
@@ -1083,11 +1031,7 @@ contains
   ! due to exch_bk_idx
   !
   subroutine psb_c_backward_map(alpha,x,beta,y,desc,info,work)
-    use psb_spmat_type
-    use psb_descriptor_type
-    use psb_comm_mod
-    use psb_serial_mod
-    use psi_mod
+
     implicit none 
     type(psb_inter_desc_type), intent(in) :: desc
     complex(psb_spk_), intent(in)       :: alpha,beta
@@ -1155,11 +1099,7 @@ contains
   ! due to exch_fw_idx
   !
   subroutine psb_z_forward_map(alpha,x,beta,y,desc,info,work)
-    use psb_spmat_type
-    use psb_descriptor_type
-    use psb_comm_mod
-    use psb_serial_mod
-    use psi_mod
+
     implicit none 
     type(psb_inter_desc_type), intent(in) :: desc
     complex(psb_dpk_), intent(in)       :: alpha,beta
@@ -1226,11 +1166,7 @@ contains
   ! due to exch_bk_idx
   !
   subroutine psb_z_backward_map(alpha,x,beta,y,desc,info,work)
-    use psb_spmat_type
-    use psb_descriptor_type
-    use psb_comm_mod
-    use psb_serial_mod
-    use psi_mod
+
     implicit none 
     type(psb_inter_desc_type), intent(in) :: desc
     complex(psb_dpk_), intent(in)       :: alpha,beta
@@ -1294,11 +1230,7 @@ contains
 
 
   subroutine psb_s_apply_linmap(alpha,x,beta,y,a_map,cd_xt,descin,descout)
-    use psb_spmat_type
-    use psb_descriptor_type
-    use psb_comm_mod
-    use psb_serial_mod
-    use psi_mod
+
     implicit none 
     real(psb_spk_), intent(in)      :: alpha,beta
     real(psb_spk_), intent(inout)   :: x(:),y(:)
@@ -1322,11 +1254,7 @@ contains
 
 
   subroutine psb_d_apply_linmap(alpha,x,beta,y,a_map,cd_xt,descin,descout)
-    use psb_spmat_type
-    use psb_descriptor_type
-    use psb_comm_mod
-    use psb_serial_mod
-    use psi_mod
+
     implicit none 
     real(psb_dpk_), intent(in)      :: alpha,beta
     real(psb_dpk_), intent(inout)   :: x(:),y(:)
@@ -1350,11 +1278,7 @@ contains
 
 
   subroutine psb_c_apply_linmap(alpha,x,beta,y,a_map,cd_xt,descin,descout)
-    use psb_spmat_type
-    use psb_descriptor_type
-    use psb_comm_mod
-    use psb_serial_mod
-    use psi_mod
+
     implicit none 
     complex(psb_spk_), intent(in)      :: alpha,beta
     complex(psb_spk_), intent(inout)   :: x(:),y(:)
@@ -1377,11 +1301,7 @@ contains
   end subroutine psb_c_apply_linmap
 
   subroutine psb_z_apply_linmap(alpha,x,beta,y,a_map,cd_xt,descin,descout)
-    use psb_spmat_type
-    use psb_descriptor_type
-    use psb_comm_mod
-    use psb_serial_mod
-    use psi_mod
+
     implicit none 
     complex(psb_dpk_), intent(in)      :: alpha,beta
     complex(psb_dpk_), intent(inout)   :: x(:),y(:)

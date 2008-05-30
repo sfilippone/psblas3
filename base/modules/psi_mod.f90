@@ -32,6 +32,10 @@
 module psi_mod
 
   use psi_serial_mod
+  use psb_descriptor_type
+  use psb_const_mod
+  use psb_error_mod
+  use psb_penv_mod
 
 
   interface
@@ -53,7 +57,7 @@ module psi_mod
 
   interface
     subroutine psi_crea_index(desc_a,index_in,index_out,glob_idx,nxch,nsnd,nrcv,info)
-      use psb_descriptor_type
+      use psb_descriptor_type, only : psb_desc_type, psb_spk_, psb_dpk_
       type(psb_desc_type), intent(in)     :: desc_a
       integer, intent(out)                :: info,nxch,nsnd,nrcv
       integer, intent(in)                 :: index_in(:)
@@ -73,7 +77,7 @@ module psi_mod
   interface
     subroutine psi_desc_index(desc,index_in,dep_list,&
          & length_dl,nsnd,nrcv,desc_index,isglob_in,info)
-      use psb_descriptor_type
+      use psb_descriptor_type, only : psb_desc_type, psb_spk_, psb_dpk_
       type(psb_desc_type) :: desc
       integer         :: index_in(:),dep_list(:)
       integer,allocatable, intent(inout)  :: desc_index(:)
@@ -97,7 +101,7 @@ module psi_mod
 
   interface psi_swapdata
     subroutine psi_sswapdatam(flag,n,beta,y,desc_a,work,info,data)
-      use psb_descriptor_type
+      use psb_descriptor_type, only : psb_desc_type, psb_spk_, psb_dpk_
       integer, intent(in)         :: flag, n
       integer, intent(out)        :: info
       real(psb_spk_)              :: y(:,:), beta
@@ -106,7 +110,7 @@ module psi_mod
       integer, optional           :: data
     end subroutine psi_sswapdatam
     subroutine psi_sswapdatav(flag,beta,y,desc_a,work,info,data)
-      use psb_descriptor_type
+      use psb_descriptor_type, only : psb_desc_type, psb_spk_, psb_dpk_
       integer, intent(in)         :: flag
       integer, intent(out)        :: info
       real(psb_spk_)              :: y(:), beta 
@@ -131,7 +135,7 @@ module psi_mod
       integer, intent(in)   :: idx(:),totxch,totsnd,totrcv
     end subroutine psi_sswapidxv
     subroutine psi_dswapdatam(flag,n,beta,y,desc_a,work,info,data)
-      use psb_descriptor_type
+      use psb_descriptor_type, only : psb_desc_type, psb_spk_, psb_dpk_
       integer, intent(in)         :: flag, n
       integer, intent(out)        :: info
       real(psb_dpk_)              :: y(:,:), beta
@@ -140,7 +144,7 @@ module psi_mod
       integer, optional           :: data
     end subroutine psi_dswapdatam
     subroutine psi_dswapdatav(flag,beta,y,desc_a,work,info,data)
-      use psb_descriptor_type
+      use psb_descriptor_type, only : psb_desc_type, psb_spk_, psb_dpk_
       integer, intent(in)         :: flag
       integer, intent(out)        :: info
       real(psb_dpk_)              :: y(:), beta 
@@ -165,7 +169,7 @@ module psi_mod
       integer, intent(in)   :: idx(:),totxch,totsnd,totrcv
     end subroutine psi_dswapidxv
     subroutine psi_iswapdatam(flag,n,beta,y,desc_a,work,info,data)
-      use psb_descriptor_type
+      use psb_descriptor_type, only : psb_desc_type, psb_spk_, psb_dpk_
       integer, intent(in)         :: flag, n
       integer, intent(out)        :: info
       integer                     :: y(:,:), beta
@@ -174,7 +178,7 @@ module psi_mod
       integer, optional           :: data
     end subroutine psi_iswapdatam
     subroutine psi_iswapdatav(flag,beta,y,desc_a,work,info,data)
-      use psb_descriptor_type
+      use psb_descriptor_type, only : psb_desc_type, psb_spk_, psb_dpk_
       integer, intent(in)         :: flag
       integer, intent(out)        :: info
       integer                     :: y(:), beta
@@ -199,7 +203,7 @@ module psi_mod
       integer, intent(in)  :: idx(:),totxch,totsnd,totrcv
     end subroutine psi_iswapidxv
     subroutine psi_cswapdatam(flag,n,beta,y,desc_a,work,info,data)
-      use psb_descriptor_type
+      use psb_descriptor_type, only : psb_desc_type, psb_spk_, psb_dpk_
       integer, intent(in)         :: flag, n
       integer, intent(out)        :: info
       complex(psb_spk_)           :: y(:,:), beta
@@ -208,7 +212,7 @@ module psi_mod
       integer, optional           :: data
     end subroutine psi_cswapdatam
     subroutine psi_cswapdatav(flag,beta,y,desc_a,work,info,data)
-      use psb_descriptor_type
+      use psb_descriptor_type, only : psb_desc_type, psb_spk_, psb_dpk_
       integer, intent(in)         :: flag
       integer, intent(out)        :: info
       complex(psb_spk_)           :: y(:), beta
@@ -233,7 +237,7 @@ module psi_mod
       integer, intent(in)      :: idx(:),totxch,totsnd,totrcv
     end subroutine psi_cswapidxv
     subroutine psi_zswapdatam(flag,n,beta,y,desc_a,work,info,data)
-      use psb_descriptor_type
+      use psb_descriptor_type, only : psb_desc_type, psb_spk_, psb_dpk_
       integer, intent(in)         :: flag, n
       integer, intent(out)        :: info
       complex(psb_dpk_)           :: y(:,:), beta
@@ -242,7 +246,7 @@ module psi_mod
       integer, optional           :: data
     end subroutine psi_zswapdatam
     subroutine psi_zswapdatav(flag,beta,y,desc_a,work,info,data)
-      use psb_descriptor_type
+      use psb_descriptor_type, only : psb_desc_type, psb_spk_, psb_dpk_
       integer, intent(in)         :: flag
       integer, intent(out)        :: info
       complex(psb_dpk_)           :: y(:), beta
@@ -271,7 +275,7 @@ module psi_mod
 
   interface psi_swaptran
     subroutine psi_sswaptranm(flag,n,beta,y,desc_a,work,info,data)
-      use psb_descriptor_type
+      use psb_descriptor_type, only : psb_desc_type, psb_spk_, psb_dpk_
       integer, intent(in)         :: flag, n
       integer, intent(out)        :: info
       real(psb_spk_)              :: y(:,:), beta
@@ -280,7 +284,7 @@ module psi_mod
       integer, optional           :: data
     end subroutine psi_sswaptranm
     subroutine psi_sswaptranv(flag,beta,y,desc_a,work,info,data)
-      use psb_descriptor_type
+      use psb_descriptor_type, only : psb_desc_type, psb_spk_, psb_dpk_
       integer, intent(in)         :: flag
       integer, intent(out)        :: info
       real(psb_spk_)              :: y(:), beta
@@ -305,7 +309,7 @@ module psi_mod
       integer, intent(in)   :: idx(:),totxch,totsnd,totrcv
     end subroutine psi_stranidxv
     subroutine psi_dswaptranm(flag,n,beta,y,desc_a,work,info,data)
-      use psb_descriptor_type
+      use psb_descriptor_type, only : psb_desc_type, psb_spk_, psb_dpk_
       integer, intent(in)         :: flag, n
       integer, intent(out)        :: info
       real(psb_dpk_)              :: y(:,:), beta
@@ -314,7 +318,7 @@ module psi_mod
       integer, optional           :: data
     end subroutine psi_dswaptranm
     subroutine psi_dswaptranv(flag,beta,y,desc_a,work,info,data)
-      use psb_descriptor_type
+      use psb_descriptor_type, only : psb_desc_type, psb_spk_, psb_dpk_
       integer, intent(in)         :: flag
       integer, intent(out)        :: info
       real(psb_dpk_)              :: y(:), beta
@@ -339,7 +343,7 @@ module psi_mod
       integer, intent(in)   :: idx(:),totxch,totsnd,totrcv
     end subroutine psi_dtranidxv
     subroutine psi_iswaptranm(flag,n,beta,y,desc_a,work,info,data)
-      use psb_descriptor_type
+      use psb_descriptor_type, only : psb_desc_type, psb_spk_, psb_dpk_
       integer, intent(in)         :: flag, n
       integer, intent(out)        :: info
       integer                     :: y(:,:), beta
@@ -348,7 +352,7 @@ module psi_mod
       integer, optional           :: data
     end subroutine psi_iswaptranm
     subroutine psi_iswaptranv(flag,beta,y,desc_a,work,info,data)
-      use psb_descriptor_type
+      use psb_descriptor_type, only : psb_desc_type, psb_spk_, psb_dpk_
       integer, intent(in)         :: flag
       integer, intent(out)        :: info
       integer                     :: y(:), beta
@@ -373,7 +377,7 @@ module psi_mod
       integer, intent(in)  :: idx(:),totxch,totsnd,totrcv
     end subroutine psi_itranidxv
     subroutine psi_cswaptranm(flag,n,beta,y,desc_a,work,info,data)
-      use psb_descriptor_type
+      use psb_descriptor_type, only : psb_desc_type, psb_spk_, psb_dpk_
       integer, intent(in)         :: flag, n
       integer, intent(out)        :: info
       complex(psb_spk_)           :: y(:,:), beta
@@ -382,7 +386,7 @@ module psi_mod
       integer, optional           :: data
     end subroutine psi_cswaptranm
     subroutine psi_cswaptranv(flag,beta,y,desc_a,work,info,data)
-      use psb_descriptor_type
+      use psb_descriptor_type, only : psb_desc_type, psb_spk_, psb_dpk_
       integer, intent(in)         :: flag
       integer, intent(out)        :: info
       complex(psb_spk_)           :: y(:), beta
@@ -407,7 +411,7 @@ module psi_mod
       integer, intent(in)       :: idx(:),totxch,totsnd,totrcv
     end subroutine psi_ctranidxv
     subroutine psi_zswaptranm(flag,n,beta,y,desc_a,work,info,data)
-      use psb_descriptor_type
+      use psb_descriptor_type, only : psb_desc_type, psb_spk_, psb_dpk_
       integer, intent(in)         :: flag, n
       integer, intent(out)        :: info
       complex(psb_dpk_)           :: y(:,:), beta
@@ -416,7 +420,7 @@ module psi_mod
       integer, optional           :: data
     end subroutine psi_zswaptranm
     subroutine psi_zswaptranv(flag,beta,y,desc_a,work,info,data)
-      use psb_descriptor_type
+      use psb_descriptor_type, only : psb_desc_type, psb_spk_, psb_dpk_
       integer, intent(in)         :: flag
       integer, intent(out)        :: info
       complex(psb_dpk_)           :: y(:), beta
@@ -451,7 +455,7 @@ module psi_mod
   end interface
   interface psi_fnd_owner
     subroutine psi_fnd_owner(nv,idx,iprc,desc,info)
-      use psb_descriptor_type
+      use psb_descriptor_type, only : psb_desc_type, psb_spk_, psb_dpk_
       integer, intent(in) :: nv
       integer, intent(in) ::  idx(:)
       integer, allocatable, intent(out) ::  iprc(:)
@@ -462,7 +466,7 @@ module psi_mod
 
   interface psi_ldsc_pre_halo
     subroutine psi_ldsc_pre_halo(desc,ext_hv,info)
-      use psb_descriptor_type
+      use psb_descriptor_type, only : psb_desc_type, psb_spk_, psb_dpk_
       type(psb_desc_type), intent(inout) :: desc
       logical, intent(in)  :: ext_hv
       integer, intent(out) :: info
@@ -471,7 +475,7 @@ module psi_mod
 
   interface psi_bld_hash
     subroutine psi_bld_hash(desc,info)
-      use psb_descriptor_type
+      use psb_descriptor_type, only : psb_desc_type, psb_spk_, psb_dpk_
       type(psb_desc_type), intent(inout) :: desc
       integer, intent(out) :: info
     end subroutine psi_bld_hash
@@ -479,7 +483,7 @@ module psi_mod
 
   interface psi_bld_tmphalo
     subroutine psi_bld_tmphalo(desc,info)
-      use psb_descriptor_type
+      use psb_descriptor_type, only : psb_desc_type, psb_spk_, psb_dpk_
       type(psb_desc_type), intent(inout) :: desc
       integer, intent(out) :: info
     end subroutine psi_bld_tmphalo
@@ -488,7 +492,7 @@ module psi_mod
 
   interface psi_bld_tmpovrl
     subroutine psi_bld_tmpovrl(iv,desc,info)
-      use psb_descriptor_type
+      use psb_descriptor_type, only : psb_desc_type, psb_spk_, psb_dpk_
       integer, intent(in)  :: iv(:)
       type(psb_desc_type), intent(inout) :: desc
       integer, intent(out) :: info
@@ -498,7 +502,7 @@ module psi_mod
 
   interface psi_idx_cnv
     subroutine psi_idx_cnv1(nv,idxin,desc,info,mask,owned)
-      use psb_descriptor_type
+      use psb_descriptor_type, only : psb_desc_type, psb_spk_, psb_dpk_
       integer, intent(in)    :: nv
       integer, intent(inout) ::  idxin(:)
       type(psb_desc_type), intent(in) :: desc
@@ -507,7 +511,7 @@ module psi_mod
       logical, intent(in), optional :: owned
     end subroutine psi_idx_cnv1
     subroutine psi_idx_cnv2(nv,idxin,idxout,desc,info,mask,owned)
-      use psb_descriptor_type
+      use psb_descriptor_type, only : psb_desc_type, psb_spk_, psb_dpk_
       integer, intent(in)  :: nv, idxin(:)
       integer, intent(out) :: idxout(:)
       type(psb_desc_type), intent(in) :: desc
@@ -516,7 +520,7 @@ module psi_mod
       logical, intent(in), optional :: owned
     end subroutine psi_idx_cnv2
     subroutine psi_idx_cnvs(idxin,idxout,desc,info,mask,owned)
-      use psb_descriptor_type
+      use psb_descriptor_type, only : psb_desc_type, psb_spk_, psb_dpk_
       integer, intent(in)  :: idxin
       integer, intent(out) :: idxout
       type(psb_desc_type), intent(in) :: desc
@@ -528,7 +532,7 @@ module psi_mod
 
   interface psi_idx_ins_cnv
     subroutine psi_idx_ins_cnv1(nv,idxin,desc,info,mask)
-      use psb_descriptor_type
+      use psb_descriptor_type, only : psb_desc_type, psb_spk_, psb_dpk_
       integer, intent(in)    :: nv
       integer, intent(inout) ::  idxin(:)
       type(psb_desc_type), intent(inout) :: desc
@@ -536,7 +540,7 @@ module psi_mod
       logical, intent(in), optional, target :: mask(:)
     end subroutine psi_idx_ins_cnv1
     subroutine psi_idx_ins_cnv2(nv,idxin,idxout,desc,info,mask)
-      use psb_descriptor_type
+      use psb_descriptor_type, only : psb_desc_type, psb_spk_, psb_dpk_
       integer, intent(in)  :: nv, idxin(:)
       integer, intent(out) :: idxout(:)
       type(psb_desc_type), intent(inout) :: desc
@@ -544,7 +548,7 @@ module psi_mod
       logical, intent(in), optional, target :: mask(:)
     end subroutine psi_idx_ins_cnv2
     subroutine psi_idx_ins_cnvs(idxin,idxout,desc,info,mask)
-      use psb_descriptor_type
+      use psb_descriptor_type, only : psb_desc_type, psb_spk_, psb_dpk_
       integer, intent(in)  :: idxin
       integer, intent(out) :: idxout
       type(psb_desc_type), intent(inout) :: desc
@@ -590,10 +594,6 @@ contains
 
   subroutine psi_cnv_dsc(halo_in,ovrlap_in,ext_in,cdesc, info)
 
-    use psb_const_mod
-    use psb_error_mod
-    use psb_penv_mod
-    use psb_descriptor_type
     use psb_realloc_mod
     implicit none
 
@@ -826,10 +826,7 @@ contains
   end subroutine psi_inner_cnv2
 
   subroutine  psi_sovrl_updr1(x,desc_a,update,info)
-    use psb_descriptor_type
-    use psb_const_mod
-    use psb_error_mod
-    use psb_penv_mod
+
     implicit none
 
     real(psb_spk_), intent(inout), target :: x(:)
@@ -898,10 +895,7 @@ contains
 
 
   subroutine  psi_sovrl_updr2(x,desc_a,update,info)
-    use psb_descriptor_type
-    use psb_const_mod
-    use psb_error_mod
-    use psb_penv_mod
+
     implicit none
 
     real(psb_spk_), intent(inout), target :: x(:,:)
@@ -969,10 +963,7 @@ contains
   end subroutine psi_sovrl_updr2
 
   subroutine  psi_dovrl_updr1(x,desc_a,update,info)
-    use psb_descriptor_type
-    use psb_const_mod
-    use psb_error_mod
-    use psb_penv_mod
+
     implicit none
 
     real(psb_dpk_), intent(inout), target :: x(:)
@@ -1041,10 +1032,7 @@ contains
 
 
   subroutine  psi_dovrl_updr2(x,desc_a,update,info)
-    use psb_descriptor_type
-    use psb_const_mod
-    use psb_error_mod
-    use psb_penv_mod
+
     implicit none
 
     real(psb_dpk_), intent(inout), target :: x(:,:)
@@ -1112,10 +1100,7 @@ contains
   end subroutine psi_dovrl_updr2
 
   subroutine  psi_covrl_updr1(x,desc_a,update,info)
-    use psb_descriptor_type
-    use psb_const_mod
-    use psb_error_mod
-    use psb_penv_mod
+
     implicit none
 
     complex(psb_spk_), intent(inout), target :: x(:)
@@ -1184,10 +1169,7 @@ contains
 
 
   subroutine  psi_covrl_updr2(x,desc_a,update,info)
-    use psb_descriptor_type
-    use psb_const_mod
-    use psb_error_mod
-    use psb_penv_mod
+
     implicit none
 
     complex(psb_spk_), intent(inout), target :: x(:,:)
@@ -1255,10 +1237,7 @@ contains
   end subroutine psi_covrl_updr2
 
   subroutine  psi_zovrl_updr1(x,desc_a,update,info)
-    use psb_descriptor_type
-    use psb_const_mod
-    use psb_error_mod
-    use psb_penv_mod
+
     implicit none
 
     complex(psb_dpk_), intent(inout), target :: x(:)
@@ -1327,10 +1306,7 @@ contains
 
 
   subroutine  psi_zovrl_updr2(x,desc_a,update,info)
-    use psb_descriptor_type
-    use psb_const_mod
-    use psb_error_mod
-    use psb_penv_mod
+
     implicit none
 
     complex(psb_dpk_), intent(inout), target :: x(:,:)
@@ -1398,10 +1374,7 @@ contains
   end subroutine psi_zovrl_updr2
 
   subroutine  psi_iovrl_updr1(x,desc_a,update,info)
-    use psb_descriptor_type
-    use psb_const_mod
-    use psb_error_mod
-    use psb_penv_mod
+
     implicit none
 
     integer, intent(inout), target   :: x(:)
@@ -1471,10 +1444,7 @@ contains
 
 
   subroutine  psi_iovrl_updr2(x,desc_a,update,info)
-    use psb_descriptor_type
-    use psb_const_mod
-    use psb_error_mod
-    use psb_penv_mod
+
     implicit none
 
     integer, intent(inout), target   :: x(:,:)
@@ -1544,11 +1514,8 @@ contains
 
 
   subroutine  psi_sovrl_saver1(x,xs,desc_a,info)
-    use psb_descriptor_type
-    use psb_const_mod
-    use psb_error_mod
     use psb_realloc_mod
-    use psb_penv_mod
+
     implicit none
 
     real(psb_spk_), intent(inout)  :: x(:)
@@ -1599,10 +1566,7 @@ contains
   end subroutine psi_sovrl_saver1
 
   subroutine  psi_sovrl_restrr1(x,xs,desc_a,info)
-    use psb_descriptor_type
-    use psb_const_mod
-    use psb_error_mod
-    use psb_penv_mod
+
     implicit none
 
     real(psb_spk_), intent(inout)  :: x(:)
@@ -1648,11 +1612,8 @@ contains
 
 
   subroutine  psi_sovrl_saver2(x,xs,desc_a,info)
-    use psb_descriptor_type
-    use psb_const_mod
-    use psb_error_mod
     use psb_realloc_mod
-    use psb_penv_mod
+
     implicit none
 
     real(psb_spk_), intent(inout)  :: x(:,:)
@@ -1704,10 +1665,7 @@ contains
   end subroutine psi_sovrl_saver2
 
   subroutine  psi_sovrl_restrr2(x,xs,desc_a,info)
-    use psb_descriptor_type
-    use psb_const_mod
-    use psb_error_mod
-    use psb_penv_mod
+
     implicit none
 
     real(psb_spk_), intent(inout)  :: x(:,:)
@@ -1760,11 +1718,8 @@ contains
 
 
   subroutine  psi_dovrl_saver1(x,xs,desc_a,info)
-    use psb_descriptor_type
-    use psb_const_mod
-    use psb_error_mod
     use psb_realloc_mod
-    use psb_penv_mod
+
     implicit none
 
     real(psb_dpk_), intent(inout)  :: x(:)
@@ -1815,10 +1770,7 @@ contains
   end subroutine psi_dovrl_saver1
 
   subroutine  psi_dovrl_restrr1(x,xs,desc_a,info)
-    use psb_descriptor_type
-    use psb_const_mod
-    use psb_error_mod
-    use psb_penv_mod
+
     implicit none
 
     real(psb_dpk_), intent(inout)  :: x(:)
@@ -1864,11 +1816,8 @@ contains
 
 
   subroutine  psi_dovrl_saver2(x,xs,desc_a,info)
-    use psb_descriptor_type
-    use psb_const_mod
-    use psb_error_mod
     use psb_realloc_mod
-    use psb_penv_mod
+
     implicit none
 
     real(psb_dpk_), intent(inout)  :: x(:,:)
@@ -1920,10 +1869,7 @@ contains
   end subroutine psi_dovrl_saver2
 
   subroutine  psi_dovrl_restrr2(x,xs,desc_a,info)
-    use psb_descriptor_type
-    use psb_const_mod
-    use psb_error_mod
-    use psb_penv_mod
+
     implicit none
 
     real(psb_dpk_), intent(inout)  :: x(:,:)
@@ -1975,11 +1921,8 @@ contains
   end subroutine psi_dovrl_restrr2
 
   subroutine  psi_covrl_saver1(x,xs,desc_a,info)
-    use psb_descriptor_type
-    use psb_const_mod
-    use psb_error_mod
     use psb_realloc_mod
-    use psb_penv_mod
+
     implicit none
 
     complex(psb_spk_), intent(inout)  :: x(:)
@@ -2030,10 +1973,7 @@ contains
   end subroutine psi_covrl_saver1
 
   subroutine  psi_covrl_restrr1(x,xs,desc_a,info)
-    use psb_descriptor_type
-    use psb_const_mod
-    use psb_error_mod
-    use psb_penv_mod
+
     implicit none
     
     complex(psb_spk_), intent(inout)  :: x(:)
@@ -2079,11 +2019,8 @@ contains
 
 
   subroutine  psi_covrl_saver2(x,xs,desc_a,info)
-    use psb_descriptor_type
-    use psb_const_mod
-    use psb_error_mod
     use psb_realloc_mod
-    use psb_penv_mod
+
     implicit none
 
     complex(psb_spk_), intent(inout)  :: x(:,:)
@@ -2135,10 +2072,7 @@ contains
   end subroutine psi_covrl_saver2
 
   subroutine  psi_covrl_restrr2(x,xs,desc_a,info)
-    use psb_descriptor_type
-    use psb_const_mod
-    use psb_error_mod
-    use psb_penv_mod
+
     implicit none
 
     complex(psb_spk_), intent(inout)  :: x(:,:)
@@ -2191,11 +2125,9 @@ contains
 
 
   subroutine  psi_zovrl_saver1(x,xs,desc_a,info)
-    use psb_descriptor_type
-    use psb_const_mod
-    use psb_error_mod
+
     use psb_realloc_mod
-    use psb_penv_mod
+
     implicit none
 
     complex(psb_dpk_), intent(inout)  :: x(:)
@@ -2246,10 +2178,7 @@ contains
   end subroutine psi_zovrl_saver1
 
   subroutine  psi_zovrl_restrr1(x,xs,desc_a,info)
-    use psb_descriptor_type
-    use psb_const_mod
-    use psb_error_mod
-    use psb_penv_mod
+
     implicit none
     
     complex(psb_dpk_), intent(inout)  :: x(:)
@@ -2295,11 +2224,9 @@ contains
 
 
   subroutine  psi_zovrl_saver2(x,xs,desc_a,info)
-    use psb_descriptor_type
-    use psb_const_mod
-    use psb_error_mod
+
     use psb_realloc_mod
-    use psb_penv_mod
+
     implicit none
 
     complex(psb_dpk_), intent(inout)  :: x(:,:)
@@ -2351,10 +2278,7 @@ contains
   end subroutine psi_zovrl_saver2
 
   subroutine  psi_zovrl_restrr2(x,xs,desc_a,info)
-    use psb_descriptor_type
-    use psb_const_mod
-    use psb_error_mod
-    use psb_penv_mod
+
     implicit none
 
     complex(psb_dpk_), intent(inout)  :: x(:,:)
@@ -2407,11 +2331,9 @@ contains
 
 
   subroutine  psi_iovrl_saver1(x,xs,desc_a,info)
-    use psb_descriptor_type
-    use psb_const_mod
-    use psb_error_mod
+
     use psb_realloc_mod
-    use psb_penv_mod
+
     implicit none
 
     integer, intent(inout)  :: x(:)
@@ -2462,10 +2384,7 @@ contains
   end subroutine psi_iovrl_saver1
 
   subroutine  psi_iovrl_restrr1(x,xs,desc_a,info)
-    use psb_descriptor_type
-    use psb_const_mod
-    use psb_error_mod
-    use psb_penv_mod
+
     implicit none
 
     integer, intent(inout)  :: x(:)
@@ -2567,10 +2486,7 @@ contains
   end subroutine psi_iovrl_saver2
 
   subroutine  psi_iovrl_restrr2(x,xs,desc_a,info)
-    use psb_descriptor_type
-    use psb_const_mod
-    use psb_error_mod
-    use psb_penv_mod
+
     implicit none
 
     integer, intent(inout)  :: x(:,:)
@@ -2622,10 +2538,7 @@ contains
   end subroutine psi_iovrl_restrr2
 
   subroutine psi_bld_ovr_mst(me,ovrlap_elem,mst_idx,info)
-    use psb_const_mod
-    use psb_error_mod
-    use psb_penv_mod
-    use psb_descriptor_type
+
     use psb_realloc_mod
     implicit none
 

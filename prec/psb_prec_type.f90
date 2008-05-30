@@ -37,10 +37,10 @@
 module psb_prec_type
 
   ! Reduces size of .mod file.
-  use psb_const_mod
   use psb_base_mod, only : psb_sspmat_type, psb_cspmat_type,&
-       & psb_dspmat_type, psb_zspmat_type,&
-       & psb_desc_type, psb_sizeof
+       & psb_dspmat_type, psb_zspmat_type, psb_dpk_, psb_spk_,&
+       & psb_desc_type, psb_sizeof, psb_sp_free, psb_cdfree,&
+       & psb_erractionsave, psb_erractionrestore, psb_error, psb_get_errstatus
 
   integer, parameter :: psb_min_prec_=0, psb_noprec_=0, psb_diag_=1, &
        & psb_bjac_=2, psb_max_prec_=2
@@ -139,31 +139,26 @@ module psb_prec_type
 contains
 
   subroutine psb_sout_prec_descr(p)
-    use psb_base_mod
     type(psb_sprec_type), intent(in) :: p
     call psb_sfile_prec_descr(6,p)
   end subroutine psb_sout_prec_descr
 
   subroutine psb_out_prec_descr(p)
-    use psb_base_mod
     type(psb_dprec_type), intent(in) :: p
     call psb_file_prec_descr(6,p)
   end subroutine psb_out_prec_descr
 
   subroutine psb_cout_prec_descr(p)
-    use psb_base_mod
     type(psb_cprec_type), intent(in) :: p
     call psb_cfile_prec_descr(6,p)
   end subroutine psb_cout_prec_descr
 
   subroutine psb_zout_prec_descr(p)
-    use psb_base_mod
     type(psb_zprec_type), intent(in) :: p
     call psb_zfile_prec_descr(6,p)
   end subroutine psb_zout_prec_descr
 
   subroutine psb_file_prec_descr(iout,p)
-    use psb_base_mod
     integer, intent(in)              :: iout
     type(psb_dprec_type), intent(in) :: p
     
@@ -181,7 +176,6 @@ contains
   end subroutine psb_file_prec_descr
 
   subroutine psb_sfile_prec_descr(iout,p)
-    use psb_base_mod
     integer, intent(in)              :: iout
     type(psb_sprec_type), intent(in) :: p
     
@@ -199,7 +193,6 @@ contains
   end subroutine psb_sfile_prec_descr
 
   subroutine psb_cfile_prec_descr(iout,p)
-    use psb_base_mod
     integer, intent(in)              :: iout
     type(psb_cprec_type), intent(in) :: p
 
@@ -216,7 +209,6 @@ contains
   end subroutine psb_cfile_prec_descr
 
   subroutine psb_zfile_prec_descr(iout,p)
-    use psb_base_mod
     integer, intent(in)              :: iout
     type(psb_zprec_type), intent(in) :: p
 
@@ -234,7 +226,6 @@ contains
 
 
   function is_legal_prec(ip)
-    use psb_base_mod
     integer, intent(in) :: ip
     logical             :: is_legal_prec
 
@@ -242,7 +233,6 @@ contains
     return
   end function is_legal_prec
   function is_legal_ml_fact(ip)
-    use psb_base_mod
     integer, intent(in) :: ip
     logical             :: is_legal_ml_fact
 
@@ -250,7 +240,6 @@ contains
     return
   end function is_legal_ml_fact
   function is_legal_ml_eps(ip)
-    use psb_base_mod
     real(psb_dpk_), intent(in) :: ip
     logical             :: is_legal_ml_eps
 
@@ -260,7 +249,6 @@ contains
 
 
   subroutine psb_icheck_def(ip,name,id,is_legal)
-    use psb_base_mod
     integer, intent(inout) :: ip
     integer, intent(in)    :: id
     character(len=*), intent(in) :: name
@@ -278,7 +266,6 @@ contains
   end subroutine psb_icheck_def
 
   subroutine psb_scheck_def(ip,name,id,is_legal)
-    use psb_base_mod
     real(psb_spk_), intent(inout) :: ip
     real(psb_spk_), intent(in)    :: id
     character(len=*), intent(in) :: name
@@ -297,7 +284,6 @@ contains
   end subroutine psb_scheck_def
 
   subroutine psb_dcheck_def(ip,name,id,is_legal)
-    use psb_base_mod
     real(psb_dpk_), intent(inout) :: ip
     real(psb_dpk_), intent(in)    :: id
     character(len=*), intent(in) :: name
@@ -316,7 +302,6 @@ contains
   end subroutine psb_dcheck_def
 
   subroutine psb_s_precfree(p,info)
-    use psb_base_mod
     type(psb_sprec_type), intent(inout) :: p 
     integer, intent(out) ::  info
     integer :: me, err_act,i 
@@ -381,7 +366,6 @@ contains
   end subroutine psb_s_precfree
 
   subroutine psb_nullify_sprec(p)
-    use psb_base_mod
     type(psb_sprec_type), intent(inout) :: p
 
 !!$    nullify(p%av,p%d,p%iprcparm,p%rprcparm,p%perm,p%invperm,p%mlia,&
@@ -390,7 +374,6 @@ contains
   end subroutine psb_nullify_sprec
 
   subroutine psb_d_precfree(p,info)
-    use psb_base_mod
     type(psb_dprec_type), intent(inout) :: p
     integer, intent(out)                :: info
     integer             :: me, err_act,i
@@ -455,7 +438,6 @@ contains
   end subroutine psb_d_precfree
 
   subroutine psb_nullify_dprec(p)
-    use psb_base_mod
     type(psb_dprec_type), intent(inout) :: p
 
 !!$    nullify(p%av,p%d,p%iprcparm,p%rprcparm,p%perm,p%invperm,p%mlia,&
@@ -464,7 +446,6 @@ contains
   end subroutine psb_nullify_dprec
 
   subroutine psb_c_precfree(p,info)
-    use psb_base_mod
     type(psb_cprec_type), intent(inout) :: p
     integer, intent(out)                :: info
     integer             :: err_act,i
@@ -522,14 +503,12 @@ contains
   end subroutine psb_c_precfree
 
   subroutine psb_nullify_cprec(p)
-    use psb_base_mod
     type(psb_cprec_type), intent(inout) :: p
 
 
   end subroutine psb_nullify_cprec
 
   subroutine psb_z_precfree(p,info)
-    use psb_base_mod
     type(psb_zprec_type), intent(inout) :: p
     integer, intent(out)                :: info
     integer             :: err_act,i
@@ -587,7 +566,6 @@ contains
   end subroutine psb_z_precfree
 
   subroutine psb_nullify_zprec(p)
-    use psb_base_mod
     type(psb_zprec_type), intent(inout) :: p
 
 
@@ -595,7 +573,6 @@ contains
 
 
   function pr_to_str(iprec)
-    use psb_base_mod
 
     integer, intent(in)  :: iprec
     character(len=10)     :: pr_to_str
@@ -615,7 +592,6 @@ contains
 
 
   function psb_dprec_sizeof(prec)
-    use psb_base_mod
     type(psb_dprec_type), intent(in) :: prec
     integer             :: psb_dprec_sizeof
     integer             :: val,i
@@ -638,7 +614,6 @@ contains
   end function psb_dprec_sizeof
 
   function psb_sprec_sizeof(prec)
-    use psb_base_mod
     type(psb_sprec_type), intent(in) :: prec
     integer             :: psb_sprec_sizeof
     integer             :: val,i
@@ -661,7 +636,6 @@ contains
   end function psb_sprec_sizeof
 
   function psb_zprec_sizeof(prec)
-    use psb_base_mod
     type(psb_zprec_type), intent(in) :: prec
     integer             :: psb_zprec_sizeof
     integer             :: val,i
@@ -684,7 +658,6 @@ contains
   end function psb_zprec_sizeof
 
   function psb_cprec_sizeof(prec)
-    use psb_base_mod
     type(psb_cprec_type), intent(in) :: prec
     integer             :: psb_cprec_sizeof
     integer             :: val,i
