@@ -129,7 +129,7 @@ subroutine psb_srgmres(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,irst,ist
   Real(psb_spk_) :: scal, gm, rti, rti1
   Integer       ::litmax, naux, mglob, it,k, itrace_,&
        & np,me, n_row, n_col, nl, int_err(5)
-  Logical, Parameter :: exchange=.True., noexchange=.False., use_srot=.true.
+  Logical, Parameter :: exchange=.True., noexchange=.False.
   Integer, Parameter :: irmax = 8
   Integer            :: itx, i, isvch, ictxt,istop_, err_act
   integer            :: debug_level, debug_unit
@@ -341,35 +341,18 @@ subroutine psb_srgmres(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,irst,ist
       h(i+1,i) = psb_genrm2(w,desc_a,info)
       scal=sone/h(i+1,i)
       call psb_geaxpby(scal,w,szero,v(:,i+1),desc_a,info)
-      if (use_srot) then 
-        do k=2,i
-          call srot(1,h(k-1,i),1,h(k,i),1,c(k-1),s(k-1))
-        enddo
-        
-        rti  = h(i,i)
-        rti1 = h(i+1,i) 
-        call srotg(rti,rti1,c(i),s(i))
-        call srot(1,h(i,i),1,h(i+1,i),1,c(i),s(i))
-        h(i+1,i) = szero
-        call srot(1,rs(i),1,rs(i+1),1,c(i),s(i))
 
-      else
-        do k=2,i
-          dt       = h(k-1,i)
-          h(k-1,i) =  c(k-1)*dt + s(k-1)*h(k,i)
-          h(k,i)   = -s(k-1)*dt + c(k-1)*h(k,i)
-        enddo
-        gm =  safe_dn2(h(i,i),h(i+1,i))
-        if (debug_level >= psb_debug_ext_) &
-             & write(debug_unit,*) me,' ',trim(name),' GM : ',gm
-        gm = max(gm,s_epstol)
-
-        c(i) = h(i,i)/gm
-        s(i) = h(i+1,i)/gm
-        rs(i+1) = -s(i)*rs(i)
-        rs(i)   = c(i)*rs(i)
-        h(i,i)  = c(i)*h(i,i)+s(i)*h(i+1,i)
-      endif
+      do k=2,i
+        call srot(1,h(k-1,i),1,h(k,i),1,c(k-1),s(k-1))
+      enddo
+      
+      rti  = h(i,i)
+      rti1 = h(i+1,i) 
+      call srotg(rti,rti1,c(i),s(i))
+      call srot(1,h(i,i),1,h(i+1,i),1,c(i),s(i))
+      h(i+1,i) = szero
+      call srot(1,rs(i),1,rs(i+1),1,c(i),s(i))
+      
       if (istop_ == 1) then 
         !
         ! build x and then compute the residual and its infinity norm
@@ -499,21 +482,6 @@ subroutine psb_srgmres(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,irst,ist
     return
   end if
   return
-
-contains
-  function safe_dn2(a,b)
-    real(psb_spk_), intent(in) :: a, b
-    real(psb_spk_)  :: safe_dn2
-    real(psb_spk_)  :: t
-    
-    t = max(abs(a),abs(b))
-    if (t==0.d0) then 
-      safe_dn2 = 0.d0
-    else
-      safe_dn2 = t * sqrt(abs(a/t)**2 + abs(b/t)**2)
-    endif
-    return
-  end function safe_dn2
 
 end subroutine psb_srgmres
 

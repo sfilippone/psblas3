@@ -341,35 +341,17 @@ subroutine psb_drgmres(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,irst,ist
       h(i+1,i) = psb_genrm2(w,desc_a,info)
       scal=done/h(i+1,i)
       call psb_geaxpby(scal,w,dzero,v(:,i+1),desc_a,info)
-      if (use_drot) then 
-        do k=2,i
-          call drot(1,h(k-1,i),1,h(k,i),1,c(k-1),s(k-1))
-        enddo
-        
-        rti  = h(i,i)
-        rti1 = h(i+1,i) 
-        call drotg(rti,rti1,c(i),s(i))
-        call drot(1,h(i,i),1,h(i+1,i),1,c(i),s(i))
-        h(i+1,i) = dzero
-        call drot(1,rs(i),1,rs(i+1),1,c(i),s(i))
-
-      else
-        do k=2,i
-          dt       = h(k-1,i)
-          h(k-1,i) =  c(k-1)*dt + s(k-1)*h(k,i)
-          h(k,i)   = -s(k-1)*dt + c(k-1)*h(k,i)
-        enddo
-        gm =  safe_dn2(h(i,i),h(i+1,i))
-        if (debug_level >= psb_debug_ext_) &
-             & write(debug_unit,*) me,' ',trim(name),' GM : ',gm
-        gm = max(gm,epstol)
-
-        c(i) = h(i,i)/gm
-        s(i) = h(i+1,i)/gm
-        rs(i+1) = -s(i)*rs(i)
-        rs(i)   = c(i)*rs(i)
-        h(i,i)  = c(i)*h(i,i)+s(i)*h(i+1,i)
-      endif
+      do k=2,i
+        call drot(1,h(k-1,i),1,h(k,i),1,c(k-1),s(k-1))
+      enddo
+      
+      rti  = h(i,i)
+      rti1 = h(i+1,i) 
+      call drotg(rti,rti1,c(i),s(i))
+      call drot(1,h(i,i),1,h(i+1,i),1,c(i),s(i))
+      h(i+1,i) = dzero
+      call drot(1,rs(i),1,rs(i+1),1,c(i),s(i))
+      
       if (istop_ == 1) then 
         !
         ! build x and then compute the residual and its infinity norm
@@ -480,21 +462,6 @@ subroutine psb_drgmres(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,irst,ist
     return
   end if
   return
-
-contains
-  function safe_dn2(a,b)
-    real(psb_dpk_), intent(in) :: a, b
-    real(psb_dpk_)  :: safe_dn2
-    real(psb_dpk_)  :: t
-    
-    t = max(abs(a),abs(b))
-    if (t==0.d0) then 
-      safe_dn2 = 0.d0
-    else
-      safe_dn2 = t * sqrt(abs(a/t)**2 + abs(b/t)**2)
-    endif
-    return
-  end function safe_dn2
 
 end subroutine psb_drgmres
 

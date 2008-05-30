@@ -78,3 +78,44 @@ subroutine psb_ctransp(a,b,c,fmt)
 
   return
 end subroutine psb_ctransp
+
+subroutine psb_ctransp1(a,c,fmt)
+  use psb_spmat_type
+  use psb_tools_mod
+  use psb_string_mod
+  use psb_serial_mod, psb_protect_name => psb_ctransp1
+  implicit none
+
+  type(psb_cspmat_type), intent(inout) :: a
+  integer, optional          :: c
+  character(len=*), optional :: fmt
+
+  character(len=5)           :: fmt_
+  integer  ::c_, info 
+  integer, allocatable  :: itmp(:)
+
+  if (present(c)) then 
+    c_=c
+  else
+    c_=1
+  endif
+  if (present(fmt)) then 
+    fmt_ = psb_toupper(fmt)
+  else 
+    fmt_='CSR'
+  endif
+
+  call psb_spcnv(a,info,afmt='coo')
+  
+  if (info /= 0) then 
+    write(0,*) 'transp: info from CSDP ',info
+    return
+  end if
+  call psb_transfer(a%ia1,itmp,info)
+  call psb_transfer(a%ia2,a%ia1,info)
+  call psb_transfer(itmp,a%ia2,info)
+
+  call psb_spcnv(a,info,afmt=fmt_)
+
+  return
+end subroutine psb_ctransp1
