@@ -29,22 +29,9 @@
 !!$  POSSIBILITY OF SUCH DAMAGE.
 !!$ 
 !!$  
-! File: psb_cdbldext.f90
-!
-! Subroutine: psb_cdbldext
-!    This routine takes a matrix A with its descriptor, and builds the 
-!    auxiliary descriptor corresponding to the number of overlap levels
-!    specified on input. 
-
 Subroutine psb_cd_lstext(desc_a,in_list,desc_ov,info, mask,extype)
 
-  use psb_tools_mod, psb_protect_name => psb_cd_lstext
-
-  use psb_serial_mod
-  use psb_descriptor_type
-  use psb_error_mod
-  use psb_penv_mod
-  use psb_realloc_mod
+  use psb_base_mod, psb_protect_name => psb_cd_lstext
   use psi_mod
 
   Implicit None

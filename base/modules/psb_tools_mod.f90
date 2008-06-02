@@ -33,6 +33,32 @@ Module psb_tools_mod
   use psb_const_mod
   use psb_spmat_type
 
+
+  interface psb_cd_reinit
+    Subroutine psb_cd_reinit(desc,info)
+      use psb_descriptor_type
+      Implicit None
+
+      !     .. Array Arguments ..
+      Type(psb_desc_type), Intent(inout) :: desc
+      integer, intent(out)               :: info
+    end Subroutine psb_cd_reinit
+  end interface
+
+  interface psb_cdcpy
+    subroutine psb_cdcpy(desc_in, desc_out, info)
+      use psb_descriptor_type
+
+      implicit none
+      !....parameters...
+
+      type(psb_desc_type), intent(in)  :: desc_in
+      type(psb_desc_type), intent(out) :: desc_out
+      integer, intent(out)             :: info
+    end subroutine psb_cdcpy
+  end interface
+
+
   interface  psb_geall
     subroutine psb_salloc(x, desc_a, info, n, lb)
       use psb_descriptor_type
@@ -791,8 +817,8 @@ Module psb_tools_mod
       integer,intent(out)                ::  y  
       integer, intent(out)               ::  info
       character, intent(in), optional    ::  iact
-      
-    end subroutine psb_loc_to_glob2s    
+
+    end subroutine psb_loc_to_glob2s
     subroutine psb_loc_to_globs(x,desc_a,info,iact)
       use psb_descriptor_type
       type(psb_desc_type), intent(in)    ::  desc_a
@@ -836,7 +862,7 @@ Module psb_tools_mod
   interface psb_is_local
     module procedure psb_is_local
   end interface
-  
+
   interface psb_owned_index
     module procedure psb_owned_index, psb_owned_index_v
   end interface
@@ -855,7 +881,7 @@ contains
     logical :: psb_is_owned
     logical :: res
     integer :: info
-    
+
     call psb_owned_index(res,idx,desc,info)
     if (info /= 0) res=.false.
     psb_is_owned = res
@@ -869,7 +895,7 @@ contains
     logical :: psb_is_local
     logical :: res
     integer :: info
-    
+
     call psb_local_index(res,idx,desc,info)
     if (info /= 0) res=.false.
     psb_is_local = res
@@ -882,11 +908,11 @@ contains
     type(psb_desc_type), intent(in) :: desc
     logical, intent(out) :: res
     integer, intent(out) :: info
-    
+
     integer :: lx
 
     call psb_glob_to_loc(idx,lx,desc,info,iact='I',owned=.true.)
-    
+
     res = (lx>0)
   end subroutine psb_owned_index
 
@@ -903,7 +929,7 @@ contains
     res=.false.
     if (info /= 0) return
     call psb_glob_to_loc(idx,lx,desc,info,iact='I',owned=.true.)
-    
+
     res = (lx>0)
   end subroutine psb_owned_index_v
 
@@ -918,10 +944,10 @@ contains
     integer :: lx
 
     call psb_glob_to_loc(idx,lx,desc,info,iact='I',owned=.false.)
-    
+
     res = (lx>0)
   end subroutine psb_local_index
-  
+
   subroutine psb_local_index_v(res,idx,desc,info)
     use psb_descriptor_type
     implicit none 
@@ -935,7 +961,7 @@ contains
     res=.false.
     if (info /= 0) return
     call psb_glob_to_loc(idx,lx,desc,info,iact='I',owned=.false.)
-    
+
     res = (lx>0)
   end subroutine psb_local_index_v
 
@@ -1164,7 +1190,7 @@ contains
     type(psb_desc_type), intent(inout)     :: cd_xt
     type(psb_desc_type), intent(in)        :: descin, descout 
     character(len=*), optional, intent(in) :: afmt
-          
+
 
     integer :: nrow_in, nrow_out, ncol_in, info, ictxt
 

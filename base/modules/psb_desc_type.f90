@@ -339,17 +339,10 @@ module psb_descriptor_type
   end interface
 
 
-  interface psb_cdcpy
-    module procedure psb_cdcpy
-  end interface
-
   interface psb_cdtransfer
     module procedure psb_cdtransfer
   end interface
 
-  interface psb_cd_reinit
-    module procedure psb_cd_reinit
-  end interface
 
   interface psb_cdfree
     module procedure psb_cdfree
@@ -991,95 +984,6 @@ contains
 
   end subroutine psb_cdfree
   !
-  ! Subroutine: psb_cdcpy
-  !   Produces a clone of a descriptor.
-  ! 
-  ! Arguments: 
-  !    desc_in  - type(psb_desc_type).         The communication descriptor to be cloned.
-  !    desc_out - type(psb_desc_type).         The output communication descriptor.
-  !    info     - integer.                       Return code.
-  subroutine psb_cdcpy(desc_in, desc_out, info)
-
-    use psb_realloc_mod
-    use psb_const_mod
-    use psb_error_mod
-    use psb_penv_mod
-
-    implicit none
-    !....parameters...
-
-    type(psb_desc_type), intent(in)  :: desc_in
-    type(psb_desc_type), intent(out) :: desc_out
-    integer, intent(out)             :: info
-
-    !locals
-    integer             :: np,me,ictxt, err_act
-    integer             :: debug_level, debug_unit
-    character(len=20)   :: name
-
-    debug_unit  = psb_get_debug_unit()
-    debug_level = psb_get_debug_level()
-
-    if (psb_get_errstatus() /= 0) return 
-    info = 0
-    call psb_erractionsave(err_act)
-    name = 'psb_cdcpy'
-
-    ictxt = psb_cd_get_context(desc_in)
-
-    ! check on blacs grid 
-    call psb_info(ictxt, me, np)
-    if (debug_level >= psb_debug_ext_) &
-         & write(debug_unit,*) me,' ',trim(name),': Entered'
-    if (np == -1) then
-      info = 2010
-      call psb_errpush(info,name)
-      goto 9999
-    endif
-
-    call psb_safe_ab_cpy(desc_in%matrix_data,desc_out%matrix_data,info)
-    if (info == 0)   call psb_safe_ab_cpy(desc_in%halo_index,desc_out%halo_index,info)
-    if (info == 0)   call psb_safe_ab_cpy(desc_in%ext_index,desc_out%ext_index,info)
-    if (info == 0)   call psb_safe_ab_cpy(desc_in%ovrlap_index,desc_out%ovrlap_index,info)
-    if (info == 0)   call psb_safe_ab_cpy(desc_in%bnd_elem,desc_out%bnd_elem,info)
-    if (info == 0)   call psb_safe_ab_cpy(desc_in%ovrlap_elem,desc_out%ovrlap_elem,info)
-    if (info == 0)   call psb_safe_ab_cpy(desc_in%ovr_mst_idx,desc_out%ovr_mst_idx,info)
-    if (info == 0)   call psb_safe_ab_cpy(desc_in%loc_to_glob,desc_out%loc_to_glob,info)
-    if (info == 0)   call psb_safe_ab_cpy(desc_in%glob_to_loc,desc_out%glob_to_loc,info)
-    if (info == 0)   call psb_safe_ab_cpy(desc_in%lprm,desc_out%lprm,info)
-    if (info == 0)   call psb_safe_ab_cpy(desc_in%idx_space,desc_out%idx_space,info)
-    if (info == 0)   call psb_safe_ab_cpy(desc_in%hashv,desc_out%hashv,info)
-    if (info == 0)   call psb_safe_ab_cpy(desc_in%glb_lc,desc_out%glb_lc,info)
-
-    if (info == 0) then 
-      if (associated(desc_in%avltree)) then 
-        call CloneSearchTree(desc_in%avltree,desc_out%avltree)
-      end if
-    end if
-
-    if (info /= 0) then
-      info = 4010
-      call psb_errpush(info,name)
-      goto 9999
-    endif
-    if (debug_level >= psb_debug_ext_) &
-         & write(debug_unit,*) me,' ',trim(name),': Done'
-
-    call psb_erractionrestore(err_act)
-    return
-
-9999 continue
-    call psb_erractionrestore(err_act)
-
-    if (err_act == psb_act_ret_) then
-      return
-    else
-      call psb_error(ictxt)
-    end if
-    return
-
-  end subroutine psb_cdcpy
-  !
   ! Subroutine: psb_cdtransfer
   !   Transfers data and allocation from in to out; behaves like MOVE_ALLOC, i.e.
   !   the IN arg is empty (and deallocated) upon exit. 
@@ -1283,62 +1187,6 @@ contains
     Return
 
   end Subroutine psb_cd_get_recv_idx
-
-  Subroutine psb_cd_reinit(desc,info)
-
-    use psb_error_mod
-    use psb_penv_mod
-    use psb_realloc_mod
-    Implicit None
-
-    !     .. Array Arguments ..
-    Type(psb_desc_type), Intent(inout) :: desc
-    integer, intent(out)               :: info
-
-    integer   icomm, err_act
-
-    !     .. Local Scalars ..
-    Integer ::  np, me, ictxt
-    Integer, allocatable :: tmp_halo(:),tmp_ext(:), tmp_ovr(:)
-    integer              :: debug_level, debug_unit
-    character(len=20)    :: name, ch_err
-
-    name='psb_cd_reinit'
-    info  = 0
-    call psb_erractionsave(err_act)
-    debug_unit  = psb_get_debug_unit()
-    debug_level = psb_get_debug_level()
-
-    ictxt = psb_cd_get_context(desc)
-    icomm = psb_cd_get_mpic(desc)
-    Call psb_info(ictxt, me, np)
-    if (debug_level >= psb_debug_outer_) &
-         & write(debug_unit,*) me,' ',trim(name),': start'
-
-    call psb_cd_get_recv_idx(tmp_ovr,desc,psb_comm_ovr_,info,toglob=.true.)
-    call psb_cd_get_recv_idx(tmp_halo,desc,psb_comm_halo_,info,toglob=.false.)    
-    call psb_cd_get_recv_idx(tmp_ext,desc,psb_comm_ext_,info,toglob=.false.)        
-
-    call psb_transfer(tmp_ovr,desc%ovrlap_index,info)
-    call psb_transfer(tmp_halo,desc%halo_index,info)
-    call psb_transfer(tmp_ext,desc%ext_index,info)
-    call psb_cd_set_bld(desc,info)
-
-    if (debug_level >= psb_debug_outer_) &
-         & write(debug_unit,*) me,' ',trim(name),': end'
-
-    call psb_erractionrestore(err_act)
-    return
-
-9999 continue
-    call psb_erractionrestore(err_act)
-    if (err_act == psb_act_abort_) then
-      call psb_error(ictxt)
-      return
-    end if
-    Return
-
-  End Subroutine psb_cd_reinit
 
 
 

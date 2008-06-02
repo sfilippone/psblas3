@@ -6,6 +6,7 @@ FOBJS = psb_sallc.o psb_sasb.o  \
 	psb_dfree.o psb_dins.o \
 	psb_cdals.o psb_cdalv.o psb_cd_inloc.o psb_cdins.o psb_cdprt.o \
 	psb_cdren.o psb_cdrep.o psb_get_overlap.o psb_cd_lstext.o\
+	psb_cdcpy.o psb_cd_reinit.o \
 	psb_dspalloc.o psb_dspasb.o \
 	psb_dspfree.o psb_dspins.o psb_dsprn.o \
 	psb_sspalloc.o psb_sspasb.o \
@@ -18,11 +19,6 @@ FOBJS = psb_sallc.o psb_sasb.o  \
 	psb_cspalloc.o psb_cspasb.o psb_cspfree.o\
 	psb_callc.o psb_casb.o psb_cfree.o psb_cins.o \
 	psb_cspins.o psb_csprn.o psb_map.o psb_inter_desc.o
-#	\
-#	psb_s_inter_desc.o psb_s_inter_desc_noidx.o \
-#	psb_d_inter_desc.o psb_d_inter_desc_noidx.o \
-#	psb_c_inter_desc.o psb_c_inter_desc_noidx.o \
-#	psb_z_inter_desc.o psb_z_inter_desc_noidx.o 
 
 MPFOBJS = psb_ssphalo.o psb_csphalo.o psb_dsphalo.o psb_zsphalo.o psb_icdasb.o \
 	psb_dcdbldext.o psb_zcdbldext.o psb_scdbldext.o psb_ccdbldext.o
