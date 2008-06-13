@@ -452,6 +452,13 @@ contains
 
   end function psb_is_upd_desc
 
+  logical function psb_is_repl_desc(desc)
+    type(psb_desc_type), intent(in) :: desc
+
+    psb_is_repl_desc = psb_is_repl_dec(psb_cd_get_dectype(desc))
+
+  end function psb_is_repl_desc
+
   logical function psb_is_ovl_desc(desc)
     type(psb_desc_type), intent(in) :: desc
 
@@ -489,6 +496,13 @@ contains
     psb_is_upd_dec = (dectype == psb_desc_upd_)
 
   end function psb_is_upd_dec
+
+  logical function psb_is_repl_dec(dectype)          
+    integer :: dectype
+
+    psb_is_repl_dec = (dectype == psb_desc_repl_)
+
+  end function psb_is_repl_dec
 
 
   logical function psb_is_asb_dec(dectype)          

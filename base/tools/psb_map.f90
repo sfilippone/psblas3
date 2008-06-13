@@ -48,7 +48,7 @@ subroutine psb_s_forward_map(alpha,x,beta,y,desc,info,work)
   !
   real(psb_spk_), allocatable :: xt(:)
   integer                       :: itsz, i, j,totxch,totsnd,totrcv,&
-       &  map_kind, map_data
+       &  map_kind, map_data, nr, ictxt
   character(len=20), parameter  :: name='psb_forward_map'
 
   info = 0
@@ -74,7 +74,11 @@ subroutine psb_s_forward_map(alpha,x,beta,y,desc,info,work)
     ! and a matrix-vector product. 
     call psb_halo(x,desc%desc_1,info,work=work)
     if (info == 0) call psb_csmm(alpha,desc%smap%map_fw,x,beta,y,info)
-
+    if ((info == 0) .and. psb_is_repl_desc(desc%desc_2)) then
+      ictxt = psb_cd_get_context(desc%desc_2)
+      nr = psb_cd_get_global_rows(desc%desc_2)
+      call psb_sum(ictxt,y(1:nr))
+    end if
     if (info /= 0) then 
       write(0,*) trim(name),' Error from inner routines',info
       info = -1
@@ -119,7 +123,7 @@ subroutine psb_s_backward_map(alpha,x,beta,y,desc,info,work)
   !
   real(psb_spk_), allocatable :: xt(:)
   integer                       :: itsz, i, j,totxch,totsnd,totrcv,&
-       & map_kind, map_data
+       & map_kind, map_data, nr, ictxt
   character(len=20), parameter  :: name='psb_backward_map'
 
   info = 0
@@ -144,7 +148,11 @@ subroutine psb_s_backward_map(alpha,x,beta,y,desc,info,work)
     ! Ok, we just need to call a halo update and a matrix-vector product. 
     call psb_halo(x,desc%desc_2,info,work=work)
     if (info == 0) call psb_csmm(alpha,desc%smap%map_bk,x,beta,y,info)
-
+    if ((info == 0) .and. psb_is_repl_desc(desc%desc_1)) then
+      ictxt = psb_cd_get_context(desc%desc_1)
+      nr = psb_cd_get_global_rows(desc%desc_1)
+      call psb_sum(ictxt,y(1:nr))
+    end if
     if (info /= 0) then 
       write(0,*) trim(name),' Error from inner routines',info
       info = -1
@@ -186,7 +194,7 @@ subroutine psb_d_forward_map(alpha,x,beta,y,desc,info,work)
   !
   real(psb_dpk_), allocatable :: xt(:)
   integer                       :: itsz, i, j,totxch,totsnd,totrcv,&
-       &  map_kind, map_data
+       &  map_kind, map_data, nr, ictxt
   character(len=20), parameter  :: name='psb_forward_map'
 
   info = 0
@@ -212,6 +220,11 @@ subroutine psb_d_forward_map(alpha,x,beta,y,desc,info,work)
     ! and a matrix-vector product. 
     call psb_halo(x,desc%desc_1,info,work=work)
     if (info == 0) call psb_csmm(alpha,desc%dmap%map_fw,x,beta,y,info)
+    if ((info == 0) .and. psb_is_repl_desc(desc%desc_2)) then
+      ictxt = psb_cd_get_context(desc%desc_2)
+      nr = psb_cd_get_global_rows(desc%desc_2)
+      call psb_sum(ictxt,y(1:nr))
+    end if
 
     if (info /= 0) then 
       write(0,*) trim(name),' Error from inner routines',info
@@ -257,7 +270,7 @@ subroutine psb_d_backward_map(alpha,x,beta,y,desc,info,work)
   !
   real(psb_dpk_), allocatable :: xt(:)
   integer                       :: itsz, i, j,totxch,totsnd,totrcv,&
-       & map_kind, map_data
+       & map_kind, map_data, nr, ictxt
   character(len=20), parameter  :: name='psb_backward_map'
 
   info = 0
@@ -282,6 +295,11 @@ subroutine psb_d_backward_map(alpha,x,beta,y,desc,info,work)
     ! Ok, we just need to call a halo update and a matrix-vector product. 
     call psb_halo(x,desc%desc_2,info,work=work)
     if (info == 0) call psb_csmm(alpha,desc%dmap%map_bk,x,beta,y,info)
+    if ((info == 0) .and. psb_is_repl_desc(desc%desc_1)) then
+      ictxt = psb_cd_get_context(desc%desc_1)
+      nr = psb_cd_get_global_rows(desc%desc_1)
+      call psb_sum(ictxt,y(1:nr))
+    end if
 
     if (info /= 0) then 
       write(0,*) trim(name),' Error from inner routines',info
@@ -325,7 +343,7 @@ subroutine psb_c_forward_map(alpha,x,beta,y,desc,info,work)
   !
   complex(psb_spk_), allocatable :: xt(:)
   integer                       :: itsz, i, j,totxch,totsnd,totrcv,&
-       & map_kind, map_data
+       & map_kind, map_data, nr, ictxt
   character(len=20), parameter  :: name='psb_forward_map'
 
   info = 0
@@ -350,6 +368,11 @@ subroutine psb_c_forward_map(alpha,x,beta,y,desc,info,work)
     ! Ok, we just need to call a halo update and a matrix-vector product. 
     call psb_halo(x,desc%desc_1,info,work=work)
     if (info == 0) call psb_csmm(alpha,desc%cmap%map_fw,x,beta,y,info)
+    if ((info == 0) .and. psb_is_repl_desc(desc%desc_2)) then
+      ictxt = psb_cd_get_context(desc%desc_2)
+      nr = psb_cd_get_global_rows(desc%desc_2)
+      call psb_sum(ictxt,y(1:nr))
+    end if
 
     if (info /= 0) then 
       write(0,*) trim(name),' Error from inner routines',info
@@ -393,7 +416,7 @@ subroutine psb_c_backward_map(alpha,x,beta,y,desc,info,work)
   !
   complex(psb_spk_), allocatable :: xt(:)
   integer                       :: itsz, i, j,totxch,totsnd,totrcv,&
-       & map_kind, map_data
+       & map_kind, map_data, nr, ictxt
   character(len=20), parameter  :: name='psb_backward_map'
 
   info = 0
@@ -418,6 +441,11 @@ subroutine psb_c_backward_map(alpha,x,beta,y,desc,info,work)
     ! Ok, we just need to call a halo update and a matrix-vector product. 
     call psb_halo(x,desc%desc_2,info,work=work)
     if (info == 0) call psb_csmm(alpha,desc%cmap%map_bk,x,beta,y,info)
+    if ((info == 0) .and. psb_is_repl_desc(desc%desc_1)) then
+      ictxt = psb_cd_get_context(desc%desc_1)
+      nr = psb_cd_get_global_rows(desc%desc_1)
+      call psb_sum(ictxt,y(1:nr))
+    end if
 
     if (info /= 0) then 
       write(0,*) trim(name),' Error from inner routines',info
@@ -427,7 +455,7 @@ subroutine psb_c_backward_map(alpha,x,beta,y,desc,info,work)
 
   case(psb_map_gen_linear_)
     call psb_linmap(alpha,x,beta,y,desc%cmap%map_bk,&
-         & desc%desc_bk,desc%desc_1,desc%desc_2)
+         & desc%desc_bk,desc%desc_2,desc%desc_1)
 
     if (info /= 0) then 
       write(0,*) trim(name),' Error from inner routines',info
@@ -462,7 +490,7 @@ subroutine psb_z_forward_map(alpha,x,beta,y,desc,info,work)
   !
   complex(psb_dpk_), allocatable :: xt(:)
   integer                       :: itsz, i, j,totxch,totsnd,totrcv,&
-       & map_kind, map_data
+       & map_kind, map_data, nr, ictxt
   character(len=20), parameter  :: name='psb_forward_map'
 
   info = 0
@@ -487,7 +515,11 @@ subroutine psb_z_forward_map(alpha,x,beta,y,desc,info,work)
     ! Ok, we just need to call a halo update and a matrix-vector product. 
     call psb_halo(x,desc%desc_1,info,work=work)
     if (info == 0) call psb_csmm(alpha,desc%zmap%map_fw,x,beta,y,info)
-
+    if ((info == 0) .and. psb_is_repl_desc(desc%desc_2)) then
+      ictxt = psb_cd_get_context(desc%desc_2)
+      nr = psb_cd_get_global_rows(desc%desc_2)
+      call psb_sum(ictxt,y(1:nr))
+    end if
     if (info /= 0) then 
       write(0,*) trim(name),' Error from inner routines',info
       info = -1
@@ -524,13 +556,13 @@ subroutine psb_z_backward_map(alpha,x,beta,y,desc,info,work)
   complex(psb_dpk_), intent(in)       :: alpha,beta
   complex(psb_dpk_), intent(inout)    :: x(:)
   complex(psb_dpk_), intent(out)      :: y(:)
-  integer, intent(out)                  :: info 
+  integer, intent(out)                :: info 
   complex(psb_dpk_), optional         :: work(:)
 
   !
   complex(psb_dpk_), allocatable :: xt(:)
   integer                       :: itsz, i, j,totxch,totsnd,totrcv,&
-       & map_kind, map_data
+       & map_kind, map_data, nr, ictxt
   character(len=20), parameter  :: name='psb_backward_map'
 
   info = 0
@@ -555,6 +587,11 @@ subroutine psb_z_backward_map(alpha,x,beta,y,desc,info,work)
     ! Ok, we just need to call a halo update and a matrix-vector product. 
     call psb_halo(x,desc%desc_2,info,work=work)
     if (info == 0) call psb_csmm(alpha,desc%zmap%map_bk,x,beta,y,info)
+    if ((info == 0) .and. psb_is_repl_desc(desc%desc_1)) then
+      ictxt = psb_cd_get_context(desc%desc_1)
+      nr = psb_cd_get_global_rows(desc%desc_1)
+      call psb_sum(ictxt,y(1:nr))
+    end if
 
     if (info /= 0) then 
       write(0,*) trim(name),' Error from inner routines',info
@@ -564,7 +601,7 @@ subroutine psb_z_backward_map(alpha,x,beta,y,desc,info,work)
 
   case(psb_map_gen_linear_)
     call psb_linmap(alpha,x,beta,y,desc%zmap%map_bk,&
-         & desc%desc_bk,desc%desc_1,desc%desc_2)
+         & desc%desc_bk,desc%desc_2,desc%desc_1)
 
     if (info /= 0) then 
       write(0,*) trim(name),' Error from inner routines',info
