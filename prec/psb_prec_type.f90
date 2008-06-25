@@ -124,11 +124,11 @@ module psb_prec_type
     module procedure psb_icheck_def, psb_scheck_def, psb_dcheck_def
   end interface
 
-  interface psb_prec_descr
-    module procedure psb_out_prec_descr, psb_file_prec_descr, &
-         &  psb_sout_prec_descr, psb_sfile_prec_descr, &
-         &  psb_cout_prec_descr, psb_cfile_prec_descr, &
-         &  psb_zout_prec_descr, psb_zfile_prec_descr
+  interface psb_precdescr
+    module procedure psb_file_prec_descr, &
+         &  psb_sfile_prec_descr, &
+         &  psb_cfile_prec_descr, &
+         &  psb_zfile_prec_descr
   end interface
 
   interface psb_sizeof
@@ -138,88 +138,96 @@ module psb_prec_type
 
 contains
 
-  subroutine psb_sout_prec_descr(p)
-    type(psb_sprec_type), intent(in) :: p
-    call psb_sfile_prec_descr(6,p)
-  end subroutine psb_sout_prec_descr
-
-  subroutine psb_out_prec_descr(p)
+  subroutine psb_file_prec_descr(p,iout)
     type(psb_dprec_type), intent(in) :: p
-    call psb_file_prec_descr(6,p)
-  end subroutine psb_out_prec_descr
-
-  subroutine psb_cout_prec_descr(p)
-    type(psb_cprec_type), intent(in) :: p
-    call psb_cfile_prec_descr(6,p)
-  end subroutine psb_cout_prec_descr
-
-  subroutine psb_zout_prec_descr(p)
-    type(psb_zprec_type), intent(in) :: p
-    call psb_zfile_prec_descr(6,p)
-  end subroutine psb_zout_prec_descr
-
-  subroutine psb_file_prec_descr(iout,p)
-    integer, intent(in)              :: iout
-    type(psb_dprec_type), intent(in) :: p
+    integer, intent(in), optional    :: iout
+    integer :: iout_
     
-    write(iout,*) 'Preconditioner description'
+    if (present(iout)) then 
+      iout_ = iout
+    else
+      iout_ = 6 
+    end if
+
+    write(iout_,*) 'Preconditioner description'
     select case(p%iprcparm(psb_p_type_))
     case(psb_noprec_)
-      write(iout,*) 'No preconditioning'
+      write(iout_,*) 'No preconditioning'
     case(psb_diag_)
-      write(iout,*) 'Diagonal scaling'
+      write(iout_,*) 'Diagonal scaling'
     case(psb_bjac_)
-      write(iout,*) 'Block Jacobi with: ',&
+      write(iout_,*) 'Block Jacobi with: ',&
            &  fact_names(p%iprcparm(psb_f_type_))
     end select
     
   end subroutine psb_file_prec_descr
 
-  subroutine psb_sfile_prec_descr(iout,p)
-    integer, intent(in)              :: iout
+  subroutine psb_sfile_prec_descr(p,iout)
     type(psb_sprec_type), intent(in) :: p
+    integer, intent(in), optional    :: iout
+    integer :: iout_
     
-    write(iout,*) 'Preconditioner description'
+    if (present(iout)) then 
+      iout_ = iout
+    else
+      iout_ = 6 
+    end if
+    
+    write(iout_,*) 'Preconditioner description'
     select case(p%iprcparm(psb_p_type_))
     case(psb_noprec_)
-      write(iout,*) 'No preconditioning'
+      write(iout_,*) 'No preconditioning'
     case(psb_diag_)
-      write(iout,*) 'Diagonal scaling'
+      write(iout_,*) 'Diagonal scaling'
     case(psb_bjac_)
-      write(iout,*) 'Block Jacobi with: ',&
+      write(iout_,*) 'Block Jacobi with: ',&
            &  fact_names(p%iprcparm(psb_f_type_))
     end select
     
   end subroutine psb_sfile_prec_descr
 
-  subroutine psb_cfile_prec_descr(iout,p)
-    integer, intent(in)              :: iout
+  subroutine psb_cfile_prec_descr(p,iout)
     type(psb_cprec_type), intent(in) :: p
+    integer, intent(in), optional    :: iout
+    integer :: iout_
+    
+    if (present(iout)) then 
+      iout_ = iout
+    else
+      iout_ = 6 
+    end if
 
-    write(iout,*) 'Preconditioner description'
+    write(iout_,*) 'Preconditioner description'
     select case(p%iprcparm(psb_p_type_))
     case(psb_noprec_)
-      write(iout,*) 'No preconditioning'
+      write(iout_,*) 'No preconditioning'
     case(psb_diag_)
-      write(iout,*) 'Diagonal scaling'
+      write(iout_,*) 'Diagonal scaling'
     case(psb_bjac_)
-      write(iout,*) 'Block Jacobi with: ',&
+      write(iout_,*) 'Block Jacobi with: ',&
            &  fact_names(p%iprcparm(psb_f_type_))
     end select
   end subroutine psb_cfile_prec_descr
 
-  subroutine psb_zfile_prec_descr(iout,p)
-    integer, intent(in)              :: iout
+  subroutine psb_zfile_prec_descr(p,iout)
     type(psb_zprec_type), intent(in) :: p
+    integer, intent(in), optional    :: iout
+    integer :: iout_
+    
+    if (present(iout)) then 
+      iout_ = iout
+    else
+      iout_ = 6 
+    end if
 
-    write(iout,*) 'Preconditioner description'
+    write(iout_,*) 'Preconditioner description'
     select case(p%iprcparm(psb_p_type_))
     case(psb_noprec_)
-      write(iout,*) 'No preconditioning'
+      write(iout_,*) 'No preconditioning'
     case(psb_diag_)
-      write(iout,*) 'Diagonal scaling'
+      write(iout_,*) 'Diagonal scaling'
     case(psb_bjac_)
-      write(iout,*) 'Block Jacobi with: ',&
+      write(iout_,*) 'Block Jacobi with: ',&
            &  fact_names(p%iprcparm(psb_f_type_))
     end select
   end subroutine psb_zfile_prec_descr

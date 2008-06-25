@@ -228,7 +228,7 @@ program cf_sample
   call psb_sum(ictxt,descsize)
   call psb_sum(ictxt,precsize)
   if (iam==psb_root_) then 
-    call psb_prec_descr(6,prec)
+    call psb_precdescr(prec)
     write(*,'("Matrix: ",a)')mtrx_file
     write(*,'("Computed solution on ",i8," processors")')np
     write(*,'("Iterations to convergence: ",i6)')iter

@@ -1544,8 +1544,9 @@ position as the corresponding entries in $x$.
 \item The routines return the items in the chosen ordering; the
   output difference is the handling of  ties (i.e. items with an
   equal   value) in the original input. With the merge-sort algorithm
-  ties are   preserved in the same order as they had in the original
-  sequence,  while this is not guaranteed for quicksort or heapsort;
+  ties are   preserved in the same relative order as they had in the
+  original   sequence,  while this is not guaranteed for quicksort or
+  heapsort; 
 \item If $flag = psb\_sort\_ovw\_idx\_$ then the entries in $ix(1:n)$
   where $n$ is the size of $x$ are initialized to $ix(i) \leftarrow
   i$; thus, upon return from the subroutine, for each

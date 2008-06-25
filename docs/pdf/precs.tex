@@ -174,9 +174,10 @@ An integer value; 0 means no error has been detected.
 
 
 
-\subroutine{psb\_prec\_descr}{Prints a description of current preconditioner}
+\subroutine{psb\_precdescr}{Prints a description of current preconditioner}
 
-\syntax{call psb\_prec\_descr}{prec}
+\syntax{call psb\_precdescr}{prec}
+\syntax*{call psb\_precdescr}{prec, iout}
 
 \begin{description}
 \item[Type:] Asynchronous.
@@ -186,6 +187,11 @@ Scope: {\bf local} \\
 Type: {\bf required}\\
 Intent: {\bf in}.\\
 Specified as: a preconditioner data structure \precdata.
+\item[iout] output unit.
+Scope: {\bf local} \\
+Type: {\bf optiona}\\
+Intent: {\bf in}.\\
+Specified as: an integer number. 
 \end{description}
 
 
