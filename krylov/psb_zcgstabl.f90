@@ -156,7 +156,7 @@ Subroutine psb_zcgstabl(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,irst,is
   if (present(istop)) then 
     istop_ = istop 
   else
-    istop_ = 1
+    istop_ = 2
   endif
 
   if (present(itmax)) then 

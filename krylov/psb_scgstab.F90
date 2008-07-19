@@ -166,7 +166,7 @@ Subroutine psb_scgstab(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,istop)
   If (Present(istop)) Then 
     istop_ = istop 
   Else
-    istop_ = 1
+    istop_ = 2
   Endif
   !
   !  ISTOP_ = 1:  Normwise backward error, infinity norm 

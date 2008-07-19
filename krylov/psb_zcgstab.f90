@@ -142,7 +142,7 @@ subroutine psb_zcgstab(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,istop)
   If (Present(istop)) Then 
     istop_ = istop 
   Else
-    istop_ = 1
+    istop_ = 2
   Endif
 
   call psb_chkvect(mglob,1,size(x,1),1,1,desc_a,info)

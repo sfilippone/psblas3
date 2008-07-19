@@ -156,7 +156,7 @@ subroutine psb_srgmres(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,irst,ist
   if (present(istop)) then 
     istop_ = istop 
   else
-    istop_ = 1
+    istop_ = 2
   endif
 !
 !  ISTOP_ = 1:  Normwise backward error, infinity norm 

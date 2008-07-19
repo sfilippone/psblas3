@@ -149,7 +149,7 @@ subroutine psb_cbicg(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,istop)
   if (present(istop)) then 
     istop_ = istop 
   else
-    istop_ = 1
+    istop_ = 2
   endif
   !
   !  istop_ = 1:  normwise backward error, infinity norm 
