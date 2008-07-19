@@ -8,7 +8,7 @@ strategy is to keep error messages on a stack allowing the user to
 trace back up to the point where the first error message has been
 generated. Every routine in the PSBLAS-2.0 library has, as last
 non-optional argument, an integer \verb|info| variable; whenever,
-inside the routine, en error is detected, this variable is set to a
+inside the routine, an error is detected, this variable is set to a
 value corresponding to a specific error code. Then this error code is
 also pushed on the error stack and then either control is returned to
 the caller routine or the execution is aborted, depending on the users
