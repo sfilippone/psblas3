@@ -106,27 +106,21 @@ contains
         if (valcrd > 0) read (infile,fmt=valfmt) (a%aspk(i),i=1,nnzero)
 
         if (present(b)) then
-          call psb_ensure_size(nrow,b,info)
           if ((psb_toupper(rhstype(1:1)) == 'F').and.(rhscrd > 0)) then 
+            call psb_ensure_size(nrow,b,info)
             read (infile,fmt=rhsfmt) (b(i),i=1,nrow)
-          else 
-            b = szero
           endif
         endif
         if (present(g)) then
-          call psb_ensure_size(nrow,g,info)
           if ((psb_toupper(rhstype(2:2)) == 'G').and.(rhscrd > 0)) then 
+            call psb_ensure_size(nrow,g,info)
             read (infile,fmt=rhsfmt) (g(i),i=1,nrow)
-          else 
-            g = szero
           endif
         endif
         if (present(x)) then
-          call psb_ensure_size(nrow,x,info)
           if ((psb_toupper(rhstype(3:3)) == 'X').and.(rhscrd > 0)) then 
+            call psb_ensure_size(nrow,x,info)
             read (infile,fmt=rhsfmt) (x(i),i=1,nrow)
-          else 
-            x = szero
           endif
         endif
 
@@ -140,27 +134,21 @@ contains
         if (valcrd > 0) read (infile,fmt=valfmt) (a%aspk(i),i=1,nnzero)
 
         if (present(b)) then
-          call psb_ensure_size(nrow,b,info)
           if ((psb_toupper(rhstype(1:1)) == 'F').and.(rhscrd > 0)) then 
+            call psb_ensure_size(nrow,b,info)
             read (infile,fmt=rhsfmt) (b(i),i=1,nrow)
-          else 
-            b = szero
           endif
         endif
         if (present(g)) then
-          call psb_ensure_size(nrow,g,info)
           if ((psb_toupper(rhstype(2:2)) == 'G').and.(rhscrd > 0)) then 
+            call psb_ensure_size(nrow,g,info)
             read (infile,fmt=rhsfmt) (g(i),i=1,nrow)
-          else 
-            g = szero
           endif
         endif
         if (present(x)) then
-          call psb_ensure_size(nrow,x,info)
           if ((psb_toupper(rhstype(3:3)) == 'X').and.(rhscrd > 0)) then 
+            call psb_ensure_size(nrow,x,info)
             read (infile,fmt=rhsfmt) (x(i),i=1,nrow)
-          else 
-            x = szero
           endif
         endif
 
@@ -399,27 +387,21 @@ contains
         if (valcrd > 0) read (infile,fmt=valfmt) (a%aspk(i),i=1,nnzero)
 
         if (present(b)) then
-          call psb_ensure_size(nrow,b,info)
           if ((psb_toupper(rhstype(1:1)) == 'F').and.(rhscrd > 0)) then 
+            call psb_ensure_size(nrow,b,info)
             read (infile,fmt=rhsfmt) (b(i),i=1,nrow)
-          else 
-            b = dzero
           endif
         endif
         if (present(g)) then
-          call psb_ensure_size(nrow,g,info)
           if ((psb_toupper(rhstype(2:2)) == 'G').and.(rhscrd > 0)) then 
+            call psb_ensure_size(nrow,g,info)
             read (infile,fmt=rhsfmt) (g(i),i=1,nrow)
-          else 
-            g = dzero
           endif
         endif
         if (present(x)) then
-          call psb_ensure_size(nrow,x,info)
           if ((psb_toupper(rhstype(3:3)) == 'X').and.(rhscrd > 0)) then 
+            call psb_ensure_size(nrow,x,info)
             read (infile,fmt=rhsfmt) (x(i),i=1,nrow)
-          else 
-            x = dzero
           endif
         endif
 
@@ -434,27 +416,21 @@ contains
 
 
         if (present(b)) then
-          call psb_ensure_size(nrow,b,info)
           if ((psb_toupper(rhstype(1:1)) == 'F').and.(rhscrd > 0)) then 
+            call psb_ensure_size(nrow,b,info)
             read (infile,fmt=rhsfmt) (b(i),i=1,nrow)
-          else 
-            b = dzero
           endif
         endif
         if (present(g)) then
-          call psb_ensure_size(nrow,g,info)
           if ((psb_toupper(rhstype(2:2)) == 'G').and.(rhscrd > 0)) then 
+            call psb_ensure_size(nrow,g,info)
             read (infile,fmt=rhsfmt) (g(i),i=1,nrow)
-          else 
-            g = dzero
           endif
         endif
         if (present(x)) then
-          call psb_ensure_size(nrow,x,info)
           if ((psb_toupper(rhstype(3:3)) == 'X').and.(rhscrd > 0)) then 
+            call psb_ensure_size(nrow,x,info)
             read (infile,fmt=rhsfmt) (x(i),i=1,nrow)
-          else 
-            x = dzero
           endif
         endif
 
@@ -697,27 +673,21 @@ contains
         if (valcrd > 0) read (infile,fmt=valfmt) (a%aspk(i),i=1,nnzero)
 
         if (present(b)) then
-          call psb_ensure_size(nrow,b,info)
           if ((psb_toupper(rhstype(1:1)) == 'F').and.(rhscrd > 0)) then 
+            call psb_ensure_size(nrow,b,info)
             read (infile,fmt=rhsfmt) (b(i),i=1,nrow)
-          else 
-            b = czero
           endif
         endif
         if (present(g)) then
-          call psb_ensure_size(nrow,g,info)
           if ((psb_toupper(rhstype(2:2)) == 'G').and.(rhscrd > 0)) then 
+            call psb_ensure_size(nrow,g,info)
             read (infile,fmt=rhsfmt) (g(i),i=1,nrow)
-          else 
-            g = czero
           endif
         endif
         if (present(x)) then
-          call psb_ensure_size(nrow,x,info)
           if ((psb_toupper(rhstype(3:3)) == 'X').and.(rhscrd > 0)) then 
+            call psb_ensure_size(nrow,x,info)
             read (infile,fmt=rhsfmt) (x(i),i=1,nrow)
-          else 
-            x = czero
           endif
         endif
 
@@ -741,27 +711,21 @@ contains
         if (valcrd > 0) read (infile,fmt=valfmt) (a%aspk(i),i=1,nnzero)
 
         if (present(b)) then
-          call psb_ensure_size(nrow,b,info)
           if ((psb_toupper(rhstype(1:1)) == 'F').and.(rhscrd > 0)) then 
+            call psb_ensure_size(nrow,b,info)
             read (infile,fmt=rhsfmt) (b(i),i=1,nrow)
-          else 
-            b = czero
           endif
         endif
         if (present(g)) then
-          call psb_ensure_size(nrow,g,info)
           if ((psb_toupper(rhstype(2:2)) == 'G').and.(rhscrd > 0)) then 
+            call psb_ensure_size(nrow,g,info)
             read (infile,fmt=rhsfmt) (g(i),i=1,nrow)
-          else 
-            g = czero
           endif
         endif
         if (present(x)) then
-          call psb_ensure_size(nrow,x,info)
           if ((psb_toupper(rhstype(3:3)) == 'X').and.(rhscrd > 0)) then 
+            call psb_ensure_size(nrow,x,info)
             read (infile,fmt=rhsfmt) (x(i),i=1,nrow)
-          else 
-            x = czero
           endif
         endif
 
@@ -816,27 +780,21 @@ contains
         if (valcrd > 0) read (infile,fmt=valfmt) (a%aspk(i),i=1,nnzero)
 
         if (present(b)) then
-          call psb_ensure_size(nrow,b,info)
           if ((psb_toupper(rhstype(1:1)) == 'F').and.(rhscrd > 0)) then 
+            call psb_ensure_size(nrow,b,info)
             read (infile,fmt=rhsfmt) (b(i),i=1,nrow)
-          else 
-            b = czero
           endif
         endif
         if (present(g)) then
-          call psb_ensure_size(nrow,g,info)
           if ((psb_toupper(rhstype(2:2)) == 'G').and.(rhscrd > 0)) then 
+            call psb_ensure_size(nrow,g,info)
             read (infile,fmt=rhsfmt) (g(i),i=1,nrow)
-          else 
-            g = czero
           endif
         endif
         if (present(x)) then
-          call psb_ensure_size(nrow,x,info)
           if ((psb_toupper(rhstype(3:3)) == 'X').and.(rhscrd > 0)) then 
+            call psb_ensure_size(nrow,x,info)
             read (infile,fmt=rhsfmt) (x(i),i=1,nrow)
-          else 
-            x = czero
           endif
         endif
         
@@ -1085,27 +1043,21 @@ contains
         if (valcrd > 0) read (infile,fmt=valfmt) (a%aspk(i),i=1,nnzero)
 
         if (present(b)) then
-          call psb_ensure_size(nrow,b,info)
           if ((psb_toupper(rhstype(1:1)) == 'F').and.(rhscrd > 0)) then 
+            call psb_ensure_size(nrow,b,info)
             read (infile,fmt=rhsfmt) (b(i),i=1,nrow)
-          else 
-            b = zzero
           endif
         endif
         if (present(g)) then
-          call psb_ensure_size(nrow,g,info)
           if ((psb_toupper(rhstype(2:2)) == 'G').and.(rhscrd > 0)) then 
+            call psb_ensure_size(nrow,g,info)
             read (infile,fmt=rhsfmt) (g(i),i=1,nrow)
-          else 
-            g = zzero
           endif
         endif
         if (present(x)) then
-          call psb_ensure_size(nrow,x,info)
           if ((psb_toupper(rhstype(3:3)) == 'X').and.(rhscrd > 0)) then 
+            call psb_ensure_size(nrow,x,info)
             read (infile,fmt=rhsfmt) (x(i),i=1,nrow)
-          else 
-            x = zzero
           endif
         endif
 
@@ -1129,27 +1081,21 @@ contains
         if (valcrd > 0) read (infile,fmt=valfmt) (a%aspk(i),i=1,nnzero)
 
         if (present(b)) then
-          call psb_ensure_size(nrow,b,info)
           if ((psb_toupper(rhstype(1:1)) == 'F').and.(rhscrd > 0)) then 
+            call psb_ensure_size(nrow,b,info)
             read (infile,fmt=rhsfmt) (b(i),i=1,nrow)
-          else 
-            b = zzero
           endif
         endif
         if (present(g)) then
-          call psb_ensure_size(nrow,g,info)
           if ((psb_toupper(rhstype(2:2)) == 'G').and.(rhscrd > 0)) then 
+            call psb_ensure_size(nrow,g,info)
             read (infile,fmt=rhsfmt) (g(i),i=1,nrow)
-          else 
-            g = zzero
           endif
         endif
         if (present(x)) then
-          call psb_ensure_size(nrow,x,info)
           if ((psb_toupper(rhstype(3:3)) == 'X').and.(rhscrd > 0)) then 
+            call psb_ensure_size(nrow,x,info)
             read (infile,fmt=rhsfmt) (x(i),i=1,nrow)
-          else 
-            x = zzero
           endif
         endif
 
@@ -1204,27 +1150,21 @@ contains
         if (valcrd > 0) read (infile,fmt=valfmt) (a%aspk(i),i=1,nnzero)
 
         if (present(b)) then
-          call psb_ensure_size(nrow,b,info)
           if ((psb_toupper(rhstype(1:1)) == 'F').and.(rhscrd > 0)) then 
+            call psb_ensure_size(nrow,b,info)
             read (infile,fmt=rhsfmt) (b(i),i=1,nrow)
-          else 
-            b = zzero
           endif
         endif
         if (present(g)) then
-          call psb_ensure_size(nrow,g,info)
           if ((psb_toupper(rhstype(2:2)) == 'G').and.(rhscrd > 0)) then 
+            call psb_ensure_size(nrow,g,info)
             read (infile,fmt=rhsfmt) (g(i),i=1,nrow)
-          else 
-            g = zzero
           endif
         endif
         if (present(x)) then
-          call psb_ensure_size(nrow,x,info)
           if ((psb_toupper(rhstype(3:3)) == 'X').and.(rhscrd > 0)) then 
+            call psb_ensure_size(nrow,x,info)
             read (infile,fmt=rhsfmt) (x(i),i=1,nrow)
-          else 
-            x = zzero
           endif
         endif
         call psb_spcnv(a,ircode,afmt='coo')

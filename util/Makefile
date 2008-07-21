@@ -24,6 +24,7 @@ lib:  $(OBJS)
 
 
 psb_util_mod.o: $(BASEOBJS)
+psb_read_mat_mod.o: psb_mmio_mod.o
 
 veryclean: clean
 	/bin/rm -f $(HERE)/$(LIBNAME)

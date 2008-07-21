@@ -31,15 +31,239 @@
 !!$  
 module psb_mmio_mod
 
-  public mm_mat_read, mm_mat_write
+  public mm_mat_read, mm_mat_write, mm_vet_read
   interface mm_mat_read
     module procedure smm_mat_read,  dmm_mat_read, cmm_mat_read, zmm_mat_read
   end interface
   interface mm_mat_write
     module procedure smm_mat_write, dmm_mat_write, cmm_mat_write,  zmm_mat_write
   end interface
+  interface mm_vet_read
+    module procedure mm_svet_read, mm_dvet_read, mm_cvet_read, mm_zvet_read
+  end interface
 
 contains
+
+  subroutine mm_svet_read(filename, b, info)   
+    use psb_base_mod
+    implicit none
+    character                             :: filename*(*)
+    real(psb_spk_), allocatable, intent(out)  :: b(:,:)
+    integer, intent(out) :: info 
+    integer, parameter   :: infile = 2
+    integer              :: nrow, ncol, i,root, np,  me,  ircode, j
+    character            :: mmheader*15, fmt*15, object*10, type*10, sym*15,&
+         & line*1024
+
+    info = 0
+    open(infile,file=filename, status='old', err=901, action="read")
+    read(infile,fmt=*, end=902) mmheader, object, fmt, type, sym
+    
+    if ( (object /= 'matrix').or.(fmt /= 'array')) then
+      write(0,*) 'read_rhs: input file type not yet supported'
+      info = -3
+      return
+    end if
+    
+    do 
+      read(infile,fmt='(a)') line
+      if (line(1:1) /= '%')  exit
+    end do
+    
+    read(line,fmt=*)nrow,ncol
+    
+    if ((psb_tolower(type) == 'real').and.(psb_tolower(sym) == 'general')) then
+      allocate(b(nrow,ncol),stat = ircode)
+      if (ircode /= 0)   goto 993
+      read(infile,fmt=*,end=902) ((b(i,j), i=1,nrow),j=1,ncol)
+      
+    end if      ! read right hand sides
+
+    return 
+    ! open failed
+901 write(0,*) 'mm_vet_read: could not open file ',&
+         & infile,' for input'
+    info = -1
+    return
+
+902 write(0,*) 'mmv_vet_read: unexpected end of file ',infile,&
+         & ' during input'
+    info = -2
+    return
+993 write(0,*) 'mm_vet_read: memory allocation failure'
+    info = -3
+    return
+  end subroutine mm_svet_read
+
+
+  subroutine mm_dvet_read(filename, b, info)   
+    use psb_base_mod
+    implicit none
+    character                             :: filename*(*)
+    real(psb_dpk_), allocatable, intent(out)  :: b(:,:)
+    integer, intent(out) :: info 
+    integer, parameter   :: infile = 2
+    integer              :: nrow, ncol, i,root, np,  me,  ircode, j
+    character            :: mmheader*15, fmt*15, object*10, type*10, sym*15,&
+         & line*1024
+
+    info = 0
+    open(infile,file=filename, status='old', err=901, action="read")
+    read(infile,fmt=*, end=902) mmheader, object, fmt, type, sym
+    
+    if ( (object /= 'matrix').or.(fmt /= 'array')) then
+      write(0,*) 'read_rhs: input file type not yet supported'
+      info = -3
+      return
+    end if
+    
+    do 
+      read(infile,fmt='(a)') line
+      if (line(1:1) /= '%')  exit
+    end do
+    
+    read(line,fmt=*)nrow,ncol
+    
+    if ((psb_tolower(type) == 'real').and.(psb_tolower(sym) == 'general')) then
+      allocate(b(nrow,ncol),stat = ircode)
+      if (ircode /= 0)   goto 993
+      read(infile,fmt=*,end=902) ((b(i,j), i=1,nrow),j=1,ncol)
+      
+    end if      ! read right hand sides
+
+    return 
+    ! open failed
+901 write(0,*) 'mm_vet_read: could not open file ',&
+         & infile,' for input'
+    info = -1
+    return
+
+902 write(0,*) 'mmv_vet_read: unexpected end of file ',infile,&
+         & ' during input'
+    info = -2
+    return
+993 write(0,*) 'mm_vet_read: memory allocation failure'
+    info = -3
+    return
+  end subroutine mm_dvet_read
+
+
+  subroutine mm_cvet_read(filename, b, info)   
+    use psb_base_mod
+    implicit none
+    character                             :: filename*(*)
+    complex(psb_spk_), allocatable, intent(out)  :: b(:,:)
+    integer, intent(out) :: info 
+    integer, parameter   :: infile = 2
+    integer              :: nrow, ncol, i,root, np,  me,  ircode, j
+    real(psb_spk_)       :: bre, bim 
+    character            :: mmheader*15, fmt*15, object*10, type*10, sym*15,&
+         & line*1024
+
+    info = 0
+    open(infile,file=filename, status='old', err=901, action="read")
+    read(infile,fmt=*, end=902) mmheader, object, fmt, type, sym
+    
+    if ( (object /= 'matrix').or.(fmt /= 'array')) then
+      write(0,*) 'read_rhs: input file type not yet supported'
+      info = -3
+      return
+    end if
+    
+    do 
+      read(infile,fmt='(a)') line
+      if (line(1:1) /= '%')  exit
+    end do
+    
+    read(line,fmt=*)nrow,ncol
+    
+    if ((psb_tolower(type) == 'real').and.(psb_tolower(sym) == 'general')) then
+      allocate(b(nrow,ncol),stat = ircode)
+      if (ircode /= 0)   goto 993
+      do j=1, ncol
+        do i=1, nrow
+          read(infile,fmt=*,end=902) bre,bim
+          b(i,j) = cmplx(bre,bim)
+        end do
+      end do
+      
+    end if      ! read right hand sides
+
+    return 
+    ! open failed
+901 write(0,*) 'mm_vet_read: could not open file ',&
+         & infile,' for input'
+    info = -1
+    return
+
+902 write(0,*) 'mmv_vet_read: unexpected end of file ',infile,&
+         & ' during input'
+    info = -2
+    return
+993 write(0,*) 'mm_vet_read: memory allocation failure'
+    info = -3
+    return
+  end subroutine mm_cvet_read
+
+
+  subroutine mm_zvet_read(filename, b, info)   
+    use psb_base_mod
+    implicit none
+    character                             :: filename*(*)
+    complex(psb_dpk_), allocatable, intent(out)  :: b(:,:)
+    integer, intent(out) :: info 
+    integer, parameter   :: infile = 2
+    integer              :: nrow, ncol, i,root, np,  me,  ircode, j
+    real(psb_dpk_)       :: bre, bim 
+    character            :: mmheader*15, fmt*15, object*10, type*10, sym*15,&
+         & line*1024
+
+    info = 0
+    open(infile,file=filename, status='old', err=901, action="read")
+    read(infile,fmt=*, end=902) mmheader, object, fmt, type, sym
+    
+    if ( (object /= 'matrix').or.(fmt /= 'array')) then
+      write(0,*) 'read_rhs: input file type not yet supported'
+      info = -3
+      return
+    end if
+    
+    do 
+      read(infile,fmt='(a)') line
+      if (line(1:1) /= '%')  exit
+    end do
+    
+    read(line,fmt=*)nrow,ncol
+    
+    if ((psb_tolower(type) == 'real').and.(psb_tolower(sym) == 'general')) then
+      allocate(b(nrow,ncol),stat = ircode)
+      if (ircode /= 0)   goto 993
+      do j=1, ncol
+        do i=1, nrow
+          read(infile,fmt=*,end=902) bre,bim
+          b(i,j) = cmplx(bre,bim)
+        end do
+      end do
+      
+    end if      ! read right hand sides
+
+    return 
+    ! open failed
+901 write(0,*) 'mm_vet_read: could not open file ',&
+         & infile,' for input'
+    info = -1
+    return
+
+902 write(0,*) 'mmv_vet_read: unexpected end of file ',infile,&
+         & ' during input'
+    info = -2
+    return
+993 write(0,*) 'mm_vet_read: memory allocation failure'
+    info = -3
+    return
+  end subroutine mm_zvet_read
+
+
 
   subroutine smm_mat_read(a, iret, iunit, filename)   
     use psb_base_mod

@@ -108,7 +108,7 @@ program cf_sample
 
     if(rhs_file /= 'NONE') then
        !  reading an rhs
-       call read_rhs(rhs_file,aux_b,ictxt)
+       call read_rhs(rhs_file,aux_b,info,ictxt)
     end if
 
     if (psb_size(aux_b,dim=1)==m_problem) then
