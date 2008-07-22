@@ -48,10 +48,11 @@ contains
     integer, intent(out)                   :: iret
     integer, optional, intent(in)          :: iunit
     character(len=*), optional, intent(in) :: filename
-    real(psb_spk_), optional, allocatable :: b(:), g(:), x(:) 
+    real(psb_spk_), optional, allocatable, intent(out)  :: b(:,:), g(:,:), x(:,:) 
     character(len=72), optional, intent(out) :: mtitle
 
     character  :: rhstype*3,type*3,key*8
+    character(len=72) :: mtitle_
     character indfmt*16,ptrfmt*16,rhsfmt*20,valfmt*20
     integer        :: indcrd,  ptrcrd, totcrd,&
          & valcrd, rhscrd, nrow, ncol, nnzero, neltvl, nrhs, nrhsix
@@ -81,7 +82,7 @@ contains
       endif
     endif
 
-    read (infile,fmt=fmt10) mtitle,key,totcrd,ptrcrd,indcrd,valcrd,rhscrd,&
+    read(infile,fmt=fmt10) mtitle_,key,totcrd,ptrcrd,indcrd,valcrd,rhscrd,&
          & type,nrow,ncol,nnzero,neltvl,ptrfmt,indfmt,valfmt,rhsfmt
     if (rhscrd > 0) read(infile,fmt=fmt11)rhstype,nrhs,nrhsix
 
@@ -90,6 +91,7 @@ contains
       write(0,*) 'Memory allocation failed'
       goto 993
     end if
+    if (present(mtitle)) mtitle=mtitle_
 
     a%m    = nrow
     a%k    = ncol
@@ -107,20 +109,20 @@ contains
 
         if (present(b)) then
           if ((psb_toupper(rhstype(1:1)) == 'F').and.(rhscrd > 0)) then 
-            call psb_ensure_size(nrow,b,info)
-            read (infile,fmt=rhsfmt) (b(i),i=1,nrow)
+            call psb_realloc(nrow,1,b,info)
+            read (infile,fmt=rhsfmt) (b(i,1),i=1,nrow)
           endif
         endif
         if (present(g)) then
           if ((psb_toupper(rhstype(2:2)) == 'G').and.(rhscrd > 0)) then 
-            call psb_ensure_size(nrow,g,info)
-            read (infile,fmt=rhsfmt) (g(i),i=1,nrow)
+            call psb_realloc(nrow,1,g,info)
+            read (infile,fmt=rhsfmt) (g(i,1),i=1,nrow)
           endif
         endif
         if (present(x)) then
           if ((psb_toupper(rhstype(3:3)) == 'X').and.(rhscrd > 0)) then 
-            call psb_ensure_size(nrow,x,info)
-            read (infile,fmt=rhsfmt) (x(i),i=1,nrow)
+            call psb_realloc(nrow,1,x,info)
+            read (infile,fmt=rhsfmt) (x(i,1),i=1,nrow)
           endif
         endif
 
@@ -133,22 +135,23 @@ contains
         read (infile,fmt=indfmt) (a%ia1(i),i=1,nnzero)
         if (valcrd > 0) read (infile,fmt=valfmt) (a%aspk(i),i=1,nnzero)
 
+
         if (present(b)) then
           if ((psb_toupper(rhstype(1:1)) == 'F').and.(rhscrd > 0)) then 
-            call psb_ensure_size(nrow,b,info)
-            read (infile,fmt=rhsfmt) (b(i),i=1,nrow)
+            call psb_realloc(nrow,1,b,info)
+            read (infile,fmt=rhsfmt) (b(i,1),i=1,nrow)
           endif
         endif
         if (present(g)) then
           if ((psb_toupper(rhstype(2:2)) == 'G').and.(rhscrd > 0)) then 
-            call psb_ensure_size(nrow,g,info)
-            read (infile,fmt=rhsfmt) (g(i),i=1,nrow)
+            call psb_realloc(nrow,1,g,info)
+            read (infile,fmt=rhsfmt) (g(i,1),i=1,nrow)
           endif
         endif
         if (present(x)) then
           if ((psb_toupper(rhstype(3:3)) == 'X').and.(rhscrd > 0)) then 
-            call psb_ensure_size(nrow,x,info)
-            read (infile,fmt=rhsfmt) (x(i),i=1,nrow)
+            call psb_realloc(nrow,1,x,info)
+            read (infile,fmt=rhsfmt) (x(i,1),i=1,nrow)
           endif
         endif
 
@@ -187,10 +190,10 @@ contains
     write(0,*) 'read_matrix: could not open file ',filename,' for input'
     return
 902 iret=902
-    write(0,*) 'DHB_READ: Unexpected end of file '
+    write(0,*) 'HB_READ: Unexpected end of file '
     return
 993 iret=993
-    write(0,*) 'DHB_READ: Memory allocation failure'
+    write(0,*) 'HB_READ: Memory allocation failure'
     return
   end subroutine shb_read
 
@@ -329,10 +332,11 @@ contains
     integer, intent(out)                   :: iret
     integer, optional, intent(in)          :: iunit
     character(len=*), optional, intent(in) :: filename
-    real(psb_dpk_), optional, allocatable :: b(:), g(:), x(:) 
+    real(psb_dpk_), optional, allocatable, intent(out)  :: b(:,:), g(:,:), x(:,:) 
     character(len=72), optional, intent(out) :: mtitle
 
     character  :: rhstype*3,type*3,key*8
+    character(len=72) :: mtitle_
     character indfmt*16,ptrfmt*16,rhsfmt*20,valfmt*20
     integer        :: indcrd,  ptrcrd, totcrd,&
          & valcrd, rhscrd, nrow, ncol, nnzero, neltvl, nrhs, nrhsix
@@ -362,7 +366,7 @@ contains
       endif
     endif
 
-    read (infile,fmt=fmt10) mtitle,key,totcrd,ptrcrd,indcrd,valcrd,rhscrd,&
+    read (infile,fmt=fmt10) mtitle_,key,totcrd,ptrcrd,indcrd,valcrd,rhscrd,&
          & type,nrow,ncol,nnzero,neltvl,ptrfmt,indfmt,valfmt,rhsfmt
     if (rhscrd > 0) read(infile,fmt=fmt11)rhstype,nrhs,nrhsix
 
@@ -371,7 +375,7 @@ contains
       write(0,*) 'Memory allocation failed'
       goto 993
     end if
-
+    if (present(mtitle)) mtitle=mtitle_
     a%m    = nrow
     a%k    = ncol
     a%fida = 'CSR'
@@ -388,20 +392,20 @@ contains
 
         if (present(b)) then
           if ((psb_toupper(rhstype(1:1)) == 'F').and.(rhscrd > 0)) then 
-            call psb_ensure_size(nrow,b,info)
-            read (infile,fmt=rhsfmt) (b(i),i=1,nrow)
+            call psb_realloc(nrow,1,b,info)
+            read (infile,fmt=rhsfmt) (b(i,1),i=1,nrow)
           endif
         endif
         if (present(g)) then
           if ((psb_toupper(rhstype(2:2)) == 'G').and.(rhscrd > 0)) then 
-            call psb_ensure_size(nrow,g,info)
-            read (infile,fmt=rhsfmt) (g(i),i=1,nrow)
+            call psb_realloc(nrow,1,g,info)
+            read (infile,fmt=rhsfmt) (g(i,1),i=1,nrow)
           endif
         endif
         if (present(x)) then
           if ((psb_toupper(rhstype(3:3)) == 'X').and.(rhscrd > 0)) then 
-            call psb_ensure_size(nrow,x,info)
-            read (infile,fmt=rhsfmt) (x(i),i=1,nrow)
+            call psb_realloc(nrow,1,x,info)
+            read (infile,fmt=rhsfmt) (x(i,1),i=1,nrow)
           endif
         endif
 
@@ -417,23 +421,22 @@ contains
 
         if (present(b)) then
           if ((psb_toupper(rhstype(1:1)) == 'F').and.(rhscrd > 0)) then 
-            call psb_ensure_size(nrow,b,info)
-            read (infile,fmt=rhsfmt) (b(i),i=1,nrow)
+            call psb_realloc(nrow,1,b,info)
+            read (infile,fmt=rhsfmt) (b(i,1),i=1,nrow)
           endif
         endif
         if (present(g)) then
           if ((psb_toupper(rhstype(2:2)) == 'G').and.(rhscrd > 0)) then 
-            call psb_ensure_size(nrow,g,info)
-            read (infile,fmt=rhsfmt) (g(i),i=1,nrow)
+            call psb_realloc(nrow,1,g,info)
+            read (infile,fmt=rhsfmt) (g(i,1),i=1,nrow)
           endif
         endif
         if (present(x)) then
           if ((psb_toupper(rhstype(3:3)) == 'X').and.(rhscrd > 0)) then 
-            call psb_ensure_size(nrow,x,info)
-            read (infile,fmt=rhsfmt) (x(i),i=1,nrow)
+            call psb_realloc(nrow,1,x,info)
+            read (infile,fmt=rhsfmt) (x(i,1),i=1,nrow)
           endif
         endif
-
 
         call psb_spcnv(a,ircode,afmt='csr')
         if (ircode /= 0)   goto 993  
@@ -470,15 +473,12 @@ contains
     write(0,*) 'read_matrix: could not open file ',filename,' for input'
     return
 902 iret=902
-    write(0,*) 'DHB_READ: Unexpected end of file '
+    write(0,*) 'HB_READ: Unexpected end of file '
     return
 993 iret=993
-    write(0,*) 'DHB_READ: Memory allocation failure'
+    write(0,*) 'HB_READ: Memory allocation failure'
     return
   end subroutine dhb_read
-
-
-
 
   subroutine dhb_write(a,iret,iunit,filename,key,rhs,g,x,mtitle)
     use psb_base_mod
@@ -615,14 +615,15 @@ contains
     integer, intent(out)                   :: iret
     integer, optional, intent(in)          :: iunit
     character(len=*), optional, intent(in) :: filename
-    complex(psb_spk_), optional, allocatable  :: b(:), g(:), x(:) 
+    complex(psb_spk_), optional, allocatable, intent(out)  :: b(:,:), g(:,:), x(:,:) 
     character(len=72), optional, intent(out) :: mtitle
 
     character  :: rhstype*3,type*3,key*8
+    character(len=72) :: mtitle_
     character indfmt*16,ptrfmt*16,rhsfmt*20,valfmt*20
     integer        :: indcrd,  ptrcrd, totcrd,&
          & valcrd, rhscrd, nrow, ncol, nnzero, neltvl, nrhs, nrhsix
-    integer                     :: ircode, i,nzr,infile,info
+    integer                     :: ircode, i,nzr,infile, info
     character(len=*), parameter :: fmt10='(a72,a8,/,5i14,/,a3,11x,4i14,/,2a16,2a20)'
     character(len=*), parameter :: fmt11='(a3,11x,2i14)'
     character(len=*), parameter :: fmt111='(1x,a8,1x,i8,1x,a10)'
@@ -648,25 +649,26 @@ contains
       endif
     endif
 
-    read (infile,fmt=fmt10) mtitle,key,totcrd,ptrcrd,indcrd,valcrd,rhscrd,&
+    read (infile,fmt=fmt10) mtitle_,key,totcrd,ptrcrd,indcrd,valcrd,rhscrd,&
          & type,nrow,ncol,nnzero,neltvl,ptrfmt,indfmt,valfmt,rhsfmt
     if (rhscrd > 0) read(infile,fmt=fmt11)rhstype,nrhs,nrhsix
 
+    call psb_sp_all(a,nnzero,nrow+1,nnzero,ircode)
+    if (ircode /= 0 ) then 
+      write(0,*) 'Memory allocation failed'
+      goto 993
+    end if
+    if (present(mtitle)) mtitle=mtitle_
 
-    if (psb_tolower(type(1:1)) == 'c') then 
+    a%m    = nrow
+    a%k    = ncol
+    a%fida = 'CSR'
+    a%descra='G'
+
+
+    if (psb_tolower(type(1:1)) == 'r') then 
       if (psb_tolower(type(2:2)) == 'u') then 
 
-        call psb_sp_all(a,nnzero,nrow+1,nnzero,ircode)
-        
-        if (ircode /= 0 ) then 
-          write(0,*) 'Memory allocation failed'
-          goto 993
-        end if
-        
-        a%m    = nrow
-        a%k    = ncol
-        a%fida = 'CSR'
-        a%descra='G'
 
         read (infile,fmt=ptrfmt) (a%ia2(i),i=1,nrow+1)
         read (infile,fmt=indfmt) (a%ia1(i),i=1,nnzero)
@@ -674,20 +676,20 @@ contains
 
         if (present(b)) then
           if ((psb_toupper(rhstype(1:1)) == 'F').and.(rhscrd > 0)) then 
-            call psb_ensure_size(nrow,b,info)
-            read (infile,fmt=rhsfmt) (b(i),i=1,nrow)
+            call psb_realloc(nrow,1,b,info)
+            read (infile,fmt=rhsfmt) (b(i,1),i=1,nrow)
           endif
         endif
         if (present(g)) then
           if ((psb_toupper(rhstype(2:2)) == 'G').and.(rhscrd > 0)) then 
-            call psb_ensure_size(nrow,g,info)
-            read (infile,fmt=rhsfmt) (g(i),i=1,nrow)
+            call psb_realloc(nrow,1,g,info)
+            read (infile,fmt=rhsfmt) (g(i,1),i=1,nrow)
           endif
         endif
         if (present(x)) then
           if ((psb_toupper(rhstype(3:3)) == 'X').and.(rhscrd > 0)) then 
-            call psb_ensure_size(nrow,x,info)
-            read (infile,fmt=rhsfmt) (x(i),i=1,nrow)
+            call psb_realloc(nrow,1,x,info)
+            read (infile,fmt=rhsfmt) (x(i,1),i=1,nrow)
           endif
         endif
 
@@ -695,53 +697,35 @@ contains
 
         ! we are generally working with non-symmetric matrices, so
         ! we de-symmetrize what we are about to read
-        
-        call psb_sp_all(nrow,ncol,a,nnzero,ircode)
-
-        if (ircode /= 0 ) then 
-          write(0,*) 'Memory allocation failed'
-          goto 993
-        end if
-        a%fida = 'CSR'
-        a%descra='G'
-        
 
         read (infile,fmt=ptrfmt) (a%ia2(i),i=1,nrow+1)
         read (infile,fmt=indfmt) (a%ia1(i),i=1,nnzero)
         if (valcrd > 0) read (infile,fmt=valfmt) (a%aspk(i),i=1,nnzero)
 
+
         if (present(b)) then
           if ((psb_toupper(rhstype(1:1)) == 'F').and.(rhscrd > 0)) then 
-            call psb_ensure_size(nrow,b,info)
-            read (infile,fmt=rhsfmt) (b(i),i=1,nrow)
+            call psb_realloc(nrow,1,b,info)
+            read (infile,fmt=rhsfmt) (b(i,1),i=1,nrow)
           endif
         endif
         if (present(g)) then
           if ((psb_toupper(rhstype(2:2)) == 'G').and.(rhscrd > 0)) then 
-            call psb_ensure_size(nrow,g,info)
-            read (infile,fmt=rhsfmt) (g(i),i=1,nrow)
+            call psb_realloc(nrow,1,g,info)
+            read (infile,fmt=rhsfmt) (g(i,1),i=1,nrow)
           endif
         endif
         if (present(x)) then
           if ((psb_toupper(rhstype(3:3)) == 'X').and.(rhscrd > 0)) then 
-            call psb_ensure_size(nrow,x,info)
-            read (infile,fmt=rhsfmt) (x(i),i=1,nrow)
+            call psb_realloc(nrow,1,x,info)
+            read (infile,fmt=rhsfmt) (x(i,1),i=1,nrow)
           endif
         endif
 
-        call psb_spcnv(a,ircode,afmt='coo')
-        if (ircode /= 0) then
-          write(0,*) 'ipcsr2coo ',ircode
-          goto 993  
-        end if
+        call psb_spcnv(a,ircode,afmt='csr')
+        if (ircode /= 0)   goto 993  
 
         call psb_sp_reall(a,2*nnzero,ircode)
-      
-        if (ircode /= 0 ) then 
-          write(0,*) 'Memory allocation failed'
-          goto 993
-        end if
-
         ! A is now in COO format
         nzr = nnzero
         do i=1,nnzero
@@ -754,78 +738,7 @@ contains
         end do
         a%infoa(psb_nnz_) = nzr
         call psb_spcnv(a,ircode,afmt='csr')
-        if (ircode /= 0) then
-          write(0,*) 'ipcoo2csr ',ircode
-          goto 993  
-        end if
-
-      else if (psb_tolower(type(2:2)) == 'h') then 
-
-        ! we are generally working with non-symmetric matrices, so
-        ! we de-symmetrize what we are about to read
-        
-
-        call psb_sp_all(nrow,ncol,a,2*nnzero,ircode)
-        
-        if (ircode /= 0 ) then 
-          write(0,*) 'Memory allocation failed'
-          goto 993
-        end if
-        a%fida = 'CSR'
-        a%descra='G'
-        
-
-        read (infile,fmt=ptrfmt) (a%ia2(i),i=1,nrow+1)
-        read (infile,fmt=indfmt) (a%ia1(i),i=1,nnzero)
-        if (valcrd > 0) read (infile,fmt=valfmt) (a%aspk(i),i=1,nnzero)
-
-        if (present(b)) then
-          if ((psb_toupper(rhstype(1:1)) == 'F').and.(rhscrd > 0)) then 
-            call psb_ensure_size(nrow,b,info)
-            read (infile,fmt=rhsfmt) (b(i),i=1,nrow)
-          endif
-        endif
-        if (present(g)) then
-          if ((psb_toupper(rhstype(2:2)) == 'G').and.(rhscrd > 0)) then 
-            call psb_ensure_size(nrow,g,info)
-            read (infile,fmt=rhsfmt) (g(i),i=1,nrow)
-          endif
-        endif
-        if (present(x)) then
-          if ((psb_toupper(rhstype(3:3)) == 'X').and.(rhscrd > 0)) then 
-            call psb_ensure_size(nrow,x,info)
-            read (infile,fmt=rhsfmt) (x(i),i=1,nrow)
-          endif
-        endif
-        
-        call psb_spcnv(a,ircode,afmt='coo')
-        if (ircode /= 0) then
-          write(0,*) 'ipcsr2coo ',ircode
-          goto 993  
-        end if
-        call psb_sp_reall(a,2*nnzero,ircode)
-      
-        if (ircode /= 0 ) then 
-          write(0,*) 'Memory allocation failed'
-          goto 993
-        end if
-
-        ! A is now in COO format
-        nzr = nnzero
-        do i=1,nnzero
-          if (a%ia1(i) /= a%ia2(i)) then 
-            nzr = nzr + 1
-            a%aspk(nzr) = conjg(a%aspk(i))
-            a%ia1(nzr) = a%ia2(i)
-            a%ia2(nzr) = a%ia1(i)
-          end if
-        end do
-        a%infoa(psb_nnz_) = nzr
-        call psb_spcnv(a,ircode,afmt='csr')
-        if (ircode /= 0) then
-          write(0,*) 'ipcoo2csr ',ircode
-          goto 993  
-        end if
+        if (ircode /= 0)   goto 993
 
       else
         write(0,*) 'read_matrix: matrix type not yet supported'
@@ -844,14 +757,12 @@ contains
     write(0,*) 'read_matrix: could not open file ',filename,' for input'
     return
 902 iret=902
-    write(0,*) 'ZHB_READ: Unexpected end of file '
+    write(0,*) 'HB_READ: Unexpected end of file '
     return
 993 iret=993
-    write(0,*) 'ZHB_READ: Memory allocation failure'
+    write(0,*) 'HB_READ: Memory allocation failure'
     return
   end subroutine chb_read
-
-
 
 
   subroutine chb_write(a,iret,iunit,filename,key,rhs,g,x,mtitle)
@@ -985,14 +896,15 @@ contains
     integer, intent(out)                   :: iret
     integer, optional, intent(in)          :: iunit
     character(len=*), optional, intent(in) :: filename
-    complex(psb_dpk_), optional, allocatable  :: b(:), g(:), x(:)
+    complex(psb_dpk_), optional, allocatable, intent(out)  :: b(:,:), g(:,:), x(:,:) 
     character(len=72), optional, intent(out) :: mtitle
 
     character  :: rhstype*3,type*3,key*8
+    character(len=72) :: mtitle_
     character indfmt*16,ptrfmt*16,rhsfmt*20,valfmt*20
     integer        :: indcrd,  ptrcrd, totcrd,&
          & valcrd, rhscrd, nrow, ncol, nnzero, neltvl, nrhs, nrhsix
-    integer                     :: ircode, i,nzr,infile,info
+    integer                     :: ircode, i,nzr,infile, info
     character(len=*), parameter :: fmt10='(a72,a8,/,5i14,/,a3,11x,4i14,/,2a16,2a20)'
     character(len=*), parameter :: fmt11='(a3,11x,2i14)'
     character(len=*), parameter :: fmt111='(1x,a8,1x,i8,1x,a10)'
@@ -1018,25 +930,26 @@ contains
       endif
     endif
 
-    read (infile,fmt=fmt10) mtitle,key,totcrd,ptrcrd,indcrd,valcrd,rhscrd,&
+    read (infile,fmt=fmt10) mtitle_,key,totcrd,ptrcrd,indcrd,valcrd,rhscrd,&
          & type,nrow,ncol,nnzero,neltvl,ptrfmt,indfmt,valfmt,rhsfmt
     if (rhscrd > 0) read(infile,fmt=fmt11)rhstype,nrhs,nrhsix
 
+    call psb_sp_all(a,nnzero,nrow+1,nnzero,ircode)
+    if (ircode /= 0 ) then 
+      write(0,*) 'Memory allocation failed'
+      goto 993
+    end if
+    if (present(mtitle)) mtitle=mtitle_
 
-    if (psb_tolower(type(1:1)) == 'c') then 
+    a%m    = nrow
+    a%k    = ncol
+    a%fida = 'CSR'
+    a%descra='G'
+
+
+    if (psb_tolower(type(1:1)) == 'r') then 
       if (psb_tolower(type(2:2)) == 'u') then 
 
-        call psb_sp_all(a,nnzero,nrow+1,nnzero,ircode)
-        
-        if (ircode /= 0 ) then 
-          write(0,*) 'Memory allocation failed'
-          goto 993
-        end if
-        
-        a%m    = nrow
-        a%k    = ncol
-        a%fida = 'CSR'
-        a%descra='G'
 
         read (infile,fmt=ptrfmt) (a%ia2(i),i=1,nrow+1)
         read (infile,fmt=indfmt) (a%ia1(i),i=1,nnzero)
@@ -1044,20 +957,20 @@ contains
 
         if (present(b)) then
           if ((psb_toupper(rhstype(1:1)) == 'F').and.(rhscrd > 0)) then 
-            call psb_ensure_size(nrow,b,info)
-            read (infile,fmt=rhsfmt) (b(i),i=1,nrow)
+            call psb_realloc(nrow,1,b,info)
+            read (infile,fmt=rhsfmt) (b(i,1),i=1,nrow)
           endif
         endif
         if (present(g)) then
           if ((psb_toupper(rhstype(2:2)) == 'G').and.(rhscrd > 0)) then 
-            call psb_ensure_size(nrow,g,info)
-            read (infile,fmt=rhsfmt) (g(i),i=1,nrow)
+            call psb_realloc(nrow,1,g,info)
+            read (infile,fmt=rhsfmt) (g(i,1),i=1,nrow)
           endif
         endif
         if (present(x)) then
           if ((psb_toupper(rhstype(3:3)) == 'X').and.(rhscrd > 0)) then 
-            call psb_ensure_size(nrow,x,info)
-            read (infile,fmt=rhsfmt) (x(i),i=1,nrow)
+            call psb_realloc(nrow,1,x,info)
+            read (infile,fmt=rhsfmt) (x(i,1),i=1,nrow)
           endif
         endif
 
@@ -1065,53 +978,35 @@ contains
 
         ! we are generally working with non-symmetric matrices, so
         ! we de-symmetrize what we are about to read
-        
-        call psb_sp_all(nrow,ncol,a,nnzero,ircode)
-
-        if (ircode /= 0 ) then 
-          write(0,*) 'Memory allocation failed'
-          goto 993
-        end if
-        a%fida = 'CSR'
-        a%descra='G'
-        
 
         read (infile,fmt=ptrfmt) (a%ia2(i),i=1,nrow+1)
         read (infile,fmt=indfmt) (a%ia1(i),i=1,nnzero)
         if (valcrd > 0) read (infile,fmt=valfmt) (a%aspk(i),i=1,nnzero)
 
+
         if (present(b)) then
           if ((psb_toupper(rhstype(1:1)) == 'F').and.(rhscrd > 0)) then 
-            call psb_ensure_size(nrow,b,info)
-            read (infile,fmt=rhsfmt) (b(i),i=1,nrow)
+            call psb_realloc(nrow,1,b,info)
+            read (infile,fmt=rhsfmt) (b(i,1),i=1,nrow)
           endif
         endif
         if (present(g)) then
           if ((psb_toupper(rhstype(2:2)) == 'G').and.(rhscrd > 0)) then 
-            call psb_ensure_size(nrow,g,info)
-            read (infile,fmt=rhsfmt) (g(i),i=1,nrow)
+            call psb_realloc(nrow,1,g,info)
+            read (infile,fmt=rhsfmt) (g(i,1),i=1,nrow)
           endif
         endif
         if (present(x)) then
           if ((psb_toupper(rhstype(3:3)) == 'X').and.(rhscrd > 0)) then 
-            call psb_ensure_size(nrow,x,info)
-            read (infile,fmt=rhsfmt) (x(i),i=1,nrow)
+            call psb_realloc(nrow,1,x,info)
+            read (infile,fmt=rhsfmt) (x(i,1),i=1,nrow)
           endif
         endif
 
-        call psb_spcnv(a,ircode,afmt='coo')
-        if (ircode /= 0) then
-          write(0,*) 'ipcsr2coo ',ircode
-          goto 993  
-        end if
+        call psb_spcnv(a,ircode,afmt='csr')
+        if (ircode /= 0)   goto 993  
 
         call psb_sp_reall(a,2*nnzero,ircode)
-      
-        if (ircode /= 0 ) then 
-          write(0,*) 'Memory allocation failed'
-          goto 993
-        end if
-
         ! A is now in COO format
         nzr = nnzero
         do i=1,nnzero
@@ -1124,77 +1019,7 @@ contains
         end do
         a%infoa(psb_nnz_) = nzr
         call psb_spcnv(a,ircode,afmt='csr')
-        if (ircode /= 0) then
-          write(0,*) 'ipcoo2csr ',ircode
-          goto 993  
-        end if
-
-      else if (psb_tolower(type(2:2)) == 'h') then 
-
-        ! we are generally working with non-symmetric matrices, so
-        ! we de-symmetrize what we are about to read
-        
-
-        call psb_sp_all(nrow,ncol,a,2*nnzero,ircode)
-        
-        if (ircode /= 0 ) then 
-          write(0,*) 'Memory allocation failed'
-          goto 993
-        end if
-        a%fida = 'CSR'
-        a%descra='G'
-        
-
-        read (infile,fmt=ptrfmt) (a%ia2(i),i=1,nrow+1)
-        read (infile,fmt=indfmt) (a%ia1(i),i=1,nnzero)
-        if (valcrd > 0) read (infile,fmt=valfmt) (a%aspk(i),i=1,nnzero)
-
-        if (present(b)) then
-          if ((psb_toupper(rhstype(1:1)) == 'F').and.(rhscrd > 0)) then 
-            call psb_ensure_size(nrow,b,info)
-            read (infile,fmt=rhsfmt) (b(i),i=1,nrow)
-          endif
-        endif
-        if (present(g)) then
-          if ((psb_toupper(rhstype(2:2)) == 'G').and.(rhscrd > 0)) then 
-            call psb_ensure_size(nrow,g,info)
-            read (infile,fmt=rhsfmt) (g(i),i=1,nrow)
-          endif
-        endif
-        if (present(x)) then
-          if ((psb_toupper(rhstype(3:3)) == 'X').and.(rhscrd > 0)) then 
-            call psb_ensure_size(nrow,x,info)
-            read (infile,fmt=rhsfmt) (x(i),i=1,nrow)
-          endif
-        endif
-        call psb_spcnv(a,ircode,afmt='coo')
-        if (ircode /= 0) then
-          write(0,*) 'ipcsr2coo ',ircode
-          goto 993  
-        end if
-        call psb_sp_reall(a,2*nnzero,ircode)
-      
-        if (ircode /= 0 ) then 
-          write(0,*) 'Memory allocation failed'
-          goto 993
-        end if
-
-        ! A is now in COO format
-        nzr = nnzero
-        do i=1,nnzero
-          if (a%ia1(i) /= a%ia2(i)) then 
-            nzr = nzr + 1
-            a%aspk(nzr) = conjg(a%aspk(i))
-            a%ia1(nzr) = a%ia2(i)
-            a%ia2(nzr) = a%ia1(i)
-          end if
-        end do
-        a%infoa(psb_nnz_) = nzr
-        call psb_spcnv(a,ircode,afmt='csr')
-        if (ircode /= 0) then
-          write(0,*) 'ipcoo2csr ',ircode
-          goto 993  
-        end if
+        if (ircode /= 0)   goto 993
 
       else
         write(0,*) 'read_matrix: matrix type not yet supported'
@@ -1213,14 +1038,12 @@ contains
     write(0,*) 'read_matrix: could not open file ',filename,' for input'
     return
 902 iret=902
-    write(0,*) 'ZHB_READ: Unexpected end of file '
+    write(0,*) 'HB_READ: Unexpected end of file '
     return
 993 iret=993
-    write(0,*) 'ZHB_READ: Memory allocation failure'
+    write(0,*) 'HB_READ: Memory allocation failure'
     return
   end subroutine zhb_read
-
-
 
 
   subroutine zhb_write(a,iret,iunit,filename,key,rhs,g,x,mtitle)

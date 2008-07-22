@@ -64,6 +64,8 @@ program df_sample
 
   character(len=5)   :: afmt
   character(len=20)  :: name
+  character(len=2)   :: filefmt
+  integer, parameter :: iunit=12
   integer   :: iparm(20)
 
   ! other variables
@@ -92,7 +94,7 @@ program df_sample
   !
   !  get parameters
   !
-  call get_parms(ictxt,mtrx_file,rhs_file,kmethd,ptype,&
+  call get_parms(ictxt,mtrx_file,rhs_file,filefmt,kmethd,ptype,&
        & ipart,afmt,istopc,itmax,itrace,irst,eps)
 
   call psb_barrier(ictxt)
@@ -101,16 +103,35 @@ program df_sample
   nrhs = 1
 
   if (iam==psb_root_) then
-    call read_mat(mtrx_file, aux_a, ictxt)
-
+    select case(psb_toupper(filefmt)) 
+    case('MM') 
+      ! For Matrix Market we have an input file for the matrix
+      ! and an (optional) second file for the RHS. 
+      call mm_mat_read(aux_a,info,iunit=iunit,filename=mtrx_file)
+      if (info == 0) then 
+        if (rhs_file /= 'NONE') then
+          call mm_vet_read(aux_b,info,iunit=iunit,filename=rhs_file)
+        end if
+      end if
+      
+    case ('HB')
+      ! For Harwell-Boeing we have a single file which may or may not
+      ! contain an RHS.
+      call hb_read(aux_a,info,iunit=iunit,b=aux_b,filename=mtrx_file)
+      
+    case default
+      info = -1 
+      write(0,*) 'Wrong choice for fileformat ', filefmt
+    end select
+    if (info /= 0) then
+      write(0,*) 'Error while reading input matrix '
+      call psb_abort(ictxt)
+    end if
+    
     m_problem = aux_a%m
     call psb_bcast(ictxt,m_problem)
-
-    if(rhs_file /= 'NONE') then
-      !  reading an rhs
-      call read_rhs(rhs_file,aux_b,info,ictxt)
-    end if
-
+    
+    ! At this point aux_b may still be unallocated
     if (psb_size(aux_b,dim=1)==m_problem) then
       ! if any rhs were present, broadcast the first one
       write(0,'("Ok, got an rhs ")')
@@ -123,14 +144,16 @@ program df_sample
         call psb_errpush(4000,name)
         goto 9999
       endif
-
+      
       b_col_glob => aux_b(:,1)
       do i=1, m_problem
         b_col_glob(i) = 1.d0
       enddo
     endif
     call psb_bcast(ictxt,b_col_glob(1:m_problem))
+
   else
+
     call psb_bcast(ictxt,m_problem)
     call psb_realloc(m_problem,1,aux_b,ircode)
     if (ircode /= 0) then
@@ -139,6 +162,7 @@ program df_sample
     endif
     b_col_glob =>aux_b(:,1)
     call psb_bcast(ictxt,b_col_glob(1:m_problem)) 
+
   end if
 
   ! switch over different partition types

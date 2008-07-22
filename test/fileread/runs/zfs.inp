@@ -1,7 +1,8 @@
 11                  Number of inputs
-kim1.mtx    aft02.mtx     qc2534.mtx   young1c.mtx  waveguide3D.mtx          This (and others) from: http://math.nist.gov/MatrixMarket/  or 
-NONE                     http://www.cise.ufl.edu/research/sparse/matrices/index.html
-CGS                  Iterative method: BiCGSTAB CGS RGMRES BiCGSTABL
+young1c.mtx         This (and others) from: http://math.nist.gov/MatrixMarket/  or 
+NONE                    http://www.cise.ufl.edu/research/sparse/matrices/index.html
+MM                  File format: MM: Matrix Market  HB: Harwell-Boeing.
+BICGSTAB            Iterative method: BiCGSTAB CGS RGMRES BiCGSTABL BICG CG
 BJAC                Preconditioner NONE  DIAG  BJAC  
 CSR                 Storage format CSR COO JAD 
 0                   IPART: Partition method 0: BLK   2: graph (with Metis) 

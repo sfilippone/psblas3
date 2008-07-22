@@ -1343,9 +1343,9 @@ Optional Packages:
                           to CFLAGS
   --with-fflags           additional FFLAGS flags to be added: will prepend
                           to FFLAGS
-  --with-libs             List additional libraries here. For example,
-                          --with-libs=-lsuperlu or
-                          --with-libs=/path/libsuperlu.a
+  --with-libs             List additional link flags here. For example,
+                          --with-libs=-lspecial_system_lib or
+                          --with-libs=-L/path/to/libs
   --with-clibs            additional CLIBS flags to be added: will prepend
                           to CLIBS
   --with-flibs            additional FLIBS flags to be added: will prepend

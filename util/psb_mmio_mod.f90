@@ -44,19 +44,37 @@ module psb_mmio_mod
 
 contains
 
-  subroutine mm_svet_read(filename, b, info)   
+  subroutine mm_svet_read(b, info, iunit, filename)   
     use psb_base_mod
     implicit none
-    character                             :: filename*(*)
     real(psb_spk_), allocatable, intent(out)  :: b(:,:)
-    integer, intent(out) :: info 
-    integer, parameter   :: infile = 2
-    integer              :: nrow, ncol, i,root, np,  me,  ircode, j
+    integer, intent(out)        :: info
+    integer, optional, intent(in)          :: iunit
+    character(len=*), optional, intent(in) :: filename
+    integer              :: nrow, ncol, i,root, np,  me,  ircode, j,infile
     character            :: mmheader*15, fmt*15, object*10, type*10, sym*15,&
          & line*1024
 
     info = 0
-    open(infile,file=filename, status='old', err=901, action="read")
+    if (present(filename)) then
+      if (filename=='-') then 
+        infile=5
+      else
+        if (present(iunit)) then 
+          infile=iunit
+        else
+          infile=99
+        endif
+        open(infile,file=filename, status='OLD', err=901, action='READ')
+      endif
+    else 
+      if (present(iunit)) then 
+        infile=iunit
+      else
+        infile=5
+      endif
+    endif
+
     read(infile,fmt=*, end=902) mmheader, object, fmt, type, sym
     
     if ( (object /= 'matrix').or.(fmt /= 'array')) then
@@ -78,6 +96,8 @@ contains
       read(infile,fmt=*,end=902) ((b(i,j), i=1,nrow),j=1,ncol)
       
     end if      ! read right hand sides
+
+    if (infile/=5) close(infile)
 
     return 
     ! open failed
@@ -96,19 +116,37 @@ contains
   end subroutine mm_svet_read
 
 
-  subroutine mm_dvet_read(filename, b, info)   
+  subroutine mm_dvet_read(b, info, iunit, filename)   
     use psb_base_mod
     implicit none
-    character                             :: filename*(*)
     real(psb_dpk_), allocatable, intent(out)  :: b(:,:)
-    integer, intent(out) :: info 
-    integer, parameter   :: infile = 2
-    integer              :: nrow, ncol, i,root, np,  me,  ircode, j
+    integer, intent(out)        :: info
+    integer, optional, intent(in)          :: iunit
+    character(len=*), optional, intent(in) :: filename
+    integer              :: nrow, ncol, i,root, np,  me,  ircode, j, infile
     character            :: mmheader*15, fmt*15, object*10, type*10, sym*15,&
          & line*1024
 
     info = 0
-    open(infile,file=filename, status='old', err=901, action="read")
+    if (present(filename)) then
+      if (filename=='-') then 
+        infile=5
+      else
+        if (present(iunit)) then 
+          infile=iunit
+        else
+          infile=99
+        endif
+        open(infile,file=filename, status='OLD', err=901, action='READ')
+      endif
+    else 
+      if (present(iunit)) then 
+        infile=iunit
+      else
+        infile=5
+      endif
+    endif
+
     read(infile,fmt=*, end=902) mmheader, object, fmt, type, sym
     
     if ( (object /= 'matrix').or.(fmt /= 'array')) then
@@ -130,6 +168,7 @@ contains
       read(infile,fmt=*,end=902) ((b(i,j), i=1,nrow),j=1,ncol)
       
     end if      ! read right hand sides
+    if (infile/=5) close(infile)
 
     return 
     ! open failed
@@ -148,20 +187,38 @@ contains
   end subroutine mm_dvet_read
 
 
-  subroutine mm_cvet_read(filename, b, info)   
+  subroutine mm_cvet_read(b, info, iunit, filename)   
     use psb_base_mod
     implicit none
-    character                             :: filename*(*)
     complex(psb_spk_), allocatable, intent(out)  :: b(:,:)
-    integer, intent(out) :: info 
-    integer, parameter   :: infile = 2
-    integer              :: nrow, ncol, i,root, np,  me,  ircode, j
+    integer, intent(out)        :: info
+    integer, optional, intent(in)          :: iunit
+    character(len=*), optional, intent(in) :: filename
+    integer              :: nrow, ncol, i,root, np,  me,  ircode, j,infile
     real(psb_spk_)       :: bre, bim 
     character            :: mmheader*15, fmt*15, object*10, type*10, sym*15,&
          & line*1024
 
     info = 0
-    open(infile,file=filename, status='old', err=901, action="read")
+    if (present(filename)) then
+      if (filename=='-') then 
+        infile=5
+      else
+        if (present(iunit)) then 
+          infile=iunit
+        else
+          infile=99
+        endif
+        open(infile,file=filename, status='OLD', err=901, action='READ')
+      endif
+    else 
+      if (present(iunit)) then 
+        infile=iunit
+      else
+        infile=5
+      endif
+    endif
+
     read(infile,fmt=*, end=902) mmheader, object, fmt, type, sym
     
     if ( (object /= 'matrix').or.(fmt /= 'array')) then
@@ -188,6 +245,7 @@ contains
       end do
       
     end if      ! read right hand sides
+    if (infile/=5) close(infile)
 
     return 
     ! open failed
@@ -206,20 +264,38 @@ contains
   end subroutine mm_cvet_read
 
 
-  subroutine mm_zvet_read(filename, b, info)   
+  subroutine mm_zvet_read(b, info, iunit, filename)   
     use psb_base_mod
     implicit none
-    character                             :: filename*(*)
     complex(psb_dpk_), allocatable, intent(out)  :: b(:,:)
-    integer, intent(out) :: info 
-    integer, parameter   :: infile = 2
-    integer              :: nrow, ncol, i,root, np,  me,  ircode, j
+    integer, intent(out)        :: info
+    integer, optional, intent(in)          :: iunit
+    character(len=*), optional, intent(in) :: filename
+    integer              :: nrow, ncol, i,root, np,  me,  ircode, j,infile
     real(psb_dpk_)       :: bre, bim 
     character            :: mmheader*15, fmt*15, object*10, type*10, sym*15,&
          & line*1024
 
     info = 0
-    open(infile,file=filename, status='old', err=901, action="read")
+    if (present(filename)) then
+      if (filename=='-') then 
+        infile=5
+      else
+        if (present(iunit)) then 
+          infile=iunit
+        else
+          infile=99
+        endif
+        open(infile,file=filename, status='OLD', err=901, action='READ')
+      endif
+    else 
+      if (present(iunit)) then 
+        infile=iunit
+      else
+        infile=5
+      endif
+    endif
+
     read(infile,fmt=*, end=902) mmheader, object, fmt, type, sym
     
     if ( (object /= 'matrix').or.(fmt /= 'array')) then
@@ -246,6 +322,7 @@ contains
       end do
       
     end if      ! read right hand sides
+    if (infile/=5) close(infile)
 
     return 
     ! open failed
@@ -265,11 +342,11 @@ contains
 
 
 
-  subroutine smm_mat_read(a, iret, iunit, filename)   
+  subroutine smm_mat_read(a, info, iunit, filename)   
     use psb_base_mod
     implicit none
     type(psb_sspmat_type), intent(out)  :: a
-    integer, intent(out)        :: iret
+    integer, intent(out)        :: info
     integer, optional, intent(in)          :: iunit
     character(len=*), optional, intent(in) :: filename
     character      :: mmheader*15, fmt*15, object*10, type*10, sym*15
@@ -277,7 +354,7 @@ contains
     integer        :: nrow, ncol, nnzero
     integer        :: ircode, i,nzr,infile
 
-    iret = 0
+    info = 0
 
     if (present(filename)) then
       if (filename=='-') then 
@@ -302,7 +379,7 @@ contains
 
     if ( (psb_tolower(object) /= 'matrix').or.(psb_tolower(fmt)/='coordinate')) then
       write(0,*) 'READ_MATRIX: input file type not yet supported'
-      iret=909
+      info=909
       return
     end if
 
@@ -348,36 +425,36 @@ contains
 
     else
       write(0,*) 'read_matrix: matrix type not yet supported'
-      iret=904
+      info=904
     end if
     if (infile/=5) close(infile)
     return 
 
     ! open failed
-901 iret=901
+901 info=901
     write(0,*) 'read_matrix: could not open file ',filename,' for input'
     return
-902 iret=902
+902 info=902
     write(0,*) 'READ_MATRIX: Unexpected end of file '
     return
-993 iret=993
+993 info=993
     write(0,*) 'READ_MATRIX: Memory allocation failure'
     return
   end subroutine smm_mat_read
 
 
-  subroutine smm_mat_write(a,mtitle,iret,iunit,filename)
+  subroutine smm_mat_write(a,mtitle,info,iunit,filename)
     use psb_base_mod
     implicit none
     type(psb_sspmat_type), intent(in)  :: a
-    integer, intent(out)        :: iret
+    integer, intent(out)        :: info
     character(len=*), intent(in) :: mtitle
     integer, optional, intent(in)          :: iunit
     character(len=*), optional, intent(in) :: filename
     integer                     :: iout
 
 
-    iret = 0
+    info = 0
 
     if (present(filename)) then 
       if (filename=='-') then 
@@ -406,16 +483,16 @@ contains
     return
 
 901 continue 
-    iret=901
+    info=901
     write(0,*) 'Error while opening ',filename
     return
   end subroutine smm_mat_write
 
-  subroutine dmm_mat_read(a, iret, iunit, filename)   
+  subroutine dmm_mat_read(a, info, iunit, filename)   
     use psb_base_mod
     implicit none
     type(psb_dspmat_type), intent(out)  :: a
-    integer, intent(out)        :: iret
+    integer, intent(out)        :: info
     integer, optional, intent(in)          :: iunit
     character(len=*), optional, intent(in) :: filename
     character      :: mmheader*15, fmt*15, object*10, type*10, sym*15
@@ -423,7 +500,7 @@ contains
     integer        :: nrow, ncol, nnzero
     integer        :: ircode, i,nzr,infile
 
-    iret = 0
+    info = 0
 
     if (present(filename)) then
       if (filename=='-') then 
@@ -448,7 +525,7 @@ contains
 
     if ( (psb_tolower(object) /= 'matrix').or.(psb_tolower(fmt)/='coordinate')) then
       write(0,*) 'READ_MATRIX: input file type not yet supported'
-      iret=909
+      info=909
       return
     end if
 
@@ -494,36 +571,36 @@ contains
 
     else
       write(0,*) 'read_matrix: matrix type not yet supported'
-      iret=904
+      info=904
     end if
     if (infile/=5) close(infile)
     return 
 
     ! open failed
-901 iret=901
+901 info=901
     write(0,*) 'read_matrix: could not open file ',filename,' for input'
     return
-902 iret=902
+902 info=902
     write(0,*) 'READ_MATRIX: Unexpected end of file '
     return
-993 iret=993
+993 info=993
     write(0,*) 'READ_MATRIX: Memory allocation failure'
     return
   end subroutine dmm_mat_read
 
 
-  subroutine dmm_mat_write(a,mtitle,iret,iunit,filename)
+  subroutine dmm_mat_write(a,mtitle,info,iunit,filename)
     use psb_base_mod
     implicit none
     type(psb_dspmat_type), intent(in)  :: a
-    integer, intent(out)        :: iret
+    integer, intent(out)        :: info
     character(len=*), intent(in) :: mtitle
     integer, optional, intent(in)          :: iunit
     character(len=*), optional, intent(in) :: filename
     integer                     :: iout
 
 
-    iret = 0
+    info = 0
 
     if (present(filename)) then 
       if (filename=='-') then 
@@ -552,16 +629,16 @@ contains
     return
 
 901 continue 
-    iret=901
+    info=901
     write(0,*) 'Error while opening ',filename
     return
   end subroutine dmm_mat_write
 
-  subroutine cmm_mat_read(a, iret, iunit, filename)   
+  subroutine cmm_mat_read(a, info, iunit, filename)   
     use psb_base_mod
     implicit none
     type(psb_cspmat_type), intent(out)  :: a
-    integer, intent(out)        :: iret
+    integer, intent(out)        :: info
     integer, optional, intent(in)          :: iunit
     character(len=*), optional, intent(in) :: filename
     character      :: mmheader*15, fmt*15, object*10, type*10, sym*15
@@ -570,7 +647,7 @@ contains
     integer        :: ircode, i,nzr,infile
     real(psb_spk_)   :: are, aim
 
-    iret = 0
+    info = 0
 
     if (present(filename)) then
       if (filename=='-') then 
@@ -595,7 +672,7 @@ contains
 
     if ( (psb_tolower(object) /= 'matrix').or.(psb_tolower(fmt)/='coordinate')) then
       write(0,*) 'READ_MATRIX: input file type not yet supported'
-      iret=909
+      info=909
       return
     end if
 
@@ -668,37 +745,37 @@ contains
 
     else
       write(0,*) 'read_matrix: matrix type not yet supported'
-      iret=904
+      info=904
     end if
     if (infile/=5) close(infile)
     return 
 
     ! open failed
-901 iret=901
+901 info=901
     write(0,*) 'read_matrix: could not open file ',filename,' for input'
     return
-902 iret=902
+902 info=902
     write(0,*) 'READ_MATRIX: Unexpected end of file '
     return
-993 iret=993
+993 info=993
     write(0,*) 'READ_MATRIX: Memory allocation failure'
     return
   end subroutine cmm_mat_read
 
 
 
-  subroutine cmm_mat_write(a,mtitle,iret,iunit,filename)
+  subroutine cmm_mat_write(a,mtitle,info,iunit,filename)
     use psb_base_mod
     implicit none
     type(psb_cspmat_type), intent(in)  :: a
-    integer, intent(out)        :: iret
+    integer, intent(out)        :: info
     character(len=*), intent(in) :: mtitle
     integer, optional, intent(in)          :: iunit
     character(len=*), optional, intent(in) :: filename
     integer                     :: iout
 
 
-    iret = 0
+    info = 0
 
     if (present(filename)) then 
       if (filename=='-') then 
@@ -727,16 +804,16 @@ contains
     return
 
 901 continue 
-    iret=901
+    info=901
     write(0,*) 'Error while opening ',filename
     return
   end subroutine cmm_mat_write
 
-  subroutine zmm_mat_read(a, iret, iunit, filename)   
+  subroutine zmm_mat_read(a, info, iunit, filename)   
     use psb_base_mod
     implicit none
     type(psb_zspmat_type), intent(out)  :: a
-    integer, intent(out)        :: iret
+    integer, intent(out)        :: info
     integer, optional, intent(in)          :: iunit
     character(len=*), optional, intent(in) :: filename
     character      :: mmheader*15, fmt*15, object*10, type*10, sym*15
@@ -745,7 +822,7 @@ contains
     integer        :: ircode, i,nzr,infile
     real(psb_dpk_)   :: are, aim
 
-    iret = 0
+    info = 0
 
     if (present(filename)) then
       if (filename=='-') then 
@@ -770,7 +847,7 @@ contains
 
     if ( (psb_tolower(object) /= 'matrix').or.(psb_tolower(fmt)/='coordinate')) then
       write(0,*) 'READ_MATRIX: input file type not yet supported'
-      iret=909
+      info=909
       return
     end if
 
@@ -843,37 +920,37 @@ contains
 
     else
       write(0,*) 'read_matrix: matrix type not yet supported'
-      iret=904
+      info=904
     end if
     if (infile/=5) close(infile)
     return 
 
     ! open failed
-901 iret=901
+901 info=901
     write(0,*) 'read_matrix: could not open file ',filename,' for input'
     return
-902 iret=902
+902 info=902
     write(0,*) 'READ_MATRIX: Unexpected end of file '
     return
-993 iret=993
+993 info=993
     write(0,*) 'READ_MATRIX: Memory allocation failure'
     return
   end subroutine zmm_mat_read
 
 
 
-  subroutine zmm_mat_write(a,mtitle,iret,iunit,filename)
+  subroutine zmm_mat_write(a,mtitle,info,iunit,filename)
     use psb_base_mod
     implicit none
     type(psb_zspmat_type), intent(in)  :: a
-    integer, intent(out)        :: iret
+    integer, intent(out)        :: info
     character(len=*), intent(in) :: mtitle
     integer, optional, intent(in)          :: iunit
     character(len=*), optional, intent(in) :: filename
     integer                     :: iout
 
 
-    iret = 0
+    info = 0
 
     if (present(filename)) then 
       if (filename=='-') then 
@@ -902,7 +979,7 @@ contains
     return
 
 901 continue 
-    iret=901
+    info=901
     write(0,*) 'Error while opening ',filename
     return
   end subroutine zmm_mat_write

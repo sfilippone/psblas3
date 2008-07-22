@@ -36,7 +36,6 @@ module psb_util_mod
   use psb_metispart_mod
   use psb_hbio_mod
   use psb_mmio_mod
-  use psb_read_mat_mod
   use psb_mat_dist_mod
 end module psb_util_mod
 

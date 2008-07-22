@@ -272,8 +272,8 @@ AC_DEFUN([PAC_ARG_WITH_LIBS],
 AC_MSG_CHECKING([whether additional libraries are needed])
 AC_ARG_WITH(libs,
 AC_HELP_STRING([--with-libs], 
-[List additional libraries here.  For example, --with-libs=-lsuperlu
-or --with-libs=/path/libsuperlu.a]),
+[List additional link flags  here.  For example, --with-libs=-lspecial_system_lib
+or --with-libs=-L/path/to/libs]),
 [
 LIBS="${withval} ${LIBS}"
 AC_MSG_RESULT([LIBS = ${LIBS}])
