@@ -1,0 +1,122 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+
+<!--Converted with LaTeX2HTML 2002-2-1 (1.71)
+original version by:  Nikos Drakos, CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>psb_errpush -- Pushes an error code onto the error stack</TITLE>
+<META NAME="description" CONTENT="psb_errpush -- Pushes an error code onto the error stack">
+<META NAME="keywords" CONTENT="userhtml">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META NAME="Generator" CONTENT="LaTeX2HTML v2002-2-1">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+
+<LINK REL="STYLESHEET" HREF="userhtml.css">
+
+<LINK REL="next" HREF="node89.html">
+<LINK REL="previous" HREF="node87.html">
+<LINK REL="up" HREF="node87.html">
+<LINK REL="next" HREF="node89.html">
+</HEAD>
+
+<BODY >
+<!--Navigation Panel-->
+<A NAME="tex2html1284"
+  HREF="node89.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next"
+ SRC="file:/usr/share/latex2html/icons/next.png"></A> 
+<A NAME="tex2html1280"
+  HREF="node87.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up"
+ SRC="file:/usr/share/latex2html/icons/up.png"></A> 
+<A NAME="tex2html1274"
+  HREF="node87.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous"
+ SRC="file:/usr/share/latex2html/icons/prev.png"></A> 
+<A NAME="tex2html1282"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents"
+ SRC="file:/usr/share/latex2html/icons/contents.png"></A>  
+<BR>
+<B> Next:</B> <A NAME="tex2html1285"
+  HREF="node89.html">psb_error   Prints</A>
+<B> Up:</B> <A NAME="tex2html1281"
+  HREF="node87.html">Error handling</A>
+<B> Previous:</B> <A NAME="tex2html1275"
+  HREF="node87.html">Error handling</A>
+ &nbsp; <B>  <A NAME="tex2html1283"
+  HREF="node1.html">Contents</A></B> 
+<BR>
+<BR>
+<!--End of Navigation Panel-->
+
+<H2><A NAME="SECTION00091000000000000000">
+psb_errpush -- Pushes an error code onto the error
+  stack</A>
+</H2>
+
+<P>
+<PRE>
+call psb_errpush(err_c, r_name, i_err, a_err)
+</PRE>
+
+<P>
+<DL>
+<DT><STRONG>Type:</STRONG></DT>
+<DD>Asynchronous.
+</DD>
+<DT><STRONG><B>On Entry</B></STRONG></DT>
+<DD>
+</DD>
+<DT><STRONG>err_c</STRONG></DT>
+<DD>the error code
+<BR>
+Scope: <B>local</B> 
+<BR>
+Type: <B>required</B>
+<BR>
+Intent: <B>in</B>.
+<BR>
+Specified as: an integer.
+</DD>
+<DT><STRONG>r_name</STRONG></DT>
+<DD>the soutine where the error has been caught.
+<BR>
+Scope: <B>local</B> 
+<BR>
+Type: <B>required</B>
+<BR>
+Intent: <B>in</B>.
+<BR>
+Specified as: a string.
+<BR></DD>
+<DT><STRONG>i_err</STRONG></DT>
+<DD>addional info for error code
+<BR>
+Scope: <B>local</B> 
+<BR>
+Type: <B>optional</B>
+<BR>
+Specified as: an integer array
+<BR></DD>
+<DT><STRONG>a_err</STRONG></DT>
+<DD>addional info for error code
+<BR>
+Scope: <B>local</B> 
+<BR>
+Type: <B>optional</B>
+<BR>
+Specified as: a string.
+<BR></DD>
+</DL>
+
+<P>
+<BR><HR>
+
+</BODY>
+</HTML>

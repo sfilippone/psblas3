@@ -1,0 +1,205 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+
+<!--Converted with LaTeX2HTML 2002-2-1 (1.71)
+original version by:  Nikos Drakos, CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>psb_spasb -- Sparse matrix assembly routine</TITLE>
+<META NAME="description" CONTENT="psb_spasb -- Sparse matrix assembly routine">
+<META NAME="keywords" CONTENT="userhtml">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META NAME="Generator" CONTENT="LaTeX2HTML v2002-2-1">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+
+<LINK REL="STYLESHEET" HREF="userhtml.css">
+
+<LINK REL="next" HREF="node52.html">
+<LINK REL="previous" HREF="node50.html">
+<LINK REL="up" HREF="node42.html">
+<LINK REL="next" HREF="node52.html">
+</HEAD>
+
+<BODY >
+<!--Navigation Panel-->
+<A NAME="tex2html824"
+  HREF="node52.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next"
+ SRC="file:/usr/share/latex2html/icons/next.png"></A> 
+<A NAME="tex2html820"
+  HREF="node42.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up"
+ SRC="file:/usr/share/latex2html/icons/up.png"></A> 
+<A NAME="tex2html814"
+  HREF="node50.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous"
+ SRC="file:/usr/share/latex2html/icons/prev.png"></A> 
+<A NAME="tex2html822"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents"
+ SRC="file:/usr/share/latex2html/icons/contents.png"></A>  
+<BR>
+<B> Next:</B> <A NAME="tex2html825"
+  HREF="node52.html">psb_spfree   Frees</A>
+<B> Up:</B> <A NAME="tex2html821"
+  HREF="node42.html">Data management routines</A>
+<B> Previous:</B> <A NAME="tex2html815"
+  HREF="node50.html">psb_spins   Insert</A>
+ &nbsp; <B>  <A NAME="tex2html823"
+  HREF="node1.html">Contents</A></B> 
+<BR>
+<BR>
+<!--End of Navigation Panel-->
+
+<H2><A NAME="SECTION00079000000000000000">
+psb_spasb -- Sparse matrix assembly routine</A>
+</H2>
+
+<P>
+<PRE>
+call psb_spasb(a, desc_a, info, afmt, upd, dupl)
+</PRE>
+
+<P>
+<DL>
+<DT><STRONG>Type:</STRONG></DT>
+<DD>Synchronous.
+</DD>
+<DT><STRONG><B>On Entry</B></STRONG></DT>
+<DD>
+</DD>
+<DT><STRONG>desc_a</STRONG></DT>
+<DD>the communication descriptor.
+<BR>
+Scope:<B>local</B>.
+<BR>
+Type:<B>required</B>.
+<BR>
+Intent: <B>in</B>.
+<BR>
+Specified as: a structured data of type descdata<TT>psb_desc_type</TT>.
+</DD>
+<DT><STRONG>afmt</STRONG></DT>
+<DD>the storage format for the sparse matrix.
+<BR>
+Scope: <B>global</B>.
+<BR>
+Type: <B>optional</B>.
+<BR>
+Intent: <B>in</B>.
+<BR>
+Specified as: an array of characters. Defalt:  'CSR'.
+</DD>
+<DT><STRONG>upd</STRONG></DT>
+<DD>Provide for updates to the matrix coefficients.
+<BR>
+Scope: <B>global</B>.
+<BR>
+Type: <B>optional</B>.
+<BR>
+Intent: <B>in</B>.
+<BR>
+Specified as: integer, possible values: <code>psb_upd_srch_</code>, <code>psb_upd_perm_</code>
+</DD>
+<DT><STRONG>dupl</STRONG></DT>
+<DD>How to handle duplicate coefficients.
+<BR>
+Scope: <B>global</B>.
+<BR>
+Type: <B>optional</B>.
+<BR>
+Intent: <B>in</B>.
+<BR>
+Specified as: integer, possible values: <code>psb_dupl_ovwrt_</code>,
+<code>psb_dupl_add_</code>, <code>psb_dupl_err_</code>.
+</DD>
+</DL>
+
+<P>
+<DL>
+<DT><STRONG><B>On Return</B></STRONG></DT>
+<DD>
+</DD>
+<DT><STRONG>a</STRONG></DT>
+<DD>the matrix to be assembled.
+<BR>
+Scope:<B>local</B>
+<BR>
+Type:<B>required</B>
+<BR>
+Intent: <B>inout</B>.
+<BR>
+Specified as: a structured data of type spdata<TT>psb_spmat_type</TT>.
+</DD>
+<DT><STRONG>info</STRONG></DT>
+<DD>Error code.
+<BR>
+Scope: <B>local</B> 
+<BR>
+Type: <B>required</B> 
+<BR>
+Intent: <B>out</B>.
+<BR>
+An integer value; 0 means no error has been detected. 
+</DD>
+</DL>
+
+<P>
+<FONT SIZE="+1"><B>Notes</B></FONT>
+
+<OL>
+<LI>On entry to this routine the descriptor must  be in  the
+  assembled state, i.e. <code>psb_cdasb</code> must already have been called.
+</LI>
+<LI>The sparse matrix may be in either the build or update state;
+</LI>
+<LI>Duplicate entries are detected and handled in both build and
+  update state, with the exception of the error action that is only
+  taken in the build state, i.e. on the first assembly; 
+</LI>
+<LI>If the update choice is <code>psb_upd_perm_</code>, then subsequent
+  calls to <code>psb_spins</code> to update the matrix must be arranged in
+  such a way as to produce exactly the same sequence of coefficient
+  values as encountered at the first assembly; 
+</LI>
+<LI>On exit from this routine the matrix is in the assembled state,
+  and thus is suitable for the computational routines. 
+</LI>
+</OL>
+
+<P>
+<HR>
+<!--Navigation Panel-->
+<A NAME="tex2html824"
+  HREF="node52.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next"
+ SRC="file:/usr/share/latex2html/icons/next.png"></A> 
+<A NAME="tex2html820"
+  HREF="node42.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up"
+ SRC="file:/usr/share/latex2html/icons/up.png"></A> 
+<A NAME="tex2html814"
+  HREF="node50.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous"
+ SRC="file:/usr/share/latex2html/icons/prev.png"></A> 
+<A NAME="tex2html822"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents"
+ SRC="file:/usr/share/latex2html/icons/contents.png"></A>  
+<BR>
+<B> Next:</B> <A NAME="tex2html825"
+  HREF="node52.html">psb_spfree   Frees</A>
+<B> Up:</B> <A NAME="tex2html821"
+  HREF="node42.html">Data management routines</A>
+<B> Previous:</B> <A NAME="tex2html815"
+  HREF="node50.html">psb_spins   Insert</A>
+ &nbsp; <B>  <A NAME="tex2html823"
+  HREF="node1.html">Contents</A></B> 
+<!--End of Navigation Panel-->
+
+</BODY>
+</HTML>

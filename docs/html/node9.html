@@ -1,0 +1,257 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+
+<!--Converted with LaTeX2HTML 2002-2-1 (1.71)
+original version by:  Nikos Drakos, CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>Descriptor data structure</TITLE>
+<META NAME="description" CONTENT="Descriptor data structure">
+<META NAME="keywords" CONTENT="userhtml">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META NAME="Generator" CONTENT="LaTeX2HTML v2002-2-1">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+
+<LINK REL="STYLESHEET" HREF="userhtml.css">
+
+<LINK REL="next" HREF="node11.html">
+<LINK REL="previous" HREF="node8.html">
+<LINK REL="up" HREF="node8.html">
+<LINK REL="next" HREF="node10.html">
+</HEAD>
+
+<BODY >
+<!--Navigation Panel-->
+<A NAME="tex2html281"
+  HREF="node10.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next"
+ SRC="file:/usr/share/latex2html/icons/next.png"></A> 
+<A NAME="tex2html277"
+  HREF="node8.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up"
+ SRC="file:/usr/share/latex2html/icons/up.png"></A> 
+<A NAME="tex2html271"
+  HREF="node8.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous"
+ SRC="file:/usr/share/latex2html/icons/prev.png"></A> 
+<A NAME="tex2html279"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents"
+ SRC="file:/usr/share/latex2html/icons/contents.png"></A>  
+<BR>
+<B> Next:</B> <A NAME="tex2html282"
+  HREF="node10.html">Named Constants</A>
+<B> Up:</B> <A NAME="tex2html278"
+  HREF="node8.html">Data Structures</A>
+<B> Previous:</B> <A NAME="tex2html272"
+  HREF="node8.html">Data Structures</A>
+ &nbsp; <B>  <A NAME="tex2html280"
+  HREF="node1.html">Contents</A></B> 
+<BR>
+<BR>
+<!--End of Navigation Panel-->
+
+<H2><A NAME="SECTION00041000000000000000"></A>
+<A NAME="sec:desc"></A>
+<BR>
+Descriptor data structure
+</H2>
+All the general matrix informations and elements to be
+exchanged among processes are stored within a data structure of the
+type descdata<TT>psb_desc_type</TT>. 
+Every structure of this type is associated to a sparse matrix, it
+contains data about general matrix informations and elements to be
+exchanged among processes.  
+
+<P>
+It is not necessary for the user to know the internal structure of
+<code>psb_desc_type</code>, it is set in a transparent mode by the tools
+routines of Sec.&nbsp;<A HREF="node42.html#sec:toolsrout">6</A>, and its fields may be accessed
+if necessary via  the routines of sec.&nbsp;<A HREF="node14.html#sec:dataquery">3.4</A>;
+nevertheless we include a  description for the curious 
+reader:   
+<DL>
+<DT><STRONG><B>matrix_data</B></STRONG></DT>
+<DD>includes general information about matrix and
+process grid, such as the communication context, the size of the
+global matrix, the size of the portion of matrix stored on the current
+process, and so on. 
+Specified as: an allocatable integer array of dimension <code>psb_mdata_size_</code>.
+</DD>
+<DT><STRONG><B>halo_index</B></STRONG></DT>
+<DD>A list of the halo and boundary elements for
+the current process to be exchanged with other processes; for each
+processes with which it is necessary to communicate:
+
+<OL>
+<LI>Process identifier;
+</LI>
+<LI>Number of points to be received;
+</LI>
+<LI>Indices of points to be received;
+</LI>
+<LI>Number of points to be sent;
+</LI>
+<LI>Indices of points to be sent;
+</LI>
+</OL>
+The list may contain an arbitrary number of groups; its end is marked
+by a -1.
+<BR>
+Specified as: an allocatable integer array of rank one.
+</DD>
+<DT><STRONG><B>ext_index</B></STRONG></DT>
+<DD>A list of element indices to be exchanged to
+  implement the mapping between a base descriptor and a descriptor
+  with overlap. 
+</DD>
+<DT><STRONG><B>ovrlap_index</B></STRONG></DT>
+<DD>A list of the overlap elements for the
+current process, organized in groups like the previous vector:
+
+<OL>
+<LI>Process identifier;
+</LI>
+<LI>Number of points to be received;
+</LI>
+<LI>Indices of points to be received;
+</LI>
+<LI>Number of points to be sent;
+</LI>
+<LI>Indices of points to be sent;
+</LI>
+</OL>
+The list may contain an arbitrary number of groups; its end is marked
+by a -1.
+<BR>
+Specified as: an allocatable integer array  of rank one.
+</DD>
+<DT><STRONG><B>ovr_mst_idx</B></STRONG></DT>
+<DD>A list to retrieve the value of each
+  overlap element from the respective master process.
+<BR>
+Specified as: an allocatable integer array of rank one.
+</DD>
+<DT><STRONG><B>ovrlap_elem</B></STRONG></DT>
+<DD>For all overlap points belonging to th
+ecurrent process:
+
+<OL>
+<LI>Overlap point index;
+</LI>
+<LI>Number of processes sharing that overlap points;
+</LI>
+<LI>Index of a ``master'' process: 
+</LI>
+</OL>
+Specified as: an allocatable integer array of rank two.
+</DD>
+<DT><STRONG><B>loc_to_glob</B></STRONG></DT>
+<DD>each element <IMG
+ WIDTH="10" HEIGHT="17" ALIGN="BOTTOM" BORDER="0"
+ SRC="img3.png"
+ ALT="$i$"> of this array contains
+global identifier of the local variable <IMG
+ WIDTH="10" HEIGHT="17" ALIGN="BOTTOM" BORDER="0"
+ SRC="img3.png"
+ ALT="$i$">.
+<BR>
+Specified as: an allocatable integer array of rank one.
+</DD>
+<DT><STRONG><B>glob_to_loc, glb_lc, hashv</B></STRONG></DT>
+<DD>Contain a mapping from
+  global to local indices. 
+</DD>
+</DL>
+The Fortran&nbsp;95 definition  for <code>psb_desc_type</code> structures is 
+as follows:
+
+<DIV ALIGN="CENTER"><A NAME="fig:desctype"></A><A NAME="618"></A>
+<TABLE>
+<CAPTION ALIGN="BOTTOM"><STRONG>Figure 3:</STRONG>
+The PSBLAS defined data type that
+    contains the communication descriptor.</CAPTION>
+<TR><TD>
+<BR>
+   
+  <DIV ALIGN="CENTER">
+<!-- MATH
+ $\fbox{\TheSbox}$
+ -->
+<IMG
+ WIDTH="536" HEIGHT="218" ALIGN="MIDDLE" BORDER="0"
+ SRC="img17.png"
+ ALT="\fbox{\TheSbox}">
+</DIV></TD></TR>
+</TABLE>
+</DIV>
+
+<P>
+A communication descriptor associated with a sparse  matrix has a
+state, which can take the following values:
+<DL>
+<DT><STRONG>Build:</STRONG></DT>
+<DD>State entered after the first allocation, and before the
+  first assembly; in this state it is possible to add communication
+  requirements among different processes. 
+</DD>
+<DT><STRONG>Assembled:</STRONG></DT>
+<DD>State entered after the assembly; computations using
+  the associated sparse matrix, such as matrix-vector products, are
+  only possible   in this state.
+</DD>
+</DL>
+The global to local index  mapping may be stored in two different
+formats: the first is simpler but more expensive, as it requires on
+each process an amount of memory proportional to the global size of
+the index space; the second is more complex, but only requires memory
+proportional to the local index space size. The choice is made at the
+time of the initialization according to a threshold; this threshold
+may be queried and set using the functions in
+sec.&nbsp;<A HREF="node14.html#sec:dataquery">3.4</A>. 
+
+<P>
+<BR><HR>
+<!--Table of Child-Links-->
+<A NAME="CHILD_LINKS"><STRONG>Subsections</STRONG></A>
+
+<UL>
+<LI><A NAME="tex2html283"
+  HREF="node10.html">Named Constants</A>
+</UL>
+<!--End of Table of Child-Links-->
+<HR>
+<!--Navigation Panel-->
+<A NAME="tex2html281"
+  HREF="node10.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next"
+ SRC="file:/usr/share/latex2html/icons/next.png"></A> 
+<A NAME="tex2html277"
+  HREF="node8.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up"
+ SRC="file:/usr/share/latex2html/icons/up.png"></A> 
+<A NAME="tex2html271"
+  HREF="node8.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous"
+ SRC="file:/usr/share/latex2html/icons/prev.png"></A> 
+<A NAME="tex2html279"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents"
+ SRC="file:/usr/share/latex2html/icons/contents.png"></A>  
+<BR>
+<B> Next:</B> <A NAME="tex2html282"
+  HREF="node10.html">Named Constants</A>
+<B> Up:</B> <A NAME="tex2html278"
+  HREF="node8.html">Data Structures</A>
+<B> Previous:</B> <A NAME="tex2html272"
+  HREF="node8.html">Data Structures</A>
+ &nbsp; <B>  <A NAME="tex2html280"
+  HREF="node1.html">Contents</A></B> 
+<!--End of Navigation Panel-->
+
+</BODY>
+</HTML>

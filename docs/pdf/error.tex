@@ -119,9 +119,13 @@ Aborting...
 \end{figure}
 
 
-\subroutine{psb\_errpush}{Pushes an error code onto the error stack}
+\clearpage\subsection*{psb\_errpush --- Pushes an error code onto the error
+  stack}
+\addcontentsline{toc}{subsection}{psb\_errpush}
 
-\syntax{call psb\_errpush}{err\_c, r\_name, i\_err, a\_err}
+\begin{verbatim}
+call psb_errpush(err_c, r_name, i_err, a_err)
+\end{verbatim}
 
 \begin{description}
 \item[Type:] Asynchronous.
@@ -146,9 +150,13 @@ Type: {\bf optional}\\
 Specified as: a string.\\
 \end{description}
 
-\subroutine{psb\_error}{Prints the error stack content and aborts execution}
+\clearpage\subsection*{psb\_error --- Prints the error stack content and aborts
+  execution}
+\addcontentsline{toc}{subsection}{psb\_error}
 
-\syntax{call psb\_error}{icontxt}
+\begin{verbatim}
+call psb_error(icontxt)
+\end{verbatim}
 
 \begin{description}
 \item[Type:] Asynchronous.
@@ -162,9 +170,13 @@ Specified as: an integer.
 
 
 
-\subroutine{psb\_set\_errverbosity}{Sets the verbosity of error messages.}
+\clearpage\subsection*{psb\_set\_errverbosity --- Sets the verbosity of error
+  messages.}
+\addcontentsline{toc}{subsection}{psb\_set\_errverbosity}
 
-\syntax{call psb\_set\_errverbosity}{v}
+\begin{verbatim}
+call psb_set_errverbosity(v)
+\end{verbatim}
 
 \begin{description}
 \item[Type:] Asynchronous.
@@ -176,10 +188,14 @@ Intent: {\bf in}.\\
 Specified as: an integer.
 \end{description}
 
-\subroutine{psb\_set\_erraction}{Set the type of action to be taken
-  upon error condition.}
+\clearpage\subsection*{psb\_set\_erraction --- Set the type of action to be
+  taken  upon error condition.}
+\addcontentsline{toc}{subsection}{psb\_set\_erraction}
 
-\syntax{call psb\_set\_erraction}{err\_act}
+
+\begin{verbatim}
+call psb_set_erraction(err_act)
+\end{verbatim}
 
 \begin{description}
 \item[Type:] Asynchronous.
@@ -194,9 +210,12 @@ Specified as: an integer. Possible values: \verb|psb_act_ret|,
 
 
 
-%% \subroutine{psb\_errcomm}{Error communication routine}
+%% \clearpage\subsection*{psb\_errcomm --- Error communication routine}
+%\addcontentsline{toc}{subsection}{psb\_errcomm}
 
-%% \syntax{call psb\_errcomm}{icontxt, err}
+\begin{verbatim}
+call psb_errcomm(icontxt, err)
+\end{verbatim}
 
 %% \begin{description}
 %% \item[\bf On Entry]

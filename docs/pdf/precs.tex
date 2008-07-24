@@ -24,9 +24,12 @@ module  \verb|psb_prec_mod|.
 
 
 
-\subroutine{psb\_precinit}{Initialize a  preconditioner}
+\clearpage\subsection*{psb\_precinit --- Initialize a  preconditioner}
+\addcontentsline{toc}{subsection}{psb\_precinit}
 
-\syntax{call psb\_precinit}{prec, ptype, info}
+\begin{verbatim}
+call psb_precinit(prec, ptype, info)
+\end{verbatim}
 
 \begin{description}
 \item[Type:] Asynchronous.
@@ -57,7 +60,7 @@ Type: {\bf required}\\
 Intent: {\bf out}.\\
 Error code: if no error, 0 is returned.
 \end{description}
-\subsection*{Usage Notes}
+{\par\noindent\large\bfseries Notes}
 %% The PSBLAS 2.0 contains a number of preconditioners, ranging from a
 %% simple diagonal scaling to 2-level domain decomposition. These
 %% preconditioners may use the SuperLU or the UMFPACK software, if
@@ -78,9 +81,12 @@ $ptype$ string as follows\footnote{The string is case-insensitive}:
 \end{description}
 
 
-\subroutine{psb\_precbld}{Builds a preconditioner}
+\clearpage\subsection*{psb\_precbld --- Builds a preconditioner}
+\addcontentsline{toc}{subsection}{psb\_precbld}
 
-\syntax{call psb\_precbld}{a, desc\_a, prec, info}
+\begin{verbatim}
+call psb_precbld(a, desc_a, prec, info)
+\end{verbatim}
 
 \begin{description}
 \item[Type:] Synchronous.
@@ -123,10 +129,13 @@ An integer value; 0 means no error has been detected.
 
 
 
-\subroutine{psb\_precaply}{Preconditioner application routine}
+\clearpage\subsection*{psb\_precaply --- Preconditioner application routine}
+\addcontentsline{toc}{subsection}{psb\_precaply}
 
-\syntax{call psb\_precaply}{prec,x,y,desc\_a,info,trans,work}
-\syntax*{call psb\_precaply}{prec,x,desc\_a,info,trans}
+\begin{verbatim}
+call psb_precaply(prec,x,y,desc_a,info,trans,work)
+call psb_precaply(prec,x,desc_a,info,trans)
+\end{verbatim}
 
 \begin{description}
 \item[Type:] Synchronous.
@@ -174,10 +183,14 @@ An integer value; 0 means no error has been detected.
 
 
 
-\subroutine{psb\_precdescr}{Prints a description of current preconditioner}
+\clearpage\subsection*{psb\_precdescr --- Prints a description of current
+  preconditioner}
+\addcontentsline{toc}{subsection}{psb\_precdescr}
 
-\syntax{call psb\_precdescr}{prec}
-\syntax*{call psb\_precdescr}{prec, iout}
+\begin{verbatim}
+call psb_precdescr(prec)
+call psb_precdescr(prec, iout)
+\end{verbatim}
 
 \begin{description}
 \item[Type:] Asynchronous.

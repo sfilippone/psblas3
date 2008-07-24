@@ -1,0 +1,121 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+
+<!--Converted with LaTeX2HTML 2002-2-1 (1.71)
+original version by:  Nikos Drakos, CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>psb_spfree -- Frees a sparse matrix</TITLE>
+<META NAME="description" CONTENT="psb_spfree -- Frees a sparse matrix">
+<META NAME="keywords" CONTENT="userhtml">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META NAME="Generator" CONTENT="LaTeX2HTML v2002-2-1">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+
+<LINK REL="STYLESHEET" HREF="userhtml.css">
+
+<LINK REL="next" HREF="node53.html">
+<LINK REL="previous" HREF="node51.html">
+<LINK REL="up" HREF="node42.html">
+<LINK REL="next" HREF="node53.html">
+</HEAD>
+
+<BODY >
+<!--Navigation Panel-->
+<A NAME="tex2html836"
+  HREF="node53.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next"
+ SRC="file:/usr/share/latex2html/icons/next.png"></A> 
+<A NAME="tex2html832"
+  HREF="node42.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up"
+ SRC="file:/usr/share/latex2html/icons/up.png"></A> 
+<A NAME="tex2html826"
+  HREF="node51.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous"
+ SRC="file:/usr/share/latex2html/icons/prev.png"></A> 
+<A NAME="tex2html834"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents"
+ SRC="file:/usr/share/latex2html/icons/contents.png"></A>  
+<BR>
+<B> Next:</B> <A NAME="tex2html837"
+  HREF="node53.html">psb_sprn   Reinit</A>
+<B> Up:</B> <A NAME="tex2html833"
+  HREF="node42.html">Data management routines</A>
+<B> Previous:</B> <A NAME="tex2html827"
+  HREF="node51.html">psb_spasb   Sparse</A>
+ &nbsp; <B>  <A NAME="tex2html835"
+  HREF="node1.html">Contents</A></B> 
+<BR>
+<BR>
+<!--End of Navigation Panel-->
+
+<H2><A NAME="SECTION000710000000000000000">
+psb_spfree -- Frees a sparse matrix</A>
+</H2>
+
+<P>
+<PRE>
+call psb_spfree(a, desc_a, info)
+</PRE>
+
+<P>
+<DL>
+<DT><STRONG>Type:</STRONG></DT>
+<DD>Synchronous.
+</DD>
+<DT><STRONG><B>On Entry</B></STRONG></DT>
+<DD>
+</DD>
+<DT><STRONG>a</STRONG></DT>
+<DD>the matrix to be freed.
+<BR>
+Scope:<B>local</B>
+<BR>
+Type:<B>required</B>
+<BR>
+Intent: <B>inout</B>.
+<BR>
+Specified as: a structured data of type spdata<TT>psb_spmat_type</TT>.
+</DD>
+<DT><STRONG>desc_a</STRONG></DT>
+<DD>the communication descriptor.
+<BR>
+Scope:<B>local</B>.
+<BR>
+Type:<B>required</B>.
+<BR>
+Intent: <B>in</B>.
+<BR>
+Specified as: a structured data of type descdata<TT>psb_desc_type</TT>.
+</DD>
+</DL>
+
+<P>
+<DL>
+<DT><STRONG><B>On Return</B></STRONG></DT>
+<DD>
+</DD>
+<DT><STRONG>info</STRONG></DT>
+<DD>Error code.
+<BR>
+Scope: <B>local</B> 
+<BR>
+Type: <B>required</B> 
+<BR>
+Intent: <B>out</B>.
+<BR>
+An integer value; 0 means no error has been detected. 
+</DD>
+</DL>
+
+<P>
+<BR><HR>
+
+</BODY>
+</HTML>

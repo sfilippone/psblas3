@@ -1,0 +1,103 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+
+<!--Converted with LaTeX2HTML 2002-2-1 (1.71)
+original version by:  Nikos Drakos, CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>Preconditioner data structure</TITLE>
+<META NAME="description" CONTENT="Preconditioner data structure">
+<META NAME="keywords" CONTENT="userhtml">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META NAME="Generator" CONTENT="LaTeX2HTML v2002-2-1">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+
+<LINK REL="STYLESHEET" HREF="userhtml.css">
+
+<LINK REL="next" HREF="node14.html">
+<LINK REL="previous" HREF="node11.html">
+<LINK REL="up" HREF="node8.html">
+<LINK REL="next" HREF="node14.html">
+</HEAD>
+
+<BODY >
+<!--Navigation Panel-->
+<A NAME="tex2html327"
+  HREF="node14.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next"
+ SRC="file:/usr/share/latex2html/icons/next.png"></A> 
+<A NAME="tex2html323"
+  HREF="node8.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up"
+ SRC="file:/usr/share/latex2html/icons/up.png"></A> 
+<A NAME="tex2html317"
+  HREF="node12.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous"
+ SRC="file:/usr/share/latex2html/icons/prev.png"></A> 
+<A NAME="tex2html325"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents"
+ SRC="file:/usr/share/latex2html/icons/contents.png"></A>  
+<BR>
+<B> Next:</B> <A NAME="tex2html328"
+  HREF="node14.html">Data structure query routines</A>
+<B> Up:</B> <A NAME="tex2html324"
+  HREF="node8.html">Data Structures</A>
+<B> Previous:</B> <A NAME="tex2html318"
+  HREF="node12.html">Named Constants</A>
+ &nbsp; <B>  <A NAME="tex2html326"
+  HREF="node1.html">Contents</A></B> 
+<BR>
+<BR>
+<!--End of Navigation Panel-->
+
+<H2><A NAME="SECTION00043000000000000000"></A>
+<A NAME="sec:prec"></A>
+<BR>
+Preconditioner data structure
+</H2>
+Our base library  offers support for  simple well known preconditioners
+like Diagonal Scaling or Block Jacobi with incomplete
+factorization ILU(0). 
+
+<P>
+A preconditioner is held in the precdata<TT>    psb_prec_type</TT> data structure reported in 
+figure&nbsp;<A HREF="#fig:prectype">5</A>. The <code>psb_prec_type</code> 
+data type may contain a simple preconditioning matrix with the
+associated communication descriptor.The values contained in
+the <code>iprcparm</code> and <code>rprcparm</code> define tha type of
+preconditioner along with all the parameters related to it; thus,
+<code>iprcparm</code> and <code>rprcparm</code> define how the other records have
+to be interpreted. This data structure is the basis of more complex
+preconditioning strategies, which are the subject of further
+research. 
+
+<DIV ALIGN="CENTER"><A NAME="fig:prectype"></A><A NAME="622"></A>
+<TABLE>
+<CAPTION ALIGN="BOTTOM"><STRONG>Figure 5:</STRONG>
+The PSBLAS defined data type that contains a preconditioner.</CAPTION>
+<TR><TD><FONT SIZE="-1">  <BR>
+
+<BR>
+   
+  </FONT>
+<DIV ALIGN="CENTER"><FONT SIZE="-1"><!-- MATH
+ $\fbox{\TheSbox}$
+ -->
+<IMG
+ WIDTH="536" HEIGHT="218" ALIGN="MIDDLE" BORDER="0"
+ SRC="img17.png"
+ ALT="\fbox{\TheSbox}"></FONT></DIV><FONT SIZE="-1">
+  </FONT></TD></TR>
+</TABLE>
+</DIV>
+
+<P>
+<BR><HR>
+
+</BODY>
+</HTML>

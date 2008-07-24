@@ -1,0 +1,227 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+
+<!--Converted with LaTeX2HTML 2002-2-1 (1.71)
+original version by:  Nikos Drakos, CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>psb_spnrmi -- Infinity Norm of Sparse Matrix</TITLE>
+<META NAME="description" CONTENT="psb_spnrmi -- Infinity Norm of Sparse Matrix">
+<META NAME="keywords" CONTENT="userhtml">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META NAME="Generator" CONTENT="LaTeX2HTML v2002-2-1">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+
+<LINK REL="STYLESHEET" HREF="userhtml.css">
+
+<LINK REL="next" HREF="node35.html">
+<LINK REL="previous" HREF="node33.html">
+<LINK REL="up" HREF="node25.html">
+<LINK REL="next" HREF="node35.html">
+</HEAD>
+
+<BODY >
+<!--Navigation Panel-->
+<A NAME="tex2html593"
+  HREF="node35.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next"
+ SRC="file:/usr/share/latex2html/icons/next.png"></A> 
+<A NAME="tex2html589"
+  HREF="node25.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up"
+ SRC="file:/usr/share/latex2html/icons/up.png"></A> 
+<A NAME="tex2html583"
+  HREF="node33.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous"
+ SRC="file:/usr/share/latex2html/icons/prev.png"></A> 
+<A NAME="tex2html591"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents"
+ SRC="file:/usr/share/latex2html/icons/contents.png"></A>  
+<BR>
+<B> Next:</B> <A NAME="tex2html594"
+  HREF="node35.html">psb_spmm   Sparse</A>
+<B> Up:</B> <A NAME="tex2html590"
+  HREF="node25.html">Computational routines</A>
+<B> Previous:</B> <A NAME="tex2html584"
+  HREF="node33.html">psb_genrm2s   Generalized</A>
+ &nbsp; <B>  <A NAME="tex2html592"
+  HREF="node1.html">Contents</A></B> 
+<BR>
+<BR>
+<!--End of Navigation Panel-->
+
+<H2><A NAME="SECTION00059000000000000000">
+psb_spnrmi -- Infinity Norm of Sparse Matrix</A>
+</H2>
+
+<P>
+This function computes the infinity-norm of a matrix <IMG
+ WIDTH="16" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ SRC="img1.png"
+ ALT="$A$">:
+<BR>
+<P>
+<BR><P></P>
+<DIV ALIGN="CENTER">
+<!-- MATH
+ \begin{displaymath}
+nrmi \leftarrow \|A\|_\infty
+\end{displaymath}
+ -->
+
+<IMG
+ WIDTH="101" HEIGHT="28" BORDER="0"
+ SRC="img47.png"
+ ALT="\begin{displaymath}nrmi \leftarrow \Vert A\Vert _\infty \end{displaymath}">
+</DIV>
+<BR CLEAR="ALL">
+<P></P>
+where:
+<DL>
+<DT><STRONG><IMG
+ WIDTH="16" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ SRC="img1.png"
+ ALT="$A$"></STRONG></DT>
+<DD>represents the global matrix <IMG
+ WIDTH="16" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ SRC="img1.png"
+ ALT="$A$">
+</DD>
+</DL>
+
+<P>
+<BR><P></P>
+<DIV ALIGN="CENTER"><A NAME="1423"></A>
+<TABLE>
+<CAPTION><STRONG>Table 10:</STRONG>
+Data types</CAPTION>
+<TR><TD>
+<DIV ALIGN="CENTER">
+<TABLE CELLPADDING=3 BORDER="1" ALIGN="CENTER">
+<TR><TD ALIGN="LEFT"><IMG
+ WIDTH="16" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ SRC="img1.png"
+ ALT="$A$"></TD>
+<TD ALIGN="LEFT"><B>Function</B></TD>
+</TR>
+<TR><TD ALIGN="LEFT">Short Precision Real</TD>
+<TD ALIGN="LEFT">psb_spnrmi</TD>
+</TR>
+<TR><TD ALIGN="LEFT">Long Precision Real</TD>
+<TD ALIGN="LEFT">psb_spnrmi</TD>
+</TR>
+<TR><TD ALIGN="LEFT">Short Precision Complex</TD>
+<TD ALIGN="LEFT">psb_spnrmi</TD>
+</TR>
+<TR><TD ALIGN="LEFT">Long Precision Complex</TD>
+<TD ALIGN="LEFT">psb_spnrmi</TD>
+</TR>
+</TABLE>
+</DIV>
+</TD></TR>
+</TABLE>
+</DIV><P></P>
+<BR>
+
+<P>
+<PRE>
+psb_spnrmi(A, desc_a, info)
+</PRE>
+
+<P>
+<DL>
+<DT><STRONG>Type:</STRONG></DT>
+<DD>Synchronous.
+</DD>
+<DT><STRONG><B>On Entry</B></STRONG></DT>
+<DD>
+</DD>
+<DT><STRONG>a</STRONG></DT>
+<DD>the local  portion of the global sparse matrix
+<IMG
+ WIDTH="16" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ SRC="img1.png"
+ ALT="$A$">. 
+<BR>
+Scope: <B>local</B> 
+<BR>
+Type: <B>required</B>
+<BR>
+Intent: <B>in</B>.
+<BR>
+Specified as: a structured data of type spdata<TT>psb_spmat_type</TT>.
+</DD>
+<DT><STRONG>desc_a</STRONG></DT>
+<DD>contains data structures for communications.
+<BR>
+Scope: <B>local</B> 
+<BR>
+Type: <B>required</B>
+<BR>
+Intent: <B>in</B>.
+<BR>
+Specified as: a structured data of type descdata<TT>psb_desc_type</TT>.
+</DD>
+<DT><STRONG><B>On Return</B></STRONG></DT>
+<DD>
+</DD>
+<DT><STRONG>Function value</STRONG></DT>
+<DD>is the infinity-norm of sparse submatrix <IMG
+ WIDTH="16" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ SRC="img1.png"
+ ALT="$A$">.
+<BR>
+Scope: <B>global</B> 
+<BR>
+Specified as: a long precision real number.
+</DD>
+<DT><STRONG>info</STRONG></DT>
+<DD>Error code.
+<BR>
+Scope: <B>local</B> 
+<BR>
+Type: <B>required</B> 
+<BR>
+Intent: <B>out</B>.
+<BR>
+An integer value; 0 means no error has been detected. 
+</DD>
+</DL>
+
+<P>
+<HR>
+<!--Navigation Panel-->
+<A NAME="tex2html593"
+  HREF="node35.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next"
+ SRC="file:/usr/share/latex2html/icons/next.png"></A> 
+<A NAME="tex2html589"
+  HREF="node25.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up"
+ SRC="file:/usr/share/latex2html/icons/up.png"></A> 
+<A NAME="tex2html583"
+  HREF="node33.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous"
+ SRC="file:/usr/share/latex2html/icons/prev.png"></A> 
+<A NAME="tex2html591"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents"
+ SRC="file:/usr/share/latex2html/icons/contents.png"></A>  
+<BR>
+<B> Next:</B> <A NAME="tex2html594"
+  HREF="node35.html">psb_spmm   Sparse</A>
+<B> Up:</B> <A NAME="tex2html590"
+  HREF="node25.html">Computational routines</A>
+<B> Previous:</B> <A NAME="tex2html584"
+  HREF="node33.html">psb_genrm2s   Generalized</A>
+ &nbsp; <B>  <A NAME="tex2html592"
+  HREF="node1.html">Contents</A></B> 
+<!--End of Navigation Panel-->
+
+</BODY>
+</HTML>

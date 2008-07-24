@@ -1,0 +1,111 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+
+<!--Converted with LaTeX2HTML 2002-2-1 (1.71)
+original version by:  Nikos Drakos, CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>psb_cd_get_local_rows -- Get number of local rows</TITLE>
+<META NAME="description" CONTENT="psb_cd_get_local_rows -- Get number of local rows">
+<META NAME="keywords" CONTENT="userhtml">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META NAME="Generator" CONTENT="LaTeX2HTML v2002-2-1">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+
+<LINK REL="STYLESHEET" HREF="userhtml.css">
+
+<LINK REL="next" HREF="node16.html">
+<LINK REL="previous" HREF="node14.html">
+<LINK REL="up" HREF="node14.html">
+<LINK REL="next" HREF="node16.html">
+</HEAD>
+
+<BODY >
+<!--Navigation Panel-->
+<A NAME="tex2html355"
+  HREF="node16.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next"
+ SRC="file:/usr/share/latex2html/icons/next.png"></A> 
+<A NAME="tex2html351"
+  HREF="node14.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up"
+ SRC="file:/usr/share/latex2html/icons/up.png"></A> 
+<A NAME="tex2html345"
+  HREF="node14.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous"
+ SRC="file:/usr/share/latex2html/icons/prev.png"></A> 
+<A NAME="tex2html353"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents"
+ SRC="file:/usr/share/latex2html/icons/contents.png"></A>  
+<BR>
+<B> Next:</B> <A NAME="tex2html356"
+  HREF="node16.html">psb_cd_get_local_cols   Get</A>
+<B> Up:</B> <A NAME="tex2html352"
+  HREF="node14.html">Data structure query routines</A>
+<B> Previous:</B> <A NAME="tex2html346"
+  HREF="node14.html">Data structure query routines</A>
+ &nbsp; <B>  <A NAME="tex2html354"
+  HREF="node1.html">Contents</A></B> 
+<BR>
+<BR>
+<!--End of Navigation Panel-->
+
+<H3><A NAME="SECTION00044100000000000000">
+psb_cd_get_local_rows -- Get number of local rows</A>
+</H3>
+
+<P>
+<PRE>
+nr = psb_cd_get_local_rows(desc)
+</PRE>
+
+<P>
+<DL>
+<DT><STRONG>Type:</STRONG></DT>
+<DD>Asynchronous.
+</DD>
+<DT><STRONG><B>On Entry</B></STRONG></DT>
+<DD>
+</DD>
+<DT><STRONG>desc</STRONG></DT>
+<DD>the communication descriptor.
+<BR>
+Scope: <B>local</B>.
+<BR>
+Type: <B>required</B>.
+<BR>
+Intent: <B>in</B>.
+<BR>
+Specified as: a structured data of type descdata<TT>psb_desc_type</TT>.
+</DD>
+</DL>
+
+<P>
+<DL>
+<DT><STRONG><B>On Return</B></STRONG></DT>
+<DD>
+</DD>
+<DT><STRONG>Function value</STRONG></DT>
+<DD>The number of local rows, i.e. the number of
+  rows owned by the current process; as explained in&nbsp;<A HREF="node2.html#sec:intro">1</A>,
+  it is equal to <!-- MATH
+ $|{\cal I}_i| + |{\cal B}_i|$
+ -->
+<IMG
+ WIDTH="71" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
+ SRC="img9.png"
+ ALT="$\vert{\cal I}_i\vert + \vert{\cal B}_i\vert$">. The returned value is
+  specific to the calling process. 
+</DD>
+</DL>
+
+<P>
+<BR><HR>
+
+</BODY>
+</HTML>

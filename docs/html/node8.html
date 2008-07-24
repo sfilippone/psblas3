@@ -1,0 +1,150 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+
+<!--Converted with LaTeX2HTML 2002-2-1 (1.71)
+original version by:  Nikos Drakos, CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>Data Structures</TITLE>
+<META NAME="description" CONTENT="Data Structures">
+<META NAME="keywords" CONTENT="userhtml">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META NAME="Generator" CONTENT="LaTeX2HTML v2002-2-1">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+
+<LINK REL="STYLESHEET" HREF="userhtml.css">
+
+<LINK REL="next" HREF="node25.html">
+<LINK REL="previous" HREF="node3.html">
+<LINK REL="up" HREF="userhtml.html">
+<LINK REL="next" HREF="node9.html">
+</HEAD>
+
+<BODY >
+<!--Navigation Panel-->
+<A NAME="tex2html253"
+  HREF="node9.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next"
+ SRC="file:/usr/share/latex2html/icons/next.png"></A> 
+<A NAME="tex2html249"
+  HREF="userhtml.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up"
+ SRC="file:/usr/share/latex2html/icons/up.png"></A> 
+<A NAME="tex2html243"
+  HREF="node7.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous"
+ SRC="file:/usr/share/latex2html/icons/prev.png"></A> 
+<A NAME="tex2html251"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents"
+ SRC="file:/usr/share/latex2html/icons/contents.png"></A>  
+<BR>
+<B> Next:</B> <A NAME="tex2html254"
+  HREF="node9.html">Descriptor data structure</A>
+<B> Up:</B> <A NAME="tex2html250"
+  HREF="userhtml.html">userhtml</A>
+<B> Previous:</B> <A NAME="tex2html244"
+  HREF="node7.html">Programming model</A>
+ &nbsp; <B>  <A NAME="tex2html252"
+  HREF="node1.html">Contents</A></B> 
+<BR>
+<BR>
+<!--End of Navigation Panel-->
+
+<H1><A NAME="SECTION00040000000000000000"></A>
+<A NAME="sec:datastruct"></A>
+<BR>
+Data Structures
+</H1>
+
+<P>
+In this chapter we  illustrate the  data structures used for definition of
+routines interfaces. They  include data structures for sparse matrices,
+communication descriptors and preconditioners.
+<P>
+All the data types and the basic subroutine interfaces are defined in
+the module <code>psb_base_mod</code>; this will have to be included by every
+user subroutine that makes use of the library. 
+
+<P>
+Real and complex data types are parametrized with a kind type defined
+in the library as follows: 
+<DL>
+<DT><STRONG>psb_spk_</STRONG></DT>
+<DD>Kind parameter for short precision real and complex
+  data; corresponds to a <code>REAL</code> declaration and is
+  normally 4 bytes. 
+</DD>
+<DT><STRONG>psb_dpk_</STRONG></DT>
+<DD>Kind parameter for long precision real and complex
+  data; corresponds to a <code>DOUBLE PRECISION</code> declaration and is
+  normally 8 bytes. 
+</DD>
+</DL>
+
+<P>
+<BR><HR>
+<!--Table of Child-Links-->
+<A NAME="CHILD_LINKS"><STRONG>Subsections</STRONG></A>
+
+<UL>
+<LI><A NAME="tex2html255"
+  HREF="node9.html">Descriptor data structure</A>
+<UL>
+<LI><A NAME="tex2html256"
+  HREF="node10.html">Named Constants</A>
+</UL>
+<BR>
+<LI><A NAME="tex2html257"
+  HREF="node11.html">Sparse Matrix data structure</A>
+<UL>
+<LI><A NAME="tex2html258"
+  HREF="node12.html">Named Constants</A>
+</UL>
+<BR>
+<LI><A NAME="tex2html259"
+  HREF="node13.html">Preconditioner data structure</A>
+<LI><A NAME="tex2html260"
+  HREF="node14.html">Data structure query routines</A>
+<UL>
+<LI><A NAME="tex2html261"
+  HREF="node15.html">psb_cd_get_local_rows -- Get number of local rows</A>
+<LI><A NAME="tex2html262"
+  HREF="node16.html">psb_cd_get_local_cols -- Get number of local cols</A>
+<LI><A NAME="tex2html263"
+  HREF="node17.html">psb_cd_get_global_rows -- Get number of global rows</A>
+<LI><A NAME="tex2html264"
+  HREF="node18.html">psb_cd_get_global_cols -- Get number of global cols</A>
+</UL>
+<BR>
+<LI><A NAME="tex2html265"
+  HREF="node19.html">
+<DIV ALIGN="LEFT">
+psb_cd_get_context--Get communication context 
+</DIV></A>
+<UL>
+<LI><A NAME="tex2html266"
+  HREF="node20.html">psb_cd_get_large_threshold -- Get threshold for
+  index mapping switch</A>
+<LI><A NAME="tex2html267"
+  HREF="node21.html">psb_cd_set_large_threshold -- Set threshold for
+  index mapping switch</A>
+<LI><A NAME="tex2html268"
+  HREF="node22.html">psb_sp_get_nrows -- Get number of  rows in a sparse
+  matrix</A>
+<LI><A NAME="tex2html269"
+  HREF="node23.html">psb_sp_get_ncols -- Get number of  columns in a
+  sparse matrix</A>
+<LI><A NAME="tex2html270"
+  HREF="node24.html">psb_sp_get_nnzeros -- Get number of nonzero elements
+  in a sparse matrix</A>
+</UL></UL>
+<!--End of Table of Child-Links-->
+<BR><HR>
+
+</BODY>
+</HTML>

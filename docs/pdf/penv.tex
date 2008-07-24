@@ -2,9 +2,12 @@
 \section{Parallel environment routines}
 \label{sec:parenv}
 
-\subroutine{psb\_init}{Initializes PSBLAS parallel environment}
+\clearpage\subsection*{psb\_init --- Initializes PSBLAS parallel environment}
+\addcontentsline{toc}{subsection}{psb\_init}
 
-\syntax{call psb\_init}{icontxt, np}
+\begin{verbatim}
+call psb_init(icontxt, np)
+\end{verbatim}
 
 This subroutine initializes the PSBLAS parallel environment, defining
 a virtual parallel machine.
@@ -31,7 +34,7 @@ Specified as: an integer variable.
 \end{description}
 
 
-\section*{Notes}
+{\par\noindent\large\bfseries Notes}
 \begin{enumerate}
 \item A call to this routine must precede any other PSBLAS call. 
 \item It is an error to specify a value for $np$ greater than the
@@ -40,9 +43,13 @@ Specified as: an integer variable.
 \end{enumerate}
 
 
-\subroutine{psb\_info}{Return information about  PSBLAS parallel environment}
+\clearpage\subsection*{psb\_info --- Return information about  PSBLAS parallel
+  environment}
+\addcontentsline{toc}{subsection}{psb\_info}
 
-\syntax{call psb\_info}{icontxt, iam, np}
+\begin{verbatim}
+call psb_info(icontxt, iam, np)
+\end{verbatim}
 
 This subroutine returns information about  the PSBLAS parallel environment, defining
 a virtual parallel machine.
@@ -72,7 +79,7 @@ Specified as: an integer variable. \
 \end{description}
 
 
-\section*{Notes}
+{\par\noindent\large\bfseries Notes}
 \begin{enumerate}
 \item For processes in the virtual parallel machine  the identifier
   will satisfy $0 \le iam \le np-1$;
@@ -84,10 +91,13 @@ Specified as: an integer variable. \
 \end{enumerate}
 
 
-\subroutine{psb\_exit}{Exit from  PSBLAS parallel environment}
+\clearpage\subsection*{psb\_exit --- Exit from  PSBLAS parallel environment}
+\addcontentsline{toc}{subsection}{psb\_exit}
 
-\syntax{call psb\_exit}{icontxt}
-\syntax*{call psb\_exit}{icontxt,close}
+\begin{verbatim}
+call psb_exit(icontxt)
+call psb_exit(icontxt,close)
+\end{verbatim}
 
 This subroutine exits from the  PSBLAS parallel virtual  machine.
 \begin{description}
@@ -107,7 +117,7 @@ Intent: {\bf in}.\\
 Specified as: a logical  variable, default value: true.
 \end{description}
 
-\section*{Notes}
+{\par\noindent\large\bfseries Notes}
 \begin{enumerate}
 \item This routine may be called even if a previous call to
   \verb|psb_info| has returned with $iam=-1$; indeed, it it is the only
@@ -124,9 +134,12 @@ Specified as: a logical  variable, default value: true.
 \end{enumerate}
 
 
-\subroutine{psb\_get\_mpicomm}{Get the MPI communicator}
+\clearpage\subsection*{psb\_get\_mpicomm --- Get the MPI communicator}
+\addcontentsline{toc}{subsection}{psb\_get\_mpicomm}
 
-\syntax{call psb\_get\_mpicomm}{icontxt, icomm}
+\begin{verbatim}
+call psb_get_mpicomm(icontxt, icomm)
+\end{verbatim}
 
 This subroutine returns the MPI communicator associated with a PSBLAS context
 \begin{description}
@@ -149,9 +162,12 @@ Intent: {\bf out}.\\
 \end{description}
 
 
-\subroutine{psb\_get\_rank}{Get the MPI rank}
+\clearpage\subsection*{psb\_get\_rank --- Get the MPI rank}
+\addcontentsline{toc}{subsection}{psb\_get\_rank}
 
-\syntax{call psb\_get\_rank}{rank, icontxt, id}
+\begin{verbatim}
+call psb_get_rank(rank, icontxt, id)
+\end{verbatim}
 
 This subroutine returns the MPI rank of the  PSBLAS process $id$
 \begin{description}
@@ -181,9 +197,12 @@ Intent: {\bf out}.\\
 
 
 
-\subroutine{psb\_wtime}{Wall clock timing}
+\clearpage\subsection*{psb\_wtime --- Wall clock timing}
+\addcontentsline{toc}{subsection}{psb\_wtime}
 
-\syntax{time = psb\_wtime}{}
+\begin{verbatim}
+time = psb_wtime()
+\end{verbatim}
 
 This function returns a wall clock timer. The resolution of the timer
 is dependent on the underlying parallel environment implementation.
@@ -195,9 +214,13 @@ Returned  as: a  \verb|real(psb_dpk_)|  variable.
 \end{description}
 
 
-\subroutine{psb\_barrier}{Sinchronization point  parallel environment}
+\clearpage\subsection*{psb\_barrier --- Sinchronization point  parallel
+  environment}
+\addcontentsline{toc}{subsection}{psb\_barrier}
 
-\syntax{call psb\_barrier}{icontxt}
+\begin{verbatim}
+call psb_barrier(icontxt)
+\end{verbatim}
 
 This subroutine acts as an explicit synchronization point for  the  PSBLAS
 parallel virtual  machine. 
@@ -213,9 +236,12 @@ Specified as: an integer variable.
 \end{description}
 
 
-\subroutine{psb\_abort}{Abort a computation}
+\clearpage\subsection*{psb\_abort --- Abort a computation}
+\addcontentsline{toc}{subsection}{psb\_abort}
 
-\syntax{call psb\_abort}{icontxt}
+\begin{verbatim}
+call psb_abort(icontxt)
+\end{verbatim}
 
 This subroutine aborts computation on the parallel virtual machine. 
 \begin{description}
@@ -233,9 +259,12 @@ Specified as: an integer variable.
 
 
 
-\subroutine{psb\_bcast}{Broadcast data}
+\clearpage\subsection*{psb\_bcast --- Broadcast data}
+\addcontentsline{toc}{subsection}{psb\_bcast}
 
-\syntax{call psb\_bcast}{icontxt, dat, root}
+\begin{verbatim}
+call psb_bcast(icontxt, dat, root)
+\end{verbatim}
 
 This subroutine implements a broadcast operation based on the
 underlying communication library. 
@@ -276,9 +305,12 @@ Type, kind, rank and size must agree on all processes.
 \end{description}
 
 
-\subroutine{psb\_sum}{Global sum}
+\clearpage\subsection*{psb\_sum --- Global sum}
+\addcontentsline{toc}{subsection}{psb\_sum}
 
-\syntax{call psb\_sum}{icontxt, dat, root}
+\begin{verbatim}
+call psb_sum(icontxt, dat, root)
+\end{verbatim}
 
 This subroutine implements a sum reduction  operation based on the
 underlying communication library. 
@@ -318,7 +350,7 @@ scalar, or a rank 1 or 2 array. \\
 Type, kind, rank and size must agree on all processes.
 \end{description}
 
-\section*{Notes}
+{\par\noindent\large\bfseries Notes}
 \begin{enumerate}
 \item The \verb|dat| argument is both input and output, and its
   value may be changed even on processes different from the final
@@ -327,9 +359,12 @@ Type, kind, rank and size must agree on all processes.
 
 
 
-\subroutine{psb\_max}{Global maximum}
+\clearpage\subsection*{psb\_max --- Global maximum}
+\addcontentsline{toc}{subsection}{psb\_max}
 
-\syntax{call psb\_max}{icontxt, dat, root}
+\begin{verbatim}
+call psb_max(icontxt, dat, root)
+\end{verbatim}
 
 This subroutine implements a maximum valuereduction
 operation based on the underlying communication library. 
@@ -370,16 +405,19 @@ Type, kind, rank and size must agree on all processes.
 \end{description}
 
 
-\section*{Notes}
+{\par\noindent\large\bfseries Notes}
 \begin{enumerate}
 \item The \verb|dat| argument is both input and output, and its
   value may be changed even on processes different from the final
   result destination.
 \end{enumerate}
 
-\subroutine{psb\_min}{Global minimum}
+\clearpage\subsection*{psb\_min --- Global minimum}
+\addcontentsline{toc}{subsection}{psb\_min}
 
-\syntax{call psb\_min}{icontxt, dat, root}
+\begin{verbatim}
+call psb_min(icontxt, dat, root)
+\end{verbatim}
 
 This subroutine implements a minimum value reduction
 operation based on the underlying communication library. 
@@ -420,16 +458,19 @@ Type, kind, rank and size must agree on all processes.
 \end{description}
 
 
-\section*{Notes}
+{\par\noindent\large\bfseries Notes}
 \begin{enumerate}
 \item The \verb|dat| argument is both input and output, and its
   value may be changed even on processes different from the final
   result destination.
 \end{enumerate}
 
-\subroutine{psb\_amx}{Global maximum absolute value}
+\clearpage\subsection*{psb\_amx --- Global maximum absolute value}
+\addcontentsline{toc}{subsection}{psb\_amx}
 
-\syntax{call psb\_amx}{icontxt, dat, root}
+\begin{verbatim}
+call psb_amx(icontxt, dat, root)
+\end{verbatim}
 
 This subroutine implements a maximum absolute value reduction
 operation based on the underlying communication library. 
@@ -470,16 +511,19 @@ Type, kind, rank and size must agree on all processes.
 \end{description}
 
 
-\section*{Notes}
+{\par\noindent\large\bfseries Notes}
 \begin{enumerate}
 \item The \verb|dat| argument is both input and output, and its
   value may be changed even on processes different from the final
   result destination.
 \end{enumerate}
 
-\subroutine{psb\_amn}{Global minimum absolute value}
+\clearpage\subsection*{psb\_amn --- Global minimum absolute value}
+\addcontentsline{toc}{subsection}{psb\_amn}
 
-\syntax{call psb\_amn}{icontxt, dat, root}
+\begin{verbatim}
+call psb_amn(icontxt, dat, root)
+\end{verbatim}
 
 This subroutine implements a minimum absolute value reduction
 operation based on the underlying communication library. 
@@ -520,7 +564,7 @@ Type, kind, rank and size must agree on all processes.
 \end{description}
 
 
-\section*{Notes}
+{\par\noindent\large\bfseries Notes}
 \begin{enumerate}
 \item The \verb|dat| argument is both input and output, and its
   value may be changed even on processes different from the final
@@ -528,9 +572,12 @@ Type, kind, rank and size must agree on all processes.
 \end{enumerate}
 
 
-\subroutine{psb\_snd}{Send data}
+\clearpage\subsection*{psb\_snd --- Send data}
+\addcontentsline{toc}{subsection}{psb\_snd}
 
-\syntax{call psb\_snd}{icontxt, dat, dst, m}
+\begin{verbatim}
+call psb_snd(icontxt, dat, dst, m)
+\end{verbatim}
 
 This subroutine sends a packet of data to a destination.
 \begin{description}
@@ -570,16 +617,19 @@ same value on sending and receiving processes.
 \item[\bf On Return]
 \end{description}
 
-\section*{Notes}
+{\par\noindent\large\bfseries Notes}
 \begin{enumerate}
 \item This subroutine implies a synchronization, but only between the
   calling process and the destination  process $dst$.
 \end{enumerate}
 
 
-\subroutine{psb\_rcv}{Receive data}
+\clearpage\subsection*{psb\_rcv --- Receive data}
+\addcontentsline{toc}{subsection}{psb\_rcv}
 
-\syntax{call psb\_rcv}{icontxt, dat, src, m}
+\begin{verbatim}
+call psb_rcv(icontxt, dat, src, m)
+\end{verbatim}
 
 This subroutine receives a packet of data to a destination.
 \begin{description}
@@ -619,7 +669,7 @@ Type, kind and  rank must agree on sender and receiver process; if $m$ is
 not specified, size must agree as well. 
 \end{description}
 
-\section*{Notes}
+{\par\noindent\large\bfseries Notes}
 \begin{enumerate}
 \item This subroutine implies a synchronization, but only between the
   calling process and the source  process $src$.

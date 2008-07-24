@@ -1,0 +1,123 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+
+<!--Converted with LaTeX2HTML 2002-2-1 (1.71)
+original version by:  Nikos Drakos, CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>psb_cdcpy -- Copies a communication descriptor</TITLE>
+<META NAME="description" CONTENT="psb_cdcpy -- Copies a communication descriptor">
+<META NAME="keywords" CONTENT="userhtml">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META NAME="Generator" CONTENT="LaTeX2HTML v2002-2-1">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+
+<LINK REL="STYLESHEET" HREF="userhtml.css">
+
+<LINK REL="next" HREF="node47.html">
+<LINK REL="previous" HREF="node45.html">
+<LINK REL="up" HREF="node42.html">
+<LINK REL="next" HREF="node47.html">
+</HEAD>
+
+<BODY >
+<!--Navigation Panel-->
+<A NAME="tex2html764"
+  HREF="node47.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next"
+ SRC="file:/usr/share/latex2html/icons/next.png"></A> 
+<A NAME="tex2html760"
+  HREF="node42.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up"
+ SRC="file:/usr/share/latex2html/icons/up.png"></A> 
+<A NAME="tex2html754"
+  HREF="node45.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous"
+ SRC="file:/usr/share/latex2html/icons/prev.png"></A> 
+<A NAME="tex2html762"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents"
+ SRC="file:/usr/share/latex2html/icons/contents.png"></A>  
+<BR>
+<B> Next:</B> <A NAME="tex2html765"
+  HREF="node47.html">psb_cdfree   Frees</A>
+<B> Up:</B> <A NAME="tex2html761"
+  HREF="node42.html">Data management routines</A>
+<B> Previous:</B> <A NAME="tex2html755"
+  HREF="node45.html">psb_cdasb   Communication</A>
+ &nbsp; <B>  <A NAME="tex2html763"
+  HREF="node1.html">Contents</A></B> 
+<BR>
+<BR>
+<!--End of Navigation Panel-->
+
+<H2><A NAME="SECTION00074000000000000000">
+psb_cdcpy -- Copies a communication descriptor</A>
+</H2>
+
+<P>
+<PRE>
+call psb_cdcpy(desc_in, desc_out, info)
+</PRE>
+
+<P>
+<DL>
+<DT><STRONG>Type:</STRONG></DT>
+<DD>Asynchronous.
+</DD>
+<DT><STRONG><B>On Entry</B></STRONG></DT>
+<DD>
+</DD>
+<DT><STRONG>desc_in</STRONG></DT>
+<DD>the communication descriptor.
+<BR>
+Scope:<B>local</B>.
+<BR>
+Type:<B>required</B>.
+<BR>
+Intent: <B>in</B>.
+<BR>
+Specified as: a structured data of type descdata<TT>psb_desc_type</TT>.
+
+<P>
+</DD>
+</DL>
+
+<P>
+<DL>
+<DT><STRONG><B>On Return</B></STRONG></DT>
+<DD>
+</DD>
+<DT><STRONG>desc_out</STRONG></DT>
+<DD>the communication descriptor copy.
+<BR>
+Scope:<B>local</B>.
+<BR>
+Type:<B>required</B>.
+<BR>
+Intent: <B>out</B>.
+<BR>
+Specified as: a structured data of type descdata<TT>psb_desc_type</TT>.
+</DD>
+<DT><STRONG>info</STRONG></DT>
+<DD>Error code.
+<BR>
+Scope: <B>local</B> 
+<BR>
+Type: <B>required</B> 
+<BR>
+Intent: <B>out</B>.
+<BR>
+An integer value; 0 means no error has been detected. 
+</DD>
+</DL>
+
+<P>
+<BR><HR>
+
+</BODY>
+</HTML>

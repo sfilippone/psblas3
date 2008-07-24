@@ -1,0 +1,273 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+
+<!--Converted with LaTeX2HTML 2002-2-1 (1.71)
+original version by:  Nikos Drakos, CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>psb_scatter -- Scatter Global Dense Matrix</TITLE>
+<META NAME="description" CONTENT="psb_scatter -- Scatter Global Dense Matrix">
+<META NAME="keywords" CONTENT="userhtml">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META NAME="Generator" CONTENT="LaTeX2HTML v2002-2-1">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+
+<LINK REL="STYLESHEET" HREF="userhtml.css">
+
+<LINK REL="previous" HREF="node40.html">
+<LINK REL="up" HREF="node37.html">
+<LINK REL="next" HREF="node42.html">
+</HEAD>
+
+<BODY >
+<!--Navigation Panel-->
+<A NAME="tex2html677"
+  HREF="node42.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next"
+ SRC="file:/usr/share/latex2html/icons/next.png"></A> 
+<A NAME="tex2html673"
+  HREF="node37.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up"
+ SRC="file:/usr/share/latex2html/icons/up.png"></A> 
+<A NAME="tex2html669"
+  HREF="node40.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous"
+ SRC="file:/usr/share/latex2html/icons/prev.png"></A> 
+<A NAME="tex2html675"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents"
+ SRC="file:/usr/share/latex2html/icons/contents.png"></A>  
+<BR>
+<B> Next:</B> <A NAME="tex2html678"
+  HREF="node42.html">Data management routines</A>
+<B> Up:</B> <A NAME="tex2html674"
+  HREF="node37.html">Communication routines</A>
+<B> Previous:</B> <A NAME="tex2html670"
+  HREF="node40.html">psb_gather   Gather</A>
+ &nbsp; <B>  <A NAME="tex2html676"
+  HREF="node1.html">Contents</A></B> 
+<BR>
+<BR>
+<!--End of Navigation Panel-->
+
+<H2><A NAME="SECTION00064000000000000000">
+psb_scatter -- Scatter Global Dense Matrix</A>
+</H2>
+
+<P>
+These subroutines scatters the portions of global dense matrix owned
+by a process to all the processes in the processes grid.
+
+<P>
+<BR><P></P>
+<DIV ALIGN="CENTER">
+<!-- MATH
+ \begin{displaymath}
+loc\_x_i \leftarrow scatter(glob\_x)
+\end{displaymath}
+ -->
+
+<IMG
+ WIDTH="167" HEIGHT="28" BORDER="0"
+ SRC="img80.png"
+ ALT="\begin{displaymath}loc\_x_i \leftarrow scatter(glob\_x) \end{displaymath}">
+</DIV>
+<BR CLEAR="ALL">
+<P></P>
+where:
+<DL>
+<DT><STRONG><IMG
+ WIDTH="46" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ SRC="img72.png"
+ ALT="$glob\_x$"></STRONG></DT>
+<DD>is the global matrix <!-- MATH
+ $glob\_x_{1:m,1:n}$
+ -->
+<IMG
+ WIDTH="91" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ SRC="img73.png"
+ ALT="$glob\_x_{1:m,1:n}$">
+</DD>
+<DT><STRONG><IMG
+ WIDTH="43" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ SRC="img74.png"
+ ALT="$loc\_x_i$"></STRONG></DT>
+<DD>is the local portion of global dense matrix on
+process <IMG
+ WIDTH="10" HEIGHT="17" ALIGN="BOTTOM" BORDER="0"
+ SRC="img3.png"
+ ALT="$i$">.
+</DD>
+<DT><STRONG><IMG
+ WIDTH="54" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
+ SRC="img81.png"
+ ALT="$scatter$"></STRONG></DT>
+<DD>is the scatter function.
+</DD>
+</DL>
+
+<P>
+<BR><P></P>
+<DIV ALIGN="CENTER"><A NAME="2678"></A>
+<TABLE>
+<CAPTION><STRONG>Table 16:</STRONG>
+Data types</CAPTION>
+<TR><TD>
+<DIV ALIGN="CENTER">
+<TABLE CELLPADDING=3 BORDER="1" ALIGN="CENTER">
+<TR><TD ALIGN="LEFT"><IMG
+ WIDTH="33" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ SRC="img76.png"
+ ALT="$x_i, y$"></TD>
+<TD ALIGN="LEFT"><B>Subroutine</B></TD>
+</TR>
+<TR><TD ALIGN="LEFT">Integer</TD>
+<TD ALIGN="LEFT">psb_scatter</TD>
+</TR>
+<TR><TD ALIGN="LEFT">Short Precision Real</TD>
+<TD ALIGN="LEFT">psb_scatter</TD>
+</TR>
+<TR><TD ALIGN="LEFT">Long Precision Real</TD>
+<TD ALIGN="LEFT">psb_scatter</TD>
+</TR>
+<TR><TD ALIGN="LEFT">Short Precision Complex</TD>
+<TD ALIGN="LEFT">psb_scatter</TD>
+</TR>
+<TR><TD ALIGN="LEFT">Long Precision Complex</TD>
+<TD ALIGN="LEFT">psb_scatter</TD>
+</TR>
+</TABLE>
+</DIV>
+</TD></TR>
+</TABLE>
+</DIV><P></P>
+<BR>
+
+<P>
+<PRE>
+call psb_scatter(glob_x, loc_x, desc_a, info, root)
+call psb_scatter(glob_x, loc_x, desc_a, info, root)
+</PRE>
+
+<P>
+<DL>
+<DT><STRONG>Type:</STRONG></DT>
+<DD>Synchronous.
+</DD>
+<DT><STRONG><B>On Entry</B></STRONG></DT>
+<DD>
+</DD>
+<DT><STRONG>glob_x</STRONG></DT>
+<DD>The array that must be scattered into local pieces.
+<BR>
+Scope: <B>global</B> 
+<BR>
+Type: <B>required</B>
+<BR>
+Intent: <B>in</B>.
+<BR>
+Specified as: a rank one or two array.
+</DD>
+<DT><STRONG>desc_a</STRONG></DT>
+<DD>contains data structures for communications.
+<BR>
+Scope: <B>local</B> 
+<BR>
+Type: <B>required</B>
+<BR>
+Intent: <B>in</B>.
+<BR>
+Specified as: a structured data of type descdata<TT>psb_desc_type</TT>.
+</DD>
+<DT><STRONG>root</STRONG></DT>
+<DD>The process that holds the global copy. If <IMG
+ WIDTH="75" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ SRC="img77.png"
+ ALT="$root=-1$"> all
+  the processes have a copy of the global vector.
+<BR>
+Scope: <B>global</B> 
+<BR>
+Type: <B>optional</B>
+<BR>
+Intent: <B>in</B>.
+<BR>
+Specified as: an integer variable <!-- MATH
+ $-1\le root\le np-1$
+ -->
+<IMG
+ WIDTH="140" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ SRC="img78.png"
+ ALT="$-1\le root\le np-1$">, default <IMG
+ WIDTH="25" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ SRC="img79.png"
+ ALT="$-1$">. 
+</DD>
+<DT><STRONG><B>On Return</B></STRONG></DT>
+<DD>
+</DD>
+<DT><STRONG>loc_x</STRONG></DT>
+<DD>the local portion of global dense matrix
+<IMG
+ WIDTH="46" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ SRC="img72.png"
+ ALT="$glob\_x$">. 
+<BR>
+Scope: <B>local</B> 
+<BR>
+Type: <B>required</B>
+<BR>
+Intent: <B>out</B>.
+<BR>
+Specified as: a rank one or two array containing numbers of the type
+indicated in Table&nbsp;<A HREF="#tab:scatter">16</A>.
+</DD>
+<DT><STRONG>info</STRONG></DT>
+<DD>Error code.
+<BR>
+Scope: <B>local</B> 
+<BR>
+Type: <B>required</B> 
+<BR>
+Intent: <B>out</B>.
+<BR>
+An integer value; 0 means no error has been detected. 
+</DD>
+</DL>
+
+<P>
+<HR>
+<!--Navigation Panel-->
+<A NAME="tex2html677"
+  HREF="node42.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next"
+ SRC="file:/usr/share/latex2html/icons/next.png"></A> 
+<A NAME="tex2html673"
+  HREF="node37.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up"
+ SRC="file:/usr/share/latex2html/icons/up.png"></A> 
+<A NAME="tex2html669"
+  HREF="node40.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous"
+ SRC="file:/usr/share/latex2html/icons/prev.png"></A> 
+<A NAME="tex2html675"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents"
+ SRC="file:/usr/share/latex2html/icons/contents.png"></A>  
+<BR>
+<B> Next:</B> <A NAME="tex2html678"
+  HREF="node42.html">Data management routines</A>
+<B> Up:</B> <A NAME="tex2html674"
+  HREF="node37.html">Communication routines</A>
+<B> Previous:</B> <A NAME="tex2html670"
+  HREF="node40.html">psb_gather   Gather</A>
+ &nbsp; <B>  <A NAME="tex2html676"
+  HREF="node1.html">Contents</A></B> 
+<!--End of Navigation Panel-->
+
+</BODY>
+</HTML>

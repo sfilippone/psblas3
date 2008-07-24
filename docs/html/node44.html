@@ -1,0 +1,193 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+
+<!--Converted with LaTeX2HTML 2002-2-1 (1.71)
+original version by:  Nikos Drakos, CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>psb_cdins -- Communication descriptor insert routine</TITLE>
+<META NAME="description" CONTENT="psb_cdins -- Communication descriptor insert routine">
+<META NAME="keywords" CONTENT="userhtml">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META NAME="Generator" CONTENT="LaTeX2HTML v2002-2-1">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+
+<LINK REL="STYLESHEET" HREF="userhtml.css">
+
+<LINK REL="next" HREF="node45.html">
+<LINK REL="previous" HREF="node43.html">
+<LINK REL="up" HREF="node42.html">
+<LINK REL="next" HREF="node45.html">
+</HEAD>
+
+<BODY >
+<!--Navigation Panel-->
+<A NAME="tex2html740"
+  HREF="node45.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next"
+ SRC="file:/usr/share/latex2html/icons/next.png"></A> 
+<A NAME="tex2html736"
+  HREF="node42.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up"
+ SRC="file:/usr/share/latex2html/icons/up.png"></A> 
+<A NAME="tex2html730"
+  HREF="node43.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous"
+ SRC="file:/usr/share/latex2html/icons/prev.png"></A> 
+<A NAME="tex2html738"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents"
+ SRC="file:/usr/share/latex2html/icons/contents.png"></A>  
+<BR>
+<B> Next:</B> <A NAME="tex2html741"
+  HREF="node45.html">psb_cdasb   Communication</A>
+<B> Up:</B> <A NAME="tex2html737"
+  HREF="node42.html">Data management routines</A>
+<B> Previous:</B> <A NAME="tex2html731"
+  HREF="node43.html">psb_cdall   Allocates</A>
+ &nbsp; <B>  <A NAME="tex2html739"
+  HREF="node1.html">Contents</A></B> 
+<BR>
+<BR>
+<!--End of Navigation Panel-->
+
+<H2><A NAME="SECTION00072000000000000000">
+psb_cdins -- Communication descriptor insert routine</A>
+</H2>
+
+<P>
+<PRE>
+call psb_cdins(nz, ia, ja, desc_a, info)
+</PRE>
+
+<P>
+This subroutine examines the edges of the graph associated with the
+discretization mesh (and isomorphic to the sparsity pattern of a
+linear system coefficient matrix), storing them as necessary into the
+communication descriptor.
+
+<P>
+<DL>
+<DT><STRONG>Type:</STRONG></DT>
+<DD>Asynchronous.
+</DD>
+<DT><STRONG><B>On Entry</B></STRONG></DT>
+<DD>
+</DD>
+<DT><STRONG>nz</STRONG></DT>
+<DD>the number of points being inserted.
+<BR>
+Scope: <B>local</B>.
+<BR>
+Type: <B>required</B>.
+<BR>
+Intent: <B>in</B>.
+<BR>
+Specified as: an integer value.
+</DD>
+<DT><STRONG>ia</STRONG></DT>
+<DD>the indices of the starting vertex of the edges  being inserted.
+<BR>
+Scope: <B>local</B>.
+<BR>
+Type: <B>required</B>.
+<BR>
+Intent: <B>in</B>.
+<BR>
+Specified as: an integer array of length <IMG
+ WIDTH="22" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
+ SRC="img95.png"
+ ALT="$nz$">.
+</DD>
+<DT><STRONG>ja</STRONG></DT>
+<DD>the indices of the end vertex of the edges  being inserted.
+<BR>
+Scope: <B>local</B>.
+<BR>
+Type: <B>required</B>.
+<BR>
+Intent: <B>in</B>.
+<BR>
+Specified as: an integer array of length <IMG
+ WIDTH="22" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
+ SRC="img95.png"
+ ALT="$nz$">.
+</DD>
+</DL>
+
+<P>
+<DL>
+<DT><STRONG><B>On Return</B></STRONG></DT>
+<DD>
+</DD>
+<DT><STRONG>desc_a</STRONG></DT>
+<DD>the updated communication descriptor.
+<BR>
+Scope:<B>local</B>.
+<BR>
+Type:<B>required</B>.
+<BR>
+Intent: <B>inout</B>.
+<BR>
+Specified as: a structured data of type descdata<TT>psb_desc_type</TT>.
+</DD>
+<DT><STRONG>info</STRONG></DT>
+<DD>Error code.
+<BR>
+Scope: <B>local</B> 
+<BR>
+Type: <B>required</B> 
+<BR>
+Intent: <B>out</B>.
+<BR>
+An integer value; 0 means no error has been detected. 
+</DD>
+</DL>
+<FONT SIZE="+1"><B>Notes</B></FONT>
+
+<OL>
+<LI>This routine may only be called if the descriptor is in the
+  build state;
+</LI>
+<LI>This routine automatically ignores edges that do not
+insist on the  current process, i.e. edges for which neither the starting
+nor the end vertex belong to the current process. 
+</LI>
+</OL>
+
+<P>
+<HR>
+<!--Navigation Panel-->
+<A NAME="tex2html740"
+  HREF="node45.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next"
+ SRC="file:/usr/share/latex2html/icons/next.png"></A> 
+<A NAME="tex2html736"
+  HREF="node42.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up"
+ SRC="file:/usr/share/latex2html/icons/up.png"></A> 
+<A NAME="tex2html730"
+  HREF="node43.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous"
+ SRC="file:/usr/share/latex2html/icons/prev.png"></A> 
+<A NAME="tex2html738"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents"
+ SRC="file:/usr/share/latex2html/icons/contents.png"></A>  
+<BR>
+<B> Next:</B> <A NAME="tex2html741"
+  HREF="node45.html">psb_cdasb   Communication</A>
+<B> Up:</B> <A NAME="tex2html737"
+  HREF="node42.html">Data management routines</A>
+<B> Previous:</B> <A NAME="tex2html731"
+  HREF="node43.html">psb_cdall   Allocates</A>
+ &nbsp; <B>  <A NAME="tex2html739"
+  HREF="node1.html">Contents</A></B> 
+<!--End of Navigation Panel-->
+
+</BODY>
+</HTML>

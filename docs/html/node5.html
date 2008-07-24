@@ -1,0 +1,186 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+
+<!--Converted with LaTeX2HTML 2002-2-1 (1.71)
+original version by:  Nikos Drakos, CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>Library contents</TITLE>
+<META NAME="description" CONTENT="Library contents">
+<META NAME="keywords" CONTENT="userhtml">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META NAME="Generator" CONTENT="LaTeX2HTML v2002-2-1">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+
+<LINK REL="STYLESHEET" HREF="userhtml.css">
+
+<LINK REL="next" HREF="node6.html">
+<LINK REL="previous" HREF="node4.html">
+<LINK REL="up" HREF="node3.html">
+<LINK REL="next" HREF="node6.html">
+</HEAD>
+
+<BODY >
+<!--Navigation Panel-->
+<A NAME="tex2html219"
+  HREF="node6.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next"
+ SRC="file:/usr/share/latex2html/icons/next.png"></A> 
+<A NAME="tex2html215"
+  HREF="node3.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up"
+ SRC="file:/usr/share/latex2html/icons/up.png"></A> 
+<A NAME="tex2html209"
+  HREF="node4.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous"
+ SRC="file:/usr/share/latex2html/icons/prev.png"></A> 
+<A NAME="tex2html217"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents"
+ SRC="file:/usr/share/latex2html/icons/contents.png"></A>  
+<BR>
+<B> Next:</B> <A NAME="tex2html220"
+  HREF="node6.html">Application structure</A>
+<B> Up:</B> <A NAME="tex2html216"
+  HREF="node3.html">General overview</A>
+<B> Previous:</B> <A NAME="tex2html210"
+  HREF="node4.html">Basic Nomenclature</A>
+ &nbsp; <B>  <A NAME="tex2html218"
+  HREF="node1.html">Contents</A></B> 
+<BR>
+<BR>
+<!--End of Navigation Panel-->
+
+<H2><A NAME="SECTION00032000000000000000">
+Library contents</A>
+</H2>
+
+<P>
+The PSBLAS library consists of various classes of subroutines:
+<DL>
+<DT><STRONG>Computational routines</STRONG></DT>
+<DD>comprising:
+
+<UL>
+<LI>Sparse matrix by dense matrix product; 
+</LI>
+<LI>Sparse triangular
+systems solution for block diagonal matrices;
+</LI>
+<LI>Vector and matrix norms;
+</LI>
+<LI>Dense matrix sums;
+</LI>
+<LI>Dot products.
+</LI>
+</UL> 
+</DD>
+<DT><STRONG>Communication routines</STRONG></DT>
+<DD>handling halo and overlap
+  communications;
+</DD>
+<DT><STRONG>Data management and auxiliary routines</STRONG></DT>
+<DD>including:
+
+<UL>
+<LI>Parallel environment management
+</LI>
+<LI>Communication descriptors allocation;
+</LI>
+<LI>Dense and sparse matrix allocation;
+</LI>
+<LI>Dense and sparse matrix build and update;
+</LI>
+<LI>Sparse matrix and data distribution preprocessing.
+</LI>
+</UL> 
+</DD>
+<DT><STRONG>Preconditioner routines</STRONG></DT>
+<DD>
+</DD>
+<DT><STRONG>Iterative methods</STRONG></DT>
+<DD>a subset of Krylov subspace iterative
+  methods
+</DD>
+</DL>
+The following naming scheme has been adopted for all the symbols
+internally defined in the PSBLAS software package:
+
+<UL>
+<LI>all the symbols (i.e. subroutine names, data types...) are
+  prefixed by <code>psb_</code> 
+</LI>
+<LI>all the data type names are suffixed by <code>_type</code>
+</LI>
+<LI>all the constant values are suffixed by <code>_</code>
+</LI>
+<LI>all the subroutine names follow the rule <code>psb_xxname</code> where
+  <code>xx</code> can be either:
+  
+<UL>
+<LI><code>ge</code>: the routine is related to dense data, 
+</LI>
+<LI><code>sp</code>: the routine is related to sparse data, 
+</LI>
+<LI><code>cd</code>: the routine is related to communication descriptor
+        (see&nbsp;<A HREF="node8.html#sec:datastruct">3</A>).
+  
+</LI>
+</UL>
+  For example the <code>psb_geins</code>, <code>psb_spins</code> and
+  <code>psb_cdins</code> perform the same action (see&nbsp;<A HREF="node42.html#sec:toolsrout">6</A>) on
+  dense matrices, sparse matrices and communication descriptors
+  respectively.
+  Interface overloading allows the usage of the same subroutine
+  interfaces for both real and complex data.
+</LI>
+</UL>
+In the description of the subroutines, arguments or argument entries
+are classified as:
+<DL>
+<DT><STRONG>global</STRONG></DT>
+<DD>For input arguments, the value must be the same on all processes
+  participating in the subroutine call; for output arguments the value
+  is guaranteed to be the same.
+</DD>
+<DT><STRONG>local</STRONG></DT>
+<DD>Each process has its own value(s) independently.
+</DD>
+</DL>
+
+<P>
+<HR>
+<!--Navigation Panel-->
+<A NAME="tex2html219"
+  HREF="node6.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next"
+ SRC="file:/usr/share/latex2html/icons/next.png"></A> 
+<A NAME="tex2html215"
+  HREF="node3.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up"
+ SRC="file:/usr/share/latex2html/icons/up.png"></A> 
+<A NAME="tex2html209"
+  HREF="node4.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous"
+ SRC="file:/usr/share/latex2html/icons/prev.png"></A> 
+<A NAME="tex2html217"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents"
+ SRC="file:/usr/share/latex2html/icons/contents.png"></A>  
+<BR>
+<B> Next:</B> <A NAME="tex2html220"
+  HREF="node6.html">Application structure</A>
+<B> Up:</B> <A NAME="tex2html216"
+  HREF="node3.html">General overview</A>
+<B> Previous:</B> <A NAME="tex2html210"
+  HREF="node4.html">Basic Nomenclature</A>
+ &nbsp; <B>  <A NAME="tex2html218"
+  HREF="node1.html">Contents</A></B> 
+<!--End of Navigation Panel-->
+
+</BODY>
+</HTML>

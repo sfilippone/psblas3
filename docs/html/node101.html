@@ -1,0 +1,159 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+
+<!--Converted with LaTeX2HTML 2002-2-1 (1.71)
+original version by:  Nikos Drakos, CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>psb_precaply -- Preconditioner application routine</TITLE>
+<META NAME="description" CONTENT="psb_precaply -- Preconditioner application routine">
+<META NAME="keywords" CONTENT="userhtml">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META NAME="Generator" CONTENT="LaTeX2HTML v2002-2-1">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+
+<LINK REL="STYLESHEET" HREF="userhtml.css">
+
+<LINK REL="next" HREF="node102.html">
+<LINK REL="previous" HREF="node100.html">
+<LINK REL="up" HREF="node98.html">
+<LINK REL="next" HREF="node102.html">
+</HEAD>
+
+<BODY >
+<!--Navigation Panel-->
+<A NAME="tex2html1445"
+  HREF="node102.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next"
+ SRC="file:/usr/share/latex2html/icons/next.png"></A> 
+<A NAME="tex2html1441"
+  HREF="node98.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up"
+ SRC="file:/usr/share/latex2html/icons/up.png"></A> 
+<A NAME="tex2html1435"
+  HREF="node100.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous"
+ SRC="file:/usr/share/latex2html/icons/prev.png"></A> 
+<A NAME="tex2html1443"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents"
+ SRC="file:/usr/share/latex2html/icons/contents.png"></A>  
+<BR>
+<B> Next:</B> <A NAME="tex2html1446"
+  HREF="node102.html">psb_precdescr   Prints</A>
+<B> Up:</B> <A NAME="tex2html1442"
+  HREF="node98.html">Preconditioner routines</A>
+<B> Previous:</B> <A NAME="tex2html1436"
+  HREF="node100.html">psb_precbld   Builds</A>
+ &nbsp; <B>  <A NAME="tex2html1444"
+  HREF="node1.html">Contents</A></B> 
+<BR>
+<BR>
+<!--End of Navigation Panel-->
+
+<H2><A NAME="SECTION000113000000000000000">
+psb_precaply -- Preconditioner application routine</A>
+</H2>
+
+<P>
+<PRE>
+call psb_precaply(prec,x,y,desc_a,info,trans,work)
+call psb_precaply(prec,x,desc_a,info,trans)
+</PRE>
+
+<P>
+<DL>
+<DT><STRONG>Type:</STRONG></DT>
+<DD>Synchronous.
+</DD>
+<DT><STRONG><B>On Entry</B></STRONG></DT>
+<DD>
+</DD>
+<DT><STRONG>prec</STRONG></DT>
+<DD>the preconditioner.
+Scope: <B>local</B> 
+<BR>
+Type: <B>required</B>
+<BR>
+Intent: <B>in</B>.
+<BR>
+Specified as: a preconditioner data structure precdata<TT>psb_prec_type</TT>.
+</DD>
+<DT><STRONG>x</STRONG></DT>
+<DD>the source vector.
+Scope: <B>local</B> 
+<BR>
+Type: <B>required</B>
+<BR>
+Intent: <B>inout</B>.
+<BR>
+Specified as: a double precision array.
+</DD>
+<DT><STRONG>desc_a</STRONG></DT>
+<DD>the problem communication descriptor.
+Scope: <B>local</B> 
+<BR>
+Type: <B>required</B>
+<BR>
+Intent: <B>in</B>.
+<BR>
+Specified as: a communication data structure descdata<TT>psb_desc_type</TT>.
+</DD>
+<DT><STRONG>trans</STRONG></DT>
+<DD>Scope:  
+<BR>
+Type: <B>optional</B>
+<BR>
+Intent: <B>in</B>.
+<BR>
+Specified as: a character.
+</DD>
+<DT><STRONG>work</STRONG></DT>
+<DD>an optional work space
+Scope: <B>local</B> 
+<BR>
+Type: <B>optional</B>
+<BR>
+Intent: <B>inout</B>.
+<BR>
+Specified as: a double precision array.
+</DD>
+</DL>
+
+<P>
+<DL>
+<DT><STRONG><B>On Return</B></STRONG></DT>
+<DD>
+</DD>
+<DT><STRONG>y</STRONG></DT>
+<DD>the destination vector.
+Scope: <B>local</B> 
+<BR>
+Type: <B>required</B>
+<BR>
+Intent: <B>inout</B>.
+<BR>
+Specified as: a double precision array.
+</DD>
+<DT><STRONG>info</STRONG></DT>
+<DD>Error code.
+<BR>
+Scope: <B>local</B> 
+<BR>
+Type: <B>required</B> 
+<BR>
+Intent: <B>out</B>.
+<BR>
+An integer value; 0 means no error has been detected. 
+</DD>
+</DL>
+
+<P>
+<BR><HR>
+
+</BODY>
+</HTML>

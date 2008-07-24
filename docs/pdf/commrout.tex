@@ -8,7 +8,8 @@ The routines in this chapter implement various global communication operators
 on vectors associated with a discretization mesh. For auxiliary communication
 routines not tied to a discretization space see~\ref{sec:toolsrout}.
 
-\subroutine{psb\_halo}{Halo Data Communication}    
+\clearpage\subsection*{psb\_halo --- Halo Data Communication}    
+\addcontentsline{toc}{subsection}{psb\_halo}
 
 These subroutines gathers the values of the halo
 elements, and  (optionally) scale the result:
@@ -36,8 +37,10 @@ Long Precision Complex & psb\_halo \\
 \caption{Data types\label{tab:f90halo}}
 \end{table}
 
-\syntax{call psb\_halo}{x, desc\_a, info}
-\syntax*{call psb\_halo}{x, desc\_a, info, alpha, work, data}
+\begin{verbatim}
+call psb_halo(x, desc_a, info)
+call psb_halo(x, desc_a, info, alpha, work, data)
+\end{verbatim}
 
 \begin{description}
 \item[Type:] Synchronous.
@@ -93,7 +96,8 @@ An integer value that contains an error code.
 \end{center}
 \caption{Sample discretization mesh.\label{fig:try8x8}}
 \end{figure}
-\section*{Example of use}
+
+{\par\noindent\large\bfseries Usage Example}
 Consider the discretization mesh depicted in fig.~\ref{fig:try8x8},
 partitioned among two processes as shown by the dashed line; the data
 distribution is such that each process will own 32 entries in the
@@ -159,7 +163,8 @@ following:
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
-\subroutine{psb\_ovrl}{Overlap Update}    
+\clearpage\subsection*{psb\_ovrl --- Overlap Update}    
+\addcontentsline{toc}{subsection}{psb\_ovrl}
 
 These subroutines applies an overlap operator to the input vector:
 
@@ -187,8 +192,10 @@ Long Precision Complex & psb\_ovrl \\
 \caption{Data types\label{tab:f90ovrl}}
 \end{table}
 
-\syntax{call psb\_ovrl}{x, desc\_a, info}
-\syntax*{call psb\_ovrl}{x, desc\_a, info, update=update\_type, work=work} 
+\begin{verbatim}
+call psb_ovrl(x, desc_a, info)
+call psb_ovrl(x, desc_a, info, update=update_type, work=work)
+\end{verbatim} 
 
 \begin{description}
 \item[Type:] Synchronous.
@@ -239,7 +246,7 @@ An integer value; 0 means no error has been detected.
 \end{description}
 
 
-\section*{Usage notes}
+{\par\noindent\large\bfseries Notes}
 \begin{enumerate}
 \item If there is no overlap in the data distribution associated with
   the descriptor, no operations are performed;
@@ -263,7 +270,7 @@ their instances.
 \end{center}
 \caption{Sample discretization mesh.\label{fig:try8x8_ov}}
 \end{figure}
-\section*{Example of use}
+{\par\noindent\large\bfseries Example of use}
 Consider the discretization mesh depicted in fig.~\ref{fig:try8x8_ov},
 partitioned among two processes as shown by the dashed lines, with an
 overlap of 1 extra layer with respect to the partition of
@@ -343,7 +350,8 @@ following (showing a transition among the two subdomains)
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\subroutine{psb\_gather}{Gather Global Dense Matrix}
+\clearpage\subsection*{psb\_gather --- Gather Global Dense Matrix}
+\addcontentsline{toc}{subsection}{psb\_gather}
 
 These subroutines collect the portions of global dense matrix
 distributed over all process into one single array stored on one
@@ -375,8 +383,10 @@ Long Precision Complex & psb\_gather \\
 \caption{Data types\label{tab:gather}}
 \end{table}
 
-\syntax{call psb\_gather}{glob\_x, loc\_x, desc\_a, info, root}
-\syntax{call psb\_gather}{glob\_x, loc\_x, desc\_a, info, root}
+\begin{verbatim}
+call psb_gather(glob_x, loc_x, desc_a, info, root)
+call psb_gather(glob_x, loc_x, desc_a, info, root)
+\end{verbatim}
 
 \begin{description}
 \item[Type:] Synchronous.
@@ -442,7 +452,8 @@ An integer value; 0 means no error has been detected.
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\subroutine{psb\_scatter}{Scatter Global Dense Matrix}
+\clearpage\subsection*{psb\_scatter --- Scatter Global Dense Matrix}
+\addcontentsline{toc}{subsection}{psb\_scatter}
 
 These subroutines scatters the portions of global dense matrix owned
 by a process to all the processes in the processes grid.
@@ -473,8 +484,10 @@ Long Precision Complex & psb\_scatter \\
 \caption{Data types\label{tab:scatter}}
 \end{table}
 
-\syntax{call psb\_scatter}{glob\_x, loc\_x, desc\_a, info, root}
-\syntax{call psb\_scatter}{glob\_x, loc\_x, desc\_a, info, root}
+\begin{verbatim}
+call psb_scatter(glob_x, loc_x, desc_a, info, root)
+call psb_scatter(glob_x, loc_x, desc_a, info, root)
+\end{verbatim}
 
 \begin{description}
 \item[Type:] Synchronous.

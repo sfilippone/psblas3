@@ -5,17 +5,20 @@
 %
 %%   psb_cdall %%
 %
-\subroutine{psb\_cdall}{Allocates a communication descriptor}
+\subsection*{psb\_cdall --- Allocates a communication descriptor}
+\addcontentsline{toc}{subsection}{psb\_cdall}
 
-\syntax{call psb\_cdall}{icontxt, desc\_a, info,mg=mg,parts=parts}
-\syntax*{call psb\_cdall}{icontxt, desc\_a, info,vg=vg,flag=flag}
-\syntax*{call psb\_cdall}{icontxt, desc\_a, info,vl=vl}
-\syntax*{call psb\_cdall}{icontxt, desc\_a, info,nl=nl}
-\syntax*{call psb\_cdall}{icontxt, desc\_a, info,mg=mg,repl=.true.}
+\begin{verbatim}
+call psb_cdall(icontxt, desc_a, info,mg=mg,parts=parts)
+call psb_cdall(icontxt, desc_a, info,vg=vg,flag=flag)
+call psb_cdall(icontxt, desc_a, info,vl=vl)
+call psb_cdall(icontxt, desc_a, info,nl=nl)
+call psb_cdall(icontxt, desc_a, info,mg=mg,repl=.true.)
+\end{verbatim}
 
 This subroutine initializes the communication descriptor associated
 with an index space. Exactly one of the  optional arguments
-\verb|parts|, \verb|vg|, \verb|vl| or \verb|nl| 
+\verb|parts|, \verb|vg|, \verb|vl|, \verb|nl|  or \verb|repl| 
 must be specified, thereby choosing
 the specific initialization strategy:
 \begin{description}
@@ -82,7 +85,7 @@ Intent: {\bf out}.\\
 An integer value; 0 means no error has been detected. 
 \end{description}
 
-\section*{Notes}
+{\par\noindent\large\bfseries Notes}
 \begin{enumerate}
 \item Exactly one of the optional arguments  \verb|parts|, \verb|vg|,
   \verb|vl|, \verb|nl|  must be specified, thereby choosing the
@@ -140,9 +143,12 @@ An integer value; 0 means no error has been detected.
 %
 %%   psb_cdins %%
 %
-\subroutine{psb\_cdins}{Communication descriptor insert routine}
+\clearpage\subsection*{psb\_cdins --- Communication descriptor insert routine}
+\addcontentsline{toc}{subsection}{psb\_cdins}
 
-\syntax{call psb\_cdins}{nz, ia, ja, desc\_a, info}
+\begin{verbatim}
+call psb_cdins(nz, ia, ja, desc_a, info)
+\end{verbatim}
 
 This subroutine examines the edges of the graph associated with the
 discretization mesh (and isomorphic to the sparsity pattern of a
@@ -190,7 +196,7 @@ Type: {\bf required} \\
 Intent: {\bf out}.\\
 An integer value; 0 means no error has been detected. 
 \end{description}
-\section*{Notes}
+{\par\noindent\large\bfseries Notes}
 \begin{enumerate}
 \item This routine may only be called if the descriptor is in the
   build state;
@@ -204,9 +210,12 @@ nor the end vertex belong to the current process.
 %
 %%   psb_cdasb %%
 %
-\subroutine{psb\_cdasb}{Communication descriptor assembly routine}
+\clearpage\subsection*{psb\_cdasb --- Communication descriptor assembly routine}
+\addcontentsline{toc}{subsection}{psb\_cdasb}
 
-\syntax{call psb\_cdasb}{desc\_a, info}
+\begin{verbatim}
+call psb_cdasb(desc_a, info)
+\end{verbatim}
 
 \begin{description}
 \item[Type:] Synchronous.
@@ -232,7 +241,7 @@ Intent: {\bf out}.\\
 An integer value; 0 means no error has been detected. 
 %\item[arg] 
 \end{description}
-\section*{Notes}
+{\par\noindent\large\bfseries Notes}
 \begin{enumerate}
 \item On exit from this routine the descriptor is in the assembled
   state. 
@@ -243,9 +252,12 @@ An integer value; 0 means no error has been detected.
 %
 %%   psb_cdcpy %%
 %
-\subroutine{psb\_cdcpy}{Copies a communication descriptor}
+\clearpage\subsection*{psb\_cdcpy --- Copies a communication descriptor}
+\addcontentsline{toc}{subsection}{psb\_cdcpy}
 
-\syntax{call psb\_cdcpy}{desc\_in, desc\_out, info}
+\begin{verbatim}
+call psb_cdcpy(desc_in, desc_out, info)
+\end{verbatim}
 
 \begin{description}
 \item[Type:] Asynchronous.
@@ -276,9 +288,12 @@ An integer value; 0 means no error has been detected.
 %
 %%   psb_cdfree %%
 %
-\subroutine{psb\_cdfree}{Frees a communication descriptor}
+\clearpage\subsection*{psb\_cdfree --- Frees a communication descriptor}
+\addcontentsline{toc}{subsection}{psb\_cdfree}
 
-\syntax{call psb\_cdfree}{desc\_a, info}
+\begin{verbatim}
+call psb_cdfree(desc_a, info)
+\end{verbatim}
 
 \begin{description}
 \item[Type:] Synchronous.
@@ -304,9 +319,13 @@ An integer value; 0 means no error has been detected.
 %
 %%   psb_cdcpy %%
 %
-\subroutine{psb\_cdbldext}{Build an extended  communication descriptor}
+\clearpage\subsection*{psb\_cdbldext --- Build an extended  communication
+  descriptor}
+\addcontentsline{toc}{subsection}{psb\_cdbldext}
 
-\syntax{call psb\_cdbldext}{a,desc\_a,nl,desc\_out, info, extype}
+\begin{verbatim}
+call psb_cdbldext(a,desc_a,nl,desc_out, info, extype)
+\end{verbatim}
 
 This subroutine builds an extended communication descriptor, based on
 the input descriptor \verb|desc_a| and on the stencil specified
@@ -352,7 +371,7 @@ Intent: {\bf out}.\\
 An integer value; 0 means no error has been detected. 
 \end{description}
 
-\section*{Notes}
+{\par\noindent\large\bfseries Notes}
 \begin{enumerate}
 \item Specifying \verb|psb_ovt_xhal_| for the \verb|extype| argument
   the user will obtain a descriptor for a domain partition in which
@@ -370,7 +389,9 @@ An integer value; 0 means no error has been detected.
 %% %
 %% %%   psb_cdren %%
 %% %
-%% \subroutine{psb\_cdren}{Applies a renumeration to a communication descriptor}
+%% \subsection*{psb\_cdren --- Applies a renumeration to a
+%% communication descriptor}
+%% \addcontentsline{toc}{subsection}{psb\_cdren}
 
 %% \syntax{call psb\_cdren}{trans, iperm, desc\_a, info}
 
@@ -405,7 +426,8 @@ An integer value; 0 means no error has been detected.
 %
 %%   psb_descprt %%
 %
-%% \subroutine{psb\_cdprt}{Prints a descriptor}
+%% \subsection*{psb\_cdprt --- Prints a descriptor}
+%%\addcontentsline{toc}{subsection}{psb\_cdprt}
 
 %% \syntax{call psb\_cdprt}{iout, desc\_a, glob, short}
 
@@ -434,9 +456,12 @@ An integer value; 0 means no error has been detected.
 %
 %%   psb_spalloc %%
 %
-\subroutine{psb\_spall}{Allocates a sparse matrix}
+\clearpage\subsection*{psb\_spall --- Allocates a sparse matrix}
+\addcontentsline{toc}{subsection}{psb\_spall}
 
-\syntax{call psb\_spall}{a, desc\_a, info, nnz}
+\begin{verbatim}
+call psb_spall(a, desc_a, info, nnz)
+\end{verbatim}
 
 \begin{description}
 \item[Type:] Synchronous.
@@ -467,7 +492,7 @@ Type: {\bf required} \\
 Intent: {\bf out}.\\
 An integer value; 0 means no error has been detected. 
 \end{description}
-\section*{Notes}
+{\par\noindent\large\bfseries Notes}
 \begin{enumerate}
 \item On exit from this routine the sparse matrix  is in the build
   state.
@@ -483,9 +508,13 @@ An integer value; 0 means no error has been detected.
 %
 %%   psb_spins %%
 %
-\subroutine{psb\_spins}{Insert a cloud of elements into a sparse matrix}
+\clearpage\subsection*{psb\_spins --- Insert a cloud of elements into a sparse
+  matrix}
+\addcontentsline{toc}{subsection}{psb\_spins}
 
-\syntax{call psb\_spins}{nz, ia, ja, val, a, desc\_a, info}
+\begin{verbatim}
+call psb_spins(nz, ia, ja, val, a, desc_a, info)
+\end{verbatim}
 
 \begin{description}
 \item[Type:] Asynchronous.
@@ -545,7 +574,7 @@ Intent: {\bf out}.\\
 An integer value; 0 means no error has been detected. 
 \end{description}
 
-\section*{Notes}
+{\par\noindent\large\bfseries Notes}
 \begin{enumerate}
 \item On entry to this routine the descriptor may be in either the
   build or assembled state.
@@ -569,9 +598,12 @@ An integer value; 0 means no error has been detected.
 %
 %%   psb_spasb %%
 %
-\subroutine{psb\_spasb}{Sparse matrix assembly routine}
+\clearpage\subsection*{psb\_spasb --- Sparse matrix assembly routine}
+\addcontentsline{toc}{subsection}{psb\_spasb}
 
-\syntax{call psb\_spasb}{a, desc\_a, info, afmt, upd, dupl}
+\begin{verbatim}
+call psb_spasb(a, desc_a, info, afmt, upd, dupl)
+\end{verbatim}
 
 \begin{description}
 \item[Type:] Synchronous.
@@ -613,7 +645,7 @@ Intent: {\bf out}.\\
 An integer value; 0 means no error has been detected. 
 \end{description}
 
-\section*{Notes}
+{\par\noindent\large\bfseries Notes}
 \begin{enumerate}
 \item On entry to this routine the descriptor must  be in  the
   assembled state, i.e. \verb|psb_cdasb| must already have been called.
@@ -634,7 +666,9 @@ An integer value; 0 means no error has been detected.
 %% %
 %% %%   psb_spcnv %%
 %% %
-%% \subroutine{psb\_spcnv}{Converts a sparse matrix storage format}
+%% \subsection*{psb\_spcnv --- Converts a sparse matrix storage
+%% format}
+%%\addcontentsline{toc}{subsection}{psb\_spcnv}
 
 %% \syntax{call psb\_spcnv}{a, b, desc\_a, info}
 
@@ -667,9 +701,12 @@ An integer value; 0 means no error has been detected.
 %
 %%   psb_spfree %%
 %
-\subroutine{psb\_spfree}{Frees a sparse matrix}
+\clearpage\subsection*{psb\_spfree --- Frees a sparse matrix}
+\addcontentsline{toc}{subsection}{psb\_spfree}
 
-\syntax{call psb\_spfree}{a, desc\_a, info}
+\begin{verbatim}
+call psb_spfree(a, desc_a, info)
+\end{verbatim}
 
 \begin{description}
 \item[Type:] Synchronous.
@@ -701,9 +738,13 @@ An integer value; 0 means no error has been detected.
 %
 %%   psb_sprn %%
 %
-\subroutine{psb\_sprn}{Reinit sparse matrix structure for psblas routines.}
+\clearpage\subsection*{psb\_sprn --- Reinit sparse matrix structure for psblas
+  routines.}
+\addcontentsline{toc}{subsection}{psb\_sprn}
 
-\syntax{call psb\_sprn}{a, decsc\_a, info, clear}
+\begin{verbatim}
+call psb_sprn(a, decsc_a, info, clear)
+\end{verbatim}
 
 \begin{description}
 \item[Type:] Synchronous.
@@ -733,7 +774,7 @@ Type: {\bf required} \\
 Intent: {\bf out}.\\
 An integer value; 0 means no error has been detected. 
 \end{description}
-\section*{Notes}
+{\par\noindent\large\bfseries Notes}
 \begin{enumerate}
 \item On exit from this routine the sparse matrix is in the update
   state. 
@@ -741,7 +782,8 @@ An integer value; 0 means no error has been detected.
 %
 %%   psb_spupdate %%
 %
-%% \subroutine{psb\_spupdate}{Updates a sparse matrix.}
+%% \subsection*{psb\_spupdate --- Updates a sparse matrix.}
+%%\addcontentsline{toc}{subsection}{psb\_spupdate}
 
 %% \syntax{call psb\_spupdate}{a, ia, ja, blck, desc\_a, info, ix, jx, updflag}
 
@@ -755,7 +797,9 @@ An integer value; 0 means no error has been detected.
 %% %
 %% %%   psb_csrp %%
 %% %
-%% \subroutine{psb\_csrp}{Applies a right permutation to a sparse matrix}
+%% \subsection*{psb\_csrp --- Applies a right permutation to a sparse
+%% matrix}
+%%\addcontentsline{toc}{subsection}{psb\_csrp}
 
 %% \syntax{call psb\_csrp}{trans, iperm, a, info}
 
@@ -785,9 +829,12 @@ An integer value; 0 means no error has been detected.
 %
 %%   psb_alloc %%
 %
-\subroutine{psb\_geall}{Allocates a dense matrix}
+\clearpage\subsection*{psb\_geall --- Allocates a dense matrix}
+\addcontentsline{toc}{subsection}{psb\_geall}
 
-\syntax{call psb\_geall}{x, desc\_a, info, n, lb}
+\begin{verbatim}
+call psb_geall(x, desc_a, info, n, lb)
+\end{verbatim}
 
 \begin{description}
 \item[Type:] Synchronous.
@@ -830,9 +877,12 @@ An integer value; 0 means no error has been detected.
 %
 %%   psb_ins %%
 %
-\subroutine{psb\_geins}{Dense matrix insertion routine}
+\clearpage\subsection*{psb\_geins --- Dense matrix insertion routine}
+\addcontentsline{toc}{subsection}{psb\_geins}
 
-\syntax{call psb\_geins}{m, irw, val, x, desc\_a, info,dupl}
+\begin{verbatim}
+call psb_geins(m, irw, val, x, desc_a, info,dupl)
+\end{verbatim}
 
 \begin{description}
 \item[Type:] Asynchronous.
@@ -883,7 +933,7 @@ Intent: {\bf out}.\\
 An integer value; 0 means no error has been detected. 
 \end{description}
 
-\section*{Notes}
+{\par\noindent\large\bfseries Notes}
 \begin{enumerate}
 \item Dense vectors/matrices do not have an associated state;
 \item Duplicate entries are either overwritten or added, there is no
@@ -894,9 +944,12 @@ An integer value; 0 means no error has been detected.
 %
 %%   psb_asb %%
 %
-\subroutine{psb\_geasb}{Assembly a dense matrix}
+\clearpage\subsection*{psb\_geasb --- Assembly a dense matrix}
+\addcontentsline{toc}{subsection}{psb\_geasb}
 
-\syntax{call psb\_geasb}{x, desc\_a, info}
+\begin{verbatim}
+call psb_geasb(x, desc_a, info)
+\end{verbatim}
 
 \begin{description}
 \item[Type:] Synchronous.
@@ -925,9 +978,12 @@ An integer value; 0 means no error has been detected.
 %
 %%   psb_free %%
 %
-\subroutine{psb\_gefree}{Frees a dense matrix}
+\clearpage\subsection*{psb\_gefree --- Frees a dense matrix}
+\addcontentsline{toc}{subsection}{psb\_gefree}
 
-\syntax{call psb\_gefree}{x, desc\_a, info}
+\begin{verbatim}
+call psb_gefree(x, desc_a, info)
+\end{verbatim}
 
 \begin{description}
 \item[Type:] Synchronous.
@@ -960,9 +1016,13 @@ An integer value; 0 means no error has been detected.
 %
 %%   psb_gelp %%
 %
-\subroutine{psb\_gelp}{Applies a left permutation to a dense matrix}
+\clearpage\subsection*{psb\_gelp --- Applies a left permutation to a dense
+  matrix}
+\addcontentsline{toc}{subsection}{psb\_gelp}
 
-\syntax{call psb\_gelp}{trans, iperm, x, info}
+\begin{verbatim}
+call psb_gelp(trans, iperm, x, info)
+\end{verbatim}
 
 \begin{description}
 \item[Type:] Asynchronous.
@@ -997,10 +1057,14 @@ An integer value; 0 means no error has been detected.
 %
 %%   psb_glob_to_loc %%
 %
-\subroutine{psb\_glob\_to\_loc}{Global to local indices convertion}
+\clearpage\subsection*{psb\_glob\_to\_loc --- Global to local indices
+  convertion}
+\addcontentsline{toc}{subsection}{psb\_glob\_to\_loc}
 
-\syntax{call psb\_glob\_to\_loc}{x, y, desc\_a, info, iact,owned}
-\syntax*{call psb\_glob\_to\_loc}{x, desc\_a, info, iact,owned}
+\begin{verbatim}
+call psb_glob_to_loc(x, y, desc_a, info, iact,owned)
+call psb_glob_to_loc(x, desc_a, info, iact,owned)
+\end{verbatim}
 
 \begin{description}
 \item[Type:] Asynchronous.
@@ -1052,17 +1116,23 @@ Intent: {\bf out}.\\
 An integer value; 0 means no error has been detected. 
 \end{description}
 
-\section*{Notes}
+{\par\noindent\large\bfseries Notes}
 \begin{enumerate}
 \item If an input index is out of range, then the corresponding output
   index is set to a negative number;
 \item The default \verb|I|gnore means that the negative output is the
   only action taken on an out-of-range input.
 \end{enumerate}
-\subroutine{psb\_loc\_to\_glob}{Local to global indices conversion}
 
-\syntax{call psb\_loc\_to\_glob}{x, y, desc\_a, info, iact}
-\syntax*{call psb\_loc\_to\_glob}{x, desc\_a, info, iact}
+
+\clearpage\subsection*{psb\_loc\_to\_glob --- Local to global indices
+  conversion}
+\addcontentsline{toc}{subsection}{psb\_loc\_to\_glob}
+
+\begin{verbatim}
+call psb_loc_to_glob(x, y, desc_a, info, iact)
+call psb_loc_to_glob(x, desc_a, info, iact)
+\end{verbatim}
 
 \begin{description}
 \item[Type:] Asynchronous.
@@ -1112,9 +1182,12 @@ An integer value; 0 means no error has been detected.
 %
 %%   psb_loc_to_glob %%
 %
-\subroutine{psb\_is\_owned}{}
+\clearpage\subsection*{psb\_is\_owned }
+\addcontentsline{toc}{subsection}{psb\_is\_owned}
 
-\syntax{call psb\_is\_owned}{x, desc\_a}
+\begin{verbatim}
+call psb_is_owned(x, desc_a)
+\end{verbatim}
 
 \begin{description}
 \item[Type:] Asynchronous.
@@ -1141,7 +1214,7 @@ Intent: {\bf out}.\\
 \end{description}
 
 
-\section*{Notes}
+{\par\noindent\large\bfseries Notes}
 \begin{enumerate}
 \item This routine returns a \verb|.true.| value for an index
   that is strictly owned by the current process, excluding the halo
@@ -1149,9 +1222,12 @@ Intent: {\bf out}.\\
 \end{enumerate}
 
 
-\subroutine{psb\_owned\_index}{}
+\clearpage\subsection*{psb\_owned\_index }
+\addcontentsline{toc}{subsection}{psb\_owned\_index}
 
-\syntax{call psb\_owned\_index}{y, x, desc\_a, info}
+\begin{verbatim}
+call psb_owned_index(y, x, desc_a, info)
+\end{verbatim}
 
 \begin{description}
 \item[Type:] Asynchronous.
@@ -1190,7 +1266,7 @@ An integer value; 0 means no error has been detected.
 \end{description}
 
 
-\section*{Notes}
+{\par\noindent\large\bfseries Notes}
 \begin{enumerate}
 \item This routine returns a \verb|.true.| value for those indices
   that are strictly owned by the current process, excluding the halo
@@ -1198,9 +1274,12 @@ An integer value; 0 means no error has been detected.
 \end{enumerate}
 
 
-\subroutine{psb\_is\_local}{}
+\clearpage\subsection*{psb\_is\_local }
+\addcontentsline{toc}{subsection}{psb\_is\_local}
 
-\syntax{call psb\_is\_local}{x, desc\_a}
+\begin{verbatim}
+call psb_is_local(x, desc_a)
+\end{verbatim}
 
 \begin{description}
 \item[Type:] Asynchronous.
@@ -1227,16 +1306,19 @@ Intent: {\bf out}.\\
 \end{description}
 
 
-\section*{Notes}
+{\par\noindent\large\bfseries Notes}
 \begin{enumerate}
 \item This routine returns a \verb|.true.| value for an index
   that is local to the current process, including the halo
   indices
 \end{enumerate}
 
-\subroutine{psb\_local\_index}{}
+\clearpage\subsection*{psb\_local\_index }
+\addcontentsline{toc}{subsection}{psb\_local\_index}
 
-\syntax{call psb\_local\_index}{y, x, desc\_a, info}
+\begin{verbatim}
+call psb_local_index(y, x, desc_a, info)
+\end{verbatim}
 
 \begin{description}
 \item[Type:] Asynchronous.
@@ -1275,7 +1357,7 @@ An integer value; 0 means no error has been detected.
 \end{description}
 
 
-\section*{Notes}
+{\par\noindent\large\bfseries Notes}
 \begin{enumerate}
 \item This routine returns a \verb|.true.| value for those indices
   that are local to  the current process, including the halo
@@ -1287,9 +1369,12 @@ An integer value; 0 means no error has been detected.
 %
 %%   psb_ins %%
 %
-\subroutine{psb\_get\_boundary}{Extract list of boundary elements}
+\clearpage\subsection*{psb\_get\_boundary --- Extract list of boundary elements}
+\addcontentsline{toc}{subsection}{psb\_get\_boundary}
 
-\syntax{call psb\_get\_boundary}{bndel, desc, info}
+\begin{verbatim}
+call psb_get_boundary(bndel, desc, info)
+\end{verbatim}
 
 \begin{description}
 \item[Type:] Asynchronous.
@@ -1317,7 +1402,7 @@ Intent: {\bf out}.\\
 An integer value; 0 means no error has been detected. 
 \end{description}
 
-\section*{Notes}
+{\par\noindent\large\bfseries Notes}
 \begin{enumerate}
 \item If there are no boundary elements (i.e., if the local part of
   the connectivity graph is self-contained) the output vector is set
@@ -1326,9 +1411,12 @@ An integer value; 0 means no error has been detected.
   number of boundary elements. 
 \end{enumerate}
 
-\subroutine{psb\_get\_overlap}{Extract list of overlap elements}
+\clearpage\subsection*{psb\_get\_overlap --- Extract list of overlap elements}
+\addcontentsline{toc}{subsection}{psb\_get\_overlap}
 
-\syntax{call psb\_get\_overlap}{ovrel, desc, info}
+\begin{verbatim}
+call psb_get_overlap(ovrel, desc, info)
+\end{verbatim}
 
 \begin{description}
 \item[Type:] Asynchronous.
@@ -1356,7 +1444,7 @@ Intent: {\bf out}.\\
 An integer value; 0 means no error has been detected. 
 \end{description}
 
-\section*{Notes}
+{\par\noindent\large\bfseries Notes}
 \begin{enumerate}
 \item If there are no overlap elements the output vector is set
   to the ``not allocated'' state.  
@@ -1366,10 +1454,13 @@ An integer value; 0 means no error has been detected.
 
 
 
-\subroutine{psb\_sp\_getrow}{Extract row(s) from a sparse matrix}
+\clearpage\subsection*{psb\_sp\_getrow --- Extract row(s) from a sparse matrix}
+\addcontentsline{toc}{subsection}{psb\_sp\_getrow}
 
-\syntax{call psb\_sp\_getrow}{row, a, nz, ia, ja, val, info, append,
-  nzin, lrw}
+\begin{verbatim}
+call psb_sp_getrow(row, a, nz, ia, ja, val, info, &
+              & append, nzin, lrw)
+\end{verbatim}
 
 \begin{description}
 \item[Type:] Asynchronous.
@@ -1440,7 +1531,7 @@ Intent: {\bf out}.\\
 An integer value; 0 means no error has been detected. 
 \end{description}
 
-\section*{Notes}
+{\par\noindent\large\bfseries Notes}
 \begin{enumerate}
 \item The output $nz$ is always the size of the output generated by
   the current call; thus, if \verb|append=.true.|, the total output
@@ -1456,14 +1547,17 @@ An integer value; 0 means no error has been detected.
 
 
 
-\subroutine{psb\_sizeof}{Memory occupation}
+\clearpage\subsection*{psb\_sizeof --- Memory occupation}
+\addcontentsline{toc}{subsection}{psb\_sizeof}
 
 This function computes the memory occupation of a PSBLAS object.
 
 
-\syntax{psb\_sizeof}{a}
-\syntax*{psb\_sizeof}{desc\_a}
-\syntax*{psb\_sizeof}{prec}
+\begin{verbatim}
+isz = psb_sizeof(a)
+isz = psb_sizeof(desc_a)
+isz = psb_sizeof(prec)
+\end{verbatim}
 
 \begin{description}
 \item[Type:] Asynchronous.
@@ -1492,14 +1586,17 @@ Returned  as: an integer number.
 \end{description}
 
 
-\subroutine{Sorting utilities}{}
+\clearpage\subsection*{Sorting utilities}
+\addcontentsline{toc}{subsection}{Sorting utilities}
 
-\subroutine*{psb\_msort}{Sorting by the Merge-sort algorithm}
-\subroutine*{psb\_qsort}{Sorting by the Quicksort  algorithm}
-\subroutine*{psb\_hsort}{Sorting by the Heapsort  algorithm}
-\syntax{call psb\_msort}{x,ix,dir,flag}
-\syntax*{call psb\_qsort}{x,ix,dir,flag}
-\syntax*{call psb\_hsort}{x,ix,dir,flag}
+{\par\noindent\large\bfseries psb\_msort --- Sorting by the Merge-sort algorithm}
+{\par\noindent\large\bfseries psb\_qsort --- Sorting by the Quicksort  algorithm}
+{\par\noindent\large\bfseries psb\_hsort --- Sorting by the Heapsort  algorithm}
+\begin{verbatim}
+call psb_msort(x,ix,dir,flag)
+call psb_qsort(x,ix,dir,flag)
+call psb_hsort(x,ix,dir,flag)
+\end{verbatim}
 
 These  serial routines sort a sequence $X$ into ascending or
 descending  order. The argument meaning is identical for the three
@@ -1536,7 +1633,8 @@ Type: {\bf Optional} \\
 An integer array of rank 1, whose entries are moved to the same
 position as the corresponding entries in $x$.
 \end{description}
-\section*{Usage notes}
+
+{\goodbreak\par\noindent\large\bfseries Notes}
 \begin{enumerate}
 \item The sorting can be performed in the up/down direction, on the
   natural or absolute values; for  complex data the sorting can only

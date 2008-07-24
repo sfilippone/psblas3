@@ -1,0 +1,98 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+
+<!--Converted with LaTeX2HTML 2002-2-1 (1.71)
+original version by:  Nikos Drakos, CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>psb_set_erraction -- Set the type of action to be taken upon error condition.</TITLE>
+<META NAME="description" CONTENT="psb_set_erraction -- Set the type of action to be taken upon error condition.">
+<META NAME="keywords" CONTENT="userhtml">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META NAME="Generator" CONTENT="LaTeX2HTML v2002-2-1">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+
+<LINK REL="STYLESHEET" HREF="userhtml.css">
+
+<LINK REL="previous" HREF="node90.html">
+<LINK REL="up" HREF="node87.html">
+<LINK REL="next" HREF="node92.html">
+</HEAD>
+
+<BODY >
+<!--Navigation Panel-->
+<A NAME="tex2html1318"
+  HREF="node92.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next"
+ SRC="file:/usr/share/latex2html/icons/next.png"></A> 
+<A NAME="tex2html1314"
+  HREF="node87.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up"
+ SRC="file:/usr/share/latex2html/icons/up.png"></A> 
+<A NAME="tex2html1310"
+  HREF="node90.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous"
+ SRC="file:/usr/share/latex2html/icons/prev.png"></A> 
+<A NAME="tex2html1316"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents"
+ SRC="file:/usr/share/latex2html/icons/contents.png"></A>  
+<BR>
+<B> Next:</B> <A NAME="tex2html1319"
+  HREF="node92.html">Utilities</A>
+<B> Up:</B> <A NAME="tex2html1315"
+  HREF="node87.html">Error handling</A>
+<B> Previous:</B> <A NAME="tex2html1311"
+  HREF="node90.html">psb_set_errverbosity   Sets</A>
+ &nbsp; <B>  <A NAME="tex2html1317"
+  HREF="node1.html">Contents</A></B> 
+<BR>
+<BR>
+<!--End of Navigation Panel-->
+
+<H2><A NAME="SECTION00094000000000000000">
+psb_set_erraction -- Set the type of action to be
+  taken  upon error condition.</A>
+</H2>
+
+<P>
+<PRE>
+call psb_set_erraction(err_act)
+</PRE>
+
+<P>
+<DL>
+<DT><STRONG>Type:</STRONG></DT>
+<DD>Asynchronous.
+</DD>
+<DT><STRONG><B>On Entry</B></STRONG></DT>
+<DD>
+</DD>
+<DT><STRONG>err_act</STRONG></DT>
+<DD>the type of action.
+<BR>
+Scope: <B>global</B> 
+<BR>
+Type: <B>required</B>
+<BR>
+Intent: <B>in</B>.
+<BR>
+Specified as: an integer. Possible values: <code>psb_act_ret</code>,
+<code>psb_act_abort</code>. 
+</DD>
+</DL>
+
+<P>
+<PRE>
+call psb_errcomm(icontxt, err)
+</PRE>
+
+<P>
+<BR><HR>
+
+</BODY>
+</HTML>
