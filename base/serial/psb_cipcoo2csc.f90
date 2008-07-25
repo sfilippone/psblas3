@@ -76,9 +76,11 @@ subroutine psb_cipcoo2csc(a,info,clshr)
   end if
 
   call psb_fixcoo(a,info,idir=1)
-  nc  = a%k
-  nza = a%infoa(psb_nnz_)
-  allocate(iaux(max(nc+1,1)),stat=info)
+  if (info == 0) then 
+    nc  = a%k
+    nza = a%infoa(psb_nnz_)
+    allocate(iaux(max(nc+1,1)),stat=info)
+  end if
   if (info /= 0) then 
     info=4025
     call psb_errpush(info,name,a_err='integer',i_err=(/max(nc+1,1),0,0,0,0/))
@@ -88,7 +90,12 @@ subroutine psb_cipcoo2csc(a,info,clshr)
        & ': out of fixcoo',nza,nc,size(a%ia2),size(iaux)
 
   call psb_transfer(a%ia2,itemp,info)
-  call psb_transfer(iaux,a%ia2,info)
+  if (info == 0) call psb_transfer(iaux,a%ia2,info)
+  if (info /= 0) then 
+    info=4010
+    call psb_errpush(info,name,a_err='psb_transfer')
+    goto 9999      
+  end if
 
   !
   ! This routine can be used in two modes:
