@@ -166,7 +166,7 @@ subroutine psb_sfixcoo(a,info,idir)
   case(1) !  Col major order
 
     call msort_up(nza,a%ia2(1),iaux(1),iret)
-    if (iret == 0) call reordvn(nza,a%aspk(1),a%ia1(1),a%ia2(1),iaux(1))
+    if (iret == 0) call sreordvn(nza,a%aspk(1),a%ia1(1),a%ia2(1),iaux(1))
     i    = 1
     j    = i
     do while (i <= nza)
@@ -177,7 +177,7 @@ subroutine psb_sfixcoo(a,info,idir)
       nzl = j - i
       call msort_up(nzl,a%ia1(i),iaux(1),iret)
       if (iret == 0) &
-           & call reordvn(nzl,a%aspk(i),a%ia1(i),a%ia2(i),iaux(1))
+           & call sreordvn(nzl,a%aspk(i),a%ia1(i),a%ia2(i),iaux(1))
       i = j
     enddo
 
