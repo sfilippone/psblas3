@@ -34,6 +34,7 @@
  ! Parameters:
 subroutine camsrx(n,x,indx,idir,flag)
   use psb_serial_mod
+  use psb_ip_reord_mod
   implicit none
   integer :: n,idir,flag
   complex(psb_spk_) :: x(n)
@@ -70,28 +71,7 @@ subroutine camsrx(n,x,indx,idir,flag)
     call camsort_dw(n,x,iaux,iret)
   end if
 
-  if (iret /= 1) then 
-    lp = iaux(0)
-    k  = 1
-    do 
-      if ((lp==0).or.(k>n)) exit
-      do 
-        if (lp >= k) exit
-        lp = iaux(lp)
-      end do
-      swap     = x(lp)
-      x(lp)    = x(k)
-      x(k)     = swap
-      ixswap   = indx(lp)
-      indx(lp) = indx(k)
-      indx(k)  = ixswap
-      lswap    = iaux(lp)
-      iaux(lp) = iaux(k)
-      iaux(k)  = lp
-      lp = lswap 
-      k  = k + 1
-    enddo
-  end if
+  if (iret == 0) call psb_ip_reord(n,x,indx,iaux)
 
   deallocate(iaux,stat=info)
   if (info/=0) then 

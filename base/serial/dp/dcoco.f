@@ -38,6 +38,7 @@ c
       use psb_const_mod
       use psb_spmat_type
       use psb_string_mod
+      use psb_ip_reord_mod
       implicit none
 
 c     .. scalar arguments ..
@@ -155,7 +156,8 @@ c
             
 c     .... order with key ia1n ...
             call msort_up(nnz,ia1n,aux,iret)
-            if (iret.eq.0) call reordvn3(nnz,arn,ia1n,ia2n,aux(ipx),aux)
+            if (iret == 0) call psb_ip_reord(nzl,arn,
+     +        ia1n,ia2n,aux(ipx:),aux)
 c     .... order with key ia2n ...
             
             i    = 1
@@ -167,8 +169,9 @@ c     .... order with key ia2n ...
               enddo
               nzl = j - i
               call msort_up(nzl,ia2n(i),aux,iret)
-              if (iret.eq.0) call reordvn3(nzl,arn(i),ia1n(i),ia2n(i),
-     +          aux(ipx+i-1),aux)
+              if (iret == 0) call psb_ip_reord(nzl,arn(i:i+nzl-1),
+     +          ia1n(i:i+nzl-1),ia2n(i:i+nzl-1),
+     +          aux(ipx+i-1:ipx+i+nzl-1),aux)
               i = j
             enddo
             
@@ -206,7 +209,9 @@ c     ... sum the duplicated element ...
             
 c     .... order with key ia1n ...
             call msort_up(nnz,ia1n,aux,iret)
-            if (iret.eq.0) call reordvn(nnz,arn,ia1n,ia2n,aux)
+            if (iret == 0) call psb_ip_reord(nzl,arn,
+     +        ia1n,ia2n,aux)
+
 c     .... order with key ia2n ...
             
             i    = 1
@@ -218,8 +223,8 @@ c     .... order with key ia2n ...
               enddo
               nzl = j - i
               call msort_up(nzl,ia2n(i),aux,iret)
-              if (iret.eq.0) call reordvn(nzl,arn(i),ia1n(i),ia2n(i),
-     +          aux)
+              if (iret == 0) call psb_ip_reord(nzl,arn(i:i+nzl-1),
+     +          ia1n(i:i+nzl-1),ia2n(i:i+nzl-1),aux)
               i = j
             enddo
 c     ... construct final COO  representation...

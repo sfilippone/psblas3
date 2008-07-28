@@ -40,6 +40,7 @@ C
       use psb_const_mod
       use psb_string_mod
       use psb_error_mod
+      use psb_ip_reord_mod
       IMPLICIT NONE
 
 C     
@@ -137,7 +138,8 @@ C     SCALE  = (UNITD.EQ.'L') ! meaningless
           
 C     .... Order with key IA1N....
           CALL MSORT_UP(NNZ,IA1N,AUX,IRET)
-          IF (IRET.EQ.0) CALL REORDVN(NNZ,ARN,IA1N,IA2N,AUX)           
+          if (iret == 0) call psb_ip_reord(nnz,arn,
+     +        ia1n,ia2n,aux)
           
 C     .... Order with key IA2N ...
           I    = 1
@@ -149,8 +151,9 @@ C     .... Order with key IA2N ...
             ENDDO
             NZL = J - I
             CALL MSORT_UP(NZL,IA2N(I),AUX,IRET)
-            IF (IRET.EQ.0) CALL REORDVN(NZL,ARN(I),IA1N(I),IA2N(I),
-     +        AUX)
+            if (iret == 0) call psb_ip_reord(nzl,arn(i:i+nzl-1),
+     +        ia1n(i:i+nzl-1),ia2n(i:i+nzl-1),aux)
+
             I = J
           ENDDO
           INFON(1)=nnz

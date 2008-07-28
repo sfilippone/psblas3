@@ -38,6 +38,7 @@ Subroutine psb_zfixcoo(a,info,idir)
   use psb_const_mod
   use psb_string_mod
   use psb_serial_mod, psb_protect_name => psb_zfixcoo
+  use psb_ip_reord_mod
   use psb_error_mod
   implicit none
 
@@ -85,7 +86,8 @@ Subroutine psb_zfixcoo(a,info,idir)
   case(0) !  Row major order
 
     call msort_up(nza,a%ia1(1),iaux(1),iret)
-    if (iret == 0) call zreordvn(nza,a%aspk(1),a%ia1(1),a%ia2(1),iaux(1))
+    if (iret == 0) &
+         & call psb_ip_reord(nza,a%aspk,a%ia1,a%ia2,iaux)
     i    = 1
     j    = i
     do while (i <= nza)
@@ -96,7 +98,8 @@ Subroutine psb_zfixcoo(a,info,idir)
       nzl = j - i
       call msort_up(nzl,a%ia2(i),iaux(1),iret)
       if (iret == 0) &
-           & call zreordvn(nzl,a%aspk(i),a%ia1(i),a%ia2(i),iaux(1))
+           & call psb_ip_reord(nzl,a%aspk(i:i+nzl-1),&
+           & a%ia1(i:i+nzl-1),a%ia2(i:i+nzl-1),iaux)
       i = j
     enddo
 
@@ -166,7 +169,8 @@ Subroutine psb_zfixcoo(a,info,idir)
   case(1) !  Col major order
 
     call msort_up(nza,a%ia2(1),iaux(1),iret)
-    if (iret == 0) call zreordvn(nza,a%aspk(1),a%ia1(1),a%ia2(1),iaux(1))
+    if (iret == 0) &
+         & call psb_ip_reord(nza,a%aspk,a%ia1,a%ia2,iaux)
     i    = 1
     j    = i
     do while (i <= nza)
@@ -177,7 +181,8 @@ Subroutine psb_zfixcoo(a,info,idir)
       nzl = j - i
       call msort_up(nzl,a%ia1(i),iaux(1),iret)
       if (iret == 0) &
-           & call zreordvn(nzl,a%aspk(i),a%ia1(i),a%ia2(i),iaux(1))
+           & call psb_ip_reord(nzl,a%aspk(i:i+nzl-1),&
+           & a%ia1(i:i+nzl-1),a%ia2(i:i+nzl-1),iaux)
       i = j
     enddo
 

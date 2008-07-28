@@ -34,6 +34,7 @@
  ! Parameters:
 subroutine imsr(n,x,idir)
   use psb_serial_mod
+  use psb_ip_reord_mod
   implicit none
 
   integer :: n, idir
@@ -63,25 +64,7 @@ subroutine imsr(n,x,idir)
     call msort_dw(n,x,iaux,iret)
   end if
   
-  if (iret == 0) then 
-    lp = iaux(0)
-    k  = 1
-    do 
-      if ((lp==0).or.(k>n)) exit
-      do 
-        if (lp >= k) exit
-        lp = iaux(lp)
-      end do
-      iswap    = x(lp)
-      x(lp)    = x(k)
-      x(k)     = iswap
-      lswap    = iaux(lp)
-      iaux(lp) = iaux(k)
-      iaux(k)  = lp
-      lp = lswap 
-      k  = k + 1
-    enddo
-  end if
+  if (iret == 0) call psb_ip_reord(n,x,iaux)
 
   deallocate(iaux,stat=info)
   if (info/=0) then 

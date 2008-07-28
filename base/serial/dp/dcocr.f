@@ -40,6 +40,7 @@ C
       use psb_error_mod
       use psb_spmat_type
       use psb_string_mod
+      use psb_ip_reord_mod
       IMPLICIT NONE
 
 C
@@ -169,7 +170,9 @@ c
 
 C       .... Order with key IA ...
             call msort_up(nnz,itmp,aux,iret)
-            if (iret.eq.0) call reordvn3(nnz,arn,itmp,ian1,aux(ipx),aux)
+            if (iret == 0) call psb_ip_reord(nnz,arn,
+     +        itmp,ian1,aux(ipx:),aux)
+
             if (debug_level >= psb_debug_serial_) then 
               do i=1, nnz-1
                 if (itmp(i).gt.itmp(i+1)) then 
@@ -194,8 +197,9 @@ C       .... Order with key JA ...
               enddo
               nzl = j - i
               call msort_up(nzl,ian1(i),aux,iret)
-              if (iret.eq.0) call reordvn3(nzl,arn(i),itmp(i),ian1(i),
-     +          aux(ipx+i-1),aux)
+              if (iret == 0) call psb_ip_reord(nzl,arn(i:i+nzl-1),
+     +          itmp(i:i+nzl-1),ian1(i:i+nzl-1),
+     +          aux(ipx+i-1:ipx+i+nzl-1),aux)
               i = j
             enddo
 
@@ -258,7 +262,8 @@ c                    ... sum the duplicated element ...
 C       .... Order with key IA ...
 
             call msort_up(nnz,itmp,aux,iret)
-            if (iret.eq.0) call reordvn(nnz,arn,itmp,ian1,aux)
+            if (iret == 0) call psb_ip_reord(nnz,arn,
+     +        itmp,ian1,aux)
 C       .... Order with key JA ...
             i    = 1
             j    = i
@@ -271,8 +276,9 @@ C       .... Order with key JA ...
               enddo
               nzl = j - i
               call msort_up(nzl,ian1(i),aux,iret)
-              if (iret.eq.0)
-     +          call reordvn(nzl,arn(i),itmp(i),ian1(i),aux)
+              if (iret == 0) call psb_ip_reord(nzl,arn(i:i+nzl-1),
+     +          itmp(i:i+nzl-1),ian1(i:i+nzl-1),aux)
+
               i = j
             enddo
 
@@ -343,7 +349,8 @@ c                    ... sum the duplicated element ...
      +      psb_toupper(DESCRA(2:2)).EQ.'U') THEN
 
             call msort_up(nnz,itmp,aux,iret)
-            if (iret.eq.0) call reordvn(nnz,arn,itmp,ian1,aux)
+            if (iret == 0) call psb_ip_reord(nnz,arn,
+     +        itmp,ian1,aux)
 C       .... Order with key JA ...
             i    = 1
             j    = i
@@ -356,8 +363,8 @@ C       .... Order with key JA ...
               enddo
               nzl = j - i
               call msort_up(nzl,ian1(i),aux,iret)
-              if (iret.eq.0)
-     +          call reordvn(nzl,arn(i),itmp(i),ian1(i),aux)
+              if (iret == 0) call psb_ip_reord(nzl,arn(i:i+nzl-1),
+     +          itmp(i:i+nzl-1),ian1(i:i+nzl-1),aux)
               i = j
             enddo
 
@@ -416,7 +423,8 @@ c                    ... sum the duplicated element ...
      +        psb_toupper(DESCRA(2:2)).EQ.'L') THEN
 
             call msort_up(nnz,itmp,aux,iret)
-            if (iret.eq.0) call reordvn(nnz,arn,itmp,ian1,aux)
+            if (iret == 0) call psb_ip_reord(nnz,arn,
+     +        itmp,ian1,aux)
 C       .... Order with key JA ...
             i    = 1
             j    = i
@@ -429,8 +437,8 @@ C       .... Order with key JA ...
               enddo
               nzl = j - i
               call msort_up(nzl,ian1(i),aux,iret)
-              if (iret.eq.0)
-     +          call reordvn(nzl,arn(i),itmp(i),ian1(i),aux)
+              if (iret == 0) call psb_ip_reord(nzl,arn(i:i+nzl-1),
+     +          itmp(i:i+nzl-1),ian1(i:i+nzl-1),aux)
               i = j
             enddo
 

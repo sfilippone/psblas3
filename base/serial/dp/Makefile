@@ -6,7 +6,7 @@ include ../../../Make.inc
 FOBJS = dcrcr.o dcrjd.o dgblock.o partition.o  \
 	dgindex.o djadrp.o djadrp1.o dcsrrp.o dcsrp1.o check_dim.o \
 	Max_nnzero.o dcoco.o dcocr.o dcrco.o djdcox.o djdco.o dvtfg.o dgind_tri.o \
-	gen_block.o reordvn.o\
+	gen_block.o\
 	scrjd.o scrco.o scrcr.o scocr.o scoco.o sgindex.o sgind_tri.o\
 	ccoco.o ccocr.o ccrco.o ccrcr.o ccrjd.o cgindex.o cgind_tri.o\
 	zcoco.o zcocr.o zcrco.o zcrcr.o zcrjd.o zgindex.o zgind_tri.o
