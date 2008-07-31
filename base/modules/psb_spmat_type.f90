@@ -120,45 +120,30 @@ module psb_spmat_type
   character(len=5)   :: psb_fidef_='CSR'
 
 
-
-  type psb_sspmat_type
-    integer     :: m, k
-    character(len=5) :: fida
+  type psb_base_spmat_type 
+    integer           :: m, k
+    character(len=5)  :: fida
     character(len=11) :: descra
-    integer     :: infoa(psb_ifasize_)
-    real(psb_spk_), allocatable  :: aspk(:)
+    integer           :: infoa(psb_ifasize_)
     integer, allocatable :: ia1(:), ia2(:)
     integer, allocatable :: pl(:), pr(:)
+  end type psb_base_spmat_type
+
+
+  type, extends(psb_base_spmat_type) :: psb_sspmat_type
+    real(psb_spk_), allocatable  :: aspk(:)
   end type psb_sspmat_type
 
-  type psb_cspmat_type
-    integer     :: m, k
-    character(len=5) :: fida
-    character(len=11) :: descra
-    integer     :: infoa(psb_ifasize_)
+  type, extends(psb_base_spmat_type) :: psb_cspmat_type
     complex(psb_spk_), allocatable  :: aspk(:)
-    integer, allocatable  :: ia1(:), ia2(:)
-    integer, allocatable  :: pl(:), pr(:)
   end type psb_cspmat_type
 
-  type psb_dspmat_type
-    integer     :: m, k
-    character(len=5) :: fida
-    character(len=11) :: descra
-    integer     :: infoa(psb_ifasize_)
+  type, extends(psb_base_spmat_type) :: psb_dspmat_type
     real(psb_dpk_), allocatable  :: aspk(:)
-    integer, allocatable :: ia1(:), ia2(:)
-    integer, allocatable :: pl(:), pr(:)
   end type psb_dspmat_type
 
-  type psb_zspmat_type
-    integer     :: m, k
-    character(len=5) :: fida
-    character(len=11) :: descra
-    integer     :: infoa(psb_ifasize_)
+  type, extends(psb_base_spmat_type) :: psb_zspmat_type
     complex(psb_dpk_), allocatable  :: aspk(:)
-    integer, allocatable  :: ia1(:), ia2(:)
-    integer, allocatable  :: pl(:), pr(:)
   end type psb_zspmat_type
 
   interface psb_nullify_sp
@@ -464,7 +449,17 @@ contains
       psb_get_zsp_nnz_row = 0
     end if
   end function psb_get_zsp_nnz_row
-
+!!$
+!!$  subroutine psb_nullify_base_sp(mat)
+!!$    implicit none
+!!$    class(psb_base_spmat_type), intent(inout) :: mat
+!!$    mat%infoa(:)=0
+!!$    mat%m=0
+!!$    mat%k=0
+!!$    mat%fida=''
+!!$    mat%descra=''
+!!$
+!!$  end subroutine psb_nullify_base_sp
 
   subroutine psb_nullify_ssp(mat)
     implicit none

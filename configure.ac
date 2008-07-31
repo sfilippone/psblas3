@@ -671,6 +671,10 @@ $(.mod).o:
 	$(F90) $(F90COPT) $(FINCLUDES)  -c $<
 %$(.mod): %.f90
 	$(F90) $(F90COPT) $(FINCLUDES)  -c $<
+%.o: %.f03
+	$(F90) $(F90COPT) $(FINCLUDES)  -c $<
+%$(.mod): %.f03
+	$(F90) $(F90COPT) $(FINCLUDES)  -c $<
 %.o: %.F
 	$(FC) $(FCOPT) $(FINCLUDES) $(FDEFINES)  -c $<
 %$(.mod): %.F
@@ -679,6 +683,10 @@ $(.mod).o:
 	$(F90) $(F90COPT) $(FINCLUDES) $(FDEFINES)  -c $<
 %$(.mod): %.F90
 	$(F90) $(F90COPT) $(FINCLUDES) $(FDEFINES) -c $<'
+%.o: %.F03
+	$(F03) $(F90COPT) $(FINCLUDES) $(FDEFINES)  -c $<
+%$(.mod): %.F03
+	$(F03) $(F90COPT) $(FINCLUDES) $(FDEFINES) -c $<'
 
 else
 
@@ -701,6 +709,10 @@ $(.mod).o:
 	$(F90) $(F90COPT) $(FINCLUDES) -c $<
 .f90.o:
 	$(F90) $(F90COPT) $(FINCLUDES) -c $<
+.f03$(.mod):
+	$(F03) $(F90COPT) $(FINCLUDES) -c $<
+.f03.o:
+	$(F03) $(F90COPT) $(FINCLUDES) -c $<
 .F.o:
 	$(FC)  $(FCOPT)   $(FINCLUDES) $(FDEFINES) -c $<
 .F$(.mod):
@@ -709,6 +721,10 @@ $(.mod).o:
 	$(F90) $(F90COPT) $(FINCLUDES) $(FDEFINES) -c $<
 .F90$(.mod):
 	$(F90) $(F90COPT) $(FINCLUDES) $(FDEFINES) -c $<'
+.F03.o:
+	$(F03) $(F90COPT) $(FINCLUDES) $(FDEFINES) -c $<
+.F03$(.mod):
+	$(F03) $(F90COPT) $(FINCLUDES) $(FDEFINES) -c $<'
 
 fi
 AC_SUBST(PSBLASRULES)
