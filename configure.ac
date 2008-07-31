@@ -682,7 +682,7 @@ $(.mod).o:
 %.o: %.F90
 	$(F90) $(F90COPT) $(FINCLUDES) $(FDEFINES)  -c $<
 %$(.mod): %.F90
-	$(F90) $(F90COPT) $(FINCLUDES) $(FDEFINES) -c $<'
+	$(F90) $(F90COPT) $(FINCLUDES) $(FDEFINES) -c $<
 %.o: %.F03
 	$(F03) $(F90COPT) $(FINCLUDES) $(FDEFINES)  -c $<
 %$(.mod): %.F03
@@ -720,7 +720,7 @@ $(.mod).o:
 .F90.o:
 	$(F90) $(F90COPT) $(FINCLUDES) $(FDEFINES) -c $<
 .F90$(.mod):
-	$(F90) $(F90COPT) $(FINCLUDES) $(FDEFINES) -c $<'
+	$(F90) $(F90COPT) $(FINCLUDES) $(FDEFINES) -c $<
 .F03.o:
 	$(F03) $(F90COPT) $(FINCLUDES) $(FDEFINES) -c $<
 .F03$(.mod):
