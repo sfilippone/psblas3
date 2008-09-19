@@ -50,7 +50,6 @@ subroutine psb_cdalv(v, ictxt, desc, info, flag)
   use psb_error_mod
   use psi_mod
   use psb_penv_mod
-  use psb_avl_mod
   implicit None
   !....Parameters...
   Integer, intent(in)               :: ictxt, v(:)
@@ -136,18 +135,23 @@ subroutine psb_cdalv(v, ictxt, desc, info, flag)
     goto 9999
   end if
 
-  !count local rows number
+  ! count local rows number
+  loc_row = max(1,(m+np-1)/np) 
   ! allocate work vector
   if (psb_cd_choose_large_state(ictxt,m)) then 
     allocate(desc%matrix_data(psb_mdata_size_),&
-         &temp_ovrlap(m),stat=info)
-    desc%matrix_data(:) = 0
-    desc%matrix_data(psb_desc_size_) = psb_desc_large_
+         &temp_ovrlap(2*loc_row),stat=info)
+    if (info == 0) then 
+      desc%matrix_data(:) = 0
+      desc%matrix_data(psb_desc_size_) = psb_desc_large_
+    end if
   else
     allocate(desc%glob_to_loc(m),desc%matrix_data(psb_mdata_size_),&
-         &temp_ovrlap(m),stat=info)
-    desc%matrix_data(:) = 0
-    desc%matrix_data(psb_desc_size_) = psb_desc_normal_
+         &temp_ovrlap(2*loc_row),stat=info)
+    if (info == 0) then 
+      desc%matrix_data(:) = 0
+      desc%matrix_data(psb_desc_size_) = psb_desc_normal_
+    end if
   end if
   if (info /= 0) then     
     info=4025
@@ -215,7 +219,6 @@ subroutine psb_cdalv(v, ictxt, desc, info, flag)
 
     allocate(desc%loc_to_glob(loc_col), desc%lprm(1),&
          & stat=info)  
-    if (info == 0) call InitSearchTree(desc%avltree,info)
     if (info /= 0) then
       info=4025
       int_err(1)=loc_col
@@ -231,7 +234,6 @@ subroutine psb_cdalv(v, ictxt, desc, info, flag)
       if ((v(i)-flag_) == me) then
         k = k + 1 
         desc%loc_to_glob(k) = i
-        call SearchInsKey(desc%avltree,i,glx,k,info)
       endif
     enddo
 
@@ -328,6 +330,11 @@ subroutine psb_cdalv(v, ictxt, desc, info, flag)
   desc%ext_index(:)            = -1
 
   call psb_cd_set_bld(desc,info)
+  if (info /= 0) then
+    info=4010
+    call psb_errpush(info,name,a_err='psb_cd_set_bld')
+    Goto 9999
+  end if
 
   if (debug_level >= psb_debug_ext_) &
        & write(debug_unit,*) me,' ',trim(name),': end'

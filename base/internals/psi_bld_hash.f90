@@ -33,8 +33,8 @@
 ! File: psi_bld_hash.f90
 !
 ! Subroutine: psi_bld_hash
-!   Convers the AVL tree data structure into the hashed list 
-!   of ordered sublists.
+!   Build a hashed list of ordered sublists of the indices
+!   contained in loc_to_glob. 
 !   
 ! 
 ! Arguments: 
@@ -53,7 +53,7 @@ subroutine psi_bld_hash(desc,info)
   type(psb_desc_type), intent(inout) :: desc
   integer, intent(out) :: info
 
-  integer          ::  i,j,np,me,lhalo,nhalo,&
+  integer          ::  i,j,np,me,lhalo,nhalo,nbits,hsize,hmask,&
        & n_col, err_act,  key, ih, nh, idx, nk,icomm
   integer             :: ictxt,n_row
   character(len=20)   :: name,ch_err
@@ -85,7 +85,26 @@ subroutine psi_bld_hash(desc,info)
 
   nk = n_col
   call psb_realloc(nk,2,desc%glb_lc,info) 
-  if (info ==0) call psb_realloc(psb_hash_size+1,desc%hashv,info,lb=0)
+  
+  nbits = psb_hash_bits
+  hsize = 2**nbits
+  do 
+    if (hsize < 0) then 
+      ! This should never happen for sane values
+      ! of psb_max_hash_bits.
+      write(0,*) 'Error: hash size overflow ',hsize,nbits
+      info = -2 
+      return
+    end if
+    if (hsize > nk) exit
+    if (nbits >= psb_max_hash_bits) exit
+    nbits = nbits + 1
+    hsize = hsize * 2 
+  end do
+  hmask = hsize - 1 
+  desc%hashvsize = hsize
+  desc%hashvmask = hmask
+  if (info ==0) call psb_realloc(hsize+1,desc%hashv,info,lb=0)
   if (info /= 0) then 
     ch_err='psb_realloc'
     call psb_errpush(info,name,a_err=ch_err)
@@ -94,32 +113,32 @@ subroutine psi_bld_hash(desc,info)
 
   ! Build a hashed table of sorted lists to search for 
   ! indices.
-  desc%hashv(0:psb_hash_size) = 0
+  desc%hashv(0:hsize) = 0
   do i=1, nk
     key = desc%loc_to_glob(i)
-    ih  = iand(key,psb_hash_mask) 
+    ih  = iand(key,hmask) 
     desc%hashv(ih) = desc%hashv(ih) + 1
   end do
   nh = desc%hashv(0) 
   idx = 1
-  do i=1, psb_hash_size
+  do i=1, hsize
     desc%hashv(i-1) = idx
     idx = idx + nh
     nh = desc%hashv(i)
   end do
   do i=1, nk
     key = desc%loc_to_glob(i)
-    ih  = iand(key,psb_hash_mask)
+    ih  = iand(key,hmask)
     idx = desc%hashv(ih) 
     desc%glb_lc(idx,1) = key
     desc%glb_lc(idx,2) = i
     desc%hashv(ih) = desc%hashv(ih) + 1
   end do
-  do i = psb_hash_size, 1, -1 
+  do i = hsize, 1, -1 
     desc%hashv(i) = desc%hashv(i-1)
   end do
   desc%hashv(0) = 1
-  do i=0, psb_hash_size-1 
+  do i=0, hsize-1 
     idx = desc%hashv(i)
     nh  = desc%hashv(i+1) - desc%hashv(i) 
     if (nh > 1) then 

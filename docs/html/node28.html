@@ -63,10 +63,10 @@ psb_gedots -- Generalized Dot Product</A>
 This subroutine computes a series of  dot products among the columns of
 two dense matrices  <IMG
  WIDTH="13" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
- SRC="img24.png"
+ SRC="img26.png"
  ALT="$x$"> and <IMG
  WIDTH="13" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="img25.png"
+ SRC="img27.png"
  ALT="$y$">: 
 <BR><P></P>
 <DIV ALIGN="CENTER">
@@ -78,7 +78,7 @@ res(i) \leftarrow x(:,i)^T y(:,i)
 
 <IMG
  WIDTH="150" HEIGHT="28" BORDER="0"
- SRC="img31.png"
+ SRC="img33.png"
  ALT="\begin{displaymath}res(i) \leftarrow x(:,i)^T y(:,i)\end{displaymath}">
 </DIV>
 <BR CLEAR="ALL">
@@ -86,17 +86,17 @@ res(i) \leftarrow x(:,i)^T y(:,i)
 If the matrices are complex, then the
 usual convention applies, i.e. the conjugate transpose of <IMG
  WIDTH="13" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
- SRC="img24.png"
+ SRC="img26.png"
  ALT="$x$"> is
 used. If <IMG
  WIDTH="13" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
- SRC="img24.png"
+ SRC="img26.png"
  ALT="$x$"> and <IMG
  WIDTH="13" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="img25.png"
+ SRC="img27.png"
  ALT="$y$"> are of rank one, then <IMG
  WIDTH="26" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
- SRC="img32.png"
+ SRC="img34.png"
  ALT="$res$"> is a scalar, else it
 is a rank one array. 
 
@@ -105,7 +105,7 @@ is a rank one array.
 call psb_gedots(res, x, y, desc_a, info)
 </PRE>
 <BR><P></P>
-<DIV ALIGN="CENTER"><A NAME="1416"></A>
+<DIV ALIGN="CENTER"><A NAME="1418"></A>
 <TABLE>
 <CAPTION><STRONG>Table 3:</STRONG>
 Data types</CAPTION>
@@ -114,13 +114,13 @@ Data types</CAPTION>
 <TABLE CELLPADDING=3 BORDER="1" ALIGN="CENTER">
 <TR><TD ALIGN="LEFT"><IMG
  WIDTH="26" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
- SRC="img32.png"
+ SRC="img34.png"
  ALT="$res$">, <IMG
  WIDTH="13" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
- SRC="img24.png"
+ SRC="img26.png"
  ALT="$x$">, <IMG
  WIDTH="13" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="img25.png"
+ SRC="img27.png"
  ALT="$y$"></TD>
 <TD ALIGN="LEFT"><B>Subroutine</B></TD>
 </TR>
@@ -155,7 +155,7 @@ Data types</CAPTION>
 <DD>the local portion of global dense matrix
 <IMG
  WIDTH="13" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
- SRC="img24.png"
+ SRC="img26.png"
  ALT="$x$">. 
 <BR>
 Scope: <B>local</B> 
@@ -168,17 +168,17 @@ Specified as: an array of rank one or two
 containing numbers of type specified in
 Table&nbsp;<A HREF="#tab:f90mdot">3</A>. The rank of <IMG
  WIDTH="13" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
- SRC="img24.png"
+ SRC="img26.png"
  ALT="$x$"> must be the same of <IMG
  WIDTH="13" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="img25.png"
+ SRC="img27.png"
  ALT="$y$">. 
 </DD>
 <DT><STRONG>y</STRONG></DT>
 <DD>the local portion of global dense matrix
 <IMG
  WIDTH="13" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="img25.png"
+ SRC="img27.png"
  ALT="$y$">. 
 <BR>
 Scope: <B>local</B> 
@@ -191,10 +191,10 @@ Specified as: an array of rank one or two
 containing numbers of type specified in
 Table&nbsp;<A HREF="#tab:f90mdot">3</A>. The rank of <IMG
  WIDTH="13" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="img25.png"
+ SRC="img27.png"
  ALT="$y$"> must be the same of <IMG
  WIDTH="13" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
- SRC="img24.png"
+ SRC="img26.png"
  ALT="$x$">. 
 </DD>
 <DT><STRONG>desc_a</STRONG></DT>
@@ -214,10 +214,10 @@ Specified as: a structured data of type descdata<TT>psb_desc_type</TT>.
 <DT><STRONG>res</STRONG></DT>
 <DD>is the dot product of subvectors <IMG
  WIDTH="13" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
- SRC="img24.png"
+ SRC="img26.png"
  ALT="$x$"> and <IMG
  WIDTH="13" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="img25.png"
+ SRC="img27.png"
  ALT="$y$">.
 <BR>
 Scope: <B>global</B> 

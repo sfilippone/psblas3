@@ -48,12 +48,12 @@ module psb_sort_mod
   !  The up/down constant are defined in pairs having 
   !  opposite values. We make use of this fact in the heapsort routine.
   !
-  integer, parameter :: psb_sort_up_=1,      psb_sort_down_=-1
-  integer, parameter :: psb_lsort_up_=2,     psb_lsort_down_=-2
-  integer, parameter :: psb_asort_up_=3,     psb_asort_down_=-3
-  integer, parameter :: psb_alsort_up_=4,    psb_alsort_down_=-4
-  integer, parameter :: psb_sort_ovw_idx_=0, psb_sort_keep_idx_=1
-  integer, parameter :: psb_heap_resize=200
+  integer, parameter :: psb_sort_up_      = 1, psb_sort_down_     = -1
+  integer, parameter :: psb_lsort_up_     = 2, psb_lsort_down_    = -2
+  integer, parameter :: psb_asort_up_     = 3, psb_asort_down_    = -3
+  integer, parameter :: psb_alsort_up_    = 4, psb_alsort_down_   = -4
+  integer, parameter :: psb_sort_ovw_idx_ = 0, psb_sort_keep_idx_ =  1
+  integer, parameter :: psb_heap_resize   = 200
 
   type psb_int_heap
     integer              :: last, dir
@@ -131,8 +131,57 @@ module psb_sort_mod
          & psb_double_idx_heap_get_first, psb_dcomplex_idx_heap_get_first
   end interface
 
+  interface psb_ibsrch
+    module procedure psb_ibsrch
+  end interface
+  interface psb_issrch
+    module procedure psb_issrch
+  end interface
 
 contains
+
+  function  psb_ibsrch(key,n,v) result(ipos)
+    implicit none
+    integer ipos, key, n
+    integer v(n)
+    
+    integer lb, ub, m
+        
+    lb = 1 
+    ub = n
+    ipos = -1 
+    
+    do while (lb.le.ub) 
+      m = (lb+ub)/2
+      if (key.eq.v(m))  then
+        ipos = m 
+        lb   = ub + 1
+      else if (key.lt.v(m))  then
+        ub = m-1
+      else 
+        lb = m + 1
+      end if
+    enddo
+    return
+  end function psb_ibsrch
+
+  function psb_issrch(key,n,v) result(ipos)
+    implicit none
+    integer ipos, key, n
+    integer v(n)
+    
+    integer i
+      
+    ipos = -1 
+    do i=1,n
+      if (key.eq.v(i))  then
+        ipos = i
+        return
+      end if
+    enddo
+    return
+  end function psb_issrch
+
 
   subroutine imsort(x,ix,dir,flag)
     use psb_error_mod

@@ -8,6 +8,6 @@ CSR                 Storage format CSR COO JAD
 0                   IPART: Partition method 0: BLK   2: graph (with Metis) 
 2                   ISTOPC
 01000               ITMAX
-01                  ITRACE
+-1                  ITRACE
 04                  IRST     (restart for RGMRES and BiCGSTABL) 
 1.d-6               EPS

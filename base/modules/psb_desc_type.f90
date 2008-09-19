@@ -37,7 +37,7 @@
 
 module psb_descriptor_type
   use psb_const_mod
-  use psb_avl_mod
+  use psb_hash_mod 
 
   implicit none
 
@@ -102,9 +102,10 @@ module psb_descriptor_type
   !
   ! Constants for hashing into desc%hashv(:) and desc%glb_lc(:,:)
   !
-  integer, parameter :: psb_hash_bits=14
+  integer, parameter :: psb_hash_bits=16
+  integer, parameter :: psb_max_hash_bits=22
   integer, parameter :: psb_hash_size=2**psb_hash_bits, psb_hash_mask=psb_hash_size-1
-  integer, parameter :: psb_default_large_threshold=512*1024   ! to be reviewed
+  integer, parameter :: psb_default_large_threshold=1*1024*1024   
   integer, parameter :: psb_hpnt_nentries_=7
 
   !
@@ -136,6 +137,8 @@ module psb_descriptor_type
   !|     integer, allocatable :: hashv(:), glb_lc(:,:)
   !|     integer, allocatable :: lprm(:)
   !|     integer, allocatable :: idx_space(:)
+  !|     type(psb_hash_type), pointer :: hash => null()
+  !|     type(psb_desc_type), pointer :: base_desc => null()
   !|  end type psb_desc_type
   !
   !  
@@ -193,17 +196,23 @@ module psb_descriptor_type
   !        will thus be N_COL + N_GLOB
   !   ii.  If the global index space is very large (larger than the threshold value
   !        which may be set by the user), then it is not advisable to have such an 
-  !        array. In this case we only record the global indices that do have a 
+  !        array.
+  !        In this case we only record the global indices that do have a 
   !        local counterpart, so that the local storage will be proportional to 
-  !        N_COL. During the build phase we keep the known global indices in an 
-  !        AVL tree data structure whose pointer is stored in avltree, so that we 
-  !        can do both search and insertions in log time. At assembly time, we move 
-  !        the information into hashv(:) and glb_lc(:,:). The idea is that 
-  !        glb_lc(:,1) will hold sorted global indices, and glb_lc(:,2) the 
-  !        corresponding local indices, so that we may do a binary search. To cut down
-  !        the search time we partition glb_lc into a set of lists addressed by 
-  !        hashv(:) based on the value of the lowest PSB_HASH_BITS bits of the 
-  !        global index. 
+  !        N_COL.
+  !        The idea is that  glb_lc(:,1) will hold sorted global indices, and
+  !        glb_lc(:,2) the corresponding local indices, so that we may do a binary search.
+  !        To cut down  the search time we partition glb_lc into a set of lists
+  !        addressed by  hashv(:) based on the value of the lowest
+  !        PSB_HASH_BITS bits of the  global index. 
+  !        During the build phase glb_lc() will store the indices of the internal points,
+  !        i.e. local indices 1:NROW, since those are known ad CDALL time.
+  !        The halo indices that we encounter during the build phase are put in
+  !        a PSB_HASH_TYPE data structure, which implements a very simple hash, which will
+  !        nonetheless be quite fast at low occupancy rates.
+  !        At assembly time, we move everything into hashv(:) and glb_lc(:,:).
+  !        Note that the desc%hash component is a pointer, but it really should be
+  !        an allocatable scalar. 
   !
   !  7. The data exchange is based on lists of local indices to be exchanged; all the 
   !     lists have the same format, as follows:
@@ -303,11 +312,12 @@ module psb_descriptor_type
     integer, allocatable :: bnd_elem(:)
     integer, allocatable :: loc_to_glob(:)
     integer, allocatable :: glob_to_loc (:)
+    integer              :: hashvsize, hashvmask
     integer, allocatable :: hashv(:), glb_lc(:,:)
-    type(psb_tree_int2), pointer   :: avltree => null()
     integer, allocatable :: lprm(:)
     integer, allocatable :: idx_space(:)
-    type(psb_desc_type), pointer :: base_desc => null()
+    type(psb_hash_type), pointer     :: hash => null()
+    type(psb_desc_type), pointer     :: base_desc => null()
   end type psb_desc_type
 
   interface psb_sizeof
@@ -354,15 +364,12 @@ module psb_descriptor_type
 
 contains 
 
-  function psb_cd_sizeof(desc)
+  function psb_cd_sizeof(desc)  result(val)
     implicit none
     !....Parameters...
 
     Type(psb_desc_type), intent(in) :: desc
-    Integer                      :: psb_cd_sizeof
-    !locals
-    integer :: val
-    integer, external :: SizeofPairSearchTree
+    integer(psb_long_int_k_) :: val
 
     val = 0
     if (allocated(desc%matrix_data))  val = val + psb_sizeof_int*size(desc%matrix_data)
@@ -378,9 +385,8 @@ contains
     if (allocated(desc%glb_lc))       val = val + psb_sizeof_int*size(desc%glb_lc)
     if (allocated(desc%lprm))         val = val + psb_sizeof_int*size(desc%lprm)
     if (allocated(desc%idx_space))    val = val + psb_sizeof_int*size(desc%idx_space)
-    if (associated(desc%avltree))     val = val + psb_sizeof(desc%avltree) 
+    if (associated(desc%hash))        val = val + psb_sizeof(desc%hash) 
 
-    psb_cd_sizeof = val
   end function psb_cd_sizeof
 
 
@@ -419,7 +425,7 @@ contains
     type(psb_desc_type), intent(inout) :: desc
     ! We have nothing left to do here.
     ! Perhaps we should delete this subroutine? 
-    nullify(desc%avltree,desc%base_desc)
+    nullify(desc%hash,desc%base_desc)
 
   end subroutine psb_nullify_desc
 
@@ -481,7 +487,7 @@ contains
     psb_is_ok_dec = ((dectype == psb_desc_asb_).or.(dectype == psb_desc_bld_).or.&
          &(dectype == psb_cd_ovl_asb_).or.(dectype == psb_cd_ovl_bld_).or.&
          &(dectype == psb_desc_upd_).or.&
-         &(dectype== psb_desc_repl_))
+         &(dectype == psb_desc_repl_))
   end function psb_is_ok_dec
 
   logical function psb_is_bld_dec(dectype)
@@ -619,70 +625,6 @@ contains
   end function psb_cd_get_mpic
 
 
-  subroutine psb_cd_set_bld(desc,info)
-    !
-    ! Change state of a descriptor into BUILD. 
-    ! If the descriptor is LARGE, check the  AVL search tree
-    ! and initialize it if necessary.
-    !
-    use psb_const_mod
-    use psb_error_mod
-    use psb_penv_mod
-
-    implicit none
-    type(psb_desc_type), intent(inout) :: desc
-    integer                            :: info
-    !locals
-    integer             :: np,me,ictxt, err_act,idx,gidx,lidx
-    logical, parameter  :: debug=.false.,debugprt=.false.
-    character(len=20)   :: name
-    if (debug) write(0,*) me,'Entered CDCPY'
-    if (psb_get_errstatus() /= 0) return 
-    info = 0
-    call psb_erractionsave(err_act)
-    name = 'psb_cd_set_bld'
-
-    ictxt = psb_cd_get_context(desc)
-
-    if (debug) write(0,*)'Entered CDSETBLD',ictxt
-    ! check on blacs grid 
-    call psb_info(ictxt, me, np)
-    if (debug) write(0,*) me,'Entered CDSETBLD'
-    if (psb_is_asb_desc(desc)) then 
-!!$      write(0,*) 'Warning: doing setbld on an assembled descriptor'
-    end if
-
-    if (psb_is_large_desc(desc)) then 
-      if (debug) write(0,*) me,'SET_BLD: alocating avltree'
-      if (.not.associated(desc%avltree)) then 
-        call InitSearchTree(desc%avltree,info)
-        do idx=1, psb_cd_get_local_cols(desc)
-          gidx = desc%loc_to_glob(idx)
-          call SearchInsKey(desc%avltree,gidx,lidx,idx,info)        
-          if (lidx /= idx) then 
-            write(0,*) 'Warning from cdset: mismatch in AVLTREE ',idx,lidx
-          endif
-        enddo
-      end if
-      
-    end if
-    desc%matrix_data(psb_dec_type_) = psb_desc_bld_ 
-
-    if (debug) write(0,*) me,'SET_BLD: done'
-    call psb_erractionrestore(err_act)
-    return
-
-9999 continue
-    call psb_erractionrestore(err_act)
-
-    if (err_act == psb_act_ret_) then
-      return
-    else
-      call psb_error(ictxt)
-    end if
-    return
-  end subroutine psb_cd_set_bld
-
   subroutine psb_cd_set_ovl_asb(desc,info)
     !
     ! Change state of a descriptor into ovl_build. 
@@ -694,18 +636,6 @@ contains
     if (psb_is_asb_desc(desc)) desc%matrix_data(psb_dec_type_) = psb_cd_ovl_asb_ 
 
   end subroutine psb_cd_set_ovl_asb
-
-  subroutine psb_cd_set_ovl_bld(desc,info)
-    !
-    ! Change state of a descriptor into ovl_build. 
-    implicit none
-    type(psb_desc_type), intent(inout) :: desc
-    integer                            :: info
-
-    call psb_cd_set_bld(desc,info) 
-    if (info == 0) desc%matrix_data(psb_dec_type_) = psb_cd_ovl_bld_ 
-
-  end subroutine psb_cd_set_ovl_bld
 
 
   subroutine psb_get_xch_idx(idx,totxch,totsnd,totrcv)
@@ -961,8 +891,8 @@ contains
       end if
     end if
 
-    if (associated(desc_a%avltree)) then 
-      call FreeSearchTree(desc_a%avltree,info)
+    if (associated(desc_a%hash)) then 
+      deallocate(desc_a%hash,stat=info)
       if (info /= 0) then 
         info=2060
         call psb_errpush(info,name)
@@ -1071,7 +1001,7 @@ contains
     if (info == 0)  &
          & call psb_transfer( desc_in%glb_lc      ,    desc_out%glb_lc       , info)
 
-    desc_out%avltree => desc_in%avltree; nullify(desc_in%avltree)
+    desc_out%hash => desc_in%hash; nullify(desc_in%hash)
     
     if (info /= 0) then
       info = 4010

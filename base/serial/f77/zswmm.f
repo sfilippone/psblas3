@@ -171,7 +171,7 @@ C
       NAME = 'ZSWMM\0'
       IERROR = 0 
       CALL FCPSB_ERRACTIONSAVE(ERR_ACT)
-      
+      WORK(1) = zzero      
       IF (psb_toupper(FIDA(1:3)).EQ.'CSR') THEN
 C
 C        A, IA1, IA2 --->  AR,   JA,   IA

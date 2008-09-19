@@ -1,6 +1,33 @@
 Changelog. A lot less detailed than usual, at least for past
 history. 
 
+2008/09/18: Defined psb_sizeof to be integer(8). Added support
+	    into psb_sum, psb_amx and other reductions for long int
+	    scalars. 
+	
+2008/09/16: Implemented new scheme for index conversion.
+	    Changed cdall with an option to suppress global checks. 
+	
+2008/09/02: Improved psi_fnd_owner performace.
+	
+2008/09/01: Better timings in the pargen test cases.
+
+2008/08/28: Changed CDALL in case of VL to handle overlapped indices. 	
+	
+2008/07/28: New sorting/reordering modules.	
+	
+2008/07/24: Addded HTML version of user's guide.	
+	
+2008/07/22: Fixed I/O for Harwell-Boeing and Matrix Market examples
+	
+2008/05/27: Merged single precision branch.
+	
+2008/04/28: Fixed trimming space in sparse matrix conversion.
+	    Fixed performance issue in cdins.
+	
+2008/03/25: Fix performance bug in psi_idx_ins_cnv. Changed names of 
+            some internal components of preconditioner data structure.
+
 2008/03/27: Merged the experimental branch for implementing the AVL tree
             data structure in Fortran instead of relying on C and passing
 	    functions around to perform comparisons. There seems to be

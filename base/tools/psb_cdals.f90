@@ -51,7 +51,6 @@ subroutine psb_cdals(m, n, parts, ictxt, desc, info)
   use psb_const_mod
   use psi_mod
   use psb_penv_mod
-  use psb_avl_mod
   implicit None
   include 'parts.fh'
   !....Parameters...
@@ -74,7 +73,7 @@ subroutine psb_cdals(m, n, parts, ictxt, desc, info)
   call psb_erractionsave(err_act)
   debug_unit  = psb_get_debug_unit()
   debug_level = psb_get_debug_level()
-  
+
 
   call psb_info(ictxt, me, np)
   if (debug_level >= psb_debug_ext_) &
@@ -125,18 +124,23 @@ subroutine psb_cdals(m, n, parts, ictxt, desc, info)
 
   call psb_nullify_desc(desc)
 
-  !count local rows number
+  ! count local rows number
+  loc_row = max(1,(m+np-1)/np) 
   ! allocate work vector
   if (psb_cd_choose_large_state(ictxt,m)) then 
     allocate(desc%matrix_data(psb_mdata_size_),&
-         & temp_ovrlap(m),prc_v(np),stat=info)
-    desc%matrix_data(:) = 0
-    desc%matrix_data(psb_desc_size_) = psb_desc_large_
+         & temp_ovrlap(2*loc_row),prc_v(np),stat=info)
+    if (info == 0) then 
+      desc%matrix_data(:) = 0
+      desc%matrix_data(psb_desc_size_) = psb_desc_large_
+    end if
   else
     allocate(desc%glob_to_loc(m),desc%matrix_data(psb_mdata_size_),&
-         & temp_ovrlap(m),prc_v(np),stat=info)
-    desc%matrix_data(:) = 0
-    desc%matrix_data(psb_desc_size_) = psb_desc_normal_
+         & temp_ovrlap(2*loc_row),prc_v(np),stat=info)
+    if (info == 0) then 
+      desc%matrix_data(:) = 0
+      desc%matrix_data(psb_desc_size_) = psb_desc_normal_
+    end if
   end if
   if (info /= 0) then     
     info=4025
@@ -170,11 +174,10 @@ subroutine psb_cdals(m, n, parts, ictxt, desc, info)
     ! is transferred to a series of ordered linear lists, 
     ! hashed by the low order bits of the entries.
     !
-    loc_col = (m+np-1)/np
+    loc_col = max(1,(m+np-1)/np)
     loc_col = min(2*loc_col,m)
     allocate(desc%loc_to_glob(loc_col), desc%lprm(1),&
          & stat=info)  
-    if (info == 0) call InitSearchTree(desc%avltree,info)
     if (info /= 0) then
       info=4025
       int_err(1)=loc_col
@@ -225,7 +228,7 @@ subroutine psb_cdals(m, n, parts, ictxt, desc, info)
           if (prc_v(j) == me) exit
           j=j+1
         enddo
-        
+
         if (j <= nprocs) then 
           if (prc_v(j) == me) then
             ! this point belongs to me
@@ -237,7 +240,6 @@ subroutine psb_cdals(m, n, parts, ictxt, desc, info)
               goto 9999
             end if
             desc%loc_to_glob(k) = i
-            call SearchInsKey(desc%avltree,i,glx,k,info)
             if (nprocs > 1)  then
               call psb_ensure_size((itmpov+3+nprocs),temp_ovrlap,info,pad=-1)
               if (info /= 0) then
@@ -253,7 +255,7 @@ subroutine psb_cdals(m, n, parts, ictxt, desc, info)
               itmpov = itmpov + nprocs
             endif
           end if
-        end if        
+        end if
       end if
     enddo
     if (info /= 0) then 
@@ -371,7 +373,7 @@ subroutine psb_cdals(m, n, parts, ictxt, desc, info)
 
 
   call psi_bld_tmpovrl(temp_ovrlap,desc,info)
-  
+
   if (info == 0) deallocate(prc_v,temp_ovrlap,stat=info)
   if (info /= psb_no_err_) then 
     info=4000
@@ -396,6 +398,11 @@ subroutine psb_cdals(m, n, parts, ictxt, desc, info)
   desc%ext_index(:)            = -1
 
   call psb_cd_set_bld(desc,info)
+  if (info /= 0) then
+    info=4010
+    call psb_errpush(info,name,a_err='psb_cd_set_bld')
+    Goto 9999
+  end if
 
 
   if (debug_level >= psb_debug_ext_) &

@@ -31,13 +31,17 @@
 !!$  
 
 module psb_const_mod
+  ! This should be integer(8), and normally different from default integer. 
+  integer, parameter  :: longndig=12
+  integer, parameter  :: psb_long_int_k_ = selected_int_kind(longndig)
   !
-  ! This must be the kind parameter corresponding to MPI_DOUBLE_PRECISION
+  ! These must be the kind parameter corresponding to MPI_DOUBLE_PRECISION
   ! and MPI_REAL
   !
-  integer, parameter           :: psb_dpk_ = kind(1.d0)
-  integer, parameter           :: psb_spk_ = kind(1.e0)
-  integer                      :: psb_sizeof_dp, psb_sizeof_int, psb_sizeof_sp
+  integer, parameter  :: psb_dpk_ = kind(1.d0)
+  integer, parameter  :: psb_spk_ = kind(1.e0)
+  integer             :: psb_sizeof_dp, psb_sizeof_sp
+  integer             :: psb_sizeof_int, psb_sizeof_long_int
 
   !
   !     Handy & miscellaneous constants

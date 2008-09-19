@@ -556,6 +556,9 @@ Subroutine psb_dcdbldext(a,desc_a,novr,desc_ov,info, extype)
             works(j) = workr(i)
           end if
         end do
+        ! Eliminate duplicates from request
+        call psb_msort_unique(works(1:j),iszs)
+
         !
         ! fnd_owner on desc_a because we want the procs who
         ! owned the rows from the beginning!

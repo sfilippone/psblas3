@@ -18,6 +18,8 @@ install:
 	   $(INSTALL_DATA) lib/*.a  $(INSTALL_LIBDIR))
 	(./mkdir.sh  $(INSTALL_INCLUDEDIR) && \
 	   $(INSTALL_DATA) lib/*$(.mod) $(INSTALL_INCLUDEDIR))
+	(./mkdir.sh  $(INSTALL_DOCSDIR) && \
+	   /bin/cp -fr docs/*pdf docs/html $(INSTALL_DOCSDIR))
 clean: 
 	(cd base; make clean)
 	(cd prec; make clean )
@@ -31,4 +33,7 @@ veryclean: cleanlib
 	(cd prec; make veryclean )
 	(cd krylov; make veryclean)
 	(cd util; make veryclean)
+	(cd test/fileread; make clean)
+	(cd test/pargen; make clean)
+	(cd test/util; make clean)
 

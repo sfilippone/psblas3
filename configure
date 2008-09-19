@@ -728,6 +728,7 @@ INSTALL
 INSTALL_DIR
 INSTALL_LIBDIR
 INSTALL_INCLUDEDIR
+INSTALL_DOCSDIR
 BLACS_LIBS
 METIS_LIBS
 CINCLUDES
@@ -1988,8 +1989,12 @@ case $includedir in
    \/* )   eval "INSTALL_INCLUDEDIR=$includedir";;
    * ) eval "INSTALL_INCLUDEDIR=$INSTALL_DIR/include";;
 esac
-{ echo "$as_me:$LINENO: result: $INSTALL_DIR $INSTALL_INCLUDEDIR $INSTALL_LIBDIR" >&5
-echo "${ECHO_T}$INSTALL_DIR $INSTALL_INCLUDEDIR $INSTALL_LIBDIR" >&6; }
+case $docsdir in
+   \/* )   eval "INSTALL_DOCSDIR=$docsdir";;
+   * ) eval "INSTALL_DOCSDIR=$INSTALL_DIR/docs";;
+esac
+{ echo "$as_me:$LINENO: result: $INSTALL_DIR $INSTALL_INCLUDEDIR $INSTALL_LIBDIR $INSTALL_DOCSDIR" >&5
+echo "${ECHO_T}$INSTALL_DIR $INSTALL_INCLUDEDIR $INSTALL_LIBDIR $INSTALL_DOCSDIR" >&6; }
 
 # Note that the following line won't save from troubles.
 # AC_PROG_FC([mpxlf95 mpxlf90 mpxlf pgf95 pgf90 mpif95 mpif90 gfortran f95 f90 ifc])
@@ -10605,6 +10610,7 @@ UTILLIBNAME=libpsb_util.a
 
 
 
+
 if test "X$psblas_make_gnumake" == "Xyes" ; then
 PSBLASRULES='
 PSBLDLIBS=$(BLACS) $(LAPACK) $(BLAS) $(METIS_LIB) $(LIBS)
@@ -11501,6 +11507,7 @@ INSTALL!$INSTALL$ac_delim
 INSTALL_DIR!$INSTALL_DIR$ac_delim
 INSTALL_LIBDIR!$INSTALL_LIBDIR$ac_delim
 INSTALL_INCLUDEDIR!$INSTALL_INCLUDEDIR$ac_delim
+INSTALL_DOCSDIR!$INSTALL_DOCSDIR$ac_delim
 BLACS_LIBS!$BLACS_LIBS$ac_delim
 METIS_LIBS!$METIS_LIBS$ac_delim
 CINCLUDES!$CINCLUDES$ac_delim
@@ -11514,7 +11521,7 @@ LIBOBJS!$LIBOBJS$ac_delim
 LTLIBOBJS!$LTLIBOBJS$ac_delim
 _ACEOF
 
-  if test `sed -n "s/.*$ac_delim\$/X/p" conf$$subs.sed | grep -c X` = 27; then
+  if test `sed -n "s/.*$ac_delim\$/X/p" conf$$subs.sed | grep -c X` = 28; then
     break
   elif $ac_last_try; then
     { { echo "$as_me:$LINENO: error: could not make $CONFIG_STATUS" >&5

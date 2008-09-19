@@ -84,14 +84,11 @@ subroutine psb_cdcpy(desc_in, desc_out, info)
   if (info == 0)   call psb_safe_ab_cpy(desc_in%glob_to_loc,desc_out%glob_to_loc,info)
   if (info == 0)   call psb_safe_ab_cpy(desc_in%lprm,desc_out%lprm,info)
   if (info == 0)   call psb_safe_ab_cpy(desc_in%idx_space,desc_out%idx_space,info)
+  desc_out%hashvsize =   desc_in%hashvsize 
+  desc_out%hashvmask =   desc_in%hashvmask
   if (info == 0)   call psb_safe_ab_cpy(desc_in%hashv,desc_out%hashv,info)
   if (info == 0)   call psb_safe_ab_cpy(desc_in%glb_lc,desc_out%glb_lc,info)
-
-  if (info == 0) then 
-    if (associated(desc_in%avltree)) then 
-      call CloneSearchTree(desc_in%avltree,desc_out%avltree)
-    end if
-  end if
+  if (info == 0)   call CloneHashTable(desc_in%hash,desc_out%hash,info)
 
   if (info /= 0) then
     info = 4010

@@ -101,7 +101,7 @@ scalar, or a rank 1 or 2 array.  Type, kind, rank and size must agree on all pro
 <DT><STRONG>root</STRONG></DT>
 <DD>Process to hold the final value, or <IMG
  WIDTH="25" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="img79.png"
+ SRC="img83.png"
  ALT="$-1$"> to make it available
   on all processes.
 <BR>
@@ -116,7 +116,7 @@ Specified as: an integer value <!-- MATH
  -->
 <IMG
  WIDTH="165" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="img124.png"
+ SRC="img128.png"
  ALT="$-1&lt;= root &lt;= np-1$">, default -1. 
 <BR></DD>
 </DL>
@@ -149,6 +149,8 @@ Type, kind, rank and size must agree on all processes.
 <LI>The <code>dat</code> argument is both input and output, and its
   value may be changed even on processes different from the final
   result destination.
+</LI>
+<LI>The <code>dat</code> argument may also be a long integer scalar.
 </LI>
 </OL>
 

@@ -94,12 +94,17 @@ user does not need to delve into their details (see Sec.&nbsp;<A HREF="node70.ht
 
 <P>
 
-<DIV ALIGN="CENTER"><A NAME="fig:psblas"></A><A NAME="222"></A>
+<DIV ALIGN="CENTER"><A NAME="fig:psblas"></A><A NAME="224"></A>
 <TABLE>
 <CAPTION ALIGN="BOTTOM"><STRONG>Figure 1:</STRONG>
 PSBLAS library components hierarchy.</CAPTION>
 <TR><TD>
 <DIV ALIGN="CENTER">
+<IMG
+ WIDTH="204" HEIGHT="294" ALIGN="BOTTOM" BORDER="0"
+ SRC="img3.png"
+ ALT="\includegraphics[scale=0.65]{figures/psblas.eps}">
+
 <!-- MATH
  $\rotatebox{-90}{\includegraphics[scale=0.65]{figures/psblas}}$
  -->
@@ -107,6 +112,7 @@ PSBLAS library components hierarchy.</CAPTION>
  WIDTH="37" HEIGHT="2" ALIGN="BOTTOM" BORDER="0"
  SRC="img2.png"
  ALT="\rotatebox{-90}{\includegraphics[scale=0.65]{figures/psblas}}">
+
 </DIV></TD></TR>
 </TABLE>
 </DIV>
@@ -150,7 +156,7 @@ process generates its own portion. We never require that the entire
 matrix be available on a single node. However, it is possible
 to hold the entire matrix in one process and distribute it
 explicitly<A NAME="tex2html2"
-  HREF="footnode.html#foot164"><SUP>1</SUP></A>, even though  the resulting 
+  HREF="footnode.html#foot165"><SUP>1</SUP></A>, even though  the resulting 
 bottleneck would make this option unattractive in most  cases. 
 
 <P>

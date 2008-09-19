@@ -38,7 +38,7 @@ module psb_prec_type
 
   ! Reduces size of .mod file.
   use psb_base_mod, only : psb_sspmat_type, psb_cspmat_type,&
-       & psb_dspmat_type, psb_zspmat_type, psb_dpk_, psb_spk_,&
+       & psb_dspmat_type, psb_zspmat_type, psb_dpk_, psb_spk_, psb_long_int_k_,&
        & psb_desc_type, psb_sizeof, psb_sp_free, psb_cdfree,&
        & psb_erractionsave, psb_erractionrestore, psb_error, psb_get_errstatus
 
@@ -599,11 +599,10 @@ contains
   end function pr_to_str
 
 
-  function psb_dprec_sizeof(prec)
+  function psb_dprec_sizeof(prec) result(val)
     type(psb_dprec_type), intent(in) :: prec
-    integer             :: psb_dprec_sizeof
-    integer             :: val,i
-    
+    integer(psb_long_int_k_) :: val
+    integer :: i
     val = 0
     if (allocated(prec%iprcparm)) val = val + psb_sizeof_int * size(prec%iprcparm)
     if (allocated(prec%rprcparm)) val = val + psb_sizeof_dp  * size(prec%rprcparm)
@@ -617,14 +616,12 @@ contains
       end do
     end if
     
-    psb_dprec_sizeof = val 
-    
   end function psb_dprec_sizeof
 
-  function psb_sprec_sizeof(prec)
+  function psb_sprec_sizeof(prec) result(val)
     type(psb_sprec_type), intent(in) :: prec
-    integer             :: psb_sprec_sizeof
-    integer             :: val,i
+    integer(psb_long_int_k_) :: val
+    integer             :: i
     
     val = 0
     if (allocated(prec%iprcparm)) val = val + psb_sizeof_int * size(prec%iprcparm)
@@ -639,14 +636,12 @@ contains
       end do
     end if
     
-    psb_sprec_sizeof = val 
-    
   end function psb_sprec_sizeof
 
-  function psb_zprec_sizeof(prec)
+  function psb_zprec_sizeof(prec) result(val)
     type(psb_zprec_type), intent(in) :: prec
-    integer             :: psb_zprec_sizeof
-    integer             :: val,i
+    integer(psb_long_int_k_) :: val
+    integer             :: i
     
     val = 0
     if (allocated(prec%iprcparm)) val = val + psb_sizeof_int * size(prec%iprcparm)
@@ -654,21 +649,19 @@ contains
     if (allocated(prec%d))        val = val + 2 * psb_sizeof_dp * size(prec%d)
     if (allocated(prec%perm))     val = val + psb_sizeof_int * size(prec%perm)
     if (allocated(prec%invperm))  val = val + psb_sizeof_int * size(prec%invperm)
-                                  val = val + psb_sizeof(prec%desc_data)
+    val = val + psb_sizeof(prec%desc_data)
     if (allocated(prec%av))  then 
       do i=1,size(prec%av)
         val = val + psb_sizeof(prec%av(i))
       end do
     end if
     
-    psb_zprec_sizeof = val 
-    
   end function psb_zprec_sizeof
 
-  function psb_cprec_sizeof(prec)
+  function psb_cprec_sizeof(prec) result(val)
     type(psb_cprec_type), intent(in) :: prec
-    integer             :: psb_cprec_sizeof
-    integer             :: val,i
+    integer(psb_long_int_k_) :: val
+    integer             :: i
     
     val = 0
     if (allocated(prec%iprcparm)) val = val + psb_sizeof_int * size(prec%iprcparm)
@@ -676,14 +669,12 @@ contains
     if (allocated(prec%d))        val = val + 2 * psb_sizeof_sp * size(prec%d)
     if (allocated(prec%perm))     val = val + psb_sizeof_int * size(prec%perm)
     if (allocated(prec%invperm))  val = val + psb_sizeof_int * size(prec%invperm)
-                                  val = val + psb_sizeof(prec%desc_data)
+    val = val + psb_sizeof(prec%desc_data)
     if (allocated(prec%av))  then 
       do i=1,size(prec%av)
         val = val + psb_sizeof(prec%av(i))
       end do
     end if
-    
-    psb_cprec_sizeof = val 
     
   end function psb_cprec_sizeof
     

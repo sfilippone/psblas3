@@ -1,5 +1,5 @@
 !!$  
-!!$              Parallel Sparse BLAS  version 2.2
+!!$              Parallel Sparse BLAS  version 2.3.1
 !!$    (C) Copyright 2006/2007/2008
 !!$                       Salvatore Filippone    University of Rome Tor Vergata
 !!$                       Alfredo Buttari        University of Rome Tor Vergata
@@ -32,34 +32,22 @@
 ! File: ppde.f90
 !
 ! Program: ppde
-! This sample program shows how to build and solve a sparse linear
-!
-! The program  solves a linear system based on the partial differential
-! equation 
-!
+! This sample program solves a linear system obtained by discretizing a
+! PDE with Dirichlet BCs. 
 ! 
 !
-! The equation generated is
+! The PDE is a general second order equation in 3d
 !
-!   b1 d d (u)  b2  d d (u)    a1 d (u))  a2 d (u)))   
-! -   ------   -    ------  +    ----- +  ------     + a3 u = 0
-!      dx dx         dy dy         dx        dy        
+!   b1 dd(u)  b2 dd(u)    b3 dd(u)    a1 d(u)   a2 d(u)  a3 d(u)  
+! -   ------ -  ------ -  ------ -  -----  -  ------  -  ------ + a4 u  = 0
+!      dxdx     dydy       dzdz        dx       dy         dz   
 !
-! 
-! with  Dirichlet boundary conditions on the unit cube 
+! with Dirichlet boundary conditions, on the unit cube  0<=x,y,z<=1.
 !
-!    0<=x,y,z<=1
-! 
-! The equation is discretized with finite differences and uniform stepsize;
-! the resulting  discrete  equation is
-!
-! ( u(x,y,z)(2b1+2b2+a1+a2)+u(x-1,y)(-b1-a1)+u(x,y-1)(-b2-a2)+
-!  -u(x+1,y)b1-u(x,y+1)b2)*(1/h**2)
-!
-! Example taken from: C.T.Kelley
+! Example taken from:
+!    C.T.Kelley
 !    Iterative Methods for Linear and Nonlinear Equations
 !    SIAM 1995
-!
 !
 ! In this sample program the index space of the discretized
 ! computational domain is first numbered sequentially in a standard way, 
@@ -69,13 +57,14 @@
 ! Boundary conditions are set in a very simple way, by adding 
 ! equations of the form
 !
-!   u(x,y) = rhs(x,y)
+!   u(x,y) = exp(-x^2-y^2-z^2)
+!
+! Note that if a1=a2=a3=a4=0., the PDE is the well-known Laplace equation.
 !
 program ppde
   use psb_base_mod
   use psb_prec_mod
   use psb_krylov_mod
-  use psb_util_mod
   implicit none
 
   ! input parameters
@@ -99,6 +88,7 @@ program ppde
 
   ! solver parameters
   integer            :: iter, itmax,itrace, istopc, irst
+  integer(psb_long_int_k_) :: amatsize, precsize, descsize
   real(psb_spk_)   :: err, eps
 
   ! other variables
@@ -119,7 +109,6 @@ program ppde
   if(psb_get_errstatus() /= 0) goto 9999
   name='pde90'
   call psb_set_errverbosity(2)
-
   !
   !  get parameters
   !
@@ -128,10 +117,10 @@ program ppde
   !
   !  allocate and fill in the coefficient matrix, rhs and initial guess 
   !
-  call psb_cd_set_large_threshold(128)
   call psb_barrier(ictxt)
   t1 = psb_wtime()
-  call create_matrix(idim,a,b,x,desc_a,part_block,ictxt,afmt,info)  
+  call create_matrix(idim,a,b,x,desc_a,ictxt,afmt,info)  
+  call psb_barrier(ictxt)
   t2 = psb_wtime() - t1
   if(info /= 0) then
     info=4010
@@ -140,8 +129,7 @@ program ppde
     goto 9999
   end if
 
-  call psb_amx(ictxt,t2)
-  if (iam == psb_root_) write(*,'("Overall matrix creation time : ",es10.4)')t2
+  if (iam == psb_root_) write(*,'("Overall matrix creation time : ",es12.5)')t2
   if (iam == psb_root_) write(*,'(" ")')
   !
   !  prepare the preconditioner.
@@ -163,7 +151,7 @@ program ppde
 
   call psb_amx(ictxt,tprec)
 
-  if (iam == psb_root_) write(*,'("Preconditioner time : ",es10.4)')tprec
+  if (iam == psb_root_) write(*,'("Preconditioner time : ",es12.5)')tprec
   if (iam == psb_root_) write(*,'(" ")')
 
   !
@@ -187,13 +175,22 @@ program ppde
   t2 = psb_wtime() - t1
   call psb_amx(ictxt,t2)
 
+  amatsize = psb_sizeof(a)
+  descsize = psb_sizeof(desc_a)
+  precsize = psb_sizeof(prec)
+  call psb_sum(ictxt,amatsize)
+  call psb_sum(ictxt,descsize)
+  call psb_sum(ictxt,precsize)
   if (iam == psb_root_) then
     write(*,'(" ")')
-    write(*,'("Time to solve matrix    : ",es10.4)')t2
-    write(*,'("Time per iteration      : ",es10.4)')t2/iter
-    write(*,'("Number of iterations    : ",i0)')iter
-    write(*,'("Error estimate on exit  : ",es10.4)')err
-    write(*,'("Info  on exit           : ",i0)')info
+    write(*,'("Time to solve matrix          : ",es12.5)')t2
+    write(*,'("Time per iteration            : ",es12.5)')t2/iter
+    write(*,'("Number of iterations          : ",i0)')iter
+    write(*,'("Convergence indicator on exit : ",es12.5)')err
+    write(*,'("Info  on exit                 : ",i0)')info
+    write(*,'("Total memory occupation for A:      ",i12)')amatsize
+    write(*,'("Total memory occupation for DESC_A: ",i12)')descsize
+    write(*,'("Total memory occupation for PREC:   ",i12)')precsize
   end if
 
   !  
@@ -202,7 +199,7 @@ program ppde
   call psb_gefree(b,desc_a,info)
   call psb_gefree(x,desc_a,info)
   call psb_spfree(a,desc_a,info)
-!!$  call psb_precfree(prec,info)
+  call psb_precfree(prec,info)
   call psb_cdfree(desc_a,info)
   if(info /= 0) then
     info=4010
@@ -220,7 +217,7 @@ program ppde
 
 contains
   !
-  ! get iteration parameters from the command line
+  ! get iteration parameters from standard input
   !
   subroutine  get_parms(ictxt,kmethd,ptype,afmt,idim,istopc,itmax,itrace,irst)
     integer      :: ictxt
@@ -326,7 +323,7 @@ contains
   !  subroutine to allocate and fill in the coefficient matrix and
   !  the rhs. 
   !
-  subroutine create_matrix(idim,a,b,xv,desc_a,parts,ictxt,afmt,info)
+  subroutine create_matrix(idim,a,b,xv,desc_a,ictxt,afmt,info)
     !
     !   discretize the partial diferential equation
     ! 
@@ -334,50 +331,39 @@ contains
     ! -   ------ -  ------ -  ------ -  -----  -  ------  -  ------ + a4 u 
     !      dxdx     dydy       dzdz        dx       dy         dz   
     !
-    !  = 0 
-    ! 
-    ! boundary condition: dirichlet
-    !    0< x,y,z<1
-    !  
-    !  u(x,y,z)(2b1+2b2+2b3+a1+a2+a3)+u(x-1,y,z)(-b1-a1)+u(x,y-1,z)(-b2-a2)+
-    !  + u(x,y,z-1)(-b3-a3)-u(x+1,y,z)b1-u(x,y+1,z)b2-u(x,y,z+1)b3
-
+    ! with Dirichlet boundary conditions, on the unit cube  0<=x,y,z<=1.
+    !
+    ! Boundary conditions are set in a very simple way, by adding 
+    ! equations of the form
+    !
+    !   u(x,y) = exp(-x^2-y^2-z^2)
+    !
+    ! Note that if a1=a2=a3=a4=0., the PDE is the well-known Laplace equation.
+    !
     use psb_base_mod
     implicit none
     integer                        :: idim
-    integer, parameter             :: nbmax=10
-    real(psb_spk_), allocatable  :: b(:),xv(:)
+    integer, parameter             :: nb=20
+    real(psb_spk_), allocatable    :: b(:),xv(:)
     type(psb_desc_type)            :: desc_a
     integer                        :: ictxt, info
     character                      :: afmt*5
-    interface 
-      !   .....user passed subroutine.....
-      subroutine parts(global_indx,n,np,pv,nv)
-        implicit none
-        integer, intent(in)  :: global_indx, n, np
-        integer, intent(out) :: nv
-        integer, intent(out) :: pv(*) 
-      end subroutine parts
-    end interface   ! local variables
     type(psb_sspmat_type)    :: a
-    real(psb_spk_)         :: zt(nbmax),glob_x,glob_y,glob_z
-    integer                  :: m,n,nnz,glob_row
+    real(psb_spk_)           :: zt(nb),glob_x,glob_y,glob_z
+    integer                  :: m,n,nnz,glob_row,nlr,i,ii,ib,k
     integer                  :: x,y,z,ia,indx_owner
-    integer                  :: np, iam
+    integer                  :: np, iam, nr, nt
     integer                  :: element
-    integer                  :: nv, inv
-    integer, allocatable     :: irow(:),icol(:)
+    integer, allocatable     :: irow(:),icol(:),myidx(:)
     real(psb_spk_), allocatable :: val(:)
-    integer, allocatable     :: prv(:)
     ! deltah dimension of each grid cell
     ! deltat discretization time
     real(psb_spk_)         :: deltah
-    real(psb_spk_),parameter   :: rhs=0.d0,one=1.d0,zero=0.d0
-    real(psb_spk_)   :: t1, t2, t3, tins, tasb
+    real(psb_spk_),parameter   :: rhs=0.0,one=1.0,zero=0.0
+    real(psb_dpk_)   :: t0, t1, t2, t3, tasb, talc, ttot, tgen 
     real(psb_spk_)   :: a1, a2, a3, a4, b1, b2, b3 
     external           :: a1, a2, a3, a4, b1, b2, b3
     integer            :: err_act
-    ! common area
 
     character(len=20)  :: name, ch_err
 
@@ -397,11 +383,26 @@ contains
     nnz = ((n*9)/(np))
     if(iam == psb_root_) write(0,'("Generating Matrix (size=",i0x,")...")')n
 
-    call psb_cdall(ictxt,desc_a,info,mg=n,parts=parts)
+    !
+    ! Using a simple BLOCK distribution.
+    !
+    nt = (m+np-1)/np
+    nr = min(nt,m-(iam*nt))
+
+    nt = nr
+    call psb_sum(ictxt,nt) 
+    if (nt /= m) write(0,*) iam, 'Initialization error ',nr,nt,m
+    call psb_barrier(ictxt)
+    t0 = psb_wtime()
+    call psb_cdall(ictxt,desc_a,info,nl=nr)
     if (info == 0) call psb_spall(a,desc_a,info,nnz=nnz)
     ! define  rhs from boundary conditions; also build initial guess 
     if (info == 0) call psb_geall(b,desc_a,info)
     if (info == 0) call psb_geall(xv,desc_a,info)
+    nlr = psb_cd_get_local_rows(desc_a)
+    call psb_barrier(ictxt)
+    talc = psb_wtime()-t0
+
     if (info /= 0) then
       info=4010
       ch_err='allocation rout.'
@@ -413,160 +414,164 @@ contains
     ! time; just a small matrix. might be extended to generate 
     ! a bunch of rows per call. 
     ! 
-    allocate(val(20*nbmax),irow(20*nbmax),&
-         &icol(20*nbmax),prv(np),stat=info)
+    allocate(val(20*nb),irow(20*nb),&
+         &icol(20*nb),myidx(nlr),stat=info)
     if (info /= 0 ) then 
       info=4000
       call psb_errpush(info,name)
       goto 9999
     endif
 
-    tins = 0.d0
-    call psb_barrier(ictxt)
-    t1 = psb_wtime()
+    do i=1,nlr
+      myidx(i) = i
+    end do
+
+
+    call psb_loc_to_glob(myidx,desc_a,info)
 
     ! loop over rows belonging to current process in a block
     ! distribution.
 
-    !    icol(1)=1    
-    do glob_row = 1, n
-      call parts(glob_row,n,np,prv,nv)
-      do inv = 1, nv
-        indx_owner = prv(inv)
-        if (indx_owner == iam) then
-          ! local matrix pointer 
-          element=1
-          ! compute gridpoint coordinates
-          if (mod(glob_row,(idim*idim)) == 0) then
-            x = glob_row/(idim*idim)
-          else
-            x = glob_row/(idim*idim)+1
-          endif
-          if (mod((glob_row-(x-1)*idim*idim),idim) == 0) then
-            y = (glob_row-(x-1)*idim*idim)/idim
-          else
-            y = (glob_row-(x-1)*idim*idim)/idim+1
-          endif
-          z = glob_row-(x-1)*idim*idim-(y-1)*idim
-          ! glob_x, glob_y, glob_x coordinates
-          glob_x=x*deltah
-          glob_y=y*deltah
-          glob_z=z*deltah
+    call psb_barrier(ictxt)
+    t1 = psb_wtime()
+    do ii=1, nlr,nb
+      ib = min(nb,nlr-ii+1) 
+      element = 1
+      do k=1,ib
+        i=ii+k-1
+        ! local matrix pointer 
+        glob_row=myidx(i)
+        ! compute gridpoint coordinates
+        if (mod(glob_row,(idim*idim)) == 0) then
+          x = glob_row/(idim*idim)
+        else
+          x = glob_row/(idim*idim)+1
+        endif
+        if (mod((glob_row-(x-1)*idim*idim),idim) == 0) then
+          y = (glob_row-(x-1)*idim*idim)/idim
+        else
+          y = (glob_row-(x-1)*idim*idim)/idim+1
+        endif
+        z = glob_row-(x-1)*idim*idim-(y-1)*idim
+        ! glob_x, glob_y, glob_x coordinates
+        glob_x=x*deltah
+        glob_y=y*deltah
+        glob_z=z*deltah
 
-          ! check on boundary points 
-          zt(1) = 0.d0
-          ! internal point: build discretization
-          !   
-          !  term depending on   (x-1,y,z)
-          !
-          if (x==1) then 
-            val(element)=-b1(glob_x,glob_y,glob_z)&
-                 & -a1(glob_x,glob_y,glob_z)
-            val(element) = val(element)/(deltah*&
-                 & deltah)
-            zt(1) = exp(-glob_y**2-glob_z**2)*(-val(element))
-          else
-            val(element)=-b1(glob_x,glob_y,glob_z)&
-                 & -a1(glob_x,glob_y,glob_z)
-            val(element) = val(element)/(deltah*&
-                 & deltah)
-            icol(element)=(x-2)*idim*idim+(y-1)*idim+(z)
-            element=element+1
-          endif
-          !  term depending on     (x,y-1,z)
-          if (y==1) then 
-            val(element)=-b2(glob_x,glob_y,glob_z)&
-                 & -a2(glob_x,glob_y,glob_z)
-            val(element) = val(element)/(deltah*&
-                 & deltah)
-            zt(1) = exp(-glob_y**2-glob_z**2)*exp(-glob_x)*(-val(element))  
-          else
-            val(element)=-b2(glob_x,glob_y,glob_z)&
-                 & -a2(glob_x,glob_y,glob_z)
-            val(element) = val(element)/(deltah*&
-                 & deltah)
-            icol(element)=(x-1)*idim*idim+(y-2)*idim+(z)
-            element=element+1
-          endif
-          !  term depending on     (x,y,z-1)
-          if (z==1) then 
-            val(element)=-b3(glob_x,glob_y,glob_z)&
-                 & -a3(glob_x,glob_y,glob_z)
-            val(element) = val(element)/(deltah*&
-                 & deltah)
-            zt(1) = exp(-glob_y**2-glob_z**2)*exp(-glob_x)*(-val(element))  
-          else
-            val(element)=-b3(glob_x,glob_y,glob_z)&
-                 & -a3(glob_x,glob_y,glob_z)
-            val(element) = val(element)/(deltah*&
-                 & deltah)
-            icol(element)=(x-1)*idim*idim+(y-1)*idim+(z-1)
-            element=element+1
-          endif
-          !  term depending on     (x,y,z)
-          val(element)=2*b1(glob_x,glob_y,glob_z)&
-               & +2*b2(glob_x,glob_y,glob_z)&
-               & +2*b3(glob_x,glob_y,glob_z)&
-               & +a1(glob_x,glob_y,glob_z)&
-               & +a2(glob_x,glob_y,glob_z)&
-               & +a3(glob_x,glob_y,glob_z)
+        ! check on boundary points 
+        zt(k) = 0.d0
+        ! internal point: build discretization
+        !   
+        !  term depending on   (x-1,y,z)
+        !
+        if (x==1) then 
+          val(element)=-b1(glob_x,glob_y,glob_z)&
+               & -a1(glob_x,glob_y,glob_z)
           val(element) = val(element)/(deltah*&
                & deltah)
-          icol(element)=(x-1)*idim*idim+(y-1)*idim+(z)
-          element=element+1                  
-          !  term depending on     (x,y,z+1)
-          if (z==idim) then 
-            val(element)=-b1(glob_x,glob_y,glob_z)
-            val(element) = val(element)/(deltah*&
-                 & deltah)
-            zt(1) = exp(-glob_y**2-glob_z**2)*exp(-glob_x)*(-val(element))  
-          else
-            val(element)=-b1(glob_x,glob_y,glob_z)
-            val(element) = val(element)/(deltah*&
-                 & deltah)
-            icol(element)=(x-1)*idim*idim+(y-1)*idim+(z+1)
-            element=element+1
-          endif
-          !  term depending on     (x,y+1,z)
-          if (y==idim) then 
-            val(element)=-b2(glob_x,glob_y,glob_z)
-            val(element) = val(element)/(deltah*&
-                 & deltah)
-            zt(1) = exp(-glob_y**2-glob_z**2)*exp(-glob_x)*(-val(element))  
-          else
-            val(element)=-b2(glob_x,glob_y,glob_z)
-            val(element) = val(element)/(deltah*&
-                 & deltah)
-            icol(element)=(x-1)*idim*idim+(y)*idim+(z)
-            element=element+1
-          endif
-          !  term depending on     (x+1,y,z)
-          if (x<idim) then 
-            val(element)=-b3(glob_x,glob_y,glob_z)
-            val(element) = val(element)/(deltah*&
-                 & deltah)
-            icol(element)=(x)*idim*idim+(y-1)*idim+(z)
-            element=element+1
-          endif
-          irow(1:element-1)=glob_row
-          ia=glob_row
+          zt(k) = exp(-glob_y**2-glob_z**2)*(-val(element))
+        else
+          val(element)=-b1(glob_x,glob_y,glob_z)&
+               & -a1(glob_x,glob_y,glob_z)
+          val(element) = val(element)/(deltah*&
+               & deltah)
+          icol(element) = (x-2)*idim*idim+(y-1)*idim+(z)
+          irow(element) = glob_row
+          element       = element+1
+        endif
+        !  term depending on     (x,y-1,z)
+        if (y==1) then 
+          val(element)=-b2(glob_x,glob_y,glob_z)&
+               & -a2(glob_x,glob_y,glob_z)
+          val(element) = val(element)/(deltah*&
+               & deltah)
+          zt(k) = exp(-glob_y**2-glob_z**2)*exp(-glob_x)*(-val(element))  
+        else
+          val(element)=-b2(glob_x,glob_y,glob_z)&
+               & -a2(glob_x,glob_y,glob_z)
+          val(element) = val(element)/(deltah*&
+               & deltah)
+          icol(element) = (x-1)*idim*idim+(y-2)*idim+(z)
+          irow(element) = glob_row
+          element       = element+1
+        endif
+        !  term depending on     (x,y,z-1)
+        if (z==1) then 
+          val(element)=-b3(glob_x,glob_y,glob_z)&
+               & -a3(glob_x,glob_y,glob_z)
+          val(element) = val(element)/(deltah*&
+               & deltah)
+          zt(k) = exp(-glob_y**2-glob_z**2)*exp(-glob_x)*(-val(element))  
+        else
+          val(element)=-b3(glob_x,glob_y,glob_z)&
+               & -a3(glob_x,glob_y,glob_z)
+          val(element) = val(element)/(deltah*&
+               & deltah)
+          icol(element) = (x-1)*idim*idim+(y-1)*idim+(z-1)
+          irow(element) = glob_row
+          element       = element+1
+        endif
+        !  term depending on     (x,y,z)
+        val(element)=2*b1(glob_x,glob_y,glob_z)&
+             & +2*b2(glob_x,glob_y,glob_z)&
+             & +2*b3(glob_x,glob_y,glob_z)&
+             & +a1(glob_x,glob_y,glob_z)&
+             & +a2(glob_x,glob_y,glob_z)&
+             & +a3(glob_x,glob_y,glob_z)
+        val(element) = val(element)/(deltah*&
+             & deltah)
+        icol(element) = (x-1)*idim*idim+(y-1)*idim+(z)
+        irow(element) = glob_row
+        element       = element+1                  
+        !  term depending on     (x,y,z+1)
+        if (z==idim) then 
+          val(element)=-b1(glob_x,glob_y,glob_z)
+          val(element) = val(element)/(deltah*&
+               & deltah)
+          zt(k) = exp(-glob_y**2-glob_z**2)*exp(-glob_x)*(-val(element))  
+        else
+          val(element)=-b1(glob_x,glob_y,glob_z)
+          val(element) = val(element)/(deltah*&
+               & deltah)
+          icol(element) = (x-1)*idim*idim+(y-1)*idim+(z+1)
+          irow(element) = glob_row
+          element       = element+1
+        endif
+        !  term depending on     (x,y+1,z)
+        if (y==idim) then 
+          val(element)=-b2(glob_x,glob_y,glob_z)
+          val(element) = val(element)/(deltah*&
+               & deltah)
+          zt(k) = exp(-glob_y**2-glob_z**2)*exp(-glob_x)*(-val(element))  
+        else
+          val(element)=-b2(glob_x,glob_y,glob_z)
+          val(element) = val(element)/(deltah*&
+               & deltah)
+          icol(element) = (x-1)*idim*idim+(y)*idim+(z)
+          irow(element) = glob_row
+          element       = element+1
+        endif
+        !  term depending on     (x+1,y,z)
+        if (x<idim) then 
+          val(element)=-b3(glob_x,glob_y,glob_z)
+          val(element) = val(element)/(deltah*&
+               & deltah)
+          icol(element) = (x)*idim*idim+(y-1)*idim+(z)
+          irow(element) = glob_row
+          element       = element+1
+        endif
 
-          t3 = psb_wtime()
-          call psb_spins(element-1,irow,icol,val,a,desc_a,info)
-          if(info /= 0) exit
-          tins = tins + (psb_wtime()-t3)
-          call psb_geins(1,(/ia/),zt(1:1),b,desc_a,info)
-          if(info /= 0) exit
-          zt(1)=0.d0
-          call psb_geins(1,(/ia/),zt(1:1),xv,desc_a,info)
-          if(info /= 0) exit
-        end if
       end do
+      call psb_spins(element-1,irow,icol,val,a,desc_a,info)
+      if(info /= 0) exit
+      call psb_geins(ib,myidx(ii:ii+ib-1),zt(1:ib),b,desc_a,info)
+      if(info /= 0) exit
+      zt(:)=0.d0
+      call psb_geins(ib,myidx(ii:ii+ib-1),zt(1:ib),xv,desc_a,info)
+      if(info /= 0) exit
     end do
 
-    call psb_barrier(ictxt)    
-    t2 = psb_wtime()-t1
-
+    tgen = psb_wtime()-t1
     if(info /= 0) then
       info=4010
       ch_err='insert rout.'
@@ -576,30 +581,18 @@ contains
 
     deallocate(val,irow,icol)
 
+    call psb_barrier(ictxt)
     t1 = psb_wtime()
     call psb_cdasb(desc_a,info)
-    call psb_spasb(a,desc_a,info,dupl=psb_dupl_err_,afmt=afmt)
+    if (info == 0) &
+         & call psb_spasb(a,desc_a,info,dupl=psb_dupl_err_,afmt=afmt)
     call psb_barrier(ictxt)
-    tasb = psb_wtime()-t1
     if(info /= 0) then
       info=4010
       ch_err='asb rout.'
       call psb_errpush(info,name,a_err=ch_err)
       goto 9999
     end if
-
-    call psb_amx(ictxt,t2)
-    call psb_amx(ictxt,tins)
-    call psb_amx(ictxt,tasb)
-
-    if(iam == psb_root_) then
-      write(*,'("The matrix has been generated and assembled in ",a3," format.")')&
-           &   a%fida(1:3)
-      write(*,'("-pspins time   : ",es10.4)')tins
-      write(*,'("-insert time   : ",es10.4)')t2
-      write(*,'("-assembly time : ",es10.4)')tasb
-    end if
-
     call psb_geasb(b,desc_a,info)
     call psb_geasb(xv,desc_a,info)
     if(info /= 0) then
@@ -608,7 +601,23 @@ contains
       call psb_errpush(info,name,a_err=ch_err)
       goto 9999
     end if
+    tasb = psb_wtime()-t1
+    call psb_barrier(ictxt)
+    ttot = psb_wtime() - t0 
 
+    call psb_amx(ictxt,talc)
+    call psb_amx(ictxt,tgen)
+    call psb_amx(ictxt,tasb)
+    call psb_amx(ictxt,ttot)
+    if(iam == psb_root_) then
+      write(*,'("The matrix has been generated and assembled in ",a3," format.")')&
+           &   a%fida(1:3)
+      write(*,'("-allocation  time : ",es12.5)') talc
+      write(*,'("-coeff. gen. time : ",es12.5)') tgen
+      write(*,'("-assembly    time : ",es12.5)') tasb
+      write(*,'("-total       time : ",es12.5)') ttot
+
+    end if
     call psb_erractionrestore(err_act)
     return
 
@@ -625,46 +634,46 @@ end program ppde
 ! functions parametrizing the differential equation 
 !  
 function a1(x,y,z)
-  use psb_base_mod
+  use psb_base_mod, only : psb_spk_
   real(psb_spk_) :: a1
   real(psb_spk_) :: x,y,z
   a1=1.e0
 end function a1
 function a2(x,y,z)
-  use psb_base_mod
+  use psb_base_mod, only : psb_spk_
   real(psb_spk_) ::  a2
   real(psb_spk_) :: x,y,z
-  a2=2.d1*y
+  a2=2.e1*y
 end function a2
 function a3(x,y,z)
-  use psb_base_mod
+  use psb_base_mod, only : psb_spk_
   real(psb_spk_) ::  a3
   real(psb_spk_) :: x,y,z      
   a3=1.e0
 end function a3
 function a4(x,y,z)
-  use psb_base_mod
+  use psb_base_mod, only : psb_spk_
   real(psb_spk_) ::  a4
   real(psb_spk_) :: x,y,z      
   a4=1.e0
 end function a4
 function b1(x,y,z)
-  use psb_base_mod
+  use psb_base_mod, only : psb_spk_
   real(psb_spk_) ::  b1   
   real(psb_spk_) :: x,y,z
   b1=1.e0
 end function b1
 function b2(x,y,z)
-  use psb_base_mod
+  use psb_base_mod, only : psb_spk_
   real(psb_spk_) ::  b2
   real(psb_spk_) :: x,y,z
   b2=1.e0
 end function b2
 function b3(x,y,z)
-  use psb_base_mod
+  use psb_base_mod, only : psb_spk_
   real(psb_spk_) ::  b3
   real(psb_spk_) :: x,y,z
-  b3=1.e0 
+  b3=1.e0
 end function b3
 
 

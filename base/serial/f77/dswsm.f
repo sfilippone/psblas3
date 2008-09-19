@@ -181,6 +181,7 @@ C     .. Executable Statements ..
       NAME = 'DSWSM'
       IERROR = 0
       CALL FCPSB_ERRACTIONSAVE(ERR_ACT)
+      WORK(1) = dzero
       debug_unit  = psb_get_debug_unit()
       debug_level = psb_get_debug_level()
 

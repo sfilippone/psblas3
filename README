@@ -1,4 +1,4 @@
-This directory contains  the PSBLAS library, version 2.2
+This directory contains  the PSBLAS library, version 2.3
 
  
 Version 1.0 of the library was described in:
@@ -22,13 +22,10 @@ specified  in TR15581).
 
 For the Intel compilers, we recommend version 9.1 or later.
 
-IBM SP.
+IBM SP:
 The library has been tested on an IBM SP5, with XLC and XLF 
 version 10.1 and the IBM ESSL/PESSL versions of the BLAS and the
 BLACS. 
-The  setting 
-F90=xlf95 -qsuffix=f=f90:cpp=F90
-in Make.inc.sp5 takes care of the f90/F90 extensions. 
 
 
 UTILITIES
@@ -38,7 +35,8 @@ Harwell-Boeing and MatrixMarket file formats.
 
 DOCUMENTATION
 
-See userguide.pdf 
+See docs/psblas-2.3.pdf; an HTML version of the same document is
+available in docs/html. 
 Please consult the sample programs, especially test/pargen/ppde.f90. 
 
 
@@ -54,11 +52,6 @@ Duff, I., Marrone, M., Radicati, G., and Vittoli, C.
 Level 3 basic linear algebra subprograms for sparse matrices: a user 
 level interface
 ACM Trans. Math. Softw., 23(3), 379-401, 1997.
-
-In the multilevel preconditioners we use SMMP by Randolph E. Bank and
-Craig C. Douglas  na.bank@na-net.ornl.gov and
-na.cdouglas@na-net.ornl.gov;  we wrapped  it in a Fortran 95 interface
-with dynamic memory allocation. 
 
 INSTALLING
 
@@ -80,8 +73,8 @@ prerequisites (see also SERIAL below):
    This is optional; it is  used in the util and test/fileread
    directories but only if you define the HAVE_METIS directive.
 
-We offer an experimental configure script: if everything works well,
-it will generate a Make.inc file suitable for building the library. 
+The configure script will generate a Make.inc file suitable for
+building the library.  
 The script is capable of recognizing the needed libraries with their
 default names; if they are in unusual places consider adding the paths
 with --with-lib, or explicitly specifying the names in --with-blas,
@@ -89,31 +82,16 @@ with --with-lib, or explicitly specifying the names in --with-blas,
 Please note that a common way for the configure script to fail is to
 specify inconsistent MPI vs. plain compilers, either directly or
 indirectly via environment variables; e.g. specifying the Intel
-compiler with FC=ifort and the default MPIFC=mpif90 which points to
-GNU Fortran 4.1. The best way to avoid this situation is (in our
-opinion) to use the environment modules package (see
-http://modules.sourceforge.net/), and load the relevant variables with
-(e.g.)  
+compiler with FC=ifort while at the same time having an  MPIFC=mpif90
+which points to GNU Fortran. 
+The best way to avoid this situation is (in our opinion) to use the
+environment modules package (see http://modules.sourceforge.net/), and
+load the relevant variables with (e.g.)  
 module load gnu42 mpich 
 This will delegate to the modules setup to make sure that the version
 of mpich in use is the one compiled with the gnu42 compilers. 
 After the configure script has completed you can always tweak the
 Make.inc  file yourself. 
-
-An annoying problem exists with some versions of MPICH: the configure
-script will set -DMPI_MOD, which is to say, the MPI call interfaces
-will be resolved by using the MPI Fortran module. However usage of the
-module may cause compilation to fail if coupled with the debugging
-option -ggdb, because the compiler complains that it cannot find any
-matching interface. 
-The solution: either take out the -ggdb option, or, if you really need
-to debug, force -DMPI_H in place of -DMPI_MOD.
-
-
-As a backup alternative, you can always choose a Make.inc.XXX file in
-directory Make that fits your compilers, modify the paths to libraries
-to  match your installation and copy it to Make.inc in the top
-directory. 
 
 After you have Make.inc fixed,  run 
  make 
@@ -134,51 +112,32 @@ coupled with the debugging option -g, because the compiler complains
 that it cannot find a matching interface for some of the
 communication routines.
 The solution: either take out the -g option, or, if you really need to
-debug, force -DMPI_H in place of -DMPI_MOD. 
+debug, edit Make.inc to force -DMPI_H in place of -DMPI_MOD. 
 
-
-
-
-SERIAL: We now provide an (experimental) option to run in serial
-	mode. This has only been tested with GCC but it should work
-	with the others as well. In serial mode you don't need the
-	prereqs 1 and 2 above, and you need to use the -serialmpi
-	Make.inc. BEWARE: we only provide a VERY minimal set of fake mpi
-	routines that is known to work with our codes; specifically, we
-	do not handle a process doing send/receives to itself, neither
-	do we handle user defined data types. 
 
 TODO:
 Fix all reamining bugs. Bugs? We dont' have any ! ;-)
-Work on a single precision version if there is sufficient demand for
-it.
+
 
 The PSBLAS team. 
+
+RELATED SOFTWARE
+
+If you are looking for more sophisticated preconditioners, you may be
+interested in the package  MLD2P4 from http://www.mld2p4.it 
+
 
 
 Contact: Salvatore Filippone     salvatore.filippone@uniroma2.it
 
 Credits for version 2.2:
-Michele Martone contributed the configure machinery. 
+Michele Martone contributed the initial version of the configure
+machinery.  
 
 Credits for version 2.0:
 Salvatore  Filippone
 Alfredo    Buttari
 
-
-In a sister package called MLD2P4 we are going to provide a library of
-more sophisticated preconditioners, including parallel multilevel ones
-that were  developed with the contribution of:  
-Pasqua     D'Ambra
-Daniela    di Serafino
-
-In that package we will provide interfaces to the following software
-packages: 
-   --  SuperLU 3.0        http://crd.lbl.gov/~xiaoye/SuperLU/
-   --  UMFPACK 4.4        http://www.cise.ufl.edu/research/sparse/umfpack/ 
-These are optional, you only need to install them if you actually want
-to use them.  
-The MLD2P4 package will be published soon, watch this space!. 
 
 Credits for version 1.0:
 

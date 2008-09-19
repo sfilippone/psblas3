@@ -170,6 +170,7 @@ C
       NAME = 'CSWMM\0'
       IERROR = 0 
       CALL FCPSB_ERRACTIONSAVE(ERR_ACT)
+      WORK(1) = czero
       
       IF (psb_toupper(FIDA(1:3)).EQ.'CSR') THEN
 C

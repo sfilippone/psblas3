@@ -56,15 +56,13 @@ subroutine psi_idx_cnv1(nv,idxin,desc,info,mask,owned)
   integer, intent(inout) ::  idxin(:)
   type(psb_desc_type), intent(in) :: desc
   integer, intent(out) :: info
-  logical, intent(in), optional, target :: mask(:)
+  logical, intent(in), optional :: mask(:)
   logical, intent(in), optional :: owned
-  integer :: ictxt,mglob, nglob
+  integer :: ictxt,mglob, nglob,ip,lip,i
   integer                :: np, me
   integer                :: nrow,ncol, err_act
-  integer, allocatable   :: idxout(:)
   integer, parameter     :: relocsz=200
   character(len=20)      :: name
-  logical, pointer       :: mask_(:)
   logical                :: owned_
 
   info = 0
@@ -91,7 +89,7 @@ subroutine psi_idx_cnv1(nv,idxin,desc,info,mask,owned)
     goto 9999
   end if
   if (nv == 0) return
-  
+
 
   if (size(idxin) < nv) then 
     info = 1111
@@ -106,15 +104,6 @@ subroutine psi_idx_cnv1(nv,idxin,desc,info,mask,owned)
       call psb_errpush(info,name)
       goto 9999
     end if
-    mask_ => mask
-  else
-    allocate(mask_(nv),stat=info)
-    if (info /= 0) then 
-      info = 4000 
-      call psb_errpush(info,name)
-      goto 9999
-    endif
-    mask_ = .true.
   endif
 
   if (present(owned)) then 
@@ -123,19 +112,123 @@ subroutine psi_idx_cnv1(nv,idxin,desc,info,mask,owned)
     owned_ = .false.
   endif
 
-  allocate(idxout(nv),stat=info)
-  if (info /= 0) then 
-    info = 4000 
-    call psb_errpush(info,name)
-    goto 9999
-  endif
-  call psi_idx_cnv2(nv,idxin,idxout,desc,info,mask_,owned_)
-  idxin(1:nv) = idxout(1:nv)
+  !
+  ! The input descriptor may be in any state
+  !
+  if (psb_is_large_desc(desc)) then 
+    !
+    ! Large descriptor: the size of the index space is such that
+    ! we decided not to allocate the glob_to_loc(:) map.
+    !
+    if (psb_is_bld_desc(desc)) then 
+      !
+      ! During the build phase of a large descriptor the indices 
+      ! are kept in an AVL tree.
+      !
+      if (present(mask)) then 
 
-  deallocate(idxout)
+        do i = 1, nv
+          if (mask(i)) then 
+            ip = idxin(i) 
+            if ((ip < 1 ).or.(ip>mglob)) then 
+              idxin(i) = -1
+              cycle
+            endif
+            call psi_inner_cnv(ip,lip,desc%hashvmask,desc%hashv,desc%glb_lc)
+            if ((lip < 0).and.associated(desc%hash)) &
+                 &  call psb_hash_searchkey(ip,lip,desc%hash,info)
+            if (owned_) then 
+              if (lip<=nrow) then 
+                idxin(i) = lip
+              else 
+                idxin(i) = -1
+              endif
+            else
+              idxin(i) = lip
+            endif
+          end if
+        enddo
+      else
+        do i = 1, nv
+          ip = idxin(i) 
+          if ((ip < 1 ).or.(ip>mglob)) then 
+            idxin(i) = -1
+            cycle
+          endif
+          call psi_inner_cnv(ip,lip,desc%hashvmask,desc%hashv,desc%glb_lc)
+          if ((lip < 0).and.associated(desc%hash)) &
+               &  call psb_hash_searchkey(ip,lip,desc%hash,info)
+          if (owned_) then 
+            if (lip<=nrow) then 
+              idxin(i) = lip
+            else 
+              idxin(i) = -1
+            endif
+          else
+            idxin(i) = lip
+          endif
+        enddo
+      end if
+    else if (psb_is_asb_desc(desc)) then 
+      !
+      ! When a large descriptor is assembled the indices 
+      ! are kept in a (hashed) list of ordered lists, 
+      ! hence psi_inner_cnv does the hashing and binary search.
+      !
+      if (.not.allocated(desc%hashv)) then 
+        info = 4001
+        call psb_errpush(info,name,a_err='Invalid hashv into inner_cnv')
+      end if
+      call psi_inner_cnv(nv,idxin,desc%hashvmask,desc%hashv,desc%glb_lc,mask=mask)
+    end if
 
-  if (.not.present(mask)) then 
-    deallocate(mask_)
+  else
+
+    !
+    ! Not a large descriptor, so we have  the glob_to_loc(:) map
+    ! available. 
+    !
+    if (present(mask)) then 
+      do i = 1, nv
+        if (mask(i)) then 
+          ip = idxin(i) 
+          if ((ip < 1 ).or.(ip>mglob)) then 
+            info = 1133
+            call psb_errpush(info,name)
+            goto 9999
+          endif
+          lip = desc%glob_to_loc(ip)
+          if (owned_) then 
+            if (lip<=nrow) then 
+              idxin(i) = lip
+            else 
+              idxin(i) = -1
+            endif
+          else
+            idxin(i) = lip
+          endif
+        end if
+      enddo
+    else
+      do i = 1, nv
+        ip = idxin(i) 
+        if ((ip < 1 ).or.(ip>mglob)) then 
+          info = 1133
+          call psb_errpush(info,name)
+          goto 9999
+        endif
+        lip = desc%glob_to_loc(ip)
+        if (owned_) then 
+          if (lip<=nrow) then 
+            idxin(i) = lip
+          else 
+            idxin(i) = -1
+          endif
+        else
+          idxin(i) = lip
+        endif
+      enddo
+    end if
   end if
 
   call psb_erractionrestore(err_act)
@@ -204,18 +297,17 @@ subroutine psi_idx_cnv2(nv,idxin,idxout,desc,info,mask,owned)
   use psb_const_mod
   use psb_error_mod
   use psb_penv_mod
-  use psb_avl_mod
   use psi_mod, psb_protect_name => psi_idx_cnv2
   implicit none
   integer, intent(in)  :: nv, idxin(:)
   integer, intent(out) :: idxout(:)
   type(psb_desc_type), intent(in) :: desc
   integer, intent(out) :: info
-  logical, intent(in), optional, target :: mask(:)
+  logical, intent(in), optional :: mask(:)
   logical, intent(in), optional :: owned
   integer :: i,ictxt,mglob, nglob
   integer                :: np, me
-  integer                :: nrow,ncol, ip, err_act,lip, lipf
+  integer                :: nrow,ncol, err_act
   integer, parameter     :: relocsz=200
   character(len=20)      :: name
   logical, pointer       :: mask_(:)
@@ -258,106 +350,9 @@ subroutine psi_idx_cnv2(nv,idxin,idxout,desc,info,mask,owned)
     goto 9999
   end if
 
-  if (present(mask)) then 
-    if (size(mask) < nv) then 
-      info = 1111
-      call psb_errpush(info,name)
-      goto 9999
-    end if
-    mask_ => mask
-  else
-    allocate(mask_(nv),stat=info)
-    if (info /= 0) then 
-      info = 4000 
-      call psb_errpush(info,name)
-      goto 9999
-    endif
-    mask_ = .true.
-  endif
 
-  if (present(owned)) then 
-    owned_ = owned
-  else
-    owned_ = .false.
-  endif
-
-  !
-  ! The input descriptor may be in any state
-  !
-  if (psb_is_large_desc(desc)) then 
-    !
-    ! Large descriptor: the size of the index space is such that
-    ! we decided not to allocate the glob_to_loc(:) map.
-    !
-    if (psb_is_bld_desc(desc)) then 
-      !
-      ! During the build phase of a large descriptor the indices 
-      ! are kept in an AVL tree.
-      !
-      do i = 1, nv
-        if (mask_(i)) then 
-          ip = idxin(i) 
-          if ((ip < 1 ).or.(ip>mglob)) then 
-            idxout(i) = -1
-            cycle
-          endif
-          call SearchKey(desc%avltree,ip,lip,info)
-          if (owned_) then 
-            if (lip<=nrow) then 
-              idxout(i) = lip
-            else 
-              idxout(i) = -1
-            endif
-          else
-            idxout(i) = lip
-          endif
-        end if
-      enddo
-    else if (psb_is_asb_desc(desc)) then 
-      !
-      ! When a large descriptor is assembled the indices 
-      ! are kept in a (hashed) list of ordered lists, 
-      ! hence psi_inner_cnv does the hashing and binary search.
-      !
-
-      if (.not.allocated(desc%hashv)) then 
-        write(0,*) 'Inconsistent input to inner_cnv'
-      end if
-      call psi_inner_cnv(nv,idxin,idxout,psb_hash_mask,desc%hashv,desc%glb_lc)
-    end if
-
-  else
-
-    !
-    ! Not a large descriptor, so we have  the glob_to_loc(:) map
-    ! available. 
-    !
-    do i = 1, nv
-      if (mask_(i)) then 
-        ip = idxin(i) 
-        if ((ip < 1 ).or.(ip>mglob)) then 
-          info = 1133
-          call psb_errpush(info,name)
-          goto 9999
-        endif
-        lip = desc%glob_to_loc(ip)
-        if (owned_) then 
-          if (lip<=nrow) then 
-            idxout(i) = lip
-          else 
-            idxout(i) = -1
-          endif
-        else
-          idxout(i) = lip
-        endif
-      end if
-    enddo
-  end if
-
-
-  if (.not.present(mask)) then 
-    deallocate(mask_)
-  end if
+  idxout(1:nv) = idxin(1:nv) 
+  call psi_idx_cnv1(nv,idxout,desc,info,mask=mask,owned=owned)  
 
   call psb_erractionrestore(err_act)
   return
@@ -427,24 +422,45 @@ subroutine psi_idx_cnvs(idxin,idxout,desc,info,mask,owned)
   integer, intent(out) :: idxout
   type(psb_desc_type), intent(in) :: desc
   integer, intent(out) :: info
-  logical, intent(in), optional, target :: mask
+  logical, intent(in), optional :: mask
   logical, intent(in), optional :: owned
+  logical  :: mask_(1)
   integer  :: iout(1) 
-  logical  :: mask_, owned_
-
-  if (present(mask)) then 
+  
+  if (present(mask)) then
     mask_ = mask
   else
-    mask_ = .true.
-  endif
-  if (present(owned)) then 
-    owned_ = owned
-  else
-    owned_ = .true.
-  endif
-  call psi_idx_cnv(1,(/idxin/),iout,desc,info,(/mask_/),owned_)
+    mask_=.true.
+  end if
+  iout = idxin
+  call psi_idx_cnv(1,iout,desc,info,mask=mask_,owned=owned)
   idxout=iout(1)
 
   return
 
 end subroutine psi_idx_cnvs
+subroutine psi_idx_cnvs1(idxin,desc,info,mask,owned)
+
+  use psi_mod, psb_protect_name => psi_idx_cnvs1
+  use psb_descriptor_type
+  integer, intent(inout)  :: idxin
+  type(psb_desc_type), intent(in) :: desc
+  integer, intent(out) :: info
+  logical, intent(in), optional :: mask
+  logical, intent(in), optional :: owned
+  logical  :: mask_(1)
+  integer  :: iout(1) 
+  
+  if (present(mask)) then
+    mask_ = mask
+  else
+    mask_=.true.
+  end if
+
+  iout(1) = idxin
+  call psi_idx_cnv(1,iout,desc,info,mask=mask_,owned=owned)
+  idxin   = iout(1)
+
+  return
+  
+end subroutine psi_idx_cnvs1

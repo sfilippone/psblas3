@@ -365,76 +365,66 @@ contains
   end function psb_is_ok_inter_desc
 
 
-  function psb_s_map_sizeof(map)
+  function psb_s_map_sizeof(map) result(val)
     implicit none
     type(psb_s_map_type), intent(in) :: map
-    Integer                      :: psb_s_map_sizeof
-    integer :: val
+    integer(psb_long_int_k_) :: val
 
     val = 0
-
     val = val + psb_sizeof(map%map_fw)
     val = val + psb_sizeof(map%map_bk)
-    psb_s_map_sizeof = val 
+
   end function psb_s_map_sizeof
 
-  function psb_d_map_sizeof(map)
+  function psb_d_map_sizeof(map) result(val)
     implicit none
     type(psb_d_map_type), intent(in) :: map
-    Integer                      :: psb_d_map_sizeof
-    integer :: val
+    integer(psb_long_int_k_) :: val
 
     val = 0
-
     val = val + psb_sizeof(map%map_fw)
     val = val + psb_sizeof(map%map_bk)
-    psb_d_map_sizeof = val 
+
   end function psb_d_map_sizeof
 
-  function psb_c_map_sizeof(map)
+  function psb_c_map_sizeof(map) result(val)
     implicit none
     type(psb_c_map_type), intent(in) :: map
-    Integer                      :: psb_c_map_sizeof
-    integer :: val
+    integer(psb_long_int_k_) :: val
 
     val = 0
-
     val = val + psb_sizeof(map%map_fw)
     val = val + psb_sizeof(map%map_bk)
-    psb_c_map_sizeof = val 
+
   end function psb_c_map_sizeof
 
-  function psb_z_map_sizeof(map)
+  function psb_z_map_sizeof(map) result(val)
     implicit none
     type(psb_z_map_type), intent(in) :: map
-    Integer                      :: psb_z_map_sizeof
-    integer :: val
+    integer(psb_long_int_k_) :: val
 
     val = 0
-
     val = val + psb_sizeof(map%map_fw)
     val = val + psb_sizeof(map%map_bk)
-    psb_z_map_sizeof = val 
+
   end function psb_z_map_sizeof
 
-  function psb_itd_sizeof(desc)
+  function psb_itd_sizeof(desc) result(val)
     implicit none 
     type(psb_inter_desc_type), intent(in) :: desc
-    Integer                      :: psb_itd_sizeof
-    integer :: val
+    integer(psb_long_int_k_) :: val
 
     val = 0
-
-    if (allocated(desc%itd_data))    val = val + 4*size(desc%itd_data)
-    if (allocated(desc%exch_fw_idx)) val = val + 4*size(desc%exch_fw_idx)
-    if (allocated(desc%exch_bk_idx)) val = val + 4*size(desc%exch_bk_idx)
+    if (allocated(desc%itd_data))    val = val + psb_sizeof_int*size(desc%itd_data)
+    if (allocated(desc%exch_fw_idx)) val = val + psb_sizeof_int*size(desc%exch_fw_idx)
+    if (allocated(desc%exch_bk_idx)) val = val + psb_sizeof_int*size(desc%exch_bk_idx)
     val = val + psb_sizeof(desc%desc_fw)
     val = val + psb_sizeof(desc%desc_bk)
     val = val + psb_sizeof(desc%dmap)
     val = val + psb_sizeof(desc%zmap)
-    psb_itd_sizeof = val 
+
   end function psb_itd_sizeof
-!!$
+
 
 
 

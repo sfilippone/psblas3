@@ -177,6 +177,7 @@ C     .. Executable Statements ..
       NAME   = 'CSWSM\0'
       IERROR = 0
       CALL FCPSB_ERRACTIONSAVE(ERR_ACT)
+      WORK(1) = czero
 C
 C     Check for identity matrix
 C

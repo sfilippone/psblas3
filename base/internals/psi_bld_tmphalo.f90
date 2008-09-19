@@ -91,53 +91,44 @@ subroutine psi_bld_tmphalo(desc,info)
   ! Here we do not know yet who owns what, so we have 
   ! to call fnd_owner.
   nh = (n_col-n_row)
-  if (nh >= 0) then 
-    Allocate(helem(nh),stat=info)
-    if (info /= 0) then 
-      call psb_errpush(4010,name,a_err='Allocate')
-      goto 9999      
-    end if
+  Allocate(helem(max(1,nh)),stat=info)
+  if (info /= 0) then 
+    call psb_errpush(4010,name,a_err='Allocate')
+    goto 9999      
+  end if
 
-    do i=1, nh
-      helem(i) = desc%loc_to_glob(n_row+i)
-    end do
+  do i=1, nh
+    helem(i) = desc%loc_to_glob(n_row+i)
+  end do
 
-    call psi_fnd_owner(nh,helem,hproc,desc,info)
-    if (info /= 0) then 
-      call psb_errpush(4010,name,a_err='fnd_owner')
-      goto 9999      
-    endif
-    if (nh > size(hproc)) then 
-      info=4010
-      call psb_errpush(4010,name,a_err='nh > size(hproc)')
-      goto 9999      
-    end if
-    allocate(tmphl((3*((n_col-n_row)+1)+1)),stat=info)
-    if (info /= 0) then 
-      call psb_errpush(4010,name,a_err='Allocate')
-      goto 9999      
-    end if
-    j  = 1
-    do i=1,nh
-      tmphl(j+0) = hproc(i)
-      if (tmphl(j+0)<0) then 
-        write(0,*) 'Unrecoverable error: missing proc from asb'
-      end if
-      tmphl(j+1) = 1
-      tmphl(j+2) = n_row+i
-      j          = j + 3
-    end do
-    tmphl(j) = -1
-    lhalo = j
-    nhalo = (lhalo-1)/3
-  else 
-    allocate(tmphl(1),stat=info) 
-    if (info /= 0) then 
-      call psb_errpush(4010,name,a_err='Allocate')
-      goto 9999      
-    end if
-    tmphl=-1
+  call psi_fnd_owner(nh,helem,hproc,desc,info)
+  if (info /= 0) then 
+    call psb_errpush(4010,name,a_err='fnd_owner')
+    goto 9999      
   endif
+  if (nh > size(hproc)) then 
+    info=4010
+    call psb_errpush(4010,name,a_err='nh > size(hproc)')
+    goto 9999      
+  end if
+  allocate(tmphl((3*((n_col-n_row)+1)+1)),stat=info)
+  if (info /= 0) then 
+    call psb_errpush(4010,name,a_err='Allocate')
+    goto 9999      
+  end if
+  j  = 1
+  do i=1,nh
+    tmphl(j+0) = hproc(i)
+    if (tmphl(j+0)<0) then 
+      write(0,*) 'Unrecoverable error: missing proc from asb'
+    end if
+    tmphl(j+1) = 1
+    tmphl(j+2) = n_row+i
+    j          = j + 3
+  end do
+  tmphl(j) = -1
+  lhalo = j
+  nhalo = (lhalo-1)/3
 
   call psb_transfer(tmphl,desc%halo_index,info)
 

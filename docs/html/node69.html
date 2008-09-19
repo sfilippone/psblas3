@@ -59,8 +59,14 @@ Sorting utilities</A>
 </H2>
 
 <P>
-<FONT SIZE="+1"><B>psb_msort -- Sorting by the Merge-sort algorithm</B></FONT>
-<FONT SIZE="+1"><B>psb_qsort -- Sorting by the Quicksort  algorithm</B></FONT>
+<FONT SIZE="+1"><B>psb_msort -- Sorting by the Merge-sort
+  algorithm</B></FONT>
+
+<P>
+<FONT SIZE="+1"><B>psb_qsort -- Sorting by the Quicksort
+  algorithm</B></FONT>
+
+<P>
 <FONT SIZE="+1"><B>psb_hsort -- Sorting by the Heapsort  algorithm</B></FONT>
 <PRE>
 call psb_msort(x,ix,dir,flag)
@@ -71,7 +77,7 @@ call psb_hsort(x,ix,dir,flag)
 <P>
 These  serial routines sort a sequence <IMG
  WIDTH="18" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
- SRC="img106.png"
+ SRC="img110.png"
  ALT="$X$"> into ascending or
 descending  order. The argument meaning is identical for the three
 calls; the only difference is the algorithm used to accomplish the
@@ -97,7 +103,7 @@ Type:<B>optional</B>.
 <BR>
 Specified as: an integer array of (at least) the same size as <IMG
  WIDTH="18" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
- SRC="img106.png"
+ SRC="img110.png"
  ALT="$X$">.
 </DD>
 <DT><STRONG>dir</STRONG></DT>
@@ -105,14 +111,23 @@ Specified as: an integer array of (at least) the same size as <IMG
 <BR>
 Type:<B>optional</B>.
 <BR>
-Specified as: an integer value: <code>psb_sort_up_</code>,
+Specified as: an integer value: <DL>
+<DT><STRONG>Integer and real data:</STRONG></DT>
+<DD><code>psb_sort_up_</code>,
 <code>psb_sort_down_</code>, <code>psb_asort_up_</code>, <code>psb_asort_down_</code>;
 default <code>psb_sort_up_</code>. 
+</DD>
+<DT><STRONG>Complex data:</STRONG></DT>
+<DD><code>psb_lsort_up_</code>,
+<code>psb_lsort_down_</code>, <code>psb_asort_up_</code>, <code>psb_asort_down_</code>;
+default <code>psb_lsort_up_</code>. 
+</DD>
+</DL>
 </DD>
 <DT><STRONG>flag</STRONG></DT>
 <DD>Whether to keep the original values in <IMG
  WIDTH="27" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
- SRC="img107.png"
+ SRC="img111.png"
  ALT="$IX$">.
 <BR>
 Type:<B>optional</B>.
@@ -144,7 +159,7 @@ Type: <B>Optional</B>
 An integer array of rank 1, whose entries are moved to the same
 position as the corresponding entries in <IMG
  WIDTH="13" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
- SRC="img24.png"
+ SRC="img26.png"
  ALT="$x$">.
 </DD>
 </DL>
@@ -155,9 +170,12 @@ position as the corresponding entries in <IMG
 <FONT SIZE="+1"><B>Notes</B></FONT>
 
 <OL>
-<LI>The sorting can be performed in the up/down direction, on the
-  natural or absolute values; for  complex data the sorting can only
-  be done on the absolute values; 
+<LI>For integer or real data the sorting can be performed in the up/down direction, on the
+  natural or absolute values;
+</LI>
+<LI>For  complex data the sorting can  be done in a lexicographic
+  order (i.e.: sort on the real part with ties broken according to
+  the imaginary part) or on the absolute values; 
 </LI>
 <LI>The routines return the items in the chosen ordering; the
   output difference is the handling of  ties (i.e. items with an
@@ -171,35 +189,35 @@ position as the corresponding entries in <IMG
  -->
 <IMG
  WIDTH="180" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="img108.png"
+ SRC="img112.png"
  ALT="$flag = psb\_sort\_ovw\_idx\_$"> then the entries in <IMG
  WIDTH="62" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
- SRC="img109.png"
+ SRC="img113.png"
  ALT="$ix(1:n)$">
   where <IMG
  WIDTH="14" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
- SRC="img13.png"
+ SRC="img15.png"
  ALT="$n$"> is the size of <IMG
  WIDTH="13" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
- SRC="img24.png"
+ SRC="img26.png"
  ALT="$x$"> are initialized to <!-- MATH
  $ix(i) \leftarrow
   i$
  -->
 <IMG
  WIDTH="66" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
- SRC="img110.png"
+ SRC="img114.png"
  ALT="$ix(i) \leftarrow
 i$">; thus, upon return from the subroutine, for each
   index <IMG
  WIDTH="10" HEIGHT="17" ALIGN="BOTTOM" BORDER="0"
- SRC="img3.png"
+ SRC="img4.png"
  ALT="$i$"> we have in <IMG
  WIDTH="37" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
- SRC="img111.png"
+ SRC="img115.png"
  ALT="$ix(i)$"> the position that the item <IMG
  WIDTH="31" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
- SRC="img112.png"
+ SRC="img116.png"
  ALT="$x(i)$">
   occupied in the original data sequence;
 </LI>
@@ -208,16 +226,16 @@ i$">; thus, upon return from the subroutine, for each
  -->
 <IMG
  WIDTH="185" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="img113.png"
+ SRC="img117.png"
  ALT="$flag = psb\_sort\_keep\_idx\_$"> the routine will assume that
   the entries in <IMG
  WIDTH="35" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
- SRC="img114.png"
+ SRC="img118.png"
  ALT="$ix(:)$"> have already been initialized by the user;
 </LI>
 <LI>The three sorting algorithms have a similar <IMG
  WIDTH="74" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
- SRC="img115.png"
+ SRC="img119.png"
  ALT="$O(n \log n)$"> expected
   running time; in the average case quicksort will be the
   fastest and merge-sort the slowest. However note that:
@@ -225,7 +243,7 @@ i$">; thus, upon return from the subroutine, for each
 <OL>
 <LI>The worst case running time for quicksort is <IMG
  WIDTH="45" HEIGHT="34" ALIGN="MIDDLE" BORDER="0"
- SRC="img116.png"
+ SRC="img120.png"
  ALT="$O(n^2)$">; the algorithm
   implemented here follows the well-known median-of-three heuristics,
   but the worst case may still apply;
@@ -233,7 +251,7 @@ i$">; thus, upon return from the subroutine, for each
 <LI>The worst case running time for merge-sort and heap-sort is
   <IMG
  WIDTH="74" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
- SRC="img115.png"
+ SRC="img119.png"
  ALT="$O(n \log n)$"> as the average case;
 </LI>
 <LI>The merge-sort algorithm is implemented to take advantage of 

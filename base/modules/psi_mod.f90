@@ -502,32 +502,40 @@ module psi_mod
 
   interface psi_idx_cnv
     subroutine psi_idx_cnv1(nv,idxin,desc,info,mask,owned)
-      use psb_descriptor_type, only : psb_desc_type, psb_spk_, psb_dpk_
+      use psb_descriptor_type, only : psb_desc_type
       integer, intent(in)    :: nv
       integer, intent(inout) ::  idxin(:)
       type(psb_desc_type), intent(in) :: desc
       integer, intent(out) :: info
-      logical, intent(in), optional, target :: mask(:)
+      logical, intent(in), optional :: mask(:)
       logical, intent(in), optional :: owned
     end subroutine psi_idx_cnv1
     subroutine psi_idx_cnv2(nv,idxin,idxout,desc,info,mask,owned)
-      use psb_descriptor_type, only : psb_desc_type, psb_spk_, psb_dpk_
+      use psb_descriptor_type, only : psb_desc_type
       integer, intent(in)  :: nv, idxin(:)
       integer, intent(out) :: idxout(:)
       type(psb_desc_type), intent(in) :: desc
       integer, intent(out) :: info
-      logical, intent(in), optional, target :: mask(:)
+      logical, intent(in), optional :: mask(:)
       logical, intent(in), optional :: owned
     end subroutine psi_idx_cnv2
     subroutine psi_idx_cnvs(idxin,idxout,desc,info,mask,owned)
-      use psb_descriptor_type, only : psb_desc_type, psb_spk_, psb_dpk_
+      use psb_descriptor_type, only : psb_desc_type
       integer, intent(in)  :: idxin
       integer, intent(out) :: idxout
       type(psb_desc_type), intent(in) :: desc
       integer, intent(out) :: info
-      logical, intent(in), optional, target :: mask
+      logical, intent(in), optional :: mask
       logical, intent(in), optional :: owned
     end subroutine psi_idx_cnvs
+    subroutine psi_idx_cnvs1(idxin,desc,info,mask,owned)
+      use psb_descriptor_type, only : psb_desc_type
+      integer, intent(inout)  :: idxin
+      type(psb_desc_type), intent(in) :: desc
+      integer, intent(out) :: info
+      logical, intent(in), optional :: mask
+      logical, intent(in), optional :: owned
+    end subroutine psi_idx_cnvs1
   end interface
 
   interface psi_idx_ins_cnv
@@ -537,7 +545,7 @@ module psi_mod
       integer, intent(inout) ::  idxin(:)
       type(psb_desc_type), intent(inout) :: desc
       integer, intent(out) :: info
-      logical, intent(in), optional, target :: mask(:)
+      logical, intent(in), optional :: mask(:)
     end subroutine psi_idx_ins_cnv1
     subroutine psi_idx_ins_cnv2(nv,idxin,idxout,desc,info,mask)
       use psb_descriptor_type, only : psb_desc_type, psb_spk_, psb_dpk_
@@ -545,16 +553,23 @@ module psi_mod
       integer, intent(out) :: idxout(:)
       type(psb_desc_type), intent(inout) :: desc
       integer, intent(out) :: info
-      logical, intent(in), optional, target :: mask(:)
+      logical, intent(in), optional :: mask(:)
     end subroutine psi_idx_ins_cnv2
-    subroutine psi_idx_ins_cnvs(idxin,idxout,desc,info,mask)
+    subroutine psi_idx_ins_cnvs2(idxin,idxout,desc,info,mask)
       use psb_descriptor_type, only : psb_desc_type, psb_spk_, psb_dpk_
       integer, intent(in)  :: idxin
       integer, intent(out) :: idxout
       type(psb_desc_type), intent(inout) :: desc
       integer, intent(out) :: info
-      logical, intent(in), optional, target :: mask
-    end subroutine psi_idx_ins_cnvs
+      logical, intent(in), optional :: mask
+    end subroutine psi_idx_ins_cnvs2
+    subroutine psi_idx_ins_cnvs1(idxin,desc,info,mask)
+      use psb_descriptor_type, only : psb_desc_type, psb_spk_, psb_dpk_
+      integer, intent(inout)  :: idxin
+      type(psb_desc_type), intent(inout) :: desc
+      integer, intent(out) :: info
+      logical, intent(in), optional :: mask
+    end subroutine psi_idx_ins_cnvs1
   end interface
 
   interface psi_cnv_dsc
@@ -562,7 +577,9 @@ module psi_mod
   end interface
 
   interface psi_inner_cnv
-    module procedure psi_inner_cnv1, psi_inner_cnv2
+    module procedure psi_inner_cnv1, psi_inner_cnv2,&
+         & psi_inner_cnvs, psi_inner_cnvs2
+!         & psi_inner_cnv1_mask, psi_inner_cnv2_mask,&         
   end interface
 
   interface psi_ovrl_upd
@@ -729,10 +746,9 @@ contains
   end subroutine psi_cnv_dsc
 
 
-
-  subroutine psi_inner_cnv1(n,x,hashmask,hashv,glb_lc)
-    integer, intent(in)    :: n,hashmask,hashv(0:),glb_lc(:,:)
-    integer, intent(inout) :: x(:)
+  subroutine psi_inner_cnvs(x,hashmask,hashv,glb_lc)
+    integer, intent(in)    :: hashmask,hashv(0:),glb_lc(:,:)
+    integer, intent(inout) :: x
 
     integer :: i, ih, key, idx,nh,tmp,lb,ub,lm
     !
@@ -743,41 +759,164 @@ contains
     ! for a width of psb_hash_bits 
     !
 
-    do i=1, n
-      key = x(i) 
-      ih  = iand(key,hashmask)
-      idx = hashv(ih)
-      nh  = hashv(ih+1) - hashv(ih) 
-      if (nh > 0) then 
-        tmp = -1 
-        lb = idx
-        ub = idx+nh-1
-        do 
-          if (lb>ub) exit
-          lm = (lb+ub)/2
-          if (key==glb_lc(lm,1)) then 
-            tmp = lm
-            exit
-          else if (key<glb_lc(lm,1)) then 
-            ub = lm - 1
-          else
-            lb = lm + 1
+    key = x
+    ih  = iand(key,hashmask)
+    idx = hashv(ih)
+    nh  = hashv(ih+1) - hashv(ih) 
+    if (nh > 0) then 
+      tmp = -1 
+      lb = idx
+      ub = idx+nh-1
+      do 
+        if (lb>ub) exit
+        lm = (lb+ub)/2
+        if (key==glb_lc(lm,1)) then 
+          tmp = lm
+          exit
+        else if (key<glb_lc(lm,1)) then 
+          ub = lm - 1
+        else
+          lb = lm + 1
+        end if
+      end do
+    else 
+      tmp = -1
+    end if
+    if (tmp > 0) then 
+      x = glb_lc(tmp,2)
+    else         
+      x = tmp 
+    end if
+  end subroutine psi_inner_cnvs
+
+  subroutine psi_inner_cnvs2(x,y,hashmask,hashv,glb_lc)
+    integer, intent(in)  :: hashmask,hashv(0:),glb_lc(:,:)
+    integer, intent(in)  :: x
+    integer, intent(out) :: y
+
+    integer :: i, ih, key, idx,nh,tmp,lb,ub,lm
+    !
+    ! When a large descriptor is assembled the indices 
+    ! are kept in a (hashed) list of ordered lists. 
+    ! Thus we first hash the index, then we do a binary search on the 
+    ! ordered sublist. The hashing is based on the low-order bits 
+    ! for a width of psb_hash_bits 
+    !
+
+    key = x
+    ih  = iand(key,hashmask)
+    idx = hashv(ih)
+    nh  = hashv(ih+1) - hashv(ih) 
+    if (nh > 0) then 
+      tmp = -1 
+      lb = idx
+      ub = idx+nh-1
+      do 
+        if (lb>ub) exit
+        lm = (lb+ub)/2
+        if (key==glb_lc(lm,1)) then 
+          tmp = lm
+          exit
+        else if (key<glb_lc(lm,1)) then 
+          ub = lm - 1
+        else
+          lb = lm + 1
+        end if
+      end do
+    else 
+      tmp = -1
+    end if
+    if (tmp > 0) then 
+      y = glb_lc(tmp,2)
+    else         
+      y = tmp 
+    end if
+  end subroutine psi_inner_cnvs2
+
+
+  subroutine psi_inner_cnv1(n,x,hashmask,hashv,glb_lc,mask)
+    integer, intent(in)    :: n,hashmask,hashv(0:),glb_lc(:,:)
+    logical, intent(in), optional    :: mask(:)
+    integer, intent(inout) :: x(:)
+
+    integer :: i, ih, key, idx,nh,tmp,lb,ub,lm
+    !
+    ! When a large descriptor is assembled the indices 
+    ! are kept in a (hashed) list of ordered lists. 
+    ! Thus we first hash the index, then we do a binary search on the 
+    ! ordered sublist. The hashing is based on the low-order bits 
+    ! for a width of psb_hash_bits 
+    !
+    if (present(mask)) then 
+      do i=1, n
+        if (mask(i)) then 
+          key = x(i) 
+          ih  = iand(key,hashmask)
+          idx = hashv(ih)
+          nh  = hashv(ih+1) - hashv(ih) 
+          if (nh > 0) then 
+            tmp = -1 
+            lb = idx
+            ub = idx+nh-1
+            do 
+              if (lb>ub) exit
+              lm = (lb+ub)/2
+              if (key==glb_lc(lm,1)) then 
+                tmp = lm
+                exit
+              else if (key<glb_lc(lm,1)) then 
+                ub = lm - 1
+              else
+                lb = lm + 1
+              end if
+            end do
+          else 
+            tmp = -1
           end if
-        end do
-      else 
-        tmp = -1
-      end if
-      if (tmp > 0) then 
-        x(i) = glb_lc(tmp,2)
-      else         
-        x(i) = tmp 
-      end if
-    end do
+          if (tmp > 0) then 
+            x(i) = glb_lc(tmp,2)
+          else         
+            x(i) = tmp 
+          end if
+        end if
+      end do
+    else
+      do i=1, n
+        key = x(i) 
+        ih  = iand(key,hashmask)
+        idx = hashv(ih)
+        nh  = hashv(ih+1) - hashv(ih) 
+        if (nh > 0) then 
+          tmp = -1 
+          lb = idx
+          ub = idx+nh-1
+          do 
+            if (lb>ub) exit
+            lm = (lb+ub)/2
+            if (key==glb_lc(lm,1)) then 
+              tmp = lm
+              exit
+            else if (key<glb_lc(lm,1)) then 
+              ub = lm - 1
+            else
+              lb = lm + 1
+            end if
+          end do
+        else 
+          tmp = -1
+        end if
+        if (tmp > 0) then 
+          x(i) = glb_lc(tmp,2)
+        else         
+          x(i) = tmp 
+        end if
+      end do
+    end if
   end subroutine psi_inner_cnv1
 
-
-  subroutine psi_inner_cnv2(n,x,y,hashmask,hashv,glb_lc)
+  subroutine psi_inner_cnv2(n,x,y,hashmask,hashv,glb_lc,mask)
     integer, intent(in)  :: n, hashmask,hashv(0:),glb_lc(:,:)
+    logical, intent(in),optional  :: mask(:)
     integer, intent(in)  :: x(:)
     integer, intent(out) :: y(:)
 
@@ -789,40 +928,77 @@ contains
     ! ordered sublist. The hashing is based on the low-order bits 
     ! for a width of psb_hash_bits 
     !
-
-    do i=1, n
-      key = x(i) 
-      ih  = iand(key,hashmask)
-      if (ih > ubound(hashv,1) ) then 
-        write(0,*) ' In inner cnv: ',ih,ubound(hashv)
-      end if
-      idx = hashv(ih)
-      nh  = hashv(ih+1) - hashv(ih) 
-      if (nh > 0) then 
-        tmp = -1 
-        lb = idx
-        ub = idx+nh-1
-        do 
-          if (lb>ub) exit
-          lm = (lb+ub)/2
-          if (key==glb_lc(lm,1)) then 
-            tmp = lm
-            exit
-          else if (key<glb_lc(lm,1)) then 
-            ub = lm - 1
-          else
-            lb = lm + 1
+    if (present(mask)) then 
+      do i=1, n
+        if (mask(i)) then 
+          key = x(i) 
+          ih  = iand(key,hashmask)
+          if (ih > ubound(hashv,1) ) then 
+            write(0,*) ' In inner cnv: ',ih,ubound(hashv)
           end if
-        end do
-      else 
-        tmp = -1
-      end if
-      if (tmp > 0) then 
-        y(i) = glb_lc(tmp,2)
-      else         
-        y(i) = tmp 
-      end if
-    end do
+          idx = hashv(ih)
+          nh  = hashv(ih+1) - hashv(ih) 
+          if (nh > 0) then 
+            tmp = -1 
+            lb = idx
+            ub = idx+nh-1
+            do 
+              if (lb>ub) exit
+              lm = (lb+ub)/2
+              if (key==glb_lc(lm,1)) then 
+                tmp = lm
+                exit
+              else if (key<glb_lc(lm,1)) then 
+                ub = lm - 1
+              else
+                lb = lm + 1
+              end if
+            end do
+          else 
+            tmp = -1
+          end if
+          if (tmp > 0) then 
+            y(i) = glb_lc(tmp,2)
+          else         
+            y(i) = tmp 
+          end if
+        end if
+      end do
+    else
+      do i=1, n
+        key = x(i) 
+        ih  = iand(key,hashmask)
+        if (ih > ubound(hashv,1) ) then 
+          write(0,*) ' In inner cnv: ',ih,ubound(hashv)
+        end if
+        idx = hashv(ih)
+        nh  = hashv(ih+1) - hashv(ih) 
+        if (nh > 0) then 
+          tmp = -1 
+          lb = idx
+          ub = idx+nh-1
+          do 
+            if (lb>ub) exit
+            lm = (lb+ub)/2
+            if (key==glb_lc(lm,1)) then 
+              tmp = lm
+              exit
+            else if (key<glb_lc(lm,1)) then 
+              ub = lm - 1
+            else
+              lb = lm + 1
+            end if
+          end do
+        else 
+          tmp = -1
+        end if
+        if (tmp > 0) then 
+          y(i) = glb_lc(tmp,2)
+        else         
+          y(i) = tmp 
+        end if
+      end do
+    end if
   end subroutine psi_inner_cnv2
 
   subroutine  psi_sovrl_updr1(x,desc_a,update,info)
@@ -1688,14 +1864,14 @@ contains
       call psb_errpush(info,name)
       goto 9999
     endif
-    
+
     if (size(x,2) /= size(xs,2)) then 
       info = 4001
       call psb_errpush(info,name, a_err='Mismacth columns X vs XS')
       goto 9999
     endif
-      
-    
+
+
     isz = size(desc_a%ovrlap_elem,1)
 
     do i=1, isz
@@ -1892,14 +2068,14 @@ contains
       call psb_errpush(info,name)
       goto 9999
     endif
-    
+
     if (size(x,2) /= size(xs,2)) then 
       info = 4001
       call psb_errpush(info,name, a_err='Mismacth columns X vs XS')
       goto 9999
     endif
-      
-    
+
+
     isz = size(desc_a%ovrlap_elem,1)
 
     do i=1, isz
@@ -1975,7 +2151,7 @@ contains
   subroutine  psi_covrl_restrr1(x,xs,desc_a,info)
 
     implicit none
-    
+
     complex(psb_spk_), intent(inout)  :: x(:)
     complex(psb_spk_)                 :: xs(:)
     type(psb_desc_type), intent(in)  :: desc_a
@@ -2095,14 +2271,14 @@ contains
       call psb_errpush(info,name)
       goto 9999
     endif
-    
+
     if (size(x,2) /= size(xs,2)) then 
       info = 4001
       call psb_errpush(info,name, a_err='Mismacth columns X vs XS')
       goto 9999
     endif
-      
-    
+
+
     isz = size(desc_a%ovrlap_elem,1)
 
     do i=1, isz
@@ -2180,7 +2356,7 @@ contains
   subroutine  psi_zovrl_restrr1(x,xs,desc_a,info)
 
     implicit none
-    
+
     complex(psb_dpk_), intent(inout)  :: x(:)
     complex(psb_dpk_)                 :: xs(:)
     type(psb_desc_type), intent(in)  :: desc_a
@@ -2301,14 +2477,14 @@ contains
       call psb_errpush(info,name)
       goto 9999
     endif
-    
+
     if (size(x,2) /= size(xs,2)) then 
       info = 4001
       call psb_errpush(info,name, a_err='Mismacth columns X vs XS')
       goto 9999
     endif
-      
-    
+
+
     isz = size(desc_a%ovrlap_elem,1)
 
     do i=1, isz
@@ -2509,14 +2685,14 @@ contains
       call psb_errpush(info,name)
       goto 9999
     endif
-    
+
     if (size(x,2) /= size(xs,2)) then 
       info = 4001
       call psb_errpush(info,name, a_err='Mismacth columns X vs XS')
       goto 9999
     endif
-      
-    
+
+
     isz = size(desc_a%ovrlap_elem,1)
 
     do i=1, isz

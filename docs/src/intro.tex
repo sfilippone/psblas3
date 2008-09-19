@@ -93,8 +93,13 @@ user does not need to delve into their details (see Sec.~\ref{sec:parenv}).
 %% initialization routines will take the communication context for this
 %% grid and store internally for further use. 
 
-\begin{figure}[h] \begin{center}
+\begin{figure}[h] 
+\begin{center}
+\ifcase\pdfoutput
+\includegraphics[scale=0.65]{figures/psblas.eps}
+\or
 \rotatebox{-90}{\includegraphics[scale=0.65]{figures/psblas}}
+\fi
 \end{center}
 \caption{PSBLAS library components hierarchy.\label{fig:psblas}}
 \end{figure}
@@ -204,7 +209,12 @@ local rows)  is $|{\cal I}_i| + |{\cal B}_i| +|{\cal H}_i|$.
 
 \begin{figure}[h] 
 \begin{center}
+\ifcase\pdfoutput
+%\rotatebox{-90}{
+\includegraphics[scale=0.65]{figures/points.eps}%}
+\or
 \rotatebox{-90}{\includegraphics[scale=0.65]{figures/points}}
+\fi
 \end{center}
 \caption{Point classfication.\label{fig:points}}
 \end{figure}

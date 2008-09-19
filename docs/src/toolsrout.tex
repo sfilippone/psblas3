@@ -11,7 +11,7 @@
 \begin{verbatim}
 call psb_cdall(icontxt, desc_a, info,mg=mg,parts=parts)
 call psb_cdall(icontxt, desc_a, info,vg=vg,flag=flag)
-call psb_cdall(icontxt, desc_a, info,vl=vl)
+call psb_cdall(icontxt, desc_a, info,vl=vl,globalcheck=.true.)
 call psb_cdall(icontxt, desc_a, info,nl=nl)
 call psb_cdall(icontxt, desc_a, info,mg=mg,repl=.true.)
 \end{verbatim}
@@ -20,7 +20,7 @@ This subroutine initializes the communication descriptor associated
 with an index space. Exactly one of the  optional arguments
 \verb|parts|, \verb|vg|, \verb|vl|, \verb|nl|  or \verb|repl| 
 must be specified, thereby choosing
-the specific initialization strategy:
+the specific initialization strategy.
 \begin{description}
 \item[\bf  On Entry ]
 \item[Type:] Synchronous.
@@ -30,12 +30,12 @@ Type:{\bf required}.\\
 Intent: {\bf in}.\\
 Specified as: an integer value.
 \item[vg] Data allocation: each index $i\in \{1\dots mg\}$ is allocated
-  to process $vg(i)$.
+  to process $vg(i)$.\\
 Scope:{\bf global}.\\
 Type:{\bf optional}.\\
 Intent: {\bf in}.\\
 Specified as: an integer array. 
-\item[flag] Specifies whether entries in $vg$ are zero- or one-based.
+\item[flag] Specifies whether entries in $vg$ are zero- or one-based.\\
 Scope:{\bf global}.\\
 Type:{\bf optional}.\\
 Intent: {\bf in}.\\
@@ -52,23 +52,29 @@ Scope:{\bf global}.\\
 Type:{\bf required}.\\
 Specified as: a subroutine. 
 \item[vl] Data allocation: the set of global indices belonging to the
-  calling process. 
+  calling process. \\
 Scope:{\bf local}.\\
 Type:{\bf optional}.\\
 Intent: {\bf in}.\\
 Specified as: an integer array. 
 \item[nl] Data allocation: in a generalized block-row distribution the
-  number of indices belonging to the current process. 
+  number of indices belonging to the current process. \\
 Scope:{\bf local}.\\
 Type:{\bf optional}.\\
 Intent: {\bf in}.\\
 Specified as: an integer value. 
 \item[repl] Data allocation: build a replicated index space (i.e. all
-  processes own all indices).
+  processes own all indices).\\
 Scope:{\bf global}.\\
 Type:{\bf optional}.\\
 Intent: {\bf in}.\\
 Specified as: the logical value \verb|.true.|
+\item[globalcheck] Data allocation: do global checks on the local
+  index lists \verb|vl|\\
+Scope:{\bf global}.\\
+Type:{\bf optional}.\\
+Intent: {\bf in}.\\
+Specified as: a logical value, default: \verb|.true.|
 \end{description}
 
 \begin{description}
@@ -88,7 +94,7 @@ An integer value; 0 means no error has been detected.
 {\par\noindent\large\bfseries Notes}
 \begin{enumerate}
 \item Exactly one of the optional arguments  \verb|parts|, \verb|vg|,
-  \verb|vl|, \verb|nl|  must be specified, thereby choosing the
+  \verb|vl|, \verb|nl|  or \verb|repl| must be specified, thereby choosing the
   initialization   strategy as follows:
 \begin{description}
 \item[parts] In this case we have a subroutine specifying the mapping
@@ -113,7 +119,7 @@ An integer value; 0 means no error has been detected.
   The output arguments are:
   \begin{description}
     \item[nv] The number of entries in \verb|pv|;
-    \item[pv] A vector containint the indices of the processes to
+    \item[pv] A vector containing the indices of the processes to
     which the global index should be assigend; each entry must satisfy
     $0\le pv(i) < np$; if $nv>1$ we have an index assigned to multiple
     processes, i.e. we have an overlap among the subdomains.
@@ -126,9 +132,16 @@ An integer value; 0 means no error has been detected.
   or $(1\dots np)$ according to the value of \verb|flag|.
 \item[vl] In this case we are specifying the list of indices assigned
   to the current process; thus, the global problem size $mg$ is given by
-  the sum of the sizes of the individual vectors \verb|vl| specified
-  on the calling processes. The subroutine will check that each entry
-  in the global index space $(1\dots mg)$ is specified exactly once. 
+  the range of the aggregate of the individual vectors \verb|vl| specified
+  in the calling processes. If \verb|globalcheck=.true.| 
+  the subroutine will check how many times  each entry in the global
+  index   space $(1\dots mg)$ is specified in the input lists
+  \verb|vl|, thus allowing for the presence of overlap in the input,
+  and checking for ``orphan'' indices. 
+  If \verb|globalcheck=.false.|, the subroutine will not check for
+  overlap, and may be substantially faster, but
+  the user is implicitly guaranteeing that there are neither orphan
+  nor overlap indices. 
 \item[nl] In this case we are implying a generalized row-block
   distribution in which each process $I$ gets assigned a consecutive
   chunk of $N_I=nl$ global indices.
@@ -137,6 +150,28 @@ An integer value; 0 means no error has been detected.
   useful in the construction of some multilevel preconditioners.
 \end{description}
 \item On exit from this routine the descriptor is in the build state
+\end{enumerate}
+{\par\noindent\large\bfseries Notes}
+\begin{enumerate}
+\item On exit from this routine the descriptor is in the build
+  state. 
+\item Calling the routine with \verb|vg| or \verb|parts| implies that
+  every process will scan the entire index space to figure out the
+  local indices.
+\item Overlapped indices are possible with both \verb|parts| and
+  \verb|vl| invocations.
+\item When the subroutine is invoked with \verb|vl| in
+  conjunction with \verb|globalcheck=.true.|, it will perform a scan
+  of the index   space to search for overlap or orphan indices.
+\item When the subroutine is invoked with \verb|vl| in
+  conjunction with \verb|globalcheck=.false.|, no index space scan
+  will take place. Thus it is the responsibility of the user to make
+  sure that the indices specified in \verb|vl| have neither orphans nor
+  overlaps; if this assumption fails, results will be 
+  unpredictable. 
+\item Orphan and overlap indices are
+  impossible by construction when the subroutine is invoked with
+  \verb|nl| or \verb|vg|.
 \end{enumerate}
 
 
@@ -1582,15 +1617,19 @@ Specified as: a preconditioner data structure \precdata.
 \item[Function value] The memory occupation of the object specified in
   the calling sequence, in bytes.\\
 Scope: {\bf local} \\
-Returned  as: an integer number.
+Returned  as: an \verb|integer(psb_long_int_k_)| number.
 \end{description}
 
 
 \clearpage\subsection*{Sorting utilities}
 \addcontentsline{toc}{subsection}{Sorting utilities}
 
-{\par\noindent\large\bfseries psb\_msort --- Sorting by the Merge-sort algorithm}
-{\par\noindent\large\bfseries psb\_qsort --- Sorting by the Quicksort  algorithm}
+{\par\noindent\large\bfseries psb\_msort --- Sorting by the Merge-sort
+  algorithm}
+
+{\par\noindent\large\bfseries psb\_qsort --- Sorting by the Quicksort
+  algorithm}
+
 {\par\noindent\large\bfseries psb\_hsort --- Sorting by the Heapsort  algorithm}
 \begin{verbatim}
 call psb_msort(x,ix,dir,flag)
@@ -1613,9 +1652,14 @@ Type:{\bf optional}.\\
 Specified as: an integer array of (at least) the same size as $X$.
 \item[dir] The desired ordering.\\
 Type:{\bf optional}.\\
-Specified as: an integer value: \verb|psb_sort_up_|,
+Specified as: an integer value: \begin{description}
+\item[Integer and real data:] \verb|psb_sort_up_|,
 \verb|psb_sort_down_|, \verb|psb_asort_up_|, \verb|psb_asort_down_|;
 default \verb|psb_sort_up_|. 
+\item[Complex data:] \verb|psb_lsort_up_|,
+\verb|psb_lsort_down_|, \verb|psb_asort_up_|, \verb|psb_asort_down_|;
+default \verb|psb_lsort_up_|. 
+\end{description}
 \item[flag] Whether to keep the original values in $IX$.\\
 Type:{\bf optional}.\\
 Specified as: an integer value \verb|psb_sort_ovw_idx_| or
@@ -1636,9 +1680,11 @@ position as the corresponding entries in $x$.
 
 {\goodbreak\par\noindent\large\bfseries Notes}
 \begin{enumerate}
-\item The sorting can be performed in the up/down direction, on the
-  natural or absolute values; for  complex data the sorting can only
-  be done on the absolute values; 
+\item For integer or real data the sorting can be performed in the up/down direction, on the
+  natural or absolute values;
+\item For  complex data the sorting can  be done in a lexicographic
+  order (i.e.: sort on the real part with ties broken according to
+  the imaginary part) or on the absolute values; 
 \item The routines return the items in the chosen ordering; the
   output difference is the handling of  ties (i.e. items with an
   equal   value) in the original input. With the merge-sort algorithm

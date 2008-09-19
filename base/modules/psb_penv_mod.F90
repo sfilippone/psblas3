@@ -100,6 +100,7 @@ module psb_penv_mod
 
   interface psb_max
     module procedure psb_imaxs, psb_imaxv, psb_imaxm,&
+         & psb_i8maxs, &
          & psb_smaxs, psb_smaxv, psb_smaxm,&
          & psb_dmaxs, psb_dmaxv, psb_dmaxm
   end interface
@@ -107,6 +108,7 @@ module psb_penv_mod
 
   interface psb_min
     module procedure psb_imins, psb_iminv, psb_iminm,&
+         & psb_i8mins, &
          & psb_smins, psb_sminv, psb_sminm,&
          & psb_dmins, psb_dminv, psb_dminm
   end interface
@@ -114,6 +116,7 @@ module psb_penv_mod
 
   interface psb_amx
     module procedure psb_iamxs, psb_iamxv, psb_iamxm,&
+         & psb_i8amxs, &
          & psb_samxs, psb_samxv, psb_samxm,&
          & psb_camxs, psb_camxv, psb_camxm,&
          & psb_damxs, psb_damxv, psb_damxm,&
@@ -122,6 +125,7 @@ module psb_penv_mod
 
   interface psb_amn
     module procedure psb_iamns, psb_iamnv, psb_iamnm,&
+         & psb_i8amns, &
          & psb_samns, psb_samnv, psb_samnm,&
          & psb_camns, psb_camnv, psb_camnm,&
          & psb_damns, psb_damnv, psb_damnm,&
@@ -130,6 +134,7 @@ module psb_penv_mod
 
   interface psb_sum
     module procedure psb_isums, psb_isumv, psb_isumm,&
+         & psb_i8sums, &
          & psb_ssums, psb_ssumv, psb_ssumm,&
          & psb_csums, psb_csumv, psb_csumm,&
          & psb_dsums, psb_dsumv, psb_dsumm,&
@@ -162,10 +167,12 @@ contains
     real(psb_dpk_) :: dv(2) 
     real(psb_spk_) :: sv(2) 
     integer        :: iv(2)
+    integer(psb_long_int_k_) :: ilv(2)
     
     call psi_c_diffadd(sv(1),sv(2),psb_sizeof_sp)
     call psi_c_diffadd(dv(1),dv(2),psb_sizeof_dp)
     call psi_c_diffadd(iv(1),iv(2),psb_sizeof_int)
+    call psi_c_diffadd(ilv(1),ilv(2),psb_sizeof_long_int)
     
   end subroutine psi_get_sizes
   
@@ -1147,6 +1154,7 @@ contains
     endif
 #endif    
   end subroutine psb_imins
+
   subroutine psb_iminv(ictxt,dat,root)
     use psb_realloc_mod
 #ifdef MPI_MOD
@@ -2322,6 +2330,217 @@ contains
   end subroutine psb_zamnm
 
 
+
+  subroutine psb_i8sums(ictxt,dat,root)
+#ifdef MPI_MOD
+    use mpi
+#endif
+#ifdef MPI_H
+    include 'mpif.h'
+#endif
+    integer, intent(in)                    :: ictxt
+    integer(psb_long_int_k_), intent(inout) :: dat
+    integer, intent(in), optional          :: root
+    integer :: mpi_int8_type, info, icomm
+    
+    integer                 :: root_, iam, np
+    integer(psb_long_int_k_) :: dat_
+    
+    if (present(root)) then 
+      root_ = root
+    else
+      root_ = -1
+    endif
+    call psb_info(ictxt,iam,np)
+    call psb_get_mpicomm(ictxt,icomm)
+    mpi_int8_type = mpi_integer8
+    if (root_ == -1) then 
+      dat_=dat
+      call mpi_allreduce(dat_,dat,1,mpi_int8_type,mpi_sum,icomm,info)
+    else
+      if (iam==root_) then 
+        dat_=dat
+        call mpi_reduce(dat_,dat,1,mpi_int8_type,mpi_sum,root_,icomm,info)
+      else
+        call mpi_reduce(dat,dat_,1,mpi_int8_type,mpi_sum,root_,icomm,info)
+      end if
+    endif
+
+  end subroutine psb_i8sums
+
+  subroutine psb_i8amx_mpi_user(inv, outv,len,type) 
+    integer(psb_long_int_k_) :: inv(*),outv(*)
+    integer :: len,type
+    integer :: i
+    
+    do i=1, len
+      if (abs(inv(i)) > abs(outv(i))) then 
+        outv(i) = inv(i)
+      end if
+    end do
+  end subroutine psb_i8amx_mpi_user
+  
+  subroutine psb_i8amn_mpi_user(inv, outv,len,type) 
+#ifdef MPI_MOD
+    use mpi
+#endif
+#ifdef MPI_H
+    include 'mpif.h'
+#endif
+    integer(psb_long_int_k_) :: inv(*),outv(*)
+    integer :: len,type
+    integer :: i
+    if (type /= mpi_integer8) then 
+      write(0,*) 'Invalid type !!!'
+    end if
+    do i=1, len
+      if (abs(inv(i)) < abs(outv(i))) then 
+        outv(i) = inv(i)
+      end if
+    end do
+  end subroutine psb_i8amn_mpi_user
+
+  subroutine psb_i8amns(ictxt,dat,root)
+#ifdef MPI_MOD
+    use mpi
+#endif
+#ifdef MPI_H
+    include 'mpif.h'
+#endif
+    integer, intent(in)              :: ictxt
+    integer(psb_long_int_k_), intent(inout)  :: dat
+    integer, intent(in), optional    :: root
+    integer :: root_
+    integer(psb_long_int_k_) :: dat_
+    integer :: iam, np, icomm,info, i8amn
+    
+#if !defined(SERIAL_MPI)
+
+    call psb_info(ictxt,iam,np)
+    call psb_get_mpicomm(ictxt,icomm)
+    
+    call mpi_op_create(psb_i8amn_mpi_user,.true.,i8amn,info)
+    
+    if (present(root)) then 
+      root_ = root
+    else
+      root_ = -1
+    endif
+    if (root_ == -1) then 
+      call mpi_allreduce(dat,dat_,1,mpi_integer8,i8amn,icomm,info)
+      dat = dat_
+    else
+      call mpi_reduce(dat,dat_,1,mpi_integer8,i8amn,root_,icomm,info)
+      dat = dat_
+    endif
+    call mpi_op_free(i8amn,info)
+#endif    
+  end subroutine psb_i8amns
+
+  subroutine psb_i8amxs(ictxt,dat,root)
+#ifdef MPI_MOD
+    use mpi
+#endif
+#ifdef MPI_H
+    include 'mpif.h'
+#endif
+    integer, intent(in)              :: ictxt
+    integer(psb_long_int_k_), intent(inout)  :: dat
+    integer, intent(in), optional    :: root
+    integer :: root_
+    integer(psb_long_int_k_) :: dat_
+    integer :: iam, np, icomm,info, i8amx
+    
+#if !defined(SERIAL_MPI)
+
+    call psb_info(ictxt,iam,np)
+    call psb_get_mpicomm(ictxt,icomm)
+    
+    call mpi_op_create(psb_i8amx_mpi_user,.true.,i8amx,info)
+    
+    if (present(root)) then 
+      root_ = root
+    else
+      root_ = -1
+    endif
+    if (root_ == -1) then 
+      call mpi_allreduce(dat,dat_,1,mpi_integer8,i8amx,icomm,info)
+      dat = dat_
+    else
+      call mpi_reduce(dat,dat_,1,mpi_integer8,i8amx,root_,icomm,info)
+      dat = dat_
+    endif
+    call mpi_op_free(i8amx,info)
+#endif    
+  end subroutine psb_i8amxs
+  
+  subroutine psb_i8mins(ictxt,dat,root)
+#ifdef MPI_MOD
+    use mpi
+#endif
+#ifdef MPI_H
+    include 'mpif.h'
+#endif
+    integer, intent(in)              :: ictxt
+    integer(psb_long_int_k_), intent(inout)  :: dat
+    integer, intent(in), optional    :: root
+    integer :: root_
+    integer(psb_long_int_k_) :: dat_
+    integer :: iam, np, icomm,info
+    
+#if !defined(SERIAL_MPI)
+
+    call psb_info(ictxt,iam,np)
+    call psb_get_mpicomm(ictxt,icomm)
+
+    if (present(root)) then 
+      root_ = root
+    else
+      root_ = -1
+    endif
+    if (root_ == -1) then 
+      call mpi_allreduce(dat,dat_,1,mpi_integer8,mpi_min,icomm,info)
+      dat = dat_
+    else
+      call mpi_reduce(dat,dat_,1,mpi_integer8,mpi_min,root_,icomm,info)
+      dat = dat_
+    endif
+#endif    
+  end subroutine psb_i8mins
+  
+  subroutine psb_i8maxs(ictxt,dat,root)
+#ifdef MPI_MOD
+    use mpi
+#endif
+#ifdef MPI_H
+    include 'mpif.h'
+#endif
+    integer, intent(in)              :: ictxt
+    integer(psb_long_int_k_), intent(inout)  :: dat
+    integer, intent(in), optional    :: root
+    integer :: root_
+    integer(psb_long_int_k_) :: dat_
+    integer :: iam, np, icomm,info
+    
+#if !defined(SERIAL_MPI)
+
+    call psb_info(ictxt,iam,np)
+    call psb_get_mpicomm(ictxt,icomm)
+
+    if (present(root)) then 
+      root_ = root
+    else
+      root_ = -1
+    endif
+    if (root_ == -1) then 
+      call mpi_allreduce(dat,dat_,1,mpi_integer8,mpi_max,icomm,info)
+      dat = dat_
+    else
+      call mpi_reduce(dat,dat_,1,mpi_integer8,mpi_max,root_,icomm,info)
+      dat = dat_
+    endif
+#endif    
+  end subroutine psb_i8maxs
 
   subroutine psb_isums(ictxt,dat,root)
     integer, intent(in)              :: ictxt

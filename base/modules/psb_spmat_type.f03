@@ -140,6 +140,11 @@ module psb_spmat_type
 
   type, extends(psb_base_spmat_type) :: psb_dspmat_type
     real(psb_dpk_), allocatable  :: aspk(:)
+
+  contains
+    procedure, pass(a) :: i_spmv => psb_dspmv_inner    
+    procedure, pass(a) :: i_spmm => psb_dspmm_inner    
+    generic, public    :: spmm => i_spmv, i_spmm
   end type psb_dspmat_type
 
   type, extends(psb_base_spmat_type) :: psb_zspmat_type
@@ -242,9 +247,27 @@ module psb_spmat_type
          & psb_dspinfo, psb_zspinfo
   end interface
 
-
+  private psb_dspmm_inner, psb_dspmv_inner
 
 contains
+
+  subroutine psb_dspmv_inner(alpha,a,x,beta,y,info)
+    type(psb_dspmat_type), intent(in) :: a
+    real(psb_dpk_), intent(in)    :: alpha,beta,x(:)
+    real(psb_dpk_), intent(inout) :: y(:)
+    integer, intent(out)          :: info
+
+    write(0,*) 'Inner spmv was invoked!'
+  end subroutine psb_dspmv_inner
+
+  subroutine psb_dspmm_inner(alpha,a,x,beta,y,info)
+    type(psb_dspmat_type), intent(in) :: a
+    real(psb_dpk_), intent(in)    :: alpha,beta,x(:,:)
+    real(psb_dpk_), intent(inout) :: y(:,:)
+    integer, intent(out)          :: info
+
+    write(0,*) 'Inner spmm was invoked!'
+  end subroutine psb_dspmm_inner
 
   integer function psb_get_ssp_nrows(a)
     type(psb_sspmat_type), intent(in) :: a
@@ -926,15 +949,12 @@ contains
 
   end function psb_ssp_getifld
 
-  function psb_sspsizeof(a)
+  function psb_sspsizeof(a) result(val)
     implicit none
     !....Parameters...
 
     Type(psb_sspmat_type), intent(in) :: A
-    Integer                      :: psb_sspsizeof
-
-    !locals
-    integer :: val
+    integer(psb_long_int_k_) :: val
 
     val   = psb_sizeof_int*size(a%infoa)
 
@@ -954,10 +974,6 @@ contains
     if (allocated(a%pr)) then 
       val = val + psb_sizeof_int * size(a%pr)
     endif
-
-
-    psb_sspsizeof = val
-    Return
 
   end function psb_sspsizeof
 
@@ -1462,22 +1478,17 @@ contains
 
   end function psb_dsp_getifld
 
-  function psb_dspsizeof(a)
+  function psb_dspsizeof(a) result(val)
     implicit none
     !....Parameters...
 
     Type(psb_dspmat_type), intent(in) :: A
-    Integer                      :: psb_dspsizeof
-
-    !locals
-    integer :: val
+    integer(psb_long_int_k_) :: val
 
     val   = psb_sizeof_int*size(a%infoa)
-
     if (allocated(a%aspk)) then 
       val = val + psb_sizeof_dp  * size(a%aspk)
     endif
-
     if (allocated(a%ia1)) then 
       val = val + psb_sizeof_int * size(a%ia1)
     endif
@@ -1490,10 +1501,6 @@ contains
     if (allocated(a%pr)) then 
       val = val + psb_sizeof_int * size(a%pr)
     endif
-
-
-    psb_dspsizeof = val
-    Return
 
   end function psb_dspsizeof
 
@@ -1971,20 +1978,15 @@ contains
 
   end function psb_csp_getifld
 
-  function psb_cspsizeof(a)
+  function psb_cspsizeof(a) result(val)
     implicit none
-    !....Parameters...
 
     Type(psb_cspmat_type), intent(in) :: A
-    Integer                      :: psb_cspsizeof
-
-    !locals
-    integer :: val
+    integer(psb_long_int_k_) :: val
 
     val   = psb_sizeof_int*size(a%infoa)
-
     if (allocated(a%aspk)) then 
-      val = val + 2 * psb_sizeof_dp * size(a%aspk)
+      val = val + 2 * psb_sizeof_sp * size(a%aspk)
     endif
 
     if (allocated(a%ia1)) then 
@@ -1999,10 +2001,6 @@ contains
     if (allocated(a%pr)) then 
       val = val + psb_sizeof_int * size(a%pr)
     endif
-
-
-    psb_cspsizeof = val
-    Return
 
   end function psb_cspsizeof
 
@@ -2473,22 +2471,18 @@ contains
 
   end function psb_zsp_getifld
 
-  function psb_zspsizeof(a)
+  function psb_zspsizeof(a) result(val)
     implicit none
     !....Parameters...
 
     Type(psb_zspmat_type), intent(in) :: A
-    Integer                      :: psb_zspsizeof
-
-    !locals
-    integer :: val
+    integer(psb_long_int_k_) :: val
 
     val   = psb_sizeof_int*size(a%infoa)
 
     if (allocated(a%aspk)) then 
       val = val + 2 * psb_sizeof_dp * size(a%aspk)
     endif
-
     if (allocated(a%ia1)) then 
       val = val + psb_sizeof_int * size(a%ia1)
     endif
@@ -2501,10 +2495,6 @@ contains
     if (allocated(a%pr)) then 
       val = val + psb_sizeof_int * size(a%pr)
     endif
-
-
-    psb_zspsizeof = val
-    Return
 
   end function psb_zspsizeof
 

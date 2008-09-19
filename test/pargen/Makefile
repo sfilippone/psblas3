@@ -14,6 +14,7 @@ FINCLUDES=$(FMFLAG)$(LIBDIR) $(FMFLAG).
 
 EXEDIR=./runs
 
+all: ppde spde
 
 ppde: ppde.o  
 	$(F90LINK) ppde.o  -o ppde $(PSBLAS_LIB) $(LDLIBS)

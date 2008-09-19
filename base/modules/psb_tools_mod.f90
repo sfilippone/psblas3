@@ -34,6 +34,22 @@ Module psb_tools_mod
   use psb_spmat_type
 
 
+  interface psb_cd_set_bld
+    subroutine psb_cd_set_bld(desc,info)
+      use psb_descriptor_type
+      type(psb_desc_type), intent(inout) :: desc
+      integer                            :: info
+    end subroutine psb_cd_set_bld
+  end interface
+
+  interface psb_cd_set_ovl_bld
+    subroutine psb_cd_set_ovl_bld(desc,info)
+      use psb_descriptor_type
+      type(psb_desc_type), intent(inout) :: desc
+      integer                            :: info
+    end subroutine psb_cd_set_ovl_bld
+  end interface
+
   interface psb_cd_reinit
     Subroutine psb_cd_reinit(desc,info)
       use psb_descriptor_type
@@ -977,7 +993,7 @@ contains
 
   end subroutine psb_get_boundary
 
-  subroutine psb_cdall(ictxt, desc, info,mg,ng,parts,vg,vl,flag,nl,repl)
+  subroutine psb_cdall(ictxt, desc, info,mg,ng,parts,vg,vl,flag,nl,repl, globalcheck)
     use psb_descriptor_type
     use psb_serial_mod
     use psb_const_mod
@@ -987,11 +1003,11 @@ contains
     include 'parts.fh'
     Integer, intent(in)               :: mg,ng,ictxt, vg(:), vl(:),nl
     integer, intent(in)               :: flag
-    logical, intent(in)               :: repl
+    logical, intent(in)               :: repl, globalcheck
     integer, intent(out)              :: info
     type(psb_desc_type), intent(out)  :: desc
 
-    optional :: mg,ng,parts,vg,vl,flag,nl,repl
+    optional :: mg,ng,parts,vg,vl,flag,nl,repl, globalcheck
 
     interface 
       subroutine psb_cdals(m, n, parts, ictxt, desc, info)
@@ -1008,12 +1024,13 @@ contains
         integer, intent(out)              :: info
         Type(psb_desc_type), intent(out)  :: desc
       end subroutine psb_cdalv
-      subroutine psb_cd_inloc(v, ictxt, desc, info)
+      subroutine psb_cd_inloc(v, ictxt, desc, info, globalcheck)
         use psb_descriptor_type
         implicit None
         Integer, intent(in)               :: ictxt, v(:)
         integer, intent(out)              :: info
         type(psb_desc_type), intent(out)  :: desc
+        logical, intent(in), optional     :: globalcheck
       end subroutine psb_cd_inloc
       subroutine psb_cdrep(m, ictxt, desc,info)
         use psb_descriptor_type
@@ -1079,7 +1096,7 @@ contains
       call psb_cdalv(vg, ictxt, desc, info, flag=flag_)
 
     else if (present(vl)) then 
-      call psb_cd_inloc(vl,ictxt,desc,info)
+      call psb_cd_inloc(vl,ictxt,desc,info, globalcheck=globalcheck)
 
     else if (present(nl)) then 
       allocate(itmpsz(0:np-1),stat=info)
@@ -1096,7 +1113,7 @@ contains
       do i=0, me-1
         nlp = nlp + itmpsz(i)
       end do
-      call psb_cd_inloc((/(i,i=nlp+1,nlp+nl)/),ictxt,desc,info)
+      call psb_cd_inloc((/(i,i=nlp+1,nlp+nl)/),ictxt,desc,info,globalcheck=.false.)
 
     endif
 

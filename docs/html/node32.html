@@ -63,7 +63,7 @@ psb_geasums -- Generalized 1-Norm of Vector</A>
 This subroutine computes a series of  1-norms on the columns of
 a  dense matrix  <IMG
  WIDTH="13" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
- SRC="img24.png"
+ SRC="img26.png"
  ALT="$x$">: 
 <BR><P></P>
 <DIV ALIGN="CENTER">
@@ -75,19 +75,19 @@ res(i) \leftarrow \max_k |x(k,i)|
 
 <IMG
  WIDTH="147" HEIGHT="36" BORDER="0"
- SRC="img36.png"
+ SRC="img38.png"
  ALT="\begin{displaymath}res(i) \leftarrow \max_k \vert x(k,i)\vert \end{displaymath}">
 </DIV>
 <BR CLEAR="ALL">
 <P></P>
 This function computes the 1-norm of a vector <IMG
  WIDTH="13" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
- SRC="img24.png"
+ SRC="img26.png"
  ALT="$x$">.
 <BR>
 If <IMG
  WIDTH="13" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
- SRC="img24.png"
+ SRC="img26.png"
  ALT="$x$"> is a real vector 
 it computes 1-norm as:
 <BR><P></P>
@@ -100,14 +100,14 @@ res(i) \leftarrow  \|x_i\|
 
 <IMG
  WIDTH="94" HEIGHT="28" BORDER="0"
- SRC="img40.png"
+ SRC="img42.png"
  ALT="\begin{displaymath}res(i) \leftarrow \Vert x_i\Vert\end{displaymath}">
 </DIV>
 <BR CLEAR="ALL">
 <P></P>
 else if <IMG
  WIDTH="13" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
- SRC="img24.png"
+ SRC="img26.png"
  ALT="$x$"> is a complex vector then it computes 1-norm  as:
 <BR><P></P>
 <DIV ALIGN="CENTER">
@@ -119,7 +119,7 @@ res(i) \leftarrow \|re(x)\|_1 + \|im(x)\|_1
 
 <IMG
  WIDTH="206" HEIGHT="28" BORDER="0"
- SRC="img41.png"
+ SRC="img43.png"
  ALT="\begin{displaymath}res(i) \leftarrow \Vert re(x)\Vert _1 + \Vert im(x)\Vert _1\end{displaymath}">
 </DIV>
 <BR CLEAR="ALL">
@@ -132,7 +132,7 @@ call psb_geasums(res, x, desc_a, info)
 
 <P>
 <BR><P></P>
-<DIV ALIGN="CENTER"><A NAME="1420"></A>
+<DIV ALIGN="CENTER"><A NAME="1422"></A>
 <TABLE>
 <CAPTION><STRONG>Table 7:</STRONG>
 Data types</CAPTION>
@@ -141,11 +141,11 @@ Data types</CAPTION>
 <TABLE CELLPADDING=3 BORDER="1" ALIGN="CENTER">
 <TR><TD ALIGN="LEFT"><IMG
  WIDTH="26" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
- SRC="img32.png"
+ SRC="img34.png"
  ALT="$res$"></TD>
 <TD ALIGN="LEFT"><IMG
  WIDTH="13" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
- SRC="img24.png"
+ SRC="img26.png"
  ALT="$x$"></TD>
 <TD ALIGN="LEFT"><B>Subroutine</B></TD>
 </TR>
@@ -184,7 +184,7 @@ Data types</CAPTION>
 <DD>the local portion of global dense matrix
 <IMG
  WIDTH="13" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
- SRC="img24.png"
+ SRC="img26.png"
  ALT="$x$">. 
 
 <BR>
@@ -217,7 +217,7 @@ Specified as: a structured data of type descdata<TT>psb_desc_type</TT>.
 <DT><STRONG>res</STRONG></DT>
 <DD>contains the 1-norm of (the columns of) <IMG
  WIDTH="13" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
- SRC="img24.png"
+ SRC="img26.png"
  ALT="$x$">.
 <BR>
 Scope: <B>global</B> 
@@ -246,12 +246,12 @@ ifstarsubroutinesubroutinepsb_genrm22-Norm of Vector
 <P>
 This function computes the 2-norm of a vector <IMG
  WIDTH="13" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
- SRC="img24.png"
+ SRC="img26.png"
  ALT="$x$">.
 <BR>
 If <IMG
  WIDTH="13" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
- SRC="img24.png"
+ SRC="img26.png"
  ALT="$x$"> is a double precision real  vector
 it computes 2-norm as:
 <BR><P></P>
@@ -264,14 +264,14 @@ nrm2 \leftarrow \sqrt{x^T x}
 
 <IMG
  WIDTH="106" HEIGHT="24" BORDER="0"
- SRC="img42.png"
+ SRC="img44.png"
  ALT="\begin{displaymath}nrm2 \leftarrow \sqrt{x^T x}\end{displaymath}">
 </DIV>
 <BR CLEAR="ALL">
 <P></P>
 else if <IMG
  WIDTH="13" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
- SRC="img24.png"
+ SRC="img26.png"
  ALT="$x$"> is double precision complex vector then it computes 2-norm  as:
 <BR><P></P>
 <DIV ALIGN="CENTER">
@@ -283,7 +283,7 @@ nrm2 \leftarrow \sqrt{x^H x}
 
 <IMG
  WIDTH="108" HEIGHT="24" BORDER="0"
- SRC="img43.png"
+ SRC="img45.png"
  ALT="\begin{displaymath}nrm2 \leftarrow \sqrt{x^H x}\end{displaymath}">
 </DIV>
 <BR CLEAR="ALL">
@@ -291,7 +291,7 @@ nrm2 \leftarrow \sqrt{x^H x}
 
 <P>
 <BR><P></P>
-<DIV ALIGN="CENTER"><A NAME="1421"></A>
+<DIV ALIGN="CENTER"><A NAME="1423"></A>
 <TABLE>
 <CAPTION><STRONG>Table 8:</STRONG>
 Data types</CAPTION>
@@ -300,11 +300,11 @@ Data types</CAPTION>
 <TABLE CELLPADDING=3 BORDER="1" ALIGN="CENTER">
 <TR><TD ALIGN="LEFT"><IMG
  WIDTH="43" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
- SRC="img44.png"
+ SRC="img46.png"
  ALT="$nrm2$"></TD>
 <TD ALIGN="LEFT"><IMG
  WIDTH="13" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
- SRC="img24.png"
+ SRC="img26.png"
  ALT="$x$"></TD>
 <TD ALIGN="LEFT"><B>Function</B></TD>
 </TR>
@@ -348,7 +348,7 @@ psb_genrm2(x, desc_a, info)
 <DD>the local portion of global dense matrix
 <IMG
  WIDTH="13" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
- SRC="img24.png"
+ SRC="img26.png"
  ALT="$x$">.
 <BR>
 Scope: <B>local</B> 
@@ -380,7 +380,7 @@ Specified as: a structured data of type descdata<TT>psb_desc_type</TT>.
 <DT><STRONG>Function Value</STRONG></DT>
 <DD>is the 2-norm of subvector <IMG
  WIDTH="13" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
- SRC="img24.png"
+ SRC="img26.png"
  ALT="$x$">.
 <BR>
 Scope: <B>global</B> 

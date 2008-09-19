@@ -49,7 +49,6 @@ subroutine psb_icdasb(desc_a,info,ext_hv)
   use psi_mod
   use psb_error_mod
   use psb_penv_mod
-  use psb_avl_mod
 #ifdef MPI_MOD
     use mpi
 #endif
@@ -113,7 +112,11 @@ subroutine psb_icdasb(desc_a,info,ext_hv)
     
     if (debug_level >= psb_debug_ext_) &
          & write(debug_unit,*) me,' ',trim(name),': Checking rows insertion'
+    !
     ! check if all local row are inserted
+    ! Note: this may still be useful for the case of 
+    !       cdall(..., vl=vl, globalcheck=.false.)
+    !       
     do i=1,psb_cd_get_local_cols(desc_a)
       if (desc_a%loc_to_glob(i) < 0) then
         info=3100
@@ -134,6 +137,10 @@ subroutine psb_icdasb(desc_a,info,ext_hv)
       if (debug_level >= psb_debug_ext_) &
            & write(debug_unit,*) me,' ',trim(name),': Large descriptor, calling ldsc_pre_halo'
       call psi_ldsc_pre_halo(desc_a,ext_hv_,info)
+      if (info /= 0) then
+        call psb_errpush(4010,name,a_err='ldsc_pre_halo')
+        goto 9999
+      end if      
     end if
 
     ! Take out the lists for ovrlap, halo and ext...
@@ -150,23 +157,13 @@ subroutine psb_icdasb(desc_a,info,ext_hv)
       goto 9999
     end if
 
-
     deallocate(ovrlap_index, halo_index, ext_index, stat=info)
     if (info /= 0) then
       info =4000
       call psb_errpush(info,name)
       goto 9999
     end if
-    ! Finally, cleanup the AVL tree of indices, if any, as it is
-    ! only needed while in the build state.
-    if (associated(desc_a%avltree)) then 
-      call FreeSearchTree(desc_a%avltree,info)   
-      if (info /= 0) then 
-        info=2059
-        call psb_errpush(info,name)
-        goto 9999
-      end if
-    end if
+
     ! Ok, register into MATRIX_DATA 
     desc_a%matrix_data(psb_dec_type_) = psb_desc_asb_
   else

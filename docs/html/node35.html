@@ -74,7 +74,7 @@ y \leftarrow \alpha P_r A P_c x + \beta y
 <TABLE WIDTH="100%" ALIGN="CENTER">
 <TR VALIGN="MIDDLE"><TD ALIGN="CENTER" NOWRAP><A NAME="eq:f90spmm_no_tra"></A><IMG
  WIDTH="136" HEIGHT="27" BORDER="0"
- SRC="img48.png"
+ SRC="img50.png"
  ALT="\begin{displaymath}
 y \leftarrow \alpha P_r A P_c x + \beta y
 \end{displaymath}"></TD>
@@ -93,7 +93,7 @@ y \leftarrow \alpha P_r A^T P_c x + \beta y
 <TABLE WIDTH="100%" ALIGN="CENTER">
 <TR VALIGN="MIDDLE"><TD ALIGN="CENTER" NOWRAP><A NAME="eq:f90spmm_tra"></A><IMG
  WIDTH="145" HEIGHT="27" BORDER="0"
- SRC="img49.png"
+ SRC="img51.png"
  ALT="\begin{displaymath}
 y \leftarrow \alpha P_r A^T P_c x + \beta y
 \end{displaymath}"></TD>
@@ -112,7 +112,7 @@ y \leftarrow \alpha P_r A^H P_c x + \beta y
 <TABLE WIDTH="100%" ALIGN="CENTER">
 <TR VALIGN="MIDDLE"><TD ALIGN="CENTER" NOWRAP><A NAME="eq:f90spmm_con"></A><IMG
  WIDTH="148" HEIGHT="27" BORDER="0"
- SRC="img50.png"
+ SRC="img52.png"
  ALT="\begin{displaymath}
 y \leftarrow \alpha P_r A^H P_c x + \beta y
 \end{displaymath}"></TD>
@@ -126,20 +126,20 @@ where:
 <DL>
 <DT><STRONG><IMG
  WIDTH="13" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
- SRC="img24.png"
+ SRC="img26.png"
  ALT="$x$"></STRONG></DT>
 <DD>is the global dense submatrix <IMG
  WIDTH="25" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="img51.png"
+ SRC="img53.png"
  ALT="$x_{:, :}$">
 </DD>
 <DT><STRONG><IMG
  WIDTH="13" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="img25.png"
+ SRC="img27.png"
  ALT="$y$"></STRONG></DT>
 <DD>is the global dense submatrix <IMG
  WIDTH="23" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="img52.png"
+ SRC="img54.png"
  ALT="$y_{:, :}$">
 </DD>
 <DT><STRONG><IMG
@@ -153,7 +153,7 @@ where:
 </DD>
 <DT><STRONG><IMG
  WIDTH="45" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="img53.png"
+ SRC="img55.png"
  ALT="$P_r, P_c$"></STRONG></DT>
 <DD>are the permutation matrices.
 </DD>
@@ -161,7 +161,7 @@ where:
 
 <P>
 <BR><P></P>
-<DIV ALIGN="CENTER"><A NAME="1424"></A>
+<DIV ALIGN="CENTER"><A NAME="1426"></A>
 <TABLE>
 <CAPTION><STRONG>Table 11:</STRONG>
 Data types</CAPTION>
@@ -173,16 +173,16 @@ Data types</CAPTION>
  SRC="img1.png"
  ALT="$A$">, <IMG
  WIDTH="13" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
- SRC="img24.png"
+ SRC="img26.png"
  ALT="$x$">, <IMG
  WIDTH="13" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="img25.png"
+ SRC="img27.png"
  ALT="$y$">, <IMG
  WIDTH="14" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
- SRC="img26.png"
+ SRC="img28.png"
  ALT="$\alpha$">, <IMG
  WIDTH="14" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="img27.png"
+ SRC="img29.png"
  ALT="$\beta$"></TD>
 <TD ALIGN="LEFT"><B>Subroutine</B></TD>
 </TR>
@@ -223,7 +223,7 @@ call psb_spmm(alpha, a, x, beta, y,desc_a, info, &amp;
 <DT><STRONG>alpha</STRONG></DT>
 <DD>the scalar <IMG
  WIDTH="14" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
- SRC="img26.png"
+ SRC="img28.png"
  ALT="$\alpha$">.
 <BR>
 Scope: <B>global</B> 
@@ -254,7 +254,7 @@ Specified as: a structured data of type spdata<TT>psb_spmat_type</TT>.
 <DD>the local portion of global dense matrix
 <IMG
  WIDTH="13" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
- SRC="img24.png"
+ SRC="img26.png"
  ALT="$x$">. 
 
 <BR>
@@ -268,16 +268,16 @@ Specified as:  a rank one or two array
 containing numbers of type specified in
 Table&nbsp;<A HREF="#tab:f90spmm">11</A>.  The rank of <IMG
  WIDTH="13" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
- SRC="img24.png"
+ SRC="img26.png"
  ALT="$x$"> must be the same of <IMG
  WIDTH="13" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="img25.png"
+ SRC="img27.png"
  ALT="$y$">. 
 </DD>
 <DT><STRONG>beta</STRONG></DT>
 <DD>the scalar <IMG
  WIDTH="14" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="img27.png"
+ SRC="img29.png"
  ALT="$\beta$">.
 <BR>
 Scope: <B>global</B> 
@@ -292,7 +292,7 @@ Specified as: a number of the data type indicated in Table&nbsp;<A HREF="#tab:f9
 <DD>the local portion of global dense matrix
 <IMG
  WIDTH="13" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="img25.png"
+ SRC="img27.png"
  ALT="$y$">. 
 
 <BR>
@@ -306,10 +306,10 @@ Specified as:  a rank one or two array
 containing numbers of type specified in
 Table&nbsp;<A HREF="#tab:f90spmm">11</A>. The rank of <IMG
  WIDTH="13" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="img25.png"
+ SRC="img27.png"
  ALT="$y$"> must be the same of <IMG
  WIDTH="13" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
- SRC="img24.png"
+ SRC="img26.png"
  ALT="$x$">. 
 </DD>
 <DT><STRONG>desc_a</STRONG></DT>
@@ -346,7 +346,7 @@ Intent: <B>in</B>.
 <BR>
 Default: <IMG
  WIDTH="78" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
- SRC="img54.png"
+ SRC="img56.png"
  ALT="$trans = N$">
 <BR>
 Specified as: a character variable.
@@ -364,10 +364,10 @@ Intent: <B>inout</B>.
 <BR>
 Specified as: a rank one array of the same type of <IMG
  WIDTH="13" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
- SRC="img24.png"
+ SRC="img26.png"
  ALT="$x$"> and <IMG
  WIDTH="13" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="img25.png"
+ SRC="img27.png"
  ALT="$y$"> with
 the TARGET attribute. 
 
@@ -379,7 +379,7 @@ the TARGET attribute.
 <DT><STRONG>y</STRONG></DT>
 <DD>the local portion of result submatrix <IMG
  WIDTH="13" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="img25.png"
+ SRC="img27.png"
  ALT="$y$">.
 <BR>
 Scope: <B>local</B> 

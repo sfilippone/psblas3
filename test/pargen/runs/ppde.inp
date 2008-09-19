@@ -2,9 +2,9 @@
 BICGSTAB                 Iterative method BICGSTAB CGS  BICG BICGSTABL RGMRES
 BJAC                   Preconditioner NONE  DIAG  BJAC 
 CSR                    Storage format for matrix A:  CSR COO JAD 
-100                    Domain size (acutal system is this**3)
+080                    Domain size (acutal system is this**3)
 1                      Stopping criterion
-80                     MAXIT
+20                     MAXIT
 -1                     ITRACE
 20                     IRST    restart for RGMRES  and BiCGSTABL
 

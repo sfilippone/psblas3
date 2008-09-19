@@ -162,7 +162,7 @@ C
       NAME = 'DSWMM\0'
       IERROR = 0
       CALL FCPSB_ERRACTIONSAVE(ERR_ACT)
-
+      WORK(1) = dzero
 C     Switching on FIDA: proper sparse BLAS routine is selected
 C     according to data structure
 C

@@ -122,7 +122,8 @@ Subroutine psb_zcdbldext(a,desc_a,novr,desc_ov,info, extype)
   Call psb_info(ictxt, me, np)
 
   If (debug_level >= psb_debug_outer_) &
-       & Write(debug_unit,*) me,' ',trim(name),': start',novr
+       & Write(debug_unit,*) me,' ',trim(name),&
+       & ': start',novr
 
   if (present(extype)) then
     extype_ = extype
@@ -144,7 +145,8 @@ Subroutine psb_zcdbldext(a,desc_a,novr,desc_ov,info, extype)
   endif
 
   if (debug_level >= psb_debug_outer_) &
-       & write(debug_unit,*) me,' ',trim(name),':Calling desccpy'
+       & write(debug_unit,*) me,' ',trim(name),&
+       & ':Calling desccpy'
   call psb_cdcpy(desc_a,desc_ov,info)
   if (info /= 0) then
     info=4010
@@ -153,7 +155,9 @@ Subroutine psb_zcdbldext(a,desc_a,novr,desc_ov,info, extype)
     goto 9999
   end if
   if (debug_level >= psb_debug_outer_) &
-       & write(debug_unit,*) me,' ',trim(name),':From desccpy'
+       & write(debug_unit,*) me,' ',trim(name),&
+       & ':From desccpy'
+
   if (novr==0) then 
     !
     ! Just copy the input.  
@@ -164,7 +168,8 @@ Subroutine psb_zcdbldext(a,desc_a,novr,desc_ov,info, extype)
 
 
   If (debug_level >= psb_debug_outer_)then 
-    Write(debug_unit,*) me,' ',trim(name),':BEGIN ',nhalo
+    Write(debug_unit,*) me,' ',trim(name),&
+         & ':BEGIN ',nhalo
     call psb_barrier(ictxt)
   endif
 
@@ -179,7 +184,7 @@ Subroutine psb_zcdbldext(a,desc_a,novr,desc_ov,info, extype)
     lworks = ((nztot+m-1)/m)*nhalo
     lworkr = ((nztot+m-1)/m)*nhalo
   else
-    info=-1
+    info   = -1
     call psb_errpush(info,name)
     goto 9999
   endif
@@ -234,12 +239,12 @@ Subroutine psb_zcdbldext(a,desc_a,novr,desc_ov,info, extype)
   tmp_ovr_idx(:) = -1
   orig_ovr(:)    = -1
   tmp_halo(:)    = -1
-  counter_e      = 1
-  tot_recv       = 0
-  counter_t      = 1
-  counter_h      = 1
-  counter_o      = 1
-  cntov_o        = 1
+  counter_e      =  1
+  tot_recv       =  0
+  counter_t      =  1
+  counter_h      =  1
+  counter_o      =  1
+  cntov_o        =  1
   ! Init overlap with desc_a%ovrlap (if any) 
   counter = 1
   Do While (desc_a%ovrlap_index(counter) /= -1)
@@ -300,7 +305,8 @@ Subroutine psb_zcdbldext(a,desc_a,novr,desc_ov,info, extype)
   Do i_ovr = 1, novr
 
     if (debug_level >= psb_debug_outer_) &
-         & write(debug_unit,*) me,' ',trim(name),':Running on overlap level ',i_ovr,' of ',novr
+         & write(debug_unit,*) me,' ',trim(name),&
+         & ':Running on overlap level ',i_ovr,' of ',novr
 
     !
     ! At this point, halo contains a valid halo corresponding to the
@@ -332,7 +338,8 @@ Subroutine psb_zcdbldext(a,desc_a,novr,desc_ov,info, extype)
       end If
       tot_recv=tot_recv+n_elem_recv
       if (debug_level >= psb_debug_outer_) &
-           & write(debug_unit,*) me,' ',trim(name),': tot_recv:',proc,n_elem_recv,tot_recv
+           & write(debug_unit,*) me,' ',trim(name),&
+           &  ': tot_recv:',proc,n_elem_recv,tot_recv
       !
       !
       ! The format of the halo vector exists in two forms: 1. Temporary 
@@ -367,10 +374,10 @@ Subroutine psb_zcdbldext(a,desc_a,novr,desc_ov,info, extype)
           goto 9999
         end if
 
-        tmp_ovr_idx(counter_o)=proc
-        tmp_ovr_idx(counter_o+1)=1
-        tmp_ovr_idx(counter_o+2)=gidx
-        tmp_ovr_idx(counter_o+3)=-1
+        tmp_ovr_idx(counter_o)   = proc
+        tmp_ovr_idx(counter_o+1) = 1
+        tmp_ovr_idx(counter_o+2) = gidx
+        tmp_ovr_idx(counter_o+3) = -1
         counter_o=counter_o+3
         call psb_ensure_size((counter_h+3),tmp_halo,info,pad=-1)
         if (info /= 0) then
@@ -379,10 +386,10 @@ Subroutine psb_zcdbldext(a,desc_a,novr,desc_ov,info, extype)
           goto 9999
         end if
 
-        tmp_halo(counter_h)=proc
-        tmp_halo(counter_h+1)=1
-        tmp_halo(counter_h+2)=idx
-        tmp_halo(counter_h+3)=-1
+        tmp_halo(counter_h)   = proc
+        tmp_halo(counter_h+1) = 1
+        tmp_halo(counter_h+2) = idx
+        tmp_halo(counter_h+3) = -1
 
         counter_h=counter_h+3
 
@@ -410,10 +417,10 @@ Subroutine psb_zcdbldext(a,desc_a,novr,desc_ov,info, extype)
           goto 9999
         end if
 
-        tmp_ovr_idx(counter_o)=proc
-        tmp_ovr_idx(counter_o+1)=1
-        tmp_ovr_idx(counter_o+2)=gidx
-        tmp_ovr_idx(counter_o+3)=-1
+        tmp_ovr_idx(counter_o)   = proc
+        tmp_ovr_idx(counter_o+1) = 1
+        tmp_ovr_idx(counter_o+2) = gidx
+        tmp_ovr_idx(counter_o+3) = -1
         counter_o=counter_o+3
 
         !
@@ -465,6 +472,7 @@ Subroutine psb_zcdbldext(a,desc_a,novr,desc_ov,info, extype)
         if (debug_level >= psb_debug_outer_) &
              & write(debug_unit,*) me,' ',trim(name),&
              & ':Checktmp_o_i Loop Mid2',tmp_ovr_idx(1:10)
+
         sdsz(proc+1) = tot_elem
         idxs         = idxs + tot_elem
       end if
@@ -516,7 +524,7 @@ Subroutine psb_zcdbldext(a,desc_a,novr,desc_ov,info, extype)
           call psb_errpush(info,name,a_err=ch_err)
           goto 9999
         end if
-        lworkr=max(iszr,1)
+        lworkr = max(iszr,1)
       end if
 
       call mpi_alltoallv(works,sdsz,bsdindx,mpi_integer,&
@@ -548,12 +556,15 @@ Subroutine psb_zcdbldext(a,desc_a,novr,desc_ov,info, extype)
             works(j) = workr(i)
           end if
         end do
+        ! Eliminate duplicates from request
+        call psb_msort_unique(works(1:j),iszs)
+
         !
         ! fnd_owner on desc_a because we want the procs who
         ! owned the rows from the beginning!
         !
         call psi_fnd_owner(iszs,works,temp,desc_a,info)
-        n_col=psb_cd_get_local_cols(desc_ov)
+        n_col = psb_cd_get_local_cols(desc_ov)
 
         do i=1,iszs
           idx = works(i)
@@ -574,11 +585,11 @@ Subroutine psb_zcdbldext(a,desc_a,novr,desc_ov,info, extype)
               goto 9999
             end if
 
-            t_halo_in(counter_t)=proc_id
-            t_halo_in(counter_t+1)=1
-            t_halo_in(counter_t+2)=lidx
-            t_halo_in(counter_t+3)=-1
-            counter_t=counter_t+3
+            t_halo_in(counter_t)   = proc_id
+            t_halo_in(counter_t+1) = 1
+            t_halo_in(counter_t+2) = lidx
+            t_halo_in(counter_t+3) = -1
+            counter_t              = counter_t+3
           endif
         end Do
         n_col   = psb_cd_get_local_cols(desc_ov)
@@ -595,8 +606,8 @@ Subroutine psb_zcdbldext(a,desc_a,novr,desc_ov,info, extype)
             ! we receive them guarantees that all indices for HALO(I)
             ! will be less than those for HALO(J) whenever I<J
             !
-            n_col=n_col+1
-            proc_id=-desc_ov%glob_to_loc(idx)-np-1
+            n_col   = n_col+1
+            proc_id = -desc_ov%glob_to_loc(idx)-np-1
             call psb_ensure_size(n_col,desc_ov%loc_to_glob,info,pad=-1)
             if (info /= 0) then
               info=4010
@@ -604,8 +615,8 @@ Subroutine psb_zcdbldext(a,desc_a,novr,desc_ov,info, extype)
               goto 9999
             end if
 
-            desc_ov%glob_to_loc(idx)=n_col
-            desc_ov%loc_to_glob(n_col)=idx
+            desc_ov%glob_to_loc(idx)   = n_col
+            desc_ov%loc_to_glob(n_col) = idx
 
             call psb_ensure_size((counter_t+3),t_halo_in,info,pad=-1)
             if (info /= 0) then
@@ -614,21 +625,23 @@ Subroutine psb_zcdbldext(a,desc_a,novr,desc_ov,info, extype)
               goto 9999
             end if
 
-            t_halo_in(counter_t)=proc_id
-            t_halo_in(counter_t+1)=1
-            t_halo_in(counter_t+2)=n_col
-            t_halo_in(counter_t+3)=-1
+            t_halo_in(counter_t)   = proc_id
+            t_halo_in(counter_t+1) = 1
+            t_halo_in(counter_t+2) = n_col
+            t_halo_in(counter_t+3) = -1
             counter_t=counter_t+3
             if (debug_level >= psb_debug_outer_) &
-                 & write(debug_unit,*) me,' ',trim(name),': Added into t_halo_in from recv',&
-                 &proc_id,n_col,idx
+                 & write(debug_unit,*) me,' ',trim(name),&
+                 & ': Added into t_halo_in from recv',&
+                 & proc_id,n_col,idx
           else if (desc_ov%glob_to_loc(idx) < 0) Then
             if (debug_level >= psb_debug_outer_) &
-                 & write(debug_unit,*) me,' ',trim(name),':Wrong input to cdbldextbld?',&
-                 &idx,desc_ov%glob_to_loc(idx)
+                 & write(debug_unit,*) me,' ',trim(name),&
+                 & ':Wrong input to cdbldextbld?',&
+                 & idx,desc_ov%glob_to_loc(idx)
           End If
         End Do
-        desc_ov%matrix_data(psb_n_col_)=n_col
+        desc_ov%matrix_data(psb_n_col_) = n_col
 
       end if
 
@@ -691,7 +704,7 @@ Subroutine psb_zcdbldext(a,desc_a,novr,desc_ov,info, extype)
       call psb_errpush(4010,name,a_err='deallocate')
       goto 9999
     end if
-    
+
   case(psb_ovt_asov_)
     !
     ! Build an overlapped descriptor for Additive Schwarz 
