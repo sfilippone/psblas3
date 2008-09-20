@@ -58,7 +58,7 @@ subroutine psb_zcsprt(iout,a,iv,eirs,eics,head,ivr,ivc)
   character(len=*), optional        :: head
   integer, intent(in), optional     :: ivr(:), ivc(:)
 
-  character(len=*), parameter       :: frmtr='(2(i6,1x),2(es16.8,1x),2(i6,1x))'
+  character(len=*), parameter       :: frmtr='(2(i6,1x),2(es26.18,1x),2(i6,1x))'
   integer  :: irs,ics,i,j
 
   if (present(eirs)) then 
