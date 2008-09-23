@@ -267,6 +267,38 @@ module psb_comm_mod
       integer, intent(out)             :: info
       integer, intent(in), optional    :: root
     end subroutine psb_iscatterv
+    subroutine  psb_sscatterm(globx, locx, desc_a, info, root)
+      use psb_descriptor_type
+      real(psb_spk_), intent(out)    :: locx(:,:)
+      real(psb_spk_), intent(in)     :: globx(:,:)
+      type(psb_desc_type), intent(in)  :: desc_a
+      integer, intent(out)             :: info
+      integer, intent(in), optional    :: root
+    end subroutine psb_sscatterm
+    subroutine  psb_sscatterv(globx, locx, desc_a, info, root)
+      use psb_descriptor_type
+      real(psb_spk_), intent(out)    :: locx(:)
+      real(psb_spk_), intent(in)     :: globx(:)
+      type(psb_desc_type), intent(in)  :: desc_a
+      integer, intent(out)             :: info
+      integer, intent(in), optional    :: root
+    end subroutine psb_sscatterv
+    subroutine  psb_cscatterm(globx, locx, desc_a, info, root)
+      use psb_descriptor_type
+      complex(psb_spk_), intent(out) :: locx(:,:)
+      complex(psb_spk_), intent(in)  :: globx(:,:)
+      type(psb_desc_type), intent(in)  :: desc_a
+      integer, intent(out)             :: info
+      integer, intent(in), optional    :: root
+    end subroutine psb_cscatterm
+    subroutine  psb_cscatterv(globx, locx, desc_a, info, root)
+      use psb_descriptor_type
+      complex(psb_spk_), intent(out) :: locx(:)
+      complex(psb_spk_), intent(in)  :: globx(:)
+      type(psb_desc_type), intent(in)  :: desc_a
+      integer, intent(out)             :: info
+      integer, intent(in), optional    :: root
+    end subroutine psb_cscatterv
   end interface
 
   interface psb_gather

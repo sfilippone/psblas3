@@ -122,16 +122,16 @@ subroutine psi_idx_ins_cnv1(nv,idxin,desc,info,mask)
           endif
           nxt = ncol + 1
 
-          call psi_inner_cnv(ip,lip,desc%hashvmask,desc%hashv,desc%glb_lc)
+          call psi_inner_cnv(ip,lip,desc%idxmap%hashvmask,desc%idxmap%hashv,desc%idxmap%glb_lc)
           if (lip < 0) &
-               & call psb_hash_searchinskey(ip,lip,nxt,desc%hash,info)        
+               & call psb_hash_searchinskey(ip,lip,nxt,desc%idxmap%hash,info)        
           if (info >=0) then 
             if (nxt == lip) then 
               ncol = nxt
-              isize = size(desc%loc_to_glob)
+              isize = size(desc%idxmap%loc_to_glob)
               if (ncol > isize) then 
                 nh = ncol + max(nv,relocsz)
-                call psb_realloc(nh,desc%loc_to_glob,info,pad=-1)
+                call psb_realloc(nh,desc%idxmap%loc_to_glob,info,pad=-1)
                 if (info /= 0) then
                   info=1
                   ch_err='psb_realloc'
@@ -140,7 +140,7 @@ subroutine psi_idx_ins_cnv1(nv,idxin,desc,info,mask)
                 end if
                 isize = nh
               endif
-              desc%loc_to_glob(nxt)  = ip
+              desc%idxmap%loc_to_glob(nxt)  = ip
             endif
             info = 0
           else
@@ -165,16 +165,16 @@ subroutine psi_idx_ins_cnv1(nv,idxin,desc,info,mask)
         endif
         nxt = ncol + 1
 
-        call psi_inner_cnv(ip,lip,desc%hashvmask,desc%hashv,desc%glb_lc)
+        call psi_inner_cnv(ip,lip,desc%idxmap%hashvmask,desc%idxmap%hashv,desc%idxmap%glb_lc)
         if (lip < 0) &
-             & call psb_hash_searchinskey(ip,lip,nxt,desc%hash,info)        
+             & call psb_hash_searchinskey(ip,lip,nxt,desc%idxmap%hash,info)        
         if (info >=0) then 
           if (nxt == lip) then 
             ncol = nxt
-            isize = size(desc%loc_to_glob)
+            isize = size(desc%idxmap%loc_to_glob)
             if (ncol > isize) then 
               nh = ncol + max(nv,relocsz)
-              call psb_realloc(nh,desc%loc_to_glob,info,pad=-1)
+              call psb_realloc(nh,desc%idxmap%loc_to_glob,info,pad=-1)
               if (info /= 0) then
                 info=1
                 ch_err='psb_realloc'
@@ -183,7 +183,7 @@ subroutine psi_idx_ins_cnv1(nv,idxin,desc,info,mask)
               end if
               isize = nh
             endif
-            desc%loc_to_glob(nxt)  = ip
+            desc%idxmap%loc_to_glob(nxt)  = ip
           endif
           info = 0
         else
@@ -238,17 +238,17 @@ subroutine psi_idx_ins_cnv1(nv,idxin,desc,info,mask)
             idxin(i) = -1
             cycle
           endif
-          k  = desc%glob_to_loc(ip)
+          k  = desc%idxmap%glob_to_loc(ip)
           if (k < -np) then
             k    = k + np
             k    = - k - 1
             ncol = ncol + 1      
             lip  = ncol
-            desc%glob_to_loc(ip)   = ncol
-            isize = size(desc%loc_to_glob)
+            desc%idxmap%glob_to_loc(ip)   = ncol
+            isize = size(desc%idxmap%loc_to_glob)
             if (ncol > isize) then 
               nh = ncol + max(nv,relocsz)
-              call psb_realloc(nh,desc%loc_to_glob,info,pad=-1)
+              call psb_realloc(nh,desc%idxmap%loc_to_glob,info,pad=-1)
               if (info /= 0) then
                 info=3
                 ch_err='psb_realloc'
@@ -257,7 +257,7 @@ subroutine psi_idx_ins_cnv1(nv,idxin,desc,info,mask)
               end if
               isize = nh
             endif
-            desc%loc_to_glob(ncol) = ip
+            desc%idxmap%loc_to_glob(ncol) = ip
             isize = size(desc%halo_index)
             if ((pnt_halo+3) > isize) then
               nh = isize + max(nv,relocsz)
@@ -291,17 +291,17 @@ subroutine psi_idx_ins_cnv1(nv,idxin,desc,info,mask)
           idxin(i) = -1
           cycle
         endif
-        k  = desc%glob_to_loc(ip)
+        k  = desc%idxmap%glob_to_loc(ip)
         if (k < -np) then
           k    = k + np
           k    = - k - 1
           ncol = ncol + 1      
           lip  = ncol
-          desc%glob_to_loc(ip)   = ncol
-          isize = size(desc%loc_to_glob)
+          desc%idxmap%glob_to_loc(ip)   = ncol
+          isize = size(desc%idxmap%loc_to_glob)
           if (ncol > isize) then 
             nh = ncol + max(nv,relocsz)
-            call psb_realloc(nh,desc%loc_to_glob,info,pad=-1)
+            call psb_realloc(nh,desc%idxmap%loc_to_glob,info,pad=-1)
             if (info /= 0) then
               info=3
               ch_err='psb_realloc'
@@ -310,7 +310,7 @@ subroutine psi_idx_ins_cnv1(nv,idxin,desc,info,mask)
             end if
             isize = nh
           endif
-          desc%loc_to_glob(ncol) = ip
+          desc%idxmap%loc_to_glob(ncol) = ip
           isize = size(desc%halo_index)
           if ((pnt_halo+3) > isize) then
             nh = isize + max(nv,relocsz)

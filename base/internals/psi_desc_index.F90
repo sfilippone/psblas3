@@ -257,10 +257,14 @@ subroutine psi_desc_index(desc,index_in,dep_list,&
         sndbuf(bsdindx(proc+1)+j) = (index_in(i+j))
       end do
     else
-      
-      do j=1, nerv
-        sndbuf(bsdindx(proc+1)+j) = desc%loc_to_glob(index_in(i+j))
-      end do
+      call psb_map_l2g(index_in(i+1:i+nerv),&
+           & sndbuf(bsdindx(proc+1)+1:bsdindx(proc+1)+nerv),&
+           & desc%idxmap,info) 
+      if (info /= 0) then
+        call psb_errpush(4010,name,a_err='psb_map_l2g')
+        goto 9999
+      end if
+
     endif
     bsdindx(proc+1) = bsdindx(proc+1) + nerv
     i = i + nerv + 1 

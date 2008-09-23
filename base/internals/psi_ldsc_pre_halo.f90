@@ -87,21 +87,19 @@ subroutine psi_ldsc_pre_halo(desc,ext_hv,info)
     goto 9999
   end if
 
-  call psi_bld_hash(desc,info)
+  call psi_bld_g2lmap(desc,info)
   if (info /= 0) then 
     ch_err='psi_bld_hash'
     call psb_errpush(info,name,a_err=ch_err)
     goto 9999
   end if
-  ! We no longer need the desc%hash structure.
-  if (associated(desc%hash)) then 
-    deallocate(desc%hash,stat=info)
-    if (info /= 0) then 
-      ch_err='psi_bld_tmphalo'
-      info = 4010
-      call psb_errpush(info,name,a_err=ch_err)
-      goto 9999
-    end if
+  ! We no longer need the inner hash structure.
+  call psb_free(desc%idxmap%hash,info)
+  if (info /= 0) then 
+    ch_err='psi_bld_tmphalo'
+    info = 4010
+    call psb_errpush(info,name,a_err=ch_err)
+    goto 9999
   end if
   if (.not.ext_hv) then
     call psi_bld_tmphalo(desc,info)

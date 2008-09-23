@@ -118,7 +118,7 @@ subroutine psb_icdasb(desc_a,info,ext_hv)
     !       cdall(..., vl=vl, globalcheck=.false.)
     !       
     do i=1,psb_cd_get_local_cols(desc_a)
-      if (desc_a%loc_to_glob(i) < 0) then
+      if (desc_a%idxmap%loc_to_glob(i) < 0) then
         info=3100
         exit
       endif
@@ -129,7 +129,7 @@ subroutine psb_icdasb(desc_a,info,ext_hv)
       goto 9999
     endif
     ! Trim size of loc_to_glob component.
-    call psb_realloc(psb_cd_get_local_cols(desc_a),desc_a%loc_to_glob,info)
+    call psb_realloc(psb_cd_get_local_cols(desc_a),desc_a%idxmap%loc_to_glob,info)
 
     ! If large index space, we have to pre-process and rebuild
     ! the list of halo indices as if it was in small index space    

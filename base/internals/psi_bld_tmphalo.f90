@@ -98,10 +98,11 @@ subroutine psi_bld_tmphalo(desc,info)
   end if
 
   do i=1, nh
-    helem(i) = desc%loc_to_glob(n_row+i)
+    helem(i) = n_row+i ! desc%loc_to_glob(n_row+i)
   end do
-
-  call psi_fnd_owner(nh,helem,hproc,desc,info)
+  call psb_map_l2g(helem,desc%idxmap,info)
+  if (info == 0) &
+       & call psi_fnd_owner(nh,helem,hproc,desc,info)
   if (info /= 0) then 
     call psb_errpush(4010,name,a_err='fnd_owner')
     goto 9999      

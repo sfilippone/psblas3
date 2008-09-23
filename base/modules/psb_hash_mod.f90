@@ -38,8 +38,10 @@
 !   (See Knuth: TAOCP, Vol. 3, sec. 6.4)
 !   These hash functions are not very smart; however they are very simple and fast.
 !   The intended usage of this hash table is to store indices of halo points, which
-!   are supposed to be few compared to the internal indices
-!   (which are stored elsewhere), so in this context they are acceptable.
+!   are supposed to be few compared to the internal indices (which are stored elsewhere).
+!   Therefore, either the table has a very low occupancy, and this scheme will work,
+!   or we have lots more to worry about in parallel performance than the efficiency
+!   of this hashing scheme.
 !
 !
 !
@@ -64,8 +66,22 @@ module psb_hash_mod
   interface psb_hash_init
     module procedure psb_hash_init_v, psb_hash_init_n
   end interface
+
   interface psb_sizeof
     module procedure psb_sizeof_hash_type
+  end interface
+
+
+  interface psb_transfer
+    module procedure HashTransfer
+  end interface
+
+  interface psb_hash_copy
+    module procedure HashCopy
+  end interface
+
+  interface psb_free
+    module procedure HashFree
   end interface
 
 contains
@@ -90,12 +106,12 @@ contains
 
   
   function psb_Sizeof_hash_type(hash) result(val)
-    type(psb_hash_type), pointer :: hash
+    type(psb_hash_type) :: hash
     integer(psb_long_int_k_) :: val
-    val = 0
-    if (associated(hash)) then 
-      val = val + psb_sizeof_int * size(hash%table)
-    end if
+    val = 4*psb_sizeof_int + 2*psb_sizeof_long_int
+    if (allocated(hash%table)) &
+         & val = val + psb_sizeof_int * size(hash%table)
+    
   end function psb_Sizeof_hash_type
 
   
@@ -105,6 +121,20 @@ contains
     
     psb_hash_avg_acc = dble(hash%nacc)/dble(hash%nsrch)
   end function psb_hash_avg_acc
+
+  subroutine HashFree(hashin,info)
+    use psb_realloc_mod
+    type(psb_hash_type) :: hashin
+    
+    info = 0
+    if (allocated(hashin%table)) then 
+      deallocate(hashin%table,stat=info) 
+    end if
+    hashin%nbits  = 0
+    hashin%hsize  = 0
+    hashin%hmask  = 0
+    hashin%nk     = 0    
+  end subroutine HashFree
 
   subroutine HashTransfer(hashin,hashout,info)
     use psb_realloc_mod
@@ -310,6 +340,10 @@ contains
     integer :: i,j,k,hsize,hmask, hk, hd
 
     info  = HashOK
+    if (.not.allocated(hash%table) ) then 
+      val  = HashFreeEntry
+      return
+    end if
     hsize = hash%hsize
     hmask = hash%hmask
     hk = iand(hashval(key),hmask)

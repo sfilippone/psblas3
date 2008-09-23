@@ -96,10 +96,9 @@ subroutine psb_cd_set_bld(desc,info)
     ! the hash occupancy.
     !
     nc = psb_cd_get_local_cols(desc)
-    if (.not.associated(desc%hash)) allocate(desc%hash,stat=info)
     if (info == 0)&
-         & call psb_hash_init(nc,desc%hash,info)
-    if (info == 0) call psi_bld_hash(desc,info)
+         & call psb_hash_init(nc,desc%idxmap%hash,info)
+    if (info == 0) call psi_bld_g2lmap(desc,info)
     if (info /= 0) then 
       call psb_errpush(4010,name,a_err='hashInit')
       goto 9999      

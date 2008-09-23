@@ -134,9 +134,9 @@ subroutine psi_idx_cnv1(nv,idxin,desc,info,mask,owned)
               idxin(i) = -1
               cycle
             endif
-            call psi_inner_cnv(ip,lip,desc%hashvmask,desc%hashv,desc%glb_lc)
-            if ((lip < 0).and.associated(desc%hash)) &
-                 &  call psb_hash_searchkey(ip,lip,desc%hash,info)
+            call psi_inner_cnv(ip,lip,desc%idxmap%hashvmask,desc%idxmap%hashv,desc%idxmap%glb_lc)
+            if (lip < 0) &
+                 &  call psb_hash_searchkey(ip,lip,desc%idxmap%hash,info)
             if (owned_) then 
               if (lip<=nrow) then 
                 idxin(i) = lip
@@ -155,9 +155,9 @@ subroutine psi_idx_cnv1(nv,idxin,desc,info,mask,owned)
             idxin(i) = -1
             cycle
           endif
-          call psi_inner_cnv(ip,lip,desc%hashvmask,desc%hashv,desc%glb_lc)
-          if ((lip < 0).and.associated(desc%hash)) &
-               &  call psb_hash_searchkey(ip,lip,desc%hash,info)
+          call psi_inner_cnv(ip,lip,desc%idxmap%hashvmask,desc%idxmap%hashv,desc%idxmap%glb_lc)
+          if (lip < 0) &
+               &  call psb_hash_searchkey(ip,lip,desc%idxmap%hash,info)
           if (owned_) then 
             if (lip<=nrow) then 
               idxin(i) = lip
@@ -175,11 +175,11 @@ subroutine psi_idx_cnv1(nv,idxin,desc,info,mask,owned)
       ! are kept in a (hashed) list of ordered lists, 
       ! hence psi_inner_cnv does the hashing and binary search.
       !
-      if (.not.allocated(desc%hashv)) then 
+      if (.not.allocated(desc%idxmap%hashv)) then 
         info = 4001
         call psb_errpush(info,name,a_err='Invalid hashv into inner_cnv')
       end if
-      call psi_inner_cnv(nv,idxin,desc%hashvmask,desc%hashv,desc%glb_lc,mask=mask)
+      call psi_inner_cnv(nv,idxin,desc%idxmap%hashvmask,desc%idxmap%hashv,desc%idxmap%glb_lc,mask=mask)
     end if
 
   else
@@ -197,7 +197,7 @@ subroutine psi_idx_cnv1(nv,idxin,desc,info,mask,owned)
             call psb_errpush(info,name)
             goto 9999
           endif
-          lip = desc%glob_to_loc(ip)
+          lip = desc%idxmap%glob_to_loc(ip)
           if (owned_) then 
             if (lip<=nrow) then 
               idxin(i) = lip
@@ -217,7 +217,7 @@ subroutine psi_idx_cnv1(nv,idxin,desc,info,mask,owned)
           call psb_errpush(info,name)
           goto 9999
         endif
-        lip = desc%glob_to_loc(ip)
+        lip = desc%idxmap%glob_to_loc(ip)
         if (owned_) then 
           if (lip<=nrow) then 
             idxin(i) = lip

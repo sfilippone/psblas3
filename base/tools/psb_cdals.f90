@@ -132,14 +132,14 @@ subroutine psb_cdals(m, n, parts, ictxt, desc, info)
          & temp_ovrlap(2*loc_row),prc_v(np),stat=info)
     if (info == 0) then 
       desc%matrix_data(:) = 0
-      desc%matrix_data(psb_desc_size_) = psb_desc_large_
+      desc%idxmap%state = psb_desc_large_
     end if
   else
-    allocate(desc%glob_to_loc(m),desc%matrix_data(psb_mdata_size_),&
+    allocate(desc%idxmap%glob_to_loc(m),desc%matrix_data(psb_mdata_size_),&
          & temp_ovrlap(2*loc_row),prc_v(np),stat=info)
     if (info == 0) then 
       desc%matrix_data(:) = 0
-      desc%matrix_data(psb_desc_size_) = psb_desc_normal_
+      desc%idxmap%state = psb_desc_normal_
     end if
   end if
   if (info /= 0) then     
@@ -176,7 +176,7 @@ subroutine psb_cdals(m, n, parts, ictxt, desc, info)
     !
     loc_col = max(1,(m+np-1)/np)
     loc_col = min(2*loc_col,m)
-    allocate(desc%loc_to_glob(loc_col), desc%lprm(1),&
+    allocate(desc%idxmap%loc_to_glob(loc_col), desc%lprm(1),&
          & stat=info)  
     if (info /= 0) then
       info=4025
@@ -187,7 +187,7 @@ subroutine psb_cdals(m, n, parts, ictxt, desc, info)
 
     ! set LOC_TO_GLOB array to all "-1" values
     desc%lprm(1) = 0
-    desc%loc_to_glob(:) = -1
+    desc%idxmap%loc_to_glob(:) = -1
     k = 0
     do i=1,m
       if (info == 0) then
@@ -233,13 +233,13 @@ subroutine psb_cdals(m, n, parts, ictxt, desc, info)
           if (prc_v(j) == me) then
             ! this point belongs to me
             k = k + 1 
-            call psb_ensure_size((k+1),desc%loc_to_glob,info,pad=-1)
+            call psb_ensure_size((k+1),desc%idxmap%loc_to_glob,info,pad=-1)
             if (info /= 0) then
               info=4010
               call psb_errpush(info,name,a_err='psb_ensure_size')
               goto 9999
             end if
-            desc%loc_to_glob(k) = i
+            desc%idxmap%loc_to_glob(k) = i
             if (nprocs > 1)  then
               call psb_ensure_size((itmpov+3+nprocs),temp_ovrlap,info,pad=-1)
               if (info /= 0) then
@@ -310,7 +310,7 @@ subroutine psb_cdals(m, n, parts, ictxt, desc, info)
             end if
           end do
         endif
-        desc%glob_to_loc(i) = -(np+prc_v(1)+1)
+        desc%idxmap%glob_to_loc(i) = -(np+prc_v(1)+1)
         j=1
         do 
           if (j > nprocs) exit
@@ -321,7 +321,7 @@ subroutine psb_cdals(m, n, parts, ictxt, desc, info)
           if (prc_v(j) == me) then
             ! this point belongs to me
             counter=counter+1
-            desc%glob_to_loc(i) = counter
+            desc%idxmap%glob_to_loc(i) = counter
             if (nprocs > 1)  then
               call psb_ensure_size((itmpov+3+nprocs),temp_ovrlap,info,pad=-1)
               if (info /= 0) then
@@ -344,7 +344,7 @@ subroutine psb_cdals(m, n, parts, ictxt, desc, info)
     loc_row=counter
     loc_col=min(2*loc_row,m)
 
-    allocate(desc%loc_to_glob(loc_col),&
+    allocate(desc%idxmap%loc_to_glob(loc_col),&
          &desc%lprm(1),stat=info)  
     if (info /= 0) then 
       call psb_errpush(4010,name,a_err='Allocate')
@@ -353,11 +353,11 @@ subroutine psb_cdals(m, n, parts, ictxt, desc, info)
 
     ! set LOC_TO_GLOB array to all "-1" values
     desc%lprm(1) = 0
-    desc%loc_to_glob(:) = -1
+    desc%idxmap%loc_to_glob(:) = -1
     do i=1,m
-      k = desc%glob_to_loc(i) 
+      k = desc%idxmap%glob_to_loc(i) 
       if (k > 0) then 
-        desc%loc_to_glob(k) = i
+        desc%idxmap%loc_to_glob(k) = i
       endif
     enddo
 

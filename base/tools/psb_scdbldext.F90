@@ -255,21 +255,18 @@ Subroutine psb_scdbldext(a,desc_a,novr,desc_ov,info, extype)
     Do j=0,n_elem_recv-1
 
       idx = desc_a%ovrlap_index(counter+psb_elem_recv_+j)
-      If(idx > Size(desc_ov%loc_to_glob)) then 
+      call psb_map_l2g(idx,gidx,desc_ov%idxmap,info) 
+      If (gidx < 0) then 
         info=-3
         call psb_errpush(info,name)
         goto 9999
       endif
-
-      gidx = desc_ov%loc_to_glob(idx)
-
       call psb_ensure_size((cntov_o+3),orig_ovr,info,pad=-1)
       if (info /= 0) then
         info=4010
         call psb_errpush(info,name,a_err='psb_ensure_size')
         goto 9999
       end if
-
       orig_ovr(cntov_o)=proc
       orig_ovr(cntov_o+1)=1
       orig_ovr(cntov_o+2)=gidx
@@ -352,21 +349,19 @@ Subroutine psb_scdbldext(a,desc_a,novr,desc_ov,info, extype)
       ! add recv elements in halo_index into ovrlap_index
       !
       Do j=0,n_elem_recv-1
-        If((counter+psb_elem_recv_+j)>Size(halo)) then 
+        If ((counter+psb_elem_recv_+j)>Size(halo)) then 
           info=-2
           call psb_errpush(info,name)
           goto 9999
         end If
 
         idx = halo(counter+psb_elem_recv_+j)
-        If(idx > Size(desc_ov%loc_to_glob)) then 
+        call psb_map_l2g(idx,gidx,desc_ov%idxmap,info) 
+        If (gidx < 0) then 
           info=-3
           call psb_errpush(info,name)
           goto 9999
-        endif
-
-        gidx = desc_ov%loc_to_glob(idx)
-
+        endif        
         call psb_ensure_size((counter_o+3),tmp_ovr_idx,info,pad=-1)
         if (info /= 0) then
           info=4010
@@ -404,12 +399,19 @@ Subroutine psb_scdbldext(a,desc_a,novr,desc_ov,info, extype)
       !
       Do j=0,n_elem_send-1
 
-        idx = halo(counter+psb_elem_send_+j)
-        gidx = desc_ov%loc_to_glob(idx)
-        if (idx > psb_cd_get_local_rows(Desc_a)) &
-             & write(debug_unit,*) me,' ',trim(name),':Out of local rows ',i_ovr,&
-             & idx,psb_cd_get_local_rows(Desc_a)
+!!$        idx = halo(counter+psb_elem_send_+j)
+!!$        gidx = desc_ov%loc_to_glob(idx)
+!!$        if (idx > psb_cd_get_local_rows(Desc_a)) &
+!!$             & write(debug_unit,*) me,' ',trim(name),':Out of local rows ',i_ovr,&
+!!$             & idx,psb_cd_get_local_rows(Desc_a)
 
+        idx = halo(counter+psb_elem_send_+j)
+        call psb_map_l2g(idx,gidx,desc_ov%idxmap,info) 
+        If (gidx < 0) then 
+          info=-3
+          call psb_errpush(info,name)
+          goto 9999
+        endif
         call psb_ensure_size((counter_o+3),tmp_ovr_idx,info,pad=-1)
         if (info /= 0) then
           info=4010
@@ -455,9 +457,9 @@ Subroutine psb_scdbldext(a,desc_a,novr,desc_ov,info, extype)
             call psb_errpush(info,name,a_err=ch_err)
             goto 9999
           end if
-          Do jj=1,n_elem
-            works(idxs+tot_elem+jj)=desc_ov%loc_to_glob(blk%ia2(jj))
-          End Do
+          call psb_map_l2g(blk%ia2(1:n_elem),&
+               & works(idxs+tot_elem+1:idxs+tot_elem+n_elem),&
+               & desc_ov%idxmap,info) 
           tot_elem=tot_elem+n_elem
         End If
 
@@ -469,17 +471,12 @@ Subroutine psb_scdbldext(a,desc_a,novr,desc_ov,info, extype)
           call psb_msort_unique(works(idxs+1:idxs+tot_elem),i)
           tot_elem=i
         endif
-        if (debug_level >= psb_debug_outer_) &
-             & write(debug_unit,*) me,' ',trim(name),&
-             & ':Checktmp_o_i Loop Mid2',tmp_ovr_idx(1:10)
 
         sdsz(proc+1) = tot_elem
         idxs         = idxs + tot_elem
       end if
       counter   = counter+n_elem_send+3
-      if (debug_level >= psb_debug_outer_) &
-           & write(debug_unit,*) me,' ',trim(name),&
-           & ':Checktmp_o_i Loop End',tmp_ovr_idx(1:10)
+
     Enddo
     if (debug_level >= psb_debug_outer_) &
          & write(debug_unit,*) me,' ',trim(name),&
@@ -600,23 +597,23 @@ Subroutine psb_scdbldext(a,desc_a,novr,desc_ov,info, extype)
           idx=workr(i)
           if (idx <1) then 
             write(0,*) me,'Error in CDBLDEXTBLD level',i_ovr,' : ',idx,i,iszr
-          else  If (desc_ov%glob_to_loc(idx) < -np) Then
+          else  If (desc_ov%idxmap%glob_to_loc(idx) < -np) Then
             !
             ! This is a new index. Assigning a local index as
             ! we receive them guarantees that all indices for HALO(I)
             ! will be less than those for HALO(J) whenever I<J
             !
             n_col   = n_col+1
-            proc_id = -desc_ov%glob_to_loc(idx)-np-1
-            call psb_ensure_size(n_col,desc_ov%loc_to_glob,info,pad=-1)
+            proc_id = -desc_ov%idxmap%glob_to_loc(idx)-np-1
+            call psb_ensure_size(n_col,desc_ov%idxmap%loc_to_glob,info,pad=-1)
             if (info /= 0) then
               info=4010
               call psb_errpush(info,name,a_err='psb_ensure_size')
               goto 9999
             end if
 
-            desc_ov%glob_to_loc(idx)   = n_col
-            desc_ov%loc_to_glob(n_col) = idx
+            desc_ov%idxmap%glob_to_loc(idx)   = n_col
+            desc_ov%idxmap%loc_to_glob(n_col) = idx
 
             call psb_ensure_size((counter_t+3),t_halo_in,info,pad=-1)
             if (info /= 0) then
@@ -634,11 +631,12 @@ Subroutine psb_scdbldext(a,desc_a,novr,desc_ov,info, extype)
                  & write(debug_unit,*) me,' ',trim(name),&
                  & ': Added into t_halo_in from recv',&
                  & proc_id,n_col,idx
-          else if (desc_ov%glob_to_loc(idx) < 0) Then
+          else if (desc_ov%idxmap%glob_to_loc(idx) < 0) Then
+
             if (debug_level >= psb_debug_outer_) &
                  & write(debug_unit,*) me,' ',trim(name),&
                  & ':Wrong input to cdbldextbld?',&
-                 & idx,desc_ov%glob_to_loc(idx)
+                 & idx,desc_ov%idxmap%glob_to_loc(idx)
           End If
         End Do
         desc_ov%matrix_data(psb_n_col_) = n_col

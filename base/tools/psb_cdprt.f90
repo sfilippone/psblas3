@@ -69,10 +69,10 @@ subroutine psb_cdprt(iout,desc_p,glob,short)
     n_row=desc_p%matrix_data(psb_n_row_)
     n_col=desc_p%matrix_data(psb_n_col_)
     if (.not.lshort) &
-         & write(iout,*) 'Loc_to_glob ',desc_p%loc_to_glob(1:n_row), ': ',&
-         & desc_p%loc_to_glob(n_row+1:n_col)
+         & write(iout,*) 'Loc_to_glob ',desc_p%idxmap%loc_to_glob(1:n_row), ': ',&
+         & desc_p%idxmap%loc_to_glob(n_row+1:n_col)
 
-!!$    if (.not.lshort) write(iout,*) 'glob_to_loc ',desc_p%glob_to_loc(1:m) 
+!!$    if (.not.lshort) write(iout,*) 'glob_to_loc ',desc_p%idxmap%glob_to_loc(1:m) 
     write(iout,*) 'Halo_index'
     counter      = 1
     Do
@@ -147,16 +147,16 @@ subroutine psb_cdprt(iout,desc_p,glob,short)
     if (.not.lshort) then 
       write(iout,*) 'Loc_to_glob '
       do i=1, n_row
-        write(iout,*) i, desc_p%loc_to_glob(i)
+        write(iout,*) i, desc_p%idxmap%loc_to_glob(i)
       enddo
       write(iout,*) '........'
       do i=n_row+1,n_col
-        write(iout,*) i, desc_p%loc_to_glob(i)
+        write(iout,*) i, desc_p%idxmap%loc_to_glob(i)
       enddo
 
 !!$      write(iout,*) 'glob_to_loc '
 !!$      do i=1,m
-!!$        write(iout,*) i,desc_p%glob_to_loc(i)
+!!$        write(iout,*) i,desc_p%idxmap%glob_to_loc(i)
 !!$      enddo
     endif
     write(iout,*) 'Halo_index'
@@ -170,7 +170,7 @@ subroutine psb_cdprt(iout,desc_p,glob,short)
       if (.not.lshort) then 
         do i=counter+psb_n_elem_recv_+1,counter+psb_n_elem_recv_+n_elem_recv
           write(iout,*) &
-               & desc_p%loc_to_glob(desc_p%halo_index(i)),desc_p%halo_index(i)
+               & desc_p%idxmap%loc_to_glob(desc_p%halo_index(i)),desc_p%halo_index(i)
         enddo
       endif
       write(iout,*) 'Halo_index Send',proc,n_elem_send
@@ -178,7 +178,7 @@ subroutine psb_cdprt(iout,desc_p,glob,short)
         do i=counter+n_elem_recv+psb_n_elem_send_+1, &
              & counter+n_elem_recv+psb_n_elem_send_+n_elem_send
           write(iout,*) &
-               & desc_p%loc_to_glob(desc_p%halo_index(i)),  desc_p%halo_index(i)
+               & desc_p%idxmap%loc_to_glob(desc_p%halo_index(i)),  desc_p%halo_index(i)
         enddo
       endif
       counter   = counter+n_elem_recv+n_elem_send+3
@@ -195,7 +195,7 @@ subroutine psb_cdprt(iout,desc_p,glob,short)
       if (.not.lshort) then 
         do i=counter+psb_n_elem_recv_+1,counter+psb_n_elem_recv_+n_elem_recv
           write(iout,*) &
-               & desc_p%loc_to_glob(desc_p%ext_index(i)),desc_p%ext_index(i)
+               & desc_p%idxmap%loc_to_glob(desc_p%ext_index(i)),desc_p%ext_index(i)
         enddo
       endif
       write(iout,*) 'Ext_index Send',proc,n_elem_send
@@ -203,7 +203,7 @@ subroutine psb_cdprt(iout,desc_p,glob,short)
         do i=counter+n_elem_recv+psb_n_elem_send_+1, &
              & counter+n_elem_recv+psb_n_elem_send_+n_elem_send
           write(iout,*) &
-               & desc_p%loc_to_glob(desc_p%ext_index(i)),  desc_p%ext_index(i)
+               & desc_p%idxmap%loc_to_glob(desc_p%ext_index(i)),  desc_p%ext_index(i)
         enddo
       endif
       counter   = counter+n_elem_recv+n_elem_send+3
@@ -220,7 +220,7 @@ subroutine psb_cdprt(iout,desc_p,glob,short)
       write(iout,*) 'Ovrlap_index Receive',proc,n_elem_recv
       if (.not.lshort) then 
         do i=counter+psb_n_elem_recv_+1,counter+psb_n_elem_recv_+n_elem_recv
-          write(iout,*) desc_p%loc_to_glob(desc_p%ovrlap_index(i)),&
+          write(iout,*) desc_p%idxmap%loc_to_glob(desc_p%ovrlap_index(i)),&
                & desc_p%ovrlap_index(i)
         enddo
       endif
@@ -228,7 +228,7 @@ subroutine psb_cdprt(iout,desc_p,glob,short)
       if (.not.lshort) then 
         do i=counter+n_elem_recv+psb_n_elem_send_+1, &
              &                   counter+n_elem_recv+psb_n_elem_send_+n_elem_send
-          write(iout,*) desc_p%loc_to_glob(desc_p%ovrlap_index(i)),&
+          write(iout,*) desc_p%idxmap%loc_to_glob(desc_p%ovrlap_index(i)),&
                &   desc_p%ovrlap_index(i)
         enddo
       endif
@@ -241,7 +241,7 @@ subroutine psb_cdprt(iout,desc_p,glob,short)
       idx         = desc_p%ovrlap_elem(counter,1)
       n_elem_recv = desc_p%ovrlap_elem(counter,2)
       proc        = desc_p%ovrlap_elem(counter,3)
-      if (.not.lshort) write(iout,*) idx,desc_p%loc_to_glob(idx),n_elem_Recv,proc
+      if (.not.lshort) write(iout,*) idx,desc_p%idxmap%loc_to_glob(idx),n_elem_Recv,proc
     enddo
 
   end if

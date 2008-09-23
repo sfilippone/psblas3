@@ -152,7 +152,7 @@ subroutine  psb_zscatterm(globx, locx, desc_a, info, iroot)
     ! extract my chunk
     do j=1,k
       do i=1, nrow
-        idx=desc_a%loc_to_glob(i)
+        idx = desc_a%idxmap%loc_to_glob(i)
         locx(i,jlocx+j-1)=globx(idx,jglobx+j-1)
       end do
     end do
@@ -187,7 +187,7 @@ subroutine  psb_zscatterm(globx, locx, desc_a, info, iroot)
 
     end if
 
-    call mpi_gatherv(desc_a%loc_to_glob,nrow,&
+    call mpi_gatherv(desc_a%idxmap%loc_to_glob,nrow,&
          & mpi_integer,l_t_g_all,all_dim,&
          & displ,mpi_integer,rootrank,icomm,info)
 
@@ -371,7 +371,7 @@ subroutine  psb_zscatterv(globx, locx, desc_a, info, iroot)
   if ((root == -1).or.(np==1)) then
     ! extract my chunk
     do i=1, nrow
-      idx=desc_a%loc_to_glob(i)
+      idx=desc_a%idxmap%loc_to_glob(i)
       locx(i)=globx(idx)
     end do
   else
@@ -397,7 +397,7 @@ subroutine  psb_zscatterv(globx, locx, desc_a, info, iroot)
       allocate(l_t_g_all(sum(all_dim)),scatterv(sum(all_dim)))
     end if
 
-    call mpi_gatherv(desc_a%loc_to_glob,nrow,&
+    call mpi_gatherv(desc_a%idxmap%loc_to_glob,nrow,&
          & mpi_integer,l_t_g_all,all_dim,&
          & displ,mpi_integer,rootrank,icomm,info)
 

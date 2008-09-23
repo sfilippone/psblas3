@@ -137,7 +137,7 @@ subroutine  psb_sgatherm(globx, locx, desc_a, info, iroot)
 
   do j=1,k
     do i=1,psb_cd_get_local_rows(desc_a)
-      idx                   = desc_a%loc_to_glob(i)
+      idx                   = desc_a%idxmap%loc_to_glob(i)
       globx(idx,jglobx+j-1) = locx(i,jlx+j-1)
     end do
   end do
@@ -146,7 +146,7 @@ subroutine  psb_sgatherm(globx, locx, desc_a, info, iroot)
     do i=1, size(desc_a%ovrlap_elem,1)
       if (me /= desc_a%ovrlap_elem(i,3)) then 
         idx = desc_a%ovrlap_elem(i,1)
-        idx = desc_a%loc_to_glob(idx)
+        idx = desc_a%idxmap%loc_to_glob(idx)
         globx(idx,jglobx+j-1) = szero
       end if
     end do
@@ -300,7 +300,7 @@ subroutine  psb_sgatherv(globx, locx, desc_a, info, iroot)
   globx(:)=0.d0
 
   do i=1,psb_cd_get_local_rows(desc_a)
-     idx = desc_a%loc_to_glob(i)
+     idx = desc_a%idxmap%loc_to_glob(i)
      globx(idx) = locx(i)
   end do
   
@@ -308,7 +308,7 @@ subroutine  psb_sgatherv(globx, locx, desc_a, info, iroot)
   do i=1, size(desc_a%ovrlap_elem,1)
     if (me /= desc_a%ovrlap_elem(i,3)) then 
       idx = desc_a%ovrlap_elem(i,1)
-      idx = desc_a%loc_to_glob(idx)
+      idx = desc_a%idxmap%loc_to_glob(idx)
       globx(idx) = szero
     end if
   end do

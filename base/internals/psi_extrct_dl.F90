@@ -161,6 +161,7 @@ subroutine psi_extract_dep_list(desc_data,desc_str,dep_list,&
   i=1
   if (debug_level >= psb_debug_inner_)&
        & write(debug_unit,*) me,' ',trim(name),': start ',info,desc_data(psb_dec_type_)
+
   pointer_dep_list=1
   if (psb_is_bld_dec(desc_data(psb_dec_type_))) then 
     do while (desc_str(i) /= -1)

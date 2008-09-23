@@ -69,7 +69,7 @@ subroutine psi_sort_dl(dep_list,l_dep_list,np,info)
   isz = iich + ndgmx
   if (debug_level >= psb_debug_inner_)&
        & write(debug_unit,*) name,': ndgmx ',ndgmx,isz
-  
+
   allocate(work(isz))
   ! call srtlist(dep_list, dl_lda, l_dep_list, np, info)
   call srtlist(dep_list,size(dep_list,1),l_dep_list,np,work(idg),&

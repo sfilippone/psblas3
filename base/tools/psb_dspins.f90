@@ -165,7 +165,7 @@ subroutine psb_dspins(nz,ia,ja,val,a,desc_a,info,rebuild)
       ncol = psb_cd_get_local_cols(desc_a)
 
       if (spstate == psb_spmat_bld_) then 
-        call psb_coins(nz,ia,ja,val,a,1,nrow,1,ncol,info,gtl=desc_a%glob_to_loc)
+        call psb_coins(nz,ia,ja,val,a,1,nrow,1,ncol,info,gtl=desc_a%idxmap%glob_to_loc)
         if (info /= 0) then
           info=4010
           ch_err='psb_coins'
@@ -211,7 +211,7 @@ subroutine psb_dspins(nz,ia,ja,val,a,desc_a,info,rebuild)
       nrow = psb_cd_get_local_rows(desc_a)
       ncol = psb_cd_get_local_cols(desc_a)
       call psb_coins(nz,ia,ja,val,a,1,nrow,1,ncol,&
-           & info,gtl=desc_a%glob_to_loc,rebuild=rebuild_)
+           & info,gtl=desc_a%idxmap%glob_to_loc,rebuild=rebuild_)
       if (info /= 0) then
         info=4010
         ch_err='psb_coins'
@@ -372,7 +372,7 @@ subroutine psb_dspins_2desc(nz,ia,ja,val,a,desc_ar,desc_ac,info)
 !!$      nrow = psb_cd_get_local_rows(desc_a)
 !!$      ncol = psb_cd_get_local_cols(desc_a)
 !!$      call psb_coins(nz,ia,ja,val,a,1,nrow,1,ncol,&
-!!$           & info,gtl=desc_a%glob_to_loc,rebuild=rebuild_)
+!!$           & info,gtl=desc_a%idxmap%glob_to_loc,rebuild=rebuild_)
 !!$      if (info /= 0) then
 !!$        info=4010
 !!$        ch_err='psb_coins'

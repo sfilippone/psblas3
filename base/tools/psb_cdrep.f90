@@ -179,8 +179,8 @@ subroutine psb_cdrep(m, ictxt, desc, info)
 
   !count local rows number
   ! allocate work vector
-  allocate(desc%glob_to_loc(m),desc%matrix_data(psb_mdata_size_),&
-       &   desc%loc_to_glob(m),desc%lprm(1),&
+  allocate(desc%idxmap%glob_to_loc(m),desc%matrix_data(psb_mdata_size_),&
+       &   desc%idxmap%loc_to_glob(m),desc%lprm(1),&
        &   desc%ovrlap_elem(0,3),stat=info)
   if (info /= 0) then     
     info=4025
@@ -190,7 +190,7 @@ subroutine psb_cdrep(m, ictxt, desc, info)
   endif
   ! If the index space is replicated there's no point in not having 
   ! the full map on the current process. 
-  desc%matrix_data(psb_desc_size_) = psb_desc_normal_
+  desc%idxmap%state = psb_desc_normal_
   
 
   desc%matrix_data(psb_m_)        = m
@@ -202,8 +202,8 @@ subroutine psb_cdrep(m, ictxt, desc, info)
   desc%matrix_data(psb_dec_type_) = psb_desc_bld_
 
   do i=1,m
-    desc%glob_to_loc(i) = i
-    desc%loc_to_glob(i) = i
+    desc%idxmap%glob_to_loc(i) = i
+    desc%idxmap%loc_to_glob(i) = i
   enddo
 
   tovr  = -1 

@@ -125,19 +125,26 @@ module psb_descriptor_type
   !  type: psb_desc_type
   !  
   !  Communication Descriptor data structure.
+  !| type psb_idxmap_type
+  !|   integer              :: state 
+  !|   integer, allocatable :: loc_to_glob(:)
+  !|   integer, allocatable :: glob_to_loc(:)
+  !|   integer              :: hashvsize, hashvmask
+  !|   integer, allocatable :: hashv(:), glb_lc(:,:)
+  !|   type(psb_hash_type)  :: hash
+  !| end type psb_idxmap_type
+  !
+  !
   !|  type psb_desc_type
-  !|     integer, allocatable :: matrix_data(:)
-  !|     integer, allocatable :: halo_index(:), ext_index(:)
-  !|     integer, allocatable :: bnd_elem(:)
-  !|     integer, allocatable :: ovrlap_index(:)
-  !|     integer, allocatable :: ovrlap_elem(:,:)
-  !|     integer, allocatable :: ovr_mst_idx(:)
-  !|     integer, allocatable :: loc_to_glob(:)
-  !|     integer, allocatable :: glob_to_loc (:)
-  !|     integer, allocatable :: hashv(:), glb_lc(:,:)
-  !|     integer, allocatable :: lprm(:)
-  !|     integer, allocatable :: idx_space(:)
-  !|     type(psb_hash_type), pointer :: hash => null()
+  !|     integer, allocatable  :: matrix_data(:)
+  !|     integer, allocatable  :: halo_index(:), ext_index(:)
+  !|     integer, allocatable  :: bnd_elem(:)
+  !|     integer, allocatable  :: ovrlap_index(:)
+  !|     integer, allocatable  :: ovrlap_elem(:,:)
+  !|     integer, allocatable  :: ovr_mst_idx(:)
+  !|     type(psb_idxmap_type) :: idxmap
+  !|     integer, allocatable  :: lprm(:)
+  !|     integer, allocatable  :: idx_space(:)
   !|     type(psb_desc_type), pointer :: base_desc => null()
   !|  end type psb_desc_type
   !
@@ -161,9 +168,9 @@ module psb_descriptor_type
   !  and is only entered by the psb_cdrep call. Currently it is only 
   !  used in the last level of some multilevel preconditioners. 
   ! 
-  !  The LOC_TO_GLOB, GLOB_TO_LOC, GLB_LC, HASHV and AVLTREE arrays implement the 
-  !  mapping between local and global indices, according to the following 
-  !  guidelines:
+  !  The LOC_TO_GLOB, GLOB_TO_LOC, GLB_LC, HASHV and HASH  data structures
+  !  inside IDXMAP  implement the  mapping between local and global indices,
+  !  according to the following   guidelines:
   !
   !  1. Each global index I is owned by at least one process;
   !
@@ -208,11 +215,9 @@ module psb_descriptor_type
   !        During the build phase glb_lc() will store the indices of the internal points,
   !        i.e. local indices 1:NROW, since those are known ad CDALL time.
   !        The halo indices that we encounter during the build phase are put in
-  !        a PSB_HASH_TYPE data structure, which implements a very simple hash, which will
-  !        nonetheless be quite fast at low occupancy rates.
+  !        a PSB_HASH_TYPE data structure, which implements a very simple hash; this
+  !        hash  will nonetheless be quite fast at low occupancy rates.
   !        At assembly time, we move everything into hashv(:) and glb_lc(:,:).
-  !        Note that the desc%hash component is a pointer, but it really should be
-  !        an allocatable scalar. 
   !
   !  7. The data exchange is based on lists of local indices to be exchanged; all the 
   !     lists have the same format, as follows:
@@ -294,7 +299,7 @@ module psb_descriptor_type
   !  1. Allows a purely local matrix/stencil buildup phase, requiring only 
   !     one synch point at the end (CDASB)
   !  2. Takes shortcuts when the problem size is not too large (the default threshold
-  !     assumes that you are willing to spend up to 16 MB on each process for the 
+  !     assumes that you are willing to spend up to 4 MB on each process for the 
   !     glob_to_loc mapping)
   !  3. Supports restriction/prolongation operators with the same routines 
   !     just choosing (in the swapdata/swaptran internals) on which index list 
@@ -302,26 +307,31 @@ module psb_descriptor_type
   !
   !
   !
-  type psb_desc_type
-    integer, allocatable :: matrix_data(:)
-    integer, allocatable :: halo_index(:)
-    integer, allocatable :: ext_index(:)
-    integer, allocatable :: ovrlap_index(:)
-    integer, allocatable :: ovrlap_elem(:,:)
-    integer, allocatable :: ovr_mst_idx(:)
-    integer, allocatable :: bnd_elem(:)
+  type psb_idxmap_type
+    integer              :: state 
     integer, allocatable :: loc_to_glob(:)
-    integer, allocatable :: glob_to_loc (:)
+    integer, allocatable :: glob_to_loc(:)
     integer              :: hashvsize, hashvmask
     integer, allocatable :: hashv(:), glb_lc(:,:)
-    integer, allocatable :: lprm(:)
-    integer, allocatable :: idx_space(:)
-    type(psb_hash_type), pointer     :: hash => null()
+    type(psb_hash_type)  :: hash
+  end type psb_idxmap_type
+
+  type psb_desc_type
+    integer, allocatable  :: matrix_data(:)
+    integer, allocatable  :: halo_index(:)
+    integer, allocatable  :: ext_index(:)
+    integer, allocatable  :: ovrlap_index(:)
+    integer, allocatable  :: ovrlap_elem(:,:)
+    integer, allocatable  :: ovr_mst_idx(:)
+    integer, allocatable  :: bnd_elem(:)
+    type(psb_idxmap_type) :: idxmap 
+    integer, allocatable  :: lprm(:)
     type(psb_desc_type), pointer     :: base_desc => null()
+    integer, allocatable :: idx_space(:)
   end type psb_desc_type
 
   interface psb_sizeof
-    module procedure psb_cd_sizeof
+    module procedure psb_cd_sizeof, psb_idxmap_sizeof
   end interface
 
   interface psb_is_ok_desc
@@ -349,20 +359,41 @@ module psb_descriptor_type
   end interface
 
 
-  interface psb_cdtransfer
-    module procedure psb_cdtransfer
+  interface psb_transfer
+    module procedure psb_cdtransfer, psb_idxmap_transfer
   end interface
 
 
-  interface psb_cdfree
-    module procedure psb_cdfree
+  interface psb_free
+    module procedure psb_cdfree, psb_idxmap_free
   end interface
 
+  interface psb_map_l2g
+    module procedure psb_map_l2g_s1, psb_map_l2g_s2,&
+         & psb_map_l2g_v1, psb_map_l2g_v2
+  end interface
 
   integer, private, save :: cd_large_threshold=psb_default_large_threshold 
 
 
 contains 
+
+  function psb_idxmap_sizeof(map)  result(val)
+    implicit none
+    !....Parameters...
+
+    Type(psb_idxmap_type), intent(in) :: map
+    integer(psb_long_int_k_) :: val
+
+    val = 3*psb_sizeof_int
+    if (allocated(map%loc_to_glob))  val = val + psb_sizeof_int*size(map%loc_to_glob)
+    if (allocated(map%glob_to_loc))  val = val + psb_sizeof_int*size(map%glob_to_loc)
+    if (allocated(map%hashv))        val = val + psb_sizeof_int*size(map%hashv)
+    if (allocated(map%glb_lc))       val = val + psb_sizeof_int*size(map%glb_lc)
+    val = val + psb_sizeof(map%hash) 
+
+  end function psb_idxmap_sizeof
+    
 
   function psb_cd_sizeof(desc)  result(val)
     implicit none
@@ -371,7 +402,7 @@ contains
     Type(psb_desc_type), intent(in) :: desc
     integer(psb_long_int_k_) :: val
 
-    val = 0
+    val = 0 
     if (allocated(desc%matrix_data))  val = val + psb_sizeof_int*size(desc%matrix_data)
     if (allocated(desc%halo_index))   val = val + psb_sizeof_int*size(desc%halo_index)
     if (allocated(desc%ext_index))    val = val + psb_sizeof_int*size(desc%ext_index)
@@ -379,13 +410,9 @@ contains
     if (allocated(desc%ovrlap_index)) val = val + psb_sizeof_int*size(desc%ovrlap_index)
     if (allocated(desc%ovrlap_elem))  val = val + psb_sizeof_int*size(desc%ovrlap_elem)
     if (allocated(desc%ovr_mst_idx))  val = val + psb_sizeof_int*size(desc%ovr_mst_idx)
-    if (allocated(desc%loc_to_glob))  val = val + psb_sizeof_int*size(desc%loc_to_glob)
-    if (allocated(desc%glob_to_loc))  val = val + psb_sizeof_int*size(desc%glob_to_loc)
-    if (allocated(desc%hashv))        val = val + psb_sizeof_int*size(desc%hashv)
-    if (allocated(desc%glb_lc))       val = val + psb_sizeof_int*size(desc%glb_lc)
     if (allocated(desc%lprm))         val = val + psb_sizeof_int*size(desc%lprm)
     if (allocated(desc%idx_space))    val = val + psb_sizeof_int*size(desc%idx_space)
-    if (associated(desc%hash))        val = val + psb_sizeof(desc%hash) 
+    val = val + psb_sizeof(desc%idxmap)
 
   end function psb_cd_sizeof
 
@@ -425,7 +452,7 @@ contains
     type(psb_desc_type), intent(inout) :: desc
     ! We have nothing left to do here.
     ! Perhaps we should delete this subroutine? 
-    nullify(desc%hash,desc%base_desc)
+    nullify(desc%base_desc)
 
   end subroutine psb_nullify_desc
 
@@ -601,7 +628,7 @@ contains
     type(psb_desc_type), intent(in) :: desc
 
     if (allocated(desc%matrix_data)) then 
-      psb_cd_get_size = desc%matrix_data(psb_desc_size_)
+      psb_cd_get_size = desc%idxmap%state
     else
       psb_cd_get_size = -1
       call psb_errpush(1122,'psb_cd_get_size')
@@ -733,6 +760,59 @@ contains
     return
   end subroutine psb_cd_get_list
 
+  subroutine psb_idxmap_free(map,info)
+    !...free descriptor structure...
+    use psb_const_mod
+    use psb_error_mod
+    use psb_penv_mod
+    implicit none
+    !....parameters...
+    type(psb_idxmap_type), intent(inout) :: map
+    integer, intent(out)               :: info
+    !...locals....
+    integer             :: ictxt,np,me, err_act
+    character(len=*), parameter ::  name = 'psb_idxmap_free'
+
+    if(psb_get_errstatus() /= 0) return 
+    info=0
+    call psb_erractionsave(err_act)
+
+    if (allocated(map%loc_to_glob)) then 
+      deallocate(map%loc_to_glob,stat=info) 
+    end if
+    if ((info == 0).and.allocated(map%glob_to_loc)) then 
+      deallocate(map%glob_to_loc,stat=info) 
+    end if
+    if ((info == 0).and.allocated(map%hashv)) then 
+      deallocate(map%hashv,stat=info) 
+    end if
+    if ((info == 0).and.allocated(map%glb_lc)) then 
+      deallocate(map%glb_lc,stat=info) 
+    end if
+    if (info /= 0) call psb_free(map%hash, info) 
+    if (info /= 0) then 
+      info=2052
+      call psb_errpush(info,name)
+      goto 9999
+    end if
+    
+
+    call psb_erractionrestore(err_act)
+    return
+
+9999 continue
+    call psb_erractionrestore(err_act)
+
+    if (err_act == psb_act_ret_) then
+      return
+    else
+      call psb_error(ictxt)
+    end if
+    return
+
+  end subroutine psb_idxmap_free
+
+
   !
   ! Subroutine: psb_cdfree
   !   Frees a descriptor data structure.
@@ -775,36 +855,7 @@ contains
       goto 9999
     endif
 
-    !...deallocate desc_a....
-    if(.not.allocated(desc_a%loc_to_glob)) then
-      info=296
-      call psb_errpush(info,name)
-      goto 9999
-    end if
-
-    !deallocate loc_to_glob  field
-    deallocate(desc_a%loc_to_glob,stat=info)
-    if (info /= 0) then
-      info=2051
-      call psb_errpush(info,name)
-      goto 9999
-    end if
-
-    if (.not.psb_is_large_desc(desc_a)) then 
-      if (.not.allocated(desc_a%glob_to_loc)) then
-        info=297
-        call psb_errpush(info,name)
-        goto 9999
-      end if
-
-      !deallocate glob_to_loc field
-      deallocate(desc_a%glob_to_loc,stat=info)
-      if (info /= 0) then
-        info=2052
-        call psb_errpush(info,name)
-        goto 9999
-      end if
-    endif
+    call psb_free(desc_a%idxmap,info)
 
     if (.not.allocated(desc_a%halo_index)) then
       info=298
@@ -871,33 +922,6 @@ contains
       info=2057
       call psb_errpush(info,name)
       goto 9999
-    end if
-
-    if (allocated(desc_a%hashv)) then 
-      deallocate(desc_a%hashv,stat=info)
-      if (info /= 0) then 
-        info=2058
-        call psb_errpush(info,name)
-        goto 9999
-      end if
-    end if
-
-    if (allocated(desc_a%glb_lc)) then 
-      deallocate(desc_a%glb_lc,stat=info)
-      if (info /= 0) then 
-        info=2059
-        call psb_errpush(info,name)
-        goto 9999
-      end if
-    end if
-
-    if (associated(desc_a%hash)) then 
-      deallocate(desc_a%hash,stat=info)
-      if (info /= 0) then 
-        info=2060
-        call psb_errpush(info,name)
-        goto 9999
-      end if
     end if
 
     if (allocated(desc_a%idx_space)) then 
@@ -989,20 +1013,11 @@ contains
     if (info == 0)  &
          & call psb_transfer( desc_in%ext_index   ,    desc_out%ext_index    , info)
     if (info == 0)  &
-         & call psb_transfer( desc_in%loc_to_glob ,    desc_out%loc_to_glob  , info)
-    if (info == 0)  &
-         & call psb_transfer( desc_in%glob_to_loc ,    desc_out%glob_to_loc  , info)
-    if (info == 0)  &
          & call psb_transfer( desc_in%lprm        ,    desc_out%lprm         , info)
     if (info == 0)  &
          & call psb_transfer( desc_in%idx_space   ,    desc_out%idx_space    , info)
-    if (info == 0)  &
-         & call psb_transfer( desc_in%hashv       ,    desc_out%hashv        , info)
-    if (info == 0)  &
-         & call psb_transfer( desc_in%glb_lc      ,    desc_out%glb_lc       , info)
-
-    desc_out%hash => desc_in%hash; nullify(desc_in%hash)
-    
+    if (info == 0) &
+         & call psb_transfer(desc_in%idxmap, desc_out%idxmap,info)
     if (info /= 0) then
       info = 4010
       call psb_errpush(info,name)
@@ -1026,6 +1041,232 @@ contains
 
   end subroutine psb_cdtransfer
 
+  subroutine psb_idxmap_transfer(map_in, map_out, info)
+
+    use psb_realloc_mod
+    use psb_const_mod
+    use psb_error_mod
+    use psb_penv_mod
+
+    implicit none
+    !....parameters...
+
+    type(psb_idxmap_type), intent(inout)  :: map_in
+    type(psb_idxmap_type), intent(inout)  :: map_out
+    integer, intent(out)                :: info
+
+    !locals
+    integer             :: np,me,ictxt, err_act
+    integer              :: debug_level, debug_unit
+    character(len=*), parameter  ::  name = 'psb_idxmap_transfer'
+
+    if (psb_get_errstatus()/=0) return 
+    info = 0
+    call psb_erractionsave(err_act)
+
+    debug_unit  = psb_get_debug_unit()
+    debug_level = psb_get_debug_level()
+
+    map_out%state     = map_in%state
+    map_out%hashvsize = map_in%hashvsize
+    map_out%hashvmask = map_in%hashvmask
+
+    if (info == 0)  &
+         & call psb_transfer( map_in%loc_to_glob ,    map_out%loc_to_glob  , info)
+    if (info == 0)  &
+         & call psb_transfer( map_in%glob_to_loc ,    map_out%glob_to_loc  , info)
+    if (info == 0)  &
+         & call psb_transfer( map_in%hashv       ,    map_out%hashv        , info)
+    if (info == 0)  &
+         & call psb_transfer( map_in%glb_lc      ,    map_out%glb_lc       , info)
+    if (info == 0)  &
+         & call psb_transfer( map_in%hash        ,    map_out%hash        , info)
+    
+    if (info /= 0) then
+      info = 4010
+      call psb_errpush(info,name)
+      goto 9999
+    endif
+    if (debug_level >= psb_debug_ext_) &
+         & write(debug_unit,*) me,' ',trim(name),': end'
+
+    call psb_erractionrestore(err_act)
+    return
+
+9999 continue
+    call psb_erractionrestore(err_act)
+
+    if (err_act == psb_act_ret_) then
+      return
+    else
+      call psb_error()
+    end if
+    return
+
+  end subroutine psb_idxmap_transfer
+
+  subroutine psb_idxmap_copy(map_in, map_out, info)
+
+    use psb_realloc_mod
+    use psb_const_mod
+    use psb_error_mod
+    use psb_penv_mod
+
+    implicit none
+    !....parameters...
+
+    type(psb_idxmap_type), intent(in)    :: map_in
+    type(psb_idxmap_type), intent(inout) :: map_out
+    integer, intent(out)                 :: info
+
+    !locals
+    integer             :: np,me,ictxt, err_act
+    integer              :: debug_level, debug_unit
+    character(len=*), parameter  ::  name = 'psb_idxmap_transfer'
+
+    if (psb_get_errstatus()/=0) return 
+    info = 0
+    call psb_erractionsave(err_act)
+
+    debug_unit  = psb_get_debug_unit()
+    debug_level = psb_get_debug_level()
+
+    map_out%state     = map_in%state
+    map_out%hashvsize = map_in%hashvsize
+    map_out%hashvmask = map_in%hashvmask
+
+    call psb_safe_ab_cpy( map_in%loc_to_glob ,    map_out%loc_to_glob  , info)
+    if (info == 0)  &
+         & call psb_safe_ab_cpy( map_in%glob_to_loc ,    map_out%glob_to_loc  , info)
+    if (info == 0)  &
+         & call psb_safe_ab_cpy( map_in%hashv       ,    map_out%hashv        , info)
+    if (info == 0)  &
+         & call psb_safe_ab_cpy( map_in%glb_lc      ,    map_out%glb_lc       , info)
+    if (info == 0)  &
+         & call psb_hash_copy( map_in%hash        ,    map_out%hash        , info)
+    
+    if (info /= 0) then
+      info = 4010
+      call psb_errpush(info,name)
+      goto 9999
+    endif
+    if (debug_level >= psb_debug_ext_) &
+         & write(debug_unit,*) me,' ',trim(name),': end'
+
+    call psb_erractionrestore(err_act)
+    return
+
+9999 continue
+    call psb_erractionrestore(err_act)
+
+    if (err_act == psb_act_ret_) then
+      return
+    else
+      call psb_error()
+    end if
+    return
+
+  end subroutine psb_idxmap_copy
+
+  subroutine psb_map_l2g_s1(idx,map,info)
+    implicit none 
+    integer, intent(inout) :: idx
+    integer, intent(out)   :: info 
+    type(psb_idxmap_type)  :: map
+    integer :: nc
+
+    info = 0
+    if (.not.allocated(map%loc_to_glob)) then 
+      info = 140
+      idx = -1 
+      return
+    end if
+    nc = size(map%loc_to_glob) 
+    if ((idx < 1).or.(idx>nc)) then 
+      info = 140
+      idx = -1 
+      return
+    end if
+    idx = map%loc_to_glob(idx) 
+    
+  end subroutine psb_map_l2g_s1
+
+  subroutine psb_map_l2g_s2(idx,gidx,map,info)
+    implicit none 
+    integer, intent(in)   :: idx
+    integer, intent(out)  :: gidx, info 
+    type(psb_idxmap_type) :: map
+    integer :: nc
+
+    info = 0
+    if (.not.allocated(map%loc_to_glob)) then 
+      info = 140
+      gidx = -1 
+      return
+    end if
+    nc = size(map%loc_to_glob) 
+    if ((idx < 1).or.(idx>nc)) then 
+      info = 140
+      gidx = -1 
+      return
+    end if
+    gidx = map%loc_to_glob(idx) 
+    
+  end subroutine psb_map_l2g_s2
+
+  subroutine psb_map_l2g_v1(idx,map,info)
+    implicit none 
+    integer, intent(inout) :: idx(:)
+    integer, intent(out)   :: info 
+    type(psb_idxmap_type)  :: map
+    integer :: nc, i, ix
+
+    info = 0
+    if (.not.allocated(map%loc_to_glob)) then 
+      info = 140
+      idx = -1 
+      return
+    end if
+    nc = size(map%loc_to_glob) 
+    do i=1, size(idx) 
+      ix = idx(i)
+      if ((ix < 1).or.(ix>nc)) then 
+        info = 140
+        idx(i) = -1 
+      else        
+        idx(i) = map%loc_to_glob(ix) 
+      end if
+    end do
+    
+  end subroutine psb_map_l2g_v1
+
+  subroutine psb_map_l2g_v2(idx,gidx,map,info)
+    implicit none 
+    integer, intent(in)    :: idx(:)
+    integer, intent(out)   :: gidx(:),info 
+    type(psb_idxmap_type)  :: map
+    integer :: nc, i, ix
+
+    info = 0
+    if ((.not.allocated(map%loc_to_glob)).or.&
+         & (size(gidx)<size(idx))) then 
+      info = 140
+      gidx = -1 
+      return
+    end if
+      
+    nc = size(map%loc_to_glob) 
+    do i=1, size(idx) 
+      ix = idx(i)
+      if ((ix < 1).or.(ix>nc)) then 
+        info = 140
+        gidx(i) = -1 
+      else        
+        gidx(i) = map%loc_to_glob(ix) 
+      end if
+    end do
+    
+  end subroutine psb_map_l2g_v2
 
 
   Subroutine psb_cd_get_recv_idx(tmp,desc,data,info,toglob)
@@ -1098,12 +1339,12 @@ contains
           goto 9999
         end if
         if (toglob) then
-          If(idx > Size(desc%loc_to_glob)) then 
+          call psb_map_l2g(idx,gidx,desc%idxmap,info)
+          If (gidx < 0) then 
             info=-3
             call psb_errpush(info,name)
             goto 9999
           endif
-          gidx = desc%loc_to_glob(idx)
           tmp(outcnt)   = proc
           tmp(outcnt+1) = 1
           tmp(outcnt+2) = gidx
@@ -1114,7 +1355,7 @@ contains
           tmp(outcnt+2) = idx
           tmp(outcnt+3) = -1
         end if
-        outcnt            = outcnt+3
+        outcnt          = outcnt+3
       end Do
       incnt = incnt+n_elem_recv+n_elem_send+3
     end Do

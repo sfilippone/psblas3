@@ -137,14 +137,14 @@ subroutine psb_cdren(trans,iperm,desc_a,info)
     if (debug_level >= psb_debug_ext_) &
          & write(debug_unit,*) me,' ',trim(name),': renumbering glob_to_loc'
     do i=1, n_col
-      desc_a%glob_to_loc(desc_a%loc_to_glob(desc_a%lprm(i))) = i  
+      desc_a%idxmap%glob_to_loc(desc_a%idxmap%loc_to_glob(desc_a%lprm(i))) = i  
     enddo
     if (debug_level >= psb_debug_ext_) &
          & write(debug_unit,*) me,' ',trim(name),': renumbering loc_to_glob'
     do i=1,psb_cd_get_global_rows(desc_a) 
-      j = desc_a%glob_to_loc(i)
+      j = desc_a%idxmap%glob_to_loc(i)
       if (j>0) then 
-        desc_a%loc_to_glob(j) = i
+        desc_a%idxmap%loc_to_glob(j) = i
       endif
     enddo
     if (debug_level >= psb_debug_ext_) &

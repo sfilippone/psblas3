@@ -41,14 +41,14 @@
 !    desc     - type(psb_desc_type).    The communication descriptor.        
 !    info     - integer.                  return code.
 !
-subroutine psi_bld_hash(desc,info)
+subroutine psi_bld_g2lmap(desc,info)
   use psb_descriptor_type
   use psb_serial_mod
   use psb_const_mod
   use psb_error_mod
   use psb_penv_mod
   use psb_realloc_mod
-  use psi_mod, psb_protect_name => psi_bld_hash
+  use psi_mod, psb_protect_name => psi_bld_g2lmap
   implicit none
   type(psb_desc_type), intent(inout) :: desc
   integer, intent(out) :: info
@@ -59,7 +59,7 @@ subroutine psi_bld_hash(desc,info)
   character(len=20)   :: name,ch_err
 
   info = 0
-  name = 'psi_bld_hash'
+  name = 'psi_bld_g2lmap'
   call psb_erractionsave(err_act)
 
   ictxt = psb_cd_get_context(desc)
@@ -84,7 +84,7 @@ subroutine psi_bld_hash(desc,info)
 
 
   nk = n_col
-  call psb_realloc(nk,2,desc%glb_lc,info) 
+  call psb_realloc(nk,2,desc%idxmap%glb_lc,info) 
   
   nbits = psb_hash_bits
   hsize = 2**nbits
@@ -102,9 +102,9 @@ subroutine psi_bld_hash(desc,info)
     hsize = hsize * 2 
   end do
   hmask = hsize - 1 
-  desc%hashvsize = hsize
-  desc%hashvmask = hmask
-  if (info ==0) call psb_realloc(hsize+1,desc%hashv,info,lb=0)
+  desc%idxmap%hashvsize = hsize
+  desc%idxmap%hashvmask = hmask
+  if (info ==0) call psb_realloc(hsize+1,desc%idxmap%hashv,info,lb=0)
   if (info /= 0) then 
     ch_err='psb_realloc'
     call psb_errpush(info,name,a_err=ch_err)
@@ -113,37 +113,38 @@ subroutine psi_bld_hash(desc,info)
 
   ! Build a hashed table of sorted lists to search for 
   ! indices.
-  desc%hashv(0:hsize) = 0
+  desc%idxmap%hashv(0:hsize) = 0
   do i=1, nk
-    key = desc%loc_to_glob(i)
+    key = desc%idxmap%loc_to_glob(i)
     ih  = iand(key,hmask) 
-    desc%hashv(ih) = desc%hashv(ih) + 1
+    desc%idxmap%hashv(ih) = desc%idxmap%hashv(ih) + 1
   end do
-  nh = desc%hashv(0) 
+  nh = desc%idxmap%hashv(0) 
   idx = 1
   do i=1, hsize
-    desc%hashv(i-1) = idx
+    desc%idxmap%hashv(i-1) = idx
     idx = idx + nh
-    nh = desc%hashv(i)
+    nh = desc%idxmap%hashv(i)
   end do
   do i=1, nk
-    key = desc%loc_to_glob(i)
-    ih  = iand(key,hmask)
-    idx = desc%hashv(ih) 
-    desc%glb_lc(idx,1) = key
-    desc%glb_lc(idx,2) = i
-    desc%hashv(ih) = desc%hashv(ih) + 1
+    key                       = desc%idxmap%loc_to_glob(i)
+    ih                        = iand(key,hmask)
+    idx                       = desc%idxmap%hashv(ih) 
+    desc%idxmap%glb_lc(idx,1) = key
+    desc%idxmap%glb_lc(idx,2) = i
+    desc%idxmap%hashv(ih)     = desc%idxmap%hashv(ih) + 1
   end do
   do i = hsize, 1, -1 
-    desc%hashv(i) = desc%hashv(i-1)
+    desc%idxmap%hashv(i) = desc%idxmap%hashv(i-1)
   end do
-  desc%hashv(0) = 1
+  desc%idxmap%hashv(0) = 1
   do i=0, hsize-1 
-    idx = desc%hashv(i)
-    nh  = desc%hashv(i+1) - desc%hashv(i) 
+    idx = desc%idxmap%hashv(i)
+    nh  = desc%idxmap%hashv(i+1) - desc%idxmap%hashv(i) 
     if (nh > 1) then 
-      call psb_msort(desc%glb_lc(idx:idx+nh-1,1),&
-           & ix=desc%glb_lc(idx:idx+nh-1,2),flag=psb_sort_keep_idx_)
+      call psb_msort(desc%idxmap%glb_lc(idx:idx+nh-1,1),&
+           & ix=desc%idxmap%glb_lc(idx:idx+nh-1,2),&
+           & flag=psb_sort_keep_idx_)
     end if
   end do
 
@@ -161,4 +162,4 @@ subroutine psi_bld_hash(desc,info)
   return
 
 
-end subroutine psi_bld_hash
+end subroutine psi_bld_g2lmap

@@ -78,33 +78,16 @@ subroutine psb_loc_to_glob2(x,y,desc_a,info,iact)
   endif
   act=psb_toupper(act)
 
-  n=size(x)
-  do i=1,n
-    if ((x(i) > psb_cd_get_local_cols(desc_a)).or.&
-         &  (x(i) <= zero)) then
-      info=140
-      int_err(1)=tmp
-      int_err(2)=psb_cd_get_local_cols(desc_a)  
-      exit
-    else
-      tmp=desc_a%loc_to_glob(x(i))
-      if((tmp > zero).or.(tmp <= psb_cd_get_global_rows(desc_a))) then
-        y(i)=tmp
-      else
-        info = 140
-        int_err(1)=tmp
-        int_err(2)=psb_cd_get_local_cols(desc_a)
-        exit
-      end if
-    end if
-  enddo
+  call psb_map_l2g(x,y,desc_a%idxmap,info) 
 
   if (info /= 0) then
     select case(act)
     case('E','I')
-      ! do nothing
+      ! do nothing, silently.
+      info = 0
     case('W')
-      write(0,'("Error ",i5," in subroutine glob_to_loc")') info
+      write(0,'("Error ",i5," in subroutine loc_to_glob")') info
+      info = 0
     case('A')
       call psb_errpush(info,name)
       goto 9999
@@ -204,32 +187,16 @@ subroutine psb_loc_to_glob(x,desc_a,info,iact)
   endif
   act = psb_toupper(act)
 
-  n=size(x)
-  do i=1,n
-    if ((x(i) > psb_cd_get_local_cols(desc_a)).or.&
-         &  (x(i) <= zero)) then
-      info=140
-      int_err(1)=x(i)
-      int_err(2)=psb_cd_get_local_cols(desc_a)  
-      exit
-    else
-      tmp=desc_a%loc_to_glob(x(i))
-      if((tmp > zero).or.(tmp <= psb_cd_get_global_rows(desc_a))) then
-        x(i)=tmp
-      else
-        info = 140
-        exit
-      end if
-    end if
-  enddo
+  call psb_map_l2g(x,desc_a%idxmap,info) 
 
   if (info /= 0) then
     select case(act)
     case('E','I')
-!!$      call psb_erractionrestore(err_act)
-!!$      return
+      ! do nothing, silently.
+      info = 0
     case('W')
-      write(0,'("Error ",i5," in subroutine glob_to_loc")') info
+      write(0,'("Error ",i5," in subroutine loc_to_glob")') info
+      info = 0
     case('A')
       call psb_errpush(info,name)
       goto 9999

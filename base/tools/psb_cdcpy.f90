@@ -74,21 +74,22 @@ subroutine psb_cdcpy(desc_in, desc_out, info)
   endif
 
   call psb_safe_ab_cpy(desc_in%matrix_data,desc_out%matrix_data,info)
-  if (info == 0)   call psb_safe_ab_cpy(desc_in%halo_index,desc_out%halo_index,info)
-  if (info == 0)   call psb_safe_ab_cpy(desc_in%ext_index,desc_out%ext_index,info)
-  if (info == 0)   call psb_safe_ab_cpy(desc_in%ovrlap_index,desc_out%ovrlap_index,info)
-  if (info == 0)   call psb_safe_ab_cpy(desc_in%bnd_elem,desc_out%bnd_elem,info)
-  if (info == 0)   call psb_safe_ab_cpy(desc_in%ovrlap_elem,desc_out%ovrlap_elem,info)
-  if (info == 0)   call psb_safe_ab_cpy(desc_in%ovr_mst_idx,desc_out%ovr_mst_idx,info)
-  if (info == 0)   call psb_safe_ab_cpy(desc_in%loc_to_glob,desc_out%loc_to_glob,info)
-  if (info == 0)   call psb_safe_ab_cpy(desc_in%glob_to_loc,desc_out%glob_to_loc,info)
-  if (info == 0)   call psb_safe_ab_cpy(desc_in%lprm,desc_out%lprm,info)
-  if (info == 0)   call psb_safe_ab_cpy(desc_in%idx_space,desc_out%idx_space,info)
-  desc_out%hashvsize =   desc_in%hashvsize 
-  desc_out%hashvmask =   desc_in%hashvmask
-  if (info == 0)   call psb_safe_ab_cpy(desc_in%hashv,desc_out%hashv,info)
-  if (info == 0)   call psb_safe_ab_cpy(desc_in%glb_lc,desc_out%glb_lc,info)
-  if (info == 0)   call CloneHashTable(desc_in%hash,desc_out%hash,info)
+  if (info == 0) call psb_safe_ab_cpy(desc_in%halo_index,desc_out%halo_index,info)
+  if (info == 0) call psb_safe_ab_cpy(desc_in%ext_index,desc_out%ext_index,info)
+  if (info == 0) call psb_safe_ab_cpy(desc_in%ovrlap_index,desc_out%ovrlap_index,info)
+  if (info == 0) call psb_safe_ab_cpy(desc_in%bnd_elem,desc_out%bnd_elem,info)
+  if (info == 0) call psb_safe_ab_cpy(desc_in%ovrlap_elem,desc_out%ovrlap_elem,info)
+  if (info == 0) call psb_safe_ab_cpy(desc_in%ovr_mst_idx,desc_out%ovr_mst_idx,info)
+  if (info == 0) call psb_safe_ab_cpy(desc_in%lprm,desc_out%lprm,info)
+  if (info == 0) call psb_safe_ab_cpy(desc_in%idx_space,desc_out%idx_space,info)
+  if (info == 0) call psb_idxmap_copy(desc_in%idxmap,desc_out%idxmap, info)
+!!$  if (info == 0)   call psb_safe_ab_cpy(desc_in%loc_to_glob,desc_out%loc_to_glob,info)
+!!$  if (info == 0)   call psb_safe_ab_cpy(desc_in%glob_to_loc,desc_out%glob_to_loc,info)
+!!$  desc_out%hashvsize =   desc_in%hashvsize 
+!!$  desc_out%hashvmask =   desc_in%hashvmask
+!!$  if (info == 0)   call psb_safe_ab_cpy(desc_in%hashv,desc_out%hashv,info)
+!!$  if (info == 0)   call psb_safe_ab_cpy(desc_in%glb_lc,desc_out%glb_lc,info)
+!!$  if (info == 0)   call CloneHashTable(desc_in%hash,desc_out%hash,info)
 
   if (info /= 0) then
     info = 4010
