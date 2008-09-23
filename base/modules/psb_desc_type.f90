@@ -1222,6 +1222,7 @@ contains
     integer :: nc, i, ix
 
     info = 0
+    if (size(idx)==0) return
     if (.not.allocated(map%loc_to_glob)) then 
       info = 140
       idx = -1 
@@ -1248,6 +1249,7 @@ contains
     integer :: nc, i, ix
 
     info = 0
+    if (size(idx)==0) return
     if ((.not.allocated(map%loc_to_glob)).or.&
          & (size(gidx)<size(idx))) then 
       info = 140
@@ -1267,7 +1269,6 @@ contains
     end do
     
   end subroutine psb_map_l2g_v2
-
 
   Subroutine psb_cd_get_recv_idx(tmp,desc,data,info,toglob)
 

@@ -81,7 +81,6 @@ subroutine psi_bld_tmphalo(desc,info)
     goto 9999
   endif
 
-
   if (.not.(psb_is_bld_desc(desc).and.psb_is_large_desc(desc))) then 
     info = 1122
     call psb_errpush(info,name)
@@ -100,9 +99,11 @@ subroutine psi_bld_tmphalo(desc,info)
   do i=1, nh
     helem(i) = n_row+i ! desc%loc_to_glob(n_row+i)
   end do
-  call psb_map_l2g(helem,desc%idxmap,info)
+
+  call psb_map_l2g(helem(1:nh),desc%idxmap,info)
   if (info == 0) &
        & call psi_fnd_owner(nh,helem,hproc,desc,info)
+
   if (info /= 0) then 
     call psb_errpush(4010,name,a_err='fnd_owner')
     goto 9999      
@@ -112,6 +113,7 @@ subroutine psi_bld_tmphalo(desc,info)
     call psb_errpush(4010,name,a_err='nh > size(hproc)')
     goto 9999      
   end if
+
   allocate(tmphl((3*((n_col-n_row)+1)+1)),stat=info)
   if (info /= 0) then 
     call psb_errpush(4010,name,a_err='Allocate')

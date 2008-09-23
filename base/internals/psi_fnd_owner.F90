@@ -74,7 +74,7 @@ subroutine psi_fnd_owner(nv,idx,iprc,desc,info)
   integer             :: i,n_row,n_col,err_act,ih,icomm,hsize,ip,isz,k,j,&
        & last_ih, last_j
   integer             :: ictxt,np,me
-  logical, parameter  :: gettime=.false.
+  logical, parameter  :: gettime=.true.
   real(psb_dpk_)      :: t0, t1, t2, t3, t4, tamx, tidx
   character(len=20)   :: name
 
@@ -90,6 +90,7 @@ subroutine psi_fnd_owner(nv,idx,iprc,desc,info)
 
   ! check on blacs grid 
   call psb_info(ictxt, me, np)
+
   if (np == -1) then
     info = 2010
     call psb_errpush(info,name)
@@ -121,6 +122,7 @@ subroutine psi_fnd_owner(nv,idx,iprc,desc,info)
     call psb_errpush(4010,name,a_err='Allocate') 
     goto 9999      
   end if
+
   hsz       = 0
   hsz(me+1) = nv
   call psb_amx(ictxt,hsz,info)
@@ -151,10 +153,12 @@ subroutine psi_fnd_owner(nv,idx,iprc,desc,info)
   if (gettime) then 
     t3 = psb_wtime()
   end if
+
   call psi_idx_cnv(hsize,hproc,helem,desc,info,owned=.true.)
   if (gettime) then 
     tidx = psb_wtime()-t3
   end if
+  if (info == 140) info = 0
   if (info /= 0) then 
     call psb_errpush(4010,name,a_err='psi_idx_cnv')
     goto 9999      
@@ -179,6 +183,7 @@ subroutine psi_fnd_owner(nv,idx,iprc,desc,info)
   if (gettime) then 
     t3 = psb_wtime()
   end if
+
   ! Collect all the answers with alltoallv (need sizes) 
   call mpi_alltoall(sdsz,1,mpi_integer,rvsz,1,mpi_integer,icomm,info)
 

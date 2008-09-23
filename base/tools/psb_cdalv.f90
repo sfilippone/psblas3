@@ -140,14 +140,14 @@ subroutine psb_cdalv(v, ictxt, desc, info, flag)
   ! allocate work vector
   if (psb_cd_choose_large_state(ictxt,m)) then 
     allocate(desc%matrix_data(psb_mdata_size_),&
-         &temp_ovrlap(2*loc_row),stat=info)
+         &temp_ovrlap(max(1,2*loc_row)),stat=info)
     if (info == 0) then 
       desc%matrix_data(:) = 0
       desc%idxmap%state = psb_desc_large_
     end if
   else
     allocate(desc%idxmap%glob_to_loc(m),desc%matrix_data(psb_mdata_size_),&
-         &temp_ovrlap(2*loc_row),stat=info)
+         &temp_ovrlap(max(1,2*loc_row)),stat=info)
     if (info == 0) then 
       desc%matrix_data(:) = 0
       desc%idxmap%state = psb_desc_normal_

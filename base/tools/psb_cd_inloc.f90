@@ -283,7 +283,7 @@ subroutine psb_cd_inloc(v, ictxt, desc, info, globalcheck)
   ! allocate work vector
   if (islarge) then 
     allocate(desc%matrix_data(psb_mdata_size_),&
-         &temp_ovrlap(2*loc_row),desc%lprm(1),&
+         &temp_ovrlap(max(1,2*loc_row)),desc%lprm(1),&
          & stat=info)
     if (info == 0) then 
       desc%lprm(1)        = 0   
@@ -292,7 +292,7 @@ subroutine psb_cd_inloc(v, ictxt, desc, info, globalcheck)
     end if
   else
     allocate(desc%idxmap%glob_to_loc(m),desc%matrix_data(psb_mdata_size_),&
-         &temp_ovrlap(2*loc_row),desc%lprm(1),&
+         &temp_ovrlap(max(1,2*loc_row)),desc%lprm(1),&
          & stat=info)
     if (info == 0) then 
       desc%lprm(1)        = 0   

@@ -387,7 +387,7 @@ contains
     ! Using a simple BLOCK distribution.
     !
     nt = (m+np-1)/np
-    nr = min(nt,m-(iam*nt))
+    nr = max(0,min(nt,m-(iam*nt)))
 
     nt = nr
     call psb_sum(ictxt,nt) 
