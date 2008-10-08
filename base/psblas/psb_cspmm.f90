@@ -250,7 +250,7 @@ subroutine  psb_cspmm(alpha,a,x,beta,y,desc_a,info,&
         if(info /= 0) exit blk
 
         !  local Matrix-vector product
-        call psb_csmm(alpha,a,x(:,jjx+i-1:jjx+i+ib-1),&
+        call a%csmm(alpha,x(:,jjx+i-1:jjx+i+ib-1),&
              & beta,y(:,jjy+i-1:jjy+i+ib-1),info,trans=trans_)
 
         if(info /= 0) exit blk
@@ -265,7 +265,7 @@ subroutine  psb_cspmm(alpha,a,x,beta,y,desc_a,info,&
       if (doswap_)&
            & call psi_swapdata(ior(psb_swap_send_,psb_swap_recv_),&
            & ib1,czero,x(:,1:ik),desc_a,iwork,info)
-      if (info == 0) call psb_csmm(alpha,a,x(:,1:ik),beta,y(:,1:ik),info)
+      if (info == 0) call a%csmm(alpha,x(:,1:ik),beta,y(:,1:ik),info)
     end if
 
     if(info /= 0) then
@@ -311,7 +311,7 @@ subroutine  psb_cspmm(alpha,a,x,beta,y,desc_a,info,&
     if (info == 0) call psi_ovrl_upd(x,desc_a,psb_avg_,info)
     y(nrow+1:ncol,1:ik)    = czero
 
-    if (info == 0) call psb_csmm(alpha,a,x(:,1:ik),beta,y(:,1:ik),info,trans=trans_)
+    if (info == 0) call a%csmm(alpha,x(:,1:ik),beta,y(:,1:ik),info,trans=trans_)
     if (debug_level >= psb_debug_comp_) &
          & write(debug_unit,*) me,' ',trim(name),' csmm ', info
     if (info /= 0) then
@@ -581,7 +581,7 @@ subroutine  psb_cspmv(alpha,a,x,beta,y,desc_a,info,&
     end if
 
     !  local Matrix-vector product
-    call psb_csmm(alpha,a,x(iix:lldx),beta,y(iiy:lldy),info)
+    call a%csmm(alpha,x(iix:lldx),beta,y(iiy:lldy),info)
 
     if(info /= 0) then
       info = 4011
@@ -628,7 +628,7 @@ subroutine  psb_cspmv(alpha,a,x,beta,y,desc_a,info,&
     yp(nrow+1:ncol) = czero
     
     !  local Matrix-vector product
-    if (info == 0) call psb_csmm(alpha,a,x,beta,yp,info,trans=trans_)
+    if (info == 0) call a%csmm(alpha,x,beta,yp,info,trans=trans_)
 
     if (debug_level >= psb_debug_comp_) &
          & write(debug_unit,*) me,' ',trim(name),' csmm ', info

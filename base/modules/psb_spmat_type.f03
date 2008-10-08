@@ -127,28 +127,52 @@ module psb_spmat_type
     integer           :: infoa(psb_ifasize_)
     integer, allocatable :: ia1(:), ia2(:)
     integer, allocatable :: pl(:), pr(:)
+
   end type psb_base_spmat_type
 
 
   type, extends(psb_base_spmat_type) :: psb_sspmat_type
     real(psb_spk_), allocatable  :: aspk(:)
+  contains
+    procedure, pass(a) :: psb_scsmm
+    procedure, pass(a) :: psb_scsmv
+    generic, public    :: csmm => psb_scsmm, psb_scsmv
+    procedure, pass(t) :: psb_scssm
+    procedure, pass(t) :: psb_scssv
+    generic, public    :: cssm => psb_scssm, psb_scssv
   end type psb_sspmat_type
 
   type, extends(psb_base_spmat_type) :: psb_cspmat_type
     complex(psb_spk_), allocatable  :: aspk(:)
+  contains
+    procedure, pass(a) :: psb_ccsmm
+    procedure, pass(a) :: psb_ccsmv
+    generic, public    :: csmm => psb_ccsmm, psb_ccsmv
+    procedure, pass(t) :: psb_ccssm
+    procedure, pass(t) :: psb_ccssv
+    generic, public    :: cssm => psb_ccssm, psb_ccssv
   end type psb_cspmat_type
 
   type, extends(psb_base_spmat_type) :: psb_dspmat_type
     real(psb_dpk_), allocatable  :: aspk(:)
-
   contains
-    procedure, pass(a) :: i_spmv => psb_dspmv_inner    
-    procedure, pass(a) :: i_spmm => psb_dspmm_inner    
-    generic, public    :: spmm => i_spmv, i_spmm
+    procedure, pass(a) :: psb_dcsmm
+    procedure, pass(a) :: psb_dcsmv
+    generic, public    :: csmm => psb_dcsmm, psb_dcsmv
+    procedure, pass(t) :: psb_dcssm
+    procedure, pass(t) :: psb_dcssv
+    generic, public    :: cssm => psb_dcssm, psb_dcssv
   end type psb_dspmat_type
 
   type, extends(psb_base_spmat_type) :: psb_zspmat_type
     complex(psb_dpk_), allocatable  :: aspk(:)
+  contains
+    procedure, pass(a) :: psb_zcsmm
+    procedure, pass(a) :: psb_zcsmv
+    generic, public    :: csmm => psb_zcsmm, psb_zcsmv
+    procedure, pass(t) :: psb_zcssm
+    procedure, pass(t) :: psb_zcssv
+    generic, public    :: cssm => psb_zcssm, psb_zcssv
   end type psb_zspmat_type
 
   interface psb_nullify_sp
@@ -247,27 +271,145 @@ module psb_spmat_type
          & psb_dspinfo, psb_zspinfo
   end interface
 
-  private psb_dspmm_inner, psb_dspmv_inner
+
+  interface psb_csmm 
+    subroutine psb_scsmv(alpha,a,b,beta,c,info,trans)
+      import :: psb_sspmat_type, psb_spk_
+      type(psb_sspmat_type) :: a
+      real(psb_spk_) :: alpha, beta, b(:), c(:)
+      integer :: info
+      character, optional :: trans
+    end subroutine psb_scsmv
+    subroutine psb_scsmm(alpha,a,b,beta,c,info,trans)
+      import :: psb_sspmat_type, psb_spk_
+      type(psb_sspmat_type) :: a
+      real(psb_spk_) :: alpha, beta, b(:,:), c(:,:)
+      integer :: info
+      character, optional :: trans
+    end subroutine psb_scsmm
+    subroutine psb_dcsmv(alpha,a,b,beta,c,info,trans)
+      import :: psb_dspmat_type, psb_dpk_
+      type(psb_dspmat_type) :: a
+      real(psb_dpk_) :: alpha, beta, b(:), c(:)
+      integer :: info
+      character, optional :: trans
+    end subroutine psb_dcsmv
+    subroutine psb_dcsmm(alpha,a,b,beta,c,info,trans)
+      import :: psb_dspmat_type, psb_dpk_
+      type(psb_dspmat_type) :: a
+      real(psb_dpk_) :: alpha, beta, b(:,:), c(:,:)
+      integer :: info
+      character, optional :: trans
+    end subroutine psb_dcsmm
+    subroutine psb_ccsmv(alpha,a,b,beta,c,info,trans)
+      import :: psb_cspmat_type, psb_spk_
+      type(psb_cspmat_type) :: a
+      complex(psb_spk_) :: alpha, beta, b(:), c(:)
+      integer :: info
+      character, optional :: trans
+    end subroutine psb_ccsmv
+    subroutine psb_ccsmm(alpha,a,b,beta,c,info,trans)
+      import :: psb_cspmat_type, psb_spk_
+      type(psb_cspmat_type) :: a
+      complex(psb_spk_) :: alpha, beta, b(:,:), c(:,:)
+      integer :: info
+      character, optional :: trans
+    end subroutine psb_ccsmm
+    subroutine psb_zcsmv(alpha,a,b,beta,c,info,trans)
+      import :: psb_zspmat_type, psb_dpk_
+      type(psb_zspmat_type) :: a
+      complex(psb_dpk_) :: alpha, beta, b(:), c(:)
+      integer :: info
+      character, optional :: trans
+    end subroutine psb_zcsmv
+    subroutine psb_zcsmm(alpha,a,b,beta,c,info,trans)
+      import :: psb_zspmat_type, psb_dpk_
+      type(psb_zspmat_type) :: a
+      complex(psb_dpk_) :: alpha, beta, b(:,:), c(:,:)
+      integer :: info
+      character, optional :: trans
+    end subroutine psb_zcsmm
+  end interface
+
+  interface psb_cssm
+    subroutine psb_scssm(alpha,t,b,beta,c,info,trans,unitd,d)
+      import :: psb_sspmat_type, psb_dspmat_type,&
+           & psb_cspmat_type, psb_zspmat_type, psb_spk_, psb_dpk_
+      type(psb_sspmat_type) :: t
+      real(psb_spk_) :: alpha, beta, b(:,:), c(:,:)
+      integer :: info
+      character, optional :: trans, unitd
+      real(psb_spk_), optional, target :: d(:)
+    end subroutine psb_scssm
+    subroutine psb_scssv(alpha,t,b,beta,c,info,trans,unitd,d)
+      import :: psb_sspmat_type, psb_dspmat_type,&
+           & psb_cspmat_type, psb_zspmat_type, psb_spk_, psb_dpk_
+      type(psb_sspmat_type) :: t
+      real(psb_spk_) :: alpha, beta, b(:), c(:)
+      integer :: info
+      character, optional :: trans, unitd
+      real(psb_spk_), optional, target :: d(:)
+    end subroutine psb_scssv
+    subroutine psb_dcssm(alpha,t,b,beta,c,info,trans,unitd,d)
+      import :: psb_sspmat_type, psb_dspmat_type,&
+           & psb_cspmat_type, psb_zspmat_type, psb_spk_, psb_dpk_
+      type(psb_dspmat_type) :: t
+      real(psb_dpk_) :: alpha, beta, b(:,:), c(:,:)
+      integer :: info
+      character, optional :: trans, unitd
+      real(psb_dpk_), optional, target :: d(:)
+    end subroutine psb_dcssm
+    subroutine psb_dcssv(alpha,t,b,beta,c,info,trans,unitd,d)
+      import :: psb_sspmat_type, psb_dspmat_type,&
+           & psb_cspmat_type, psb_zspmat_type, psb_spk_, psb_dpk_
+      type(psb_dspmat_type) :: t
+      real(psb_dpk_) :: alpha, beta, b(:), c(:)
+      integer :: info
+      character, optional :: trans, unitd
+      real(psb_dpk_), optional, target :: d(:)
+    end subroutine psb_dcssv
+    subroutine psb_ccssm(alpha,t,b,beta,c,info,trans,unitd,d)
+      import :: psb_sspmat_type, psb_dspmat_type,&
+           & psb_cspmat_type, psb_zspmat_type, psb_spk_, psb_dpk_
+      type(psb_cspmat_type) :: t
+      complex(psb_spk_) :: alpha, beta, b(:,:), c(:,:)
+      integer :: info
+      character, optional :: trans, unitd
+      complex(psb_spk_), optional, target :: d(:)
+    end subroutine psb_ccssm
+    subroutine psb_ccssv(alpha,t,b,beta,c,info,trans,unitd,d)
+      import :: psb_sspmat_type, psb_dspmat_type,&
+           & psb_cspmat_type, psb_zspmat_type, psb_spk_, psb_dpk_
+      type(psb_cspmat_type) :: t
+      complex(psb_spk_) :: alpha, beta, b(:), c(:)
+      integer :: info
+      character, optional :: trans, unitd
+      complex(psb_spk_), optional, target :: d(:)
+    end subroutine psb_ccssv
+    subroutine psb_zcssm(alpha,t,b,beta,c,info,trans,unitd,d)
+      import :: psb_sspmat_type, psb_dspmat_type,&
+           & psb_cspmat_type, psb_zspmat_type, psb_spk_, psb_dpk_
+      type(psb_zspmat_type) :: t
+      complex(psb_dpk_) :: alpha, beta, b(:,:), c(:,:)
+      integer :: info
+      character, optional :: trans, unitd
+      complex(psb_dpk_), optional, target :: d(:)
+    end subroutine psb_zcssm
+    subroutine psb_zcssv(alpha,t,b,beta,c,info,trans,unitd,d)
+      import :: psb_sspmat_type, psb_dspmat_type,&
+           & psb_cspmat_type, psb_zspmat_type, psb_spk_, psb_dpk_
+      type(psb_zspmat_type) :: t
+      complex(psb_dpk_) :: alpha, beta, b(:), c(:)
+      integer :: info
+      character, optional :: trans, unitd
+      complex(psb_dpk_), optional, target :: d(:)
+    end subroutine psb_zcssv
+  end interface
+
+
 
 contains
 
-  subroutine psb_dspmv_inner(alpha,a,x,beta,y,info)
-    type(psb_dspmat_type), intent(in) :: a
-    real(psb_dpk_), intent(in)    :: alpha,beta,x(:)
-    real(psb_dpk_), intent(inout) :: y(:)
-    integer, intent(out)          :: info
-
-    write(0,*) 'Inner spmv was invoked!'
-  end subroutine psb_dspmv_inner
-
-  subroutine psb_dspmm_inner(alpha,a,x,beta,y,info)
-    type(psb_dspmat_type), intent(in) :: a
-    real(psb_dpk_), intent(in)    :: alpha,beta,x(:,:)
-    real(psb_dpk_), intent(inout) :: y(:,:)
-    integer, intent(out)          :: info
-
-    write(0,*) 'Inner spmm was invoked!'
-  end subroutine psb_dspmm_inner
 
   integer function psb_get_ssp_nrows(a)
     type(psb_sspmat_type), intent(in) :: a

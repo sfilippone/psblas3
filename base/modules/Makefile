@@ -23,7 +23,7 @@ lib:  mpfobjs  $(MODULES)  $(OBJS)  $(LIBMOD)
 	/bin/cp -p *$(.mod) $(LIBDIR)
 
 psb_realloc_mod.o : psb_error_mod.o 
-psb_spmat_type.o : psb_realloc_mod.o psb_error_mod.o psb_const_mod.o psb_string_mod.o
+psb_spmat_type.o : psb_realloc_mod.o psb_error_mod.o psb_const_mod.o psb_string_mod.o psb_sort_mod.o
 psb_error_mod.o: psb_const_mod.o
 psb_penv_mod.o: psb_const_mod.o psb_error_mod.o psb_realloc_mod.o psb_blacs_mod.o
 psb_blacs_mod.o: psb_const_mod.o

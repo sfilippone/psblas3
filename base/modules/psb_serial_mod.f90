@@ -58,147 +58,149 @@ module psb_serial_mod
     end subroutine psb_zcsrws
   end interface
 
-  interface psb_cssm
-    subroutine psb_scssm(alpha,t,b,beta,c,info,trans,unitd,d)
-      use psb_spmat_type, only : psb_sspmat_type, psb_dspmat_type,&
-           & psb_cspmat_type, psb_zspmat_type, psb_spk_, psb_dpk_
-      type(psb_sspmat_type) :: t
-      real(psb_spk_) :: alpha, beta, b(:,:), c(:,:)
-      integer :: info
-      character, optional :: trans, unitd
-      real(psb_spk_), optional, target :: d(:)
-    end subroutine psb_scssm
-    subroutine psb_scssv(alpha,t,b,beta,c,info,trans,unitd,d)
-      use psb_spmat_type, only : psb_sspmat_type, psb_dspmat_type,&
-           & psb_cspmat_type, psb_zspmat_type, psb_spk_, psb_dpk_
-      type(psb_sspmat_type) :: t
-      real(psb_spk_) :: alpha, beta, b(:), c(:)
-      integer :: info
-      character, optional :: trans, unitd
-      real(psb_spk_), optional, target :: d(:)
-    end subroutine psb_scssv
-    subroutine psb_dcssm(alpha,t,b,beta,c,info,trans,unitd,d)
-      use psb_spmat_type, only : psb_sspmat_type, psb_dspmat_type,&
-           & psb_cspmat_type, psb_zspmat_type, psb_spk_, psb_dpk_
-      type(psb_dspmat_type) :: t
-      real(psb_dpk_) :: alpha, beta, b(:,:), c(:,:)
-      integer :: info
-      character, optional :: trans, unitd
-      real(psb_dpk_), optional, target :: d(:)
-    end subroutine psb_dcssm
-    subroutine psb_dcssv(alpha,t,b,beta,c,info,trans,unitd,d)
-      use psb_spmat_type, only : psb_sspmat_type, psb_dspmat_type,&
-           & psb_cspmat_type, psb_zspmat_type, psb_spk_, psb_dpk_
-      type(psb_dspmat_type) :: t
-      real(psb_dpk_) :: alpha, beta, b(:), c(:)
-      integer :: info
-      character, optional :: trans, unitd
-      real(psb_dpk_), optional, target :: d(:)
-    end subroutine psb_dcssv
-    subroutine psb_ccssm(alpha,t,b,beta,c,info,trans,unitd,d)
-      use psb_spmat_type, only : psb_sspmat_type, psb_dspmat_type,&
-           & psb_cspmat_type, psb_zspmat_type, psb_spk_, psb_dpk_
-      type(psb_cspmat_type) :: t
-      complex(psb_spk_) :: alpha, beta, b(:,:), c(:,:)
-      integer :: info
-      character, optional :: trans, unitd
-      complex(psb_spk_), optional, target :: d(:)
-    end subroutine psb_ccssm
-    subroutine psb_ccssv(alpha,t,b,beta,c,info,trans,unitd,d)
-      use psb_spmat_type, only : psb_sspmat_type, psb_dspmat_type,&
-           & psb_cspmat_type, psb_zspmat_type, psb_spk_, psb_dpk_
-      type(psb_cspmat_type) :: t
-      complex(psb_spk_) :: alpha, beta, b(:), c(:)
-      integer :: info
-      character, optional :: trans, unitd
-      complex(psb_spk_), optional, target :: d(:)
-    end subroutine psb_ccssv
-    subroutine psb_zcssm(alpha,t,b,beta,c,info,trans,unitd,d)
-      use psb_spmat_type, only : psb_sspmat_type, psb_dspmat_type,&
-           & psb_cspmat_type, psb_zspmat_type, psb_spk_, psb_dpk_
-      type(psb_zspmat_type) :: t
-      complex(psb_dpk_) :: alpha, beta, b(:,:), c(:,:)
-      integer :: info
-      character, optional :: trans, unitd
-      complex(psb_dpk_), optional, target :: d(:)
-    end subroutine psb_zcssm
-    subroutine psb_zcssv(alpha,t,b,beta,c,info,trans,unitd,d)
-      use psb_spmat_type, only : psb_sspmat_type, psb_dspmat_type,&
-           & psb_cspmat_type, psb_zspmat_type, psb_spk_, psb_dpk_
-      type(psb_zspmat_type) :: t
-      complex(psb_dpk_) :: alpha, beta, b(:), c(:)
-      integer :: info
-      character, optional :: trans, unitd
-      complex(psb_dpk_), optional, target :: d(:)
-    end subroutine psb_zcssv
-  end interface
+!!$  interface psb_cssm
+!!$    subroutine psb_scssm(alpha,t,b,beta,c,info,trans,unitd,d)
+!!$      use psb_spmat_type, only : psb_sspmat_type, psb_dspmat_type,&
+!!$           & psb_cspmat_type, psb_zspmat_type, psb_spk_, psb_dpk_
+!!$      type(psb_sspmat_type) :: t
+!!$      real(psb_spk_) :: alpha, beta, b(:,:), c(:,:)
+!!$      integer :: info
+!!$      character, optional :: trans, unitd
+!!$      real(psb_spk_), optional, target :: d(:)
+!!$    end subroutine psb_scssm
+!!$    subroutine psb_scssv(alpha,t,b,beta,c,info,trans,unitd,d)
+!!$      use psb_spmat_type, only : psb_sspmat_type, psb_dspmat_type,&
+!!$           & psb_cspmat_type, psb_zspmat_type, psb_spk_, psb_dpk_
+!!$      type(psb_sspmat_type) :: t
+!!$      real(psb_spk_) :: alpha, beta, b(:), c(:)
+!!$      integer :: info
+!!$      character, optional :: trans, unitd
+!!$      real(psb_spk_), optional, target :: d(:)
+!!$    end subroutine psb_scssv
+!!$    subroutine psb_dcssm(alpha,t,b,beta,c,info,trans,unitd,d)
+!!$      use psb_spmat_type, only : psb_sspmat_type, psb_dspmat_type,&
+!!$           & psb_cspmat_type, psb_zspmat_type, psb_spk_, psb_dpk_
+!!$      type(psb_dspmat_type) :: t
+!!$      real(psb_dpk_) :: alpha, beta, b(:,:), c(:,:)
+!!$      integer :: info
+!!$      character, optional :: trans, unitd
+!!$      real(psb_dpk_), optional, target :: d(:)
+!!$    end subroutine psb_dcssm
+!!$    subroutine psb_dcssv(alpha,t,b,beta,c,info,trans,unitd,d)
+!!$      use psb_spmat_type, only : psb_sspmat_type, psb_dspmat_type,&
+!!$           & psb_cspmat_type, psb_zspmat_type, psb_spk_, psb_dpk_
+!!$      type(psb_dspmat_type) :: t
+!!$      real(psb_dpk_) :: alpha, beta, b(:), c(:)
+!!$      integer :: info
+!!$      character, optional :: trans, unitd
+!!$      real(psb_dpk_), optional, target :: d(:)
+!!$    end subroutine psb_dcssv
+!!$    subroutine psb_ccssm(alpha,t,b,beta,c,info,trans,unitd,d)
+!!$      use psb_spmat_type, only : psb_sspmat_type, psb_dspmat_type,&
+!!$           & psb_cspmat_type, psb_zspmat_type, psb_spk_, psb_dpk_
+!!$      type(psb_cspmat_type) :: t
+!!$      complex(psb_spk_) :: alpha, beta, b(:,:), c(:,:)
+!!$      integer :: info
+!!$      character, optional :: trans, unitd
+!!$      complex(psb_spk_), optional, target :: d(:)
+!!$    end subroutine psb_ccssm
+!!$    subroutine psb_ccssv(alpha,t,b,beta,c,info,trans,unitd,d)
+!!$      use psb_spmat_type, only : psb_sspmat_type, psb_dspmat_type,&
+!!$           & psb_cspmat_type, psb_zspmat_type, psb_spk_, psb_dpk_
+!!$      type(psb_cspmat_type) :: t
+!!$      complex(psb_spk_) :: alpha, beta, b(:), c(:)
+!!$      integer :: info
+!!$      character, optional :: trans, unitd
+!!$      complex(psb_spk_), optional, target :: d(:)
+!!$    end subroutine psb_ccssv
+!!$    subroutine psb_zcssm(alpha,t,b,beta,c,info,trans,unitd,d)
+!!$      use psb_spmat_type, only : psb_sspmat_type, psb_dspmat_type,&
+!!$           & psb_cspmat_type, psb_zspmat_type, psb_spk_, psb_dpk_
+!!$      type(psb_zspmat_type) :: t
+!!$      complex(psb_dpk_) :: alpha, beta, b(:,:), c(:,:)
+!!$      integer :: info
+!!$      character, optional :: trans, unitd
+!!$      complex(psb_dpk_), optional, target :: d(:)
+!!$    end subroutine psb_zcssm
+!!$    subroutine psb_zcssv(alpha,t,b,beta,c,info,trans,unitd,d)
+!!$      use psb_spmat_type, only : psb_sspmat_type, psb_dspmat_type,&
+!!$           & psb_cspmat_type, psb_zspmat_type, psb_spk_, psb_dpk_
+!!$      type(psb_zspmat_type) :: t
+!!$      complex(psb_dpk_) :: alpha, beta, b(:), c(:)
+!!$      integer :: info
+!!$      character, optional :: trans, unitd
+!!$      complex(psb_dpk_), optional, target :: d(:)
+!!$    end subroutine psb_zcssv
+!!$  end interface
 
-  interface psb_csmm
-    subroutine psb_scsmv(alpha,a,b,beta,c,info,trans)
-      use psb_spmat_type, only : psb_sspmat_type, psb_dspmat_type,&
-           & psb_cspmat_type, psb_zspmat_type, psb_spk_, psb_dpk_
-      type(psb_sspmat_type) :: a
-      real(psb_spk_) :: alpha, beta, b(:), c(:)
-      integer :: info
-      character, optional :: trans
-    end subroutine psb_scsmv
-    subroutine psb_scsmm(alpha,a,b,beta,c,info,trans)
-      use psb_spmat_type, only : psb_sspmat_type, psb_dspmat_type,&
-           & psb_cspmat_type, psb_zspmat_type, psb_spk_, psb_dpk_
-      type(psb_sspmat_type) :: a
-      real(psb_spk_) :: alpha, beta, b(:,:), c(:,:)
-      integer :: info
-      character, optional :: trans
-    end subroutine psb_scsmm
-    subroutine psb_dcsmv(alpha,a,b,beta,c,info,trans)
-      use psb_spmat_type, only : psb_sspmat_type, psb_dspmat_type,&
-           & psb_cspmat_type, psb_zspmat_type, psb_spk_, psb_dpk_
-      type(psb_dspmat_type) :: a
-      real(psb_dpk_) :: alpha, beta, b(:), c(:)
-      integer :: info
-      character, optional :: trans
-    end subroutine psb_dcsmv
-    subroutine psb_dcsmm(alpha,a,b,beta,c,info,trans)
-      use psb_spmat_type, only : psb_sspmat_type, psb_dspmat_type,&
-           & psb_cspmat_type, psb_zspmat_type, psb_spk_, psb_dpk_
-      type(psb_dspmat_type) :: a
-      real(psb_dpk_) :: alpha, beta, b(:,:), c(:,:)
-      integer :: info
-      character, optional :: trans
-    end subroutine psb_dcsmm
-    subroutine psb_ccsmv(alpha,a,b,beta,c,info,trans)
-      use psb_spmat_type, only : psb_sspmat_type, psb_dspmat_type,&
-           & psb_cspmat_type, psb_zspmat_type, psb_spk_, psb_dpk_
-      type(psb_cspmat_type) :: a
-      complex(psb_spk_) :: alpha, beta, b(:), c(:)
-      integer :: info
-      character, optional :: trans
-    end subroutine psb_ccsmv
-    subroutine psb_ccsmm(alpha,a,b,beta,c,info,trans)
-      use psb_spmat_type, only : psb_sspmat_type, psb_dspmat_type,&
-           & psb_cspmat_type, psb_zspmat_type, psb_spk_, psb_dpk_
-      type(psb_cspmat_type) :: a
-      complex(psb_spk_) :: alpha, beta, b(:,:), c(:,:)
-      integer :: info
-      character, optional :: trans
-    end subroutine psb_ccsmm
-    subroutine psb_zcsmv(alpha,a,b,beta,c,info,trans)
-      use psb_spmat_type, only : psb_sspmat_type, psb_dspmat_type,&
-           & psb_cspmat_type, psb_zspmat_type, psb_spk_, psb_dpk_
-      type(psb_zspmat_type) :: a
-      complex(psb_dpk_) :: alpha, beta, b(:), c(:)
-      integer :: info
-      character, optional :: trans
-    end subroutine psb_zcsmv
-    subroutine psb_zcsmm(alpha,a,b,beta,c,info,trans)
-      use psb_spmat_type, only : psb_sspmat_type, psb_dspmat_type,&
-           & psb_cspmat_type, psb_zspmat_type, psb_spk_, psb_dpk_
-      type(psb_zspmat_type) :: a
-      complex(psb_dpk_) :: alpha, beta, b(:,:), c(:,:)
-      integer :: info
-      character, optional :: trans
-    end subroutine psb_zcsmm
-  end interface
+!!$  interface psb_csmm
+!!$    module procedure psb_scsmm, psb_scsmv, psb_dcsmm, psb_dcsmv,&
+!!$         & psb_ccsmm, psb_ccsmv, psb_zcsmm, psb_zcsmv
+!!$    subroutine psb_scsmv(alpha,a,b,beta,c,info,trans)
+!!$      use psb_spmat_type, only : psb_sspmat_type, psb_dspmat_type,&
+!!$           & psb_cspmat_type, psb_zspmat_type, psb_spk_, psb_dpk_
+!!$      type(psb_sspmat_type) :: a
+!!$      real(psb_spk_) :: alpha, beta, b(:), c(:)
+!!$      integer :: info
+!!$      character, optional :: trans
+!!$    end subroutine psb_scsmv
+!!$    subroutine psb_scsmm(alpha,a,b,beta,c,info,trans)
+!!$      use psb_spmat_type, only : psb_sspmat_type, psb_dspmat_type,&
+!!$           & psb_cspmat_type, psb_zspmat_type, psb_spk_, psb_dpk_
+!!$      type(psb_sspmat_type) :: a
+!!$      real(psb_spk_) :: alpha, beta, b(:,:), c(:,:)
+!!$      integer :: info
+!!$      character, optional :: trans
+!!$    end subroutine psb_scsmm
+!!$    subroutine psb_dcsmv(alpha,a,b,beta,c,info,trans)
+!!$      use psb_spmat_type, only : psb_sspmat_type, psb_dspmat_type,&
+!!$           & psb_cspmat_type, psb_zspmat_type, psb_spk_, psb_dpk_
+!!$      type(psb_dspmat_type) :: a
+!!$      real(psb_dpk_) :: alpha, beta, b(:), c(:)
+!!$      integer :: info
+!!$      character, optional :: trans
+!!$    end subroutine psb_dcsmv
+!!$    subroutine psb_dcsmm(alpha,a,b,beta,c,info,trans)
+!!$      use psb_spmat_type, only : psb_sspmat_type, psb_dspmat_type,&
+!!$           & psb_cspmat_type, psb_zspmat_type, psb_spk_, psb_dpk_
+!!$      type(psb_dspmat_type) :: a
+!!$      real(psb_dpk_) :: alpha, beta, b(:,:), c(:,:)
+!!$      integer :: info
+!!$      character, optional :: trans
+!!$    end subroutine psb_dcsmm
+!!$    subroutine psb_ccsmv(alpha,a,b,beta,c,info,trans)
+!!$      use psb_spmat_type, only : psb_sspmat_type, psb_dspmat_type,&
+!!$           & psb_cspmat_type, psb_zspmat_type, psb_spk_, psb_dpk_
+!!$      type(psb_cspmat_type) :: a
+!!$      complex(psb_spk_) :: alpha, beta, b(:), c(:)
+!!$      integer :: info
+!!$      character, optional :: trans
+!!$    end subroutine psb_ccsmv
+!!$    subroutine psb_ccsmm(alpha,a,b,beta,c,info,trans)
+!!$      use psb_spmat_type, only : psb_sspmat_type, psb_dspmat_type,&
+!!$           & psb_cspmat_type, psb_zspmat_type, psb_spk_, psb_dpk_
+!!$      type(psb_cspmat_type) :: a
+!!$      complex(psb_spk_) :: alpha, beta, b(:,:), c(:,:)
+!!$      integer :: info
+!!$      character, optional :: trans
+!!$    end subroutine psb_ccsmm
+!!$    subroutine psb_zcsmv(alpha,a,b,beta,c,info,trans)
+!!$      use psb_spmat_type, only : psb_sspmat_type, psb_dspmat_type,&
+!!$           & psb_cspmat_type, psb_zspmat_type, psb_spk_, psb_dpk_
+!!$      type(psb_zspmat_type) :: a
+!!$      complex(psb_dpk_) :: alpha, beta, b(:), c(:)
+!!$      integer :: info
+!!$      character, optional :: trans
+!!$    end subroutine psb_zcsmv
+!!$    subroutine psb_zcsmm(alpha,a,b,beta,c,info,trans)
+!!$      use psb_spmat_type, only : psb_sspmat_type, psb_dspmat_type,&
+!!$           & psb_cspmat_type, psb_zspmat_type, psb_spk_, psb_dpk_
+!!$      type(psb_zspmat_type) :: a
+!!$      complex(psb_dpk_) :: alpha, beta, b(:,:), c(:,:)
+!!$      integer :: info
+!!$      character, optional :: trans
+!!$    end subroutine psb_zcsmm
+!!$  end interface
 
   interface psb_cest
     subroutine psb_cest(afmt, m,n,nnz, lia1, lia2, lar, iup, info)

@@ -34,7 +34,9 @@
 ! Arguments:
 
 subroutine psb_scsmv(alpha,a,b,beta,c,info,trans)
-  use psb_spmat_type
+  use psb_spmat_type, psb_protect_name => psb_scsmv
+  use psb_error_mod
+
   implicit none 
 
   type(psb_sspmat_type) :: a

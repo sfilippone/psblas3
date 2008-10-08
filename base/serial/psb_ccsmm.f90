@@ -33,7 +33,7 @@
 ! Subroutine: 
 ! Arguments:
 subroutine psb_ccsmm(alpha,a,b,beta,c,info,trans)
-  use psb_spmat_type
+  use psb_spmat_type, psb_protect_name => psb_ccsmm
   use psb_error_mod
   implicit none 
 

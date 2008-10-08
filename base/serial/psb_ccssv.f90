@@ -34,7 +34,7 @@
 ! Arguments:
 
 subroutine psb_ccssv(alpha,t,b,beta,c,info,trans,unitd,d)
-  use psb_spmat_type
+  use psb_spmat_type, psb_protect_name => psb_ccssv
   use psb_error_mod
   implicit none
 

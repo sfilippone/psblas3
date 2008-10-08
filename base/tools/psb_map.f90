@@ -219,7 +219,8 @@ subroutine psb_d_forward_map(alpha,x,beta,y,desc,info,work)
     ! Ok, we just need to call a halo update on the base desc
     ! and a matrix-vector product. 
     call psb_halo(x,desc%desc_1,info,work=work)
-    if (info == 0) call psb_csmm(alpha,desc%dmap%map_fw,x,beta,y,info)
+    if (info == 0) call desc%dmap%map_fw%spmm(alpha,x,beta,y,info)
+!!$    if (info == 0) call psb_csmm(alpha,desc%dmap%map_fw,x,beta,y,info)
     if ((info == 0) .and. psb_is_repl_desc(desc%desc_2)) then
       ictxt = psb_cd_get_context(desc%desc_2)
       nr = psb_cd_get_global_rows(desc%desc_2)
@@ -294,7 +295,8 @@ subroutine psb_d_backward_map(alpha,x,beta,y,desc,info,work)
   case(psb_map_aggr_)
     ! Ok, we just need to call a halo update and a matrix-vector product. 
     call psb_halo(x,desc%desc_2,info,work=work)
-    if (info == 0) call psb_csmm(alpha,desc%dmap%map_bk,x,beta,y,info)
+!!$    if (info == 0) call psb_csmm(alpha,desc%dmap%map_bk,x,beta,y,info)
+    if (info == 0) call desc%dmap%map_bk%spmm(alpha,x,beta,y,info)
     if ((info == 0) .and. psb_is_repl_desc(desc%desc_1)) then
       ictxt = psb_cd_get_context(desc%desc_1)
       nr = psb_cd_get_global_rows(desc%desc_1)
@@ -660,7 +662,8 @@ subroutine psb_d_apply_linmap(alpha,x,beta,y,a_map,cd_xt,descin,descout)
   allocate(tmp(nct),stat=info)
   if (info == 0) tmp(1:nrt) = x(1:nrt)
   if (info == 0) call psb_halo(tmp,cd_xt,info) 
-  if (info == 0) call psb_csmm(alpha,a_map,tmp,beta,y,info)
+  if (info == 0) call a_map%spmm(alpha,tmp,beta,y,info)
+!!$  if (info == 0) call psb_csmm(alpha,a_map,tmp,beta,y,info)
   if (info /= 0) then 
     write(0,*) 'Error in apply_map'
   endif

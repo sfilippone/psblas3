@@ -4,7 +4,7 @@ BJAC                   Preconditioner NONE  DIAG  BJAC
 CSR                    Storage format for matrix A:  CSR COO JAD 
 080                    Domain size (acutal system is this**3)
 1                      Stopping criterion
-20                     MAXIT
+200                    MAXIT
 -1                     ITRACE
 20                     IRST    restart for RGMRES  and BiCGSTABL
 

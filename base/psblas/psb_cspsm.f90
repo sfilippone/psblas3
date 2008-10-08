@@ -258,7 +258,7 @@ subroutine  psb_cspsm(alpha,a,x,beta,y,desc_a,info,&
   ! Perform local triangular system solve
   xp => x(iix:lldx,jjx:jjx+ik-1)
   yp => y(iiy:lldy,jjy:jjy+ik-1)
-  call psb_cssm(alpha,a,xp,beta,yp,info,unitd=lunitd,d=id,trans=itrans)
+  call a%cssm(alpha,xp,beta,yp,info,unitd=lunitd,d=id,trans=itrans)
 
   if(info /= 0) then
     info = 4010
@@ -528,7 +528,7 @@ subroutine  psb_cspsv(alpha,a,x,beta,y,desc_a,info,&
   ! Perform local triangular system solve
   xp => x(iix:lldx)
   yp => y(iiy:lldy)
-  call psb_cssm(alpha,a,xp,beta,yp,info,unitd=lunitd,d=id,trans=itrans)
+  call a%cssm(alpha,xp,beta,yp,info,unitd=lunitd,d=id,trans=itrans)
 
   if(info /= 0) then
     info = 4010
