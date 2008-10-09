@@ -127,7 +127,6 @@ module psb_spmat_type
     integer           :: infoa(psb_ifasize_)
     integer, allocatable :: ia1(:), ia2(:)
     integer, allocatable :: pl(:), pr(:)
-
   end type psb_base_spmat_type
 
 
