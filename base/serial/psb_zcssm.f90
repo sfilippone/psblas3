@@ -38,7 +38,7 @@ subroutine psb_zcssm(alpha,t,b,beta,c,info,trans,unitd,d)
   use psb_error_mod
   implicit none
 
-  type(psb_zspmat_type) :: t
+  class(psb_zspmat_type) :: t
   complex(psb_dpk_)      :: alpha, beta, b(:,:), c(:,:)
   integer               :: info
   character, optional   :: trans, unitd

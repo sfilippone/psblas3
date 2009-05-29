@@ -612,9 +612,9 @@ Module psb_tools_mod
     end subroutine psb_zspasb
   end interface
 
-  interface psb_spfree
-    module procedure psb_ssp_free, psb_dsp_free, psb_zsp_free
-  end interface
+!!$  interface psb_spfree
+!!$    module procedure psb_ssp_free, psb_dsp_free, psb_zsp_free
+!!$  end interface
 
   interface psb_spfree
     subroutine psb_sspfree(a, desc_a,info)

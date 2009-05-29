@@ -38,7 +38,7 @@ subroutine psb_scssv(alpha,t,b,beta,c,info,trans,unitd,d)
   use psb_error_mod
   implicit none
 
-  type(psb_sspmat_type) :: t
+  class(psb_sspmat_type) :: t
   real(psb_spk_)      :: alpha, beta, b(:), c(:)
   integer               :: info
   character, optional   :: trans, unitd

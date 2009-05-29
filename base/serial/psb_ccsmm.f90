@@ -37,7 +37,7 @@ subroutine psb_ccsmm(alpha,a,b,beta,c,info,trans)
   use psb_error_mod
   implicit none 
 
-  type(psb_cspmat_type) :: a
+  class(psb_cspmat_type) :: a
   complex(psb_spk_)      :: alpha, beta, b(:,:), c(:,:)
   integer               :: info
   character, optional   :: trans

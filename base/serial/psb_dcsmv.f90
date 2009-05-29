@@ -38,8 +38,8 @@ subroutine psb_dcsmv(alpha,a,b,beta,c,info,trans)
   use psb_error_mod
   implicit none 
 
-  type(psb_dspmat_type) :: a
-  real(psb_dpk_)      :: alpha, beta, b(:), c(:)
+  class(psb_dspmat_type) :: a
+  real(psb_dpk_)         :: alpha, beta, b(:), c(:)
   integer               :: info
   character, optional   :: trans
   
