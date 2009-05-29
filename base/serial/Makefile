@@ -13,7 +13,7 @@ FOBJS = psb_cest.o psb_dcoins.o psb_dcsmm.o psb_dcsmv.o \
 	psb_zcoins.o psb_zcsprt.o psb_zneigh.o psb_ztransp.o psb_ztransc.o\
 	psb_zrwextd.o psb_zsymbmm.o psb_znumbmm.o psb_zspscal.o psb_zspclip.o\
 	psb_getifield.o psb_setifield.o psb_update_mod.o psb_getrow_mod.o\
-	psb_dgelp.o psb_zgelp.o psb_dcsrp.o psb_zcsrp.o\
+	psb_dgelp.o psb_zgelp.o\
 	psb_dspshift.o psb_dspsetbld.o psb_zspshift.o psb_zspsetbld.o\
 	psb_scsprt.o psb_sspcnv.o psb_scoins.o psb_scsmm.o psb_scsmv.o \
 	psb_scssm.o psb_scssv.o psb_sneigh.o psb_sspgtblk.o psb_sspgetrow.o \
@@ -27,7 +27,7 @@ FOBJS = psb_cest.o psb_dcoins.o psb_dcsmm.o psb_dcsmv.o \
 	psb_ccssm.o psb_ccssv.o psb_ccsmm.o psb_ccsmv.o psb_ctransp.o psb_ctransc.o\
 	psb_cspclip.o psb_crwextd.o psb_cspscal.o\
 	psb_cnumbmm.o psb_csymbmm.o psb_cneigh.o psb_ip_reord_mod.o
-#
+# psb_dcsrp.o psb_zcsrp.o\
 
 LIBDIR=..
 MODDIR=../modules

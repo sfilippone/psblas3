@@ -135,7 +135,8 @@ subroutine psb_icdasb(desc_a,info,ext_hv)
     ! the list of halo indices as if it was in small index space    
     if (psb_is_large_desc(desc_a)) then 
       if (debug_level >= psb_debug_ext_) &
-           & write(debug_unit,*) me,' ',trim(name),': Large descriptor, calling ldsc_pre_halo'
+           & write(debug_unit,*) me,' ',trim(name),&
+           & ': Large descriptor, calling ldsc_pre_halo'
       call psi_ldsc_pre_halo(desc_a,ext_hv_,info)
       if (info /= 0) then
         call psb_errpush(4010,name,a_err='ldsc_pre_halo')
@@ -144,9 +145,9 @@ subroutine psb_icdasb(desc_a,info,ext_hv)
     end if
 
     ! Take out the lists for ovrlap, halo and ext...
-    call psb_transfer(desc_a%ovrlap_index,ovrlap_index,info)
-    call psb_transfer(desc_a%halo_index,halo_index,info)
-    call psb_transfer(desc_a%ext_index,ext_index,info)
+    call psb_move_alloc(desc_a%ovrlap_index,ovrlap_index,info)
+    call psb_move_alloc(desc_a%halo_index,halo_index,info)
+    call psb_move_alloc(desc_a%ext_index,ext_index,info)
 
     if (debug_level >= psb_debug_ext_) &
          & write(debug_unit,*) me,' ',trim(name),': Final conversion'

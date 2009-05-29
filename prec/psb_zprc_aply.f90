@@ -42,7 +42,7 @@ subroutine psb_zprc_aply(prec,x,y,desc_data,info,trans, work)
   complex(psb_dpk_),intent(inout)   :: y(:)
   integer, intent(out)                :: info
   character(len=1), optional          :: trans
-  complex(psb_dpk_), optional, target  :: work(:)
+  complex(psb_dpk_), intent(inout), optional, target  :: work(:)
 
   ! Local variables
   character     :: trans_ 

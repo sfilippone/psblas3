@@ -55,17 +55,17 @@ module psb_realloc_mod
     module procedure psb_dreallocatec2
   end Interface
 
-  interface psb_transfer
-    module procedure psb_stransfer1d
-    module procedure psb_stransfer2d
-    module procedure psb_dtransfer1d
-    module procedure psb_dtransfer2d
-    module procedure psb_itransfer1d
-    module procedure psb_itransfer2d
-    module procedure psb_ctransfer1d
-    module procedure psb_ctransfer2d
-    module procedure psb_ztransfer1d
-    module procedure psb_ztransfer2d
+  interface psb_move_alloc
+    module procedure psb_smove_alloc1d
+    module procedure psb_smove_alloc2d
+    module procedure psb_dmove_alloc1d
+    module procedure psb_dmove_alloc2d
+    module procedure psb_imove_alloc1d
+    module procedure psb_imove_alloc2d
+    module procedure psb_cmove_alloc1d
+    module procedure psb_cmove_alloc2d
+    module procedure psb_zmove_alloc1d
+    module procedure psb_zmove_alloc2d
   end interface
 
   Interface psb_safe_ab_cpy
@@ -1593,9 +1593,9 @@ Contains
           goto 9999
         end if
         tmp(lb_:lb_-1+min(len,dim))=rrax(lbi:lbi-1+min(len,dim))
-        if (debug) write(0,*) 'reallocate : calling transfer '
-        call psb_transfer(tmp,rrax,info)
-        if (debug) write(0,*) 'reallocate : from transfer ',info
+        if (debug) write(0,*) 'reallocate : calling move_alloc '
+        call psb_move_alloc(tmp,rrax,info)
+        if (debug) write(0,*) 'reallocate : from move_alloc ',info
       end if
     else
       dim = 0
@@ -1672,7 +1672,7 @@ Contains
           goto 9999
         end if
         tmp(lb_:lb_-1+min(len,dim))=rrax(lbi:lbi-1+min(len,dim))
-        call psb_transfer(tmp,rrax,info)
+        call psb_move_alloc(tmp,rrax,info)
       End If
     else
       dim = 0
@@ -1746,7 +1746,7 @@ Contains
           goto 9999
         end if
         tmp(lb_:lb_-1+min(len,dim))=rrax(lbi:lbi-1+min(len,dim))
-        call psb_transfer(tmp,rrax,info)
+        call psb_move_alloc(tmp,rrax,info)
       End If
     else
       dim = 0
@@ -1820,7 +1820,7 @@ Contains
           goto 9999
         end if
         tmp(lb_:lb_-1+min(len,dim))=rrax(lbi:lbi-1+min(len,dim))
-        call psb_transfer(tmp,rrax,info)
+        call psb_move_alloc(tmp,rrax,info)
       end if
     else
       dim = 0
@@ -1893,7 +1893,7 @@ Contains
           goto 9999
         end if
         tmp(lb_:lb_-1+min(len,dim))=rrax(lbi:lbi-1+min(len,dim))
-        call psb_transfer(tmp,rrax,info)
+        call psb_move_alloc(tmp,rrax,info)
       end if
     else
       dim = 0
@@ -1984,7 +1984,7 @@ Contains
         end if
         tmp(lb1_:lb1_-1+min(len1,dim),lb2_:lb2_-1+min(len2,dim2)) = &
              & rrax(lbi1:lbi1-1+min(len1,dim),lbi2:lbi2-1+min(len2,dim2))
-        call psb_transfer(tmp,rrax,info)
+        call psb_move_alloc(tmp,rrax,info)
       End If
     else
       dim  = 0
@@ -2076,7 +2076,7 @@ Contains
         end if
         tmp(lb1_:lb1_-1+min(len1,dim),lb2_:lb2_-1+min(len2,dim2)) = &
              & rrax(lbi1:lbi1-1+min(len1,dim),lbi2:lbi2-1+min(len2,dim2))
-        call psb_transfer(tmp,rrax,info)
+        call psb_move_alloc(tmp,rrax,info)
       End If
     else
       dim  = 0
@@ -2168,7 +2168,7 @@ Contains
         end if
         tmp(lb1_:lb1_-1+min(len1,dim),lb2_:lb2_-1+min(len2,dim2)) = &
              & rrax(lbi1:lbi1-1+min(len1,dim),lbi2:lbi2-1+min(len2,dim2))
-        call psb_transfer(tmp,rrax,info)
+        call psb_move_alloc(tmp,rrax,info)
       End If
     else
       dim  = 0
@@ -2260,7 +2260,7 @@ Contains
         end if
         tmp(lb1_:lb1_-1+min(len1,dim),lb2_:lb2_-1+min(len2,dim2)) = &
              & rrax(lbi1:lbi1-1+min(len1,dim),lbi2:lbi2-1+min(len2,dim2))
-        call psb_transfer(tmp,rrax,info)
+        call psb_move_alloc(tmp,rrax,info)
       End If
     else
       dim  = 0
@@ -2351,7 +2351,7 @@ Contains
         end if
         tmp(lb1_:lb1_-1+min(len1,dim),lb2_:lb2_-1+min(len2,dim2)) = &
              & rrax(lbi1:lbi1-1+min(len1,dim),lbi2:lbi2-1+min(len2,dim2))
-        call psb_transfer(tmp,rrax,info)
+        call psb_move_alloc(tmp,rrax,info)
       End If
     else
       dim  = 0
@@ -2625,7 +2625,7 @@ Contains
     return
   End Subroutine psb_dreallocate2i1z
 
-  Subroutine psb_stransfer1d(vin,vout,info)
+  Subroutine psb_smove_alloc1d(vin,vout,info)
     use psb_error_mod
     real(psb_spk_), allocatable, intent(inout) :: vin(:),vout(:)
     integer, intent(out) :: info 
@@ -2637,7 +2637,7 @@ Contains
     if (allocated(vin)) then 
       call move_alloc(vin,vout)
     else if (allocated(vout)) then 
-!!$      write(0,*) 'transfer: Clearing output'
+!!$      write(0,*) 'move_alloc: Clearing output'
       deallocate(vout)
     end if
 
@@ -2651,9 +2651,9 @@ Contains
     vout = vin
     deallocate(vin,stat=info)
 #endif
-  end Subroutine psb_stransfer1d
+  end Subroutine psb_smove_alloc1d
 
-  Subroutine psb_stransfer2d(vin,vout,info)
+  Subroutine psb_smove_alloc2d(vin,vout,info)
     use psb_error_mod
     real(psb_spk_), allocatable, intent(inout) :: vin(:,:),vout(:,:)
     integer, intent(out) :: info 
@@ -2678,9 +2678,9 @@ Contains
     vout = vin
     deallocate(vin,stat=info)
 #endif
-  end Subroutine psb_stransfer2d
+  end Subroutine psb_smove_alloc2d
 
-  Subroutine psb_dtransfer1d(vin,vout,info)
+  Subroutine psb_dmove_alloc1d(vin,vout,info)
     use psb_error_mod
     real(psb_dpk_), allocatable, intent(inout) :: vin(:),vout(:)
     integer, intent(out) :: info 
@@ -2692,7 +2692,7 @@ Contains
     if (allocated(vin)) then 
       call move_alloc(vin,vout)
     else if (allocated(vout)) then 
-!!$      write(0,*) 'transfer: Clearing output'
+!!$      write(0,*) 'move_alloc: Clearing output'
       deallocate(vout)
     end if
 
@@ -2706,9 +2706,9 @@ Contains
     vout = vin
     deallocate(vin,stat=info)
 #endif
-  end Subroutine psb_dtransfer1d
+  end Subroutine psb_dmove_alloc1d
 
-  Subroutine psb_dtransfer2d(vin,vout,info)
+  Subroutine psb_dmove_alloc2d(vin,vout,info)
     use psb_error_mod
     real(psb_dpk_), allocatable, intent(inout) :: vin(:,:),vout(:,:)
     integer, intent(out) :: info 
@@ -2733,9 +2733,9 @@ Contains
     vout = vin
     deallocate(vin,stat=info)
 #endif
-  end Subroutine psb_dtransfer2d
+  end Subroutine psb_dmove_alloc2d
 
-  Subroutine psb_ctransfer1d(vin,vout,info)
+  Subroutine psb_cmove_alloc1d(vin,vout,info)
     use psb_error_mod
     complex(psb_spk_), allocatable, intent(inout) :: vin(:),vout(:)
     integer, intent(out) :: info 
@@ -2758,9 +2758,9 @@ Contains
     vout = vin
     deallocate(vin,stat=info)
 #endif
-  end Subroutine psb_ctransfer1d
+  end Subroutine psb_cmove_alloc1d
 
-  Subroutine psb_ctransfer2d(vin,vout,info)
+  Subroutine psb_cmove_alloc2d(vin,vout,info)
     use psb_error_mod
     complex(psb_spk_), allocatable, intent(inout) :: vin(:,:),vout(:,:)
     integer, intent(out) :: info 
@@ -2785,9 +2785,9 @@ Contains
     vout = vin
     deallocate(vin,stat=info)
 #endif
-  end Subroutine psb_ctransfer2d
+  end Subroutine psb_cmove_alloc2d
 
-  Subroutine psb_ztransfer1d(vin,vout,info)
+  Subroutine psb_zmove_alloc1d(vin,vout,info)
     use psb_error_mod
     complex(psb_dpk_), allocatable, intent(inout) :: vin(:),vout(:)
     integer, intent(out) :: info 
@@ -2810,9 +2810,9 @@ Contains
     vout = vin
     deallocate(vin,stat=info)
 #endif
-  end Subroutine psb_ztransfer1d
+  end Subroutine psb_zmove_alloc1d
 
-  Subroutine psb_ztransfer2d(vin,vout,info)
+  Subroutine psb_zmove_alloc2d(vin,vout,info)
     use psb_error_mod
     complex(psb_dpk_), allocatable, intent(inout) :: vin(:,:),vout(:,:)
     integer, intent(out) :: info 
@@ -2837,9 +2837,9 @@ Contains
     vout = vin
     deallocate(vin,stat=info)
 #endif
-  end Subroutine psb_ztransfer2d
+  end Subroutine psb_zmove_alloc2d
 
-  Subroutine psb_itransfer1d(vin,vout,info)
+  Subroutine psb_imove_alloc1d(vin,vout,info)
     use psb_error_mod
     integer, allocatable, intent(inout) :: vin(:),vout(:)
     integer, intent(out) :: info 
@@ -2850,7 +2850,7 @@ Contains
     if (allocated(vin)) then 
       call move_alloc(vin,vout)
     else if (allocated(vout)) then 
-!!$      write(0,*) 'transfer: Clearing output'
+!!$      write(0,*) 'move_alloc: Clearing output'
       deallocate(vout)
     end if
 #else
@@ -2863,9 +2863,9 @@ Contains
     vout = vin
     deallocate(vin,stat=info)
 #endif
-  end Subroutine psb_itransfer1d
+  end Subroutine psb_imove_alloc1d
 
-  Subroutine psb_itransfer2d(vin,vout,info)
+  Subroutine psb_imove_alloc2d(vin,vout,info)
     use psb_error_mod
     integer, allocatable, intent(inout) :: vin(:,:),vout(:,:)
     integer, intent(out) :: info 
@@ -2890,6 +2890,6 @@ Contains
     vout = vin
     deallocate(vin,stat=info)
 #endif
-  end Subroutine psb_itransfer2d
+  end Subroutine psb_imove_alloc2d
 
 end module psb_realloc_mod

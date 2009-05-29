@@ -70,14 +70,6 @@ subroutine psb_cgelp(trans,iperm,x,info)
     end subroutine cgelp
   end interface
 
-  interface isaperm
-
-    logical function isaperm(n,ip)
-      integer, intent(in)    :: n   
-      integer, intent(inout) :: ip(*)
-    end function isaperm
-  end interface
-
   character(len=20)   :: name, ch_err
   name = 'psb_cgelp'
 
@@ -97,7 +89,7 @@ subroutine psb_cgelp(trans,iperm,x,info)
   end if
   itemp(:) = iperm(:) 
   
-  if (.not.isaperm(i1sz,itemp)) then
+  if (.not.psb_isaperm(i1sz,itemp)) then
     info = 70
     int_err(1) = 1      
     call psb_errpush(info,name,i_err=int_err)
@@ -205,13 +197,6 @@ subroutine psb_cgelpv(trans,iperm,x,info)
     end subroutine cgelp
   end interface
 
-  interface isaperm
-
-    logical function isaperm(n,ip)
-      integer, intent(in)    :: n   
-      integer, intent(inout) :: ip(*)
-    end function isaperm
-  end interface
 
   character(len=20)   :: name, ch_err
   name = 'psb_cgelpv'
@@ -232,7 +217,7 @@ subroutine psb_cgelpv(trans,iperm,x,info)
   end if
   itemp(:) = iperm(:) 
   
-  if (.not.isaperm(i1sz,itemp)) then
+  if (.not.psb_isaperm(i1sz,itemp)) then
     info = 70
     int_err(1) = 1      
     call psb_errpush(info,name,i_err=int_err)

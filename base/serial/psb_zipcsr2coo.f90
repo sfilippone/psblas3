@@ -69,10 +69,10 @@ Subroutine psb_zipcsr2coo(a,info)
     call psb_errpush(info,name,a_err='integer',i_err=(/max(nza,1),0,0,0,0/))
     goto 9999      
   end if
-!!$  write(0,*) 'ipcsr2coo ',a%m      
-  call psb_transfer(a%ia2,itemp,info)
-  call psb_transfer(a%ia1,a%ia2,info)
-  call psb_transfer(iaux,a%ia1,info)
+
+  call psb_move_alloc(a%ia2,itemp,info)
+  call psb_move_alloc(a%ia1,a%ia2,info)
+  call psb_move_alloc(iaux,a%ia1,info)
   
   do i=1, nr
     do j=itemp(i),itemp(i+1)-1

@@ -74,7 +74,7 @@ subroutine psi_fnd_owner(nv,idx,iprc,desc,info)
   integer             :: i,n_row,n_col,err_act,ih,icomm,hsize,ip,isz,k,j,&
        & last_ih, last_j
   integer             :: ictxt,np,me
-  logical, parameter  :: gettime=.true.
+  logical, parameter  :: gettime=.false.
   real(psb_dpk_)      :: t0, t1, t2, t3, t4, tamx, tidx
   character(len=20)   :: name
 
@@ -237,7 +237,7 @@ subroutine psi_fnd_owner(nv,idx,iprc,desc,info)
       do
         if (j > size(answers,1)) then 
           ! Last resort attempt.
-          call ibsrch(j,ih,size(answers,1),answers(:,1))
+          j = psb_ibsrch(ih,size(answers,1),answers(:,1))
           if (j == -1) then 
             write(0,*) me,'psi_fnd_owner: searching for ',ih, &
                  & 'not found : ',size(answers,1),':',answers(:,1)
@@ -249,7 +249,7 @@ subroutine psi_fnd_owner(nv,idx,iprc,desc,info)
         if (answers(j,1) == ih) exit
         if (answers(j,1) > ih) then 
           k = j 
-          call ibsrch(j,ih,k,answers(1:k,1))
+          j = psb_ibsrch(ih,k,answers(1:k,1))
           if (j == -1) then 
             write(0,*) me,'psi_fnd_owner: searching for ',ih, &
                  & 'not found : ',size(answers,1),':',answers(:,1)

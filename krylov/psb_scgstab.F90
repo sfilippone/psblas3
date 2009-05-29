@@ -270,7 +270,7 @@ Subroutine psb_scgstab(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,istop)
            & ' Iteration: ',itx
 
       rho_old = rho    
-      rho     = psb_gexdot(q,r,desc_a,info)
+      rho     = psb_gedot(q,r,desc_a,info)
 
       if (rho==dzero) then
          if (debug_level >= psb_debug_ext_) &
@@ -301,7 +301,7 @@ Subroutine psb_scgstab(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,istop)
       imerr = MPE_Log_event( imme, 0, "ed SPMM" )
 #endif
 
-      sigma = psb_gexdot(q,v,desc_a,info)
+      sigma = psb_gedot(q,v,desc_a,info)
       if (sigma==dzero) then
          if (debug_level >= psb_debug_ext_) &
               & write(debug_unit,*) me,' ',trim(name),&
@@ -338,7 +338,7 @@ Subroutine psb_scgstab(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,istop)
          goto 9999
       end if
       
-      sigma = psb_gexdot(t,t,desc_a,info)
+      sigma = psb_gedot(t,t,desc_a,info)
       if (sigma==dzero) then
          if (debug_level >= psb_debug_ext_) &
               & write(debug_unit,*) me,' ',trim(name),&
@@ -346,7 +346,7 @@ Subroutine psb_scgstab(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,istop)
         exit iteration
       endif
       
-      tau   = psb_gexdot(t,s,desc_a,info)
+      tau   = psb_gedot(t,s,desc_a,info)
       omega = tau/sigma
 
       if (omega==szero) then

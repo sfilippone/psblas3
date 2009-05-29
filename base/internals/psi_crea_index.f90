@@ -61,11 +61,11 @@ subroutine psi_crea_index(desc_a,index_in,index_out,glob_idx,nxch,nsnd,nrcv,info
   use psi_mod, psb_protect_name => psi_crea_index
   implicit none
 
-  type(psb_desc_type), intent(in)  :: desc_a
-  integer, intent(out)             :: info,nxch,nsnd,nrcv
-  integer, intent(in)              :: index_in(:)
-  integer, allocatable             :: index_out(:)
-  logical                          :: glob_idx
+  type(psb_desc_type), intent(in)     :: desc_a
+  integer, intent(out)                :: info,nxch,nsnd,nrcv
+  integer, intent(in)                 :: index_in(:)
+  integer, allocatable, intent(inout) :: index_out(:)
+  logical                             :: glob_idx
 
   !         ....local scalars...      
   integer    :: ictxt, me, np, mode, err_act, dl_lda

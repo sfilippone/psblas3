@@ -194,7 +194,7 @@ module psb_spmat_type
          & psb_dsp_getifld, psb_zsp_getifld
   end interface
 
-  interface psb_sp_transfer
+  interface psb_move_alloc
     module procedure psb_ssp_transfer, psb_csp_transfer,&
          & psb_dsp_transfer, psb_zsp_transfer
   end interface
@@ -274,56 +274,56 @@ module psb_spmat_type
   interface psb_csmm 
     subroutine psb_scsmv(alpha,a,b,beta,c,info,trans)
       import :: psb_sspmat_type, psb_spk_
-      type(psb_sspmat_type) :: a
+      class(psb_sspmat_type) :: a
       real(psb_spk_) :: alpha, beta, b(:), c(:)
       integer :: info
       character, optional :: trans
     end subroutine psb_scsmv
     subroutine psb_scsmm(alpha,a,b,beta,c,info,trans)
       import :: psb_sspmat_type, psb_spk_
-      type(psb_sspmat_type) :: a
+      class(psb_sspmat_type) :: a
       real(psb_spk_) :: alpha, beta, b(:,:), c(:,:)
       integer :: info
       character, optional :: trans
     end subroutine psb_scsmm
     subroutine psb_dcsmv(alpha,a,b,beta,c,info,trans)
       import :: psb_dspmat_type, psb_dpk_
-      type(psb_dspmat_type) :: a
+      class(psb_dspmat_type) :: a
       real(psb_dpk_) :: alpha, beta, b(:), c(:)
       integer :: info
       character, optional :: trans
     end subroutine psb_dcsmv
     subroutine psb_dcsmm(alpha,a,b,beta,c,info,trans)
       import :: psb_dspmat_type, psb_dpk_
-      type(psb_dspmat_type) :: a
+      class(psb_dspmat_type) :: a
       real(psb_dpk_) :: alpha, beta, b(:,:), c(:,:)
       integer :: info
       character, optional :: trans
     end subroutine psb_dcsmm
     subroutine psb_ccsmv(alpha,a,b,beta,c,info,trans)
       import :: psb_cspmat_type, psb_spk_
-      type(psb_cspmat_type) :: a
+      class(psb_cspmat_type) :: a
       complex(psb_spk_) :: alpha, beta, b(:), c(:)
       integer :: info
       character, optional :: trans
     end subroutine psb_ccsmv
     subroutine psb_ccsmm(alpha,a,b,beta,c,info,trans)
       import :: psb_cspmat_type, psb_spk_
-      type(psb_cspmat_type) :: a
+      class(psb_cspmat_type) :: a
       complex(psb_spk_) :: alpha, beta, b(:,:), c(:,:)
       integer :: info
       character, optional :: trans
     end subroutine psb_ccsmm
     subroutine psb_zcsmv(alpha,a,b,beta,c,info,trans)
       import :: psb_zspmat_type, psb_dpk_
-      type(psb_zspmat_type) :: a
+      class(psb_zspmat_type) :: a
       complex(psb_dpk_) :: alpha, beta, b(:), c(:)
       integer :: info
       character, optional :: trans
     end subroutine psb_zcsmv
     subroutine psb_zcsmm(alpha,a,b,beta,c,info,trans)
       import :: psb_zspmat_type, psb_dpk_
-      type(psb_zspmat_type) :: a
+      class(psb_zspmat_type) :: a
       complex(psb_dpk_) :: alpha, beta, b(:,:), c(:,:)
       integer :: info
       character, optional :: trans
@@ -334,7 +334,7 @@ module psb_spmat_type
     subroutine psb_scssm(alpha,t,b,beta,c,info,trans,unitd,d)
       import :: psb_sspmat_type, psb_dspmat_type,&
            & psb_cspmat_type, psb_zspmat_type, psb_spk_, psb_dpk_
-      type(psb_sspmat_type) :: t
+      class(psb_sspmat_type) :: t
       real(psb_spk_) :: alpha, beta, b(:,:), c(:,:)
       integer :: info
       character, optional :: trans, unitd
@@ -343,7 +343,7 @@ module psb_spmat_type
     subroutine psb_scssv(alpha,t,b,beta,c,info,trans,unitd,d)
       import :: psb_sspmat_type, psb_dspmat_type,&
            & psb_cspmat_type, psb_zspmat_type, psb_spk_, psb_dpk_
-      type(psb_sspmat_type) :: t
+      class(psb_sspmat_type) :: t
       real(psb_spk_) :: alpha, beta, b(:), c(:)
       integer :: info
       character, optional :: trans, unitd
@@ -352,7 +352,7 @@ module psb_spmat_type
     subroutine psb_dcssm(alpha,t,b,beta,c,info,trans,unitd,d)
       import :: psb_sspmat_type, psb_dspmat_type,&
            & psb_cspmat_type, psb_zspmat_type, psb_spk_, psb_dpk_
-      type(psb_dspmat_type) :: t
+      class(psb_dspmat_type) :: t
       real(psb_dpk_) :: alpha, beta, b(:,:), c(:,:)
       integer :: info
       character, optional :: trans, unitd
@@ -361,7 +361,7 @@ module psb_spmat_type
     subroutine psb_dcssv(alpha,t,b,beta,c,info,trans,unitd,d)
       import :: psb_sspmat_type, psb_dspmat_type,&
            & psb_cspmat_type, psb_zspmat_type, psb_spk_, psb_dpk_
-      type(psb_dspmat_type) :: t
+      class(psb_dspmat_type) :: t
       real(psb_dpk_) :: alpha, beta, b(:), c(:)
       integer :: info
       character, optional :: trans, unitd
@@ -370,7 +370,7 @@ module psb_spmat_type
     subroutine psb_ccssm(alpha,t,b,beta,c,info,trans,unitd,d)
       import :: psb_sspmat_type, psb_dspmat_type,&
            & psb_cspmat_type, psb_zspmat_type, psb_spk_, psb_dpk_
-      type(psb_cspmat_type) :: t
+      class(psb_cspmat_type) :: t
       complex(psb_spk_) :: alpha, beta, b(:,:), c(:,:)
       integer :: info
       character, optional :: trans, unitd
@@ -379,7 +379,7 @@ module psb_spmat_type
     subroutine psb_ccssv(alpha,t,b,beta,c,info,trans,unitd,d)
       import :: psb_sspmat_type, psb_dspmat_type,&
            & psb_cspmat_type, psb_zspmat_type, psb_spk_, psb_dpk_
-      type(psb_cspmat_type) :: t
+      class(psb_cspmat_type) :: t
       complex(psb_spk_) :: alpha, beta, b(:), c(:)
       integer :: info
       character, optional :: trans, unitd
@@ -388,7 +388,7 @@ module psb_spmat_type
     subroutine psb_zcssm(alpha,t,b,beta,c,info,trans,unitd,d)
       import :: psb_sspmat_type, psb_dspmat_type,&
            & psb_cspmat_type, psb_zspmat_type, psb_spk_, psb_dpk_
-      type(psb_zspmat_type) :: t
+      class(psb_zspmat_type) :: t
       complex(psb_dpk_) :: alpha, beta, b(:,:), c(:,:)
       integer :: info
       character, optional :: trans, unitd
@@ -397,7 +397,7 @@ module psb_spmat_type
     subroutine psb_zcssv(alpha,t,b,beta,c,info,trans,unitd,d)
       import :: psb_sspmat_type, psb_dspmat_type,&
            & psb_cspmat_type, psb_zspmat_type, psb_spk_, psb_dpk_
-      type(psb_zspmat_type) :: t
+      class(psb_zspmat_type) :: t
       complex(psb_dpk_) :: alpha, beta, b(:), c(:)
       integer :: info
       character, optional :: trans, unitd
@@ -613,17 +613,7 @@ contains
       psb_get_zsp_nnz_row = 0
     end if
   end function psb_get_zsp_nnz_row
-!!$
-!!$  subroutine psb_nullify_base_sp(mat)
-!!$    implicit none
-!!$    class(psb_base_spmat_type), intent(inout) :: mat
-!!$    mat%infoa(:)=0
-!!$    mat%m=0
-!!$    mat%k=0
-!!$    mat%fida=''
-!!$    mat%descra=''
-!!$
-!!$  end subroutine psb_nullify_base_sp
+
 
   subroutine psb_nullify_ssp(mat)
     implicit none
@@ -949,11 +939,11 @@ contains
     info  = 0
 
 
-    call psb_transfer( a%aspk,     b%aspk  , info)
-    call psb_transfer( a%ia1 ,     b%ia1   , info)
-    call psb_transfer( a%ia2 ,     b%ia2   , info)
-    call psb_transfer( a%pl  ,     b%pl    , info)
-    call psb_transfer( a%pr  ,     b%pr    , info)
+    call psb_move_alloc( a%aspk,     b%aspk  , info)
+    call psb_move_alloc( a%ia1 ,     b%ia1   , info)
+    call psb_move_alloc( a%ia2 ,     b%ia2   , info)
+    call psb_move_alloc( a%pl  ,     b%pl    , info)
+    call psb_move_alloc( a%pr  ,     b%pr    , info)
     b%infoa(:) = a%infoa(:)
     b%fida     = a%fida
     b%descra   = a%descra
@@ -1098,11 +1088,9 @@ contains
     integer(psb_long_int_k_) :: val
 
     val   = psb_sizeof_int*size(a%infoa)
-
     if (allocated(a%aspk)) then 
       val = val + psb_sizeof_sp  * size(a%aspk)
     endif
-
     if (allocated(a%ia1)) then 
       val = val + psb_sizeof_int * size(a%ia1)
     endif
@@ -1478,11 +1466,11 @@ contains
     info  = 0
 
 
-    call psb_transfer( a%aspk,     b%aspk  , info)
-    call psb_transfer( a%ia1 ,     b%ia1   , info)
-    call psb_transfer( a%ia2 ,     b%ia2   , info)
-    call psb_transfer( a%pl  ,     b%pl    , info)
-    call psb_transfer( a%pr  ,     b%pr    , info)
+    call psb_move_alloc( a%aspk,     b%aspk  , info)
+    call psb_move_alloc( a%ia1 ,     b%ia1   , info)
+    call psb_move_alloc( a%ia2 ,     b%ia2   , info)
+    call psb_move_alloc( a%pl  ,     b%pl    , info)
+    call psb_move_alloc( a%pr  ,     b%pr    , info)
     b%infoa(:) = a%infoa(:)
     b%fida     = a%fida
     b%descra   = a%descra
@@ -1986,11 +1974,11 @@ contains
 
     info  = 0
 
-    call psb_transfer( a%aspk,     b%aspk  , info)
-    call psb_transfer( a%ia1 ,     b%ia1   , info)
-    call psb_transfer( a%ia2 ,     b%ia2   , info)
-    call psb_transfer( a%pl  ,     b%pl    , info)
-    call psb_transfer( a%pr  ,     b%pr    , info)
+    call psb_move_alloc( a%aspk,     b%aspk  , info)
+    call psb_move_alloc( a%ia1 ,     b%ia1   , info)
+    call psb_move_alloc( a%ia2 ,     b%ia2   , info)
+    call psb_move_alloc( a%pl  ,     b%pl    , info)
+    call psb_move_alloc( a%pr  ,     b%pr    , info)
     b%infoa(:) = a%infoa(:)
     b%fida     = a%fida
     b%descra   = a%descra
@@ -2479,11 +2467,11 @@ contains
 
     info  = 0
 
-    call psb_transfer( a%aspk,     b%aspk  , info)
-    call psb_transfer( a%ia1 ,     b%ia1   , info)
-    call psb_transfer( a%ia2 ,     b%ia2   , info)
-    call psb_transfer( a%pl  ,     b%pl    , info)
-    call psb_transfer( a%pr  ,     b%pr    , info)
+    call psb_move_alloc( a%aspk,     b%aspk  , info)
+    call psb_move_alloc( a%ia1 ,     b%ia1   , info)
+    call psb_move_alloc( a%ia2 ,     b%ia2   , info)
+    call psb_move_alloc( a%pl  ,     b%pl    , info)
+    call psb_move_alloc( a%pr  ,     b%pr    , info)
     b%infoa(:) = a%infoa(:)
     b%fida     = a%fida
     b%descra   = a%descra
@@ -2674,6 +2662,7 @@ contains
     use psb_const_mod
     use psb_error_mod
     use psb_string_mod
+    use psb_sort_mod
     implicit none
 
     type(psb_sspmat_type), intent(in), target :: a
@@ -2730,7 +2719,7 @@ contains
         if (a%infoa(psb_srtd_) == psb_isrtdcoo_) then 
           ! In this case we can do a binary search. 
           nz = a%infoa(psb_nnz_)
-          call ibsrch(ip,irw,nz,a%ia1)
+          ip = psb_ibsrch(irw,nz,a%ia1)
           jp = ip
           ! expand [ip,jp] to contain all row entries.
           do 
@@ -2833,6 +2822,7 @@ contains
     use psb_const_mod
     use psb_error_mod
     use psb_string_mod
+    use psb_sort_mod
     implicit none
 
     type(psb_dspmat_type), intent(in), target :: a
@@ -2889,7 +2879,7 @@ contains
         if (a%infoa(psb_srtd_) == psb_isrtdcoo_) then 
           ! In this case we can do a binary search. 
           nz = a%infoa(psb_nnz_)
-          call ibsrch(ip,irw,nz,a%ia1)
+          ip = psb_ibsrch(irw,nz,a%ia1)
           jp = ip
           ! expand [ip,jp] to contain all row entries.
           do 
@@ -2992,6 +2982,7 @@ contains
     use psb_const_mod
     use psb_error_mod
     use psb_string_mod
+    use psb_sort_mod
     implicit none
 
     type(psb_cspmat_type), intent(in), target :: a
@@ -3043,7 +3034,7 @@ contains
         if (a%infoa(psb_srtd_) == psb_isrtdcoo_) then 
           ! In this case we can do a binary search. 
           nz = a%infoa(psb_nnz_)
-          call ibsrch(ip,irw,nz,a%ia1)
+          ip = psb_ibsrch(irw,nz,a%ia1)
           jp = ip
           ! expand [ip,jp] to contain all row entries.
           do 
@@ -3143,6 +3134,7 @@ contains
   end subroutine psb_cspinfo
 
   subroutine psb_zspinfo(ireq,a,ires,info,iaux)
+    use psb_sort_mod
     use psb_const_mod
     use psb_error_mod
     use psb_string_mod
@@ -3197,7 +3189,7 @@ contains
         if (a%infoa(psb_srtd_) == psb_isrtdcoo_) then 
           ! In this case we can do a binary search. 
           nz = a%infoa(psb_nnz_)
-          call ibsrch(ip,irw,nz,a%ia1)
+          ip = psb_ibsrch(irw,nz,a%ia1)
           jp = ip
           ! expand [ip,jp] to contain all row entries.
           do 

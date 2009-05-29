@@ -41,7 +41,7 @@ subroutine psb_sprc_aply(prec,x,y,desc_data,info,trans, work)
   real(psb_spk_),intent(inout)      :: y(:)
   integer, intent(out)                :: info
   character(len=1), optional          :: trans
-  real(psb_spk_), optional, target  :: work(:)
+  real(psb_spk_), intent(inout), optional, target  :: work(:)
 
   ! Local variables
   character     :: trans_ 

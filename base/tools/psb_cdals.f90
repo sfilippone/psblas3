@@ -168,9 +168,9 @@ subroutine psb_cdals(m, n, parts, ictxt, desc, info)
     !
     ! Yes, we do have a large index space. Therefore we are 
     ! keeping on the local process a map of only the global 
-    ! indices ending up here; this map is stored in an AVL
-    ! tree during the build stage, so as to guarantee log-time
-    ! serch and insertion of new items. At assembly time it 
+    ! indices ending up here; this map is stored partly in
+    ! a hash of sorted lists, part in a hash table.
+    ! At assembly time 
     ! is transferred to a series of ordered linear lists, 
     ! hashed by the low order bits of the entries.
     !

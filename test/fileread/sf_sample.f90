@@ -172,8 +172,8 @@ program sf_sample
       call part_block(i,m_problem,np,ipv,nv)
       ivg(i) = ipv(1)
     enddo
-    call psb_matdist(aux_a, a, ivg, ictxt, &
-         & desc_a,b_col_glob,b_col,info,fmt=afmt)
+    call psb_matdist(aux_a, a, ictxt, &
+         & desc_a,b_col_glob,b_col,info,fmt=afmt,v=ivg)
   else if (ipart == 2) then 
     if (iam==psb_root_) then 
       write(*,'("Partition type: graph")')
@@ -184,12 +184,12 @@ program sf_sample
     call psb_barrier(ictxt)
     call distr_mtpart(psb_root_,ictxt)
     call getv_mtpart(ivg)
-    call psb_matdist(aux_a, a, ivg, ictxt, &
-         & desc_a,b_col_glob,b_col,info,fmt=afmt)
+    call psb_matdist(aux_a, a, ictxt, &
+         & desc_a,b_col_glob,b_col,info,fmt=afmt,v=ivg)
   else 
     if (iam==psb_root_) write(*,'("Partition type: block")')
-    call psb_matdist(aux_a, a, part_block, ictxt, &
-         & desc_a,b_col_glob,b_col,info,fmt=afmt)
+    call psb_matdist(aux_a, a,  ictxt, &
+         & desc_a,b_col_glob,b_col,info,fmt=afmt,parts=part_block)
   end if
 
   call psb_geall(x_col,desc_a,info)

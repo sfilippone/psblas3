@@ -52,7 +52,7 @@ subroutine psi_crea_bnd_elem(bndel,desc_a,info)
   implicit none
   
   integer, allocatable :: bndel(:)
-  type(psb_desc_type)  :: desc_a
+  type(psb_desc_type), intent(in)  :: desc_a
   integer, intent(out) :: info
 
   integer, allocatable :: work(:)
@@ -86,7 +86,7 @@ subroutine psi_crea_bnd_elem(bndel,desc_a,info)
   call psb_msort_unique(work(1:i),j)
 
   if (.true.) then 
-    if (j>0) then 
+    if (j>=0) then 
       call psb_realloc(j,bndel,info)
       if (info /= 0) then 
         call psb_errpush(4010,name,a_err='Allocate')

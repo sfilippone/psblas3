@@ -35,11 +35,11 @@ subroutine psb_sdiagsc_bld(a,desc_a,p,upd,info)
   use psb_prec_mod, psb_protect_name => psb_sdiagsc_bld
   Implicit None
 
-  type(psb_sspmat_type), target        :: a
-  type(psb_desc_type), intent(in)      :: desc_a
-  type(psb_sprec_type),intent(inout)   :: p
-  character, intent(in)                :: upd
-  integer, intent(out)                 :: info
+  type(psb_sspmat_type), intent(in), target :: a
+  type(psb_desc_type), intent(in)           :: desc_a
+  type(psb_sprec_type),intent(inout)        :: p
+  character, intent(in)                     :: upd
+  integer, intent(out)                      :: info
 
 
   ! Local scalars

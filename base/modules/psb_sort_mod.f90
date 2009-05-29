@@ -138,7 +138,65 @@ module psb_sort_mod
     module procedure psb_issrch
   end interface
 
+  interface psb_isaperm
+    module procedure psb_isaperm
+  end interface
+
 contains
+
+  logical function psb_isaperm(n,eip)               
+    implicit none
+
+    integer, intent(in) :: n                                                      
+    integer, intent(in) :: eip(n)
+    integer, allocatable :: ip(:)
+    integer i,j,m, info
+
+
+    psb_isaperm = .true.
+    if (n <= 0) return
+    allocate(ip(n), stat=info) 
+    if (info /= 0) return
+    !
+    !   sanity check first 
+    !     
+    do i=1, n 
+      ip(i) = eip(i)
+      if ((ip(i) < 1).or.(ip(i) > n)) then
+        write(0,*) 'Out of bounds in isaperm' ,ip(i), n
+        psb_isaperm = .false.
+        return
+      endif
+    enddo
+
+    !
+    ! now work through the cycles, by marking each successive item as negative.
+    ! no cycle should intersect with any other, hence the  >= 1 check. 
+    !
+    do m = 1, n    
+      i = ip(m) 
+      if (i < 0) then      
+        ip(m) = -i          
+      else if (i /= m) then 
+        j     = ip(i)               
+        ip(i) = -j          
+        i     = j
+        do while ((j >= 1).and.(j /= m))
+          j     = ip(i)               
+          ip(i) = -j 
+          i     = j               
+        enddo
+        ip(m) = iabs(ip(m))
+        if (j /= m) then 
+          psb_isaperm = .false.
+          goto 9999
+        endif
+      end if
+    enddo
+9999 continue 
+
+    return                                                                    
+  end function psb_isaperm
 
   function  psb_ibsrch(key,n,v) result(ipos)
     implicit none
@@ -156,7 +214,7 @@ contains
       if (key.eq.v(m))  then
         ipos = m 
         lb   = ub + 1
-      else if (key.lt.v(m))  then
+      else if (key < v(m))  then
         ub = m-1
       else 
         lb = m + 1

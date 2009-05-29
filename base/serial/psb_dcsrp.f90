@@ -64,14 +64,6 @@ subroutine psb_dcsrp(trans,iperm,a, info)
   end interface
 
 
-  interface isaperm
-
-    logical function isaperm(n,ip)
-      integer, intent(in)    :: n   
-      integer, intent(inout) :: ip(*)
-    end function isaperm
-  end interface
-
   !...parameters....
   type(psb_dspmat_type), intent(inout)  ::  a
   integer, intent(inout)                :: iperm(:), info
@@ -83,8 +75,8 @@ subroutine psb_dcsrp(trans,iperm,a, info)
   integer                               ::  n_row,err_act, int_err(5)
   character(len=20)                     ::  name, char_err
 
-  n_row   = psb_get_sp_nrows(a)
-  n_col   = psb_get_sp_ncols(a)
+  n_row   = psb_sp_get_nrows(a)
+  n_col   = psb_sp_get_ncols(a)
 
   if(psb_get_errstatus() /= 0) return 
   info=0
@@ -99,7 +91,7 @@ subroutine psb_dcsrp(trans,iperm,a, info)
     call psb_errpush(info,name,int_err)
     goto 9999
   else
-    if (.not.isaperm(ipsize,iperm)) then
+    if (.not.psb_isaperm(ipsize,iperm)) then
       info = 70
       int_err(1) = 1      
       call psb_errpush(info,name,int_err)

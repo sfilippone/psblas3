@@ -46,7 +46,7 @@ subroutine psb_cneigh(a,idx,neigh,n,info,lev)
   integer, intent(in)               :: idx ! the index whose neighbours we want to find
   integer, intent(out)              :: n, info   ! the number of neighbours and the info
   integer, allocatable              :: neigh(:) ! the neighbours
-  integer, optional                 :: lev ! level of neighbours to find
+  integer, optional, intent(in)     :: lev ! level of neighbours to find
 
   integer :: lev_, i, nl, ifl,ill,&
        &  n1, err_act, nn, nidx,ntl

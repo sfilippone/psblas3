@@ -68,9 +68,9 @@ subroutine psb_dtransp(a,b,c,fmt)
     write(0,*) 'transp: info from CSDP ',info
     return
   end if
-  call psb_transfer(b%ia1,itmp,info)
-  call psb_transfer(b%ia2,b%ia1,info)
-  call psb_transfer(itmp,b%ia2,info)
+  call psb_move_alloc(b%ia1,itmp,info)
+  call psb_move_alloc(b%ia2,b%ia1,info)
+  call psb_move_alloc(itmp,b%ia2,info)
 
   b%m = a%k 
   b%k = a%m
@@ -111,9 +111,9 @@ subroutine psb_dtransp1(a,c,fmt)
     write(0,*) 'transp: info from CSDP ',info
     return
   end if
-  call psb_transfer(a%ia1,itmp,info)
-  call psb_transfer(a%ia2,a%ia1,info)
-  call psb_transfer(itmp,a%ia2,info)
+  call psb_move_alloc(a%ia1,itmp,info)
+  call psb_move_alloc(a%ia2,a%ia1,info)
+  call psb_move_alloc(itmp,a%ia2,info)
 
   call psb_spcnv(a,info,afmt=fmt_)
 

@@ -40,8 +40,8 @@ subroutine psb_ztransp(a,b,c,fmt)
   use psb_serial_mod, psb_protect_name => psb_ztransp
   implicit none
 
-  type(psb_zspmat_type), intent(inout) :: a
-  type(psb_zspmat_type), intent(out)   :: b
+  type(psb_zspmat_type), intent(in)  :: a
+  type(psb_zspmat_type), intent(out) :: b
   integer, optional          :: c
   character(len=*), optional :: fmt
 
@@ -68,9 +68,9 @@ subroutine psb_ztransp(a,b,c,fmt)
     write(0,*) 'transp: info from CSDP ',info
     return
   end if
-  call psb_transfer(b%ia1,itmp,info)
-  call psb_transfer(b%ia2,b%ia1,info)
-  call psb_transfer(itmp,b%ia2,info)
+  call psb_move_alloc(b%ia1,itmp,info)
+  call psb_move_alloc(b%ia2,b%ia1,info)
+  call psb_move_alloc(itmp,b%ia2,info)
 
   b%m = a%k 
   b%k = a%m
@@ -111,9 +111,9 @@ subroutine psb_ztransp1(a,c,fmt)
     write(0,*) 'transp: info from CSDP ',info
     return
   end if
-  call psb_transfer(a%ia1,itmp,info)
-  call psb_transfer(a%ia2,a%ia1,info)
-  call psb_transfer(itmp,a%ia2,info)
+  call psb_move_alloc(a%ia1,itmp,info)
+  call psb_move_alloc(a%ia2,a%ia1,info)
+  call psb_move_alloc(itmp,a%ia2,info)
 
   call psb_spcnv(a,info,afmt=fmt_)
 

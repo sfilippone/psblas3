@@ -89,11 +89,11 @@ subroutine psb_cipcoo2csc(a,info,clshr)
   if(debug_level >= psb_debug_serial_) write(debug_unit,*) trim(name),&
        & ': out of fixcoo',nza,nc,size(a%ia2),size(iaux)
 
-  call psb_transfer(a%ia2,itemp,info)
-  if (info == 0) call psb_transfer(iaux,a%ia2,info)
+  call psb_move_alloc(a%ia2,itemp,info)
+  if (info == 0) call psb_move_alloc(iaux,a%ia2,info)
   if (info /= 0) then 
     info=4010
-    call psb_errpush(info,name,a_err='psb_transfer')
+    call psb_errpush(info,name,a_err='psb_move_alloc')
     goto 9999      
   end if
 

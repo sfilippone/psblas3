@@ -22,8 +22,6 @@ dnl SEE  : --module-path --include-path
 
 dnl NOTE : There is no cross compilation support.
 
-dnl NOTE : missing ifort and kl* library handling..
-dnl NOTE : odd configurations like ifc + gcc still await in the mist of the unknown
 
 
 ###############################################################################
@@ -38,11 +36,11 @@ dnl NOTE : odd configurations like ifc + gcc still await in the mist of the unkn
 ###############################################################################
 
 # NOTE: the literal for version (the second argument to AC_INIT should be a literal!)
-AC_INIT([PSBLAS],2.2, salvatore.filippone@uniroma2.it)
+AC_INIT([PSBLAS],3.0, salvatore.filippone@uniroma2.it)
 
 # VERSION is the file containing the PSBLAS version code
 # FIXME
-psblas_cv_version="`cat VERSION`"
+psblas_cv_version="3.0"
 
 # A sample source file
 AC_CONFIG_SRCDIR([base/modules/psb_base_mod.f90])
@@ -58,11 +56,8 @@ AC_MSG_NOTICE([
 	documentation, you can make your own by hand for your needs.
 
 	Be sure to specify the library paths of your interest. Examples:
-        ./configure CFLAGS=-L/some/directory/LIB         <- will force CFLAGS
-        CFLAGS=-L/some/directory/LIB ./configure         <- will force CFLAGS
-        ./configure --with-cflags=-L/some/directory/LIB  <- will append to CFLAGS
+        ./configure --with-libs=-L/some/directory/LIB    <- will append to LIBS
         FC=mpif90 F77=$FC CC=mpicc ./configure           <- will force FC,CC,F77
-        FLINK=gcc FLINK=gcc ./configure                  <- will force FLINK,F90LINK
 
 	See ./configure --help=short fore more info.
 --------------------------------------------------------------------------------
@@ -97,9 +92,9 @@ AC_MSG_RESULT([$INSTALL_DIR $INSTALL_INCLUDEDIR $INSTALL_LIBDIR $INSTALL_DOCSDIR
 
 # Note that the following line won't save from troubles.
 # AC_PROG_FC([mpxlf95 mpxlf90 mpxlf pgf95 pgf90 mpif95 mpif90 gfortran f95 f90 ifc])
-AC_PROG_FC([xlf95 xlf90 xlf pgf95 pgf90 ifort ifc  gfortran])
+AC_PROG_FC([xlf95 xlf90 xlf pgf95 pgf90 ifort ifc  nagfor gfortran])
 #AC_PROG_FC
-AC_PROG_F77([xlf pgf77 ifort ifc  gfortran])
+AC_PROG_F77([xlf pgf77 ifort ifc nagfor gfortran])
 AC_PROG_CC([xlc pgcc icc gcc ])
 dnl AC_PROG_CXX
 
@@ -125,14 +120,14 @@ fi
 AC_LANG([C])
 if test "X$MPICC" = "X" ; then
     # This is our MPICC compiler preference: it will override ACX_MPI's first try.
-    AC_CHECK_PROGS([MPICC],[mpxlc mpcc pgcc mpicc])
+    AC_CHECK_PROGS([MPICC],[mpxlc mpcc mpicc])
 fi
 ACX_MPI([], [AC_MSG_ERROR([[Cannot find any suitable MPI implementation for C]])])
 
 AC_LANG(Fortran 77)
 if test "X$MPIF77" = "X" ; then
     # This is our MPIFC compiler preference: it will override ACX_MPI's first try.
-    AC_CHECK_PROGS([MPIF77],[mpxlf mpif77 pgf77 mpf77 ifc])
+    AC_CHECK_PROGS([MPIF77],[mpxlf mpf77 mpif77])
 fi
 ACX_MPI([], [AC_MSG_ERROR([[Cannot find any suitable MPI implementation for Fortran 77]])])
 
@@ -140,7 +135,7 @@ AC_LANG([Fortran])
 
 if test "X$MPIFC" = "X" ; then
     # This is our MPIFC compiler preference: it will override ACX_MPI's first try.
-    AC_CHECK_PROGS([MPIFC],[mpxlf95 mpxlf90 mpif95 mpif90 pgf95 pg90 mpf95 mpf90 ifc ])
+    AC_CHECK_PROGS([MPIFC],[mpxlf95 mpxlf90 mpf95 mpf90  mpif95 mpif90  ])
 fi
 
 ACX_MPI([], [AC_MSG_ERROR([[Cannot find any suitable MPI implementation for Fortran]])])
@@ -168,9 +163,9 @@ fi
 ###############################################################################
 
 dnl NOTE : no spaces before the comma, and no brackets before the second argument!
-PAC_ARG_WITH_FLAGS(ccflags,CCFLAGS)
-PAC_ARG_WITH_FLAGS(cflags,CFLAGS)
-PAC_ARG_WITH_FLAGS(fflags,FFLAGS)
+PAC_ARG_WITH_FLAGS(ccopt,CCOPT)
+PAC_ARG_WITH_FLAGS(fcopt,FCOPT)
+PAC_ARG_WITH_FLAGS(f90copt,F90COPT)
 #PAC_ARG_WITH_FLAGS(ldflags,LDFLAGS)
 PAC_ARG_WITH_LIBS
 PAC_ARG_WITH_FLAGS(clibs,CLIBS)
@@ -213,10 +208,9 @@ PAC_CHECK_HAVE_GFORTRAN(
 # Test for TR 15581, aka allocatables extensions.
 #
 PAC_FORTRAN_TEST_TR15581( 
-	[AC_MSG_RESULT([yes.])],
-        [AC_MSG_ERROR([no.
- Sorry, cannot build PSBLAS without support for TR15581. 
- Please get a Fortran compiler that supports it, e.g. GNU Fortran 4.2.])]
+	[],
+        [AC_MSG_ERROR([Sorry, cannot build PSBLAS without support for TR15581. 
+ Please get a Fortran compiler that supports it, e.g. GNU Fortran 4.3.])]
 )
 
 if test x"$psblas_cv_fc" == "x" ; then
@@ -225,29 +219,40 @@ if test x"$psblas_cv_fc" == "x" ; then
 	# Some configurations of the XLF want "-WF," prepended to -D.. flags.
 	# TODO : discover the exact conditions when the usage of -WF is needed.
 	psblas_cv_define_prepend="-WF,"
- # Note : there coule be problems with old xlf compiler versions ( <10.1 )
+        if eval "$MPIFC -qversion 2>&1 | grep -e\"Version: 10\.\" 2>/dev/null"; then
+        	FDEFINES="$psblas_cv_define_prepend-DXLF_10 $FDEFINES"		  
+        fi
+
+ # Note : there could be problems with old xlf compiler versions ( <10.1 )
  # since (as far as it is known to us) -WF, is not used in earlier versions.
  # More problems could be undocumented yet.
- else
-  # Sun compiler detection
-  if eval "$MPIFC -V  2>&1 | grep Sun 2>/dev/null" ; then
-	psblas_cv_fc="sun"
-  else
+ elif eval "$MPIFC -V  2>&1 | grep Sun 2>/dev/null" ; then
+   # Sun compiler detection
+  
+   psblas_cv_fc="sun"
+ elif eval "$MPIFC -V  2>&1 | grep Portland 2>/dev/null" ; then
    # Portland group compiler detection
-   if eval "$MPIFC -V  2>&1 | grep Portland 2>/dev/null" ; then
-	psblas_cv_fc="pg"
-   else
-    # Intel compiler identification
-    if eval "$MPIFC -V 2>&1 | grep Intel.*Fortran.*Compiler 2>/dev/null" ; then
-     psblas_cv_fc="ifc"
-    else
-     psblas_cv_fc=""
-     # unsupported MPI Fortran compiler
-     AC_MSG_ERROR([[Unknown compiler ! Make sure your Fortran compiler is specified as compatible in the documentation!]])
-    fi
-   fi
-  fi
+   
+   psblas_cv_fc="pg"
+ elif eval "$MPIFC -V 2>&1 | grep Intel.*Fortran.*Compiler 2>/dev/null" ; then
+   # Intel compiler identification
+    
+   psblas_cv_fc="ifc"
+ elif eval "$MPIFC -v  2>&1 | grep NAG 2>/dev/null" ; then
+   psblas_cv_fc="nag"
+   FC="$MPIFC"
+   F77="$MPIFC"
+ else
+   psblas_cv_fc=""
+  # unsupported MPI Fortran compiler
+     AC_MSG_NOTICE([[Unknown Fortran compiler, proceeding with fingers crossed !]])
  fi
+fi
+if test "X$psblas_cv_fc" == "Xgcc" ; then
+PAC_HAVE_MODERN_GFORTRAN(
+	[],
+        [AC_MSG_ERROR([Sorry, we require GNU Fortran 4.3 or later.])]
+)
 fi
 # TODO : SEE _AC_PROG_FC_V
 # TODO : AC_MSG_ERROR(see "$ac_cv_prog_FC_fc")
@@ -266,7 +271,14 @@ if test X"$ac_cv_sizeof_void_p" == X"8" ; then
   CDEFINES="-DPtr64Bits $CDEFINES"
 fi
 AC_LANG([Fortran])
+if test "X$psblas_cv_fc" == X"pg" ; then
+   save_FC=$FC
+   FC=$F77
+fi
 __AC_FC_NAME_MANGLING
+if test "X$psblas_cv_fc" == X"pg" ; then
+   FC=$save_FC
+fi
 AC_LANG([C])
 dnl AC_MSG_NOTICE([Fortran name mangling: $ac_cv_fc_mangling])
 [pac_fc_case=${ac_cv_fc_mangling%%,*}]
@@ -321,19 +333,13 @@ AC_MSG_RESULT([ $pac_f_c_names ])
 # 			Make.inc generation logic
 ###############################################################################
 
-# Note : This script is sensitive to FFLAGS, FCFLAGS, CFLAGS variables.
-# Note : We cannot be sure whether ./configure test programs will use these *FLAGS.
 
-dnl  Note: CFLAGS == '' is a rare condition, but we provide mechanism, not policy.
-dnl  So we prefer:
-
-if test "X$CFLAGS" == "X" ; then
-dnl over
-dnl if true ; then
+if test "X$CCOPT" == "X" ; then
  if test "X$psblas_cv_fc" == "Xgcc" ; then
- # note that no space should be placed around the equality symbol in assignations
+ # note that no space should be placed around the equality symbol in assignements
  # Note : 'native' is valid _only_ on GCC/x86  (32/64 bits)
    CCOPT="-O3  $CCOPT"
+
  elif test "X$psblas_cv_fc" == X"xlf" ; then
    # XL compiler : consider using -qarch=auto
      CCOPT="-O3 -qarch=auto $CCOPT"
@@ -348,15 +354,16 @@ dnl if true ; then
    # other compilers ..
      CCOPT="-fast $CCOPT"
   # NOTE : PG & Sun use -fast instead -O3
+ elif test "X$psblas_cv_fc" == X"nag" ; then
+   # using GCC in conjunction with NAG.
+     CCOPT="-O2"
  else 
      CCOPT="-O2 $CCOPT"
  fi
-else
- CCOPT="${CFLAGS}"
 fi
 CFLAGS="${CCOPT}"
 
-if test "X$FFLAGS" == "X" ; then
+if test "X$FCOPT" == "X" ; then
  if test "X$psblas_cv_fc" == "Xgcc" ; then
  # note that no space should be placed around the equality symbol in assignations
  # Note : 'native' is valid _only_ on GCC/x86  (32/64 bits)
@@ -374,16 +381,21 @@ if test "X$FFLAGS" == "X" ; then
  elif test "X$psblas_cv_fc" == X"sun" ; then
    # other compilers ..
      FCOPT="-fast $FCOPT"
+ elif test "X$psblas_cv_fc" == X"nag" ; then
+   # NAG  compiler ..
+     FCOPT="-O2 "
   # NOTE : PG & Sun use -fast instead -O3
  else 
      FCOPT="-O2 $FCOPT"
  fi
-else
- FCOPT="${FFLAGS}"
+fi
+if test "X$psblas_cv_fc" == X"nag" ; then
+   # Add needed options 
+   FCOPT="$FCOPT -mismatch -dcfuns"
 fi
 FFLAGS="${FCOPT}"
 
-if test "X$FCFLAGS" == "X" ; then
+if test "X$F90COPT" == "X" ; then
  if test "X$psblas_cv_fc" == "Xgcc" ; then
  # note that no space should be placed around the equality symbol in assignations
  # Note : 'native' is valid _only_ on GCC/x86  (32/64 bits)
@@ -398,14 +410,22 @@ if test "X$FCFLAGS" == "X" ; then
    # other compilers ..
      F90COPT="-fast $F90COPT"
  elif test "X$psblas_cv_fc" == X"sun" ; then
-   # other compilers ..
      F90COPT="-fast $F90COPT"
-  # NOTE : PG & Sun use -fast instead -O3
+ elif test "X$psblas_cv_fc" == X"nag" ; then
+   # NAG compiler
+     F90COPT="-O2"
  else 
+   # other compilers ..
      F90COPT="-O2 $F90COPT"
  fi
 else
- F90COPT="${FCFLAGS}"
+ echo "Found FCFLAGS $F90COPT"
+  #F90COPT="${FCFLAGS}"
+fi
+if test "X$psblas_cv_fc" == X"nag" ; then
+   # Add needed options 
+     F90COPT="$F90COPT -mismatch -dcfuns"
+     EXTRA_OPT="-mismatch_all"
 fi
 FCFLAGS="${F90COPT}"
 
@@ -414,13 +434,12 @@ FCFLAGS="${F90COPT}"
 ##############################################################################
 # Compilers variables selection 
 ##############################################################################
-if true ; then
- if test "X$psblas_cv_fc" == X"xlf" ; then
+if test "X$psblas_cv_fc" == X"xlf" ; then
   # WARNING : this is EVIL : specifying a pathname prefixed compiler will be ignored!
   # But this is necessary since :
   #  - if called from some script, xlf could behave strangely
   #  - it is not said that mpxlf95 gets chosen by the configure script.
-    F90="xlf95   -qsuffix=f=f90:cpp=F90"
+  F90="xlf95   -qsuffix=f=f90:cpp=F90"
  #  F90="xlf95"
   MPF90="mpxlf95 -qsuffix=f=f90:cpp=F90"
 #    FC="xlf"
@@ -439,7 +458,7 @@ if true ; then
  #MPFCC="mpxlc"
   # Note : -qfixed should be not specified in the environment FFLAGS or things will break.
   #        This fact should be documented somewhere.
- else 
+else 
   # We really think about the GCC here but this is our idea for other compilers, too.
   # If the user wishes to, she should specify MPICC, MPIF77 after ./configure.
   # Note: this behavious should be documented.
@@ -449,8 +468,8 @@ if true ; then
   MPF77=${MPIFC}
      CC=${CC}
    MPCC=${MPICC}
- fi
 fi
+
 
 ##############################################################################
 # Choice of our compilers, needed by Make.inc
@@ -630,6 +649,7 @@ AC_SUBST(MPF77)
 AC_SUBST(MPCC)
 AC_SUBST(FCOPT)
 AC_SUBST(CCOPT)
+AC_SUBST(EXTRA_OPT)
 AC_SUBST(FIFLAG)
 AC_SUBST(FMFLAG)
 AC_SUBST(MODEXT)
@@ -667,7 +687,7 @@ $(.mod).o:
 	
 
 %.o: %.c
-	$(CC) $(F90COPT) $(CINCLUDES) $(CDEFINES)  -c $<
+	$(CC) $(CCOPT) $(CINCLUDES) $(CDEFINES)  -c $<
 %.o: %.f
 	$(FC) $(FCOPT) $(FINCLUDES)  -c $<
 %$(.mod): %.f
@@ -675,10 +695,6 @@ $(.mod).o:
 %.o: %.f90
 	$(F90) $(F90COPT) $(FINCLUDES)  -c $<
 %$(.mod): %.f90
-	$(F90) $(F90COPT) $(FINCLUDES)  -c $<
-%.o: %.f03
-	$(F90) $(F90COPT) $(FINCLUDES)  -c $<
-%$(.mod): %.f03
 	$(F90) $(F90COPT) $(FINCLUDES)  -c $<
 %.o: %.F
 	$(FC) $(FCOPT) $(FINCLUDES) $(FDEFINES)  -c $<
@@ -688,10 +704,15 @@ $(.mod).o:
 	$(F90) $(F90COPT) $(FINCLUDES) $(FDEFINES)  -c $<
 %$(.mod): %.F90
 	$(F90) $(F90COPT) $(FINCLUDES) $(FDEFINES) -c $<
+
+%.o: %.f03
+	$(F90) $(F90COPT) $(FINCLUDES)  -c $<
+%$(.mod): %.f03
+	$(F90) $(F90COPT) $(FINCLUDES)  -c $<
 %.o: %.F03
-	$(F03) $(F90COPT) $(FINCLUDES) $(FDEFINES)  -c $<
+	$(F90) $(F90COPT) $(FINCLUDES) $(FDEFINES)  -c $<
 %$(.mod): %.F03
-	$(F03) $(F90COPT) $(FINCLUDES) $(FDEFINES) -c $<'
+	$(F90) $(F90COPT) $(FINCLUDES) $(FDEFINES) -c $<'
 
 else
 
@@ -714,10 +735,6 @@ $(.mod).o:
 	$(F90) $(F90COPT) $(FINCLUDES) -c $<
 .f90.o:
 	$(F90) $(F90COPT) $(FINCLUDES) -c $<
-.f03$(.mod):
-	$(F03) $(F90COPT) $(FINCLUDES) -c $<
-.f03.o:
-	$(F03) $(F90COPT) $(FINCLUDES) -c $<
 .F.o:
 	$(FC)  $(FCOPT)   $(FINCLUDES) $(FDEFINES) -c $<
 .F$(.mod):
@@ -726,10 +743,14 @@ $(.mod).o:
 	$(F90) $(F90COPT) $(FINCLUDES) $(FDEFINES) -c $<
 .F90$(.mod):
 	$(F90) $(F90COPT) $(FINCLUDES) $(FDEFINES) -c $<
+.f03$(.mod):
+	$(F90) $(F90COPT) $(FINCLUDES) -c $<
+.f03.o:
+	$(F90) $(F90COPT) $(FINCLUDES) -c $<
 .F03.o:
-	$(F03) $(F90COPT) $(FINCLUDES) $(FDEFINES) -c $<
+	$(F90) $(F90COPT) $(FINCLUDES) $(FDEFINES) -c $<
 .F03$(.mod):
-	$(F03) $(F90COPT) $(FINCLUDES) $(FDEFINES) -c $<'
+	$(F90) $(F90COPT) $(FINCLUDES) $(FDEFINES) -c $<'
 
 fi
 AC_SUBST(PSBLASRULES)
@@ -753,20 +774,20 @@ AC_MSG_NOTICE([
 
    	MPF90                 : ${MPF90}
 	MPF77                 : ${MPF77}
-	MPICC                 : ${MPICC}
+	MPCC                  : ${MPICC}
 dnl	F90LINK               : ${F90LINK}
 	FLINK                 : ${FLINK}
 
 	FDEFINES              : ${FDEFINES}
 	CDEFINES              : ${CDEFINES}
-	CFLAGS                : ${CFLAGS}
-	FFLAGS                : ${FFLAGS}
-	FCFLAGS               : ${FCFLAGS}
+dnl	CFLAGS                : ${CFLAGS}
+dnl	FFLAGS                : ${FFLAGS}
+dnl	FCFLAGS               : ${FCFLAGS}
 	MODEXT                : ${MODEXT}
 	FMFLAG                : ${FMFLAG}
-dnl	F90COPT               : ${F90COPT}
-dnl	FCOPT                 : ${FCOPT}
-dnl	CCOPT                 : ${CCOPT}
+   	F90COPT               : ${F90COPT}
+   	FCOPT                 : ${FCOPT}
+   	CCOPT                 : ${CCOPT}
 
 dnl	ESSL/PESSL            : ${psblas_cv_have_essl} / ${psblas_cv_have_pessl}
 

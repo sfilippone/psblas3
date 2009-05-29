@@ -136,7 +136,7 @@ rm -f conftest*])
 
 
 
-dnl @synopsis PAC_HAVE_MODERN_GCC( [ACTION-IF-FOUND [, ACTION-IF-NOT-FOUND]])
+dnl @synopsis PAC_HAVE_MODERN_GFORTRAN( [ACTION-IF-FOUND [, ACTION-IF-NOT-FOUND]])
 dnl
 dnl Will check if the GNU fortran version is suitable for PSBLAS.
 dnl If yes, will execute ACTION-IF-FOUND. Otherwise, ACTION-IF-NOT-FOUND.
@@ -145,16 +145,16 @@ dnl Note : Will use MPIFC; if unset, will use '$FC'.
 dnl 
 dnl @author Michele Martone <michele.martone@uniroma2.it>
 dnl
-AC_DEFUN(PAC_HAVE_MODERN_GCC,
+AC_DEFUN(PAC_HAVE_MODERN_GFORTRAN,
 ac_exeext=''
 ac_ext='F'
 ac_link='${MPIFC-$FC} -o conftest${ac_exeext} $FFLAGS $LDFLAGS conftest.$ac_ext $LIBS 1>&5'
 dnl Warning : square brackets are EVIL!
-[
+[AC_MSG_CHECKING([GNU Fortran version at least 4.3])
 cat > conftest.$ac_ext <<EOF
            program main
-#if ( __GNUC__ >= 4 && __GNUC_MINOR__ >= 2 ) || ( __GNUC__ > 4 )
-              print *, "ciao"
+#if ( __GNUC__ >= 4 && __GNUC_MINOR__ >= 3 ) || ( __GNUC__ > 4 )
+              print *, "ok"
 #else
         this program will fail
 #endif
@@ -162,9 +162,11 @@ cat > conftest.$ac_ext <<EOF
 
 EOF
 if AC_TRY_EVAL(ac_link) && test -s conftest${ac_exeext}; then
+  AC_MSG_RESULT([ yes.])
   ifelse([$1], , :, [rm -rf conftest*
   $1])
 else
+ AC_MSG_RESULT([ no.])
   echo "configure: failed program was:" >&AC_FD_CC
   cat conftest.$ac_ext >&AC_FD_CC
 ifelse([$2], , , [  rm -rf conftest*

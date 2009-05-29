@@ -94,23 +94,6 @@ module psb_psblas_mod
     end function psb_zdot
   end interface
 
-  interface psb_gexdot
-    function psb_sxdotv(x, y, desc_a,info) 
-      use psb_descriptor_type
-      real(psb_dpk_)                   :: psb_sxdotv
-      real(psb_spk_), intent(in)       :: x(:), y(:)
-      type(psb_desc_type), intent(in)    :: desc_a
-      integer, intent(out)               :: info
-    end function psb_sxdotv
-    function psb_sxdot(x, y, desc_a, info, jx, jy) 
-      use psb_descriptor_type
-      real(psb_dpk_)                   :: psb_sxdot
-      real(psb_spk_), intent(in)       :: x(:,:), y(:,:)
-      type(psb_desc_type), intent(in)    :: desc_a
-      integer, optional, intent(in)      :: jx, jy
-      integer, intent(out)               :: info
-    end function psb_sxdot
-  end interface
 
   interface psb_gedots
     subroutine  psb_sdotvs(res,x, y, desc_a, info) 

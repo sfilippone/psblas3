@@ -1,6 +1,381 @@
+2008/09/18: Defined psb_sizeof to be integer(8). Added support
+	    into psb_sum, psb_amx and other reductions for long int
+	    scalars. 
+	
+2008/09/16: Implemented new scheme for index conversion.
+	    Changed cdall with an option to suppress global checks. 
+	
+2008/09/02: Improved psi_fnd_owner performace.
+	
+2008/09/01: Better timings in the pargen test cases.
+
+2008/08/28: Changed CDALL in case of VL to handle overlapped indices. 	
+	
+2008/07/28: New sorting/reordering modules.	
+	
+2008/07/24: Addded HTML version of user's guide.	
+	
+2008/07/22: Fixed I/O for Harwell-Boeing and Matrix Market examples
+	
+2008/05/27: Merged single precision branch.
+	
+2008/04/28: Fixed trimming space in sparse matrix conversion.
+	    Fixed performance issue in cdins.
+	
+2008/03/25: Fix performance bug in psi_idx_ins_cnv. Changed names of 
+            some internal components of preconditioner data structure.
+
+=======
+2009/01/27: Renamed psb_transfer into psb_move_alloc. 	
+2009/01/08: Require GNU Fortran 4.3 or later.	
+2008/11/04: Repackaged and streamlined linear maps. 
+	
+2008/10/16: Fixed internal structure of psb_inter_desc. 	
+	
+2008/09/23: Fix borderline cases where one process does not own any 
+	    indices from the global space.
+	
+2008/09/18: Defined psb_sizeof to be integer(8). Added support
+	    into psb_sum, psb_amx and other reductions for long int
+	    scalars. 
+	
+2008/09/16: Implemented new scheme for index conversion.
+	    Changed cdall with an option to suppress global checks. 
+	
+2008/09/02: Improved psi_fnd_owner performace.
+	
+2008/09/01: Better timings in the pargen test cases.
+
+2008/08/28: Changed CDALL in case of VL to handle overlapped indices. 	
+	
+2008/07/28: New sorting/reordering modules.	
+	
+2008/07/24: Addded HTML version of user's guide.	
+	
+2008/07/22: Fixed I/O for Harwell-Boeing and Matrix Market examples
+	
+2008/05/27: Merged single precision branch.
+	
+2008/04/28: Fixed trimming space in sparse matrix conversion.
+	    Fixed performance issue in cdins.
+	
+2008/03/25: Fix performance bug in psi_idx_ins_cnv. Changed names of 
+            some internal components of preconditioner data structure.
+
+>>>>>>> .merge-dx.r3587
+2008/03/27: Merged the experimental branch for implementing the AVL tree
+            data structure in Fortran instead of relying on C and passing
+	    functions around to perform comparisons. There seems to be
+	    some performance advantage, although not very large.
+	
+2008/03/25: Merged in changes from the 2.2-maint branch re: error
+	    messages, performance bug in psi_idx_ins_cnv.
+	
+2008/02/26: New psb_linmap_init, psb_linmap_ins, psb_linmap_asb for a
+	    general linear operator mapping among index spaces.
+	
+2008/02/18: Branched off for  Version 2.2
+
+2008/02/08: Merged changes from intermesh branch: we now have an
+	    inter_desc_type object. Currently we only implement the
+	    version needed for aggregation algorithms in the algebraic
+	    multigrid preconditioners, but we'll define more general
+	    (linear) maps soon enough. 
+
+2008/01/25: Various changes to variables controlling conditional
+	    compilation on the Fortran side: removed NETLIB_BLACS, now
+	    HAVE_METIS HAVE_ESSL_BLACS HAVE_KSENDID.
+	    Files impacted: Make.inc.XXX, base/modules/psb_penv_mod,
+	    util/psb_metispart_mod
+	
+	
+2008/01/18: Centralized convergence checks. Still partial for RGMRES. 	
+	
+2008/01/14: Merged changes for handling of transpose vs. overlap.
+	
+2008/01/10: Changed name of GMRESR into RGMRES for consistency.
+	
+2007/12/21: Merged in debug infrastructure, internal and html docs. 
+	
+2007/11/14: Fix INTENT(IN) on X vector in preconditioner routines.
+	
+2007/10/15: Repackaged the sorting routines in a submodule of their
+	    own, adding some heap management and heapsort utilities for the
+	    benefit of the multilevel preconditioners. 
+
+2007/09/28: Moved gelp and csrp to serial. Changed interface to
+    	    sphalo: the new one makes more sense.
+            Updated documentation. 
+
+2007/09/14: Second round of serial changes: merged into trunk, fixed
+	    JAD regeneration and srch_upd now works.           
+
+2007/09/10: First round of serial changes: implemented serial
+	    psb_spcnv unifying multiple functionalities.
+
+2007/09/04: Implemented RGMRES for complex data.
+
+2007/06/04: Fixed implementation of fctint and coins: assume size
+	    arrays caused troubles on some compilers. Documentation of
+	    set_large_threshold. 
+
+2007/05/22: Defined psb_precinit. 
+
+2007/05/15: Defined psb_sizeof.
+
+2007/05/15: Merged in various fixes coming from tests on SP5 and
+	    HP-Itanium.	 
+
+2007/04/08: Changed the implementation of psb_sp_getrow & friends.  
+
+2007/03/27: Merged in changes for enabling compilation on SUN.
+
+2007/02/22: Fixed various misalignments between real and complex.
+	    Defined new psb_sp_clip routines.
+	    Fixed psb_rwextd.
+	    Changed the USE statements, minimizing size of modules and
+	    maximizing consistency checks. 
+
+2007/02/01: Merged serial version: we provide a minimal fake mpi to
+	    allow compiling and running without mpi and blacs. Only
+	    tested with gnu42 so far.
+
+2007/01/23: Defined new field ext_index in desc_type, and
+	    fixed long standing inconsistency in usage of overlap for
+	    AS preconditioners. Modified halo to accept selector for
+	    halo_index vs. ext_index.
+
+2007/01/11: Migrated repository to SVN. 
+
+2007/01/11: MLD2P4 has been moved to the new org. Now tackling the 
+            test dirs.
+
+2007/01/09: First try at reorganizing directories. Subdir MLD2P4 still
+	    to be fixed. Documentation still to be updated. 
+
+2006/12/11: Documented options in glob_to_loc.
+
+2006/12/06: Fixed raw aggregation.
+
+2006/12/05: Taken out extra interfaces; inserted use modules with ONLY
+	    clauses where appropriate.
+
+2006/11/30: Fixed a bug in raw aggregation. Note: raw aggregation
+	    gives different results from smoothed with omega=0.0,
+	    because in the latter we have explicitly stored zero
+	    coefficients that would be absent in the first, thus
+	    generating different ILU factorizations.
+
+2006/11/28: Merged the mods for descriptors of large index spaces to
+	    avoid having the GLOB_TO_LOC array. Took the chance to
+	    reorganize the descriptor build routines and define some
+	    access functions for descriptor features and entries, so
+	    as not to use the descriptor components directly. Tested
+	    with AS, 2- and 3- level Post smoothers. 
+
+2006/11/09: The allocatable version works, but under gcc42 there is a
+	    compiler bug when using -fbounds-check. 
+
+2006/11/08: Merged the allocatable version; hope everything works!
+
+2006/11/08: Branched version psblas2-2-0-maint, and defined tag
+	    2.0.2.6 
+
+2006/11/02: Done in the allocatable branch: repackaging of cdasb and
+	    friends, taking out AVL trees where they were not
+	    absolutely needed, and new dcsrmv routine. 
+
+2006/11/01: Merged changes in the handling of data exchange.
+
+2006/10/03: Merged in the multilevel preconditioner stuff. This is
+	    still experimental, especially the interfaces are not
+	    stable yet. 
+
+2006/10/03: Declared version 2.0.2.5 for reference purposes.
+
+2006/10/03: Fixed a bunch of minor bugs, incuding the sorting routines
+	    imsr  and imsrx. Added a default call to blacs_exit inside
+	    psb_exit fixed a bad termination in test/pargen/ppde90.f90
+
+2006/09/02: Declared version 2.0.2, after having fixed a lot of
+	    details in the environment routines.
+
+2006/07/25: Defined a new psb_wtime function. Modified precset to
+	    have a non-optional INFO dummy argument.
+
+2006/07/06: Fixed bug in swaptran. Added psb_krylov generic interface.
+
+2006/07/04: Ooops, the GetRow mod in SMMP is a performance hit.
+	    Need to investigate further. 
+
+2006/06/21: Bug fix in hb_read when dealing with symmetric matrices. 
+
+2006/06/20: Rewritten symbmm and numbmm from SMMP to be intependent of
+	    CSR  storage by using GetRow. Still need to test for
+	    performance. 
+
+2006/06/16: Defined GetRow. This way we may close the mat objects.
+	    Next we will rewrite SMMP to only make use of GetRow,
+	    not to rely on CSR storage format. 
+
+2006/05/29: Added BLACS-like routines for data communication,
+	    broadcasts, reductions, send/receive.
+
+2006/05/25: Added environment management routines.
+
+2006/05/03: Bug fixes, plus some change in the internals for SPINS,
+	    preparing hooks for insertion with local numbering.
+
+2006/04/24: Minor changes to the interface of dense tools routines,
+	    trying to achieve a uniform look & feel.
+	    Rewritten documentation; it is now reasonable, though not
+	    perfect, except for the preconditioner routines. 
+	    We can now declare RC3. 
+
+2006/04/21: A bunch of fixes related to various matrix initialization 
+	    problems that were revealed while testing on SP5.         
+
+2006/04/18: Changed interface to spasb and csdp: better handling of 
+	    regeneration. To be tested further for sophisticated uses.
+
+2006/03/31: We declare RC2 now. Improved I/O routines in test/Fileread.
+
+2006/03/24: We have a complex version now, working (not necessarily bug free). 
+
+2006/03/15: Started move to complex version.  
+
+2006/03/01: Complete restructure of PREC section. 
+
+2006/02/01: New naming scheme.
+
+2006/01/01: New multilevel preconditioning wih smoothed aggregation.
+
+2005/09   : Now enabled UMFPACK complete factorization as basis for AS. 
+
+2005/05/04: Now enabled SuperLU complete factorization as basis for AS. 
+
+2005/04/29: First version with decoupled 2-level.
+
+2005/04/06: Started work on decoupling the preconditioner aggregation
+	    for 2-level from the main factorization. 
+
+2005/03/30: First version of new DSC/SP allocate/insert/assembly
+	    routines.  
+2005/03/17: First version of RGMRES. To be refined. 
+
+2005/03/08: dSwapTran aligned with dSwapData. Taken out SwapOverlap.
+	    also moved onto iSwapX.
+
+2005/03/07: dSwapData rewritten to achieve: 1. better performance;
+	    2. more flexible functionality. It is now possible to
+	    avoid SwapOvrlap entirely, relying on just SwapData.
+	    SwapTran is still alive, since it reads the descriptors in
+	    "transpose" mode. Also, added work areas to preconditioner
+	    routine, to avoid excessive allocation in the halo/overlap
+	    exchange.
+
+2005/03/04: Had to put in a workaround for a gfortran bug:
+	    tolower/toupper cannot be functions. 
+
+2005/02/09: Explicit storage choice for the smoother. This seems
+            to be changing a little bit the actual preconditioner. 
+	    To be evaluated further.
+
+2005/02/08: Renamed F90_PSPREC to PSB_PRCAPLY and Preconditioner to   
+	    PSB_PRCBLD. Changed the way PRCAPLY decides what to do.
+	    Still needs a PSB_PRCSET to be called before PRCBLD.
+
+2005/01/28: Started moving functionalities to a SERIAL F90 layer. Also
+	    defined a new COMM layer, to enable implementing SPMM
+	    directly in F90.
+
+2005/01/20: Finally taken out a direct call to the F77 DCSDP from
+	    SPASB. 
+
+2005/01/18: After much work, we now have 2-level Additive Schwarz
+	    prototype implemented and working. We now start a major
+	    code cleanup that will take some time. Mainly we want to
+	    move a lot of the serial F77 functionality into  a new F95
+	    serial layer, to simplify the parallel F95 code. 
+
+2004/11/25: Following the introduction of Additive Shwarz and
+	    variants, we have now renamed DECOMP_ and friends as
+	    DESC_; this makes things more readable. Sooner or later
+	    we're going to merge this into mainline, but this version
+	    is still very much in a state of flux.
+
+2004/07/18: For use with gfortran we need to declare the pointer
+	    components  with NULL() initialization. This rules out
+	    VAST and PGI.
+
+2004/07/15: First development version with gfortran from the current 
+	    snapshot of gcc 3.5.0. 
+	    It is now possible in PSI_dSwapData to opt for
+	    SEND|RECEIVE|SYNC data exchange; plan is to extend to all
+	    data exchange functions, plus making it available as an
+	    option from the F90 level.
+  
+2004/07/06: Merged in a lot of stuff coming mainly from the ASM
+	    development; full merge will have to wait  a little more.
+	    Among other things:
+	    use of psimod
+	    new choice parms for overlap
+	    new data exchange for swapdata, to be extended.
+	    multicolumn CSMM.
+	    use psrealloc
+	    new format for marking a matrix as suitable for update. 
+	    
+
+2003/12/09: Changed DSALLOC and DSASB to make sure whenever a dense
+	    matrix is allocated it is also zeroed out. 
+
+2003/10/13: Added call to BLACS_SET in the solvers to ensure global
+	    heterogeneous coherence in the combine operations.
+
+2003/09/30: Added LOC_TO_GLOB and GLOB_TO_LOC support routines. 
+
+2003/09/30: Changed interface for smart update capabilities: choose
+	    with optional parameters in ASB routines. 
+
+2003/09/16: IFC 7.0 had a strange behaviour in the test programs:
+	    sometimes the declaration of PARTS dummy argument with an
+	    INTERFACE would not work, requiring an EXTERNAL
+	    declaration. The proper INTERFACE works now with 7.1.
+
+2003/03/10: Halo data exchange in F90_PSHALO can now be applied to
+	    integer data; create appropriate support routines. 
+
+2002/12/05: Initial version of Fileread sample programs.
+
+2002/11/19: Fixes for JAD preconditioner.
+
+2002/11/19: Methods for patterns: create a  descriptor without a
+	    matrix. 
+
+2001/11/16: Reviewed the interfaces: in the tools section we really
+	    need the POINTER attribute for dense vectors, but not in
+	    the computational routines; taking it  out allows more
+	    flexibility. 
+
+2001/09/16: Smart update capabilities.
+
+2001/03/16: Renumbering routines.
+
+2001/01/14: Added extensions to compute multiple DOTs and AMAXs at once;
+
+=======
 Changelog. A lot less detailed than usual, at least for past
 history. 
 
+2009/01/27: Renamed psb_transfer into psb_move_alloc. 	
+2009/01/08: Require GNU Fortran 4.3 or later.	
+2008/11/04: Repackaged and streamlined linear maps. 
+	
+2008/10/16: Fixed internal structure of psb_inter_desc. 	
+	
+2008/09/23: Fix borderline cases where one process does not own any 
+	    indices from the global space.
+	
 2008/09/18: Defined psb_sizeof to be integer(8). Added support
 	    into psb_sum, psb_amx and other reductions for long int
 	    scalars. 
@@ -328,3 +703,4 @@ history.
 
 2001/01/14: Added extensions to compute multiple DOTs and AMAXs at once;
 
+>>>>>>> .merge-dx.r3592

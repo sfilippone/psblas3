@@ -133,7 +133,7 @@ subroutine psi_bld_tmphalo(desc,info)
   lhalo = j
   nhalo = (lhalo-1)/3
 
-  call psb_transfer(tmphl,desc%halo_index,info)
+  call psb_move_alloc(tmphl,desc%halo_index,info)
 
   call psb_erractionrestore(err_act)
   return

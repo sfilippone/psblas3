@@ -84,16 +84,6 @@ Subroutine psb_dcdbldext(a,desc_a,novr,desc_ov,info, extype)
   integer, intent(out)                    :: info
   integer, intent(in),optional            :: extype
 
-  interface 
-    subroutine psb_icdasb(desc_a,info,ext_hv)
-      use psb_descriptor_type
-      Type(psb_desc_type), intent(inout) :: desc_a
-      integer, intent(out)               :: info
-      logical, intent(in),optional       :: ext_hv
-    end subroutine psb_icdasb
-  end interface
-  integer   icomm, err_act
-
   !     .. Local Scalars ..
   Integer ::  i, j, np, me,m,nnzero,&
        &  ictxt, lovr, lworks,lworkr, n_row,n_col, int_err(5),&
@@ -102,6 +92,7 @@ Subroutine psb_dcdbldext(a,desc_a,novr,desc_ov,info, extype)
        & n_elem_send,tot_recv,tot_elem,cntov_o,&
        & counter_t,n_elem,i_ovr,jj,proc_id,isz, &
        & idxr, idxs, iszr, iszs, nxch, nsnd, nrcv,lidx, extype_
+  integer :: icomm, err_act
 
   type(psb_dspmat_type) :: blk
   Integer, allocatable  :: tmp_halo(:),tmp_ovr_idx(:), orig_ovr(:)
@@ -361,7 +352,7 @@ Subroutine psb_dcdbldext(a,desc_a,novr,desc_ov,info, extype)
           info=-3
           call psb_errpush(info,name)
           goto 9999
-        endif        
+        endif
         call psb_ensure_size((counter_o+3),tmp_ovr_idx,info,pad=-1)
         if (info /= 0) then
           info=4010
@@ -398,12 +389,6 @@ Subroutine psb_dcdbldext(a,desc_a,novr,desc_ov,info, extype)
       ! add send elements in halo_index into ovrlap_index
       !
       Do j=0,n_elem_send-1
-
-!!$        idx = halo(counter+psb_elem_send_+j)
-!!$        gidx = desc_ov%loc_to_glob(idx)
-!!$        if (idx > psb_cd_get_local_rows(Desc_a)) &
-!!$             & write(debug_unit,*) me,' ',trim(name),':Out of local rows ',i_ovr,&
-!!$             & idx,psb_cd_get_local_rows(Desc_a)
 
         idx = halo(counter+psb_elem_send_+j)
         call psb_map_l2g(idx,gidx,desc_ov%idxmap,info) 
@@ -657,18 +642,18 @@ Subroutine psb_dcdbldext(a,desc_a,novr,desc_ov,info, extype)
 
 
       if (debug_level >= psb_debug_outer_) then
-         write(debug_unit,*) me,' ',trim(name),':Checktmp_o_i 1',tmp_ovr_idx(1:10)      
-         write(debug_unit,*) me,' ',trim(name),':Calling Crea_index'
-       end if
+        write(debug_unit,*) me,' ',trim(name),':Checktmp_o_i 1',tmp_ovr_idx(1:10)      
+        write(debug_unit,*) me,' ',trim(name),':Calling Crea_index'
+      end if
 
       call psi_crea_index(desc_ov,t_halo_in,t_halo_out,.false.,&
            & nxch,nsnd,nrcv,info)
-      
+
       if (debug_level >= psb_debug_outer_) then 
         write(debug_unit,*) me,' ',trim(name),':Done Crea_Index'
         call psb_barrier(ictxt)
       end if
-      call psb_transfer(t_halo_out,halo,info)
+      call psb_move_alloc(t_halo_out,halo,info)
       !
       ! At this point we have built the halo necessary for I_OVR+1.
       !
@@ -687,7 +672,7 @@ Subroutine psb_dcdbldext(a,desc_a,novr,desc_ov,info, extype)
     !               5. n_col(ov)  current. 
     !
     desc_ov%matrix_data(psb_n_row_) = desc_a%matrix_data(psb_n_row_)
-    call psb_transfer(orig_ovr,desc_ov%ovrlap_index,info)
+    call psb_move_alloc(orig_ovr,desc_ov%ovrlap_index,info)
     call psb_ensure_size((counter_h+counter_t+1),tmp_halo,info,pad=-1)
     if (info /= 0) then
       call psb_errpush(4010,name,a_err='psb_ensure_size')
@@ -696,7 +681,7 @@ Subroutine psb_dcdbldext(a,desc_a,novr,desc_ov,info, extype)
     tmp_halo(counter_h:counter_h+counter_t-1) = t_halo_in(1:counter_t)
     counter_h            = counter_h+counter_t-1
     tmp_halo(counter_h:) = -1
-    call psb_transfer(tmp_halo,desc_ov%halo_index,info)
+    call psb_move_alloc(tmp_halo,desc_ov%halo_index,info)
     deallocate(tmp_ovr_idx,stat=info)
     if (info /= 0) then
       call psb_errpush(4010,name,a_err='deallocate')
@@ -722,16 +707,15 @@ Subroutine psb_dcdbldext(a,desc_a,novr,desc_ov,info, extype)
     orig_ovr(cntov_o:cntov_o+counter_o-1) = tmp_ovr_idx(1:counter_o)
     cntov_o = cntov_o+counter_o-1
     orig_ovr(cntov_o:) = -1
-    call psb_transfer(orig_ovr,desc_ov%ovrlap_index,info)
+    call psb_move_alloc(orig_ovr,desc_ov%ovrlap_index,info)
     deallocate(tmp_ovr_idx,stat=info)
     if (info /= 0) then
       call psb_errpush(4010,name,a_err='deallocate')
       goto 9999
     end if
     tmp_halo(counter_h:) = -1
-    call psb_transfer(tmp_halo,desc_ov%ext_index,info)
-    call psb_transfer(t_halo_in,desc_ov%halo_index,info)
-
+    call psb_move_alloc(tmp_halo,desc_ov%ext_index,info)
+    call psb_move_alloc(t_halo_in,desc_ov%halo_index,info)
   case default
     call psb_errpush(30,name,i_err=(/5,extype_,0,0,0/))
     goto 9999

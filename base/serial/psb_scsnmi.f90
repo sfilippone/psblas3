@@ -47,7 +47,7 @@ function psb_scsnmi(a,info,trans)
      function scsnmi(trans,m,n,fida,descra,a,ia1,ia2,&
           &                 infoa,ierror)
        use psb_const_mod
-       real(psb_spk_)   :: dcsnmi
+       real(psb_spk_)   :: scsnmi
        integer          ::  m,n, ierror
        character        ::  trans
        integer          ::  ia1(*),ia2(*),infoa(*)

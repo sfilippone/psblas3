@@ -134,7 +134,7 @@ subroutine psi_crea_ovr_elem(me,desc_overlap,ovr_elem,info)
   nel = ix
 
   call psb_realloc(nel,3,telem,info)
-  call psb_transfer(telem,ovr_elem,info) 
+  call psb_move_alloc(telem,ovr_elem,info) 
 
   call psb_erractionrestore(err_act)
   return

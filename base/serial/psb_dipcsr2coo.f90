@@ -70,9 +70,9 @@ Subroutine psb_dipcsr2coo(a,info)
     goto 9999      
   end if
 !!$  write(0,*) 'ipcsr2coo ',a%m      
-  call psb_transfer(a%ia2,itemp,info)
-  call psb_transfer(a%ia1,a%ia2,info)
-  call psb_transfer(iaux,a%ia1,info)
+  call psb_move_alloc(a%ia2,itemp,info)
+  call psb_move_alloc(a%ia1,a%ia2,info)
+  call psb_move_alloc(iaux,a%ia1,info)
   
   do i=1, nr
     do j=itemp(i),itemp(i+1)-1

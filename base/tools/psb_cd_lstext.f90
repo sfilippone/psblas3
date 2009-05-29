@@ -44,16 +44,6 @@ Subroutine psb_cd_lstext(desc_a,in_list,desc_ov,info, mask,extype)
   logical, intent(in), optional, target   :: mask(:)
   integer, intent(in),optional            :: extype
 
-  interface 
-    subroutine psb_icdasb(desc_a,info,ext_hv)
-      use psb_descriptor_type
-      Type(psb_desc_type), intent(inout) :: desc_a
-      integer, intent(out)               :: info
-      logical, intent(in),optional       :: ext_hv
-    end subroutine psb_icdasb
-  end interface
-  integer   icomm, err_act
-
   !     .. Local Scalars ..
   Integer ::  i, j, np, me,m,nnzero,&
        &  ictxt, lovr, lworks,lworkr, n_row,n_col, int_err(5),&
@@ -62,6 +52,7 @@ Subroutine psb_cd_lstext(desc_a,in_list,desc_ov,info, mask,extype)
        & n_elem_send,tot_recv,tot_elem,cntov_o,&
        & counter_t,n_elem,i_ovr,jj,proc_id,isz, nl, &
        & idxr, idxs, iszr, iszs, nxch, nsnd, nrcv,lidx, extype_
+  integer :: icomm, err_act
 
   Integer, allocatable  :: tmp_halo(:),tmp_ovr_idx(:), orig_ovr(:)
   Integer,allocatable   :: halo(:),works(:),workr(:),t_halo_in(:),&

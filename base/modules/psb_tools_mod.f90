@@ -666,7 +666,7 @@ Module psb_tools_mod
       type(psb_desc_type), intent(inout)   :: desc_ac
       type(psb_sspmat_type), intent(inout) :: a
       integer, intent(in)                  :: nz,ia(:),ja(:)
-      real(kind(1.d0)), intent(in)         :: val(:)
+      real(psb_spk_), intent(in)           :: val(:)
       integer, intent(out)                 :: info
     end subroutine psb_sspins_2desc
     subroutine psb_dspins(nz,ia,ja,val,a,desc_a,info,rebuild)
@@ -858,6 +858,16 @@ Module psb_tools_mod
       integer, intent(out)            :: info
     end subroutine psb_get_ovrlap
   end interface
+
+  interface psb_icdasb
+    subroutine psb_icdasb(desc,info,ext_hv)
+      use psb_descriptor_type
+      Type(psb_desc_type), intent(inout) :: desc
+      integer, intent(out)               :: info
+      logical, intent(in),optional       :: ext_hv
+    end subroutine psb_icdasb
+  end interface
+
 
   interface psb_linmap_init
     module procedure psb_dlinmap_init, psb_zlinmap_init
@@ -1135,15 +1145,6 @@ contains
 
   subroutine psb_cdasb(desc,info)
     use psb_descriptor_type
-
-    interface 
-      subroutine psb_icdasb(desc,info,ext_hv)
-        use psb_descriptor_type
-        Type(psb_desc_type), intent(inout) :: desc
-        integer, intent(out)               :: info
-        logical, intent(in),optional       :: ext_hv
-      end subroutine psb_icdasb
-    end interface
 
     Type(psb_desc_type), intent(inout) :: desc
     integer, intent(out)               :: info

@@ -80,7 +80,7 @@ module psi_mod
       use psb_descriptor_type, only : psb_desc_type, psb_spk_, psb_dpk_
       type(psb_desc_type) :: desc
       integer         :: index_in(:),dep_list(:)
-      integer,allocatable, intent(inout)  :: desc_index(:)
+      integer,allocatable  :: desc_index(:)
       integer         :: length_dl,nsnd,nrcv,info
       logical         :: isglob_in
     end subroutine psi_desc_index
@@ -584,6 +584,10 @@ module psi_mod
     module procedure psi_cnv_dsc
   end interface
 
+  interface psi_renum_index
+    module procedure psi_renum_index
+  end interface
+
   interface psi_inner_cnv
     module procedure psi_inner_cnv1, psi_inner_cnv2,&
          & psi_inner_cnvs, psi_inner_cnvs2
@@ -617,6 +621,83 @@ module psi_mod
 
 contains
 
+  subroutine psi_renum_index(iperm,idx,info)
+    use psb_serial_mod 
+    implicit none 
+
+    integer, intent(out)   :: info
+    integer, intent(in)    :: iperm(:)
+    integer, intent(inout) :: idx(:)
+
+    integer :: i,j,k,nh
+    
+    i=1
+    k=idx(i)
+    do while (k /= -1) 
+      i = i+1
+      nh = idx(i)
+      do j = i+1, i+nh
+        idx(j) = iperm(idx(j))
+      enddo
+      i  = i + nh + 1
+      nh = idx(i)
+      do j = i+1, i+nh
+        idx(j) = iperm(idx(j))
+      enddo
+      i = i + nh + 1
+      k = idx(i)
+    enddo
+
+  end subroutine psi_renum_index
+
+  subroutine psi_renum_idxmap(nc,iperm,idxmap,info)
+    use psb_serial_mod 
+    implicit none 
+
+    integer, intent(out)   :: info
+    integer, intent(in)    :: nc,iperm(:)
+    type(psb_idxmap_type), intent(inout) :: idxmap
+    
+    integer, allocatable :: itmp(:)
+    integer :: i,j,k,nh
+    
+    if (nc > size(iperm)) then 
+      info = 2 
+      return
+    endif
+
+    if (idxmap%state == psb_desc_large_) then 
+
+      allocate(itmp(size(idxmap%loc_to_glob)), stat=i)
+      if (i/=0) then
+        info = 4001
+        return
+      end if
+      do i=1,nc
+        itmp(i) = idxmap%loc_to_glob(iperm(i))
+      end do
+      do i=1, size(idxmap%glb_lc,1)
+        idxmap%glb_lc(i,2) = iperm(idxmap%glb_lc(i,2))
+      end do
+      do i=1, nc 
+        idxmap%loc_to_glob(i) = itmp(i)
+      end do
+        
+    else
+
+      do i=1, nc
+        idxmap%glob_to_loc(idxmap%loc_to_glob(iperm(i))) = i  
+      enddo
+      do i=1,size(idxmap%glob_to_loc)
+        j = idxmap%glob_to_loc(i)
+        if (j>0) then 
+          idxmap%loc_to_glob(j) = i
+        endif
+      enddo
+    end if
+      
+  end subroutine psi_renum_idxmap
+  
   subroutine psi_cnv_dsc(halo_in,ovrlap_in,ext_in,cdesc, info)
 
     use psb_realloc_mod
@@ -662,7 +743,7 @@ contains
       call psb_errpush(4010,name,a_err='psi_crea_index')
       goto 9999
     end if
-    call psb_transfer(idx_out,cdesc%halo_index,info)
+    call psb_move_alloc(idx_out,cdesc%halo_index,info)
     cdesc%matrix_data(psb_thal_xch_) = nxch
     cdesc%matrix_data(psb_thal_snd_) = nsnd
     cdesc%matrix_data(psb_thal_rcv_) = nrcv 
@@ -678,7 +759,7 @@ contains
       call psb_errpush(4010,name,a_err='psi_crea_index')
       goto 9999
     end if
-    call psb_transfer(idx_out,cdesc%ext_index,info)
+    call psb_move_alloc(idx_out,cdesc%ext_index,info)
     cdesc%matrix_data(psb_text_xch_) = nxch
     cdesc%matrix_data(psb_text_snd_) = nsnd
     cdesc%matrix_data(psb_text_rcv_) = nrcv 
@@ -692,9 +773,9 @@ contains
       call psb_errpush(4010,name,a_err='psi_crea_index')
       goto 9999
     end if
-    call psb_transfer(idx_out,cdesc%ovrlap_index,info)
+    call psb_move_alloc(idx_out,cdesc%ovrlap_index,info)
     if (info /= 0) then
-      call psb_errpush(4010,name,a_err='psb_transfer')
+      call psb_errpush(4010,name,a_err='psb_move_alloc')
       goto 9999
     end if
 
@@ -720,9 +801,9 @@ contains
       call psb_errpush(4010,name,a_err='psi_bld_ovr_mst')
       goto 9999
     end if
-    call psb_transfer(idx_out,cdesc%ovr_mst_idx,info)
+    call psb_move_alloc(idx_out,cdesc%ovr_mst_idx,info)
     if (info /= 0) then
-      call psb_errpush(4010,name,a_err='psb_transfer')
+      call psb_errpush(4010,name,a_err='psb_move_alloc')
       goto 9999
     end if
 
@@ -732,7 +813,7 @@ contains
 
     ! finally bnd_elem
     call psi_crea_bnd_elem(idx_out,cdesc,info)
-    if (info == 0) call psb_transfer(idx_out,cdesc%bnd_elem,info)
+    if (info == 0) call psb_move_alloc(idx_out,cdesc%bnd_elem,info)
 
     if (info /= 0) then
       call psb_errpush(4010,name,a_err='psi_crea_bnd_elem')

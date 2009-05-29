@@ -35,7 +35,7 @@ subroutine psb_sprecbld(a,desc_a,p,info,upd)
   use psb_prec_mod, psb_protect_name => psb_sprecbld
   Implicit None
 
-  type(psb_sspmat_type), target           :: a
+  type(psb_sspmat_type), intent(in), target :: a
   type(psb_desc_type), intent(in), target :: desc_a
   type(psb_sprec_type),intent(inout)      :: p
   integer, intent(out)                    :: info

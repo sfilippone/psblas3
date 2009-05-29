@@ -235,7 +235,7 @@ subroutine psb_zcoins(nz,ia,ja,val,a,imin,imax,jmin,jmax,info,gtl,rebuild)
             if (debug_level >= psb_debug_serial_) &
                  & write(debug_unit,*) trim(name),&
                  & ':  Rebuild size',tmp%infoa(psb_nnz_) ,irst            
-            call psb_sp_transfer(tmp,a,info)
+            call psb_move_alloc(tmp,a,info)
             if(info /= izero) then
               info=4010
               ch_err='psb_sp_transfer'
@@ -404,7 +404,7 @@ subroutine psb_zcoins(nz,ia,ja,val,a,imin,imax,jmin,jmax,info,gtl,rebuild)
             if (debug_level >= psb_debug_serial_) &
                  & write(debug_unit,*) trim(name),&
                  & ':  Rebuild size',tmp%infoa(psb_nnz_) ,irst            
-            call psb_sp_transfer(tmp,a,info)
+            call psb_move_alloc(tmp,a,info)
             call psb_sp_info(psb_nztotreq_,a,nza,info)
             call psb_sp_info(psb_nzsizereq_,a,isza,info)
             if(info /= izero) then

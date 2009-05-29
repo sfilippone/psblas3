@@ -381,7 +381,7 @@ contains
     m   = idim*idim*idim
     n   = m
     nnz = ((n*9)/(np))
-    if(iam == psb_root_) write(0,'("Generating Matrix (size=",i0x,")...")')n
+    if(iam == psb_root_) write(0,'("Generating Matrix (size=",i0,")...")')n
 
     !
     ! Using a simple BLOCK distribution.

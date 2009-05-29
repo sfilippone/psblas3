@@ -31,14 +31,90 @@
 !!$  
 !!$
 !
-! Takes a vector X from space desc%desc_1 and maps it onto
-! desc%desc_2 under desc%map_fw possibly with communication
-! due to exch_fw_idx
 !
-subroutine psb_s_forward_map(alpha,x,beta,y,desc,info,work)
-  use psb_base_mod, psb_protect_name => psb_s_forward_map
+subroutine psb_s_map_X2Y(alpha,x,beta,y,map,info,work)
+  use psb_base_mod, psb_protect_name => psb_s_map_X2Y
   implicit none 
-  type(psb_inter_desc_type), intent(in) :: desc
+  type(psb_slinmap_type), intent(in) :: map
+  real(psb_spk_), intent(in)     :: alpha,beta
+  real(psb_spk_), intent(inout)  :: x(:)
+  real(psb_spk_), intent(out)    :: y(:)
+  integer, intent(out)           :: info 
+  real(psb_spk_), optional       :: work(:)
+
+  !
+  real(psb_spk_), allocatable   :: xt(:), yt(:)
+  integer                       :: i, j, nr1, nc1,nr2, nc2,&
+       &  map_kind, map_data, nr, ictxt
+  character(len=20), parameter  :: name='psb_map_X2Y'
+
+  info = 0
+  if (.not.psb_is_asb_map(map)) then 
+    write(0,*) trim(name),' Invalid descriptor input'
+    info = 1
+    return 
+  end if
+
+  map_kind = psb_get_map_kind(map)
+
+  select case(map_kind)
+  case(psb_map_aggr_)
+
+    ictxt = psb_cd_get_context(map%p_desc_Y)
+    nr2   = psb_cd_get_global_rows(map%p_desc_Y)
+    nc2   = psb_cd_get_local_cols(map%p_desc_Y) 
+    allocate(yt(nc2),stat=info) 
+    if (info == 0) call psb_halo(x,map%p_desc_X,info,work=work)
+    if (info == 0) call psb_csmm(sone,map%map_X2Y,x,szero,yt,info)
+    if ((info == 0) .and. psb_is_repl_desc(map%p_desc_Y)) then
+      call psb_sum(ictxt,yt(1:nr2))
+    end if
+    if (info == 0) call psb_geaxpby(alpha,yt,beta,y,map%p_desc_Y,info)
+    if (info /= 0) then 
+      write(0,*) trim(name),' Error from inner routines',info
+      info = -1
+    end if
+
+  case(psb_map_gen_linear_)
+
+    ictxt = psb_cd_get_context(map%desc_Y)
+    nr1   = psb_cd_get_local_rows(map%desc_X) 
+    nc1   = psb_cd_get_local_cols(map%desc_X) 
+    nr2   = psb_cd_get_global_rows(map%desc_Y)
+    nc2   = psb_cd_get_local_cols(map%desc_Y) 
+    allocate(xt(nc1),yt(nc2),stat=info) 
+    xt(1:nr1) = x(1:nr1) 
+    if (info == 0) call psb_halo(xt,map%desc_X,info,work=work)
+    if (info == 0) call psb_csmm(sone,map%map_X2Y,xt,szero,yt,info)
+    if ((info == 0) .and. psb_is_repl_desc(map%desc_Y)) then
+      call psb_sum(ictxt,yt(1:nr2))
+    end if
+    if (info == 0) call psb_geaxpby(alpha,yt,beta,y,map%desc_Y,info)
+    if (info /= 0) then 
+      write(0,*) trim(name),' Error from inner routines',info
+      info = -1
+    end if
+   
+
+  case default
+    write(0,*) trim(name),' Invalid descriptor input'
+    info = 1
+    return 
+  end select
+
+end subroutine psb_s_map_X2Y
+
+
+!
+! Takes a vector x from space map%p_desc_Y and maps it onto
+! map%p_desc_X under map%map_Y2X possibly with communication
+! due to exch_bk_idx
+!
+subroutine psb_s_map_Y2X(alpha,x,beta,y,map,info,work)
+  use psb_base_mod, psb_protect_name => psb_s_map_Y2X
+
+  implicit none 
+  type(psb_slinmap_type), intent(in) :: map
   real(psb_spk_), intent(in)     :: alpha,beta
   real(psb_spk_), intent(inout)  :: x(:)
   real(psb_spk_), intent(out)    :: y(:)
@@ -46,145 +122,77 @@ subroutine psb_s_forward_map(alpha,x,beta,y,desc,info,work)
   real(psb_spk_), optional       :: work(:)
 
   !
-  real(psb_spk_), allocatable :: xt(:)
-  integer                       :: itsz, i, j,totxch,totsnd,totrcv,&
-       &  map_kind, map_data, nr, ictxt
-  character(len=20), parameter  :: name='psb_forward_map'
-
-  info = 0
-  if (.not.psb_is_asb_desc(desc)) then 
-    write(0,*) trim(name),' Invalid descriptor inupt'
-    info = 1
-    return 
-  end if
-
-  itsz     = psb_cd_get_fw_tmp_sz(desc)
-  map_kind = psb_cd_get_map_kind(desc)
-  map_data = psb_cd_get_map_data(desc)
-  if (map_data /= psb_map_single_) then 
-    write(0,*) trim(name),' Invalid descriptor inupt: map_data', &
-         & map_data,psb_map_single_
-    info = 1
-    return 
-  endif
-
-  select case(map_kind)
-  case(psb_map_aggr_)
-    ! Ok, we just need to call a halo update on the base desc
-    ! and a matrix-vector product. 
-    call psb_halo(x,desc%desc_1,info,work=work)
-    if (info == 0) call psb_csmm(alpha,desc%smap%map_fw,x,beta,y,info)
-    if ((info == 0) .and. psb_is_repl_desc(desc%desc_2)) then
-      ictxt = psb_cd_get_context(desc%desc_2)
-      nr = psb_cd_get_global_rows(desc%desc_2)
-      call psb_sum(ictxt,y(1:nr))
-    end if
-    if (info /= 0) then 
-      write(0,*) trim(name),' Error from inner routines',info
-      info = -1
-    end if
-
-  case(psb_map_gen_linear_)
-
-    call psb_linmap(alpha,x,beta,y,desc%smap%map_fw,&
-         & desc%desc_fw,desc%desc_1,desc%desc_2)
-
-    if (info /= 0) then 
-      write(0,*) trim(name),' Error from inner routines',info
-      info = -1
-    end if
-
-
-  case default
-    write(0,*) trim(name),' Invalid descriptor inupt'
-    info = 1
-    return 
-  end select
-
-end subroutine psb_s_forward_map
-
-
-!
-! Takes a vector X from space desc%desc_2 and maps it onto
-! desc%desc_1 under desc%map_bk possibly with communication
-! due to exch_bk_idx
-!
-subroutine psb_s_backward_map(alpha,x,beta,y,desc,info,work)
-  use psb_base_mod, psb_protect_name => psb_s_backward_map
-
-  implicit none 
-  type(psb_inter_desc_type), intent(in) :: desc
-  real(psb_spk_), intent(in)     :: alpha,beta
-  real(psb_spk_), intent(inout)  :: x(:)
-  real(psb_spk_), intent(out)    :: y(:)
-  integer, intent(out)             :: info 
-  real(psb_spk_), optional       :: work(:)
-
-  !
-  real(psb_spk_), allocatable :: xt(:)
-  integer                       :: itsz, i, j,totxch,totsnd,totrcv,&
+  real(psb_spk_), allocatable :: xt(:), yt(:)
+  integer                       :: i, j, nr1, nc1,nr2, nc2,&
        & map_kind, map_data, nr, ictxt
-  character(len=20), parameter  :: name='psb_backward_map'
+  character(len=20), parameter  :: name='psb_map_Y2X'
 
   info = 0
-  if (.not.psb_is_asb_desc(desc)) then 
-    write(0,*) trim(name),' Invalid descriptor inupt'
+  if (.not.psb_is_asb_map(map)) then 
+    write(0,*) trim(name),' Invalid descriptor input'
     info = 1
     return 
   end if
 
-  itsz     = psb_cd_get_bk_tmp_sz(desc)
-  map_kind = psb_cd_get_map_kind(desc)
-  map_data = psb_cd_get_map_data(desc)
-  if (map_data /= psb_map_single_) then 
-    write(0,*) trim(name),' Invalid descriptor inupt: map_data',&
-         & map_data,psb_map_single_
-    info = 1
-    return 
-  endif
+  map_kind = psb_get_map_kind(map)
 
   select case(map_kind)
   case(psb_map_aggr_)
-    ! Ok, we just need to call a halo update and a matrix-vector product. 
-    call psb_halo(x,desc%desc_2,info,work=work)
-    if (info == 0) call psb_csmm(alpha,desc%smap%map_bk,x,beta,y,info)
-    if ((info == 0) .and. psb_is_repl_desc(desc%desc_1)) then
-      ictxt = psb_cd_get_context(desc%desc_1)
-      nr = psb_cd_get_global_rows(desc%desc_1)
-      call psb_sum(ictxt,y(1:nr))
+
+    ictxt = psb_cd_get_context(map%p_desc_X)
+    nr2   = psb_cd_get_global_rows(map%p_desc_X)
+    nc2   = psb_cd_get_local_cols(map%p_desc_X) 
+    allocate(yt(nc2),stat=info) 
+    if (info == 0) call psb_halo(x,map%p_desc_Y,info,work=work)
+    if (info == 0) call psb_csmm(sone,map%map_Y2X,x,szero,yt,info)
+    if ((info == 0) .and. psb_is_repl_desc(map%p_desc_X)) then
+      call psb_sum(ictxt,yt(1:nr2))
     end if
+    if (info == 0) call psb_geaxpby(alpha,yt,beta,y,map%p_desc_X,info)
     if (info /= 0) then 
       write(0,*) trim(name),' Error from inner routines',info
       info = -1
     end if
-
 
   case(psb_map_gen_linear_)
-    call psb_linmap(alpha,x,beta,y,desc%smap%map_bk,&
-         & desc%desc_bk,desc%desc_2,desc%desc_1)
+
+    ictxt = psb_cd_get_context(map%desc_X)
+    nr1   = psb_cd_get_local_rows(map%desc_Y) 
+    nc1   = psb_cd_get_local_cols(map%desc_Y) 
+    nr2   = psb_cd_get_global_rows(map%desc_X)
+    nc2   = psb_cd_get_local_cols(map%desc_X) 
+    allocate(xt(nc1),yt(nc2),stat=info) 
+    xt(1:nr1) = x(1:nr1) 
+    if (info == 0) call psb_halo(xt,map%desc_Y,info,work=work)
+    if (info == 0) call psb_csmm(sone,map%map_Y2X,xt,szero,yt,info)
+    if ((info == 0) .and. psb_is_repl_desc(map%desc_X)) then
+      call psb_sum(ictxt,yt(1:nr2))
+    end if
+    if (info == 0) call psb_geaxpby(alpha,yt,beta,y,map%desc_X,info)
     if (info /= 0) then 
       write(0,*) trim(name),' Error from inner routines',info
       info = -1
     end if
+   
 
   case default
-    write(0,*) trim(name),' Invalid descriptor inupt'
+    write(0,*) trim(name),' Invalid descriptor input'
     info = 1
     return 
   end select
 
-end subroutine psb_s_backward_map
+end subroutine psb_s_map_Y2X
 
 
 !
-! Takes a vector X from space desc%desc_1 and maps it onto
-! desc%desc_2 under desc%map_fw possibly with communication
+! Takes a vector x from space map%p_desc_X and maps it onto
+! map%p_desc_Y under map%map_X2Y possibly with communication
 ! due to exch_fw_idx
 !
-subroutine psb_d_forward_map(alpha,x,beta,y,desc,info,work)
-  use psb_base_mod, psb_protect_name => psb_d_forward_map
+subroutine psb_d_map_X2Y(alpha,x,beta,y,map,info,work)
+  use psb_base_mod, psb_protect_name => psb_d_map_X2Y
   implicit none 
-  type(psb_inter_desc_type), intent(in) :: desc
+  type(psb_dlinmap_type), intent(in) :: map
   real(psb_dpk_), intent(in)     :: alpha,beta
   real(psb_dpk_), intent(inout)  :: x(:)
   real(psb_dpk_), intent(out)    :: y(:)
@@ -192,41 +200,33 @@ subroutine psb_d_forward_map(alpha,x,beta,y,desc,info,work)
   real(psb_dpk_), optional       :: work(:)
 
   !
-  real(psb_dpk_), allocatable :: xt(:)
-  integer                       :: itsz, i, j,totxch,totsnd,totrcv,&
+  real(psb_dpk_), allocatable :: xt(:), yt(:)
+  integer                       :: i, j, nr1, nc1,nr2, nc2 ,&
        &  map_kind, map_data, nr, ictxt
-  character(len=20), parameter  :: name='psb_forward_map'
+  character(len=20), parameter  :: name='psb_map_X2Y'
 
   info = 0
-  if (.not.psb_is_asb_desc(desc)) then 
-    write(0,*) trim(name),' Invalid descriptor inupt'
+  if (.not.psb_is_asb_map(map)) then 
+    write(0,*) trim(name),' Invalid descriptor input: unassembled'
     info = 1
     return 
   end if
 
-  itsz     = psb_cd_get_fw_tmp_sz(desc)
-  map_kind = psb_cd_get_map_kind(desc)
-  map_data = psb_cd_get_map_data(desc)
-  if (map_data /= psb_map_double_) then 
-    write(0,*) trim(name),' Invalid descriptor inupt: map_data', &
-         & map_data,psb_map_double_
-    info = 1
-    return 
-  endif
+  map_kind = psb_get_map_kind(map)
 
   select case(map_kind)
   case(psb_map_aggr_)
-    ! Ok, we just need to call a halo update on the base desc
-    ! and a matrix-vector product. 
-    call psb_halo(x,desc%desc_1,info,work=work)
-    if (info == 0) call desc%dmap%map_fw%spmm(alpha,x,beta,y,info)
-!!$    if (info == 0) call psb_csmm(alpha,desc%dmap%map_fw,x,beta,y,info)
-    if ((info == 0) .and. psb_is_repl_desc(desc%desc_2)) then
-      ictxt = psb_cd_get_context(desc%desc_2)
-      nr = psb_cd_get_global_rows(desc%desc_2)
-      call psb_sum(ictxt,y(1:nr))
-    end if
 
+    ictxt = psb_cd_get_context(map%p_desc_Y)
+    nr2   = psb_cd_get_global_rows(map%p_desc_Y)
+    nc2   = psb_cd_get_local_cols(map%p_desc_Y) 
+    allocate(yt(nc2),stat=info) 
+    if (info == 0) call psb_halo(x,map%p_desc_X,info,work=work)
+    if (info == 0) call psb_csmm(done,map%map_X2Y,x,dzero,yt,info)
+    if ((info == 0) .and. psb_is_repl_desc(map%p_desc_Y)) then
+      call psb_sum(ictxt,yt(1:nr2))
+    end if
+    if (info == 0) call psb_geaxpby(alpha,yt,beta,y,map%p_desc_Y,info)
     if (info /= 0) then 
       write(0,*) trim(name),' Error from inner routines',info
       info = -1
@@ -234,34 +234,45 @@ subroutine psb_d_forward_map(alpha,x,beta,y,desc,info,work)
 
   case(psb_map_gen_linear_)
 
-    call psb_linmap(alpha,x,beta,y,desc%dmap%map_fw,&
-         & desc%desc_fw,desc%desc_1,desc%desc_2)
-
+    ictxt = psb_cd_get_context(map%desc_Y)
+    nr1   = psb_cd_get_local_rows(map%desc_X) 
+    nc1   = psb_cd_get_local_cols(map%desc_X) 
+    nr2   = psb_cd_get_global_rows(map%desc_Y)
+    nc2   = psb_cd_get_local_cols(map%desc_Y) 
+    allocate(xt(nc1),yt(nc2),stat=info) 
+    xt(1:nr1) = x(1:nr1) 
+    if (info == 0) call psb_halo(xt,map%desc_X,info,work=work)
+    if (info == 0) call psb_csmm(done,map%map_X2Y,xt,dzero,yt,info)
+    if ((info == 0) .and. psb_is_repl_desc(map%desc_Y)) then
+      call psb_sum(ictxt,yt(1:nr2))
+    end if
+    if (info == 0) call psb_geaxpby(alpha,yt,beta,y,map%desc_Y,info)
     if (info /= 0) then 
       write(0,*) trim(name),' Error from inner routines',info
       info = -1
     end if
-
+   
 
   case default
-    write(0,*) trim(name),' Invalid descriptor inupt'
+    write(0,*) trim(name),' Invalid descriptor input', &
+         & map_kind, psb_map_aggr_, psb_map_gen_linear_
     info = 1
     return 
   end select
 
-end subroutine psb_d_forward_map
+end subroutine psb_d_map_X2Y
 
 
 !
-! Takes a vector X from space desc%desc_2 and maps it onto
-! desc%desc_1 under desc%map_bk possibly with communication
+! Takes a vector x from space map%p_desc_Y and maps it onto
+! map%p_desc_X under map%map_Y2X possibly with communication
 ! due to exch_bk_idx
 !
-subroutine psb_d_backward_map(alpha,x,beta,y,desc,info,work)
-  use psb_base_mod, psb_protect_name => psb_d_backward_map
+subroutine psb_d_map_Y2X(alpha,x,beta,y,map,info,work)
+  use psb_base_mod, psb_protect_name => psb_d_map_Y2X
 
   implicit none 
-  type(psb_inter_desc_type), intent(in) :: desc
+  type(psb_dlinmap_type), intent(in) :: map
   real(psb_dpk_), intent(in)     :: alpha,beta
   real(psb_dpk_), intent(inout)  :: x(:)
   real(psb_dpk_), intent(out)    :: y(:)
@@ -269,73 +280,78 @@ subroutine psb_d_backward_map(alpha,x,beta,y,desc,info,work)
   real(psb_dpk_), optional       :: work(:)
 
   !
-  real(psb_dpk_), allocatable :: xt(:)
-  integer                       :: itsz, i, j,totxch,totsnd,totrcv,&
+  real(psb_dpk_), allocatable :: xt(:), yt(:)
+  integer                       :: i, j, nr1, nc1,nr2, nc2,&
        & map_kind, map_data, nr, ictxt
-  character(len=20), parameter  :: name='psb_backward_map'
+  character(len=20), parameter  :: name='psb_map_Y2X'
 
   info = 0
-  if (.not.psb_is_asb_desc(desc)) then 
-    write(0,*) trim(name),' Invalid descriptor inupt'
+  if (.not.psb_is_asb_map(map)) then 
+    write(0,*) trim(name),' Invalid descriptor input'
     info = 1
     return 
   end if
 
-  itsz     = psb_cd_get_bk_tmp_sz(desc)
-  map_kind = psb_cd_get_map_kind(desc)
-  map_data = psb_cd_get_map_data(desc)
-  if (map_data /= psb_map_double_) then 
-    write(0,*) trim(name),' Invalid descriptor inupt: map_data',&
-         & map_data,psb_map_double_
-    info = 1
-    return 
-  endif
+  map_kind = psb_get_map_kind(map)
 
   select case(map_kind)
   case(psb_map_aggr_)
-    ! Ok, we just need to call a halo update and a matrix-vector product. 
-    call psb_halo(x,desc%desc_2,info,work=work)
-!!$    if (info == 0) call psb_csmm(alpha,desc%dmap%map_bk,x,beta,y,info)
-    if (info == 0) call desc%dmap%map_bk%spmm(alpha,x,beta,y,info)
-    if ((info == 0) .and. psb_is_repl_desc(desc%desc_1)) then
-      ictxt = psb_cd_get_context(desc%desc_1)
-      nr = psb_cd_get_global_rows(desc%desc_1)
-      call psb_sum(ictxt,y(1:nr))
-    end if
 
+    ictxt = psb_cd_get_context(map%p_desc_X)
+    nr2   = psb_cd_get_global_rows(map%p_desc_X)
+    nc2   = psb_cd_get_local_cols(map%p_desc_X) 
+    allocate(yt(nc2),stat=info) 
+    if (info == 0) call psb_halo(x,map%p_desc_Y,info,work=work)
+    if (info == 0) call psb_csmm(done,map%map_Y2X,x,dzero,yt,info)
+    if ((info == 0) .and. psb_is_repl_desc(map%p_desc_X)) then
+      call psb_sum(ictxt,yt(1:nr2))
+    end if
+    if (info == 0) call psb_geaxpby(alpha,yt,beta,y,map%p_desc_X,info)
     if (info /= 0) then 
       write(0,*) trim(name),' Error from inner routines',info
       info = -1
     end if
-
 
   case(psb_map_gen_linear_)
-    call psb_linmap(alpha,x,beta,y,desc%dmap%map_bk,&
-         & desc%desc_bk,desc%desc_2,desc%desc_1)
+
+    ictxt = psb_cd_get_context(map%desc_X)
+    nr1   = psb_cd_get_local_rows(map%desc_Y) 
+    nc1   = psb_cd_get_local_cols(map%desc_Y) 
+    nr2   = psb_cd_get_global_rows(map%desc_X)
+    nc2   = psb_cd_get_local_cols(map%desc_X) 
+    allocate(xt(nc1),yt(nc2),stat=info) 
+    xt(1:nr1) = x(1:nr1) 
+    if (info == 0) call psb_halo(xt,map%desc_Y,info,work=work)
+    if (info == 0) call psb_csmm(done,map%map_Y2X,xt,dzero,yt,info)
+    if ((info == 0) .and. psb_is_repl_desc(map%desc_X)) then
+      call psb_sum(ictxt,yt(1:nr2))
+    end if
+    if (info == 0) call psb_geaxpby(alpha,yt,beta,y,map%desc_X,info)
     if (info /= 0) then 
       write(0,*) trim(name),' Error from inner routines',info
       info = -1
     end if
+   
 
   case default
-    write(0,*) trim(name),' Invalid descriptor inupt'
+    write(0,*) trim(name),' Invalid descriptor input'
     info = 1
     return 
   end select
 
-end subroutine psb_d_backward_map
+end subroutine psb_d_map_Y2X
 
 
 !
-! Takes a vector X from space desc%desc_1 and maps it onto
-! desc%desc_2 under desc%map_fw possibly with communication
+! Takes a vector x from space map%p_desc_X and maps it onto
+! map%p_desc_Y under map%map_X2Y possibly with communication
 ! due to exch_fw_idx
 !
-subroutine psb_c_forward_map(alpha,x,beta,y,desc,info,work)
-  use psb_base_mod, psb_protect_name => psb_c_forward_map
+subroutine psb_c_map_X2Y(alpha,x,beta,y,map,info,work)
+  use psb_base_mod, psb_protect_name => psb_c_map_X2Y
 
   implicit none 
-  type(psb_inter_desc_type), intent(in) :: desc
+  type(psb_clinmap_type), intent(in) :: map
   complex(psb_spk_), intent(in)         :: alpha,beta
   complex(psb_spk_), intent(inout)      :: x(:)
   complex(psb_spk_), intent(out)        :: y(:)
@@ -343,72 +359,78 @@ subroutine psb_c_forward_map(alpha,x,beta,y,desc,info,work)
   complex(psb_spk_), optional           :: work(:)
 
   !
-  complex(psb_spk_), allocatable :: xt(:)
-  integer                       :: itsz, i, j,totxch,totsnd,totrcv,&
+  complex(psb_spk_), allocatable :: xt(:), yt(:)
+  integer                       :: i, j, nr1, nc1,nr2, nc2,&
        & map_kind, map_data, nr, ictxt
-  character(len=20), parameter  :: name='psb_forward_map'
+  character(len=20), parameter  :: name='psb_map_X2Y'
 
   info = 0
-  if (.not.psb_is_asb_desc(desc)) then 
-    write(0,*) trim(name),' Invalid descriptor inupt'
+  if (.not.psb_is_asb_map(map)) then 
+    write(0,*) trim(name),' Invalid descriptor input'
     info = 1
     return 
   end if
 
-  itsz     = psb_cd_get_fw_tmp_sz(desc)
-  map_kind = psb_cd_get_map_kind(desc)
-  map_data = psb_cd_get_map_data(desc)
-  if (map_data /= psb_map_complex_) then 
-    write(0,*) trim(name),' Invalid descriptor inupt: map_data',&
-         & map_data,psb_map_complex_
-    info = 1
-    return 
-  endif
+  map_kind = psb_get_map_kind(map)
 
   select case(map_kind)
   case(psb_map_aggr_)
-    ! Ok, we just need to call a halo update and a matrix-vector product. 
-    call psb_halo(x,desc%desc_1,info,work=work)
-    if (info == 0) call psb_csmm(alpha,desc%cmap%map_fw,x,beta,y,info)
-    if ((info == 0) .and. psb_is_repl_desc(desc%desc_2)) then
-      ictxt = psb_cd_get_context(desc%desc_2)
-      nr = psb_cd_get_global_rows(desc%desc_2)
-      call psb_sum(ictxt,y(1:nr))
-    end if
 
+    ictxt = psb_cd_get_context(map%p_desc_Y)
+    nr2   = psb_cd_get_global_rows(map%p_desc_Y)
+    nc2   = psb_cd_get_local_cols(map%p_desc_Y) 
+    allocate(yt(nc2),stat=info) 
+    if (info == 0) call psb_halo(x,map%p_desc_X,info,work=work)
+    if (info == 0) call psb_csmm(cone,map%map_X2Y,x,czero,yt,info)
+    if ((info == 0) .and. psb_is_repl_desc(map%p_desc_Y)) then
+      call psb_sum(ictxt,yt(1:nr2))
+    end if
+    if (info == 0) call psb_geaxpby(alpha,yt,beta,y,map%p_desc_Y,info)
     if (info /= 0) then 
       write(0,*) trim(name),' Error from inner routines',info
       info = -1
     end if
 
   case(psb_map_gen_linear_)
-    call psb_linmap(alpha,x,beta,y,desc%cmap%map_fw,&
-         & desc%desc_fw,desc%desc_1,desc%desc_2)
 
+    ictxt = psb_cd_get_context(map%desc_Y)
+    nr1   = psb_cd_get_local_rows(map%desc_X) 
+    nc1   = psb_cd_get_local_cols(map%desc_X) 
+    nr2   = psb_cd_get_global_rows(map%desc_Y)
+    nc2   = psb_cd_get_local_cols(map%desc_Y) 
+    allocate(xt(nc1),yt(nc2),stat=info) 
+    xt(1:nr1) = x(1:nr1) 
+    if (info == 0) call psb_halo(xt,map%desc_X,info,work=work)
+    if (info == 0) call psb_csmm(cone,map%map_X2Y,xt,czero,yt,info)
+    if ((info == 0) .and. psb_is_repl_desc(map%desc_Y)) then
+      call psb_sum(ictxt,yt(1:nr2))
+    end if
+    if (info == 0) call psb_geaxpby(alpha,yt,beta,y,map%desc_Y,info)
     if (info /= 0) then 
       write(0,*) trim(name),' Error from inner routines',info
       info = -1
     end if
+   
 
   case default
-    write(0,*) trim(name),' Invalid descriptor inupt'
+    write(0,*) trim(name),' Invalid descriptor input'
     info = 1
     return 
   end select
 
-end subroutine psb_c_forward_map
+end subroutine psb_c_map_X2Y
 
 
 !
-! Takes a vector X from space desc%desc_2 and maps it onto
-! desc%desc_1 under desc%map_bk possibly with communication
+! Takes a vector x from space map%p_desc_Y and maps it onto
+! map%p_desc_X under map%map_Y2X possibly with communication
 ! due to exch_bk_idx
 !
-subroutine psb_c_backward_map(alpha,x,beta,y,desc,info,work)
-  use psb_base_mod, psb_protect_name => psb_c_backward_map
+subroutine psb_c_map_Y2X(alpha,x,beta,y,map,info,work)
+  use psb_base_mod, psb_protect_name => psb_c_map_Y2X
 
   implicit none 
-  type(psb_inter_desc_type), intent(in) :: desc
+  type(psb_clinmap_type), intent(in) :: map
   complex(psb_spk_), intent(in)       :: alpha,beta
   complex(psb_spk_), intent(inout)    :: x(:)
   complex(psb_spk_), intent(out)      :: y(:)
@@ -416,73 +438,78 @@ subroutine psb_c_backward_map(alpha,x,beta,y,desc,info,work)
   complex(psb_spk_), optional         :: work(:)
 
   !
-  complex(psb_spk_), allocatable :: xt(:)
-  integer                       :: itsz, i, j,totxch,totsnd,totrcv,&
+  complex(psb_spk_), allocatable :: xt(:), yt(:)
+  integer                       :: i, j, nr1, nc1,nr2, nc2,&
        & map_kind, map_data, nr, ictxt
-  character(len=20), parameter  :: name='psb_backward_map'
+  character(len=20), parameter  :: name='psb_map_Y2X'
 
   info = 0
-  if (.not.psb_is_asb_desc(desc)) then 
-    write(0,*) trim(name),' Invalid descriptor inupt'
+  if (.not.psb_is_asb_map(map)) then 
+    write(0,*) trim(name),' Invalid descriptor input'
     info = 1
     return 
   end if
 
-  itsz     = psb_cd_get_bk_tmp_sz(desc)
-  map_kind = psb_cd_get_map_kind(desc)
-  map_data = psb_cd_get_map_data(desc)
-  if (map_data /= psb_map_complex_) then 
-    write(0,*) trim(name),' Invalid descriptor inupt: map_data',&
-         & map_data,psb_map_complex_
-    info = 1
-    return 
-  endif
+  map_kind = psb_get_map_kind(map)
 
   select case(map_kind)
   case(psb_map_aggr_)
-    ! Ok, we just need to call a halo update and a matrix-vector product. 
-    call psb_halo(x,desc%desc_2,info,work=work)
-    if (info == 0) call psb_csmm(alpha,desc%cmap%map_bk,x,beta,y,info)
-    if ((info == 0) .and. psb_is_repl_desc(desc%desc_1)) then
-      ictxt = psb_cd_get_context(desc%desc_1)
-      nr = psb_cd_get_global_rows(desc%desc_1)
-      call psb_sum(ictxt,y(1:nr))
-    end if
 
+    ictxt = psb_cd_get_context(map%p_desc_X)
+    nr2   = psb_cd_get_global_rows(map%p_desc_X)
+    nc2   = psb_cd_get_local_cols(map%p_desc_X) 
+    allocate(yt(nc2),stat=info) 
+    if (info == 0) call psb_halo(x,map%p_desc_Y,info,work=work)
+    if (info == 0) call psb_csmm(cone,map%map_Y2X,x,czero,yt,info)
+    if ((info == 0) .and. psb_is_repl_desc(map%p_desc_X)) then
+      call psb_sum(ictxt,yt(1:nr2))
+    end if
+    if (info == 0) call psb_geaxpby(alpha,yt,beta,y,map%p_desc_X,info)
     if (info /= 0) then 
       write(0,*) trim(name),' Error from inner routines',info
       info = -1
     end if
-
 
   case(psb_map_gen_linear_)
-    call psb_linmap(alpha,x,beta,y,desc%cmap%map_bk,&
-         & desc%desc_bk,desc%desc_2,desc%desc_1)
 
+    ictxt = psb_cd_get_context(map%desc_X)
+    nr1   = psb_cd_get_local_rows(map%desc_Y) 
+    nc1   = psb_cd_get_local_cols(map%desc_Y) 
+    nr2   = psb_cd_get_global_rows(map%desc_X)
+    nc2   = psb_cd_get_local_cols(map%desc_X) 
+    allocate(xt(nc1),yt(nc2),stat=info) 
+    xt(1:nr1) = x(1:nr1) 
+    if (info == 0) call psb_halo(xt,map%desc_Y,info,work=work)
+    if (info == 0) call psb_csmm(cone,map%map_Y2X,xt,czero,yt,info)
+    if ((info == 0) .and. psb_is_repl_desc(map%desc_X)) then
+      call psb_sum(ictxt,yt(1:nr2))
+    end if
+    if (info == 0) call psb_geaxpby(alpha,yt,beta,y,map%desc_X,info)
     if (info /= 0) then 
       write(0,*) trim(name),' Error from inner routines',info
       info = -1
     end if
+   
 
   case default
-    write(0,*) trim(name),' Invalid descriptor inupt'
+    write(0,*) trim(name),' Invalid descriptor input'
     info = 1
     return 
   end select
 
-end subroutine psb_c_backward_map
+end subroutine psb_c_map_Y2X
 
 
 !
-! Takes a vector X from space desc%desc_1 and maps it onto
-! desc%desc_2 under desc%map_fw possibly with communication
+! Takes a vector x from space map%p_desc_X and maps it onto
+! map%p_desc_Y under map%map_X2Y possibly with communication
 ! due to exch_fw_idx
 !
-subroutine psb_z_forward_map(alpha,x,beta,y,desc,info,work)
-  use psb_base_mod, psb_protect_name => psb_z_forward_map
+subroutine psb_z_map_X2Y(alpha,x,beta,y,map,info,work)
+  use psb_base_mod, psb_protect_name => psb_z_map_X2Y
 
   implicit none 
-  type(psb_inter_desc_type), intent(in) :: desc
+  type(psb_zlinmap_type), intent(in) :: map
   complex(psb_dpk_), intent(in)       :: alpha,beta
   complex(psb_dpk_), intent(inout)    :: x(:)
   complex(psb_dpk_), intent(out)      :: y(:)
@@ -490,71 +517,78 @@ subroutine psb_z_forward_map(alpha,x,beta,y,desc,info,work)
   complex(psb_dpk_), optional         :: work(:)
 
   !
-  complex(psb_dpk_), allocatable :: xt(:)
-  integer                       :: itsz, i, j,totxch,totsnd,totrcv,&
+  complex(psb_dpk_), allocatable :: xt(:), yt(:)
+  integer                       :: i, j, nr1, nc1,nr2, nc2,&
        & map_kind, map_data, nr, ictxt
-  character(len=20), parameter  :: name='psb_forward_map'
+  character(len=20), parameter  :: name='psb_map_X2Y'
 
   info = 0
-  if (.not.psb_is_asb_desc(desc)) then 
-    write(0,*) trim(name),' Invalid descriptor inupt'
+  if (.not.psb_is_asb_map(map)) then 
+    write(0,*) trim(name),' Invalid descriptor input'
     info = 1
     return 
   end if
 
-  itsz     = psb_cd_get_fw_tmp_sz(desc)
-  map_kind = psb_cd_get_map_kind(desc)
-  map_data = psb_cd_get_map_data(desc)
-  if (map_data /= psb_map_double_complex_) then 
-    write(0,*) trim(name),' Invalid descriptor inupt: map_data',&
-         & map_data,psb_map_double_complex_
-    info = 1
-    return 
-  endif
+  map_kind = psb_get_map_kind(map)
 
   select case(map_kind)
   case(psb_map_aggr_)
-    ! Ok, we just need to call a halo update and a matrix-vector product. 
-    call psb_halo(x,desc%desc_1,info,work=work)
-    if (info == 0) call psb_csmm(alpha,desc%zmap%map_fw,x,beta,y,info)
-    if ((info == 0) .and. psb_is_repl_desc(desc%desc_2)) then
-      ictxt = psb_cd_get_context(desc%desc_2)
-      nr = psb_cd_get_global_rows(desc%desc_2)
-      call psb_sum(ictxt,y(1:nr))
+
+    ictxt = psb_cd_get_context(map%p_desc_Y)
+    nr2   = psb_cd_get_global_rows(map%p_desc_Y)
+    nc2   = psb_cd_get_local_cols(map%p_desc_Y) 
+    allocate(yt(nc2),stat=info) 
+    if (info == 0) call psb_halo(x,map%p_desc_X,info,work=work)
+    if (info == 0) call psb_csmm(zone,map%map_X2Y,x,zzero,yt,info)
+    if ((info == 0) .and. psb_is_repl_desc(map%p_desc_Y)) then
+      call psb_sum(ictxt,yt(1:nr2))
     end if
+    if (info == 0) call psb_geaxpby(alpha,yt,beta,y,map%p_desc_Y,info)
     if (info /= 0) then 
       write(0,*) trim(name),' Error from inner routines',info
       info = -1
     end if
 
   case(psb_map_gen_linear_)
-    call psb_linmap(alpha,x,beta,y,desc%zmap%map_fw,&
-         & desc%desc_fw,desc%desc_1,desc%desc_2)
 
+    ictxt = psb_cd_get_context(map%desc_Y)
+    nr1   = psb_cd_get_local_rows(map%desc_X) 
+    nc1   = psb_cd_get_local_cols(map%desc_X) 
+    nr2   = psb_cd_get_global_rows(map%desc_Y)
+    nc2   = psb_cd_get_local_cols(map%desc_Y) 
+    allocate(xt(nc1),yt(nc2),stat=info) 
+    xt(1:nr1) = x(1:nr1) 
+    if (info == 0) call psb_halo(xt,map%desc_X,info,work=work)
+    if (info == 0) call psb_csmm(zone,map%map_X2Y,xt,zzero,yt,info)
+    if ((info == 0) .and. psb_is_repl_desc(map%desc_Y)) then
+      call psb_sum(ictxt,yt(1:nr2))
+    end if
+    if (info == 0) call psb_geaxpby(alpha,yt,beta,y,map%desc_Y,info)
     if (info /= 0) then 
       write(0,*) trim(name),' Error from inner routines',info
       info = -1
     end if
+   
 
   case default
-    write(0,*) trim(name),' Invalid descriptor inupt'
+    write(0,*) trim(name),' Invalid descriptor input'
     info = 1
     return 
   end select
 
-end subroutine psb_z_forward_map
+end subroutine psb_z_map_X2Y
 
 
 !
-! Takes a vector X from space desc%desc_2 and maps it onto
-! desc%desc_1 under desc%map_bk possibly with communication
+! Takes a vector x from space map%p_desc_Y and maps it onto
+! map%p_desc_X under map%map_Y2X possibly with communication
 ! due to exch_bk_idx
 !
-subroutine psb_z_backward_map(alpha,x,beta,y,desc,info,work)
-  use psb_base_mod, psb_protect_name => psb_z_backward_map
+subroutine psb_z_map_Y2X(alpha,x,beta,y,map,info,work)
+  use psb_base_mod, psb_protect_name => psb_z_map_Y2X
 
   implicit none 
-  type(psb_inter_desc_type), intent(in) :: desc
+  type(psb_zlinmap_type), intent(in) :: map
   complex(psb_dpk_), intent(in)       :: alpha,beta
   complex(psb_dpk_), intent(inout)    :: x(:)
   complex(psb_dpk_), intent(out)      :: y(:)
@@ -562,160 +596,65 @@ subroutine psb_z_backward_map(alpha,x,beta,y,desc,info,work)
   complex(psb_dpk_), optional         :: work(:)
 
   !
-  complex(psb_dpk_), allocatable :: xt(:)
-  integer                       :: itsz, i, j,totxch,totsnd,totrcv,&
+  complex(psb_dpk_), allocatable :: xt(:), yt(:)
+  integer                       :: i, j, nr1, nc1,nr2, nc2,&
        & map_kind, map_data, nr, ictxt
-  character(len=20), parameter  :: name='psb_backward_map'
+  character(len=20), parameter  :: name='psb_map_Y2X'
 
   info = 0
-  if (.not.psb_is_asb_desc(desc)) then 
-    write(0,*) trim(name),' Invalid descriptor inupt'
+  if (.not.psb_is_asb_map(map)) then 
+    write(0,*) trim(name),' Invalid descriptor input'
     info = 1
     return 
   end if
 
-  itsz     = psb_cd_get_bk_tmp_sz(desc)
-  map_kind = psb_cd_get_map_kind(desc)
-  map_data = psb_cd_get_map_data(desc)
-  if (map_data /= psb_map_double_complex_) then 
-    write(0,*) trim(name),' Invalid descriptor inupt: map_data',&
-         & map_data,psb_map_double_complex_
-    info = 1
-    return 
-  endif
+  map_kind = psb_get_map_kind(map)
 
   select case(map_kind)
   case(psb_map_aggr_)
-    ! Ok, we just need to call a halo update and a matrix-vector product. 
-    call psb_halo(x,desc%desc_2,info,work=work)
-    if (info == 0) call psb_csmm(alpha,desc%zmap%map_bk,x,beta,y,info)
-    if ((info == 0) .and. psb_is_repl_desc(desc%desc_1)) then
-      ictxt = psb_cd_get_context(desc%desc_1)
-      nr = psb_cd_get_global_rows(desc%desc_1)
-      call psb_sum(ictxt,y(1:nr))
-    end if
 
+    ictxt = psb_cd_get_context(map%p_desc_X)
+    nr2   = psb_cd_get_global_rows(map%p_desc_X)
+    nc2   = psb_cd_get_local_cols(map%p_desc_X) 
+    allocate(yt(nc2),stat=info) 
+    if (info == 0) call psb_halo(x,map%p_desc_Y,info,work=work)
+    if (info == 0) call psb_csmm(zone,map%map_Y2X,x,zzero,yt,info)
+    if ((info == 0) .and. psb_is_repl_desc(map%p_desc_X)) then
+      call psb_sum(ictxt,yt(1:nr2))
+    end if
+    if (info == 0) call psb_geaxpby(alpha,yt,beta,y,map%p_desc_X,info)
     if (info /= 0) then 
       write(0,*) trim(name),' Error from inner routines',info
       info = -1
     end if
-
 
   case(psb_map_gen_linear_)
-    call psb_linmap(alpha,x,beta,y,desc%zmap%map_bk,&
-         & desc%desc_bk,desc%desc_2,desc%desc_1)
 
+    ictxt = psb_cd_get_context(map%desc_X)
+    nr1   = psb_cd_get_local_rows(map%desc_Y) 
+    nc1   = psb_cd_get_local_cols(map%desc_Y) 
+    nr2   = psb_cd_get_global_rows(map%desc_X)
+    nc2   = psb_cd_get_local_cols(map%desc_X) 
+    allocate(xt(nc1),yt(nc2),stat=info) 
+    xt(1:nr1) = x(1:nr1) 
+    if (info == 0) call psb_halo(xt,map%desc_Y,info,work=work)
+    if (info == 0) call psb_csmm(zone,map%map_Y2X,xt,zzero,yt,info)
+    if ((info == 0) .and. psb_is_repl_desc(map%desc_X)) then
+      call psb_sum(ictxt,yt(1:nr2))
+    end if
+    if (info == 0) call psb_geaxpby(alpha,yt,beta,y,map%desc_X,info)
     if (info /= 0) then 
       write(0,*) trim(name),' Error from inner routines',info
       info = -1
     end if
+   
 
   case default
-    write(0,*) trim(name),' Invalid descriptor inupt'
+    write(0,*) trim(name),' Invalid descriptor input'
     info = 1
     return 
   end select
 
-end subroutine psb_z_backward_map
+end subroutine psb_z_map_Y2X
 
 
-
-subroutine psb_s_apply_linmap(alpha,x,beta,y,a_map,cd_xt,descin,descout)
-  use psb_base_mod, psb_protect_name => psb_s_apply_linmap
-
-  implicit none 
-  real(psb_spk_), intent(in)      :: alpha,beta
-  real(psb_spk_), intent(inout)   :: x(:),y(:)
-  type(psb_sspmat_type), intent(in) :: a_map
-  type(psb_desc_type), intent(in)   :: cd_xt,descin, descout 
-
-  integer :: nrt, nct, info
-  real(psb_spk_), allocatable :: tmp(:)
-
-  nrt = psb_cd_get_local_rows(cd_xt)
-  nct = psb_cd_get_local_cols(cd_xt)
-  allocate(tmp(nct),stat=info)
-  if (info == 0) tmp(1:nrt) = x(1:nrt)
-  if (info == 0) call psb_halo(tmp,cd_xt,info) 
-  if (info == 0) call psb_csmm(alpha,a_map,tmp,beta,y,info)
-  if (info /= 0) then 
-    write(0,*) 'Error in apply_map'
-  endif
-
-end subroutine psb_s_apply_linmap
-
-
-subroutine psb_d_apply_linmap(alpha,x,beta,y,a_map,cd_xt,descin,descout)
-  use psb_base_mod, psb_protect_name => psb_d_apply_linmap
-
-  implicit none 
-  real(psb_dpk_), intent(in)      :: alpha,beta
-  real(psb_dpk_), intent(inout)   :: x(:),y(:)
-  type(psb_dspmat_type), intent(in) :: a_map
-  type(psb_desc_type), intent(in)   :: cd_xt,descin, descout 
-
-  integer :: nrt, nct, info
-  real(psb_dpk_), allocatable :: tmp(:)
-
-  nrt = psb_cd_get_local_rows(cd_xt)
-  nct = psb_cd_get_local_cols(cd_xt)
-  allocate(tmp(nct),stat=info)
-  if (info == 0) tmp(1:nrt) = x(1:nrt)
-  if (info == 0) call psb_halo(tmp,cd_xt,info) 
-  if (info == 0) call a_map%spmm(alpha,tmp,beta,y,info)
-!!$  if (info == 0) call psb_csmm(alpha,a_map,tmp,beta,y,info)
-  if (info /= 0) then 
-    write(0,*) 'Error in apply_map'
-  endif
-
-end subroutine psb_d_apply_linmap
-
-
-subroutine psb_c_apply_linmap(alpha,x,beta,y,a_map,cd_xt,descin,descout)
-  use psb_base_mod, psb_protect_name => psb_c_apply_linmap
-
-  implicit none 
-  complex(psb_spk_), intent(in)      :: alpha,beta
-  complex(psb_spk_), intent(inout)   :: x(:),y(:)
-  type(psb_cspmat_type), intent(in) :: a_map
-  type(psb_desc_type), intent(in)   :: cd_xt,descin, descout 
-
-  integer :: nrt, nct, info
-  complex(psb_spk_), allocatable :: tmp(:)
-
-  nrt = psb_cd_get_local_rows(cd_xt)
-  nct = psb_cd_get_local_cols(cd_xt)
-  allocate(tmp(nct),stat=info)
-  if (info == 0) tmp(1:nrt) = x(1:nrt)
-  if (info == 0) call psb_halo(tmp,cd_xt,info) 
-  if (info == 0) call psb_csmm(alpha,a_map,tmp,beta,y,info)
-  if (info /= 0) then 
-    write(0,*) 'Error in apply_map'
-  endif
-
-end subroutine psb_c_apply_linmap
-
-subroutine psb_z_apply_linmap(alpha,x,beta,y,a_map,cd_xt,descin,descout)
-
-  use psb_base_mod, psb_protect_name => psb_z_apply_linmap
-
-  implicit none 
-  complex(psb_dpk_), intent(in)      :: alpha,beta
-  complex(psb_dpk_), intent(inout)   :: x(:),y(:)
-  type(psb_zspmat_type), intent(in) :: a_map
-  type(psb_desc_type), intent(in)   :: cd_xt,descin, descout 
-
-  integer :: nrt, nct, info
-  complex(psb_dpk_), allocatable :: tmp(:)
-
-  nrt = psb_cd_get_local_rows(cd_xt)
-  nct = psb_cd_get_local_cols(cd_xt)
-  allocate(tmp(nct),stat=info)
-  if (info == 0) tmp(1:nrt) = x(1:nrt)
-  if (info == 0) call psb_halo(tmp,cd_xt,info) 
-  if (info == 0) call psb_csmm(alpha,a_map,tmp,beta,y,info)
-  if (info /= 0) then 
-    write(0,*) 'Error in apply_map'
-  endif
-
-end subroutine psb_z_apply_linmap

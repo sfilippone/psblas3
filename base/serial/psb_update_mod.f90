@@ -318,7 +318,7 @@ contains
               i2 = a%ia2(ir+1)
               nc=i2-i1
 
-              call ibsrch(ip,ic,nc,a%ia1(i1:i2-1))    
+              ip = psb_ibsrch(ic,nc,a%ia1(i1:i2-1))    
               if (ip>0) then 
                 a%aspk(i1+ip-1) = val(i)
               else
@@ -353,7 +353,7 @@ contains
               i1 = a%ia2(ir)
               i2 = a%ia2(ir+1)
               nc = i2-i1
-              call ibsrch(ip,ic,nc,a%ia1(i1:i2-1))
+              ip = psb_ibsrch(ic,nc,a%ia1(i1:i2-1))
               if (ip>0) then 
                 a%aspk(i1+ip-1) = a%aspk(i1+ip-1) + val(i)
               else
@@ -398,7 +398,7 @@ contains
             i2 = a%ia2(ir+1)
             nc=i2-i1
 
-            call ibsrch(ip,ic,nc,a%ia1(i1:i2-1))    
+            ip = psb_ibsrch(ic,nc,a%ia1(i1:i2-1))    
             if (ip>0) then 
               a%aspk(i1+ip-1) = val(i)
             else
@@ -429,7 +429,7 @@ contains
             i1 = a%ia2(ir)
             i2 = a%ia2(ir+1)
             nc = i2-i1
-            call ibsrch(ip,ic,nc,a%ia1(i1:i2-1))
+            ip = psb_ibsrch(ic,nc,a%ia1(i1:i2-1))
             if (ip>0) then 
               a%aspk(i1+ip-1) = a%aspk(i1+ip-1) + val(i)
             else
@@ -508,7 +508,7 @@ contains
             if ((ir > 0).and.(ir <= a%m)) then 
               ic = gtl(ic) 
               if (ir /= ilr) then 
-                call ibsrch(i1,ir,nnz,a%ia1)
+                i1 = psb_ibsrch(ir,nnz,a%ia1)
                 i2 = i1
                 do 
                   if (i2+1 > nnz) exit
@@ -526,7 +526,7 @@ contains
                 i2 = 1
               end if
               nc = i2-i1+1
-              call issrch(ip,ic,nc,a%ia2(i1:i2))
+              ip = psb_issrch(ic,nc,a%ia2(i1:i2))
               if (ip>0) then 
                 a%aspk(i1+ip-1) = val(i)
               else
@@ -551,7 +551,7 @@ contains
             if ((ir > 0).and.(ir <= a%m)) then 
 
               if (ir /= ilr) then 
-                call ibsrch(i1,ir,nnz,a%ia1)
+                i1 = psb_ibsrch(ir,nnz,a%ia1)
                 i2 = i1
                 do 
                   if (i2+1 > nnz) exit
@@ -569,7 +569,7 @@ contains
                 i2 = 1
               end if
               nc = i2-i1+1
-              call issrch(ip,ic,nc,a%ia2(i1:i2))
+              ip = psb_issrch(ic,nc,a%ia2(i1:i2))
               if (ip>0) then 
                 a%aspk(i1+ip-1) = a%aspk(i1+ip-1) + val(i)
               else
@@ -603,7 +603,7 @@ contains
           if ((ir > 0).and.(ir <= a%m)) then 
 
             if (ir /= ilr) then 
-              call ibsrch(i1,ir,nnz,a%ia1)
+              i1 = psb_ibsrch(ir,nnz,a%ia1)
               i2 = i1
               do 
                 if (i2+1 > nnz) exit
@@ -621,7 +621,7 @@ contains
               i2 = 1
             end if
             nc = i2-i1+1
-            call issrch(ip,ic,nc,a%ia2(i1:i2))
+            ip = psb_issrch(ic,nc,a%ia2(i1:i2))
             if (ip>0) then 
               a%aspk(i1+ip-1) = val(i)
             else
@@ -639,7 +639,7 @@ contains
           if ((ir > 0).and.(ir <= a%m)) then 
 
             if (ir /= ilr) then 
-              call ibsrch(i1,ir,nnz,a%ia1)
+              i1 = psb_ibsrch(ir,nnz,a%ia1)
               i2 = i1
               do 
                 if (i2+1 > nnz) exit
@@ -657,7 +657,7 @@ contains
               i2 = 1
             end if
             nc = i2-i1+1
-            call issrch(ip,ic,nc,a%ia2(i1:i2))
+            ip = psb_issrch(ic,nc,a%ia2(i1:i2))
             if (ip>0) then 
               a%aspk(i1+ip-1) = a%aspk(i1+ip-1) + val(i)
             else
@@ -780,7 +780,7 @@ contains
             ir = gtl(ir)
             if ((ir > 0).and.(ir <= a%m)) then 
               ic = gtl(ic) 
-              call ibsrch(i,ir,nr,rows)
+              i = psb_ibsrch(ir,nr,rows)
 
               ! find which block the row belongs to
               blk = blks(i)
@@ -869,7 +869,7 @@ contains
           ir = ia(ii)
           ic = ja(ii) 
           if ((ir >=1).and.(ir<=a%m).and.(ic>=1).and.(ic<=a%k)) then 
-            call ibsrch(i,ir,nr,rows)
+            i = psb_ibsrch(ir,nr,rows)
             ! find which block the row belongs to
             blk = blks(i)
 
@@ -969,7 +969,7 @@ contains
               i2 = a%ia2(ir+1)
               nc=i2-i1
 
-              call ibsrch(ip,ic,nc,a%ia1(i1:i2-1))    
+              ip = psb_ibsrch(ic,nc,a%ia1(i1:i2-1))    
               if (ip>0) then 
                 a%aspk(i1+ip-1) = val(i)
               else
@@ -1004,7 +1004,7 @@ contains
               i1 = a%ia2(ir)
               i2 = a%ia2(ir+1)
               nc = i2-i1
-              call ibsrch(ip,ic,nc,a%ia1(i1:i2-1))
+              ip = psb_ibsrch(ic,nc,a%ia1(i1:i2-1))
               if (ip>0) then 
                 a%aspk(i1+ip-1) = a%aspk(i1+ip-1) + val(i)
               else
@@ -1050,7 +1050,7 @@ contains
             i2 = a%ia2(ir+1)
             nc=i2-i1
 
-            call ibsrch(ip,ic,nc,a%ia1(i1:i2-1))    
+            ip = psb_ibsrch(ic,nc,a%ia1(i1:i2-1))    
             if (ip>0) then 
               a%aspk(i1+ip-1) = val(i)
             else
@@ -1081,7 +1081,7 @@ contains
             i1 = a%ia2(ir)
             i2 = a%ia2(ir+1)
             nc = i2-i1
-            call ibsrch(ip,ic,nc,a%ia1(i1:i2-1))
+            ip = psb_ibsrch(ic,nc,a%ia1(i1:i2-1))
             if (ip>0) then 
               a%aspk(i1+ip-1) = a%aspk(i1+ip-1) + val(i)
             else
@@ -1160,7 +1160,7 @@ contains
             if ((ir > 0).and.(ir <= a%m)) then 
               ic = gtl(ic) 
               if (ir /= ilr) then 
-                call ibsrch(i1,ir,nnz,a%ia1)
+                i1 = psb_ibsrch(ir,nnz,a%ia1)
                 i2 = i1
                 do 
                   if (i2+1 > nnz) exit
@@ -1178,7 +1178,7 @@ contains
                 i2 = 1
               end if
               nc = i2-i1+1
-              call issrch(ip,ic,nc,a%ia2(i1:i2))
+              ip = psb_issrch(ic,nc,a%ia2(i1:i2))
               if (ip>0) then 
                 a%aspk(i1+ip-1) = val(i)
               else
@@ -1203,7 +1203,7 @@ contains
             if ((ir > 0).and.(ir <= a%m)) then 
 
               if (ir /= ilr) then 
-                call ibsrch(i1,ir,nnz,a%ia1)
+                i1 = psb_ibsrch(ir,nnz,a%ia1)
                 i2 = i1
                 do 
                   if (i2+1 > nnz) exit
@@ -1221,7 +1221,7 @@ contains
                 i2 = 1
               end if
               nc = i2-i1+1
-              call issrch(ip,ic,nc,a%ia2(i1:i2))
+              ip = psb_issrch(ic,nc,a%ia2(i1:i2))
               if (ip>0) then 
                 a%aspk(i1+ip-1) = a%aspk(i1+ip-1) + val(i)
               else
@@ -1255,7 +1255,7 @@ contains
           if ((ir > 0).and.(ir <= a%m)) then 
 
             if (ir /= ilr) then 
-              call ibsrch(i1,ir,nnz,a%ia1)
+              i1 = psb_ibsrch(ir,nnz,a%ia1)
               i2 = i1
               do 
                 if (i2+1 > nnz) exit
@@ -1273,7 +1273,7 @@ contains
               i2 = 1
             end if
             nc = i2-i1+1
-            call issrch(ip,ic,nc,a%ia2(i1:i2))
+            ip = psb_issrch(ic,nc,a%ia2(i1:i2))
             if (ip>0) then 
               a%aspk(i1+ip-1) = val(i)
             else
@@ -1291,7 +1291,7 @@ contains
           if ((ir > 0).and.(ir <= a%m)) then 
 
             if (ir /= ilr) then 
-              call ibsrch(i1,ir,nnz,a%ia1)
+              i1 = psb_ibsrch(ir,nnz,a%ia1)
               i2 = i1
               do 
                 if (i2+1 > nnz) exit
@@ -1309,7 +1309,7 @@ contains
               i2 = 1
             end if
             nc = i2-i1+1
-            call issrch(ip,ic,nc,a%ia2(i1:i2))
+            ip = psb_issrch(ic,nc,a%ia2(i1:i2))
             if (ip>0) then 
               a%aspk(i1+ip-1) = a%aspk(i1+ip-1) + val(i)
             else
@@ -1432,7 +1432,7 @@ contains
             ir = gtl(ir)
             if ((ir > 0).and.(ir <= a%m)) then 
               ic = gtl(ic) 
-              call ibsrch(i,ir,nr,rows)
+              i = psb_ibsrch(ir,nr,rows)
 
               ! find which block the row belongs to
               blk = blks(i)
@@ -1521,7 +1521,7 @@ contains
           ir = ia(ii)
           ic = ja(ii) 
           if ((ir >=1).and.(ir<=a%m).and.(ic>=1).and.(ic<=a%k)) then 
-            call ibsrch(i,ir,nr,rows)
+            i = psb_ibsrch(ir,nr,rows)
             ! find which block the row belongs to
             blk = blks(i)
 
@@ -1622,7 +1622,7 @@ contains
               i2 = a%ia2(ir+1)
               nc=i2-i1
 
-              call ibsrch(ip,ic,nc,a%ia1(i1:i2-1))    
+              ip = psb_ibsrch(ic,nc,a%ia1(i1:i2-1))    
               if (ip>0) then 
                 a%aspk(i1+ip-1) = val(i)
               else
@@ -1656,7 +1656,7 @@ contains
               i1 = a%ia2(ir)
               i2 = a%ia2(ir+1)
               nc = i2-i1
-              call issrch(ip,ic,nc,a%ia1(i1:i2-1))
+              ip = psb_issrch(ic,nc,a%ia1(i1:i2-1))
               if (ip>0) then 
                 a%aspk(i1+ip-1) = a%aspk(i1+ip-1) + val(i)
               else
@@ -1701,7 +1701,7 @@ contains
             i2 = a%ia2(ir+1)
             nc=i2-i1
 
-            call ibsrch(ip,ic,nc,a%ia1(i1:i2-1))    
+            ip = psb_ibsrch(ic,nc,a%ia1(i1:i2-1))    
             if (ip>0) then 
               a%aspk(i1+ip-1) = val(i)
             else
@@ -1732,7 +1732,7 @@ contains
             i1 = a%ia2(ir)
             i2 = a%ia2(ir+1)
             nc = i2-i1
-            call ibsrch(ip,ic,nc,a%ia1(i1:i2-1))
+            ip = psb_ibsrch(ic,nc,a%ia1(i1:i2-1))
             if (ip>0) then 
               a%aspk(i1+ip-1) = a%aspk(i1+ip-1) + val(i)
             else
@@ -1812,7 +1812,7 @@ contains
             if ((ir > 0).and.(ir <= a%m)) then 
               ic = gtl(ic) 
               if (ir /= ilr) then 
-                call ibsrch(i1,ir,nnz,a%ia1)
+                i1 = psb_ibsrch(ir,nnz,a%ia1)
                 i2 = i1
                 do 
                   if (i2+1 > nnz) exit
@@ -1830,7 +1830,7 @@ contains
                 i2 = 1
               end if
               nc = i2-i1+1
-              call issrch(ip,ic,nc,a%ia2(i1:i2))
+              ip = psb_issrch(ic,nc,a%ia2(i1:i2))
               if (ip>0) then 
                 a%aspk(i1+ip-1) = val(i)
               else
@@ -1855,7 +1855,7 @@ contains
             if ((ir > 0).and.(ir <= a%m)) then 
 
               if (ir /= ilr) then 
-                call ibsrch(i1,ir,nnz,a%ia1)
+                i1 = psb_ibsrch(ir,nnz,a%ia1)
                 i2 = i1
                 do 
                   if (i2+1 > nnz) exit
@@ -1873,7 +1873,7 @@ contains
                 i2 = 1
               end if
               nc = i2-i1+1
-              call issrch(ip,ic,nc,a%ia2(i1:i2))
+              ip = psb_issrch(ic,nc,a%ia2(i1:i2))
               if (ip>0) then 
                 a%aspk(i1+ip-1) = a%aspk(i1+ip-1) + val(i)
               else
@@ -1907,7 +1907,7 @@ contains
           if ((ir > 0).and.(ir <= a%m)) then 
 
             if (ir /= ilr) then 
-              call ibsrch(i1,ir,nnz,a%ia1)
+              i1 = psb_ibsrch(ir,nnz,a%ia1)
               i2 = i1
               do 
                 if (i2+1 > nnz) exit
@@ -1925,7 +1925,7 @@ contains
               i2 = 1
             end if
             nc = i2-i1+1
-            call issrch(ip,ic,nc,a%ia2(i1:i2))
+            ip = psb_issrch(ic,nc,a%ia2(i1:i2))
             if (ip>0) then 
               a%aspk(i1+ip-1) = val(i)
             else
@@ -1943,7 +1943,7 @@ contains
           if ((ir > 0).and.(ir <= a%m)) then 
 
             if (ir /= ilr) then 
-              call ibsrch(i1,ir,nnz,a%ia1)
+              i1 = psb_ibsrch(ir,nnz,a%ia1)
               i2 = i1
               do 
                 if (i2+1 > nnz) exit
@@ -1961,7 +1961,7 @@ contains
               i2 = 1
             end if
             nc = i2-i1+1
-            call issrch(ip,ic,nc,a%ia2(i1:i2))
+            ip = psb_issrch(ic,nc,a%ia2(i1:i2))
             if (ip>0) then 
               a%aspk(i1+ip-1) = a%aspk(i1+ip-1) + val(i)
             else
@@ -2086,7 +2086,7 @@ contains
             ir = gtl(ir)
             if ((ir > 0).and.(ir <= a%m)) then 
               ic = gtl(ic) 
-              call ibsrch(i,ir,nr,rows)
+              i = psb_ibsrch(ir,nr,rows)
 
               ! find which block the row belongs to
               blk = blks(i)
@@ -2175,7 +2175,7 @@ contains
           ir = ia(ii)
           ic = ja(ii) 
           if ((ir >=1).and.(ir<=a%m).and.(ic>=1).and.(ic<=a%k)) then 
-            call ibsrch(i,ir,nr,rows)
+            i = psb_ibsrch(ir,nr,rows)
             ! find which block the row belongs to
             blk = blks(i)
 
@@ -2275,7 +2275,7 @@ contains
               i2 = a%ia2(ir+1)
               nc=i2-i1
 
-              call ibsrch(ip,ic,nc,a%ia1(i1:i2-1))    
+              ip = psb_ibsrch(ic,nc,a%ia1(i1:i2-1))    
               if (ip>0) then 
                 a%aspk(i1+ip-1) = val(i)
               else
@@ -2309,7 +2309,7 @@ contains
               i1 = a%ia2(ir)
               i2 = a%ia2(ir+1)
               nc = i2-i1
-              call issrch(ip,ic,nc,a%ia1(i1:i2-1))
+              ip = psb_issrch(ic,nc,a%ia1(i1:i2-1))
               if (ip>0) then 
                 a%aspk(i1+ip-1) = a%aspk(i1+ip-1) + val(i)
               else
@@ -2355,7 +2355,7 @@ contains
             i2 = a%ia2(ir+1)
             nc=i2-i1
 
-            call ibsrch(ip,ic,nc,a%ia1(i1:i2-1))    
+            ip = psb_ibsrch(ic,nc,a%ia1(i1:i2-1))    
             if (ip>0) then 
               a%aspk(i1+ip-1) = val(i)
             else
@@ -2386,7 +2386,7 @@ contains
             i1 = a%ia2(ir)
             i2 = a%ia2(ir+1)
             nc = i2-i1
-            call ibsrch(ip,ic,nc,a%ia1(i1:i2-1))
+            ip = psb_ibsrch(ic,nc,a%ia1(i1:i2-1))
             if (ip>0) then 
               a%aspk(i1+ip-1) = a%aspk(i1+ip-1) + val(i)
             else
@@ -2466,7 +2466,7 @@ contains
             if ((ir > 0).and.(ir <= a%m)) then 
               ic = gtl(ic) 
               if (ir /= ilr) then 
-                call ibsrch(i1,ir,nnz,a%ia1)
+                i1 = psb_ibsrch(ir,nnz,a%ia1)
                 i2 = i1
                 do 
                   if (i2+1 > nnz) exit
@@ -2484,7 +2484,7 @@ contains
                 i2 = 1
               end if
               nc = i2-i1+1
-              call issrch(ip,ic,nc,a%ia2(i1:i2))
+              ip = psb_issrch(ic,nc,a%ia2(i1:i2))
               if (ip>0) then 
                 a%aspk(i1+ip-1) = val(i)
               else
@@ -2509,7 +2509,7 @@ contains
             if ((ir > 0).and.(ir <= a%m)) then 
 
               if (ir /= ilr) then 
-                call ibsrch(i1,ir,nnz,a%ia1)
+                i1 = psb_ibsrch(ir,nnz,a%ia1)
                 i2 = i1
                 do 
                   if (i2+1 > nnz) exit
@@ -2527,7 +2527,7 @@ contains
                 i2 = 1
               end if
               nc = i2-i1+1
-              call issrch(ip,ic,nc,a%ia2(i1:i2))
+              ip = psb_issrch(ic,nc,a%ia2(i1:i2))
               if (ip>0) then 
                 a%aspk(i1+ip-1) = a%aspk(i1+ip-1) + val(i)
               else
@@ -2561,7 +2561,7 @@ contains
           if ((ir > 0).and.(ir <= a%m)) then 
 
             if (ir /= ilr) then 
-              call ibsrch(i1,ir,nnz,a%ia1)
+              i1 = psb_ibsrch(ir,nnz,a%ia1)
               i2 = i1
               do 
                 if (i2+1 > nnz) exit
@@ -2579,7 +2579,7 @@ contains
               i2 = 1
             end if
             nc = i2-i1+1
-            call issrch(ip,ic,nc,a%ia2(i1:i2))
+            ip = psb_issrch(ic,nc,a%ia2(i1:i2))
             if (ip>0) then 
               a%aspk(i1+ip-1) = val(i)
             else
@@ -2597,7 +2597,7 @@ contains
           if ((ir > 0).and.(ir <= a%m)) then 
 
             if (ir /= ilr) then 
-              call ibsrch(i1,ir,nnz,a%ia1)
+              i1 = psb_ibsrch(ir,nnz,a%ia1)
               i2 = i1
               do 
                 if (i2+1 > nnz) exit
@@ -2615,7 +2615,7 @@ contains
               i2 = 1
             end if
             nc = i2-i1+1
-            call issrch(ip,ic,nc,a%ia2(i1:i2))
+            ip = psb_issrch(ic,nc,a%ia2(i1:i2))
             if (ip>0) then 
               a%aspk(i1+ip-1) = a%aspk(i1+ip-1) + val(i)
             else
@@ -2740,7 +2740,7 @@ contains
             ir = gtl(ir)
             if ((ir > 0).and.(ir <= a%m)) then 
               ic = gtl(ic) 
-              call ibsrch(i,ir,nr,rows)
+              i = psb_ibsrch(ir,nr,rows)
 
               ! find which block the row belongs to
               blk = blks(i)
@@ -2829,7 +2829,7 @@ contains
           ir = ia(ii)
           ic = ja(ii) 
           if ((ir >=1).and.(ir<=a%m).and.(ic>=1).and.(ic<=a%k)) then 
-            call ibsrch(i,ir,nr,rows)
+            i = psb_ibsrch(ir,nr,rows)
             ! find which block the row belongs to
             blk = blks(i)
 

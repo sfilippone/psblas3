@@ -7,5 +7,3 @@ CSR                    Storage format for matrix A:  CSR COO JAD
 200                    MAXIT
 -1                     ITRACE
 20                     IRST    restart for RGMRES  and BiCGSTABL
-
-

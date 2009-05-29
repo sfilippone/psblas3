@@ -65,9 +65,9 @@ Subroutine psb_cd_reinit(desc,info)
   call psb_cd_get_recv_idx(tmp_halo,desc,psb_comm_halo_,info,toglob=.false.)    
   call psb_cd_get_recv_idx(tmp_ext,desc,psb_comm_ext_,info,toglob=.false.)        
 
-  call psb_transfer(tmp_ovr,desc%ovrlap_index,info)
-  call psb_transfer(tmp_halo,desc%halo_index,info)
-  call psb_transfer(tmp_ext,desc%ext_index,info)
+  call psb_move_alloc(tmp_ovr,desc%ovrlap_index,info)
+  call psb_move_alloc(tmp_halo,desc%halo_index,info)
+  call psb_move_alloc(tmp_ext,desc%ext_index,info)
   call psb_cd_set_bld(desc,info)
 
   if (debug_level >= psb_debug_outer_) &

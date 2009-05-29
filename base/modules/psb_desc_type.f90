@@ -359,7 +359,7 @@ module psb_descriptor_type
   end interface
 
 
-  interface psb_transfer
+  interface psb_move_alloc
     module procedure psb_cdtransfer, psb_idxmap_transfer
   end interface
 
@@ -978,7 +978,7 @@ contains
 
     !locals
     integer             :: np,me,ictxt, err_act
-    integer              :: debug_level, debug_unit
+    integer             :: debug_level, debug_unit
     character(len=20)   :: name
 
     if (psb_get_errstatus()/=0) return 
@@ -988,36 +988,29 @@ contains
     debug_unit  = psb_get_debug_unit()
     debug_level = psb_get_debug_level()
 
-    ictxt=psb_cd_get_context(desc_in)
+    ! Should not require ictxt to be present: this
+    ! function might be called even when desc_in is
+    ! empty. 
 
-    call psb_info(ictxt, me, np)
-    if (debug_level >= psb_debug_outer_)&
-         &  write(debug_unit,*) me,' ',trim(name),': start.'
-    if (np == -1) then
-      info = 2010
-      call psb_errpush(info,name)
-      goto 9999
-    endif
-
-    call psb_transfer( desc_in%matrix_data ,    desc_out%matrix_data  , info)
+    call psb_move_alloc( desc_in%matrix_data ,    desc_out%matrix_data  , info)
     if (info == 0)  &
-         & call psb_transfer( desc_in%halo_index  ,    desc_out%halo_index   , info)
+         & call psb_move_alloc( desc_in%halo_index  ,    desc_out%halo_index   , info)
     if (info == 0)  &
-         & call psb_transfer( desc_in%bnd_elem    ,    desc_out%bnd_elem     , info)
+         & call psb_move_alloc( desc_in%bnd_elem    ,    desc_out%bnd_elem     , info)
     if (info == 0)  &
-         & call psb_transfer( desc_in%ovrlap_elem ,    desc_out%ovrlap_elem  , info)
+         & call psb_move_alloc( desc_in%ovrlap_elem ,    desc_out%ovrlap_elem  , info)
     if (info == 0)  &
-         & call psb_transfer( desc_in%ovrlap_index,    desc_out%ovrlap_index , info)
+         & call psb_move_alloc( desc_in%ovrlap_index,    desc_out%ovrlap_index , info)
     if (info == 0)  &
-         & call psb_transfer( desc_in%ovr_mst_idx ,    desc_out%ovr_mst_idx  , info)
+         & call psb_move_alloc( desc_in%ovr_mst_idx ,    desc_out%ovr_mst_idx  , info)
     if (info == 0)  &
-         & call psb_transfer( desc_in%ext_index   ,    desc_out%ext_index    , info)
+         & call psb_move_alloc( desc_in%ext_index   ,    desc_out%ext_index    , info)
     if (info == 0)  &
-         & call psb_transfer( desc_in%lprm        ,    desc_out%lprm         , info)
+         & call psb_move_alloc( desc_in%lprm        ,    desc_out%lprm         , info)
     if (info == 0)  &
-         & call psb_transfer( desc_in%idx_space   ,    desc_out%idx_space    , info)
+         & call psb_move_alloc( desc_in%idx_space   ,    desc_out%idx_space    , info)
     if (info == 0) &
-         & call psb_transfer(desc_in%idxmap, desc_out%idxmap,info)
+         & call psb_move_alloc(desc_in%idxmap, desc_out%idxmap,info)
     if (info /= 0) then
       info = 4010
       call psb_errpush(info,name)
@@ -1035,7 +1028,7 @@ contains
     if (err_act == psb_act_ret_) then
       return
     else
-      call psb_error(ictxt)
+      call psb_error()
     end if
     return
 
@@ -1072,15 +1065,15 @@ contains
     map_out%hashvmask = map_in%hashvmask
 
     if (info == 0)  &
-         & call psb_transfer( map_in%loc_to_glob ,    map_out%loc_to_glob  , info)
+         & call psb_move_alloc( map_in%loc_to_glob ,    map_out%loc_to_glob  , info)
     if (info == 0)  &
-         & call psb_transfer( map_in%glob_to_loc ,    map_out%glob_to_loc  , info)
+         & call psb_move_alloc( map_in%glob_to_loc ,    map_out%glob_to_loc  , info)
     if (info == 0)  &
-         & call psb_transfer( map_in%hashv       ,    map_out%hashv        , info)
+         & call psb_move_alloc( map_in%hashv       ,    map_out%hashv        , info)
     if (info == 0)  &
-         & call psb_transfer( map_in%glb_lc      ,    map_out%glb_lc       , info)
+         & call psb_move_alloc( map_in%glb_lc      ,    map_out%glb_lc       , info)
     if (info == 0)  &
-         & call psb_transfer( map_in%hash        ,    map_out%hash        , info)
+         & call psb_move_alloc( map_in%hash        ,    map_out%hash        , info)
     
     if (info /= 0) then
       info = 4010
@@ -1269,6 +1262,7 @@ contains
     end do
     
   end subroutine psb_map_l2g_v2
+
 
   Subroutine psb_cd_get_recv_idx(tmp,desc,data,info,toglob)
 

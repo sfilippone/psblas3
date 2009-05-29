@@ -72,7 +72,7 @@ module psb_hash_mod
   end interface
 
 
-  interface psb_transfer
+  interface psb_move_alloc
     module procedure HashTransfer
   end interface
 
@@ -149,7 +149,7 @@ contains
     hashout%nk    = hashin%nk
     hashout%nsrch = hashin%nsrch
     hashout%nacc  = hashin%nacc
-    call psb_transfer(hashin%table, hashout%table,info)
+    call psb_move_alloc(hashin%table, hashout%table,info)
 
   end subroutine HashTransfer
 

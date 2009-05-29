@@ -89,9 +89,9 @@ subroutine psb_dipcoo2csr(a,info,rwshr)
        & write(debug_unit,*) trim(name),&
        & ': out of fixcoo',nza,nr,size(a%ia2),size(iaux)
 
-  call psb_transfer(a%ia1,itemp,info)
-  call psb_transfer(a%ia2,a%ia1,info)
-  call psb_transfer(iaux,a%ia2,info)
+  call psb_move_alloc(a%ia1,itemp,info)
+  call psb_move_alloc(a%ia2,a%ia1,info)
+  call psb_move_alloc(iaux,a%ia2,info)
 
   !
   ! This routine can be used in two modes:

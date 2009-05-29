@@ -58,8 +58,8 @@ subroutine psb_ccsprt(iout,a,iv,eirs,eics,head,ivr,ivc)
   character(len=*), optional        :: head
   integer, intent(in), optional     :: ivr(:), ivc(:)
 
-  character(len=*), parameter       :: frmtr='(2(i6,1x),2(es16.8,1x),2(i6,1x))'
-  integer  :: irs,ics,i,j
+  character(len=80)                 :: frmtv 
+  integer  :: irs,ics,i,j, nmx, ni
 
   if (present(eirs)) then 
     irs = eirs
@@ -79,6 +79,12 @@ subroutine psb_ccsprt(iout,a,iv,eirs,eics,head,ivr,ivc)
     write(iout,'(a,a)') '% ',psb_toupper(a%fida)
   endif
 
+  nmx = max(a%m,a%k,1)
+  ni  = floor(log10(1.0*nmx)) + 1
+  
+  write(frmtv,'(a,i3.3,a,i3.3,a)') '(2(i',ni,',1x),2(es16.8,1x),2(i',ni,',1x))'
+
+ 
   select case(psb_toupper(a%fida)) 
 
   case ('CSR')
@@ -88,32 +94,32 @@ subroutine psb_ccsprt(iout,a,iv,eirs,eics,head,ivr,ivc)
     if (present(iv)) then 
       do i=1, a%m
         do j=a%ia2(i),a%ia2(i+1)-1
-          write(iout,frmtr) iv(irs+i),iv(ics+a%ia1(j)),a%aspk(j)
+          write(iout,frmtv) iv(irs+i),iv(ics+a%ia1(j)),a%aspk(j)
         enddo
       enddo
     else
       if (present(ivr).and..not.present(ivc)) then 
         do i=1, a%m
           do j=a%ia2(i),a%ia2(i+1)-1
-            write(iout,frmtr) ivr(irs+i),(ics+a%ia1(j)),a%aspk(j)
+            write(iout,frmtv) ivr(irs+i),(ics+a%ia1(j)),a%aspk(j)
           enddo
         enddo
       else if (present(ivr).and.present(ivc)) then 
         do i=1, a%m
           do j=a%ia2(i),a%ia2(i+1)-1
-            write(iout,frmtr) ivr(irs+i),ivc(ics+a%ia1(j)),a%aspk(j)
+            write(iout,frmtv) ivr(irs+i),ivc(ics+a%ia1(j)),a%aspk(j)
           enddo
         enddo
       else if (.not.present(ivr).and.present(ivc)) then 
         do i=1, a%m
           do j=a%ia2(i),a%ia2(i+1)-1
-            write(iout,frmtr) (irs+i),ivc(ics+a%ia1(j)),a%aspk(j)
+            write(iout,frmtv) (irs+i),ivc(ics+a%ia1(j)),a%aspk(j)
           enddo
         enddo
       else if (.not.present(ivr).and..not.present(ivc)) then 
         do i=1, a%m
           do j=a%ia2(i),a%ia2(i+1)-1
-            write(iout,frmtr) (irs+i),(ics+a%ia1(j)),a%aspk(j)
+            write(iout,frmtv) (irs+i),(ics+a%ia1(j)),a%aspk(j)
           enddo
         enddo
       endif
@@ -126,32 +132,32 @@ subroutine psb_ccsprt(iout,a,iv,eirs,eics,head,ivr,ivc)
     if (present(iv)) then 
       do i=1, a%k
         do j=a%ia2(i),a%ia2(i+1)-1
-          write(iout,frmtr) iv(irs+a%ia1(j)),iv(ics+i),a%aspk(j)
+          write(iout,frmtv) iv(irs+a%ia1(j)),iv(ics+i),a%aspk(j)
         enddo
       enddo
     else
       if (present(ivr).and..not.present(ivc)) then 
         do i=1, a%k
           do j=a%ia2(i),a%ia2(i+1)-1
-            write(iout,frmtr) ivr(irs+a%ia1(j)),(ics+i),a%aspk(j)
+            write(iout,frmtv) ivr(irs+a%ia1(j)),(ics+i),a%aspk(j)
           enddo
         enddo
       else if (present(ivr).and.present(ivc)) then 
         do i=1, a%k
           do j=a%ia2(i),a%ia2(i+1)-1
-            write(iout,frmtr) ivr(irs+a%ia1(j)),ivc(ics+i),a%aspk(j)
+            write(iout,frmtv) ivr(irs+a%ia1(j)),ivc(ics+i),a%aspk(j)
           enddo
         enddo
       else if (.not.present(ivr).and.present(ivc)) then 
         do i=1, a%m
           do j=a%ia2(i),a%ia2(i+1)-1
-            write(iout,frmtr) (irs+a%ia1(j)),ivc(ics+i),a%aspk(j)
+            write(iout,frmtv) (irs+a%ia1(j)),ivc(ics+i),a%aspk(j)
           enddo
         enddo
       else if (.not.present(ivr).and..not.present(ivc)) then 
         do i=1, a%k
           do j=a%ia2(i),a%ia2(i+1)-1
-            write(iout,frmtr) (irs+a%ia1(j)),(ics+i),a%aspk(j)
+            write(iout,frmtv) (irs+a%ia1(j)),(ics+i),a%aspk(j)
           enddo
         enddo
       endif
@@ -161,28 +167,28 @@ subroutine psb_ccsprt(iout,a,iv,eirs,eics,head,ivr,ivc)
     if(present(iv)) then 
       write(iout,*) a%m,a%k,a%infoa(psb_nnz_)
       do j=1,a%infoa(psb_nnz_)
-        write(iout,frmtr) iv(a%ia1(j)),iv(a%ia2(j)),a%aspk(j)
+        write(iout,frmtv) iv(a%ia1(j)),iv(a%ia2(j)),a%aspk(j)
       enddo
     else      
       if (present(ivr).and..not.present(ivc)) then 
         write(iout,*) a%m,a%k,a%infoa(psb_nnz_)
         do j=1,a%infoa(psb_nnz_)
-          write(iout,frmtr) ivr(a%ia1(j)),a%ia2(j),a%aspk(j)
+          write(iout,frmtv) ivr(a%ia1(j)),a%ia2(j),a%aspk(j)
         enddo
       else if (present(ivr).and.present(ivc)) then 
         write(iout,*) a%m,a%k,a%infoa(psb_nnz_)
         do j=1,a%infoa(psb_nnz_)
-          write(iout,frmtr) ivr(a%ia1(j)),ivc(a%ia2(j)),a%aspk(j)
+          write(iout,frmtv) ivr(a%ia1(j)),ivc(a%ia2(j)),a%aspk(j)
         enddo
       else if (.not.present(ivr).and.present(ivc)) then 
         write(iout,*) a%m,a%k,a%infoa(psb_nnz_)
         do j=1,a%infoa(psb_nnz_)
-          write(iout,frmtr) a%ia1(j),ivc(a%ia2(j)),a%aspk(j)
+          write(iout,frmtv) a%ia1(j),ivc(a%ia2(j)),a%aspk(j)
         enddo
       else if (.not.present(ivr).and..not.present(ivc)) then 
         write(iout,*) a%m,a%k,a%infoa(psb_nnz_)
         do j=1,a%infoa(psb_nnz_)
-          write(iout,frmtr) a%ia1(j),a%ia2(j),a%aspk(j)
+          write(iout,frmtv) a%ia1(j),a%ia2(j),a%aspk(j)
         enddo
       endif
     endif

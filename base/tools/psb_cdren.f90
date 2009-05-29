@@ -48,22 +48,18 @@ subroutine psb_cdren(trans,iperm,desc_a,info)
   use psb_descriptor_type
   use psb_const_mod
   use psb_error_mod
+  use psb_serial_mod
   use psb_penv_mod
+  use psi_mod
   use psb_string_mod
   implicit none
 
-  interface isaperm
-    logical function isaperm(n,ip)
-      integer, intent(in)    :: n   
-      integer, intent(inout) :: ip(*)
-    end function isaperm
-  end interface
 
   !...parameters....
-  type(psb_desc_type), intent(inout)    ::  desc_a
-  integer, intent(inout)                ::  iperm(:)
-  character, intent(in)                 :: trans
-  integer, intent(out)                  :: info
+  type(psb_desc_type), intent(inout)  :: desc_a
+  integer, intent(inout)              :: iperm(:)
+  character, intent(in)               :: trans
+  integer, intent(out)                :: info
   !....locals....
   integer              :: i,j,np,me, n_col, kh, nh
   integer              :: dectype
@@ -74,7 +70,7 @@ subroutine psb_cdren(trans,iperm,desc_a,info)
   if(psb_get_errstatus() /= 0) return 
   info=0
   call psb_erractionsave(err_act)
-  name = 'psb_dcren'
+  name = 'psb_cdren'
   debug_unit  = psb_get_debug_unit()
   debug_level = psb_get_debug_level()
 
@@ -99,7 +95,7 @@ subroutine psb_cdren(trans,iperm,desc_a,info)
   endif
 
   if (iperm(1) /= 0) then 
-    if (.not.isaperm(n_row,iperm)) then
+    if (.not.psb_isaperm(n_row,iperm)) then
       info = 610
       int_err(1) = iperm(1)
       call psb_errpush(info,name,int_err)
@@ -132,61 +128,23 @@ subroutine psb_cdren(trans,iperm,desc_a,info)
     endif
     ! crossed fingers.....
     ! fix glob_to_loc/loc_to_glob  mappings, then indices lists
-    ! hmm, maybe we should just moe all of this onto a different level,
+    ! hmm, maybe we should just move all of this onto a different level,
     ! have a specialized subroutine, and do it in the solver context???? 
-    if (debug_level >= psb_debug_ext_) &
-         & write(debug_unit,*) me,' ',trim(name),': renumbering glob_to_loc'
-    do i=1, n_col
-      desc_a%idxmap%glob_to_loc(desc_a%idxmap%loc_to_glob(desc_a%lprm(i))) = i  
-    enddo
-    if (debug_level >= psb_debug_ext_) &
-         & write(debug_unit,*) me,' ',trim(name),': renumbering loc_to_glob'
-    do i=1,psb_cd_get_global_rows(desc_a) 
-      j = desc_a%idxmap%glob_to_loc(i)
-      if (j>0) then 
-        desc_a%idxmap%loc_to_glob(j) = i
-      endif
-    enddo
-    if (debug_level >= psb_debug_ext_) &
-         & write(debug_unit,*) me,' ',trim(name),': renumbering halo_index'
-    i=1
-    kh=desc_a%halo_index(i)
-    do while (kh /= -1) 
-      i = i+1
-      nh = desc_a%halo_index(i)
-      do j = i+1, i+nh
-        desc_a%halo_index(j) = &
-             &desc_a%lprm(desc_a%halo_index(j))
-      enddo
-      i = i + nh + 1
-      nh = desc_a%halo_index(i)
-      do j= i+1, i+nh
-        desc_a%halo_index(j) = &
-             &desc_a%lprm(desc_a%halo_index(j))
-      enddo
-      i = i + nh + 1
-      kh=desc_a%halo_index(i)
-    enddo
-    if (debug_level >= psb_debug_ext_) &
-         & write(debug_unit,*) me,' ',trim(name),': renumbering ovrlap_index'
-    i=1
-    kh=desc_a%ovrlap_index(i)
-    do while (kh /= -1) 
-      i = i + 1
-      nh = desc_a%ovrlap_index(i)
-      do j= i+1, i+nh
-        desc_a%ovrlap_index(j) = &
-             &desc_a%lprm(desc_a%ovrlap_index(j))
-      enddo
-      i = i + nh + 1
-      kh=desc_a%ovrlap_index(i)
-    enddo
-    if (debug_level >= psb_debug_ext_) &
-         & write(debug_unit,*) me,' ',&
-         & trim(name),': renumbering ovrlap_elem'
-
+    call psi_renum_idxmap(n_col,desc_a%lprm,desc_a%idxmap,info)
+    if (allocated(desc_a%halo_index)) &
+         & call psi_renum_index(desc_a%lprm,desc_a%halo_index,info)
+    if (allocated(desc_a%ovrlap_index)) &
+         & call psi_renum_index(desc_a%lprm,desc_a%ovrlap_index,info)
+    if (allocated(desc_a%ovr_mst_idx)) &
+         & call psi_renum_index(desc_a%lprm,desc_a%ovr_mst_idx,info)
+    if (allocated(desc_a%ext_index)) &
+         & call psi_renum_index(desc_a%lprm,desc_a%ext_index,info)
+          
     do i=1, size(desc_a%ovrlap_elem,1)
       desc_a%ovrlap_elem(i,1) = desc_a%lprm(desc_a%ovrlap_elem(i,1))
+    end do
+    do i=1, size(desc_a%bnd_elem)
+      desc_a%bnd_elem(i) = desc_a%lprm(desc_a%bnd_elem(i))
     end do
 
     if (debug_level >= psb_debug_ext_) &

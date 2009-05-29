@@ -136,8 +136,8 @@ subroutine psi_bld_tmpovrl(iv,desc,info)
   enddo
   l_ov_ix         = l_ov_ix + 1
   ov_idx(l_ov_ix) = -1
-  call psb_transfer(ov_idx,desc%ovrlap_index,info) 
-  if (info == 0) call psb_transfer(ov_el,desc%ovrlap_elem,info)
+  call psb_move_alloc(ov_idx,desc%ovrlap_index,info) 
+  if (info == 0) call psb_move_alloc(ov_el,desc%ovrlap_elem,info)
 
 
   call psb_erractionrestore(err_act)

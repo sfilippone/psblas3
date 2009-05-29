@@ -44,7 +44,8 @@ module psb_getrow_mod
 contains
   
   subroutine csr_sspgtrow(irw,a,nz,ia,ja,val,nzin,append,lrw,info,iren)
-
+    
+    use psb_sort_mod
     use psb_spmat_type
     use psb_const_mod
     implicit none
@@ -159,6 +160,7 @@ contains
 
   subroutine coo_sspgtrow(irw,a,nz,ia,ja,val,nzin,append,lrw,info,iren)
 
+    use psb_sort_mod
     use psb_spmat_type
     use psb_const_mod
     use psb_error_mod
@@ -204,7 +206,7 @@ contains
       if (debug_level >= psb_debug_serial_)&
            & write(debug_unit,*) trim(name), ': srtdcoo '
       do
-        call ibsrch(ip,irw,nza,a%ia1)
+        ip = psb_ibsrch(irw,nza,a%ia1)
         if (ip /= -1) exit
         irw = irw + 1
         if (irw > lrw) then
@@ -229,7 +231,7 @@ contains
       end if
       
       do
-        call ibsrch(jp,lrw,nza,a%ia1)
+        jp = psb_ibsrch(lrw,nza,a%ia1)
         if (jp /= -1) exit
         lrw = lrw - 1
         if (irw > lrw) then
@@ -335,6 +337,7 @@ contains
 
   subroutine jad_sspgtrow(irw,a,nz,ia,ja,val,nzin,append,lrw,info,iren)
 
+    use psb_sort_mod
     use psb_spmat_type
     use psb_const_mod
     
@@ -467,6 +470,7 @@ contains
   
   subroutine csr_dspgtrow(irw,a,nz,ia,ja,val,nzin,append,lrw,info,iren)
 
+    use psb_sort_mod
     use psb_spmat_type
     use psb_const_mod
     implicit none
@@ -581,6 +585,7 @@ contains
 
   subroutine coo_dspgtrow(irw,a,nz,ia,ja,val,nzin,append,lrw,info,iren)
 
+    use psb_sort_mod
     use psb_spmat_type
     use psb_const_mod
     use psb_error_mod
@@ -626,7 +631,7 @@ contains
       if (debug_level >= psb_debug_serial_)&
            & write(debug_unit,*) trim(name), ': srtdcoo '
       do
-        call ibsrch(ip,irw,nza,a%ia1)
+        ip = psb_ibsrch(irw,nza,a%ia1)
         if (ip /= -1) exit
         irw = irw + 1
         if (irw > lrw) then
@@ -651,7 +656,7 @@ contains
       end if
       
       do
-        call ibsrch(jp,lrw,nza,a%ia1)
+        jp = psb_ibsrch(lrw,nza,a%ia1)
         if (jp /= -1) exit
         lrw = lrw - 1
         if (irw > lrw) then
@@ -757,6 +762,7 @@ contains
 
   subroutine jad_dspgtrow(irw,a,nz,ia,ja,val,nzin,append,lrw,info,iren)
 
+    use psb_sort_mod
     use psb_spmat_type
     use psb_const_mod
     
@@ -889,6 +895,7 @@ contains
   
   subroutine csr_cspgtrow(irw,a,nz,ia,ja,val,nzin,append,lrw,info,iren)
 
+    use psb_sort_mod
     use psb_spmat_type
     use psb_const_mod
     use psb_error_mod
@@ -1005,6 +1012,7 @@ contains
 
   subroutine coo_cspgtrow(irw,a,nz,ia,ja,val,nzin,append,lrw,info,iren)
 
+    use psb_sort_mod
     use psb_spmat_type
     use psb_const_mod
     use psb_error_mod
@@ -1052,7 +1060,7 @@ contains
       if (debug_level >= psb_debug_serial_) &
            & write(debug_unit,*)  trim(name),': srtdcoo '
       do
-        call ibsrch(ip,irw,nza,a%ia1)
+        ip = psb_ibsrch(irw,nza,a%ia1)
         if (ip /= -1) exit
         irw = irw + 1
         if (irw > lrw) then
@@ -1077,7 +1085,7 @@ contains
       end if
       
       do
-        call ibsrch(jp,lrw,nza,a%ia1)
+        jp = psb_ibsrch(lrw,nza,a%ia1)
         if (jp /= -1) exit
         lrw = lrw - 1
         if (irw > lrw) then
@@ -1183,6 +1191,7 @@ contains
 
   subroutine jad_cspgtrow(irw,a,nz,ia,ja,val,nzin,append,lrw,info,iren)
 
+    use psb_sort_mod
     use psb_spmat_type
     use psb_const_mod
     implicit none
@@ -1314,6 +1323,7 @@ contains
   
   subroutine csr_zspgtrow(irw,a,nz,ia,ja,val,nzin,append,lrw,info,iren)
 
+    use psb_sort_mod
     use psb_spmat_type
     use psb_const_mod
     use psb_error_mod
@@ -1430,6 +1440,7 @@ contains
 
   subroutine coo_zspgtrow(irw,a,nz,ia,ja,val,nzin,append,lrw,info,iren)
 
+    use psb_sort_mod
     use psb_spmat_type
     use psb_const_mod
     use psb_error_mod
@@ -1477,7 +1488,7 @@ contains
       if (debug_level >= psb_debug_serial_) &
            & write(debug_unit,*)  trim(name),': srtdcoo '
       do
-        call ibsrch(ip,irw,nza,a%ia1)
+        ip = psb_ibsrch(irw,nza,a%ia1)
         if (ip /= -1) exit
         irw = irw + 1
         if (irw > lrw) then
@@ -1502,7 +1513,7 @@ contains
       end if
       
       do
-        call ibsrch(jp,lrw,nza,a%ia1)
+        jp = psb_ibsrch(lrw,nza,a%ia1)
         if (jp /= -1) exit
         lrw = lrw - 1
         if (irw > lrw) then
@@ -1608,6 +1619,7 @@ contains
 
   subroutine jad_zspgtrow(irw,a,nz,ia,ja,val,nzin,append,lrw,info,iren)
 
+    use psb_sort_mod
     use psb_spmat_type
     use psb_const_mod
     implicit none

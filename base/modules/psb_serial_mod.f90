@@ -591,56 +591,60 @@ module psb_serial_mod
     subroutine psb_stransp(a,b,c,fmt)
       use psb_spmat_type, only : psb_sspmat_type, psb_dspmat_type,&
            & psb_cspmat_type, psb_zspmat_type, psb_spk_, psb_dpk_
-      type(psb_sspmat_type) :: a,b
+      type(psb_sspmat_type), intent(in) :: a
+      type(psb_sspmat_type), intent(out)   :: b
       integer, optional :: c
       character(len=*), optional :: fmt
     end subroutine psb_stransp
     subroutine psb_dtransp(a,b,c,fmt)
       use psb_spmat_type, only : psb_sspmat_type, psb_dspmat_type,&
            & psb_cspmat_type, psb_zspmat_type, psb_spk_, psb_dpk_
-      type(psb_dspmat_type) :: a,b
+      type(psb_dspmat_type), intent(in) :: a
+      type(psb_dspmat_type), intent(out)   :: b
       integer, optional :: c
       character(len=*), optional :: fmt
     end subroutine psb_dtransp
     subroutine psb_ctransp(a,b,c,fmt)
       use psb_spmat_type, only : psb_sspmat_type, psb_dspmat_type,&
            & psb_cspmat_type, psb_zspmat_type, psb_spk_, psb_dpk_
-      type(psb_cspmat_type) :: a,b
+      type(psb_cspmat_type), intent(in) :: a
+      type(psb_cspmat_type), intent(out)   :: b
       integer, optional :: c
       character(len=*), optional :: fmt
     end subroutine psb_ctransp
     subroutine psb_ztransp(a,b,c,fmt)
       use psb_spmat_type, only : psb_sspmat_type, psb_dspmat_type,&
            & psb_cspmat_type, psb_zspmat_type, psb_spk_, psb_dpk_
-      type(psb_zspmat_type) :: a,b
+      type(psb_zspmat_type), intent(in) :: a
+      type(psb_zspmat_type), intent(out)   :: b
       integer, optional :: c
       character(len=*), optional :: fmt
     end subroutine psb_ztransp
     subroutine psb_stransp1(a,c,fmt)
       use psb_spmat_type, only : psb_sspmat_type, psb_dspmat_type,&
            & psb_cspmat_type, psb_zspmat_type, psb_spk_, psb_dpk_
-      type(psb_sspmat_type) :: a
+      type(psb_sspmat_type), intent(inout) :: a
       integer, optional :: c
       character(len=*), optional :: fmt
     end subroutine psb_stransp1
     subroutine psb_dtransp1(a,c,fmt)
       use psb_spmat_type, only : psb_sspmat_type, psb_dspmat_type,&
            & psb_cspmat_type, psb_zspmat_type, psb_spk_, psb_dpk_
-      type(psb_dspmat_type) :: a
+      type(psb_dspmat_type), intent(inout) :: a
       integer, optional :: c
       character(len=*), optional :: fmt
     end subroutine psb_dtransp1
     subroutine psb_ctransp1(a,c,fmt)
       use psb_spmat_type, only : psb_sspmat_type, psb_dspmat_type,&
            & psb_cspmat_type, psb_zspmat_type, psb_spk_, psb_dpk_
-      type(psb_cspmat_type) :: a
+      type(psb_cspmat_type), intent(inout) :: a
       integer, optional :: c
       character(len=*), optional :: fmt
     end subroutine psb_ctransp1
     subroutine psb_ztransp1(a,c,fmt)
       use psb_spmat_type, only : psb_sspmat_type, psb_dspmat_type,&
            & psb_cspmat_type, psb_zspmat_type, psb_spk_, psb_dpk_
-      type(psb_zspmat_type) :: a
+      type(psb_zspmat_type), intent(inout) :: a
       integer, optional :: c
       character(len=*), optional :: fmt
     end subroutine psb_ztransp1
@@ -650,14 +654,16 @@ module psb_serial_mod
     subroutine psb_ctransc(a,b,c,fmt)
       use psb_spmat_type, only : psb_sspmat_type, psb_dspmat_type,&
            & psb_cspmat_type, psb_zspmat_type, psb_spk_, psb_dpk_
-      type(psb_cspmat_type) :: a,b
+      type(psb_cspmat_type), intent(in) :: a
+      type(psb_cspmat_type), intent(out)   :: b
       integer, optional :: c
       character(len=*), optional :: fmt
     end subroutine psb_ctransc
     subroutine psb_ztransc(a,b,c,fmt)
       use psb_spmat_type, only : psb_sspmat_type, psb_dspmat_type,&
            & psb_cspmat_type, psb_zspmat_type, psb_spk_, psb_dpk_
-      type(psb_zspmat_type) :: a,b
+      type(psb_zspmat_type), intent(in) :: a
+      type(psb_zspmat_type), intent(out)   :: b
       integer, optional :: c
       character(len=*), optional :: fmt
     end subroutine psb_ztransc

@@ -242,7 +242,7 @@ subroutine  psb_dspmm(alpha,a,x,beta,y,desc_a,info,&
       blk: do i=1, ik, nb
         ib=ib1
         ib1 = max(0,min(nb,(ik)-(i-1+ib)))
-        xp => x(iix:lldx,jjx+i+ib-1:jjx+i+ib+ib1-2)
+        xp => x(iix:lldx,jjx+i-1+ib:jjx+i-1+ib+ib1-1)
         if ((ib1 > 0).and.(doswap_)) &
              & call psi_swapdata(psb_swap_send_,ib1,&
              & dzero,xp,desc_a,iwork,info)
@@ -250,8 +250,8 @@ subroutine  psb_dspmm(alpha,a,x,beta,y,desc_a,info,&
         if(info /= 0) exit blk
 
         !  local Matrix-vector product
-        call a%csmm(alpha,x(:,jjx+i-1:jjx+i+ib-1),&
-             & beta,y(:,jjy+i-1:jjy+i+ib-1),info,trans=trans_)
+        call a%csmm(alpha,x(:,jjx+i-1:jjx+i-1+ib-1),&
+             & beta,y(:,jjy+i-1:jjy+i-1+ib-1),info,trans=trans_)
 
         if(info /= 0) exit blk
 
@@ -305,6 +305,8 @@ subroutine  psb_dspmm(alpha,a,x,beta,y,desc_a,info,&
     !
     ! Non-empty overlap, need a buffer to hold
     ! the entries updated with average operator.
+    ! Why the average? because in this way they will contribute
+    ! with a proper scale factor (1/np) to the overall product.
     ! 
     call psi_ovrl_save(x(:,1:ik),xvsave,desc_a,info)
     if (info == 0) call psi_ovrl_upd(x,desc_a,psb_avg_,info)
@@ -620,6 +622,8 @@ subroutine  psb_dspmv(alpha,a,x,beta,y,desc_a,info,&
     !
     ! Non-empty overlap, need a buffer to hold
     ! the entries updated with average operator.
+    ! Why the average? because in this way they will contribute
+    ! with a proper scale factor (1/np) to the overall product.
     ! 
     call psi_ovrl_save(x,xvsave,desc_a,info)
     if (info == 0) call psi_ovrl_upd(x,desc_a,psb_avg_,info)

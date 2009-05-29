@@ -1,4 +1,4 @@
-This directory contains  the PSBLAS library, version 2.3
+This directory contains  the PSBLAS library, version 3.0
 
  
 Version 1.0 of the library was described in:
@@ -16,16 +16,6 @@ compiling with  other compiler/operating systems please let us know.
 
 LINUX:
 
-On Linux we work with the GCC compiler; note that we require version
-4.2.0 (or later) as it contains support for ALLOCATABLEs (as
-specified  in TR15581). 
-
-For the Intel compilers, we recommend version 9.1 or later.
-
-IBM SP:
-The library has been tested on an IBM SP5, with XLC and XLF 
-version 10.1 and the IBM ESSL/PESSL versions of the BLAS and the
-BLACS. 
 
 
 UTILITIES
@@ -149,4 +139,4 @@ Dario      Pascucci
 
 
 
-
+k

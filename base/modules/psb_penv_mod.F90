@@ -134,7 +134,7 @@ module psb_penv_mod
 
   interface psb_sum
     module procedure psb_isums, psb_isumv, psb_isumm,&
-         & psb_i8sums, &
+         & psb_i8sums, psb_i8sumv,&
          & psb_ssums, psb_ssumv, psb_ssumm,&
          & psb_csums, psb_csumv, psb_csumm,&
          & psb_dsums, psb_dsumv, psb_dsumm,&
@@ -2329,6 +2329,46 @@ contains
 #endif    
   end subroutine psb_zamnm
 
+
+
+  subroutine psb_i8sumv(ictxt,dat,root)
+#ifdef MPI_MOD
+    use mpi
+#endif
+#ifdef MPI_H
+    include 'mpif.h'
+#endif
+    integer, intent(in)                    :: ictxt
+    integer(psb_long_int_k_), intent(inout) :: dat(:)
+    integer, intent(in), optional          :: root
+    integer :: mpi_int8_type, info, icomm
+    
+    integer                 :: root_, iam, np, isz
+    integer(psb_long_int_k_), allocatable  :: dat_(:)
+    
+    if (present(root)) then 
+      root_ = root
+    else
+      root_ = -1
+    endif
+    call psb_info(ictxt,iam,np)
+    call psb_get_mpicomm(ictxt,icomm)
+    mpi_int8_type = mpi_integer8
+    isz = size(dat)
+    allocate(dat_(isz),stat=info)
+    if (root_ == -1) then 
+      dat_=dat
+      call mpi_allreduce(dat_,dat,isz,mpi_int8_type,mpi_sum,icomm,info)
+    else
+      if (iam==root_) then 
+        dat_=dat
+        call mpi_reduce(dat_,dat,isz,mpi_int8_type,mpi_sum,root_,icomm,info)
+      else
+        call mpi_reduce(dat,dat_,isz,mpi_int8_type,mpi_sum,root_,icomm,info)
+      end if
+    endif
+
+  end subroutine psb_i8sumv
 
 
   subroutine psb_i8sums(ictxt,dat,root)

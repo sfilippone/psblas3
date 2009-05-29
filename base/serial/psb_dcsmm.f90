@@ -37,10 +37,10 @@ subroutine psb_dcsmm(alpha,a,b,beta,c,info,trans)
   use psb_error_mod
   implicit none 
 
-  type(psb_dspmat_type) :: a
-  real(psb_dpk_)      :: alpha, beta, b(:,:), c(:,:)
-  integer               :: info
-  character, optional   :: trans
+  class(psb_dspmat_type) :: a
+  real(psb_dpk_)         :: alpha, beta, b(:,:), c(:,:)
+  integer                :: info
+  character, optional    :: trans
   
   real(psb_dpk_), allocatable :: work(:)
   character                     :: trans_
