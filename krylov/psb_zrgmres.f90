@@ -348,7 +348,7 @@ Subroutine psb_zrgmres(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,irst,ist
       rti  = h(i,i)
       rti1 = h(i+1,i) 
       call zrotg(rti,rti1,tmp,s(i))
-      c(i) = cmplx(tmp,dzero)
+      c(i) = cmplx(tmp,dzero,kind=psb_dpk_)
       call zrot(1,h(i,i),1,h(i+1,i),1,real(c(i)),s(i))
       h(i+1,i) = zzero
       call zrot(1,rs(i),1,rs(i+1),1,real(c(i)),s(i))
@@ -574,11 +574,11 @@ contains
     !
 
     scale = cdabs(ca) + cdabs(cb)
-    norm = scale*dsqrt((cdabs(ca/dcmplx(scale,0.0d0)))**2 +&
-         &   (cdabs(cb/dcmplx(scale,0.0d0)))**2)
+    norm = scale*dsqrt((cdabs(ca/cmplx(scale,0.0d0,kind=psb_dpk_)))**2 +&
+         &   (cdabs(cb/cmplx(scale,0.0d0,kind=psb_dpk_)))**2)
     alpha = ca /cdabs(ca)
     c = cdabs(ca) / norm
-    s = alpha * dconjg(cb) / norm
+    s = alpha * conjg(cb) / norm
     ca = alpha * norm
     !
 

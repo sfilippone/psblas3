@@ -6,6 +6,7 @@ LIBNAME=$(BASELIBNAME)
 LIBMOD=psb_base_mod$(.mod)
 lib:
 	(cd modules; make lib LIBNAME=$(BASELIBNAME) F90=$(MPF90) F90COPT="$(F90COPT) $(MPI_OPT)")
+	(cd newserial; make lib LIBNAME=$(BASELIBNAME) )
 	(cd comm; make lib LIBNAME=$(BASELIBNAME))
 	(cd internals; make lib LIBNAME=$(BASELIBNAME))
 	(cd tools; make lib LIBNAME=$(BASELIBNAME))

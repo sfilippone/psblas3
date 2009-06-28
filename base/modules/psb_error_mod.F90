@@ -471,6 +471,9 @@ contains
       write (0,'("Argument M is required when argument PARTS is specified")')
     case(600)
       write (0,'("Sparse Matrix and descriptors are in an invalid state for this subroutine call: ",i0)')i_e_d(1)
+    case(700)
+      write (0,'("Base version has been called: the actual derived type is incomplete!")')
+
     case (1122)
       write (0,'("Invalid state for communication descriptor")')
     case (1123)

@@ -240,7 +240,7 @@ contains
       do j=1, ncol
         do i=1, nrow
           read(infile,fmt=*,end=902) bre,bim
-          b(i,j) = cmplx(bre,bim)
+          b(i,j) = cmplx(bre,bim,kind=psb_spk_)
         end do
       end do
       
@@ -317,7 +317,7 @@ contains
       do j=1, ncol
         do i=1, nrow
           read(infile,fmt=*,end=902) bre,bim
-          b(i,j) = cmplx(bre,bim)
+          b(i,j) = cmplx(bre,bim,kind=psb_dpk_)
         end do
       end do
       
@@ -689,7 +689,7 @@ contains
       a%descra = 'G'      
       do i=1,nnzero
         read(infile,fmt=*,end=902) a%ia1(i),a%ia2(i),are,aim
-        a%aspk(i) = cmplx(are,aim)
+        a%aspk(i) = cmplx(are,aim,kind=psb_spk_)
       end do
       a%infoa(psb_nnz_) = nnzero
       
@@ -704,7 +704,7 @@ contains
       a%descra = 'G'      
       do i=1,nnzero
         read(infile,fmt=*,end=902) a%ia1(i),a%ia2(i),are,aim
-        a%aspk(i) = cmplx(are,aim)
+        a%aspk(i) = cmplx(are,aim,kind=psb_spk_)
       end do
 
       nzr = nnzero
@@ -728,7 +728,7 @@ contains
       a%descra = 'G'      
       do i=1,nnzero
         read(infile,fmt=*,end=902) a%ia1(i),a%ia2(i),are,aim
-        a%aspk(i) = cmplx(are,aim)
+        a%aspk(i) = cmplx(are,aim,kind=psb_spk_)
       end do
 
       nzr = nnzero
@@ -864,7 +864,7 @@ contains
       a%descra = 'G'      
       do i=1,nnzero
         read(infile,fmt=*,end=902) a%ia1(i),a%ia2(i),are,aim
-        a%aspk(i) = cmplx(are,aim)
+        a%aspk(i) = cmplx(are,aim,kind=psb_dpk_)
       end do
       a%infoa(psb_nnz_) = nnzero
       
@@ -879,7 +879,7 @@ contains
       a%descra = 'G'      
       do i=1,nnzero
         read(infile,fmt=*,end=902) a%ia1(i),a%ia2(i),are,aim
-        a%aspk(i) = cmplx(are,aim)
+        a%aspk(i) = cmplx(are,aim,kind=psb_dpk_)
       end do
 
       nzr = nnzero
@@ -903,7 +903,7 @@ contains
       a%descra = 'G'      
       do i=1,nnzero
         read(infile,fmt=*,end=902) a%ia1(i),a%ia2(i),are,aim
-        a%aspk(i) = cmplx(are,aim)
+        a%aspk(i) = cmplx(are,aim,kind=psb_dpk_)
       end do
 
       nzr = nnzero
