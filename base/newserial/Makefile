@@ -1,6 +1,6 @@
 include ../../Make.inc
 
-MODULES = psbn_base_mat_mod.o psbn_coo_mat.o psbn_csr_mat.o
+MODULES = psbn_base_mat_mod.o psbn_d_base_mat_mod.o psbn_coo_mat.o psbn_csr_mat.o psbn_mat_mod.o
 
 
 LIBMOD=
@@ -15,7 +15,8 @@ lib:  $(MODULES)  $(OBJS)  $(LIBMOD)
 	$(RANLIB) $(LIBDIR)/$(LIBNAME) #	/bin/cp -p $(LIBMOD) $(LIBDIR)
 	/bin/cp -p *$(.mod) $(LIBDIR)
 
-psbn_coo_mat.o psbn_csr_mat.o:	psbn_base_mat_mod.o
+psbn_mat_mod.o:	psbn_base_mat_mod.o
+psbn_coo_mat.o psbn_csr_mat.o:	psbn_d_base_mat_mod.o
 
 
 clean:
