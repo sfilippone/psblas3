@@ -28,6 +28,7 @@ contains
 
   subroutine d_coo_csmv(alpha,a,x,beta,y,info,trans) 
     use psb_const_mod
+    use psb_error_mod
     class(psbn_d_coo_sparse_mat), intent(in) :: a
     real(psb_dpk_), intent(in)          :: alpha, beta, x(:)
     real(psb_dpk_), intent(inout)       :: y(:)
@@ -38,6 +39,11 @@ contains
     integer   :: i,j,k,m,n, nnz, ir, jc
     real(psb_dpk_) :: acc
     logical   :: tra
+    Integer :: err_act
+    character(len=20)  :: name='d_co_csmv'
+    logical, parameter :: debug=.false.
+
+    call psb_erractionsave(err_act)
 
     if (present(trans)) then
       trans_ = trans
@@ -46,6 +52,13 @@ contains
     end if
     
     tra = ((trans_=='T').or.(trans_=='t'))
+
+    if (.not.a%is_asb()) then 
+      info = 1121
+      call psb_errpush(info,name)
+      goto 9999
+    endif
+
 
     if (tra) then 
       m = a%get_ncols()
@@ -150,10 +163,23 @@ contains
       
     endif
 
+    call psb_erractionrestore(err_act)
+    return
+
+9999 continue
+    call psb_erractionrestore(err_act)
+
+    if (err_act == psb_act_abort_) then
+      call psb_error()
+      return
+    end if
+    return
+
   end subroutine d_coo_csmv
 
   subroutine d_coo_csmm(alpha,a,x,beta,y,info,trans) 
     use psb_const_mod
+    use psb_error_mod
     class(psbn_d_coo_sparse_mat), intent(in) :: a
     real(psb_dpk_), intent(in)          :: alpha, beta, x(:,:)
     real(psb_dpk_), intent(inout)       :: y(:,:)
@@ -164,6 +190,11 @@ contains
     integer   :: i,j,k,m,n, nnz, ir, jc, nc
     real(psb_dpk_), allocatable  :: acc(:)
     logical   :: tra
+    Integer :: err_act
+    character(len=20)  :: name='d_coo_csmm'
+    logical, parameter :: debug=.false.
+
+    call psb_erractionsave(err_act)
 
     if (present(trans)) then
       trans_ = trans
@@ -171,6 +202,13 @@ contains
       trans_ = 'N'
     end if
     
+    if (.not.a%is_asb()) then 
+      info = 1121
+      call psb_errpush(info,name)
+      goto 9999
+    endif
+
+
     tra = ((trans_=='T').or.(trans_=='t'))
 
     if (tra) then 
@@ -182,12 +220,14 @@ contains
     end if
     nnz = a%get_nzeros()
 
-    nc = size(x,2) 
-    if (nc /= size(y,2)) then 
-      write(0,*) 'Mismatch in column sizes!!'
-      return
+    nc = min(size(x,2), size(y,2))
+    allocate(acc(nc),stat=info)
+    if(info /= 0) then
+      info=4010
+      call psb_errpush(info,name,a_err='allocate')
+      goto 9999
     end if
-    allocate(acc(nc))
+
 
     if (alpha == dzero) then
       if (beta == dzero) then
@@ -282,6 +322,18 @@ contains
       end if                  !.....end testing on alpha
       
     endif
+
+    call psb_erractionrestore(err_act)
+    return
+
+9999 continue
+    call psb_erractionrestore(err_act)
+
+    if (err_act == psb_act_abort_) then
+      call psb_error()
+      return
+    end if
+    return
 
   end subroutine d_coo_csmm
   

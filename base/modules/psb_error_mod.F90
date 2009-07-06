@@ -474,6 +474,8 @@ contains
     case(700)
       write (0,'("Base version has been called: the actual derived type is incomplete!")')
 
+    case (1121)
+      write (0,'("Invalid state for sparse matrix A")')
     case (1122)
       write (0,'("Invalid state for communication descriptor")')
     case (1123)

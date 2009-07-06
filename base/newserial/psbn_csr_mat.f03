@@ -28,27 +28,38 @@ contains
 
   subroutine d_csr_csmv(alpha,a,x,beta,y,info,trans) 
     use psb_const_mod
+    use psb_error_mod
     class(psbn_d_csr_sparse_mat), intent(in) :: a
     real(psb_dpk_), intent(in)          :: alpha, beta, x(:)
     real(psb_dpk_), intent(inout)       :: y(:)
     integer, intent(out)                :: info
     character, optional, intent(in)     :: trans
-    
+
     character :: trans_
     integer   :: i,j,k,m,n, nnz, ir, jc
     real(psb_dpk_) :: acc
     logical   :: tra
+    Integer :: err_act
+    character(len=20)  :: name='d_csr_csmv'
+    logical, parameter :: debug=.false.
+
+    call psb_erractionsave(err_act)
+    info = 0 
 
     if (present(trans)) then
       trans_ = trans
     else
       trans_ = 'N'
     end if
-    
+
     if (.not.a%is_asb()) then 
       write(0,*) 'Error: csmv called on an unassembled mat'
-    end if
-    
+      info = 1121
+      call psb_errpush(info,name)
+      goto 9999
+    endif
+
+
     tra = ((trans_=='T').or.(trans_=='t'))
 
     if (tra) then 
@@ -58,8 +69,8 @@ contains
       n = a%get_ncols()
       m = a%get_nrows()
     end if
-    
-    
+
+
     if (alpha == dzero) then
       if (beta == dzero) then
         do i = 1, m
@@ -85,7 +96,7 @@ contains
             enddo
             y(i) = acc
           end do
-        
+
         else if (alpha == -done) then 
 
           do i=1,m 
@@ -95,7 +106,7 @@ contains
             enddo
             y(i) = -acc
           end do
-      
+
         else 
 
           do i=1,m 
@@ -107,8 +118,8 @@ contains
           end do
 
         end if
-        
-        
+
+
       else if (beta == done) then 
 
         if (alpha == done) then 
@@ -119,7 +130,7 @@ contains
             enddo
             y(i) = y(i) + acc
           end do
-        
+
         else if (alpha == -done) then 
 
           do i=1,m 
@@ -129,7 +140,7 @@ contains
             enddo
             y(i) = y(i) -acc
           end do
-      
+
         else 
 
           do i=1,m 
@@ -141,7 +152,7 @@ contains
           end do
 
         end if
-        
+
       else if (beta == -done) then 
 
         if (alpha == done) then 
@@ -152,7 +163,7 @@ contains
             enddo
             y(i) = -y(i) + acc
           end do
-        
+
         else if (alpha == -done) then 
 
           do i=1,m 
@@ -162,7 +173,7 @@ contains
             enddo
             y(i) = -y(i) -acc
           end do
-      
+
         else 
 
           do i=1,m 
@@ -173,7 +184,7 @@ contains
             y(i) = -y(i) + alpha*acc
           end do
 
-        end if        
+        end if
 
       else 
 
@@ -185,7 +196,7 @@ contains
             enddo
             y(i) = beta*y(i) + acc
           end do
-        
+
         else if (alpha == -done) then 
 
           do i=1,m 
@@ -195,7 +206,7 @@ contains
             enddo
             y(i) = beta*y(i) - acc
           end do
-      
+
         else 
 
           do i=1,m 
@@ -207,7 +218,7 @@ contains
           end do
 
         end if
-                
+
       end if
 
     else if (tra) then 
@@ -236,40 +247,51 @@ contains
             y(ir) = y(ir) +  a%val(j)*x(i)
           end do
         enddo
-        
+
       else if (alpha.eq.-done) then
-        
+
         do i=1,n
           do j=a%irp(i), a%irp(i+1)-1
             ir = a%ja(j)
             y(ir) = y(ir) -  a%val(j)*x(i)
           end do
         enddo
-        
+
       else                    
-        
+
         do i=1,n
           do j=a%irp(i), a%irp(i+1)-1
             ir = a%ja(j)
             y(ir) = y(ir) + alpha*a%val(j)*x(i)
           end do
         enddo
-        
-      end if               
-      
+
+      end if
+
     endif
-      
+
     if (a%is_unit()) then 
       do i=1, min(m,n)
         y(i) = y(i) + alpha*x(i)
       end do
     end if
 
+    call psb_erractionrestore(err_act)
+    return
+9999 continue
+    call psb_erractionrestore(err_act)
+
+    if (err_act == psb_act_abort_) then
+      call psb_error()
+      return
+    end if
+    return
 
   end subroutine d_csr_csmv
 
   subroutine d_csr_csmm(alpha,a,x,beta,y,info,trans) 
     use psb_const_mod
+    use psb_error_mod
     class(psbn_d_csr_sparse_mat), intent(in) :: a
     real(psb_dpk_), intent(in)          :: alpha, beta, x(:,:)
     real(psb_dpk_), intent(inout)       :: y(:,:)
@@ -280,6 +302,11 @@ contains
     integer   :: i,j,k,m,n, nnz, ir, jc, nc
     real(psb_dpk_), allocatable  :: acc(:)
     logical   :: tra
+    Integer :: err_act
+    character(len=20)  :: name='d_csr_csmm'
+    logical, parameter :: debug=.false.
+
+    call psb_erractionsave(err_act)
 
     if (present(trans)) then
       trans_ = trans
@@ -289,8 +316,10 @@ contains
     
     tra = ((trans_=='T').or.(trans_=='t'))
     if (.not.a%is_asb()) then 
-      write(0,*) 'Error: csmv called on an unassembled mat'
-    end if
+      info = 1121
+      call psb_errpush(info,name)
+      goto 9999
+    endif
     
     if (tra) then 
       m = a%get_ncols()
@@ -300,12 +329,14 @@ contains
       m = a%get_nrows()
     end if
 
-    nc = size(x,2) 
-    if (nc /= size(y,2)) then 
-      write(0,*) 'Mismatch in column sizes!!'
-      return
+    nc = min(size(x,2) , size(y,2) )
+
+    allocate(acc(nc), stat=info)
+    if(info /= 0) then
+      info=4010
+      call psb_errpush(info,name,a_err='allocate')
+      goto 9999
     end if
-    allocate(acc(nc))
 
    if (alpha == dzero) then
       if (beta == dzero) then
@@ -512,12 +543,23 @@ contains
       end do
     end if
     
+    call psb_erractionrestore(err_act)
+    return
+9999 continue
+    call psb_erractionrestore(err_act)
+
+    if (err_act == psb_act_abort_) then
+      call psb_error()
+      return
+    end if
+    return
 
   end subroutine d_csr_csmm
 
 
   subroutine d_csr_cssv(alpha,a,x,beta,y,info,trans) 
     use psb_const_mod
+    use psb_error_mod
     class(psbn_d_csr_sparse_mat), intent(in) :: a
     real(psb_dpk_), intent(in)          :: alpha, beta, x(:)
     real(psb_dpk_), intent(inout)       :: y(:)
@@ -529,6 +571,11 @@ contains
     real(psb_dpk_) :: acc
     real(psb_dpk_), allocatable :: tmp(:)
     logical   :: tra
+    Integer :: err_act
+    character(len=20)  :: name='d_csr_cssv'
+    logical, parameter :: debug=.false.
+
+    call psb_erractionsave(err_act)
 
     if (present(trans)) then
       trans_ = trans
@@ -536,14 +583,18 @@ contains
       trans_ = 'N'
     end if
     if (.not.a%is_asb()) then 
-      write(0,*) 'Error: cssv called on an unassembled mat'
-    end if
+      info = 1121
+      call psb_errpush(info,name)
+      goto 9999
+    endif
         
     tra = ((trans_=='T').or.(trans_=='t'))
     m = a%get_nrows()
     
     if (.not. (a%is_triangle())) then 
-      write(0,*) 'Called SV on a non-triangular mat!'
+      info = 1121
+      call psb_errpush(info,name)
+      goto 9999
     end if
 
 
@@ -578,6 +629,17 @@ contains
       end do
     end if
     
+    call psb_erractionrestore(err_act)
+    return
+
+9999 continue
+    call psb_erractionrestore(err_act)
+
+    if (err_act == psb_act_abort_) then
+      call psb_error()
+      return
+    end if
+    return
 
   contains 
 
@@ -690,6 +752,7 @@ contains
 
   subroutine d_csr_cssm(alpha,a,x,beta,y,info,trans) 
     use psb_const_mod
+    use psb_error_mod
     class(psbn_d_csr_sparse_mat), intent(in) :: a
     real(psb_dpk_), intent(in)          :: alpha, beta, x(:,:)
     real(psb_dpk_), intent(inout)       :: y(:,:)
@@ -701,6 +764,11 @@ contains
     real(psb_dpk_) :: acc
     real(psb_dpk_), allocatable :: tmp(:,:)
     logical   :: tra
+    Integer :: err_act
+    character(len=20)  :: name='d_base_csmm'
+    logical, parameter :: debug=.false.
+
+    call psb_erractionsave(err_act)
 
     if (present(trans)) then
       trans_ = trans
@@ -708,19 +776,21 @@ contains
       trans_ = 'N'
     end if
     if (.not.a%is_asb()) then 
-      write(0,*) 'Error: cssm called on an unassembled mat'
-    end if
+      info = 1121
+      call psb_errpush(info,name)
+      goto 9999
+    endif
+
         
     tra = ((trans_=='T').or.(trans_=='t'))
     m   = a%get_nrows()
-    nc  = size(x,2) 
-    if (nc /= size(y,2)) then 
-      write(0,*) 'Mismatch in column sizes!!'
-      return
-    end if
+    nc  = min(size(x,2) , size(y,2)) 
     
     if (.not. (a%is_triangle())) then 
       write(0,*) 'Called SM on a non-triangular mat!'
+      info = 1121
+      call psb_errpush(info,name)
+      goto 9999
     end if
 
 
@@ -744,16 +814,37 @@ contains
       end do
     else 
       allocate(tmp(m,nc), stat=info) 
-      if (info /= 0) then 
-        write(0,*) 'Memory allocation error in CSRSM '
-        return
+      if(info /= 0) then
+        info=4010
+        call psb_errpush(info,name,a_err='allocate')
+        goto 9999
       end if
+
       tmp(1:m,:) = x(1:m,:)
       call inner_csrsm(tra,a,tmp,y,info)
       do  i = 1, m
         y(i,:) = alpha*tmp(i,:) + beta*y(i,:)
       end do
     end if
+
+    if(info /= 0) then
+      info=4010
+      call psb_errpush(info,name,a_err='inner_csrsm')
+      goto 9999
+    end if
+
+    call psb_erractionrestore(err_act)
+    return
+
+
+9999 continue
+    call psb_erractionrestore(err_act)
+
+    if (err_act == psb_act_abort_) then
+      call psb_error()
+      return
+    end if
+    return
     
 
   contains 
@@ -769,8 +860,8 @@ contains
       real(psb_dpk_), allocatable  :: acc(:)
       
       allocate(acc(size(x,2)), stat=info)
-      if (info /= 0) then 
-        write(0,*) 'Memory allocation error in CSRSM '
+      if(info /= 0) then
+        info=4010
         return
       end if
       
