@@ -17,8 +17,6 @@ module psbn_base_mat_mod
   integer, parameter :: psbn_upd_srch_   = 98764
   integer, parameter :: psbn_upd_perm_   = 98765
   integer, parameter :: psbn_upd_dflt_   = psbn_upd_srch_
-  ! Mark a COO matrix with sorted entries.
-  integer, parameter :: psbn_isrtdcoo_   = 98761
   integer, parameter :: psbn_maxjdrows_=8, psbn_minjdrows_=4
   integer, parameter :: psbn_dbleint_=2
   character(len=5)   :: psbn_fidef_='CSR'
@@ -27,7 +25,7 @@ module psbn_base_mat_mod
   type  :: psbn_base_sparse_mat
     integer              :: m, n
     integer, private     :: state 
-    logical, private     :: triangle, unitd, upper
+    logical, private     :: triangle, unitd, upper, sorted
   contains 
     procedure, pass(a) :: base_get_nrows
     procedure, pass(a) :: base_get_ncols
@@ -37,6 +35,7 @@ module psbn_base_mat_mod
     procedure, pass(a) :: base_is_bld
     procedure, pass(a) :: base_is_upd
     procedure, pass(a) :: base_is_asb
+    procedure, pass(a) :: base_is_sorted
     procedure, pass(a) :: base_is_upper
     procedure, pass(a) :: base_is_lower
     procedure, pass(a) :: base_is_triangle
@@ -44,8 +43,10 @@ module psbn_base_mat_mod
     procedure, pass(a) :: base_get_neigh
     procedure, pass(a) :: base_allocate_mn
     procedure, pass(a) :: base_allocate_mnnz
+    procedure, pass(a) :: base_reallocate_nz
     procedure, pass(a) :: base_free
     generic, public    :: allocate => base_allocate_mn, base_allocate_mnnz
+    generic, public    :: reallocate => base_reallocate_nz
     generic, public    :: get_nrows => base_get_nrows
     generic, public    :: get_ncols => base_get_ncols
     generic, public    :: get_nzeros => base_get_nzeros
@@ -58,6 +59,7 @@ module psbn_base_mat_mod
     generic, public    :: is_bld => base_is_bld
     generic, public    :: is_upd => base_is_upd
     generic, public    :: is_asb => base_is_asb
+    generic, public    :: is_sorted => base_is_sorted
     generic, public    :: get_neigh => base_get_neigh
     generic, public    :: free => base_free
     
@@ -124,6 +126,12 @@ contains
     logical :: res
     res = (a%state == psbn_spmat_asb_)
   end function base_is_asb
+
+  function base_is_sorted(a) result(res)
+    class(psbn_base_sparse_mat), intent(in) :: a
+    logical :: res
+    res = a%sorted
+  end function base_is_sorted
 
 
   function base_get_nzeros(a) result(res)
@@ -242,6 +250,27 @@ contains
     return
 
   end subroutine base_allocate_mnnz
+
+  subroutine  base_reallocate_nz(nz,a) 
+    use psb_error_mod
+    integer, intent(in) :: nz
+    class(psbn_base_sparse_mat), intent(inout) :: a
+    Integer :: err_act
+    character(len=20)  :: name='base_reallocate_nz'
+    logical, parameter :: debug=.false.
+
+    call psb_erractionsave(err_act)
+    ! This is the base version. If we get here
+    ! it means the derived class is incomplete,
+    ! so we throw an error.
+    call psb_errpush(700,name)
+          
+    if (err_act /= psb_act_ret_) then
+      call psb_error()
+    end if
+    return
+
+  end subroutine base_reallocate_nz
 
   subroutine  base_free(a) 
     use psb_error_mod

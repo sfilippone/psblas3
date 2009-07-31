@@ -704,7 +704,6 @@ contains
         if (a%is_lower()) then 
           if (a%is_unit()) then 
             do i=a%get_nrows(), 1, -1
-              y(i) = y(i)/a%val(a%irp(i+1)-1)
               acc = y(i) 
               do j=a%irp(i), a%irp(i+1)-1
                 jc    = a%ja(j)
@@ -917,7 +916,6 @@ contains
         if (a%is_lower()) then 
           if (a%is_unit()) then 
             do i=a%get_nrows(), 1, -1
-              y(i,:) = y(i,:)/a%val(a%irp(i+1)-1)
               acc = y(i,:) 
               do j=a%irp(i), a%irp(i+1)-1
                 jc    = a%ja(j)
