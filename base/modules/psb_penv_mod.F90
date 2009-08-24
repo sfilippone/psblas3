@@ -32,11 +32,16 @@
 #if defined(SERIAL_MPI)
 ! Provide a fake mpi module just to keep the compiler(s) happy.
 module mpi
+  use psb_const_mod
   integer, parameter :: mpi_success=0
   integer, parameter :: mpi_request_null=0
   integer, parameter :: mpi_status_size=1
-  integer, parameter :: mpi_integer=1, mpi_double_precision=3
-  integer, parameter :: mpi_double_complex=5 
+  integer, parameter :: mpi_integer          = 1
+  integer, parameter :: mpi_integer8         = 2
+  integer, parameter :: mpi_real             = 3
+  integer, parameter :: mpi_double_precision = 4
+  integer, parameter :: mpi_complex          = 5   
+  integer, parameter :: mpi_double_complex   = 6 
   real(psb_dpk_), external :: mpi_wtime
 end module mpi
 #endif    
@@ -144,9 +149,7 @@ module psb_penv_mod
 
 #if defined(SERIAL_MPI)
   integer, private, save :: nctxt=0
-#endif
-
-
+#else 
 #if defined(HAVE_KSENDID)
   interface 
     integer function krecvid(contxt,proc_to_comm,myrow)
@@ -158,7 +161,9 @@ module psb_penv_mod
       integer contxt,proc_to_comm,myrow
     end function ksendid
   end interface
-#endif  
+#endif
+#endif
+  
   private psi_get_sizes
 contains 
 
@@ -2351,6 +2356,7 @@ contains
     else
       root_ = -1
     endif
+#if !defined(SERIAL_MPI)
     call psb_info(ictxt,iam,np)
     call psb_get_mpicomm(ictxt,icomm)
     mpi_int8_type = mpi_integer8
@@ -2367,6 +2373,7 @@ contains
         call mpi_reduce(dat,dat_,isz,mpi_int8_type,mpi_sum,root_,icomm,info)
       end if
     endif
+#endif
 
   end subroutine psb_i8sumv
 
@@ -2391,6 +2398,7 @@ contains
     else
       root_ = -1
     endif
+#if !defined(SERIAL_MPI)
     call psb_info(ictxt,iam,np)
     call psb_get_mpicomm(ictxt,icomm)
     mpi_int8_type = mpi_integer8
@@ -2405,7 +2413,7 @@ contains
         call mpi_reduce(dat,dat_,1,mpi_int8_type,mpi_sum,root_,icomm,info)
       end if
     endif
-
+#endif
   end subroutine psb_i8sums
 
   subroutine psb_i8amx_mpi_user(inv, outv,len,type) 
@@ -3502,7 +3510,7 @@ contains
   subroutine psb_set_coher(ictxt,isvch)
     integer :: ictxt, isvch
     ! Ensure global repeatability for convergence checks.
-#if !defined(HAVE_ESSL_BLACS)
+#if (!defined(HAVE_ESSL_BLACS)) &&(!defined(SERIAL_MPI))
     Call blacs_get(ictxt,15,isvch)
     Call blacs_set(ictxt,15,1)
 #else
@@ -3513,7 +3521,7 @@ contains
   subroutine psb_restore_coher(ictxt,isvch)
     integer :: ictxt, isvch
     ! Ensure global coherence for convergence checks.
-#if !defined(HAVE_ESSL_BLACS)
+#if (!defined(HAVE_ESSL_BLACS)) &&(!defined(SERIAL_MPI))
     Call blacs_set(ictxt,15,isvch)
 #else
     ! Do nothing: ESSL does coherence by default,

@@ -109,14 +109,22 @@ fi
 if test "X$CC" == "X" ; then
 	AC_MSG_ERROR([Problem : No C compiler specified nor found!])
 fi
+
 ###############################################################################
 #			Suitable MPI compilers detection
 ###############################################################################
 # Note: Someday we will contemplate a fake MPI - configured version of PSBLAS
 ###############################################################################
+# First check whether the user required our serial (fake) mpi.
+PAC_ARG_SERIAL_MPI
 
 #Note : we miss the name of the Intel C compiler
-
+if test x"$pac_cv_serial_mpi" == x"yes" ; then
+   FAKEMPI="fakempi.o";
+   MPIFC="$FC";
+   MPIF77="$F77";
+   MPICC="$CC";
+else 
 AC_LANG([C])
 if test "X$MPICC" = "X" ; then
     # This is our MPICC compiler preference: it will override ACX_MPI's first try.
@@ -139,7 +147,7 @@ if test "X$MPIFC" = "X" ; then
 fi
 
 ACX_MPI([], [AC_MSG_ERROR([[Cannot find any suitable MPI implementation for Fortran]])])
-
+fi
 # We leave a default language for the next checks.
 dnl AC_LANG([Fortran 77])
 AC_LANG([C])
@@ -391,7 +399,7 @@ if test "X$FCOPT" == "X" ; then
 fi
 if test "X$psblas_cv_fc" == X"nag" ; then
    # Add needed options 
-   FCOPT="$FCOPT -mismatch -dcfuns"
+   FCOPT="$FCOPT -mismatch -dcfuns -f2003"
 fi
 FFLAGS="${FCOPT}"
 
@@ -424,9 +432,13 @@ else
 fi
 if test "X$psblas_cv_fc" == X"nag" ; then
    # Add needed options 
-     F90COPT="$F90COPT -mismatch -dcfuns"
+     F90COPT="$F90COPT -mismatch -dcfuns -f2003"
      EXTRA_OPT="-mismatch_all"
+     F03COPT="${F90COPT}"
+else
+     F03COPT="${F90COPT}"
 fi
+
 FCFLAGS="${F90COPT}"
 
 # COPT,FCOPT, F90COPT are aliases for FFLAGS,CFLAGS,FCFLAGS .
@@ -441,7 +453,6 @@ if test "X$psblas_cv_fc" == X"xlf" ; then
   #  - it is not said that mpxlf95 gets chosen by the configure script.
   F90="xlf95   -qsuffix=f=f90:cpp=F90"
  #  F90="xlf95"
-  MPF90="mpxlf95 -qsuffix=f=f90:cpp=F90"
 #    FC="xlf"
 
 # Note : this gives problems in base/serial/aux/isaperm.f
@@ -450,11 +461,17 @@ if test "X$psblas_cv_fc" == X"xlf" ; then
 # Note : this is the cure
      FC="xlf     -qsuffix=f=f:cpp=F"
      # Note : maybe we will want xlf -qsuffix=cpp=F
-
     F77="xlf"
-  MPF77="mpxlf95 -qfixed  -qsuffix=f=f:cpp=F"
      CC="xlc"
-   MPCC="mpcc"
+  if test x"$pac_cv_serial_mpi" == x"yes" ; then
+     MPF90="xlf95 -qsuffix=f=f90:cpp=F90"
+     MPF77="xlf95 -qfixed  -qsuffix=f=f:cpp=F"
+     MPCC="xlc"
+  else 
+     MPF90="mpxlf95 -qsuffix=f=f90:cpp=F90"
+     MPF77="mpxlf95 -qfixed  -qsuffix=f=f:cpp=F"
+     MPCC="mpcc"
+  fi
  #MPFCC="mpxlc"
   # Note : -qfixed should be not specified in the environment FFLAGS or things will break.
   #        This fact should be documented somewhere.
@@ -487,8 +504,8 @@ fi
 ##############################################################################
 AX_F90_MODULE_EXTENSION
 AX_F90_MODULE_FLAG
-MODEXT=".$ax_f90_modext"
-FMFLAG="${ax_f90_modflag%%[ ]*}"
+MODEXT=".$ax_cv_f90_modext"
+FMFLAG="${ax_cv_f90_modflag%%[ ]*}"
 FIFLAG=-I
 
 ###############################################################################
@@ -504,11 +521,14 @@ FIFLAG=-I
 
 ###############################################################################
 # Custom test : do we have a module or include for MPI Fortran interface?
-
-PAC_FORTRAN_CHECK_HAVE_MPI_MOD(
-	[FDEFINES="$psblas_cv_define_prepend-DMPI_MOD $FDEFINES"],
+if test x"$pac_cv_serial_mpi" == x"yes" ; then
+   FDEFINES="$psblas_cv_define_prepend-DSERIAL_MPI $psblas_cv_define_prepend-DMPI_MOD $FDEFINES";
+else 
+ PAC_FORTRAN_CHECK_HAVE_MPI_MOD(
+ 	[FDEFINES="$psblas_cv_define_prepend-DMPI_MOD $FDEFINES"],
 	[FDEFINES="$psblas_cv_define_prepend-DMPI_H $FDEFINES"]
-)
+ )
+fi
 
 # Custom test : do we have move_alloc ?
 PAC_FORTRAN_HAVE_MOVE_ALLOC(
@@ -577,6 +597,7 @@ ACX_LAPACK(
 ###############################################################################
 #		BLACS library presence checks
 ###############################################################################
+if test x"$pac_cv_serial_mpi" == x"no" ; then
 save_FC="$FC";
 save_CC="$CC";
 FC="$MPIFC";
@@ -584,6 +605,8 @@ CC="$MPICC";
 PAC_CHECK_BLACS
 FC="$save_FC";
 CC="$save_CC";
+fi
+
 PAC_MAKE_IS_GNUMAKE
 
 ###############################################################################
@@ -644,12 +667,14 @@ AC_SUBST(CDEFINES)
 AC_SUBST(BASELIBNAME)
 AC_SUBST(F90)
 AC_SUBST(F90COPT)
+AC_SUBST(F03COPT)
 AC_SUBST(MPF90)
 AC_SUBST(MPF77)
 AC_SUBST(MPCC)
 AC_SUBST(FCOPT)
 AC_SUBST(CCOPT)
 AC_SUBST(EXTRA_OPT)
+AC_SUBST(FAKEMPI)
 AC_SUBST(FIFLAG)
 AC_SUBST(FMFLAG)
 AC_SUBST(MODEXT)
@@ -710,9 +735,9 @@ $(.mod).o:
 %$(.mod): %.f03
 	$(F90) $(F90COPT) $(FINCLUDES)  -c $<
 %.o: %.F03
-	$(F90) $(F90COPT) $(FINCLUDES) $(FDEFINES)  -c $<
+	$(F90) $(F03COPT) $(FINCLUDES) $(FDEFINES)  -c $<
 %$(.mod): %.F03
-	$(F90) $(F90COPT) $(FINCLUDES) $(FDEFINES) -c $<'
+	$(F90) $(F03COPT) $(FINCLUDES) $(FDEFINES) -c $<'
 
 else
 
@@ -748,9 +773,9 @@ $(.mod).o:
 .f03.o:
 	$(F90) $(F90COPT) $(FINCLUDES) -c $<
 .F03.o:
-	$(F90) $(F90COPT) $(FINCLUDES) $(FDEFINES) -c $<
+	$(F90) $(F03COPT) $(FINCLUDES) $(FDEFINES) -c $<
 .F03$(.mod):
-	$(F90) $(F90COPT) $(FINCLUDES) $(FDEFINES) -c $<'
+	$(F90) $(F03COPT) $(FINCLUDES) $(FDEFINES) -c $<'
 
 fi
 AC_SUBST(PSBLASRULES)
@@ -785,6 +810,7 @@ dnl	FFLAGS                : ${FFLAGS}
 dnl	FCFLAGS               : ${FCFLAGS}
 	MODEXT                : ${MODEXT}
 	FMFLAG                : ${FMFLAG}
+   	F03COPT               : ${F03COPT}
    	F90COPT               : ${F90COPT}
    	FCOPT                 : ${FCOPT}
    	CCOPT                 : ${CCOPT}

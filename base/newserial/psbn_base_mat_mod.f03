@@ -1,4 +1,6 @@
 module psbn_base_mat_mod
+  
+  use psb_const_mod 
 
   integer, parameter :: psbn_spmat_null_=0, psbn_spmat_bld_=1
   integer, parameter :: psbn_spmat_asb_=2, psbn_spmat_upd_=4
@@ -24,117 +26,117 @@ module psbn_base_mat_mod
 
   type  :: psbn_base_sparse_mat
     integer              :: m, n
-    integer, private     :: state 
+    integer, private     :: state, duplicate 
     logical, private     :: triangle, unitd, upper, sorted
   contains 
-    procedure, pass(a) :: base_get_nrows
-    procedure, pass(a) :: base_get_ncols
-    procedure, pass(a) :: base_get_nzeros
-    procedure, pass(a) :: base_get_size
-    procedure, pass(a) :: base_get_state
-    procedure, pass(a) :: base_is_bld
-    procedure, pass(a) :: base_is_upd
-    procedure, pass(a) :: base_is_asb
-    procedure, pass(a) :: base_is_sorted
-    procedure, pass(a) :: base_is_upper
-    procedure, pass(a) :: base_is_lower
-    procedure, pass(a) :: base_is_triangle
-    procedure, pass(a) :: base_is_unit
-    procedure, pass(a) :: base_get_neigh
-    procedure, pass(a) :: base_allocate_mn
-    procedure, pass(a) :: base_allocate_mnnz
-    procedure, pass(a) :: base_reallocate_nz
-    procedure, pass(a) :: base_free
-    generic, public    :: allocate => base_allocate_mn, base_allocate_mnnz
-    generic, public    :: reallocate => base_reallocate_nz
-    generic, public    :: get_nrows => base_get_nrows
-    generic, public    :: get_ncols => base_get_ncols
-    generic, public    :: get_nzeros => base_get_nzeros
-    generic, public    :: get_size  => base_get_size
-    generic, public    :: get_state => base_get_state
-    generic, public    :: is_triangle => base_is_triangle
-    generic, public    :: is_unit => base_is_unit
-    generic, public    :: is_upper => base_is_upper
-    generic, public    :: is_lower => base_is_lower
-    generic, public    :: is_bld => base_is_bld
-    generic, public    :: is_upd => base_is_upd
-    generic, public    :: is_asb => base_is_asb
-    generic, public    :: is_sorted => base_is_sorted
-    generic, public    :: get_neigh => base_get_neigh
-    generic, public    :: free => base_free
+    procedure, pass(a) :: get_nrows
+    procedure, pass(a) :: get_ncols
+    procedure, pass(a) :: get_nzeros
+    procedure, pass(a) :: get_size
+    procedure, pass(a) :: get_state
+    procedure, pass(a) :: get_dupl
+    procedure, pass(a) :: is_null
+    procedure, pass(a) :: is_bld
+    procedure, pass(a) :: is_upd
+    procedure, pass(a) :: is_asb
+    procedure, pass(a) :: is_sorted
+    procedure, pass(a) :: is_upper
+    procedure, pass(a) :: is_lower
+    procedure, pass(a) :: is_triangle
+    procedure, pass(a) :: is_unit
+    procedure, pass(a) :: get_neigh
+    procedure, pass(a) :: allocate_mn
+    procedure, pass(a) :: allocate_mnnz
+    procedure, pass(a) :: reallocate_nz
+    procedure, pass(a) :: free
+    generic,   public  :: allocate => allocate_mn, allocate_mnnz
+    generic,   public  :: reallocate => reallocate_nz
     
   end type psbn_base_sparse_mat
   
 contains
  
-  function base_get_state(a) result(res)
+  function get_dupl(a) result(res)
+    class(psbn_base_sparse_mat), intent(in) :: a
+    integer :: res
+    res = a%duplicate
+  end function get_dupl
+ 
+ 
+  function get_state(a) result(res)
     class(psbn_base_sparse_mat), intent(in) :: a
     integer :: res
     res = a%state
-  end function base_get_state
+  end function get_state
  
-  function base_get_nrows(a) result(res)
+  function get_nrows(a) result(res)
     class(psbn_base_sparse_mat), intent(in) :: a
     integer :: res
     res = a%m
-  end function base_get_nrows
+  end function get_nrows
 
-  function base_get_ncols(a) result(res)
+  function get_ncols(a) result(res)
     class(psbn_base_sparse_mat), intent(in) :: a
     integer :: res
     res = a%n
-  end function base_get_ncols
+  end function get_ncols
 
-  function base_is_triangle(a) result(res)
+  function is_triangle(a) result(res)
     class(psbn_base_sparse_mat), intent(in) :: a
     logical :: res
     res = a%triangle
-  end function base_is_triangle
+  end function is_triangle
 
-  function base_is_unit(a) result(res)
+  function is_unit(a) result(res)
     class(psbn_base_sparse_mat), intent(in) :: a
     logical :: res
     res = a%unitd
-  end function base_is_unit
+  end function is_unit
 
-  function base_is_upper(a) result(res)
+  function is_upper(a) result(res)
     class(psbn_base_sparse_mat), intent(in) :: a
     logical :: res
     res = a%upper
-  end function base_is_upper
+  end function is_upper
 
-  function base_is_lower(a) result(res)
+  function is_lower(a) result(res)
     class(psbn_base_sparse_mat), intent(in) :: a
     logical :: res
     res = .not.a%upper
-  end function base_is_lower
+  end function is_lower
 
-  function base_is_bld(a) result(res)
+  function is_null(a) result(res)
+    class(psbn_base_sparse_mat), intent(in) :: a
+    logical :: res
+    res = (a%state == psbn_spmat_null_)
+  end function is_null
+
+  function is_bld(a) result(res)
     class(psbn_base_sparse_mat), intent(in) :: a
     logical :: res
     res = (a%state == psbn_spmat_bld_)
-  end function base_is_bld
+  end function is_bld
 
-  function base_is_upd(a) result(res)
+  function is_upd(a) result(res)
     class(psbn_base_sparse_mat), intent(in) :: a
     logical :: res
     res = (a%state == psbn_spmat_upd_)
-  end function base_is_upd
+  end function is_upd
 
-  function base_is_asb(a) result(res)
+  function is_asb(a) result(res)
     class(psbn_base_sparse_mat), intent(in) :: a
     logical :: res
     res = (a%state == psbn_spmat_asb_)
-  end function base_is_asb
+  end function is_asb
 
-  function base_is_sorted(a) result(res)
+  function is_sorted(a) result(res)
     class(psbn_base_sparse_mat), intent(in) :: a
     logical :: res
     res = a%sorted
-  end function base_is_sorted
+  end function is_sorted
 
 
-  function base_get_nzeros(a) result(res)
+  function get_nzeros(a) result(res)
     use psb_error_mod
     class(psbn_base_sparse_mat), intent(in) :: a
     integer :: res
@@ -155,15 +157,15 @@ contains
     end if
     return
 
-  end function base_get_nzeros
+  end function get_nzeros
 
-  function base_get_size(a) result(res)
+  function get_size(a) result(res)
     use psb_error_mod
     class(psbn_base_sparse_mat), intent(in) :: a
     integer :: res
     
     Integer :: err_act
-    character(len=20)  :: name='base_get_size'
+    character(len=20)  :: name='get_size'
     logical, parameter :: debug=.false.
 
     call psb_erractionsave(err_act)
@@ -178,10 +180,10 @@ contains
     end if
     return
 
-  end function base_get_size
+  end function get_size
 
 
-  subroutine base_get_neigh(a,idx,neigh,n,info,lev)
+  subroutine get_neigh(a,idx,neigh,n,info,lev)
     use psb_error_mod
     class(psbn_base_sparse_mat), intent(in) :: a   
     integer, intent(in)                :: idx 
@@ -191,7 +193,7 @@ contains
     integer, optional, intent(in)      :: lev 
     
     Integer :: err_act
-    character(len=20)  :: name='base_get_neigh'
+    character(len=20)  :: name='get_neigh'
     logical, parameter :: debug=.false.
 
     call psb_erractionsave(err_act)
@@ -206,15 +208,15 @@ contains
     end if
     return
 
-  end subroutine base_get_neigh
+  end subroutine get_neigh
 
-  subroutine  base_allocate_mn(m,n,a) 
+  subroutine  allocate_mn(m,n,a) 
     use psb_error_mod
     integer, intent(in) :: m,n
     class(psbn_base_sparse_mat), intent(inout) :: a
 
     Integer :: err_act
-    character(len=20)  :: name='base_allocate_mn'
+    character(len=20)  :: name='allocate_mn'
     logical, parameter :: debug=.false.
 
     call psb_erractionsave(err_act)
@@ -228,14 +230,14 @@ contains
     end if
     return
 
-  end subroutine base_allocate_mn
+  end subroutine allocate_mn
 
-  subroutine  base_allocate_mnnz(m,n,nz,a) 
+  subroutine  allocate_mnnz(m,n,nz,a) 
     use psb_error_mod
     integer, intent(in) :: m,n,nz
     class(psbn_base_sparse_mat), intent(inout) :: a
     Integer :: err_act
-    character(len=20)  :: name='base_allocate_mnz'
+    character(len=20)  :: name='allocate_mnz'
     logical, parameter :: debug=.false.
 
     call psb_erractionsave(err_act)
@@ -249,14 +251,14 @@ contains
     end if
     return
 
-  end subroutine base_allocate_mnnz
+  end subroutine allocate_mnnz
 
-  subroutine  base_reallocate_nz(nz,a) 
+  subroutine  reallocate_nz(nz,a) 
     use psb_error_mod
     integer, intent(in) :: nz
     class(psbn_base_sparse_mat), intent(inout) :: a
     Integer :: err_act
-    character(len=20)  :: name='base_reallocate_nz'
+    character(len=20)  :: name='reallocate_nz'
     logical, parameter :: debug=.false.
 
     call psb_erractionsave(err_act)
@@ -270,13 +272,13 @@ contains
     end if
     return
 
-  end subroutine base_reallocate_nz
+  end subroutine reallocate_nz
 
-  subroutine  base_free(a) 
+  subroutine  free(a) 
     use psb_error_mod
     class(psbn_base_sparse_mat), intent(inout) :: a
     Integer :: err_act
-    character(len=20)  :: name='base_free'
+    character(len=20)  :: name='free'
     logical, parameter :: debug=.false.
 
     call psb_erractionsave(err_act)
@@ -290,7 +292,7 @@ contains
     end if
     return
 
-  end subroutine base_free
+  end subroutine free
 
 end module psbn_base_mat_mod
 

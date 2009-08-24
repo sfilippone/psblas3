@@ -64,8 +64,11 @@
 #endif
 
 #define mpi_integer        1
-#define mpi_double         3
-#define mpi_double_complex 5
+#define mpi_integer8       2
+#define mpi_real           3
+#define mpi_double         4
+#define mpi_complex        5
+#define mpi_double_complex 6
 
 double mpi_wtime() 
 {
@@ -104,9 +107,18 @@ void mpi_alltoall(void* sdb, int* sdc, int* sdt,
   if (*sdt == mpi_integer) {
     memcpy(rvb,sdb, (*sdc)*sizeof(int));
   }
+  if (*sdt == mpi_integer8) {
+    memcpy(rvb,sdb, (*sdc)*2*sizeof(int));
+  }
+  if (*sdt == mpi_real) {
+    memcpy(rvb,sdb, (*sdc)*sizeof(float));
+  } 
   if (*sdt == mpi_double) {
     memcpy(rvb,sdb, (*sdc)*sizeof(double));
   } 
+  if (*sdt == mpi_complex) {
+    memcpy(rvb,sdb, (*sdc)*2*sizeof(float));
+  }
   if (*sdt == mpi_double_complex) {
     memcpy(rvb,sdb, (*sdc)*2*sizeof(double));
   }
@@ -123,10 +135,22 @@ void mpi_alltoallv(void* sdb, int* sdc, int* sdspl, int* sdt,
     memcpy((rvb+rdspl[0]*sizeof(int)),
 	   (sdb+sdspl[0]*sizeof(int)),(*sdc)*sizeof(int));
   }
+  if (*sdt == mpi_integer8) {
+    memcpy((rvb+rdspl[0]*2*sizeof(int)),
+	   (sdb+sdspl[0]*2*sizeof(int)),(*sdc)*2*sizeof(int));
+  }
+  if (*sdt == mpi_real) {
+    memcpy((rvb+rdspl[0]*sizeof(float)),
+	   (sdb+sdspl[0]*sizeof(float)),(*sdc)*sizeof(float));
+  } 
   if (*sdt == mpi_double) {
     memcpy((rvb+rdspl[0]*sizeof(double)),
 	   (sdb+sdspl[0]*sizeof(double)),(*sdc)*sizeof(double));
   } 
+  if (*sdt == mpi_complex) {
+    memcpy((rvb+rdspl[0]*2*sizeof(float)),
+	   (sdb+sdspl[0]*2*sizeof(float)),(*sdc)*2*sizeof(float));
+  }
   if (*sdt == mpi_double_complex) {
     memcpy((rvb+rdspl[0]*2*sizeof(double)),
 	   (sdb+sdspl[0]*2*sizeof(double)),(*sdc)*2*sizeof(double));
@@ -143,9 +167,18 @@ void mpi_allgather(void* sdb, int* sdc, int* sdt,
   if (*sdt == mpi_integer) {
     memcpy(rvb,sdb, (*sdc)*sizeof(int));
   }
+  if (*sdt == mpi_integer8) {
+    memcpy(rvb,sdb, (*sdc)*2*sizeof(int));
+  }
+  if (*sdt == mpi_real) {
+    memcpy(rvb,sdb, (*sdc)*sizeof(float));
+  } 
   if (*sdt == mpi_double) {
     memcpy(rvb,sdb, (*sdc)*sizeof(double));
   } 
+  if (*sdt == mpi_complex) {
+    memcpy(rvb,sdb, (*sdc)*2*sizeof(float));
+  }
   if (*sdt == mpi_double_complex) {
     memcpy(rvb,sdb, (*sdc)*2*sizeof(double));
   }
@@ -159,22 +192,25 @@ void mpi_allgatherv(void* sdb, int* sdc, int* sdt,
   int i,j,k; 
   
   if (*sdt == mpi_integer) {
-    memcpy(rvb,sdb, (*sdc)*sizeof(int));
-  }
-  if (*sdt == mpi_double) {
-    memcpy(rvb,sdb, (*sdc)*sizeof(double));
-  } 
-  if (*sdt == mpi_double_complex) {
-    memcpy(rvb,sdb, (*sdc)*2*sizeof(double));
-  }
-  if (*sdt == mpi_integer) {
     memcpy((rvb+rdspl[0]*sizeof(int)),
 	   (sdb),(*sdc)*sizeof(int));
   }
+  if (*sdt == mpi_integer8) {
+    memcpy((rvb+rdspl[0]*2*sizeof(int)),
+	   (sdb),(*sdc)*2*sizeof(int));
+  }
+  if (*sdt == mpi_real) {
+    memcpy((rvb+rdspl[0]*sizeof(float)),
+	   (sdb),(*sdc)*sizeof(float));
+  } 
   if (*sdt == mpi_double) {
     memcpy((rvb+rdspl[0]*sizeof(double)),
 	   (sdb),(*sdc)*sizeof(double));
   } 
+  if (*sdt == mpi_complex) {
+    memcpy((rvb+rdspl[0]*2*sizeof(float)),
+	   (sdb),(*sdc)*2*sizeof(float));
+  }
   if (*sdt == mpi_double_complex) {
     memcpy((rvb+rdspl[0]*2*sizeof(double)),
 	   (sdb),(*sdc)*2*sizeof(double));

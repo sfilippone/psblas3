@@ -2,6 +2,7 @@
 module psbn_d_base_mat_mod
 
   use psbn_base_mat_mod
+
   type, extends(psbn_base_sparse_mat) :: psbn_d_base_sparse_mat
   contains
     procedure, pass(a) :: d_base_csmv
@@ -10,23 +11,23 @@ module psbn_d_base_mat_mod
     procedure, pass(a) :: d_base_cssv
     procedure, pass(a) :: d_base_cssm
     generic, public    :: psbn_cssm => d_base_cssm, d_base_cssv
-    procedure, pass(a) :: d_base_csins
-    generic, public    :: csins => d_base_csins
+    procedure, pass(a) :: csins
     
   end type psbn_d_base_sparse_mat
 
 contains 
 
-  subroutine d_base_csins(nz,val,ia,ja,a,info) 
-    use psb_const_mod
+  subroutine csins(nz,val,ia,ja,a,imin,imax,jmin,jmax,info,gtl) 
     use psb_error_mod
-    class(psbn_d_base_sparse_mat), intent(in) :: a
-    real(psb_dpk_), intent(in)    :: val(:)
-    integer, intent(in)           :: nz, ia(:), ja(:)
+    use psb_realloc_mod
+    class(psbn_d_base_sparse_mat), intent(inout) :: a
+    real(psb_dpk_), intent(in)      :: val(:)
+    integer, intent(in)             :: nz, ia(:), ja(:), imin,imax,jmin,jmax
     integer, intent(out)            :: info
+    integer, intent(in), optional   :: gtl(:)
 
     Integer :: err_act
-    character(len=20)  :: name='d_base_csins'
+    character(len=20)  :: name='csins'
     logical, parameter :: debug=.false.
 
     call psb_erractionsave(err_act)
@@ -41,10 +42,9 @@ contains
     end if
     return
 
-  end subroutine d_base_csins
+  end subroutine csins
 
   subroutine d_base_csmm(alpha,a,x,beta,y,info,trans) 
-    use psb_const_mod
     use psb_error_mod
     class(psbn_d_base_sparse_mat), intent(in) :: a
     real(psb_dpk_), intent(in)    :: alpha, beta, x(:,:)
@@ -60,8 +60,9 @@ contains
     ! This is the base version. If we get here
     ! it means the derived class is incomplete,
     ! so we throw an error.
-    call psb_errpush(700,name)
-          
+    info = 700
+    call psb_errpush(info,name)
+         
     if (err_act /= psb_act_ret_) then
       call psb_error()
     end if
@@ -85,7 +86,8 @@ contains
     ! This is the base version. If we get here
     ! it means the derived class is incomplete,
     ! so we throw an error.
-    call psb_errpush(700,name)
+    info = 700
+    call psb_errpush(info,name)
           
     if (err_act /= psb_act_ret_) then
       call psb_error()
@@ -108,11 +110,11 @@ contains
     logical, parameter :: debug=.false.
 
     call psb_erractionsave(err_act)
-    info = 700
     ! This is the base version. If we get here
     ! it means the derived class is incomplete,
     ! so we throw an error.
-    call psb_errpush(700,name)
+    info = 700
+    call psb_errpush(info,name)
           
     if (err_act /= psb_act_ret_) then
       call psb_error()
@@ -134,11 +136,11 @@ contains
     logical, parameter :: debug=.false.
 
     call psb_erractionsave(err_act)
-    info = 700
     ! This is the base version. If we get here
     ! it means the derived class is incomplete,
     ! so we throw an error.
-    call psb_errpush(700,name)
+    info = 700
+    call psb_errpush(info,name)
           
     if (err_act /= psb_act_ret_) then
       call psb_error()

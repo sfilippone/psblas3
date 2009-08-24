@@ -18,7 +18,7 @@ dnl make it work even if ac_fc_ext="f"
 
 AC_DEFUN([AX_F90_MODULE_FLAG],[
 AC_CACHE_CHECK([fortran 90 modules inclusion flag],
-ax_f90_modflag,
+ax_cv_f90_modflag,
 [AC_LANG_PUSH(Fortran)
 i=0
 while test \( -f tmpdir_$i \) -o \( -d tmpdir_$i \) ; do
@@ -35,9 +35,9 @@ AC_COMPILE_IFELSE([
       end module conftest_module
   ],[],[])
 cd ..
-ax_f90_modflag="not found"
+ax_cv_f90_modflag="not found"
 for ax_flag in "-I " "-M" "-p"; do
-  if test "$ax_f90_modflag" = "not found" ; then
+  if test "$ax_cv_f90_modflag" = "not found" ; then
     ax_save_FCFLAGS="$FCFLAGS"
     FCFLAGS="$ax_save_FCFLAGS ${ax_flag}tmpdir_$i"
     AC_COMPILE_IFELSE([
@@ -45,7 +45,7 @@ for ax_flag in "-I " "-M" "-p"; do
        use conftest_module
        call conftest_routine
        end program conftest_program
-      ],[ax_f90_modflag="$ax_flag"],[])
+      ],[ax_cv_f90_modflag="$ax_flag"],[])
     FCFLAGS="$ax_save_FCFLAGS"
   fi
 done
