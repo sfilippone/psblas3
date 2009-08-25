@@ -136,8 +136,8 @@ subroutine  psb_caxpby(alpha, x, beta,y,desc_a,info, n, jx, jy)
   if ((in /= 0)) then
     if(psb_cd_get_local_rows(desc_a) > 0) then
       call caxpby(psb_cd_get_local_cols(desc_a),in,&
-           & alpha,x(iix,jjx),size(x,1),beta,&
-           & y(iiy,jjy),size(y,1),info)
+           & alpha,x(iix:,jjx),size(x,1),beta,&
+           & y(iiy:,jjy),size(y,1),info)
     end if
   end if
 

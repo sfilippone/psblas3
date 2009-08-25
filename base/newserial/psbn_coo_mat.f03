@@ -5,8 +5,6 @@ module psbn_d_coo_sparse_mat_mod
   type, extends(psbn_d_base_sparse_mat) :: psbn_d_coo_sparse_mat
 
     integer              :: nnz
-    logical              :: sorted
-    
     integer, allocatable :: ia(:), ja(:)
     real(psb_dpk_), allocatable :: val(:)
 

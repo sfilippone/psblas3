@@ -297,9 +297,9 @@ C
 C        Both right and left permutation required
 C
         P=LWORKB+1
-        CALL SLPUPD(K,N,PR,B,LDB,DZERO,WORK,K)
+        CALL SLPUPD(K,N,PR,B,LDB,SZERO,WORK,K)
         CALL SSWMM(TRANS,M,N,K,ALPHA,FIDA,DESCRA,A,IA1,IA2,INFOA,     
-     &     WORK,K,DZERO,WORK(P),M,WORK(P+LWORKC),LWORKS,IERROR)
+     &     WORK,K,SZERO,WORK(P),M,WORK(P+LWORKC),LWORKS,IERROR)
         LWORKS = INT(WORK(P+LWORKC))
         IF(IERROR .NE. 0) THEN
            IERROR=4011
@@ -312,7 +312,7 @@ C
 C        Only right permutation required
 C
         P=LWORKB+1
-        CALL SLPUPD(K,N,PR,B,LDB,DZERO,WORK,K)
+        CALL SLPUPD(K,N,PR,B,LDB,SZERO,WORK,K)
         CALL SSWMM(TRANS,M,N,K,ALPHA,FIDA,DESCRA,A,IA1,IA2,INFOA,    
      &     WORK,K,BETA,C,LDC,WORK(P),LWORKS,IERROR)
         LWORKS = INT(WORK(P))
@@ -327,7 +327,7 @@ C        Only left permutation required
 C
         P=LWORKC+1
         CALL SSWMM(TRANS,M,N,K,ALPHA,FIDA,DESCRA,A,IA1,IA2,INFOA,    
-     &     B,LDB,DZERO,WORK,M,WORK(P),LWORKS,IERROR)
+     &     B,LDB,SZERO,WORK,M,WORK(P),LWORKS,IERROR)
         LWORKS = INT(WORK(P))
         IF(IERROR .NE. 0) THEN
            IERROR=4011

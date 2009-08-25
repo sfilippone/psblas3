@@ -102,7 +102,7 @@ function psb_dnrm2(x, desc_a, info, jx)
   if(m /= 0) then
     if (psb_cd_get_local_rows(desc_a) > 0) then 
       ndim = psb_cd_get_local_rows(desc_a)
-      nrm2 = dnrm2( ndim, x(iix,jjx), ione )
+      nrm2 = dnrm2( ndim, x(iix:,jjx), ione )
 
       ! adjust  because overlapped elements are computed more than once
       do i=1,size(desc_a%ovrlap_elem,1)

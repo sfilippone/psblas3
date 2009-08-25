@@ -156,7 +156,7 @@ subroutine  psb_chalom(x,desc_a,info,alpha,jx,ik,work,tran,mode,data)
   if(present(alpha)) then
     if(alpha /= 1.d0) then
       do i=0, k-1
-        call zscal(nrow,alpha,x(1,jjx+i),1)
+        call zscal(nrow,alpha,x(:,jjx+i),1)
       end do
     end if
   end if

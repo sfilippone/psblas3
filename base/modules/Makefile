@@ -1,12 +1,14 @@
 include ../../Make.inc
 
-MODULES = psb_realloc_mod.o psb_string_mod.o psb_spmat_type.o \
+BASIC_MODS= psb_const_mod.o psb_error_mod.o psb_realloc_mod.o
+UTIL_MODS = psb_string_mod.o psb_spmat_type.o \
 	psb_desc_type.o psb_sort_mod.o psb_penv_mod.o \
 	psb_serial_mod.o psb_tools_mod.o psb_blacs_mod.o \
-	psb_error_mod.o psb_const_mod.o psb_linmap_type_mod.o \
-	psb_comm_mod.o psb_psblas_mod.o psi_serial_mod.o psi_mod.o \
+	psb_linmap_type_mod.o psb_comm_mod.o psb_psblas_mod.o \
+	psi_serial_mod.o psi_mod.o \
 	psb_check_mod.o psb_gps_mod.o psb_linmap_mod.o psb_hash_mod.o
 
+MODULES=$(BASIC_MODS) $(UTIL_MODS)
 
 LIBMOD=psb_base_mod$(.mod)
 OBJS = error.o psb_base_mod.o $(EXTRA_COBJS) cutil.o
@@ -15,7 +17,7 @@ CINCLUDES=-I.
 FINCLUDES=$(FMFLAG)$(LIBDIR) $(FMFLAG). $(FIFLAG).
 
 
-lib:  blacsmod $(MODULES)  $(OBJS)  $(LIBMOD)
+lib:  $(BASIC_MODS) blacsmod $(UTIL_MODS)  $(OBJS)  $(LIBMOD)
 	$(AR) $(LIBDIR)/$(LIBNAME) $(MODULES) $(OBJS) $(MPFOBJS)
 	$(RANLIB) $(LIBDIR)/$(LIBNAME)
 	/bin/cp -p $(LIBMOD) $(LIBDIR)
@@ -43,7 +45,7 @@ psb_base_mod.o: $(MODULES)
 
 
 blacsmod:
-	(make psb_blacs_mod.o F90COPT="$(F90COPT) $(EXTRA_OPT)")
+	(make psb_blacs_mod.o psb_penv_mod.o F90COPT="$(F90COPT) $(EXTRA_OPT)")
 
 
 clean:

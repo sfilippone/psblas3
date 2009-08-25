@@ -296,9 +296,9 @@ C
 C        Both right and left permutation required
 C
          P=LWORKB+1
-         CALL CLPUPD(K,N,PR,B,LDB,ZZERO,WORK,K)
+         CALL CLPUPD(K,N,PR,B,LDB,CZERO,WORK,K)
          CALL CSWMM(TRANS,M,N,K,ALPHA,FIDA,DESCRA,A,IA1,IA2,INFOA,  
-     &           WORK,K,ZZERO,WORK(P),M,WORK(P+LWORKC),LWORKS,IERROR)
+     &           WORK,K,CZERO,WORK(P),M,WORK(P+LWORKC),LWORKS,IERROR)
          LWORKS = INT(REAL(WORK(P+LWORKC)))
          IF(IERROR .NE. 0) THEN
             IF (IERROR.EQ.3010) THEN
@@ -313,7 +313,7 @@ C
 C        Only right permutation required
 C
          P=LWORKB+1
-         CALL CLPUPD(K,N,PR,B,LDB,ZZERO,WORK,K)
+         CALL CLPUPD(K,N,PR,B,LDB,CZERO,WORK,K)
          CALL CSWMM(TRANS,M,N,K,ALPHA,FIDA,DESCRA,A,IA1,IA2,INFOA,  
      &           WORK,K,BETA,C,LDC,WORK(P),LWORKS,IERROR)
          LWORKS = INT(REAL(WORK(P)))
@@ -330,7 +330,7 @@ C        Only left permutation required
 C
          P=LWORKC+1
          CALL CSWMM(TRANS,M,N,K,ALPHA,FIDA,DESCRA,A,IA1,IA2,INFOA,  
-     &           B,LDB,ZZERO,WORK,M,WORK(P),LWORKS,IERROR)
+     &           B,LDB,CZERO,WORK,M,WORK(P),LWORKS,IERROR)
          LWORKS = INT(REAL(WORK(P)))
          IF(IERROR .NE. 0) THEN
             IF (IERROR.EQ.3010) THEN

@@ -123,7 +123,7 @@ function psb_sdot(x, y,desc_a, info, jx, jy)
   if(m /= 0) then
     if(psb_cd_get_local_rows(desc_a) > 0) then
       dot_local = sdot(psb_cd_get_local_rows(desc_a),&
-           & x(iix,jjx),ione,y(iiy,jjy),ione)
+           & x(iix:,jjx),ione,y(iiy:,jjy),ione)
       ! adjust dot_local because overlapped elements are computed more than once
       do i=1,size(desc_a%ovrlap_elem,1)
         idx  = desc_a%ovrlap_elem(i,1)
@@ -540,7 +540,7 @@ subroutine psb_smdots(res, x, y, desc_a, info)
     if(psb_cd_get_local_rows(desc_a) > 0) then
       do j=1,k
         dot_local(j) = sdot(psb_cd_get_local_rows(desc_a),&
-             & x(1,j),ione,y(1,j),ione)
+             & x(1:,j),ione,y(1:,j),ione)
         ! adjust dot_local because overlapped elements are computed more than once
       end do
       do i=1,size(desc_a%ovrlap_elem,1)

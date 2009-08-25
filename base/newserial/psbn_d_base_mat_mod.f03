@@ -100,8 +100,8 @@ contains
   subroutine d_base_cssm(alpha,a,x,beta,y,info,trans) 
     use psb_error_mod
     class(psbn_d_base_sparse_mat), intent(in) :: a
-    real(kind(1.d0)), intent(in)    :: alpha, beta, x(:,:)
-    real(kind(1.d0)), intent(inout) :: y(:,:)
+    real(psb_dpk_), intent(in)    :: alpha, beta, x(:,:)
+    real(psb_dpk_), intent(inout) :: y(:,:)
     integer, intent(out)            :: info
     character, optional, intent(in) :: trans
     
@@ -126,8 +126,8 @@ contains
   subroutine d_base_cssv(alpha,a,x,beta,y,info,trans) 
     use psb_error_mod
     class(psbn_d_base_sparse_mat), intent(in) :: a
-    real(kind(1.d0)), intent(in)    :: alpha, beta, x(:)
-    real(kind(1.d0)), intent(inout) :: y(:)
+    real(psb_dpk_), intent(in)    :: alpha, beta, x(:)
+    real(psb_dpk_), intent(inout) :: y(:)
     integer, intent(out)            :: info
     character, optional, intent(in) :: trans
 

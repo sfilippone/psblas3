@@ -112,7 +112,7 @@ function psb_casum (x,desc_a, info, jx)
   ! compute local max
   if ((m /= 0)) then
     if(psb_cd_get_local_rows(desc_a) > 0) then
-      asum=scasum(psb_cd_get_local_rows(desc_a)-iix+1,x(iix,jjx),ione)
+      asum=scasum(psb_cd_get_local_rows(desc_a)-iix+1,x(iix:,jjx),ione)
 
       ! adjust asum because overlapped elements are computed more than once
       do i=1,size(desc_a%ovrlap_elem,1)

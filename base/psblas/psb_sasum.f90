@@ -108,7 +108,7 @@ function psb_sasum (x,desc_a, info, jx)
   ! compute local max
   if ((m /= 0)) then
     if(psb_cd_get_local_rows(desc_a) > 0) then
-      asum=sasum(psb_cd_get_local_rows(desc_a)-iix+1,x(iix,jjx),ione)
+      asum=sasum(psb_cd_get_local_rows(desc_a)-iix+1,x(iix:,jjx),ione)
 
       ! adjust asum because overlapped elements are computed more than once
       do i=1,size(desc_a%ovrlap_elem,1)

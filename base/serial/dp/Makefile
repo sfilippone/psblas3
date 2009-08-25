@@ -3,13 +3,15 @@ include ../../../Make.inc
 # The object files
 #
 
-FOBJS = dcrcr.o dcrjd.o dgblock.o partition.o  \
+XOBJS = scrjd.o  dcrjd.o ccrjd.o zcrjd.o
+FOBJS = dcrcr.o dgblock.o partition.o  \
 	dgindex.o djadrp.o djadrp1.o dcsrrp.o dcsrp1.o check_dim.o \
 	Max_nnzero.o dcoco.o dcocr.o dcrco.o djdcox.o djdco.o dvtfg.o dgind_tri.o \
 	gen_block.o\
-	scrjd.o scrco.o scrcr.o scocr.o scoco.o sgindex.o sgind_tri.o\
-	ccoco.o ccocr.o ccrco.o ccrcr.o ccrjd.o cgindex.o cgind_tri.o\
-	zcoco.o zcocr.o zcrco.o zcrcr.o zcrjd.o zgindex.o zgind_tri.o
+	scrco.o scrcr.o scocr.o scoco.o sgindex.o sgind_tri.o\
+	ccoco.o ccocr.o ccrco.o ccrcr.o cgindex.o cgind_tri.o\
+	zcoco.o zcocr.o zcrco.o zcrcr.o zgindex.o zgind_tri.o\
+	$(XOBJS)
 
 # 
 # dgind_tri.o
@@ -34,9 +36,12 @@ LIBFILE=$(LIBDIR)/$(LIBNAME)
 #
 
 
-lib: $(FOBJS)
+lib: xobjs $(FOBJS)
 	$(AR) $(LIBDIR)/$(LIBNAME) $(OBJS)
 	$(RANLIB) $(LIBDIR)/$(LIBNAME)
+
+xobjs:
+	(make $(XOBJS)  FCOPT="$(FCOPT) $(EXTRA_OPT)")
 
 clean: cleanobjs
 
