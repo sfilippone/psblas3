@@ -186,68 +186,6 @@ contains
 
   end subroutine d_fix_coo
   
-  subroutine d_coo_to_coo(a,b,info) 
-    use psb_error_mod
-    use psb_realloc_mod
-    class(psbn_d_coo_sparse_mat), intent(in) :: a
-    class(psbn_d_coo_sparse_mat), intent(out) :: b
-    integer, intent(out)            :: info
-
-    Integer :: err_act
-    character(len=20)  :: name='to_coo'
-    logical, parameter :: debug=.false.
-
-    call psb_erractionsave(err_act)
-    info = 0
-    call d_coo_to_coo_impl(a,b,info)
-    if (info /= 0) goto 9999
-
-    call psb_erractionrestore(err_act)
-    return
-
-9999 continue
-    call psb_erractionrestore(err_act)
-
-    call psb_errpush(info,name)
-          
-    if (err_act /= psb_act_ret_) then
-      call psb_error()
-    end if
-    return
-
-  end subroutine d_coo_to_coo
-  
-  subroutine d_coo_from_coo(a,b,info) 
-    use psb_error_mod
-    use psb_realloc_mod
-    class(psbn_d_coo_sparse_mat), intent(inout) :: a
-    class(psbn_d_coo_sparse_mat), intent(in) :: b
-    integer, intent(out)            :: info
-
-    Integer :: err_act
-    character(len=20)  :: name='from_coo'
-    logical, parameter :: debug=.false.
-
-    call psb_erractionsave(err_act)
-    info = 0
-    call d_coo_from_coo_impl(a,b,info)
-    if (info /= 0) goto 9999
-
-    call psb_erractionrestore(err_act)
-    return
-
-9999 continue
-    call psb_erractionrestore(err_act)
-
-    call psb_errpush(info,name)
-          
-    if (err_act /= psb_act_ret_) then
-      call psb_error()
-    end if
-    return
-
-  end subroutine d_coo_from_coo
-  
   subroutine from_coo(a,b,info) 
     use psb_error_mod
     use psb_realloc_mod
@@ -408,6 +346,69 @@ contains
 
   end subroutine d_base_cssv
 
+
+  subroutine d_coo_to_coo(a,b,info) 
+    use psb_error_mod
+    use psb_realloc_mod
+    class(psbn_d_coo_sparse_mat), intent(in) :: a
+    class(psbn_d_coo_sparse_mat), intent(out) :: b
+    integer, intent(out)            :: info
+
+    Integer :: err_act
+    character(len=20)  :: name='to_coo'
+    logical, parameter :: debug=.false.
+
+    call psb_erractionsave(err_act)
+    info = 0
+    call d_coo_to_coo_impl(a,b,info)
+    if (info /= 0) goto 9999
+
+    call psb_erractionrestore(err_act)
+    return
+
+9999 continue
+    call psb_erractionrestore(err_act)
+
+    call psb_errpush(info,name)
+          
+    if (err_act /= psb_act_ret_) then
+      call psb_error()
+    end if
+    return
+
+  end subroutine d_coo_to_coo
+  
+  subroutine d_coo_from_coo(a,b,info) 
+    use psb_error_mod
+    use psb_realloc_mod
+    class(psbn_d_coo_sparse_mat), intent(inout) :: a
+    class(psbn_d_coo_sparse_mat), intent(in) :: b
+    integer, intent(out)            :: info
+
+    Integer :: err_act
+    character(len=20)  :: name='from_coo'
+    logical, parameter :: debug=.false.
+
+    call psb_erractionsave(err_act)
+    info = 0
+    call d_coo_from_coo_impl(a,b,info)
+    if (info /= 0) goto 9999
+
+    call psb_erractionrestore(err_act)
+    return
+
+9999 continue
+    call psb_erractionrestore(err_act)
+
+    call psb_errpush(info,name)
+          
+    if (err_act /= psb_act_ret_) then
+      call psb_error()
+    end if
+    return
+
+  end subroutine d_coo_from_coo
+  
   subroutine  d_coo_reallocate_nz(nz,a) 
     use psb_error_mod
     use psb_realloc_mod
