@@ -5,7 +5,7 @@ UTIL_MODS = psb_string_mod.o psb_spmat_type.o \
 	psb_desc_type.o psb_sort_mod.o psb_penv_mod.o \
 	psb_serial_mod.o psb_tools_mod.o psb_blacs_mod.o \
 	psb_linmap_type_mod.o psb_comm_mod.o psb_psblas_mod.o \
-	psi_serial_mod.o psi_mod.o \
+	psi_serial_mod.o psi_mod.o  psb_ip_reord_mod.o\
 	psb_check_mod.o psb_gps_mod.o psb_linmap_mod.o psb_hash_mod.o
 
 MODULES=$(BASIC_MODS) $(UTIL_MODS)
@@ -26,6 +26,7 @@ lib:  $(BASIC_MODS) blacsmod $(UTIL_MODS)  $(OBJS)  $(LIBMOD)
 psb_realloc_mod.o : psb_error_mod.o 
 psb_spmat_type.o : psb_realloc_mod.o psb_error_mod.o psb_const_mod.o psb_string_mod.o psb_sort_mod.o
 psb_error_mod.o: psb_const_mod.o
+psb_ip_reord_mod.o: psb_const_mod.o
 psb_penv_mod.o: psb_const_mod.o psb_error_mod.o psb_realloc_mod.o psb_blacs_mod.o
 psb_blacs_mod.o: psb_const_mod.o
 psi_serial_mod.o: psb_const_mod.o psb_realloc_mod.o

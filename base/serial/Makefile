@@ -26,7 +26,7 @@ FOBJS = psb_cest.o psb_dcoins.o psb_dcsmm.o psb_dcsmv.o \
 	psb_cgelp.o psb_cspgtdiag.o psb_cspgtblk.o psb_cspgetrow.o\
 	psb_ccssm.o psb_ccssv.o psb_ccsmm.o psb_ccsmv.o psb_ctransp.o psb_ctransc.o\
 	psb_cspclip.o psb_crwextd.o psb_cspscal.o\
-	psb_cnumbmm.o psb_csymbmm.o psb_cneigh.o psb_ip_reord_mod.o
+	psb_cnumbmm.o psb_csymbmm.o psb_cneigh.o
 # psb_dcsrp.o psb_zcsrp.o\
 
 LIBDIR=..
@@ -43,7 +43,7 @@ lib1:	$(FOBJS)
 psb_scoins.o psb_dcoins.o psb_zcoins.o: psb_update_mod.o
 psb_sspgetrow.o psb_dspgetrow.o psb_zspgetrow.o: psb_getrow_mod.o
 psb_sspcnv.o psb_dspcnv.o pzb_zspcnv.o: psb_regen_mod.o
-psb_sfixcoo.o psb_dfixcoo.o psb_cfixcoo.o psb_zfixcoo.o: psb_ip_reord_mod.o
+#psb_sfixcoo.o psb_dfixcoo.o psb_cfixcoo.o psb_zfixcoo.o: psb_ip_reord_mod.o
 
 auxd:  psb_ip_reord_mod.o
 	(cd aux; make lib)

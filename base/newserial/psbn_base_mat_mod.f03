@@ -2,6 +2,7 @@ module psbn_base_mat_mod
   
   use psb_const_mod 
 
+  integer, parameter :: psbn_invalid_ = -1 
   integer, parameter :: psbn_spmat_null_=0, psbn_spmat_bld_=1
   integer, parameter :: psbn_spmat_asb_=2, psbn_spmat_upd_=4
 
@@ -29,12 +30,29 @@ module psbn_base_mat_mod
     integer, private     :: state, duplicate 
     logical, private     :: triangle, unitd, upper, sorted
   contains 
+    procedure, pass(a) :: set_nrows
+    procedure, pass(a) :: set_ncols
+    procedure, pass(a) :: set_dupl
+    procedure, pass(a) :: set_state
+    procedure, pass(a) :: set_null
+    procedure, pass(a) :: set_bld
+    procedure, pass(a) :: set_upd
+    procedure, pass(a) :: set_asb
+    procedure, pass(a) :: set_sorted
+    procedure, pass(a) :: set_upper
+    procedure, pass(a) :: set_lower
+    procedure, pass(a) :: set_triangle
+    procedure, pass(a) :: set_unit
+
+
     procedure, pass(a) :: get_nrows
     procedure, pass(a) :: get_ncols
     procedure, pass(a) :: get_nzeros
     procedure, pass(a) :: get_size
     procedure, pass(a) :: get_state
     procedure, pass(a) :: get_dupl
+
+
     procedure, pass(a) :: is_null
     procedure, pass(a) :: is_bld
     procedure, pass(a) :: is_upd
@@ -80,6 +98,112 @@ contains
     integer :: res
     res = a%n
   end function get_ncols
+
+ 
+  subroutine  set_nrows(m,a) 
+    class(psbn_base_sparse_mat), intent(inout) :: a
+    integer, intent(in) :: m
+    a%m = m
+  end subroutine set_nrows
+
+  subroutine  set_ncols(n,a) 
+    class(psbn_base_sparse_mat), intent(inout) :: a
+    integer, intent(in) :: n
+    a%n = n
+  end subroutine set_ncols
+
+
+  subroutine  set_state(n,a) 
+    class(psbn_base_sparse_mat), intent(inout) :: a
+    integer, intent(in) :: n
+    a%state = n
+  end subroutine set_state
+
+
+  subroutine  set_dupl(n,a) 
+    class(psbn_base_sparse_mat), intent(inout) :: a
+    integer, intent(in) :: n
+    a%duplicate = n
+  end subroutine set_dupl
+
+  subroutine  set_null(a) 
+    class(psbn_base_sparse_mat), intent(inout) :: a
+
+    a%state = psbn_spmat_null_
+  end subroutine set_null
+
+  subroutine  set_bld(a) 
+    class(psbn_base_sparse_mat), intent(inout) :: a
+
+    a%state = psbn_spmat_bld_
+  end subroutine set_bld
+
+  subroutine  set_upd(a) 
+    class(psbn_base_sparse_mat), intent(inout) :: a
+
+    a%state = psbn_spmat_upd_
+  end subroutine set_upd
+
+  subroutine  set_asb(a) 
+    class(psbn_base_sparse_mat), intent(inout) :: a
+
+    a%state = psbn_spmat_asb_
+  end subroutine set_asb
+
+  subroutine set_sorted(a,val) 
+    class(psbn_base_sparse_mat), intent(inout) :: a
+    logical, intent(in), optional :: val
+    
+    if (present(val)) then 
+      a%sorted = val
+    else
+      a%sorted = .true.
+    end if
+  end subroutine set_sorted
+
+  subroutine set_triangle(a,val) 
+    class(psbn_base_sparse_mat), intent(inout) :: a
+    logical, intent(in), optional :: val
+    
+    if (present(val)) then 
+      a%triangle = val
+    else
+      a%triangle = .true.
+    end if
+  end subroutine set_triangle
+
+  subroutine set_unit(a,val) 
+    class(psbn_base_sparse_mat), intent(inout) :: a
+    logical, intent(in), optional :: val
+    
+    if (present(val)) then 
+      a%unitd = val
+    else
+      a%unitd = .true.
+    end if
+  end subroutine set_unit
+
+  subroutine set_lower(a,val) 
+    class(psbn_base_sparse_mat), intent(inout) :: a
+    logical, intent(in), optional :: val
+    
+    if (present(val)) then 
+      a%upper = .not.val
+    else
+      a%upper = .false.
+    end if
+  end subroutine set_lower
+
+  subroutine set_upper(a,val) 
+    class(psbn_base_sparse_mat), intent(inout) :: a
+    logical, intent(in), optional :: val
+    
+    if (present(val)) then 
+      a%upper = val
+    else
+      a%upper = .true.
+    end if
+  end subroutine set_upper
 
   function is_triangle(a) result(res)
     class(psbn_base_sparse_mat), intent(in) :: a

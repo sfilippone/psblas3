@@ -300,19 +300,20 @@ dnl
 AC_DEFUN([PAC_ARG_SERIAL_MPI],
 [
 AC_MSG_CHECKING([whether we want serial (fake) mpi])
-AC_ARG_WITH(serial-mpi,
-AC_HELP_STRING([--with-serial-mpi], 
-[Specify whether to enable a fake mpi library to run in serial mode.
-  --with-serial-mpi={yes|no}]),
+AC_ARG_ENABLE(serial,
+AC_HELP_STRING([--enable-serial], 
+[Specify whether to enable a fake mpi library to run in serial mode. ]),
 [
-pac_cv_serial_mpi="${withval}";
-],
-[pac_cv_serial_mpi="no";]
+pac_cv_serial_mpi="yes";
+]
+dnl ,
+dnl [pac_cv_serial_mpi="no";]
 )
 if test x"$pac_cv_serial_mpi" == x"yes" ; then
    AC_MSG_RESULT([yes.])
 else
-   AC_MSG_RESULT([no.])
+ pac_cv_serial_mpi="no";
+ AC_MSG_RESULT([no.])
 fi
 ]
 )
