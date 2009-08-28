@@ -809,17 +809,7 @@ contains
     endif
 
     nz = max(7*m,7*n,1)
-      
-    if (info == 0) call psb_realloc(nz,a%ia,info)
-    if (info == 0) call psb_realloc(nz,a%ja,info)
-    if (info == 0) call psb_realloc(nz,a%val,info)
-    if (info == 0) then 
-      call a%set_nrows(m)
-      call a%set_ncols(n)
-      call a%set_nzeros(0)
-      call a%set_bld()
-      call a%set_triangle(.false.)
-    end if
+    call a%allocate(m,n,nz)
 
     call psb_erractionrestore(err_act)
     return
