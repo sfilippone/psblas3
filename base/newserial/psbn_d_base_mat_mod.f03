@@ -16,6 +16,9 @@ module psbn_d_base_mat_mod
     procedure, pass(a) :: from_coo
 
   end type psbn_d_base_sparse_mat
+  private :: d_base_csmv, d_base_csmm, d_base_cssv, d_base_cssm,&
+       & csins, to_coo, from_coo
+
 
   type, extends(psbn_d_base_sparse_mat) :: psbn_d_coo_sparse_mat
 
@@ -33,11 +36,19 @@ module psbn_d_base_mat_mod
     procedure, pass(a)  :: d_base_cssv => d_coo_cssv
     procedure, pass(a)  :: csins => d_coo_csins
     procedure, pass(a)  :: reallocate_nz => d_coo_reallocate_nz
+    procedure, pass(a)  :: allocate_mnnz => d_coo_allocate_mnnz
+    procedure, pass(a)  :: allocate_mn => d_coo_allocate_mn
     procedure, pass(a)  :: to_coo => d_coo_to_coo
     procedure, pass(a)  :: from_coo => d_coo_from_coo
     procedure, pass(a)  :: fix => d_fix_coo
+    procedure, pass(a)  :: free => d_coo_free
 
   end type psbn_d_coo_sparse_mat
+  private :: d_coo_get_nzeros, d_coo_set_nzeros, &
+       & d_coo_csmm, d_coo_csmv, d_coo_cssm, d_coo_cssv, &
+       & d_coo_csins, d_coo_reallocate_nz, d_coo_allocate_mnnz, &
+       & d_coo_allocate_mn, d_coo_to_coo, d_coo_from_coo, &
+       & d_fix_coo, d_coo_free
 
 
   interface 
@@ -705,6 +716,124 @@ contains
     return
 
   end subroutine d_coo_cssm
+
+
+  subroutine  d_coo_free(a) 
+
+    class(psbn_d_coo_sparse_mat), intent(inout) :: a
+
+    if (allocated(a%ia)) deallocate(a%ia)
+    if (allocated(a%ja)) deallocate(a%ja)
+    if (allocated(a%val)) deallocate(a%val)
+    call a%set_null()
+    call a%set_nrows(0)
+    call a%set_ncols(0)
+    
+    return
+
+  end subroutine d_coo_free
+
+  subroutine  d_coo_allocate_mnnz(m,n,nz,a) 
+    use psb_error_mod
+    use psb_realloc_mod
+    integer, intent(in) :: m,n,nz
+    class(psbn_d_coo_sparse_mat), intent(inout) :: a
+    Integer :: err_act, info
+    character(len=20)  :: name='allocate_mnz'
+    logical, parameter :: debug=.false.
+
+    call psb_erractionsave(err_act)
+    info = 0
+    if (m < 0) then 
+      info = 10
+      call psb_errpush(info,name,i_err=(/1,0,0,0,0/))
+      goto 9999
+    endif
+    if (n < 0) then 
+      info = 10
+      call psb_errpush(info,name,i_err=(/2,0,0,0,0/))
+      goto 9999
+    endif
+    if (nz < 0) then 
+      info = 10
+      call psb_errpush(info,name,i_err=(/3,0,0,0,0/))
+      goto 9999
+    endif
+      
+    if (info == 0) call psb_realloc(nz,a%ia,info)
+    if (info == 0) call psb_realloc(nz,a%ja,info)
+    if (info == 0) call psb_realloc(nz,a%val,info)
+    if (info == 0) then 
+      call a%set_nrows(m)
+      call a%set_ncols(n)
+      call a%set_nzeros(0)
+      call a%set_bld()
+      call a%set_triangle(.false.)
+    end if
+
+    call psb_erractionrestore(err_act)
+    return
+
+9999 continue
+    call psb_erractionrestore(err_act)
+
+    if (err_act == psb_act_abort_) then
+      call psb_error()
+      return
+    end if
+    return
+
+  end subroutine d_coo_allocate_mnnz
+
+
+  subroutine  d_coo_allocate_mn(m,n,a) 
+    use psb_error_mod
+    use psb_realloc_mod
+    integer, intent(in) :: m,n
+    class(psbn_d_coo_sparse_mat), intent(inout) :: a
+    Integer :: err_act, info, nz
+    character(len=20)  :: name='allocate_mn'
+    logical, parameter :: debug=.false.
+
+    call psb_erractionsave(err_act)
+    info = 0
+    if (m < 0) then 
+      info = 10
+      call psb_errpush(info,name,i_err=(/1,0,0,0,0/))
+      goto 9999
+    endif
+    if (n < 0) then 
+      info = 10
+      call psb_errpush(info,name,i_err=(/2,0,0,0,0/))
+      goto 9999
+    endif
+
+    nz = max(7*m,7*n,1)
+      
+    if (info == 0) call psb_realloc(nz,a%ia,info)
+    if (info == 0) call psb_realloc(nz,a%ja,info)
+    if (info == 0) call psb_realloc(nz,a%val,info)
+    if (info == 0) then 
+      call a%set_nrows(m)
+      call a%set_ncols(n)
+      call a%set_nzeros(0)
+      call a%set_bld()
+      call a%set_triangle(.false.)
+    end if
+
+    call psb_erractionrestore(err_act)
+    return
+
+9999 continue
+    call psb_erractionrestore(err_act)
+
+    if (err_act == psb_act_abort_) then
+      call psb_error()
+      return
+    end if
+    return
+
+  end subroutine d_coo_allocate_mn
 
 
 end module psbn_d_base_mat_mod

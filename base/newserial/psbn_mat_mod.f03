@@ -43,6 +43,12 @@ module psbn_d_mat_mod
     
   end type psbn_d_sparse_mat
 
+  private :: get_nrows, get_ncols, get_nzeros, get_size, &
+       & get_state, get_dupl, is_null, is_bld, is_upd, &
+       & is_asb, is_sorted, is_upper, is_lower, is_triangle, &
+       & is_unit, get_neigh, allocate_mn, allocate_mnnz, &
+       & reallocate_nz, free, d_csmv, d_csmm, d_cssv, d_cssm 
+
 contains 
 
   function get_dupl(a) result(res)
@@ -51,7 +57,7 @@ contains
     integer :: res
     
     if (allocated(a%a)) then 
-      res = a%a%get_dupl
+      res = a%a%get_dupl()
     else
       res = psbn_invalid_
     end if
@@ -304,47 +310,139 @@ contains
 
   end subroutine get_neigh
 
-  subroutine  allocate_mn(m,n,a) 
+  subroutine  allocate_mn(m,n,a,type,mold) 
     use psb_error_mod
+    use psb_string_mod
     integer, intent(in) :: m,n
     class(psbn_d_sparse_mat), intent(inout) :: a
+    character(len=*), intent(in), optional :: type
+    class(psbn_d_base_sparse_mat), intent(in), optional :: mold
 
-    Integer :: err_act
+    Integer :: err_act, info
     character(len=20)  :: name='allocate_mn'
+    character(len=8)   :: type_
     logical, parameter :: debug=.false.
 
 
     call psb_erractionsave(err_act)
-    ! This is the base version. If we get here
-    ! it means the derived class is incomplete,
-    ! so we throw an error.
-    call psb_errpush(700,name)
+    info = 0 
+    if (allocated(a%a)) then 
+      call a%a%free()
+      deallocate(a%a)
+    end if
+
+    if (present(mold)) then 
+      allocate(a%a, source=mold, stat=info)
+
+    else
+
+      if (present(type)) then 
+        type_ = psb_toupper(type)
+      else
+        type_ = 'COO'
+      end if
+
+      select case(type) 
+      case('COO')
+        allocate(psbn_d_coo_sparse_mat :: a%a, stat=info)
+! Add here a few other data structures inplemented by default.
+
+!!$      case('CSR') 
+!!$        allocate(psbn_d_csr_sparse_mat :: a%a, stat=info)
+
+      case default
+        allocate(psbn_d_coo_sparse_mat :: a%a, stat=info)
+      end select
+
+    end if
+
+    if (info /= 0) then 
+      info = 4010
+      goto 9999
+    end if
+    
+    call a%a%allocate(m,n)
           
-    if (err_act /= psb_act_ret_) then
+    call psb_erractionrestore(err_act)
+    return
+
+9999 continue
+    call psb_erractionrestore(err_act)
+
+    if (err_act == psb_act_abort_) then
       call psb_error()
+      return
     end if
     return
+
 
   end subroutine allocate_mn
 
-  subroutine  allocate_mnnz(m,n,nz,a) 
+  subroutine  allocate_mnnz(m,n,nz,a,type,mold) 
     use psb_error_mod
+    use psb_string_mod
     integer, intent(in) :: m,n,nz
     class(psbn_d_sparse_mat), intent(inout) :: a
-    Integer :: err_act
-    character(len=20)  :: name='allocate_mnz'
+    character(len=*), intent(in), optional :: type
+    class(psbn_d_base_sparse_mat), intent(in), optional :: mold
+
+    Integer :: err_act, info
+    character(len=20)  :: name='allocate_mnnz'
+    character(len=8)   :: type_
     logical, parameter :: debug=.false.
 
+
     call psb_erractionsave(err_act)
-    ! This is the base version. If we get here
-    ! it means the derived class is incomplete,
-    ! so we throw an error.
-    call psb_errpush(700,name)
+    info = 0 
+    if (allocated(a%a)) then 
+      call a%a%free()
+      deallocate(a%a)
+    end if
+
+    if (present(mold)) then 
+      allocate(a%a, source=mold, stat=info)
+
+    else
+
+      if (present(type)) then 
+        type_ = psb_toupper(type)
+      else
+        type_ = 'COO'
+      end if
+
+      select case(type) 
+      case('COO')
+        allocate(psbn_d_coo_sparse_mat :: a%a, stat=info)
+! Add here a few other data structures inplemented by default.
+
+!!$      case('CSR') 
+!!$        allocate(psbn_d_csr_sparse_mat :: a%a, stat=info)
+
+      case default
+        allocate(psbn_d_coo_sparse_mat :: a%a, stat=info)
+      end select
+
+    end if
+
+    if (info /= 0) then 
+      info = 4010
+      goto 9999
+    end if
+    
+    call a%a%allocate(m,n,nz)
           
-    if (err_act /= psb_act_ret_) then
+    call psb_erractionrestore(err_act)
+    return
+
+9999 continue
+    call psb_erractionrestore(err_act)
+
+    if (err_act == psb_act_abort_) then
       call psb_error()
+      return
     end if
     return
+
 
   end subroutine allocate_mnnz
 
@@ -356,14 +454,25 @@ contains
     character(len=20)  :: name='reallocate_nz'
     logical, parameter :: debug=.false.
 
-    call psb_erractionsave(err_act)
-    ! This is the base version. If we get here
-    ! it means the derived class is incomplete,
-    ! so we throw an error.
-    call psb_errpush(700,name)
-          
-    if (err_act /= psb_act_ret_) then
+    if (.not.allocated(a%a)) then 
+      info = 1121
+      call psb_errpush(info,name)
+      goto 9999
+    endif
+
+    call a%a%reallocate(nz)
+
+    if (info /= 0) goto 9999
+
+    call psb_erractionrestore(err_act)
+    return
+
+9999 continue
+    call psb_erractionrestore(err_act)
+
+    if (err_act == psb_act_abort_) then
       call psb_error()
+      return
     end if
     return
 
@@ -385,6 +494,16 @@ contains
 
     call a%a%free()
 
+    call psb_erractionrestore(err_act)
+    return
+
+9999 continue
+    call psb_erractionrestore(err_act)
+
+    if (err_act == psb_act_abort_) then
+      call psb_error()
+      return
+    end if
     return
 
   end subroutine free

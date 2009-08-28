@@ -1,6 +1,6 @@
 include ../../Make.inc
 
-MODULES = psbn_base_mat_mod.o psbn_d_base_mat_mod.o psbn_d_coo_impl.o 
+MODULES = psbn_base_mat_mod.o psbn_d_base_mat_mod.o psbn_d_coo_impl.o  psbn_mat_mod.o
 #	psbn_csr_mat.o 
 
 
