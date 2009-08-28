@@ -1,4 +1,4 @@
-module psbn_d_csr_sparse_mat_mod
+module psbn_d_csr_mat_mod
 
   use psbn_d_base_mat_mod
 
@@ -564,6 +564,4 @@ contains
 
   end subroutine d_csr_allocate_mn
 
-
-  
-end module psbn_d_csr_sparse_mat_mod
+end module psbn_d_csr_mat_mod
