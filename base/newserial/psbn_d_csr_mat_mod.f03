@@ -30,6 +30,7 @@ module psbn_d_csr_mat_mod
   interface 
     subroutine d_csr_to_coo_impl(a,b,info) 
       use psb_const_mod
+      use psbn_d_base_mat_mod
       import psbn_d_csr_sparse_mat
       class(psbn_d_csr_sparse_mat), intent(in) :: a
       class(psbn_d_coo_sparse_mat), intent(out) :: b
@@ -40,6 +41,7 @@ module psbn_d_csr_mat_mod
   interface 
     subroutine d_csr_from_coo_impl(a,b,info) 
       use psb_const_mod
+      use psbn_d_base_mat_mod
       import psbn_d_csr_sparse_mat
       class(psbn_d_csr_sparse_mat), intent(inout) :: a
       class(psbn_d_coo_sparse_mat), intent(in)    :: b
@@ -503,9 +505,9 @@ contains
     if (info == 0) call psb_realloc(nz,a%ja,info)
     if (info == 0) call psb_realloc(nz,a%val,info)
     if (info == 0) then 
+      a%irp=0
       call a%set_nrows(m)
       call a%set_ncols(n)
-      call a%set_nzeros(0)
       call a%set_bld()
       call a%set_triangle(.false.)
     end if

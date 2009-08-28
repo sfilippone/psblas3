@@ -937,7 +937,7 @@ subroutine d_csr_csins_impl(nz,val,ia,ja,a,imin,imax,jmin,jmax,info,gtl)
   use psb_realloc_mod
   use psbn_d_csr_mat_mod, psb_protect_name => d_csr_csins_impl
 
-  class(psbn_d_coo_sparse_mat), intent(inout) :: a
+  class(psbn_d_csr_sparse_mat), intent(inout) :: a
   real(psb_dpk_), intent(in)      :: val(:)
   integer, intent(in)             :: nz, ia(:), ja(:), imin,imax,jmin,jmax
   integer, intent(out)            :: info
