@@ -41,6 +41,9 @@ Design principles for this directory.
   needed. All of the methods are simply thrown onto the corresponding
   methods of the (allocatable, polymorphic) component A%A as needed
   (provided the component is allocated, that is).
+  This is what is called a STATE design pattern (different from the
+  internal state we discussed above).
+
   As an example, consider the allocate/build/assembly cycle: 
   the outer code would do the following: 
   1.  Allocate(psbn_d_coo_sparse_mat ::  a%a) 
