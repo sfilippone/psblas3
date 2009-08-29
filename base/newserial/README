@@ -28,78 +28,78 @@ Design principles for this directory.
    OUTER object which is what the rest of the library sees, as
    follows: 
      
-  type :: psbn_d_sparse_mat
+   type :: psbn_d_sparse_mat
 
-    class(psbn_d_base_sparse_mat), allocatable  :: a 
+     class(psbn_d_base_sparse_mat), allocatable  :: a 
     
-  end type psbn_d_sparse_mat
-  type(psbn_d_sparse_mat) :: a
+   end type psbn_d_sparse_mat
+   type(psbn_d_sparse_mat) :: a
 
-  In this way we can have an outer object whose type is stable
-  both statically (at compile time) and at runtime, while at runtime
-  the type of the inner object switches from COO to CSR to whatever as
-  needed. All of the methods are simply thrown onto the corresponding
-  methods of the (allocatable, polymorphic) component A%A as needed
-  (provided the component is allocated, that is).
-  This is what is called a STATE design pattern (different from the
-  internal state we discussed above).
+   In this way we can have an outer object whose type is stable
+   both statically (at compile time) and at runtime, while at runtime
+   the type of the inner object switches from COO to CSR to whatever as
+   needed. All of the methods are simply thrown onto the corresponding
+   methods of the (allocatable, polymorphic) component A%A as needed
+   (provided the component is allocated, that is).
+   This is what is called a STATE design pattern (different from the
+   internal state we discussed above).
 
-  As an example, consider the allocate/build/assembly cycle: 
-  the outer code would do the following: 
-  1.  Allocate(psbn_d_coo_sparse_mat ::  a%a) 
+   As an example, consider the allocate/build/assembly cycle: 
+   the outer code would do the following: 
+   1.  Allocate(psbn_d_coo_sparse_mat ::  a%a) 
 
-  2. During the build loop a call to A%CSINS() gets translated into
-     CALL A%A%CSINS()
+   2. During the build loop a call to A%CSINS() gets translated into
+      CALL A%A%CSINS()
     
-  3. At assembly time the code would do the following
-     subroutine psb_spasb(a,....)
-     type(psbn_d_sparse_mat), intent(inout)  :: a
+   3. At assembly time the code would do the following
+      subroutine psb_spasb(a,....)
+      type(psbn_d_sparse_mat), intent(inout)  :: a 
 
-     class(psbn_d_base_sparse_mat), allocatable :: temp
+      class(psbn_d_base_sparse_mat), allocatable :: temp
 
-     select case (TYPE)
-     case('CSR')
-        allocate(psbn_d_csr_sparse_mat :: temp, stat=info)
-     end select				 
-     call temp%from_coo(a%a)
-     call a%a%free()
-     call move_alloc(temp,a%a)
+      select case (TYPE)
+      case('CSR')
+         allocate(psbn_d_csr_sparse_mat :: temp, stat=info)
+      end select				 
+      call temp%from_coo(a%a)
+      call a%a%free()
+      call move_alloc(temp,a%a)
       
 
-  4. Note in the above that to_coo, from_coo are defined so that every
-     conceivable  storage representation provides just 2 conversion
-     routines, avoiding quadratic explosion. But since all have to
-     provide them, the to_coo/from_coo is defined in d_base_mat_mod
-     together with d_coo_sparse_mat, which enjoys the "eldest child"
-     status with respect to all the other types derived from
-     d_base_sparse_mat (its "siblings"). 
+   4. Note in the above that to_coo, from_coo are defined so that every
+      conceivable  storage representation provides just 2 conversion
+      routines, avoiding quadratic explosion. But since all have to
+      provide them, the to_coo/from_coo is defined in d_base_mat_mod
+      together with d_coo_sparse_mat, which enjoys the "eldest child"
+      status with respect to all the other types derived from
+      d_base_sparse_mat (its "siblings"). 
 
-  5. How does a user add a new storage format? Very simple. After
-     deriving the class and implementing all the necessary methods,
-     the user declares in the program a dummy variable of the new
-     inner type 
+   5. How does a user add a new storage format? Very simple. After
+      deriving the class and implementing all the necessary methods,
+      the user declares in the program a dummy variable of the new
+      inner type 
 
-     type(X_YYY_sparse_mat) :: reftype
+      type(X_YYY_sparse_mat) :: reftype
 
 
-     then calls 
-       call psb_spasb(a,....,mold=reftype)
+      then calls 
+        call psb_spasb(a,....,mold=reftype)
 
-     In psb_spasb we have
-     class(psbn_d_base_sparse_mat), intent(in), optional :: mold
+      In psb_spasb we have
+      class(psbn_d_base_sparse_mat), intent(in), optional :: mold
 
-     if (present(mold)) then 
+      if (present(mold)) then 
         allocate(temp,source=mold,stat=info)
-     end select				 
-     call temp%from_coo(a%a)
-     call a%a%free()
-     call move_alloc(temp,a%a)
+      end select				 
+      call temp%from_coo(a%a)
+      call a%a%free()
+      call move_alloc(temp,a%a)
   
-     AND IT'S DONE! Nothing else in the library requires the explicit
-     knowledge of type of  MOLD. 
+      AND IT'S DONE! Nothing else in the library requires the explicit
+      knowledge of type of  MOLD. 
 
-     User exercise: start by adding CSR in this way. 
-     (waiting for a couple of bug fixes from NAG to actually test this.)
+      User exercise: start by adding CSR in this way. 
+      (waiting for a couple of bug fixes from NAG to actually test this.)
 
     
   

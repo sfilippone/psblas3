@@ -49,6 +49,30 @@ module psbn_d_mat_mod
        & is_unit, get_neigh, allocate_mn, allocate_mnnz, &
        & reallocate_nz, free, d_csmv, d_csmm, d_cssv, d_cssm 
 
+
+  interface psbn_spcnv
+    subroutine psbn_d_spcnv(a,b,info,type,mold,upd,dupl)
+      use psbn_d_base_mat_mod
+      import psbn_d_sparse_mat
+      type(psbn_d_sparse_mat), intent(in)    :: a
+      type(psbn_d_sparse_mat), intent(out)   :: b
+      integer, intent(out)                   :: info
+      integer,optional, intent(in)           :: dupl, upd
+      character(len=*), optional, intent(in) :: type
+      class(psbn_d_base_sparse_mat), intent(in), optional :: mold
+      
+    end subroutine psbn_d_spcnv
+    subroutine psbn_d_spcnv_ip(a,info,type,mold,dupl)
+      use psbn_d_base_mat_mod
+      import psbn_d_sparse_mat
+      type(psbn_d_sparse_mat), intent(inout)  :: a
+      integer, intent(out)                    :: info
+      integer,optional, intent(in)            :: dupl
+      character(len=*), optional, intent(in)  :: type
+      class(psbn_d_base_sparse_mat), intent(in), optional :: mold
+    end subroutine psbn_d_spcnv_ip
+  end interface
+
 contains 
 
   function get_dupl(a) result(res)
