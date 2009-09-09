@@ -77,6 +77,7 @@ contains
 
   function get_dupl(a) result(res)
     use psb_error_mod
+    implicit none 
     class(psbn_d_sparse_mat), intent(in) :: a
     integer :: res
     
@@ -89,6 +90,7 @@ contains
  
  
   function get_state(a) result(res)
+    implicit none 
     class(psbn_d_sparse_mat), intent(in) :: a
     integer :: res
     
@@ -100,6 +102,7 @@ contains
   end function get_state
  
   function get_nrows(a) result(res)
+    implicit none 
     class(psbn_d_sparse_mat), intent(in) :: a
     integer :: res
     
@@ -112,6 +115,7 @@ contains
   end function get_nrows
 
   function get_ncols(a) result(res)
+    implicit none 
     class(psbn_d_sparse_mat), intent(in) :: a
     integer :: res
 
@@ -124,6 +128,7 @@ contains
   end function get_ncols
 
   function is_triangle(a) result(res)
+    implicit none 
     class(psbn_d_sparse_mat), intent(in) :: a
     logical :: res
 
@@ -136,6 +141,7 @@ contains
   end function is_triangle
 
   function is_unit(a) result(res)
+    implicit none 
     class(psbn_d_sparse_mat), intent(in) :: a
     logical :: res
 
@@ -148,6 +154,7 @@ contains
   end function is_unit
 
   function is_upper(a) result(res)
+    implicit none 
     class(psbn_d_sparse_mat), intent(in) :: a
     logical :: res
 
@@ -160,6 +167,7 @@ contains
   end function is_upper
 
   function is_lower(a) result(res)
+    implicit none 
     class(psbn_d_sparse_mat), intent(in) :: a
     logical :: res
 
@@ -172,6 +180,7 @@ contains
   end function is_lower
 
   function is_null(a) result(res)
+    implicit none 
     class(psbn_d_sparse_mat), intent(in) :: a
     logical :: res
     
@@ -184,6 +193,7 @@ contains
   end function is_null
 
   function is_bld(a) result(res)
+    implicit none 
     class(psbn_d_sparse_mat), intent(in) :: a
     logical :: res
 
@@ -196,6 +206,7 @@ contains
   end function is_bld
 
   function is_upd(a) result(res)
+    implicit none 
     class(psbn_d_sparse_mat), intent(in) :: a
     logical :: res
 
@@ -208,6 +219,7 @@ contains
   end function is_upd
 
   function is_asb(a) result(res)
+    implicit none 
     class(psbn_d_sparse_mat), intent(in) :: a
     logical :: res
 
@@ -220,6 +232,7 @@ contains
   end function is_asb
 
   function is_sorted(a) result(res)
+    implicit none 
     class(psbn_d_sparse_mat), intent(in) :: a
     logical :: res
 
@@ -234,10 +247,11 @@ contains
 
   function get_nzeros(a) result(res)
     use psb_error_mod
+    implicit none 
     class(psbn_d_sparse_mat), intent(in) :: a
     integer :: res
     
-    Integer :: err_act
+    Integer :: err_act, info
     character(len=20)  :: name='get_nzeros'
     logical, parameter :: debug=.false.
 
@@ -265,10 +279,11 @@ contains
 
   function get_size(a) result(res)
     use psb_error_mod
+    implicit none 
     class(psbn_d_sparse_mat), intent(in) :: a
     integer :: res
     
-    Integer :: err_act
+    Integer :: err_act, info
     character(len=20)  :: name='get_size'
     logical, parameter :: debug=.false.
 
@@ -298,6 +313,7 @@ contains
 
   subroutine get_neigh(a,idx,neigh,n,info,lev)
     use psb_error_mod
+    implicit none 
     class(psbn_d_sparse_mat), intent(in) :: a   
     integer, intent(in)                :: idx 
     integer, intent(out)               :: n   
@@ -309,6 +325,7 @@ contains
     character(len=20)  :: name='get_neigh'
     logical, parameter :: debug=.false.
 
+    info = 0
     call psb_erractionsave(err_act)
     if (.not.allocated(a%a)) then 
       info = 1121
@@ -337,6 +354,7 @@ contains
   subroutine  allocate_mn(m,n,a,type,mold) 
     use psb_error_mod
     use psb_string_mod
+    implicit none 
     integer, intent(in) :: m,n
     class(psbn_d_sparse_mat), intent(inout) :: a
     character(len=*), intent(in), optional :: type
@@ -405,6 +423,7 @@ contains
   subroutine  allocate_mnnz(m,n,nz,a,type,mold) 
     use psb_error_mod
     use psb_string_mod
+    implicit none 
     integer, intent(in) :: m,n,nz
     class(psbn_d_sparse_mat), intent(inout) :: a
     character(len=*), intent(in), optional :: type
@@ -472,9 +491,10 @@ contains
 
   subroutine  reallocate_nz(nz,a) 
     use psb_error_mod
+    implicit none 
     integer, intent(in) :: nz
     class(psbn_d_sparse_mat), intent(inout) :: a
-    Integer :: err_act
+    Integer :: err_act, info
     character(len=20)  :: name='reallocate_nz'
     logical, parameter :: debug=.false.
 
@@ -504,8 +524,9 @@ contains
 
   subroutine  free(a) 
     use psb_error_mod
+    implicit none 
     class(psbn_d_sparse_mat), intent(inout) :: a
-    Integer :: err_act
+    Integer :: err_act, info
     character(len=20)  :: name='free'
     logical, parameter :: debug=.false.
 
@@ -535,6 +556,7 @@ contains
 
   subroutine d_csmm(alpha,a,x,beta,y,info,trans) 
     use psb_error_mod
+    implicit none 
     class(psbn_d_sparse_mat), intent(in) :: a
     real(kind(1.d0)), intent(in)    :: alpha, beta, x(:,:)
     real(kind(1.d0)), intent(inout) :: y(:,:)
@@ -544,6 +566,7 @@ contains
     character(len=20)  :: name='psbn_csmm'
     logical, parameter :: debug=.false.
 
+    info = 0
     call psb_erractionsave(err_act)
     if (.not.allocated(a%a)) then 
       info = 1121
@@ -569,6 +592,7 @@ contains
 
   subroutine d_csmv(alpha,a,x,beta,y,info,trans) 
     use psb_error_mod
+    implicit none 
     class(psbn_d_sparse_mat), intent(in) :: a
     real(kind(1.d0)), intent(in)    :: alpha, beta, x(:)
     real(kind(1.d0)), intent(inout) :: y(:)
@@ -578,6 +602,7 @@ contains
     character(len=20)  :: name='psbn_csmv'
     logical, parameter :: debug=.false.
 
+    info = 0
     call psb_erractionsave(err_act)
     if (.not.allocated(a%a)) then 
       info = 1121
@@ -603,6 +628,7 @@ contains
 
   subroutine d_cssm(alpha,a,x,beta,y,info,trans) 
     use psb_error_mod
+    implicit none 
     class(psbn_d_sparse_mat), intent(in) :: a
     real(kind(1.d0)), intent(in)    :: alpha, beta, x(:,:)
     real(kind(1.d0)), intent(inout) :: y(:,:)
@@ -612,6 +638,7 @@ contains
     character(len=20)  :: name='psbn_cssm'
     logical, parameter :: debug=.false.
 
+    info = 0
     call psb_erractionsave(err_act)
     if (.not.allocated(a%a)) then 
       info = 1121
@@ -637,6 +664,7 @@ contains
 
   subroutine d_cssv(alpha,a,x,beta,y,info,trans) 
     use psb_error_mod
+    implicit none 
     class(psbn_d_sparse_mat), intent(in) :: a
     real(kind(1.d0)), intent(in)    :: alpha, beta, x(:)
     real(kind(1.d0)), intent(inout) :: y(:)
@@ -646,6 +674,7 @@ contains
     character(len=20)  :: name='psbn_cssv'
     logical, parameter :: debug=.false.
 
+    info = 0 
     call psb_erractionsave(err_act)
     if (.not.allocated(a%a)) then 
       info = 1121

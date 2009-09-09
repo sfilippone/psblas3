@@ -60,7 +60,7 @@ C     .. Local Arrays ..
         CALL FCPSB_ERRPUSH(IERROR,NAME,INT_VAL)
         GOTO 9999
       END IF
-      IF (psb_toupper(DESCRA(3:3)).EQ.'N') DIAG = 'N'
+      DIAG = 'N'
       IF (psb_toupper(DESCRA(3:3)).EQ.'U') DIAG = 'U'
       IF(UNITD.EQ.'B') THEN
         IERROR=5

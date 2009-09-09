@@ -19,7 +19,9 @@ lib:  $(MODULES)  $(OBJS)  $(LIBMOD)
 psbn_mat_mod.o:	psbn_base_mat_mod.o
 psbn_coo_mat.o psbn_csr_mat.o:	psbn_d_base_mat_mod.o
 
+psbn_d_coo_impl.o: psbn_d_base_mat_mod.o
 psbn_d_csr_impl.o: psbn_d_csr_mat_mod.o
+
 psbn_mat_impl.o: psbn_mat_mod.o
 
 clean:
