@@ -139,6 +139,7 @@ contains
     ! Note that if a1=a2=a3=a4=0., the PDE is the well-known Laplace equation.
     !
     use psb_base_mod
+    use psbn_d_cxx_mat_mod
     implicit none
     integer                        :: idim
     integer, parameter             :: nb=20
@@ -157,6 +158,7 @@ contains
     type(psbn_d_sparse_mat)     :: a_n
     type(psbn_d_coo_sparse_mat) :: acoo
     type(psbn_d_csr_sparse_mat) :: acsr
+    type(psbn_d_cxx_sparse_mat) :: acxx
     ! deltah dimension of each grid cell
     ! deltat discretization time
     real(psb_dpk_)         :: deltah
@@ -200,12 +202,8 @@ contains
     t0 = psb_wtime()
 
     call psbn_csall(nr,nr,a_n,info)
-!!$    call acoo%allocate
 
     talc = psb_wtime()-t0
-
-!!$    write(*,*) 'Test get size:',d_coo_get_size(acoo)
-!!$    write(*,*) 'Test 2 get size:',acoo%get_size(),acoo%get_nzeros()
 
     if (info /= 0) then
       info=4010
@@ -233,7 +231,6 @@ contains
     t1 = psb_wtime()
     do ii=1, nlr,nb
       ib = min(nb,nlr-ii+1) 
-!!$      write(0,*) 'Row ',ii,ib
       element = 1
       do k=1,ib
         i=ii+k-1
@@ -372,10 +369,8 @@ contains
       goto 9999
     end if
     
-!!$    call acoo%print(19)
     t1 = psb_wtime()
-    call psbn_cscnv(a_n,info,mold=acsr)
-!!$    call psbn_cscnv(a_n,info,type='csr')
+    call psbn_cscnv(a_n,info,mold=acxx)
 
     if(info /= 0) then
       info=4010
@@ -386,16 +381,16 @@ contains
     tasb = psb_wtime()-t1
     call a_n%print(20)
 
-    t1 = psb_wtime()
+!!$    t1 = psb_wtime()
 !!$    call psbn_cscnv(a_n,info,mold=acoo)
-
-    if(info /= 0) then
-      info=4010
-      ch_err='asb rout.'
-      call psb_errpush(info,name,a_err=ch_err)
-      goto 9999
-    end if
-    tmov = psb_wtime()-t1
+!!$
+!!$    if(info /= 0) then
+!!$      info=4010
+!!$      ch_err='asb rout.'
+!!$      call psb_errpush(info,name,a_err=ch_err)
+!!$      goto 9999
+!!$    end if
+!!$    tmov = psb_wtime()-t1
 
 
     if(iam == psb_root_) then
