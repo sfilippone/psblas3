@@ -469,6 +469,8 @@ contains
       write (0,'("Exactly one of the optional arguments  ",a," must be present")')a_e_d
     case(582)
       write (0,'("Argument M is required when argument PARTS is specified")')
+    case(583)
+      write (0,'("No more than one of the optional arguments  ",a," must be present")')a_e_d
     case(600)
       write (0,'("Sparse Matrix and descriptors are in an invalid state for this subroutine call: ",i0)')i_e_d(1)
     case(700)

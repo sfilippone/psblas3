@@ -2,13 +2,28 @@
 module psbn_d_mat_mod
 
   use psbn_d_base_mat_mod
-  
+  use psbn_d_csr_mat_mod
+
   type :: psbn_d_sparse_mat
 
     class(psbn_d_base_sparse_mat), allocatable  :: a 
     
   contains
     
+    procedure, pass(a) :: set_nrows
+    procedure, pass(a) :: set_ncols
+    procedure, pass(a) :: set_dupl
+    procedure, pass(a) :: set_state
+    procedure, pass(a) :: set_null
+    procedure, pass(a) :: set_bld
+    procedure, pass(a) :: set_upd
+    procedure, pass(a) :: set_asb
+    procedure, pass(a) :: set_sorted
+    procedure, pass(a) :: set_upper
+    procedure, pass(a) :: set_lower
+    procedure, pass(a) :: set_triangle
+    procedure, pass(a) :: set_unit
+
     procedure, pass(a) :: get_nrows
     procedure, pass(a) :: get_ncols
     procedure, pass(a) :: get_nzeros
@@ -26,11 +41,13 @@ module psbn_d_mat_mod
     procedure, pass(a) :: is_triangle
     procedure, pass(a) :: is_unit
     procedure, pass(a) :: get_neigh
-    procedure, pass(a) :: allocate_mn
     procedure, pass(a) :: allocate_mnnz
     procedure, pass(a) :: reallocate_nz
     procedure, pass(a) :: free
-    generic,   public  :: allocate => allocate_mn, allocate_mnnz
+    procedure, pass(a) :: print => sparse_print
+    procedure, pass(a) :: get_fmt => sparse_get_fmt
+
+    generic,   public  :: allocate => allocate_mnnz
     generic,   public  :: reallocate => reallocate_nz
 
     procedure, pass(a) :: d_csmv
@@ -46,18 +63,45 @@ module psbn_d_mat_mod
   private :: get_nrows, get_ncols, get_nzeros, get_size, &
        & get_state, get_dupl, is_null, is_bld, is_upd, &
        & is_asb, is_sorted, is_upper, is_lower, is_triangle, &
-       & is_unit, get_neigh, allocate_mn, allocate_mnnz, &
-       & reallocate_nz, free, d_csmv, d_csmm, d_cssv, d_cssm 
+       & is_unit, get_neigh, allocate_mnnz, &
+       & reallocate_nz, free, d_csmv, d_csmm, d_cssv, d_cssm, sparse_print, &
+       & set_nrows, set_ncols, set_dupl, set_state, set_null, set_bld, &
+       & set_upd, set_asb, set_sorted, set_upper, set_lower, set_triangle, &
+       & set_unit
 
 
-  interface psbn_spcnv
+
+  interface psbn_csall
+    subroutine psbn_d_csall(nr,nc,a,info,nz) 
+      use psbn_d_base_mat_mod
+      import psbn_d_sparse_mat
+      type(psbn_d_sparse_mat), intent(out) :: a
+      integer, intent(in)             :: nr,nc
+      integer, intent(out)            :: info
+      integer, intent(in), optional   :: nz
+    end subroutine psbn_d_csall
+  end interface
+
+  interface psbn_csins
+    subroutine psbn_d_csins(nz,val,ia,ja,a,imin,imax,jmin,jmax,info,gtl) 
+      use psbn_d_base_mat_mod
+      import psbn_d_sparse_mat
+      type(psbn_d_sparse_mat), intent(inout) :: a
+      real(psb_dpk_), intent(in)      :: val(:)
+      integer, intent(in)             :: nz, ia(:), ja(:), imin,imax,jmin,jmax
+      integer, intent(out)            :: info
+      integer, intent(in), optional   :: gtl(:)
+    end subroutine psbn_d_csins
+  end interface
+
+  interface psbn_cscnv
     subroutine psbn_d_spcnv(a,b,info,type,mold,upd,dupl)
       use psbn_d_base_mat_mod
       import psbn_d_sparse_mat
       type(psbn_d_sparse_mat), intent(in)    :: a
       type(psbn_d_sparse_mat), intent(out)   :: b
       integer, intent(out)                   :: info
-      integer,optional, intent(in)           :: dupl, upd
+      integer, optional, intent(in)           :: dupl, upd
       character(len=*), optional, intent(in) :: type
       class(psbn_d_base_sparse_mat), intent(in), optional :: mold
       
@@ -74,6 +118,22 @@ module psbn_d_mat_mod
   end interface
 
 contains 
+
+ 
+  function sparse_get_fmt(a) result(res)
+    implicit none 
+    class(psbn_d_sparse_mat), intent(in) :: a
+    character(len=5) :: res
+    
+    if (allocated(a%a)) then 
+      res = a%a%get_fmt()
+    else
+      res = 'NULL'
+    end if
+    
+  end function sparse_get_fmt
+
+
 
   function get_dupl(a) result(res)
     use psb_error_mod
@@ -244,6 +304,414 @@ contains
 
   end function is_sorted
 
+ 
+  subroutine  set_nrows(m,a) 
+    use psb_error_mod
+    implicit none 
+    class(psbn_d_sparse_mat), intent(inout) :: a
+    integer, intent(in) :: m
+    Integer :: err_act, info
+    character(len=20)  :: name='set_nrows'
+    logical, parameter :: debug=.false.
+
+    call psb_erractionsave(err_act)
+    if (.not.allocated(a%a)) then 
+      info = 1121
+      call psb_errpush(info,name)
+      goto 9999
+    endif
+
+    call a%a%set_nrows(m)
+
+    call psb_erractionrestore(err_act)
+    return
+
+9999 continue
+    call psb_erractionrestore(err_act)
+
+    if (err_act == psb_act_abort_) then
+      call psb_error()
+      return
+    end if
+
+
+  end subroutine set_nrows
+
+  subroutine  set_ncols(n,a) 
+    use psb_error_mod
+    implicit none 
+    class(psbn_d_sparse_mat), intent(inout) :: a
+    integer, intent(in) :: n
+    Integer :: err_act, info
+    character(len=20)  :: name='get_nzeros'
+    logical, parameter :: debug=.false.
+
+    call psb_erractionsave(err_act)
+    if (.not.allocated(a%a)) then 
+      info = 1121
+      call psb_errpush(info,name)
+      goto 9999
+    endif
+    call a%a%set_ncols(n)
+
+    call psb_erractionrestore(err_act)
+    return
+
+9999 continue
+    call psb_erractionrestore(err_act)
+
+    if (err_act == psb_act_abort_) then
+      call psb_error()
+      return
+    end if
+
+
+  end subroutine set_ncols
+
+
+  subroutine  set_state(n,a) 
+    use psb_error_mod
+    implicit none 
+    class(psbn_d_sparse_mat), intent(inout) :: a
+    integer, intent(in) :: n
+    Integer :: err_act, info
+    character(len=20)  :: name='get_nzeros'
+    logical, parameter :: debug=.false.
+
+    call psb_erractionsave(err_act)
+    if (.not.allocated(a%a)) then 
+      info = 1121
+      call psb_errpush(info,name)
+      goto 9999
+    endif
+    call a%a%set_state(n)
+
+    call psb_erractionrestore(err_act)
+    return
+
+9999 continue
+    call psb_erractionrestore(err_act)
+
+    if (err_act == psb_act_abort_) then
+      call psb_error()
+      return
+    end if
+
+
+  end subroutine set_state
+
+
+  subroutine  set_dupl(n,a) 
+    use psb_error_mod
+    implicit none 
+    class(psbn_d_sparse_mat), intent(inout) :: a
+    integer, intent(in) :: n
+    Integer :: err_act, info
+    character(len=20)  :: name='get_nzeros'
+    logical, parameter :: debug=.false.
+
+    call psb_erractionsave(err_act)
+    if (.not.allocated(a%a)) then 
+      info = 1121
+      call psb_errpush(info,name)
+      goto 9999
+    endif
+
+    call a%a%set_dupl(n)
+
+    call psb_erractionrestore(err_act)
+    return
+
+9999 continue
+    call psb_erractionrestore(err_act)
+
+    if (err_act == psb_act_abort_) then
+      call psb_error()
+      return
+    end if
+
+
+  end subroutine set_dupl
+
+  subroutine  set_null(a) 
+    use psb_error_mod
+    implicit none 
+    class(psbn_d_sparse_mat), intent(inout) :: a
+    Integer :: err_act, info
+    character(len=20)  :: name='get_nzeros'
+    logical, parameter :: debug=.false.
+
+    call psb_erractionsave(err_act)
+    if (.not.allocated(a%a)) then 
+      info = 1121
+      call psb_errpush(info,name)
+      goto 9999
+    endif
+    
+    call a%a%set_null()
+
+    call psb_erractionrestore(err_act)
+    return
+
+9999 continue
+    call psb_erractionrestore(err_act)
+
+    if (err_act == psb_act_abort_) then
+      call psb_error()
+      return
+    end if
+
+
+  end subroutine set_null
+
+  subroutine  set_bld(a) 
+    use psb_error_mod
+    implicit none 
+    class(psbn_d_sparse_mat), intent(inout) :: a
+    Integer :: err_act, info
+    character(len=20)  :: name='get_nzeros'
+    logical, parameter :: debug=.false.
+
+    call psb_erractionsave(err_act)
+    if (.not.allocated(a%a)) then 
+      info = 1121
+      call psb_errpush(info,name)
+      goto 9999
+    endif
+
+    call a%a%set_bld()
+    
+    call psb_erractionrestore(err_act)
+    return
+
+9999 continue
+    call psb_erractionrestore(err_act)
+
+    if (err_act == psb_act_abort_) then
+      call psb_error()
+      return
+    end if
+
+  end subroutine set_bld
+
+  subroutine  set_upd(a) 
+    use psb_error_mod
+    implicit none 
+    class(psbn_d_sparse_mat), intent(inout) :: a
+    Integer :: err_act, info
+    character(len=20)  :: name='get_nzeros'
+    logical, parameter :: debug=.false.
+
+    call psb_erractionsave(err_act)
+    if (.not.allocated(a%a)) then 
+      info = 1121
+      call psb_errpush(info,name)
+      goto 9999
+    endif
+
+    call a%a%set_upd()
+
+    call psb_erractionrestore(err_act)
+    return
+
+9999 continue
+    call psb_erractionrestore(err_act)
+
+    if (err_act == psb_act_abort_) then
+      call psb_error()
+      return
+    end if
+
+
+  end subroutine set_upd
+
+  subroutine  set_asb(a) 
+    use psb_error_mod
+    implicit none 
+    class(psbn_d_sparse_mat), intent(inout) :: a
+    Integer :: err_act, info
+    character(len=20)  :: name='get_nzeros'
+    logical, parameter :: debug=.false.
+
+    call psb_erractionsave(err_act)
+    if (.not.allocated(a%a)) then 
+      info = 1121
+      call psb_errpush(info,name)
+      goto 9999
+    endif
+    
+    call a%a%set_asb()
+
+    call psb_erractionrestore(err_act)
+    return
+
+9999 continue
+    call psb_erractionrestore(err_act)
+
+    if (err_act == psb_act_abort_) then
+      call psb_error()
+      return
+    end if
+
+  end subroutine set_asb
+
+  subroutine set_sorted(a,val) 
+    use psb_error_mod
+    implicit none 
+    class(psbn_d_sparse_mat), intent(inout) :: a
+    logical, intent(in), optional :: val
+    Integer :: err_act, info
+    character(len=20)  :: name='get_nzeros'
+    logical, parameter :: debug=.false.
+
+    call psb_erractionsave(err_act)
+    if (.not.allocated(a%a)) then 
+      info = 1121
+      call psb_errpush(info,name)
+      goto 9999
+    endif
+    
+    call a%a%set_sorted(val)
+    
+    call psb_erractionrestore(err_act)
+    return
+
+9999 continue
+    call psb_erractionrestore(err_act)
+
+    if (err_act == psb_act_abort_) then
+      call psb_error()
+      return
+    end if
+
+  end subroutine set_sorted
+
+  subroutine set_triangle(a,val) 
+    use psb_error_mod
+    implicit none 
+    class(psbn_d_sparse_mat), intent(inout) :: a
+    logical, intent(in), optional :: val
+    Integer :: err_act, info
+    character(len=20)  :: name='get_nzeros'
+    logical, parameter :: debug=.false.
+
+    call psb_erractionsave(err_act)
+    if (.not.allocated(a%a)) then 
+      info = 1121
+      call psb_errpush(info,name)
+      goto 9999
+    endif
+
+    call a%a%set_triangle(val)
+
+    call psb_erractionrestore(err_act)
+    return
+
+9999 continue
+    call psb_erractionrestore(err_act)
+
+    if (err_act == psb_act_abort_) then
+      call psb_error()
+      return
+    end if
+
+  end subroutine set_triangle
+
+  subroutine set_unit(a,val) 
+    use psb_error_mod
+    implicit none 
+    class(psbn_d_sparse_mat), intent(inout) :: a
+    logical, intent(in), optional :: val
+    Integer :: err_act, info
+    character(len=20)  :: name='get_nzeros'
+    logical, parameter :: debug=.false.
+
+    call psb_erractionsave(err_act)
+    if (.not.allocated(a%a)) then 
+      info = 1121
+      call psb_errpush(info,name)
+      goto 9999
+    endif
+    
+    call a%a%set_unit(val)
+
+    call psb_erractionrestore(err_act)
+    return
+
+9999 continue
+    call psb_erractionrestore(err_act)
+
+    if (err_act == psb_act_abort_) then
+      call psb_error()
+      return
+    end if
+
+  end subroutine set_unit
+
+  subroutine set_lower(a,val) 
+    use psb_error_mod
+    implicit none 
+    class(psbn_d_sparse_mat), intent(inout) :: a
+    logical, intent(in), optional :: val
+    Integer :: err_act, info
+    character(len=20)  :: name='get_nzeros'
+    logical, parameter :: debug=.false.
+
+    call psb_erractionsave(err_act)
+    if (.not.allocated(a%a)) then 
+      info = 1121
+      call psb_errpush(info,name)
+      goto 9999
+    endif
+
+    call a%a%set_lower(val)
+
+    call psb_erractionrestore(err_act)
+    return
+
+9999 continue
+    call psb_erractionrestore(err_act)
+
+    if (err_act == psb_act_abort_) then
+      call psb_error()
+      return
+    end if
+
+  end subroutine set_lower
+
+  subroutine set_upper(a,val) 
+    use psb_error_mod
+    implicit none 
+    class(psbn_d_sparse_mat), intent(inout) :: a
+    logical, intent(in), optional :: val
+    Integer :: err_act, info
+    character(len=20)  :: name='get_nzeros'
+    logical, parameter :: debug=.false.
+
+    call psb_erractionsave(err_act)
+    if (.not.allocated(a%a)) then 
+      info = 1121
+      call psb_errpush(info,name)
+      goto 9999
+    endif
+
+    call a%a%set_upper(val)
+
+    call psb_erractionrestore(err_act)
+    return
+
+9999 continue
+    call psb_erractionrestore(err_act)
+
+    if (err_act == psb_act_abort_) then
+      call psb_error()
+      return
+    end if
+
+  end subroutine set_upper
+
+
+
 
   function get_nzeros(a) result(res)
     use psb_error_mod
@@ -310,6 +778,45 @@ contains
 
   end function get_size
 
+  subroutine sparse_print(iout,a,iv,eirs,eics,head,ivr,ivc)
+    use psb_error_mod
+    implicit none 
+
+    integer, intent(in)               :: iout
+    class(psbn_d_sparse_mat), intent(in) :: a   
+    integer, intent(in), optional     :: iv(:)
+    integer, intent(in), optional     :: eirs,eics
+    character(len=*), optional        :: head
+    integer, intent(in), optional     :: ivr(:), ivc(:)
+
+    Integer :: err_act, info
+    character(len=20)  :: name='sparse_print'
+    logical, parameter :: debug=.false.
+
+    info = 0
+    call psb_erractionsave(err_act)
+    if (.not.allocated(a%a)) then 
+      info = 1121
+      call psb_errpush(info,name)
+      goto 9999
+    endif
+
+    call a%a%print(iout,iv,eirs,eics,head,ivr,ivc)
+
+
+    call psb_erractionrestore(err_act)
+    return
+
+9999 continue
+    call psb_erractionrestore(err_act)
+
+    if (err_act == psb_act_abort_) then
+      call psb_error()
+      return
+    end if
+    return
+
+  end subroutine sparse_print
 
   subroutine get_neigh(a,idx,neigh,n,info,lev)
     use psb_error_mod
@@ -351,81 +858,14 @@ contains
 
   end subroutine get_neigh
 
-  subroutine  allocate_mn(m,n,a,type,mold) 
+
+  subroutine  allocate_mnnz(m,n,a,nz,type,mold) 
     use psb_error_mod
     use psb_string_mod
     implicit none 
     integer, intent(in) :: m,n
     class(psbn_d_sparse_mat), intent(inout) :: a
-    character(len=*), intent(in), optional :: type
-    class(psbn_d_base_sparse_mat), intent(in), optional :: mold
-
-    Integer :: err_act, info
-    character(len=20)  :: name='allocate_mn'
-    character(len=8)   :: type_
-    logical, parameter :: debug=.false.
-
-
-    call psb_erractionsave(err_act)
-    info = 0 
-    if (allocated(a%a)) then 
-      call a%a%free()
-      deallocate(a%a)
-    end if
-
-    if (present(mold)) then 
-      allocate(a%a, source=mold, stat=info)
-
-    else
-
-      if (present(type)) then 
-        type_ = psb_toupper(type)
-      else
-        type_ = 'COO'
-      end if
-
-      select case(type) 
-      case('COO')
-        allocate(psbn_d_coo_sparse_mat :: a%a, stat=info)
-! Add here a few other data structures inplemented by default.
-
-!!$      case('CSR') 
-!!$        allocate(psbn_d_csr_sparse_mat :: a%a, stat=info)
-
-      case default
-        allocate(psbn_d_coo_sparse_mat :: a%a, stat=info)
-      end select
-
-    end if
-
-    if (info /= 0) then 
-      info = 4010
-      goto 9999
-    end if
-    
-    call a%a%allocate(m,n)
-          
-    call psb_erractionrestore(err_act)
-    return
-
-9999 continue
-    call psb_erractionrestore(err_act)
-
-    if (err_act == psb_act_abort_) then
-      call psb_error()
-      return
-    end if
-    return
-
-
-  end subroutine allocate_mn
-
-  subroutine  allocate_mnnz(m,n,nz,a,type,mold) 
-    use psb_error_mod
-    use psb_string_mod
-    implicit none 
-    integer, intent(in) :: m,n,nz
-    class(psbn_d_sparse_mat), intent(inout) :: a
+    integer, intent(in), optional :: nz
     character(len=*), intent(in), optional :: type
     class(psbn_d_base_sparse_mat), intent(in), optional :: mold
 

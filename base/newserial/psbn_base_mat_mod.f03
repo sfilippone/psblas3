@@ -51,6 +51,7 @@ module psbn_base_mat_mod
     procedure, pass(a) :: get_size
     procedure, pass(a) :: get_state
     procedure, pass(a) :: get_dupl
+    procedure, pass(a) :: get_fmt
 
 
     procedure, pass(a) :: is_null
@@ -63,11 +64,10 @@ module psbn_base_mat_mod
     procedure, pass(a) :: is_triangle
     procedure, pass(a) :: is_unit
     procedure, pass(a) :: get_neigh
-    procedure, pass(a) :: allocate_mn
     procedure, pass(a) :: allocate_mnnz
     procedure, pass(a) :: reallocate_nz
     procedure, pass(a) :: free
-    generic,   public  :: allocate => allocate_mn, allocate_mnnz
+    generic,   public  :: allocate => allocate_mnnz
     generic,   public  :: reallocate => reallocate_nz
 
     procedure, pass(a) :: print => sparse_print
@@ -80,10 +80,17 @@ module psbn_base_mat_mod
        & get_nzeros, get_size, get_state, get_dupl, is_null, is_bld, &
        & is_upd, is_asb, is_sorted, is_upper, is_lower, is_triangle, &
        & is_unit, get_neigh, allocate_mn, allocate_mnnz, reallocate_nz, &
-       & free, sparse_print
+       & free, sparse_print,get_fmt
   
 contains
  
+  function get_fmt(a) result(res)
+    implicit none 
+    class(psbn_base_sparse_mat), intent(in) :: a
+    character(len=5) :: res
+    res = 'NULL'
+  end function get_fmt
+  
   function get_dupl(a) result(res)
     implicit none 
     class(psbn_base_sparse_mat), intent(in) :: a
@@ -403,34 +410,12 @@ contains
 
   end subroutine get_neigh
 
-  subroutine  allocate_mn(m,n,a) 
+  subroutine  allocate_mnnz(m,n,a,nz) 
     use psb_error_mod
     implicit none 
     integer, intent(in) :: m,n
     class(psbn_base_sparse_mat), intent(inout) :: a
-
-    Integer :: err_act
-    character(len=20)  :: name='allocate_mn'
-    logical, parameter :: debug=.false.
-
-    call psb_erractionsave(err_act)
-    ! This is the base version. If we get here
-    ! it means the derived class is incomplete,
-    ! so we throw an error.
-    call psb_errpush(700,name)
-          
-    if (err_act /= psb_act_ret_) then
-      call psb_error()
-    end if
-    return
-
-  end subroutine allocate_mn
-
-  subroutine  allocate_mnnz(m,n,nz,a) 
-    use psb_error_mod
-    implicit none 
-    integer, intent(in) :: m,n,nz
-    class(psbn_base_sparse_mat), intent(inout) :: a
+    integer, intent(in), optional  :: nz
     Integer :: err_act
     character(len=20)  :: name='allocate_mnz'
     logical, parameter :: debug=.false.

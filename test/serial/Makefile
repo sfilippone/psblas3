@@ -14,10 +14,13 @@ FINCLUDES=$(FMFLAG)$(LIBDIR) $(FMFLAG).
 
 EXEDIR=./runs
 
-all: d_coo_matgen 
+all: d_coo_matgen d_matgen
 d_coo_matgen: d_coo_matgen.o
 	$(F90LINK) d_coo_matgen.o  -o d_coo_matgen  $(PSBLAS_LIB) $(LDLIBS)
 	/bin/mv d_coo_matgen $(EXEDIR)	
+d_matgen: d_matgen.o
+	$(F90LINK) d_matgen.o  -o d_matgen  $(PSBLAS_LIB) $(LDLIBS)
+	/bin/mv d_matgen $(EXEDIR)	
 
 #ppde spde
 
@@ -34,7 +37,7 @@ spde: spde.o
 
 
 clean: 
-	/bin/rm -f d_coo_matgen.o tpg.o ppde.o spde.o  $(EXEDIR)/ppde 
+	/bin/rm -f d_coo_matgen.o d_matgen.o tpg.o ppde.o spde.o  $(EXEDIR)/ppde 
 verycleanlib: 
 	(cd ../..; make veryclean)
 lib:

@@ -16,7 +16,6 @@ module psbn_d_csr_mat_mod
     procedure, pass(a)  :: reallocate_nz => d_csr_reallocate_nz
     procedure, pass(a)  :: csins => d_csr_csins
     procedure, pass(a)  :: allocate_mnnz => d_csr_allocate_mnnz
-    procedure, pass(a)  :: allocate_mn => d_csr_allocate_mn
     procedure, pass(a)  :: cp_to_coo => d_cp_csr_to_coo
     procedure, pass(a)  :: cp_from_coo => d_cp_csr_from_coo
     procedure, pass(a)  :: cp_to_fmt => d_cp_csr_to_fmt
@@ -27,12 +26,15 @@ module psbn_d_csr_mat_mod
     procedure, pass(a)  :: mv_from_fmt => d_mv_csr_from_fmt
     procedure, pass(a)  :: free => d_csr_free
     procedure, pass(a)  :: print => d_csr_print
+    procedure, pass(a)  :: get_fmt  => d_csr_get_fmt
   end type psbn_d_csr_sparse_mat
   private :: d_csr_get_nzeros, d_csr_csmm, d_csr_csmv, d_csr_cssm, d_csr_cssv, &
        & d_csr_csins, d_csr_reallocate_nz, d_csr_allocate_mnnz, &
-       & d_csr_allocate_mn, d_csr_free,  d_csr_print, &
+       & d_csr_free,  d_csr_print, d_csr_get_fmt, &
        & d_cp_csr_to_coo, d_cp_csr_from_coo, &
-       & d_mv_csr_to_coo, d_mv_csr_from_coo
+       & d_mv_csr_to_coo, d_mv_csr_from_coo, &
+       & d_cp_csr_to_fmt, d_cp_csr_from_fmt, &
+       & d_mv_csr_to_fmt, d_mv_csr_from_fmt
 
 
   interface 
@@ -182,6 +184,14 @@ module psbn_d_csr_mat_mod
 
 
 contains 
+
+  function d_csr_get_fmt(a) result(res)
+    implicit none 
+    class(psbn_d_csr_sparse_mat), intent(in) :: a
+    character(len=5) :: res
+    res = 'CSR'
+  end function d_csr_get_fmt
+  
 
   subroutine  d_csr_reallocate_nz(nz,a) 
     use psb_error_mod
@@ -574,7 +584,7 @@ contains
 
     call psb_erractionsave(err_act)
     info = 0
-!!$    call d_cp_csr_to_fmt_impl(a,b,info)
+    call d_cp_csr_to_fmt_impl(a,b,info)
     if (info /= 0) goto 9999
 
     call psb_erractionrestore(err_act)
@@ -606,7 +616,7 @@ contains
 
     call psb_erractionsave(err_act)
     info = 0
-!!$    call d_cp_csr_from_fmt_impl(a,b,info)
+    call d_cp_csr_from_fmt_impl(a,b,info)
     if (info /= 0) goto 9999
 
     call psb_erractionrestore(err_act)
@@ -704,7 +714,7 @@ contains
 
     call psb_erractionsave(err_act)
     info = 0
-!!$    call d_mv_csr_to_fmt_impl(a,b,info)
+    call d_mv_csr_to_fmt_impl(a,b,info)
     if (info /= 0) goto 9999
 
     call psb_erractionrestore(err_act)
@@ -736,7 +746,7 @@ contains
 
     call psb_erractionsave(err_act)
     info = 0
-!!$    call d_mv_csr_from_fmt_impl(a,b,info)
+    call d_mv_csr_from_fmt_impl(a,b,info)
     if (info /= 0) goto 9999
 
     call psb_erractionrestore(err_act)
@@ -755,13 +765,14 @@ contains
   end subroutine d_mv_csr_from_fmt
 
 
-  subroutine  d_csr_allocate_mnnz(m,n,nz,a) 
+  subroutine  d_csr_allocate_mnnz(m,n,a,nz) 
     use psb_error_mod
     use psb_realloc_mod
     implicit none 
-    integer, intent(in) :: m,n,nz
+    integer, intent(in) :: m,n
     class(psbn_d_csr_sparse_mat), intent(inout) :: a
-    Integer :: err_act, info
+    integer, intent(in), optional :: nz
+    Integer :: err_act, info, nz_
     character(len=20)  :: name='allocate_mnz'
     logical, parameter :: debug=.false.
 
@@ -777,15 +788,20 @@ contains
       call psb_errpush(info,name,i_err=(/2,0,0,0,0/))
       goto 9999
     endif
-    if (nz < 0) then 
+        if (present(nz)) then 
+      nz_ = nz
+    else
+      nz_ = max(7*m,7*n,1)
+    end if
+    if (nz_ < 0) then 
       info = 10
       call psb_errpush(info,name,i_err=(/3,0,0,0,0/))
       goto 9999
     endif
       
     if (info == 0) call psb_realloc(m+1,a%irp,info)
-    if (info == 0) call psb_realloc(nz,a%ja,info)
-    if (info == 0) call psb_realloc(nz,a%val,info)
+    if (info == 0) call psb_realloc(nz_,a%ja,info)
+    if (info == 0) call psb_realloc(nz_,a%val,info)
     if (info == 0) then 
       a%irp=0
       call a%set_nrows(m)
@@ -808,46 +824,6 @@ contains
 
   end subroutine d_csr_allocate_mnnz
 
-
-  subroutine  d_csr_allocate_mn(m,n,a) 
-    use psb_error_mod
-    use psb_realloc_mod
-    implicit none 
-    integer, intent(in) :: m,n
-    class(psbn_d_csr_sparse_mat), intent(inout) :: a
-    Integer :: err_act, info, nz
-    character(len=20)  :: name='allocate_mn'
-    logical, parameter :: debug=.false.
-
-    call psb_erractionsave(err_act)
-    info = 0
-    if (m < 0) then 
-      info = 10
-      call psb_errpush(info,name,i_err=(/1,0,0,0,0/))
-      goto 9999
-    endif
-    if (n < 0) then 
-      info = 10
-      call psb_errpush(info,name,i_err=(/2,0,0,0,0/))
-      goto 9999
-    endif
-
-    nz = max(7*m,7*n,1)
-    call a%allocate(m,n,nz)
-
-    call psb_erractionrestore(err_act)
-    return
-
-9999 continue
-    call psb_erractionrestore(err_act)
-
-    if (err_act == psb_act_abort_) then
-      call psb_error()
-      return
-    end if
-    return
-
-  end subroutine d_csr_allocate_mn
 
   subroutine d_csr_print(iout,a,iv,eirs,eics,head,ivr,ivc)
     use psb_spmat_type
