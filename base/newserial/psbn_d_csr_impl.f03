@@ -942,10 +942,10 @@ end subroutine d_csr_cssm_impl
 
 
 
-subroutine d_csr_csins_impl(nz,val,ia,ja,a,imin,imax,jmin,jmax,info,gtl) 
+subroutine d_csr_csput_impl(nz,val,ia,ja,a,imin,imax,jmin,jmax,info,gtl) 
   use psb_error_mod
   use psb_realloc_mod
-  use psbn_d_csr_mat_mod, psb_protect_name => d_csr_csins_impl
+  use psbn_d_csr_mat_mod, psb_protect_name => d_csr_csput_impl
   implicit none 
 
   class(psbn_d_csr_sparse_mat), intent(inout) :: a
@@ -956,7 +956,7 @@ subroutine d_csr_csins_impl(nz,val,ia,ja,a,imin,imax,jmin,jmax,info,gtl)
 
 
   Integer            :: err_act
-  character(len=20)  :: name='d_csr_csins'
+  character(len=20)  :: name='d_csr_csput'
   logical, parameter :: debug=.false.
   integer            :: nza, i,j,k, nzl, isza, int_err(5)
 
@@ -1193,7 +1193,7 @@ contains
 
   end subroutine d_csr_srch_upd
 
-end subroutine d_csr_csins_impl
+end subroutine d_csr_csput_impl
 
 
 
@@ -1438,38 +1438,15 @@ subroutine d_mv_csr_to_fmt_impl(a,b,info)
 
   info = 0
 
-  call tmp%mv_from_fmt(a,info)
-  call b%mv_from_coo(tmp,info)
+  select type (b)
+  class is (psbn_d_coo_sparse_mat) 
+    call a%mv_to_coo(b,info)
+  class default
+    call tmp%mv_from_fmt(a,info)
+    if (info == 0) call b%mv_from_coo(tmp,info)
+  end select
 
 end subroutine d_mv_csr_to_fmt_impl
-
-
-subroutine d_mv_csr_from_fmt_impl(a,b,info) 
-  use psb_const_mod
-  use psb_realloc_mod
-  use psbn_d_base_mat_mod
-  use psbn_d_csr_mat_mod, psb_protect_name => d_mv_csr_from_fmt_impl
-  implicit none 
-
-  class(psbn_d_csr_sparse_mat), intent(inout)  :: a
-  class(psbn_d_base_sparse_mat), intent(inout) :: b
-  integer, intent(out)                         :: info
-
-  !locals
-  type(psbn_d_coo_sparse_mat) :: tmp
-  logical             :: rwshr_
-  Integer             :: nza, nr, i,j,irw, idl,err_act, nc
-  Integer, Parameter  :: maxtry=8
-  integer              :: debug_level, debug_unit
-  character(len=20)   :: name
-
-  info = 0
-
-  call tmp%mv_from_fmt(b,info)
-  call a%mv_from_coo(tmp,info)
-
-end subroutine d_mv_csr_from_fmt_impl
-
 
 
 subroutine d_cp_csr_to_fmt_impl(a,b,info) 
@@ -1493,10 +1470,49 @@ subroutine d_cp_csr_to_fmt_impl(a,b,info)
 
   info = 0
 
-  call tmp%cp_from_fmt(a,info)
-  call b%mv_from_coo(tmp,info)
+
+  select type (b)
+  class is (psbn_d_coo_sparse_mat) 
+    call a%cp_to_coo(b,info)
+  class default
+    call tmp%cp_from_fmt(a,info)
+    if (info == 0) call b%mv_from_coo(tmp,info)
+  end select
 
 end subroutine d_cp_csr_to_fmt_impl
+
+
+subroutine d_mv_csr_from_fmt_impl(a,b,info) 
+  use psb_const_mod
+  use psb_realloc_mod
+  use psbn_d_base_mat_mod
+  use psbn_d_csr_mat_mod, psb_protect_name => d_mv_csr_from_fmt_impl
+  implicit none 
+
+  class(psbn_d_csr_sparse_mat), intent(inout)  :: a
+  class(psbn_d_base_sparse_mat), intent(inout) :: b
+  integer, intent(out)                         :: info
+
+  !locals
+  type(psbn_d_coo_sparse_mat) :: tmp
+  logical             :: rwshr_
+  Integer             :: nza, nr, i,j,irw, idl,err_act, nc
+  Integer, Parameter  :: maxtry=8
+  integer              :: debug_level, debug_unit
+  character(len=20)   :: name
+
+  info = 0
+
+  select type (b)
+  class is (psbn_d_coo_sparse_mat) 
+    call a%mv_from_coo(b,info)
+  class default
+    call tmp%mv_from_fmt(b,info)
+    if (info == 0) call a%mv_from_coo(tmp,info)
+  end select
+
+end subroutine d_mv_csr_from_fmt_impl
+
 
 
 subroutine d_cp_csr_from_fmt_impl(a,b,info) 
@@ -1520,8 +1536,12 @@ subroutine d_cp_csr_from_fmt_impl(a,b,info)
 
   info = 0
 
-  call tmp%cp_from_fmt(b,info)
-  call a%mv_from_coo(tmp,info)
-
+  select type (b)
+  class is (psbn_d_coo_sparse_mat) 
+    call a%cp_from_coo(b,info)
+  class default
+    call tmp%cp_from_fmt(b,info)
+    if (info == 0) call a%mv_from_coo(tmp,info)
+  end select
 end subroutine d_cp_csr_from_fmt_impl
 

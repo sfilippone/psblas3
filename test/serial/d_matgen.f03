@@ -201,7 +201,7 @@ contains
 
     t0 = psb_wtime()
 
-    call psbn_csall(nr,nr,a_n,info)
+    call a_n%csall(nr,nr,info)
 
     talc = psb_wtime()-t0
 
@@ -357,7 +357,7 @@ contains
         endif
 
       end do
-      call psbn_csins(element-1,val,irow,icol,a_n,1,nr,1,nr,info)
+      call a_n%csput(element-1,val,irow,icol,1,nr,1,nr,info)
 
     end do
 
@@ -368,9 +368,9 @@ contains
       call psb_errpush(info,name,a_err=ch_err)
       goto 9999
     end if
-    
+    call a_n%print(19)
     t1 = psb_wtime()
-    call psbn_cscnv(a_n,info,mold=acxx)
+    call a_n%cscnv(info,mold=acsr)
 
     if(info /= 0) then
       info=4010
@@ -380,18 +380,19 @@ contains
     end if
     tasb = psb_wtime()-t1
     call a_n%print(20)
-
-!!$    t1 = psb_wtime()
-!!$    call psbn_cscnv(a_n,info,mold=acoo)
 !!$
-!!$    if(info /= 0) then
-!!$      info=4010
-!!$      ch_err='asb rout.'
-!!$      call psb_errpush(info,name,a_err=ch_err)
-!!$      goto 9999
-!!$    end if
-!!$    tmov = psb_wtime()-t1
+    t1 = psb_wtime()
+    call a_n%cscnv(info,mold=acxx)
 
+    if(info /= 0) then
+      info=4010
+      ch_err='asb rout.'
+      call psb_errpush(info,name,a_err=ch_err)
+      goto 9999
+    end if
+    tmov = psb_wtime()-t1
+    call a_n%print(21)
+!!$
 
     if(iam == psb_root_) then
       write(*,'("The matrix has been generated and is currently  in ",a3," format.")')&

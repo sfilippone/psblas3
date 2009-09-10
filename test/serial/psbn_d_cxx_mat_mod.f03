@@ -14,7 +14,7 @@ module psbn_d_cxx_mat_mod
     procedure, pass(a)  :: d_base_cssm => d_cxx_cssm
     procedure, pass(a)  :: d_base_cssv => d_cxx_cssv
     procedure, pass(a)  :: reallocate_nz => d_cxx_reallocate_nz
-    procedure, pass(a)  :: csins => d_cxx_csins
+    procedure, pass(a)  :: csput => d_cxx_csput
     procedure, pass(a)  :: allocate_mnnz => d_cxx_allocate_mnnz
     procedure, pass(a)  :: cp_to_coo => d_cp_cxx_to_coo
     procedure, pass(a)  :: cp_from_coo => d_cp_cxx_from_coo
@@ -29,7 +29,7 @@ module psbn_d_cxx_mat_mod
     procedure, pass(a)  :: get_fmt  => d_cxx_get_fmt
   end type psbn_d_cxx_sparse_mat
   private :: d_cxx_get_nzeros, d_cxx_csmm, d_cxx_csmv, d_cxx_cssm, d_cxx_cssv, &
-       & d_cxx_csins, d_cxx_reallocate_nz, d_cxx_allocate_mnnz, &
+       & d_cxx_csput, d_cxx_reallocate_nz, d_cxx_allocate_mnnz, &
        & d_cxx_free,  d_cxx_print, d_cxx_get_fmt, &
        & d_cp_cxx_to_coo, d_cp_cxx_from_coo, &
        & d_mv_cxx_to_coo, d_mv_cxx_from_coo, &
@@ -128,7 +128,7 @@ module psbn_d_cxx_mat_mod
   end interface
 
   interface 
-    subroutine d_cxx_csins_impl(nz,val,ia,ja,a,imin,imax,jmin,jmax,info,gtl) 
+    subroutine d_cxx_csput_impl(nz,val,ia,ja,a,imin,imax,jmin,jmax,info,gtl) 
       use psb_const_mod
       import psbn_d_cxx_sparse_mat
       class(psbn_d_cxx_sparse_mat), intent(inout) :: a
@@ -136,7 +136,7 @@ module psbn_d_cxx_mat_mod
       integer, intent(in)             :: nz, ia(:), ja(:), imin,imax,jmin,jmax
       integer, intent(out)            :: info
       integer, intent(in), optional   :: gtl(:)
-    end subroutine d_cxx_csins_impl
+    end subroutine d_cxx_csput_impl
   end interface
 
   interface d_cxx_cssm_impl
@@ -235,7 +235,7 @@ contains
   end function d_cxx_get_nzeros
   
 
-  subroutine d_cxx_csins(nz,val,ia,ja,a,imin,imax,jmin,jmax,info,gtl) 
+  subroutine d_cxx_csput(nz,val,ia,ja,a,imin,imax,jmin,jmax,info,gtl) 
     use psb_const_mod
     use psb_error_mod
     implicit none 
@@ -247,7 +247,7 @@ contains
 
 
     Integer            :: err_act
-    character(len=20)  :: name='d_cxx_csins'
+    character(len=20)  :: name='d_cxx_csput'
     logical, parameter :: debug=.false.
     integer            :: nza, i,j,k, nzl, isza, int_err(5)
 
@@ -282,7 +282,7 @@ contains
 
     if (nz == 0) return
 
-    call d_cxx_csins_impl(nz,val,ia,ja,a,imin,imax,jmin,jmax,info,gtl) 
+    call d_cxx_csput_impl(nz,val,ia,ja,a,imin,imax,jmin,jmax,info,gtl) 
     if (info /= 0) goto 9999
 
     call psb_erractionrestore(err_act)
@@ -296,7 +296,7 @@ contains
       return
     end if
     return
-  end subroutine d_cxx_csins
+  end subroutine d_cxx_csput
 
 
   subroutine d_cxx_csmv(alpha,a,x,beta,y,info,trans) 
@@ -601,39 +601,6 @@ contains
     return
 
   end subroutine d_cp_cxx_to_fmt
-  
-  subroutine d_cp_cxx_from_fmt(a,b,info) 
-    use psb_error_mod
-    use psb_realloc_mod
-    implicit none 
-    class(psbn_d_cxx_sparse_mat), intent(inout) :: a
-    class(psbn_d_base_sparse_mat), intent(in) :: b
-    integer, intent(out)            :: info
-
-    Integer :: err_act
-    character(len=20)  :: name='from_fmt'
-    logical, parameter :: debug=.false.
-
-    call psb_erractionsave(err_act)
-    info = 0
-    call d_cp_cxx_from_fmt_impl(a,b,info)
-    if (info /= 0) goto 9999
-
-    call psb_erractionrestore(err_act)
-    return
-
-9999 continue
-    call psb_erractionrestore(err_act)
-
-    call psb_errpush(info,name)
-          
-    if (err_act /= psb_act_ret_) then
-      call psb_error()
-    end if
-    return
-
-  end subroutine d_cp_cxx_from_fmt
-
 
   subroutine d_mv_cxx_to_coo(a,b,info) 
     use psb_error_mod
@@ -667,6 +634,39 @@ contains
 
   end subroutine d_mv_cxx_to_coo
   
+  
+  subroutine d_cp_cxx_from_fmt(a,b,info) 
+    use psb_error_mod
+    use psb_realloc_mod
+    implicit none 
+    class(psbn_d_cxx_sparse_mat), intent(inout) :: a
+    class(psbn_d_base_sparse_mat), intent(in) :: b
+    integer, intent(out)            :: info
+
+    Integer :: err_act
+    character(len=20)  :: name='from_fmt'
+    logical, parameter :: debug=.false.
+
+    call psb_erractionsave(err_act)
+    info = 0
+    call d_cp_cxx_from_fmt_impl(a,b,info)
+    if (info /= 0) goto 9999
+
+    call psb_erractionrestore(err_act)
+    return
+
+9999 continue
+    call psb_erractionrestore(err_act)
+
+    call psb_errpush(info,name)
+          
+    if (err_act /= psb_act_ret_) then
+      call psb_error()
+    end if
+    return
+
+  end subroutine d_cp_cxx_from_fmt
+
   subroutine d_mv_cxx_from_coo(a,b,info) 
     use psb_error_mod
     use psb_realloc_mod

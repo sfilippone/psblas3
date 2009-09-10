@@ -318,7 +318,7 @@ contains
     ! This is the base version. If we get here
     ! it means the derived class is incomplete,
     ! so we throw an error.
-    call psb_errpush(700,name)
+    call psb_errpush(700,name,a_err=a%get_fmt())
           
     if (err_act /= psb_act_ret_) then
       call psb_error()
@@ -342,7 +342,7 @@ contains
     ! This is the base version. If we get here
     ! it means the derived class is incomplete,
     ! so we throw an error.
-    call psb_errpush(700,name)
+    call psb_errpush(700,name,a_err=a%get_fmt())
           
     if (err_act /= psb_act_ret_) then
       call psb_error()
@@ -372,7 +372,7 @@ contains
     ! This is the base version. If we get here
     ! it means the derived class is incomplete,
     ! so we throw an error.
-    call psb_errpush(700,name)
+    call psb_errpush(700,name,a_err=a%get_fmt())
 
     if (err_act /= psb_act_ret_) then
       call psb_error()
@@ -401,7 +401,7 @@ contains
     ! This is the base version. If we get here
     ! it means the derived class is incomplete,
     ! so we throw an error.
-    call psb_errpush(700,name)
+    call psb_errpush(700,name,a_err=a%get_fmt())
 
     if (err_act /= psb_act_ret_) then
       call psb_error()
@@ -424,7 +424,7 @@ contains
     ! This is the base version. If we get here
     ! it means the derived class is incomplete,
     ! so we throw an error.
-    call psb_errpush(700,name)
+    call psb_errpush(700,name,a_err=a%get_fmt())
           
     if (err_act /= psb_act_ret_) then
       call psb_error()
@@ -446,7 +446,7 @@ contains
     ! This is the base version. If we get here
     ! it means the derived class is incomplete,
     ! so we throw an error.
-    call psb_errpush(700,name)
+    call psb_errpush(700,name,a_err=a%get_fmt())
           
     if (err_act /= psb_act_ret_) then
       call psb_error()
@@ -467,7 +467,7 @@ contains
     ! This is the base version. If we get here
     ! it means the derived class is incomplete,
     ! so we throw an error.
-    call psb_errpush(700,name)
+    call psb_errpush(700,name,a_err=a%get_fmt())
           
     if (err_act /= psb_act_ret_) then
       call psb_error()

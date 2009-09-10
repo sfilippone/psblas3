@@ -14,7 +14,7 @@ module psbn_d_csr_mat_mod
     procedure, pass(a)  :: d_base_cssm => d_csr_cssm
     procedure, pass(a)  :: d_base_cssv => d_csr_cssv
     procedure, pass(a)  :: reallocate_nz => d_csr_reallocate_nz
-    procedure, pass(a)  :: csins => d_csr_csins
+    procedure, pass(a)  :: csput => d_csr_csput
     procedure, pass(a)  :: allocate_mnnz => d_csr_allocate_mnnz
     procedure, pass(a)  :: cp_to_coo => d_cp_csr_to_coo
     procedure, pass(a)  :: cp_from_coo => d_cp_csr_from_coo
@@ -29,7 +29,7 @@ module psbn_d_csr_mat_mod
     procedure, pass(a)  :: get_fmt  => d_csr_get_fmt
   end type psbn_d_csr_sparse_mat
   private :: d_csr_get_nzeros, d_csr_csmm, d_csr_csmv, d_csr_cssm, d_csr_cssv, &
-       & d_csr_csins, d_csr_reallocate_nz, d_csr_allocate_mnnz, &
+       & d_csr_csput, d_csr_reallocate_nz, d_csr_allocate_mnnz, &
        & d_csr_free,  d_csr_print, d_csr_get_fmt, &
        & d_cp_csr_to_coo, d_cp_csr_from_coo, &
        & d_mv_csr_to_coo, d_mv_csr_from_coo, &
@@ -128,7 +128,7 @@ module psbn_d_csr_mat_mod
   end interface
 
   interface 
-    subroutine d_csr_csins_impl(nz,val,ia,ja,a,imin,imax,jmin,jmax,info,gtl) 
+    subroutine d_csr_csput_impl(nz,val,ia,ja,a,imin,imax,jmin,jmax,info,gtl) 
       use psb_const_mod
       import psbn_d_csr_sparse_mat
       class(psbn_d_csr_sparse_mat), intent(inout) :: a
@@ -136,7 +136,7 @@ module psbn_d_csr_mat_mod
       integer, intent(in)             :: nz, ia(:), ja(:), imin,imax,jmin,jmax
       integer, intent(out)            :: info
       integer, intent(in), optional   :: gtl(:)
-    end subroutine d_csr_csins_impl
+    end subroutine d_csr_csput_impl
   end interface
 
   interface d_csr_cssm_impl
@@ -235,7 +235,7 @@ contains
   end function d_csr_get_nzeros
   
 
-  subroutine d_csr_csins(nz,val,ia,ja,a,imin,imax,jmin,jmax,info,gtl) 
+  subroutine d_csr_csput(nz,val,ia,ja,a,imin,imax,jmin,jmax,info,gtl) 
     use psb_const_mod
     use psb_error_mod
     implicit none 
@@ -247,7 +247,7 @@ contains
 
 
     Integer            :: err_act
-    character(len=20)  :: name='d_csr_csins'
+    character(len=20)  :: name='d_csr_csput'
     logical, parameter :: debug=.false.
     integer            :: nza, i,j,k, nzl, isza, int_err(5)
 
@@ -282,7 +282,7 @@ contains
 
     if (nz == 0) return
 
-    call d_csr_csins_impl(nz,val,ia,ja,a,imin,imax,jmin,jmax,info,gtl) 
+    call d_csr_csput_impl(nz,val,ia,ja,a,imin,imax,jmin,jmax,info,gtl) 
     if (info /= 0) goto 9999
 
     call psb_erractionrestore(err_act)
@@ -296,7 +296,7 @@ contains
       return
     end if
     return
-  end subroutine d_csr_csins
+  end subroutine d_csr_csput
 
 
   subroutine d_csr_csmv(alpha,a,x,beta,y,info,trans) 

@@ -853,10 +853,10 @@ subroutine d_coo_csmm_impl(alpha,a,x,beta,y,info,trans)
 end subroutine d_coo_csmm_impl
 
 
-subroutine d_coo_csins_impl(nz,val,ia,ja,a,imin,imax,jmin,jmax,info,gtl) 
+subroutine d_coo_csput_impl(nz,val,ia,ja,a,imin,imax,jmin,jmax,info,gtl) 
   use psb_error_mod
   use psb_realloc_mod
-  use psbn_d_base_mat_mod, psb_protect_name => d_coo_csins_impl
+  use psbn_d_base_mat_mod, psb_protect_name => d_coo_csput_impl
   implicit none 
     
   class(psbn_d_coo_sparse_mat), intent(inout) :: a
@@ -867,7 +867,7 @@ subroutine d_coo_csins_impl(nz,val,ia,ja,a,imin,imax,jmin,jmax,info,gtl)
 
 
   Integer            :: err_act
-  character(len=20)  :: name='d_coo_csins_impl'
+  character(len=20)  :: name='d_coo_csput_impl'
   logical, parameter :: debug=.false.
   integer            :: nza, i,j,k, nzl, isza, int_err(5)
 
@@ -905,7 +905,7 @@ subroutine d_coo_csins_impl(nz,val,ia,ja,a,imin,imax,jmin,jmax,info,gtl)
 
   nza  = a%get_nzeros()
   isza = a%get_size()
-!!$  write(0,*) 'On entry to csins_impl: ',nza
+!!$  write(0,*) 'On entry to csput_impl: ',nza
   if (a%is_bld()) then 
     ! Build phase. Must handle reallocations in a sensible way.
     if (isza < (nza+nz)) then 
@@ -1303,7 +1303,7 @@ contains
 
     end subroutine d_coo_srch_upd
 
-end subroutine d_coo_csins_impl
+end subroutine d_coo_csput_impl
 
 
 subroutine d_cp_coo_to_coo_impl(a,b,info) 

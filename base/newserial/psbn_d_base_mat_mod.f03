@@ -6,11 +6,11 @@ module psbn_d_base_mat_mod
   contains
     procedure, pass(a) :: d_base_csmv
     procedure, pass(a) :: d_base_csmm
-    generic, public    :: psbn_csmm => d_base_csmm, d_base_csmv
+    generic, public    :: csmm => d_base_csmm, d_base_csmv
     procedure, pass(a) :: d_base_cssv
     procedure, pass(a) :: d_base_cssm
-    generic, public    :: psbn_cssm => d_base_cssm, d_base_cssv
-    procedure, pass(a) :: csins
+    generic, public    :: cssm => d_base_cssm, d_base_cssv
+    procedure, pass(a) :: csput
     procedure, pass(a) :: cp_to_coo
     procedure, pass(a) :: cp_from_coo
     procedure, pass(a) :: cp_to_fmt
@@ -21,7 +21,7 @@ module psbn_d_base_mat_mod
     procedure, pass(a) :: mv_from_fmt
   end type psbn_d_base_sparse_mat
   private :: d_base_csmv, d_base_csmm, d_base_cssv, d_base_cssm,&
-       & csins, cp_to_coo, cp_from_coo, cp_to_fmt, cp_from_fmt, &
+       & csput, cp_to_coo, cp_from_coo, cp_to_fmt, cp_from_fmt, &
        & mv_to_coo, mv_from_coo, mv_to_fmt, mv_from_fmt
   
   
@@ -40,7 +40,7 @@ module psbn_d_base_mat_mod
     procedure, pass(a)  :: d_base_csmv => d_coo_csmv
     procedure, pass(a)  :: d_base_cssm => d_coo_cssm
     procedure, pass(a)  :: d_base_cssv => d_coo_cssv
-    procedure, pass(a)  :: csins => d_coo_csins
+    procedure, pass(a)  :: csput => d_coo_csput
     procedure, pass(a)  :: reallocate_nz => d_coo_reallocate_nz
     procedure, pass(a)  :: allocate_mnnz => d_coo_allocate_mnnz
     procedure, pass(a)  :: cp_to_coo   => d_cp_coo_to_coo
@@ -59,7 +59,7 @@ module psbn_d_base_mat_mod
   end type psbn_d_coo_sparse_mat
   private :: d_coo_get_nzeros, d_coo_set_nzeros, &
        & d_coo_csmm, d_coo_csmv, d_coo_cssm, d_coo_cssv, &
-       & d_coo_csins, d_coo_reallocate_nz, d_coo_allocate_mnnz, &
+       & d_coo_csput, d_coo_reallocate_nz, d_coo_allocate_mnnz, &
        & d_fix_coo, d_coo_free, d_coo_print, d_coo_get_fmt, &
        & d_cp_coo_to_coo, d_cp_coo_from_coo, &
        & d_cp_coo_to_fmt, d_cp_coo_from_fmt
@@ -168,7 +168,7 @@ module psbn_d_base_mat_mod
 
   
   interface 
-    subroutine d_coo_csins_impl(nz,val,ia,ja,a,imin,imax,jmin,jmax,info,gtl) 
+    subroutine d_coo_csput_impl(nz,val,ia,ja,a,imin,imax,jmin,jmax,info,gtl) 
       use psb_const_mod
       import psbn_d_coo_sparse_mat
       class(psbn_d_coo_sparse_mat), intent(inout) :: a
@@ -176,7 +176,7 @@ module psbn_d_base_mat_mod
       integer, intent(in)             :: nz, ia(:), ja(:), imin,imax,jmin,jmax
       integer, intent(out)            :: info
       integer, intent(in), optional   :: gtl(:)
-    end subroutine d_coo_csins_impl
+    end subroutine d_coo_csput_impl
   end interface
   
   interface d_coo_cssm_impl
@@ -241,7 +241,7 @@ contains
     ! it means the derived class is incomplete,
     ! so we throw an error.
     info = 700
-    call psb_errpush(info,name)
+    call psb_errpush(info,name,a_err=a%get_fmt())
     
     if (err_act /= psb_act_ret_) then
       call psb_error()
@@ -267,7 +267,7 @@ contains
     ! it means the derived class is incomplete,
     ! so we throw an error.
     info = 700
-    call psb_errpush(info,name)
+    call psb_errpush(info,name,a_err=a%get_fmt())
     
     if (err_act /= psb_act_ret_) then
       call psb_error()
@@ -294,7 +294,7 @@ contains
     ! it means the derived class is incomplete,
     ! so we throw an error.
     info = 700
-    call psb_errpush(info,name)
+    call psb_errpush(info,name,a_err=a%get_fmt())
     
     if (err_act /= psb_act_ret_) then
       call psb_error()
@@ -320,7 +320,7 @@ contains
     ! it means the derived class is incomplete,
     ! so we throw an error.
     info = 700
-    call psb_errpush(info,name)
+    call psb_errpush(info,name,a_err=a%get_fmt())
     
     if (err_act /= psb_act_ret_) then
       call psb_error()
@@ -347,7 +347,7 @@ contains
     ! it means the derived class is incomplete,
     ! so we throw an error.
     info = 700
-    call psb_errpush(info,name)
+    call psb_errpush(info,name,a_err=a%get_fmt())
     
     if (err_act /= psb_act_ret_) then
       call psb_error()
@@ -373,7 +373,7 @@ contains
     ! it means the derived class is incomplete,
     ! so we throw an error.
     info = 700
-    call psb_errpush(info,name)
+    call psb_errpush(info,name,a_err=a%get_fmt())
     
     if (err_act /= psb_act_ret_) then
       call psb_error()
@@ -400,7 +400,7 @@ contains
     ! it means the derived class is incomplete,
     ! so we throw an error.
     info = 700
-    call psb_errpush(info,name)
+    call psb_errpush(info,name,a_err=a%get_fmt())
     
     if (err_act /= psb_act_ret_) then
       call psb_error()
@@ -426,7 +426,7 @@ contains
     ! it means the derived class is incomplete,
     ! so we throw an error.
     info = 700
-    call psb_errpush(info,name)
+    call psb_errpush(info,name,a_err=a%get_fmt())
     
     if (err_act /= psb_act_ret_) then
       call psb_error()
@@ -477,7 +477,7 @@ contains
   end subroutine d_fix_coo
   
   
-  subroutine csins(nz,val,ia,ja,a,imin,imax,jmin,jmax,info,gtl) 
+  subroutine csput(nz,val,ia,ja,a,imin,imax,jmin,jmax,info,gtl) 
     use psb_error_mod
     use psb_realloc_mod
     implicit none 
@@ -488,7 +488,7 @@ contains
     integer, intent(in), optional   :: gtl(:)
     
     Integer :: err_act
-    character(len=20)  :: name='csins'
+    character(len=20)  :: name='csput'
     logical, parameter :: debug=.false.
     
     call psb_erractionsave(err_act)
@@ -496,14 +496,14 @@ contains
     ! it means the derived class is incomplete,
     ! so we throw an error.
     info = 700
-    call psb_errpush(info,name)
+    call psb_errpush(info,name,a_err=a%get_fmt())
     
     if (err_act /= psb_act_ret_) then
       call psb_error()
     end if
     return
     
-  end subroutine csins
+  end subroutine csput
   
   subroutine d_base_csmm(alpha,a,x,beta,y,info,trans) 
     use psb_error_mod
@@ -523,7 +523,7 @@ contains
     ! it means the derived class is incomplete,
     ! so we throw an error.
     info = 700
-    call psb_errpush(info,name)
+    call psb_errpush(info,name,a_err=a%get_fmt())
     
     if (err_act /= psb_act_ret_) then
       call psb_error()
@@ -550,7 +550,7 @@ contains
     ! it means the derived class is incomplete,
     ! so we throw an error.
     info = 700
-    call psb_errpush(info,name)
+    call psb_errpush(info,name,a_err=a%get_fmt())
     
     if (err_act /= psb_act_ret_) then
       call psb_error()
@@ -578,7 +578,7 @@ contains
     ! it means the derived class is incomplete,
     ! so we throw an error.
     info = 700
-    call psb_errpush(info,name)
+    call psb_errpush(info,name,a_err=a%get_fmt())
     
     if (err_act /= psb_act_ret_) then
       call psb_error()
@@ -605,7 +605,7 @@ contains
     ! it means the derived class is incomplete,
     ! so we throw an error.
     info = 700
-    call psb_errpush(info,name)
+    call psb_errpush(info,name,a_err=a%get_fmt())
     
     if (err_act /= psb_act_ret_) then
       call psb_error()
@@ -952,7 +952,7 @@ contains
   end subroutine d_coo_set_nzeros
   
   
-  subroutine d_coo_csins(nz,val,ia,ja,a,imin,imax,jmin,jmax,info,gtl) 
+  subroutine d_coo_csput(nz,val,ia,ja,a,imin,imax,jmin,jmax,info,gtl) 
     use psb_error_mod
     use psb_realloc_mod
     implicit none 
@@ -964,7 +964,7 @@ contains
     
     
     Integer            :: err_act
-    character(len=20)  :: name='d_coo_csins'
+    character(len=20)  :: name='d_coo_csput'
     logical, parameter :: debug=.false.
     integer            :: nza, i,j,k, nzl, isza, int_err(5)
     
@@ -999,7 +999,7 @@ contains
     
     if (nz == 0) return
     nza = a%get_nzeros()
-    call d_coo_csins_impl(nz,val,ia,ja,a,imin,imax,jmin,jmax,info,gtl) 
+    call d_coo_csput_impl(nz,val,ia,ja,a,imin,imax,jmin,jmax,info,gtl) 
     if (info /= 0) goto 9999
     
     call psb_erractionrestore(err_act)
@@ -1014,7 +1014,7 @@ contains
     end if
     return
     
-  end subroutine d_coo_csins
+  end subroutine d_coo_csput
   
   
   subroutine d_coo_csmv(alpha,a,x,beta,y,info,trans) 
