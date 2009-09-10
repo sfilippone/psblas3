@@ -1,4 +1,17 @@
 
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+  !
+  !
+  !
+  ! Computational routines
+  !
+  !
+  !
+  !
+  !
+  !
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
 subroutine d_csr_csmv_impl(alpha,a,x,beta,y,info,trans) 
   use psb_error_mod
   use psbn_d_csr_mat_mod, psb_protect_name => d_csr_csmv_impl
@@ -939,6 +952,45 @@ contains
   end subroutine inner_csrsm
 
 end subroutine d_csr_cssm_impl
+
+function d_csr_csnmi_impl(a) result(res)
+  use psb_error_mod
+  use psbn_d_csr_mat_mod, psb_protect_name => d_csr_csnmi_impl
+  implicit none 
+  class(psbn_d_csr_sparse_mat), intent(in) :: a
+  real(psb_dpk_)         :: res
+
+  integer   :: i,j,k,m,n, nr, ir, jc, nc
+  real(psb_dpk_) :: acc
+  logical   :: tra
+  Integer :: err_act
+  character(len=20)  :: name='d_csnmi'
+  logical, parameter :: debug=.false.
+
+
+  res = dzero 
+ 
+  do i = 1, a%get_nrows()
+    acc = dzero
+    do j=a%irp(i),a%irp(i+1)-1  
+      acc = acc + abs(a%val(j))
+    end do
+    res = max(res,acc)
+  end do
+
+end function d_csr_csnmi_impl
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+  !
+  !
+  !
+  ! Data management
+  !
+  !
+  !
+  !
+  !
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!  
 
 
 

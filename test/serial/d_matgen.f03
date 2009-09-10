@@ -161,7 +161,7 @@ contains
     type(psbn_d_cxx_sparse_mat) :: acxx
     ! deltah dimension of each grid cell
     ! deltat discretization time
-    real(psb_dpk_)         :: deltah
+    real(psb_dpk_)         :: deltah, anorm
     real(psb_dpk_),parameter   :: rhs=0.d0,one=1.d0,zero=0.d0
     real(psb_dpk_)   :: t0, t1, t2, t3, tasb, talc, ttot, tgen, tcpy, tmov
     real(psb_dpk_)   :: a1, a2, a3, a4, b1, b2, b3 
@@ -172,7 +172,7 @@ contains
 
     info = 0
     name = 'create_matrix'
-    call psb_erractionsave(err_act)
+!!$    call psb_erractionsave(err_act)
 
     call psb_info(ictxt, iam, np)
 
@@ -380,6 +380,8 @@ contains
     end if
     tasb = psb_wtime()-t1
     call a_n%print(20)
+    anorm = a_n%csnmi()
+    write(0,*) 'Nrm infinity ',anorm
 !!$
     t1 = psb_wtime()
     call a_n%cscnv(info,mold=acxx)
@@ -392,6 +394,8 @@ contains
     end if
     tmov = psb_wtime()-t1
     call a_n%print(21)
+    anorm = a_n%csnmi()
+    write(0,*) 'Nrm infinity ',anorm
 !!$
 
     if(iam == psb_root_) then
@@ -404,7 +408,7 @@ contains
 !!$      write(*,'("-total       time : ",es12.5)') ttot
 
     end if
-    call psb_erractionrestore(err_act)
+!!$    call psb_erractionrestore(err_act)
     return
 
 9999 continue

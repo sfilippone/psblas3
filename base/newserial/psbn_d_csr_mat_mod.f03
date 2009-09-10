@@ -8,29 +8,30 @@ module psbn_d_csr_mat_mod
     real(psb_dpk_), allocatable :: val(:)
 
   contains
-    procedure, pass(a)  :: get_nzeros => d_csr_get_nzeros
-    procedure, pass(a)  :: d_base_csmm => d_csr_csmm
-    procedure, pass(a)  :: d_base_csmv => d_csr_csmv
-    procedure, pass(a)  :: d_base_cssm => d_csr_cssm
-    procedure, pass(a)  :: d_base_cssv => d_csr_cssv
-    procedure, pass(a)  :: reallocate_nz => d_csr_reallocate_nz
-    procedure, pass(a)  :: csput => d_csr_csput
-    procedure, pass(a)  :: allocate_mnnz => d_csr_allocate_mnnz
-    procedure, pass(a)  :: cp_to_coo => d_cp_csr_to_coo
-    procedure, pass(a)  :: cp_from_coo => d_cp_csr_from_coo
-    procedure, pass(a)  :: cp_to_fmt => d_cp_csr_to_fmt
-    procedure, pass(a)  :: cp_from_fmt => d_cp_csr_from_fmt
-    procedure, pass(a)  :: mv_to_coo => d_mv_csr_to_coo
-    procedure, pass(a)  :: mv_from_coo => d_mv_csr_from_coo
-    procedure, pass(a)  :: mv_to_fmt => d_mv_csr_to_fmt
-    procedure, pass(a)  :: mv_from_fmt => d_mv_csr_from_fmt
-    procedure, pass(a)  :: free => d_csr_free
-    procedure, pass(a)  :: print => d_csr_print
-    procedure, pass(a)  :: get_fmt  => d_csr_get_fmt
+    procedure, pass(a) :: get_nzeros => d_csr_get_nzeros
+    procedure, pass(a) :: get_fmt  => d_csr_get_fmt
+    procedure, pass(a) :: d_base_csmm => d_csr_csmm
+    procedure, pass(a) :: d_base_csmv => d_csr_csmv
+    procedure, pass(a) :: d_base_cssm => d_csr_cssm
+    procedure, pass(a) :: d_base_cssv => d_csr_cssv
+    procedure, pass(a) :: csnmi => d_csr_csnmi
+    procedure, pass(a) :: reallocate_nz => d_csr_reallocate_nz
+    procedure, pass(a) :: csput => d_csr_csput
+    procedure, pass(a) :: allocate_mnnz => d_csr_allocate_mnnz
+    procedure, pass(a) :: cp_to_coo => d_cp_csr_to_coo
+    procedure, pass(a) :: cp_from_coo => d_cp_csr_from_coo
+    procedure, pass(a) :: cp_to_fmt => d_cp_csr_to_fmt
+    procedure, pass(a) :: cp_from_fmt => d_cp_csr_from_fmt
+    procedure, pass(a) :: mv_to_coo => d_mv_csr_to_coo
+    procedure, pass(a) :: mv_from_coo => d_mv_csr_from_coo
+    procedure, pass(a) :: mv_to_fmt => d_mv_csr_to_fmt
+    procedure, pass(a) :: mv_from_fmt => d_mv_csr_from_fmt
+    procedure, pass(a) :: free => d_csr_free
+    procedure, pass(a) :: print => d_csr_print
   end type psbn_d_csr_sparse_mat
   private :: d_csr_get_nzeros, d_csr_csmm, d_csr_csmv, d_csr_cssm, d_csr_cssv, &
        & d_csr_csput, d_csr_reallocate_nz, d_csr_allocate_mnnz, &
-       & d_csr_free,  d_csr_print, d_csr_get_fmt, &
+       & d_csr_free,  d_csr_print, d_csr_get_fmt, d_csr_csnmi, &
        & d_cp_csr_to_coo, d_cp_csr_from_coo, &
        & d_mv_csr_to_coo, d_mv_csr_from_coo, &
        & d_cp_csr_to_fmt, d_cp_csr_from_fmt, &
@@ -181,9 +182,30 @@ module psbn_d_csr_mat_mod
     end subroutine d_csr_csmm_impl
   end interface
 
+  interface d_csr_csnmi_impl
+    function d_csr_csnmi_impl(a) result(res)
+      use psb_const_mod
+      import psbn_d_csr_sparse_mat
+      class(psbn_d_csr_sparse_mat), intent(in) :: a
+      real(psb_dpk_)         :: res
+    end function d_csr_csnmi_impl
+  end interface
+  
 
 
 contains 
+
+  !=====================================
+  !
+  !
+  !
+  ! Getters 
+  !
+  !
+  !
+  !
+  !
+  !=====================================
 
   function d_csr_get_fmt(a) result(res)
     implicit none 
@@ -192,6 +214,26 @@ contains
     res = 'CSR'
   end function d_csr_get_fmt
   
+  function d_csr_get_nzeros(a) result(res)
+    implicit none 
+    class(psbn_d_csr_sparse_mat), intent(in) :: a
+    integer :: res
+    res = a%irp(a%m+1)-1
+  end function d_csr_get_nzeros
+
+
+!=====================================
+  !
+  !
+  !
+  ! Data management
+  !
+  !
+  !
+  !
+  !
+!=====================================  
+
 
   subroutine  d_csr_reallocate_nz(nz,a) 
     use psb_error_mod
@@ -226,14 +268,6 @@ contains
     return
 
   end subroutine d_csr_reallocate_nz
-
-  function d_csr_get_nzeros(a) result(res)
-    implicit none 
-    class(psbn_d_csr_sparse_mat), intent(in) :: a
-    integer :: res
-    res = a%irp(a%m+1)-1
-  end function d_csr_get_nzeros
-  
 
   subroutine d_csr_csput(nz,val,ia,ja,a,imin,imax,jmin,jmax,info,gtl) 
     use psb_const_mod
@@ -297,195 +331,6 @@ contains
     end if
     return
   end subroutine d_csr_csput
-
-
-  subroutine d_csr_csmv(alpha,a,x,beta,y,info,trans) 
-    use psb_error_mod
-    implicit none 
-    class(psbn_d_csr_sparse_mat), intent(in) :: a
-    real(psb_dpk_), intent(in)          :: alpha, beta, x(:)
-    real(psb_dpk_), intent(inout)       :: y(:)
-    integer, intent(out)                :: info
-    character, optional, intent(in)     :: trans
-    
-    character :: trans_
-    integer   :: i,j,k,m,n, nnz, ir, jc
-    real(psb_dpk_) :: acc
-    logical   :: tra
-    Integer :: err_act
-    character(len=20)  :: name='d_csr_csmv'
-    logical, parameter :: debug=.false.
-
-    call psb_erractionsave(err_act)
-
-    if (.not.a%is_asb()) then 
-      info = 1121
-      call psb_errpush(info,name)
-      goto 9999
-    endif
-
-
-    call d_csr_csmm_impl(alpha,a,x,beta,y,info,trans) 
-    
-    if (info /= 0) goto 9999
-
-    call psb_erractionrestore(err_act)
-    return
-
-9999 continue
-    call psb_erractionrestore(err_act)
-
-    if (err_act == psb_act_abort_) then
-      call psb_error()
-      return
-    end if
-    return
-
-  end subroutine d_csr_csmv
-
-  subroutine d_csr_csmm(alpha,a,x,beta,y,info,trans) 
-    use psb_error_mod
-    implicit none 
-    class(psbn_d_csr_sparse_mat), intent(in) :: a
-    real(psb_dpk_), intent(in)          :: alpha, beta, x(:,:)
-    real(psb_dpk_), intent(inout)       :: y(:,:)
-    integer, intent(out)                :: info
-    character, optional, intent(in)     :: trans
-    
-    character :: trans_
-    integer   :: i,j,k,m,n, nnz, ir, jc, nc
-    real(psb_dpk_), allocatable  :: acc(:)
-    logical   :: tra
-    Integer :: err_act
-    character(len=20)  :: name='d_csr_csmm'
-    logical, parameter :: debug=.false.
-
-    call psb_erractionsave(err_act)
-
-
-
-    call d_csr_csmm_impl(alpha,a,x,beta,y,info,trans) 
-    
-    if (info /= 0) goto 9999
-
-    call psb_erractionrestore(err_act)
-    return
-
-9999 continue
-    call psb_erractionrestore(err_act)
-
-    if (err_act == psb_act_abort_) then
-      call psb_error()
-      return
-    end if
-    return
-
-  end subroutine d_csr_csmm
-
-
-  subroutine d_csr_cssv(alpha,a,x,beta,y,info,trans) 
-    use psb_error_mod
-    implicit none 
-    class(psbn_d_csr_sparse_mat), intent(in) :: a
-    real(psb_dpk_), intent(in)          :: alpha, beta, x(:)
-    real(psb_dpk_), intent(inout)       :: y(:)
-    integer, intent(out)                :: info
-    character, optional, intent(in)     :: trans
-    
-    character :: trans_
-    integer   :: i,j,k,m,n, nnz, ir, jc
-    real(psb_dpk_) :: acc
-    real(psb_dpk_), allocatable :: tmp(:)
-    logical   :: tra
-    Integer :: err_act
-    character(len=20)  :: name='d_csr_cssv'
-    logical, parameter :: debug=.false.
-
-    call psb_erractionsave(err_act)
-
-    if (.not.a%is_asb()) then 
-      info = 1121
-      call psb_errpush(info,name)
-      goto 9999
-    endif
-
-    
-    if (.not. (a%is_triangle())) then 
-      write(0,*) 'Called SM on a non-triangular mat!'
-      info = 1121
-      call psb_errpush(info,name)
-      goto 9999
-    end if
-    
-    call d_csr_cssm_impl(alpha,a,x,beta,y,info,trans) 
-
-    call psb_erractionrestore(err_act)
-    return
-
-
-9999 continue
-    call psb_erractionrestore(err_act)
-
-    if (err_act == psb_act_abort_) then
-      call psb_error()
-      return
-    end if
-    return
-
-
-  end subroutine d_csr_cssv
-
-
-
-  subroutine d_csr_cssm(alpha,a,x,beta,y,info,trans) 
-    use psb_error_mod
-    implicit none 
-    class(psbn_d_csr_sparse_mat), intent(in) :: a
-    real(psb_dpk_), intent(in)          :: alpha, beta, x(:,:)
-    real(psb_dpk_), intent(inout)       :: y(:,:)
-    integer, intent(out)                :: info
-    character, optional, intent(in)     :: trans
-    
-    character :: trans_
-    integer   :: i,j,k,m,n, nnz, ir, jc, nc
-    real(psb_dpk_) :: acc
-    real(psb_dpk_), allocatable :: tmp(:,:)
-    logical   :: tra
-    Integer :: err_act
-    character(len=20)  :: name='d_csr_csmm'
-    logical, parameter :: debug=.false.
-
-    call psb_erractionsave(err_act)
-
-    if (.not.a%is_asb()) then 
-      info = 1121
-      call psb_errpush(info,name)
-      goto 9999
-    endif
-
-    
-    if (.not. (a%is_triangle())) then 
-      write(0,*) 'Called SM on a non-triangular mat!'
-      info = 1121
-      call psb_errpush(info,name)
-      goto 9999
-    end if
-    
-    call d_csr_cssm_impl(alpha,a,x,beta,y,info,trans) 
-    call psb_erractionrestore(err_act)
-    return
-
-
-9999 continue
-    call psb_erractionrestore(err_act)
-
-    if (err_act == psb_act_abort_) then
-      call psb_error()
-      return
-    end if
-    return
-
-  end subroutine d_csr_cssm
 
 
   subroutine  d_csr_free(a) 
@@ -905,6 +750,228 @@ contains
     endif
 
   end subroutine d_csr_print
+
+
+  !=====================================
+  !
+  !
+  !
+  ! Computational routines
+  !
+  !
+  !
+  !
+  !
+  !
+  !=====================================
+
+
+  subroutine d_csr_csmv(alpha,a,x,beta,y,info,trans) 
+    use psb_error_mod
+    implicit none 
+    class(psbn_d_csr_sparse_mat), intent(in) :: a
+    real(psb_dpk_), intent(in)          :: alpha, beta, x(:)
+    real(psb_dpk_), intent(inout)       :: y(:)
+    integer, intent(out)                :: info
+    character, optional, intent(in)     :: trans
+    
+    character :: trans_
+    integer   :: i,j,k,m,n, nnz, ir, jc
+    real(psb_dpk_) :: acc
+    logical   :: tra
+    Integer :: err_act
+    character(len=20)  :: name='d_csr_csmv'
+    logical, parameter :: debug=.false.
+
+    call psb_erractionsave(err_act)
+
+    if (.not.a%is_asb()) then 
+      info = 1121
+      call psb_errpush(info,name)
+      goto 9999
+    endif
+
+
+    call d_csr_csmm_impl(alpha,a,x,beta,y,info,trans) 
+    
+    if (info /= 0) goto 9999
+
+    call psb_erractionrestore(err_act)
+    return
+
+9999 continue
+    call psb_erractionrestore(err_act)
+
+    if (err_act == psb_act_abort_) then
+      call psb_error()
+      return
+    end if
+    return
+
+  end subroutine d_csr_csmv
+
+  subroutine d_csr_csmm(alpha,a,x,beta,y,info,trans) 
+    use psb_error_mod
+    implicit none 
+    class(psbn_d_csr_sparse_mat), intent(in) :: a
+    real(psb_dpk_), intent(in)          :: alpha, beta, x(:,:)
+    real(psb_dpk_), intent(inout)       :: y(:,:)
+    integer, intent(out)                :: info
+    character, optional, intent(in)     :: trans
+    
+    character :: trans_
+    integer   :: i,j,k,m,n, nnz, ir, jc, nc
+    real(psb_dpk_), allocatable  :: acc(:)
+    logical   :: tra
+    Integer :: err_act
+    character(len=20)  :: name='d_csr_csmm'
+    logical, parameter :: debug=.false.
+
+    call psb_erractionsave(err_act)
+
+
+
+    call d_csr_csmm_impl(alpha,a,x,beta,y,info,trans) 
+    
+    if (info /= 0) goto 9999
+
+    call psb_erractionrestore(err_act)
+    return
+
+9999 continue
+    call psb_erractionrestore(err_act)
+
+    if (err_act == psb_act_abort_) then
+      call psb_error()
+      return
+    end if
+    return
+
+  end subroutine d_csr_csmm
+
+
+  subroutine d_csr_cssv(alpha,a,x,beta,y,info,trans) 
+    use psb_error_mod
+    implicit none 
+    class(psbn_d_csr_sparse_mat), intent(in) :: a
+    real(psb_dpk_), intent(in)          :: alpha, beta, x(:)
+    real(psb_dpk_), intent(inout)       :: y(:)
+    integer, intent(out)                :: info
+    character, optional, intent(in)     :: trans
+    
+    character :: trans_
+    integer   :: i,j,k,m,n, nnz, ir, jc
+    real(psb_dpk_) :: acc
+    real(psb_dpk_), allocatable :: tmp(:)
+    logical   :: tra
+    Integer :: err_act
+    character(len=20)  :: name='d_csr_cssv'
+    logical, parameter :: debug=.false.
+
+    call psb_erractionsave(err_act)
+
+    if (.not.a%is_asb()) then 
+      info = 1121
+      call psb_errpush(info,name)
+      goto 9999
+    endif
+
+    
+    if (.not. (a%is_triangle())) then 
+      write(0,*) 'Called SM on a non-triangular mat!'
+      info = 1121
+      call psb_errpush(info,name)
+      goto 9999
+    end if
+    
+    call d_csr_cssm_impl(alpha,a,x,beta,y,info,trans) 
+
+    call psb_erractionrestore(err_act)
+    return
+
+
+9999 continue
+    call psb_erractionrestore(err_act)
+
+    if (err_act == psb_act_abort_) then
+      call psb_error()
+      return
+    end if
+    return
+
+
+  end subroutine d_csr_cssv
+
+
+
+  subroutine d_csr_cssm(alpha,a,x,beta,y,info,trans) 
+    use psb_error_mod
+    implicit none 
+    class(psbn_d_csr_sparse_mat), intent(in) :: a
+    real(psb_dpk_), intent(in)          :: alpha, beta, x(:,:)
+    real(psb_dpk_), intent(inout)       :: y(:,:)
+    integer, intent(out)                :: info
+    character, optional, intent(in)     :: trans
+    
+    character :: trans_
+    integer   :: i,j,k,m,n, nnz, ir, jc, nc
+    real(psb_dpk_) :: acc
+    real(psb_dpk_), allocatable :: tmp(:,:)
+    logical   :: tra
+    Integer :: err_act
+    character(len=20)  :: name='d_csr_csmm'
+    logical, parameter :: debug=.false.
+
+    call psb_erractionsave(err_act)
+
+    if (.not.a%is_asb()) then 
+      info = 1121
+      call psb_errpush(info,name)
+      goto 9999
+    endif
+
+    
+    if (.not. (a%is_triangle())) then 
+      write(0,*) 'Called SM on a non-triangular mat!'
+      info = 1121
+      call psb_errpush(info,name)
+      goto 9999
+    end if
+    
+    call d_csr_cssm_impl(alpha,a,x,beta,y,info,trans) 
+    call psb_erractionrestore(err_act)
+    return
+
+
+9999 continue
+    call psb_erractionrestore(err_act)
+
+    if (err_act == psb_act_abort_) then
+      call psb_error()
+      return
+    end if
+    return
+
+  end subroutine d_csr_cssm
+ 
+  function d_csr_csnmi(a) result(res)
+    use psb_error_mod
+    use psb_const_mod
+    implicit none 
+    class(psbn_d_csr_sparse_mat), intent(in) :: a
+    real(psb_dpk_)         :: res
+    
+    Integer :: err_act
+    character(len=20)  :: name='csnmi'
+    logical, parameter :: debug=.false.
+    
+    
+    res = d_csr_csnmi_impl(a)
+    
+    return
+
+  end function d_csr_csnmi
+
 
 
 end module psbn_d_csr_mat_mod

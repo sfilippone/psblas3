@@ -22,6 +22,7 @@ clean:
 	(cd tools; make clean)
 	(cd serial; make clean)
 	(cd psblas; make clean)
+	(cd newserial; make clean)
 
 veryclean: clean 
 	/bin/rm -f $(HERE)/$(LIBNAME) $(LIBMOD) *$(.mod)

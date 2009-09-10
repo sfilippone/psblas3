@@ -125,7 +125,7 @@ subroutine psbn_d_spcnv(a,b,info,type,mold,upd,dupl)
     call psb_errpush(info,name)
     goto 9999
   end if
-
+  
   call altmp%cp_from_fmt(a%a, info)
   
   if (info /= 0) then
@@ -208,15 +208,20 @@ subroutine psbn_d_spcnv_ip(a,info,type,mold,dupl)
   else
     allocate(psbn_d_csr_sparse_mat :: altmp, stat=info) 
   end if
+
   
   if (info /= 0) then 
     info = 4000
     call psb_errpush(info,name)
     goto 9999
   end if
-
-  call altmp%mv_from_fmt(a%a, info)
   
+  if (allocated(altmp)) then 
+    call altmp%mv_from_fmt(a%a, info)
+  else
+    write(0,*) 'Unallocated altmp??'
+    info = -1
+  end if
   if (info /= 0) then
     info = 4010
     call psb_errpush(info,name,a_err="mv_from")

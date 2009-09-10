@@ -2,7 +2,7 @@
 subroutine d_coo_cssm_impl(alpha,a,x,beta,y,info,trans) 
   use psb_error_mod
   use psbn_d_base_mat_mod, psb_protect_name => d_coo_cssm_impl
-    implicit none 
+  implicit none 
   class(psbn_d_coo_sparse_mat), intent(in) :: a
   real(psb_dpk_), intent(in)          :: alpha, beta, x(:,:)
   real(psb_dpk_), intent(inout)       :: y(:,:)
@@ -852,6 +852,54 @@ subroutine d_coo_csmm_impl(alpha,a,x,beta,y,info,trans)
 
 end subroutine d_coo_csmm_impl
 
+function d_coo_csnmi_impl(a) result(res)
+  use psb_error_mod
+  use psbn_d_base_mat_mod, psb_protect_name => d_coo_csnmi_impl
+  implicit none 
+  class(psbn_d_coo_sparse_mat), intent(in) :: a
+  real(psb_dpk_)         :: res
+
+  integer   :: i,j,k,m,n, nnz, ir, jc, nc
+  real(psb_dpk_) :: acc
+  real(psb_dpk_), allocatable :: tmp(:,:)
+  logical   :: tra
+  Integer :: err_act
+  character(len=20)  :: name='d_base_csnmi'
+  logical, parameter :: debug=.false.
+
+
+  res = dzero 
+  nnz = a%get_nzeros()
+  i   = 1
+  j   = i
+  do while (i<=nnz) 
+    do while ((a%ia(j) == a%ia(i)).and. (j <= nnz))
+      j = j+1
+    enddo
+    acc = dzero
+    do k=i, j-1
+      acc = acc + abs(a%val(k))
+    end do
+    res = max(res,acc)
+  end do
+
+end function d_coo_csnmi_impl
+
+
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+  !
+  !
+  !
+  ! Data management
+  !
+  !
+  !
+  !
+  !
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!  
+
+
 
 subroutine d_coo_csput_impl(nz,val,ia,ja,a,imin,imax,jmin,jmax,info,gtl) 
   use psb_error_mod
@@ -950,80 +998,6 @@ subroutine d_coo_csput_impl(nz,val,ia,ja,a,imin,imax,jmin,jmax,info,gtl)
 
 
 contains
-!!$
-!!$    subroutine psb_inner_upd(nz,ia,ja,val,nza,aspk,maxsz,&
-!!$         & imin,imax,jmin,jmax,info,gtl)
-!!$      implicit none 
-!!$
-!!$      integer, intent(in) :: nz, imin,imax,jmin,jmax,maxsz
-!!$      integer, intent(in) :: ia(:),ja(:)
-!!$      integer, intent(inout) :: nza
-!!$      real(psb_dpk_), intent(in) :: val(:)
-!!$      real(psb_dpk_), intent(inout) :: aspk(:)
-!!$      integer, intent(out) :: info
-!!$      integer, intent(in), optional  :: gtl(:)
-!!$      integer  :: i,ir,ic, ng,nzl
-!!$      character(len=20)    :: name, ch_err
-!!$
-!!$
-!!$      name='psb_inner_upd'
-!!$      nzl = 0
-!!$      if (present(gtl)) then 
-!!$        ng = size(gtl) 
-!!$        if ((nza > nzl)) then 
-!!$          do i=1, nz 
-!!$            nza = nza + 1 
-!!$            if (nza>maxsz) then 
-!!$              call psb_errpush(50,name,i_err=(/7,maxsz,5,0,nza /))
-!!$              info = -71
-!!$              return
-!!$            endif
-!!$            aspk(nza) = val(i)
-!!$          end do
-!!$        else
-!!$          do i=1, nz 
-!!$            ir = ia(i)
-!!$            ic = ja(i) 
-!!$            if ((ir >=1).and.(ir<=ng).and.(ic>=1).and.(ic<=ng)) then 
-!!$              ir = gtl(ir)
-!!$              ic = gtl(ic) 
-!!$              if ((ir >=imin).and.(ir<=imax).and.(ic>=jmin).and.(ic<=jmax)) then 
-!!$                nza = nza + 1 
-!!$                if (nza>maxsz) then 
-!!$                  info = -72
-!!$                  return
-!!$                endif
-!!$                aspk(nza) = val(i)
-!!$              end if
-!!$            end if
-!!$          end do
-!!$        end if
-!!$      else
-!!$        if ((nza >= nzl)) then 
-!!$          do i=1, nz 
-!!$            nza = nza + 1 
-!!$            if (nza>maxsz) then 
-!!$              info = -73
-!!$              return
-!!$            endif
-!!$            aspk(nza) = val(i)
-!!$          end do
-!!$        else
-!!$          do i=1, nz 
-!!$            ir = ia(i)
-!!$            ic = ja(i) 
-!!$            if ((ir >=imin).and.(ir<=imax).and.(ic>=jmin).and.(ic<=jmax)) then 
-!!$              nza = nza + 1 
-!!$              if (nza>maxsz) then 
-!!$                info = -74
-!!$                return
-!!$              endif
-!!$              aspk(nza) = val(i)
-!!$            end if
-!!$          end do
-!!$        end if
-!!$      end if
-!!$    end subroutine psb_inner_upd
 
   subroutine psb_inner_ins(nz,ia,ja,val,nza,ia1,ia2,aspk,maxsz,&
        & imin,imax,jmin,jmax,info,gtl)
@@ -1082,151 +1056,56 @@ contains
   end subroutine psb_inner_ins
 
 
-    subroutine d_coo_srch_upd(nz,ia,ja,val,a,&
-         & imin,imax,jmin,jmax,info,gtl)
-      
-      use psb_const_mod
-      use psb_realloc_mod
-      use psb_string_mod
-      use psb_serial_mod
-      implicit none 
-      
-      class(psbn_d_coo_sparse_mat), intent(inout) :: a
-      integer, intent(in) :: nz, imin,imax,jmin,jmax
-      integer, intent(in) :: ia(:),ja(:)
-      real(psb_dpk_), intent(in) :: val(:)
-      integer, intent(out) :: info
-      integer, intent(in), optional  :: gtl(:)
-      integer  :: i,ir,ic, ilr, ilc, ip, &
-           & i1,i2,nc,nnz,dupl,ng
-      integer              :: debug_level, debug_unit
-      character(len=20)    :: name='d_coo_srch_upd'
-      
-      info = 0
-      debug_unit  = psb_get_debug_unit()
-      debug_level = psb_get_debug_level()
+  subroutine d_coo_srch_upd(nz,ia,ja,val,a,&
+       & imin,imax,jmin,jmax,info,gtl)
 
-      dupl = a%get_dupl()
-      
-      if (.not.a%is_sorted()) then 
-        info = -4
-        return
-      end if
-      
-      ilr = -1 
-      ilc = -1 
-      nnz = a%get_nzeros()
-      
-      
-      if (present(gtl)) then
-        ng = size(gtl)
-        
-        select case(dupl)
-        case(psbn_dupl_ovwrt_,psbn_dupl_err_)
-          ! Overwrite.
-          ! Cannot test for error, should have been caught earlier.
-          do i=1, nz
-            ir = ia(i)
-            ic = ja(i) 
-            if ((ir >=1).and.(ir<=ng).and.(ic>=1).and.(ic<=ng)) then 
-              ir = gtl(ir)
-              if ((ir > 0).and.(ir <= a%m)) then 
-                ic = gtl(ic) 
-                if (ir /= ilr) then 
-                  i1 = psb_ibsrch(ir,nnz,a%ia)
-                  i2 = i1
-                  do 
-                    if (i2+1 > nnz) exit
-                    if (a%ia(i2+1) /= a%ia(i2)) exit
-                    i2 = i2 + 1
-                  end do
-                  do 
-                    if (i1-1 < 1) exit
-                    if (a%ia(i1-1) /= a%ia(i1)) exit
-                    i1 = i1 - 1
-                  end do
-                  ilr = ir
-                else
-                  i1 = 1
-                  i2 = 1
-                end if
-                nc = i2-i1+1
-                ip = psb_issrch(ic,nc,a%ja(i1:i2))
-                if (ip>0) then 
-                  a%val(i1+ip-1) = val(i)
-                else
-                  info = i 
-                  return
-                end if
-              else
-                if (debug_level >= psb_debug_serial_) &
-                     & write(debug_unit,*) trim(name),&
-                     & ': Discarding row that does not belong to us.'
-              endif
-            end if
-          end do
-        case(psbn_dupl_add_)
-          ! Add
-          do i=1, nz
-            ir = ia(i)
-            ic = ja(i) 
-            if ((ir >=1).and.(ir<=ng).and.(ic>=1).and.(ic<=ng)) then 
-              ir = gtl(ir)
-              ic = gtl(ic) 
-              if ((ir > 0).and.(ir <= a%m)) then 
-                
-                if (ir /= ilr) then 
-                  i1 = psb_ibsrch(ir,nnz,a%ia)
-                  i2 = i1
-                  do 
-                    if (i2+1 > nnz) exit
-                    if (a%ia(i2+1) /= a%ia(i2)) exit
-                    i2 = i2 + 1
-                  end do
-                  do 
-                    if (i1-1 < 1) exit
-                    if (a%ia(i1-1) /= a%ia(i1)) exit
-                    i1 = i1 - 1
-                  end do
-                  ilr = ir
-                else
-                  i1 = 1
-                  i2 = 1
-                end if
-                nc = i2-i1+1
-                ip = psb_issrch(ic,nc,a%ja(i1:i2))
-                if (ip>0) then 
-                  a%val(i1+ip-1) = a%val(i1+ip-1) + val(i)
-                else
-                  info = i 
-                  return
-                end if
-              else
-                if (debug_level >= psb_debug_serial_) &
-                     & write(debug_unit,*) trim(name),&
-                     & ': Discarding row that does not belong to us.'              
-              end if
-            end if
-          end do
-          
-        case default
-          info = -3
-          if (debug_level >= psb_debug_serial_) &
-               & write(debug_unit,*) trim(name),&
-               & ': Duplicate handling: ',dupl
-        end select
-        
-      else
-        
-        select case(dupl)
-        case(psbn_dupl_ovwrt_,psbn_dupl_err_)
-          ! Overwrite.
-          ! Cannot test for error, should have been caught earlier.
-          do i=1, nz
-            ir = ia(i)
-            ic = ja(i) 
+    use psb_const_mod
+    use psb_realloc_mod
+    use psb_string_mod
+    use psb_serial_mod
+    implicit none 
+
+    class(psbn_d_coo_sparse_mat), intent(inout) :: a
+    integer, intent(in) :: nz, imin,imax,jmin,jmax
+    integer, intent(in) :: ia(:),ja(:)
+    real(psb_dpk_), intent(in) :: val(:)
+    integer, intent(out) :: info
+    integer, intent(in), optional  :: gtl(:)
+    integer  :: i,ir,ic, ilr, ilc, ip, &
+         & i1,i2,nc,nnz,dupl,ng
+    integer              :: debug_level, debug_unit
+    character(len=20)    :: name='d_coo_srch_upd'
+
+    info = 0
+    debug_unit  = psb_get_debug_unit()
+    debug_level = psb_get_debug_level()
+
+    dupl = a%get_dupl()
+
+    if (.not.a%is_sorted()) then 
+      info = -4
+      return
+    end if
+
+    ilr = -1 
+    ilc = -1 
+    nnz = a%get_nzeros()
+
+
+    if (present(gtl)) then
+      ng = size(gtl)
+
+      select case(dupl)
+      case(psbn_dupl_ovwrt_,psbn_dupl_err_)
+        ! Overwrite.
+        ! Cannot test for error, should have been caught earlier.
+        do i=1, nz
+          ir = ia(i)
+          ic = ja(i) 
+          if ((ir >=1).and.(ir<=ng).and.(ic>=1).and.(ic<=ng)) then 
+            ir = gtl(ir)
             if ((ir > 0).and.(ir <= a%m)) then 
-
+              ic = gtl(ic) 
               if (ir /= ilr) then 
                 i1 = psb_ibsrch(ir,nnz,a%ia)
                 i2 = i1
@@ -1253,14 +1132,21 @@ contains
                 info = i 
                 return
               end if
-            end if
-          end do
-
-        case(psbn_dupl_add_)
-          ! Add
-          do i=1, nz
-            ir = ia(i)
-            ic = ja(i) 
+            else
+              if (debug_level >= psb_debug_serial_) &
+                   & write(debug_unit,*) trim(name),&
+                   & ': Discarding row that does not belong to us.'
+            endif
+          end if
+        end do
+      case(psbn_dupl_add_)
+        ! Add
+        do i=1, nz
+          ir = ia(i)
+          ic = ja(i) 
+          if ((ir >=1).and.(ir<=ng).and.(ic>=1).and.(ic<=ng)) then 
+            ir = gtl(ir)
+            ic = gtl(ic) 
             if ((ir > 0).and.(ir <= a%m)) then 
 
               if (ir /= ilr) then 
@@ -1289,19 +1175,107 @@ contains
                 info = i 
                 return
               end if
+            else
+              if (debug_level >= psb_debug_serial_) &
+                   & write(debug_unit,*) trim(name),&
+                   & ': Discarding row that does not belong to us.'              
             end if
-          end do
+          end if
+        end do
 
-        case default
-          info = -3
-          if (debug_level >= psb_debug_serial_) &
-               & write(debug_unit,*) trim(name),&
-               & ': Duplicate handling: ',dupl
-        end select
+      case default
+        info = -3
+        if (debug_level >= psb_debug_serial_) &
+             & write(debug_unit,*) trim(name),&
+             & ': Duplicate handling: ',dupl
+      end select
 
-      end if
+    else
 
-    end subroutine d_coo_srch_upd
+      select case(dupl)
+      case(psbn_dupl_ovwrt_,psbn_dupl_err_)
+        ! Overwrite.
+        ! Cannot test for error, should have been caught earlier.
+        do i=1, nz
+          ir = ia(i)
+          ic = ja(i) 
+          if ((ir > 0).and.(ir <= a%m)) then 
+
+            if (ir /= ilr) then 
+              i1 = psb_ibsrch(ir,nnz,a%ia)
+              i2 = i1
+              do 
+                if (i2+1 > nnz) exit
+                if (a%ia(i2+1) /= a%ia(i2)) exit
+                i2 = i2 + 1
+              end do
+              do 
+                if (i1-1 < 1) exit
+                if (a%ia(i1-1) /= a%ia(i1)) exit
+                i1 = i1 - 1
+              end do
+              ilr = ir
+            else
+              i1 = 1
+              i2 = 1
+            end if
+            nc = i2-i1+1
+            ip = psb_issrch(ic,nc,a%ja(i1:i2))
+            if (ip>0) then 
+              a%val(i1+ip-1) = val(i)
+            else
+              info = i 
+              return
+            end if
+          end if
+        end do
+
+      case(psbn_dupl_add_)
+        ! Add
+        do i=1, nz
+          ir = ia(i)
+          ic = ja(i) 
+          if ((ir > 0).and.(ir <= a%m)) then 
+
+            if (ir /= ilr) then 
+              i1 = psb_ibsrch(ir,nnz,a%ia)
+              i2 = i1
+              do 
+                if (i2+1 > nnz) exit
+                if (a%ia(i2+1) /= a%ia(i2)) exit
+                i2 = i2 + 1
+              end do
+              do 
+                if (i1-1 < 1) exit
+                if (a%ia(i1-1) /= a%ia(i1)) exit
+                i1 = i1 - 1
+              end do
+              ilr = ir
+            else
+              i1 = 1
+              i2 = 1
+            end if
+            nc = i2-i1+1
+            ip = psb_issrch(ic,nc,a%ja(i1:i2))
+            if (ip>0) then 
+              a%val(i1+ip-1) = a%val(i1+ip-1) + val(i)
+            else
+              info = i 
+              return
+            end if
+          end if
+        end do
+
+      case default
+        info = -3
+        if (debug_level >= psb_debug_serial_) &
+             & write(debug_unit,*) trim(name),&
+             & ': Duplicate handling: ',dupl
+      end select
+
+    end if
+
+  end subroutine d_coo_srch_upd
 
 end subroutine d_coo_csput_impl
 
@@ -1518,7 +1492,7 @@ subroutine d_fix_coo_impl(a,info,idir)
   if (nza < 2) return
 
   dupl_ = a%get_dupl()
-!!$
+
   call d_fix_coo_inner(nza,dupl_,a%ia,a%ja,a%val,i,info,idir_)
 
   call a%set_sorted()
@@ -1526,188 +1500,6 @@ subroutine d_fix_coo_impl(a,info,idir)
   call a%set_asb()
   
 
-!!$  allocate(iaux(nza+2),stat=info) 
-!!$  if (info /= 0) return
-!!$
-!!$
-!!$  select case(idir_) 
-!!$
-!!$  case(0) !  Row major order
-!!$
-!!$    call msort_up(nza,a%ia(1),iaux(1),iret)
-!!$    if (iret == 0) &
-!!$         & call psb_ip_reord(nza,a%val,a%ia,a%ja,iaux)
-!!$    i    = 1
-!!$    j    = i
-!!$    do while (i <= nza)
-!!$      do while ((a%ia(j) == a%ia(i)))
-!!$        j = j+1
-!!$        if (j > nza) exit
-!!$      enddo
-!!$      nzl = j - i
-!!$      call msort_up(nzl,a%ja(i),iaux(1),iret)
-!!$      if (iret == 0) &
-!!$           & call psb_ip_reord(nzl,a%val(i:i+nzl-1),&
-!!$           & a%ia(i:i+nzl-1),a%ja(i:i+nzl-1),iaux)
-!!$      i = j
-!!$    enddo
-!!$
-!!$    i = 1
-!!$    irw = a%ia(i)
-!!$    icl = a%ja(i)
-!!$    j = 1
-!!$
-!!$    select case(dupl_)
-!!$    case(psbn_dupl_ovwrt_)
-!!$
-!!$      do 
-!!$        j = j + 1
-!!$        if (j > nza) exit
-!!$        if ((a%ia(j) == irw).and.(a%ja(j) == icl)) then 
-!!$          a%val(i) = a%val(j)
-!!$        else
-!!$          i = i+1
-!!$          a%val(i) = a%val(j)
-!!$          a%ia(i) = a%ia(j)
-!!$          a%ja(i) = a%ja(j)
-!!$          irw = a%ia(i) 
-!!$          icl = a%ja(i) 
-!!$        endif
-!!$      enddo
-!!$
-!!$    case(psbn_dupl_add_)
-!!$
-!!$      do 
-!!$        j = j + 1
-!!$        if (j > nza) exit
-!!$        if ((a%ia(j) == irw).and.(a%ja(j) == icl)) then 
-!!$          a%val(i) = a%val(i) + a%val(j)
-!!$        else
-!!$          i = i+1
-!!$          a%val(i) = a%val(j)
-!!$          a%ia(i) = a%ia(j)
-!!$          a%ja(i) = a%ja(j)
-!!$          irw = a%ia(i) 
-!!$          icl = a%ja(i) 
-!!$        endif
-!!$      enddo
-!!$
-!!$    case(psbn_dupl_err_)
-!!$      do 
-!!$        j = j + 1
-!!$        if (j > nza) exit
-!!$        if ((a%ia(j) == irw).and.(a%ja(j) == icl)) then 
-!!$          call psb_errpush(130,name)          
-!!$          goto 9999
-!!$        else
-!!$          i = i+1
-!!$          a%val(i) = a%val(j)
-!!$          a%ia(i) = a%ia(j)
-!!$          a%ja(i) = a%ja(j)
-!!$          irw = a%ia(i) 
-!!$          icl = a%ja(i) 
-!!$        endif
-!!$      enddo
-!!$    case default
-!!$      write(0,*) 'Error in fix_coo: unsafe dupl',dupl_
-!!$
-!!$    end select
-!!$
-!!$
-!!$    if(debug_level >= psb_debug_serial_)&
-!!$         & write(debug_unit,*)  trim(name),': end second loop'
-!!$
-!!$  case(1) !  Col major order
-!!$
-!!$    call msort_up(nza,a%ja(1),iaux(1),iret)
-!!$    if (iret == 0) &
-!!$         & call psb_ip_reord(nza,a%val,a%ia,a%ja,iaux)
-!!$    i    = 1
-!!$    j    = i
-!!$    do while (i <= nza)
-!!$      do while ((a%ja(j) == a%ja(i)))
-!!$        j = j+1
-!!$        if (j > nza) exit
-!!$      enddo
-!!$      nzl = j - i
-!!$      call msort_up(nzl,a%ia(i),iaux(1),iret)
-!!$      if (iret == 0) &
-!!$           & call psb_ip_reord(nzl,a%val(i:i+nzl-1),&
-!!$           & a%ia(i:i+nzl-1),a%ja(i:i+nzl-1),iaux)
-!!$      i = j
-!!$    enddo
-!!$
-!!$    i = 1
-!!$    irw = a%ia(i)
-!!$    icl = a%ja(i)
-!!$    j = 1
-!!$
-!!$
-!!$    select case(dupl_)
-!!$    case(psbn_dupl_ovwrt_)
-!!$      do 
-!!$        j = j + 1
-!!$        if (j > nza) exit
-!!$        if ((a%ia(j) == irw).and.(a%ja(j) == icl)) then 
-!!$          a%val(i) = a%val(j)
-!!$        else
-!!$          i = i+1
-!!$          a%val(i) = a%val(j)
-!!$          a%ia(i) = a%ia(j)
-!!$          a%ja(i) = a%ja(j)
-!!$          irw = a%ia(i) 
-!!$          icl = a%ja(i) 
-!!$        endif
-!!$      enddo
-!!$
-!!$    case(psbn_dupl_add_)
-!!$      do 
-!!$        j = j + 1
-!!$        if (j > nza) exit
-!!$        if ((a%ia(j) == irw).and.(a%ja(j) == icl)) then 
-!!$          a%val(i) = a%val(i) + a%val(j)
-!!$        else
-!!$          i = i+1
-!!$          a%val(i) = a%val(j)
-!!$          a%ia(i) = a%ia(j)
-!!$          a%ja(i) = a%ja(j)
-!!$          irw = a%ia(i) 
-!!$          icl = a%ja(i) 
-!!$        endif
-!!$      enddo
-!!$
-!!$    case(psbn_dupl_err_)
-!!$      do 
-!!$        j = j + 1
-!!$        if (j > nza) exit
-!!$        if ((a%ia(j) == irw).and.(a%ja(j) == icl)) then 
-!!$          call psb_errpush(130,name)
-!!$          goto 9999
-!!$        else
-!!$          i = i+1
-!!$          a%val(i) = a%val(j)
-!!$          a%ia(i) = a%ia(j)
-!!$          a%ja(i) = a%ja(j)
-!!$          irw = a%ia(i) 
-!!$          icl = a%ja(i) 
-!!$        endif
-!!$      enddo
-!!$    case default
-!!$      write(0,*) 'Error in fix_coo: unsafe dupl',dupl_
-!!$    end select
-!!$    if (debug_level >= psb_debug_serial_)&
-!!$         & write(debug_unit,*)  trim(name),': end second loop'
-!!$  case default
-!!$    write(debug_unit,*) trim(name),': unknown direction ',idir_
-!!$  end select
-!!$  
-!!$
-!!$  call a%set_sorted()
-!!$  call a%set_nzeros(i)
-!!$  call a%set_asb()
-!!$  
-!!$  deallocate(iaux)
-!!$
   call psb_erractionrestore(err_act)
   return
 
@@ -1718,8 +1510,6 @@ subroutine d_fix_coo_impl(a,info,idir)
     return
   end if
   return
-
-
 
 end subroutine d_fix_coo_impl
 

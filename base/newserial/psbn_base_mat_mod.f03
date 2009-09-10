@@ -30,6 +30,35 @@ module psbn_base_mat_mod
     integer, private     :: state, duplicate 
     logical, private     :: triangle, unitd, upper, sorted
   contains 
+
+    ! ====================================
+    !
+    ! Getters 
+    !
+    !
+    ! ====================================
+    procedure, pass(a) :: get_nrows
+    procedure, pass(a) :: get_ncols
+    procedure, pass(a) :: get_nzeros
+    procedure, pass(a) :: get_size
+    procedure, pass(a) :: get_state
+    procedure, pass(a) :: get_dupl
+    procedure, pass(a) :: get_fmt
+    procedure, pass(a) :: is_null
+    procedure, pass(a) :: is_bld
+    procedure, pass(a) :: is_upd
+    procedure, pass(a) :: is_asb
+    procedure, pass(a) :: is_sorted
+    procedure, pass(a) :: is_upper
+    procedure, pass(a) :: is_lower
+    procedure, pass(a) :: is_triangle
+    procedure, pass(a) :: is_unit
+    
+    ! ====================================
+    !
+    ! Setters 
+    !
+    ! ====================================
     procedure, pass(a) :: set_nrows
     procedure, pass(a) :: set_ncols
     procedure, pass(a) :: set_dupl
@@ -45,31 +74,18 @@ module psbn_base_mat_mod
     procedure, pass(a) :: set_unit
 
 
-    procedure, pass(a) :: get_nrows
-    procedure, pass(a) :: get_ncols
-    procedure, pass(a) :: get_nzeros
-    procedure, pass(a) :: get_size
-    procedure, pass(a) :: get_state
-    procedure, pass(a) :: get_dupl
-    procedure, pass(a) :: get_fmt
 
-
-    procedure, pass(a) :: is_null
-    procedure, pass(a) :: is_bld
-    procedure, pass(a) :: is_upd
-    procedure, pass(a) :: is_asb
-    procedure, pass(a) :: is_sorted
-    procedure, pass(a) :: is_upper
-    procedure, pass(a) :: is_lower
-    procedure, pass(a) :: is_triangle
-    procedure, pass(a) :: is_unit
+    ! ====================================
+    !
+    ! Data management
+    !
+    ! ====================================  
     procedure, pass(a) :: get_neigh
     procedure, pass(a) :: allocate_mnnz
     procedure, pass(a) :: reallocate_nz
     procedure, pass(a) :: free
     generic,   public  :: allocate => allocate_mnnz
     generic,   public  :: reallocate => reallocate_nz
-
     procedure, pass(a) :: print => sparse_print
             
   end type psbn_base_sparse_mat

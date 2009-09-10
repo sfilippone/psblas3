@@ -38,7 +38,8 @@ spde: spde.o
 
 
 clean: 
-	/bin/rm -f d_coo_matgen.o d_matgen.o tpg.o ppde.o spde.o  $(EXEDIR)/ppde 
+	/bin/rm -f d_coo_matgen.o d_matgen.o tpg.o ppde.o spde.o \
+	 psbn_d_cxx_mat_mod.o psbn_d_cxx_impl.o $(EXEDIR)/ppde 
 verycleanlib: 
 	(cd ../..; make veryclean)
 lib:

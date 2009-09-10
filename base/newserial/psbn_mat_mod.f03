@@ -54,6 +54,7 @@ module psbn_d_mat_mod
     procedure, pass(a) :: print => sparse_print
 
     ! Computational routines 
+    procedure, pass(a) :: csnmi
     procedure, pass(a) :: d_csmv
     procedure, pass(a) :: d_csmm
     generic, public    :: csmm => d_csmm, d_csmv
@@ -71,12 +72,12 @@ module psbn_d_mat_mod
        & reallocate_nz, free, d_csmv, d_csmm, d_cssv, d_cssm, sparse_print, &
        & set_nrows, set_ncols, set_dupl, set_state, set_null, set_bld, &
        & set_upd, set_asb, set_sorted, set_upper, set_lower, set_triangle, &
-       & set_unit
+       & set_unit, csnmi
 
 contains 
 
 
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+  !=====================================
   !
   !
   !
@@ -86,7 +87,7 @@ contains
   !
   !
   !
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+  !=====================================
 
 
   function sparse_get_fmt(a) result(res)
@@ -342,7 +343,7 @@ contains
 
 
 
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+  !=====================================
   !
   !
   !
@@ -353,7 +354,7 @@ contains
   !
   !
   !
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+  !=====================================
 
 
   subroutine  set_nrows(m,a) 
@@ -762,7 +763,7 @@ contains
   end subroutine set_upper
 
 
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+  !=====================================
   !
   !
   !
@@ -772,7 +773,7 @@ contains
   !
   !
   !
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!  
+  !=====================================  
 
 
 
@@ -793,7 +794,7 @@ contains
     logical, parameter :: debug=.false.
 
     info = 0
-    call psb_erractionsave(err_act)
+    call psb_get_erraction(err_act)
     if (.not.allocated(a%a)) then 
       info = 1121
       call psb_errpush(info,name)
@@ -802,12 +803,9 @@ contains
 
     call a%a%print(iout,iv,eirs,eics,head,ivr,ivc)
 
-
-    call psb_erractionrestore(err_act)
     return
 
 9999 continue
-    call psb_erractionrestore(err_act)
 
     if (err_act == psb_act_abort_) then
       call psb_error()
@@ -873,8 +871,8 @@ contains
     character(len=20)  :: name='csall'
     logical, parameter :: debug=.false.
 
+    call psb_get_erraction(err_act)
 
-    call psb_erractionsave(err_act)
     info = 0
     allocate(psbn_d_coo_sparse_mat :: a%a, stat=info)
     if (info /= 0) then 
@@ -885,11 +883,9 @@ contains
     call a%a%allocate(nr,nc,nz)
     call a%set_bld() 
 
-    call psb_erractionrestore(err_act)
     return
 
 9999 continue
-    call psb_erractionrestore(err_act)
 
     if (err_act == psb_act_abort_) then
       call psb_error()
@@ -916,9 +912,6 @@ contains
 
     call a%a%reallocate(nz)
 
-    if (info /= 0) goto 9999
-
-    call psb_erractionrestore(err_act)
     return
 
 9999 continue
@@ -940,7 +933,6 @@ contains
     character(len=20)  :: name='free'
     logical, parameter :: debug=.false.
 
-    call psb_erractionsave(err_act)
     if (.not.allocated(a%a)) then 
       info = 1121
       call psb_errpush(info,name)
@@ -949,7 +941,6 @@ contains
 
     call a%a%free()
 
-    call psb_erractionrestore(err_act)
     return
 
 9999 continue
@@ -1113,6 +1104,9 @@ contains
       goto 9999
     end if
 
+    if (debug) write(0,*) 'Converting from ',&
+         & a%get_fmt(),' to ',altmp%get_fmt()
+
     call altmp%cp_from_fmt(a%a, info)
 
     if (info /= 0) then
@@ -1202,6 +1196,9 @@ contains
       goto 9999
     end if
 
+    if (debug) write(0,*) 'Converting in-place from ',&
+         & a%get_fmt(),' to ',altmp%get_fmt()
+
     call altmp%mv_from_fmt(a%a, info)
 
     if (info /= 0) then
@@ -1229,9 +1226,7 @@ contains
 
 
 
-
-
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+  !=====================================
   !
   !
   !
@@ -1242,7 +1237,7 @@ contains
   !
   !
   !
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+  !=====================================
 
 
   subroutine d_csmm(alpha,a,x,beta,y,info,trans) 
@@ -1266,7 +1261,7 @@ contains
     endif
 
     call a%a%csmm(alpha,x,beta,y,info,trans) 
-
+    if (info /= 0) goto 9999 
     call psb_erractionrestore(err_act)
     return
 
@@ -1302,7 +1297,7 @@ contains
     endif
 
     call a%a%csmm(alpha,x,beta,y,info,trans) 
-
+    if (info /= 0) goto 9999 
     call psb_erractionrestore(err_act)
     return
 
@@ -1338,6 +1333,7 @@ contains
     endif
 
     call a%a%cssm(alpha,x,beta,y,info,trans) 
+    if (info /= 0) goto 9999 
 
     call psb_erractionrestore(err_act)
     return
@@ -1375,6 +1371,7 @@ contains
 
     call a%a%cssm(alpha,x,beta,y,info,trans) 
 
+    if (info /= 0) goto 9999 
 
     call psb_erractionrestore(err_act)
     return
@@ -1389,6 +1386,39 @@ contains
     return
 
   end subroutine d_cssv
+
+
+  function csnmi(a) result(res)
+    use psb_error_mod
+    use psb_const_mod
+    implicit none 
+    class(psbn_d_sparse_mat), intent(in) :: a
+    real(psb_dpk_)         :: res
+
+    Integer :: err_act, info
+    character(len=20)  :: name='csnmi'
+    logical, parameter :: debug=.false.
+
+    if (.not.allocated(a%a)) then 
+      info = 1121
+      call psb_errpush(info,name)
+      goto 9999
+    endif
+
+    res = a%a%csnmi()
+
+
+    return
+
+9999 continue
+
+    if (err_act == psb_act_abort_) then
+      call psb_error()
+      return
+    end if
+    return
+
+  end function csnmi
 
 end module psbn_d_mat_mod
 
