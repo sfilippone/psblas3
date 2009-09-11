@@ -1,5 +1,5 @@
 !
-program d_coo_matgen
+program d_matgen
   use psb_base_mod
   use psb_prec_mod
   use psb_krylov_mod
@@ -154,7 +154,7 @@ contains
     integer                  :: np, iam, nr, nt,nz,isz
     integer                  :: element
     integer, allocatable     :: irow(:),icol(:),myidx(:)
-    real(psb_dpk_), allocatable :: val(:)
+    real(psb_dpk_), allocatable :: val(:), diag(:)
     type(psbn_d_sparse_mat)     :: a_n
     type(psbn_d_coo_sparse_mat) :: acoo
     type(psbn_d_csr_sparse_mat) :: acsr
@@ -382,6 +382,26 @@ contains
     call a_n%print(20)
     anorm = a_n%csnmi()
     write(0,*) 'Nrm infinity ',anorm
+    call a_n%csget(2,3,element,irow,icol,val,info)
+    write(0,*) 'From csget ',element,info
+    if (info == 0) then 
+      do i=1,element
+        write(0,*) irow(i),icol(i),val(i)
+      end do
+    end if
+    
+    isz = a_n%get_size()
+    write(0,*) 'Size 1: ',isz
+    call a_n%trim()
+    isz = a_n%get_size()
+    write(0,*) 'Size 2: ',isz
+    
+
+      
+    allocate(diag(nlr),stat=info) 
+    if (info == 0) then 
+      call a_n%get_diag(diag,info) 
+    end if
 !!$
     t1 = psb_wtime()
     call a_n%cscnv(info,mold=acxx)
@@ -396,6 +416,7 @@ contains
     call a_n%print(21)
     anorm = a_n%csnmi()
     write(0,*) 'Nrm infinity ',anorm
+
 !!$
 
     if(iam == psb_root_) then
@@ -419,7 +440,7 @@ contains
     end if
     return
   end subroutine create_matrix
-end program d_coo_matgen
+end program d_matgen
 !
 ! functions parametrizing the differential equation 
 !  

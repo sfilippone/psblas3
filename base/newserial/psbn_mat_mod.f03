@@ -44,8 +44,12 @@ module psbn_d_mat_mod
     ! Memory/data management 
     procedure, pass(a) :: csall
     procedure, pass(a) :: free
+    procedure, pass(a) :: trim
     procedure, pass(a) :: csput 
-    procedure, pass(a) :: csget
+    procedure, pass(a) :: d_csgetrow
+    procedure, pass(a) :: d_csgetblk
+    generic, public    :: csget => d_csgetrow, d_csgetblk 
+    procedure, pass(a) :: csclip
     procedure, pass(a) :: reall => reallocate_nz
     procedure, pass(a) :: get_neigh
     procedure, pass(a) :: d_cscnv
@@ -54,6 +58,7 @@ module psbn_d_mat_mod
     procedure, pass(a) :: print => sparse_print
 
     ! Computational routines 
+    procedure, pass(a) :: get_diag
     procedure, pass(a) :: csnmi
     procedure, pass(a) :: d_csmv
     procedure, pass(a) :: d_csmm
@@ -68,11 +73,12 @@ module psbn_d_mat_mod
   private :: get_nrows, get_ncols, get_nzeros, get_size, &
        & get_state, get_dupl, is_null, is_bld, is_upd, &
        & is_asb, is_sorted, is_upper, is_lower, is_triangle, &
-       & is_unit, get_neigh, csall, csput, csget, d_cscnv, d_cscnv_ip, &
-       & reallocate_nz, free, d_csmv, d_csmm, d_cssv, d_cssm, sparse_print, &
+       & is_unit, get_neigh, csall, csput, d_csgetrow,&
+       & d_csgetblk, csclip, d_cscnv, d_cscnv_ip, &
+       & reallocate_nz, free, trim, d_csmv, d_csmm, d_cssv, d_cssm, sparse_print, &
        & set_nrows, set_ncols, set_dupl, set_state, set_null, set_bld, &
        & set_upd, set_asb, set_sorted, set_upper, set_lower, set_triangle, &
-       & set_unit, csnmi
+       & set_unit, csnmi, get_diag
 
 contains 
 
@@ -904,6 +910,7 @@ contains
     character(len=20)  :: name='reallocate_nz'
     logical, parameter :: debug=.false.
 
+    call psb_get_erraction(err_act)
     if (.not.allocated(a%a)) then 
       info = 1121
       call psb_errpush(info,name)
@@ -933,6 +940,7 @@ contains
     character(len=20)  :: name='free'
     logical, parameter :: debug=.false.
 
+    call psb_get_erraction(err_act)
     if (.not.allocated(a%a)) then 
       info = 1121
       call psb_errpush(info,name)
@@ -944,7 +952,6 @@ contains
     return
 
 9999 continue
-    call psb_erractionrestore(err_act)
 
     if (err_act == psb_act_abort_) then
       call psb_error()
@@ -953,6 +960,36 @@ contains
     return
 
   end subroutine free
+
+  subroutine  trim(a) 
+    use psb_error_mod
+    implicit none 
+    class(psbn_d_sparse_mat), intent(inout) :: a
+    Integer :: err_act, info
+    character(len=20)  :: name='trim'
+    logical, parameter :: debug=.false.
+
+    call psb_get_erraction(err_act)
+    if (.not.allocated(a%a)) then 
+      info = 1121
+      call psb_errpush(info,name)
+      goto 9999
+    endif
+
+    call a%a%trim()
+
+    return
+
+9999 continue
+
+    if (err_act == psb_act_abort_) then
+      call psb_error()
+      return
+    end if
+    return
+
+  end subroutine trim
+
 
   subroutine csput(nz,val,ia,ja,a,imin,imax,jmin,jmax,info,gtl) 
     use psbn_d_base_mat_mod
@@ -993,19 +1030,27 @@ contains
 
   end subroutine csput
 
-  subroutine csget(nz,val,ia,ja,a,imin,imax,jmin,jmax,info,gtl) 
-    use psbn_d_base_mat_mod
+  subroutine d_csgetrow(imin,imax,a,nz,ia,ja,val,info,&
+       & jmin,jmax,iren,append,nzin,rscale,cscale)
+    ! Output is always in  COO format 
     use psb_error_mod
-    implicit none 
-    class(psbn_d_sparse_mat), intent(inout) :: a
-    real(psb_dpk_), intent(in)      :: val(:)
-    integer, intent(out)            :: nz, ia(:), ja(:)
-    integer, intent(in)             :: imin,imax,jmin,jmax
-    integer, intent(out)            :: info
-    integer, intent(in), optional   :: gtl(:)
+    use psb_const_mod
+    use psbn_d_base_mat_mod
+    implicit none
+    
+    class(psbn_d_sparse_mat), intent(in) :: a
+    integer, intent(in)                  :: imin,imax
+    integer, intent(out)                 :: nz
+    integer, allocatable, intent(inout)  :: ia(:), ja(:)
+    real(psb_dpk_), allocatable,  intent(inout)    :: val(:)
+    integer,intent(out)                  :: info
+    logical, intent(in), optional        :: append
+    integer, intent(in), optional        :: iren(:)
+    integer, intent(in), optional        :: jmin,jmax, nzin
+    logical, intent(in), optional        :: rscale,cscale
 
     Integer :: err_act
-    character(len=20)  :: name='csput'
+    character(len=20)  :: name='csget'
     logical, parameter :: debug=.false.
 
     info = 0
@@ -1016,14 +1061,10 @@ contains
       goto 9999
     endif
 
-    info = 700 
-    call psb_errpush(info,name,a_err='CSGET')
-    goto 9999
 
-
-!!$
-!!$    call a%a%csget(nz,val,ia,ja,imin,imax,jmin,jmax,info,gtl) 
-!!$    if (info /= 0) goto 9999 
+    call a%a%csget(imin,imax,nz,ia,ja,val,info,&
+       & jmin,jmax,iren,append,nzin,rscale,cscale)
+    if (info /= 0) goto 9999 
 
     call psb_erractionrestore(err_act)
     return
@@ -1036,7 +1077,109 @@ contains
       return
     end if
 
-  end subroutine csget
+  end subroutine d_csgetrow
+
+
+
+  subroutine d_csgetblk(imin,imax,a,b,info,&
+       & jmin,jmax,iren,append,rscale,cscale)
+    ! Output is always in  COO format 
+    use psb_error_mod
+    use psb_const_mod
+    use psbn_d_base_mat_mod
+    implicit none
+    
+    class(psbn_d_sparse_mat), intent(in) :: a
+    class(psbn_d_sparse_mat), intent(out) :: b
+    integer, intent(in)                  :: imin,imax
+    integer,intent(out)                  :: info
+    logical, intent(in), optional        :: append
+    integer, intent(in), optional        :: iren(:)
+    integer, intent(in), optional        :: jmin,jmax
+    logical, intent(in), optional        :: rscale,cscale
+
+    Integer :: err_act
+    character(len=20)  :: name='csget'
+    logical, parameter :: debug=.false.
+    type(psbn_d_coo_sparse_mat), allocatable  :: acoo
+
+
+    info = 0
+    call psb_erractionsave(err_act)
+    if (a%is_null()) then 
+      info = 1121
+      call psb_errpush(info,name)
+      goto 9999
+    endif
+
+    allocate(acoo,stat=info)    
+    
+    if (info == 0) call a%a%csget(imin,imax,acoo,info,&
+       & jmin,jmax,iren,append,rscale,cscale)
+    if (info == 0) call move_alloc(acoo,b%a)
+    if (info /= 0) goto 9999 
+
+    call psb_erractionrestore(err_act)
+    return
+
+9999 continue
+    call psb_erractionrestore(err_act)
+
+    if (err_act == psb_act_abort_) then
+      call psb_error()
+      return
+    end if
+
+  end subroutine d_csgetblk
+
+
+
+  subroutine csclip(a,b,info,&
+       & imin,imax,jmin,jmax,rscale,cscale)
+    ! Output is always in  COO format 
+    use psb_error_mod
+    use psb_const_mod
+    use psbn_d_base_mat_mod
+    implicit none
+    
+    class(psbn_d_sparse_mat), intent(in) :: a
+    class(psbn_d_sparse_mat), intent(out) :: b
+    integer,intent(out)                  :: info
+    integer, intent(in), optional        :: imin,imax,jmin,jmax
+    logical, intent(in), optional        :: rscale,cscale
+
+    Integer :: err_act
+    character(len=20)  :: name='csclip'
+    logical, parameter :: debug=.false.
+    type(psbn_d_coo_sparse_mat), allocatable  :: acoo
+
+    info = 0
+    call psb_erractionsave(err_act)
+    if (a%is_null()) then 
+      info = 1121
+      call psb_errpush(info,name)
+      goto 9999
+    endif
+
+    allocate(acoo,stat=info)    
+    if (info == 0) call a%a%csclip(acoo,info,&
+       & imin,imax,jmin,jmax,rscale,cscale)
+    if (info == 0) call move_alloc(acoo,b%a)
+    if (info /= 0) goto 9999 
+
+    call psb_erractionrestore(err_act)
+    return
+
+9999 continue
+    call psb_erractionrestore(err_act)
+
+    if (err_act == psb_act_abort_) then
+      call psb_error()
+      return
+    end if
+
+  end subroutine csclip
+
 
 
   subroutine d_cscnv(a,b,info,type,mold,upd,dupl)
@@ -1399,6 +1542,7 @@ contains
     character(len=20)  :: name='csnmi'
     logical, parameter :: debug=.false.
 
+    call psb_get_erraction(err_act)
     if (.not.allocated(a%a)) then 
       info = 1121
       call psb_errpush(info,name)
@@ -1419,6 +1563,46 @@ contains
     return
 
   end function csnmi
+
+
+
+  subroutine get_diag(a,d,info)
+    use psb_error_mod
+    use psb_const_mod
+    implicit none 
+    class(psbn_d_sparse_mat), intent(in) :: a
+    real(psb_dpk_), intent(out)          :: d(:)
+    integer, intent(out)                 :: info
+
+    Integer :: err_act
+    character(len=20)  :: name='csnmi'
+    logical, parameter :: debug=.false.
+
+    call psb_erractionsave(err_act)
+    if (.not.allocated(a%a)) then 
+      info = 1121
+      call psb_errpush(info,name)
+      goto 9999
+    endif
+
+    call a%a%get_diag(d,info)
+    if (info /= 0) goto 9999
+
+    call psb_erractionrestore(err_act)
+    return
+
+9999 continue
+    call psb_erractionrestore(err_act)
+
+    if (err_act == psb_act_abort_) then
+      call psb_error()
+      return
+    end if
+    return
+
+  end subroutine get_diag
+
+
 
 end module psbn_d_mat_mod
 

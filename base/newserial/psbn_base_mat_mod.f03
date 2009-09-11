@@ -84,6 +84,7 @@ module psbn_base_mat_mod
     procedure, pass(a) :: allocate_mnnz
     procedure, pass(a) :: reallocate_nz
     procedure, pass(a) :: free
+    procedure, pass(a) :: trim
     generic,   public  :: allocate => allocate_mnnz
     generic,   public  :: reallocate => reallocate_nz
     procedure, pass(a) :: print => sparse_print
@@ -96,7 +97,7 @@ module psbn_base_mat_mod
        & get_nzeros, get_size, get_state, get_dupl, is_null, is_bld, &
        & is_upd, is_asb, is_sorted, is_upper, is_lower, is_triangle, &
        & is_unit, get_neigh, allocate_mn, allocate_mnnz, reallocate_nz, &
-       & free, sparse_print,get_fmt
+       & free, sparse_print, get_fmt, trim
   
 contains
  
@@ -329,7 +330,7 @@ contains
     character(len=20)  :: name='base_get_nzeros'
     logical, parameter :: debug=.false.
 
-    call psb_erractionsave(err_act)
+    call psb_get_erraction(err_act)
     res = -1
     ! This is the base version. If we get here
     ! it means the derived class is incomplete,
@@ -353,7 +354,7 @@ contains
     character(len=20)  :: name='get_size'
     logical, parameter :: debug=.false.
 
-    call psb_erractionsave(err_act)
+    call psb_get_erraction(err_act)
     res = -1
     ! This is the base version. If we get here
     ! it means the derived class is incomplete,
@@ -383,7 +384,7 @@ contains
     character(len=20)  :: name='sparse_print'
     logical, parameter :: debug=.false.
 
-    call psb_erractionsave(err_act)
+    call psb_get_erraction(err_act)
     info = 700
     ! This is the base version. If we get here
     ! it means the derived class is incomplete,
@@ -412,7 +413,7 @@ contains
     character(len=20)  :: name='get_neigh'
     logical, parameter :: debug=.false.
 
-    call psb_erractionsave(err_act)
+    call psb_get_erraction(err_act)
     info = 700
     ! This is the base version. If we get here
     ! it means the derived class is incomplete,
@@ -436,7 +437,7 @@ contains
     character(len=20)  :: name='allocate_mnz'
     logical, parameter :: debug=.false.
 
-    call psb_erractionsave(err_act)
+    call psb_get_erraction(err_act)
     ! This is the base version. If we get here
     ! it means the derived class is incomplete,
     ! so we throw an error.
@@ -458,7 +459,7 @@ contains
     character(len=20)  :: name='reallocate_nz'
     logical, parameter :: debug=.false.
 
-    call psb_erractionsave(err_act)
+    call psb_get_erraction(err_act)
     ! This is the base version. If we get here
     ! it means the derived class is incomplete,
     ! so we throw an error.
@@ -479,7 +480,7 @@ contains
     character(len=20)  :: name='free'
     logical, parameter :: debug=.false.
 
-    call psb_erractionsave(err_act)
+    call psb_get_erraction(err_act)
     ! This is the base version. If we get here
     ! it means the derived class is incomplete,
     ! so we throw an error.
@@ -491,6 +492,27 @@ contains
     return
 
   end subroutine free
+
+  subroutine  trim(a) 
+    use psb_error_mod
+    implicit none 
+    class(psbn_base_sparse_mat), intent(inout) :: a
+    Integer :: err_act
+    character(len=20)  :: name='trim'
+    logical, parameter :: debug=.false.
+
+    call psb_get_erraction(err_act)
+    ! This is the base version. If we get here
+    ! it means the derived class is incomplete,
+    ! so we throw an error.
+    call psb_errpush(700,name,a_err=a%get_fmt())
+          
+    if (err_act /= psb_act_ret_) then
+      call psb_error()
+    end if
+    return
+
+  end subroutine trim
 
 end module psbn_base_mat_mod
 
