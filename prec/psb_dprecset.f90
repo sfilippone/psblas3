@@ -39,7 +39,7 @@ subroutine psb_dprecseti(p,what,val,info)
   integer, intent(out)                   :: info
 
   info = 0
-
+  return
   select case(what)
   case (psb_f_type_) 
     if (p%iprcparm(psb_p_type_) /= psb_bjac_) then 

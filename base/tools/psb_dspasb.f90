@@ -57,11 +57,12 @@ subroutine psb_dspasb(a,desc_a, info, afmt, upd, dupl)
   use psb_error_mod
   use psb_string_mod
   use psb_penv_mod
+  use psbn_d_mat_mod
   implicit none
 
 
   !...Parameters....
-  type(psb_dspmat_type), intent (inout)   :: a
+  type(psbn_d_sparse_mat), intent (inout)  :: a
   type(psb_desc_type), intent(in)         :: desc_a
   integer, intent(out)                    :: info
   integer,optional, intent(in)            :: dupl, upd
@@ -106,23 +107,27 @@ subroutine psb_dspasb(a,desc_a, info, afmt, upd, dupl)
 
   !check on errors encountered in psdspins
 
-  spstate = a%infoa(psb_state_) 
-  if (spstate == psb_spmat_bld_) then 
+
+  if (a%is_bld()) then 
     !
     ! First case: we come from a fresh build. 
     ! 
 
     n_row = psb_cd_get_local_rows(desc_a)
     n_col = psb_cd_get_local_cols(desc_a)
-    a%m = n_row
-    a%k = n_col
+    call a%set_nrows(n_row)
+    call a%set_ncols(n_col)
   end if
 
-  call psb_spcnv(a,info,afmt=afmt,upd=upd,dupl=dupl)
+  call a%cscnv(info,type=afmt,dupl=dupl)
 
-  IF (debug_level >= psb_debug_ext_)&
-       & write(debug_unit, *) me,' ',trim(name),':  From SPCNV',&
-       & info,' ',A%FIDA
+  
+  IF (debug_level >= psb_debug_ext_) then 
+    ch_err=a%get_fmt()
+    write(debug_unit, *) me,' ',trim(name),':  From SPCNV',&
+         & info,' ',ch_err
+  end IF
+  
   if (info /= psb_no_err_) then    
     info=4010
     ch_err='psb_spcnv'

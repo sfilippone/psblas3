@@ -1184,9 +1184,10 @@ contains
 end subroutine d_coo_csgetrow_impl
 
 
-subroutine d_coo_csput_impl(nz,val,ia,ja,a,imin,imax,jmin,jmax,info,gtl) 
+subroutine d_coo_csput_impl(nz,ia,ja,val,a,imin,imax,jmin,jmax,info,gtl) 
   use psb_error_mod
   use psb_realloc_mod
+  use psb_sort_mod
   use psbn_d_base_mat_mod, psb_protect_name => d_coo_csput_impl
   implicit none 
     
@@ -1346,7 +1347,6 @@ contains
     use psb_const_mod
     use psb_realloc_mod
     use psb_string_mod
-    use psb_serial_mod
     implicit none 
 
     class(psbn_d_coo_sparse_mat), intent(inout) :: a
@@ -1742,9 +1742,9 @@ subroutine d_fix_coo_impl(a,info,idir)
   use psb_const_mod
   use psb_error_mod
   use psb_realloc_mod
-  use psbn_d_base_mat_mod, psb_protect_name => d_fix_coo_impl
   use psb_string_mod
   use psb_ip_reord_mod
+  use psbn_d_base_mat_mod, psb_protect_name => d_fix_coo_impl
   implicit none 
 
   class(psbn_d_coo_sparse_mat), intent(inout) :: a

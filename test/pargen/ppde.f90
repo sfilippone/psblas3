@@ -65,6 +65,7 @@ program ppde
   use psb_base_mod
   use psb_prec_mod
   use psb_krylov_mod
+  use psbn_d_mat_mod
   implicit none
 
   ! input parameters
@@ -77,7 +78,8 @@ program ppde
   real(psb_dpk_) :: t1, t2, tprec 
 
   ! sparse matrix and preconditioner
-  type(psb_dspmat_type) :: a
+  type(psbn_d_sparse_mat) :: a
+!!$  type(psb_dspmat_type) :: a
   type(psb_dprec_type)  :: prec
   ! descriptor
   type(psb_desc_type)   :: desc_a
@@ -176,7 +178,8 @@ program ppde
   t2 = psb_wtime() - t1
   call psb_amx(ictxt,t2)
 
-  amatsize = psb_sizeof(a)
+!!$  amatsize = psb_sizeof(a)
+  amatsize = 0
   descsize = psb_sizeof(desc_a)
   precsize = psb_sizeof(prec)
   call psb_sum(ictxt,amatsize)
@@ -343,14 +346,15 @@ contains
     ! Note that if a1=a2=a3=a4=0., the PDE is the well-known Laplace equation.
     !
     use psb_base_mod
+    use psbn_d_mat_mod
     implicit none
-    integer                        :: idim
-    integer, parameter             :: nb=20
-    real(psb_dpk_), allocatable    :: b(:),xv(:)
-    type(psb_desc_type)            :: desc_a
-    integer                        :: ictxt, info
-    character                      :: afmt*5
-    type(psb_dspmat_type)    :: a
+    integer                      :: idim
+    integer, parameter           :: nb=20
+    real(psb_dpk_), allocatable  :: b(:),xv(:)
+    type(psb_desc_type)          :: desc_a
+    integer                      :: ictxt, info
+    character                    :: afmt*5
+    type(psbn_d_sparse_mat)       :: a
     real(psb_dpk_)           :: zt(nb),glob_x,glob_y,glob_z
     integer                  :: m,n,nnz,glob_row,nlr,i,ii,ib,k
     integer                  :: x,y,z,ia,indx_owner
@@ -359,6 +363,7 @@ contains
     integer, allocatable     :: irow(:),icol(:),myidx(:)
     real(psb_dpk_), allocatable :: val(:)
     ! deltah dimension of each grid cell
+
     ! deltat discretization time
     real(psb_dpk_)         :: deltah
     real(psb_dpk_),parameter   :: rhs=0.d0,one=1.d0,zero=0.d0
@@ -367,7 +372,7 @@ contains
     external           :: a1, a2, a3, a4, b1, b2, b3
     integer            :: err_act
 
-    character(len=20)  :: name, ch_err
+    character(len=20)  :: name, ch_err,tmpfmt
 
     info = 0
     name = 'create_matrix'
@@ -612,8 +617,9 @@ contains
     call psb_amx(ictxt,tasb)
     call psb_amx(ictxt,ttot)
     if(iam == psb_root_) then
+      tmpfmt = a%get_fmt()
       write(*,'("The matrix has been generated and assembled in ",a3," format.")')&
-           &   a%fida(1:3)
+           &   tmpfmt
       write(*,'("-allocation  time : ",es12.5)') talc
       write(*,'("-coeff. gen. time : ",es12.5)') tgen
       write(*,'("-assembly    time : ",es12.5)') tasb

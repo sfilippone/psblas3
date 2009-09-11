@@ -589,8 +589,9 @@ module psb_psblas_mod
     function psb_dnrmi(a, desc_a,info)
       use psb_serial_mod
       use psb_descriptor_type
+      use psbn_d_mat_mod
       real(psb_dpk_)                    :: psb_dnrmi
-      type(psb_dspmat_type), intent (in) :: a
+      type(psbn_d_sparse_mat), intent (in) :: a
       type(psb_desc_type), intent (in)   :: desc_a
       integer, intent(out)                :: info
     end function psb_dnrmi
@@ -646,7 +647,8 @@ module psb_psblas_mod
          &trans, k, jx, jy,work,doswap)
       use psb_serial_mod
       use psb_descriptor_type
-      type(psb_dspmat_type), intent(in)    :: a
+      use psbn_d_mat_mod
+      type(psbn_d_sparse_mat), intent(in)    :: a
       real(psb_dpk_), intent(inout)        :: x(:,:)
       real(psb_dpk_), intent(inout)        :: y(:,:)
       real(psb_dpk_), intent(in)           :: alpha, beta
@@ -661,7 +663,8 @@ module psb_psblas_mod
          & desc_a, info, trans, work,doswap)
       use psb_serial_mod
       use psb_descriptor_type
-      type(psb_dspmat_type), intent(in)   :: a
+      use psbn_d_mat_mod
+      type(psbn_d_sparse_mat), intent(in)   :: a
       real(psb_dpk_), intent(inout)       :: x(:)
       real(psb_dpk_), intent(inout)       :: y(:)
       real(psb_dpk_), intent(in)          :: alpha, beta

@@ -66,7 +66,6 @@ module psbn_d_mat_mod
     procedure, pass(a) :: d_scals
     procedure, pass(a) :: d_scal
     generic, public    :: scal => d_scals, d_scal 
-
     procedure, pass(a) :: d_cssv
     procedure, pass(a) :: d_cssm
     generic, public    :: cssm => d_cssm, d_cssv
@@ -78,9 +77,12 @@ module psbn_d_mat_mod
        & is_asb, is_sorted, is_upper, is_lower, is_triangle, &
        & is_unit, get_neigh, csall, csput, d_csgetrow,&
        & d_csgetblk, csclip, d_cscnv, d_cscnv_ip, &
-       & reallocate_nz, free, trim, d_csmv, d_csmm, d_cssv, d_cssm, sparse_print, &
-       & set_nrows, set_ncols, set_dupl, set_state, set_null, set_bld, &
-       & set_upd, set_asb, set_sorted, set_upper, set_lower, set_triangle, &
+       & reallocate_nz, free, trim, &
+       & d_csmv, d_csmm, d_cssv, d_cssm, sparse_print, &
+       & set_nrows, set_ncols, set_dupl, &
+       & set_state, set_null, set_bld, &
+       & set_upd, set_asb, set_sorted, &
+       & set_upper, set_lower, set_triangle, &
        & set_unit, csnmi, get_diag, d_scals, d_scal
 
 contains 
@@ -994,7 +996,7 @@ contains
   end subroutine trim
 
 
-  subroutine csput(nz,val,ia,ja,a,imin,imax,jmin,jmax,info,gtl) 
+  subroutine csput(nz,ia,ja,val,a,imin,imax,jmin,jmax,info,gtl) 
     use psbn_d_base_mat_mod
     use psb_error_mod
     implicit none 
@@ -1017,7 +1019,7 @@ contains
     endif
 
 
-    call a%a%csput(nz,val,ia,ja,imin,imax,jmin,jmax,info,gtl) 
+    call a%a%csput(nz,ia,ja,val,imin,imax,jmin,jmax,info,gtl) 
     if (info /= 0) goto 9999 
 
     call psb_erractionrestore(err_act)

@@ -15,11 +15,11 @@ Design principles for this directory.
         type. At this level we define the computational interfaces to
 	MV and SV, since they require the type of the vectors/scalars
    	involved (should also add NRMI here!!!!), but again they will
-   	be empty shells. We also define the interface to CSINS,
+   	be empty shells. We also define the interface to CSPUT,
    	required to build the object, and TO_COO,FROM_COO (see
    	below). 
    iii. The X_YYY_object where the real implementation of the
-      	MV/SV/NRMI/CSINS/ALLOCATE/FREE/TO_COO/FROM_COO takes place.  
+      	MV/SV/NRMI/CSPUT/ALLOCATE/FREE/TO_COO/FROM_COO takes place.  
 
 2. What is a sparse matrix (take 2)? 
    The above structure by itself does not allow a sparse matrix to

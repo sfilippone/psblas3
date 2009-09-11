@@ -45,10 +45,11 @@ module psb_prec_mod
       character, intent(in),optional             :: upd
     end subroutine psb_sprecbld
     subroutine psb_dprecbld(a,desc_a,prec,info,upd)
+      use psbn_d_mat_mod
       use psb_base_mod, only  : psb_desc_type, psb_dspmat_type, psb_dpk_
       use psb_prec_type, only : psb_dprec_type
       implicit none
-      type(psb_dspmat_type), intent(in), target  :: a
+      type(psbn_d_sparse_mat), intent(in), target  :: a
       type(psb_desc_type), intent(in), target    :: desc_a
       type(psb_dprec_type), intent(inout)        :: prec
       integer, intent(out)                       :: info

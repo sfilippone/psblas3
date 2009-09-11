@@ -46,11 +46,12 @@ subroutine psb_dspfree(a, desc_a,info)
   use psb_serial_mod
   use psb_const_mod
   use psb_error_mod
+  use psbn_d_mat_mod
   implicit none
 
   !....parameters...
   type(psb_desc_type), intent(in)      :: desc_a
-  type(psb_dspmat_type), intent(inout) :: a
+  type(psbn_d_sparse_mat), intent(inout) :: a
   integer, intent(out)                 :: info
   !...locals....
   integer             :: ictxt,err_act
@@ -70,14 +71,14 @@ subroutine psb_dspfree(a, desc_a,info)
   end if
 
   !...deallocate a....
-  call psb_sp_free(a,info)
+  call a%free()
 
 
-  if(info /= 0) then
-    info=2045
-    call psb_errpush(info,name)
-    goto 9999
-  end if
+!!$  if(info /= 0) then
+!!$    info=2045
+!!$    call psb_errpush(info,name)
+!!$    goto 9999
+!!$  end if
 
   call psb_erractionrestore(err_act)
   return

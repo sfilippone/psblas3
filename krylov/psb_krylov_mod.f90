@@ -62,7 +62,8 @@ Module psb_krylov_mod
          & desc_a,info,itmax,iter,err,itrace,istop,cond)
       use psb_base_mod, only  : psb_desc_type, psb_dspmat_type, psb_dpk_
       use psb_prec_mod, only : psb_dprec_type
-      type(psb_dspmat_type), intent(in)  :: a
+      use psbn_d_mat_mod
+      type(psbn_d_sparse_mat), intent(in)  :: a
       type(psb_desc_type), intent(in)    :: desc_a
       real(psb_dpk_), intent(in)       :: b(:)
       real(psb_dpk_), intent(inout)    :: x(:)
@@ -125,7 +126,8 @@ Module psb_krylov_mod
          & desc_a,info,itmax,iter,err,itrace,istop)
       use psb_base_mod, only  : psb_desc_type, psb_dspmat_type, psb_dpk_
       use psb_prec_mod, only : psb_dprec_type
-      type(psb_dspmat_type), intent(in)  :: a
+      use psbn_d_mat_mod
+      type(psbn_d_sparse_mat), intent(in)  :: a
       type(psb_desc_type), intent(in)    :: desc_a
       real(psb_dpk_), intent(in)         :: b(:)
       real(psb_dpk_), intent(inout)      :: x(:)
@@ -188,7 +190,8 @@ Module psb_krylov_mod
          & desc_a,info,itmax,iter,err,itrace,istop)
       use psb_base_mod, only  : psb_desc_type, psb_dspmat_type, psb_dpk_
       use psb_prec_mod, only : psb_dprec_type
-      type(psb_dspmat_type), intent(in)  :: a
+      use psbn_d_mat_mod
+      type(psbn_d_sparse_mat), intent(in)  :: a
       type(psb_desc_type), intent(in)    :: desc_a
       real(psb_dpk_), intent(in)       :: b(:)
       real(psb_dpk_), intent(inout)    :: x(:)
@@ -251,7 +254,8 @@ Module psb_krylov_mod
          &itmax,iter,err, itrace,irst,istop)
       use psb_base_mod, only  : psb_desc_type, psb_dspmat_type, psb_dpk_
       use psb_prec_mod, only : psb_dprec_type
-      Type(psb_dspmat_type), Intent(in)  :: a
+      use psbn_d_mat_mod
+      type(psbn_d_sparse_mat), intent(in)  :: a
       Type(psb_desc_type), Intent(in)    :: desc_a
       type(psb_dprec_type), intent(in)   :: prec
       Real(psb_dpk_), Intent(in)       :: b(:)
@@ -314,7 +318,8 @@ Module psb_krylov_mod
          &itmax,iter,err,itrace,irst,istop)
       use psb_base_mod, only  : psb_desc_type, psb_dspmat_type, psb_dpk_
       use psb_prec_mod, only : psb_dprec_type
-      Type(psb_dspmat_type), Intent(in)  :: a
+      use psbn_d_mat_mod
+      type(psbn_d_sparse_mat), intent(in)  :: a
       Type(psb_desc_type), Intent(in)    :: desc_a
       type(psb_dprec_type), intent(in)   :: prec 
       Real(psb_dpk_), Intent(in)       :: b(:)
@@ -377,7 +382,8 @@ Module psb_krylov_mod
          &itmax,iter,err,itrace,istop)
       use psb_base_mod, only  : psb_desc_type, psb_dspmat_type, psb_dpk_
       use psb_prec_mod, only : psb_dprec_type
-      type(psb_dspmat_type), intent(in)  :: a
+      use psbn_d_mat_mod
+      type(psbn_d_sparse_mat), intent(in)  :: a
       type(psb_desc_type), intent(in)    :: desc_a 
       type(psb_dprec_type), intent(in)   :: prec 
       real(psb_dpk_), intent(in)       :: b(:)
@@ -613,9 +619,12 @@ contains
 
     use psb_base_mod
     use psb_prec_mod,only : psb_sprec_type, psb_dprec_type, psb_cprec_type, psb_zprec_type
+    use psbn_d_mat_mod
+
+    type(psbn_d_sparse_mat), intent(in)  :: a
 
     character(len=*)                   :: method
-    Type(psb_dspmat_type), Intent(in)  :: a
+!!$    Type(psb_dspmat_type), Intent(in)  :: a
     Type(psb_desc_type), Intent(in)    :: desc_a
     type(psb_dprec_type), intent(in)   :: prec 
     Real(psb_dpk_), Intent(in)       :: b(:)
@@ -1059,10 +1068,12 @@ contains
   
   subroutine psb_d_init_conv(methdname,stopc,trace,itmax,a,b,eps,desc_a,stopdat,info)
     use psb_base_mod
+    use psbn_d_mat_mod
     implicit none 
+    type(psbn_d_sparse_mat), intent(in)  :: a
     character(len=*), intent(in)      :: methdname
     integer, intent(in)               :: stopc, trace,itmax
-    type(psb_dspmat_type), intent(in) :: a
+!!$    type(psb_dspmat_type), intent(in) :: a
     real(psb_dpk_), intent(in)      :: b(:), eps
     type(psb_desc_type), intent(in)   :: desc_a
     type(psb_itconv_type)             :: stopdat

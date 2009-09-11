@@ -129,7 +129,7 @@ module psbn_d_cxx_mat_mod
   end interface
 
   interface 
-    subroutine d_cxx_csput_impl(nz,val,ia,ja,a,imin,imax,jmin,jmax,info,gtl) 
+    subroutine d_cxx_csput_impl(nz,ia,ja,val,a,imin,imax,jmin,jmax,info,gtl) 
       use psb_const_mod
       import psbn_d_cxx_sparse_mat
       class(psbn_d_cxx_sparse_mat), intent(inout) :: a

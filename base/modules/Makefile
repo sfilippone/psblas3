@@ -17,7 +17,7 @@ CINCLUDES=-I.
 FINCLUDES=$(FMFLAG)$(LIBDIR) $(FMFLAG). $(FIFLAG).
 
 
-lib:  $(BASIC_MODS) blacsmod $(UTIL_MODS)  $(OBJS)  $(LIBMOD)
+lib:  $(BASIC_MODS) blacsmod newmods $(UTIL_MODS)  $(OBJS)  $(LIBMOD)
 	$(AR) $(LIBDIR)/$(LIBNAME) $(MODULES) $(OBJS) $(MPFOBJS)
 	$(RANLIB) $(LIBDIR)/$(LIBNAME)
 	/bin/cp -p $(LIBMOD) $(LIBDIR)
@@ -44,7 +44,8 @@ psb_hash_mod.o: psb_const_mod.o psb_realloc_mod.o
 
 psb_base_mod.o: $(MODULES)
 
-
+newmods: $(BASIC_MODS) psb_string_mod.o psb_sort_mod.o psb_ip_reord_mod.o
+	(cd ../newserial; make lib LIBNAME=$(LIBNAME))
 blacsmod:
 	(make psb_blacs_mod.o psb_penv_mod.o F90COPT="$(F90COPT) $(EXTRA_OPT)")
 

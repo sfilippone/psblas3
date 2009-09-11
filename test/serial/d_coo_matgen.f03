@@ -357,7 +357,7 @@ contains
         endif
 
       end do
-      call acoo%csput(element-1,val,irow,icol,1,nr,1,nr,info)
+      call acoo%csput(element-1,irow,icol,val,1,nr,1,nr,info)
 
     end do
 

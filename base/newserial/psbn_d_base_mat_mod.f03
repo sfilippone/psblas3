@@ -191,7 +191,7 @@ module psbn_d_base_mat_mod
 
 
   interface 
-    subroutine d_coo_csput_impl(nz,val,ia,ja,a,imin,imax,jmin,jmax,info,gtl) 
+    subroutine d_coo_csput_impl(nz,ia,ja,val,a,imin,imax,jmin,jmax,info,gtl) 
       use psb_const_mod
       import psbn_d_coo_sparse_mat
       class(psbn_d_coo_sparse_mat), intent(inout) :: a
@@ -504,7 +504,7 @@ contains
   end subroutine mv_from_fmt
 
 
-  subroutine csput(nz,val,ia,ja,a,imin,imax,jmin,jmax,info,gtl) 
+  subroutine csput(nz,ia,ja,val,a,imin,imax,jmin,jmax,info,gtl) 
     use psb_error_mod
     use psb_realloc_mod
     implicit none 
@@ -1283,7 +1283,7 @@ contains
   end subroutine d_coo_reallocate_nz
 
 
-  subroutine d_coo_csput(nz,val,ia,ja,a,imin,imax,jmin,jmax,info,gtl) 
+  subroutine d_coo_csput(nz,ia,ja,val,a,imin,imax,jmin,jmax,info,gtl) 
     use psb_error_mod
     use psb_realloc_mod
     implicit none 
@@ -1330,7 +1330,7 @@ contains
 
     if (nz == 0) return
     nza = a%get_nzeros()
-    call d_coo_csput_impl(nz,val,ia,ja,a,imin,imax,jmin,jmax,info,gtl) 
+    call d_coo_csput_impl(nz,ia,ja,val,a,imin,imax,jmin,jmax,info,gtl) 
     if (info /= 0) goto 9999
 
     call psb_erractionrestore(err_act)
@@ -1694,7 +1694,6 @@ contains
 
 
   subroutine d_coo_print(iout,a,iv,eirs,eics,head,ivr,ivc)
-    use psb_spmat_type
     use psb_string_mod
     implicit none 
 

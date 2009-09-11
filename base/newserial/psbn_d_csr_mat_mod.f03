@@ -139,7 +139,7 @@ module psbn_d_csr_mat_mod
   end interface
 
   interface 
-    subroutine d_csr_csput_impl(nz,val,ia,ja,a,imin,imax,jmin,jmax,info,gtl) 
+    subroutine d_csr_csput_impl(nz,ia,ja,val,a,imin,imax,jmin,jmax,info,gtl) 
       use psb_const_mod
       import psbn_d_csr_sparse_mat
       class(psbn_d_csr_sparse_mat), intent(inout) :: a
@@ -322,7 +322,7 @@ contains
 
   end subroutine d_csr_reallocate_nz
 
-  subroutine d_csr_csput(nz,val,ia,ja,a,imin,imax,jmin,jmax,info,gtl) 
+  subroutine d_csr_csput(nz,ia,ja,val,a,imin,imax,jmin,jmax,info,gtl) 
     use psb_const_mod
     use psb_error_mod
     implicit none 
@@ -369,7 +369,7 @@ contains
 
     if (nz == 0) return
 
-    call d_csr_csput_impl(nz,val,ia,ja,a,imin,imax,jmin,jmax,info,gtl) 
+    call d_csr_csput_impl(nz,ia,ja,val,a,imin,imax,jmin,jmax,info,gtl) 
     if (info /= 0) goto 9999
 
     call psb_erractionrestore(err_act)
@@ -948,7 +948,6 @@ contains
 
 
   subroutine d_csr_print(iout,a,iv,eirs,eics,head,ivr,ivc)
-    use psb_spmat_type
     use psb_string_mod
     implicit none 
 

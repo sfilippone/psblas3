@@ -44,7 +44,11 @@ subroutine psb_dprecinit(p,ptype,info)
   if (info == 0) call psb_realloc(psb_rfpsz,p%rprcparm,info)
   if (info /= 0) return
   p%iprcparm(:) = 0
-
+  p%iprcparm(:)           = 0
+  p%iprcparm(psb_p_type_)     = psb_noprec_
+  p%iprcparm(psb_f_type_)     = psb_f_none_
+  
+  return
   select case(psb_toupper(ptype(1:len_trim(ptype))))
   case ('NONE','NOPREC') 
     p%iprcparm(:)           = 0

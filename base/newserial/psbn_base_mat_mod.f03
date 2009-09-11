@@ -369,8 +369,7 @@ contains
   end function get_size
 
   subroutine sparse_print(iout,a,iv,eirs,eics,head,ivr,ivc)
-    use psb_spmat_type
-    use psb_string_mod
+    use psb_error_mod
     implicit none 
 
     integer, intent(in)               :: iout

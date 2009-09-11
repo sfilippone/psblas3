@@ -1172,7 +1172,7 @@ end subroutine d_csr_csgetrow_impl
 
 
 
-subroutine d_csr_csput_impl(nz,val,ia,ja,a,imin,imax,jmin,jmax,info,gtl) 
+subroutine d_csr_csput_impl(nz,ia,ja,val,a,imin,imax,jmin,jmax,info,gtl) 
   use psb_error_mod
   use psb_realloc_mod
   use psbn_d_csr_mat_mod, psb_protect_name => d_csr_csput_impl
@@ -1236,7 +1236,7 @@ contains
     use psb_const_mod
     use psb_realloc_mod
     use psb_string_mod
-    use psb_serial_mod
+    use psb_sort_mod
     implicit none 
 
     class(psbn_d_csr_sparse_mat), intent(inout) :: a

@@ -29,13 +29,14 @@
 !!$  POSSIBILITY OF SUCH DAMAGE.
 !!$ 
 !!$  
-subroutine psb_dprecbld(a,desc_a,p,info,upd)
+subroutine psb_dprecbld(aa,desc_a,p,info,upd)
 
   use psb_base_mod
+  use psbn_d_mat_mod
   use psb_prec_mod, psb_protect_name => psb_dprecbld
   Implicit None
 
-  type(psb_dspmat_type), intent(in), target :: a
+  type(psbn_d_sparse_mat), intent(in), target :: aa
   type(psb_desc_type), intent(in), target :: desc_a
   type(psb_dprec_type),intent(inout)      :: p
   integer, intent(out)                    :: info
@@ -46,6 +47,7 @@ subroutine psb_dprecbld(a,desc_a,p,info,upd)
        & me,np,mglob, err_act
   integer      :: int_err(5)
   character    :: upd_
+  type(psb_dspmat_type), target :: a
 
   integer,parameter  :: iroot=psb_root_,iout=60,ilout=40
   character(len=20)   :: name, ch_err
@@ -85,6 +87,7 @@ subroutine psb_dprecbld(a,desc_a,p,info,upd)
        &  psb_diag_,is_legal_prec)
 
   call psb_nullify_desc(p%desc_data)
+
 
   select case(p%iprcparm(psb_p_type_)) 
   case (psb_noprec_)

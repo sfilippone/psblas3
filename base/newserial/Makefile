@@ -8,7 +8,7 @@ LIBMOD=
 OBJS = 
 LIBDIR=..
 CINCLUDES=-I. 
-FINCLUDES=$(FMFLAG)$(LIBDIR) $(FMFLAG). $(FIFLAG).
+FINCLUDES=$(FMFLAG)$(LIBDIR) $(FMFLAG). $(FIFLAG). $(FMFLAG)../modules
 
 
 lib:  $(MODULES)  $(OBJS)  $(LIBMOD)
@@ -16,7 +16,7 @@ lib:  $(MODULES)  $(OBJS)  $(LIBMOD)
 	$(RANLIB) $(LIBDIR)/$(LIBNAME) #	/bin/cp -p $(LIBMOD) $(LIBDIR)
 	/bin/cp -p *$(.mod) $(LIBDIR)
 
-psbn_mat_mod.o:	psbn_base_mat_mod.o
+psbn_mat_mod.o:	psbn_base_mat_mod.o  psbn_d_csr_mat_mod.o
 psbn_coo_mat.o psbn_csr_mat.o:	psbn_d_base_mat_mod.o
 
 psbn_d_coo_impl.o: psbn_d_base_mat_mod.o
