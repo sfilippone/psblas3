@@ -63,6 +63,9 @@ module psbn_d_mat_mod
     procedure, pass(a) :: d_csmv
     procedure, pass(a) :: d_csmm
     generic, public    :: csmm => d_csmm, d_csmv
+    procedure, pass(a) :: d_scals
+    procedure, pass(a) :: d_scal
+    generic, public    :: scal => d_scals, d_scal 
 
     procedure, pass(a) :: d_cssv
     procedure, pass(a) :: d_cssm
@@ -78,7 +81,7 @@ module psbn_d_mat_mod
        & reallocate_nz, free, trim, d_csmv, d_csmm, d_cssv, d_cssm, sparse_print, &
        & set_nrows, set_ncols, set_dupl, set_state, set_null, set_bld, &
        & set_upd, set_asb, set_sorted, set_upper, set_lower, set_triangle, &
-       & set_unit, csnmi, get_diag
+       & set_unit, csnmi, get_diag, d_scals, d_scal
 
 contains 
 
@@ -1602,6 +1605,77 @@ contains
 
   end subroutine get_diag
 
+  subroutine d_scal(d,a,info)
+    use psb_error_mod
+    use psb_const_mod
+    implicit none 
+    class(psbn_d_sparse_mat), intent(inout) :: a
+    real(psb_dpk_), intent(in)              :: d(:)
+    integer, intent(out)                    :: info
+
+    Integer :: err_act
+    character(len=20)  :: name='csnmi'
+    logical, parameter :: debug=.false.
+
+    call psb_erractionsave(err_act)
+    if (.not.allocated(a%a)) then 
+      info = 1121
+      call psb_errpush(info,name)
+      goto 9999
+    endif
+
+    call a%a%scal(d,info)
+    if (info /= 0) goto 9999
+
+    call psb_erractionrestore(err_act)
+    return
+
+9999 continue
+    call psb_erractionrestore(err_act)
+
+    if (err_act == psb_act_abort_) then
+      call psb_error()
+      return
+    end if
+    return
+
+  end subroutine d_scal
+
+  subroutine d_scals(d,a,info)
+    use psb_error_mod
+    use psb_const_mod
+    implicit none 
+    class(psbn_d_sparse_mat), intent(inout) :: a
+    real(psb_dpk_), intent(in)              :: d
+    integer, intent(out)                    :: info
+
+    Integer :: err_act
+    character(len=20)  :: name='csnmi'
+    logical, parameter :: debug=.false.
+
+    call psb_erractionsave(err_act)
+    if (.not.allocated(a%a)) then 
+      info = 1121
+      call psb_errpush(info,name)
+      goto 9999
+    endif
+
+    call a%a%scal(d,info)
+    if (info /= 0) goto 9999
+
+    call psb_erractionrestore(err_act)
+    return
+
+9999 continue
+    call psb_erractionrestore(err_act)
+
+    if (err_act == psb_act_abort_) then
+      call psb_error()
+      return
+    end if
+    return
+
+  end subroutine d_scals
 
 
 end module psbn_d_mat_mod
