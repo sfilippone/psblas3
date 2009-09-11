@@ -102,7 +102,7 @@ subroutine psb_dprecbld(aa,desc_a,p,info,upd)
 
   case (psb_diag_)
 
-    call psb_diagsc_bld(a,desc_a,p,upd_,info)
+    call psb_diagsc_bld(aa,desc_a,p,upd_,info)
     if(info /= 0) then
       info=4010
       ch_err='psb_diagsc_bld'

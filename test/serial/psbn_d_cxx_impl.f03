@@ -1,16 +1,16 @@
 
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-  !
-  !
-  !
-  ! Computational routines
-  !
-  !
-  !
-  !
-  !
-  !
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!=====================================
+!
+!
+!
+! Computational routines
+!
+!
+!
+!
+!
+!
+!=====================================
 
 subroutine d_cxx_csmv_impl(alpha,a,x,beta,y,info,trans) 
   use psb_error_mod
@@ -980,21 +980,199 @@ function d_cxx_csnmi_impl(a) result(res)
 
 end function d_cxx_csnmi_impl
 
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-  !
-  !
-  !
-  ! Data management
-  !
-  !
-  !
-  !
-  !
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!  
+!===================================== 
+!
+!
+!
+! Data management
+!
+!
+!
+!
+!
+!=====================================   
+
+
+subroutine d_cxx_csgetrow_impl(imin,imax,a,nz,ia,ja,val,info,&
+     & jmin,jmax,iren,append,nzin,rscale,cscale)
+  ! Output is always in  COO format 
+  use psb_error_mod
+  use psb_const_mod
+  use psb_error_mod
+  use psbn_d_base_mat_mod
+  use psbn_d_cxx_mat_mod, psb_protect_name => d_cxx_csgetrow_impl
+  implicit none
+
+  class(psbn_d_cxx_sparse_mat), intent(in) :: a
+  integer, intent(in)                  :: imin,imax
+  integer, intent(out)                 :: nz
+  integer, allocatable, intent(inout)  :: ia(:), ja(:)
+  real(psb_dpk_), allocatable,  intent(inout)    :: val(:)
+  integer,intent(out)                  :: info
+  logical, intent(in), optional        :: append
+  integer, intent(in), optional        :: iren(:)
+  integer, intent(in), optional        :: jmin,jmax, nzin
+  logical, intent(in), optional        :: rscale,cscale
+
+  logical :: append_, rscale_, cscale_ 
+  integer :: nzin_, jmin_, jmax_, err_act, i
+  character(len=20)  :: name='csget'
+  logical, parameter :: debug=.false.
+
+  call psb_erractionsave(err_act)
+  info = 0
+
+  if (present(jmin)) then
+    jmin_ = jmin
+  else
+    jmin_ = 1
+  endif
+  if (present(jmax)) then
+    jmax_ = jmax
+  else
+    jmax_ = a%get_ncols()
+  endif
+
+  if ((imax<imin).or.(jmax_<jmin_)) return
+
+  if (present(append)) then
+    append_=append
+  else
+    append_=.false.
+  endif
+  if ((append_).and.(present(nzin))) then 
+    nzin_ = nzin
+  else
+    nzin_ = 0
+  endif
+  if (present(rscale)) then 
+    rscale_ = rscale
+  else
+    rscale_ = .false.
+  endif
+  if (present(cscale)) then 
+    cscale_ = cscale
+  else
+    cscale_ = .false.
+  endif
+  if ((rscale_.or.cscale_).and.(present(iren))) then 
+    info = 583
+    call psb_errpush(info,name,a_err='iren (rscale.or.cscale)')
+    goto 9999
+  end if
+
+  call cxx_getrow(imin,imax,jmin_,jmax_,a,nz,ia,ja,val,nzin_,append_,info,&
+       & iren)
+  
+  if (rscale_) then 
+    do i=nzin_+1, nzin_+nz
+      ia(i) = ia(i) - imin + 1
+    end do
+  end if
+  if (cscale_) then 
+    do i=nzin_+1, nzin_+nz
+      ja(i) = ja(i) - jmin_ + 1
+    end do
+  end if
+
+  if (info /= 0) goto 9999
+
+  call psb_erractionrestore(err_act)
+  return
+
+9999 continue
+  call psb_erractionrestore(err_act)
+
+  if (err_act == psb_act_abort_) then
+    call psb_error()
+    return
+  end if
+  return
+
+contains
+
+  subroutine cxx_getrow(imin,imax,jmin,jmax,a,nz,ia,ja,val,nzin,append,info,&
+       & iren)
+
+    use psb_const_mod
+    use psb_error_mod
+    use psb_realloc_mod
+    use psb_sort_mod
+    implicit none
+
+    class(psbn_d_cxx_sparse_mat), intent(in)    :: a
+    integer                              :: imin,imax,jmin,jmax
+    integer, intent(out)                 :: nz
+    integer, allocatable, intent(inout)  :: ia(:), ja(:)
+    real(psb_dpk_), allocatable,  intent(inout)    :: val(:)
+    integer, intent(in)                  :: nzin
+    logical, intent(in)                  :: append
+    integer                              :: info
+    integer, optional                    :: iren(:)
+    integer  :: nzin_, nza, idx,i,j,k, nzt, irw, lrw
+    integer  :: debug_level, debug_unit
+    character(len=20) :: name='coo_getrow'
+
+    debug_unit  = psb_get_debug_unit()
+    debug_level = psb_get_debug_level()
+
+    nza = a%get_nzeros()
+    irw = imin
+    lrw = min(imax,a%get_nrows())
+    if (irw<0) then 
+      write(debug_unit,*) ' spgtrow Error : idx no good ',irw
+      info = 2
+      return
+    end if
+
+    if (append) then 
+      nzin_ = nzin
+    else
+      nzin_ = 0
+    endif
+
+    nzt = a%irp(lrw)-a%irp(irw)
+    nz = 0 
+
+    
+    call psb_ensure_size(nzin_+nzt,ia,info)
+    if (info==0) call psb_ensure_size(nzin_+nzt,ja,info)
+    if (info==0) call psb_ensure_size(nzin_+nzt,val,info)
+    if (info /= 0) return
+    
+    if (present(iren)) then 
+      do i=irw, lrw
+        do j=a%irp(i), a%irp(i+1) - 1
+          if ((jmin <= a%ja(j)).and.(a%ja(j)<=jmax)) then 
+            nzin_ = nzin_ + 1
+            nz    = nz + 1
+            val(nzin_) = a%val(j)
+            ia(nzin_)  = iren(i)
+            ja(nzin_)  = iren(a%ja(j))
+          end if
+        enddo
+      end do
+    else
+      do i=irw, lrw
+        do j=a%irp(i), a%irp(i+1) - 1
+          if ((jmin <= a%ja(j)).and.(a%ja(j)<=jmax)) then 
+            nzin_ = nzin_ + 1
+            nz    = nz + 1
+            val(nzin_) = a%val(j)
+            ia(nzin_)  = (i)
+            ja(nzin_)  = (a%ja(j))
+          end if
+        enddo
+      end do
+    end if
+
+  end subroutine cxx_getrow
+
+end subroutine d_cxx_csgetrow_impl
 
 
 
-subroutine d_cxx_csput_impl(nz,val,ia,ja,a,imin,imax,jmin,jmax,info,gtl) 
+subroutine d_cxx_csput_impl(nz,ia,ja,val,a,imin,imax,jmin,jmax,info,gtl) 
   use psb_error_mod
   use psb_realloc_mod
   use psbn_d_cxx_mat_mod, psb_protect_name => d_cxx_csput_impl
@@ -1058,7 +1236,7 @@ contains
     use psb_const_mod
     use psb_realloc_mod
     use psb_string_mod
-    use psb_serial_mod
+    use psb_sort_mod
     implicit none 
 
     class(psbn_d_cxx_sparse_mat), intent(inout) :: a
@@ -1596,3 +1774,4 @@ subroutine d_cp_cxx_from_fmt_impl(a,b,info)
     if (info == 0) call a%mv_from_coo(tmp,info)
   end select
 end subroutine d_cp_cxx_from_fmt_impl
+

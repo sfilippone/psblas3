@@ -71,8 +71,6 @@ module psbn_d_base_mat_mod
     procedure, pass(a) :: free     => d_coo_free
     procedure, pass(a) :: trim     => d_coo_trim
     procedure, pass(a) :: d_csgetrow => d_coo_csgetrow
-    procedure, pass(a) :: d_csgetblk => d_coo_csgetblk
-    procedure, pass(a) :: csclip     => d_coo_csclip
     procedure, pass(a) :: print    => d_coo_print
     procedure, pass(a) :: get_fmt  => d_coo_get_fmt
     
@@ -84,8 +82,7 @@ module psbn_d_base_mat_mod
        & d_fix_coo, d_coo_free, d_coo_print, d_coo_get_fmt, &
        & d_cp_coo_to_coo, d_cp_coo_from_coo, &
        & d_cp_coo_to_fmt, d_cp_coo_from_fmt, &
-       & d_coo_scals, d_coo_scal, d_coo_csgetrow, d_coo_csgetblk, &
-       & d_coo_csclip
+       & d_coo_scals, d_coo_scal, d_coo_csgetrow
   
   
   interface 
@@ -568,6 +565,7 @@ contains
   end subroutine d_csgetrow
 
 
+
   subroutine d_csgetblk(imin,imax,a,b,info,&
        & jmin,jmax,iren,append,rscale,cscale)
     ! Output is always in  COO format 
@@ -583,19 +581,44 @@ contains
     integer, intent(in), optional        :: iren(:)
     integer, intent(in), optional        :: jmin,jmax
     logical, intent(in), optional        :: rscale,cscale
-    Integer :: err_act
+    Integer :: err_act, nzin, nzout
     character(len=20)  :: name='csget'
+    logical :: append_
     logical, parameter :: debug=.false.
+    
+    call psb_erractionsave(err_act)
+    info = 0
 
-    call psb_get_erraction(err_act)
-    ! This is the base version. If we get here
-    ! it means the derived class is incomplete,
-    ! so we throw an error.
-    info = 700
-    call psb_errpush(info,name,a_err=a%get_fmt())
+    if (present(append)) then 
+      append_ = append
+    else
+      append_ = .false.
+    endif
+    if (append_) then 
+      nzin = a%get_nzeros()
+    else
+      nzin = 0
+    endif
 
-    if (err_act /= psb_act_ret_) then
+    call a%csget(imin,imax,nzout,b%ia,b%ja,b%val,info,&
+         & jmin=jmin, jmax=jmax, iren=iren, append=append_, &
+         & nzin=nzin, rscale=rscale, cscale=cscale)
+
+    if (info /= 0) goto 9999
+
+    call b%set_nzeros(nzin+nzout)
+    call b%fix(info)
+    if (info /= 0) goto 9999
+    
+    call psb_erractionrestore(err_act)
+    return
+
+9999 continue
+    call psb_erractionrestore(err_act)
+
+    if (err_act == psb_act_abort_) then
       call psb_error()
+      return
     end if
     return
 
@@ -614,19 +637,78 @@ contains
     integer,intent(out)                  :: info
     integer, intent(in), optional        :: imin,imax,jmin,jmax
     logical, intent(in), optional        :: rscale,cscale
-    Integer :: err_act
-    character(len=20)  :: name='csclip'
+
+    Integer :: err_act, nzin, nzout, imin_, imax_, jmin_, jmax_, mb,nb
+    character(len=20)  :: name='csget'
+    logical :: rscale_, cscale_
     logical, parameter :: debug=.false.
+    
+    call psb_erractionsave(err_act)
+    info = 0
 
-    call psb_get_erraction(err_act)
-    ! This is the base version. If we get here
-    ! it means the derived class is incomplete,
-    ! so we throw an error.
-    info = 700
-    call psb_errpush(info,name,a_err=a%get_fmt())
+    nzin = 0
+    if (present(imin)) then 
+      imin_ = imin
+    else
+      imin_ = 1
+    end if
+    if (present(imax)) then 
+      imax_ = imax
+    else
+      imax_ = a%get_nrows()
+    end if
+    if (present(jmin)) then 
+      jmin_ = jmin
+    else
+      jmin_ = 1
+    end if
+    if (present(jmax)) then 
+      jmax_ = jmax
+    else
+      jmax_ = a%get_ncols()
+    end if
+    if (present(rscale)) then 
+      rscale_ = rscale
+    else
+      rscale_ = .true.
+    end if
+    if (present(cscale)) then 
+      cscale_ = cscale
+    else
+      cscale_ = .true.
+    end if
 
-    if (err_act /= psb_act_ret_) then
+    if (rscale_) then 
+      mb = imax_ - imin_ +1
+    else 
+      mb = a%get_nrows() ! Should this be imax_ ?? 
+    endif
+    if (cscale_) then 
+      nb = jmax_ - jmin_ +1
+    else 
+      nb = a%get_ncols()  ! Should this be jmax_ ?? 
+    endif
+    call b%allocate(mb,nb)
+
+    call a%csget(imin_,imax_,nzout,b%ia,b%ja,b%val,info,&
+         & jmin=jmin_, jmax=jmax_, append=.false., &
+         & nzin=nzin, rscale=rscale_, cscale=cscale_)
+
+    if (info /= 0) goto 9999
+
+    call b%set_nzeros(nzin+nzout)
+    call b%fix(info)
+
+    if (info /= 0) goto 9999
+    call psb_erractionrestore(err_act)
+    return
+
+9999 continue
+    call psb_erractionrestore(err_act)
+
+    if (err_act == psb_act_abort_) then
       call psb_error()
+      return
     end if
     return
 
@@ -1390,156 +1472,6 @@ contains
     return
 
   end subroutine d_coo_csgetrow
-
-
-  subroutine d_coo_csgetblk(imin,imax,a,b,info,&
-       & jmin,jmax,iren,append,rscale,cscale)
-    ! Output is always in  COO format 
-    use psb_error_mod
-    use psb_const_mod
-    implicit none
-    
-    class(psbn_d_coo_sparse_mat), intent(in) :: a
-    class(psbn_d_coo_sparse_mat), intent(inout) :: b
-    integer, intent(in)                  :: imin,imax
-    integer,intent(out)                  :: info
-    logical, intent(in), optional        :: append
-    integer, intent(in), optional        :: iren(:)
-    integer, intent(in), optional        :: jmin,jmax
-    logical, intent(in), optional        :: rscale,cscale
-    Integer :: err_act, nzin, nzout
-    character(len=20)  :: name='csget'
-    logical :: append_
-    logical, parameter :: debug=.false.
-    
-    call psb_erractionsave(err_act)
-    info = 0
-
-    if (present(append)) then 
-      append_ = append
-    else
-      append_ = .false.
-    endif
-    if (append_) then 
-      nzin = a%get_nzeros()
-    else
-      nzin = 0
-    endif
-
-    call a%csget(imin,imax,nzout,b%ia,b%ja,b%val,info,&
-         & jmin=jmin, jmax=jmax, iren=iren, append=append_, &
-         & nzin=nzin, rscale=rscale, cscale=cscale)
-
-    if (info /= 0) goto 9999
-
-    call b%set_nzeros(nzin+nzout)
-    call b%fix(info)
-    if (info /= 0) goto 9999
-    
-    call psb_erractionrestore(err_act)
-    return
-
-9999 continue
-    call psb_erractionrestore(err_act)
-
-    if (err_act == psb_act_abort_) then
-      call psb_error()
-      return
-    end if
-    return
-
-  end subroutine d_coo_csgetblk
-
-
-  subroutine d_coo_csclip(a,b,info,&
-       & imin,imax,jmin,jmax,rscale,cscale)
-    ! Output is always in  COO format 
-    use psb_error_mod
-    use psb_const_mod
-    implicit none
-    
-    class(psbn_d_coo_sparse_mat), intent(in) :: a
-    class(psbn_d_coo_sparse_mat), intent(out) :: b
-    integer,intent(out)                  :: info
-    integer, intent(in), optional        :: imin,imax,jmin,jmax
-    logical, intent(in), optional        :: rscale,cscale
-
-    Integer :: err_act, nzin, nzout, imin_, imax_, jmin_, jmax_, mb,nb
-    character(len=20)  :: name='csget'
-    logical :: rscale_, cscale_
-    logical, parameter :: debug=.false.
-    
-    call psb_erractionsave(err_act)
-    info = 0
-
-    nzin = 0
-    if (present(imin)) then 
-      imin_ = imin
-    else
-      imin_ = 1
-    end if
-    if (present(imax)) then 
-      imax_ = imax
-    else
-      imax_ = a%get_nrows()
-    end if
-    if (present(jmin)) then 
-      jmin_ = jmin
-    else
-      jmin_ = 1
-    end if
-    if (present(jmax)) then 
-      jmax_ = jmax
-    else
-      jmax_ = a%get_ncols()
-    end if
-    if (present(rscale)) then 
-      rscale_ = rscale
-    else
-      rscale_ = .true.
-    end if
-    if (present(cscale)) then 
-      cscale_ = cscale
-    else
-      cscale_ = .true.
-    end if
-
-    if (rscale_) then 
-      mb = imax_ - imin_ +1
-    else 
-      mb = a%get_nrows() ! Should this be imax_ ?? 
-    endif
-    if (cscale_) then 
-      nb = jmax_ - jmin_ +1
-    else 
-      nb = a%get_ncols()  ! Should this be jmax_ ?? 
-    endif
-    call b%allocate(mb,nb)
-
-    call a%csget(imin_,imax_,nzout,b%ia,b%ja,b%val,info,&
-         & jmin=jmin_, jmax=jmax_, append=.false., &
-         & nzin=nzin, rscale=rscale_, cscale=cscale_)
-
-    if (info /= 0) goto 9999
-
-    call b%set_nzeros(nzin+nzout)
-    call b%fix(info)
-
-    if (info /= 0) goto 9999
-    call psb_erractionrestore(err_act)
-    return
-
-9999 continue
-    call psb_erractionrestore(err_act)
-
-    if (err_act == psb_act_abort_) then
-      call psb_error()
-      return
-    end if
-    return
-
-  end subroutine d_coo_csclip
-
 
 
 !!$

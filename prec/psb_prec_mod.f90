@@ -406,8 +406,9 @@ module psb_prec_mod
     subroutine psb_ddiagsc_bld(a,desc_a,p,upd,info)
       use psb_base_mod, only  : psb_desc_type, psb_dspmat_type, psb_dpk_
       use psb_prec_type, only : psb_dprec_type
+      use psbn_d_mat_mod
       integer, intent(out)                      :: info
-      type(psb_dspmat_type), intent(in), target :: a
+      type(psbn_d_sparse_mat), intent(in), target :: a
       type(psb_dprec_type), intent(inout)    :: p
       type(psb_desc_type), intent(in)           :: desc_a
       character, intent(in)                     :: upd

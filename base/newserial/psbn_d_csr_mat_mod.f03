@@ -30,8 +30,6 @@ module psbn_d_csr_mat_mod
     procedure, pass(a) :: mv_to_fmt => d_mv_csr_to_fmt
     procedure, pass(a) :: mv_from_fmt => d_mv_csr_from_fmt
     procedure, pass(a) :: d_csgetrow => d_csr_csgetrow
-    procedure, pass(a) :: d_csgetblk => d_csr_csgetblk
-    procedure, pass(a) :: csclip     => d_csr_csclip
     procedure, pass(a) :: get_size => d_csr_get_size
     procedure, pass(a) :: free => d_csr_free
     procedure, pass(a) :: trim => d_csr_trim
@@ -44,8 +42,7 @@ module psbn_d_csr_mat_mod
        & d_mv_csr_to_coo, d_mv_csr_from_coo, &
        & d_cp_csr_to_fmt, d_cp_csr_from_fmt, &
        & d_mv_csr_to_fmt, d_mv_csr_from_fmt, &
-       & d_csr_scals, d_csr_scal, d_csr_trim, d_csr_csgetrow, d_csr_csgetblk, &
-       & d_csr_csclip, d_csr_get_size
+       & d_csr_scals, d_csr_scal, d_csr_trim, d_csr_csgetrow, d_csr_get_size
 
 
   interface 
