@@ -40,6 +40,8 @@ module psbn_d_mat_mod
     procedure, pass(a) :: is_triangle
     procedure, pass(a) :: is_unit
     procedure, pass(a) :: get_fmt => sparse_get_fmt
+    procedure, pass(a) :: sizeof => d_sizeof
+
 
     ! Memory/data management 
     procedure, pass(a) :: csall
@@ -78,12 +80,32 @@ module psbn_d_mat_mod
        & is_unit, get_neigh, csall, csput, d_csgetrow,&
        & d_csgetblk, csclip, d_cscnv, d_cscnv_ip, &
        & reallocate_nz, free, trim, &
-       & d_csmv, d_csmm, d_cssv, d_cssm, sparse_print, &
+       & sparse_print, &
        & set_nrows, set_ncols, set_dupl, &
        & set_state, set_null, set_bld, &
        & set_upd, set_asb, set_sorted, &
        & set_upper, set_lower, set_triangle, &
-       & set_unit, csnmi, get_diag, d_scals, d_scal
+       & set_unit, get_diag
+
+  interface psb_sizeof
+    module procedure d_sizeof
+  end interface
+
+  interface psbn_csmm
+    module procedure d_csmm, d_csmv
+  end interface
+
+  interface psbn_cssm
+    module procedure d_cssm, d_cssv
+  end interface
+
+  interface psbn_csnmi
+    module procedure csnmi
+  end interface
+  
+  interface psbn_scal
+    module procedure d_scals, d_scal
+  end interface
 
 contains 
 
@@ -99,6 +121,20 @@ contains
   !
   !
   !=====================================
+
+  
+  function d_sizeof(a) result(res)
+    implicit none 
+    class(psbn_d_sparse_mat), intent(in) :: a
+    integer(psb_long_int_k_) :: res
+    
+    res = 0
+    if (allocated(a%a)) then 
+      res = a%a%sizeof()
+    end if
+    
+  end function d_sizeof
+
 
 
   function sparse_get_fmt(a) result(res)
@@ -1265,7 +1301,7 @@ contains
 
     call move_alloc(altmp,b%a)
     call b%set_asb() 
-
+    call b%trim()
     call psb_erractionrestore(err_act)
     return
 
@@ -1357,7 +1393,7 @@ contains
 
     call move_alloc(altmp,a%a)
     call a%set_asb() 
-
+    call a%trim()
     call psb_erractionrestore(err_act)
     return
 
@@ -1460,14 +1496,15 @@ contains
 
   end subroutine d_csmv
 
-  subroutine d_cssm(alpha,a,x,beta,y,info,trans) 
+  subroutine d_cssm(alpha,a,x,beta,y,info,trans,side,d) 
     use psb_error_mod
     implicit none 
     class(psbn_d_sparse_mat), intent(in) :: a
     real(kind(1.d0)), intent(in)    :: alpha, beta, x(:,:)
     real(kind(1.d0)), intent(inout) :: y(:,:)
     integer, intent(out)            :: info
-    character, optional, intent(in) :: trans
+    character, optional, intent(in) :: trans, side
+    real(psb_dpk_), intent(in), optional :: d(:)
     Integer :: err_act
     character(len=20)  :: name='psbn_cssm'
     logical, parameter :: debug=.false.
@@ -1480,7 +1517,7 @@ contains
       goto 9999
     endif
 
-    call a%a%cssm(alpha,x,beta,y,info,trans) 
+    call a%a%cssm(alpha,x,beta,y,info,trans,side,d) 
     if (info /= 0) goto 9999 
 
     call psb_erractionrestore(err_act)
@@ -1497,14 +1534,15 @@ contains
 
   end subroutine d_cssm
 
-  subroutine d_cssv(alpha,a,x,beta,y,info,trans) 
+  subroutine d_cssv(alpha,a,x,beta,y,info,trans,side,d) 
     use psb_error_mod
     implicit none 
     class(psbn_d_sparse_mat), intent(in) :: a
     real(kind(1.d0)), intent(in)    :: alpha, beta, x(:)
     real(kind(1.d0)), intent(inout) :: y(:)
     integer, intent(out)            :: info
-    character, optional, intent(in) :: trans
+    character, optional, intent(in) :: trans, side
+    real(psb_dpk_), intent(in), optional :: d(:)
     Integer :: err_act
     character(len=20)  :: name='psbn_cssv'
     logical, parameter :: debug=.false.
@@ -1516,8 +1554,8 @@ contains
       call psb_errpush(info,name)
       goto 9999
     endif
-
-    call a%a%cssm(alpha,x,beta,y,info,trans) 
+    
+    call a%a%cssm(alpha,x,beta,y,info,trans,side,d) 
 
     if (info /= 0) goto 9999 
 

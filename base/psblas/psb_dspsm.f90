@@ -64,7 +64,7 @@
 !    desc_a  -  type(psb_desc_type).   The communication descriptor.
 !    info    -  integer.               Return code
 !    trans   -  character(optional).   Whether A or A'. If not present 'N' is assumed.
-!    unitd   -  character(optional).   Specify some type of operation with
+!    side   -  character(optional).   Specify some type of operation with
 !                                      the diagonal matrix D.
 !    choice  -  integer(optional).     The kind of update to perform on overlap elements.
 !    d(:)    -  real  , optional       Matrix for diagonal scaling.
@@ -75,7 +75,7 @@
 !
 ! 
 subroutine  psb_dspsm(alpha,a,x,beta,y,desc_a,info,&
-     & trans, unitd, choice, diag, k, jx, jy, work)   
+     & trans, side, choice, diag, k, jx, jy, work)   
 
   use psb_spmat_type
   use psb_serial_mod
@@ -86,17 +86,18 @@ subroutine  psb_dspsm(alpha,a,x,beta,y,desc_a,info,&
   use psb_error_mod
   use psb_string_mod
   use psb_penv_mod
+  use psbn_d_mat_mod
   implicit none
 
   real(psb_dpk_), intent(in)              :: alpha, beta
   real(psb_dpk_), intent(in), target      :: x(:,:)
   real(psb_dpk_), intent(inout), target   :: y(:,:)
-  type (psb_dspmat_type), intent(in)        :: a
+  type(psbn_d_sparse_mat), intent(in)        :: a
   type(psb_desc_type), intent(in)           :: desc_a
   integer, intent(out)                      :: info
   real(psb_dpk_), intent(in), optional, target      :: diag(:)
   real(psb_dpk_), optional, target       :: work(:)
-  character, intent(in), optional           :: trans, unitd
+  character, intent(in), optional           :: trans, side
   integer, intent(in), optional             :: choice
   integer, intent(in), optional             :: k, jx, jy
 
@@ -106,7 +107,7 @@ subroutine  psb_dspsm(alpha,a,x,beta,y,desc_a,info,&
        & ix, iy, ik, ijx, ijy, i, lld,&
        & m, nrow, ncol, liwork, llwork, iiy, jjy, idx, ndm
 
-  character                :: lunitd
+  character                :: lside
   integer, parameter       :: nb=4
   real(psb_dpk_),pointer :: iwork(:), xp(:,:), yp(:,:), id(:)
   character                :: itrans
@@ -158,10 +159,10 @@ subroutine  psb_dspsm(alpha,a,x,beta,y,desc_a,info,&
     choice_ = psb_avg_
   endif
 
-  if (present(unitd)) then     
-    lunitd = psb_toupper(unitd)
+  if (present(side)) then     
+    lside = psb_toupper(side)
   else
-    lunitd = 'U'
+    lside = 'U'
   endif
 
   if (present(trans)) then     
@@ -192,8 +193,6 @@ subroutine  psb_dspsm(alpha,a,x,beta,y,desc_a,info,&
   ! check for presence/size of a work area
   iwork => null()
   liwork= 2*ncol
-  if (a%pr(1) /= 0) llwork = liwork + m * ik
-  if (a%pl(1) /= 0) llwork = llwork + m * ik
   if (present(work)) then
     if (size(work) >= liwork) then
       aliw =.false.
@@ -259,7 +258,7 @@ subroutine  psb_dspsm(alpha,a,x,beta,y,desc_a,info,&
   ! Perform local triangular system solve
   xp => x(iix:lldx,jjx:jjx+ik-1)
   yp => y(iiy:lldy,jjy:jjy+ik-1)
-  call a%cssm(alpha,xp,beta,yp,info,unitd=lunitd,d=id,trans=itrans)
+  call psbn_cssm(alpha,a,xp,beta,yp,info,side=side,d=diag,trans=trans)
 
   if(info /= 0) then
     info = 4010
@@ -357,14 +356,14 @@ end subroutine psb_dspsm
 !    desc_a  -  type(psb_desc_type).   The communication descriptor.
 !    info    -  integer.               Return code
 !    trans   -  character(optional).   Whether A or A'. If not present 'N' is assumed.
-!    unitd   -  character(optional).   Specify some type of operation with
+!    side   -  character(optional).   Specify some type of operation with
 !                                      the diagonal matrix D.
 !    choice  -  integer(optional).     The kind of update to perform on overlap elements.
 !    d(:)    -  real  , optional       Matrix for diagonal scaling.
 !    work(:) -  real  , optional       Working area.
 ! 
 subroutine  psb_dspsv(alpha,a,x,beta,y,desc_a,info,&
-     & trans, unitd, choice, diag, work)   
+     & trans, side, choice, diag, work)   
   use psb_spmat_type
   use psb_serial_mod
   use psb_descriptor_type
@@ -374,17 +373,18 @@ subroutine  psb_dspsv(alpha,a,x,beta,y,desc_a,info,&
   use psb_error_mod
   use psb_string_mod
   use psb_penv_mod
+  use psbn_d_mat_mod
   implicit none 
 
   real(psb_dpk_), intent(in)              :: alpha, beta
   real(psb_dpk_), intent(in), target      :: x(:)
   real(psb_dpk_), intent(inout), target   :: y(:)
-  type(psb_dspmat_type), intent(in)         :: a
+  type(psbn_d_sparse_mat), intent(in)         :: a
   type(psb_desc_type), intent(in)           :: desc_a
   integer, intent(out)                      :: info
   real(psb_dpk_), intent(in), optional, target    :: diag(:)
   real(psb_dpk_), optional, target        :: work(:)
-  character, intent(in), optional           :: trans, unitd
+  character, intent(in), optional           :: trans, side
   integer, intent(in), optional             :: choice
 
   ! locals
@@ -393,7 +393,7 @@ subroutine  psb_dspsv(alpha,a,x,beta,y,desc_a,info,&
        & ix, iy, ik, jx, jy, i, lld,&
        & m, nrow, ncol, liwork, llwork, iiy, jjy, idx, ndm
 
-  character                :: lunitd
+  character                :: lside
   integer, parameter       :: nb=4
   real(psb_dpk_),pointer :: iwork(:), xp(:), yp(:), id(:)
   character                :: itrans
@@ -429,10 +429,10 @@ subroutine  psb_dspsv(alpha,a,x,beta,y,desc_a,info,&
     choice_ = psb_avg_
   endif
 
-  if (present(unitd)) then     
-    lunitd = psb_toupper(unitd)
+  if (present(side)) then     
+    lside = psb_toupper(side)
   else
-    lunitd = 'U'
+    lside = 'U'
   endif
 
   if (present(trans)) then     
@@ -529,7 +529,8 @@ subroutine  psb_dspsv(alpha,a,x,beta,y,desc_a,info,&
   ! Perform local triangular system solve
   xp => x(iix:lldx)
   yp => y(iiy:lldy)
-  call a%cssm(alpha,xp,beta,yp,info,unitd=lunitd,d=id,trans=itrans)
+  call psbn_cssm(alpha,a,xp,beta,yp,info,side=side,d=diag,trans=trans)
+!!$  call psbn_cssm(alpha,a,xp,beta,yp,info,side=side,d=id,trans=itrans)
 
   if(info /= 0) then
     info = 4010

@@ -9,13 +9,17 @@ module psbn_d_base_mat_mod
     generic, public    :: csmm => d_base_csmm, d_base_csmv
     procedure, pass(a) :: d_base_cssv
     procedure, pass(a) :: d_base_cssm
-    generic, public    :: cssm => d_base_cssm, d_base_cssv
+    generic, public    :: base_cssm => d_base_cssm, d_base_cssv
+    procedure, pass(a) :: d_cssv
+    procedure, pass(a) :: d_cssm
+    generic, public    :: cssm => d_cssm, d_cssv
     procedure, pass(a) :: d_scals
     procedure, pass(a) :: d_scal
     generic, public    :: scal => d_scals, d_scal 
-    procedure, pass(a) :: get_diag
     procedure, pass(a) :: csnmi
+    procedure, pass(a) :: get_diag
     procedure, pass(a) :: csput
+
     procedure, pass(a) :: d_csgetrow
     procedure, pass(a) :: d_csgetblk
     generic, public    :: csget => d_csgetrow, d_csgetblk 
@@ -34,7 +38,7 @@ module psbn_d_base_mat_mod
        & d_scals, d_scal, csnmi, csput, d_csgetrow, d_csgetblk, &
        & cp_to_coo, cp_from_coo, cp_to_fmt, cp_from_fmt, &
        & mv_to_coo, mv_from_coo, mv_to_fmt, mv_from_fmt, &
-       & get_diag, csclip
+       & get_diag, csclip, d_cssv, d_cssm 
   
   
   type, extends(psbn_d_base_sparse_mat) :: psbn_d_coo_sparse_mat
@@ -73,6 +77,7 @@ module psbn_d_base_mat_mod
     procedure, pass(a) :: d_csgetrow => d_coo_csgetrow
     procedure, pass(a) :: print    => d_coo_print
     procedure, pass(a) :: get_fmt  => d_coo_get_fmt
+    procedure, pass(a) :: sizeof => d_coo_sizeof
     
   end type psbn_d_coo_sparse_mat
 
@@ -82,7 +87,7 @@ module psbn_d_base_mat_mod
        & d_fix_coo, d_coo_free, d_coo_print, d_coo_get_fmt, &
        & d_cp_coo_to_coo, d_cp_coo_from_coo, &
        & d_cp_coo_to_fmt, d_cp_coo_from_fmt, &
-       & d_coo_scals, d_coo_scal, d_coo_csgetrow
+       & d_coo_scals, d_coo_scal, d_coo_csgetrow, d_coo_sizeof
   
   
   interface 
@@ -838,6 +843,265 @@ contains
 
   end subroutine d_base_cssv
 
+  subroutine d_cssm(alpha,a,x,beta,y,info,trans,side,d) 
+    use psb_error_mod
+    use psb_string_mod
+    implicit none 
+    class(psbn_d_base_sparse_mat), intent(in) :: a
+    real(psb_dpk_), intent(in)    :: alpha, beta, x(:,:)
+    real(psb_dpk_), intent(inout) :: y(:,:)
+    integer, intent(out)            :: info
+    character, optional, intent(in) :: trans, side
+    real(psb_dpk_), intent(in), optional :: d(:)
+    
+    real(psb_dpk_), allocatable :: tmp(:,:)
+    Integer :: err_act, nar,nac,nc, i
+    character(len=1) :: side_
+    character(len=20)  :: name='d_cssm'
+    logical, parameter :: debug=.false.
+
+    call psb_erractionsave(err_act)
+
+    if (.not.a%is_asb()) then 
+      info = 1121
+      call psb_errpush(info,name)
+      goto 9999
+    endif
+
+    nar = a%get_nrows()
+    nac = a%get_ncols()
+    nc = min(size(x,2), size(y,2))
+    if (size(x,1) < nac) then
+      info = 36
+      call psb_errpush(info,name,i_err=(/3,nac,0,0,0/))
+      goto 9999
+    end if
+    if (size(y,1) < nar) then
+      info = 36
+      call psb_errpush(info,name,i_err=(/3,nar,0,0,0/))
+      goto 9999
+    end if
+    
+    if (.not. (a%is_triangle())) then 
+      info = 1121
+      call psb_errpush(info,name)
+      goto 9999
+    end if
+
+    if (present(d)) then 
+      if (present(side)) then 
+        side_ = side
+      else
+        side_ = 'L'
+      end if
+        
+      if (psb_toupper(side_) == 'R') then 
+        if (size(d,1) < nac) then
+          info = 36
+          call psb_errpush(info,name,i_err=(/9,nac,0,0,0/))
+          goto 9999
+        end if
+        
+        allocate(tmp(nac,nc),stat=info) 
+        if (info /= 0) info = 4000 
+        if (info == 0) then 
+          do i=1, nac
+            tmp(i,1:nc) = d(i)*x(i,1:nc) 
+          end do
+        end if
+        if (info == 0)&
+             & call a%base_cssm(alpha,tmp,beta,y,info,trans)
+        
+        if (info == 0) then 
+          deallocate(tmp,stat=info) 
+          if (info /= 0) info = 4000
+        end if
+      
+      else if (psb_toupper(side_) == 'L') then 
+        
+        if (size(d,1) < nar) then
+          info = 36
+          call psb_errpush(info,name,i_err=(/9,nar,0,0,0/))
+          goto 9999
+        end if
+        
+        allocate(tmp(nar,nc),stat=info) 
+        if (info /= 0) info = 4000 
+        if (info == 0)&
+             & call a%base_cssm(done,x,dzero,tmp,info,trans)
+        
+        if (info == 0)then 
+          do i=1, nar
+            tmp(i,1:nc) = d(i)*tmp(i,1:nc) 
+          end do
+        end if
+        if (info == 0)&
+             & call daxpby(nar,nc,alpha,tmp,size(tmp,1),beta,y,size(y,1),info)
+
+        if (info == 0) then 
+          deallocate(tmp,stat=info) 
+          if (info /= 0) info = 4000
+        end if
+        
+      else
+        info = 31
+        call psb_errpush(info,name,i_err=(/8,0,0,0,0/),a_err=side_)
+        goto 9999
+      end if
+    else 
+      ! Side is ignored in this case 
+      call a%base_cssm(alpha,x,beta,y,info,trans)
+    end if
+    
+    if (info /= 0) then 
+      info = 4010 
+      call psb_errpush(info,name, a_err='base_cssm')
+      goto 9999
+    end if
+
+
+    return
+    call psb_erractionrestore(err_act)
+    return
+
+
+9999 continue
+    call psb_erractionrestore(err_act)
+
+    if (err_act == psb_act_abort_) then
+      call psb_error()
+      return
+    end if
+    return
+
+
+  end subroutine d_cssm
+
+  subroutine d_cssv(alpha,a,x,beta,y,info,trans,side,d) 
+    use psb_error_mod
+    use psb_string_mod
+    implicit none 
+    class(psbn_d_base_sparse_mat), intent(in) :: a
+    real(psb_dpk_), intent(in)    :: alpha, beta, x(:)
+    real(psb_dpk_), intent(inout) :: y(:)
+    integer, intent(out)            :: info
+    character, optional, intent(in) :: trans, side
+    real(psb_dpk_), intent(in), optional :: d(:)
+    
+    real(psb_dpk_), allocatable :: tmp(:)
+    Integer :: err_act, nar,nac,nc, i
+    character(len=1) :: side_
+    character(len=20)  :: name='d_cssm'
+    logical, parameter :: debug=.false.
+
+    call psb_erractionsave(err_act)
+
+    if (.not.a%is_asb()) then
+      info = 1121
+      call psb_errpush(info,name)
+      goto 9999
+    endif
+
+    nar = a%get_nrows()
+    nac = a%get_ncols()
+    nc = 1
+    if (size(x,1) < nac) then
+      info = 36
+      call psb_errpush(info,name,i_err=(/3,nac,0,0,0/))
+      goto 9999
+    end if
+    if (size(y,1) < nar) then
+      info = 36
+      call psb_errpush(info,name,i_err=(/3,nar,0,0,0/))
+      goto 9999
+    end if
+    
+    if (.not. (a%is_triangle())) then 
+      info = 1121
+      call psb_errpush(info,name)
+      goto 9999
+    end if
+
+    if (present(d)) then 
+      if (present(side)) then 
+        side_ = side
+      else
+        side_ = 'L'
+      end if
+        
+      if (psb_toupper(side_) == 'R') then 
+        if (size(d,1) < nac) then
+          info = 36
+          call psb_errpush(info,name,i_err=(/9,nac,0,0,0/))
+          goto 9999
+        end if
+        
+        allocate(tmp(nac),stat=info) 
+        if (info /= 0) info = 4000 
+        if (info == 0) tmp(1:nac) = d(1:nac)*x(1:nac) 
+        if (info == 0)&
+             & call a%base_cssm(alpha,tmp,beta,y,info,trans)
+        
+        if (info == 0) then 
+          deallocate(tmp,stat=info) 
+          if (info /= 0) info = 4000
+        end if
+      
+      else if (psb_toupper(side_) == 'L') then 
+        if (size(d,1) < nar) then
+          info = 36
+          call psb_errpush(info,name,i_err=(/9,nar,0,0,0/))
+          goto 9999
+        end if
+        
+        allocate(tmp(nar),stat=info) 
+        if (info /= 0) info = 4000 
+        if (info == 0)&
+             & call a%base_cssm(done,x,dzero,tmp,info,trans)
+
+        if (info == 0) tmp(1:nar) = d(1:nar)*tmp(1:nar) 
+        if (info == 0)&
+             & call daxpby(nar,nc,alpha,tmp,size(tmp,1),beta,y,size(y,1),info)
+        
+        if (info == 0) then 
+          deallocate(tmp,stat=info) 
+          if (info /= 0) info = 4000
+        end if
+        
+      else
+        info = 31
+        call psb_errpush(info,name,i_err=(/8,0,0,0,0/),a_err=side_)
+        goto 9999
+      end if
+    else 
+      ! Side is ignored in this case 
+      call a%base_cssm(alpha,x,beta,y,info,trans)
+    end if
+
+    if (info /= 0) then 
+      info = 4010 
+      call psb_errpush(info,name, a_err='base_cssm')
+      goto 9999
+    end if
+
+
+    return
+    call psb_erractionrestore(err_act)
+    return
+
+
+9999 continue
+    call psb_erractionrestore(err_act)
+
+    if (err_act == psb_act_abort_) then
+      call psb_error()
+      return
+    end if
+    return
+
+
+  end subroutine d_cssv
+
 
   subroutine d_scals(d,a,info) 
     use psb_error_mod
@@ -908,7 +1172,7 @@ contains
     ! so we throw an error.
     info = 700
     call psb_errpush(info,name,a_err=a%get_fmt())
-    write(0,*) 'Got into error path',err_act,psb_act_ret_
+
     if (err_act /= psb_act_ret_) then
       call psb_error()
     end if
@@ -960,6 +1224,18 @@ contains
   !
   !====================================
 
+
+  
+  function d_coo_sizeof(a) result(res)
+    implicit none 
+    class(psbn_d_coo_sparse_mat), intent(in) :: a
+    integer(psb_long_int_k_) :: res
+    res = 8 + 1
+    res = res + psb_sizeof_dp  * size(a%val)
+    res = res + psb_sizeof_int * size(a%ia)
+    res = res + psb_sizeof_int * size(a%ja)
+      
+  end function d_coo_sizeof
 
 
   function d_coo_get_fmt(a) result(res)
@@ -1597,7 +1873,6 @@ contains
       call psb_errpush(info,name,i_err=(/3,0,0,0,0/))
       goto 9999
     endif
-
     if (info == 0) call psb_realloc(nz_,a%ia,info)
     if (info == 0) call psb_realloc(nz_,a%ja,info)
     if (info == 0) call psb_realloc(nz_,a%val,info)
@@ -1721,7 +1996,7 @@ contains
     character, optional, intent(in)     :: trans
 
     character :: trans_
-    integer   :: i,j,k,m,n, nnz, ir, jc
+    integer   :: i,j,k,m,n, nnz, ir, jc, nac, nar
     real(psb_dpk_) :: acc
     logical   :: tra
     Integer :: err_act
@@ -1735,7 +2010,19 @@ contains
       call psb_errpush(info,name)
       goto 9999
     endif
-
+    nar = a%get_nrows()
+    nac = a%get_ncols()
+    if (size(x) < nac) then
+      info = 36
+      call psb_errpush(info,name,i_err=(/3,nac,0,0,0/))
+      goto 9999
+    end if
+    if (size(y) < nar) then
+      info = 36
+      call psb_errpush(info,name,i_err=(/3,nar,0,0,0/))
+      goto 9999
+    end if
+    
 
     call d_coo_csmm_impl(alpha,a,x,beta,y,info,trans) 
 
@@ -1765,7 +2052,7 @@ contains
     character, optional, intent(in)     :: trans
 
     character :: trans_
-    integer   :: i,j,k,m,n, nnz, ir, jc, nc
+    integer   :: i,j,k,m,n, nnz, ir, jc, nc, nar, nac
     real(psb_dpk_), allocatable  :: acc(:)
     logical   :: tra
     Integer :: err_act
@@ -1775,7 +2062,24 @@ contains
     call psb_erractionsave(err_act)
 
 
-
+    if (.not.a%is_asb()) then 
+      info = 1121
+      call psb_errpush(info,name)
+      goto 9999
+    endif
+    nar = a%get_nrows()
+    nac = a%get_ncols()
+    if (size(x,1) < nac) then
+      info = 36
+      call psb_errpush(info,name,i_err=(/3,nac,0,0,0/))
+      goto 9999
+    end if
+    if (size(y,1) < nar) then
+      info = 36
+      call psb_errpush(info,name,i_err=(/3,nar,0,0,0/))
+      goto 9999
+    end if
+    
     call d_coo_csmm_impl(alpha,a,x,beta,y,info,trans) 
 
     if (info /= 0) goto 9999
@@ -1805,7 +2109,7 @@ contains
     character, optional, intent(in)     :: trans
 
     character :: trans_
-    integer   :: i,j,k,m,n, nnz, ir, jc
+    integer   :: i,j,k,m,n, nnz, ir, jc, nar, nac
     real(psb_dpk_) :: acc
     real(psb_dpk_), allocatable :: tmp(:)
     logical   :: tra
@@ -1821,9 +2125,21 @@ contains
       goto 9999
     endif
 
+    nar = a%get_nrows()
+    nac = a%get_ncols()
+    if (size(x,1) < nac) then
+      info = 36
+      call psb_errpush(info,name,i_err=(/3,nac,0,0,0/))
+      goto 9999
+    end if
+    if (size(y,1) < nar) then
+      info = 36
+      call psb_errpush(info,name,i_err=(/3,nar,0,0,0/))
+      goto 9999
+    end if
+    
 
     if (.not. (a%is_triangle())) then 
-      write(0,*) 'Called SM on a non-triangular mat!'
       info = 1121
       call psb_errpush(info,name)
       goto 9999
@@ -1859,7 +2175,7 @@ contains
     character, optional, intent(in)     :: trans
 
     character :: trans_
-    integer   :: i,j,k,m,n, nnz, ir, jc, nc
+    integer   :: i,j,k,m,n, nnz, ir, jc, nc, nar, nac
     real(psb_dpk_) :: acc
     real(psb_dpk_), allocatable :: tmp(:,:)
     logical   :: tra
@@ -1875,9 +2191,21 @@ contains
       goto 9999
     endif
 
+    nar = a%get_nrows()
+    nac = a%get_ncols()
+    if (size(x,1) < nac) then
+      info = 36
+      call psb_errpush(info,name,i_err=(/3,nac,0,0,0/))
+      goto 9999
+    end if
+    if (size(y,1) < nar) then
+      info = 36
+      call psb_errpush(info,name,i_err=(/3,nar,0,0,0/))
+      goto 9999
+    end if
+    
 
     if (.not. (a%is_triangle())) then 
-      write(0,*) 'Called SM on a non-triangular mat!'
       info = 1121
       call psb_errpush(info,name)
       goto 9999

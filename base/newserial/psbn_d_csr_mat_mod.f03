@@ -34,6 +34,7 @@ module psbn_d_csr_mat_mod
     procedure, pass(a) :: free => d_csr_free
     procedure, pass(a) :: trim => d_csr_trim
     procedure, pass(a) :: print => d_csr_print
+    procedure, pass(a) :: sizeof => d_csr_sizeof
   end type psbn_d_csr_sparse_mat
   private :: d_csr_get_nzeros, d_csr_csmm, d_csr_csmv, d_csr_cssm, d_csr_cssv, &
        & d_csr_csput, d_csr_reallocate_nz, d_csr_allocate_mnnz, &
@@ -42,7 +43,8 @@ module psbn_d_csr_mat_mod
        & d_mv_csr_to_coo, d_mv_csr_from_coo, &
        & d_cp_csr_to_fmt, d_cp_csr_from_fmt, &
        & d_mv_csr_to_fmt, d_mv_csr_from_fmt, &
-       & d_csr_scals, d_csr_scal, d_csr_trim, d_csr_csgetrow, d_csr_get_size
+       & d_csr_scals, d_csr_scal, d_csr_trim, d_csr_csgetrow, d_csr_get_size, &
+       & d_csr_sizeof
 
 
   interface 
@@ -233,6 +235,18 @@ contains
   !
   !
   !=====================================
+
+  
+  function d_csr_sizeof(a) result(res)
+    implicit none 
+    class(psbn_d_csr_sparse_mat), intent(in) :: a
+    integer(psb_long_int_k_) :: res
+    res = 8 
+    res = res + psb_sizeof_dp  * size(a%val)
+    res = res + psb_sizeof_int * size(a%irp)
+    res = res + psb_sizeof_int * size(a%ja)
+      
+  end function d_csr_sizeof
 
   function d_csr_get_fmt(a) result(res)
     implicit none 
@@ -1151,7 +1165,6 @@ contains
 
     
     if (.not. (a%is_triangle())) then 
-      write(0,*) 'Called SM on a non-triangular mat!'
       info = 1121
       call psb_errpush(info,name)
       goto 9999
@@ -1205,7 +1218,6 @@ contains
 
     
     if (.not. (a%is_triangle())) then 
-      write(0,*) 'Called SM on a non-triangular mat!'
       info = 1121
       call psb_errpush(info,name)
       goto 9999

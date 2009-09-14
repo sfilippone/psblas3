@@ -88,7 +88,8 @@ module psbn_base_mat_mod
     generic,   public  :: allocate => allocate_mnnz
     generic,   public  :: reallocate => reallocate_nz
     procedure, pass(a) :: print => sparse_print
-            
+    procedure, pass(a) :: sizeof
+
   end type psbn_base_sparse_mat
 
   private :: set_nrows, set_ncols, set_dupl, set_state, &
@@ -97,10 +98,21 @@ module psbn_base_mat_mod
        & get_nzeros, get_size, get_state, get_dupl, is_null, is_bld, &
        & is_upd, is_asb, is_sorted, is_upper, is_lower, is_triangle, &
        & is_unit, get_neigh, allocate_mn, allocate_mnnz, reallocate_nz, &
-       & free, sparse_print, get_fmt, trim
+       & free, sparse_print, get_fmt, trim, sizeof
   
+
 contains
+
+  
+  function sizeof(a) result(res)
+    implicit none 
+    class(psbn_base_sparse_mat), intent(in) :: a
+    integer(psb_long_int_k_) :: res
+    res = 8
+  end function sizeof
  
+ 
+
   function get_fmt(a) result(res)
     implicit none 
     class(psbn_base_sparse_mat), intent(in) :: a

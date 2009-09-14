@@ -771,7 +771,8 @@ module psb_psblas_mod
          & diag, n, jx, jy, work)
       use psb_serial_mod
       use psb_descriptor_type
-      type(psb_dspmat_type), intent(in)    :: t
+      use psbn_d_mat_mod
+      type(psbn_d_sparse_mat), intent(in)    :: t
       real(psb_dpk_), intent(in)           :: x(:,:)
       real(psb_dpk_), intent(inout)        :: y(:,:)
       real(psb_dpk_), intent(in)           :: alpha, beta
@@ -787,7 +788,8 @@ module psb_psblas_mod
          & diag, work)
       use psb_serial_mod
       use psb_descriptor_type
-      type(psb_dspmat_type), intent(in)      :: t
+      use psbn_d_mat_mod
+      type(psbn_d_sparse_mat), intent(in)    :: t
       real(psb_dpk_), intent(in)             :: x(:)
       real(psb_dpk_), intent(inout)          :: y(:)
       real(psb_dpk_), intent(in)             :: alpha, beta

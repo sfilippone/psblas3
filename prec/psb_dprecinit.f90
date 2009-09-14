@@ -55,12 +55,12 @@ subroutine psb_dprecinit(p,ptype,info)
     p%iprcparm(psb_p_type_)     = psb_diag_
     p%iprcparm(psb_f_type_)     = psb_f_none_
 
-!!$  case ('BJAC') 
-!!$    p%iprcparm(:)            = 0
-!!$    p%iprcparm(psb_p_type_)      = psb_bjac_
-!!$    p%iprcparm(psb_f_type_)      = psb_f_ilu_n_
-!!$    p%iprcparm(psb_ilu_fill_in_) = 0
-!!$
+  case ('BJAC') 
+    p%iprcparm(:)            = 0
+    p%iprcparm(psb_p_type_)      = psb_bjac_
+    p%iprcparm(psb_f_type_)      = psb_f_ilu_n_
+    p%iprcparm(psb_ilu_fill_in_) = 0
+
   case default
     write(0,*) 'Unknown preconditioner type request "',ptype,'"'
     info = 2

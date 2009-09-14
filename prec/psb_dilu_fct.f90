@@ -37,12 +37,13 @@ subroutine psb_dilu_fct(a,l,u,d,info,blck)
   !
   !
   use psb_base_mod
+  use psbn_d_mat_mod
   implicit none
   !     .. Scalar Arguments ..
   integer, intent(out)                ::     info
   !     .. Array Arguments ..
-  type(psb_dspmat_type),intent(in)    :: a
-  type(psb_dspmat_type),intent(inout) :: l,u
+  type(psbn_d_sparse_mat),intent(in)    :: a
+  type(psbn_d_csr_sparse_mat),intent(inout) :: l,u
   type(psb_dspmat_type),intent(in), optional, target :: blck
   real(psb_dpk_), intent(inout)     ::  d(:)
   !     .. Local Scalars ..
@@ -76,25 +77,26 @@ subroutine psb_dilu_fct(a,l,u,d,info,blck)
     blck_%m=0
   endif
 
-  call psb_dilu_fctint(m,a%m,a,blck_%m,blck_,&
-       & d,l%aspk,l%ia1,l%ia2,u%aspk,u%ia1,u%ia2,l1,l2,info)
+  call psb_dilu_fctint(m,a%get_nrows(),a,blck_%m,blck_,&
+       & d,l%val,l%ja,l%irp,u%val,u%ja,u%irp,l1,l2,info)
   if(info /= 0) then
      info=4010
      ch_err='psb_dilu_fctint'
      call psb_errpush(info,name,a_err=ch_err)
      goto 9999
   end if
-  
-  l%infoa(1) = l1
-  l%fida     = 'CSR'
-  l%descra   = 'TLU'
-  u%infoa(1) = l2
-  u%fida     = 'CSR'
-  u%descra   = 'TUU'
-  l%m = m
-  l%k = m
-  u%m = m
-  u%k = m
+
+  call l%set_triangle()
+  call l%set_lower()
+  call l%set_unit()
+  call u%set_triangle()
+  call u%set_upper()
+  call u%set_unit()
+  call l%set_nrows(m)
+  call l%set_ncols(m)
+  call u%set_nrows(m)
+  call u%set_ncols(m)
+
   if (present(blck)) then 
     blck_ => null() 
   else
@@ -124,17 +126,22 @@ contains
        & d,laspk,lia1,lia2,uaspk,uia1,uia2,l1,l2,info)
     implicit none 
 
-    type(psb_dspmat_type)          :: a,b
+    type(psbn_d_sparse_mat)          :: a
+    type(psb_dspmat_type)          :: b
     integer                        :: m,ma,mb,l1,l2,info
     integer, dimension(:)          :: lia1,lia2,uia1,uia2
     real(psb_dpk_), dimension(:) :: laspk,uaspk,d
 
-    integer :: i,j,k,l,low1,low2,kk,jj,ll, irb, ktrw,err_act
+    integer :: i,j,k,l,low1,low2,kk,jj,ll, irb, ktrw,err_act, nz
     real(psb_dpk_) :: dia,temp
     integer, parameter :: nrb=16
     type(psb_dspmat_type) :: trw
+    integer, allocatable :: irow(:), icol(:)
+    real(psb_dpk_), allocatable :: val(:)
+
     integer             :: int_err(5) 
     character(len=20)   :: name, ch_err
+    
 
     name='psb_dilu_fctint'
     if(psb_get_errstatus() /= 0) return 
@@ -162,61 +169,23 @@ contains
       d(i) = dzero
 
       !
-      ! Here we take a fast shortcut if possible, otherwise 
-      ! use spgtblk, slower but able (in principle) to handle 
-      ! anything. 
       !
-      if (a%fida=='CSR') then 
-        do j = a%ia2(i), a%ia2(i+1) - 1
-          k = a%ia1(j)
-          !           write(0,*)'KKKKK',k
-          if ((k < i).and.(k >= 1)) then
-            l1 = l1 + 1
-            laspk(l1) = a%aspk(j)
-            lia1(l1) = k
-          else if (k == i) then
-            d(i) = a%aspk(j)
-          else if ((k > i).and.(k <= m)) then
-            l2 = l2 + 1
-            uaspk(l2) = a%aspk(j)
-            uia1(l2) = k
-          end if
-        enddo
-
-      else
-
-        if ((mod(i,nrb) == 1).or.(nrb==1)) then 
-          irb = min(ma-i+1,nrb)
-          call psb_sp_getblk(i,a,trw,info,lrw=i+irb-1)
-          if(info /= 0) then
-            info=4010
-            ch_err='psb_sp_getblk'
-            call psb_errpush(info,name,a_err=ch_err)
-            goto 9999
-          end if
-          ktrw=1
+      call a%csget(i,i,nz,irow,icol,val,info)
+      do j=1, nz
+        k = icol(j)
+        !           write(0,*)'KKKKK',k
+        if ((k < i).and.(k >= 1)) then
+          l1 = l1 + 1
+          laspk(l1) = val(j)
+          lia1(l1) = k
+        else if (k == i) then
+          d(i) = val(j)
+        else if ((k > i).and.(k <= m)) then
+          l2 = l2 + 1
+          uaspk(l2) = val(j)
+          uia1(l2) = k
         end if
-
-        do 
-          if (ktrw > trw%infoa(psb_nnz_)) exit
-          if (trw%ia1(ktrw) > i) exit
-          k = trw%ia2(ktrw)
-          if ((k < i).and.(k >= 1)) then
-            l1 = l1 + 1
-            laspk(l1) = trw%aspk(ktrw)
-            lia1(l1) = k
-          else if (k == i) then
-            d(i) = trw%aspk(ktrw)
-          else if ((k > i).and.(k <= m)) then
-            l2 = l2 + 1
-            uaspk(l2) = trw%aspk(ktrw)
-            uia1(l2) = k
-          end if
-          ktrw = ktrw + 1
-        enddo
-
-      end if
-
+      end do
 !!$
 
       lia2(i+1) = l1 + 1

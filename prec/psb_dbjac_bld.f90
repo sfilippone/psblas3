@@ -30,6 +30,7 @@
 !!$ 
 !!$  
 subroutine psb_dbjac_bld(a,desc_a,p,upd,info)
+  use psbn_d_mat_mod
   use psb_base_mod
   use psb_prec_mod, psb_protect_name => psb_dbjac_bld
   implicit none
@@ -37,7 +38,7 @@ subroutine psb_dbjac_bld(a,desc_a,p,upd,info)
   !     .. Scalar Arguments ..                                                    
   integer, intent(out)                      :: info
   !     .. array Arguments ..                                                     
-  type(psb_dspmat_type), intent(in), target :: a
+  type(psbn_d_sparse_mat), intent(in), target :: a
   type(psb_dprec_type), intent(inout)    :: p
   type(psb_desc_type), intent(in)           :: desc_a
   character, intent(in)                     :: upd
@@ -47,6 +48,7 @@ subroutine psb_dbjac_bld(a,desc_a,p,upd,info)
   integer  ::    int_err(5)
   character ::        trans, unitd
   type(psb_dspmat_type) :: atmp
+  type(psbn_d_csr_sparse_mat), allocatable  :: lf, uf
   real(psb_dpk_) :: t1,t2,t3,t4,t5,t6, t7, t8
   integer   nztota,  err_act, n_row, nrow_a,n_col, nhalo
   integer :: ictxt,np,me
@@ -61,7 +63,7 @@ subroutine psb_dbjac_bld(a,desc_a,p,upd,info)
   ictxt=psb_cd_get_context(desc_a)
   call psb_info(ictxt, me, np)
 
-  m = a%m
+  m = a%get_nrows()
   if (m < 0) then
     info = 10
     int_err(1) = 1
@@ -89,12 +91,12 @@ subroutine psb_dbjac_bld(a,desc_a,p,upd,info)
     if (allocated(p%av)) then 
       if (size(p%av) < psb_bp_ilu_avsz) then 
         do i=1,size(p%av) 
-          call psb_sp_free(p%av(i),info)
-          if (info /= 0) then 
-            ! Actually, we don't care here about this.
-            ! Just let it go.
-            ! return
-          end if
+          call p%av(i)%free()
+!!$          if (info /= 0) then 
+!!$            ! Actually, we don't care here about this.
+!!$            ! Just let it go.
+!!$            ! return
+!!$          end if
         enddo
         deallocate(p%av,stat=info)
       endif
@@ -108,17 +110,19 @@ subroutine psb_dbjac_bld(a,desc_a,p,upd,info)
     endif
 
     nrow_a = psb_cd_get_local_rows(desc_a)
-    nztota = psb_sp_get_nnzeros(a)
+    nztota = a%get_nzeros()
 
     n_col  = psb_cd_get_local_cols(desc_a)
     nhalo  = n_col-nrow_a
     n_row  = p%desc_data%matrix_data(psb_n_row_)
-    p%av(psb_l_pr_)%m  = n_row
-    p%av(psb_l_pr_)%k  = n_row
-    p%av(psb_u_pr_)%m  = n_row
-    p%av(psb_u_pr_)%k  = n_row
-    call psb_sp_all(n_row,n_row,p%av(psb_l_pr_),nztota,info)
-    if (info == 0) call psb_sp_all(n_row,n_row,p%av(psb_u_pr_),nztota,info)
+    
+    allocate(lf,uf,stat=info)
+    if (info == 0) call lf%allocate(n_row,n_row,nztota)
+    if (info == 0) call uf%allocate(n_row,n_row,nztota)
+    
+
+!!$    call p%av(psb_l_pr_)%csall(n_row,n_row,info,nztota)
+!!$    if (info == 0) call p%av(psb_u_pr_)%csall(n_row,n_row,info,nztota)
     if(info/=0) then
       info=4010
       ch_err='psb_sp_all'
@@ -140,24 +144,34 @@ subroutine psb_dbjac_bld(a,desc_a,p,upd,info)
 
     endif
     t3 = psb_wtime()
-    ! This is where we have mo renumbering, thus no need 
+    ! This is where we have no renumbering, thus no need 
     ! for ATMP
+!!$    call p%av(psb_l_pr_)%cscnv(info,type='CSR')
+!!$    call p%av(psb_u_pr_)%cscnv(info,type='CSR')
+    
+    call psb_ilu_fct(a,lf,uf,p%d,info)
 
-    call psb_ilu_fct(a,p%av(psb_l_pr_),p%av(psb_u_pr_),p%d,info)
-    if(info/=0) then
+    if(info==0) then
+      call move_alloc(lf,p%av(psb_l_pr_)%a)
+      call move_alloc(uf,p%av(psb_u_pr_)%a)
+      call p%av(psb_l_pr_)%set_asb()
+      call p%av(psb_u_pr_)%set_asb()
+      call p%av(psb_l_pr_)%trim()
+      call p%av(psb_u_pr_)%trim()
+    else
       info=4010
       ch_err='psb_ilu_fct'
       call psb_errpush(info,name,a_err=ch_err)
       goto 9999
     end if
-
-    if (psb_sp_getifld(psb_upd_,p%av(psb_u_pr_),info) /= psb_upd_perm_) then
-      call psb_sp_trim(p%av(psb_u_pr_),info)
-    endif
-
-    if (psb_sp_getifld(psb_upd_,p%av(psb_l_pr_),info) /= psb_upd_perm_) then
-      call psb_sp_trim(p%av(psb_l_pr_),info)
-    endif
+!!$
+!!$    if (psb_sp_getifld(psb_upd_,p%av(psb_u_pr_),info) /= psb_upd_perm_) then
+!!$      call psb_sp_trim(p%av(psb_u_pr_),info)
+!!$    endif
+!!$
+!!$    if (psb_sp_getifld(psb_upd_,p%av(psb_l_pr_),info) /= psb_upd_perm_) then
+!!$      call psb_sp_trim(p%av(psb_l_pr_),info)
+!!$    endif
 
 
   case(psb_f_none_) 

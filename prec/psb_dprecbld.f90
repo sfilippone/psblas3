@@ -115,7 +115,7 @@ subroutine psb_dprecbld(aa,desc_a,p,info,upd)
     call psb_check_def(p%iprcparm(psb_f_type_),'fact',&
          &  psb_f_ilu_n_,is_legal_ml_fact)
 
-    call psb_bjac_bld(a,desc_a,p,upd_,info)
+    call psb_bjac_bld(aa,desc_a,p,upd_,info)
 
     if(info /= 0) then
       call psb_errpush(4010,name,a_err='psb_bjac_bld')

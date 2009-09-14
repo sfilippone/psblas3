@@ -94,7 +94,7 @@ program ppde
   real(psb_dpk_)   :: err, eps
 
   ! other variables
-  integer            :: info
+  integer            :: info, i
   character(len=20)  :: name,ch_err
 
   info=0
@@ -131,7 +131,6 @@ program ppde
     call psb_errpush(info,name,a_err=ch_err)
     goto 9999
   end if
-
   if (iam == psb_root_) write(*,'("Overall matrix creation time : ",es12.5)')t2
   if (iam == psb_root_) write(*,'(" ")')
   !
@@ -156,7 +155,6 @@ program ppde
 
   if (iam == psb_root_) write(*,'("Preconditioner time : ",es12.5)')tprec
   if (iam == psb_root_) write(*,'(" ")')
-
   !
   ! iterative method parameters 
   !
@@ -178,8 +176,7 @@ program ppde
   t2 = psb_wtime() - t1
   call psb_amx(ictxt,t2)
 
-!!$  amatsize = psb_sizeof(a)
-  amatsize = 0
+  amatsize = psb_sizeof(a)
   descsize = psb_sizeof(desc_a)
   precsize = psb_sizeof(prec)
   call psb_sum(ictxt,amatsize)

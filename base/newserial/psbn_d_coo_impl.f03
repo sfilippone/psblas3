@@ -29,7 +29,6 @@ subroutine d_coo_cssm_impl(alpha,a,x,beta,y,info,trans)
 
 
   if (.not. (a%is_triangle())) then 
-    write(0,*) 'Called SM on a non-triangular mat!'
     info = 1121
     call psb_errpush(info,name)
     goto 9999
@@ -48,20 +47,20 @@ subroutine d_coo_cssm_impl(alpha,a,x,beta,y,info,trans)
   if (alpha == dzero) then
     if (beta == dzero) then
       do i = 1, m
-        y(i,:) = dzero
+        y(i,1:nc) = dzero
       enddo
     else
       do  i = 1, m
-        y(i,:) = beta*y(i,:)
+        y(i,1:nc) = beta*y(i,1:nc)
       end do
     endif
     return
   end if
 
   if (beta == dzero) then 
-    call inner_coosm(tra,a,x,y,info)
+    call inner_coosm(tra,a,x(:,1:nc),y(:,1:nc),info)
     do  i = 1, m
-      y(i,:) = alpha*y(i,:)
+      y(i,1:nc) = alpha*y(i,1:nc)
     end do
   else 
     allocate(tmp(m,nc), stat=info) 
@@ -71,10 +70,10 @@ subroutine d_coo_cssm_impl(alpha,a,x,beta,y,info,trans)
       goto 9999
     end if
 
-    tmp(1:m,:) = x(1:m,:)
-    call inner_coosm(tra,a,tmp,y,info)
+    tmp(1:m,1:nc) = x(1:m,1:nc)
+    call inner_coosm(tra,a,tmp(:,1:nc),y(:,1:nc),info)
     do  i = 1, m
-      y(i,:) = alpha*tmp(i,:) + beta*y(i,:)
+      y(i,1:nc) = alpha*tmp(i,1:nc) + beta*y(i,1:nc)
     end do
   end if
 
@@ -135,7 +134,7 @@ contains
             do 
               if (j > nnz) exit
               if (a%ia(j) > i) exit
-              acc = acc + a%val(j)*x(a%ja(j),:)
+              acc = acc + a%val(j)*y(a%ja(j),:)
               j   = j + 1
             end do
             y(i,:) = x(i,:) - acc
@@ -152,7 +151,7 @@ contains
                 j = j + 1
                 exit
               end if
-              acc = acc + a%val(j)*x(a%ja(j),:)
+              acc = acc + a%val(j)*y(a%ja(j),:)
               j   = j + 1
             end do
           end do
@@ -185,7 +184,7 @@ contains
                 j = j - 1
                 exit
               end if
-              acc = acc + a%val(j)*x(a%ja(j),:)
+              acc = acc + a%val(j)*y(a%ja(j),:)
               j   = j - 1
             end do
           end do
@@ -396,7 +395,7 @@ contains
             do 
               if (j > nnz) exit
               if (a%ia(j) > i) exit
-              acc = acc + a%val(j)*x(a%ja(j))
+              acc = acc + a%val(j)*y(a%ja(j))
               j   = j + 1
             end do
             y(i) = x(i) - acc
@@ -413,7 +412,7 @@ contains
                 j = j + 1
                 exit
               end if
-              acc = acc + a%val(j)*x(a%ja(j))
+              acc = acc + a%val(j)*y(a%ja(j))
               j   = j + 1
             end do
           end do
@@ -427,7 +426,7 @@ contains
             do 
               if (j < 1) exit
               if (a%ia(j) < i) exit
-              acc = acc + a%val(j)*x(a%ja(j))
+              acc = acc + a%val(j)*y(a%ja(j))
               j   = j - 1
             end do
             y(i) = x(i) - acc
@@ -446,7 +445,7 @@ contains
                 j = j - 1
                 exit
               end if
-              acc = acc + a%val(j)*x(a%ja(j))
+              acc = acc + a%val(j)*y(a%ja(j))
               j   = j - 1
             end do
           end do
@@ -747,11 +746,11 @@ subroutine d_coo_csmm_impl(alpha,a,x,beta,y,info,trans)
   if (alpha == dzero) then
     if (beta == dzero) then
       do i = 1, m
-        y(i,:) = dzero
+        y(i,1:nc) = dzero
       enddo
     else
       do  i = 1, m
-        y(i,:) = beta*y(i,:)
+        y(i,1:nc) = beta*y(i,1:nc)
       end do
     endif
     return
@@ -759,28 +758,28 @@ subroutine d_coo_csmm_impl(alpha,a,x,beta,y,info,trans)
     if (.not.a%is_unit()) then 
       if (beta == dzero) then
         do i = 1, m
-          y(i,:) = dzero
+          y(i,1:nc) = dzero
         enddo
       else
         do  i = 1, m
-          y(i,:) = beta*y(i,:)
+          y(i,1:nc) = beta*y(i,1:nc)
         end do
       endif
 
     else  if (a%is_unit()) then 
       if (beta == dzero) then
         do i = 1, min(m,n)
-          y(i,:) = alpha*x(i,:)
+          y(i,1:nc) = alpha*x(i,1:nc)
         enddo
         do i = min(m,n)+1, m
-          y(i,:) = dzero
+          y(i,1:nc) = dzero
         enddo
       else
         do  i = 1, min(m,n) 
-          y(i,:) = beta*y(i,:) + alpha*x(i,:)
+          y(i,1:nc) = beta*y(i,1:nc) + alpha*x(i,1:nc)
         end do
         do i = min(m,n)+1, m
-          y(i,:) = beta*y(i,:)
+          y(i,1:nc) = beta*y(i,1:nc)
         enddo
       endif
 
@@ -796,15 +795,15 @@ subroutine d_coo_csmm_impl(alpha,a,x,beta,y,info,trans)
       acc  = dzero
       do 
         if (i>nnz) then 
-          y(ir,:) = y(ir,:) + alpha * acc
+          y(ir,1:nc) = y(ir,1:nc) + alpha * acc
           exit
         endif
         if (a%ia(i) /= ir) then 
-          y(ir,:) = y(ir,:) + alpha * acc
+          y(ir,1:nc) = y(ir,1:nc) + alpha * acc
           ir    = a%ia(i) 
           acc   = dzero
         endif
-        acc     = acc + a%val(i) * x(a%ja(i),:)
+        acc     = acc + a%val(i) * x(a%ja(i),1:nc)
         i       = i + 1               
       enddo
     end if
@@ -815,7 +814,7 @@ subroutine d_coo_csmm_impl(alpha,a,x,beta,y,info,trans)
       do i=1,nnz
         ir = a%ja(i)
         jc = a%ia(i)
-        y(ir,:) = y(ir,:) +  a%val(i)*x(jc,:)
+        y(ir,1:nc) = y(ir,1:nc) +  a%val(i)*x(jc,1:nc)
       enddo
 
     else if (alpha.eq.-done) then
@@ -823,7 +822,7 @@ subroutine d_coo_csmm_impl(alpha,a,x,beta,y,info,trans)
       do i=1,nnz
         ir = a%ja(i)
         jc = a%ia(i)
-        y(ir,:) = y(ir,:) - a%val(i)*x(jc,:)
+        y(ir,1:nc) = y(ir,1:nc) - a%val(i)*x(jc,1:nc)
       enddo
 
     else                    
@@ -831,7 +830,7 @@ subroutine d_coo_csmm_impl(alpha,a,x,beta,y,info,trans)
       do i=1,nnz
         ir = a%ja(i)
         jc = a%ia(i)
-        y(ir,:) = y(ir,:) + alpha*a%val(i)*x(jc,:)
+        y(ir,1:nc) = y(ir,1:nc) + alpha*a%val(i)*x(jc,1:nc)
       enddo
 
     end if                  !.....end testing on alpha
@@ -861,7 +860,6 @@ function d_coo_csnmi_impl(a) result(res)
 
   integer   :: i,j,k,m,n, nnz, ir, jc, nc
   real(psb_dpk_) :: acc
-  real(psb_dpk_), allocatable :: tmp(:,:)
   logical   :: tra
   Integer :: err_act
   character(len=20)  :: name='d_base_csnmi'
@@ -1028,7 +1026,6 @@ contains
     irw = imin
     lrw = imax
     if (irw<0) then 
-      write(debug_unit,*) ' spgtrow Error : idx no good ',irw
       info = 2
       return
     end if
@@ -1237,13 +1234,11 @@ subroutine d_coo_csput_impl(nz,ia,ja,val,a,imin,imax,jmin,jmax,info,gtl)
 
   nza  = a%get_nzeros()
   isza = a%get_size()
-!!$  write(0,*) 'On entry to csput_impl: ',nza
   if (a%is_bld()) then 
     ! Build phase. Must handle reallocations in a sensible way.
     if (isza < (nza+nz)) then 
       call a%reallocate(max(nza+nz,int(1.5*isza)))
       isza = a%get_size()
-!!$      write(0,*) 'isza: ',isza,nza+nz
     endif
 
     call psb_inner_ins(nz,ia,ja,val,nza,a%ia,a%ja,a%val,isza,&
@@ -1327,7 +1322,6 @@ contains
         if ((ir >=imin).and.(ir<=imax).and.(ic>=jmin).and.(ic<=jmax)) then 
           nza = nza + 1 
           if (nza > maxsz) then 
-            write(0,*) 'err -92 ',nza,maxsz
             info = -92
             return
           endif

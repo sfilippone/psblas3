@@ -41,6 +41,7 @@ module psb_prec_type
        & psb_dspmat_type, psb_zspmat_type, psb_dpk_, psb_spk_, psb_long_int_k_,&
        & psb_desc_type, psb_sizeof, psb_sp_free, psb_cdfree,&
        & psb_erractionsave, psb_erractionrestore, psb_error, psb_get_errstatus
+  use psbn_d_mat_mod, only : psbn_d_sparse_mat
 
   integer, parameter :: psb_min_prec_=0, psb_noprec_=0, psb_diag_=1, &
        & psb_bjac_=2, psb_max_prec_=2
@@ -75,7 +76,7 @@ module psb_prec_type
   end type psb_sprec_type
 
   type psb_dprec_type
-    type(psb_dspmat_type), allocatable :: av(:) 
+    type(psbn_d_sparse_mat), allocatable :: av(:) 
     real(psb_dpk_), allocatable        :: d(:)  
     type(psb_desc_type)                :: desc_data 
     integer, allocatable               :: iprcparm(:) 
@@ -402,7 +403,8 @@ contains
 
     if (allocated(p%av))  then 
       do i=1,size(p%av) 
-        call psb_sp_free(p%av(i),info)
+!!$        call psb_sp_free(p%av(i),info)
+        call p%av(i)%free()
         if (info /= 0) then 
           ! Actually, we don't care here about this.
           ! Just let it go.
@@ -600,6 +602,7 @@ contains
 
 
   function psb_dprec_sizeof(prec) result(val)
+    use psbn_d_mat_mod
     type(psb_dprec_type), intent(in) :: prec
     integer(psb_long_int_k_) :: val
     integer :: i

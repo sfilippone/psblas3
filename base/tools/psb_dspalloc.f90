@@ -109,7 +109,7 @@ subroutine psb_dspalloc(a, desc_a, info, nnz)
        & write(debug_unit,*) me,' ',trim(name),':allocating size:',length_ia1
 
   !....allocate aspk, ia1, ia2.....
-  call a%csall(loc_row,loc_col,length_ia1,info)
+  call a%csall(loc_row,loc_col,info,nz=length_ia1)
   if(info /= 0) then
     info=4010
     ch_err='sp_all'

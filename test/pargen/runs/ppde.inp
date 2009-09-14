@@ -1,11 +1,11 @@
 7                      Number of entries below this
 BICGSTAB                 Iterative method BICGSTAB CGS  BICG BICGSTABL RGMRES
-DIAG                   Preconditioner NONE  DIAG  BJAC 
-CSR                    Storage format for matrix A:  CSR COO JAD 
+BJAC                   Preconditioner NONE  DIAG  BJAC 
+COO                    Storage format for matrix A:  CSR COO JAD 
 060                    Domain size (acutal system is this**3)
-1                      Stopping criterion
+2                      Stopping criterion
 0400                   MAXIT
--40                     ITRACE
+-01                     ITRACE
 20                     IRST    restart for RGMRES  and BiCGSTABL
 
 

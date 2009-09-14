@@ -40,7 +40,6 @@ subroutine d_csr_csmv_impl(alpha,a,x,beta,y,info,trans)
   end if
 
   if (.not.a%is_asb()) then 
-    write(0,*) 'Error: csmv called on an unassembled mat'
     info = 1121
     call psb_errpush(info,name)
     goto 9999
@@ -567,7 +566,6 @@ subroutine d_csr_cssv_impl(alpha,a,x,beta,y,info,trans)
 
   info = 0
   call psb_erractionsave(err_act)
-
   if (present(trans)) then
     trans_ = trans
   else
@@ -588,7 +586,7 @@ subroutine d_csr_cssv_impl(alpha,a,x,beta,y,info,trans)
     goto 9999
   end if
 
-
+  
   if (alpha == dzero) then
     if (beta == dzero) then
       do i = 1, m
@@ -603,18 +601,29 @@ subroutine d_csr_cssv_impl(alpha,a,x,beta,y,info,trans)
   end if
 
   if (beta == dzero) then 
-    call inner_csrsv(tra,a,x,y)
-    do  i = 1, m
-      y(i) = alpha*y(i)
-    end do
+!!$    call inner_csrsv(tra,a,x,y)
+    call inner_csrsv(tra,a%is_lower(),a%is_unit(),a%get_nrows(),&
+         & a%irp,a%ja,a%val,x,y) 
+    if (alpha == done) then 
+      ! do nothing
+    else if (alpha == -done) then 
+      do  i = 1, m
+        y(i) = -y(i)
+      end do
+    else
+      do  i = 1, m
+        y(i) = alpha*y(i)
+      end do
+    end if
   else 
     allocate(tmp(m), stat=info) 
     if (info /= 0) then 
-      write(0,*) 'Memory allocation error in CSRSV '
       return
     end if
     tmp(1:m) = x(1:m)
-    call inner_csrsv(tra,a,tmp,y)
+    call inner_csrsv(tra,a%is_lower(),a%is_unit(),a%get_nrows(),&
+         & a%irp,a%ja,a%val,tmp,y) 
+!!$    call inner_csrsv(tra,a,tmp,y)
     do  i = 1, m
       y(i) = alpha*tmp(i) + beta*y(i)
     end do
@@ -634,53 +643,56 @@ subroutine d_csr_cssv_impl(alpha,a,x,beta,y,info,trans)
 
 contains 
 
-  subroutine inner_csrsv(tra,a,x,y) 
+  subroutine inner_csrsv(tra,lower,unit,n,irp,ja,val,x,y) 
     implicit none 
-    logical, intent(in)                 :: tra  
-    class(psbn_d_csr_sparse_mat), intent(in) :: a
-    real(psb_dpk_), intent(in)          :: x(:)
-    real(psb_dpk_), intent(out)         :: y(:)
+    logical, intent(in)                 :: tra,lower,unit  
+!!$    class(psbn_d_csr_sparse_mat), intent(in) :: a
+    integer, intent(in)                 :: irp(*), ja(*),n
+    
+    real(psb_dpk_), intent(in)          :: val(*)
+    real(psb_dpk_), intent(in)          :: x(*)
+    real(psb_dpk_), intent(out)         :: y(*)
 
     integer :: i,j,k,m, ir, jc
     real(psb_dpk_) :: acc
 
     if (.not.tra) then 
 
-      if (a%is_lower()) then 
-        if (a%is_unit()) then 
-          do i=1, a%get_nrows()
+      if (lower) then 
+        if (unit) then 
+          do i=1, n
             acc = dzero 
-            do j=a%irp(i), a%irp(i+1)-1
-              acc = acc + a%val(j)*x(a%ja(j))
+            do j=irp(i), irp(i+1)-1
+              acc = acc + val(j)*y(ja(j))
             end do
             y(i) = x(i) - acc
           end do
-        else if (.not.a%is_unit()) then 
-          do i=1, a%get_nrows()
+        else if (.not.unit) then 
+          do i=1, n
             acc = dzero 
-            do j=a%irp(i), a%irp(i+1)-2
-              acc = acc + a%val(j)*x(a%ja(j))
+            do j=irp(i), irp(i+1)-2
+              acc = acc + val(j)*y(ja(j))
             end do
-            y(i) = (x(i) - acc)/a%val(a%irp(i+1)-1)
+            y(i) = (x(i) - acc)/val(irp(i+1)-1)
           end do
         end if
-      else if (a%is_upper()) then 
+      else if (.not.lower) then 
 
-        if (a%is_unit()) then 
-          do i=a%get_nrows(), 1, -1 
+        if (unit) then 
+          do i=n, 1, -1 
             acc = dzero 
-            do j=a%irp(i), a%irp(i+1)-1
-              acc = acc + a%val(j)*x(a%ja(j))
+            do j=irp(i), irp(i+1)-1
+              acc = acc + val(j)*y(ja(j))
             end do
             y(i) = x(i) - acc
           end do
-        else if (.not.a%is_unit()) then 
-          do i=a%get_nrows(), 1, -1 
+        else if (.not.unit) then 
+          do i=n, 1, -1 
             acc = dzero 
-            do j=a%irp(i)+1, a%irp(i+1)-1
-              acc = acc + a%val(j)*x(a%ja(j))
+            do j=irp(i)+1, irp(i+1)-1
+              acc = acc + val(j)*y(ja(j))
             end do
-            y(i) = (x(i) - acc)/a%val(a%irp(i))
+            y(i) = (x(i) - acc)/val(irp(i))
           end do
         end if
 
@@ -688,46 +700,46 @@ contains
 
     else if (tra) then 
 
-      do i=1, a%get_nrows()
+      do i=1, n
         y(i) = x(i)
       end do
 
-      if (a%is_lower()) then 
-        if (a%is_unit()) then 
-          do i=a%get_nrows(), 1, -1
+      if (lower) then 
+        if (unit) then 
+          do i=n, 1, -1
             acc = y(i) 
-            do j=a%irp(i), a%irp(i+1)-1
-              jc    = a%ja(j)
-              y(jc) = y(jc) - a%val(j)*acc 
+            do j=irp(i), irp(i+1)-1
+              jc    = ja(j)
+              y(jc) = y(jc) - val(j)*acc 
             end do
           end do
-        else if (.not.a%is_unit()) then 
-          do i=a%get_nrows(), 1, -1
-            y(i) = y(i)/a%val(a%irp(i+1)-1)
+        else if (.not.unit) then 
+          do i=n, 1, -1
+            y(i) = y(i)/val(irp(i+1)-1)
             acc  = y(i) 
-            do j=a%irp(i), a%irp(i+1)-2
-              jc    = a%ja(j)
-              y(jc) = y(jc) - a%val(j)*acc 
+            do j=irp(i), irp(i+1)-2
+              jc    = ja(j)
+              y(jc) = y(jc) - val(j)*acc 
             end do
           end do
         end if
-      else if (a%is_upper()) then 
+      else if (.not.lower) then 
 
-        if (a%is_unit()) then 
-          do i=1, a%get_nrows()
+        if (unit) then 
+          do i=1, n
             acc  = y(i) 
-            do j=a%irp(i), a%irp(i+1)-1
-              jc    = a%ja(j)
-              y(jc) = y(jc) - a%val(j)*acc 
+            do j=irp(i), irp(i+1)-1
+              jc    = ja(j)
+              y(jc) = y(jc) - val(j)*acc 
             end do
           end do
-        else if (.not.a%is_unit()) then 
-          do i=1, a%get_nrows()
-            y(i) = y(i)/a%val(a%irp(i))
+        else if (.not.unit) then 
+          do i=1, n
+            y(i) = y(i)/val(irp(i))
             acc  = y(i) 
-            do j=a%irp(i)+1, a%irp(i+1)-1
-              jc    = a%ja(j)
-              y(jc) = y(jc) - a%val(j)*acc 
+            do j=irp(i)+1, irp(i+1)-1
+              jc    = ja(j)
+              y(jc) = y(jc) - val(j)*acc 
             end do
           end do
         end if
@@ -779,7 +791,6 @@ subroutine d_csr_cssm_impl(alpha,a,x,beta,y,info,trans)
   nc  = min(size(x,2) , size(y,2)) 
 
   if (.not. (a%is_triangle())) then 
-    write(0,*) 'Called SM on a non-triangular mat!'
     info = 1121
     call psb_errpush(info,name)
     goto 9999
@@ -800,9 +811,11 @@ subroutine d_csr_cssm_impl(alpha,a,x,beta,y,info,trans)
   end if
 
   if (beta == dzero) then 
-    call inner_csrsm(tra,a,x,y,info)
+!!$    call inner_csrsm(tra,a,x,y,info)
+    call inner_csrsm(tra,a%is_lower(),a%is_unit(),a%get_nrows(),nc,&
+         & a%irp,a%ja,a%val,x,size(x,1),y,size(y,1),info) 
     do  i = 1, m
-      y(i,:) = alpha*y(i,:)
+      y(i,1:nc) = alpha*y(i,1:nc)
     end do
   else 
     allocate(tmp(m,nc), stat=info) 
@@ -812,10 +825,12 @@ subroutine d_csr_cssm_impl(alpha,a,x,beta,y,info,trans)
       goto 9999
     end if
 
-    tmp(1:m,:) = x(1:m,:)
-    call inner_csrsm(tra,a,tmp,y,info)
+    tmp(1:m,:) = x(1:m,1:nc)
+    call inner_csrsm(tra,a%is_lower(),a%is_unit(),a%get_nrows(),nc,&
+         & a%irp,a%ja,a%val,tmp,size(tmp,1),y,size(y,1),info) 
+!!$    call inner_csrsm(tra,a,tmp,y,info)
     do  i = 1, m
-      y(i,:) = alpha*tmp(i,:) + beta*y(i,:)
+      y(i,1:nc) = alpha*tmp(i,1:nc) + beta*y(i,1:nc)
     end do
   end if
 
@@ -841,18 +856,19 @@ subroutine d_csr_cssm_impl(alpha,a,x,beta,y,info,trans)
 
 contains 
 
-  subroutine inner_csrsm(tra,a,x,y,info) 
+  subroutine inner_csrsm(tra,lower,unit,nr,nc,&
+       & irp,ja,val,x,ldx,y,ldy,info) 
     implicit none 
-    logical, intent(in)                 :: tra  
-    class(psbn_d_csr_sparse_mat), intent(in) :: a
-    real(psb_dpk_), intent(in)          :: x(:,:)
-    real(psb_dpk_), intent(out)         :: y(:,:)
+    logical, intent(in)                 :: tra,lower,unit
+    integer, intent(in)                 :: nr,nc,ldx,ldy,irp(*),ja(*)
+    real(psb_dpk_), intent(in)          :: val(*), x(ldx,*)
+    real(psb_dpk_), intent(out)         :: y(ldy,*)
     integer, intent(out)                :: info
     integer :: i,j,k,m, ir, jc
     real(psb_dpk_), allocatable  :: acc(:)
 
     info = 0
-    allocate(acc(size(x,2)), stat=info)
+    allocate(acc(nc), stat=info)
     if(info /= 0) then
       info=4010
       return
@@ -861,41 +877,41 @@ contains
 
     if (.not.tra) then 
 
-      if (a%is_lower()) then 
-        if (a%is_unit()) then 
-          do i=1, a%get_nrows()
+      if (lower) then 
+        if (unit) then 
+          do i=1, nr
             acc = dzero 
             do j=a%irp(i), a%irp(i+1)-1
-              acc = acc + a%val(j)*x(a%ja(j),:)
+              acc = acc + a%val(j)*y(a%ja(j),1:nc)
             end do
-            y(i,:) = x(i,:) - acc
+            y(i,1:nc) = x(i,1:nc) - acc
           end do
-        else if (.not.a%is_unit()) then 
-          do i=1, a%get_nrows()
+        else if (.not.unit) then 
+          do i=1, nr
             acc = dzero 
             do j=a%irp(i), a%irp(i+1)-2
-              acc = acc + a%val(j)*x(a%ja(j),:)
+              acc = acc + a%val(j)*y(a%ja(j),1:nc)
             end do
-            y(i,:) = (x(i,:) - acc)/a%val(a%irp(i+1)-1)
+            y(i,1:nc) = (x(i,1:nc) - acc)/a%val(a%irp(i+1)-1)
           end do
         end if
-      else if (a%is_upper()) then 
+      else if (.not.lower) then 
 
-        if (a%is_unit()) then 
-          do i=a%get_nrows(), 1, -1 
+        if (unit) then 
+          do i=nr, 1, -1 
             acc = dzero 
             do j=a%irp(i), a%irp(i+1)-1
-              acc = acc + a%val(j)*x(a%ja(j),:)
+              acc = acc + a%val(j)*y(a%ja(j),1:nc)
             end do
-            y(i,:) = x(i,:) - acc
+            y(i,1:nc) = x(i,1:nc) - acc
           end do
-        else if (.not.a%is_unit()) then 
-          do i=a%get_nrows(), 1, -1 
+        else if (.not.unit) then 
+          do i=nr, 1, -1 
             acc = dzero 
             do j=a%irp(i)+1, a%irp(i+1)-1
-              acc = acc + a%val(j)*x(a%ja(j),:)
+              acc = acc + a%val(j)*y(a%ja(j),1:nc)
             end do
-            y(i,:) = (x(i,:) - acc)/a%val(a%irp(i))
+            y(i,1:nc) = (x(i,1:nc) - acc)/a%val(a%irp(i))
           end do
         end if
 
@@ -903,46 +919,46 @@ contains
 
     else if (tra) then 
 
-      do i=1, a%get_nrows()
-        y(i,:) = x(i,:)
+      do i=1, nr
+        y(i,1:nc) = x(i,1:nc)
       end do
 
-      if (a%is_lower()) then 
-        if (a%is_unit()) then 
-          do i=a%get_nrows(), 1, -1
-            acc = y(i,:) 
+      if (lower) then 
+        if (unit) then 
+          do i=nr, 1, -1
+            acc = y(i,1:nc) 
             do j=a%irp(i), a%irp(i+1)-1
               jc    = a%ja(j)
-              y(jc,:) = y(jc,:) - a%val(j)*acc 
+              y(jc,1:nc) = y(jc,1:nc) - a%val(j)*acc 
             end do
           end do
-        else if (.not.a%is_unit()) then 
-          do i=a%get_nrows(), 1, -1
-            y(i,:) = y(i,:)/a%val(a%irp(i+1)-1)
-            acc  = y(i,:) 
+        else if (.not.unit) then 
+          do i=nr, 1, -1
+            y(i,1:nc) = y(i,1:nc)/a%val(a%irp(i+1)-1)
+            acc  = y(i,1:nc) 
             do j=a%irp(i), a%irp(i+1)-2
               jc    = a%ja(j)
-              y(jc,:) = y(jc,:) - a%val(j)*acc 
+              y(jc,1:nc) = y(jc,1:nc) - a%val(j)*acc 
             end do
           end do
         end if
-      else if (a%is_upper()) then 
+      else if (.not.lower) then 
 
-        if (a%is_unit()) then 
-          do i=1, a%get_nrows()
-            acc  = y(i,:) 
+        if (unit) then 
+          do i=1, nr
+            acc  = y(i,1:nc) 
             do j=a%irp(i), a%irp(i+1)-1
               jc    = a%ja(j)
-              y(jc,:) = y(jc,:) - a%val(j)*acc 
+              y(jc,1:nc) = y(jc,1:nc) - a%val(j)*acc 
             end do
           end do
-        else if (.not.a%is_unit()) then 
-          do i=1, a%get_nrows()
-            y(i,:) = y(i,:)/a%val(a%irp(i))
-            acc    = y(i,:) 
+        else if (.not.unit) then 
+          do i=1, nr
+            y(i,1:nc) = y(i,1:nc)/a%val(a%irp(i))
+            acc    = y(i,1:nc) 
             do j=a%irp(i)+1, a%irp(i+1)-1
               jc      = a%ja(j)
-              y(jc,:) = y(jc,:) - a%val(j)*acc 
+              y(jc,1:nc) = y(jc,1:nc) - a%val(j)*acc 
             end do
           end do
         end if
@@ -1120,7 +1136,6 @@ contains
     irw = imin
     lrw = min(imax,a%get_nrows())
     if (irw<0) then 
-      write(debug_unit,*) ' spgtrow Error : idx no good ',irw
       info = 2
       return
     end if
@@ -1131,13 +1146,14 @@ contains
       nzin_ = 0
     endif
 
-    nzt = a%irp(lrw)-a%irp(irw)
+    nzt = a%irp(lrw+1)-a%irp(irw)
     nz = 0 
 
-    
+
     call psb_ensure_size(nzin_+nzt,ia,info)
     if (info==0) call psb_ensure_size(nzin_+nzt,ja,info)
     if (info==0) call psb_ensure_size(nzin_+nzt,val,info)
+
     if (info /= 0) return
     
     if (present(iren)) then 
@@ -1671,6 +1687,9 @@ subroutine d_mv_csr_to_fmt_impl(a,b,info)
   select type (b)
   class is (psbn_d_coo_sparse_mat) 
     call a%mv_to_coo(b,info)
+    ! Need to fix trivial copies! 
+!!$  class is (psbn_d_csr_sparse_mat) 
+!!$    call a%mv_to_coo(b,info)
   class default
     call tmp%mv_from_fmt(a,info)
     if (info == 0) call b%mv_from_coo(tmp,info)
