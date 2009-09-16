@@ -1,6 +1,8 @@
 
 subroutine d_coo_cssm_impl(alpha,a,x,beta,y,info,trans) 
+  use psb_const_mod
   use psb_error_mod
+  use psb_string_mod
   use psbn_d_base_mat_mod, psb_protect_name => d_coo_cssm_impl
   implicit none 
   class(psbn_d_coo_sparse_mat), intent(in) :: a
@@ -39,7 +41,7 @@ subroutine d_coo_cssm_impl(alpha,a,x,beta,y,info,trans)
   else
     trans_ = 'N'
   end if
-  tra = ((trans_=='T').or.(trans_=='t'))
+  tra = (psb_toupper(trans_)=='T').or.(psb_toupper(trans_)=='C'))
   m   = a%get_nrows()
   nc  = min(size(x,2) , size(y,2)) 
 
@@ -270,6 +272,7 @@ end subroutine d_coo_cssm_impl
 subroutine d_coo_cssv_impl(alpha,a,x,beta,y,info,trans) 
   use psb_const_mod
   use psb_error_mod
+  use psb_string_mod
   use psbn_d_base_mat_mod, psb_protect_name => d_coo_cssv_impl
   implicit none 
   class(psbn_d_coo_sparse_mat), intent(in) :: a
@@ -301,7 +304,7 @@ subroutine d_coo_cssv_impl(alpha,a,x,beta,y,info,trans)
     goto 9999
   endif
 
-  tra = ((trans_=='T').or.(trans_=='t'))
+  tra = (psb_toupper(trans_)=='T').or.(psb_toupper(trans_)=='C'))
   m = a%get_nrows()
 
   if (.not. (a%is_triangle())) then 
@@ -589,18 +592,7 @@ subroutine d_coo_csmv_impl(alpha,a,x,beta,y,info,trans)
     endif
     return
   else 
-    if (.not.a%is_unit()) then 
-      if (beta == dzero) then
-        do i = 1, m
-          y(i) = dzero
-        enddo
-      else
-        do  i = 1, m
-          y(i) = beta*y(i)
-        end do
-      endif
-
-    else  if (a%is_unit()) then 
+    if (a%is_triangle().and.a%is_unit()) then 
       if (beta == dzero) then
         do i = 1, min(m,n)
           y(i) = alpha*x(i)
@@ -615,6 +607,16 @@ subroutine d_coo_csmv_impl(alpha,a,x,beta,y,info,trans)
         do i = min(m,n)+1, m
           y(i) = beta*y(i)
         enddo
+      endif
+    else
+      if (beta == dzero) then
+        do i = 1, m
+          y(i) = dzero
+        enddo
+      else
+        do  i = 1, m
+          y(i) = beta*y(i)
+        end do
       endif
 
     endif
@@ -643,6 +645,7 @@ subroutine d_coo_csmv_impl(alpha,a,x,beta,y,info,trans)
     end if
 
   else if (tra) then 
+
     if (alpha.eq.done) then
       i    = 1
       do i=1,nnz
@@ -755,18 +758,7 @@ subroutine d_coo_csmm_impl(alpha,a,x,beta,y,info,trans)
     endif
     return
   else 
-    if (.not.a%is_unit()) then 
-      if (beta == dzero) then
-        do i = 1, m
-          y(i,1:nc) = dzero
-        enddo
-      else
-        do  i = 1, m
-          y(i,1:nc) = beta*y(i,1:nc)
-        end do
-      endif
-
-    else  if (a%is_unit()) then 
+    if (a%is_triangle().and.a%is_unit()) then 
       if (beta == dzero) then
         do i = 1, min(m,n)
           y(i,1:nc) = alpha*x(i,1:nc)
@@ -781,6 +773,16 @@ subroutine d_coo_csmm_impl(alpha,a,x,beta,y,info,trans)
         do i = min(m,n)+1, m
           y(i,1:nc) = beta*y(i,1:nc)
         enddo
+      endif
+    else
+      if (beta == dzero) then
+        do i = 1, m
+          y(i,1:nc) = dzero
+        enddo
+      else
+        do  i = 1, m
+          y(i,1:nc) = beta*y(i,1:nc)
+        end do
       endif
 
     endif
@@ -1581,6 +1583,7 @@ subroutine d_cp_coo_to_coo_impl(a,b,info)
   call b%set_state(a%get_state())
   call b%set_triangle(a%is_triangle())
   call b%set_upper(a%is_upper()) 
+  call b%set_unit(a%is_unit()) 
 
   call b%reallocate(a%get_nzeros())
 
@@ -1631,6 +1634,7 @@ subroutine d_cp_coo_from_coo_impl(a,b,info)
   call a%set_state(b%get_state())
   call a%set_triangle(b%is_triangle())
   call a%set_upper(b%is_upper())
+  call a%set_unit(b%is_unit()) 
 
   call a%reallocate(b%get_nzeros())
 
@@ -2054,6 +2058,7 @@ subroutine d_mv_coo_to_coo_impl(a,b,info)
   call b%set_state(a%get_state())
   call b%set_triangle(a%is_triangle())
   call b%set_upper(a%is_upper()) 
+  call b%set_unit(a%is_unit()) 
 
   call b%reallocate(a%get_nzeros())
 
@@ -2105,6 +2110,7 @@ subroutine d_mv_coo_from_coo_impl(a,b,info)
   call a%set_state(b%get_state())
   call a%set_triangle(b%is_triangle())
   call a%set_upper(b%is_upper())
+  call a%set_unit(b%is_unit()) 
 
   call a%reallocate(b%get_nzeros())
 

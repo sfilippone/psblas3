@@ -14,6 +14,7 @@
 
 subroutine d_csr_csmv_impl(alpha,a,x,beta,y,info,trans) 
   use psb_error_mod
+  use psb_string_mod
   use psbn_d_csr_mat_mod, psb_protect_name => d_csr_csmv_impl
   implicit none 
   class(psbn_d_csr_sparse_mat), intent(in) :: a
@@ -46,7 +47,7 @@ subroutine d_csr_csmv_impl(alpha,a,x,beta,y,info,trans)
   endif
 
 
-  tra = ((trans_=='T').or.(trans_=='t'))
+  tra = (psb_toupper(trans_)=='T').or.(psb_toupper(trans_)=='C')
 
   if (tra) then 
     m = a%get_ncols()
@@ -56,214 +57,13 @@ subroutine d_csr_csmv_impl(alpha,a,x,beta,y,info,trans)
     m = a%get_nrows()
   end if
 
-
-  if (alpha == dzero) then
-    if (beta == dzero) then
-      do i = 1, m
-        y(i) = dzero
-      enddo
-    else
-      do  i = 1, m
-        y(i) = beta*y(i)
-      end do
-    endif
-    return
-  end if
-
-  if (.not.tra) then 
-
-    if (beta == dzero) then 
-
-      if (alpha == done) then 
-        do i=1,m 
-          acc  = dzero
-          do j=a%irp(i), a%irp(i+1)-1
-            acc  = acc + a%val(j) * x(a%ja(j))          
-          enddo
-          y(i) = acc
-        end do
-
-      else if (alpha == -done) then 
-
-        do i=1,m 
-          acc  = dzero
-          do j=a%irp(i), a%irp(i+1)-1
-            acc  = acc + a%val(j) * x(a%ja(j))          
-          enddo
-          y(i) = -acc
-        end do
-
-      else 
-
-        do i=1,m 
-          acc  = dzero
-          do j=a%irp(i), a%irp(i+1)-1
-            acc  = acc + a%val(j) * x(a%ja(j))          
-          enddo
-          y(i) = alpha*acc
-        end do
-
-      end if
-
-
-    else if (beta == done) then 
-
-      if (alpha == done) then 
-        do i=1,m 
-          acc  = dzero
-          do j=a%irp(i), a%irp(i+1)-1
-            acc  = acc + a%val(j) * x(a%ja(j))          
-          enddo
-          y(i) = y(i) + acc
-        end do
-
-      else if (alpha == -done) then 
-
-        do i=1,m 
-          acc  = dzero
-          do j=a%irp(i), a%irp(i+1)-1
-            acc  = acc + a%val(j) * x(a%ja(j))          
-          enddo
-          y(i) = y(i) -acc
-        end do
-
-      else 
-
-        do i=1,m 
-          acc  = dzero
-          do j=a%irp(i), a%irp(i+1)-1
-            acc  = acc + a%val(j) * x(a%ja(j))          
-          enddo
-          y(i) = y(i) + alpha*acc
-        end do
-
-      end if
-
-    else if (beta == -done) then 
-
-      if (alpha == done) then 
-        do i=1,m 
-          acc  = dzero
-          do j=a%irp(i), a%irp(i+1)-1
-            acc  = acc + a%val(j) * x(a%ja(j))          
-          enddo
-          y(i) = -y(i) + acc
-        end do
-
-      else if (alpha == -done) then 
-
-        do i=1,m 
-          acc  = dzero
-          do j=a%irp(i), a%irp(i+1)-1
-            acc  = acc + a%val(j) * x(a%ja(j))          
-          enddo
-          y(i) = -y(i) -acc
-        end do
-
-      else 
-
-        do i=1,m 
-          acc  = dzero
-          do j=a%irp(i), a%irp(i+1)-1
-            acc  = acc + a%val(j) * x(a%ja(j))          
-          enddo
-          y(i) = -y(i) + alpha*acc
-        end do
-
-      end if
-
-    else 
-
-      if (alpha == done) then 
-        do i=1,m 
-          acc  = dzero
-          do j=a%irp(i), a%irp(i+1)-1
-            acc  = acc + a%val(j) * x(a%ja(j))          
-          enddo
-          y(i) = beta*y(i) + acc
-        end do
-
-      else if (alpha == -done) then 
-
-        do i=1,m 
-          acc  = dzero
-          do j=a%irp(i), a%irp(i+1)-1
-            acc  = acc + a%val(j) * x(a%ja(j))          
-          enddo
-          y(i) = beta*y(i) - acc
-        end do
-
-      else 
-
-        do i=1,m 
-          acc  = dzero
-          do j=a%irp(i), a%irp(i+1)-1
-            acc  = acc + a%val(j) * x(a%ja(j))          
-          enddo
-          y(i) = beta*y(i) + alpha*acc
-        end do
-
-      end if
-
-    end if
-
-  else if (tra) then 
-
-    if (beta == dzero) then 
-      do i=1, m
-        y(i) = dzero
-      end do
-    else if (beta == done) then 
-      ! Do nothing
-    else if (beta == -done) then 
-      do i=1, m
-        y(i) = -y(i) 
-      end do
-    else
-      do i=1, m
-        y(i) = beta*y(i) 
-      end do
-    end if
-
-    if (alpha.eq.done) then
-
-      do i=1,n
-        do j=a%irp(i), a%irp(i+1)-1
-          ir = a%ja(j)
-          y(ir) = y(ir) +  a%val(j)*x(i)
-        end do
-      enddo
-
-    else if (alpha.eq.-done) then
-
-      do i=1,n
-        do j=a%irp(i), a%irp(i+1)-1
-          ir = a%ja(j)
-          y(ir) = y(ir) -  a%val(j)*x(i)
-        end do
-      enddo
-
-    else                    
-
-      do i=1,n
-        do j=a%irp(i), a%irp(i+1)-1
-          ir = a%ja(j)
-          y(ir) = y(ir) + alpha*a%val(j)*x(i)
-        end do
-      enddo
-
-    end if
-
-  endif
-
-  if (a%is_unit()) then 
-    do i=1, min(m,n)
-      y(i) = y(i) + alpha*x(i)
-    end do
-  end if
+  call d_csr_csmv_inner(m,n,alpha,a%irp,a%ja,a%val,&
+       & a%is_triangle(),a%is_unit(),&
+       & x,beta,y,tra) 
 
   call psb_erractionrestore(err_act)
   return
+
 9999 continue
   call psb_erractionrestore(err_act)
 
@@ -273,10 +73,233 @@ subroutine d_csr_csmv_impl(alpha,a,x,beta,y,info,trans)
   end if
   return
 
+contains
+  subroutine d_csr_csmv_inner(m,n,alpha,irp,ja,val,is_triangle,is_unit,&
+       & x,beta,y,tra) 
+    integer, intent(in)             :: m,n,irp(*),ja(*)
+    real(psb_dpk_), intent(in)      :: alpha, beta, x(*),val(*)
+    real(psb_dpk_), intent(inout)   :: y(*)
+    logical, intent(in)             :: is_triangle,is_unit,tra
+
+
+    integer   :: i,j,k, ir, jc
+    real(psb_dpk_) :: acc
+
+    if (alpha == dzero) then
+      if (beta == dzero) then
+        do i = 1, m
+          y(i) = dzero
+        enddo
+      else
+        do  i = 1, m
+          y(i) = beta*y(i)
+        end do
+      endif
+      return
+    end if
+
+
+    if (.not.tra) then 
+
+      if (beta == dzero) then 
+
+        if (alpha == done) then 
+          do i=1,m 
+            acc  = dzero
+            do j=irp(i), irp(i+1)-1
+              acc  = acc + val(j) * x(ja(j))          
+            enddo
+            y(i) = acc
+          end do
+
+        else if (alpha == -done) then 
+
+          do i=1,m 
+            acc  = dzero
+            do j=irp(i), irp(i+1)-1
+              acc  = acc + val(j) * x(ja(j))          
+            enddo
+            y(i) = -acc
+          end do
+
+        else 
+
+          do i=1,m 
+            acc  = dzero
+            do j=irp(i), irp(i+1)-1
+              acc  = acc + val(j) * x(ja(j))          
+            enddo
+            y(i) = alpha*acc
+          end do
+
+        end if
+
+
+      else if (beta == done) then 
+
+        if (alpha == done) then 
+          do i=1,m 
+            acc  = dzero
+            do j=irp(i), irp(i+1)-1
+              acc  = acc + val(j) * x(ja(j))          
+            enddo
+            y(i) = y(i) + acc
+          end do
+
+        else if (alpha == -done) then 
+
+          do i=1,m 
+            acc  = dzero
+            do j=irp(i), irp(i+1)-1
+              acc  = acc + val(j) * x(ja(j))          
+            enddo
+            y(i) = y(i) -acc
+          end do
+
+        else 
+
+          do i=1,m 
+            acc  = dzero
+            do j=irp(i), irp(i+1)-1
+              acc  = acc + val(j) * x(ja(j))          
+            enddo
+            y(i) = y(i) + alpha*acc
+          end do
+
+        end if
+
+      else if (beta == -done) then 
+
+        if (alpha == done) then 
+          do i=1,m 
+            acc  = dzero
+            do j=irp(i), irp(i+1)-1
+              acc  = acc + val(j) * x(ja(j))          
+            enddo
+            y(i) = -y(i) + acc
+          end do
+
+        else if (alpha == -done) then 
+
+          do i=1,m 
+            acc  = dzero
+            do j=irp(i), irp(i+1)-1
+              acc  = acc + val(j) * x(ja(j))          
+            enddo
+            y(i) = -y(i) -acc
+          end do
+
+        else 
+
+          do i=1,m 
+            acc  = dzero
+            do j=irp(i), irp(i+1)-1
+              acc  = acc + val(j) * x(ja(j))          
+            enddo
+            y(i) = -y(i) + alpha*acc
+          end do
+
+        end if
+
+      else 
+
+        if (alpha == done) then 
+          do i=1,m 
+            acc  = dzero
+            do j=irp(i), irp(i+1)-1
+              acc  = acc + val(j) * x(ja(j))          
+            enddo
+            y(i) = beta*y(i) + acc
+          end do
+
+        else if (alpha == -done) then 
+
+          do i=1,m 
+            acc  = dzero
+            do j=irp(i), irp(i+1)-1
+              acc  = acc + val(j) * x(ja(j))          
+            enddo
+            y(i) = beta*y(i) - acc
+          end do
+
+        else 
+
+          do i=1,m 
+            acc  = dzero
+            do j=irp(i), irp(i+1)-1
+              acc  = acc + val(j) * x(ja(j))          
+            enddo
+            y(i) = beta*y(i) + alpha*acc
+          end do
+
+        end if
+
+      end if
+
+    else if (tra) then 
+
+      if (beta == dzero) then 
+        do i=1, m
+          y(i) = dzero
+        end do
+      else if (beta == done) then 
+        ! Do nothing
+      else if (beta == -done) then 
+        do i=1, m
+          y(i) = -y(i) 
+        end do
+      else
+        do i=1, m
+          y(i) = beta*y(i) 
+        end do
+      end if
+
+      if (alpha.eq.done) then
+
+        do i=1,n
+          do j=irp(i), irp(i+1)-1
+            ir = ja(j)
+            y(ir) = y(ir) +  val(j)*x(i)
+          end do
+        enddo
+
+      else if (alpha.eq.-done) then
+
+        do i=1,n
+          do j=irp(i), irp(i+1)-1
+            ir = ja(j)
+            y(ir) = y(ir) -  val(j)*x(i)
+          end do
+        enddo
+
+      else                    
+
+        do i=1,n
+          do j=irp(i), irp(i+1)-1
+            ir = ja(j)
+            y(ir) = y(ir) + alpha*val(j)*x(i)
+          end do
+        enddo
+
+      end if
+
+    endif
+
+    if (is_triangle.and.is_unit) then 
+      do i=1, min(m,n)
+        y(i) = y(i) + alpha*x(i)
+      end do
+    end if
+
+
+  end subroutine d_csr_csmv_inner
+
+
 end subroutine d_csr_csmv_impl
 
 subroutine d_csr_csmm_impl(alpha,a,x,beta,y,info,trans) 
   use psb_error_mod
+  use psb_string_mod
   use psbn_d_csr_mat_mod, psb_protect_name => d_csr_csmm_impl
   implicit none 
   class(psbn_d_csr_sparse_mat), intent(in) :: a
@@ -302,12 +325,12 @@ subroutine d_csr_csmm_impl(alpha,a,x,beta,y,info,trans)
     trans_ = 'N'
   end if
 
-  tra = ((trans_=='T').or.(trans_=='t'))
   if (.not.a%is_asb()) then 
     info = 1121
     call psb_errpush(info,name)
     goto 9999
   endif
+  tra = (psb_toupper(trans_)=='T').or.(psb_toupper(trans_)=='C')
 
   if (tra) then 
     m = a%get_ncols()
@@ -325,211 +348,11 @@ subroutine d_csr_csmm_impl(alpha,a,x,beta,y,info,trans)
     call psb_errpush(info,name,a_err='allocate')
     goto 9999
   end if
+  
+  call  d_csr_csmm_inner(m,n,nc,alpha,a%irp,a%ja,a%val, &
+       & a%is_triangle(),a%is_unit(),x,size(x,1), &
+       & beta,y,size(y,1),tra,acc) 
 
-  if (alpha == dzero) then
-    if (beta == dzero) then
-      do i = 1, m
-        y(i,:) = dzero
-      enddo
-    else
-      do  i = 1, m
-        y(i,:) = beta*y(i,:)
-      end do
-    endif
-    return
-  end if
-
-  if (.not.tra) then 
-
-    if (beta == dzero) then 
-
-      if (alpha == done) then 
-        do i=1,m 
-          acc  = dzero
-          do j=a%irp(i), a%irp(i+1)-1
-            acc  = acc + a%val(j) * x(a%ja(j),:)          
-          enddo
-          y(i,:) = acc
-        end do
-
-      else if (alpha == -done) then 
-
-        do i=1,m 
-          acc  = dzero
-          do j=a%irp(i), a%irp(i+1)-1
-            acc  = acc + a%val(j) * x(a%ja(j),:)          
-          enddo
-          y(i,:) = -acc
-        end do
-
-      else 
-
-        do i=1,m 
-          acc  = dzero
-          do j=a%irp(i), a%irp(i+1)-1
-            acc  = acc + a%val(j) * x(a%ja(j),:)          
-          enddo
-          y(i,:) = alpha*acc
-        end do
-
-      end if
-
-
-    else if (beta == done) then 
-
-      if (alpha == done) then 
-        do i=1,m 
-          acc  = dzero
-          do j=a%irp(i), a%irp(i+1)-1
-            acc  = acc + a%val(j) * x(a%ja(j),:)          
-          enddo
-          y(i,:) = y(i,:) + acc
-        end do
-
-      else if (alpha == -done) then 
-
-        do i=1,m 
-          acc  = dzero
-          do j=a%irp(i), a%irp(i+1)-1
-            acc  = acc + a%val(j) * x(a%ja(j),:)          
-          enddo
-          y(i,:) = y(i,:) -acc
-        end do
-
-      else 
-
-        do i=1,m 
-          acc  = dzero
-          do j=a%irp(i), a%irp(i+1)-1
-            acc  = acc + a%val(j) * x(a%ja(j),:)          
-          enddo
-          y(i,:) = y(i,:) + alpha*acc
-        end do
-
-      end if
-
-    else if (beta == -done) then 
-
-      if (alpha == done) then 
-        do i=1,m 
-          acc  = dzero
-          do j=a%irp(i), a%irp(i+1)-1
-            acc  = acc + a%val(j) * x(a%ja(j),:)          
-          enddo
-          y(i,:) = -y(i,:) + acc
-        end do
-
-      else if (alpha == -done) then 
-
-        do i=1,m 
-          acc  = dzero
-          do j=a%irp(i), a%irp(i+1)-1
-            acc  = acc + a%val(j) * x(a%ja(j),:)          
-          enddo
-          y(i,:) = -y(i,:) -acc
-        end do
-
-      else 
-
-        do i=1,m 
-          acc  = dzero
-          do j=a%irp(i), a%irp(i+1)-1
-            acc  = acc + a%val(j) * x(a%ja(j),:)          
-          enddo
-          y(i,:) = -y(i,:) + alpha*acc
-        end do
-
-      end if
-
-    else 
-
-      if (alpha == done) then 
-        do i=1,m 
-          acc  = dzero
-          do j=a%irp(i), a%irp(i+1)-1
-            acc  = acc + a%val(j) * x(a%ja(j),:)          
-          enddo
-          y(i,:) = beta*y(i,:) + acc
-        end do
-
-      else if (alpha == -done) then 
-
-        do i=1,m 
-          acc  = dzero
-          do j=a%irp(i), a%irp(i+1)-1
-            acc  = acc + a%val(j) * x(a%ja(j),:)          
-          enddo
-          y(i,:) = beta*y(i,:) - acc
-        end do
-
-      else 
-
-        do i=1,m 
-          acc  = dzero
-          do j=a%irp(i), a%irp(i+1)-1
-            acc  = acc + a%val(j) * x(a%ja(j),:)          
-          enddo
-          y(i,:) = beta*y(i,:) + alpha*acc
-        end do
-
-      end if
-
-    end if
-
-  else if (tra) then 
-
-    if (beta == dzero) then 
-      do i=1, m
-        y(i,:) = dzero
-      end do
-    else if (beta == done) then 
-      ! Do nothing
-    else if (beta == -done) then 
-      do i=1, m
-        y(i,:) = -y(i,:) 
-      end do
-    else
-      do i=1, m
-        y(i,:) = beta*y(i,:) 
-      end do
-    end if
-
-    if (alpha.eq.done) then
-
-      do i=1,n
-        do j=a%irp(i), a%irp(i+1)-1
-          ir = a%ja(j)
-          y(ir,:) = y(ir,:) +  a%val(j)*x(i,:)
-        end do
-      enddo
-
-    else if (alpha.eq.-done) then
-
-      do i=1,n
-        do j=a%irp(i), a%irp(i+1)-1
-          ir = a%ja(j)
-          y(ir,:) = y(ir,:) -  a%val(j)*x(i,:)
-        end do
-      enddo
-
-    else                    
-
-      do i=1,n
-        do j=a%irp(i), a%irp(i+1)-1
-          ir = a%ja(j)
-          y(ir,:) = y(ir,:) + alpha*a%val(j)*x(i,:)
-        end do
-      enddo
-
-    end if
-
-  endif
-
-  if (a%is_unit()) then 
-    do i=1, min(m,n)
-      y(i,:) = y(i,:) + alpha*x(i,:)
-    end do
-  end if
 
   call psb_erractionrestore(err_act)
   return
@@ -541,6 +364,225 @@ subroutine d_csr_csmm_impl(alpha,a,x,beta,y,info,trans)
     return
   end if
   return
+
+contains
+  subroutine d_csr_csmm_inner(m,n,nc,alpha,irp,ja,val,&
+       & is_triangle,is_unit,x,ldx,beta,y,ldy,tra,acc) 
+    integer, intent(in)             :: m,n,ldx,ldy,nc,irp(*),ja(*)
+    real(psb_dpk_), intent(in)      :: alpha, beta, x(ldx,*),val(*)
+    real(psb_dpk_), intent(inout)   :: y(ldy,*)
+    logical, intent(in)             :: is_triangle,is_unit,tra
+
+    real(psb_dpk_), intent(inout)   :: acc(*)
+    integer   :: i,j,k, ir, jc
+    
+    
+  if (alpha == dzero) then
+    if (beta == dzero) then
+      do i = 1, m
+        y(i,1:nc) = dzero
+      enddo
+    else
+      do  i = 1, m
+        y(i,1:nc) = beta*y(i,1:nc)
+      end do
+    endif
+    return
+  end if
+
+  if (.not.tra) then 
+
+    if (beta == dzero) then 
+
+      if (alpha == done) then 
+        do i=1,m 
+          acc(1:nc)  = dzero
+          do j=irp(i), irp(i+1)-1
+            acc(1:nc)  = acc(1:nc) + val(j) * x(ja(j),1:nc)          
+          enddo
+          y(i,1:nc) = acc(1:nc)
+        end do
+
+      else if (alpha == -done) then 
+
+        do i=1,m 
+          acc(1:nc)  = dzero
+          do j=irp(i), irp(i+1)-1
+            acc(1:nc)  = acc(1:nc) + val(j) * x(ja(j),1:nc)          
+          enddo
+          y(i,1:nc) = -acc(1:nc)
+        end do
+
+      else 
+
+        do i=1,m 
+          acc(1:nc)  = dzero
+          do j=irp(i), irp(i+1)-1
+            acc(1:nc)  = acc(1:nc) + val(j) * x(ja(j),1:nc)          
+          enddo
+          y(i,1:nc) = alpha*acc(1:nc)
+        end do
+
+      end if
+
+
+    else if (beta == done) then 
+
+      if (alpha == done) then 
+        do i=1,m 
+          acc(1:nc)  = dzero
+          do j=irp(i), irp(i+1)-1
+            acc(1:nc)  = acc(1:nc) + val(j) * x(ja(j),1:nc)          
+          enddo
+          y(i,1:nc) = y(i,1:nc) + acc(1:nc)
+        end do
+
+      else if (alpha == -done) then 
+
+        do i=1,m 
+          acc(1:nc)  = dzero
+          do j=irp(i), irp(i+1)-1
+            acc(1:nc)  = acc(1:nc) + val(j) * x(ja(j),1:nc)          
+          enddo
+          y(i,1:nc) = y(i,1:nc) -acc(1:nc)
+        end do
+
+      else 
+
+        do i=1,m 
+          acc(1:nc)  = dzero
+          do j=irp(i), irp(i+1)-1
+            acc(1:nc)  = acc(1:nc) + val(j) * x(ja(j),1:nc)          
+          enddo
+          y(i,1:nc) = y(i,1:nc) + alpha*acc(1:nc)
+        end do
+
+      end if
+
+    else if (beta == -done) then 
+
+      if (alpha == done) then 
+        do i=1,m 
+          acc(1:nc)  = dzero
+          do j=irp(i), irp(i+1)-1
+            acc(1:nc)  = acc(1:nc) + val(j) * x(ja(j),1:nc)          
+          enddo
+          y(i,1:nc) = -y(i,1:nc) + acc(1:nc)
+        end do
+
+      else if (alpha == -done) then 
+
+        do i=1,m 
+          acc(1:nc)  = dzero
+          do j=irp(i), irp(i+1)-1
+            acc(1:nc)  = acc(1:nc) + val(j) * x(ja(j),1:nc)          
+          enddo
+          y(i,1:nc) = -y(i,1:nc) -acc(1:nc)
+        end do
+
+      else 
+
+        do i=1,m 
+          acc(1:nc)  = dzero
+          do j=irp(i), irp(i+1)-1
+            acc(1:nc)  = acc(1:nc) + val(j) * x(ja(j),1:nc)          
+          enddo
+          y(i,1:nc) = -y(i,1:nc) + alpha*acc(1:nc)
+        end do
+
+      end if
+
+    else 
+
+      if (alpha == done) then 
+        do i=1,m 
+          acc(1:nc)  = dzero
+          do j=irp(i), irp(i+1)-1
+            acc(1:nc)  = acc(1:nc) + val(j) * x(ja(j),1:nc)          
+          enddo
+          y(i,1:nc) = beta*y(i,1:nc) + acc(1:nc)
+        end do
+
+      else if (alpha == -done) then 
+
+        do i=1,m 
+          acc(1:nc)  = dzero
+          do j=irp(i), irp(i+1)-1
+            acc(1:nc)  = acc(1:nc) + val(j) * x(ja(j),1:nc)          
+          enddo
+          y(i,1:nc) = beta*y(i,1:nc) - acc(1:nc)
+        end do
+
+      else 
+
+        do i=1,m 
+          acc(1:nc)  = dzero
+          do j=irp(i), irp(i+1)-1
+            acc(1:nc)  = acc(1:nc) + val(j) * x(ja(j),1:nc)          
+          enddo
+          y(i,1:nc) = beta*y(i,1:nc) + alpha*acc(1:nc)
+        end do
+
+      end if
+
+    end if
+
+  else if (tra) then 
+
+    if (beta == dzero) then 
+      do i=1, m
+        y(i,1:nc) = dzero
+      end do
+    else if (beta == done) then 
+      ! Do nothing
+    else if (beta == -done) then 
+      do i=1, m
+        y(i,1:nc) = -y(i,1:nc) 
+      end do
+    else
+      do i=1, m
+        y(i,1:nc) = beta*y(i,1:nc) 
+      end do
+    end if
+
+    if (alpha.eq.done) then
+
+      do i=1,n
+        do j=irp(i), irp(i+1)-1
+          ir = ja(j)
+          y(ir,1:nc) = y(ir,1:nc) +  val(j)*x(i,1:nc)
+        end do
+      enddo
+
+    else if (alpha.eq.-done) then
+
+      do i=1,n
+        do j=irp(i), irp(i+1)-1
+          ir = ja(j)
+          y(ir,1:nc) = y(ir,1:nc) -  val(j)*x(i,1:nc)
+        end do
+      enddo
+
+    else                    
+
+      do i=1,n
+        do j=irp(i), irp(i+1)-1
+          ir = ja(j)
+          y(ir,1:nc) = y(ir,1:nc) + alpha*val(j)*x(i,1:nc)
+        end do
+      enddo
+
+    end if
+
+  endif
+
+  if (is_triangle.and.is_unit) then 
+    do i=1, min(m,n)
+      y(i,1:nc) = y(i,1:nc) + alpha*x(i,1:nc)
+    end do
+  end if
+
+end subroutine d_csr_csmm_inner
 
 end subroutine d_csr_csmm_impl
 
@@ -601,7 +643,7 @@ subroutine d_csr_cssv_impl(alpha,a,x,beta,y,info,trans)
   end if
 
   if (beta == dzero) then 
-!!$    call inner_csrsv(tra,a,x,y)
+
     call inner_csrsv(tra,a%is_lower(),a%is_unit(),a%get_nrows(),&
          & a%irp,a%ja,a%val,x,y) 
     if (alpha == done) then 
@@ -623,7 +665,6 @@ subroutine d_csr_cssv_impl(alpha,a,x,beta,y,info,trans)
     tmp(1:m) = x(1:m)
     call inner_csrsv(tra,a%is_lower(),a%is_unit(),a%get_nrows(),&
          & a%irp,a%ja,a%val,tmp,y) 
-!!$    call inner_csrsv(tra,a,tmp,y)
     do  i = 1, m
       y(i) = alpha*tmp(i) + beta*y(i)
     end do
@@ -646,9 +687,7 @@ contains
   subroutine inner_csrsv(tra,lower,unit,n,irp,ja,val,x,y) 
     implicit none 
     logical, intent(in)                 :: tra,lower,unit  
-!!$    class(psbn_d_csr_sparse_mat), intent(in) :: a
     integer, intent(in)                 :: irp(*), ja(*),n
-    
     real(psb_dpk_), intent(in)          :: val(*)
     real(psb_dpk_), intent(in)          :: x(*)
     real(psb_dpk_), intent(out)         :: y(*)
@@ -811,7 +850,6 @@ subroutine d_csr_cssm_impl(alpha,a,x,beta,y,info,trans)
   end if
 
   if (beta == dzero) then 
-!!$    call inner_csrsm(tra,a,x,y,info)
     call inner_csrsm(tra,a%is_lower(),a%is_unit(),a%get_nrows(),nc,&
          & a%irp,a%ja,a%val,x,size(x,1),y,size(y,1),info) 
     do  i = 1, m
@@ -828,7 +866,6 @@ subroutine d_csr_cssm_impl(alpha,a,x,beta,y,info,trans)
     tmp(1:m,:) = x(1:m,1:nc)
     call inner_csrsm(tra,a%is_lower(),a%is_unit(),a%get_nrows(),nc,&
          & a%irp,a%ja,a%val,tmp,size(tmp,1),y,size(y,1),info) 
-!!$    call inner_csrsm(tra,a,tmp,y,info)
     do  i = 1, m
       y(i,1:nc) = alpha*tmp(i,1:nc) + beta*y(i,1:nc)
     end do
@@ -1496,7 +1533,7 @@ subroutine d_cp_csr_to_coo_impl(a,b,info)
   nc  = a%get_ncols()
   nza = a%get_nzeros()
 
-  call b%allocate(nr,nr,nza)
+  call b%allocate(nr,nc,nza)
 
   do i=1, nr
     do j=a%irp(i),a%irp(i+1)-1
@@ -1513,6 +1550,7 @@ subroutine d_cp_csr_to_coo_impl(a,b,info)
   call b%set_state(a%get_state())
   call b%set_triangle(a%is_triangle())
   call b%set_upper(a%is_upper())
+  call b%set_unit(a%is_unit()) 
   call b%fix(info)
 
 
@@ -1551,6 +1589,7 @@ subroutine d_mv_csr_to_coo_impl(a,b,info)
   call b%set_state(a%get_state())
   call b%set_triangle(a%is_triangle())
   call b%set_upper(a%is_upper())
+  call b%set_unit(a%is_unit()) 
 
   call move_alloc(a%ja,b%ja)
   call move_alloc(a%val,b%val)
@@ -1603,6 +1642,7 @@ subroutine d_mv_csr_from_coo_impl(a,b,info)
   call a%set_state(b%get_state())
   call a%set_triangle(b%is_triangle())
   call a%set_upper(b%is_upper())
+  call a%set_unit(b%is_unit()) 
   ! Dirty trick: call move_alloc to have the new data allocated just once.
   call move_alloc(b%ia,itemp)
   call move_alloc(b%ja,a%ja)

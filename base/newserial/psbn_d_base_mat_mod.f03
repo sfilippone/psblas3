@@ -1882,6 +1882,7 @@ contains
       call a%set_nzeros(0)
       call a%set_bld()
       call a%set_triangle(.false.)
+      call a%set_unit(.false.)
       call a%set_dupl(psbn_dupl_def_)
     end if
     if (info /= 0) goto 9999 

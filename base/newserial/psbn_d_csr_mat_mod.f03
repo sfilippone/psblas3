@@ -941,6 +941,7 @@ contains
       call a%set_ncols(n)
       call a%set_bld()
       call a%set_triangle(.false.)
+      call a%set_unit(.false.)
     end if
 
     call psb_erractionrestore(err_act)
