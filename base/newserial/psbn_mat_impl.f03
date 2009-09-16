@@ -1,10 +1,10 @@
-subroutine psbn_d_csall(nr,nc,a,info,nz) 
-  use psbn_d_base_mat_mod
+subroutine psb_d_csall(nr,nc,a,info,nz) 
+  use psb_d_base_mat_mod
   use psb_realloc_mod
   use psb_sort_mod
-  use psbn_d_mat_mod, psb_protect_name => psbn_d_csall
+  use psb_d_mat_mod, psb_protect_name => psb_d_csall
   implicit none 
-  type(psbn_d_sparse_mat), intent(out) :: a
+  type(psb_d_sparse_mat), intent(out) :: a
   integer, intent(in)             :: nr,nc
   integer, intent(out)            :: info
   integer, intent(in), optional   :: nz
@@ -15,22 +15,22 @@ subroutine psbn_d_csall(nr,nc,a,info,nz)
   call a%set_bld() 
   return
 
-end subroutine psbn_d_csall
+end subroutine psb_d_csall
 
 
-subroutine psbn_d_csput(nz,val,ia,ja,a,imin,imax,jmin,jmax,info,gtl) 
-  use psbn_d_base_mat_mod
+subroutine psb_d_csput(nz,val,ia,ja,a,imin,imax,jmin,jmax,info,gtl) 
+  use psb_d_base_mat_mod
   use psb_error_mod
-  use psbn_d_mat_mod, psb_protect_name => psbn_d_csput
+  use psb_d_mat_mod, psb_protect_name => psb_d_csput
   implicit none 
-  type(psbn_d_sparse_mat), intent(inout) :: a
+  type(psb_d_sparse_mat), intent(inout) :: a
   real(psb_dpk_), intent(in)      :: val(:)
   integer, intent(in)             :: nz, ia(:), ja(:), imin,imax,jmin,jmax
   integer, intent(out)            :: info
   integer, intent(in), optional   :: gtl(:)
 
   Integer :: err_act
-  character(len=20)  :: name='psbn_csput'
+  character(len=20)  :: name='psb_csput'
   logical, parameter :: debug=.false.
 
   info = 0
@@ -56,26 +56,26 @@ subroutine psbn_d_csput(nz,val,ia,ja,a,imin,imax,jmin,jmax,info,gtl)
     return
   end if
   
-end subroutine psbn_d_csput
+end subroutine psb_d_csput
 
 
 
-subroutine psbn_d_spcnv(a,b,info,type,mold,upd,dupl)
+subroutine psb_d_spcnv(a,b,info,type,mold,upd,dupl)
   use psb_error_mod
   use psb_string_mod
-  use psbn_d_mat_mod, psb_protect_name => psbn_d_spcnv
+  use psb_d_mat_mod, psb_protect_name => psb_d_spcnv
   implicit none 
-  type(psbn_d_sparse_mat), intent(in)    :: a
-  type(psbn_d_sparse_mat), intent(out)   :: b
+  type(psb_d_sparse_mat), intent(in)    :: a
+  type(psb_d_sparse_mat), intent(out)   :: b
   integer, intent(out)                   :: info
   integer,optional, intent(in)           :: dupl, upd
   character(len=*), optional, intent(in) :: type
-  class(psbn_d_base_sparse_mat), intent(in), optional :: mold
+  class(psb_d_base_sparse_mat), intent(in), optional :: mold
   
 
-  class(psbn_d_base_sparse_mat), allocatable  :: altmp
+  class(psb_d_base_sparse_mat), allocatable  :: altmp
   Integer :: err_act
-  character(len=20)  :: name='psbn_cscnv'
+  character(len=20)  :: name='psb_cscnv'
   logical, parameter :: debug=.false.
 
   info = 0
@@ -91,7 +91,7 @@ subroutine psbn_d_spcnv(a,b,info,type,mold,upd,dupl)
     call b%set_dupl(dupl)
   else if (a%is_bld()) then 
     ! Does this make sense at all?? Who knows..
-    call b%set_dupl(psbn_dupl_def_)
+    call b%set_dupl(psb_dupl_def_)
   end if
   
   if (count( (/present(mold),present(type) /)) > 1) then
@@ -108,16 +108,16 @@ subroutine psbn_d_spcnv(a,b,info,type,mold,upd,dupl)
 
     select case (psb_toupper(type))
     case ('CSR')
-      allocate(psbn_d_csr_sparse_mat :: altmp, stat=info) 
+      allocate(psb_d_csr_sparse_mat :: altmp, stat=info) 
     case ('COO')
-      allocate(psbn_d_coo_sparse_mat :: altmp, stat=info) 
+      allocate(psb_d_coo_sparse_mat :: altmp, stat=info) 
     case default
       info = 136 
       call psb_errpush(info,name,a_err=type)
       goto 9999
     end select
   else
-    allocate(psbn_d_csr_sparse_mat :: altmp, stat=info) 
+    allocate(psb_d_csr_sparse_mat :: altmp, stat=info) 
   end if
   
   if (info /= 0) then 
@@ -148,24 +148,24 @@ subroutine psbn_d_spcnv(a,b,info,type,mold,upd,dupl)
     return
   end if
 
-end subroutine psbn_d_spcnv
+end subroutine psb_d_spcnv
 
-subroutine psbn_d_spcnv_ip(a,info,type,mold,dupl)
+subroutine psb_d_spcnv_ip(a,info,type,mold,dupl)
   use psb_error_mod
   use psb_string_mod
-  use psbn_d_mat_mod, psb_protect_name => psbn_d_spcnv_ip
+  use psb_d_mat_mod, psb_protect_name => psb_d_spcnv_ip
   implicit none 
 
-  type(psbn_d_sparse_mat), intent(inout) :: a
+  type(psb_d_sparse_mat), intent(inout) :: a
   integer, intent(out)                   :: info
   integer,optional, intent(in)           :: dupl
   character(len=*), optional, intent(in) :: type
-  class(psbn_d_base_sparse_mat), intent(in), optional :: mold
+  class(psb_d_base_sparse_mat), intent(in), optional :: mold
 
 
-  class(psbn_d_base_sparse_mat), allocatable  :: altmp
+  class(psb_d_base_sparse_mat), allocatable  :: altmp
   Integer :: err_act
-  character(len=20)  :: name='psbn_cscnv'
+  character(len=20)  :: name='psb_cscnv'
   logical, parameter :: debug=.false.
 
   info = 0
@@ -180,7 +180,7 @@ subroutine psbn_d_spcnv_ip(a,info,type,mold,dupl)
   if (present(dupl)) then 
     call a%set_dupl(dupl)
   else if (a%is_bld()) then 
-    call a%set_dupl(psbn_dupl_def_)
+    call a%set_dupl(psb_dupl_def_)
   end if
   
   if (count( (/present(mold),present(type) /)) > 1) then
@@ -197,16 +197,16 @@ subroutine psbn_d_spcnv_ip(a,info,type,mold,dupl)
 
     select case (psb_toupper(type))
     case ('CSR')
-      allocate(psbn_d_csr_sparse_mat :: altmp, stat=info) 
+      allocate(psb_d_csr_sparse_mat :: altmp, stat=info) 
     case ('COO')
-      allocate(psbn_d_coo_sparse_mat :: altmp, stat=info) 
+      allocate(psb_d_coo_sparse_mat :: altmp, stat=info) 
     case default
       info = 136 
       call psb_errpush(info,name,a_err=type)
       goto 9999
     end select
   else
-    allocate(psbn_d_csr_sparse_mat :: altmp, stat=info) 
+    allocate(psb_d_csr_sparse_mat :: altmp, stat=info) 
   end if
 
   
@@ -242,4 +242,4 @@ subroutine psbn_d_spcnv_ip(a,info,type,mold,dupl)
     return
   end if
 
-end subroutine psbn_d_spcnv_ip
+end subroutine psb_d_spcnv_ip

@@ -1,30 +1,30 @@
-module psbn_base_mat_mod
+module psb_base_mat_mod
   
   use psb_const_mod 
 
-!!$  integer, parameter :: psbn_invalid_ = -1 
-!!$  integer, parameter :: psbn_spmat_null_=0, psbn_spmat_bld_=1
-!!$  integer, parameter :: psbn_spmat_asb_=2, psbn_spmat_upd_=4
+!!$  integer, parameter :: psb_invalid_ = -1 
+!!$  integer, parameter :: psb_spmat_null_=0, psb_spmat_bld_=1
+!!$  integer, parameter :: psb_spmat_asb_=2, psb_spmat_upd_=4
 !!$
-!!$  integer, parameter :: psbn_ireg_flgs_=10, psbn_ip2_=0
-!!$  integer, parameter :: psbn_iflag_=2, psbn_ichk_=3
-!!$  integer, parameter :: psbn_nnzt_=4, psbn_zero_=5,psbn_ipc_=6
+!!$  integer, parameter :: psb_ireg_flgs_=10, psb_ip2_=0
+!!$  integer, parameter :: psb_iflag_=2, psb_ichk_=3
+!!$  integer, parameter :: psb_nnzt_=4, psb_zero_=5,psb_ipc_=6
 !!$  ! Duplicate coefficients handling
 !!$  ! These are usually set while calling spcnv as one of its
 !!$  ! optional arugments.
-!!$  integer, parameter :: psbn_dupl_ovwrt_ = 0
-!!$  integer, parameter :: psbn_dupl_add_   = 1
-!!$  integer, parameter :: psbn_dupl_err_   = 2
-!!$  integer, parameter :: psbn_dupl_def_   = psbn_dupl_ovwrt_
+!!$  integer, parameter :: psb_dupl_ovwrt_ = 0
+!!$  integer, parameter :: psb_dupl_add_   = 1
+!!$  integer, parameter :: psb_dupl_err_   = 2
+!!$  integer, parameter :: psb_dupl_def_   = psb_dupl_ovwrt_
 !!$  ! Matrix update mode
-!!$  integer, parameter :: psbn_upd_srch_   = 98764
-!!$  integer, parameter :: psbn_upd_perm_   = 98765
-!!$  integer, parameter :: psbn_upd_dflt_   = psbn_upd_srch_
-!!$  integer, parameter :: psbn_maxjdrows_=8, psbn_minjdrows_=4
-!!$  integer, parameter :: psbn_dbleint_=2
+!!$  integer, parameter :: psb_upd_srch_   = 98764
+!!$  integer, parameter :: psb_upd_perm_   = 98765
+!!$  integer, parameter :: psb_upd_dflt_   = psb_upd_srch_
+!!$  integer, parameter :: psb_maxjdrows_=8, psb_minjdrows_=4
+!!$  integer, parameter :: psb_dbleint_=2
 
 
-  type  :: psbn_base_sparse_mat
+  type  :: psb_base_sparse_mat
     integer              :: m, n
     integer, private     :: state, duplicate 
     logical, private     :: triangle, unitd, upper, sorted
@@ -89,7 +89,7 @@ module psbn_base_mat_mod
     procedure, pass(a) :: print => sparse_print
     procedure, pass(a) :: sizeof
 
-  end type psbn_base_sparse_mat
+  end type psb_base_sparse_mat
 
   private :: set_nrows, set_ncols, set_dupl, set_state, &
        & set_null, set_bld, set_upd, set_asb, set_sorted, set_upper, &
@@ -105,7 +105,7 @@ contains
   
   function sizeof(a) result(res)
     implicit none 
-    class(psbn_base_sparse_mat), intent(in) :: a
+    class(psb_base_sparse_mat), intent(in) :: a
     integer(psb_long_int_k_) :: res
     res = 8
   end function sizeof
@@ -114,14 +114,14 @@ contains
 
   function get_fmt(a) result(res)
     implicit none 
-    class(psbn_base_sparse_mat), intent(in) :: a
+    class(psb_base_sparse_mat), intent(in) :: a
     character(len=5) :: res
     res = 'NULL'
   end function get_fmt
   
   function get_dupl(a) result(res)
     implicit none 
-    class(psbn_base_sparse_mat), intent(in) :: a
+    class(psb_base_sparse_mat), intent(in) :: a
     integer :: res
     res = a%duplicate
   end function get_dupl
@@ -129,21 +129,21 @@ contains
  
   function get_state(a) result(res)
     implicit none 
-    class(psbn_base_sparse_mat), intent(in) :: a
+    class(psb_base_sparse_mat), intent(in) :: a
     integer :: res
     res = a%state
   end function get_state
  
   function get_nrows(a) result(res)
     implicit none 
-    class(psbn_base_sparse_mat), intent(in) :: a
+    class(psb_base_sparse_mat), intent(in) :: a
     integer :: res
     res = a%m
   end function get_nrows
 
   function get_ncols(a) result(res)
     implicit none 
-    class(psbn_base_sparse_mat), intent(in) :: a
+    class(psb_base_sparse_mat), intent(in) :: a
     integer :: res
     res = a%n
   end function get_ncols
@@ -151,14 +151,14 @@ contains
  
   subroutine  set_nrows(m,a) 
     implicit none 
-    class(psbn_base_sparse_mat), intent(inout) :: a
+    class(psb_base_sparse_mat), intent(inout) :: a
     integer, intent(in) :: m
     a%m = m
   end subroutine set_nrows
 
   subroutine  set_ncols(n,a) 
     implicit none 
-    class(psbn_base_sparse_mat), intent(inout) :: a
+    class(psb_base_sparse_mat), intent(inout) :: a
     integer, intent(in) :: n
     a%n = n
   end subroutine set_ncols
@@ -166,7 +166,7 @@ contains
 
   subroutine  set_state(n,a) 
     implicit none 
-    class(psbn_base_sparse_mat), intent(inout) :: a
+    class(psb_base_sparse_mat), intent(inout) :: a
     integer, intent(in) :: n
     a%state = n
   end subroutine set_state
@@ -174,42 +174,42 @@ contains
 
   subroutine  set_dupl(n,a) 
     implicit none 
-    class(psbn_base_sparse_mat), intent(inout) :: a
+    class(psb_base_sparse_mat), intent(inout) :: a
     integer, intent(in) :: n
     a%duplicate = n
   end subroutine set_dupl
 
   subroutine  set_null(a) 
     implicit none 
-    class(psbn_base_sparse_mat), intent(inout) :: a
+    class(psb_base_sparse_mat), intent(inout) :: a
 
-    a%state = psbn_spmat_null_
+    a%state = psb_spmat_null_
   end subroutine set_null
 
   subroutine  set_bld(a) 
     implicit none 
-    class(psbn_base_sparse_mat), intent(inout) :: a
+    class(psb_base_sparse_mat), intent(inout) :: a
 
-    a%state = psbn_spmat_bld_
+    a%state = psb_spmat_bld_
   end subroutine set_bld
 
   subroutine  set_upd(a) 
     implicit none 
-    class(psbn_base_sparse_mat), intent(inout) :: a
+    class(psb_base_sparse_mat), intent(inout) :: a
 
-    a%state = psbn_spmat_upd_
+    a%state = psb_spmat_upd_
   end subroutine set_upd
 
   subroutine  set_asb(a) 
     implicit none 
-    class(psbn_base_sparse_mat), intent(inout) :: a
+    class(psb_base_sparse_mat), intent(inout) :: a
 
-    a%state = psbn_spmat_asb_
+    a%state = psb_spmat_asb_
   end subroutine set_asb
 
   subroutine set_sorted(a,val) 
     implicit none 
-    class(psbn_base_sparse_mat), intent(inout) :: a
+    class(psb_base_sparse_mat), intent(inout) :: a
     logical, intent(in), optional :: val
     
     if (present(val)) then 
@@ -221,7 +221,7 @@ contains
 
   subroutine set_triangle(a,val) 
     implicit none 
-    class(psbn_base_sparse_mat), intent(inout) :: a
+    class(psb_base_sparse_mat), intent(inout) :: a
     logical, intent(in), optional :: val
     
     if (present(val)) then 
@@ -233,7 +233,7 @@ contains
 
   subroutine set_unit(a,val) 
     implicit none 
-    class(psbn_base_sparse_mat), intent(inout) :: a
+    class(psb_base_sparse_mat), intent(inout) :: a
     logical, intent(in), optional :: val
     
     if (present(val)) then 
@@ -245,7 +245,7 @@ contains
 
   subroutine set_lower(a,val) 
     implicit none 
-    class(psbn_base_sparse_mat), intent(inout) :: a
+    class(psb_base_sparse_mat), intent(inout) :: a
     logical, intent(in), optional :: val
     
     if (present(val)) then 
@@ -257,7 +257,7 @@ contains
 
   subroutine set_upper(a,val) 
     implicit none 
-    class(psbn_base_sparse_mat), intent(inout) :: a
+    class(psb_base_sparse_mat), intent(inout) :: a
     logical, intent(in), optional :: val
     
     if (present(val)) then 
@@ -269,63 +269,63 @@ contains
 
   function is_triangle(a) result(res)
     implicit none 
-    class(psbn_base_sparse_mat), intent(in) :: a
+    class(psb_base_sparse_mat), intent(in) :: a
     logical :: res
     res = a%triangle
   end function is_triangle
 
   function is_unit(a) result(res)
     implicit none 
-    class(psbn_base_sparse_mat), intent(in) :: a
+    class(psb_base_sparse_mat), intent(in) :: a
     logical :: res
     res = a%unitd
   end function is_unit
 
   function is_upper(a) result(res)
     implicit none 
-    class(psbn_base_sparse_mat), intent(in) :: a
+    class(psb_base_sparse_mat), intent(in) :: a
     logical :: res
     res = a%upper
   end function is_upper
 
   function is_lower(a) result(res)
     implicit none 
-    class(psbn_base_sparse_mat), intent(in) :: a
+    class(psb_base_sparse_mat), intent(in) :: a
     logical :: res
     res = .not.a%upper
   end function is_lower
 
   function is_null(a) result(res)
     implicit none 
-    class(psbn_base_sparse_mat), intent(in) :: a
+    class(psb_base_sparse_mat), intent(in) :: a
     logical :: res
-    res = (a%state == psbn_spmat_null_)
+    res = (a%state == psb_spmat_null_)
   end function is_null
 
   function is_bld(a) result(res)
     implicit none 
-    class(psbn_base_sparse_mat), intent(in) :: a
+    class(psb_base_sparse_mat), intent(in) :: a
     logical :: res
-    res = (a%state == psbn_spmat_bld_)
+    res = (a%state == psb_spmat_bld_)
   end function is_bld
 
   function is_upd(a) result(res)
     implicit none 
-    class(psbn_base_sparse_mat), intent(in) :: a
+    class(psb_base_sparse_mat), intent(in) :: a
     logical :: res
-    res = (a%state == psbn_spmat_upd_)
+    res = (a%state == psb_spmat_upd_)
   end function is_upd
 
   function is_asb(a) result(res)
     implicit none 
-    class(psbn_base_sparse_mat), intent(in) :: a
+    class(psb_base_sparse_mat), intent(in) :: a
     logical :: res
-    res = (a%state == psbn_spmat_asb_)
+    res = (a%state == psb_spmat_asb_)
   end function is_asb
 
   function is_sorted(a) result(res)
     implicit none 
-    class(psbn_base_sparse_mat), intent(in) :: a
+    class(psb_base_sparse_mat), intent(in) :: a
     logical :: res
     res = a%sorted
   end function is_sorted
@@ -334,7 +334,7 @@ contains
   function get_nzeros(a) result(res)
     use psb_error_mod
     implicit none 
-    class(psbn_base_sparse_mat), intent(in) :: a
+    class(psb_base_sparse_mat), intent(in) :: a
     integer :: res
     
     Integer :: err_act
@@ -358,7 +358,7 @@ contains
   function get_size(a) result(res)
     use psb_error_mod
     implicit none 
-    class(psbn_base_sparse_mat), intent(in) :: a
+    class(psb_base_sparse_mat), intent(in) :: a
     integer :: res
     
     Integer :: err_act
@@ -384,7 +384,7 @@ contains
     implicit none 
 
     integer, intent(in)               :: iout
-    class(psbn_base_sparse_mat), intent(in) :: a   
+    class(psb_base_sparse_mat), intent(in) :: a   
     integer, intent(in), optional     :: iv(:)
     integer, intent(in), optional     :: eirs,eics
     character(len=*), optional        :: head
@@ -412,7 +412,7 @@ contains
   subroutine get_neigh(a,idx,neigh,n,info,lev)
     use psb_error_mod
     implicit none 
-    class(psbn_base_sparse_mat), intent(in) :: a   
+    class(psb_base_sparse_mat), intent(in) :: a   
     integer, intent(in)                :: idx 
     integer, intent(out)               :: n   
     integer, allocatable, intent(out)  :: neigh(:)
@@ -441,7 +441,7 @@ contains
     use psb_error_mod
     implicit none 
     integer, intent(in) :: m,n
-    class(psbn_base_sparse_mat), intent(inout) :: a
+    class(psb_base_sparse_mat), intent(inout) :: a
     integer, intent(in), optional  :: nz
     Integer :: err_act
     character(len=20)  :: name='allocate_mnz'
@@ -464,7 +464,7 @@ contains
     use psb_error_mod
     implicit none 
     integer, intent(in) :: nz
-    class(psbn_base_sparse_mat), intent(inout) :: a
+    class(psb_base_sparse_mat), intent(inout) :: a
     Integer :: err_act
     character(len=20)  :: name='reallocate_nz'
     logical, parameter :: debug=.false.
@@ -485,7 +485,7 @@ contains
   subroutine  free(a) 
     use psb_error_mod
     implicit none 
-    class(psbn_base_sparse_mat), intent(inout) :: a
+    class(psb_base_sparse_mat), intent(inout) :: a
     Integer :: err_act
     character(len=20)  :: name='free'
     logical, parameter :: debug=.false.
@@ -506,7 +506,7 @@ contains
   subroutine  trim(a) 
     use psb_error_mod
     implicit none 
-    class(psbn_base_sparse_mat), intent(inout) :: a
+    class(psb_base_sparse_mat), intent(inout) :: a
     Integer :: err_act
     character(len=20)  :: name='trim'
     logical, parameter :: debug=.false.
@@ -524,5 +524,5 @@ contains
 
   end subroutine trim
 
-end module psbn_base_mat_mod
+end module psb_base_mat_mod
 
