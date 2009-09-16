@@ -98,9 +98,9 @@ Subroutine psb_dcgstab(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,istop)
   use psb_base_mod
   use psb_prec_mod
   use psb_krylov_mod, psb_protect_name => psb_dcgstab
-  use psbn_d_mat_mod
+  use psb_d_mat_mod
   implicit none
-  type(psbn_d_sparse_mat), intent(in)  :: a
+  type(psb_d_sparse_mat), intent(in)  :: a
   
 
 !!$  parameters 

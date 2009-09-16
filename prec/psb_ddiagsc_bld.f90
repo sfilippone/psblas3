@@ -32,11 +32,11 @@
 subroutine psb_ddiagsc_bld(a,desc_a,p,upd,info)
 
   use psb_base_mod
-  use psbn_d_mat_mod
+  use psb_d_mat_mod
   use psb_prec_mod, psb_protect_name => psb_ddiagsc_bld
   Implicit None
 
-  type(psbn_d_sparse_mat), intent(in), target :: a
+  type(psb_d_sparse_mat), intent(in), target :: a
   type(psb_desc_type), intent(in)           :: desc_a
   type(psb_dprec_type),intent(inout)        :: p
   character, intent(in)                     :: upd

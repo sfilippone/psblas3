@@ -32,11 +32,11 @@
 subroutine psb_dprecbld(aa,desc_a,p,info,upd)
 
   use psb_base_mod
-  use psbn_d_mat_mod
+  use psb_d_mat_mod
   use psb_prec_mod, psb_protect_name => psb_dprecbld
   Implicit None
 
-  type(psbn_d_sparse_mat), intent(in), target :: aa
+  type(psb_d_sparse_mat), intent(in), target :: aa
   type(psb_desc_type), intent(in), target :: desc_a
   type(psb_dprec_type),intent(inout)      :: p
   integer, intent(out)                    :: info

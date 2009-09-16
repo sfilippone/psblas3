@@ -547,14 +547,14 @@ contains
     !     on exit : unchanged.
     !
     use psb_base_mod
-    use psbn_d_mat_mod
+    use psb_d_mat_mod
     implicit none
 
     ! parameters
     type(psb_dspmat_type)      :: a_glob
     real(psb_dpk_)             :: b_glob(:)
     integer                    :: ictxt
-    type(psbn_d_sparse_mat)      :: a
+    type(psb_d_sparse_mat)      :: a
     real(psb_dpk_), allocatable  :: b(:)
     type(psb_desc_type)        :: desc_a
     integer, intent(out)       :: info

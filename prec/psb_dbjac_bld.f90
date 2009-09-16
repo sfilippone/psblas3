@@ -30,7 +30,7 @@
 !!$ 
 !!$  
 subroutine psb_dbjac_bld(a,desc_a,p,upd,info)
-  use psbn_d_mat_mod
+  use psb_d_mat_mod
   use psb_base_mod
   use psb_prec_mod, psb_protect_name => psb_dbjac_bld
   implicit none
@@ -38,7 +38,7 @@ subroutine psb_dbjac_bld(a,desc_a,p,upd,info)
   !     .. Scalar Arguments ..                                                    
   integer, intent(out)                      :: info
   !     .. array Arguments ..                                                     
-  type(psbn_d_sparse_mat), intent(in), target :: a
+  type(psb_d_sparse_mat), intent(in), target :: a
   type(psb_dprec_type), intent(inout)    :: p
   type(psb_desc_type), intent(in)           :: desc_a
   character, intent(in)                     :: upd
@@ -48,7 +48,7 @@ subroutine psb_dbjac_bld(a,desc_a,p,upd,info)
   integer  ::    int_err(5)
   character ::        trans, unitd
   type(psb_dspmat_type) :: atmp
-  type(psbn_d_csr_sparse_mat), allocatable  :: lf, uf
+  type(psb_d_csr_sparse_mat), allocatable  :: lf, uf
   real(psb_dpk_) :: t1,t2,t3,t4,t5,t6, t7, t8
   integer   nztota,  err_act, n_row, nrow_a,n_col, nhalo
   integer :: ictxt,np,me

@@ -37,13 +37,13 @@ subroutine psb_dilu_fct(a,l,u,d,info,blck)
   !
   !
   use psb_base_mod
-  use psbn_d_mat_mod
+  use psb_d_mat_mod
   implicit none
   !     .. Scalar Arguments ..
   integer, intent(out)                ::     info
   !     .. Array Arguments ..
-  type(psbn_d_sparse_mat),intent(in)    :: a
-  type(psbn_d_csr_sparse_mat),intent(inout) :: l,u
+  type(psb_d_sparse_mat),intent(in)    :: a
+  type(psb_d_csr_sparse_mat),intent(inout) :: l,u
   type(psb_dspmat_type),intent(in), optional, target :: blck
   real(psb_dpk_), intent(inout)     ::  d(:)
   !     .. Local Scalars ..
@@ -124,11 +124,11 @@ subroutine psb_dilu_fct(a,l,u,d,info,blck)
 contains
   subroutine psb_dilu_fctint(m,ma,a,mb,b,&
        & d,laspk,lia1,lia2,uaspk,uia1,uia2,l1,l2,info)
-    use psbn_d_base_mat_mod
+    use psb_d_base_mat_mod
 
     implicit none 
 
-    type(psbn_d_sparse_mat)          :: a
+    type(psb_d_sparse_mat)          :: a
     type(psb_dspmat_type)          :: b
     integer                        :: m,ma,mb,l1,l2,info
     integer, dimension(:)          :: lia1,lia2,uia1,uia2
@@ -137,7 +137,7 @@ contains
     integer :: i,j,k,l,low1,low2,kk,jj,ll, irb, ktrw,err_act, nz
     real(psb_dpk_) :: dia,temp
     integer, parameter :: nrb=60
-    type(psbn_d_coo_sparse_mat) :: trw
+    type(psb_d_coo_sparse_mat) :: trw
     integer, allocatable :: irow(:), icol(:)
     real(psb_dpk_), allocatable :: val(:)
 
