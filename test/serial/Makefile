@@ -18,10 +18,10 @@ all: d_coo_matgen d_matgen
 d_coo_matgen: d_coo_matgen.o
 	$(F90LINK) d_coo_matgen.o  -o d_coo_matgen  $(PSBLAS_LIB) $(LDLIBS)
 	/bin/mv d_coo_matgen $(EXEDIR)	
-d_matgen: d_matgen.o psbn_d_cxx_mat_mod.o psbn_d_cxx_impl.o
-	$(F90LINK) d_matgen.o psbn_d_cxx_mat_mod.o psbn_d_cxx_impl.o -o d_matgen  $(PSBLAS_LIB) $(LDLIBS)
+d_matgen: d_matgen.o psb_d_cxx_mat_mod.o psb_d_cxx_impl.o
+	$(F90LINK) d_matgen.o psb_d_cxx_mat_mod.o psb_d_cxx_impl.o -o d_matgen  $(PSBLAS_LIB) $(LDLIBS)
 	/bin/mv d_matgen $(EXEDIR)	
-d_matgen.o: psbn_d_cxx_mat_mod.o 
+d_matgen.o: psb_d_cxx_mat_mod.o 
 
 #ppde spde
 
@@ -39,7 +39,7 @@ spde: spde.o
 
 clean: 
 	/bin/rm -f d_coo_matgen.o d_matgen.o tpg.o ppde.o spde.o \
-	 psbn_d_cxx_mat_mod.o psbn_d_cxx_impl.o $(EXEDIR)/ppde 
+	 psb_d_cxx_mat_mod.o psb_d_cxx_impl.o $(EXEDIR)/ppde 
 verycleanlib: 
 	(cd ../..; make veryclean)
 lib:
