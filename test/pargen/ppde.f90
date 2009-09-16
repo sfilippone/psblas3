@@ -344,6 +344,7 @@ contains
     !
     use psb_base_mod
     use psbn_d_mat_mod
+    use psbn_d_csc_mat_mod
     implicit none
     integer                      :: idim
     integer, parameter           :: nb=20
@@ -352,6 +353,9 @@ contains
     integer                      :: ictxt, info
     character                    :: afmt*5
     type(psbn_d_sparse_mat)       :: a
+    type(psbn_d_csc_sparse_mat)       :: acsc
+    type(psbn_d_coo_sparse_mat)       :: acoo
+    type(psbn_d_csr_sparse_mat)       :: acsr
     real(psb_dpk_)           :: zt(nb),glob_x,glob_y,glob_z
     integer                  :: m,n,nnz,glob_row,nlr,i,ii,ib,k
     integer                  :: x,y,z,ia,indx_owner
@@ -589,7 +593,7 @@ contains
     t1 = psb_wtime()
     call psb_cdasb(desc_a,info)
     if (info == 0) &
-         & call psb_spasb(a,desc_a,info,dupl=psb_dupl_err_,afmt=afmt)
+         & call psb_spasb(a,desc_a,info,dupl=psb_dupl_err_,mold=acsr)
     call psb_barrier(ictxt)
     if(info /= 0) then
       info=4010
@@ -608,7 +612,7 @@ contains
     tasb = psb_wtime()-t1
     call psb_barrier(ictxt)
     ttot = psb_wtime() - t0 
-
+!!$    call a%print(20+iam)
     call psb_amx(ictxt,talc)
     call psb_amx(ictxt,tgen)
     call psb_amx(ictxt,tasb)

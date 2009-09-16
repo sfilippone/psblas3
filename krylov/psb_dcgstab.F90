@@ -123,7 +123,7 @@ Subroutine psb_dcgstab(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,istop)
   integer            :: debug_level, debug_unit
   Logical, Parameter :: exchange=.True., noexchange=.False., debug1 = .False.
   Integer, Parameter :: irmax = 8
-  Integer            :: itx, isvch, ictxt, err_act
+  Integer            :: itx, isvch, ictxt, err_act, i
   Integer            :: istop_
   Real(psb_dpk_)   :: alpha, beta, rho, rho_old, sigma, omega, tau
   type(psb_itconv_type) :: stopdat

@@ -2,27 +2,26 @@ module psbn_base_mat_mod
   
   use psb_const_mod 
 
-  integer, parameter :: psbn_invalid_ = -1 
-  integer, parameter :: psbn_spmat_null_=0, psbn_spmat_bld_=1
-  integer, parameter :: psbn_spmat_asb_=2, psbn_spmat_upd_=4
-
-  integer, parameter :: psbn_ireg_flgs_=10, psbn_ip2_=0
-  integer, parameter :: psbn_iflag_=2, psbn_ichk_=3
-  integer, parameter :: psbn_nnzt_=4, psbn_zero_=5,psbn_ipc_=6
-  ! Duplicate coefficients handling
-  ! These are usually set while calling spcnv as one of its
-  ! optional arugments.
-  integer, parameter :: psbn_dupl_ovwrt_ = 0
-  integer, parameter :: psbn_dupl_add_   = 1
-  integer, parameter :: psbn_dupl_err_   = 2
-  integer, parameter :: psbn_dupl_def_   = psbn_dupl_ovwrt_
-  ! Matrix update mode
-  integer, parameter :: psbn_upd_srch_   = 98764
-  integer, parameter :: psbn_upd_perm_   = 98765
-  integer, parameter :: psbn_upd_dflt_   = psbn_upd_srch_
-  integer, parameter :: psbn_maxjdrows_=8, psbn_minjdrows_=4
-  integer, parameter :: psbn_dbleint_=2
-  character(len=5)   :: psbn_fidef_='CSR'
+!!$  integer, parameter :: psbn_invalid_ = -1 
+!!$  integer, parameter :: psbn_spmat_null_=0, psbn_spmat_bld_=1
+!!$  integer, parameter :: psbn_spmat_asb_=2, psbn_spmat_upd_=4
+!!$
+!!$  integer, parameter :: psbn_ireg_flgs_=10, psbn_ip2_=0
+!!$  integer, parameter :: psbn_iflag_=2, psbn_ichk_=3
+!!$  integer, parameter :: psbn_nnzt_=4, psbn_zero_=5,psbn_ipc_=6
+!!$  ! Duplicate coefficients handling
+!!$  ! These are usually set while calling spcnv as one of its
+!!$  ! optional arugments.
+!!$  integer, parameter :: psbn_dupl_ovwrt_ = 0
+!!$  integer, parameter :: psbn_dupl_add_   = 1
+!!$  integer, parameter :: psbn_dupl_err_   = 2
+!!$  integer, parameter :: psbn_dupl_def_   = psbn_dupl_ovwrt_
+!!$  ! Matrix update mode
+!!$  integer, parameter :: psbn_upd_srch_   = 98764
+!!$  integer, parameter :: psbn_upd_perm_   = 98765
+!!$  integer, parameter :: psbn_upd_dflt_   = psbn_upd_srch_
+!!$  integer, parameter :: psbn_maxjdrows_=8, psbn_minjdrows_=4
+!!$  integer, parameter :: psbn_dbleint_=2
 
 
   type  :: psbn_base_sparse_mat

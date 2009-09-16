@@ -57,5 +57,49 @@ module psb_const_mod
   real(psb_dpk_), parameter      :: epstol=1.d-32, psb_percent_=0.7
   real(psb_spk_), parameter      :: s_epstol=1.e-16 ! How to choose this?
   character, parameter           :: psb_all_='A',  psb_topdef_=' '
+  
+  !
+  ! Sparse matrix constants
+  !
+
+  !
+  !
+  !     Queries into spmat%info
+  !     
+  integer, parameter :: psb_nztotreq_=1, psb_nzrowreq_=2
+  integer, parameter :: psb_nzsizereq_=3
+  !
+  !     Entries and values for  spmat%info
+  !     
+  integer, parameter :: psb_nnz_=1
+  integer, parameter :: psb_del_bnd_=7, psb_srtd_=8
+  integer, parameter :: psb_state_=9
+  integer, parameter :: psb_upd_pnt_=10
+  integer, parameter :: psb_dupl_=11,  psb_upd_=12
+  integer, parameter :: psb_ifasize_=16
+  !  
+  integer, parameter :: psb_spmat_null_=0, psb_spmat_bld_=1
+  integer, parameter :: psb_spmat_asb_=2, psb_spmat_upd_=4
+
+  integer, parameter :: psb_ireg_flgs_=10, psb_ip2_=0
+  integer, parameter :: psb_iflag_=2, psb_ichk_=3
+  integer, parameter :: psb_nnzt_=4, psb_zero_=5,psb_ipc_=6
+  ! Duplicate coefficients handling
+  ! These are usually set while calling spcnv as one of its
+  ! optional arugments.
+  integer, parameter :: psb_dupl_ovwrt_ = 0
+  integer, parameter :: psb_dupl_add_   = 1
+  integer, parameter :: psb_dupl_err_   = 2
+  integer, parameter :: psb_dupl_def_   = psb_dupl_ovwrt_
+  ! Matrix update mode
+  integer, parameter :: psb_upd_srch_   = 98764
+  integer, parameter :: psb_upd_perm_   = 98765
+  integer, parameter :: psb_upd_dflt_   = psb_upd_srch_
+  ! Mark a COO matrix with sorted entries.
+  integer, parameter :: psb_isrtdcoo_   = 98761
+  integer, parameter :: psb_maxjdrows_=8, psb_minjdrows_=4
+  integer, parameter :: psb_dbleint_=2
+  character(len=5)   :: psb_fidef_='CSR'
+
 
 end module psb_const_mod
