@@ -33,7 +33,7 @@ LIBDIR=..
 MODDIR=../modules
 FINCLUDES=$(FMFLAG)$(LIBDIR) $(FMFLAG)$(MODDIR) $(FMFLAG).
 
-lib: auxd cood csrd jadd f77d dpd lib1
+lib: auxd cood csrd jadd f77d f03d dpd lib1
 	$(AR) $(LIBDIR)/$(LIBNAME) $(FOBJS)
 	$(RANLIB) $(LIBDIR)/$(LIBNAME)
 
@@ -45,7 +45,7 @@ psb_sspgetrow.o psb_dspgetrow.o psb_zspgetrow.o: psb_getrow_mod.o
 psb_sspcnv.o psb_dspcnv.o pzb_zspcnv.o: psb_regen_mod.o
 #psb_sfixcoo.o psb_dfixcoo.o psb_cfixcoo.o psb_zfixcoo.o: psb_ip_reord_mod.o
 
-auxd:  psb_ip_reord_mod.o
+auxd: 
 	(cd aux; make lib)
 
 cood:
@@ -57,11 +57,13 @@ csrd:
 jadd:
 	(cd jad; make lib)
 
-dpd:  psb_ip_reord_mod.o
+dpd:  
 	(cd dp; make lib)
 
 f77d:
 	(cd f77; make lib)
+f03d:
+	(cd f03; make lib)
 
 clean:
 	/bin/rm -f $(FOBJS) *$(.mod)
@@ -71,5 +73,6 @@ clean:
 	(cd jad; make clean)
 	(cd dp; make  clean)
 	(cd f77; make clean)
+	(cd f03; make clean)
 
 veryclean: clean 

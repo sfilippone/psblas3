@@ -583,7 +583,7 @@ subroutine  psb_dspmv(alpha,a,x,beta,y,desc_a,info,&
       call psi_swapdata(ior(psb_swap_send_,psb_swap_recv_),&
            & dzero,x,desc_a,iwork,info,data=psb_comm_halo_)
     end if
-    ! Just for fun 
+
     call psbn_csmm(alpha,a,x,beta,y,info)
 
     if(info /= 0) then

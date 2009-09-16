@@ -41,7 +41,7 @@ subroutine d_coo_cssm_impl(alpha,a,x,beta,y,info,trans)
   else
     trans_ = 'N'
   end if
-  tra = (psb_toupper(trans_)=='T').or.(psb_toupper(trans_)=='C'))
+  tra = (psb_toupper(trans_)=='T').or.(psb_toupper(trans_)=='C')
   m   = a%get_nrows()
   nc  = min(size(x,2) , size(y,2)) 
 
@@ -304,7 +304,7 @@ subroutine d_coo_cssv_impl(alpha,a,x,beta,y,info,trans)
     goto 9999
   endif
 
-  tra = (psb_toupper(trans_)=='T').or.(psb_toupper(trans_)=='C'))
+  tra = (psb_toupper(trans_)=='T').or.(psb_toupper(trans_)=='C')
   m = a%get_nrows()
 
   if (.not. (a%is_triangle())) then 

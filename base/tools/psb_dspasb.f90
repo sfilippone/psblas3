@@ -48,7 +48,7 @@
 !                                            psb_dupl_err_       raise an error. 
 ! 
 !
-subroutine psb_dspasb(a,desc_a, info, afmt, upd, dupl)
+subroutine psb_dspasb(a,desc_a, info, afmt, upd, dupl, mold)
   use psb_descriptor_type
   use psb_spmat_type
   use psb_serial_mod
@@ -67,6 +67,7 @@ subroutine psb_dspasb(a,desc_a, info, afmt, upd, dupl)
   integer, intent(out)                    :: info
   integer,optional, intent(in)            :: dupl, upd
   character(len=*), optional, intent(in)         :: afmt
+  class(psbn_d_base_sparse_mat), intent(in), optional :: mold
   !....Locals....
   integer               :: int_err(5)
   integer               :: np,me,n_col, err_act
@@ -119,7 +120,7 @@ subroutine psb_dspasb(a,desc_a, info, afmt, upd, dupl)
     call a%set_ncols(n_col)
   end if
 
-  call a%cscnv(info,type=afmt,dupl=dupl)
+  call a%cscnv(info,type=afmt,dupl=dupl, mold=mold)
 
   
   IF (debug_level >= psb_debug_ext_) then 
