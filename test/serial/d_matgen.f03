@@ -3,9 +3,9 @@ program d_matgen
   use psb_base_mod
   use psb_prec_mod
   use psb_krylov_mod
-  use psbn_d_base_mat_mod
-  use psbn_d_csr_mat_mod
-  use psbn_d_mat_mod
+  use psb_d_base_mat_mod
+  use psb_d_csr_mat_mod
+  use psb_d_mat_mod
   implicit none
 
   ! input parameters
@@ -139,7 +139,7 @@ contains
     ! Note that if a1=a2=a3=a4=0., the PDE is the well-known Laplace equation.
     !
     use psb_base_mod
-    use psbn_d_cxx_mat_mod
+    use psb_d_cxx_mat_mod
     implicit none
     integer                        :: idim
     integer, parameter             :: nb=20
@@ -155,10 +155,10 @@ contains
     integer                  :: element
     integer, allocatable     :: irow(:),icol(:),myidx(:)
     real(psb_dpk_), allocatable :: val(:), diag(:)
-    type(psbn_d_sparse_mat)     :: a_n
-    type(psbn_d_coo_sparse_mat) :: acoo
-    type(psbn_d_csr_sparse_mat) :: acsr
-    type(psbn_d_cxx_sparse_mat) :: acxx
+    type(psb_d_sparse_mat)     :: a_n
+    type(psb_d_coo_sparse_mat) :: acoo
+    type(psb_d_csr_sparse_mat) :: acsr
+    type(psb_d_cxx_sparse_mat) :: acxx
     ! deltah dimension of each grid cell
     ! deltat discretization time
     real(psb_dpk_)         :: deltah, anorm

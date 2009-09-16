@@ -65,7 +65,7 @@ program ppde
   use psb_base_mod
   use psb_prec_mod
   use psb_krylov_mod
-  use psbn_d_mat_mod
+  use psb_d_mat_mod
   implicit none
 
   ! input parameters
@@ -78,7 +78,7 @@ program ppde
   real(psb_dpk_) :: t1, t2, tprec 
 
   ! sparse matrix and preconditioner
-  type(psbn_d_sparse_mat) :: a
+  type(psb_d_sparse_mat) :: a
 !!$  type(psb_dspmat_type) :: a
   type(psb_dprec_type)  :: prec
   ! descriptor
@@ -343,8 +343,8 @@ contains
     ! Note that if a1=a2=a3=a4=0., the PDE is the well-known Laplace equation.
     !
     use psb_base_mod
-    use psbn_d_mat_mod
-    use psbn_d_csc_mat_mod
+    use psb_d_mat_mod
+    use psb_d_csc_mat_mod
     implicit none
     integer                      :: idim
     integer, parameter           :: nb=20
@@ -352,10 +352,10 @@ contains
     type(psb_desc_type)          :: desc_a
     integer                      :: ictxt, info
     character                    :: afmt*5
-    type(psbn_d_sparse_mat)       :: a
-    type(psbn_d_csc_sparse_mat)       :: acsc
-    type(psbn_d_coo_sparse_mat)       :: acoo
-    type(psbn_d_csr_sparse_mat)       :: acsr
+    type(psb_d_sparse_mat)       :: a
+    type(psb_d_csc_sparse_mat)       :: acsc
+    type(psb_d_coo_sparse_mat)       :: acoo
+    type(psb_d_csr_sparse_mat)       :: acsr
     real(psb_dpk_)           :: zt(nb),glob_x,glob_y,glob_z
     integer                  :: m,n,nnz,glob_row,nlr,i,ii,ib,k
     integer                  :: x,y,z,ia,indx_owner

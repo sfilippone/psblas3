@@ -3,8 +3,8 @@ program d_coo_matgen
   use psb_base_mod
   use psb_prec_mod
   use psb_krylov_mod
-  use psbn_d_base_mat_mod
-  use psbn_d_csr_mat_mod
+  use psb_d_base_mat_mod
+  use psb_d_csr_mat_mod
   implicit none
 
   ! input parameters
@@ -153,8 +153,8 @@ contains
     integer                  :: element
     integer, allocatable     :: irow(:),icol(:),myidx(:)
     real(psb_dpk_), allocatable :: val(:)
-    type(psbn_d_coo_sparse_mat) :: acoo
-    type(psbn_d_csr_sparse_mat) :: acsr
+    type(psb_d_coo_sparse_mat) :: acoo
+    type(psb_d_csr_sparse_mat) :: acsr
     ! deltah dimension of each grid cell
     ! deltat discretization time
     real(psb_dpk_)         :: deltah
