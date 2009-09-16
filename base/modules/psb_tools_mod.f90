@@ -550,9 +550,9 @@ Module psb_tools_mod
     subroutine psb_dspalloc(a, desc_a, info, nnz)
       use psb_descriptor_type
       use psb_spmat_type
-      use psbn_d_mat_mod
+      use psb_d_mat_mod
       type(psb_desc_type), intent(inout) :: desc_a
-      type(psbn_d_sparse_mat), intent(out) :: a
+      type(psb_d_sparse_mat), intent(out) :: a
       integer, intent(out)               :: info
       integer, optional, intent(in)      :: nnz
     end subroutine psb_dspalloc
@@ -587,13 +587,13 @@ Module psb_tools_mod
     subroutine psb_dspasb(a,desc_a, info, afmt, upd, dupl,mold)
       use psb_descriptor_type
       use psb_spmat_type
-      use psbn_d_mat_mod
-      type(psbn_d_sparse_mat), intent (inout)  :: a
+      use psb_d_mat_mod
+      type(psb_d_sparse_mat), intent (inout)  :: a
       type(psb_desc_type), intent(in)         :: desc_a
       integer, intent(out)                    :: info
       integer,optional, intent(in)            :: dupl, upd
       character(len=*), optional, intent(in)  :: afmt
-      class(psbn_d_base_sparse_mat), intent(in), optional :: mold
+      class(psb_d_base_sparse_mat), intent(in), optional :: mold
     end subroutine psb_dspasb
     subroutine psb_cspasb(a,desc_a, info, afmt, upd, dupl)
       use psb_descriptor_type
@@ -630,9 +630,9 @@ Module psb_tools_mod
     subroutine psb_dspfree(a, desc_a,info)
       use psb_descriptor_type
       use psb_spmat_type
-      use psbn_d_mat_mod
+      use psb_d_mat_mod
       type(psb_desc_type), intent(in) :: desc_a
-      type(psbn_d_sparse_mat), intent(inout)       ::a
+      type(psb_d_sparse_mat), intent(inout)       ::a
       integer, intent(out)        :: info
     end subroutine psb_dspfree
     subroutine psb_cspfree(a, desc_a,info)
@@ -676,9 +676,9 @@ Module psb_tools_mod
     subroutine psb_dspins(nz,ia,ja,val,a,desc_a,info,rebuild)
       use psb_descriptor_type
       use psb_spmat_type
-      use psbn_d_mat_mod
+      use psb_d_mat_mod
       type(psb_desc_type), intent(inout)   :: desc_a
-      type(psbn_d_sparse_mat), intent(inout) :: a
+      type(psb_d_sparse_mat), intent(inout) :: a
       integer, intent(in)                  :: nz,ia(:),ja(:)
       real(psb_dpk_), intent(in)         :: val(:)
       integer, intent(out)                 :: info

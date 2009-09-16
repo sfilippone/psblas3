@@ -74,13 +74,13 @@ subroutine  psb_dspmm(alpha,a,x,beta,y,desc_a,info,&
   use psb_error_mod
   use psb_string_mod
   use psb_penv_mod
-  use psbn_d_mat_mod
+  use psb_d_mat_mod
   implicit none
 
   real(psb_dpk_), intent(in)             :: alpha, beta
   real(psb_dpk_), intent(inout), target  :: x(:,:)
   real(psb_dpk_), intent(inout), target  :: y(:,:)
-  type(psbn_d_sparse_mat), intent(in)        :: a
+  type(psb_d_sparse_mat), intent(in)        :: a
   type(psb_desc_type), intent(in)          :: desc_a
   integer, intent(out)                     :: info
   real(psb_dpk_), optional, target       :: work(:)
@@ -251,7 +251,7 @@ subroutine  psb_dspmm(alpha,a,x,beta,y,desc_a,info,&
         if(info /= 0) exit blk
 
         !  local Matrix-vector product
-        call psbn_csmm(alpha,a,x(:,jjx+i-1:jjx+i-1+ib-1),&
+        call psb_csmm(alpha,a,x(:,jjx+i-1:jjx+i-1+ib-1),&
              & beta,y(:,jjy+i-1:jjy+i-1+ib-1),info,trans=trans_)
 
         if(info /= 0) exit blk
@@ -266,7 +266,7 @@ subroutine  psb_dspmm(alpha,a,x,beta,y,desc_a,info,&
       if (doswap_)&
            & call psi_swapdata(ior(psb_swap_send_,psb_swap_recv_),&
            & ib1,dzero,x(:,1:ik),desc_a,iwork,info)
-      if (info == 0) call psbn_csmm(alpha,a,x(:,1:ik),beta,y(:,1:ik),info)
+      if (info == 0) call psb_csmm(alpha,a,x(:,1:ik),beta,y(:,1:ik),info)
     end if
     if(info /= 0) then
       info = 4011
@@ -313,7 +313,7 @@ subroutine  psb_dspmm(alpha,a,x,beta,y,desc_a,info,&
     if (info == 0) call psi_ovrl_upd(x,desc_a,psb_avg_,info)
     y(nrow+1:ncol,1:ik)    = dzero
 
-    if (info == 0) call psbn_csmm(alpha,a,x(:,1:ik),beta,y(:,1:ik),info,trans=trans_)
+    if (info == 0) call psb_csmm(alpha,a,x(:,1:ik),beta,y(:,1:ik),info,trans=trans_)
     if (debug_level >= psb_debug_comp_) &
          & write(debug_unit,*) me,' ',trim(name),' csmm ', info
     if (info /= 0) then
@@ -436,13 +436,13 @@ subroutine  psb_dspmv(alpha,a,x,beta,y,desc_a,info,&
   use psb_error_mod
   use psb_string_mod
   use psb_penv_mod
-  use psbn_d_mat_mod
+  use psb_d_mat_mod
   implicit none
 
   real(psb_dpk_), intent(in)             :: alpha, beta
   real(psb_dpk_), intent(inout), target  :: x(:)
   real(psb_dpk_), intent(inout), target  :: y(:)
-  type(psbn_d_sparse_mat), intent(in)        :: a
+  type(psb_d_sparse_mat), intent(in)        :: a
 !!$  type(psb_dspmat_type), intent(in)        :: a
   type(psb_desc_type), intent(in)          :: desc_a
   integer, intent(out)                     :: info
@@ -584,7 +584,7 @@ subroutine  psb_dspmv(alpha,a,x,beta,y,desc_a,info,&
            & dzero,x,desc_a,iwork,info,data=psb_comm_halo_)
     end if
 
-    call psbn_csmm(alpha,a,x,beta,y,info)
+    call psb_csmm(alpha,a,x,beta,y,info)
 
     if(info /= 0) then
       info = 4011
@@ -633,7 +633,7 @@ subroutine  psb_dspmv(alpha,a,x,beta,y,desc_a,info,&
     yp(nrow+1:ncol) = dzero
     
     !  local Matrix-vector product
-    if (info == 0) call psbn_csmm(alpha,a,x,beta,y,info,trans=trans_)
+    if (info == 0) call psb_csmm(alpha,a,x,beta,y,info,trans=trans_)
 
     if (debug_level >= psb_debug_comp_) &
          & write(debug_unit,*) me,' ',trim(name),' csmm ', info

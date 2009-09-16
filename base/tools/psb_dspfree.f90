@@ -46,12 +46,12 @@ subroutine psb_dspfree(a, desc_a,info)
   use psb_serial_mod
   use psb_const_mod
   use psb_error_mod
-  use psbn_d_mat_mod
+  use psb_d_mat_mod
   implicit none
 
   !....parameters...
   type(psb_desc_type), intent(in)      :: desc_a
-  type(psbn_d_sparse_mat), intent(inout) :: a
+  type(psb_d_sparse_mat), intent(inout) :: a
   integer, intent(out)                 :: info
   !...locals....
   integer             :: ictxt,err_act

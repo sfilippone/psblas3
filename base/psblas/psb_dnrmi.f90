@@ -47,10 +47,10 @@ function psb_dnrmi(a,desc_a,info)
   use psb_check_mod
   use psb_error_mod
   use psb_penv_mod
-  use psbn_d_mat_mod
+  use psb_d_mat_mod
   implicit none
 
-  type(psbn_d_sparse_mat), intent(in)   :: a
+  type(psb_d_sparse_mat), intent(in)   :: a
   integer, intent(out)                :: info
   type(psb_desc_type), intent(in)     :: desc_a
   real(psb_dpk_)                    :: psb_dnrmi
@@ -95,7 +95,7 @@ function psb_dnrmi(a,desc_a,info)
   end if
 
   if ((m /= 0).and.(n /= 0)) then
-    nrmi = psbn_csnmi(a)
+    nrmi = psb_csnmi(a)
     if(info /= 0) then
       info=4010
       ch_err='psb_csnmi'

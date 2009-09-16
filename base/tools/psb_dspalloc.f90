@@ -49,12 +49,12 @@ subroutine psb_dspalloc(a, desc_a, info, nnz)
   use psb_const_mod
   use psb_error_mod
   use psb_penv_mod
-  use psbn_d_mat_mod
+  use psb_d_mat_mod
   implicit none
 
   !....parameters...
   type(psb_desc_type), intent(inout) :: desc_a
-  type(psbn_d_sparse_mat), intent(out) :: a
+  type(psb_d_sparse_mat), intent(out) :: a
   integer, intent(out)               :: info
   integer, optional, intent(in)      :: nnz
 

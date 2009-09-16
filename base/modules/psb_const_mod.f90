@@ -78,6 +78,7 @@ module psb_const_mod
   integer, parameter :: psb_dupl_=11,  psb_upd_=12
   integer, parameter :: psb_ifasize_=16
   !  
+  integer, parameter :: psb_invalid_ = -1 
   integer, parameter :: psb_spmat_null_=0, psb_spmat_bld_=1
   integer, parameter :: psb_spmat_asb_=2, psb_spmat_upd_=4
 

@@ -57,17 +57,17 @@ subroutine psb_dspasb(a,desc_a, info, afmt, upd, dupl, mold)
   use psb_error_mod
   use psb_string_mod
   use psb_penv_mod
-  use psbn_d_mat_mod
+  use psb_d_mat_mod
   implicit none
 
 
   !...Parameters....
-  type(psbn_d_sparse_mat), intent (inout)  :: a
+  type(psb_d_sparse_mat), intent (inout)  :: a
   type(psb_desc_type), intent(in)         :: desc_a
   integer, intent(out)                    :: info
   integer,optional, intent(in)            :: dupl, upd
   character(len=*), optional, intent(in)         :: afmt
-  class(psbn_d_base_sparse_mat), intent(in), optional :: mold
+  class(psb_d_base_sparse_mat), intent(in), optional :: mold
   !....Locals....
   integer               :: int_err(5)
   integer               :: np,me,n_col, err_act

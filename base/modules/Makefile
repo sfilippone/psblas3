@@ -6,7 +6,9 @@ UTIL_MODS = psb_string_mod.o psb_spmat_type.o \
 	psb_serial_mod.o psb_tools_mod.o psb_blacs_mod.o \
 	psb_linmap_type_mod.o psb_comm_mod.o psb_psblas_mod.o \
 	psi_serial_mod.o psi_mod.o  psb_ip_reord_mod.o\
-	psb_check_mod.o psb_gps_mod.o psb_linmap_mod.o psb_hash_mod.o
+	psb_check_mod.o psb_gps_mod.o psb_linmap_mod.o psb_hash_mod.o\
+	psbn_base_mat_mod.o psbn_d_base_mat_mod.o  psbn_mat_mod.o\
+	 psbn_d_csr_mat_mod.o  
 
 MODULES=$(BASIC_MODS) $(UTIL_MODS)
 
@@ -17,12 +19,15 @@ CINCLUDES=-I.
 FINCLUDES=$(FMFLAG)$(LIBDIR) $(FMFLAG). $(FIFLAG).
 
 
-lib:  $(BASIC_MODS) blacsmod newmods $(UTIL_MODS)  $(OBJS)  $(LIBMOD)
+lib:  $(BASIC_MODS) blacsmod  $(UTIL_MODS)  $(OBJS)  $(LIBMOD)
 	$(AR) $(LIBDIR)/$(LIBNAME) $(MODULES) $(OBJS) $(MPFOBJS)
 	$(RANLIB) $(LIBDIR)/$(LIBNAME)
 	/bin/cp -p $(LIBMOD) $(LIBDIR)
 	/bin/cp -p *$(.mod) $(LIBDIR)
 
+
+psbn_d_base_mat_mod.o: psb_string_mod.o psb_sort_mod.o psb_ip_reord_mod.o psb_error_mod.o
+psbn_mat_mod.o:	psbn_d_base_mat_mod.o  psbn_d_csr_mat_mod.o
 psb_realloc_mod.o : psb_error_mod.o 
 psb_spmat_type.o : psb_realloc_mod.o psb_error_mod.o psb_const_mod.o psb_string_mod.o psb_sort_mod.o
 psb_error_mod.o: psb_const_mod.o
@@ -32,19 +37,19 @@ psb_blacs_mod.o: psb_const_mod.o
 psi_serial_mod.o: psb_const_mod.o psb_realloc_mod.o
 psi_mod.o: psb_penv_mod.o psb_error_mod.o psb_desc_type.o psb_const_mod.o psi_serial_mod.o psb_serial_mod.o
 psb_desc_type.o: psb_const_mod.o psb_error_mod.o psb_penv_mod.o psb_realloc_mod.o  psb_hash_mod.o
-psb_linmap_mod.o: psb_linmap_type_mod.o
-psb_linmap_type_mod.o: psb_desc_type.o psb_spmat_type.o psb_error_mod.o psb_serial_mod.o psb_comm_mod.o 
+psb_linmap_mod.o: psb_linmap_type_mod.o psbn_mat_mod.o
+psb_linmap_type_mod.o: psb_desc_type.o psb_spmat_type.o psb_error_mod.o psb_serial_mod.o psb_comm_mod.o psbn_mat_mod.o
 psb_check_mod.o: psb_desc_type.o
 psb_serial_mod.o: psb_spmat_type.o psb_string_mod.o psb_sort_mod.o psi_serial_mod.o
 psb_sort_mod.o: psb_error_mod.o psb_realloc_mod.o psb_const_mod.o
-psb_methd_mod.o: psb_serial_mod.o psb_desc_type.o psb_prec_type.o
-psb_tools_mod.o: psb_spmat_type.o psb_desc_type.o psi_mod.o psb_gps_mod.o psb_linmap_mod.o
+psb_tools_mod.o: psb_spmat_type.o psb_desc_type.o psi_mod.o psb_gps_mod.o psb_linmap_mod.o psbn_mat_mod.o
+psb_psblas_mod.o: psbn_mat_mod.o psb_spmat_type.o psb_desc_type.o 
 psb_gps_mod.o:	psb_realloc_mod.o
 psb_hash_mod.o: psb_const_mod.o psb_realloc_mod.o
 
 psb_base_mod.o: $(MODULES)
 
-newmods: $(BASIC_MODS) psb_string_mod.o psb_sort_mod.o psb_ip_reord_mod.o
+newmods: $(BASIC_MODS)
 	(cd ../newserial; make lib LIBNAME=$(LIBNAME))
 blacsmod:
 	(make psb_blacs_mod.o psb_penv_mod.o F90COPT="$(F90COPT) $(EXTRA_OPT)")

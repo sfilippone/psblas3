@@ -86,13 +86,13 @@ subroutine  psb_dspsm(alpha,a,x,beta,y,desc_a,info,&
   use psb_error_mod
   use psb_string_mod
   use psb_penv_mod
-  use psbn_d_mat_mod
+  use psb_d_mat_mod
   implicit none
 
   real(psb_dpk_), intent(in)              :: alpha, beta
   real(psb_dpk_), intent(in), target      :: x(:,:)
   real(psb_dpk_), intent(inout), target   :: y(:,:)
-  type(psbn_d_sparse_mat), intent(in)        :: a
+  type(psb_d_sparse_mat), intent(in)        :: a
   type(psb_desc_type), intent(in)           :: desc_a
   integer, intent(out)                      :: info
   real(psb_dpk_), intent(in), optional, target      :: diag(:)
@@ -258,7 +258,7 @@ subroutine  psb_dspsm(alpha,a,x,beta,y,desc_a,info,&
   ! Perform local triangular system solve
   xp => x(iix:lldx,jjx:jjx+ik-1)
   yp => y(iiy:lldy,jjy:jjy+ik-1)
-  call psbn_cssm(alpha,a,xp,beta,yp,info,side=side,d=diag,trans=trans)
+  call psb_cssm(alpha,a,xp,beta,yp,info,side=side,d=diag,trans=trans)
 
   if(info /= 0) then
     info = 4010
@@ -373,13 +373,13 @@ subroutine  psb_dspsv(alpha,a,x,beta,y,desc_a,info,&
   use psb_error_mod
   use psb_string_mod
   use psb_penv_mod
-  use psbn_d_mat_mod
+  use psb_d_mat_mod
   implicit none 
 
   real(psb_dpk_), intent(in)              :: alpha, beta
   real(psb_dpk_), intent(in), target      :: x(:)
   real(psb_dpk_), intent(inout), target   :: y(:)
-  type(psbn_d_sparse_mat), intent(in)         :: a
+  type(psb_d_sparse_mat), intent(in)         :: a
   type(psb_desc_type), intent(in)           :: desc_a
   integer, intent(out)                      :: info
   real(psb_dpk_), intent(in), optional, target    :: diag(:)
@@ -529,8 +529,8 @@ subroutine  psb_dspsv(alpha,a,x,beta,y,desc_a,info,&
   ! Perform local triangular system solve
   xp => x(iix:lldx)
   yp => y(iiy:lldy)
-  call psbn_cssm(alpha,a,xp,beta,yp,info,side=side,d=diag,trans=trans)
-!!$  call psbn_cssm(alpha,a,xp,beta,yp,info,side=side,d=id,trans=itrans)
+  call psb_cssm(alpha,a,xp,beta,yp,info,side=side,d=diag,trans=trans)
+!!$  call psb_cssm(alpha,a,xp,beta,yp,info,side=side,d=id,trans=itrans)
 
   if(info /= 0) then
     info = 4010

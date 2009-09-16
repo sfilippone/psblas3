@@ -57,12 +57,12 @@ subroutine psb_dspins(nz,ia,ja,val,a,desc_a,info,rebuild)
   use psb_const_mod
   use psb_error_mod
   use psb_penv_mod
-  use psbn_d_mat_mod
+  use psb_d_mat_mod
   implicit none
 
   !....parameters...
   type(psb_desc_type), intent(inout)   :: desc_a
-  type(psbn_d_sparse_mat), intent(inout) :: a
+  type(psb_d_sparse_mat), intent(inout) :: a
   integer, intent(in)                  :: nz,ia(:),ja(:)
   real(psb_dpk_), intent(in)         :: val(:)
   integer, intent(out)                 :: info
