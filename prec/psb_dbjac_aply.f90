@@ -38,7 +38,6 @@ subroutine psb_dbjac_aply(alpha,prec,x,beta,y,desc_data,trans,work,info)
   ! 
 
   use psb_base_mod
-  use psb_d_mat_mod
   use psb_prec_mod, psb_protect_name => psb_dbjac_aply
   implicit none 
 

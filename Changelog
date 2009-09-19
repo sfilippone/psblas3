@@ -1,6 +1,8 @@
 Changelog. A lot less detailed than usual, at least for past
 history. 
-
+2009/09/15: First working OO implementation for serial routines on sparse
+	    matrix data structures. Only D for the time being. 
+	
 2009/08/25: New configure flag 
 	    --enable-serial
 	    for serial-only  compilation. 	

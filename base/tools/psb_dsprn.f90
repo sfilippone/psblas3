@@ -44,7 +44,7 @@
 Subroutine psb_dsprn(a, desc_a,info,clear)
 
   use psb_descriptor_type
-  use psb_spmat_type
+  use psb_mat_mod
   use psb_serial_mod
   use psb_const_mod
   use psb_error_mod
@@ -53,7 +53,7 @@ Subroutine psb_dsprn(a, desc_a,info,clear)
 
   !....Parameters...
   Type(psb_desc_type), intent(in)      :: desc_a
-  Type(psb_dspmat_type), intent(inout) :: a
+  Type(psb_d_sparse_mat), intent(inout) :: a
   integer, intent(out)                 :: info
   logical, intent(in), optional        :: clear
 
@@ -87,13 +87,8 @@ Subroutine psb_dsprn(a, desc_a,info,clear)
     call psb_errpush(info,name)
     goto 9999
   endif
-  if (present(clear)) then 
-    clear_ = clear
-  else
-    clear_ = .true.
-  end if
 
-  call psb_sp_reinit(a,info,clear=clear_)
+  call a%reinit(clear=clear)
 
   if (info /= 0) goto 9999
   if (debug_level >= psb_debug_outer_) &

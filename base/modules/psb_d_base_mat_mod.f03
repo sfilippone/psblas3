@@ -38,9 +38,8 @@ module psb_d_base_mat_mod
        & d_scals, d_scal, csnmi, csput, d_csgetrow, d_csgetblk, &
        & cp_to_coo, cp_from_coo, cp_to_fmt, cp_from_fmt, &
        & mv_to_coo, mv_from_coo, mv_to_fmt, mv_from_fmt, &
-       & get_diag, csclip, d_cssv, d_cssm 
-  
-  
+       & get_diag, csclip, d_cssv, d_cssm
+
   type, extends(psb_d_base_sparse_mat) :: psb_d_coo_sparse_mat
     
     integer              :: nnz
@@ -75,9 +74,12 @@ module psb_d_base_mat_mod
     procedure, pass(a) :: free     => d_coo_free
     procedure, pass(a) :: trim     => d_coo_trim
     procedure, pass(a) :: d_csgetrow => d_coo_csgetrow
+    procedure, pass(a) :: csgetptn => d_coo_csgetptn
     procedure, pass(a) :: print    => d_coo_print
     procedure, pass(a) :: get_fmt  => d_coo_get_fmt
+    procedure, pass(a) :: get_nz_row  => d_coo_get_nz_row
     procedure, pass(a) :: sizeof => d_coo_sizeof
+    procedure, pass(a) :: reinit => d_coo_reinit
     
   end type psb_d_coo_sparse_mat
 
@@ -87,8 +89,9 @@ module psb_d_base_mat_mod
        & d_fix_coo, d_coo_free, d_coo_print, d_coo_get_fmt, &
        & d_cp_coo_to_coo, d_cp_coo_from_coo, &
        & d_cp_coo_to_fmt, d_cp_coo_from_fmt, &
-       & d_coo_scals, d_coo_scal, d_coo_csgetrow, d_coo_sizeof
-  
+       & d_coo_scals, d_coo_scal, d_coo_csgetrow, d_coo_sizeof, &
+       & d_coo_csgetptn, d_coo_get_nz_row, d_coo_reinit
+
   
   interface 
     subroutine d_fix_coo_inner(nzin,dupl,ia,ja,val,nzout,info,idir) 
@@ -125,7 +128,7 @@ module psb_d_base_mat_mod
     subroutine d_cp_coo_from_coo_impl(a,b,info) 
       use psb_const_mod
       import psb_d_coo_sparse_mat
-      class(psb_d_coo_sparse_mat), intent(inout) :: a
+      class(psb_d_coo_sparse_mat), intent(out) :: a
       class(psb_d_coo_sparse_mat), intent(in)    :: b
       integer, intent(out)                        :: info
     end subroutine d_cp_coo_from_coo_impl
@@ -205,6 +208,24 @@ module psb_d_base_mat_mod
     end subroutine d_coo_csput_impl
   end interface
 
+  interface 
+    subroutine d_coo_csgetptn_impl(imin,imax,a,nz,ia,ja,info,&
+         & jmin,jmax,iren,append,nzin,rscale,cscale)
+      use psb_const_mod
+      import psb_d_coo_sparse_mat
+      implicit none
+      class(psb_d_coo_sparse_mat), intent(in) :: a
+      integer, intent(in)                  :: imin,imax
+      integer, intent(out)                 :: nz
+      integer, allocatable, intent(inout)  :: ia(:), ja(:)
+      integer,intent(out)                  :: info
+      logical, intent(in), optional        :: append
+      integer, intent(in), optional        :: iren(:)
+      integer, intent(in), optional        :: jmin,jmax, nzin
+      logical, intent(in), optional        :: rscale,cscale
+    end subroutine d_coo_csgetptn_impl
+  end interface
+  
   interface 
     subroutine d_coo_csgetrow_impl(imin,imax,a,nz,ia,ja,val,info,&
          & jmin,jmax,iren,append,nzin,rscale,cscale)
@@ -292,7 +313,6 @@ contains
   !
   !
   !====================================
-
 
   subroutine cp_to_coo(a,b,info) 
     use psb_error_mod
@@ -1278,6 +1298,56 @@ contains
   end function d_coo_get_nzeros
 
 
+  function  d_coo_get_nz_row(idx,a) result(res)
+    use psb_const_mod
+    use psb_sort_mod
+    implicit none
+    
+    class(psb_d_coo_sparse_mat), intent(in) :: a
+    integer, intent(in)                  :: idx
+    integer                              :: res
+    integer  :: nzin_, nza,ip,jp,i,k
+    
+    res = 0 
+    nza = a%get_nzeros()
+    if (a%is_sorted()) then 
+      ! In this case we can do a binary search. 
+      ip = psb_ibsrch(idx,nza,a%ia)
+      if (ip /= -1) return
+      jp = ip 
+      do 
+        if (ip < 2) exit
+        if (a%ia(ip-1) == idx) then  
+          ip = ip -1 
+        else 
+          exit
+        end if
+      end do
+      do 
+        if (jp == nza) exit
+        if (a%ia(jp+1) == idx) then  
+          jp = jp + 1
+        else 
+          exit
+        end if
+      end do
+      
+      res = jp - ip +1 
+      
+    else
+      
+      res = 0
+      
+      do i=1, nza
+        if (a%ia(i) == idx) then 
+          res = res + 1 
+        end if
+      end do
+      
+    end if
+    
+  end function d_coo_get_nz_row
+
   !====================================
   !
   !
@@ -1383,7 +1453,7 @@ contains
     use psb_error_mod
     use psb_realloc_mod
     implicit none 
-    class(psb_d_coo_sparse_mat), intent(inout) :: a
+    class(psb_d_coo_sparse_mat), intent(out) :: a
     class(psb_d_coo_sparse_mat), intent(in) :: b
     integer, intent(out)            :: info
 
@@ -1410,6 +1480,7 @@ contains
     return
 
   end subroutine d_cp_coo_from_coo
+
 
   subroutine d_cp_coo_to_fmt(a,b,info) 
     use psb_error_mod
@@ -1540,6 +1611,73 @@ contains
     return
 
   end subroutine d_mv_coo_from_coo
+
+
+!!$
+!!$  subroutine d_coo_cp_from(a,b)
+!!$    use psb_error_mod
+!!$    implicit none 
+!!$
+!!$    class(psb_d_coo_sparse_mat), intent(out)   :: a
+!!$    type(psb_d_coo_sparse_mat), intent(inout) :: b
+!!$
+!!$
+!!$    Integer :: err_act, info
+!!$    character(len=20)  :: name='mv_from'
+!!$    logical, parameter :: debug=.false.
+!!$
+!!$    call psb_erractionsave(err_act)
+!!$    info = 0
+!!$    call d_cp_coo_from_coo_impl(a,b,info)
+!!$    if (info /= 0) goto 9999
+!!$
+!!$    call psb_erractionrestore(err_act)
+!!$    return
+!!$
+!!$9999 continue
+!!$    call psb_erractionrestore(err_act)
+!!$
+!!$    call psb_errpush(info,name)
+!!$
+!!$    if (err_act /= psb_act_ret_) then
+!!$      call psb_error()
+!!$    end if
+!!$    return
+!!$
+!!$  end subroutine d_coo_cp_from
+!!$
+!!$  subroutine d_coo_mv_from(a,b)
+!!$    use psb_error_mod
+!!$    implicit none 
+!!$
+!!$    class(psb_d_coo_sparse_mat), intent(out)   :: a
+!!$    type(psb_d_coo_sparse_mat), intent(inout) :: b
+!!$
+!!$
+!!$    Integer :: err_act, info
+!!$    character(len=20)  :: name='mv_from'
+!!$    logical, parameter :: debug=.false.
+!!$
+!!$    call psb_erractionsave(err_act)
+!!$    info = 0
+!!$    call d_mv_coo_from_coo_impl(a,b,info)
+!!$    if (info /= 0) goto 9999
+!!$
+!!$    call psb_erractionrestore(err_act)
+!!$    return
+!!$
+!!$9999 continue
+!!$    call psb_erractionrestore(err_act)
+!!$
+!!$    call psb_errpush(info,name)
+!!$
+!!$    if (err_act /= psb_act_ret_) then
+!!$      call psb_error()
+!!$    end if
+!!$    return
+!!$
+!!$  end subroutine d_coo_mv_from
+!!$
 
   subroutine d_mv_coo_to_fmt(a,b,info) 
     use psb_error_mod
@@ -1750,46 +1888,47 @@ contains
   end subroutine d_coo_csgetrow
 
 
-!!$
-!!$  subroutine d_coo_csget(irw,a,nz,ia,ja,val,info,iren,lrw,append,nzin)
-!!$    ! Output is always in  COO format 
-!!$    use psb_error_mod
-!!$    use psb_const_mod
-!!$    implicit none
-!!$    
-!!$    class(psb_d_coo_sparse_mat), intent(inout) :: a
-!!$    integer, intent(in)                  :: irw
-!!$    integer, intent(out)                 :: nz
-!!$    integer, allocatable, intent(inout)  :: ia(:), ja(:)
-!!$    real(psb_dpk_), allocatable,  intent(inout)    :: val(:)
-!!$    integer,intent(out)                  :: info
-!!$    logical, intent(in), optional        :: append
-!!$    integer, intent(in), optional        :: iren(:)
-!!$    integer, intent(in), optional        :: lrw, nzin
-!!$    Integer :: err_act
-!!$    character(len=20)  :: name='csget'
-!!$    logical, parameter :: debug=.false.
-!!$
-!!$    call psb_erractionsave(err_act)
-!!$    info = 0
-!!$
-!!$    call d_coo_csget_impl(irw,a,nz,ia,ja,val,info,iren,lrw,append,nzin)
-!!$    if (info /= 0) goto 9999
-!!$
-!!$    call psb_erractionrestore(err_act)
-!!$    return
-!!$
-!!$9999 continue
-!!$    call psb_erractionrestore(err_act)
-!!$
-!!$    if (err_act == psb_act_abort_) then
-!!$      call psb_error()
-!!$      return
-!!$    end if
-!!$    return
-!!$
-!!$  end subroutine d_coo_csget
-!!$
+  subroutine d_coo_csgetptn(imin,imax,a,nz,ia,ja,info,&
+       & jmin,jmax,iren,append,nzin,rscale,cscale)
+    ! Output is always in  COO format 
+    use psb_error_mod
+    use psb_const_mod
+    implicit none
+    
+    class(psb_d_coo_sparse_mat), intent(in) :: a
+    integer, intent(in)                  :: imin,imax
+    integer, intent(out)                 :: nz
+    integer, allocatable, intent(inout)  :: ia(:), ja(:)
+    integer,intent(out)                  :: info
+    logical, intent(in), optional        :: append
+    integer, intent(in), optional        :: iren(:)
+    integer, intent(in), optional        :: jmin,jmax, nzin
+    logical, intent(in), optional        :: rscale,cscale
+    Integer :: err_act
+    character(len=20)  :: name='csget'
+    logical, parameter :: debug=.false.
+
+    call psb_erractionsave(err_act)
+    info = 0
+
+    call d_coo_csgetptn_impl(imin,imax,a,nz,ia,ja,info,&
+         & jmin,jmax,iren,append,nzin,rscale,cscale)
+
+    if (info /= 0) goto 9999
+
+    call psb_erractionrestore(err_act)
+    return
+
+9999 continue
+    call psb_erractionrestore(err_act)
+
+    if (err_act == psb_act_abort_) then
+      call psb_error()
+      return
+    end if
+    return
+
+  end subroutine d_coo_csgetptn
 
 
   subroutine  d_coo_free(a) 
@@ -1807,6 +1946,54 @@ contains
     return
 
   end subroutine d_coo_free
+
+  subroutine d_coo_reinit(a,clear)
+    use psb_error_mod
+    implicit none 
+
+    class(psb_d_coo_sparse_mat), intent(inout) :: a   
+    logical, intent(in), optional :: clear
+
+    Integer :: err_act, info
+    character(len=20)  :: name='reinit'
+    logical  :: clear_
+    logical, parameter :: debug=.false.
+
+    call psb_erractionsave(err_act)
+    info = 0
+
+
+    if (present(clear)) then 
+      clear_ = clear
+    else
+      clear_ = .true.
+    end if
+
+    if (a%is_bld() .or. a%is_upd()) then 
+      ! do nothing
+      return
+    else if (a%is_asb()) then 
+      if (clear_) a%val(:) = dzero
+      call a%set_upd()
+    else
+      info = 1121
+      call psb_errpush(info,name)
+      goto 9999
+    end if
+
+    call psb_erractionrestore(err_act)
+    return
+
+9999 continue
+    call psb_erractionrestore(err_act)
+
+    if (err_act == psb_act_abort_) then
+      call psb_error()
+      return
+    end if
+    return
+
+  end subroutine d_coo_reinit
 
 
   subroutine  d_coo_trim(a)

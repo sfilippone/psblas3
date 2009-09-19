@@ -41,7 +41,7 @@ program df_sample
   character(len=40) :: kmethd, ptype, mtrx_file, rhs_file
 
   ! sparse matrices
-  type(psb_dspmat_type) :: a, aux_a
+  type(psb_d_sparse_mat) :: a, aux_a
 
   ! preconditioner data
   type(psb_dprec_type)  :: prec
@@ -129,7 +129,7 @@ program df_sample
       call psb_abort(ictxt)
     end if
     
-    m_problem = aux_a%m
+    m_problem = aux_a%get_nrows()
     call psb_bcast(ictxt,m_problem)
     
     ! At this point aux_b may still be unallocated
@@ -182,7 +182,13 @@ program df_sample
       write(*,'("Partition type: graph")')
       write(*,'(" ")')
       !      write(0,'("Build type: graph")')
-      call build_mtpart(aux_a%m,aux_a%fida,aux_a%ia1,aux_a%ia2,np)
+      select type (aa=>a%a) 
+      type is (psb_d_csr_sparse_mat)
+        call build_mtpart(aa%get_nrows(),aa%get_fmt(),aa%ja,aa%irp,np)
+      class default
+        write(0,*) 'Should never get here!' 
+        call psb_abort(ictxt)
+      end select
     endif
     call psb_barrier(ictxt)
     call distr_mtpart(psb_root_,ictxt)

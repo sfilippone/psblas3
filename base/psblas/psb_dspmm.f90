@@ -65,8 +65,6 @@
 subroutine  psb_dspmm(alpha,a,x,beta,y,desc_a,info,&
      & trans, k, jx, jy, work, doswap)   
 
-  use psb_spmat_type
-  use psb_serial_mod
   use psb_descriptor_type
   use psb_comm_mod
   use psi_mod
@@ -426,8 +424,6 @@ end subroutine psb_dspmm
 subroutine  psb_dspmv(alpha,a,x,beta,y,desc_a,info,&
      & trans, work, doswap)   
 
-  use psb_spmat_type
-  use psb_serial_mod
   use psb_descriptor_type
   use psb_comm_mod
   use psb_const_mod
@@ -443,7 +439,6 @@ subroutine  psb_dspmv(alpha,a,x,beta,y,desc_a,info,&
   real(psb_dpk_), intent(inout), target  :: x(:)
   real(psb_dpk_), intent(inout), target  :: y(:)
   type(psb_d_sparse_mat), intent(in)        :: a
-!!$  type(psb_dspmat_type), intent(in)        :: a
   type(psb_desc_type), intent(in)          :: desc_a
   integer, intent(out)                     :: info
   real(psb_dpk_), optional, target       :: work(:)

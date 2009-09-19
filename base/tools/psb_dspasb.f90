@@ -50,8 +50,6 @@
 !
 subroutine psb_dspasb(a,desc_a, info, afmt, upd, dupl, mold)
   use psb_descriptor_type
-  use psb_spmat_type
-  use psb_serial_mod
   use psb_const_mod
   use psi_mod
   use psb_error_mod

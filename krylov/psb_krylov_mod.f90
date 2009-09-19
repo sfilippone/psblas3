@@ -60,9 +60,8 @@ Module psb_krylov_mod
     end subroutine psb_scg
     subroutine psb_dcg(a,prec,b,x,eps,&
          & desc_a,info,itmax,iter,err,itrace,istop,cond)
-      use psb_base_mod, only  : psb_desc_type, psb_dspmat_type, psb_dpk_
+      use psb_base_mod, only  : psb_desc_type, psb_d_sparse_mat, psb_dpk_
       use psb_prec_mod, only : psb_dprec_type
-      use psb_d_mat_mod
       type(psb_d_sparse_mat), intent(in)  :: a
       type(psb_desc_type), intent(in)    :: desc_a
       real(psb_dpk_), intent(in)       :: b(:)
@@ -124,9 +123,8 @@ Module psb_krylov_mod
     end subroutine psb_sbicg
     subroutine psb_dbicg(a,prec,b,x,eps,&
          & desc_a,info,itmax,iter,err,itrace,istop)
-      use psb_base_mod, only  : psb_desc_type, psb_dspmat_type, psb_dpk_
+      use psb_base_mod, only  : psb_desc_type, psb_d_sparse_mat, psb_dpk_
       use psb_prec_mod, only : psb_dprec_type
-      use psb_d_mat_mod
       type(psb_d_sparse_mat), intent(in)  :: a
       type(psb_desc_type), intent(in)    :: desc_a
       real(psb_dpk_), intent(in)         :: b(:)
@@ -188,9 +186,8 @@ Module psb_krylov_mod
     end subroutine psb_scgstab
     subroutine psb_dcgstab(a,prec,b,x,eps,&
          & desc_a,info,itmax,iter,err,itrace,istop)
-      use psb_base_mod, only  : psb_desc_type, psb_dspmat_type, psb_dpk_
+      use psb_base_mod, only  : psb_desc_type, psb_d_sparse_mat, psb_dpk_
       use psb_prec_mod, only : psb_dprec_type
-      use psb_d_mat_mod
       type(psb_d_sparse_mat), intent(in)  :: a
       type(psb_desc_type), intent(in)    :: desc_a
       real(psb_dpk_), intent(in)       :: b(:)
@@ -252,9 +249,8 @@ Module psb_krylov_mod
     end subroutine psb_scgstabl
     Subroutine psb_dcgstabl(a,prec,b,x,eps,desc_a,info,&
          &itmax,iter,err, itrace,irst,istop)
-      use psb_base_mod, only  : psb_desc_type, psb_dspmat_type, psb_dpk_
+      use psb_base_mod, only  : psb_desc_type, psb_d_sparse_mat, psb_dpk_
       use psb_prec_mod, only : psb_dprec_type
-      use psb_d_mat_mod
       type(psb_d_sparse_mat), intent(in)  :: a
       Type(psb_desc_type), Intent(in)    :: desc_a
       type(psb_dprec_type), intent(in)   :: prec
@@ -316,9 +312,8 @@ Module psb_krylov_mod
     end subroutine psb_srgmres
     Subroutine psb_drgmres(a,prec,b,x,eps,desc_a,info,&
          &itmax,iter,err,itrace,irst,istop)
-      use psb_base_mod, only  : psb_desc_type, psb_dspmat_type, psb_dpk_
+      use psb_base_mod, only  : psb_desc_type, psb_d_sparse_mat, psb_dpk_
       use psb_prec_mod, only : psb_dprec_type
-      use psb_d_mat_mod
       type(psb_d_sparse_mat), intent(in)  :: a
       Type(psb_desc_type), Intent(in)    :: desc_a
       type(psb_dprec_type), intent(in)   :: prec 
@@ -380,9 +375,8 @@ Module psb_krylov_mod
     end subroutine psb_scgs
     subroutine psb_dcgs(a,prec,b,x,eps,desc_a,info,&
          &itmax,iter,err,itrace,istop)
-      use psb_base_mod, only  : psb_desc_type, psb_dspmat_type, psb_dpk_
+      use psb_base_mod, only  : psb_desc_type, psb_d_sparse_mat, psb_dpk_
       use psb_prec_mod, only : psb_dprec_type
-      use psb_d_mat_mod
       type(psb_d_sparse_mat), intent(in)  :: a
       type(psb_desc_type), intent(in)    :: desc_a 
       type(psb_dprec_type), intent(in)   :: prec 
@@ -585,7 +579,7 @@ contains
   !                                           BICGSTABL
   !                                           RGMRES
   !                                           
-  !    a      -  type(psb_dspmat_type)      Input: sparse matrix containing A.
+  !    a      -  type(psb_d_sparse_mat)      Input: sparse matrix containing A.
   !    prec   -  type(psb_dprec_type)       Input: preconditioner
   !    b      -  real,dimension(:)            Input: vector containing the
   !                                           right hand side B
@@ -619,12 +613,10 @@ contains
 
     use psb_base_mod
     use psb_prec_mod,only : psb_sprec_type, psb_dprec_type, psb_cprec_type, psb_zprec_type
-    use psb_d_mat_mod
 
     type(psb_d_sparse_mat), intent(in)  :: a
 
     character(len=*)                   :: method
-!!$    Type(psb_dspmat_type), Intent(in)  :: a
     Type(psb_desc_type), Intent(in)    :: desc_a
     type(psb_dprec_type), intent(in)   :: prec 
     Real(psb_dpk_), Intent(in)       :: b(:)
@@ -1068,12 +1060,10 @@ contains
   
   subroutine psb_d_init_conv(methdname,stopc,trace,itmax,a,b,eps,desc_a,stopdat,info)
     use psb_base_mod
-    use psb_d_mat_mod
     implicit none 
     type(psb_d_sparse_mat), intent(in)  :: a
     character(len=*), intent(in)      :: methdname
     integer, intent(in)               :: stopc, trace,itmax
-!!$    type(psb_dspmat_type), intent(in) :: a
     real(psb_dpk_), intent(in)      :: b(:), eps
     type(psb_desc_type), intent(in)   :: desc_a
     type(psb_itconv_type)             :: stopdat

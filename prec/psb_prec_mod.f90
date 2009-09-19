@@ -45,8 +45,7 @@ module psb_prec_mod
       character, intent(in),optional             :: upd
     end subroutine psb_sprecbld
     subroutine psb_dprecbld(a,desc_a,prec,info,upd)
-      use psb_d_mat_mod
-      use psb_base_mod, only  : psb_desc_type, psb_dspmat_type, psb_dpk_
+      use psb_base_mod, only  : psb_desc_type, psb_d_sparse_mat, psb_dpk_
       use psb_prec_type, only : psb_dprec_type
       implicit none
       type(psb_d_sparse_mat), intent(in), target  :: a
@@ -329,14 +328,12 @@ module psb_prec_mod
       real(psb_spk_), intent(inout)     ::  d(:)
     end subroutine psb_silu_fct
     subroutine psb_dilu_fct(a,l,u,d,info,blck)
-      use psb_base_mod, only  : psb_desc_type, psb_dspmat_type, psb_dpk_
-      use psb_d_mat_mod
+      use psb_base_mod, only  : psb_desc_type, psb_d_sparse_mat,&
+           & psb_d_csr_sparse_mat, psb_dpk_
       integer, intent(out)                ::     info
       type(psb_d_sparse_mat),intent(in)    :: a
       type(psb_d_csr_sparse_mat),intent(inout) :: l,u
-!!$      type(psb_dspmat_type),intent(in)    :: a
-!!$      type(psb_dspmat_type),intent(inout) :: l,u
-      type(psb_dspmat_type),intent(in), optional, target :: blck
+      type(psb_d_sparse_mat),intent(in), optional, target :: blck
       real(psb_dpk_), intent(inout)     ::  d(:)
     end subroutine psb_dilu_fct
     subroutine psb_cilu_fct(a,l,u,d,info,blck)
@@ -368,8 +365,7 @@ module psb_prec_mod
       character, intent(in)                     :: upd
     end subroutine psb_sbjac_bld
     subroutine psb_dbjac_bld(a,desc_a,p,upd,info)
-      use psb_d_mat_mod
-      use psb_base_mod, only  : psb_desc_type, psb_dspmat_type, psb_dpk_
+      use psb_base_mod, only  : psb_desc_type, psb_d_sparse_mat, psb_dpk_
       use psb_prec_type, only : psb_dprec_type
       integer, intent(out)                      :: info
       type(psb_d_sparse_mat), intent(in), target :: a

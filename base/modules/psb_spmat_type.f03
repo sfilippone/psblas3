@@ -115,13 +115,13 @@ module psb_spmat_type
 
   type, extends(psb_base_spmat_type) :: psb_dspmat_type
     real(psb_dpk_), allocatable  :: aspk(:)
-  contains
-    procedure, pass(a) :: psb_dcsmm
-    procedure, pass(a) :: psb_dcsmv
-    generic, public    :: csmm => psb_dcsmm, psb_dcsmv
-    procedure, pass(t) :: psb_dcssm
-    procedure, pass(t) :: psb_dcssv
-    generic, public    :: cssm => psb_dcssm, psb_dcssv
+!!$  contains
+!!$    procedure, pass(a) :: psb_dcsmm
+!!$    procedure, pass(a) :: psb_dcsmv
+!!$    generic, public    :: csmm => psb_dcsmm, psb_dcsmv
+!!$    procedure, pass(t) :: psb_dcssm
+!!$    procedure, pass(t) :: psb_dcssv
+!!$    generic, public    :: cssm => psb_dcssm, psb_dcssv
   end type psb_dspmat_type
 
   type, extends(psb_base_spmat_type) :: psb_zspmat_type

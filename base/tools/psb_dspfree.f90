@@ -42,8 +42,6 @@
 subroutine psb_dspfree(a, desc_a,info)
   !...free sparse matrix structure...
   use psb_descriptor_type
-  use psb_spmat_type
-  use psb_serial_mod
   use psb_const_mod
   use psb_error_mod
   use psb_d_mat_mod
@@ -72,13 +70,6 @@ subroutine psb_dspfree(a, desc_a,info)
 
   !...deallocate a....
   call a%free()
-
-
-!!$  if(info /= 0) then
-!!$    info=2045
-!!$    call psb_errpush(info,name)
-!!$    goto 9999
-!!$  end if
 
   call psb_erractionrestore(err_act)
   return

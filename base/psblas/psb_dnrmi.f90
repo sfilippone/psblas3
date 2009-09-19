@@ -43,17 +43,16 @@
 !
 function psb_dnrmi(a,desc_a,info)  
   use psb_descriptor_type
-  use psb_serial_mod
   use psb_check_mod
   use psb_error_mod
   use psb_penv_mod
   use psb_d_mat_mod
   implicit none
 
-  type(psb_d_sparse_mat), intent(in)   :: a
-  integer, intent(out)                :: info
-  type(psb_desc_type), intent(in)     :: desc_a
-  real(psb_dpk_)                    :: psb_dnrmi
+  type(psb_d_sparse_mat), intent(in) :: a
+  integer, intent(out)               :: info
+  type(psb_desc_type), intent(in)    :: desc_a
+  real(psb_dpk_)                     :: psb_dnrmi
 
   ! locals
   integer                  :: ictxt, np, me,&

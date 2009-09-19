@@ -77,8 +77,6 @@
 subroutine  psb_dspsm(alpha,a,x,beta,y,desc_a,info,&
      & trans, side, choice, diag, k, jx, jy, work)   
 
-  use psb_spmat_type
-  use psb_serial_mod
   use psb_descriptor_type
   use psb_comm_mod
   use psi_mod
@@ -364,8 +362,6 @@ end subroutine psb_dspsm
 ! 
 subroutine  psb_dspsv(alpha,a,x,beta,y,desc_a,info,&
      & trans, side, choice, diag, work)   
-  use psb_spmat_type
-  use psb_serial_mod
   use psb_descriptor_type
   use psb_comm_mod
   use psi_mod

@@ -32,7 +32,6 @@
 subroutine psb_dprecbld(aa,desc_a,p,info,upd)
 
   use psb_base_mod
-  use psb_d_mat_mod
   use psb_prec_mod, psb_protect_name => psb_dprecbld
   Implicit None
 

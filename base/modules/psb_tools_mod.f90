@@ -33,7 +33,6 @@ Module psb_tools_mod
   use psb_const_mod
   use psb_spmat_type
 
-
   interface psb_cd_set_bld
     subroutine psb_cd_set_bld(desc,info)
       use psb_descriptor_type
@@ -232,9 +231,9 @@ Module psb_tools_mod
     Subroutine psb_dsphalo(a,desc_a,blk,info,rowcnv,colcnv,&
          & rowscale,colscale,outfmt,data)
       use psb_descriptor_type
-      use psb_spmat_type
-      Type(psb_dspmat_type),Intent(in)    :: a
-      Type(psb_dspmat_type),Intent(inout) :: blk
+      use psb_mat_mod
+      Type(psb_d_sparse_mat),Intent(in)    :: a
+      Type(psb_d_sparse_mat),Intent(inout) :: blk
       Type(psb_desc_type),Intent(in),target :: desc_a
       integer, intent(out)                :: info
       logical, optional, intent(in)       :: rowcnv,colcnv,rowscale,colscale
@@ -488,9 +487,9 @@ Module psb_tools_mod
     end Subroutine psb_scdbldext
     Subroutine psb_dcdbldext(a,desc_a,novr,desc_ov,info,extype)
       use psb_descriptor_type
-      Use psb_spmat_type
+      Use psb_mat_mod
       integer, intent(in)                     :: novr
-      Type(psb_dspmat_type), Intent(in)       :: a
+      Type(psb_d_sparse_mat), Intent(in)       :: a
       Type(psb_desc_type), Intent(in), target :: desc_a
       Type(psb_desc_type), Intent(out)        :: desc_ov
       integer, intent(out)                    :: info
@@ -686,10 +685,10 @@ Module psb_tools_mod
     end subroutine psb_dspins
     subroutine psb_dspins_2desc(nz,ia,ja,val,a,desc_ar,desc_ac,info)
       use psb_descriptor_type
-      use psb_spmat_type
+      use psb_d_mat_mod
+      type(psb_d_sparse_mat), intent(inout) :: a
       type(psb_desc_type), intent(in)      :: desc_ar
       type(psb_desc_type), intent(inout)   :: desc_ac
-      type(psb_dspmat_type), intent(inout) :: a
       integer, intent(in)                  :: nz,ia(:),ja(:)
       real(psb_dpk_), intent(in)           :: val(:)
       integer, intent(out)                 :: info
@@ -748,9 +747,9 @@ Module psb_tools_mod
     end subroutine psb_ssprn
     subroutine psb_dsprn(a, desc_a,info,clear)
       use psb_descriptor_type
-      use psb_spmat_type
+      use psb_mat_mod
       type(psb_desc_type), intent(in)      :: desc_a
-      type(psb_dspmat_type), intent(inout) :: a
+      type(psb_d_sparse_mat), intent(inout) :: a
       integer, intent(out)                 :: info
       logical, intent(in), optional        :: clear
     end subroutine psb_dsprn
@@ -1159,13 +1158,13 @@ contains
 
 
   subroutine psb_dlinmap_init(a_map,cd_xt,descin,descout)
-    use psb_spmat_type
     use psb_descriptor_type
     use psb_serial_mod
     use psb_penv_mod
     use psb_error_mod
+    use psb_mat_mod
     implicit none 
-    type(psb_dspmat_type), intent(out) :: a_map
+    type(psb_d_sparse_mat), intent(out) :: a_map
     type(psb_desc_type), intent(out)   :: cd_xt
     type(psb_desc_type), intent(in)    :: descin, descout 
 
@@ -1185,18 +1184,18 @@ contains
     ncol_in  = psb_cd_get_local_cols(cd_xt)
     nrow_out = psb_cd_get_local_rows(descout)
 
-    call psb_sp_all(nrow_out,ncol_in,a_map,info)
+    call a_map%csall(nrow_out,ncol_in,info)
 
   end subroutine psb_dlinmap_init
 
   subroutine psb_dlinmap_ins(nz,ir,ic,val,a_map,cd_xt,descin,descout)
-    use psb_spmat_type
+    use psb_mat_mod
     use psb_descriptor_type
     implicit none 
     integer, intent(in)                  :: nz
     integer, intent(in)                  :: ir(:),ic(:)
     real(kind(1.d0)), intent(in)         :: val(:)
-    type(psb_dspmat_type), intent(inout) :: a_map
+    type(psb_d_sparse_mat), intent(inout) :: a_map
     type(psb_desc_type), intent(inout)   :: cd_xt
     type(psb_desc_type), intent(in)      :: descin, descout 
     integer :: info
@@ -1205,11 +1204,11 @@ contains
   end subroutine psb_dlinmap_ins
 
   subroutine psb_dlinmap_asb(a_map,cd_xt,descin,descout,afmt)
-    use psb_spmat_type
+    use psb_mat_mod
     use psb_descriptor_type
     use psb_serial_mod
     implicit none 
-    type(psb_dspmat_type), intent(inout)   :: a_map
+    type(psb_d_sparse_mat), intent(inout)   :: a_map
     type(psb_desc_type), intent(inout)     :: cd_xt
     type(psb_desc_type), intent(in)        :: descin, descout 
     character(len=*), optional, intent(in) :: afmt
@@ -1220,8 +1219,8 @@ contains
     ictxt = psb_cd_get_context(descin)
 
     call psb_cdasb(cd_xt,info)
-    a_map%k = psb_cd_get_local_cols(cd_xt)
-    call psb_spcnv(a_map,info,afmt=afmt)
+    call a_map%set_ncols(psb_cd_get_local_cols(cd_xt))
+    call a_map%cscnv(info,type=afmt)
 
   end subroutine psb_dlinmap_asb
 

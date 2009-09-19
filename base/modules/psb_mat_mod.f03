@@ -27,6 +27,7 @@ module psb_d_mat_mod
     procedure, pass(a) :: get_nrows
     procedure, pass(a) :: get_ncols
     procedure, pass(a) :: get_nzeros
+    procedure, pass(a) :: get_nz_row
     procedure, pass(a) :: get_size
     procedure, pass(a) :: get_state
     procedure, pass(a) :: get_dupl
@@ -48,17 +49,24 @@ module psb_d_mat_mod
     procedure, pass(a) :: free
     procedure, pass(a) :: trim
     procedure, pass(a) :: csput 
+    procedure, pass(a) :: d_csgetptn
     procedure, pass(a) :: d_csgetrow
     procedure, pass(a) :: d_csgetblk
-    generic, public    :: csget => d_csgetrow, d_csgetblk 
+    generic, public    :: csget => d_csgetptn, d_csgetrow, d_csgetblk 
     procedure, pass(a) :: csclip
     procedure, pass(a) :: reall => reallocate_nz
     procedure, pass(a) :: get_neigh
     procedure, pass(a) :: d_cscnv
     procedure, pass(a) :: d_cscnv_ip
     generic, public    :: cscnv => d_cscnv, d_cscnv_ip
+    procedure, pass(a) :: reinit
     procedure, pass(a) :: print => sparse_print
-
+    procedure, pass(a) :: d_mv_from
+    generic, public    :: mv_from => d_mv_from
+    procedure, pass(a) :: d_cp_from
+    generic, public    :: cp_from => d_cp_from
+    
+    
     ! Computational routines 
     procedure, pass(a) :: get_diag
     procedure, pass(a) :: csnmi
@@ -80,15 +88,24 @@ module psb_d_mat_mod
        & is_unit, get_neigh, csall, csput, d_csgetrow,&
        & d_csgetblk, csclip, d_cscnv, d_cscnv_ip, &
        & reallocate_nz, free, trim, &
-       & sparse_print, &
+       & sparse_print, reinit, &
        & set_nrows, set_ncols, set_dupl, &
        & set_state, set_null, set_bld, &
        & set_upd, set_asb, set_sorted, &
        & set_upper, set_lower, set_triangle, &
-       & set_unit, get_diag
+       & set_unit, get_diag, get_nz_row, d_csgetptn, &
+       & d_mv_from, d_cp_from
 
   interface psb_sizeof
     module procedure d_sizeof
+  end interface
+
+  interface psb_move_alloc 
+    module procedure d_sparse_mat_move
+  end interface
+
+  interface psb_clone
+    module procedure d_sparse_mat_clone
   end interface
 
   interface psb_csmm
@@ -387,6 +404,22 @@ contains
     return
 
   end function get_size
+
+
+  function get_nz_row(idx,a) result(res)
+    use psb_error_mod
+    implicit none 
+    integer, intent(in)               :: idx
+    class(psb_d_sparse_mat), intent(in) :: a
+    integer :: res
+    
+    Integer :: err_act
+
+    res = 0
+    
+    if (allocated(a%a)) res = a%a%get_nz_row(idx)
+
+  end function get_nz_row
 
 
 
@@ -823,8 +856,6 @@ contains
   !=====================================  
 
 
-
-
   subroutine sparse_print(iout,a,iv,eirs,eics,head,ivr,ivc)
     use psb_error_mod
     implicit none 
@@ -989,7 +1020,7 @@ contains
     endif
 
     call a%a%free()
-
+    deallocate(a%a) 
     return
 
 9999 continue
@@ -1070,6 +1101,54 @@ contains
     end if
 
   end subroutine csput
+
+  subroutine d_csgetptn(imin,imax,a,nz,ia,ja,info,&
+       & jmin,jmax,iren,append,nzin,rscale,cscale)
+    ! Output is always in  COO format 
+    use psb_error_mod
+    use psb_const_mod
+    use psb_d_base_mat_mod
+    implicit none
+    
+    class(psb_d_sparse_mat), intent(in) :: a
+    integer, intent(in)                  :: imin,imax
+    integer, intent(out)                 :: nz
+    integer, allocatable, intent(inout)  :: ia(:), ja(:)
+    integer,intent(out)                  :: info
+    logical, intent(in), optional        :: append
+    integer, intent(in), optional        :: iren(:)
+    integer, intent(in), optional        :: jmin,jmax, nzin
+    logical, intent(in), optional        :: rscale,cscale
+
+    Integer :: err_act
+    character(len=20)  :: name='csget'
+    logical, parameter :: debug=.false.
+
+    info = 0
+    call psb_erractionsave(err_act)
+    if (a%is_null()) then 
+      info = 1121
+      call psb_errpush(info,name)
+      goto 9999
+    endif
+
+
+    call a%a%csget(imin,imax,nz,ia,ja,info,&
+       & jmin,jmax,iren,append,nzin,rscale,cscale)
+    if (info /= 0) goto 9999 
+
+    call psb_erractionrestore(err_act)
+    return
+
+9999 continue
+    call psb_erractionrestore(err_act)
+
+    if (err_act == psb_act_abort_) then
+      call psb_error()
+      return
+    end if
+
+  end subroutine d_csgetptn
 
   subroutine d_csgetrow(imin,imax,a,nz,ia,ja,val,info,&
        & jmin,jmax,iren,append,nzin,rscale,cscale)
@@ -1407,7 +1486,132 @@ contains
 
   end subroutine d_cscnv_ip
 
+  subroutine d_mv_from(a,b)
+    use psb_error_mod
+    use psb_string_mod
+    implicit none 
+    class(psb_d_sparse_mat), intent(out) :: a
+    class(psb_d_base_sparse_mat), intent(inout) :: b
+    integer :: info
 
+    allocate(a%a,source=b, stat=info)
+    call a%a%mv_from_fmt(b,info)
+    
+    return
+  end subroutine d_mv_from
+
+  subroutine d_cp_from(a,b)
+    use psb_error_mod
+    use psb_string_mod
+    implicit none 
+    class(psb_d_sparse_mat), intent(out) :: a
+    class(psb_d_base_sparse_mat), intent(inout), allocatable :: b
+    Integer :: err_act, info
+    character(len=20)  :: name='clone'
+    logical, parameter :: debug=.false.
+
+    call psb_erractionsave(err_act)
+    info = 0
+    
+    allocate(a%a,source=b,stat=info)
+    if (info /= 0) info = 4000
+    if (info == 0) call a%a%cp_from_fmt(b, info)    
+    if (info /= 0) goto 9999 
+
+    call psb_erractionrestore(err_act)
+    return
+
+9999 continue
+    call psb_erractionrestore(err_act)
+
+    if (err_act == psb_act_abort_) then
+      call psb_error()
+      return
+    end if
+  end subroutine d_cp_from
+
+  subroutine d_sparse_mat_move(a,b,info)
+    use psb_error_mod
+    use psb_string_mod
+    implicit none 
+    class(psb_d_sparse_mat), intent(inout) :: a
+    class(psb_d_sparse_mat), intent(out)   :: b
+    integer, intent(out)                   :: info
+
+    Integer :: err_act
+    character(len=20)  :: name='move_alloc'
+    logical, parameter :: debug=.false.
+
+    info = 0
+    call move_alloc(a%a,b%a)
+    
+    return
+  end subroutine d_sparse_mat_move
+
+  subroutine d_sparse_mat_clone(a,b,info)
+    use psb_error_mod
+    use psb_string_mod
+    implicit none 
+    class(psb_d_sparse_mat), intent(in)  :: a
+    class(psb_d_sparse_mat), intent(out) :: b
+    integer, intent(out)                 :: info
+
+    Integer :: err_act
+    character(len=20)  :: name='clone'
+    logical, parameter :: debug=.false.
+
+    call psb_erractionsave(err_act)
+    info = 0
+    
+    allocate(b%a,source=a%a,stat=info)
+    if (info /= 0) info = 4000
+    if (info == 0) call b%a%cp_from_fmt(a%a, info)    
+    if (info /= 0) goto 9999 
+
+    call psb_erractionrestore(err_act)
+    return
+
+9999 continue
+    call psb_erractionrestore(err_act)
+
+    if (err_act == psb_act_abort_) then
+      call psb_error()
+      return
+    end if
+
+  end subroutine d_sparse_mat_clone
+
+
+  subroutine reinit(a,clear)
+    use psb_error_mod
+    implicit none 
+
+    class(psb_d_sparse_mat), intent(inout) :: a   
+    logical, intent(in), optional :: clear
+    Integer :: err_act, info
+    character(len=20)  :: name='reinit'
+
+    call psb_erractionsave(err_act)
+    if (a%is_null()) then 
+      info = 1121
+      call psb_errpush(info,name)
+      goto 9999
+    endif
+
+    call a%a%reinit(clear)
+
+    call psb_erractionrestore(err_act)
+    return
+
+9999 continue
+    call psb_erractionrestore(err_act)
+
+    if (err_act == psb_act_abort_) then
+      call psb_error()
+      return
+    end if
+
+  end subroutine reinit
 
 
   !=====================================
@@ -1554,7 +1758,7 @@ contains
       call psb_errpush(info,name)
       goto 9999
     endif
-    
+
     call a%a%cssm(alpha,x,beta,y,info,trans,side,d) 
 
     if (info /= 0) goto 9999 
@@ -1720,3 +1924,6 @@ contains
 
 end module psb_d_mat_mod
 
+module  psb_mat_mod
+  use psb_d_mat_mod
+end module psb_mat_mod

@@ -52,8 +52,6 @@ subroutine psb_dspins(nz,ia,ja,val,a,desc_a,info,rebuild)
 
   use psb_tools_mod, psb_protect_name => psb_dspins
   use psb_descriptor_type
-  use psb_spmat_type
-  use psb_serial_mod
   use psb_const_mod
   use psb_error_mod
   use psb_penv_mod
@@ -241,17 +239,16 @@ end subroutine psb_dspins
 subroutine psb_dspins_2desc(nz,ia,ja,val,a,desc_ar,desc_ac,info)
   use psb_tools_mod, psb_protect_name => psb_dspins_2desc
   use psb_descriptor_type
-  use psb_spmat_type
-  use psb_serial_mod
   use psb_const_mod
   use psb_error_mod
   use psb_penv_mod
+  use psb_d_mat_mod
   implicit none
 
   !....parameters...
   type(psb_desc_type), intent(in)      :: desc_ar
   type(psb_desc_type), intent(inout)   :: desc_ac
-  type(psb_dspmat_type), intent(inout) :: a
+  type(psb_d_sparse_mat), intent(inout) :: a
   integer, intent(in)                  :: nz,ia(:),ja(:)
   real(kind=psb_dpk_), intent(in)      :: val(:)
   integer, intent(out)                 :: info
@@ -307,7 +304,6 @@ subroutine psb_dspins_2desc(nz,ia,ja,val,a,desc_ar,desc_ac,info)
   end if
   if (nz==0) return
 
-  spstate = a%infoa(psb_state_)
   if (psb_is_bld_desc(desc_ac)) then 
 
     allocate(ila(nz),jla(nz),stat=info)
@@ -331,7 +327,7 @@ subroutine psb_dspins_2desc(nz,ia,ja,val,a,desc_ar,desc_ac,info)
     nrow = psb_cd_get_local_rows(desc_ar)
     ncol = psb_cd_get_local_cols(desc_ac)
 
-    call psb_coins(nz,ila,jla,val,a,1,nrow,1,ncol,info)
+    call a%csput(nz,ila,jla,val,1,nrow,1,ncol,info)
     if (info /= 0) then
       info=4010
       ch_err='psb_coins'

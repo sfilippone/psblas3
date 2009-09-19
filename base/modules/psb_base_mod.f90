@@ -41,4 +41,5 @@ module psb_base_mod
   use psb_psblas_mod
   use psb_gps_mod
   use psb_tools_mod
+  use psb_mat_mod
 end module psb_base_mod

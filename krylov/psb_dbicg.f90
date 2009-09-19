@@ -98,12 +98,9 @@ subroutine psb_dbicg(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,istop)
   use psb_base_mod
   use psb_prec_mod
   use psb_krylov_mod, psb_protect_name => psb_dbicg
-  use psb_d_mat_mod
   implicit none
   type(psb_d_sparse_mat), intent(in)  :: a
   
-!!$  parameters 
-!!$  type(psb_dspmat_type), intent(in)  :: a
   type(psb_dprec_type), intent(in)   :: prec 
   type(psb_desc_type), intent(in)    :: desc_a
   real(psb_dpk_), intent(in)       :: b(:)

@@ -2,30 +2,8 @@ module psb_base_mat_mod
   
   use psb_const_mod 
 
-!!$  integer, parameter :: psb_invalid_ = -1 
-!!$  integer, parameter :: psb_spmat_null_=0, psb_spmat_bld_=1
-!!$  integer, parameter :: psb_spmat_asb_=2, psb_spmat_upd_=4
-!!$
-!!$  integer, parameter :: psb_ireg_flgs_=10, psb_ip2_=0
-!!$  integer, parameter :: psb_iflag_=2, psb_ichk_=3
-!!$  integer, parameter :: psb_nnzt_=4, psb_zero_=5,psb_ipc_=6
-!!$  ! Duplicate coefficients handling
-!!$  ! These are usually set while calling spcnv as one of its
-!!$  ! optional arugments.
-!!$  integer, parameter :: psb_dupl_ovwrt_ = 0
-!!$  integer, parameter :: psb_dupl_add_   = 1
-!!$  integer, parameter :: psb_dupl_err_   = 2
-!!$  integer, parameter :: psb_dupl_def_   = psb_dupl_ovwrt_
-!!$  ! Matrix update mode
-!!$  integer, parameter :: psb_upd_srch_   = 98764
-!!$  integer, parameter :: psb_upd_perm_   = 98765
-!!$  integer, parameter :: psb_upd_dflt_   = psb_upd_srch_
-!!$  integer, parameter :: psb_maxjdrows_=8, psb_minjdrows_=4
-!!$  integer, parameter :: psb_dbleint_=2
-
-
   type  :: psb_base_sparse_mat
-    integer              :: m, n
+    integer, private     :: m, n
     integer, private     :: state, duplicate 
     logical, private     :: triangle, unitd, upper, sorted
   contains 
@@ -39,6 +17,7 @@ module psb_base_mat_mod
     procedure, pass(a) :: get_nrows
     procedure, pass(a) :: get_ncols
     procedure, pass(a) :: get_nzeros
+    procedure, pass(a) :: get_nz_row
     procedure, pass(a) :: get_size
     procedure, pass(a) :: get_state
     procedure, pass(a) :: get_dupl
@@ -84,8 +63,11 @@ module psb_base_mat_mod
     procedure, pass(a) :: reallocate_nz
     procedure, pass(a) :: free
     procedure, pass(a) :: trim
+    procedure, pass(a) :: reinit
     generic,   public  :: allocate => allocate_mnnz
     generic,   public  :: reallocate => reallocate_nz
+    procedure, pass(a) :: csgetptn
+    generic, public    :: csget => csgetptn
     procedure, pass(a) :: print => sparse_print
     procedure, pass(a) :: sizeof
 
@@ -97,12 +79,11 @@ module psb_base_mat_mod
        & get_nzeros, get_size, get_state, get_dupl, is_null, is_bld, &
        & is_upd, is_asb, is_sorted, is_upper, is_lower, is_triangle, &
        & is_unit, get_neigh, allocate_mn, allocate_mnnz, reallocate_nz, &
-       & free, sparse_print, get_fmt, trim, sizeof
+       & free, sparse_print, get_fmt, trim, sizeof, reinit, csgetptn, &
+       & get_nz_row
   
-
 contains
 
-  
   function sizeof(a) result(res)
     implicit none 
     class(psb_base_sparse_mat), intent(in) :: a
@@ -331,6 +312,31 @@ contains
   end function is_sorted
 
 
+  function get_nz_row(idx,a) result(res)
+    use psb_error_mod
+    implicit none 
+    integer, intent(in)                    :: idx
+    class(psb_base_sparse_mat), intent(in) :: a
+    integer :: res
+    
+    Integer :: err_act
+    character(len=20)  :: name='base_get_nz_row'
+    logical, parameter :: debug=.false.
+
+    call psb_get_erraction(err_act)
+    res = -1
+    ! This is the base version. If we get here
+    ! it means the derived class is incomplete,
+    ! so we throw an error.
+    call psb_errpush(700,name,a_err=a%get_fmt())
+          
+    if (err_act /= psb_act_ret_) then
+      call psb_error()
+    end if
+    return
+
+  end function get_nz_row
+
   function get_nzeros(a) result(res)
     use psb_error_mod
     implicit none 
@@ -379,6 +385,76 @@ contains
 
   end function get_size
 
+  subroutine reinit(a,clear)
+    use psb_error_mod
+    implicit none 
+
+    class(psb_base_sparse_mat), intent(inout) :: a   
+    logical, intent(in), optional :: clear
+
+    Integer :: err_act, info
+    character(len=20)  :: name='reinit'
+    logical, parameter :: debug=.false.
+
+    call psb_get_erraction(err_act)
+    info = 700
+    ! This is the base version. If we get here
+    ! it means the derived class is incomplete,
+    ! so we throw an error.
+    call psb_errpush(700,name,a_err=a%get_fmt())
+
+    if (err_act /= psb_act_ret_) then
+      call psb_error()
+    end if
+    return
+
+  end subroutine reinit
+
+!!$
+!!$  !
+!!$  ! Since at this level we have only simple components,
+!!$  ! mv_from is identical to cp_from. 
+!!$  !
+!!$  subroutine mv_from(a,b)
+!!$    use psb_error_mod
+!!$    implicit none 
+!!$
+!!$    class(psb_base_sparse_mat), intent(out)   :: a
+!!$    type(psb_base_sparse_mat), intent(inout) :: b
+!!$
+!!$    a%m         = b%m
+!!$    a%n         = b%n
+!!$    a%state     = b%state
+!!$    a%duplicate = b%duplicate
+!!$    a%triangle  = b%triangle
+!!$    a%unitd     = b%unitd
+!!$    a%upper     = b%upper
+!!$    a%sorted    = b%sorted
+!!$
+!!$    return
+!!$
+!!$  end subroutine mv_from
+!!$
+!!$  subroutine cp_from(a,b)
+!!$    use psb_error_mod
+!!$    implicit none 
+!!$
+!!$    class(psb_base_sparse_mat), intent(out) :: a
+!!$    type(psb_base_sparse_mat), intent(in)  :: b
+!!$
+!!$    a%m         = b%m
+!!$    a%n         = b%n
+!!$    a%state     = b%state
+!!$    a%duplicate = b%duplicate
+!!$    a%triangle  = b%triangle
+!!$    a%unitd     = b%unitd
+!!$    a%upper     = b%upper
+!!$    a%sorted    = b%sorted
+!!$
+!!$    return
+!!$
+!!$  end subroutine cp_from
+!!$
   subroutine sparse_print(iout,a,iv,eirs,eics,head,ivr,ivc)
     use psb_error_mod
     implicit none 
@@ -408,6 +484,39 @@ contains
 
   end subroutine sparse_print
 
+  subroutine csgetptn(imin,imax,a,nz,ia,ja,info,&
+       & jmin,jmax,iren,append,nzin,rscale,cscale)
+    ! Output is always in  COO format 
+    use psb_error_mod
+    use psb_const_mod
+    implicit none
+    
+    class(psb_base_sparse_mat), intent(in) :: a
+    integer, intent(in)                  :: imin,imax
+    integer, intent(out)                 :: nz
+    integer, allocatable, intent(inout)  :: ia(:), ja(:)
+    integer,intent(out)                  :: info
+    logical, intent(in), optional        :: append
+    integer, intent(in), optional        :: iren(:)
+    integer, intent(in), optional        :: jmin,jmax, nzin
+    logical, intent(in), optional        :: rscale,cscale
+    Integer :: err_act
+    character(len=20)  :: name='csget'
+    logical, parameter :: debug=.false.
+
+    call psb_get_erraction(err_act)
+    ! This is the base version. If we get here
+    ! it means the derived class is incomplete,
+    ! so we throw an error.
+    info = 700
+    call psb_errpush(info,name,a_err=a%get_fmt())
+
+    if (err_act /= psb_act_ret_) then
+      call psb_error()
+    end if
+    return
+
+  end subroutine csgetptn
 
   subroutine get_neigh(a,idx,neigh,n,info,lev)
     use psb_error_mod
@@ -523,6 +632,7 @@ contains
     return
 
   end subroutine trim
+
 
 end module psb_base_mat_mod
 

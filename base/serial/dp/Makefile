@@ -3,15 +3,20 @@ include ../../../Make.inc
 # The object files
 #
 
-XOBJS = scrjd.o  dcrjd.o ccrjd.o zcrjd.o
-FOBJS = dcrcr.o dgblock.o partition.o  \
-	dgindex.o djadrp.o djadrp1.o dcsrrp.o dcsrp1.o check_dim.o \
-	Max_nnzero.o dcoco.o dcocr.o dcrco.o djdcox.o djdco.o dvtfg.o dgind_tri.o \
+XOBJS = scrjd.o   ccrjd.o zcrjd.o
+FOBJS = partition.o dgblock.o  dvtfg.o \
+	check_dim.o \
+	Max_nnzero.o \
 	gen_block.o\
 	scrco.o scrcr.o scocr.o scoco.o sgindex.o sgind_tri.o\
 	ccoco.o ccocr.o ccrco.o ccrcr.o cgindex.o cgind_tri.o\
 	zcoco.o zcocr.o zcrco.o zcrcr.o zgindex.o zgind_tri.o\
 	$(XOBJS)
+
+#dcoco.o dcocr.o dcrco.o djdcox.o djdco.o dgind_tri.o \
+#dcrcr.o 
+#dgindex.o djadrp.o djadrp1.o dcsrrp.o dcsrp1.o 
+#dcrjd.o
 
 # 
 # dgind_tri.o

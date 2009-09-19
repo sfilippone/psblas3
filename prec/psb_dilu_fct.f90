@@ -37,7 +37,6 @@ subroutine psb_dilu_fct(a,l,u,d,info,blck)
   !
   !
   use psb_base_mod
-  use psb_d_mat_mod
   implicit none
   !     .. Scalar Arguments ..
   integer, intent(out)                ::     info

@@ -113,7 +113,7 @@ function psb_d_linmap(map_kind,desc_X, desc_Y, map_X2Y, map_Y2X,iaggr,naggr) res
   implicit none 
   type(psb_dlinmap_type)         :: this
   type(psb_desc_type), target       :: desc_X, desc_Y
-  type(psb_dspmat_type), intent(in) :: map_X2Y, map_Y2X
+  type(psb_d_sparse_mat), intent(in) :: map_X2Y, map_Y2X
   integer, intent(in)               :: map_kind
   integer, intent(in), optional     :: iaggr(:), naggr(:)
   !
@@ -171,8 +171,8 @@ function psb_d_linmap(map_kind,desc_X, desc_Y, map_X2Y, map_Y2X,iaggr,naggr) res
     info = 1
   end select
 
-  if (info == 0) call psb_sp_clone(map_X2Y,this%map_X2Y,info)
-  if (info == 0) call psb_sp_clone(map_Y2X,this%map_Y2X,info)
+  if (info == 0) call psb_clone(map_X2Y,this%map_X2Y,info)
+  if (info == 0) call psb_clone(map_Y2X,this%map_Y2X,info)
   if (info == 0) call psb_realloc(psb_itd_data_size_,this%itd_data,info) 
   if (info == 0) then
     call psb_set_map_kind(map_kind, this)
@@ -182,8 +182,8 @@ function psb_d_linmap(map_kind,desc_X, desc_Y, map_X2Y, map_Y2X,iaggr,naggr) res
     return
   end if
   if (debug) then 
-    write(0,*) trim(name),'  forward map:',allocated(this%map_X2Y%aspk)
-    write(0,*) trim(name),' backward map:',allocated(this%map_Y2X%aspk)
+!!$    write(0,*) trim(name),'  forward map:',allocated(this%map_X2Y%aspk)
+!!$    write(0,*) trim(name),' backward map:',allocated(this%map_Y2X%aspk)
   end if
 
 end function psb_d_linmap
