@@ -37,7 +37,7 @@
 program dhb2mm
   use psb_base_mod
   use psb_util_mod
-  type(psb_dspmat_type) :: a
+  type(psb_d_sparse_mat) :: a
   
   integer    :: info
   character(len=72)  :: mtitle

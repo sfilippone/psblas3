@@ -182,7 +182,7 @@ program df_sample
       write(*,'("Partition type: graph")')
       write(*,'(" ")')
       !      write(0,'("Build type: graph")')
-      select type (aa=>a%a) 
+      select type (aa=>aux_a%a) 
       type is (psb_d_csr_sparse_mat)
         call build_mtpart(aa%get_nrows(),aa%get_fmt(),aa%ja,aa%irp,np)
       class default
