@@ -182,13 +182,8 @@ program df_sample
       write(*,'("Partition type: graph")')
       write(*,'(" ")')
       !      write(0,'("Build type: graph")')
-      select type (aa=>aux_a%a) 
-      type is (psb_d_csr_sparse_mat)
-        call build_mtpart(aa%get_nrows(),aa%get_fmt(),aa%ja,aa%irp,np)
-      class default
-        write(0,*) 'Should never get here!' 
-        call psb_abort(ictxt)
-      end select
+      call build_mtpart(aux_a,np)
+
     endif
     call psb_barrier(ictxt)
     call distr_mtpart(psb_root_,ictxt)

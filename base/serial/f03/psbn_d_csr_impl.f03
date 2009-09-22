@@ -1708,7 +1708,7 @@ subroutine d_cp_csr_to_coo_impl(a,b,info)
   nza = a%get_nzeros()
 
   call b%allocate(nr,nc,nza)
-  b%psb_d_base_sparse_mat = a%psb_d_base_sparse_mat
+  call cp_from(b%psb_d_base_sparse_mat,a%psb_d_base_sparse_mat)
 
   do i=1, nr
     do j=a%irp(i),a%irp(i+1)-1
@@ -1749,8 +1749,7 @@ subroutine d_mv_csr_to_coo_impl(a,b,info)
   nc  = a%get_ncols()
   nza = a%get_nzeros()
 
-
-  b%psb_d_base_sparse_mat = a%psb_d_base_sparse_mat
+  call mv_from( b%psb_d_base_sparse_mat,a%psb_d_base_sparse_mat)
   call b%set_nzeros(a%get_nzeros())
   call move_alloc(a%ja,b%ja)
   call move_alloc(a%val,b%val)
@@ -1797,7 +1796,8 @@ subroutine d_mv_csr_from_coo_impl(a,b,info)
   nc  = b%get_ncols()
   nza = b%get_nzeros()
   
-  a%psb_d_base_sparse_mat = b%psb_d_base_sparse_mat
+  call mv_from(a%psb_d_base_sparse_mat,b%psb_d_base_sparse_mat)
+
   ! Dirty trick: call move_alloc to have the new data allocated just once.
   call move_alloc(b%ia,itemp)
   call move_alloc(b%ja,a%ja)
@@ -1884,7 +1884,7 @@ subroutine d_mv_csr_to_fmt_impl(a,b,info)
     call a%mv_to_coo(b,info)
     ! Need to fix trivial copies! 
   type is (psb_d_csr_sparse_mat) 
-    b%psb_d_base_sparse_mat = a%psb_d_base_sparse_mat 
+    call mv_from(b%psb_d_base_sparse_mat,a%psb_d_base_sparse_mat)
     call move_alloc(a%irp, b%irp)
     call move_alloc(a%ja,  b%ja)
     call move_alloc(a%val, b%val)
@@ -1961,7 +1961,7 @@ subroutine d_mv_csr_from_fmt_impl(a,b,info)
     call a%mv_from_coo(b,info)
 
   type is (psb_d_csr_sparse_mat) 
-    a%psb_d_base_sparse_mat = b%psb_d_base_sparse_mat 
+    call mv_from(a%psb_d_base_sparse_mat,b%psb_d_base_sparse_mat)
     call move_alloc(b%irp, a%irp)
     call move_alloc(b%ja,  a%ja)
     call move_alloc(b%val, a%val)
@@ -2002,7 +2002,7 @@ subroutine d_cp_csr_from_fmt_impl(a,b,info)
     call a%cp_from_coo(b,info)
 
   type is (psb_d_csr_sparse_mat) 
-    a%psb_d_base_sparse_mat = b%psb_d_base_sparse_mat
+    call cp_from(a%psb_d_base_sparse_mat,b%psb_d_base_sparse_mat)
     a%irp = b%irp
     a%ja  = b%ja
     a%val = b%val

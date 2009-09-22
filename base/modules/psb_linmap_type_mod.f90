@@ -36,7 +36,7 @@
 !    to different spaces.
 !
 module psb_linmap_type_mod
-  use psb_spmat_type, only : psb_sspmat_type, psb_dspmat_type, &
+  use psb_spmat_type, only : psb_sspmat_type,  &
        & psb_cspmat_type, psb_zspmat_type, psb_spk_, psb_dpk_, psb_sizeof
 
   use psb_d_mat_mod, only: psb_d_sparse_mat

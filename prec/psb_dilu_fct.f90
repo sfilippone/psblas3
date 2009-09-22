@@ -43,11 +43,11 @@ subroutine psb_dilu_fct(a,l,u,d,info,blck)
   !     .. Array Arguments ..
   type(psb_d_sparse_mat),intent(in)    :: a
   type(psb_d_csr_sparse_mat),intent(inout) :: l,u
-  type(psb_dspmat_type),intent(in), optional, target :: blck
+  type(psb_d_sparse_mat),intent(in), optional, target :: blck
   real(psb_dpk_), intent(inout)     ::  d(:)
   !     .. Local Scalars ..
   integer   ::  l1,l2,m,err_act  
-  type(psb_dspmat_type), pointer  :: blck_
+  type(psb_d_sparse_mat), pointer  :: blck_
   character(len=20)   :: name, ch_err
   name='psb_dcsrlu'
   info = 0
@@ -64,19 +64,11 @@ subroutine psb_dilu_fct(a,l,u,d,info,blck)
       goto 9999      
     end if
 
-    call psb_nullify_sp(blck_)  ! Why do we need this? Who knows.... 
-    call psb_sp_all(0,0,blck_,1,info)
-    if(info /= 0) then
-       info=4010
-       ch_err='psb_sp_all'
-       call psb_errpush(info,name,a_err=ch_err)
-       goto 9999
-    end if
+    call blck_%csall(0,0,info,1)
 
-    blck_%m=0
   endif
 
-  call psb_dilu_fctint(m,a%get_nrows(),a,blck_%m,blck_,&
+  call psb_dilu_fctint(m,a%get_nrows(),a,blck_%get_nrows(),blck_,&
        & d,l%val,l%ja,l%irp,u%val,u%ja,u%irp,l1,l2,info)
   if(info /= 0) then
      info=4010
@@ -99,7 +91,7 @@ subroutine psb_dilu_fct(a,l,u,d,info,blck)
   if (present(blck)) then 
     blck_ => null() 
   else
-    call psb_sp_free(blck_,info)
+    call blck_%free()
     if(info /= 0) then
        info=4010
        ch_err='psb_sp_free'
@@ -127,8 +119,8 @@ contains
 
     implicit none 
 
-    type(psb_d_sparse_mat)          :: a
-    type(psb_dspmat_type)          :: b
+    type(psb_d_sparse_mat)         :: a
+    type(psb_d_sparse_mat)         :: b
     integer                        :: m,ma,mb,l1,l2,info
     integer, dimension(:)          :: lia1,lia2,uia1,uia2
     real(psb_dpk_), dimension(:) :: laspk,uaspk,d

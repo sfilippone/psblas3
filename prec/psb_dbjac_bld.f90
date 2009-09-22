@@ -46,7 +46,7 @@ subroutine psb_dbjac_bld(a,desc_a,p,upd,info)
   integer  ::    i, m
   integer  ::    int_err(5)
   character ::        trans, unitd
-  type(psb_dspmat_type) :: atmp
+!!$  type(psb_dspmat_type) :: atmp
   type(psb_d_csr_sparse_mat), allocatable  :: lf, uf
   real(psb_dpk_) :: t1,t2,t3,t4,t5,t6, t7, t8
   integer   nztota,  err_act, n_row, nrow_a,n_col, nhalo
@@ -72,7 +72,7 @@ subroutine psb_dbjac_bld(a,desc_a,p,upd,info)
   endif
   trans = 'N'
   unitd = 'U'
-  call psb_nullify_sp(atmp)
+!!$  call psb_nullify_sp(atmp)
 
   call psb_cdcpy(desc_a,p%desc_data,info)
   if(info /= 0) then

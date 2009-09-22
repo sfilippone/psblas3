@@ -32,6 +32,8 @@ module psb_d_base_mat_mod
     procedure, pass(a) :: mv_from_coo
     procedure, pass(a) :: mv_to_fmt
     procedure, pass(a) :: mv_from_fmt
+!!$    procedure, pass(a) :: base_cp_from => d_base_cp_from
+!!$    procedure, pass(a) :: base_mv_from => d_base_mv_from
   end type psb_d_base_sparse_mat
 
   private :: d_base_csmv, d_base_csmm, d_base_cssv, d_base_cssm,&
@@ -39,6 +41,16 @@ module psb_d_base_mat_mod
        & cp_to_coo, cp_from_coo, cp_to_fmt, cp_from_fmt, &
        & mv_to_coo, mv_from_coo, mv_to_fmt, mv_from_fmt, &
        & get_diag, csclip, d_cssv, d_cssm
+!!$, &
+!!$       & d_base_mv_from, d_base_cp_from
+
+  interface cp_from 
+    module procedure d_base_cp_from
+  end interface
+  interface mv_from 
+    module procedure d_base_mv_from
+  end interface
+
 
   type, extends(psb_d_base_sparse_mat) :: psb_d_coo_sparse_mat
     
@@ -313,6 +325,39 @@ contains
   !
   !
   !====================================
+
+  !
+  ! For the time being we do not have anything beyond
+  ! the base components, but you never know. 
+  !
+  subroutine d_base_mv_from(a,b)
+    use psb_error_mod
+    implicit none 
+
+    type(psb_d_base_sparse_mat), intent(out)  :: a
+    type(psb_d_base_sparse_mat), intent(inout) :: b
+
+!!$    call a%psb_base_sparse_mat%base_mv_from(b%psb_base_sparse_mat)
+    call mv_from(a%psb_base_sparse_mat,b%psb_base_sparse_mat)
+
+    return
+
+  end subroutine d_base_mv_from
+
+  subroutine d_base_cp_from(a,b)
+    use psb_error_mod
+    implicit none 
+    
+    type(psb_d_base_sparse_mat), intent(out) :: a
+    type(psb_d_base_sparse_mat), intent(in)  :: b
+
+    call cp_from(a%psb_base_sparse_mat,b%psb_base_sparse_mat)
+
+    return
+
+  end subroutine d_base_cp_from
+
+
 
   subroutine cp_to_coo(a,b,info) 
     use psb_error_mod

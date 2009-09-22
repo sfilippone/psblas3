@@ -38,7 +38,7 @@ module psb_prec_type
 
   ! Reduces size of .mod file.
   use psb_base_mod, only : psb_sspmat_type, psb_cspmat_type,&
-       & psb_dspmat_type, psb_zspmat_type, psb_dpk_, psb_spk_, psb_long_int_k_,&
+       & psb_zspmat_type, psb_dpk_, psb_spk_, psb_long_int_k_,&
        & psb_desc_type, psb_sizeof, psb_sp_free, psb_cdfree,&
        & psb_erractionsave, psb_erractionrestore, psb_error, psb_get_errstatus
   use psb_d_mat_mod, only : psb_d_sparse_mat

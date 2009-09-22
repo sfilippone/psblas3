@@ -46,7 +46,6 @@ subroutine psb_dprecbld(aa,desc_a,p,info,upd)
        & me,np,mglob, err_act
   integer      :: int_err(5)
   character    :: upd_
-  type(psb_dspmat_type), target :: a
 
   integer,parameter  :: iroot=psb_root_,iout=60,ilout=40
   character(len=20)   :: name, ch_err

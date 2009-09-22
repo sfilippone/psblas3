@@ -3,9 +3,14 @@ module psb_base_mat_mod
   use psb_const_mod 
 
   type  :: psb_base_sparse_mat
-    integer, private     :: m, n
-    integer, private     :: state, duplicate 
-    logical, private     :: triangle, unitd, upper, sorted
+    integer     :: m, n
+    integer     :: state, duplicate 
+    logical     :: triangle, unitd, upper, sorted
+    ! This is a different animal: it's a kitchen sink for
+    ! any additional parameters that may be needed
+    ! when converting to/from COO. Why here?
+    ! Will tell you one day...
+    integer, allocatable :: aux(:)
   contains 
 
     ! ====================================
@@ -22,6 +27,7 @@ module psb_base_mat_mod
     procedure, pass(a) :: get_state
     procedure, pass(a) :: get_dupl
     procedure, pass(a) :: get_fmt
+    procedure, pass(a) :: get_aux
     procedure, pass(a) :: is_null
     procedure, pass(a) :: is_bld
     procedure, pass(a) :: is_upd
@@ -50,7 +56,7 @@ module psb_base_mat_mod
     procedure, pass(a) :: set_lower
     procedure, pass(a) :: set_triangle
     procedure, pass(a) :: set_unit
-
+    procedure, pass(a) :: set_aux
 
 
     ! ====================================
@@ -58,6 +64,7 @@ module psb_base_mat_mod
     ! Data management
     !
     ! ====================================  
+
     procedure, pass(a) :: get_neigh
     procedure, pass(a) :: allocate_mnnz
     procedure, pass(a) :: reallocate_nz
@@ -69,7 +76,9 @@ module psb_base_mat_mod
     procedure, pass(a) :: csgetptn
     generic, public    :: csget => csgetptn
     procedure, pass(a) :: print => sparse_print
-    procedure, pass(a) :: sizeof
+    procedure, pass(a) :: sizeof    
+!!$    procedure, pass(a) :: base_cp_from
+!!$    procedure, pass(a) :: base_mv_from
 
   end type psb_base_sparse_mat
 
@@ -80,7 +89,14 @@ module psb_base_mat_mod
        & is_upd, is_asb, is_sorted, is_upper, is_lower, is_triangle, &
        & is_unit, get_neigh, allocate_mn, allocate_mnnz, reallocate_nz, &
        & free, sparse_print, get_fmt, trim, sizeof, reinit, csgetptn, &
-       & get_nz_row
+       & get_nz_row, get_aux, set_aux
+!!$, base_mv_from, base_cp_from
+  interface cp_from 
+    module procedure base_cp_from
+  end interface
+  interface mv_from 
+    module procedure base_mv_from
+  end interface
   
 contains
 
@@ -129,6 +145,22 @@ contains
     res = a%n
   end function get_ncols
 
+ 
+  subroutine  set_aux(v,a) 
+    implicit none 
+    class(psb_base_sparse_mat), intent(inout) :: a
+    integer, intent(in) :: v(:)
+    ! TBD
+    write(0,*) 'SET_AUX is empty right now '
+  end subroutine set_aux
+
+  subroutine  get_aux(v,a) 
+    implicit none 
+    class(psb_base_sparse_mat), intent(in) :: a
+    integer, intent(out), allocatable  :: v(:)
+    ! TBD
+    write(0,*) 'GET_AUX is empty right now '
+  end subroutine get_aux
  
   subroutine  set_nrows(m,a) 
     implicit none 
@@ -410,51 +442,50 @@ contains
 
   end subroutine reinit
 
-!!$
-!!$  !
-!!$  ! Since at this level we have only simple components,
-!!$  ! mv_from is identical to cp_from. 
-!!$  !
-!!$  subroutine mv_from(a,b)
-!!$    use psb_error_mod
-!!$    implicit none 
-!!$
-!!$    class(psb_base_sparse_mat), intent(out)   :: a
-!!$    type(psb_base_sparse_mat), intent(inout) :: b
-!!$
-!!$    a%m         = b%m
-!!$    a%n         = b%n
-!!$    a%state     = b%state
-!!$    a%duplicate = b%duplicate
-!!$    a%triangle  = b%triangle
-!!$    a%unitd     = b%unitd
-!!$    a%upper     = b%upper
-!!$    a%sorted    = b%sorted
-!!$
-!!$    return
-!!$
-!!$  end subroutine mv_from
-!!$
-!!$  subroutine cp_from(a,b)
-!!$    use psb_error_mod
-!!$    implicit none 
-!!$
-!!$    class(psb_base_sparse_mat), intent(out) :: a
-!!$    type(psb_base_sparse_mat), intent(in)  :: b
-!!$
-!!$    a%m         = b%m
-!!$    a%n         = b%n
-!!$    a%state     = b%state
-!!$    a%duplicate = b%duplicate
-!!$    a%triangle  = b%triangle
-!!$    a%unitd     = b%unitd
-!!$    a%upper     = b%upper
-!!$    a%sorted    = b%sorted
-!!$
-!!$    return
-!!$
-!!$  end subroutine cp_from
-!!$
+
+  !
+  !
+  subroutine base_mv_from(a,b)
+    use psb_error_mod
+    implicit none 
+
+    type(psb_base_sparse_mat), intent(out)  :: a
+    type(psb_base_sparse_mat), intent(inout) :: b
+
+    a%m         = b%m
+    a%n         = b%n
+    a%state     = b%state
+    a%duplicate = b%duplicate
+    a%triangle  = b%triangle
+    a%unitd     = b%unitd
+    a%upper     = b%upper
+    a%sorted    = b%sorted
+    call move_alloc(b%aux,a%aux)
+
+    return
+
+  end subroutine base_mv_from
+
+  subroutine base_cp_from(a,b)
+    use psb_error_mod
+    implicit none 
+
+    type(psb_base_sparse_mat), intent(out) :: a
+    type(psb_base_sparse_mat), intent(in)  :: b
+
+    a%m         = b%m
+    a%n         = b%n
+    a%state     = b%state
+    a%duplicate = b%duplicate
+    a%triangle  = b%triangle
+    a%unitd     = b%unitd
+    a%upper     = b%upper
+    a%sorted    = b%sorted
+    a%aux       = b%aux
+    return
+
+  end subroutine base_cp_from
+
   subroutine sparse_print(iout,a,iv,eirs,eics,head,ivr,ivc)
     use psb_error_mod
     implicit none 
