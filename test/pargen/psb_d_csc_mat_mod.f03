@@ -29,13 +29,20 @@ module psb_d_csc_mat_mod
     procedure, pass(a) :: mv_from_coo => d_mv_csc_from_coo
     procedure, pass(a) :: mv_to_fmt => d_mv_csc_to_fmt
     procedure, pass(a) :: mv_from_fmt => d_mv_csc_from_fmt
+    procedure, pass(a) :: csgetptn => d_csc_csgetptn
     procedure, pass(a) :: d_csgetrow => d_csc_csgetrow
     procedure, pass(a) :: get_size => d_csc_get_size
     procedure, pass(a) :: free => d_csc_free
     procedure, pass(a) :: trim => d_csc_trim
     procedure, pass(a) :: print => d_csc_print
     procedure, pass(a) :: sizeof => d_csc_sizeof
+    procedure, pass(a) :: reinit => d_csc_reinit
+    procedure, pass(a) :: d_csc_cp_from
+    generic, public    :: cp_from => d_csc_cp_from
+    procedure, pass(a) :: d_csc_mv_from
+    generic, public    :: mv_from => d_csc_mv_from
   end type psb_d_csc_sparse_mat
+
   private :: d_csc_get_nzeros, d_csc_csmm, d_csc_csmv, d_csc_cssm, d_csc_cssv, &
        & d_csc_csput, d_csc_reallocate_nz, d_csc_allocate_mnnz, &
        & d_csc_free,  d_csc_print, d_csc_get_fmt, d_csc_csnmi, get_diag, &
@@ -44,7 +51,7 @@ module psb_d_csc_mat_mod
        & d_cp_csc_to_fmt, d_cp_csc_from_fmt, &
        & d_mv_csc_to_fmt, d_mv_csc_from_fmt, &
        & d_csc_scals, d_csc_scal, d_csc_trim, d_csc_csgetrow, d_csc_get_size, &
-       & d_csc_sizeof
+       & d_csc_sizeof, d_csc_csgetptn, d_csc_get_nz_row, d_csc_reinit
 
 
   interface 
@@ -147,6 +154,25 @@ module psb_d_csc_mat_mod
       integer, intent(out)            :: info
       integer, intent(in), optional   :: gtl(:)
     end subroutine d_csc_csput_impl
+  end interface
+
+  interface 
+    subroutine d_csc_csgetptn_impl(imin,imax,a,nz,ia,ja,info,&
+         & jmin,jmax,iren,append,nzin,rscale,cscale)
+      use psb_const_mod
+      import psb_d_csc_sparse_mat
+      implicit none
+      
+      class(psb_d_csc_sparse_mat), intent(in) :: a
+      integer, intent(in)                  :: imin,imax
+      integer, intent(out)                 :: nz
+      integer, allocatable, intent(inout)  :: ia(:), ja(:)
+      integer,intent(out)                  :: info
+      logical, intent(in), optional        :: append
+      integer, intent(in), optional        :: iren(:)
+      integer, intent(in), optional        :: jmin,jmax, nzin
+      logical, intent(in), optional        :: rscale,cscale
+    end subroutine d_csc_csgetptn_impl
   end interface
 
   interface 
@@ -259,7 +285,7 @@ contains
     implicit none 
     class(psb_d_csc_sparse_mat), intent(in) :: a
     integer :: res
-    res = a%icp(a%m+1)-1
+    res = a%icp(a%get_ncols()+1)-1
   end function d_csc_get_nzeros
 
   function d_csc_get_size(a) result(res)
@@ -285,6 +311,26 @@ contains
     end if
 
   end function d_csc_get_size
+
+
+
+  function  d_csc_get_nz_col(idx,a) result(res)
+    use psb_const_mod
+    implicit none
+    
+    class(psb_d_csc_sparse_mat), intent(in) :: a
+    integer, intent(in)                  :: idx
+    integer                              :: res
+    
+    res = 0 
+ 
+    if ((1<=idx).and.(idx<=a%get_ncols())) then 
+      res = a%icp(idx+1)-a%icp(idx)
+    end if
+    
+  end function d_csc_get_nz_col
+
+
 
   !=====================================
   !
@@ -313,7 +359,7 @@ contains
 
     call psb_realloc(nz,a%ia,info)
     if (info == 0) call psb_realloc(nz,a%val,info)
-    if (info == 0) call psb_realloc(max(nz,a%m+1,a%n+1),a%icp,info)
+    if (info == 0) call psb_realloc(max(nz,a%get_nrows()+1,a%get_ncols()+1),a%icp,info)
     if (info /= 0) then 
       call psb_errpush(4000,name)
       goto 9999
@@ -395,6 +441,49 @@ contains
     end if
     return
   end subroutine d_csc_csput
+
+  subroutine d_csc_csgetptn(imin,imax,a,nz,ia,ja,info,&
+       & jmin,jmax,iren,append,nzin,rscale,cscale)
+    ! Output is always in  COO format 
+    use psb_error_mod
+    use psb_const_mod
+    implicit none
+    
+    class(psb_d_csc_sparse_mat), intent(in) :: a
+    integer, intent(in)                  :: imin,imax
+    integer, intent(out)                 :: nz
+    integer, allocatable, intent(inout)  :: ia(:), ja(:)
+    integer,intent(out)                  :: info
+    logical, intent(in), optional        :: append
+    integer, intent(in), optional        :: iren(:)
+    integer, intent(in), optional        :: jmin,jmax, nzin
+    logical, intent(in), optional        :: rscale,cscale
+    Integer :: err_act
+    character(len=20)  :: name='csget'
+    logical, parameter :: debug=.false.
+
+    call psb_erractionsave(err_act)
+    info = 0
+
+    call d_csc_csgetptn_impl(imin,imax,a,nz,ia,ja,info,&
+         & jmin,jmax,iren,append,nzin,rscale,cscale)
+
+    if (info /= 0) goto 9999
+
+    call psb_erractionrestore(err_act)
+    return
+
+9999 continue
+    call psb_erractionrestore(err_act)
+
+    if (err_act == psb_act_abort_) then
+      call psb_error()
+      return
+    end if
+    return
+
+  end subroutine d_csc_csgetptn
+
 
   subroutine d_csc_csgetrow(imin,imax,a,nz,ia,ja,val,info,&
        & jmin,jmax,iren,append,nzin,rscale,cscale)
@@ -604,6 +693,54 @@ contains
     return
 
   end subroutine d_csc_free
+
+  subroutine d_csc_reinit(a,clear)
+    use psb_error_mod
+    implicit none 
+
+    class(psb_d_csc_sparse_mat), intent(inout) :: a   
+    logical, intent(in), optional :: clear
+
+    Integer :: err_act, info
+    character(len=20)  :: name='reinit'
+    logical  :: clear_
+    logical, parameter :: debug=.false.
+
+    call psb_erractionsave(err_act)
+    info = 0
+
+
+    if (present(clear)) then 
+      clear_ = clear
+    else
+      clear_ = .true.
+    end if
+
+    if (a%is_bld() .or. a%is_upd()) then 
+      ! do nothing
+      return
+    else if (a%is_asb()) then 
+      if (clear_) a%val(:) = dzero
+      call a%set_upd()
+    else
+      info = 1121
+      call psb_errpush(info,name)
+      goto 9999
+    end if
+
+    call psb_erractionrestore(err_act)
+    return
+
+9999 continue
+    call psb_erractionrestore(err_act)
+
+    if (err_act == psb_act_abort_) then
+      call psb_error()
+      return
+    end if
+    return
+
+  end subroutine d_csc_reinit
 
   subroutine  d_csc_trim(a)
     use psb_realloc_mod
@@ -1036,6 +1173,81 @@ contains
     endif
 
   end subroutine d_csc_print
+
+
+  subroutine d_csc_cp_from(a,b)
+    use psb_error_mod
+    implicit none 
+
+    class(psb_d_csc_sparse_mat), intent(out) :: a
+    type(psb_d_csc_sparse_mat), intent(in)   :: b
+
+
+    Integer :: err_act, info
+    character(len=20)  :: name='cp_from'
+    logical, parameter :: debug=.false.
+
+    call psb_erractionsave(err_act)
+
+    info = 0
+
+    call a%allocate(b%get_nrows(),b%get_ncols(),b%get_nzeros())
+    call a%psb_d_base_sparse_mat%cp_from(b%psb_d_base_sparse_mat)
+    a%icp = b%icp 
+    a%ia  = b%ia
+    a%val = b%val 
+
+    if (info /= 0) goto 9999
+    call psb_erractionrestore(err_act)
+    return
+
+9999 continue
+    call psb_erractionrestore(err_act)
+
+    call psb_errpush(info,name)
+
+    if (err_act /= psb_act_ret_) then
+      call psb_error()
+    end if
+    return
+
+  end subroutine d_csc_cp_from
+
+  subroutine d_csc_mv_from(a,b)
+    use psb_error_mod
+    implicit none 
+
+    class(psb_d_csc_sparse_mat), intent(out)  :: a
+    type(psb_d_csc_sparse_mat), intent(inout) :: b
+    
+
+    Integer :: err_act, info
+    character(len=20)  :: name='mv_from'
+    logical, parameter :: debug=.false.
+
+    call psb_erractionsave(err_act)
+    info = 0
+    call a%psb_d_base_sparse_mat%mv_from(b%psb_d_base_sparse_mat)
+    call move_alloc(b%icp, a%icp)
+    call move_alloc(b%ia,  a%ia)
+    call move_alloc(b%val, a%val)
+    call b%free()
+
+    call psb_erractionrestore(err_act)
+    return
+
+9999 continue
+    call psb_erractionrestore(err_act)
+
+    call psb_errpush(info,name)
+
+    if (err_act /= psb_act_ret_) then
+      call psb_error()
+    end if
+    return
+
+  end subroutine d_csc_mv_from
+
 
 
   !=====================================

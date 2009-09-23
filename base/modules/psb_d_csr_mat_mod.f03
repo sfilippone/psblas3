@@ -29,8 +29,6 @@ module psb_d_csr_mat_mod
     procedure, pass(a) :: mv_from_coo => d_mv_csr_from_coo
     procedure, pass(a) :: mv_to_fmt => d_mv_csr_to_fmt
     procedure, pass(a) :: mv_from_fmt => d_mv_csr_from_fmt
-!!$    procedure, pass(a) :: mv_from => d_csr_mv_from
-!!$    procedure, pass(a) :: cp_from => d_csr_cp_from
     procedure, pass(a) :: csgetptn => d_csr_csgetptn
     procedure, pass(a) :: d_csgetrow => d_csr_csgetrow
     procedure, pass(a) :: get_nz_row => d_csr_get_nz_row
@@ -40,8 +38,13 @@ module psb_d_csr_mat_mod
     procedure, pass(a) :: print => d_csr_print
     procedure, pass(a) :: sizeof => d_csr_sizeof
     procedure, pass(a) :: reinit => d_csr_reinit
+    procedure, pass(a) :: d_csr_cp_from
+    generic, public    :: cp_from => d_csr_cp_from
+    procedure, pass(a) :: d_csr_mv_from
+    generic, public    :: mv_from => d_csr_mv_from
 
   end type psb_d_csr_sparse_mat
+
   private :: d_csr_get_nzeros, d_csr_csmm, d_csr_csmv, d_csr_cssm, d_csr_cssv, &
        & d_csr_csput, d_csr_reallocate_nz, d_csr_allocate_mnnz, &
        & d_csr_free,  d_csr_print, d_csr_get_fmt, d_csr_csnmi, get_diag, &
@@ -1179,80 +1182,80 @@ contains
 
   end subroutine d_csr_print
 
-!!$
-!!$  subroutine d_csr_cp_from(a,b)
-!!$    use psb_error_mod
-!!$    implicit none 
-!!$
-!!$    class(psb_d_csr_sparse_mat), intent(out)   :: a
-!!$    class(psb_d_csr_sparse_mat), intent(inout) :: b
-!!$
-!!$
-!!$    Integer :: err_act, info
-!!$    character(len=20)  :: name='cp_from'
-!!$    logical, parameter :: debug=.false.
-!!$
-!!$    call psb_erractionsave(err_act)
-!!$
-!!$    info = 0
-!!$
-!!$    call a%allocate(b%get_nrows(),b%get_ncols(),b%get_nzeros())
-!!$    a%psb_d_base_sparse_mat = b%psb_d_base_sparse_mat 
-!!$    a%irp = b%irp 
-!!$    a%ja  = b%ja
-!!$    a%val = b%val 
-!!$
-!!$    if (info /= 0) goto 9999
-!!$    call psb_erractionrestore(err_act)
-!!$    return
-!!$
-!!$9999 continue
-!!$    call psb_erractionrestore(err_act)
-!!$
-!!$    call psb_errpush(info,name)
-!!$
-!!$    if (err_act /= psb_act_ret_) then
-!!$      call psb_error()
-!!$    end if
-!!$    return
-!!$
-!!$  end subroutine d_csr_cp_from
-!!$
-!!$  subroutine d_csr_mv_from(a,b)
-!!$    use psb_error_mod
-!!$    implicit none 
-!!$
-!!$    class(psb_d_csr_sparse_mat), intent(out)   :: a
-!!$    class(psb_d_csr_sparse_mat), intent(inout) :: b
-!!$
-!!$
-!!$    Integer :: err_act, info
-!!$    character(len=20)  :: name='mv_from'
-!!$    logical, parameter :: debug=.false.
-!!$
-!!$    call psb_erractionsave(err_act)
-!!$    info = 0
-!!$    call a%psb_d_base_sparse_mat%mv_from(b%psb_d_base_sparse_mat)
-!!$    call move_alloc(b%irp, a%irp)
-!!$    call move_alloc(b%ja,  a%ja)
-!!$    call move_alloc(b%val, a%val)
-!!$    call b%free()
-!!$
-!!$    call psb_erractionrestore(err_act)
-!!$    return
-!!$
-!!$9999 continue
-!!$    call psb_erractionrestore(err_act)
-!!$
-!!$    call psb_errpush(info,name)
-!!$
-!!$    if (err_act /= psb_act_ret_) then
-!!$      call psb_error()
-!!$    end if
-!!$    return
-!!$
-!!$  end subroutine d_csr_mv_from
-!!$
+
+  subroutine d_csr_cp_from(a,b)
+    use psb_error_mod
+    implicit none 
+
+    class(psb_d_csr_sparse_mat), intent(out) :: a
+    type(psb_d_csr_sparse_mat), intent(in)   :: b
+
+
+    Integer :: err_act, info
+    character(len=20)  :: name='cp_from'
+    logical, parameter :: debug=.false.
+
+    call psb_erractionsave(err_act)
+
+    info = 0
+
+    call a%allocate(b%get_nrows(),b%get_ncols(),b%get_nzeros())
+    call a%psb_d_base_sparse_mat%cp_from(b%psb_d_base_sparse_mat)
+    a%irp = b%irp 
+    a%ja  = b%ja
+    a%val = b%val 
+
+    if (info /= 0) goto 9999
+    call psb_erractionrestore(err_act)
+    return
+
+9999 continue
+    call psb_erractionrestore(err_act)
+
+    call psb_errpush(info,name)
+
+    if (err_act /= psb_act_ret_) then
+      call psb_error()
+    end if
+    return
+
+  end subroutine d_csr_cp_from
+
+  subroutine d_csr_mv_from(a,b)
+    use psb_error_mod
+    implicit none 
+
+    class(psb_d_csr_sparse_mat), intent(out)  :: a
+    type(psb_d_csr_sparse_mat), intent(inout) :: b
+    
+
+    Integer :: err_act, info
+    character(len=20)  :: name='mv_from'
+    logical, parameter :: debug=.false.
+
+    call psb_erractionsave(err_act)
+    info = 0
+    call a%psb_d_base_sparse_mat%mv_from(b%psb_d_base_sparse_mat)
+    call move_alloc(b%irp, a%irp)
+    call move_alloc(b%ja,  a%ja)
+    call move_alloc(b%val, a%val)
+    call b%free()
+
+    call psb_erractionrestore(err_act)
+    return
+
+9999 continue
+    call psb_erractionrestore(err_act)
+
+    call psb_errpush(info,name)
+
+    if (err_act /= psb_act_ret_) then
+      call psb_error()
+    end if
+    return
+
+  end subroutine d_csr_mv_from
+
 
 
   !=====================================

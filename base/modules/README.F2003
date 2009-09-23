@@ -98,8 +98,6 @@ Design principles for this directory.
       AND IT'S DONE! Nothing else in the library requires the explicit
       knowledge of type of  MOLD. 
 
-      User exercise: start by adding CSR in this way. 
-      (waiting for a couple of bug fixes from NAG to actually test this.)
 
     
   

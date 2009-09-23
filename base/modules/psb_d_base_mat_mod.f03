@@ -32,25 +32,17 @@ module psb_d_base_mat_mod
     procedure, pass(a) :: mv_from_coo
     procedure, pass(a) :: mv_to_fmt
     procedure, pass(a) :: mv_from_fmt
-!!$    procedure, pass(a) :: base_cp_from => d_base_cp_from
-!!$    procedure, pass(a) :: base_mv_from => d_base_mv_from
+    procedure, pass(a) :: d_base_cp_from
+    generic, public    :: cp_from => d_base_cp_from
+    procedure, pass(a) :: d_base_mv_from
+    generic, public    :: mv_from => d_base_mv_from
   end type psb_d_base_sparse_mat
 
   private :: d_base_csmv, d_base_csmm, d_base_cssv, d_base_cssm,&
        & d_scals, d_scal, csnmi, csput, d_csgetrow, d_csgetblk, &
        & cp_to_coo, cp_from_coo, cp_to_fmt, cp_from_fmt, &
        & mv_to_coo, mv_from_coo, mv_to_fmt, mv_from_fmt, &
-       & get_diag, csclip, d_cssv, d_cssm
-!!$, &
-!!$       & d_base_mv_from, d_base_cp_from
-
-  interface cp_from 
-    module procedure d_base_cp_from
-  end interface
-  interface mv_from 
-    module procedure d_base_mv_from
-  end interface
-
+       & get_diag, csclip, d_cssv, d_cssm, base_cp_from, base_mv_from
 
   type, extends(psb_d_base_sparse_mat) :: psb_d_coo_sparse_mat
     
@@ -92,6 +84,10 @@ module psb_d_base_mat_mod
     procedure, pass(a) :: get_nz_row  => d_coo_get_nz_row
     procedure, pass(a) :: sizeof => d_coo_sizeof
     procedure, pass(a) :: reinit => d_coo_reinit
+    procedure, pass(a) :: d_coo_cp_from
+    generic, public    :: cp_from => d_coo_cp_from
+    procedure, pass(a) :: d_coo_mv_from
+    generic, public    :: mv_from => d_coo_mv_from
     
   end type psb_d_coo_sparse_mat
 
@@ -102,7 +98,8 @@ module psb_d_base_mat_mod
        & d_cp_coo_to_coo, d_cp_coo_from_coo, &
        & d_cp_coo_to_fmt, d_cp_coo_from_fmt, &
        & d_coo_scals, d_coo_scal, d_coo_csgetrow, d_coo_sizeof, &
-       & d_coo_csgetptn, d_coo_get_nz_row, d_coo_reinit
+       & d_coo_csgetptn, d_coo_get_nz_row, d_coo_reinit,&
+       & d_coo_cp_from, d_coo_mv_from
 
   
   interface 
@@ -326,39 +323,6 @@ contains
   !
   !====================================
 
-  !
-  ! For the time being we do not have anything beyond
-  ! the base components, but you never know. 
-  !
-  subroutine d_base_mv_from(a,b)
-    use psb_error_mod
-    implicit none 
-
-    type(psb_d_base_sparse_mat), intent(out)  :: a
-    type(psb_d_base_sparse_mat), intent(inout) :: b
-
-!!$    call a%psb_base_sparse_mat%base_mv_from(b%psb_base_sparse_mat)
-    call mv_from(a%psb_base_sparse_mat,b%psb_base_sparse_mat)
-
-    return
-
-  end subroutine d_base_mv_from
-
-  subroutine d_base_cp_from(a,b)
-    use psb_error_mod
-    implicit none 
-    
-    type(psb_d_base_sparse_mat), intent(out) :: a
-    type(psb_d_base_sparse_mat), intent(in)  :: b
-
-    call cp_from(a%psb_base_sparse_mat,b%psb_base_sparse_mat)
-
-    return
-
-  end subroutine d_base_cp_from
-
-
-
   subroutine cp_to_coo(a,b,info) 
     use psb_error_mod
     use psb_realloc_mod
@@ -569,6 +533,36 @@ contains
     return
 
   end subroutine mv_from_fmt
+
+  subroutine d_base_mv_from(a,b)
+    use psb_error_mod
+    implicit none 
+
+    class(psb_d_base_sparse_mat), intent(out)   :: a
+    type(psb_d_base_sparse_mat), intent(inout) :: b
+
+
+    ! No new things here, very easy
+    call a%psb_base_sparse_mat%mv_from(b%psb_base_sparse_mat)
+
+    return
+
+  end subroutine d_base_mv_from
+
+  subroutine d_base_cp_from(a,b)
+    use psb_error_mod
+    implicit none 
+
+    class(psb_d_base_sparse_mat), intent(out) :: a
+    type(psb_d_base_sparse_mat), intent(in)  :: b
+
+    ! No new things here, very easy
+    call a%psb_base_sparse_mat%cp_from(b%psb_base_sparse_mat)
+
+    return
+
+  end subroutine d_base_cp_from
+
 
 
   subroutine csput(nz,ia,ja,val,a,imin,imax,jmin,jmax,info,gtl) 
@@ -1658,71 +1652,71 @@ contains
   end subroutine d_mv_coo_from_coo
 
 
-!!$
-!!$  subroutine d_coo_cp_from(a,b)
-!!$    use psb_error_mod
-!!$    implicit none 
-!!$
-!!$    class(psb_d_coo_sparse_mat), intent(out)   :: a
-!!$    type(psb_d_coo_sparse_mat), intent(inout) :: b
-!!$
-!!$
-!!$    Integer :: err_act, info
-!!$    character(len=20)  :: name='mv_from'
-!!$    logical, parameter :: debug=.false.
-!!$
-!!$    call psb_erractionsave(err_act)
-!!$    info = 0
-!!$    call d_cp_coo_from_coo_impl(a,b,info)
-!!$    if (info /= 0) goto 9999
-!!$
-!!$    call psb_erractionrestore(err_act)
-!!$    return
-!!$
-!!$9999 continue
-!!$    call psb_erractionrestore(err_act)
-!!$
-!!$    call psb_errpush(info,name)
-!!$
-!!$    if (err_act /= psb_act_ret_) then
-!!$      call psb_error()
-!!$    end if
-!!$    return
-!!$
-!!$  end subroutine d_coo_cp_from
-!!$
-!!$  subroutine d_coo_mv_from(a,b)
-!!$    use psb_error_mod
-!!$    implicit none 
-!!$
-!!$    class(psb_d_coo_sparse_mat), intent(out)   :: a
-!!$    type(psb_d_coo_sparse_mat), intent(inout) :: b
-!!$
-!!$
-!!$    Integer :: err_act, info
-!!$    character(len=20)  :: name='mv_from'
-!!$    logical, parameter :: debug=.false.
-!!$
-!!$    call psb_erractionsave(err_act)
-!!$    info = 0
-!!$    call d_mv_coo_from_coo_impl(a,b,info)
-!!$    if (info /= 0) goto 9999
-!!$
-!!$    call psb_erractionrestore(err_act)
-!!$    return
-!!$
-!!$9999 continue
-!!$    call psb_erractionrestore(err_act)
-!!$
-!!$    call psb_errpush(info,name)
-!!$
-!!$    if (err_act /= psb_act_ret_) then
-!!$      call psb_error()
-!!$    end if
-!!$    return
-!!$
-!!$  end subroutine d_coo_mv_from
-!!$
+
+  subroutine d_coo_cp_from(a,b)
+    use psb_error_mod
+    implicit none 
+
+    class(psb_d_coo_sparse_mat), intent(out) :: a
+    type(psb_d_coo_sparse_mat), intent(in)   :: b
+
+
+    Integer :: err_act, info
+    character(len=20)  :: name='cp_from'
+    logical, parameter :: debug=.false.
+
+    call psb_erractionsave(err_act)
+    info = 0
+    call d_cp_coo_from_coo_impl(a,b,info)
+    if (info /= 0) goto 9999
+
+    call psb_erractionrestore(err_act)
+    return
+
+9999 continue
+    call psb_erractionrestore(err_act)
+
+    call psb_errpush(info,name)
+
+    if (err_act /= psb_act_ret_) then
+      call psb_error()
+    end if
+    return
+
+  end subroutine d_coo_cp_from
+
+  subroutine d_coo_mv_from(a,b)
+    use psb_error_mod
+    implicit none 
+
+    class(psb_d_coo_sparse_mat), intent(out)  :: a
+    type(psb_d_coo_sparse_mat), intent(inout) :: b
+
+
+    Integer :: err_act, info
+    character(len=20)  :: name='mv_from'
+    logical, parameter :: debug=.false.
+
+    call psb_erractionsave(err_act)
+    info = 0
+    call d_mv_coo_from_coo_impl(a,b,info)
+    if (info /= 0) goto 9999
+
+    call psb_erractionrestore(err_act)
+    return
+
+9999 continue
+    call psb_erractionrestore(err_act)
+
+    call psb_errpush(info,name)
+
+    if (err_act /= psb_act_ret_) then
+      call psb_error()
+    end if
+    return
+
+  end subroutine d_coo_mv_from
+
 
   subroutine d_mv_coo_to_fmt(a,b,info) 
     use psb_error_mod

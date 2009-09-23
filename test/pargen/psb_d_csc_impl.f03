@@ -14,6 +14,7 @@
 
 subroutine d_csc_csmv_impl(alpha,a,x,beta,y,info,trans) 
   use psb_error_mod
+  use psb_string_mod
   use psb_d_csc_mat_mod, psb_protect_name => d_csc_csmv_impl
   implicit none 
   class(psb_d_csc_sparse_mat), intent(in) :: a
@@ -46,7 +47,7 @@ subroutine d_csc_csmv_impl(alpha,a,x,beta,y,info,trans)
   endif
 
 
-  tra = ((trans_=='T').or.(trans_=='t'))
+  tra = (psb_toupper(trans_)=='T').or.(psb_toupper(trans_)=='C')
 
   if (tra) then 
     m = a%get_ncols()
@@ -277,6 +278,7 @@ end subroutine d_csc_csmv_impl
 
 subroutine d_csc_csmm_impl(alpha,a,x,beta,y,info,trans) 
   use psb_error_mod
+  use psb_string_mod
   use psb_d_csc_mat_mod, psb_protect_name => d_csc_csmm_impl
   implicit none 
   class(psb_d_csc_sparse_mat), intent(in) :: a
@@ -302,7 +304,7 @@ subroutine d_csc_csmm_impl(alpha,a,x,beta,y,info,trans)
     trans_ = 'N'
   end if
 
-  tra = ((trans_=='T').or.(trans_=='t'))
+  tra = (psb_toupper(trans_)=='T').or.(psb_toupper(trans_)=='C')
   if (.not.a%is_asb()) then 
     info = 1121
     call psb_errpush(info,name)
@@ -547,6 +549,7 @@ end subroutine d_csc_csmm_impl
 
 subroutine d_csc_cssv_impl(alpha,a,x,beta,y,info,trans) 
   use psb_error_mod
+  use psb_string_mod
   use psb_d_csc_mat_mod, psb_protect_name => d_csc_cssv_impl
   implicit none 
   class(psb_d_csc_sparse_mat), intent(in) :: a
@@ -577,7 +580,7 @@ subroutine d_csc_cssv_impl(alpha,a,x,beta,y,info,trans)
     goto 9999
   endif
 
-  tra = ((trans_=='T').or.(trans_=='t'))
+  tra = (psb_toupper(trans_)=='T').or.(psb_toupper(trans_)=='C')
   m = a%get_nrows()
 
   if (.not. (a%is_triangle())) then 
@@ -750,6 +753,7 @@ end subroutine d_csc_cssv_impl
 
 subroutine d_csc_cssm_impl(alpha,a,x,beta,y,info,trans) 
   use psb_error_mod
+  use psb_string_mod
   use psb_d_csc_mat_mod, psb_protect_name => d_csc_cssm_impl
   implicit none 
   class(psb_d_csc_sparse_mat), intent(in) :: a
@@ -782,7 +786,7 @@ subroutine d_csc_cssm_impl(alpha,a,x,beta,y,info,trans)
   endif
 
 
-  tra = ((trans_=='T').or.(trans_=='t'))
+  tra = (psb_toupper(trans_)=='T').or.(psb_toupper(trans_)=='C')
   m   = a%get_nrows()
   nc  = min(size(x,2) , size(y,2)) 
 
@@ -1009,6 +1013,193 @@ end function d_csc_csnmi_impl
 !
 !
 !=====================================   
+
+subroutine d_csc_csgetptn_impl(imin,imax,a,nz,ia,ja,info,&
+     & jmin,jmax,iren,append,nzin,rscale,cscale)
+  ! Output is always in  COO format 
+  use psb_error_mod
+  use psb_const_mod
+  use psb_error_mod
+  use psb_d_base_mat_mod
+  use psb_d_csc_mat_mod, psb_protect_name => d_csc_csgetptn_impl
+  implicit none
+
+  class(psb_d_csc_sparse_mat), intent(in) :: a
+  integer, intent(in)                  :: imin,imax
+  integer, intent(out)                 :: nz
+  integer, allocatable, intent(inout)  :: ia(:), ja(:)
+  integer,intent(out)                  :: info
+  logical, intent(in), optional        :: append
+  integer, intent(in), optional        :: iren(:)
+  integer, intent(in), optional        :: jmin,jmax, nzin
+  logical, intent(in), optional        :: rscale,cscale
+
+  logical :: append_, rscale_, cscale_ 
+  integer :: nzin_, jmin_, jmax_, err_act, i
+  character(len=20)  :: name='csget'
+  logical, parameter :: debug=.false.
+
+  call psb_erractionsave(err_act)
+  info = 0
+
+  if (present(jmin)) then
+    jmin_ = jmin
+  else
+    jmin_ = 1
+  endif
+  if (present(jmax)) then
+    jmax_ = jmax
+  else
+    jmax_ = a%get_ncols()
+  endif
+
+  if ((imax<imin).or.(jmax_<jmin_)) return
+
+  if (present(append)) then
+    append_=append
+  else
+    append_=.false.
+  endif
+  if ((append_).and.(present(nzin))) then 
+    nzin_ = nzin
+  else
+    nzin_ = 0
+  endif
+  if (present(rscale)) then 
+    rscale_ = rscale
+  else
+    rscale_ = .false.
+  endif
+  if (present(cscale)) then 
+    cscale_ = cscale
+  else
+    cscale_ = .false.
+  endif
+  if ((rscale_.or.cscale_).and.(present(iren))) then 
+    info = 583
+    call psb_errpush(info,name,a_err='iren (rscale.or.cscale)')
+    goto 9999
+  end if
+
+  call csc_getptn(imin,imax,jmin_,jmax_,a,nz,ia,ja,nzin_,append_,info,iren)
+  
+  if (rscale_) then 
+    do i=nzin_+1, nzin_+nz
+      ia(i) = ia(i) - imin + 1
+    end do
+  end if
+  if (cscale_) then 
+    do i=nzin_+1, nzin_+nz
+      ja(i) = ja(i) - jmin_ + 1
+    end do
+  end if
+
+  if (info /= 0) goto 9999
+
+  call psb_erractionrestore(err_act)
+  return
+
+9999 continue
+  call psb_erractionrestore(err_act)
+
+  if (err_act == psb_act_abort_) then
+    call psb_error()
+    return
+  end if
+  return
+
+contains
+
+  subroutine csc_getptn(imin,imax,jmin,jmax,a,nz,ia,ja,nzin,append,info,&
+       & iren)
+
+    use psb_const_mod
+    use psb_error_mod
+    use psb_realloc_mod
+    use psb_sort_mod
+    implicit none
+
+    class(psb_d_csc_sparse_mat), intent(in)    :: a
+    integer                              :: imin,imax,jmin,jmax
+    integer, intent(out)                 :: nz
+    integer, allocatable, intent(inout)  :: ia(:), ja(:)
+    integer, intent(in)                  :: nzin
+    logical, intent(in)                  :: append
+    integer                              :: info
+    integer, optional                    :: iren(:)
+    integer  :: nzin_, nza, idx,i,j,k, nzt, irw, lrw, icl, lcl,m,isz
+    integer  :: debug_level, debug_unit
+    character(len=20) :: name='coo_getrow'
+
+    debug_unit  = psb_get_debug_unit()
+    debug_level = psb_get_debug_level()
+
+    nza = a%get_nzeros()
+    irw = imin
+    lrw = min(imax,a%get_nrows())
+    icl = jmin
+    lcl = min(jmax,a%get_ncols())
+    if (irw<0) then 
+      info = 2
+      return
+    end if
+
+    if (append) then 
+      nzin_ = nzin
+    else
+      nzin_ = 0
+    endif
+
+
+    nzt = min((a%icp(lcl+1)-a%icp(icl)),&
+         & ((nza*(lcl+1-icl))/a%get_ncols()) )
+    nz = 0 
+
+
+    call psb_ensure_size(nzin_+nzt,ia,info)
+    if (info==0) call psb_ensure_size(nzin_+nzt,ja,info)
+
+    if (info /= 0) return
+    isz = min(size(ia),size(ja))
+    if (present(iren)) then 
+      do i=icl, lcl
+        do j=a%icp(i), a%icp(i+1) - 1
+          if ((imin <= a%ia(j)).and.(a%ia(j)<=imax)) then 
+            nzin_ = nzin_ + 1
+            if (nzin_>isz) then 
+              call psb_ensure_size(int(1.25*nzin_)+1,ia,info)
+              call psb_ensure_size(int(1.25*nzin_)+1,ja,info)
+              isz = min(size(ia),size(ja))
+            end if
+            nz    = nz + 1
+            ia(nzin_)  = iren(a%ia(j))
+            ja(nzin_)  = iren(i)
+          end if
+        enddo
+      end do
+    else
+      do i=icl, lcl
+        do j=a%icp(i), a%icp(i+1) - 1
+          if ((imin <= a%ia(j)).and.(a%ia(j)<=imax)) then 
+            nzin_ = nzin_ + 1
+            if (nzin_>isz) then 
+              call psb_ensure_size(int(1.25*nzin_)+1,ia,info)
+              call psb_ensure_size(int(1.25*nzin_)+1,ja,info)
+              isz = min(size(ia),size(ja))
+            end if
+            nz    = nz + 1
+            ia(nzin_)  = (a%ia(j))
+            ja(nzin_)  = (i)
+          end if
+        enddo
+      end do
+    end if
+    
+  end subroutine csc_getptn
+  
+end subroutine d_csc_csgetptn_impl
+
+
 
 
 subroutine d_csc_csgetrow_impl(imin,imax,a,nz,ia,ja,val,info,&
@@ -1521,6 +1712,7 @@ subroutine d_cp_csc_to_coo_impl(a,b,info)
   nza = a%get_nzeros()
 
   call b%allocate(nr,nc,nza)
+  call b%psb_d_base_sparse_mat%cp_from(a%psb_d_base_sparse_mat)
 
   do i=1, nc
     do j=a%icp(i),a%icp(i+1)-1
@@ -1531,13 +1723,6 @@ subroutine d_cp_csc_to_coo_impl(a,b,info)
   end do
   
   call b%set_nzeros(a%get_nzeros())
-  call b%set_nrows(a%get_nrows())
-  call b%set_ncols(a%get_ncols())
-  call b%set_dupl(a%get_dupl())
-  call b%set_state(a%get_state())
-  call b%set_triangle(a%is_triangle())
-  call b%set_upper(a%is_upper())
-  call b%set_unit(a%is_unit()) 
   call b%fix(info)
 
 
@@ -1569,15 +1754,8 @@ subroutine d_mv_csc_to_coo_impl(a,b,info)
   nc  = a%get_ncols()
   nza = a%get_nzeros()
 
+  call b%psb_d_base_sparse_mat%mv_from(a%psb_d_base_sparse_mat)
   call b%set_nzeros(a%get_nzeros())
-  call b%set_nrows(a%get_nrows())
-  call b%set_ncols(a%get_ncols())
-  call b%set_dupl(a%get_dupl())
-  call b%set_state(a%get_state())
-  call b%set_triangle(a%is_triangle())
-  call b%set_upper(a%is_upper())
-  call b%set_unit(a%is_unit()) 
-
   call move_alloc(a%ia,b%ia)
   call move_alloc(a%val,b%val)
   call psb_realloc(nza,b%ja,info)
@@ -1621,14 +1799,9 @@ subroutine d_mv_csc_from_coo_impl(a,b,info)
   nr  = b%get_nrows()
   nc  = b%get_ncols()
   nza = b%get_nzeros()
+  
+  call a%psb_d_base_sparse_mat%mv_from(b%psb_d_base_sparse_mat)
 
-  call a%set_nrows(b%get_nrows())
-  call a%set_ncols(b%get_ncols())
-  call a%set_dupl(b%get_dupl())
-  call a%set_state(b%get_state())
-  call a%set_triangle(b%is_triangle())
-  call a%set_upper(b%is_upper())
-  call a%set_unit(b%is_unit()) 
   ! Dirty trick: call move_alloc to have the new data allocated just once.
   call move_alloc(b%ja,itemp)
   call move_alloc(b%ia,a%ia)
@@ -1711,11 +1884,16 @@ subroutine d_mv_csc_to_fmt_impl(a,b,info)
   info = 0
 
   select type (b)
-  class is (psb_d_coo_sparse_mat) 
+  type is (psb_d_coo_sparse_mat) 
     call a%mv_to_coo(b,info)
     ! Need to fix trivial copies! 
-! !$  class is (psb_d_csc_sparse_mat) 
-! !$    call a%mv_to_coo(b,info)
+  type is (psb_d_csc_sparse_mat) 
+    call b%psb_d_base_sparse_mat%mv_from(a%psb_d_base_sparse_mat)
+    call move_alloc(a%icp, b%icp)
+    call move_alloc(a%ia,  b%ia)
+    call move_alloc(a%val, b%val)
+    call a%free()
+    
   class default
     call tmp%mv_from_fmt(a,info)
     if (info == 0) call b%mv_from_coo(tmp,info)
@@ -1747,8 +1925,12 @@ subroutine d_cp_csc_to_fmt_impl(a,b,info)
 
 
   select type (b)
-  class is (psb_d_coo_sparse_mat) 
+  type is (psb_d_coo_sparse_mat) 
     call a%cp_to_coo(b,info)
+
+  type is (psb_d_csc_sparse_mat) 
+    b = a
+
   class default
     call tmp%cp_from_fmt(a,info)
     if (info == 0) call b%mv_from_coo(tmp,info)
@@ -1779,8 +1961,16 @@ subroutine d_mv_csc_from_fmt_impl(a,b,info)
   info = 0
 
   select type (b)
-  class is (psb_d_coo_sparse_mat) 
+  type is (psb_d_coo_sparse_mat) 
     call a%mv_from_coo(b,info)
+
+  type is (psb_d_csc_sparse_mat) 
+    call a%psb_d_base_sparse_mat%mv_from(b%psb_d_base_sparse_mat)
+    call move_alloc(b%icp, a%icp)
+    call move_alloc(b%ia,  a%ia)
+    call move_alloc(b%val, a%val)
+    call b%free()
+
   class default
     call tmp%mv_from_fmt(b,info)
     if (info == 0) call a%mv_from_coo(tmp,info)
@@ -1812,8 +2002,15 @@ subroutine d_cp_csc_from_fmt_impl(a,b,info)
   info = 0
 
   select type (b)
-  class is (psb_d_coo_sparse_mat) 
+  type is (psb_d_coo_sparse_mat) 
     call a%cp_from_coo(b,info)
+
+  type is (psb_d_csc_sparse_mat) 
+    call a%psb_d_base_sparse_mat%cp_from(b%psb_d_base_sparse_mat)
+    a%icp = b%icp
+    a%ia  = b%ia
+    a%val = b%val
+
   class default
     call tmp%cp_from_fmt(b,info)
     if (info == 0) call a%mv_from_coo(tmp,info)

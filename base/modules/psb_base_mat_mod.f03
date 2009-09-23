@@ -3,9 +3,9 @@ module psb_base_mat_mod
   use psb_const_mod 
 
   type  :: psb_base_sparse_mat
-    integer     :: m, n
-    integer     :: state, duplicate 
-    logical     :: triangle, unitd, upper, sorted
+    integer, private     :: m, n
+    integer, private     :: state, duplicate 
+    logical, private     :: triangle, unitd, upper, sorted
     ! This is a different animal: it's a kitchen sink for
     ! any additional parameters that may be needed
     ! when converting to/from COO. Why here?
@@ -64,7 +64,6 @@ module psb_base_mat_mod
     ! Data management
     !
     ! ====================================  
-
     procedure, pass(a) :: get_neigh
     procedure, pass(a) :: allocate_mnnz
     procedure, pass(a) :: reallocate_nz
@@ -76,9 +75,11 @@ module psb_base_mat_mod
     procedure, pass(a) :: csgetptn
     generic, public    :: csget => csgetptn
     procedure, pass(a) :: print => sparse_print
-    procedure, pass(a) :: sizeof    
-!!$    procedure, pass(a) :: base_cp_from
-!!$    procedure, pass(a) :: base_mv_from
+    procedure, pass(a) :: sizeof
+    procedure, pass(a) :: base_cp_from
+    generic, public    :: cp_from => base_cp_from
+    procedure, pass(a) :: base_mv_from
+    generic, public    :: mv_from => base_mv_from
 
   end type psb_base_sparse_mat
 
@@ -89,14 +90,7 @@ module psb_base_mat_mod
        & is_upd, is_asb, is_sorted, is_upper, is_lower, is_triangle, &
        & is_unit, get_neigh, allocate_mn, allocate_mnnz, reallocate_nz, &
        & free, sparse_print, get_fmt, trim, sizeof, reinit, csgetptn, &
-       & get_nz_row, get_aux, set_aux
-!!$, base_mv_from, base_cp_from
-  interface cp_from 
-    module procedure base_cp_from
-  end interface
-  interface mv_from 
-    module procedure base_mv_from
-  end interface
+       & get_nz_row, get_aux, set_aux, base_cp_from, base_mv_from
   
 contains
 
@@ -449,7 +443,7 @@ contains
     use psb_error_mod
     implicit none 
 
-    type(psb_base_sparse_mat), intent(out)  :: a
+    class(psb_base_sparse_mat), intent(out)   :: a
     type(psb_base_sparse_mat), intent(inout) :: b
 
     a%m         = b%m
@@ -470,7 +464,7 @@ contains
     use psb_error_mod
     implicit none 
 
-    type(psb_base_sparse_mat), intent(out) :: a
+    class(psb_base_sparse_mat), intent(out) :: a
     type(psb_base_sparse_mat), intent(in)  :: b
 
     a%m         = b%m

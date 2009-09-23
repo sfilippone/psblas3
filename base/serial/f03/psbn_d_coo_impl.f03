@@ -1849,7 +1849,7 @@ subroutine d_cp_coo_to_coo_impl(a,b,info)
 
   call psb_erractionsave(err_act)
   info = 0
-  call cp_from(b%psb_d_base_sparse_mat,a%psb_d_base_sparse_mat)
+  call b%psb_d_base_sparse_mat%cp_from(a%psb_d_base_sparse_mat)
 
   call b%set_nzeros(a%get_nzeros())
   call b%reallocate(a%get_nzeros())
@@ -1894,7 +1894,7 @@ subroutine d_cp_coo_from_coo_impl(a,b,info)
 
   call psb_erractionsave(err_act)
   info = 0
-  call cp_from(a%psb_d_base_sparse_mat,b%psb_d_base_sparse_mat)
+  call a%psb_d_base_sparse_mat%cp_from(b%psb_d_base_sparse_mat)
   call a%set_nzeros(b%get_nzeros())
   call a%reallocate(b%get_nzeros())
 
@@ -2311,7 +2311,7 @@ subroutine d_mv_coo_to_coo_impl(a,b,info)
 
   call psb_erractionsave(err_act)
   info = 0
-  call mv_from(b%psb_d_base_sparse_mat,a%psb_d_base_sparse_mat)
+  call b%psb_d_base_sparse_mat%mv_from(a%psb_d_base_sparse_mat)
   call b%set_nzeros(a%get_nzeros())
   call b%reallocate(a%get_nzeros())
 
@@ -2356,7 +2356,7 @@ subroutine d_mv_coo_from_coo_impl(a,b,info)
 
   call psb_erractionsave(err_act)
   info = 0
-  call mv_from(a%psb_d_base_sparse_mat,b%psb_d_base_sparse_mat)
+  call a%psb_d_base_sparse_mat%mv_from(b%psb_d_base_sparse_mat)
   call a%set_nzeros(b%get_nzeros())
   call a%reallocate(b%get_nzeros())
 
