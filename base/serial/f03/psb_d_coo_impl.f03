@@ -646,7 +646,7 @@ subroutine d_coo_csmv_impl(alpha,a,x,beta,y,info,trans)
 
   else if (tra) then 
 
-    if (alpha.eq.done) then
+    if (alpha == done) then
       i    = 1
       do i=1,nnz
         ir = a%ja(i)
@@ -654,7 +654,7 @@ subroutine d_coo_csmv_impl(alpha,a,x,beta,y,info,trans)
         y(ir) = y(ir) +  a%val(i)*x(jc)
       enddo
 
-    else if (alpha.eq.-done) then
+    else if (alpha == -done) then
 
       do i=1,nnz
         ir = a%ja(i)
@@ -811,7 +811,7 @@ subroutine d_coo_csmm_impl(alpha,a,x,beta,y,info,trans)
     end if
 
   else if (tra) then 
-    if (alpha.eq.done) then
+    if (alpha == done) then
       i    = 1
       do i=1,nnz
         ir = a%ja(i)
@@ -819,7 +819,7 @@ subroutine d_coo_csmm_impl(alpha,a,x,beta,y,info,trans)
         y(ir,1:nc) = y(ir,1:nc) +  a%val(i)*x(jc,1:nc)
       enddo
 
-    else if (alpha.eq.-done) then
+    else if (alpha == -done) then
 
       do i=1,nnz
         ir = a%ja(i)
