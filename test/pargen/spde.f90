@@ -109,7 +109,6 @@ program ppde
   if(psb_get_errstatus() /= 0) goto 9999
   name='pde90'
   call psb_set_errverbosity(2)
-  call enablecore()
   !
   !  get parameters
   !

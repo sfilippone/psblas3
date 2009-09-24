@@ -41,7 +41,7 @@ program sf_sample
   character(len=40) :: kmethd, ptype, mtrx_file, rhs_file
 
   ! sparse matrices
-  type(psb_sspmat_type) :: a, aux_a
+  type(psb_s_sparse_mat) :: a, aux_a
 
   ! preconditioner data
   type(psb_sprec_type)  :: prec
@@ -129,7 +129,7 @@ program sf_sample
       call psb_abort(ictxt)
     end if
     
-    m_problem = aux_a%m
+    m_problem = aux_a%get_nrows()
     call psb_bcast(ictxt,m_problem)
     
     ! At this point aux_b may still be unallocated
@@ -179,7 +179,8 @@ program sf_sample
       write(*,'("Partition type: graph")')
       write(*,'(" ")')
       !      write(0,'("Build type: graph")')
-      call build_mtpart(aux_a%m,aux_a%fida,aux_a%ia1,aux_a%ia2,np)
+      call build_mtpart(aux_a,np)
+
     endif
     call psb_barrier(ictxt)
     call distr_mtpart(psb_root_,ictxt)
