@@ -662,9 +662,9 @@ subroutine d_csr_cssv_impl(alpha,a,x,beta,y,info,trans)
     if (info /= 0) then 
       return
     end if
-    tmp(1:m) = x(1:m)
+
     call inner_csrsv(tra,a%is_lower(),a%is_unit(),a%get_nrows(),&
-         & a%irp,a%ja,a%val,tmp,y) 
+         & a%irp,a%ja,a%val,x,tmp) 
     do  i = 1, m
       y(i) = alpha*tmp(i) + beta*y(i)
     end do
@@ -863,9 +863,8 @@ subroutine d_csr_cssm_impl(alpha,a,x,beta,y,info,trans)
       goto 9999
     end if
 
-    tmp(1:m,:) = x(1:m,1:nc)
     call inner_csrsm(tra,a%is_lower(),a%is_unit(),a%get_nrows(),nc,&
-         & a%irp,a%ja,a%val,tmp,size(tmp,1),y,size(y,1),info) 
+         & a%irp,a%ja,a%val,x,size(x,1),tmp,size(tmp,1),info) 
     do  i = 1, m
       y(i,1:nc) = alpha*tmp(i,1:nc) + beta*y(i,1:nc)
     end do

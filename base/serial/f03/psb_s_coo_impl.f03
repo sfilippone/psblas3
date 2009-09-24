@@ -44,6 +44,7 @@ subroutine s_coo_cssm_impl(alpha,a,x,beta,y,info,trans)
   tra = (psb_toupper(trans_)=='T').or.(psb_toupper(trans_)=='C')
   m   = a%get_nrows()
   nc  = min(size(x,2) , size(y,2)) 
+  nnz = a%get_nzeros()
 
 
   if (alpha == szero) then
@@ -60,7 +61,9 @@ subroutine s_coo_cssm_impl(alpha,a,x,beta,y,info,trans)
   end if
 
   if (beta == szero) then 
-    call inner_coosm(tra,a,x(:,1:nc),y(:,1:nc),info)
+    call inner_coosm(tra,a%is_lower(),a%is_unit(),a%is_sorted(),&
+         & m,nc,nnz,a%ia,a%ja,a%val,&
+         & x,size(x,1),y,size(y,1),info)
     do  i = 1, m
       y(i,1:nc) = alpha*y(i,1:nc)
     end do
@@ -72,8 +75,9 @@ subroutine s_coo_cssm_impl(alpha,a,x,beta,y,info,trans)
       goto 9999
     end if
 
-    tmp(1:m,1:nc) = x(1:m,1:nc)
-    call inner_coosm(tra,a,tmp(:,1:nc),y(:,1:nc),info)
+    call inner_coosm(tra,a%is_lower(),a%is_unit(),a%is_sorted(),&
+         & m,nc,nnz,a%ia,a%ja,a%val,&
+         & x,size(x,1),tmp,size(tmp,1),info)
     do  i = 1, m
       y(i,1:nc) = alpha*tmp(i,1:nc) + beta*y(i,1:nc)
     end do
@@ -101,92 +105,93 @@ subroutine s_coo_cssm_impl(alpha,a,x,beta,y,info,trans)
 
 contains 
 
-  subroutine inner_coosm(tra,a,x,y,info) 
+  subroutine inner_coosm(tra,lower,unit,sorted,nr,nc,nz,&
+       & ia,ja,val,x,ldx,y,ldy,info) 
     implicit none 
-    logical, intent(in)                 :: tra  
-    class(psb_s_coo_sparse_mat), intent(in) :: a
-    real(psb_spk_), intent(in)          :: x(:,:)
-    real(psb_spk_), intent(out)         :: y(:,:)
+    logical, intent(in)                 :: tra,lower,unit,sorted
+    integer, intent(in)                 :: nr,nc,nz,ldx,ldy,ia(*),ja(*)
+    real(psb_spk_), intent(in)          :: val(*), x(ldx,*)
+    real(psb_spk_), intent(out)         :: y(ldy,*)
     integer, intent(out)                :: info
     integer :: i,j,k,m, ir, jc
     real(psb_spk_), allocatable  :: acc(:)
 
     info = 0
-    allocate(acc(size(x,2)), stat=info)
+    allocate(acc(nc), stat=info)
     if(info /= 0) then
       info=4010
       return
     end if
 
 
-    if (.not.a%is_sorted()) then 
+    if (.not.sorted) then 
       info = 1121
       return
     end if
 
-    nnz = a%get_nzeros()
+    nnz = nz
 
     if (.not.tra) then 
 
-      if (a%is_lower()) then 
-        if (a%is_unit()) then 
+      if (lower) then 
+        if (unit) then 
           j = 1
-          do i=1, a%get_nrows()
-            acc = szero
+          do i=1, nr
+            acc(1:nc) = szero
             do 
               if (j > nnz) exit
-              if (a%ia(j) > i) exit
-              acc = acc + a%val(j)*y(a%ja(j),:)
+              if (ia(j) > i) exit
+              acc(1:nc) = acc(1:nc) + val(j)*y(ja(j),1:nc)
               j   = j + 1
             end do
-            y(i,:) = x(i,:) - acc
+            y(i,1:nc) = x(i,1:nc) - acc(1:nc)
           end do
-        else if (.not.a%is_unit()) then 
+        else if (.not.unit) then 
           j = 1
-          do i=1, a%get_nrows()
-            acc = szero
+          do i=1, nr
+            acc(1:nc) = szero
             do 
               if (j > nnz) exit
-              if (a%ia(j) > i) exit
-              if (a%ja(j) == i) then 
-                y(i,:) = (x(i,:) - acc)/a%val(j)
+              if (ia(j) > i) exit
+              if (ja(j) == i) then 
+                y(i,1:nc) = (x(i,1:nc) - acc(1:nc))/val(j)
                 j = j + 1
                 exit
               end if
-              acc = acc + a%val(j)*y(a%ja(j),:)
+              acc(1:nc) = acc(1:nc) + val(j)*y(ja(j),1:nc)
               j   = j + 1
             end do
           end do
         end if
 
-      else if (a%is_upper()) then 
-        if (a%is_unit()) then 
+      else if (.not.lower) then 
+        if (unit) then 
           j = nnz
-          do i=a%get_nrows(), 1, -1 
-            acc = szero 
+          do i=nr, 1, -1 
+            acc(1:nc) = szero 
             do 
               if (j < 1) exit
-              if (a%ia(j) < i) exit
-              acc = acc + a%val(j)*x(a%ja(j),:)
+              if (ia(j) < i) exit
+              acc(1:nc) = acc(1:nc) + val(j)*x(ja(j),1:nc)
               j   = j - 1
             end do
-            y(i,:) = x(i,:) - acc
+            y(i,1:nc) = x(i,1:nc) - acc(1:nc)
           end do
 
-        else if (.not.a%is_unit()) then 
+        else if (.not.unit) then 
 
           j = nnz
-          do i=a%get_nrows(), 1, -1 
-            acc = szero 
+          do i=nr, 1, -1 
+            acc(1:nc) = szero 
             do 
               if (j < 1) exit
-              if (a%ia(j) < i) exit
-              if (a%ja(j) == i) then 
-                y(i,:) = (x(i,:) - acc)/a%val(j)
+              if (ia(j) < i) exit
+              if (ja(j) == i) then 
+                y(i,1:nc) = (x(i,1:nc) - acc(1:nc))/val(j)
                 j = j - 1
                 exit
               end if
-              acc = acc + a%val(j)*y(a%ja(j),:)
+              acc(1:nc) = acc(1:nc) + val(j)*y(ja(j),1:nc)
               j   = j - 1
             end do
           end do
@@ -196,66 +201,66 @@ contains
 
     else if (tra) then 
 
-      do i=1, a%get_nrows()
-        y(i,:) = x(i,:)
+      do i=1, nr
+        y(i,1:nc) = x(i,1:nc)
       end do
 
-      if (a%is_lower()) then 
-        if (a%is_unit()) then 
+      if (lower) then 
+        if (unit) then 
           j = nnz
-          do i=a%get_nrows(), 1, -1
-            acc = y(i,:) 
+          do i=nr, 1, -1
+            acc(1:nc) = y(i,1:nc) 
             do
               if (j < 1) exit
-              if (a%ia(j) < i) exit
-              jc    = a%ja(j)
-              y(jc,:) = y(jc,:) - a%val(j)*acc 
+              if (ia(j) < i) exit
+              jc    = ja(j)
+              y(jc,1:nc) = y(jc,1:nc) - val(j)*acc(1:nc) 
               j     = j - 1 
             end do
           end do
-        else if (.not.a%is_unit()) then 
+        else if (.not.unit) then 
           j = nnz
-          do i=a%get_nrows(), 1, -1
-            if (a%ja(j) == i) then 
-              y(i,:) = y(i,:) /a%val(j)
+          do i=nr, 1, -1
+            if (ja(j) == i) then 
+              y(i,1:nc) = y(i,1:nc) /val(j)
               j    = j - 1
             end if
-            acc  = y(i,:) 
+            acc(1:nc)  = y(i,1:nc) 
             do 
               if (j < 1) exit
-              if (a%ia(j) < i) exit
-              jc    = a%ja(j)
-              y(jc,:) = y(jc,:) - a%val(j)*acc 
+              if (ia(j) < i) exit
+              jc    = ja(j)
+              y(jc,1:nc) = y(jc,1:nc) - val(j)*acc(1:nc) 
               j     = j - 1
             end do
           end do
 
-        else if (a%is_upper()) then 
-          if (a%is_unit()) then 
+        else if (.not.lower) then 
+          if (unit) then 
             j = 1
-            do i=1, a%get_nrows()
-              acc = y(i,:)
+            do i=1, nr
+              acc(1:nc) = y(i,1:nc)
               do 
                 if (j > nnz) exit
-                if (a%ia(j) > i) exit
-                jc    = a%ja(j)
-                y(jc,:) = y(jc,:) - a%val(j)*acc 
+                if (ia(j) > i) exit
+                jc    = ja(j)
+                y(jc,1:nc) = y(jc,1:nc) - val(j)*acc(1:nc) 
                 j   = j + 1
               end do
             end do
-          else if (.not.a%is_unit()) then 
+          else if (.not.unit) then 
             j = 1
-            do i=1, a%get_nrows()
-              if (a%ja(j) == i) then 
-                y(i,:) = y(i,:) /a%val(j)
+            do i=1, nr
+              if (ja(j) == i) then 
+                y(i,1:nc) = y(i,1:nc) /val(j)
                 j    = j + 1
               end if
-              acc = y(i,:)
+              acc(1:nc) = y(i,1:nc)
               do 
                 if (j > nnz) exit
-                if (a%ia(j) > i) exit
-                jc    = a%ja(j)
-                y(jc,:) = y(jc,:) - a%val(j)*acc 
+                if (ia(j) > i) exit
+                jc    = ja(j)
+                y(jc,1:nc) = y(jc,1:nc) - val(j)*acc(1:nc) 
                 j   = j + 1
               end do
             end do
@@ -328,7 +333,9 @@ subroutine s_coo_cssv_impl(alpha,a,x,beta,y,info,trans)
   end if
 
   if (beta == szero) then 
-    call inner_coosv(tra,a,x,y,info)
+    call inner_coosv(tra,a%is_lower(),a%is_unit(),a%is_sorted(),&
+         & a%get_nrows(),a%get_nzeros(),a%ia,a%ja,a%val,&
+         & x,y,info)
     if (info /= 0) then 
       call psb_errpush(info,name)
       goto 9999
@@ -344,8 +351,9 @@ subroutine s_coo_cssv_impl(alpha,a,x,beta,y,info,trans)
       goto 9999
     end if
 
-    tmp(1:m) = x(1:m)
-    call inner_coosv(tra,a,tmp,y,info)
+    call inner_coosv(tra,a%is_lower(),a%is_unit(),a%is_sorted(),&
+         & a%get_nrows(),a%get_nzeros(),a%ia,a%ja,a%val,&
+         & x,tmp,info)
     if (info /= 0) then 
       call psb_errpush(info,name)
       goto 9999
@@ -369,86 +377,87 @@ subroutine s_coo_cssv_impl(alpha,a,x,beta,y,info,trans)
 
 contains 
 
-  subroutine inner_coosv(tra,a,x,y,info) 
+  subroutine inner_coosv(tra,lower,unit,sorted,nr,nz,&
+       & ia,ja,val,x,y,info) 
     implicit none 
-    logical, intent(in)                 :: tra  
-    class(psb_s_coo_sparse_mat), intent(in) :: a
-    real(psb_spk_), intent(in)          :: x(:)
-    real(psb_spk_), intent(out)         :: y(:)
-    integer, intent(out) :: info
+    logical, intent(in)                 :: tra,lower,unit,sorted
+    integer, intent(in)                 :: nr,nz,ia(*),ja(*)
+    real(psb_spk_), intent(in)          :: val(*), x(*)
+    real(psb_spk_), intent(out)         :: y(*)
+    integer, intent(out)                :: info
 
     integer :: i,j,k,m, ir, jc, nnz
     real(psb_spk_) :: acc
 
     info = 0
-    if (.not.a%is_sorted()) then 
+    if (.not.sorted) then 
       info = 1121
       return
     end if
 
-    nnz = a%get_nzeros()
+    nnz = nz
 
     if (.not.tra) then 
 
-      if (a%is_lower()) then 
-        if (a%is_unit()) then 
+      if (lower) then 
+        if (unit) then 
           j = 1
-          do i=1, a%get_nrows()
+          do i=1, nr
             acc = szero
             do 
               if (j > nnz) exit
-              if (a%ia(j) > i) exit
-              acc = acc + a%val(j)*y(a%ja(j))
+              if (ia(j) > i) exit
+              acc = acc + val(j)*y(ja(j))
               j   = j + 1
             end do
             y(i) = x(i) - acc
           end do
-        else if (.not.a%is_unit()) then 
+        else if (.not.unit) then 
           j = 1
-          do i=1, a%get_nrows()
+          do i=1, nr
             acc = szero
             do 
               if (j > nnz) exit
-              if (a%ia(j) > i) exit
-              if (a%ja(j) == i) then 
-                y(i) = (x(i) - acc)/a%val(j)
+              if (ia(j) > i) exit
+              if (ja(j) == i) then 
+                y(i) = (x(i) - acc)/val(j)
                 j = j + 1
                 exit
               end if
-              acc = acc + a%val(j)*y(a%ja(j))
+              acc = acc + val(j)*y(ja(j))
               j   = j + 1
             end do
           end do
         end if
 
-      else if (a%is_upper()) then 
-        if (a%is_unit()) then 
+      else if (.not.lower) then 
+        if (unit) then 
           j = nnz
-          do i=a%get_nrows(), 1, -1 
+          do i=nr, 1, -1 
             acc = szero 
             do 
               if (j < 1) exit
-              if (a%ia(j) < i) exit
-              acc = acc + a%val(j)*y(a%ja(j))
+              if (ia(j) < i) exit
+              acc = acc + val(j)*y(ja(j))
               j   = j - 1
             end do
             y(i) = x(i) - acc
           end do
 
-        else if (.not.a%is_unit()) then 
+        else if (.not.unit) then 
 
           j = nnz
-          do i=a%get_nrows(), 1, -1 
+          do i=nr, 1, -1 
             acc = szero 
             do 
               if (j < 1) exit
-              if (a%ia(j) < i) exit
-              if (a%ja(j) == i) then 
-                y(i) = (x(i) - acc)/a%val(j)
+              if (ia(j) < i) exit
+              if (ja(j) == i) then 
+                y(i) = (x(i) - acc)/val(j)
                 j = j - 1
                 exit
               end if
-              acc = acc + a%val(j)*y(a%ja(j))
+              acc = acc + val(j)*y(ja(j))
               j   = j - 1
             end do
           end do
@@ -458,66 +467,66 @@ contains
 
     else if (tra) then 
 
-      do i=1, a%get_nrows()
+      do i=1, nr
         y(i) = x(i)
       end do
 
-      if (a%is_lower()) then 
-        if (a%is_unit()) then 
+      if (lower) then 
+        if (unit) then 
           j = nnz
-          do i=a%get_nrows(), 1, -1
+          do i=nr, 1, -1
             acc = y(i) 
             do
               if (j < 1) exit
-              if (a%ia(j) < i) exit
-              jc    = a%ja(j)
-              y(jc) = y(jc) - a%val(j)*acc 
+              if (ia(j) < i) exit
+              jc    = ja(j)
+              y(jc) = y(jc) - val(j)*acc 
               j     = j - 1 
             end do
           end do
-        else if (.not.a%is_unit()) then 
+        else if (.not.unit) then 
           j = nnz
-          do i=a%get_nrows(), 1, -1
-            if (a%ja(j) == i) then 
-              y(i) = y(i) /a%val(j)
+          do i=nr, 1, -1
+            if (ja(j) == i) then 
+              y(i) = y(i) /val(j)
               j    = j - 1
             end if
             acc  = y(i) 
             do 
               if (j < 1) exit
-              if (a%ia(j) < i) exit
-              jc    = a%ja(j)
-              y(jc) = y(jc) - a%val(j)*acc 
+              if (ia(j) < i) exit
+              jc    = ja(j)
+              y(jc) = y(jc) - val(j)*acc 
               j     = j - 1
             end do
           end do
 
-        else if (a%is_upper()) then 
-          if (a%is_unit()) then 
+        else if (.not.lower) then 
+          if (unit) then 
             j = 1
-            do i=1, a%get_nrows()
+            do i=1, nr
               acc = y(i)
               do 
                 if (j > nnz) exit
-                if (a%ia(j) > i) exit
-                jc    = a%ja(j)
-                y(jc) = y(jc) - a%val(j)*acc 
+                if (ia(j) > i) exit
+                jc    = ja(j)
+                y(jc) = y(jc) - val(j)*acc 
                 j   = j + 1
               end do
             end do
-          else if (.not.a%is_unit()) then 
+          else if (.not.unit) then 
             j = 1
-            do i=1, a%get_nrows()
-              if (a%ja(j) == i) then 
-                y(i) = y(i) /a%val(j)
+            do i=1, nr
+              if (ja(j) == i) then 
+                y(i) = y(i) /val(j)
                 j    = j + 1
               end if
               acc = y(i)
               do 
                 if (j > nnz) exit
-                if (a%ia(j) > i) exit
-                jc    = a%ja(j)
-                y(jc) = y(jc) - a%val(j)*acc 
+                if (ia(j) > i) exit
+                jc    = ja(j)
+                y(jc) = y(jc) - val(j)*acc 
                 j   = j + 1
               end do
             end do
