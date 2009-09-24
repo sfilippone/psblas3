@@ -622,12 +622,24 @@ subroutine s_csr_cssv_impl(alpha,a,x,beta,y,info,trans)
   tra = ((trans_=='T').or.(trans_=='t'))
   m = a%get_nrows()
 
+  
   if (.not. (a%is_triangle())) then 
     info = 1121
     call psb_errpush(info,name)
     goto 9999
   end if
 
+  if (size(x)<m) then 
+    info = 36
+    call psb_errpush(info,name,i_err=(/3,m,0,0,0/))
+    goto 9999
+  end if
+
+  if (size(y)<m) then 
+    info = 36
+    call psb_errpush(info,name,i_err=(/5,m,0,0,0/))
+    goto 9999
+  end if
   
   if (alpha == szero) then
     if (beta == szero) then
@@ -807,7 +819,7 @@ subroutine s_csr_cssm_impl(alpha,a,x,beta,y,info,trans)
   real(psb_spk_), allocatable :: tmp(:,:)
   logical   :: tra
   Integer :: err_act
-  character(len=20)  :: name='s_base_csmm'
+  character(len=20)  :: name='s_base_cssm'
   logical, parameter :: debug=.false.
 
   info = 0

@@ -30,8 +30,8 @@
 !!$ 
 !!$  
 module psi_serial_mod
-  
-  
+
+
   interface psi_gth
     module procedure &
          & psi_igthv,  psi_sgthv,  psi_cgthv, psi_dgthv,  psi_zgthv,&
@@ -45,6 +45,80 @@ module psi_serial_mod
          & psi_csctmv, psi_csctv,&
          & psi_dsctmv, psi_dsctv,&
          & psi_zsctmv, psi_zsctv
+  end interface
+
+  interface psb_geaxpby
+    module procedure psi_saxpbyv, psi_saxpby, &
+         & psi_daxpbyv, psi_daxpby, &
+         & psi_caxpbyv, psi_caxpby, &
+         & psi_zaxpbyv, psi_zaxpby
+  end interface
+
+
+  interface psb_gelp
+    ! 2-D version
+    subroutine psb_sgelp(trans,iperm,x,info)
+      use psb_const_mod
+      real(psb_spk_), intent(inout)      ::  x(:,:)
+      integer, intent(in)                  ::  iperm(:)
+      integer, intent(out)                 ::  info
+      character, intent(in)                :: trans
+    end subroutine psb_sgelp
+    ! 1-D version
+    subroutine psb_sgelpv(trans,iperm,x,info)
+      use psb_const_mod
+      real(psb_spk_), intent(inout)    ::  x(:)
+      integer, intent(in)                  ::  iperm(:)
+      integer, intent(out)                 ::  info
+      character, intent(in)              :: trans
+    end subroutine psb_sgelpv
+    subroutine psb_dgelp(trans,iperm,x,info)
+      use psb_const_mod
+      real(psb_dpk_), intent(inout)      ::  x(:,:)
+      integer, intent(in)                  ::  iperm(:)
+      integer, intent(out)                 ::  info
+      character, intent(in)                :: trans
+    end subroutine psb_dgelp
+    ! 1-D version
+    subroutine psb_dgelpv(trans,iperm,x,info)
+      use psb_const_mod
+      real(psb_dpk_), intent(inout)    ::  x(:)
+      integer, intent(in)                  ::  iperm(:)
+      integer, intent(out)                 ::  info
+      character, intent(in)              :: trans
+    end subroutine psb_dgelpv
+    ! 2-D version
+    subroutine psb_cgelp(trans,iperm,x,info)
+      use psb_const_mod
+      complex(psb_spk_), intent(inout)      ::  x(:,:)
+      integer, intent(in)                  ::  iperm(:)
+      integer, intent(out)                 ::  info
+      character, intent(in)                :: trans
+    end subroutine psb_cgelp
+    ! 1-D version
+    subroutine psb_cgelpv(trans,iperm,x,info)
+      use psb_const_mod
+      complex(psb_spk_), intent(inout)    ::  x(:)
+      integer, intent(in)                  ::  iperm(:)
+      integer, intent(out)                 ::  info
+      character, intent(in)              :: trans
+    end subroutine psb_cgelpv
+    ! 2-D version
+    subroutine psb_zgelp(trans,iperm,x,info)
+      use psb_const_mod
+      complex(psb_dpk_), intent(inout)      ::  x(:,:)
+      integer, intent(in)                  ::  iperm(:)
+      integer, intent(out)                 ::  info
+      character, intent(in)                :: trans
+    end subroutine psb_zgelp
+    ! 1-D version
+    subroutine psb_zgelpv(trans,iperm,x,info)
+      use psb_const_mod
+      complex(psb_dpk_), intent(inout)    ::  x(:)
+      integer, intent(in)                  ::  iperm(:)
+      integer, intent(out)                 ::  info
+      character, intent(in)              :: trans
+    end subroutine psb_zgelpv
   end interface
 
 
@@ -87,7 +161,7 @@ contains
       else
         y(1:n) = beta*y(1:n) 
       end if
-        
+
       if (alpha == izero) then 
         ! do nothing
       else if (alpha == ione) then 
@@ -143,7 +217,7 @@ contains
       else
         y(1:n) = beta*y(1:n) 
       end if
-        
+
       if (alpha == szero) then 
         ! do nothing
       else if (alpha == sone) then 
@@ -199,7 +273,7 @@ contains
       else
         y(1:n) = beta*y(1:n) 
       end if
-        
+
       if (alpha == dzero) then 
         ! do nothing
       else if (alpha == done) then 
@@ -255,7 +329,7 @@ contains
       else
         y(1:n) = beta*y(1:n) 
       end if
-        
+
       if (alpha == czero) then 
         ! do nothing
       else if (alpha == cone) then 
@@ -311,7 +385,7 @@ contains
       else
         y(1:n) = beta*y(1:n) 
       end if
-        
+
       if (alpha == zzero) then 
         ! do nothing
       else if (alpha == zone) then 
@@ -854,6 +928,413 @@ contains
       end do
     end if
   end subroutine psi_zsctv
-  
+
+
+  subroutine psi_saxpbyv(m,alpha, x, beta, y, info)
+    use psb_const_mod
+    use psb_error_mod
+    implicit none 
+    
+    integer, intent(in)               :: m
+    real(psb_spk_), intent (in)       ::  x(:)
+    real(psb_spk_), intent (inout)    ::  y(:)
+    real(psb_spk_), intent (in)       :: alpha, beta
+    integer, intent(out)                :: info
+    integer                  :: err_act
+    character(len=20)        :: name, ch_err
+    
+    name='psb_geaxpby'
+    if(psb_get_errstatus() /= 0) return 
+    info=0
+    call psb_erractionsave(err_act)
+    
+    if (m < 0) then
+      info = 10
+      call psb_errpush(info,name,i_err=(/1,m,0,0,0/))
+      goto 9999 
+    end if
+    if (size(x) < m) then 
+      info = 36 
+      call psb_errpush(info,name,i_err=(/3,m,0,0,0/))
+      goto 9999 
+    end if
+    if (size(y) < m) then 
+      info = 36 
+      call psb_errpush(info,name,i_err=(/5,m,0,0,0/))
+      goto 9999 
+    end if
+    
+    if (m>0) call saxpby(m,1,alpha,x,size(x,1),beta,y,size(y,1),info)
+    
+    call psb_erractionrestore(err_act)
+    return
+
+9999 continue
+    call psb_erractionrestore(err_act)
+    
+    if (err_act == psb_act_abort_) then
+      call psb_error()
+      return
+    end if
+    return
+    
+  end subroutine psi_saxpbyv
+  subroutine psi_saxpby(m,n,alpha, x, beta, y, info)
+    use psb_const_mod
+    use psb_error_mod
+    implicit none 
+    integer, intent(in)               :: m, n
+    real(psb_spk_), intent (in)       ::  x(:,:)
+    real(psb_spk_), intent (inout)    ::  y(:,:)
+    real(psb_spk_), intent (in)       ::  alpha, beta
+    integer, intent(out)                :: info
+    integer                  :: err_act
+    character(len=20)        :: name, ch_err
+    
+    name='psb_geaxpby'
+    if(psb_get_errstatus() /= 0) return 
+    info=0
+    call psb_erractionsave(err_act)
+    
+    if (m < 0) then
+      info = 10
+      call psb_errpush(info,name,i_err=(/1,m,0,0,0/))
+      goto 9999 
+    end if
+    if (n < 0) then
+      info = 10
+      call psb_errpush(info,name,i_err=(/2,n,0,0,0/))
+      goto 9999 
+    end if
+    if (size(x,1) < m) then 
+      info = 36 
+      call psb_errpush(info,name,i_err=(/4,m,0,0,0/))
+      goto 9999 
+    end if
+    if (size(y,1) < m) then 
+      info = 36 
+      call psb_errpush(info,name,i_err=(/6,m,0,0,0/))
+      goto 9999 
+    end if
+
+    if ((m>0).and.(n>0)) call saxpby(m,n,alpha,x,size(x,1),beta,y,size(y,1),info)
+    
+    call psb_erractionrestore(err_act)
+    return
+
+9999 continue
+    call psb_erractionrestore(err_act)
+    
+    if (err_act == psb_act_abort_) then
+      call psb_error()
+      return
+    end if
+    return
+    
+  end subroutine psi_saxpby
+
+  subroutine psi_daxpbyv(m,alpha, x, beta, y, info)
+    use psb_const_mod
+    use psb_error_mod
+    implicit none 
+    integer, intent(in)               :: m
+    real(psb_dpk_), intent (in)       ::  x(:)
+    real(psb_dpk_), intent (inout)    ::  y(:)
+    real(psb_dpk_), intent (in)       :: alpha, beta
+    integer, intent(out)                :: info
+    integer                  :: err_act
+    character(len=20)        :: name, ch_err
+    
+    name='psb_geaxpby'
+    if(psb_get_errstatus() /= 0) return 
+    info=0
+    call psb_erractionsave(err_act)
+    
+    if (m < 0) then
+      info = 10
+      call psb_errpush(info,name,i_err=(/1,m,0,0,0/))
+      goto 9999 
+    end if
+    if (size(x) < m) then 
+      info = 36 
+      call psb_errpush(info,name,i_err=(/3,m,0,0,0/))
+      goto 9999 
+    end if
+    if (size(y) < m) then 
+      info = 36 
+      call psb_errpush(info,name,i_err=(/5,m,0,0,0/))
+      goto 9999 
+    end if
+
+    if (m>0) call daxpby(m,1,alpha,x,size(x,1),beta,y,size(y,1),info)
+    
+    call psb_erractionrestore(err_act)
+    return
+
+9999 continue
+    call psb_erractionrestore(err_act)
+    
+    if (err_act == psb_act_abort_) then
+      call psb_error()
+      return
+    end if
+    return
+    
+  end subroutine psi_daxpbyv
+  subroutine psi_daxpby(m,n,alpha, x, beta, y, info)
+    use psb_const_mod
+    use psb_error_mod
+    implicit none 
+    integer, intent(in)               :: m, n
+    real(psb_dpk_), intent (in)       ::  x(:,:)
+    real(psb_dpk_), intent (inout)    ::  y(:,:)
+    real(psb_dpk_), intent (in)       ::  alpha, beta
+    integer, intent(out)                :: info
+    integer                  :: err_act
+    character(len=20)        :: name, ch_err
+    
+    name='psb_geaxpby'
+    if(psb_get_errstatus() /= 0) return 
+    info=0
+    call psb_erractionsave(err_act)
+    
+    if (m < 0) then
+      info = 10
+      call psb_errpush(info,name,i_err=(/1,m,0,0,0/))
+      goto 9999 
+    end if
+    if (n < 0) then
+      info = 10
+      call psb_errpush(info,name,i_err=(/2,n,0,0,0/))
+      goto 9999 
+    end if
+    if (size(x,1) < m) then 
+      info = 36 
+      call psb_errpush(info,name,i_err=(/4,m,0,0,0/))
+      goto 9999 
+    end if
+    if (size(y,1) < m) then 
+      info = 36 
+      call psb_errpush(info,name,i_err=(/6,m,0,0,0/))
+      goto 9999 
+    end if
+
+    if ((m>0).and.(n>0)) call daxpby(m,n,alpha,x,size(x,1),beta,y,size(y,1),info)
+    
+    call psb_erractionrestore(err_act)
+    return
+
+9999 continue
+    call psb_erractionrestore(err_act)
+    
+    if (err_act == psb_act_abort_) then
+      call psb_error()
+      return
+    end if
+    return
+  end subroutine psi_daxpby
+
+  subroutine psi_caxpbyv(m,alpha, x, beta, y, info)
+    use psb_const_mod
+    use psb_error_mod
+    implicit none 
+    integer, intent(in)               :: m
+    complex(psb_spk_), intent (in)       ::  x(:)
+    complex(psb_spk_), intent (inout)    ::  y(:)
+    complex(psb_spk_), intent (in)       :: alpha, beta
+    integer, intent(out)                :: info
+    integer                  :: err_act
+    character(len=20)        :: name, ch_err
+    
+    name='psb_geaxpby'
+    if(psb_get_errstatus() /= 0) return 
+    info=0
+    call psb_erractionsave(err_act)
+    
+    if (m < 0) then
+      info = 10
+      call psb_errpush(info,name,i_err=(/1,m,0,0,0/))
+      goto 9999 
+    end if
+    if (size(x) < m) then 
+      info = 36 
+      call psb_errpush(info,name,i_err=(/3,m,0,0,0/))
+      goto 9999 
+    end if
+    if (size(y) < m) then 
+      info = 36 
+      call psb_errpush(info,name,i_err=(/5,m,0,0,0/))
+      goto 9999 
+    end if
+
+    if (m>0) call caxpby(m,1,alpha,x,size(x,1),beta,y,size(y,1),info)
+    
+    call psb_erractionrestore(err_act)
+    return
+
+9999 continue
+    call psb_erractionrestore(err_act)
+    
+    if (err_act == psb_act_abort_) then
+      call psb_error()
+      return
+    end if
+    return
+    
+  end subroutine psi_caxpbyv
+  subroutine psi_caxpby(m,n,alpha, x, beta, y, info)
+    use psb_const_mod
+    use psb_error_mod
+    implicit none 
+    integer, intent(in)               :: m, n
+    complex(psb_spk_), intent (in)       ::  x(:,:)
+    complex(psb_spk_), intent (inout)    ::  y(:,:)
+    complex(psb_spk_), intent (in)       ::  alpha, beta
+    integer, intent(out)                :: info
+    integer                  :: err_act
+    character(len=20)        :: name, ch_err
+    
+    name='psb_geaxpby'
+    if(psb_get_errstatus() /= 0) return 
+    info=0
+    call psb_erractionsave(err_act)
+    
+    if (m < 0) then
+      info = 10
+      call psb_errpush(info,name,i_err=(/1,m,0,0,0/))
+      goto 9999 
+    end if
+    if (n < 0) then
+      info = 10
+      call psb_errpush(info,name,i_err=(/2,n,0,0,0/))
+      goto 9999 
+    end if
+    if (size(x,1) < m) then 
+      info = 36 
+      call psb_errpush(info,name,i_err=(/4,m,0,0,0/))
+      goto 9999 
+    end if
+    if (size(y,1) < m) then 
+      info = 36 
+      call psb_errpush(info,name,i_err=(/6,m,0,0,0/))
+      goto 9999 
+    end if
+
+    if ((m>0).and.(n>0)) call caxpby(m,n,alpha,x,size(x,1),beta,y,size(y,1),info)
+    
+    call psb_erractionrestore(err_act)
+    return
+
+9999 continue
+    call psb_erractionrestore(err_act)
+    
+    if (err_act == psb_act_abort_) then
+      call psb_error()
+      return
+    end if
+    return
+  end subroutine psi_caxpby
+
+  subroutine psi_zaxpbyv(m,alpha, x, beta, y, info)
+    use psb_const_mod
+    use psb_error_mod
+    implicit none 
+    integer, intent(in)               :: m
+    complex(psb_dpk_), intent (in)       ::  x(:)
+    complex(psb_dpk_), intent (inout)    ::  y(:)
+    complex(psb_dpk_), intent (in)       :: alpha, beta
+    integer, intent(out)                :: info
+    integer                  :: err_act
+    character(len=20)        :: name, ch_err
+    
+    name='psb_geaxpby'
+    if(psb_get_errstatus() /= 0) return 
+    info=0
+    call psb_erractionsave(err_act)
+    
+    if (m < 0) then
+      info = 10
+      call psb_errpush(info,name,i_err=(/1,m,0,0,0/))
+      goto 9999 
+    end if
+    if (size(x) < m) then 
+      info = 36 
+      call psb_errpush(info,name,i_err=(/3,m,0,0,0/))
+      goto 9999 
+    end if
+    if (size(y) < m) then 
+      info = 36 
+      call psb_errpush(info,name,i_err=(/5,m,0,0,0/))
+      goto 9999 
+    end if
+
+    if (m>0) call zaxpby(m,1,alpha,x,size(x,1),beta,y,size(y,1),info)
+    
+    call psb_erractionrestore(err_act)
+    return
+
+9999 continue
+    call psb_erractionrestore(err_act)
+    
+    if (err_act == psb_act_abort_) then
+      call psb_error()
+      return
+    end if
+    return
+    
+  end subroutine psi_zaxpbyv
+  subroutine psi_zaxpby(m,n,alpha, x, beta, y, info)
+    use psb_const_mod
+    use psb_error_mod
+    implicit none 
+    integer, intent(in)               :: m, n
+    complex(psb_dpk_), intent (in)       ::  x(:,:)
+    complex(psb_dpk_), intent (inout)    ::  y(:,:)
+    complex(psb_dpk_), intent (in)       ::  alpha, beta
+    integer, intent(out)                :: info
+    integer                  :: err_act
+    character(len=20)        :: name, ch_err
+    
+    name='psb_geaxpby'
+    if(psb_get_errstatus() /= 0) return 
+    info=0
+    call psb_erractionsave(err_act)
+    
+    if (m < 0) then
+      info = 10
+      call psb_errpush(info,name,i_err=(/1,m,0,0,0/))
+      goto 9999 
+    end if
+    if (n < 0) then
+      info = 10
+      call psb_errpush(info,name,i_err=(/2,n,0,0,0/))
+      goto 9999 
+    end if
+    if (size(x,1) < m) then 
+      info = 36 
+      call psb_errpush(info,name,i_err=(/4,m,0,0,0/))
+      goto 9999 
+    end if
+    if (size(y,1) < m) then 
+      info = 36 
+      call psb_errpush(info,name,i_err=(/6,m,0,0,0/))
+      goto 9999 
+    end if
+
+    if ((m>0).and.(n>0)) call zaxpby(m,n,alpha,x,size(x,1),beta,y,size(y,1),info)
+    
+    call psb_erractionrestore(err_act)
+    return
+
+9999 continue
+    call psb_erractionrestore(err_act)
+    
+    if (err_act == psb_act_abort_) then
+      call psb_error()
+      return
+    end if
+    return
+  end subroutine psi_zaxpby
+
 
 end module psi_serial_mod

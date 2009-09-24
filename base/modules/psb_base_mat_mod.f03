@@ -1,6 +1,7 @@
 module psb_base_mat_mod
   
   use psb_const_mod 
+  use psi_serial_mod
 
   type  :: psb_base_sparse_mat
     integer, private     :: m, n

@@ -62,7 +62,7 @@
 !
 ! Arguments:
 !
-!    a      -  type(psb_sspmat_type)      Input: sparse matrix containing A.
+!    a      -  type(psb_s_sparse_mat)      Input: sparse matrix containing A.
 !    prec   -  type(psb_sprec_type)       Input: preconditioner
 !    b      -  real,dimension(:)          Input: vector containing the
 !                                         right hand side B
@@ -100,7 +100,7 @@ Subroutine psb_scgstab(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,istop)
   use psb_krylov_mod, psb_protect_name => psb_scgstab
   Implicit None
 !!$  parameters 
-  Type(psb_sspmat_type), Intent(in)  :: a
+  Type(psb_s_sparse_mat), Intent(in)  :: a
   Type(psb_sprec_type), Intent(in)   :: prec 
   Type(psb_desc_type), Intent(in)    :: desc_a
   Real(psb_spk_), Intent(in)       :: b(:)
@@ -272,7 +272,7 @@ Subroutine psb_scgstab(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,istop)
       rho_old = rho    
       rho     = psb_gedot(q,r,desc_a,info)
 
-      if (rho==dzero) then
+      if (rho==szero) then
          if (debug_level >= psb_debug_ext_) &
               & write(debug_unit,*) me,' ',trim(name),&
               & ' Iteration breakdown R',rho
@@ -302,7 +302,7 @@ Subroutine psb_scgstab(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,istop)
 #endif
 
       sigma = psb_gedot(q,v,desc_a,info)
-      if (sigma==dzero) then
+      if (sigma==szero) then
          if (debug_level >= psb_debug_ext_) &
               & write(debug_unit,*) me,' ',trim(name),&
               & ' Iteration breakdown S1', sigma
@@ -339,7 +339,7 @@ Subroutine psb_scgstab(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,istop)
       end if
       
       sigma = psb_gedot(t,t,desc_a,info)
-      if (sigma==dzero) then
+      if (sigma==szero) then
          if (debug_level >= psb_debug_ext_) &
               & write(debug_unit,*) me,' ',trim(name),&
               & ' Iteration breakdown S2', sigma

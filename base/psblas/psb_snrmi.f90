@@ -43,13 +43,13 @@
 !
 function psb_snrmi(a,desc_a,info)  
   use psb_descriptor_type
-  use psb_serial_mod
   use psb_check_mod
   use psb_error_mod
   use psb_penv_mod
+  use psb_mat_mod
   implicit none
 
-  type(psb_sspmat_type), intent(in)   :: a
+  type(psb_s_sparse_mat), intent(in)   :: a
   integer, intent(out)                :: info
   type(psb_desc_type), intent(in)     :: desc_a
   real(psb_spk_)                    :: psb_snrmi
@@ -94,8 +94,7 @@ function psb_snrmi(a,desc_a,info)
   end if
 
   if ((m /= 0).and.(n /= 0)) then
-    nrmi = psb_csnmi(a,info)
-
+    nrmi = psb_csnmi(a)
     if(info /= 0) then
       info=4010
       ch_err='psb_csnmi'

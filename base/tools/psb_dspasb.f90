@@ -55,7 +55,7 @@ subroutine psb_dspasb(a,desc_a, info, afmt, upd, dupl, mold)
   use psb_error_mod
   use psb_string_mod
   use psb_penv_mod
-  use psb_d_mat_mod
+  use psb_mat_mod
   implicit none
 
 

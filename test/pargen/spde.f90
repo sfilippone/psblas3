@@ -73,11 +73,11 @@ program ppde
   integer   :: idim
 
   ! miscellaneous 
-  real(psb_spk_), parameter :: one = 1.d0
-  real(psb_spk_) :: t1, t2, tprec 
+  real(psb_spk_), parameter :: one = 1.0
+  real(psb_dpk_) :: t1, t2, tprec 
 
   ! sparse matrix and preconditioner
-  type(psb_sspmat_type) :: a
+  type(psb_s_sparse_mat) :: a
   type(psb_sprec_type)  :: prec
   ! descriptor
   type(psb_desc_type)   :: desc_a
@@ -92,7 +92,7 @@ program ppde
   real(psb_spk_)   :: err, eps
 
   ! other variables
-  integer            :: info
+  integer            :: info, i
   character(len=20)  :: name,ch_err
 
   info=0
@@ -109,6 +109,7 @@ program ppde
   if(psb_get_errstatus() /= 0) goto 9999
   name='pde90'
   call psb_set_errverbosity(2)
+  call enablecore()
   !
   !  get parameters
   !
@@ -128,7 +129,6 @@ program ppde
     call psb_errpush(info,name,a_err=ch_err)
     goto 9999
   end if
-
   if (iam == psb_root_) write(*,'("Overall matrix creation time : ",es12.5)')t2
   if (iam == psb_root_) write(*,'(" ")')
   !
@@ -153,7 +153,6 @@ program ppde
 
   if (iam == psb_root_) write(*,'("Preconditioner time : ",es12.5)')tprec
   if (iam == psb_root_) write(*,'(" ")')
-
   !
   ! iterative method parameters 
   !
@@ -181,6 +180,7 @@ program ppde
   call psb_sum(ictxt,amatsize)
   call psb_sum(ictxt,descsize)
   call psb_sum(ictxt,precsize)
+
   if (iam == psb_root_) then
     write(*,'(" ")')
     write(*,'("Time to solve matrix          : ",es12.5)')t2
@@ -341,6 +341,7 @@ contains
     ! Note that if a1=a2=a3=a4=0., the PDE is the well-known Laplace equation.
     !
     use psb_base_mod
+    use psb_mat_mod
     implicit none
     integer                        :: idim
     integer, parameter             :: nb=20
@@ -348,7 +349,9 @@ contains
     type(psb_desc_type)            :: desc_a
     integer                        :: ictxt, info
     character                      :: afmt*5
-    type(psb_sspmat_type)    :: a
+    type(psb_s_sparse_mat)         :: a
+    type(psb_s_coo_sparse_mat)     :: acoo
+    type(psb_s_csr_sparse_mat)     :: acsr
     real(psb_spk_)           :: zt(nb),glob_x,glob_y,glob_z
     integer                  :: m,n,nnz,glob_row,nlr,i,ii,ib,k
     integer                  :: x,y,z,ia,indx_owner
@@ -365,7 +368,7 @@ contains
     external           :: a1, a2, a3, a4, b1, b2, b3
     integer            :: err_act
 
-    character(len=20)  :: name, ch_err
+    character(len=20)  :: name, ch_err,tmpfmt
 
     info = 0
     name = 'create_matrix'
@@ -585,7 +588,7 @@ contains
     t1 = psb_wtime()
     call psb_cdasb(desc_a,info)
     if (info == 0) &
-         & call psb_spasb(a,desc_a,info,dupl=psb_dupl_err_,afmt=afmt)
+         & call psb_spasb(a,desc_a,info,dupl=psb_dupl_err_,mold=acsr)
     call psb_barrier(ictxt)
     if(info /= 0) then
       info=4010
@@ -610,8 +613,9 @@ contains
     call psb_amx(ictxt,tasb)
     call psb_amx(ictxt,ttot)
     if(iam == psb_root_) then
+      tmpfmt = a%get_fmt()
       write(*,'("The matrix has been generated and assembled in ",a3," format.")')&
-           &   a%fida(1:3)
+           &   tmpfmt
       write(*,'("-allocation  time : ",es12.5)') talc
       write(*,'("-coeff. gen. time : ",es12.5)') tgen
       write(*,'("-assembly    time : ",es12.5)') tasb

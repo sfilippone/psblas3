@@ -193,11 +193,11 @@ function psb_s_linmap(map_kind,desc_X, desc_Y, map_X2Y, map_Y2X,iaggr,naggr) res
   use psb_base_mod, psb_protect_name => psb_s_linmap
 
   implicit none 
-  type(psb_slinmap_type)         :: this
-  type(psb_desc_type), target       :: desc_X, desc_Y
-  type(psb_sspmat_type), intent(in) :: map_X2Y, map_Y2X
-  integer, intent(in)               :: map_kind
-  integer, intent(in), optional     :: iaggr(:), naggr(:)
+  type(psb_slinmap_type)             :: this
+  type(psb_desc_type), target        :: desc_X, desc_Y
+  type(psb_s_sparse_mat), intent(in) :: map_X2Y, map_Y2X
+  integer, intent(in)                :: map_kind
+  integer, intent(in), optional      :: iaggr(:), naggr(:)
   !
   integer                      :: info
   character(len=20), parameter :: name='psb_linmap'
@@ -254,8 +254,8 @@ function psb_s_linmap(map_kind,desc_X, desc_Y, map_X2Y, map_Y2X,iaggr,naggr) res
   end select
   
 
-  if (info == 0) call psb_sp_clone(map_X2Y,this%map_X2Y,info)
-  if (info == 0) call psb_sp_clone(map_Y2X,this%map_Y2X,info)
+  if (info == 0) call psb_clone(map_X2Y,this%map_X2Y,info)
+  if (info == 0) call psb_clone(map_Y2X,this%map_Y2X,info)
   if (info == 0) call psb_realloc(psb_itd_data_size_,this%itd_data,info) 
   if (info == 0) then
     call psb_set_map_kind(map_kind, this)

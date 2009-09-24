@@ -3,11 +3,12 @@ include ../../../Make.inc
 #
 # The object files
 #
-FOBJS = scoonrmi.o scoomm.o scoomv.o scoosm.o scoosv.o scoorws.o\
-	ccoonrmi.o ccoomm.o ccoomv.o ccoosm.o ccoosv.o ccoorws.o\
+FOBJS = ccoonrmi.o ccoomm.o ccoomv.o ccoosm.o ccoosv.o ccoorws.o\
 	zcoomm.o zcoomv.o zcoonrmi.o zcoorws.o zcoosm.o zcoosv.o
 
 #	dcoonrmi.o dcoomm.o dcoomv.o dcoosm.o dcoosv.o dcoorws.o\
+#scoonrmi.o scoomm.o scoomv.o scoosm.o scoosv.o scoorws.o\
+
 
 OBJS=$(FOBJS)
 

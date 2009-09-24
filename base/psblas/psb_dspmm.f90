@@ -72,7 +72,7 @@ subroutine  psb_dspmm(alpha,a,x,beta,y,desc_a,info,&
   use psb_error_mod
   use psb_string_mod
   use psb_penv_mod
-  use psb_d_mat_mod
+  use psb_mat_mod
   implicit none
 
   real(psb_dpk_), intent(in)             :: alpha, beta
@@ -432,7 +432,7 @@ subroutine  psb_dspmv(alpha,a,x,beta,y,desc_a,info,&
   use psb_error_mod
   use psb_string_mod
   use psb_penv_mod
-  use psb_d_mat_mod
+  use psb_mat_mod
   implicit none
 
   real(psb_dpk_), intent(in)             :: alpha, beta

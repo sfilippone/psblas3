@@ -11,12 +11,6 @@ FOBJS = psb_cest.o    \
 	psb_getifield.o psb_setifield.o psb_update_mod.o psb_getrow_mod.o\
 	 psb_zgelp.o\
 	  psb_zspshift.o psb_zspsetbld.o\
-	psb_scsprt.o psb_sspcnv.o psb_scoins.o psb_scsmm.o psb_scsmv.o \
-	psb_scssm.o psb_scssv.o psb_sneigh.o psb_sspgtblk.o psb_sspgetrow.o \
-	psb_sfixcoo.o psb_sipcsr2coo.o psb_sipcoo2csr.o  psb_sipcoo2csc.o \
-	psb_sgelp.o psb_sspgtdiag.o psb_scsnmi.o  psb_stransp.o \
-	psb_sspclip.o psb_srwextd.o psb_sspscal.o\
-	psb_snumbmm.o psb_ssymbmm.o\
 	psb_ccsprt.o psb_cspcnv.o psb_ccoins.o psb_ccsnmi.o\
 	psb_cfixcoo.o psb_cipcsr2coo.o psb_cipcoo2csr.o  psb_cipcoo2csc.o \
 	psb_cgelp.o psb_cspgtdiag.o psb_cspgtblk.o psb_cspgetrow.o\

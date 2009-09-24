@@ -47,7 +47,7 @@ subroutine psb_dspalloc(a, desc_a, info, nnz)
   use psb_const_mod
   use psb_error_mod
   use psb_penv_mod
-  use psb_d_mat_mod
+  use psb_mat_mod
   implicit none
 
   !....parameters...

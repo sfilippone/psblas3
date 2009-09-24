@@ -46,7 +46,6 @@ subroutine psb_dbjac_bld(a,desc_a,p,upd,info)
   integer  ::    i, m
   integer  ::    int_err(5)
   character ::        trans, unitd
-!!$  type(psb_dspmat_type) :: atmp
   type(psb_d_csr_sparse_mat), allocatable  :: lf, uf
   real(psb_dpk_) :: t1,t2,t3,t4,t5,t6, t7, t8
   integer   nztota,  err_act, n_row, nrow_a,n_col, nhalo
@@ -72,7 +71,6 @@ subroutine psb_dbjac_bld(a,desc_a,p,upd,info)
   endif
   trans = 'N'
   unitd = 'U'
-!!$  call psb_nullify_sp(atmp)
 
   call psb_cdcpy(desc_a,p%desc_data,info)
   if(info /= 0) then
@@ -91,11 +89,6 @@ subroutine psb_dbjac_bld(a,desc_a,p,upd,info)
       if (size(p%av) < psb_bp_ilu_avsz) then 
         do i=1,size(p%av) 
           call p%av(i)%free()
-!!$          if (info /= 0) then 
-!!$            ! Actually, we don't care here about this.
-!!$            ! Just let it go.
-!!$            ! return
-!!$          end if
         enddo
         deallocate(p%av,stat=info)
       endif
@@ -119,9 +112,6 @@ subroutine psb_dbjac_bld(a,desc_a,p,upd,info)
     if (info == 0) call lf%allocate(n_row,n_row,nztota)
     if (info == 0) call uf%allocate(n_row,n_row,nztota)
     
-
-!!$    call p%av(psb_l_pr_)%csall(n_row,n_row,info,nztota)
-!!$    if (info == 0) call p%av(psb_u_pr_)%csall(n_row,n_row,info,nztota)
     if(info/=0) then
       info=4010
       ch_err='psb_sp_all'
@@ -144,15 +134,11 @@ subroutine psb_dbjac_bld(a,desc_a,p,upd,info)
     endif
     t3 = psb_wtime()
     ! This is where we have no renumbering, thus no need 
-    ! for ATMP
-!!$    call p%av(psb_l_pr_)%cscnv(info,type='CSR')
-!!$    call p%av(psb_u_pr_)%cscnv(info,type='CSR')
-    
     call psb_ilu_fct(a,lf,uf,p%d,info)
 
     if(info==0) then
-      call move_alloc(lf,p%av(psb_l_pr_)%a)
-      call move_alloc(uf,p%av(psb_u_pr_)%a)
+      call p%av(psb_l_pr_)%mv_from(lf)
+      call p%av(psb_u_pr_)%mv_from(uf)
       call p%av(psb_l_pr_)%set_asb()
       call p%av(psb_u_pr_)%set_asb()
       call p%av(psb_l_pr_)%trim()
@@ -163,15 +149,6 @@ subroutine psb_dbjac_bld(a,desc_a,p,upd,info)
       call psb_errpush(info,name,a_err=ch_err)
       goto 9999
     end if
-!!$
-!!$    if (psb_sp_getifld(psb_upd_,p%av(psb_u_pr_),info) /= psb_upd_perm_) then
-!!$      call psb_sp_trim(p%av(psb_u_pr_),info)
-!!$    endif
-!!$
-!!$    if (psb_sp_getifld(psb_upd_,p%av(psb_l_pr_),info) /= psb_upd_perm_) then
-!!$      call psb_sp_trim(p%av(psb_l_pr_),info)
-!!$    endif
-
 
   case(psb_f_none_) 
     info=4010

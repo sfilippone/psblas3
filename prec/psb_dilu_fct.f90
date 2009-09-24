@@ -49,7 +49,7 @@ subroutine psb_dilu_fct(a,l,u,d,info,blck)
   integer   ::  l1,l2,m,err_act  
   type(psb_d_sparse_mat), pointer  :: blck_
   character(len=20)   :: name, ch_err
-  name='psb_dcsrlu'
+  name='psb_ilu_fct'
   info = 0
   call psb_erractionsave(err_act)
   !     .. Executable Statements ..
@@ -115,7 +115,7 @@ subroutine psb_dilu_fct(a,l,u,d,info,blck)
 contains
   subroutine psb_dilu_fctint(m,ma,a,mb,b,&
        & d,laspk,lia1,lia2,uaspk,uia1,uia2,l1,l2,info)
-    use psb_d_base_mat_mod
+    use psb_mat_mod
 
     implicit none 
 
@@ -129,9 +129,6 @@ contains
     real(psb_dpk_) :: dia,temp
     integer, parameter :: nrb=60
     type(psb_d_coo_sparse_mat) :: trw
-    integer, allocatable :: irow(:), icol(:)
-    real(psb_dpk_), allocatable :: val(:)
-
     integer             :: int_err(5) 
     character(len=20)   :: name, ch_err
 
@@ -275,36 +272,36 @@ contains
     do i = ma+1, m
       d(i) = dzero
 
-!!$      if ((mod(i,nrb) == 1).or.(nrb==1)) then 
-!!$        irb = min(ma-i+1,nrb)
-!!$        call b%csget(i-ma,i-ma+irb-1,trw,info)
-!!$        nz = trw%get_nzeros()
-!!$        if(info /= 0) then
-!!$          info=4010
-!!$          ch_err='a%csget'
-!!$          call psb_errpush(info,name,a_err=ch_err)
-!!$          goto 9999
-!!$        end if
-!!$        ktrw=1
-!!$      end if
-!!$      
-!!$      do 
-!!$        if (ktrw > nz ) exit
-!!$        if (trw%ia(ktrw) > i) exit
-!!$        k = trw%ja(ktrw)
-!!$        if ((k < i).and.(k >= 1)) then
-!!$          l1 = l1 + 1
-!!$          laspk(l1) = trw%val(ktrw)
-!!$          lia1(l1) = k
-!!$        else if (k == i) then
-!!$          d(i) = trw%val(ktrw)
-!!$        else if ((k > i).and.(k <= m)) then
-!!$          l2 = l2 + 1
-!!$          uaspk(l2) = trw%val(ktrw)
-!!$          uia1(l2) = k
-!!$        end if
-!!$        ktrw = ktrw + 1
-!!$      enddo
+      if ((mod(i,nrb) == 1).or.(nrb==1)) then 
+        irb = min(ma-i+1,nrb)
+        call b%a%csget(i-ma,i-ma+irb-1,trw,info)
+        nz = trw%get_nzeros()
+        if(info /= 0) then
+          info=4010
+          ch_err='a%csget'
+          call psb_errpush(info,name,a_err=ch_err)
+          goto 9999
+        end if
+        ktrw=1
+      end if
+      
+      do 
+        if (ktrw > nz ) exit
+        if (trw%ia(ktrw) > i) exit
+        k = trw%ja(ktrw)
+        if ((k < i).and.(k >= 1)) then
+          l1 = l1 + 1
+          laspk(l1) = trw%val(ktrw)
+          lia1(l1) = k
+        else if (k == i) then
+          d(i) = trw%val(ktrw)
+        else if ((k > i).and.(k <= m)) then
+          l2 = l2 + 1
+          uaspk(l2) = trw%val(ktrw)
+          uia1(l2) = k
+        end if
+        ktrw = ktrw + 1
+      enddo
 
 
       lia2(i+1) = l1 + 1

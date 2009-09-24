@@ -44,7 +44,7 @@ contains
   subroutine shb_read(a, iret, iunit, filename,b,g,x,mtitle)   
     use psb_base_mod
     implicit none
-    type(psb_sspmat_type), intent(out)     :: a
+    type(psb_s_sparse_mat), intent(out)    :: a
     integer, intent(out)                   :: iret
     integer, optional, intent(in)          :: iunit
     character(len=*), optional, intent(in) :: filename
@@ -56,6 +56,8 @@ contains
     character indfmt*16,ptrfmt*16,rhsfmt*20,valfmt*20
     integer        :: indcrd,  ptrcrd, totcrd,&
          & valcrd, rhscrd, nrow, ncol, nnzero, neltvl, nrhs, nrhsix
+    type(psb_s_csr_sparse_mat) :: acsr
+    type(psb_s_coo_sparse_mat) :: acoo
     integer                     :: ircode, i,nzr,infile, info
     character(len=*), parameter :: fmt10='(a72,a8,/,5i14,/,a3,11x,4i14,/,2a16,2a20)'
     character(len=*), parameter :: fmt11='(a3,11x,2i14)'
@@ -82,31 +84,29 @@ contains
       endif
     endif
 
-    read(infile,fmt=fmt10) mtitle_,key,totcrd,ptrcrd,indcrd,valcrd,rhscrd,&
+    read (infile,fmt=fmt10) mtitle_,key,totcrd,ptrcrd,indcrd,valcrd,rhscrd,&
          & type,nrow,ncol,nnzero,neltvl,ptrfmt,indfmt,valfmt,rhsfmt
     if (rhscrd > 0) read(infile,fmt=fmt11)rhstype,nrhs,nrhsix
-
-    call psb_sp_all(a,nnzero,nrow+1,nnzero,ircode)
+    
+    call acsr%allocate(nrow,ncol,nnzero)
     if (ircode /= 0 ) then 
       write(0,*) 'Memory allocation failed'
       goto 993
     end if
+    
     if (present(mtitle)) mtitle=mtitle_
-
-    a%m    = nrow
-    a%k    = ncol
-    a%fida = 'CSR'
-    a%descra='G'
-
+    
 
     if (psb_tolower(type(1:1)) == 'r') then 
       if (psb_tolower(type(2:2)) == 'u') then 
 
 
-        read (infile,fmt=ptrfmt) (a%ia2(i),i=1,nrow+1)
-        read (infile,fmt=indfmt) (a%ia1(i),i=1,nnzero)
-        if (valcrd > 0) read (infile,fmt=valfmt) (a%aspk(i),i=1,nnzero)
-
+        read (infile,fmt=ptrfmt) (acsr%irp(i),i=1,nrow+1)
+        read (infile,fmt=indfmt) (acsr%ja(i),i=1,nnzero)
+        if (valcrd > 0) read (infile,fmt=valfmt) (acsr%val(i),i=1,nnzero)
+        
+        call a%mv_from(acsr)
+        
         if (present(b)) then
           if ((psb_toupper(rhstype(1:1)) == 'F').and.(rhscrd > 0)) then 
             call psb_realloc(nrow,1,b,info)
@@ -131,9 +131,9 @@ contains
         ! we are generally working with non-symmetric matrices, so
         ! we de-symmetrize what we are about to read
 
-        read (infile,fmt=ptrfmt) (a%ia2(i),i=1,nrow+1)
-        read (infile,fmt=indfmt) (a%ia1(i),i=1,nnzero)
-        if (valcrd > 0) read (infile,fmt=valfmt) (a%aspk(i),i=1,nnzero)
+        read (infile,fmt=ptrfmt) (acsr%irp(i),i=1,nrow+1)
+        read (infile,fmt=indfmt) (acsr%ja(i),i=1,nnzero)
+        if (valcrd > 0) read (infile,fmt=valfmt) (acsr%val(i),i=1,nnzero)
 
 
         if (present(b)) then
@@ -155,23 +155,24 @@ contains
           endif
         endif
 
-        call psb_spcnv(a,ircode,afmt='csr')
-        if (ircode /= 0)   goto 993  
-
-        call psb_sp_reall(a,2*nnzero,ircode)
+        
+        call acoo%mv_from_fmt(acsr,info)
+        call acoo%reallocate(2*nnzero)
         ! A is now in COO format
         nzr = nnzero
         do i=1,nnzero
-          if (a%ia1(i) /= a%ia2(i)) then 
+          if (acoo%ia(i) /= acoo%ja(i)) then 
             nzr = nzr + 1
-            a%aspk(nzr) = a%aspk(i)
-            a%ia1(nzr) = a%ia2(i)
-            a%ia2(nzr) = a%ia1(i)
+            acoo%val(nzr) = acoo%val(i)
+            acoo%ia(nzr) = acoo%ja(i)
+            acoo%ja(nzr) = acoo%ia(i)
           end if
         end do
-        a%infoa(psb_nnz_) = nzr
-        call psb_spcnv(a,ircode,afmt='csr')
-        if (ircode /= 0)   goto 993
+        call acoo%set_nzeros(nzr)
+        call acoo%fix(ircode)
+        if (ircode==0) call a%mv_from(acoo)
+        if (ircode==0) call a%cscnv(ircode,type='csr')
+        if (ircode/=0) goto 993
 
       else
         write(0,*) 'read_matrix: matrix type not yet supported'
@@ -197,11 +198,10 @@ contains
     return
   end subroutine shb_read
 
-
   subroutine shb_write(a,iret,iunit,filename,key,rhs,g,x,mtitle)
     use psb_base_mod
     implicit none
-    type(psb_sspmat_type), intent(in)  :: a
+    type(psb_s_sparse_mat), intent(in)  :: a
     integer, intent(out)        :: iret
     character(len=*), optional, intent(in) :: mtitle
     integer, optional, intent(in)          :: iunit
@@ -258,11 +258,13 @@ contains
       key_ = 'PSBMAT00'
     endif
 
-    if (psb_toupper(a%fida) == 'CSR') then 
+    
+    select type(aa=>a%a)
+    type is (psb_s_csr_sparse_mat)
       
-      nrow   = a%m
-      ncol   = a%k
-      nnzero = a%ia2(nrow+1)-1
+      nrow   = aa%get_nrows()
+      ncol   = aa%get_ncols()
+      nnzero = aa%get_nzeros()
       
       neltvl = 0 
 
@@ -286,7 +288,8 @@ contains
         rhscrd = 0
         nrhs   = 0
       end if
-      totcrd = ptrcrd + indcrd + valcrd + rhscrd      
+      totcrd = ptrcrd + indcrd + valcrd + rhscrd
+      
       nrhsix  = nrhs*nrow
       
       if (present(g)) then 
@@ -295,24 +298,24 @@ contains
       if (present(x)) then 
         rhstype(3:3) = 'X'
       end if
-
       type    = 'RUA'
       
       write (iout,fmt=fmt10) mtitle_,key_,totcrd,ptrcrd,indcrd,valcrd,rhscrd,&
            &  type,nrow,ncol,nnzero,neltvl,ptrfmt,indfmt,valfmt,rhsfmt
       if (rhscrd > 0) write (iout,fmt=fmt11) rhstype,nrhs,nrhsix
-      write (iout,fmt=ptrfmt) (a%ia2(i),i=1,nrow+1)
-      write (iout,fmt=indfmt) (a%ia1(i),i=1,nnzero)
-      if (valcrd > 0) write (iout,fmt=valfmt) (a%aspk(i),i=1,nnzero)
+      write (iout,fmt=ptrfmt) (aa%irp(i),i=1,nrow+1)
+      write (iout,fmt=indfmt) (aa%ja(i),i=1,nnzero)
+      if (valcrd > 0) write (iout,fmt=valfmt) (aa%val(i),i=1,nnzero)
       if (rhscrd > 0) write (iout,fmt=rhsfmt) (rhs(i),i=1,nrow)
       if (present(g).and.(rhscrd>0)) write (iout,fmt=rhsfmt) (g(i),i=1,nrow)
       if (present(x).and.(rhscrd>0)) write (iout,fmt=rhsfmt) (x(i),i=1,nrow)
 
-    else
 
-      write(0,*) 'format: ',a%fida,' not yet implemented'
+    class default
 
-    endif
+      write(0,*) 'format: ',a%get_fmt(),' not yet implemented'
+
+    end select
 
     if (iout /= 6) close(iout)
 
@@ -324,6 +327,7 @@ contains
     write(0,*) 'Error while opening ',filename
     return
   end subroutine shb_write
+
 
   subroutine dhb_read(a, iret, iunit, filename,b,g,x,mtitle)   
     use psb_base_mod

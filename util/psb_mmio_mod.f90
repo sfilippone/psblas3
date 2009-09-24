@@ -341,11 +341,10 @@ contains
   end subroutine mm_zvet_read
 
 
-
   subroutine smm_mat_read(a, info, iunit, filename)   
     use psb_base_mod
     implicit none
-    type(psb_sspmat_type), intent(out)  :: a
+    type(psb_s_sparse_mat), intent(out)  :: a
     integer, intent(out)        :: info
     integer, optional, intent(in)          :: iunit
     character(len=*), optional, intent(in) :: filename
@@ -353,6 +352,7 @@ contains
     character(1024)      :: line
     integer        :: nrow, ncol, nnzero
     integer        :: ircode, i,nzr,infile
+    type(psb_s_coo_sparse_mat), allocatable :: acoo
 
     info = 0
 
@@ -388,46 +388,51 @@ contains
       if (line(1:1) /= '%')  exit
     end do
     read(line,fmt=*) nrow,ncol,nnzero
-    
+
+    allocate(acoo, stat=ircode)
+    if (ircode /= 0)   goto 993    
     if ((psb_tolower(type) == 'real').and.(psb_tolower(sym) == 'general')) then
-      call psb_sp_all(nrow,ncol,a,nnzero,ircode)
-      a%fida   = 'COO'
-      a%descra = 'G'      
-      if (ircode /= 0)   goto 993
+      call acoo%allocate(nrow,ncol,nnzero)
       do i=1,nnzero
-        read(infile,fmt=*,end=902) a%ia1(i),a%ia2(i),a%aspk(i)
+        read(infile,fmt=*,end=902) acoo%ia(i),acoo%ja(i),acoo%val(i)
       end do
-      a%infoa(psb_nnz_) = nnzero
-      call psb_spcnv(a,ircode,afmt='csr')
+      call acoo%set_nzeros(nnzero)
+      call acoo%fix(info)
+
+      call a%mv_from(acoo)
+      call a%cscnv(ircode,type='csr')
 
     else if ((psb_tolower(type) == 'real').and.(psb_tolower(sym) == 'symmetric')) then
       ! we are generally working with non-symmetric matrices, so
       ! we de-symmetrize what we are about to read
-      call psb_sp_all(nrow,ncol,a,2*nnzero,ircode)
-      a%fida   = 'COO'
-      a%descra = 'G'      
-      if (ircode /= 0)   goto 993
+      call acoo%allocate(nrow,ncol,nnzero)
       do i=1,nnzero
-        read(infile,fmt=*,end=902) a%ia1(i),a%ia2(i),a%aspk(i)
+        read(infile,fmt=*,end=902) acoo%ia(i),acoo%ja(i),acoo%val(i)
       end do
-
       nzr = nnzero
       do i=1,nnzero
-        if (a%ia1(i) /= a%ia2(i)) then 
+        if (acoo%ia(i) /= acoo%ja(i)) then 
           nzr = nzr + 1
-          a%aspk(nzr) = a%aspk(i)
-          a%ia1(nzr) = a%ia2(i)
-          a%ia2(nzr) = a%ia1(i)
+          acoo%val(nzr) = acoo%val(i)
+          acoo%ia(nzr) = acoo%ja(i)
+          acoo%ja(nzr) = acoo%ia(i)
         end if
       end do
-      a%infoa(psb_nnz_) = nzr
-      call psb_spcnv(a,ircode,afmt='csr')
+      call acoo%set_nzeros(nzr)
+      call acoo%fix(info)
+
+      call a%mv_from(acoo)
+      call a%cscnv(ircode,type='csr')
 
     else
       write(0,*) 'read_matrix: matrix type not yet supported'
       info=904
     end if
+    
+
     if (infile/=5) close(infile)
+
+
     return 
 
     ! open failed
@@ -446,7 +451,7 @@ contains
   subroutine smm_mat_write(a,mtitle,info,iunit,filename)
     use psb_base_mod
     implicit none
-    type(psb_sspmat_type), intent(in)  :: a
+    type(psb_s_sparse_mat), intent(in)  :: a
     integer, intent(out)        :: info
     character(len=*), intent(in) :: mtitle
     integer, optional, intent(in)          :: iunit
@@ -475,7 +480,7 @@ contains
       endif
     endif
     
-    call psb_csprt(iout,a,head=mtitle)
+    call a%print(iout,head=mtitle)
 
     if (iout /= 6) close(iout)
 
@@ -487,6 +492,8 @@ contains
     write(0,*) 'Error while opening ',filename
     return
   end subroutine smm_mat_write
+  
+
 
   subroutine dmm_mat_read(a, info, iunit, filename)   
     use psb_base_mod

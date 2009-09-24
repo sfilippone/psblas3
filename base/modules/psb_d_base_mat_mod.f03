@@ -995,7 +995,7 @@ contains
           end do
         end if
         if (info == 0)&
-             & call daxpby(nar,nc,alpha,tmp,size(tmp,1),beta,y,size(y,1),info)
+             & call psb_geaxpby(nar,nc,alpha,tmp,beta,y,info)
 
         if (info == 0) then 
           deallocate(tmp,stat=info) 
@@ -1120,7 +1120,7 @@ contains
 
         if (info == 0) tmp(1:nar) = d(1:nar)*tmp(1:nar) 
         if (info == 0)&
-             & call daxpby(nar,nc,alpha,tmp,size(tmp,1),beta,y,size(y,1),info)
+             & call psb_geaxpby(nar,alpha,tmp,beta,y,info)
         
         if (info == 0) then 
           deallocate(tmp,stat=info) 

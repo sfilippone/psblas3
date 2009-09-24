@@ -22,8 +22,8 @@ ppde: ppde.o  psb_d_csc_impl.o psb_d_csc_mat_mod.o
 
 psb_d_csc_impl.o ppde.o: psb_d_csc_mat_mod.o
 
-spde: spde.o  
-	$(F90LINK) spde.o  -o spde $(PSBLAS_LIB) $(LDLIBS)
+spde: spde.o  enablecore.o
+	$(F90LINK) spde.o enablecore.o -o spde $(PSBLAS_LIB) $(LDLIBS)
 	/bin/mv spde $(EXEDIR)
 
 .f90.o:

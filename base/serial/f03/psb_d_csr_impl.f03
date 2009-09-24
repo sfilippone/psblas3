@@ -807,7 +807,7 @@ subroutine d_csr_cssm_impl(alpha,a,x,beta,y,info,trans)
   real(psb_dpk_), allocatable :: tmp(:,:)
   logical   :: tra
   Integer :: err_act
-  character(len=20)  :: name='d_base_csmm'
+  character(len=20)  :: name='d_base_cssm'
   logical, parameter :: debug=.false.
 
   info = 0

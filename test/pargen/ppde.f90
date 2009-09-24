@@ -78,7 +78,6 @@ program ppde
 
   ! sparse matrix and preconditioner
   type(psb_d_sparse_mat) :: a
-!!$  type(psb_dspmat_type) :: a
   type(psb_dprec_type)  :: prec
   ! descriptor
   type(psb_desc_type)   :: desc_a
@@ -110,7 +109,6 @@ program ppde
   if(psb_get_errstatus() /= 0) goto 9999
   name='pde90'
   call psb_set_errverbosity(2)
-
   !
   !  get parameters
   !
@@ -611,7 +609,7 @@ contains
     tasb = psb_wtime()-t1
     call psb_barrier(ictxt)
     ttot = psb_wtime() - t0 
-!!$    call a%print(20+iam)
+
     call psb_amx(ictxt,talc)
     call psb_amx(ictxt,tgen)
     call psb_amx(ictxt,tasb)

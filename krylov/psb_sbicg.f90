@@ -62,7 +62,7 @@
 !
 ! Arguments:
 !
-!    a      -  type(psb_sspmat_type)      Input: sparse matrix containing A.
+!    a      -  type(psb_s_sparse_mat)      Input: sparse matrix containing A.
 !    prec   -  type(psb_sprec_type)       Input: preconditioner
 !    b      -  real,dimension(:)            Input: vector containing the
 !                                           right hand side B
@@ -101,7 +101,7 @@ subroutine psb_sbicg(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,istop)
   implicit none
 
 !!$  parameters 
-  type(psb_sspmat_type), intent(in)  :: a
+  type(psb_s_sparse_mat), intent(in)  :: a
   type(psb_sprec_type), intent(in)   :: prec 
   type(psb_desc_type), intent(in)    :: desc_a
   real(psb_spk_), intent(in)       :: b(:)

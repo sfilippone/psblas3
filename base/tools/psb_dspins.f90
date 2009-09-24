@@ -55,7 +55,7 @@ subroutine psb_dspins(nz,ia,ja,val,a,desc_a,info,rebuild)
   use psb_const_mod
   use psb_error_mod
   use psb_penv_mod
-  use psb_d_mat_mod
+  use psb_mat_mod
   implicit none
 
   !....parameters...
@@ -242,7 +242,7 @@ subroutine psb_dspins_2desc(nz,ia,ja,val,a,desc_ar,desc_ac,info)
   use psb_const_mod
   use psb_error_mod
   use psb_penv_mod
-  use psb_d_mat_mod
+  use psb_mat_mod
   implicit none
 
   !....parameters...

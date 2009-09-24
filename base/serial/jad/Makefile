@@ -3,8 +3,9 @@ include ../../../Make.inc
 # The object files
 #
 
-FOBJS = 	sjadmm.o sjadmv.o sjadsm.o sjadsv.o sjdnrmi.o sjadnr.o\
-	sjadmv2.o sjadmv3.o sjadmv4.o sjadrws.o sjdrws.o
+FOBJS = 
+#	sjadmm.o sjadmv.o sjadsm.o sjadsv.o sjdnrmi.o sjadnr.o\
+#	sjadmv2.o sjadmv3.o sjadmv4.o sjadrws.o sjdrws.o
 
 #djadmm.o djadmv.o djadsm.o djadsv.o djdnrmi.o djadnr.o\
 #	djadmv2.o djadmv3.o djadmv4.o djadrws.o djdrws.o \

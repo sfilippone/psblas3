@@ -105,19 +105,6 @@ subroutine psb_ddiagsc_bld(a,desc_a,p,upd,info)
     endif
   end do
 
-!!$  if (a%pl(1) /= 0) then
-!!$    !
-!!$    ! Apply the same row permutation as in the sparse matrix A
-!!$    !
-!!$    call  psb_gelp('n',a%pl,p%d,info)
-!!$    if(info /= 0) then
-!!$      info=4010
-!!$      ch_err='psb_dgelp'
-!!$      call psb_errpush(info,name,a_err=ch_err)
-!!$      goto 9999
-!!$    end if
-!!$  endif
-
   call psb_erractionrestore(err_act)
   return
 

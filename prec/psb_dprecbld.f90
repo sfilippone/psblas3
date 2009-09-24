@@ -29,13 +29,13 @@
 !!$  POSSIBILITY OF SUCH DAMAGE.
 !!$ 
 !!$  
-subroutine psb_dprecbld(aa,desc_a,p,info,upd)
+subroutine psb_dprecbld(a,desc_a,p,info,upd)
 
   use psb_base_mod
   use psb_prec_mod, psb_protect_name => psb_dprecbld
   Implicit None
 
-  type(psb_d_sparse_mat), intent(in), target :: aa
+  type(psb_d_sparse_mat), intent(in), target :: a
   type(psb_desc_type), intent(in), target :: desc_a
   type(psb_dprec_type),intent(inout)      :: p
   integer, intent(out)                    :: info
@@ -86,7 +86,6 @@ subroutine psb_dprecbld(aa,desc_a,p,info,upd)
 
   call psb_nullify_desc(p%desc_data)
 
-
   select case(p%iprcparm(psb_p_type_)) 
   case (psb_noprec_)
     ! Do nothing. 
@@ -100,7 +99,7 @@ subroutine psb_dprecbld(aa,desc_a,p,info,upd)
 
   case (psb_diag_)
 
-    call psb_diagsc_bld(aa,desc_a,p,upd_,info)
+    call psb_diagsc_bld(a,desc_a,p,upd_,info)
     if(info /= 0) then
       info=4010
       ch_err='psb_diagsc_bld'
@@ -113,7 +112,7 @@ subroutine psb_dprecbld(aa,desc_a,p,info,upd)
     call psb_check_def(p%iprcparm(psb_f_type_),'fact',&
          &  psb_f_ilu_n_,is_legal_ml_fact)
 
-    call psb_bjac_bld(aa,desc_a,p,upd_,info)
+    call psb_bjac_bld(a,desc_a,p,upd_,info)
 
     if(info /= 0) then
       call psb_errpush(4010,name,a_err='psb_bjac_bld')

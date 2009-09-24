@@ -8,7 +8,6 @@ FOBJS = partition.o dgblock.o  dvtfg.o \
 	check_dim.o \
 	Max_nnzero.o \
 	gen_block.o\
-	scrco.o scrcr.o scocr.o scoco.o sgindex.o sgind_tri.o\
 	ccoco.o ccocr.o ccrco.o ccrcr.o cgindex.o cgind_tri.o\
 	zcoco.o zcocr.o zcrco.o zcrcr.o zgindex.o zgind_tri.o\
 	$(XOBJS)
@@ -17,6 +16,7 @@ FOBJS = partition.o dgblock.o  dvtfg.o \
 #dcrcr.o 
 #dgindex.o djadrp.o djadrp1.o dcsrrp.o dcsrp1.o 
 #dcrjd.o
+#	scrco.o scrcr.o scocr.o scoco.o sgindex.o sgind_tri.o\
 
 # 
 # dgind_tri.o

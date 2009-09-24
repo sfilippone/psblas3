@@ -91,16 +91,16 @@ module psb_spmat_type
   end type psb_base_spmat_type
 
 
-  type, extends(psb_base_spmat_type) :: psb_sspmat_type
-    real(psb_spk_), allocatable  :: aspk(:)
-  contains
-    procedure, pass(a) :: psb_scsmm
-    procedure, pass(a) :: psb_scsmv
-    generic, public    :: csmm => psb_scsmm, psb_scsmv
-    procedure, pass(t) :: psb_scssm
-    procedure, pass(t) :: psb_scssv
-    generic, public    :: cssm => psb_scssm, psb_scssv
-  end type psb_sspmat_type
+!!$  type, extends(psb_base_spmat_type) :: psb_sspmat_type
+!!$    real(psb_spk_), allocatable  :: aspk(:)
+!!$  contains
+!!$    procedure, pass(a) :: psb_scsmm
+!!$    procedure, pass(a) :: psb_scsmv
+!!$    generic, public    :: csmm => psb_scsmm, psb_scsmv
+!!$    procedure, pass(t) :: psb_scssm
+!!$    procedure, pass(t) :: psb_scssv
+!!$    generic, public    :: cssm => psb_scssm, psb_scssv
+!!$  end type psb_sspmat_type
 
   type, extends(psb_base_spmat_type) :: psb_cspmat_type
     complex(psb_spk_), allocatable  :: aspk(:)
@@ -129,115 +129,113 @@ module psb_spmat_type
   end type psb_zspmat_type
 
   interface psb_nullify_sp
-    module procedure psb_nullify_ssp, psb_nullify_csp,&
+    module procedure psb_nullify_csp,&
          & psb_nullify_zsp
   end interface
 
   interface psb_sp_clone
-    module procedure psb_sspclone, psb_cspclone,&
+    module procedure psb_cspclone,&
          & psb_zspclone
   end interface
 
   interface psb_sp_setifld
-    module procedure psb_ssp_setifld, psb_csp_setifld,&
+    module procedure psb_csp_setifld,&
          & psb_zsp_setifld
   end interface
 
   interface psb_sp_getifld
-    module procedure psb_ssp_getifld, psb_csp_getifld,&
+    module procedure psb_csp_getifld,&
          & psb_zsp_getifld
   end interface
 
   interface psb_move_alloc
-    module procedure psb_ssp_transfer, psb_csp_transfer,&
+    module procedure psb_csp_transfer,&
          & psb_zsp_transfer
   end interface
 
   interface psb_sp_trim
-    module procedure psb_ssp_trim, psb_csp_trim,&
+    module procedure psb_csp_trim,&
          & psb_zsp_trim
   end interface
 
   interface psb_sp_trimsize
-    module procedure psb_ssp_trimsize, psb_csp_trimsize,&
+    module procedure psb_csp_trimsize,&
          & psb_zsp_trimsize
   end interface
 
   interface psb_sp_reall
-    module procedure psb_sspreallocate, psb_sspreall3, &
-         & psb_cspreall3, psb_cspreallocate,&
+    module procedure psb_cspreall3, psb_cspreallocate,&
          & psb_zspreall3, psb_zspreallocate
   end interface
 
   interface psb_sp_all
-    module procedure psb_sspallocate, psb_sspall3, psb_sspallmk, psb_sspallmknz, &
-         & psb_cspallocate, psb_cspall3, psb_cspallmk, psb_cspallmknz, &
+    module procedure psb_cspallocate, psb_cspall3, psb_cspallmk, psb_cspallmknz, &
          & psb_zspallocate, psb_zspall3, psb_zspallmk, psb_zspallmknz
   end interface
 
   interface psb_sp_free
-    module procedure psb_ssp_free, psb_csp_free,&
+    module procedure  psb_csp_free,&
          & psb_zsp_free
   end interface
 
   interface psb_sp_reinit
-    module procedure psb_sspreinit,  psb_cspreinit, &
+    module procedure   psb_cspreinit, &
          & psb_zspreinit
   end interface
 
   interface psb_sizeof
-    module procedure psb_sspsizeof,  psb_cspsizeof,&
+    module procedure   psb_cspsizeof,&
          & psb_zspsizeof
   end interface
 
   interface psb_sp_get_nrows
-    module procedure psb_get_ssp_nrows, psb_get_csp_nrows,&
+    module procedure  psb_get_csp_nrows,&
          & psb_get_zsp_nrows
   end interface
 
   interface psb_sp_get_ncols
-    module procedure psb_get_ssp_ncols, psb_get_csp_ncols,&
+    module procedure  psb_get_csp_ncols,&
          & psb_get_zsp_ncols
   end interface
 
   interface psb_sp_get_nnzeros
-    module procedure psb_get_ssp_nnzeros, psb_get_csp_nnzeros,&
+    module procedure  psb_get_csp_nnzeros,&
          & psb_get_zsp_nnzeros
   end interface
 
   interface psb_sp_get_nzsize
-    module procedure psb_get_ssp_nzsize, psb_get_csp_nzsize,&
+    module procedure  psb_get_csp_nzsize,&
          & psb_get_zsp_nzsize
   end interface
 
   interface psb_sp_get_nnz_row
-    module procedure psb_get_ssp_nnz_row, psb_get_csp_nnz_row,&
+    module procedure  psb_get_csp_nnz_row,&
          & psb_get_zsp_nnz_row
   end interface
 
 
 
   interface psb_sp_info
-    module procedure psb_sspinfo, psb_cspinfo, &
+    module procedure  psb_cspinfo, &
          & psb_zspinfo
   end interface
 
 
   interface psb_csmm 
-    subroutine psb_scsmv(alpha,a,b,beta,c,info,trans)
-      import :: psb_sspmat_type, psb_spk_
-      class(psb_sspmat_type) :: a
-      real(psb_spk_) :: alpha, beta, b(:), c(:)
-      integer :: info
-      character, optional :: trans
-    end subroutine psb_scsmv
-    subroutine psb_scsmm(alpha,a,b,beta,c,info,trans)
-      import :: psb_sspmat_type, psb_spk_
-      class(psb_sspmat_type) :: a
-      real(psb_spk_) :: alpha, beta, b(:,:), c(:,:)
-      integer :: info
-      character, optional :: trans
-    end subroutine psb_scsmm
+!!$    subroutine psb_scsmv(alpha,a,b,beta,c,info,trans)
+!!$      import :: psb_sspmat_type, psb_spk_
+!!$      class(psb_sspmat_type) :: a
+!!$      real(psb_spk_) :: alpha, beta, b(:), c(:)
+!!$      integer :: info
+!!$      character, optional :: trans
+!!$    end subroutine psb_scsmv
+!!$    subroutine psb_scsmm(alpha,a,b,beta,c,info,trans)
+!!$      import :: psb_sspmat_type, psb_spk_
+!!$      class(psb_sspmat_type) :: a
+!!$      real(psb_spk_) :: alpha, beta, b(:,:), c(:,:)
+!!$      integer :: info
+!!$      character, optional :: trans
+!!$    end subroutine psb_scsmm
 !!$    subroutine psb_dcsmv(alpha,a,b,beta,c,info,trans)
 !!$      import :: psb_dspmat_type, psb_dpk_
 !!$      class(psb_dspmat_type) :: a
@@ -283,24 +281,24 @@ module psb_spmat_type
   end interface
 
   interface psb_cssm
-    subroutine psb_scssm(alpha,t,b,beta,c,info,trans,unitd,d)
-      import :: psb_sspmat_type,&
-           & psb_cspmat_type, psb_zspmat_type, psb_spk_, psb_dpk_
-      class(psb_sspmat_type) :: t
-      real(psb_spk_) :: alpha, beta, b(:,:), c(:,:)
-      integer :: info
-      character, optional :: trans, unitd
-      real(psb_spk_), optional, target :: d(:)
-    end subroutine psb_scssm
-    subroutine psb_scssv(alpha,t,b,beta,c,info,trans,unitd,d)
-      import :: psb_sspmat_type,&
-           & psb_cspmat_type, psb_zspmat_type, psb_spk_, psb_dpk_
-      class(psb_sspmat_type) :: t
-      real(psb_spk_) :: alpha, beta, b(:), c(:)
-      integer :: info
-      character, optional :: trans, unitd
-      real(psb_spk_), optional, target :: d(:)
-    end subroutine psb_scssv
+!!$    subroutine psb_scssm(alpha,t,b,beta,c,info,trans,unitd,d)
+!!$      import :: psb_sspmat_type,&
+!!$           & psb_cspmat_type, psb_zspmat_type, psb_spk_, psb_dpk_
+!!$      class(psb_sspmat_type) :: t
+!!$      real(psb_spk_) :: alpha, beta, b(:,:), c(:,:)
+!!$      integer :: info
+!!$      character, optional :: trans, unitd
+!!$      real(psb_spk_), optional, target :: d(:)
+!!$    end subroutine psb_scssm
+!!$    subroutine psb_scssv(alpha,t,b,beta,c,info,trans,unitd,d)
+!!$      import :: psb_sspmat_type,&
+!!$           & psb_cspmat_type, psb_zspmat_type, psb_spk_, psb_dpk_
+!!$      class(psb_sspmat_type) :: t
+!!$      real(psb_spk_) :: alpha, beta, b(:), c(:)
+!!$      integer :: info
+!!$      character, optional :: trans, unitd
+!!$      real(psb_spk_), optional, target :: d(:)
+!!$    end subroutine psb_scssv
 !!$    subroutine psb_dcssm(alpha,t,b,beta,c,info,trans,unitd,d)
 !!$      import :: psb_sspmat_type, psb_dspmat_type,&
 !!$           & psb_cspmat_type, psb_zspmat_type, psb_spk_, psb_dpk_
@@ -320,8 +318,7 @@ module psb_spmat_type
 !!$      real(psb_dpk_), optional, target :: d(:)
 !!$    end subroutine psb_dcssv
     subroutine psb_ccssm(alpha,t,b,beta,c,info,trans,unitd,d)
-      import :: psb_sspmat_type,&
-           & psb_cspmat_type, psb_zspmat_type, psb_spk_, psb_dpk_
+      import :: psb_cspmat_type, psb_zspmat_type, psb_spk_, psb_dpk_
       class(psb_cspmat_type) :: t
       complex(psb_spk_) :: alpha, beta, b(:,:), c(:,:)
       integer :: info
@@ -329,8 +326,7 @@ module psb_spmat_type
       complex(psb_spk_), optional, target :: d(:)
     end subroutine psb_ccssm
     subroutine psb_ccssv(alpha,t,b,beta,c,info,trans,unitd,d)
-      import :: psb_sspmat_type,&
-           & psb_cspmat_type, psb_zspmat_type, psb_spk_, psb_dpk_
+      import :: psb_cspmat_type, psb_zspmat_type, psb_spk_, psb_dpk_
       class(psb_cspmat_type) :: t
       complex(psb_spk_) :: alpha, beta, b(:), c(:)
       integer :: info
@@ -338,8 +334,7 @@ module psb_spmat_type
       complex(psb_spk_), optional, target :: d(:)
     end subroutine psb_ccssv
     subroutine psb_zcssm(alpha,t,b,beta,c,info,trans,unitd,d)
-      import :: psb_sspmat_type,&
-           & psb_cspmat_type, psb_zspmat_type, psb_spk_, psb_dpk_
+      import :: psb_cspmat_type, psb_zspmat_type, psb_spk_, psb_dpk_
       class(psb_zspmat_type) :: t
       complex(psb_dpk_) :: alpha, beta, b(:,:), c(:,:)
       integer :: info
@@ -347,8 +342,7 @@ module psb_spmat_type
       complex(psb_dpk_), optional, target :: d(:)
     end subroutine psb_zcssm
     subroutine psb_zcssv(alpha,t,b,beta,c,info,trans,unitd,d)
-      import :: psb_sspmat_type,&
-           & psb_cspmat_type, psb_zspmat_type, psb_spk_, psb_dpk_
+      import :: psb_cspmat_type, psb_zspmat_type, psb_spk_, psb_dpk_
       class(psb_zspmat_type) :: t
       complex(psb_dpk_) :: alpha, beta, b(:), c(:)
       integer :: info
@@ -362,19 +356,19 @@ module psb_spmat_type
 contains
 
 
-  integer function psb_get_ssp_nrows(a)
-    type(psb_sspmat_type), intent(in) :: a
-    psb_get_ssp_nrows = a%m
-
-    return
-  end function psb_get_ssp_nrows
-
-  integer function psb_get_ssp_ncols(a)
-    type(psb_sspmat_type), intent(in) :: a
-    psb_get_ssp_ncols = a%k
-
-    return
-  end function psb_get_ssp_ncols
+!!$  integer function psb_get_ssp_nrows(a)
+!!$    type(psb_sspmat_type), intent(in) :: a
+!!$    psb_get_ssp_nrows = a%m
+!!$
+!!$    return
+!!$  end function psb_get_ssp_nrows
+!!$
+!!$  integer function psb_get_ssp_ncols(a)
+!!$    type(psb_sspmat_type), intent(in) :: a
+!!$    psb_get_ssp_ncols = a%k
+!!$
+!!$    return
+!!$  end function psb_get_ssp_ncols
   integer function psb_get_csp_nrows(a)
     type(psb_cspmat_type), intent(in) :: a
     psb_get_csp_nrows = a%m
@@ -418,18 +412,18 @@ contains
     return
   end function psb_get_zsp_ncols
 
-
-  integer function psb_get_ssp_nnzeros(a)
-    type(psb_sspmat_type), intent(in) :: a  
-    integer :: ires,info
-
-    call psb_sp_info(psb_nztotreq_,a,ires,info)
-    if (info == 0) then 
-      psb_get_ssp_nnzeros = ires
-    else
-      psb_get_ssp_nnzeros = 0
-    end if
-  end function psb_get_ssp_nnzeros
+!!$
+!!$  integer function psb_get_ssp_nnzeros(a)
+!!$    type(psb_sspmat_type), intent(in) :: a  
+!!$    integer :: ires,info
+!!$
+!!$    call psb_sp_info(psb_nztotreq_,a,ires,info)
+!!$    if (info == 0) then 
+!!$      psb_get_ssp_nnzeros = ires
+!!$    else
+!!$      psb_get_ssp_nnzeros = 0
+!!$    end if
+!!$  end function psb_get_ssp_nnzeros
 
   integer function psb_get_csp_nnzeros(a)
     type(psb_cspmat_type), intent(in) :: a  
@@ -467,17 +461,17 @@ contains
     end if
   end function psb_get_zsp_nnzeros
 
-  integer function psb_get_ssp_nzsize(a)
-    type(psb_sspmat_type), intent(in) :: a  
-    integer :: ires,info
-
-    call psb_sp_info(psb_nzsizereq_,a,ires,info)
-    if (info == 0) then 
-      psb_get_ssp_nzsize = ires
-    else
-      psb_get_ssp_nzsize = 0
-    end if
-  end function psb_get_ssp_nzsize
+!!$  integer function psb_get_ssp_nzsize(a)
+!!$    type(psb_sspmat_type), intent(in) :: a  
+!!$    integer :: ires,info
+!!$
+!!$    call psb_sp_info(psb_nzsizereq_,a,ires,info)
+!!$    if (info == 0) then 
+!!$      psb_get_ssp_nzsize = ires
+!!$    else
+!!$      psb_get_ssp_nzsize = 0
+!!$    end if
+!!$  end function psb_get_ssp_nzsize
 
   integer function psb_get_csp_nzsize(a)
     type(psb_cspmat_type), intent(in) :: a  
@@ -515,18 +509,18 @@ contains
     end if
   end function psb_get_zsp_nzsize
 
-  integer function psb_get_ssp_nnz_row(ir,a)
-    integer, intent(in)               :: ir
-    type(psb_sspmat_type), intent(in) :: a  
-    integer :: ires,info
-
-    call psb_sp_info(psb_nzrowreq_,a,ires,info,iaux=ir)
-    if (info == 0) then 
-      psb_get_ssp_nnz_row = ires
-    else
-      psb_get_ssp_nnz_row = 0
-    end if
-  end function psb_get_ssp_nnz_row
+!!$  integer function psb_get_ssp_nnz_row(ir,a)
+!!$    integer, intent(in)               :: ir
+!!$    type(psb_sspmat_type), intent(in) :: a  
+!!$    integer :: ires,info
+!!$
+!!$    call psb_sp_info(psb_nzrowreq_,a,ires,info,iaux=ir)
+!!$    if (info == 0) then 
+!!$      psb_get_ssp_nnz_row = ires
+!!$    else
+!!$      psb_get_ssp_nnz_row = 0
+!!$    end if
+!!$  end function psb_get_ssp_nnz_row
 
   integer function psb_get_csp_nnz_row(ir,a)
     integer, intent(in)               :: ir
@@ -568,533 +562,533 @@ contains
   end function psb_get_zsp_nnz_row
 
 
-  subroutine psb_nullify_ssp(mat)
-    implicit none
-    type(psb_sspmat_type), intent(inout) :: mat
-
-!!$    nullify(mat%aspk,mat%ia1,mat%ia2,mat%pl,mat%pr)
-
-    mat%infoa(:)=0
-    mat%m=0
-    mat%k=0
-    mat%fida=''
-    mat%descra=''
-
-  end subroutine psb_nullify_ssp
-
-  Subroutine psb_sspreinit(a,info,clear)
-    use psb_string_mod
-    Implicit None
-
-    !....Parameters...
-    Type(psb_sspmat_type), intent(inout) :: a
-    integer, intent(out)                 :: info
-    logical, intent(in), optional        :: clear
-
-    !locals
-    logical, parameter  :: debug=.false.
-    logical             :: clear_
-    character(len=20)   :: name
-
-    info = 0
-    name = 'psb_sp_reinit'
-
-    if (present(clear)) then 
-      clear_ = clear
-    else
-      clear_ = .true.
-    end if
-
-    select case(psb_sp_getifld(psb_state_,a,info))
-    case(psb_spmat_asb_) 
-
-      if (clear_) a%aspk(:) = dzero
-
-      if (psb_sp_getifld(psb_upd_,a,info)==psb_upd_perm_) then 
-        if(psb_toupper(a%fida(1:3)) == 'JAD') then
-          a%ia1(a%infoa(psb_upd_pnt_)+psb_nnz_) = 0
-        else
-          a%ia2(a%infoa(psb_upd_pnt_)+psb_nnz_) = 0
-        endif
-      endif
-      a%infoa(psb_state_) = psb_spmat_upd_
-    case(psb_spmat_bld_) 
-      ! in this case do nothing. this allows sprn to be called 
-      ! right after allocate, with spins doing the right thing.
-      ! hopefully :-)
-
-    case( psb_spmat_upd_) 
-
-    case default
-      info=591     
-      call psb_errpush(info,name)
-    end select
-
-  end Subroutine psb_sspreinit
-
-  Subroutine psb_sspallocate(a, nnz,info)
-    implicit none
-    !....Parameters...
-    Type(psb_sspmat_type), intent(inout) :: A
-    Integer, intent(in)          :: nnz
-    integer, intent(out)         :: info
-
-    !locals
-    logical, parameter  :: debug=.false.
-
-    info  = 0
-    if (nnz < 0) then
-      info=45
-      return
-    Endif
-    if (debug) write(0,*) 'SPALL : NNZ ',nnz,a%m,a%k
-    call psb_nullify_sp(a)
-    call psb_sp_reall(a,nnz,info)
-    if (info /= 0) return
-    a%pl(:)=0
-    a%pr(:)=0
-    ! set INFOA fields
-    a%fida   = 'COO'
-    a%descra = 'GUN'
-    a%infoa(:) = 0
-    a%infoa(psb_state_) = psb_spmat_bld_
-    a%m        = 0
-    a%k        = 0
-    if (debug) write(0,*) 'SPALL : end'
-    Return
-
-  End Subroutine psb_sspallocate
-
-  Subroutine psb_sspallmk(m,k,a,info)
-    implicit none
-    !....Parameters...
-
-    Type(psb_sspmat_type), intent(inout) :: A
-    Integer, intent(in)          :: m,k
-    Integer, intent(out)         :: info
-
-    !locals
-    logical, parameter  :: debug=.false.
-    integer  :: nnz
-
-    INFO  = 0
-    call psb_nullify_sp(a)
-    nnz = 2*max(1,m,k)
-    a%m=max(0,m)
-    a%k=max(0,k)
-    if (debug) write(0,*) 'SPALL : NNZ ',nnz,a%m,a%k
-    call psb_sp_reall(a,nnz,info)
-    if (debug) write(0,*) 'Check in ALLOCATE ',info,allocated(a%pl),allocated(a%pr)
-    if (info /= 0) return
-    a%pl(:)=0
-    a%pr(:)=0
-    ! set INFOA fields
-    a%fida   = 'COO'
-    a%descra = 'GUN'
-    a%infoa(:) = 0
-    a%infoa(psb_state_) = psb_spmat_bld_
-    if (debug) write(0,*) 'SPALL : end'
-    Return
-
-  end subroutine psb_sspallmk
-
-  Subroutine psb_sspallmknz(m,k,a, nnz,info)
-    implicit none
-    !....parameters...
-
-    type(psb_sspmat_type), intent(inout) :: a
-    integer, intent(in)                  :: m,k,nnz
-    integer, intent(out)                 :: info
-
-    !locals
-    logical, parameter  :: debug=.false.
-
-    info  = 0
-    if (nnz < 0) then
-      info=45
-      return
-    endif
-    call psb_nullify_sp(a)
-    if (debug) write(0,*) 'spallmknz : nnz ',nnz,a%m,a%k,psb_get_errstatus()
-    a%m=max(0,m)
-    a%k=max(0,k)
-    call psb_sp_reall(a,nnz,info)
-    if (debug) write(0,*) 'Check in ALLOCATE ',info,allocated(a%pl),allocated(a%pr)
-    if (info /= 0) return
-    a%pl(:)=0
-    a%pr(:)=0
-    ! set infoa fields
-    a%fida   = 'COO'
-    a%descra = 'GUN'
-    a%infoa(:) = 0
-    a%infoa(psb_state_) = psb_spmat_bld_
-    if (debug) write(0,*) 'spall : end'
-    return
-
-  end subroutine psb_sspallmknz
-
-
-  subroutine psb_sspall3(a, ni1,ni2,nd,info)
-    implicit none
-    !....Parameters...
-    Type(psb_sspmat_type), intent(inout) :: A
-    Integer, intent(in)          :: ni1,ni2,nd
-    Integer, intent(out)         :: info
-
-    !locals
-    logical, parameter  :: debug=.false.
-
-    info  = 0
-    call psb_nullify_sp(a)
-    call psb_sp_reall(a, ni1,ni2,nd,info)
-    if (info /= 0) return
-    a%pl(:)=0
-    a%pr(:)=0
-    ! set INFOA fields
-    a%fida   = 'COO'
-    a%descra = 'GUN'
-    a%infoa(:) = 0
-    a%infoa(psb_state_) = psb_spmat_bld_
-    a%m      = 0
-    a%k      = 0
-    if (debug) write(0,*) 'SPALL : end'
-    Return
-
-  End Subroutine psb_sspall3
-
-
-  subroutine psb_sspreallocate(a, nnz,info,ifc)
-    implicit none
-    !....Parameters...
-    Type(psb_sspmat_type), intent(inout)  :: A
-    Integer, intent(in)           :: NNZ
-    Integer, intent(out)          :: info
-    !
-    ! ifc is used here to allocate space in IA1 for smart 
-    ! regeneration. This probably ought to be changed, 
-    ! by adding a new component to d_spmat, or by making
-    ! infoa a pointer.    
-    !
-    Integer, intent(in), optional :: ifc
-    integer                       :: ifc_
-
-    !locals
-    logical, parameter  :: debug=.false.
-
-    info  = 0
-    if (nnz < 0) then
-      info=45
-      return
-    endif
-    if (present(ifc)) then 
-      ifc_ = max(1,ifc)
-    else
-      ifc_ = 1
-    endif
-
-    if (ifc_ == 1) then 
-      if (debug) write(0,*) 'sspreallocate: calling realloc',max(nnz,a%m+1,a%k+1)
-      call psb_realloc(max(nnz,a%m+1,a%k+1),a%ia1,a%ia2,a%aspk,info)
-      if (debug) write(0,*) 'sspreallocate: done realloc',info, psb_get_errstatus()
-    else
-      call psb_realloc(max(nnz,a%m+1,a%k+1),a%aspk,info)
-      if (info /= 0) return 
-      call psb_realloc(max(nnz,a%m+1,a%k+1),a%ia2,info)
-      if (info /= 0) return 
-      call psb_realloc(max(ifc*nnz+200,a%m+1,a%k+1),a%ia1,info)
-      if (info /= 0) return 
-    end if
-    if (info /= 0) return
-    call psb_realloc(max(1,a%m),a%pl,info)
-    if (info /= 0) return
-    call psb_realloc(max(1,a%k),a%pr,info)
-    if (debug) write(0,*) 'sspreallocate:',allocated(a%ia1),allocated(a%ia2),&
-         & allocated(a%aspk),allocated(a%pl),allocated(a%pr),info
-    if (info /= 0) return
-
-    Return
-
-  End Subroutine psb_sspreallocate
-
-  subroutine psb_sspreall3(a, ni1,ni2,nd,info)
-    implicit none
-    !....Parameters...
-    Type(psb_sspmat_type), intent(inout)  :: A
-    Integer, intent(in)                   :: ni1,ni2,nd
-    Integer, intent(inout)                :: info
-
-    !locals
-    logical, parameter  :: debug=.false.
-
-    info  = 0
-    if (debug) write(0,*) 'Before realloc',nd,size(a%aspk),ni1,ni2
-    call psb_realloc(nd,a%aspk,info)
-    if (debug) write(0,*) 'After realloc',nd,size(a%aspk),info
-    if (info /= 0) return 
-    if (debug) write(0,*) 'Before realloc2',ni2,allocated(a%ia2),size(a%ia2)
-    call psb_realloc(ni2,a%ia2,info)
-    if (info /= 0) return 
-    if (debug) write(0,*) 'Before realloc3',ni1,allocated(a%ia1),size(a%ia1)
-    call psb_realloc(ni1,a%ia1,info)
-    if (info /= 0) return
-    if (debug) write(0,*) 'Before realloc4',max(1,a%m),allocated(a%pl),size(a%pl)
-    call psb_realloc(max(1,a%m),a%pl,info)
-    if (info /= 0) return
-    if (debug) write(0,*) 'Before realloc5',max(1,a%k),allocated(a%pr),size(a%pr)
-    call psb_realloc(max(1,a%k),a%pr,info)
-    if (info /= 0) return
-
-    Return
-
-  End Subroutine psb_sspreall3
-
-
-  subroutine psb_sspclone(a, b,info)
-    implicit none
-    !....Parameters...
-    Type(psb_sspmat_type), intent(in)   :: A
-    Type(psb_sspmat_type), intent(out)  :: B
-    Integer, intent(out)                :: info
-
-    !locals
-
-    INFO  = 0
-    call psb_nullify_sp(b)
-    call psb_safe_ab_cpy(a%aspk,b%aspk,info)
-    if (info == 0) call psb_safe_ab_cpy(a%ia1,b%ia1,info)
-    if (info == 0) call psb_safe_ab_cpy(a%ia2,b%ia2,info)
-    if (info == 0) call psb_safe_ab_cpy(a%pl,b%pl,info)
-    if (info == 0) call psb_safe_ab_cpy(a%pr,b%pr,info)
-    if (info /= 0) then
-      info=2023
-      return
-    Endif
-    b%infoa(:) = a%infoa(:)
-    b%fida     = a%fida
-    b%descra   = a%descra
-    b%m        = a%m
-    b%k        = a%k
-
-    Return
-
-  End Subroutine psb_sspclone
-
-
-
-  ! Will be changed to use MOVE_ALLOC 
-  subroutine psb_ssp_transfer(a, b,info)
-    implicit none
-    !....Parameters...
-    Type(psb_sspmat_type), intent(inout)  :: A
-    Type(psb_sspmat_type), intent(inout)  :: B
-    Integer, intent(out)                  :: info
-
-    info  = 0
-
-
-    call psb_move_alloc( a%aspk,     b%aspk  , info)
-    call psb_move_alloc( a%ia1 ,     b%ia1   , info)
-    call psb_move_alloc( a%ia2 ,     b%ia2   , info)
-    call psb_move_alloc( a%pl  ,     b%pl    , info)
-    call psb_move_alloc( a%pr  ,     b%pr    , info)
-    b%infoa(:) = a%infoa(:)
-    b%fida     = a%fida
-    b%descra   = a%descra
-    b%m        = a%m
-    b%k        = a%k
-
-    call psb_nullify_sp(a)
-
-    Return
-
-  End Subroutine psb_ssp_transfer
-
-
-  Subroutine psb_ssp_setifld(val,field,a,info)
-    implicit none
-    !....Parameters...
-
-    Type(psb_sspmat_type), intent(inout) :: A
-    Integer, intent(in)          :: field,val
-    Integer, intent(out)         :: info
-
-    info  = 0
-
-
-    if (info == 0) &
-         & call psb_setifield(val,field,a%infoa,psb_ifasize_,info)
-
-
-    Return
-
-  end subroutine psb_ssp_setifld
-
-
-  !
-  ! Reduce the size of A to the barest minimum necessary.
-  !
-  !
-
-
-  subroutine psb_ssp_trim(a,info)
-    use psb_string_mod
-    implicit none
-    !....Parameters...
-    Type(psb_sspmat_type), intent(inout) :: A
-    Integer, intent(out)          :: info
-
-    !locals
-    Integer           :: i1, i2, ia
-
-    info  = 0
-    call psb_sp_trimsize(a,i1,i2,ia,info)
-    i1 = max(i1,1);  i2 = max(i2,1);  ia = max(ia,1)
-    if (info == 0) call psb_sp_reall(a,i1,i2,ia,info)
-
-    Return
-
-  End Subroutine psb_ssp_trim
-
-
-  subroutine psb_ssp_trimsize(a, i1,i2,ia,info)
-    use psb_string_mod
-    implicit none
-    !....Parameters...
-    Type(psb_sspmat_type), intent(in) :: A
-    Integer, intent(out)              :: i1, i2, ia, info
-
-    !locals
-    Integer             :: nza
-
-    info  = 0
-    if (psb_sp_getifld(psb_upd_,a,info) == psb_upd_perm_) then 
-      info = -1 
-      i1 = size(a%ia1)
-      i2 = size(a%ia2)
-      ia = size(a%aspk)
-      return
-    endif
-    select case(psb_tolower(a%fida))
-    case('csr')
-      nza = a%ia2(a%m+1)-1
-      ia  = nza
-      i1  = nza
-      i2  = a%m + 1
-    case('csc')
-      nza = a%ia2(a%k+1)-1
-      ia  = nza
-      i1  = nza
-      i2  = a%k + 1
-    case('coo','coi')
-      nza = a%infoa(psb_nnz_)
-      i1  = nza
-      i2  = nza
-      ia  = nza
-    case('jad')
-      ! Feeling lazy today
-      i1 = size(a%ia1)
-      i2 = size(a%ia2)
-      ia = size(a%aspk)
-    case default
-      i1 = size(a%ia1)
-      i2 = size(a%ia2)
-      ia = size(a%aspk)
-    end select
-
-    Return
-
-  End Subroutine psb_ssp_trimsize
-
-  function psb_ssp_getifld(field,a,info)
-    implicit none
-    !....Parameters...
-
-    Type(psb_sspmat_type), intent(in) :: A
-    Integer, intent(in)          :: field
-    Integer                      :: psb_ssp_getifld
-    Integer, intent(out)         :: info
-
-    !locals
-    integer :: val
-
-    info  = 0
-    val   = -1
-
-    if ((field < 1).or.(field > psb_ifasize_)) then
-      info = -1
-      psb_ssp_getifld = val
-      return
-    endif
-
-    call psb_getifield(val,field,a%infoa,psb_ifasize_,info)
-
-    psb_ssp_getifld = val
-    Return
-
-  end function psb_ssp_getifld
-
-  function psb_sspsizeof(a) result(val)
-    implicit none
-    !....Parameters...
-
-    Type(psb_sspmat_type), intent(in) :: A
-    integer(psb_long_int_k_) :: val
-
-    val   = psb_sizeof_int*size(a%infoa)
-    if (allocated(a%aspk)) then 
-      val = val + psb_sizeof_sp  * size(a%aspk)
-    endif
-    if (allocated(a%ia1)) then 
-      val = val + psb_sizeof_int * size(a%ia1)
-    endif
-    if (allocated(a%ia2)) then 
-      val = val + psb_sizeof_int * size(a%ia2)
-    endif
-    if (allocated(a%pl)) then 
-      val = val + psb_sizeof_int * size(a%pl)
-    endif
-    if (allocated(a%pr)) then 
-      val = val + psb_sizeof_int * size(a%pr)
-    endif
-
-  end function psb_sspsizeof
-
-
-  subroutine psb_ssp_free(a,info)
-    implicit none
-    !....Parameters...
-    Type(psb_sspmat_type), intent(inout)  :: A
-    Integer, intent(out)        :: info
-    !locals
-    integer             :: iret
-    info  = 0
-
-    if (allocated(a%aspk)) then
-!!$      write(0,*) 'Deallocating aspk'
-      deallocate(a%aspk,STAT=IRET)
-!!$      write(0,*) 'Deallocated  aspk',iret
-      if (iret /= 0) info = max(info,1)
-    endif
-    if (allocated(a%ia1)) then
-      deallocate(a%ia1,STAT=IRET)
-      if (iret /= 0) info = max(info,2)
-    endif
-    if (allocated(a%ia2)) then
-      deallocate(a%ia2,STAT=IRET)
-      if (iret /= 0) info = max(info,3)
-    endif
-    if (allocated(a%pr)) then
-      deallocate(a%pr,STAT=IRET)
-      if (iret /= 0) info = max(info,4)
-    endif
-    if (allocated(a%pl)) then
-      deallocate(a%pl,STAT=IRET)
-      if (iret /= 0) info = max(info,5)
-    endif
-    call psb_nullify_sp(a)
-!!$    write(0,*) 'End of sp_free ',info
-    Return
-  End Subroutine psb_ssp_free
+!!$  subroutine psb_nullify_ssp(mat)
+!!$    implicit none
+!!$    type(psb_sspmat_type), intent(inout) :: mat
+!!$
+!!$! !$    nullify(mat%aspk,mat%ia1,mat%ia2,mat%pl,mat%pr)
+!!$
+!!$    mat%infoa(:)=0
+!!$    mat%m=0
+!!$    mat%k=0
+!!$    mat%fida=''
+!!$    mat%descra=''
+!!$
+!!$  end subroutine psb_nullify_ssp
+!!$
+!!$  Subroutine psb_sspreinit(a,info,clear)
+!!$    use psb_string_mod
+!!$    Implicit None
+!!$
+!!$    !....Parameters...
+!!$    Type(psb_sspmat_type), intent(inout) :: a
+!!$    integer, intent(out)                 :: info
+!!$    logical, intent(in), optional        :: clear
+!!$
+!!$    !locals
+!!$    logical, parameter  :: debug=.false.
+!!$    logical             :: clear_
+!!$    character(len=20)   :: name
+!!$
+!!$    info = 0
+!!$    name = 'psb_sp_reinit'
+!!$
+!!$    if (present(clear)) then 
+!!$      clear_ = clear
+!!$    else
+!!$      clear_ = .true.
+!!$    end if
+!!$
+!!$    select case(psb_sp_getifld(psb_state_,a,info))
+!!$    case(psb_spmat_asb_) 
+!!$
+!!$      if (clear_) a%aspk(:) = dzero
+!!$
+!!$      if (psb_sp_getifld(psb_upd_,a,info)==psb_upd_perm_) then 
+!!$        if(psb_toupper(a%fida(1:3)) == 'JAD') then
+!!$          a%ia1(a%infoa(psb_upd_pnt_)+psb_nnz_) = 0
+!!$        else
+!!$          a%ia2(a%infoa(psb_upd_pnt_)+psb_nnz_) = 0
+!!$        endif
+!!$      endif
+!!$      a%infoa(psb_state_) = psb_spmat_upd_
+!!$    case(psb_spmat_bld_) 
+!!$      ! in this case do nothing. this allows sprn to be called 
+!!$      ! right after allocate, with spins doing the right thing.
+!!$      ! hopefully :-)
+!!$
+!!$    case( psb_spmat_upd_) 
+!!$
+!!$    case default
+!!$      info=591     
+!!$      call psb_errpush(info,name)
+!!$    end select
+!!$
+!!$  end Subroutine psb_sspreinit
+!!$
+!!$  Subroutine psb_sspallocate(a, nnz,info)
+!!$    implicit none
+!!$    !....Parameters...
+!!$    Type(psb_sspmat_type), intent(inout) :: A
+!!$    Integer, intent(in)          :: nnz
+!!$    integer, intent(out)         :: info
+!!$
+!!$    !locals
+!!$    logical, parameter  :: debug=.false.
+!!$
+!!$    info  = 0
+!!$    if (nnz < 0) then
+!!$      info=45
+!!$      return
+!!$    Endif
+!!$    if (debug) write(0,*) 'SPALL : NNZ ',nnz,a%m,a%k
+!!$    call psb_nullify_sp(a)
+!!$    call psb_sp_reall(a,nnz,info)
+!!$    if (info /= 0) return
+!!$    a%pl(:)=0
+!!$    a%pr(:)=0
+!!$    ! set INFOA fields
+!!$    a%fida   = 'COO'
+!!$    a%descra = 'GUN'
+!!$    a%infoa(:) = 0
+!!$    a%infoa(psb_state_) = psb_spmat_bld_
+!!$    a%m        = 0
+!!$    a%k        = 0
+!!$    if (debug) write(0,*) 'SPALL : end'
+!!$    Return
+!!$
+!!$  End Subroutine psb_sspallocate
+!!$
+!!$  Subroutine psb_sspallmk(m,k,a,info)
+!!$    implicit none
+!!$    !....Parameters...
+!!$
+!!$    Type(psb_sspmat_type), intent(inout) :: A
+!!$    Integer, intent(in)          :: m,k
+!!$    Integer, intent(out)         :: info
+!!$
+!!$    !locals
+!!$    logical, parameter  :: debug=.false.
+!!$    integer  :: nnz
+!!$
+!!$    INFO  = 0
+!!$    call psb_nullify_sp(a)
+!!$    nnz = 2*max(1,m,k)
+!!$    a%m=max(0,m)
+!!$    a%k=max(0,k)
+!!$    if (debug) write(0,*) 'SPALL : NNZ ',nnz,a%m,a%k
+!!$    call psb_sp_reall(a,nnz,info)
+!!$    if (debug) write(0,*) 'Check in ALLOCATE ',info,allocated(a%pl),allocated(a%pr)
+!!$    if (info /= 0) return
+!!$    a%pl(:)=0
+!!$    a%pr(:)=0
+!!$    ! set INFOA fields
+!!$    a%fida   = 'COO'
+!!$    a%descra = 'GUN'
+!!$    a%infoa(:) = 0
+!!$    a%infoa(psb_state_) = psb_spmat_bld_
+!!$    if (debug) write(0,*) 'SPALL : end'
+!!$    Return
+!!$
+!!$  end subroutine psb_sspallmk
+!!$
+!!$  Subroutine psb_sspallmknz(m,k,a, nnz,info)
+!!$    implicit none
+!!$    !....parameters...
+!!$
+!!$    type(psb_sspmat_type), intent(inout) :: a
+!!$    integer, intent(in)                  :: m,k,nnz
+!!$    integer, intent(out)                 :: info
+!!$
+!!$    !locals
+!!$    logical, parameter  :: debug=.false.
+!!$
+!!$    info  = 0
+!!$    if (nnz < 0) then
+!!$      info=45
+!!$      return
+!!$    endif
+!!$    call psb_nullify_sp(a)
+!!$    if (debug) write(0,*) 'spallmknz : nnz ',nnz,a%m,a%k,psb_get_errstatus()
+!!$    a%m=max(0,m)
+!!$    a%k=max(0,k)
+!!$    call psb_sp_reall(a,nnz,info)
+!!$    if (debug) write(0,*) 'Check in ALLOCATE ',info,allocated(a%pl),allocated(a%pr)
+!!$    if (info /= 0) return
+!!$    a%pl(:)=0
+!!$    a%pr(:)=0
+!!$    ! set infoa fields
+!!$    a%fida   = 'COO'
+!!$    a%descra = 'GUN'
+!!$    a%infoa(:) = 0
+!!$    a%infoa(psb_state_) = psb_spmat_bld_
+!!$    if (debug) write(0,*) 'spall : end'
+!!$    return
+!!$
+!!$  end subroutine psb_sspallmknz
+!!$
+!!$
+!!$  subroutine psb_sspall3(a, ni1,ni2,nd,info)
+!!$    implicit none
+!!$    !....Parameters...
+!!$    Type(psb_sspmat_type), intent(inout) :: A
+!!$    Integer, intent(in)          :: ni1,ni2,nd
+!!$    Integer, intent(out)         :: info
+!!$
+!!$    !locals
+!!$    logical, parameter  :: debug=.false.
+!!$
+!!$    info  = 0
+!!$    call psb_nullify_sp(a)
+!!$    call psb_sp_reall(a, ni1,ni2,nd,info)
+!!$    if (info /= 0) return
+!!$    a%pl(:)=0
+!!$    a%pr(:)=0
+!!$    ! set INFOA fields
+!!$    a%fida   = 'COO'
+!!$    a%descra = 'GUN'
+!!$    a%infoa(:) = 0
+!!$    a%infoa(psb_state_) = psb_spmat_bld_
+!!$    a%m      = 0
+!!$    a%k      = 0
+!!$    if (debug) write(0,*) 'SPALL : end'
+!!$    Return
+!!$
+!!$  End Subroutine psb_sspall3
+!!$
+!!$
+!!$  subroutine psb_sspreallocate(a, nnz,info,ifc)
+!!$    implicit none
+!!$    !....Parameters...
+!!$    Type(psb_sspmat_type), intent(inout)  :: A
+!!$    Integer, intent(in)           :: NNZ
+!!$    Integer, intent(out)          :: info
+!!$    !
+!!$    ! ifc is used here to allocate space in IA1 for smart 
+!!$    ! regeneration. This probably ought to be changed, 
+!!$    ! by adding a new component to d_spmat, or by making
+!!$    ! infoa a pointer.    
+!!$    !
+!!$    Integer, intent(in), optional :: ifc
+!!$    integer                       :: ifc_
+!!$
+!!$    !locals
+!!$    logical, parameter  :: debug=.false.
+!!$
+!!$    info  = 0
+!!$    if (nnz < 0) then
+!!$      info=45
+!!$      return
+!!$    endif
+!!$    if (present(ifc)) then 
+!!$      ifc_ = max(1,ifc)
+!!$    else
+!!$      ifc_ = 1
+!!$    endif
+!!$
+!!$    if (ifc_ == 1) then 
+!!$      if (debug) write(0,*) 'sspreallocate: calling realloc',max(nnz,a%m+1,a%k+1)
+!!$      call psb_realloc(max(nnz,a%m+1,a%k+1),a%ia1,a%ia2,a%aspk,info)
+!!$      if (debug) write(0,*) 'sspreallocate: done realloc',info, psb_get_errstatus()
+!!$    else
+!!$      call psb_realloc(max(nnz,a%m+1,a%k+1),a%aspk,info)
+!!$      if (info /= 0) return 
+!!$      call psb_realloc(max(nnz,a%m+1,a%k+1),a%ia2,info)
+!!$      if (info /= 0) return 
+!!$      call psb_realloc(max(ifc*nnz+200,a%m+1,a%k+1),a%ia1,info)
+!!$      if (info /= 0) return 
+!!$    end if
+!!$    if (info /= 0) return
+!!$    call psb_realloc(max(1,a%m),a%pl,info)
+!!$    if (info /= 0) return
+!!$    call psb_realloc(max(1,a%k),a%pr,info)
+!!$    if (debug) write(0,*) 'sspreallocate:',allocated(a%ia1),allocated(a%ia2),&
+!!$         & allocated(a%aspk),allocated(a%pl),allocated(a%pr),info
+!!$    if (info /= 0) return
+!!$
+!!$    Return
+!!$
+!!$  End Subroutine psb_sspreallocate
+!!$
+!!$  subroutine psb_sspreall3(a, ni1,ni2,nd,info)
+!!$    implicit none
+!!$    !....Parameters...
+!!$    Type(psb_sspmat_type), intent(inout)  :: A
+!!$    Integer, intent(in)                   :: ni1,ni2,nd
+!!$    Integer, intent(inout)                :: info
+!!$
+!!$    !locals
+!!$    logical, parameter  :: debug=.false.
+!!$
+!!$    info  = 0
+!!$    if (debug) write(0,*) 'Before realloc',nd,size(a%aspk),ni1,ni2
+!!$    call psb_realloc(nd,a%aspk,info)
+!!$    if (debug) write(0,*) 'After realloc',nd,size(a%aspk),info
+!!$    if (info /= 0) return 
+!!$    if (debug) write(0,*) 'Before realloc2',ni2,allocated(a%ia2),size(a%ia2)
+!!$    call psb_realloc(ni2,a%ia2,info)
+!!$    if (info /= 0) return 
+!!$    if (debug) write(0,*) 'Before realloc3',ni1,allocated(a%ia1),size(a%ia1)
+!!$    call psb_realloc(ni1,a%ia1,info)
+!!$    if (info /= 0) return
+!!$    if (debug) write(0,*) 'Before realloc4',max(1,a%m),allocated(a%pl),size(a%pl)
+!!$    call psb_realloc(max(1,a%m),a%pl,info)
+!!$    if (info /= 0) return
+!!$    if (debug) write(0,*) 'Before realloc5',max(1,a%k),allocated(a%pr),size(a%pr)
+!!$    call psb_realloc(max(1,a%k),a%pr,info)
+!!$    if (info /= 0) return
+!!$
+!!$    Return
+!!$
+!!$  End Subroutine psb_sspreall3
+!!$
+!!$
+!!$  subroutine psb_sspclone(a, b,info)
+!!$    implicit none
+!!$    !....Parameters...
+!!$    Type(psb_sspmat_type), intent(in)   :: A
+!!$    Type(psb_sspmat_type), intent(out)  :: B
+!!$    Integer, intent(out)                :: info
+!!$
+!!$    !locals
+!!$
+!!$    INFO  = 0
+!!$    call psb_nullify_sp(b)
+!!$    call psb_safe_ab_cpy(a%aspk,b%aspk,info)
+!!$    if (info == 0) call psb_safe_ab_cpy(a%ia1,b%ia1,info)
+!!$    if (info == 0) call psb_safe_ab_cpy(a%ia2,b%ia2,info)
+!!$    if (info == 0) call psb_safe_ab_cpy(a%pl,b%pl,info)
+!!$    if (info == 0) call psb_safe_ab_cpy(a%pr,b%pr,info)
+!!$    if (info /= 0) then
+!!$      info=2023
+!!$      return
+!!$    Endif
+!!$    b%infoa(:) = a%infoa(:)
+!!$    b%fida     = a%fida
+!!$    b%descra   = a%descra
+!!$    b%m        = a%m
+!!$    b%k        = a%k
+!!$
+!!$    Return
+!!$
+!!$  End Subroutine psb_sspclone
+!!$
+!!$
+!!$
+!!$  ! Will be changed to use MOVE_ALLOC 
+!!$  subroutine psb_ssp_transfer(a, b,info)
+!!$    implicit none
+!!$    !....Parameters...
+!!$    Type(psb_sspmat_type), intent(inout)  :: A
+!!$    Type(psb_sspmat_type), intent(inout)  :: B
+!!$    Integer, intent(out)                  :: info
+!!$
+!!$    info  = 0
+!!$
+!!$
+!!$    call psb_move_alloc( a%aspk,     b%aspk  , info)
+!!$    call psb_move_alloc( a%ia1 ,     b%ia1   , info)
+!!$    call psb_move_alloc( a%ia2 ,     b%ia2   , info)
+!!$    call psb_move_alloc( a%pl  ,     b%pl    , info)
+!!$    call psb_move_alloc( a%pr  ,     b%pr    , info)
+!!$    b%infoa(:) = a%infoa(:)
+!!$    b%fida     = a%fida
+!!$    b%descra   = a%descra
+!!$    b%m        = a%m
+!!$    b%k        = a%k
+!!$
+!!$    call psb_nullify_sp(a)
+!!$
+!!$    Return
+!!$
+!!$  End Subroutine psb_ssp_transfer
+!!$
+!!$
+!!$  Subroutine psb_ssp_setifld(val,field,a,info)
+!!$    implicit none
+!!$    !....Parameters...
+!!$
+!!$    Type(psb_sspmat_type), intent(inout) :: A
+!!$    Integer, intent(in)          :: field,val
+!!$    Integer, intent(out)         :: info
+!!$
+!!$    info  = 0
+!!$
+!!$
+!!$    if (info == 0) &
+!!$         & call psb_setifield(val,field,a%infoa,psb_ifasize_,info)
+!!$
+!!$
+!!$    Return
+!!$
+!!$  end subroutine psb_ssp_setifld
+!!$
+!!$
+!!$  !
+!!$  ! Reduce the size of A to the barest minimum necessary.
+!!$  !
+!!$  !
+!!$
+!!$
+!!$  subroutine psb_ssp_trim(a,info)
+!!$    use psb_string_mod
+!!$    implicit none
+!!$    !....Parameters...
+!!$    Type(psb_sspmat_type), intent(inout) :: A
+!!$    Integer, intent(out)          :: info
+!!$
+!!$    !locals
+!!$    Integer           :: i1, i2, ia
+!!$
+!!$    info  = 0
+!!$    call psb_sp_trimsize(a,i1,i2,ia,info)
+!!$    i1 = max(i1,1);  i2 = max(i2,1);  ia = max(ia,1)
+!!$    if (info == 0) call psb_sp_reall(a,i1,i2,ia,info)
+!!$
+!!$    Return
+!!$
+!!$  End Subroutine psb_ssp_trim
+!!$
+!!$
+!!$  subroutine psb_ssp_trimsize(a, i1,i2,ia,info)
+!!$    use psb_string_mod
+!!$    implicit none
+!!$    !....Parameters...
+!!$    Type(psb_sspmat_type), intent(in) :: A
+!!$    Integer, intent(out)              :: i1, i2, ia, info
+!!$
+!!$    !locals
+!!$    Integer             :: nza
+!!$
+!!$    info  = 0
+!!$    if (psb_sp_getifld(psb_upd_,a,info) == psb_upd_perm_) then 
+!!$      info = -1 
+!!$      i1 = size(a%ia1)
+!!$      i2 = size(a%ia2)
+!!$      ia = size(a%aspk)
+!!$      return
+!!$    endif
+!!$    select case(psb_tolower(a%fida))
+!!$    case('csr')
+!!$      nza = a%ia2(a%m+1)-1
+!!$      ia  = nza
+!!$      i1  = nza
+!!$      i2  = a%m + 1
+!!$    case('csc')
+!!$      nza = a%ia2(a%k+1)-1
+!!$      ia  = nza
+!!$      i1  = nza
+!!$      i2  = a%k + 1
+!!$    case('coo','coi')
+!!$      nza = a%infoa(psb_nnz_)
+!!$      i1  = nza
+!!$      i2  = nza
+!!$      ia  = nza
+!!$    case('jad')
+!!$      ! Feeling lazy today
+!!$      i1 = size(a%ia1)
+!!$      i2 = size(a%ia2)
+!!$      ia = size(a%aspk)
+!!$    case default
+!!$      i1 = size(a%ia1)
+!!$      i2 = size(a%ia2)
+!!$      ia = size(a%aspk)
+!!$    end select
+!!$
+!!$    Return
+!!$
+!!$  End Subroutine psb_ssp_trimsize
+!!$
+!!$  function psb_ssp_getifld(field,a,info)
+!!$    implicit none
+!!$    !....Parameters...
+!!$
+!!$    Type(psb_sspmat_type), intent(in) :: A
+!!$    Integer, intent(in)          :: field
+!!$    Integer                      :: psb_ssp_getifld
+!!$    Integer, intent(out)         :: info
+!!$
+!!$    !locals
+!!$    integer :: val
+!!$
+!!$    info  = 0
+!!$    val   = -1
+!!$
+!!$    if ((field < 1).or.(field > psb_ifasize_)) then
+!!$      info = -1
+!!$      psb_ssp_getifld = val
+!!$      return
+!!$    endif
+!!$
+!!$    call psb_getifield(val,field,a%infoa,psb_ifasize_,info)
+!!$
+!!$    psb_ssp_getifld = val
+!!$    Return
+!!$
+!!$  end function psb_ssp_getifld
+!!$
+!!$  function psb_sspsizeof(a) result(val)
+!!$    implicit none
+!!$    !....Parameters...
+!!$
+!!$    Type(psb_sspmat_type), intent(in) :: A
+!!$    integer(psb_long_int_k_) :: val
+!!$
+!!$    val   = psb_sizeof_int*size(a%infoa)
+!!$    if (allocated(a%aspk)) then 
+!!$      val = val + psb_sizeof_sp  * size(a%aspk)
+!!$    endif
+!!$    if (allocated(a%ia1)) then 
+!!$      val = val + psb_sizeof_int * size(a%ia1)
+!!$    endif
+!!$    if (allocated(a%ia2)) then 
+!!$      val = val + psb_sizeof_int * size(a%ia2)
+!!$    endif
+!!$    if (allocated(a%pl)) then 
+!!$      val = val + psb_sizeof_int * size(a%pl)
+!!$    endif
+!!$    if (allocated(a%pr)) then 
+!!$      val = val + psb_sizeof_int * size(a%pr)
+!!$    endif
+!!$
+!!$  end function psb_sspsizeof
+!!$
+!!$
+!!$  subroutine psb_ssp_free(a,info)
+!!$    implicit none
+!!$    !....Parameters...
+!!$    Type(psb_sspmat_type), intent(inout)  :: A
+!!$    Integer, intent(out)        :: info
+!!$    !locals
+!!$    integer             :: iret
+!!$    info  = 0
+!!$
+!!$    if (allocated(a%aspk)) then
+!!$! !$      write(0,*) 'Deallocating aspk'
+!!$      deallocate(a%aspk,STAT=IRET)
+!!$! !$      write(0,*) 'Deallocated  aspk',iret
+!!$      if (iret /= 0) info = max(info,1)
+!!$    endif
+!!$    if (allocated(a%ia1)) then
+!!$      deallocate(a%ia1,STAT=IRET)
+!!$      if (iret /= 0) info = max(info,2)
+!!$    endif
+!!$    if (allocated(a%ia2)) then
+!!$      deallocate(a%ia2,STAT=IRET)
+!!$      if (iret /= 0) info = max(info,3)
+!!$    endif
+!!$    if (allocated(a%pr)) then
+!!$      deallocate(a%pr,STAT=IRET)
+!!$      if (iret /= 0) info = max(info,4)
+!!$    endif
+!!$    if (allocated(a%pl)) then
+!!$      deallocate(a%pl,STAT=IRET)
+!!$      if (iret /= 0) info = max(info,5)
+!!$    endif
+!!$    call psb_nullify_sp(a)
+!!$! !$    write(0,*) 'End of sp_free ',info
+!!$    Return
+!!$  End Subroutine psb_ssp_free
 
 !!$  subroutine psb_nullify_dsp(mat)
 !!$    implicit none
@@ -2610,166 +2604,166 @@ contains
   End Subroutine psb_zsp_free
 
 
-  subroutine psb_sspinfo(ireq,a,ires,info,iaux)
-    use psb_const_mod
-    use psb_error_mod
-    use psb_string_mod
-    use psb_sort_mod
-    implicit none
-
-    type(psb_sspmat_type), intent(in), target :: a
-    integer, intent(in)               :: ireq
-    integer, intent(out)              :: ires, info
-    integer, intent(in), optional     :: iaux
-
-    integer :: j,ip,jp,nr,irw,nz, err_act, row, ipx, pia, pja, rb,idx, nc
-    integer, pointer :: ia1(:), ia2(:), ia3(:), ja(:)
-    character(len=20)                 :: name, ch_err
-
-    name='psb_sspinfo'
-    info  = 0
-    call psb_erractionsave(err_act)
-
-
-    if (ireq == psb_nztotreq_) then 
-      ! The number of nonzeroes
-      if (psb_toupper(a%fida) == 'CSR') then 
-        nr   = a%m
-        ires = a%ia2(nr+1)-1
-      else if ((psb_toupper(a%fida) == 'COO').or.(psb_toupper(a%fida) == 'COI')) then 
-        ires = a%infoa(psb_nnz_)
-      else if (psb_toupper(a%fida) == 'JAD') then 
-        ires = a%infoa(psb_nnz_)
-      else if (psb_toupper(a%fida) == 'CSC') then 
-        nc   = a%k
-        ires = a%ia2(nc+1)-1
-      else
-        ires=-1
-        info=136
-        ch_err=a%fida(1:3)
-        call psb_errpush(info,name,a_err=ch_err)
-        goto 9999
-      end if
-
-    else if (ireq == psb_nzrowreq_) then 
-      ! The number of nonzeroes in row iaux
-      if (.not.present(iaux)) then 
-        write(0,*) 'Need IAUX when ireq=nzrowreq'
-        ires=-1
-        return
-      endif
-      irw = iaux
-      if (irw > a%m) then 
-        write(0,*) 'SPINFO: Accessing out of bounds? ',irw,a%m
-        ires = 0
-        return
-      endif
-      if (psb_toupper(a%fida) == 'CSR') then 
-        ires = a%ia2(irw+1)-a%ia2(irw)
-      else if ((psb_toupper(a%fida) == 'COO').or.(psb_toupper(a%fida) == 'COI')) then 
-
-        if (a%infoa(psb_srtd_) == psb_isrtdcoo_) then 
-          ! In this case we can do a binary search. 
-          nz = a%infoa(psb_nnz_)
-          ip = psb_ibsrch(irw,nz,a%ia1)
-          jp = ip
-          ! expand [ip,jp] to contain all row entries.
-          do 
-            if (ip < 2) exit
-            if (a%ia1(ip-1) == irw) then  
-              ip = ip -1 
-            else 
-              exit
-            end if
-          end do
-
-          do
-            if (jp > nz) exit
-            if (a%ia1(jp) == irw) then
-              jp =jp + 1
-            else
-              exit
-            endif
-          end do
-          ires = jp-ip
-        else
-          ires = count(a%ia1(1:a%infoa(psb_nnz_))==irw)
-        endif
-!!$      ires = 0
-!!$      do i=1, a%infoa(psb_nnz_) 
-!!$        if (a%ia1(i) == irw) ires = ires + 1
-!!$      enddo
-      else if (psb_toupper(a%fida) == 'JAD') then 
-        pia = a%ia2(2) ! points to the beginning of ia(3,png)
-        pja = a%ia2(3) ! points to the beginning of ja(:)
-        ja  => a%ia2(pja:)             ! the array containing the pointers to ka and aspk
-        ia1 => a%ia2(pia:pja-1:3)      ! the array containing the first row index of each block
-        ia2 => a%ia2(pia+1:pja-1:3)    ! the array containing a pointer to the pos. in ja to the first jad column
-        ia3 => a%ia2(pia+2:pja-1:3)    ! the array containing a pointer to the pos. in ja to the first csr column
-
-        idx=a%pl(irw)
-        j=0
-        nz=0
-        blkfnd: do
-          j=j+1
-          if(ia1(j) == idx) then
-            nz=nz+ia3(j)-ia2(j)
-            ipx = ia1(j)         ! the first row index of the block
-            rb  = idx-ipx        ! the row offset within the block
-            row = ia3(j)+rb
-            nz  = nz+ja(row+1)-ja(row)
-            exit blkfnd
-          else if(ia1(j) > idx) then
-            nz=nz+ia3(j-1)-ia2(j-1)
-            ipx = ia1(j-1)         ! the first row index of the block
-            rb  = idx-ipx          ! the row offset within the block
-            row = ia3(j-1)+rb
-            nz  = nz+ja(row+1)-ja(row)
-            exit blkfnd
-          end if
-        end do blkfnd
-        ires=nz
-      else
-        ires=-1
-        info=136
-        ch_err=a%fida(1:3)
-        call psb_errpush(info,name,a_err=ch_err)
-        goto 9999
-      end if
-
-    else  if (ireq == psb_nzsizereq_) then 
-      if (psb_toupper(a%fida) == 'CSR') then 
-        ires = size(a%aspk)
-      else if ((psb_toupper(a%fida) == 'COO').or.(psb_toupper(a%fida) == 'COI')) then 
-        ires = size(a%aspk)
-      else if (psb_toupper(a%fida) == 'JAD') then 
-        ires = a%infoa(psb_nnz_)
-      else
-        ires=-1
-        info=136
-        ch_err=a%fida(1:3)
-        call psb_errpush(info,name,a_err=ch_err)
-        goto 9999
-      end if
-
-    else 
-      write(0,*) 'Unknown request into SPINFO'
-      ires=-1
-    endif
-
-    call psb_erractionrestore(err_act)
-    return
-
-9999 continue
-    call psb_erractionrestore(err_act)
-    if (err_act == psb_act_abort_) then
-      call psb_error()
-      return
-    end if
-    return
-
-  end subroutine psb_sspinfo
-
+!!$  subroutine psb_sspinfo(ireq,a,ires,info,iaux)
+!!$    use psb_const_mod
+!!$    use psb_error_mod
+!!$    use psb_string_mod
+!!$    use psb_sort_mod
+!!$    implicit none
+!!$
+!!$    type(psb_sspmat_type), intent(in), target :: a
+!!$    integer, intent(in)               :: ireq
+!!$    integer, intent(out)              :: ires, info
+!!$    integer, intent(in), optional     :: iaux
+!!$
+!!$    integer :: j,ip,jp,nr,irw,nz, err_act, row, ipx, pia, pja, rb,idx, nc
+!!$    integer, pointer :: ia1(:), ia2(:), ia3(:), ja(:)
+!!$    character(len=20)                 :: name, ch_err
+!!$
+!!$    name='psb_sspinfo'
+!!$    info  = 0
+!!$    call psb_erractionsave(err_act)
+!!$
+!!$
+!!$    if (ireq == psb_nztotreq_) then 
+!!$      ! The number of nonzeroes
+!!$      if (psb_toupper(a%fida) == 'CSR') then 
+!!$        nr   = a%m
+!!$        ires = a%ia2(nr+1)-1
+!!$      else if ((psb_toupper(a%fida) == 'COO').or.(psb_toupper(a%fida) == 'COI')) then 
+!!$        ires = a%infoa(psb_nnz_)
+!!$      else if (psb_toupper(a%fida) == 'JAD') then 
+!!$        ires = a%infoa(psb_nnz_)
+!!$      else if (psb_toupper(a%fida) == 'CSC') then 
+!!$        nc   = a%k
+!!$        ires = a%ia2(nc+1)-1
+!!$      else
+!!$        ires=-1
+!!$        info=136
+!!$        ch_err=a%fida(1:3)
+!!$        call psb_errpush(info,name,a_err=ch_err)
+!!$        goto 9999
+!!$      end if
+!!$
+!!$    else if (ireq == psb_nzrowreq_) then 
+!!$      ! The number of nonzeroes in row iaux
+!!$      if (.not.present(iaux)) then 
+!!$        write(0,*) 'Need IAUX when ireq=nzrowreq'
+!!$        ires=-1
+!!$        return
+!!$      endif
+!!$      irw = iaux
+!!$      if (irw > a%m) then 
+!!$        write(0,*) 'SPINFO: Accessing out of bounds? ',irw,a%m
+!!$        ires = 0
+!!$        return
+!!$      endif
+!!$      if (psb_toupper(a%fida) == 'CSR') then 
+!!$        ires = a%ia2(irw+1)-a%ia2(irw)
+!!$      else if ((psb_toupper(a%fida) == 'COO').or.(psb_toupper(a%fida) == 'COI')) then 
+!!$
+!!$        if (a%infoa(psb_srtd_) == psb_isrtdcoo_) then 
+!!$          ! In this case we can do a binary search. 
+!!$          nz = a%infoa(psb_nnz_)
+!!$          ip = psb_ibsrch(irw,nz,a%ia1)
+!!$          jp = ip
+!!$          ! expand [ip,jp] to contain all row entries.
+!!$          do 
+!!$            if (ip < 2) exit
+!!$            if (a%ia1(ip-1) == irw) then  
+!!$              ip = ip -1 
+!!$            else 
+!!$              exit
+!!$            end if
+!!$          end do
+!!$
+!!$          do
+!!$            if (jp > nz) exit
+!!$            if (a%ia1(jp) == irw) then
+!!$              jp =jp + 1
+!!$            else
+!!$              exit
+!!$            endif
+!!$          end do
+!!$          ires = jp-ip
+!!$        else
+!!$          ires = count(a%ia1(1:a%infoa(psb_nnz_))==irw)
+!!$        endif
+!!$! !$      ires = 0
+!!$! !$      do i=1, a%infoa(psb_nnz_) 
+!!$! !$        if (a%ia1(i) == irw) ires = ires + 1
+!!$! !$      enddo
+!!$      else if (psb_toupper(a%fida) == 'JAD') then 
+!!$        pia = a%ia2(2) ! points to the beginning of ia(3,png)
+!!$        pja = a%ia2(3) ! points to the beginning of ja(:)
+!!$        ja  => a%ia2(pja:)             ! the array containing the pointers to ka and aspk
+!!$        ia1 => a%ia2(pia:pja-1:3)      ! the array containing the first row index of each block
+!!$        ia2 => a%ia2(pia+1:pja-1:3)    ! the array containing a pointer to the pos. in ja to the first jad column
+!!$        ia3 => a%ia2(pia+2:pja-1:3)    ! the array containing a pointer to the pos. in ja to the first csr column
+!!$
+!!$        idx=a%pl(irw)
+!!$        j=0
+!!$        nz=0
+!!$        blkfnd: do
+!!$          j=j+1
+!!$          if(ia1(j) == idx) then
+!!$            nz=nz+ia3(j)-ia2(j)
+!!$            ipx = ia1(j)         ! the first row index of the block
+!!$            rb  = idx-ipx        ! the row offset within the block
+!!$            row = ia3(j)+rb
+!!$            nz  = nz+ja(row+1)-ja(row)
+!!$            exit blkfnd
+!!$          else if(ia1(j) > idx) then
+!!$            nz=nz+ia3(j-1)-ia2(j-1)
+!!$            ipx = ia1(j-1)         ! the first row index of the block
+!!$            rb  = idx-ipx          ! the row offset within the block
+!!$            row = ia3(j-1)+rb
+!!$            nz  = nz+ja(row+1)-ja(row)
+!!$            exit blkfnd
+!!$          end if
+!!$        end do blkfnd
+!!$        ires=nz
+!!$      else
+!!$        ires=-1
+!!$        info=136
+!!$        ch_err=a%fida(1:3)
+!!$        call psb_errpush(info,name,a_err=ch_err)
+!!$        goto 9999
+!!$      end if
+!!$
+!!$    else  if (ireq == psb_nzsizereq_) then 
+!!$      if (psb_toupper(a%fida) == 'CSR') then 
+!!$        ires = size(a%aspk)
+!!$      else if ((psb_toupper(a%fida) == 'COO').or.(psb_toupper(a%fida) == 'COI')) then 
+!!$        ires = size(a%aspk)
+!!$      else if (psb_toupper(a%fida) == 'JAD') then 
+!!$        ires = a%infoa(psb_nnz_)
+!!$      else
+!!$        ires=-1
+!!$        info=136
+!!$        ch_err=a%fida(1:3)
+!!$        call psb_errpush(info,name,a_err=ch_err)
+!!$        goto 9999
+!!$      end if
+!!$
+!!$    else 
+!!$      write(0,*) 'Unknown request into SPINFO'
+!!$      ires=-1
+!!$    endif
+!!$
+!!$    call psb_erractionrestore(err_act)
+!!$    return
+!!$
+!!$9999 continue
+!!$    call psb_erractionrestore(err_act)
+!!$    if (err_act == psb_act_abort_) then
+!!$      call psb_error()
+!!$      return
+!!$    end if
+!!$    return
+!!$
+!!$  end subroutine psb_sspinfo
+!!$
 !!$  subroutine psb_dspinfo(ireq,a,ires,info,iaux)
 !!$    use psb_const_mod
 !!$    use psb_error_mod

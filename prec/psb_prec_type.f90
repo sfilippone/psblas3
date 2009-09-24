@@ -37,11 +37,11 @@
 module psb_prec_type
 
   ! Reduces size of .mod file.
-  use psb_base_mod, only : psb_sspmat_type, psb_cspmat_type,&
+  use psb_base_mod, only : psb_cspmat_type,&
        & psb_zspmat_type, psb_dpk_, psb_spk_, psb_long_int_k_,&
        & psb_desc_type, psb_sizeof, psb_sp_free, psb_cdfree,&
        & psb_erractionsave, psb_erractionrestore, psb_error, psb_get_errstatus
-  use psb_d_mat_mod, only : psb_d_sparse_mat
+  use psb_mat_mod, only : psb_s_sparse_mat,  psb_d_sparse_mat
 
   integer, parameter :: psb_min_prec_=0, psb_noprec_=0, psb_diag_=1, &
        & psb_bjac_=2, psb_max_prec_=2
@@ -66,23 +66,23 @@ module psb_prec_type
 
 
   type psb_sprec_type
-    type(psb_sspmat_type), allocatable :: av(:) 
-    real(psb_spk_), allocatable        :: d(:)  
-    type(psb_desc_type)                :: desc_data 
-    integer, allocatable               :: iprcparm(:) 
-    real(psb_spk_), allocatable        :: rprcparm(:) 
-    integer, allocatable               :: perm(:),  invperm(:) 
-    integer                            :: prec, base_prec
+    type(psb_s_sparse_mat), allocatable :: av(:) 
+    real(psb_spk_), allocatable         :: d(:)  
+    type(psb_desc_type)                 :: desc_data 
+    integer, allocatable                :: iprcparm(:) 
+    real(psb_spk_), allocatable         :: rprcparm(:) 
+    integer, allocatable                :: perm(:),  invperm(:) 
+    integer                             :: prec, base_prec
   end type psb_sprec_type
 
   type psb_dprec_type
     type(psb_d_sparse_mat), allocatable :: av(:) 
-    real(psb_dpk_), allocatable        :: d(:)  
-    type(psb_desc_type)                :: desc_data 
-    integer, allocatable               :: iprcparm(:) 
-    real(psb_dpk_), allocatable        :: rprcparm(:) 
-    integer, allocatable               :: perm(:),  invperm(:) 
-    integer                            :: prec, base_prec
+    real(psb_dpk_), allocatable         :: d(:)  
+    type(psb_desc_type)                 :: desc_data 
+    integer, allocatable                :: iprcparm(:) 
+    real(psb_dpk_), allocatable         :: rprcparm(:) 
+    integer, allocatable                :: perm(:),  invperm(:) 
+    integer                             :: prec, base_prec
   end type psb_dprec_type
 
   type psb_cprec_type
@@ -331,12 +331,7 @@ contains
 
     if (allocated(p%av))  then 
       do i=1,size(p%av) 
-        call psb_sp_free(p%av(i),info)
-        if (info /= 0) then 
-          ! Actually, we don't care here about this.
-          ! Just let it go.
-          ! return
-        end if
+        call p%av(i)%free()
       enddo
       deallocate(p%av,stat=info)
     end if
@@ -403,13 +398,7 @@ contains
 
     if (allocated(p%av))  then 
       do i=1,size(p%av) 
-!!$        call psb_sp_free(p%av(i),info)
         call p%av(i)%free()
-        if (info /= 0) then 
-          ! Actually, we don't care here about this.
-          ! Just let it go.
-          ! return
-        end if
       enddo
       deallocate(p%av,stat=info)
     end if
@@ -602,7 +591,7 @@ contains
 
 
   function psb_dprec_sizeof(prec) result(val)
-    use psb_d_mat_mod
+    use psb_mat_mod
     type(psb_dprec_type), intent(in) :: prec
     integer(psb_long_int_k_) :: val
     integer :: i
@@ -622,6 +611,7 @@ contains
   end function psb_dprec_sizeof
 
   function psb_sprec_sizeof(prec) result(val)
+    use psb_mat_mod
     type(psb_sprec_type), intent(in) :: prec
     integer(psb_long_int_k_) :: val
     integer             :: i

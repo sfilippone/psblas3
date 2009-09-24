@@ -219,9 +219,9 @@ Module psb_tools_mod
     Subroutine psb_ssphalo(a,desc_a,blk,info,rowcnv,colcnv,&
          & rowscale,colscale,outfmt,data)
       use psb_descriptor_type
-      use psb_spmat_type
-      Type(psb_sspmat_type),Intent(in)    :: a
-      Type(psb_sspmat_type),Intent(inout) :: blk
+      use psb_mat_mod
+      Type(psb_s_sparse_mat),Intent(in)    :: a
+      Type(psb_s_sparse_mat),Intent(inout) :: blk
       Type(psb_desc_type),Intent(in),target :: desc_a
       integer, intent(out)                :: info
       logical, optional, intent(in)       :: rowcnv,colcnv,rowscale,colscale
@@ -477,9 +477,9 @@ Module psb_tools_mod
   interface psb_cdbldext
     Subroutine psb_scdbldext(a,desc_a,novr,desc_ov,info,extype)
       use psb_descriptor_type
-      Use psb_spmat_type
+      Use psb_mat_mod
       integer, intent(in)                     :: novr
-      Type(psb_sspmat_type), Intent(in)       :: a
+      Type(psb_s_sparse_mat), Intent(in)      :: a
       Type(psb_desc_type), Intent(in), target :: desc_a
       Type(psb_desc_type), Intent(out)        :: desc_ov
       integer, intent(out)                    :: info
@@ -540,20 +540,20 @@ Module psb_tools_mod
   interface psb_spall
     subroutine psb_sspalloc(a, desc_a, info, nnz)
       use psb_descriptor_type
-      use psb_spmat_type
-      type(psb_desc_type), intent(inout) :: desc_a
-      type(psb_sspmat_type), intent(out) :: a
-      integer, intent(out)               :: info
-      integer, optional, intent(in)      :: nnz
+      use psb_mat_mod
+      type(psb_desc_type), intent(inout)  :: desc_a
+      type(psb_s_sparse_mat), intent(out) :: a
+      integer, intent(out)                :: info
+      integer, optional, intent(in)       :: nnz
     end subroutine psb_sspalloc
     subroutine psb_dspalloc(a, desc_a, info, nnz)
       use psb_descriptor_type
       use psb_spmat_type
-      use psb_d_mat_mod
-      type(psb_desc_type), intent(inout) :: desc_a
+      use psb_mat_mod
+      type(psb_desc_type), intent(inout)  :: desc_a
       type(psb_d_sparse_mat), intent(out) :: a
-      integer, intent(out)               :: info
-      integer, optional, intent(in)      :: nnz
+      integer, intent(out)                :: info
+      integer, optional, intent(in)       :: nnz
     end subroutine psb_dspalloc
     subroutine psb_cspalloc(a, desc_a, info, nnz)
       use psb_descriptor_type
@@ -574,19 +574,20 @@ Module psb_tools_mod
   end interface
 
   interface psb_spasb
-    subroutine psb_sspasb(a,desc_a, info, afmt, upd, dupl)
+    subroutine psb_sspasb(a,desc_a, info, afmt, upd, dupl, mold)
       use psb_descriptor_type
-      use psb_spmat_type
-      type(psb_sspmat_type), intent (inout)   :: a
+      use psb_mat_mod
+      type(psb_s_sparse_mat), intent (inout)  :: a
       type(psb_desc_type), intent(in)         :: desc_a
       integer, intent(out)                    :: info
       integer,optional, intent(in)            :: dupl, upd
       character(len=*), optional, intent(in)  :: afmt
+      class(psb_s_base_sparse_mat), intent(in), optional :: mold
     end subroutine psb_sspasb
     subroutine psb_dspasb(a,desc_a, info, afmt, upd, dupl,mold)
       use psb_descriptor_type
       use psb_spmat_type
-      use psb_d_mat_mod
+      use psb_mat_mod
       type(psb_d_sparse_mat), intent (inout)  :: a
       type(psb_desc_type), intent(in)         :: desc_a
       integer, intent(out)                    :: info
@@ -621,18 +622,18 @@ Module psb_tools_mod
   interface psb_spfree
     subroutine psb_sspfree(a, desc_a,info)
       use psb_descriptor_type
-      use psb_spmat_type
-      type(psb_desc_type), intent(in) :: desc_a
-      type(psb_sspmat_type), intent(inout)       ::a
-      integer, intent(out)        :: info
+      use psb_mat_mod
+      type(psb_desc_type), intent(in)       :: desc_a
+      type(psb_s_sparse_mat), intent(inout) :: a
+      integer, intent(out)                  :: info
     end subroutine psb_sspfree
     subroutine psb_dspfree(a, desc_a,info)
       use psb_descriptor_type
       use psb_spmat_type
-      use psb_d_mat_mod
-      type(psb_desc_type), intent(in) :: desc_a
-      type(psb_d_sparse_mat), intent(inout)       ::a
-      integer, intent(out)        :: info
+      use psb_mat_mod
+      type(psb_desc_type), intent(in)       :: desc_a
+      type(psb_d_sparse_mat), intent(inout) :: a
+      integer, intent(out)                  :: info
     end subroutine psb_dspfree
     subroutine psb_cspfree(a, desc_a,info)
       use psb_descriptor_type
@@ -654,28 +655,28 @@ Module psb_tools_mod
   interface psb_spins
     subroutine psb_sspins(nz,ia,ja,val,a,desc_a,info,rebuild)
       use psb_descriptor_type
-      use psb_spmat_type
-      type(psb_desc_type), intent(inout)   :: desc_a
-      type(psb_sspmat_type), intent(inout) :: a
-      integer, intent(in)                  :: nz,ia(:),ja(:)
-      real(psb_spk_), intent(in)           :: val(:)
-      integer, intent(out)                 :: info
-      logical, intent(in), optional        :: rebuild
+      use psb_mat_mod
+      type(psb_desc_type), intent(inout)    :: desc_a
+      type(psb_s_sparse_mat), intent(inout) :: a
+      integer, intent(in)                   :: nz,ia(:),ja(:)
+      real(psb_spk_), intent(in)            :: val(:)
+      integer, intent(out)                  :: info
+      logical, intent(in), optional         :: rebuild
     end subroutine psb_sspins
     subroutine psb_sspins_2desc(nz,ia,ja,val,a,desc_ar,desc_ac,info)
       use psb_descriptor_type
-      use psb_spmat_type
-      type(psb_desc_type), intent(in)      :: desc_ar
-      type(psb_desc_type), intent(inout)   :: desc_ac
-      type(psb_sspmat_type), intent(inout) :: a
-      integer, intent(in)                  :: nz,ia(:),ja(:)
-      real(psb_spk_), intent(in)           :: val(:)
-      integer, intent(out)                 :: info
+      use psb_mat_mod
+      type(psb_desc_type), intent(in)       :: desc_ar
+      type(psb_desc_type), intent(inout)    :: desc_ac
+      type(psb_s_sparse_mat), intent(inout) :: a
+      integer, intent(in)                   :: nz,ia(:),ja(:)
+      real(psb_spk_), intent(in)            :: val(:)
+      integer, intent(out)                  :: info
     end subroutine psb_sspins_2desc
     subroutine psb_dspins(nz,ia,ja,val,a,desc_a,info,rebuild)
       use psb_descriptor_type
       use psb_spmat_type
-      use psb_d_mat_mod
+      use psb_mat_mod
       type(psb_desc_type), intent(inout)   :: desc_a
       type(psb_d_sparse_mat), intent(inout) :: a
       integer, intent(in)                  :: nz,ia(:),ja(:)
@@ -685,7 +686,7 @@ Module psb_tools_mod
     end subroutine psb_dspins
     subroutine psb_dspins_2desc(nz,ia,ja,val,a,desc_ar,desc_ac,info)
       use psb_descriptor_type
-      use psb_d_mat_mod
+      use psb_mat_mod
       type(psb_d_sparse_mat), intent(inout) :: a
       type(psb_desc_type), intent(in)      :: desc_ar
       type(psb_desc_type), intent(inout)   :: desc_ac
@@ -739,19 +740,19 @@ Module psb_tools_mod
   interface psb_sprn
     subroutine psb_ssprn(a, desc_a,info,clear)
       use psb_descriptor_type
-      use psb_spmat_type
-      type(psb_desc_type), intent(in)      :: desc_a
-      type(psb_sspmat_type), intent(inout) :: a
-      integer, intent(out)                 :: info
-      logical, intent(in), optional        :: clear
-    end subroutine psb_ssprn
+      use psb_mat_mod
+      type(psb_desc_type), intent(in)       :: desc_a
+      type(psb_s_sparse_mat), intent(inout) :: a
+      integer, intent(out)                  :: info
+      logical, intent(in), optional         :: clear
+    end subroutine psb_ssprn 
     subroutine psb_dsprn(a, desc_a,info,clear)
       use psb_descriptor_type
       use psb_mat_mod
-      type(psb_desc_type), intent(in)      :: desc_a
+      type(psb_desc_type), intent(in)       :: desc_a
       type(psb_d_sparse_mat), intent(inout) :: a
-      integer, intent(out)                 :: info
-      logical, intent(in), optional        :: clear
+      integer, intent(out)                  :: info
+      logical, intent(in), optional         :: clear
     end subroutine psb_dsprn
     subroutine psb_csprn(a, desc_a,info,clear)
       use psb_descriptor_type

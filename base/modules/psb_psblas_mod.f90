@@ -581,18 +581,19 @@ module psb_psblas_mod
     function psb_snrmi(a, desc_a,info)
       use psb_serial_mod
       use psb_descriptor_type
-      real(psb_spk_)                    :: psb_snrmi
-      type(psb_sspmat_type), intent (in) :: a
-      type(psb_desc_type), intent (in)   :: desc_a
+      use psb_mat_mod
+      real(psb_spk_)                      :: psb_snrmi
+      type(psb_s_sparse_mat), intent (in) :: a
+      type(psb_desc_type), intent (in)    :: desc_a
       integer, intent(out)                :: info
     end function psb_snrmi
     function psb_dnrmi(a, desc_a,info)
       use psb_serial_mod
       use psb_descriptor_type
-      use psb_d_mat_mod
-      real(psb_dpk_)                    :: psb_dnrmi
+      use psb_mat_mod
+      real(psb_dpk_)                      :: psb_dnrmi
       type(psb_d_sparse_mat), intent (in) :: a
-      type(psb_desc_type), intent (in)   :: desc_a
+      type(psb_desc_type), intent (in)    :: desc_a
       integer, intent(out)                :: info
     end function psb_dnrmi
     function psb_cnrmi(a, desc_a,info)
@@ -618,7 +619,8 @@ module psb_psblas_mod
          &trans, k, jx, jy,work,doswap)
       use psb_serial_mod
       use psb_descriptor_type
-      type(psb_sspmat_type), intent(in)   :: a
+      use psb_mat_mod
+      type(psb_s_sparse_mat), intent(in)   :: a
       real(psb_spk_), intent(inout)      :: x(:,:)
       real(psb_spk_), intent(inout)      :: y(:,:)
       real(psb_spk_), intent(in)         :: alpha, beta
@@ -633,7 +635,8 @@ module psb_psblas_mod
          & desc_a, info, trans, work,doswap)
       use psb_serial_mod
       use psb_descriptor_type
-      type(psb_sspmat_type), intent(in)   :: a
+      use psb_mat_mod
+      type(psb_s_sparse_mat), intent(in)   :: a
       real(psb_spk_), intent(inout)      :: x(:)
       real(psb_spk_), intent(inout)      :: y(:)
       real(psb_spk_), intent(in)         :: alpha, beta
@@ -647,7 +650,7 @@ module psb_psblas_mod
          &trans, k, jx, jy,work,doswap)
       use psb_serial_mod
       use psb_descriptor_type
-      use psb_d_mat_mod
+      use psb_mat_mod
       type(psb_d_sparse_mat), intent(in)    :: a
       real(psb_dpk_), intent(inout)        :: x(:,:)
       real(psb_dpk_), intent(inout)        :: y(:,:)
@@ -663,7 +666,7 @@ module psb_psblas_mod
          & desc_a, info, trans, work,doswap)
       use psb_serial_mod
       use psb_descriptor_type
-      use psb_d_mat_mod
+      use psb_mat_mod
       type(psb_d_sparse_mat), intent(in)   :: a
       real(psb_dpk_), intent(inout)       :: x(:)
       real(psb_dpk_), intent(inout)       :: y(:)
@@ -736,65 +739,67 @@ module psb_psblas_mod
 
   interface psb_spsm
     subroutine psb_sspsm(alpha, t, x, beta, y,&
-         & desc_a, info, trans, unit, choice,& 
+         & desc_a, info, trans, side, choice,& 
          & diag, n, jx, jy, work)
       use psb_serial_mod
       use psb_descriptor_type
-      type(psb_sspmat_type), intent(in)    :: t
+      use psb_mat_mod
+      type(psb_s_sparse_mat), intent(in)   :: t
       real(psb_spk_), intent(in)           :: x(:,:)
       real(psb_spk_), intent(inout)        :: y(:,:)
       real(psb_spk_), intent(in)           :: alpha, beta
       type(psb_desc_type), intent(in)      :: desc_a
-      character, optional, intent(in)      :: trans, unit
+      character, optional, intent(in)      :: trans, side
       integer, optional, intent(in)        :: n, jx, jy
       integer, optional, intent(in)        :: choice
       real(psb_spk_), optional, intent(in),target :: work(:), diag(:)
       integer, intent(out)               :: info
     end subroutine psb_sspsm
     subroutine psb_sspsv(alpha, t, x, beta, y,&
-         & desc_a, info, trans, unit, choice,& 
+         & desc_a, info, trans, side, choice,& 
          & diag, work)
       use psb_serial_mod
       use psb_descriptor_type
-      type(psb_sspmat_type), intent(in)    :: t
+      use psb_mat_mod
+      type(psb_s_sparse_mat), intent(in)   :: t
       real(psb_spk_), intent(in)           :: x(:)
       real(psb_spk_), intent(inout)        :: y(:)
       real(psb_spk_), intent(in)           :: alpha, beta
       type(psb_desc_type), intent(in)      :: desc_a
-      character, optional, intent(in)      :: trans, unit
+      character, optional, intent(in)      :: trans, side
       integer, optional, intent(in)        :: choice
       real(psb_spk_), optional, intent(in),target :: work(:), diag(:)
       integer, intent(out)                   :: info
     end subroutine psb_sspsv
     subroutine psb_dspsm(alpha, t, x, beta, y,&
-         & desc_a, info, trans, unit, choice,& 
+         & desc_a, info, trans, side, choice,& 
          & diag, n, jx, jy, work)
       use psb_serial_mod
       use psb_descriptor_type
-      use psb_d_mat_mod
+      use psb_mat_mod
       type(psb_d_sparse_mat), intent(in)    :: t
       real(psb_dpk_), intent(in)           :: x(:,:)
       real(psb_dpk_), intent(inout)        :: y(:,:)
       real(psb_dpk_), intent(in)           :: alpha, beta
       type(psb_desc_type), intent(in)      :: desc_a
-      character, optional, intent(in)      :: trans, unit
+      character, optional, intent(in)      :: trans, side
       integer, optional, intent(in)        :: n, jx, jy
       integer, optional, intent(in)        :: choice
       real(psb_dpk_), optional, intent(in),target :: work(:), diag(:)
       integer, intent(out)               :: info
     end subroutine psb_dspsm
     subroutine psb_dspsv(alpha, t, x, beta, y,&
-         & desc_a, info, trans, unit, choice,& 
+         & desc_a, info, trans, side, choice,& 
          & diag, work)
       use psb_serial_mod
       use psb_descriptor_type
-      use psb_d_mat_mod
+      use psb_mat_mod
       type(psb_d_sparse_mat), intent(in)    :: t
       real(psb_dpk_), intent(in)             :: x(:)
       real(psb_dpk_), intent(inout)          :: y(:)
       real(psb_dpk_), intent(in)             :: alpha, beta
       type(psb_desc_type), intent(in)        :: desc_a
-      character, optional, intent(in)        :: trans, unit
+      character, optional, intent(in)        :: trans, side
       integer, optional, intent(in)          :: choice
       real(psb_dpk_), optional, intent(in),target :: work(:), diag(:)
       integer, intent(out)                   :: info

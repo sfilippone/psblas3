@@ -35,7 +35,7 @@ subroutine psb_sdiagsc_bld(a,desc_a,p,upd,info)
   use psb_prec_mod, psb_protect_name => psb_sdiagsc_bld
   Implicit None
 
-  type(psb_sspmat_type), intent(in), target :: a
+  type(psb_s_sparse_mat), intent(in), target :: a
   type(psb_desc_type), intent(in)           :: desc_a
   type(psb_sprec_type),intent(inout)        :: p
   character, intent(in)                     :: upd
@@ -76,7 +76,7 @@ subroutine psb_sdiagsc_bld(a,desc_a,p,upd,info)
   !
   ! Retrieve the diagonal entries of the matrix A
   !
-  call psb_sp_getdiag(a,p%d,info)
+  call a%get_diag(p%d,info)
   if(info /= 0) then
     info=4010
     ch_err='psb_sp_getdiag'
@@ -98,25 +98,12 @@ subroutine psb_sdiagsc_bld(a,desc_a,p,upd,info)
   ! it is set to one/a_ii
   !
   do i=1,n_row
-    if (p%d(i) == dzero) then
-      p%d(i) = done
+    if (p%d(i) == szero) then
+      p%d(i) = sone
     else
-      p%d(i) = done/p%d(i)
+      p%d(i) = sone/p%d(i)
     endif
   end do
-
-  if (a%pl(1) /= 0) then
-    !
-    ! Apply the same row permutation as in the sparse matrix A
-    !
-    call  psb_gelp('n',a%pl,p%d,info)
-    if(info /= 0) then
-      info=4010
-      ch_err='psb_gelp'
-      call psb_errpush(info,name,a_err=ch_err)
-      goto 9999
-    end if
-  endif
 
   call psb_erractionrestore(err_act)
   return

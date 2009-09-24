@@ -45,9 +45,9 @@ Module psb_krylov_mod
   interface psb_cg
     subroutine psb_scg(a,prec,b,x,eps,&
          & desc_a,info,itmax,iter,err,itrace,istop,cond)
-      use psb_base_mod, only  : psb_desc_type, psb_sspmat_type, psb_spk_
+      use psb_base_mod, only  : psb_desc_type, psb_s_sparse_mat, psb_spk_
       use psb_prec_mod, only : psb_sprec_type
-      type(psb_sspmat_type), intent(in)  :: a
+      type(psb_s_sparse_mat), intent(in)  :: a
       type(psb_desc_type), intent(in)    :: desc_a
       real(psb_spk_), intent(in)       :: b(:)
       real(psb_spk_), intent(inout)    :: x(:)
@@ -108,9 +108,9 @@ Module psb_krylov_mod
   interface psb_bicg
     subroutine psb_sbicg(a,prec,b,x,eps,&
          & desc_a,info,itmax,iter,err,itrace,istop)
-      use psb_base_mod, only  : psb_desc_type, psb_sspmat_type, psb_spk_
+      use psb_base_mod, only  : psb_desc_type, psb_s_sparse_mat, psb_spk_
       use psb_prec_mod, only : psb_sprec_type
-      type(psb_sspmat_type), intent(in)  :: a
+      type(psb_s_sparse_mat), intent(in)  :: a
       type(psb_desc_type), intent(in)    :: desc_a
       real(psb_spk_), intent(in)       :: b(:)
       real(psb_spk_), intent(inout)    :: x(:)
@@ -171,9 +171,9 @@ Module psb_krylov_mod
   interface psb_bicgstab
     subroutine psb_scgstab(a,prec,b,x,eps,&
          & desc_a,info,itmax,iter,err,itrace,istop)
-      use psb_base_mod, only  : psb_desc_type, psb_sspmat_type, psb_spk_
+      use psb_base_mod, only  : psb_desc_type, psb_s_sparse_mat, psb_spk_
       use psb_prec_mod, only : psb_sprec_type
-      type(psb_sspmat_type), intent(in)  :: a
+      type(psb_s_sparse_mat), intent(in)  :: a
       type(psb_desc_type), intent(in)    :: desc_a
       real(psb_spk_), intent(in)       :: b(:)
       real(psb_spk_), intent(inout)    :: x(:)
@@ -234,9 +234,9 @@ Module psb_krylov_mod
   interface psb_bicgstabl
     Subroutine psb_scgstabl(a,prec,b,x,eps,desc_a,info,&
          &itmax,iter,err, itrace,irst,istop)
-      use psb_base_mod, only  : psb_desc_type, psb_sspmat_type, psb_spk_
+      use psb_base_mod, only  : psb_desc_type, psb_s_sparse_mat, psb_spk_
       use psb_prec_mod, only : psb_sprec_type
-      Type(psb_sspmat_type), Intent(in)  :: a
+      Type(psb_s_sparse_mat), Intent(in)  :: a
       Type(psb_desc_type), Intent(in)    :: desc_a
       type(psb_sprec_type), intent(in)   :: prec
       Real(psb_spk_), Intent(in)       :: b(:)
@@ -297,9 +297,9 @@ Module psb_krylov_mod
   interface psb_rgmres
     Subroutine psb_srgmres(a,prec,b,x,eps,desc_a,info,&
          &itmax,iter,err,itrace,irst,istop)
-      use psb_base_mod, only  : psb_desc_type, psb_sspmat_type, psb_spk_
+      use psb_base_mod, only  : psb_desc_type, psb_s_sparse_mat, psb_spk_
       use psb_prec_mod, only : psb_sprec_type
-      Type(psb_sspmat_type), Intent(in)  :: a
+      Type(psb_s_sparse_mat), Intent(in)  :: a
       Type(psb_desc_type), Intent(in)    :: desc_a
       type(psb_sprec_type), intent(in)   :: prec 
       Real(psb_spk_), Intent(in)       :: b(:)
@@ -360,9 +360,9 @@ Module psb_krylov_mod
   interface psb_cgs
     subroutine psb_scgs(a,prec,b,x,eps,desc_a,info,&
          &itmax,iter,err,itrace,istop)
-      use psb_base_mod, only  : psb_desc_type, psb_sspmat_type, psb_spk_
+      use psb_base_mod, only  : psb_desc_type, psb_s_sparse_mat, psb_spk_
       use psb_prec_mod, only : psb_sprec_type
-      type(psb_sspmat_type), intent(in)  :: a
+      type(psb_s_sparse_mat), intent(in)  :: a
       type(psb_desc_type), intent(in)    :: desc_a 
       type(psb_sprec_type), intent(in)   :: prec 
       real(psb_spk_), intent(in)       :: b(:)
@@ -462,7 +462,7 @@ contains
   !                                           BICGSTABL
   !                                           RGMRES
   !                                           
-  !    a      -  type(psb_sspmat_type)      Input: sparse matrix containing A.
+  !    a      -  type(psb_s_sparse_mat)      Input: sparse matrix containing A.
   !    prec   -  type(psb_sprec_type)       Input: preconditioner
   !    b      -  real,dimension(:)            Input: vector containing the
   !                                           right hand side B
@@ -498,7 +498,7 @@ contains
     use psb_prec_mod,only : psb_sprec_type, psb_dprec_type, psb_cprec_type, psb_zprec_type
 
     character(len=*)                   :: method
-    Type(psb_sspmat_type), Intent(in)  :: a
+    Type(psb_s_sparse_mat), Intent(in)  :: a
     Type(psb_desc_type), Intent(in)    :: desc_a
     type(psb_sprec_type), intent(in)   :: prec 
     Real(psb_spk_), Intent(in)       :: b(:)
@@ -996,7 +996,7 @@ contains
     implicit none 
     character(len=*), intent(in)      :: methdname
     integer, intent(in)               :: stopc, trace,itmax
-    type(psb_sspmat_type), intent(in) :: a
+    type(psb_s_sparse_mat), intent(in) :: a
     real(psb_spk_), intent(in)        :: b(:), eps
     type(psb_desc_type), intent(in)   :: desc_a
     type(psb_itconv_type)             :: stopdat

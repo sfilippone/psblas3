@@ -37,8 +37,7 @@
 !
 module psb_linmap_mod
 
-  use psb_spmat_type, only : psb_sspmat_type, &
-       & psb_cspmat_type, psb_zspmat_type, psb_spk_, psb_dpk_, psb_sizeof
+  use psb_spmat_type, only : psb_cspmat_type, psb_zspmat_type, psb_spk_, psb_dpk_, psb_sizeof
   use psb_descriptor_type
   use psb_linmap_type_mod
 
@@ -166,7 +165,7 @@ module psb_linmap_mod
       implicit none 
       type(psb_slinmap_type)         :: psb_s_linmap    
       type(psb_desc_type), target       :: desc_X, desc_Y
-      type(psb_sspmat_type), intent(in) :: map_X2Y, map_Y2X
+      type(psb_s_sparse_mat), intent(in) :: map_X2Y, map_Y2X
       integer, intent(in)               :: map_kind
       integer, intent(in), optional     :: iaggr(:), naggr(:)
     end function psb_s_linmap
@@ -452,6 +451,7 @@ contains
 
 
   function psb_slinmap_sizeof(map) result(val)
+    use psb_mat_mod
     implicit none 
     type(psb_slinmap_type), intent(in) :: map
     integer(psb_long_int_k_) :: val
@@ -471,7 +471,7 @@ contains
   end function psb_slinmap_sizeof
 
   function psb_dlinmap_sizeof(map) result(val)
-    use psb_d_mat_mod
+    use psb_mat_mod
     implicit none 
     type(psb_dlinmap_type), intent(in) :: map
     integer(psb_long_int_k_) :: val
@@ -534,7 +534,7 @@ contains
     implicit none 
     type(psb_slinmap_type), intent(out) :: out_map    
     type(psb_desc_type), target       :: desc_X, desc_Y
-    type(psb_sspmat_type), intent(in) :: map_X2Y, map_Y2X
+    type(psb_s_sparse_mat), intent(in) :: map_X2Y, map_Y2X
     integer, intent(in)               :: map_kind
     integer, intent(in), optional     :: iaggr(:), naggr(:)
     out_map = psb_linmap(map_kind,desc_X,desc_Y,map_X2Y,map_Y2X,iaggr,naggr)
@@ -575,8 +575,9 @@ contains
 
   
   subroutine  psb_slinmap_transfer(mapin,mapout,info)
-    use psb_spmat_type
+    use psb_realloc_mod
     use psb_descriptor_type
+    use psb_mat_mod
     implicit none 
     type(psb_slinmap_type) :: mapin,mapout
     integer, intent(out)      :: info 
