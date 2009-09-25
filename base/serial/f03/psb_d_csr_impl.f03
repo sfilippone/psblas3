@@ -589,6 +589,7 @@ end subroutine d_csr_csmm_impl
 
 subroutine d_csr_cssv_impl(alpha,a,x,beta,y,info,trans) 
   use psb_error_mod
+  use psb_string_mod
   use psb_d_csr_mat_mod, psb_protect_name => d_csr_cssv_impl
   implicit none 
   class(psb_d_csr_sparse_mat), intent(in) :: a
@@ -619,7 +620,7 @@ subroutine d_csr_cssv_impl(alpha,a,x,beta,y,info,trans)
     goto 9999
   endif
 
-  tra = ((trans_=='T').or.(trans_=='t'))
+  tra = (psb_toupper(trans_)=='T').or.(psb_toupper(trans_)=='C')
   m = a%get_nrows()
 
   if (.not. (a%is_triangle())) then 
@@ -793,6 +794,7 @@ end subroutine d_csr_cssv_impl
 
 subroutine d_csr_cssm_impl(alpha,a,x,beta,y,info,trans) 
   use psb_error_mod
+  use psb_string_mod
   use psb_d_csr_mat_mod, psb_protect_name => d_csr_cssm_impl
   implicit none 
   class(psb_d_csr_sparse_mat), intent(in) :: a
@@ -825,7 +827,8 @@ subroutine d_csr_cssm_impl(alpha,a,x,beta,y,info,trans)
   endif
 
 
-  tra = ((trans_=='T').or.(trans_=='t'))
+  tra = (psb_toupper(trans_)=='T').or.(psb_toupper(trans_)=='C')
+
   m   = a%get_nrows()
   nc  = min(size(x,2) , size(y,2)) 
 
@@ -917,18 +920,18 @@ contains
         if (unit) then 
           do i=1, nr
             acc = dzero 
-            do j=a%irp(i), a%irp(i+1)-1
-              acc = acc + a%val(j)*y(a%ja(j),1:nc)
+            do j=irp(i), irp(i+1)-1
+              acc = acc + val(j)*y(ja(j),1:nc)
             end do
             y(i,1:nc) = x(i,1:nc) - acc
           end do
         else if (.not.unit) then 
           do i=1, nr
             acc = dzero 
-            do j=a%irp(i), a%irp(i+1)-2
-              acc = acc + a%val(j)*y(a%ja(j),1:nc)
+            do j=irp(i), irp(i+1)-2
+              acc = acc + val(j)*y(ja(j),1:nc)
             end do
-            y(i,1:nc) = (x(i,1:nc) - acc)/a%val(a%irp(i+1)-1)
+            y(i,1:nc) = (x(i,1:nc) - acc)/val(irp(i+1)-1)
           end do
         end if
       else if (.not.lower) then 
@@ -936,18 +939,18 @@ contains
         if (unit) then 
           do i=nr, 1, -1 
             acc = dzero 
-            do j=a%irp(i), a%irp(i+1)-1
-              acc = acc + a%val(j)*y(a%ja(j),1:nc)
+            do j=irp(i), irp(i+1)-1
+              acc = acc + val(j)*y(ja(j),1:nc)
             end do
             y(i,1:nc) = x(i,1:nc) - acc
           end do
         else if (.not.unit) then 
           do i=nr, 1, -1 
             acc = dzero 
-            do j=a%irp(i)+1, a%irp(i+1)-1
-              acc = acc + a%val(j)*y(a%ja(j),1:nc)
+            do j=irp(i)+1, irp(i+1)-1
+              acc = acc + val(j)*y(ja(j),1:nc)
             end do
-            y(i,1:nc) = (x(i,1:nc) - acc)/a%val(a%irp(i))
+            y(i,1:nc) = (x(i,1:nc) - acc)/val(irp(i))
           end do
         end if
 
@@ -963,18 +966,18 @@ contains
         if (unit) then 
           do i=nr, 1, -1
             acc = y(i,1:nc) 
-            do j=a%irp(i), a%irp(i+1)-1
-              jc    = a%ja(j)
-              y(jc,1:nc) = y(jc,1:nc) - a%val(j)*acc 
+            do j=irp(i), irp(i+1)-1
+              jc    = ja(j)
+              y(jc,1:nc) = y(jc,1:nc) - val(j)*acc 
             end do
           end do
         else if (.not.unit) then 
           do i=nr, 1, -1
-            y(i,1:nc) = y(i,1:nc)/a%val(a%irp(i+1)-1)
+            y(i,1:nc) = y(i,1:nc)/val(irp(i+1)-1)
             acc  = y(i,1:nc) 
-            do j=a%irp(i), a%irp(i+1)-2
-              jc    = a%ja(j)
-              y(jc,1:nc) = y(jc,1:nc) - a%val(j)*acc 
+            do j=irp(i), irp(i+1)-2
+              jc    = ja(j)
+              y(jc,1:nc) = y(jc,1:nc) - val(j)*acc 
             end do
           end do
         end if
@@ -983,18 +986,18 @@ contains
         if (unit) then 
           do i=1, nr
             acc  = y(i,1:nc) 
-            do j=a%irp(i), a%irp(i+1)-1
-              jc    = a%ja(j)
-              y(jc,1:nc) = y(jc,1:nc) - a%val(j)*acc 
+            do j=irp(i), irp(i+1)-1
+              jc    = ja(j)
+              y(jc,1:nc) = y(jc,1:nc) - val(j)*acc 
             end do
           end do
         else if (.not.unit) then 
           do i=1, nr
-            y(i,1:nc) = y(i,1:nc)/a%val(a%irp(i))
+            y(i,1:nc) = y(i,1:nc)/val(irp(i))
             acc    = y(i,1:nc) 
-            do j=a%irp(i)+1, a%irp(i+1)-1
-              jc      = a%ja(j)
-              y(jc,1:nc) = y(jc,1:nc) - a%val(j)*acc 
+            do j=irp(i)+1, irp(i+1)-1
+              jc      = ja(j)
+              y(jc,1:nc) = y(jc,1:nc) - val(j)*acc 
             end do
           end do
         end if

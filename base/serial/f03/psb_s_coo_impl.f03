@@ -543,6 +543,7 @@ end subroutine s_coo_cssv_impl
 subroutine s_coo_csmv_impl(alpha,a,x,beta,y,info,trans) 
   use psb_const_mod
   use psb_error_mod
+  use psb_string_mod
   use psb_s_base_mat_mod, psb_protect_name => s_coo_csMv_impl
   implicit none 
 
@@ -576,9 +577,7 @@ subroutine s_coo_csmv_impl(alpha,a,x,beta,y,info,trans)
     trans_ = 'N'
   end if
 
-  tra = ((trans_=='T').or.(trans_=='t'))
-
-
+  tra = (psb_toupper(trans_)=='T').or.(psb_toupper(trans_)=='C')
 
   if (tra) then 
     m = a%get_ncols()
@@ -701,6 +700,7 @@ end subroutine s_coo_csmv_impl
 subroutine s_coo_csmm_impl(alpha,a,x,beta,y,info,trans) 
   use psb_const_mod
   use psb_error_mod
+  use psb_string_mod
   use psb_s_base_mat_mod, psb_protect_name => s_coo_csmm_impl
   implicit none 
   class(psb_s_coo_sparse_mat), intent(in) :: a
@@ -734,8 +734,7 @@ subroutine s_coo_csmm_impl(alpha,a,x,beta,y,info,trans)
     trans_ = 'N'
   end if
 
-
-  tra = ((trans_=='T').or.(trans_=='t'))
+  tra = (psb_toupper(trans_)=='T').or.(psb_toupper(trans_)=='C')
 
   if (tra) then 
     m = a%get_ncols()

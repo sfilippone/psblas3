@@ -1,23 +1,23 @@
 
-subroutine d_coo_cssm_impl(alpha,a,x,beta,y,info,trans) 
+subroutine c_coo_cssm_impl(alpha,a,x,beta,y,info,trans) 
   use psb_const_mod
   use psb_error_mod
   use psb_string_mod
-  use psb_d_base_mat_mod, psb_protect_name => d_coo_cssm_impl
+  use psb_c_base_mat_mod, psb_protect_name => c_coo_cssm_impl
   implicit none 
-  class(psb_d_coo_sparse_mat), intent(in) :: a
-  real(psb_dpk_), intent(in)          :: alpha, beta, x(:,:)
-  real(psb_dpk_), intent(inout)       :: y(:,:)
+  class(psb_c_coo_sparse_mat), intent(in) :: a
+  complex(psb_spk_), intent(in)          :: alpha, beta, x(:,:)
+  complex(psb_spk_), intent(inout)       :: y(:,:)
   integer, intent(out)                :: info
   character, optional, intent(in)     :: trans
 
   character :: trans_
   integer   :: i,j,k,m,n, nnz, ir, jc, nc
-  real(psb_dpk_) :: acc
-  real(psb_dpk_), allocatable :: tmp(:,:)
-  logical   :: tra
+  complex(psb_spk_) :: acc
+  complex(psb_spk_), allocatable :: tmp(:,:)
+  logical   :: tra, ctra
   Integer :: err_act
-  character(len=20)  :: name='d_base_csmm'
+  character(len=20)  :: name='c_base_cssm'
   logical, parameter :: debug=.false.
 
   info = 0
@@ -41,15 +41,16 @@ subroutine d_coo_cssm_impl(alpha,a,x,beta,y,info,trans)
   else
     trans_ = 'N'
   end if
-  tra = (psb_toupper(trans_)=='T').or.(psb_toupper(trans_)=='C')
+  tra  = (psb_toupper(trans_)=='T')
+  ctra = (psb_toupper(trans_)=='C')
   m   = a%get_nrows()
   nc  = min(size(x,2) , size(y,2)) 
   nnz = a%get_nzeros()
 
-  if (alpha == dzero) then
-    if (beta == dzero) then
+  if (alpha == zzero) then
+    if (beta == zzero) then
       do i = 1, m
-        y(i,1:nc) = dzero
+        y(i,1:nc) = zzero
       enddo
     else
       do  i = 1, m
@@ -59,8 +60,8 @@ subroutine d_coo_cssm_impl(alpha,a,x,beta,y,info,trans)
     return
   end if
 
-  if (beta == dzero) then 
-    call inner_coosm(tra,a%is_lower(),a%is_unit(),a%is_sorted(),&
+  if (beta == zzero) then 
+    call inner_coosm(tra,ctra,a%is_lower(),a%is_unit(),a%is_sorted(),&
          & m,nc,nnz,a%ia,a%ja,a%val,&
          & x,size(x,1),y,size(y,1),info)
     do  i = 1, m
@@ -74,7 +75,7 @@ subroutine d_coo_cssm_impl(alpha,a,x,beta,y,info,trans)
       goto 9999
     end if
 
-    call inner_coosm(tra,a%is_lower(),a%is_unit(),a%is_sorted(),&
+    call inner_coosm(tra,ctra,a%is_lower(),a%is_unit(),a%is_sorted(),&
          & m,nc,nnz,a%ia,a%ja,a%val,&
          & x,size(x,1),tmp,size(tmp,1),info)
     do  i = 1, m
@@ -104,17 +105,17 @@ subroutine d_coo_cssm_impl(alpha,a,x,beta,y,info,trans)
 
 contains 
 
-  subroutine inner_coosm(tra,lower,unit,sorted,nr,nc,nz,&
+  subroutine inner_coosm(tra,ctra,lower,unit,sorted,nr,nc,nz,&
        & ia,ja,val,x,ldx,y,ldy,info) 
     implicit none 
-    logical, intent(in)                 :: tra,lower,unit,sorted
+    logical, intent(in)                 :: tra,ctra,lower,unit,sorted
     integer, intent(in)                 :: nr,nc,nz,ldx,ldy,ia(*),ja(*)
-    real(psb_dpk_), intent(in)          :: val(*), x(ldx,*)
-    real(psb_dpk_), intent(out)         :: y(ldy,*)
+    complex(psb_spk_), intent(in)       :: val(*), x(ldx,*)
+    complex(psb_spk_), intent(out)      :: y(ldy,*)
     integer, intent(out)                :: info
 
     integer :: i,j,k,m, ir, jc
-    real(psb_dpk_), allocatable  :: acc(:)
+    complex(psb_spk_), allocatable  :: acc(:)
 
     info = 0
     allocate(acc(nc), stat=info)
@@ -131,13 +132,13 @@ contains
 
     nnz = nz
 
-    if (.not.tra) then 
+    if ((.not.tra).and.(.not.ctra)) then 
 
       if (lower) then 
         if (unit) then 
           j = 1
           do i=1, nr
-            acc(1:nc) = dzero
+            acc(1:nc) = zzero
             do 
               if (j > nnz) exit
               if (ia(j) > i) exit
@@ -149,7 +150,7 @@ contains
         else if (.not.unit) then 
           j = 1
           do i=1, nr
-            acc(1:nc) = dzero
+            acc(1:nc) = zzero
             do 
               if (j > nnz) exit
               if (ia(j) > i) exit
@@ -168,7 +169,7 @@ contains
         if (unit) then 
           j = nnz
           do i=nr, 1, -1 
-            acc(1:nc) = dzero 
+            acc(1:nc) = zzero 
             do 
               if (j < 1) exit
               if (ia(j) < i) exit
@@ -182,7 +183,7 @@ contains
 
           j = nnz
           do i=nr, 1, -1 
-            acc(1:nc) = dzero 
+            acc(1:nc) = zzero 
             do 
               if (j < 1) exit
               if (ia(j) < i) exit
@@ -267,32 +268,101 @@ contains
           end if
         end if
       end if
+
+    else if (ctra) then 
+
+      do i=1, nr
+        y(i,1:nc) = x(i,1:nc)
+      end do
+
+      if (lower) then 
+        if (unit) then 
+          j = nnz
+          do i=nr, 1, -1
+            acc(1:nc) = y(i,1:nc) 
+            do
+              if (j < 1) exit
+              if (ia(j) < i) exit
+              jc    = ja(j)
+              y(jc,1:nc) = y(jc,1:nc) - conjg(val(j))*acc(1:nc) 
+              j     = j - 1 
+            end do
+          end do
+        else if (.not.unit) then 
+          j = nnz
+          do i=nr, 1, -1
+            if (ja(j) == i) then 
+              y(i,1:nc) = y(i,1:nc) /conjg(val(j))
+              j    = j - 1
+            end if
+            acc(1:nc)  = y(i,1:nc) 
+            do 
+              if (j < 1) exit
+              if (ia(j) < i) exit
+              jc    = ja(j)
+              y(jc,1:nc) = y(jc,1:nc) - conjg(val(j))*acc(1:nc) 
+              j     = j - 1
+            end do
+          end do
+
+        else if (.not.lower) then 
+          if (unit) then 
+            j = 1
+            do i=1, nr
+              acc(1:nc) = y(i,1:nc)
+              do 
+                if (j > nnz) exit
+                if (ia(j) > i) exit
+                jc    = ja(j)
+                y(jc,1:nc) = y(jc,1:nc) - conjg(val(j))*acc(1:nc) 
+                j   = j + 1
+              end do
+            end do
+          else if (.not.unit) then 
+            j = 1
+            do i=1, nr
+              if (ja(j) == i) then 
+                y(i,1:nc) = y(i,1:nc) /conjg(val(j))
+                j    = j + 1
+              end if
+              acc(1:nc) = y(i,1:nc)
+              do 
+                if (j > nnz) exit
+                if (ia(j) > i) exit
+                jc    = ja(j)
+                y(jc,1:nc) = y(jc,1:nc) - conjg(val(j))*acc(1:nc) 
+                j   = j + 1
+              end do
+            end do
+          end if
+        end if
+      end if
     end if
   end subroutine inner_coosm
 
-end subroutine d_coo_cssm_impl
+end subroutine c_coo_cssm_impl
 
 
 
-subroutine d_coo_cssv_impl(alpha,a,x,beta,y,info,trans) 
+subroutine c_coo_cssv_impl(alpha,a,x,beta,y,info,trans) 
   use psb_const_mod
   use psb_error_mod
   use psb_string_mod
-  use psb_d_base_mat_mod, psb_protect_name => d_coo_cssv_impl
+  use psb_c_base_mat_mod, psb_protect_name => c_coo_cssv_impl
   implicit none 
-  class(psb_d_coo_sparse_mat), intent(in) :: a
-  real(psb_dpk_), intent(in)          :: alpha, beta, x(:)
-  real(psb_dpk_), intent(inout)       :: y(:)
+  class(psb_c_coo_sparse_mat), intent(in) :: a
+  complex(psb_spk_), intent(in)          :: alpha, beta, x(:)
+  complex(psb_spk_), intent(inout)       :: y(:)
   integer, intent(out)                :: info
   character, optional, intent(in)     :: trans
 
   character :: trans_
   integer   :: i,j,k,m,n, nnz, ir, jc
-  real(psb_dpk_) :: acc
-  real(psb_dpk_), allocatable :: tmp(:)
-  logical   :: tra
+  complex(psb_spk_) :: acc
+  complex(psb_spk_), allocatable :: tmp(:)
+  logical   :: tra, ctra
   Integer :: err_act
-  character(len=20)  :: name='d_coo_cssv_impl'
+  character(len=20)  :: name='c_coo_cssv_impl'
   logical, parameter :: debug=.false.
 
   info = 0
@@ -309,7 +379,8 @@ subroutine d_coo_cssv_impl(alpha,a,x,beta,y,info,trans)
     goto 9999
   endif
 
-  tra = (psb_toupper(trans_)=='T').or.(psb_toupper(trans_)=='C')
+  tra  = (psb_toupper(trans_)=='T')
+  ctra = (psb_toupper(trans_)=='C')
   m = a%get_nrows()
 
   if (.not. (a%is_triangle())) then 
@@ -319,10 +390,10 @@ subroutine d_coo_cssv_impl(alpha,a,x,beta,y,info,trans)
   end if
 
 
-  if (alpha == dzero) then
-    if (beta == dzero) then
+  if (alpha == zzero) then
+    if (beta == zzero) then
       do i = 1, m
-        y(i) = dzero
+        y(i) = zzero
       enddo
     else
       do  i = 1, m
@@ -332,8 +403,8 @@ subroutine d_coo_cssv_impl(alpha,a,x,beta,y,info,trans)
     return
   end if
 
-  if (beta == dzero) then 
-    call inner_coosv(tra,a%is_lower(),a%is_unit(),a%is_sorted(),&
+  if (beta == zzero) then 
+    call inner_coosv(tra,ctra,a%is_lower(),a%is_unit(),a%is_sorted(),&
          & a%get_nrows(),a%get_nzeros(),a%ia,a%ja,a%val,&
          & x,y,info)
     if (info /= 0) then 
@@ -351,7 +422,7 @@ subroutine d_coo_cssv_impl(alpha,a,x,beta,y,info,trans)
       goto 9999
     end if
 
-    call inner_coosv(tra,a%is_lower(),a%is_unit(),a%is_sorted(),&
+    call inner_coosv(tra,ctra,a%is_lower(),a%is_unit(),a%is_sorted(),&
          & a%get_nrows(),a%get_nzeros(),a%ia,a%ja,a%val,&
          & x,tmp,info)
     if (info /= 0) then 
@@ -377,17 +448,17 @@ subroutine d_coo_cssv_impl(alpha,a,x,beta,y,info,trans)
 
 contains 
 
-  subroutine inner_coosv(tra,lower,unit,sorted,nr,nz,&
+  subroutine inner_coosv(tra,ctra,lower,unit,sorted,nr,nz,&
        & ia,ja,val,x,y,info) 
     implicit none 
-    logical, intent(in)                 :: tra,lower,unit,sorted
+    logical, intent(in)                 :: tra,ctra,lower,unit,sorted
     integer, intent(in)                 :: nr,nz,ia(*),ja(*)
-    real(psb_dpk_), intent(in)          :: val(*), x(*)
-    real(psb_dpk_), intent(out)         :: y(*)
+    complex(psb_spk_), intent(in)       :: val(*), x(*)
+    complex(psb_spk_), intent(out)      :: y(*)
     integer, intent(out)                :: info
 
     integer :: i,j,k,m, ir, jc, nnz
-    real(psb_dpk_) :: acc
+    complex(psb_spk_) :: acc
 
     info = 0
     if (.not.sorted) then 
@@ -397,13 +468,13 @@ contains
 
     nnz = nz
 
-    if (.not.tra) then 
+    if ((.not.tra).and.(.not.ctra)) then 
 
       if (lower) then 
         if (unit) then 
           j = 1
           do i=1, nr
-            acc = dzero
+            acc = zzero
             do 
               if (j > nnz) exit
               if (ia(j) > i) exit
@@ -415,7 +486,7 @@ contains
         else if (.not.unit) then 
           j = 1
           do i=1, nr
-            acc = dzero
+            acc = zzero
             do 
               if (j > nnz) exit
               if (ia(j) > i) exit
@@ -434,7 +505,7 @@ contains
         if (unit) then 
           j = nnz
           do i=nr, 1, -1 
-            acc = dzero 
+            acc = zzero 
             do 
               if (j < 1) exit
               if (ia(j) < i) exit
@@ -448,7 +519,7 @@ contains
 
           j = nnz
           do i=nr, 1, -1 
-            acc = dzero 
+            acc = zzero 
             do 
               if (j < 1) exit
               if (ia(j) < i) exit
@@ -533,32 +604,101 @@ contains
           end if
         end if
       end if
+
+    else if (ctra) then 
+
+      do i=1, nr
+        y(i) = x(i)
+      end do
+
+      if (lower) then 
+        if (unit) then 
+          j = nnz
+          do i=nr, 1, -1
+            acc = y(i) 
+            do
+              if (j < 1) exit
+              if (ia(j) < i) exit
+              jc    = ja(j)
+              y(jc) = y(jc) - conjg(val(j))*acc 
+              j     = j - 1 
+            end do
+          end do
+        else if (.not.unit) then 
+          j = nnz
+          do i=nr, 1, -1
+            if (ja(j) == i) then 
+              y(i) = y(i) /conjg(val(j))
+              j    = j - 1
+            end if
+            acc  = y(i) 
+            do 
+              if (j < 1) exit
+              if (ia(j) < i) exit
+              jc    = ja(j)
+              y(jc) = y(jc) - conjg(val(j))*acc 
+              j     = j - 1
+            end do
+          end do
+
+        else if (.not.lower) then 
+          if (unit) then 
+            j = 1
+            do i=1, nr
+              acc = y(i)
+              do 
+                if (j > nnz) exit
+                if (ia(j) > i) exit
+                jc    = ja(j)
+                y(jc) = y(jc) - conjg(val(j))*acc 
+                j   = j + 1
+              end do
+            end do
+          else if (.not.unit) then 
+            j = 1
+            do i=1, nr
+              if (ja(j) == i) then 
+                y(i) = y(i) /conjg(val(j))
+                j    = j + 1
+              end if
+              acc = y(i)
+              do 
+                if (j > nnz) exit
+                if (ia(j) > i) exit
+                jc    = ja(j)
+                y(jc) = y(jc) - conjg(val(j))*acc 
+                j   = j + 1
+              end do
+            end do
+          end if
+        end if
+      end if
     end if
 
   end subroutine inner_coosv
 
 
-end subroutine d_coo_cssv_impl
+end subroutine c_coo_cssv_impl
 
-subroutine d_coo_csmv_impl(alpha,a,x,beta,y,info,trans) 
+subroutine c_coo_csmv_impl(alpha,a,x,beta,y,info,trans) 
   use psb_const_mod
   use psb_error_mod
   use psb_string_mod
-  use psb_d_base_mat_mod, psb_protect_name => d_coo_csMv_impl
+  use psb_c_base_mat_mod, psb_protect_name => c_coo_csMv_impl
   implicit none 
 
-  class(psb_d_coo_sparse_mat), intent(in) :: a
-  real(psb_dpk_), intent(in)          :: alpha, beta, x(:)
-  real(psb_dpk_), intent(inout)       :: y(:)
+  class(psb_c_coo_sparse_mat), intent(in) :: a
+  complex(psb_spk_), intent(in)          :: alpha, beta, x(:)
+  complex(psb_spk_), intent(inout)       :: y(:)
   integer, intent(out)                :: info
   character, optional, intent(in)     :: trans
 
   character :: trans_
   integer   :: i,j,k,m,n, nnz, ir, jc
-  real(psb_dpk_) :: acc
-  logical   :: tra
+  complex(psb_spk_) :: acc
+  logical   :: tra, ctra
   Integer :: err_act
-  character(len=20)  :: name='d_coo_csmv_impl'
+  character(len=20)  :: name='c_coo_csmv_impl'
   logical, parameter :: debug=.false.
 
   info = 0
@@ -577,7 +717,9 @@ subroutine d_coo_csmv_impl(alpha,a,x,beta,y,info,trans)
     trans_ = 'N'
   end if
 
-  tra = (psb_toupper(trans_)=='T').or.(psb_toupper(trans_)=='C')
+  tra  = (psb_toupper(trans_)=='T')
+  ctra = (psb_toupper(trans_)=='C')
+
 
 
   if (tra) then 
@@ -589,10 +731,10 @@ subroutine d_coo_csmv_impl(alpha,a,x,beta,y,info,trans)
   end if
   nnz = a%get_nzeros()
 
-  if (alpha == dzero) then
-    if (beta == dzero) then
+  if (alpha == zzero) then
+    if (beta == zzero) then
       do i = 1, m
-        y(i) = dzero
+        y(i) = zzero
       enddo
     else
       do  i = 1, m
@@ -602,12 +744,12 @@ subroutine d_coo_csmv_impl(alpha,a,x,beta,y,info,trans)
     return
   else 
     if (a%is_triangle().and.a%is_unit()) then 
-      if (beta == dzero) then
+      if (beta == zzero) then
         do i = 1, min(m,n)
           y(i) = alpha*x(i)
         enddo
         do i = min(m,n)+1, m
-          y(i) = dzero
+          y(i) = zzero
         enddo
       else
         do  i = 1, min(m,n) 
@@ -618,9 +760,9 @@ subroutine d_coo_csmv_impl(alpha,a,x,beta,y,info,trans)
         enddo
       endif
     else
-      if (beta == dzero) then
+      if (beta == zzero) then
         do i = 1, m
-          y(i) = dzero
+          y(i) = zzero
         enddo
       else
         do  i = 1, m
@@ -632,12 +774,12 @@ subroutine d_coo_csmv_impl(alpha,a,x,beta,y,info,trans)
 
   end if
 
-  if (.not.tra) then 
+  if ((.not.tra).and.(.not.ctra)) then 
     i    = 1
     j    = i
     if (nnz > 0) then 
       ir   = a%ia(1) 
-      acc  = dzero
+      acc  = zzero
       do 
         if (i>nnz) then 
           y(ir) = y(ir) + alpha * acc
@@ -646,7 +788,7 @@ subroutine d_coo_csmv_impl(alpha,a,x,beta,y,info,trans)
         if (a%ia(i) /= ir) then 
           y(ir) = y(ir) + alpha * acc
           ir    = a%ia(i) 
-          acc   = dzero
+          acc   = zzero
         endif
         acc     = acc + a%val(i) * x(a%ja(i))
         i       = i + 1               
@@ -655,7 +797,7 @@ subroutine d_coo_csmv_impl(alpha,a,x,beta,y,info,trans)
 
   else if (tra) then 
 
-    if (alpha == done) then
+    if (alpha == zone) then
       i    = 1
       do i=1,nnz
         ir = a%ja(i)
@@ -663,7 +805,7 @@ subroutine d_coo_csmv_impl(alpha,a,x,beta,y,info,trans)
         y(ir) = y(ir) +  a%val(i)*x(jc)
       enddo
 
-    else if (alpha == -done) then
+    else if (alpha == -zone) then
 
       do i=1,nnz
         ir = a%ja(i)
@@ -677,6 +819,34 @@ subroutine d_coo_csmv_impl(alpha,a,x,beta,y,info,trans)
         ir = a%ja(i)
         jc = a%ia(i)
         y(ir) = y(ir) + alpha*a%val(i)*x(jc)
+      enddo
+
+    end if                  !.....end testing on alpha
+
+  else if (ctra) then 
+
+    if (alpha == zone) then
+      i    = 1
+      do i=1,nnz
+        ir = a%ja(i)
+        jc = a%ia(i)
+        y(ir) = y(ir) +  conjg(a%val(i))*x(jc)
+      enddo
+
+    else if (alpha == -zone) then
+
+      do i=1,nnz
+        ir = a%ja(i)
+        jc = a%ia(i)
+        y(ir) = y(ir) - conjg(a%val(i))*x(jc)
+      enddo
+
+    else                    
+
+      do i=1,nnz
+        ir = a%ja(i)
+        jc = a%ia(i)
+        y(ir) = y(ir) + alpha*conjg(a%val(i))*x(jc)
       enddo
 
     end if                  !.....end testing on alpha
@@ -695,27 +865,27 @@ subroutine d_coo_csmv_impl(alpha,a,x,beta,y,info,trans)
   end if
   return
 
-end subroutine d_coo_csmv_impl
+end subroutine c_coo_csmv_impl
 
 
-subroutine d_coo_csmm_impl(alpha,a,x,beta,y,info,trans) 
+subroutine c_coo_csmm_impl(alpha,a,x,beta,y,info,trans) 
   use psb_const_mod
   use psb_error_mod
   use psb_string_mod
-  use psb_d_base_mat_mod, psb_protect_name => d_coo_csmm_impl
+  use psb_c_base_mat_mod, psb_protect_name => c_coo_csmm_impl
   implicit none 
-  class(psb_d_coo_sparse_mat), intent(in) :: a
-  real(psb_dpk_), intent(in)          :: alpha, beta, x(:,:)
-  real(psb_dpk_), intent(inout)       :: y(:,:)
+  class(psb_c_coo_sparse_mat), intent(in) :: a
+  complex(psb_spk_), intent(in)          :: alpha, beta, x(:,:)
+  complex(psb_spk_), intent(inout)       :: y(:,:)
   integer, intent(out)                :: info
   character, optional, intent(in)     :: trans
 
   character :: trans_
   integer   :: i,j,k,m,n, nnz, ir, jc, nc
-  real(psb_dpk_), allocatable  :: acc(:)
-  logical   :: tra
+  complex(psb_spk_), allocatable  :: acc(:)
+  logical   :: tra, ctra
   Integer :: err_act
-  character(len=20)  :: name='d_coo_csmm_impl'
+  character(len=20)  :: name='c_coo_csmm_impl'
   logical, parameter :: debug=.false.
 
   info = 0
@@ -736,7 +906,9 @@ subroutine d_coo_csmm_impl(alpha,a,x,beta,y,info,trans)
   end if
 
 
-  tra = (psb_toupper(trans_)=='T').or.(psb_toupper(trans_)=='C')
+  tra  = (psb_toupper(trans_)=='T')
+  ctra = (psb_toupper(trans_)=='C')
+
 
   if (tra) then 
     m = a%get_ncols()
@@ -756,10 +928,10 @@ subroutine d_coo_csmm_impl(alpha,a,x,beta,y,info,trans)
   end if
 
 
-  if (alpha == dzero) then
-    if (beta == dzero) then
+  if (alpha == zzero) then
+    if (beta == zzero) then
       do i = 1, m
-        y(i,1:nc) = dzero
+        y(i,1:nc) = zzero
       enddo
     else
       do  i = 1, m
@@ -769,12 +941,12 @@ subroutine d_coo_csmm_impl(alpha,a,x,beta,y,info,trans)
     return
   else 
     if (a%is_triangle().and.a%is_unit()) then 
-      if (beta == dzero) then
+      if (beta == zzero) then
         do i = 1, min(m,n)
           y(i,1:nc) = alpha*x(i,1:nc)
         enddo
         do i = min(m,n)+1, m
-          y(i,1:nc) = dzero
+          y(i,1:nc) = zzero
         enddo
       else
         do  i = 1, min(m,n) 
@@ -785,9 +957,9 @@ subroutine d_coo_csmm_impl(alpha,a,x,beta,y,info,trans)
         enddo
       endif
     else
-      if (beta == dzero) then
+      if (beta == zzero) then
         do i = 1, m
-          y(i,1:nc) = dzero
+          y(i,1:nc) = zzero
         enddo
       else
         do  i = 1, m
@@ -799,12 +971,12 @@ subroutine d_coo_csmm_impl(alpha,a,x,beta,y,info,trans)
 
   end if
 
-  if (.not.tra) then 
+  if ((.not.tra).and.(.not.ctra)) then 
     i    = 1
     j    = i
     if (nnz > 0) then 
       ir   = a%ia(1) 
-      acc  = dzero
+      acc  = zzero
       do 
         if (i>nnz) then 
           y(ir,1:nc) = y(ir,1:nc) + alpha * acc
@@ -813,7 +985,7 @@ subroutine d_coo_csmm_impl(alpha,a,x,beta,y,info,trans)
         if (a%ia(i) /= ir) then 
           y(ir,1:nc) = y(ir,1:nc) + alpha * acc
           ir    = a%ia(i) 
-          acc   = dzero
+          acc   = zzero
         endif
         acc     = acc + a%val(i) * x(a%ja(i),1:nc)
         i       = i + 1               
@@ -821,7 +993,7 @@ subroutine d_coo_csmm_impl(alpha,a,x,beta,y,info,trans)
     end if
 
   else if (tra) then 
-    if (alpha == done) then
+    if (alpha == zone) then
       i    = 1
       do i=1,nnz
         ir = a%ja(i)
@@ -829,7 +1001,7 @@ subroutine d_coo_csmm_impl(alpha,a,x,beta,y,info,trans)
         y(ir,1:nc) = y(ir,1:nc) +  a%val(i)*x(jc,1:nc)
       enddo
 
-    else if (alpha == -done) then
+    else if (alpha == -zone) then
 
       do i=1,nnz
         ir = a%ja(i)
@@ -843,6 +1015,34 @@ subroutine d_coo_csmm_impl(alpha,a,x,beta,y,info,trans)
         ir = a%ja(i)
         jc = a%ia(i)
         y(ir,1:nc) = y(ir,1:nc) + alpha*a%val(i)*x(jc,1:nc)
+      enddo
+
+    end if                  !.....end testing on alpha
+
+  else if (ctra) then 
+
+    if (alpha == zone) then
+      i    = 1
+      do i=1,nnz
+        ir = a%ja(i)
+        jc = a%ia(i)
+        y(ir,1:nc) = y(ir,1:nc) +  conjg(a%val(i))*x(jc,1:nc)
+      enddo
+
+    else if (alpha == -zone) then
+
+      do i=1,nnz
+        ir = a%ja(i)
+        jc = a%ia(i)
+        y(ir,1:nc) = y(ir,1:nc) - conjg(a%val(i))*x(jc,1:nc)
+      enddo
+
+    else                    
+
+      do i=1,nnz
+        ir = a%ja(i)
+        jc = a%ia(i)
+        y(ir,1:nc) = y(ir,1:nc) + alpha*conjg(a%val(i))*x(jc,1:nc)
       enddo
 
     end if                  !.....end testing on alpha
@@ -861,20 +1061,20 @@ subroutine d_coo_csmm_impl(alpha,a,x,beta,y,info,trans)
   end if
   return
 
-end subroutine d_coo_csmm_impl
+end subroutine c_coo_csmm_impl
 
-function d_coo_csnmi_impl(a) result(res)
+function c_coo_csnmi_impl(a) result(res)
   use psb_error_mod
-  use psb_d_base_mat_mod, psb_protect_name => d_coo_csnmi_impl
+  use psb_c_base_mat_mod, psb_protect_name => c_coo_csnmi_impl
   implicit none 
-  class(psb_d_coo_sparse_mat), intent(in) :: a
-  real(psb_dpk_)         :: res
+  class(psb_c_coo_sparse_mat), intent(in) :: a
+  real(psb_spk_)         :: res
 
   integer   :: i,j,k,m,n, nnz, ir, jc, nc
-  real(psb_dpk_) :: acc
+  real(psb_spk_) :: acc
   logical   :: tra
   Integer :: err_act
-  character(len=20)  :: name='d_base_csnmi'
+  character(len=20)  :: name='c_base_csnmi'
   logical, parameter :: debug=.false.
 
 
@@ -894,7 +1094,7 @@ function d_coo_csnmi_impl(a) result(res)
     i = j
   end do
 
-end function d_coo_csnmi_impl
+end function c_coo_csnmi_impl
 
 
 
@@ -912,16 +1112,16 @@ end function d_coo_csnmi_impl
 
 
 
-subroutine d_coo_csgetptn_impl(imin,imax,a,nz,ia,ja,info,&
+subroutine c_coo_csgetptn_impl(imin,imax,a,nz,ia,ja,info,&
      & jmin,jmax,iren,append,nzin,rscale,cscale)
   ! Output is always in  COO format 
   use psb_error_mod
   use psb_const_mod
   use psb_error_mod
-  use psb_d_base_mat_mod, psb_protect_name => d_coo_csgetptn_impl
+  use psb_c_base_mat_mod, psb_protect_name => c_coo_csgetptn_impl
   implicit none
 
-  class(psb_d_coo_sparse_mat), intent(in) :: a
+  class(psb_c_coo_sparse_mat), intent(in) :: a
   integer, intent(in)                  :: imin,imax
   integer, intent(out)                 :: nz
   integer, allocatable, intent(inout)  :: ia(:), ja(:)
@@ -1017,7 +1217,7 @@ contains
     use psb_sort_mod
     implicit none
 
-    class(psb_d_coo_sparse_mat), intent(in)    :: a
+    class(psb_c_coo_sparse_mat), intent(in)    :: a
     integer                              :: imin,imax,jmin,jmax
     integer, intent(out)                 :: nz
     integer, allocatable, intent(inout)  :: ia(:), ja(:)
@@ -1180,23 +1380,23 @@ contains
 
   end subroutine coo_getptn
 
-end subroutine d_coo_csgetptn_impl
+end subroutine c_coo_csgetptn_impl
 
 
-subroutine d_coo_csgetrow_impl(imin,imax,a,nz,ia,ja,val,info,&
+subroutine c_coo_csgetrow_impl(imin,imax,a,nz,ia,ja,val,info,&
      & jmin,jmax,iren,append,nzin,rscale,cscale)
   ! Output is always in  COO format 
   use psb_error_mod
   use psb_const_mod
   use psb_error_mod
-  use psb_d_base_mat_mod, psb_protect_name => d_coo_csgetrow_impl
+  use psb_c_base_mat_mod, psb_protect_name => c_coo_csgetrow_impl
   implicit none
 
-  class(psb_d_coo_sparse_mat), intent(in) :: a
+  class(psb_c_coo_sparse_mat), intent(in) :: a
   integer, intent(in)                  :: imin,imax
   integer, intent(out)                 :: nz
   integer, allocatable, intent(inout)  :: ia(:), ja(:)
-  real(psb_dpk_), allocatable,  intent(inout)    :: val(:)
+  complex(psb_spk_), allocatable,  intent(inout)    :: val(:)
   integer,intent(out)                  :: info
   logical, intent(in), optional        :: append
   integer, intent(in), optional        :: iren(:)
@@ -1289,11 +1489,11 @@ contains
     use psb_sort_mod
     implicit none
 
-    class(psb_d_coo_sparse_mat), intent(in)    :: a
+    class(psb_c_coo_sparse_mat), intent(in)    :: a
     integer                              :: imin,imax,jmin,jmax
     integer, intent(out)                 :: nz
     integer, allocatable, intent(inout)  :: ia(:), ja(:)
-    real(psb_dpk_), allocatable,  intent(inout)    :: val(:)
+    complex(psb_spk_), allocatable,  intent(inout)    :: val(:)
     integer, intent(in)                  :: nzin
     logical, intent(in)                  :: append
     integer                              :: info
@@ -1461,25 +1661,25 @@ contains
 
   end subroutine coo_getrow
 
-end subroutine d_coo_csgetrow_impl
+end subroutine c_coo_csgetrow_impl
 
 
-subroutine d_coo_csput_impl(nz,ia,ja,val,a,imin,imax,jmin,jmax,info,gtl) 
+subroutine c_coo_csput_impl(nz,ia,ja,val,a,imin,imax,jmin,jmax,info,gtl) 
   use psb_error_mod
   use psb_realloc_mod
   use psb_sort_mod
-  use psb_d_base_mat_mod, psb_protect_name => d_coo_csput_impl
+  use psb_c_base_mat_mod, psb_protect_name => c_coo_csput_impl
   implicit none 
     
-  class(psb_d_coo_sparse_mat), intent(inout) :: a
-  real(psb_dpk_), intent(in)      :: val(:)
+  class(psb_c_coo_sparse_mat), intent(inout) :: a
+  complex(psb_spk_), intent(in)      :: val(:)
   integer, intent(in)             :: nz, ia(:), ja(:), imin,imax,jmin,jmax
   integer, intent(out)            :: info
   integer, intent(in), optional   :: gtl(:)
 
 
   Integer            :: err_act
-  character(len=20)  :: name='d_coo_csput_impl'
+  character(len=20)  :: name='c_coo_csput_impl'
   logical, parameter :: debug=.false.
   integer            :: nza, i,j,k, nzl, isza, int_err(5)
 
@@ -1532,7 +1732,7 @@ subroutine d_coo_csput_impl(nz,ia,ja,val,a,imin,imax,jmin,jmax,info,gtl)
 
   else  if (a%is_upd()) then 
 
-    call  d_coo_srch_upd(nz,ia,ja,val,a,&
+    call  c_coo_srch_upd(nz,ia,ja,val,a,&
          & imin,imax,jmin,jmax,info,gtl)
     if (info /= 0) then 
       info = 1121
@@ -1569,8 +1769,8 @@ contains
     integer, intent(in) :: nz, imin,imax,jmin,jmax,maxsz
     integer, intent(in) :: ia(:),ja(:)
     integer, intent(inout) :: nza,ia1(:),ia2(:)
-    real(psb_dpk_), intent(in) :: val(:)
-    real(psb_dpk_), intent(inout) :: aspk(:)
+    complex(psb_spk_), intent(in) :: val(:)
+    complex(psb_spk_), intent(inout) :: aspk(:)
     integer, intent(out) :: info
     integer, intent(in), optional  :: gtl(:)
     integer :: i,ir,ic,ng
@@ -1618,7 +1818,7 @@ contains
   end subroutine psb_inner_ins
 
 
-  subroutine d_coo_srch_upd(nz,ia,ja,val,a,&
+  subroutine c_coo_srch_upd(nz,ia,ja,val,a,&
        & imin,imax,jmin,jmax,info,gtl)
 
     use psb_const_mod
@@ -1626,16 +1826,16 @@ contains
     use psb_string_mod
     implicit none 
 
-    class(psb_d_coo_sparse_mat), intent(inout) :: a
+    class(psb_c_coo_sparse_mat), intent(inout) :: a
     integer, intent(in) :: nz, imin,imax,jmin,jmax
     integer, intent(in) :: ia(:),ja(:)
-    real(psb_dpk_), intent(in) :: val(:)
+    complex(psb_spk_), intent(in) :: val(:)
     integer, intent(out) :: info
     integer, intent(in), optional  :: gtl(:)
     integer  :: i,ir,ic, ilr, ilc, ip, &
          & i1,i2,nc,nnz,dupl,ng, nr
     integer              :: debug_level, debug_unit
-    character(len=20)    :: name='d_coo_srch_upd'
+    character(len=20)    :: name='c_coo_srch_upd'
 
     info = 0
     debug_unit  = psb_get_debug_unit()
@@ -1838,18 +2038,18 @@ contains
 
     end if
 
-  end subroutine d_coo_srch_upd
+  end subroutine c_coo_srch_upd
 
-end subroutine d_coo_csput_impl
+end subroutine c_coo_csput_impl
 
 
-subroutine d_cp_coo_to_coo_impl(a,b,info) 
+subroutine c_cp_coo_to_coo_impl(a,b,info) 
   use psb_error_mod
   use psb_realloc_mod
-  use psb_d_base_mat_mod, psb_protect_name => d_cp_coo_to_coo_impl
+  use psb_c_base_mat_mod, psb_protect_name => c_cp_coo_to_coo_impl
   implicit none 
-  class(psb_d_coo_sparse_mat), intent(in) :: a
-  class(psb_d_coo_sparse_mat), intent(out) :: b
+  class(psb_c_coo_sparse_mat), intent(in) :: a
+  class(psb_c_coo_sparse_mat), intent(out) :: b
   integer, intent(out)            :: info
 
   Integer :: err_act
@@ -1859,7 +2059,7 @@ subroutine d_cp_coo_to_coo_impl(a,b,info)
 
   call psb_erractionsave(err_act)
   info = 0
-  call b%psb_d_base_sparse_mat%cp_from(a%psb_d_base_sparse_mat)
+  call b%psb_c_base_sparse_mat%cp_from(a%psb_c_base_sparse_mat)
 
   call b%set_nzeros(a%get_nzeros())
   call b%reallocate(a%get_nzeros())
@@ -1885,15 +2085,15 @@ subroutine d_cp_coo_to_coo_impl(a,b,info)
   end if
   return
 
-end subroutine d_cp_coo_to_coo_impl
+end subroutine c_cp_coo_to_coo_impl
   
-subroutine d_cp_coo_from_coo_impl(a,b,info) 
+subroutine c_cp_coo_from_coo_impl(a,b,info) 
   use psb_error_mod
   use psb_realloc_mod
-  use psb_d_base_mat_mod, psb_protect_name => d_cp_coo_from_coo_impl
+  use psb_c_base_mat_mod, psb_protect_name => c_cp_coo_from_coo_impl
   implicit none 
-  class(psb_d_coo_sparse_mat), intent(out) :: a
-  class(psb_d_coo_sparse_mat), intent(in) :: b
+  class(psb_c_coo_sparse_mat), intent(out) :: a
+  class(psb_c_coo_sparse_mat), intent(in) :: b
   integer, intent(out)            :: info
 
   Integer :: err_act
@@ -1904,7 +2104,7 @@ subroutine d_cp_coo_from_coo_impl(a,b,info)
 
   call psb_erractionsave(err_act)
   info = 0
-  call a%psb_d_base_sparse_mat%cp_from(b%psb_d_base_sparse_mat)
+  call a%psb_c_base_sparse_mat%cp_from(b%psb_c_base_sparse_mat)
   call a%set_nzeros(b%get_nzeros())
   call a%reallocate(b%get_nzeros())
 
@@ -1929,16 +2129,16 @@ subroutine d_cp_coo_from_coo_impl(a,b,info)
   end if
   return
 
-end subroutine d_cp_coo_from_coo_impl
+end subroutine c_cp_coo_from_coo_impl
 
 
-subroutine d_cp_coo_to_fmt_impl(a,b,info) 
+subroutine c_cp_coo_to_fmt_impl(a,b,info) 
   use psb_error_mod
   use psb_realloc_mod
-  use psb_d_base_mat_mod, psb_protect_name => d_cp_coo_to_fmt_impl
+  use psb_c_base_mat_mod, psb_protect_name => c_cp_coo_to_fmt_impl
   implicit none 
-  class(psb_d_coo_sparse_mat), intent(in) :: a
-  class(psb_d_base_sparse_mat), intent(out) :: b
+  class(psb_c_coo_sparse_mat), intent(in) :: a
+  class(psb_c_base_sparse_mat), intent(out) :: b
   integer, intent(out)            :: info
 
   Integer :: err_act
@@ -1966,15 +2166,15 @@ subroutine d_cp_coo_to_fmt_impl(a,b,info)
   end if
   return
 
-end subroutine d_cp_coo_to_fmt_impl
+end subroutine c_cp_coo_to_fmt_impl
   
-subroutine d_cp_coo_from_fmt_impl(a,b,info) 
+subroutine c_cp_coo_from_fmt_impl(a,b,info) 
   use psb_error_mod
   use psb_realloc_mod
-  use psb_d_base_mat_mod, psb_protect_name => d_cp_coo_from_fmt_impl
+  use psb_c_base_mat_mod, psb_protect_name => c_cp_coo_from_fmt_impl
   implicit none 
-  class(psb_d_coo_sparse_mat), intent(inout) :: a
-  class(psb_d_base_sparse_mat), intent(in) :: b
+  class(psb_c_coo_sparse_mat), intent(inout) :: a
+  class(psb_c_base_sparse_mat), intent(in) :: b
   integer, intent(out)            :: info
 
   Integer :: err_act
@@ -2003,19 +2203,19 @@ subroutine d_cp_coo_from_fmt_impl(a,b,info)
   end if
   return
 
-end subroutine d_cp_coo_from_fmt_impl
+end subroutine c_cp_coo_from_fmt_impl
 
 
-subroutine d_fix_coo_impl(a,info,idir) 
+subroutine c_fix_coo_impl(a,info,idir) 
   use psb_const_mod
   use psb_error_mod
   use psb_realloc_mod
   use psb_string_mod
   use psb_ip_reord_mod
-  use psb_d_base_mat_mod, psb_protect_name => d_fix_coo_impl
+  use psb_c_base_mat_mod, psb_protect_name => c_fix_coo_impl
   implicit none 
 
-  class(psb_d_coo_sparse_mat), intent(inout) :: a
+  class(psb_c_coo_sparse_mat), intent(inout) :: a
   integer, intent(out)                :: info
   integer, intent(in), optional :: idir
   integer, allocatable :: iaux(:)
@@ -2045,7 +2245,7 @@ subroutine d_fix_coo_impl(a,info,idir)
 
   dupl_ = a%get_dupl()
 
-  call d_fix_coo_inner(nza,dupl_,a%ia,a%ja,a%val,i,info,idir_)
+  call c_fix_coo_inner(nza,dupl_,a%ia,a%ja,a%val,i,info,idir_)
 
   call a%set_sorted()
   call a%set_nzeros(i)
@@ -2063,22 +2263,22 @@ subroutine d_fix_coo_impl(a,info,idir)
   end if
   return
 
-end subroutine d_fix_coo_impl
+end subroutine c_fix_coo_impl
 
 
 
-subroutine d_fix_coo_inner(nzin,dupl,ia,ja,val,nzout,info,idir) 
+subroutine c_fix_coo_inner(nzin,dupl,ia,ja,val,nzout,info,idir) 
   use psb_const_mod
   use psb_error_mod
   use psb_realloc_mod
-  use psb_d_base_mat_mod, psb_protect_name => d_fix_coo_inner
+  use psb_c_base_mat_mod, psb_protect_name => c_fix_coo_inner
   use psb_string_mod
   use psb_ip_reord_mod
   implicit none 
   
   integer, intent(in)           :: nzin, dupl
   integer, intent(inout)        :: ia(:), ja(:)
-  real(psb_dpk_), intent(inout) :: val(:)
+  complex(psb_spk_), intent(inout) :: val(:)
   integer, intent(out)          :: nzout, info
   integer, intent(in), optional :: idir
   !locals
@@ -2300,18 +2500,18 @@ subroutine d_fix_coo_inner(nzin,dupl,ia,ja,val,nzout,info,idir)
 
 
 
-end subroutine d_fix_coo_inner
+end subroutine c_fix_coo_inner
 
 
 
 
-subroutine d_mv_coo_to_coo_impl(a,b,info) 
+subroutine c_mv_coo_to_coo_impl(a,b,info) 
   use psb_error_mod
   use psb_realloc_mod
-  use psb_d_base_mat_mod, psb_protect_name => d_mv_coo_to_coo_impl
+  use psb_c_base_mat_mod, psb_protect_name => c_mv_coo_to_coo_impl
   implicit none 
-  class(psb_d_coo_sparse_mat), intent(inout) :: a
-  class(psb_d_coo_sparse_mat), intent(out) :: b
+  class(psb_c_coo_sparse_mat), intent(inout) :: a
+  class(psb_c_coo_sparse_mat), intent(out) :: b
   integer, intent(out)            :: info
 
   Integer :: err_act
@@ -2321,7 +2521,7 @@ subroutine d_mv_coo_to_coo_impl(a,b,info)
 
   call psb_erractionsave(err_act)
   info = 0
-  call b%psb_d_base_sparse_mat%mv_from(a%psb_d_base_sparse_mat)
+  call b%psb_c_base_sparse_mat%mv_from(a%psb_c_base_sparse_mat)
   call b%set_nzeros(a%get_nzeros())
   call b%reallocate(a%get_nzeros())
 
@@ -2347,15 +2547,15 @@ subroutine d_mv_coo_to_coo_impl(a,b,info)
   end if
   return
 
-end subroutine d_mv_coo_to_coo_impl
+end subroutine c_mv_coo_to_coo_impl
   
-subroutine d_mv_coo_from_coo_impl(a,b,info) 
+subroutine c_mv_coo_from_coo_impl(a,b,info) 
   use psb_error_mod
   use psb_realloc_mod
-  use psb_d_base_mat_mod, psb_protect_name => d_mv_coo_from_coo_impl
+  use psb_c_base_mat_mod, psb_protect_name => c_mv_coo_from_coo_impl
   implicit none 
-  class(psb_d_coo_sparse_mat), intent(inout) :: a
-  class(psb_d_coo_sparse_mat), intent(inout) :: b
+  class(psb_c_coo_sparse_mat), intent(inout) :: a
+  class(psb_c_coo_sparse_mat), intent(inout) :: b
   integer, intent(out)            :: info
 
   Integer :: err_act
@@ -2366,7 +2566,7 @@ subroutine d_mv_coo_from_coo_impl(a,b,info)
 
   call psb_erractionsave(err_act)
   info = 0
-  call a%psb_d_base_sparse_mat%mv_from(b%psb_d_base_sparse_mat)
+  call a%psb_c_base_sparse_mat%mv_from(b%psb_c_base_sparse_mat)
   call a%set_nzeros(b%get_nzeros())
   call a%reallocate(b%get_nzeros())
 
@@ -2396,16 +2596,16 @@ subroutine d_mv_coo_from_coo_impl(a,b,info)
   end if
   return
 
-end subroutine d_mv_coo_from_coo_impl
+end subroutine c_mv_coo_from_coo_impl
 
 
-subroutine d_mv_coo_to_fmt_impl(a,b,info) 
+subroutine c_mv_coo_to_fmt_impl(a,b,info) 
   use psb_error_mod
   use psb_realloc_mod
-  use psb_d_base_mat_mod, psb_protect_name => d_mv_coo_to_fmt_impl
+  use psb_c_base_mat_mod, psb_protect_name => c_mv_coo_to_fmt_impl
   implicit none 
-  class(psb_d_coo_sparse_mat), intent(inout) :: a
-  class(psb_d_base_sparse_mat), intent(out) :: b
+  class(psb_c_coo_sparse_mat), intent(inout) :: a
+  class(psb_c_base_sparse_mat), intent(out) :: b
   integer, intent(out)            :: info
 
   Integer :: err_act
@@ -2433,15 +2633,15 @@ subroutine d_mv_coo_to_fmt_impl(a,b,info)
   end if
   return
 
-end subroutine d_mv_coo_to_fmt_impl
+end subroutine c_mv_coo_to_fmt_impl
   
-subroutine d_mv_coo_from_fmt_impl(a,b,info) 
+subroutine c_mv_coo_from_fmt_impl(a,b,info) 
   use psb_error_mod
   use psb_realloc_mod
-  use psb_d_base_mat_mod, psb_protect_name => d_mv_coo_from_fmt_impl
+  use psb_c_base_mat_mod, psb_protect_name => c_mv_coo_from_fmt_impl
   implicit none 
-  class(psb_d_coo_sparse_mat), intent(inout) :: a
-  class(psb_d_base_sparse_mat), intent(inout) :: b
+  class(psb_c_coo_sparse_mat), intent(inout) :: a
+  class(psb_c_base_sparse_mat), intent(inout) :: b
   integer, intent(out)            :: info
 
   Integer :: err_act
@@ -2470,4 +2670,4 @@ subroutine d_mv_coo_from_fmt_impl(a,b,info)
   end if
   return
 
-end subroutine d_mv_coo_from_fmt_impl
+end subroutine c_mv_coo_from_fmt_impl
