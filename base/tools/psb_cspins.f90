@@ -42,7 +42,7 @@
 !    ia(:)    - integer                     The row indices of the coefficients.
 !    ja(:)    - integer                     The column indices of the coefficients.
 !    val(:)   - complex                     The values of the coefficients to be inserted.
-!    a        - type(psb_dspmat_type).      The sparse destination matrix.      
+!    a        - type(psb_d_sparse_mat).      The sparse destination matrix.      
 !    desc_a   - type(psb_desc_type).        The communication descriptor.
 !    info     - integer.                    Error code
 !    rebuild  - logical                     Allows to reopen a matrix under
@@ -52,7 +52,6 @@ subroutine psb_cspins(nz,ia,ja,val,a,desc_a,info,rebuild)
 
   use psb_tools_mod, psb_protect_name => psb_cspins
   use psb_descriptor_type
-  use psb_spmat_type
   use psb_serial_mod
   use psb_const_mod
   use psb_error_mod
@@ -61,20 +60,19 @@ subroutine psb_cspins(nz,ia,ja,val,a,desc_a,info,rebuild)
 
   !....parameters...
   type(psb_desc_type), intent(inout)   :: desc_a
-  type(psb_cspmat_type), intent(inout) :: a
+  type(psb_c_sparse_mat), intent(inout) :: a
   integer, intent(in)                  :: nz,ia(:),ja(:)
   complex(psb_spk_), intent(in)      :: val(:)
   integer, intent(out)                 :: info
   logical, intent(in), optional        :: rebuild
   !locals.....
 
-  integer :: nrow, err_act,mglob,ncol, spstate
+  integer :: nrow, err_act, ncol, spstate
   integer                :: ictxt,np,me
   logical, parameter     :: debug=.false.
   integer, parameter     :: relocsz=200
   logical                :: rebuild_
   integer, allocatable   :: ila(:),jla(:)
-
   character(len=20)  :: name, ch_err
 
   info = 0
@@ -83,7 +81,6 @@ subroutine psb_cspins(nz,ia,ja,val,a,desc_a,info,rebuild)
 
 
   ictxt = psb_cd_get_context(desc_a)
-  mglob = psb_cd_get_global_rows(desc_a)
 
   call psb_info(ictxt, me, np)
 
@@ -122,7 +119,6 @@ subroutine psb_cspins(nz,ia,ja,val,a,desc_a,info,rebuild)
     rebuild_ = .false.
   endif
 
-  spstate = a%infoa(psb_state_)
   if (psb_is_bld_desc(desc_a)) then 
     if (psb_is_large_desc(desc_a)) then 
 
@@ -141,8 +137,8 @@ subroutine psb_cspins(nz,ia,ja,val,a,desc_a,info,rebuild)
       nrow = psb_cd_get_local_rows(desc_a)
       ncol = psb_cd_get_local_cols(desc_a)
 
-      if (spstate == psb_spmat_bld_) then 
-        call psb_coins(nz,ila,jla,val,a,1,nrow,1,ncol,info)
+      if (a%is_bld()) then 
+        call a%csput(nz,ila,jla,val,1,nrow,1,ncol,info)
         if (info /= 0) then
           info=4010
           ch_err='psb_coins'
@@ -166,8 +162,8 @@ subroutine psb_cspins(nz,ia,ja,val,a,desc_a,info,rebuild)
       nrow = psb_cd_get_local_rows(desc_a)
       ncol = psb_cd_get_local_cols(desc_a)
 
-      if (spstate == psb_spmat_bld_) then 
-        call psb_coins(nz,ia,ja,val,a,1,nrow,1,ncol,info,gtl=desc_a%idxmap%glob_to_loc)
+      if (a%is_bld()) then 
+        call a%csput(nz,ia,ja,val,1,nrow,1,ncol,info,gtl=desc_a%idxmap%glob_to_loc)
         if (info /= 0) then
           info=4010
           ch_err='psb_coins'
@@ -181,7 +177,7 @@ subroutine psb_cspins(nz,ia,ja,val,a,desc_a,info,rebuild)
       end if
 
     end if
-
+    
   else if (psb_is_asb_desc(desc_a)) then 
 
     if (psb_is_large_desc(desc_a)) then 
@@ -200,8 +196,7 @@ subroutine psb_cspins(nz,ia,ja,val,a,desc_a,info,rebuild)
       nrow = psb_cd_get_local_rows(desc_a)
       ncol = psb_cd_get_local_cols(desc_a)
 
-      call psb_coins(nz,ila,jla,val,a,1,nrow,1,ncol,&
-           & info,rebuild=rebuild_)
+      call a%csput(nz,ila,jla,val,1,nrow,1,ncol,info)
       if (info /= 0) then
         info=4010
         ch_err='psb_coins'
@@ -212,8 +207,8 @@ subroutine psb_cspins(nz,ia,ja,val,a,desc_a,info,rebuild)
     else
       nrow = psb_cd_get_local_rows(desc_a)
       ncol = psb_cd_get_local_cols(desc_a)
-      call psb_coins(nz,ia,ja,val,a,1,nrow,1,ncol,&
-           & info,gtl=desc_a%idxmap%glob_to_loc,rebuild=rebuild_)
+      call a%csput(nz,ia,ja,val,1,nrow,1,ncol,&
+           & info,gtl=desc_a%idxmap%glob_to_loc)
       if (info /= 0) then
         info=4010
         ch_err='psb_coins'
@@ -244,7 +239,6 @@ end subroutine psb_cspins
 subroutine psb_cspins_2desc(nz,ia,ja,val,a,desc_ar,desc_ac,info)
   use psb_tools_mod, psb_protect_name => psb_cspins_2desc
   use psb_descriptor_type
-  use psb_spmat_type
   use psb_serial_mod
   use psb_const_mod
   use psb_error_mod
@@ -254,7 +248,7 @@ subroutine psb_cspins_2desc(nz,ia,ja,val,a,desc_ar,desc_ac,info)
   !....parameters...
   type(psb_desc_type), intent(in)      :: desc_ar
   type(psb_desc_type), intent(inout)   :: desc_ac
-  type(psb_cspmat_type), intent(inout) :: a
+  type(psb_c_sparse_mat), intent(inout) :: a
   integer, intent(in)                  :: nz,ia(:),ja(:)
   complex(psb_spk_), intent(in)        :: val(:)
   integer, intent(out)                 :: info
@@ -310,7 +304,6 @@ subroutine psb_cspins_2desc(nz,ia,ja,val,a,desc_ar,desc_ac,info)
   end if
   if (nz==0) return
 
-  spstate = a%infoa(psb_state_)
   if (psb_is_bld_desc(desc_ac)) then 
 
     allocate(ila(nz),jla(nz),stat=info)
@@ -334,7 +327,7 @@ subroutine psb_cspins_2desc(nz,ia,ja,val,a,desc_ar,desc_ac,info)
     nrow = psb_cd_get_local_rows(desc_ar)
     ncol = psb_cd_get_local_cols(desc_ac)
 
-    call psb_coins(nz,ila,jla,val,a,1,nrow,1,ncol,info)
+    call a%csput(nz,ila,jla,val,1,nrow,1,ncol,info)
     if (info /= 0) then
       info=4010
       ch_err='psb_coins'

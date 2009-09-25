@@ -42,9 +42,9 @@
 subroutine psb_sspfree(a, desc_a,info)
   !...free sparse matrix structure...
   use psb_descriptor_type
+  use psb_serial_mod
   use psb_const_mod
   use psb_error_mod
-  use psb_mat_mod
   implicit none
 
   !....parameters...

@@ -37,7 +37,7 @@
 !    specified on input. 
 ! 
 ! Arguments: 
-!    a        - type(psb_dspmat_type).       The input sparse matrix.
+!    a        - type(psb_d_sparse_mat).       The input sparse matrix.
 !    desc_a   - type(psb_desc_type).         The input communication descriptor.
 !    novr     - integer.                       The number of overlap levels.
 !    desc_ov  - type(psb_desc_type).         The auxiliary output communication 
@@ -67,7 +67,6 @@ Subroutine psb_dcdbldext(a,desc_a,novr,desc_ov,info, extype)
   use psb_error_mod
   use psb_penv_mod
   use psb_realloc_mod
-  use psb_mat_mod
   use psi_mod
 #ifdef MPI_MOD
   use mpi

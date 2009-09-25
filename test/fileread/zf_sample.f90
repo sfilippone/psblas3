@@ -41,7 +41,7 @@ program zf_sample
   character(len=40) :: kmethd, ptype, mtrx_file, rhs_file
 
   ! sparse matrices
-  type(psb_zspmat_type) :: a, aux_a
+  type(psb_z_sparse_mat) :: a, aux_a
 
   ! preconditioner data
   type(psb_zprec_type)  :: prec
@@ -129,7 +129,7 @@ program zf_sample
       call psb_abort(ictxt)
     end if
     
-    m_problem = aux_a%m
+    m_problem = aux_a%get_nrows()
     call psb_bcast(ictxt,m_problem)
     
     ! At this point aux_b may still be unallocated
@@ -179,7 +179,8 @@ program zf_sample
       write(*,'("Partition type: graph")')
       write(*,'(" ")')
       !      write(0,'("Build type: graph")')
-      call build_mtpart(aux_a%m,aux_a%fida,aux_a%ia1,aux_a%ia2,np)
+      call build_mtpart(aux_a,np)
+
     endif
     call psb_barrier(ictxt)
     call distr_mtpart(psb_root_,ictxt)
@@ -230,14 +231,12 @@ program zf_sample
      write(*,'(" ")')
   end if
 
-  call psb_set_debug_level(0)
   iparm = 0
   call psb_barrier(ictxt)
   t1 = psb_wtime()
   call psb_krylov(kmethd,a,prec,b_col,x_col,eps,desc_a,info,& 
        & itmax=itmax,iter=iter,err=err,itrace=itrace,istop=istopc,irst=irst)     
   call psb_barrier(ictxt)
-  call psb_set_debug_level(0)
   t2 = psb_wtime() - t1
   call psb_amx(ictxt,t2)
   call psb_geaxpby(zone,b_col,zzero,r_col,desc_a,info)

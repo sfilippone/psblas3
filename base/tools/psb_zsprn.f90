@@ -36,7 +36,7 @@
 !    is in the update state.
 ! 
 ! Arguments: 
-!    a        - type(psb_zspmat_type).        The sparse matrix to be reinitiated.      
+!    a        - type(psb_z_sparse_mat).        The sparse matrix to be reinitiated.      
 !    desc_a   - type(psb_desc_type).          The communication descriptor.
 !    info     - integer.                        Return code.
 !    clear    - logical, optional               Whether the coefficients should be zeroed
@@ -45,7 +45,6 @@
 Subroutine psb_zsprn(a, desc_a,info,clear)
 
   use psb_descriptor_type
-  use psb_spmat_type
   use psb_serial_mod
   use psb_const_mod
   use psb_error_mod
@@ -54,7 +53,7 @@ Subroutine psb_zsprn(a, desc_a,info,clear)
 
   !....Parameters...
   Type(psb_desc_type), intent(in)      :: desc_a
-  Type(psb_zspmat_type), intent(inout) :: a
+  Type(psb_z_sparse_mat), intent(inout) :: a
   integer, intent(out)                 :: info
   logical, intent(in), optional        :: clear
 
@@ -87,13 +86,8 @@ Subroutine psb_zsprn(a, desc_a,info,clear)
     call psb_errpush(info,name)
     goto 9999
   endif
-  if (present(clear)) then 
-    clear_ = clear
-  else
-    clear_ = .true.
-  end if
 
-  call psb_sp_reinit(a,info,clear=clear_)
+  call a%reinit(clear=clear)
 
   if (info /= 0) goto 9999
   if (debug_level >= psb_debug_outer_) &

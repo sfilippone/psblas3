@@ -47,9 +47,10 @@ function psb_cnrmi(a,desc_a,info)
   use psb_check_mod
   use psb_error_mod
   use psb_penv_mod
+  use psb_mat_mod
   implicit none
 
-  type(psb_cspmat_type), intent(in)   :: a
+  type(psb_c_sparse_mat), intent(in)   :: a
   integer, intent(out)                :: info
   type(psb_desc_type), intent(in)     :: desc_a
   real(psb_spk_)                    :: psb_cnrmi
@@ -94,8 +95,7 @@ function psb_cnrmi(a,desc_a,info)
   end if
 
   if ((m /= 0).and.(n /= 0)) then
-    nrmi = psb_csnmi(a,info)
-
+    nrmi = psb_csnmi(a)
     if(info /= 0) then
       info=4010
       ch_err='psb_csnmi'
@@ -103,7 +103,7 @@ function psb_cnrmi(a,desc_a,info)
       goto 9999
     end if
   else
-    nrmi = 0.d0
+    nrmi = 0.0
   end if
 
   ! compute global max

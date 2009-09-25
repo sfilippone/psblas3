@@ -37,7 +37,7 @@
 !    normi := max(abs(sum(A(i,j))))                                              
 !
 ! Arguments:
-!    a      -  type(psb_dspmat_type).   The sparse matrix containing A.
+!    a      -  type(psb_d_sparse_mat).   The sparse matrix containing A.
 !    desc_a -  type(psb_desc_type).     The communication descriptor.
 !    info   -  integer.                   Return code
 !
@@ -47,9 +47,10 @@ function psb_znrmi(a,desc_a,info)
   use psb_check_mod
   use psb_error_mod
   use psb_penv_mod
+  use psb_mat_mod
   implicit none
 
-  type(psb_zspmat_type), intent(in)   :: a
+  type(psb_z_sparse_mat), intent(in)   :: a
   integer, intent(out)                :: info
   type(psb_desc_type), intent(in)     :: desc_a
   real(psb_dpk_)                    :: psb_znrmi
@@ -94,8 +95,7 @@ function psb_znrmi(a,desc_a,info)
   end if
 
   if ((m /= 0).and.(n /= 0)) then
-    nrmi = psb_csnmi(a,info)
-
+    nrmi = psb_csnmi(a)
     if(info /= 0) then
       info=4010
       ch_err='psb_csnmi'
@@ -105,7 +105,6 @@ function psb_znrmi(a,desc_a,info)
   else
     nrmi = 0.d0
   end if
-
   ! compute global max
   call psb_amx(ictxt, nrmi)
 

@@ -4,11 +4,13 @@ include ../../../Make.inc
 # The object files
 #
 FOBJS =  daxpby.o 	saxpby.o \
-	sgelp.o\
-	caxpby.o clpupd.o ccsmm.o cswmm.o ccsnmi.o ccsrws.o\
-	cswsm.o ccssm.o cgelp.o\
-	zcsnmi.o  zaxpby.o zcsmm.o zcssm.o zswmm.o zswsm.o\
-	zcsrws.o zgelp.o zlpupd.o
+	caxpby.o  zaxpby.o 
+
+
+#	clpupd.o ccsmm.o cswmm.o ccsnmi.o ccsrws.o\
+#	cswsm.o ccssm.o cgelp.o\
+#	zcsnmi.o  zcsmm.o zcssm.o zswmm.o zswsm.o\
+#	zcsrws.o zgelp.o zlpupd.o
 
 #dcsmm.o dcsnmi.o dcsrp.o dcssm.o \
 #	dgelp.o dlpupd.o dswmm.o \

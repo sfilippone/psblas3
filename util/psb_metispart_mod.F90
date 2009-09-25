@@ -60,7 +60,7 @@ module psb_metispart_mod
   integer, allocatable, save :: graph_vect(:)
 
   interface build_mtpart
-    module procedure build_mtpart, d_mat_build_mtpart, s_mat_build_mtpart
+    module procedure build_mtpart, d_mat_build_mtpart, s_mat_build_mtpart, z_mat_build_mtpart, c_mat_build_mtpart
   end interface
 
 contains
@@ -166,6 +166,40 @@ contains
     end select
 
   end subroutine s_mat_build_mtpart
+
+  
+  subroutine z_mat_build_mtpart(a,nparts)
+    use psb_base_mod
+    type(psb_z_sparse_mat), intent(in) :: a
+    integer       :: nparts
+    
+
+    select type (aa=>a%a) 
+    type is (psb_z_csr_sparse_mat)
+      call build_mtpart(aa%get_nrows(),aa%get_fmt(),aa%ja,aa%irp,nparts)
+    class default
+      write(0,*) 'Sorry, right now we only take CSR input!'
+      call psb_abort(ictxt)
+    end select
+    
+  end subroutine z_mat_build_mtpart
+
+  
+  subroutine c_mat_build_mtpart(a,nparts)
+    use psb_base_mod
+    type(psb_c_sparse_mat), intent(in) :: a
+    integer       :: nparts
+    
+
+    select type (aa=>a%a) 
+    type is (psb_c_csr_sparse_mat)
+      call build_mtpart(aa%get_nrows(),aa%get_fmt(),aa%ja,aa%irp,nparts)
+    class default
+      write(0,*) 'Sorry, right now we only take CSR input!'
+      call psb_abort(ictxt)
+    end select
+
+  end subroutine c_mat_build_mtpart
 
 
   subroutine build_mtpart(n,fida,ia1,ia2,nparts)

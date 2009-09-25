@@ -43,6 +43,7 @@
 !
 function psb_snrmi(a,desc_a,info)  
   use psb_descriptor_type
+  use psb_serial_mod
   use psb_check_mod
   use psb_error_mod
   use psb_penv_mod
@@ -103,7 +104,7 @@ function psb_snrmi(a,desc_a,info)
     end if
 
   else
-    nrmi = 0.d0
+    nrmi = 0.0
   end if
   ! compute global max
   call psb_amx(ictxt, nrmi)

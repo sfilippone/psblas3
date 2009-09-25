@@ -37,7 +37,7 @@
 program zhb2mm
   use psb_base_mod
   use psb_util_mod
-  type(psb_zspmat_type) :: a
+  type(psb_z_sparse_mat) :: a
   
   integer    :: info
   character(len=72)  :: mtitle

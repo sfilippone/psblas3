@@ -34,7 +34,7 @@ subroutine psb_cest(afmt,m,n,nnz, lia1, lia2, lar, iup,info)
   use psb_error_mod
   use psb_const_mod
   use psb_string_mod
-  use psb_spmat_type
+  use psb_serial_mod
 
   implicit none
 

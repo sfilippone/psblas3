@@ -35,14 +35,13 @@
 !    Frees a sparse matrix structure.
 ! 
 ! Arguments: 
-!    a        - type(psb_cspmat_type).          The sparse matrix to be freed.      
+!    a        - type(psb_c_sparse_mat).          The sparse matrix to be freed.      
 !    desc_a   - type(psb_desc_type).            The communication descriptor.
 !    info     - integer.                          return code.
 !
 subroutine psb_cspfree(a, desc_a,info)
   !...free sparse matrix structure...
   use psb_descriptor_type
-  use psb_spmat_type
   use psb_serial_mod
   use psb_const_mod
   use psb_error_mod
@@ -50,7 +49,7 @@ subroutine psb_cspfree(a, desc_a,info)
 
   !....parameters...
   type(psb_desc_type), intent(in)      :: desc_a
-  type(psb_cspmat_type), intent(inout) :: a
+  type(psb_c_sparse_mat), intent(inout) :: a
   integer, intent(out)        :: info
   !...locals....
   integer             :: ictxt, err_act
@@ -70,14 +69,7 @@ subroutine psb_cspfree(a, desc_a,info)
   end if
 
   !...deallocate a....
-  call psb_sp_free(a,info)
-
-
-  if(info /= 0) then
-    info=2045
-    call psb_errpush(info,name)
-    goto 9999
-  end if
+  call a%free()
 
   call psb_erractionrestore(err_act)
   return

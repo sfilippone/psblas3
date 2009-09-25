@@ -49,7 +49,7 @@
 !
 ! Arguments:   
 !    alpha   -  complex                The scalar alpha.
-!    a       -  type(psb_zspmat_type). The sparse matrix containing A.
+!    a       -  type(psb_z_sparse_mat). The sparse matrix containing A.
 !    x(:,:)  -  complex                The input vector containing the entries of ( X ).
 !    beta    -  complex                The scalar beta.
 !    y(:,:)  -  complex                The input vector containing the entries of ( Y ).
@@ -65,8 +65,6 @@
 subroutine  psb_zspmm(alpha,a,x,beta,y,desc_a,info,&
      & trans, k, jx, jy, work, doswap)   
 
-  use psb_spmat_type
-  use psb_serial_mod
   use psb_descriptor_type
   use psb_comm_mod
   use psi_mod
@@ -74,12 +72,13 @@ subroutine  psb_zspmm(alpha,a,x,beta,y,desc_a,info,&
   use psb_error_mod
   use psb_string_mod
   use psb_penv_mod
+  use psb_mat_mod
   implicit none
 
   complex(psb_dpk_), intent(in)             :: alpha, beta
   complex(psb_dpk_), intent(inout), target  :: x(:,:)
   complex(psb_dpk_), intent(inout), target  :: y(:,:)
-  type(psb_zspmat_type), intent(in)        :: a
+  type(psb_z_sparse_mat), intent(in)        :: a
   type(psb_desc_type), intent(in)          :: desc_a
   integer, intent(out)                     :: info
   complex(psb_dpk_), optional, target      :: work(:)
@@ -250,7 +249,7 @@ subroutine  psb_zspmm(alpha,a,x,beta,y,desc_a,info,&
         if(info /= 0) exit blk
 
         !  local Matrix-vector product
-        call a%csmm(alpha,x(:,jjx+i-1:jjx+i-1+ib-1),&
+        call psb_csmm(alpha,a,x(:,jjx+i-1:jjx+i-1+ib-1),&
              & beta,y(:,jjy+i-1:jjy+i-1+ib-1),info,trans=trans_)
 
         if(info /= 0) exit blk
@@ -265,9 +264,8 @@ subroutine  psb_zspmm(alpha,a,x,beta,y,desc_a,info,&
       if (doswap_)&
            & call psi_swapdata(ior(psb_swap_send_,psb_swap_recv_),&
            & ib1,zzero,x(:,1:ik),desc_a,iwork,info)
-      if (info == 0) call a%csmm(alpha,x(:,1:ik),beta,y(:,1:ik),info)
+      if (info == 0) call psb_csmm(alpha,a,x(:,1:ik),beta,y(:,1:ik),info)
     end if
-
     if(info /= 0) then
       info = 4011
       call psb_errpush(info,name)
@@ -313,7 +311,7 @@ subroutine  psb_zspmm(alpha,a,x,beta,y,desc_a,info,&
     if (info == 0) call psi_ovrl_upd(x,desc_a,psb_avg_,info)
     y(nrow+1:ncol,1:ik)    = zzero
 
-    if (info == 0) call a%csmm(alpha,x(:,1:ik),beta,y(:,1:ik),info,trans=trans_)
+    if (info == 0) call psb_csmm(alpha,a,x(:,1:ik),beta,y(:,1:ik),info,trans=trans_)
     if (debug_level >= psb_debug_comp_) &
          & write(debug_unit,*) me,' ',trim(name),' csmm ', info
     if (info /= 0) then
@@ -413,7 +411,7 @@ end subroutine psb_zspmm
 !
 ! Arguments:   
 !    alpha   -  complex                The scalar alpha.
-!    a       -  type(psb_zspmat_type). The sparse matrix containing A.
+!    a       -  type(psb_z_sparse_mat). The sparse matrix containing A.
 !    x(:)    -  complex                The input vector containing the entries of ( X ).
 !    beta    -  complex                The scalar beta.
 !    y(:)    -  complex                The input vector containing the entries of ( Y ).
@@ -426,8 +424,6 @@ end subroutine psb_zspmm
 subroutine  psb_zspmv(alpha,a,x,beta,y,desc_a,info,&
      & trans, work, doswap)   
 
-  use psb_spmat_type
-  use psb_serial_mod
   use psb_descriptor_type
   use psb_comm_mod
   use psb_const_mod
@@ -436,12 +432,13 @@ subroutine  psb_zspmv(alpha,a,x,beta,y,desc_a,info,&
   use psb_error_mod
   use psb_string_mod
   use psb_penv_mod
+  use psb_mat_mod
   implicit none
 
   complex(psb_dpk_), intent(in)             :: alpha, beta
   complex(psb_dpk_), intent(inout), target  :: x(:)
   complex(psb_dpk_), intent(inout), target  :: y(:)
-  type(psb_zspmat_type), intent(in)        :: a
+  type(psb_z_sparse_mat), intent(in)        :: a
   type(psb_desc_type), intent(in)          :: desc_a
   integer, intent(out)                     :: info
   complex(psb_dpk_), optional, target    :: work(:)
@@ -582,8 +579,7 @@ subroutine  psb_zspmv(alpha,a,x,beta,y,desc_a,info,&
            & zzero,x,desc_a,iwork,info,data=psb_comm_halo_)
     end if
 
-    !  local Matrix-vector product
-    call a%csmm(alpha,x(iix:lldx),beta,y(iiy:lldy),info)
+    call psb_csmm(alpha,a,x,beta,y,info)
 
     if(info /= 0) then
       info = 4011
@@ -632,7 +628,7 @@ subroutine  psb_zspmv(alpha,a,x,beta,y,desc_a,info,&
     yp(nrow+1:ncol) = zzero
     
     !  local Matrix-vector product
-    if (info == 0) call a%csmm(alpha,x,beta,yp,info,trans=trans_)
+    if (info == 0) call psb_csmm(alpha,a,x,beta,y,info,trans=trans_)
 
     if (debug_level >= psb_debug_comp_) &
          & write(debug_unit,*) me,' ',trim(name),' csmm ', info

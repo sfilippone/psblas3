@@ -1,4 +1,4 @@
-module  psb_mat_mod
+module psb_mat_mod
   use psb_s_mat_mod
   use psb_d_mat_mod
   use psb_c_mat_mod

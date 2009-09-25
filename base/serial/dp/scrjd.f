@@ -61,7 +61,7 @@ C     ARN,IAN1
 C     IAN2,INFON, IP1, IP2
 C   
       use psb_const_mod
-      use psb_spmat_type
+      use psb_serial_mod
       use psb_string_mod
       IMPLICIT NONE
 

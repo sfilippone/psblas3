@@ -927,6 +927,7 @@ contains
 
   end subroutine dmatdist
 
+
   subroutine cmatdist(a_glob, a, ictxt, desc_a,&
        & b_glob, b, info, parts, v, inroot,fmt)
     !
@@ -986,14 +987,15 @@ contains
     !     on exit : unchanged.
     !
     use psb_base_mod
+    use psb_mat_mod
     implicit none
 
     ! parameters
-    type(psb_cspmat_type)      :: a_glob
-    complex(psb_spk_)          :: b_glob(:)
+    type(psb_c_sparse_mat)     :: a_glob
+    complex(psb_spk_)             :: b_glob(:)
     integer                    :: ictxt
-    type(psb_cspmat_type)      :: a
-    complex(psb_spk_), allocatable  :: b(:)
+    type(psb_c_sparse_mat)      :: a
+    complex(psb_spk_), allocatable :: b(:)
     type(psb_desc_type)        :: desc_a
     integer, intent(out)       :: info
     integer, optional          :: inroot
@@ -1037,22 +1039,15 @@ contains
     end if
     call psb_info(ictxt, iam, np)     
     if (iam == root) then
-      ! extract information from a_glob
-      if (a_glob%fida /=  'CSR') then
-        info=135
-        ch_err='CSR'
-        call psb_errpush(info,name,a_err=ch_err)
-        goto 9999
-      endif
-      nrow = a_glob%m
-      ncol = a_glob%k
+      nrow = a_glob%get_nrows()
+      ncol = a_glob%get_ncols()
       if (nrow /= ncol) then
         write(0,*) 'a rectangular matrix ? ',nrow,ncol
         info=-1
         call psb_errpush(info,name)
         goto 9999
       endif
-      nnzero = size(a_glob%aspk)
+      nnzero = a_glob%get_nzeros()
       nrhs   = 1
     endif
 
@@ -1157,7 +1152,7 @@ contains
 
           ll = 0
           do i= i_count, j_count-1
-            call psb_sp_getrow(i,a_glob,nz,&
+            call a_glob%csget(i,i,nz,&
                  & irow,icol,val,info,nzin=ll,append=.true.)
             if (info /= 0) then            
               if (nz >min(size(irow(ll+1:)),size(icol(ll+1:)),size(val(ll+1:)))) then 
@@ -1245,7 +1240,7 @@ contains
 
             ll = 0
             do i= i_count, i_count
-              call psb_sp_getrow(i,a_glob,nz,&
+              call a_glob%csget(i,i,nz,&
                    & irow,icol,val,info,nzin=ll,append=.true.)
               if (info /= 0) then            
                 if (nz >min(size(irow(ll+1:)),size(icol(ll+1:)),size(val(ll+1:)))) then 
@@ -1376,6 +1371,7 @@ contains
     return
 
   end subroutine cmatdist
+  
 
   subroutine zmatdist(a_glob, a, ictxt, desc_a,&
        & b_glob, b, info, parts, v, inroot,fmt)
@@ -1436,14 +1432,15 @@ contains
     !     on exit : unchanged.
     !
     use psb_base_mod
+    use psb_mat_mod
     implicit none
 
     ! parameters
-    type(psb_zspmat_type)      :: a_glob
-    complex(psb_dpk_)          :: b_glob(:)
+    type(psb_z_sparse_mat)     :: a_glob
+    complex(psb_dpk_)             :: b_glob(:)
     integer                    :: ictxt
-    type(psb_zspmat_type)      :: a
-    complex(psb_dpk_), allocatable  :: b(:)
+    type(psb_z_sparse_mat)      :: a
+    complex(psb_dpk_), allocatable :: b(:)
     type(psb_desc_type)        :: desc_a
     integer, intent(out)       :: info
     integer, optional          :: inroot
@@ -1487,22 +1484,15 @@ contains
     end if
     call psb_info(ictxt, iam, np)     
     if (iam == root) then
-      ! extract information from a_glob
-      if (a_glob%fida /=  'CSR') then
-        info=135
-        ch_err='CSR'
-        call psb_errpush(info,name,a_err=ch_err)
-        goto 9999
-      endif
-      nrow = a_glob%m
-      ncol = a_glob%k
+      nrow = a_glob%get_nrows()
+      ncol = a_glob%get_ncols()
       if (nrow /= ncol) then
         write(0,*) 'a rectangular matrix ? ',nrow,ncol
         info=-1
         call psb_errpush(info,name)
         goto 9999
       endif
-      nnzero = size(a_glob%aspk)
+      nnzero = a_glob%get_nzeros()
       nrhs   = 1
     endif
 
@@ -1607,7 +1597,7 @@ contains
 
           ll = 0
           do i= i_count, j_count-1
-            call psb_sp_getrow(i,a_glob,nz,&
+            call a_glob%csget(i,i,nz,&
                  & irow,icol,val,info,nzin=ll,append=.true.)
             if (info /= 0) then            
               if (nz >min(size(irow(ll+1:)),size(icol(ll+1:)),size(val(ll+1:)))) then 
@@ -1695,7 +1685,7 @@ contains
 
             ll = 0
             do i= i_count, i_count
-              call psb_sp_getrow(i,a_glob,nz,&
+              call a_glob%csget(i,i,nz,&
                    & irow,icol,val,info,nzin=ll,append=.true.)
               if (info /= 0) then            
                 if (nz >min(size(irow(ll+1:)),size(icol(ll+1:)),size(val(ll+1:)))) then 
@@ -1826,6 +1816,5 @@ contains
     return
 
   end subroutine zmatdist
-
 
 end module psb_mat_dist_mod

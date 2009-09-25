@@ -62,8 +62,8 @@
 !    
 ! Arguments:
 !
-!    a      -  type(psb_cspmat_type)      Input: sparse matrix containing A.
-!    prec   -  type(psb_cprec_type)       Input: preconditioner
+!    a      -  type(psb_c_sparse_mat)      Input: sparse matrix containing A.
+!    prec   -  class(psb_cprec_type)       Input: preconditioner
 !    b      -  complex,dimension(:)       Input: vector containing the
 !                                         right hand side B
 !    x      -  complex,dimension(:)       Input/Output: vector containing the
@@ -99,8 +99,8 @@ subroutine psb_ccgstab(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,istop)
   use psb_krylov_mod, psb_protect_name => psb_ccgstab
   Implicit None
 !!$  parameters 
-  Type(psb_cspmat_type), Intent(in)  :: a
-  Type(psb_cprec_type), Intent(in)   :: prec 
+  Type(psb_c_sparse_mat), Intent(in)  :: a
+  class(psb_cprec_type), Intent(in)   :: prec 
   Type(psb_desc_type), Intent(in)    :: desc_a
   Complex(psb_spk_), Intent(in)       :: b(:)
   Complex(psb_spk_), Intent(inout)    :: x(:)

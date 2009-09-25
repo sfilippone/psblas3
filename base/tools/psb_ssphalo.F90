@@ -60,8 +60,7 @@ Subroutine psb_ssphalo(a,desc_a,blk,info,rowcnv,colcnv,&
      &  rowscale,colscale,outfmt,data)
 
   use psb_const_mod
-  use psb_string_mod
-  use psb_mat_mod
+  use psb_serial_mod
   use psb_descriptor_type
   use psb_realloc_mod
   use psb_tools_mod, psb_protect_name => psb_ssphalo

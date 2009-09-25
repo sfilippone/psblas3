@@ -62,8 +62,8 @@
 !
 ! Arguments:
 !
-!    a      -  type(psb_zspmat_type)      Input: sparse matrix containing A.
-!    prec   -  type(psb_zprec_type)       Input: preconditioner
+!    a      -  type(psb_z_sparse_mat)      Input: sparse matrix containing A.
+!    prec   -  class(psb_zprec_type)       Input: preconditioner
 !    b(:)   -  complex                    Input: vector containing the
 !                                         right hand side B
 !    x(:)   -  complex                    Input/Output: vector containing the
@@ -100,8 +100,8 @@ subroutine psb_zbicg(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,istop)
   implicit none
 
 !!$  parameters 
-  type(psb_zspmat_type), intent(in)  :: a
-  type(psb_zprec_type), intent(in)   :: prec 
+  type(psb_z_sparse_mat), intent(in)  :: a
+  class(psb_zprec_type), intent(in)   :: prec 
   type(psb_desc_type), intent(in)    :: desc_a
   complex(psb_dpk_), intent(in)    :: b(:)
   complex(psb_dpk_), intent(inout) :: x(:)

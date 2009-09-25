@@ -41,15 +41,15 @@ subroutine psb_cilu_fct(a,l,u,d,info,blck)
   !     .. Scalar Arguments ..
   integer, intent(out)                ::     info
   !     .. Array Arguments ..
-  type(psb_cspmat_type),intent(in)    :: a
-  type(psb_cspmat_type),intent(inout) :: l,u
-  type(psb_cspmat_type),intent(in), optional, target :: blck
+  type(psb_c_sparse_mat),intent(in)    :: a
+  type(psb_c_csr_sparse_mat),intent(inout) :: l,u
+  type(psb_c_sparse_mat),intent(in), optional, target :: blck
   complex(psb_spk_), intent(inout)     ::  d(:)
   !     .. Local Scalars ..
   integer   ::  l1, l2,m,err_act  
-  type(psb_cspmat_type), pointer  :: blck_
+  type(psb_c_sparse_mat), pointer  :: blck_
   character(len=20)   :: name, ch_err
-  name='psb_ccsrlu'
+  name='psb_ilu_fct'
   info = 0
   call psb_erractionsave(err_act)
   !     .. Executable Statements ..
@@ -64,41 +64,34 @@ subroutine psb_cilu_fct(a,l,u,d,info,blck)
       goto 9999      
     end if
 
-    call psb_nullify_sp(blck_)  ! Why do we need this? Who knows.... 
-    call psb_sp_all(0,0,blck_,1,info)
-    if(info /= 0) then
-       info=4010
-       ch_err='psb_sp_all'
-       call psb_errpush(info,name,a_err=ch_err)
-       goto 9999
-    end if
+    call blck_%csall(0,0,info,1)
 
-    blck_%m=0
   endif
 
-  call psb_cilu_fctint(m,a%m,a,blck_%m,blck_,&
-       & d,l%aspk,l%ia1,l%ia2,u%aspk,u%ia1,u%ia2,l1,l2,info)
+  call psb_cilu_fctint(m,a%get_nrows(),a,blck_%get_nrows(),blck_,&
+       & d,l%val,l%ja,l%irp,u%val,u%ja,u%irp,l1,l2,info)
   if(info /= 0) then
      info=4010
      ch_err='psb_cilu_fctint'
      call psb_errpush(info,name,a_err=ch_err)
      goto 9999
   end if
-  
-  l%infoa(1) = l1
-  l%fida     = 'CSR'
-  l%descra   = 'TLU'
-  u%infoa(1) = l2
-  u%fida     = 'CSR'
-  u%descra   = 'TUU'
-  l%m = m
-  l%k = m
-  u%m = m
-  u%k = m
+
+  call l%set_triangle()
+  call l%set_lower()
+  call l%set_unit()
+  call u%set_triangle()
+  call u%set_upper()
+  call u%set_unit()
+  call l%set_nrows(m)
+  call l%set_ncols(m)
+  call u%set_nrows(m)
+  call u%set_ncols(m)
+
   if (present(blck)) then 
     blck_ => null() 
   else
-    call psb_sp_free(blck_,info)
+    call blck_%free()
     if(info /= 0) then
        info=4010
        ch_err='psb_sp_free'
@@ -124,15 +117,15 @@ contains
        & d,laspk,lia1,lia2,uaspk,uia1,uia2,l1,l2,info)
     implicit none 
 
-    type(psb_cspmat_type)          :: a,b
+    type(psb_c_sparse_mat)          :: a,b
     integer                        :: m,ma,mb,l1,l2,info
     integer, dimension(:)          :: lia1,lia2,uia1,uia2
     complex(psb_spk_), dimension(:) :: laspk,uaspk,d
 
-    integer :: i,j,k,l,low1,low2,kk,jj,ll, irb, ktrw,err_act
+    integer :: i,j,k,l,low1,low2,kk,jj,ll, irb, ktrw,err_act, nz
     complex(psb_spk_) :: dia,temp
-    integer, parameter :: nrb=16
-    type(psb_cspmat_type) :: trw
+    integer, parameter :: nrb=60
+    type(psb_c_coo_sparse_mat) :: trw
     integer             :: int_err(5) 
     character(len=20)   :: name, ch_err
 
@@ -140,11 +133,7 @@ contains
     if(psb_get_errstatus() /= 0) return 
     info=0
     call psb_erractionsave(err_act)
-    call psb_nullify_sp(trw)
-    trw%m=0
-    trw%k=0
-
-    call psb_sp_all(trw,1,info)
+    call trw%allocate(0,0,info)
     if(info /= 0) then
       info=4010
       ch_err='psb_sp_all'
@@ -159,64 +148,40 @@ contains
     m = ma+mb
 
     do i = 1, ma
-      d(i) = zzero
+      d(i) = czero
 
       !
-      ! Here we take a fast shortcut if possible, otherwise 
-      ! use spgtblk, slower but able (in principle) to handle 
-      ! anything. 
       !
-      if (a%fida=='CSR') then 
-        do j = a%ia2(i), a%ia2(i+1) - 1
-          k = a%ia1(j)
-          !           write(0,*)'KKKKK',k
-          if ((k < i).and.(k >= 1)) then
-            l1 = l1 + 1
-            laspk(l1) = a%aspk(j)
-            lia1(l1) = k
-          else if (k == i) then
-            d(i) = a%aspk(j)
-          else if ((k > i).and.(k <= m)) then
-            l2 = l2 + 1
-            uaspk(l2) = a%aspk(j)
-            uia1(l2) = k
-          end if
-        enddo
-
-      else
-
-        if ((mod(i,nrb) == 1).or.(nrb==1)) then 
-          irb = min(ma-i+1,nrb)
-          call psb_sp_getblk(i,a,trw,info,lrw=i+irb-1)
-          if(info /= 0) then
-            info=4010
-            ch_err='psb_sp_getblk'
-            call psb_errpush(info,name,a_err=ch_err)
-            goto 9999
-          end if
-          ktrw=1
+      if ((mod(i,nrb) == 1).or.(nrb==1)) then 
+        irb = min(ma-i+1,nrb)
+        call a%a%csget(i,i+irb-1,trw,info)
+        if(info /= 0) then
+          info=4010
+          ch_err='a%csget'
+          call psb_errpush(info,name,a_err=ch_err)
+          goto 9999
         end if
-
-        do 
-          if (ktrw > trw%infoa(psb_nnz_)) exit
-          if (trw%ia1(ktrw) > i) exit
-          k = trw%ia2(ktrw)
-          if ((k < i).and.(k >= 1)) then
-            l1 = l1 + 1
-            laspk(l1) = trw%aspk(ktrw)
-            lia1(l1) = k
-          else if (k == i) then
-            d(i) = trw%aspk(ktrw)
-          else if ((k > i).and.(k <= m)) then
-            l2 = l2 + 1
-            uaspk(l2) = trw%aspk(ktrw)
-            uia1(l2) = k
-          end if
-          ktrw = ktrw + 1
-        enddo
-
+        nz = trw%get_nzeros()
+        ktrw=1
       end if
-
+      
+      do 
+        if (ktrw > nz ) exit
+        if (trw%ia(ktrw) > i) exit
+        k = trw%ja(ktrw)
+        if ((k < i).and.(k >= 1)) then
+          l1 = l1 + 1
+          laspk(l1) = trw%val(ktrw)
+          lia1(l1) = k
+        else if (k == i) then
+          d(i) = trw%val(ktrw)
+        else if ((k > i).and.(k <= m)) then
+          l2 = l2 + 1
+          uaspk(l2) = trw%val(ktrw)
+          uia1(l2) = k
+        end if
+        ktrw = ktrw + 1
+      enddo
 !!$
 
       lia2(i+1) = l1 + 1
@@ -291,7 +256,7 @@ contains
         call psb_errpush(info,name,i_err=int_err,a_err=ch_err)
         goto 9999
       else
-        dia = zone/dia
+        dia = cone/dia
       end if
       d(i) = dia
       ! write(6,*)'diag(',i,')=',d(i)
@@ -302,63 +267,38 @@ contains
     enddo
 
     do i = ma+1, m
-      d(i) = zzero
+      d(i) = czero
 
-
-      if (b%fida=='CSR') then 
-
-        do j = b%ia2(i-ma), b%ia2(i-ma+1) - 1
-          k = b%ia1(j)
-          !           if (me == 2)  write(0,*)'ecco k=',k
-          if ((k < i).and.(k >= 1)) then
-            l1 = l1 + 1
-            laspk(l1) = b%aspk(j)
-            lia1(l1) = k
-            !              if(me == 2) write(0,*)'scrivo l'
-          else if (k == i) then
-            d(i) = b%aspk(j)
-          else if ((k > i).and.(k <= m)) then
-            l2 = l2 + 1
-            uaspk(l2) = b%aspk(j)
-            !              write(0,*)'KKKKK',k
-            uia1(l2) = k
-          end if
-        enddo
-
-      else
-
-        if ((mod((i-ma),nrb) == 1).or.(nrb==1)) then 
-          irb = min(m-i+1,nrb)
-          call psb_sp_getblk(i-ma,b,trw,info,lrw=i-ma+irb-1)
-          if(info /= 0) then
-            info=4010
-            ch_err='psb_sp_getblk'
-            call psb_errpush(info,name,a_err=ch_err)
-            goto 9999
-          end if
-          ktrw=1
+      if ((mod(i,nrb) == 1).or.(nrb==1)) then 
+        irb = min(ma-i+1,nrb)
+        call b%a%csget(i-ma,i-ma+irb-1,trw,info)
+        nz = trw%get_nzeros()
+        if(info /= 0) then
+          info=4010
+          ch_err='a%csget'
+          call psb_errpush(info,name,a_err=ch_err)
+          goto 9999
         end if
-
-        do 
-          if (ktrw > trw%infoa(psb_nnz_)) exit
-          if (trw%ia1(ktrw) > i) exit
-          k = trw%ia2(ktrw)
-          ! write(0,*)'KKKKK',k
-          if ((k < i).and.(k >= 1)) then
-            l1 = l1 + 1
-            laspk(l1) = trw%aspk(ktrw)
-            lia1(l1) = k
-          else if (k == i) then
-            d(i) = trw%aspk(ktrw)
-          else if ((k > i).and.(k <= m)) then
-            l2 = l2 + 1
-            uaspk(l2) = trw%aspk(ktrw)
-            uia1(l2) = k
-          end if
-          ktrw = ktrw + 1
-        enddo
-
-      endif
+        ktrw=1
+      end if
+      
+      do 
+        if (ktrw > nz ) exit
+        if (trw%ia(ktrw) > i) exit
+        k = trw%ja(ktrw)
+        if ((k < i).and.(k >= 1)) then
+          l1 = l1 + 1
+          laspk(l1) = trw%val(ktrw)
+          lia1(l1) = k
+        else if (k == i) then
+          d(i) = trw%val(ktrw)
+        else if ((k > i).and.(k <= m)) then
+          l2 = l2 + 1
+          uaspk(l2) = trw%val(ktrw)
+          uia1(l2) = k
+        end if
+        ktrw = ktrw + 1
+      enddo
 
 
       lia2(i+1) = l1 + 1
@@ -431,7 +371,7 @@ contains
         call psb_errpush(info,name,i_err=int_err,a_err=ch_err)
         goto 9999
       else
-        dia = zone/dia
+        dia = cone/dia
       end if
       d(i) = dia
       !     Scale row i of upper triangle
@@ -440,13 +380,7 @@ contains
       enddo
     enddo
 
-    call psb_sp_free(trw,info)
-    if(info /= 0) then
-      info=4010
-      ch_err='psb_sp_free'
-      call psb_errpush(info,name,a_err=ch_err)
-      goto 9999
-    end if
+    call trw%free()
 
     call psb_erractionrestore(err_act)
     return

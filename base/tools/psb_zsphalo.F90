@@ -38,9 +38,9 @@
 !    
 ! 
 ! Arguments: 
-!    a        - type(psb_zspmat_type)   The local part of input matrix A
+!    a        - type(psb_z_sparse_mat)   The local part of input matrix A
 !    desc_a   - type(psb_desc_type).  The communication descriptor.
-!    blck     - type(psb_zspmat_type)   The local part of output matrix BLCK
+!    blck     - type(psb_z_sparse_mat)   The local part of output matrix BLCK
 !    info     - integer.                Return code
 !    rowcnv   - logical                 Should row/col indices be converted
 !    colcnv   - logical                 to/from global numbering when sent/received?
@@ -73,8 +73,8 @@ Subroutine psb_zsphalo(a,desc_a,blk,info,rowcnv,colcnv,&
     include 'mpif.h'
 #endif
 
-  Type(psb_zspmat_type),Intent(in)    :: a
-  Type(psb_zspmat_type),Intent(inout) :: blk
+  Type(psb_z_sparse_mat),Intent(in)    :: a
+  Type(psb_z_sparse_mat),Intent(inout) :: blk
   Type(psb_desc_type),Intent(in), target :: desc_a
   integer, intent(out)                :: info
   logical, optional, intent(in)       :: rowcnv,colcnv,rowscale,colscale
@@ -89,8 +89,9 @@ Subroutine psb_zsphalo(a,desc_a,blk,info,rowcnv,colcnv,&
   Integer, allocatable  :: sdid(:,:), brvindx(:),rvid(:,:), &
        & rvsz(:), bsdindx(:),sdsz(:), iasnd(:), jasnd(:)
   complex(psb_dpk_), allocatable :: valsnd(:)
-  integer, pointer :: idxv(:)
-  logical :: rowcnv_,colcnv_,rowscale_,colscale_
+  type(psb_z_coo_sparse_mat), allocatable :: acoo
+  integer, pointer  :: idxv(:)
+  logical           :: rowcnv_,colcnv_,rowscale_,colscale_
   character(len=5)  :: outfmt_
   integer           :: debug_level, debug_unit
   character(len=20) :: name, ch_err
@@ -143,7 +144,7 @@ Subroutine psb_zsphalo(a,desc_a,blk,info,rowcnv,colcnv,&
   Call psb_info(ictxt, me, np)
 
   Allocate(sdid(np,3),rvid(np,3),brvindx(np+1),&
-       & rvsz(np),sdsz(np),bsdindx(np+1),stat=info)
+       & rvsz(np),sdsz(np),bsdindx(np+1), acoo,stat=info)
 
   if (info /= 0) then
     info=4000
@@ -180,8 +181,7 @@ Subroutine psb_zsphalo(a,desc_a,blk,info,rowcnv,colcnv,&
   idx = 0
   idxs = 0
   idxr = 0
-  blk%k = a%k
-  blk%m = 0 
+  call acoo%allocate(0,a%get_ncols(),info)
   ! For all rows in the halo descriptor, extract and send/receive.
   Do 
     proc=idxv(counter)
@@ -192,13 +192,11 @@ Subroutine psb_zsphalo(a,desc_a,blk,info,rowcnv,colcnv,&
     tot_elem = 0
     Do j=0,n_el_send-1
       idx = idxv(counter+psb_elem_send_+j)
-      n_elem = psb_sp_get_nnz_row(idx,a)
+      n_elem = a%get_nz_row(idx)
       tot_elem = tot_elem+n_elem      
     Enddo
     sdsz(proc+1) = tot_elem
-
-    blk%m = blk%m + n_el_recv
-
+    call acoo%set_nrows(acoo%get_nrows() + n_el_recv)
     counter   = counter+n_el_send+3
   Enddo
 
@@ -228,9 +226,9 @@ Subroutine psb_zsphalo(a,desc_a,blk,info,rowcnv,colcnv,&
   Enddo
 
   iszr=sum(rvsz)
-  call psb_sp_all(blk,max(iszr,1),info)
+  call acoo%reallocate(max(iszr,1))
   if (debug_level >= psb_debug_outer_)&
-       & write(debug_unit,*) me,' ',trim(name),': Sizes:',size(blk%ia1),size(blk%ia2),&
+       & write(debug_unit,*) me,' ',trim(name),': Sizes:',acoo%get_size(),&
        & ' Send:',sdsz(:),' Receive:',rvsz(:)
   if (info /= 0) then
     info=4010
@@ -259,9 +257,8 @@ Subroutine psb_zsphalo(a,desc_a,blk,info,rowcnv,colcnv,&
 
     Do j=0,n_el_send-1
       idx = idxv(counter+psb_elem_send_+j)
-      n_elem = psb_sp_get_nnz_row(idx,a)
-      
-      call psb_sp_getrow(idx,a,ngtz,iasnd,jasnd,valsnd,info,&
+      n_elem = a%get_nz_row(idx)
+      call a%csget(idx,idx,ngtz,iasnd,jasnd,valsnd,info,&
            &  append=.true.,nzin=tot_elem)
       if (info /= 0) then
         info=4010
@@ -271,9 +268,7 @@ Subroutine psb_zsphalo(a,desc_a,blk,info,rowcnv,colcnv,&
       end if
       tot_elem=tot_elem+n_elem
     Enddo
-
     ipx = ipx + 1 
-
     counter   = counter+n_el_send+3
   Enddo
   nz = tot_elem
@@ -289,11 +284,11 @@ Subroutine psb_zsphalo(a,desc_a,blk,info,rowcnv,colcnv,&
 
 
   call mpi_alltoallv(valsnd,sdsz,bsdindx,mpi_double_complex,&
-       & blk%aspk,rvsz,brvindx,mpi_double_complex,icomm,info)
+       & acoo%val,rvsz,brvindx,mpi_double_complex,icomm,info)
   call mpi_alltoallv(iasnd,sdsz,bsdindx,mpi_integer,&
-       & blk%ia1,rvsz,brvindx,mpi_integer,icomm,info)
+       & acoo%ia,rvsz,brvindx,mpi_integer,icomm,info)
   call mpi_alltoallv(jasnd,sdsz,bsdindx,mpi_integer,&
-       & blk%ia2,rvsz,brvindx,mpi_integer,icomm,info)
+       & acoo%ja,rvsz,brvindx,mpi_integer,icomm,info)
   if (info /= 0) then
     info=4010
     ch_err='mpi_alltoallv'
@@ -304,8 +299,8 @@ Subroutine psb_zsphalo(a,desc_a,blk,info,rowcnv,colcnv,&
   !
   ! Convert into local numbering 
   !
-  if (rowcnv_) call psb_glob_to_loc(blk%ia1(1:iszr),desc_a,info,iact='I')
-  if (colcnv_) call psb_glob_to_loc(blk%ia2(1:iszr),desc_a,info,iact='I')
+  if (rowcnv_) call psb_glob_to_loc(acoo%ia(1:iszr),desc_a,info,iact='I')
+  if (colcnv_) call psb_glob_to_loc(acoo%ja(1:iszr),desc_a,info,iact='I')
 
   if (info /= 0) then
     info=4010
@@ -315,21 +310,21 @@ Subroutine psb_zsphalo(a,desc_a,blk,info,rowcnv,colcnv,&
   end if
 
   l1  = 0
-  blk%m=0
+  call acoo%set_nrows(0)
   !
   irmin = huge(irmin)
   icmin = huge(icmin)
   irmax = 0
   icmax = 0
   Do i=1,iszr
-    r=(blk%ia1(i))
-    k=(blk%ia2(i))
+    r=(acoo%ia(i))
+    k=(acoo%ja(i))
     ! Just in case some of the conversions were out-of-range
     If ((r>0).and.(k>0)) Then
       l1=l1+1
-      blk%aspk(l1) = blk%aspk(i)
-      blk%ia1(l1) = r 
-      blk%ia2(l1) = k
+      acoo%val(l1) = acoo%val(i)
+      acoo%ia(l1)  = r 
+      acoo%ja(l1)  = k
       irmin = min(irmin,r)
       irmax = max(irmax,r)
       icmin = min(icmin,k)
@@ -337,37 +332,28 @@ Subroutine psb_zsphalo(a,desc_a,blk,info,rowcnv,colcnv,&
     End If
   Enddo
   if (rowscale_) then 
-    blk%m = max(irmax-irmin+1,0)
-    blk%ia1(1:l1) = blk%ia1(1:l1) - irmin + 1
-  else
-    blk%m = irmax
+    call acoo%set_nrows(max(irmax-irmin+1,0))
+    acoo%ia(1:l1) = acoo%ia(1:l1) - irmin + 1
+  else    
+    call acoo%set_nrows(irmax)
   end if
   if (colscale_) then 
-    blk%k = max(icmax-icmin+1,0)
-    blk%ia2(1:l1) = blk%ia2(1:l1) - icmin + 1
+    call acoo%set_ncols(max(icmax-icmin+1,0))
+    acoo%ja(1:l1) = acoo%ja(1:l1) - icmin + 1
   else
-    blk%k = icmax
+    call acoo%set_ncols(icmax)
   end if
+  call acoo%set_nzeros(l1)
 
-  blk%fida            = 'COO'
-  blk%infoa(psb_nnz_) = l1
-  call psb_ensure_size(1,blk%pl,info)
-  if (info == 0) call psb_ensure_size(1,blk%pr,info)
-  if (info /= 0) then 
-    info=4010
-    ch_err='psb_ensure_size'
-    call psb_errpush(info,name,a_err=ch_err)
-    goto 9999
-  end if
-  blk%pl = 0
-  blk%pr = 0
 
   if (debug_level >= psb_debug_outer_)&
        & write(debug_unit,*) me,' ',trim(name),&
-       & ': End data exchange',counter,l1,blk%m
+       & ': End data exchange',counter,l1
+
+  call move_alloc(acoo,blk%a)
 
   ! Do we expect any duplicates to appear???? 
-  call psb_spcnv(blk,info,afmt=outfmt_,dupl=psb_dupl_add_)
+  call blk%cscnv(info,type=outfmt_,dupl=psb_dupl_add_)
   if (info /= 0) then
     info=4010
     ch_err='psb_spcnv'

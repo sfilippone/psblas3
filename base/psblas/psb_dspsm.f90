@@ -260,7 +260,7 @@ subroutine  psb_dspsm(alpha,a,x,beta,y,desc_a,info,&
 
   if(info /= 0) then
     info = 4010
-    ch_err='dcssm'
+    ch_err='cssm'
     call psb_errpush(info,name,a_err=ch_err)
     goto 9999
   end if

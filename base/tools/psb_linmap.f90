@@ -37,7 +37,7 @@ function psb_c_linmap(map_kind,desc_X, desc_Y, map_X2Y, map_Y2X,iaggr,naggr) res
   implicit none 
   type(psb_clinmap_type)         :: this
   type(psb_desc_type), target       :: desc_X, desc_Y
-  type(psb_cspmat_type), intent(in) :: map_X2Y, map_Y2X
+  type(psb_c_sparse_mat), intent(in) :: map_X2Y, map_Y2X
   integer, intent(in)               :: map_kind
   integer, intent(in), optional     :: iaggr(:), naggr(:)
   !
@@ -93,8 +93,8 @@ function psb_c_linmap(map_kind,desc_X, desc_Y, map_X2Y, map_Y2X,iaggr,naggr) res
     info = 1
   end select
 
-  if (info == 0) call psb_sp_clone(map_X2Y,this%map_X2Y,info)
-  if (info == 0) call psb_sp_clone(map_Y2X,this%map_Y2X,info)
+  if (info == 0) call psb_clone(map_X2Y,this%map_X2Y,info)
+  if (info == 0) call psb_clone(map_Y2X,this%map_Y2X,info)
   if (info == 0) call psb_realloc(psb_itd_data_size_,this%itd_data,info) 
   if (info == 0) then
     call psb_set_map_kind(map_kind, this)
@@ -274,7 +274,7 @@ function psb_z_linmap(map_kind,desc_X, desc_Y, map_X2Y, map_Y2X,iaggr,naggr) res
   implicit none 
   type(psb_zlinmap_type)         :: this
   type(psb_desc_type), target       :: desc_X, desc_Y
-  type(psb_zspmat_type), intent(in) :: map_X2Y, map_Y2X
+  type(psb_z_sparse_mat), intent(in) :: map_X2Y, map_Y2X
   integer, intent(in)               :: map_kind
   integer, intent(in), optional     :: iaggr(:), naggr(:)
   !
@@ -331,8 +331,8 @@ function psb_z_linmap(map_kind,desc_X, desc_Y, map_X2Y, map_Y2X,iaggr,naggr) res
     info = 1
   end select
 
-  if (info == 0) call psb_sp_clone(map_X2Y,this%map_X2Y,info)
-  if (info == 0) call psb_sp_clone(map_Y2X,this%map_Y2X,info)
+  if (info == 0) call psb_clone(map_X2Y,this%map_X2Y,info)
+  if (info == 0) call psb_clone(map_Y2X,this%map_Y2X,info)
   if (info == 0) call psb_realloc(psb_itd_data_size_,this%itd_data,info) 
   if (info == 0) then
     call psb_set_map_kind(map_kind, this)

@@ -31,7 +31,7 @@
 !!$  
 Module psb_tools_mod
   use psb_const_mod
-  use psb_spmat_type
+
 
   interface psb_cd_set_bld
     subroutine psb_cd_set_bld(desc,info)
@@ -243,9 +243,9 @@ Module psb_tools_mod
     Subroutine psb_csphalo(a,desc_a,blk,info,rowcnv,colcnv,&
          & rowscale,colscale,outfmt,data)
       use psb_descriptor_type
-      use psb_spmat_type
-      Type(psb_cspmat_type),Intent(in)    :: a
-      Type(psb_cspmat_type),Intent(inout) :: blk
+      use psb_mat_mod
+      Type(psb_c_sparse_mat),Intent(in)    :: a
+      Type(psb_c_sparse_mat),Intent(inout) :: blk
       Type(psb_desc_type),Intent(in)      :: desc_a
       integer, intent(out)                :: info
       logical, optional, intent(in)       :: rowcnv,colcnv,rowscale,colscale
@@ -255,9 +255,9 @@ Module psb_tools_mod
     Subroutine psb_zsphalo(a,desc_a,blk,info,rowcnv,colcnv,&
          & rowscale,colscale,outfmt,data)
       use psb_descriptor_type
-      use psb_spmat_type
-      Type(psb_zspmat_type),Intent(in)    :: a
-      Type(psb_zspmat_type),Intent(inout) :: blk
+      use psb_mat_mod
+      Type(psb_z_sparse_mat),Intent(in)    :: a
+      Type(psb_z_sparse_mat),Intent(inout) :: blk
       Type(psb_desc_type),Intent(in)      :: desc_a
       integer, intent(out)                :: info
       logical, optional, intent(in)       :: rowcnv,colcnv,rowscale,colscale
@@ -497,9 +497,9 @@ Module psb_tools_mod
     end Subroutine psb_dcdbldext
     Subroutine psb_ccdbldext(a,desc_a,novr,desc_ov,info,extype)
       use psb_descriptor_type
-      Use psb_spmat_type
+      use psb_mat_mod
       integer, intent(in)                     :: novr
-      Type(psb_cspmat_type), Intent(in)       :: a
+      Type(psb_c_sparse_mat), Intent(in)       :: a
       Type(psb_desc_type), Intent(in), target :: desc_a
       Type(psb_desc_type), Intent(out)        :: desc_ov
       integer, intent(out)                    :: info
@@ -507,9 +507,9 @@ Module psb_tools_mod
     end Subroutine psb_ccdbldext
     Subroutine psb_zcdbldext(a,desc_a,novr,desc_ov,info,extype)
       use psb_descriptor_type
-      Use psb_spmat_type
+      Use psb_mat_mod
       integer, intent(in)                     :: novr
-      Type(psb_zspmat_type), Intent(in)       :: a
+      Type(psb_z_sparse_mat), Intent(in)       :: a
       Type(psb_desc_type), Intent(in), target :: desc_a
       Type(psb_desc_type), Intent(out)        :: desc_ov
       integer, intent(out)                    :: info
@@ -548,7 +548,6 @@ Module psb_tools_mod
     end subroutine psb_sspalloc
     subroutine psb_dspalloc(a, desc_a, info, nnz)
       use psb_descriptor_type
-      use psb_spmat_type
       use psb_mat_mod
       type(psb_desc_type), intent(inout)  :: desc_a
       type(psb_d_sparse_mat), intent(out) :: a
@@ -557,17 +556,17 @@ Module psb_tools_mod
     end subroutine psb_dspalloc
     subroutine psb_cspalloc(a, desc_a, info, nnz)
       use psb_descriptor_type
-      use psb_spmat_type
+      use psb_mat_mod
       type(psb_desc_type), intent(inout) :: desc_a
-      type(psb_cspmat_type), intent(out) :: a
+      type(psb_c_sparse_mat), intent(out) :: a
       integer, intent(out)               :: info
       integer, optional, intent(in)      :: nnz
     end subroutine psb_cspalloc
     subroutine psb_zspalloc(a, desc_a, info, nnz)
       use psb_descriptor_type
-      use psb_spmat_type
+      use psb_mat_mod
       type(psb_desc_type), intent(inout) :: desc_a
-      type(psb_zspmat_type), intent(out) :: a
+      type(psb_z_sparse_mat), intent(out) :: a
       integer, intent(out)               :: info
       integer, optional, intent(in)      :: nnz
     end subroutine psb_zspalloc
@@ -586,7 +585,6 @@ Module psb_tools_mod
     end subroutine psb_sspasb
     subroutine psb_dspasb(a,desc_a, info, afmt, upd, dupl,mold)
       use psb_descriptor_type
-      use psb_spmat_type
       use psb_mat_mod
       type(psb_d_sparse_mat), intent (inout)  :: a
       type(psb_desc_type), intent(in)         :: desc_a
@@ -597,8 +595,8 @@ Module psb_tools_mod
     end subroutine psb_dspasb
     subroutine psb_cspasb(a,desc_a, info, afmt, upd, dupl)
       use psb_descriptor_type
-      use psb_spmat_type
-      type(psb_cspmat_type), intent (inout)   :: a
+      use psb_mat_mod
+      type(psb_c_sparse_mat), intent (inout)   :: a
       type(psb_desc_type), intent(in)         :: desc_a
       integer, intent(out)                    :: info
       integer,optional, intent(in)            :: dupl, upd
@@ -606,8 +604,8 @@ Module psb_tools_mod
     end subroutine psb_cspasb
     subroutine psb_zspasb(a,desc_a, info, afmt, upd, dupl)
       use psb_descriptor_type
-      use psb_spmat_type
-      type(psb_zspmat_type), intent (inout)   :: a
+      use psb_mat_mod
+      type(psb_z_sparse_mat), intent (inout)   :: a
       type(psb_desc_type), intent(in)         :: desc_a
       integer, intent(out)                    :: info
       integer,optional, intent(in)            :: dupl, upd
@@ -629,7 +627,6 @@ Module psb_tools_mod
     end subroutine psb_sspfree
     subroutine psb_dspfree(a, desc_a,info)
       use psb_descriptor_type
-      use psb_spmat_type
       use psb_mat_mod
       type(psb_desc_type), intent(in)       :: desc_a
       type(psb_d_sparse_mat), intent(inout) :: a
@@ -637,16 +634,16 @@ Module psb_tools_mod
     end subroutine psb_dspfree
     subroutine psb_cspfree(a, desc_a,info)
       use psb_descriptor_type
-      use psb_spmat_type
+      use psb_mat_mod
       type(psb_desc_type), intent(in) :: desc_a
-      type(psb_cspmat_type), intent(inout)      ::a
+      type(psb_c_sparse_mat), intent(inout)      ::a
       integer, intent(out)        :: info
     end subroutine psb_cspfree
     subroutine psb_zspfree(a, desc_a,info)
       use psb_descriptor_type
-      use psb_spmat_type
+      use psb_mat_mod
       type(psb_desc_type), intent(in) :: desc_a
-      type(psb_zspmat_type), intent(inout)       ::a
+      type(psb_z_sparse_mat), intent(inout)       ::a
       integer, intent(out)        :: info
     end subroutine psb_zspfree
   end interface
@@ -675,7 +672,6 @@ Module psb_tools_mod
     end subroutine psb_sspins_2desc
     subroutine psb_dspins(nz,ia,ja,val,a,desc_a,info,rebuild)
       use psb_descriptor_type
-      use psb_spmat_type
       use psb_mat_mod
       type(psb_desc_type), intent(inout)   :: desc_a
       type(psb_d_sparse_mat), intent(inout) :: a
@@ -696,9 +692,9 @@ Module psb_tools_mod
     end subroutine psb_dspins_2desc
     subroutine psb_cspins(nz,ia,ja,val,a,desc_a,info,rebuild)
       use psb_descriptor_type
-      use psb_spmat_type
+      use psb_mat_mod
       type(psb_desc_type), intent(inout)   :: desc_a
-      type(psb_cspmat_type), intent(inout) :: a
+      type(psb_c_sparse_mat), intent(inout) :: a
       integer, intent(in)                  :: nz,ia(:),ja(:)
       complex(psb_spk_), intent(in)      :: val(:)
       integer, intent(out)                 :: info
@@ -706,19 +702,19 @@ Module psb_tools_mod
     end subroutine psb_cspins
     subroutine psb_cspins_2desc(nz,ia,ja,val,a,desc_ar,desc_ac,info)
       use psb_descriptor_type
-      use psb_spmat_type
+      use psb_mat_mod
       type(psb_desc_type), intent(in)      :: desc_ar
       type(psb_desc_type), intent(inout)   :: desc_ac
-      type(psb_cspmat_type), intent(inout) :: a
+      type(psb_c_sparse_mat), intent(inout) :: a
       integer, intent(in)                  :: nz,ia(:),ja(:)
       complex(psb_spk_), intent(in)        :: val(:)
       integer, intent(out)                 :: info
     end subroutine psb_cspins_2desc
     subroutine psb_zspins(nz,ia,ja,val,a,desc_a,info,rebuild)
       use psb_descriptor_type
-      use psb_spmat_type
+      use psb_mat_mod
       type(psb_desc_type), intent(inout)   :: desc_a
-      type(psb_zspmat_type), intent(inout) :: a
+      type(psb_z_sparse_mat), intent(inout) :: a
       integer, intent(in)                  :: nz,ia(:),ja(:)
       complex(psb_dpk_), intent(in)      :: val(:)
       integer, intent(out)                 :: info
@@ -726,10 +722,10 @@ Module psb_tools_mod
     end subroutine psb_zspins
     subroutine psb_zspins_2desc(nz,ia,ja,val,a,desc_ar,desc_ac,info)
       use psb_descriptor_type
-      use psb_spmat_type
+      use psb_mat_mod
       type(psb_desc_type), intent(in)      :: desc_ar
       type(psb_desc_type), intent(inout)   :: desc_ac
-      type(psb_zspmat_type), intent(inout) :: a
+      type(psb_z_sparse_mat), intent(inout) :: a
       integer, intent(in)                  :: nz,ia(:),ja(:)
       complex(psb_dpk_), intent(in)        :: val(:)
       integer, intent(out)                 :: info
@@ -756,17 +752,17 @@ Module psb_tools_mod
     end subroutine psb_dsprn
     subroutine psb_csprn(a, desc_a,info,clear)
       use psb_descriptor_type
-      use psb_spmat_type
+      use psb_mat_mod
       type(psb_desc_type), intent(in)      :: desc_a
-      type(psb_cspmat_type), intent(inout) :: a
+      type(psb_c_sparse_mat), intent(inout) :: a
       integer, intent(out)                 :: info
       logical, intent(in), optional        :: clear
     end subroutine psb_csprn
     subroutine psb_zsprn(a, desc_a,info,clear)
       use psb_descriptor_type
-      use psb_spmat_type
+      use psb_mat_mod
       type(psb_desc_type), intent(in)      :: desc_a
-      type(psb_zspmat_type), intent(inout) :: a
+      type(psb_z_sparse_mat), intent(inout) :: a
       integer, intent(out)                 :: info
       logical, intent(in), optional        :: clear
     end subroutine psb_zsprn
@@ -875,15 +871,15 @@ Module psb_tools_mod
 
 
   interface psb_linmap_init
-    module procedure psb_dlinmap_init, psb_zlinmap_init
+    module procedure psb_slinmap_init, psb_clinmap_init, psb_dlinmap_init, psb_zlinmap_init
   end interface
 
   interface psb_linmap_ins
-    module procedure psb_dlinmap_ins, psb_zlinmap_ins
+    module procedure psb_slinmap_ins, psb_clinmap_ins, psb_dlinmap_ins, psb_zlinmap_ins
   end interface
 
   interface psb_linmap_asb
-    module procedure psb_dlinmap_asb, psb_zlinmap_asb
+    module procedure psb_slinmap_asb, psb_clinmap_asb, psb_dlinmap_asb, psb_zlinmap_asb
   end interface
 
   interface psb_is_owned
@@ -1158,6 +1154,73 @@ contains
   end subroutine psb_cdasb
 
 
+  subroutine psb_slinmap_init(a_map,cd_xt,descin,descout)
+    use psb_descriptor_type
+    use psb_serial_mod
+    use psb_penv_mod
+    use psb_error_mod
+    use psb_mat_mod
+    implicit none 
+    type(psb_s_sparse_mat), intent(out) :: a_map
+    type(psb_desc_type), intent(out)   :: cd_xt
+    type(psb_desc_type), intent(in)    :: descin, descout 
+
+    integer :: nrow_in, nrow_out, ncol_in, info, ictxt
+
+    ictxt = psb_cd_get_context(descin)
+    call psb_cdcpy(descin,cd_xt,info)
+    if (info ==0) call psb_cd_reinit(cd_xt,info)
+    if (info /= 0) then 
+      write(0,*) 'Error on reinitialising the extension map'
+      call psb_error(ictxt)
+      call psb_abort(ictxt)
+      stop
+    end if
+
+    nrow_in  = psb_cd_get_local_rows(cd_xt)
+    ncol_in  = psb_cd_get_local_cols(cd_xt)
+    nrow_out = psb_cd_get_local_rows(descout)
+
+    call a_map%csall(nrow_out,ncol_in,info)
+
+  end subroutine psb_slinmap_init
+
+  subroutine psb_slinmap_ins(nz,ir,ic,val,a_map,cd_xt,descin,descout)
+    use psb_mat_mod
+    use psb_descriptor_type
+    implicit none 
+    integer, intent(in)                  :: nz
+    integer, intent(in)                  :: ir(:),ic(:)
+    real(psb_spk_), intent(in)         :: val(:)
+    type(psb_s_sparse_mat), intent(inout) :: a_map
+    type(psb_desc_type), intent(inout)   :: cd_xt
+    type(psb_desc_type), intent(in)      :: descin, descout 
+    integer :: info
+    call psb_spins(nz,ir,ic,val,a_map,descout,cd_xt,info)
+
+  end subroutine psb_slinmap_ins
+
+  subroutine psb_slinmap_asb(a_map,cd_xt,descin,descout,afmt)
+    use psb_mat_mod
+    use psb_descriptor_type
+    use psb_serial_mod
+    implicit none 
+    type(psb_s_sparse_mat), intent(inout)   :: a_map
+    type(psb_desc_type), intent(inout)     :: cd_xt
+    type(psb_desc_type), intent(in)        :: descin, descout 
+    character(len=*), optional, intent(in) :: afmt
+
+
+    integer :: nrow_in, nrow_out, ncol_in, info, ictxt
+
+    ictxt = psb_cd_get_context(descin)
+
+    call psb_cdasb(cd_xt,info)
+    call a_map%set_ncols(psb_cd_get_local_cols(cd_xt))
+    call a_map%cscnv(info,type=afmt)
+
+  end subroutine psb_slinmap_asb
+
   subroutine psb_dlinmap_init(a_map,cd_xt,descin,descout)
     use psb_descriptor_type
     use psb_serial_mod
@@ -1195,7 +1258,7 @@ contains
     implicit none 
     integer, intent(in)                  :: nz
     integer, intent(in)                  :: ir(:),ic(:)
-    real(kind(1.d0)), intent(in)         :: val(:)
+    real(psb_dpk_), intent(in)         :: val(:)
     type(psb_d_sparse_mat), intent(inout) :: a_map
     type(psb_desc_type), intent(inout)   :: cd_xt
     type(psb_desc_type), intent(in)      :: descin, descout 
@@ -1225,14 +1288,14 @@ contains
 
   end subroutine psb_dlinmap_asb
 
-  subroutine psb_zlinmap_init(a_map,cd_xt,descin,descout)
-    use psb_spmat_type
+  subroutine psb_clinmap_init(a_map,cd_xt,descin,descout)
+    use psb_mat_mod
     use psb_descriptor_type
     use psb_serial_mod
     use psb_penv_mod
     use psb_error_mod
     implicit none 
-    type(psb_zspmat_type), intent(out) :: a_map
+    type(psb_c_sparse_mat), intent(out) :: a_map
     type(psb_desc_type), intent(out)   :: cd_xt
     type(psb_desc_type), intent(in)    :: descin, descout 
 
@@ -1253,32 +1316,32 @@ contains
     ncol_in  = psb_cd_get_local_cols(cd_xt)
     nrow_out = psb_cd_get_local_rows(descout)
 
-    call psb_sp_all(nrow_out,ncol_in,a_map,info)
+    call a_map%csall(nrow_out,ncol_in,info)
 
-  end subroutine psb_zlinmap_init
+  end subroutine psb_clinmap_init
 
-  subroutine psb_zlinmap_ins(nz,ir,ic,val,a_map,cd_xt,descin,descout)
-    use psb_spmat_type
+  subroutine psb_clinmap_ins(nz,ir,ic,val,a_map,cd_xt,descin,descout)
+    use psb_mat_mod
     use psb_descriptor_type
     implicit none 
     integer, intent(in)                  :: nz
     integer, intent(in)                  :: ir(:),ic(:)
-    complex(kind(1.d0)), intent(in)      :: val(:)
-    type(psb_zspmat_type), intent(inout) :: a_map
+    complex(psb_spk_), intent(in)      :: val(:)
+    type(psb_c_sparse_mat), intent(inout) :: a_map
     type(psb_desc_type), intent(inout)   :: cd_xt
     type(psb_desc_type), intent(in)      :: descin, descout 
     integer :: info
 
     call psb_spins(nz,ir,ic,val,a_map,descout,cd_xt,info)
 
-  end subroutine psb_zlinmap_ins
+  end subroutine psb_clinmap_ins
 
-  subroutine psb_zlinmap_asb(a_map,cd_xt,descin,descout,afmt)
-    use psb_spmat_type
+  subroutine psb_clinmap_asb(a_map,cd_xt,descin,descout,afmt)
+    use psb_mat_mod
     use psb_descriptor_type
     use psb_serial_mod
     implicit none 
-    type(psb_zspmat_type), intent(inout)   :: a_map
+    type(psb_c_sparse_mat), intent(inout)   :: a_map
     type(psb_desc_type), intent(inout)     :: cd_xt
     type(psb_desc_type), intent(in)        :: descin, descout 
     character(len=*), optional, intent(in) :: afmt
@@ -1288,8 +1351,77 @@ contains
     ictxt = psb_cd_get_context(descin)
 
     call psb_cdasb(cd_xt,info)
-    a_map%k = psb_cd_get_local_cols(cd_xt)
-    call psb_spcnv(a_map,info,afmt=afmt)
+    call a_map%set_ncols(psb_cd_get_local_cols(cd_xt))
+    call a_map%cscnv(info,type=afmt)
+
+  end subroutine psb_clinmap_asb
+
+
+  subroutine psb_zlinmap_init(a_map,cd_xt,descin,descout)
+    use psb_mat_mod
+    use psb_descriptor_type
+    use psb_serial_mod
+    use psb_penv_mod
+    use psb_error_mod
+    implicit none 
+    type(psb_z_sparse_mat), intent(out) :: a_map
+    type(psb_desc_type), intent(out)   :: cd_xt
+    type(psb_desc_type), intent(in)    :: descin, descout 
+
+    integer :: nrow_in, nrow_out, ncol_in, info, ictxt
+
+    ictxt = psb_cd_get_context(descin)
+
+    call psb_cdcpy(descin,cd_xt,info)
+    if (info ==0) call psb_cd_reinit(cd_xt,info)
+    if (info /= 0) then 
+      write(0,*) 'Error on reinitialising the extension map'
+      call psb_error(ictxt)
+      call psb_abort(ictxt)
+      stop
+    end if
+
+    nrow_in  = psb_cd_get_local_rows(cd_xt)
+    ncol_in  = psb_cd_get_local_cols(cd_xt)
+    nrow_out = psb_cd_get_local_rows(descout)
+
+    call a_map%csall(nrow_out,ncol_in,info)
+
+  end subroutine psb_zlinmap_init
+
+  subroutine psb_zlinmap_ins(nz,ir,ic,val,a_map,cd_xt,descin,descout)
+    use psb_mat_mod
+    use psb_descriptor_type
+    implicit none 
+    integer, intent(in)                  :: nz
+    integer, intent(in)                  :: ir(:),ic(:)
+    complex(psb_dpk_), intent(in)      :: val(:)
+    type(psb_z_sparse_mat), intent(inout) :: a_map
+    type(psb_desc_type), intent(inout)   :: cd_xt
+    type(psb_desc_type), intent(in)      :: descin, descout 
+    integer :: info
+
+    call psb_spins(nz,ir,ic,val,a_map,descout,cd_xt,info)
+
+  end subroutine psb_zlinmap_ins
+
+  subroutine psb_zlinmap_asb(a_map,cd_xt,descin,descout,afmt)
+    use psb_mat_mod
+    use psb_descriptor_type
+    use psb_serial_mod
+    implicit none 
+    type(psb_z_sparse_mat), intent(inout)   :: a_map
+    type(psb_desc_type), intent(inout)     :: cd_xt
+    type(psb_desc_type), intent(in)        :: descin, descout 
+    character(len=*), optional, intent(in) :: afmt
+
+    integer :: nrow_in, nrow_out, ncol_in, info, ictxt
+
+    ictxt = psb_cd_get_context(descin)
+
+    call psb_cdasb(cd_xt,info)
+    call a_map%set_ncols(psb_cd_get_local_cols(cd_xt))
+    call a_map%cscnv(info,type=afmt)
 
   end subroutine psb_zlinmap_asb
 

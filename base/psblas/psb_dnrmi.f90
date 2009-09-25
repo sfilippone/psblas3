@@ -43,6 +43,7 @@
 !
 function psb_dnrmi(a,desc_a,info)  
   use psb_descriptor_type
+  use psb_serial_mod
   use psb_check_mod
   use psb_error_mod
   use psb_penv_mod
@@ -101,7 +102,6 @@ function psb_dnrmi(a,desc_a,info)
       call psb_errpush(info,name,a_err=ch_err)
       goto 9999
     end if
-
   else
     nrmi = 0.d0
   end if

@@ -35,7 +35,7 @@
 !    Allocate sparse matrix structure for psblas routines.
 ! 
 ! Arguments: 
-!    a        - type(psb_sspmat_type).       The sparse matrix to be allocated.      
+!    a        - type(psb_s_sparse_mat).       The sparse matrix to be allocated.      
 !    desc_a   - type(psb_desc_type).         The communication descriptor to be updated.
 !    info     - integer.                       Return code.
 !    nnz      - integer(optional).             The number of nonzeroes in the matrix.
@@ -44,10 +44,10 @@
 subroutine psb_sspalloc(a, desc_a, info, nnz)
 
   use psb_descriptor_type
+  use psb_serial_mod
   use psb_const_mod
   use psb_error_mod
   use psb_penv_mod
-  use psb_mat_mod
   implicit none
 
   !....parameters...

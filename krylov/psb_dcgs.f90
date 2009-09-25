@@ -62,8 +62,8 @@
 !
 ! Arguments:
 !
-!    a      -  type(psb_dspmat_type)      Input: sparse matrix containing A.
-!    prec   -  type(psb_dprec_type)       Input: preconditioner
+!    a      -  type(psb_d_sparse_mat)      Input: sparse matrix containing A.
+!    prec   -  class(psb_dprec_type)       Input: preconditioner
 !    b      -  real,dimension(:)          Input: vector containing the
 !                                         right hand side B
 !    x      -  real,dimension(:)          Input/Output: vector containing the
@@ -103,7 +103,7 @@ Subroutine psb_dcgs(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,istop)
   
 
   Type(psb_desc_type), Intent(in)    :: desc_a 
-  Type(psb_dprec_type), Intent(in)   :: prec 
+  class(psb_dprec_type), Intent(in)   :: prec 
   Real(psb_dpk_), Intent(in)       :: b(:)
   Real(psb_dpk_), Intent(inout)    :: x(:)
   Real(psb_dpk_), Intent(in)       :: eps

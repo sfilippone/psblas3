@@ -42,7 +42,7 @@
 !    ia(:)    - integer                     The row indices of the coefficients.
 !    ja(:)    - integer                     The column indices of the coefficients.
 !    val(:)   - real                        The values of the coefficients to be inserted.
-!    a        - type(psb_dspmat_type).      The sparse destination matrix.      
+!    a        - type(psb_d_sparse_mat).      The sparse destination matrix.      
 !    desc_a   - type(psb_desc_type).        The communication descriptor.
 !    info     - integer.                    Error code
 !    rebuild  - logical                     Allows to reopen a matrix under
@@ -52,10 +52,10 @@ subroutine psb_dspins(nz,ia,ja,val,a,desc_a,info,rebuild)
 
   use psb_tools_mod, psb_protect_name => psb_dspins
   use psb_descriptor_type
+  use psb_serial_mod
   use psb_const_mod
   use psb_error_mod
   use psb_penv_mod
-  use psb_mat_mod
   implicit none
 
   !....parameters...
@@ -239,10 +239,10 @@ end subroutine psb_dspins
 subroutine psb_dspins_2desc(nz,ia,ja,val,a,desc_ar,desc_ac,info)
   use psb_tools_mod, psb_protect_name => psb_dspins_2desc
   use psb_descriptor_type
+  use psb_serial_mod
   use psb_const_mod
   use psb_error_mod
   use psb_penv_mod
-  use psb_mat_mod
   implicit none
 
   !....parameters...

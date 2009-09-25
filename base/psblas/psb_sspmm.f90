@@ -65,7 +65,6 @@
 subroutine  psb_sspmm(alpha,a,x,beta,y,desc_a,info,&
      & trans, k, jx, jy, work, doswap)   
 
-  use psb_spmat_type
   use psb_serial_mod
   use psb_descriptor_type
   use psb_comm_mod

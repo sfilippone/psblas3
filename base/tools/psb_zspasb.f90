@@ -35,7 +35,7 @@
 !    Assemble sparse matrix
 ! 
 ! Arguments: 
-!    a        - type(psb_zspmat_type).          The sparse matrix to be assembled
+!    a        - type(psb_z_sparse_mat).          The sparse matrix to be assembled
 !    desc_a   - type(psb_desc_type).            The communication descriptor.
 !    info     - integer.                     return code.
 !    afmt     - character(optional)          The desired output storage format.
@@ -48,10 +48,8 @@
 !                                            psb_dupl_err_       raise an error. 
 ! 
 !
-subroutine psb_zspasb(a,desc_a, info, afmt, upd, dupl)
-
+subroutine psb_zspasb(a,desc_a, info, afmt, upd, dupl, mold)
   use psb_descriptor_type
-  use psb_spmat_type
   use psb_serial_mod
   use psb_const_mod
   use psi_mod
@@ -62,11 +60,12 @@ subroutine psb_zspasb(a,desc_a, info, afmt, upd, dupl)
 
 
   !...Parameters....
-  type(psb_zspmat_type), intent (inout)   :: a
+  type(psb_z_sparse_mat), intent (inout)   :: a
   type(psb_desc_type), intent(in)         :: desc_a
   integer, intent(out)                    :: info
   integer,optional, intent(in)            :: dupl, upd
   character(len=*), optional, intent(in)         :: afmt
+  class(psb_z_base_sparse_mat), intent(in), optional :: mold
   !....Locals....
   integer               :: int_err(5)
   integer               :: np,me,n_col, err_act
@@ -107,23 +106,27 @@ subroutine psb_zspasb(a,desc_a, info, afmt, upd, dupl)
 
   !check on errors encountered in psdspins
 
-  spstate = a%infoa(psb_state_) 
-  if (spstate == psb_spmat_bld_) then 
+
+  if (a%is_bld()) then 
     !
     ! First case: we come from a fresh build. 
     ! 
 
     n_row = psb_cd_get_local_rows(desc_a)
     n_col = psb_cd_get_local_cols(desc_a)
-    a%m = n_row
-    a%k = n_col
+    call a%set_nrows(n_row)
+    call a%set_ncols(n_col)
   end if
 
-  call psb_spcnv(a,info,afmt=afmt,upd=upd,dupl=dupl)
+  call a%cscnv(info,type=afmt,dupl=dupl, mold=mold)
 
-  IF (debug_level >= psb_debug_ext_)&
-       & write(debug_unit, *) me,' ',trim(name),':  From SPCNV',&
-       & info,' ',A%FIDA
+  
+  IF (debug_level >= psb_debug_ext_) then 
+    ch_err=a%get_fmt()
+    write(debug_unit, *) me,' ',trim(name),':  From SPCNV',&
+         & info,' ',ch_err
+  end IF
+  
   if (info /= psb_no_err_) then    
     info=4010
     ch_err='psb_spcnv'

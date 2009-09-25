@@ -35,16 +35,16 @@
 !    Frees a sparse matrix structure.
 ! 
 ! Arguments: 
-!    a        - type(psb_dspmat_type).          The sparse matrix to be freed.      
+!    a        - type(psb_d_sparse_mat).          The sparse matrix to be freed.      
 !    desc_a   - type(psb_desc_type).            The communication descriptor.
 !    info     - integer.                          return code.
 !
 subroutine psb_dspfree(a, desc_a,info)
   !...free sparse matrix structure...
   use psb_descriptor_type
+  use psb_serial_mod
   use psb_const_mod
   use psb_error_mod
-  use psb_mat_mod
   implicit none
 
   !....parameters...

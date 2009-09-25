@@ -35,7 +35,7 @@
 !    Allocate sparse matrix structure for psblas routines.
 ! 
 ! Arguments: 
-!    a        - type(psb_cspmat_type).       The sparse matrix to be allocated.      
+!    a        - type(psb_c_sparse_mat).       The sparse matrix to be allocated.      
 !    desc_a   - type(psb_desc_type).         The communication descriptor to be updated.
 !    info     - integer.                       Return code.
 !    nnz      - integer(optional).             The number of nonzeroes in the matrix.
@@ -44,7 +44,6 @@
 subroutine psb_cspalloc(a, desc_a, info, nnz)
 
   use psb_descriptor_type
-  use psb_spmat_type
   use psb_serial_mod
   use psb_const_mod
   use psb_error_mod
@@ -53,7 +52,7 @@ subroutine psb_cspalloc(a, desc_a, info, nnz)
 
   !....parameters...
   type(psb_desc_type), intent(inout) :: desc_a
-  type(psb_cspmat_type), intent(out) :: a
+  type(psb_c_sparse_mat), intent(out) :: a
   integer, intent(out)               :: info
   integer, optional, intent(in)      :: nnz
 
@@ -108,7 +107,7 @@ subroutine psb_cspalloc(a, desc_a, info, nnz)
        & write(debug_unit,*) me,' ',trim(name),':allocating size:',length_ia1
 
   !....allocate aspk, ia1, ia2.....
-  call psb_sp_all(loc_row,loc_col,a,length_ia1,info)
+  call a%csall(loc_row,loc_col,info,nz=length_ia1)
   if(info /= 0) then
     info=4010
     ch_err='sp_all'

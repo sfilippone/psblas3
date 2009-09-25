@@ -37,11 +37,10 @@
 module psb_prec_type
 
   ! Reduces size of .mod file.
-  use psb_base_mod, only : psb_cspmat_type,&
-       & psb_zspmat_type, psb_dpk_, psb_spk_, psb_long_int_k_,&
-       & psb_desc_type, psb_sizeof, psb_sp_free, psb_cdfree,&
-       & psb_erractionsave, psb_erractionrestore, psb_error, psb_get_errstatus
-  use psb_mat_mod, only : psb_s_sparse_mat,  psb_d_sparse_mat
+  use psb_base_mod, only : psb_dpk_, psb_spk_, psb_long_int_k_,&
+       & psb_desc_type, psb_sizeof, psb_free, psb_cdfree,&
+       & psb_erractionsave, psb_erractionrestore, psb_error, psb_get_errstatus,&
+       & psb_s_sparse_mat,  psb_d_sparse_mat,  psb_c_sparse_mat,  psb_z_sparse_mat
 
   integer, parameter :: psb_min_prec_=0, psb_noprec_=0, psb_diag_=1, &
        & psb_bjac_=2, psb_max_prec_=2
@@ -86,7 +85,7 @@ module psb_prec_type
   end type psb_dprec_type
 
   type psb_cprec_type
-    type(psb_cspmat_type), allocatable :: av(:) 
+    type(psb_c_sparse_mat), allocatable :: av(:) 
     complex(psb_spk_), allocatable     :: d(:)  
     type(psb_desc_type)                :: desc_data 
     integer, allocatable               :: iprcparm(:) 
@@ -97,7 +96,7 @@ module psb_prec_type
 
 
   type psb_zprec_type
-    type(psb_zspmat_type), allocatable :: av(:) 
+    type(psb_z_sparse_mat), allocatable :: av(:) 
     complex(psb_dpk_), allocatable     :: d(:)  
     type(psb_desc_type)                :: desc_data 
     integer, allocatable               :: iprcparm(:) 
@@ -460,12 +459,7 @@ contains
 
     if (allocated(p%av))  then 
       do i=1,size(p%av) 
-        call psb_sp_free(p%av(i),info)
-        if (info /= 0) then 
-          ! Actually, we don't care here about this.
-          ! Just let it go.
-          ! return
-        end if
+        call p%av(i)%free()
       enddo
       deallocate(p%av,stat=info)
 
@@ -523,12 +517,7 @@ contains
 
     if (allocated(p%av))  then 
       do i=1,size(p%av) 
-        call psb_sp_free(p%av(i),info)
-        if (info /= 0) then 
-          ! Actually, we don't care here about this.
-          ! Just let it go.
-          ! return
-        end if
+        call p%av(i)%free()
       enddo
       deallocate(p%av,stat=info)
 
@@ -591,7 +580,6 @@ contains
 
 
   function psb_dprec_sizeof(prec) result(val)
-    use psb_mat_mod
     type(psb_dprec_type), intent(in) :: prec
     integer(psb_long_int_k_) :: val
     integer :: i
@@ -611,7 +599,6 @@ contains
   end function psb_dprec_sizeof
 
   function psb_sprec_sizeof(prec) result(val)
-    use psb_mat_mod
     type(psb_sprec_type), intent(in) :: prec
     integer(psb_long_int_k_) :: val
     integer             :: i

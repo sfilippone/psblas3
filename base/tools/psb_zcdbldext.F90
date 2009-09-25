@@ -37,7 +37,7 @@
 !    specified on input. 
 ! 
 ! Arguments: 
-!    a        - type(psb_zspmat_type).       The input sparse matrix.
+!    a        - type(psb_z_sparse_mat).       The input sparse matrix.
 !    desc_a   - type(psb_desc_type).         The input communication descriptor.
 !    novr     - integer.                       The number of overlap levels.
 !    desc_ov  - type(psb_desc_type).         The auxiliary output communication 
@@ -78,23 +78,23 @@ Subroutine psb_zcdbldext(a,desc_a,novr,desc_ov,info, extype)
 
   !     .. Array Arguments ..
   integer, intent(in)               :: novr
-  Type(psb_zspmat_type), Intent(in)       ::  a
+  Type(psb_z_sparse_mat), Intent(in)       ::  a
   Type(psb_desc_type), Intent(in), target :: desc_a
   Type(psb_desc_type), Intent(out)        :: desc_ov
   integer, intent(out)                    :: info
   integer, intent(in),optional            :: extype
 
   !     .. Local Scalars ..
-  Integer ::  i, j, np, me,m,nnzero,&
+  Integer ::  i, j, np, me,m,&
        &  ictxt, lovr, lworks,lworkr, n_row,n_col, int_err(5),&
        &  index_dim,elem_dim, l_tmp_ovr_idx,l_tmp_halo, nztot,nhalo
   Integer :: counter,counter_h, counter_o, counter_e,idx,gidx,proc,n_elem_recv,&
        & n_elem_send,tot_recv,tot_elem,cntov_o,&
        & counter_t,n_elem,i_ovr,jj,proc_id,isz, &
        & idxr, idxs, iszr, iszs, nxch, nsnd, nrcv,lidx, extype_
-  integer   icomm, err_act
+  integer :: icomm, err_act
 
-  type(psb_zspmat_type) :: blk
+  integer, allocatable  :: irow(:), icol(:)
   Integer, allocatable  :: tmp_halo(:),tmp_ovr_idx(:), orig_ovr(:)
   Integer,allocatable   :: halo(:),works(:),workr(:),t_halo_in(:),&
        & t_halo_out(:),temp(:),maskr(:)
@@ -122,7 +122,6 @@ Subroutine psb_zcdbldext(a,desc_a,novr,desc_ov,info, extype)
     extype_ = psb_ovt_xhal_  
   endif
   m      = psb_cd_get_local_rows(desc_a)
-  nnzero = Size(a%aspk)
   n_row  = psb_cd_get_local_rows(desc_a)
   n_col  = psb_cd_get_local_cols(desc_a)
   nhalo  = n_col-m
@@ -169,7 +168,7 @@ Subroutine psb_zcdbldext(a,desc_a,novr,desc_ov,info, extype)
   ! LOVR= (NNZ/NROW)*N_HALO*NOVR  This assumes that the local average 
   ! nonzeros per row is the same as the global. 
   !
-  nztot = psb_sp_get_nnzeros(a)
+  nztot = a%get_nzeros()
   if (nztot>0) then 
     lovr   = ((nztot+m-1)/m)*nhalo*novr
     lworks = ((nztot+m-1)/m)*nhalo
@@ -209,16 +208,6 @@ Subroutine psb_zcdbldext(a,desc_a,novr,desc_ov,info, extype)
     call psb_errpush(4010,name,a_err='Allocate')
     goto 9999      
   end if
-
-  call psb_sp_all(blk,max(lworks,lworkr),info)
-  if (info /= 0) then
-    info=4010
-    ch_err='psb_sp_all'
-    call psb_errpush(info,name,a_err=ch_err)
-    goto 9999
-  end if
-
-  blk%fida='COO'
 
   Allocate(orig_ovr(l_tmp_ovr_idx),tmp_ovr_idx(l_tmp_ovr_idx),&
        & tmp_halo(l_tmp_halo), halo(size(desc_a%halo_index)),stat=info)
@@ -340,7 +329,7 @@ Subroutine psb_zcdbldext(a,desc_a,novr,desc_ov,info, extype)
       ! add recv elements in halo_index into ovrlap_index
       !
       Do j=0,n_elem_recv-1
-        If ((counter+psb_elem_recv_+j)>Size(halo)) then 
+        If((counter+psb_elem_recv_+j)>Size(halo)) then 
           info=-2
           call psb_errpush(info,name)
           goto 9999
@@ -414,35 +403,20 @@ Subroutine psb_zcdbldext(a,desc_a,novr,desc_ov,info, extype)
         ! Prepare to exchange the halo rows with the other proc.
         !
         If (i_ovr <= (novr)) Then
-          n_elem = psb_sp_get_nnz_row(idx,a)
+          call a%csget(idx,idx,n_elem,irow,icol,info)
+          if (info /= 0) then
+            info=4010
+            call psb_errpush(info,name,a_err='csget')
+            goto 9999
+          end if
+          
           call psb_ensure_size((idxs+tot_elem+n_elem),works,info)
           if (info /= 0) then
             info=4010
             call psb_errpush(info,name,a_err='psb_ensure_size')
             goto 9999
           end if
-
-          If((n_elem) > size(blk%ia2)) Then
-            isz = max((3*size(blk%ia2))/2,(n_elem))
-            if (debug_level >= psb_debug_outer_) &
-                 & write(debug_unit,*) me,'Realloc blk',isz
-            call psb_sp_reall(blk,isz,info)
-            if (info /= 0) then
-              info=4010
-              ch_err='psb_sp_reall'
-              call psb_errpush(info,name,a_err=ch_err)
-              goto 9999
-            end if
-          End If
-
-          call psb_sp_getblk(idx,a,blk,info)
-          if (info /= 0) then
-            info=4010
-            ch_err='psb_sp_getblk'
-            call psb_errpush(info,name,a_err=ch_err)
-            goto 9999
-          end if
-          call psb_map_l2g(blk%ia2(1:n_elem),&
+          call psb_map_l2g(icol(1:n_elem),&
                & works(idxs+tot_elem+1:idxs+tot_elem+n_elem),&
                & desc_ov%idxmap,info) 
           tot_elem=tot_elem+n_elem
@@ -734,14 +708,20 @@ Subroutine psb_zcdbldext(a,desc_a,novr,desc_ov,info, extype)
   end if
 
   call psb_icdasb(desc_ov,info,ext_hv=.true.)
-
+  if (info /= 0) then
+    call psb_errpush(4010,name,a_err='icdasdb')
+    goto 9999
+  end if
+  
   call psb_cd_set_ovl_asb(desc_ov,info)
 
-  if (info == 0) call psb_sp_free(blk,info)
-  if (info /= 0) then
-    ch_err='sp_free'
-    call psb_errpush(4013,name,a_err=ch_err,i_err=(/info,0,0,0,0/))
-    goto 9999
+  if (info == 0)  then 
+    if (allocated(irow)) deallocate(irow,stat=info)
+    if ((info ==0).and.allocated(icol)) deallocate(icol,stat=info)
+    if (info /= 0) then
+      call psb_errpush(4013,name,a_err='deallocate',i_err=(/info,0,0,0,0/))
+      goto 9999
+    end if
   end if
 
   if (debug_level >= psb_debug_outer_) &

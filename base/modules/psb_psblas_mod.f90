@@ -599,16 +599,18 @@ module psb_psblas_mod
     function psb_cnrmi(a, desc_a,info)
       use psb_serial_mod
       use psb_descriptor_type
+      use psb_mat_mod
       real(psb_spk_)                    :: psb_cnrmi
-      type(psb_cspmat_type), intent (in) :: a
+      type(psb_c_sparse_mat), intent (in) :: a
       type(psb_desc_type), intent (in)   :: desc_a
       integer, intent(out)                :: info
     end function psb_cnrmi
     function psb_znrmi(a, desc_a,info)
       use psb_serial_mod
       use psb_descriptor_type
+      use psb_mat_mod
       real(psb_dpk_)                    :: psb_znrmi
-      type(psb_zspmat_type), intent (in) :: a
+      type(psb_z_sparse_mat), intent (in) :: a
       type(psb_desc_type), intent (in)   :: desc_a
       integer, intent(out)                :: info
     end function psb_znrmi
@@ -681,7 +683,8 @@ module psb_psblas_mod
          &trans, k, jx, jy,work,doswap)
       use psb_serial_mod
       use psb_descriptor_type
-      type(psb_cspmat_type), intent(in)    :: a
+      use psb_mat_mod
+      type(psb_c_sparse_mat), intent(in)    :: a
       complex(psb_spk_), intent(inout)     :: x(:,:)
       complex(psb_spk_), intent(inout)     :: y(:,:)
       complex(psb_spk_), intent(in)        :: alpha, beta
@@ -696,7 +699,8 @@ module psb_psblas_mod
          & desc_a, info, trans, work,doswap)
       use psb_serial_mod
       use psb_descriptor_type
-      type(psb_cspmat_type), intent(in)    :: a
+      use psb_mat_mod
+      type(psb_c_sparse_mat), intent(in)    :: a
       complex(psb_spk_), intent(inout)     :: x(:)
       complex(psb_spk_), intent(inout)     :: y(:)
       complex(psb_spk_), intent(in)        :: alpha, beta
@@ -710,7 +714,8 @@ module psb_psblas_mod
          &trans, k, jx, jy,work,doswap)
       use psb_serial_mod
       use psb_descriptor_type
-      type(psb_zspmat_type), intent(in)    :: a
+      use psb_mat_mod
+      type(psb_z_sparse_mat), intent(in)    :: a
       complex(psb_dpk_), intent(inout)     :: x(:,:)
       complex(psb_dpk_), intent(inout)     :: y(:,:)
       complex(psb_dpk_), intent(in)        :: alpha, beta
@@ -725,7 +730,8 @@ module psb_psblas_mod
          & desc_a, info, trans, work,doswap)
       use psb_serial_mod
       use psb_descriptor_type
-      type(psb_zspmat_type), intent(in)    :: a
+      use psb_mat_mod
+      type(psb_z_sparse_mat), intent(in)    :: a
       complex(psb_dpk_), intent(inout)     :: x(:)
       complex(psb_dpk_), intent(inout)     :: y(:)
       complex(psb_dpk_), intent(in)        :: alpha, beta
@@ -805,63 +811,67 @@ module psb_psblas_mod
       integer, intent(out)                   :: info
     end subroutine psb_dspsv
     subroutine psb_cspsm(alpha, t, x, beta, y,&
-         & desc_a, info, trans, unit, choice,& 
+         & desc_a, info, trans, side, choice,& 
          & diag, n, jx, jy, work)
       use psb_serial_mod
       use psb_descriptor_type
-      type(psb_cspmat_type), intent(in)      :: t
+      use psb_mat_mod
+      type(psb_c_sparse_mat), intent(in)      :: t
       complex(psb_spk_), intent(in)          :: x(:,:)
       complex(psb_spk_), intent(inout)       :: y(:,:)
       complex(psb_spk_), intent(in)          :: alpha, beta
       type(psb_desc_type), intent(in)        :: desc_a
-      character, optional, intent(in)        :: trans, unit
+      character, optional, intent(in)        :: trans, side
       integer, optional, intent(in)          :: n, jx, jy
       integer, optional, intent(in)          :: choice
       complex(psb_spk_), optional, intent(in),target :: work(:), diag(:)
       integer, intent(out)               :: info
     end subroutine psb_cspsm
     subroutine psb_cspsv(alpha, t, x, beta, y,&
-         & desc_a, info, trans, unit, choice,& 
+         & desc_a, info, trans, side, choice,& 
          & diag, work)
       use psb_serial_mod
       use psb_descriptor_type
-      type(psb_cspmat_type), intent(in)      :: t
+      use psb_mat_mod
+      type(psb_c_sparse_mat), intent(in)      :: t
       complex(psb_spk_), intent(in)          :: x(:)
       complex(psb_spk_), intent(inout)       :: y(:)
       complex(psb_spk_), intent(in)          :: alpha, beta
       type(psb_desc_type), intent(in)        :: desc_a
-      character, optional, intent(in)        :: trans, unit
+      character, optional, intent(in)        :: trans, side
       integer, optional, intent(in)          :: choice
       complex(psb_spk_), optional, intent(in),target :: work(:), diag(:)
       integer, intent(out)                   :: info
     end subroutine psb_cspsv
     subroutine psb_zspsm(alpha, t, x, beta, y,&
-         & desc_a, info, trans, unit, choice,& 
+         & desc_a, info, trans, side, choice,& 
          & diag, n, jx, jy, work)
       use psb_serial_mod
       use psb_descriptor_type
-      type(psb_zspmat_type), intent(in)      :: t
+      use psb_mat_mod
+      type(psb_z_sparse_mat), intent(in)      :: t
       complex(psb_dpk_), intent(in)          :: x(:,:)
       complex(psb_dpk_), intent(inout)       :: y(:,:)
       complex(psb_dpk_), intent(in)          :: alpha, beta
       type(psb_desc_type), intent(in)        :: desc_a
-      character, optional, intent(in)        :: trans, unit
+      character, optional, intent(in)        :: trans, side
       integer, optional, intent(in)          :: n, jx, jy
       integer, optional, intent(in)          :: choice
       complex(psb_dpk_), optional, intent(in),target :: work(:), diag(:)
       integer, intent(out)               :: info
     end subroutine psb_zspsm
     subroutine psb_zspsv(alpha, t, x, beta, y,&
-         & desc_a, info, trans, unit, choice,& 
+         & desc_a, info, trans, side, choice,& 
          & diag, work)
       use psb_serial_mod
       use psb_descriptor_type
-      type(psb_zspmat_type), intent(in)      :: t
+      use psb_mat_mod
+      type(psb_z_sparse_mat), intent(in)      :: t
       complex(psb_dpk_), intent(in)          :: x(:)
       complex(psb_dpk_), intent(inout)       :: y(:)
       complex(psb_dpk_), intent(in)          :: alpha, beta
       type(psb_desc_type), intent(in)        :: desc_a
-      character, optional, intent(in)        :: trans, unit
+      character, optional, intent(in)        :: trans, side
       integer, optional, intent(in)          :: choice
       complex(psb_dpk_), optional, intent(in),target :: work(:), diag(:)
       integer, intent(out)                   :: info

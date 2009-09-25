@@ -3,14 +3,16 @@ include ../../../Make.inc
 # The object files
 #
 
-XOBJS = scrjd.o   ccrjd.o zcrjd.o
+XOBJS = 
+#scrjd.o   ccrjd.o zcrjd.o
 FOBJS = partition.o dgblock.o  dvtfg.o \
 	check_dim.o \
 	Max_nnzero.o \
-	gen_block.o\
-	ccoco.o ccocr.o ccrco.o ccrcr.o cgindex.o cgind_tri.o\
-	zcoco.o zcocr.o zcrco.o zcrcr.o zgindex.o zgind_tri.o\
-	$(XOBJS)
+	gen_block.o
+ #\
+#	ccoco.o ccocr.o ccrco.o ccrcr.o cgindex.o cgind_tri.o\
+#	zcoco.o zcocr.o zcrco.o zcrcr.o zgindex.o zgind_tri.o\
+#	$(XOBJS)
 
 #dcoco.o dcocr.o dcrco.o djdcox.o djdco.o dgind_tri.o \
 #dcrcr.o 
@@ -41,7 +43,7 @@ LIBFILE=$(LIBDIR)/$(LIBNAME)
 #
 
 
-lib: xobjs $(FOBJS)
+lib:  $(FOBJS)
 	$(AR) $(LIBDIR)/$(LIBNAME) $(OBJS)
 	$(RANLIB) $(LIBDIR)/$(LIBNAME)
 

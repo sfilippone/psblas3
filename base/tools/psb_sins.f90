@@ -49,7 +49,6 @@ subroutine psb_sinsvi(m, irw, val, x, desc_a, info, dupl)
   !....insert dense submatrix to dense matrix .....
   use psb_const_mod
   use psb_descriptor_type
-  use psb_spmat_type
   use psb_error_mod
   use psb_penv_mod
   use psi_mod
@@ -234,7 +233,6 @@ end subroutine psb_sinsvi
 subroutine psb_sinsi(m, irw, val, x, desc_a, info, dupl)
   !....insert dense submatrix to dense matrix .....
   use psb_descriptor_type
-  use psb_spmat_type
   use psb_const_mod
   use psb_error_mod
   use psb_penv_mod

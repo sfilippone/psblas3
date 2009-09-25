@@ -1,22 +1,22 @@
 include ../../Make.inc
 
 
-FOBJS = psb_cest.o    \
-	psb_regen_mod.o   psb_lsame.o psb_zspgetrow.o\
-	psb_zcsmm.o psb_zcsmv.o  psb_zspgtdiag.o psb_zspgtblk.o\
-	psb_zcsnmi.o psb_zcsrws.o psb_zcssm.o psb_zcssv.o psb_zspcnv.o\
-	psb_zfixcoo.o psb_zipcoo2csr.o psb_zipcsr2coo.o psb_zipcoo2csc.o \
-	psb_zcoins.o psb_zcsprt.o psb_zneigh.o psb_ztransp.o psb_ztransc.o\
-	psb_zrwextd.o psb_zsymbmm.o psb_znumbmm.o psb_zspscal.o psb_zspclip.o\
-	psb_getifield.o psb_setifield.o psb_update_mod.o psb_getrow_mod.o\
-	 psb_zgelp.o\
-	  psb_zspshift.o psb_zspsetbld.o\
-	psb_ccsprt.o psb_cspcnv.o psb_ccoins.o psb_ccsnmi.o\
-	psb_cfixcoo.o psb_cipcsr2coo.o psb_cipcoo2csr.o  psb_cipcoo2csc.o \
-	psb_cgelp.o psb_cspgtdiag.o psb_cspgtblk.o psb_cspgetrow.o\
-	psb_ccssm.o psb_ccssv.o psb_ccsmm.o psb_ccsmv.o psb_ctransp.o psb_ctransc.o\
-	psb_cspclip.o psb_crwextd.o psb_cspscal.o\
-	psb_cnumbmm.o psb_csymbmm.o psb_cneigh.o
+FOBJS = psb_lsame.o    
+#	psb_regen_mod.o   psb_lsame.o psb_zspgetrow.o\
+#	psb_zcsmm.o psb_zcsmv.o  psb_zspgtdiag.o psb_zspgtblk.o\
+#	psb_zcsnmi.o psb_zcsrws.o psb_zcssm.o psb_zcssv.o psb_zspcnv.o\
+#	psb_zfixcoo.o psb_zipcoo2csr.o psb_zipcsr2coo.o psb_zipcoo2csc.o \
+#	psb_zcoins.o psb_zcsprt.o psb_zneigh.o psb_ztransp.o psb_ztransc.o\
+#	psb_zrwextd.o psb_zsymbmm.o psb_znumbmm.o psb_zspscal.o psb_zspclip.o\
+#	psb_getifield.o psb_setifield.o psb_update_mod.o psb_getrow_mod.o\
+#	 psb_zgelp.o\
+#	  psb_zspshift.o psb_zspsetbld.o\
+#	psb_ccsprt.o psb_cspcnv.o psb_ccoins.o psb_ccsnmi.o\
+#	psb_cfixcoo.o psb_cipcsr2coo.o psb_cipcoo2csr.o  psb_cipcoo2csc.o \
+#	psb_cgelp.o psb_cspgtdiag.o psb_cspgtblk.o psb_cspgetrow.o\
+#	psb_ccssm.o psb_ccssv.o psb_ccsmm.o psb_ccsmv.o psb_ctransp.o psb_ctransc.o\
+#	psb_cspclip.o psb_crwextd.o psb_cspscal.o\
+#	psb_cnumbmm.o psb_csymbmm.o psb_cneigh.o
 #FOBJS = psb_cest.o psb_dcoins.o psb_dcsmm.o psb_dcsmv.o \
 #	psb_dcsnmi.o psb_dcsprt.o psb_dcsrws.o psb_dcssm.o psb_dcssv.o \
 #	psb_dfixcoo.o psb_dipcoo2csr.o psb_dipcsr2coo.o psb_dneigh.o \
@@ -49,10 +49,11 @@ LIBDIR=..
 MODDIR=../modules
 FINCLUDES=$(FMFLAG)$(LIBDIR) $(FMFLAG)$(MODDIR) $(FMFLAG).
 
-lib: auxd cood csrd jadd f77d f03d dpd lib1
+lib: auxd  f77d f03d dpd lib1
 	$(AR) $(LIBDIR)/$(LIBNAME) $(FOBJS)
 	$(RANLIB) $(LIBDIR)/$(LIBNAME)
 
+#cood csrd jadd
 
 lib1:	$(FOBJS)
 

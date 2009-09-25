@@ -67,7 +67,6 @@ Subroutine psb_scdbldext(a,desc_a,novr,desc_ov,info, extype)
   use psb_error_mod
   use psb_penv_mod
   use psb_realloc_mod
-  use psb_mat_mod
   use psi_mod
 #ifdef MPI_MOD
   use mpi
