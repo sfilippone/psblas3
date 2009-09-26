@@ -2119,7 +2119,10 @@ subroutine z_cp_csr_to_fmt_impl(a,b,info)
     call a%cp_to_coo(b,info)
 
   type is (psb_z_csr_sparse_mat) 
-    b = a
+    call b%psb_z_base_sparse_mat%cp_from(a%psb_z_base_sparse_mat)
+    b%irp = a%irp
+    b%ja  = a%ja
+    b%val = a%val
 
   class default
     call tmp%cp_from_fmt(a,info)
