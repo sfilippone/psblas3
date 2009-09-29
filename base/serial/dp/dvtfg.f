@@ -79,7 +79,7 @@ C
           IWORK1(I) = 0                                                       
           IWORK3(I) = 0                                                    
  40     CONTINUE                                                               
-        IF (psb_toupper(UPLO).EQ.'L') THEN                                                  
+        IF (psb_toupper(UPLO).EQ.'L') THEN                                           
 C                                                                               
 C           LOWER TRIANGULAR SPARSE MATRIX                                      
 C                                                                               
@@ -89,7 +89,7 @@ C
               IWORK1(I) = MAX(IWORK1(I),IWORK1(JA(J))+1)                    
  60         CONTINUE                                                         
  80       CONTINUE                                                            
-        ELSE IF (psb_toupper(UPLO).EQ.'U') THEN                                             
+        ELSE IF (psb_toupper(UPLO).EQ.'U') THEN                                         
 C                                                                               
 C           UPPER TRIANGULAR SPARSE MATRIX                                      
 C                                                                               

@@ -1699,14 +1699,14 @@ contains
 
   end subroutine s_csmv
 
-  subroutine s_cssm(alpha,a,x,beta,y,info,trans,side,d) 
+  subroutine s_cssm(alpha,a,x,beta,y,info,trans,scale,d) 
     use psb_error_mod
     implicit none 
     class(psb_s_sparse_mat), intent(in) :: a
     real(psb_spk_), intent(in)    :: alpha, beta, x(:,:)
     real(psb_spk_), intent(inout) :: y(:,:)
     integer, intent(out)            :: info
-    character, optional, intent(in) :: trans, side
+    character, optional, intent(in) :: trans, scale
     real(psb_spk_), intent(in), optional :: d(:)
     Integer :: err_act
     character(len=20)  :: name='psb_cssm'
@@ -1720,7 +1720,7 @@ contains
       goto 9999
     endif
 
-    call a%a%cssm(alpha,x,beta,y,info,trans,side,d) 
+    call a%a%cssm(alpha,x,beta,y,info,trans,scale,d) 
     if (info /= 0) goto 9999 
 
     call psb_erractionrestore(err_act)
@@ -1737,14 +1737,14 @@ contains
 
   end subroutine s_cssm
 
-  subroutine s_cssv(alpha,a,x,beta,y,info,trans,side,d) 
+  subroutine s_cssv(alpha,a,x,beta,y,info,trans,scale,d) 
     use psb_error_mod
     implicit none 
     class(psb_s_sparse_mat), intent(in) :: a
     real(psb_spk_), intent(in)    :: alpha, beta, x(:)
     real(psb_spk_), intent(inout) :: y(:)
     integer, intent(out)            :: info
-    character, optional, intent(in) :: trans, side
+    character, optional, intent(in) :: trans, scale
     real(psb_spk_), intent(in), optional :: d(:)
     Integer :: err_act
     character(len=20)  :: name='psb_cssv'
@@ -1758,7 +1758,7 @@ contains
       goto 9999
     endif
 
-    call a%a%cssm(alpha,x,beta,y,info,trans,side,d) 
+    call a%a%cssm(alpha,x,beta,y,info,trans,scale,d) 
 
     if (info /= 0) goto 9999 
 

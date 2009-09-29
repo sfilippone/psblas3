@@ -64,7 +64,7 @@
 !    desc_a  -  type(psb_desc_type).   The communication descriptor.
 !    info    -  integer.               Return code
 !    trans   -  character(optional).   Whether A or A'. If not present 'N' is assumed.
-!    side   -  character(optional).   Specify some type of operation with
+!    scale   -  character(optional).   Specify some type of operation with
 !                                      the diagonal matrix D.
 !    choice  -  integer(optional).     The kind of update to perform on overlap elements.
 !    d(:)    -  real  , optional       Matrix for diagonal scaling.
@@ -75,7 +75,7 @@
 !
 ! 
 subroutine  psb_dspsm(alpha,a,x,beta,y,desc_a,info,&
-     & trans, side, choice, diag, k, jx, jy, work)   
+     & trans, scale, choice, diag, k, jx, jy, work)   
 
   use psb_descriptor_type
   use psb_comm_mod
@@ -95,7 +95,7 @@ subroutine  psb_dspsm(alpha,a,x,beta,y,desc_a,info,&
   integer, intent(out)                      :: info
   real(psb_dpk_), intent(in), optional, target      :: diag(:)
   real(psb_dpk_), optional, target       :: work(:)
-  character, intent(in), optional           :: trans, side
+  character, intent(in), optional           :: trans, scale
   integer, intent(in), optional             :: choice
   integer, intent(in), optional             :: k, jx, jy
 
@@ -105,7 +105,7 @@ subroutine  psb_dspsm(alpha,a,x,beta,y,desc_a,info,&
        & ix, iy, ik, ijx, ijy, i, lld,&
        & m, nrow, ncol, liwork, llwork, iiy, jjy, idx, ndm
 
-  character                :: lside
+  character                :: lscale
   integer, parameter       :: nb=4
   real(psb_dpk_),pointer :: iwork(:), xp(:,:), yp(:,:), id(:)
   character                :: itrans
@@ -157,10 +157,10 @@ subroutine  psb_dspsm(alpha,a,x,beta,y,desc_a,info,&
     choice_ = psb_avg_
   endif
 
-  if (present(side)) then     
-    lside = psb_toupper(side)
+  if (present(scale)) then     
+    lscale = psb_toupper(scale)
   else
-    lside = 'U'
+    lscale = 'U'
   endif
 
   if (present(trans)) then     
@@ -256,7 +256,7 @@ subroutine  psb_dspsm(alpha,a,x,beta,y,desc_a,info,&
   ! Perform local triangular system solve
   xp => x(iix:lldx,jjx:jjx+ik-1)
   yp => y(iiy:lldy,jjy:jjy+ik-1)
-  call psb_cssm(alpha,a,xp,beta,yp,info,side=side,d=diag,trans=trans)
+  call psb_cssm(alpha,a,xp,beta,yp,info,scale=scale,d=diag,trans=trans)
 
   if(info /= 0) then
     info = 4010
@@ -354,14 +354,14 @@ end subroutine psb_dspsm
 !    desc_a  -  type(psb_desc_type).   The communication descriptor.
 !    info    -  integer.               Return code
 !    trans   -  character(optional).   Whether A or A'. If not present 'N' is assumed.
-!    side   -  character(optional).   Specify some type of operation with
+!    scale   -  character(optional).   Specify some type of operation with
 !                                      the diagonal matrix D.
 !    choice  -  integer(optional).     The kind of update to perform on overlap elements.
 !    d(:)    -  real  , optional       Matrix for diagonal scaling.
 !    work(:) -  real  , optional       Working area.
 ! 
 subroutine  psb_dspsv(alpha,a,x,beta,y,desc_a,info,&
-     & trans, side, choice, diag, work)   
+     & trans, scale, choice, diag, work)   
   use psb_descriptor_type
   use psb_comm_mod
   use psi_mod
@@ -380,7 +380,7 @@ subroutine  psb_dspsv(alpha,a,x,beta,y,desc_a,info,&
   integer, intent(out)                      :: info
   real(psb_dpk_), intent(in), optional, target    :: diag(:)
   real(psb_dpk_), optional, target        :: work(:)
-  character, intent(in), optional           :: trans, side
+  character, intent(in), optional           :: trans, scale
   integer, intent(in), optional             :: choice
 
   ! locals
@@ -389,7 +389,7 @@ subroutine  psb_dspsv(alpha,a,x,beta,y,desc_a,info,&
        & ix, iy, ik, jx, jy, i, lld,&
        & m, nrow, ncol, liwork, llwork, iiy, jjy, idx, ndm
 
-  character                :: lside
+  character                :: lscale
   integer, parameter       :: nb=4
   real(psb_dpk_),pointer :: iwork(:), xp(:), yp(:), id(:)
   character                :: itrans
@@ -425,10 +425,10 @@ subroutine  psb_dspsv(alpha,a,x,beta,y,desc_a,info,&
     choice_ = psb_avg_
   endif
 
-  if (present(side)) then     
-    lside = psb_toupper(side)
+  if (present(scale)) then     
+    lscale = psb_toupper(scale)
   else
-    lside = 'U'
+    lscale = 'U'
   endif
 
   if (present(trans)) then     
@@ -525,7 +525,7 @@ subroutine  psb_dspsv(alpha,a,x,beta,y,desc_a,info,&
   ! Perform local triangular system solve
   xp => x(iix:lldx)
   yp => y(iiy:lldy)
-  call psb_cssm(alpha,a,xp,beta,yp,info,side=side,d=diag,trans=trans)
+  call psb_cssm(alpha,a,xp,beta,yp,info,scale=scale,d=diag,trans=trans)
 
   if(info /= 0) then
     info = 4010

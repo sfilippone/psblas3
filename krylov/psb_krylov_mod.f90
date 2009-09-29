@@ -48,14 +48,14 @@ Module psb_krylov_mod
       use psb_base_mod, only  : psb_desc_type, psb_s_sparse_mat, psb_spk_
       use psb_prec_mod, only : psb_sprec_type
       type(psb_s_sparse_mat), intent(in)  :: a
-      type(psb_desc_type), intent(in)    :: desc_a
-      real(psb_spk_), intent(in)       :: b(:)
-      real(psb_spk_), intent(inout)    :: x(:)
-      real(psb_spk_), intent(in)       :: eps
+      type(psb_desc_type), intent(in)     :: desc_a
+      real(psb_spk_), intent(in)          :: b(:)
+      real(psb_spk_), intent(inout)       :: x(:)
+      real(psb_spk_), intent(in)          :: eps
       class(psb_sprec_type), intent(in)   :: prec
-      integer, intent(out)               :: info
-      integer, optional, intent(in)      :: itmax, itrace,istop
-      integer, optional, intent(out)     :: iter
+      integer, intent(out)                :: info
+      integer, optional, intent(in)       :: itmax, itrace,istop
+      integer, optional, intent(out)      :: iter
       real(psb_spk_), optional, intent(out) :: err,cond
     end subroutine psb_scg
     subroutine psb_dcg(a,prec,b,x,eps,&
@@ -63,14 +63,14 @@ Module psb_krylov_mod
       use psb_base_mod, only  : psb_desc_type, psb_d_sparse_mat, psb_dpk_
       use psb_prec_mod, only : psb_dprec_type
       type(psb_d_sparse_mat), intent(in)  :: a
-      type(psb_desc_type), intent(in)    :: desc_a
-      real(psb_dpk_), intent(in)       :: b(:)
-      real(psb_dpk_), intent(inout)    :: x(:)
-      real(psb_dpk_), intent(in)       :: eps
+      type(psb_desc_type), intent(in)     :: desc_a
+      real(psb_dpk_), intent(in)          :: b(:)
+      real(psb_dpk_), intent(inout)       :: x(:)
+      real(psb_dpk_), intent(in)          :: eps
       class(psb_dprec_type), intent(in)   :: prec
-      integer, intent(out)               :: info
-      integer, optional, intent(in)      :: itmax, itrace,istop
-      integer, optional, intent(out)     :: iter
+      integer, intent(out)                :: info
+      integer, optional, intent(in)       :: itmax, itrace,istop
+      integer, optional, intent(out)      :: iter
       real(psb_dpk_), optional, intent(out) :: err,cond
     end subroutine psb_dcg
     subroutine psb_ccg(a,prec,b,x,eps,&
@@ -78,14 +78,14 @@ Module psb_krylov_mod
       use psb_base_mod, only  : psb_desc_type, psb_c_sparse_mat, psb_spk_
       use psb_prec_mod, only : psb_cprec_type
       type(psb_c_sparse_mat), intent(in)  :: a
-      type(psb_desc_type), intent(in)    :: desc_a
-      complex(psb_spk_), intent(in)    :: b(:)
-      complex(psb_spk_), intent(inout) :: x(:)
-      real(psb_spk_), intent(in)       :: eps
+      type(psb_desc_type), intent(in)     :: desc_a
+      complex(psb_spk_), intent(in)       :: b(:)
+      complex(psb_spk_), intent(inout)    :: x(:)
+      real(psb_spk_), intent(in)          :: eps
       class(psb_cprec_type), intent(in)   :: prec
-      integer, intent(out)               :: info
-      integer, optional, intent(in)      :: itmax, itrace,istop
-      integer, optional, intent(out)     :: iter
+      integer, intent(out)                :: info
+      integer, optional, intent(in)       :: itmax, itrace,istop
+      integer, optional, intent(out)      :: iter
       real(psb_spk_), optional, intent(out) :: err
     end subroutine psb_ccg
     subroutine psb_zcg(a,prec,b,x,eps,&
@@ -93,14 +93,14 @@ Module psb_krylov_mod
       use psb_base_mod, only  : psb_desc_type, psb_z_sparse_mat, psb_dpk_
       use psb_prec_mod, only : psb_zprec_type
       type(psb_z_sparse_mat), intent(in)  :: a
-      type(psb_desc_type), intent(in)    :: desc_a
-      complex(psb_dpk_), intent(in)    :: b(:)
-      complex(psb_dpk_), intent(inout) :: x(:)
-      real(psb_dpk_), intent(in)       :: eps
+      type(psb_desc_type), intent(in)     :: desc_a
+      complex(psb_dpk_), intent(in)       :: b(:)
+      complex(psb_dpk_), intent(inout)    :: x(:)
+      real(psb_dpk_), intent(in)          :: eps
       class(psb_zprec_type), intent(in)   :: prec
-      integer, intent(out)               :: info
-      integer, optional, intent(in)      :: itmax, itrace,istop
-      integer, optional, intent(out)     :: iter
+      integer, intent(out)                :: info
+      integer, optional, intent(in)       :: itmax, itrace,istop
+      integer, optional, intent(out)      :: iter
       real(psb_dpk_), optional, intent(out) :: err
     end subroutine psb_zcg
   end interface
@@ -111,14 +111,14 @@ Module psb_krylov_mod
       use psb_base_mod, only  : psb_desc_type, psb_s_sparse_mat, psb_spk_
       use psb_prec_mod, only : psb_sprec_type
       type(psb_s_sparse_mat), intent(in)  :: a
-      type(psb_desc_type), intent(in)    :: desc_a
-      real(psb_spk_), intent(in)       :: b(:)
-      real(psb_spk_), intent(inout)    :: x(:)
-      real(psb_spk_), intent(in)       :: eps
+      type(psb_desc_type), intent(in)     :: desc_a
+      real(psb_spk_), intent(in)          :: b(:)
+      real(psb_spk_), intent(inout)       :: x(:)
+      real(psb_spk_), intent(in)          :: eps
       class(psb_sprec_type), intent(in)   :: prec
-      integer, intent(out)               :: info
-      integer, optional, intent(in)      :: itmax, itrace,istop
-      integer, optional, intent(out)     :: iter
+      integer, intent(out)                :: info
+      integer, optional, intent(in)       :: itmax, itrace,istop
+      integer, optional, intent(out)      :: iter
       real(psb_spk_), optional, intent(out) :: err
     end subroutine psb_sbicg
     subroutine psb_dbicg(a,prec,b,x,eps,&
@@ -126,14 +126,14 @@ Module psb_krylov_mod
       use psb_base_mod, only  : psb_desc_type, psb_d_sparse_mat, psb_dpk_
       use psb_prec_mod, only : psb_dprec_type
       type(psb_d_sparse_mat), intent(in)  :: a
-      type(psb_desc_type), intent(in)    :: desc_a
-      real(psb_dpk_), intent(in)         :: b(:)
-      real(psb_dpk_), intent(inout)      :: x(:)
-      real(psb_dpk_), intent(in)         :: eps
+      type(psb_desc_type), intent(in)     :: desc_a
+      real(psb_dpk_), intent(in)          :: b(:)
+      real(psb_dpk_), intent(inout)       :: x(:)
+      real(psb_dpk_), intent(in)          :: eps
       class(psb_dprec_type), intent(in)   :: prec
-      integer, intent(out)               :: info
-      integer, optional, intent(in)      :: itmax, itrace,istop
-      integer, optional, intent(out)     :: iter
+      integer, intent(out)                :: info
+      integer, optional, intent(in)       :: itmax, itrace,istop
+      integer, optional, intent(out)      :: iter
       real(psb_dpk_), optional, intent(out) :: err
     end subroutine psb_dbicg
     subroutine psb_cbicg(a,prec,b,x,eps,&
@@ -141,14 +141,14 @@ Module psb_krylov_mod
       use psb_base_mod, only  : psb_desc_type, psb_c_sparse_mat, psb_spk_
       use psb_prec_mod, only : psb_cprec_type
       type(psb_c_sparse_mat), intent(in)  :: a
-      type(psb_desc_type), intent(in)    :: desc_a
-      complex(psb_spk_), intent(in)      :: b(:)
-      complex(psb_spk_), intent(inout)   :: x(:)
-      real(psb_spk_), intent(in)         :: eps
+      type(psb_desc_type), intent(in)     :: desc_a
+      complex(psb_spk_), intent(in)       :: b(:)
+      complex(psb_spk_), intent(inout)    :: x(:)
+      real(psb_spk_), intent(in)          :: eps
       class(psb_cprec_type), intent(in)   :: prec
-      integer, intent(out)               :: info
-      integer, optional, intent(in)      :: itmax, itrace,istop
-      integer, optional, intent(out)     :: iter
+      integer, intent(out)                :: info
+      integer, optional, intent(in)       :: itmax, itrace,istop
+      integer, optional, intent(out)      :: iter
       real(psb_spk_), optional, intent(out) :: err
     end subroutine psb_cbicg
     subroutine psb_zbicg(a,prec,b,x,eps,&
@@ -156,14 +156,14 @@ Module psb_krylov_mod
       use psb_base_mod, only  : psb_desc_type, psb_z_sparse_mat, psb_dpk_
       use psb_prec_mod, only : psb_zprec_type
       type(psb_z_sparse_mat), intent(in)  :: a
-      type(psb_desc_type), intent(in)    :: desc_a
-      complex(psb_dpk_), intent(in)      :: b(:)
-      complex(psb_dpk_), intent(inout)   :: x(:)
-      real(psb_dpk_), intent(in)         :: eps
+      type(psb_desc_type), intent(in)     :: desc_a
+      complex(psb_dpk_), intent(in)       :: b(:)
+      complex(psb_dpk_), intent(inout)    :: x(:)
+      real(psb_dpk_), intent(in)          :: eps
       class(psb_zprec_type), intent(in)   :: prec
-      integer, intent(out)               :: info
-      integer, optional, intent(in)      :: itmax, itrace,istop
-      integer, optional, intent(out)     :: iter
+      integer, intent(out)                :: info
+      integer, optional, intent(in)       :: itmax, itrace,istop
+      integer, optional, intent(out)      :: iter
       real(psb_dpk_), optional, intent(out) :: err
     end subroutine psb_zbicg
   end interface
@@ -174,14 +174,14 @@ Module psb_krylov_mod
       use psb_base_mod, only  : psb_desc_type, psb_s_sparse_mat, psb_spk_
       use psb_prec_mod, only : psb_sprec_type
       type(psb_s_sparse_mat), intent(in)  :: a
-      type(psb_desc_type), intent(in)    :: desc_a
-      real(psb_spk_), intent(in)       :: b(:)
-      real(psb_spk_), intent(inout)    :: x(:)
-      real(psb_spk_), intent(in)       :: eps
+      type(psb_desc_type), intent(in)     :: desc_a
+      real(psb_spk_), intent(in)          :: b(:)
+      real(psb_spk_), intent(inout)       :: x(:)
+      real(psb_spk_), intent(in)          :: eps
       class(psb_sprec_type), intent(in)   :: prec
-      integer, intent(out)               :: info
-      integer, optional, intent(in)      :: itmax, itrace,istop
-      integer, optional, intent(out)     :: iter
+      integer, intent(out)                :: info
+      integer, optional, intent(in)       :: itmax, itrace,istop
+      integer, optional, intent(out)      :: iter
       real(psb_spk_), optional, intent(out) :: err
     end subroutine psb_scgstab
     subroutine psb_dcgstab(a,prec,b,x,eps,&
@@ -189,14 +189,14 @@ Module psb_krylov_mod
       use psb_base_mod, only  : psb_desc_type, psb_d_sparse_mat, psb_dpk_
       use psb_prec_mod, only : psb_dprec_type
       type(psb_d_sparse_mat), intent(in)  :: a
-      type(psb_desc_type), intent(in)    :: desc_a
-      real(psb_dpk_), intent(in)       :: b(:)
-      real(psb_dpk_), intent(inout)    :: x(:)
-      real(psb_dpk_), intent(in)       :: eps
+      type(psb_desc_type), intent(in)     :: desc_a
+      real(psb_dpk_), intent(in)          :: b(:)
+      real(psb_dpk_), intent(inout)       :: x(:)
+      real(psb_dpk_), intent(in)          :: eps
       class(psb_dprec_type), intent(in)   :: prec
-      integer, intent(out)               :: info
-      integer, optional, intent(in)      :: itmax, itrace,istop
-      integer, optional, intent(out)     :: iter
+      integer, intent(out)                :: info
+      integer, optional, intent(in)       :: itmax, itrace,istop
+      integer, optional, intent(out)      :: iter
       real(psb_dpk_), optional, intent(out) :: err
     end subroutine psb_dcgstab
     subroutine psb_ccgstab(a,prec,b,x,eps,&
@@ -204,14 +204,14 @@ Module psb_krylov_mod
       use psb_base_mod, only  : psb_desc_type, psb_c_sparse_mat, psb_spk_
       use psb_prec_mod, only : psb_cprec_type
       type(psb_c_sparse_mat), intent(in)  :: a
-      type(psb_desc_type), intent(in)    :: desc_a
+      type(psb_desc_type), intent(in)     :: desc_a
       complex(psb_spk_), intent(in)       :: b(:)
       complex(psb_spk_), intent(inout)    :: x(:)
-      real(psb_spk_), intent(in)       :: eps
+      real(psb_spk_), intent(in)          :: eps
       class(psb_cprec_type), intent(in)   :: prec
-      integer, intent(out)               :: info
-      integer, optional, intent(in)      :: itmax, itrace,istop
-      integer, optional, intent(out)     :: iter
+      integer, intent(out)                :: info
+      integer, optional, intent(in)       :: itmax, itrace,istop
+      integer, optional, intent(out)      :: iter
       real(psb_spk_), optional, intent(out) :: err
     end subroutine psb_ccgstab
     subroutine psb_zcgstab(a,prec,b,x,eps,&
@@ -219,14 +219,14 @@ Module psb_krylov_mod
       use psb_base_mod, only  : psb_desc_type, psb_z_sparse_mat, psb_dpk_
       use psb_prec_mod, only : psb_zprec_type
       type(psb_z_sparse_mat), intent(in)  :: a
-      type(psb_desc_type), intent(in)    :: desc_a
+      type(psb_desc_type), intent(in)     :: desc_a
       complex(psb_dpk_), intent(in)       :: b(:)
       complex(psb_dpk_), intent(inout)    :: x(:)
-      real(psb_dpk_), intent(in)       :: eps
+      real(psb_dpk_), intent(in)          :: eps
       class(psb_zprec_type), intent(in)   :: prec
-      integer, intent(out)               :: info
-      integer, optional, intent(in)      :: itmax, itrace,istop
-      integer, optional, intent(out)     :: iter
+      integer, intent(out)                :: info
+      integer, optional, intent(in)       :: itmax, itrace,istop
+      integer, optional, intent(out)      :: iter
       real(psb_dpk_), optional, intent(out) :: err
     end subroutine psb_zcgstab
   end interface
@@ -237,14 +237,14 @@ Module psb_krylov_mod
       use psb_base_mod, only  : psb_desc_type, psb_s_sparse_mat, psb_spk_
       use psb_prec_mod, only : psb_sprec_type
       Type(psb_s_sparse_mat), Intent(in)  :: a
-      Type(psb_desc_type), Intent(in)    :: desc_a
+      Type(psb_desc_type), Intent(in)     :: desc_a
       class(psb_sprec_type), intent(in)   :: prec
-      Real(psb_spk_), Intent(in)       :: b(:)
-      Real(psb_spk_), Intent(inout)    :: x(:)
-      Real(psb_spk_), Intent(in)       :: eps
-      integer, intent(out)               :: info
-      Integer, Optional, Intent(in)      :: itmax, itrace, irst,istop
-      Integer, Optional, Intent(out)     :: iter
+      Real(psb_spk_), Intent(in)          :: b(:)
+      Real(psb_spk_), Intent(inout)       :: x(:)
+      Real(psb_spk_), Intent(in)          :: eps
+      integer, intent(out)                :: info
+      Integer, Optional, Intent(in)       :: itmax, itrace, irst,istop
+      Integer, Optional, Intent(out)      :: iter
       Real(psb_spk_), Optional, Intent(out) :: err
     end subroutine psb_scgstabl
     Subroutine psb_dcgstabl(a,prec,b,x,eps,desc_a,info,&
@@ -252,14 +252,14 @@ Module psb_krylov_mod
       use psb_base_mod, only  : psb_desc_type, psb_d_sparse_mat, psb_dpk_
       use psb_prec_mod, only : psb_dprec_type
       type(psb_d_sparse_mat), intent(in)  :: a
-      Type(psb_desc_type), Intent(in)    :: desc_a
+      Type(psb_desc_type), Intent(in)     :: desc_a
       class(psb_dprec_type), intent(in)   :: prec
-      Real(psb_dpk_), Intent(in)       :: b(:)
-      Real(psb_dpk_), Intent(inout)    :: x(:)
-      Real(psb_dpk_), Intent(in)       :: eps
-      integer, intent(out)               :: info
-      Integer, Optional, Intent(in)      :: itmax, itrace, irst,istop
-      Integer, Optional, Intent(out)     :: iter
+      Real(psb_dpk_), Intent(in)          :: b(:)
+      Real(psb_dpk_), Intent(inout)       :: x(:)
+      Real(psb_dpk_), Intent(in)          :: eps
+      integer, intent(out)                :: info
+      Integer, Optional, Intent(in)       :: itmax, itrace, irst,istop
+      Integer, Optional, Intent(out)      :: iter
       Real(psb_dpk_), Optional, Intent(out) :: err
     end subroutine psb_dcgstabl
     Subroutine psb_ccgstabl(a,prec,b,x,eps,desc_a,info,&
@@ -267,14 +267,14 @@ Module psb_krylov_mod
       use psb_base_mod, only  : psb_desc_type, psb_c_sparse_mat, psb_spk_
       use psb_prec_mod, only : psb_cprec_type
       Type(psb_c_sparse_mat), Intent(in)  :: a
-      Type(psb_desc_type), Intent(in)    :: desc_a
+      Type(psb_desc_type), Intent(in)     :: desc_a
       class(psb_cprec_type), intent(in)   :: prec 
-      complex(psb_spk_), Intent(in)    :: b(:)
-      complex(psb_spk_), Intent(inout) :: x(:)
-      Real(psb_spk_), Intent(in)       :: eps
-      integer, intent(out)               :: info
-      Integer, Optional, Intent(in)      :: itmax, itrace, irst,istop
-      Integer, Optional, Intent(out)     :: iter
+      complex(psb_spk_), Intent(in)       :: b(:)
+      complex(psb_spk_), Intent(inout)    :: x(:)
+      Real(psb_spk_), Intent(in)          :: eps
+      integer, intent(out)                :: info
+      Integer, Optional, Intent(in)       :: itmax, itrace, irst,istop
+      Integer, Optional, Intent(out)      :: iter
       Real(psb_spk_), Optional, Intent(out) :: err
     end subroutine psb_ccgstabl
     Subroutine psb_zcgstabl(a,prec,b,x,eps,desc_a,info,&
@@ -282,14 +282,14 @@ Module psb_krylov_mod
       use psb_base_mod, only  : psb_desc_type, psb_z_sparse_mat, psb_dpk_
       use psb_prec_mod, only : psb_zprec_type
       Type(psb_z_sparse_mat), Intent(in)  :: a
-      Type(psb_desc_type), Intent(in)    :: desc_a
+      Type(psb_desc_type), Intent(in)     :: desc_a
       class(psb_zprec_type), intent(in)   :: prec 
-      complex(psb_dpk_), Intent(in)    :: b(:)
-      complex(psb_dpk_), Intent(inout) :: x(:)
-      Real(psb_dpk_), Intent(in)       :: eps
-      integer, intent(out)               :: info
-      Integer, Optional, Intent(in)      :: itmax, itrace, irst,istop
-      Integer, Optional, Intent(out)     :: iter
+      complex(psb_dpk_), Intent(in)       :: b(:)
+      complex(psb_dpk_), Intent(inout)    :: x(:)
+      Real(psb_dpk_), Intent(in)          :: eps
+      integer, intent(out)                :: info
+      Integer, Optional, Intent(in)       :: itmax, itrace, irst,istop
+      Integer, Optional, Intent(out)      :: iter
       Real(psb_dpk_), Optional, Intent(out) :: err
     end subroutine psb_zcgstabl
   end interface
@@ -300,14 +300,14 @@ Module psb_krylov_mod
       use psb_base_mod, only  : psb_desc_type, psb_s_sparse_mat, psb_spk_
       use psb_prec_mod, only : psb_sprec_type
       Type(psb_s_sparse_mat), Intent(in)  :: a
-      Type(psb_desc_type), Intent(in)    :: desc_a
+      Type(psb_desc_type), Intent(in)     :: desc_a
       class(psb_sprec_type), intent(in)   :: prec 
-      Real(psb_spk_), Intent(in)       :: b(:)
-      Real(psb_spk_), Intent(inout)    :: x(:)
-      Real(psb_spk_), Intent(in)       :: eps
-      integer, intent(out)               :: info
-      Integer, Optional, Intent(in)      :: itmax, itrace, irst,istop
-      Integer, Optional, Intent(out)     :: iter
+      Real(psb_spk_), Intent(in)          :: b(:)
+      Real(psb_spk_), Intent(inout)       :: x(:)
+      Real(psb_spk_), Intent(in)          :: eps
+      integer, intent(out)                :: info
+      Integer, Optional, Intent(in)       :: itmax, itrace, irst,istop
+      Integer, Optional, Intent(out)      :: iter
       Real(psb_spk_), Optional, Intent(out) :: err
     end subroutine psb_srgmres
     Subroutine psb_drgmres(a,prec,b,x,eps,desc_a,info,&
@@ -315,14 +315,14 @@ Module psb_krylov_mod
       use psb_base_mod, only  : psb_desc_type, psb_d_sparse_mat, psb_dpk_
       use psb_prec_mod, only : psb_dprec_type
       type(psb_d_sparse_mat), intent(in)  :: a
-      Type(psb_desc_type), Intent(in)    :: desc_a
+      Type(psb_desc_type), Intent(in)     :: desc_a
       class(psb_dprec_type), intent(in)   :: prec 
-      Real(psb_dpk_), Intent(in)       :: b(:)
-      Real(psb_dpk_), Intent(inout)    :: x(:)
-      Real(psb_dpk_), Intent(in)       :: eps
-      integer, intent(out)               :: info
-      Integer, Optional, Intent(in)      :: itmax, itrace, irst,istop
-      Integer, Optional, Intent(out)     :: iter
+      Real(psb_dpk_), Intent(in)          :: b(:)
+      Real(psb_dpk_), Intent(inout)       :: x(:)
+      Real(psb_dpk_), Intent(in)          :: eps
+      integer, intent(out)                :: info
+      Integer, Optional, Intent(in)       :: itmax, itrace, irst,istop
+      Integer, Optional, Intent(out)      :: iter
       Real(psb_dpk_), Optional, Intent(out) :: err
     end subroutine psb_drgmres
     Subroutine psb_crgmres(a,prec,b,x,eps,desc_a,info,&
@@ -330,14 +330,14 @@ Module psb_krylov_mod
       use psb_base_mod, only  : psb_desc_type, psb_c_sparse_mat, psb_spk_
       use psb_prec_mod, only : psb_cprec_type
       Type(psb_c_sparse_mat), Intent(in)  :: a
-      Type(psb_desc_type), Intent(in)    :: desc_a
+      Type(psb_desc_type), Intent(in)     :: desc_a
       class(psb_cprec_type), intent(in)   :: prec 
-      complex(psb_spk_), Intent(in)    :: b(:)
-      complex(psb_spk_), Intent(inout) :: x(:)
-      Real(psb_spk_), Intent(in)       :: eps
-      integer, intent(out)               :: info
-      Integer, Optional, Intent(in)      :: itmax, itrace, irst,istop
-      Integer, Optional, Intent(out)     :: iter
+      complex(psb_spk_), Intent(in)       :: b(:)
+      complex(psb_spk_), Intent(inout)    :: x(:)
+      Real(psb_spk_), Intent(in)          :: eps
+      integer, intent(out)                :: info
+      Integer, Optional, Intent(in)       :: itmax, itrace, irst,istop
+      Integer, Optional, Intent(out)      :: iter
       Real(psb_spk_), Optional, Intent(out) :: err
     end subroutine psb_crgmres
     Subroutine psb_zrgmres(a,prec,b,x,eps,desc_a,info,&
@@ -345,14 +345,14 @@ Module psb_krylov_mod
       use psb_base_mod, only  : psb_desc_type, psb_z_sparse_mat, psb_dpk_
       use psb_prec_mod, only : psb_zprec_type
       Type(psb_z_sparse_mat), Intent(in)  :: a
-      Type(psb_desc_type), Intent(in)    :: desc_a
+      Type(psb_desc_type), Intent(in)     :: desc_a
       class(psb_zprec_type), intent(in)   :: prec 
-      complex(psb_dpk_), Intent(in)    :: b(:)
-      complex(psb_dpk_), Intent(inout) :: x(:)
-      Real(psb_dpk_), Intent(in)       :: eps
-      integer, intent(out)               :: info
-      Integer, Optional, Intent(in)      :: itmax, itrace, irst,istop
-      Integer, Optional, Intent(out)     :: iter
+      complex(psb_dpk_), Intent(in)       :: b(:)
+      complex(psb_dpk_), Intent(inout)    :: x(:)
+      Real(psb_dpk_), Intent(in)          :: eps
+      integer, intent(out)                :: info
+      Integer, Optional, Intent(in)       :: itmax, itrace, irst,istop
+      Integer, Optional, Intent(out)      :: iter
       Real(psb_dpk_), Optional, Intent(out) :: err
     end subroutine psb_zrgmres
   end interface
@@ -363,14 +363,14 @@ Module psb_krylov_mod
       use psb_base_mod, only  : psb_desc_type, psb_s_sparse_mat, psb_spk_
       use psb_prec_mod, only : psb_sprec_type
       type(psb_s_sparse_mat), intent(in)  :: a
-      type(psb_desc_type), intent(in)    :: desc_a 
+      type(psb_desc_type), intent(in)     :: desc_a 
       class(psb_sprec_type), intent(in)   :: prec 
-      real(psb_spk_), intent(in)       :: b(:)
-      real(psb_spk_), intent(inout)    :: x(:)
-      real(psb_spk_), intent(in)       :: eps
-      integer, intent(out)               :: info
-      integer, optional, intent(in)      :: itmax, itrace,istop
-      integer, optional, intent(out)     :: iter
+      real(psb_spk_), intent(in)          :: b(:)
+      real(psb_spk_), intent(inout)       :: x(:)
+      real(psb_spk_), intent(in)          :: eps
+      integer, intent(out)                :: info
+      integer, optional, intent(in)       :: itmax, itrace,istop
+      integer, optional, intent(out)      :: iter
       real(psb_spk_), optional, intent(out) :: err
     end subroutine psb_scgs
     subroutine psb_dcgs(a,prec,b,x,eps,desc_a,info,&
@@ -378,14 +378,14 @@ Module psb_krylov_mod
       use psb_base_mod, only  : psb_desc_type, psb_d_sparse_mat, psb_dpk_
       use psb_prec_mod, only : psb_dprec_type
       type(psb_d_sparse_mat), intent(in)  :: a
-      type(psb_desc_type), intent(in)    :: desc_a 
+      type(psb_desc_type), intent(in)     :: desc_a 
       class(psb_dprec_type), intent(in)   :: prec 
-      real(psb_dpk_), intent(in)       :: b(:)
-      real(psb_dpk_), intent(inout)    :: x(:)
-      real(psb_dpk_), intent(in)       :: eps
-      integer, intent(out)               :: info
-      integer, optional, intent(in)      :: itmax, itrace,istop
-      integer, optional, intent(out)     :: iter
+      real(psb_dpk_), intent(in)          :: b(:)
+      real(psb_dpk_), intent(inout)       :: x(:)
+      real(psb_dpk_), intent(in)          :: eps
+      integer, intent(out)                :: info
+      integer, optional, intent(in)       :: itmax, itrace,istop
+      integer, optional, intent(out)      :: iter
       real(psb_dpk_), optional, intent(out) :: err
     end subroutine psb_dcgs
     subroutine psb_ccgs(a,prec,b,x,eps,&
@@ -393,14 +393,14 @@ Module psb_krylov_mod
       use psb_base_mod, only  : psb_desc_type, psb_c_sparse_mat, psb_spk_
       use psb_prec_mod, only : psb_cprec_type
       type(psb_c_sparse_mat), intent(in)  :: a
-      type(psb_desc_type), intent(in)    :: desc_a
+      type(psb_desc_type), intent(in)     :: desc_a
       complex(psb_spk_), intent(in)       :: b(:)
       complex(psb_spk_), intent(inout)    :: x(:)
-      real(psb_spk_), intent(in)       :: eps
+      real(psb_spk_), intent(in)          :: eps
       class(psb_cprec_type), intent(in)   :: prec
-      integer, intent(out)               :: info
-      integer, optional, intent(in)      :: itmax, itrace,istop
-      integer, optional, intent(out)     :: iter
+      integer, intent(out)                :: info
+      integer, optional, intent(in)       :: itmax, itrace,istop
+      integer, optional, intent(out)      :: iter
       real(psb_spk_), optional, intent(out) :: err
     end subroutine psb_ccgs
     subroutine psb_zcgs(a,prec,b,x,eps,&
@@ -408,14 +408,14 @@ Module psb_krylov_mod
       use psb_base_mod, only  : psb_desc_type, psb_z_sparse_mat, psb_dpk_
       use psb_prec_mod, only : psb_zprec_type
       type(psb_z_sparse_mat), intent(in)  :: a
-      type(psb_desc_type), intent(in)    :: desc_a
+      type(psb_desc_type), intent(in)     :: desc_a
       complex(psb_dpk_), intent(in)       :: b(:)
       complex(psb_dpk_), intent(inout)    :: x(:)
-      real(psb_dpk_), intent(in)       :: eps
+      real(psb_dpk_), intent(in)          :: eps
       class(psb_zprec_type), intent(in)   :: prec
-      integer, intent(out)               :: info
-      integer, optional, intent(in)      :: itmax, itrace,istop
-      integer, optional, intent(out)     :: iter
+      integer, intent(out)                :: info
+      integer, optional, intent(in)       :: itmax, itrace,istop
+      integer, optional, intent(out)      :: iter
       real(psb_dpk_), optional, intent(out) :: err
     end subroutine psb_zcgs
   end interface

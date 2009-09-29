@@ -902,7 +902,7 @@ contains
 
   end subroutine z_base_cssv
 
-  subroutine z_cssm(alpha,a,x,beta,y,info,trans,side,d) 
+  subroutine z_cssm(alpha,a,x,beta,y,info,trans,scale,d) 
     use psb_error_mod
     use psb_string_mod
     implicit none 
@@ -910,12 +910,12 @@ contains
     complex(psb_dpk_), intent(in)    :: alpha, beta, x(:,:)
     complex(psb_dpk_), intent(inout) :: y(:,:)
     integer, intent(out)            :: info
-    character, optional, intent(in) :: trans, side
+    character, optional, intent(in) :: trans, scale
     complex(psb_dpk_), intent(in), optional :: d(:)
     
     complex(psb_dpk_), allocatable :: tmp(:,:)
     Integer :: err_act, nar,nac,nc, i
-    character(len=1) :: side_
+    character(len=1) :: scale_
     character(len=20)  :: name='z_cssm'
     logical, parameter :: debug=.false.
 
@@ -948,13 +948,13 @@ contains
     end if
 
     if (present(d)) then 
-      if (present(side)) then 
-        side_ = side
+      if (present(scale)) then 
+        scale_ = scale
       else
-        side_ = 'L'
+        scale_ = 'L'
       end if
         
-      if (psb_toupper(side_) == 'R') then 
+      if (psb_toupper(scale_) == 'R') then 
         if (size(d,1) < nac) then
           info = 36
           call psb_errpush(info,name,i_err=(/9,nac,0,0,0/))
@@ -976,7 +976,7 @@ contains
           if (info /= 0) info = 4000
         end if
       
-      else if (psb_toupper(side_) == 'L') then 
+      else if (psb_toupper(scale_) == 'L') then 
         
         if (size(d,1) < nar) then
           info = 36
@@ -1004,11 +1004,11 @@ contains
         
       else
         info = 31
-        call psb_errpush(info,name,i_err=(/8,0,0,0,0/),a_err=side_)
+        call psb_errpush(info,name,i_err=(/8,0,0,0,0/),a_err=scale_)
         goto 9999
       end if
     else 
-      ! Side is ignored in this case 
+      ! Scale is ignored in this case 
       call a%base_cssm(alpha,x,beta,y,info,trans)
     end if
     
@@ -1036,7 +1036,7 @@ contains
 
   end subroutine z_cssm
 
-  subroutine z_cssv(alpha,a,x,beta,y,info,trans,side,d) 
+  subroutine z_cssv(alpha,a,x,beta,y,info,trans,scale,d) 
     use psb_error_mod
     use psb_string_mod
     implicit none 
@@ -1044,12 +1044,12 @@ contains
     complex(psb_dpk_), intent(in)    :: alpha, beta, x(:)
     complex(psb_dpk_), intent(inout) :: y(:)
     integer, intent(out)            :: info
-    character, optional, intent(in) :: trans, side
+    character, optional, intent(in) :: trans, scale
     complex(psb_dpk_), intent(in), optional :: d(:)
     
     complex(psb_dpk_), allocatable :: tmp(:)
     Integer :: err_act, nar,nac,nc, i
-    character(len=1) :: side_
+    character(len=1) :: scale_
     character(len=20)  :: name='z_cssm'
     logical, parameter :: debug=.false.
 
@@ -1082,13 +1082,13 @@ contains
     end if
 
     if (present(d)) then 
-      if (present(side)) then 
-        side_ = side
+      if (present(scale)) then 
+        scale_ = scale
       else
-        side_ = 'L'
+        scale_ = 'L'
       end if
         
-      if (psb_toupper(side_) == 'R') then 
+      if (psb_toupper(scale_) == 'R') then 
         if (size(d,1) < nac) then
           info = 36
           call psb_errpush(info,name,i_err=(/9,nac,0,0,0/))
@@ -1106,7 +1106,7 @@ contains
           if (info /= 0) info = 4000
         end if
       
-      else if (psb_toupper(side_) == 'L') then 
+      else if (psb_toupper(scale_) == 'L') then 
         if (size(d,1) < nar) then
           info = 36
           call psb_errpush(info,name,i_err=(/9,nar,0,0,0/))
@@ -1129,11 +1129,11 @@ contains
         
       else
         info = 31
-        call psb_errpush(info,name,i_err=(/8,0,0,0,0/),a_err=side_)
+        call psb_errpush(info,name,i_err=(/8,0,0,0,0/),a_err=scale_)
         goto 9999
       end if
     else 
-      ! Side is ignored in this case 
+      ! Scale is ignored in this case 
       call a%base_cssm(alpha,x,beta,y,info,trans)
     end if
 
