@@ -304,14 +304,14 @@ module psb_psblas_mod
       type(psb_desc_type), intent (in) :: desc_a
       integer, intent(out)               :: info
     end subroutine psb_samaxvs
-    subroutine  psb_smamax(res,x,desc_a,info,jx)
+    subroutine  psb_smamaxs(res,x,desc_a,info,jx)
       use psb_descriptor_type
       real(psb_spk_), intent (out)      :: res(:)
       real(psb_spk_), intent (in)       :: x(:,:)
       type(psb_desc_type), intent (in)    :: desc_a
       integer, intent(out)                :: info
       integer, optional                   :: jx
-    end subroutine psb_smamax
+    end subroutine psb_smamaxs
     subroutine  psb_damaxvs(res,x,desc_a,info)
       use psb_descriptor_type
       real(psb_dpk_), intent (out)      :: res
@@ -319,14 +319,14 @@ module psb_psblas_mod
       type(psb_desc_type), intent (in) :: desc_a
       integer, intent(out)               :: info
     end subroutine psb_damaxvs
-    subroutine  psb_dmamax(res,x,desc_a,info,jx)
+    subroutine  psb_dmamaxs(res,x,desc_a,info,jx)
       use psb_descriptor_type
       real(psb_dpk_), intent (out)      :: res(:)
       real(psb_dpk_), intent (in)       :: x(:,:)
       type(psb_desc_type), intent (in)    :: desc_a
       integer, intent(out)                :: info
       integer, optional                   :: jx
-    end subroutine psb_dmamax
+    end subroutine psb_dmamaxs
     subroutine  psb_camaxvs(res,x,desc_a,info)
       use psb_descriptor_type
       real(psb_spk_), intent (out)      :: res
@@ -334,14 +334,14 @@ module psb_psblas_mod
       type(psb_desc_type), intent (in) :: desc_a
       integer, intent(out)               :: info
     end subroutine psb_camaxvs
-    subroutine  psb_cmamax(res,x,desc_a,info,jx)
+    subroutine  psb_cmamaxs(res,x,desc_a,info,jx)
       use psb_descriptor_type
       real(psb_spk_), intent (out)      :: res(:)
       complex(psb_spk_), intent (in)       :: x(:,:)
       type(psb_desc_type), intent (in)    :: desc_a
       integer, intent(out)                :: info
       integer, optional                   :: jx
-    end subroutine psb_cmamax
+    end subroutine psb_cmamaxs
     subroutine  psb_zamaxvs(res,x,desc_a,info)
       use psb_descriptor_type
       real(psb_dpk_), intent (out)      :: res
@@ -349,14 +349,14 @@ module psb_psblas_mod
       type(psb_desc_type), intent (in) :: desc_a
       integer, intent(out)               :: info
     end subroutine psb_zamaxvs
-    subroutine  psb_zmamax(res,x,desc_a,info,jx)
+    subroutine  psb_zmamaxs(res,x,desc_a,info,jx)
       use psb_descriptor_type
       real(psb_dpk_), intent (out)      :: res(:)
       complex(psb_dpk_), intent (in)       :: x(:,:)
       type(psb_desc_type), intent (in)    :: desc_a
       integer, intent(out)                :: info
       integer, optional                   :: jx
-    end subroutine psb_zmamax
+    end subroutine psb_zmamaxs
   end interface
 
   interface psb_geasum
