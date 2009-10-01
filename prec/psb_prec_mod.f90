@@ -181,90 +181,90 @@ module psb_prec_mod
       integer, intent(out)                   :: info
     end subroutine psb_zprecsetd
   end interface
-
-
-  interface psb_precaply
-    subroutine psb_sprc_aply(prec,x,y,desc_data,info,trans,work)
-      use psb_base_mod, only  : psb_desc_type, psb_s_sparse_mat, psb_spk_
-      use psb_prec_type, only : psb_sprec_type
-      type(psb_desc_type),intent(in)    :: desc_data
-      type(psb_sprec_type), intent(in)  :: prec
-      real(psb_spk_),intent(in)       :: x(:)
-      real(psb_spk_),intent(inout)    :: y(:)
-      integer, intent(out)              :: info
-      character(len=1), optional        :: trans
-      real(psb_spk_),intent(inout), optional, target :: work(:)
-    end subroutine psb_sprc_aply
-    subroutine psb_sprc_aply1(prec,x,desc_data,info,trans)
-      use psb_base_mod, only  : psb_desc_type, psb_s_sparse_mat, psb_spk_
-      use psb_prec_type, only : psb_sprec_type
-      type(psb_desc_type),intent(in)    :: desc_data
-      type(psb_sprec_type), intent(in)  :: prec
-      real(psb_spk_),intent(inout)    :: x(:)
-      integer, intent(out)              :: info
-      character(len=1), optional        :: trans
-    end subroutine psb_sprc_aply1
-    subroutine psb_dprc_aply(prec,x,y,desc_data,info,trans,work)
-      use psb_base_mod, only  : psb_desc_type, psb_dpk_
-      use psb_prec_type, only : psb_dprec_type
-      type(psb_desc_type),intent(in)    :: desc_data
-      type(psb_dprec_type), intent(in)  :: prec
-      real(psb_dpk_),intent(in)       :: x(:)
-      real(psb_dpk_),intent(inout)    :: y(:)
-      integer, intent(out)              :: info
-      character(len=1), optional        :: trans
-      real(psb_dpk_),intent(inout), optional, target :: work(:)
-    end subroutine psb_dprc_aply
-    subroutine psb_dprc_aply1(prec,x,desc_data,info,trans)
-      use psb_base_mod, only  : psb_desc_type, psb_dpk_
-      use psb_prec_type, only : psb_dprec_type
-      type(psb_desc_type),intent(in)    :: desc_data
-      type(psb_dprec_type), intent(in)  :: prec
-      real(psb_dpk_),intent(inout)    :: x(:)
-      integer, intent(out)              :: info
-      character(len=1), optional        :: trans
-    end subroutine psb_dprc_aply1
-    subroutine psb_cprc_aply(prec,x,y,desc_data,info,trans,work)
-      use psb_base_mod, only  : psb_desc_type, psb_c_sparse_mat, psb_spk_
-      use psb_prec_type, only : psb_cprec_type
-      type(psb_desc_type),intent(in)    :: desc_data
-      type(psb_cprec_type), intent(in)  :: prec
-      complex(psb_spk_),intent(in)    :: x(:)
-      complex(psb_spk_),intent(inout) :: y(:)
-      integer, intent(out)              :: info
-      character(len=1), optional        :: trans
-      complex(psb_spk_),intent(inout), optional, target :: work(:)
-    end subroutine psb_cprc_aply
-    subroutine psb_cprc_aply1(prec,x,desc_data,info,trans)
-      use psb_base_mod, only  : psb_desc_type, psb_c_sparse_mat, psb_spk_
-      use psb_prec_type, only : psb_cprec_type
-      type(psb_desc_type),intent(in)    :: desc_data
-      type(psb_cprec_type), intent(in)  :: prec
-      complex(psb_spk_),intent(inout) :: x(:)
-      integer, intent(out)              :: info
-      character(len=1), optional        :: trans
-    end subroutine psb_cprc_aply1
-    subroutine psb_zprc_aply(prec,x,y,desc_data,info,trans,work)
-      use psb_base_mod, only  : psb_desc_type, psb_z_sparse_mat, psb_dpk_
-      use psb_prec_type, only : psb_zprec_type
-      type(psb_desc_type),intent(in)    :: desc_data
-      type(psb_zprec_type), intent(in)  :: prec
-      complex(psb_dpk_),intent(in)    :: x(:)
-      complex(psb_dpk_),intent(inout) :: y(:)
-      integer, intent(out)              :: info
-      character(len=1), optional        :: trans
-      complex(psb_dpk_),intent(inout), optional, target :: work(:)
-    end subroutine psb_zprc_aply
-    subroutine psb_zprc_aply1(prec,x,desc_data,info,trans)
-      use psb_base_mod, only  : psb_desc_type, psb_z_sparse_mat, psb_dpk_
-      use psb_prec_type, only : psb_zprec_type
-      type(psb_desc_type),intent(in)    :: desc_data
-      type(psb_zprec_type), intent(in)  :: prec
-      complex(psb_dpk_),intent(inout) :: x(:)
-      integer, intent(out)              :: info
-      character(len=1), optional        :: trans
-    end subroutine psb_zprc_aply1
-  end interface
+!!$
+!!$
+!!$  interface psb_precaply
+!!$    subroutine psb_sprc_aply(prec,x,y,desc_data,info,trans,work)
+!!$      use psb_base_mod, only  : psb_desc_type, psb_s_sparse_mat, psb_spk_
+!!$      use psb_prec_type, only : psb_sprec_type
+!!$      type(psb_desc_type),intent(in)    :: desc_data
+!!$      type(psb_sprec_type), intent(in)  :: prec
+!!$      real(psb_spk_),intent(in)       :: x(:)
+!!$      real(psb_spk_),intent(inout)    :: y(:)
+!!$      integer, intent(out)              :: info
+!!$      character(len=1), optional        :: trans
+!!$      real(psb_spk_),intent(inout), optional, target :: work(:)
+!!$    end subroutine psb_sprc_aply
+!!$    subroutine psb_sprc_aply1(prec,x,desc_data,info,trans)
+!!$      use psb_base_mod, only  : psb_desc_type, psb_s_sparse_mat, psb_spk_
+!!$      use psb_prec_type, only : psb_sprec_type
+!!$      type(psb_desc_type),intent(in)    :: desc_data
+!!$      type(psb_sprec_type), intent(in)  :: prec
+!!$      real(psb_spk_),intent(inout)    :: x(:)
+!!$      integer, intent(out)              :: info
+!!$      character(len=1), optional        :: trans
+!!$    end subroutine psb_sprc_aply1
+!!$    subroutine psb_dprc_aply(prec,x,y,desc_data,info,trans,work)
+!!$      use psb_base_mod, only  : psb_desc_type, psb_dpk_
+!!$      use psb_prec_type, only : psb_dprec_type
+!!$      type(psb_desc_type),intent(in)    :: desc_data
+!!$      type(psb_dprec_type), intent(in)  :: prec
+!!$      real(psb_dpk_),intent(in)       :: x(:)
+!!$      real(psb_dpk_),intent(inout)    :: y(:)
+!!$      integer, intent(out)              :: info
+!!$      character(len=1), optional        :: trans
+!!$      real(psb_dpk_),intent(inout), optional, target :: work(:)
+!!$    end subroutine psb_dprc_aply
+!!$    subroutine psb_dprc_aply1(prec,x,desc_data,info,trans)
+!!$      use psb_base_mod, only  : psb_desc_type, psb_dpk_
+!!$      use psb_prec_type, only : psb_dprec_type
+!!$      type(psb_desc_type),intent(in)    :: desc_data
+!!$      type(psb_dprec_type), intent(in)  :: prec
+!!$      real(psb_dpk_),intent(inout)    :: x(:)
+!!$      integer, intent(out)              :: info
+!!$      character(len=1), optional        :: trans
+!!$    end subroutine psb_dprc_aply1
+!!$    subroutine psb_cprc_aply(prec,x,y,desc_data,info,trans,work)
+!!$      use psb_base_mod, only  : psb_desc_type, psb_c_sparse_mat, psb_spk_
+!!$      use psb_prec_type, only : psb_cprec_type
+!!$      type(psb_desc_type),intent(in)    :: desc_data
+!!$      type(psb_cprec_type), intent(in)  :: prec
+!!$      complex(psb_spk_),intent(in)    :: x(:)
+!!$      complex(psb_spk_),intent(inout) :: y(:)
+!!$      integer, intent(out)              :: info
+!!$      character(len=1), optional        :: trans
+!!$      complex(psb_spk_),intent(inout), optional, target :: work(:)
+!!$    end subroutine psb_cprc_aply
+!!$    subroutine psb_cprc_aply1(prec,x,desc_data,info,trans)
+!!$      use psb_base_mod, only  : psb_desc_type, psb_c_sparse_mat, psb_spk_
+!!$      use psb_prec_type, only : psb_cprec_type
+!!$      type(psb_desc_type),intent(in)    :: desc_data
+!!$      type(psb_cprec_type), intent(in)  :: prec
+!!$      complex(psb_spk_),intent(inout) :: x(:)
+!!$      integer, intent(out)              :: info
+!!$      character(len=1), optional        :: trans
+!!$    end subroutine psb_cprc_aply1
+!!$    subroutine psb_zprc_aply(prec,x,y,desc_data,info,trans,work)
+!!$      use psb_base_mod, only  : psb_desc_type, psb_z_sparse_mat, psb_dpk_
+!!$      use psb_prec_type, only : psb_zprec_type
+!!$      type(psb_desc_type),intent(in)    :: desc_data
+!!$      type(psb_zprec_type), intent(in)  :: prec
+!!$      complex(psb_dpk_),intent(in)    :: x(:)
+!!$      complex(psb_dpk_),intent(inout) :: y(:)
+!!$      integer, intent(out)              :: info
+!!$      character(len=1), optional        :: trans
+!!$      complex(psb_dpk_),intent(inout), optional, target :: work(:)
+!!$    end subroutine psb_zprc_aply
+!!$    subroutine psb_zprc_aply1(prec,x,desc_data,info,trans)
+!!$      use psb_base_mod, only  : psb_desc_type, psb_z_sparse_mat, psb_dpk_
+!!$      use psb_prec_type, only : psb_zprec_type
+!!$      type(psb_desc_type),intent(in)    :: desc_data
+!!$      type(psb_zprec_type), intent(in)  :: prec
+!!$      complex(psb_dpk_),intent(inout) :: x(:)
+!!$      integer, intent(out)              :: info
+!!$      character(len=1), optional        :: trans
+!!$    end subroutine psb_zprc_aply1
+!!$  end interface
 
 
   interface psb_bjac_aply

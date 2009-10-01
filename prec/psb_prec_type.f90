@@ -71,7 +71,11 @@ module psb_prec_type
     integer, allocatable                :: iprcparm(:) 
     real(psb_spk_), allocatable         :: rprcparm(:) 
     integer, allocatable                :: perm(:),  invperm(:) 
-    integer                             :: prec, base_prec
+    integer                             :: prec
+  contains
+    procedure, pass(prec)               :: s_apply2v
+    procedure, pass(prec)               :: s_apply1v
+    generic, public                     :: apply => s_apply2v, s_apply1v
   end type psb_sprec_type
 
   type psb_dprec_type
@@ -81,7 +85,11 @@ module psb_prec_type
     integer, allocatable                :: iprcparm(:) 
     real(psb_dpk_), allocatable         :: rprcparm(:) 
     integer, allocatable                :: perm(:),  invperm(:) 
-    integer                             :: prec, base_prec
+    integer                             :: prec
+  contains
+    procedure, pass(prec)               :: d_apply2v
+    procedure, pass(prec)               :: d_apply1v
+    generic, public                     :: apply => d_apply2v, d_apply1v
   end type psb_dprec_type
 
   type psb_cprec_type
@@ -91,7 +99,11 @@ module psb_prec_type
     integer, allocatable               :: iprcparm(:) 
     real(psb_spk_), allocatable        :: rprcparm(:) 
     integer, allocatable               :: perm(:),  invperm(:) 
-    integer                            :: prec, base_prec
+    integer                            :: prec
+  contains
+    procedure, pass(prec)               :: c_apply2v
+    procedure, pass(prec)               :: c_apply1v
+    generic, public                     :: apply => c_apply2v, c_apply1v
   end type psb_cprec_type
 
 
@@ -102,7 +114,11 @@ module psb_prec_type
     integer, allocatable               :: iprcparm(:) 
     real(psb_dpk_), allocatable        :: rprcparm(:) 
     integer, allocatable               :: perm(:),  invperm(:) 
-    integer                            :: prec, base_prec
+    integer                            :: prec
+  contains
+    procedure, pass(prec)               :: z_apply2v
+    procedure, pass(prec)               :: z_apply1v
+    generic, public                     :: apply => z_apply2v, z_apply1v
   end type psb_zprec_type
 
 
@@ -136,7 +152,97 @@ module psb_prec_type
          & psb_cprec_sizeof, psb_zprec_sizeof
   end interface
 
+
+
+
+  interface psb_precaply
+    subroutine psb_sprc_aply(prec,x,y,desc_data,info,trans,work)
+      use psb_base_mod, only  : psb_desc_type, psb_spk_
+      import psb_sprec_type
+      type(psb_desc_type),intent(in)    :: desc_data
+      type(psb_sprec_type), intent(in)  :: prec
+      real(psb_spk_),intent(in)       :: x(:)
+      real(psb_spk_),intent(inout)    :: y(:)
+      integer, intent(out)              :: info
+      character(len=1), optional        :: trans
+      real(psb_spk_),intent(inout), optional, target :: work(:)
+    end subroutine psb_sprc_aply
+    subroutine psb_sprc_aply1(prec,x,desc_data,info,trans)
+      use psb_base_mod, only  : psb_desc_type, psb_spk_
+      import psb_sprec_type
+      type(psb_desc_type),intent(in)    :: desc_data
+      type(psb_sprec_type), intent(in)  :: prec
+      real(psb_spk_),intent(inout)      :: x(:)
+      integer, intent(out)              :: info
+      character(len=1), optional        :: trans
+    end subroutine psb_sprc_aply1
+    subroutine psb_dprc_aply(prec,x,y,desc_data,info,trans,work)
+      use psb_base_mod, only  : psb_desc_type, psb_dpk_
+      import psb_dprec_type
+      type(psb_desc_type),intent(in)    :: desc_data
+      type(psb_dprec_type), intent(in)  :: prec
+      real(psb_dpk_),intent(in)         :: x(:)
+      real(psb_dpk_),intent(inout)      :: y(:)
+      integer, intent(out)              :: info
+      character(len=1), optional        :: trans
+      real(psb_dpk_),intent(inout), optional, target :: work(:)
+    end subroutine psb_dprc_aply
+    subroutine psb_dprc_aply1(prec,x,desc_data,info,trans)
+      use psb_base_mod, only  : psb_desc_type, psb_dpk_
+      import psb_dprec_type
+      type(psb_desc_type),intent(in)    :: desc_data
+      type(psb_dprec_type), intent(in)  :: prec
+      real(psb_dpk_),intent(inout)    :: x(:)
+      integer, intent(out)              :: info
+      character(len=1), optional        :: trans
+    end subroutine psb_dprc_aply1
+    subroutine psb_cprc_aply(prec,x,y,desc_data,info,trans,work)
+      use psb_base_mod, only  : psb_desc_type, psb_spk_
+      import psb_cprec_type
+      type(psb_desc_type),intent(in)    :: desc_data
+      type(psb_cprec_type), intent(in)  :: prec
+      complex(psb_spk_),intent(in)    :: x(:)
+      complex(psb_spk_),intent(inout) :: y(:)
+      integer, intent(out)              :: info
+      character(len=1), optional        :: trans
+      complex(psb_spk_),intent(inout), optional, target :: work(:)
+    end subroutine psb_cprc_aply
+    subroutine psb_cprc_aply1(prec,x,desc_data,info,trans)
+      use psb_base_mod, only  : psb_desc_type, psb_spk_
+      import psb_cprec_type
+      type(psb_desc_type),intent(in)    :: desc_data
+      type(psb_cprec_type), intent(in)  :: prec
+      complex(psb_spk_),intent(inout) :: x(:)
+      integer, intent(out)              :: info
+      character(len=1), optional        :: trans
+    end subroutine psb_cprc_aply1
+    subroutine psb_zprc_aply(prec,x,y,desc_data,info,trans,work)
+      use psb_base_mod, only  : psb_desc_type, psb_dpk_
+      import psb_zprec_type
+      type(psb_desc_type),intent(in)    :: desc_data
+      type(psb_zprec_type), intent(in)  :: prec
+      complex(psb_dpk_),intent(in)    :: x(:)
+      complex(psb_dpk_),intent(inout) :: y(:)
+      integer, intent(out)              :: info
+      character(len=1), optional        :: trans
+      complex(psb_dpk_),intent(inout), optional, target :: work(:)
+    end subroutine psb_zprc_aply
+    subroutine psb_zprc_aply1(prec,x,desc_data,info,trans)
+      use psb_base_mod, only  : psb_desc_type, psb_dpk_
+      import psb_zprec_type
+      type(psb_desc_type),intent(in)    :: desc_data
+      type(psb_zprec_type), intent(in)  :: prec
+      complex(psb_dpk_),intent(inout) :: x(:)
+      integer, intent(out)              :: info
+      character(len=1), optional        :: trans
+    end subroutine psb_zprc_aply1
+  end interface
+
+
 contains
+
+  
+
 
   subroutine psb_file_prec_descr(p,iout)
     type(psb_dprec_type), intent(in) :: p
@@ -310,6 +416,7 @@ contains
   end subroutine psb_dcheck_def
 
   subroutine psb_s_precfree(p,info)
+    use psb_base_mod
     type(psb_sprec_type), intent(inout) :: p 
     integer, intent(out) ::  info
     integer :: me, err_act,i 
@@ -377,6 +484,7 @@ contains
   end subroutine psb_nullify_sprec
 
   subroutine psb_d_precfree(p,info)
+    use psb_base_mod
     type(psb_dprec_type), intent(inout) :: p
     integer, intent(out)                :: info
     integer             :: me, err_act,i
@@ -444,6 +552,7 @@ contains
   end subroutine psb_nullify_dprec
 
   subroutine psb_c_precfree(p,info)
+    use psb_base_mod
     type(psb_cprec_type), intent(inout) :: p
     integer, intent(out)                :: info
     integer             :: err_act,i
@@ -502,6 +611,7 @@ contains
   end subroutine psb_nullify_cprec
 
   subroutine psb_z_precfree(p,info)
+    use psb_base_mod
     type(psb_zprec_type), intent(inout) :: p
     integer, intent(out)                :: info
     integer             :: err_act,i
@@ -580,6 +690,7 @@ contains
 
 
   function psb_dprec_sizeof(prec) result(val)
+    use psb_base_mod
     type(psb_dprec_type), intent(in) :: prec
     integer(psb_long_int_k_) :: val
     integer :: i
@@ -599,6 +710,7 @@ contains
   end function psb_dprec_sizeof
 
   function psb_sprec_sizeof(prec) result(val)
+    use psb_base_mod
     type(psb_sprec_type), intent(in) :: prec
     integer(psb_long_int_k_) :: val
     integer             :: i
@@ -619,6 +731,7 @@ contains
   end function psb_sprec_sizeof
 
   function psb_zprec_sizeof(prec) result(val)
+    use psb_base_mod
     type(psb_zprec_type), intent(in) :: prec
     integer(psb_long_int_k_) :: val
     integer             :: i
@@ -639,6 +752,7 @@ contains
   end function psb_zprec_sizeof
 
   function psb_cprec_sizeof(prec) result(val)
+    use psb_base_mod
     type(psb_cprec_type), intent(in) :: prec
     integer(psb_long_int_k_) :: val
     integer             :: i
@@ -658,5 +772,284 @@ contains
     
   end function psb_cprec_sizeof
     
+
+
+  subroutine s_apply2v(prec,x,y,desc_data,info,trans,work)
+    use psb_base_mod
+    type(psb_desc_type),intent(in)    :: desc_data
+    class(psb_sprec_type), intent(in)  :: prec
+    real(psb_spk_),intent(in)       :: x(:)
+    real(psb_spk_),intent(inout)    :: y(:)
+    integer, intent(out)              :: info
+    character(len=1), optional        :: trans
+    real(psb_spk_),intent(inout), optional, target :: work(:)
+    Integer :: err_act
+    character(len=20)  :: name='s_prec_apply'
+
+    call psb_erractionsave(err_act)
+    
+    select type(prec) 
+    type is (psb_sprec_type)
+      call psb_precaply(prec,x,y,desc_data,info,trans,work)
+    class default
+      info = 700
+      call psb_errpush(info,name)
+      goto 9999 
+    end select
+    
+    call psb_erractionrestore(err_act)
+    return
+
+9999 continue
+    call psb_erractionrestore(err_act)
+    if (err_act == psb_act_abort_) then
+      call psb_error()
+      return
+    end if
+    return
+
+  end subroutine s_apply2v
+  subroutine s_apply1v(prec,x,desc_data,info,trans)
+    use psb_base_mod
+    type(psb_desc_type),intent(in)    :: desc_data
+    class(psb_sprec_type), intent(in)  :: prec
+    real(psb_spk_),intent(inout)    :: x(:)
+    integer, intent(out)              :: info
+    character(len=1), optional        :: trans
+    Integer :: err_act
+    character(len=20)  :: name='s_prec_apply'
+
+    call psb_erractionsave(err_act)
+    
+    select type(prec) 
+    type is (psb_sprec_type)
+      call psb_precaply(prec,x,desc_data,info,trans)
+    class default
+      info = 700
+      call psb_errpush(info,name)
+      goto 9999 
+    end select
+    
+    call psb_erractionrestore(err_act)
+    return
+
+9999 continue
+    call psb_erractionrestore(err_act)
+    if (err_act == psb_act_abort_) then
+      call psb_error()
+      return
+    end if
+    return
+  end subroutine s_apply1v
+
+  subroutine d_apply2v(prec,x,y,desc_data,info,trans,work)
+    use psb_base_mod
+    type(psb_desc_type),intent(in)    :: desc_data
+    class(psb_dprec_type), intent(in)  :: prec
+    real(psb_dpk_),intent(in)       :: x(:)
+    real(psb_dpk_),intent(inout)    :: y(:)
+    integer, intent(out)              :: info
+    character(len=1), optional        :: trans
+    real(psb_dpk_),intent(inout), optional, target :: work(:)
+    Integer :: err_act
+    character(len=20)  :: name='d_prec_apply'
+
+    call psb_erractionsave(err_act)
+    
+    select type(prec) 
+    type is (psb_dprec_type)
+      call psb_precaply(prec,x,y,desc_data,info,trans,work)
+    class default
+      info = 700
+      call psb_errpush(info,name)
+      goto 9999 
+    end select
+    
+    call psb_erractionrestore(err_act)
+    return
+
+9999 continue
+    call psb_erractionrestore(err_act)
+    if (err_act == psb_act_abort_) then
+      call psb_error()
+      return
+    end if
+    return
+
+  end subroutine d_apply2v
+
+  subroutine d_apply1v(prec,x,desc_data,info,trans)
+    use psb_base_mod
+    type(psb_desc_type),intent(in)    :: desc_data
+    class(psb_dprec_type), intent(in)  :: prec
+    real(psb_dpk_),intent(inout)    :: x(:)
+    integer, intent(out)              :: info
+    character(len=1), optional        :: trans
+    Integer :: err_act
+    character(len=20)  :: name='d_prec_apply'
+
+    call psb_erractionsave(err_act)
+    
+    select type(prec) 
+    type is (psb_dprec_type)
+      call psb_precaply(prec,x,desc_data,info,trans)
+    class default
+      info = 700
+      call psb_errpush(info,name)
+      goto 9999 
+    end select
+    
+    call psb_erractionrestore(err_act)
+    return
+
+9999 continue
+    call psb_erractionrestore(err_act)
+    if (err_act == psb_act_abort_) then
+      call psb_error()
+      return
+    end if
+    return
+    
+  end subroutine d_apply1v
+  subroutine c_apply2v(prec,x,y,desc_data,info,trans,work)
+    use psb_base_mod
+    
+    type(psb_desc_type),intent(in)    :: desc_data
+    class(psb_cprec_type), intent(in)  :: prec
+    complex(psb_spk_),intent(in)    :: x(:)
+    complex(psb_spk_),intent(inout) :: y(:)
+    integer, intent(out)              :: info
+    character(len=1), optional        :: trans
+    complex(psb_spk_),intent(inout), optional, target :: work(:)
+    Integer :: err_act
+    character(len=20)  :: name='s_prec_apply'
+
+    call psb_erractionsave(err_act)
+    
+    select type(prec) 
+    type is (psb_cprec_type)
+      call psb_precaply(prec,x,y,desc_data,info,trans,work)
+    class default
+      info = 700
+      call psb_errpush(info,name)
+      goto 9999 
+    end select
+    
+    call psb_erractionrestore(err_act)
+    return
+
+9999 continue
+    call psb_erractionrestore(err_act)
+    if (err_act == psb_act_abort_) then
+      call psb_error()
+      return
+    end if
+    return
+
+  end subroutine c_apply2v
+  subroutine c_apply1v(prec,x,desc_data,info,trans)
+    use psb_base_mod
+    
+    type(psb_desc_type),intent(in)    :: desc_data
+    class(psb_cprec_type), intent(in)  :: prec
+    complex(psb_spk_),intent(inout) :: x(:)
+    integer, intent(out)              :: info
+    character(len=1), optional        :: trans
+    Integer :: err_act
+    character(len=20)  :: name='c_prec_apply'
+
+    call psb_erractionsave(err_act)
+    
+    select type(prec) 
+    type is (psb_cprec_type)
+      call psb_precaply(prec,x,desc_data,info,trans)
+    class default
+      info = 700
+      call psb_errpush(info,name)
+      goto 9999 
+    end select
+    
+    call psb_erractionrestore(err_act)
+    return
+
+9999 continue
+    call psb_erractionrestore(err_act)
+    if (err_act == psb_act_abort_) then
+      call psb_error()
+      return
+    end if
+    return
+    
+  end subroutine c_apply1v
+  
+  subroutine z_apply2v(prec,x,y,desc_data,info,trans,work)
+    use psb_base_mod
+    type(psb_desc_type),intent(in)    :: desc_data
+    class(psb_zprec_type), intent(in)  :: prec
+    complex(psb_dpk_),intent(in)    :: x(:)
+    complex(psb_dpk_),intent(inout) :: y(:)
+    integer, intent(out)              :: info
+    character(len=1), optional        :: trans
+    complex(psb_dpk_),intent(inout), optional, target :: work(:)
+    Integer :: err_act
+    character(len=20)  :: name='z_prec_apply'
+
+    call psb_erractionsave(err_act)
+    
+    select type(prec) 
+    type is (psb_zprec_type)
+      call psb_precaply(prec,x,y,desc_data,info,trans,work)
+    class default
+      info = 700
+      call psb_errpush(info,name)
+      goto 9999 
+    end select
+    
+    call psb_erractionrestore(err_act)
+    return
+
+9999 continue
+    call psb_erractionrestore(err_act)
+    if (err_act == psb_act_abort_) then
+      call psb_error()
+      return
+    end if
+    return
+    
+  end subroutine z_apply2v
+  subroutine z_apply1v(prec,x,desc_data,info,trans)
+    use psb_base_mod
+    
+    type(psb_desc_type),intent(in)    :: desc_data
+    class(psb_zprec_type), intent(in)  :: prec
+    complex(psb_dpk_),intent(inout) :: x(:)
+    integer, intent(out)              :: info
+    character(len=1), optional        :: trans
+    Integer :: err_act
+    character(len=20)  :: name='z_prec_apply'
+
+    call psb_erractionsave(err_act)
+    
+    select type(prec) 
+    type is (psb_zprec_type)
+      call psb_precaply(prec,x,desc_data,info,trans)
+    class default
+      info = 700
+      call psb_errpush(info,name)
+      goto 9999 
+    end select
+    
+    call psb_erractionrestore(err_act)
+    return
+
+9999 continue
+    call psb_erractionrestore(err_act)
+    if (err_act == psb_act_abort_) then
+      call psb_error()
+      return
+    end if
+    return
+    
+  end subroutine z_apply1v
 
 end module psb_prec_type

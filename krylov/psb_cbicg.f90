@@ -255,8 +255,8 @@ subroutine psb_cbicg(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,istop)
       if (debug_level >= psb_debug_ext_) &
            & write(debug_unit,*) me,' ',trim(name),'iteration: ',itx
 
-      call psb_precaply(prec,r,z,desc_a,info,work=aux)
-      if (info == 0) call psb_precaply(prec,rt,zt,desc_a,info,trans='c',work=aux)
+      call prec%apply(r,z,desc_a,info,work=aux)
+      if (info == 0) call prec%apply(rt,zt,desc_a,info,trans='c',work=aux)
 
       rho_old = rho    
       rho = psb_gedot(rt,z,desc_a,info)

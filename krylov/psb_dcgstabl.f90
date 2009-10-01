@@ -253,7 +253,7 @@ Subroutine psb_dcgstabl(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,irst,is
     call psb_geaxpby(done,b,dzero,r,desc_a,info)
     if (info == 0) call psb_spmm(-done,a,x,done,r,desc_a,info,work=aux)
     
-    if (info == 0) call psb_precaply(prec,r,desc_a,info)
+    if (info == 0) call prec%apply(r,desc_a,info)
 
     if (info == 0) call psb_geaxpby(done,r,dzero,rt0,desc_a,info)
     if (info == 0) call psb_geaxpby(done,r,dzero,rh(:,0),desc_a,info)
@@ -305,7 +305,7 @@ Subroutine psb_dcgstabl(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,irst,is
         call psb_geaxpby(done,rh(:,0:j),-beta,uh(:,0:j),desc_a,info)
         call psb_spmm(done,a,uh(:,j),dzero,uh(:,j+1),desc_a,info,work=aux)
 
-        call psb_precaply(prec,uh(:,j+1),desc_a,info)
+        call prec%apply(uh(:,j+1),desc_a,info)
 
         gamma(j) = psb_gedot(uh(:,j+1),rt0,desc_a,info)
 
@@ -324,7 +324,7 @@ Subroutine psb_dcgstabl(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,irst,is
         call psb_geaxpby(alpha,uh(:,0),done,x,desc_a,info)
         call psb_spmm(done,a,rh(:,j),dzero,rh(:,j+1),desc_a,info,work=aux)
 
-        call psb_precaply(prec,rh(:,j+1),desc_a,info)
+        call prec%apply(rh(:,j+1),desc_a,info)
                 
       enddo
       

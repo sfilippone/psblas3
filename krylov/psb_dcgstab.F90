@@ -289,7 +289,7 @@ Subroutine psb_dcgstab(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,istop)
 #ifdef MPE_KRYLOV
       imerr = MPE_Log_event( ifctb, 0, "st PREC" )
 #endif
-      call psb_precaply(prec,p,f,desc_a,info,work=aux)
+      call prec%apply(p,f,desc_a,info,work=aux)
 #ifdef MPE_KRYLOV
       imerr = MPE_Log_event( ifcte, 0, "ed PREC" )
       imerr = MPE_Log_event( immb, 0, "st SPMM" )
@@ -320,7 +320,7 @@ Subroutine psb_dcgstab(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,istop)
 #ifdef MPE_KRYLOV
       imerr = MPE_Log_event( ifctb, 0, "st PREC" )
 #endif
-      call psb_precaply(prec,s,z,desc_a,info,work=aux)
+      call prec%apply(s,z,desc_a,info,work=aux)
 
 #ifdef MPE_KRYLOV
       imerr = MPE_Log_event( ifcte, 0, "ed PREC" )

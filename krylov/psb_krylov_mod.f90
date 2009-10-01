@@ -497,20 +497,20 @@ contains
     use psb_base_mod
     use psb_prec_mod,only : psb_sprec_type, psb_dprec_type, psb_cprec_type, psb_zprec_type
 
-    character(len=*)                   :: method
+    character(len=*)                    :: method
     Type(psb_s_sparse_mat), Intent(in)  :: a
-    Type(psb_desc_type), Intent(in)    :: desc_a
+    Type(psb_desc_type), Intent(in)     :: desc_a
     class(psb_sprec_type), intent(in)   :: prec 
-    Real(psb_spk_), Intent(in)       :: b(:)
-    Real(psb_spk_), Intent(inout)    :: x(:)
-    Real(psb_spk_), Intent(in)       :: eps
-    integer, intent(out)               :: info
-    Integer, Optional, Intent(in)      :: itmax, itrace, irst,istop
-    Integer, Optional, Intent(out)     :: iter
+    Real(psb_spk_), Intent(in)          :: b(:)
+    Real(psb_spk_), Intent(inout)       :: x(:)
+    Real(psb_spk_), Intent(in)          :: eps
+    integer, intent(out)                :: info
+    Integer, Optional, Intent(in)       :: itmax, itrace, irst,istop
+    Integer, Optional, Intent(out)      :: iter
     Real(psb_spk_), Optional, Intent(out) :: err,cond
 
     integer                            :: ictxt,me,np,err_act
-    character(len=20)             :: name
+    character(len=20)                  :: name
 
     info = 0
     name = 'psb_krylov'

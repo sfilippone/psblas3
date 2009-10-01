@@ -102,13 +102,13 @@ subroutine psb_dbicg(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,istop)
   type(psb_d_sparse_mat), intent(in)  :: a
   
   class(psb_dprec_type), intent(in)   :: prec 
-  type(psb_desc_type), intent(in)    :: desc_a
-  real(psb_dpk_), intent(in)       :: b(:)
-  real(psb_dpk_), intent(inout)    :: x(:)
-  real(psb_dpk_), intent(in)       :: eps
-  integer, intent(out)               :: info
-  integer, optional, intent(in)      :: itmax, itrace, istop
-  integer, optional, intent(out)     :: iter
+  type(psb_desc_type), intent(in)     :: desc_a
+  real(psb_dpk_), intent(in)          :: b(:)
+  real(psb_dpk_), intent(inout)       :: x(:)
+  real(psb_dpk_), intent(in)          :: eps
+  integer, intent(out)                :: info
+  integer, optional, intent(in)       :: itmax, itrace, istop
+  integer, optional, intent(out)      :: iter
   real(psb_dpk_), optional, intent(out) :: err
 !!$   local data
   real(psb_dpk_), allocatable, target  :: aux(:),wwrk(:,:)
@@ -254,8 +254,8 @@ subroutine psb_dbicg(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,istop)
       if (debug_level >= psb_debug_ext_) &
            & write(debug_unit,*) me,' ',trim(name),'iteration: ',itx
 
-      call psb_precaply(prec,r,z,desc_a,info,work=aux)
-      if (info == 0) call psb_precaply(prec,rt,zt,desc_a,info,trans='t',work=aux)
+      call prec%apply(r,z,desc_a,info,work=aux)
+      if (info == 0) call prec%apply(rt,zt,desc_a,info,trans='t',work=aux)
 
       rho_old = rho    
       rho = psb_gedot(rt,z,desc_a,info)

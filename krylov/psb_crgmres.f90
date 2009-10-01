@@ -330,7 +330,7 @@ Subroutine psb_crgmres(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,irst,ist
     inner:  Do i=1,nl
       itx  = itx + 1
 
-      call psb_precaply(prec,v(:,i),w1,desc_a,info)
+      call prec%apply(v(:,i),w1,desc_a,info)
       Call psb_spmm(cone,a,w1,czero,w,desc_a,info,work=aux)
       !
 
@@ -366,7 +366,7 @@ Subroutine psb_crgmres(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,irst,ist
         do k=1, i
           call psb_geaxpby(rst(k),v(:,k),cone,xt,desc_a,info)
         end do
-        call psb_precaply(prec,xt,desc_a,info)
+        call prec%apply(xt,desc_a,info)
         call psb_geaxpby(cone,x,cone,xt,desc_a,info)
         call psb_geaxpby(cone,b,czero,w1,desc_a,info)
         call psb_spmm(-cone,a,xt,cone,w1,desc_a,info,work=aux)
@@ -402,7 +402,7 @@ Subroutine psb_crgmres(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,irst,ist
           do k=1, i
             call psb_geaxpby(rs(k),v(:,k),cone,w1,desc_a,info)
           end do
-          call psb_precaply(prec,w1,w,desc_a,info)
+          call prec%apply(w1,w,desc_a,info)
           call psb_geaxpby(cone,w,cone,x,desc_a,info)
         end if
 
@@ -429,7 +429,7 @@ Subroutine psb_crgmres(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,irst,ist
       do k=1, nl
         call psb_geaxpby(rs(k),v(:,k),cone,w1,desc_a,info)
       end do
-      call psb_precaply(prec,w1,w,desc_a,info)
+      call prec%apply(w1,w,desc_a,info)
       call psb_geaxpby(cone,w,cone,x,desc_a,info)
     end if
 
