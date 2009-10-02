@@ -8,7 +8,7 @@ Design principles for this directory.
    format.  
    Thus we have a three-level inheritance chain: 
    i.   The  base object, defining the methods to set/query the various
-        properties, and allocate and a free. Some of the property
+        properties, and allocate and  free. Some of the property
         getters/setters, allocate and free depend on the storage
         format, so at this level they will just throw an error. 
    ii.  The X_base_object, where X=s,d,c,z  thus defining the
@@ -70,7 +70,7 @@ Design principles for this directory.
       conceivable  storage representation provides just 2 conversion
       routines, avoiding quadratic explosion. But since all have to
       provide them, the to_coo/from_coo is defined in d_base_mat_mod
-      together with d_coo_sparse_mat, which enjoys the "eldest child"
+      together with d_coo_sparse_mat, which enjoys the "crown prince"
       status with respect to all the other types derived from
       d_base_sparse_mat (its "siblings"). 
 
