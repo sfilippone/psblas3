@@ -36,6 +36,12 @@ module psb_d_base_mat_mod
     generic, public    :: cp_from => d_base_cp_from
     procedure, pass(a) :: d_base_mv_from
     generic, public    :: mv_from => d_base_mv_from
+
+    procedure, pass(a) :: base_transp_1mat => d_base_transp_1mat
+    procedure, pass(a) :: base_transp_2mat => d_base_transp_2mat
+    procedure, pass(a) :: base_transc_1mat => d_base_transc_1mat
+    procedure, pass(a) :: base_transc_2mat => d_base_transc_2mat
+
   end type psb_d_base_sparse_mat
 
   private :: d_base_csmv, d_base_csmm, d_base_cssv, d_base_cssm,&
@@ -88,6 +94,8 @@ module psb_d_base_mat_mod
     generic, public    :: cp_from => d_coo_cp_from
     procedure, pass(a) :: d_coo_mv_from
     generic, public    :: mv_from => d_coo_mv_from
+    procedure, pass(a) :: base_transp_1mat => d_coo_transp_1mat
+    procedure, pass(a) :: base_transc_1mat => d_coo_transc_1mat
     
   end type psb_d_coo_sparse_mat
 
@@ -99,7 +107,8 @@ module psb_d_base_mat_mod
        & d_cp_coo_to_fmt, d_cp_coo_from_fmt, &
        & d_coo_scals, d_coo_scal, d_coo_csgetrow, d_coo_sizeof, &
        & d_coo_csgetptn, d_coo_get_nz_row, d_coo_reinit,&
-       & d_coo_cp_from, d_coo_mv_from
+       & d_coo_cp_from, d_coo_mv_from, &
+       & d_coo_transp_1mat, d_coo_transc_1mat
 
   
   interface 
@@ -777,6 +786,160 @@ contains
     return
 
   end subroutine csclip
+
+
+
+  !
+  ! Here we go. 
+  !
+!!$  subroutine d_coo_transp_2mat(a,b)
+!!$    use psb_error_mod
+!!$    implicit none 
+!!$    
+!!$    class(psb_d_coo_sparse_mat), intent(out) :: a
+!!$    type(psb_d_coo_sparse_mat), intent(in)   :: b
+!!$    
+!!$    call a%psb_d_base_sparse_mat%psb_base_sparse_mat%transp(b%psb_d_base_sparse_mat%psb_base_sparse_mat) 
+!!$    a%ia = b%ja
+!!$    a%ja = b%ia
+!!$    a%val = b%val 
+!!$    
+!!$    call a%fix()
+!!$
+!!$    return
+!!$    
+!!$  end subroutine d_coo_transp_2mat
+!!$
+!!$  subroutine d_coo_transc_2mat(a,b)
+!!$    use psb_error_mod
+!!$    implicit none 
+!!$    
+!!$    class(psb_d_coo_sparse_mat), intent(out) :: a
+!!$    class(psb_d_coo_sparse_mat), intent(in)   :: b
+!!$    
+!!$    call a%transp(b) 
+!!$  end subroutine d_coo_transc_2mat
+!!$
+  subroutine d_coo_transp_1mat(a)
+    use psb_error_mod
+    implicit none 
+    
+    class(psb_d_coo_sparse_mat), intent(inout) :: a
+
+    integer, allocatable :: itemp(:) 
+    integer :: info
+    
+    call a%psb_d_base_sparse_mat%psb_base_sparse_mat%transp()
+    call move_alloc(a%ia,itemp)
+    call move_alloc(a%ja,a%ia)
+    call move_alloc(itemp,a%ja)
+        
+    call a%fix(info)
+
+    return
+    
+  end subroutine d_coo_transp_1mat
+
+  subroutine d_coo_transc_1mat(a)
+    use psb_error_mod
+    implicit none 
+    
+    class(psb_d_coo_sparse_mat), intent(inout) :: a
+    
+    call a%transp() 
+  end subroutine d_coo_transc_1mat
+
+  subroutine d_base_transp_2mat(a,b)
+    use psb_error_mod
+    implicit none 
+    
+    class(psb_d_base_sparse_mat), intent(out) :: a
+    class(psb_base_sparse_mat), intent(in)   :: b
+
+    type(psb_d_coo_sparse_mat) :: tmp
+    integer err_act, info
+    character(len=*), parameter :: name='d_base_transp'
+    
+    call psb_erractionsave(err_act)
+
+    info = 0
+    select type(b)
+    class is (psb_d_base_sparse_mat)
+      call b%cp_to_coo(tmp,info)
+      if (info == 0) call tmp%transp()
+      if (info == 0) call a%mv_from_coo(tmp,info)
+    class default
+      info = 700
+    end select
+    if (info /= 0) then 
+      call psb_errpush(info,name,a_err=b%get_fmt())
+      goto 9999
+    end if
+    call psb_erractionrestore(err_act) 
+
+    return
+9999 continue
+    if (err_act /= psb_act_ret_) then
+      call psb_error()
+    end if
+      
+    return
+    
+  end subroutine d_base_transp_2mat
+
+  subroutine d_base_transc_2mat(a,b)
+    use psb_error_mod
+    implicit none 
+    
+    class(psb_d_base_sparse_mat), intent(out) :: a
+    class(psb_base_sparse_mat), intent(in)   :: b
+    
+    call a%transp(b) 
+  end subroutine d_base_transc_2mat
+
+  subroutine d_base_transp_1mat(a)
+    use psb_error_mod
+    implicit none 
+    
+    class(psb_d_base_sparse_mat), intent(inout) :: a
+
+    type(psb_d_coo_sparse_mat) :: tmp
+    integer :: err_act, info
+    character(len=*), parameter :: name='d_base_transp'
+
+    call psb_erractionsave(err_act)
+    info = 0
+    call a%mv_to_coo(tmp,info)
+    if (info == 0) call tmp%transp()
+    if (info == 0) call a%mv_from_coo(tmp,info)
+    
+    if (info /= 0) then 
+      info = 700 
+      call psb_errpush(info,name,a_err=a%get_fmt())
+      goto 9999
+    end if
+    call psb_erractionrestore(err_act) 
+
+    return
+9999 continue
+    if (err_act /= psb_act_ret_) then
+      call psb_error()
+    end if
+      
+    return
+    
+    
+  end subroutine d_base_transp_1mat
+
+  subroutine d_base_transc_1mat(a)
+    use psb_error_mod
+    implicit none 
+    
+    class(psb_d_base_sparse_mat), intent(inout) :: a
+    
+    call a%transp() 
+  end subroutine d_base_transc_1mat
+
 
 
 

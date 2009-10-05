@@ -64,6 +64,13 @@ module psb_d_mat_mod
     generic, public    :: mv_from => d_mv_from
     procedure, pass(a) :: d_cp_from
     generic, public    :: cp_from => d_cp_from
+    procedure, pass(a) :: d_transp_1mat
+    procedure, pass(a) :: d_transp_2mat
+    generic, public    :: transp => d_transp_1mat, d_transp_2mat
+    procedure, pass(a) :: d_transc_1mat
+    procedure, pass(a) :: d_transc_2mat
+    generic, public    :: transc => d_transc_1mat, d_transc_2mat
+
     
     
     ! Computational routines 
@@ -93,7 +100,9 @@ module psb_d_mat_mod
        & set_upd, set_asb, set_sorted, &
        & set_upper, set_lower, set_triangle, &
        & set_unit, get_diag, get_nz_row, d_csgetptn, &
-       & d_mv_from, d_cp_from
+       & d_mv_from, d_cp_from, &
+       & d_transp_1mat, d_transp_2mat, &
+       & d_transc_1mat, d_transc_2mat
 
   interface psb_sizeof
     module procedure d_sizeof
@@ -1581,6 +1590,154 @@ contains
   end subroutine d_sparse_mat_clone
 
 
+  subroutine d_transp_1mat(a)
+    use psb_error_mod
+    use psb_string_mod
+    implicit none 
+    class(psb_d_sparse_mat), intent(inout) :: a
+
+    Integer :: err_act, info
+    character(len=20)  :: name='transp'
+    logical, parameter :: debug=.false.
+
+
+    call psb_erractionsave(err_act)
+    if (a%is_null()) then 
+      info = 1121
+      call psb_errpush(info,name)
+      goto 9999
+    endif
+
+    call a%a%transp()
+
+    call psb_erractionrestore(err_act)
+    return
+
+9999 continue
+    call psb_erractionrestore(err_act)
+
+    if (err_act == psb_act_abort_) then
+      call psb_error()
+      return
+    end if
+
+  end subroutine d_transp_1mat
+
+
+  subroutine d_transp_2mat(a,b)
+    use psb_error_mod
+    use psb_string_mod
+    implicit none 
+    class(psb_d_sparse_mat), intent(out) :: a
+    class(psb_d_sparse_mat), intent(in)  :: b
+
+    Integer :: err_act, info
+    character(len=20)  :: name='transp'
+    logical, parameter :: debug=.false.
+
+
+    call psb_erractionsave(err_act)
+    if (b%is_null()) then 
+      info = 1121
+      call psb_errpush(info,name)
+      goto 9999
+    endif
+
+    allocate(a%a,source=b%a,stat=info)
+    if (info /= 0) then 
+      info = 4000
+      goto 9999
+    end if
+    call a%a%transp(b%a)    
+
+    call psb_erractionrestore(err_act)
+    return
+
+9999 continue
+    call psb_erractionrestore(err_act)
+
+    if (err_act == psb_act_abort_) then
+      call psb_error()
+      return
+    end if
+
+  end subroutine d_transp_2mat
+
+  subroutine d_transc_1mat(a)
+    use psb_error_mod
+    use psb_string_mod
+    implicit none 
+    class(psb_d_sparse_mat), intent(inout) :: a
+
+    Integer :: err_act, info
+    character(len=20)  :: name='transc'
+    logical, parameter :: debug=.false.
+
+
+    call psb_erractionsave(err_act)
+    if (a%is_null()) then 
+      info = 1121
+      call psb_errpush(info,name)
+      goto 9999
+    endif
+
+    call a%a%transc()
+
+    call psb_erractionrestore(err_act)
+    return
+
+9999 continue
+    call psb_erractionrestore(err_act)
+
+    if (err_act == psb_act_abort_) then
+      call psb_error()
+      return
+    end if
+
+  end subroutine d_transc_1mat
+
+
+  subroutine d_transc_2mat(a,b)
+    use psb_error_mod
+    use psb_string_mod
+    implicit none 
+    class(psb_d_sparse_mat), intent(out) :: a
+    class(psb_d_sparse_mat), intent(in)  :: b
+
+    Integer :: err_act, info
+    character(len=20)  :: name='transc'
+    logical, parameter :: debug=.false.
+
+
+    call psb_erractionsave(err_act)
+    if (b%is_null()) then 
+      info = 1121
+      call psb_errpush(info,name)
+      goto 9999
+    endif
+
+    allocate(a%a,source=b%a,stat=info)
+    if (info /= 0) then 
+      info = 4000
+      goto 9999
+    end if
+    call a%a%transc(b%a)    
+    
+    call psb_erractionrestore(err_act)
+    return
+
+9999 continue
+    call psb_erractionrestore(err_act)
+
+    if (err_act == psb_act_abort_) then
+      call psb_error()
+      return
+    end if
+
+  end subroutine d_transc_2mat
+
+
+
   subroutine reinit(a,clear)
     use psb_error_mod
     implicit none 
@@ -1611,6 +1768,7 @@ contains
     end if
 
   end subroutine reinit
+
 
 
   !=====================================

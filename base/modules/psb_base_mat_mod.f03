@@ -81,6 +81,12 @@ module psb_base_mat_mod
     generic, public    :: cp_from => base_cp_from
     procedure, pass(a) :: base_mv_from
     generic, public    :: mv_from => base_mv_from
+    procedure, pass(a) :: base_transp_1mat
+    procedure, pass(a) :: base_transp_2mat
+    generic, public    :: transp => base_transp_1mat, base_transp_2mat
+    procedure, pass(a) :: base_transc_1mat
+    procedure, pass(a) :: base_transc_2mat
+    generic, public    :: transc => base_transc_1mat, base_transc_2mat
 
   end type psb_base_sparse_mat
 
@@ -91,7 +97,8 @@ module psb_base_mat_mod
        & is_upd, is_asb, is_sorted, is_upper, is_lower, is_triangle, &
        & is_unit, get_neigh, allocate_mn, allocate_mnnz, reallocate_nz, &
        & free, sparse_print, get_fmt, trim, sizeof, reinit, csgetptn, &
-       & get_nz_row, get_aux, set_aux, base_cp_from, base_mv_from
+       & get_nz_row, get_aux, set_aux, base_cp_from, base_mv_from, &
+       & base_transp_1mat, base_transp_2mat,  base_transc_1mat, base_transc_2mat
   
 contains
 
@@ -480,6 +487,72 @@ contains
     return
 
   end subroutine base_cp_from
+
+
+  !
+  ! Here we go. 
+  !
+  subroutine base_transp_2mat(a,b)
+    use psb_error_mod
+    implicit none 
+    
+    class(psb_base_sparse_mat), intent(out) :: a
+    class(psb_base_sparse_mat), intent(in)  :: b
+    
+    a%m         = b%n
+    a%n         = b%m
+    a%state     = b%state
+    a%duplicate = b%duplicate
+    a%triangle  = b%triangle
+    a%unitd     = b%unitd
+    a%upper     = .not.b%upper
+    a%sorted    = .false.
+    a%aux       = b%aux 
+    
+    return
+    
+  end subroutine base_transp_2mat
+
+  subroutine base_transc_2mat(a,b)
+    use psb_error_mod
+    implicit none 
+    
+    class(psb_base_sparse_mat), intent(out) :: a
+    class(psb_base_sparse_mat), intent(in)   :: b
+
+    call a%transp(b) 
+  end subroutine base_transc_2mat
+
+  subroutine base_transp_1mat(a)
+    use psb_error_mod
+    implicit none 
+    
+    class(psb_base_sparse_mat), intent(inout) :: a
+    integer :: itmp
+
+    itmp        = a%m
+    a%m         = a%n
+    a%n         = itmp
+    a%state     = a%state
+    a%duplicate = a%duplicate
+    a%triangle  = a%triangle
+    a%unitd     = a%unitd
+    a%upper     = .not.a%upper
+    a%sorted    = .false.
+    
+    return
+    
+  end subroutine base_transp_1mat
+
+  subroutine base_transc_1mat(a)
+    use psb_error_mod
+    implicit none 
+    
+    class(psb_base_sparse_mat), intent(inout) :: a
+    
+    call a%transp() 
+  end subroutine base_transc_1mat
+
 
   subroutine sparse_print(iout,a,iv,eirs,eics,head,ivr,ivc)
     use psb_error_mod
