@@ -87,7 +87,7 @@ module psb_base_mat_mod
     procedure, pass(a) :: base_transc_1mat
     procedure, pass(a) :: base_transc_2mat
     generic, public    :: transc => base_transc_1mat, base_transc_2mat
-
+ 
   end type psb_base_sparse_mat
 
   private :: set_nrows, set_ncols, set_dupl, set_state, &
