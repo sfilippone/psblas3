@@ -41,5 +41,59 @@ module psb_serial_mod
        & psb_sct => psi_sct
 
   use psb_mat_mod
+
+  interface psb_symbmm
+    subroutine psb_dsymbmm(a,b,c,info)
+      use psb_mat_mod
+      implicit none 
+      type(psb_d_sparse_mat), intent(in)  :: a,b
+      type(psb_d_sparse_mat), intent(out) :: c
+      integer, intent(out)                :: info
+    end subroutine psb_dsymbmm
+    subroutine psb_dbase_symbmm(a,b,c,info)
+      use psb_mat_mod
+      implicit none 
+      class(psb_d_base_sparse_mat), intent(in) :: a,b
+      type(psb_d_csr_sparse_mat), intent(out)  :: c
+      integer, intent(out)                     :: info
+    end subroutine psb_dbase_symbmm
+  end interface
+  interface psb_numbmm
+    subroutine psb_dnumbmm(a,b,c)
+      use psb_mat_mod
+      implicit none 
+      type(psb_d_sparse_mat), intent(in) :: a,b
+      type(psb_d_sparse_mat), intent(inout)  :: c
+    end subroutine psb_dnumbmm
+    subroutine psb_dbase_numbmm(a,b,c)
+      use psb_mat_mod
+      implicit none 
+      class(psb_d_base_sparse_mat), intent(in) :: a,b
+      type(psb_d_csr_sparse_mat), intent(inout)  :: c
+    end subroutine psb_dbase_numbmm
+  end interface
+
+  interface psb_rwextd
+    subroutine psb_drwextd(nr,a,info,b,rowscale)
+      use psb_mat_mod
+      implicit none
+      integer, intent(in)                          :: nr
+      type(psb_d_sparse_mat), intent(inout)        :: a
+      integer,intent(out)                          :: info
+      type(psb_d_sparse_mat), intent(in), optional :: b
+      logical,intent(in), optional                 :: rowscale
+    end subroutine psb_drwextd
+    subroutine psb_dbase_rwextd(nr,a,info,b,rowscale)
+      use psb_mat_mod
+      implicit none
+      integer, intent(in)                                :: nr
+      class(psb_d_base_sparse_mat), intent(inout)        :: a
+      integer,intent(out)                                :: info
+      class(psb_d_base_sparse_mat), intent(in), optional :: b
+      logical,intent(in), optional                       :: rowscale
+    end subroutine psb_dbase_rwextd
+  end interface
+  
+  
 end module psb_serial_mod
 

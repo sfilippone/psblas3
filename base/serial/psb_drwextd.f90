@@ -39,127 +39,54 @@
 !
 !
 subroutine psb_drwextd(nr,a,info,b,rowscale)
-  use psb_spmat_type
   use psb_error_mod
   use psb_string_mod
   use psb_serial_mod, psb_protect_name => psb_drwextd
   implicit none
 
   ! Extend matrix A up to NR rows with empty ones (i.e.: all zeroes)
-  integer, intent(in)                            :: nr
-  type(psb_dspmat_type), intent(inout)           :: a
-  integer,intent(out)                            :: info
-  type(psb_dspmat_type), intent(in), optional    :: b
-  logical,intent(in), optional                   :: rowscale
+  integer, intent(in)                          :: nr
+  type(psb_d_sparse_mat), intent(inout)        :: a
+  integer,intent(out)                          :: info
+  type(psb_d_sparse_mat), intent(in), optional :: b
+  logical,intent(in), optional                 :: rowscale
 
   integer :: i,j,ja,jb,err_act,nza,nzb
   character(len=20)                 :: name, ch_err
+  type(psb_d_coo_sparse_mat)        :: actmp
   logical  rowscale_ 
 
   name='psb_drwextd'
   info  = 0
   call psb_erractionsave(err_act)
 
-  if (present(rowscale)) then 
-    rowscale_ = rowscale
-  else
-    rowscale_ = .true.
-  end if
-
-  if (nr > a%m) then 
-    if (psb_toupper(a%fida) == 'CSR') then 
-      call psb_ensure_size(nr+1,a%ia2,info)
+  if (nr > a%get_nrows()) then 
+    select type(aa=> a%a) 
+    type is (psb_d_csr_sparse_mat)
       if (present(b)) then 
-        nzb = psb_sp_get_nnzeros(b)
-        call psb_ensure_size(size(a%ia1)+nzb,a%ia1,info)
-        call psb_ensure_size(size(a%aspk)+nzb,a%aspk,info)
-        if (psb_toupper(b%fida)=='CSR') then 
-
-          do i=1, min(nr-a%m,b%m)
-            a%ia2(a%m+i+1) =  a%ia2(a%m+i) + b%ia2(i+1) - b%ia2(i)
-            ja = a%ia2(a%m+i)
-            jb = b%ia2(i)
-            do 
-              if (jb >=  b%ia2(i+1)) exit
-              a%aspk(ja) = b%aspk(jb)
-              a%ia1(ja) = b%ia1(jb)
-              ja = ja + 1
-              jb = jb + 1
-            end do
-          end do
-          do j=i,nr-a%m
-            a%ia2(a%m+i+1) = a%ia2(a%m+i)
-          end do
-        else 
-          write(0,*) 'Implement SPGETBLK in RWEXTD!!!!!!!'
-        endif
+        call psb_rwextd(nr,aa,info,b%a,rowscale)
       else
-        do i=a%m+2,nr+1
-          a%ia2(i) = a%ia2(i-1)
-        end do
+        call psb_rwextd(nr,aa,info,rowscale=rowscale)
       end if
-      a%m = nr
-      a%k = max(a%k,b%k)
-
-    else if (psb_toupper(a%fida) == 'COO') then 
-
+    type is (psb_d_coo_sparse_mat) 
       if (present(b)) then 
-        nza = psb_sp_get_nnzeros(a)
-        nzb = psb_sp_get_nnzeros(b)
-        call psb_sp_reall(a,nza+nzb,info)
-        if (psb_toupper(b%fida)=='COO') then 
-          if (rowscale_) then 
-            do j=1,nzb
-              if ((a%m + b%ia1(j)) <= nr) then 
-                nza = nza + 1
-                a%ia1(nza)  = a%m + b%ia1(j)
-                a%ia2(nza)  = b%ia2(j)
-                a%aspk(nza) = b%aspk(j)
-              end if
-            enddo
-          else
-            do j=1,nzb
-              if ((b%ia1(j)) <= nr) then 
-                nza = nza + 1
-                a%ia1(nza)  = b%ia1(j)
-                a%ia2(nza)  = b%ia2(j)
-                a%aspk(nza) = b%aspk(j)                
-              endif
-            enddo
-          endif
-          a%infoa(psb_nnz_) = nza
-        else if(psb_toupper(b%fida)=='CSR') then 
-          do i=1, min(nr-a%m,b%m)
-            do 
-              jb = b%ia2(i)
-              if (jb >=  b%ia2(i+1)) exit
-              nza = nza + 1 
-              a%aspk(nza) = b%aspk(jb)
-              a%ia1(nza)  = a%m + i
-              a%ia2(nza)  = b%ia1(jb)
-              jb = jb + 1
-            end do
-          end do
-          a%infoa(psb_nnz_) = nza
+        call psb_rwextd(nr,aa,info,b%a,rowscale=rowscale)
+      else
+        call psb_rwextd(nr,aa,info,rowscale=rowscale)
+      end if
+    class default
+      call aa%mv_to_coo(actmp,info)
+      if (info == 0) then 
+        if (present(b)) then 
+          call psb_rwextd(nr,actmp,info,b%a,rowscale=rowscale)
         else
-          write(0,*) 'Implement SPGETBLK in RWEXTD!!!!!!!'
-        endif
-      endif
-      a%m = nr
-      a%k = max(a%k,b%k)
-    else if (a%fida == 'JAD') then 
-       info=135
-       ch_err=a%fida(1:3)
-       call psb_errpush(info,name,a_err=ch_err)
-       goto 9999
-    else
-       info=136
-       ch_err=a%fida(1:3)
-       call psb_errpush(info,name,a_err=ch_err)
-       goto 9999
-    end if
-
+          call psb_rwextd(nr,actmp,info,rowscale=rowscale)
+        end if
+      end if
+      if (info == 0) call aa%mv_from_coo(actmp,info)
+    end select
   end if
+  if (info /= 0) goto 9999
 
   call psb_erractionrestore(err_act)
   return
@@ -173,3 +100,158 @@ subroutine psb_drwextd(nr,a,info,b,rowscale)
   return
 
 end subroutine psb_drwextd
+subroutine psb_dbase_rwextd(nr,a,info,b,rowscale)
+  use psb_error_mod
+  use psb_string_mod
+  use psb_serial_mod, psb_protect_name => psb_dbase_rwextd
+  implicit none
+
+  ! Extend matrix A up to NR rows with empty ones (i.e.: all zeroes)
+  integer, intent(in)                                :: nr
+  class(psb_d_base_sparse_mat), intent(inout)        :: a
+  integer,intent(out)                                :: info
+  class(psb_d_base_sparse_mat), intent(in), optional :: b
+  logical,intent(in), optional                       :: rowscale
+
+  integer :: i,j,ja,jb,err_act,nza,nzb, ma, mb, na, nb
+  character(len=20)                 :: name, ch_err
+  logical  rowscale_ 
+
+  name='psb_dbase_rwextd'
+  info  = 0
+  call psb_erractionsave(err_act)
+
+  if (present(rowscale)) then 
+    rowscale_ = rowscale
+  else
+    rowscale_ = .true.
+  end if
+
+  ma = a%get_nrows()
+  na = a%get_ncols()
+
+
+  select type(a) 
+  type is (psb_d_csr_sparse_mat)
+
+    call psb_ensure_size(nr+1,a%irp,info)
+
+    if (present(b)) then 
+      mb = b%get_nrows()
+      nb = b%get_ncols()
+      nzb = b%get_nzeros()
+
+      select type (b) 
+      type is (psb_d_csr_sparse_mat)
+        call psb_ensure_size(size(a%ja)+nzb,a%ja,info)
+        call psb_ensure_size(size(a%val)+nzb,a%val,info)
+        do i=1, min(nr-ma,mb)
+          a%irp(ma+i+1) =  a%irp(ma+i) + b%irp(i+1) - b%irp(i)
+          ja = a%irp(ma+i)
+          jb = b%irp(i)
+          do 
+            if (jb >=  b%irp(i+1)) exit
+            a%val(ja) = b%val(jb)
+            a%ja(ja)  = b%ja(jb)
+            ja = ja + 1
+            jb = jb + 1
+          end do
+        end do
+        do j=i,nr-ma
+          a%irp(ma+i+1) = a%irp(ma+i)
+        end do
+        class default 
+
+        write(0,*) 'Implement SPGETBLK in RWEXTD!!!!!!!'
+      end select
+      call a%set_ncols(max(na,nb))
+
+    else
+
+      do i=ma+2,nr+1
+        a%irp(i) = a%irp(i-1)
+      end do
+
+    end if
+
+    call a%set_nrows(nr)
+
+
+  type is (psb_d_coo_sparse_mat) 
+    nza = a%get_nzeros()
+
+    if (present(b)) then 
+      mb = b%get_nrows()
+      nb = b%get_ncols()
+      nzb = b%get_nzeros()
+      call a%reallocate(nza+nzb)
+
+      select type(b)
+      type is (psb_d_coo_sparse_mat) 
+
+        if (rowscale_) then 
+          do j=1,nzb
+            if ((ma + b%ia(j)) <= nr) then 
+              nza = nza + 1
+              a%ia(nza)  = ma + b%ia(j)
+              a%ja(nza)  = b%ja(j)
+              a%val(nza) = b%val(j)
+            end if
+          enddo
+        else
+          do j=1,nzb
+            if ((ma + b%ia(j)) <= nr) then 
+              nza = nza + 1
+              a%ia(nza)  = b%ia(j)
+              a%ja(nza)  = b%ja(j)
+              a%val(nza) = b%val(j)
+            end if
+          enddo
+        endif
+        call a%set_nzeros(nza)
+
+      type is (psb_d_csr_sparse_mat) 
+        
+        do i=1, min(nr-ma,mb)
+          do 
+            jb = b%irp(i)
+            if (jb >=  b%irp(i+1)) exit
+            nza = nza + 1 
+            a%val(nza) = b%val(jb)
+            a%ia(nza)  = ma + i
+            a%ja(nza)  = b%ja(jb)
+            jb = jb + 1
+          end do
+        end do
+        call a%set_nzeros(nza)
+
+      class default 
+        write(0,*) 'Implement SPGETBLK in RWEXTD!!!!!!!'
+
+      end select
+
+      call a%set_ncols(max(na,nb))
+    endif
+
+    call a%set_nrows(nr)
+
+  class default 
+    info = 135
+    ch_err=a%get_fmt()
+    call psb_errpush(info,name,a_err=ch_err)
+    goto 9999
+
+  end select
+
+  call psb_erractionrestore(err_act)
+  return
+
+9999 continue
+  call psb_erractionrestore(err_act)
+  if (err_act == psb_act_abort_) then
+    call psb_error()
+    return
+  end if
+  return
+
+end subroutine psb_dbase_rwextd

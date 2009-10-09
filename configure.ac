@@ -399,7 +399,7 @@ if test "X$FCOPT" == "X" ; then
 fi
 if test "X$psblas_cv_fc" == X"nag" ; then
    # Add needed options 
-   FCOPT="$FCOPT  -dcfuns -f2003 -wmismatch=mpi_scatterv,mpi_alltoallv,mpi_gatherv"
+   FCOPT="$FCOPT  -dcfuns -f2003 -wmismatch=mpi_scatterv,mpi_alltoallv,mpi_gatherv,mpi_allgatherv"
 fi
 FFLAGS="${FCOPT}"
 
@@ -432,7 +432,7 @@ else
 fi
 if test "X$psblas_cv_fc" == X"nag" ; then
    # Add needed options 
-     F90COPT="$F90COPT -dcfuns -f2003 -wmismatch=mpi_scatterv,mpi_alltoallv,mpi_gatherv"
+     F90COPT="$F90COPT -dcfuns -f2003 -wmismatch=mpi_scatterv,mpi_alltoallv,mpi_gatherv,mpi_allgatherv"
      EXTRA_OPT="-mismatch_all"
      F03COPT="${F90COPT}"
 else

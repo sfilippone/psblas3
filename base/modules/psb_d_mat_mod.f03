@@ -52,18 +52,25 @@ module psb_d_mat_mod
     procedure, pass(a) :: d_csgetrow
     procedure, pass(a) :: d_csgetblk
     generic, public    :: csget => d_csgetptn, d_csgetrow, d_csgetblk 
-    procedure, pass(a) :: csclip
+    procedure, pass(a) :: d_csclip
+    procedure, pass(a) :: d_b_csclip
+    generic, public    :: csclip => d_b_csclip, d_csclip
     procedure, pass(a) :: reall => reallocate_nz
     procedure, pass(a) :: get_neigh
     procedure, pass(a) :: d_cscnv
     procedure, pass(a) :: d_cscnv_ip
-    generic, public    :: cscnv => d_cscnv, d_cscnv_ip
+    procedure, pass(a) :: d_cscnv_base
+    generic, public    :: cscnv => d_cscnv, d_cscnv_ip, d_cscnv_base
     procedure, pass(a) :: reinit
     procedure, pass(a) :: print => sparse_print
     procedure, pass(a) :: d_mv_from
     generic, public    :: mv_from => d_mv_from
+    procedure, pass(a) :: d_mv_to
+    generic, public    :: mv_to => d_mv_to
     procedure, pass(a) :: d_cp_from
     generic, public    :: cp_from => d_cp_from
+    procedure, pass(a) :: d_cp_to
+    generic, public    :: cp_to => d_cp_to
     procedure, pass(a) :: d_transp_1mat
     procedure, pass(a) :: d_transp_2mat
     generic, public    :: transp => d_transp_1mat, d_transp_2mat
@@ -92,7 +99,7 @@ module psb_d_mat_mod
        & get_state, get_dupl, is_null, is_bld, is_upd, &
        & is_asb, is_sorted, is_upper, is_lower, is_triangle, &
        & is_unit, get_neigh, csall, csput, d_csgetrow,&
-       & d_csgetblk, csclip, d_cscnv, d_cscnv_ip, &
+       & d_csgetblk, d_csclip, d_b_csclip, d_cscnv, d_cscnv_ip, &
        & reallocate_nz, free, trim, &
        & sparse_print, reinit, &
        & set_nrows, set_ncols, set_dupl, &
@@ -100,7 +107,7 @@ module psb_d_mat_mod
        & set_upd, set_asb, set_sorted, &
        & set_upper, set_lower, set_triangle, &
        & set_unit, get_diag, get_nz_row, d_csgetptn, &
-       & d_mv_from, d_cp_from, &
+       & d_mv_from, d_mv_to, d_cp_from, d_cp_to,&
        & d_transp_1mat, d_transp_2mat, &
        & d_transc_1mat, d_transc_2mat
 
@@ -1262,7 +1269,7 @@ contains
 
 
 
-  subroutine csclip(a,b,info,&
+  subroutine d_csclip(a,b,info,&
        & imin,imax,jmin,jmax,rscale,cscale)
     ! Output is always in  COO format 
     use psb_error_mod
@@ -1306,7 +1313,52 @@ contains
       return
     end if
 
-  end subroutine csclip
+  end subroutine d_csclip
+
+  subroutine d_b_csclip(a,b,info,&
+       & imin,imax,jmin,jmax,rscale,cscale)
+    ! Output is always in  COO format 
+    use psb_error_mod
+    use psb_const_mod
+    use psb_d_base_mat_mod
+    implicit none
+    
+    class(psb_d_sparse_mat), intent(in) :: a
+    type(psb_d_coo_sparse_mat), intent(out) :: b
+    integer,intent(out)                  :: info
+    integer, intent(in), optional        :: imin,imax,jmin,jmax
+    logical, intent(in), optional        :: rscale,cscale
+
+    Integer :: err_act
+    character(len=20)  :: name='csclip'
+    logical, parameter :: debug=.false.
+    type(psb_d_coo_sparse_mat), allocatable  :: acoo
+
+    info = 0
+    call psb_erractionsave(err_act)
+    if (a%is_null()) then 
+      info = 1121
+      call psb_errpush(info,name)
+      goto 9999
+    endif
+
+    allocate(acoo,stat=info)    
+    if (info == 0) call a%a%csclip(b,info,&
+       & imin,imax,jmin,jmax,rscale,cscale)
+    if (info /= 0) goto 9999 
+
+    call psb_erractionrestore(err_act)
+    return
+
+9999 continue
+    call psb_erractionrestore(err_act)
+
+    if (err_act == psb_act_abort_) then
+      call psb_error()
+      return
+    end if
+
+  end subroutine d_b_csclip
 
 
 
@@ -1494,6 +1546,61 @@ contains
 
   end subroutine d_cscnv_ip
 
+
+  subroutine d_cscnv_base(a,b,info,dupl)
+    use psb_error_mod
+    use psb_string_mod
+    implicit none 
+    class(psb_d_sparse_mat), intent(in)       :: a
+    class(psb_d_base_sparse_mat), intent(out) :: b
+    integer, intent(out)                   :: info
+    integer,optional, intent(in)           :: dupl
+
+
+    type(psb_d_coo_sparse_mat)  :: altmp
+    Integer :: err_act
+    character(len=20)  :: name='cscnv'
+    logical, parameter :: debug=.false.
+
+    info = 0
+    call psb_erractionsave(err_act)
+
+    if (a%is_null()) then 
+      info = 1121
+      call psb_errpush(info,name)
+      goto 9999
+    endif
+
+    call a%a%cp_to_coo(altmp,info )
+    if ((info == 0).and.present(dupl)) then 
+      call altmp%set_dupl(dupl)
+    end if
+    call altmp%fix(info)
+    if (info == 0) call altmp%trim()
+    if (info == 0) call altmp%set_asb() 
+    if (info == 0) call b%mv_from_coo(altmp,info)
+
+    if (info /= 0) then
+      info = 4010
+      call psb_errpush(info,name,a_err="mv_from")
+      goto 9999
+    end if
+
+    call psb_erractionrestore(err_act)
+    return
+
+9999 continue
+    call psb_erractionrestore(err_act)
+
+    if (err_act == psb_act_abort_) then
+      call psb_error()
+      return
+    end if
+
+  end subroutine d_cscnv_base
+
+
+
   subroutine d_mv_from(a,b)
     use psb_error_mod
     use psb_string_mod
@@ -1537,6 +1644,33 @@ contains
       return
     end if
   end subroutine d_cp_from
+
+  subroutine d_mv_to(a,b)
+    use psb_error_mod
+    use psb_string_mod
+    implicit none 
+    class(psb_d_sparse_mat), intent(inout) :: a
+    class(psb_d_base_sparse_mat), intent(out) :: b
+    integer :: info
+
+    call b%mv_from_fmt(a%a,info)
+    
+    return
+  end subroutine d_mv_to
+
+  subroutine d_cp_to(a,b)
+    use psb_error_mod
+    use psb_string_mod
+    implicit none 
+    class(psb_d_sparse_mat), intent(in) :: a
+    class(psb_d_base_sparse_mat), intent(out) :: b
+    integer :: info
+
+    call b%cp_from_fmt(a%a,info)
+    
+    return
+  end subroutine d_cp_to
+
 
   subroutine d_sparse_mat_move(a,b,info)
     use psb_error_mod
@@ -1979,7 +2113,7 @@ contains
     integer, intent(out)                 :: info
 
     Integer :: err_act
-    character(len=20)  :: name='csnmi'
+    character(len=20)  :: name='get_diag'
     logical, parameter :: debug=.false.
 
     call psb_erractionsave(err_act)
@@ -2015,7 +2149,7 @@ contains
     integer, intent(out)                    :: info
 
     Integer :: err_act
-    character(len=20)  :: name='csnmi'
+    character(len=20)  :: name='scal'
     logical, parameter :: debug=.false.
 
     call psb_erractionsave(err_act)
@@ -2051,7 +2185,7 @@ contains
     integer, intent(out)                    :: info
 
     Integer :: err_act
-    character(len=20)  :: name='csnmi'
+    character(len=20)  :: name='scal'
     logical, parameter :: debug=.false.
 
     call psb_erractionsave(err_act)

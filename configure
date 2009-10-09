@@ -771,7 +771,7 @@ SHELL'
 ac_subst_files=''
 ac_user_opts='
 enable_option_checking
-with_serial_mpi
+enable_serial
 with_ccopt
 with_fcopt
 with_f90copt
@@ -1429,14 +1429,14 @@ Optional Features:
   --disable-option-checking  ignore unrecognized --enable/--with options
   --disable-FEATURE       do not include FEATURE (same as --enable-FEATURE=no)
   --enable-FEATURE[=ARG]  include FEATURE [ARG=yes]
+  --enable-serial         Specify whether to enable a fake mpi library to run
+                          in serial mode.
   --disable-dependency-tracking  speeds up one-time build
   --enable-dependency-tracking   do not reject slow dependency extractors
 
 Optional Packages:
   --with-PACKAGE[=ARG]    use PACKAGE [ARG=yes]
   --without-PACKAGE       do not use PACKAGE (same as --with-PACKAGE=no)
-  --with-serial-mpi       Specify whether to enable a fake mpi library to run
-                          in serial mode. --with-serial-mpi={yes|no}
   --with-ccopt            additional CCOPT flags to be added: will prepend
                           to CCOPT
   --with-fcopt            additional FCOPT flags to be added: will prepend
@@ -3394,14 +3394,11 @@ fi
 
 { $as_echo "$as_me:$LINENO: checking whether we want serial (fake) mpi" >&5
 $as_echo_n "checking whether we want serial (fake) mpi... " >&6; }
+# Check whether --enable-serial was given.
+if test "${enable_serial+set}" = set; then
+  enableval=$enable_serial;
+pac_cv_serial_mpi="yes";
 
-# Check whether --with-serial-mpi was given.
-if test "${with_serial_mpi+set}" = set; then
-  withval=$with_serial_mpi;
-pac_cv_serial_mpi="${withval}";
-
-else
-  pac_cv_serial_mpi="no";
 
 fi
 
@@ -3409,7 +3406,8 @@ if test x"$pac_cv_serial_mpi" == x"yes" ; then
    { $as_echo "$as_me:$LINENO: result: yes." >&5
 $as_echo "yes." >&6; }
 else
-   { $as_echo "$as_me:$LINENO: result: no." >&5
+ pac_cv_serial_mpi="no";
+ { $as_echo "$as_me:$LINENO: result: no." >&5
 $as_echo "no." >&6; }
 fi
 
@@ -7119,7 +7117,7 @@ if test "X$FCOPT" == "X" ; then
 fi
 if test "X$psblas_cv_fc" == X"nag" ; then
    # Add needed options
-   FCOPT="$FCOPT  -dcfuns -f2003 -wmismatch=mpi_scatterv,mpi_alltoallv,mpi_gatherv"
+   FCOPT="$FCOPT  -dcfuns -f2003 -wmismatch=mpi_scatterv,mpi_alltoallv,mpi_gatherv,mpi_allgatherv"
 fi
 FFLAGS="${FCOPT}"
 
@@ -7152,7 +7150,7 @@ else
 fi
 if test "X$psblas_cv_fc" == X"nag" ; then
    # Add needed options
-     F90COPT="$F90COPT -dcfuns -f2003 -wmismatch=mpi_scatterv,mpi_alltoallv,mpi_gatherv"
+     F90COPT="$F90COPT -dcfuns -f2003 -wmismatch=mpi_scatterv,mpi_alltoallv,mpi_gatherv,mpi_allgatherv"
      EXTRA_OPT="-mismatch_all"
      F03COPT="${F90COPT}"
 else

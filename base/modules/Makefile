@@ -53,6 +53,7 @@ psi_mod.o: psb_penv_mod.o psb_error_mod.o psb_desc_type.o psb_const_mod.o psi_se
 psb_desc_type.o: psb_const_mod.o psb_error_mod.o psb_penv_mod.o psb_realloc_mod.o  psb_hash_mod.o
 psb_linmap_mod.o: psb_linmap_type_mod.o psb_mat_mod.o 
 psb_linmap_type_mod.o: psb_desc_type.o psb_error_mod.o psb_serial_mod.o psb_comm_mod.o psb_mat_mod.o
+psb_comm_mod.o: psb_desc_type.o psb_mat_mod.o
 psb_check_mod.o: psb_desc_type.o
 psb_serial_mod.o: psb_mat_mod.o psb_string_mod.o psb_sort_mod.o psi_serial_mod.o
 psb_sort_mod.o: psb_error_mod.o psb_realloc_mod.o psb_const_mod.o

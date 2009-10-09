@@ -4,7 +4,7 @@ include ../../../Make.inc
 # The object files
 #
 FOBJS =  daxpby.o 	saxpby.o \
-	caxpby.o  zaxpby.o 
+	caxpby.o  zaxpby.o smmp.o
 
 
 #	clpupd.o ccsmm.o cswmm.o ccsnmi.o ccsrws.o\
