@@ -40,8 +40,8 @@ module psb_const_mod
   !
   integer, parameter  :: psb_dpk_ = kind(1.d0)
   integer, parameter  :: psb_spk_ = kind(1.e0)
-  integer             :: psb_sizeof_dp, psb_sizeof_sp
-  integer             :: psb_sizeof_int, psb_sizeof_long_int
+  integer, save       :: psb_sizeof_dp, psb_sizeof_sp
+  integer, save       :: psb_sizeof_int, psb_sizeof_long_int
 
   !
   !     Handy & miscellaneous constants
