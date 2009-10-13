@@ -18,7 +18,7 @@ c=======================================================================
      *  index)
       use psb_const_mod
       use psb_realloc_mod
-      use psb_serial_mod, only: psb_msort
+      use psb_sort_mod, only: psb_msort
 c
       integer       ia(*), ja(*), diaga,
      *  ib(*), jb(*), diagb,
