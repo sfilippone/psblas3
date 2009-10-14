@@ -619,6 +619,8 @@ contains
 
   subroutine get_neigh(a,idx,neigh,n,info,lev)
     use psb_error_mod
+    use psb_realloc_mod
+    use psb_sort_mod
     implicit none 
     class(psb_base_sparse_mat), intent(in) :: a   
     integer, intent(in)                :: idx 
@@ -626,17 +628,64 @@ contains
     integer, allocatable, intent(out)  :: neigh(:)
     integer, intent(out)               :: info
     integer, optional, intent(in)      :: lev 
-    
-    Integer :: err_act
+
+    integer :: lev_, i, nl, ifl,ill,&
+         &  n1, err_act, nn, nidx,ntl
+    integer, allocatable :: ia(:), ja(:)
     character(len=20)  :: name='get_neigh'
     logical, parameter :: debug=.false.
 
-    call psb_get_erraction(err_act)
-    info = 700
-    ! This is the base version. If we get here
-    ! it means the derived class is incomplete,
-    ! so we throw an error.
-    call psb_errpush(700,name,a_err=a%get_fmt())
+    call psb_erractionsave(err_act)
+    info = 0
+    if(present(lev)) then 
+      lev_ = lev
+    else
+      lev_=1
+    end if
+    ! Turns out we can write get_neigh at this
+    ! level 
+    n = 0
+    call a%csget(idx,idx,n,ia,ja,info)
+    if (info == 0) call psb_realloc(n,neigh,info)
+    if (info /= 0) then 
+      call psb_errpush(4000,name)
+      goto 9999
+    end if
+    neigh(1:n) = ja(1:n)
+    ifl = 1
+    ill = n
+    do nl = 2, lev_ 
+      n1 = ill - ifl + 1
+      call psb_ensure_size(ill+n1*n1,neigh,info)
+      if (info /= 0) then 
+        call psb_errpush(4000,name)
+        goto 9999
+      end if
+      ntl = 0
+      do i=ifl,ill
+        nidx=neigh(i)
+        if ((nidx /= idx).and.(nidx > 0).and.(nidx <= a%m)) then
+          call a%csget(nidx,nidx,nn,ia,ja,info)
+          if (info==0) call psb_ensure_size(ill+ntl+nn,neigh,info)
+          if (info /= 0) then 
+            call psb_errpush(4000,name)
+            goto 9999
+          end if
+          neigh(ill+ntl+1:ill+ntl+nn)=ja(1:nn)
+          ntl = ntl+nn
+        end if
+      end do
+      call psb_msort_unique(neigh(ill+1:ill+ntl),nn)
+      ifl = ill + 1
+      ill = ill + nn
+    end do
+    call psb_msort_unique(neigh(1:ill),nn,dir=psb_sort_up_)
+    n = nn
+
+    call psb_erractionrestore(err_act)
+    return
+
+9999 continue
 
     if (err_act /= psb_act_ret_) then
       call psb_error()
