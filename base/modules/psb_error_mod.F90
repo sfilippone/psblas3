@@ -480,7 +480,9 @@ contains
     case(600)
       write (0,'("Sparse Matrix and descriptors are in an invalid state for this subroutine call: ",i0)')i_e_d(1)
     case(700)
-      write (0,'("Base version has been called; the class implementation for ",a," may be incomplete!")') a_e_d
+      write (0,'("The base version of subroutine ''",a,"'' has been called.",/,&
+           &"The class implementation for ''",a,"'' may be incomplete!")') &
+           & trim(r_name), trim(a_e_d)
 
     case (1121)
       write (0,'("Invalid state for sparse matrix A")')
