@@ -1332,7 +1332,6 @@ contains
     Integer :: err_act
     character(len=20)  :: name='csclip'
     logical, parameter :: debug=.false.
-    type(psb_d_coo_sparse_mat), allocatable  :: acoo
 
     info = 0
     call psb_erractionsave(err_act)
@@ -1341,9 +1340,8 @@ contains
       call psb_errpush(info,name)
       goto 9999
     endif
-
-    allocate(acoo,stat=info)    
-    if (info == 0) call a%a%csclip(b,info,&
+    write(0,*) 'b_csclip :',a%get_fmt()
+    call a%a%csclip(b,info,&
        & imin,imax,jmin,jmax,rscale,cscale)
     if (info /= 0) goto 9999 
 

@@ -950,7 +950,10 @@ subroutine d_coo_csgetptn_impl(imin,imax,a,nz,ia,ja,info,&
     jmax_ = a%get_ncols()
   endif
 
-  if ((imax<imin).or.(jmax_<jmin_)) return
+  if ((imax<imin).or.(jmax_<jmin_)) then 
+    nz = 0
+    return
+  end if
 
   if (present(append)) then
     append_=append
@@ -1222,7 +1225,10 @@ subroutine d_coo_csgetrow_impl(imin,imax,a,nz,ia,ja,val,info,&
     jmax_ = a%get_ncols()
   endif
 
-  if ((imax<imin).or.(jmax_<jmin_)) return
+  if ((imax<imin).or.(jmax_<jmin_)) then 
+    nz = 0
+    return
+  end if
 
   if (present(append)) then
     append_=append

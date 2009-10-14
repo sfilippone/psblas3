@@ -809,7 +809,7 @@ subroutine d_csr_cssm_impl(alpha,a,x,beta,y,info,trans)
   real(psb_dpk_), allocatable :: tmp(:,:)
   logical   :: tra
   Integer :: err_act
-  character(len=20)  :: name='d_base_cssm'
+  character(len=20)  :: name='d_csr_cssm'
   logical, parameter :: debug=.false.
 
   info = 0
@@ -1087,7 +1087,10 @@ subroutine d_csr_csgetptn_impl(imin,imax,a,nz,ia,ja,info,&
     jmax_ = a%get_ncols()
   endif
 
-  if ((imax<imin).or.(jmax_<jmin_)) return
+  if ((imax<imin).or.(jmax_<jmin_)) then 
+    nz = 0
+    return
+  end if
 
   if (present(append)) then
     append_=append
@@ -1163,7 +1166,7 @@ contains
     integer, optional                    :: iren(:)
     integer  :: nzin_, nza, idx,i,j,k, nzt, irw, lrw
     integer  :: debug_level, debug_unit
-    character(len=20) :: name='coo_getrow'
+    character(len=20) :: name='csr_getptn'
 
     debug_unit  = psb_get_debug_unit()
     debug_level = psb_get_debug_level()
@@ -1248,7 +1251,7 @@ subroutine d_csr_csgetrow_impl(imin,imax,a,nz,ia,ja,val,info,&
 
   call psb_erractionsave(err_act)
   info = 0
-
+  
   if (present(jmin)) then
     jmin_ = jmin
   else
@@ -1260,7 +1263,10 @@ subroutine d_csr_csgetrow_impl(imin,imax,a,nz,ia,ja,val,info,&
     jmax_ = a%get_ncols()
   endif
 
-  if ((imax<imin).or.(jmax_<jmin_)) return
+  if ((imax<imin).or.(jmax_<jmin_)) then 
+    nz = 0
+    return
+  end if
 
   if (present(append)) then
     append_=append
