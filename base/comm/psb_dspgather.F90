@@ -2,7 +2,7 @@ subroutine  psb_dsp_allgather(globa, loca, desc_a, info, root, dupl,keepnum,keep
   use psb_descriptor_type
   use psb_error_mod
   use psb_mat_mod
-
+  use psb_penv_mod
 #ifdef MPI_MOD
   use mpi
 #endif

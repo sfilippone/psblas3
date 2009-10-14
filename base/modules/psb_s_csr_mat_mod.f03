@@ -272,7 +272,7 @@ contains
     class(psb_s_csr_sparse_mat), intent(in) :: a
     integer(psb_long_int_k_) :: res
     res = 8 
-    res = res + psb_sizeof_dp  * size(a%val)
+    res = res + psb_sizeof_sp  * size(a%val)
     res = res + psb_sizeof_int * size(a%irp)
     res = res + psb_sizeof_int * size(a%ja)
       

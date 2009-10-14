@@ -137,7 +137,7 @@ contains
     if(psb_get_errstatus() /= 0) return 
     info=0
     call psb_erractionsave(err_act)
-    call trw%allocate(0,0,info)
+    call trw%allocate(0,0,1)
     if(info /= 0) then
       info=4010
       ch_err='psb_sp_all'
