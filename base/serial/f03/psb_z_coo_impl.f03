@@ -2580,11 +2580,6 @@ subroutine z_mv_coo_from_coo_impl(a,b,info)
   call move_alloc(b%ja , a%ja   )
   call move_alloc(b%val, a%val )
   call b%free()
-
-  a%ia(:)  = b%ia(:)
-  a%ja(:)  = b%ja(:)
-  a%val(:) = b%val(:)
-
   call a%fix(info)
 
   if (info /= 0) goto 9999

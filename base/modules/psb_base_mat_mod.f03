@@ -483,10 +483,8 @@ contains
     a%unitd     = b%unitd
     a%upper     = b%upper
     a%sorted    = b%sorted
-    if (allocated(b%aux)) then 
-      allocate(a%aux(size(b%aux)))
-      a%aux(:)       = b%aux(:)
-    end if
+    a%aux       = b%aux
+
     return
 
   end subroutine base_cp_from
@@ -510,10 +508,7 @@ contains
     a%unitd     = b%unitd
     a%upper     = .not.b%upper
     a%sorted    = .false.
-    if (allocated(b%aux)) then 
-      allocate(a%aux(size(b%aux)))
-      a%aux(:)       = b%aux(:)
-    end if
+    a%aux       = b%aux
     
     return
     
