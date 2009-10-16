@@ -1340,7 +1340,7 @@ contains
       call psb_errpush(info,name)
       goto 9999
     endif
-    write(0,*) 'b_csclip :',a%get_fmt()
+
     call a%a%csclip(b,info,&
        & imin,imax,jmin,jmax,rscale,cscale)
     if (info /= 0) goto 9999 
