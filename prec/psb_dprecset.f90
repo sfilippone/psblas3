@@ -37,50 +37,18 @@ subroutine psb_dprecseti(p,what,val,info)
   type(psb_dprec_type), intent(inout)    :: p
   integer                                :: what, val 
   integer, intent(out)                   :: info
+  character(len=20) :: name='precset'
 
   info = 0
-  return
-  select case(what)
-  case (psb_f_type_) 
-    if (p%iprcparm(psb_p_type_) /= psb_bjac_) then 
-      write(0,*) 'WHAT is invalid for current preconditioner ',p%iprcparm(psb_p_type_),&
-           & 'ignoring user specification'
-      return
-    endif
-    p%iprcparm(psb_f_type_)     = val
+  if (.not.allocated(p%dprec)) then 
+    info = 1124
+    call psb_errpush(info,name,a_err="preconditioner")
+    return
+!!$    goto 9999
+  end if
 
-  case (psb_ilu_fill_in_) 
-    if ((p%iprcparm(psb_p_type_) /= psb_bjac_).or.(p%iprcparm(psb_f_type_) /= psb_f_ilu_n_)) then 
-      write(0,*) 'WHAT is invalid for current preconditioner ',p%iprcparm(psb_p_type_),&
-           & 'ignoring user specification'
-      return
-    endif
-    p%iprcparm(psb_ilu_fill_in_) = val
- 
-  case default
-    write(0,*) 'WHAT is invalid, ignoring user specification'
-
-  end select
-  return
-
-end subroutine psb_dprecseti
-
-
-subroutine psb_dprecsetd(p,what,val,info)
-
-  use psb_base_mod
-  use psb_prec_mod, psb_protect_name => psb_dprecsetd
-  implicit none
-  type(psb_dprec_type), intent(inout)    :: p
-  integer                                :: what
-  real(psb_dpk_)                       :: val 
-  integer, intent(out)                   :: info
-
-!
-!  This will have to be changed if/when we put together an ILU(eps)
-!  factorization.
-!
-  select case(what)
+  call p%dprec%precset(what,val,info)
+!!$  select case(what)
 !!$  case (psb_f_type_) 
 !!$    if (p%iprcparm(psb_p_type_) /= psb_bjac_) then 
 !!$      write(0,*) 'WHAT is invalid for current preconditioner ',p%iprcparm(psb_p_type_),&
@@ -96,11 +64,61 @@ subroutine psb_dprecsetd(p,what,val,info)
 !!$      return
 !!$    endif
 !!$    p%iprcparm(psb_ilu_fill_in_) = val
- 
-  case default
-    write(0,*) 'WHAT is invalid, ignoring user specification'
+!!$ 
+!!$  case default
+!!$    write(0,*) 'WHAT is invalid, ignoring user specification'
+!!$
+!!$  end select
+  return
 
-  end select
+end subroutine psb_dprecseti
+
+
+subroutine psb_dprecsetd(p,what,val,info)
+
+  use psb_base_mod
+  use psb_prec_mod, psb_protect_name => psb_dprecsetd
+  implicit none
+  type(psb_dprec_type), intent(inout)    :: p
+  integer                                :: what
+  real(psb_dpk_)                       :: val 
+  integer, intent(out)                   :: info
+  character(len=20) :: name='precset'
+
+  info = 0
+  if (.not.allocated(p%dprec)) then 
+    info = 1124
+    call psb_errpush(info,name,a_err="preconditioner")
+    return
+!!$    goto 9999
+  end if
+
+  call p%dprec%precset(what,val,info)
+!!$!
+!!$!  This will have to be changed if/when we put together an ILU(eps)
+!!$!  factorization.
+!!$!
+!!$  select case(what)
+!!$  case (psb_f_type_) 
+!!$    if (p%iprcparm(psb_p_type_) /= psb_bjac_) then 
+!!$      write(0,*) 'WHAT is invalid for current preconditioner ',p%iprcparm(psb_p_type_),&
+!!$           & 'ignoring user specification'
+!!$      return
+!!$    endif
+!!$    p%iprcparm(psb_f_type_)     = val
+!!$
+!!$  case (psb_ilu_fill_in_) 
+!!$    if ((p%iprcparm(psb_p_type_) /= psb_bjac_).or.(p%iprcparm(psb_f_type_) /= psb_f_ilu_n_)) then 
+!!$      write(0,*) 'WHAT is invalid for current preconditioner ',p%iprcparm(psb_p_type_),&
+!!$           & 'ignoring user specification'
+!!$      return
+!!$    endif
+!!$    p%iprcparm(psb_ilu_fill_in_) = val
+!!$ 
+!!$  case default
+!!$    write(0,*) 'WHAT is invalid, ignoring user specification'
+!!$
+!!$  end select
   return
 
 end subroutine psb_dprecsetd

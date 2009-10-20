@@ -2,12 +2,10 @@ include ../Make.inc
 
 LIBDIR=../lib
 HERE=.
-MODOBJS= psb_prec_type.o  psb_prec_mod.o
-F90OBJS= psb_dbjac_bld.o psb_dilu_fct.o\
+MODOBJS= psb_prec_type.o  psb_prec_mod.o psb_d_diagprec.o psb_d_nullprec.o \
+	psb_d_bjacprec.o
+F90OBJS=  psb_dilu_fct.o\
 	psb_dprecbld.o psb_dprecset.o psb_dprecinit.o \
-	psb_ddiagsc_bld.o \
-	psb_dprc_aply.o \
-	psb_dgprec_aply.o psb_dbjac_aply.o\
 	psb_sbjac_bld.o psb_silu_fct.o\
 	psb_sprecbld.o psb_sprecset.o psb_sprecinit.o \
 	psb_sdiagsc_bld.o \
@@ -39,6 +37,7 @@ $(OBJS): $(LIBDIR)/psb_base_mod$(.mod)
 $(F90OBJS): $(MODOBJS)
 
 psb_prec_mod.o:  psb_prec_type.o
+psb_d_bjacprec.o psb_d_diagprec.o psb_d_nullprec.o:  psb_prec_type.o psb_prec_mod.o
 
 veryclean: clean
 	/bin/rm -f $(LIBNAME)
