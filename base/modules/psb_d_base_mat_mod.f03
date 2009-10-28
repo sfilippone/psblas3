@@ -1258,7 +1258,7 @@ contains
         
         allocate(tmp(nac),stat=info) 
         if (info /= 0) info = 4000 
-        if (info == 0) tmp(1:nac) = d(1:nac)*x(1:nac) 
+        if (info == 0) call inner_vscal(nac,d,x,tmp) 
         if (info == 0)&
              & call a%base_cssm(alpha,tmp,beta,y,info,trans)
         
@@ -1273,19 +1273,23 @@ contains
           call psb_errpush(info,name,i_err=(/9,nar,0,0,0/))
           goto 9999
         end if
-        
-        allocate(tmp(nar),stat=info) 
-        if (info /= 0) info = 4000 
-        if (info == 0)&
-             & call a%base_cssm(done,x,dzero,tmp,info,trans)
 
-        if (info == 0) tmp(1:nar) = d(1:nar)*tmp(1:nar) 
-        if (info == 0)&
-             & call psb_geaxpby(nar,alpha,tmp,beta,y,info)
-        
-        if (info == 0) then 
-          deallocate(tmp,stat=info) 
-          if (info /= 0) info = 4000
+        if (beta == dzero) then 
+          call a%base_cssm(alpha,x,dzero,y,info,trans)
+          if (info == 0)  call inner_vscal1(nar,d,y)
+        else
+          allocate(tmp(nar),stat=info) 
+          if (info /= 0) info = 4000 
+          if (info == 0)&
+               & call a%base_cssm(alpha,x,dzero,tmp,info,trans)
+          
+          if (info == 0)  call inner_vscal1(nar,d,tmp)
+          if (info == 0)&
+               & call psb_geaxpby(nar,done,tmp,beta,y,info)
+          if (info == 0) then 
+            deallocate(tmp,stat=info) 
+            if (info /= 0) info = 4000
+          end if
         end if
         
       else
@@ -1318,8 +1322,31 @@ contains
       return
     end if
     return
-
-
+  contains
+    subroutine inner_vscal(n,d,x,y)
+      implicit none 
+      integer, intent(in)         :: n
+      real(psb_dpk_), intent(in)  :: d(*),x(*)
+      real(psb_dpk_), intent(out) :: y(*)
+      integer :: i
+      
+      do i=1,n
+        y(i) = d(i)*x(i) 
+      end do
+    end subroutine inner_vscal
+    
+    subroutine inner_vscal1(n,d,x)
+      implicit none 
+      integer, intent(in)         :: n
+      real(psb_dpk_), intent(in)  :: d(*)
+      real(psb_dpk_), intent(inout) :: x(*)
+      integer :: i
+      
+      do i=1,n
+        x(i) = d(i)*x(i) 
+      end do
+    end subroutine inner_vscal1
+    
   end subroutine d_cssv
 
 

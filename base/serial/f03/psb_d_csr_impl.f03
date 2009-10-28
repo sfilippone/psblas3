@@ -117,9 +117,9 @@ contains
           do i=1,m 
             acc  = dzero
             do j=irp(i), irp(i+1)-1
-              acc  = acc + val(j) * x(ja(j))          
+              acc  = acc - val(j) * x(ja(j))          
             enddo
-            y(i) = -acc
+            y(i) = acc
           end do
 
         else 
@@ -149,11 +149,11 @@ contains
         else if (alpha == -done) then 
 
           do i=1,m 
-            acc  = dzero
+            acc  = y(i)
             do j=irp(i), irp(i+1)-1
-              acc  = acc + val(j) * x(ja(j))          
+              acc  = acc - val(j) * x(ja(j))          
             enddo
-            y(i) = y(i) -acc
+            y(i) = acc
           end do
 
         else 
@@ -172,21 +172,21 @@ contains
 
         if (alpha == done) then 
           do i=1,m 
-            acc  = dzero
+            acc  = -y(i)
             do j=irp(i), irp(i+1)-1
               acc  = acc + val(j) * x(ja(j))          
             enddo
-            y(i) = -y(i) + acc
+            y(i) = acc
           end do
 
         else if (alpha == -done) then 
 
           do i=1,m 
-            acc  = dzero
+            acc  = y(i)
             do j=irp(i), irp(i+1)-1
-              acc  = acc + val(j) * x(ja(j))          
+              acc  = acc - val(j) * x(ja(j))          
             enddo
-            y(i) = -y(i) -acc
+            y(i) =  acc
           end do
 
         else 
@@ -408,9 +408,9 @@ contains
         do i=1,m 
           acc(1:nc)  = dzero
           do j=irp(i), irp(i+1)-1
-            acc(1:nc)  = acc(1:nc) + val(j) * x(ja(j),1:nc)          
+            acc(1:nc)  = acc(1:nc) - val(j) * x(ja(j),1:nc)          
           enddo
-          y(i,1:nc) = -acc(1:nc)
+          y(i,1:nc) = acc(1:nc)
         end do
 
       else 
@@ -430,21 +430,21 @@ contains
 
       if (alpha == done) then 
         do i=1,m 
-          acc(1:nc)  = dzero
+          acc(1:nc)  = y(i,1:nc)
           do j=irp(i), irp(i+1)-1
             acc(1:nc)  = acc(1:nc) + val(j) * x(ja(j),1:nc)          
           enddo
-          y(i,1:nc) = y(i,1:nc) + acc(1:nc)
+          y(i,1:nc) = acc(1:nc)
         end do
 
       else if (alpha == -done) then 
 
-        do i=1,m 
-          acc(1:nc)  = dzero
+        do i=1,m
+          acc(1:nc)  = y(i,1:nc)
           do j=irp(i), irp(i+1)-1
-            acc(1:nc)  = acc(1:nc) + val(j) * x(ja(j),1:nc)          
+            acc(1:nc)  = acc(1:nc) - val(j) * x(ja(j),1:nc)          
           enddo
-          y(i,1:nc) = y(i,1:nc) -acc(1:nc)
+          y(i,1:nc) = acc(1:nc)
         end do
 
       else 
@@ -629,6 +629,17 @@ subroutine d_csr_cssv_impl(alpha,a,x,beta,y,info,trans)
     goto 9999
   end if
 
+  if (size(x)<m) then 
+    info = 36
+    call psb_errpush(info,name,i_err=(/3,m,0,0,0/))
+    goto 9999
+  end if
+
+  if (size(y)<m) then 
+    info = 36
+    call psb_errpush(info,name,i_err=(/5,m,0,0,0/))
+    goto 9999
+  end if
   
   if (alpha == dzero) then
     if (beta == dzero) then
@@ -666,9 +677,9 @@ subroutine d_csr_cssv_impl(alpha,a,x,beta,y,info,trans)
 
     call inner_csrsv(tra,a%is_lower(),a%is_unit(),a%get_nrows(),&
          & a%irp,a%ja,a%val,x,tmp) 
-    do  i = 1, m
-      y(i) = alpha*tmp(i) + beta*y(i)
-    end do
+
+    call psb_geaxpby(m,alpha,tmp,beta,y,info)
+
   end if
 
   call psb_erractionrestore(err_act)

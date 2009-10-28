@@ -1,22 +1,22 @@
-module psb_d_bjacprec
+module psb_z_bjacprec
   use psb_prec_type
 
   
-  type, extends(psb_d_base_prec_type) :: psb_d_bjac_prec_type
+  type, extends(psb_z_base_prec_type) :: psb_z_bjac_prec_type
     integer, allocatable                :: iprcparm(:)
-    type(psb_d_sparse_mat), allocatable :: av(:)
-    real(psb_dpk_), allocatable         :: d(:)
+    type(psb_z_sparse_mat), allocatable :: av(:)
+    complex(psb_dpk_), allocatable         :: d(:)
   contains
-    procedure, pass(prec) :: apply     => d_bjac_apply
-    procedure, pass(prec) :: precbld   => d_bjac_precbld
-    procedure, pass(prec) :: precinit  => d_bjac_precinit
-    procedure, pass(prec) :: d_base_precseti  => d_bjac_precseti
-    procedure, pass(prec) :: d_base_precsetr  => d_bjac_precsetr
-    procedure, pass(prec) :: d_base_precsetc  => d_bjac_precsetc
-    procedure, pass(prec) :: precfree         => d_bjac_precfree
-    procedure, pass(prec) :: precdescr        => d_bjac_precdescr
-    procedure, pass(prec) :: sizeof           => d_bjac_sizeof
-  end type psb_d_bjac_prec_type
+    procedure, pass(prec) :: apply     => z_bjac_apply
+    procedure, pass(prec) :: precbld   => z_bjac_precbld
+    procedure, pass(prec) :: precinit  => z_bjac_precinit
+    procedure, pass(prec) :: z_base_precseti  => z_bjac_precseti
+    procedure, pass(prec) :: z_base_precsetr  => z_bjac_precsetr
+    procedure, pass(prec) :: z_base_precsetc  => z_bjac_precsetc
+    procedure, pass(prec) :: precfree         => z_bjac_precfree
+    procedure, pass(prec) :: precdescr        => z_bjac_precdescr
+    procedure, pass(prec) :: sizeof           => z_bjac_sizeof
+  end type psb_z_bjac_prec_type
 
 
   character(len=15), parameter, private :: &
@@ -26,24 +26,24 @@ module psb_d_bjacprec
 contains
   
 
-  subroutine d_bjac_apply(alpha,prec,x,beta,y,desc_data,info,trans,work)
+  subroutine z_bjac_apply(alpha,prec,x,beta,y,desc_data,info,trans,work)
     use psb_base_mod
     type(psb_desc_type),intent(in)    :: desc_data
-    class(psb_d_bjac_prec_type), intent(in)  :: prec
-    real(psb_dpk_),intent(in)         :: alpha,beta
-    real(psb_dpk_),intent(in)         :: x(:)
-    real(psb_dpk_),intent(inout)      :: y(:)
+    class(psb_z_bjac_prec_type), intent(in)  :: prec
+    complex(psb_dpk_),intent(in)         :: alpha,beta
+    complex(psb_dpk_),intent(in)         :: x(:)
+    complex(psb_dpk_),intent(inout)      :: y(:)
     integer, intent(out)              :: info
     character(len=1), optional        :: trans
-    real(psb_dpk_),intent(inout), optional, target :: work(:)
+    complex(psb_dpk_),intent(inout), optional, target :: work(:)
 
     ! Local variables
     integer :: n_row,n_col
-    real(psb_dpk_), pointer :: ww(:), aux(:)
+    complex(psb_dpk_), pointer :: ww(:), aux(:)
     integer :: ictxt,np,me, err_act, int_err(5)
     integer            :: debug_level, debug_unit
     character          :: trans_
-    character(len=20)  :: name='d_bjac_prec_apply'
+    character(len=20)  :: name='z_bjac_prec_apply'
     character(len=20)  :: ch_err
 
     info = 0
@@ -115,14 +115,20 @@ contains
       
       select case(trans_)
       case('N')
-        call psb_spsm(done,prec%av(psb_l_pr_),x,dzero,ww,desc_data,info,&
+        call psb_spsm(zone,prec%av(psb_l_pr_),x,zzero,ww,desc_data,info,&
              & trans=trans_,scale='L',diag=prec%d,choice=psb_none_,work=aux)
         if(info ==0) call psb_spsm(alpha,prec%av(psb_u_pr_),ww,beta,y,desc_data,info,&
              & trans=trans_,scale='U',choice=psb_none_, work=aux)
         
-      case('T','C')
-        call psb_spsm(done,prec%av(psb_u_pr_),x,dzero,ww,desc_data,info,&
+      case('T')
+        call psb_spsm(zone,prec%av(psb_u_pr_),x,zzero,ww,desc_data,info,&
              & trans=trans_,scale='L',diag=prec%d,choice=psb_none_, work=aux)
+        if(info ==0)  call psb_spsm(alpha,prec%av(psb_l_pr_),ww,beta,y,desc_data,info,&
+           & trans=trans_,scale='U',choice=psb_none_,work=aux)
+
+      case('C')
+        call psb_spsm(zone,prec%av(psb_u_pr_),x,zzero,ww,desc_data,info,&
+             & trans=trans_,scale='L',diag=conjg(prec%d),choice=psb_none_, work=aux)
         if(info ==0)  call psb_spsm(alpha,prec%av(psb_l_pr_),ww,beta,y,desc_data,info,&
            & trans=trans_,scale='U',choice=psb_none_,work=aux)
         
@@ -164,17 +170,17 @@ contains
     return
 
 
-  end subroutine d_bjac_apply
+  end subroutine z_bjac_apply
 
-  subroutine d_bjac_precinit(prec,info)
+  subroutine z_bjac_precinit(prec,info)
     
     use psb_base_mod
     Implicit None
     
-    class(psb_d_bjac_prec_type),intent(inout) :: prec
+    class(psb_z_bjac_prec_type),intent(inout) :: prec
     integer, intent(out)                     :: info
     Integer :: err_act, nrow
-    character(len=20)  :: name='d_null_precinit'
+    character(len=20)  :: name='z_bjac_precinit'
 
     call psb_erractionsave(err_act)
 
@@ -202,18 +208,18 @@ contains
       return
     end if
     return
-  end subroutine d_bjac_precinit
+  end subroutine z_bjac_precinit
 
 
-  subroutine d_bjac_precbld(a,desc_a,prec,info,upd)
+  subroutine z_bjac_precbld(a,desc_a,prec,info,upd)
 
     use psb_base_mod
     use psb_prec_mod
     Implicit None
 
-    type(psb_d_sparse_mat), intent(in), target :: a
+    type(psb_z_sparse_mat), intent(in), target :: a
     type(psb_desc_type), intent(in), target  :: desc_a
-    class(psb_d_bjac_prec_type),intent(inout) :: prec
+    class(psb_z_bjac_prec_type),intent(inout) :: prec
     integer, intent(out)                     :: info
     character, intent(in), optional          :: upd
 
@@ -221,10 +227,10 @@ contains
     integer  ::    i, m
     integer  ::    int_err(5)
     character ::        trans, unitd
-    type(psb_d_csr_sparse_mat), allocatable  :: lf, uf
+    type(psb_z_csr_sparse_mat), allocatable  :: lf, uf
     integer   nztota,  err_act, n_row, nrow_a,n_col, nhalo
     integer :: ictxt,np,me
-    character(len=20)  :: name='d_bjac_precbld'
+    character(len=20)  :: name='z_bjac_precbld'
     character(len=20)  :: ch_err
 
 
@@ -346,19 +352,19 @@ contains
     end if
     return
 
-  end subroutine d_bjac_precbld
+  end subroutine z_bjac_precbld
 
-  subroutine d_bjac_precseti(prec,what,val,info)
+  subroutine z_bjac_precseti(prec,what,val,info)
     
     use psb_base_mod
     Implicit None
     
-    class(psb_d_bjac_prec_type),intent(inout) :: prec
+    class(psb_z_bjac_prec_type),intent(inout) :: prec
     integer, intent(in)                      :: what 
     integer, intent(in)                      :: val 
     integer, intent(out)                     :: info
     Integer :: err_act, nrow
-    character(len=20)  :: name='d_bjac_precset'
+    character(len=20)  :: name='z_bjac_precset'
 
     call psb_erractionsave(err_act)
 
@@ -401,19 +407,19 @@ contains
       return
     end if
     return
-  end subroutine d_bjac_precseti
+  end subroutine z_bjac_precseti
 
-  subroutine d_bjac_precsetr(prec,what,val,info)
+  subroutine z_bjac_precsetr(prec,what,val,info)
     
     use psb_base_mod
     Implicit None
     
-    class(psb_d_bjac_prec_type),intent(inout) :: prec
+    class(psb_z_bjac_prec_type),intent(inout) :: prec
     integer, intent(in)                      :: what 
     real(psb_dpk_), intent(in)               :: val 
     integer, intent(out)                     :: info
     Integer :: err_act, nrow
-    character(len=20)  :: name='d_bjac_precset'
+    character(len=20)  :: name='z_bjac_precset'
 
     call psb_erractionsave(err_act)
 
@@ -429,19 +435,19 @@ contains
       return
     end if
     return
-  end subroutine d_bjac_precsetr
+  end subroutine z_bjac_precsetr
 
-  subroutine d_bjac_precsetc(prec,what,val,info)
+  subroutine z_bjac_precsetc(prec,what,val,info)
     
     use psb_base_mod
     Implicit None
     
-    class(psb_d_bjac_prec_type),intent(inout) :: prec
+    class(psb_z_bjac_prec_type),intent(inout) :: prec
     integer, intent(in)                      :: what 
     character(len=*), intent(in)             :: val
     integer, intent(out)                     :: info
     Integer :: err_act, nrow
-    character(len=20)  :: name='d_bjac_precset'
+    character(len=20)  :: name='c_bjac_precset'
 
     call psb_erractionsave(err_act)
 
@@ -457,18 +463,18 @@ contains
       return
     end if
     return
-  end subroutine d_bjac_precsetc
+  end subroutine z_bjac_precsetc
 
-  subroutine d_bjac_precfree(prec,info)
+  subroutine z_bjac_precfree(prec,info)
     
     use psb_base_mod
     Implicit None
 
-    class(psb_d_bjac_prec_type), intent(inout) :: prec
+    class(psb_z_bjac_prec_type), intent(inout) :: prec
     integer, intent(out)                :: info
     
     Integer :: err_act, i
-    character(len=20)  :: name='d_bjac_precfree'
+    character(len=20)  :: name='z_bjac_precfree'
     
     call psb_erractionsave(err_act)
     
@@ -493,19 +499,19 @@ contains
     end if
     return
     
-  end subroutine d_bjac_precfree
+  end subroutine z_bjac_precfree
   
 
-  subroutine d_bjac_precdescr(prec,iout)
+  subroutine z_bjac_precdescr(prec,iout)
     
     use psb_base_mod
     Implicit None
 
-    class(psb_d_bjac_prec_type), intent(in) :: prec
+    class(psb_z_bjac_prec_type), intent(in) :: prec
     integer, intent(in), optional    :: iout
 
     Integer :: err_act, nrow, info
-    character(len=20)  :: name='d_bjac_precdescr'
+    character(len=20)  :: name='z_bjac_precdescr'
     integer :: iout_
 
     call psb_erractionsave(err_act)
@@ -542,22 +548,22 @@ contains
     end if
     return
     
-  end subroutine d_bjac_precdescr
+  end subroutine z_bjac_precdescr
 
-  function d_bjac_sizeof(prec) result(val)
+  function z_bjac_sizeof(prec) result(val)
     use psb_base_mod
-    class(psb_d_bjac_prec_type), intent(in) :: prec
+    class(psb_z_bjac_prec_type), intent(in) :: prec
     integer(psb_long_int_k_) :: val
     
     val = 0
     if (allocated(prec%d)) then 
-      val = val + psb_sizeof_dp * size(prec%d)
+      val = val + 2*psb_sizeof_dp * size(prec%d)
     endif
     if (allocated(prec%av)) then 
       val = val + psb_sizeof(prec%av(psb_l_pr_))
       val = val + psb_sizeof(prec%av(psb_u_pr_))
     endif
     return
-  end function d_bjac_sizeof
+  end function z_bjac_sizeof
 
-end module psb_d_bjacprec
+end module psb_z_bjacprec

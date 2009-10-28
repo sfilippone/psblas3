@@ -64,20 +64,27 @@ module psb_prec_type
   integer, parameter :: psb_max_avsz=psb_bp_ilu_avsz
 
 
+  type psb_s_base_prec_type
+  contains
+    procedure, pass(prec) :: apply     => s_base_apply
+    procedure, pass(prec) :: precbld   => s_base_precbld
+    procedure, pass(prec) :: s_base_precseti
+    procedure, pass(prec) :: s_base_precsetr
+    procedure, pass(prec) :: s_base_precsetc
+    procedure, pass(prec) :: sizeof  => s_base_sizeof
+    generic, public       :: precset => s_base_precseti, s_base_precsetr, s_base_precsetc
+    procedure, pass(prec) :: precinit  => s_base_precinit
+    procedure, pass(prec) :: precfree  => s_base_precfree
+    procedure, pass(prec) :: precdescr => s_base_precdescr
+  end type psb_s_base_prec_type
+  
   type psb_sprec_type
-    type(psb_s_sparse_mat), allocatable :: av(:) 
-    real(psb_spk_), allocatable         :: d(:)  
-    type(psb_desc_type)                 :: desc_data 
-    integer, allocatable                :: iprcparm(:) 
-    real(psb_spk_), allocatable         :: rprcparm(:) 
-    integer, allocatable                :: perm(:),  invperm(:) 
-    integer                             :: prec
+    class(psb_s_base_prec_type), allocatable :: prec
   contains
     procedure, pass(prec)               :: s_apply2v
     procedure, pass(prec)               :: s_apply1v
     generic, public                     :: apply => s_apply2v, s_apply1v
   end type psb_sprec_type
-
 
   type psb_d_base_prec_type
   contains
@@ -94,36 +101,52 @@ module psb_prec_type
   end type psb_d_base_prec_type
   
   type psb_dprec_type
-    class(psb_d_base_prec_type), allocatable :: dprec
+    class(psb_d_base_prec_type), allocatable :: prec
   contains
     procedure, pass(prec)               :: d_apply2v
     procedure, pass(prec)               :: d_apply1v
     generic, public                     :: apply => d_apply2v, d_apply1v
   end type psb_dprec_type
 
+
+  type psb_c_base_prec_type
+  contains
+    procedure, pass(prec) :: apply     => c_base_apply
+    procedure, pass(prec) :: precbld   => c_base_precbld
+    procedure, pass(prec) :: c_base_precseti
+    procedure, pass(prec) :: c_base_precsetr
+    procedure, pass(prec) :: c_base_precsetc
+    procedure, pass(prec) :: sizeof  => c_base_sizeof
+    generic, public       :: precset => c_base_precseti, c_base_precsetr, c_base_precsetc
+    procedure, pass(prec) :: precinit  => c_base_precinit
+    procedure, pass(prec) :: precfree  => c_base_precfree
+    procedure, pass(prec) :: precdescr => c_base_precdescr
+  end type psb_c_base_prec_type
+  
   type psb_cprec_type
-    type(psb_c_sparse_mat), allocatable :: av(:) 
-    complex(psb_spk_), allocatable     :: d(:)  
-    type(psb_desc_type)                :: desc_data 
-    integer, allocatable               :: iprcparm(:) 
-    real(psb_spk_), allocatable        :: rprcparm(:) 
-    integer, allocatable               :: perm(:),  invperm(:) 
-    integer                            :: prec
+    class(psb_c_base_prec_type), allocatable :: prec
   contains
     procedure, pass(prec)               :: c_apply2v
     procedure, pass(prec)               :: c_apply1v
     generic, public                     :: apply => c_apply2v, c_apply1v
   end type psb_cprec_type
 
-
+  type psb_z_base_prec_type
+  contains
+    procedure, pass(prec) :: apply => z_base_apply
+    procedure, pass(prec) :: precbld   => z_base_precbld
+    procedure, pass(prec) :: z_base_precseti
+    procedure, pass(prec) :: z_base_precsetr
+    procedure, pass(prec) :: z_base_precsetc
+    procedure, pass(prec) :: sizeof  => z_base_sizeof
+    generic, public       :: precset => z_base_precseti, z_base_precsetr, z_base_precsetc
+    procedure, pass(prec) :: precinit  => z_base_precinit
+    procedure, pass(prec) :: precfree  => z_base_precfree
+    procedure, pass(prec) :: precdescr => z_base_precdescr
+  end type psb_z_base_prec_type
+  
   type psb_zprec_type
-    type(psb_z_sparse_mat), allocatable :: av(:) 
-    complex(psb_dpk_), allocatable     :: d(:)  
-    type(psb_desc_type)                :: desc_data 
-    integer, allocatable               :: iprcparm(:) 
-    real(psb_dpk_), allocatable        :: rprcparm(:) 
-    integer, allocatable               :: perm(:),  invperm(:) 
-    integer                            :: prec
+    class(psb_z_base_prec_type), allocatable :: prec
   contains
     procedure, pass(prec)               :: z_apply2v
     procedure, pass(prec)               :: z_apply1v
@@ -162,7 +185,6 @@ module psb_prec_type
          & psb_cprec_sizeof, &
          & psb_zprec_sizeof
   end interface
-
 
 
 
@@ -259,7 +281,7 @@ contains
     use psb_base_mod
     type(psb_dprec_type), intent(in) :: p
     integer, intent(in), optional    :: iout
-    integer :: iout_
+    integer :: iout_, info
     character(len=20) :: name='prec_descr' 
     
     if (present(iout)) then 
@@ -268,42 +290,42 @@ contains
       iout_ = 6 
     end if
 
-    if (.not.allocated(p%dprec)) then 
+    if (.not.allocated(p%prec)) then 
       info = 1124
       call psb_errpush(info,name,a_err="preconditioner")
     end if
-    call p%dprec%precdescr(iout)
+    call p%prec%precdescr(iout)
 
   end subroutine psb_file_prec_descr
 
   subroutine psb_sfile_prec_descr(p,iout)
+    use psb_base_mod
     type(psb_sprec_type), intent(in) :: p
     integer, intent(in), optional    :: iout
-    integer :: iout_
+    integer :: iout_,info
+    character(len=20) :: name='prec_descr' 
     
     if (present(iout)) then 
       iout_ = iout
     else
       iout_ = 6 
     end if
-    
-    write(iout_,*) 'Preconditioner description'
-    select case(p%iprcparm(psb_p_type_))
-    case(psb_noprec_)
-      write(iout_,*) 'No preconditioning'
-    case(psb_diag_)
-      write(iout_,*) 'Diagonal scaling'
-    case(psb_bjac_)
-      write(iout_,*) 'Block Jacobi with: ',&
-           &  fact_names(p%iprcparm(psb_f_type_))
-    end select
+
+    if (.not.allocated(p%prec)) then 
+      info = 1124
+      call psb_errpush(info,name,a_err="preconditioner")
+    end if
+    call p%prec%precdescr(iout)
     
   end subroutine psb_sfile_prec_descr
 
+
   subroutine psb_cfile_prec_descr(p,iout)
+    use psb_base_mod
     type(psb_cprec_type), intent(in) :: p
     integer, intent(in), optional    :: iout
-    integer :: iout_
+    integer :: iout_,info
+    character(len=20) :: name='prec_descr' 
     
     if (present(iout)) then 
       iout_ = iout
@@ -311,22 +333,21 @@ contains
       iout_ = 6 
     end if
 
-    write(iout_,*) 'Preconditioner description'
-    select case(p%iprcparm(psb_p_type_))
-    case(psb_noprec_)
-      write(iout_,*) 'No preconditioning'
-    case(psb_diag_)
-      write(iout_,*) 'Diagonal scaling'
-    case(psb_bjac_)
-      write(iout_,*) 'Block Jacobi with: ',&
-           &  fact_names(p%iprcparm(psb_f_type_))
-    end select
+    if (.not.allocated(p%prec)) then 
+      info = 1124
+      call psb_errpush(info,name,a_err="preconditioner")
+    end if
+    call p%prec%precdescr(iout)
+    
   end subroutine psb_cfile_prec_descr
 
+
   subroutine psb_zfile_prec_descr(p,iout)
+    use psb_base_mod
     type(psb_zprec_type), intent(in) :: p
     integer, intent(in), optional    :: iout
-    integer :: iout_
+    integer :: iout_,info
+    character(len=20) :: name='prec_descr' 
     
     if (present(iout)) then 
       iout_ = iout
@@ -334,16 +355,12 @@ contains
       iout_ = 6 
     end if
 
-    write(iout_,*) 'Preconditioner description'
-    select case(p%iprcparm(psb_p_type_))
-    case(psb_noprec_)
-      write(iout_,*) 'No preconditioning'
-    case(psb_diag_)
-      write(iout_,*) 'Diagonal scaling'
-    case(psb_bjac_)
-      write(iout_,*) 'Block Jacobi with: ',&
-           &  fact_names(p%iprcparm(psb_f_type_))
-    end select
+    if (.not.allocated(p%prec)) then 
+      info = 1124
+      call psb_errpush(info,name,a_err="preconditioner")
+    end if
+    call p%prec%precdescr(iout)
+    
   end subroutine psb_zfile_prec_descr
 
 
@@ -436,40 +453,12 @@ contains
 
     me=-1
 
-    ! Actually we migh just deallocate the top level array, except 
-    ! for the inner UMFPACK or SLU stuff
-
-    if (allocated(p%d)) then 
-      deallocate(p%d,stat=info)
+    if (allocated(p%prec)) then 
+      call p%prec%precfree(info)
+      if (info /= 0) goto 9999
+      deallocate(p%prec,stat=info)
+      if (info /= 0) goto 9999
     end if
-
-    if (allocated(p%av))  then 
-      do i=1,size(p%av) 
-        call p%av(i)%free()
-      enddo
-      deallocate(p%av,stat=info)
-    end if
-
-    if (allocated(p%desc_data%matrix_data)) &
-         & call psb_cdfree(p%desc_data,info)
-
-    if (allocated(p%rprcparm)) then 
-      deallocate(p%rprcparm,stat=info)
-    end if
-
-    if (allocated(p%perm)) then 
-      deallocate(p%perm,stat=info)
-    endif
-
-    if (allocated(p%invperm)) then 
-      deallocate(p%invperm,stat=info)
-    endif
-
-    if (allocated(p%iprcparm)) then 
-      deallocate(p%iprcparm,stat=info)
-    end if
-    call psb_nullify_prec(p)
-
     call psb_erractionrestore(err_act)
     return
 
@@ -486,9 +475,6 @@ contains
   subroutine psb_nullify_sprec(p)
     type(psb_sprec_type), intent(inout) :: p
 
-!!$    nullify(p%av,p%d,p%iprcparm,p%rprcparm,p%perm,p%invperm,p%mlia,&
-!!$         & p%nlaggr,p%base_a,p%base_desc,p%dorig,p%desc_data, p%desc_ac)
-
   end subroutine psb_nullify_sprec
 
   subroutine psb_d_precfree(p,info)
@@ -504,11 +490,10 @@ contains
 
     me=-1
 
-   
-    if (allocated(p%dprec)) then 
-      call p%dprec%precfree(info)
+    if (allocated(p%prec)) then 
+      call p%prec%precfree(info)
       if (info /= 0) goto 9999
-      deallocate(p%dprec,stat=info)
+      deallocate(p%prec,stat=info)
       if (info /= 0) goto 9999
     end if
     call psb_erractionrestore(err_act)
@@ -541,36 +526,14 @@ contains
     name = 'psb_precfree'
     call psb_erractionsave(err_act)
 
-    if (allocated(p%d)) then 
-      deallocate(p%d,stat=info)
+    me=-1
+
+    if (allocated(p%prec)) then 
+      call p%prec%precfree(info)
+      if (info /= 0) goto 9999
+      deallocate(p%prec,stat=info)
+      if (info /= 0) goto 9999
     end if
-
-    if (allocated(p%av))  then 
-      do i=1,size(p%av) 
-        call p%av(i)%free()
-      enddo
-      deallocate(p%av,stat=info)
-
-    end if
-    if (allocated(p%desc_data%matrix_data)) &
-         & call psb_cdfree(p%desc_data,info)
-
-    if (allocated(p%rprcparm)) then 
-      deallocate(p%rprcparm,stat=info)
-    end if
-
-    if (allocated(p%perm)) then 
-      deallocate(p%perm,stat=info)
-    endif
-
-    if (allocated(p%invperm)) then 
-      deallocate(p%invperm,stat=info)
-    endif
-
-    if (allocated(p%iprcparm)) then 
-      deallocate(p%iprcparm,stat=info)
-    end if
-    call psb_nullify_prec(p)
     call psb_erractionrestore(err_act)
     return
 
@@ -600,36 +563,14 @@ contains
     name = 'psb_precfree'
     call psb_erractionsave(err_act)
 
-    if (allocated(p%d)) then 
-      deallocate(p%d,stat=info)
+    me=-1
+
+    if (allocated(p%prec)) then 
+      call p%prec%precfree(info)
+      if (info /= 0) goto 9999
+      deallocate(p%prec,stat=info)
+      if (info /= 0) goto 9999
     end if
-
-    if (allocated(p%av))  then 
-      do i=1,size(p%av) 
-        call p%av(i)%free()
-      enddo
-      deallocate(p%av,stat=info)
-
-    end if
-    if (allocated(p%desc_data%matrix_data)) &
-         & call psb_cdfree(p%desc_data,info)
-
-    if (allocated(p%rprcparm)) then 
-      deallocate(p%rprcparm,stat=info)
-    end if
-
-    if (allocated(p%perm)) then 
-      deallocate(p%perm,stat=info)
-    endif
-
-    if (allocated(p%invperm)) then 
-      deallocate(p%invperm,stat=info)
-    endif
-
-    if (allocated(p%iprcparm)) then 
-      deallocate(p%iprcparm,stat=info)
-    end if
-    call psb_nullify_prec(p)
     call psb_erractionrestore(err_act)
     return
 
@@ -644,7 +585,6 @@ contains
 
   subroutine psb_nullify_zprec(p)
     type(psb_zprec_type), intent(inout) :: p
-
 
   end subroutine psb_nullify_zprec
 
@@ -675,8 +615,8 @@ contains
     integer :: i
     val = 0
     
-    if (allocated(prec%dprec)) then 
-      val = val + prec%dprec%sizeof()
+    if (allocated(prec%prec)) then 
+      val = val + prec%prec%sizeof()
     end if
   end function psb_dprec_sizeof
 
@@ -687,16 +627,9 @@ contains
     integer             :: i
     
     val = 0
-    if (allocated(prec%iprcparm)) val = val + psb_sizeof_int * size(prec%iprcparm)
-    if (allocated(prec%rprcparm)) val = val + psb_sizeof_sp  * size(prec%rprcparm)
-    if (allocated(prec%d))        val = val + psb_sizeof_sp  * size(prec%d)
-    if (allocated(prec%perm))     val = val + psb_sizeof_int * size(prec%perm)
-    if (allocated(prec%invperm))  val = val + psb_sizeof_int * size(prec%invperm)
-    val = val + psb_sizeof(prec%desc_data)
-    if (allocated(prec%av))  then 
-      do i=1,size(prec%av)
-        val = val + psb_sizeof(prec%av(i))
-      end do
+    
+    if (allocated(prec%prec)) then 
+      val = val + prec%prec%sizeof()
     end if
     
   end function psb_sprec_sizeof
@@ -708,16 +641,8 @@ contains
     integer             :: i
     
     val = 0
-    if (allocated(prec%iprcparm)) val = val + psb_sizeof_int * size(prec%iprcparm)
-    if (allocated(prec%rprcparm)) val = val + psb_sizeof_dp  * size(prec%rprcparm)
-    if (allocated(prec%d))        val = val + 2 * psb_sizeof_dp * size(prec%d)
-    if (allocated(prec%perm))     val = val + psb_sizeof_int * size(prec%perm)
-    if (allocated(prec%invperm))  val = val + psb_sizeof_int * size(prec%invperm)
-    val = val + psb_sizeof(prec%desc_data)
-    if (allocated(prec%av))  then 
-      do i=1,size(prec%av)
-        val = val + psb_sizeof(prec%av(i))
-      end do
+    if (allocated(prec%prec)) then 
+      val = val + prec%prec%sizeof()
     end if
     
   end function psb_zprec_sizeof
@@ -729,22 +654,13 @@ contains
     integer             :: i
     
     val = 0
-    if (allocated(prec%iprcparm)) val = val + psb_sizeof_int * size(prec%iprcparm)
-    if (allocated(prec%rprcparm)) val = val + psb_sizeof_sp  * size(prec%rprcparm)
-    if (allocated(prec%d))        val = val + 2 * psb_sizeof_sp * size(prec%d)
-    if (allocated(prec%perm))     val = val + psb_sizeof_int * size(prec%perm)
-    if (allocated(prec%invperm))  val = val + psb_sizeof_int * size(prec%invperm)
-    val = val + psb_sizeof(prec%desc_data)
-    if (allocated(prec%av))  then 
-      do i=1,size(prec%av)
-        val = val + psb_sizeof(prec%av(i))
-      end do
+    if (allocated(prec%prec)) then 
+      val = val + prec%prec%sizeof()
     end if
     
   end function psb_cprec_sizeof
     
-
-
+ 
   subroutine s_apply2v(prec,x,y,desc_data,info,trans,work)
     use psb_base_mod
     type(psb_desc_type),intent(in)    :: desc_data
@@ -754,81 +670,13 @@ contains
     integer, intent(out)              :: info
     character(len=1), optional        :: trans
     real(psb_spk_),intent(inout), optional, target :: work(:)
-    Integer :: err_act
-    character(len=20)  :: name='s_prec_apply'
-
-    call psb_erractionsave(err_act)
-    
-    select type(prec) 
-    type is (psb_sprec_type)
-      call psb_precaply(prec,x,y,desc_data,info,trans,work)
-    class default
-      info = 700
-      call psb_errpush(info,name)
-      goto 9999 
-    end select
-    
-    call psb_erractionrestore(err_act)
-    return
-
-9999 continue
-    call psb_erractionrestore(err_act)
-    if (err_act == psb_act_abort_) then
-      call psb_error()
-      return
-    end if
-    return
-
-  end subroutine s_apply2v
-  subroutine s_apply1v(prec,x,desc_data,info,trans)
-    use psb_base_mod
-    type(psb_desc_type),intent(in)    :: desc_data
-    class(psb_sprec_type), intent(in)  :: prec
-    real(psb_spk_),intent(inout)    :: x(:)
-    integer, intent(out)              :: info
-    character(len=1), optional        :: trans
-    Integer :: err_act
-    character(len=20)  :: name='s_prec_apply'
-
-    call psb_erractionsave(err_act)
-    
-    select type(prec) 
-    type is (psb_sprec_type)
-      call psb_precaply(prec,x,desc_data,info,trans)
-    class default
-      info = 700
-      call psb_errpush(info,name)
-      goto 9999 
-    end select
-    
-    call psb_erractionrestore(err_act)
-    return
-
-9999 continue
-    call psb_erractionrestore(err_act)
-    if (err_act == psb_act_abort_) then
-      call psb_error()
-      return
-    end if
-    return
-  end subroutine s_apply1v
-
-  subroutine d_apply2v(prec,x,y,desc_data,info,trans,work)
-    use psb_base_mod
-    type(psb_desc_type),intent(in)    :: desc_data
-    class(psb_dprec_type), intent(in)  :: prec
-    real(psb_dpk_),intent(in)       :: x(:)
-    real(psb_dpk_),intent(inout)    :: y(:)
-    integer, intent(out)              :: info
-    character(len=1), optional        :: trans
-    real(psb_dpk_),intent(inout), optional, target :: work(:)
     
     character     :: trans_ 
-    real(psb_dpk_), pointer :: work_(:)
+    real(psb_spk_), pointer :: work_(:)
     integer :: ictxt,np,me,err_act
     character(len=20)   :: name
     
-    name='psb_d_prc_apply'
+    name='s_apply2v'
     info = 0
     call psb_erractionsave(err_act)
     
@@ -853,12 +701,143 @@ contains
       
     end if
     
-    if (.not.allocated(prec%dprec)) then 
+    if (.not.allocated(prec%prec)) then 
       info = 1124
       call psb_errpush(info,name,a_err="preconditioner")
       goto 9999
     end if
-    call prec%dprec%apply(done,x,dzero,y,desc_data,info,trans_,work=work_)
+    call prec%prec%apply(sone,x,szero,y,desc_data,info,trans_,work=work_)
+    if (present(work)) then 
+    else
+      deallocate(work_,stat=info)
+      if (info /= 0) then 
+        info = 4010
+        call psb_errpush(info,name,a_err='DeAllocate')
+        goto 9999      
+      end if
+    end if
+    
+    call psb_erractionrestore(err_act)
+    return
+    
+9999 continue
+    call psb_erractionrestore(err_act)
+    if (err_act == psb_act_abort_) then
+      call psb_error()
+      return
+    end if
+    return
+
+  end subroutine s_apply2v
+
+  subroutine s_apply1v(prec,x,desc_data,info,trans)
+    use psb_base_mod
+    type(psb_desc_type),intent(in)    :: desc_data
+    class(psb_sprec_type), intent(in)  :: prec
+    real(psb_spk_),intent(inout)    :: x(:)
+    integer, intent(out)              :: info
+    character(len=1), optional        :: trans
+
+    character     :: trans_
+    integer :: ictxt,np,me, err_act
+    real(psb_spk_), pointer :: WW(:), w1(:)
+    character(len=20)   :: name
+    name='s_apply1v'
+    info = 0
+    call psb_erractionsave(err_act)
+    
+    
+    ictxt=psb_cd_get_context(desc_data)
+    call psb_info(ictxt, me, np)
+    if (present(trans)) then 
+      trans_=psb_toupper(trans)
+    else
+      trans_='N'
+    end if
+    
+    if (.not.allocated(prec%prec)) then 
+      info = 1124
+      call psb_errpush(info,name,a_err="preconditioner")
+      goto 9999
+    end if
+    allocate(ww(size(x)),w1(size(x)),stat=info)
+    if (info /= 0) then 
+      info = 4010
+      call psb_errpush(info,name,a_err='Allocate')
+      goto 9999      
+    end if
+    call prec%prec%apply(sone,x,szero,ww,desc_data,info,trans_,work=w1)
+    if(info /=0) goto 9999
+    x(:) = ww(:)
+    deallocate(ww,W1,stat=info)
+    if (info /= 0) then 
+      info = 4010
+      call psb_errpush(info,name,a_err='DeAllocate')
+      goto 9999      
+    end if
+
+    
+    call psb_erractionrestore(err_act)
+    return
+
+9999 continue
+    call psb_errpush(info,name)
+    call psb_erractionrestore(err_act)
+    if (err_act == psb_act_abort_) then
+      call psb_error()
+      return
+    end if
+    return
+    
+  end subroutine s_apply1v
+
+
+  subroutine d_apply2v(prec,x,y,desc_data,info,trans,work)
+    use psb_base_mod
+    type(psb_desc_type),intent(in)    :: desc_data
+    class(psb_dprec_type), intent(in)  :: prec
+    real(psb_dpk_),intent(in)       :: x(:)
+    real(psb_dpk_),intent(inout)    :: y(:)
+    integer, intent(out)              :: info
+    character(len=1), optional        :: trans
+    real(psb_dpk_),intent(inout), optional, target :: work(:)
+    
+    character     :: trans_ 
+    real(psb_dpk_), pointer :: work_(:)
+    integer :: ictxt,np,me,err_act
+    character(len=20)   :: name
+    
+    name='d_apply2v'
+    info = 0
+    call psb_erractionsave(err_act)
+    
+    ictxt = psb_cd_get_context(desc_data)
+    call psb_info(ictxt, me, np)
+    
+    if (present(trans)) then 
+      trans_=trans
+    else
+      trans_='N'
+    end if
+    
+    if (present(work)) then 
+      work_ => work
+    else
+      allocate(work_(4*psb_cd_get_local_cols(desc_data)),stat=info)
+      if (info /= 0) then 
+        info = 4010
+        call psb_errpush(info,name,a_err='Allocate')
+        goto 9999      
+      end if
+      
+    end if
+    
+    if (.not.allocated(prec%prec)) then 
+      info = 1124
+      call psb_errpush(info,name,a_err="preconditioner")
+      goto 9999
+    end if
+    call prec%prec%apply(done,x,dzero,y,desc_data,info,trans_,work=work_)
     if (present(work)) then 
     else
       deallocate(work_,stat=info)
@@ -894,7 +873,7 @@ contains
     integer :: ictxt,np,me, err_act
     real(psb_dpk_), pointer :: WW(:), w1(:)
     character(len=20)   :: name
-    name='psb_d_apply1'
+    name='d_apply1v'
     info = 0
     call psb_erractionsave(err_act)
     
@@ -907,7 +886,7 @@ contains
       trans_='N'
     end if
     
-    if (.not.allocated(prec%dprec)) then 
+    if (.not.allocated(prec%prec)) then 
       info = 1124
       call psb_errpush(info,name,a_err="preconditioner")
       goto 9999
@@ -918,7 +897,7 @@ contains
       call psb_errpush(info,name,a_err='Allocate')
       goto 9999      
     end if
-    call prec%dprec%apply(done,x,dzero,ww,desc_data,info,trans_,work=w1)
+    call prec%prec%apply(done,x,dzero,ww,desc_data,info,trans_,work=w1)
     if(info /=0) goto 9999
     x(:) = ww(:)
     deallocate(ww,W1,stat=info)
@@ -942,33 +921,67 @@ contains
     return
     
   end subroutine d_apply1v
+
+ 
   subroutine c_apply2v(prec,x,y,desc_data,info,trans,work)
     use psb_base_mod
-    
     type(psb_desc_type),intent(in)    :: desc_data
-    class(psb_cprec_type), intent(in)  :: prec
-    complex(psb_spk_),intent(in)    :: x(:)
-    complex(psb_spk_),intent(inout) :: y(:)
+    class(psb_cprec_type), intent(in) :: prec
+    complex(psb_spk_),intent(in)      :: x(:)
+    complex(psb_spk_),intent(inout)   :: y(:)
     integer, intent(out)              :: info
     character(len=1), optional        :: trans
     complex(psb_spk_),intent(inout), optional, target :: work(:)
-    Integer :: err_act
-    character(len=20)  :: name='s_prec_apply'
-
+    
+    character     :: trans_ 
+    complex(psb_spk_), pointer :: work_(:)
+    integer :: ictxt,np,me,err_act
+    character(len=20)   :: name
+    
+    name='c_apply2v'
+    info = 0
     call psb_erractionsave(err_act)
     
-    select type(prec) 
-    type is (psb_cprec_type)
-      call psb_precaply(prec,x,y,desc_data,info,trans,work)
-    class default
-      info = 700
-      call psb_errpush(info,name)
-      goto 9999 
-    end select
+    ictxt = psb_cd_get_context(desc_data)
+    call psb_info(ictxt, me, np)
+    
+    if (present(trans)) then 
+      trans_=trans
+    else
+      trans_='N'
+    end if
+    
+    if (present(work)) then 
+      work_ => work
+    else
+      allocate(work_(4*psb_cd_get_local_cols(desc_data)),stat=info)
+      if (info /= 0) then 
+        info = 4010
+        call psb_errpush(info,name,a_err='Allocate')
+        goto 9999      
+      end if
+      
+    end if
+    
+    if (.not.allocated(prec%prec)) then 
+      info = 1124
+      call psb_errpush(info,name,a_err="preconditioner")
+      goto 9999
+    end if
+    call prec%prec%apply(cone,x,czero,y,desc_data,info,trans_,work=work_)
+    if (present(work)) then 
+    else
+      deallocate(work_,stat=info)
+      if (info /= 0) then 
+        info = 4010
+        call psb_errpush(info,name,a_err='DeAllocate')
+        goto 9999      
+      end if
+    end if
     
     call psb_erractionrestore(err_act)
     return
-
+    
 9999 continue
     call psb_erractionrestore(err_act)
     if (err_act == psb_act_abort_) then
@@ -978,32 +991,59 @@ contains
     return
 
   end subroutine c_apply2v
+
   subroutine c_apply1v(prec,x,desc_data,info,trans)
     use psb_base_mod
-    
     type(psb_desc_type),intent(in)    :: desc_data
-    class(psb_cprec_type), intent(in)  :: prec
-    complex(psb_spk_),intent(inout) :: x(:)
+    class(psb_cprec_type), intent(in) :: prec
+    complex(psb_spk_),intent(inout)   :: x(:)
     integer, intent(out)              :: info
     character(len=1), optional        :: trans
-    Integer :: err_act
-    character(len=20)  :: name='c_prec_apply'
 
+    character     :: trans_
+    integer :: ictxt,np,me, err_act
+    complex(psb_spk_), pointer :: WW(:), w1(:)
+    character(len=20)   :: name
+    name='c_apply1v'
+    info = 0
     call psb_erractionsave(err_act)
     
-    select type(prec) 
-    type is (psb_cprec_type)
-      call psb_precaply(prec,x,desc_data,info,trans)
-    class default
-      info = 700
-      call psb_errpush(info,name)
-      goto 9999 
-    end select
+    
+    ictxt=psb_cd_get_context(desc_data)
+    call psb_info(ictxt, me, np)
+    if (present(trans)) then 
+      trans_=psb_toupper(trans)
+    else
+      trans_='N'
+    end if
+    
+    if (.not.allocated(prec%prec)) then 
+      info = 1124
+      call psb_errpush(info,name,a_err="preconditioner")
+      goto 9999
+    end if
+    allocate(ww(size(x)),w1(size(x)),stat=info)
+    if (info /= 0) then 
+      info = 4010
+      call psb_errpush(info,name,a_err='Allocate')
+      goto 9999      
+    end if
+    call prec%prec%apply(cone,x,czero,ww,desc_data,info,trans_,work=w1)
+    if(info /=0) goto 9999
+    x(:) = ww(:)
+    deallocate(ww,W1,stat=info)
+    if (info /= 0) then 
+      info = 4010
+      call psb_errpush(info,name,a_err='DeAllocate')
+      goto 9999      
+    end if
+
     
     call psb_erractionrestore(err_act)
     return
 
 9999 continue
+    call psb_errpush(info,name)
     call psb_erractionrestore(err_act)
     if (err_act == psb_act_abort_) then
       call psb_error()
@@ -1012,33 +1052,67 @@ contains
     return
     
   end subroutine c_apply1v
-  
+
+
   subroutine z_apply2v(prec,x,y,desc_data,info,trans,work)
     use psb_base_mod
     type(psb_desc_type),intent(in)    :: desc_data
-    class(psb_zprec_type), intent(in)  :: prec
-    complex(psb_dpk_),intent(in)    :: x(:)
-    complex(psb_dpk_),intent(inout) :: y(:)
+    class(psb_zprec_type), intent(in) :: prec
+    complex(psb_dpk_),intent(in)      :: x(:)
+    complex(psb_dpk_),intent(inout)   :: y(:)
     integer, intent(out)              :: info
     character(len=1), optional        :: trans
     complex(psb_dpk_),intent(inout), optional, target :: work(:)
-    Integer :: err_act
-    character(len=20)  :: name='z_prec_apply'
-
+    
+    character     :: trans_ 
+    complex(psb_dpk_), pointer :: work_(:)
+    integer :: ictxt,np,me,err_act
+    character(len=20)   :: name
+    
+    name='z_apply2v'
+    info = 0
     call psb_erractionsave(err_act)
     
-    select type(prec) 
-    type is (psb_zprec_type)
-      call psb_precaply(prec,x,y,desc_data,info,trans,work)
-    class default
-      info = 700
-      call psb_errpush(info,name)
-      goto 9999 
-    end select
+    ictxt = psb_cd_get_context(desc_data)
+    call psb_info(ictxt, me, np)
+    
+    if (present(trans)) then 
+      trans_=trans
+    else
+      trans_='N'
+    end if
+    
+    if (present(work)) then 
+      work_ => work
+    else
+      allocate(work_(4*psb_cd_get_local_cols(desc_data)),stat=info)
+      if (info /= 0) then 
+        info = 4010
+        call psb_errpush(info,name,a_err='Allocate')
+        goto 9999      
+      end if
+      
+    end if
+    
+    if (.not.allocated(prec%prec)) then 
+      info = 1124
+      call psb_errpush(info,name,a_err="preconditioner")
+      goto 9999
+    end if
+    call prec%prec%apply(zone,x,zzero,y,desc_data,info,trans_,work=work_)
+    if (present(work)) then 
+    else
+      deallocate(work_,stat=info)
+      if (info /= 0) then 
+        info = 4010
+        call psb_errpush(info,name,a_err='DeAllocate')
+        goto 9999      
+      end if
+    end if
     
     call psb_erractionrestore(err_act)
     return
-
+    
 9999 continue
     call psb_erractionrestore(err_act)
     if (err_act == psb_act_abort_) then
@@ -1046,34 +1120,61 @@ contains
       return
     end if
     return
-    
+
   end subroutine z_apply2v
+
   subroutine z_apply1v(prec,x,desc_data,info,trans)
     use psb_base_mod
-    
     type(psb_desc_type),intent(in)    :: desc_data
-    class(psb_zprec_type), intent(in)  :: prec
-    complex(psb_dpk_),intent(inout) :: x(:)
+    class(psb_zprec_type), intent(in) :: prec
+    complex(psb_dpk_),intent(inout)   :: x(:)
     integer, intent(out)              :: info
     character(len=1), optional        :: trans
-    Integer :: err_act
-    character(len=20)  :: name='z_prec_apply'
 
+    character     :: trans_
+    integer :: ictxt,np,me, err_act
+    complex(psb_dpk_), pointer :: WW(:), w1(:)
+    character(len=20)   :: name
+    name='z_apply1v'
+    info = 0
     call psb_erractionsave(err_act)
     
-    select type(prec) 
-    type is (psb_zprec_type)
-      call psb_precaply(prec,x,desc_data,info,trans)
-    class default
-      info = 700
-      call psb_errpush(info,name)
-      goto 9999 
-    end select
+    
+    ictxt=psb_cd_get_context(desc_data)
+    call psb_info(ictxt, me, np)
+    if (present(trans)) then 
+      trans_=psb_toupper(trans)
+    else
+      trans_='N'
+    end if
+    
+    if (.not.allocated(prec%prec)) then 
+      info = 1124
+      call psb_errpush(info,name,a_err="preconditioner")
+      goto 9999
+    end if
+    allocate(ww(size(x)),w1(size(x)),stat=info)
+    if (info /= 0) then 
+      info = 4010
+      call psb_errpush(info,name,a_err='Allocate')
+      goto 9999      
+    end if
+    call prec%prec%apply(zone,x,zzero,ww,desc_data,info,trans_,work=w1)
+    if(info /=0) goto 9999
+    x(:) = ww(:)
+    deallocate(ww,W1,stat=info)
+    if (info /= 0) then 
+      info = 4010
+      call psb_errpush(info,name,a_err='DeAllocate')
+      goto 9999      
+    end if
+
     
     call psb_erractionrestore(err_act)
     return
 
 9999 continue
+    call psb_errpush(info,name)
     call psb_erractionrestore(err_act)
     if (err_act == psb_act_abort_) then
       call psb_error()
@@ -1082,6 +1183,291 @@ contains
     return
     
   end subroutine z_apply1v
+
+
+  subroutine s_base_apply(alpha,prec,x,beta,y,desc_data,info,trans,work)
+    use psb_base_mod
+    type(psb_desc_type),intent(in)    :: desc_data
+    class(psb_s_base_prec_type), intent(in)  :: prec
+    real(psb_spk_),intent(in)         :: alpha, beta
+    real(psb_spk_),intent(in)         :: x(:)
+    real(psb_spk_),intent(inout)      :: y(:)
+    integer, intent(out)              :: info
+    character(len=1), optional        :: trans
+    real(psb_spk_),intent(inout), optional, target :: work(:)
+    Integer :: err_act, nrow
+    character(len=20)  :: name='s_base_prec_apply'
+
+    call psb_erractionsave(err_act)
+
+    !
+    ! This is the base version and we should throw an error. 
+    ! Or should it be the NULL preonditioner???
+    !
+    info = 700
+    call psb_errpush(info,name)
+    goto 9999 
+    
+    call psb_erractionrestore(err_act)
+    return
+
+9999 continue
+    call psb_erractionrestore(err_act)
+    if (err_act == psb_act_abort_) then
+      call psb_error()
+      return
+    end if
+    return
+
+  end subroutine s_base_apply
+
+  subroutine s_base_precinit(prec,info)
+    
+    use psb_base_mod
+    Implicit None
+    
+    class(psb_s_base_prec_type),intent(inout) :: prec
+    integer, intent(out)                     :: info
+    Integer :: err_act, nrow
+    character(len=20)  :: name='s_base_precinit'
+
+    call psb_erractionsave(err_act)
+
+    !
+    ! This is the base version and we should throw an error. 
+    ! Or should it be the NULL preonditioner???
+    !
+    info = 700
+    call psb_errpush(info,name)
+    goto 9999 
+    
+    call psb_erractionrestore(err_act)
+    return
+
+9999 continue
+    call psb_erractionrestore(err_act)
+    if (err_act == psb_act_abort_) then
+      call psb_error()
+      return
+    end if
+    return
+  end subroutine s_base_precinit
+
+  subroutine s_base_precbld(a,desc_a,prec,info,upd)
+    
+    use psb_base_mod
+    Implicit None
+    
+    type(psb_s_sparse_mat), intent(in), target :: a
+    type(psb_desc_type), intent(in), target  :: desc_a
+    class(psb_s_base_prec_type),intent(inout) :: prec
+    integer, intent(out)                     :: info
+    character, intent(in), optional          :: upd
+    Integer :: err_act, nrow
+    character(len=20)  :: name='s_base_precbld'
+
+    call psb_erractionsave(err_act)
+
+    !
+    ! This is the base version and we should throw an error. 
+    ! Or should it be the NULL preonditioner???
+    !
+    info = 700
+    call psb_errpush(info,name)
+    goto 9999 
+    
+    call psb_erractionrestore(err_act)
+    return
+
+9999 continue
+    call psb_erractionrestore(err_act)
+    if (err_act == psb_act_abort_) then
+      call psb_error()
+      return
+    end if
+    return
+  end subroutine s_base_precbld
+
+  subroutine s_base_precseti(prec,what,val,info)
+    
+    use psb_base_mod
+    Implicit None
+    
+    class(psb_s_base_prec_type),intent(inout) :: prec
+    integer, intent(in)                      :: what 
+    integer, intent(in)                      :: val 
+    integer, intent(out)                     :: info
+    Integer :: err_act, nrow
+    character(len=20)  :: name='s_base_precseti'
+
+    call psb_erractionsave(err_act)
+
+    !
+    ! This is the base version and we should throw an error. 
+    ! Or should it be the NULL preonditioner???
+    !
+    info = 700
+    call psb_errpush(info,name)
+    goto 9999 
+    
+    call psb_erractionrestore(err_act)
+    return
+
+9999 continue
+    call psb_erractionrestore(err_act)
+    if (err_act == psb_act_abort_) then
+      call psb_error()
+      return
+    end if
+    return
+  end subroutine s_base_precseti
+
+  subroutine s_base_precsetr(prec,what,val,info)
+    
+    use psb_base_mod
+    Implicit None
+    
+    class(psb_s_base_prec_type),intent(inout) :: prec
+    integer, intent(in)                      :: what 
+    real(psb_spk_), intent(in)               :: val 
+    integer, intent(out)                     :: info
+    Integer :: err_act, nrow
+    character(len=20)  :: name='s_base_precsetr'
+
+    call psb_erractionsave(err_act)
+
+    !
+    ! This is the base version and we should throw an error. 
+    ! Or should it be the NULL preonditioner???
+    !
+    info = 700
+    call psb_errpush(info,name)
+    goto 9999 
+    
+    call psb_erractionrestore(err_act)
+    return
+
+9999 continue
+    call psb_erractionrestore(err_act)
+    if (err_act == psb_act_abort_) then
+      call psb_error()
+      return
+    end if
+    return
+  end subroutine s_base_precsetr
+
+  subroutine s_base_precsetc(prec,what,val,info)
+    
+    use psb_base_mod
+    Implicit None
+    
+    class(psb_s_base_prec_type),intent(inout) :: prec
+    integer, intent(in)                      :: what 
+    character(len=*), intent(in)             :: val
+    integer, intent(out)                     :: info
+    Integer :: err_act, nrow
+    character(len=20)  :: name='s_base_precsetc'
+
+    call psb_erractionsave(err_act)
+
+    !
+    ! This is the base version and we should throw an error. 
+    ! Or should it be the NULL preonditioner???
+    !
+    info = 700
+    call psb_errpush(info,name)
+    goto 9999 
+    
+    call psb_erractionrestore(err_act)
+    return
+
+9999 continue
+    call psb_erractionrestore(err_act)
+    if (err_act == psb_act_abort_) then
+      call psb_error()
+      return
+    end if
+    return
+  end subroutine s_base_precsetc
+
+  subroutine s_base_precfree(prec,info)
+    
+    use psb_base_mod
+    Implicit None
+
+    class(psb_s_base_prec_type), intent(inout) :: prec
+    integer, intent(out)                :: info
+    
+    Integer :: err_act, nrow
+    character(len=20)  :: name='s_base_precfree'
+    
+    call psb_erractionsave(err_act)
+    
+    !
+    ! This is the base version and we should throw an error. 
+    ! Or should it be the NULL preonditioner???
+    !
+    info = 700
+    call psb_errpush(info,name)
+    goto 9999 
+    
+    call psb_erractionrestore(err_act)
+    return
+
+9999 continue
+    call psb_erractionrestore(err_act)
+    if (err_act == psb_act_abort_) then
+      call psb_error()
+      return
+    end if
+    return
+    
+  end subroutine s_base_precfree
+  
+
+  subroutine s_base_precdescr(prec,iout)
+    
+    use psb_base_mod
+    Implicit None
+
+    class(psb_s_base_prec_type), intent(in) :: prec
+    integer, intent(in), optional    :: iout
+
+    Integer :: err_act, nrow, info
+    character(len=20)  :: name='s_base_precdescr'
+
+    call psb_erractionsave(err_act)
+
+    !
+    ! This is the base version and we should throw an error. 
+    ! Or should it be the NULL preonditioner???
+    !
+    info = 700
+    call psb_errpush(info,name)
+    goto 9999 
+    
+    call psb_erractionrestore(err_act)
+    return
+
+9999 continue
+    call psb_erractionrestore(err_act)
+    if (err_act == psb_act_abort_) then
+      call psb_error()
+      return
+    end if
+    return
+    
+  end subroutine s_base_precdescr
+  
+
+  function s_base_sizeof(prec) result(val)
+    use psb_base_mod
+    class(psb_s_base_prec_type), intent(in) :: prec
+    integer(psb_long_int_k_) :: val
+    
+    val = 0
+    return
+  end function s_base_sizeof
 
 
   subroutine d_base_apply(alpha,prec,x,beta,y,desc_data,info,trans,work)
@@ -1367,6 +1753,577 @@ contains
     val = 0
     return
   end function d_base_sizeof
+
+
+  subroutine c_base_apply(alpha,prec,x,beta,y,desc_data,info,trans,work)
+    use psb_base_mod
+    type(psb_desc_type),intent(in)       :: desc_data
+    class(psb_c_base_prec_type), intent(in)  :: prec
+    complex(psb_spk_),intent(in)         :: alpha, beta
+    complex(psb_spk_),intent(in)         :: x(:)
+    complex(psb_spk_),intent(inout)      :: y(:)
+    integer, intent(out)                 :: info
+    character(len=1), optional           :: trans
+    complex(psb_spk_),intent(inout), optional, target :: work(:)
+    Integer :: err_act, nrow
+    character(len=20)  :: name='c_base_prec_apply'
+
+    call psb_erractionsave(err_act)
+
+    !
+    ! This is the base version and we should throw an error. 
+    ! Or should it be the NULL preonditioner???
+    !
+    info = 700
+    call psb_errpush(info,name)
+    goto 9999 
+    
+    call psb_erractionrestore(err_act)
+    return
+
+9999 continue
+    call psb_erractionrestore(err_act)
+    if (err_act == psb_act_abort_) then
+      call psb_error()
+      return
+    end if
+    return
+
+  end subroutine c_base_apply
+
+  subroutine c_base_precinit(prec,info)
+    
+    use psb_base_mod
+    Implicit None
+    
+    class(psb_c_base_prec_type),intent(inout) :: prec
+    integer, intent(out)                     :: info
+    Integer :: err_act, nrow
+    character(len=20)  :: name='c_base_precinit'
+
+    call psb_erractionsave(err_act)
+
+    !
+    ! This is the base version and we should throw an error. 
+    ! Or should it be the NULL preonditioner???
+    !
+    info = 700
+    call psb_errpush(info,name)
+    goto 9999 
+    
+    call psb_erractionrestore(err_act)
+    return
+
+9999 continue
+    call psb_erractionrestore(err_act)
+    if (err_act == psb_act_abort_) then
+      call psb_error()
+      return
+    end if
+    return
+  end subroutine c_base_precinit
+
+  subroutine c_base_precbld(a,desc_a,prec,info,upd)
+    
+    use psb_base_mod
+    Implicit None
+    
+    type(psb_c_sparse_mat), intent(in), target :: a
+    type(psb_desc_type), intent(in), target  :: desc_a
+    class(psb_c_base_prec_type),intent(inout) :: prec
+    integer, intent(out)                     :: info
+    character, intent(in), optional          :: upd
+    Integer :: err_act, nrow
+    character(len=20)  :: name='c_base_precbld'
+
+    call psb_erractionsave(err_act)
+
+    !
+    ! This is the base version and we should throw an error. 
+    ! Or should it be the NULL preonditioner???
+    !
+    info = 700
+    call psb_errpush(info,name)
+    goto 9999 
+    
+    call psb_erractionrestore(err_act)
+    return
+
+9999 continue
+    call psb_erractionrestore(err_act)
+    if (err_act == psb_act_abort_) then
+      call psb_error()
+      return
+    end if
+    return
+  end subroutine c_base_precbld
+
+  subroutine c_base_precseti(prec,what,val,info)
+    
+    use psb_base_mod
+    Implicit None
+    
+    class(psb_c_base_prec_type),intent(inout) :: prec
+    integer, intent(in)                      :: what 
+    integer, intent(in)                      :: val 
+    integer, intent(out)                     :: info
+    Integer :: err_act, nrow
+    character(len=20)  :: name='c_base_precseti'
+
+    call psb_erractionsave(err_act)
+
+    !
+    ! This is the base version and we should throw an error. 
+    ! Or should it be the NULL preonditioner???
+    !
+    info = 700
+    call psb_errpush(info,name)
+    goto 9999 
+    
+    call psb_erractionrestore(err_act)
+    return
+
+9999 continue
+    call psb_erractionrestore(err_act)
+    if (err_act == psb_act_abort_) then
+      call psb_error()
+      return
+    end if
+    return
+  end subroutine c_base_precseti
+
+  subroutine c_base_precsetr(prec,what,val,info)
+    
+    use psb_base_mod
+    Implicit None
+    
+    class(psb_c_base_prec_type),intent(inout) :: prec
+    integer, intent(in)                      :: what 
+    real(psb_spk_), intent(in)               :: val 
+    integer, intent(out)                     :: info
+    Integer :: err_act, nrow
+    character(len=20)  :: name='c_base_precsetr'
+
+    call psb_erractionsave(err_act)
+
+    !
+    ! This is the base version and we should throw an error. 
+    ! Or should it be the NULL preonditioner???
+    !
+    info = 700
+    call psb_errpush(info,name)
+    goto 9999 
+    
+    call psb_erractionrestore(err_act)
+    return
+
+9999 continue
+    call psb_erractionrestore(err_act)
+    if (err_act == psb_act_abort_) then
+      call psb_error()
+      return
+    end if
+    return
+  end subroutine c_base_precsetr
+
+  subroutine c_base_precsetc(prec,what,val,info)
+    
+    use psb_base_mod
+    Implicit None
+    
+    class(psb_c_base_prec_type),intent(inout) :: prec
+    integer, intent(in)                      :: what 
+    character(len=*), intent(in)             :: val
+    integer, intent(out)                     :: info
+    Integer :: err_act, nrow
+    character(len=20)  :: name='c_base_precsetc'
+
+    call psb_erractionsave(err_act)
+
+    !
+    ! This is the base version and we should throw an error. 
+    ! Or should it be the NULL preonditioner???
+    !
+    info = 700
+    call psb_errpush(info,name)
+    goto 9999 
+    
+    call psb_erractionrestore(err_act)
+    return
+
+9999 continue
+    call psb_erractionrestore(err_act)
+    if (err_act == psb_act_abort_) then
+      call psb_error()
+      return
+    end if
+    return
+  end subroutine c_base_precsetc
+
+  subroutine c_base_precfree(prec,info)
+    
+    use psb_base_mod
+    Implicit None
+
+    class(psb_c_base_prec_type), intent(inout) :: prec
+    integer, intent(out)                :: info
+    
+    Integer :: err_act, nrow
+    character(len=20)  :: name='c_base_precfree'
+    
+    call psb_erractionsave(err_act)
+    
+    !
+    ! This is the base version and we should throw an error. 
+    ! Or should it be the NULL preonditioner???
+    !
+    info = 700
+    call psb_errpush(info,name)
+    goto 9999 
+    
+    call psb_erractionrestore(err_act)
+    return
+
+9999 continue
+    call psb_erractionrestore(err_act)
+    if (err_act == psb_act_abort_) then
+      call psb_error()
+      return
+    end if
+    return
+    
+  end subroutine c_base_precfree
+  
+
+  subroutine c_base_precdescr(prec,iout)
+    
+    use psb_base_mod
+    Implicit None
+
+    class(psb_c_base_prec_type), intent(in) :: prec
+    integer, intent(in), optional    :: iout
+
+    Integer :: err_act, nrow, info
+    character(len=20)  :: name='c_base_precdescr'
+
+    call psb_erractionsave(err_act)
+
+    !
+    ! This is the base version and we should throw an error. 
+    ! Or should it be the NULL preonditioner???
+    !
+    info = 700
+    call psb_errpush(info,name)
+    goto 9999 
+    
+    call psb_erractionrestore(err_act)
+    return
+
+9999 continue
+    call psb_erractionrestore(err_act)
+    if (err_act == psb_act_abort_) then
+      call psb_error()
+      return
+    end if
+    return
+    
+  end subroutine c_base_precdescr
+  
+
+  function c_base_sizeof(prec) result(val)
+    use psb_base_mod
+    class(psb_c_base_prec_type), intent(in) :: prec
+    integer(psb_long_int_k_) :: val
+    
+    val = 0
+    return
+  end function c_base_sizeof
+
+
+  subroutine z_base_apply(alpha,prec,x,beta,y,desc_data,info,trans,work)
+    use psb_base_mod
+    type(psb_desc_type),intent(in)       :: desc_data
+    class(psb_z_base_prec_type), intent(in)  :: prec
+    complex(psb_dpk_),intent(in)         :: alpha, beta
+    complex(psb_dpk_),intent(in)         :: x(:)
+    complex(psb_dpk_),intent(inout)      :: y(:)
+    integer, intent(out)                 :: info
+    character(len=1), optional           :: trans
+    complex(psb_dpk_),intent(inout), optional, target :: work(:)
+    Integer :: err_act, nrow
+    character(len=20)  :: name='z_base_prec_apply'
+
+    call psb_erractionsave(err_act)
+
+    !
+    ! This is the base version and we should throw an error. 
+    ! Or should it be the NULL preonditioner???
+    !
+    info = 700
+    call psb_errpush(info,name)
+    goto 9999 
+    
+    call psb_erractionrestore(err_act)
+    return
+
+9999 continue
+    call psb_erractionrestore(err_act)
+    if (err_act == psb_act_abort_) then
+      call psb_error()
+      return
+    end if
+    return
+
+  end subroutine z_base_apply
+
+  subroutine z_base_precinit(prec,info)
+    
+    use psb_base_mod
+    Implicit None
+    
+    class(psb_z_base_prec_type),intent(inout) :: prec
+    integer, intent(out)                     :: info
+    Integer :: err_act, nrow
+    character(len=20)  :: name='z_base_precinit'
+
+    call psb_erractionsave(err_act)
+
+    !
+    ! This is the base version and we should throw an error. 
+    ! Or should it be the NULL preonditioner???
+    !
+    info = 700
+    call psb_errpush(info,name)
+    goto 9999 
+    
+    call psb_erractionrestore(err_act)
+    return
+
+9999 continue
+    call psb_erractionrestore(err_act)
+    if (err_act == psb_act_abort_) then
+      call psb_error()
+      return
+    end if
+    return
+  end subroutine z_base_precinit
+
+  subroutine z_base_precbld(a,desc_a,prec,info,upd)
+    
+    use psb_base_mod
+    Implicit None
+    
+    type(psb_z_sparse_mat), intent(in), target :: a
+    type(psb_desc_type), intent(in), target  :: desc_a
+    class(psb_z_base_prec_type),intent(inout) :: prec
+    integer, intent(out)                     :: info
+    character, intent(in), optional          :: upd
+    Integer :: err_act, nrow
+    character(len=20)  :: name='z_base_precbld'
+
+    call psb_erractionsave(err_act)
+
+    !
+    ! This is the base version and we should throw an error. 
+    ! Or should it be the NULL preonditioner???
+    !
+    info = 700
+    call psb_errpush(info,name)
+    goto 9999 
+    
+    call psb_erractionrestore(err_act)
+    return
+
+9999 continue
+    call psb_erractionrestore(err_act)
+    if (err_act == psb_act_abort_) then
+      call psb_error()
+      return
+    end if
+    return
+  end subroutine z_base_precbld
+
+  subroutine z_base_precseti(prec,what,val,info)
+    
+    use psb_base_mod
+    Implicit None
+    
+    class(psb_z_base_prec_type),intent(inout) :: prec
+    integer, intent(in)                      :: what 
+    integer, intent(in)                      :: val 
+    integer, intent(out)                     :: info
+    Integer :: err_act, nrow
+    character(len=20)  :: name='z_base_precseti'
+
+    call psb_erractionsave(err_act)
+
+    !
+    ! This is the base version and we should throw an error. 
+    ! Or should it be the NULL preonditioner???
+    !
+    info = 700
+    call psb_errpush(info,name)
+    goto 9999 
+    
+    call psb_erractionrestore(err_act)
+    return
+
+9999 continue
+    call psb_erractionrestore(err_act)
+    if (err_act == psb_act_abort_) then
+      call psb_error()
+      return
+    end if
+    return
+  end subroutine z_base_precseti
+
+  subroutine z_base_precsetr(prec,what,val,info)
+    
+    use psb_base_mod
+    Implicit None
+    
+    class(psb_z_base_prec_type),intent(inout) :: prec
+    integer, intent(in)                      :: what 
+    real(psb_dpk_), intent(in)               :: val 
+    integer, intent(out)                     :: info
+    Integer :: err_act, nrow
+    character(len=20)  :: name='z_base_precsetr'
+
+    call psb_erractionsave(err_act)
+
+    !
+    ! This is the base version and we should throw an error. 
+    ! Or should it be the NULL preonditioner???
+    !
+    info = 700
+    call psb_errpush(info,name)
+    goto 9999 
+    
+    call psb_erractionrestore(err_act)
+    return
+
+9999 continue
+    call psb_erractionrestore(err_act)
+    if (err_act == psb_act_abort_) then
+      call psb_error()
+      return
+    end if
+    return
+  end subroutine z_base_precsetr
+
+  subroutine z_base_precsetc(prec,what,val,info)
+    
+    use psb_base_mod
+    Implicit None
+    
+    class(psb_z_base_prec_type),intent(inout) :: prec
+    integer, intent(in)                      :: what 
+    character(len=*), intent(in)             :: val
+    integer, intent(out)                     :: info
+    Integer :: err_act, nrow
+    character(len=20)  :: name='z_base_precsetc'
+
+    call psb_erractionsave(err_act)
+
+    !
+    ! This is the base version and we should throw an error. 
+    ! Or should it be the NULL preonditioner???
+    !
+    info = 700
+    call psb_errpush(info,name)
+    goto 9999 
+    
+    call psb_erractionrestore(err_act)
+    return
+
+9999 continue
+    call psb_erractionrestore(err_act)
+    if (err_act == psb_act_abort_) then
+      call psb_error()
+      return
+    end if
+    return
+  end subroutine z_base_precsetc
+
+  subroutine z_base_precfree(prec,info)
+    
+    use psb_base_mod
+    Implicit None
+
+    class(psb_z_base_prec_type), intent(inout) :: prec
+    integer, intent(out)                :: info
+    
+    Integer :: err_act, nrow
+    character(len=20)  :: name='z_base_precfree'
+    
+    call psb_erractionsave(err_act)
+    
+    !
+    ! This is the base version and we should throw an error. 
+    ! Or should it be the NULL preonditioner???
+    !
+    info = 700
+    call psb_errpush(info,name)
+    goto 9999 
+    
+    call psb_erractionrestore(err_act)
+    return
+
+9999 continue
+    call psb_erractionrestore(err_act)
+    if (err_act == psb_act_abort_) then
+      call psb_error()
+      return
+    end if
+    return
+    
+  end subroutine z_base_precfree
+  
+
+  subroutine z_base_precdescr(prec,iout)
+    
+    use psb_base_mod
+    Implicit None
+
+    class(psb_z_base_prec_type), intent(in) :: prec
+    integer, intent(in), optional    :: iout
+
+    Integer :: err_act, nrow, info
+    character(len=20)  :: name='z_base_precdescr'
+
+    call psb_erractionsave(err_act)
+
+    !
+    ! This is the base version and we should throw an error. 
+    ! Or should it be the NULL preonditioner???
+    !
+    info = 700
+    call psb_errpush(info,name)
+    goto 9999 
+    
+    call psb_erractionrestore(err_act)
+    return
+
+9999 continue
+    call psb_erractionrestore(err_act)
+    if (err_act == psb_act_abort_) then
+      call psb_error()
+      return
+    end if
+    return
+    
+  end subroutine z_base_precdescr
+  
+
+  function z_base_sizeof(prec) result(val)
+    use psb_base_mod
+    class(psb_z_base_prec_type), intent(in) :: prec
+    integer(psb_long_int_k_) :: val
+    
+    val = 0
+    return
+  end function z_base_sizeof
+
 
 
 end module psb_prec_type

@@ -50,7 +50,7 @@ subroutine psb_zprc_aply(prec,x,y,desc_data,info,trans, work)
   integer :: ictxt,np,me,err_act
   character(len=20)   :: name
 
-  name='psb_zprec_aply'
+  name='psb_prc_aply'
   info = 0
   call psb_erractionsave(err_act)
 
@@ -74,10 +74,12 @@ subroutine psb_zprc_aply(prec,x,y,desc_data,info,trans, work)
 
   end if
 
-  call psb_gprec_aply(zone,prec,x,zzero,y,desc_data,trans_,work_,info)
-
-  ! If the original distribution has an overlap we should fix that. 
-
+  if (.not.allocated(prec%prec)) then 
+    info = 1124
+    call psb_errpush(info,name,a_err="preconditioner")
+    goto 9999
+  end if
+  call prec%prec%apply(zone,x,zzero,y,desc_data,info,trans_,work=work_)
   if (present(work)) then 
   else
     deallocate(work_)
@@ -151,7 +153,7 @@ subroutine psb_zprc_aply1(prec,x,desc_data,info,trans)
   integer :: ictxt,np,me, err_act
   complex(psb_dpk_), pointer :: WW(:), w1(:)
   character(len=20)   :: name
-  name='psb_zprec1'
+  name='psb_prc_aply1'
   info = 0
   call psb_erractionsave(err_act)
   
@@ -164,12 +166,17 @@ subroutine psb_zprc_aply1(prec,x,desc_data,info,trans)
     trans_='N'
   end if
 
+  if (.not.allocated(prec%prec)) then 
+    info = 1124
+    call psb_errpush(info,name,a_err="preconditioner")
+    goto 9999
+  end if
   allocate(ww(size(x)),w1(size(x)),stat=info)
   if (info /= 0) then 
     call psb_errpush(4010,name,a_err='Allocate')
     goto 9999      
   end if
-  call psb_zprc_aply(prec,x,ww,desc_data,info,trans_,work=w1)
+  call prec%prec%apply(zone,x,zzero,ww,desc_data,info,trans_,work=w1)
   if(info /=0) goto 9999
   x(:) = ww(:)
   deallocate(ww,W1)

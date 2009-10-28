@@ -43,57 +43,28 @@ subroutine psb_dprecinit(p,ptype,info)
 
   info = 0
 
-  if (.false.) then 
-!!$  call psb_realloc(psb_ifpsz,p%iprcparm,info)
-!!$  if (info == 0) call psb_realloc(psb_rfpsz,p%rprcparm,info)
-!!$  if (info /= 0) return
-!!$
-!!$  select case(psb_toupper(ptype(1:len_trim(ptype))))
-!!$  case ('NONE','NOPREC') 
-!!$    p%iprcparm(:)           = 0
-!!$    p%iprcparm(psb_p_type_)     = psb_noprec_
-!!$    p%iprcparm(psb_f_type_)     = psb_f_none_
-!!$
-!!$  case ('DIAG')
-!!$    p%iprcparm(:)           = 0
-!!$    p%iprcparm(psb_p_type_)     = psb_diag_
-!!$    p%iprcparm(psb_f_type_)     = psb_f_none_
-!!$
-!!$  case ('BJAC') 
-!!$    p%iprcparm(:)            = 0
-!!$    p%iprcparm(psb_p_type_)      = psb_bjac_
-!!$    p%iprcparm(psb_f_type_)      = psb_f_ilu_n_
-!!$    p%iprcparm(psb_ilu_fill_in_) = 0
-!!$
-!!$  case default
-!!$    write(0,*) 'Unknown preconditioner type request "',ptype,'"'
-!!$    info = 2
-!!$
-!!$  end select
-  else
-    if (allocated(p%dprec) ) then
-      call p%dprec%precfree(info)
-      if (info == 0) deallocate(p%dprec,stat=info) 
-      if (info /= 0) return
-    end if
-
-    select case(psb_toupper(ptype(1:len_trim(ptype))))
-    case ('NONE','NOPREC') 
-      
-      allocate(psb_d_null_prec_type :: p%dprec, stat=info)       
-      
-    case ('DIAG')
-      allocate(psb_d_diag_prec_type :: p%dprec, stat=info)       
-
-    case ('BJAC') 
-      allocate(psb_d_bjac_prec_type :: p%dprec, stat=info)       
-
-    case default
-      write(0,*) 'Unknown preconditioner type request "',ptype,'"'
-      info = 2
-
-    end select
-    if (info == 0)  call p%dprec%precinit(info)
-
+  if (allocated(p%prec) ) then
+    call p%prec%precfree(info)
+    if (info == 0) deallocate(p%prec,stat=info) 
+    if (info /= 0) return
   end if
+  
+  select case(psb_toupper(ptype(1:len_trim(ptype))))
+  case ('NONE','NOPREC') 
+    
+    allocate(psb_d_null_prec_type :: p%prec, stat=info)       
+    
+  case ('DIAG')
+    allocate(psb_d_diag_prec_type :: p%prec, stat=info)       
+    
+  case ('BJAC') 
+    allocate(psb_d_bjac_prec_type :: p%prec, stat=info)       
+    
+  case default
+    write(0,*) 'Unknown preconditioner type request "',ptype,'"'
+    info = 2
+    
+  end select
+  if (info == 0)  call p%prec%precinit(info)
+  
 end subroutine psb_dprecinit

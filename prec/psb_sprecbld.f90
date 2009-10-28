@@ -81,51 +81,14 @@ subroutine psb_sprecbld(a,desc_a,p,info,upd)
   ! ALso should define symbolic names for the preconditioners. 
   !
 
-  call psb_check_def(p%iprcparm(psb_p_type_),'base_prec',&
-       &  psb_diag_,is_legal_prec)
-
-  call psb_nullify_desc(p%desc_data)
-
-  select case(p%iprcparm(psb_p_type_)) 
-  case (psb_noprec_)
-    ! Do nothing. 
-    call psb_cdcpy(desc_a,p%desc_data,info)
-    if(info /= 0) then
-      info=4010
-      ch_err='psb_cdcpy'
-      call psb_errpush(info,name,a_err=ch_err)
-      goto 9999
-    end if
-
-  case (psb_diag_)
-
-    call psb_diagsc_bld(a,desc_a,p,upd_,info)
-    if(info /= 0) then
-      info=4010
-      ch_err='psb_diagsc_bld'
-      call psb_errpush(info,name,a_err=ch_err)
-      goto 9999
-    end if
-
-  case (psb_bjac_)
-
-    call psb_check_def(p%iprcparm(psb_f_type_),'fact',&
-         &  psb_f_ilu_n_,is_legal_ml_fact)
-
-    call psb_bjac_bld(a,desc_a,p,upd_,info)
-
-    if(info /= 0) then
-      call psb_errpush(4010,name,a_err='psb_bjac_bld')
-      goto 9999
-    end if
-
-  case default
-    info=4010
-    ch_err='Unknown psb_p_type_'
-    call psb_errpush(info,name,a_err=ch_err)
+  if (.not.allocated(p%prec)) then
+    info = 1124
+    call psb_errpush(info,name,a_err="preconditioner")
     goto 9999
+  end if
 
-  end select
+  call p%prec%precbld(a,desc_a,info,upd)
+  if (info /= 0) goto 9999
 
   call psb_erractionrestore(err_act)
   return

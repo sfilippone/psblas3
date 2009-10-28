@@ -490,7 +490,9 @@ contains
       write (0,'("Invalid state for communication descriptor")')
     case (1123)
       write (0,'("Invalid combined state for A and DESC_A")')
-    case(1124:1999)
+    case (1124)
+      write (0,'("Invalid state for object:",a)') trim(a_e_d)
+    case(1125:1999)
       write (0,'("computational error. code: ",i0)')err_c
     case(2010)
       write (0,'("BLACS error. Number of processes=-1")')

@@ -37,30 +37,18 @@ subroutine psb_cprecseti(p,what,val,info)
   type(psb_cprec_type), intent(inout)    :: p
   integer                                :: what, val 
   integer, intent(out)                   :: info
+  character(len=20) :: name='precset'
 
   info = 0
+  if (.not.allocated(p%prec)) then 
+    info = 1124
+    call psb_errpush(info,name,a_err="preconditioner")
+    return
+!!$    goto 9999
+  end if
 
-  select case(what)
-  case (psb_f_type_) 
-    if (p%iprcparm(psb_p_type_) /= psb_bjac_) then 
-      write(0,*) 'WHAT is invalid for current preconditioner ',p%iprcparm(psb_p_type_),&
-           & 'ignoring user specification'
-      return
-    endif
-    p%iprcparm(psb_f_type_)     = val
+  call p%prec%precset(what,val,info)
 
-  case (psb_ilu_fill_in_) 
-    if ((p%iprcparm(psb_p_type_) /= psb_bjac_).or.(p%iprcparm(psb_f_type_) /= psb_f_ilu_n_)) then 
-      write(0,*) 'WHAT is invalid for current preconditioner ',p%iprcparm(psb_p_type_),&
-           & 'ignoring user specification'
-      return
-    endif
-    p%iprcparm(psb_ilu_fill_in_) = val
- 
-  case default
-    write(0,*) 'WHAT is invalid, ignoring user specification'
-
-  end select
   return
 
 end subroutine psb_cprecseti
@@ -75,32 +63,18 @@ subroutine psb_cprecsets(p,what,val,info)
   integer                                :: what
   real(psb_spk_)                       :: val 
   integer, intent(out)                   :: info
+  character(len=20) :: name='precset'
 
-!
-!  This will have to be changed if/when we put together an ILU(eps)
-!  factorization.
-!
-  select case(what)
-!!$  case (psb_f_type_) 
-!!$    if (p%iprcparm(psb_p_type_) /= psb_bjac_) then 
-!!$      write(0,*) 'WHAT is invalid for current preconditioner ',p%iprcparm(psb_p_type_),&
-!!$           & 'ignoring user specification'
-!!$      return
-!!$    endif
-!!$    p%iprcparm(psb_f_type_)     = val
-!!$
-!!$  case (psb_ilu_fill_in_) 
-!!$    if ((p%iprcparm(psb_p_type_) /= psb_bjac_).or.(p%iprcparm(psb_f_type_) /= psb_f_ilu_n_)) then 
-!!$      write(0,*) 'WHAT is invalid for current preconditioner ',p%iprcparm(psb_p_type_),&
-!!$           & 'ignoring user specification'
-!!$      return
-!!$    endif
-!!$    p%iprcparm(psb_ilu_fill_in_) = val
- 
-  case default
-    write(0,*) 'WHAT is invalid, ignoring user specification'
+  info = 0
+  if (.not.allocated(p%prec)) then 
+    info = 1124
+    call psb_errpush(info,name,a_err="preconditioner")
+    return
+!!$    goto 9999
+  end if
 
-  end select
+  call p%prec%precset(what,val,info)
+
   return
 
 end subroutine psb_cprecsets

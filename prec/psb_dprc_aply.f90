@@ -73,13 +73,12 @@ subroutine psb_dprc_aply(prec,x,y,desc_data,info,trans, work)
 
   end if
 
-  if (.not.allocated(prec%dprec)) then 
+  if (.not.allocated(prec%prec)) then 
     info = 1124
     call psb_errpush(info,name,a_err="preconditioner")
     goto 9999
   end if
-!!$  call psb_gprec_aply(done,prec,x,dzero,y,desc_data,trans_,work_,info)
-  call prec%dprec%apply(done,x,dzero,y,desc_data,info,trans_,work=work_)
+  call prec%prec%apply(done,x,dzero,y,desc_data,info,trans_,work=work_)
   if (present(work)) then 
   else
     deallocate(work_)
@@ -153,7 +152,7 @@ subroutine psb_dprc_aply1(prec,x,desc_data,info,trans)
   integer :: ictxt,np,me, err_act
   real(psb_dpk_), pointer :: WW(:), w1(:)
   character(len=20)   :: name
-  name='psb_dprec_aply1'
+  name='psb_prc_aply1'
   info = 0
   call psb_erractionsave(err_act)
   
@@ -166,7 +165,7 @@ subroutine psb_dprc_aply1(prec,x,desc_data,info,trans)
     trans_='N'
   end if
 
-  if (.not.allocated(prec%dprec)) then 
+  if (.not.allocated(prec%prec)) then 
     info = 1124
     call psb_errpush(info,name,a_err="preconditioner")
     goto 9999
@@ -176,7 +175,7 @@ subroutine psb_dprc_aply1(prec,x,desc_data,info,trans)
     call psb_errpush(4010,name,a_err='Allocate')
     goto 9999      
   end if
-  call prec%dprec%apply(done,x,dzero,ww,desc_data,info,trans_,work=w1)
+  call prec%prec%apply(done,x,dzero,ww,desc_data,info,trans_,work=w1)
   if(info /=0) goto 9999
   x(:) = ww(:)
   deallocate(ww,W1)

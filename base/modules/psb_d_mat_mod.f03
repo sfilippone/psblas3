@@ -1485,6 +1485,7 @@ contains
       call a%set_dupl(psb_dupl_def_)
     end if
 
+    write(0,*)name,' ', present(mold), present(type),count( (/present(mold),present(type) /))
     if (count( (/present(mold),present(type) /)) > 1) then
       info = 583
       call psb_errpush(info,name,a_err='TYPE, MOLD')

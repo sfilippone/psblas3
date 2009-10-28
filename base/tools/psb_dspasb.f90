@@ -118,6 +118,7 @@ subroutine psb_dspasb(a,desc_a, info, afmt, upd, dupl, mold)
     call a%set_ncols(n_col)
   end if
 
+  write(0,*)name,' ', present(mold), present(afmt),count( (/present(mold),present(afmt) /))
   call a%cscnv(info,type=afmt,dupl=dupl, mold=mold)
 
   

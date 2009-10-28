@@ -117,9 +117,9 @@ contains
           do i=1,m 
             acc  = szero
             do j=irp(i), irp(i+1)-1
-              acc  = acc + val(j) * x(ja(j))          
+              acc  = acc - val(j) * x(ja(j))          
             enddo
-            y(i) = -acc
+            y(i) = acc
           end do
 
         else 
@@ -149,11 +149,11 @@ contains
         else if (alpha == -sone) then 
 
           do i=1,m 
-            acc  = szero
+            acc  = y(i)
             do j=irp(i), irp(i+1)-1
-              acc  = acc + val(j) * x(ja(j))          
+              acc  = acc - val(j) * x(ja(j))          
             enddo
-            y(i) = y(i) -acc
+            y(i) = acc
           end do
 
         else 
@@ -172,21 +172,21 @@ contains
 
         if (alpha == sone) then 
           do i=1,m 
-            acc  = szero
+            acc  = -y(i)
             do j=irp(i), irp(i+1)-1
               acc  = acc + val(j) * x(ja(j))          
             enddo
-            y(i) = -y(i) + acc
+            y(i) = acc
           end do
 
         else if (alpha == -sone) then 
 
           do i=1,m 
-            acc  = szero
+            acc  = y(i)
             do j=irp(i), irp(i+1)-1
-              acc  = acc + val(j) * x(ja(j))          
+              acc  = acc - val(j) * x(ja(j))          
             enddo
-            y(i) = -y(i) -acc
+            y(i) =  acc
           end do
 
         else 
@@ -408,9 +408,9 @@ contains
         do i=1,m 
           acc(1:nc)  = szero
           do j=irp(i), irp(i+1)-1
-            acc(1:nc)  = acc(1:nc) + val(j) * x(ja(j),1:nc)          
+            acc(1:nc)  = acc(1:nc) - val(j) * x(ja(j),1:nc)          
           enddo
-          y(i,1:nc) = -acc(1:nc)
+          y(i,1:nc) = acc(1:nc)
         end do
 
       else 
@@ -430,21 +430,21 @@ contains
 
       if (alpha == sone) then 
         do i=1,m 
-          acc(1:nc)  = szero
+          acc(1:nc)  = y(i,1:nc)
           do j=irp(i), irp(i+1)-1
             acc(1:nc)  = acc(1:nc) + val(j) * x(ja(j),1:nc)          
           enddo
-          y(i,1:nc) = y(i,1:nc) + acc(1:nc)
+          y(i,1:nc) = acc(1:nc)
         end do
 
       else if (alpha == -sone) then 
 
-        do i=1,m 
-          acc(1:nc)  = szero
+        do i=1,m
+          acc(1:nc)  = y(i,1:nc)
           do j=irp(i), irp(i+1)-1
-            acc(1:nc)  = acc(1:nc) + val(j) * x(ja(j),1:nc)          
+            acc(1:nc)  = acc(1:nc) - val(j) * x(ja(j),1:nc)          
           enddo
-          y(i,1:nc) = y(i,1:nc) -acc(1:nc)
+          y(i,1:nc) = acc(1:nc)
         end do
 
       else 
@@ -621,10 +621,8 @@ subroutine s_csr_cssv_impl(alpha,a,x,beta,y,info,trans)
   endif
 
   tra = (psb_toupper(trans_)=='T').or.(psb_toupper(trans_)=='C')
-
   m = a%get_nrows()
 
-  
   if (.not. (a%is_triangle())) then 
     info = 1121
     call psb_errpush(info,name)
@@ -676,11 +674,12 @@ subroutine s_csr_cssv_impl(alpha,a,x,beta,y,info,trans)
     if (info /= 0) then 
       return
     end if
+
     call inner_csrsv(tra,a%is_lower(),a%is_unit(),a%get_nrows(),&
          & a%irp,a%ja,a%val,x,tmp) 
-    do  i = 1, m
-      y(i) = alpha*tmp(i) + beta*y(i)
-    end do
+
+    call psb_geaxpby(m,alpha,tmp,beta,y,info)
+
   end if
 
   call psb_erractionrestore(err_act)
@@ -840,6 +839,7 @@ subroutine s_csr_cssm_impl(alpha,a,x,beta,y,info,trans)
 
 
   tra = (psb_toupper(trans_)=='T').or.(psb_toupper(trans_)=='C')
+
   m   = a%get_nrows()
   nc  = min(size(x,2) , size(y,2)) 
 
@@ -1079,7 +1079,7 @@ subroutine s_csr_csgetptn_impl(imin,imax,a,nz,ia,ja,info,&
   integer, intent(in), optional        :: jmin,jmax, nzin
   logical, intent(in), optional        :: rscale,cscale
 
-  logical :: appens_, rscale_, cscale_ 
+  logical :: append_, rscale_, cscale_ 
   integer :: nzin_, jmin_, jmax_, err_act, i
   character(len=20)  :: name='csget'
   logical, parameter :: debug=.false.
@@ -1104,11 +1104,11 @@ subroutine s_csr_csgetptn_impl(imin,imax,a,nz,ia,ja,info,&
   end if
 
   if (present(append)) then
-    appens_=append
+    append_=append
   else
-    appens_=.false.
+    append_=.false.
   endif
-  if ((appens_).and.(present(nzin))) then 
+  if ((append_).and.(present(nzin))) then 
     nzin_ = nzin
   else
     nzin_ = 0
@@ -1129,7 +1129,7 @@ subroutine s_csr_csgetptn_impl(imin,imax,a,nz,ia,ja,info,&
     goto 9999
   end if
 
-  call csr_getptn(imin,imax,jmin_,jmax_,a,nz,ia,ja,nzin_,appens_,info,iren)
+  call csr_getptn(imin,imax,jmin_,jmax_,a,nz,ia,ja,nzin_,append_,info,iren)
   
   if (rscale_) then 
     do i=nzin_+1, nzin_+nz
@@ -1177,7 +1177,7 @@ contains
     integer, optional                    :: iren(:)
     integer  :: nzin_, nza, idx,i,j,k, nzt, irw, lrw
     integer  :: debug_level, debug_unit
-    character(len=20) :: name='coo_getrow'
+    character(len=20) :: name='csr_getptn'
 
     debug_unit  = psb_get_debug_unit()
     debug_level = psb_get_debug_level()
@@ -1255,7 +1255,7 @@ subroutine s_csr_csgetrow_impl(imin,imax,a,nz,ia,ja,val,info,&
   integer, intent(in), optional        :: jmin,jmax, nzin
   logical, intent(in), optional        :: rscale,cscale
 
-  logical :: appens_, rscale_, cscale_ 
+  logical :: append_, rscale_, cscale_ 
   integer :: nzin_, jmin_, jmax_, err_act, i
   character(len=20)  :: name='csget'
   logical, parameter :: debug=.false.
@@ -1280,11 +1280,11 @@ subroutine s_csr_csgetrow_impl(imin,imax,a,nz,ia,ja,val,info,&
   end if
 
   if (present(append)) then
-    appens_=append
+    append_=append
   else
-    appens_=.false.
+    append_=.false.
   endif
-  if ((appens_).and.(present(nzin))) then 
+  if ((append_).and.(present(nzin))) then 
     nzin_ = nzin
   else
     nzin_ = 0
@@ -1305,7 +1305,7 @@ subroutine s_csr_csgetrow_impl(imin,imax,a,nz,ia,ja,val,info,&
     goto 9999
   end if
 
-  call csr_getrow(imin,imax,jmin_,jmax_,a,nz,ia,ja,val,nzin_,appens_,info,&
+  call csr_getrow(imin,imax,jmin_,jmax_,a,nz,ia,ja,val,nzin_,append_,info,&
        & iren)
   
   if (rscale_) then 
