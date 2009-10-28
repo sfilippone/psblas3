@@ -405,7 +405,7 @@ contains
     else if ((psb_tolower(type) == 'real').and.(psb_tolower(sym) == 'symmetric')) then
       ! we are generally working with non-symmetric matrices, so
       ! we de-symmetrize what we are about to read
-      call acoo%allocate(nrow,ncol,nnzero)
+      call acoo%allocate(nrow,ncol,2*nnzero)
       do i=1,nnzero
         read(infile,fmt=*,end=902) acoo%ia(i),acoo%ja(i),acoo%val(i)
       end do
@@ -559,7 +559,7 @@ contains
     else if ((psb_tolower(type) == 'real').and.(psb_tolower(sym) == 'symmetric')) then
       ! we are generally working with non-symmetric matrices, so
       ! we de-symmetrize what we are about to read
-      call acoo%allocate(nrow,ncol,nnzero)
+      call acoo%allocate(nrow,ncol,2*nnzero)
       do i=1,nnzero
         read(infile,fmt=*,end=902) acoo%ia(i),acoo%ja(i),acoo%val(i)
       end do
@@ -712,7 +712,7 @@ contains
     else if ((psb_tolower(type) == 'complex').and.(psb_tolower(sym) == 'symmetric')) then
       ! we are generally working with non-symmetric matrices, so
       ! we de-symmetrize what we are about to read
-      call acoo%allocate(nrow,ncol,nnzero)
+      call acoo%allocate(nrow,ncol,2*nnzero)
       do i=1,nnzero
         read(infile,fmt=*,end=902) acoo%ia(i),acoo%ja(i),are,aim
         acoo%val(i) = cmplx(are,aim,kind=psb_spk_)
@@ -735,7 +735,7 @@ contains
     else if ((psb_tolower(type) == 'complex').and.(psb_tolower(sym) == 'hermitian')) then
       ! we are generally working with non-symmetric matrices, so
       ! we de-symmetrize what we are about to read
-      call acoo%allocate(nrow,ncol,nnzero)
+      call acoo%allocate(nrow,ncol,2*nnzero)
       do i=1,nnzero
         read(infile,fmt=*,end=902) acoo%ia(i),acoo%ja(i),are,aim
         acoo%val(i) = cmplx(are,aim,kind=psb_spk_)
@@ -889,7 +889,7 @@ contains
     else if ((psb_tolower(type) == 'complex').and.(psb_tolower(sym) == 'symmetric')) then
       ! we are generally working with non-symmetric matrices, so
       ! we de-symmetrize what we are about to read
-      call acoo%allocate(nrow,ncol,nnzero)
+      call acoo%allocate(nrow,ncol,2*nnzero)
       do i=1,nnzero
         read(infile,fmt=*,end=902) acoo%ia(i),acoo%ja(i),are,aim
         acoo%val(i) = cmplx(are,aim,kind=psb_dpk_)
@@ -912,7 +912,7 @@ contains
     else if ((psb_tolower(type) == 'complex').and.(psb_tolower(sym) == 'hermitian')) then
       ! we are generally working with non-symmetric matrices, so
       ! we de-symmetrize what we are about to read
-      call acoo%allocate(nrow,ncol,nnzero)
+      call acoo%allocate(nrow,ncol,2*nnzero)
       do i=1,nnzero
         read(infile,fmt=*,end=902) acoo%ia(i),acoo%ja(i),are,aim
         acoo%val(i) = cmplx(are,aim,kind=psb_dpk_)
