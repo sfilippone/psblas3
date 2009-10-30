@@ -1,5 +1,5 @@
 11                  Number of inputs
-waveguide3D.mtx         This (and others) from: http://math.nist.gov/MatrixMarket/  or 
+young1c.mtx         This (and others) from: http://math.nist.gov/MatrixMarket/  or 
 NONE                     http://www.cise.ufl.edu/research/sparse/matrices/index.html
 MM                  File format: MM: Matrix Market  HB: Harwell-Boeing.
 BICGSTAB            Iterative method: BiCGSTAB CGS RGMRES BiCGSTABL BICG CG
