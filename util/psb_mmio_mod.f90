@@ -31,15 +31,23 @@
 !!$  
 module psb_mmio_mod
 
-  public mm_mat_read, mm_mat_write, mm_vet_read
+  public mm_mat_read, mm_mat_write, mm_vet_read, mm_vet_write
+
   interface mm_mat_read
     module procedure smm_mat_read,  dmm_mat_read, cmm_mat_read, zmm_mat_read
   end interface
+
   interface mm_mat_write
     module procedure smm_mat_write, dmm_mat_write, cmm_mat_write,  zmm_mat_write
   end interface
+
   interface mm_vet_read
     module procedure mm_svet_read, mm_dvet_read, mm_cvet_read, mm_zvet_read
+  end interface
+
+  interface mm_vet_write
+    module procedure mm_svet2_write, mm_svet1_write, mm_dvet2_write, mm_dvet1_write,&
+         &  mm_cvet2_write, mm_cvet1_write, mm_zvet2_write, mm_zvet1_write
   end interface
 
 contains
@@ -340,6 +348,456 @@ contains
     return
   end subroutine mm_zvet_read
 
+  subroutine mm_svet2_write(b, header, info, iunit, filename)   
+    use psb_base_mod
+    implicit none
+    real(psb_spk_), intent(in)  :: b(:,:)
+    character(len=*), intent(in) :: header
+    integer, intent(out)        :: info
+    integer, optional, intent(in)          :: iunit
+    character(len=*), optional, intent(in) :: filename
+    integer              :: nrow, ncol, i,root, np,  me,  ircode, j, outfile
+    
+    character(len=80)                 :: frmtv 
+
+    info = 0
+    if (present(filename)) then
+      if (filename=='-') then 
+        outfile=6
+      else
+        if (present(iunit)) then 
+          outfile=iunit
+        else
+          outfile=99
+        endif
+        open(outfile,file=filename, err=901, action='WRITE')
+      endif
+    else 
+      if (present(iunit)) then 
+        outfile=iunit
+      else
+        outfile=6
+      endif
+    endif
+
+    write(outfile,'(a)') '%%MatrixMarket matrix array real general'
+    write(outfile,'(a)') '% '//trim(header)
+    write(outfile,'(a)') '% '
+    nrow = size(b,1) 
+    ncol = size(b,2) 
+    write(outfile,*) nrow,ncol
+    
+    write(frmtv,'(a,i3.3,a)') '(',ncol,'(es26.18,1x))'
+
+    do i=1,size(b,1) 
+      write(outfile,frmtv) b(i,1:ncol)
+    end do
+    
+    if (outfile /= 6) close(outfile)
+
+    return 
+    ! open failed
+901 write(0,*) 'mm_vet_write: could not open file ',&
+         & outfile,' for output'
+    info = -1
+    return
+
+  end subroutine mm_svet2_write
+
+  subroutine mm_svet1_write(b, header, info, iunit, filename)   
+    use psb_base_mod
+    implicit none
+    real(psb_spk_), intent(in)  :: b(:)
+    character(len=*), intent(in) :: header
+    integer, intent(out)        :: info
+    integer, optional, intent(in)          :: iunit
+    character(len=*), optional, intent(in) :: filename
+    integer              :: nrow, ncol, i,root, np,  me,  ircode, j, outfile
+    
+    character(len=80)                 :: frmtv 
+
+    info = 0
+    if (present(filename)) then
+      if (filename=='-') then 
+        outfile=6
+      else
+        if (present(iunit)) then 
+          outfile=iunit
+        else
+          outfile=99
+        endif
+        open(outfile,file=filename, err=901, action='WRITE')
+      endif
+    else 
+      if (present(iunit)) then 
+        outfile=iunit
+      else
+        outfile=6
+      endif
+    endif
+
+    write(outfile,'(a)') '%%MatrixMarket matrix array real general'
+    write(outfile,'(a)') '% '//trim(header)
+    write(outfile,'(a)') '% '
+    nrow = size(b,1) 
+    ncol = 1
+    write(outfile,*) nrow,ncol
+    
+    write(frmtv,'(a,i3.3,a)') '(',ncol,'(es26.18,1x))'
+
+    do i=1,size(b,1) 
+      write(outfile,frmtv) b(i)
+    end do
+    
+    if (outfile /= 6) close(outfile)
+
+    return 
+    ! open failed
+901 write(0,*) 'mm_vet_write: could not open file ',&
+         & outfile,' for output'
+    info = -1
+    return
+
+  end subroutine mm_svet1_write
+
+
+  subroutine mm_dvet2_write(b, header, info, iunit, filename)   
+    use psb_base_mod
+    implicit none
+    real(psb_dpk_), intent(in)  :: b(:,:)
+    character(len=*), intent(in) :: header
+    integer, intent(out)        :: info
+    integer, optional, intent(in)          :: iunit
+    character(len=*), optional, intent(in) :: filename
+    integer              :: nrow, ncol, i,root, np,  me,  ircode, j, outfile
+    
+    character(len=80)                 :: frmtv 
+
+    info = 0
+    if (present(filename)) then
+      if (filename=='-') then 
+        outfile=6
+      else
+        if (present(iunit)) then 
+          outfile=iunit
+        else
+          outfile=99
+        endif
+        open(outfile,file=filename, err=901, action='WRITE')
+      endif
+    else 
+      if (present(iunit)) then 
+        outfile=iunit
+      else
+        outfile=6
+      endif
+    endif
+
+    write(outfile,'(a)') '%%MatrixMarket matrix array real general'
+    write(outfile,'(a)') '% '//trim(header)
+    write(outfile,'(a)') '% '
+    nrow = size(b,1) 
+    ncol = size(b,2) 
+    write(outfile,*) nrow,ncol
+    
+    write(frmtv,'(a,i3.3,a)') '(',ncol,'(es26.18,1x))'
+
+    do i=1,size(b,1) 
+      write(outfile,frmtv) b(i,1:ncol)
+    end do
+    
+    if (outfile /= 6) close(outfile)
+
+    return 
+    ! open failed
+901 write(0,*) 'mm_vet_write: could not open file ',&
+         & outfile,' for output'
+    info = -1
+    return
+
+  end subroutine mm_dvet2_write
+
+  subroutine mm_dvet1_write(b, header, info, iunit, filename)   
+    use psb_base_mod
+    implicit none
+    real(psb_dpk_), intent(in)  :: b(:)
+    character(len=*), intent(in) :: header
+    integer, intent(out)        :: info
+    integer, optional, intent(in)          :: iunit
+    character(len=*), optional, intent(in) :: filename
+    integer              :: nrow, ncol, i,root, np,  me,  ircode, j, outfile
+    
+    character(len=80)                 :: frmtv 
+
+    info = 0
+    if (present(filename)) then
+      if (filename=='-') then 
+        outfile=6
+      else
+        if (present(iunit)) then 
+          outfile=iunit
+        else
+          outfile=99
+        endif
+        open(outfile,file=filename, err=901, action='WRITE')
+      endif
+    else 
+      if (present(iunit)) then 
+        outfile=iunit
+      else
+        outfile=6
+      endif
+    endif
+
+    write(outfile,'(a)') '%%MatrixMarket matrix array real general'
+    write(outfile,'(a)') '% '//trim(header)
+    write(outfile,'(a)') '% '
+    nrow = size(b,1) 
+    ncol = 1
+    write(outfile,*) nrow,ncol
+    
+    write(frmtv,'(a,i3.3,a)') '(',ncol,'(es26.18,1x))'
+
+    do i=1,size(b,1) 
+      write(outfile,frmtv) b(i)
+    end do
+    
+    if (outfile /= 6) close(outfile)
+
+    return 
+    ! open failed
+901 write(0,*) 'mm_vet_write: could not open file ',&
+         & outfile,' for output'
+    info = -1
+    return
+
+  end subroutine mm_dvet1_write
+
+
+  subroutine mm_cvet2_write(b, header, info, iunit, filename)   
+    use psb_base_mod
+    implicit none
+    complex(psb_spk_), intent(in)  :: b(:,:)
+    character(len=*), intent(in) :: header
+    integer, intent(out)        :: info
+    integer, optional, intent(in)          :: iunit
+    character(len=*), optional, intent(in) :: filename
+    integer              :: nrow, ncol, i,root, np,  me,  ircode, j, outfile
+    
+    character(len=80)                 :: frmtv 
+
+    info = 0
+    if (present(filename)) then
+      if (filename=='-') then 
+        outfile=6
+      else
+        if (present(iunit)) then 
+          outfile=iunit
+        else
+          outfile=99
+        endif
+        open(outfile,file=filename, err=901, action='WRITE')
+      endif
+    else 
+      if (present(iunit)) then 
+        outfile=iunit
+      else
+        outfile=6
+      endif
+    endif
+
+    write(outfile,'(a)') '%%MatrixMarket matrix array real general'
+    write(outfile,'(a)') '% '//trim(header)
+    write(outfile,'(a)') '% '
+    nrow = size(b,1) 
+    ncol = size(b,2) 
+    write(outfile,*) nrow,ncol
+    
+    write(frmtv,'(a,i5.5,a)') '(',2*ncol,'(es26.18,1x))'
+
+    do i=1,size(b,1) 
+      write(outfile,frmtv) b(i,1:ncol)
+    end do
+    
+    if (outfile /= 6) close(outfile)
+
+    return 
+    ! open failed
+901 write(0,*) 'mm_vet_write: could not open file ',&
+         & outfile,' for output'
+    info = -1
+    return
+
+  end subroutine mm_cvet2_write
+
+  subroutine mm_cvet1_write(b, header, info, iunit, filename)   
+    use psb_base_mod
+    implicit none
+    complex(psb_spk_), intent(in)  :: b(:)
+    character(len=*), intent(in) :: header
+    integer, intent(out)        :: info
+    integer, optional, intent(in)          :: iunit
+    character(len=*), optional, intent(in) :: filename
+    integer              :: nrow, ncol, i,root, np,  me,  ircode, j, outfile
+    
+    character(len=80)                 :: frmtv 
+
+    info = 0
+    if (present(filename)) then
+      if (filename=='-') then 
+        outfile=6
+      else
+        if (present(iunit)) then 
+          outfile=iunit
+        else
+          outfile=99
+        endif
+        open(outfile,file=filename, err=901, action='WRITE')
+      endif
+    else 
+      if (present(iunit)) then 
+        outfile=iunit
+      else
+        outfile=6
+      endif
+    endif
+
+    write(outfile,'(a)') '%%MatrixMarket matrix array real general'
+    write(outfile,'(a)') '% '//trim(header)
+    write(outfile,'(a)') '% '
+    nrow = size(b,1) 
+    ncol = 1
+    write(outfile,*) nrow,ncol
+    
+    write(frmtv,'(a,i5.5,a)') '(',2*ncol,'(es26.18,1x))'
+
+    do i=1,size(b,1) 
+      write(outfile,frmtv) b(i)
+    end do
+    
+    if (outfile /= 6) close(outfile)
+
+    return 
+    ! open failed
+901 write(0,*) 'mm_vet_write: could not open file ',&
+         & outfile,' for output'
+    info = -1
+    return
+
+  end subroutine mm_cvet1_write
+
+  subroutine mm_zvet2_write(b, header, info, iunit, filename)   
+    use psb_base_mod
+    implicit none
+    complex(psb_dpk_), intent(in)  :: b(:,:)
+    character(len=*), intent(in) :: header
+    integer, intent(out)        :: info
+    integer, optional, intent(in)          :: iunit
+    character(len=*), optional, intent(in) :: filename
+    integer              :: nrow, ncol, i,root, np,  me,  ircode, j, outfile
+    
+    character(len=80)                 :: frmtv 
+
+    info = 0
+    if (present(filename)) then
+      if (filename=='-') then 
+        outfile=6
+      else
+        if (present(iunit)) then 
+          outfile=iunit
+        else
+          outfile=99
+        endif
+        open(outfile,file=filename, err=901, action='WRITE')
+      endif
+    else 
+      if (present(iunit)) then 
+        outfile=iunit
+      else
+        outfile=6
+      endif
+    endif
+
+    write(outfile,'(a)') '%%MatrixMarket matrix array real general'
+    write(outfile,'(a)') '% '//trim(header)
+    write(outfile,'(a)') '% '
+    nrow = size(b,1) 
+    ncol = size(b,2) 
+    write(outfile,*) nrow,ncol
+    
+    write(frmtv,'(a,i5.5,a)') '(',2*ncol,'(es26.18,1x))'
+
+    do i=1,size(b,1) 
+      write(outfile,frmtv) b(i,1:ncol)
+    end do
+    
+    if (outfile /= 6) close(outfile)
+
+    return 
+    ! open failed
+901 write(0,*) 'mm_vet_write: could not open file ',&
+         & outfile,' for output'
+    info = -1
+    return
+
+  end subroutine mm_zvet2_write
+
+  subroutine mm_zvet1_write(b, header, info, iunit, filename)   
+    use psb_base_mod
+    implicit none
+    complex(psb_dpk_), intent(in)  :: b(:)
+    character(len=*), intent(in) :: header
+    integer, intent(out)        :: info
+    integer, optional, intent(in)          :: iunit
+    character(len=*), optional, intent(in) :: filename
+    integer              :: nrow, ncol, i,root, np,  me,  ircode, j, outfile
+    
+    character(len=80)                 :: frmtv 
+
+    info = 0
+    if (present(filename)) then
+      if (filename=='-') then 
+        outfile=6
+      else
+        if (present(iunit)) then 
+          outfile=iunit
+        else
+          outfile=99
+        endif
+        open(outfile,file=filename, err=901, action='WRITE')
+      endif
+    else 
+      if (present(iunit)) then 
+        outfile=iunit
+      else
+        outfile=6
+      endif
+    endif
+
+    write(outfile,'(a)') '%%MatrixMarket matrix array real general'
+    write(outfile,'(a)') '% '//trim(header)
+    write(outfile,'(a)') '% '
+    nrow = size(b,1) 
+    ncol = 1
+    write(outfile,*) nrow,ncol
+    
+    write(frmtv,'(a,i5.5,a)') '(',2*ncol,'(es26.18,1x))'
+
+    do i=1,size(b,1) 
+      write(outfile,frmtv) b(i)
+    end do
+    
+    if (outfile /= 6) close(outfile)
+
+    return 
+    ! open failed
+901 write(0,*) 'mm_vet_write: could not open file ',&
+         & outfile,' for output'
+    info = -1
+    return
+
+  end subroutine mm_zvet1_write
+
 
   subroutine smm_mat_read(a, info, iunit, filename)   
     use psb_base_mod
@@ -431,8 +889,6 @@ contains
     
 
     if (infile/=5) close(infile)
-
-
     return 
 
     ! open failed
@@ -492,8 +948,6 @@ contains
     write(0,*) 'Error while opening ',filename
     return
   end subroutine smm_mat_write
-  
-
 
   subroutine dmm_mat_read(a, info, iunit, filename)   
     use psb_base_mod
@@ -582,11 +1036,7 @@ contains
       write(0,*) 'read_matrix: matrix type not yet supported'
       info=904
     end if
-    
-
     if (infile/=5) close(infile)
-
-
     return 
 
     ! open failed
@@ -759,11 +1209,7 @@ contains
       write(0,*) 'read_matrix: matrix type not yet supported'
       info=904
     end if
-    
-
     if (infile/=5) close(infile)
-
-
     return 
 
     ! open failed
@@ -936,11 +1382,7 @@ contains
       write(0,*) 'read_matrix: matrix type not yet supported'
       info=904
     end if
-    
-
     if (infile/=5) close(infile)
-
-
     return 
 
     ! open failed
