@@ -2,6 +2,7 @@ module psb_z_mat_mod
 
   use psb_z_base_mat_mod
   use psb_z_csr_mat_mod
+  use psb_z_csc_mat_mod
 
   type :: psb_z_sparse_mat
 

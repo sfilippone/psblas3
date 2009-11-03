@@ -63,7 +63,7 @@ function psb_ddot(x, y,desc_a, info, jx, jy)
 
   ! locals
   integer                  :: ictxt, np, me, idx, ndm,&
-       & err_act, iix, jjx, ix, ijx, iy, ijy, iiy, jjy, i, m
+       & err_act, iix, jjx, ix, ijx, iy, ijy, iiy, jjy, i, m, nr
   real(psb_dpk_)         :: dot_local
   real(psb_dpk_)         :: ddot
   character(len=20)        :: name, ch_err
@@ -121,9 +121,9 @@ function psb_ddot(x, y,desc_a, info, jx, jy)
   end if
 
   if(m /= 0) then
-    if(psb_cd_get_local_rows(desc_a) > 0) then
-      dot_local = ddot(psb_cd_get_local_rows(desc_a),&
-           & x(iix:,jjx),ione,y(iiy:,jjy),ione)
+    nr = psb_cd_get_local_rows(desc_a) 
+    if(nr > 0) then
+      dot_local = ddot(nr, x(iix:,jjx),ione,y(iiy:,jjy),ione)
       ! adjust dot_local because overlapped elements are computed more than once
       do i=1,size(desc_a%ovrlap_elem,1)
         idx  = desc_a%ovrlap_elem(i,1)
@@ -215,7 +215,7 @@ function psb_ddotv(x, y,desc_a, info)
 
   ! locals
   integer                  :: ictxt, np, me, idx, ndm,&
-       & err_act, iix, jjx, ix, jx, iy, jy, iiy, jjy, i, m
+       & err_act, iix, jjx, ix, jx, iy, jy, iiy, jjy, i, m, nr
   real(psb_dpk_)         :: dot_local
   real(psb_dpk_)         :: ddot
   character(len=20)        :: name, ch_err
@@ -258,9 +258,10 @@ function psb_ddotv(x, y,desc_a, info)
   end if
 
   if(m /= 0) then
-    if(psb_cd_get_local_rows(desc_a) > 0) then
-      dot_local = ddot(psb_cd_get_local_rows(desc_a),&
-           & x,ione,y,ione)
+    nr = psb_cd_get_local_rows(desc_a) 
+    if(nr > 0) then
+      dot_local = ddot(nr, x,ione,y,ione)
+
       ! adjust dot_local because overlapped elements are computed more than once
       do i=1,size(desc_a%ovrlap_elem,1)
         idx  = desc_a%ovrlap_elem(i,1)
@@ -352,7 +353,7 @@ subroutine psb_ddotvs(res, x, y,desc_a, info)
 
   ! locals
   integer                  :: ictxt, np, me, idx, ndm,&
-       & err_act, iix, jjx, ix, iy,  iiy, jjy, i, m
+       & err_act, iix, jjx, ix, iy,  iiy, jjy, i, m, nr
   real(psb_dpk_)         :: dot_local
   real(psb_dpk_)         :: ddot
   character(len=20)        :: name, ch_err
@@ -392,9 +393,9 @@ subroutine psb_ddotvs(res, x, y,desc_a, info)
   end if
 
   if(m /= 0) then
-    if(psb_cd_get_local_rows(desc_a) > 0) then
-      dot_local = ddot(psb_cd_get_local_rows(desc_a),&
-           & x,ione,y,ione)
+    nr = psb_cd_get_local_rows(desc_a) 
+    if(nr > 0) then
+      dot_local = ddot(nr, x,ione,y,ione)
       ! adjust dot_local because overlapped elements are computed more than once
       do i=1,size(desc_a%ovrlap_elem,1)
         idx  = desc_a%ovrlap_elem(i,1)
@@ -487,7 +488,7 @@ subroutine psb_dmdots(res, x, y, desc_a, info)
 
   ! locals
   integer                  :: ictxt, np, me, idx, ndm,&
-       & err_act, iix, jjx, ix, iy, iiy, jjy, i, m, j, k
+       & err_act, iix, jjx, ix, iy, iiy, jjy, i, m, j, k, nr
   real(psb_dpk_),allocatable  :: dot_local(:)
   real(psb_dpk_)         :: ddot
   character(len=20)        :: name, ch_err
@@ -537,10 +538,10 @@ subroutine psb_dmdots(res, x, y, desc_a, info)
   allocate(dot_local(k))
 
   if(m /= 0) then
-    if(psb_cd_get_local_rows(desc_a) > 0) then
+    nr = psb_cd_get_local_rows(desc_a) 
+    if(nr > 0) then
       do j=1,k
-        dot_local(j) = ddot(psb_cd_get_local_rows(desc_a),&
-             & x(1:,j),ione,y(1:,j),ione)
+        dot_local(j) = ddot(nr,x(1:,j),ione,y(1:,j),ione)
         ! adjust dot_local because overlapped elements are computed more than once
       end do
       do i=1,size(desc_a%ovrlap_elem,1)

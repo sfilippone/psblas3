@@ -16,11 +16,10 @@ EXEDIR=./runs
 
 all: ppde spde
 
-ppde: ppde.o  psb_d_csc_impl.o psb_d_csc_mat_mod.o
-	$(F90LINK) -pg ppde.o  psb_d_csc_impl.o psb_d_csc_mat_mod.o -o ppde $(PSBLAS_LIB) $(LDLIBS)
+ppde: ppde.o 
+	$(F90LINK) -pg ppde.o -o ppde $(PSBLAS_LIB) $(LDLIBS)
 	/bin/mv ppde $(EXEDIR)
 
-psb_d_csc_impl.o ppde.o: psb_d_csc_mat_mod.o
 
 spde: spde.o 
 	$(F90LINK) spde.o  -o spde $(PSBLAS_LIB) $(LDLIBS)

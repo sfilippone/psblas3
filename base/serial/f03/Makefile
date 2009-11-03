@@ -3,8 +3,9 @@ include ../../../Make.inc
 #
 # The object files
 #
-FOBJS =  psb_s_csr_impl.o  psb_s_coo_impl.o  psb_d_csr_impl.o  psb_d_coo_impl.o\
-  psb_c_csr_impl.o  psb_c_coo_impl.o  psb_z_csr_impl.o  psb_z_coo_impl.o
+FOBJS =  psb_s_csr_impl.o  psb_c_csr_impl.o  psb_d_csr_impl.o  psb_z_csr_impl.o\
+	psb_s_coo_impl.o  psb_c_coo_impl.o  psb_d_coo_impl.o  psb_z_coo_impl.o\
+	psb_s_csc_impl.o  psb_c_csc_impl.o  psb_d_csc_impl.o  psb_z_csc_impl.o
 
 OBJS=$(FOBJS)
 

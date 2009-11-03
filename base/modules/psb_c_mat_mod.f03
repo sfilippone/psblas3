@@ -2,6 +2,7 @@ module psb_c_mat_mod
 
   use psb_c_base_mat_mod
   use psb_c_csr_mat_mod
+  use psb_c_csc_mat_mod
 
   type :: psb_c_sparse_mat
 
@@ -1426,7 +1427,6 @@ contains
       call a%set_dupl(psb_dupl_def_)
     end if
 
-    write(0,*)name,' ', present(mold), present(type),count( (/present(mold),present(type) /))
     if (count( (/present(mold),present(type) /)) > 1) then
       info = 583
       call psb_errpush(info,name,a_err='TYPE, MOLD')

@@ -593,7 +593,7 @@ Module psb_tools_mod
       character(len=*), optional, intent(in)  :: afmt
       class(psb_d_base_sparse_mat), intent(in), optional :: mold
     end subroutine psb_dspasb
-    subroutine psb_cspasb(a,desc_a, info, afmt, upd, dupl)
+    subroutine psb_cspasb(a,desc_a, info, afmt, upd, dupl,mold)
       use psb_descriptor_type
       use psb_mat_mod
       type(psb_c_sparse_mat), intent (inout)   :: a
@@ -601,8 +601,9 @@ Module psb_tools_mod
       integer, intent(out)                    :: info
       integer,optional, intent(in)            :: dupl, upd
       character(len=*), optional, intent(in)  :: afmt
+      class(psb_c_base_sparse_mat), intent(in), optional :: mold
     end subroutine psb_cspasb
-    subroutine psb_zspasb(a,desc_a, info, afmt, upd, dupl)
+    subroutine psb_zspasb(a,desc_a, info, afmt, upd, dupl,mold)
       use psb_descriptor_type
       use psb_mat_mod
       type(psb_z_sparse_mat), intent (inout)   :: a
@@ -610,6 +611,7 @@ Module psb_tools_mod
       integer, intent(out)                    :: info
       integer,optional, intent(in)            :: dupl, upd
       character(len=*), optional, intent(in)  :: afmt
+      class(psb_z_base_sparse_mat), intent(in), optional :: mold
     end subroutine psb_zspasb
   end interface
 

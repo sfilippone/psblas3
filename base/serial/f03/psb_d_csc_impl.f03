@@ -226,7 +226,7 @@ subroutine d_csc_csmv_impl(alpha,a,x,beta,y,info,trans)
       end do
     end if
 
-    if (alpha.eq.done) then
+    if (alpha == done) then
 
       do i=1,n
         do j=a%icp(i), a%icp(i+1)-1
@@ -235,7 +235,7 @@ subroutine d_csc_csmv_impl(alpha,a,x,beta,y,info,trans)
         end do
       enddo
 
-    else if (alpha.eq.-done) then
+    else if (alpha == -done) then
 
       do i=1,n
         do j=a%icp(i), a%icp(i+1)-1
@@ -496,7 +496,7 @@ subroutine d_csc_csmm_impl(alpha,a,x,beta,y,info,trans)
       end do
     end if
 
-    if (alpha.eq.done) then
+    if (alpha == done) then
 
       do i=1,n
         do j=a%icp(i), a%icp(i+1)-1
@@ -505,7 +505,7 @@ subroutine d_csc_csmm_impl(alpha,a,x,beta,y,info,trans)
         end do
       enddo
 
-    else if (alpha.eq.-done) then
+    else if (alpha == -done) then
 
       do i=1,n
         do j=a%icp(i), a%icp(i+1)-1

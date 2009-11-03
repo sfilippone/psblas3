@@ -54,8 +54,6 @@ module psb_d_csr_mat_mod
        & d_mv_csr_to_fmt, d_mv_csr_from_fmt, &
        & d_csr_scals, d_csr_scal, d_csr_trim, d_csr_csgetrow, d_csr_get_size, &
        & d_csr_sizeof, d_csr_csgetptn, d_csr_get_nz_row, d_csr_reinit
-!!$, &
-!!$       & d_csr_mv_from, d_csr_mv_from
 
 
   interface 

@@ -341,7 +341,6 @@ contains
     !
     use psb_base_mod
     use psb_d_mat_mod
-    use psb_d_csc_mat_mod
     implicit none
     integer                      :: idim
     integer, parameter           :: nb=20

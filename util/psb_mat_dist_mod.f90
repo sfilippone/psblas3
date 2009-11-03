@@ -1324,7 +1324,6 @@ contains
       goto 9999
     end if
 
-    write(0,*)name,' Calling spasb',psb_dupl_err_,' ',afmt
     call psb_barrier(ictxt)
     t2 = psb_wtime()
     call psb_spasb(a,desc_a,info,dupl=psb_dupl_err_,afmt=afmt)     

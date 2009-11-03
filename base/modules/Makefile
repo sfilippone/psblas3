@@ -8,10 +8,10 @@ UTIL_MODS = psb_string_mod.o \
 	psi_serial_mod.o psi_mod.o  psb_ip_reord_mod.o\
 	psb_check_mod.o psb_gps_mod.o psb_linmap_mod.o psb_hash_mod.o\
 	psb_base_mat_mod.o  psb_mat_mod.o\
-	psb_s_base_mat_mod.o psb_s_csr_mat_mod.o  psb_s_mat_mod.o \
-	psb_d_base_mat_mod.o psb_d_csr_mat_mod.o  psb_d_mat_mod.o \
-	psb_c_base_mat_mod.o psb_c_csr_mat_mod.o  psb_c_mat_mod.o \
-	psb_z_base_mat_mod.o psb_z_csr_mat_mod.o  psb_z_mat_mod.o 
+	psb_s_base_mat_mod.o psb_s_csr_mat_mod.o psb_s_csc_mat_mod.o psb_s_mat_mod.o \
+	psb_d_base_mat_mod.o psb_d_csr_mat_mod.o psb_d_csc_mat_mod.o psb_d_mat_mod.o \
+	psb_c_base_mat_mod.o psb_c_csr_mat_mod.o psb_c_csc_mat_mod.o psb_c_mat_mod.o \
+	psb_z_base_mat_mod.o psb_z_csr_mat_mod.o psb_z_csc_mat_mod.o psb_z_mat_mod.o 
 
 
 MODULES=$(BASIC_MODS) $(UTIL_MODS)
@@ -33,14 +33,14 @@ lib:  $(BASIC_MODS) blacsmod  $(UTIL_MODS)  $(OBJS)  $(LIBMOD)
 psb_base_mat_mod.o: psb_string_mod.o psb_sort_mod.o psb_ip_reord_mod.o\
 	psb_error_mod.o psi_serial_mod.o
 psb_s_base_mat_mod.o psb_d_base_mat_mod.o psb_c_base_mat_mod.o psb_z_base_mat_mod.o: psb_base_mat_mod.o
-psb_s_mat_mod.o: psb_s_base_mat_mod.o  psb_s_csr_mat_mod.o
-psb_d_mat_mod.o: psb_d_base_mat_mod.o  psb_d_csr_mat_mod.o
-psb_c_mat_mod.o: psb_c_base_mat_mod.o  psb_c_csr_mat_mod.o
-psb_z_mat_mod.o: psb_z_base_mat_mod.o  psb_z_csr_mat_mod.o
-psb_s_csr_mat_mod.o: psb_s_base_mat_mod.o 
-psb_d_csr_mat_mod.o: psb_d_base_mat_mod.o 
-psb_c_csr_mat_mod.o: psb_c_base_mat_mod.o 
-psb_z_csr_mat_mod.o: psb_z_base_mat_mod.o 
+psb_s_mat_mod.o: psb_s_base_mat_mod.o psb_s_csr_mat_mod.o psb_s_csc_mat_mod.o
+psb_d_mat_mod.o: psb_d_base_mat_mod.o psb_d_csr_mat_mod.o psb_d_csc_mat_mod.o
+psb_c_mat_mod.o: psb_c_base_mat_mod.o psb_c_csr_mat_mod.o psb_c_csc_mat_mod.o
+psb_z_mat_mod.o: psb_z_base_mat_mod.o psb_z_csr_mat_mod.o psb_z_csc_mat_mod.o
+psb_s_csc_mat_mod.o psb_s_csr_mat_mod.o: psb_s_base_mat_mod.o 
+psb_d_csc_mat_mod.o psb_d_csr_mat_mod.o: psb_d_base_mat_mod.o 
+psb_dccsc_mat_mod.o psb_c_csr_mat_mod.o: psb_c_base_mat_mod.o 
+psb_z_csc_mat_mod.o psb_z_csr_mat_mod.o: psb_z_base_mat_mod.o 
 psb_mat_mod.o: psb_s_mat_mod.o psb_d_mat_mod.o psb_c_mat_mod.o psb_z_mat_mod.o
 psb_realloc_mod.o : psb_error_mod.o 
 psb_spmat_type.o : psb_realloc_mod.o psb_error_mod.o psb_const_mod.o psb_string_mod.o psb_sort_mod.o
