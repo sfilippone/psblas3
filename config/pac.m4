@@ -650,3 +650,321 @@ else
     psblas_make_gnumake='no'
 fi
 ])dnl
+
+
+dnl @synopsis PAC_BLAS([ACTION-IF-FOUND[, ACTION-IF-NOT-FOUND]])
+dnl modified from ACX_BLAS([ACTION-IF-FOUND[, ACTION-IF-NOT-FOUND]])
+dnl
+dnl This macro looks for a library that implements the BLAS
+dnl linear-algebra interface (see http://www.netlib.org/blas/). On
+dnl success, it sets the BLAS_LIBS output variable to hold the
+dnl requisite library linkages.
+dnl
+dnl To link with BLAS, you should link with:
+dnl
+dnl 	$BLAS_LIBS $LIBS $FLIBS
+dnl
+dnl in that order. FLIBS is the output variable of the
+dnl AC_F77_LIBRARY_LDFLAGS macro (called if necessary by ACX_BLAS), and
+dnl is sometimes necessary in order to link with F77 libraries. Users
+dnl will also need to use AC_F77_DUMMY_MAIN (see the autoconf manual),
+dnl for the same reason.
+dnl
+dnl Many libraries are searched for, from ATLAS to CXML to ESSL. The
+dnl user may also use --with-blas=<lib> in order to use some specific
+dnl BLAS library <lib>. In order to link successfully, however, be
+dnl aware that you will probably need to use the same Fortran compiler
+dnl (which can be set via the F77 env. var.) as was used to compile the
+dnl BLAS library.
+dnl
+dnl ACTION-IF-FOUND is a list of shell commands to run if a BLAS
+dnl library is found, and ACTION-IF-NOT-FOUND is a list of commands to
+dnl run it if it is not found. If ACTION-IF-FOUND is not specified, the
+dnl default action will define HAVE_BLAS.
+dnl
+dnl This macro requires autoconf 2.50 or later.
+dnl
+dnl @category InstalledPackages
+dnl @author Steven G. Johnson <stevenj@alum.mit.edu>
+dnl @version 2001-12-13
+dnl @license GPLWithACException
+dnl modified by salvatore.filippone@uniroma2.it
+dnl shifted check for ESSL as it was generating erroneous results on
+dnl AIX SP5. 
+dnl Modified with new name to handle Fortran compilers (such as NAG) 
+dnl for which the linking MUST be done with the compiler (i.e.: 
+dnl trying to link the Fortran version of the BLAS with the C compiler 
+dnl would fail even when linking in the compiler's library)
+
+AC_DEFUN([PAC_BLAS], [
+AC_PREREQ(2.50)
+AC_REQUIRE([AC_F77_LIBRARY_LDFLAGS])
+pac_blas_ok=no
+
+AC_ARG_WITH(blas,
+	[AC_HELP_STRING([--with-blas=<lib>], [use BLAS library <lib>])])
+case $with_blas in
+	yes | "") ;;
+	no) pac_blas_ok=disable ;;
+	-* | */* | *.a | *.so | *.so.* | *.o) BLAS_LIBS="$with_blas" ;;
+	*) BLAS_LIBS="-l$with_blas" ;;
+esac
+
+# Get fortran linker names of BLAS functions to check for.
+AC_F77_FUNC(sgemm)
+AC_F77_FUNC(dgemm)
+
+pac_blas_save_LIBS="$LIBS"
+LIBS="$LIBS $FLIBS"
+
+# First, check BLAS_LIBS environment variable
+if test $pac_blas_ok = no; then
+if test "x$BLAS_LIBS" != x; then
+	save_LIBS="$LIBS"; LIBS="$BLAS_LIBS $LIBS"
+	AC_LANG([Fortran])
+	AC_MSG_CHECKING([for sgemm in $BLAS_LIBS])
+	AC_TRY_LINK_FUNC(sgemm, [pac_blas_ok=yes], [BLAS_LIBS=""])
+	AC_MSG_RESULT($pac_blas_ok)
+	AC_LANG([C])
+	LIBS="$save_LIBS"
+fi
+fi
+
+
+# BLAS in ATLAS library? (http://math-atlas.sourceforge.net/)
+if test $pac_blas_ok = no; then
+	AC_CHECK_LIB(atlas, ATL_xerbla,
+		[AC_LANG([Fortran])
+		 AC_CHECK_LIB(f77blas, sgemm,
+		[AC_LANG([C])
+		 AC_CHECK_LIB(cblas, cblas_dgemm,
+			[pac_blas_ok=yes
+			 BLAS_LIBS="-lcblas -lf77blas -latlas"],
+			[], [-lf77blas -latlas])],
+			[], [-latlas])])
+	AC_LANG([C])
+
+fi
+
+# BLAS in PhiPACK libraries? (requires generic BLAS lib, too)
+if test $pac_blas_ok = no; then
+        AC_LANG([Fortran])
+	AC_CHECK_LIB(blas, sgemm,
+		[AC_CHECK_LIB(dgemm, dgemm,
+		[AC_CHECK_LIB(sgemm, sgemm,
+			[pac_blas_ok=yes; BLAS_LIBS="-lsgemm -ldgemm -lblas"],
+			[], [-lblas])],
+			[], [-lblas])])
+        AC_LANG([C])
+fi
+
+# BLAS in Alpha CXML library? 
+if test $pac_blas_ok = no; then
+	AC_CHECK_LIB(cxml, $sgemm, [pac_blas_ok=yes;BLAS_LIBS="-lcxml"])
+fi
+
+# BLAS in Alpha DXML library? (now called CXML, see above)
+if test $pac_blas_ok = no; then
+	AC_CHECK_LIB(dxml, $sgemm, [pac_blas_ok=yes;BLAS_LIBS="-ldxml"])
+
+fi
+
+# BLAS in Sun Performance library?
+if test $pac_blas_ok = no; then
+	if test "x$GCC" != xyes; then # only works with Sun CC
+		AC_CHECK_LIB(sunmath, acosp,
+			[AC_CHECK_LIB(sunperf, $sgemm,
+        			[BLAS_LIBS="-xlic_lib=sunperf -lsunmath"
+                                 pac_blas_ok=yes],[],[-lsunmath])])
+
+	fi
+fi
+
+# BLAS in SCSL library?  (SGI/Cray Scientific Library)
+if test $pac_blas_ok = no; then
+	AC_CHECK_LIB(scs, $sgemm, [pac_blas_ok=yes; BLAS_LIBS="-lscs"])
+fi
+
+# BLAS in SGIMATH library?
+if test $pac_blas_ok = no; then
+	AC_CHECK_LIB(complib.sgimath, $sgemm,
+		     [pac_blas_ok=yes; BLAS_LIBS="-lcomplib.sgimath"])
+fi
+
+# BLAS in IBM ESSL library? (requires generic BLAS lib, too)
+if test $pac_blas_ok = no; then
+	AC_CHECK_LIB(blas, $sgemm,
+		[AC_CHECK_LIB(essl, $sgemm,
+			[pac_blas_ok=yes; BLAS_LIBS="-lessl -lblas"],
+			[], [-lblas $FLIBS])])
+fi
+# BLAS linked to by default?  (happens on some supercomputers)
+if test $pac_blas_ok = no; then
+	save_LIBS="$LIBS"; LIBS="$LIBS"
+	AC_TRY_LINK_FUNC($sgemm, [pac_blas_ok=yes], [BLAS_LIBS=""])
+dnl	AC_CHECK_FUNC($sgemm, [pac_blas_ok=yes])
+	LIBS="$save_LIBS"
+fi
+
+# Generic BLAS library?
+if test $pac_blas_ok = no; then
+  AC_LANG([Fortran])
+  AC_CHECK_LIB(blas, sgemm, [pac_blas_ok=yes; BLAS_LIBS="-lblas"])
+  AC_LANG([C])
+  if test $pac_blas_ok = no; then
+    AC_CHECK_LIB(blas, $sgemm, [pac_blas_ok=yes; BLAS_LIBS="-lblas"])
+  fi
+fi
+
+AC_SUBST(BLAS_LIBS)
+
+LIBS="$pac_blas_save_LIBS"
+
+# Finally, execute ACTION-IF-FOUND/ACTION-IF-NOT-FOUND:
+if test x"$pac_blas_ok" = xyes; then
+        ifelse([$1],,AC_DEFINE(HAVE_BLAS,1,[Define if you have a BLAS library.]),[$1])
+        :
+else
+        pac_blas_ok=no
+        $2
+fi
+])dnl PAC_BLAS
+
+
+dnl @synopsis PAC_LAPACK([ACTION-IF-FOUND[, ACTION-IF-NOT-FOUND]])
+dnl @synopsis ACX_LAPACK([ACTION-IF-FOUND[, ACTION-IF-NOT-FOUND]])
+dnl
+dnl This macro looks for a library that implements the LAPACK
+dnl linear-algebra interface (see http://www.netlib.org/lapack/). On
+dnl success, it sets the LAPACK_LIBS output variable to hold the
+dnl requisite library linkages.
+dnl
+dnl To link with LAPACK, you should link with:
+dnl
+dnl     $LAPACK_LIBS $BLAS_LIBS $LIBS $FLIBS
+dnl
+dnl in that order. BLAS_LIBS is the output variable of the ACX_BLAS
+dnl macro, called automatically. FLIBS is the output variable of the
+dnl AC_F77_LIBRARY_LDFLAGS macro (called if necessary by ACX_BLAS), and
+dnl is sometimes necessary in order to link with F77 libraries. Users
+dnl will also need to use AC_F77_DUMMY_MAIN (see the autoconf manual),
+dnl for the same reason.
+dnl
+dnl The user may also use --with-lapack=<lib> in order to use some
+dnl specific LAPACK library <lib>. In order to link successfully,
+dnl however, be aware that you will probably need to use the same
+dnl Fortran compiler (which can be set via the F77 env. var.) as was
+dnl used to compile the LAPACK and BLAS libraries.
+dnl
+dnl ACTION-IF-FOUND is a list of shell commands to run if a LAPACK
+dnl library is found, and ACTION-IF-NOT-FOUND is a list of commands to
+dnl run it if it is not found. If ACTION-IF-FOUND is not specified, the
+dnl default action will define HAVE_LAPACK.
+dnl
+dnl @category InstalledPackages
+dnl @author Steven G. Johnson <stevenj@alum.mit.edu>
+dnl @version 2002-03-12
+dnl @license GPLWithACException
+dnl modified by salvatore.filippone@uniroma2.it
+dnl shifted check for ESSL as it was generating erroneous results on
+dnl AIX SP5. 
+dnl Modified with new name to handle Fortran compilers (such as NAG) 
+dnl for which the linking MUST be done with the compiler (i.e.: 
+dnl trying to link the Fortran version of the BLAS with the C compiler 
+dnl would fail even when linking in the compiler's library)
+
+AC_DEFUN([PAC_LAPACK], [
+AC_REQUIRE([PAC_BLAS])
+pac_lapack_ok=no
+
+AC_ARG_WITH(lapack,
+        [AC_HELP_STRING([--with-lapack=<lib>], [use LAPACK library <lib>])])
+case $with_lapack in
+        yes | "") ;;
+        no) pac_lapack_ok=disable ;;
+        -* | */* | *.a | *.so | *.so.* | *.o) LAPACK_LIBS="$with_lapack" ;;
+        *) LAPACK_LIBS="-l$with_lapack" ;;
+esac
+
+# Get fortran linker name of LAPACK function to check for.
+AC_F77_FUNC(cheev)
+
+# We cannot use LAPACK if BLAS is not found
+if test "x$pac_blas_ok" != xyes; then
+        pac_lapack_ok=noblas
+fi
+
+# First, check LAPACK_LIBS environment variable
+if test "x$LAPACK_LIBS" != x; then
+        save_LIBS="$LIBS"; LIBS="$LAPACK_LIBS $BLAS_LIBS $LIBS $FLIBS"
+        AC_MSG_CHECKING([for cheev in $LAPACK_LIBS])
+	AC_LANG([Fortran])
+	dnl Warning : square brackets are EVIL!
+	cat > conftest.$ac_ext <<EOF
+        program test_cheev 
+          call cheev
+        end 
+EOF
+	if AC_TRY_EVAL(ac_link) && test -s conftest${ac_exeext}; then
+	  pac_lapack_ok=yes
+	  AC_MSG_RESULT([yes])	
+	else
+	  AC_MSG_RESULT([no])	
+	  echo "configure: failed program was:" >&AC_FD_CC
+	  cat conftest.$ac_ext >&AC_FD_CC
+	fi 
+	rm -f conftest*
+        LIBS="$save_LIBS"
+        if test pac_lapack_ok = no; then
+                LAPACK_LIBS=""
+        fi
+        AC_LANG([C])
+fi
+
+# LAPACK linked to by default?  (is sometimes included in BLAS lib)
+if test $pac_lapack_ok = no; then
+        save_LIBS="$LIBS"; LIBS="$LIBS $BLAS_LIBS $FLIBS"
+        AC_MSG_CHECKING([for cheev in default libs])
+	AC_LANG([Fortran])
+	dnl Warning : square brackets are EVIL!
+	cat > conftest.$ac_ext <<EOF
+        program test_cheev 
+          call cheev
+        end 
+EOF
+	if AC_TRY_EVAL(ac_link) && test -s conftest${ac_exeext}; then
+	  pac_lapack_ok=yes
+	  AC_MSG_RESULT([yes])	
+	else
+	  AC_MSG_RESULT([no])	
+	  echo "configure: failed program was:" >&AC_FD_CC
+	  cat conftest.$ac_ext >&AC_FD_CC
+	fi 
+	rm -f conftest*
+        LIBS="$save_LIBS"
+        AC_LANG([C])
+fi
+
+# Generic LAPACK library?
+for lapack in lapack lapack_rs6k; do
+        if test $pac_lapack_ok = no; then
+                save_LIBS="$LIBS"; LIBS="$BLAS_LIBS $LIBS"
+		AC_LANG([Fortran])
+		AC_CHECK_LIB($lapack, cheev,
+                    [pac_lapack_ok=yes; LAPACK_LIBS="-l$lapack"], [], [$FLIBS])
+		AC_LANG([C])
+                LIBS="$save_LIBS"
+        fi
+done
+
+AC_SUBST(LAPACK_LIBS)
+
+# Finally, execute ACTION-IF-FOUND/ACTION-IF-NOT-FOUND:
+if test x"$pac_lapack_ok" = xyes; then
+        ifelse([$1],,AC_DEFINE(HAVE_LAPACK,1,[Define if you have LAPACK library.]),[$1])
+        :
+else
+        pac_lapack_ok=no
+        $2
+fi
+])dnl PAC_LAPACK

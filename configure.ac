@@ -588,8 +588,8 @@ AR="${AR} -cur"
 # But PSBLAS examples could take advantage of these libraries, too.
 
 AC_LANG([C])
-ACX_BLAS([], [AC_MSG_ERROR([[Cannot find BLAS library, specify a path using --with-blas=DIR/LIB (for example --with-blas=/usr/path/lib/libcxml.a)]])])
-ACX_LAPACK(
+PAC_BLAS([], [AC_MSG_ERROR([[Cannot find BLAS library, specify a path using --with-blas=DIR/LIB (for example --with-blas=/usr/path/lib/libcxml.a)]])])
+PAC_LAPACK(
 [FDEFINES="$psblas_cv_define_prepend-DHAVE_LAPACK $FDEFINES"],
 )
 
@@ -597,6 +597,7 @@ ACX_LAPACK(
 ###############################################################################
 #		BLACS library presence checks
 ###############################################################################
+AC_LANG([C])
 if test x"$pac_cv_serial_mpi" == x"no" ; then
 save_FC="$FC";
 save_CC="$CC";
