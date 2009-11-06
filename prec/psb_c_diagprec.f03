@@ -8,12 +8,12 @@ module psb_c_diagprec
     procedure, pass(prec) :: apply     => c_diag_apply
     procedure, pass(prec) :: precbld   => c_diag_precbld
     procedure, pass(prec) :: precinit  => c_diag_precinit  
-    procedure, pass(prec) :: c_base_precseti  => c_diag_precseti
-    procedure, pass(prec) :: c_base_precsetr  => c_diag_precsetr
-    procedure, pass(prec) :: c_base_precsetc  => c_diag_precsetc
-    procedure, pass(prec) :: precfree         => c_diag_precfree
-    procedure, pass(prec) :: precdescr        => c_diag_precdescr
-    procedure, pass(prec) :: sizeof           => c_diag_sizeof
+    procedure, pass(prec) :: precseti  => c_diag_precseti
+    procedure, pass(prec) :: precsetr  => c_diag_precsetr
+    procedure, pass(prec) :: precsetc  => c_diag_precsetc
+    procedure, pass(prec) :: precfree  => c_diag_precfree
+    procedure, pass(prec) :: precdescr => c_diag_precdescr
+    procedure, pass(prec) :: sizeof    => c_diag_sizeof
   end type psb_c_diag_prec_type
 
 

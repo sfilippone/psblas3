@@ -562,7 +562,7 @@ contains
 
 
     select type(aa=>a%a)
-    type is (psb_s_csc_sparse_mat)
+    type is (psb_d_csc_sparse_mat)
 
       acpnt => aa
 
@@ -909,7 +909,7 @@ contains
 
 
     select type(aa=>a%a)
-    type is (psb_s_csc_sparse_mat)
+    type is (psb_c_csc_sparse_mat)
 
       acpnt => aa
 
@@ -1255,7 +1255,7 @@ contains
 
 
     select type(aa=>a%a)
-    type is (psb_s_csc_sparse_mat)
+    type is (psb_z_csc_sparse_mat)
 
       acpnt => aa
 

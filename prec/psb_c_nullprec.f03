@@ -7,12 +7,12 @@ module psb_c_nullprec
     procedure, pass(prec) :: apply     => c_null_apply
     procedure, pass(prec) :: precbld   => c_null_precbld
     procedure, pass(prec) :: precinit  => c_null_precinit
-    procedure, pass(prec) :: c_base_precseti  => c_null_precseti
-    procedure, pass(prec) :: c_base_precsetr  => c_null_precsetr
-    procedure, pass(prec) :: c_base_precsetc  => c_null_precsetc
-    procedure, pass(prec) :: precfree         => c_null_precfree
-    procedure, pass(prec) :: precdescr        => c_null_precdescr
-    procedure, pass(prec) :: sizeof           => c_null_sizeof
+    procedure, pass(prec) :: precseti  => c_null_precseti
+    procedure, pass(prec) :: precsetr  => c_null_precsetr
+    procedure, pass(prec) :: precsetc  => c_null_precsetc
+    procedure, pass(prec) :: precfree  => c_null_precfree
+    procedure, pass(prec) :: precdescr => c_null_precdescr
+    procedure, pass(prec) :: sizeof    => c_null_sizeof
   end type psb_c_null_prec_type
 
 

@@ -68,11 +68,11 @@ module psb_prec_type
   contains
     procedure, pass(prec) :: apply     => s_base_apply
     procedure, pass(prec) :: precbld   => s_base_precbld
-    procedure, pass(prec) :: s_base_precseti
-    procedure, pass(prec) :: s_base_precsetr
-    procedure, pass(prec) :: s_base_precsetc
-    procedure, pass(prec) :: sizeof  => s_base_sizeof
-    generic, public       :: precset => s_base_precseti, s_base_precsetr, s_base_precsetc
+    procedure, pass(prec) :: precseti  => s_base_precseti
+    procedure, pass(prec) :: precsetr  => s_base_precsetr
+    procedure, pass(prec) :: precsetc  => s_base_precsetc
+    procedure, pass(prec) :: sizeof    => s_base_sizeof
+    generic, public       :: precset   => precseti, precsetr, precsetc
     procedure, pass(prec) :: precinit  => s_base_precinit
     procedure, pass(prec) :: precfree  => s_base_precfree
     procedure, pass(prec) :: precdescr => s_base_precdescr
@@ -88,13 +88,13 @@ module psb_prec_type
 
   type psb_d_base_prec_type
   contains
-    procedure, pass(prec) :: apply => d_base_apply
+    procedure, pass(prec) :: apply     => d_base_apply
     procedure, pass(prec) :: precbld   => d_base_precbld
-    procedure, pass(prec) :: d_base_precseti
-    procedure, pass(prec) :: d_base_precsetr
-    procedure, pass(prec) :: d_base_precsetc
-    procedure, pass(prec) :: sizeof  => d_base_sizeof
-    generic, public       :: precset => d_base_precseti, d_base_precsetr, d_base_precsetc
+    procedure, pass(prec) :: precseti  => d_base_precseti
+    procedure, pass(prec) :: precsetr  => d_base_precsetr
+    procedure, pass(prec) :: precsetc  => d_base_precsetc
+    procedure, pass(prec) :: sizeof    => d_base_sizeof
+    generic, public       :: precset   => precseti, precsetr, precsetc
     procedure, pass(prec) :: precinit  => d_base_precinit
     procedure, pass(prec) :: precfree  => d_base_precfree
     procedure, pass(prec) :: precdescr => d_base_precdescr
@@ -113,11 +113,11 @@ module psb_prec_type
   contains
     procedure, pass(prec) :: apply     => c_base_apply
     procedure, pass(prec) :: precbld   => c_base_precbld
-    procedure, pass(prec) :: c_base_precseti
-    procedure, pass(prec) :: c_base_precsetr
-    procedure, pass(prec) :: c_base_precsetc
-    procedure, pass(prec) :: sizeof  => c_base_sizeof
-    generic, public       :: precset => c_base_precseti, c_base_precsetr, c_base_precsetc
+    procedure, pass(prec) :: precseti  => c_base_precseti
+    procedure, pass(prec) :: precsetr  => c_base_precsetr
+    procedure, pass(prec) :: precsetc  => c_base_precsetc
+    procedure, pass(prec) :: sizeof    => c_base_sizeof
+    generic, public       :: precset   => precseti, precsetr, precsetc
     procedure, pass(prec) :: precinit  => c_base_precinit
     procedure, pass(prec) :: precfree  => c_base_precfree
     procedure, pass(prec) :: precdescr => c_base_precdescr
@@ -133,13 +133,13 @@ module psb_prec_type
 
   type psb_z_base_prec_type
   contains
-    procedure, pass(prec) :: apply => z_base_apply
+    procedure, pass(prec) :: apply     => z_base_apply
     procedure, pass(prec) :: precbld   => z_base_precbld
-    procedure, pass(prec) :: z_base_precseti
-    procedure, pass(prec) :: z_base_precsetr
-    procedure, pass(prec) :: z_base_precsetc
-    procedure, pass(prec) :: sizeof  => z_base_sizeof
-    generic, public       :: precset => z_base_precseti, z_base_precsetr, z_base_precsetc
+    procedure, pass(prec) :: precseti  => z_base_precseti
+    procedure, pass(prec) :: precsetr  => z_base_precsetr
+    procedure, pass(prec) :: precsetc  => z_base_precsetc
+    procedure, pass(prec) :: sizeof    => z_base_sizeof
+    generic, public       :: precset   => precseti, precsetr, precsetc
     procedure, pass(prec) :: precinit  => z_base_precinit
     procedure, pass(prec) :: precfree  => z_base_precfree
     procedure, pass(prec) :: precdescr => z_base_precdescr

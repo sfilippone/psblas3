@@ -10,12 +10,12 @@ module psb_c_bjacprec
     procedure, pass(prec) :: apply     => c_bjac_apply
     procedure, pass(prec) :: precbld   => c_bjac_precbld
     procedure, pass(prec) :: precinit  => c_bjac_precinit
-    procedure, pass(prec) :: c_base_precseti  => c_bjac_precseti
-    procedure, pass(prec) :: c_base_precsetr  => c_bjac_precsetr
-    procedure, pass(prec) :: c_base_precsetc  => c_bjac_precsetc
-    procedure, pass(prec) :: precfree         => c_bjac_precfree
-    procedure, pass(prec) :: precdescr        => c_bjac_precdescr
-    procedure, pass(prec) :: sizeof           => c_bjac_sizeof
+    procedure, pass(prec) :: precseti  => c_bjac_precseti
+    procedure, pass(prec) :: precsetr  => c_bjac_precsetr
+    procedure, pass(prec) :: precsetc  => c_bjac_precsetc
+    procedure, pass(prec) :: precfree  => c_bjac_precfree
+    procedure, pass(prec) :: precdescr => c_bjac_precdescr
+    procedure, pass(prec) :: sizeof    => c_bjac_sizeof
   end type psb_c_bjac_prec_type
 
 
