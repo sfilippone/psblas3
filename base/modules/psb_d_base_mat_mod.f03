@@ -790,34 +790,6 @@ contains
   !
   ! Here we go. 
   !
-!!$  subroutine d_coo_transp_2mat(a,b)
-!!$    use psb_error_mod
-!!$    implicit none 
-!!$    
-!!$    class(psb_d_coo_sparse_mat), intent(out) :: a
-!!$    type(psb_d_coo_sparse_mat), intent(in)   :: b
-!!$    
-!!$    call a%psb_d_base_sparse_mat%psb_base_sparse_mat%transp(b%psb_d_base_sparse_mat%psb_base_sparse_mat) 
-!!$    a%ia = b%ja
-!!$    a%ja = b%ia
-!!$    a%val = b%val 
-!!$    
-!!$    call a%fix()
-!!$
-!!$    return
-!!$    
-!!$  end subroutine d_coo_transp_2mat
-!!$
-!!$  subroutine d_coo_transc_2mat(a,b)
-!!$    use psb_error_mod
-!!$    implicit none 
-!!$    
-!!$    class(psb_d_coo_sparse_mat), intent(out) :: a
-!!$    class(psb_d_coo_sparse_mat), intent(in)   :: b
-!!$    
-!!$    call a%transp(b) 
-!!$  end subroutine d_coo_transc_2mat
-!!$
   subroutine d_coo_transp_1mat(a)
     use psb_error_mod
     implicit none 

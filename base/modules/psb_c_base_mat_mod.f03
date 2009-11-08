@@ -36,6 +36,11 @@ module psb_c_base_mat_mod
     generic, public    :: cp_from => c_base_cp_from
     procedure, pass(a) :: c_base_mv_from
     generic, public    :: mv_from => c_base_mv_from
+
+    procedure, pass(a) :: base_transp_1mat => c_base_transp_1mat
+    procedure, pass(a) :: base_transp_2mat => c_base_transp_2mat
+    procedure, pass(a) :: base_transc_1mat => c_base_transc_1mat
+    procedure, pass(a) :: base_transc_2mat => c_base_transc_2mat
   end type psb_c_base_sparse_mat
 
   private :: c_base_csmv, c_base_csmm, c_base_cssv, c_base_cssm,&
@@ -88,7 +93,9 @@ module psb_c_base_mat_mod
     generic, public    :: cp_from => c_coo_cp_from
     procedure, pass(a) :: c_coo_mv_from
     generic, public    :: mv_from => c_coo_mv_from
-    
+    procedure, pass(a) :: base_transp_1mat => c_coo_transp_1mat
+    procedure, pass(a) :: base_transc_1mat => c_coo_transc_1mat
+        
   end type psb_c_coo_sparse_mat
 
   private :: c_coo_get_nzeros, c_coo_set_nzeros, c_coo_get_diag, &
@@ -99,7 +106,8 @@ module psb_c_base_mat_mod
        & c_cp_coo_to_fmt, c_cp_coo_from_fmt, &
        & c_coo_scals, c_coo_scal, c_coo_csgetrow, c_coo_sizeof, &
        & c_coo_csgetptn, c_coo_get_nz_row, c_coo_reinit,&
-       & c_coo_cp_from, c_coo_mv_from
+       & c_coo_cp_from, c_coo_mv_from, &
+       & c_coo_transp_1mat, c_coo_transc_1mat
 
   
   interface 
@@ -777,6 +785,186 @@ contains
     return
 
   end subroutine csclip
+
+
+  !
+  ! Here we go. 
+  !
+  subroutine c_coo_transp_1mat(a)
+    use psb_error_mod
+    implicit none 
+    
+    class(psb_c_coo_sparse_mat), intent(inout) :: a
+
+    integer, allocatable :: itemp(:) 
+    integer :: info
+    
+    call a%psb_c_base_sparse_mat%psb_base_sparse_mat%transp()
+    call move_alloc(a%ia,itemp)
+    call move_alloc(a%ja,a%ia)
+    call move_alloc(itemp,a%ja)
+        
+    call a%fix(info)
+
+    return
+    
+  end subroutine c_coo_transp_1mat
+
+  subroutine c_coo_transc_1mat(a)
+    use psb_error_mod
+    implicit none 
+    
+    class(psb_c_coo_sparse_mat), intent(inout) :: a
+    
+    call a%transp() 
+    a%val(:) = conjg(a%val)
+
+  end subroutine c_coo_transc_1mat
+
+  subroutine c_base_transp_2mat(a,b)
+    use psb_error_mod
+    implicit none 
+    
+    class(psb_c_base_sparse_mat), intent(out) :: a
+    class(psb_base_sparse_mat), intent(in)   :: b
+
+    type(psb_c_coo_sparse_mat) :: tmp
+    integer err_act, info
+    character(len=*), parameter :: name='c_base_transp'
+    
+    call psb_erractionsave(err_act)
+
+    info = 0
+    select type(b)
+    class is (psb_c_base_sparse_mat)
+      call b%cp_to_coo(tmp,info)
+      if (info == 0) call tmp%transp()
+      if (info == 0) call a%mv_from_coo(tmp,info)
+    class default
+      info = 700
+    end select
+    if (info /= 0) then 
+      call psb_errpush(info,name,a_err=b%get_fmt())
+      goto 9999
+    end if
+    call psb_erractionrestore(err_act) 
+
+    return
+9999 continue
+    if (err_act /= psb_act_ret_) then
+      call psb_error()
+    end if
+      
+    return
+    
+  end subroutine c_base_transp_2mat
+
+  subroutine c_base_transc_2mat(a,b)
+    use psb_error_mod
+    implicit none 
+    
+    class(psb_c_base_sparse_mat), intent(out) :: a
+    class(psb_base_sparse_mat), intent(in)   :: b
+
+    type(psb_c_coo_sparse_mat) :: tmp
+    integer err_act, info
+    character(len=*), parameter :: name='c_base_transc'
+    
+    call psb_erractionsave(err_act)
+
+    
+    info = 0
+    select type(b)
+    class is (psb_c_base_sparse_mat)
+      call b%cp_to_coo(tmp,info)
+      if (info == 0) call tmp%transc()
+      if (info == 0) call a%mv_from_coo(tmp,info)
+    class default
+      info = 700
+    end select
+    if (info /= 0) then 
+      call psb_errpush(info,name,a_err=b%get_fmt())
+      goto 9999
+    end if
+    call psb_erractionrestore(err_act) 
+
+    return
+9999 continue
+    if (err_act /= psb_act_ret_) then
+      call psb_error()
+    end if
+      
+    return
+  end subroutine c_base_transc_2mat
+
+  subroutine c_base_transp_1mat(a)
+    use psb_error_mod
+    implicit none 
+    
+    class(psb_c_base_sparse_mat), intent(inout) :: a
+
+    type(psb_c_coo_sparse_mat) :: tmp
+    integer :: err_act, info
+    character(len=*), parameter :: name='c_base_transp'
+
+    call psb_erractionsave(err_act)
+    info = 0
+    call a%mv_to_coo(tmp,info)
+    if (info == 0) call tmp%transp()
+    if (info == 0) call a%mv_from_coo(tmp,info)
+    
+    if (info /= 0) then 
+      info = 700 
+      call psb_errpush(info,name,a_err=a%get_fmt())
+      goto 9999
+    end if
+    call psb_erractionrestore(err_act) 
+
+    return
+9999 continue
+    if (err_act /= psb_act_ret_) then
+      call psb_error()
+    end if
+      
+    return
+    
+    
+  end subroutine c_base_transp_1mat
+
+  subroutine c_base_transc_1mat(a)
+    use psb_error_mod
+    implicit none 
+    
+    class(psb_c_base_sparse_mat), intent(inout) :: a
+    
+    type(psb_c_coo_sparse_mat) :: tmp
+    integer :: err_act, info
+    character(len=*), parameter :: name='c_base_transc'
+
+    call psb_erractionsave(err_act)
+    info = 0
+    call a%mv_to_coo(tmp,info)
+    if (info == 0) call tmp%transc()
+    if (info == 0) call a%mv_from_coo(tmp,info)
+    
+    if (info /= 0) then 
+      info = 700 
+      call psb_errpush(info,name,a_err=a%get_fmt())
+      goto 9999
+    end if
+    call psb_erractionrestore(err_act) 
+
+    return
+9999 continue
+    if (err_act /= psb_act_ret_) then
+      call psb_error()
+    end if
+      
+    return
+    
+    
+  end subroutine c_base_transc_1mat
+
 
 
 
