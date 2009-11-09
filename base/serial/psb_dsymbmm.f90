@@ -187,7 +187,6 @@ contains
     type(psb_d_csr_sparse_mat), intent(out) :: c
     integer               :: index(:),info
     integer, allocatable  :: iarw(:), iacl(:),ibrw(:),ibcl(:)
-    real(psb_dpk_), allocatable :: aval(:),bval(:)
     integer  :: maxlmn,i,j,m,n,k,l,istart,length,nazr,nbzr,jj,minlm,minmn
     integer               :: nze, ma,na,mb,nb
 
@@ -205,7 +204,7 @@ contains
     maxlmn = max(l,m,n)
 
     allocate(iarw(maxlmn),iacl(maxlmn),ibrw(maxlmn),ibcl(maxlmn),&
-         & aval(maxlmn),bval(maxlmn), stat=info)
+         & stat=info)
     if (info /= 0) then 
       info = 4000
       return
@@ -222,7 +221,7 @@ contains
     main: do  i=1,n
       istart=-1
       length=0
-      call a%csget(i,i,nazr,iarw,iacl,aval,info)
+      call a%csget(i,i,nazr,iarw,iacl,info)
       do jj=1, nazr
 
         j=iacl(jj)
@@ -232,7 +231,7 @@ contains
           info = 1
           return
         endif
-        call b%csget(j,j,nbzr,ibrw,ibcl,bval,info)
+        call b%csget(j,j,nbzr,ibrw,ibcl,info)
         do k=1,nbzr
           if ((ibcl(k)<1).or.(ibcl(k)>maxlmn)) then 
             write(0,*) 'Problem in SYMBMM 1:',j,k,ibcl(k),maxlmn

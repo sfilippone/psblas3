@@ -40,62 +40,107 @@
 !
 
 subroutine psb_csymbmm(a,b,c,info)
-  use psb_spmat_type
+  use psb_mat_mod
   use psb_string_mod
   use psb_serial_mod, psb_protect_name => psb_csymbmm
   implicit none 
 
-  type(psb_cspmat_type) :: a,b,c
+  type(psb_c_sparse_mat), intent(in)    :: a,b
+  type(psb_c_sparse_mat), intent(out)   :: c
+  integer, intent(out)                  :: info
+  type(psb_c_csr_sparse_mat), allocatable :: ccsr
+  integer               :: err_act
+  character(len=*), parameter ::  name='psb_symbmm'
+  call psb_erractionsave(err_act)
+  info = 0
+
+  if ((a%is_null()) .or.(b%is_null())) then
+    info = 1121
+    call psb_errpush(info,name)
+    goto 9999
+  endif
+
+  allocate(ccsr, stat=info)
+  if (info /= 0)  then
+    info = 4000 
+    call psb_errpush(info,name) 
+    goto 9999
+  end if
+  call psb_symbmm(a%a,b%a,ccsr,info)
+  if (info /= 0) then 
+    call psb_errpush(info,name) 
+    goto 9999
+  end if
+  call move_alloc(ccsr,c%a)
+
+  call psb_erractionrestore(err_act)
+  return
+
+9999 continue
+  call psb_erractionrestore(err_act)
+  if (err_act == psb_act_abort_) then
+     call psb_error()
+     return
+  end if
+  return
+
+end subroutine psb_csymbmm
+
+subroutine psb_cbase_symbmm(a,b,c,info)
+  use psb_mat_mod
+  use psb_serial_mod, psb_protect_name => psb_cbase_symbmm
+  implicit none 
+
+  class(psb_c_base_sparse_mat), intent(in) :: a,b
+  type(psb_c_csr_sparse_mat), intent(out)  :: c
+  integer, intent(out)                     :: info
   integer, allocatable  :: itemp(:)
-  integer               :: nze,info
-
-  interface 
-    subroutine symbmm (n, m, l, ia, ja, diaga, &
-         & ib, jb, diagb, ic, jc, diagc, index)
-      integer  n,m,l,  ia(*), ja(*), diaga, ib(*), jb(*), diagb,&
-           & diagc,  index(*)
-      integer, allocatable  :: ic(:),jc(:)
-    end subroutine symbmm
-  end interface
-
-  character(len=20)         :: name
-  integer                   :: err_act
-  logical                   :: csra, csrb
+  integer               :: nze, ma,na,mb,nb
+  character(len=20)     :: name
+  integer               :: err_act
   name='psb_symbmm'
   call psb_erractionsave(err_act)
+  info = 0
 
-  csra = (psb_toupper(a%fida(1:3))=='CSR')
-  csrb = (psb_toupper(b%fida(1:3))=='CSR')
+  ma = a%get_nrows()
+  na = a%get_ncols()
+  mb = b%get_nrows()
+  nb = b%get_ncols()
 
-  if (b%m /= a%k) then 
-    write(0,*) 'Mismatch in SYMBMM: ',a%m,a%k,b%m,b%k
+
+  if ( mb /= na ) then 
+    write(0,*) 'Mismatch in SYMBMM: ',ma,na,mb,nb
   endif
-  allocate(itemp(max(a%m,a%k,b%m,b%k)),stat=info)    
+  allocate(itemp(max(ma,na,mb,nb)),stat=info)    
   if (info /= 0) then 
-    return
+    info = 4000 
+    call psb_Errpush(info,name)
+    goto 9999
   endif
-  nze = max(a%m+1,2*a%m)
-  call psb_sp_reall(c,nze,info)
   !
   ! Note: we need to test whether there is a performance impact 
   !       in not using the original Douglas & Bank code. 
   !
-  if (csra.and.csrb) then 
-    call symbmm(a%m,a%k,b%k,a%ia2,a%ia1,0,&
-         & b%ia2,b%ia1,0,&
-         & c%ia2,c%ia1,0,itemp)
-  else 
-    call inner_symbmm(a,b,c,itemp,info)
-  endif
-  call psb_realloc(size(c%ia1),c%aspk,info)
+  select type(a)
+  type is (psb_c_csr_sparse_mat) 
+    select type(b)
+    type is (psb_c_csr_sparse_mat) 
+      call csr_symbmm(a,b,c,itemp,info)
+    class default
+      call gen_symbmm(a,b,c,itemp,info)
+    end select
+  class default
+    call gen_symbmm(a,b,c,itemp,info)
+  end select
 
-  c%pl(1) = 0
-  c%pr(1) = 0
-  c%m=a%m
-  c%k=b%k
-  c%fida='CSR'
-  c%descra='GUN'
+  if (info /= 0) then 
+    call psb_errpush(info,name) 
+    goto 9999
+  end if
+
+  call psb_realloc(size(c%ja),c%val,info)
   deallocate(itemp) 
+
   call psb_erractionrestore(err_act)
   return
 
@@ -108,82 +153,119 @@ subroutine psb_csymbmm(a,b,c,info)
   return
 
 contains
-  subroutine inner_symbmm(a,b,c,index,info)
-    type(psb_cspmat_type) :: a,b,c
+
+  subroutine csr_symbmm(a,b,c,itemp,info)
+    type(psb_c_csr_sparse_mat), intent(in)  :: a,b
+    type(psb_c_csr_sparse_mat), intent(out) :: c
+    integer                                 :: itemp(:) 
+    integer, intent(out)                    :: info
+    interface 
+      subroutine symbmm (n, m, l, ia, ja, diaga, &
+           & ib, jb, diagb, ic, jc, diagc, index)
+        integer  n,m,l,  ia(*), ja(*), diaga, ib(*), jb(*), diagb,&
+             & diagc,  index(*)
+        integer, allocatable :: ic(:),jc(:)
+      end subroutine symbmm
+    end interface
+    integer               :: nze, ma,na,mb,nb
+
+    info = 0 
+    ma = a%get_nrows()
+    na = a%get_ncols()
+    mb = b%get_nrows()
+    nb = b%get_ncols()
+    
+    nze = max(ma+1,2*ma)
+    call c%allocate(ma,nb,nze)
+    call symbmm(ma,na,nb,a%irp,a%ja,0,&
+         & b%irp,b%ja,0,&
+         & c%irp,c%ja,0,itemp)
+    
+  end subroutine csr_symbmm
+  subroutine gen_symbmm(a,b,c,index,info)
+    class(psb_c_base_sparse_mat), intent(in)  :: a,b
+    type(psb_c_csr_sparse_mat), intent(out) :: c
     integer               :: index(:),info
     integer, allocatable  :: iarw(:), iacl(:),ibrw(:),ibcl(:)
-    complex(psb_spk_), allocatable :: aval(:),bval(:)
     integer  :: maxlmn,i,j,m,n,k,l,istart,length,nazr,nbzr,jj,minlm,minmn
+    integer               :: nze, ma,na,mb,nb
 
+    ma = a%get_nrows()
+    na = a%get_ncols()
+    mb = b%get_nrows()
+    nb = b%get_ncols()
 
-    n = a%m
-    m = a%k 
-    l = b%k 
+    nze = max(ma+1,2*ma)
+    call c%allocate(ma,nb,nze)
+
+    n = ma
+    m = na 
+    l = nb 
     maxlmn = max(l,m,n)
 
     allocate(iarw(maxlmn),iacl(maxlmn),ibrw(maxlmn),ibcl(maxlmn),&
-         & aval(maxlmn),bval(maxlmn), stat=info)
+         & stat=info)
     if (info /= 0) then 
+      info = 4000
       return
     endif
 
-
-    if (size(c%ia2) < n+1) then 
-
-      call psb_realloc(n+1,c%ia2,info)
-    endif
     do i=1,maxlmn
       index(i)=0
     end do
 
-      c%ia2(1)=1
-      minlm = min(l,m)
-      minmn = min(m,n)
+    c%irp(1)=1
+    minlm = min(l,m)
+    minmn = min(m,n)
 
-      main: do  i=1,n
-        istart=-1
-        length=0
-        call psb_sp_getrow(i,a,nazr,iarw,iacl,aval,info)
-        do jj=1, nazr
-          
-          j=iacl(jj)
-          
-          if ((j<1).or.(j>m)) then 
-            write(0,*) ' SymbMM: Problem with A ',i,jj,j,m
-          endif
-          call psb_sp_getrow(j,b,nbzr,ibrw,ibcl,bval,info)
-          do k=1,nbzr
-            if ((ibcl(k)<1).or.(ibcl(k)>maxlmn)) then 
-                write(0,*) 'Problem in SYMBMM 1:',j,k,ibcl(k),maxlmn
-            else
-              if(index(ibcl(k)) == 0) then
-                index(ibcl(k))=istart
-                istart=ibcl(k)
-                length=length+1
-              endif
-            endif
-          end do
-        end do
+    main: do  i=1,n
+      istart=-1
+      length=0
+      call a%csget(i,i,nazr,iarw,iacl,info)
+      do jj=1, nazr
 
-        c%ia2(i+1)=c%ia2(i)+length
-        
-        if (c%ia2(i+1) > size(c%ia1)) then 
-          if (n > (2*i)) then 
-            nze = max(c%ia2(i+1), c%ia2(i)*((n+i-1)/i))
+        j=iacl(jj)
+
+        if ((j<1).or.(j>m)) then 
+          write(0,*) ' SymbMM: Problem with A ',i,jj,j,m
+          info = 1
+          return
+        endif
+        call b%csget(j,j,nbzr,ibrw,ibcl,info)
+        do k=1,nbzr
+          if ((ibcl(k)<1).or.(ibcl(k)>maxlmn)) then 
+            write(0,*) 'Problem in SYMBMM 1:',j,k,ibcl(k),maxlmn
+            info=2
+            return
           else
-            nze = max(c%ia2(i+1), nint((dble(c%ia2(i))*(dble(n)/i)))   )
-          endif 
-          call psb_realloc(nze,c%ia1,info)
-        end if 
-        do j= c%ia2(i),c%ia2(i+1)-1
-          c%ia1(j)=istart
-          istart=index(istart)
-          index(c%ia1(j))=0
+            if(index(ibcl(k)) == 0) then
+              index(ibcl(k))=istart
+              istart=ibcl(k)
+              length=length+1
+            endif
+          endif
         end do
-        call psb_msort(c%ia1(c%ia2(i):c%ia2(i)+length-1))
-        index(i) = 0
-      end do main
+      end do
 
-  end subroutine inner_symbmm
+      c%irp(i+1)=c%irp(i)+length
 
-end subroutine psb_csymbmm
+      if (c%irp(i+1) > size(c%ja)) then 
+        if (n > (2*i)) then 
+          nze = max(c%irp(i+1), c%irp(i)*((n+i-1)/i))
+        else
+          nze = max(c%irp(i+1), nint((dble(c%irp(i))*(dble(n)/i)))   )
+        endif
+        call psb_realloc(nze,c%ja,info)
+      end if
+      do j= c%irp(i),c%irp(i+1)-1
+        c%ja(j)=istart
+        istart=index(istart)
+        index(c%ja(j))=0
+      end do
+      call psb_msort(c%ja(c%irp(i):c%irp(i)+length-1))
+      index(i) = 0
+    end do main
+
+  end subroutine gen_symbmm
+
+end subroutine psb_cbase_symbmm

@@ -41,72 +41,173 @@
 !
 
 subroutine psb_snumbmm(a,b,c)
-  use psb_spmat_type
+  use psb_mat_mod
+  use psb_string_mod
   use psb_serial_mod, psb_protect_name => psb_snumbmm
-  implicit none
+  implicit none 
 
-  type(psb_sspmat_type)         :: a,b,c
-  real(psb_spk_), allocatable   :: temp(:)
-  integer                       :: info
-  logical                       :: csra, csrb
-  
-  allocate(temp(max(a%m,a%k,b%m,b%k)),stat=info)
-  if (info /= 0) then
-    return
+  type(psb_s_sparse_mat), intent(in) :: a,b
+  type(psb_s_sparse_mat), intent(inout)  :: c
+  integer               :: info
+  integer               :: err_act
+  character(len=*), parameter ::  name='psb_numbmm'
+
+  call psb_erractionsave(err_act)
+  info = 0
+
+  if ((a%is_null()) .or.(b%is_null()).or.(c%is_null())) then
+    info = 1121
+    call psb_errpush(info,name)
+    goto 9999
   endif
-  call psb_realloc(size(c%ia1),c%aspk,info)
+
+  select type(aa=>c%a)
+  type is (psb_s_csr_sparse_mat)
+    call psb_numbmm(a%a,b%a,aa)
+  class default
+    info = 1121
+    call psb_errpush(info,name)
+    goto 9999
+  end select
+
+  call c%set_asb()
+
+  call psb_erractionrestore(err_act)
+  return
+
+9999 continue
+  call psb_erractionrestore(err_act)
+  if (err_act == psb_act_abort_) then
+     call psb_error()
+     return
+  end if
+  return
+
+end subroutine psb_snumbmm
+
+subroutine psb_sbase_numbmm(a,b,c)
+  use psb_mat_mod
+  use psb_string_mod
+  use psb_serial_mod, psb_protect_name => psb_sbase_numbmm
+  implicit none 
+
+  class(psb_s_base_sparse_mat), intent(in) :: a,b
+  type(psb_s_csr_sparse_mat), intent(inout)  :: c
+  integer, allocatable  :: itemp(:)
+  integer               :: nze, ma,na,mb,nb  
+  character(len=20)     :: name
+  real(psb_spk_), allocatable :: temp(:)
+  integer               :: info
+  integer               :: err_act
+  name='psb_numbmm'
+  call psb_erractionsave(err_act)
+  info = 0
+
+
+  ma = a%get_nrows()
+  na = a%get_ncols()
+  mb = b%get_nrows()
+  nb = b%get_ncols()
+
+
+  if ( mb /= na ) then 
+    write(0,*) 'Mismatch in SYMBMM: ',ma,na,mb,nb
+  endif
+  allocate(temp(max(ma,na,mb,nb)),stat=info)    
+  if (info /= 0) then 
+    info = 4000 
+    call psb_Errpush(info,name)
+    goto 9999
+  endif
+
   !
   ! Note: we still have to test about possible performance hits. 
   !
   !
-  csra = (psb_toupper(a%fida(1:3))=='CSR')
-  csrb = (psb_toupper(b%fida(1:3))=='CSR')
-
-  if (csra.and.csrb) then 
-    call snumbmm(a%m,a%k,b%k,a%ia2,a%ia1,0,a%aspk,&
-         & b%ia2,b%ia1,0,b%aspk,&
-         & c%ia2,c%ia1,0,c%aspk,temp)
-  else
-    call inner_numbmm(a,b,c,temp,info)
-    if (info /= 0) then 
-      write(0,*) 'Error ',info,' from inner numbmm'
-    end if
+  call psb_ensure_size(size(c%ja),c%val,info)
+  select type(a)
+  type is (psb_s_csr_sparse_mat) 
+    select type(b)
+    type is (psb_s_csr_sparse_mat) 
+      call csr_numbmm(a,b,c,temp,info)
+    class default
+      call gen_numbmm(a,b,c,temp,info)
+    end select
+  class default
+    call gen_numbmm(a,b,c,temp,info)
+  end select
+  
+  if (info /= 0) then 
+    call psb_errpush(info,name)
+    goto 9999
   end if
-  call psb_sp_setifld(psb_spmat_asb_,psb_state_,c,info)
+
+  call c%set_asb()
   deallocate(temp) 
+
+  call psb_erractionrestore(err_act)
+  return
+
+9999 continue
+  call psb_erractionrestore(err_act)
+  if (err_act == psb_act_abort_) then
+     call psb_error()
+     return
+  end if
   return
 
 contains 
 
-  subroutine inner_numbmm(a,b,c,temp,info)
-    type(psb_sspmat_type) :: a,b,c
+  subroutine csr_numbmm(a,b,c,temp,info)
+    type(psb_s_csr_sparse_mat), intent(in)  :: a,b
+    type(psb_s_csr_sparse_mat), intent(inout) :: c
+    real(psb_spk_)                          :: temp(:)
+    integer, intent(out)                    :: info
+    integer               :: nze, ma,na,mb,nb
+
+    info = 0 
+    ma = a%get_nrows()
+    na = a%get_ncols()
+    mb = b%get_nrows()
+    nb = b%get_ncols()
+    
+    call snumbmm(ma,na,nb,a%irp,a%ja,0,a%val,&
+         & b%irp,b%ja,0,b%val,&
+         & c%irp,c%ja,0,c%val,temp)
+
+    
+  end subroutine csr_numbmm
+
+  subroutine gen_numbmm(a,b,c,temp,info)
+    class(psb_s_base_sparse_mat), intent(in)  :: a,b
+    type(psb_s_csr_sparse_mat), intent(inout) :: c
     integer               :: info
-    real(psb_spk_)        :: temp(:)
+    real(psb_spk_)      :: temp(:)
     integer, allocatable  :: iarw(:), iacl(:),ibrw(:),ibcl(:)
     real(psb_spk_), allocatable :: aval(:),bval(:)
     integer  :: maxlmn,i,j,m,n,k,l,nazr,nbzr,jj,minlm,minmn,minln
     real(psb_spk_)      :: ajj
 
-    n = a%m
-    m = a%k 
-    l = b%k 
+    n = a%get_nrows()
+    m = a%get_ncols() 
+    l = b%get_ncols()
     maxlmn = max(l,m,n)
     allocate(iarw(maxlmn),iacl(maxlmn),ibrw(maxlmn),ibcl(maxlmn),&
          & aval(maxlmn),bval(maxlmn), stat=info)
-    if (info /= 0) then 
+    if (info /= 0) then
+      info = 4000
       return
     endif
 
     do i = 1,maxlmn
-      temp(i) = szero
+      temp(i) = dzero
     end do
     minlm = min(l,m)
     minln = min(l,n)
     minmn = min(m,n)
     do  i = 1,n
 
-      call psb_sp_getrow(i,a,nazr,iarw,iacl,aval,info)
-
+      call a%csget(i,i,nazr,iarw,iacl,aval,info)
       do jj=1, nazr
         j=iacl(jj)
         ajj = aval(jj)
@@ -116,7 +217,7 @@ contains
             return
           
         endif
-        call psb_sp_getrow(j,b,nbzr,ibrw,ibcl,bval,info)
+        call b%csget(j,j,nbzr,ibrw,ibcl,bval,info)
         do k=1,nbzr
           if ((ibcl(k)<1).or.(ibcl(k)>maxlmn)) then 
             write(0,*) 'Problem in NUMBM 1:',j,k,ibcl(k),maxlmn
@@ -127,19 +228,19 @@ contains
           endif
         enddo
       end do
-      do  j = c%ia2(i),c%ia2(i+1)-1
-        if((c%ia1(j)<1).or. (c%ia1(j) > maxlmn))  then 
-          write(0,*) ' NUMBMM: output problem',i,j,c%ia1(j),maxlmn
+      do  j = c%irp(i),c%irp(i+1)-1
+        if((c%ja(j)<1).or. (c%ja(j) > maxlmn))  then 
+          write(0,*) ' NUMBMM: output problem',i,j,c%ja(j),maxlmn
             info = 3
             return
         else
-          c%aspk(j) = temp(c%ia1(j))
-          temp(c%ia1(j)) = szero
+          c%val(j) = temp(c%ja(j))
+          temp(c%ja(j)) = dzero
         endif
       end do
     end do
 
+    
+  end subroutine gen_numbmm
 
-  end subroutine inner_numbmm
-
-end subroutine psb_snumbmm
+end subroutine psb_sbase_numbmm

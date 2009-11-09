@@ -43,6 +43,20 @@ module psb_serial_mod
   use psb_mat_mod
 
   interface psb_symbmm
+    subroutine psb_ssymbmm(a,b,c,info)
+      use psb_mat_mod
+      implicit none 
+      type(psb_s_sparse_mat), intent(in)  :: a,b
+      type(psb_s_sparse_mat), intent(out) :: c
+      integer, intent(out)                :: info
+    end subroutine psb_ssymbmm
+    subroutine psb_sbase_symbmm(a,b,c,info)
+      use psb_mat_mod
+      implicit none 
+      class(psb_s_base_sparse_mat), intent(in) :: a,b
+      type(psb_s_csr_sparse_mat), intent(out)  :: c
+      integer, intent(out)                     :: info
+    end subroutine psb_sbase_symbmm
     subroutine psb_dsymbmm(a,b,c,info)
       use psb_mat_mod
       implicit none 
@@ -57,8 +71,49 @@ module psb_serial_mod
       type(psb_d_csr_sparse_mat), intent(out)  :: c
       integer, intent(out)                     :: info
     end subroutine psb_dbase_symbmm
+    subroutine psb_csymbmm(a,b,c,info)
+      use psb_mat_mod
+      implicit none 
+      type(psb_c_sparse_mat), intent(in)  :: a,b
+      type(psb_c_sparse_mat), intent(out) :: c
+      integer, intent(out)                :: info
+    end subroutine psb_csymbmm
+    subroutine psb_cbase_symbmm(a,b,c,info)
+      use psb_mat_mod
+      implicit none 
+      class(psb_c_base_sparse_mat), intent(in) :: a,b
+      type(psb_c_csr_sparse_mat), intent(out)  :: c
+      integer, intent(out)                     :: info
+    end subroutine psb_cbase_symbmm
+    subroutine psb_zsymbmm(a,b,c,info)
+      use psb_mat_mod
+      implicit none 
+      type(psb_z_sparse_mat), intent(in)  :: a,b
+      type(psb_z_sparse_mat), intent(out) :: c
+      integer, intent(out)                :: info
+    end subroutine psb_zsymbmm
+    subroutine psb_zbase_symbmm(a,b,c,info)
+      use psb_mat_mod
+      implicit none 
+      class(psb_z_base_sparse_mat), intent(in) :: a,b
+      type(psb_z_csr_sparse_mat), intent(out)  :: c
+      integer, intent(out)                     :: info
+    end subroutine psb_zbase_symbmm
   end interface
+
   interface psb_numbmm
+    subroutine psb_snumbmm(a,b,c)
+      use psb_mat_mod
+      implicit none 
+      type(psb_s_sparse_mat), intent(in) :: a,b
+      type(psb_s_sparse_mat), intent(inout)  :: c
+    end subroutine psb_snumbmm
+    subroutine psb_sbase_numbmm(a,b,c)
+      use psb_mat_mod
+      implicit none 
+      class(psb_s_base_sparse_mat), intent(in) :: a,b
+      type(psb_s_csr_sparse_mat), intent(inout)  :: c
+    end subroutine psb_sbase_numbmm
     subroutine psb_dnumbmm(a,b,c)
       use psb_mat_mod
       implicit none 
@@ -71,9 +126,51 @@ module psb_serial_mod
       class(psb_d_base_sparse_mat), intent(in) :: a,b
       type(psb_d_csr_sparse_mat), intent(inout)  :: c
     end subroutine psb_dbase_numbmm
+    subroutine psb_cnumbmm(a,b,c)
+      use psb_mat_mod
+      implicit none 
+      type(psb_c_sparse_mat), intent(in) :: a,b
+      type(psb_c_sparse_mat), intent(inout)  :: c
+    end subroutine psb_cnumbmm
+    subroutine psb_cbase_numbmm(a,b,c)
+      use psb_mat_mod
+      implicit none 
+      class(psb_c_base_sparse_mat), intent(in) :: a,b
+      type(psb_c_csr_sparse_mat), intent(inout)  :: c
+    end subroutine psb_cbase_numbmm
+    subroutine psb_znumbmm(a,b,c)
+      use psb_mat_mod
+      implicit none 
+      type(psb_z_sparse_mat), intent(in) :: a,b
+      type(psb_z_sparse_mat), intent(inout)  :: c
+    end subroutine psb_znumbmm
+    subroutine psb_zbase_numbmm(a,b,c)
+      use psb_mat_mod
+      implicit none 
+      class(psb_z_base_sparse_mat), intent(in) :: a,b
+      type(psb_z_csr_sparse_mat), intent(inout)  :: c
+    end subroutine psb_zbase_numbmm
   end interface
 
   interface psb_rwextd
+    subroutine psb_srwextd(nr,a,info,b,rowscale)
+      use psb_mat_mod
+      implicit none
+      integer, intent(in)                          :: nr
+      type(psb_s_sparse_mat), intent(inout)        :: a
+      integer,intent(out)                          :: info
+      type(psb_s_sparse_mat), intent(in), optional :: b
+      logical,intent(in), optional                 :: rowscale
+    end subroutine psb_srwextd
+    subroutine psb_sbase_rwextd(nr,a,info,b,rowscale)
+      use psb_mat_mod
+      implicit none
+      integer, intent(in)                                :: nr
+      class(psb_s_base_sparse_mat), intent(inout)        :: a
+      integer,intent(out)                                :: info
+      class(psb_s_base_sparse_mat), intent(in), optional :: b
+      logical,intent(in), optional                       :: rowscale
+    end subroutine psb_sbase_rwextd
     subroutine psb_drwextd(nr,a,info,b,rowscale)
       use psb_mat_mod
       implicit none
@@ -92,6 +189,42 @@ module psb_serial_mod
       class(psb_d_base_sparse_mat), intent(in), optional :: b
       logical,intent(in), optional                       :: rowscale
     end subroutine psb_dbase_rwextd
+    subroutine psb_crwextd(nr,a,info,b,rowscale)
+      use psb_mat_mod
+      implicit none
+      integer, intent(in)                          :: nr
+      type(psb_c_sparse_mat), intent(inout)        :: a
+      integer,intent(out)                          :: info
+      type(psb_c_sparse_mat), intent(in), optional :: b
+      logical,intent(in), optional                 :: rowscale
+    end subroutine psb_crwextd
+    subroutine psb_cbase_rwextd(nr,a,info,b,rowscale)
+      use psb_mat_mod
+      implicit none
+      integer, intent(in)                                :: nr
+      class(psb_c_base_sparse_mat), intent(inout)        :: a
+      integer,intent(out)                                :: info
+      class(psb_c_base_sparse_mat), intent(in), optional :: b
+      logical,intent(in), optional                       :: rowscale
+    end subroutine psb_cbase_rwextd
+    subroutine psb_zrwextd(nr,a,info,b,rowscale)
+      use psb_mat_mod
+      implicit none
+      integer, intent(in)                          :: nr
+      type(psb_z_sparse_mat), intent(inout)        :: a
+      integer,intent(out)                          :: info
+      type(psb_z_sparse_mat), intent(in), optional :: b
+      logical,intent(in), optional                 :: rowscale
+    end subroutine psb_zrwextd
+    subroutine psb_zbase_rwextd(nr,a,info,b,rowscale)
+      use psb_mat_mod
+      implicit none
+      integer, intent(in)                                :: nr
+      class(psb_z_base_sparse_mat), intent(inout)        :: a
+      integer,intent(out)                                :: info
+      class(psb_z_base_sparse_mat), intent(in), optional :: b
+      logical,intent(in), optional                       :: rowscale
+    end subroutine psb_zbase_rwextd
   end interface
   
   
