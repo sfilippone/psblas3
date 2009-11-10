@@ -35,7 +35,7 @@ zf_sample: $(ZFOBJS)
 	$(MPF90) $(F90COPT) $(FINCLUDES) $(FDEFINES) -c $<
 
 clean: 
-	/bin/rm -f $(DFOBJS) $(ZFOBJS) $(SFOBJS)\
+	/bin/rm -f $(DFOBJS) $(ZFOBJS) $(SFOBJS) $(CFOBJS)\
         *$(.mod) $(EXEDIR)/df_sample $(EXEDIR)/zf_sample  
 
 lib:
