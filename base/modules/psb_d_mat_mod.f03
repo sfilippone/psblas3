@@ -56,6 +56,9 @@ module psb_d_mat_mod
     procedure, pass(a) :: d_csclip
     procedure, pass(a) :: d_b_csclip
     generic, public    :: csclip => d_b_csclip, d_csclip
+    procedure, pass(a) :: d_clip_d_ip
+    procedure, pass(a) :: d_clip_d
+    generic, public    :: clip_diag => d_clip_d_ip, d_clip_d
     procedure, pass(a) :: reall => reallocate_nz
     procedure, pass(a) :: get_neigh
     procedure, pass(a) :: d_cscnv
@@ -99,7 +102,7 @@ module psb_d_mat_mod
   private :: get_nrows, get_ncols, get_nzeros, get_size, &
        & get_state, get_dupl, is_null, is_bld, is_upd, &
        & is_asb, is_sorted, is_upper, is_lower, is_triangle, &
-       & is_unit, get_neigh, csall, csput, d_csgetrow,&
+       & is_unit, get_neigh, csall, csput, d_csgetrow,  d_clip_d_ip, d_clip_d,&
        & d_csgetblk, d_csclip, d_b_csclip, d_cscnv, d_cscnv_ip, &
        & reallocate_nz, free, trim, &
        & sparse_print, reinit, &
@@ -1599,6 +1602,125 @@ contains
   end subroutine d_cscnv_base
 
 
+  subroutine d_clip_d(a,b,info)
+    ! Output is always in  COO format 
+    use psb_error_mod
+    use psb_const_mod
+    use psb_d_base_mat_mod
+    implicit none
+    
+    class(psb_d_sparse_mat), intent(in) :: a
+    class(psb_d_sparse_mat), intent(out) :: b
+    integer,intent(out)                  :: info
+    
+    Integer :: err_act
+    character(len=20)  :: name='clip_diag'
+    logical, parameter :: debug=.false.
+    type(psb_d_coo_sparse_mat), allocatable  :: acoo
+    integer :: i, j, nz
+    
+    info = 0
+    call psb_erractionsave(err_act)
+    if (a%is_null()) then 
+      info = 1121
+      call psb_errpush(info,name)
+      goto 9999
+    endif
+    
+    allocate(acoo,stat=info)    
+    if (info == 0) call a%a%cp_to_coo(acoo,info)
+    if (info /= 0) then 
+      info = 4000
+      call psb_errpush(info,name)
+      goto 9999
+    endif
+    
+    nz = acoo%get_nzeros()
+    j = 0
+    do i=1, nz
+      if (acoo%ia(i) /= acoo%ja(i)) then 
+        j = j + 1 
+        acoo%ia(j)  = acoo%ia(i)
+        acoo%ja(j)  = acoo%ja(i)
+        acoo%val(j) = acoo%val(i)
+      end if
+    end do
+    call acoo%set_nzeros(j)
+    call acoo%trim()
+    call b%mv_from(acoo)
+    
+    call psb_erractionrestore(err_act)
+    return
+    
+9999 continue
+    call psb_erractionrestore(err_act)
+    
+    if (err_act == psb_act_abort_) then
+      call psb_error()
+      return
+    end if
+    
+  end subroutine d_clip_d
+
+
+  subroutine d_clip_d_ip(a,info)
+    ! Output is always in  COO format 
+    use psb_error_mod
+    use psb_const_mod
+    use psb_d_base_mat_mod
+    implicit none
+    
+    class(psb_d_sparse_mat), intent(inout) :: a
+    integer,intent(out)                  :: info
+
+    Integer :: err_act
+    character(len=20)  :: name='clip_diag'
+    logical, parameter :: debug=.false.
+    type(psb_d_coo_sparse_mat), allocatable  :: acoo
+    integer :: i, j, nz
+
+    info = 0
+    call psb_erractionsave(err_act)
+    if (a%is_null()) then 
+      info = 1121
+      call psb_errpush(info,name)
+      goto 9999
+    endif
+
+    allocate(acoo,stat=info)    
+    if (info == 0) call a%a%mv_to_coo(acoo,info)
+    if (info /= 0) then
+      info = 4000
+      call psb_errpush(info,name)
+      goto 9999
+    endif
+    
+    nz = acoo%get_nzeros()
+    j = 0
+    do i=1, nz
+      if (acoo%ia(i) /= acoo%ja(i)) then 
+        j = j + 1 
+        acoo%ia(j)  = acoo%ia(i)
+        acoo%ja(j)  = acoo%ja(i)
+        acoo%val(j) = acoo%val(i)
+      end if
+    end do
+    call acoo%set_nzeros(j)
+    call acoo%trim()
+    call a%mv_from(acoo)
+
+    call psb_erractionrestore(err_act)
+    return
+
+9999 continue
+    call psb_erractionrestore(err_act)
+
+    if (err_act == psb_act_abort_) then
+      call psb_error()
+      return
+    end if
+
+  end subroutine d_clip_d_ip
 
   subroutine d_mv_from(a,b)
     use psb_error_mod

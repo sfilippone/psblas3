@@ -54,6 +54,9 @@ module psb_s_mat_mod
     procedure, pass(a) :: s_csgetblk
     generic, public    :: csget => s_csgetptn, s_csgetrow, s_csgetblk 
     procedure, pass(a) :: csclip
+    procedure, pass(a) :: s_clip_d_ip
+    procedure, pass(a) :: s_clip_d
+    generic, public    :: clip_diag => s_clip_d_ip, s_clip_d
     procedure, pass(a) :: reall => reallocate_nz
     procedure, pass(a) :: get_neigh
     procedure, pass(a) :: s_cscnv
@@ -63,8 +66,19 @@ module psb_s_mat_mod
     procedure, pass(a) :: print => sparse_print
     procedure, pass(a) :: s_mv_from
     generic, public    :: mv_from => s_mv_from
+    procedure, pass(a) :: s_mv_to
+    generic, public    :: mv_to => s_mv_to
     procedure, pass(a) :: s_cp_from
     generic, public    :: cp_from => s_cp_from
+    procedure, pass(a) :: s_cp_to
+    generic, public    :: cp_to => s_cp_to
+    procedure, pass(a) :: s_transp_1mat
+    procedure, pass(a) :: s_transp_2mat
+    generic, public    :: transp => s_transp_1mat, s_transp_2mat
+    procedure, pass(a) :: s_transc_1mat
+    procedure, pass(a) :: s_transc_2mat
+    generic, public    :: transc => s_transc_1mat, s_transc_2mat
+
     
     
     ! Computational routines 
@@ -85,7 +99,7 @@ module psb_s_mat_mod
   private :: get_nrows, get_ncols, get_nzeros, get_size, &
        & get_state, get_dupl, is_null, is_bld, is_upd, &
        & is_asb, is_sorted, is_upper, is_lower, is_triangle, &
-       & is_unit, get_neigh, csall, csput, s_csgetrow,&
+       & is_unit, get_neigh, csall, csput, s_csgetrow,  s_clip_d_ip, s_clip_d,&
        & s_csgetblk, csclip, s_cscnv, s_cscnv_ip, &
        & reallocate_nz, free, trim, &
        & sparse_print, reinit, &
@@ -94,7 +108,9 @@ module psb_s_mat_mod
        & set_upd, set_asb, set_sorted, &
        & set_upper, set_lower, set_triangle, &
        & set_unit, get_diag, get_nz_row, s_csgetptn, &
-       & s_mv_from, s_cp_from
+       & s_mv_from, s_mv_to, s_cp_from, s_cp_to,&
+       & s_transp_1mat, s_transp_2mat, &
+       & s_transc_1mat, s_transc_2mat
 
   interface psb_sizeof
     module procedure s_sizeof
@@ -1486,6 +1502,126 @@ contains
 
   end subroutine s_cscnv_ip
 
+  subroutine s_clip_d(a,b,info)
+    ! Output is always in  COO format 
+    use psb_error_mod
+    use psb_const_mod
+    use psb_s_base_mat_mod
+    implicit none
+    
+    class(psb_s_sparse_mat), intent(in) :: a
+    class(psb_s_sparse_mat), intent(out) :: b
+    integer,intent(out)                  :: info
+    
+    Integer :: err_act
+    character(len=20)  :: name='clip_diag'
+    logical, parameter :: debug=.false.
+    type(psb_s_coo_sparse_mat), allocatable  :: acoo
+    integer :: i, j, nz
+    
+    info = 0
+    call psb_erractionsave(err_act)
+    if (a%is_null()) then 
+      info = 1121
+      call psb_errpush(info,name)
+      goto 9999
+    endif
+    
+    allocate(acoo,stat=info)    
+    if (info == 0) call a%a%cp_to_coo(acoo,info)
+    if (info /= 0) then 
+      info = 4000
+      call psb_errpush(info,name)
+      goto 9999
+    endif
+    
+    nz = acoo%get_nzeros()
+    j = 0
+    do i=1, nz
+      if (acoo%ia(i) /= acoo%ja(i)) then 
+        j = j + 1 
+        acoo%ia(j)  = acoo%ia(i)
+        acoo%ja(j)  = acoo%ja(i)
+        acoo%val(j) = acoo%val(i)
+      end if
+    end do
+    call acoo%set_nzeros(j)
+    call acoo%trim()
+    call b%mv_from(acoo)
+    
+    call psb_erractionrestore(err_act)
+    return
+    
+9999 continue
+    call psb_erractionrestore(err_act)
+    
+    if (err_act == psb_act_abort_) then
+      call psb_error()
+      return
+    end if
+    
+  end subroutine s_clip_d
+
+
+  subroutine s_clip_d_ip(a,info)
+    ! Output is always in  COO format 
+    use psb_error_mod
+    use psb_const_mod
+    use psb_s_base_mat_mod
+    implicit none
+    
+    class(psb_s_sparse_mat), intent(inout) :: a
+    integer,intent(out)                  :: info
+
+    Integer :: err_act
+    character(len=20)  :: name='clip_diag'
+    logical, parameter :: debug=.false.
+    type(psb_s_coo_sparse_mat), allocatable  :: acoo
+    integer :: i, j, nz
+
+    info = 0
+    call psb_erractionsave(err_act)
+    if (a%is_null()) then 
+      info = 1121
+      call psb_errpush(info,name)
+      goto 9999
+    endif
+
+    allocate(acoo,stat=info)    
+    if (info == 0) call a%a%mv_to_coo(acoo,info)
+    if (info /= 0) then
+      info = 4000
+      call psb_errpush(info,name)
+      goto 9999
+    endif
+    
+    nz = acoo%get_nzeros()
+    j = 0
+    do i=1, nz
+      if (acoo%ia(i) /= acoo%ja(i)) then 
+        j = j + 1 
+        acoo%ia(j)  = acoo%ia(i)
+        acoo%ja(j)  = acoo%ja(i)
+        acoo%val(j) = acoo%val(i)
+      end if
+    end do
+    call acoo%set_nzeros(j)
+    call acoo%trim()
+    call a%mv_from(acoo)
+
+    call psb_erractionrestore(err_act)
+    return
+
+9999 continue
+    call psb_erractionrestore(err_act)
+
+    if (err_act == psb_act_abort_) then
+      call psb_error()
+      return
+    end if
+
+  end subroutine s_clip_d_ip
+
   subroutine s_mv_from(a,b)
     use psb_error_mod
     use psb_string_mod
@@ -1529,6 +1665,32 @@ contains
       return
     end if
   end subroutine s_cp_from
+
+  subroutine s_mv_to(a,b)
+    use psb_error_mod
+    use psb_string_mod
+    implicit none 
+    class(psb_s_sparse_mat), intent(inout) :: a
+    class(psb_s_base_sparse_mat), intent(out) :: b
+    integer :: info
+
+    call b%mv_from_fmt(a%a,info)
+    
+    return
+  end subroutine s_mv_to
+
+  subroutine s_cp_to(a,b)
+    use psb_error_mod
+    use psb_string_mod
+    implicit none 
+    class(psb_s_sparse_mat), intent(in) :: a
+    class(psb_s_base_sparse_mat), intent(out) :: b
+    integer :: info
+
+    call b%cp_from_fmt(a%a,info)
+    
+    return
+  end subroutine s_cp_to
 
   subroutine s_sparse_mat_move(a,b,info)
     use psb_error_mod
@@ -1580,6 +1742,153 @@ contains
     end if
 
   end subroutine s_sparse_mat_clone
+
+
+  subroutine s_transp_1mat(a)
+    use psb_error_mod 
+    use psb_string_mod
+    implicit none 
+    class(psb_s_sparse_mat), intent(inout) :: a
+
+    Integer :: err_act, info 
+    character(len=20) :: name='transp'
+    logical, parameter :: debug=.false.
+
+
+    call psb_erractionsave(err_act) 
+    if (a%is_null()) then 
+      info = 1121
+      call psb_errpush(info,name) 
+      goto 9999 
+    endif
+
+    call a%a%transp()
+
+    call psb_erractionrestore(err_act) 
+    return
+
+9999 continue 
+    call psb_erractionrestore(err_act)
+
+    if (err_act == psb_act_abort_) then
+      call psb_error() 
+      return
+    end if
+    
+  end subroutine s_transp_1mat
+
+
+  subroutine s_transp_2mat(a,b)
+    use psb_error_mod
+    use psb_string_mod
+    implicit none 
+    class(psb_s_sparse_mat), intent(out) :: a
+    class(psb_s_sparse_mat), intent(in)  :: b
+
+    Integer :: err_act, info
+    character(len=20)  :: name='transp'
+    logical, parameter :: debug=.false.
+
+
+    call psb_erractionsave(err_act)
+    if (b%is_null()) then 
+      info = 1121
+      call psb_errpush(info,name)
+      goto 9999
+    endif
+
+    allocate(a%a,source=b%a,stat=info)
+    if (info /= 0) then 
+      info = 4000
+      goto 9999
+    end if
+    call a%a%transp(b%a)    
+
+    call psb_erractionrestore(err_act)
+    return
+
+9999 continue
+    call psb_erractionrestore(err_act)
+
+    if (err_act == psb_act_abort_) then
+      call psb_error()
+      return
+    end if
+
+  end subroutine s_transp_2mat
+
+  subroutine s_transc_1mat(a)
+    use psb_error_mod
+    use psb_string_mod
+    implicit none 
+    class(psb_s_sparse_mat), intent(inout) :: a
+
+    Integer :: err_act, info
+    character(len=20)  :: name='transc'
+    logical, parameter :: debug=.false.
+
+
+    call psb_erractionsave(err_act)
+    if (a%is_null()) then 
+      info = 1121
+      call psb_errpush(info,name)
+      goto 9999
+    endif
+
+    call a%a%transc()
+
+    call psb_erractionrestore(err_act)
+    return
+
+9999 continue
+    call psb_erractionrestore(err_act)
+
+    if (err_act == psb_act_abort_) then
+      call psb_error()
+      return
+    end if
+
+  end subroutine s_transc_1mat
+
+
+  subroutine s_transc_2mat(a,b)
+    use psb_error_mod
+    use psb_string_mod
+    implicit none 
+    class(psb_s_sparse_mat), intent(out) :: a
+    class(psb_s_sparse_mat), intent(in)  :: b
+
+    Integer :: err_act, info
+    character(len=20)  :: name='transc'
+    logical, parameter :: debug=.false.
+
+
+    call psb_erractionsave(err_act)
+    if (b%is_null()) then 
+      info = 1121
+      call psb_errpush(info,name)
+      goto 9999
+    endif
+
+    allocate(a%a,source=b%a,stat=info)
+    if (info /= 0) then 
+      info = 4000
+      goto 9999
+    end if
+    call a%a%transc(b%a)    
+    
+    call psb_erractionrestore(err_act)
+    return
+
+9999 continue
+    call psb_erractionrestore(err_act)
+
+    if (err_act == psb_act_abort_) then
+      call psb_error()
+      return
+    end if
+
+  end subroutine s_transc_2mat
 
 
   subroutine reinit(a,clear)

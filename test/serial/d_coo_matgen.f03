@@ -17,7 +17,7 @@ program d_coo_matgen
   real(psb_dpk_) :: t1, t2, tprec 
 
   ! sparse matrix and preconditioner
-  type(psb_dspmat_type) :: a
+  type(psb_d_sparse_mat) :: a
   type(psb_dprec_type)  :: prec
   ! descriptor
   type(psb_desc_type)   :: desc_a
@@ -145,7 +145,7 @@ contains
     type(psb_desc_type)            :: desc_a
     integer                        :: ictxt, info
     character                      :: afmt*5
-    type(psb_dspmat_type)    :: a
+    type(psb_d_sparse_mat)   :: a
     real(psb_dpk_)           :: zt(nb),glob_x,glob_y,glob_z
     integer                  :: m,n,nnz,glob_row,nlr,i,ii,ib,k
     integer                  :: x,y,z,ia,indx_owner
@@ -161,10 +161,10 @@ contains
     real(psb_dpk_),parameter   :: rhs=0.d0,one=1.d0,zero=0.d0
     real(psb_dpk_)   :: t0, t1, t2, t3, tasb, talc, ttot, tgen, tcpy, tmov
     real(psb_dpk_)   :: a1, a2, a3, a4, b1, b2, b3 
-    external           :: a1, a2, a3, a4, b1, b2, b3
-    integer            :: err_act
+    external         :: a1, a2, a3, a4, b1, b2, b3
+    integer          :: err_act
 
-    character(len=20)  :: name, ch_err
+    character(len=20)  :: name, ch_err, asbfmt
 
     info = 0
     name = 'create_matrix'
@@ -404,8 +404,9 @@ contains
     tmov = psb_wtime()-t1
 !!$    call acsr%print(22)
     if(iam == psb_root_) then
+      asbfmt = a%get_fmt()
       write(*,'("The matrix has been generated and assembled in ",a3," format.")')&
-           &   a%fida(1:3)
+           &   asbfmt
       write(*,'("-allocation  time : ",es12.5)') talc
       write(*,'("-coeff. gen. time : ",es12.5)') tgen
       write(*,'("-assembly    time : ",es12.5)') tasb

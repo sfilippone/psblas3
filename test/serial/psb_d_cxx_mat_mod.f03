@@ -29,12 +29,22 @@ module psb_d_cxx_mat_mod
     procedure, pass(a) :: mv_from_coo => d_mv_cxx_from_coo
     procedure, pass(a) :: mv_to_fmt => d_mv_cxx_to_fmt
     procedure, pass(a) :: mv_from_fmt => d_mv_cxx_from_fmt
+    procedure, pass(a) :: csgetptn => d_cxx_csgetptn
     procedure, pass(a) :: d_csgetrow => d_cxx_csgetrow
+    procedure, pass(a) :: get_nz_row => d_cxx_get_nz_row
     procedure, pass(a) :: get_size => d_cxx_get_size
     procedure, pass(a) :: free => d_cxx_free
     procedure, pass(a) :: trim => d_cxx_trim
     procedure, pass(a) :: print => d_cxx_print
+    procedure, pass(a) :: sizeof => d_cxx_sizeof
+    procedure, pass(a) :: reinit => d_cxx_reinit
+    procedure, pass(a) :: d_cxx_cp_from
+    generic, public    :: cp_from => d_cxx_cp_from
+    procedure, pass(a) :: d_cxx_mv_from
+    generic, public    :: mv_from => d_cxx_mv_from
+
   end type psb_d_cxx_sparse_mat
+
   private :: d_cxx_get_nzeros, d_cxx_csmm, d_cxx_csmv, d_cxx_cssm, d_cxx_cssv, &
        & d_cxx_csput, d_cxx_reallocate_nz, d_cxx_allocate_mnnz, &
        & d_cxx_free,  d_cxx_print, d_cxx_get_fmt, d_cxx_csnmi, get_diag, &
@@ -42,7 +52,8 @@ module psb_d_cxx_mat_mod
        & d_mv_cxx_to_coo, d_mv_cxx_from_coo, &
        & d_cp_cxx_to_fmt, d_cp_cxx_from_fmt, &
        & d_mv_cxx_to_fmt, d_mv_cxx_from_fmt, &
-       & d_cxx_scals, d_cxx_scal, d_cxx_trim, d_cxx_csgetrow, d_cxx_get_size
+       & d_cxx_scals, d_cxx_scal, d_cxx_trim, d_cxx_csgetrow, d_cxx_get_size, &
+       & d_cxx_sizeof, d_cxx_csgetptn, d_cxx_get_nz_row, d_cxx_reinit
 
 
   interface 
@@ -148,6 +159,25 @@ module psb_d_cxx_mat_mod
   end interface
 
   interface 
+    subroutine d_cxx_csgetptn_impl(imin,imax,a,nz,ia,ja,info,&
+         & jmin,jmax,iren,append,nzin,rscale,cscale)
+      use psb_const_mod
+      import psb_d_cxx_sparse_mat
+      implicit none
+      
+      class(psb_d_cxx_sparse_mat), intent(in) :: a
+      integer, intent(in)                  :: imin,imax
+      integer, intent(out)                 :: nz
+      integer, allocatable, intent(inout)  :: ia(:), ja(:)
+      integer,intent(out)                  :: info
+      logical, intent(in), optional        :: append
+      integer, intent(in), optional        :: iren(:)
+      integer, intent(in), optional        :: jmin,jmax, nzin
+      logical, intent(in), optional        :: rscale,cscale
+    end subroutine d_cxx_csgetptn_impl
+  end interface
+
+  interface 
     subroutine d_cxx_csgetrow_impl(imin,imax,a,nz,ia,ja,val,info,&
          & jmin,jmax,iren,append,nzin,rscale,cscale)
       use psb_const_mod
@@ -234,6 +264,18 @@ contains
   !
   !=====================================
 
+  
+  function d_cxx_sizeof(a) result(res)
+    implicit none 
+    class(psb_d_cxx_sparse_mat), intent(in) :: a
+    integer(psb_long_int_k_) :: res
+    res = 8 
+    res = res + psb_sizeof_dp  * size(a%val)
+    res = res + psb_sizeof_int * size(a%irp)
+    res = res + psb_sizeof_int * size(a%ja)
+      
+  end function d_cxx_sizeof
+
   function d_cxx_get_fmt(a) result(res)
     implicit none 
     class(psb_d_cxx_sparse_mat), intent(in) :: a
@@ -245,7 +287,7 @@ contains
     implicit none 
     class(psb_d_cxx_sparse_mat), intent(in) :: a
     integer :: res
-    res = a%irp(a%m+1)-1
+    res = a%irp(a%get_nrows()+1)-1
   end function d_cxx_get_nzeros
 
   function d_cxx_get_size(a) result(res)
@@ -271,6 +313,26 @@ contains
     end if
 
   end function d_cxx_get_size
+
+
+
+  function  d_cxx_get_nz_row(idx,a) result(res)
+    use psb_const_mod
+    implicit none
+    
+    class(psb_d_cxx_sparse_mat), intent(in) :: a
+    integer, intent(in)                  :: idx
+    integer                              :: res
+    
+    res = 0 
+ 
+    if ((1<=idx).and.(idx<=a%get_nrows())) then 
+      res = a%irp(idx+1)-a%irp(idx)
+    end if
+    
+  end function d_cxx_get_nz_row
+
+
 
   !=====================================
   !
@@ -299,7 +361,8 @@ contains
 
     call psb_realloc(nz,a%ja,info)
     if (info == 0) call psb_realloc(nz,a%val,info)
-    if (info == 0) call psb_realloc(max(nz,a%m+1,a%n+1),a%irp,info)
+    if (info == 0) call psb_realloc(&
+         & max(nz,a%get_nrows()+1,a%get_ncols()+1),a%irp,info)
     if (info /= 0) then 
       call psb_errpush(4000,name)
       goto 9999
@@ -381,6 +444,49 @@ contains
     end if
     return
   end subroutine d_cxx_csput
+
+  subroutine d_cxx_csgetptn(imin,imax,a,nz,ia,ja,info,&
+       & jmin,jmax,iren,append,nzin,rscale,cscale)
+    ! Output is always in  COO format 
+    use psb_error_mod
+    use psb_const_mod
+    implicit none
+    
+    class(psb_d_cxx_sparse_mat), intent(in) :: a
+    integer, intent(in)                  :: imin,imax
+    integer, intent(out)                 :: nz
+    integer, allocatable, intent(inout)  :: ia(:), ja(:)
+    integer,intent(out)                  :: info
+    logical, intent(in), optional        :: append
+    integer, intent(in), optional        :: iren(:)
+    integer, intent(in), optional        :: jmin,jmax, nzin
+    logical, intent(in), optional        :: rscale,cscale
+    Integer :: err_act
+    character(len=20)  :: name='csget'
+    logical, parameter :: debug=.false.
+
+    call psb_erractionsave(err_act)
+    info = 0
+
+    call d_cxx_csgetptn_impl(imin,imax,a,nz,ia,ja,info,&
+         & jmin,jmax,iren,append,nzin,rscale,cscale)
+
+    if (info /= 0) goto 9999
+
+    call psb_erractionrestore(err_act)
+    return
+
+9999 continue
+    call psb_erractionrestore(err_act)
+
+    if (err_act == psb_act_abort_) then
+      call psb_error()
+      return
+    end if
+    return
+
+  end subroutine d_cxx_csgetptn
+
 
   subroutine d_cxx_csgetrow(imin,imax,a,nz,ia,ja,val,info,&
        & jmin,jmax,iren,append,nzin,rscale,cscale)
@@ -590,6 +696,55 @@ contains
     return
 
   end subroutine d_cxx_free
+
+  subroutine d_cxx_reinit(a,clear)
+    use psb_error_mod
+    implicit none 
+
+    class(psb_d_cxx_sparse_mat), intent(inout) :: a   
+    logical, intent(in), optional :: clear
+
+    Integer :: err_act, info
+    character(len=20)  :: name='reinit'
+    logical  :: clear_
+    logical, parameter :: debug=.false.
+
+    call psb_erractionsave(err_act)
+    info = 0
+
+
+    if (present(clear)) then 
+      clear_ = clear
+    else
+      clear_ = .true.
+    end if
+
+    if (a%is_bld() .or. a%is_upd()) then 
+      ! do nothing
+      return
+    else if (a%is_asb()) then 
+      if (clear_) a%val(:) = dzero
+      call a%set_upd()
+    else
+      info = 1121
+      call psb_errpush(info,name)
+      goto 9999
+    end if
+
+    call psb_erractionrestore(err_act)
+    return
+
+9999 continue
+    call psb_erractionrestore(err_act)
+
+    if (err_act == psb_act_abort_) then
+      call psb_error()
+      return
+    end if
+    return
+
+  end subroutine d_cxx_reinit
+
 
   subroutine  d_cxx_trim(a)
     use psb_realloc_mod
@@ -927,6 +1082,7 @@ contains
       call a%set_ncols(n)
       call a%set_bld()
       call a%set_triangle(.false.)
+      call a%set_unit(.false.)
     end if
 
     call psb_erractionrestore(err_act)
@@ -1023,6 +1179,81 @@ contains
     endif
 
   end subroutine d_cxx_print
+
+
+  subroutine d_cxx_cp_from(a,b)
+    use psb_error_mod
+    implicit none 
+
+    class(psb_d_cxx_sparse_mat), intent(out) :: a
+    type(psb_d_cxx_sparse_mat), intent(in)   :: b
+
+
+    Integer :: err_act, info
+    character(len=20)  :: name='cp_from'
+    logical, parameter :: debug=.false.
+
+    call psb_erractionsave(err_act)
+
+    info = 0
+
+    call a%allocate(b%get_nrows(),b%get_ncols(),b%get_nzeros())
+    call a%psb_d_base_sparse_mat%cp_from(b%psb_d_base_sparse_mat)
+    a%irp = b%irp 
+    a%ja  = b%ja
+    a%val = b%val 
+
+    if (info /= 0) goto 9999
+    call psb_erractionrestore(err_act)
+    return
+
+9999 continue
+    call psb_erractionrestore(err_act)
+
+    call psb_errpush(info,name)
+
+    if (err_act /= psb_act_ret_) then
+      call psb_error()
+    end if
+    return
+
+  end subroutine d_cxx_cp_from
+
+  subroutine d_cxx_mv_from(a,b)
+    use psb_error_mod
+    implicit none 
+
+    class(psb_d_cxx_sparse_mat), intent(out)  :: a
+    type(psb_d_cxx_sparse_mat), intent(inout) :: b
+    
+
+    Integer :: err_act, info
+    character(len=20)  :: name='mv_from'
+    logical, parameter :: debug=.false.
+
+    call psb_erractionsave(err_act)
+    info = 0
+    call a%psb_d_base_sparse_mat%mv_from(b%psb_d_base_sparse_mat)
+    call move_alloc(b%irp, a%irp)
+    call move_alloc(b%ja,  a%ja)
+    call move_alloc(b%val, a%val)
+    call b%free()
+
+    call psb_erractionrestore(err_act)
+    return
+
+9999 continue
+    call psb_erractionrestore(err_act)
+
+    call psb_errpush(info,name)
+
+    if (err_act /= psb_act_ret_) then
+      call psb_error()
+    end if
+    return
+
+  end subroutine d_cxx_mv_from
+
 
 
   !=====================================
@@ -1151,7 +1382,6 @@ contains
 
     
     if (.not. (a%is_triangle())) then 
-      write(0,*) 'Called SM on a non-triangular mat!'
       info = 1121
       call psb_errpush(info,name)
       goto 9999
@@ -1205,7 +1435,6 @@ contains
 
     
     if (.not. (a%is_triangle())) then 
-      write(0,*) 'Called SM on a non-triangular mat!'
       info = 1121
       call psb_errpush(info,name)
       goto 9999
