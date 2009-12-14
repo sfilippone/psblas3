@@ -7,18 +7,6 @@ FOBJS =  daxpby.o 	saxpby.o \
 	caxpby.o  zaxpby.o smmp.o
 
 
-#	clpupd.o ccsmm.o cswmm.o ccsnmi.o ccsrws.o\
-#	cswsm.o ccssm.o cgelp.o\
-#	zcsnmi.o  zcsmm.o zcssm.o zswmm.o zswsm.o\
-#	zcsrws.o zgelp.o zlpupd.o
-
-#dcsmm.o dcsnmi.o dcsrp.o dcssm.o \
-#	dgelp.o dlpupd.o dswmm.o \
-#	dswsm.o smmp.o dcsrws.o \
-#slpupd.o scsmm.o sswmm.o scsnmi.o scsrws.o\
-#sswsm.o scssm.o 
-
-
 OBJS=$(FOBJS)
 
 #
