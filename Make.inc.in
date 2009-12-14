@@ -10,7 +10,7 @@
 
 # The following ones are the variables used by the PSBLAS make scripts.
 
-F03=@F90@
+F03=@F03@
 F90=@F90@
 FC=@FC@
 CC=@CC@

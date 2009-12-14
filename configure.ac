@@ -452,6 +452,7 @@ if test "X$psblas_cv_fc" == X"xlf" ; then
   #  - if called from some script, xlf could behave strangely
   #  - it is not said that mpxlf95 gets chosen by the configure script.
   F90="xlf95   -qsuffix=f=f90:cpp=F90"
+  F03="xlf2003  -qsuffix=f=f03:cpp=F03"
  #  F90="xlf95"
 #    FC="xlf"
 
@@ -480,6 +481,7 @@ else
   # If the user wishes to, she should specify MPICC, MPIF77 after ./configure.
   # Note: this behavious should be documented.
     F90=${FC}
+    F03=${FC}
   MPF90=${MPIFC}
      FC=${FC}
   MPF77=${MPIFC}
@@ -668,6 +670,7 @@ AC_SUBST(CDEFINES)
 AC_SUBST(BASELIBNAME)
 AC_SUBST(F90)
 AC_SUBST(F90COPT)
+AC_SUBST(F03)
 AC_SUBST(F03COPT)
 AC_SUBST(MPF90)
 AC_SUBST(MPF77)
@@ -732,13 +735,13 @@ $(.mod).o:
 	$(F90) $(F90COPT) $(FINCLUDES) $(FDEFINES) -c $<
 
 %.o: %.f03
-	$(F90) $(F90COPT) $(FINCLUDES)  -c $<
+	$(F03) $(F03COPT) $(FINCLUDES)  -c $<
 %$(.mod): %.f03
-	$(F90) $(F90COPT) $(FINCLUDES)  -c $<
+	$(F03) $(F03COPT) $(FINCLUDES)  -c $<
 %.o: %.F03
-	$(F90) $(F03COPT) $(FINCLUDES) $(FDEFINES)  -c $<
+	$(F03) $(F03COPT) $(FINCLUDES) $(FDEFINES)  -c $<
 %$(.mod): %.F03
-	$(F90) $(F03COPT) $(FINCLUDES) $(FDEFINES) -c $<'
+	$(F03) $(F03COPT) $(FINCLUDES) $(FDEFINES) -c $<'
 
 else
 
@@ -770,13 +773,13 @@ $(.mod).o:
 .F90$(.mod):
 	$(F90) $(F90COPT) $(FINCLUDES) $(FDEFINES) -c $<
 .f03$(.mod):
-	$(F90) $(F90COPT) $(FINCLUDES) -c $<
+	$(F03) $(F03COPT) $(FINCLUDES) -c $<
 .f03.o:
-	$(F90) $(F90COPT) $(FINCLUDES) -c $<
+	$(F03) $(F03COPT) $(FINCLUDES) -c $<
 .F03.o:
-	$(F90) $(F03COPT) $(FINCLUDES) $(FDEFINES) -c $<
+	$(F03) $(F03COPT) $(FINCLUDES) $(FDEFINES) -c $<
 .F03$(.mod):
-	$(F90) $(F03COPT) $(FINCLUDES) $(FDEFINES) -c $<'
+	$(F03) $(F03COPT) $(FINCLUDES) $(FDEFINES) -c $<'
 
 fi
 AC_SUBST(PSBLASRULES)

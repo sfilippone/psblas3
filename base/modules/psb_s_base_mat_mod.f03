@@ -1295,7 +1295,7 @@ contains
   subroutine s_scals(d,a,info) 
     use psb_error_mod
     implicit none 
-    class(psb_s_base_sparse_mat), intent(in) :: a
+    class(psb_s_base_sparse_mat), intent(inout) :: a
     real(psb_spk_), intent(in)      :: d
     integer, intent(out)            :: info
 
@@ -1321,7 +1321,7 @@ contains
   subroutine s_scal(d,a,info) 
     use psb_error_mod
     implicit none 
-    class(psb_s_base_sparse_mat), intent(in) :: a
+    class(psb_s_base_sparse_mat), intent(inout) :: a
     real(psb_spk_), intent(in)      :: d(:)
     integer, intent(out)            :: info
 

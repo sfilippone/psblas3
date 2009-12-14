@@ -708,12 +708,14 @@ contains
     integer, intent(out)         :: totxch,idxr,idxs,info
 
     !locals
-    integer             :: np,me,ictxt,err_act
+    integer             :: np,me,ictxt,err_act, debug_level,debug_unit
     logical, parameter  :: debug=.false.,debugprt=.false.
     character(len=20), parameter  :: name='psb_cd_get_list'
 
     info = 0
     call psb_erractionsave(err_act)
+    debug_unit  = psb_get_debug_unit()
+    debug_level = psb_get_debug_level()
 
     ictxt = psb_cd_get_context(desc)
 
@@ -726,15 +728,17 @@ contains
       ipnt   => desc%ovrlap_index
     case(psb_comm_ext_) 
       ipnt   => desc%ext_index
-      if (.not.associated(desc%base_desc)) then
-        write(0,*) trim(name),&
-             & ': Warning: trying to get ext_index on a descriptor ',&
-             & 'which does not have a base_desc!'
-      end if
-      if (.not.psb_is_ovl_desc(desc)) then
-        write(0,*) trim(name),&
-             & ': Warning: trying to get ext_index on a descriptor ',&
-             & 'which is not overlap-extended!'
+      if (debug_level >= psb_debug_ext_) then
+        if (.not.associated(desc%base_desc)) then
+          write(debug_unit,*) trim(name),&
+               & ': Warning: trying to get ext_index on a descriptor ',&
+               & 'which does not have a base_desc!'
+        end if
+        if (.not.psb_is_ovl_desc(desc)) then
+          write(debug_unit,*) trim(name),&
+               & ': Warning: trying to get ext_index on a descriptor ',&
+               & 'which is not overlap-extended!'
+        end if
       end if
     case(psb_comm_mov_) 
       ipnt   => desc%ovr_mst_idx

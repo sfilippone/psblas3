@@ -1353,7 +1353,7 @@ contains
   subroutine c_scals(d,a,info) 
     use psb_error_mod
     implicit none 
-    class(psb_c_base_sparse_mat), intent(in) :: a
+    class(psb_c_base_sparse_mat), intent(inout) :: a
     complex(psb_spk_), intent(in)      :: d
     integer, intent(out)            :: info
 
@@ -1379,7 +1379,7 @@ contains
   subroutine c_scal(d,a,info) 
     use psb_error_mod
     implicit none 
-    class(psb_c_base_sparse_mat), intent(in) :: a
+    class(psb_c_base_sparse_mat), intent(inout) :: a
     complex(psb_spk_), intent(in)      :: d(:)
     integer, intent(out)            :: info
 
