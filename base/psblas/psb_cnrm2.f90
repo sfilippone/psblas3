@@ -45,10 +45,7 @@
 !    jx     -  integer(optional).   The column offset for sub( X ).
 !
 function psb_cnrm2(x, desc_a, info, jx)  
-  use psb_descriptor_type
-  use psb_check_mod
-  use psb_error_mod
-  use psb_penv_mod
+  use psb_sparse_mod, psb_protect_name => psb_cnrm2
   implicit none
 
   complex(psb_spk_), intent(in)      ::  x(:,:)
@@ -181,10 +178,7 @@ end function psb_cnrm2
 !    info   -  integer.              Return code
 !
 function psb_cnrm2v(x, desc_a, info)  
-  use psb_descriptor_type
-  use psb_check_mod
-  use psb_error_mod
-  use psb_penv_mod
+  use psb_sparse_mod, psb_protect_name => psb_cnrm2v
   implicit none
 
   complex(psb_spk_), intent(in)   :: x(:)
@@ -313,10 +307,7 @@ end function psb_cnrm2v
 !    info   -  integer.              Return code
 !
 subroutine psb_cnrm2vs(res, x, desc_a, info)
-  use psb_descriptor_type
-  use psb_check_mod
-  use psb_error_mod
-  use psb_penv_mod
+  use psb_sparse_mod, psb_protect_name => psb_cnrm2vs
   implicit none
 
   complex(psb_spk_), intent(in)   :: x(:)

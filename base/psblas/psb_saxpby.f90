@@ -51,11 +51,7 @@
 !    jy     -  integer(optional).   The column offset for sub( Y ).
 !
 subroutine  psb_saxpby(alpha, x, beta,y,desc_a,info, n, jx, jy)
-  use psb_descriptor_type
-  use psb_check_mod
-  use psb_const_mod
-  use psb_error_mod
-  use psb_penv_mod
+  use psb_sparse_mod, psb_protect_name => psb_saxpby
   implicit none                    
 
   integer, intent(in), optional   :: n, jx, jy
@@ -206,11 +202,7 @@ end subroutine psb_saxpby
 !
 !
 subroutine  psb_saxpbyv(alpha, x, beta,y,desc_a,info)
-  use psb_descriptor_type
-  use psb_const_mod
-  use psb_check_mod
-  use psb_error_mod
-  use psb_penv_mod
+  use psb_sparse_mod, psb_protect_name => psb_saxpbyv
   implicit none                    
 
   integer, intent(out)            :: info

@@ -40,7 +40,7 @@ contains
   !
   subroutine  get_dparms(ictxt,mtrx_file,rhs_file,filefmt,kmethd,ptype,ipart,&
        & afmt,istopc,itmax,itrace,irst,eps)
-    use psb_base_mod
+    use psb_sparse_mod
     integer      :: ictxt
     character(len=2)  :: filefmt
     character(len=40) :: kmethd, mtrx_file, rhs_file, ptype
@@ -141,7 +141,7 @@ contains
   
   subroutine  get_sparms(ictxt,mtrx_file,rhs_file,filefmt,kmethd,ptype,ipart,&
        & afmt,istopc,itmax,itrace,irst,eps)
-    use psb_base_mod
+    use psb_sparse_mod
     integer      :: ictxt
     character(len=2)  :: filefmt
     character(len=40) :: kmethd, mtrx_file, rhs_file, ptype

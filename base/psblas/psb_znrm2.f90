@@ -313,10 +313,7 @@ end function psb_znrm2v
 !    info   -  integer.              Return code
 !
 subroutine psb_znrm2vs(res, x, desc_a, info)
-  use psb_descriptor_type
-  use psb_check_mod
-  use psb_error_mod
-  use psb_penv_mod
+  use psb_sparse_mod, psb_protect_name => psb_znrm2vs
   implicit none
 
   complex(psb_dpk_), intent(in)   :: x(:)

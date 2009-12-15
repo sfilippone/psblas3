@@ -40,11 +40,7 @@
 !    info     - integer.                          return code.
 !
 subroutine psb_zspfree(a, desc_a,info)
-  !...free sparse matrix structure...
-  use psb_descriptor_type
-  use psb_serial_mod
-  use psb_const_mod
-  use psb_error_mod
+  use psb_sparse_mod, psb_protect_name => psb_zspfree
   implicit none
 
   !....parameters...

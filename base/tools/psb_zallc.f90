@@ -43,13 +43,8 @@
 !    n      - optional number of columns.
 !    lb     - optional lower bound on column indices
 subroutine psb_zalloc(x, desc_a, info, n, lb)
-  !....allocate dense  matrix for psblas routines.....
-  use psb_descriptor_type
-  use psb_const_mod
-  use psb_error_mod
-  use psb_realloc_mod
-  use psb_penv_mod
-
+  use psb_sparse_mod, psb_protect_name => psb_zalloc
+  use psi_mod
   implicit none
 
   !....parameters...
@@ -181,13 +176,8 @@ end subroutine psb_zalloc
 !    desc_a - the communication descriptor.
 !    info   - return code
 subroutine psb_zallocv(x, desc_a,info,n)
-  !....allocate sparse matrix structure for psblas routines.....
-  use psb_descriptor_type
-  use psb_const_mod
-  use psb_realloc_mod
-  use psb_error_mod
-  use psb_penv_mod
-
+  use psb_sparse_mod, psb_protect_name => psb_zallocv
+  use psi_mod
   implicit none
 
   !....parameters...

@@ -42,12 +42,7 @@
 !    info   -  integer.                   Return code
 !
 function psb_cnrmi(a,desc_a,info)  
-  use psb_descriptor_type
-  use psb_serial_mod
-  use psb_check_mod
-  use psb_error_mod
-  use psb_penv_mod
-  use psb_mat_mod
+  use psb_sparse_mod, psb_protect_name => psb_cnrmi
   implicit none
 
   type(psb_c_sparse_mat), intent(in)   :: a

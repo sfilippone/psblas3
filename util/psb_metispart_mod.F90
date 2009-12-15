@@ -88,7 +88,7 @@ contains
 
 
   subroutine distr_mtpart(root, ictxt)
-    use psb_base_mod
+    use psb_sparse_mod
     integer    :: root, ictxt
     integer    :: n, me, np
 
@@ -135,7 +135,7 @@ contains
   end subroutine getv_mtpart
   
   subroutine d_mat_build_mtpart(a,nparts)
-    use psb_base_mod
+    use psb_sparse_mod
     type(psb_d_sparse_mat), intent(in) :: a
     integer       :: nparts
     
@@ -152,7 +152,7 @@ contains
 
   
   subroutine s_mat_build_mtpart(a,nparts)
-    use psb_base_mod
+    use psb_sparse_mod
     type(psb_s_sparse_mat), intent(in) :: a
     integer       :: nparts
     
@@ -169,7 +169,7 @@ contains
 
   
   subroutine z_mat_build_mtpart(a,nparts)
-    use psb_base_mod
+    use psb_sparse_mod
     type(psb_z_sparse_mat), intent(in) :: a
     integer       :: nparts
     
@@ -186,7 +186,7 @@ contains
 
   
   subroutine c_mat_build_mtpart(a,nparts)
-    use psb_base_mod
+    use psb_sparse_mod
     type(psb_c_sparse_mat), intent(in) :: a
     integer       :: nparts
     
@@ -203,7 +203,7 @@ contains
 
 
   subroutine build_mtpart(n,fida,ia1,ia2,nparts)
-    use psb_base_mod
+    use psb_sparse_mod
     integer       :: nparts
     integer       :: ia1(:), ia2(:)
     integer       :: n, i,numflag,nedc,wgflag

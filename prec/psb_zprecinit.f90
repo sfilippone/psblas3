@@ -31,7 +31,7 @@
 !!$  
 subroutine psb_zprecinit(p,ptype,info)
 
-  use psb_base_mod
+  use psb_sparse_mod
   use psb_prec_mod, psb_protect_name => psb_zprecinit
   use psb_z_nullprec
   use psb_z_diagprec

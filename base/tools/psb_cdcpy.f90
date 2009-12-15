@@ -39,7 +39,7 @@
   !    info     - integer.                       Return code.
 subroutine psb_cdcpy(desc_in, desc_out, info)
 
-  use psb_base_mod, psb_protect_name => psb_cdcpy
+  use psb_sparse_mod, psb_protect_name => psb_cdcpy
 
   implicit none
   !....parameters...

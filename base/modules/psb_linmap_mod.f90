@@ -451,7 +451,7 @@ contains
 
 
   function psb_slinmap_sizeof(map) result(val)
-    use psb_mat_mod
+    use psb_mat_mod, only : psb_sizeof
     implicit none 
     type(psb_slinmap_type), intent(in) :: map
     integer(psb_long_int_k_) :: val
@@ -471,7 +471,7 @@ contains
   end function psb_slinmap_sizeof
 
   function psb_dlinmap_sizeof(map) result(val)
-    use psb_mat_mod
+    use psb_mat_mod, only : psb_sizeof
     implicit none 
     type(psb_dlinmap_type), intent(in) :: map
     integer(psb_long_int_k_) :: val
@@ -491,7 +491,7 @@ contains
   end function psb_dlinmap_sizeof
 
   function psb_clinmap_sizeof(map) result(val)
-    use psb_mat_mod
+    use psb_mat_mod, only : psb_sizeof
     implicit none 
     type(psb_clinmap_type), intent(in) :: map
     integer(psb_long_int_k_) :: val
@@ -511,7 +511,7 @@ contains
   end function psb_clinmap_sizeof
 
   function psb_zlinmap_sizeof(map) result(val)
-    use psb_mat_mod
+    use psb_mat_mod, only : psb_sizeof
     implicit none 
     type(psb_zlinmap_type), intent(in) :: map
     integer(psb_long_int_k_) :: val
@@ -579,7 +579,7 @@ contains
   subroutine  psb_slinmap_transfer(mapin,mapout,info)
     use psb_realloc_mod
     use psb_descriptor_type
-    use psb_mat_mod
+    use psb_mat_mod, only : psb_move_alloc
     implicit none 
     type(psb_slinmap_type) :: mapin,mapout
     integer, intent(out)      :: info 
@@ -601,7 +601,7 @@ contains
   subroutine  psb_dlinmap_transfer(mapin,mapout,info)
     use psb_realloc_mod
     use psb_descriptor_type
-    use psb_mat_mod
+    use psb_mat_mod, only : psb_move_alloc
     implicit none 
     type(psb_dlinmap_type) :: mapin,mapout
     integer, intent(out)      :: info 
@@ -622,7 +622,7 @@ contains
   
   subroutine  psb_clinmap_transfer(mapin,mapout,info)
     use psb_realloc_mod
-    use psb_mat_mod
+    use psb_mat_mod, only : psb_move_alloc
     use psb_descriptor_type
     implicit none 
     type(psb_clinmap_type) :: mapin,mapout
@@ -644,7 +644,7 @@ contains
   
   subroutine  psb_zlinmap_transfer(mapin,mapout,info)
     use psb_realloc_mod
-    use psb_mat_mod
+    use psb_mat_mod, only : psb_move_alloc
     use psb_descriptor_type
     implicit none 
     type(psb_zlinmap_type) :: mapin,mapout

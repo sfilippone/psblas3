@@ -31,7 +31,7 @@
 !!$  
 subroutine psb_cprecinit(p,ptype,info)
 
-  use psb_base_mod
+  use psb_sparse_mod
   use psb_prec_mod, psb_protect_name => psb_cprecinit
   use psb_c_nullprec
   use psb_c_diagprec

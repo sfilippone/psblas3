@@ -42,12 +42,7 @@
 !                                              (local, user estimate)
 !
 subroutine psb_zspalloc(a, desc_a, info, nnz)
-
-  use psb_descriptor_type
-  use psb_serial_mod
-  use psb_const_mod
-  use psb_error_mod
-  use psb_penv_mod
+  use psb_sparse_mod, psb_protect_name => psb_zspalloc
   implicit none
 
   !....parameters...

@@ -43,9 +43,7 @@
 !    info     - integer.                  return code.
 !
 subroutine psb_get_ovrlap(ovrel,desc,info)
-  use psb_descriptor_type
-  use psb_realloc_mod
-  use psb_error_mod
+  use psb_sparse_mod, psb_protect_name => psb_get_ovrlap
   implicit none 
   integer, allocatable, intent(out) :: ovrel(:)
   type(psb_desc_type), intent(in) :: desc

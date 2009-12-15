@@ -311,10 +311,7 @@ end function psb_dnrm2v
 !    info   -  integer.                   Return code
 !
 subroutine psb_dnrm2vs(res, x, desc_a, info)
-  use psb_descriptor_type
-  use psb_check_mod
-  use psb_error_mod
-  use psb_penv_mod
+  use psb_sparse_mod, psb_protect_name => psb_dnrm2vs
   implicit none
 
   real(psb_dpk_), intent(in)      :: x(:)

@@ -35,7 +35,7 @@
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 module psb_prec_const_mod
 
-  use psb_base_mod, only : psb_dpk_, psb_spk_, psb_long_int_k_
+  use psb_sparse_mod, only : psb_dpk_, psb_spk_, psb_long_int_k_
 
   integer, parameter :: psb_min_prec_=0, psb_noprec_=0, psb_diag_=1, &
        & psb_bjac_=2, psb_max_prec_=2

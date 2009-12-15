@@ -49,13 +49,7 @@
 !                                           certain circumstances.
 !
 subroutine psb_dspins(nz,ia,ja,val,a,desc_a,info,rebuild)
-
-  use psb_tools_mod, psb_protect_name => psb_dspins
-  use psb_descriptor_type
-  use psb_serial_mod
-  use psb_const_mod
-  use psb_error_mod
-  use psb_penv_mod
+  use psb_sparse_mod, psb_protect_name => psb_dspins
   implicit none
 
   !....parameters...
@@ -237,12 +231,7 @@ end subroutine psb_dspins
 
 
 subroutine psb_dspins_2desc(nz,ia,ja,val,a,desc_ar,desc_ac,info)
-  use psb_tools_mod, psb_protect_name => psb_dspins_2desc
-  use psb_descriptor_type
-  use psb_serial_mod
-  use psb_const_mod
-  use psb_error_mod
-  use psb_penv_mod
+  use psb_sparse_mod, psb_protect_name => psb_dspins_2desc
   implicit none
 
   !....parameters...

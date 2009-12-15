@@ -3,7 +3,7 @@ include ../Make.inc
 HERE=.
 LIBDIR=../lib
 LIBNAME=$(BASELIBNAME)
-LIBMOD=psb_base_mod$(.mod)
+LIBMOD=psb_sparse_mod$(.mod)
 lib:
 	(cd modules; make lib LIBNAME=$(BASELIBNAME) F90="$(MPF90)" F90COPT="$(F90COPT) $(MPI_OPT)")
 	(cd serial; make lib LIBNAME=$(BASELIBNAME))

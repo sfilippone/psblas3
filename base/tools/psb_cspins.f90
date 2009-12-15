@@ -49,22 +49,17 @@
 !                                           certain circumstances.
 !
 subroutine psb_cspins(nz,ia,ja,val,a,desc_a,info,rebuild)
-
-  use psb_tools_mod, psb_protect_name => psb_cspins
-  use psb_descriptor_type
-  use psb_serial_mod
-  use psb_const_mod
-  use psb_error_mod
-  use psb_penv_mod
+  use psb_sparse_mod, psb_protect_name => psb_cspins
+  use psi_mod
   implicit none
 
   !....parameters...
-  type(psb_desc_type), intent(inout)   :: desc_a
+  type(psb_desc_type), intent(inout)    :: desc_a
   type(psb_c_sparse_mat), intent(inout) :: a
-  integer, intent(in)                  :: nz,ia(:),ja(:)
-  complex(psb_spk_), intent(in)      :: val(:)
-  integer, intent(out)                 :: info
-  logical, intent(in), optional        :: rebuild
+  integer, intent(in)                   :: nz,ia(:),ja(:)
+  complex(psb_spk_), intent(in)         :: val(:)
+  integer, intent(out)                  :: info
+  logical, intent(in), optional         :: rebuild
   !locals.....
 
   integer :: nrow, err_act, ncol, spstate
@@ -237,12 +232,8 @@ end subroutine psb_cspins
 
 
 subroutine psb_cspins_2desc(nz,ia,ja,val,a,desc_ar,desc_ac,info)
-  use psb_tools_mod, psb_protect_name => psb_cspins_2desc
-  use psb_descriptor_type
-  use psb_serial_mod
-  use psb_const_mod
-  use psb_error_mod
-  use psb_penv_mod
+  use psb_sparse_mod, psb_protect_name => psb_cspins_2desc
+  use psi_mod
   implicit none
 
   !....parameters...

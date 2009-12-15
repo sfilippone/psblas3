@@ -39,9 +39,7 @@
 !
 !
 subroutine psb_zrwextd(nr,a,info,b,rowscale)
-  use psb_error_mod
-  use psb_string_mod
-  use psb_serial_mod, psb_protect_name => psb_zrwextd
+  use psb_sparse_mod, psb_protect_name => psb_zrwextd
   implicit none
 
   ! Extend matrix A up to NR rows with empty ones (i.e.: all zeroes)
@@ -101,9 +99,7 @@ subroutine psb_zrwextd(nr,a,info,b,rowscale)
 
 end subroutine psb_zrwextd
 subroutine psb_zbase_rwextd(nr,a,info,b,rowscale)
-  use psb_error_mod
-  use psb_string_mod
-  use psb_serial_mod, psb_protect_name => psb_zbase_rwextd
+  use psb_sparse_mod, psb_protect_name => psb_zbase_rwextd
   implicit none
 
   ! Extend matrix A up to NR rows with empty ones (i.e.: all zeroes)

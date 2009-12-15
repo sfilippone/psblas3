@@ -20,7 +20,7 @@ contains
   
 
   subroutine d_null_apply(alpha,prec,x,beta,y,desc_data,info,trans,work)
-    use psb_base_mod
+    use psb_sparse_mod
     type(psb_desc_type),intent(in)    :: desc_data
     class(psb_d_null_prec_type), intent(in)  :: prec
     real(psb_dpk_),intent(in)         :: x(:)
@@ -75,7 +75,7 @@ contains
 
   subroutine d_null_precinit(prec,info)
     
-    use psb_base_mod
+    use psb_sparse_mod
     Implicit None
     
     class(psb_d_null_prec_type),intent(inout) :: prec
@@ -102,7 +102,7 @@ contains
 
   subroutine d_null_precbld(a,desc_a,prec,info,upd)
     
-    use psb_base_mod
+    use psb_sparse_mod
     Implicit None
     
     type(psb_d_sparse_mat), intent(in), target :: a
@@ -132,7 +132,7 @@ contains
 
   subroutine d_null_precseti(prec,what,val,info)
     
-    use psb_base_mod
+    use psb_sparse_mod
     Implicit None
     
     class(psb_d_null_prec_type),intent(inout) :: prec
@@ -160,7 +160,7 @@ contains
 
   subroutine d_null_precsetr(prec,what,val,info)
     
-    use psb_base_mod
+    use psb_sparse_mod
     Implicit None
     
     class(psb_d_null_prec_type),intent(inout) :: prec
@@ -188,7 +188,7 @@ contains
 
   subroutine d_null_precsetc(prec,what,val,info)
     
-    use psb_base_mod
+    use psb_sparse_mod
     Implicit None
     
     class(psb_d_null_prec_type),intent(inout) :: prec
@@ -216,7 +216,7 @@ contains
 
   subroutine d_null_precfree(prec,info)
     
-    use psb_base_mod
+    use psb_sparse_mod
     Implicit None
 
     class(psb_d_null_prec_type), intent(inout) :: prec
@@ -245,7 +245,7 @@ contains
 
   subroutine d_null_precdescr(prec,iout)
     
-    use psb_base_mod
+    use psb_sparse_mod
     Implicit None
 
     class(psb_d_null_prec_type), intent(in) :: prec
@@ -281,7 +281,7 @@ contains
   end subroutine d_null_precdescr
 
   function d_null_sizeof(prec) result(val)
-    use psb_base_mod
+    use psb_sparse_mod
     class(psb_d_null_prec_type), intent(in) :: prec
     integer(psb_long_int_k_) :: val
     

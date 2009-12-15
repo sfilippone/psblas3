@@ -43,18 +43,14 @@
 !                                      halo descriptor with respect to a normal call. 
 !
 subroutine psb_icdasb(desc_a,info,ext_hv)
-  use psb_descriptor_type
-  use psb_serial_mod
-  use psb_const_mod
+  use psb_sparse_mod, psb_protect_name => psb_icdasb
   use psi_mod
-  use psb_error_mod
-  use psb_penv_mod
 #ifdef MPI_MOD
-    use mpi
+  use mpi
 #endif
   implicit none
 #ifdef MPI_H
-    include 'mpif.h'
+  include 'mpif.h'
 #endif
   !...Parameters....
   type(psb_desc_type), intent(inout) :: desc_a

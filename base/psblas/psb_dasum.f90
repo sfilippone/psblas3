@@ -327,11 +327,7 @@ end function psb_dasumv
 !    jx     -  integer(optional).         The column offset.
 !
 subroutine psb_dasumvs(res,x,desc_a, info)
-  use psb_serial_mod
-  use psb_descriptor_type
-  use psb_check_mod
-  use psb_error_mod
-  use psb_penv_mod
+  use psb_sparse_mod, psb_protect_name => psb_dasumvs
   implicit none
 
   real(psb_dpk_), intent(in)      :: x(:)

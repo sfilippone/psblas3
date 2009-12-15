@@ -39,17 +39,13 @@
 !    desc_a   - type(psb_desc_type).      The communication descriptor.
 !    info     - integer.                    Return code
 subroutine psb_dfree(x, desc_a, info)
-  !...free dense matrix structure...
-  use psb_const_mod
-  use psb_descriptor_type
-  use psb_error_mod
-  use psb_penv_mod
+  use psb_sparse_mod, psb_protect_name => psb_dfree
   implicit none
 
   !....parameters...
   real(psb_dpk_),allocatable, intent(inout)  :: x(:,:)
   type(psb_desc_type), intent(in) :: desc_a
-  integer                     :: info
+  integer, intent(out)            :: info
 
   !...locals....
   integer             :: ictxt,np,me,err_act
@@ -114,12 +110,7 @@ end subroutine psb_dfree
 !    desc_a   - type(psb_desc_type).         The communication descriptor.
 !    info     - integer.                       Return code
 subroutine psb_dfreev(x, desc_a, info)
-  !...free dense matrix structure...
-  use psb_const_mod
-  use psb_descriptor_type
-  use psb_error_mod
-  use psb_penv_mod
-
+  use psb_sparse_mod, psb_protect_name => psb_dfreev
   implicit none
   !....parameters...
   real(psb_dpk_),allocatable, intent(inout)    :: x(:)

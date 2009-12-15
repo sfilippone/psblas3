@@ -57,20 +57,14 @@
 !
 Subroutine psb_zsphalo(a,desc_a,blk,info,rowcnv,colcnv,&
      &  rowscale,colscale,outfmt,data)
-
-  use psb_const_mod
-  use psb_serial_mod
-  use psb_descriptor_type
-  use psb_realloc_mod
-  use psb_tools_mod, psb_protect_name => psb_zsphalo
-  use psb_error_mod
-  use psb_penv_mod
+  use psb_sparse_mod, psb_protect_name => psb_zsphalo
+  
 #ifdef MPI_MOD
-    use mpi
+  use mpi
 #endif
   Implicit None
 #ifdef MPI_H
-    include 'mpif.h'
+  include 'mpif.h'
 #endif
 
   Type(psb_z_sparse_mat),Intent(in)    :: a

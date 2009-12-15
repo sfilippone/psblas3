@@ -46,11 +46,7 @@
 !                                     psb_dupl_ovwrt_    overwrite
 !                                     psb_dupl_add_      add         
 subroutine psb_sinsvi(m, irw, val, x, desc_a, info, dupl)
-  !....insert dense submatrix to dense matrix .....
-  use psb_const_mod
-  use psb_descriptor_type
-  use psb_error_mod
-  use psb_penv_mod
+  use psb_sparse_mod, psb_protect_name => psb_sinsvi
   use psi_mod
   implicit none
 
@@ -231,11 +227,7 @@ end subroutine psb_sinsvi
 !                                     psb_dupl_ovwrt_    overwrite
 !                                     psb_dupl_add_      add         
 subroutine psb_sinsi(m, irw, val, x, desc_a, info, dupl)
-  !....insert dense submatrix to dense matrix .....
-  use psb_descriptor_type
-  use psb_const_mod
-  use psb_error_mod
-  use psb_penv_mod
+  use psb_sparse_mod, psb_protect_name => psb_sinsi
   use psi_mod
   implicit none
 

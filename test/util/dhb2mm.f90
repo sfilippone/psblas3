@@ -35,7 +35,7 @@
 ! format
 !
 program dhb2mm
-  use psb_base_mod
+  use psb_sparse_mod
   use psb_util_mod
   type(psb_d_sparse_mat) :: a
   

@@ -51,11 +51,7 @@
 !    jy     -  integer(optional)    The column offset for Y 
 !
 subroutine  psb_zaxpby(alpha, x, beta,y,desc_a,info, n, jx, jy)
-  use psb_descriptor_type
-  use psb_check_mod
-  use psb_const_mod
-  use psb_error_mod
-  use psb_penv_mod
+  use psb_sparse_mod, psb_protect_name => psb_zaxpby
   implicit none                    
 
   integer, intent(in), optional   :: n, jx, jy
@@ -205,11 +201,7 @@ end subroutine psb_zaxpby
 !
 !
 subroutine  psb_zaxpbyv(alpha, x, beta,y,desc_a,info)
-  use psb_descriptor_type
-  use psb_const_mod
-  use psb_check_mod
-  use psb_error_mod
-  use psb_penv_mod
+  use psb_sparse_mod, psb_protect_name => psb_zaxpbyv
   implicit none                    
 
   integer, intent(out)            :: info

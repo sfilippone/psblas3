@@ -31,7 +31,7 @@
 !!$  
 subroutine psb_dprecseti(p,what,val,info)
 
-  use psb_base_mod
+  use psb_sparse_mod
   use psb_prec_mod, psb_protect_name => psb_dprecseti
   implicit none
   type(psb_dprec_type), intent(inout)    :: p
@@ -56,7 +56,7 @@ end subroutine psb_dprecseti
 
 subroutine psb_dprecsetd(p,what,val,info)
 
-  use psb_base_mod
+  use psb_sparse_mod
   use psb_prec_mod, psb_protect_name => psb_dprecsetd
   implicit none
   type(psb_dprec_type), intent(inout)    :: p

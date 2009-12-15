@@ -42,7 +42,7 @@ module psb_hbio_mod
 contains
 
   subroutine shb_read(a, iret, iunit, filename,b,g,x,mtitle)   
-    use psb_base_mod
+    use psb_sparse_mod
     implicit none
     type(psb_s_sparse_mat), intent(out)    :: a
     integer, intent(out)                   :: iret
@@ -200,7 +200,7 @@ contains
   end subroutine shb_read
 
   subroutine shb_write(a,iret,iunit,filename,key,rhs,g,x,mtitle)
-    use psb_base_mod
+    use psb_sparse_mod
     implicit none
     type(psb_s_sparse_mat), intent(in), target :: a
     integer, intent(out)        :: iret
@@ -341,7 +341,7 @@ contains
 
 
   subroutine dhb_read(a, iret, iunit, filename,b,g,x,mtitle)   
-    use psb_base_mod
+    use psb_sparse_mod
     implicit none
     type(psb_d_sparse_mat), intent(out)    :: a
     integer, intent(out)                   :: iret
@@ -499,7 +499,7 @@ contains
   end subroutine dhb_read
 
   subroutine dhb_write(a,iret,iunit,filename,key,rhs,g,x,mtitle)
-    use psb_base_mod
+    use psb_sparse_mod
     implicit none
     type(psb_d_sparse_mat), intent(in), target :: a
     integer, intent(out)        :: iret
@@ -641,7 +641,7 @@ contains
 
 
   subroutine chb_read(a, iret, iunit, filename,b,g,x,mtitle)   
-    use psb_base_mod
+    use psb_sparse_mod
     implicit none
     type(psb_c_sparse_mat), intent(out)    :: a
     integer, intent(out)                   :: iret
@@ -846,7 +846,7 @@ contains
   end subroutine chb_read
 
   subroutine chb_write(a,iret,iunit,filename,key,rhs,g,x,mtitle)
-    use psb_base_mod
+    use psb_sparse_mod
     implicit none
     type(psb_c_sparse_mat), intent(in), target :: a
     integer, intent(out)        :: iret
@@ -987,7 +987,7 @@ contains
 
 
   subroutine zhb_read(a, iret, iunit, filename,b,g,x,mtitle)   
-    use psb_base_mod
+    use psb_sparse_mod
     implicit none
     type(psb_z_sparse_mat), intent(out)    :: a
     integer, intent(out)                   :: iret
@@ -1192,7 +1192,7 @@ contains
   end subroutine zhb_read
 
   subroutine zhb_write(a,iret,iunit,filename,key,rhs,g,x,mtitle)
-    use psb_base_mod
+    use psb_sparse_mod
     implicit none
     type(psb_z_sparse_mat), intent(in), target :: a
     integer, intent(out)        :: iret

@@ -7,7 +7,9 @@ UTIL_MODS = psb_string_mod.o \
 	psb_base_tools_mod.o psb_s_tools_mod.o  psb_d_tools_mod.o\
 	psb_c_tools_mod.o  psb_z_tools_mod.o  psb_tools_mod.o \
 	psb_blacs_mod.o \
-	psb_linmap_type_mod.o psb_comm_mod.o psb_psblas_mod.o \
+	psb_linmap_type_mod.o psb_comm_mod.o\
+	psb_s_psblas_mod.o psb_c_psblas_mod.o \
+	psb_d_psblas_mod.o psb_z_psblas_mod.o psb_psblas_mod.o \
 	psi_serial_mod.o psi_mod.o  psb_ip_reord_mod.o\
 	psb_check_mod.o psb_gps_mod.o psb_linmap_mod.o psb_hash_mod.o\
 	psb_base_mat_mod.o  psb_mat_mod.o\
@@ -63,7 +65,9 @@ psb_sort_mod.o: psb_error_mod.o psb_realloc_mod.o psb_const_mod.o
 psb_tools_mod.o: 	psb_base_tools_mod.o psb_s_tools_mod.o  psb_d_tools_mod.o\
 	psb_c_tools_mod.o  psb_z_tools_mod.o  
 psb_base_tools_mod.o psb_s_tools_mod.o  psb_d_tools_mod.o psb_c_tools_mod.o  psb_z_tools_mod.o: psb_desc_type.o psi_mod.o psb_gps_mod.o psb_linmap_mod.o psb_mat_mod.o
-psb_psblas_mod.o: psb_mat_mod.o psb_desc_type.o 
+psb_psblas_mod.o: psb_mat_mod.o psb_desc_type.o psb_s_psblas_mod.o psb_c_psblas_mod.o \
+ psb_d_psblas_mod.o psb_z_psblas_mod.o
+
 psb_gps_mod.o:	psb_realloc_mod.o
 psb_hash_mod.o: psb_const_mod.o psb_realloc_mod.o
 

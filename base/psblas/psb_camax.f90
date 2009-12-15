@@ -44,12 +44,9 @@
 !    info   -  integer.              Return code
 !    jx     -  integer(optional).    The column offset.
 !
-function psb_camax (x,desc_a, info, jx)
-  use psb_penv_mod 
-  use psb_serial_mod
-  use psb_descriptor_type
-  use psb_check_mod
-  use psb_error_mod
+function psb_camax(x,desc_a, info, jx)
+  use psb_sparse_mod, psb_protect_name => psb_camax
+
   implicit none
 
   complex(psb_spk_), intent(in)    :: x(:,:)
@@ -178,11 +175,8 @@ end function psb_camax
 !    info   -  integer.              Return code
 !
 function psb_camaxv (x,desc_a, info)
-  use psb_penv_mod
-  use psb_serial_mod
-  use psb_descriptor_type
-  use psb_check_mod
-  use psb_error_mod
+  use psb_sparse_mod, psb_protect_name => psb_camaxv
+
   implicit none
 
   complex(psb_spk_), intent(in)   :: x(:)
@@ -309,11 +303,8 @@ end function psb_camaxv
 !    jx     -  integer(optional).   The column offset.
 !
 subroutine psb_camaxvs(res,x,desc_a, info)
-  use psb_penv_mod
-  use psb_serial_mod
-  use psb_descriptor_type
-  use psb_check_mod
-  use psb_error_mod
+  use psb_sparse_mod, psb_protect_name => psb_camaxvs
+
   implicit none
 
   complex(psb_spk_), intent(in)   :: x(:)
@@ -437,11 +428,8 @@ end subroutine psb_camaxvs
 !    info   -  integer.             Return code
 !
 subroutine psb_cmamaxs(res,x,desc_a, info,jx)
-  use psb_penv_mod
-  use psb_serial_mod
-  use psb_descriptor_type
-  use psb_check_mod
-  use psb_error_mod
+  use psb_sparse_mod, psb_protect_name => psb_cmamaxs
+
   implicit none
 
   complex(psb_spk_), intent(in)   :: x(:,:)

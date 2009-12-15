@@ -31,7 +31,7 @@
 !!$  
 subroutine psb_sprc_aply(prec,x,y,desc_data,info,trans, work)
 
-  use psb_base_mod
+  use psb_sparse_mod
   use psb_prec_mod, psb_protect_name => psb_sprc_aply
   implicit none
 
@@ -137,7 +137,7 @@ end subroutine psb_sprc_aply
 !!$  
 subroutine psb_sprc_aply1(prec,x,desc_data,info,trans)
 
-  use psb_base_mod
+  use psb_sparse_mod
   use psb_prec_mod, psb_protect_name => psb_sprc_aply1
   implicit none
 

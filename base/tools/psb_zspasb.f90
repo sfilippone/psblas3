@@ -49,13 +49,8 @@
 ! 
 !
 subroutine psb_zspasb(a,desc_a, info, afmt, upd, dupl, mold)
-  use psb_descriptor_type
-  use psb_serial_mod
-  use psb_const_mod
+  use psb_sparse_mod, psb_protect_name => psb_zspasb
   use psi_mod
-  use psb_error_mod
-  use psb_string_mod
-  use psb_penv_mod
   implicit none
 
 

@@ -61,19 +61,14 @@
 !
 Subroutine psb_ccdbldext(a,desc_a,novr,desc_ov,info, extype)
 
-  use psb_tools_mod, psb_protect_name => psb_ccdbldext
-  use psb_serial_mod
-  use psb_descriptor_type
-  use psb_error_mod
-  use psb_penv_mod
-  use psb_realloc_mod
-  use psi_mod
+  use psb_sparse_mod, psb_protect_name => psb_ccdbldext
+
 #ifdef MPI_MOD
-    use mpi
+  use mpi
 #endif
   Implicit None
 #ifdef MPI_H
-    include 'mpif.h'
+  include 'mpif.h'
 #endif
 
   !     .. Array Arguments ..

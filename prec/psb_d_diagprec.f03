@@ -21,7 +21,7 @@ contains
   
 
   subroutine d_diag_apply(alpha,prec,x,beta,y,desc_data,info,trans,work)
-    use psb_base_mod
+    use psb_sparse_mod
     type(psb_desc_type),intent(in)    :: desc_data
     class(psb_d_diag_prec_type), intent(in)  :: prec
     real(psb_dpk_),intent(in)         :: x(:)
@@ -100,7 +100,7 @@ contains
 
   subroutine d_diag_precinit(prec,info)
     
-    use psb_base_mod
+    use psb_sparse_mod
     Implicit None
     
     class(psb_d_diag_prec_type),intent(inout) :: prec
@@ -128,7 +128,7 @@ contains
 
   subroutine d_diag_precbld(a,desc_a,prec,info,upd)
     
-    use psb_base_mod
+    use psb_sparse_mod
     Implicit None
     
     type(psb_d_sparse_mat), intent(in), target :: a
@@ -186,7 +186,7 @@ contains
 
   subroutine d_diag_precseti(prec,what,val,info)
     
-    use psb_base_mod
+    use psb_sparse_mod
     Implicit None
     
     class(psb_d_diag_prec_type),intent(inout) :: prec
@@ -214,7 +214,7 @@ contains
 
   subroutine d_diag_precsetr(prec,what,val,info)
     
-    use psb_base_mod
+    use psb_sparse_mod
     Implicit None
     
     class(psb_d_diag_prec_type),intent(inout) :: prec
@@ -242,7 +242,7 @@ contains
 
   subroutine d_diag_precsetc(prec,what,val,info)
     
-    use psb_base_mod
+    use psb_sparse_mod
     Implicit None
     
     class(psb_d_diag_prec_type),intent(inout) :: prec
@@ -270,7 +270,7 @@ contains
 
   subroutine d_diag_precfree(prec,info)
     
-    use psb_base_mod
+    use psb_sparse_mod
     Implicit None
 
     class(psb_d_diag_prec_type), intent(inout) :: prec
@@ -299,7 +299,7 @@ contains
 
   subroutine d_diag_precdescr(prec,iout)
     
-    use psb_base_mod
+    use psb_sparse_mod
     Implicit None
 
     class(psb_d_diag_prec_type), intent(in) :: prec
@@ -340,7 +340,7 @@ contains
   end subroutine d_diag_precdescr
 
   function d_diag_sizeof(prec) result(val)
-    use psb_base_mod
+    use psb_sparse_mod
     class(psb_d_diag_prec_type), intent(in) :: prec
     integer(psb_long_int_k_) :: val
     

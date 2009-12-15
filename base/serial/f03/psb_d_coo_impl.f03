@@ -1,9 +1,10 @@
 
 subroutine d_coo_cssm_impl(alpha,a,x,beta,y,info,trans) 
-  use psb_const_mod
-  use psb_error_mod
-  use psb_string_mod
-  use psb_d_base_mat_mod, psb_protect_name => d_coo_cssm_impl
+!!$  use psb_const_mod
+!!$  use psb_error_mod
+!!$  use psb_string_mod
+!!$  use psb_d_base_mat_mod, psb_protect_name => d_coo_cssm_impl
+  use psb_sparse_mod, psb_protect_name => d_coo_cssm_impl
   implicit none 
   class(psb_d_coo_sparse_mat), intent(in) :: a
   real(psb_dpk_), intent(in)          :: alpha, beta, x(:,:)

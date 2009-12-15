@@ -42,12 +42,7 @@
 !    desc  - type(psb_desc_type).         The communication descriptor.
 !    info    - integer.                       Eventually returns an error code
 subroutine psb_cd_inloc(v, ictxt, desc, info, globalcheck)
-  use psb_descriptor_type
-  use psb_serial_mod
-  use psb_const_mod
-  use psb_error_mod
-  use psi_mod
-  use psb_penv_mod
+  use psb_sparse_mod
   implicit None
   !....Parameters...
   Integer, intent(in)               :: ictxt, v(:)

@@ -75,15 +75,8 @@
 ! 
 subroutine  psb_zspsm(alpha,a,x,beta,y,desc_a,info,&
      & trans, scale, choice, diag, k, jx, jy, work)   
-
-  use psb_descriptor_type
-  use psb_comm_mod
+  use psb_sparse_mod, psb_protect_name => psb_zspsm
   use psi_mod
-  use psb_check_mod
-  use psb_error_mod
-  use psb_string_mod
-  use psb_penv_mod
-  use psb_mat_mod
   implicit none
 
   complex(psb_dpk_), intent(in)              :: alpha, beta
@@ -93,7 +86,7 @@ subroutine  psb_zspsm(alpha,a,x,beta,y,desc_a,info,&
   type(psb_desc_type), intent(in)           :: desc_a
   integer, intent(out)                      :: info
   complex(psb_dpk_), intent(in), optional, target      :: diag(:)
-  complex(psb_dpk_), optional, target       :: work(:)
+  complex(psb_dpk_), optional, target, intent(inout)   :: work(:)
   character, intent(in), optional           :: trans, scale
   integer, intent(in), optional             :: choice
   integer, intent(in), optional             :: k, jx, jy
@@ -361,14 +354,8 @@ end subroutine psb_zspsm
 ! 
 subroutine  psb_zspsv(alpha,a,x,beta,y,desc_a,info,&
      & trans, scale, choice, diag, work)   
-  use psb_descriptor_type
-  use psb_comm_mod
+  use psb_sparse_mod, psb_protect_name => psb_zspsv
   use psi_mod
-  use psb_check_mod
-  use psb_error_mod
-  use psb_string_mod
-  use psb_penv_mod
-  use psb_mat_mod
   implicit none 
 
   complex(psb_dpk_), intent(in)              :: alpha, beta
@@ -378,7 +365,7 @@ subroutine  psb_zspsv(alpha,a,x,beta,y,desc_a,info,&
   type(psb_desc_type), intent(in)           :: desc_a
   integer, intent(out)                      :: info
   complex(psb_dpk_), intent(in), optional, target    :: diag(:)
-  complex(psb_dpk_), optional, target      :: work(:)
+  complex(psb_dpk_), optional, target, intent(inout) :: work(:)
   character, intent(in), optional           :: trans, scale
   integer, intent(in), optional             :: choice
 

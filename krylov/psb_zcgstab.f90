@@ -94,7 +94,7 @@
 !                                         estimate of) residual. 
 !
 subroutine psb_zcgstab(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,istop)
-  use psb_base_mod
+  use psb_sparse_mod
   use psb_prec_mod
   use psb_krylov_mod, psb_protect_name => psb_zcgstab
   Implicit None

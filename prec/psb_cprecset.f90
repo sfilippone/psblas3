@@ -31,7 +31,7 @@
 !!$  
 subroutine psb_cprecseti(p,what,val,info)
 
-  use psb_base_mod
+  use psb_sparse_mod
   use psb_prec_mod, psb_protect_name => psb_cprecseti
   implicit none
   type(psb_cprec_type), intent(inout)    :: p
@@ -56,7 +56,7 @@ end subroutine psb_cprecseti
 
 subroutine psb_cprecsets(p,what,val,info)
 
-  use psb_base_mod
+  use psb_sparse_mod
   use psb_prec_mod, psb_protect_name => psb_cprecsets
   implicit none
   type(psb_cprec_type), intent(inout)    :: p

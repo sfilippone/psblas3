@@ -77,17 +77,17 @@ Module psb_base_tools_mod
   interface  psb_geall
     subroutine psb_ialloc(x, desc_a, info,n, lb)
       use psb_descriptor_type
-      integer, allocatable, intent(out)                 :: x(:,:)
-      type(psb_desc_type), intent(in)  :: desc_a
-      integer, intent(out)             :: info
-      integer, optional, intent(in)    :: n, lb
+      integer, allocatable, intent(out) :: x(:,:)
+      type(psb_desc_type), intent(in)   :: desc_a
+      integer, intent(out)              :: info
+      integer, optional, intent(in)     :: n, lb
     end subroutine psb_ialloc
     subroutine psb_iallocv(x, desc_a,info,n)
       use psb_descriptor_type
-      integer, allocatable, intent(out)                :: x(:)
-      type(psb_desc_type), intent(in) :: desc_a
-      integer                         :: info
-      integer, optional, intent(in)   :: n
+      integer, allocatable, intent(out) :: x(:)
+      type(psb_desc_type), intent(in)   :: desc_a
+      integer, intent(out)              :: info
+      integer, optional, intent(in)     :: n
     end subroutine psb_iallocv
   end interface
 
@@ -96,7 +96,7 @@ Module psb_base_tools_mod
     subroutine psb_iasb(x, desc_a, info)
       use psb_descriptor_type
       type(psb_desc_type), intent(in) ::  desc_a
-      integer, allocatable, intent(inout)                ::  x(:,:)
+      integer, allocatable, intent(inout)  ::  x(:,:)
       integer, intent(out)            ::  info
     end subroutine psb_iasb
     subroutine psb_iasbv(x, desc_a, info)
@@ -122,15 +122,15 @@ Module psb_base_tools_mod
   interface psb_gefree
     subroutine psb_ifree(x, desc_a, info)
       use psb_descriptor_type
-      integer,allocatable, intent(inout)                 :: x(:,:)
-      type(psb_desc_type), intent(in) :: desc_a
-      integer                         :: info
+      integer,allocatable, intent(inout) :: x(:,:)
+      type(psb_desc_type), intent(in)    :: desc_a
+      integer, intent(out)               :: info
     end subroutine psb_ifree
     subroutine psb_ifreev(x, desc_a, info)
       use psb_descriptor_type
-      integer, allocatable, intent(inout)                :: x(:)
-      type(psb_desc_type), intent(in) :: desc_a
-      integer                         :: info
+      integer, allocatable, intent(inout) :: x(:)
+      type(psb_desc_type), intent(in)     :: desc_a
+      integer, intent(out)                :: info
     end subroutine psb_ifreev
   end interface
 

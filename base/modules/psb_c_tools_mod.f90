@@ -70,7 +70,7 @@ Module psb_c_tools_mod
     Subroutine psb_csphalo(a,desc_a,blk,info,rowcnv,colcnv,&
          & rowscale,colscale,outfmt,data)
       use psb_descriptor_type
-      use psb_mat_mod
+      use psb_mat_mod, only : psb_c_sparse_mat
       Type(psb_c_sparse_mat),Intent(in)    :: a
       Type(psb_c_sparse_mat),Intent(inout) :: blk
       Type(psb_desc_type),Intent(in)      :: desc_a
@@ -86,13 +86,13 @@ Module psb_c_tools_mod
       use psb_descriptor_type
       complex(psb_spk_),allocatable, intent(inout)        :: x(:,:)
       type(psb_desc_type), intent(in) :: desc_a
-      integer                         :: info
+      integer, intent(out)            :: info
     end subroutine psb_cfree
     subroutine psb_cfreev(x, desc_a, info)
       use psb_descriptor_type
       complex(psb_spk_),allocatable, intent(inout)        :: x(:)
       type(psb_desc_type), intent(in) :: desc_a
-      integer                         :: info
+      integer, intent(out)            :: info
     end subroutine psb_cfreev
   end interface
 
@@ -124,7 +124,7 @@ Module psb_c_tools_mod
   interface psb_cdbldext
     Subroutine psb_ccdbldext(a,desc_a,novr,desc_ov,info,extype)
       use psb_descriptor_type
-      use psb_mat_mod
+      use psb_mat_mod, only : psb_c_sparse_mat
       integer, intent(in)                     :: novr
       Type(psb_c_sparse_mat), Intent(in)       :: a
       Type(psb_desc_type), Intent(in), target :: desc_a
@@ -137,7 +137,7 @@ Module psb_c_tools_mod
   interface psb_spall
     subroutine psb_cspalloc(a, desc_a, info, nnz)
       use psb_descriptor_type
-      use psb_mat_mod
+      use psb_mat_mod, only : psb_c_sparse_mat
       type(psb_desc_type), intent(inout) :: desc_a
       type(psb_c_sparse_mat), intent(out) :: a
       integer, intent(out)               :: info
@@ -148,7 +148,7 @@ Module psb_c_tools_mod
   interface psb_spasb
     subroutine psb_cspasb(a,desc_a, info, afmt, upd, dupl,mold)
       use psb_descriptor_type
-      use psb_mat_mod
+      use psb_mat_mod, only : psb_c_sparse_mat, psb_c_base_sparse_mat
       type(psb_c_sparse_mat), intent (inout)   :: a
       type(psb_desc_type), intent(in)         :: desc_a
       integer, intent(out)                    :: info
@@ -161,7 +161,7 @@ Module psb_c_tools_mod
   interface psb_spfree
     subroutine psb_cspfree(a, desc_a,info)
       use psb_descriptor_type
-      use psb_mat_mod
+      use psb_mat_mod, only : psb_c_sparse_mat
       type(psb_desc_type), intent(in) :: desc_a
       type(psb_c_sparse_mat), intent(inout)      ::a
       integer, intent(out)        :: info
@@ -172,7 +172,7 @@ Module psb_c_tools_mod
   interface psb_spins
     subroutine psb_cspins(nz,ia,ja,val,a,desc_a,info,rebuild)
       use psb_descriptor_type
-      use psb_mat_mod
+      use psb_mat_mod, only : psb_c_sparse_mat
       type(psb_desc_type), intent(inout)   :: desc_a
       type(psb_c_sparse_mat), intent(inout) :: a
       integer, intent(in)                  :: nz,ia(:),ja(:)
@@ -182,7 +182,7 @@ Module psb_c_tools_mod
     end subroutine psb_cspins
     subroutine psb_cspins_2desc(nz,ia,ja,val,a,desc_ar,desc_ac,info)
       use psb_descriptor_type
-      use psb_mat_mod
+      use psb_mat_mod, only : psb_c_sparse_mat
       type(psb_desc_type), intent(in)      :: desc_ar
       type(psb_desc_type), intent(inout)   :: desc_ac
       type(psb_c_sparse_mat), intent(inout) :: a
@@ -196,7 +196,7 @@ Module psb_c_tools_mod
   interface psb_sprn
     subroutine psb_csprn(a, desc_a,info,clear)
       use psb_descriptor_type
-      use psb_mat_mod
+      use psb_mat_mod, only : psb_c_sparse_mat
       type(psb_desc_type), intent(in)      :: desc_a
       type(psb_c_sparse_mat), intent(inout) :: a
       integer, intent(out)                 :: info
@@ -219,7 +219,8 @@ Module psb_c_tools_mod
 
 contains
   subroutine psb_clinmap_init(a_map,cd_xt,descin,descout)
-    use psb_mat_mod
+    use psb_base_tools_mod
+    use psb_c_mat_mod
     use psb_descriptor_type
     use psb_serial_mod
     use psb_penv_mod
@@ -251,7 +252,8 @@ contains
   end subroutine psb_clinmap_init
 
   subroutine psb_clinmap_ins(nz,ir,ic,val,a_map,cd_xt,descin,descout)
-    use psb_mat_mod
+    use psb_base_tools_mod
+    use psb_c_mat_mod
     use psb_descriptor_type
     implicit none 
     integer, intent(in)                  :: nz
@@ -267,7 +269,8 @@ contains
   end subroutine psb_clinmap_ins
 
   subroutine psb_clinmap_asb(a_map,cd_xt,descin,descout,afmt)
-    use psb_mat_mod
+    use psb_base_tools_mod
+    use psb_c_mat_mod
     use psb_descriptor_type
     use psb_serial_mod
     implicit none 

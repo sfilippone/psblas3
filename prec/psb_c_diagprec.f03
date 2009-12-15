@@ -21,7 +21,7 @@ contains
   
 
   subroutine c_diag_apply(alpha,prec,x,beta,y,desc_data,info,trans,work)
-    use psb_base_mod
+    use psb_sparse_mod
     type(psb_desc_type),intent(in)    :: desc_data
     class(psb_c_diag_prec_type), intent(in)  :: prec
     complex(psb_spk_),intent(in)         :: x(:)
@@ -123,7 +123,7 @@ contains
 
   subroutine c_diag_precinit(prec,info)
     
-    use psb_base_mod
+    use psb_sparse_mod
     Implicit None
     
     class(psb_c_diag_prec_type),intent(inout) :: prec
@@ -151,7 +151,7 @@ contains
 
   subroutine c_diag_precbld(a,desc_a,prec,info,upd)
     
-    use psb_base_mod
+    use psb_sparse_mod
     Implicit None
     
     type(psb_c_sparse_mat), intent(in), target :: a
@@ -209,7 +209,7 @@ contains
 
   subroutine c_diag_precseti(prec,what,val,info)
     
-    use psb_base_mod
+    use psb_sparse_mod
     Implicit None
     
     class(psb_c_diag_prec_type),intent(inout) :: prec
@@ -237,7 +237,7 @@ contains
 
   subroutine c_diag_precsetr(prec,what,val,info)
     
-    use psb_base_mod
+    use psb_sparse_mod
     Implicit None
     
     class(psb_c_diag_prec_type),intent(inout) :: prec
@@ -265,7 +265,7 @@ contains
 
   subroutine c_diag_precsetc(prec,what,val,info)
     
-    use psb_base_mod
+    use psb_sparse_mod
     Implicit None
     
     class(psb_c_diag_prec_type),intent(inout) :: prec
@@ -293,7 +293,7 @@ contains
 
   subroutine c_diag_precfree(prec,info)
     
-    use psb_base_mod
+    use psb_sparse_mod
     Implicit None
 
     class(psb_c_diag_prec_type), intent(inout) :: prec
@@ -322,7 +322,7 @@ contains
 
   subroutine c_diag_precdescr(prec,iout)
     
-    use psb_base_mod
+    use psb_sparse_mod
     Implicit None
 
     class(psb_c_diag_prec_type), intent(in) :: prec
@@ -363,7 +363,7 @@ contains
   end subroutine c_diag_precdescr
 
   function c_diag_sizeof(prec) result(val)
-    use psb_base_mod
+    use psb_sparse_mod
     class(psb_c_diag_prec_type), intent(in) :: prec
     integer(psb_long_int_k_) :: val
     

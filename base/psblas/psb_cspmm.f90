@@ -64,16 +64,8 @@
 ! 
 subroutine  psb_cspmm(alpha,a,x,beta,y,desc_a,info,&
      & trans, k, jx, jy, work, doswap)   
-
-  use psb_serial_mod
-  use psb_descriptor_type
-  use psb_comm_mod
+  use psb_sparse_mod, psb_protect_name => psb_cspmm
   use psi_mod
-  use psb_check_mod
-  use psb_error_mod
-  use psb_string_mod
-  use psb_penv_mod
-  use psb_mat_mod
   implicit none
 
   complex(psb_spk_), intent(in)             :: alpha, beta
@@ -82,7 +74,7 @@ subroutine  psb_cspmm(alpha,a,x,beta,y,desc_a,info,&
   type(psb_c_sparse_mat), intent(in)        :: a
   type(psb_desc_type), intent(in)          :: desc_a
   integer, intent(out)                     :: info
-  complex(psb_spk_), optional, target      :: work(:)
+  complex(psb_spk_), optional, target, intent(inout)  :: work(:)
   character, intent(in), optional          :: trans
   integer, intent(in), optional            :: k, jx, jy
   logical, intent(in), optional            :: doswap
@@ -424,16 +416,8 @@ end subroutine psb_cspmm
 ! 
 subroutine  psb_cspmv(alpha,a,x,beta,y,desc_a,info,&
      & trans, work, doswap)   
-
-  use psb_descriptor_type
-  use psb_comm_mod
-  use psb_const_mod
+  use psb_sparse_mod, psb_protect_name => psb_cspmv
   use psi_mod
-  use psb_check_mod
-  use psb_error_mod
-  use psb_string_mod
-  use psb_penv_mod
-  use psb_mat_mod
   implicit none
 
   complex(psb_spk_), intent(in)             :: alpha, beta
@@ -442,7 +426,7 @@ subroutine  psb_cspmv(alpha,a,x,beta,y,desc_a,info,&
   type(psb_c_sparse_mat), intent(in)        :: a
   type(psb_desc_type), intent(in)          :: desc_a
   integer, intent(out)                     :: info
-  complex(psb_spk_), optional, target    :: work(:)
+  complex(psb_spk_), optional, target, intent(inout) :: work(:)
   character, intent(in), optional          :: trans
   logical, intent(in), optional            :: doswap
 

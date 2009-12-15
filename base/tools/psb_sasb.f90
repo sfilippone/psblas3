@@ -43,13 +43,7 @@
 !    desc_a  - type(psb_desc_type).  The communication descriptor.
 !    info    - integer.                return code
 subroutine psb_sasb(x, desc_a, info)
-  !....assembly dense matrix x .....
-  use psb_descriptor_type
-  use psb_const_mod
-  use psb_comm_mod
-  use psb_error_mod
-  use psb_realloc_mod
-  use psb_penv_mod
+  use psb_sparse_mod, psb_protect_name => psb_sasb
   implicit none
 
   type(psb_desc_type), intent(in) ::  desc_a
@@ -182,13 +176,7 @@ end subroutine psb_sasb
 !    desc_a  - type(psb_desc_type).  The communication descriptor.
 !    info    - integer.                Return code
 subroutine psb_sasbv(x, desc_a, info)
-  !....assembly dense matrix x .....
-  use psb_descriptor_type
-  use psb_const_mod
-  use psb_comm_mod
-  use psb_error_mod
-  use psb_realloc_mod
-  use psb_penv_mod
+  use psb_sparse_mod, psb_protect_name => psb_sasbv
   implicit none
 
   type(psb_desc_type), intent(in) ::  desc_a

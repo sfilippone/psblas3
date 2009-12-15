@@ -47,12 +47,7 @@
 !                                         owned by the process, i.e. excludes halo.
 !
 subroutine psb_glob_to_loc2(x,y,desc_a,info,iact,owned)
-
-  use psb_descriptor_type
-  use psb_const_mod
-  use psb_error_mod
-  use psb_string_mod
-  use psb_penv_mod
+  use psb_sparse_mod, psb_protect_name => psb_glob_to_loc2
   use psi_mod
   implicit none
 
@@ -171,12 +166,7 @@ end subroutine psb_glob_to_loc2
 !                                         owned by the process, i.e. excludes halo.
 !
 subroutine psb_glob_to_loc(x,desc_a,info,iact,owned)
-
-  use psb_penv_mod
-  use psb_descriptor_type
-  use psb_const_mod
-  use psb_error_mod
-  use psb_string_mod
+  use psb_sparse_mod, psb_protect_name => psb_glob_to_loc
   use psi_mod
   implicit none
 
@@ -252,8 +242,7 @@ subroutine psb_glob_to_loc(x,desc_a,info,iact,owned)
 end subroutine psb_glob_to_loc
 
 subroutine psb_glob_to_loc2s(x,y,desc_a,info,iact,owned)
-  use psb_descriptor_type
-  use psb_tools_mod, psb_protect_name => psb_glob_to_loc2s
+  use psb_sparse_mod, psb_protect_name => psb_glob_to_loc2s
   implicit none 
   type(psb_desc_type), intent(in)    ::  desc_a
   integer,intent(in)                 ::  x
@@ -270,8 +259,7 @@ subroutine psb_glob_to_loc2s(x,y,desc_a,info,iact,owned)
 end subroutine psb_glob_to_loc2s
 
 subroutine psb_glob_to_locs(x,desc_a,info,iact,owned)
-  use psb_descriptor_type
-  use psb_tools_mod, psb_protect_name => psb_glob_to_locs
+  use psb_sparse_mod, psb_protect_name => psb_glob_to_locs
   implicit none 
   type(psb_desc_type), intent(in)    ::  desc_a
   integer,intent(inout)              ::  x  

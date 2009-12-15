@@ -96,7 +96,7 @@ contains
     !     on entry: specifies processor holding a_glob. default: 0
     !     on exit : unchanged.
     !
-    use psb_base_mod
+    use psb_sparse_mod
     use psb_mat_mod
     implicit none
 
@@ -541,7 +541,7 @@ contains
     !     on entry: specifies processor holding a_glob. default: 0
     !     on exit : unchanged.
     !
-    use psb_base_mod
+    use psb_sparse_mod
     use psb_mat_mod
     implicit none
 
@@ -986,7 +986,7 @@ contains
     !     on entry: specifies processor holding a_glob. default: 0
     !     on exit : unchanged.
     !
-    use psb_base_mod
+    use psb_sparse_mod
     use psb_mat_mod
     implicit none
 
@@ -1431,7 +1431,7 @@ contains
     !     on entry: specifies processor holding a_glob. default: 0
     !     on exit : unchanged.
     !
-    use psb_base_mod
+    use psb_sparse_mod
     use psb_mat_mod
     implicit none
 

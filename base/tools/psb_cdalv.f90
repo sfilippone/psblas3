@@ -44,12 +44,7 @@
 !    info    - integer.                       Return code
 !    flag    - integer.                       Are V's contents 0- or 1-based?
 subroutine psb_cdalv(v, ictxt, desc, info, flag)
-  use psb_descriptor_type
-  use psb_serial_mod
-  use psb_const_mod
-  use psb_error_mod
-  use psi_mod
-  use psb_penv_mod
+  use psb_sparse_mod
   implicit None
   !....Parameters...
   Integer, intent(in)               :: ictxt, v(:)

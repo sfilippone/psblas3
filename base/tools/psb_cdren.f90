@@ -45,13 +45,8 @@
 !    info     - integer.                       Return code
 !
 subroutine psb_cdren(trans,iperm,desc_a,info)
-  use psb_descriptor_type
-  use psb_const_mod
-  use psb_error_mod
-  use psb_serial_mod
-  use psb_penv_mod
+  use psb_sparse_mod, psb_protect_name => psb_cdren
   use psi_mod
-  use psb_string_mod
   implicit none
 
 

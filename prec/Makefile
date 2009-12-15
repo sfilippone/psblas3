@@ -32,7 +32,7 @@ lib:  $(OBJS)
 	/bin/cp -p $(HERE)/$(LIBNAME) $(LIBDIR)
 	/bin/cp -p $(LIBMOD) $(LOCAL_MODS) $(LIBDIR)
 
-$(OBJS): $(LIBDIR)/psb_base_mod$(.mod)
+$(OBJS): $(LIBDIR)/psb_sparse_mod$(.mod)
 
 $(F90OBJS): $(MODOBJS)
 

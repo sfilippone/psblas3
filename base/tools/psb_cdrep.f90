@@ -29,8 +29,6 @@
 !!$  POSSIBILITY OF SUCH DAMAGE.
 !!$ 
 !!$  
-subroutine psb_cdrep(m, ictxt, desc, info)
-
   !  Purpose
   !  =======
   !  
@@ -103,13 +101,9 @@ subroutine psb_cdrep(m, ictxt, desc, info)
   ! END OF desc OUTPUT FIELDS
   !
   !
-
-  use psb_descriptor_type
-  use psb_serial_mod
-  use psb_const_mod
-  use psb_error_mod
+subroutine psb_cdrep(m, ictxt, desc, info)
+  use psb_sparse_mod
   use psi_mod
-  use psb_penv_mod
   implicit None
   !....Parameters...
   Integer, intent(in)               :: m,ictxt

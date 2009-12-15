@@ -32,7 +32,7 @@
 
 function psb_c_linmap(map_kind,desc_X, desc_Y, map_X2Y, map_Y2X,iaggr,naggr) result(this)
 
-  use psb_base_mod, psb_protect_name => psb_c_linmap
+  use psb_sparse_mod, psb_protect_name => psb_c_linmap
 
   implicit none 
   type(psb_clinmap_type)         :: this
@@ -108,7 +108,7 @@ end function psb_c_linmap
 
 function psb_d_linmap(map_kind,desc_X, desc_Y, map_X2Y, map_Y2X,iaggr,naggr) result(this)
 
-  use psb_base_mod, psb_protect_name => psb_d_linmap
+  use psb_sparse_mod, psb_protect_name => psb_d_linmap
 
   implicit none 
   type(psb_dlinmap_type)         :: this
@@ -190,7 +190,7 @@ end function psb_d_linmap
 
 function psb_s_linmap(map_kind,desc_X, desc_Y, map_X2Y, map_Y2X,iaggr,naggr) result(this)
 
-  use psb_base_mod, psb_protect_name => psb_s_linmap
+  use psb_sparse_mod, psb_protect_name => psb_s_linmap
 
   implicit none 
   type(psb_slinmap_type)             :: this
@@ -269,7 +269,7 @@ end function psb_s_linmap
 
 function psb_z_linmap(map_kind,desc_X, desc_Y, map_X2Y, map_Y2X,iaggr,naggr) result(this)
 
-  use psb_base_mod, psb_protect_name => psb_z_linmap
+  use psb_sparse_mod, psb_protect_name => psb_z_linmap
 
   implicit none 
   type(psb_zlinmap_type)         :: this

@@ -42,12 +42,7 @@
 !    clear    - logical, optional               Whether the coefficients should be zeroed
 !                                               default .true.          
 Subroutine psb_dsprn(a, desc_a,info,clear)
-
-  use psb_descriptor_type
-  use psb_serial_mod
-  use psb_const_mod
-  use psb_error_mod
-  use psb_penv_mod
+  use psb_sparse_mod, psb_protect_name => psb_dsprn
   Implicit None
 
   !....Parameters...

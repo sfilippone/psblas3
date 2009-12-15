@@ -46,13 +46,8 @@
 !    jla(:)   - integer, optional              The col indices in local numbering
 !
 subroutine psb_cdinsrc(nz,ia,ja,desc_a,info,ila,jla)
-  use psb_descriptor_type
-  use psb_serial_mod
-  use psb_const_mod
-  use psb_error_mod
-  use psb_penv_mod
+  use psb_sparse_mod, psb_protect_name => psb_cdinsrc
   use psi_mod
-  use psb_tools_mod, psb_protect_name => psb_cdinsrc
   implicit none
 
   !....PARAMETERS...
@@ -171,14 +166,8 @@ end subroutine psb_cdinsrc
 !    mask(:)  - logical, optional, target
 !
 subroutine psb_cdinsc(nz,ja,desc,info,jla,mask)
-  
-  use psb_descriptor_type
-  use psb_serial_mod
-  use psb_const_mod
-  use psb_error_mod
-  use psb_penv_mod
+  use psb_sparse_mod, psb_protect_name => psb_cdinsc
   use psi_mod
-  use psb_tools_mod, psb_protect_name => psb_cdinsc
   implicit none
 
   !....PARAMETERS...

@@ -76,15 +76,8 @@
 ! 
 subroutine  psb_sspsm(alpha,a,x,beta,y,desc_a,info,&
      & trans, scale, choice, diag, k, jx, jy, work)   
-
-  use psb_descriptor_type
-  use psb_comm_mod
+  use psb_sparse_mod, psb_protect_name => psb_sspsm
   use psi_mod
-  use psb_check_mod
-  use psb_error_mod
-  use psb_string_mod
-  use psb_penv_mod
-  use psb_mat_mod
   implicit none
 
   real(psb_spk_), intent(in)              :: alpha, beta
@@ -94,7 +87,7 @@ subroutine  psb_sspsm(alpha,a,x,beta,y,desc_a,info,&
   type(psb_desc_type), intent(in)           :: desc_a
   integer, intent(out)                      :: info
   real(psb_spk_), intent(in), optional, target      :: diag(:)
-  real(psb_spk_), optional, target       :: work(:)
+  real(psb_spk_), optional, target, intent(inout)   :: work(:)
   character, intent(in), optional           :: trans, scale
   integer, intent(in), optional             :: choice
   integer, intent(in), optional             :: k, jx, jy
@@ -362,14 +355,8 @@ end subroutine psb_sspsm
 ! 
 subroutine  psb_sspsv(alpha,a,x,beta,y,desc_a,info,&
      & trans, scale, choice, diag, work)   
-  use psb_descriptor_type
-  use psb_comm_mod
+  use psb_sparse_mod, psb_protect_name => psb_sspsv
   use psi_mod
-  use psb_check_mod
-  use psb_error_mod
-  use psb_string_mod
-  use psb_penv_mod
-  use psb_mat_mod
   implicit none 
 
   real(psb_spk_), intent(in)              :: alpha, beta
@@ -379,7 +366,7 @@ subroutine  psb_sspsv(alpha,a,x,beta,y,desc_a,info,&
   type(psb_desc_type), intent(in)           :: desc_a
   integer, intent(out)                      :: info
   real(psb_spk_), intent(in), optional, target    :: diag(:)
-  real(psb_spk_), optional, target        :: work(:)
+  real(psb_spk_), optional, target, intent(inout) :: work(:)
   character, intent(in), optional           :: trans, scale
   integer, intent(in), optional             :: choice
 

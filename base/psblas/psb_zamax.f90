@@ -309,11 +309,7 @@ end function psb_zamaxv
 !    jx     -  integer(optional).   The column offset.
 !
 subroutine psb_zamaxvs(res,x,desc_a, info)
-  use psb_penv_mod
-  use psb_serial_mod
-  use psb_descriptor_type
-  use psb_check_mod
-  use psb_error_mod
+  use psb_sparse_mod, psb_protect_name => psb_zamaxvs
   implicit none
 
   complex(psb_dpk_), intent(in)   :: x(:)
@@ -437,11 +433,7 @@ end subroutine psb_zamaxvs
 !    info   -  integer.             Return code
 !
 subroutine psb_zmamaxs(res,x,desc_a, info,jx)
-  use psb_penv_mod
-  use psb_serial_mod
-  use psb_descriptor_type
-  use psb_check_mod
-  use psb_error_mod
+  use psb_sparse_mod, psb_protect_name => psb_zmamaxs
   implicit none
 
   complex(psb_dpk_), intent(in)   :: x(:,:)
