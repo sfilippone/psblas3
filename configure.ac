@@ -43,7 +43,7 @@ AC_INIT([PSBLAS],3.0, salvatore.filippone@uniroma2.it)
 psblas_cv_version="3.0"
 
 # A sample source file
-AC_CONFIG_SRCDIR([base/modules/psb_base_mod.f90])
+AC_CONFIG_SRCDIR([base/modules/psb_sparse_mod.f90])
 dnl AC_CONFIG_AUX_DIR(config)
 
 # Our custom M4 macros are in the 'config' directory

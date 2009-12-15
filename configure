@@ -600,7 +600,7 @@ PACKAGE_VERSION='3.0'
 PACKAGE_STRING='PSBLAS 3.0'
 PACKAGE_BUGREPORT='salvatore.filippone@uniroma2.it'
 
-ac_unique_file="base/modules/psb_base_mod.f90"
+ac_unique_file="base/modules/psb_sparse_mod.f90"
 # Factoring default headers for most tests.
 ac_includes_default="\
 #include <stdio.h>
