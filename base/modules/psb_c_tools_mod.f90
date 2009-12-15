@@ -38,14 +38,14 @@ Module psb_c_tools_mod
       implicit none
       complex(psb_spk_), allocatable, intent(out)    :: x(:,:)
       type(psb_desc_type), intent(in) :: desc_a
-      integer                         :: info
+      integer, intent(out)            :: info
       integer, optional, intent(in)   :: n, lb
     end subroutine psb_calloc
     subroutine psb_callocv(x, desc_a,info,n)
       use psb_descriptor_type
       complex(psb_spk_), allocatable, intent(out)    :: x(:)
       type(psb_desc_type), intent(in) :: desc_a
-      integer                         :: info
+      integer, intent(out)            :: info
       integer, optional, intent(in)   :: n
     end subroutine psb_callocv
   end interface

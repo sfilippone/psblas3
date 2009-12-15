@@ -1,8 +1,8 @@
 module psb_c_mat_mod
 
   use psb_c_base_mat_mod
-  use psb_c_csr_mat_mod
-  use psb_c_csc_mat_mod
+  use psb_c_csr_mat_mod, only : psb_c_csr_sparse_mat
+  use psb_c_csc_mat_mod, only : psb_c_csc_sparse_mat
 
   type :: psb_c_sparse_mat
 

@@ -37,14 +37,14 @@ Module psb_z_tools_mod
       implicit none
       complex(psb_dpk_), allocatable, intent(out)    :: x(:,:)
       type(psb_desc_type), intent(in) :: desc_a
-      integer                         :: info
+      integer, intent(out)            :: info
       integer, optional, intent(in)   :: n, lb
     end subroutine psb_zalloc
     subroutine psb_zallocv(x, desc_a,info,n)
       use psb_descriptor_type
       complex(psb_dpk_), allocatable, intent(out)    :: x(:)
       type(psb_desc_type), intent(in) :: desc_a
-      integer                         :: info
+      integer, intent(out)            :: info
       integer, optional, intent(in)   :: n
     end subroutine psb_zallocv
   end interface

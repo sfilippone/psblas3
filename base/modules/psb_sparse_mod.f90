@@ -29,7 +29,7 @@
 !!$  POSSIBILITY OF SUCH DAMAGE.
 !!$ 
 !!$  
-module psb_base_mod
+module psb_sparse_mod
   use psb_string_mod
   use psb_error_mod
   use psb_penv_mod
@@ -42,4 +42,4 @@ module psb_base_mod
   use psb_psblas_mod
   use psb_gps_mod
   use psb_tools_mod
-end module psb_base_mod
+end module psb_sparse_mod

@@ -19,8 +19,8 @@ UTIL_MODS = psb_string_mod.o \
 
 MODULES=$(BASIC_MODS) $(UTIL_MODS)
 
-LIBMOD=psb_base_mod$(.mod)
-OBJS = error.o psb_base_mod.o $(EXTRA_COBJS) cutil.o
+LIBMOD=psb_sparse_mod$(.mod)
+OBJS = error.o psb_sparse_mod.o $(EXTRA_COBJS) cutil.o
 LIBDIR=..
 CINCLUDES=-I. 
 FINCLUDES=$(FMFLAG)$(LIBDIR) $(FMFLAG). $(FIFLAG).
@@ -67,7 +67,7 @@ psb_psblas_mod.o: psb_mat_mod.o psb_desc_type.o
 psb_gps_mod.o:	psb_realloc_mod.o
 psb_hash_mod.o: psb_const_mod.o psb_realloc_mod.o
 
-psb_base_mod.o: $(MODULES)
+psb_sparse_mod.o: $(MODULES)
 
 newmods: $(BASIC_MODS)
 	(cd ../newserial; make lib LIBNAME=$(LIBNAME))
