@@ -43,6 +43,7 @@
 !    info    - integer.                       Eventually returns an error code
 subroutine psb_cd_inloc(v, ictxt, desc, info, globalcheck)
   use psb_sparse_mod
+  use psi_mod
   implicit None
   !....Parameters...
   Integer, intent(in)               :: ictxt, v(:)

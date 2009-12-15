@@ -40,9 +40,7 @@
 !
 
 subroutine psb_csymbmm(a,b,c,info)
-  use psb_mat_mod
-  use psb_string_mod
-  use psb_serial_mod, psb_protect_name => psb_csymbmm
+  use psb_sparse_mod, psb_protect_name => psb_csymbmm
   implicit none 
 
   type(psb_c_sparse_mat), intent(in)    :: a,b

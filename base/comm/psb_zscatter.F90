@@ -44,14 +44,10 @@
 !                                              If -1 all the processes have a copy. 
 !                                              Default -1
 subroutine  psb_zscatterm(globx, locx, desc_a, info, iroot)
-
-  use psb_descriptor_type
-  use psb_check_mod
-  use psb_error_mod
+  use psb_sparse_mod, psb_protect_name => psb_zscatterm
 #ifdef MPI_MOD
   use mpi
 #endif
-  use psb_penv_mod
   implicit none
 #ifdef MPI_H
   include 'mpif.h'
@@ -276,13 +272,10 @@ end subroutine psb_zscatterm
 !                                              the processes have a copy.
 !
 subroutine  psb_zscatterv(globx, locx, desc_a, info, iroot)
-  use psb_descriptor_type
-  use psb_check_mod
-  use psb_error_mod
+  use psb_sparse_mod, psb_protect_name => psb_zscatterv
 #ifdef MPI_MOD
   use mpi
 #endif
-  use psb_penv_mod
   implicit none
 #ifdef MPI_H
   include 'mpif.h'

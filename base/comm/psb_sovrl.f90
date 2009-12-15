@@ -64,20 +64,15 @@
 !
 !
 subroutine  psb_sovrlm(x,desc_a,info,jx,ik,work,update,mode)
-  use psb_descriptor_type
-  use psb_const_mod
+  use psb_sparse_mod, psb_protect_name => psb_sovrlm
   use psi_mod
-  use psb_realloc_mod
-  use psb_check_mod
-  use psb_error_mod
-  use psb_penv_mod
   implicit none
 
   real(psb_spk_), intent(inout), target   :: x(:,:)
-  type(psb_desc_type), intent(in)           :: desc_a
-  integer, intent(out)                      :: info
-  real(psb_spk_), optional, target        :: work(:)
-  integer, intent(in), optional             :: update,jx,ik,mode
+  type(psb_desc_type), intent(in)         :: desc_a
+  integer, intent(out)                    :: info
+  real(psb_spk_), optional, target, intent(inout) :: work(:)
+  integer, intent(in), optional           :: update,jx,ik,mode
 
   ! locals
   integer                  :: ictxt, np, me, &
@@ -271,20 +266,15 @@ end subroutine psb_sovrlm
 !
 !
 subroutine  psb_sovrlv(x,desc_a,info,work,update,mode)
-  use psb_descriptor_type
+  use psb_sparse_mod, psb_protect_name => psb_sovrlv
   use psi_mod
-  use psb_const_mod
-  use psb_realloc_mod
-  use psb_check_mod
-  use psb_error_mod
-  use psb_penv_mod
   implicit none
 
   real(psb_spk_), intent(inout), target   :: x(:)
-  type(psb_desc_type), intent(in)           :: desc_a
-  integer, intent(out)                      :: info
-  real(psb_spk_), optional, target        :: work(:)
-  integer, intent(in), optional             :: update,mode
+  type(psb_desc_type), intent(in)         :: desc_a
+  integer, intent(out)                    :: info
+  real(psb_spk_), optional, target, intent(inout)  :: work(:)
+  integer, intent(in), optional           :: update,mode
 
   ! locals
   integer                  :: ictxt, np, me, &

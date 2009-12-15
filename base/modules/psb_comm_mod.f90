@@ -37,7 +37,7 @@ module psb_comm_mod
       real(psb_spk_), intent(inout)           :: x(:,:)
       type(psb_desc_type), intent(in)         :: desc_a
       integer, intent(out)                    :: info
-      real(psb_spk_), intent(inout), optional :: work(:)
+      real(psb_spk_), intent(inout), optional, target :: work(:)
       integer, intent(in), optional           :: update,jx,ik,mode
     end subroutine psb_sovrlm
     subroutine  psb_sovrlv(x,desc_a,info,work,update,mode)
@@ -45,7 +45,7 @@ module psb_comm_mod
       real(psb_spk_), intent(inout)           :: x(:)
       type(psb_desc_type), intent(in)         :: desc_a
       integer, intent(out)                    :: info
-      real(psb_spk_), intent(inout), optional :: work(:)
+      real(psb_spk_), intent(inout), optional, target :: work(:)
       integer, intent(in), optional           :: update,mode
     end subroutine psb_sovrlv
     subroutine  psb_dovrlm(x,desc_a,info,jx,ik,work,update,mode)
@@ -53,7 +53,7 @@ module psb_comm_mod
       real(psb_dpk_), intent(inout)           :: x(:,:)
       type(psb_desc_type), intent(in)         :: desc_a
       integer, intent(out)                    :: info
-      real(psb_dpk_), intent(inout), optional :: work(:)
+      real(psb_dpk_), intent(inout), optional, target :: work(:)
       integer, intent(in), optional           :: update,jx,ik,mode
     end subroutine psb_dovrlm
     subroutine  psb_dovrlv(x,desc_a,info,work,update,mode)
@@ -61,7 +61,7 @@ module psb_comm_mod
       real(psb_dpk_), intent(inout)           :: x(:)
       type(psb_desc_type), intent(in)         :: desc_a
       integer, intent(out)                    :: info
-      real(psb_dpk_), intent(inout), optional :: work(:)
+      real(psb_dpk_), intent(inout), optional, target :: work(:)
       integer, intent(in), optional           :: update,mode
     end subroutine psb_dovrlv
     subroutine  psb_iovrlm(x,desc_a,info,jx,ik,work,update,mode)
@@ -69,7 +69,7 @@ module psb_comm_mod
       integer,          intent(inout)         :: x(:,:)
       type(psb_desc_type), intent(in)         :: desc_a
       integer, intent(out)                    :: info
-      integer, intent(inout), optional        :: work(:)
+      integer, intent(inout), optional, target  :: work(:)
       integer, intent(in), optional           :: update,jx,ik,mode
     end subroutine psb_iovrlm
     subroutine  psb_iovrlv(x,desc_a,info,work,update,mode)
@@ -77,7 +77,7 @@ module psb_comm_mod
       integer, intent(inout)                  :: x(:)
       type(psb_desc_type), intent(in)         :: desc_a
       integer, intent(out)                    :: info
-      integer, intent(inout), optional        :: work(:)
+      integer, intent(inout), optional, target :: work(:)
       integer, intent(in), optional           :: update,mode
     end subroutine psb_iovrlv
     subroutine  psb_covrlm(x,desc_a,info,jx,ik,work,update,mode)
@@ -85,7 +85,7 @@ module psb_comm_mod
       complex(psb_spk_), intent(inout)           :: x(:,:)
       type(psb_desc_type), intent(in)            :: desc_a
       integer, intent(out)                       :: info
-      complex(psb_spk_), intent(inout), optional :: work(:)
+      complex(psb_spk_), intent(inout), optional, target :: work(:)
       integer, intent(in), optional              :: update,jx,ik,mode
     end subroutine psb_covrlm
     subroutine  psb_covrlv(x,desc_a,info,work,update,mode)
@@ -93,7 +93,7 @@ module psb_comm_mod
       complex(psb_spk_), intent(inout)           :: x(:)
       type(psb_desc_type), intent(in)            :: desc_a
       integer, intent(out)                       :: info
-      complex(psb_spk_), intent(inout), optional :: work(:)
+      complex(psb_spk_), intent(inout), optional, target :: work(:)
       integer, intent(in), optional              :: update,mode
     end subroutine psb_covrlv
     subroutine  psb_zovrlm(x,desc_a,info,jx,ik,work,update,mode)
@@ -101,7 +101,7 @@ module psb_comm_mod
       complex(psb_dpk_), intent(inout)           :: x(:,:)
       type(psb_desc_type), intent(in)            :: desc_a
       integer, intent(out)                       :: info
-      complex(psb_dpk_), intent(inout), optional :: work(:)
+      complex(psb_dpk_), intent(inout), optional, target :: work(:)
       integer, intent(in), optional              :: update,jx,ik,mode
     end subroutine psb_zovrlm
     subroutine  psb_zovrlv(x,desc_a,info,work,update,mode)
@@ -109,7 +109,7 @@ module psb_comm_mod
       complex(psb_dpk_), intent(inout)           :: x(:)
       type(psb_desc_type), intent(in)            :: desc_a
       integer, intent(out)                       :: info
-      complex(psb_dpk_), intent(inout), optional :: work(:)
+      complex(psb_dpk_), intent(inout), optional, target :: work(:)
       integer, intent(in), optional              :: update,mode
     end subroutine psb_zovrlv
   end interface
@@ -121,7 +121,7 @@ module psb_comm_mod
       type(psb_desc_type), intent(in)         :: desc_a
       integer, intent(out)                    :: info
       real(psb_spk_), intent(in), optional    :: alpha
-      real(psb_spk_), target, optional        :: work(:)
+      real(psb_spk_), target, optional, intent(inout) :: work(:)
       integer, intent(in), optional           :: mode,jx,ik,data
       character, intent(in), optional         :: tran
     end subroutine psb_shalom
@@ -131,7 +131,7 @@ module psb_comm_mod
       type(psb_desc_type), intent(in)         :: desc_a
       integer, intent(out)                    :: info
       real(psb_spk_), intent(in), optional    :: alpha
-      real(psb_spk_), target, optional        :: work(:)
+      real(psb_spk_), target, optional, intent(inout) :: work(:)
       integer, intent(in), optional           :: mode,data
       character, intent(in), optional         :: tran
     end subroutine psb_shalov
@@ -141,7 +141,7 @@ module psb_comm_mod
       type(psb_desc_type), intent(in)         :: desc_a
       integer, intent(out)                    :: info
       real(psb_dpk_), intent(in), optional    :: alpha
-      real(psb_dpk_), target, optional        :: work(:)
+      real(psb_dpk_), target, optional, intent(inout) :: work(:)
       integer, intent(in), optional           :: mode,jx,ik,data
       character, intent(in), optional         :: tran
     end subroutine psb_dhalom
@@ -151,7 +151,7 @@ module psb_comm_mod
       type(psb_desc_type), intent(in)         :: desc_a
       integer, intent(out)                    :: info
       real(psb_dpk_), intent(in), optional    :: alpha
-      real(psb_dpk_), target, optional        :: work(:)
+      real(psb_dpk_), target, optional, intent(inout) :: work(:)
       integer, intent(in), optional           :: mode,data
       character, intent(in), optional         :: tran
     end subroutine psb_dhalov
@@ -161,7 +161,7 @@ module psb_comm_mod
       type(psb_desc_type), intent(in)        :: desc_a
       integer, intent(out)                   :: info
       real(psb_dpk_), intent(in), optional   :: alpha
-      integer, intent(inout), optional       :: work(:)
+      integer, intent(inout), optional, target  :: work(:)
       integer, intent(in), optional          :: mode,jx,ik,data
       character, intent(in), optional        :: tran
     end subroutine psb_ihalom
@@ -171,7 +171,7 @@ module psb_comm_mod
       type(psb_desc_type), intent(in)        :: desc_a
       integer, intent(out)                   :: info
       real(psb_dpk_), intent(in), optional   :: alpha
-      integer, intent(inout), optional       :: work(:)
+      integer, intent(inout), optional, target :: work(:)
       integer, intent(in), optional          :: mode,data
       character, intent(in), optional        :: tran
     end subroutine psb_ihalov
@@ -181,7 +181,7 @@ module psb_comm_mod
       type(psb_desc_type), intent(in)         :: desc_a
       integer, intent(out)                    :: info
       complex(psb_spk_), intent(in), optional :: alpha
-      complex(psb_spk_), target, optional     :: work(:)
+      complex(psb_spk_), target, optional, intent(inout) :: work(:)
       integer, intent(in), optional           :: mode,jx,ik,data
       character, intent(in), optional         :: tran
     end subroutine psb_chalom
@@ -191,7 +191,7 @@ module psb_comm_mod
       type(psb_desc_type), intent(in)         :: desc_a
       integer, intent(out)                    :: info
       complex(psb_spk_), intent(in), optional :: alpha
-      complex(psb_spk_), target, optional     :: work(:)
+      complex(psb_spk_), target, optional, intent(inout) :: work(:)
       integer, intent(in), optional           :: mode,data
       character, intent(in), optional         :: tran
     end subroutine psb_chalov
@@ -201,7 +201,7 @@ module psb_comm_mod
       type(psb_desc_type), intent(in)         :: desc_a
       integer, intent(out)                    :: info
       complex(psb_dpk_), intent(in), optional :: alpha
-      complex(psb_dpk_), target, optional     :: work(:)
+      complex(psb_dpk_), target, optional, intent(inout) :: work(:)
       integer, intent(in), optional           :: mode,jx,ik,data
       character, intent(in), optional         :: tran
     end subroutine psb_zhalom
@@ -211,7 +211,7 @@ module psb_comm_mod
       type(psb_desc_type), intent(in)         :: desc_a
       integer, intent(out)                    :: info
       complex(psb_dpk_), intent(in), optional :: alpha
-      complex(psb_dpk_), target, optional     :: work(:)
+      complex(psb_dpk_), target, optional, intent(inout) :: work(:)
       integer, intent(in), optional           :: mode,data
       character, intent(in), optional         :: tran
     end subroutine psb_zhalov

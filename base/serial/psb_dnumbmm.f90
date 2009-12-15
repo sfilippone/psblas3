@@ -41,9 +41,7 @@
 !
 
 subroutine psb_dnumbmm(a,b,c)
-  use psb_mat_mod
-  use psb_string_mod
-  use psb_serial_mod, psb_protect_name => psb_dnumbmm
+  use psb_sparse_mod, psb_protect_name => psb_dnumbmm
   implicit none 
 
   type(psb_d_sparse_mat), intent(in) :: a,b

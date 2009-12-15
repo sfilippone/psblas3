@@ -45,13 +45,10 @@
 !                                              Default -1
 subroutine  psb_cscatterm(globx, locx, desc_a, info, iroot)
 
-  use psb_descriptor_type
-  use psb_check_mod
-  use psb_error_mod
+  use psb_sparse_mod, psb_protect_name => psb_cscatterm
 #ifdef MPI_MOD
   use mpi
 #endif
-  use psb_penv_mod
   implicit none
 #ifdef MPI_H
   include 'mpif.h'
@@ -276,13 +273,10 @@ end subroutine psb_cscatterm
 !                                              the processes have a copy.
 !
 subroutine  psb_cscatterv(globx, locx, desc_a, info, iroot)
-  use psb_descriptor_type
-  use psb_check_mod
-  use psb_error_mod
+  use psb_sparse_mod, psb_protect_name => psb_cscatterv
 #ifdef MPI_MOD
   use mpi
 #endif
-  use psb_penv_mod
   implicit none
 #ifdef MPI_H
   include 'mpif.h'

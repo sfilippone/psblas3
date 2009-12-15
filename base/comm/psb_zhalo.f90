@@ -54,21 +54,15 @@
 !
 !
 subroutine  psb_zhalom(x,desc_a,info,alpha,jx,ik,work,tran,mode,data)
-  use psb_descriptor_type
-  use psb_const_mod
+  use psb_sparse_mod, psb_protect_name => psb_zhalom
   use psi_mod
-  use psb_check_mod
-  use psb_realloc_mod
-  use psb_error_mod
-  use psb_string_mod
-  use psb_penv_mod
   implicit none
 
-  complex(psb_dpk_), intent(inout), target   :: x(:,:)
+  complex(psb_dpk_), intent(inout), target  :: x(:,:)
   type(psb_desc_type), intent(in)           :: desc_a
   integer, intent(out)                      :: info
-  complex(psb_dpk_), intent(in), optional    :: alpha
-  complex(psb_dpk_), optional, target        :: work(:)
+  complex(psb_dpk_), intent(in), optional   :: alpha
+  complex(psb_dpk_), optional, target, intent(inout) :: work(:)
   integer, intent(in), optional             :: mode,jx,ik,data
   character, intent(in), optional           :: tran
 
@@ -282,21 +276,15 @@ end subroutine psb_zhalom
 !
 !
 subroutine  psb_zhalov(x,desc_a,info,alpha,work,tran,mode,data)
-  use psb_descriptor_type
-  use psb_const_mod
+  use psb_sparse_mod, psb_protect_name => psb_zhalov
   use psi_mod
-  use psb_check_mod
-  use psb_realloc_mod
-  use psb_error_mod
-  use psb_string_mod
-  use psb_penv_mod
   implicit none
 
-  complex(psb_dpk_), intent(inout)           :: x(:)
+  complex(psb_dpk_), intent(inout)          :: x(:)
   type(psb_desc_type), intent(in)           :: desc_a
   integer, intent(out)                      :: info
-  complex(psb_dpk_), intent(in), optional    :: alpha
-  complex(psb_dpk_), target, optional        :: work(:)
+  complex(psb_dpk_), intent(in), optional   :: alpha
+  complex(psb_dpk_), target, optional, intent(inout) :: work(:)
   integer, intent(in), optional             :: mode,data
   character, intent(in), optional           :: tran
 

@@ -45,6 +45,7 @@
 !    info    - integer.                       Error code (if any).
 subroutine psb_cdals(m, n, parts, ictxt, desc, info)
   use psb_sparse_mod
+  use psi_mod
   implicit None
   include 'parts.fh'
   !....Parameters...

@@ -46,10 +46,7 @@
 !                                              the processes will have a copy.
 !
 subroutine  psb_cgatherm(globx, locx, desc_a, info, iroot)
-  use psb_descriptor_type
-  use psb_check_mod
-  use psb_error_mod
-  use psb_penv_mod
+  use psb_sparse_mod, psb_protect_name => psb_cgatherm
   implicit none
 
   complex(psb_spk_), intent(in)    :: locx(:,:)
@@ -222,10 +219,7 @@ end subroutine psb_cgatherm
 !                                              default: -1
 !
 subroutine  psb_cgatherv(globx, locx, desc_a, info, iroot)
-  use psb_descriptor_type
-  use psb_check_mod
-  use psb_error_mod
-  use psb_penv_mod
+  use psb_sparse_mod, psb_protect_name => psb_cgatherv
   implicit none
 
   complex(psb_spk_), intent(in)    :: locx(:)

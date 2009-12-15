@@ -64,19 +64,14 @@
 !
 !
 subroutine  psb_iovrlm(x,desc_a,info,jx,ik,work,update,mode)
-  use psb_descriptor_type
-  use psb_const_mod
+  use psb_sparse_mod, psb_protect_name => psb_iovrlm
   use psi_mod
-  use psb_realloc_mod
-  use psb_check_mod
-  use psb_error_mod
-  use psb_penv_mod
   implicit none
 
   integer, intent(inout), target  :: x(:,:)
   type(psb_desc_type), intent(in) :: desc_a
   integer, intent(out)            :: info
-  integer, optional, target       :: work(:)
+  integer, optional, target, intent(inout) :: work(:)
   integer, intent(in), optional   :: update,jx,ik,mode
 
   ! locals
@@ -270,19 +265,14 @@ end subroutine psb_iovrlm
 !
 !
 subroutine  psb_iovrlv(x,desc_a,info,work,update,mode)
-  use psb_descriptor_type
+  use psb_sparse_mod, psb_protect_name => psb_iovrlv
   use psi_mod
-  use psb_const_mod
-  use psb_realloc_mod
-  use psb_check_mod
-  use psb_error_mod
-  use psb_penv_mod
   implicit none
 
   integer, intent(inout), target  :: x(:)
   type(psb_desc_type), intent(in) :: desc_a
   integer, intent(out)            :: info
-  integer, optional, target       :: work(:)
+  integer, optional, target, intent(inout) :: work(:)
   integer, intent(in), optional   :: update,mode
 
   ! locals

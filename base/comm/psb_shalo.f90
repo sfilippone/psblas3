@@ -54,23 +54,17 @@
 !
 !
 subroutine  psb_shalom(x,desc_a,info,alpha,jx,ik,work,tran,mode,data)
-  use psb_descriptor_type
-  use psb_const_mod
+  use psb_sparse_mod, psb_protect_name => psb_shalom
   use psi_mod
-  use psb_check_mod
-  use psb_realloc_mod
-  use psb_error_mod
-  use psb_string_mod
-  use psb_penv_mod
   implicit none
 
   real(psb_spk_), intent(inout), target   :: x(:,:)
-  type(psb_desc_type), intent(in)           :: desc_a
-  integer, intent(out)                      :: info
+  type(psb_desc_type), intent(in)         :: desc_a
+  integer, intent(out)                    :: info
   real(psb_spk_), intent(in), optional    :: alpha
-  real(psb_spk_), optional, target        :: work(:)
-  integer, intent(in), optional             :: mode,jx,ik,data
-  character, intent(in), optional           :: tran
+  real(psb_spk_), optional, target, intent(inout) :: work(:)
+  integer, intent(in), optional           :: mode,jx,ik,data
+  character, intent(in), optional         :: tran
 
   ! locals
   integer                  :: ictxt, np, me,&
@@ -281,23 +275,17 @@ end subroutine psb_shalom
 !
 !
 subroutine  psb_shalov(x,desc_a,info,alpha,work,tran,mode,data)
-  use psb_descriptor_type
-  use psb_const_mod
+  use psb_sparse_mod, psb_protect_name => psb_shalov
   use psi_mod
-  use psb_check_mod
-  use psb_realloc_mod
-  use psb_error_mod
-  use psb_string_mod
-  use psb_penv_mod
   implicit none
 
   real(psb_spk_), intent(inout)           :: x(:)
-  type(psb_desc_type), intent(in)           :: desc_a
-  integer, intent(out)                      :: info
+  type(psb_desc_type), intent(in)         :: desc_a
+  integer, intent(out)                    :: info
   real(psb_spk_), intent(in), optional    :: alpha
-  real(psb_spk_), target, optional        :: work(:)
-  integer, intent(in), optional             :: mode,data
-  character, intent(in), optional           :: tran
+  real(psb_spk_), target, optional, intent(inout) :: work(:)
+  integer, intent(in), optional           :: mode,data
+  character, intent(in), optional         :: tran
 
   ! locals
   integer                  :: ictxt, np, me,&

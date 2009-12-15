@@ -65,19 +65,14 @@
 !
 !
 subroutine  psb_covrlm(x,desc_a,info,jx,ik,work,update,mode)
-  use psb_descriptor_type
-  use psb_const_mod
+  use psb_sparse_mod, psb_protect_name => psb_covrlm
   use psi_mod
-  use psb_realloc_mod
-  use psb_check_mod
-  use psb_error_mod
-  use psb_penv_mod
   implicit none
 
-  complex(psb_spk_), intent(inout), target   :: x(:,:)
+  complex(psb_spk_), intent(inout), target  :: x(:,:)
   type(psb_desc_type), intent(in)           :: desc_a
   integer, intent(out)                      :: info
-  complex(psb_spk_), optional, target        :: work(:)
+  complex(psb_spk_), optional, target, intent(inout)  :: work(:)
   integer, intent(in), optional             :: update,jx,ik,mode
 
   ! locals
@@ -269,20 +264,15 @@ end subroutine psb_covrlm
 !
 !
 subroutine  psb_covrlv(x,desc_a,info,work,update,mode)
-  use psb_descriptor_type
+  use psb_sparse_mod, psb_protect_name => psb_covrlv
   use psi_mod
-  use psb_const_mod
-  use psb_realloc_mod
-  use psb_check_mod
-  use psb_error_mod
-  use psb_penv_mod
   implicit none
 
-  complex(psb_spk_), intent(inout), target :: x(:)
-  type(psb_desc_type), intent(in)            :: desc_a
-  integer, intent(out)                       :: info
-  complex(psb_spk_), optional, target      :: work(:)
-  integer, intent(in), optional              :: update,mode
+  complex(psb_spk_), intent(inout), target  :: x(:)
+  type(psb_desc_type), intent(in)           :: desc_a
+  integer, intent(out)                      :: info
+  complex(psb_spk_), optional, target, intent(inout) :: work(:)
+  integer, intent(in), optional             :: update,mode
 
   ! locals
   integer                  :: ictxt, np, me, &

@@ -47,10 +47,7 @@
 !                                              Default: -1. 
 !
 subroutine  psb_dgatherm(globx, locx, desc_a, info, iroot)
-  use psb_descriptor_type
-  use psb_check_mod
-  use psb_error_mod
-  use psb_penv_mod
+  use psb_sparse_mod, psb_protect_name => psb_dgatherm
   implicit none
 
   real(psb_dpk_), intent(in)    :: locx(:,:)
@@ -219,10 +216,7 @@ end subroutine psb_dgatherm
 !                                              the processes will have a copy.
 !
 subroutine  psb_dgatherv(globx, locx, desc_a, info, iroot)
-  use psb_descriptor_type
-  use psb_check_mod
-  use psb_error_mod
-  use psb_penv_mod
+  use psb_sparse_mod, psb_protect_name => psb_dgatherv
   implicit none
 
   real(psb_dpk_), intent(in)    :: locx(:)
