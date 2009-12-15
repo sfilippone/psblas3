@@ -62,6 +62,7 @@
 Subroutine psb_ccdbldext(a,desc_a,novr,desc_ov,info, extype)
 
   use psb_sparse_mod, psb_protect_name => psb_ccdbldext
+  use psi_mod
 
 #ifdef MPI_MOD
   use mpi
