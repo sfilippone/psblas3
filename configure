@@ -5604,95 +5604,6 @@ else
 fi
 rm -f conftest*
 
-#
-# Test for TR 15581, aka allocatables extensions.
-#
-ac_exeext=''
-ac_ext='f90'
-ac_link='${MPIFC-$FC} -o conftest${ac_exeext} $FCFLAGS $LDFLAGS conftest.$ac_ext $LIBS 1>&5'
-{ $as_echo "$as_me:$LINENO: checking support for Fortran allocatables TR15581" >&5
-$as_echo_n "checking support for Fortran allocatables TR15581... " >&6; }
-i=0
-while test \( -f tmpdir_$i \) -o \( -d tmpdir_$i \) ; do
-  i=`expr $i + 1`
-done
-mkdir tmpdir_$i
-cd tmpdir_$i
-cat > conftest.$ac_ext <<EOF
-module conftest
-  type outer
-    integer,  allocatable :: v(:)
-  end type outer
-
-  interface foo
-    module procedure foov, food
-  end interface
-contains
-
-  subroutine foov(a,b)
-
-    implicit none
-    integer, allocatable, intent(inout) :: a(:)
-    integer, allocatable, intent(out) :: b(:)
-
-
-    allocate(b(size(a)))
-
-  end subroutine foov
-  subroutine food(a,b)
-
-    implicit none
-    type(outer), intent(inout) :: a
-    type(outer), intent(out) :: b
-
-
-    allocate(b%v(size(a%v)))
-
-  end subroutine food
-
-end module conftest
-
-
-
-program testtr15581
-  use conftest
-  type(outer) :: da, db
-  integer, allocatable :: a(:), b(:)
-
-  allocate(a(10),da%v(10))
-  a = (/ (i,i=1,10) /)
-  da%v = (/ (i,i=1,10) /)
-  call foo(a,b)
-  call foo(da,db)
-  write(*,*) b
-  write(*,*) db%v
-
-end program testtr15581
-EOF
-if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
-  (eval $ac_link) 2>&5
-  ac_status=$?
-  $as_echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } && test -s conftest${ac_exeext}; then
-  { $as_echo "$as_me:$LINENO: result: yes" >&5
-$as_echo "yes" >&6; }
-  :
-else
-  { $as_echo "$as_me:$LINENO: result: no" >&5
-$as_echo "no" >&6; }
-  echo "configure: failed program was:" >&5
-  cat conftest.$ac_ext >&5
-
-  { { $as_echo "$as_me:$LINENO: error: Sorry, cannot build PSBLAS without support for TR15581.
- Please get a Fortran compiler that supports it, e.g. GNU Fortran 4.3." >&5
-$as_echo "$as_me: error: Sorry, cannot build PSBLAS without support for TR15581.
- Please get a Fortran compiler that supports it, e.g. GNU Fortran 4.3." >&2;}
-   { (exit 1); exit 1; }; }
-
-fi
-cd ..
-rm -fr tmpdir_$i
-
 if test x"$psblas_cv_fc" == "x" ; then
  if eval "$MPIFC -qversion 2>&1 | grep XL 2>/dev/null" ; then
 	psblas_cv_fc="xlf"
@@ -7461,7 +7372,215 @@ fi
 rm -f conftest*
 fi
 
-# Custom test : do we have move_alloc ?
+
+#
+# Tests for support of various Fortran features; some of them are critical,
+# some optional
+#
+
+#
+# Critical features
+#
+ac_exeext=''
+ac_ext='f90'
+ac_link='${MPIFC-$FC} -o conftest${ac_exeext} $FCFLAGS $LDFLAGS conftest.$ac_ext $LIBS 1>&5'
+{ $as_echo "$as_me:$LINENO: checking support for Fortran allocatables TR15581" >&5
+$as_echo_n "checking support for Fortran allocatables TR15581... " >&6; }
+i=0
+while test \( -f tmpdir_$i \) -o \( -d tmpdir_$i \) ; do
+  i=`expr $i + 1`
+done
+mkdir tmpdir_$i
+cd tmpdir_$i
+cat > conftest.$ac_ext <<EOF
+module conftest
+  type outer
+    integer,  allocatable :: v(:)
+  end type outer
+
+  interface foo
+    module procedure foov, food
+  end interface
+contains
+
+  subroutine foov(a,b)
+
+    implicit none
+    integer, allocatable, intent(inout) :: a(:)
+    integer, allocatable, intent(out) :: b(:)
+
+
+    allocate(b(size(a)))
+
+  end subroutine foov
+  subroutine food(a,b)
+
+    implicit none
+    type(outer), intent(inout) :: a
+    type(outer), intent(out) :: b
+
+
+    allocate(b%v(size(a%v)))
+
+  end subroutine food
+
+end module conftest
+
+
+
+program testtr15581
+  use conftest
+  type(outer) :: da, db
+  integer, allocatable :: a(:), b(:)
+
+  allocate(a(10),da%v(10))
+  a = (/ (i,i=1,10) /)
+  da%v = (/ (i,i=1,10) /)
+  call foo(a,b)
+  call foo(da,db)
+  write(*,*) b
+  write(*,*) db%v
+
+end program testtr15581
+EOF
+if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
+  (eval $ac_link) 2>&5
+  ac_status=$?
+  $as_echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } && test -s conftest${ac_exeext}; then
+  { $as_echo "$as_me:$LINENO: result: yes" >&5
+$as_echo "yes" >&6; }
+  :
+else
+  { $as_echo "$as_me:$LINENO: result: no" >&5
+$as_echo "no" >&6; }
+  echo "configure: failed program was:" >&5
+  cat conftest.$ac_ext >&5
+
+  { { $as_echo "$as_me:$LINENO: error: Sorry, cannot build PSBLAS without support for TR15581.
+ Please get a Fortran compiler that supports it, e.g. GNU Fortran 4.5." >&5
+$as_echo "$as_me: error: Sorry, cannot build PSBLAS without support for TR15581.
+ Please get a Fortran compiler that supports it, e.g. GNU Fortran 4.5." >&2;}
+   { (exit 1); exit 1; }; }
+
+fi
+cd ..
+rm -fr tmpdir_$i
+
+ac_exeext=''
+ac_ext='f90'
+ac_link='${MPIFC-$FC} -o conftest${ac_exeext} $FCFLAGS $LDFLAGS conftest.$ac_ext $LIBS 1>&5'
+{ $as_echo "$as_me:$LINENO: checking support for Fortran EXTENDS" >&5
+$as_echo_n "checking support for Fortran EXTENDS... " >&6; }
+i=0
+while test \( -f tmpdir_$i \) -o \( -d tmpdir_$i \) ; do
+  i=`expr $i + 1`
+done
+mkdir tmpdir_$i
+cd tmpdir_$i
+cat > conftest.$ac_ext <<EOF
+program conftest
+  type foo
+    integer :: i
+  end type foo
+  type, extends(foo) :: bar
+    integer j
+  end type bar
+  type(bar) :: barvar
+end program conftest
+EOF
+if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
+  (eval $ac_link) 2>&5
+  ac_status=$?
+  $as_echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } && test -s conftest${ac_exeext}; then
+  { $as_echo "$as_me:$LINENO: result: yes" >&5
+$as_echo "yes" >&6; }
+  :
+else
+  { $as_echo "$as_me:$LINENO: result: no" >&5
+$as_echo "no" >&6; }
+  echo "configure: failed program was:" >&5
+  cat conftest.$ac_ext >&5
+
+  { { $as_echo "$as_me:$LINENO: error: Sorry, cannot build PSBLAS without support for EXTENDS.
+ Please get a Fortran compiler that supports it, e.g. GNU Fortran 4.5." >&5
+$as_echo "$as_me: error: Sorry, cannot build PSBLAS without support for EXTENDS.
+ Please get a Fortran compiler that supports it, e.g. GNU Fortran 4.5." >&2;}
+   { (exit 1); exit 1; }; }
+
+fi
+cd ..
+rm -fr tmpdir_$i
+
+ac_exeext=''
+ac_ext='f90'
+ac_link='${MPIFC-$FC} -o conftest${ac_exeext} $FCFLAGS $LDFLAGS conftest.$ac_ext $LIBS 1>&5'
+{ $as_echo "$as_me:$LINENO: checking support for Fortran CLASS TBP" >&5
+$as_echo_n "checking support for Fortran CLASS TBP... " >&6; }
+i=0
+while test \( -f tmpdir_$i \) -o \( -d tmpdir_$i \) ; do
+  i=`expr $i + 1`
+done
+mkdir tmpdir_$i
+cd tmpdir_$i
+cat > conftest.$ac_ext <<EOF
+module foo_mod
+  type foo
+    integer :: i
+  contains
+    procedure, pass(a) :: doit
+    procedure, pass(a) :: getit
+  end type foo
+
+  private doit,getit
+contains
+  subroutine  doit(a)
+    class(foo) :: a
+
+    a%i = 1
+    write(*,*) 'FOO%DOIT base version'
+  end subroutine doit
+  function getit(a) result(res)
+    class(foo) :: a
+    integer :: res
+
+    res = a%i
+  end function getit
+
+end module foo_mod
+program conftest
+  use foo_mod
+  type(foo) :: foovar
+end program conftest
+EOF
+if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
+  (eval $ac_link) 2>&5
+  ac_status=$?
+  $as_echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } && test -s conftest${ac_exeext}; then
+  { $as_echo "$as_me:$LINENO: result: yes" >&5
+$as_echo "yes" >&6; }
+  :
+else
+  { $as_echo "$as_me:$LINENO: result: no" >&5
+$as_echo "no" >&6; }
+  echo "configure: failed program was:" >&5
+  cat conftest.$ac_ext >&5
+
+  { { $as_echo "$as_me:$LINENO: error: Sorry, cannot build PSBLAS without support for CLASS and type bound procedures.
+ Please get a Fortran compiler that supports them, e.g. GNU Fortran 4.5." >&5
+$as_echo "$as_me: error: Sorry, cannot build PSBLAS without support for CLASS and type bound procedures.
+ Please get a Fortran compiler that supports them, e.g. GNU Fortran 4.5." >&2;}
+   { (exit 1); exit 1; }; }
+
+fi
+cd ..
+rm -fr tmpdir_$i
+
+#
+# Optional features
+#
 ac_exeext=''
 ac_ext='f'
 ac_link='${MPIFC-$FC} -o conftest${ac_exeext} $FFLAGS $LDFLAGS conftest.$ac_ext $LIBS 1>&5'
@@ -7518,6 +7637,55 @@ if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
 $as_echo "yes" >&6; }
 
   FDEFINES="$psblas_cv_define_prepend-DHAVE_VOLATILE $FDEFINES"
+else
+  { $as_echo "$as_me:$LINENO: result: no" >&5
+$as_echo "no" >&6; }
+  echo "configure: failed program was:" >&5
+  cat conftest.$ac_ext >&5
+fi
+cd ..
+rm -fr tmpdir_$i
+
+ac_exeext=''
+ac_ext='f90'
+ac_link='${MPIFC-$FC} -o conftest${ac_exeext} $FCFLAGS $LDFLAGS conftest.$ac_ext $LIBS 1>&5'
+{ $as_echo "$as_me:$LINENO: checking support for Fortran FINAL" >&5
+$as_echo_n "checking support for Fortran FINAL... " >&6; }
+i=0
+while test \( -f tmpdir_$i \) -o \( -d tmpdir_$i \) ; do
+  i=`expr $i + 1`
+done
+mkdir tmpdir_$i
+cd tmpdir_$i
+cat > conftest.$ac_ext <<EOF
+module foo_mod
+  type foo
+    integer :: i
+  contains
+    final  :: destroy_foo
+  end type foo
+
+  private destroy_foo
+contains
+  subroutine destroy_foo(a)
+    type(foo) :: a
+     ! Just a test
+  end subroutine destroy_foo
+end module foo_mod
+program conftest
+  use foo_mod
+  type(foo) :: foovar
+end program conftest
+EOF
+if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
+  (eval $ac_link) 2>&5
+  ac_status=$?
+  $as_echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } && test -s conftest${ac_exeext}; then
+  { $as_echo "$as_me:$LINENO: result: yes" >&5
+$as_echo "yes" >&6; }
+
+  FDEFINES="$psblas_cv_define_prepend-DHAVE_FINAL $FDEFINES"
 else
   { $as_echo "$as_me:$LINENO: result: no" >&5
 $as_echo "no" >&6; }

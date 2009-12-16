@@ -335,7 +335,7 @@ ac_link='${MPIFC-$FC} -o conftest${ac_exeext} $FCFLAGS $LDFLAGS conftest.$ac_ext
 dnl Warning : square brackets are EVIL!
 [cat > conftest.$ac_ext <<EOF
            program test
-	       use psb_base_mod
+	       use psb_sparse_mod
            end program test
 EOF
 if AC_TRY_EVAL(ac_link) && test -s conftest${ac_exeext}; then
@@ -441,6 +441,7 @@ ifelse([$2], , , [
 fi
 cd ..
 rm -fr tmpdir_$i])
+
 dnl @synopsis PAC_FORTRAN_TEST_VOLATILE( [ACTION-IF-FOUND [, ACTION-IF-NOT-FOUND]])
 dnl
 dnl Will try to compile and link a program checking the VOLATILE Fortran support.
@@ -486,6 +487,191 @@ ifelse([$2], , , [
 fi
 cd ..
 rm -fr tmpdir_$i])
+
+
+
+dnl @synopsis PAC_FORTRAN_TEST_EXTENDS( [ACTION-IF-FOUND [, ACTION-IF-NOT-FOUND]])
+dnl
+dnl Will try to compile and link a program checking the EXTENDS Fortran support.
+dnl
+dnl Will use MPIFC, otherwise '$FC'.
+dnl
+dnl If the test passes, will execute ACTION-IF-FOUND. Otherwise, ACTION-IF-NOT-FOUND.
+dnl Note : This file will be likely to induce the compiler to create a module file
+dnl (for a module called conftest).
+dnl Depending on the compiler flags, this could cause a conftest.mod file to appear
+dnl in the present directory, or in another, or with another name. So be warned!
+dnl
+dnl @author Salvatore Filippone <salvatore.filippone@uniroma2.it>
+AC_DEFUN(PAC_FORTRAN_TEST_EXTENDS,
+ac_exeext=''
+ac_ext='f90'
+ac_link='${MPIFC-$FC} -o conftest${ac_exeext} $FCFLAGS $LDFLAGS conftest.$ac_ext $LIBS 1>&5'
+dnl Warning : square brackets are EVIL!
+[AC_MSG_CHECKING([support for Fortran EXTENDS])
+i=0
+while test \( -f tmpdir_$i \) -o \( -d tmpdir_$i \) ; do
+  i=`expr $i + 1`
+done
+mkdir tmpdir_$i
+cd tmpdir_$i
+cat > conftest.$ac_ext <<EOF
+program conftest
+  type foo
+    integer :: i
+  end type foo
+  type, extends(foo) :: bar
+    integer j
+  end type bar 
+  type(bar) :: barvar
+end program conftest
+EOF
+if AC_TRY_EVAL(ac_link) && test -s conftest${ac_exeext}; then
+  AC_MSG_RESULT([yes])
+  ifelse([$1], , :, [
+  $1])
+else
+  AC_MSG_RESULT([no])
+  echo "configure: failed program was:" >&AC_FD_CC
+  cat conftest.$ac_ext >&AC_FD_CC
+ifelse([$2], , , [  
+  $2
+])dnl
+fi
+cd ..
+rm -fr tmpdir_$i])
+
+dnl @synopsis PAC_FORTRAN_TEST_CLASS_TBP( [ACTION-IF-FOUND [, ACTION-IF-NOT-FOUND]])
+dnl
+dnl Will try to compile and link a program checking the TBP Fortran support.
+dnl
+dnl Will use MPIFC, otherwise '$FC'.
+dnl
+dnl If the test passes, will execute ACTION-IF-FOUND. Otherwise, ACTION-IF-NOT-FOUND.
+dnl Note : This file will be likely to induce the compiler to create a module file
+dnl (for a module called conftest).
+dnl Depending on the compiler flags, this could cause a conftest.mod file to appear
+dnl in the present directory, or in another, or with another name. So be warned!
+dnl
+dnl @author Salvatore Filippone <salvatore.filippone@uniroma2.it>
+AC_DEFUN(PAC_FORTRAN_TEST_CLASS_TBP,
+ac_exeext=''
+ac_ext='f90'
+ac_link='${MPIFC-$FC} -o conftest${ac_exeext} $FCFLAGS $LDFLAGS conftest.$ac_ext $LIBS 1>&5'
+dnl Warning : square brackets are EVIL!
+[AC_MSG_CHECKING([support for Fortran CLASS TBP])
+i=0
+while test \( -f tmpdir_$i \) -o \( -d tmpdir_$i \) ; do
+  i=`expr $i + 1`
+done
+mkdir tmpdir_$i
+cd tmpdir_$i
+cat > conftest.$ac_ext <<EOF
+module foo_mod
+  type foo
+    integer :: i 
+  contains
+    procedure, pass(a) :: doit
+    procedure, pass(a) :: getit
+  end type foo
+
+  private doit,getit
+contains
+  subroutine  doit(a) 
+    class(foo) :: a
+    
+    a%i = 1
+    write(*,*) 'FOO%DOIT base version'
+  end subroutine doit
+  function getit(a) result(res)
+    class(foo) :: a
+    integer :: res
+
+    res = a%i
+  end function getit
+
+end module foo_mod
+program conftest
+  use foo_mod
+  type(foo) :: foovar
+end program conftest
+EOF
+if AC_TRY_EVAL(ac_link) && test -s conftest${ac_exeext}; then
+  AC_MSG_RESULT([yes])
+  ifelse([$1], , :, [
+  $1])
+else
+  AC_MSG_RESULT([no])
+  echo "configure: failed program was:" >&AC_FD_CC
+  cat conftest.$ac_ext >&AC_FD_CC
+ifelse([$2], , , [  
+  $2
+])dnl
+fi
+cd ..
+rm -fr tmpdir_$i])
+
+
+dnl @synopsis PAC_FORTRAN_TEST_FINAL( [ACTION-IF-FOUND [, ACTION-IF-NOT-FOUND]])
+dnl
+dnl Will try to compile and link a program checking the FINAL Fortran support.
+dnl
+dnl Will use MPIFC, otherwise '$FC'.
+dnl
+dnl If the test passes, will execute ACTION-IF-FOUND. Otherwise, ACTION-IF-NOT-FOUND.
+dnl Note : This file will be likely to induce the compiler to create a module file
+dnl (for a module called conftest).
+dnl Depending on the compiler flags, this could cause a conftest.mod file to appear
+dnl in the present directory, or in another, or with another name. So be warned!
+dnl
+dnl @author Salvatore Filippone <salvatore.filippone@uniroma2.it>
+AC_DEFUN(PAC_FORTRAN_TEST_FINAL,
+ac_exeext=''
+ac_ext='f90'
+ac_link='${MPIFC-$FC} -o conftest${ac_exeext} $FCFLAGS $LDFLAGS conftest.$ac_ext $LIBS 1>&5'
+dnl Warning : square brackets are EVIL!
+[AC_MSG_CHECKING([support for Fortran FINAL])
+i=0
+while test \( -f tmpdir_$i \) -o \( -d tmpdir_$i \) ; do
+  i=`expr $i + 1`
+done
+mkdir tmpdir_$i
+cd tmpdir_$i
+cat > conftest.$ac_ext <<EOF
+module foo_mod
+  type foo
+    integer :: i 
+  contains
+    final  :: destroy_foo
+  end type foo
+
+  private destroy_foo
+contains
+  subroutine destroy_foo(a)
+    type(foo) :: a
+     ! Just a test
+  end subroutine destroy_foo
+end module foo_mod
+program conftest
+  use foo_mod
+  type(foo) :: foovar
+end program conftest
+EOF
+if AC_TRY_EVAL(ac_link) && test -s conftest${ac_exeext}; then
+  AC_MSG_RESULT([yes])
+  ifelse([$1], , :, [
+  $1])
+else
+  AC_MSG_RESULT([no])
+  echo "configure: failed program was:" >&AC_FD_CC
+  cat conftest.$ac_ext >&AC_FD_CC
+ifelse([$2], , , [  
+  $2
+])dnl
+fi
+cd ..
+rm -fr tmpdir_$i])
+
 
 dnl @synopsis PAC_CHECK_BLACS
 dnl

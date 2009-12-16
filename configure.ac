@@ -212,15 +212,6 @@ PAC_CHECK_HAVE_GFORTRAN(
 	[]
 )
 
-#
-# Test for TR 15581, aka allocatables extensions.
-#
-PAC_FORTRAN_TEST_TR15581( 
-	[],
-        [AC_MSG_ERROR([Sorry, cannot build PSBLAS without support for TR15581. 
- Please get a Fortran compiler that supports it, e.g. GNU Fortran 4.3.])]
-)
-
 if test x"$psblas_cv_fc" == "x" ; then
  if eval "$MPIFC -qversion 2>&1 | grep XL 2>/dev/null" ; then
 	psblas_cv_fc="xlf"
@@ -532,7 +523,36 @@ else
  )
 fi
 
-# Custom test : do we have move_alloc ?
+
+#
+# Tests for support of various Fortran features; some of them are critical,
+# some optional
+#
+
+#
+# Critical features
+#
+PAC_FORTRAN_TEST_TR15581( 
+	[],
+        [AC_MSG_ERROR([Sorry, cannot build PSBLAS without support for TR15581. 
+ Please get a Fortran compiler that supports it, e.g. GNU Fortran 4.5.])]
+)
+
+PAC_FORTRAN_TEST_EXTENDS( 
+	[],
+        [AC_MSG_ERROR([Sorry, cannot build PSBLAS without support for EXTENDS. 
+ Please get a Fortran compiler that supports it, e.g. GNU Fortran 4.5.])]
+)
+
+PAC_FORTRAN_TEST_CLASS_TBP( 
+	[],
+        [AC_MSG_ERROR([Sorry, cannot build PSBLAS without support for CLASS and type bound procedures. 
+ Please get a Fortran compiler that supports them, e.g. GNU Fortran 4.5.])]
+)
+
+#
+# Optional features
+#
 PAC_FORTRAN_HAVE_MOVE_ALLOC(
 	[FDEFINES="$psblas_cv_define_prepend-DHAVE_MOVE_ALLOC $FDEFINES"],
 	
@@ -540,6 +560,10 @@ PAC_FORTRAN_HAVE_MOVE_ALLOC(
 
 PAC_FORTRAN_TEST_VOLATILE( 
 	[FDEFINES="$psblas_cv_define_prepend-DHAVE_VOLATILE $FDEFINES"],
+)
+
+PAC_FORTRAN_TEST_FINAL( 
+	[FDEFINES="$psblas_cv_define_prepend-DHAVE_FINAL $FDEFINES"],
 )
 
 ###############################################################################
