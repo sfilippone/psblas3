@@ -92,7 +92,7 @@ AC_MSG_RESULT([$INSTALL_DIR $INSTALL_INCLUDEDIR $INSTALL_LIBDIR $INSTALL_DOCSDIR
 
 # Note that the following line won't save from troubles.
 # AC_PROG_FC([mpxlf95 mpxlf90 mpxlf pgf95 pgf90 mpif95 mpif90 gfortran f95 f90 ifc])
-AC_PROG_FC([xlf95 xlf90 xlf pgf95 pgf90 ifort ifc  nagfor gfortran])
+AC_PROG_FC([xlf2003_r xlf2003 xlf95_r xlf95 xlf90 xlf pgf95 pgf90 ifort ifc  nagfor gfortran])
 #AC_PROG_FC
 AC_PROG_F77([xlf pgf77 ifort ifc nagfor gfortran])
 AC_PROG_CC([xlc pgcc icc gcc ])
@@ -132,6 +132,17 @@ if test "X$MPICC" = "X" ; then
 fi
 ACX_MPI([], [AC_MSG_ERROR([[Cannot find any suitable MPI implementation for C]])])
 
+
+AC_LANG([Fortran])
+
+if test "X$MPIFC" = "X" ; then
+    # This is our MPIFC compiler preference: it will override ACX_MPI's first try.
+    AC_CHECK_PROGS([MPIFC],[mpxlf2003_r mpxlf2003 mpxlf95_r mpxlf90 mpf95 mpf90  mpif95 mpif90  ])
+fi
+
+ACX_MPI([], [AC_MSG_ERROR([[Cannot find any suitable MPI implementation for Fortran]])])
+fi
+
 AC_LANG(Fortran 77)
 if test "X$MPIF77" = "X" ; then
     # This is our MPIFC compiler preference: it will override ACX_MPI's first try.
@@ -139,15 +150,6 @@ if test "X$MPIF77" = "X" ; then
 fi
 ACX_MPI([], [AC_MSG_ERROR([[Cannot find any suitable MPI implementation for Fortran 77]])])
 
-AC_LANG([Fortran])
-
-if test "X$MPIFC" = "X" ; then
-    # This is our MPIFC compiler preference: it will override ACX_MPI's first try.
-    AC_CHECK_PROGS([MPIFC],[mpxlf95 mpxlf90 mpf95 mpf90  mpif95 mpif90  ])
-fi
-
-ACX_MPI([], [AC_MSG_ERROR([[Cannot find any suitable MPI implementation for Fortran]])])
-fi
 # We leave a default language for the next checks.
 dnl AC_LANG([Fortran 77])
 AC_LANG([C])
@@ -443,7 +445,7 @@ if test "X$psblas_cv_fc" == X"xlf" ; then
   #  - if called from some script, xlf could behave strangely
   #  - it is not said that mpxlf95 gets chosen by the configure script.
   F90="xlf95   -qsuffix=f=f90:cpp=F90"
-  F03="xlf2003  -qsuffix=f=f03:cpp=F03"
+  F03="xlf2003_r  -qsuffix=f=f03:cpp=F03"
  #  F90="xlf95"
 #    FC="xlf"
 
@@ -456,11 +458,11 @@ if test "X$psblas_cv_fc" == X"xlf" ; then
     F77="xlf"
      CC="xlc"
   if test x"$pac_cv_serial_mpi" == x"yes" ; then
-     MPF90="xlf95 -qsuffix=f=f90:cpp=F90"
+     MPF90="xlf2003_r -qsuffix=f=f90:cpp=F90"
      MPF77="xlf95 -qfixed  -qsuffix=f=f:cpp=F"
      MPCC="xlc"
   else 
-     MPF90="mpxlf95 -qsuffix=f=f90:cpp=F90"
+     MPF90="mpxlf2003_r -qsuffix=f=f90:cpp=F90"
      MPF77="mpxlf95 -qfixed  -qsuffix=f=f:cpp=F"
      MPCC="mpcc"
   fi
@@ -549,14 +551,15 @@ PAC_FORTRAN_TEST_CLASS_TBP(
         [AC_MSG_ERROR([Sorry, cannot build PSBLAS without support for CLASS and type bound procedures. 
  Please get a Fortran compiler that supports them, e.g. GNU Fortran 4.5.])]
 )
+PAC_FORTRAN_HAVE_MOVE_ALLOC(
+	[FDEFINES="$psblas_cv_define_prepend-DHAVE_MOVE_ALLOC $FDEFINES"],
+        [AC_MSG_ERROR([Sorry, cannot build PSBLAS without support for EXTENDS. 
+ Please get a Fortran compiler that supports it, e.g. GNU Fortran 4.5.])]
+)
 
 #
 # Optional features
 #
-PAC_FORTRAN_HAVE_MOVE_ALLOC(
-	[FDEFINES="$psblas_cv_define_prepend-DHAVE_MOVE_ALLOC $FDEFINES"],
-	
-)
 
 PAC_FORTRAN_TEST_VOLATILE( 
 	[FDEFINES="$psblas_cv_define_prepend-DHAVE_VOLATILE $FDEFINES"],
