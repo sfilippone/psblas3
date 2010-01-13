@@ -141,7 +141,6 @@ if test "X$MPIFC" = "X" ; then
 fi
 
 ACX_MPI([], [AC_MSG_ERROR([[Cannot find any suitable MPI implementation for Fortran]])])
-fi
 
 AC_LANG(Fortran 77)
 if test "X$MPIF77" = "X" ; then
@@ -149,6 +148,7 @@ if test "X$MPIF77" = "X" ; then
     AC_CHECK_PROGS([MPIF77],[mpxlf mpf77 mpif77])
 fi
 ACX_MPI([], [AC_MSG_ERROR([[Cannot find any suitable MPI implementation for Fortran 77]])])
+fi
 
 # We leave a default language for the next checks.
 dnl AC_LANG([Fortran 77])

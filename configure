@@ -4260,7 +4260,6 @@ _ACEOF
         :
 fi
 
-fi
 
 ac_ext=f
 ac_compile='$F77 -c $FFLAGS conftest.$ac_ext >&5'
@@ -4688,6 +4687,7 @@ _ACEOF
         :
 fi
 
+fi
 
 # We leave a default language for the next checks.
 ac_ext=c
