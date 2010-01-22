@@ -569,6 +569,14 @@ PAC_FORTRAN_TEST_FINAL(
 	[FDEFINES="$psblas_cv_define_prepend-DHAVE_FINAL $FDEFINES"],
 )
 
+PAC_FORTRAN_TEST_SAME_TYPE( 
+	[FDEFINES="$psblas_cv_define_prepend-DHAVE_SAME_TYPE_AS $FDEFINES"],
+)
+
+PAC_FORTRAN_TEST_EXTENDS_TYPE( 
+	[FDEFINES="$psblas_cv_define_prepend-DHAVE_EXTENDS_TYPE_OF $FDEFINES"],
+)
+
 ###############################################################################
 #	Additional pathname stuff (yes, it is redundant and confusing...)
 ###############################################################################

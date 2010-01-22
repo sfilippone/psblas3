@@ -672,6 +672,116 @@ fi
 cd ..
 rm -fr tmpdir_$i])
 
+dnl @synopsis PAC_FORTRAN_TEST_SAME_TYPE( [ACTION-IF-FOUND [, ACTION-IF-NOT-FOUND]])
+dnl
+dnl Will try to compile and link a program checking the SAME_TYPE_AS Fortran support.
+dnl
+dnl Will use MPIFC, otherwise '$FC'.
+dnl
+dnl If the test passes, will execute ACTION-IF-FOUND. Otherwise, ACTION-IF-NOT-FOUND.
+dnl Note : This file will be likely to induce the compiler to create a module file
+dnl (for a module called conftest).
+dnl Depending on the compiler flags, this could cause a conftest.mod file to appear
+dnl in the present directory, or in another, or with another name. So be warned!
+dnl
+dnl @author Salvatore Filippone <salvatore.filippone@uniroma2.it>
+AC_DEFUN(PAC_FORTRAN_TEST_SAME_TYPE,
+ac_exeext=''
+ac_ext='f90'
+ac_link='${MPIFC-$FC} -o conftest${ac_exeext} $FCFLAGS $LDFLAGS conftest.$ac_ext $LIBS 1>&5'
+dnl Warning : square brackets are EVIL!
+[AC_MSG_CHECKING([support for Fortran SAME_TYPE_AS])
+i=0
+while test \( -f tmpdir_$i \) -o \( -d tmpdir_$i \) ; do
+  i=`expr $i + 1`
+done
+mkdir tmpdir_$i
+cd tmpdir_$i
+cat > conftest.$ac_ext <<EOF
+program stt
+  type foo
+    integer :: i
+  end type foo
+  type, extends(foo) :: new_foo
+    integer :: j
+  end type new_foo
+  type(foo) :: foov
+  type(new_foo) :: nfv1, nfv2
+
+    
+  write(*,*) 'foov == nfv1? ', same_type_as(foov,nfv1)
+  write(*,*) 'nfv2 == nfv1? ', same_type_as(nfv2,nfv1)
+end program stt
+EOF
+if AC_TRY_EVAL(ac_link) && test -s conftest${ac_exeext}; then
+  AC_MSG_RESULT([yes])
+  ifelse([$1], , :, [
+  $1])
+else
+  AC_MSG_RESULT([no])
+  echo "configure: failed program was:" >&AC_FD_CC
+  cat conftest.$ac_ext >&AC_FD_CC
+ifelse([$2], , , [  
+  $2
+])dnl
+fi
+cd ..
+rm -fr tmpdir_$i])
+
+dnl @synopsis PAC_FORTRAN_TEST_EXTENDS_TYPE( [ACTION-IF-FOUND [, ACTION-IF-NOT-FOUND]])
+dnl
+dnl Will try to compile and link a program checking the EXTENDS_TYPE_OF Fortran support.
+dnl
+dnl Will use MPIFC, otherwise '$FC'.
+dnl
+dnl If the test passes, will execute ACTION-IF-FOUND. Otherwise, ACTION-IF-NOT-FOUND.
+dnl Note : This file will be likely to induce the compiler to create a module file
+dnl (for a module called conftest).
+dnl Depending on the compiler flags, this could cause a conftest.mod file to appear
+dnl in the present directory, or in another, or with another name. So be warned!
+dnl
+dnl @author Salvatore Filippone <salvatore.filippone@uniroma2.it>
+AC_DEFUN(PAC_FORTRAN_TEST_EXTENDS_TYPE,
+ac_exeext=''
+ac_ext='f90'
+ac_link='${MPIFC-$FC} -o conftest${ac_exeext} $FCFLAGS $LDFLAGS conftest.$ac_ext $LIBS 1>&5'
+dnl Warning : square brackets are EVIL!
+[AC_MSG_CHECKING([support for Fortran EXTENDS_TYPE_OF])
+i=0
+while test \( -f tmpdir_$i \) -o \( -d tmpdir_$i \) ; do
+  i=`expr $i + 1`
+done
+mkdir tmpdir_$i
+cd tmpdir_$i
+cat > conftest.$ac_ext <<EOF
+program xtt
+  type foo
+    integer :: i
+  end type foo
+  type, extends(foo) :: new_foo
+    integer :: j
+  end type new_foo
+  type(foo) :: foov
+  type(new_foo) :: nfv1, nfv2
+
+  write(*,*) 'nfv1 extends foov? ', extends_type_of(nfv1,foov)
+end program xtt
+EOF
+if AC_TRY_EVAL(ac_link) && test -s conftest${ac_exeext}; then
+  AC_MSG_RESULT([yes])
+  ifelse([$1], , :, [
+  $1])
+else
+  AC_MSG_RESULT([no])
+  echo "configure: failed program was:" >&AC_FD_CC
+  cat conftest.$ac_ext >&AC_FD_CC
+ifelse([$2], , , [  
+  $2
+])dnl
+fi
+cd ..
+rm -fr tmpdir_$i])
+
 
 dnl @synopsis PAC_CHECK_BLACS
 dnl

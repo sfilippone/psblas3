@@ -249,7 +249,7 @@ contains
       !     
       !     Non singularity
       !     
-      if (dabs(dia) < epstol) then
+      if (dabs(dia) < d_epstol) then
         !
         !     Pivot too small: unstable factorization
         !     
@@ -364,7 +364,7 @@ contains
       !     
       !     Non singularity
       !     
-      if (dabs(dia) < epstol) then
+      if (dabs(dia) < d_epstol) then
         !
         !     Pivot too small: unstable factorization
         !     
