@@ -54,8 +54,8 @@ module psb_const_mod
   complex(psb_spk_), parameter   :: cone=(1.e0,0.0e0)
   complex(psb_dpk_), parameter   :: zzero=(0.d0,0.0d0)
   complex(psb_dpk_), parameter   :: zone=(1.d0,0.0d0)
-  real(psb_dpk_), parameter      :: d_epstol=1.d-32
-  real(psb_spk_), parameter      :: s_epstol=1.e-16 ! How to choose this?
+  real(psb_dpk_), parameter      :: d_epstol=1.1d-16 ! Unit roundoff.  
+  real(psb_spk_), parameter      :: s_epstol=5.e-8   ! Is this right?
   character, parameter           :: psb_all_='A',  psb_topdef_=' '
   
   !
