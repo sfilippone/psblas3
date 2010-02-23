@@ -21,8 +21,8 @@
 #define psi_c_diffadd   PSI_C_DIFFADD
 #endif
 
-void psi_c_diffadd(void *p1, void *p2, int *ret)
+void psi_c_diffadd(char *p1, char *p2, int *ret)
 {
-  *ret = p2-p1;
+  *ret = (int)(p2-p1);
   return;
 }
