@@ -95,7 +95,7 @@ function psb_znrmi(a,desc_a,info)
   end if
 
   if ((m /= 0).and.(n /= 0)) then
-    nrmi = psb_csnmi(a)
+    nrmi = a%csnmi()
     if(info /= 0) then
       info=4010
       ch_err='psb_csnmi'

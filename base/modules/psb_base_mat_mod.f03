@@ -20,44 +20,44 @@ module psb_base_mat_mod
     !
     !
     ! ====================================
-    procedure, pass(a) :: get_nrows
-    procedure, pass(a) :: get_ncols
-    procedure, pass(a) :: get_nzeros
-    procedure, pass(a) :: get_nz_row
-    procedure, pass(a) :: get_size
-    procedure, pass(a) :: get_state
-    procedure, pass(a) :: get_dupl
-    procedure, pass(a) :: get_fmt
-    procedure, pass(a) :: get_aux
-    procedure, pass(a) :: is_null
-    procedure, pass(a) :: is_bld
-    procedure, pass(a) :: is_upd
-    procedure, pass(a) :: is_asb
-    procedure, pass(a) :: is_sorted
-    procedure, pass(a) :: is_upper
-    procedure, pass(a) :: is_lower
-    procedure, pass(a) :: is_triangle
-    procedure, pass(a) :: is_unit
+    procedure, pass(a) :: get_nrows => psb_base_get_nrows
+    procedure, pass(a) :: get_ncols => psb_base_get_ncols
+    procedure, pass(a) :: get_nzeros => psb_base_get_nzeros
+    procedure, pass(a) :: get_nz_row => psb_base_get_nz_row
+    procedure, pass(a) :: get_size => psb_base_get_size
+    procedure, pass(a) :: get_state => psb_base_get_state
+    procedure, pass(a) :: get_dupl => psb_base_get_dupl
+    procedure, pass(a) :: get_fmt => psb_base_get_fmt
+    procedure, pass(a) :: get_aux => psb_base_get_aux
+    procedure, pass(a) :: is_null => psb_base_is_null
+    procedure, pass(a) :: is_bld => psb_base_is_bld
+    procedure, pass(a) :: is_upd => psb_base_is_upd
+    procedure, pass(a) :: is_asb => psb_base_is_asb
+    procedure, pass(a) :: is_sorted => psb_base_is_sorted
+    procedure, pass(a) :: is_upper => psb_base_is_upper
+    procedure, pass(a) :: is_lower => psb_base_is_lower
+    procedure, pass(a) :: is_triangle => psb_base_is_triangle
+    procedure, pass(a) :: is_unit => psb_base_is_unit
     
     ! ====================================
     !
     ! Setters 
     !
     ! ====================================
-    procedure, pass(a) :: set_nrows
-    procedure, pass(a) :: set_ncols
-    procedure, pass(a) :: set_dupl
-    procedure, pass(a) :: set_state
-    procedure, pass(a) :: set_null
-    procedure, pass(a) :: set_bld
-    procedure, pass(a) :: set_upd
-    procedure, pass(a) :: set_asb
-    procedure, pass(a) :: set_sorted
-    procedure, pass(a) :: set_upper
-    procedure, pass(a) :: set_lower
-    procedure, pass(a) :: set_triangle
-    procedure, pass(a) :: set_unit
-    procedure, pass(a) :: set_aux
+    procedure, pass(a) :: set_nrows => psb_base_set_nrows
+    procedure, pass(a) :: set_ncols => psb_base_set_ncols
+    procedure, pass(a) :: set_dupl => psb_base_set_dupl
+    procedure, pass(a) :: set_state => psb_base_set_state
+    procedure, pass(a) :: set_null => psb_base_set_null
+    procedure, pass(a) :: set_bld => psb_base_set_bld
+    procedure, pass(a) :: set_upd => psb_base_set_upd
+    procedure, pass(a) :: set_asb => psb_base_set_asb
+    procedure, pass(a) :: set_sorted => psb_base_set_sorted
+    procedure, pass(a) :: set_upper => psb_base_set_upper
+    procedure, pass(a) :: set_lower => psb_base_set_lower
+    procedure, pass(a) :: set_triangle => psb_base_set_triangle
+    procedure, pass(a) :: set_unit => psb_base_set_unit
+    procedure, pass(a) :: set_aux => psb_base_set_aux
 
 
     ! ====================================
@@ -65,164 +65,258 @@ module psb_base_mat_mod
     ! Data management
     !
     ! ====================================  
-    procedure, pass(a) :: get_neigh
-    procedure, pass(a) :: allocate_mnnz
-    procedure, pass(a) :: reallocate_nz
-    procedure, pass(a) :: free
-    procedure, pass(a) :: trim
-    procedure, pass(a) :: reinit
+    procedure, pass(a) :: get_neigh => psb_base_get_neigh
+    procedure, pass(a) :: free => psb_base_free
+    procedure, pass(a) :: trim => psb_base_trim
+    procedure, pass(a) :: reinit => psb_base_reinit
+    procedure, pass(a) :: allocate_mnnz => psb_base_allocate_mnnz
+    procedure, pass(a) :: reallocate_nz => psb_base_reallocate_nz
     generic,   public  :: allocate => allocate_mnnz
     generic,   public  :: reallocate => reallocate_nz
-    procedure, pass(a) :: csgetptn
+    procedure, pass(a) :: csgetptn => psb_base_csgetptn
     generic, public    :: csget => csgetptn
-    procedure, pass(a) :: print => sparse_print
-    procedure, pass(a) :: sizeof
-    procedure, pass(a) :: base_cp_from
-    generic, public    :: cp_from => base_cp_from
-    procedure, pass(a) :: base_mv_from
-    generic, public    :: mv_from => base_mv_from
-    procedure, pass(a) :: base_transp_1mat
-    procedure, pass(a) :: base_transp_2mat
-    generic, public    :: transp => base_transp_1mat, base_transp_2mat
-    procedure, pass(a) :: base_transc_1mat
-    procedure, pass(a) :: base_transc_2mat
-    generic, public    :: transc => base_transc_1mat, base_transc_2mat
+    procedure, pass(a) :: print => psb_base_sparse_print
+    procedure, pass(a) :: sizeof => psb_base_sizeof
+    procedure, pass(a) :: psb_base_cp_from
+    generic, public    :: cp_from => psb_base_cp_from
+    procedure, pass(a) :: psb_base_mv_from
+    generic, public    :: mv_from => psb_base_mv_from
+    procedure, pass(a) :: transp_1mat => psb_base_transp_1mat
+    procedure, pass(a) :: transp_2mat => psb_base_transp_2mat
+    generic, public    :: transp => transp_1mat, transp_2mat
+    procedure, pass(a) :: transc_1mat => psb_base_transc_1mat
+    procedure, pass(a) :: transc_2mat => psb_base_transc_2mat
+    generic, public    :: transc => transc_1mat, transc_2mat
  
   end type psb_base_sparse_mat
 
-  private :: set_nrows, set_ncols, set_dupl, set_state, &
-       & set_null, set_bld, set_upd, set_asb, set_sorted, set_upper, &
-       & set_lower, set_triangle, set_unit, get_nrows, get_ncols, &
-       & get_nzeros, get_size, get_state, get_dupl, is_null, is_bld, &
-       & is_upd, is_asb, is_sorted, is_upper, is_lower, is_triangle, &
-       & is_unit, get_neigh, allocate_mn, allocate_mnnz, reallocate_nz, &
-       & free, sparse_print, get_fmt, trim, sizeof, reinit, csgetptn, &
-       & get_nz_row, get_aux, set_aux, base_cp_from, base_mv_from, &
-       & base_transp_1mat, base_transp_2mat,  base_transc_1mat, base_transc_2mat
+
+  interface 
+    function psb_base_get_nz_row(idx,a) result(res)
+      import psb_base_sparse_mat, psb_long_int_k_
+      integer, intent(in)                    :: idx
+      class(psb_base_sparse_mat), intent(in) :: a
+      integer :: res
+    end function psb_base_get_nz_row
+  end interface
   
+  interface 
+    function psb_base_get_nzeros(a) result(res)
+      import psb_base_sparse_mat, psb_long_int_k_
+      class(psb_base_sparse_mat), intent(in) :: a
+      integer :: res
+    end function psb_base_get_nzeros
+  end interface
+
+  interface 
+    function psb_base_get_size(a) result(res)
+      import psb_base_sparse_mat, psb_long_int_k_
+      class(psb_base_sparse_mat), intent(in) :: a
+      integer :: res
+    end function psb_base_get_size
+  end interface
+
+  interface 
+    subroutine psb_base_reinit(a,clear)
+      import psb_base_sparse_mat, psb_long_int_k_
+      class(psb_base_sparse_mat), intent(inout) :: a   
+      logical, intent(in), optional :: clear
+    end subroutine psb_base_reinit
+  end interface
+  
+  interface 
+    subroutine psb_base_sparse_print(iout,a,iv,eirs,eics,head,ivr,ivc)
+      import psb_base_sparse_mat, psb_long_int_k_
+      integer, intent(in)               :: iout
+      class(psb_base_sparse_mat), intent(in) :: a   
+      integer, intent(in), optional     :: iv(:)
+      integer, intent(in), optional     :: eirs,eics
+      character(len=*), optional        :: head
+      integer, intent(in), optional     :: ivr(:), ivc(:)
+    end subroutine psb_base_sparse_print
+  end interface
+
+  interface 
+    subroutine psb_base_csgetptn(imin,imax,a,nz,ia,ja,info,&
+         & jmin,jmax,iren,append,nzin,rscale,cscale)
+      import psb_base_sparse_mat, psb_long_int_k_
+      class(psb_base_sparse_mat), intent(in) :: a
+      integer, intent(in)                  :: imin,imax
+      integer, intent(out)                 :: nz
+      integer, allocatable, intent(inout)  :: ia(:), ja(:)
+      integer,intent(out)                  :: info
+      logical, intent(in), optional        :: append
+      integer, intent(in), optional        :: iren(:)
+      integer, intent(in), optional        :: jmin,jmax, nzin
+      logical, intent(in), optional        :: rscale,cscale
+    end subroutine psb_base_csgetptn
+  end interface
+  
+  interface 
+    subroutine psb_base_get_neigh(a,idx,neigh,n,info,lev)
+      import psb_base_sparse_mat, psb_long_int_k_
+      class(psb_base_sparse_mat), intent(in) :: a   
+      integer, intent(in)                :: idx 
+      integer, intent(out)               :: n   
+      integer, allocatable, intent(out)  :: neigh(:)
+      integer, intent(out)               :: info
+      integer, optional, intent(in)      :: lev 
+    end subroutine psb_base_get_neigh
+  end interface
+  
+  interface 
+    subroutine  psb_base_allocate_mnnz(m,n,a,nz) 
+      import psb_base_sparse_mat, psb_long_int_k_
+      integer, intent(in) :: m,n
+      class(psb_base_sparse_mat), intent(inout) :: a
+      integer, intent(in), optional  :: nz
+    end subroutine psb_base_allocate_mnnz
+  end interface
+
+  interface 
+    subroutine psb_base_reallocate_nz(nz,a) 
+      import psb_base_sparse_mat, psb_long_int_k_
+      integer, intent(in) :: nz
+      class(psb_base_sparse_mat), intent(inout) :: a
+    end subroutine psb_base_reallocate_nz
+  end interface
+
+  interface 
+    subroutine psb_base_free(a) 
+      import psb_base_sparse_mat, psb_long_int_k_
+      class(psb_base_sparse_mat), intent(inout) :: a
+    end subroutine psb_base_free
+  end interface
+  
+  interface 
+    subroutine psb_base_trim(a) 
+      import psb_base_sparse_mat, psb_long_int_k_
+      class(psb_base_sparse_mat), intent(inout) :: a
+    end subroutine psb_base_trim
+  end interface
+  
+ 
 contains
 
-  function sizeof(a) result(res)
+  function psb_base_sizeof(a) result(res)
     implicit none 
     class(psb_base_sparse_mat), intent(in) :: a
     integer(psb_long_int_k_) :: res
     res = 8
-  end function sizeof
+  end function psb_base_sizeof
  
- 
-
-  function get_fmt(a) result(res)
+  function psb_base_get_fmt(a) result(res)
     implicit none 
     class(psb_base_sparse_mat), intent(in) :: a
     character(len=5) :: res
     res = 'NULL'
-  end function get_fmt
+  end function psb_base_get_fmt
   
-  function get_dupl(a) result(res)
+  function psb_base_get_dupl(a) result(res)
     implicit none 
     class(psb_base_sparse_mat), intent(in) :: a
     integer :: res
     res = a%duplicate
-  end function get_dupl
+  end function psb_base_get_dupl
  
  
-  function get_state(a) result(res)
+  function psb_base_get_state(a) result(res)
     implicit none 
     class(psb_base_sparse_mat), intent(in) :: a
     integer :: res
     res = a%state
-  end function get_state
+  end function psb_base_get_state
  
-  function get_nrows(a) result(res)
+  function psb_base_get_nrows(a) result(res)
     implicit none 
     class(psb_base_sparse_mat), intent(in) :: a
     integer :: res
     res = a%m
-  end function get_nrows
+  end function psb_base_get_nrows
 
-  function get_ncols(a) result(res)
+  function psb_base_get_ncols(a) result(res)
     implicit none 
     class(psb_base_sparse_mat), intent(in) :: a
     integer :: res
     res = a%n
-  end function get_ncols
+  end function psb_base_get_ncols
 
  
-  subroutine  set_aux(v,a) 
+  subroutine  psb_base_set_aux(v,a) 
     implicit none 
     class(psb_base_sparse_mat), intent(inout) :: a
     integer, intent(in) :: v(:)
     ! TBD
     write(0,*) 'SET_AUX is empty right now '
-  end subroutine set_aux
+  end subroutine psb_base_set_aux
 
-  subroutine  get_aux(v,a) 
+  subroutine  psb_base_get_aux(v,a) 
     implicit none 
     class(psb_base_sparse_mat), intent(in) :: a
     integer, intent(out), allocatable  :: v(:)
     ! TBD
     write(0,*) 'GET_AUX is empty right now '
-  end subroutine get_aux
+  end subroutine psb_base_get_aux
  
-  subroutine  set_nrows(m,a) 
+  subroutine  psb_base_set_nrows(m,a) 
     implicit none 
     class(psb_base_sparse_mat), intent(inout) :: a
     integer, intent(in) :: m
     a%m = m
-  end subroutine set_nrows
+  end subroutine psb_base_set_nrows
 
-  subroutine  set_ncols(n,a) 
+  subroutine  psb_base_set_ncols(n,a) 
     implicit none 
     class(psb_base_sparse_mat), intent(inout) :: a
     integer, intent(in) :: n
     a%n = n
-  end subroutine set_ncols
+  end subroutine psb_base_set_ncols
+  
 
-
-  subroutine  set_state(n,a) 
+  subroutine  psb_base_set_state(n,a) 
     implicit none 
     class(psb_base_sparse_mat), intent(inout) :: a
     integer, intent(in) :: n
     a%state = n
-  end subroutine set_state
+  end subroutine psb_base_set_state
 
 
-  subroutine  set_dupl(n,a) 
+  subroutine  psb_base_set_dupl(n,a) 
     implicit none 
     class(psb_base_sparse_mat), intent(inout) :: a
     integer, intent(in) :: n
     a%duplicate = n
-  end subroutine set_dupl
+  end subroutine psb_base_set_dupl
 
-  subroutine  set_null(a) 
+  subroutine  psb_base_set_null(a) 
     implicit none 
     class(psb_base_sparse_mat), intent(inout) :: a
 
     a%state = psb_spmat_null_
-  end subroutine set_null
+  end subroutine psb_base_set_null
 
-  subroutine  set_bld(a) 
+  subroutine  psb_base_set_bld(a) 
     implicit none 
     class(psb_base_sparse_mat), intent(inout) :: a
 
     a%state = psb_spmat_bld_
-  end subroutine set_bld
+  end subroutine psb_base_set_bld
 
-  subroutine  set_upd(a) 
+  subroutine  psb_base_set_upd(a) 
     implicit none 
     class(psb_base_sparse_mat), intent(inout) :: a
 
     a%state = psb_spmat_upd_
-  end subroutine set_upd
+  end subroutine psb_base_set_upd
 
-  subroutine  set_asb(a) 
+  subroutine  psb_base_set_asb(a) 
     implicit none 
     class(psb_base_sparse_mat), intent(inout) :: a
 
     a%state = psb_spmat_asb_
-  end subroutine set_asb
+  end subroutine psb_base_set_asb
 
-  subroutine set_sorted(a,val) 
+  subroutine psb_base_set_sorted(a,val) 
     implicit none 
     class(psb_base_sparse_mat), intent(inout) :: a
     logical, intent(in), optional :: val
@@ -232,9 +326,9 @@ contains
     else
       a%sorted = .true.
     end if
-  end subroutine set_sorted
+  end subroutine psb_base_set_sorted
 
-  subroutine set_triangle(a,val) 
+  subroutine psb_base_set_triangle(a,val) 
     implicit none 
     class(psb_base_sparse_mat), intent(inout) :: a
     logical, intent(in), optional :: val
@@ -244,9 +338,9 @@ contains
     else
       a%triangle = .true.
     end if
-  end subroutine set_triangle
+  end subroutine psb_base_set_triangle
 
-  subroutine set_unit(a,val) 
+  subroutine psb_base_set_unit(a,val) 
     implicit none 
     class(psb_base_sparse_mat), intent(inout) :: a
     logical, intent(in), optional :: val
@@ -256,9 +350,9 @@ contains
     else
       a%unitd = .true.
     end if
-  end subroutine set_unit
+  end subroutine psb_base_set_unit
 
-  subroutine set_lower(a,val) 
+  subroutine psb_base_set_lower(a,val) 
     implicit none 
     class(psb_base_sparse_mat), intent(inout) :: a
     logical, intent(in), optional :: val
@@ -268,9 +362,9 @@ contains
     else
       a%upper = .false.
     end if
-  end subroutine set_lower
+  end subroutine psb_base_set_lower
 
-  subroutine set_upper(a,val) 
+  subroutine psb_base_set_upper(a,val) 
     implicit none 
     class(psb_base_sparse_mat), intent(inout) :: a
     logical, intent(in), optional :: val
@@ -280,175 +374,72 @@ contains
     else
       a%upper = .true.
     end if
-  end subroutine set_upper
+  end subroutine psb_base_set_upper
 
-  function is_triangle(a) result(res)
+  function psb_base_is_triangle(a) result(res)
     implicit none 
     class(psb_base_sparse_mat), intent(in) :: a
     logical :: res
     res = a%triangle
-  end function is_triangle
+  end function psb_base_is_triangle
 
-  function is_unit(a) result(res)
+  function psb_base_is_unit(a) result(res)
     implicit none 
     class(psb_base_sparse_mat), intent(in) :: a
     logical :: res
     res = a%unitd
-  end function is_unit
+  end function psb_base_is_unit
 
-  function is_upper(a) result(res)
+  function psb_base_is_upper(a) result(res)
     implicit none 
     class(psb_base_sparse_mat), intent(in) :: a
     logical :: res
     res = a%upper
-  end function is_upper
+  end function psb_base_is_upper
 
-  function is_lower(a) result(res)
+  function psb_base_is_lower(a) result(res)
     implicit none 
     class(psb_base_sparse_mat), intent(in) :: a
     logical :: res
     res = .not.a%upper
-  end function is_lower
+  end function psb_base_is_lower
 
-  function is_null(a) result(res)
+  function psb_base_is_null(a) result(res)
     implicit none 
     class(psb_base_sparse_mat), intent(in) :: a
     logical :: res
     res = (a%state == psb_spmat_null_)
-  end function is_null
+  end function psb_base_is_null
 
-  function is_bld(a) result(res)
+  function psb_base_is_bld(a) result(res)
     implicit none 
     class(psb_base_sparse_mat), intent(in) :: a
     logical :: res
     res = (a%state == psb_spmat_bld_)
-  end function is_bld
+  end function psb_base_is_bld
 
-  function is_upd(a) result(res)
+  function psb_base_is_upd(a) result(res)
     implicit none 
     class(psb_base_sparse_mat), intent(in) :: a
     logical :: res
     res = (a%state == psb_spmat_upd_)
-  end function is_upd
+  end function psb_base_is_upd
 
-  function is_asb(a) result(res)
+  function psb_base_is_asb(a) result(res)
     implicit none 
     class(psb_base_sparse_mat), intent(in) :: a
     logical :: res
     res = (a%state == psb_spmat_asb_)
-  end function is_asb
+  end function psb_base_is_asb
 
-  function is_sorted(a) result(res)
+  function psb_base_is_sorted(a) result(res)
     implicit none 
     class(psb_base_sparse_mat), intent(in) :: a
     logical :: res
     res = a%sorted
-  end function is_sorted
+  end function psb_base_is_sorted
 
-
-  function get_nz_row(idx,a) result(res)
-    use psb_error_mod
-    implicit none 
-    integer, intent(in)                    :: idx
-    class(psb_base_sparse_mat), intent(in) :: a
-    integer :: res
-    
-    Integer :: err_act
-    character(len=20)  :: name='base_get_nz_row'
-    logical, parameter :: debug=.false.
-
-    call psb_get_erraction(err_act)
-    res = -1
-    ! This is the base version. If we get here
-    ! it means the derived class is incomplete,
-    ! so we throw an error.
-    call psb_errpush(700,name,a_err=a%get_fmt())
-          
-    if (err_act /= psb_act_ret_) then
-      call psb_error()
-    end if
-    return
-
-  end function get_nz_row
-
-  function get_nzeros(a) result(res)
-    use psb_error_mod
-    implicit none 
-    class(psb_base_sparse_mat), intent(in) :: a
-    integer :: res
-    
-    Integer :: err_act
-    character(len=20)  :: name='base_get_nzeros'
-    logical, parameter :: debug=.false.
-
-    call psb_get_erraction(err_act)
-    res = -1
-    ! This is the base version. If we get here
-    ! it means the derived class is incomplete,
-    ! so we throw an error.
-    call psb_errpush(700,name,a_err=a%get_fmt())
-          
-    if (err_act /= psb_act_ret_) then
-      call psb_error()
-    end if
-    return
-
-  end function get_nzeros
-
-  function get_size(a) result(res)
-    use psb_error_mod
-    implicit none 
-    class(psb_base_sparse_mat), intent(in) :: a
-    integer :: res
-    
-    Integer :: err_act
-    character(len=20)  :: name='get_size'
-    logical, parameter :: debug=.false.
-
-    call psb_get_erraction(err_act)
-    res = -1
-    ! This is the base version. If we get here
-    ! it means the derived class is incomplete,
-    ! so we throw an error.
-    call psb_errpush(700,name,a_err=a%get_fmt())
-          
-    if (err_act /= psb_act_ret_) then
-      call psb_error()
-    end if
-    return
-
-  end function get_size
-
-  subroutine reinit(a,clear)
-    use psb_error_mod
-    implicit none 
-
-    class(psb_base_sparse_mat), intent(inout) :: a   
-    logical, intent(in), optional :: clear
-
-    Integer :: err_act, info
-    character(len=20)  :: name='reinit'
-    logical, parameter :: debug=.false.
-
-    call psb_get_erraction(err_act)
-    info = 700
-    ! This is the base version. If we get here
-    ! it means the derived class is incomplete,
-    ! so we throw an error.
-    call psb_errpush(700,name,a_err=a%get_fmt())
-
-    if (err_act /= psb_act_ret_) then
-      call psb_error()
-    end if
-    return
-
-  end subroutine reinit
-
-
-  !
-  !
-  subroutine base_mv_from(a,b)
-    use psb_error_mod
+  subroutine psb_base_mv_from(a,b)
     implicit none 
 
     class(psb_base_sparse_mat), intent(out)   :: a
@@ -464,12 +455,9 @@ contains
     a%sorted    = b%sorted
     call move_alloc(b%aux,a%aux)
 
-    return
-
-  end subroutine base_mv_from
-
-  subroutine base_cp_from(a,b)
-    use psb_error_mod
+  end subroutine psb_base_mv_from
+  
+  subroutine psb_base_cp_from(a,b)
     implicit none 
 
     class(psb_base_sparse_mat), intent(out) :: a
@@ -487,16 +475,10 @@ contains
       allocate(a%aux(size(b%aux)))
       a%aux(:)       = b%aux(:)
     end if
-    return 
 
-  end subroutine base_cp_from
+  end subroutine psb_base_cp_from
 
-
-  !
-  ! Here we go. 
-  !
-  subroutine base_transp_2mat(a,b)
-    use psb_error_mod
+  subroutine psb_base_transp_2mat(a,b)
     implicit none 
     
     class(psb_base_sparse_mat), intent(out) :: a
@@ -515,22 +497,18 @@ contains
       a%aux(:)       = b%aux(:)
     end if
     
-    return
-    
-  end subroutine base_transp_2mat
+  end subroutine psb_base_transp_2mat
 
-  subroutine base_transc_2mat(a,b)
-    use psb_error_mod
+  subroutine psb_base_transc_2mat(a,b)
     implicit none 
     
     class(psb_base_sparse_mat), intent(out) :: a
     class(psb_base_sparse_mat), intent(in)   :: b
 
     call a%transp(b) 
-  end subroutine base_transc_2mat
+  end subroutine psb_base_transc_2mat
 
-  subroutine base_transp_1mat(a)
-    use psb_error_mod
+  subroutine psb_base_transp_1mat(a)
     implicit none 
     
     class(psb_base_sparse_mat), intent(inout) :: a
@@ -546,246 +524,15 @@ contains
     a%upper     = .not.a%upper
     a%sorted    = .false.
     
-    return
-    
-  end subroutine base_transp_1mat
+  end subroutine psb_base_transp_1mat
 
-  subroutine base_transc_1mat(a)
-    use psb_error_mod
+  subroutine psb_base_transc_1mat(a)
     implicit none 
     
     class(psb_base_sparse_mat), intent(inout) :: a
     
     call a%transp() 
-  end subroutine base_transc_1mat
-
-
-  subroutine sparse_print(iout,a,iv,eirs,eics,head,ivr,ivc)
-    use psb_error_mod
-    implicit none 
-
-    integer, intent(in)               :: iout
-    class(psb_base_sparse_mat), intent(in) :: a   
-    integer, intent(in), optional     :: iv(:)
-    integer, intent(in), optional     :: eirs,eics
-    character(len=*), optional        :: head
-    integer, intent(in), optional     :: ivr(:), ivc(:)
-
-    Integer :: err_act, info
-    character(len=20)  :: name='sparse_print'
-    logical, parameter :: debug=.false.
-
-    call psb_get_erraction(err_act)
-    info = 700
-    ! This is the base version. If we get here
-    ! it means the derived class is incomplete,
-    ! so we throw an error.
-    call psb_errpush(700,name,a_err=a%get_fmt())
-
-    if (err_act /= psb_act_ret_) then
-      call psb_error()
-    end if
-    return
-
-  end subroutine sparse_print
-
-  subroutine csgetptn(imin,imax,a,nz,ia,ja,info,&
-       & jmin,jmax,iren,append,nzin,rscale,cscale)
-    ! Output is always in  COO format 
-    use psb_error_mod
-    use psb_const_mod
-    implicit none
-    
-    class(psb_base_sparse_mat), intent(in) :: a
-    integer, intent(in)                  :: imin,imax
-    integer, intent(out)                 :: nz
-    integer, allocatable, intent(inout)  :: ia(:), ja(:)
-    integer,intent(out)                  :: info
-    logical, intent(in), optional        :: append
-    integer, intent(in), optional        :: iren(:)
-    integer, intent(in), optional        :: jmin,jmax, nzin
-    logical, intent(in), optional        :: rscale,cscale
-    Integer :: err_act
-    character(len=20)  :: name='csget'
-    logical, parameter :: debug=.false.
-
-    call psb_get_erraction(err_act)
-    ! This is the base version. If we get here
-    ! it means the derived class is incomplete,
-    ! so we throw an error.
-    info = 700
-    call psb_errpush(info,name,a_err=a%get_fmt())
-
-    if (err_act /= psb_act_ret_) then
-      call psb_error()
-    end if
-    return
-
-  end subroutine csgetptn
-
-  subroutine get_neigh(a,idx,neigh,n,info,lev)
-    use psb_error_mod
-    use psb_realloc_mod
-    use psb_sort_mod
-    implicit none 
-    class(psb_base_sparse_mat), intent(in) :: a   
-    integer, intent(in)                :: idx 
-    integer, intent(out)               :: n   
-    integer, allocatable, intent(out)  :: neigh(:)
-    integer, intent(out)               :: info
-    integer, optional, intent(in)      :: lev 
-
-    integer :: lev_, i, nl, ifl,ill,&
-         &  n1, err_act, nn, nidx,ntl
-    integer, allocatable :: ia(:), ja(:)
-    character(len=20)  :: name='get_neigh'
-    logical, parameter :: debug=.false.
-
-    call psb_erractionsave(err_act)
-    info = 0
-    if(present(lev)) then 
-      lev_ = lev
-    else
-      lev_=1
-    end if
-    ! Turns out we can write get_neigh at this
-    ! level 
-    n = 0
-    call a%csget(idx,idx,n,ia,ja,info)
-    if (info == 0) call psb_realloc(n,neigh,info)
-    if (info /= 0) then 
-      call psb_errpush(4000,name)
-      goto 9999
-    end if
-    neigh(1:n) = ja(1:n)
-    ifl = 1
-    ill = n
-    do nl = 2, lev_ 
-      n1 = ill - ifl + 1
-      call psb_ensure_size(ill+n1*n1,neigh,info)
-      if (info /= 0) then 
-        call psb_errpush(4000,name)
-        goto 9999
-      end if
-      ntl = 0
-      do i=ifl,ill
-        nidx=neigh(i)
-        if ((nidx /= idx).and.(nidx > 0).and.(nidx <= a%m)) then
-          call a%csget(nidx,nidx,nn,ia,ja,info)
-          if (info==0) call psb_ensure_size(ill+ntl+nn,neigh,info)
-          if (info /= 0) then 
-            call psb_errpush(4000,name)
-            goto 9999
-          end if
-          neigh(ill+ntl+1:ill+ntl+nn)=ja(1:nn)
-          ntl = ntl+nn
-        end if
-      end do
-      call psb_msort_unique(neigh(ill+1:ill+ntl),nn)
-      ifl = ill + 1
-      ill = ill + nn
-    end do
-    call psb_msort_unique(neigh(1:ill),nn,dir=psb_sort_up_)
-    n = nn
-
-    call psb_erractionrestore(err_act)
-    return
-
-9999 continue
-
-    if (err_act /= psb_act_ret_) then
-      call psb_error()
-    end if
-    return
-
-  end subroutine get_neigh
-
-  subroutine  allocate_mnnz(m,n,a,nz) 
-    use psb_error_mod
-    implicit none 
-    integer, intent(in) :: m,n
-    class(psb_base_sparse_mat), intent(inout) :: a
-    integer, intent(in), optional  :: nz
-    Integer :: err_act
-    character(len=20)  :: name='allocate_mnz'
-    logical, parameter :: debug=.false.
-
-    call psb_get_erraction(err_act)
-    ! This is the base version. If we get here
-    ! it means the derived class is incomplete,
-    ! so we throw an error.
-    call psb_errpush(700,name,a_err=a%get_fmt())
-          
-    if (err_act /= psb_act_ret_) then
-      call psb_error()
-    end if
-    return
-
-  end subroutine allocate_mnnz
-
-  subroutine  reallocate_nz(nz,a) 
-    use psb_error_mod
-    implicit none 
-    integer, intent(in) :: nz
-    class(psb_base_sparse_mat), intent(inout) :: a
-    Integer :: err_act
-    character(len=20)  :: name='reallocate_nz'
-    logical, parameter :: debug=.false.
-
-    call psb_get_erraction(err_act)
-    ! This is the base version. If we get here
-    ! it means the derived class is incomplete,
-    ! so we throw an error.
-    call psb_errpush(700,name,a_err=a%get_fmt())
-          
-    if (err_act /= psb_act_ret_) then
-      call psb_error()
-    end if
-    return
-
-  end subroutine reallocate_nz
-
-  subroutine  free(a) 
-    use psb_error_mod
-    implicit none 
-    class(psb_base_sparse_mat), intent(inout) :: a
-    Integer :: err_act
-    character(len=20)  :: name='free'
-    logical, parameter :: debug=.false.
-
-    call psb_get_erraction(err_act)
-    ! This is the base version. If we get here
-    ! it means the derived class is incomplete,
-    ! so we throw an error.
-    call psb_errpush(700,name,a_err=a%get_fmt())
-          
-    if (err_act /= psb_act_ret_) then
-      call psb_error()
-    end if
-    return
-
-  end subroutine free
-
-  subroutine  trim(a) 
-    use psb_error_mod
-    implicit none 
-    class(psb_base_sparse_mat), intent(inout) :: a
-    Integer :: err_act
-    character(len=20)  :: name='trim'
-    logical, parameter :: debug=.false.
-
-    call psb_get_erraction(err_act)
-    ! This is the base version. If we get here
-    ! it means the derived class is incomplete,
-    ! so we throw an error.
-    call psb_errpush(700,name,a_err=a%get_fmt())
-          
-    if (err_act /= psb_act_ret_) then
-      call psb_error()
-    end if
-    return
-
-  end subroutine trim
+  end subroutine psb_base_transc_1mat
 
 
 end module psb_base_mat_mod

@@ -1,4 +1,3 @@
-
 !=====================================
 !
 !
@@ -12,10 +11,10 @@
 !
 !=====================================
 
-subroutine c_csc_csmv_impl(alpha,a,x,beta,y,info,trans) 
+subroutine psb_c_csc_csmv(alpha,a,x,beta,y,info,trans) 
   use psb_error_mod
   use psb_string_mod
-  use psb_c_csc_mat_mod, psb_protect_name => c_csc_csmv_impl
+  use psb_c_csc_mat_mod, psb_protect_name => psb_c_csc_csmv
   implicit none 
   class(psb_c_csc_sparse_mat), intent(in) :: a
   complex(psb_spk_), intent(in)          :: alpha, beta, x(:)
@@ -57,6 +56,19 @@ subroutine c_csc_csmv_impl(alpha,a,x,beta,y,info,trans)
   else
     n = a%get_ncols()
     m = a%get_nrows()
+  end if
+
+
+  if (size(x,1)<n) then 
+    info = 36
+    call psb_errpush(info,name,i_err=(/3,n,0,0,0/))
+    goto 9999
+  end if
+
+  if (size(y,1)<m) then 
+    info = 36
+    call psb_errpush(info,name,i_err=(/5,m,0,0,0/))
+    goto 9999
   end if
 
 
@@ -413,12 +425,12 @@ subroutine c_csc_csmv_impl(alpha,a,x,beta,y,info,trans)
   end if
   return
 
-end subroutine c_csc_csmv_impl
+end subroutine psb_c_csc_csmv
 
-subroutine c_csc_csmm_impl(alpha,a,x,beta,y,info,trans) 
+subroutine psb_c_csc_csmm(alpha,a,x,beta,y,info,trans) 
   use psb_error_mod
   use psb_string_mod
-  use psb_c_csc_mat_mod, psb_protect_name => c_csc_csmm_impl
+  use psb_c_csc_mat_mod, psb_protect_name => psb_c_csc_csmm
   implicit none 
   class(psb_c_csc_sparse_mat), intent(in) :: a
   complex(psb_spk_), intent(in)          :: alpha, beta, x(:,:)
@@ -459,6 +471,19 @@ subroutine c_csc_csmm_impl(alpha,a,x,beta,y,info,trans)
     n = a%get_ncols()
     m = a%get_nrows()
   end if
+
+  if (size(x,1)<n) then 
+    info = 36
+    call psb_errpush(info,name,i_err=(/3,n,0,0,0/))
+    goto 9999
+  end if
+
+  if (size(y,1)<m) then 
+    info = 36
+    call psb_errpush(info,name,i_err=(/5,m,0,0,0/))
+    goto 9999
+  end if
+
 
   nc = min(size(x,2) , size(y,2) )
 
@@ -822,13 +847,13 @@ subroutine c_csc_csmm_impl(alpha,a,x,beta,y,info,trans)
   end if
   return
 
-end subroutine c_csc_csmm_impl
+end subroutine psb_c_csc_csmm
 
 
-subroutine c_csc_cssv_impl(alpha,a,x,beta,y,info,trans) 
+subroutine psb_c_csc_cssv(alpha,a,x,beta,y,info,trans) 
   use psb_error_mod
   use psb_string_mod
-  use psb_c_csc_mat_mod, psb_protect_name => c_csc_cssv_impl
+  use psb_c_csc_mat_mod, psb_protect_name => psb_c_csc_cssv
   implicit none 
   class(psb_c_csc_sparse_mat), intent(in) :: a
   complex(psb_spk_), intent(in)          :: alpha, beta, x(:)
@@ -868,6 +893,19 @@ subroutine c_csc_cssv_impl(alpha,a,x,beta,y,info,trans)
     call psb_errpush(info,name)
     goto 9999
   end if
+
+  if (size(x,1)<m) then 
+    info = 36
+    call psb_errpush(info,name,i_err=(/3,n,0,0,0/))
+    goto 9999
+  end if
+
+  if (size(y,1)<m) then 
+    info = 36
+    call psb_errpush(info,name,i_err=(/5,m,0,0,0/))
+    goto 9999
+  end if
+
 
   
   if (alpha == czero) then
@@ -939,25 +977,6 @@ contains
 
       if (lower) then 
         if (unit) then 
-          do i=1, n
-            acc = czero 
-            do j=icp(i), icp(i+1)-1
-              acc = acc + val(j)*y(ia(j))
-            end do
-            y(i) = x(i) - acc
-          end do
-        else if (.not.unit) then 
-          do i=1, n
-            acc = czero 
-            do j=icp(i), icp(i+1)-2
-              acc = acc + val(j)*y(ia(j))
-            end do
-            y(i) = (x(i) - acc)/val(icp(i+1)-1)
-          end do
-        end if
-      else if (.not.lower) then 
-
-        if (unit) then 
           do i=n, 1, -1 
             acc = czero 
             do j=icp(i), icp(i+1)-1
@@ -975,16 +994,13 @@ contains
           end do
         end if
 
-      end if
+      else if (.not.lower) then 
 
-    else if (ctra) then 
-
-      if (lower) then 
         if (unit) then 
           do i=1, n
             acc = czero 
             do j=icp(i), icp(i+1)-1
-              acc = acc + conjg(val(j))*y(ia(j))
+              acc = acc + val(j)*y(ia(j))
             end do
             y(i) = x(i) - acc
           end do
@@ -992,12 +1008,16 @@ contains
           do i=1, n
             acc = czero 
             do j=icp(i), icp(i+1)-2
-              acc = acc + conjg(val(j))*y(ia(j))
+              acc = acc + val(j)*y(ia(j))
             end do
-            y(i) = (x(i) - acc)/conjg(val(icp(i+1)-1))
+            y(i) = (x(i) - acc)/val(icp(i+1)-1)
           end do
         end if
-      else if (.not.lower) then 
+      end if
+
+    else if (ctra) then 
+
+      if (lower) then 
 
         if (unit) then 
           do i=n, 1, -1 
@@ -1017,6 +1037,26 @@ contains
           end do
         end if
 
+      else if (.not.lower) then 
+
+        if (unit) then 
+          do i=1, n
+            acc = czero 
+            do j=icp(i), icp(i+1)-1
+              acc = acc + conjg(val(j))*y(ia(j))
+            end do
+            y(i) = x(i) - acc
+          end do
+        else if (.not.unit) then 
+          do i=1, n
+            acc = czero 
+            do j=icp(i), icp(i+1)-2
+              acc = acc + conjg(val(j))*y(ia(j))
+            end do
+            y(i) = (x(i) - acc)/conjg(val(icp(i+1)-1))
+          end do
+        end if
+
       end if
 
     else if (.not.(tra.or.ctra)) then 
@@ -1026,25 +1066,6 @@ contains
       end do
 
       if (lower) then 
-        if (unit) then 
-          do i=n, 1, -1
-            acc = y(i) 
-            do j=icp(i), icp(i+1)-1
-              jc    = ia(j)
-              y(jc) = y(jc) - val(j)*acc 
-            end do
-          end do
-        else if (.not.unit) then 
-          do i=n, 1, -1
-            y(i) = y(i)/val(icp(i+1)-1)
-            acc  = y(i) 
-            do j=icp(i), icp(i+1)-2
-              jc    = ia(j)
-              y(jc) = y(jc) - val(j)*acc 
-            end do
-          end do
-        end if
-      else if (.not.lower) then 
 
         if (unit) then 
           do i=1, n
@@ -1065,18 +1086,39 @@ contains
           end do
         end if
 
+      else if (.not.lower) then 
+
+        if (unit) then 
+          do i=n, 1, -1
+            acc = y(i) 
+            do j=icp(i), icp(i+1)-1
+              jc    = ia(j)
+              y(jc) = y(jc) - val(j)*acc 
+            end do
+          end do
+        else if (.not.unit) then 
+          do i=n, 1, -1
+            y(i) = y(i)/val(icp(i+1)-1)
+            acc  = y(i) 
+            do j=icp(i), icp(i+1)-2
+              jc    = ia(j)
+              y(jc) = y(jc) - val(j)*acc 
+            end do
+          end do
+        end if
+
       end if
     end if
   end subroutine inner_cscsv
 
-end subroutine c_csc_cssv_impl
+end subroutine psb_c_csc_cssv
 
 
 
-subroutine c_csc_cssm_impl(alpha,a,x,beta,y,info,trans) 
+subroutine psb_c_csc_cssm(alpha,a,x,beta,y,info,trans) 
   use psb_error_mod
   use psb_string_mod
-  use psb_c_csc_mat_mod, psb_protect_name => c_csc_cssm_impl
+  use psb_c_csc_mat_mod, psb_protect_name => psb_c_csc_cssm
   implicit none 
   class(psb_c_csc_sparse_mat), intent(in) :: a
   complex(psb_spk_), intent(in)          :: alpha, beta, x(:,:)
@@ -1113,6 +1155,19 @@ subroutine c_csc_cssm_impl(alpha,a,x,beta,y,info,trans)
 
   m   = a%get_nrows()
   nc  = min(size(x,2) , size(y,2)) 
+
+  if (size(x,1)<m) then 
+    info = 36
+    call psb_errpush(info,name,i_err=(/3,n,0,0,0/))
+    goto 9999
+  end if
+
+  if (size(y,1)<m) then 
+    info = 36
+    call psb_errpush(info,name,i_err=(/5,m,0,0,0/))
+    goto 9999
+  end if
+
 
   if (.not. (a%is_triangle())) then 
     info = 1121
@@ -1183,8 +1238,8 @@ contains
     implicit none 
     logical, intent(in)                 :: tra,ctra,lower,unit
     integer, intent(in)                 :: nr,nc,ldx,ldy,icp(*),ia(*)
-    complex(psb_spk_), intent(in)       :: val(*), x(ldx,*)
-    complex(psb_spk_), intent(out)      :: y(ldy,*)
+    complex(psb_spk_), intent(in)          :: val(*), x(ldx,*)
+    complex(psb_spk_), intent(out)         :: y(ldy,*)
     integer, intent(out)                :: info
     integer :: i,j,k,m, ir, jc
     complex(psb_spk_), allocatable  :: acc(:)
@@ -1331,11 +1386,11 @@ contains
     end if
   end subroutine inner_cscsm
 
-end subroutine c_csc_cssm_impl
+end subroutine psb_c_csc_cssm
 
-function c_csc_csnmi_impl(a) result(res)
+function psb_c_csc_csnmi(a) result(res)
   use psb_error_mod
-  use psb_c_csc_mat_mod, psb_protect_name => c_csc_csnmi_impl
+  use psb_c_csc_mat_mod, psb_protect_name => psb_c_csc_csnmi
   implicit none 
   class(psb_c_csc_sparse_mat), intent(in) :: a
   real(psb_spk_)         :: res
@@ -1348,14 +1403,14 @@ function c_csc_csnmi_impl(a) result(res)
   logical, parameter :: debug=.false.
 
 
-  res = szero 
+  res = czero 
   nr = a%get_nrows()
   nc = a%get_ncols()
   allocate(acc(nr),stat=info)
   if (info /= 0) then 
     return
   end if
-  acc(:) = szero
+  acc(:) = dzero
   do i=1, nc
     do j=a%icp(i),a%icp(i+1)-1  
       acc(a%ia(j)) = acc(a%ia(j)) + abs(a%val(j))
@@ -1366,7 +1421,135 @@ function c_csc_csnmi_impl(a) result(res)
   end do
   deallocate(acc)
 
-end function c_csc_csnmi_impl
+end function psb_c_csc_csnmi
+
+
+subroutine psb_c_csc_get_diag(a,d,info) 
+  use psb_error_mod
+  use psb_const_mod
+  use psb_c_csc_mat_mod, psb_protect_name => psb_c_csc_get_diag
+  implicit none 
+  class(psb_c_csc_sparse_mat), intent(in) :: a
+  complex(psb_spk_), intent(out)     :: d(:)
+  integer, intent(out)            :: info
+
+  Integer :: err_act, mnm, i, j, k
+  character(len=20)  :: name='get_diag'
+  logical, parameter :: debug=.false.
+
+  info  = 0
+  call psb_erractionsave(err_act)
+
+  mnm = min(a%get_nrows(),a%get_ncols())
+  if (size(d) < mnm) then 
+    info=35
+    call psb_errpush(info,name,i_err=(/2,size(d),0,0,0/))
+    goto 9999
+  end if
+
+
+  do i=1, mnm
+    do k=a%icp(i),a%icp(i+1)-1
+      j=a%ia(k)
+      if ((j==i) .and.(j <= mnm )) then 
+        d(i) = a%val(k)
+      endif
+    enddo
+  end do
+  do i=mnm+1,size(d) 
+    d(i) = czero
+  end do
+  call psb_erractionrestore(err_act)
+  return
+
+9999 continue
+  call psb_erractionrestore(err_act)
+  if (err_act == psb_act_abort_) then
+    call psb_error()
+    return
+  end if
+  return
+
+end subroutine psb_c_csc_get_diag
+
+
+subroutine psb_c_csc_scal(d,a,info) 
+  use psb_error_mod
+  use psb_const_mod
+  use psb_c_csc_mat_mod, psb_protect_name => psb_c_csc_scal
+  implicit none 
+  class(psb_c_csc_sparse_mat), intent(inout) :: a
+  complex(psb_spk_), intent(in)      :: d(:)
+  integer, intent(out)            :: info
+
+  Integer :: err_act,mnm, i, j, n
+  character(len=20)  :: name='scal'
+  logical, parameter :: debug=.false.
+
+  info  = 0
+  call psb_erractionsave(err_act)
+
+  n = a%get_ncols()
+  if (size(d) < n) then 
+    info=35
+    call psb_errpush(info,name,i_err=(/2,size(d),0,0,0/))
+    goto 9999
+  end if
+
+  do i=1, n
+    do j = a%icp(i), a%icp(i+1) -1 
+      a%val(j) = a%val(j) * d(a%ia(j))
+    end do
+  enddo
+
+  call psb_erractionrestore(err_act)
+  return
+
+9999 continue
+  call psb_erractionrestore(err_act)
+  if (err_act == psb_act_abort_) then
+    call psb_error()
+    return
+  end if
+  return
+
+end subroutine psb_c_csc_scal
+
+
+subroutine psb_c_csc_scals(d,a,info) 
+  use psb_error_mod
+  use psb_const_mod
+  use psb_c_csc_mat_mod, psb_protect_name => psb_c_csc_scals
+  implicit none 
+  class(psb_c_csc_sparse_mat), intent(inout) :: a
+  complex(psb_spk_), intent(in)      :: d
+  integer, intent(out)            :: info
+
+  Integer :: err_act,mnm, i, j, m
+  character(len=20)  :: name='scal'
+  logical, parameter :: debug=.false.
+
+  info  = 0
+  call psb_erractionsave(err_act)
+
+
+  do i=1,a%get_nzeros()
+    a%val(i) = a%val(i) * d
+  enddo
+
+  call psb_erractionrestore(err_act)
+  return
+
+9999 continue
+  call psb_erractionrestore(err_act)
+  if (err_act == psb_act_abort_) then
+    call psb_error()
+    return
+  end if
+  return
+
+end subroutine psb_c_csc_scals
+
 
 !===================================== 
 !
@@ -1380,14 +1563,14 @@ end function c_csc_csnmi_impl
 !
 !=====================================   
 
-subroutine c_csc_csgetptn_impl(imin,imax,a,nz,ia,ja,info,&
+subroutine psb_c_csc_csgetptn(imin,imax,a,nz,ia,ja,info,&
      & jmin,jmax,iren,append,nzin,rscale,cscale)
   ! Output is always in  COO format 
   use psb_error_mod
   use psb_const_mod
   use psb_error_mod
   use psb_c_base_mat_mod
-  use psb_c_csc_mat_mod, psb_protect_name => c_csc_csgetptn_impl
+  use psb_c_csc_mat_mod, psb_protect_name => psb_c_csc_csgetptn
   implicit none
 
   class(psb_c_csc_sparse_mat), intent(in) :: a
@@ -1563,19 +1746,19 @@ contains
     
   end subroutine csc_getptn
   
-end subroutine c_csc_csgetptn_impl
+end subroutine psb_c_csc_csgetptn
 
 
 
 
-subroutine c_csc_csgetrow_impl(imin,imax,a,nz,ia,ja,val,info,&
+subroutine psb_c_csc_csgetrow(imin,imax,a,nz,ia,ja,val,info,&
      & jmin,jmax,iren,append,nzin,rscale,cscale)
   ! Output is always in  COO format 
   use psb_error_mod
   use psb_const_mod
   use psb_error_mod
   use psb_c_base_mat_mod
-  use psb_c_csc_mat_mod, psb_protect_name => c_csc_csgetrow_impl
+  use psb_c_csc_mat_mod, psb_protect_name => psb_c_csc_csgetrow
   implicit none
 
   class(psb_c_csc_sparse_mat), intent(in) :: a
@@ -1758,14 +1941,14 @@ contains
     end if
   end subroutine csc_getrow
 
-end subroutine c_csc_csgetrow_impl
+end subroutine psb_c_csc_csgetrow
 
 
 
-subroutine c_csc_csput_impl(nz,ia,ja,val,a,imin,imax,jmin,jmax,info,gtl) 
+subroutine psb_c_csc_csput(nz,ia,ja,val,a,imin,imax,jmin,jmax,info,gtl) 
   use psb_error_mod
   use psb_realloc_mod
-  use psb_c_csc_mat_mod, psb_protect_name => c_csc_csput_impl
+  use psb_c_csc_mat_mod, psb_protect_name => psb_c_csc_csput
   implicit none 
 
   class(psb_c_csc_sparse_mat), intent(inout) :: a
@@ -1780,7 +1963,37 @@ subroutine c_csc_csput_impl(nz,ia,ja,val,a,imin,imax,jmin,jmax,info,gtl)
   logical, parameter :: debug=.false.
   integer            :: nza, i,j,k, nzl, isza, int_err(5)
 
+  call psb_erractionsave(err_act)
   info = 0
+
+  if (nz <= 0) then 
+    info = 10
+    int_err(1)=1
+    call psb_errpush(info,name,i_err=int_err)
+    goto 9999
+  end if
+  if (size(ia) < nz) then 
+    info = 35
+    int_err(1)=2
+    call psb_errpush(info,name,i_err=int_err)
+    goto 9999
+  end if
+
+  if (size(ja) < nz) then 
+    info = 35
+    int_err(1)=3
+    call psb_errpush(info,name,i_err=int_err)
+    goto 9999
+  end if
+  if (size(val) < nz) then 
+    info = 35
+    int_err(1)=4
+    call psb_errpush(info,name,i_err=int_err)
+    goto 9999
+  end if
+
+  if (nz == 0) return
+
   nza  = a%get_nzeros()
 
   if (a%is_bld()) then 
@@ -1788,9 +2001,9 @@ subroutine c_csc_csput_impl(nz,ia,ja,val,a,imin,imax,jmin,jmax,info,gtl)
     info = 1121
 
   else  if (a%is_upd()) then 
-    call  c_csc_srch_upd(nz,ia,ja,val,a,&
+    call  psb_c_csc_srch_upd(nz,ia,ja,val,a,&
          & imin,imax,jmin,jmax,info,gtl)
-    
+
     if (info /= 0) then  
 
       info = 1121
@@ -1820,7 +2033,7 @@ subroutine c_csc_csput_impl(nz,ia,ja,val,a,imin,imax,jmin,jmax,info,gtl)
 
 contains
 
-  subroutine c_csc_srch_upd(nz,ia,ja,val,a,&
+  subroutine psb_c_csc_srch_upd(nz,ia,ja,val,a,&
        & imin,imax,jmin,jmax,info,gtl)
 
     use psb_const_mod
@@ -2018,17 +2231,17 @@ contains
 
     end if
 
-  end subroutine c_csc_srch_upd
+  end subroutine psb_c_csc_srch_upd
 
-end subroutine c_csc_csput_impl
+end subroutine psb_c_csc_csput
 
 
 
-subroutine c_cp_csc_from_coo_impl(a,b,info) 
+subroutine psb_c_cp_csc_from_coo(a,b,info) 
   use psb_const_mod
   use psb_realloc_mod
   use psb_c_base_mat_mod
-  use psb_c_csc_mat_mod, psb_protect_name => c_cp_csc_from_coo_impl
+  use psb_c_csc_mat_mod, psb_protect_name => psb_c_cp_csc_from_coo
   implicit none 
 
   class(psb_c_csc_sparse_mat), intent(inout) :: a
@@ -2049,18 +2262,18 @@ subroutine c_cp_csc_from_coo_impl(a,b,info)
   call tmp%cp_from_coo(b,info)
   if (info ==0) call a%mv_from_coo(tmp,info)
 
-end subroutine c_cp_csc_from_coo_impl
+end subroutine psb_c_cp_csc_from_coo
 
 
 
-subroutine c_cp_csc_to_coo_impl(a,b,info) 
+subroutine psb_c_cp_csc_to_coo(a,b,info) 
   use psb_const_mod
   use psb_c_base_mat_mod
-  use psb_c_csc_mat_mod, psb_protect_name => c_cp_csc_to_coo_impl
+  use psb_c_csc_mat_mod, psb_protect_name => psb_c_cp_csc_to_coo
   implicit none 
 
   class(psb_c_csc_sparse_mat), intent(in)  :: a
-  class(psb_c_coo_sparse_mat), intent(out) :: b
+  class(psb_c_coo_sparse_mat), intent(inout) :: b
   integer, intent(out)                      :: info
 
   integer, allocatable :: itemp(:)
@@ -2092,18 +2305,18 @@ subroutine c_cp_csc_to_coo_impl(a,b,info)
   call b%fix(info)
 
 
-end subroutine c_cp_csc_to_coo_impl
+end subroutine psb_c_cp_csc_to_coo
 
 
-subroutine c_mv_csc_to_coo_impl(a,b,info) 
+subroutine psb_c_mv_csc_to_coo(a,b,info) 
   use psb_const_mod
   use psb_realloc_mod
   use psb_c_base_mat_mod
-  use psb_c_csc_mat_mod, psb_protect_name => c_mv_csc_to_coo_impl
+  use psb_c_csc_mat_mod, psb_protect_name => psb_c_mv_csc_to_coo
   implicit none 
 
   class(psb_c_csc_sparse_mat), intent(inout) :: a
-  class(psb_c_coo_sparse_mat), intent(out)   :: b
+  class(psb_c_coo_sparse_mat), intent(inout)   :: b
   integer, intent(out)                        :: info
 
   integer, allocatable :: itemp(:)
@@ -2134,15 +2347,15 @@ subroutine c_mv_csc_to_coo_impl(a,b,info)
   call a%free()
   call b%fix(info)
 
-end subroutine c_mv_csc_to_coo_impl
+end subroutine psb_c_mv_csc_to_coo
 
 
 
-subroutine c_mv_csc_from_coo_impl(a,b,info) 
+subroutine psb_c_mv_csc_from_coo(a,b,info) 
   use psb_const_mod
   use psb_realloc_mod
   use psb_c_base_mat_mod
-  use psb_c_csc_mat_mod, psb_protect_name => c_mv_csc_from_coo_impl
+  use psb_c_csc_mat_mod, psb_protect_name => psb_c_mv_csc_from_coo
   implicit none 
 
   class(psb_c_csc_sparse_mat), intent(inout) :: a
@@ -2225,18 +2438,18 @@ subroutine c_mv_csc_from_coo_impl(a,b,info)
   endif
 
 
-end subroutine c_mv_csc_from_coo_impl
+end subroutine psb_c_mv_csc_from_coo
 
 
-subroutine c_mv_csc_to_fmt_impl(a,b,info) 
+subroutine psb_c_mv_csc_to_fmt(a,b,info) 
   use psb_const_mod
   use psb_realloc_mod
   use psb_c_base_mat_mod
-  use psb_c_csc_mat_mod, psb_protect_name => c_mv_csc_to_fmt_impl
+  use psb_c_csc_mat_mod, psb_protect_name => psb_c_mv_csc_to_fmt
   implicit none 
 
   class(psb_c_csc_sparse_mat), intent(inout) :: a
-  class(psb_c_base_sparse_mat), intent(out)  :: b
+  class(psb_c_base_sparse_mat), intent(inout)  :: b
   integer, intent(out)                        :: info
 
   !locals
@@ -2265,18 +2478,18 @@ subroutine c_mv_csc_to_fmt_impl(a,b,info)
     if (info == 0) call b%mv_from_coo(tmp,info)
   end select
 
-end subroutine c_mv_csc_to_fmt_impl
+end subroutine psb_c_mv_csc_to_fmt
 !!$
 
-subroutine c_cp_csc_to_fmt_impl(a,b,info) 
+subroutine psb_c_cp_csc_to_fmt(a,b,info) 
   use psb_const_mod
   use psb_realloc_mod
   use psb_c_base_mat_mod
-  use psb_c_csc_mat_mod, psb_protect_name => c_cp_csc_to_fmt_impl
+  use psb_c_csc_mat_mod, psb_protect_name => psb_c_cp_csc_to_fmt
   implicit none 
 
   class(psb_c_csc_sparse_mat), intent(in)   :: a
-  class(psb_c_base_sparse_mat), intent(out) :: b
+  class(psb_c_base_sparse_mat), intent(inout) :: b
   integer, intent(out)                       :: info
 
   !locals
@@ -2305,14 +2518,14 @@ subroutine c_cp_csc_to_fmt_impl(a,b,info)
     if (info == 0) call b%mv_from_coo(tmp,info)
   end select
 
-end subroutine c_cp_csc_to_fmt_impl
+end subroutine psb_c_cp_csc_to_fmt
 
 
-subroutine c_mv_csc_from_fmt_impl(a,b,info) 
+subroutine psb_c_mv_csc_from_fmt(a,b,info) 
   use psb_const_mod
   use psb_realloc_mod
   use psb_c_base_mat_mod
-  use psb_c_csc_mat_mod, psb_protect_name => c_mv_csc_from_fmt_impl
+  use psb_c_csc_mat_mod, psb_protect_name => psb_c_mv_csc_from_fmt
   implicit none 
 
   class(psb_c_csc_sparse_mat), intent(inout)  :: a
@@ -2345,15 +2558,15 @@ subroutine c_mv_csc_from_fmt_impl(a,b,info)
     if (info == 0) call a%mv_from_coo(tmp,info)
   end select
 
-end subroutine c_mv_csc_from_fmt_impl
+end subroutine psb_c_mv_csc_from_fmt
 
 
 
-subroutine c_cp_csc_from_fmt_impl(a,b,info) 
+subroutine psb_c_cp_csc_from_fmt(a,b,info) 
   use psb_const_mod
   use psb_realloc_mod
   use psb_c_base_mat_mod
-  use psb_c_csc_mat_mod, psb_protect_name => c_cp_csc_from_fmt_impl
+  use psb_c_csc_mat_mod, psb_protect_name => psb_c_cp_csc_from_fmt
   implicit none 
 
   class(psb_c_csc_sparse_mat), intent(inout) :: a
@@ -2384,5 +2597,403 @@ subroutine c_cp_csc_from_fmt_impl(a,b,info)
     call tmp%cp_from_fmt(b,info)
     if (info == 0) call a%mv_from_coo(tmp,info)
   end select
-end subroutine c_cp_csc_from_fmt_impl
+end subroutine psb_c_cp_csc_from_fmt
+
+
+subroutine  psb_c_csc_reallocate_nz(nz,a) 
+  use psb_error_mod
+  use psb_realloc_mod
+  use psb_c_csc_mat_mod, psb_protect_name => psb_c_csc_reallocate_nz
+  implicit none 
+  integer, intent(in) :: nz
+  class(psb_c_csc_sparse_mat), intent(inout) :: a
+  Integer :: err_act, info
+  character(len=20)  :: name='c_csc_reallocate_nz'
+  logical, parameter :: debug=.false.
+
+  call psb_erractionsave(err_act)
+
+  call psb_realloc(nz,a%ia,info)
+  if (info == 0) call psb_realloc(nz,a%val,info)
+  if (info == 0) call psb_realloc(max(nz,a%get_nrows()+1,a%get_ncols()+1),a%icp,info)
+  if (info /= 0) then 
+    call psb_errpush(4000,name)
+    goto 9999
+  end if
+
+  call psb_erractionrestore(err_act)
+  return
+
+9999 continue
+  call psb_erractionrestore(err_act)
+
+  if (err_act == psb_act_abort_) then
+    call psb_error()
+    return
+  end if
+  return
+
+end subroutine psb_c_csc_reallocate_nz
+
+
+
+subroutine psb_c_csc_csgetblk(imin,imax,a,b,info,&
+     & jmin,jmax,iren,append,rscale,cscale)
+  ! Output is always in  COO format 
+  use psb_error_mod
+  use psb_const_mod
+  use psb_c_csc_mat_mod, psb_protect_name => psb_c_csc_csgetblk
+  implicit none
+
+  class(psb_c_csc_sparse_mat), intent(in) :: a
+  class(psb_c_coo_sparse_mat), intent(inout) :: b
+  integer, intent(in)                  :: imin,imax
+  integer,intent(out)                  :: info
+  logical, intent(in), optional        :: append
+  integer, intent(in), optional        :: iren(:)
+  integer, intent(in), optional        :: jmin,jmax
+  logical, intent(in), optional        :: rscale,cscale
+  Integer :: err_act, nzin, nzout
+  character(len=20)  :: name='csget'
+  logical :: append_
+  logical, parameter :: debug=.false.
+
+  call psb_erractionsave(err_act)
+  info = 0
+
+  if (present(append)) then 
+    append_ = append
+  else
+    append_ = .false.
+  endif
+  if (append_) then 
+    nzin = a%get_nzeros()
+  else
+    nzin = 0
+  endif
+
+  call a%csget(imin,imax,nzout,b%ia,b%ja,b%val,info,&
+       & jmin=jmin, jmax=jmax, iren=iren, append=append_, &
+       & nzin=nzin, rscale=rscale, cscale=cscale)
+
+  if (info /= 0) goto 9999
+
+  call b%set_nzeros(nzin+nzout)
+  call b%fix(info)
+  if (info /= 0) goto 9999
+
+  call psb_erractionrestore(err_act)
+  return
+
+9999 continue
+  call psb_erractionrestore(err_act)
+
+  if (err_act == psb_act_abort_) then
+    call psb_error()
+    return
+  end if
+  return
+
+end subroutine psb_c_csc_csgetblk
+
+subroutine psb_c_csc_reinit(a,clear)
+  use psb_error_mod
+  use psb_c_csc_mat_mod, psb_protect_name => psb_c_csc_reinit
+  implicit none 
+
+  class(psb_c_csc_sparse_mat), intent(inout) :: a   
+  logical, intent(in), optional :: clear
+
+  Integer :: err_act, info
+  character(len=20)  :: name='reinit'
+  logical  :: clear_
+  logical, parameter :: debug=.false.
+
+  call psb_erractionsave(err_act)
+  info = 0
+
+
+  if (present(clear)) then 
+    clear_ = clear
+  else
+    clear_ = .true.
+  end if
+
+  if (a%is_bld() .or. a%is_upd()) then 
+    ! do nothing
+    return
+  else if (a%is_asb()) then 
+    if (clear_) a%val(:) = czero
+    call a%set_upd()
+  else
+    info = 1121
+    call psb_errpush(info,name)
+    goto 9999
+  end if
+
+  call psb_erractionrestore(err_act)
+  return
+
+9999 continue
+  call psb_erractionrestore(err_act)
+
+  if (err_act == psb_act_abort_) then
+    call psb_error()
+    return
+  end if
+  return
+
+end subroutine psb_c_csc_reinit
+
+subroutine  psb_c_csc_trim(a)
+  use psb_realloc_mod
+  use psb_error_mod
+  use psb_c_csc_mat_mod, psb_protect_name => psb_c_csc_trim
+  implicit none 
+  class(psb_c_csc_sparse_mat), intent(inout) :: a
+  Integer :: err_act, info, nz, n
+  character(len=20)  :: name='trim'
+  logical, parameter :: debug=.false.
+
+  call psb_erractionsave(err_act)
+  info = 0
+  n   = a%get_ncols()
+  nz  = a%get_nzeros()
+  if (info == 0) call psb_realloc(n+1,a%icp,info)
+  if (info == 0) call psb_realloc(nz,a%ia,info)
+  if (info == 0) call psb_realloc(nz,a%val,info)
+
+  if (info /= 0) goto 9999 
+  call psb_erractionrestore(err_act)
+  return
+
+9999 continue
+  call psb_erractionrestore(err_act)
+
+  if (err_act == psb_act_abort_) then
+    call psb_error()
+    return
+  end if
+  return
+
+end subroutine psb_c_csc_trim
+
+subroutine  psb_c_csc_allocate_mnnz(m,n,a,nz) 
+  use psb_error_mod
+  use psb_realloc_mod
+  use psb_c_csc_mat_mod, psb_protect_name => psb_c_csc_allocate_mnnz
+  implicit none 
+  integer, intent(in) :: m,n
+  class(psb_c_csc_sparse_mat), intent(inout) :: a
+  integer, intent(in), optional :: nz
+  Integer :: err_act, info, nz_
+  character(len=20)  :: name='allocate_mnz'
+  logical, parameter :: debug=.false.
+
+  call psb_erractionsave(err_act)
+  info = 0
+  if (m < 0) then 
+    info = 10
+    call psb_errpush(info,name,i_err=(/1,0,0,0,0/))
+    goto 9999
+  endif
+  if (n < 0) then 
+    info = 10
+    call psb_errpush(info,name,i_err=(/2,0,0,0,0/))
+    goto 9999
+  endif
+  if (present(nz)) then 
+    nz_ = nz
+  else
+    nz_ = max(7*m,7*n,1)
+  end if
+  if (nz_ < 0) then 
+    info = 10
+    call psb_errpush(info,name,i_err=(/3,0,0,0,0/))
+    goto 9999
+  endif
+
+  if (info == 0) call psb_realloc(n+1,a%icp,info)
+  if (info == 0) call psb_realloc(nz_,a%ia,info)
+  if (info == 0) call psb_realloc(nz_,a%val,info)
+  if (info == 0) then 
+    a%icp=0
+    call a%set_nrows(m)
+    call a%set_ncols(n)
+    call a%set_bld()
+    call a%set_triangle(.false.)
+    call a%set_unit(.false.)
+  end if
+
+  call psb_erractionrestore(err_act)
+  return
+
+9999 continue
+  call psb_erractionrestore(err_act)
+
+  if (err_act == psb_act_abort_) then
+    call psb_error()
+    return
+  end if
+  return
+
+end subroutine psb_c_csc_allocate_mnnz
+
+subroutine psb_c_csc_print(iout,a,iv,eirs,eics,head,ivr,ivc)
+  use psb_string_mod
+  use psb_c_csc_mat_mod, psb_protect_name => psb_c_csc_print
+  implicit none 
+
+  integer, intent(in)               :: iout
+  class(psb_c_csc_sparse_mat), intent(in) :: a   
+  integer, intent(in), optional     :: iv(:)
+  integer, intent(in), optional     :: eirs,eics
+  character(len=*), optional        :: head
+  integer, intent(in), optional     :: ivr(:), ivc(:)
+
+  Integer :: err_act
+  character(len=20)  :: name='c_csc_print'
+  logical, parameter :: debug=.false.
+
+  character(len=80)                 :: frmtv 
+  integer  :: irs,ics,i,j, nmx, ni, nr, nc, nz
+
+  if (present(eirs)) then 
+    irs = eirs
+  else
+    irs = 0
+  endif
+  if (present(eics)) then 
+    ics = eics
+  else
+    ics = 0
+  endif
+
+  if (present(head)) then 
+    write(iout,'(a)') '%%MatrixMarket matrix coordinate real general'
+    write(iout,'(a,a)') '% ',head 
+    write(iout,'(a)') '%'    
+    write(iout,'(a,a)') '% COO'
+  endif
+
+  nr = a%get_nrows()
+  nc = a%get_ncols()
+  nz = a%get_nzeros()
+  nmx = max(nr,nc,1)
+  ni  = floor(log10(1.0*nmx)) + 1
+
+  write(frmtv,'(a,i3.3,a,i3.3,a)') '(2(i',ni,',1x),es26.18,1x,2(i',ni,',1x))'
+  write(iout,*) nr, nc, nz 
+  if(present(iv)) then 
+    do i=1, nr
+      do j=a%icp(i),a%icp(i+1)-1 
+        write(iout,frmtv) iv(a%ia(j)),iv(i),a%val(j)
+      end do
+    enddo
+  else      
+    if (present(ivr).and..not.present(ivc)) then 
+      do i=1, nr
+        do j=a%icp(i),a%icp(i+1)-1 
+          write(iout,frmtv) ivr(a%ia(j)),i,a%val(j)
+        end do
+      enddo
+    else if (present(ivr).and.present(ivc)) then 
+      do i=1, nr
+        do j=a%icp(i),a%icp(i+1)-1 
+          write(iout,frmtv) ivr(a%ia(j)),ivc(i),a%val(j)
+        end do
+      enddo
+    else if (.not.present(ivr).and.present(ivc)) then 
+      do i=1, nr
+        do j=a%icp(i),a%icp(i+1)-1 
+          write(iout,frmtv) (a%ia(j)),ivc(i),a%val(j)
+        end do
+      enddo
+    else if (.not.present(ivr).and..not.present(ivc)) then 
+      do i=1, nr
+        do j=a%icp(i),a%icp(i+1)-1 
+          write(iout,frmtv) (a%ia(j)),(i),a%val(j)
+        end do
+      enddo
+    endif
+  endif
+
+end subroutine psb_c_csc_print
+
+subroutine psb_c_csc_cp_from(a,b)
+  use psb_error_mod
+  use psb_c_csc_mat_mod, psb_protect_name => psb_c_csc_cp_from
+  implicit none 
+
+  class(psb_c_csc_sparse_mat), intent(inout) :: a
+  type(psb_c_csc_sparse_mat), intent(in)   :: b
+
+
+  Integer :: err_act, info
+  character(len=20)  :: name='cp_from'
+  logical, parameter :: debug=.false.
+
+  call psb_erractionsave(err_act)
+
+  info = 0
+
+  call a%allocate(b%get_nrows(),b%get_ncols(),b%get_nzeros())
+  call a%psb_c_base_sparse_mat%cp_from(b%psb_c_base_sparse_mat)
+  a%icp = b%icp 
+  a%ia  = b%ia
+  a%val = b%val 
+
+  if (info /= 0) goto 9999
+  call psb_erractionrestore(err_act)
+  return
+
+9999 continue
+  call psb_erractionrestore(err_act)
+
+  call psb_errpush(info,name)
+
+  if (err_act /= psb_act_ret_) then
+    call psb_error()
+  end if
+  return
+
+end subroutine psb_c_csc_cp_from
+
+subroutine psb_c_csc_mv_from(a,b)
+  use psb_error_mod
+  use psb_c_csc_mat_mod, psb_protect_name => psb_c_csc_mv_from
+  implicit none 
+
+  class(psb_c_csc_sparse_mat), intent(inout)  :: a
+  type(psb_c_csc_sparse_mat), intent(inout) :: b
+
+
+  Integer :: err_act, info
+  character(len=20)  :: name='mv_from'
+  logical, parameter :: debug=.false.
+
+  call psb_erractionsave(err_act)
+  info = 0
+  call a%psb_c_base_sparse_mat%mv_from(b%psb_c_base_sparse_mat)
+  call move_alloc(b%icp, a%icp)
+  call move_alloc(b%ia,  a%ia)
+  call move_alloc(b%val, a%val)
+  call b%free()
+
+  call psb_erractionrestore(err_act)
+  return
+
+9999 continue
+  call psb_erractionrestore(err_act)
+
+  call psb_errpush(info,name)
+
+  if (err_act /= psb_act_ret_) then
+    call psb_error()
+  end if
+  return
+
+end subroutine psb_c_csc_mv_from
+
+
 

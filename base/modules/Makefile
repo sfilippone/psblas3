@@ -44,7 +44,7 @@ psb_c_mat_mod.o: psb_c_base_mat_mod.o psb_c_csr_mat_mod.o psb_c_csc_mat_mod.o
 psb_z_mat_mod.o: psb_z_base_mat_mod.o psb_z_csr_mat_mod.o psb_z_csc_mat_mod.o
 psb_s_csc_mat_mod.o psb_s_csr_mat_mod.o: psb_s_base_mat_mod.o 
 psb_d_csc_mat_mod.o psb_d_csr_mat_mod.o: psb_d_base_mat_mod.o 
-psb_dccsc_mat_mod.o psb_c_csr_mat_mod.o: psb_c_base_mat_mod.o 
+psb_c_csc_mat_mod.o psb_c_csr_mat_mod.o: psb_c_base_mat_mod.o 
 psb_z_csc_mat_mod.o psb_z_csr_mat_mod.o: psb_z_base_mat_mod.o 
 psb_mat_mod.o: psb_s_mat_mod.o psb_d_mat_mod.o psb_c_mat_mod.o psb_z_mat_mod.o
 psb_realloc_mod.o : psb_error_mod.o 

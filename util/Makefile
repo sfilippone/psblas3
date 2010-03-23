@@ -6,11 +6,12 @@ LIBDIR=../lib
 HERE=.
 
 BASEOBJS= psb_blockpart_mod.o psb_metispart_mod.o \
-      psb_hbio_mod.o psb_mmio_mod.o psb_mat_dist_mod.o 
-MODOBJ=psb_util_mod.o
-OBJS=$(BASEOBJS) $(MODOBJ)
+      psb_hbio_mod.o psb_mmio_mod.o psb_mat_dist_mod.o
+IMPLOBJS= psb_hbio_impl.o psb_mmio_impl.o psb_mat_dist_impl.o
+MODOBJS=psb_util_mod.o $(BASEOBJS)
+OBJS=$(MODOBJS) $(IMPLOBJS)
 LIBMOD=psb_util_mod$(.mod)
-LOCAL_MODS=$(OBJS:.o=$(.mod))
+LOCAL_MODS=$(MODOBJS:.o=$(.mod))
 LIBNAME=$(UTILLIBNAME)
 FINCLUDES=$(FMFLAG)$(LIBDIR) $(FMFLAG).
 
@@ -23,7 +24,6 @@ lib:  $(OBJS)
 
 
 psb_util_mod.o: $(BASEOBJS)
-psb_read_mat_mod.o: psb_mmio_mod.o
 
 veryclean: clean
 	/bin/rm -f $(HERE)/$(LIBNAME)
