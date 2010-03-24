@@ -362,7 +362,7 @@ if test "X$CCOPT" == "X" ; then
      CCOPT="-O2 $CCOPT"
  fi
 fi
-CFLAGS="${CCOPT}"
+#CFLAGS="${CCOPT}"
 
 if test "X$FCOPT" == "X" ; then
  if test "X$psblas_cv_fc" == "Xgcc" ; then
@@ -371,7 +371,7 @@ if test "X$FCOPT" == "X" ; then
    FCOPT="-O3  $FCOPT"
  elif test "X$psblas_cv_fc" == X"xlf" ; then
    # XL compiler : consider using -qarch=auto
-     FCOPT="-O3 -qarch=auto $FCOPT"
+     FCOPT="-O3 -qarch=auto  -qfixed -qsuffix=f=f:cpp=F $FCOPT"
  elif test "X$psblas_cv_fc" == X"ifc" ; then
    # other compilers ..
      FCOPT="-O3 $FCOPT"
@@ -394,7 +394,7 @@ if test "X$psblas_cv_fc" == X"nag" ; then
    # Add needed options 
    FCOPT="$FCOPT  -dcfuns -f2003 -wmismatch=mpi_scatterv,mpi_alltoallv,mpi_gatherv,mpi_allgatherv"
 fi
-FFLAGS="${FCOPT}"
+#FFLAGS="${FCOPT}"
 
 if test "X$F90COPT" == "X" ; then
  if test "X$psblas_cv_fc" == "Xgcc" ; then
@@ -403,7 +403,7 @@ if test "X$F90COPT" == "X" ; then
    F90COPT="-O3  $F90COPT"
  elif test "X$psblas_cv_fc" == X"xlf" ; then
    # XL compiler : consider using -qarch=auto
-     F90COPT="-O3 -qarch=auto $F90COPT"
+     F90COPT="-O3 -qarch=auto -qsuffix=f=f90:cpp=F90 $F90COPT"
  elif test "X$psblas_cv_fc" == X"ifc" ; then
    # other compilers ..
      F90COPT="-O3 $F90COPT"
@@ -428,59 +428,30 @@ if test "X$psblas_cv_fc" == X"nag" ; then
      F90COPT="$F90COPT -dcfuns -f2003 -wmismatch=mpi_scatterv,mpi_alltoallv,mpi_gatherv,mpi_allgatherv"
      EXTRA_OPT="-mismatch_all"
      F03COPT="${F90COPT}"
+     F03="nagfor"		
+elif test "X$psblas_cv_fc" == X"xlf" ; then
+     F03="xlf2003_r"	   
+     F03COPT="-O3 -qarch=auto -qsuffix=f=f03:cpp=F03 $F03COPT"	
 else
+     F03=${FC}
      F03COPT="${F90COPT}"
 fi
 
-FCFLAGS="${F90COPT}"
+#FCFLAGS="${F90COPT}"
 
 # COPT,FCOPT, F90COPT are aliases for FFLAGS,CFLAGS,FCFLAGS .
 
 ##############################################################################
 # Compilers variables selection 
 ##############################################################################
-if test "X$psblas_cv_fc" == X"xlf" ; then
-  # WARNING : this is EVIL : specifying a pathname prefixed compiler will be ignored!
-  # But this is necessary since :
-  #  - if called from some script, xlf could behave strangely
-  #  - it is not said that mpxlf95 gets chosen by the configure script.
-  F90="xlf95   -qsuffix=f=f90:cpp=F90"
-  F03="xlf2003_r  -qsuffix=f=f03:cpp=F03"
- #  F90="xlf95"
-#    FC="xlf"
+F90=${FC}
+F03=${F03}
+MPF90=${MPIFC}
+FC=${FC}
+MPF77=${MPIFC}
+CC=${CC}
+MPCC=${MPICC}
 
-# Note : this gives problems in base/serial/aux/isaperm.f
-# FC="mpxlf     -qsuffix=f=f90:cpp=F90" 
-
-# Note : this is the cure
-     FC="xlf     -qsuffix=f=f:cpp=F"
-     # Note : maybe we will want xlf -qsuffix=cpp=F
-    F77="xlf"
-     CC="xlc"
-  if test x"$pac_cv_serial_mpi" == x"yes" ; then
-     MPF90="xlf2003_r -qsuffix=f=f90:cpp=F90"
-     MPF77="xlf95 -qfixed  -qsuffix=f=f:cpp=F"
-     MPCC="xlc"
-  else 
-     MPF90="mpxlf2003_r -qsuffix=f=f90:cpp=F90"
-     MPF77="mpxlf95 -qfixed  -qsuffix=f=f:cpp=F"
-     MPCC="mpcc"
-  fi
- #MPFCC="mpxlc"
-  # Note : -qfixed should be not specified in the environment FFLAGS or things will break.
-  #        This fact should be documented somewhere.
-else 
-  # We really think about the GCC here but this is our idea for other compilers, too.
-  # If the user wishes to, she should specify MPICC, MPIF77 after ./configure.
-  # Note: this behavious should be documented.
-    F90=${FC}
-    F03=${FC}
-  MPF90=${MPIFC}
-     FC=${FC}
-  MPF77=${MPIFC}
-     CC=${CC}
-   MPCC=${MPICC}
-fi
 
 
 ##############################################################################

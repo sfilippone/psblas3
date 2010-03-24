@@ -18,7 +18,8 @@ FOBJS = psb_sallc.o psb_sasb.o  \
 	psb_zspins.o psb_zsprn.o \
 	psb_cspalloc.o psb_cspasb.o psb_cspfree.o\
 	psb_callc.o psb_casb.o psb_cfree.o psb_cins.o \
-	psb_cspins.o psb_csprn.o psb_map.o psb_cd_set_bld.o psb_linmap.o
+	psb_cspins.o psb_csprn.o psb_cd_set_bld.o 
+#psb_linmap.o  psb_map.o
 
 MPFOBJS = psb_ssphalo.o psb_csphalo.o psb_dsphalo.o psb_zsphalo.o psb_icdasb.o \
 	psb_dcdbldext.o psb_zcdbldext.o psb_scdbldext.o psb_ccdbldext.o
