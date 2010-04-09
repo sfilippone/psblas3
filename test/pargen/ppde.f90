@@ -352,9 +352,9 @@ contains
     type(psb_d_csc_sparse_mat)       :: acsc
     type(psb_d_coo_sparse_mat)       :: acoo
     type(psb_d_csr_sparse_mat)       :: acsr
-    real(psb_dpk_)           :: zt(nb),glob_x,glob_y,glob_z
+    real(psb_dpk_)           :: zt(nb),x,y,z
     integer                  :: m,n,nnz,glob_row,nlr,i,ii,ib,k
-    integer                  :: x,y,z,ia,indx_owner
+    integer                  :: ix,iy,iz,ia,indx_owner
     integer                  :: np, iam, nr, nt
     integer                  :: element
     integer, allocatable     :: irow(:),icol(:),myidx(:)
@@ -447,20 +447,20 @@ contains
         glob_row=myidx(i)
         ! compute gridpoint coordinates
         if (mod(glob_row,(idim*idim)) == 0) then
-          x = glob_row/(idim*idim)
+          ix = glob_row/(idim*idim)
         else
-          x = glob_row/(idim*idim)+1
+          ix = glob_row/(idim*idim)+1
         endif
-        if (mod((glob_row-(x-1)*idim*idim),idim) == 0) then
-          y = (glob_row-(x-1)*idim*idim)/idim
+        if (mod((glob_row-(ix-1)*idim*idim),idim) == 0) then
+          iy = (glob_row-(ix-1)*idim*idim)/idim
         else
-          y = (glob_row-(x-1)*idim*idim)/idim+1
+          iy = (glob_row-(ix-1)*idim*idim)/idim+1
         endif
-        z = glob_row-(x-1)*idim*idim-(y-1)*idim
-        ! glob_x, glob_y, glob_x coordinates
-        glob_x=x*deltah
-        glob_y=y*deltah
-        glob_z=z*deltah
+        iz = glob_row-(ix-1)*idim*idim-(iy-1)*idim
+        ! x, y, x coordinates
+        x = ix*deltah
+        y = iy*deltah
+        z = iz*deltah
 
         ! check on boundary points 
         zt(k) = 0.d0
@@ -468,99 +468,81 @@ contains
         !   
         !  term depending on   (x-1,y,z)
         !
-        if (x==1) then 
-          val(element)=-b1(glob_x,glob_y,glob_z)&
-               & -a1(glob_x,glob_y,glob_z)
+        if (ix==1) then 
+          val(element)=-b1(x,y,z)-a1(x,y,z)
           val(element) = val(element)/(deltah*&
                & deltah)
-          zt(k) = exp(-glob_y**2-glob_z**2)*(-val(element))
+          zt(k) = exp(-y**2-z**2)*(-val(element))
         else
-          val(element)=-b1(glob_x,glob_y,glob_z)&
-               & -a1(glob_x,glob_y,glob_z)
+          val(element)=-b1(x,y,z)-a1(x,y,z)
           val(element) = val(element)/(deltah*&
                & deltah)
-          icol(element) = (x-2)*idim*idim+(y-1)*idim+(z)
+          icol(element) = (ix-2)*idim*idim+(iy-1)*idim+(iz)
           irow(element) = glob_row
           element       = element+1
         endif
         !  term depending on     (x,y-1,z)
-        if (y==1) then 
-          val(element)=-b2(glob_x,glob_y,glob_z)&
-               & -a2(glob_x,glob_y,glob_z)
+        if (iy==1) then 
+          val(element)=-b2(x,y,z)-a2(x,y,z)
           val(element) = val(element)/(deltah*&
                & deltah)
-          zt(k) = exp(-glob_y**2-glob_z**2)*exp(-glob_x)*(-val(element))  
+          zt(k) = exp(-y**2-z**2)*exp(-x)*(-val(element))  
         else
-          val(element)=-b2(glob_x,glob_y,glob_z)&
-               & -a2(glob_x,glob_y,glob_z)
-          val(element) = val(element)/(deltah*&
-               & deltah)
-          icol(element) = (x-1)*idim*idim+(y-2)*idim+(z)
+          val(element)=-b2(x,y,z)-a2(x,y,z)
+          val(element) = val(element)/(deltah*deltah)
+          icol(element) = (ix-1)*idim*idim+(iy-2)*idim+(iz)
           irow(element) = glob_row
           element       = element+1
         endif
         !  term depending on     (x,y,z-1)
-        if (z==1) then 
-          val(element)=-b3(glob_x,glob_y,glob_z)&
-               & -a3(glob_x,glob_y,glob_z)
-          val(element) = val(element)/(deltah*&
-               & deltah)
-          zt(k) = exp(-glob_y**2-glob_z**2)*exp(-glob_x)*(-val(element))  
+        if (iz==1) then 
+          val(element)=-b3(x,y,z)-a3(x,y,z)
+          val(element) = val(element)/(deltah*deltah)
+          zt(k) = exp(-y**2-z**2)*exp(-x)*(-val(element))  
         else
-          val(element)=-b3(glob_x,glob_y,glob_z)&
-               & -a3(glob_x,glob_y,glob_z)
-          val(element) = val(element)/(deltah*&
-               & deltah)
-          icol(element) = (x-1)*idim*idim+(y-1)*idim+(z-1)
+          val(element)=-b3(x,y,z)-a3(x,y,z)
+          val(element) = val(element)/(deltah*deltah)
+          icol(element) = (ix-1)*idim*idim+(iy-1)*idim+(iz-1)
           irow(element) = glob_row
           element       = element+1
         endif
         !  term depending on     (x,y,z)
-        val(element)=2*b1(glob_x,glob_y,glob_z)&
-             & +2*b2(glob_x,glob_y,glob_z)&
-             & +2*b3(glob_x,glob_y,glob_z)&
-             & +a1(glob_x,glob_y,glob_z)&
-             & +a2(glob_x,glob_y,glob_z)&
-             & +a3(glob_x,glob_y,glob_z)
-        val(element) = val(element)/(deltah*&
-             & deltah)
-        icol(element) = (x-1)*idim*idim+(y-1)*idim+(z)
+        val(element)=2*b1(x,y,z) + 2*b2(x,y,z)&
+             & + 2*b3(x,y,z) + a1(x,y,z)&
+             & + a2(x,y,z) + a3(x,y,z)
+        val(element) = val(element)/(deltah*deltah)
+        icol(element) = (ix-1)*idim*idim+(iy-1)*idim+(iz)
         irow(element) = glob_row
         element       = element+1                  
         !  term depending on     (x,y,z+1)
-        if (z==idim) then 
-          val(element)=-b1(glob_x,glob_y,glob_z)
-          val(element) = val(element)/(deltah*&
-               & deltah)
-          zt(k) = exp(-glob_y**2-glob_z**2)*exp(-glob_x)*(-val(element))  
+        if (iz==idim) then 
+          val(element)=-b1(x,y,z)
+          val(element) = val(element)/(deltah*deltah)
+          zt(k) = exp(-y**2-z**2)*exp(-x)*(-val(element))  
         else
-          val(element)=-b1(glob_x,glob_y,glob_z)
-          val(element) = val(element)/(deltah*&
-               & deltah)
-          icol(element) = (x-1)*idim*idim+(y-1)*idim+(z+1)
+          val(element)=-b1(x,y,z)
+          val(element) = val(element)/(deltah*deltah)
+          icol(element) = (ix-1)*idim*idim+(iy-1)*idim+(iz+1)
           irow(element) = glob_row
           element       = element+1
         endif
         !  term depending on     (x,y+1,z)
-        if (y==idim) then 
-          val(element)=-b2(glob_x,glob_y,glob_z)
-          val(element) = val(element)/(deltah*&
-               & deltah)
-          zt(k) = exp(-glob_y**2-glob_z**2)*exp(-glob_x)*(-val(element))  
+        if (iy==idim) then 
+          val(element)=-b2(x,y,z)
+          val(element) = val(element)/(deltah*deltah)
+          zt(k) = exp(-y**2-z**2)*exp(-x)*(-val(element))  
         else
-          val(element)=-b2(glob_x,glob_y,glob_z)
-          val(element) = val(element)/(deltah*&
-               & deltah)
-          icol(element) = (x-1)*idim*idim+(y)*idim+(z)
+          val(element)=-b2(x,y,z)
+          val(element) = val(element)/(deltah*deltah)
+          icol(element) = (ix-1)*idim*idim+(iy)*idim+(iz)
           irow(element) = glob_row
           element       = element+1
         endif
         !  term depending on     (x+1,y,z)
-        if (x<idim) then 
-          val(element)=-b3(glob_x,glob_y,glob_z)
-          val(element) = val(element)/(deltah*&
-               & deltah)
-          icol(element) = (x)*idim*idim+(y-1)*idim+(z)
+        if (ix<idim) then 
+          val(element)=-b3(x,y,z)
+          val(element) = val(element)/(deltah*deltah)
+          icol(element) = (ix)*idim*idim+(iy-1)*idim+(iz)
           irow(element) = glob_row
           element       = element+1
         endif
