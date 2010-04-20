@@ -133,7 +133,7 @@ program ppde
   !
   !  prepare the preconditioner.
   !  
-  if(iam == psb_root_) write(0,'("Setting preconditioner to : ",a)')ptype
+  if(iam == psb_root_) write(*,'("Setting preconditioner to : ",a)')ptype
   call psb_precinit(prec,ptype,info)
 
   call psb_barrier(ictxt)
@@ -385,7 +385,7 @@ contains
     m   = idim*idim*idim
     n   = m
     nnz = ((n*9)/(np))
-    if(iam == psb_root_) write(0,'("Generating Matrix (size=",i0,")...")')n
+    if(iam == psb_root_) write(*,'("Generating Matrix (size=",i0,")...")')n
 
     !
     ! Using a simple BLOCK distribution.
