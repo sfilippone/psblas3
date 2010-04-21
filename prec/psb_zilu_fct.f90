@@ -152,36 +152,57 @@ contains
 
       !
       !
-      if ((mod(i,nrb) == 1).or.(nrb==1)) then 
-        irb = min(ma-i+1,nrb)
-        call a%a%csget(i,i+irb-1,trw,info)
-        if(info /= 0) then
-          info=4010
-          ch_err='a%csget'
-          call psb_errpush(info,name,a_err=ch_err)
-          goto 9999
+      select type(aa => a%a) 
+      type is (psb_z_csr_sparse_mat)
+        do j = aa%irp(i), aa%irp(i+1) - 1
+          k = aa%ja(j)
+          !           write(0,*)'KKKKK',k
+          if ((k < i).and.(k >= 1)) then
+            l1 = l1 + 1
+            laspk(l1) = aa%val(j)
+            lia1(l1) = k
+          else if (k == i) then
+            d(i) = aa%val(j)
+          else if ((k > i).and.(k <= m)) then
+            l2 = l2 + 1
+            uaspk(l2) = aa%val(j)
+            uia1(l2) = k
+          end if
+        enddo
+
+      class default
+
+        if ((mod(i,nrb) == 1).or.(nrb==1)) then 
+          irb = min(ma-i+1,nrb)
+          call a%a%csget(i,i+irb-1,trw,info)
+          if(info /= 0) then
+            info=4010
+            ch_err='a%csget'
+            call psb_errpush(info,name,a_err=ch_err)
+            goto 9999
+          end if
+          nz = trw%get_nzeros()
+          ktrw=1
         end if
-        nz = trw%get_nzeros()
-        ktrw=1
-      end if
-      
-      do 
-        if (ktrw > nz ) exit
-        if (trw%ia(ktrw) > i) exit
-        k = trw%ja(ktrw)
-        if ((k < i).and.(k >= 1)) then
-          l1 = l1 + 1
-          laspk(l1) = trw%val(ktrw)
-          lia1(l1) = k
-        else if (k == i) then
-          d(i) = trw%val(ktrw)
-        else if ((k > i).and.(k <= m)) then
-          l2 = l2 + 1
-          uaspk(l2) = trw%val(ktrw)
-          uia1(l2) = k
-        end if
-        ktrw = ktrw + 1
-      enddo
+
+        do 
+          if (ktrw > nz ) exit
+          if (trw%ia(ktrw) > i) exit
+          k = trw%ja(ktrw)
+          if ((k < i).and.(k >= 1)) then
+            l1 = l1 + 1
+            laspk(l1) = trw%val(ktrw)
+            lia1(l1) = k
+          else if (k == i) then
+            d(i) = trw%val(ktrw)
+          else if ((k > i).and.(k <= m)) then
+            l2 = l2 + 1
+            uaspk(l2) = trw%val(ktrw)
+            uia1(l2) = k
+          end if
+          ktrw = ktrw + 1
+        enddo
+      end select
 !!$
 
       lia2(i+1) = l1 + 1
@@ -269,36 +290,57 @@ contains
     do i = ma+1, m
       d(i) = zzero
 
-      if ((mod(i,nrb) == 1).or.(nrb==1)) then 
-        irb = min(ma-i+1,nrb)
-        call b%a%csget(i-ma,i-ma+irb-1,trw,info)
-        nz = trw%get_nzeros()
-        if(info /= 0) then
-          info=4010
-          ch_err='a%csget'
-          call psb_errpush(info,name,a_err=ch_err)
-          goto 9999
+      select type(aa => b%a) 
+      type is (psb_z_csr_sparse_mat)
+        do j = aa%irp(i-ma), aa%irp(i-ma+1) - 1
+          k = aa%ja(j)
+          !           write(0,*)'KKKKK',k
+          if ((k < i).and.(k >= 1)) then
+            l1 = l1 + 1
+            laspk(l1) = aa%val(j)
+            lia1(l1) = k
+          else if (k == i) then
+            d(i) = aa%val(j)
+          else if ((k > i).and.(k <= m)) then
+            l2 = l2 + 1
+            uaspk(l2) = aa%val(j)
+            uia1(l2) = k
+          end if
+        enddo
+
+      class default
+
+        if ((mod(i,nrb) == 1).or.(nrb==1)) then 
+          irb = min(ma-i+1,nrb)
+          call b%a%csget(i-ma,i-ma+irb-1,trw,info)
+          nz = trw%get_nzeros()
+          if(info /= 0) then
+            info=4010
+            ch_err='a%csget'
+            call psb_errpush(info,name,a_err=ch_err)
+            goto 9999
+          end if
+          ktrw=1
         end if
-        ktrw=1
-      end if
-      
-      do 
-        if (ktrw > nz ) exit
-        if (trw%ia(ktrw) > i) exit
-        k = trw%ja(ktrw)
-        if ((k < i).and.(k >= 1)) then
-          l1 = l1 + 1
-          laspk(l1) = trw%val(ktrw)
-          lia1(l1) = k
-        else if (k == i) then
-          d(i) = trw%val(ktrw)
-        else if ((k > i).and.(k <= m)) then
-          l2 = l2 + 1
-          uaspk(l2) = trw%val(ktrw)
-          uia1(l2) = k
-        end if
-        ktrw = ktrw + 1
-      enddo
+
+        do 
+          if (ktrw > nz ) exit
+          if (trw%ia(ktrw) > i) exit
+          k = trw%ja(ktrw)
+          if ((k < i).and.(k >= 1)) then
+            l1 = l1 + 1
+            laspk(l1) = trw%val(ktrw)
+            lia1(l1) = k
+          else if (k == i) then
+            d(i) = trw%val(ktrw)
+          else if ((k > i).and.(k <= m)) then
+            l2 = l2 + 1
+            uaspk(l2) = trw%val(ktrw)
+            uia1(l2) = k
+          end if
+          ktrw = ktrw + 1
+        enddo
+      end select
 
 
       lia2(i+1) = l1 + 1
