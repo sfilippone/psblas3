@@ -31,7 +31,10 @@
 !!$  
 
 module psb_const_mod
-  ! This should be integer(8), and normally different from default integer. 
+  ! This is the default integer
+  integer, parameter  :: ndig=8
+  integer, parameter  :: psb_int_k_ = selected_int_kind(ndig)
+  ! This is an 8-byte  integer, and normally different from default integer. 
   integer, parameter  :: longndig=12
   integer, parameter  :: psb_long_int_k_ = selected_int_kind(longndig)
   !
