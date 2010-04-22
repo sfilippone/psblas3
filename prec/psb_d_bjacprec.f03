@@ -46,7 +46,7 @@ contains
     character(len=20)  :: name='d_bjac_prec_apply'
     character(len=20)  :: ch_err
 
-    info = 0
+    info = psb_success_
     call psb_erractionsave(err_act)
     debug_unit  = psb_get_debug_unit()
     debug_level = psb_get_debug_level()
@@ -59,7 +59,7 @@ contains
     case('N','T','C')
       ! Ok
     case default
-      call psb_errpush(40,name)
+      call psb_errpush(psb_err_iarg_invalid_i_,name)
       goto 9999
     end select
     
@@ -95,16 +95,16 @@ contains
         aux => work(n_col+1:)
       else
         allocate(aux(4*n_col),stat=info)
-        if (info /= 0) then 
-          call psb_errpush(4010,name,a_err='Allocate')
+        if (info /= psb_success_) then 
+          call psb_errpush(psb_err_from_subroutine_,name,a_err='Allocate')
           goto 9999      
         end if
         
       endif
     else
       allocate(ww(n_col),aux(4*n_col),stat=info)
-      if (info /= 0) then 
-        call psb_errpush(4010,name,a_err='Allocate')
+      if (info /= psb_success_) then 
+        call psb_errpush(psb_err_from_subroutine_,name,a_err='Allocate')
         goto 9999      
       end if
     endif
@@ -117,24 +117,24 @@ contains
       case('N')
         call psb_spsm(done,prec%av(psb_l_pr_),x,dzero,ww,desc_data,info,&
              & trans=trans_,scale='L',diag=prec%d,choice=psb_none_,work=aux)
-        if(info ==0) call psb_spsm(alpha,prec%av(psb_u_pr_),ww,beta,y,desc_data,info,&
+        if(info == psb_success_) call psb_spsm(alpha,prec%av(psb_u_pr_),ww,beta,y,desc_data,info,&
              & trans=trans_,scale='U',choice=psb_none_, work=aux)
         
       case('T','C')
         call psb_spsm(done,prec%av(psb_u_pr_),x,dzero,ww,desc_data,info,&
              & trans=trans_,scale='L',diag=prec%d,choice=psb_none_, work=aux)
-        if(info ==0)  call psb_spsm(alpha,prec%av(psb_l_pr_),ww,beta,y,desc_data,info,&
+        if(info == psb_success_)  call psb_spsm(alpha,prec%av(psb_l_pr_),ww,beta,y,desc_data,info,&
            & trans=trans_,scale='U',choice=psb_none_,work=aux)
         
       end select
-      if (info /=0) then 
+      if (info /= psb_success_) then 
         ch_err="psb_spsm"
         goto 9999
       end if
       
       
     case default
-      info = 4001
+      info = psb_err_internal_error_
       call psb_errpush(info,name,a_err='Invalid factorization')
       goto 9999
     end select
@@ -178,10 +178,10 @@ contains
 
     call psb_erractionsave(err_act)
 
-    info = 0
+    info = psb_success_
     call psb_realloc(psb_ifpsz,prec%iprcparm,info)
-    if (info /= 0) then
-      info = 4000
+    if (info /= psb_success_) then
+      info = psb_err_alloc_dealloc_
       call psb_Errpush(info,name)
       goto 9999
     end if
@@ -229,7 +229,7 @@ contains
 
 
     if(psb_get_errstatus() /= 0) return 
-    info = 0
+    info = psb_success_
 
     call psb_erractionsave(err_act)
 
@@ -238,7 +238,7 @@ contains
 
     m = a%get_nrows()
     if (m < 0) then
-      info = 10
+      info = psb_err_iarg_neg_
       int_err(1) = 1
       int_err(2) = m
       call psb_errpush(info,name,i_err=int_err)
@@ -261,8 +261,8 @@ contains
       end if
       if (.not.allocated(prec%av)) then 
         allocate(prec%av(psb_max_avsz),stat=info)
-        if (info /= 0) then
-          call psb_errpush(4000,name)
+        if (info /= psb_success_) then
+          call psb_errpush(psb_err_alloc_dealloc_,name)
           goto 9999
         end if
       endif
@@ -275,11 +275,11 @@ contains
       n_row  = nrow_a
 
       allocate(lf,uf,stat=info)
-      if (info == 0) call lf%allocate(n_row,n_row,nztota)
-      if (info == 0) call uf%allocate(n_row,n_row,nztota)
+      if (info == psb_success_) call lf%allocate(n_row,n_row,nztota)
+      if (info == psb_success_) call uf%allocate(n_row,n_row,nztota)
 
-      if(info/=0) then
-        info=4010
+      if(info /= psb_success_) then
+        info=psb_err_from_subroutine_
         ch_err='psb_sp_all'
         call psb_errpush(info,name,a_err=ch_err)
         goto 9999
@@ -292,8 +292,8 @@ contains
       endif
       if (.not.allocated(prec%d)) then 
         allocate(prec%d(n_row),stat=info)
-        if (info /= 0) then 
-          call psb_errpush(4010,name,a_err='Allocate')
+        if (info /= psb_success_) then 
+          call psb_errpush(psb_err_from_subroutine_,name,a_err='Allocate')
           goto 9999      
         end if
 
@@ -301,7 +301,7 @@ contains
       ! This is where we have no renumbering, thus no need 
       call psb_ilu_fct(a,lf,uf,prec%d,info)
 
-      if(info==0) then
+      if(info == psb_success_) then
         call prec%av(psb_l_pr_)%mv_from(lf)
         call prec%av(psb_u_pr_)%mv_from(uf)
         call prec%av(psb_l_pr_)%set_asb()
@@ -309,7 +309,7 @@ contains
         call prec%av(psb_l_pr_)%trim()
         call prec%av(psb_u_pr_)%trim()
       else
-        info=4010
+        info=psb_err_from_subroutine_
         ch_err='psb_ilu_fct'
         call psb_errpush(info,name,a_err=ch_err)
         goto 9999
@@ -322,13 +322,13 @@ contains
 !!$      end do
 
     case(psb_f_none_) 
-      info=4010
+      info=psb_err_from_subroutine_
       ch_err='Inconsistent prec  psb_f_none_'
       call psb_errpush(info,name,a_err=ch_err)
       goto 9999
 
     case default
-      info=4010
+      info=psb_err_from_subroutine_
       ch_err='Unknown psb_f_type_'
       call psb_errpush(info,name,a_err=ch_err)
       goto 9999
@@ -362,7 +362,7 @@ contains
 
     call psb_erractionsave(err_act)
 
-    info = 0
+    info = psb_success_
     if (.not.allocated(prec%iprcparm)) then 
       info = 1124
       call psb_errpush(info,name,a_err="preconditioner")
@@ -417,7 +417,7 @@ contains
 
     call psb_erractionsave(err_act)
 
-    info = 0
+    info = psb_success_
     
     call psb_erractionrestore(err_act)
     return
@@ -445,7 +445,7 @@ contains
 
     call psb_erractionsave(err_act)
 
-    info = 0
+    info = psb_success_
     
     call psb_erractionrestore(err_act)
     return
@@ -472,7 +472,7 @@ contains
     
     call psb_erractionsave(err_act)
     
-    info = 0
+    info = psb_success_
     if (allocated(prec%av)) then 
       do i=1,size(prec%av) 
         call prec%av(i)%free()
@@ -510,7 +510,7 @@ contains
 
     call psb_erractionsave(err_act)
 
-    info = 0
+    info = psb_success_
    
     if (present(iout)) then 
       iout_ = iout
@@ -529,7 +529,7 @@ contains
 
     call psb_erractionsave(err_act)
 
-    info = 0
+    info = psb_success_
     
     call psb_erractionrestore(err_act)
     return

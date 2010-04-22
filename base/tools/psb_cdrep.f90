@@ -30,14 +30,14 @@
 !!$ 
 !!$  
   !  Purpose
-  !  =======
+  !  == = ====
   !  
   !  Allocate special descriptor for replicated index space.
   ! 
   !
   !
   ! INPUT
-  !======
+  ! == ====
   ! M                 :(Global Input) Integer 
   !                    Total number of  equations
   !                    required.
@@ -46,7 +46,7 @@
   !                required.
   !
   ! OUTPUT
-  !=========
+  ! == =======
   ! desc   : TYPEDESC
   ! desc OUTPUT FIELDS:
   !
@@ -117,7 +117,7 @@ subroutine psb_cdrep(m, ictxt, desc, info)
   character(len=20)   :: name
 
   if(psb_get_errstatus() /= 0) return 
-  info=0
+  info=psb_success_
   err=0
   name = 'psb_cdrep'
   debug_unit  = psb_get_debug_unit()
@@ -130,16 +130,16 @@ subroutine psb_cdrep(m, ictxt, desc, info)
   n = m
   !... check m and n parameters....
   if (m < 1) then
-    info = 10
+    info = psb_err_iarg_neg_
     int_err(1) = 1
     int_err(2) = m
   else if (n < 1) then
-    info = 10
+    info = psb_err_iarg_neg_
     int_err(1) = 2
     int_err(2) = n
   endif
 
-  if (info /= 0) then 
+  if (info /= psb_success_) then 
     call psb_errpush(info,name,i_err=int_err)
     goto 9999
   end if
@@ -154,15 +154,15 @@ subroutine psb_cdrep(m, ictxt, desc, info)
   else
     call psb_bcast(ictxt,exch(1:2),root=psb_root_)
     if (exch(1) /= m) then
-      info=550
+      info=psb_err_parm_differs_among_procs_
       int_err(1)=1
     else if (exch(2) /= n) then
-      info=550
+      info=psb_err_parm_differs_among_procs_
       int_err(1)=2
     endif
   endif
 
-  if (info /= 0) then 
+  if (info /= psb_success_) then 
     call psb_errpush(info,name,i_err=int_err)
     goto 9999
   end if
@@ -176,8 +176,8 @@ subroutine psb_cdrep(m, ictxt, desc, info)
   allocate(desc%idxmap%glob_to_loc(m),desc%matrix_data(psb_mdata_size_),&
        &   desc%idxmap%loc_to_glob(m),desc%lprm(1),&
        &   desc%ovrlap_elem(0,3),stat=info)
-  if (info /= 0) then     
-    info=4025
+  if (info /= psb_success_) then     
+    info=psb_err_alloc_request_
     int_err(1)=2*m+psb_mdata_size_+1
     call psb_errpush(info,name,i_err=int_err,a_err='integer')
     goto 9999
@@ -206,8 +206,8 @@ subroutine psb_cdrep(m, ictxt, desc, info)
   desc%lprm(:)         = 0
 
   call psi_cnv_dsc(thalo,tovr,text,desc,info)
-  if (info /= 0) then
-    call psb_errpush(4010,name,a_err='psi_cvn_dsc')
+  if (info /= psb_success_) then
+    call psb_errpush(psb_err_from_subroutine_,name,a_err='psi_cvn_dsc')
     goto 9999
   end if
   

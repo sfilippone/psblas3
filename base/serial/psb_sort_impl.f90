@@ -55,7 +55,7 @@ logical function psb_isaperm(n,eip)
   psb_isaperm = .true.
   if (n <= 0) return
   allocate(ip(n), stat=info) 
-  if (info /= 0) return
+  if (info /= psb_success_) return
   !
   !   sanity check first 
   !     
@@ -166,7 +166,7 @@ subroutine imsort(x,ix,dir,flag)
   case( psb_sort_up_, psb_sort_down_)
     ! OK keep going
   case default
-    call psb_errpush(30,name,i_err=(/3,dir_,0,0,0/))
+    call psb_errpush(psb_err_input_value_invalid_i_,name,i_err=(/3,dir_,0,0,0/))
     goto 9999
   end select
 
@@ -174,7 +174,7 @@ subroutine imsort(x,ix,dir,flag)
 
   if (present(ix)) then 
     if (size(ix) < n) then 
-      call psb_errpush(35,name,i_err=(/2,size(ix),0,0,0/))
+      call psb_errpush(psb_err_input_asize_invalid_i_,name,i_err=(/2,size(ix),0,0,0/))
       goto 9999
     end if
     if (present(flag)) then 
@@ -186,7 +186,7 @@ subroutine imsort(x,ix,dir,flag)
     case( psb_sort_ovw_idx_, psb_sort_keep_idx_)
       ! OK keep going
     case default
-      call psb_errpush(30,name,i_err=(/4,flag_,0,0,0/))
+      call psb_errpush(psb_err_input_value_invalid_i_,name,i_err=(/4,flag_,0,0,0/))
       goto 9999
     end select
 
@@ -227,7 +227,7 @@ subroutine smsort(x,ix,dir,flag)
   case( psb_sort_up_, psb_sort_down_)
     ! OK keep going
   case default
-    call psb_errpush(30,name,i_err=(/3,dir_,0,0,0/))
+    call psb_errpush(psb_err_input_value_invalid_i_,name,i_err=(/3,dir_,0,0,0/))
     goto 9999
   end select
 
@@ -235,7 +235,7 @@ subroutine smsort(x,ix,dir,flag)
 
   if (present(ix)) then 
     if (size(ix) < n) then 
-      call psb_errpush(35,name,i_err=(/2,size(ix),0,0,0/))
+      call psb_errpush(psb_err_input_asize_invalid_i_,name,i_err=(/2,size(ix),0,0,0/))
       goto 9999
     end if
     if (present(flag)) then 
@@ -247,7 +247,7 @@ subroutine smsort(x,ix,dir,flag)
     case( psb_sort_ovw_idx_, psb_sort_keep_idx_)
       ! OK keep going
     case default
-      call psb_errpush(30,name,i_err=(/4,flag_,0,0,0/))
+      call psb_errpush(psb_err_input_value_invalid_i_,name,i_err=(/4,flag_,0,0,0/))
       goto 9999
     end select
 
@@ -287,7 +287,7 @@ subroutine dmsort(x,ix,dir,flag)
   case( psb_sort_up_, psb_sort_down_)
     ! OK keep going
   case default
-    call psb_errpush(30,name,i_err=(/3,dir_,0,0,0/))
+    call psb_errpush(psb_err_input_value_invalid_i_,name,i_err=(/3,dir_,0,0,0/))
     goto 9999
   end select
 
@@ -295,7 +295,7 @@ subroutine dmsort(x,ix,dir,flag)
 
   if (present(ix)) then 
     if (size(ix) < n) then 
-      call psb_errpush(35,name,i_err=(/2,size(ix),0,0,0/))
+      call psb_errpush(psb_err_input_asize_invalid_i_,name,i_err=(/2,size(ix),0,0,0/))
       goto 9999
     end if
     if (present(flag)) then 
@@ -307,7 +307,7 @@ subroutine dmsort(x,ix,dir,flag)
     case( psb_sort_ovw_idx_, psb_sort_keep_idx_)
       ! OK keep going
     case default
-      call psb_errpush(30,name,i_err=(/4,flag_,0,0,0/))
+      call psb_errpush(psb_err_input_value_invalid_i_,name,i_err=(/4,flag_,0,0,0/))
       goto 9999
     end select
 
@@ -347,7 +347,7 @@ subroutine camsort(x,ix,dir,flag)
   case( psb_asort_up_, psb_asort_down_)
     ! OK keep going
   case default
-    call psb_errpush(30,name,i_err=(/3,dir_,0,0,0/))
+    call psb_errpush(psb_err_input_value_invalid_i_,name,i_err=(/3,dir_,0,0,0/))
     goto 9999
   end select
 
@@ -355,7 +355,7 @@ subroutine camsort(x,ix,dir,flag)
 
   if (present(ix)) then 
     if (size(ix) < n) then 
-      call psb_errpush(35,name,i_err=(/2,size(ix),0,0,0/))
+      call psb_errpush(psb_err_input_asize_invalid_i_,name,i_err=(/2,size(ix),0,0,0/))
       goto 9999
     end if
     if (present(flag)) then 
@@ -367,7 +367,7 @@ subroutine camsort(x,ix,dir,flag)
     case( psb_sort_ovw_idx_, psb_sort_keep_idx_)
       ! OK keep going
     case default
-      call psb_errpush(30,name,i_err=(/4,flag_,0,0,0/))
+      call psb_errpush(psb_err_input_value_invalid_i_,name,i_err=(/4,flag_,0,0,0/))
       goto 9999
     end select
 
@@ -407,7 +407,7 @@ subroutine zamsort(x,ix,dir,flag)
   case( psb_asort_up_, psb_asort_down_)
     ! OK keep going
   case default
-    call psb_errpush(30,name,i_err=(/3,dir_,0,0,0/))
+    call psb_errpush(psb_err_input_value_invalid_i_,name,i_err=(/3,dir_,0,0,0/))
     goto 9999
   end select
 
@@ -415,7 +415,7 @@ subroutine zamsort(x,ix,dir,flag)
 
   if (present(ix)) then 
     if (size(ix) < n) then 
-      call psb_errpush(35,name,i_err=(/2,size(ix),0,0,0/))
+      call psb_errpush(psb_err_input_asize_invalid_i_,name,i_err=(/2,size(ix),0,0,0/))
       goto 9999
     end if
     if (present(flag)) then 
@@ -427,7 +427,7 @@ subroutine zamsort(x,ix,dir,flag)
     case( psb_sort_ovw_idx_, psb_sort_keep_idx_)
       ! OK keep going
     case default
-      call psb_errpush(30,name,i_err=(/4,flag_,0,0,0/))
+      call psb_errpush(psb_err_input_value_invalid_i_,name,i_err=(/4,flag_,0,0,0/))
       goto 9999
     end select
 
@@ -468,7 +468,7 @@ subroutine imsort_u(x,nout,dir)
   case( psb_sort_up_, psb_sort_down_)
     ! OK keep going
   case default
-    call psb_errpush(30,name,i_err=(/3,dir_,0,0,0/))
+    call psb_errpush(psb_err_input_value_invalid_i_,name,i_err=(/3,dir_,0,0,0/))
     goto 9999
   end select
 
@@ -509,7 +509,7 @@ subroutine iqsort(x,ix,dir,flag)
   case( psb_sort_ovw_idx_, psb_sort_keep_idx_)
     ! OK keep going
   case default
-    call psb_errpush(30,name,i_err=(/4,flag_,0,0,0/))
+    call psb_errpush(psb_err_input_value_invalid_i_,name,i_err=(/4,flag_,0,0,0/))
     goto 9999
   end select
 
@@ -525,7 +525,7 @@ subroutine iqsort(x,ix,dir,flag)
   case( psb_sort_up_, psb_sort_down_)
     if (present(ix)) then 
       if (size(ix) < n) then 
-        call psb_errpush(35,name,i_err=(/2,size(ix),0,0,0/))
+        call psb_errpush(psb_err_input_asize_invalid_i_,name,i_err=(/2,size(ix),0,0,0/))
         goto 9999
       end if
 
@@ -538,7 +538,7 @@ subroutine iqsort(x,ix,dir,flag)
     ! OK keep going
     if (present(ix)) then 
       if (size(ix) < n) then 
-        call psb_errpush(35,name,i_err=(/2,size(ix),0,0,0/))
+        call psb_errpush(psb_err_input_asize_invalid_i_,name,i_err=(/2,size(ix),0,0,0/))
         goto 9999
       end if
 
@@ -548,7 +548,7 @@ subroutine iqsort(x,ix,dir,flag)
     end if
 
   case default
-    call psb_errpush(30,name,i_err=(/3,dir_,0,0,0/))
+    call psb_errpush(psb_err_input_value_invalid_i_,name,i_err=(/3,dir_,0,0,0/))
     goto 9999
   end select
 
@@ -586,7 +586,7 @@ subroutine sqsort(x,ix,dir,flag)
   case( psb_sort_ovw_idx_, psb_sort_keep_idx_)
     ! OK keep going
   case default
-    call psb_errpush(30,name,i_err=(/4,flag_,0,0,0/))
+    call psb_errpush(psb_err_input_value_invalid_i_,name,i_err=(/4,flag_,0,0,0/))
     goto 9999
   end select
 
@@ -602,7 +602,7 @@ subroutine sqsort(x,ix,dir,flag)
   case( psb_sort_up_, psb_sort_down_)
     if (present(ix)) then 
       if (size(ix) < n) then 
-        call psb_errpush(35,name,i_err=(/2,size(ix),0,0,0/))
+        call psb_errpush(psb_err_input_asize_invalid_i_,name,i_err=(/2,size(ix),0,0,0/))
         goto 9999
       end if
 
@@ -615,7 +615,7 @@ subroutine sqsort(x,ix,dir,flag)
     ! OK keep going
     if (present(ix)) then 
       if (size(ix) < n) then 
-        call psb_errpush(35,name,i_err=(/2,size(ix),0,0,0/))
+        call psb_errpush(psb_err_input_asize_invalid_i_,name,i_err=(/2,size(ix),0,0,0/))
         goto 9999
       end if
 
@@ -625,7 +625,7 @@ subroutine sqsort(x,ix,dir,flag)
     end if
 
   case default
-    call psb_errpush(30,name,i_err=(/3,dir_,0,0,0/))
+    call psb_errpush(psb_err_input_value_invalid_i_,name,i_err=(/3,dir_,0,0,0/))
     goto 9999
   end select
 
@@ -662,7 +662,7 @@ subroutine dqsort(x,ix,dir,flag)
   case( psb_sort_ovw_idx_, psb_sort_keep_idx_)
     ! OK keep going
   case default
-    call psb_errpush(30,name,i_err=(/4,flag_,0,0,0/))
+    call psb_errpush(psb_err_input_value_invalid_i_,name,i_err=(/4,flag_,0,0,0/))
     goto 9999
   end select
 
@@ -678,7 +678,7 @@ subroutine dqsort(x,ix,dir,flag)
   case( psb_sort_up_, psb_sort_down_)
     if (present(ix)) then 
       if (size(ix) < n) then 
-        call psb_errpush(35,name,i_err=(/2,size(ix),0,0,0/))
+        call psb_errpush(psb_err_input_asize_invalid_i_,name,i_err=(/2,size(ix),0,0,0/))
         goto 9999
       end if
 
@@ -691,7 +691,7 @@ subroutine dqsort(x,ix,dir,flag)
     ! OK keep going
     if (present(ix)) then 
       if (size(ix) < n) then 
-        call psb_errpush(35,name,i_err=(/2,size(ix),0,0,0/))
+        call psb_errpush(psb_err_input_asize_invalid_i_,name,i_err=(/2,size(ix),0,0,0/))
         goto 9999
       end if
 
@@ -701,7 +701,7 @@ subroutine dqsort(x,ix,dir,flag)
     end if
 
   case default
-    call psb_errpush(30,name,i_err=(/3,dir_,0,0,0/))
+    call psb_errpush(psb_err_input_value_invalid_i_,name,i_err=(/3,dir_,0,0,0/))
     goto 9999
   end select
 
@@ -739,7 +739,7 @@ subroutine cqsort(x,ix,dir,flag)
   case( psb_sort_ovw_idx_, psb_sort_keep_idx_)
     ! OK keep going
   case default
-    call psb_errpush(30,name,i_err=(/4,flag_,0,0,0/))
+    call psb_errpush(psb_err_input_value_invalid_i_,name,i_err=(/4,flag_,0,0,0/))
     goto 9999
   end select
 
@@ -755,7 +755,7 @@ subroutine cqsort(x,ix,dir,flag)
   case( psb_lsort_up_, psb_lsort_down_)
     if (present(ix)) then 
       if (size(ix) < n) then 
-        call psb_errpush(35,name,i_err=(/2,size(ix),0,0,0/))
+        call psb_errpush(psb_err_input_asize_invalid_i_,name,i_err=(/2,size(ix),0,0,0/))
         goto 9999
       end if
 
@@ -768,7 +768,7 @@ subroutine cqsort(x,ix,dir,flag)
     ! OK keep going
     if (present(ix)) then 
       if (size(ix) < n) then 
-        call psb_errpush(35,name,i_err=(/2,size(ix),0,0,0/))
+        call psb_errpush(psb_err_input_asize_invalid_i_,name,i_err=(/2,size(ix),0,0,0/))
         goto 9999
       end if
 
@@ -781,7 +781,7 @@ subroutine cqsort(x,ix,dir,flag)
     ! OK keep going
     if (present(ix)) then 
       if (size(ix) < n) then 
-        call psb_errpush(35,name,i_err=(/2,size(ix),0,0,0/))
+        call psb_errpush(psb_err_input_asize_invalid_i_,name,i_err=(/2,size(ix),0,0,0/))
         goto 9999
       end if
 
@@ -791,7 +791,7 @@ subroutine cqsort(x,ix,dir,flag)
     end if
 
   case default
-    call psb_errpush(30,name,i_err=(/3,dir_,0,0,0/))
+    call psb_errpush(psb_err_input_value_invalid_i_,name,i_err=(/3,dir_,0,0,0/))
     goto 9999
   end select
 
@@ -829,7 +829,7 @@ subroutine zqsort(x,ix,dir,flag)
   case( psb_sort_ovw_idx_, psb_sort_keep_idx_)
     ! OK keep going
   case default
-    call psb_errpush(30,name,i_err=(/4,flag_,0,0,0/))
+    call psb_errpush(psb_err_input_value_invalid_i_,name,i_err=(/4,flag_,0,0,0/))
     goto 9999
   end select
 
@@ -845,7 +845,7 @@ subroutine zqsort(x,ix,dir,flag)
   case( psb_lsort_up_, psb_lsort_down_)
     if (present(ix)) then 
       if (size(ix) < n) then 
-        call psb_errpush(35,name,i_err=(/2,size(ix),0,0,0/))
+        call psb_errpush(psb_err_input_asize_invalid_i_,name,i_err=(/2,size(ix),0,0,0/))
         goto 9999
       end if
 
@@ -858,7 +858,7 @@ subroutine zqsort(x,ix,dir,flag)
     ! OK keep going
     if (present(ix)) then 
       if (size(ix) < n) then 
-        call psb_errpush(35,name,i_err=(/2,size(ix),0,0,0/))
+        call psb_errpush(psb_err_input_asize_invalid_i_,name,i_err=(/2,size(ix),0,0,0/))
         goto 9999
       end if
 
@@ -871,7 +871,7 @@ subroutine zqsort(x,ix,dir,flag)
     ! OK keep going
     if (present(ix)) then 
       if (size(ix) < n) then 
-        call psb_errpush(35,name,i_err=(/2,size(ix),0,0,0/))
+        call psb_errpush(psb_err_input_asize_invalid_i_,name,i_err=(/2,size(ix),0,0,0/))
         goto 9999
       end if
 
@@ -881,7 +881,7 @@ subroutine zqsort(x,ix,dir,flag)
     end if
 
   case default
-    call psb_errpush(30,name,i_err=(/3,dir_,0,0,0/))
+    call psb_errpush(psb_err_input_value_invalid_i_,name,i_err=(/3,dir_,0,0,0/))
     goto 9999
   end select
 
@@ -923,7 +923,7 @@ subroutine ihsort(x,ix,dir,flag)
   case( psb_sort_ovw_idx_, psb_sort_keep_idx_)
     ! OK keep going
   case default
-    call psb_errpush(30,name,i_err=(/4,flag_,0,0,0/))
+    call psb_errpush(psb_err_input_value_invalid_i_,name,i_err=(/4,flag_,0,0,0/))
     goto 9999
   end select
 
@@ -937,7 +937,7 @@ subroutine ihsort(x,ix,dir,flag)
   case(psb_sort_up_,psb_sort_down_,psb_asort_up_,psb_asort_down_) 
     ! OK
   case default
-    call psb_errpush(30,name,i_err=(/3,dir_,0,0,0/))
+    call psb_errpush(psb_err_input_value_invalid_i_,name,i_err=(/3,dir_,0,0,0/))
     goto 9999
   end select
 
@@ -954,10 +954,10 @@ subroutine ihsort(x,ix,dir,flag)
 
   if (present(ix)) then 
     if (size(ix) < n) then 
-      call psb_errpush(35,name,i_err=(/2,size(ix),0,0,0/))
+      call psb_errpush(psb_err_input_asize_invalid_i_,name,i_err=(/2,size(ix),0,0,0/))
       goto 9999
     end if
-    if (flag_==psb_sort_ovw_idx_) then 
+    if (flag_ == psb_sort_ovw_idx_) then 
       do i=1, n
         ix(i) = i
       end do
@@ -1032,7 +1032,7 @@ subroutine shsort(x,ix,dir,flag)
   case( psb_sort_ovw_idx_, psb_sort_keep_idx_)
     ! OK keep going
   case default
-    call psb_errpush(30,name,i_err=(/4,flag_,0,0,0/))
+    call psb_errpush(psb_err_input_value_invalid_i_,name,i_err=(/4,flag_,0,0,0/))
     goto 9999
   end select
 
@@ -1046,7 +1046,7 @@ subroutine shsort(x,ix,dir,flag)
   case(psb_sort_up_,psb_sort_down_,psb_asort_up_,psb_asort_down_) 
     ! OK
   case default
-    call psb_errpush(30,name,i_err=(/3,dir_,0,0,0/))
+    call psb_errpush(psb_err_input_value_invalid_i_,name,i_err=(/3,dir_,0,0,0/))
     goto 9999
   end select
 
@@ -1063,10 +1063,10 @@ subroutine shsort(x,ix,dir,flag)
 
   if (present(ix)) then 
     if (size(ix) < n) then 
-      call psb_errpush(35,name,i_err=(/2,size(ix),0,0,0/))
+      call psb_errpush(psb_err_input_asize_invalid_i_,name,i_err=(/2,size(ix),0,0,0/))
       goto 9999
     end if
-    if (flag_==psb_sort_ovw_idx_) then 
+    if (flag_ == psb_sort_ovw_idx_) then 
       do i=1, n
         ix(i) = i
       end do
@@ -1141,7 +1141,7 @@ subroutine dhsort(x,ix,dir,flag)
   case( psb_sort_ovw_idx_, psb_sort_keep_idx_)
     ! OK keep going
   case default
-    call psb_errpush(30,name,i_err=(/4,flag_,0,0,0/))
+    call psb_errpush(psb_err_input_value_invalid_i_,name,i_err=(/4,flag_,0,0,0/))
     goto 9999
   end select
 
@@ -1155,7 +1155,7 @@ subroutine dhsort(x,ix,dir,flag)
   case(psb_sort_up_,psb_sort_down_,psb_asort_up_,psb_asort_down_) 
     ! OK
   case default
-    call psb_errpush(30,name,i_err=(/3,dir_,0,0,0/))
+    call psb_errpush(psb_err_input_value_invalid_i_,name,i_err=(/3,dir_,0,0,0/))
     goto 9999
   end select
 
@@ -1172,10 +1172,10 @@ subroutine dhsort(x,ix,dir,flag)
 
   if (present(ix)) then 
     if (size(ix) < n) then 
-      call psb_errpush(35,name,i_err=(/2,size(ix),0,0,0/))
+      call psb_errpush(psb_err_input_asize_invalid_i_,name,i_err=(/2,size(ix),0,0,0/))
       goto 9999
     end if
-    if (flag_==psb_sort_ovw_idx_) then 
+    if (flag_ == psb_sort_ovw_idx_) then 
       do i=1, n
         ix(i) = i
       end do
@@ -1250,7 +1250,7 @@ subroutine chsort(x,ix,dir,flag)
   case( psb_sort_ovw_idx_, psb_sort_keep_idx_)
     ! OK keep going
   case default
-    call psb_errpush(30,name,i_err=(/4,flag_,0,0,0/))
+    call psb_errpush(psb_err_input_value_invalid_i_,name,i_err=(/4,flag_,0,0,0/))
     goto 9999
   end select
 
@@ -1264,7 +1264,7 @@ subroutine chsort(x,ix,dir,flag)
   case(psb_asort_up_,psb_asort_down_) 
     ! OK
   case default
-    call psb_errpush(30,name,i_err=(/3,dir_,0,0,0/))
+    call psb_errpush(psb_err_input_value_invalid_i_,name,i_err=(/3,dir_,0,0,0/))
     goto 9999
   end select
 
@@ -1281,10 +1281,10 @@ subroutine chsort(x,ix,dir,flag)
 
   if (present(ix)) then 
     if (size(ix) < n) then 
-      call psb_errpush(35,name,i_err=(/2,size(ix),0,0,0/))
+      call psb_errpush(psb_err_input_asize_invalid_i_,name,i_err=(/2,size(ix),0,0,0/))
       goto 9999
     end if
-    if (flag_==psb_sort_ovw_idx_) then 
+    if (flag_ == psb_sort_ovw_idx_) then 
       do i=1, n
         ix(i) = i
       end do
@@ -1359,7 +1359,7 @@ subroutine zhsort(x,ix,dir,flag)
   case( psb_sort_ovw_idx_, psb_sort_keep_idx_)
     ! OK keep going
   case default
-    call psb_errpush(30,name,i_err=(/4,flag_,0,0,0/))
+    call psb_errpush(psb_err_input_value_invalid_i_,name,i_err=(/4,flag_,0,0,0/))
     goto 9999
   end select
 
@@ -1373,7 +1373,7 @@ subroutine zhsort(x,ix,dir,flag)
   case(psb_asort_up_,psb_asort_down_) 
     ! OK
   case default
-    call psb_errpush(30,name,i_err=(/3,dir_,0,0,0/))
+    call psb_errpush(psb_err_input_value_invalid_i_,name,i_err=(/3,dir_,0,0,0/))
     goto 9999
   end select
 
@@ -1390,10 +1390,10 @@ subroutine zhsort(x,ix,dir,flag)
 
   if (present(ix)) then 
     if (size(ix) < n) then 
-      call psb_errpush(35,name,i_err=(/2,size(ix),0,0,0/))
+      call psb_errpush(psb_err_input_asize_invalid_i_,name,i_err=(/2,size(ix),0,0,0/))
       goto 9999
     end if
-    if (flag_==psb_sort_ovw_idx_) then 
+    if (flag_ == psb_sort_ovw_idx_) then 
       do i=1, n
         ix(i) = i
       end do
@@ -1458,7 +1458,7 @@ subroutine psb_init_int_heap(heap,info,dir)
   integer, intent(out)            :: info
   integer, intent(in), optional   :: dir
 
-  info = 0
+  info = psb_success_
   heap%last=0
   if (present(dir)) then 
     heap%dir = dir
@@ -1484,7 +1484,7 @@ subroutine psb_dump_int_heap(iout,heap,info)
   integer, intent(out)           :: info
   integer, intent(in)            :: iout
 
-  info = 0
+  info = psb_success_
   if (iout < 0) then
     write(0,*) 'Invalid file '
     info =-1
@@ -1512,7 +1512,7 @@ subroutine psb_insert_int_heap(key,heap,info)
   type(psb_int_heap), intent(inout) :: heap
   integer, intent(out)              :: info
 
-  info = 0
+  info = psb_success_
   if (heap%last < 0) then 
     write(0,*) 'Invalid last in heap ',heap%last
     info = heap%last
@@ -1521,7 +1521,7 @@ subroutine psb_insert_int_heap(key,heap,info)
 
   heap%last = heap%last 
   call psb_ensure_size(heap%last+1,heap%keys,info,addsz=psb_heap_resize)
-  if (info /= 0) then 
+  if (info /= psb_success_) then 
     write(0,*) 'Memory allocation failure in heap_insert'
     info = -5
     return
@@ -1539,7 +1539,7 @@ subroutine psb_int_heap_get_first(key,heap,info)
   type(psb_int_heap), intent(inout) :: heap
   integer, intent(out)              :: key,info
 
-  info = 0
+  info = psb_success_
 
   call psi_int_heap_get_first(key,heap%last,heap%keys,heap%dir,info)
 
@@ -1563,7 +1563,7 @@ subroutine psb_init_real_idx_heap(heap,info,dir)
   integer, intent(out)            :: info
   integer, intent(in), optional   :: dir
 
-  info = 0
+  info = psb_success_
   heap%last=0
   if (present(dir)) then 
     heap%dir = dir
@@ -1590,7 +1590,7 @@ subroutine psb_dump_real_idx_heap(iout,heap,info)
   integer, intent(out)           :: info
   integer, intent(in)            :: iout
 
-  info = 0
+  info = psb_success_
   if (iout < 0) then
     write(0,*) 'Invalid file '
     info =-1
@@ -1623,7 +1623,7 @@ subroutine psb_insert_real_idx_heap(key,index,heap,info)
   type(psb_real_idx_heap), intent(inout) :: heap
   integer, intent(out)              :: info
 
-  info = 0
+  info = psb_success_
   if (heap%last < 0) then 
     write(0,*) 'Invalid last in heap ',heap%last
     info = heap%last
@@ -1631,9 +1631,9 @@ subroutine psb_insert_real_idx_heap(key,index,heap,info)
   endif
 
   call psb_ensure_size(heap%last+1,heap%keys,info,addsz=psb_heap_resize)
-  if (info == 0) &
+  if (info == psb_success_) &
        & call psb_ensure_size(heap%last+1,heap%idxs,info,addsz=psb_heap_resize)
-  if (info /= 0) then 
+  if (info /= psb_success_) then 
     write(0,*) 'Memory allocation failure in heap_insert'
     info = -5
     return
@@ -1653,7 +1653,7 @@ subroutine psb_real_idx_heap_get_first(key,index,heap,info)
   integer, intent(out)              :: index,info
   real(psb_spk_), intent(out)     :: key
 
-  info = 0
+  info = psb_success_
 
   call psi_real_idx_heap_get_first(key,index,&
        & heap%last,heap%keys,heap%idxs,heap%dir,info)
@@ -1678,7 +1678,7 @@ subroutine psb_init_double_idx_heap(heap,info,dir)
   integer, intent(out)            :: info
   integer, intent(in), optional   :: dir
 
-  info = 0
+  info = psb_success_
   heap%last=0
   if (present(dir)) then 
     heap%dir = dir
@@ -1705,7 +1705,7 @@ subroutine psb_dump_double_idx_heap(iout,heap,info)
   integer, intent(out)           :: info
   integer, intent(in)            :: iout
 
-  info = 0
+  info = psb_success_
   if (iout < 0) then
     write(0,*) 'Invalid file '
     info =-1
@@ -1738,7 +1738,7 @@ subroutine psb_insert_double_idx_heap(key,index,heap,info)
   type(psb_double_idx_heap), intent(inout) :: heap
   integer, intent(out)              :: info
 
-  info = 0
+  info = psb_success_
   if (heap%last < 0) then 
     write(0,*) 'Invalid last in heap ',heap%last
     info = heap%last
@@ -1746,9 +1746,9 @@ subroutine psb_insert_double_idx_heap(key,index,heap,info)
   endif
 
   call psb_ensure_size(heap%last+1,heap%keys,info,addsz=psb_heap_resize)
-  if (info == 0) &
+  if (info == psb_success_) &
        & call psb_ensure_size(heap%last+1,heap%idxs,info,addsz=psb_heap_resize)
-  if (info /= 0) then 
+  if (info /= psb_success_) then 
     write(0,*) 'Memory allocation failure in heap_insert'
     info = -5
     return
@@ -1768,7 +1768,7 @@ subroutine psb_double_idx_heap_get_first(key,index,heap,info)
   integer, intent(out)              :: index,info
   real(psb_dpk_), intent(out)     :: key
 
-  info = 0
+  info = psb_success_
 
   call psi_double_idx_heap_get_first(key,index,&
        & heap%last,heap%keys,heap%idxs,heap%dir,info)
@@ -1792,7 +1792,7 @@ subroutine psb_init_int_idx_heap(heap,info,dir)
   integer, intent(out)            :: info
   integer, intent(in), optional   :: dir
 
-  info = 0
+  info = psb_success_
   heap%last=0
   if (present(dir)) then 
     heap%dir = dir
@@ -1819,7 +1819,7 @@ subroutine psb_dump_int_idx_heap(iout,heap,info)
   integer, intent(out)           :: info
   integer, intent(in)            :: iout
 
-  info = 0
+  info = psb_success_
   if (iout < 0) then
     write(0,*) 'Invalid file '
     info =-1
@@ -1852,7 +1852,7 @@ subroutine psb_insert_int_idx_heap(key,index,heap,info)
   type(psb_int_idx_heap), intent(inout) :: heap
   integer, intent(out)                  :: info
 
-  info = 0
+  info = psb_success_
   if (heap%last < 0) then 
     write(0,*) 'Invalid last in heap ',heap%last
     info = heap%last
@@ -1860,9 +1860,9 @@ subroutine psb_insert_int_idx_heap(key,index,heap,info)
   endif
 
   call psb_ensure_size(heap%last+1,heap%keys,info,addsz=psb_heap_resize)
-  if (info == 0) &
+  if (info == psb_success_) &
        & call psb_ensure_size(heap%last+1,heap%idxs,info,addsz=psb_heap_resize)
-  if (info /= 0) then 
+  if (info /= psb_success_) then 
     write(0,*) 'Memory allocation failure in heap_insert'
     info = -5
     return
@@ -1882,7 +1882,7 @@ subroutine psb_int_idx_heap_get_first(key,index,heap,info)
   integer, intent(out)                  :: index,info
   integer, intent(out)                  :: key
 
-  info = 0
+  info = psb_success_
 
   call psi_int_idx_heap_get_first(key,index,&
        & heap%last,heap%keys,heap%idxs,heap%dir,info)
@@ -1908,7 +1908,7 @@ subroutine psb_init_scomplex_idx_heap(heap,info,dir)
   integer, intent(out)            :: info
   integer, intent(in), optional   :: dir
 
-  info = 0
+  info = psb_success_
   heap%last=0
   if (present(dir)) then 
     heap%dir = dir
@@ -1936,7 +1936,7 @@ subroutine psb_dump_scomplex_idx_heap(iout,heap,info)
   integer, intent(out)           :: info
   integer, intent(in)            :: iout
 
-  info = 0
+  info = psb_success_
   if (iout < 0) then
     write(0,*) 'Invalid file '
     info =-1
@@ -1969,7 +1969,7 @@ subroutine psb_insert_scomplex_idx_heap(key,index,heap,info)
   type(psb_scomplex_idx_heap), intent(inout) :: heap
   integer, intent(out)                       :: info
 
-  info = 0
+  info = psb_success_
   if (heap%last < 0) then 
     write(0,*) 'Invalid last in heap ',heap%last
     info = heap%last
@@ -1977,9 +1977,9 @@ subroutine psb_insert_scomplex_idx_heap(key,index,heap,info)
   endif
 
   call psb_ensure_size(heap%last+1,heap%keys,info,addsz=psb_heap_resize)
-  if (info == 0) &
+  if (info == psb_success_) &
        & call psb_ensure_size(heap%last+1,heap%idxs,info,addsz=psb_heap_resize)
-  if (info /= 0) then 
+  if (info /= psb_success_) then 
     write(0,*) 'Memory allocation failure in heap_insert'
     info = -5
     return
@@ -1999,7 +1999,7 @@ subroutine psb_scomplex_idx_heap_get_first(key,index,heap,info)
   complex(psb_spk_), intent(out)           :: key
 
 
-  info = 0
+  info = psb_success_
 
   call psi_scomplex_idx_heap_get_first(key,index,&
        & heap%last,heap%keys,heap%idxs,heap%dir,info)
@@ -2025,7 +2025,7 @@ subroutine psb_init_dcomplex_idx_heap(heap,info,dir)
   integer, intent(out)            :: info
   integer, intent(in), optional   :: dir
 
-  info = 0
+  info = psb_success_
   heap%last=0
   if (present(dir)) then 
     heap%dir = dir
@@ -2053,7 +2053,7 @@ subroutine psb_dump_dcomplex_idx_heap(iout,heap,info)
   integer, intent(out)           :: info
   integer, intent(in)            :: iout
 
-  info = 0
+  info = psb_success_
   if (iout < 0) then
     write(0,*) 'Invalid file '
     info =-1
@@ -2086,7 +2086,7 @@ subroutine psb_insert_dcomplex_idx_heap(key,index,heap,info)
   type(psb_dcomplex_idx_heap), intent(inout) :: heap
   integer, intent(out)                       :: info
 
-  info = 0
+  info = psb_success_
   if (heap%last < 0) then 
     write(0,*) 'Invalid last in heap ',heap%last
     info = heap%last
@@ -2094,9 +2094,9 @@ subroutine psb_insert_dcomplex_idx_heap(key,index,heap,info)
   endif
 
   call psb_ensure_size(heap%last+1,heap%keys,info,addsz=psb_heap_resize)
-  if (info == 0) &
+  if (info == psb_success_) &
        & call psb_ensure_size(heap%last+1,heap%idxs,info,addsz=psb_heap_resize)
-  if (info /= 0) then 
+  if (info /= psb_success_) then 
     write(0,*) 'Memory allocation failure in heap_insert'
     info = -5
     return
@@ -2116,7 +2116,7 @@ subroutine psb_dcomplex_idx_heap_get_first(key,index,heap,info)
   complex(psb_dpk_), intent(out)           :: key
 
 
-  info = 0
+  info = psb_success_
 
   call psi_dcomplex_idx_heap_get_first(key,index,&
        & heap%last,heap%keys,heap%idxs,heap%dir,info)
@@ -2149,7 +2149,7 @@ subroutine psi_insert_int_heap(key,last,heap,dir,info)
   integer                 :: i, i2
   integer                 :: temp
 
-  info = 0
+  info = psb_success_
   if (last < 0) then 
     write(0,*) 'Invalid last in heap ',last
     info = last
@@ -2249,7 +2249,7 @@ subroutine psi_int_heap_get_first(key,last,heap,dir,info)
   integer                 :: temp
 
 
-  info = 0
+  info = psb_success_
   if (last <= 0) then 
     key  = 0
     info = -1
@@ -2379,7 +2379,7 @@ subroutine psi_insert_real_heap(key,last,heap,dir,info)
   integer                       :: i, i2
   real(psb_spk_)                :: temp
 
-  info = 0
+  info = psb_success_
   if (last < 0) then 
     write(0,*) 'Invalid last in heap ',last
     info = last
@@ -2480,7 +2480,7 @@ subroutine psi_real_heap_get_first(key,last,heap,dir,info)
   real(psb_spk_)        :: temp
 
 
-  info = 0
+  info = psb_success_
   if (last <= 0) then 
     key  = 0
     info = -1
@@ -2609,7 +2609,7 @@ subroutine psi_insert_double_heap(key,last,heap,dir,info)
   integer                         :: i, i2
   real(psb_dpk_)                :: temp
 
-  info = 0
+  info = psb_success_
   if (last < 0) then 
     write(0,*) 'Invalid last in heap ',last
     info = last
@@ -2710,7 +2710,7 @@ subroutine psi_double_heap_get_first(key,last,heap,dir,info)
   real(psb_dpk_)        :: temp
 
 
-  info = 0
+  info = psb_success_
   if (last <= 0) then 
     key  = 0
     info = -1
@@ -2841,7 +2841,7 @@ subroutine psi_insert_scomplex_heap(key,last,heap,dir,info)
   integer                          :: i, i2
   complex(psb_spk_)                :: temp
 
-  info = 0
+  info = psb_success_
   if (last < 0) then 
     write(0,*) 'Invalid last in heap ',last
     info = last
@@ -2942,7 +2942,7 @@ subroutine psi_scomplex_heap_get_first(key,last,heap,dir,info)
   complex(psb_spk_)        :: temp
 
 
-  info = 0
+  info = psb_success_
   if (last <= 0) then 
     key  = 0
     info = -1
@@ -3071,7 +3071,7 @@ subroutine psi_insert_dcomplex_heap(key,last,heap,dir,info)
   integer                            :: i, i2
   complex(psb_dpk_)                :: temp
 
-  info = 0
+  info = psb_success_
   if (last < 0) then 
     write(0,*) 'Invalid last in heap ',last
     info = last
@@ -3172,7 +3172,7 @@ subroutine psi_dcomplex_heap_get_first(key,last,heap,dir,info)
   complex(psb_dpk_)        :: temp
 
 
-  info = 0
+  info = psb_success_
   if (last <= 0) then 
     key  = 0
     info = -1
@@ -3305,7 +3305,7 @@ subroutine psi_insert_int_idx_heap(key,index,last,heap,idxs,dir,info)
   integer                 :: i, i2, itemp
   integer                 :: temp 
 
-  info = 0
+  info = psb_success_
   if (last < 0) then 
     write(0,*) 'Invalid last in heap ',last
     info = last
@@ -3419,7 +3419,7 @@ subroutine psi_int_idx_heap_get_first(key,index,last,heap,idxs,dir,info)
   integer                :: i, j,itemp
   integer                :: temp
 
-  info = 0
+  info = psb_success_
   if (last <= 0) then 
     key   = 0
     index = 0
@@ -3564,7 +3564,7 @@ subroutine psi_insert_real_idx_heap(key,index,last,heap,idxs,dir,info)
   integer                        :: i, i2, itemp
   real(psb_spk_)                 :: temp 
 
-  info = 0
+  info = psb_success_
   if (last < 0) then 
     write(0,*) 'Invalid last in heap ',last
     info = last
@@ -3678,7 +3678,7 @@ subroutine psi_real_idx_heap_get_first(key,index,last,heap,idxs,dir,info)
   integer                       :: i, j,itemp
   real(psb_spk_)                :: temp
 
-  info = 0
+  info = psb_success_
   if (last <= 0) then 
     key   = 0
     index = 0
@@ -3824,7 +3824,7 @@ subroutine psi_insert_double_idx_heap(key,index,last,heap,idxs,dir,info)
   integer                          :: i, i2, itemp
   real(psb_dpk_)                 :: temp 
 
-  info = 0
+  info = psb_success_
   if (last < 0) then 
     write(0,*) 'Invalid last in heap ',last
     info = last
@@ -3938,7 +3938,7 @@ subroutine psi_double_idx_heap_get_first(key,index,last,heap,idxs,dir,info)
   integer                         :: i, j,itemp
   real(psb_dpk_)                :: temp
 
-  info = 0
+  info = psb_success_
   if (last <= 0) then 
     key   = 0
     index = 0
@@ -4084,7 +4084,7 @@ subroutine psi_insert_scomplex_idx_heap(key,index,last,heap,idxs,dir,info)
   integer                          :: i, i2, itemp
   complex(psb_spk_)                :: temp 
 
-  info = 0
+  info = psb_success_
   if (last < 0) then 
     write(0,*) 'Invalid last in heap ',last
     info = last
@@ -4198,7 +4198,7 @@ subroutine psi_scomplex_idx_heap_get_first(key,index,last,heap,idxs,dir,info)
   integer                          :: i, j, itemp
   complex(psb_spk_)                :: temp
 
-  info = 0
+  info = psb_success_
   if (last <= 0) then 
     key   = 0
     index = 0
@@ -4344,7 +4344,7 @@ subroutine psi_insert_dcomplex_idx_heap(key,index,last,heap,idxs,dir,info)
   integer                            :: i, i2, itemp
   complex(psb_dpk_)                :: temp 
 
-  info = 0
+  info = psb_success_
   if (last < 0) then 
     write(0,*) 'Invalid last in heap ',last
     info = last
@@ -4458,7 +4458,7 @@ subroutine psi_dcomplex_idx_heap_get_first(key,index,last,heap,idxs,dir,info)
   integer                            :: i, j, itemp
   complex(psb_dpk_)                :: temp
 
-  info = 0
+  info = psb_success_
   if (last <= 0) then 
     key   = 0
     index = 0

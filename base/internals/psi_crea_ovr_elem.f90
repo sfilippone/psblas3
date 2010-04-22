@@ -71,7 +71,7 @@ subroutine psi_crea_ovr_elem(me,desc_overlap,ovr_elem,info)
   character(len=20)    :: name
 
 
-  info = 0
+  info = psb_success_
   name='psi_crea_ovr_elem'
 
 
@@ -85,8 +85,8 @@ subroutine psi_crea_ovr_elem(me,desc_overlap,ovr_elem,info)
   insize = size(desc_overlap)
   insize = max(1,(insize+1)/2)
   allocate(telem(insize,3),stat=info)
-  if (info /= 0) then 
-    info = 4000
+  if (info /= psb_success_) then 
+    info = psb_err_alloc_dealloc_
     call psb_errpush(info,name)
     goto 9999
   endif

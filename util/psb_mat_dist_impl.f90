@@ -38,7 +38,7 @@ subroutine smatdist(a_glob, a, ictxt, desc_a,&
   !
   !  type(d_spmat)                            :: a_glob
   !     on entry: this contains the global sparse matrix as follows:
-  !        a%fida =='csr'
+  !        a%fida == 'csr'
   !        a%aspk for coefficient values
   !        a%ia1  for column indices
   !        a%ia2  for row pointers
@@ -127,7 +127,7 @@ subroutine smatdist(a_glob, a, ictxt, desc_a,&
   real(psb_dpk_)              :: t0, t1, t2, t3, t4, t5
   character(len=20)           :: name, ch_err
 
-  info = 0
+  info = psb_success_
   err  = 0
   name = 'mat_distf'
   call psb_erractionsave(err_act)
@@ -155,7 +155,7 @@ subroutine smatdist(a_glob, a, ictxt, desc_a,&
   use_parts = present(parts)
   use_v     = present(v)
   if (count((/ use_parts, use_v /)) /= 1) then 
-    info=581
+    info=psb_err_no_optional_arg_
     call psb_errpush(info,name,a_err=" v, parts")
     goto 9999 
   endif
@@ -167,8 +167,8 @@ subroutine smatdist(a_glob, a, ictxt, desc_a,&
   call psb_bcast(ictxt,nrhs, root)
   liwork = max(np, nrow + ncol)
   allocate(iwork(liwork), stat = info)
-  if (info /= 0) then
-    info=4025
+  if (info /= psb_success_) then
+    info=psb_err_alloc_request_
     int_err(1)=liwork
     call psb_errpush(info,name,i_err=int_err,a_err='integer')
     goto 9999
@@ -182,22 +182,22 @@ subroutine smatdist(a_glob, a, ictxt, desc_a,&
   else 
     call psb_cdall(ictxt,desc_a,info,vg=v)
   end if
-  if(info/=0) then
-    info=4010
+  if(info /= psb_success_) then
+    info=psb_err_from_subroutine_
     ch_err='psb_cdall'
     call psb_errpush(info,name,a_err=ch_err)
     goto 9999
   end if
   call psb_spall(a,desc_a,info,nnz=((nnzero+np-1)/np))
-  if(info/=0) then
-    info=4010
+  if(info /= psb_success_) then
+    info=psb_err_from_subroutine_
     ch_err='psb_psspall'
     call psb_errpush(info,name,a_err=ch_err)
     goto 9999
   end if
   call psb_geall(b,desc_a,info)   
-  if(info/=0) then
-    info=4010
+  if(info /= psb_success_) then
+    info=psb_err_from_subroutine_
     ch_err='psb_psdsall'
     call psb_errpush(info,name,a_err=ch_err)
     goto 9999
@@ -207,8 +207,8 @@ subroutine smatdist(a_glob, a, ictxt, desc_a,&
 
   isize = 3*nb*max(((nnzero+nrow)/nrow),nb)
   allocate(val(isize),irow(isize),icol(isize),stat=info)
-  if(info/=0) then
-    info=4010
+  if(info /= psb_success_) then
+    info=psb_err_from_subroutine_
     ch_err='Allocate'
     call psb_errpush(info,name,a_err=ch_err)
     goto 9999
@@ -255,7 +255,7 @@ subroutine smatdist(a_glob, a, ictxt, desc_a,&
         do i= i_count, j_count-1
           call a_glob%csget(i,i,nz,&
                & irow,icol,val,info,nzin=ll,append=.true.)
-          if (info /= 0) then            
+          if (info /= psb_success_) then            
             if (nz >min(size(irow(ll+1:)),size(icol(ll+1:)),size(val(ll+1:)))) then 
               write(0,*) 'Allocation failure? This should not happen!'
             end if
@@ -267,16 +267,16 @@ subroutine smatdist(a_glob, a, ictxt, desc_a,&
 
         if (iproc == iam) then
           call psb_spins(ll,irow,icol,val,a,desc_a,info)
-          if(info/=0) then
-            info=4010
+          if(info /= psb_success_) then
+            info=psb_err_from_subroutine_
             ch_err='psb_spins'
             call psb_errpush(info,name,a_err=ch_err)
             goto 9999
           end if
           call psb_geins(nnr,(/(i,i=i_count,j_count-1)/),b_glob(i_count:j_count-1),&
                & b,desc_a,info)
-          if(info/=0) then
-            info=4010
+          if(info /= psb_success_) then
+            info=psb_err_from_subroutine_
             ch_err='psb_ins'
             call psb_errpush(info,name,a_err=ch_err)
             goto 9999
@@ -299,8 +299,8 @@ subroutine smatdist(a_glob, a, ictxt, desc_a,&
             write(0,*) iam,'need to reallocate ',ll
             deallocate(val,irow,icol)
             allocate(val(ll),irow(ll),icol(ll),stat=info)
-            if(info/=0) then
-              info=4010
+            if(info /= psb_success_) then
+              info=psb_err_from_subroutine_
               ch_err='Allocate'
               call psb_errpush(info,name,a_err=ch_err)
               goto 9999
@@ -313,16 +313,16 @@ subroutine smatdist(a_glob, a, ictxt, desc_a,&
           call psb_rcv(ictxt,b_glob(i_count:i_count+nnr-1),root)
           call psb_snd(ictxt,ll,root)
           call psb_spins(ll,irow,icol,val,a,desc_a,info)
-          if(info/=0) then
-            info=4010
+          if(info /= psb_success_) then
+            info=psb_err_from_subroutine_
             ch_err='psspins'
             call psb_errpush(info,name,a_err=ch_err)
             goto 9999
           end if
           call psb_geins(nnr,(/(i,i=i_count,i_count+nnr-1)/),&
                & b_glob(i_count:i_count+nnr-1),b,desc_a,info)
-          if(info/=0) then
-            info=4010
+          if(info /= psb_success_) then
+            info=psb_err_from_subroutine_
             ch_err='psdsins'
             call psb_errpush(info,name,a_err=ch_err)
             goto 9999
@@ -343,7 +343,7 @@ subroutine smatdist(a_glob, a, ictxt, desc_a,&
           do i= i_count, i_count
             call a_glob%csget(i,i,nz,&
                  & irow,icol,val,info,nzin=ll,append=.true.)
-            if (info /= 0) then            
+            if (info /= psb_success_) then            
               if (nz >min(size(irow(ll+1:)),size(icol(ll+1:)),size(val(ll+1:)))) then 
                 write(0,*) 'Allocation failure? This should not happen!'
               end if
@@ -356,16 +356,16 @@ subroutine smatdist(a_glob, a, ictxt, desc_a,&
           if (k_count == iam) then
 
             call psb_spins(ll,irow,icol,val,a,desc_a,info)
-            if(info/=0) then
-              info=4010
+            if(info /= psb_success_) then
+              info=psb_err_from_subroutine_
               ch_err='psspins'
               call psb_errpush(info,name,a_err=ch_err)
               goto 9999
             end if
             call psb_geins(1,(/i_count/),b_glob(i_count:i_count),&
                  & b,desc_a,info)
-            if(info/=0) then
-              info=4010
+            if(info /= psb_success_) then
+              info=psb_err_from_subroutine_
               ch_err='psdsins'
               call psb_errpush(info,name,a_err=ch_err)
               goto 9999
@@ -387,16 +387,16 @@ subroutine smatdist(a_glob, a, ictxt, desc_a,&
             call psb_rcv(ictxt,b_glob(i_count),root)
             call psb_snd(ictxt,ll,root)
             call psb_spins(ll,irow,icol,val,a,desc_a,info)
-            if(info/=0) then
-              info=4010
+            if(info /= psb_success_) then
+              info=psb_err_from_subroutine_
               ch_err='psspins'
               call psb_errpush(info,name,a_err=ch_err)
               goto 9999
             end if
             call psb_geins(1,(/i_count/),b_glob(i_count:i_count),&
                  & b,desc_a,info)
-            if(info/=0) then
-              info=4010
+            if(info /= psb_success_) then
+              info=psb_err_from_subroutine_
               ch_err='psdsins'
               call psb_errpush(info,name,a_err=ch_err)
               goto 9999
@@ -418,8 +418,8 @@ subroutine smatdist(a_glob, a, ictxt, desc_a,&
   t0 = psb_wtime()
   call psb_cdasb(desc_a,info)     
   t1 = psb_wtime()
-  if(info/=0)then
-    info=4010
+  if(info /= psb_success_)then
+    info=psb_err_from_subroutine_
     ch_err='psb_cdasb'
     call psb_errpush(info,name,a_err=ch_err)
     goto 9999
@@ -429,8 +429,8 @@ subroutine smatdist(a_glob, a, ictxt, desc_a,&
   t2 = psb_wtime()
   call psb_spasb(a,desc_a,info,dupl=psb_dupl_err_,afmt=afmt)     
   t3 = psb_wtime()
-  if(info/=0)then
-    info=4010
+  if(info /= psb_success_)then
+    info=psb_err_from_subroutine_
     ch_err='psb_spasb'
     call psb_errpush(info,name,a_err=ch_err)
     goto 9999
@@ -443,15 +443,15 @@ subroutine smatdist(a_glob, a, ictxt, desc_a,&
   end if
 
   call psb_geasb(b,desc_a,info)     
-  if(info/=0)then
-    info=4010
+  if(info /= psb_success_)then
+    info=psb_err_from_subroutine_
     ch_err='psdsasb'
     call psb_errpush(info,name,a_err=ch_err)
     goto 9999
   end if
   deallocate(val,irow,icol,stat=info)
-  if(info/=0)then
-    info=4010
+  if(info /= psb_success_)then
+    info=psb_err_from_subroutine_
     ch_err='deallocate'
     call psb_errpush(info,name,a_err=ch_err)
     goto 9999
@@ -483,7 +483,7 @@ subroutine dmatdist(a_glob, a, ictxt, desc_a,&
   !
   !  type(d_spmat)                            :: a_glob
   !     on entry: this contains the global sparse matrix as follows:
-  !        a%fida =='csr'
+  !        a%fida == 'csr'
   !        a%aspk for coefficient values
   !        a%ia1  for column indices
   !        a%ia2  for row pointers
@@ -572,7 +572,7 @@ subroutine dmatdist(a_glob, a, ictxt, desc_a,&
   real(psb_dpk_)              :: t0, t1, t2, t3, t4, t5
   character(len=20)           :: name, ch_err
 
-  info = 0
+  info = psb_success_
   err  = 0
   name = 'mat_distf'
   call psb_erractionsave(err_act)
@@ -600,7 +600,7 @@ subroutine dmatdist(a_glob, a, ictxt, desc_a,&
   use_parts = present(parts)
   use_v     = present(v)
   if (count((/ use_parts, use_v /)) /= 1) then 
-    info=581
+    info=psb_err_no_optional_arg_
     call psb_errpush(info,name,a_err=" v, parts")
     goto 9999 
   endif
@@ -612,8 +612,8 @@ subroutine dmatdist(a_glob, a, ictxt, desc_a,&
   call psb_bcast(ictxt,nrhs, root)
   liwork = max(np, nrow + ncol)
   allocate(iwork(liwork), stat = info)
-  if (info /= 0) then
-    info=4025
+  if (info /= psb_success_) then
+    info=psb_err_alloc_request_
     int_err(1)=liwork
     call psb_errpush(info,name,i_err=int_err,a_err='integer')
     goto 9999
@@ -627,22 +627,22 @@ subroutine dmatdist(a_glob, a, ictxt, desc_a,&
   else 
     call psb_cdall(ictxt,desc_a,info,vg=v)
   end if
-  if(info/=0) then
-    info=4010
+  if(info /= psb_success_) then
+    info=psb_err_from_subroutine_
     ch_err='psb_cdall'
     call psb_errpush(info,name,a_err=ch_err)
     goto 9999
   end if
   call psb_spall(a,desc_a,info,nnz=((nnzero+np-1)/np))
-  if(info/=0) then
-    info=4010
+  if(info /= psb_success_) then
+    info=psb_err_from_subroutine_
     ch_err='psb_psspall'
     call psb_errpush(info,name,a_err=ch_err)
     goto 9999
   end if
   call psb_geall(b,desc_a,info)   
-  if(info/=0) then
-    info=4010
+  if(info /= psb_success_) then
+    info=psb_err_from_subroutine_
     ch_err='psb_psdsall'
     call psb_errpush(info,name,a_err=ch_err)
     goto 9999
@@ -652,8 +652,8 @@ subroutine dmatdist(a_glob, a, ictxt, desc_a,&
 
   isize = 3*nb*max(((nnzero+nrow)/nrow),nb)
   allocate(val(isize),irow(isize),icol(isize),stat=info)
-  if(info/=0) then
-    info=4010
+  if(info /= psb_success_) then
+    info=psb_err_from_subroutine_
     ch_err='Allocate'
     call psb_errpush(info,name,a_err=ch_err)
     goto 9999
@@ -700,7 +700,7 @@ subroutine dmatdist(a_glob, a, ictxt, desc_a,&
         do i= i_count, j_count-1
           call a_glob%csget(i,i,nz,&
                & irow,icol,val,info,nzin=ll,append=.true.)
-          if (info /= 0) then            
+          if (info /= psb_success_) then            
             if (nz >min(size(irow(ll+1:)),size(icol(ll+1:)),size(val(ll+1:)))) then 
               write(0,*) 'Allocation failure? This should not happen!'
             end if
@@ -712,16 +712,16 @@ subroutine dmatdist(a_glob, a, ictxt, desc_a,&
 
         if (iproc == iam) then
           call psb_spins(ll,irow,icol,val,a,desc_a,info)
-          if(info/=0) then
-            info=4010
+          if(info /= psb_success_) then
+            info=psb_err_from_subroutine_
             ch_err='psb_spins'
             call psb_errpush(info,name,a_err=ch_err)
             goto 9999
           end if
           call psb_geins(nnr,(/(i,i=i_count,j_count-1)/),b_glob(i_count:j_count-1),&
                & b,desc_a,info)
-          if(info/=0) then
-            info=4010
+          if(info /= psb_success_) then
+            info=psb_err_from_subroutine_
             ch_err='psb_ins'
             call psb_errpush(info,name,a_err=ch_err)
             goto 9999
@@ -744,8 +744,8 @@ subroutine dmatdist(a_glob, a, ictxt, desc_a,&
             write(0,*) iam,'need to reallocate ',ll
             deallocate(val,irow,icol)
             allocate(val(ll),irow(ll),icol(ll),stat=info)
-            if(info/=0) then
-              info=4010
+            if(info /= psb_success_) then
+              info=psb_err_from_subroutine_
               ch_err='Allocate'
               call psb_errpush(info,name,a_err=ch_err)
               goto 9999
@@ -758,16 +758,16 @@ subroutine dmatdist(a_glob, a, ictxt, desc_a,&
           call psb_rcv(ictxt,b_glob(i_count:i_count+nnr-1),root)
           call psb_snd(ictxt,ll,root)
           call psb_spins(ll,irow,icol,val,a,desc_a,info)
-          if(info/=0) then
-            info=4010
+          if(info /= psb_success_) then
+            info=psb_err_from_subroutine_
             ch_err='psspins'
             call psb_errpush(info,name,a_err=ch_err)
             goto 9999
           end if
           call psb_geins(nnr,(/(i,i=i_count,i_count+nnr-1)/),&
                & b_glob(i_count:i_count+nnr-1),b,desc_a,info)
-          if(info/=0) then
-            info=4010
+          if(info /= psb_success_) then
+            info=psb_err_from_subroutine_
             ch_err='psdsins'
             call psb_errpush(info,name,a_err=ch_err)
             goto 9999
@@ -788,7 +788,7 @@ subroutine dmatdist(a_glob, a, ictxt, desc_a,&
           do i= i_count, i_count
             call a_glob%csget(i,i,nz,&
                  & irow,icol,val,info,nzin=ll,append=.true.)
-            if (info /= 0) then            
+            if (info /= psb_success_) then            
               if (nz >min(size(irow(ll+1:)),size(icol(ll+1:)),size(val(ll+1:)))) then 
                 write(0,*) 'Allocation failure? This should not happen!'
               end if
@@ -801,16 +801,16 @@ subroutine dmatdist(a_glob, a, ictxt, desc_a,&
           if (k_count == iam) then
 
             call psb_spins(ll,irow,icol,val,a,desc_a,info)
-            if(info/=0) then
-              info=4010
+            if(info /= psb_success_) then
+              info=psb_err_from_subroutine_
               ch_err='psspins'
               call psb_errpush(info,name,a_err=ch_err)
               goto 9999
             end if
             call psb_geins(1,(/i_count/),b_glob(i_count:i_count),&
                  & b,desc_a,info)
-            if(info/=0) then
-              info=4010
+            if(info /= psb_success_) then
+              info=psb_err_from_subroutine_
               ch_err='psdsins'
               call psb_errpush(info,name,a_err=ch_err)
               goto 9999
@@ -832,16 +832,16 @@ subroutine dmatdist(a_glob, a, ictxt, desc_a,&
             call psb_rcv(ictxt,b_glob(i_count),root)
             call psb_snd(ictxt,ll,root)
             call psb_spins(ll,irow,icol,val,a,desc_a,info)
-            if(info/=0) then
-              info=4010
+            if(info /= psb_success_) then
+              info=psb_err_from_subroutine_
               ch_err='psspins'
               call psb_errpush(info,name,a_err=ch_err)
               goto 9999
             end if
             call psb_geins(1,(/i_count/),b_glob(i_count:i_count),&
                  & b,desc_a,info)
-            if(info/=0) then
-              info=4010
+            if(info /= psb_success_) then
+              info=psb_err_from_subroutine_
               ch_err='psdsins'
               call psb_errpush(info,name,a_err=ch_err)
               goto 9999
@@ -863,8 +863,8 @@ subroutine dmatdist(a_glob, a, ictxt, desc_a,&
   t0 = psb_wtime()
   call psb_cdasb(desc_a,info)     
   t1 = psb_wtime()
-  if(info/=0)then
-    info=4010
+  if(info /= psb_success_)then
+    info=psb_err_from_subroutine_
     ch_err='psb_cdasb'
     call psb_errpush(info,name,a_err=ch_err)
     goto 9999
@@ -874,8 +874,8 @@ subroutine dmatdist(a_glob, a, ictxt, desc_a,&
   t2 = psb_wtime()
   call psb_spasb(a,desc_a,info,dupl=psb_dupl_err_,afmt=afmt)     
   t3 = psb_wtime()
-  if(info/=0)then
-    info=4010
+  if(info /= psb_success_)then
+    info=psb_err_from_subroutine_
     ch_err='psb_spasb'
     call psb_errpush(info,name,a_err=ch_err)
     goto 9999
@@ -888,15 +888,15 @@ subroutine dmatdist(a_glob, a, ictxt, desc_a,&
   end if
 
   call psb_geasb(b,desc_a,info)     
-  if(info/=0)then
-    info=4010
+  if(info /= psb_success_)then
+    info=psb_err_from_subroutine_
     ch_err='psdsasb'
     call psb_errpush(info,name,a_err=ch_err)
     goto 9999
   end if
   deallocate(val,irow,icol,stat=info)
-  if(info/=0)then
-    info=4010
+  if(info /= psb_success_)then
+    info=psb_err_from_subroutine_
     ch_err='deallocate'
     call psb_errpush(info,name,a_err=ch_err)
     goto 9999
@@ -928,7 +928,7 @@ subroutine cmatdist(a_glob, a, ictxt, desc_a,&
   !
   !  type(d_spmat)                            :: a_glob
   !     on entry: this contains the global sparse matrix as follows:
-  !        a%fida =='csr'
+  !        a%fida == 'csr'
   !        a%aspk for coefficient values
   !        a%ia1  for column indices
   !        a%ia2  for row pointers
@@ -1017,7 +1017,7 @@ subroutine cmatdist(a_glob, a, ictxt, desc_a,&
   real(psb_dpk_)              :: t0, t1, t2, t3, t4, t5
   character(len=20)           :: name, ch_err
 
-  info = 0
+  info = psb_success_
   err  = 0
   name = 'mat_distf'
   call psb_erractionsave(err_act)
@@ -1045,7 +1045,7 @@ subroutine cmatdist(a_glob, a, ictxt, desc_a,&
   use_parts = present(parts)
   use_v     = present(v)
   if (count((/ use_parts, use_v /)) /= 1) then 
-    info=581
+    info=psb_err_no_optional_arg_
     call psb_errpush(info,name,a_err=" v, parts")
     goto 9999 
   endif
@@ -1057,8 +1057,8 @@ subroutine cmatdist(a_glob, a, ictxt, desc_a,&
   call psb_bcast(ictxt,nrhs, root)
   liwork = max(np, nrow + ncol)
   allocate(iwork(liwork), stat = info)
-  if (info /= 0) then
-    info=4025
+  if (info /= psb_success_) then
+    info=psb_err_alloc_request_
     int_err(1)=liwork
     call psb_errpush(info,name,i_err=int_err,a_err='integer')
     goto 9999
@@ -1072,22 +1072,22 @@ subroutine cmatdist(a_glob, a, ictxt, desc_a,&
   else 
     call psb_cdall(ictxt,desc_a,info,vg=v)
   end if
-  if(info/=0) then
-    info=4010
+  if(info /= psb_success_) then
+    info=psb_err_from_subroutine_
     ch_err='psb_cdall'
     call psb_errpush(info,name,a_err=ch_err)
     goto 9999
   end if
   call psb_spall(a,desc_a,info,nnz=((nnzero+np-1)/np))
-  if(info/=0) then
-    info=4010
+  if(info /= psb_success_) then
+    info=psb_err_from_subroutine_
     ch_err='psb_psspall'
     call psb_errpush(info,name,a_err=ch_err)
     goto 9999
   end if
   call psb_geall(b,desc_a,info)   
-  if(info/=0) then
-    info=4010
+  if(info /= psb_success_) then
+    info=psb_err_from_subroutine_
     ch_err='psb_psdsall'
     call psb_errpush(info,name,a_err=ch_err)
     goto 9999
@@ -1097,8 +1097,8 @@ subroutine cmatdist(a_glob, a, ictxt, desc_a,&
 
   isize = 3*nb*max(((nnzero+nrow)/nrow),nb)
   allocate(val(isize),irow(isize),icol(isize),stat=info)
-  if(info/=0) then
-    info=4010
+  if(info /= psb_success_) then
+    info=psb_err_from_subroutine_
     ch_err='Allocate'
     call psb_errpush(info,name,a_err=ch_err)
     goto 9999
@@ -1145,7 +1145,7 @@ subroutine cmatdist(a_glob, a, ictxt, desc_a,&
         do i= i_count, j_count-1
           call a_glob%csget(i,i,nz,&
                & irow,icol,val,info,nzin=ll,append=.true.)
-          if (info /= 0) then            
+          if (info /= psb_success_) then            
             if (nz >min(size(irow(ll+1:)),size(icol(ll+1:)),size(val(ll+1:)))) then 
               write(0,*) 'Allocation failure? This should not happen!'
             end if
@@ -1157,16 +1157,16 @@ subroutine cmatdist(a_glob, a, ictxt, desc_a,&
 
         if (iproc == iam) then
           call psb_spins(ll,irow,icol,val,a,desc_a,info)
-          if(info/=0) then
-            info=4010
+          if(info /= psb_success_) then
+            info=psb_err_from_subroutine_
             ch_err='psb_spins'
             call psb_errpush(info,name,a_err=ch_err)
             goto 9999
           end if
           call psb_geins(nnr,(/(i,i=i_count,j_count-1)/),b_glob(i_count:j_count-1),&
                & b,desc_a,info)
-          if(info/=0) then
-            info=4010
+          if(info /= psb_success_) then
+            info=psb_err_from_subroutine_
             ch_err='psb_ins'
             call psb_errpush(info,name,a_err=ch_err)
             goto 9999
@@ -1189,8 +1189,8 @@ subroutine cmatdist(a_glob, a, ictxt, desc_a,&
             write(0,*) iam,'need to reallocate ',ll
             deallocate(val,irow,icol)
             allocate(val(ll),irow(ll),icol(ll),stat=info)
-            if(info/=0) then
-              info=4010
+            if(info /= psb_success_) then
+              info=psb_err_from_subroutine_
               ch_err='Allocate'
               call psb_errpush(info,name,a_err=ch_err)
               goto 9999
@@ -1203,16 +1203,16 @@ subroutine cmatdist(a_glob, a, ictxt, desc_a,&
           call psb_rcv(ictxt,b_glob(i_count:i_count+nnr-1),root)
           call psb_snd(ictxt,ll,root)
           call psb_spins(ll,irow,icol,val,a,desc_a,info)
-          if(info/=0) then
-            info=4010
+          if(info /= psb_success_) then
+            info=psb_err_from_subroutine_
             ch_err='psspins'
             call psb_errpush(info,name,a_err=ch_err)
             goto 9999
           end if
           call psb_geins(nnr,(/(i,i=i_count,i_count+nnr-1)/),&
                & b_glob(i_count:i_count+nnr-1),b,desc_a,info)
-          if(info/=0) then
-            info=4010
+          if(info /= psb_success_) then
+            info=psb_err_from_subroutine_
             ch_err='psdsins'
             call psb_errpush(info,name,a_err=ch_err)
             goto 9999
@@ -1233,7 +1233,7 @@ subroutine cmatdist(a_glob, a, ictxt, desc_a,&
           do i= i_count, i_count
             call a_glob%csget(i,i,nz,&
                  & irow,icol,val,info,nzin=ll,append=.true.)
-            if (info /= 0) then            
+            if (info /= psb_success_) then            
               if (nz >min(size(irow(ll+1:)),size(icol(ll+1:)),size(val(ll+1:)))) then 
                 write(0,*) 'Allocation failure? This should not happen!'
               end if
@@ -1246,16 +1246,16 @@ subroutine cmatdist(a_glob, a, ictxt, desc_a,&
           if (k_count == iam) then
 
             call psb_spins(ll,irow,icol,val,a,desc_a,info)
-            if(info/=0) then
-              info=4010
+            if(info /= psb_success_) then
+              info=psb_err_from_subroutine_
               ch_err='psspins'
               call psb_errpush(info,name,a_err=ch_err)
               goto 9999
             end if
             call psb_geins(1,(/i_count/),b_glob(i_count:i_count),&
                  & b,desc_a,info)
-            if(info/=0) then
-              info=4010
+            if(info /= psb_success_) then
+              info=psb_err_from_subroutine_
               ch_err='psdsins'
               call psb_errpush(info,name,a_err=ch_err)
               goto 9999
@@ -1277,16 +1277,16 @@ subroutine cmatdist(a_glob, a, ictxt, desc_a,&
             call psb_rcv(ictxt,b_glob(i_count),root)
             call psb_snd(ictxt,ll,root)
             call psb_spins(ll,irow,icol,val,a,desc_a,info)
-            if(info/=0) then
-              info=4010
+            if(info /= psb_success_) then
+              info=psb_err_from_subroutine_
               ch_err='psspins'
               call psb_errpush(info,name,a_err=ch_err)
               goto 9999
             end if
             call psb_geins(1,(/i_count/),b_glob(i_count:i_count),&
                  & b,desc_a,info)
-            if(info/=0) then
-              info=4010
+            if(info /= psb_success_) then
+              info=psb_err_from_subroutine_
               ch_err='psdsins'
               call psb_errpush(info,name,a_err=ch_err)
               goto 9999
@@ -1308,8 +1308,8 @@ subroutine cmatdist(a_glob, a, ictxt, desc_a,&
   t0 = psb_wtime()
   call psb_cdasb(desc_a,info)     
   t1 = psb_wtime()
-  if(info/=0)then
-    info=4010
+  if(info /= psb_success_)then
+    info=psb_err_from_subroutine_
     ch_err='psb_cdasb'
     call psb_errpush(info,name,a_err=ch_err)
     goto 9999
@@ -1319,8 +1319,8 @@ subroutine cmatdist(a_glob, a, ictxt, desc_a,&
   t2 = psb_wtime()
   call psb_spasb(a,desc_a,info,dupl=psb_dupl_err_,afmt=afmt)     
   t3 = psb_wtime()
-  if(info/=0)then
-    info=4010
+  if(info /= psb_success_)then
+    info=psb_err_from_subroutine_
     ch_err='psb_spasb'
     call psb_errpush(info,name,a_err=ch_err)
     goto 9999
@@ -1333,15 +1333,15 @@ subroutine cmatdist(a_glob, a, ictxt, desc_a,&
   end if
 
   call psb_geasb(b,desc_a,info)     
-  if(info/=0)then
-    info=4010
+  if(info /= psb_success_)then
+    info=psb_err_from_subroutine_
     ch_err='psdsasb'
     call psb_errpush(info,name,a_err=ch_err)
     goto 9999
   end if
   deallocate(val,irow,icol,stat=info)
-  if(info/=0)then
-    info=4010
+  if(info /= psb_success_)then
+    info=psb_err_from_subroutine_
     ch_err='deallocate'
     call psb_errpush(info,name,a_err=ch_err)
     goto 9999
@@ -1373,7 +1373,7 @@ subroutine zmatdist(a_glob, a, ictxt, desc_a,&
   !
   !  type(d_spmat)                            :: a_glob
   !     on entry: this contains the global sparse matrix as follows:
-  !        a%fida =='csr'
+  !        a%fida == 'csr'
   !        a%aspk for coefficient values
   !        a%ia1  for column indices
   !        a%ia2  for row pointers
@@ -1462,7 +1462,7 @@ subroutine zmatdist(a_glob, a, ictxt, desc_a,&
   real(psb_dpk_)              :: t0, t1, t2, t3, t4, t5
   character(len=20)           :: name, ch_err
 
-  info = 0
+  info = psb_success_
   err  = 0
   name = 'mat_distf'
   call psb_erractionsave(err_act)
@@ -1490,7 +1490,7 @@ subroutine zmatdist(a_glob, a, ictxt, desc_a,&
   use_parts = present(parts)
   use_v     = present(v)
   if (count((/ use_parts, use_v /)) /= 1) then 
-    info=581
+    info=psb_err_no_optional_arg_
     call psb_errpush(info,name,a_err=" v, parts")
     goto 9999 
   endif
@@ -1502,8 +1502,8 @@ subroutine zmatdist(a_glob, a, ictxt, desc_a,&
   call psb_bcast(ictxt,nrhs, root)
   liwork = max(np, nrow + ncol)
   allocate(iwork(liwork), stat = info)
-  if (info /= 0) then
-    info=4025
+  if (info /= psb_success_) then
+    info=psb_err_alloc_request_
     int_err(1)=liwork
     call psb_errpush(info,name,i_err=int_err,a_err='integer')
     goto 9999
@@ -1517,22 +1517,22 @@ subroutine zmatdist(a_glob, a, ictxt, desc_a,&
   else 
     call psb_cdall(ictxt,desc_a,info,vg=v)
   end if
-  if(info/=0) then
-    info=4010
+  if(info /= psb_success_) then
+    info=psb_err_from_subroutine_
     ch_err='psb_cdall'
     call psb_errpush(info,name,a_err=ch_err)
     goto 9999
   end if
   call psb_spall(a,desc_a,info,nnz=((nnzero+np-1)/np))
-  if(info/=0) then
-    info=4010
+  if(info /= psb_success_) then
+    info=psb_err_from_subroutine_
     ch_err='psb_psspall'
     call psb_errpush(info,name,a_err=ch_err)
     goto 9999
   end if
   call psb_geall(b,desc_a,info)   
-  if(info/=0) then
-    info=4010
+  if(info /= psb_success_) then
+    info=psb_err_from_subroutine_
     ch_err='psb_psdsall'
     call psb_errpush(info,name,a_err=ch_err)
     goto 9999
@@ -1542,8 +1542,8 @@ subroutine zmatdist(a_glob, a, ictxt, desc_a,&
 
   isize = 3*nb*max(((nnzero+nrow)/nrow),nb)
   allocate(val(isize),irow(isize),icol(isize),stat=info)
-  if(info/=0) then
-    info=4010
+  if(info /= psb_success_) then
+    info=psb_err_from_subroutine_
     ch_err='Allocate'
     call psb_errpush(info,name,a_err=ch_err)
     goto 9999
@@ -1590,7 +1590,7 @@ subroutine zmatdist(a_glob, a, ictxt, desc_a,&
         do i= i_count, j_count-1
           call a_glob%csget(i,i,nz,&
                & irow,icol,val,info,nzin=ll,append=.true.)
-          if (info /= 0) then            
+          if (info /= psb_success_) then            
             if (nz >min(size(irow(ll+1:)),size(icol(ll+1:)),size(val(ll+1:)))) then 
               write(0,*) 'Allocation failure? This should not happen!'
             end if
@@ -1602,16 +1602,16 @@ subroutine zmatdist(a_glob, a, ictxt, desc_a,&
 
         if (iproc == iam) then
           call psb_spins(ll,irow,icol,val,a,desc_a,info)
-          if(info/=0) then
-            info=4010
+          if(info /= psb_success_) then
+            info=psb_err_from_subroutine_
             ch_err='psb_spins'
             call psb_errpush(info,name,a_err=ch_err)
             goto 9999
           end if
           call psb_geins(nnr,(/(i,i=i_count,j_count-1)/),b_glob(i_count:j_count-1),&
                & b,desc_a,info)
-          if(info/=0) then
-            info=4010
+          if(info /= psb_success_) then
+            info=psb_err_from_subroutine_
             ch_err='psb_ins'
             call psb_errpush(info,name,a_err=ch_err)
             goto 9999
@@ -1634,8 +1634,8 @@ subroutine zmatdist(a_glob, a, ictxt, desc_a,&
             write(0,*) iam,'need to reallocate ',ll
             deallocate(val,irow,icol)
             allocate(val(ll),irow(ll),icol(ll),stat=info)
-            if(info/=0) then
-              info=4010
+            if(info /= psb_success_) then
+              info=psb_err_from_subroutine_
               ch_err='Allocate'
               call psb_errpush(info,name,a_err=ch_err)
               goto 9999
@@ -1648,16 +1648,16 @@ subroutine zmatdist(a_glob, a, ictxt, desc_a,&
           call psb_rcv(ictxt,b_glob(i_count:i_count+nnr-1),root)
           call psb_snd(ictxt,ll,root)
           call psb_spins(ll,irow,icol,val,a,desc_a,info)
-          if(info/=0) then
-            info=4010
+          if(info /= psb_success_) then
+            info=psb_err_from_subroutine_
             ch_err='psspins'
             call psb_errpush(info,name,a_err=ch_err)
             goto 9999
           end if
           call psb_geins(nnr,(/(i,i=i_count,i_count+nnr-1)/),&
                & b_glob(i_count:i_count+nnr-1),b,desc_a,info)
-          if(info/=0) then
-            info=4010
+          if(info /= psb_success_) then
+            info=psb_err_from_subroutine_
             ch_err='psdsins'
             call psb_errpush(info,name,a_err=ch_err)
             goto 9999
@@ -1678,7 +1678,7 @@ subroutine zmatdist(a_glob, a, ictxt, desc_a,&
           do i= i_count, i_count
             call a_glob%csget(i,i,nz,&
                  & irow,icol,val,info,nzin=ll,append=.true.)
-            if (info /= 0) then            
+            if (info /= psb_success_) then            
               if (nz >min(size(irow(ll+1:)),size(icol(ll+1:)),size(val(ll+1:)))) then 
                 write(0,*) 'Allocation failure? This should not happen!'
               end if
@@ -1691,16 +1691,16 @@ subroutine zmatdist(a_glob, a, ictxt, desc_a,&
           if (k_count == iam) then
 
             call psb_spins(ll,irow,icol,val,a,desc_a,info)
-            if(info/=0) then
-              info=4010
+            if(info /= psb_success_) then
+              info=psb_err_from_subroutine_
               ch_err='psspins'
               call psb_errpush(info,name,a_err=ch_err)
               goto 9999
             end if
             call psb_geins(1,(/i_count/),b_glob(i_count:i_count),&
                  & b,desc_a,info)
-            if(info/=0) then
-              info=4010
+            if(info /= psb_success_) then
+              info=psb_err_from_subroutine_
               ch_err='psdsins'
               call psb_errpush(info,name,a_err=ch_err)
               goto 9999
@@ -1722,16 +1722,16 @@ subroutine zmatdist(a_glob, a, ictxt, desc_a,&
             call psb_rcv(ictxt,b_glob(i_count),root)
             call psb_snd(ictxt,ll,root)
             call psb_spins(ll,irow,icol,val,a,desc_a,info)
-            if(info/=0) then
-              info=4010
+            if(info /= psb_success_) then
+              info=psb_err_from_subroutine_
               ch_err='psspins'
               call psb_errpush(info,name,a_err=ch_err)
               goto 9999
             end if
             call psb_geins(1,(/i_count/),b_glob(i_count:i_count),&
                  & b,desc_a,info)
-            if(info/=0) then
-              info=4010
+            if(info /= psb_success_) then
+              info=psb_err_from_subroutine_
               ch_err='psdsins'
               call psb_errpush(info,name,a_err=ch_err)
               goto 9999
@@ -1753,8 +1753,8 @@ subroutine zmatdist(a_glob, a, ictxt, desc_a,&
   t0 = psb_wtime()
   call psb_cdasb(desc_a,info)     
   t1 = psb_wtime()
-  if(info/=0)then
-    info=4010
+  if(info /= psb_success_)then
+    info=psb_err_from_subroutine_
     ch_err='psb_cdasb'
     call psb_errpush(info,name,a_err=ch_err)
     goto 9999
@@ -1764,8 +1764,8 @@ subroutine zmatdist(a_glob, a, ictxt, desc_a,&
   t2 = psb_wtime()
   call psb_spasb(a,desc_a,info,dupl=psb_dupl_err_,afmt=afmt)     
   t3 = psb_wtime()
-  if(info/=0)then
-    info=4010
+  if(info /= psb_success_)then
+    info=psb_err_from_subroutine_
     ch_err='psb_spasb'
     call psb_errpush(info,name,a_err=ch_err)
     goto 9999
@@ -1778,15 +1778,15 @@ subroutine zmatdist(a_glob, a, ictxt, desc_a,&
   end if
 
   call psb_geasb(b,desc_a,info)     
-  if(info/=0)then
-    info=4010
+  if(info /= psb_success_)then
+    info=psb_err_from_subroutine_
     ch_err='psdsasb'
     call psb_errpush(info,name,a_err=ch_err)
     goto 9999
   end if
   deallocate(val,irow,icol,stat=info)
-  if(info/=0)then
-    info=4010
+  if(info /= psb_success_)then
+    info=psb_err_from_subroutine_
     ch_err='deallocate'
     call psb_errpush(info,name,a_err=ch_err)
     goto 9999

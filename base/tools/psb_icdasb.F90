@@ -67,7 +67,7 @@ subroutine psb_icdasb(desc_a,info,ext_hv)
   integer             :: debug_level, debug_unit
   character(len=20)   :: name
 
-  info = 0
+  info = psb_success_
   int_err(1) = 0
   name = 'psb_cdasb'
 
@@ -84,13 +84,13 @@ subroutine psb_icdasb(desc_a,info,ext_hv)
   ! check on blacs grid 
   call psb_info(ictxt, me, np)
   if (np == -1) then
-    info = 2010
+    info = psb_err_blacs_error_
     call psb_errpush(info,name)
     goto 9999
   endif
 
   if (.not.psb_is_ok_desc(desc_a)) then 
-    info = 600
+    info = psb_err_spmat_invalid_state_
     int_err(1) = dectype
     call psb_errpush(info,name)
     goto 9999
@@ -134,8 +134,8 @@ subroutine psb_icdasb(desc_a,info,ext_hv)
            & write(debug_unit,*) me,' ',trim(name),&
            & ': Large descriptor, calling ldsc_pre_halo'
       call psi_ldsc_pre_halo(desc_a,ext_hv_,info)
-      if (info /= 0) then
-        call psb_errpush(4010,name,a_err='ldsc_pre_halo')
+      if (info /= psb_success_) then
+        call psb_errpush(psb_err_from_subroutine_,name,a_err='ldsc_pre_halo')
         goto 9999
       end if      
     end if
@@ -149,14 +149,14 @@ subroutine psb_icdasb(desc_a,info,ext_hv)
          & write(debug_unit,*) me,' ',trim(name),': Final conversion'
     ! Then convert and put them back where they belong.    
     call psi_cnv_dsc(halo_index,ovrlap_index,ext_index,desc_a,info) 
-    if (info /= 0) then
-      call psb_errpush(4010,name,a_err='psi_cnv_dsc')
+    if (info /= psb_success_) then
+      call psb_errpush(psb_err_from_subroutine_,name,a_err='psi_cnv_dsc')
       goto 9999
     end if
 
     deallocate(ovrlap_index, halo_index, ext_index, stat=info)
-    if (info /= 0) then
-      info =4000
+    if (info /= psb_success_) then
+      info =psb_err_alloc_dealloc_
       call psb_errpush(info,name)
       goto 9999
     end if
@@ -164,7 +164,7 @@ subroutine psb_icdasb(desc_a,info,ext_hv)
     ! Ok, register into MATRIX_DATA 
     desc_a%matrix_data(psb_dec_type_) = psb_desc_asb_
   else
-    info = 600
+    info = psb_err_spmat_invalid_state_
     call psb_errpush(info,name)
     goto 9999
   endif

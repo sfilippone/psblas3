@@ -94,7 +94,7 @@ subroutine  psb_zspmm(alpha,a,x,beta,y,desc_a,info,&
 
   name='psb_zspmm'
   if(psb_get_errstatus() /= 0) return 
-  info=0
+  info=psb_success_
   call psb_erractionsave(err_act)
   debug_unit  = psb_get_debug_unit()
   debug_level = psb_get_debug_level()
@@ -103,7 +103,7 @@ subroutine  psb_zspmm(alpha,a,x,beta,y,desc_a,info,&
 
   call psb_info(ictxt, me, np)
   if (np == -1) then
-    info = 2010
+    info = psb_err_blacs_error_
     call psb_errpush(info,name)
     goto 9999
   endif
@@ -146,7 +146,7 @@ subroutine  psb_zspmm(alpha,a,x,beta,y,desc_a,info,&
   if ( (trans_ == 'N').or.(trans_ == 'T')&
        & .or.(trans_ == 'C')) then
   else
-    info = 70
+    info = psb_err_iarg_invalid_value_
     call psb_errpush(info,name)
     goto 9999
   end if
@@ -173,8 +173,8 @@ subroutine  psb_zspmm(alpha,a,x,beta,y,desc_a,info,&
 
   if (aliw) then
     allocate(iwork(liwork),stat=info)
-    if(info /= 0) then
-      info=4010
+    if(info /= psb_success_) then
+      info=psb_err_from_subroutine_
       ch_err='psb_realloc'
       call psb_errpush(info,name,a_err=ch_err)
       goto 9999
@@ -187,8 +187,8 @@ subroutine  psb_zspmm(alpha,a,x,beta,y,desc_a,info,&
 
   ! checking for matrix correctness
   call psb_chkmat(m,n,ia,ja,desc_a,info,iia,jja)
-  if(info /= 0) then
-    info=4010
+  if(info /= psb_success_) then
+    info=psb_err_from_subroutine_
     ch_err='psb_chkmat'
     call psb_errpush(info,name,a_err=ch_err)
     goto 9999
@@ -199,17 +199,17 @@ subroutine  psb_zspmm(alpha,a,x,beta,y,desc_a,info,&
     !  Matrix is not transposed
     if((ja /= ix).or.(ia /= iy)) then
       ! this case is not yet implemented
-      info = 3030
+      info = psb_err_ja_nix_ia_niy_unsupported_
       call psb_errpush(info,name)
       goto 9999
     end if
 
     ! checking for vectors correctness
     call psb_chkvect(n,ik,size(x,1),ix,ijx,desc_a,info,iix,jjx)
-    if (info == 0) &
+    if (info == psb_success_) &
          & call psb_chkvect(m,ik,size(y,1),iy,ijy,desc_a,info,iiy,jjy)
-    if(info /= 0) then
-      info=4010
+    if(info /= psb_success_) then
+      info=psb_err_from_subroutine_
       ch_err='psb_chkvect'
       call psb_errpush(info,name,a_err=ch_err)
       goto 9999
@@ -217,7 +217,7 @@ subroutine  psb_zspmm(alpha,a,x,beta,y,desc_a,info,&
 
     if((iix /= 1).or.(iiy /= 1)) then
       ! this case is not yet implemented
-      info = 3040
+      info = psb_err_ix_n1_iy_n1_unsupported_
       call psb_errpush(info,name)
       goto 9999
     end if
@@ -239,28 +239,28 @@ subroutine  psb_zspmm(alpha,a,x,beta,y,desc_a,info,&
              & call psi_swapdata(psb_swap_send_,ib1,&
              & zzero,xp,desc_a,iwork,info)
 
-        if(info /= 0) exit blk
+        if(info /= psb_success_) exit blk
 
         !  local Matrix-vector product
         call psb_csmm(alpha,a,x(:,jjx+i-1:jjx+i-1+ib-1),&
              & beta,y(:,jjy+i-1:jjy+i-1+ib-1),info,trans=trans_)
 
-        if(info /= 0) exit blk
+        if(info /= psb_success_) exit blk
 
         if((ib1 > 0).and.(doswap_))&
              & call psi_swapdata(psb_swap_recv_,ib1,&
              & zzero,xp,desc_a,iwork,info)
 
-        if(info /= 0) exit blk
+        if(info /= psb_success_) exit blk
       end do blk
     else
       if (doswap_)&
            & call psi_swapdata(ior(psb_swap_send_,psb_swap_recv_),&
            & ib1,zzero,x(:,1:ik),desc_a,iwork,info)
-      if (info == 0) call psb_csmm(alpha,a,x(:,1:ik),beta,y(:,1:ik),info)
+      if (info == psb_success_) call psb_csmm(alpha,a,x(:,1:ik),beta,y(:,1:ik),info)
     end if
-    if(info /= 0) then
-      info = 4011
+    if(info /= psb_success_) then
+      info = psb_err_from_subroutine_non_
       call psb_errpush(info,name)
       goto 9999
     end if
@@ -270,7 +270,7 @@ subroutine  psb_zspmm(alpha,a,x,beta,y,desc_a,info,&
     !  Matrix is transposed
     if((ja /= iy).or.(ia /= ix)) then
       ! this case is not yet implemented
-      info = 3030
+      info = psb_err_ja_nix_ia_niy_unsupported_
       call psb_errpush(info,name)
       goto 9999
     end if
@@ -278,10 +278,10 @@ subroutine  psb_zspmm(alpha,a,x,beta,y,desc_a,info,&
 
     ! checking for vectors correctness
     call psb_chkvect(m,ik,size(x,1),ix,ijx,desc_a,info,iix,jjx)
-    if (info == 0) &
+    if (info == psb_success_) &
          & call psb_chkvect(n,ik,size(y,1),iy,ijy,desc_a,info,iiy,jjy)
-    if(info /= 0) then
-      info=4010
+    if(info /= psb_success_) then
+      info=psb_err_from_subroutine_
       ch_err='psb_chkvect'
       call psb_errpush(info,name,a_err=ch_err)
       goto 9999
@@ -289,7 +289,7 @@ subroutine  psb_zspmm(alpha,a,x,beta,y,desc_a,info,&
 
     if((iix /= 1).or.(iiy /= 1)) then
       ! this case is not yet implemented
-      info = 3040
+      info = psb_err_ix_n1_iy_n1_unsupported_
       call psb_errpush(info,name)
       goto 9999
     end if
@@ -301,30 +301,30 @@ subroutine  psb_zspmm(alpha,a,x,beta,y,desc_a,info,&
     ! with a proper scale factor (1/np) to the overall product.
     ! 
     call psi_ovrl_save(x(:,1:ik),xvsave,desc_a,info)
-    if (info == 0) call psi_ovrl_upd(x,desc_a,psb_avg_,info)
+    if (info == psb_success_) call psi_ovrl_upd(x,desc_a,psb_avg_,info)
     y(nrow+1:ncol,1:ik)    = zzero
 
-    if (info == 0) call psb_csmm(alpha,a,x(:,1:ik),beta,y(:,1:ik),info,trans=trans_)
+    if (info == psb_success_) call psb_csmm(alpha,a,x(:,1:ik),beta,y(:,1:ik),info,trans=trans_)
     if (debug_level >= psb_debug_comp_) &
          & write(debug_unit,*) me,' ',trim(name),' csmm ', info
-    if (info /= 0) then
-      info = 4010
+    if (info /= psb_success_) then
+      info = psb_err_from_subroutine_
       ch_err='psb_csmm'
       call psb_errpush(info,name,a_err=ch_err)
       goto 9999
     end if
-    if (info == 0) call psi_ovrl_restore(x,xvsave,desc_a,info)
+    if (info == psb_success_) call psi_ovrl_restore(x,xvsave,desc_a,info)
 
     if (doswap_)then 
       call psi_swaptran(ior(psb_swap_send_,psb_swap_recv_),&
            & ik,zone,y(:,1:ik),desc_a,iwork,info)
-      if (info == 0) call psi_swapdata(ior(psb_swap_send_,psb_swap_recv_),&
+      if (info == psb_success_) call psi_swapdata(ior(psb_swap_send_,psb_swap_recv_),&
            & ik,zone,y(:,1:ik),desc_a,iwork,info,data=psb_comm_ovr_)
 
       if (debug_level >= psb_debug_comp_) &
            & write(debug_unit,*) me,' ',trim(name),' swaptran ', info
-      if(info /= 0) then
-        info = 4010
+      if(info /= psb_success_) then
+        info = psb_err_from_subroutine_
         ch_err='PSI_dSwapTran'
         call psb_errpush(info,name,a_err=ch_err)
         goto 9999
@@ -336,8 +336,8 @@ subroutine  psb_zspmm(alpha,a,x,beta,y,desc_a,info,&
   if (aliw) deallocate(iwork,stat=info)
   if (debug_level >= psb_debug_comp_) &
        & write(debug_unit,*) me,' ',trim(name),' deallocat ',aliw, info
-  if(info /= 0) then
-    info = 4010
+  if(info /= psb_success_) then
+    info = psb_err_from_subroutine_
     ch_err='Deallocate iwork'
     call psb_errpush(info,name,a_err=ch_err)
     goto 9999
@@ -445,7 +445,7 @@ subroutine  psb_zspmv(alpha,a,x,beta,y,desc_a,info,&
 
   name='psb_zspmv'
   if(psb_get_errstatus() /= 0) return 
-  info=0
+  info=psb_success_
   call psb_erractionsave(err_act)
   debug_unit  = psb_get_debug_unit()
   debug_level = psb_get_debug_level()
@@ -453,7 +453,7 @@ subroutine  psb_zspmv(alpha,a,x,beta,y,desc_a,info,&
   ictxt=psb_cd_get_context(desc_a)
   call psb_info(ictxt, me, np)
   if (np == -1) then
-    info = 2010
+    info = psb_err_blacs_error_
     call psb_errpush(info,name)
     goto 9999
   endif
@@ -481,7 +481,7 @@ subroutine  psb_zspmv(alpha,a,x,beta,y,desc_a,info,&
   if ( (trans_ == 'N').or.(trans_ == 'T')&
        & .or.(trans_ == 'C')) then
   else
-    info = 70
+    info = psb_err_iarg_invalid_value_
     call psb_errpush(info,name)
     goto 9999
   end if
@@ -509,8 +509,8 @@ subroutine  psb_zspmv(alpha,a,x,beta,y,desc_a,info,&
 
   if (aliw) then
     allocate(iwork(liwork),stat=info)
-    if(info /= 0) then
-      info=4010
+    if(info /= psb_success_) then
+      info=psb_err_from_subroutine_
       ch_err='Allocate'
       call psb_errpush(info,name,a_err=ch_err)
       goto 9999
@@ -523,8 +523,8 @@ subroutine  psb_zspmv(alpha,a,x,beta,y,desc_a,info,&
        & write(debug_unit,*) me,' ',trim(name),' Allocated work ', info
   ! checking for matrix correctness
   call psb_chkmat(m,n,ia,ja,desc_a,info,iia,jja)
-  if(info /= 0) then
-    info=4010
+  if(info /= psb_success_) then
+    info=psb_err_from_subroutine_
     ch_err='psb_chkmat'
     call psb_errpush(info,name,a_err=ch_err)
     goto 9999
@@ -536,17 +536,17 @@ subroutine  psb_zspmv(alpha,a,x,beta,y,desc_a,info,&
     !  Matrix is not transposed
     if((ja /= ix).or.(ia /= iy)) then
       ! this case is not yet implemented
-      info = 3030
+      info = psb_err_ja_nix_ia_niy_unsupported_
       call psb_errpush(info,name)
       goto 9999
     end if
 
     ! checking for vectors correctness
     call psb_chkvect(n,ik,size(x),ix,jx,desc_a,info,iix,jjx)
-    if (info == 0) &
+    if (info == psb_success_) &
          & call psb_chkvect(m,ik,size(y),iy,jy,desc_a,info,iiy,jjy)
-    if(info /= 0) then
-      info=4010
+    if(info /= psb_success_) then
+      info=psb_err_from_subroutine_
       ch_err='psb_chkvect'
       call psb_errpush(info,name,a_err=ch_err)
       goto 9999
@@ -554,7 +554,7 @@ subroutine  psb_zspmv(alpha,a,x,beta,y,desc_a,info,&
 
     if((iix /= 1).or.(iiy /= 1)) then
       ! this case is not yet implemented
-      info = 3040
+      info = psb_err_ix_n1_iy_n1_unsupported_
       call psb_errpush(info,name)
       goto 9999
     end if
@@ -566,8 +566,8 @@ subroutine  psb_zspmv(alpha,a,x,beta,y,desc_a,info,&
 
     call psb_csmm(alpha,a,x,beta,y,info)
 
-    if(info /= 0) then
-      info = 4011
+    if(info /= psb_success_) then
+      info = psb_err_from_subroutine_non_
       call psb_errpush(info,name)
       goto 9999
     end if
@@ -576,17 +576,17 @@ subroutine  psb_zspmv(alpha,a,x,beta,y,desc_a,info,&
     !  Matrix is transposed
     if((ja /= iy).or.(ia /= ix)) then
       ! this case is not yet implemented
-      info = 3030
+      info = psb_err_ja_nix_ia_niy_unsupported_
       call psb_errpush(info,name)
       goto 9999
     end if
 
     ! checking for vectors correctness
     call psb_chkvect(m,ik,size(x),ix,jx,desc_a,info,iix,jjx)
-    if (info == 0)&
+    if (info == psb_success_)&
          & call psb_chkvect(n,ik,size(y),iy,jy,desc_a,info,iiy,jjy)
-    if(info /= 0) then
-      info=4010
+    if(info /= psb_success_) then
+      info=psb_err_from_subroutine_
       ch_err='psb_chkvect'
       call psb_errpush(info,name,a_err=ch_err)
       goto 9999
@@ -594,7 +594,7 @@ subroutine  psb_zspmv(alpha,a,x,beta,y,desc_a,info,&
 
     if((iix /= 1).or.(iiy /= 1)) then
       ! this case is not yet implemented
-      info = 3040
+      info = psb_err_ix_n1_iy_n1_unsupported_
       call psb_errpush(info,name)
       goto 9999
     end if
@@ -609,18 +609,18 @@ subroutine  psb_zspmv(alpha,a,x,beta,y,desc_a,info,&
     ! with a proper scale factor (1/np) to the overall product.
     ! 
     call psi_ovrl_save(x,xvsave,desc_a,info)
-    if (info == 0) call psi_ovrl_upd(x,desc_a,psb_avg_,info)
+    if (info == psb_success_) call psi_ovrl_upd(x,desc_a,psb_avg_,info)
     yp(nrow+1:ncol) = zzero
     
     !  local Matrix-vector product
-    if (info == 0) call psb_csmm(alpha,a,x,beta,y,info,trans=trans_)
+    if (info == psb_success_) call psb_csmm(alpha,a,x,beta,y,info,trans=trans_)
 
     if (debug_level >= psb_debug_comp_) &
          & write(debug_unit,*) me,' ',trim(name),' csmm ', info
 
-    if (info == 0) call psi_ovrl_restore(x,xvsave,desc_a,info)
-    if (info /= 0) then
-      info = 4010
+    if (info == psb_success_) call psi_ovrl_restore(x,xvsave,desc_a,info)
+    if (info /= psb_success_) then
+      info = psb_err_from_subroutine_
       ch_err='psb_csmm'
       call psb_errpush(info,name,a_err=ch_err)
       goto 9999
@@ -629,13 +629,13 @@ subroutine  psb_zspmv(alpha,a,x,beta,y,desc_a,info,&
     if (doswap_) then
       call psi_swaptran(ior(psb_swap_send_,psb_swap_recv_),&
            & zone,yp,desc_a,iwork,info)
-      if (info == 0) call psi_swapdata(ior(psb_swap_send_,psb_swap_recv_),&
+      if (info == psb_success_) call psi_swapdata(ior(psb_swap_send_,psb_swap_recv_),&
            & zone,yp,desc_a,iwork,info,data=psb_comm_ovr_)
       
       if (debug_level >= psb_debug_comp_) &
            & write(debug_unit,*) me,' ',trim(name),' swaptran ', info
-      if(info /= 0) then
-        info = 4010
+      if(info /= psb_success_) then
+        info = psb_err_from_subroutine_
         ch_err='PSI_dSwapTran'
         call psb_errpush(info,name,a_err=ch_err)
         goto 9999
@@ -647,8 +647,8 @@ subroutine  psb_zspmv(alpha,a,x,beta,y,desc_a,info,&
   if (aliw) deallocate(iwork,stat=info)
   if (debug_level >= psb_debug_comp_) &
        & write(debug_unit,*) me,' ',trim(name),' deallocat ',aliw, info
-  if(info /= 0) then
-    info = 4010
+  if(info /= psb_success_) then
+    info = psb_err_from_subroutine_
     ch_err='Deallocate iwork'
     call psb_errpush(info,name,a_err=ch_err)
     goto 9999

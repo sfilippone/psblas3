@@ -71,7 +71,7 @@ subroutine psi_bld_tmpovrl(iv,desc,info)
   integer             :: ictxt,n_row, debug_unit, debug_level
   character(len=20)   :: name,ch_err
 
-  info = 0
+  info = psb_success_
   name = 'psi_bld_tmpovrl'
   call psb_erractionsave(err_act)
   debug_unit  = psb_get_debug_unit()
@@ -82,7 +82,7 @@ subroutine psi_bld_tmpovrl(iv,desc,info)
   ! check on blacs grid 
   call psb_info(ictxt, me, np)
   if (np == -1) then
-    info = 2010
+    info = psb_err_blacs_error_
     call psb_errpush(info,name)
     goto 9999
   endif
@@ -107,7 +107,7 @@ subroutine psi_bld_tmpovrl(iv,desc,info)
 
   allocate(ov_idx(l_ov_ix),ov_el(l_ov_el,3), stat=info)
   if (info /= psb_no_err_) then
-    info=4010
+    info=psb_err_from_subroutine_
     err=info
     call psb_errpush(err,name,a_err='psb_realloc')
     goto 9999
@@ -137,7 +137,7 @@ subroutine psi_bld_tmpovrl(iv,desc,info)
   l_ov_ix         = l_ov_ix + 1
   ov_idx(l_ov_ix) = -1
   call psb_move_alloc(ov_idx,desc%ovrlap_index,info) 
-  if (info == 0) call psb_move_alloc(ov_el,desc%ovrlap_elem,info)
+  if (info == psb_success_) call psb_move_alloc(ov_el,desc%ovrlap_elem,info)
 
 
   call psb_erractionrestore(err_act)

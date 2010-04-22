@@ -135,7 +135,7 @@ subroutine calsr(n,x,dir)
         end do outer_up
         if (i == ilx) then 
           if (x(i) /= piv) then
-            call psb_errpush(4001,r_name='calsr',a_err='impossible pivot condition')
+            call psb_errpush(psb_err_internal_error_,r_name='calsr',a_err='impossible pivot condition')
             call psb_error()
           endif
           i = i + 1 
@@ -259,7 +259,7 @@ subroutine calsr(n,x,dir)
         end do outer_dw
         if (i == ilx) then 
           if (x(i) /= piv) then
-            call psb_errpush(4001,r_name='calsr',a_err='impossible pivot condition')
+            call psb_errpush(psb_err_internal_error_,r_name='calsr',a_err='impossible pivot condition')
             call psb_error()
           endif
           i = i + 1 
@@ -304,7 +304,7 @@ subroutine calsr(n,x,dir)
     endif
 
   case default
-    call psb_errpush(4001,r_name='calsr',a_err='wrong dir')
+    call psb_errpush(psb_err_internal_error_,r_name='calsr',a_err='wrong dir')
     call psb_error()
   end select
 

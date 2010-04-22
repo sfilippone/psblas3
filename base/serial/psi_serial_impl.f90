@@ -849,11 +849,11 @@ subroutine psi_saxpbyv(m,alpha, x, beta, y, info)
 
   name='psb_geaxpby'
   if(psb_get_errstatus() /= 0) return 
-  info=0
+  info=psb_success_
   call psb_erractionsave(err_act)
 
   if (m < 0) then
-    info = 10
+    info = psb_err_iarg_neg_
     call psb_errpush(info,name,i_err=(/1,m,0,0,0/))
     goto 9999 
   end if
@@ -897,16 +897,16 @@ subroutine psi_saxpby(m,n,alpha, x, beta, y, info)
 
   name='psb_geaxpby'
   if(psb_get_errstatus() /= 0) return 
-  info=0
+  info=psb_success_
   call psb_erractionsave(err_act)
 
   if (m < 0) then
-    info = 10
+    info = psb_err_iarg_neg_
     call psb_errpush(info,name,i_err=(/1,m,0,0,0/))
     goto 9999 
   end if
   if (n < 0) then
-    info = 10
+    info = psb_err_iarg_neg_
     call psb_errpush(info,name,i_err=(/2,n,0,0,0/))
     goto 9999 
   end if
@@ -951,11 +951,11 @@ subroutine psi_daxpbyv(m,alpha, x, beta, y, info)
 
   name='psb_geaxpby'
   if(psb_get_errstatus() /= 0) return 
-  info=0
+  info=psb_success_
   call psb_erractionsave(err_act)
 
   if (m < 0) then
-    info = 10
+    info = psb_err_iarg_neg_
     call psb_errpush(info,name,i_err=(/1,m,0,0,0/))
     goto 9999 
   end if
@@ -999,16 +999,16 @@ subroutine psi_daxpby(m,n,alpha, x, beta, y, info)
 
   name='psb_geaxpby'
   if(psb_get_errstatus() /= 0) return 
-  info=0
+  info=psb_success_
   call psb_erractionsave(err_act)
 
   if (m < 0) then
-    info = 10
+    info = psb_err_iarg_neg_
     call psb_errpush(info,name,i_err=(/1,m,0,0,0/))
     goto 9999 
   end if
   if (n < 0) then
-    info = 10
+    info = psb_err_iarg_neg_
     call psb_errpush(info,name,i_err=(/2,n,0,0,0/))
     goto 9999 
   end if
@@ -1052,11 +1052,11 @@ subroutine psi_caxpbyv(m,alpha, x, beta, y, info)
 
   name='psb_geaxpby'
   if(psb_get_errstatus() /= 0) return 
-  info=0
+  info=psb_success_
   call psb_erractionsave(err_act)
 
   if (m < 0) then
-    info = 10
+    info = psb_err_iarg_neg_
     call psb_errpush(info,name,i_err=(/1,m,0,0,0/))
     goto 9999 
   end if
@@ -1100,16 +1100,16 @@ subroutine psi_caxpby(m,n,alpha, x, beta, y, info)
 
   name='psb_geaxpby'
   if(psb_get_errstatus() /= 0) return 
-  info=0
+  info=psb_success_
   call psb_erractionsave(err_act)
 
   if (m < 0) then
-    info = 10
+    info = psb_err_iarg_neg_
     call psb_errpush(info,name,i_err=(/1,m,0,0,0/))
     goto 9999 
   end if
   if (n < 0) then
-    info = 10
+    info = psb_err_iarg_neg_
     call psb_errpush(info,name,i_err=(/2,n,0,0,0/))
     goto 9999 
   end if
@@ -1153,11 +1153,11 @@ subroutine psi_zaxpbyv(m,alpha, x, beta, y, info)
 
   name='psb_geaxpby'
   if(psb_get_errstatus() /= 0) return 
-  info=0
+  info=psb_success_
   call psb_erractionsave(err_act)
 
   if (m < 0) then
-    info = 10
+    info = psb_err_iarg_neg_
     call psb_errpush(info,name,i_err=(/1,m,0,0,0/))
     goto 9999 
   end if
@@ -1201,16 +1201,16 @@ subroutine psi_zaxpby(m,n,alpha, x, beta, y, info)
 
   name='psb_geaxpby'
   if(psb_get_errstatus() /= 0) return 
-  info=0
+  info=psb_success_
   call psb_erractionsave(err_act)
 
   if (m < 0) then
-    info = 10
+    info = psb_err_iarg_neg_
     call psb_errpush(info,name,i_err=(/1,m,0,0,0/))
     goto 9999 
   end if
   if (n < 0) then
-    info = 10
+    info = psb_err_iarg_neg_
     call psb_errpush(info,name,i_err=(/2,n,0,0,0/))
     goto 9999 
   end if

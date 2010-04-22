@@ -70,13 +70,13 @@ function psb_ddot(x, y,desc_a, info, jx, jy)
 
   name='psb_ddot'
   if(psb_get_errstatus() /= 0) return 
-  info=0
+  info=psb_success_
   call psb_erractionsave(err_act)
 
   ictxt=psb_cd_get_context(desc_a)
   call psb_info(ictxt, me, np)
   if (np == -ione) then
-    info = 2010
+    info = psb_err_blacs_error_
     call psb_errpush(info,name)
     goto 9999
   endif
@@ -105,17 +105,17 @@ function psb_ddot(x, y,desc_a, info, jx, jy)
 
   ! check vector correctness
   call psb_chkvect(m,ione,size(x,1),ix,ijx,desc_a,info,iix,jjx)
-  if (info == 0) &
+  if (info == psb_success_) &
        & call psb_chkvect(m,ione,size(y,1),iy,ijy,desc_a,info,iiy,jjy)
-  if(info /= 0) then
-    info=4010
+  if(info /= psb_success_) then
+    info=psb_err_from_subroutine_
     ch_err='psb_chkvect'
     call psb_errpush(info,name,a_err=ch_err)
     goto 9999
   end if
 
   if ((iix /= ione).or.(iiy /= ione)) then
-    info=3040
+    info=psb_err_ix_n1_iy_n1_unsupported_
     call psb_errpush(info,name)
     goto 9999
   end if
@@ -222,14 +222,14 @@ function psb_ddotv(x, y,desc_a, info)
 
   name='psb_ddot'
   if(psb_get_errstatus() /= 0) return 
-  info=0
+  info=psb_success_
   call psb_erractionsave(err_act)
 
   ictxt=psb_cd_get_context(desc_a)
 
   call psb_info(ictxt, me, np)
   if (np == -ione) then
-    info = 2010
+    info = psb_err_blacs_error_
     call psb_errpush(info,name)
     goto 9999
   endif
@@ -242,17 +242,17 @@ function psb_ddotv(x, y,desc_a, info)
 
   ! check vector correctness
   call psb_chkvect(m,ione,size(x,1),ix,jx,desc_a,info,iix,jjx)
-  if (info == 0) &
+  if (info == psb_success_) &
        & call psb_chkvect(m,ione,size(y,1),iy,jy,desc_a,info,iiy,jjy)
-  if(info /= 0) then
-    info=4010
+  if(info /= psb_success_) then
+    info=psb_err_from_subroutine_
     ch_err='psb_chkvect'
     call psb_errpush(info,name,a_err=ch_err)
     goto 9999
   end if
 
   if ((iix /= ione).or.(iiy /= ione)) then
-    info=3040
+    info=psb_err_ix_n1_iy_n1_unsupported_
     call psb_errpush(info,name)
     goto 9999
   end if
@@ -357,14 +357,14 @@ subroutine psb_ddotvs(res, x, y,desc_a, info)
 
   name='psb_ddot'
   if(psb_get_errstatus() /= 0) return 
-  info=0
+  info=psb_success_
   call psb_erractionsave(err_act)
 
   ictxt=psb_cd_get_context(desc_a)
 
   call psb_info(ictxt, me, np)
   if (np == -ione) then
-    info = 2010
+    info = psb_err_blacs_error_
     call psb_errpush(info,name)
     goto 9999
   endif
@@ -374,17 +374,17 @@ subroutine psb_ddotvs(res, x, y,desc_a, info)
   m = psb_cd_get_global_rows(desc_a)
   ! check vector correctness
   call psb_chkvect(m,ione,size(x,1),ix,ix,desc_a,info,iix,jjx)
-  if (info == 0) &
+  if (info == psb_success_) &
        & call psb_chkvect(m,ione,size(y,1),iy,iy,desc_a,info,iiy,jjy)
-  if(info /= 0) then
-    info=4010
+  if(info /= psb_success_) then
+    info=psb_err_from_subroutine_
     ch_err='psb_chkvect'
     call psb_errpush(info,name,a_err=ch_err)
     goto 9999
   end if
 
   if ((iix /= ione).or.(iiy /= ione)) then
-    info=3040
+    info=psb_err_ix_n1_iy_n1_unsupported_
     call psb_errpush(info,name)
     goto 9999
   end if
@@ -489,14 +489,14 @@ subroutine psb_dmdots(res, x, y, desc_a, info)
 
   name='psb_dmdots'
   if(psb_get_errstatus() /= 0) return 
-  info=0
+  info=psb_success_
   call psb_erractionsave(err_act)
 
   ictxt=psb_cd_get_context(desc_a)
 
   call psb_info(ictxt, me, np)
   if (np == -ione) then
-    info = 2010
+    info = psb_err_blacs_error_
     call psb_errpush(info,name)
     goto 9999
   endif
@@ -508,22 +508,22 @@ subroutine psb_dmdots(res, x, y, desc_a, info)
 
   ! check vector correctness
   call psb_chkvect(m,ione,size(x,1),ix,ix,desc_a,info,iix,jjx)
-  if(info /= 0) then
-    info=4010
+  if(info /= psb_success_) then
+    info=psb_err_from_subroutine_
     ch_err='psb_chkvect'
     call psb_errpush(info,name,a_err=ch_err)
     goto 9999
   end if
   call psb_chkvect(m,ione,size(y,1),iy,iy,desc_a,info,iiy,jjy)
-  if(info /= 0) then
-    info=4010
+  if(info /= psb_success_) then
+    info=psb_err_from_subroutine_
     ch_err='psb_chkvect'
     call psb_errpush(info,name,a_err=ch_err)
     goto 9999
   end if
 
   if ((ix /= ione).or.(iy /= ione)) then
-    info=3040
+    info=psb_err_ix_n1_iy_n1_unsupported_
     call psb_errpush(info,name)
     goto 9999
   end if

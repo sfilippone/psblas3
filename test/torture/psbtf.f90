@@ -24,722 +24,722 @@ program main
     goto 9999
   endif
   call       s_usmv_2_n_ap3_bp1_ix1_iy1(res,afmt,ictxt)
-  if(res/=0)failed=failed+1
+  if(res /= 0)failed=failed+1
   if(res.eq.0)passed=passed+1
   res=0
 
   call       s_usmv_2_t_ap3_bp1_ix1_iy1(res,afmt,ictxt)
-  if(res/=0)failed=failed+1
+  if(res /= 0)failed=failed+1
   if(res.eq.0)passed=passed+1
   res=0
 
   call       s_usmv_2_c_ap3_bp1_ix1_iy1(res,afmt,ictxt)
-  if(res/=0)failed=failed+1
+  if(res /= 0)failed=failed+1
   if(res.eq.0)passed=passed+1
   res=0
 
   call       s_usmv_2_n_ap3_bm0_ix1_iy1(res,afmt,ictxt)
-  if(res/=0)failed=failed+1
+  if(res /= 0)failed=failed+1
   if(res.eq.0)passed=passed+1
   res=0
 
   call       s_usmv_2_t_ap3_bm0_ix1_iy1(res,afmt,ictxt)
-  if(res/=0)failed=failed+1
+  if(res /= 0)failed=failed+1
   if(res.eq.0)passed=passed+1
   res=0
 
   call       s_usmv_2_c_ap3_bm0_ix1_iy1(res,afmt,ictxt)
-  if(res/=0)failed=failed+1
+  if(res /= 0)failed=failed+1
   if(res.eq.0)passed=passed+1
   res=0
 
   call       s_usmv_2_n_ap1_bp1_ix1_iy1(res,afmt,ictxt)
-  if(res/=0)failed=failed+1
+  if(res /= 0)failed=failed+1
   if(res.eq.0)passed=passed+1
   res=0
 
   call       s_usmv_2_t_ap1_bp1_ix1_iy1(res,afmt,ictxt)
-  if(res/=0)failed=failed+1
+  if(res /= 0)failed=failed+1
   if(res.eq.0)passed=passed+1
   res=0
 
   call       s_usmv_2_c_ap1_bp1_ix1_iy1(res,afmt,ictxt)
-  if(res/=0)failed=failed+1
+  if(res /= 0)failed=failed+1
   if(res.eq.0)passed=passed+1
   res=0
 
   call       s_usmv_2_n_ap1_bm0_ix1_iy1(res,afmt,ictxt)
-  if(res/=0)failed=failed+1
+  if(res /= 0)failed=failed+1
   if(res.eq.0)passed=passed+1
   res=0
 
   call       s_usmv_2_t_ap1_bm0_ix1_iy1(res,afmt,ictxt)
-  if(res/=0)failed=failed+1
+  if(res /= 0)failed=failed+1
   if(res.eq.0)passed=passed+1
   res=0
 
   call       s_usmv_2_c_ap1_bm0_ix1_iy1(res,afmt,ictxt)
-  if(res/=0)failed=failed+1
+  if(res /= 0)failed=failed+1
   if(res.eq.0)passed=passed+1
   res=0
 
   call       s_usmv_2_n_am1_bp1_ix1_iy1(res,afmt,ictxt)
-  if(res/=0)failed=failed+1
+  if(res /= 0)failed=failed+1
   if(res.eq.0)passed=passed+1
   res=0
 
   call       s_usmv_2_t_am1_bp1_ix1_iy1(res,afmt,ictxt)
-  if(res/=0)failed=failed+1
+  if(res /= 0)failed=failed+1
   if(res.eq.0)passed=passed+1
   res=0
 
   call       s_usmv_2_c_am1_bp1_ix1_iy1(res,afmt,ictxt)
-  if(res/=0)failed=failed+1
+  if(res /= 0)failed=failed+1
   if(res.eq.0)passed=passed+1
   res=0
 
   call       s_usmv_2_n_am1_bm0_ix1_iy1(res,afmt,ictxt)
-  if(res/=0)failed=failed+1
+  if(res /= 0)failed=failed+1
   if(res.eq.0)passed=passed+1
   res=0
 
   call       s_usmv_2_t_am1_bm0_ix1_iy1(res,afmt,ictxt)
-  if(res/=0)failed=failed+1
+  if(res /= 0)failed=failed+1
   if(res.eq.0)passed=passed+1
   res=0
 
   call       s_usmv_2_c_am1_bm0_ix1_iy1(res,afmt,ictxt)
-  if(res/=0)failed=failed+1
+  if(res /= 0)failed=failed+1
   if(res.eq.0)passed=passed+1
   res=0
 
   call       s_usmv_2_n_am3_bp1_ix1_iy1(res,afmt,ictxt)
-  if(res/=0)failed=failed+1
+  if(res /= 0)failed=failed+1
   if(res.eq.0)passed=passed+1
   res=0
 
   call       s_usmv_2_t_am3_bp1_ix1_iy1(res,afmt,ictxt)
-  if(res/=0)failed=failed+1
+  if(res /= 0)failed=failed+1
   if(res.eq.0)passed=passed+1
   res=0
 
   call       s_usmv_2_c_am3_bp1_ix1_iy1(res,afmt,ictxt)
-  if(res/=0)failed=failed+1
+  if(res /= 0)failed=failed+1
   if(res.eq.0)passed=passed+1
   res=0
 
   call       s_usmv_2_n_am3_bm0_ix1_iy1(res,afmt,ictxt)
-  if(res/=0)failed=failed+1
+  if(res /= 0)failed=failed+1
   if(res.eq.0)passed=passed+1
   res=0
 
   call       s_usmv_2_t_am3_bm0_ix1_iy1(res,afmt,ictxt)
-  if(res/=0)failed=failed+1
+  if(res /= 0)failed=failed+1
   if(res.eq.0)passed=passed+1
   res=0
 
   call       s_usmv_2_c_am3_bm0_ix1_iy1(res,afmt,ictxt)
-  if(res/=0)failed=failed+1
+  if(res /= 0)failed=failed+1
   if(res.eq.0)passed=passed+1
   res=0
 
   call       s_ussv_2_n_ap3_bm0_ix1_iy1(res,afmt,ictxt)
-  if(res/=0)failed=failed+1
+  if(res /= 0)failed=failed+1
   if(res.eq.0)passed=passed+1
   res=0
 
   call       s_ussv_2_t_ap3_bm0_ix1_iy1(res,afmt,ictxt)
-  if(res/=0)failed=failed+1
+  if(res /= 0)failed=failed+1
   if(res.eq.0)passed=passed+1
   res=0
 
   call       s_ussv_2_c_ap3_bm0_ix1_iy1(res,afmt,ictxt)
-  if(res/=0)failed=failed+1
+  if(res /= 0)failed=failed+1
   if(res.eq.0)passed=passed+1
   res=0
 
   call       s_ussv_2_n_ap1_bm0_ix1_iy1(res,afmt,ictxt)
-  if(res/=0)failed=failed+1
+  if(res /= 0)failed=failed+1
   if(res.eq.0)passed=passed+1
   res=0
 
   call       s_ussv_2_t_ap1_bm0_ix1_iy1(res,afmt,ictxt)
-  if(res/=0)failed=failed+1
+  if(res /= 0)failed=failed+1
   if(res.eq.0)passed=passed+1
   res=0
 
   call       s_ussv_2_c_ap1_bm0_ix1_iy1(res,afmt,ictxt)
-  if(res/=0)failed=failed+1
+  if(res /= 0)failed=failed+1
   if(res.eq.0)passed=passed+1
   res=0
 
   call       s_ussv_2_n_am1_bm0_ix1_iy1(res,afmt,ictxt)
-  if(res/=0)failed=failed+1
+  if(res /= 0)failed=failed+1
   if(res.eq.0)passed=passed+1
   res=0
 
   call       s_ussv_2_t_am1_bm0_ix1_iy1(res,afmt,ictxt)
-  if(res/=0)failed=failed+1
+  if(res /= 0)failed=failed+1
   if(res.eq.0)passed=passed+1
   res=0
 
   call       s_ussv_2_c_am1_bm0_ix1_iy1(res,afmt,ictxt)
-  if(res/=0)failed=failed+1
+  if(res /= 0)failed=failed+1
   if(res.eq.0)passed=passed+1
   res=0
 
   call       s_ussv_2_n_am3_bm0_ix1_iy1(res,afmt,ictxt)
-  if(res/=0)failed=failed+1
+  if(res /= 0)failed=failed+1
   if(res.eq.0)passed=passed+1
   res=0
 
   call       s_ussv_2_t_am3_bm0_ix1_iy1(res,afmt,ictxt)
-  if(res/=0)failed=failed+1
+  if(res /= 0)failed=failed+1
   if(res.eq.0)passed=passed+1
   res=0
 
   call       s_ussv_2_c_am3_bm0_ix1_iy1(res,afmt,ictxt)
-  if(res/=0)failed=failed+1
+  if(res /= 0)failed=failed+1
   if(res.eq.0)passed=passed+1
   res=0
 
   call       d_usmv_2_n_ap3_bp1_ix1_iy1(res,afmt,ictxt)
-  if(res/=0)failed=failed+1
+  if(res /= 0)failed=failed+1
   if(res.eq.0)passed=passed+1
   res=0
 
   call       d_usmv_2_t_ap3_bp1_ix1_iy1(res,afmt,ictxt)
-  if(res/=0)failed=failed+1
+  if(res /= 0)failed=failed+1
   if(res.eq.0)passed=passed+1
   res=0
 
   call       d_usmv_2_c_ap3_bp1_ix1_iy1(res,afmt,ictxt)
-  if(res/=0)failed=failed+1
+  if(res /= 0)failed=failed+1
   if(res.eq.0)passed=passed+1
   res=0
 
   call       d_usmv_2_n_ap3_bm0_ix1_iy1(res,afmt,ictxt)
-  if(res/=0)failed=failed+1
+  if(res /= 0)failed=failed+1
   if(res.eq.0)passed=passed+1
   res=0
 
   call       d_usmv_2_t_ap3_bm0_ix1_iy1(res,afmt,ictxt)
-  if(res/=0)failed=failed+1
+  if(res /= 0)failed=failed+1
   if(res.eq.0)passed=passed+1
   res=0
 
   call       d_usmv_2_c_ap3_bm0_ix1_iy1(res,afmt,ictxt)
-  if(res/=0)failed=failed+1
+  if(res /= 0)failed=failed+1
   if(res.eq.0)passed=passed+1
   res=0
 
   call       d_usmv_2_n_ap1_bp1_ix1_iy1(res,afmt,ictxt)
-  if(res/=0)failed=failed+1
+  if(res /= 0)failed=failed+1
   if(res.eq.0)passed=passed+1
   res=0
 
   call       d_usmv_2_t_ap1_bp1_ix1_iy1(res,afmt,ictxt)
-  if(res/=0)failed=failed+1
+  if(res /= 0)failed=failed+1
   if(res.eq.0)passed=passed+1
   res=0
 
   call       d_usmv_2_c_ap1_bp1_ix1_iy1(res,afmt,ictxt)
-  if(res/=0)failed=failed+1
+  if(res /= 0)failed=failed+1
   if(res.eq.0)passed=passed+1
   res=0
 
   call       d_usmv_2_n_ap1_bm0_ix1_iy1(res,afmt,ictxt)
-  if(res/=0)failed=failed+1
+  if(res /= 0)failed=failed+1
   if(res.eq.0)passed=passed+1
   res=0
 
   call       d_usmv_2_t_ap1_bm0_ix1_iy1(res,afmt,ictxt)
-  if(res/=0)failed=failed+1
+  if(res /= 0)failed=failed+1
   if(res.eq.0)passed=passed+1
   res=0
 
   call       d_usmv_2_c_ap1_bm0_ix1_iy1(res,afmt,ictxt)
-  if(res/=0)failed=failed+1
+  if(res /= 0)failed=failed+1
   if(res.eq.0)passed=passed+1
   res=0
 
   call       d_usmv_2_n_am1_bp1_ix1_iy1(res,afmt,ictxt)
-  if(res/=0)failed=failed+1
+  if(res /= 0)failed=failed+1
   if(res.eq.0)passed=passed+1
   res=0
 
   call       d_usmv_2_t_am1_bp1_ix1_iy1(res,afmt,ictxt)
-  if(res/=0)failed=failed+1
+  if(res /= 0)failed=failed+1
   if(res.eq.0)passed=passed+1
   res=0
 
   call       d_usmv_2_c_am1_bp1_ix1_iy1(res,afmt,ictxt)
-  if(res/=0)failed=failed+1
+  if(res /= 0)failed=failed+1
   if(res.eq.0)passed=passed+1
   res=0
 
   call       d_usmv_2_n_am1_bm0_ix1_iy1(res,afmt,ictxt)
-  if(res/=0)failed=failed+1
+  if(res /= 0)failed=failed+1
   if(res.eq.0)passed=passed+1
   res=0
 
   call       d_usmv_2_t_am1_bm0_ix1_iy1(res,afmt,ictxt)
-  if(res/=0)failed=failed+1
+  if(res /= 0)failed=failed+1
   if(res.eq.0)passed=passed+1
   res=0
 
   call       d_usmv_2_c_am1_bm0_ix1_iy1(res,afmt,ictxt)
-  if(res/=0)failed=failed+1
+  if(res /= 0)failed=failed+1
   if(res.eq.0)passed=passed+1
   res=0
 
   call       d_usmv_2_n_am3_bp1_ix1_iy1(res,afmt,ictxt)
-  if(res/=0)failed=failed+1
+  if(res /= 0)failed=failed+1
   if(res.eq.0)passed=passed+1
   res=0
 
   call       d_usmv_2_t_am3_bp1_ix1_iy1(res,afmt,ictxt)
-  if(res/=0)failed=failed+1
+  if(res /= 0)failed=failed+1
   if(res.eq.0)passed=passed+1
   res=0
 
   call       d_usmv_2_c_am3_bp1_ix1_iy1(res,afmt,ictxt)
-  if(res/=0)failed=failed+1
+  if(res /= 0)failed=failed+1
   if(res.eq.0)passed=passed+1
   res=0
 
   call       d_usmv_2_n_am3_bm0_ix1_iy1(res,afmt,ictxt)
-  if(res/=0)failed=failed+1
+  if(res /= 0)failed=failed+1
   if(res.eq.0)passed=passed+1
   res=0
 
   call       d_usmv_2_t_am3_bm0_ix1_iy1(res,afmt,ictxt)
-  if(res/=0)failed=failed+1
+  if(res /= 0)failed=failed+1
   if(res.eq.0)passed=passed+1
   res=0
 
   call       d_usmv_2_c_am3_bm0_ix1_iy1(res,afmt,ictxt)
-  if(res/=0)failed=failed+1
+  if(res /= 0)failed=failed+1
   if(res.eq.0)passed=passed+1
   res=0
 
   call       d_ussv_2_n_ap3_bm0_ix1_iy1(res,afmt,ictxt)
-  if(res/=0)failed=failed+1
+  if(res /= 0)failed=failed+1
   if(res.eq.0)passed=passed+1
   res=0
 
   call       d_ussv_2_t_ap3_bm0_ix1_iy1(res,afmt,ictxt)
-  if(res/=0)failed=failed+1
+  if(res /= 0)failed=failed+1
   if(res.eq.0)passed=passed+1
   res=0
 
   call       d_ussv_2_c_ap3_bm0_ix1_iy1(res,afmt,ictxt)
-  if(res/=0)failed=failed+1
+  if(res /= 0)failed=failed+1
   if(res.eq.0)passed=passed+1
   res=0
 
   call       d_ussv_2_n_ap1_bm0_ix1_iy1(res,afmt,ictxt)
-  if(res/=0)failed=failed+1
+  if(res /= 0)failed=failed+1
   if(res.eq.0)passed=passed+1
   res=0
 
   call       d_ussv_2_t_ap1_bm0_ix1_iy1(res,afmt,ictxt)
-  if(res/=0)failed=failed+1
+  if(res /= 0)failed=failed+1
   if(res.eq.0)passed=passed+1
   res=0
 
   call       d_ussv_2_c_ap1_bm0_ix1_iy1(res,afmt,ictxt)
-  if(res/=0)failed=failed+1
+  if(res /= 0)failed=failed+1
   if(res.eq.0)passed=passed+1
   res=0
 
   call       d_ussv_2_n_am1_bm0_ix1_iy1(res,afmt,ictxt)
-  if(res/=0)failed=failed+1
+  if(res /= 0)failed=failed+1
   if(res.eq.0)passed=passed+1
   res=0
 
   call       d_ussv_2_t_am1_bm0_ix1_iy1(res,afmt,ictxt)
-  if(res/=0)failed=failed+1
+  if(res /= 0)failed=failed+1
   if(res.eq.0)passed=passed+1
   res=0
 
   call       d_ussv_2_c_am1_bm0_ix1_iy1(res,afmt,ictxt)
-  if(res/=0)failed=failed+1
+  if(res /= 0)failed=failed+1
   if(res.eq.0)passed=passed+1
   res=0
 
   call       d_ussv_2_n_am3_bm0_ix1_iy1(res,afmt,ictxt)
-  if(res/=0)failed=failed+1
+  if(res /= 0)failed=failed+1
   if(res.eq.0)passed=passed+1
   res=0
 
   call       d_ussv_2_t_am3_bm0_ix1_iy1(res,afmt,ictxt)
-  if(res/=0)failed=failed+1
+  if(res /= 0)failed=failed+1
   if(res.eq.0)passed=passed+1
   res=0
 
   call       d_ussv_2_c_am3_bm0_ix1_iy1(res,afmt,ictxt)
-  if(res/=0)failed=failed+1
+  if(res /= 0)failed=failed+1
   if(res.eq.0)passed=passed+1
   res=0
 
   call       c_usmv_2_n_ap3_bp1_ix1_iy1(res,afmt,ictxt)
-  if(res/=0)failed=failed+1
+  if(res /= 0)failed=failed+1
   if(res.eq.0)passed=passed+1
   res=0
 
   call       c_usmv_2_t_ap3_bp1_ix1_iy1(res,afmt,ictxt)
-  if(res/=0)failed=failed+1
+  if(res /= 0)failed=failed+1
   if(res.eq.0)passed=passed+1
   res=0
 
   call       c_usmv_2_c_ap3_bp1_ix1_iy1(res,afmt,ictxt)
-  if(res/=0)failed=failed+1
+  if(res /= 0)failed=failed+1
   if(res.eq.0)passed=passed+1
   res=0
 
   call       c_usmv_2_n_ap3_bm0_ix1_iy1(res,afmt,ictxt)
-  if(res/=0)failed=failed+1
+  if(res /= 0)failed=failed+1
   if(res.eq.0)passed=passed+1
   res=0
 
   call       c_usmv_2_t_ap3_bm0_ix1_iy1(res,afmt,ictxt)
-  if(res/=0)failed=failed+1
+  if(res /= 0)failed=failed+1
   if(res.eq.0)passed=passed+1
   res=0
 
   call       c_usmv_2_c_ap3_bm0_ix1_iy1(res,afmt,ictxt)
-  if(res/=0)failed=failed+1
+  if(res /= 0)failed=failed+1
   if(res.eq.0)passed=passed+1
   res=0
 
   call       c_usmv_2_n_ap1_bp1_ix1_iy1(res,afmt,ictxt)
-  if(res/=0)failed=failed+1
+  if(res /= 0)failed=failed+1
   if(res.eq.0)passed=passed+1
   res=0
 
   call       c_usmv_2_t_ap1_bp1_ix1_iy1(res,afmt,ictxt)
-  if(res/=0)failed=failed+1
+  if(res /= 0)failed=failed+1
   if(res.eq.0)passed=passed+1
   res=0
 
   call       c_usmv_2_c_ap1_bp1_ix1_iy1(res,afmt,ictxt)
-  if(res/=0)failed=failed+1
+  if(res /= 0)failed=failed+1
   if(res.eq.0)passed=passed+1
   res=0
 
   call       c_usmv_2_n_ap1_bm0_ix1_iy1(res,afmt,ictxt)
-  if(res/=0)failed=failed+1
+  if(res /= 0)failed=failed+1
   if(res.eq.0)passed=passed+1
   res=0
 
   call       c_usmv_2_t_ap1_bm0_ix1_iy1(res,afmt,ictxt)
-  if(res/=0)failed=failed+1
+  if(res /= 0)failed=failed+1
   if(res.eq.0)passed=passed+1
   res=0
 
   call       c_usmv_2_c_ap1_bm0_ix1_iy1(res,afmt,ictxt)
-  if(res/=0)failed=failed+1
+  if(res /= 0)failed=failed+1
   if(res.eq.0)passed=passed+1
   res=0
 
   call       c_usmv_2_n_am1_bp1_ix1_iy1(res,afmt,ictxt)
-  if(res/=0)failed=failed+1
+  if(res /= 0)failed=failed+1
   if(res.eq.0)passed=passed+1
   res=0
 
   call       c_usmv_2_t_am1_bp1_ix1_iy1(res,afmt,ictxt)
-  if(res/=0)failed=failed+1
+  if(res /= 0)failed=failed+1
   if(res.eq.0)passed=passed+1
   res=0
 
   call       c_usmv_2_c_am1_bp1_ix1_iy1(res,afmt,ictxt)
-  if(res/=0)failed=failed+1
+  if(res /= 0)failed=failed+1
   if(res.eq.0)passed=passed+1
   res=0
 
   call       c_usmv_2_n_am1_bm0_ix1_iy1(res,afmt,ictxt)
-  if(res/=0)failed=failed+1
+  if(res /= 0)failed=failed+1
   if(res.eq.0)passed=passed+1
   res=0
 
   call       c_usmv_2_t_am1_bm0_ix1_iy1(res,afmt,ictxt)
-  if(res/=0)failed=failed+1
+  if(res /= 0)failed=failed+1
   if(res.eq.0)passed=passed+1
   res=0
 
   call       c_usmv_2_c_am1_bm0_ix1_iy1(res,afmt,ictxt)
-  if(res/=0)failed=failed+1
+  if(res /= 0)failed=failed+1
   if(res.eq.0)passed=passed+1
   res=0
 
   call       c_usmv_2_n_am3_bp1_ix1_iy1(res,afmt,ictxt)
-  if(res/=0)failed=failed+1
+  if(res /= 0)failed=failed+1
   if(res.eq.0)passed=passed+1
   res=0
 
   call       c_usmv_2_t_am3_bp1_ix1_iy1(res,afmt,ictxt)
-  if(res/=0)failed=failed+1
+  if(res /= 0)failed=failed+1
   if(res.eq.0)passed=passed+1
   res=0
 
   call       c_usmv_2_c_am3_bp1_ix1_iy1(res,afmt,ictxt)
-  if(res/=0)failed=failed+1
+  if(res /= 0)failed=failed+1
   if(res.eq.0)passed=passed+1
   res=0
 
   call       c_usmv_2_n_am3_bm0_ix1_iy1(res,afmt,ictxt)
-  if(res/=0)failed=failed+1
+  if(res /= 0)failed=failed+1
   if(res.eq.0)passed=passed+1
   res=0
 
   call       c_usmv_2_t_am3_bm0_ix1_iy1(res,afmt,ictxt)
-  if(res/=0)failed=failed+1
+  if(res /= 0)failed=failed+1
   if(res.eq.0)passed=passed+1
   res=0
 
   call       c_usmv_2_c_am3_bm0_ix1_iy1(res,afmt,ictxt)
-  if(res/=0)failed=failed+1
+  if(res /= 0)failed=failed+1
   if(res.eq.0)passed=passed+1
   res=0
 
   call       c_ussv_2_n_ap3_bm0_ix1_iy1(res,afmt,ictxt)
-  if(res/=0)failed=failed+1
+  if(res /= 0)failed=failed+1
   if(res.eq.0)passed=passed+1
   res=0
 
   call       c_ussv_2_t_ap3_bm0_ix1_iy1(res,afmt,ictxt)
-  if(res/=0)failed=failed+1
+  if(res /= 0)failed=failed+1
   if(res.eq.0)passed=passed+1
   res=0
 
   call       c_ussv_2_c_ap3_bm0_ix1_iy1(res,afmt,ictxt)
-  if(res/=0)failed=failed+1
+  if(res /= 0)failed=failed+1
   if(res.eq.0)passed=passed+1
   res=0
 
   call       c_ussv_2_n_ap1_bm0_ix1_iy1(res,afmt,ictxt)
-  if(res/=0)failed=failed+1
+  if(res /= 0)failed=failed+1
   if(res.eq.0)passed=passed+1
   res=0
 
   call       c_ussv_2_t_ap1_bm0_ix1_iy1(res,afmt,ictxt)
-  if(res/=0)failed=failed+1
+  if(res /= 0)failed=failed+1
   if(res.eq.0)passed=passed+1
   res=0
 
   call       c_ussv_2_c_ap1_bm0_ix1_iy1(res,afmt,ictxt)
-  if(res/=0)failed=failed+1
+  if(res /= 0)failed=failed+1
   if(res.eq.0)passed=passed+1
   res=0
 
   call       c_ussv_2_n_am1_bm0_ix1_iy1(res,afmt,ictxt)
-  if(res/=0)failed=failed+1
+  if(res /= 0)failed=failed+1
   if(res.eq.0)passed=passed+1
   res=0
 
   call       c_ussv_2_t_am1_bm0_ix1_iy1(res,afmt,ictxt)
-  if(res/=0)failed=failed+1
+  if(res /= 0)failed=failed+1
   if(res.eq.0)passed=passed+1
   res=0
 
   call       c_ussv_2_c_am1_bm0_ix1_iy1(res,afmt,ictxt)
-  if(res/=0)failed=failed+1
+  if(res /= 0)failed=failed+1
   if(res.eq.0)passed=passed+1
   res=0
 
   call       c_ussv_2_n_am3_bm0_ix1_iy1(res,afmt,ictxt)
-  if(res/=0)failed=failed+1
+  if(res /= 0)failed=failed+1
   if(res.eq.0)passed=passed+1
   res=0
 
   call       c_ussv_2_t_am3_bm0_ix1_iy1(res,afmt,ictxt)
-  if(res/=0)failed=failed+1
+  if(res /= 0)failed=failed+1
   if(res.eq.0)passed=passed+1
   res=0
 
   call       c_ussv_2_c_am3_bm0_ix1_iy1(res,afmt,ictxt)
-  if(res/=0)failed=failed+1
+  if(res /= 0)failed=failed+1
   if(res.eq.0)passed=passed+1
   res=0
 
   call       z_usmv_2_n_ap3_bp1_ix1_iy1(res,afmt,ictxt)
-  if(res/=0)failed=failed+1
+  if(res /= 0)failed=failed+1
   if(res.eq.0)passed=passed+1
   res=0
 
   call       z_usmv_2_t_ap3_bp1_ix1_iy1(res,afmt,ictxt)
-  if(res/=0)failed=failed+1
+  if(res /= 0)failed=failed+1
   if(res.eq.0)passed=passed+1
   res=0
 
   call       z_usmv_2_c_ap3_bp1_ix1_iy1(res,afmt,ictxt)
-  if(res/=0)failed=failed+1
+  if(res /= 0)failed=failed+1
   if(res.eq.0)passed=passed+1
   res=0
 
   call       z_usmv_2_n_ap3_bm0_ix1_iy1(res,afmt,ictxt)
-  if(res/=0)failed=failed+1
+  if(res /= 0)failed=failed+1
   if(res.eq.0)passed=passed+1
   res=0
 
   call       z_usmv_2_t_ap3_bm0_ix1_iy1(res,afmt,ictxt)
-  if(res/=0)failed=failed+1
+  if(res /= 0)failed=failed+1
   if(res.eq.0)passed=passed+1
   res=0
 
   call       z_usmv_2_c_ap3_bm0_ix1_iy1(res,afmt,ictxt)
-  if(res/=0)failed=failed+1
+  if(res /= 0)failed=failed+1
   if(res.eq.0)passed=passed+1
   res=0
 
   call       z_usmv_2_n_ap1_bp1_ix1_iy1(res,afmt,ictxt)
-  if(res/=0)failed=failed+1
+  if(res /= 0)failed=failed+1
   if(res.eq.0)passed=passed+1
   res=0
 
   call       z_usmv_2_t_ap1_bp1_ix1_iy1(res,afmt,ictxt)
-  if(res/=0)failed=failed+1
+  if(res /= 0)failed=failed+1
   if(res.eq.0)passed=passed+1
   res=0
 
   call       z_usmv_2_c_ap1_bp1_ix1_iy1(res,afmt,ictxt)
-  if(res/=0)failed=failed+1
+  if(res /= 0)failed=failed+1
   if(res.eq.0)passed=passed+1
   res=0
 
   call       z_usmv_2_n_ap1_bm0_ix1_iy1(res,afmt,ictxt)
-  if(res/=0)failed=failed+1
+  if(res /= 0)failed=failed+1
   if(res.eq.0)passed=passed+1
   res=0
 
   call       z_usmv_2_t_ap1_bm0_ix1_iy1(res,afmt,ictxt)
-  if(res/=0)failed=failed+1
+  if(res /= 0)failed=failed+1
   if(res.eq.0)passed=passed+1
   res=0
 
   call       z_usmv_2_c_ap1_bm0_ix1_iy1(res,afmt,ictxt)
-  if(res/=0)failed=failed+1
+  if(res /= 0)failed=failed+1
   if(res.eq.0)passed=passed+1
   res=0
 
   call       z_usmv_2_n_am1_bp1_ix1_iy1(res,afmt,ictxt)
-  if(res/=0)failed=failed+1
+  if(res /= 0)failed=failed+1
   if(res.eq.0)passed=passed+1
   res=0
 
   call       z_usmv_2_t_am1_bp1_ix1_iy1(res,afmt,ictxt)
-  if(res/=0)failed=failed+1
+  if(res /= 0)failed=failed+1
   if(res.eq.0)passed=passed+1
   res=0
 
   call       z_usmv_2_c_am1_bp1_ix1_iy1(res,afmt,ictxt)
-  if(res/=0)failed=failed+1
+  if(res /= 0)failed=failed+1
   if(res.eq.0)passed=passed+1
   res=0
 
   call       z_usmv_2_n_am1_bm0_ix1_iy1(res,afmt,ictxt)
-  if(res/=0)failed=failed+1
+  if(res /= 0)failed=failed+1
   if(res.eq.0)passed=passed+1
   res=0
 
   call       z_usmv_2_t_am1_bm0_ix1_iy1(res,afmt,ictxt)
-  if(res/=0)failed=failed+1
+  if(res /= 0)failed=failed+1
   if(res.eq.0)passed=passed+1
   res=0
 
   call       z_usmv_2_c_am1_bm0_ix1_iy1(res,afmt,ictxt)
-  if(res/=0)failed=failed+1
+  if(res /= 0)failed=failed+1
   if(res.eq.0)passed=passed+1
   res=0
 
   call       z_usmv_2_n_am3_bp1_ix1_iy1(res,afmt,ictxt)
-  if(res/=0)failed=failed+1
+  if(res /= 0)failed=failed+1
   if(res.eq.0)passed=passed+1
   res=0
 
   call       z_usmv_2_t_am3_bp1_ix1_iy1(res,afmt,ictxt)
-  if(res/=0)failed=failed+1
+  if(res /= 0)failed=failed+1
   if(res.eq.0)passed=passed+1
   res=0
 
   call       z_usmv_2_c_am3_bp1_ix1_iy1(res,afmt,ictxt)
-  if(res/=0)failed=failed+1
+  if(res /= 0)failed=failed+1
   if(res.eq.0)passed=passed+1
   res=0
 
   call       z_usmv_2_n_am3_bm0_ix1_iy1(res,afmt,ictxt)
-  if(res/=0)failed=failed+1
+  if(res /= 0)failed=failed+1
   if(res.eq.0)passed=passed+1
   res=0
 
   call       z_usmv_2_t_am3_bm0_ix1_iy1(res,afmt,ictxt)
-  if(res/=0)failed=failed+1
+  if(res /= 0)failed=failed+1
   if(res.eq.0)passed=passed+1
   res=0
 
   call       z_usmv_2_c_am3_bm0_ix1_iy1(res,afmt,ictxt)
-  if(res/=0)failed=failed+1
+  if(res /= 0)failed=failed+1
   if(res.eq.0)passed=passed+1
   res=0
 
   call       z_ussv_2_n_ap3_bm0_ix1_iy1(res,afmt,ictxt)
-  if(res/=0)failed=failed+1
+  if(res /= 0)failed=failed+1
   if(res.eq.0)passed=passed+1
   res=0
 
   call       z_ussv_2_t_ap3_bm0_ix1_iy1(res,afmt,ictxt)
-  if(res/=0)failed=failed+1
+  if(res /= 0)failed=failed+1
   if(res.eq.0)passed=passed+1
   res=0
 
   call       z_ussv_2_c_ap3_bm0_ix1_iy1(res,afmt,ictxt)
-  if(res/=0)failed=failed+1
+  if(res /= 0)failed=failed+1
   if(res.eq.0)passed=passed+1
   res=0
 
   call       z_ussv_2_n_ap1_bm0_ix1_iy1(res,afmt,ictxt)
-  if(res/=0)failed=failed+1
+  if(res /= 0)failed=failed+1
   if(res.eq.0)passed=passed+1
   res=0
 
   call       z_ussv_2_t_ap1_bm0_ix1_iy1(res,afmt,ictxt)
-  if(res/=0)failed=failed+1
+  if(res /= 0)failed=failed+1
   if(res.eq.0)passed=passed+1
   res=0
 
   call       z_ussv_2_c_ap1_bm0_ix1_iy1(res,afmt,ictxt)
-  if(res/=0)failed=failed+1
+  if(res /= 0)failed=failed+1
   if(res.eq.0)passed=passed+1
   res=0
 
   call       z_ussv_2_n_am1_bm0_ix1_iy1(res,afmt,ictxt)
-  if(res/=0)failed=failed+1
+  if(res /= 0)failed=failed+1
   if(res.eq.0)passed=passed+1
   res=0
 
   call       z_ussv_2_t_am1_bm0_ix1_iy1(res,afmt,ictxt)
-  if(res/=0)failed=failed+1
+  if(res /= 0)failed=failed+1
   if(res.eq.0)passed=passed+1
   res=0
 
   call       z_ussv_2_c_am1_bm0_ix1_iy1(res,afmt,ictxt)
-  if(res/=0)failed=failed+1
+  if(res /= 0)failed=failed+1
   if(res.eq.0)passed=passed+1
   res=0
 
   call       z_ussv_2_n_am3_bm0_ix1_iy1(res,afmt,ictxt)
-  if(res/=0)failed=failed+1
+  if(res /= 0)failed=failed+1
   if(res.eq.0)passed=passed+1
   res=0
 
   call       z_ussv_2_t_am3_bm0_ix1_iy1(res,afmt,ictxt)
-  if(res/=0)failed=failed+1
+  if(res /= 0)failed=failed+1
   if(res.eq.0)passed=passed+1
   res=0
 
   call       z_ussv_2_c_am3_bm0_ix1_iy1(res,afmt,ictxt)        
-  if(res/=0)failed=failed+1
+  if(res /= 0)failed=failed+1
   if(res.eq.0)passed=passed+1
   res=0
 

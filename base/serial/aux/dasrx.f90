@@ -160,7 +160,7 @@ subroutine dasrx(n,x,indx,dir,flag)
         end do outer_up
         if (i == ilx) then 
           if (x(i) /= piv) then
-            call psb_errpush(4001,r_name='dasrx',a_err='impossible pivot condition')
+            call psb_errpush(psb_err_internal_error_,r_name='dasrx',a_err='impossible pivot condition')
             call psb_error()
           endif
           i = i + 1 
@@ -298,7 +298,7 @@ subroutine dasrx(n,x,indx,dir,flag)
         end do outer_dw
         if (i == ilx) then 
           if (x(i) /= piv) then
-            call psb_errpush(4001,r_name='dasrx',a_err='impossible pivot condition')
+            call psb_errpush(psb_err_internal_error_,r_name='dasrx',a_err='impossible pivot condition')
             call psb_error()
           endif
           i = i + 1 
@@ -343,7 +343,7 @@ subroutine dasrx(n,x,indx,dir,flag)
     endif
 
   case default
-    call psb_errpush(4001,r_name='dasrx',a_err='wrong dir')
+    call psb_errpush(psb_err_internal_error_,r_name='dasrx',a_err='wrong dir')
     call psb_error()
   end select
 

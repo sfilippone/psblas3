@@ -63,7 +63,7 @@ subroutine psi_ldsc_pre_halo(desc,ext_hv,info)
   integer             :: ictxt,n_row
   character(len=20)   :: name,ch_err
 
-  info = 0
+  info = psb_success_
   name = 'psi_ldsc_pre_halo'
   call psb_erractionsave(err_act)
 
@@ -75,35 +75,35 @@ subroutine psi_ldsc_pre_halo(desc,ext_hv,info)
   ! check on blacs grid 
   call psb_info(ictxt, me, np)
   if (np == -1) then
-    info = 2010
+    info = psb_err_blacs_error_
     call psb_errpush(info,name)
     goto 9999
   endif
 
 
   if (.not.(psb_is_bld_desc(desc).and.psb_is_large_desc(desc))) then 
-    info = 1122
+    info = psb_err_invalid_cd_state_
     call psb_errpush(info,name)
     goto 9999
   end if
 
   call psi_bld_g2lmap(desc,info)
-  if (info /= 0) then 
+  if (info /= psb_success_) then 
     ch_err='psi_bld_hash'
     call psb_errpush(info,name,a_err=ch_err)
     goto 9999
   end if
   ! We no longer need the inner hash structure.
   call psb_free(desc%idxmap%hash,info)
-  if (info /= 0) then 
+  if (info /= psb_success_) then 
     ch_err='psi_bld_tmphalo'
-    info = 4010
+    info = psb_err_from_subroutine_
     call psb_errpush(info,name,a_err=ch_err)
     goto 9999
   end if
   if (.not.ext_hv) then
     call psi_bld_tmphalo(desc,info)
-    if (info /= 0) then 
+    if (info /= psb_success_) then 
       ch_err='psi_bld_tmphalo'
       call psb_errpush(info,name,a_err=ch_err)
       goto 9999

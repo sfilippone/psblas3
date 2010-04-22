@@ -52,7 +52,7 @@ contains
     integer      :: inparms(40), ip 
 
     call psb_info(ictxt,iam,np)
-    if (iam==0) then
+    if (iam == 0) then
       ! Read Input Parameters
       read(*,*) ip
       if (ip >= 5) then
@@ -153,7 +153,7 @@ contains
     integer      :: inparms(40), ip 
 
     call psb_info(ictxt,iam,np)
-    if (iam==0) then
+    if (iam == 0) then
       ! Read Input Parameters
       read(*,*) ip
       if (ip >= 5) then

@@ -41,7 +41,7 @@ module psb_mat_dist_mod
       !
       !  type(d_spmat)                            :: a_glob
       !     on entry: this contains the global sparse matrix as follows:
-      !        a%fida =='csr'
+      !        a%fida == 'csr'
       !        a%aspk for coefficient values
       !        a%ia1  for column indices
       !        a%ia2  for row pointers
@@ -125,7 +125,7 @@ module psb_mat_dist_mod
       !
       !  type(d_spmat)                            :: a_glob
       !     on entry: this contains the global sparse matrix as follows:
-      !        a%fida =='csr'
+      !        a%fida == 'csr'
       !        a%aspk for coefficient values
       !        a%ia1  for column indices
       !        a%ia2  for row pointers
@@ -210,7 +210,7 @@ module psb_mat_dist_mod
       !
       !  type(d_spmat)                            :: a_glob
       !     on entry: this contains the global sparse matrix as follows:
-      !        a%fida =='csr'
+      !        a%fida == 'csr'
       !        a%aspk for coefficient values
       !        a%ia1  for column indices
       !        a%ia2  for row pointers
@@ -295,7 +295,7 @@ module psb_mat_dist_mod
       !
       !  type(d_spmat)                            :: a_glob
       !     on entry: this contains the global sparse matrix as follows:
-      !        a%fida =='csr'
+      !        a%fida == 'csr'
       !        a%aspk for coefficient values
       !        a%ia1  for column indices
       !        a%ia2  for row pointers

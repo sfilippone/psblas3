@@ -1,5 +1,5 @@
 
-!=====================================
+! == ===================================
 !
 !
 !
@@ -10,7 +10,7 @@
 !
 !
 !
-!=====================================
+! == ===================================
 
 subroutine d_cxx_csmv_impl(alpha,a,x,beta,y,info,trans) 
   use psb_error_mod
@@ -32,7 +32,7 @@ subroutine d_cxx_csmv_impl(alpha,a,x,beta,y,info,trans)
   logical, parameter :: debug=.false.
 
   call psb_erractionsave(err_act)
-  info = 0 
+  info = psb_success_
 
   if (present(trans)) then
     trans_ = trans
@@ -47,7 +47,7 @@ subroutine d_cxx_csmv_impl(alpha,a,x,beta,y,info,trans)
   endif
 
 
-  tra = (psb_toupper(trans_)=='T').or.(psb_toupper(trans_)=='C')
+  tra = (psb_toupper(trans_) == 'T').or.(psb_toupper(trans_)=='C')
 
   if (tra) then 
     m = a%get_ncols()
@@ -316,7 +316,7 @@ subroutine d_cxx_csmm_impl(alpha,a,x,beta,y,info,trans)
   character(len=20)  :: name='d_cxx_csmm'
   logical, parameter :: debug=.false.
 
-  info = 0
+  info = psb_success_
   call psb_erractionsave(err_act)
 
   if (present(trans)) then
@@ -330,7 +330,7 @@ subroutine d_cxx_csmm_impl(alpha,a,x,beta,y,info,trans)
     call psb_errpush(info,name)
     goto 9999
   endif
-  tra = (psb_toupper(trans_)=='T').or.(psb_toupper(trans_)=='C')
+  tra = (psb_toupper(trans_) == 'T').or.(psb_toupper(trans_)=='C')
 
   if (tra) then 
     m = a%get_ncols()
@@ -343,8 +343,8 @@ subroutine d_cxx_csmm_impl(alpha,a,x,beta,y,info,trans)
   nc = min(size(x,2) , size(y,2) )
 
   allocate(acc(nc), stat=info)
-  if(info /= 0) then
-    info=4010
+  if(info /= psb_success_) then
+    info=psb_err_from_subroutine_
     call psb_errpush(info,name,a_err='allocate')
     goto 9999
   end if
@@ -607,7 +607,7 @@ subroutine d_cxx_cssv_impl(alpha,a,x,beta,y,info,trans)
   character(len=20)  :: name='d_cxx_cssv'
   logical, parameter :: debug=.false.
 
-  info = 0
+  info = psb_success_
   call psb_erractionsave(err_act)
   if (present(trans)) then
     trans_ = trans
@@ -620,7 +620,7 @@ subroutine d_cxx_cssv_impl(alpha,a,x,beta,y,info,trans)
     goto 9999
   endif
 
-  tra = (psb_toupper(trans_)=='T').or.(psb_toupper(trans_)=='C')
+  tra = (psb_toupper(trans_) == 'T').or.(psb_toupper(trans_)=='C')
   m = a%get_nrows()
 
   if (.not. (a%is_triangle())) then 
@@ -671,7 +671,7 @@ subroutine d_cxx_cssv_impl(alpha,a,x,beta,y,info,trans)
     end if
   else 
     allocate(tmp(m), stat=info) 
-    if (info /= 0) then 
+    if (info /= psb_success_) then 
       return
     end if
 
@@ -823,7 +823,7 @@ subroutine d_cxx_cssm_impl(alpha,a,x,beta,y,info,trans)
   character(len=20)  :: name='d_cxx_cssm'
   logical, parameter :: debug=.false.
 
-  info = 0
+  info = psb_success_
   call psb_erractionsave(err_act)
 
   if (present(trans)) then
@@ -838,7 +838,7 @@ subroutine d_cxx_cssm_impl(alpha,a,x,beta,y,info,trans)
   endif
 
 
-  tra = (psb_toupper(trans_)=='T').or.(psb_toupper(trans_)=='C')
+  tra = (psb_toupper(trans_) == 'T').or.(psb_toupper(trans_)=='C')
 
   m   = a%get_nrows()
   nc  = min(size(x,2) , size(y,2)) 
@@ -871,8 +871,8 @@ subroutine d_cxx_cssm_impl(alpha,a,x,beta,y,info,trans)
     end do
   else 
     allocate(tmp(m,nc), stat=info) 
-    if(info /= 0) then
-      info=4010
+    if(info /= psb_success_) then
+      info=psb_err_from_subroutine_
       call psb_errpush(info,name,a_err='allocate')
       goto 9999
     end if
@@ -884,8 +884,8 @@ subroutine d_cxx_cssm_impl(alpha,a,x,beta,y,info,trans)
     end do
   end if
 
-  if(info /= 0) then
-    info=4010
+  if(info /= psb_success_) then
+    info=psb_err_from_subroutine_
     call psb_errpush(info,name,a_err='inner_cxxsm')
     goto 9999
   end if
@@ -917,10 +917,10 @@ contains
     integer :: i,j,k,m, ir, jc
     real(psb_dpk_), allocatable  :: acc(:)
 
-    info = 0
+    info = psb_success_
     allocate(acc(nc), stat=info)
-    if(info /= 0) then
-      info=4010
+    if(info /= psb_success_) then
+      info=psb_err_from_subroutine_
       return
     end if
 
@@ -1046,7 +1046,7 @@ function d_cxx_csnmi_impl(a) result(res)
 
 end function d_cxx_csnmi_impl
 
-!===================================== 
+! == =================================== 
 !
 !
 !
@@ -1056,7 +1056,7 @@ end function d_cxx_csnmi_impl
 !
 !
 !
-!=====================================   
+! == ===================================   
 
 
 subroutine d_cxx_csgetptn_impl(imin,imax,a,nz,ia,ja,info,&
@@ -1085,7 +1085,7 @@ subroutine d_cxx_csgetptn_impl(imin,imax,a,nz,ia,ja,info,&
   logical, parameter :: debug=.false.
 
   call psb_erractionsave(err_act)
-  info = 0
+  info = psb_success_
 
   if (present(jmin)) then
     jmin_ = jmin
@@ -1124,7 +1124,7 @@ subroutine d_cxx_csgetptn_impl(imin,imax,a,nz,ia,ja,info,&
     cscale_ = .false.
   endif
   if ((rscale_.or.cscale_).and.(present(iren))) then 
-    info = 583
+    info = psb_err_many_optional_arg_
     call psb_errpush(info,name,a_err='iren (rscale.or.cscale)')
     goto 9999
   end if
@@ -1142,7 +1142,7 @@ subroutine d_cxx_csgetptn_impl(imin,imax,a,nz,ia,ja,info,&
     end do
   end if
 
-  if (info /= 0) goto 9999
+  if (info /= psb_success_) goto 9999
 
   call psb_erractionrestore(err_act)
   return
@@ -1186,7 +1186,7 @@ contains
     irw = imin
     lrw = min(imax,a%get_nrows())
     if (irw<0) then 
-      info = 2
+      info = psb_err_pivot_too_small_
       return
     end if
 
@@ -1201,9 +1201,9 @@ contains
 
 
     call psb_ensure_size(nzin_+nzt,ia,info)
-    if (info==0) call psb_ensure_size(nzin_+nzt,ja,info)
+    if (info == psb_success_) call psb_ensure_size(nzin_+nzt,ja,info)
 
-    if (info /= 0) return
+    if (info /= psb_success_) return
     
     if (present(iren)) then 
       do i=irw, lrw
@@ -1261,7 +1261,7 @@ subroutine d_cxx_csgetrow_impl(imin,imax,a,nz,ia,ja,val,info,&
   logical, parameter :: debug=.false.
 
   call psb_erractionsave(err_act)
-  info = 0
+  info = psb_success_
   
   if (present(jmin)) then
     jmin_ = jmin
@@ -1300,7 +1300,7 @@ subroutine d_cxx_csgetrow_impl(imin,imax,a,nz,ia,ja,val,info,&
     cscale_ = .false.
   endif
   if ((rscale_.or.cscale_).and.(present(iren))) then 
-    info = 583
+    info = psb_err_many_optional_arg_
     call psb_errpush(info,name,a_err='iren (rscale.or.cscale)')
     goto 9999
   end if
@@ -1319,7 +1319,7 @@ subroutine d_cxx_csgetrow_impl(imin,imax,a,nz,ia,ja,val,info,&
     end do
   end if
 
-  if (info /= 0) goto 9999
+  if (info /= psb_success_) goto 9999
 
   call psb_erractionrestore(err_act)
   return
@@ -1364,7 +1364,7 @@ contains
     irw = imin
     lrw = min(imax,a%get_nrows())
     if (irw<0) then 
-      info = 2
+      info = psb_err_pivot_too_small_
       return
     end if
 
@@ -1379,10 +1379,10 @@ contains
 
 
     call psb_ensure_size(nzin_+nzt,ia,info)
-    if (info==0) call psb_ensure_size(nzin_+nzt,ja,info)
-    if (info==0) call psb_ensure_size(nzin_+nzt,val,info)
+    if (info == psb_success_) call psb_ensure_size(nzin_+nzt,ja,info)
+    if (info == psb_success_) call psb_ensure_size(nzin_+nzt,val,info)
 
-    if (info /= 0) return
+    if (info /= psb_success_) return
     
     if (present(iren)) then 
       do i=irw, lrw
@@ -1434,7 +1434,7 @@ subroutine d_cxx_csput_impl(nz,ia,ja,val,a,imin,imax,jmin,jmax,info,gtl)
   logical, parameter :: debug=.false.
   integer            :: nza, i,j,k, nzl, isza, int_err(5)
 
-  info = 0
+  info = psb_success_
   nza  = a%get_nzeros()
 
   if (a%is_bld()) then 
@@ -1445,7 +1445,7 @@ subroutine d_cxx_csput_impl(nz,ia,ja,val,a,imin,imax,jmin,jmax,info,gtl)
     call  d_cxx_srch_upd(nz,ia,ja,val,a,&
          & imin,imax,jmin,jmax,info,gtl)
     
-    if (info /= 0) then  
+    if (info /= psb_success_) then  
 
       info = 1121
     end if
@@ -1454,7 +1454,7 @@ subroutine d_cxx_csput_impl(nz,ia,ja,val,a,imin,imax,jmin,jmax,info,gtl)
     ! State is wrong.
     info = 1121
   end if
-  if (info /= 0) then
+  if (info /= psb_success_) then
     call psb_errpush(info,name)
     goto 9999
   end if
@@ -1494,7 +1494,7 @@ contains
     integer              :: debug_level, debug_unit
     character(len=20)    :: name='d_cxx_srch_upd'
 
-    info = 0
+    info = psb_success_
     debug_unit  = psb_get_debug_unit()
     debug_level = psb_get_debug_level()
 
@@ -1693,10 +1693,10 @@ subroutine d_cp_cxx_from_coo_impl(a,b,info)
   integer              :: debug_level, debug_unit
   character(len=20)   :: name
 
-  info = 0
+  info = psb_success_
   ! This is to have fix_coo called behind the scenes
   call tmp%cp_from_coo(b,info)
-  if (info ==0) call a%mv_from_coo(tmp,info)
+  if (info == psb_success_) call a%mv_from_coo(tmp,info)
 
 end subroutine d_cp_cxx_from_coo_impl
 
@@ -1720,7 +1720,7 @@ subroutine d_cp_cxx_to_coo_impl(a,b,info)
   integer             :: debug_level, debug_unit
   character(len=20)   :: name
 
-  info = 0
+  info = psb_success_
 
   nr  = a%get_nrows()
   nc  = a%get_ncols()
@@ -1762,7 +1762,7 @@ subroutine d_mv_cxx_to_coo_impl(a,b,info)
   integer             :: debug_level, debug_unit
   character(len=20)   :: name
 
-  info = 0
+  info = psb_success_
 
   nr  = a%get_nrows()
   nc  = a%get_ncols()
@@ -1773,7 +1773,7 @@ subroutine d_mv_cxx_to_coo_impl(a,b,info)
   call move_alloc(a%ja,b%ja)
   call move_alloc(a%val,b%val)
   call psb_realloc(nza,b%ia,info)
-  if (info /= 0) return
+  if (info /= psb_success_) return
   do i=1, nr
     do j=a%irp(i),a%irp(i+1)-1
       b%ia(j)  = i
@@ -1806,10 +1806,10 @@ subroutine d_mv_cxx_from_coo_impl(a,b,info)
   integer              :: debug_level, debug_unit
   character(len=20)   :: name
 
-  info = 0
+  info = psb_success_
 
   call b%fix(info)
-  if (info /= 0) return
+  if (info /= psb_success_) return
 
   nr  = b%get_nrows()
   nc  = b%get_ncols()
@@ -1896,7 +1896,7 @@ subroutine d_mv_cxx_to_fmt_impl(a,b,info)
   integer              :: debug_level, debug_unit
   character(len=20)   :: name
 
-  info = 0
+  info = psb_success_
 
   select type (b)
   type is (psb_d_coo_sparse_mat) 
@@ -1911,7 +1911,7 @@ subroutine d_mv_cxx_to_fmt_impl(a,b,info)
     
   class default
     call tmp%mv_from_fmt(a,info)
-    if (info == 0) call b%mv_from_coo(tmp,info)
+    if (info == psb_success_) call b%mv_from_coo(tmp,info)
   end select
 
 end subroutine d_mv_cxx_to_fmt_impl
@@ -1936,7 +1936,7 @@ subroutine d_cp_cxx_to_fmt_impl(a,b,info)
   integer              :: debug_level, debug_unit
   character(len=20)   :: name
 
-  info = 0
+  info = psb_success_
 
 
   select type (b)
@@ -1951,7 +1951,7 @@ subroutine d_cp_cxx_to_fmt_impl(a,b,info)
 
   class default
     call tmp%cp_from_fmt(a,info)
-    if (info == 0) call b%mv_from_coo(tmp,info)
+    if (info == psb_success_) call b%mv_from_coo(tmp,info)
   end select
 
 end subroutine d_cp_cxx_to_fmt_impl
@@ -1976,7 +1976,7 @@ subroutine d_mv_cxx_from_fmt_impl(a,b,info)
   integer              :: debug_level, debug_unit
   character(len=20)   :: name
 
-  info = 0
+  info = psb_success_
 
   select type (b)
   type is (psb_d_coo_sparse_mat) 
@@ -1991,7 +1991,7 @@ subroutine d_mv_cxx_from_fmt_impl(a,b,info)
 
   class default
     call tmp%mv_from_fmt(b,info)
-    if (info == 0) call a%mv_from_coo(tmp,info)
+    if (info == psb_success_) call a%mv_from_coo(tmp,info)
   end select
 
 end subroutine d_mv_cxx_from_fmt_impl
@@ -2017,7 +2017,7 @@ subroutine d_cp_cxx_from_fmt_impl(a,b,info)
   integer              :: debug_level, debug_unit
   character(len=20)   :: name
 
-  info = 0
+  info = psb_success_
 
   select type (b)
   type is (psb_d_coo_sparse_mat) 
@@ -2031,7 +2031,7 @@ subroutine d_cp_cxx_from_fmt_impl(a,b,info)
 
   class default
     call tmp%cp_from_fmt(b,info)
-    if (info == 0) call a%mv_from_coo(tmp,info)
+    if (info == psb_success_) call a%mv_from_coo(tmp,info)
   end select
 end subroutine d_cp_cxx_from_fmt_impl
 

@@ -53,12 +53,12 @@ subroutine camsr(n,x,idir)
   if (n<=1) return
   
   allocate(iaux(0:n+1),stat=info)
-  if (info/=0) then 
-    call psb_errpush(4000,r_name='camsr')
+  if (info /= psb_success_) then 
+    call psb_errpush(psb_err_alloc_dealloc_,r_name='camsr')
     call psb_error()
   endif
   
-  if (idir==psb_asort_up_) then 
+  if (idir == psb_asort_up_) then 
     call camsort_up(n,x,iaux,iret)
   else
     call camsort_dw(n,x,iaux,iret)
@@ -67,8 +67,8 @@ subroutine camsr(n,x,idir)
   if (iret == 0) call psb_ip_reord(n,x,iaux)
 
   deallocate(iaux,stat=info)
-  if (info/=0) then 
-    call psb_errpush(4000,r_name='camsr')
+  if (info /= psb_success_) then 
+    call psb_errpush(psb_err_alloc_dealloc_,r_name='camsr')
     call psb_error()
   endif
   return

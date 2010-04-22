@@ -126,7 +126,7 @@ contains
     use psb_realloc_mod
     type(psb_hash_type) :: hashin
     
-    info = 0
+    info = psb_success_
     if (allocated(hashin%table)) then 
       deallocate(hashin%table,stat=info) 
     end if
@@ -177,11 +177,11 @@ contains
     
     if (associated(hashout)) then 
       deallocate(hashout,stat=info)
-      !if (info /= 0) return
+      !if (info /= psb_success_) return
     end if
     if (associated(hashin)) then
       allocate(hashout,stat=info)
-      if (info /= 0) return
+      if (info /= psb_success_) return
       call HashCopy(hashin,hashout,info)
     end if
 
@@ -194,10 +194,10 @@ contains
 
     integer :: i,j,k,hsize,nbits, nv
 
-    info  = 0
+    info  = psb_success_
     nv    = size(v)
     call psb_hash_init(nv,hash,info) 
-    if (info /= 0) return
+    if (info /= psb_success_) return
     do i=1,nv 
       call psb_hash_searchinskey(v(i),j,i,hash,info) 
       if ((j /= i).or.(info /= HashOK)) then 
@@ -215,7 +215,7 @@ contains
 
     integer :: i,j,k,hsize,nbits
 
-    info  = 0
+    info  = psb_success_
     nbits = 12
     hsize = 2**nbits
     !
@@ -238,7 +238,7 @@ contains
     hash%nsrch = 0
     hash%nacc  = 0 
     allocate(hash%table(0:hsize-1,2),stat=info) 
-    if (info /= 0) then
+    if (info /= psb_success_) then
       write(0,*) 'Error: memory allocation failure  ',hsize
       info = HashOutOfMemory
       return
@@ -267,7 +267,7 @@ contains
       nextval = hash%table(i,2)
       if (key /= HashFreeEntry) then 
         call psb_hash_searchinskey(key,val,nextval,nhash,info)        
-        if (info /= 0) then 
+        if (info /= psb_success_) then 
           info = HashOutOfMemory
           return
         end if

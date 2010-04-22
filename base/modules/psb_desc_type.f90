@@ -474,7 +474,7 @@ contains
   logical function psb_is_large_desc(desc)
     type(psb_desc_type), intent(in) :: desc
 
-    psb_is_large_desc =(psb_desc_large_==psb_cd_get_size(desc))
+    psb_is_large_desc =(psb_desc_large_ == psb_cd_get_size(desc))
 
   end function psb_is_large_desc
 
@@ -542,7 +542,7 @@ contains
     integer :: dectype
 
     psb_is_asb_dec = (dectype == psb_desc_asb_).or.&
-         & (dectype== psb_desc_repl_).or.(dectype == psb_cd_ovl_asb_)
+         & (dectype == psb_desc_repl_).or.(dectype == psb_cd_ovl_asb_)
 
   end function psb_is_asb_dec
 
@@ -604,7 +604,7 @@ contains
       psb_cd_get_context = desc%matrix_data(psb_ctxt_)
     else
       psb_cd_get_context = -1
-      call psb_errpush(1122,'psb_cd_get_context')
+      call psb_errpush(psb_err_invalid_cd_state_,'psb_cd_get_context')
       call psb_error()
     end if
   end function psb_cd_get_context
@@ -617,7 +617,7 @@ contains
       psb_cd_get_dectype = desc%matrix_data(psb_dec_type_)
     else
       psb_cd_get_dectype = -1
-      call psb_errpush(1122,'psb_cd_get_dectype')
+      call psb_errpush(psb_err_invalid_cd_state_,'psb_cd_get_dectype')
       call psb_error()
     end if
       
@@ -631,7 +631,7 @@ contains
       psb_cd_get_size = desc%idxmap%state
     else
       psb_cd_get_size = -1
-      call psb_errpush(1122,'psb_cd_get_size')
+      call psb_errpush(psb_err_invalid_cd_state_,'psb_cd_get_size')
       call psb_error()
     end if
 
@@ -645,7 +645,7 @@ contains
       psb_cd_get_mpic = desc%matrix_data(psb_mpi_c_)
     else
       psb_cd_get_mpic = -1
-      call psb_errpush(1122,'psb_cd_get_mpic')
+      call psb_errpush(psb_err_invalid_cd_state_,'psb_cd_get_mpic')
       call psb_error()
     end if
 
@@ -712,7 +712,7 @@ contains
     logical, parameter  :: debug=.false.,debugprt=.false.
     character(len=20), parameter  :: name='psb_cd_get_list'
 
-    info = 0
+    info = psb_success_
     call psb_erractionsave(err_act)
     debug_unit  = psb_get_debug_unit()
     debug_level = psb_get_debug_level()
@@ -743,7 +743,7 @@ contains
     case(psb_comm_mov_) 
       ipnt   => desc%ovr_mst_idx
     case default
-      info=4010
+      info=psb_err_from_subroutine_
       call psb_errpush(info,name,a_err='wrong Data selector')
       goto 9999
     end select
@@ -778,23 +778,23 @@ contains
     character(len=*), parameter ::  name = 'psb_idxmap_free'
 
     if(psb_get_errstatus() /= 0) return 
-    info=0
+    info=psb_success_
     call psb_erractionsave(err_act)
 
     if (allocated(map%loc_to_glob)) then 
       deallocate(map%loc_to_glob,stat=info) 
     end if
-    if ((info == 0).and.allocated(map%glob_to_loc)) then 
+    if ((info == psb_success_).and.allocated(map%glob_to_loc)) then 
       deallocate(map%glob_to_loc,stat=info) 
     end if
-    if ((info == 0).and.allocated(map%hashv)) then 
+    if ((info == psb_success_).and.allocated(map%hashv)) then 
       deallocate(map%hashv,stat=info) 
     end if
-    if ((info == 0).and.allocated(map%glb_lc)) then 
+    if ((info == psb_success_).and.allocated(map%glb_lc)) then 
       deallocate(map%glb_lc,stat=info) 
     end if
-    if (info /= 0) call psb_free(map%hash, info) 
-    if (info /= 0) then 
+    if (info /= psb_success_) call psb_free(map%hash, info) 
+    if (info /= psb_success_) then 
       info=2052
       call psb_errpush(info,name)
       goto 9999
@@ -838,13 +838,13 @@ contains
     character(len=20)   :: name
 
     if(psb_get_errstatus() /= 0) return 
-    info=0
+    info=psb_success_
     call psb_erractionsave(err_act)
     name = 'psb_cdfree'
 
 
     if (.not.allocated(desc_a%matrix_data)) then
-      info=295
+      info=psb_err_forgot_spall_
       call psb_errpush(info,name)
       return
     end if
@@ -854,7 +854,7 @@ contains
     call psb_info(ictxt, me, np)
     !     ....verify blacs grid correctness..
     if (np == -1) then
-      info = 2010
+      info = psb_err_blacs_error_
       call psb_errpush(info,name)
       goto 9999
     endif
@@ -869,7 +869,7 @@ contains
 
     !deallocate halo_index field
     deallocate(desc_a%halo_index,stat=info)
-    if (info /= 0) then
+    if (info /= psb_success_) then
       info=2053
       call psb_errpush(info,name)
       goto 9999
@@ -883,7 +883,7 @@ contains
     else
       !deallocate halo_index field
       deallocate(desc_a%bnd_elem,stat=info)
-      if (info /= 0) then
+      if (info /= psb_success_) then
         info=2054
         call psb_errpush(info,name)
         goto 9999
@@ -898,7 +898,7 @@ contains
 
     !deallocate ovrlap_index  field
     deallocate(desc_a%ovrlap_index,stat=info)
-    if (info /= 0) then
+    if (info /= psb_success_) then
       info=2055
       call psb_errpush(info,name)
       goto 9999
@@ -906,7 +906,7 @@ contains
 
     !deallocate ovrlap_elem  field
     deallocate(desc_a%ovrlap_elem,stat=info)
-    if (info /= 0) then 
+    if (info /= psb_success_) then 
       info=2056
       call psb_errpush(info,name)
       goto 9999
@@ -914,7 +914,7 @@ contains
 
     !deallocate ovrlap_index  field
     deallocate(desc_a%ovr_mst_idx,stat=info)
-    if (info /= 0) then
+    if (info /= psb_success_) then
       info=2055
       call psb_errpush(info,name)
       goto 9999
@@ -922,7 +922,7 @@ contains
 
 
     deallocate(desc_a%lprm,stat=info)
-    if (info /= 0) then 
+    if (info /= psb_success_) then 
       info=2057
       call psb_errpush(info,name)
       goto 9999
@@ -930,7 +930,7 @@ contains
 
     if (allocated(desc_a%idx_space)) then 
       deallocate(desc_a%idx_space,stat=info)
-      if (info /= 0) then 
+      if (info /= psb_success_) then 
         info=2056
         call psb_errpush(info,name)
         goto 9999
@@ -985,8 +985,8 @@ contains
     integer             :: debug_level, debug_unit
     character(len=20)   :: name
 
-    if (psb_get_errstatus()/=0) return 
-    info = 0
+    if (psb_get_errstatus() /= 0) return 
+    info = psb_success_
     call psb_erractionsave(err_act)
     name = 'psb_cdtransfer'
     debug_unit  = psb_get_debug_unit()
@@ -997,26 +997,26 @@ contains
     ! empty. 
 
     call psb_move_alloc( desc_in%matrix_data ,    desc_out%matrix_data  , info)
-    if (info == 0)  &
+    if (info == psb_success_)  &
          & call psb_move_alloc( desc_in%halo_index  ,    desc_out%halo_index   , info)
-    if (info == 0)  &
+    if (info == psb_success_)  &
          & call psb_move_alloc( desc_in%bnd_elem    ,    desc_out%bnd_elem     , info)
-    if (info == 0)  &
+    if (info == psb_success_)  &
          & call psb_move_alloc( desc_in%ovrlap_elem ,    desc_out%ovrlap_elem  , info)
-    if (info == 0)  &
+    if (info == psb_success_)  &
          & call psb_move_alloc( desc_in%ovrlap_index,    desc_out%ovrlap_index , info)
-    if (info == 0)  &
+    if (info == psb_success_)  &
          & call psb_move_alloc( desc_in%ovr_mst_idx ,    desc_out%ovr_mst_idx  , info)
-    if (info == 0)  &
+    if (info == psb_success_)  &
          & call psb_move_alloc( desc_in%ext_index   ,    desc_out%ext_index    , info)
-    if (info == 0)  &
+    if (info == psb_success_)  &
          & call psb_move_alloc( desc_in%lprm        ,    desc_out%lprm         , info)
-    if (info == 0)  &
+    if (info == psb_success_)  &
          & call psb_move_alloc( desc_in%idx_space   ,    desc_out%idx_space    , info)
-    if (info == 0) &
+    if (info == psb_success_) &
          & call psb_move_alloc(desc_in%idxmap, desc_out%idxmap,info)
-    if (info /= 0) then
-      info = 4010
+    if (info /= psb_success_) then
+      info = psb_err_from_subroutine_
       call psb_errpush(info,name)
       goto 9999
     endif
@@ -1057,8 +1057,8 @@ contains
     integer              :: debug_level, debug_unit
     character(len=*), parameter  ::  name = 'psb_idxmap_transfer'
 
-    if (psb_get_errstatus()/=0) return 
-    info = 0
+    if (psb_get_errstatus() /= 0) return 
+    info = psb_success_
     call psb_erractionsave(err_act)
 
     debug_unit  = psb_get_debug_unit()
@@ -1068,19 +1068,19 @@ contains
     map_out%hashvsize = map_in%hashvsize
     map_out%hashvmask = map_in%hashvmask
 
-    if (info == 0)  &
+    if (info == psb_success_)  &
          & call psb_move_alloc( map_in%loc_to_glob ,    map_out%loc_to_glob  , info)
-    if (info == 0)  &
+    if (info == psb_success_)  &
          & call psb_move_alloc( map_in%glob_to_loc ,    map_out%glob_to_loc  , info)
-    if (info == 0)  &
+    if (info == psb_success_)  &
          & call psb_move_alloc( map_in%hashv       ,    map_out%hashv        , info)
-    if (info == 0)  &
+    if (info == psb_success_)  &
          & call psb_move_alloc( map_in%glb_lc      ,    map_out%glb_lc       , info)
-    if (info == 0)  &
+    if (info == psb_success_)  &
          & call psb_move_alloc( map_in%hash        ,    map_out%hash        , info)
     
-    if (info /= 0) then
-      info = 4010
+    if (info /= psb_success_) then
+      info = psb_err_from_subroutine_
       call psb_errpush(info,name)
       goto 9999
     endif
@@ -1121,8 +1121,8 @@ contains
     integer              :: debug_level, debug_unit
     character(len=*), parameter  ::  name = 'psb_idxmap_transfer'
 
-    if (psb_get_errstatus()/=0) return 
-    info = 0
+    if (psb_get_errstatus() /= 0) return 
+    info = psb_success_
     call psb_erractionsave(err_act)
 
     debug_unit  = psb_get_debug_unit()
@@ -1133,17 +1133,17 @@ contains
     map_out%hashvmask = map_in%hashvmask
 
     call psb_safe_ab_cpy( map_in%loc_to_glob ,    map_out%loc_to_glob  , info)
-    if (info == 0)  &
+    if (info == psb_success_)  &
          & call psb_safe_ab_cpy( map_in%glob_to_loc ,    map_out%glob_to_loc  , info)
-    if (info == 0)  &
+    if (info == psb_success_)  &
          & call psb_safe_ab_cpy( map_in%hashv       ,    map_out%hashv        , info)
-    if (info == 0)  &
+    if (info == psb_success_)  &
          & call psb_safe_ab_cpy( map_in%glb_lc      ,    map_out%glb_lc       , info)
-    if (info == 0)  &
+    if (info == psb_success_)  &
          & call psb_hash_copy( map_in%hash        ,    map_out%hash        , info)
     
-    if (info /= 0) then
-      info = 4010
+    if (info /= psb_success_) then
+      info = psb_err_from_subroutine_
       call psb_errpush(info,name)
       goto 9999
     endif
@@ -1172,15 +1172,15 @@ contains
     type(psb_idxmap_type)  :: map
     integer :: nc
 
-    info = 0
+    info = psb_success_
     if (.not.allocated(map%loc_to_glob)) then 
-      info = 140
+      info = psb_err_iarray_outside_bounds_
       idx = -1 
       return
     end if
     nc = size(map%loc_to_glob) 
     if ((idx < 1).or.(idx>nc)) then 
-      info = 140
+      info = psb_err_iarray_outside_bounds_
       idx = -1 
       return
     end if
@@ -1195,15 +1195,15 @@ contains
     type(psb_idxmap_type) :: map
     integer :: nc
 
-    info = 0
+    info = psb_success_
     if (.not.allocated(map%loc_to_glob)) then 
-      info = 140
+      info = psb_err_iarray_outside_bounds_
       gidx = -1 
       return
     end if
     nc = size(map%loc_to_glob) 
     if ((idx < 1).or.(idx>nc)) then 
-      info = 140
+      info = psb_err_iarray_outside_bounds_
       gidx = -1 
       return
     end if
@@ -1218,10 +1218,10 @@ contains
     type(psb_idxmap_type)  :: map
     integer :: nc, i, ix
 
-    info = 0
-    if (size(idx)==0) return
+    info = psb_success_
+    if (size(idx) == 0) return
     if (.not.allocated(map%loc_to_glob)) then 
-      info = 140
+      info = psb_err_iarray_outside_bounds_
       idx = -1 
       return
     end if
@@ -1229,7 +1229,7 @@ contains
     do i=1, size(idx) 
       ix = idx(i)
       if ((ix < 1).or.(ix>nc)) then 
-        info = 140
+        info = psb_err_iarray_outside_bounds_
         idx(i) = -1 
       else        
         idx(i) = map%loc_to_glob(ix) 
@@ -1245,11 +1245,11 @@ contains
     type(psb_idxmap_type)  :: map
     integer :: nc, i, ix
 
-    info = 0
-    if (size(idx)==0) return
+    info = psb_success_
+    if (size(idx) == 0) return
     if ((.not.allocated(map%loc_to_glob)).or.&
          & (size(gidx)<size(idx))) then 
-      info = 140
+      info = psb_err_iarray_outside_bounds_
       gidx = -1 
       return
     end if
@@ -1258,7 +1258,7 @@ contains
     do i=1, size(idx) 
       ix = idx(i)
       if ((ix < 1).or.(ix>nc)) then 
-        info = 140
+        info = psb_err_iarray_outside_bounds_
         gidx(i) = -1 
       else        
         gidx(i) = map%loc_to_glob(ix) 
@@ -1288,7 +1288,7 @@ contains
     character(len=20)    :: name
 
     name  = 'psb_cd_get_recv_idx'
-    info  = 0
+    info  = psb_success_
     call psb_erractionsave(err_act)
     debug_unit  = psb_get_debug_unit()
     debug_level = psb_get_debug_level()
@@ -1307,7 +1307,7 @@ contains
       idxlist => desc%ovr_mst_idx
       write(0,*) 'Warning: unusual request getidx on ovr_mst_idx'
     case default
-      info=4010
+      info=psb_err_from_subroutine_
       call psb_errpush(info,name,a_err='wrong Data selector')
       goto 9999
     end select
@@ -1315,9 +1315,9 @@ contains
     l_tmp = 3*size(idxlist)
 
     allocate(tmp(l_tmp),stat=info)
-    if (info /= 0) then 
-      info = 4010
-      call psb_errpush(4010,name,a_err='Allocate')
+    if (info /= psb_success_) then 
+      info = psb_err_from_subroutine_
+      call psb_errpush(psb_err_from_subroutine_,name,a_err='Allocate')
       goto 9999      
     end if
       
@@ -1332,8 +1332,8 @@ contains
       Do j=0,n_elem_recv-1
         idx = idxlist(incnt+psb_elem_recv_+j)
         call psb_ensure_size((outcnt+3),tmp,info,pad=-1)
-        if (info /= 0) then
-          info=4010
+        if (info /= psb_success_) then
+          info=psb_err_from_subroutine_
           call psb_errpush(info,name,a_err='psb_ensure_size')
           goto 9999
         end if

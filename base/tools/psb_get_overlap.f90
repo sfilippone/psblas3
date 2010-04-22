@@ -52,12 +52,12 @@ subroutine psb_get_ovrlap(ovrel,desc,info)
   integer  :: i,j, err_act
   character(len=20)    :: name
 
-  info = 0
+  info = psb_success_
   name='psi_get_overlap'
   call psb_erractionsave(err_act)
 
   if (.not.psb_is_asb_desc(desc)) then
-    info = 1122
+    info = psb_err_invalid_cd_state_
     call psb_errpush(info,name)
     goto 9999
   end if
@@ -67,8 +67,8 @@ subroutine psb_get_ovrlap(ovrel,desc,info)
     i=size(desc%ovrlap_elem,1) 
 
     allocate(ovrel(i),stat=info)
-    if (info /= 0 ) then 
-      info = 4000
+    if (info /= psb_success_ ) then 
+      info = psb_err_alloc_dealloc_
       call psb_errpush(info,name)
       goto 9999
     end if
@@ -81,8 +81,8 @@ subroutine psb_get_ovrlap(ovrel,desc,info)
 
     if (allocated(ovrel)) then 
       deallocate(ovrel,stat=info)
-      if (info /= 0) then 
-        call psb_errpush(4010,name,a_err='Deallocate')
+      if (info /= psb_success_) then 
+        call psb_errpush(psb_err_from_subroutine_,name,a_err='Deallocate')
         goto 9999      
       end if
     end if

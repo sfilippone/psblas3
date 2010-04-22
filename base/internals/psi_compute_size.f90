@@ -61,19 +61,19 @@ subroutine psi_compute_size(desc_data, index_in, dl_lda, info)
   debug_unit  = psb_get_debug_unit()
   debug_level = psb_get_debug_level()
 
-  info = 0
+  info = psb_success_
   ictxt = desc_data(psb_ctxt_)
 
   call psb_info(ictxt,me,np)
   if (np == -1) then
-    info = 2010
+    info = psb_err_blacs_error_
     call psb_errpush(info,name)
     goto 9999
   endif
 
   allocate(counter_dl(0:np-1),counter_recv(0:np-1),stat=info)
-  if (info /= 0) then 
-    call psb_errpush(4010,name,a_err='Allocate')
+  if (info /= psb_success_) then 
+    call psb_errpush(psb_err_from_subroutine_,name,a_err='Allocate')
     goto 9999      
   end if
 
@@ -88,7 +88,7 @@ subroutine psi_compute_size(desc_data, index_in, dl_lda, info)
   do while (index_in(i) /= -1)
     proc=index_in(i)
     if ((proc > np-1).or.(proc < 0)) then
-      info = 115
+      info = psb_err_invalid_pid_arg_
       int_err(1) = 11
       int_err(2) = proc
       call psb_errpush(info,name,i_err=int_err)

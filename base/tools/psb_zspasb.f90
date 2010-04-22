@@ -69,7 +69,7 @@ subroutine psb_zspasb(a,desc_a, info, afmt, upd, dupl, mold)
   integer              :: debug_level, debug_unit
   character(len=20)     :: name, ch_err
 
-  info = 0
+  info = psb_success_
   int_err(1)=0
   name = 'psb_spasb'
   call psb_erractionsave(err_act)
@@ -83,13 +83,13 @@ subroutine psb_zspasb(a,desc_a, info, afmt, upd, dupl, mold)
   ! check on BLACS grid 
   call psb_info(ictxt, me, np)
   if (np == -1) then
-    info = 2010
+    info = psb_err_blacs_error_
     call psb_errpush(info,name)
     goto 9999
   endif
 
   if (.not.psb_is_asb_desc(desc_a)) then 
-    info = 600
+    info = psb_err_spmat_invalid_state_
     int_err(1) = psb_cd_get_dectype(desc_a)
     call psb_errpush(info,name)
     goto 9999
@@ -123,7 +123,7 @@ subroutine psb_zspasb(a,desc_a, info, afmt, upd, dupl, mold)
   end IF
   
   if (info /= psb_no_err_) then    
-    info=4010
+    info=psb_err_from_subroutine_
     ch_err='psb_spcnv'
     call psb_errpush(info,name,a_err=ch_err)
     goto 9999

@@ -57,7 +57,7 @@ subroutine psb_cdcpy(desc_in, desc_out, info)
   debug_level = psb_get_debug_level()
 
   if (psb_get_errstatus() /= 0) return 
-  info = 0
+  info = psb_success_
   call psb_erractionsave(err_act)
   name = 'psb_cdcpy'
 
@@ -68,31 +68,31 @@ subroutine psb_cdcpy(desc_in, desc_out, info)
   if (debug_level >= psb_debug_ext_) &
        & write(debug_unit,*) me,' ',trim(name),': Entered'
   if (np == -1) then
-    info = 2010
+    info = psb_err_blacs_error_
     call psb_errpush(info,name)
     goto 9999
   endif
 
   call psb_safe_ab_cpy(desc_in%matrix_data,desc_out%matrix_data,info)
-  if (info == 0) call psb_safe_ab_cpy(desc_in%halo_index,desc_out%halo_index,info)
-  if (info == 0) call psb_safe_ab_cpy(desc_in%ext_index,desc_out%ext_index,info)
-  if (info == 0) call psb_safe_ab_cpy(desc_in%ovrlap_index,desc_out%ovrlap_index,info)
-  if (info == 0) call psb_safe_ab_cpy(desc_in%bnd_elem,desc_out%bnd_elem,info)
-  if (info == 0) call psb_safe_ab_cpy(desc_in%ovrlap_elem,desc_out%ovrlap_elem,info)
-  if (info == 0) call psb_safe_ab_cpy(desc_in%ovr_mst_idx,desc_out%ovr_mst_idx,info)
-  if (info == 0) call psb_safe_ab_cpy(desc_in%lprm,desc_out%lprm,info)
-  if (info == 0) call psb_safe_ab_cpy(desc_in%idx_space,desc_out%idx_space,info)
-  if (info == 0) call psb_idxmap_copy(desc_in%idxmap,desc_out%idxmap, info)
-!!$  if (info == 0)   call psb_safe_ab_cpy(desc_in%loc_to_glob,desc_out%loc_to_glob,info)
-!!$  if (info == 0)   call psb_safe_ab_cpy(desc_in%glob_to_loc,desc_out%glob_to_loc,info)
+  if (info == psb_success_) call psb_safe_ab_cpy(desc_in%halo_index,desc_out%halo_index,info)
+  if (info == psb_success_) call psb_safe_ab_cpy(desc_in%ext_index,desc_out%ext_index,info)
+  if (info == psb_success_) call psb_safe_ab_cpy(desc_in%ovrlap_index,desc_out%ovrlap_index,info)
+  if (info == psb_success_) call psb_safe_ab_cpy(desc_in%bnd_elem,desc_out%bnd_elem,info)
+  if (info == psb_success_) call psb_safe_ab_cpy(desc_in%ovrlap_elem,desc_out%ovrlap_elem,info)
+  if (info == psb_success_) call psb_safe_ab_cpy(desc_in%ovr_mst_idx,desc_out%ovr_mst_idx,info)
+  if (info == psb_success_) call psb_safe_ab_cpy(desc_in%lprm,desc_out%lprm,info)
+  if (info == psb_success_) call psb_safe_ab_cpy(desc_in%idx_space,desc_out%idx_space,info)
+  if (info == psb_success_) call psb_idxmap_copy(desc_in%idxmap,desc_out%idxmap, info)
+!!$  if (info == psb_success_)   call psb_safe_ab_cpy(desc_in%loc_to_glob,desc_out%loc_to_glob,info)
+!!$  if (info == psb_success_)   call psb_safe_ab_cpy(desc_in%glob_to_loc,desc_out%glob_to_loc,info)
 !!$  desc_out%hashvsize =   desc_in%hashvsize 
 !!$  desc_out%hashvmask =   desc_in%hashvmask
-!!$  if (info == 0)   call psb_safe_ab_cpy(desc_in%hashv,desc_out%hashv,info)
-!!$  if (info == 0)   call psb_safe_ab_cpy(desc_in%glb_lc,desc_out%glb_lc,info)
-!!$  if (info == 0)   call CloneHashTable(desc_in%hash,desc_out%hash,info)
+!!$  if (info == psb_success_)   call psb_safe_ab_cpy(desc_in%hashv,desc_out%hashv,info)
+!!$  if (info == psb_success_)   call psb_safe_ab_cpy(desc_in%glb_lc,desc_out%glb_lc,info)
+!!$  if (info == psb_success_)   call CloneHashTable(desc_in%hash,desc_out%hash,info)
 
-  if (info /= 0) then
-    info = 4010
+  if (info /= psb_success_) then
+    info = psb_err_from_subroutine_
     call psb_errpush(info,name)
     goto 9999
   endif

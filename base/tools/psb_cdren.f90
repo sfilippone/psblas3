@@ -63,7 +63,7 @@ subroutine psb_cdren(trans,iperm,desc_a,info)
   character(len=20)    :: name
 
   if(psb_get_errstatus() /= 0) return 
-  info=0
+  info=psb_success_
   call psb_erractionsave(err_act)
   name = 'psb_cdren'
   debug_unit  = psb_get_debug_unit()
@@ -77,13 +77,13 @@ subroutine psb_cdren(trans,iperm,desc_a,info)
   ! check on blacs grid 
   call psb_info(ictxt, me, np)
   if (np == -1) then
-    info = 2010
+    info = psb_err_blacs_error_
     call psb_errpush(info,name)
     goto 9999
   endif
 
   if (.not.psb_is_asb_desc(desc_a)) then 
-    info = 600
+    info = psb_err_spmat_invalid_state_
     int_err(1) = dectype
     call psb_errpush(info,name,int_err)
     goto 9999

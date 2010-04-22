@@ -40,14 +40,14 @@ subroutine s_usmv_2_n_ap3_bp1_ix1_iy1(res,afmt,ictxt)
   endif
   call psb_barrier(ictxt)
   call psb_cdall(ictxt,desc_a,info,nl=m)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spall(a,desc_a,info,nnz=nnz)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_barrier(ictxt)
   call psb_spins(nnz,IA,JA,VA,a,desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_cdasb(desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spasb(a,desc_a,info,dupl=psb_dupl_err_,afmt=afmt)
   if(info.ne.0)print *,"matrix assembly failed"
   if(info.ne.0)goto 9996
@@ -56,24 +56,24 @@ subroutine s_usmv_2_n_ap3_bp1_ix1_iy1(res,afmt,ictxt)
   if(info.ne.0)print *,"psb_spmm failed"
   if(info.ne.0)goto 9996
   do i=1,2
-    if(y(i)/=cy(i))print*,"results mismatch:",y,"instead of",cy
-    if(y(i)/=cy(i))info=-1
-    if(y(i)/=cy(i))goto 9996
+    if(y(i) /= cy(i))print*,"results mismatch:",y,"instead of",cy
+    if(y(i) /= cy(i))info=-1
+    if(y(i) /= cy(i))goto 9996
   enddo
 9996 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_spfree(a,desc_a,info)
-  if (info /= 0)goto 9997
+  if (info /= psb_success_)goto 9997
 9997 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_cdfree(desc_a,info)
-  if (info /= 0)goto 9998
+  if (info /= psb_success_)goto 9998
 9998 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
 9999 continue
-  if(info /= 0)res=res+1
-  if(res/=0)print*,"on s matrix    2 x    2 blocked   1 x   1 usmv alpha= 3 beta= 1 incx=1 incy=1 trans=n is not ok"
-  if(res==0)print*,"on s matrix    2 x    2 blocked   1 x   1 usmv alpha= 3 beta= 1 incx=1 incy=1 trans=n is ok"
+  if(info /= psb_success_)res=res+1
+  if(res /= 0)print*,"on s matrix    2 x    2 blocked   1 x   1 usmv alpha= 3 beta= 1 incx=1 incy=1 trans=n is not ok"
+  if(res == 0)print*,"on s matrix    2 x    2 blocked   1 x   1 usmv alpha= 3 beta= 1 incx=1 incy=1 trans=n is ok"
 end subroutine s_usmv_2_n_ap3_bp1_ix1_iy1
 ! 
 
@@ -116,14 +116,14 @@ subroutine s_usmv_2_t_ap3_bp1_ix1_iy1(res,afmt,ictxt)
   endif
   call psb_barrier(ictxt)
   call psb_cdall(ictxt,desc_a,info,nl=m)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spall(a,desc_a,info,nnz=nnz)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_barrier(ictxt)
   call psb_spins(nnz,IA,JA,VA,a,desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_cdasb(desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spasb(a,desc_a,info,dupl=psb_dupl_err_,afmt=afmt)
   if(info.ne.0)print *,"matrix assembly failed"
   if(info.ne.0)goto 9996
@@ -132,24 +132,24 @@ subroutine s_usmv_2_t_ap3_bp1_ix1_iy1(res,afmt,ictxt)
   if(info.ne.0)print *,"psb_spmm failed"
   if(info.ne.0)goto 9996
   do i=1,2
-    if(y(i)/=cy(i))print*,"results mismatch:",y,"instead of",cy
-    if(y(i)/=cy(i))info=-1
-    if(y(i)/=cy(i))goto 9996
+    if(y(i) /= cy(i))print*,"results mismatch:",y,"instead of",cy
+    if(y(i) /= cy(i))info=-1
+    if(y(i) /= cy(i))goto 9996
   enddo
 9996 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_spfree(a,desc_a,info)
-  if (info /= 0)goto 9997
+  if (info /= psb_success_)goto 9997
 9997 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_cdfree(desc_a,info)
-  if (info /= 0)goto 9998
+  if (info /= psb_success_)goto 9998
 9998 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
 9999 continue
-  if(info /= 0)res=res+1
-  if(res/=0)print*,"on s matrix    2 x    2 blocked   1 x   1 usmv alpha= 3 beta= 1 incx=1 incy=1 trans=t is not ok"
-  if(res==0)print*,"on s matrix    2 x    2 blocked   1 x   1 usmv alpha= 3 beta= 1 incx=1 incy=1 trans=t is ok"
+  if(info /= psb_success_)res=res+1
+  if(res /= 0)print*,"on s matrix    2 x    2 blocked   1 x   1 usmv alpha= 3 beta= 1 incx=1 incy=1 trans=t is not ok"
+  if(res == 0)print*,"on s matrix    2 x    2 blocked   1 x   1 usmv alpha= 3 beta= 1 incx=1 incy=1 trans=t is ok"
 end subroutine s_usmv_2_t_ap3_bp1_ix1_iy1
 ! 
 
@@ -192,14 +192,14 @@ subroutine s_usmv_2_c_ap3_bp1_ix1_iy1(res,afmt,ictxt)
   endif
   call psb_barrier(ictxt)
   call psb_cdall(ictxt,desc_a,info,nl=m)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spall(a,desc_a,info,nnz=nnz)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_barrier(ictxt)
   call psb_spins(nnz,IA,JA,VA,a,desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_cdasb(desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spasb(a,desc_a,info,dupl=psb_dupl_err_,afmt=afmt)
   if(info.ne.0)print *,"matrix assembly failed"
   if(info.ne.0)goto 9996
@@ -208,24 +208,24 @@ subroutine s_usmv_2_c_ap3_bp1_ix1_iy1(res,afmt,ictxt)
   if(info.ne.0)print *,"psb_spmm failed"
   if(info.ne.0)goto 9996
   do i=1,2
-    if(y(i)/=cy(i))print*,"results mismatch:",y,"instead of",cy
-    if(y(i)/=cy(i))info=-1
-    if(y(i)/=cy(i))goto 9996
+    if(y(i) /= cy(i))print*,"results mismatch:",y,"instead of",cy
+    if(y(i) /= cy(i))info=-1
+    if(y(i) /= cy(i))goto 9996
   enddo
 9996 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_spfree(a,desc_a,info)
-  if (info /= 0)goto 9997
+  if (info /= psb_success_)goto 9997
 9997 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_cdfree(desc_a,info)
-  if (info /= 0)goto 9998
+  if (info /= psb_success_)goto 9998
 9998 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
 9999 continue
-  if(info /= 0)res=res+1
-  if(res/=0)print*,"on s matrix    2 x    2 blocked   1 x   1 usmv alpha= 3 beta= 1 incx=1 incy=1 trans=c is not ok"
-  if(res==0)print*,"on s matrix    2 x    2 blocked   1 x   1 usmv alpha= 3 beta= 1 incx=1 incy=1 trans=c is ok"
+  if(info /= psb_success_)res=res+1
+  if(res /= 0)print*,"on s matrix    2 x    2 blocked   1 x   1 usmv alpha= 3 beta= 1 incx=1 incy=1 trans=c is not ok"
+  if(res == 0)print*,"on s matrix    2 x    2 blocked   1 x   1 usmv alpha= 3 beta= 1 incx=1 incy=1 trans=c is ok"
 end subroutine s_usmv_2_c_ap3_bp1_ix1_iy1
 ! 
 
@@ -268,14 +268,14 @@ subroutine s_usmv_2_n_ap3_bm0_ix1_iy1(res,afmt,ictxt)
   endif
   call psb_barrier(ictxt)
   call psb_cdall(ictxt,desc_a,info,nl=m)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spall(a,desc_a,info,nnz=nnz)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_barrier(ictxt)
   call psb_spins(nnz,IA,JA,VA,a,desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_cdasb(desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spasb(a,desc_a,info,dupl=psb_dupl_err_,afmt=afmt)
   if(info.ne.0)print *,"matrix assembly failed"
   if(info.ne.0)goto 9996
@@ -284,24 +284,24 @@ subroutine s_usmv_2_n_ap3_bm0_ix1_iy1(res,afmt,ictxt)
   if(info.ne.0)print *,"psb_spmm failed"
   if(info.ne.0)goto 9996
   do i=1,2
-    if(y(i)/=cy(i))print*,"results mismatch:",y,"instead of",cy
-    if(y(i)/=cy(i))info=-1
-    if(y(i)/=cy(i))goto 9996
+    if(y(i) /= cy(i))print*,"results mismatch:",y,"instead of",cy
+    if(y(i) /= cy(i))info=-1
+    if(y(i) /= cy(i))goto 9996
   enddo
 9996 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_spfree(a,desc_a,info)
-  if (info /= 0)goto 9997
+  if (info /= psb_success_)goto 9997
 9997 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_cdfree(desc_a,info)
-  if (info /= 0)goto 9998
+  if (info /= psb_success_)goto 9998
 9998 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
 9999 continue
-  if(info /= 0)res=res+1
-  if(res/=0)print*,"on s matrix    2 x    2 blocked   1 x   1 usmv alpha= 3 beta= 0 incx=1 incy=1 trans=n is not ok"
-  if(res==0)print*,"on s matrix    2 x    2 blocked   1 x   1 usmv alpha= 3 beta= 0 incx=1 incy=1 trans=n is ok"
+  if(info /= psb_success_)res=res+1
+  if(res /= 0)print*,"on s matrix    2 x    2 blocked   1 x   1 usmv alpha= 3 beta= 0 incx=1 incy=1 trans=n is not ok"
+  if(res == 0)print*,"on s matrix    2 x    2 blocked   1 x   1 usmv alpha= 3 beta= 0 incx=1 incy=1 trans=n is ok"
 end subroutine s_usmv_2_n_ap3_bm0_ix1_iy1
 ! 
 
@@ -344,14 +344,14 @@ subroutine s_usmv_2_t_ap3_bm0_ix1_iy1(res,afmt,ictxt)
   endif
   call psb_barrier(ictxt)
   call psb_cdall(ictxt,desc_a,info,nl=m)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spall(a,desc_a,info,nnz=nnz)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_barrier(ictxt)
   call psb_spins(nnz,IA,JA,VA,a,desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_cdasb(desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spasb(a,desc_a,info,dupl=psb_dupl_err_,afmt=afmt)
   if(info.ne.0)print *,"matrix assembly failed"
   if(info.ne.0)goto 9996
@@ -360,24 +360,24 @@ subroutine s_usmv_2_t_ap3_bm0_ix1_iy1(res,afmt,ictxt)
   if(info.ne.0)print *,"psb_spmm failed"
   if(info.ne.0)goto 9996
   do i=1,2
-    if(y(i)/=cy(i))print*,"results mismatch:",y,"instead of",cy
-    if(y(i)/=cy(i))info=-1
-    if(y(i)/=cy(i))goto 9996
+    if(y(i) /= cy(i))print*,"results mismatch:",y,"instead of",cy
+    if(y(i) /= cy(i))info=-1
+    if(y(i) /= cy(i))goto 9996
   enddo
 9996 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_spfree(a,desc_a,info)
-  if (info /= 0)goto 9997
+  if (info /= psb_success_)goto 9997
 9997 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_cdfree(desc_a,info)
-  if (info /= 0)goto 9998
+  if (info /= psb_success_)goto 9998
 9998 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
 9999 continue
-  if(info /= 0)res=res+1
-  if(res/=0)print*,"on s matrix    2 x    2 blocked   1 x   1 usmv alpha= 3 beta= 0 incx=1 incy=1 trans=t is not ok"
-  if(res==0)print*,"on s matrix    2 x    2 blocked   1 x   1 usmv alpha= 3 beta= 0 incx=1 incy=1 trans=t is ok"
+  if(info /= psb_success_)res=res+1
+  if(res /= 0)print*,"on s matrix    2 x    2 blocked   1 x   1 usmv alpha= 3 beta= 0 incx=1 incy=1 trans=t is not ok"
+  if(res == 0)print*,"on s matrix    2 x    2 blocked   1 x   1 usmv alpha= 3 beta= 0 incx=1 incy=1 trans=t is ok"
 end subroutine s_usmv_2_t_ap3_bm0_ix1_iy1
 ! 
 
@@ -420,14 +420,14 @@ subroutine s_usmv_2_c_ap3_bm0_ix1_iy1(res,afmt,ictxt)
   endif
   call psb_barrier(ictxt)
   call psb_cdall(ictxt,desc_a,info,nl=m)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spall(a,desc_a,info,nnz=nnz)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_barrier(ictxt)
   call psb_spins(nnz,IA,JA,VA,a,desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_cdasb(desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spasb(a,desc_a,info,dupl=psb_dupl_err_,afmt=afmt)
   if(info.ne.0)print *,"matrix assembly failed"
   if(info.ne.0)goto 9996
@@ -436,24 +436,24 @@ subroutine s_usmv_2_c_ap3_bm0_ix1_iy1(res,afmt,ictxt)
   if(info.ne.0)print *,"psb_spmm failed"
   if(info.ne.0)goto 9996
   do i=1,2
-    if(y(i)/=cy(i))print*,"results mismatch:",y,"instead of",cy
-    if(y(i)/=cy(i))info=-1
-    if(y(i)/=cy(i))goto 9996
+    if(y(i) /= cy(i))print*,"results mismatch:",y,"instead of",cy
+    if(y(i) /= cy(i))info=-1
+    if(y(i) /= cy(i))goto 9996
   enddo
 9996 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_spfree(a,desc_a,info)
-  if (info /= 0)goto 9997
+  if (info /= psb_success_)goto 9997
 9997 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_cdfree(desc_a,info)
-  if (info /= 0)goto 9998
+  if (info /= psb_success_)goto 9998
 9998 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
 9999 continue
-  if(info /= 0)res=res+1
-  if(res/=0)print*,"on s matrix    2 x    2 blocked   1 x   1 usmv alpha= 3 beta= 0 incx=1 incy=1 trans=c is not ok"
-  if(res==0)print*,"on s matrix    2 x    2 blocked   1 x   1 usmv alpha= 3 beta= 0 incx=1 incy=1 trans=c is ok"
+  if(info /= psb_success_)res=res+1
+  if(res /= 0)print*,"on s matrix    2 x    2 blocked   1 x   1 usmv alpha= 3 beta= 0 incx=1 incy=1 trans=c is not ok"
+  if(res == 0)print*,"on s matrix    2 x    2 blocked   1 x   1 usmv alpha= 3 beta= 0 incx=1 incy=1 trans=c is ok"
 end subroutine s_usmv_2_c_ap3_bm0_ix1_iy1
 ! 
 
@@ -496,14 +496,14 @@ subroutine s_usmv_2_n_ap1_bp1_ix1_iy1(res,afmt,ictxt)
   endif
   call psb_barrier(ictxt)
   call psb_cdall(ictxt,desc_a,info,nl=m)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spall(a,desc_a,info,nnz=nnz)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_barrier(ictxt)
   call psb_spins(nnz,IA,JA,VA,a,desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_cdasb(desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spasb(a,desc_a,info,dupl=psb_dupl_err_,afmt=afmt)
   if(info.ne.0)print *,"matrix assembly failed"
   if(info.ne.0)goto 9996
@@ -512,24 +512,24 @@ subroutine s_usmv_2_n_ap1_bp1_ix1_iy1(res,afmt,ictxt)
   if(info.ne.0)print *,"psb_spmm failed"
   if(info.ne.0)goto 9996
   do i=1,2
-    if(y(i)/=cy(i))print*,"results mismatch:",y,"instead of",cy
-    if(y(i)/=cy(i))info=-1
-    if(y(i)/=cy(i))goto 9996
+    if(y(i) /= cy(i))print*,"results mismatch:",y,"instead of",cy
+    if(y(i) /= cy(i))info=-1
+    if(y(i) /= cy(i))goto 9996
   enddo
 9996 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_spfree(a,desc_a,info)
-  if (info /= 0)goto 9997
+  if (info /= psb_success_)goto 9997
 9997 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_cdfree(desc_a,info)
-  if (info /= 0)goto 9998
+  if (info /= psb_success_)goto 9998
 9998 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
 9999 continue
-  if(info /= 0)res=res+1
-  if(res/=0)print*,"on s matrix    2 x    2 blocked   1 x   1 usmv alpha= 1 beta= 1 incx=1 incy=1 trans=n is not ok"
-  if(res==0)print*,"on s matrix    2 x    2 blocked   1 x   1 usmv alpha= 1 beta= 1 incx=1 incy=1 trans=n is ok"
+  if(info /= psb_success_)res=res+1
+  if(res /= 0)print*,"on s matrix    2 x    2 blocked   1 x   1 usmv alpha= 1 beta= 1 incx=1 incy=1 trans=n is not ok"
+  if(res == 0)print*,"on s matrix    2 x    2 blocked   1 x   1 usmv alpha= 1 beta= 1 incx=1 incy=1 trans=n is ok"
 end subroutine s_usmv_2_n_ap1_bp1_ix1_iy1
 ! 
 
@@ -572,14 +572,14 @@ subroutine s_usmv_2_t_ap1_bp1_ix1_iy1(res,afmt,ictxt)
   endif
   call psb_barrier(ictxt)
   call psb_cdall(ictxt,desc_a,info,nl=m)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spall(a,desc_a,info,nnz=nnz)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_barrier(ictxt)
   call psb_spins(nnz,IA,JA,VA,a,desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_cdasb(desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spasb(a,desc_a,info,dupl=psb_dupl_err_,afmt=afmt)
   if(info.ne.0)print *,"matrix assembly failed"
   if(info.ne.0)goto 9996
@@ -588,24 +588,24 @@ subroutine s_usmv_2_t_ap1_bp1_ix1_iy1(res,afmt,ictxt)
   if(info.ne.0)print *,"psb_spmm failed"
   if(info.ne.0)goto 9996
   do i=1,2
-    if(y(i)/=cy(i))print*,"results mismatch:",y,"instead of",cy
-    if(y(i)/=cy(i))info=-1
-    if(y(i)/=cy(i))goto 9996
+    if(y(i) /= cy(i))print*,"results mismatch:",y,"instead of",cy
+    if(y(i) /= cy(i))info=-1
+    if(y(i) /= cy(i))goto 9996
   enddo
 9996 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_spfree(a,desc_a,info)
-  if (info /= 0)goto 9997
+  if (info /= psb_success_)goto 9997
 9997 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_cdfree(desc_a,info)
-  if (info /= 0)goto 9998
+  if (info /= psb_success_)goto 9998
 9998 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
 9999 continue
-  if(info /= 0)res=res+1
-  if(res/=0)print*,"on s matrix    2 x    2 blocked   1 x   1 usmv alpha= 1 beta= 1 incx=1 incy=1 trans=t is not ok"
-  if(res==0)print*,"on s matrix    2 x    2 blocked   1 x   1 usmv alpha= 1 beta= 1 incx=1 incy=1 trans=t is ok"
+  if(info /= psb_success_)res=res+1
+  if(res /= 0)print*,"on s matrix    2 x    2 blocked   1 x   1 usmv alpha= 1 beta= 1 incx=1 incy=1 trans=t is not ok"
+  if(res == 0)print*,"on s matrix    2 x    2 blocked   1 x   1 usmv alpha= 1 beta= 1 incx=1 incy=1 trans=t is ok"
 end subroutine s_usmv_2_t_ap1_bp1_ix1_iy1
 ! 
 
@@ -648,14 +648,14 @@ subroutine s_usmv_2_c_ap1_bp1_ix1_iy1(res,afmt,ictxt)
   endif
   call psb_barrier(ictxt)
   call psb_cdall(ictxt,desc_a,info,nl=m)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spall(a,desc_a,info,nnz=nnz)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_barrier(ictxt)
   call psb_spins(nnz,IA,JA,VA,a,desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_cdasb(desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spasb(a,desc_a,info,dupl=psb_dupl_err_,afmt=afmt)
   if(info.ne.0)print *,"matrix assembly failed"
   if(info.ne.0)goto 9996
@@ -664,24 +664,24 @@ subroutine s_usmv_2_c_ap1_bp1_ix1_iy1(res,afmt,ictxt)
   if(info.ne.0)print *,"psb_spmm failed"
   if(info.ne.0)goto 9996
   do i=1,2
-    if(y(i)/=cy(i))print*,"results mismatch:",y,"instead of",cy
-    if(y(i)/=cy(i))info=-1
-    if(y(i)/=cy(i))goto 9996
+    if(y(i) /= cy(i))print*,"results mismatch:",y,"instead of",cy
+    if(y(i) /= cy(i))info=-1
+    if(y(i) /= cy(i))goto 9996
   enddo
 9996 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_spfree(a,desc_a,info)
-  if (info /= 0)goto 9997
+  if (info /= psb_success_)goto 9997
 9997 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_cdfree(desc_a,info)
-  if (info /= 0)goto 9998
+  if (info /= psb_success_)goto 9998
 9998 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
 9999 continue
-  if(info /= 0)res=res+1
-  if(res/=0)print*,"on s matrix    2 x    2 blocked   1 x   1 usmv alpha= 1 beta= 1 incx=1 incy=1 trans=c is not ok"
-  if(res==0)print*,"on s matrix    2 x    2 blocked   1 x   1 usmv alpha= 1 beta= 1 incx=1 incy=1 trans=c is ok"
+  if(info /= psb_success_)res=res+1
+  if(res /= 0)print*,"on s matrix    2 x    2 blocked   1 x   1 usmv alpha= 1 beta= 1 incx=1 incy=1 trans=c is not ok"
+  if(res == 0)print*,"on s matrix    2 x    2 blocked   1 x   1 usmv alpha= 1 beta= 1 incx=1 incy=1 trans=c is ok"
 end subroutine s_usmv_2_c_ap1_bp1_ix1_iy1
 ! 
 
@@ -724,14 +724,14 @@ subroutine s_usmv_2_n_ap1_bm0_ix1_iy1(res,afmt,ictxt)
   endif
   call psb_barrier(ictxt)
   call psb_cdall(ictxt,desc_a,info,nl=m)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spall(a,desc_a,info,nnz=nnz)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_barrier(ictxt)
   call psb_spins(nnz,IA,JA,VA,a,desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_cdasb(desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spasb(a,desc_a,info,dupl=psb_dupl_err_,afmt=afmt)
   if(info.ne.0)print *,"matrix assembly failed"
   if(info.ne.0)goto 9996
@@ -740,24 +740,24 @@ subroutine s_usmv_2_n_ap1_bm0_ix1_iy1(res,afmt,ictxt)
   if(info.ne.0)print *,"psb_spmm failed"
   if(info.ne.0)goto 9996
   do i=1,2
-    if(y(i)/=cy(i))print*,"results mismatch:",y,"instead of",cy
-    if(y(i)/=cy(i))info=-1
-    if(y(i)/=cy(i))goto 9996
+    if(y(i) /= cy(i))print*,"results mismatch:",y,"instead of",cy
+    if(y(i) /= cy(i))info=-1
+    if(y(i) /= cy(i))goto 9996
   enddo
 9996 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_spfree(a,desc_a,info)
-  if (info /= 0)goto 9997
+  if (info /= psb_success_)goto 9997
 9997 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_cdfree(desc_a,info)
-  if (info /= 0)goto 9998
+  if (info /= psb_success_)goto 9998
 9998 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
 9999 continue
-  if(info /= 0)res=res+1
-  if(res/=0)print*,"on s matrix    2 x    2 blocked   1 x   1 usmv alpha= 1 beta= 0 incx=1 incy=1 trans=n is not ok"
-  if(res==0)print*,"on s matrix    2 x    2 blocked   1 x   1 usmv alpha= 1 beta= 0 incx=1 incy=1 trans=n is ok"
+  if(info /= psb_success_)res=res+1
+  if(res /= 0)print*,"on s matrix    2 x    2 blocked   1 x   1 usmv alpha= 1 beta= 0 incx=1 incy=1 trans=n is not ok"
+  if(res == 0)print*,"on s matrix    2 x    2 blocked   1 x   1 usmv alpha= 1 beta= 0 incx=1 incy=1 trans=n is ok"
 end subroutine s_usmv_2_n_ap1_bm0_ix1_iy1
 ! 
 
@@ -800,14 +800,14 @@ subroutine s_usmv_2_t_ap1_bm0_ix1_iy1(res,afmt,ictxt)
   endif
   call psb_barrier(ictxt)
   call psb_cdall(ictxt,desc_a,info,nl=m)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spall(a,desc_a,info,nnz=nnz)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_barrier(ictxt)
   call psb_spins(nnz,IA,JA,VA,a,desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_cdasb(desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spasb(a,desc_a,info,dupl=psb_dupl_err_,afmt=afmt)
   if(info.ne.0)print *,"matrix assembly failed"
   if(info.ne.0)goto 9996
@@ -816,24 +816,24 @@ subroutine s_usmv_2_t_ap1_bm0_ix1_iy1(res,afmt,ictxt)
   if(info.ne.0)print *,"psb_spmm failed"
   if(info.ne.0)goto 9996
   do i=1,2
-    if(y(i)/=cy(i))print*,"results mismatch:",y,"instead of",cy
-    if(y(i)/=cy(i))info=-1
-    if(y(i)/=cy(i))goto 9996
+    if(y(i) /= cy(i))print*,"results mismatch:",y,"instead of",cy
+    if(y(i) /= cy(i))info=-1
+    if(y(i) /= cy(i))goto 9996
   enddo
 9996 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_spfree(a,desc_a,info)
-  if (info /= 0)goto 9997
+  if (info /= psb_success_)goto 9997
 9997 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_cdfree(desc_a,info)
-  if (info /= 0)goto 9998
+  if (info /= psb_success_)goto 9998
 9998 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
 9999 continue
-  if(info /= 0)res=res+1
-  if(res/=0)print*,"on s matrix    2 x    2 blocked   1 x   1 usmv alpha= 1 beta= 0 incx=1 incy=1 trans=t is not ok"
-  if(res==0)print*,"on s matrix    2 x    2 blocked   1 x   1 usmv alpha= 1 beta= 0 incx=1 incy=1 trans=t is ok"
+  if(info /= psb_success_)res=res+1
+  if(res /= 0)print*,"on s matrix    2 x    2 blocked   1 x   1 usmv alpha= 1 beta= 0 incx=1 incy=1 trans=t is not ok"
+  if(res == 0)print*,"on s matrix    2 x    2 blocked   1 x   1 usmv alpha= 1 beta= 0 incx=1 incy=1 trans=t is ok"
 end subroutine s_usmv_2_t_ap1_bm0_ix1_iy1
 ! 
 
@@ -876,14 +876,14 @@ subroutine s_usmv_2_c_ap1_bm0_ix1_iy1(res,afmt,ictxt)
   endif
   call psb_barrier(ictxt)
   call psb_cdall(ictxt,desc_a,info,nl=m)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spall(a,desc_a,info,nnz=nnz)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_barrier(ictxt)
   call psb_spins(nnz,IA,JA,VA,a,desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_cdasb(desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spasb(a,desc_a,info,dupl=psb_dupl_err_,afmt=afmt)
   if(info.ne.0)print *,"matrix assembly failed"
   if(info.ne.0)goto 9996
@@ -892,24 +892,24 @@ subroutine s_usmv_2_c_ap1_bm0_ix1_iy1(res,afmt,ictxt)
   if(info.ne.0)print *,"psb_spmm failed"
   if(info.ne.0)goto 9996
   do i=1,2
-    if(y(i)/=cy(i))print*,"results mismatch:",y,"instead of",cy
-    if(y(i)/=cy(i))info=-1
-    if(y(i)/=cy(i))goto 9996
+    if(y(i) /= cy(i))print*,"results mismatch:",y,"instead of",cy
+    if(y(i) /= cy(i))info=-1
+    if(y(i) /= cy(i))goto 9996
   enddo
 9996 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_spfree(a,desc_a,info)
-  if (info /= 0)goto 9997
+  if (info /= psb_success_)goto 9997
 9997 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_cdfree(desc_a,info)
-  if (info /= 0)goto 9998
+  if (info /= psb_success_)goto 9998
 9998 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
 9999 continue
-  if(info /= 0)res=res+1
-  if(res/=0)print*,"on s matrix    2 x    2 blocked   1 x   1 usmv alpha= 1 beta= 0 incx=1 incy=1 trans=c is not ok"
-  if(res==0)print*,"on s matrix    2 x    2 blocked   1 x   1 usmv alpha= 1 beta= 0 incx=1 incy=1 trans=c is ok"
+  if(info /= psb_success_)res=res+1
+  if(res /= 0)print*,"on s matrix    2 x    2 blocked   1 x   1 usmv alpha= 1 beta= 0 incx=1 incy=1 trans=c is not ok"
+  if(res == 0)print*,"on s matrix    2 x    2 blocked   1 x   1 usmv alpha= 1 beta= 0 incx=1 incy=1 trans=c is ok"
 end subroutine s_usmv_2_c_ap1_bm0_ix1_iy1
 ! 
 
@@ -952,14 +952,14 @@ subroutine s_usmv_2_n_am1_bp1_ix1_iy1(res,afmt,ictxt)
   endif
   call psb_barrier(ictxt)
   call psb_cdall(ictxt,desc_a,info,nl=m)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spall(a,desc_a,info,nnz=nnz)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_barrier(ictxt)
   call psb_spins(nnz,IA,JA,VA,a,desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_cdasb(desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spasb(a,desc_a,info,dupl=psb_dupl_err_,afmt=afmt)
   if(info.ne.0)print *,"matrix assembly failed"
   if(info.ne.0)goto 9996
@@ -968,24 +968,24 @@ subroutine s_usmv_2_n_am1_bp1_ix1_iy1(res,afmt,ictxt)
   if(info.ne.0)print *,"psb_spmm failed"
   if(info.ne.0)goto 9996
   do i=1,2
-    if(y(i)/=cy(i))print*,"results mismatch:",y,"instead of",cy
-    if(y(i)/=cy(i))info=-1
-    if(y(i)/=cy(i))goto 9996
+    if(y(i) /= cy(i))print*,"results mismatch:",y,"instead of",cy
+    if(y(i) /= cy(i))info=-1
+    if(y(i) /= cy(i))goto 9996
   enddo
 9996 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_spfree(a,desc_a,info)
-  if (info /= 0)goto 9997
+  if (info /= psb_success_)goto 9997
 9997 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_cdfree(desc_a,info)
-  if (info /= 0)goto 9998
+  if (info /= psb_success_)goto 9998
 9998 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
 9999 continue
-  if(info /= 0)res=res+1
-  if(res/=0)print*,"on s matrix    2 x    2 blocked   1 x   1 usmv alpha=-1 beta= 1 incx=1 incy=1 trans=n is not ok"
-  if(res==0)print*,"on s matrix    2 x    2 blocked   1 x   1 usmv alpha=-1 beta= 1 incx=1 incy=1 trans=n is ok"
+  if(info /= psb_success_)res=res+1
+  if(res /= 0)print*,"on s matrix    2 x    2 blocked   1 x   1 usmv alpha=-1 beta= 1 incx=1 incy=1 trans=n is not ok"
+  if(res == 0)print*,"on s matrix    2 x    2 blocked   1 x   1 usmv alpha=-1 beta= 1 incx=1 incy=1 trans=n is ok"
 end subroutine s_usmv_2_n_am1_bp1_ix1_iy1
 ! 
 
@@ -1028,14 +1028,14 @@ subroutine s_usmv_2_t_am1_bp1_ix1_iy1(res,afmt,ictxt)
   endif
   call psb_barrier(ictxt)
   call psb_cdall(ictxt,desc_a,info,nl=m)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spall(a,desc_a,info,nnz=nnz)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_barrier(ictxt)
   call psb_spins(nnz,IA,JA,VA,a,desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_cdasb(desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spasb(a,desc_a,info,dupl=psb_dupl_err_,afmt=afmt)
   if(info.ne.0)print *,"matrix assembly failed"
   if(info.ne.0)goto 9996
@@ -1044,24 +1044,24 @@ subroutine s_usmv_2_t_am1_bp1_ix1_iy1(res,afmt,ictxt)
   if(info.ne.0)print *,"psb_spmm failed"
   if(info.ne.0)goto 9996
   do i=1,2
-    if(y(i)/=cy(i))print*,"results mismatch:",y,"instead of",cy
-    if(y(i)/=cy(i))info=-1
-    if(y(i)/=cy(i))goto 9996
+    if(y(i) /= cy(i))print*,"results mismatch:",y,"instead of",cy
+    if(y(i) /= cy(i))info=-1
+    if(y(i) /= cy(i))goto 9996
   enddo
 9996 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_spfree(a,desc_a,info)
-  if (info /= 0)goto 9997
+  if (info /= psb_success_)goto 9997
 9997 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_cdfree(desc_a,info)
-  if (info /= 0)goto 9998
+  if (info /= psb_success_)goto 9998
 9998 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
 9999 continue
-  if(info /= 0)res=res+1
-  if(res/=0)print*,"on s matrix    2 x    2 blocked   1 x   1 usmv alpha=-1 beta= 1 incx=1 incy=1 trans=t is not ok"
-  if(res==0)print*,"on s matrix    2 x    2 blocked   1 x   1 usmv alpha=-1 beta= 1 incx=1 incy=1 trans=t is ok"
+  if(info /= psb_success_)res=res+1
+  if(res /= 0)print*,"on s matrix    2 x    2 blocked   1 x   1 usmv alpha=-1 beta= 1 incx=1 incy=1 trans=t is not ok"
+  if(res == 0)print*,"on s matrix    2 x    2 blocked   1 x   1 usmv alpha=-1 beta= 1 incx=1 incy=1 trans=t is ok"
 end subroutine s_usmv_2_t_am1_bp1_ix1_iy1
 ! 
 
@@ -1104,14 +1104,14 @@ subroutine s_usmv_2_c_am1_bp1_ix1_iy1(res,afmt,ictxt)
   endif
   call psb_barrier(ictxt)
   call psb_cdall(ictxt,desc_a,info,nl=m)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spall(a,desc_a,info,nnz=nnz)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_barrier(ictxt)
   call psb_spins(nnz,IA,JA,VA,a,desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_cdasb(desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spasb(a,desc_a,info,dupl=psb_dupl_err_,afmt=afmt)
   if(info.ne.0)print *,"matrix assembly failed"
   if(info.ne.0)goto 9996
@@ -1120,24 +1120,24 @@ subroutine s_usmv_2_c_am1_bp1_ix1_iy1(res,afmt,ictxt)
   if(info.ne.0)print *,"psb_spmm failed"
   if(info.ne.0)goto 9996
   do i=1,2
-    if(y(i)/=cy(i))print*,"results mismatch:",y,"instead of",cy
-    if(y(i)/=cy(i))info=-1
-    if(y(i)/=cy(i))goto 9996
+    if(y(i) /= cy(i))print*,"results mismatch:",y,"instead of",cy
+    if(y(i) /= cy(i))info=-1
+    if(y(i) /= cy(i))goto 9996
   enddo
 9996 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_spfree(a,desc_a,info)
-  if (info /= 0)goto 9997
+  if (info /= psb_success_)goto 9997
 9997 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_cdfree(desc_a,info)
-  if (info /= 0)goto 9998
+  if (info /= psb_success_)goto 9998
 9998 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
 9999 continue
-  if(info /= 0)res=res+1
-  if(res/=0)print*,"on s matrix    2 x    2 blocked   1 x   1 usmv alpha=-1 beta= 1 incx=1 incy=1 trans=c is not ok"
-  if(res==0)print*,"on s matrix    2 x    2 blocked   1 x   1 usmv alpha=-1 beta= 1 incx=1 incy=1 trans=c is ok"
+  if(info /= psb_success_)res=res+1
+  if(res /= 0)print*,"on s matrix    2 x    2 blocked   1 x   1 usmv alpha=-1 beta= 1 incx=1 incy=1 trans=c is not ok"
+  if(res == 0)print*,"on s matrix    2 x    2 blocked   1 x   1 usmv alpha=-1 beta= 1 incx=1 incy=1 trans=c is ok"
 end subroutine s_usmv_2_c_am1_bp1_ix1_iy1
 ! 
 
@@ -1180,14 +1180,14 @@ subroutine s_usmv_2_n_am1_bm0_ix1_iy1(res,afmt,ictxt)
   endif
   call psb_barrier(ictxt)
   call psb_cdall(ictxt,desc_a,info,nl=m)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spall(a,desc_a,info,nnz=nnz)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_barrier(ictxt)
   call psb_spins(nnz,IA,JA,VA,a,desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_cdasb(desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spasb(a,desc_a,info,dupl=psb_dupl_err_,afmt=afmt)
   if(info.ne.0)print *,"matrix assembly failed"
   if(info.ne.0)goto 9996
@@ -1196,24 +1196,24 @@ subroutine s_usmv_2_n_am1_bm0_ix1_iy1(res,afmt,ictxt)
   if(info.ne.0)print *,"psb_spmm failed"
   if(info.ne.0)goto 9996
   do i=1,2
-    if(y(i)/=cy(i))print*,"results mismatch:",y,"instead of",cy
-    if(y(i)/=cy(i))info=-1
-    if(y(i)/=cy(i))goto 9996
+    if(y(i) /= cy(i))print*,"results mismatch:",y,"instead of",cy
+    if(y(i) /= cy(i))info=-1
+    if(y(i) /= cy(i))goto 9996
   enddo
 9996 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_spfree(a,desc_a,info)
-  if (info /= 0)goto 9997
+  if (info /= psb_success_)goto 9997
 9997 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_cdfree(desc_a,info)
-  if (info /= 0)goto 9998
+  if (info /= psb_success_)goto 9998
 9998 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
 9999 continue
-  if(info /= 0)res=res+1
-  if(res/=0)print*,"on s matrix    2 x    2 blocked   1 x   1 usmv alpha=-1 beta= 0 incx=1 incy=1 trans=n is not ok"
-  if(res==0)print*,"on s matrix    2 x    2 blocked   1 x   1 usmv alpha=-1 beta= 0 incx=1 incy=1 trans=n is ok"
+  if(info /= psb_success_)res=res+1
+  if(res /= 0)print*,"on s matrix    2 x    2 blocked   1 x   1 usmv alpha=-1 beta= 0 incx=1 incy=1 trans=n is not ok"
+  if(res == 0)print*,"on s matrix    2 x    2 blocked   1 x   1 usmv alpha=-1 beta= 0 incx=1 incy=1 trans=n is ok"
 end subroutine s_usmv_2_n_am1_bm0_ix1_iy1
 ! 
 
@@ -1256,14 +1256,14 @@ subroutine s_usmv_2_t_am1_bm0_ix1_iy1(res,afmt,ictxt)
   endif
   call psb_barrier(ictxt)
   call psb_cdall(ictxt,desc_a,info,nl=m)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spall(a,desc_a,info,nnz=nnz)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_barrier(ictxt)
   call psb_spins(nnz,IA,JA,VA,a,desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_cdasb(desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spasb(a,desc_a,info,dupl=psb_dupl_err_,afmt=afmt)
   if(info.ne.0)print *,"matrix assembly failed"
   if(info.ne.0)goto 9996
@@ -1272,24 +1272,24 @@ subroutine s_usmv_2_t_am1_bm0_ix1_iy1(res,afmt,ictxt)
   if(info.ne.0)print *,"psb_spmm failed"
   if(info.ne.0)goto 9996
   do i=1,2
-    if(y(i)/=cy(i))print*,"results mismatch:",y,"instead of",cy
-    if(y(i)/=cy(i))info=-1
-    if(y(i)/=cy(i))goto 9996
+    if(y(i) /= cy(i))print*,"results mismatch:",y,"instead of",cy
+    if(y(i) /= cy(i))info=-1
+    if(y(i) /= cy(i))goto 9996
   enddo
 9996 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_spfree(a,desc_a,info)
-  if (info /= 0)goto 9997
+  if (info /= psb_success_)goto 9997
 9997 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_cdfree(desc_a,info)
-  if (info /= 0)goto 9998
+  if (info /= psb_success_)goto 9998
 9998 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
 9999 continue
-  if(info /= 0)res=res+1
-  if(res/=0)print*,"on s matrix    2 x    2 blocked   1 x   1 usmv alpha=-1 beta= 0 incx=1 incy=1 trans=t is not ok"
-  if(res==0)print*,"on s matrix    2 x    2 blocked   1 x   1 usmv alpha=-1 beta= 0 incx=1 incy=1 trans=t is ok"
+  if(info /= psb_success_)res=res+1
+  if(res /= 0)print*,"on s matrix    2 x    2 blocked   1 x   1 usmv alpha=-1 beta= 0 incx=1 incy=1 trans=t is not ok"
+  if(res == 0)print*,"on s matrix    2 x    2 blocked   1 x   1 usmv alpha=-1 beta= 0 incx=1 incy=1 trans=t is ok"
 end subroutine s_usmv_2_t_am1_bm0_ix1_iy1
 ! 
 
@@ -1332,14 +1332,14 @@ subroutine s_usmv_2_c_am1_bm0_ix1_iy1(res,afmt,ictxt)
   endif
   call psb_barrier(ictxt)
   call psb_cdall(ictxt,desc_a,info,nl=m)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spall(a,desc_a,info,nnz=nnz)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_barrier(ictxt)
   call psb_spins(nnz,IA,JA,VA,a,desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_cdasb(desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spasb(a,desc_a,info,dupl=psb_dupl_err_,afmt=afmt)
   if(info.ne.0)print *,"matrix assembly failed"
   if(info.ne.0)goto 9996
@@ -1348,24 +1348,24 @@ subroutine s_usmv_2_c_am1_bm0_ix1_iy1(res,afmt,ictxt)
   if(info.ne.0)print *,"psb_spmm failed"
   if(info.ne.0)goto 9996
   do i=1,2
-    if(y(i)/=cy(i))print*,"results mismatch:",y,"instead of",cy
-    if(y(i)/=cy(i))info=-1
-    if(y(i)/=cy(i))goto 9996
+    if(y(i) /= cy(i))print*,"results mismatch:",y,"instead of",cy
+    if(y(i) /= cy(i))info=-1
+    if(y(i) /= cy(i))goto 9996
   enddo
 9996 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_spfree(a,desc_a,info)
-  if (info /= 0)goto 9997
+  if (info /= psb_success_)goto 9997
 9997 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_cdfree(desc_a,info)
-  if (info /= 0)goto 9998
+  if (info /= psb_success_)goto 9998
 9998 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
 9999 continue
-  if(info /= 0)res=res+1
-  if(res/=0)print*,"on s matrix    2 x    2 blocked   1 x   1 usmv alpha=-1 beta= 0 incx=1 incy=1 trans=c is not ok"
-  if(res==0)print*,"on s matrix    2 x    2 blocked   1 x   1 usmv alpha=-1 beta= 0 incx=1 incy=1 trans=c is ok"
+  if(info /= psb_success_)res=res+1
+  if(res /= 0)print*,"on s matrix    2 x    2 blocked   1 x   1 usmv alpha=-1 beta= 0 incx=1 incy=1 trans=c is not ok"
+  if(res == 0)print*,"on s matrix    2 x    2 blocked   1 x   1 usmv alpha=-1 beta= 0 incx=1 incy=1 trans=c is ok"
 end subroutine s_usmv_2_c_am1_bm0_ix1_iy1
 ! 
 
@@ -1408,14 +1408,14 @@ subroutine s_usmv_2_n_am3_bp1_ix1_iy1(res,afmt,ictxt)
   endif
   call psb_barrier(ictxt)
   call psb_cdall(ictxt,desc_a,info,nl=m)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spall(a,desc_a,info,nnz=nnz)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_barrier(ictxt)
   call psb_spins(nnz,IA,JA,VA,a,desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_cdasb(desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spasb(a,desc_a,info,dupl=psb_dupl_err_,afmt=afmt)
   if(info.ne.0)print *,"matrix assembly failed"
   if(info.ne.0)goto 9996
@@ -1424,24 +1424,24 @@ subroutine s_usmv_2_n_am3_bp1_ix1_iy1(res,afmt,ictxt)
   if(info.ne.0)print *,"psb_spmm failed"
   if(info.ne.0)goto 9996
   do i=1,2
-    if(y(i)/=cy(i))print*,"results mismatch:",y,"instead of",cy
-    if(y(i)/=cy(i))info=-1
-    if(y(i)/=cy(i))goto 9996
+    if(y(i) /= cy(i))print*,"results mismatch:",y,"instead of",cy
+    if(y(i) /= cy(i))info=-1
+    if(y(i) /= cy(i))goto 9996
   enddo
 9996 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_spfree(a,desc_a,info)
-  if (info /= 0)goto 9997
+  if (info /= psb_success_)goto 9997
 9997 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_cdfree(desc_a,info)
-  if (info /= 0)goto 9998
+  if (info /= psb_success_)goto 9998
 9998 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
 9999 continue
-  if(info /= 0)res=res+1
-  if(res/=0)print*,"on s matrix    2 x    2 blocked   1 x   1 usmv alpha=-3 beta= 1 incx=1 incy=1 trans=n is not ok"
-  if(res==0)print*,"on s matrix    2 x    2 blocked   1 x   1 usmv alpha=-3 beta= 1 incx=1 incy=1 trans=n is ok"
+  if(info /= psb_success_)res=res+1
+  if(res /= 0)print*,"on s matrix    2 x    2 blocked   1 x   1 usmv alpha=-3 beta= 1 incx=1 incy=1 trans=n is not ok"
+  if(res == 0)print*,"on s matrix    2 x    2 blocked   1 x   1 usmv alpha=-3 beta= 1 incx=1 incy=1 trans=n is ok"
 end subroutine s_usmv_2_n_am3_bp1_ix1_iy1
 ! 
 
@@ -1484,14 +1484,14 @@ subroutine s_usmv_2_t_am3_bp1_ix1_iy1(res,afmt,ictxt)
   endif
   call psb_barrier(ictxt)
   call psb_cdall(ictxt,desc_a,info,nl=m)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spall(a,desc_a,info,nnz=nnz)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_barrier(ictxt)
   call psb_spins(nnz,IA,JA,VA,a,desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_cdasb(desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spasb(a,desc_a,info,dupl=psb_dupl_err_,afmt=afmt)
   if(info.ne.0)print *,"matrix assembly failed"
   if(info.ne.0)goto 9996
@@ -1500,24 +1500,24 @@ subroutine s_usmv_2_t_am3_bp1_ix1_iy1(res,afmt,ictxt)
   if(info.ne.0)print *,"psb_spmm failed"
   if(info.ne.0)goto 9996
   do i=1,2
-    if(y(i)/=cy(i))print*,"results mismatch:",y,"instead of",cy
-    if(y(i)/=cy(i))info=-1
-    if(y(i)/=cy(i))goto 9996
+    if(y(i) /= cy(i))print*,"results mismatch:",y,"instead of",cy
+    if(y(i) /= cy(i))info=-1
+    if(y(i) /= cy(i))goto 9996
   enddo
 9996 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_spfree(a,desc_a,info)
-  if (info /= 0)goto 9997
+  if (info /= psb_success_)goto 9997
 9997 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_cdfree(desc_a,info)
-  if (info /= 0)goto 9998
+  if (info /= psb_success_)goto 9998
 9998 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
 9999 continue
-  if(info /= 0)res=res+1
-  if(res/=0)print*,"on s matrix    2 x    2 blocked   1 x   1 usmv alpha=-3 beta= 1 incx=1 incy=1 trans=t is not ok"
-  if(res==0)print*,"on s matrix    2 x    2 blocked   1 x   1 usmv alpha=-3 beta= 1 incx=1 incy=1 trans=t is ok"
+  if(info /= psb_success_)res=res+1
+  if(res /= 0)print*,"on s matrix    2 x    2 blocked   1 x   1 usmv alpha=-3 beta= 1 incx=1 incy=1 trans=t is not ok"
+  if(res == 0)print*,"on s matrix    2 x    2 blocked   1 x   1 usmv alpha=-3 beta= 1 incx=1 incy=1 trans=t is ok"
 end subroutine s_usmv_2_t_am3_bp1_ix1_iy1
 ! 
 
@@ -1560,14 +1560,14 @@ subroutine s_usmv_2_c_am3_bp1_ix1_iy1(res,afmt,ictxt)
   endif
   call psb_barrier(ictxt)
   call psb_cdall(ictxt,desc_a,info,nl=m)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spall(a,desc_a,info,nnz=nnz)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_barrier(ictxt)
   call psb_spins(nnz,IA,JA,VA,a,desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_cdasb(desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spasb(a,desc_a,info,dupl=psb_dupl_err_,afmt=afmt)
   if(info.ne.0)print *,"matrix assembly failed"
   if(info.ne.0)goto 9996
@@ -1576,24 +1576,24 @@ subroutine s_usmv_2_c_am3_bp1_ix1_iy1(res,afmt,ictxt)
   if(info.ne.0)print *,"psb_spmm failed"
   if(info.ne.0)goto 9996
   do i=1,2
-    if(y(i)/=cy(i))print*,"results mismatch:",y,"instead of",cy
-    if(y(i)/=cy(i))info=-1
-    if(y(i)/=cy(i))goto 9996
+    if(y(i) /= cy(i))print*,"results mismatch:",y,"instead of",cy
+    if(y(i) /= cy(i))info=-1
+    if(y(i) /= cy(i))goto 9996
   enddo
 9996 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_spfree(a,desc_a,info)
-  if (info /= 0)goto 9997
+  if (info /= psb_success_)goto 9997
 9997 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_cdfree(desc_a,info)
-  if (info /= 0)goto 9998
+  if (info /= psb_success_)goto 9998
 9998 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
 9999 continue
-  if(info /= 0)res=res+1
-  if(res/=0)print*,"on s matrix    2 x    2 blocked   1 x   1 usmv alpha=-3 beta= 1 incx=1 incy=1 trans=c is not ok"
-  if(res==0)print*,"on s matrix    2 x    2 blocked   1 x   1 usmv alpha=-3 beta= 1 incx=1 incy=1 trans=c is ok"
+  if(info /= psb_success_)res=res+1
+  if(res /= 0)print*,"on s matrix    2 x    2 blocked   1 x   1 usmv alpha=-3 beta= 1 incx=1 incy=1 trans=c is not ok"
+  if(res == 0)print*,"on s matrix    2 x    2 blocked   1 x   1 usmv alpha=-3 beta= 1 incx=1 incy=1 trans=c is ok"
 end subroutine s_usmv_2_c_am3_bp1_ix1_iy1
 ! 
 
@@ -1636,14 +1636,14 @@ subroutine s_usmv_2_n_am3_bm0_ix1_iy1(res,afmt,ictxt)
   endif
   call psb_barrier(ictxt)
   call psb_cdall(ictxt,desc_a,info,nl=m)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spall(a,desc_a,info,nnz=nnz)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_barrier(ictxt)
   call psb_spins(nnz,IA,JA,VA,a,desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_cdasb(desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spasb(a,desc_a,info,dupl=psb_dupl_err_,afmt=afmt)
   if(info.ne.0)print *,"matrix assembly failed"
   if(info.ne.0)goto 9996
@@ -1652,24 +1652,24 @@ subroutine s_usmv_2_n_am3_bm0_ix1_iy1(res,afmt,ictxt)
   if(info.ne.0)print *,"psb_spmm failed"
   if(info.ne.0)goto 9996
   do i=1,2
-    if(y(i)/=cy(i))print*,"results mismatch:",y,"instead of",cy
-    if(y(i)/=cy(i))info=-1
-    if(y(i)/=cy(i))goto 9996
+    if(y(i) /= cy(i))print*,"results mismatch:",y,"instead of",cy
+    if(y(i) /= cy(i))info=-1
+    if(y(i) /= cy(i))goto 9996
   enddo
 9996 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_spfree(a,desc_a,info)
-  if (info /= 0)goto 9997
+  if (info /= psb_success_)goto 9997
 9997 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_cdfree(desc_a,info)
-  if (info /= 0)goto 9998
+  if (info /= psb_success_)goto 9998
 9998 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
 9999 continue
-  if(info /= 0)res=res+1
-  if(res/=0)print*,"on s matrix    2 x    2 blocked   1 x   1 usmv alpha=-3 beta= 0 incx=1 incy=1 trans=n is not ok"
-  if(res==0)print*,"on s matrix    2 x    2 blocked   1 x   1 usmv alpha=-3 beta= 0 incx=1 incy=1 trans=n is ok"
+  if(info /= psb_success_)res=res+1
+  if(res /= 0)print*,"on s matrix    2 x    2 blocked   1 x   1 usmv alpha=-3 beta= 0 incx=1 incy=1 trans=n is not ok"
+  if(res == 0)print*,"on s matrix    2 x    2 blocked   1 x   1 usmv alpha=-3 beta= 0 incx=1 incy=1 trans=n is ok"
 end subroutine s_usmv_2_n_am3_bm0_ix1_iy1
 ! 
 
@@ -1712,14 +1712,14 @@ subroutine s_usmv_2_t_am3_bm0_ix1_iy1(res,afmt,ictxt)
   endif
   call psb_barrier(ictxt)
   call psb_cdall(ictxt,desc_a,info,nl=m)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spall(a,desc_a,info,nnz=nnz)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_barrier(ictxt)
   call psb_spins(nnz,IA,JA,VA,a,desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_cdasb(desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spasb(a,desc_a,info,dupl=psb_dupl_err_,afmt=afmt)
   if(info.ne.0)print *,"matrix assembly failed"
   if(info.ne.0)goto 9996
@@ -1728,24 +1728,24 @@ subroutine s_usmv_2_t_am3_bm0_ix1_iy1(res,afmt,ictxt)
   if(info.ne.0)print *,"psb_spmm failed"
   if(info.ne.0)goto 9996
   do i=1,2
-    if(y(i)/=cy(i))print*,"results mismatch:",y,"instead of",cy
-    if(y(i)/=cy(i))info=-1
-    if(y(i)/=cy(i))goto 9996
+    if(y(i) /= cy(i))print*,"results mismatch:",y,"instead of",cy
+    if(y(i) /= cy(i))info=-1
+    if(y(i) /= cy(i))goto 9996
   enddo
 9996 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_spfree(a,desc_a,info)
-  if (info /= 0)goto 9997
+  if (info /= psb_success_)goto 9997
 9997 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_cdfree(desc_a,info)
-  if (info /= 0)goto 9998
+  if (info /= psb_success_)goto 9998
 9998 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
 9999 continue
-  if(info /= 0)res=res+1
-  if(res/=0)print*,"on s matrix    2 x    2 blocked   1 x   1 usmv alpha=-3 beta= 0 incx=1 incy=1 trans=t is not ok"
-  if(res==0)print*,"on s matrix    2 x    2 blocked   1 x   1 usmv alpha=-3 beta= 0 incx=1 incy=1 trans=t is ok"
+  if(info /= psb_success_)res=res+1
+  if(res /= 0)print*,"on s matrix    2 x    2 blocked   1 x   1 usmv alpha=-3 beta= 0 incx=1 incy=1 trans=t is not ok"
+  if(res == 0)print*,"on s matrix    2 x    2 blocked   1 x   1 usmv alpha=-3 beta= 0 incx=1 incy=1 trans=t is ok"
 end subroutine s_usmv_2_t_am3_bm0_ix1_iy1
 ! 
 
@@ -1788,14 +1788,14 @@ subroutine s_usmv_2_c_am3_bm0_ix1_iy1(res,afmt,ictxt)
   endif
   call psb_barrier(ictxt)
   call psb_cdall(ictxt,desc_a,info,nl=m)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spall(a,desc_a,info,nnz=nnz)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_barrier(ictxt)
   call psb_spins(nnz,IA,JA,VA,a,desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_cdasb(desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spasb(a,desc_a,info,dupl=psb_dupl_err_,afmt=afmt)
   if(info.ne.0)print *,"matrix assembly failed"
   if(info.ne.0)goto 9996
@@ -1804,24 +1804,24 @@ subroutine s_usmv_2_c_am3_bm0_ix1_iy1(res,afmt,ictxt)
   if(info.ne.0)print *,"psb_spmm failed"
   if(info.ne.0)goto 9996
   do i=1,2
-    if(y(i)/=cy(i))print*,"results mismatch:",y,"instead of",cy
-    if(y(i)/=cy(i))info=-1
-    if(y(i)/=cy(i))goto 9996
+    if(y(i) /= cy(i))print*,"results mismatch:",y,"instead of",cy
+    if(y(i) /= cy(i))info=-1
+    if(y(i) /= cy(i))goto 9996
   enddo
 9996 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_spfree(a,desc_a,info)
-  if (info /= 0)goto 9997
+  if (info /= psb_success_)goto 9997
 9997 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_cdfree(desc_a,info)
-  if (info /= 0)goto 9998
+  if (info /= psb_success_)goto 9998
 9998 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
 9999 continue
-  if(info /= 0)res=res+1
-  if(res/=0)print*,"on s matrix    2 x    2 blocked   1 x   1 usmv alpha=-3 beta= 0 incx=1 incy=1 trans=c is not ok"
-  if(res==0)print*,"on s matrix    2 x    2 blocked   1 x   1 usmv alpha=-3 beta= 0 incx=1 incy=1 trans=c is ok"
+  if(info /= psb_success_)res=res+1
+  if(res /= 0)print*,"on s matrix    2 x    2 blocked   1 x   1 usmv alpha=-3 beta= 0 incx=1 incy=1 trans=c is not ok"
+  if(res == 0)print*,"on s matrix    2 x    2 blocked   1 x   1 usmv alpha=-3 beta= 0 incx=1 incy=1 trans=c is ok"
 end subroutine s_usmv_2_c_am3_bm0_ix1_iy1
 ! 
 
@@ -1863,17 +1863,17 @@ subroutine s_ussv_2_n_ap3_bm0_ix1_iy1(res,afmt,ictxt)
   endif
   call psb_barrier(ictxt)
   call psb_cdall(ictxt,desc_a,info,nl=m)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spall(a,desc_a,info,nnz=nnz)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call a%set_triangle()
   call a%set_lower()
   call a%set_unit(.false.)
   call psb_barrier(ictxt)
   call psb_spins(nnz,IA,JA,VA,a,desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_cdasb(desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spasb(a,desc_a,info,dupl=psb_dupl_err_,afmt=afmt)
   if(info.ne.0)print *,"matrix assembly failed"
   if(info.ne.0)goto 9996
@@ -1882,24 +1882,24 @@ subroutine s_ussv_2_n_ap3_bm0_ix1_iy1(res,afmt,ictxt)
   if(info.ne.0)print *,"psb_spsm failed"
   if(info.ne.0)goto 9996
   do i=1,2
-    if(y(i)/=cy(i))print*,"results mismatch:",y,"instead of",cy
-    if(y(i)/=cy(i))info=-1
-    if(y(i)/=cy(i))goto 9996
+    if(y(i) /= cy(i))print*,"results mismatch:",y,"instead of",cy
+    if(y(i) /= cy(i))info=-1
+    if(y(i) /= cy(i))goto 9996
   enddo
 9996 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_spfree(a,desc_a,info)
-  if (info /= 0)goto 9997
+  if (info /= psb_success_)goto 9997
 9997 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_cdfree(desc_a,info)
-  if (info /= 0)goto 9998
+  if (info /= psb_success_)goto 9998
 9998 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
 9999 continue
-  if(info /= 0)res=res+1
-  if(res/=0)print*,"on s matrix    2 x    2 blocked   1 x   1 ussv alpha= 3 beta= 0 incx=1 incy=1 trans=n is not ok"
-  if(res==0)print*,"on s matrix    2 x    2 blocked   1 x   1 ussv alpha= 3 beta= 0 incx=1 incy=1 trans=n is ok"
+  if(info /= psb_success_)res=res+1
+  if(res /= 0)print*,"on s matrix    2 x    2 blocked   1 x   1 ussv alpha= 3 beta= 0 incx=1 incy=1 trans=n is not ok"
+  if(res == 0)print*,"on s matrix    2 x    2 blocked   1 x   1 ussv alpha= 3 beta= 0 incx=1 incy=1 trans=n is ok"
 end subroutine s_ussv_2_n_ap3_bm0_ix1_iy1
 ! 
 
@@ -1941,18 +1941,18 @@ subroutine s_ussv_2_t_ap3_bm0_ix1_iy1(res,afmt,ictxt)
   endif
   call psb_barrier(ictxt)
   call psb_cdall(ictxt,desc_a,info,nl=m)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spall(a,desc_a,info,nnz=nnz)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call a%set_triangle()
   call a%set_lower()
   call a%set_unit(.false.)
 
   call psb_barrier(ictxt)
   call psb_spins(nnz,IA,JA,VA,a,desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_cdasb(desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spasb(a,desc_a,info,dupl=psb_dupl_err_,afmt=afmt)
   if(info.ne.0)print *,"matrix assembly failed"
   if(info.ne.0)goto 9996
@@ -1961,24 +1961,24 @@ subroutine s_ussv_2_t_ap3_bm0_ix1_iy1(res,afmt,ictxt)
   if(info.ne.0)print *,"psb_spsm failed"
   if(info.ne.0)goto 9996
   do i=1,2
-    if(y(i)/=cy(i))print*,"results mismatch:",y,"instead of",cy
-    if(y(i)/=cy(i))info=-1
-    if(y(i)/=cy(i))goto 9996
+    if(y(i) /= cy(i))print*,"results mismatch:",y,"instead of",cy
+    if(y(i) /= cy(i))info=-1
+    if(y(i) /= cy(i))goto 9996
   enddo
 9996 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_spfree(a,desc_a,info)
-  if (info /= 0)goto 9997
+  if (info /= psb_success_)goto 9997
 9997 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_cdfree(desc_a,info)
-  if (info /= 0)goto 9998
+  if (info /= psb_success_)goto 9998
 9998 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
 9999 continue
-  if(info /= 0)res=res+1
-  if(res/=0)print*,"on s matrix    2 x    2 blocked   1 x   1 ussv alpha= 3 beta= 0 incx=1 incy=1 trans=t is not ok"
-  if(res==0)print*,"on s matrix    2 x    2 blocked   1 x   1 ussv alpha= 3 beta= 0 incx=1 incy=1 trans=t is ok"
+  if(info /= psb_success_)res=res+1
+  if(res /= 0)print*,"on s matrix    2 x    2 blocked   1 x   1 ussv alpha= 3 beta= 0 incx=1 incy=1 trans=t is not ok"
+  if(res == 0)print*,"on s matrix    2 x    2 blocked   1 x   1 ussv alpha= 3 beta= 0 incx=1 incy=1 trans=t is ok"
 end subroutine s_ussv_2_t_ap3_bm0_ix1_iy1
 ! 
 
@@ -2020,18 +2020,18 @@ subroutine s_ussv_2_c_ap3_bm0_ix1_iy1(res,afmt,ictxt)
   endif
   call psb_barrier(ictxt)
   call psb_cdall(ictxt,desc_a,info,nl=m)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spall(a,desc_a,info,nnz=nnz)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call a%set_triangle()
   call a%set_lower()
   call a%set_unit(.false.)
 
   call psb_barrier(ictxt)
   call psb_spins(nnz,IA,JA,VA,a,desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_cdasb(desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spasb(a,desc_a,info,dupl=psb_dupl_err_,afmt=afmt)
   if(info.ne.0)print *,"matrix assembly failed"
   if(info.ne.0)goto 9996
@@ -2040,24 +2040,24 @@ subroutine s_ussv_2_c_ap3_bm0_ix1_iy1(res,afmt,ictxt)
   if(info.ne.0)print *,"psb_spsm failed"
   if(info.ne.0)goto 9996
   do i=1,2
-    if(y(i)/=cy(i))print*,i,"results mismatch:",y,"instead of",cy
-    if(y(i)/=cy(i))info=-1
-    if(y(i)/=cy(i))goto 9996
+    if(y(i) /= cy(i))print*,i,"results mismatch:",y,"instead of",cy
+    if(y(i) /= cy(i))info=-1
+    if(y(i) /= cy(i))goto 9996
   enddo
 9996 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_spfree(a,desc_a,info)
-  if (info /= 0)goto 9997
+  if (info /= psb_success_)goto 9997
 9997 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_cdfree(desc_a,info)
-  if (info /= 0)goto 9998
+  if (info /= psb_success_)goto 9998
 9998 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
 9999 continue
-  if(info /= 0)res=res+1
-  if(res/=0)print*,"on s matrix    2 x    2 blocked   1 x   1 ussv alpha= 3 beta= 0 incx=1 incy=1 trans=c is not ok"
-  if(res==0)print*,"on s matrix    2 x    2 blocked   1 x   1 ussv alpha= 3 beta= 0 incx=1 incy=1 trans=c is ok"
+  if(info /= psb_success_)res=res+1
+  if(res /= 0)print*,"on s matrix    2 x    2 blocked   1 x   1 ussv alpha= 3 beta= 0 incx=1 incy=1 trans=c is not ok"
+  if(res == 0)print*,"on s matrix    2 x    2 blocked   1 x   1 ussv alpha= 3 beta= 0 incx=1 incy=1 trans=c is ok"
 end subroutine s_ussv_2_c_ap3_bm0_ix1_iy1
 ! 
 
@@ -2099,18 +2099,18 @@ subroutine s_ussv_2_n_ap1_bm0_ix1_iy1(res,afmt,ictxt)
   endif
   call psb_barrier(ictxt)
   call psb_cdall(ictxt,desc_a,info,nl=m)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spall(a,desc_a,info,nnz=nnz)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call a%set_triangle()
   call a%set_lower()
   call a%set_unit(.false.)
 
   call psb_barrier(ictxt)
   call psb_spins(nnz,IA,JA,VA,a,desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_cdasb(desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spasb(a,desc_a,info,dupl=psb_dupl_err_,afmt=afmt)
   if(info.ne.0)print *,"matrix assembly failed"
   if(info.ne.0)goto 9996
@@ -2119,24 +2119,24 @@ subroutine s_ussv_2_n_ap1_bm0_ix1_iy1(res,afmt,ictxt)
   if(info.ne.0)print *,"psb_spsm failed"
   if(info.ne.0)goto 9996
   do i=1,2
-    if(y(i)/=cy(i))print*,"results mismatch:",y,"instead of",cy
-    if(y(i)/=cy(i))info=-1
-    if(y(i)/=cy(i))goto 9996
+    if(y(i) /= cy(i))print*,"results mismatch:",y,"instead of",cy
+    if(y(i) /= cy(i))info=-1
+    if(y(i) /= cy(i))goto 9996
   enddo
 9996 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_spfree(a,desc_a,info)
-  if (info /= 0)goto 9997
+  if (info /= psb_success_)goto 9997
 9997 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_cdfree(desc_a,info)
-  if (info /= 0)goto 9998
+  if (info /= psb_success_)goto 9998
 9998 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
 9999 continue
-  if(info /= 0)res=res+1
-  if(res/=0)print*,"on s matrix    2 x    2 blocked   1 x   1 ussv alpha= 1 beta= 0 incx=1 incy=1 trans=n is not ok"
-  if(res==0)print*,"on s matrix    2 x    2 blocked   1 x   1 ussv alpha= 1 beta= 0 incx=1 incy=1 trans=n is ok"
+  if(info /= psb_success_)res=res+1
+  if(res /= 0)print*,"on s matrix    2 x    2 blocked   1 x   1 ussv alpha= 1 beta= 0 incx=1 incy=1 trans=n is not ok"
+  if(res == 0)print*,"on s matrix    2 x    2 blocked   1 x   1 ussv alpha= 1 beta= 0 incx=1 incy=1 trans=n is ok"
 end subroutine s_ussv_2_n_ap1_bm0_ix1_iy1
 ! 
 
@@ -2178,18 +2178,18 @@ subroutine s_ussv_2_t_ap1_bm0_ix1_iy1(res,afmt,ictxt)
   endif
   call psb_barrier(ictxt)
   call psb_cdall(ictxt,desc_a,info,nl=m)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spall(a,desc_a,info,nnz=nnz)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call a%set_triangle()
   call a%set_lower()
   call a%set_unit(.false.)
 
   call psb_barrier(ictxt)
   call psb_spins(nnz,IA,JA,VA,a,desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_cdasb(desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spasb(a,desc_a,info,dupl=psb_dupl_err_,afmt=afmt)
   if(info.ne.0)print *,"matrix assembly failed"
   if(info.ne.0)goto 9996
@@ -2198,24 +2198,24 @@ subroutine s_ussv_2_t_ap1_bm0_ix1_iy1(res,afmt,ictxt)
   if(info.ne.0)print *,"psb_spsm failed"
   if(info.ne.0)goto 9996
   do i=1,2
-    if(y(i)/=cy(i))print*,"results mismatch:",y,"instead of",cy
-    if(y(i)/=cy(i))info=-1
-    if(y(i)/=cy(i))goto 9996
+    if(y(i) /= cy(i))print*,"results mismatch:",y,"instead of",cy
+    if(y(i) /= cy(i))info=-1
+    if(y(i) /= cy(i))goto 9996
   enddo
 9996 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_spfree(a,desc_a,info)
-  if (info /= 0)goto 9997
+  if (info /= psb_success_)goto 9997
 9997 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_cdfree(desc_a,info)
-  if (info /= 0)goto 9998
+  if (info /= psb_success_)goto 9998
 9998 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
 9999 continue
-  if(info /= 0)res=res+1
-  if(res/=0)print*,"on s matrix    2 x    2 blocked   1 x   1 ussv alpha= 1 beta= 0 incx=1 incy=1 trans=t is not ok"
-  if(res==0)print*,"on s matrix    2 x    2 blocked   1 x   1 ussv alpha= 1 beta= 0 incx=1 incy=1 trans=t is ok"
+  if(info /= psb_success_)res=res+1
+  if(res /= 0)print*,"on s matrix    2 x    2 blocked   1 x   1 ussv alpha= 1 beta= 0 incx=1 incy=1 trans=t is not ok"
+  if(res == 0)print*,"on s matrix    2 x    2 blocked   1 x   1 ussv alpha= 1 beta= 0 incx=1 incy=1 trans=t is ok"
 end subroutine s_ussv_2_t_ap1_bm0_ix1_iy1
 ! 
 
@@ -2257,18 +2257,18 @@ subroutine s_ussv_2_c_ap1_bm0_ix1_iy1(res,afmt,ictxt)
   endif
   call psb_barrier(ictxt)
   call psb_cdall(ictxt,desc_a,info,nl=m)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spall(a,desc_a,info,nnz=nnz)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call a%set_triangle()
   call a%set_lower()
   call a%set_unit(.false.)
 
   call psb_barrier(ictxt)
   call psb_spins(nnz,IA,JA,VA,a,desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_cdasb(desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spasb(a,desc_a,info,dupl=psb_dupl_err_,afmt=afmt)
   if(info.ne.0)print *,"matrix assembly failed"
   if(info.ne.0)goto 9996
@@ -2277,24 +2277,24 @@ subroutine s_ussv_2_c_ap1_bm0_ix1_iy1(res,afmt,ictxt)
   if(info.ne.0)print *,"psb_spsm failed"
   if(info.ne.0)goto 9996
   do i=1,2
-    if(y(i)/=cy(i))print*,"results mismatch:",y,"instead of",cy
-    if(y(i)/=cy(i))info=-1
-    if(y(i)/=cy(i))goto 9996
+    if(y(i) /= cy(i))print*,"results mismatch:",y,"instead of",cy
+    if(y(i) /= cy(i))info=-1
+    if(y(i) /= cy(i))goto 9996
   enddo
 9996 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_spfree(a,desc_a,info)
-  if (info /= 0)goto 9997
+  if (info /= psb_success_)goto 9997
 9997 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_cdfree(desc_a,info)
-  if (info /= 0)goto 9998
+  if (info /= psb_success_)goto 9998
 9998 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
 9999 continue
-  if(info /= 0)res=res+1
-  if(res/=0)print*,"on s matrix    2 x    2 blocked   1 x   1 ussv alpha= 1 beta= 0 incx=1 incy=1 trans=c is not ok"
-  if(res==0)print*,"on s matrix    2 x    2 blocked   1 x   1 ussv alpha= 1 beta= 0 incx=1 incy=1 trans=c is ok"
+  if(info /= psb_success_)res=res+1
+  if(res /= 0)print*,"on s matrix    2 x    2 blocked   1 x   1 ussv alpha= 1 beta= 0 incx=1 incy=1 trans=c is not ok"
+  if(res == 0)print*,"on s matrix    2 x    2 blocked   1 x   1 ussv alpha= 1 beta= 0 incx=1 incy=1 trans=c is ok"
 end subroutine s_ussv_2_c_ap1_bm0_ix1_iy1
 ! 
 
@@ -2336,18 +2336,18 @@ subroutine s_ussv_2_n_am1_bm0_ix1_iy1(res,afmt,ictxt)
   endif
   call psb_barrier(ictxt)
   call psb_cdall(ictxt,desc_a,info,nl=m)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spall(a,desc_a,info,nnz=nnz)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call a%set_triangle()
   call a%set_lower()
   call a%set_unit(.false.)
 
   call psb_barrier(ictxt)
   call psb_spins(nnz,IA,JA,VA,a,desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_cdasb(desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spasb(a,desc_a,info,dupl=psb_dupl_err_,afmt=afmt)
   if(info.ne.0)print *,"matrix assembly failed"
   if(info.ne.0)goto 9996
@@ -2356,24 +2356,24 @@ subroutine s_ussv_2_n_am1_bm0_ix1_iy1(res,afmt,ictxt)
   if(info.ne.0)print *,"psb_spsm failed"
   if(info.ne.0)goto 9996
   do i=1,2
-    if(y(i)/=cy(i))print*,"results mismatch:",y,"instead of",cy
-    if(y(i)/=cy(i))info=-1
-    if(y(i)/=cy(i))goto 9996
+    if(y(i) /= cy(i))print*,"results mismatch:",y,"instead of",cy
+    if(y(i) /= cy(i))info=-1
+    if(y(i) /= cy(i))goto 9996
   enddo
 9996 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_spfree(a,desc_a,info)
-  if (info /= 0)goto 9997
+  if (info /= psb_success_)goto 9997
 9997 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_cdfree(desc_a,info)
-  if (info /= 0)goto 9998
+  if (info /= psb_success_)goto 9998
 9998 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
 9999 continue
-  if(info /= 0)res=res+1
-  if(res/=0)print*,"on s matrix    2 x    2 blocked   1 x   1 ussv alpha=-1 beta= 0 incx=1 incy=1 trans=n is not ok"
-  if(res==0)print*,"on s matrix    2 x    2 blocked   1 x   1 ussv alpha=-1 beta= 0 incx=1 incy=1 trans=n is ok"
+  if(info /= psb_success_)res=res+1
+  if(res /= 0)print*,"on s matrix    2 x    2 blocked   1 x   1 ussv alpha=-1 beta= 0 incx=1 incy=1 trans=n is not ok"
+  if(res == 0)print*,"on s matrix    2 x    2 blocked   1 x   1 ussv alpha=-1 beta= 0 incx=1 incy=1 trans=n is ok"
 end subroutine s_ussv_2_n_am1_bm0_ix1_iy1
 ! 
 
@@ -2415,18 +2415,18 @@ subroutine s_ussv_2_t_am1_bm0_ix1_iy1(res,afmt,ictxt)
   endif
   call psb_barrier(ictxt)
   call psb_cdall(ictxt,desc_a,info,nl=m)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spall(a,desc_a,info,nnz=nnz)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call a%set_triangle()
   call a%set_lower()
   call a%set_unit(.false.)
 
   call psb_barrier(ictxt)
   call psb_spins(nnz,IA,JA,VA,a,desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_cdasb(desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spasb(a,desc_a,info,dupl=psb_dupl_err_,afmt=afmt)
   if(info.ne.0)print *,"matrix assembly failed"
   if(info.ne.0)goto 9996
@@ -2435,24 +2435,24 @@ subroutine s_ussv_2_t_am1_bm0_ix1_iy1(res,afmt,ictxt)
   if(info.ne.0)print *,"psb_spsm failed"
   if(info.ne.0)goto 9996
   do i=1,2
-    if(y(i)/=cy(i))print*,"results mismatch:",y,"instead of",cy
-    if(y(i)/=cy(i))info=-1
-    if(y(i)/=cy(i))goto 9996
+    if(y(i) /= cy(i))print*,"results mismatch:",y,"instead of",cy
+    if(y(i) /= cy(i))info=-1
+    if(y(i) /= cy(i))goto 9996
   enddo
 9996 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_spfree(a,desc_a,info)
-  if (info /= 0)goto 9997
+  if (info /= psb_success_)goto 9997
 9997 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_cdfree(desc_a,info)
-  if (info /= 0)goto 9998
+  if (info /= psb_success_)goto 9998
 9998 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
 9999 continue
-  if(info /= 0)res=res+1
-  if(res/=0)print*,"on s matrix    2 x    2 blocked   1 x   1 ussv alpha=-1 beta= 0 incx=1 incy=1 trans=t is not ok"
-  if(res==0)print*,"on s matrix    2 x    2 blocked   1 x   1 ussv alpha=-1 beta= 0 incx=1 incy=1 trans=t is ok"
+  if(info /= psb_success_)res=res+1
+  if(res /= 0)print*,"on s matrix    2 x    2 blocked   1 x   1 ussv alpha=-1 beta= 0 incx=1 incy=1 trans=t is not ok"
+  if(res == 0)print*,"on s matrix    2 x    2 blocked   1 x   1 ussv alpha=-1 beta= 0 incx=1 incy=1 trans=t is ok"
 end subroutine s_ussv_2_t_am1_bm0_ix1_iy1
 ! 
 
@@ -2494,18 +2494,18 @@ subroutine s_ussv_2_c_am1_bm0_ix1_iy1(res,afmt,ictxt)
   endif
   call psb_barrier(ictxt)
   call psb_cdall(ictxt,desc_a,info,nl=m)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spall(a,desc_a,info,nnz=nnz)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call a%set_triangle()
   call a%set_lower()
   call a%set_unit(.false.)
 
   call psb_barrier(ictxt)
   call psb_spins(nnz,IA,JA,VA,a,desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_cdasb(desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spasb(a,desc_a,info,dupl=psb_dupl_err_,afmt=afmt)
   if(info.ne.0)print *,"matrix assembly failed"
   if(info.ne.0)goto 9996
@@ -2514,24 +2514,24 @@ subroutine s_ussv_2_c_am1_bm0_ix1_iy1(res,afmt,ictxt)
   if(info.ne.0)print *,"psb_spsm failed"
   if(info.ne.0)goto 9996
   do i=1,2
-    if(y(i)/=cy(i))print*,"results mismatch:",y,"instead of",cy
-    if(y(i)/=cy(i))info=-1
-    if(y(i)/=cy(i))goto 9996
+    if(y(i) /= cy(i))print*,"results mismatch:",y,"instead of",cy
+    if(y(i) /= cy(i))info=-1
+    if(y(i) /= cy(i))goto 9996
   enddo
 9996 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_spfree(a,desc_a,info)
-  if (info /= 0)goto 9997
+  if (info /= psb_success_)goto 9997
 9997 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_cdfree(desc_a,info)
-  if (info /= 0)goto 9998
+  if (info /= psb_success_)goto 9998
 9998 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
 9999 continue
-  if(info /= 0)res=res+1
-  if(res/=0)print*,"on s matrix    2 x    2 blocked   1 x   1 ussv alpha=-1 beta= 0 incx=1 incy=1 trans=c is not ok"
-  if(res==0)print*,"on s matrix    2 x    2 blocked   1 x   1 ussv alpha=-1 beta= 0 incx=1 incy=1 trans=c is ok"
+  if(info /= psb_success_)res=res+1
+  if(res /= 0)print*,"on s matrix    2 x    2 blocked   1 x   1 ussv alpha=-1 beta= 0 incx=1 incy=1 trans=c is not ok"
+  if(res == 0)print*,"on s matrix    2 x    2 blocked   1 x   1 ussv alpha=-1 beta= 0 incx=1 incy=1 trans=c is ok"
 end subroutine s_ussv_2_c_am1_bm0_ix1_iy1
 ! 
 
@@ -2573,18 +2573,18 @@ subroutine s_ussv_2_n_am3_bm0_ix1_iy1(res,afmt,ictxt)
   endif
   call psb_barrier(ictxt)
   call psb_cdall(ictxt,desc_a,info,nl=m)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spall(a,desc_a,info,nnz=nnz)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call a%set_triangle()
   call a%set_lower()
   call a%set_unit(.false.)
 
   call psb_barrier(ictxt)
   call psb_spins(nnz,IA,JA,VA,a,desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_cdasb(desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spasb(a,desc_a,info,dupl=psb_dupl_err_,afmt=afmt)
   if(info.ne.0)print *,"matrix assembly failed"
   if(info.ne.0)goto 9996
@@ -2593,24 +2593,24 @@ subroutine s_ussv_2_n_am3_bm0_ix1_iy1(res,afmt,ictxt)
   if(info.ne.0)print *,"psb_spsm failed"
   if(info.ne.0)goto 9996
   do i=1,2
-    if(y(i)/=cy(i))print*,"results mismatch:",y,"instead of",cy
-    if(y(i)/=cy(i))info=-1
-    if(y(i)/=cy(i))goto 9996
+    if(y(i) /= cy(i))print*,"results mismatch:",y,"instead of",cy
+    if(y(i) /= cy(i))info=-1
+    if(y(i) /= cy(i))goto 9996
   enddo
 9996 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_spfree(a,desc_a,info)
-  if (info /= 0)goto 9997
+  if (info /= psb_success_)goto 9997
 9997 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_cdfree(desc_a,info)
-  if (info /= 0)goto 9998
+  if (info /= psb_success_)goto 9998
 9998 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
 9999 continue
-  if(info /= 0)res=res+1
-  if(res/=0)print*,"on s matrix    2 x    2 blocked   1 x   1 ussv alpha=-3 beta= 0 incx=1 incy=1 trans=n is not ok"
-  if(res==0)print*,"on s matrix    2 x    2 blocked   1 x   1 ussv alpha=-3 beta= 0 incx=1 incy=1 trans=n is ok"
+  if(info /= psb_success_)res=res+1
+  if(res /= 0)print*,"on s matrix    2 x    2 blocked   1 x   1 ussv alpha=-3 beta= 0 incx=1 incy=1 trans=n is not ok"
+  if(res == 0)print*,"on s matrix    2 x    2 blocked   1 x   1 ussv alpha=-3 beta= 0 incx=1 incy=1 trans=n is ok"
 end subroutine s_ussv_2_n_am3_bm0_ix1_iy1
 ! 
 
@@ -2652,18 +2652,18 @@ subroutine s_ussv_2_t_am3_bm0_ix1_iy1(res,afmt,ictxt)
   endif
   call psb_barrier(ictxt)
   call psb_cdall(ictxt,desc_a,info,nl=m)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spall(a,desc_a,info,nnz=nnz)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call a%set_triangle()
   call a%set_lower()
   call a%set_unit(.false.)
 
   call psb_barrier(ictxt)
   call psb_spins(nnz,IA,JA,VA,a,desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_cdasb(desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spasb(a,desc_a,info,dupl=psb_dupl_err_,afmt=afmt)
   if(info.ne.0)print *,"matrix assembly failed"
   if(info.ne.0)goto 9996
@@ -2672,24 +2672,24 @@ subroutine s_ussv_2_t_am3_bm0_ix1_iy1(res,afmt,ictxt)
   if(info.ne.0)print *,"psb_spsm failed"
   if(info.ne.0)goto 9996
   do i=1,2
-    if(y(i)/=cy(i))print*,"results mismatch:",y,"instead of",cy
-    if(y(i)/=cy(i))info=-1
-    if(y(i)/=cy(i))goto 9996
+    if(y(i) /= cy(i))print*,"results mismatch:",y,"instead of",cy
+    if(y(i) /= cy(i))info=-1
+    if(y(i) /= cy(i))goto 9996
   enddo
 9996 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_spfree(a,desc_a,info)
-  if (info /= 0)goto 9997
+  if (info /= psb_success_)goto 9997
 9997 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_cdfree(desc_a,info)
-  if (info /= 0)goto 9998
+  if (info /= psb_success_)goto 9998
 9998 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
 9999 continue
-  if(info /= 0)res=res+1
-  if(res/=0)print*,"on s matrix    2 x    2 blocked   1 x   1 ussv alpha=-3 beta= 0 incx=1 incy=1 trans=t is not ok"
-  if(res==0)print*,"on s matrix    2 x    2 blocked   1 x   1 ussv alpha=-3 beta= 0 incx=1 incy=1 trans=t is ok"
+  if(info /= psb_success_)res=res+1
+  if(res /= 0)print*,"on s matrix    2 x    2 blocked   1 x   1 ussv alpha=-3 beta= 0 incx=1 incy=1 trans=t is not ok"
+  if(res == 0)print*,"on s matrix    2 x    2 blocked   1 x   1 ussv alpha=-3 beta= 0 incx=1 incy=1 trans=t is ok"
 end subroutine s_ussv_2_t_am3_bm0_ix1_iy1
 ! 
 
@@ -2731,18 +2731,18 @@ subroutine s_ussv_2_c_am3_bm0_ix1_iy1(res,afmt,ictxt)
   endif
   call psb_barrier(ictxt)
   call psb_cdall(ictxt,desc_a,info,nl=m)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spall(a,desc_a,info,nnz=nnz)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call a%set_triangle()
   call a%set_lower()
   call a%set_unit(.false.)
 
   call psb_barrier(ictxt)
   call psb_spins(nnz,IA,JA,VA,a,desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_cdasb(desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spasb(a,desc_a,info,dupl=psb_dupl_err_,afmt=afmt)
   if(info.ne.0)print *,"matrix assembly failed"
   if(info.ne.0)goto 9996
@@ -2751,24 +2751,24 @@ subroutine s_ussv_2_c_am3_bm0_ix1_iy1(res,afmt,ictxt)
   if(info.ne.0)print *,"psb_spsm failed"
   if(info.ne.0)goto 9996
   do i=1,2
-    if(y(i)/=cy(i))print*,"results mismatch:",y,"instead of",cy
-    if(y(i)/=cy(i))info=-1
-    if(y(i)/=cy(i))goto 9996
+    if(y(i) /= cy(i))print*,"results mismatch:",y,"instead of",cy
+    if(y(i) /= cy(i))info=-1
+    if(y(i) /= cy(i))goto 9996
   enddo
 9996 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_spfree(a,desc_a,info)
-  if (info /= 0)goto 9997
+  if (info /= psb_success_)goto 9997
 9997 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_cdfree(desc_a,info)
-  if (info /= 0)goto 9998
+  if (info /= psb_success_)goto 9998
 9998 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
 9999 continue
-  if(info /= 0)res=res+1
-  if(res/=0)print*,"on s matrix    2 x    2 blocked   1 x   1 ussv alpha=-3 beta= 0 incx=1 incy=1 trans=c is not ok"
-  if(res==0)print*,"on s matrix    2 x    2 blocked   1 x   1 ussv alpha=-3 beta= 0 incx=1 incy=1 trans=c is ok"
+  if(info /= psb_success_)res=res+1
+  if(res /= 0)print*,"on s matrix    2 x    2 blocked   1 x   1 ussv alpha=-3 beta= 0 incx=1 incy=1 trans=c is not ok"
+  if(res == 0)print*,"on s matrix    2 x    2 blocked   1 x   1 ussv alpha=-3 beta= 0 incx=1 incy=1 trans=c is ok"
 end subroutine s_ussv_2_c_am3_bm0_ix1_iy1
 ! 
 
@@ -2811,14 +2811,14 @@ subroutine d_usmv_2_n_ap3_bp1_ix1_iy1(res,afmt,ictxt)
   endif
   call psb_barrier(ictxt)
   call psb_cdall(ictxt,desc_a,info,nl=m)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spall(a,desc_a,info,nnz=nnz)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_barrier(ictxt)
   call psb_spins(nnz,IA,JA,VA,a,desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_cdasb(desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spasb(a,desc_a,info,dupl=psb_dupl_err_,afmt=afmt)
   if(info.ne.0)print *,"matrix assembly failed"
   if(info.ne.0)goto 9996
@@ -2827,24 +2827,24 @@ subroutine d_usmv_2_n_ap3_bp1_ix1_iy1(res,afmt,ictxt)
   if(info.ne.0)print *,"psb_spmm failed"
   if(info.ne.0)goto 9996
   do i=1,2
-    if(y(i)/=cy(i))print*,"results mismatch:",y,"instead of",cy
-    if(y(i)/=cy(i))info=-1
-    if(y(i)/=cy(i))goto 9996
+    if(y(i) /= cy(i))print*,"results mismatch:",y,"instead of",cy
+    if(y(i) /= cy(i))info=-1
+    if(y(i) /= cy(i))goto 9996
   enddo
 9996 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_spfree(a,desc_a,info)
-  if (info /= 0)goto 9997
+  if (info /= psb_success_)goto 9997
 9997 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_cdfree(desc_a,info)
-  if (info /= 0)goto 9998
+  if (info /= psb_success_)goto 9998
 9998 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
 9999 continue
-  if(info /= 0)res=res+1
-  if(res/=0)print*,"on d matrix    2 x    2 blocked   1 x   1 usmv alpha= 3 beta= 1 incx=1 incy=1 trans=n is not ok"
-  if(res==0)print*,"on d matrix    2 x    2 blocked   1 x   1 usmv alpha= 3 beta= 1 incx=1 incy=1 trans=n is ok"
+  if(info /= psb_success_)res=res+1
+  if(res /= 0)print*,"on d matrix    2 x    2 blocked   1 x   1 usmv alpha= 3 beta= 1 incx=1 incy=1 trans=n is not ok"
+  if(res == 0)print*,"on d matrix    2 x    2 blocked   1 x   1 usmv alpha= 3 beta= 1 incx=1 incy=1 trans=n is ok"
 end subroutine d_usmv_2_n_ap3_bp1_ix1_iy1
 ! 
 
@@ -2887,14 +2887,14 @@ subroutine d_usmv_2_t_ap3_bp1_ix1_iy1(res,afmt,ictxt)
   endif
   call psb_barrier(ictxt)
   call psb_cdall(ictxt,desc_a,info,nl=m)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spall(a,desc_a,info,nnz=nnz)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_barrier(ictxt)
   call psb_spins(nnz,IA,JA,VA,a,desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_cdasb(desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spasb(a,desc_a,info,dupl=psb_dupl_err_,afmt=afmt)
   if(info.ne.0)print *,"matrix assembly failed"
   if(info.ne.0)goto 9996
@@ -2903,24 +2903,24 @@ subroutine d_usmv_2_t_ap3_bp1_ix1_iy1(res,afmt,ictxt)
   if(info.ne.0)print *,"psb_spmm failed"
   if(info.ne.0)goto 9996
   do i=1,2
-    if(y(i)/=cy(i))print*,"results mismatch:",y,"instead of",cy
-    if(y(i)/=cy(i))info=-1
-    if(y(i)/=cy(i))goto 9996
+    if(y(i) /= cy(i))print*,"results mismatch:",y,"instead of",cy
+    if(y(i) /= cy(i))info=-1
+    if(y(i) /= cy(i))goto 9996
   enddo
 9996 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_spfree(a,desc_a,info)
-  if (info /= 0)goto 9997
+  if (info /= psb_success_)goto 9997
 9997 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_cdfree(desc_a,info)
-  if (info /= 0)goto 9998
+  if (info /= psb_success_)goto 9998
 9998 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
 9999 continue
-  if(info /= 0)res=res+1
-  if(res/=0)print*,"on d matrix    2 x    2 blocked   1 x   1 usmv alpha= 3 beta= 1 incx=1 incy=1 trans=t is not ok"
-  if(res==0)print*,"on d matrix    2 x    2 blocked   1 x   1 usmv alpha= 3 beta= 1 incx=1 incy=1 trans=t is ok"
+  if(info /= psb_success_)res=res+1
+  if(res /= 0)print*,"on d matrix    2 x    2 blocked   1 x   1 usmv alpha= 3 beta= 1 incx=1 incy=1 trans=t is not ok"
+  if(res == 0)print*,"on d matrix    2 x    2 blocked   1 x   1 usmv alpha= 3 beta= 1 incx=1 incy=1 trans=t is ok"
 end subroutine d_usmv_2_t_ap3_bp1_ix1_iy1
 ! 
 
@@ -2963,14 +2963,14 @@ subroutine d_usmv_2_c_ap3_bp1_ix1_iy1(res,afmt,ictxt)
   endif
   call psb_barrier(ictxt)
   call psb_cdall(ictxt,desc_a,info,nl=m)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spall(a,desc_a,info,nnz=nnz)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_barrier(ictxt)
   call psb_spins(nnz,IA,JA,VA,a,desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_cdasb(desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spasb(a,desc_a,info,dupl=psb_dupl_err_,afmt=afmt)
   if(info.ne.0)print *,"matrix assembly failed"
   if(info.ne.0)goto 9996
@@ -2979,24 +2979,24 @@ subroutine d_usmv_2_c_ap3_bp1_ix1_iy1(res,afmt,ictxt)
   if(info.ne.0)print *,"psb_spmm failed"
   if(info.ne.0)goto 9996
   do i=1,2
-    if(y(i)/=cy(i))print*,"results mismatch:",y,"instead of",cy
-    if(y(i)/=cy(i))info=-1
-    if(y(i)/=cy(i))goto 9996
+    if(y(i) /= cy(i))print*,"results mismatch:",y,"instead of",cy
+    if(y(i) /= cy(i))info=-1
+    if(y(i) /= cy(i))goto 9996
   enddo
 9996 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_spfree(a,desc_a,info)
-  if (info /= 0)goto 9997
+  if (info /= psb_success_)goto 9997
 9997 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_cdfree(desc_a,info)
-  if (info /= 0)goto 9998
+  if (info /= psb_success_)goto 9998
 9998 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
 9999 continue
-  if(info /= 0)res=res+1
-  if(res/=0)print*,"on d matrix    2 x    2 blocked   1 x   1 usmv alpha= 3 beta= 1 incx=1 incy=1 trans=c is not ok"
-  if(res==0)print*,"on d matrix    2 x    2 blocked   1 x   1 usmv alpha= 3 beta= 1 incx=1 incy=1 trans=c is ok"
+  if(info /= psb_success_)res=res+1
+  if(res /= 0)print*,"on d matrix    2 x    2 blocked   1 x   1 usmv alpha= 3 beta= 1 incx=1 incy=1 trans=c is not ok"
+  if(res == 0)print*,"on d matrix    2 x    2 blocked   1 x   1 usmv alpha= 3 beta= 1 incx=1 incy=1 trans=c is ok"
 end subroutine d_usmv_2_c_ap3_bp1_ix1_iy1
 ! 
 
@@ -3039,14 +3039,14 @@ subroutine d_usmv_2_n_ap3_bm0_ix1_iy1(res,afmt,ictxt)
   endif
   call psb_barrier(ictxt)
   call psb_cdall(ictxt,desc_a,info,nl=m)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spall(a,desc_a,info,nnz=nnz)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_barrier(ictxt)
   call psb_spins(nnz,IA,JA,VA,a,desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_cdasb(desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spasb(a,desc_a,info,dupl=psb_dupl_err_,afmt=afmt)
   if(info.ne.0)print *,"matrix assembly failed"
   if(info.ne.0)goto 9996
@@ -3055,24 +3055,24 @@ subroutine d_usmv_2_n_ap3_bm0_ix1_iy1(res,afmt,ictxt)
   if(info.ne.0)print *,"psb_spmm failed"
   if(info.ne.0)goto 9996
   do i=1,2
-    if(y(i)/=cy(i))print*,"results mismatch:",y,"instead of",cy
-    if(y(i)/=cy(i))info=-1
-    if(y(i)/=cy(i))goto 9996
+    if(y(i) /= cy(i))print*,"results mismatch:",y,"instead of",cy
+    if(y(i) /= cy(i))info=-1
+    if(y(i) /= cy(i))goto 9996
   enddo
 9996 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_spfree(a,desc_a,info)
-  if (info /= 0)goto 9997
+  if (info /= psb_success_)goto 9997
 9997 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_cdfree(desc_a,info)
-  if (info /= 0)goto 9998
+  if (info /= psb_success_)goto 9998
 9998 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
 9999 continue
-  if(info /= 0)res=res+1
-  if(res/=0)print*,"on d matrix    2 x    2 blocked   1 x   1 usmv alpha= 3 beta= 0 incx=1 incy=1 trans=n is not ok"
-  if(res==0)print*,"on d matrix    2 x    2 blocked   1 x   1 usmv alpha= 3 beta= 0 incx=1 incy=1 trans=n is ok"
+  if(info /= psb_success_)res=res+1
+  if(res /= 0)print*,"on d matrix    2 x    2 blocked   1 x   1 usmv alpha= 3 beta= 0 incx=1 incy=1 trans=n is not ok"
+  if(res == 0)print*,"on d matrix    2 x    2 blocked   1 x   1 usmv alpha= 3 beta= 0 incx=1 incy=1 trans=n is ok"
 end subroutine d_usmv_2_n_ap3_bm0_ix1_iy1
 ! 
 
@@ -3115,14 +3115,14 @@ subroutine d_usmv_2_t_ap3_bm0_ix1_iy1(res,afmt,ictxt)
   endif
   call psb_barrier(ictxt)
   call psb_cdall(ictxt,desc_a,info,nl=m)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spall(a,desc_a,info,nnz=nnz)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_barrier(ictxt)
   call psb_spins(nnz,IA,JA,VA,a,desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_cdasb(desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spasb(a,desc_a,info,dupl=psb_dupl_err_,afmt=afmt)
   if(info.ne.0)print *,"matrix assembly failed"
   if(info.ne.0)goto 9996
@@ -3131,24 +3131,24 @@ subroutine d_usmv_2_t_ap3_bm0_ix1_iy1(res,afmt,ictxt)
   if(info.ne.0)print *,"psb_spmm failed"
   if(info.ne.0)goto 9996
   do i=1,2
-    if(y(i)/=cy(i))print*,"results mismatch:",y,"instead of",cy
-    if(y(i)/=cy(i))info=-1
-    if(y(i)/=cy(i))goto 9996
+    if(y(i) /= cy(i))print*,"results mismatch:",y,"instead of",cy
+    if(y(i) /= cy(i))info=-1
+    if(y(i) /= cy(i))goto 9996
   enddo
 9996 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_spfree(a,desc_a,info)
-  if (info /= 0)goto 9997
+  if (info /= psb_success_)goto 9997
 9997 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_cdfree(desc_a,info)
-  if (info /= 0)goto 9998
+  if (info /= psb_success_)goto 9998
 9998 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
 9999 continue
-  if(info /= 0)res=res+1
-  if(res/=0)print*,"on d matrix    2 x    2 blocked   1 x   1 usmv alpha= 3 beta= 0 incx=1 incy=1 trans=t is not ok"
-  if(res==0)print*,"on d matrix    2 x    2 blocked   1 x   1 usmv alpha= 3 beta= 0 incx=1 incy=1 trans=t is ok"
+  if(info /= psb_success_)res=res+1
+  if(res /= 0)print*,"on d matrix    2 x    2 blocked   1 x   1 usmv alpha= 3 beta= 0 incx=1 incy=1 trans=t is not ok"
+  if(res == 0)print*,"on d matrix    2 x    2 blocked   1 x   1 usmv alpha= 3 beta= 0 incx=1 incy=1 trans=t is ok"
 end subroutine d_usmv_2_t_ap3_bm0_ix1_iy1
 ! 
 
@@ -3191,14 +3191,14 @@ subroutine d_usmv_2_c_ap3_bm0_ix1_iy1(res,afmt,ictxt)
   endif
   call psb_barrier(ictxt)
   call psb_cdall(ictxt,desc_a,info,nl=m)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spall(a,desc_a,info,nnz=nnz)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_barrier(ictxt)
   call psb_spins(nnz,IA,JA,VA,a,desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_cdasb(desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spasb(a,desc_a,info,dupl=psb_dupl_err_,afmt=afmt)
   if(info.ne.0)print *,"matrix assembly failed"
   if(info.ne.0)goto 9996
@@ -3207,24 +3207,24 @@ subroutine d_usmv_2_c_ap3_bm0_ix1_iy1(res,afmt,ictxt)
   if(info.ne.0)print *,"psb_spmm failed"
   if(info.ne.0)goto 9996
   do i=1,2
-    if(y(i)/=cy(i))print*,"results mismatch:",y,"instead of",cy
-    if(y(i)/=cy(i))info=-1
-    if(y(i)/=cy(i))goto 9996
+    if(y(i) /= cy(i))print*,"results mismatch:",y,"instead of",cy
+    if(y(i) /= cy(i))info=-1
+    if(y(i) /= cy(i))goto 9996
   enddo
 9996 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_spfree(a,desc_a,info)
-  if (info /= 0)goto 9997
+  if (info /= psb_success_)goto 9997
 9997 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_cdfree(desc_a,info)
-  if (info /= 0)goto 9998
+  if (info /= psb_success_)goto 9998
 9998 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
 9999 continue
-  if(info /= 0)res=res+1
-  if(res/=0)print*,"on d matrix    2 x    2 blocked   1 x   1 usmv alpha= 3 beta= 0 incx=1 incy=1 trans=c is not ok"
-  if(res==0)print*,"on d matrix    2 x    2 blocked   1 x   1 usmv alpha= 3 beta= 0 incx=1 incy=1 trans=c is ok"
+  if(info /= psb_success_)res=res+1
+  if(res /= 0)print*,"on d matrix    2 x    2 blocked   1 x   1 usmv alpha= 3 beta= 0 incx=1 incy=1 trans=c is not ok"
+  if(res == 0)print*,"on d matrix    2 x    2 blocked   1 x   1 usmv alpha= 3 beta= 0 incx=1 incy=1 trans=c is ok"
 end subroutine d_usmv_2_c_ap3_bm0_ix1_iy1
 ! 
 
@@ -3267,14 +3267,14 @@ subroutine d_usmv_2_n_ap1_bp1_ix1_iy1(res,afmt,ictxt)
   endif
   call psb_barrier(ictxt)
   call psb_cdall(ictxt,desc_a,info,nl=m)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spall(a,desc_a,info,nnz=nnz)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_barrier(ictxt)
   call psb_spins(nnz,IA,JA,VA,a,desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_cdasb(desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spasb(a,desc_a,info,dupl=psb_dupl_err_,afmt=afmt)
   if(info.ne.0)print *,"matrix assembly failed"
   if(info.ne.0)goto 9996
@@ -3283,24 +3283,24 @@ subroutine d_usmv_2_n_ap1_bp1_ix1_iy1(res,afmt,ictxt)
   if(info.ne.0)print *,"psb_spmm failed"
   if(info.ne.0)goto 9996
   do i=1,2
-    if(y(i)/=cy(i))print*,"results mismatch:",y,"instead of",cy
-    if(y(i)/=cy(i))info=-1
-    if(y(i)/=cy(i))goto 9996
+    if(y(i) /= cy(i))print*,"results mismatch:",y,"instead of",cy
+    if(y(i) /= cy(i))info=-1
+    if(y(i) /= cy(i))goto 9996
   enddo
 9996 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_spfree(a,desc_a,info)
-  if (info /= 0)goto 9997
+  if (info /= psb_success_)goto 9997
 9997 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_cdfree(desc_a,info)
-  if (info /= 0)goto 9998
+  if (info /= psb_success_)goto 9998
 9998 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
 9999 continue
-  if(info /= 0)res=res+1
-  if(res/=0)print*,"on d matrix    2 x    2 blocked   1 x   1 usmv alpha= 1 beta= 1 incx=1 incy=1 trans=n is not ok"
-  if(res==0)print*,"on d matrix    2 x    2 blocked   1 x   1 usmv alpha= 1 beta= 1 incx=1 incy=1 trans=n is ok"
+  if(info /= psb_success_)res=res+1
+  if(res /= 0)print*,"on d matrix    2 x    2 blocked   1 x   1 usmv alpha= 1 beta= 1 incx=1 incy=1 trans=n is not ok"
+  if(res == 0)print*,"on d matrix    2 x    2 blocked   1 x   1 usmv alpha= 1 beta= 1 incx=1 incy=1 trans=n is ok"
 end subroutine d_usmv_2_n_ap1_bp1_ix1_iy1
 ! 
 
@@ -3343,14 +3343,14 @@ subroutine d_usmv_2_t_ap1_bp1_ix1_iy1(res,afmt,ictxt)
   endif
   call psb_barrier(ictxt)
   call psb_cdall(ictxt,desc_a,info,nl=m)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spall(a,desc_a,info,nnz=nnz)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_barrier(ictxt)
   call psb_spins(nnz,IA,JA,VA,a,desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_cdasb(desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spasb(a,desc_a,info,dupl=psb_dupl_err_,afmt=afmt)
   if(info.ne.0)print *,"matrix assembly failed"
   if(info.ne.0)goto 9996
@@ -3359,24 +3359,24 @@ subroutine d_usmv_2_t_ap1_bp1_ix1_iy1(res,afmt,ictxt)
   if(info.ne.0)print *,"psb_spmm failed"
   if(info.ne.0)goto 9996
   do i=1,2
-    if(y(i)/=cy(i))print*,"results mismatch:",y,"instead of",cy
-    if(y(i)/=cy(i))info=-1
-    if(y(i)/=cy(i))goto 9996
+    if(y(i) /= cy(i))print*,"results mismatch:",y,"instead of",cy
+    if(y(i) /= cy(i))info=-1
+    if(y(i) /= cy(i))goto 9996
   enddo
 9996 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_spfree(a,desc_a,info)
-  if (info /= 0)goto 9997
+  if (info /= psb_success_)goto 9997
 9997 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_cdfree(desc_a,info)
-  if (info /= 0)goto 9998
+  if (info /= psb_success_)goto 9998
 9998 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
 9999 continue
-  if(info /= 0)res=res+1
-  if(res/=0)print*,"on d matrix    2 x    2 blocked   1 x   1 usmv alpha= 1 beta= 1 incx=1 incy=1 trans=t is not ok"
-  if(res==0)print*,"on d matrix    2 x    2 blocked   1 x   1 usmv alpha= 1 beta= 1 incx=1 incy=1 trans=t is ok"
+  if(info /= psb_success_)res=res+1
+  if(res /= 0)print*,"on d matrix    2 x    2 blocked   1 x   1 usmv alpha= 1 beta= 1 incx=1 incy=1 trans=t is not ok"
+  if(res == 0)print*,"on d matrix    2 x    2 blocked   1 x   1 usmv alpha= 1 beta= 1 incx=1 incy=1 trans=t is ok"
 end subroutine d_usmv_2_t_ap1_bp1_ix1_iy1
 ! 
 
@@ -3419,14 +3419,14 @@ subroutine d_usmv_2_c_ap1_bp1_ix1_iy1(res,afmt,ictxt)
   endif
   call psb_barrier(ictxt)
   call psb_cdall(ictxt,desc_a,info,nl=m)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spall(a,desc_a,info,nnz=nnz)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_barrier(ictxt)
   call psb_spins(nnz,IA,JA,VA,a,desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_cdasb(desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spasb(a,desc_a,info,dupl=psb_dupl_err_,afmt=afmt)
   if(info.ne.0)print *,"matrix assembly failed"
   if(info.ne.0)goto 9996
@@ -3435,24 +3435,24 @@ subroutine d_usmv_2_c_ap1_bp1_ix1_iy1(res,afmt,ictxt)
   if(info.ne.0)print *,"psb_spmm failed"
   if(info.ne.0)goto 9996
   do i=1,2
-    if(y(i)/=cy(i))print*,"results mismatch:",y,"instead of",cy
-    if(y(i)/=cy(i))info=-1
-    if(y(i)/=cy(i))goto 9996
+    if(y(i) /= cy(i))print*,"results mismatch:",y,"instead of",cy
+    if(y(i) /= cy(i))info=-1
+    if(y(i) /= cy(i))goto 9996
   enddo
 9996 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_spfree(a,desc_a,info)
-  if (info /= 0)goto 9997
+  if (info /= psb_success_)goto 9997
 9997 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_cdfree(desc_a,info)
-  if (info /= 0)goto 9998
+  if (info /= psb_success_)goto 9998
 9998 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
 9999 continue
-  if(info /= 0)res=res+1
-  if(res/=0)print*,"on d matrix    2 x    2 blocked   1 x   1 usmv alpha= 1 beta= 1 incx=1 incy=1 trans=c is not ok"
-  if(res==0)print*,"on d matrix    2 x    2 blocked   1 x   1 usmv alpha= 1 beta= 1 incx=1 incy=1 trans=c is ok"
+  if(info /= psb_success_)res=res+1
+  if(res /= 0)print*,"on d matrix    2 x    2 blocked   1 x   1 usmv alpha= 1 beta= 1 incx=1 incy=1 trans=c is not ok"
+  if(res == 0)print*,"on d matrix    2 x    2 blocked   1 x   1 usmv alpha= 1 beta= 1 incx=1 incy=1 trans=c is ok"
 end subroutine d_usmv_2_c_ap1_bp1_ix1_iy1
 ! 
 
@@ -3495,14 +3495,14 @@ subroutine d_usmv_2_n_ap1_bm0_ix1_iy1(res,afmt,ictxt)
   endif
   call psb_barrier(ictxt)
   call psb_cdall(ictxt,desc_a,info,nl=m)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spall(a,desc_a,info,nnz=nnz)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_barrier(ictxt)
   call psb_spins(nnz,IA,JA,VA,a,desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_cdasb(desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spasb(a,desc_a,info,dupl=psb_dupl_err_,afmt=afmt)
   if(info.ne.0)print *,"matrix assembly failed"
   if(info.ne.0)goto 9996
@@ -3511,24 +3511,24 @@ subroutine d_usmv_2_n_ap1_bm0_ix1_iy1(res,afmt,ictxt)
   if(info.ne.0)print *,"psb_spmm failed"
   if(info.ne.0)goto 9996
   do i=1,2
-    if(y(i)/=cy(i))print*,"results mismatch:",y,"instead of",cy
-    if(y(i)/=cy(i))info=-1
-    if(y(i)/=cy(i))goto 9996
+    if(y(i) /= cy(i))print*,"results mismatch:",y,"instead of",cy
+    if(y(i) /= cy(i))info=-1
+    if(y(i) /= cy(i))goto 9996
   enddo
 9996 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_spfree(a,desc_a,info)
-  if (info /= 0)goto 9997
+  if (info /= psb_success_)goto 9997
 9997 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_cdfree(desc_a,info)
-  if (info /= 0)goto 9998
+  if (info /= psb_success_)goto 9998
 9998 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
 9999 continue
-  if(info /= 0)res=res+1
-  if(res/=0)print*,"on d matrix    2 x    2 blocked   1 x   1 usmv alpha= 1 beta= 0 incx=1 incy=1 trans=n is not ok"
-  if(res==0)print*,"on d matrix    2 x    2 blocked   1 x   1 usmv alpha= 1 beta= 0 incx=1 incy=1 trans=n is ok"
+  if(info /= psb_success_)res=res+1
+  if(res /= 0)print*,"on d matrix    2 x    2 blocked   1 x   1 usmv alpha= 1 beta= 0 incx=1 incy=1 trans=n is not ok"
+  if(res == 0)print*,"on d matrix    2 x    2 blocked   1 x   1 usmv alpha= 1 beta= 0 incx=1 incy=1 trans=n is ok"
 end subroutine d_usmv_2_n_ap1_bm0_ix1_iy1
 ! 
 
@@ -3571,14 +3571,14 @@ subroutine d_usmv_2_t_ap1_bm0_ix1_iy1(res,afmt,ictxt)
   endif
   call psb_barrier(ictxt)
   call psb_cdall(ictxt,desc_a,info,nl=m)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spall(a,desc_a,info,nnz=nnz)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_barrier(ictxt)
   call psb_spins(nnz,IA,JA,VA,a,desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_cdasb(desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spasb(a,desc_a,info,dupl=psb_dupl_err_,afmt=afmt)
   if(info.ne.0)print *,"matrix assembly failed"
   if(info.ne.0)goto 9996
@@ -3587,24 +3587,24 @@ subroutine d_usmv_2_t_ap1_bm0_ix1_iy1(res,afmt,ictxt)
   if(info.ne.0)print *,"psb_spmm failed"
   if(info.ne.0)goto 9996
   do i=1,2
-    if(y(i)/=cy(i))print*,"results mismatch:",y,"instead of",cy
-    if(y(i)/=cy(i))info=-1
-    if(y(i)/=cy(i))goto 9996
+    if(y(i) /= cy(i))print*,"results mismatch:",y,"instead of",cy
+    if(y(i) /= cy(i))info=-1
+    if(y(i) /= cy(i))goto 9996
   enddo
 9996 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_spfree(a,desc_a,info)
-  if (info /= 0)goto 9997
+  if (info /= psb_success_)goto 9997
 9997 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_cdfree(desc_a,info)
-  if (info /= 0)goto 9998
+  if (info /= psb_success_)goto 9998
 9998 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
 9999 continue
-  if(info /= 0)res=res+1
-  if(res/=0)print*,"on d matrix    2 x    2 blocked   1 x   1 usmv alpha= 1 beta= 0 incx=1 incy=1 trans=t is not ok"
-  if(res==0)print*,"on d matrix    2 x    2 blocked   1 x   1 usmv alpha= 1 beta= 0 incx=1 incy=1 trans=t is ok"
+  if(info /= psb_success_)res=res+1
+  if(res /= 0)print*,"on d matrix    2 x    2 blocked   1 x   1 usmv alpha= 1 beta= 0 incx=1 incy=1 trans=t is not ok"
+  if(res == 0)print*,"on d matrix    2 x    2 blocked   1 x   1 usmv alpha= 1 beta= 0 incx=1 incy=1 trans=t is ok"
 end subroutine d_usmv_2_t_ap1_bm0_ix1_iy1
 ! 
 
@@ -3647,14 +3647,14 @@ subroutine d_usmv_2_c_ap1_bm0_ix1_iy1(res,afmt,ictxt)
   endif
   call psb_barrier(ictxt)
   call psb_cdall(ictxt,desc_a,info,nl=m)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spall(a,desc_a,info,nnz=nnz)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_barrier(ictxt)
   call psb_spins(nnz,IA,JA,VA,a,desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_cdasb(desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spasb(a,desc_a,info,dupl=psb_dupl_err_,afmt=afmt)
   if(info.ne.0)print *,"matrix assembly failed"
   if(info.ne.0)goto 9996
@@ -3663,24 +3663,24 @@ subroutine d_usmv_2_c_ap1_bm0_ix1_iy1(res,afmt,ictxt)
   if(info.ne.0)print *,"psb_spmm failed"
   if(info.ne.0)goto 9996
   do i=1,2
-    if(y(i)/=cy(i))print*,"results mismatch:",y,"instead of",cy
-    if(y(i)/=cy(i))info=-1
-    if(y(i)/=cy(i))goto 9996
+    if(y(i) /= cy(i))print*,"results mismatch:",y,"instead of",cy
+    if(y(i) /= cy(i))info=-1
+    if(y(i) /= cy(i))goto 9996
   enddo
 9996 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_spfree(a,desc_a,info)
-  if (info /= 0)goto 9997
+  if (info /= psb_success_)goto 9997
 9997 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_cdfree(desc_a,info)
-  if (info /= 0)goto 9998
+  if (info /= psb_success_)goto 9998
 9998 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
 9999 continue
-  if(info /= 0)res=res+1
-  if(res/=0)print*,"on d matrix    2 x    2 blocked   1 x   1 usmv alpha= 1 beta= 0 incx=1 incy=1 trans=c is not ok"
-  if(res==0)print*,"on d matrix    2 x    2 blocked   1 x   1 usmv alpha= 1 beta= 0 incx=1 incy=1 trans=c is ok"
+  if(info /= psb_success_)res=res+1
+  if(res /= 0)print*,"on d matrix    2 x    2 blocked   1 x   1 usmv alpha= 1 beta= 0 incx=1 incy=1 trans=c is not ok"
+  if(res == 0)print*,"on d matrix    2 x    2 blocked   1 x   1 usmv alpha= 1 beta= 0 incx=1 incy=1 trans=c is ok"
 end subroutine d_usmv_2_c_ap1_bm0_ix1_iy1
 ! 
 
@@ -3723,14 +3723,14 @@ subroutine d_usmv_2_n_am1_bp1_ix1_iy1(res,afmt,ictxt)
   endif
   call psb_barrier(ictxt)
   call psb_cdall(ictxt,desc_a,info,nl=m)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spall(a,desc_a,info,nnz=nnz)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_barrier(ictxt)
   call psb_spins(nnz,IA,JA,VA,a,desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_cdasb(desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spasb(a,desc_a,info,dupl=psb_dupl_err_,afmt=afmt)
   if(info.ne.0)print *,"matrix assembly failed"
   if(info.ne.0)goto 9996
@@ -3739,24 +3739,24 @@ subroutine d_usmv_2_n_am1_bp1_ix1_iy1(res,afmt,ictxt)
   if(info.ne.0)print *,"psb_spmm failed"
   if(info.ne.0)goto 9996
   do i=1,2
-    if(y(i)/=cy(i))print*,"results mismatch:",y,"instead of",cy
-    if(y(i)/=cy(i))info=-1
-    if(y(i)/=cy(i))goto 9996
+    if(y(i) /= cy(i))print*,"results mismatch:",y,"instead of",cy
+    if(y(i) /= cy(i))info=-1
+    if(y(i) /= cy(i))goto 9996
   enddo
 9996 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_spfree(a,desc_a,info)
-  if (info /= 0)goto 9997
+  if (info /= psb_success_)goto 9997
 9997 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_cdfree(desc_a,info)
-  if (info /= 0)goto 9998
+  if (info /= psb_success_)goto 9998
 9998 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
 9999 continue
-  if(info /= 0)res=res+1
-  if(res/=0)print*,"on d matrix    2 x    2 blocked   1 x   1 usmv alpha=-1 beta= 1 incx=1 incy=1 trans=n is not ok"
-  if(res==0)print*,"on d matrix    2 x    2 blocked   1 x   1 usmv alpha=-1 beta= 1 incx=1 incy=1 trans=n is ok"
+  if(info /= psb_success_)res=res+1
+  if(res /= 0)print*,"on d matrix    2 x    2 blocked   1 x   1 usmv alpha=-1 beta= 1 incx=1 incy=1 trans=n is not ok"
+  if(res == 0)print*,"on d matrix    2 x    2 blocked   1 x   1 usmv alpha=-1 beta= 1 incx=1 incy=1 trans=n is ok"
 end subroutine d_usmv_2_n_am1_bp1_ix1_iy1
 ! 
 
@@ -3799,14 +3799,14 @@ subroutine d_usmv_2_t_am1_bp1_ix1_iy1(res,afmt,ictxt)
   endif
   call psb_barrier(ictxt)
   call psb_cdall(ictxt,desc_a,info,nl=m)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spall(a,desc_a,info,nnz=nnz)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_barrier(ictxt)
   call psb_spins(nnz,IA,JA,VA,a,desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_cdasb(desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spasb(a,desc_a,info,dupl=psb_dupl_err_,afmt=afmt)
   if(info.ne.0)print *,"matrix assembly failed"
   if(info.ne.0)goto 9996
@@ -3815,24 +3815,24 @@ subroutine d_usmv_2_t_am1_bp1_ix1_iy1(res,afmt,ictxt)
   if(info.ne.0)print *,"psb_spmm failed"
   if(info.ne.0)goto 9996
   do i=1,2
-    if(y(i)/=cy(i))print*,"results mismatch:",y,"instead of",cy
-    if(y(i)/=cy(i))info=-1
-    if(y(i)/=cy(i))goto 9996
+    if(y(i) /= cy(i))print*,"results mismatch:",y,"instead of",cy
+    if(y(i) /= cy(i))info=-1
+    if(y(i) /= cy(i))goto 9996
   enddo
 9996 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_spfree(a,desc_a,info)
-  if (info /= 0)goto 9997
+  if (info /= psb_success_)goto 9997
 9997 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_cdfree(desc_a,info)
-  if (info /= 0)goto 9998
+  if (info /= psb_success_)goto 9998
 9998 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
 9999 continue
-  if(info /= 0)res=res+1
-  if(res/=0)print*,"on d matrix    2 x    2 blocked   1 x   1 usmv alpha=-1 beta= 1 incx=1 incy=1 trans=t is not ok"
-  if(res==0)print*,"on d matrix    2 x    2 blocked   1 x   1 usmv alpha=-1 beta= 1 incx=1 incy=1 trans=t is ok"
+  if(info /= psb_success_)res=res+1
+  if(res /= 0)print*,"on d matrix    2 x    2 blocked   1 x   1 usmv alpha=-1 beta= 1 incx=1 incy=1 trans=t is not ok"
+  if(res == 0)print*,"on d matrix    2 x    2 blocked   1 x   1 usmv alpha=-1 beta= 1 incx=1 incy=1 trans=t is ok"
 end subroutine d_usmv_2_t_am1_bp1_ix1_iy1
 ! 
 
@@ -3875,14 +3875,14 @@ subroutine d_usmv_2_c_am1_bp1_ix1_iy1(res,afmt,ictxt)
   endif
   call psb_barrier(ictxt)
   call psb_cdall(ictxt,desc_a,info,nl=m)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spall(a,desc_a,info,nnz=nnz)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_barrier(ictxt)
   call psb_spins(nnz,IA,JA,VA,a,desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_cdasb(desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spasb(a,desc_a,info,dupl=psb_dupl_err_,afmt=afmt)
   if(info.ne.0)print *,"matrix assembly failed"
   if(info.ne.0)goto 9996
@@ -3891,24 +3891,24 @@ subroutine d_usmv_2_c_am1_bp1_ix1_iy1(res,afmt,ictxt)
   if(info.ne.0)print *,"psb_spmm failed"
   if(info.ne.0)goto 9996
   do i=1,2
-    if(y(i)/=cy(i))print*,"results mismatch:",y,"instead of",cy
-    if(y(i)/=cy(i))info=-1
-    if(y(i)/=cy(i))goto 9996
+    if(y(i) /= cy(i))print*,"results mismatch:",y,"instead of",cy
+    if(y(i) /= cy(i))info=-1
+    if(y(i) /= cy(i))goto 9996
   enddo
 9996 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_spfree(a,desc_a,info)
-  if (info /= 0)goto 9997
+  if (info /= psb_success_)goto 9997
 9997 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_cdfree(desc_a,info)
-  if (info /= 0)goto 9998
+  if (info /= psb_success_)goto 9998
 9998 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
 9999 continue
-  if(info /= 0)res=res+1
-  if(res/=0)print*,"on d matrix    2 x    2 blocked   1 x   1 usmv alpha=-1 beta= 1 incx=1 incy=1 trans=c is not ok"
-  if(res==0)print*,"on d matrix    2 x    2 blocked   1 x   1 usmv alpha=-1 beta= 1 incx=1 incy=1 trans=c is ok"
+  if(info /= psb_success_)res=res+1
+  if(res /= 0)print*,"on d matrix    2 x    2 blocked   1 x   1 usmv alpha=-1 beta= 1 incx=1 incy=1 trans=c is not ok"
+  if(res == 0)print*,"on d matrix    2 x    2 blocked   1 x   1 usmv alpha=-1 beta= 1 incx=1 incy=1 trans=c is ok"
 end subroutine d_usmv_2_c_am1_bp1_ix1_iy1
 ! 
 
@@ -3951,14 +3951,14 @@ subroutine d_usmv_2_n_am1_bm0_ix1_iy1(res,afmt,ictxt)
   endif
   call psb_barrier(ictxt)
   call psb_cdall(ictxt,desc_a,info,nl=m)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spall(a,desc_a,info,nnz=nnz)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_barrier(ictxt)
   call psb_spins(nnz,IA,JA,VA,a,desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_cdasb(desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spasb(a,desc_a,info,dupl=psb_dupl_err_,afmt=afmt)
   if(info.ne.0)print *,"matrix assembly failed"
   if(info.ne.0)goto 9996
@@ -3967,24 +3967,24 @@ subroutine d_usmv_2_n_am1_bm0_ix1_iy1(res,afmt,ictxt)
   if(info.ne.0)print *,"psb_spmm failed"
   if(info.ne.0)goto 9996
   do i=1,2
-    if(y(i)/=cy(i))print*,"results mismatch:",y,"instead of",cy
-    if(y(i)/=cy(i))info=-1
-    if(y(i)/=cy(i))goto 9996
+    if(y(i) /= cy(i))print*,"results mismatch:",y,"instead of",cy
+    if(y(i) /= cy(i))info=-1
+    if(y(i) /= cy(i))goto 9996
   enddo
 9996 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_spfree(a,desc_a,info)
-  if (info /= 0)goto 9997
+  if (info /= psb_success_)goto 9997
 9997 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_cdfree(desc_a,info)
-  if (info /= 0)goto 9998
+  if (info /= psb_success_)goto 9998
 9998 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
 9999 continue
-  if(info /= 0)res=res+1
-  if(res/=0)print*,"on d matrix    2 x    2 blocked   1 x   1 usmv alpha=-1 beta= 0 incx=1 incy=1 trans=n is not ok"
-  if(res==0)print*,"on d matrix    2 x    2 blocked   1 x   1 usmv alpha=-1 beta= 0 incx=1 incy=1 trans=n is ok"
+  if(info /= psb_success_)res=res+1
+  if(res /= 0)print*,"on d matrix    2 x    2 blocked   1 x   1 usmv alpha=-1 beta= 0 incx=1 incy=1 trans=n is not ok"
+  if(res == 0)print*,"on d matrix    2 x    2 blocked   1 x   1 usmv alpha=-1 beta= 0 incx=1 incy=1 trans=n is ok"
 end subroutine d_usmv_2_n_am1_bm0_ix1_iy1
 ! 
 
@@ -4027,14 +4027,14 @@ subroutine d_usmv_2_t_am1_bm0_ix1_iy1(res,afmt,ictxt)
   endif
   call psb_barrier(ictxt)
   call psb_cdall(ictxt,desc_a,info,nl=m)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spall(a,desc_a,info,nnz=nnz)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_barrier(ictxt)
   call psb_spins(nnz,IA,JA,VA,a,desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_cdasb(desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spasb(a,desc_a,info,dupl=psb_dupl_err_,afmt=afmt)
   if(info.ne.0)print *,"matrix assembly failed"
   if(info.ne.0)goto 9996
@@ -4043,24 +4043,24 @@ subroutine d_usmv_2_t_am1_bm0_ix1_iy1(res,afmt,ictxt)
   if(info.ne.0)print *,"psb_spmm failed"
   if(info.ne.0)goto 9996
   do i=1,2
-    if(y(i)/=cy(i))print*,"results mismatch:",y,"instead of",cy
-    if(y(i)/=cy(i))info=-1
-    if(y(i)/=cy(i))goto 9996
+    if(y(i) /= cy(i))print*,"results mismatch:",y,"instead of",cy
+    if(y(i) /= cy(i))info=-1
+    if(y(i) /= cy(i))goto 9996
   enddo
 9996 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_spfree(a,desc_a,info)
-  if (info /= 0)goto 9997
+  if (info /= psb_success_)goto 9997
 9997 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_cdfree(desc_a,info)
-  if (info /= 0)goto 9998
+  if (info /= psb_success_)goto 9998
 9998 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
 9999 continue
-  if(info /= 0)res=res+1
-  if(res/=0)print*,"on d matrix    2 x    2 blocked   1 x   1 usmv alpha=-1 beta= 0 incx=1 incy=1 trans=t is not ok"
-  if(res==0)print*,"on d matrix    2 x    2 blocked   1 x   1 usmv alpha=-1 beta= 0 incx=1 incy=1 trans=t is ok"
+  if(info /= psb_success_)res=res+1
+  if(res /= 0)print*,"on d matrix    2 x    2 blocked   1 x   1 usmv alpha=-1 beta= 0 incx=1 incy=1 trans=t is not ok"
+  if(res == 0)print*,"on d matrix    2 x    2 blocked   1 x   1 usmv alpha=-1 beta= 0 incx=1 incy=1 trans=t is ok"
 end subroutine d_usmv_2_t_am1_bm0_ix1_iy1
 ! 
 
@@ -4103,14 +4103,14 @@ subroutine d_usmv_2_c_am1_bm0_ix1_iy1(res,afmt,ictxt)
   endif
   call psb_barrier(ictxt)
   call psb_cdall(ictxt,desc_a,info,nl=m)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spall(a,desc_a,info,nnz=nnz)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_barrier(ictxt)
   call psb_spins(nnz,IA,JA,VA,a,desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_cdasb(desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spasb(a,desc_a,info,dupl=psb_dupl_err_,afmt=afmt)
   if(info.ne.0)print *,"matrix assembly failed"
   if(info.ne.0)goto 9996
@@ -4119,24 +4119,24 @@ subroutine d_usmv_2_c_am1_bm0_ix1_iy1(res,afmt,ictxt)
   if(info.ne.0)print *,"psb_spmm failed"
   if(info.ne.0)goto 9996
   do i=1,2
-    if(y(i)/=cy(i))print*,"results mismatch:",y,"instead of",cy
-    if(y(i)/=cy(i))info=-1
-    if(y(i)/=cy(i))goto 9996
+    if(y(i) /= cy(i))print*,"results mismatch:",y,"instead of",cy
+    if(y(i) /= cy(i))info=-1
+    if(y(i) /= cy(i))goto 9996
   enddo
 9996 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_spfree(a,desc_a,info)
-  if (info /= 0)goto 9997
+  if (info /= psb_success_)goto 9997
 9997 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_cdfree(desc_a,info)
-  if (info /= 0)goto 9998
+  if (info /= psb_success_)goto 9998
 9998 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
 9999 continue
-  if(info /= 0)res=res+1
-  if(res/=0)print*,"on d matrix    2 x    2 blocked   1 x   1 usmv alpha=-1 beta= 0 incx=1 incy=1 trans=c is not ok"
-  if(res==0)print*,"on d matrix    2 x    2 blocked   1 x   1 usmv alpha=-1 beta= 0 incx=1 incy=1 trans=c is ok"
+  if(info /= psb_success_)res=res+1
+  if(res /= 0)print*,"on d matrix    2 x    2 blocked   1 x   1 usmv alpha=-1 beta= 0 incx=1 incy=1 trans=c is not ok"
+  if(res == 0)print*,"on d matrix    2 x    2 blocked   1 x   1 usmv alpha=-1 beta= 0 incx=1 incy=1 trans=c is ok"
 end subroutine d_usmv_2_c_am1_bm0_ix1_iy1
 ! 
 
@@ -4179,14 +4179,14 @@ subroutine d_usmv_2_n_am3_bp1_ix1_iy1(res,afmt,ictxt)
   endif
   call psb_barrier(ictxt)
   call psb_cdall(ictxt,desc_a,info,nl=m)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spall(a,desc_a,info,nnz=nnz)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_barrier(ictxt)
   call psb_spins(nnz,IA,JA,VA,a,desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_cdasb(desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spasb(a,desc_a,info,dupl=psb_dupl_err_,afmt=afmt)
   if(info.ne.0)print *,"matrix assembly failed"
   if(info.ne.0)goto 9996
@@ -4195,24 +4195,24 @@ subroutine d_usmv_2_n_am3_bp1_ix1_iy1(res,afmt,ictxt)
   if(info.ne.0)print *,"psb_spmm failed"
   if(info.ne.0)goto 9996
   do i=1,2
-    if(y(i)/=cy(i))print*,"results mismatch:",y,"instead of",cy
-    if(y(i)/=cy(i))info=-1
-    if(y(i)/=cy(i))goto 9996
+    if(y(i) /= cy(i))print*,"results mismatch:",y,"instead of",cy
+    if(y(i) /= cy(i))info=-1
+    if(y(i) /= cy(i))goto 9996
   enddo
 9996 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_spfree(a,desc_a,info)
-  if (info /= 0)goto 9997
+  if (info /= psb_success_)goto 9997
 9997 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_cdfree(desc_a,info)
-  if (info /= 0)goto 9998
+  if (info /= psb_success_)goto 9998
 9998 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
 9999 continue
-  if(info /= 0)res=res+1
-  if(res/=0)print*,"on d matrix    2 x    2 blocked   1 x   1 usmv alpha=-3 beta= 1 incx=1 incy=1 trans=n is not ok"
-  if(res==0)print*,"on d matrix    2 x    2 blocked   1 x   1 usmv alpha=-3 beta= 1 incx=1 incy=1 trans=n is ok"
+  if(info /= psb_success_)res=res+1
+  if(res /= 0)print*,"on d matrix    2 x    2 blocked   1 x   1 usmv alpha=-3 beta= 1 incx=1 incy=1 trans=n is not ok"
+  if(res == 0)print*,"on d matrix    2 x    2 blocked   1 x   1 usmv alpha=-3 beta= 1 incx=1 incy=1 trans=n is ok"
 end subroutine d_usmv_2_n_am3_bp1_ix1_iy1
 ! 
 
@@ -4255,14 +4255,14 @@ subroutine d_usmv_2_t_am3_bp1_ix1_iy1(res,afmt,ictxt)
   endif
   call psb_barrier(ictxt)
   call psb_cdall(ictxt,desc_a,info,nl=m)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spall(a,desc_a,info,nnz=nnz)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_barrier(ictxt)
   call psb_spins(nnz,IA,JA,VA,a,desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_cdasb(desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spasb(a,desc_a,info,dupl=psb_dupl_err_,afmt=afmt)
   if(info.ne.0)print *,"matrix assembly failed"
   if(info.ne.0)goto 9996
@@ -4271,24 +4271,24 @@ subroutine d_usmv_2_t_am3_bp1_ix1_iy1(res,afmt,ictxt)
   if(info.ne.0)print *,"psb_spmm failed"
   if(info.ne.0)goto 9996
   do i=1,2
-    if(y(i)/=cy(i))print*,"results mismatch:",y,"instead of",cy
-    if(y(i)/=cy(i))info=-1
-    if(y(i)/=cy(i))goto 9996
+    if(y(i) /= cy(i))print*,"results mismatch:",y,"instead of",cy
+    if(y(i) /= cy(i))info=-1
+    if(y(i) /= cy(i))goto 9996
   enddo
 9996 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_spfree(a,desc_a,info)
-  if (info /= 0)goto 9997
+  if (info /= psb_success_)goto 9997
 9997 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_cdfree(desc_a,info)
-  if (info /= 0)goto 9998
+  if (info /= psb_success_)goto 9998
 9998 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
 9999 continue
-  if(info /= 0)res=res+1
-  if(res/=0)print*,"on d matrix    2 x    2 blocked   1 x   1 usmv alpha=-3 beta= 1 incx=1 incy=1 trans=t is not ok"
-  if(res==0)print*,"on d matrix    2 x    2 blocked   1 x   1 usmv alpha=-3 beta= 1 incx=1 incy=1 trans=t is ok"
+  if(info /= psb_success_)res=res+1
+  if(res /= 0)print*,"on d matrix    2 x    2 blocked   1 x   1 usmv alpha=-3 beta= 1 incx=1 incy=1 trans=t is not ok"
+  if(res == 0)print*,"on d matrix    2 x    2 blocked   1 x   1 usmv alpha=-3 beta= 1 incx=1 incy=1 trans=t is ok"
 end subroutine d_usmv_2_t_am3_bp1_ix1_iy1
 ! 
 
@@ -4331,14 +4331,14 @@ subroutine d_usmv_2_c_am3_bp1_ix1_iy1(res,afmt,ictxt)
   endif
   call psb_barrier(ictxt)
   call psb_cdall(ictxt,desc_a,info,nl=m)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spall(a,desc_a,info,nnz=nnz)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_barrier(ictxt)
   call psb_spins(nnz,IA,JA,VA,a,desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_cdasb(desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spasb(a,desc_a,info,dupl=psb_dupl_err_,afmt=afmt)
   if(info.ne.0)print *,"matrix assembly failed"
   if(info.ne.0)goto 9996
@@ -4347,24 +4347,24 @@ subroutine d_usmv_2_c_am3_bp1_ix1_iy1(res,afmt,ictxt)
   if(info.ne.0)print *,"psb_spmm failed"
   if(info.ne.0)goto 9996
   do i=1,2
-    if(y(i)/=cy(i))print*,"results mismatch:",y,"instead of",cy
-    if(y(i)/=cy(i))info=-1
-    if(y(i)/=cy(i))goto 9996
+    if(y(i) /= cy(i))print*,"results mismatch:",y,"instead of",cy
+    if(y(i) /= cy(i))info=-1
+    if(y(i) /= cy(i))goto 9996
   enddo
 9996 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_spfree(a,desc_a,info)
-  if (info /= 0)goto 9997
+  if (info /= psb_success_)goto 9997
 9997 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_cdfree(desc_a,info)
-  if (info /= 0)goto 9998
+  if (info /= psb_success_)goto 9998
 9998 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
 9999 continue
-  if(info /= 0)res=res+1
-  if(res/=0)print*,"on d matrix    2 x    2 blocked   1 x   1 usmv alpha=-3 beta= 1 incx=1 incy=1 trans=c is not ok"
-  if(res==0)print*,"on d matrix    2 x    2 blocked   1 x   1 usmv alpha=-3 beta= 1 incx=1 incy=1 trans=c is ok"
+  if(info /= psb_success_)res=res+1
+  if(res /= 0)print*,"on d matrix    2 x    2 blocked   1 x   1 usmv alpha=-3 beta= 1 incx=1 incy=1 trans=c is not ok"
+  if(res == 0)print*,"on d matrix    2 x    2 blocked   1 x   1 usmv alpha=-3 beta= 1 incx=1 incy=1 trans=c is ok"
 end subroutine d_usmv_2_c_am3_bp1_ix1_iy1
 ! 
 
@@ -4407,14 +4407,14 @@ subroutine d_usmv_2_n_am3_bm0_ix1_iy1(res,afmt,ictxt)
   endif
   call psb_barrier(ictxt)
   call psb_cdall(ictxt,desc_a,info,nl=m)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spall(a,desc_a,info,nnz=nnz)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_barrier(ictxt)
   call psb_spins(nnz,IA,JA,VA,a,desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_cdasb(desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spasb(a,desc_a,info,dupl=psb_dupl_err_,afmt=afmt)
   if(info.ne.0)print *,"matrix assembly failed"
   if(info.ne.0)goto 9996
@@ -4423,24 +4423,24 @@ subroutine d_usmv_2_n_am3_bm0_ix1_iy1(res,afmt,ictxt)
   if(info.ne.0)print *,"psb_spmm failed"
   if(info.ne.0)goto 9996
   do i=1,2
-    if(y(i)/=cy(i))print*,"results mismatch:",y,"instead of",cy
-    if(y(i)/=cy(i))info=-1
-    if(y(i)/=cy(i))goto 9996
+    if(y(i) /= cy(i))print*,"results mismatch:",y,"instead of",cy
+    if(y(i) /= cy(i))info=-1
+    if(y(i) /= cy(i))goto 9996
   enddo
 9996 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_spfree(a,desc_a,info)
-  if (info /= 0)goto 9997
+  if (info /= psb_success_)goto 9997
 9997 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_cdfree(desc_a,info)
-  if (info /= 0)goto 9998
+  if (info /= psb_success_)goto 9998
 9998 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
 9999 continue
-  if(info /= 0)res=res+1
-  if(res/=0)print*,"on d matrix    2 x    2 blocked   1 x   1 usmv alpha=-3 beta= 0 incx=1 incy=1 trans=n is not ok"
-  if(res==0)print*,"on d matrix    2 x    2 blocked   1 x   1 usmv alpha=-3 beta= 0 incx=1 incy=1 trans=n is ok"
+  if(info /= psb_success_)res=res+1
+  if(res /= 0)print*,"on d matrix    2 x    2 blocked   1 x   1 usmv alpha=-3 beta= 0 incx=1 incy=1 trans=n is not ok"
+  if(res == 0)print*,"on d matrix    2 x    2 blocked   1 x   1 usmv alpha=-3 beta= 0 incx=1 incy=1 trans=n is ok"
 end subroutine d_usmv_2_n_am3_bm0_ix1_iy1
 ! 
 
@@ -4483,14 +4483,14 @@ subroutine d_usmv_2_t_am3_bm0_ix1_iy1(res,afmt,ictxt)
   endif
   call psb_barrier(ictxt)
   call psb_cdall(ictxt,desc_a,info,nl=m)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spall(a,desc_a,info,nnz=nnz)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_barrier(ictxt)
   call psb_spins(nnz,IA,JA,VA,a,desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_cdasb(desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spasb(a,desc_a,info,dupl=psb_dupl_err_,afmt=afmt)
   if(info.ne.0)print *,"matrix assembly failed"
   if(info.ne.0)goto 9996
@@ -4499,24 +4499,24 @@ subroutine d_usmv_2_t_am3_bm0_ix1_iy1(res,afmt,ictxt)
   if(info.ne.0)print *,"psb_spmm failed"
   if(info.ne.0)goto 9996
   do i=1,2
-    if(y(i)/=cy(i))print*,"results mismatch:",y,"instead of",cy
-    if(y(i)/=cy(i))info=-1
-    if(y(i)/=cy(i))goto 9996
+    if(y(i) /= cy(i))print*,"results mismatch:",y,"instead of",cy
+    if(y(i) /= cy(i))info=-1
+    if(y(i) /= cy(i))goto 9996
   enddo
 9996 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_spfree(a,desc_a,info)
-  if (info /= 0)goto 9997
+  if (info /= psb_success_)goto 9997
 9997 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_cdfree(desc_a,info)
-  if (info /= 0)goto 9998
+  if (info /= psb_success_)goto 9998
 9998 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
 9999 continue
-  if(info /= 0)res=res+1
-  if(res/=0)print*,"on d matrix    2 x    2 blocked   1 x   1 usmv alpha=-3 beta= 0 incx=1 incy=1 trans=t is not ok"
-  if(res==0)print*,"on d matrix    2 x    2 blocked   1 x   1 usmv alpha=-3 beta= 0 incx=1 incy=1 trans=t is ok"
+  if(info /= psb_success_)res=res+1
+  if(res /= 0)print*,"on d matrix    2 x    2 blocked   1 x   1 usmv alpha=-3 beta= 0 incx=1 incy=1 trans=t is not ok"
+  if(res == 0)print*,"on d matrix    2 x    2 blocked   1 x   1 usmv alpha=-3 beta= 0 incx=1 incy=1 trans=t is ok"
 end subroutine d_usmv_2_t_am3_bm0_ix1_iy1
 ! 
 
@@ -4559,14 +4559,14 @@ subroutine d_usmv_2_c_am3_bm0_ix1_iy1(res,afmt,ictxt)
   endif
   call psb_barrier(ictxt)
   call psb_cdall(ictxt,desc_a,info,nl=m)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spall(a,desc_a,info,nnz=nnz)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_barrier(ictxt)
   call psb_spins(nnz,IA,JA,VA,a,desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_cdasb(desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spasb(a,desc_a,info,dupl=psb_dupl_err_,afmt=afmt)
   if(info.ne.0)print *,"matrix assembly failed"
   if(info.ne.0)goto 9996
@@ -4575,24 +4575,24 @@ subroutine d_usmv_2_c_am3_bm0_ix1_iy1(res,afmt,ictxt)
   if(info.ne.0)print *,"psb_spmm failed"
   if(info.ne.0)goto 9996
   do i=1,2
-    if(y(i)/=cy(i))print*,"results mismatch:",y,"instead of",cy
-    if(y(i)/=cy(i))info=-1
-    if(y(i)/=cy(i))goto 9996
+    if(y(i) /= cy(i))print*,"results mismatch:",y,"instead of",cy
+    if(y(i) /= cy(i))info=-1
+    if(y(i) /= cy(i))goto 9996
   enddo
 9996 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_spfree(a,desc_a,info)
-  if (info /= 0)goto 9997
+  if (info /= psb_success_)goto 9997
 9997 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_cdfree(desc_a,info)
-  if (info /= 0)goto 9998
+  if (info /= psb_success_)goto 9998
 9998 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
 9999 continue
-  if(info /= 0)res=res+1
-  if(res/=0)print*,"on d matrix    2 x    2 blocked   1 x   1 usmv alpha=-3 beta= 0 incx=1 incy=1 trans=c is not ok"
-  if(res==0)print*,"on d matrix    2 x    2 blocked   1 x   1 usmv alpha=-3 beta= 0 incx=1 incy=1 trans=c is ok"
+  if(info /= psb_success_)res=res+1
+  if(res /= 0)print*,"on d matrix    2 x    2 blocked   1 x   1 usmv alpha=-3 beta= 0 incx=1 incy=1 trans=c is not ok"
+  if(res == 0)print*,"on d matrix    2 x    2 blocked   1 x   1 usmv alpha=-3 beta= 0 incx=1 incy=1 trans=c is ok"
 end subroutine d_usmv_2_c_am3_bm0_ix1_iy1
 ! 
 
@@ -4634,18 +4634,18 @@ subroutine d_ussv_2_n_ap3_bm0_ix1_iy1(res,afmt,ictxt)
   endif
   call psb_barrier(ictxt)
   call psb_cdall(ictxt,desc_a,info,nl=m)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spall(a,desc_a,info,nnz=nnz)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call a%set_triangle()
   call a%set_lower()
   call a%set_unit(.false.)
 
   call psb_barrier(ictxt)
   call psb_spins(nnz,IA,JA,VA,a,desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_cdasb(desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spasb(a,desc_a,info,dupl=psb_dupl_err_,afmt=afmt)
   if(info.ne.0)print *,"matrix assembly failed"
   if(info.ne.0)goto 9996
@@ -4654,24 +4654,24 @@ subroutine d_ussv_2_n_ap3_bm0_ix1_iy1(res,afmt,ictxt)
   if(info.ne.0)print *,"psb_spsm failed"
   if(info.ne.0)goto 9996
   do i=1,2
-    if(y(i)/=cy(i))print*,"results mismatch:",y,"instead of",cy
-    if(y(i)/=cy(i))info=-1
-    if(y(i)/=cy(i))goto 9996
+    if(y(i) /= cy(i))print*,"results mismatch:",y,"instead of",cy
+    if(y(i) /= cy(i))info=-1
+    if(y(i) /= cy(i))goto 9996
   enddo
 9996 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_spfree(a,desc_a,info)
-  if (info /= 0)goto 9997
+  if (info /= psb_success_)goto 9997
 9997 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_cdfree(desc_a,info)
-  if (info /= 0)goto 9998
+  if (info /= psb_success_)goto 9998
 9998 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
 9999 continue
-  if(info /= 0)res=res+1
-  if(res/=0)print*,"on d matrix    2 x    2 blocked   1 x   1 ussv alpha= 3 beta= 0 incx=1 incy=1 trans=n is not ok"
-  if(res==0)print*,"on d matrix    2 x    2 blocked   1 x   1 ussv alpha= 3 beta= 0 incx=1 incy=1 trans=n is ok"
+  if(info /= psb_success_)res=res+1
+  if(res /= 0)print*,"on d matrix    2 x    2 blocked   1 x   1 ussv alpha= 3 beta= 0 incx=1 incy=1 trans=n is not ok"
+  if(res == 0)print*,"on d matrix    2 x    2 blocked   1 x   1 ussv alpha= 3 beta= 0 incx=1 incy=1 trans=n is ok"
 end subroutine d_ussv_2_n_ap3_bm0_ix1_iy1
 ! 
 
@@ -4713,18 +4713,18 @@ subroutine d_ussv_2_t_ap3_bm0_ix1_iy1(res,afmt,ictxt)
   endif
   call psb_barrier(ictxt)
   call psb_cdall(ictxt,desc_a,info,nl=m)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spall(a,desc_a,info,nnz=nnz)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call a%set_triangle()
   call a%set_lower()
   call a%set_unit(.false.)
 
   call psb_barrier(ictxt)
   call psb_spins(nnz,IA,JA,VA,a,desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_cdasb(desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spasb(a,desc_a,info,dupl=psb_dupl_err_,afmt=afmt)
   if(info.ne.0)print *,"matrix assembly failed"
   if(info.ne.0)goto 9996
@@ -4733,24 +4733,24 @@ subroutine d_ussv_2_t_ap3_bm0_ix1_iy1(res,afmt,ictxt)
   if(info.ne.0)print *,"psb_spsm failed"
   if(info.ne.0)goto 9996
   do i=1,2
-    if(y(i)/=cy(i))print*,"results mismatch:",y,"instead of",cy
-    if(y(i)/=cy(i))info=-1
-    if(y(i)/=cy(i))goto 9996
+    if(y(i) /= cy(i))print*,"results mismatch:",y,"instead of",cy
+    if(y(i) /= cy(i))info=-1
+    if(y(i) /= cy(i))goto 9996
   enddo
 9996 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_spfree(a,desc_a,info)
-  if (info /= 0)goto 9997
+  if (info /= psb_success_)goto 9997
 9997 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_cdfree(desc_a,info)
-  if (info /= 0)goto 9998
+  if (info /= psb_success_)goto 9998
 9998 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
 9999 continue
-  if(info /= 0)res=res+1
-  if(res/=0)print*,"on d matrix    2 x    2 blocked   1 x   1 ussv alpha= 3 beta= 0 incx=1 incy=1 trans=t is not ok"
-  if(res==0)print*,"on d matrix    2 x    2 blocked   1 x   1 ussv alpha= 3 beta= 0 incx=1 incy=1 trans=t is ok"
+  if(info /= psb_success_)res=res+1
+  if(res /= 0)print*,"on d matrix    2 x    2 blocked   1 x   1 ussv alpha= 3 beta= 0 incx=1 incy=1 trans=t is not ok"
+  if(res == 0)print*,"on d matrix    2 x    2 blocked   1 x   1 ussv alpha= 3 beta= 0 incx=1 incy=1 trans=t is ok"
 end subroutine d_ussv_2_t_ap3_bm0_ix1_iy1
 ! 
 
@@ -4792,18 +4792,18 @@ subroutine d_ussv_2_c_ap3_bm0_ix1_iy1(res,afmt,ictxt)
   endif
   call psb_barrier(ictxt)
   call psb_cdall(ictxt,desc_a,info,nl=m)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spall(a,desc_a,info,nnz=nnz)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call a%set_triangle()
   call a%set_lower()
   call a%set_unit(.false.)
 
   call psb_barrier(ictxt)
   call psb_spins(nnz,IA,JA,VA,a,desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_cdasb(desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spasb(a,desc_a,info,dupl=psb_dupl_err_,afmt=afmt)
   if(info.ne.0)print *,"matrix assembly failed"
   if(info.ne.0)goto 9996
@@ -4812,24 +4812,24 @@ subroutine d_ussv_2_c_ap3_bm0_ix1_iy1(res,afmt,ictxt)
   if(info.ne.0)print *,"psb_spsm failed"
   if(info.ne.0)goto 9996
   do i=1,2
-    if(y(i)/=cy(i))print*,"results mismatch:",y,"instead of",cy
-    if(y(i)/=cy(i))info=-1
-    if(y(i)/=cy(i))goto 9996
+    if(y(i) /= cy(i))print*,"results mismatch:",y,"instead of",cy
+    if(y(i) /= cy(i))info=-1
+    if(y(i) /= cy(i))goto 9996
   enddo
 9996 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_spfree(a,desc_a,info)
-  if (info /= 0)goto 9997
+  if (info /= psb_success_)goto 9997
 9997 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_cdfree(desc_a,info)
-  if (info /= 0)goto 9998
+  if (info /= psb_success_)goto 9998
 9998 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
 9999 continue
-  if(info /= 0)res=res+1
-  if(res/=0)print*,"on d matrix    2 x    2 blocked   1 x   1 ussv alpha= 3 beta= 0 incx=1 incy=1 trans=c is not ok"
-  if(res==0)print*,"on d matrix    2 x    2 blocked   1 x   1 ussv alpha= 3 beta= 0 incx=1 incy=1 trans=c is ok"
+  if(info /= psb_success_)res=res+1
+  if(res /= 0)print*,"on d matrix    2 x    2 blocked   1 x   1 ussv alpha= 3 beta= 0 incx=1 incy=1 trans=c is not ok"
+  if(res == 0)print*,"on d matrix    2 x    2 blocked   1 x   1 ussv alpha= 3 beta= 0 incx=1 incy=1 trans=c is ok"
 end subroutine d_ussv_2_c_ap3_bm0_ix1_iy1
 ! 
 
@@ -4871,18 +4871,18 @@ subroutine d_ussv_2_n_ap1_bm0_ix1_iy1(res,afmt,ictxt)
   endif
   call psb_barrier(ictxt)
   call psb_cdall(ictxt,desc_a,info,nl=m)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spall(a,desc_a,info,nnz=nnz)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call a%set_triangle()
   call a%set_lower()
   call a%set_unit(.false.)
 
   call psb_barrier(ictxt)
   call psb_spins(nnz,IA,JA,VA,a,desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_cdasb(desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spasb(a,desc_a,info,dupl=psb_dupl_err_,afmt=afmt)
   if(info.ne.0)print *,"matrix assembly failed"
   if(info.ne.0)goto 9996
@@ -4891,24 +4891,24 @@ subroutine d_ussv_2_n_ap1_bm0_ix1_iy1(res,afmt,ictxt)
   if(info.ne.0)print *,"psb_spsm failed"
   if(info.ne.0)goto 9996
   do i=1,2
-    if(y(i)/=cy(i))print*,"results mismatch:",y,"instead of",cy
-    if(y(i)/=cy(i))info=-1
-    if(y(i)/=cy(i))goto 9996
+    if(y(i) /= cy(i))print*,"results mismatch:",y,"instead of",cy
+    if(y(i) /= cy(i))info=-1
+    if(y(i) /= cy(i))goto 9996
   enddo
 9996 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_spfree(a,desc_a,info)
-  if (info /= 0)goto 9997
+  if (info /= psb_success_)goto 9997
 9997 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_cdfree(desc_a,info)
-  if (info /= 0)goto 9998
+  if (info /= psb_success_)goto 9998
 9998 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
 9999 continue
-  if(info /= 0)res=res+1
-  if(res/=0)print*,"on d matrix    2 x    2 blocked   1 x   1 ussv alpha= 1 beta= 0 incx=1 incy=1 trans=n is not ok"
-  if(res==0)print*,"on d matrix    2 x    2 blocked   1 x   1 ussv alpha= 1 beta= 0 incx=1 incy=1 trans=n is ok"
+  if(info /= psb_success_)res=res+1
+  if(res /= 0)print*,"on d matrix    2 x    2 blocked   1 x   1 ussv alpha= 1 beta= 0 incx=1 incy=1 trans=n is not ok"
+  if(res == 0)print*,"on d matrix    2 x    2 blocked   1 x   1 ussv alpha= 1 beta= 0 incx=1 incy=1 trans=n is ok"
 end subroutine d_ussv_2_n_ap1_bm0_ix1_iy1
 ! 
 
@@ -4950,18 +4950,18 @@ subroutine d_ussv_2_t_ap1_bm0_ix1_iy1(res,afmt,ictxt)
   endif
   call psb_barrier(ictxt)
   call psb_cdall(ictxt,desc_a,info,nl=m)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spall(a,desc_a,info,nnz=nnz)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call a%set_triangle()
   call a%set_lower()
   call a%set_unit(.false.)
 
   call psb_barrier(ictxt)
   call psb_spins(nnz,IA,JA,VA,a,desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_cdasb(desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spasb(a,desc_a,info,dupl=psb_dupl_err_,afmt=afmt)
   if(info.ne.0)print *,"matrix assembly failed"
   if(info.ne.0)goto 9996
@@ -4970,24 +4970,24 @@ subroutine d_ussv_2_t_ap1_bm0_ix1_iy1(res,afmt,ictxt)
   if(info.ne.0)print *,"psb_spsm failed"
   if(info.ne.0)goto 9996
   do i=1,2
-    if(y(i)/=cy(i))print*,"results mismatch:",y,"instead of",cy
-    if(y(i)/=cy(i))info=-1
-    if(y(i)/=cy(i))goto 9996
+    if(y(i) /= cy(i))print*,"results mismatch:",y,"instead of",cy
+    if(y(i) /= cy(i))info=-1
+    if(y(i) /= cy(i))goto 9996
   enddo
 9996 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_spfree(a,desc_a,info)
-  if (info /= 0)goto 9997
+  if (info /= psb_success_)goto 9997
 9997 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_cdfree(desc_a,info)
-  if (info /= 0)goto 9998
+  if (info /= psb_success_)goto 9998
 9998 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
 9999 continue
-  if(info /= 0)res=res+1
-  if(res/=0)print*,"on d matrix    2 x    2 blocked   1 x   1 ussv alpha= 1 beta= 0 incx=1 incy=1 trans=t is not ok"
-  if(res==0)print*,"on d matrix    2 x    2 blocked   1 x   1 ussv alpha= 1 beta= 0 incx=1 incy=1 trans=t is ok"
+  if(info /= psb_success_)res=res+1
+  if(res /= 0)print*,"on d matrix    2 x    2 blocked   1 x   1 ussv alpha= 1 beta= 0 incx=1 incy=1 trans=t is not ok"
+  if(res == 0)print*,"on d matrix    2 x    2 blocked   1 x   1 ussv alpha= 1 beta= 0 incx=1 incy=1 trans=t is ok"
 end subroutine d_ussv_2_t_ap1_bm0_ix1_iy1
 ! 
 
@@ -5029,18 +5029,18 @@ subroutine d_ussv_2_c_ap1_bm0_ix1_iy1(res,afmt,ictxt)
   endif
   call psb_barrier(ictxt)
   call psb_cdall(ictxt,desc_a,info,nl=m)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spall(a,desc_a,info,nnz=nnz)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call a%set_triangle()
   call a%set_lower()
   call a%set_unit(.false.)
 
   call psb_barrier(ictxt)
   call psb_spins(nnz,IA,JA,VA,a,desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_cdasb(desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spasb(a,desc_a,info,dupl=psb_dupl_err_,afmt=afmt)
   if(info.ne.0)print *,"matrix assembly failed"
   if(info.ne.0)goto 9996
@@ -5049,24 +5049,24 @@ subroutine d_ussv_2_c_ap1_bm0_ix1_iy1(res,afmt,ictxt)
   if(info.ne.0)print *,"psb_spsm failed"
   if(info.ne.0)goto 9996
   do i=1,2
-    if(y(i)/=cy(i))print*,"results mismatch:",y,"instead of",cy
-    if(y(i)/=cy(i))info=-1
-    if(y(i)/=cy(i))goto 9996
+    if(y(i) /= cy(i))print*,"results mismatch:",y,"instead of",cy
+    if(y(i) /= cy(i))info=-1
+    if(y(i) /= cy(i))goto 9996
   enddo
 9996 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_spfree(a,desc_a,info)
-  if (info /= 0)goto 9997
+  if (info /= psb_success_)goto 9997
 9997 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_cdfree(desc_a,info)
-  if (info /= 0)goto 9998
+  if (info /= psb_success_)goto 9998
 9998 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
 9999 continue
-  if(info /= 0)res=res+1
-  if(res/=0)print*,"on d matrix    2 x    2 blocked   1 x   1 ussv alpha= 1 beta= 0 incx=1 incy=1 trans=c is not ok"
-  if(res==0)print*,"on d matrix    2 x    2 blocked   1 x   1 ussv alpha= 1 beta= 0 incx=1 incy=1 trans=c is ok"
+  if(info /= psb_success_)res=res+1
+  if(res /= 0)print*,"on d matrix    2 x    2 blocked   1 x   1 ussv alpha= 1 beta= 0 incx=1 incy=1 trans=c is not ok"
+  if(res == 0)print*,"on d matrix    2 x    2 blocked   1 x   1 ussv alpha= 1 beta= 0 incx=1 incy=1 trans=c is ok"
 end subroutine d_ussv_2_c_ap1_bm0_ix1_iy1
 ! 
 
@@ -5108,18 +5108,18 @@ subroutine d_ussv_2_n_am1_bm0_ix1_iy1(res,afmt,ictxt)
   endif
   call psb_barrier(ictxt)
   call psb_cdall(ictxt,desc_a,info,nl=m)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spall(a,desc_a,info,nnz=nnz)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call a%set_triangle()
   call a%set_lower()
   call a%set_unit(.false.)
 
   call psb_barrier(ictxt)
   call psb_spins(nnz,IA,JA,VA,a,desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_cdasb(desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spasb(a,desc_a,info,dupl=psb_dupl_err_,afmt=afmt)
   if(info.ne.0)print *,"matrix assembly failed"
   if(info.ne.0)goto 9996
@@ -5128,24 +5128,24 @@ subroutine d_ussv_2_n_am1_bm0_ix1_iy1(res,afmt,ictxt)
   if(info.ne.0)print *,"psb_spsm failed"
   if(info.ne.0)goto 9996
   do i=1,2
-    if(y(i)/=cy(i))print*,"results mismatch:",y,"instead of",cy
-    if(y(i)/=cy(i))info=-1
-    if(y(i)/=cy(i))goto 9996
+    if(y(i) /= cy(i))print*,"results mismatch:",y,"instead of",cy
+    if(y(i) /= cy(i))info=-1
+    if(y(i) /= cy(i))goto 9996
   enddo
 9996 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_spfree(a,desc_a,info)
-  if (info /= 0)goto 9997
+  if (info /= psb_success_)goto 9997
 9997 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_cdfree(desc_a,info)
-  if (info /= 0)goto 9998
+  if (info /= psb_success_)goto 9998
 9998 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
 9999 continue
-  if(info /= 0)res=res+1
-  if(res/=0)print*,"on d matrix    2 x    2 blocked   1 x   1 ussv alpha=-1 beta= 0 incx=1 incy=1 trans=n is not ok"
-  if(res==0)print*,"on d matrix    2 x    2 blocked   1 x   1 ussv alpha=-1 beta= 0 incx=1 incy=1 trans=n is ok"
+  if(info /= psb_success_)res=res+1
+  if(res /= 0)print*,"on d matrix    2 x    2 blocked   1 x   1 ussv alpha=-1 beta= 0 incx=1 incy=1 trans=n is not ok"
+  if(res == 0)print*,"on d matrix    2 x    2 blocked   1 x   1 ussv alpha=-1 beta= 0 incx=1 incy=1 trans=n is ok"
 end subroutine d_ussv_2_n_am1_bm0_ix1_iy1
 ! 
 
@@ -5187,18 +5187,18 @@ subroutine d_ussv_2_t_am1_bm0_ix1_iy1(res,afmt,ictxt)
   endif
   call psb_barrier(ictxt)
   call psb_cdall(ictxt,desc_a,info,nl=m)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spall(a,desc_a,info,nnz=nnz)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call a%set_triangle()
   call a%set_lower()
   call a%set_unit(.false.)
 
   call psb_barrier(ictxt)
   call psb_spins(nnz,IA,JA,VA,a,desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_cdasb(desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spasb(a,desc_a,info,dupl=psb_dupl_err_,afmt=afmt)
   if(info.ne.0)print *,"matrix assembly failed"
   if(info.ne.0)goto 9996
@@ -5207,24 +5207,24 @@ subroutine d_ussv_2_t_am1_bm0_ix1_iy1(res,afmt,ictxt)
   if(info.ne.0)print *,"psb_spsm failed"
   if(info.ne.0)goto 9996
   do i=1,2
-    if(y(i)/=cy(i))print*,"results mismatch:",y,"instead of",cy
-    if(y(i)/=cy(i))info=-1
-    if(y(i)/=cy(i))goto 9996
+    if(y(i) /= cy(i))print*,"results mismatch:",y,"instead of",cy
+    if(y(i) /= cy(i))info=-1
+    if(y(i) /= cy(i))goto 9996
   enddo
 9996 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_spfree(a,desc_a,info)
-  if (info /= 0)goto 9997
+  if (info /= psb_success_)goto 9997
 9997 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_cdfree(desc_a,info)
-  if (info /= 0)goto 9998
+  if (info /= psb_success_)goto 9998
 9998 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
 9999 continue
-  if(info /= 0)res=res+1
-  if(res/=0)print*,"on d matrix    2 x    2 blocked   1 x   1 ussv alpha=-1 beta= 0 incx=1 incy=1 trans=t is not ok"
-  if(res==0)print*,"on d matrix    2 x    2 blocked   1 x   1 ussv alpha=-1 beta= 0 incx=1 incy=1 trans=t is ok"
+  if(info /= psb_success_)res=res+1
+  if(res /= 0)print*,"on d matrix    2 x    2 blocked   1 x   1 ussv alpha=-1 beta= 0 incx=1 incy=1 trans=t is not ok"
+  if(res == 0)print*,"on d matrix    2 x    2 blocked   1 x   1 ussv alpha=-1 beta= 0 incx=1 incy=1 trans=t is ok"
 end subroutine d_ussv_2_t_am1_bm0_ix1_iy1
 ! 
 
@@ -5266,18 +5266,18 @@ subroutine d_ussv_2_c_am1_bm0_ix1_iy1(res,afmt,ictxt)
   endif
   call psb_barrier(ictxt)
   call psb_cdall(ictxt,desc_a,info,nl=m)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spall(a,desc_a,info,nnz=nnz)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call a%set_triangle()
   call a%set_lower()
   call a%set_unit(.false.)
 
   call psb_barrier(ictxt)
   call psb_spins(nnz,IA,JA,VA,a,desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_cdasb(desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spasb(a,desc_a,info,dupl=psb_dupl_err_,afmt=afmt)
   if(info.ne.0)print *,"matrix assembly failed"
   if(info.ne.0)goto 9996
@@ -5286,24 +5286,24 @@ subroutine d_ussv_2_c_am1_bm0_ix1_iy1(res,afmt,ictxt)
   if(info.ne.0)print *,"psb_spsm failed"
   if(info.ne.0)goto 9996
   do i=1,2
-    if(y(i)/=cy(i))print*,"results mismatch:",y,"instead of",cy
-    if(y(i)/=cy(i))info=-1
-    if(y(i)/=cy(i))goto 9996
+    if(y(i) /= cy(i))print*,"results mismatch:",y,"instead of",cy
+    if(y(i) /= cy(i))info=-1
+    if(y(i) /= cy(i))goto 9996
   enddo
 9996 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_spfree(a,desc_a,info)
-  if (info /= 0)goto 9997
+  if (info /= psb_success_)goto 9997
 9997 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_cdfree(desc_a,info)
-  if (info /= 0)goto 9998
+  if (info /= psb_success_)goto 9998
 9998 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
 9999 continue
-  if(info /= 0)res=res+1
-  if(res/=0)print*,"on d matrix    2 x    2 blocked   1 x   1 ussv alpha=-1 beta= 0 incx=1 incy=1 trans=c is not ok"
-  if(res==0)print*,"on d matrix    2 x    2 blocked   1 x   1 ussv alpha=-1 beta= 0 incx=1 incy=1 trans=c is ok"
+  if(info /= psb_success_)res=res+1
+  if(res /= 0)print*,"on d matrix    2 x    2 blocked   1 x   1 ussv alpha=-1 beta= 0 incx=1 incy=1 trans=c is not ok"
+  if(res == 0)print*,"on d matrix    2 x    2 blocked   1 x   1 ussv alpha=-1 beta= 0 incx=1 incy=1 trans=c is ok"
 end subroutine d_ussv_2_c_am1_bm0_ix1_iy1
 ! 
 
@@ -5345,18 +5345,18 @@ subroutine d_ussv_2_n_am3_bm0_ix1_iy1(res,afmt,ictxt)
   endif
   call psb_barrier(ictxt)
   call psb_cdall(ictxt,desc_a,info,nl=m)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spall(a,desc_a,info,nnz=nnz)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call a%set_triangle()
   call a%set_lower()
   call a%set_unit(.false.)
 
   call psb_barrier(ictxt)
   call psb_spins(nnz,IA,JA,VA,a,desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_cdasb(desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spasb(a,desc_a,info,dupl=psb_dupl_err_,afmt=afmt)
   if(info.ne.0)print *,"matrix assembly failed"
   if(info.ne.0)goto 9996
@@ -5365,24 +5365,24 @@ subroutine d_ussv_2_n_am3_bm0_ix1_iy1(res,afmt,ictxt)
   if(info.ne.0)print *,"psb_spsm failed"
   if(info.ne.0)goto 9996
   do i=1,2
-    if(y(i)/=cy(i))print*,"results mismatch:",y,"instead of",cy
-    if(y(i)/=cy(i))info=-1
-    if(y(i)/=cy(i))goto 9996
+    if(y(i) /= cy(i))print*,"results mismatch:",y,"instead of",cy
+    if(y(i) /= cy(i))info=-1
+    if(y(i) /= cy(i))goto 9996
   enddo
 9996 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_spfree(a,desc_a,info)
-  if (info /= 0)goto 9997
+  if (info /= psb_success_)goto 9997
 9997 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_cdfree(desc_a,info)
-  if (info /= 0)goto 9998
+  if (info /= psb_success_)goto 9998
 9998 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
 9999 continue
-  if(info /= 0)res=res+1
-  if(res/=0)print*,"on d matrix    2 x    2 blocked   1 x   1 ussv alpha=-3 beta= 0 incx=1 incy=1 trans=n is not ok"
-  if(res==0)print*,"on d matrix    2 x    2 blocked   1 x   1 ussv alpha=-3 beta= 0 incx=1 incy=1 trans=n is ok"
+  if(info /= psb_success_)res=res+1
+  if(res /= 0)print*,"on d matrix    2 x    2 blocked   1 x   1 ussv alpha=-3 beta= 0 incx=1 incy=1 trans=n is not ok"
+  if(res == 0)print*,"on d matrix    2 x    2 blocked   1 x   1 ussv alpha=-3 beta= 0 incx=1 incy=1 trans=n is ok"
 end subroutine d_ussv_2_n_am3_bm0_ix1_iy1
 ! 
 
@@ -5424,18 +5424,18 @@ subroutine d_ussv_2_t_am3_bm0_ix1_iy1(res,afmt,ictxt)
   endif
   call psb_barrier(ictxt)
   call psb_cdall(ictxt,desc_a,info,nl=m)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spall(a,desc_a,info,nnz=nnz)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call a%set_triangle()
   call a%set_lower()
   call a%set_unit(.false.)
 
   call psb_barrier(ictxt)
   call psb_spins(nnz,IA,JA,VA,a,desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_cdasb(desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spasb(a,desc_a,info,dupl=psb_dupl_err_,afmt=afmt)
   if(info.ne.0)print *,"matrix assembly failed"
   if(info.ne.0)goto 9996
@@ -5444,24 +5444,24 @@ subroutine d_ussv_2_t_am3_bm0_ix1_iy1(res,afmt,ictxt)
   if(info.ne.0)print *,"psb_spsm failed"
   if(info.ne.0)goto 9996
   do i=1,2
-    if(y(i)/=cy(i))print*,"results mismatch:",y,"instead of",cy
-    if(y(i)/=cy(i))info=-1
-    if(y(i)/=cy(i))goto 9996
+    if(y(i) /= cy(i))print*,"results mismatch:",y,"instead of",cy
+    if(y(i) /= cy(i))info=-1
+    if(y(i) /= cy(i))goto 9996
   enddo
 9996 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_spfree(a,desc_a,info)
-  if (info /= 0)goto 9997
+  if (info /= psb_success_)goto 9997
 9997 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_cdfree(desc_a,info)
-  if (info /= 0)goto 9998
+  if (info /= psb_success_)goto 9998
 9998 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
 9999 continue
-  if(info /= 0)res=res+1
-  if(res/=0)print*,"on d matrix    2 x    2 blocked   1 x   1 ussv alpha=-3 beta= 0 incx=1 incy=1 trans=t is not ok"
-  if(res==0)print*,"on d matrix    2 x    2 blocked   1 x   1 ussv alpha=-3 beta= 0 incx=1 incy=1 trans=t is ok"
+  if(info /= psb_success_)res=res+1
+  if(res /= 0)print*,"on d matrix    2 x    2 blocked   1 x   1 ussv alpha=-3 beta= 0 incx=1 incy=1 trans=t is not ok"
+  if(res == 0)print*,"on d matrix    2 x    2 blocked   1 x   1 ussv alpha=-3 beta= 0 incx=1 incy=1 trans=t is ok"
 end subroutine d_ussv_2_t_am3_bm0_ix1_iy1
 ! 
 
@@ -5503,18 +5503,18 @@ subroutine d_ussv_2_c_am3_bm0_ix1_iy1(res,afmt,ictxt)
   endif
   call psb_barrier(ictxt)
   call psb_cdall(ictxt,desc_a,info,nl=m)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spall(a,desc_a,info,nnz=nnz)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call a%set_triangle()
   call a%set_lower()
   call a%set_unit(.false.)
 
   call psb_barrier(ictxt)
   call psb_spins(nnz,IA,JA,VA,a,desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_cdasb(desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spasb(a,desc_a,info,dupl=psb_dupl_err_,afmt=afmt)
   if(info.ne.0)print *,"matrix assembly failed"
   if(info.ne.0)goto 9996
@@ -5523,24 +5523,24 @@ subroutine d_ussv_2_c_am3_bm0_ix1_iy1(res,afmt,ictxt)
   if(info.ne.0)print *,"psb_spsm failed"
   if(info.ne.0)goto 9996
   do i=1,2
-    if(y(i)/=cy(i))print*,"results mismatch:",y,"instead of",cy
-    if(y(i)/=cy(i))info=-1
-    if(y(i)/=cy(i))goto 9996
+    if(y(i) /= cy(i))print*,"results mismatch:",y,"instead of",cy
+    if(y(i) /= cy(i))info=-1
+    if(y(i) /= cy(i))goto 9996
   enddo
 9996 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_spfree(a,desc_a,info)
-  if (info /= 0)goto 9997
+  if (info /= psb_success_)goto 9997
 9997 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_cdfree(desc_a,info)
-  if (info /= 0)goto 9998
+  if (info /= psb_success_)goto 9998
 9998 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
 9999 continue
-  if(info /= 0)res=res+1
-  if(res/=0)print*,"on d matrix    2 x    2 blocked   1 x   1 ussv alpha=-3 beta= 0 incx=1 incy=1 trans=c is not ok"
-  if(res==0)print*,"on d matrix    2 x    2 blocked   1 x   1 ussv alpha=-3 beta= 0 incx=1 incy=1 trans=c is ok"
+  if(info /= psb_success_)res=res+1
+  if(res /= 0)print*,"on d matrix    2 x    2 blocked   1 x   1 ussv alpha=-3 beta= 0 incx=1 incy=1 trans=c is not ok"
+  if(res == 0)print*,"on d matrix    2 x    2 blocked   1 x   1 ussv alpha=-3 beta= 0 incx=1 incy=1 trans=c is ok"
 end subroutine d_ussv_2_c_am3_bm0_ix1_iy1
 ! 
 
@@ -5583,14 +5583,14 @@ subroutine c_usmv_2_n_ap3_bp1_ix1_iy1(res,afmt,ictxt)
   endif
   call psb_barrier(ictxt)
   call psb_cdall(ictxt,desc_a,info,nl=m)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spall(a,desc_a,info,nnz=nnz)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_barrier(ictxt)
   call psb_spins(nnz,IA,JA,VA,a,desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_cdasb(desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spasb(a,desc_a,info,dupl=psb_dupl_err_,afmt=afmt)
   if(info.ne.0)print *,"matrix assembly failed"
   if(info.ne.0)goto 9996
@@ -5599,24 +5599,24 @@ subroutine c_usmv_2_n_ap3_bp1_ix1_iy1(res,afmt,ictxt)
   if(info.ne.0)print *,"psb_spmm failed"
   if(info.ne.0)goto 9996
   do i=1,2
-    if(y(i)/=cy(i))print*,"results mismatch:",y,"instead of",cy
-    if(y(i)/=cy(i))info=-1
-    if(y(i)/=cy(i))goto 9996
+    if(y(i) /= cy(i))print*,"results mismatch:",y,"instead of",cy
+    if(y(i) /= cy(i))info=-1
+    if(y(i) /= cy(i))goto 9996
   enddo
 9996 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_spfree(a,desc_a,info)
-  if (info /= 0)goto 9997
+  if (info /= psb_success_)goto 9997
 9997 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_cdfree(desc_a,info)
-  if (info /= 0)goto 9998
+  if (info /= psb_success_)goto 9998
 9998 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
 9999 continue
-  if(info /= 0)res=res+1
-  if(res/=0)print*,"on c matrix    2 x    2 blocked   1 x   1 usmv alpha= 3 beta= 1 incx=1 incy=1 trans=n is not ok"
-  if(res==0)print*,"on c matrix    2 x    2 blocked   1 x   1 usmv alpha= 3 beta= 1 incx=1 incy=1 trans=n is ok"
+  if(info /= psb_success_)res=res+1
+  if(res /= 0)print*,"on c matrix    2 x    2 blocked   1 x   1 usmv alpha= 3 beta= 1 incx=1 incy=1 trans=n is not ok"
+  if(res == 0)print*,"on c matrix    2 x    2 blocked   1 x   1 usmv alpha= 3 beta= 1 incx=1 incy=1 trans=n is ok"
 end subroutine c_usmv_2_n_ap3_bp1_ix1_iy1
 ! 
 
@@ -5659,14 +5659,14 @@ subroutine c_usmv_2_t_ap3_bp1_ix1_iy1(res,afmt,ictxt)
   endif
   call psb_barrier(ictxt)
   call psb_cdall(ictxt,desc_a,info,nl=m)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spall(a,desc_a,info,nnz=nnz)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_barrier(ictxt)
   call psb_spins(nnz,IA,JA,VA,a,desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_cdasb(desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spasb(a,desc_a,info,dupl=psb_dupl_err_,afmt=afmt)
   if(info.ne.0)print *,"matrix assembly failed"
   if(info.ne.0)goto 9996
@@ -5675,24 +5675,24 @@ subroutine c_usmv_2_t_ap3_bp1_ix1_iy1(res,afmt,ictxt)
   if(info.ne.0)print *,"psb_spmm failed"
   if(info.ne.0)goto 9996
   do i=1,2
-    if(y(i)/=cy(i))print*,"results mismatch:",y,"instead of",cy
-    if(y(i)/=cy(i))info=-1
-    if(y(i)/=cy(i))goto 9996
+    if(y(i) /= cy(i))print*,"results mismatch:",y,"instead of",cy
+    if(y(i) /= cy(i))info=-1
+    if(y(i) /= cy(i))goto 9996
   enddo
 9996 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_spfree(a,desc_a,info)
-  if (info /= 0)goto 9997
+  if (info /= psb_success_)goto 9997
 9997 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_cdfree(desc_a,info)
-  if (info /= 0)goto 9998
+  if (info /= psb_success_)goto 9998
 9998 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
 9999 continue
-  if(info /= 0)res=res+1
-  if(res/=0)print*,"on c matrix    2 x    2 blocked   1 x   1 usmv alpha= 3 beta= 1 incx=1 incy=1 trans=t is not ok"
-  if(res==0)print*,"on c matrix    2 x    2 blocked   1 x   1 usmv alpha= 3 beta= 1 incx=1 incy=1 trans=t is ok"
+  if(info /= psb_success_)res=res+1
+  if(res /= 0)print*,"on c matrix    2 x    2 blocked   1 x   1 usmv alpha= 3 beta= 1 incx=1 incy=1 trans=t is not ok"
+  if(res == 0)print*,"on c matrix    2 x    2 blocked   1 x   1 usmv alpha= 3 beta= 1 incx=1 incy=1 trans=t is ok"
 end subroutine c_usmv_2_t_ap3_bp1_ix1_iy1
 ! 
 
@@ -5735,14 +5735,14 @@ subroutine c_usmv_2_c_ap3_bp1_ix1_iy1(res,afmt,ictxt)
   endif
   call psb_barrier(ictxt)
   call psb_cdall(ictxt,desc_a,info,nl=m)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spall(a,desc_a,info,nnz=nnz)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_barrier(ictxt)
   call psb_spins(nnz,IA,JA,VA,a,desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_cdasb(desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spasb(a,desc_a,info,dupl=psb_dupl_err_,afmt=afmt)
   if(info.ne.0)print *,"matrix assembly failed"
   if(info.ne.0)goto 9996
@@ -5751,24 +5751,24 @@ subroutine c_usmv_2_c_ap3_bp1_ix1_iy1(res,afmt,ictxt)
   if(info.ne.0)print *,"psb_spmm failed"
   if(info.ne.0)goto 9996
   do i=1,2
-    if(y(i)/=cy(i))print*,"results mismatch:",y,"instead of",cy
-    if(y(i)/=cy(i))info=-1
-    if(y(i)/=cy(i))goto 9996
+    if(y(i) /= cy(i))print*,"results mismatch:",y,"instead of",cy
+    if(y(i) /= cy(i))info=-1
+    if(y(i) /= cy(i))goto 9996
   enddo
 9996 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_spfree(a,desc_a,info)
-  if (info /= 0)goto 9997
+  if (info /= psb_success_)goto 9997
 9997 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_cdfree(desc_a,info)
-  if (info /= 0)goto 9998
+  if (info /= psb_success_)goto 9998
 9998 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
 9999 continue
-  if(info /= 0)res=res+1
-  if(res/=0)print*,"on c matrix    2 x    2 blocked   1 x   1 usmv alpha= 3 beta= 1 incx=1 incy=1 trans=c is not ok"
-  if(res==0)print*,"on c matrix    2 x    2 blocked   1 x   1 usmv alpha= 3 beta= 1 incx=1 incy=1 trans=c is ok"
+  if(info /= psb_success_)res=res+1
+  if(res /= 0)print*,"on c matrix    2 x    2 blocked   1 x   1 usmv alpha= 3 beta= 1 incx=1 incy=1 trans=c is not ok"
+  if(res == 0)print*,"on c matrix    2 x    2 blocked   1 x   1 usmv alpha= 3 beta= 1 incx=1 incy=1 trans=c is ok"
 end subroutine c_usmv_2_c_ap3_bp1_ix1_iy1
 ! 
 
@@ -5811,14 +5811,14 @@ subroutine c_usmv_2_n_ap3_bm0_ix1_iy1(res,afmt,ictxt)
   endif
   call psb_barrier(ictxt)
   call psb_cdall(ictxt,desc_a,info,nl=m)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spall(a,desc_a,info,nnz=nnz)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_barrier(ictxt)
   call psb_spins(nnz,IA,JA,VA,a,desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_cdasb(desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spasb(a,desc_a,info,dupl=psb_dupl_err_,afmt=afmt)
   if(info.ne.0)print *,"matrix assembly failed"
   if(info.ne.0)goto 9996
@@ -5827,24 +5827,24 @@ subroutine c_usmv_2_n_ap3_bm0_ix1_iy1(res,afmt,ictxt)
   if(info.ne.0)print *,"psb_spmm failed"
   if(info.ne.0)goto 9996
   do i=1,2
-    if(y(i)/=cy(i))print*,"results mismatch:",y,"instead of",cy
-    if(y(i)/=cy(i))info=-1
-    if(y(i)/=cy(i))goto 9996
+    if(y(i) /= cy(i))print*,"results mismatch:",y,"instead of",cy
+    if(y(i) /= cy(i))info=-1
+    if(y(i) /= cy(i))goto 9996
   enddo
 9996 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_spfree(a,desc_a,info)
-  if (info /= 0)goto 9997
+  if (info /= psb_success_)goto 9997
 9997 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_cdfree(desc_a,info)
-  if (info /= 0)goto 9998
+  if (info /= psb_success_)goto 9998
 9998 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
 9999 continue
-  if(info /= 0)res=res+1
-  if(res/=0)print*,"on c matrix    2 x    2 blocked   1 x   1 usmv alpha= 3 beta= 0 incx=1 incy=1 trans=n is not ok"
-  if(res==0)print*,"on c matrix    2 x    2 blocked   1 x   1 usmv alpha= 3 beta= 0 incx=1 incy=1 trans=n is ok"
+  if(info /= psb_success_)res=res+1
+  if(res /= 0)print*,"on c matrix    2 x    2 blocked   1 x   1 usmv alpha= 3 beta= 0 incx=1 incy=1 trans=n is not ok"
+  if(res == 0)print*,"on c matrix    2 x    2 blocked   1 x   1 usmv alpha= 3 beta= 0 incx=1 incy=1 trans=n is ok"
 end subroutine c_usmv_2_n_ap3_bm0_ix1_iy1
 ! 
 
@@ -5887,14 +5887,14 @@ subroutine c_usmv_2_t_ap3_bm0_ix1_iy1(res,afmt,ictxt)
   endif
   call psb_barrier(ictxt)
   call psb_cdall(ictxt,desc_a,info,nl=m)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spall(a,desc_a,info,nnz=nnz)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_barrier(ictxt)
   call psb_spins(nnz,IA,JA,VA,a,desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_cdasb(desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spasb(a,desc_a,info,dupl=psb_dupl_err_,afmt=afmt)
   if(info.ne.0)print *,"matrix assembly failed"
   if(info.ne.0)goto 9996
@@ -5903,24 +5903,24 @@ subroutine c_usmv_2_t_ap3_bm0_ix1_iy1(res,afmt,ictxt)
   if(info.ne.0)print *,"psb_spmm failed"
   if(info.ne.0)goto 9996
   do i=1,2
-    if(y(i)/=cy(i))print*,"results mismatch:",y,"instead of",cy
-    if(y(i)/=cy(i))info=-1
-    if(y(i)/=cy(i))goto 9996
+    if(y(i) /= cy(i))print*,"results mismatch:",y,"instead of",cy
+    if(y(i) /= cy(i))info=-1
+    if(y(i) /= cy(i))goto 9996
   enddo
 9996 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_spfree(a,desc_a,info)
-  if (info /= 0)goto 9997
+  if (info /= psb_success_)goto 9997
 9997 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_cdfree(desc_a,info)
-  if (info /= 0)goto 9998
+  if (info /= psb_success_)goto 9998
 9998 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
 9999 continue
-  if(info /= 0)res=res+1
-  if(res/=0)print*,"on c matrix    2 x    2 blocked   1 x   1 usmv alpha= 3 beta= 0 incx=1 incy=1 trans=t is not ok"
-  if(res==0)print*,"on c matrix    2 x    2 blocked   1 x   1 usmv alpha= 3 beta= 0 incx=1 incy=1 trans=t is ok"
+  if(info /= psb_success_)res=res+1
+  if(res /= 0)print*,"on c matrix    2 x    2 blocked   1 x   1 usmv alpha= 3 beta= 0 incx=1 incy=1 trans=t is not ok"
+  if(res == 0)print*,"on c matrix    2 x    2 blocked   1 x   1 usmv alpha= 3 beta= 0 incx=1 incy=1 trans=t is ok"
 end subroutine c_usmv_2_t_ap3_bm0_ix1_iy1
 ! 
 
@@ -5963,14 +5963,14 @@ subroutine c_usmv_2_c_ap3_bm0_ix1_iy1(res,afmt,ictxt)
   endif
   call psb_barrier(ictxt)
   call psb_cdall(ictxt,desc_a,info,nl=m)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spall(a,desc_a,info,nnz=nnz)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_barrier(ictxt)
   call psb_spins(nnz,IA,JA,VA,a,desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_cdasb(desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spasb(a,desc_a,info,dupl=psb_dupl_err_,afmt=afmt)
   if(info.ne.0)print *,"matrix assembly failed"
   if(info.ne.0)goto 9996
@@ -5979,24 +5979,24 @@ subroutine c_usmv_2_c_ap3_bm0_ix1_iy1(res,afmt,ictxt)
   if(info.ne.0)print *,"psb_spmm failed"
   if(info.ne.0)goto 9996
   do i=1,2
-    if(y(i)/=cy(i))print*,"results mismatch:",y,"instead of",cy
-    if(y(i)/=cy(i))info=-1
-    if(y(i)/=cy(i))goto 9996
+    if(y(i) /= cy(i))print*,"results mismatch:",y,"instead of",cy
+    if(y(i) /= cy(i))info=-1
+    if(y(i) /= cy(i))goto 9996
   enddo
 9996 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_spfree(a,desc_a,info)
-  if (info /= 0)goto 9997
+  if (info /= psb_success_)goto 9997
 9997 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_cdfree(desc_a,info)
-  if (info /= 0)goto 9998
+  if (info /= psb_success_)goto 9998
 9998 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
 9999 continue
-  if(info /= 0)res=res+1
-  if(res/=0)print*,"on c matrix    2 x    2 blocked   1 x   1 usmv alpha= 3 beta= 0 incx=1 incy=1 trans=c is not ok"
-  if(res==0)print*,"on c matrix    2 x    2 blocked   1 x   1 usmv alpha= 3 beta= 0 incx=1 incy=1 trans=c is ok"
+  if(info /= psb_success_)res=res+1
+  if(res /= 0)print*,"on c matrix    2 x    2 blocked   1 x   1 usmv alpha= 3 beta= 0 incx=1 incy=1 trans=c is not ok"
+  if(res == 0)print*,"on c matrix    2 x    2 blocked   1 x   1 usmv alpha= 3 beta= 0 incx=1 incy=1 trans=c is ok"
 end subroutine c_usmv_2_c_ap3_bm0_ix1_iy1
 ! 
 
@@ -6039,14 +6039,14 @@ subroutine c_usmv_2_n_ap1_bp1_ix1_iy1(res,afmt,ictxt)
   endif
   call psb_barrier(ictxt)
   call psb_cdall(ictxt,desc_a,info,nl=m)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spall(a,desc_a,info,nnz=nnz)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_barrier(ictxt)
   call psb_spins(nnz,IA,JA,VA,a,desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_cdasb(desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spasb(a,desc_a,info,dupl=psb_dupl_err_,afmt=afmt)
   if(info.ne.0)print *,"matrix assembly failed"
   if(info.ne.0)goto 9996
@@ -6055,24 +6055,24 @@ subroutine c_usmv_2_n_ap1_bp1_ix1_iy1(res,afmt,ictxt)
   if(info.ne.0)print *,"psb_spmm failed"
   if(info.ne.0)goto 9996
   do i=1,2
-    if(y(i)/=cy(i))print*,"results mismatch:",y,"instead of",cy
-    if(y(i)/=cy(i))info=-1
-    if(y(i)/=cy(i))goto 9996
+    if(y(i) /= cy(i))print*,"results mismatch:",y,"instead of",cy
+    if(y(i) /= cy(i))info=-1
+    if(y(i) /= cy(i))goto 9996
   enddo
 9996 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_spfree(a,desc_a,info)
-  if (info /= 0)goto 9997
+  if (info /= psb_success_)goto 9997
 9997 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_cdfree(desc_a,info)
-  if (info /= 0)goto 9998
+  if (info /= psb_success_)goto 9998
 9998 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
 9999 continue
-  if(info /= 0)res=res+1
-  if(res/=0)print*,"on c matrix    2 x    2 blocked   1 x   1 usmv alpha= 1 beta= 1 incx=1 incy=1 trans=n is not ok"
-  if(res==0)print*,"on c matrix    2 x    2 blocked   1 x   1 usmv alpha= 1 beta= 1 incx=1 incy=1 trans=n is ok"
+  if(info /= psb_success_)res=res+1
+  if(res /= 0)print*,"on c matrix    2 x    2 blocked   1 x   1 usmv alpha= 1 beta= 1 incx=1 incy=1 trans=n is not ok"
+  if(res == 0)print*,"on c matrix    2 x    2 blocked   1 x   1 usmv alpha= 1 beta= 1 incx=1 incy=1 trans=n is ok"
 end subroutine c_usmv_2_n_ap1_bp1_ix1_iy1
 ! 
 
@@ -6115,14 +6115,14 @@ subroutine c_usmv_2_t_ap1_bp1_ix1_iy1(res,afmt,ictxt)
   endif
   call psb_barrier(ictxt)
   call psb_cdall(ictxt,desc_a,info,nl=m)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spall(a,desc_a,info,nnz=nnz)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_barrier(ictxt)
   call psb_spins(nnz,IA,JA,VA,a,desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_cdasb(desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spasb(a,desc_a,info,dupl=psb_dupl_err_,afmt=afmt)
   if(info.ne.0)print *,"matrix assembly failed"
   if(info.ne.0)goto 9996
@@ -6131,24 +6131,24 @@ subroutine c_usmv_2_t_ap1_bp1_ix1_iy1(res,afmt,ictxt)
   if(info.ne.0)print *,"psb_spmm failed"
   if(info.ne.0)goto 9996
   do i=1,2
-    if(y(i)/=cy(i))print*,"results mismatch:",y,"instead of",cy
-    if(y(i)/=cy(i))info=-1
-    if(y(i)/=cy(i))goto 9996
+    if(y(i) /= cy(i))print*,"results mismatch:",y,"instead of",cy
+    if(y(i) /= cy(i))info=-1
+    if(y(i) /= cy(i))goto 9996
   enddo
 9996 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_spfree(a,desc_a,info)
-  if (info /= 0)goto 9997
+  if (info /= psb_success_)goto 9997
 9997 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_cdfree(desc_a,info)
-  if (info /= 0)goto 9998
+  if (info /= psb_success_)goto 9998
 9998 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
 9999 continue
-  if(info /= 0)res=res+1
-  if(res/=0)print*,"on c matrix    2 x    2 blocked   1 x   1 usmv alpha= 1 beta= 1 incx=1 incy=1 trans=t is not ok"
-  if(res==0)print*,"on c matrix    2 x    2 blocked   1 x   1 usmv alpha= 1 beta= 1 incx=1 incy=1 trans=t is ok"
+  if(info /= psb_success_)res=res+1
+  if(res /= 0)print*,"on c matrix    2 x    2 blocked   1 x   1 usmv alpha= 1 beta= 1 incx=1 incy=1 trans=t is not ok"
+  if(res == 0)print*,"on c matrix    2 x    2 blocked   1 x   1 usmv alpha= 1 beta= 1 incx=1 incy=1 trans=t is ok"
 end subroutine c_usmv_2_t_ap1_bp1_ix1_iy1
 ! 
 
@@ -6191,14 +6191,14 @@ subroutine c_usmv_2_c_ap1_bp1_ix1_iy1(res,afmt,ictxt)
   endif
   call psb_barrier(ictxt)
   call psb_cdall(ictxt,desc_a,info,nl=m)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spall(a,desc_a,info,nnz=nnz)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_barrier(ictxt)
   call psb_spins(nnz,IA,JA,VA,a,desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_cdasb(desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spasb(a,desc_a,info,dupl=psb_dupl_err_,afmt=afmt)
   if(info.ne.0)print *,"matrix assembly failed"
   if(info.ne.0)goto 9996
@@ -6207,24 +6207,24 @@ subroutine c_usmv_2_c_ap1_bp1_ix1_iy1(res,afmt,ictxt)
   if(info.ne.0)print *,"psb_spmm failed"
   if(info.ne.0)goto 9996
   do i=1,2
-    if(y(i)/=cy(i))print*,"results mismatch:",y,"instead of",cy
-    if(y(i)/=cy(i))info=-1
-    if(y(i)/=cy(i))goto 9996
+    if(y(i) /= cy(i))print*,"results mismatch:",y,"instead of",cy
+    if(y(i) /= cy(i))info=-1
+    if(y(i) /= cy(i))goto 9996
   enddo
 9996 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_spfree(a,desc_a,info)
-  if (info /= 0)goto 9997
+  if (info /= psb_success_)goto 9997
 9997 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_cdfree(desc_a,info)
-  if (info /= 0)goto 9998
+  if (info /= psb_success_)goto 9998
 9998 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
 9999 continue
-  if(info /= 0)res=res+1
-  if(res/=0)print*,"on c matrix    2 x    2 blocked   1 x   1 usmv alpha= 1 beta= 1 incx=1 incy=1 trans=c is not ok"
-  if(res==0)print*,"on c matrix    2 x    2 blocked   1 x   1 usmv alpha= 1 beta= 1 incx=1 incy=1 trans=c is ok"
+  if(info /= psb_success_)res=res+1
+  if(res /= 0)print*,"on c matrix    2 x    2 blocked   1 x   1 usmv alpha= 1 beta= 1 incx=1 incy=1 trans=c is not ok"
+  if(res == 0)print*,"on c matrix    2 x    2 blocked   1 x   1 usmv alpha= 1 beta= 1 incx=1 incy=1 trans=c is ok"
 end subroutine c_usmv_2_c_ap1_bp1_ix1_iy1
 ! 
 
@@ -6267,14 +6267,14 @@ subroutine c_usmv_2_n_ap1_bm0_ix1_iy1(res,afmt,ictxt)
   endif
   call psb_barrier(ictxt)
   call psb_cdall(ictxt,desc_a,info,nl=m)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spall(a,desc_a,info,nnz=nnz)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_barrier(ictxt)
   call psb_spins(nnz,IA,JA,VA,a,desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_cdasb(desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spasb(a,desc_a,info,dupl=psb_dupl_err_,afmt=afmt)
   if(info.ne.0)print *,"matrix assembly failed"
   if(info.ne.0)goto 9996
@@ -6283,24 +6283,24 @@ subroutine c_usmv_2_n_ap1_bm0_ix1_iy1(res,afmt,ictxt)
   if(info.ne.0)print *,"psb_spmm failed"
   if(info.ne.0)goto 9996
   do i=1,2
-    if(y(i)/=cy(i))print*,"results mismatch:",y,"instead of",cy
-    if(y(i)/=cy(i))info=-1
-    if(y(i)/=cy(i))goto 9996
+    if(y(i) /= cy(i))print*,"results mismatch:",y,"instead of",cy
+    if(y(i) /= cy(i))info=-1
+    if(y(i) /= cy(i))goto 9996
   enddo
 9996 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_spfree(a,desc_a,info)
-  if (info /= 0)goto 9997
+  if (info /= psb_success_)goto 9997
 9997 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_cdfree(desc_a,info)
-  if (info /= 0)goto 9998
+  if (info /= psb_success_)goto 9998
 9998 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
 9999 continue
-  if(info /= 0)res=res+1
-  if(res/=0)print*,"on c matrix    2 x    2 blocked   1 x   1 usmv alpha= 1 beta= 0 incx=1 incy=1 trans=n is not ok"
-  if(res==0)print*,"on c matrix    2 x    2 blocked   1 x   1 usmv alpha= 1 beta= 0 incx=1 incy=1 trans=n is ok"
+  if(info /= psb_success_)res=res+1
+  if(res /= 0)print*,"on c matrix    2 x    2 blocked   1 x   1 usmv alpha= 1 beta= 0 incx=1 incy=1 trans=n is not ok"
+  if(res == 0)print*,"on c matrix    2 x    2 blocked   1 x   1 usmv alpha= 1 beta= 0 incx=1 incy=1 trans=n is ok"
 end subroutine c_usmv_2_n_ap1_bm0_ix1_iy1
 ! 
 
@@ -6343,14 +6343,14 @@ subroutine c_usmv_2_t_ap1_bm0_ix1_iy1(res,afmt,ictxt)
   endif
   call psb_barrier(ictxt)
   call psb_cdall(ictxt,desc_a,info,nl=m)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spall(a,desc_a,info,nnz=nnz)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_barrier(ictxt)
   call psb_spins(nnz,IA,JA,VA,a,desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_cdasb(desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spasb(a,desc_a,info,dupl=psb_dupl_err_,afmt=afmt)
   if(info.ne.0)print *,"matrix assembly failed"
   if(info.ne.0)goto 9996
@@ -6359,24 +6359,24 @@ subroutine c_usmv_2_t_ap1_bm0_ix1_iy1(res,afmt,ictxt)
   if(info.ne.0)print *,"psb_spmm failed"
   if(info.ne.0)goto 9996
   do i=1,2
-    if(y(i)/=cy(i))print*,"results mismatch:",y,"instead of",cy
-    if(y(i)/=cy(i))info=-1
-    if(y(i)/=cy(i))goto 9996
+    if(y(i) /= cy(i))print*,"results mismatch:",y,"instead of",cy
+    if(y(i) /= cy(i))info=-1
+    if(y(i) /= cy(i))goto 9996
   enddo
 9996 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_spfree(a,desc_a,info)
-  if (info /= 0)goto 9997
+  if (info /= psb_success_)goto 9997
 9997 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_cdfree(desc_a,info)
-  if (info /= 0)goto 9998
+  if (info /= psb_success_)goto 9998
 9998 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
 9999 continue
-  if(info /= 0)res=res+1
-  if(res/=0)print*,"on c matrix    2 x    2 blocked   1 x   1 usmv alpha= 1 beta= 0 incx=1 incy=1 trans=t is not ok"
-  if(res==0)print*,"on c matrix    2 x    2 blocked   1 x   1 usmv alpha= 1 beta= 0 incx=1 incy=1 trans=t is ok"
+  if(info /= psb_success_)res=res+1
+  if(res /= 0)print*,"on c matrix    2 x    2 blocked   1 x   1 usmv alpha= 1 beta= 0 incx=1 incy=1 trans=t is not ok"
+  if(res == 0)print*,"on c matrix    2 x    2 blocked   1 x   1 usmv alpha= 1 beta= 0 incx=1 incy=1 trans=t is ok"
 end subroutine c_usmv_2_t_ap1_bm0_ix1_iy1
 ! 
 
@@ -6419,14 +6419,14 @@ subroutine c_usmv_2_c_ap1_bm0_ix1_iy1(res,afmt,ictxt)
   endif
   call psb_barrier(ictxt)
   call psb_cdall(ictxt,desc_a,info,nl=m)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spall(a,desc_a,info,nnz=nnz)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_barrier(ictxt)
   call psb_spins(nnz,IA,JA,VA,a,desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_cdasb(desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spasb(a,desc_a,info,dupl=psb_dupl_err_,afmt=afmt)
   if(info.ne.0)print *,"matrix assembly failed"
   if(info.ne.0)goto 9996
@@ -6435,24 +6435,24 @@ subroutine c_usmv_2_c_ap1_bm0_ix1_iy1(res,afmt,ictxt)
   if(info.ne.0)print *,"psb_spmm failed"
   if(info.ne.0)goto 9996
   do i=1,2
-    if(y(i)/=cy(i))print*,"results mismatch:",y,"instead of",cy
-    if(y(i)/=cy(i))info=-1
-    if(y(i)/=cy(i))goto 9996
+    if(y(i) /= cy(i))print*,"results mismatch:",y,"instead of",cy
+    if(y(i) /= cy(i))info=-1
+    if(y(i) /= cy(i))goto 9996
   enddo
 9996 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_spfree(a,desc_a,info)
-  if (info /= 0)goto 9997
+  if (info /= psb_success_)goto 9997
 9997 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_cdfree(desc_a,info)
-  if (info /= 0)goto 9998
+  if (info /= psb_success_)goto 9998
 9998 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
 9999 continue
-  if(info /= 0)res=res+1
-  if(res/=0)print*,"on c matrix    2 x    2 blocked   1 x   1 usmv alpha= 1 beta= 0 incx=1 incy=1 trans=c is not ok"
-  if(res==0)print*,"on c matrix    2 x    2 blocked   1 x   1 usmv alpha= 1 beta= 0 incx=1 incy=1 trans=c is ok"
+  if(info /= psb_success_)res=res+1
+  if(res /= 0)print*,"on c matrix    2 x    2 blocked   1 x   1 usmv alpha= 1 beta= 0 incx=1 incy=1 trans=c is not ok"
+  if(res == 0)print*,"on c matrix    2 x    2 blocked   1 x   1 usmv alpha= 1 beta= 0 incx=1 incy=1 trans=c is ok"
 end subroutine c_usmv_2_c_ap1_bm0_ix1_iy1
 ! 
 
@@ -6495,14 +6495,14 @@ subroutine c_usmv_2_n_am1_bp1_ix1_iy1(res,afmt,ictxt)
   endif
   call psb_barrier(ictxt)
   call psb_cdall(ictxt,desc_a,info,nl=m)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spall(a,desc_a,info,nnz=nnz)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_barrier(ictxt)
   call psb_spins(nnz,IA,JA,VA,a,desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_cdasb(desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spasb(a,desc_a,info,dupl=psb_dupl_err_,afmt=afmt)
   if(info.ne.0)print *,"matrix assembly failed"
   if(info.ne.0)goto 9996
@@ -6511,24 +6511,24 @@ subroutine c_usmv_2_n_am1_bp1_ix1_iy1(res,afmt,ictxt)
   if(info.ne.0)print *,"psb_spmm failed"
   if(info.ne.0)goto 9996
   do i=1,2
-    if(y(i)/=cy(i))print*,"results mismatch:",y,"instead of",cy
-    if(y(i)/=cy(i))info=-1
-    if(y(i)/=cy(i))goto 9996
+    if(y(i) /= cy(i))print*,"results mismatch:",y,"instead of",cy
+    if(y(i) /= cy(i))info=-1
+    if(y(i) /= cy(i))goto 9996
   enddo
 9996 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_spfree(a,desc_a,info)
-  if (info /= 0)goto 9997
+  if (info /= psb_success_)goto 9997
 9997 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_cdfree(desc_a,info)
-  if (info /= 0)goto 9998
+  if (info /= psb_success_)goto 9998
 9998 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
 9999 continue
-  if(info /= 0)res=res+1
-  if(res/=0)print*,"on c matrix    2 x    2 blocked   1 x   1 usmv alpha=-1 beta= 1 incx=1 incy=1 trans=n is not ok"
-  if(res==0)print*,"on c matrix    2 x    2 blocked   1 x   1 usmv alpha=-1 beta= 1 incx=1 incy=1 trans=n is ok"
+  if(info /= psb_success_)res=res+1
+  if(res /= 0)print*,"on c matrix    2 x    2 blocked   1 x   1 usmv alpha=-1 beta= 1 incx=1 incy=1 trans=n is not ok"
+  if(res == 0)print*,"on c matrix    2 x    2 blocked   1 x   1 usmv alpha=-1 beta= 1 incx=1 incy=1 trans=n is ok"
 end subroutine c_usmv_2_n_am1_bp1_ix1_iy1
 ! 
 
@@ -6571,14 +6571,14 @@ subroutine c_usmv_2_t_am1_bp1_ix1_iy1(res,afmt,ictxt)
   endif
   call psb_barrier(ictxt)
   call psb_cdall(ictxt,desc_a,info,nl=m)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spall(a,desc_a,info,nnz=nnz)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_barrier(ictxt)
   call psb_spins(nnz,IA,JA,VA,a,desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_cdasb(desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spasb(a,desc_a,info,dupl=psb_dupl_err_,afmt=afmt)
   if(info.ne.0)print *,"matrix assembly failed"
   if(info.ne.0)goto 9996
@@ -6587,24 +6587,24 @@ subroutine c_usmv_2_t_am1_bp1_ix1_iy1(res,afmt,ictxt)
   if(info.ne.0)print *,"psb_spmm failed"
   if(info.ne.0)goto 9996
   do i=1,2
-    if(y(i)/=cy(i))print*,"results mismatch:",y,"instead of",cy
-    if(y(i)/=cy(i))info=-1
-    if(y(i)/=cy(i))goto 9996
+    if(y(i) /= cy(i))print*,"results mismatch:",y,"instead of",cy
+    if(y(i) /= cy(i))info=-1
+    if(y(i) /= cy(i))goto 9996
   enddo
 9996 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_spfree(a,desc_a,info)
-  if (info /= 0)goto 9997
+  if (info /= psb_success_)goto 9997
 9997 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_cdfree(desc_a,info)
-  if (info /= 0)goto 9998
+  if (info /= psb_success_)goto 9998
 9998 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
 9999 continue
-  if(info /= 0)res=res+1
-  if(res/=0)print*,"on c matrix    2 x    2 blocked   1 x   1 usmv alpha=-1 beta= 1 incx=1 incy=1 trans=t is not ok"
-  if(res==0)print*,"on c matrix    2 x    2 blocked   1 x   1 usmv alpha=-1 beta= 1 incx=1 incy=1 trans=t is ok"
+  if(info /= psb_success_)res=res+1
+  if(res /= 0)print*,"on c matrix    2 x    2 blocked   1 x   1 usmv alpha=-1 beta= 1 incx=1 incy=1 trans=t is not ok"
+  if(res == 0)print*,"on c matrix    2 x    2 blocked   1 x   1 usmv alpha=-1 beta= 1 incx=1 incy=1 trans=t is ok"
 end subroutine c_usmv_2_t_am1_bp1_ix1_iy1
 ! 
 
@@ -6647,14 +6647,14 @@ subroutine c_usmv_2_c_am1_bp1_ix1_iy1(res,afmt,ictxt)
   endif
   call psb_barrier(ictxt)
   call psb_cdall(ictxt,desc_a,info,nl=m)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spall(a,desc_a,info,nnz=nnz)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_barrier(ictxt)
   call psb_spins(nnz,IA,JA,VA,a,desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_cdasb(desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spasb(a,desc_a,info,dupl=psb_dupl_err_,afmt=afmt)
   if(info.ne.0)print *,"matrix assembly failed"
   if(info.ne.0)goto 9996
@@ -6663,24 +6663,24 @@ subroutine c_usmv_2_c_am1_bp1_ix1_iy1(res,afmt,ictxt)
   if(info.ne.0)print *,"psb_spmm failed"
   if(info.ne.0)goto 9996
   do i=1,2
-    if(y(i)/=cy(i))print*,"results mismatch:",y,"instead of",cy
-    if(y(i)/=cy(i))info=-1
-    if(y(i)/=cy(i))goto 9996
+    if(y(i) /= cy(i))print*,"results mismatch:",y,"instead of",cy
+    if(y(i) /= cy(i))info=-1
+    if(y(i) /= cy(i))goto 9996
   enddo
 9996 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_spfree(a,desc_a,info)
-  if (info /= 0)goto 9997
+  if (info /= psb_success_)goto 9997
 9997 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_cdfree(desc_a,info)
-  if (info /= 0)goto 9998
+  if (info /= psb_success_)goto 9998
 9998 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
 9999 continue
-  if(info /= 0)res=res+1
-  if(res/=0)print*,"on c matrix    2 x    2 blocked   1 x   1 usmv alpha=-1 beta= 1 incx=1 incy=1 trans=c is not ok"
-  if(res==0)print*,"on c matrix    2 x    2 blocked   1 x   1 usmv alpha=-1 beta= 1 incx=1 incy=1 trans=c is ok"
+  if(info /= psb_success_)res=res+1
+  if(res /= 0)print*,"on c matrix    2 x    2 blocked   1 x   1 usmv alpha=-1 beta= 1 incx=1 incy=1 trans=c is not ok"
+  if(res == 0)print*,"on c matrix    2 x    2 blocked   1 x   1 usmv alpha=-1 beta= 1 incx=1 incy=1 trans=c is ok"
 end subroutine c_usmv_2_c_am1_bp1_ix1_iy1
 ! 
 
@@ -6723,14 +6723,14 @@ subroutine c_usmv_2_n_am1_bm0_ix1_iy1(res,afmt,ictxt)
   endif
   call psb_barrier(ictxt)
   call psb_cdall(ictxt,desc_a,info,nl=m)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spall(a,desc_a,info,nnz=nnz)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_barrier(ictxt)
   call psb_spins(nnz,IA,JA,VA,a,desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_cdasb(desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spasb(a,desc_a,info,dupl=psb_dupl_err_,afmt=afmt)
   if(info.ne.0)print *,"matrix assembly failed"
   if(info.ne.0)goto 9996
@@ -6739,24 +6739,24 @@ subroutine c_usmv_2_n_am1_bm0_ix1_iy1(res,afmt,ictxt)
   if(info.ne.0)print *,"psb_spmm failed"
   if(info.ne.0)goto 9996
   do i=1,2
-    if(y(i)/=cy(i))print*,"results mismatch:",y,"instead of",cy
-    if(y(i)/=cy(i))info=-1
-    if(y(i)/=cy(i))goto 9996
+    if(y(i) /= cy(i))print*,"results mismatch:",y,"instead of",cy
+    if(y(i) /= cy(i))info=-1
+    if(y(i) /= cy(i))goto 9996
   enddo
 9996 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_spfree(a,desc_a,info)
-  if (info /= 0)goto 9997
+  if (info /= psb_success_)goto 9997
 9997 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_cdfree(desc_a,info)
-  if (info /= 0)goto 9998
+  if (info /= psb_success_)goto 9998
 9998 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
 9999 continue
-  if(info /= 0)res=res+1
-  if(res/=0)print*,"on c matrix    2 x    2 blocked   1 x   1 usmv alpha=-1 beta= 0 incx=1 incy=1 trans=n is not ok"
-  if(res==0)print*,"on c matrix    2 x    2 blocked   1 x   1 usmv alpha=-1 beta= 0 incx=1 incy=1 trans=n is ok"
+  if(info /= psb_success_)res=res+1
+  if(res /= 0)print*,"on c matrix    2 x    2 blocked   1 x   1 usmv alpha=-1 beta= 0 incx=1 incy=1 trans=n is not ok"
+  if(res == 0)print*,"on c matrix    2 x    2 blocked   1 x   1 usmv alpha=-1 beta= 0 incx=1 incy=1 trans=n is ok"
 end subroutine c_usmv_2_n_am1_bm0_ix1_iy1
 ! 
 
@@ -6799,14 +6799,14 @@ subroutine c_usmv_2_t_am1_bm0_ix1_iy1(res,afmt,ictxt)
   endif
   call psb_barrier(ictxt)
   call psb_cdall(ictxt,desc_a,info,nl=m)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spall(a,desc_a,info,nnz=nnz)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_barrier(ictxt)
   call psb_spins(nnz,IA,JA,VA,a,desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_cdasb(desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spasb(a,desc_a,info,dupl=psb_dupl_err_,afmt=afmt)
   if(info.ne.0)print *,"matrix assembly failed"
   if(info.ne.0)goto 9996
@@ -6815,24 +6815,24 @@ subroutine c_usmv_2_t_am1_bm0_ix1_iy1(res,afmt,ictxt)
   if(info.ne.0)print *,"psb_spmm failed"
   if(info.ne.0)goto 9996
   do i=1,2
-    if(y(i)/=cy(i))print*,"results mismatch:",y,"instead of",cy
-    if(y(i)/=cy(i))info=-1
-    if(y(i)/=cy(i))goto 9996
+    if(y(i) /= cy(i))print*,"results mismatch:",y,"instead of",cy
+    if(y(i) /= cy(i))info=-1
+    if(y(i) /= cy(i))goto 9996
   enddo
 9996 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_spfree(a,desc_a,info)
-  if (info /= 0)goto 9997
+  if (info /= psb_success_)goto 9997
 9997 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_cdfree(desc_a,info)
-  if (info /= 0)goto 9998
+  if (info /= psb_success_)goto 9998
 9998 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
 9999 continue
-  if(info /= 0)res=res+1
-  if(res/=0)print*,"on c matrix    2 x    2 blocked   1 x   1 usmv alpha=-1 beta= 0 incx=1 incy=1 trans=t is not ok"
-  if(res==0)print*,"on c matrix    2 x    2 blocked   1 x   1 usmv alpha=-1 beta= 0 incx=1 incy=1 trans=t is ok"
+  if(info /= psb_success_)res=res+1
+  if(res /= 0)print*,"on c matrix    2 x    2 blocked   1 x   1 usmv alpha=-1 beta= 0 incx=1 incy=1 trans=t is not ok"
+  if(res == 0)print*,"on c matrix    2 x    2 blocked   1 x   1 usmv alpha=-1 beta= 0 incx=1 incy=1 trans=t is ok"
 end subroutine c_usmv_2_t_am1_bm0_ix1_iy1
 ! 
 
@@ -6875,14 +6875,14 @@ subroutine c_usmv_2_c_am1_bm0_ix1_iy1(res,afmt,ictxt)
   endif
   call psb_barrier(ictxt)
   call psb_cdall(ictxt,desc_a,info,nl=m)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spall(a,desc_a,info,nnz=nnz)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_barrier(ictxt)
   call psb_spins(nnz,IA,JA,VA,a,desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_cdasb(desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spasb(a,desc_a,info,dupl=psb_dupl_err_,afmt=afmt)
   if(info.ne.0)print *,"matrix assembly failed"
   if(info.ne.0)goto 9996
@@ -6891,24 +6891,24 @@ subroutine c_usmv_2_c_am1_bm0_ix1_iy1(res,afmt,ictxt)
   if(info.ne.0)print *,"psb_spmm failed"
   if(info.ne.0)goto 9996
   do i=1,2
-    if(y(i)/=cy(i))print*,"results mismatch:",y,"instead of",cy
-    if(y(i)/=cy(i))info=-1
-    if(y(i)/=cy(i))goto 9996
+    if(y(i) /= cy(i))print*,"results mismatch:",y,"instead of",cy
+    if(y(i) /= cy(i))info=-1
+    if(y(i) /= cy(i))goto 9996
   enddo
 9996 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_spfree(a,desc_a,info)
-  if (info /= 0)goto 9997
+  if (info /= psb_success_)goto 9997
 9997 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_cdfree(desc_a,info)
-  if (info /= 0)goto 9998
+  if (info /= psb_success_)goto 9998
 9998 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
 9999 continue
-  if(info /= 0)res=res+1
-  if(res/=0)print*,"on c matrix    2 x    2 blocked   1 x   1 usmv alpha=-1 beta= 0 incx=1 incy=1 trans=c is not ok"
-  if(res==0)print*,"on c matrix    2 x    2 blocked   1 x   1 usmv alpha=-1 beta= 0 incx=1 incy=1 trans=c is ok"
+  if(info /= psb_success_)res=res+1
+  if(res /= 0)print*,"on c matrix    2 x    2 blocked   1 x   1 usmv alpha=-1 beta= 0 incx=1 incy=1 trans=c is not ok"
+  if(res == 0)print*,"on c matrix    2 x    2 blocked   1 x   1 usmv alpha=-1 beta= 0 incx=1 incy=1 trans=c is ok"
 end subroutine c_usmv_2_c_am1_bm0_ix1_iy1
 ! 
 
@@ -6951,14 +6951,14 @@ subroutine c_usmv_2_n_am3_bp1_ix1_iy1(res,afmt,ictxt)
   endif
   call psb_barrier(ictxt)
   call psb_cdall(ictxt,desc_a,info,nl=m)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spall(a,desc_a,info,nnz=nnz)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_barrier(ictxt)
   call psb_spins(nnz,IA,JA,VA,a,desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_cdasb(desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spasb(a,desc_a,info,dupl=psb_dupl_err_,afmt=afmt)
   if(info.ne.0)print *,"matrix assembly failed"
   if(info.ne.0)goto 9996
@@ -6967,24 +6967,24 @@ subroutine c_usmv_2_n_am3_bp1_ix1_iy1(res,afmt,ictxt)
   if(info.ne.0)print *,"psb_spmm failed"
   if(info.ne.0)goto 9996
   do i=1,2
-    if(y(i)/=cy(i))print*,"results mismatch:",y,"instead of",cy
-    if(y(i)/=cy(i))info=-1
-    if(y(i)/=cy(i))goto 9996
+    if(y(i) /= cy(i))print*,"results mismatch:",y,"instead of",cy
+    if(y(i) /= cy(i))info=-1
+    if(y(i) /= cy(i))goto 9996
   enddo
 9996 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_spfree(a,desc_a,info)
-  if (info /= 0)goto 9997
+  if (info /= psb_success_)goto 9997
 9997 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_cdfree(desc_a,info)
-  if (info /= 0)goto 9998
+  if (info /= psb_success_)goto 9998
 9998 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
 9999 continue
-  if(info /= 0)res=res+1
-  if(res/=0)print*,"on c matrix    2 x    2 blocked   1 x   1 usmv alpha=-3 beta= 1 incx=1 incy=1 trans=n is not ok"
-  if(res==0)print*,"on c matrix    2 x    2 blocked   1 x   1 usmv alpha=-3 beta= 1 incx=1 incy=1 trans=n is ok"
+  if(info /= psb_success_)res=res+1
+  if(res /= 0)print*,"on c matrix    2 x    2 blocked   1 x   1 usmv alpha=-3 beta= 1 incx=1 incy=1 trans=n is not ok"
+  if(res == 0)print*,"on c matrix    2 x    2 blocked   1 x   1 usmv alpha=-3 beta= 1 incx=1 incy=1 trans=n is ok"
 end subroutine c_usmv_2_n_am3_bp1_ix1_iy1
 ! 
 
@@ -7027,14 +7027,14 @@ subroutine c_usmv_2_t_am3_bp1_ix1_iy1(res,afmt,ictxt)
   endif
   call psb_barrier(ictxt)
   call psb_cdall(ictxt,desc_a,info,nl=m)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spall(a,desc_a,info,nnz=nnz)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_barrier(ictxt)
   call psb_spins(nnz,IA,JA,VA,a,desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_cdasb(desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spasb(a,desc_a,info,dupl=psb_dupl_err_,afmt=afmt)
   if(info.ne.0)print *,"matrix assembly failed"
   if(info.ne.0)goto 9996
@@ -7043,24 +7043,24 @@ subroutine c_usmv_2_t_am3_bp1_ix1_iy1(res,afmt,ictxt)
   if(info.ne.0)print *,"psb_spmm failed"
   if(info.ne.0)goto 9996
   do i=1,2
-    if(y(i)/=cy(i))print*,"results mismatch:",y,"instead of",cy
-    if(y(i)/=cy(i))info=-1
-    if(y(i)/=cy(i))goto 9996
+    if(y(i) /= cy(i))print*,"results mismatch:",y,"instead of",cy
+    if(y(i) /= cy(i))info=-1
+    if(y(i) /= cy(i))goto 9996
   enddo
 9996 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_spfree(a,desc_a,info)
-  if (info /= 0)goto 9997
+  if (info /= psb_success_)goto 9997
 9997 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_cdfree(desc_a,info)
-  if (info /= 0)goto 9998
+  if (info /= psb_success_)goto 9998
 9998 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
 9999 continue
-  if(info /= 0)res=res+1
-  if(res/=0)print*,"on c matrix    2 x    2 blocked   1 x   1 usmv alpha=-3 beta= 1 incx=1 incy=1 trans=t is not ok"
-  if(res==0)print*,"on c matrix    2 x    2 blocked   1 x   1 usmv alpha=-3 beta= 1 incx=1 incy=1 trans=t is ok"
+  if(info /= psb_success_)res=res+1
+  if(res /= 0)print*,"on c matrix    2 x    2 blocked   1 x   1 usmv alpha=-3 beta= 1 incx=1 incy=1 trans=t is not ok"
+  if(res == 0)print*,"on c matrix    2 x    2 blocked   1 x   1 usmv alpha=-3 beta= 1 incx=1 incy=1 trans=t is ok"
 end subroutine c_usmv_2_t_am3_bp1_ix1_iy1
 ! 
 
@@ -7103,14 +7103,14 @@ subroutine c_usmv_2_c_am3_bp1_ix1_iy1(res,afmt,ictxt)
   endif
   call psb_barrier(ictxt)
   call psb_cdall(ictxt,desc_a,info,nl=m)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spall(a,desc_a,info,nnz=nnz)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_barrier(ictxt)
   call psb_spins(nnz,IA,JA,VA,a,desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_cdasb(desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spasb(a,desc_a,info,dupl=psb_dupl_err_,afmt=afmt)
   if(info.ne.0)print *,"matrix assembly failed"
   if(info.ne.0)goto 9996
@@ -7119,24 +7119,24 @@ subroutine c_usmv_2_c_am3_bp1_ix1_iy1(res,afmt,ictxt)
   if(info.ne.0)print *,"psb_spmm failed"
   if(info.ne.0)goto 9996
   do i=1,2
-    if(y(i)/=cy(i))print*,"results mismatch:",y,"instead of",cy
-    if(y(i)/=cy(i))info=-1
-    if(y(i)/=cy(i))goto 9996
+    if(y(i) /= cy(i))print*,"results mismatch:",y,"instead of",cy
+    if(y(i) /= cy(i))info=-1
+    if(y(i) /= cy(i))goto 9996
   enddo
 9996 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_spfree(a,desc_a,info)
-  if (info /= 0)goto 9997
+  if (info /= psb_success_)goto 9997
 9997 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_cdfree(desc_a,info)
-  if (info /= 0)goto 9998
+  if (info /= psb_success_)goto 9998
 9998 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
 9999 continue
-  if(info /= 0)res=res+1
-  if(res/=0)print*,"on c matrix    2 x    2 blocked   1 x   1 usmv alpha=-3 beta= 1 incx=1 incy=1 trans=c is not ok"
-  if(res==0)print*,"on c matrix    2 x    2 blocked   1 x   1 usmv alpha=-3 beta= 1 incx=1 incy=1 trans=c is ok"
+  if(info /= psb_success_)res=res+1
+  if(res /= 0)print*,"on c matrix    2 x    2 blocked   1 x   1 usmv alpha=-3 beta= 1 incx=1 incy=1 trans=c is not ok"
+  if(res == 0)print*,"on c matrix    2 x    2 blocked   1 x   1 usmv alpha=-3 beta= 1 incx=1 incy=1 trans=c is ok"
 end subroutine c_usmv_2_c_am3_bp1_ix1_iy1
 ! 
 
@@ -7179,14 +7179,14 @@ subroutine c_usmv_2_n_am3_bm0_ix1_iy1(res,afmt,ictxt)
   endif
   call psb_barrier(ictxt)
   call psb_cdall(ictxt,desc_a,info,nl=m)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spall(a,desc_a,info,nnz=nnz)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_barrier(ictxt)
   call psb_spins(nnz,IA,JA,VA,a,desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_cdasb(desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spasb(a,desc_a,info,dupl=psb_dupl_err_,afmt=afmt)
   if(info.ne.0)print *,"matrix assembly failed"
   if(info.ne.0)goto 9996
@@ -7195,24 +7195,24 @@ subroutine c_usmv_2_n_am3_bm0_ix1_iy1(res,afmt,ictxt)
   if(info.ne.0)print *,"psb_spmm failed"
   if(info.ne.0)goto 9996
   do i=1,2
-    if(y(i)/=cy(i))print*,"results mismatch:",y,"instead of",cy
-    if(y(i)/=cy(i))info=-1
-    if(y(i)/=cy(i))goto 9996
+    if(y(i) /= cy(i))print*,"results mismatch:",y,"instead of",cy
+    if(y(i) /= cy(i))info=-1
+    if(y(i) /= cy(i))goto 9996
   enddo
 9996 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_spfree(a,desc_a,info)
-  if (info /= 0)goto 9997
+  if (info /= psb_success_)goto 9997
 9997 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_cdfree(desc_a,info)
-  if (info /= 0)goto 9998
+  if (info /= psb_success_)goto 9998
 9998 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
 9999 continue
-  if(info /= 0)res=res+1
-  if(res/=0)print*,"on c matrix    2 x    2 blocked   1 x   1 usmv alpha=-3 beta= 0 incx=1 incy=1 trans=n is not ok"
-  if(res==0)print*,"on c matrix    2 x    2 blocked   1 x   1 usmv alpha=-3 beta= 0 incx=1 incy=1 trans=n is ok"
+  if(info /= psb_success_)res=res+1
+  if(res /= 0)print*,"on c matrix    2 x    2 blocked   1 x   1 usmv alpha=-3 beta= 0 incx=1 incy=1 trans=n is not ok"
+  if(res == 0)print*,"on c matrix    2 x    2 blocked   1 x   1 usmv alpha=-3 beta= 0 incx=1 incy=1 trans=n is ok"
 end subroutine c_usmv_2_n_am3_bm0_ix1_iy1
 ! 
 
@@ -7255,14 +7255,14 @@ subroutine c_usmv_2_t_am3_bm0_ix1_iy1(res,afmt,ictxt)
   endif
   call psb_barrier(ictxt)
   call psb_cdall(ictxt,desc_a,info,nl=m)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spall(a,desc_a,info,nnz=nnz)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_barrier(ictxt)
   call psb_spins(nnz,IA,JA,VA,a,desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_cdasb(desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spasb(a,desc_a,info,dupl=psb_dupl_err_,afmt=afmt)
   if(info.ne.0)print *,"matrix assembly failed"
   if(info.ne.0)goto 9996
@@ -7271,24 +7271,24 @@ subroutine c_usmv_2_t_am3_bm0_ix1_iy1(res,afmt,ictxt)
   if(info.ne.0)print *,"psb_spmm failed"
   if(info.ne.0)goto 9996
   do i=1,2
-    if(y(i)/=cy(i))print*,"results mismatch:",y,"instead of",cy
-    if(y(i)/=cy(i))info=-1
-    if(y(i)/=cy(i))goto 9996
+    if(y(i) /= cy(i))print*,"results mismatch:",y,"instead of",cy
+    if(y(i) /= cy(i))info=-1
+    if(y(i) /= cy(i))goto 9996
   enddo
 9996 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_spfree(a,desc_a,info)
-  if (info /= 0)goto 9997
+  if (info /= psb_success_)goto 9997
 9997 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_cdfree(desc_a,info)
-  if (info /= 0)goto 9998
+  if (info /= psb_success_)goto 9998
 9998 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
 9999 continue
-  if(info /= 0)res=res+1
-  if(res/=0)print*,"on c matrix    2 x    2 blocked   1 x   1 usmv alpha=-3 beta= 0 incx=1 incy=1 trans=t is not ok"
-  if(res==0)print*,"on c matrix    2 x    2 blocked   1 x   1 usmv alpha=-3 beta= 0 incx=1 incy=1 trans=t is ok"
+  if(info /= psb_success_)res=res+1
+  if(res /= 0)print*,"on c matrix    2 x    2 blocked   1 x   1 usmv alpha=-3 beta= 0 incx=1 incy=1 trans=t is not ok"
+  if(res == 0)print*,"on c matrix    2 x    2 blocked   1 x   1 usmv alpha=-3 beta= 0 incx=1 incy=1 trans=t is ok"
 end subroutine c_usmv_2_t_am3_bm0_ix1_iy1
 ! 
 
@@ -7331,14 +7331,14 @@ subroutine c_usmv_2_c_am3_bm0_ix1_iy1(res,afmt,ictxt)
   endif
   call psb_barrier(ictxt)
   call psb_cdall(ictxt,desc_a,info,nl=m)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spall(a,desc_a,info,nnz=nnz)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_barrier(ictxt)
   call psb_spins(nnz,IA,JA,VA,a,desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_cdasb(desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spasb(a,desc_a,info,dupl=psb_dupl_err_,afmt=afmt)
   if(info.ne.0)print *,"matrix assembly failed"
   if(info.ne.0)goto 9996
@@ -7347,24 +7347,24 @@ subroutine c_usmv_2_c_am3_bm0_ix1_iy1(res,afmt,ictxt)
   if(info.ne.0)print *,"psb_spmm failed"
   if(info.ne.0)goto 9996
   do i=1,2
-    if(y(i)/=cy(i))print*,"results mismatch:",y,"instead of",cy
-    if(y(i)/=cy(i))info=-1
-    if(y(i)/=cy(i))goto 9996
+    if(y(i) /= cy(i))print*,"results mismatch:",y,"instead of",cy
+    if(y(i) /= cy(i))info=-1
+    if(y(i) /= cy(i))goto 9996
   enddo
 9996 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_spfree(a,desc_a,info)
-  if (info /= 0)goto 9997
+  if (info /= psb_success_)goto 9997
 9997 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_cdfree(desc_a,info)
-  if (info /= 0)goto 9998
+  if (info /= psb_success_)goto 9998
 9998 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
 9999 continue
-  if(info /= 0)res=res+1
-  if(res/=0)print*,"on c matrix    2 x    2 blocked   1 x   1 usmv alpha=-3 beta= 0 incx=1 incy=1 trans=c is not ok"
-  if(res==0)print*,"on c matrix    2 x    2 blocked   1 x   1 usmv alpha=-3 beta= 0 incx=1 incy=1 trans=c is ok"
+  if(info /= psb_success_)res=res+1
+  if(res /= 0)print*,"on c matrix    2 x    2 blocked   1 x   1 usmv alpha=-3 beta= 0 incx=1 incy=1 trans=c is not ok"
+  if(res == 0)print*,"on c matrix    2 x    2 blocked   1 x   1 usmv alpha=-3 beta= 0 incx=1 incy=1 trans=c is ok"
 end subroutine c_usmv_2_c_am3_bm0_ix1_iy1
 ! 
 
@@ -7406,18 +7406,18 @@ subroutine c_ussv_2_n_ap3_bm0_ix1_iy1(res,afmt,ictxt)
   endif
   call psb_barrier(ictxt)
   call psb_cdall(ictxt,desc_a,info,nl=m)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spall(a,desc_a,info,nnz=nnz)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call a%set_triangle()
   call a%set_lower()
   call a%set_unit(.false.)
 
   call psb_barrier(ictxt)
   call psb_spins(nnz,IA,JA,VA,a,desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_cdasb(desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spasb(a,desc_a,info,dupl=psb_dupl_err_,afmt=afmt)
   if(info.ne.0)print *,"matrix assembly failed"
   if(info.ne.0)goto 9996
@@ -7426,24 +7426,24 @@ subroutine c_ussv_2_n_ap3_bm0_ix1_iy1(res,afmt,ictxt)
   if(info.ne.0)print *,"psb_spsm failed"
   if(info.ne.0)goto 9996
   do i=1,2
-    if(y(i)/=cy(i))print*,"results mismatch:",y,"instead of",cy
-    if(y(i)/=cy(i))info=-1
-    if(y(i)/=cy(i))goto 9996
+    if(y(i) /= cy(i))print*,"results mismatch:",y,"instead of",cy
+    if(y(i) /= cy(i))info=-1
+    if(y(i) /= cy(i))goto 9996
   enddo
 9996 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_spfree(a,desc_a,info)
-  if (info /= 0)goto 9997
+  if (info /= psb_success_)goto 9997
 9997 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_cdfree(desc_a,info)
-  if (info /= 0)goto 9998
+  if (info /= psb_success_)goto 9998
 9998 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
 9999 continue
-  if(info /= 0)res=res+1
-  if(res/=0)print*,"on c matrix    2 x    2 blocked   1 x   1 ussv alpha= 3 beta= 0 incx=1 incy=1 trans=n is not ok"
-  if(res==0)print*,"on c matrix    2 x    2 blocked   1 x   1 ussv alpha= 3 beta= 0 incx=1 incy=1 trans=n is ok"
+  if(info /= psb_success_)res=res+1
+  if(res /= 0)print*,"on c matrix    2 x    2 blocked   1 x   1 ussv alpha= 3 beta= 0 incx=1 incy=1 trans=n is not ok"
+  if(res == 0)print*,"on c matrix    2 x    2 blocked   1 x   1 ussv alpha= 3 beta= 0 incx=1 incy=1 trans=n is ok"
 end subroutine c_ussv_2_n_ap3_bm0_ix1_iy1
 ! 
 
@@ -7485,18 +7485,18 @@ subroutine c_ussv_2_t_ap3_bm0_ix1_iy1(res,afmt,ictxt)
   endif
   call psb_barrier(ictxt)
   call psb_cdall(ictxt,desc_a,info,nl=m)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spall(a,desc_a,info,nnz=nnz)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call a%set_triangle()
   call a%set_lower()
   call a%set_unit(.false.)
 
   call psb_barrier(ictxt)
   call psb_spins(nnz,IA,JA,VA,a,desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_cdasb(desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spasb(a,desc_a,info,dupl=psb_dupl_err_,afmt=afmt)
   if(info.ne.0)print *,"matrix assembly failed"
   if(info.ne.0)goto 9996
@@ -7505,24 +7505,24 @@ subroutine c_ussv_2_t_ap3_bm0_ix1_iy1(res,afmt,ictxt)
   if(info.ne.0)print *,"psb_spsm failed"
   if(info.ne.0)goto 9996
   do i=1,2
-    if(y(i)/=cy(i))print*,"results mismatch:",y,"instead of",cy
-    if(y(i)/=cy(i))info=-1
-    if(y(i)/=cy(i))goto 9996
+    if(y(i) /= cy(i))print*,"results mismatch:",y,"instead of",cy
+    if(y(i) /= cy(i))info=-1
+    if(y(i) /= cy(i))goto 9996
   enddo
 9996 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_spfree(a,desc_a,info)
-  if (info /= 0)goto 9997
+  if (info /= psb_success_)goto 9997
 9997 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_cdfree(desc_a,info)
-  if (info /= 0)goto 9998
+  if (info /= psb_success_)goto 9998
 9998 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
 9999 continue
-  if(info /= 0)res=res+1
-  if(res/=0)print*,"on c matrix    2 x    2 blocked   1 x   1 ussv alpha= 3 beta= 0 incx=1 incy=1 trans=t is not ok"
-  if(res==0)print*,"on c matrix    2 x    2 blocked   1 x   1 ussv alpha= 3 beta= 0 incx=1 incy=1 trans=t is ok"
+  if(info /= psb_success_)res=res+1
+  if(res /= 0)print*,"on c matrix    2 x    2 blocked   1 x   1 ussv alpha= 3 beta= 0 incx=1 incy=1 trans=t is not ok"
+  if(res == 0)print*,"on c matrix    2 x    2 blocked   1 x   1 ussv alpha= 3 beta= 0 incx=1 incy=1 trans=t is ok"
 end subroutine c_ussv_2_t_ap3_bm0_ix1_iy1
 ! 
 
@@ -7564,18 +7564,18 @@ subroutine c_ussv_2_c_ap3_bm0_ix1_iy1(res,afmt,ictxt)
   endif
   call psb_barrier(ictxt)
   call psb_cdall(ictxt,desc_a,info,nl=m)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spall(a,desc_a,info,nnz=nnz)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call a%set_triangle()
   call a%set_lower()
   call a%set_unit(.false.)
 
   call psb_barrier(ictxt)
   call psb_spins(nnz,IA,JA,VA,a,desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_cdasb(desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spasb(a,desc_a,info,dupl=psb_dupl_err_,afmt=afmt)
   if(info.ne.0)print *,"matrix assembly failed"
   if(info.ne.0)goto 9996
@@ -7584,24 +7584,24 @@ subroutine c_ussv_2_c_ap3_bm0_ix1_iy1(res,afmt,ictxt)
   if(info.ne.0)print *,"psb_spsm failed"
   if(info.ne.0)goto 9996
   do i=1,2
-    if(y(i)/=cy(i))print*,"results mismatch:",y,"instead of",cy
-    if(y(i)/=cy(i))info=-1
-    if(y(i)/=cy(i))goto 9996
+    if(y(i) /= cy(i))print*,"results mismatch:",y,"instead of",cy
+    if(y(i) /= cy(i))info=-1
+    if(y(i) /= cy(i))goto 9996
   enddo
 9996 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_spfree(a,desc_a,info)
-  if (info /= 0)goto 9997
+  if (info /= psb_success_)goto 9997
 9997 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_cdfree(desc_a,info)
-  if (info /= 0)goto 9998
+  if (info /= psb_success_)goto 9998
 9998 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
 9999 continue
-  if(info /= 0)res=res+1
-  if(res/=0)print*,"on c matrix    2 x    2 blocked   1 x   1 ussv alpha= 3 beta= 0 incx=1 incy=1 trans=c is not ok"
-  if(res==0)print*,"on c matrix    2 x    2 blocked   1 x   1 ussv alpha= 3 beta= 0 incx=1 incy=1 trans=c is ok"
+  if(info /= psb_success_)res=res+1
+  if(res /= 0)print*,"on c matrix    2 x    2 blocked   1 x   1 ussv alpha= 3 beta= 0 incx=1 incy=1 trans=c is not ok"
+  if(res == 0)print*,"on c matrix    2 x    2 blocked   1 x   1 ussv alpha= 3 beta= 0 incx=1 incy=1 trans=c is ok"
 end subroutine c_ussv_2_c_ap3_bm0_ix1_iy1
 ! 
 
@@ -7643,18 +7643,18 @@ subroutine c_ussv_2_n_ap1_bm0_ix1_iy1(res,afmt,ictxt)
   endif
   call psb_barrier(ictxt)
   call psb_cdall(ictxt,desc_a,info,nl=m)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spall(a,desc_a,info,nnz=nnz)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call a%set_triangle()
   call a%set_lower()
   call a%set_unit(.false.)
 
   call psb_barrier(ictxt)
   call psb_spins(nnz,IA,JA,VA,a,desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_cdasb(desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spasb(a,desc_a,info,dupl=psb_dupl_err_,afmt=afmt)
   if(info.ne.0)print *,"matrix assembly failed"
   if(info.ne.0)goto 9996
@@ -7663,24 +7663,24 @@ subroutine c_ussv_2_n_ap1_bm0_ix1_iy1(res,afmt,ictxt)
   if(info.ne.0)print *,"psb_spsm failed"
   if(info.ne.0)goto 9996
   do i=1,2
-    if(y(i)/=cy(i))print*,"results mismatch:",y,"instead of",cy
-    if(y(i)/=cy(i))info=-1
-    if(y(i)/=cy(i))goto 9996
+    if(y(i) /= cy(i))print*,"results mismatch:",y,"instead of",cy
+    if(y(i) /= cy(i))info=-1
+    if(y(i) /= cy(i))goto 9996
   enddo
 9996 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_spfree(a,desc_a,info)
-  if (info /= 0)goto 9997
+  if (info /= psb_success_)goto 9997
 9997 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_cdfree(desc_a,info)
-  if (info /= 0)goto 9998
+  if (info /= psb_success_)goto 9998
 9998 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
 9999 continue
-  if(info /= 0)res=res+1
-  if(res/=0)print*,"on c matrix    2 x    2 blocked   1 x   1 ussv alpha= 1 beta= 0 incx=1 incy=1 trans=n is not ok"
-  if(res==0)print*,"on c matrix    2 x    2 blocked   1 x   1 ussv alpha= 1 beta= 0 incx=1 incy=1 trans=n is ok"
+  if(info /= psb_success_)res=res+1
+  if(res /= 0)print*,"on c matrix    2 x    2 blocked   1 x   1 ussv alpha= 1 beta= 0 incx=1 incy=1 trans=n is not ok"
+  if(res == 0)print*,"on c matrix    2 x    2 blocked   1 x   1 ussv alpha= 1 beta= 0 incx=1 incy=1 trans=n is ok"
 end subroutine c_ussv_2_n_ap1_bm0_ix1_iy1
 ! 
 
@@ -7722,18 +7722,18 @@ subroutine c_ussv_2_t_ap1_bm0_ix1_iy1(res,afmt,ictxt)
   endif
   call psb_barrier(ictxt)
   call psb_cdall(ictxt,desc_a,info,nl=m)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spall(a,desc_a,info,nnz=nnz)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call a%set_triangle()
   call a%set_lower()
   call a%set_unit(.false.)
 
   call psb_barrier(ictxt)
   call psb_spins(nnz,IA,JA,VA,a,desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_cdasb(desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spasb(a,desc_a,info,dupl=psb_dupl_err_,afmt=afmt)
   if(info.ne.0)print *,"matrix assembly failed"
   if(info.ne.0)goto 9996
@@ -7742,24 +7742,24 @@ subroutine c_ussv_2_t_ap1_bm0_ix1_iy1(res,afmt,ictxt)
   if(info.ne.0)print *,"psb_spsm failed"
   if(info.ne.0)goto 9996
   do i=1,2
-    if(y(i)/=cy(i))print*,"results mismatch:",y,"instead of",cy
-    if(y(i)/=cy(i))info=-1
-    if(y(i)/=cy(i))goto 9996
+    if(y(i) /= cy(i))print*,"results mismatch:",y,"instead of",cy
+    if(y(i) /= cy(i))info=-1
+    if(y(i) /= cy(i))goto 9996
   enddo
 9996 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_spfree(a,desc_a,info)
-  if (info /= 0)goto 9997
+  if (info /= psb_success_)goto 9997
 9997 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_cdfree(desc_a,info)
-  if (info /= 0)goto 9998
+  if (info /= psb_success_)goto 9998
 9998 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
 9999 continue
-  if(info /= 0)res=res+1
-  if(res/=0)print*,"on c matrix    2 x    2 blocked   1 x   1 ussv alpha= 1 beta= 0 incx=1 incy=1 trans=t is not ok"
-  if(res==0)print*,"on c matrix    2 x    2 blocked   1 x   1 ussv alpha= 1 beta= 0 incx=1 incy=1 trans=t is ok"
+  if(info /= psb_success_)res=res+1
+  if(res /= 0)print*,"on c matrix    2 x    2 blocked   1 x   1 ussv alpha= 1 beta= 0 incx=1 incy=1 trans=t is not ok"
+  if(res == 0)print*,"on c matrix    2 x    2 blocked   1 x   1 ussv alpha= 1 beta= 0 incx=1 incy=1 trans=t is ok"
 end subroutine c_ussv_2_t_ap1_bm0_ix1_iy1
 ! 
 
@@ -7801,18 +7801,18 @@ subroutine c_ussv_2_c_ap1_bm0_ix1_iy1(res,afmt,ictxt)
   endif
   call psb_barrier(ictxt)
   call psb_cdall(ictxt,desc_a,info,nl=m)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spall(a,desc_a,info,nnz=nnz)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call a%set_triangle()
   call a%set_lower()
   call a%set_unit(.false.)
 
   call psb_barrier(ictxt)
   call psb_spins(nnz,IA,JA,VA,a,desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_cdasb(desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spasb(a,desc_a,info,dupl=psb_dupl_err_,afmt=afmt)
   if(info.ne.0)print *,"matrix assembly failed"
   if(info.ne.0)goto 9996
@@ -7821,24 +7821,24 @@ subroutine c_ussv_2_c_ap1_bm0_ix1_iy1(res,afmt,ictxt)
   if(info.ne.0)print *,"psb_spsm failed"
   if(info.ne.0)goto 9996
   do i=1,2
-    if(y(i)/=cy(i))print*,"results mismatch:",y,"instead of",cy
-    if(y(i)/=cy(i))info=-1
-    if(y(i)/=cy(i))goto 9996
+    if(y(i) /= cy(i))print*,"results mismatch:",y,"instead of",cy
+    if(y(i) /= cy(i))info=-1
+    if(y(i) /= cy(i))goto 9996
   enddo
 9996 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_spfree(a,desc_a,info)
-  if (info /= 0)goto 9997
+  if (info /= psb_success_)goto 9997
 9997 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_cdfree(desc_a,info)
-  if (info /= 0)goto 9998
+  if (info /= psb_success_)goto 9998
 9998 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
 9999 continue
-  if(info /= 0)res=res+1
-  if(res/=0)print*,"on c matrix    2 x    2 blocked   1 x   1 ussv alpha= 1 beta= 0 incx=1 incy=1 trans=c is not ok"
-  if(res==0)print*,"on c matrix    2 x    2 blocked   1 x   1 ussv alpha= 1 beta= 0 incx=1 incy=1 trans=c is ok"
+  if(info /= psb_success_)res=res+1
+  if(res /= 0)print*,"on c matrix    2 x    2 blocked   1 x   1 ussv alpha= 1 beta= 0 incx=1 incy=1 trans=c is not ok"
+  if(res == 0)print*,"on c matrix    2 x    2 blocked   1 x   1 ussv alpha= 1 beta= 0 incx=1 incy=1 trans=c is ok"
 end subroutine c_ussv_2_c_ap1_bm0_ix1_iy1
 ! 
 
@@ -7880,18 +7880,18 @@ subroutine c_ussv_2_n_am1_bm0_ix1_iy1(res,afmt,ictxt)
   endif
   call psb_barrier(ictxt)
   call psb_cdall(ictxt,desc_a,info,nl=m)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spall(a,desc_a,info,nnz=nnz)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call a%set_triangle()
   call a%set_lower()
   call a%set_unit(.false.)
 
   call psb_barrier(ictxt)
   call psb_spins(nnz,IA,JA,VA,a,desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_cdasb(desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spasb(a,desc_a,info,dupl=psb_dupl_err_,afmt=afmt)
   if(info.ne.0)print *,"matrix assembly failed"
   if(info.ne.0)goto 9996
@@ -7900,24 +7900,24 @@ subroutine c_ussv_2_n_am1_bm0_ix1_iy1(res,afmt,ictxt)
   if(info.ne.0)print *,"psb_spsm failed"
   if(info.ne.0)goto 9996
   do i=1,2
-    if(y(i)/=cy(i))print*,"results mismatch:",y,"instead of",cy
-    if(y(i)/=cy(i))info=-1
-    if(y(i)/=cy(i))goto 9996
+    if(y(i) /= cy(i))print*,"results mismatch:",y,"instead of",cy
+    if(y(i) /= cy(i))info=-1
+    if(y(i) /= cy(i))goto 9996
   enddo
 9996 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_spfree(a,desc_a,info)
-  if (info /= 0)goto 9997
+  if (info /= psb_success_)goto 9997
 9997 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_cdfree(desc_a,info)
-  if (info /= 0)goto 9998
+  if (info /= psb_success_)goto 9998
 9998 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
 9999 continue
-  if(info /= 0)res=res+1
-  if(res/=0)print*,"on c matrix    2 x    2 blocked   1 x   1 ussv alpha=-1 beta= 0 incx=1 incy=1 trans=n is not ok"
-  if(res==0)print*,"on c matrix    2 x    2 blocked   1 x   1 ussv alpha=-1 beta= 0 incx=1 incy=1 trans=n is ok"
+  if(info /= psb_success_)res=res+1
+  if(res /= 0)print*,"on c matrix    2 x    2 blocked   1 x   1 ussv alpha=-1 beta= 0 incx=1 incy=1 trans=n is not ok"
+  if(res == 0)print*,"on c matrix    2 x    2 blocked   1 x   1 ussv alpha=-1 beta= 0 incx=1 incy=1 trans=n is ok"
 end subroutine c_ussv_2_n_am1_bm0_ix1_iy1
 ! 
 
@@ -7959,18 +7959,18 @@ subroutine c_ussv_2_t_am1_bm0_ix1_iy1(res,afmt,ictxt)
   endif
   call psb_barrier(ictxt)
   call psb_cdall(ictxt,desc_a,info,nl=m)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spall(a,desc_a,info,nnz=nnz)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call a%set_triangle()
   call a%set_lower()
   call a%set_unit(.false.)
 
   call psb_barrier(ictxt)
   call psb_spins(nnz,IA,JA,VA,a,desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_cdasb(desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spasb(a,desc_a,info,dupl=psb_dupl_err_,afmt=afmt)
   if(info.ne.0)print *,"matrix assembly failed"
   if(info.ne.0)goto 9996
@@ -7979,24 +7979,24 @@ subroutine c_ussv_2_t_am1_bm0_ix1_iy1(res,afmt,ictxt)
   if(info.ne.0)print *,"psb_spsm failed"
   if(info.ne.0)goto 9996
   do i=1,2
-    if(y(i)/=cy(i))print*,"results mismatch:",y,"instead of",cy
-    if(y(i)/=cy(i))info=-1
-    if(y(i)/=cy(i))goto 9996
+    if(y(i) /= cy(i))print*,"results mismatch:",y,"instead of",cy
+    if(y(i) /= cy(i))info=-1
+    if(y(i) /= cy(i))goto 9996
   enddo
 9996 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_spfree(a,desc_a,info)
-  if (info /= 0)goto 9997
+  if (info /= psb_success_)goto 9997
 9997 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_cdfree(desc_a,info)
-  if (info /= 0)goto 9998
+  if (info /= psb_success_)goto 9998
 9998 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
 9999 continue
-  if(info /= 0)res=res+1
-  if(res/=0)print*,"on c matrix    2 x    2 blocked   1 x   1 ussv alpha=-1 beta= 0 incx=1 incy=1 trans=t is not ok"
-  if(res==0)print*,"on c matrix    2 x    2 blocked   1 x   1 ussv alpha=-1 beta= 0 incx=1 incy=1 trans=t is ok"
+  if(info /= psb_success_)res=res+1
+  if(res /= 0)print*,"on c matrix    2 x    2 blocked   1 x   1 ussv alpha=-1 beta= 0 incx=1 incy=1 trans=t is not ok"
+  if(res == 0)print*,"on c matrix    2 x    2 blocked   1 x   1 ussv alpha=-1 beta= 0 incx=1 incy=1 trans=t is ok"
 end subroutine c_ussv_2_t_am1_bm0_ix1_iy1
 ! 
 
@@ -8038,18 +8038,18 @@ subroutine c_ussv_2_c_am1_bm0_ix1_iy1(res,afmt,ictxt)
   endif
   call psb_barrier(ictxt)
   call psb_cdall(ictxt,desc_a,info,nl=m)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spall(a,desc_a,info,nnz=nnz)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call a%set_triangle()
   call a%set_lower()
   call a%set_unit(.false.)
 
   call psb_barrier(ictxt)
   call psb_spins(nnz,IA,JA,VA,a,desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_cdasb(desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spasb(a,desc_a,info,dupl=psb_dupl_err_,afmt=afmt)
   if(info.ne.0)print *,"matrix assembly failed"
   if(info.ne.0)goto 9996
@@ -8058,24 +8058,24 @@ subroutine c_ussv_2_c_am1_bm0_ix1_iy1(res,afmt,ictxt)
   if(info.ne.0)print *,"psb_spsm failed"
   if(info.ne.0)goto 9996
   do i=1,2
-    if(y(i)/=cy(i))print*,"results mismatch:",y,"instead of",cy
-    if(y(i)/=cy(i))info=-1
-    if(y(i)/=cy(i))goto 9996
+    if(y(i) /= cy(i))print*,"results mismatch:",y,"instead of",cy
+    if(y(i) /= cy(i))info=-1
+    if(y(i) /= cy(i))goto 9996
   enddo
 9996 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_spfree(a,desc_a,info)
-  if (info /= 0)goto 9997
+  if (info /= psb_success_)goto 9997
 9997 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_cdfree(desc_a,info)
-  if (info /= 0)goto 9998
+  if (info /= psb_success_)goto 9998
 9998 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
 9999 continue
-  if(info /= 0)res=res+1
-  if(res/=0)print*,"on c matrix    2 x    2 blocked   1 x   1 ussv alpha=-1 beta= 0 incx=1 incy=1 trans=c is not ok"
-  if(res==0)print*,"on c matrix    2 x    2 blocked   1 x   1 ussv alpha=-1 beta= 0 incx=1 incy=1 trans=c is ok"
+  if(info /= psb_success_)res=res+1
+  if(res /= 0)print*,"on c matrix    2 x    2 blocked   1 x   1 ussv alpha=-1 beta= 0 incx=1 incy=1 trans=c is not ok"
+  if(res == 0)print*,"on c matrix    2 x    2 blocked   1 x   1 ussv alpha=-1 beta= 0 incx=1 incy=1 trans=c is ok"
 end subroutine c_ussv_2_c_am1_bm0_ix1_iy1
 ! 
 
@@ -8117,18 +8117,18 @@ subroutine c_ussv_2_n_am3_bm0_ix1_iy1(res,afmt,ictxt)
   endif
   call psb_barrier(ictxt)
   call psb_cdall(ictxt,desc_a,info,nl=m)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spall(a,desc_a,info,nnz=nnz)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call a%set_triangle()
   call a%set_lower()
   call a%set_unit(.false.)
 
   call psb_barrier(ictxt)
   call psb_spins(nnz,IA,JA,VA,a,desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_cdasb(desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spasb(a,desc_a,info,dupl=psb_dupl_err_,afmt=afmt)
   if(info.ne.0)print *,"matrix assembly failed"
   if(info.ne.0)goto 9996
@@ -8137,24 +8137,24 @@ subroutine c_ussv_2_n_am3_bm0_ix1_iy1(res,afmt,ictxt)
   if(info.ne.0)print *,"psb_spsm failed"
   if(info.ne.0)goto 9996
   do i=1,2
-    if(y(i)/=cy(i))print*,"results mismatch:",y,"instead of",cy
-    if(y(i)/=cy(i))info=-1
-    if(y(i)/=cy(i))goto 9996
+    if(y(i) /= cy(i))print*,"results mismatch:",y,"instead of",cy
+    if(y(i) /= cy(i))info=-1
+    if(y(i) /= cy(i))goto 9996
   enddo
 9996 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_spfree(a,desc_a,info)
-  if (info /= 0)goto 9997
+  if (info /= psb_success_)goto 9997
 9997 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_cdfree(desc_a,info)
-  if (info /= 0)goto 9998
+  if (info /= psb_success_)goto 9998
 9998 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
 9999 continue
-  if(info /= 0)res=res+1
-  if(res/=0)print*,"on c matrix    2 x    2 blocked   1 x   1 ussv alpha=-3 beta= 0 incx=1 incy=1 trans=n is not ok"
-  if(res==0)print*,"on c matrix    2 x    2 blocked   1 x   1 ussv alpha=-3 beta= 0 incx=1 incy=1 trans=n is ok"
+  if(info /= psb_success_)res=res+1
+  if(res /= 0)print*,"on c matrix    2 x    2 blocked   1 x   1 ussv alpha=-3 beta= 0 incx=1 incy=1 trans=n is not ok"
+  if(res == 0)print*,"on c matrix    2 x    2 blocked   1 x   1 ussv alpha=-3 beta= 0 incx=1 incy=1 trans=n is ok"
 end subroutine c_ussv_2_n_am3_bm0_ix1_iy1
 ! 
 
@@ -8196,18 +8196,18 @@ subroutine c_ussv_2_t_am3_bm0_ix1_iy1(res,afmt,ictxt)
   endif
   call psb_barrier(ictxt)
   call psb_cdall(ictxt,desc_a,info,nl=m)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spall(a,desc_a,info,nnz=nnz)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call a%set_triangle()
   call a%set_lower()
   call a%set_unit(.false.)
 
   call psb_barrier(ictxt)
   call psb_spins(nnz,IA,JA,VA,a,desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_cdasb(desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spasb(a,desc_a,info,dupl=psb_dupl_err_,afmt=afmt)
   if(info.ne.0)print *,"matrix assembly failed"
   if(info.ne.0)goto 9996
@@ -8216,24 +8216,24 @@ subroutine c_ussv_2_t_am3_bm0_ix1_iy1(res,afmt,ictxt)
   if(info.ne.0)print *,"psb_spsm failed"
   if(info.ne.0)goto 9996
   do i=1,2
-    if(y(i)/=cy(i))print*,"results mismatch:",y,"instead of",cy
-    if(y(i)/=cy(i))info=-1
-    if(y(i)/=cy(i))goto 9996
+    if(y(i) /= cy(i))print*,"results mismatch:",y,"instead of",cy
+    if(y(i) /= cy(i))info=-1
+    if(y(i) /= cy(i))goto 9996
   enddo
 9996 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_spfree(a,desc_a,info)
-  if (info /= 0)goto 9997
+  if (info /= psb_success_)goto 9997
 9997 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_cdfree(desc_a,info)
-  if (info /= 0)goto 9998
+  if (info /= psb_success_)goto 9998
 9998 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
 9999 continue
-  if(info /= 0)res=res+1
-  if(res/=0)print*,"on c matrix    2 x    2 blocked   1 x   1 ussv alpha=-3 beta= 0 incx=1 incy=1 trans=t is not ok"
-  if(res==0)print*,"on c matrix    2 x    2 blocked   1 x   1 ussv alpha=-3 beta= 0 incx=1 incy=1 trans=t is ok"
+  if(info /= psb_success_)res=res+1
+  if(res /= 0)print*,"on c matrix    2 x    2 blocked   1 x   1 ussv alpha=-3 beta= 0 incx=1 incy=1 trans=t is not ok"
+  if(res == 0)print*,"on c matrix    2 x    2 blocked   1 x   1 ussv alpha=-3 beta= 0 incx=1 incy=1 trans=t is ok"
 end subroutine c_ussv_2_t_am3_bm0_ix1_iy1
 ! 
 
@@ -8275,18 +8275,18 @@ subroutine c_ussv_2_c_am3_bm0_ix1_iy1(res,afmt,ictxt)
   endif
   call psb_barrier(ictxt)
   call psb_cdall(ictxt,desc_a,info,nl=m)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spall(a,desc_a,info,nnz=nnz)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call a%set_triangle()
   call a%set_lower()
   call a%set_unit(.false.)
 
   call psb_barrier(ictxt)
   call psb_spins(nnz,IA,JA,VA,a,desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_cdasb(desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spasb(a,desc_a,info,dupl=psb_dupl_err_,afmt=afmt)
   if(info.ne.0)print *,"matrix assembly failed"
   if(info.ne.0)goto 9996
@@ -8295,24 +8295,24 @@ subroutine c_ussv_2_c_am3_bm0_ix1_iy1(res,afmt,ictxt)
   if(info.ne.0)print *,"psb_spsm failed"
   if(info.ne.0)goto 9996
   do i=1,2
-    if(y(i)/=cy(i))print*,"results mismatch:",y,"instead of",cy
-    if(y(i)/=cy(i))info=-1
-    if(y(i)/=cy(i))goto 9996
+    if(y(i) /= cy(i))print*,"results mismatch:",y,"instead of",cy
+    if(y(i) /= cy(i))info=-1
+    if(y(i) /= cy(i))goto 9996
   enddo
 9996 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_spfree(a,desc_a,info)
-  if (info /= 0)goto 9997
+  if (info /= psb_success_)goto 9997
 9997 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_cdfree(desc_a,info)
-  if (info /= 0)goto 9998
+  if (info /= psb_success_)goto 9998
 9998 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
 9999 continue
-  if(info /= 0)res=res+1
-  if(res/=0)print*,"on c matrix    2 x    2 blocked   1 x   1 ussv alpha=-3 beta= 0 incx=1 incy=1 trans=c is not ok"
-  if(res==0)print*,"on c matrix    2 x    2 blocked   1 x   1 ussv alpha=-3 beta= 0 incx=1 incy=1 trans=c is ok"
+  if(info /= psb_success_)res=res+1
+  if(res /= 0)print*,"on c matrix    2 x    2 blocked   1 x   1 ussv alpha=-3 beta= 0 incx=1 incy=1 trans=c is not ok"
+  if(res == 0)print*,"on c matrix    2 x    2 blocked   1 x   1 ussv alpha=-3 beta= 0 incx=1 incy=1 trans=c is ok"
 end subroutine c_ussv_2_c_am3_bm0_ix1_iy1
 ! 
 
@@ -8355,14 +8355,14 @@ subroutine z_usmv_2_n_ap3_bp1_ix1_iy1(res,afmt,ictxt)
   endif
   call psb_barrier(ictxt)
   call psb_cdall(ictxt,desc_a,info,nl=m)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spall(a,desc_a,info,nnz=nnz)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_barrier(ictxt)
   call psb_spins(nnz,IA,JA,VA,a,desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_cdasb(desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spasb(a,desc_a,info,dupl=psb_dupl_err_,afmt=afmt)
   if(info.ne.0)print *,"matrix assembly failed"
   if(info.ne.0)goto 9996
@@ -8371,24 +8371,24 @@ subroutine z_usmv_2_n_ap3_bp1_ix1_iy1(res,afmt,ictxt)
   if(info.ne.0)print *,"psb_spmm failed"
   if(info.ne.0)goto 9996
   do i=1,2
-    if(y(i)/=cy(i))print*,"results mismatch:",y,"instead of",cy
-    if(y(i)/=cy(i))info=-1
-    if(y(i)/=cy(i))goto 9996
+    if(y(i) /= cy(i))print*,"results mismatch:",y,"instead of",cy
+    if(y(i) /= cy(i))info=-1
+    if(y(i) /= cy(i))goto 9996
   enddo
 9996 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_spfree(a,desc_a,info)
-  if (info /= 0)goto 9997
+  if (info /= psb_success_)goto 9997
 9997 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_cdfree(desc_a,info)
-  if (info /= 0)goto 9998
+  if (info /= psb_success_)goto 9998
 9998 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
 9999 continue
-  if(info /= 0)res=res+1
-  if(res/=0)print*,"on z matrix    2 x    2 blocked   1 x   1 usmv alpha= 3 beta= 1 incx=1 incy=1 trans=n is not ok"
-  if(res==0)print*,"on z matrix    2 x    2 blocked   1 x   1 usmv alpha= 3 beta= 1 incx=1 incy=1 trans=n is ok"
+  if(info /= psb_success_)res=res+1
+  if(res /= 0)print*,"on z matrix    2 x    2 blocked   1 x   1 usmv alpha= 3 beta= 1 incx=1 incy=1 trans=n is not ok"
+  if(res == 0)print*,"on z matrix    2 x    2 blocked   1 x   1 usmv alpha= 3 beta= 1 incx=1 incy=1 trans=n is ok"
 end subroutine z_usmv_2_n_ap3_bp1_ix1_iy1
 ! 
 
@@ -8431,14 +8431,14 @@ subroutine z_usmv_2_t_ap3_bp1_ix1_iy1(res,afmt,ictxt)
   endif
   call psb_barrier(ictxt)
   call psb_cdall(ictxt,desc_a,info,nl=m)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spall(a,desc_a,info,nnz=nnz)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_barrier(ictxt)
   call psb_spins(nnz,IA,JA,VA,a,desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_cdasb(desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spasb(a,desc_a,info,dupl=psb_dupl_err_,afmt=afmt)
   if(info.ne.0)print *,"matrix assembly failed"
   if(info.ne.0)goto 9996
@@ -8447,24 +8447,24 @@ subroutine z_usmv_2_t_ap3_bp1_ix1_iy1(res,afmt,ictxt)
   if(info.ne.0)print *,"psb_spmm failed"
   if(info.ne.0)goto 9996
   do i=1,2
-    if(y(i)/=cy(i))print*,"results mismatch:",y,"instead of",cy
-    if(y(i)/=cy(i))info=-1
-    if(y(i)/=cy(i))goto 9996
+    if(y(i) /= cy(i))print*,"results mismatch:",y,"instead of",cy
+    if(y(i) /= cy(i))info=-1
+    if(y(i) /= cy(i))goto 9996
   enddo
 9996 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_spfree(a,desc_a,info)
-  if (info /= 0)goto 9997
+  if (info /= psb_success_)goto 9997
 9997 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_cdfree(desc_a,info)
-  if (info /= 0)goto 9998
+  if (info /= psb_success_)goto 9998
 9998 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
 9999 continue
-  if(info /= 0)res=res+1
-  if(res/=0)print*,"on z matrix    2 x    2 blocked   1 x   1 usmv alpha= 3 beta= 1 incx=1 incy=1 trans=t is not ok"
-  if(res==0)print*,"on z matrix    2 x    2 blocked   1 x   1 usmv alpha= 3 beta= 1 incx=1 incy=1 trans=t is ok"
+  if(info /= psb_success_)res=res+1
+  if(res /= 0)print*,"on z matrix    2 x    2 blocked   1 x   1 usmv alpha= 3 beta= 1 incx=1 incy=1 trans=t is not ok"
+  if(res == 0)print*,"on z matrix    2 x    2 blocked   1 x   1 usmv alpha= 3 beta= 1 incx=1 incy=1 trans=t is ok"
 end subroutine z_usmv_2_t_ap3_bp1_ix1_iy1
 ! 
 
@@ -8507,14 +8507,14 @@ subroutine z_usmv_2_c_ap3_bp1_ix1_iy1(res,afmt,ictxt)
   endif
   call psb_barrier(ictxt)
   call psb_cdall(ictxt,desc_a,info,nl=m)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spall(a,desc_a,info,nnz=nnz)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_barrier(ictxt)
   call psb_spins(nnz,IA,JA,VA,a,desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_cdasb(desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spasb(a,desc_a,info,dupl=psb_dupl_err_,afmt=afmt)
   if(info.ne.0)print *,"matrix assembly failed"
   if(info.ne.0)goto 9996
@@ -8523,24 +8523,24 @@ subroutine z_usmv_2_c_ap3_bp1_ix1_iy1(res,afmt,ictxt)
   if(info.ne.0)print *,"psb_spmm failed"
   if(info.ne.0)goto 9996
   do i=1,2
-    if(y(i)/=cy(i))print*,"results mismatch:",y,"instead of",cy
-    if(y(i)/=cy(i))info=-1
-    if(y(i)/=cy(i))goto 9996
+    if(y(i) /= cy(i))print*,"results mismatch:",y,"instead of",cy
+    if(y(i) /= cy(i))info=-1
+    if(y(i) /= cy(i))goto 9996
   enddo
 9996 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_spfree(a,desc_a,info)
-  if (info /= 0)goto 9997
+  if (info /= psb_success_)goto 9997
 9997 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_cdfree(desc_a,info)
-  if (info /= 0)goto 9998
+  if (info /= psb_success_)goto 9998
 9998 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
 9999 continue
-  if(info /= 0)res=res+1
-  if(res/=0)print*,"on z matrix    2 x    2 blocked   1 x   1 usmv alpha= 3 beta= 1 incx=1 incy=1 trans=c is not ok"
-  if(res==0)print*,"on z matrix    2 x    2 blocked   1 x   1 usmv alpha= 3 beta= 1 incx=1 incy=1 trans=c is ok"
+  if(info /= psb_success_)res=res+1
+  if(res /= 0)print*,"on z matrix    2 x    2 blocked   1 x   1 usmv alpha= 3 beta= 1 incx=1 incy=1 trans=c is not ok"
+  if(res == 0)print*,"on z matrix    2 x    2 blocked   1 x   1 usmv alpha= 3 beta= 1 incx=1 incy=1 trans=c is ok"
 end subroutine z_usmv_2_c_ap3_bp1_ix1_iy1
 ! 
 
@@ -8583,14 +8583,14 @@ subroutine z_usmv_2_n_ap3_bm0_ix1_iy1(res,afmt,ictxt)
   endif
   call psb_barrier(ictxt)
   call psb_cdall(ictxt,desc_a,info,nl=m)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spall(a,desc_a,info,nnz=nnz)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_barrier(ictxt)
   call psb_spins(nnz,IA,JA,VA,a,desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_cdasb(desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spasb(a,desc_a,info,dupl=psb_dupl_err_,afmt=afmt)
   if(info.ne.0)print *,"matrix assembly failed"
   if(info.ne.0)goto 9996
@@ -8599,24 +8599,24 @@ subroutine z_usmv_2_n_ap3_bm0_ix1_iy1(res,afmt,ictxt)
   if(info.ne.0)print *,"psb_spmm failed"
   if(info.ne.0)goto 9996
   do i=1,2
-    if(y(i)/=cy(i))print*,"results mismatch:",y,"instead of",cy
-    if(y(i)/=cy(i))info=-1
-    if(y(i)/=cy(i))goto 9996
+    if(y(i) /= cy(i))print*,"results mismatch:",y,"instead of",cy
+    if(y(i) /= cy(i))info=-1
+    if(y(i) /= cy(i))goto 9996
   enddo
 9996 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_spfree(a,desc_a,info)
-  if (info /= 0)goto 9997
+  if (info /= psb_success_)goto 9997
 9997 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_cdfree(desc_a,info)
-  if (info /= 0)goto 9998
+  if (info /= psb_success_)goto 9998
 9998 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
 9999 continue
-  if(info /= 0)res=res+1
-  if(res/=0)print*,"on z matrix    2 x    2 blocked   1 x   1 usmv alpha= 3 beta= 0 incx=1 incy=1 trans=n is not ok"
-  if(res==0)print*,"on z matrix    2 x    2 blocked   1 x   1 usmv alpha= 3 beta= 0 incx=1 incy=1 trans=n is ok"
+  if(info /= psb_success_)res=res+1
+  if(res /= 0)print*,"on z matrix    2 x    2 blocked   1 x   1 usmv alpha= 3 beta= 0 incx=1 incy=1 trans=n is not ok"
+  if(res == 0)print*,"on z matrix    2 x    2 blocked   1 x   1 usmv alpha= 3 beta= 0 incx=1 incy=1 trans=n is ok"
 end subroutine z_usmv_2_n_ap3_bm0_ix1_iy1
 ! 
 
@@ -8659,14 +8659,14 @@ subroutine z_usmv_2_t_ap3_bm0_ix1_iy1(res,afmt,ictxt)
   endif
   call psb_barrier(ictxt)
   call psb_cdall(ictxt,desc_a,info,nl=m)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spall(a,desc_a,info,nnz=nnz)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_barrier(ictxt)
   call psb_spins(nnz,IA,JA,VA,a,desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_cdasb(desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spasb(a,desc_a,info,dupl=psb_dupl_err_,afmt=afmt)
   if(info.ne.0)print *,"matrix assembly failed"
   if(info.ne.0)goto 9996
@@ -8675,24 +8675,24 @@ subroutine z_usmv_2_t_ap3_bm0_ix1_iy1(res,afmt,ictxt)
   if(info.ne.0)print *,"psb_spmm failed"
   if(info.ne.0)goto 9996
   do i=1,2
-    if(y(i)/=cy(i))print*,"results mismatch:",y,"instead of",cy
-    if(y(i)/=cy(i))info=-1
-    if(y(i)/=cy(i))goto 9996
+    if(y(i) /= cy(i))print*,"results mismatch:",y,"instead of",cy
+    if(y(i) /= cy(i))info=-1
+    if(y(i) /= cy(i))goto 9996
   enddo
 9996 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_spfree(a,desc_a,info)
-  if (info /= 0)goto 9997
+  if (info /= psb_success_)goto 9997
 9997 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_cdfree(desc_a,info)
-  if (info /= 0)goto 9998
+  if (info /= psb_success_)goto 9998
 9998 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
 9999 continue
-  if(info /= 0)res=res+1
-  if(res/=0)print*,"on z matrix    2 x    2 blocked   1 x   1 usmv alpha= 3 beta= 0 incx=1 incy=1 trans=t is not ok"
-  if(res==0)print*,"on z matrix    2 x    2 blocked   1 x   1 usmv alpha= 3 beta= 0 incx=1 incy=1 trans=t is ok"
+  if(info /= psb_success_)res=res+1
+  if(res /= 0)print*,"on z matrix    2 x    2 blocked   1 x   1 usmv alpha= 3 beta= 0 incx=1 incy=1 trans=t is not ok"
+  if(res == 0)print*,"on z matrix    2 x    2 blocked   1 x   1 usmv alpha= 3 beta= 0 incx=1 incy=1 trans=t is ok"
 end subroutine z_usmv_2_t_ap3_bm0_ix1_iy1
 ! 
 
@@ -8735,14 +8735,14 @@ subroutine z_usmv_2_c_ap3_bm0_ix1_iy1(res,afmt,ictxt)
   endif
   call psb_barrier(ictxt)
   call psb_cdall(ictxt,desc_a,info,nl=m)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spall(a,desc_a,info,nnz=nnz)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_barrier(ictxt)
   call psb_spins(nnz,IA,JA,VA,a,desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_cdasb(desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spasb(a,desc_a,info,dupl=psb_dupl_err_,afmt=afmt)
   if(info.ne.0)print *,"matrix assembly failed"
   if(info.ne.0)goto 9996
@@ -8751,24 +8751,24 @@ subroutine z_usmv_2_c_ap3_bm0_ix1_iy1(res,afmt,ictxt)
   if(info.ne.0)print *,"psb_spmm failed"
   if(info.ne.0)goto 9996
   do i=1,2
-    if(y(i)/=cy(i))print*,"results mismatch:",y,"instead of",cy
-    if(y(i)/=cy(i))info=-1
-    if(y(i)/=cy(i))goto 9996
+    if(y(i) /= cy(i))print*,"results mismatch:",y,"instead of",cy
+    if(y(i) /= cy(i))info=-1
+    if(y(i) /= cy(i))goto 9996
   enddo
 9996 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_spfree(a,desc_a,info)
-  if (info /= 0)goto 9997
+  if (info /= psb_success_)goto 9997
 9997 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_cdfree(desc_a,info)
-  if (info /= 0)goto 9998
+  if (info /= psb_success_)goto 9998
 9998 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
 9999 continue
-  if(info /= 0)res=res+1
-  if(res/=0)print*,"on z matrix    2 x    2 blocked   1 x   1 usmv alpha= 3 beta= 0 incx=1 incy=1 trans=c is not ok"
-  if(res==0)print*,"on z matrix    2 x    2 blocked   1 x   1 usmv alpha= 3 beta= 0 incx=1 incy=1 trans=c is ok"
+  if(info /= psb_success_)res=res+1
+  if(res /= 0)print*,"on z matrix    2 x    2 blocked   1 x   1 usmv alpha= 3 beta= 0 incx=1 incy=1 trans=c is not ok"
+  if(res == 0)print*,"on z matrix    2 x    2 blocked   1 x   1 usmv alpha= 3 beta= 0 incx=1 incy=1 trans=c is ok"
 end subroutine z_usmv_2_c_ap3_bm0_ix1_iy1
 ! 
 
@@ -8811,14 +8811,14 @@ subroutine z_usmv_2_n_ap1_bp1_ix1_iy1(res,afmt,ictxt)
   endif
   call psb_barrier(ictxt)
   call psb_cdall(ictxt,desc_a,info,nl=m)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spall(a,desc_a,info,nnz=nnz)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_barrier(ictxt)
   call psb_spins(nnz,IA,JA,VA,a,desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_cdasb(desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spasb(a,desc_a,info,dupl=psb_dupl_err_,afmt=afmt)
   if(info.ne.0)print *,"matrix assembly failed"
   if(info.ne.0)goto 9996
@@ -8827,24 +8827,24 @@ subroutine z_usmv_2_n_ap1_bp1_ix1_iy1(res,afmt,ictxt)
   if(info.ne.0)print *,"psb_spmm failed"
   if(info.ne.0)goto 9996
   do i=1,2
-    if(y(i)/=cy(i))print*,"results mismatch:",y,"instead of",cy
-    if(y(i)/=cy(i))info=-1
-    if(y(i)/=cy(i))goto 9996
+    if(y(i) /= cy(i))print*,"results mismatch:",y,"instead of",cy
+    if(y(i) /= cy(i))info=-1
+    if(y(i) /= cy(i))goto 9996
   enddo
 9996 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_spfree(a,desc_a,info)
-  if (info /= 0)goto 9997
+  if (info /= psb_success_)goto 9997
 9997 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_cdfree(desc_a,info)
-  if (info /= 0)goto 9998
+  if (info /= psb_success_)goto 9998
 9998 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
 9999 continue
-  if(info /= 0)res=res+1
-  if(res/=0)print*,"on z matrix    2 x    2 blocked   1 x   1 usmv alpha= 1 beta= 1 incx=1 incy=1 trans=n is not ok"
-  if(res==0)print*,"on z matrix    2 x    2 blocked   1 x   1 usmv alpha= 1 beta= 1 incx=1 incy=1 trans=n is ok"
+  if(info /= psb_success_)res=res+1
+  if(res /= 0)print*,"on z matrix    2 x    2 blocked   1 x   1 usmv alpha= 1 beta= 1 incx=1 incy=1 trans=n is not ok"
+  if(res == 0)print*,"on z matrix    2 x    2 blocked   1 x   1 usmv alpha= 1 beta= 1 incx=1 incy=1 trans=n is ok"
 end subroutine z_usmv_2_n_ap1_bp1_ix1_iy1
 ! 
 
@@ -8887,14 +8887,14 @@ subroutine z_usmv_2_t_ap1_bp1_ix1_iy1(res,afmt,ictxt)
   endif
   call psb_barrier(ictxt)
   call psb_cdall(ictxt,desc_a,info,nl=m)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spall(a,desc_a,info,nnz=nnz)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_barrier(ictxt)
   call psb_spins(nnz,IA,JA,VA,a,desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_cdasb(desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spasb(a,desc_a,info,dupl=psb_dupl_err_,afmt=afmt)
   if(info.ne.0)print *,"matrix assembly failed"
   if(info.ne.0)goto 9996
@@ -8903,24 +8903,24 @@ subroutine z_usmv_2_t_ap1_bp1_ix1_iy1(res,afmt,ictxt)
   if(info.ne.0)print *,"psb_spmm failed"
   if(info.ne.0)goto 9996
   do i=1,2
-    if(y(i)/=cy(i))print*,"results mismatch:",y,"instead of",cy
-    if(y(i)/=cy(i))info=-1
-    if(y(i)/=cy(i))goto 9996
+    if(y(i) /= cy(i))print*,"results mismatch:",y,"instead of",cy
+    if(y(i) /= cy(i))info=-1
+    if(y(i) /= cy(i))goto 9996
   enddo
 9996 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_spfree(a,desc_a,info)
-  if (info /= 0)goto 9997
+  if (info /= psb_success_)goto 9997
 9997 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_cdfree(desc_a,info)
-  if (info /= 0)goto 9998
+  if (info /= psb_success_)goto 9998
 9998 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
 9999 continue
-  if(info /= 0)res=res+1
-  if(res/=0)print*,"on z matrix    2 x    2 blocked   1 x   1 usmv alpha= 1 beta= 1 incx=1 incy=1 trans=t is not ok"
-  if(res==0)print*,"on z matrix    2 x    2 blocked   1 x   1 usmv alpha= 1 beta= 1 incx=1 incy=1 trans=t is ok"
+  if(info /= psb_success_)res=res+1
+  if(res /= 0)print*,"on z matrix    2 x    2 blocked   1 x   1 usmv alpha= 1 beta= 1 incx=1 incy=1 trans=t is not ok"
+  if(res == 0)print*,"on z matrix    2 x    2 blocked   1 x   1 usmv alpha= 1 beta= 1 incx=1 incy=1 trans=t is ok"
 end subroutine z_usmv_2_t_ap1_bp1_ix1_iy1
 ! 
 
@@ -8963,14 +8963,14 @@ subroutine z_usmv_2_c_ap1_bp1_ix1_iy1(res,afmt,ictxt)
   endif
   call psb_barrier(ictxt)
   call psb_cdall(ictxt,desc_a,info,nl=m)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spall(a,desc_a,info,nnz=nnz)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_barrier(ictxt)
   call psb_spins(nnz,IA,JA,VA,a,desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_cdasb(desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spasb(a,desc_a,info,dupl=psb_dupl_err_,afmt=afmt)
   if(info.ne.0)print *,"matrix assembly failed"
   if(info.ne.0)goto 9996
@@ -8979,24 +8979,24 @@ subroutine z_usmv_2_c_ap1_bp1_ix1_iy1(res,afmt,ictxt)
   if(info.ne.0)print *,"psb_spmm failed"
   if(info.ne.0)goto 9996
   do i=1,2
-    if(y(i)/=cy(i))print*,"results mismatch:",y,"instead of",cy
-    if(y(i)/=cy(i))info=-1
-    if(y(i)/=cy(i))goto 9996
+    if(y(i) /= cy(i))print*,"results mismatch:",y,"instead of",cy
+    if(y(i) /= cy(i))info=-1
+    if(y(i) /= cy(i))goto 9996
   enddo
 9996 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_spfree(a,desc_a,info)
-  if (info /= 0)goto 9997
+  if (info /= psb_success_)goto 9997
 9997 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_cdfree(desc_a,info)
-  if (info /= 0)goto 9998
+  if (info /= psb_success_)goto 9998
 9998 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
 9999 continue
-  if(info /= 0)res=res+1
-  if(res/=0)print*,"on z matrix    2 x    2 blocked   1 x   1 usmv alpha= 1 beta= 1 incx=1 incy=1 trans=c is not ok"
-  if(res==0)print*,"on z matrix    2 x    2 blocked   1 x   1 usmv alpha= 1 beta= 1 incx=1 incy=1 trans=c is ok"
+  if(info /= psb_success_)res=res+1
+  if(res /= 0)print*,"on z matrix    2 x    2 blocked   1 x   1 usmv alpha= 1 beta= 1 incx=1 incy=1 trans=c is not ok"
+  if(res == 0)print*,"on z matrix    2 x    2 blocked   1 x   1 usmv alpha= 1 beta= 1 incx=1 incy=1 trans=c is ok"
 end subroutine z_usmv_2_c_ap1_bp1_ix1_iy1
 ! 
 
@@ -9039,14 +9039,14 @@ subroutine z_usmv_2_n_ap1_bm0_ix1_iy1(res,afmt,ictxt)
   endif
   call psb_barrier(ictxt)
   call psb_cdall(ictxt,desc_a,info,nl=m)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spall(a,desc_a,info,nnz=nnz)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_barrier(ictxt)
   call psb_spins(nnz,IA,JA,VA,a,desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_cdasb(desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spasb(a,desc_a,info,dupl=psb_dupl_err_,afmt=afmt)
   if(info.ne.0)print *,"matrix assembly failed"
   if(info.ne.0)goto 9996
@@ -9055,24 +9055,24 @@ subroutine z_usmv_2_n_ap1_bm0_ix1_iy1(res,afmt,ictxt)
   if(info.ne.0)print *,"psb_spmm failed"
   if(info.ne.0)goto 9996
   do i=1,2
-    if(y(i)/=cy(i))print*,"results mismatch:",y,"instead of",cy
-    if(y(i)/=cy(i))info=-1
-    if(y(i)/=cy(i))goto 9996
+    if(y(i) /= cy(i))print*,"results mismatch:",y,"instead of",cy
+    if(y(i) /= cy(i))info=-1
+    if(y(i) /= cy(i))goto 9996
   enddo
 9996 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_spfree(a,desc_a,info)
-  if (info /= 0)goto 9997
+  if (info /= psb_success_)goto 9997
 9997 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_cdfree(desc_a,info)
-  if (info /= 0)goto 9998
+  if (info /= psb_success_)goto 9998
 9998 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
 9999 continue
-  if(info /= 0)res=res+1
-  if(res/=0)print*,"on z matrix    2 x    2 blocked   1 x   1 usmv alpha= 1 beta= 0 incx=1 incy=1 trans=n is not ok"
-  if(res==0)print*,"on z matrix    2 x    2 blocked   1 x   1 usmv alpha= 1 beta= 0 incx=1 incy=1 trans=n is ok"
+  if(info /= psb_success_)res=res+1
+  if(res /= 0)print*,"on z matrix    2 x    2 blocked   1 x   1 usmv alpha= 1 beta= 0 incx=1 incy=1 trans=n is not ok"
+  if(res == 0)print*,"on z matrix    2 x    2 blocked   1 x   1 usmv alpha= 1 beta= 0 incx=1 incy=1 trans=n is ok"
 end subroutine z_usmv_2_n_ap1_bm0_ix1_iy1
 ! 
 
@@ -9115,14 +9115,14 @@ subroutine z_usmv_2_t_ap1_bm0_ix1_iy1(res,afmt,ictxt)
   endif
   call psb_barrier(ictxt)
   call psb_cdall(ictxt,desc_a,info,nl=m)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spall(a,desc_a,info,nnz=nnz)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_barrier(ictxt)
   call psb_spins(nnz,IA,JA,VA,a,desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_cdasb(desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spasb(a,desc_a,info,dupl=psb_dupl_err_,afmt=afmt)
   if(info.ne.0)print *,"matrix assembly failed"
   if(info.ne.0)goto 9996
@@ -9131,24 +9131,24 @@ subroutine z_usmv_2_t_ap1_bm0_ix1_iy1(res,afmt,ictxt)
   if(info.ne.0)print *,"psb_spmm failed"
   if(info.ne.0)goto 9996
   do i=1,2
-    if(y(i)/=cy(i))print*,"results mismatch:",y,"instead of",cy
-    if(y(i)/=cy(i))info=-1
-    if(y(i)/=cy(i))goto 9996
+    if(y(i) /= cy(i))print*,"results mismatch:",y,"instead of",cy
+    if(y(i) /= cy(i))info=-1
+    if(y(i) /= cy(i))goto 9996
   enddo
 9996 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_spfree(a,desc_a,info)
-  if (info /= 0)goto 9997
+  if (info /= psb_success_)goto 9997
 9997 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_cdfree(desc_a,info)
-  if (info /= 0)goto 9998
+  if (info /= psb_success_)goto 9998
 9998 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
 9999 continue
-  if(info /= 0)res=res+1
-  if(res/=0)print*,"on z matrix    2 x    2 blocked   1 x   1 usmv alpha= 1 beta= 0 incx=1 incy=1 trans=t is not ok"
-  if(res==0)print*,"on z matrix    2 x    2 blocked   1 x   1 usmv alpha= 1 beta= 0 incx=1 incy=1 trans=t is ok"
+  if(info /= psb_success_)res=res+1
+  if(res /= 0)print*,"on z matrix    2 x    2 blocked   1 x   1 usmv alpha= 1 beta= 0 incx=1 incy=1 trans=t is not ok"
+  if(res == 0)print*,"on z matrix    2 x    2 blocked   1 x   1 usmv alpha= 1 beta= 0 incx=1 incy=1 trans=t is ok"
 end subroutine z_usmv_2_t_ap1_bm0_ix1_iy1
 ! 
 
@@ -9191,14 +9191,14 @@ subroutine z_usmv_2_c_ap1_bm0_ix1_iy1(res,afmt,ictxt)
   endif
   call psb_barrier(ictxt)
   call psb_cdall(ictxt,desc_a,info,nl=m)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spall(a,desc_a,info,nnz=nnz)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_barrier(ictxt)
   call psb_spins(nnz,IA,JA,VA,a,desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_cdasb(desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spasb(a,desc_a,info,dupl=psb_dupl_err_,afmt=afmt)
   if(info.ne.0)print *,"matrix assembly failed"
   if(info.ne.0)goto 9996
@@ -9207,24 +9207,24 @@ subroutine z_usmv_2_c_ap1_bm0_ix1_iy1(res,afmt,ictxt)
   if(info.ne.0)print *,"psb_spmm failed"
   if(info.ne.0)goto 9996
   do i=1,2
-    if(y(i)/=cy(i))print*,"results mismatch:",y,"instead of",cy
-    if(y(i)/=cy(i))info=-1
-    if(y(i)/=cy(i))goto 9996
+    if(y(i) /= cy(i))print*,"results mismatch:",y,"instead of",cy
+    if(y(i) /= cy(i))info=-1
+    if(y(i) /= cy(i))goto 9996
   enddo
 9996 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_spfree(a,desc_a,info)
-  if (info /= 0)goto 9997
+  if (info /= psb_success_)goto 9997
 9997 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_cdfree(desc_a,info)
-  if (info /= 0)goto 9998
+  if (info /= psb_success_)goto 9998
 9998 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
 9999 continue
-  if(info /= 0)res=res+1
-  if(res/=0)print*,"on z matrix    2 x    2 blocked   1 x   1 usmv alpha= 1 beta= 0 incx=1 incy=1 trans=c is not ok"
-  if(res==0)print*,"on z matrix    2 x    2 blocked   1 x   1 usmv alpha= 1 beta= 0 incx=1 incy=1 trans=c is ok"
+  if(info /= psb_success_)res=res+1
+  if(res /= 0)print*,"on z matrix    2 x    2 blocked   1 x   1 usmv alpha= 1 beta= 0 incx=1 incy=1 trans=c is not ok"
+  if(res == 0)print*,"on z matrix    2 x    2 blocked   1 x   1 usmv alpha= 1 beta= 0 incx=1 incy=1 trans=c is ok"
 end subroutine z_usmv_2_c_ap1_bm0_ix1_iy1
 ! 
 
@@ -9267,14 +9267,14 @@ subroutine z_usmv_2_n_am1_bp1_ix1_iy1(res,afmt,ictxt)
   endif
   call psb_barrier(ictxt)
   call psb_cdall(ictxt,desc_a,info,nl=m)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spall(a,desc_a,info,nnz=nnz)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_barrier(ictxt)
   call psb_spins(nnz,IA,JA,VA,a,desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_cdasb(desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spasb(a,desc_a,info,dupl=psb_dupl_err_,afmt=afmt)
   if(info.ne.0)print *,"matrix assembly failed"
   if(info.ne.0)goto 9996
@@ -9283,24 +9283,24 @@ subroutine z_usmv_2_n_am1_bp1_ix1_iy1(res,afmt,ictxt)
   if(info.ne.0)print *,"psb_spmm failed"
   if(info.ne.0)goto 9996
   do i=1,2
-    if(y(i)/=cy(i))print*,"results mismatch:",y,"instead of",cy
-    if(y(i)/=cy(i))info=-1
-    if(y(i)/=cy(i))goto 9996
+    if(y(i) /= cy(i))print*,"results mismatch:",y,"instead of",cy
+    if(y(i) /= cy(i))info=-1
+    if(y(i) /= cy(i))goto 9996
   enddo
 9996 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_spfree(a,desc_a,info)
-  if (info /= 0)goto 9997
+  if (info /= psb_success_)goto 9997
 9997 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_cdfree(desc_a,info)
-  if (info /= 0)goto 9998
+  if (info /= psb_success_)goto 9998
 9998 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
 9999 continue
-  if(info /= 0)res=res+1
-  if(res/=0)print*,"on z matrix    2 x    2 blocked   1 x   1 usmv alpha=-1 beta= 1 incx=1 incy=1 trans=n is not ok"
-  if(res==0)print*,"on z matrix    2 x    2 blocked   1 x   1 usmv alpha=-1 beta= 1 incx=1 incy=1 trans=n is ok"
+  if(info /= psb_success_)res=res+1
+  if(res /= 0)print*,"on z matrix    2 x    2 blocked   1 x   1 usmv alpha=-1 beta= 1 incx=1 incy=1 trans=n is not ok"
+  if(res == 0)print*,"on z matrix    2 x    2 blocked   1 x   1 usmv alpha=-1 beta= 1 incx=1 incy=1 trans=n is ok"
 end subroutine z_usmv_2_n_am1_bp1_ix1_iy1
 ! 
 
@@ -9343,14 +9343,14 @@ subroutine z_usmv_2_t_am1_bp1_ix1_iy1(res,afmt,ictxt)
   endif
   call psb_barrier(ictxt)
   call psb_cdall(ictxt,desc_a,info,nl=m)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spall(a,desc_a,info,nnz=nnz)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_barrier(ictxt)
   call psb_spins(nnz,IA,JA,VA,a,desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_cdasb(desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spasb(a,desc_a,info,dupl=psb_dupl_err_,afmt=afmt)
   if(info.ne.0)print *,"matrix assembly failed"
   if(info.ne.0)goto 9996
@@ -9359,24 +9359,24 @@ subroutine z_usmv_2_t_am1_bp1_ix1_iy1(res,afmt,ictxt)
   if(info.ne.0)print *,"psb_spmm failed"
   if(info.ne.0)goto 9996
   do i=1,2
-    if(y(i)/=cy(i))print*,"results mismatch:",y,"instead of",cy
-    if(y(i)/=cy(i))info=-1
-    if(y(i)/=cy(i))goto 9996
+    if(y(i) /= cy(i))print*,"results mismatch:",y,"instead of",cy
+    if(y(i) /= cy(i))info=-1
+    if(y(i) /= cy(i))goto 9996
   enddo
 9996 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_spfree(a,desc_a,info)
-  if (info /= 0)goto 9997
+  if (info /= psb_success_)goto 9997
 9997 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_cdfree(desc_a,info)
-  if (info /= 0)goto 9998
+  if (info /= psb_success_)goto 9998
 9998 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
 9999 continue
-  if(info /= 0)res=res+1
-  if(res/=0)print*,"on z matrix    2 x    2 blocked   1 x   1 usmv alpha=-1 beta= 1 incx=1 incy=1 trans=t is not ok"
-  if(res==0)print*,"on z matrix    2 x    2 blocked   1 x   1 usmv alpha=-1 beta= 1 incx=1 incy=1 trans=t is ok"
+  if(info /= psb_success_)res=res+1
+  if(res /= 0)print*,"on z matrix    2 x    2 blocked   1 x   1 usmv alpha=-1 beta= 1 incx=1 incy=1 trans=t is not ok"
+  if(res == 0)print*,"on z matrix    2 x    2 blocked   1 x   1 usmv alpha=-1 beta= 1 incx=1 incy=1 trans=t is ok"
 end subroutine z_usmv_2_t_am1_bp1_ix1_iy1
 ! 
 
@@ -9419,14 +9419,14 @@ subroutine z_usmv_2_c_am1_bp1_ix1_iy1(res,afmt,ictxt)
   endif
   call psb_barrier(ictxt)
   call psb_cdall(ictxt,desc_a,info,nl=m)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spall(a,desc_a,info,nnz=nnz)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_barrier(ictxt)
   call psb_spins(nnz,IA,JA,VA,a,desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_cdasb(desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spasb(a,desc_a,info,dupl=psb_dupl_err_,afmt=afmt)
   if(info.ne.0)print *,"matrix assembly failed"
   if(info.ne.0)goto 9996
@@ -9435,24 +9435,24 @@ subroutine z_usmv_2_c_am1_bp1_ix1_iy1(res,afmt,ictxt)
   if(info.ne.0)print *,"psb_spmm failed"
   if(info.ne.0)goto 9996
   do i=1,2
-    if(y(i)/=cy(i))print*,"results mismatch:",y,"instead of",cy
-    if(y(i)/=cy(i))info=-1
-    if(y(i)/=cy(i))goto 9996
+    if(y(i) /= cy(i))print*,"results mismatch:",y,"instead of",cy
+    if(y(i) /= cy(i))info=-1
+    if(y(i) /= cy(i))goto 9996
   enddo
 9996 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_spfree(a,desc_a,info)
-  if (info /= 0)goto 9997
+  if (info /= psb_success_)goto 9997
 9997 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_cdfree(desc_a,info)
-  if (info /= 0)goto 9998
+  if (info /= psb_success_)goto 9998
 9998 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
 9999 continue
-  if(info /= 0)res=res+1
-  if(res/=0)print*,"on z matrix    2 x    2 blocked   1 x   1 usmv alpha=-1 beta= 1 incx=1 incy=1 trans=c is not ok"
-  if(res==0)print*,"on z matrix    2 x    2 blocked   1 x   1 usmv alpha=-1 beta= 1 incx=1 incy=1 trans=c is ok"
+  if(info /= psb_success_)res=res+1
+  if(res /= 0)print*,"on z matrix    2 x    2 blocked   1 x   1 usmv alpha=-1 beta= 1 incx=1 incy=1 trans=c is not ok"
+  if(res == 0)print*,"on z matrix    2 x    2 blocked   1 x   1 usmv alpha=-1 beta= 1 incx=1 incy=1 trans=c is ok"
 end subroutine z_usmv_2_c_am1_bp1_ix1_iy1
 ! 
 
@@ -9495,14 +9495,14 @@ subroutine z_usmv_2_n_am1_bm0_ix1_iy1(res,afmt,ictxt)
   endif
   call psb_barrier(ictxt)
   call psb_cdall(ictxt,desc_a,info,nl=m)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spall(a,desc_a,info,nnz=nnz)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_barrier(ictxt)
   call psb_spins(nnz,IA,JA,VA,a,desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_cdasb(desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spasb(a,desc_a,info,dupl=psb_dupl_err_,afmt=afmt)
   if(info.ne.0)print *,"matrix assembly failed"
   if(info.ne.0)goto 9996
@@ -9511,24 +9511,24 @@ subroutine z_usmv_2_n_am1_bm0_ix1_iy1(res,afmt,ictxt)
   if(info.ne.0)print *,"psb_spmm failed"
   if(info.ne.0)goto 9996
   do i=1,2
-    if(y(i)/=cy(i))print*,"results mismatch:",y,"instead of",cy
-    if(y(i)/=cy(i))info=-1
-    if(y(i)/=cy(i))goto 9996
+    if(y(i) /= cy(i))print*,"results mismatch:",y,"instead of",cy
+    if(y(i) /= cy(i))info=-1
+    if(y(i) /= cy(i))goto 9996
   enddo
 9996 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_spfree(a,desc_a,info)
-  if (info /= 0)goto 9997
+  if (info /= psb_success_)goto 9997
 9997 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_cdfree(desc_a,info)
-  if (info /= 0)goto 9998
+  if (info /= psb_success_)goto 9998
 9998 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
 9999 continue
-  if(info /= 0)res=res+1
-  if(res/=0)print*,"on z matrix    2 x    2 blocked   1 x   1 usmv alpha=-1 beta= 0 incx=1 incy=1 trans=n is not ok"
-  if(res==0)print*,"on z matrix    2 x    2 blocked   1 x   1 usmv alpha=-1 beta= 0 incx=1 incy=1 trans=n is ok"
+  if(info /= psb_success_)res=res+1
+  if(res /= 0)print*,"on z matrix    2 x    2 blocked   1 x   1 usmv alpha=-1 beta= 0 incx=1 incy=1 trans=n is not ok"
+  if(res == 0)print*,"on z matrix    2 x    2 blocked   1 x   1 usmv alpha=-1 beta= 0 incx=1 incy=1 trans=n is ok"
 end subroutine z_usmv_2_n_am1_bm0_ix1_iy1
 ! 
 
@@ -9571,14 +9571,14 @@ subroutine z_usmv_2_t_am1_bm0_ix1_iy1(res,afmt,ictxt)
   endif
   call psb_barrier(ictxt)
   call psb_cdall(ictxt,desc_a,info,nl=m)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spall(a,desc_a,info,nnz=nnz)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_barrier(ictxt)
   call psb_spins(nnz,IA,JA,VA,a,desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_cdasb(desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spasb(a,desc_a,info,dupl=psb_dupl_err_,afmt=afmt)
   if(info.ne.0)print *,"matrix assembly failed"
   if(info.ne.0)goto 9996
@@ -9587,24 +9587,24 @@ subroutine z_usmv_2_t_am1_bm0_ix1_iy1(res,afmt,ictxt)
   if(info.ne.0)print *,"psb_spmm failed"
   if(info.ne.0)goto 9996
   do i=1,2
-    if(y(i)/=cy(i))print*,"results mismatch:",y,"instead of",cy
-    if(y(i)/=cy(i))info=-1
-    if(y(i)/=cy(i))goto 9996
+    if(y(i) /= cy(i))print*,"results mismatch:",y,"instead of",cy
+    if(y(i) /= cy(i))info=-1
+    if(y(i) /= cy(i))goto 9996
   enddo
 9996 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_spfree(a,desc_a,info)
-  if (info /= 0)goto 9997
+  if (info /= psb_success_)goto 9997
 9997 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_cdfree(desc_a,info)
-  if (info /= 0)goto 9998
+  if (info /= psb_success_)goto 9998
 9998 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
 9999 continue
-  if(info /= 0)res=res+1
-  if(res/=0)print*,"on z matrix    2 x    2 blocked   1 x   1 usmv alpha=-1 beta= 0 incx=1 incy=1 trans=t is not ok"
-  if(res==0)print*,"on z matrix    2 x    2 blocked   1 x   1 usmv alpha=-1 beta= 0 incx=1 incy=1 trans=t is ok"
+  if(info /= psb_success_)res=res+1
+  if(res /= 0)print*,"on z matrix    2 x    2 blocked   1 x   1 usmv alpha=-1 beta= 0 incx=1 incy=1 trans=t is not ok"
+  if(res == 0)print*,"on z matrix    2 x    2 blocked   1 x   1 usmv alpha=-1 beta= 0 incx=1 incy=1 trans=t is ok"
 end subroutine z_usmv_2_t_am1_bm0_ix1_iy1
 ! 
 
@@ -9647,14 +9647,14 @@ subroutine z_usmv_2_c_am1_bm0_ix1_iy1(res,afmt,ictxt)
   endif
   call psb_barrier(ictxt)
   call psb_cdall(ictxt,desc_a,info,nl=m)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spall(a,desc_a,info,nnz=nnz)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_barrier(ictxt)
   call psb_spins(nnz,IA,JA,VA,a,desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_cdasb(desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spasb(a,desc_a,info,dupl=psb_dupl_err_,afmt=afmt)
   if(info.ne.0)print *,"matrix assembly failed"
   if(info.ne.0)goto 9996
@@ -9663,24 +9663,24 @@ subroutine z_usmv_2_c_am1_bm0_ix1_iy1(res,afmt,ictxt)
   if(info.ne.0)print *,"psb_spmm failed"
   if(info.ne.0)goto 9996
   do i=1,2
-    if(y(i)/=cy(i))print*,"results mismatch:",y,"instead of",cy
-    if(y(i)/=cy(i))info=-1
-    if(y(i)/=cy(i))goto 9996
+    if(y(i) /= cy(i))print*,"results mismatch:",y,"instead of",cy
+    if(y(i) /= cy(i))info=-1
+    if(y(i) /= cy(i))goto 9996
   enddo
 9996 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_spfree(a,desc_a,info)
-  if (info /= 0)goto 9997
+  if (info /= psb_success_)goto 9997
 9997 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_cdfree(desc_a,info)
-  if (info /= 0)goto 9998
+  if (info /= psb_success_)goto 9998
 9998 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
 9999 continue
-  if(info /= 0)res=res+1
-  if(res/=0)print*,"on z matrix    2 x    2 blocked   1 x   1 usmv alpha=-1 beta= 0 incx=1 incy=1 trans=c is not ok"
-  if(res==0)print*,"on z matrix    2 x    2 blocked   1 x   1 usmv alpha=-1 beta= 0 incx=1 incy=1 trans=c is ok"
+  if(info /= psb_success_)res=res+1
+  if(res /= 0)print*,"on z matrix    2 x    2 blocked   1 x   1 usmv alpha=-1 beta= 0 incx=1 incy=1 trans=c is not ok"
+  if(res == 0)print*,"on z matrix    2 x    2 blocked   1 x   1 usmv alpha=-1 beta= 0 incx=1 incy=1 trans=c is ok"
 end subroutine z_usmv_2_c_am1_bm0_ix1_iy1
 ! 
 
@@ -9723,14 +9723,14 @@ subroutine z_usmv_2_n_am3_bp1_ix1_iy1(res,afmt,ictxt)
   endif
   call psb_barrier(ictxt)
   call psb_cdall(ictxt,desc_a,info,nl=m)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spall(a,desc_a,info,nnz=nnz)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_barrier(ictxt)
   call psb_spins(nnz,IA,JA,VA,a,desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_cdasb(desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spasb(a,desc_a,info,dupl=psb_dupl_err_,afmt=afmt)
   if(info.ne.0)print *,"matrix assembly failed"
   if(info.ne.0)goto 9996
@@ -9739,24 +9739,24 @@ subroutine z_usmv_2_n_am3_bp1_ix1_iy1(res,afmt,ictxt)
   if(info.ne.0)print *,"psb_spmm failed"
   if(info.ne.0)goto 9996
   do i=1,2
-    if(y(i)/=cy(i))print*,"results mismatch:",y,"instead of",cy
-    if(y(i)/=cy(i))info=-1
-    if(y(i)/=cy(i))goto 9996
+    if(y(i) /= cy(i))print*,"results mismatch:",y,"instead of",cy
+    if(y(i) /= cy(i))info=-1
+    if(y(i) /= cy(i))goto 9996
   enddo
 9996 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_spfree(a,desc_a,info)
-  if (info /= 0)goto 9997
+  if (info /= psb_success_)goto 9997
 9997 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_cdfree(desc_a,info)
-  if (info /= 0)goto 9998
+  if (info /= psb_success_)goto 9998
 9998 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
 9999 continue
-  if(info /= 0)res=res+1
-  if(res/=0)print*,"on z matrix    2 x    2 blocked   1 x   1 usmv alpha=-3 beta= 1 incx=1 incy=1 trans=n is not ok"
-  if(res==0)print*,"on z matrix    2 x    2 blocked   1 x   1 usmv alpha=-3 beta= 1 incx=1 incy=1 trans=n is ok"
+  if(info /= psb_success_)res=res+1
+  if(res /= 0)print*,"on z matrix    2 x    2 blocked   1 x   1 usmv alpha=-3 beta= 1 incx=1 incy=1 trans=n is not ok"
+  if(res == 0)print*,"on z matrix    2 x    2 blocked   1 x   1 usmv alpha=-3 beta= 1 incx=1 incy=1 trans=n is ok"
 end subroutine z_usmv_2_n_am3_bp1_ix1_iy1
 ! 
 
@@ -9799,14 +9799,14 @@ subroutine z_usmv_2_t_am3_bp1_ix1_iy1(res,afmt,ictxt)
   endif
   call psb_barrier(ictxt)
   call psb_cdall(ictxt,desc_a,info,nl=m)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spall(a,desc_a,info,nnz=nnz)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_barrier(ictxt)
   call psb_spins(nnz,IA,JA,VA,a,desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_cdasb(desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spasb(a,desc_a,info,dupl=psb_dupl_err_,afmt=afmt)
   if(info.ne.0)print *,"matrix assembly failed"
   if(info.ne.0)goto 9996
@@ -9815,24 +9815,24 @@ subroutine z_usmv_2_t_am3_bp1_ix1_iy1(res,afmt,ictxt)
   if(info.ne.0)print *,"psb_spmm failed"
   if(info.ne.0)goto 9996
   do i=1,2
-    if(y(i)/=cy(i))print*,"results mismatch:",y,"instead of",cy
-    if(y(i)/=cy(i))info=-1
-    if(y(i)/=cy(i))goto 9996
+    if(y(i) /= cy(i))print*,"results mismatch:",y,"instead of",cy
+    if(y(i) /= cy(i))info=-1
+    if(y(i) /= cy(i))goto 9996
   enddo
 9996 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_spfree(a,desc_a,info)
-  if (info /= 0)goto 9997
+  if (info /= psb_success_)goto 9997
 9997 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_cdfree(desc_a,info)
-  if (info /= 0)goto 9998
+  if (info /= psb_success_)goto 9998
 9998 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
 9999 continue
-  if(info /= 0)res=res+1
-  if(res/=0)print*,"on z matrix    2 x    2 blocked   1 x   1 usmv alpha=-3 beta= 1 incx=1 incy=1 trans=t is not ok"
-  if(res==0)print*,"on z matrix    2 x    2 blocked   1 x   1 usmv alpha=-3 beta= 1 incx=1 incy=1 trans=t is ok"
+  if(info /= psb_success_)res=res+1
+  if(res /= 0)print*,"on z matrix    2 x    2 blocked   1 x   1 usmv alpha=-3 beta= 1 incx=1 incy=1 trans=t is not ok"
+  if(res == 0)print*,"on z matrix    2 x    2 blocked   1 x   1 usmv alpha=-3 beta= 1 incx=1 incy=1 trans=t is ok"
 end subroutine z_usmv_2_t_am3_bp1_ix1_iy1
 ! 
 
@@ -9875,14 +9875,14 @@ subroutine z_usmv_2_c_am3_bp1_ix1_iy1(res,afmt,ictxt)
   endif
   call psb_barrier(ictxt)
   call psb_cdall(ictxt,desc_a,info,nl=m)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spall(a,desc_a,info,nnz=nnz)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_barrier(ictxt)
   call psb_spins(nnz,IA,JA,VA,a,desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_cdasb(desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spasb(a,desc_a,info,dupl=psb_dupl_err_,afmt=afmt)
   if(info.ne.0)print *,"matrix assembly failed"
   if(info.ne.0)goto 9996
@@ -9891,24 +9891,24 @@ subroutine z_usmv_2_c_am3_bp1_ix1_iy1(res,afmt,ictxt)
   if(info.ne.0)print *,"psb_spmm failed"
   if(info.ne.0)goto 9996
   do i=1,2
-    if(y(i)/=cy(i))print*,"results mismatch:",y,"instead of",cy
-    if(y(i)/=cy(i))info=-1
-    if(y(i)/=cy(i))goto 9996
+    if(y(i) /= cy(i))print*,"results mismatch:",y,"instead of",cy
+    if(y(i) /= cy(i))info=-1
+    if(y(i) /= cy(i))goto 9996
   enddo
 9996 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_spfree(a,desc_a,info)
-  if (info /= 0)goto 9997
+  if (info /= psb_success_)goto 9997
 9997 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_cdfree(desc_a,info)
-  if (info /= 0)goto 9998
+  if (info /= psb_success_)goto 9998
 9998 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
 9999 continue
-  if(info /= 0)res=res+1
-  if(res/=0)print*,"on z matrix    2 x    2 blocked   1 x   1 usmv alpha=-3 beta= 1 incx=1 incy=1 trans=c is not ok"
-  if(res==0)print*,"on z matrix    2 x    2 blocked   1 x   1 usmv alpha=-3 beta= 1 incx=1 incy=1 trans=c is ok"
+  if(info /= psb_success_)res=res+1
+  if(res /= 0)print*,"on z matrix    2 x    2 blocked   1 x   1 usmv alpha=-3 beta= 1 incx=1 incy=1 trans=c is not ok"
+  if(res == 0)print*,"on z matrix    2 x    2 blocked   1 x   1 usmv alpha=-3 beta= 1 incx=1 incy=1 trans=c is ok"
 end subroutine z_usmv_2_c_am3_bp1_ix1_iy1
 ! 
 
@@ -9951,14 +9951,14 @@ subroutine z_usmv_2_n_am3_bm0_ix1_iy1(res,afmt,ictxt)
   endif
   call psb_barrier(ictxt)
   call psb_cdall(ictxt,desc_a,info,nl=m)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spall(a,desc_a,info,nnz=nnz)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_barrier(ictxt)
   call psb_spins(nnz,IA,JA,VA,a,desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_cdasb(desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spasb(a,desc_a,info,dupl=psb_dupl_err_,afmt=afmt)
   if(info.ne.0)print *,"matrix assembly failed"
   if(info.ne.0)goto 9996
@@ -9967,24 +9967,24 @@ subroutine z_usmv_2_n_am3_bm0_ix1_iy1(res,afmt,ictxt)
   if(info.ne.0)print *,"psb_spmm failed"
   if(info.ne.0)goto 9996
   do i=1,2
-    if(y(i)/=cy(i))print*,"results mismatch:",y,"instead of",cy
-    if(y(i)/=cy(i))info=-1
-    if(y(i)/=cy(i))goto 9996
+    if(y(i) /= cy(i))print*,"results mismatch:",y,"instead of",cy
+    if(y(i) /= cy(i))info=-1
+    if(y(i) /= cy(i))goto 9996
   enddo
 9996 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_spfree(a,desc_a,info)
-  if (info /= 0)goto 9997
+  if (info /= psb_success_)goto 9997
 9997 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_cdfree(desc_a,info)
-  if (info /= 0)goto 9998
+  if (info /= psb_success_)goto 9998
 9998 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
 9999 continue
-  if(info /= 0)res=res+1
-  if(res/=0)print*,"on z matrix    2 x    2 blocked   1 x   1 usmv alpha=-3 beta= 0 incx=1 incy=1 trans=n is not ok"
-  if(res==0)print*,"on z matrix    2 x    2 blocked   1 x   1 usmv alpha=-3 beta= 0 incx=1 incy=1 trans=n is ok"
+  if(info /= psb_success_)res=res+1
+  if(res /= 0)print*,"on z matrix    2 x    2 blocked   1 x   1 usmv alpha=-3 beta= 0 incx=1 incy=1 trans=n is not ok"
+  if(res == 0)print*,"on z matrix    2 x    2 blocked   1 x   1 usmv alpha=-3 beta= 0 incx=1 incy=1 trans=n is ok"
 end subroutine z_usmv_2_n_am3_bm0_ix1_iy1
 ! 
 
@@ -10027,14 +10027,14 @@ subroutine z_usmv_2_t_am3_bm0_ix1_iy1(res,afmt,ictxt)
   endif
   call psb_barrier(ictxt)
   call psb_cdall(ictxt,desc_a,info,nl=m)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spall(a,desc_a,info,nnz=nnz)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_barrier(ictxt)
   call psb_spins(nnz,IA,JA,VA,a,desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_cdasb(desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spasb(a,desc_a,info,dupl=psb_dupl_err_,afmt=afmt)
   if(info.ne.0)print *,"matrix assembly failed"
   if(info.ne.0)goto 9996
@@ -10043,24 +10043,24 @@ subroutine z_usmv_2_t_am3_bm0_ix1_iy1(res,afmt,ictxt)
   if(info.ne.0)print *,"psb_spmm failed"
   if(info.ne.0)goto 9996
   do i=1,2
-    if(y(i)/=cy(i))print*,"results mismatch:",y,"instead of",cy
-    if(y(i)/=cy(i))info=-1
-    if(y(i)/=cy(i))goto 9996
+    if(y(i) /= cy(i))print*,"results mismatch:",y,"instead of",cy
+    if(y(i) /= cy(i))info=-1
+    if(y(i) /= cy(i))goto 9996
   enddo
 9996 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_spfree(a,desc_a,info)
-  if (info /= 0)goto 9997
+  if (info /= psb_success_)goto 9997
 9997 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_cdfree(desc_a,info)
-  if (info /= 0)goto 9998
+  if (info /= psb_success_)goto 9998
 9998 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
 9999 continue
-  if(info /= 0)res=res+1
-  if(res/=0)print*,"on z matrix    2 x    2 blocked   1 x   1 usmv alpha=-3 beta= 0 incx=1 incy=1 trans=t is not ok"
-  if(res==0)print*,"on z matrix    2 x    2 blocked   1 x   1 usmv alpha=-3 beta= 0 incx=1 incy=1 trans=t is ok"
+  if(info /= psb_success_)res=res+1
+  if(res /= 0)print*,"on z matrix    2 x    2 blocked   1 x   1 usmv alpha=-3 beta= 0 incx=1 incy=1 trans=t is not ok"
+  if(res == 0)print*,"on z matrix    2 x    2 blocked   1 x   1 usmv alpha=-3 beta= 0 incx=1 incy=1 trans=t is ok"
 end subroutine z_usmv_2_t_am3_bm0_ix1_iy1
 ! 
 
@@ -10103,14 +10103,14 @@ subroutine z_usmv_2_c_am3_bm0_ix1_iy1(res,afmt,ictxt)
   endif
   call psb_barrier(ictxt)
   call psb_cdall(ictxt,desc_a,info,nl=m)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spall(a,desc_a,info,nnz=nnz)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_barrier(ictxt)
   call psb_spins(nnz,IA,JA,VA,a,desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_cdasb(desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spasb(a,desc_a,info,dupl=psb_dupl_err_,afmt=afmt)
   if(info.ne.0)print *,"matrix assembly failed"
   if(info.ne.0)goto 9996
@@ -10119,24 +10119,24 @@ subroutine z_usmv_2_c_am3_bm0_ix1_iy1(res,afmt,ictxt)
   if(info.ne.0)print *,"psb_spmm failed"
   if(info.ne.0)goto 9996
   do i=1,2
-    if(y(i)/=cy(i))print*,"results mismatch:",y,"instead of",cy
-    if(y(i)/=cy(i))info=-1
-    if(y(i)/=cy(i))goto 9996
+    if(y(i) /= cy(i))print*,"results mismatch:",y,"instead of",cy
+    if(y(i) /= cy(i))info=-1
+    if(y(i) /= cy(i))goto 9996
   enddo
 9996 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_spfree(a,desc_a,info)
-  if (info /= 0)goto 9997
+  if (info /= psb_success_)goto 9997
 9997 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_cdfree(desc_a,info)
-  if (info /= 0)goto 9998
+  if (info /= psb_success_)goto 9998
 9998 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
 9999 continue
-  if(info /= 0)res=res+1
-  if(res/=0)print*,"on z matrix    2 x    2 blocked   1 x   1 usmv alpha=-3 beta= 0 incx=1 incy=1 trans=c is not ok"
-  if(res==0)print*,"on z matrix    2 x    2 blocked   1 x   1 usmv alpha=-3 beta= 0 incx=1 incy=1 trans=c is ok"
+  if(info /= psb_success_)res=res+1
+  if(res /= 0)print*,"on z matrix    2 x    2 blocked   1 x   1 usmv alpha=-3 beta= 0 incx=1 incy=1 trans=c is not ok"
+  if(res == 0)print*,"on z matrix    2 x    2 blocked   1 x   1 usmv alpha=-3 beta= 0 incx=1 incy=1 trans=c is ok"
 end subroutine z_usmv_2_c_am3_bm0_ix1_iy1
 ! 
 
@@ -10178,18 +10178,18 @@ subroutine z_ussv_2_n_ap3_bm0_ix1_iy1(res,afmt,ictxt)
   endif
   call psb_barrier(ictxt)
   call psb_cdall(ictxt,desc_a,info,nl=m)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spall(a,desc_a,info,nnz=nnz)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call a%set_triangle()
   call a%set_lower()
   call a%set_unit(.false.)
 
   call psb_barrier(ictxt)
   call psb_spins(nnz,IA,JA,VA,a,desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_cdasb(desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spasb(a,desc_a,info,dupl=psb_dupl_err_,afmt=afmt)
   if(info.ne.0)print *,"matrix assembly failed"
   if(info.ne.0)goto 9996
@@ -10198,24 +10198,24 @@ subroutine z_ussv_2_n_ap3_bm0_ix1_iy1(res,afmt,ictxt)
   if(info.ne.0)print *,"psb_spsm failed"
   if(info.ne.0)goto 9996
   do i=1,2
-    if(y(i)/=cy(i))print*,"results mismatch:",y,"instead of",cy
-    if(y(i)/=cy(i))info=-1
-    if(y(i)/=cy(i))goto 9996
+    if(y(i) /= cy(i))print*,"results mismatch:",y,"instead of",cy
+    if(y(i) /= cy(i))info=-1
+    if(y(i) /= cy(i))goto 9996
   enddo
 9996 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_spfree(a,desc_a,info)
-  if (info /= 0)goto 9997
+  if (info /= psb_success_)goto 9997
 9997 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_cdfree(desc_a,info)
-  if (info /= 0)goto 9998
+  if (info /= psb_success_)goto 9998
 9998 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
 9999 continue
-  if(info /= 0)res=res+1
-  if(res/=0)print*,"on z matrix    2 x    2 blocked   1 x   1 ussv alpha= 3 beta= 0 incx=1 incy=1 trans=n is not ok"
-  if(res==0)print*,"on z matrix    2 x    2 blocked   1 x   1 ussv alpha= 3 beta= 0 incx=1 incy=1 trans=n is ok"
+  if(info /= psb_success_)res=res+1
+  if(res /= 0)print*,"on z matrix    2 x    2 blocked   1 x   1 ussv alpha= 3 beta= 0 incx=1 incy=1 trans=n is not ok"
+  if(res == 0)print*,"on z matrix    2 x    2 blocked   1 x   1 ussv alpha= 3 beta= 0 incx=1 incy=1 trans=n is ok"
 end subroutine z_ussv_2_n_ap3_bm0_ix1_iy1
 ! 
 
@@ -10257,18 +10257,18 @@ subroutine z_ussv_2_t_ap3_bm0_ix1_iy1(res,afmt,ictxt)
   endif
   call psb_barrier(ictxt)
   call psb_cdall(ictxt,desc_a,info,nl=m)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spall(a,desc_a,info,nnz=nnz)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call a%set_triangle()
   call a%set_lower()
   call a%set_unit(.false.)
 
   call psb_barrier(ictxt)
   call psb_spins(nnz,IA,JA,VA,a,desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_cdasb(desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spasb(a,desc_a,info,dupl=psb_dupl_err_,afmt=afmt)
   if(info.ne.0)print *,"matrix assembly failed"
   if(info.ne.0)goto 9996
@@ -10277,24 +10277,24 @@ subroutine z_ussv_2_t_ap3_bm0_ix1_iy1(res,afmt,ictxt)
   if(info.ne.0)print *,"psb_spsm failed"
   if(info.ne.0)goto 9996
   do i=1,2
-    if(y(i)/=cy(i))print*,"results mismatch:",y,"instead of",cy
-    if(y(i)/=cy(i))info=-1
-    if(y(i)/=cy(i))goto 9996
+    if(y(i) /= cy(i))print*,"results mismatch:",y,"instead of",cy
+    if(y(i) /= cy(i))info=-1
+    if(y(i) /= cy(i))goto 9996
   enddo
 9996 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_spfree(a,desc_a,info)
-  if (info /= 0)goto 9997
+  if (info /= psb_success_)goto 9997
 9997 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_cdfree(desc_a,info)
-  if (info /= 0)goto 9998
+  if (info /= psb_success_)goto 9998
 9998 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
 9999 continue
-  if(info /= 0)res=res+1
-  if(res/=0)print*,"on z matrix    2 x    2 blocked   1 x   1 ussv alpha= 3 beta= 0 incx=1 incy=1 trans=t is not ok"
-  if(res==0)print*,"on z matrix    2 x    2 blocked   1 x   1 ussv alpha= 3 beta= 0 incx=1 incy=1 trans=t is ok"
+  if(info /= psb_success_)res=res+1
+  if(res /= 0)print*,"on z matrix    2 x    2 blocked   1 x   1 ussv alpha= 3 beta= 0 incx=1 incy=1 trans=t is not ok"
+  if(res == 0)print*,"on z matrix    2 x    2 blocked   1 x   1 ussv alpha= 3 beta= 0 incx=1 incy=1 trans=t is ok"
 end subroutine z_ussv_2_t_ap3_bm0_ix1_iy1
 ! 
 
@@ -10336,18 +10336,18 @@ subroutine z_ussv_2_c_ap3_bm0_ix1_iy1(res,afmt,ictxt)
   endif
   call psb_barrier(ictxt)
   call psb_cdall(ictxt,desc_a,info,nl=m)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spall(a,desc_a,info,nnz=nnz)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call a%set_triangle()
   call a%set_lower()
   call a%set_unit(.false.)
 
   call psb_barrier(ictxt)
   call psb_spins(nnz,IA,JA,VA,a,desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_cdasb(desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spasb(a,desc_a,info,dupl=psb_dupl_err_,afmt=afmt)
   if(info.ne.0)print *,"matrix assembly failed"
   if(info.ne.0)goto 9996
@@ -10356,24 +10356,24 @@ subroutine z_ussv_2_c_ap3_bm0_ix1_iy1(res,afmt,ictxt)
   if(info.ne.0)print *,"psb_spsm failed"
   if(info.ne.0)goto 9996
   do i=1,2
-    if(y(i)/=cy(i))print*,"results mismatch:",y,"instead of",cy
-    if(y(i)/=cy(i))info=-1
-    if(y(i)/=cy(i))goto 9996
+    if(y(i) /= cy(i))print*,"results mismatch:",y,"instead of",cy
+    if(y(i) /= cy(i))info=-1
+    if(y(i) /= cy(i))goto 9996
   enddo
 9996 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_spfree(a,desc_a,info)
-  if (info /= 0)goto 9997
+  if (info /= psb_success_)goto 9997
 9997 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_cdfree(desc_a,info)
-  if (info /= 0)goto 9998
+  if (info /= psb_success_)goto 9998
 9998 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
 9999 continue
-  if(info /= 0)res=res+1
-  if(res/=0)print*,"on z matrix    2 x    2 blocked   1 x   1 ussv alpha= 3 beta= 0 incx=1 incy=1 trans=c is not ok"
-  if(res==0)print*,"on z matrix    2 x    2 blocked   1 x   1 ussv alpha= 3 beta= 0 incx=1 incy=1 trans=c is ok"
+  if(info /= psb_success_)res=res+1
+  if(res /= 0)print*,"on z matrix    2 x    2 blocked   1 x   1 ussv alpha= 3 beta= 0 incx=1 incy=1 trans=c is not ok"
+  if(res == 0)print*,"on z matrix    2 x    2 blocked   1 x   1 ussv alpha= 3 beta= 0 incx=1 incy=1 trans=c is ok"
 end subroutine z_ussv_2_c_ap3_bm0_ix1_iy1
 ! 
 
@@ -10415,18 +10415,18 @@ subroutine z_ussv_2_n_ap1_bm0_ix1_iy1(res,afmt,ictxt)
   endif
   call psb_barrier(ictxt)
   call psb_cdall(ictxt,desc_a,info,nl=m)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spall(a,desc_a,info,nnz=nnz)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call a%set_triangle()
   call a%set_lower()
   call a%set_unit(.false.)
 
   call psb_barrier(ictxt)
   call psb_spins(nnz,IA,JA,VA,a,desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_cdasb(desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spasb(a,desc_a,info,dupl=psb_dupl_err_,afmt=afmt)
   if(info.ne.0)print *,"matrix assembly failed"
   if(info.ne.0)goto 9996
@@ -10435,24 +10435,24 @@ subroutine z_ussv_2_n_ap1_bm0_ix1_iy1(res,afmt,ictxt)
   if(info.ne.0)print *,"psb_spsm failed"
   if(info.ne.0)goto 9996
   do i=1,2
-    if(y(i)/=cy(i))print*,"results mismatch:",y,"instead of",cy
-    if(y(i)/=cy(i))info=-1
-    if(y(i)/=cy(i))goto 9996
+    if(y(i) /= cy(i))print*,"results mismatch:",y,"instead of",cy
+    if(y(i) /= cy(i))info=-1
+    if(y(i) /= cy(i))goto 9996
   enddo
 9996 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_spfree(a,desc_a,info)
-  if (info /= 0)goto 9997
+  if (info /= psb_success_)goto 9997
 9997 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_cdfree(desc_a,info)
-  if (info /= 0)goto 9998
+  if (info /= psb_success_)goto 9998
 9998 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
 9999 continue
-  if(info /= 0)res=res+1
-  if(res/=0)print*,"on z matrix    2 x    2 blocked   1 x   1 ussv alpha= 1 beta= 0 incx=1 incy=1 trans=n is not ok"
-  if(res==0)print*,"on z matrix    2 x    2 blocked   1 x   1 ussv alpha= 1 beta= 0 incx=1 incy=1 trans=n is ok"
+  if(info /= psb_success_)res=res+1
+  if(res /= 0)print*,"on z matrix    2 x    2 blocked   1 x   1 ussv alpha= 1 beta= 0 incx=1 incy=1 trans=n is not ok"
+  if(res == 0)print*,"on z matrix    2 x    2 blocked   1 x   1 ussv alpha= 1 beta= 0 incx=1 incy=1 trans=n is ok"
 end subroutine z_ussv_2_n_ap1_bm0_ix1_iy1
 ! 
 
@@ -10494,18 +10494,18 @@ subroutine z_ussv_2_t_ap1_bm0_ix1_iy1(res,afmt,ictxt)
   endif
   call psb_barrier(ictxt)
   call psb_cdall(ictxt,desc_a,info,nl=m)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spall(a,desc_a,info,nnz=nnz)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call a%set_triangle()
   call a%set_lower()
   call a%set_unit(.false.)
 
   call psb_barrier(ictxt)
   call psb_spins(nnz,IA,JA,VA,a,desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_cdasb(desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spasb(a,desc_a,info,dupl=psb_dupl_err_,afmt=afmt)
   if(info.ne.0)print *,"matrix assembly failed"
   if(info.ne.0)goto 9996
@@ -10514,24 +10514,24 @@ subroutine z_ussv_2_t_ap1_bm0_ix1_iy1(res,afmt,ictxt)
   if(info.ne.0)print *,"psb_spsm failed"
   if(info.ne.0)goto 9996
   do i=1,2
-    if(y(i)/=cy(i))print*,"results mismatch:",y,"instead of",cy
-    if(y(i)/=cy(i))info=-1
-    if(y(i)/=cy(i))goto 9996
+    if(y(i) /= cy(i))print*,"results mismatch:",y,"instead of",cy
+    if(y(i) /= cy(i))info=-1
+    if(y(i) /= cy(i))goto 9996
   enddo
 9996 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_spfree(a,desc_a,info)
-  if (info /= 0)goto 9997
+  if (info /= psb_success_)goto 9997
 9997 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_cdfree(desc_a,info)
-  if (info /= 0)goto 9998
+  if (info /= psb_success_)goto 9998
 9998 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
 9999 continue
-  if(info /= 0)res=res+1
-  if(res/=0)print*,"on z matrix    2 x    2 blocked   1 x   1 ussv alpha= 1 beta= 0 incx=1 incy=1 trans=t is not ok"
-  if(res==0)print*,"on z matrix    2 x    2 blocked   1 x   1 ussv alpha= 1 beta= 0 incx=1 incy=1 trans=t is ok"
+  if(info /= psb_success_)res=res+1
+  if(res /= 0)print*,"on z matrix    2 x    2 blocked   1 x   1 ussv alpha= 1 beta= 0 incx=1 incy=1 trans=t is not ok"
+  if(res == 0)print*,"on z matrix    2 x    2 blocked   1 x   1 ussv alpha= 1 beta= 0 incx=1 incy=1 trans=t is ok"
 end subroutine z_ussv_2_t_ap1_bm0_ix1_iy1
 ! 
 
@@ -10573,18 +10573,18 @@ subroutine z_ussv_2_c_ap1_bm0_ix1_iy1(res,afmt,ictxt)
   endif
   call psb_barrier(ictxt)
   call psb_cdall(ictxt,desc_a,info,nl=m)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spall(a,desc_a,info,nnz=nnz)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call a%set_triangle()
   call a%set_lower()
   call a%set_unit(.false.)
 
   call psb_barrier(ictxt)
   call psb_spins(nnz,IA,JA,VA,a,desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_cdasb(desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spasb(a,desc_a,info,dupl=psb_dupl_err_,afmt=afmt)
   if(info.ne.0)print *,"matrix assembly failed"
   if(info.ne.0)goto 9996
@@ -10593,24 +10593,24 @@ subroutine z_ussv_2_c_ap1_bm0_ix1_iy1(res,afmt,ictxt)
   if(info.ne.0)print *,"psb_spsm failed"
   if(info.ne.0)goto 9996
   do i=1,2
-    if(y(i)/=cy(i))print*,"results mismatch:",y,"instead of",cy
-    if(y(i)/=cy(i))info=-1
-    if(y(i)/=cy(i))goto 9996
+    if(y(i) /= cy(i))print*,"results mismatch:",y,"instead of",cy
+    if(y(i) /= cy(i))info=-1
+    if(y(i) /= cy(i))goto 9996
   enddo
 9996 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_spfree(a,desc_a,info)
-  if (info /= 0)goto 9997
+  if (info /= psb_success_)goto 9997
 9997 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_cdfree(desc_a,info)
-  if (info /= 0)goto 9998
+  if (info /= psb_success_)goto 9998
 9998 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
 9999 continue
-  if(info /= 0)res=res+1
-  if(res/=0)print*,"on z matrix    2 x    2 blocked   1 x   1 ussv alpha= 1 beta= 0 incx=1 incy=1 trans=c is not ok"
-  if(res==0)print*,"on z matrix    2 x    2 blocked   1 x   1 ussv alpha= 1 beta= 0 incx=1 incy=1 trans=c is ok"
+  if(info /= psb_success_)res=res+1
+  if(res /= 0)print*,"on z matrix    2 x    2 blocked   1 x   1 ussv alpha= 1 beta= 0 incx=1 incy=1 trans=c is not ok"
+  if(res == 0)print*,"on z matrix    2 x    2 blocked   1 x   1 ussv alpha= 1 beta= 0 incx=1 incy=1 trans=c is ok"
 end subroutine z_ussv_2_c_ap1_bm0_ix1_iy1
 ! 
 
@@ -10652,18 +10652,18 @@ subroutine z_ussv_2_n_am1_bm0_ix1_iy1(res,afmt,ictxt)
   endif
   call psb_barrier(ictxt)
   call psb_cdall(ictxt,desc_a,info,nl=m)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spall(a,desc_a,info,nnz=nnz)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call a%set_triangle()
   call a%set_lower()
   call a%set_unit(.false.)
 
   call psb_barrier(ictxt)
   call psb_spins(nnz,IA,JA,VA,a,desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_cdasb(desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spasb(a,desc_a,info,dupl=psb_dupl_err_,afmt=afmt)
   if(info.ne.0)print *,"matrix assembly failed"
   if(info.ne.0)goto 9996
@@ -10672,24 +10672,24 @@ subroutine z_ussv_2_n_am1_bm0_ix1_iy1(res,afmt,ictxt)
   if(info.ne.0)print *,"psb_spsm failed"
   if(info.ne.0)goto 9996
   do i=1,2
-    if(y(i)/=cy(i))print*,"results mismatch:",y,"instead of",cy
-    if(y(i)/=cy(i))info=-1
-    if(y(i)/=cy(i))goto 9996
+    if(y(i) /= cy(i))print*,"results mismatch:",y,"instead of",cy
+    if(y(i) /= cy(i))info=-1
+    if(y(i) /= cy(i))goto 9996
   enddo
 9996 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_spfree(a,desc_a,info)
-  if (info /= 0)goto 9997
+  if (info /= psb_success_)goto 9997
 9997 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_cdfree(desc_a,info)
-  if (info /= 0)goto 9998
+  if (info /= psb_success_)goto 9998
 9998 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
 9999 continue
-  if(info /= 0)res=res+1
-  if(res/=0)print*,"on z matrix    2 x    2 blocked   1 x   1 ussv alpha=-1 beta= 0 incx=1 incy=1 trans=n is not ok"
-  if(res==0)print*,"on z matrix    2 x    2 blocked   1 x   1 ussv alpha=-1 beta= 0 incx=1 incy=1 trans=n is ok"
+  if(info /= psb_success_)res=res+1
+  if(res /= 0)print*,"on z matrix    2 x    2 blocked   1 x   1 ussv alpha=-1 beta= 0 incx=1 incy=1 trans=n is not ok"
+  if(res == 0)print*,"on z matrix    2 x    2 blocked   1 x   1 ussv alpha=-1 beta= 0 incx=1 incy=1 trans=n is ok"
 end subroutine z_ussv_2_n_am1_bm0_ix1_iy1
 ! 
 
@@ -10731,18 +10731,18 @@ subroutine z_ussv_2_t_am1_bm0_ix1_iy1(res,afmt,ictxt)
   endif
   call psb_barrier(ictxt)
   call psb_cdall(ictxt,desc_a,info,nl=m)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spall(a,desc_a,info,nnz=nnz)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call a%set_triangle()
   call a%set_lower()
   call a%set_unit(.false.)
 
   call psb_barrier(ictxt)
   call psb_spins(nnz,IA,JA,VA,a,desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_cdasb(desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spasb(a,desc_a,info,dupl=psb_dupl_err_,afmt=afmt)
   if(info.ne.0)print *,"matrix assembly failed"
   if(info.ne.0)goto 9996
@@ -10751,24 +10751,24 @@ subroutine z_ussv_2_t_am1_bm0_ix1_iy1(res,afmt,ictxt)
   if(info.ne.0)print *,"psb_spsm failed"
   if(info.ne.0)goto 9996
   do i=1,2
-    if(y(i)/=cy(i))print*,"results mismatch:",y,"instead of",cy
-    if(y(i)/=cy(i))info=-1
-    if(y(i)/=cy(i))goto 9996
+    if(y(i) /= cy(i))print*,"results mismatch:",y,"instead of",cy
+    if(y(i) /= cy(i))info=-1
+    if(y(i) /= cy(i))goto 9996
   enddo
 9996 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_spfree(a,desc_a,info)
-  if (info /= 0)goto 9997
+  if (info /= psb_success_)goto 9997
 9997 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_cdfree(desc_a,info)
-  if (info /= 0)goto 9998
+  if (info /= psb_success_)goto 9998
 9998 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
 9999 continue
-  if(info /= 0)res=res+1
-  if(res/=0)print*,"on z matrix    2 x    2 blocked   1 x   1 ussv alpha=-1 beta= 0 incx=1 incy=1 trans=t is not ok"
-  if(res==0)print*,"on z matrix    2 x    2 blocked   1 x   1 ussv alpha=-1 beta= 0 incx=1 incy=1 trans=t is ok"
+  if(info /= psb_success_)res=res+1
+  if(res /= 0)print*,"on z matrix    2 x    2 blocked   1 x   1 ussv alpha=-1 beta= 0 incx=1 incy=1 trans=t is not ok"
+  if(res == 0)print*,"on z matrix    2 x    2 blocked   1 x   1 ussv alpha=-1 beta= 0 incx=1 incy=1 trans=t is ok"
 end subroutine z_ussv_2_t_am1_bm0_ix1_iy1
 ! 
 
@@ -10810,18 +10810,18 @@ subroutine z_ussv_2_c_am1_bm0_ix1_iy1(res,afmt,ictxt)
   endif
   call psb_barrier(ictxt)
   call psb_cdall(ictxt,desc_a,info,nl=m)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spall(a,desc_a,info,nnz=nnz)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call a%set_triangle()
   call a%set_lower()
   call a%set_unit(.false.)
 
   call psb_barrier(ictxt)
   call psb_spins(nnz,IA,JA,VA,a,desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_cdasb(desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spasb(a,desc_a,info,dupl=psb_dupl_err_,afmt=afmt)
   if(info.ne.0)print *,"matrix assembly failed"
   if(info.ne.0)goto 9996
@@ -10830,24 +10830,24 @@ subroutine z_ussv_2_c_am1_bm0_ix1_iy1(res,afmt,ictxt)
   if(info.ne.0)print *,"psb_spsm failed"
   if(info.ne.0)goto 9996
   do i=1,2
-    if(y(i)/=cy(i))print*,"results mismatch:",y,"instead of",cy
-    if(y(i)/=cy(i))info=-1
-    if(y(i)/=cy(i))goto 9996
+    if(y(i) /= cy(i))print*,"results mismatch:",y,"instead of",cy
+    if(y(i) /= cy(i))info=-1
+    if(y(i) /= cy(i))goto 9996
   enddo
 9996 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_spfree(a,desc_a,info)
-  if (info /= 0)goto 9997
+  if (info /= psb_success_)goto 9997
 9997 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_cdfree(desc_a,info)
-  if (info /= 0)goto 9998
+  if (info /= psb_success_)goto 9998
 9998 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
 9999 continue
-  if(info /= 0)res=res+1
-  if(res/=0)print*,"on z matrix    2 x    2 blocked   1 x   1 ussv alpha=-1 beta= 0 incx=1 incy=1 trans=c is not ok"
-  if(res==0)print*,"on z matrix    2 x    2 blocked   1 x   1 ussv alpha=-1 beta= 0 incx=1 incy=1 trans=c is ok"
+  if(info /= psb_success_)res=res+1
+  if(res /= 0)print*,"on z matrix    2 x    2 blocked   1 x   1 ussv alpha=-1 beta= 0 incx=1 incy=1 trans=c is not ok"
+  if(res == 0)print*,"on z matrix    2 x    2 blocked   1 x   1 ussv alpha=-1 beta= 0 incx=1 incy=1 trans=c is ok"
 end subroutine z_ussv_2_c_am1_bm0_ix1_iy1
 ! 
 
@@ -10889,18 +10889,18 @@ subroutine z_ussv_2_n_am3_bm0_ix1_iy1(res,afmt,ictxt)
   endif
   call psb_barrier(ictxt)
   call psb_cdall(ictxt,desc_a,info,nl=m)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spall(a,desc_a,info,nnz=nnz)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call a%set_triangle()
   call a%set_lower()
   call a%set_unit(.false.)
 
   call psb_barrier(ictxt)
   call psb_spins(nnz,IA,JA,VA,a,desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_cdasb(desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spasb(a,desc_a,info,dupl=psb_dupl_err_,afmt=afmt)
   if(info.ne.0)print *,"matrix assembly failed"
   if(info.ne.0)goto 9996
@@ -10909,24 +10909,24 @@ subroutine z_ussv_2_n_am3_bm0_ix1_iy1(res,afmt,ictxt)
   if(info.ne.0)print *,"psb_spsm failed"
   if(info.ne.0)goto 9996
   do i=1,2
-    if(y(i)/=cy(i))print*,"results mismatch:",y,"instead of",cy
-    if(y(i)/=cy(i))info=-1
-    if(y(i)/=cy(i))goto 9996
+    if(y(i) /= cy(i))print*,"results mismatch:",y,"instead of",cy
+    if(y(i) /= cy(i))info=-1
+    if(y(i) /= cy(i))goto 9996
   enddo
 9996 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_spfree(a,desc_a,info)
-  if (info /= 0)goto 9997
+  if (info /= psb_success_)goto 9997
 9997 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_cdfree(desc_a,info)
-  if (info /= 0)goto 9998
+  if (info /= psb_success_)goto 9998
 9998 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
 9999 continue
-  if(info /= 0)res=res+1
-  if(res/=0)print*,"on z matrix    2 x    2 blocked   1 x   1 ussv alpha=-3 beta= 0 incx=1 incy=1 trans=n is not ok"
-  if(res==0)print*,"on z matrix    2 x    2 blocked   1 x   1 ussv alpha=-3 beta= 0 incx=1 incy=1 trans=n is ok"
+  if(info /= psb_success_)res=res+1
+  if(res /= 0)print*,"on z matrix    2 x    2 blocked   1 x   1 ussv alpha=-3 beta= 0 incx=1 incy=1 trans=n is not ok"
+  if(res == 0)print*,"on z matrix    2 x    2 blocked   1 x   1 ussv alpha=-3 beta= 0 incx=1 incy=1 trans=n is ok"
 end subroutine z_ussv_2_n_am3_bm0_ix1_iy1
 ! 
 
@@ -10968,18 +10968,18 @@ subroutine z_ussv_2_t_am3_bm0_ix1_iy1(res,afmt,ictxt)
   endif
   call psb_barrier(ictxt)
   call psb_cdall(ictxt,desc_a,info,nl=m)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spall(a,desc_a,info,nnz=nnz)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call a%set_triangle()
   call a%set_lower()
   call a%set_unit(.false.)
 
   call psb_barrier(ictxt)
   call psb_spins(nnz,IA,JA,VA,a,desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_cdasb(desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spasb(a,desc_a,info,dupl=psb_dupl_err_,afmt=afmt)
   if(info.ne.0)print *,"matrix assembly failed"
   if(info.ne.0)goto 9996
@@ -10988,24 +10988,24 @@ subroutine z_ussv_2_t_am3_bm0_ix1_iy1(res,afmt,ictxt)
   if(info.ne.0)print *,"psb_spsm failed"
   if(info.ne.0)goto 9996
   do i=1,2
-    if(y(i)/=cy(i))print*,"results mismatch:",y,"instead of",cy
-    if(y(i)/=cy(i))info=-1
-    if(y(i)/=cy(i))goto 9996
+    if(y(i) /= cy(i))print*,"results mismatch:",y,"instead of",cy
+    if(y(i) /= cy(i))info=-1
+    if(y(i) /= cy(i))goto 9996
   enddo
 9996 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_spfree(a,desc_a,info)
-  if (info /= 0)goto 9997
+  if (info /= psb_success_)goto 9997
 9997 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_cdfree(desc_a,info)
-  if (info /= 0)goto 9998
+  if (info /= psb_success_)goto 9998
 9998 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
 9999 continue
-  if(info /= 0)res=res+1
-  if(res/=0)print*,"on z matrix    2 x    2 blocked   1 x   1 ussv alpha=-3 beta= 0 incx=1 incy=1 trans=t is not ok"
-  if(res==0)print*,"on z matrix    2 x    2 blocked   1 x   1 ussv alpha=-3 beta= 0 incx=1 incy=1 trans=t is ok"
+  if(info /= psb_success_)res=res+1
+  if(res /= 0)print*,"on z matrix    2 x    2 blocked   1 x   1 ussv alpha=-3 beta= 0 incx=1 incy=1 trans=t is not ok"
+  if(res == 0)print*,"on z matrix    2 x    2 blocked   1 x   1 ussv alpha=-3 beta= 0 incx=1 incy=1 trans=t is ok"
 end subroutine z_ussv_2_t_am3_bm0_ix1_iy1
 ! 
 
@@ -11047,18 +11047,18 @@ subroutine z_ussv_2_c_am3_bm0_ix1_iy1(res,afmt,ictxt)
   endif
   call psb_barrier(ictxt)
   call psb_cdall(ictxt,desc_a,info,nl=m)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spall(a,desc_a,info,nnz=nnz)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call a%set_triangle()
   call a%set_lower()
   call a%set_unit(.false.)
 
   call psb_barrier(ictxt)
   call psb_spins(nnz,IA,JA,VA,a,desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_cdasb(desc_a,info)
-  if (info /= 0)goto 9996
+  if (info /= psb_success_)goto 9996
   call psb_spasb(a,desc_a,info,dupl=psb_dupl_err_,afmt=afmt)
   if(info.ne.0)print *,"matrix assembly failed"
   if(info.ne.0)goto 9996
@@ -11067,23 +11067,23 @@ subroutine z_ussv_2_c_am3_bm0_ix1_iy1(res,afmt,ictxt)
   if(info.ne.0)print *,"psb_spsm failed"
   if(info.ne.0)goto 9996
   do i=1,2
-    if(y(i)/=cy(i))print*,"results mismatch:",y,"instead of",cy
-    if(y(i)/=cy(i))info=-1
-    if(y(i)/=cy(i))goto 9996
+    if(y(i) /= cy(i))print*,"results mismatch:",y,"instead of",cy
+    if(y(i) /= cy(i))info=-1
+    if(y(i) /= cy(i))goto 9996
   enddo
 9996 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_spfree(a,desc_a,info)
-  if (info /= 0)goto 9997
+  if (info /= psb_success_)goto 9997
 9997 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
   call psb_cdfree(desc_a,info)
-  if (info /= 0)goto 9998
+  if (info /= psb_success_)goto 9998
 9998 continue
-  if(info /= 0)res=res+1
+  if(info /= psb_success_)res=res+1
 9999 continue
-  if(info /= 0)res=res+1
-  if(res/=0)print*,"on z matrix    2 x    2 blocked   1 x   1 ussv alpha=-3 beta= 0 incx=1 incy=1 trans=c is not ok"
-  if(res==0)print*,"on z matrix    2 x    2 blocked   1 x   1 ussv alpha=-3 beta= 0 incx=1 incy=1 trans=c is ok"
+  if(info /= psb_success_)res=res+1
+  if(res /= 0)print*,"on z matrix    2 x    2 blocked   1 x   1 ussv alpha=-3 beta= 0 incx=1 incy=1 trans=c is not ok"
+  if(res == 0)print*,"on z matrix    2 x    2 blocked   1 x   1 ussv alpha=-3 beta= 0 incx=1 incy=1 trans=c is ok"
 end subroutine z_ussv_2_c_am3_bm0_ix1_iy1
 end module psb_mvsv_tester

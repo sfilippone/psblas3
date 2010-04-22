@@ -58,7 +58,7 @@ subroutine psi_bld_g2lmap(desc,info)
   integer             :: ictxt,n_row
   character(len=20)   :: name,ch_err
 
-  info = 0
+  info = psb_success_
   name = 'psi_bld_g2lmap'
   call psb_erractionsave(err_act)
 
@@ -70,14 +70,14 @@ subroutine psi_bld_g2lmap(desc,info)
   ! check on blacs grid 
   call psb_info(ictxt, me, np)
   if (np == -1) then
-    info = 2010
+    info = psb_err_blacs_error_
     call psb_errpush(info,name)
     goto 9999
   endif
 
 
   if (.not.(psb_is_bld_desc(desc).and.psb_is_large_desc(desc))) then 
-    info = 1122
+    info = psb_err_invalid_cd_state_
     call psb_errpush(info,name)
     goto 9999
   end if
@@ -104,8 +104,8 @@ subroutine psi_bld_g2lmap(desc,info)
   hmask = hsize - 1 
   desc%idxmap%hashvsize = hsize
   desc%idxmap%hashvmask = hmask
-  if (info ==0) call psb_realloc(hsize+1,desc%idxmap%hashv,info,lb=0)
-  if (info /= 0) then 
+  if (info == psb_success_) call psb_realloc(hsize+1,desc%idxmap%hashv,info,lb=0)
+  if (info /= psb_success_) then 
     ch_err='psb_realloc'
     call psb_errpush(info,name,a_err=ch_err)
     goto 9999

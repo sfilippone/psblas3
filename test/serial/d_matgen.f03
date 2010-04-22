@@ -36,7 +36,7 @@ program d_matgen
   integer            :: info, err_act
   character(len=20)  :: name,ch_err
 
-  info=0
+  info=psb_success_
 
 
   call psb_init(ictxt)
@@ -64,7 +64,7 @@ program d_matgen
   call create_matrix(idim,a,b,x,desc_a,ictxt,afmt,info)  
   call psb_barrier(ictxt)
   t2 = psb_wtime() - t1
-  if(info /= 0) then
+  if(info /= psb_success_) then
     call psb_error(ictxt)
   end if
 
@@ -170,7 +170,7 @@ contains
 
     character(len=20)  :: name, ch_err
 
-    info = 0
+    info = psb_success_
     name = 'create_matrix'
 !!$    call psb_erractionsave(err_act)
 
@@ -205,8 +205,8 @@ contains
 
     talc = psb_wtime()-t0
 
-    if (info /= 0) then
-      info=4010
+    if (info /= psb_success_) then
+      info=psb_err_from_subroutine_
       ch_err='allocation rout.'
       call psb_errpush(info,name,a_err=ch_err)
       goto 9999
@@ -218,8 +218,8 @@ contains
     ! 
     allocate(val(20*nb),irow(20*nb),&
          &icol(20*nb),myidx(nlr),stat=info)
-    if (info /= 0 ) then 
-      info=4000
+    if (info /= psb_success_ ) then 
+      info=psb_err_alloc_dealloc_
       call psb_errpush(info,name)
       goto 9999
     endif
@@ -259,7 +259,7 @@ contains
         !   
         !  term depending on   (x-1,y,z)
         !
-        if (x==1) then 
+        if (x == 1) then 
           val(element)=-b1(glob_x,glob_y,glob_z)&
                & -a1(glob_x,glob_y,glob_z)
           val(element) = val(element)/(deltah*&
@@ -275,7 +275,7 @@ contains
           element       = element+1
         endif
         !  term depending on     (x,y-1,z)
-        if (y==1) then 
+        if (y == 1) then 
           val(element)=-b2(glob_x,glob_y,glob_z)&
                & -a2(glob_x,glob_y,glob_z)
           val(element) = val(element)/(deltah*&
@@ -291,7 +291,7 @@ contains
           element       = element+1
         endif
         !  term depending on     (x,y,z-1)
-        if (z==1) then 
+        if (z == 1) then 
           val(element)=-b3(glob_x,glob_y,glob_z)&
                & -a3(glob_x,glob_y,glob_z)
           val(element) = val(element)/(deltah*&
@@ -319,7 +319,7 @@ contains
         irow(element) = glob_row
         element       = element+1                  
         !  term depending on     (x,y,z+1)
-        if (z==idim) then 
+        if (z == idim) then 
           val(element)=-b1(glob_x,glob_y,glob_z)
           val(element) = val(element)/(deltah*&
                & deltah)
@@ -333,7 +333,7 @@ contains
           element       = element+1
         endif
         !  term depending on     (x,y+1,z)
-        if (y==idim) then 
+        if (y == idim) then 
           val(element)=-b2(glob_x,glob_y,glob_z)
           val(element) = val(element)/(deltah*&
                & deltah)
@@ -362,8 +362,8 @@ contains
     end do
 
     tgen = psb_wtime()-t1
-    if(info /= 0) then
-      info=4010
+    if(info /= psb_success_) then
+      info=psb_err_from_subroutine_
       ch_err='insert rout.'
       call psb_errpush(info,name,a_err=ch_err)
       goto 9999
@@ -372,8 +372,8 @@ contains
     t1 = psb_wtime()
     call a_n%cscnv(info,mold=acsr)
 
-    if(info /= 0) then
-      info=4010
+    if(info /= psb_success_) then
+      info=psb_err_from_subroutine_
       ch_err='asb rout.'
       call psb_errpush(info,name,a_err=ch_err)
       goto 9999
@@ -384,7 +384,7 @@ contains
     write(0,*) 'Nrm infinity ',anorm
     call a_n%csget(2,3,element,irow,icol,val,info)
     write(0,*) 'From csget ',element,info
-    if (info == 0) then 
+    if (info == psb_success_) then 
       do i=1,element
         write(0,*) irow(i),icol(i),val(i)
       end do
@@ -399,15 +399,15 @@ contains
 
       
     allocate(diag(nlr),stat=info) 
-    if (info == 0) then 
+    if (info == psb_success_) then 
       call a_n%get_diag(diag,info) 
     end if
 !!$
     t1 = psb_wtime()
     call a_n%cscnv(info,mold=acxx)
 
-    if(info /= 0) then
-      info=4010
+    if(info /= psb_success_) then
+      info=psb_err_from_subroutine_
       ch_err='asb rout.'
       call psb_errpush(info,name,a_err=ch_err)
       goto 9999

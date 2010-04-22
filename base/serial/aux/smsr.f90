@@ -53,12 +53,12 @@ subroutine smsr(n,x,idir)
   if (n<=1) return
   
   allocate(iaux(0:n+1),stat=info)
-  if (info/=0) then 
-    call psb_errpush(4000,r_name='smsr')
+  if (info /= psb_success_) then 
+    call psb_errpush(psb_err_alloc_dealloc_,r_name='smsr')
     call psb_error()
   endif
   
-  if (idir==psb_sort_up_) then 
+  if (idir == psb_sort_up_) then 
     call smsort_up(n,x,iaux,iret)
   else
     call smsort_dw(n,x,iaux,iret)
@@ -67,8 +67,8 @@ subroutine smsr(n,x,idir)
   if (iret == 0) call psb_ip_reord(n,x,iaux)
 
   deallocate(iaux,stat=info)
-  if (info/=0) then 
-    call psb_errpush(4000,r_name='smsr')
+  if (info /= psb_success_) then 
+    call psb_errpush(psb_err_alloc_dealloc_,r_name='smsr')
     call psb_error()
   endif
   return

@@ -50,7 +50,7 @@ Subroutine psb_cd_reinit(desc,info)
   character(len=20)    :: name, ch_err
 
   name='psb_cd_reinit'
-  info  = 0
+  info  = psb_success_
   call psb_erractionsave(err_act)
   debug_unit  = psb_get_debug_unit()
   debug_level = psb_get_debug_level()

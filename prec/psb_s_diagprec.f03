@@ -40,7 +40,7 @@ contains
     ! This is the base version and we should throw an error. 
     ! Or should it be the DIAG preonditioner???
     !
-    info = 0 
+    info = psb_success_
     
     nrow = psb_cd_get_local_rows(desc_data)
     if (size(x) < nrow) then 
@@ -68,8 +68,8 @@ contains
       ww => work
     else
       allocate(ww(size(x)),stat=info)
-      if (info /= 0) then 
-        call psb_errpush(4025,name,i_err=(/size(x),0,0,0,0/),a_err='real(psb_spk_)')
+      if (info /= psb_success_) then 
+        call psb_errpush(psb_err_alloc_request_,name,i_err=(/size(x),0,0,0,0/),a_err='real(psb_spk_)')
         goto 9999      
       end if
     end if
@@ -79,8 +79,8 @@ contains
 
     if (size(work) < size(x)) then 
       deallocate(ww,stat=info)
-      if (info /= 0) then 
-        call psb_errpush(4010,name,a_err='Deallocate')
+      if (info /= psb_success_) then 
+        call psb_errpush(psb_err_from_subroutine_,name,a_err='Deallocate')
         goto 9999      
       end if
     end if
@@ -110,7 +110,7 @@ contains
 
     call psb_erractionsave(err_act)
 
-    info = 0
+    info = psb_success_
 
     
     call psb_erractionrestore(err_act)
@@ -141,25 +141,25 @@ contains
 
     call psb_erractionsave(err_act)
 
-    info = 0
+    info = psb_success_
     nrow = psb_cd_get_local_cols(desc_a)
     if (allocated(prec%d)) then 
       if (size(prec%d) < nrow) then 
         deallocate(prec%d,stat=info)
       end if
     end if
-    if ((info == 0).and.(.not.allocated(prec%d))) then 
+    if ((info == psb_success_).and.(.not.allocated(prec%d))) then 
       allocate(prec%d(nrow), stat=info)
     end if
-    if (info /= 0) then 
-      info = 4000
+    if (info /= psb_success_) then 
+      info = psb_err_alloc_dealloc_
       call psb_errpush(info,name)
       goto 9999
     end if
 
     call a%get_diag(prec%d,info) 
-    if (info /= 0) then 
-      info = 4010
+    if (info /= psb_success_) then 
+      info = psb_err_from_subroutine_
       call psb_errpush(info,name, a_err='get_diag')
       goto 9999
     end if
@@ -198,7 +198,7 @@ contains
 
     call psb_erractionsave(err_act)
 
-    info = 0
+    info = psb_success_
     
     call psb_erractionrestore(err_act)
     return
@@ -226,7 +226,7 @@ contains
 
     call psb_erractionsave(err_act)
 
-    info = 0
+    info = psb_success_
     
     call psb_erractionrestore(err_act)
     return
@@ -254,7 +254,7 @@ contains
 
     call psb_erractionsave(err_act)
 
-    info = 0
+    info = psb_success_
     
     call psb_erractionrestore(err_act)
     return
@@ -281,7 +281,7 @@ contains
     
     call psb_erractionsave(err_act)
     
-    info = 0
+    info = psb_success_
     
     call psb_erractionrestore(err_act)
     return
@@ -312,7 +312,7 @@ contains
 
     call psb_erractionsave(err_act)
 
-    info = 0
+    info = psb_success_
    
     if (present(iout)) then 
       iout_ = iout
@@ -324,7 +324,7 @@ contains
 
     call psb_erractionsave(err_act)
 
-    info = 0
+    info = psb_success_
     
     call psb_erractionrestore(err_act)
     return

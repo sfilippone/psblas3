@@ -138,7 +138,7 @@ subroutine psb_srgmres(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,irst,ist
   character(len=20)           :: name
   character(len=*), parameter :: methdname='RGMRES'
 
-  info = 0
+  info = psb_success_
   name = 'psb_sgmres'
   call psb_erractionsave(err_act)
   debug_unit  = psb_get_debug_unit()
@@ -164,7 +164,7 @@ subroutine psb_srgmres(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,irst,ist
 !
 
   if ((istop_ < 1 ).or.(istop_ > 2 ) ) then
-    info=5001
+    info=psb_err_invalid_istop_
     int_err(1)=istop_
     err=info
     call psb_errpush(info,name,i_err=int_err)
@@ -195,7 +195,7 @@ subroutine psb_srgmres(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,irst,ist
          & ' not present: irst: ',irst,nl
   endif
   if (nl <=0 ) then 
-    info=5001
+    info=psb_err_invalid_istop_
     int_err(1)=nl
     err=info
     call psb_errpush(info,name,i_err=int_err)
@@ -203,14 +203,14 @@ subroutine psb_srgmres(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,irst,ist
   endif
 
   call psb_chkvect(mglob,1,size(x,1),1,1,desc_a,info)
-  if(info /= 0) then
-    info=4010
+  if(info /= psb_success_) then
+    info=psb_err_from_subroutine_
     call psb_errpush(info,name,a_err='psb_chkvect on X')
     goto 9999
   end if
   call psb_chkvect(mglob,1,size(b,1),1,1,desc_a,info)
-  if(info /= 0) then
-    info=4010    
+  if(info /= psb_success_) then
+    info=psb_err_from_subroutine_    
     call psb_errpush(info,name,a_err='psb_chkvect on B')
     goto 9999
   end if
@@ -220,16 +220,16 @@ subroutine psb_srgmres(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,irst,ist
   allocate(aux(naux),h(nl+1,nl+1),&
        &c(nl+1),s(nl+1),rs(nl+1), rst(nl+1),stat=info)
 
-  if (info == 0) call psb_geall(v,desc_a,info,n=nl+1)
-  if (info == 0) call psb_geall(w,desc_a,info)
-  if (info == 0) call psb_geall(w1,desc_a,info)
-  if (info == 0) call psb_geall(xt,desc_a,info)
-  if (info == 0) call psb_geasb(v,desc_a,info)  
-  if (info == 0) call psb_geasb(w,desc_a,info)  
-  if (info == 0) call psb_geasb(w1,desc_a,info)
-  if (info == 0) call psb_geasb(xt,desc_a,info)
-  if (info /= 0) then 
-    info=4011 
+  if (info == psb_success_) call psb_geall(v,desc_a,info,n=nl+1)
+  if (info == psb_success_) call psb_geall(w,desc_a,info)
+  if (info == psb_success_) call psb_geall(w1,desc_a,info)
+  if (info == psb_success_) call psb_geall(xt,desc_a,info)
+  if (info == psb_success_) call psb_geasb(v,desc_a,info)  
+  if (info == psb_success_) call psb_geasb(w,desc_a,info)  
+  if (info == psb_success_) call psb_geasb(w1,desc_a,info)
+  if (info == psb_success_) call psb_geasb(xt,desc_a,info)
+  if (info /= psb_success_) then 
+    info=psb_err_from_subroutine_non_ 
     call psb_errpush(info,name)
     goto 9999
   end if
@@ -250,12 +250,12 @@ subroutine psb_srgmres(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,irst,ist
   errnum = dzero
   errden = done
   deps   = eps
-  if (info /= 0) then 
-    info=4011 
+  if (info /= psb_success_) then 
+    info=psb_err_from_subroutine_non_ 
     call psb_errpush(info,name)
     goto 9999
   end if
-  if ((itrace_ > 0).and.(me==0)) call log_header(methdname)
+  if ((itrace_ > 0).and.(me == 0)) call log_header(methdname)
 
   itx   = 0
   restart: do 
@@ -269,23 +269,23 @@ subroutine psb_srgmres(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,irst,ist
          & ' restart: ',itx,it
     it = 0      
     call psb_geaxpby(sone,b,szero,v(:,1),desc_a,info)
-    if (info /= 0) then 
-      info=4011 
+    if (info /= psb_success_) then 
+      info=psb_err_from_subroutine_non_ 
       call psb_errpush(info,name)
       goto 9999
     end if
 
     call psb_spmm(-sone,a,x,sone,v(:,1),desc_a,info,work=aux)
-    if (info /= 0) then 
-      info=4011 
+    if (info /= psb_success_) then 
+      info=psb_err_from_subroutine_non_ 
       call psb_errpush(info,name)
       goto 9999
     end if
 
     rs(1) = psb_genrm2(v(:,1),desc_a,info)
     rs(2:) = szero
-    if (info /= 0) then 
-      info=4011 
+    if (info /= psb_success_) then 
+      info=psb_err_from_subroutine_non_ 
       call psb_errpush(info,name)
       goto 9999
     end if
@@ -308,8 +308,8 @@ subroutine psb_srgmres(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,irst,ist
       errnum = rni
       errden = bn2
     endif
-    if (info /= 0) then 
-      info=4011 
+    if (info /= psb_success_) then 
+      info=psb_err_from_subroutine_non_ 
       call psb_errpush(info,name)
       goto 9999
     end if
@@ -397,7 +397,7 @@ subroutine psb_srgmres(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,irst,ist
           if (debug_level >= psb_debug_ext_) &
                & write(debug_unit,*) me,' ',trim(name),&
                & ' Rebuild RS:',rs(1:i)
-          if ((debug_level >= psb_debug_ext_).and.(me==0)) then 
+          if ((debug_level >= psb_debug_ext_).and.(me == 0)) then 
 
             write(debug_unit,*) me,' ',trim(name),&
                  & ' Rebuild RS  H:'
@@ -459,12 +459,12 @@ subroutine psb_srgmres(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,irst,ist
   end if
 
   deallocate(aux,h,c,s,rs,rst, stat=info)
-  if (info == 0) call psb_gefree(v,desc_a,info)
-  if (info == 0) call psb_gefree(w,desc_a,info)
-  if (info == 0) call psb_gefree(w1,desc_a,info)
-  if (info == 0) call psb_gefree(xt,desc_a,info)
-  if (info /= 0) then
-    info=4011
+  if (info == psb_success_) call psb_gefree(v,desc_a,info)
+  if (info == psb_success_) call psb_gefree(w,desc_a,info)
+  if (info == psb_success_) call psb_gefree(w1,desc_a,info)
+  if (info == psb_success_) call psb_gefree(xt,desc_a,info)
+  if (info /= psb_success_) then
+    info=psb_err_from_subroutine_non_
     call psb_errpush(info,name)
     goto 9999
   end if

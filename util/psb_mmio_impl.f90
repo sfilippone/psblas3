@@ -40,9 +40,9 @@ subroutine mm_svet_read(b, info, iunit, filename)
   character            :: mmheader*15, fmt*15, object*10, type*10, sym*15,&
        & line*1024
 
-  info = 0
+  info = psb_success_
   if (present(filename)) then
-    if (filename=='-') then 
+    if (filename == '-') then 
       infile=5
     else
       if (present(iunit)) then 
@@ -82,7 +82,7 @@ subroutine mm_svet_read(b, info, iunit, filename)
 
   end if      ! read right hand sides
 
-  if (infile/=5) close(infile)
+  if (infile /= 5) close(infile)
 
   return 
   ! open failed
@@ -112,9 +112,9 @@ subroutine mm_dvet_read(b, info, iunit, filename)
   character            :: mmheader*15, fmt*15, object*10, type*10, sym*15,&
        & line*1024
 
-  info = 0
+  info = psb_success_
   if (present(filename)) then
-    if (filename=='-') then 
+    if (filename == '-') then 
       infile=5
     else
       if (present(iunit)) then 
@@ -153,7 +153,7 @@ subroutine mm_dvet_read(b, info, iunit, filename)
     read(infile,fmt=*,end=902) ((b(i,j), i=1,nrow),j=1,ncol)
 
   end if      ! read right hand sides
-  if (infile/=5) close(infile)
+  if (infile /= 5) close(infile)
 
   return 
   ! open failed
@@ -184,9 +184,9 @@ subroutine mm_cvet_read(b, info, iunit, filename)
   character            :: mmheader*15, fmt*15, object*10, type*10, sym*15,&
        & line*1024
 
-  info = 0
+  info = psb_success_
   if (present(filename)) then
-    if (filename=='-') then 
+    if (filename == '-') then 
       infile=5
     else
       if (present(iunit)) then 
@@ -230,7 +230,7 @@ subroutine mm_cvet_read(b, info, iunit, filename)
     end do
 
   end if      ! read right hand sides
-  if (infile/=5) close(infile)
+  if (infile /= 5) close(infile)
 
   return 
   ! open failed
@@ -261,9 +261,9 @@ subroutine mm_zvet_read(b, info, iunit, filename)
   character            :: mmheader*15, fmt*15, object*10, type*10, sym*15,&
        & line*1024
 
-  info = 0
+  info = psb_success_
   if (present(filename)) then
-    if (filename=='-') then 
+    if (filename == '-') then 
       infile=5
     else
       if (present(iunit)) then 
@@ -307,7 +307,7 @@ subroutine mm_zvet_read(b, info, iunit, filename)
     end do
 
   end if      ! read right hand sides
-  if (infile/=5) close(infile)
+  if (infile /= 5) close(infile)
 
   return 
   ! open failed
@@ -337,9 +337,9 @@ subroutine mm_svet2_write(b, header, info, iunit, filename)
 
   character(len=80)                 :: frmtv 
 
-  info = 0
+  info = psb_success_
   if (present(filename)) then
-    if (filename=='-') then 
+    if (filename == '-') then 
       outfile=6
     else
       if (present(iunit)) then 
@@ -393,9 +393,9 @@ subroutine mm_svet1_write(b, header, info, iunit, filename)
 
   character(len=80)                 :: frmtv 
 
-  info = 0
+  info = psb_success_
   if (present(filename)) then
-    if (filename=='-') then 
+    if (filename == '-') then 
       outfile=6
     else
       if (present(iunit)) then 
@@ -450,9 +450,9 @@ subroutine mm_dvet2_write(b, header, info, iunit, filename)
 
   character(len=80)                 :: frmtv 
 
-  info = 0
+  info = psb_success_
   if (present(filename)) then
-    if (filename=='-') then 
+    if (filename == '-') then 
       outfile=6
     else
       if (present(iunit)) then 
@@ -506,9 +506,9 @@ subroutine mm_dvet1_write(b, header, info, iunit, filename)
 
   character(len=80)                 :: frmtv 
 
-  info = 0
+  info = psb_success_
   if (present(filename)) then
-    if (filename=='-') then 
+    if (filename == '-') then 
       outfile=6
     else
       if (present(iunit)) then 
@@ -563,9 +563,9 @@ subroutine mm_cvet2_write(b, header, info, iunit, filename)
 
   character(len=80)                 :: frmtv 
 
-  info = 0
+  info = psb_success_
   if (present(filename)) then
-    if (filename=='-') then 
+    if (filename == '-') then 
       outfile=6
     else
       if (present(iunit)) then 
@@ -619,9 +619,9 @@ subroutine mm_cvet1_write(b, header, info, iunit, filename)
 
   character(len=80)                 :: frmtv 
 
-  info = 0
+  info = psb_success_
   if (present(filename)) then
-    if (filename=='-') then 
+    if (filename == '-') then 
       outfile=6
     else
       if (present(iunit)) then 
@@ -675,9 +675,9 @@ subroutine mm_zvet2_write(b, header, info, iunit, filename)
 
   character(len=80)                 :: frmtv 
 
-  info = 0
+  info = psb_success_
   if (present(filename)) then
-    if (filename=='-') then 
+    if (filename == '-') then 
       outfile=6
     else
       if (present(iunit)) then 
@@ -731,9 +731,9 @@ subroutine mm_zvet1_write(b, header, info, iunit, filename)
 
   character(len=80)                 :: frmtv 
 
-  info = 0
+  info = psb_success_
   if (present(filename)) then
-    if (filename=='-') then 
+    if (filename == '-') then 
       outfile=6
     else
       if (present(iunit)) then 
@@ -789,10 +789,10 @@ subroutine smm_mat_read(a, info, iunit, filename)
   integer        :: ircode, i,nzr,infile
   type(psb_s_coo_sparse_mat), allocatable :: acoo
 
-  info = 0
+  info = psb_success_
 
   if (present(filename)) then
-    if (filename=='-') then 
+    if (filename == '-') then 
       infile=5
     else
       if (present(iunit)) then 
@@ -812,7 +812,7 @@ subroutine smm_mat_read(a, info, iunit, filename)
 
   read(infile,fmt=*,end=902) mmheader, object, fmt, type, sym
 
-  if ( (psb_tolower(object) /= 'matrix').or.(psb_tolower(fmt)/='coordinate')) then
+  if ( (psb_tolower(object) /= 'matrix').or.(psb_tolower(fmt) /= 'coordinate')) then
     write(0,*) 'READ_MATRIX: input file type not yet supported'
     info=909
     return
@@ -865,7 +865,7 @@ subroutine smm_mat_read(a, info, iunit, filename)
   end if
 
 
-  if (infile/=5) close(infile)
+  if (infile /= 5) close(infile)
   return 
 
   ! open failed
@@ -892,10 +892,10 @@ subroutine smm_mat_write(a,mtitle,info,iunit,filename)
   integer                     :: iout
 
 
-  info = 0
+  info = psb_success_
 
   if (present(filename)) then 
-    if (filename=='-') then 
+    if (filename == '-') then 
       iout=6
     else
       if (present(iunit)) then 
@@ -939,10 +939,10 @@ subroutine dmm_mat_read(a, info, iunit, filename)
   integer        :: ircode, i,nzr,infile
   type(psb_d_coo_sparse_mat), allocatable :: acoo
 
-  info = 0
+  info = psb_success_
 
   if (present(filename)) then
-    if (filename=='-') then 
+    if (filename == '-') then 
       infile=5
     else
       if (present(iunit)) then 
@@ -962,7 +962,7 @@ subroutine dmm_mat_read(a, info, iunit, filename)
 
   read(infile,fmt=*,end=902) mmheader, object, fmt, type, sym
 
-  if ( (psb_tolower(object) /= 'matrix').or.(psb_tolower(fmt)/='coordinate')) then
+  if ( (psb_tolower(object) /= 'matrix').or.(psb_tolower(fmt) /= 'coordinate')) then
     write(0,*) 'READ_MATRIX: input file type not yet supported'
     info=909
     return
@@ -1013,7 +1013,7 @@ subroutine dmm_mat_read(a, info, iunit, filename)
     write(0,*) 'read_matrix: matrix type not yet supported'
     info=904
   end if
-  if (infile/=5) close(infile)
+  if (infile /= 5) close(infile)
   return 
 
   ! open failed
@@ -1040,10 +1040,10 @@ subroutine dmm_mat_write(a,mtitle,info,iunit,filename)
   integer                     :: iout
 
 
-  info = 0
+  info = psb_success_
 
   if (present(filename)) then 
-    if (filename=='-') then 
+    if (filename == '-') then 
       iout=6
     else
       if (present(iunit)) then 
@@ -1087,10 +1087,10 @@ subroutine cmm_mat_read(a, info, iunit, filename)
   integer        :: ircode, i,nzr,infile
   type(psb_c_coo_sparse_mat), allocatable :: acoo
   real(psb_spk_) :: are, aim
-  info = 0
+  info = psb_success_
 
   if (present(filename)) then
-    if (filename=='-') then 
+    if (filename == '-') then 
       infile=5
     else
       if (present(iunit)) then 
@@ -1110,7 +1110,7 @@ subroutine cmm_mat_read(a, info, iunit, filename)
 
   read(infile,fmt=*,end=902) mmheader, object, fmt, type, sym
 
-  if ( (psb_tolower(object) /= 'matrix').or.(psb_tolower(fmt)/='coordinate')) then
+  if ( (psb_tolower(object) /= 'matrix').or.(psb_tolower(fmt) /= 'coordinate')) then
     write(0,*) 'READ_MATRIX: input file type not yet supported'
     info=909
     return
@@ -1186,7 +1186,7 @@ subroutine cmm_mat_read(a, info, iunit, filename)
     write(0,*) 'read_matrix: matrix type not yet supported'
     info=904
   end if
-  if (infile/=5) close(infile)
+  if (infile /= 5) close(infile)
   return 
 
   ! open failed
@@ -1213,10 +1213,10 @@ subroutine cmm_mat_write(a,mtitle,info,iunit,filename)
   integer                     :: iout
 
 
-  info = 0
+  info = psb_success_
 
   if (present(filename)) then 
-    if (filename=='-') then 
+    if (filename == '-') then 
       iout=6
     else
       if (present(iunit)) then 
@@ -1260,10 +1260,10 @@ subroutine zmm_mat_read(a, info, iunit, filename)
   integer        :: ircode, i,nzr,infile
   type(psb_z_coo_sparse_mat), allocatable :: acoo
   real(psb_dpk_) :: are, aim
-  info = 0
+  info = psb_success_
 
   if (present(filename)) then
-    if (filename=='-') then 
+    if (filename == '-') then 
       infile=5
     else
       if (present(iunit)) then 
@@ -1283,7 +1283,7 @@ subroutine zmm_mat_read(a, info, iunit, filename)
 
   read(infile,fmt=*,end=902) mmheader, object, fmt, type, sym
 
-  if ( (psb_tolower(object) /= 'matrix').or.(psb_tolower(fmt)/='coordinate')) then
+  if ( (psb_tolower(object) /= 'matrix').or.(psb_tolower(fmt) /= 'coordinate')) then
     write(0,*) 'READ_MATRIX: input file type not yet supported'
     info=909
     return
@@ -1359,7 +1359,7 @@ subroutine zmm_mat_read(a, info, iunit, filename)
     write(0,*) 'read_matrix: matrix type not yet supported'
     info=904
   end if
-  if (infile/=5) close(infile)
+  if (infile /= 5) close(infile)
   return 
 
   ! open failed
@@ -1386,10 +1386,10 @@ subroutine zmm_mat_write(a,mtitle,info,iunit,filename)
   integer                     :: iout
 
 
-  info = 0
+  info = psb_success_
 
   if (present(filename)) then 
-    if (filename=='-') then 
+    if (filename == '-') then 
       iout=6
     else
       if (present(iunit)) then 

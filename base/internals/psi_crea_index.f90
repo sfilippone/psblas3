@@ -75,7 +75,7 @@ subroutine psi_crea_index(desc_a,index_in,index_out,glob_idx,nxch,nsnd,nrcv,info
   integer              :: debug_level, debug_unit
   character(len=20)    :: name
 
-  info = 0
+  info = psb_success_
   name='psi_crea_index'
   call psb_erractionsave(err_act)
   debug_unit  = psb_get_debug_unit()
@@ -84,7 +84,7 @@ subroutine psi_crea_index(desc_a,index_in,index_out,glob_idx,nxch,nsnd,nrcv,info
   ictxt = psb_cd_get_context(desc_a)
   call psb_info(ictxt,me,np)
   if (np == -1) then
-    info = 2010
+    info = psb_err_blacs_error_
     call psb_errpush(info,name)
     goto 9999
   endif
@@ -95,8 +95,8 @@ subroutine psi_crea_index(desc_a,index_in,index_out,glob_idx,nxch,nsnd,nrcv,info
   dl_lda=np+1
 
   allocate(dep_list(max(1,dl_lda),0:np),length_dl(0:np),stat=info)
-  if (info /= 0) then 
-    call psb_errpush(4010,name,a_err='Allocate')
+  if (info /= psb_success_) then 
+    call psb_errpush(psb_err_from_subroutine_,name,a_err='Allocate')
     goto 9999      
   end if
 
@@ -108,8 +108,8 @@ subroutine psi_crea_index(desc_a,index_in,index_out,glob_idx,nxch,nsnd,nrcv,info
 
   call psi_extract_dep_list(desc_a%matrix_data,index_in,&
        & dep_list,length_dl,np,max(1,dl_lda),mode,info)
-  if(info /= 0) then
-    call psb_errpush(4010,name,a_err='extrct_dl')
+  if(info /= psb_success_) then
+    call psb_errpush(psb_err_from_subroutine_,name,a_err='extrct_dl')
     goto 9999
   end if
 
@@ -124,8 +124,8 @@ subroutine psi_crea_index(desc_a,index_in,index_out,glob_idx,nxch,nsnd,nrcv,info
 
   ! ....now i can sort dependency lists.
   call psi_sort_dl(dep_list,length_dl,np,info)
-  if(info /= 0) then
-    call psb_errpush(4010,name,a_err='psi_sort_dl')
+  if(info /= psb_success_) then
+    call psb_errpush(psb_err_from_subroutine_,name,a_err='psi_sort_dl')
     goto 9999
   end if
 
@@ -139,8 +139,8 @@ subroutine psi_crea_index(desc_a,index_in,index_out,glob_idx,nxch,nsnd,nrcv,info
        & write(debug_unit,*) me,' ',trim(name),': out of  psi_desc_index',&
        & size(index_out)
   nxch = length_dl(me)
-  if(info /= 0) then
-    call psb_errpush(4010,name,a_err='psi_desc_index')
+  if(info /= psb_success_) then
+    call psb_errpush(psb_err_from_subroutine_,name,a_err='psi_desc_index')
     goto 9999
   end if
 

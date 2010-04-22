@@ -64,7 +64,7 @@ subroutine psb_cd_inloc(v, ictxt, desc, info, globalcheck)
   character(len=20)    :: name
 
   if(psb_get_errstatus() /= 0) return 
-  info=0
+  info=psb_success_
   err=0
   name = 'psb_cd_inloc'
   debug_unit  = psb_get_debug_unit()
@@ -95,16 +95,16 @@ subroutine psb_cd_inloc(v, ictxt, desc, info, globalcheck)
 
   !... check m and n parameters....
   if (m < 1) then
-    info = 10
+    info = psb_err_iarg_neg_
     int_err(1) = 1
     int_err(2) = m
   else if (n < 1) then
-    info = 10
+    info = psb_err_iarg_neg_
     int_err(1) = 2
     int_err(2) = n
   endif
 
-  if (info /= 0) then 
+  if (info /= psb_success_) then 
     call psb_errpush(info,name,i_err=int_err)
     goto 9999
   end if
@@ -135,8 +135,8 @@ subroutine psb_cd_inloc(v, ictxt, desc, info, globalcheck)
   islarge = psb_cd_choose_large_state(ictxt,m)
 
   allocate(vl(loc_row),stat=info) 
-  if (info /=0) then 
-    info=4000
+  if (info /= psb_success_) then 
+    info=psb_err_alloc_dealloc_
     call psb_errpush(info,name,i_err=int_err)
     goto 9999
   end if
@@ -151,8 +151,8 @@ subroutine psb_cd_inloc(v, ictxt, desc, info, globalcheck)
 
   if (check_.or.(.not.islarge)) then 
     allocate(tmpgidx(m,2),stat=info) 
-    if (info /=0) then 
-      info=4000
+    if (info /= psb_success_) then 
+      info=psb_err_alloc_dealloc_
       call psb_errpush(info,name,i_err=int_err)
       goto 9999
     end if
@@ -160,7 +160,7 @@ subroutine psb_cd_inloc(v, ictxt, desc, info, globalcheck)
     flag_   = 1
     do i=1,loc_row
       if ((v(i)<1).or.(v(i)>m)) then 
-        info = 551
+        info = psb_err_entry_out_of_bounds_
         int_err(1) = i
         int_err(2) = v(i)
         int_err(3) = loc_row
@@ -172,7 +172,7 @@ subroutine psb_cd_inloc(v, ictxt, desc, info, globalcheck)
       vl(i) = v(i) 
     end do
 
-    if (info ==0) then 
+    if (info == psb_success_) then 
       call psb_amx(ictxt,tmpgidx(:,1))
       call psb_sum(ictxt,tmpgidx(:,2))
       novrl   = 0
@@ -189,7 +189,7 @@ subroutine psb_cd_inloc(v, ictxt, desc, info, globalcheck)
       if (norphan > 0) then 
         int_err(1) = norphan
         int_err(2) = m
-        info = 552
+        info = psb_err_inconsistent_index_lists_
       end if
     end if
   else
@@ -198,7 +198,7 @@ subroutine psb_cd_inloc(v, ictxt, desc, info, globalcheck)
     npr_ov  = 0
     do i=1,loc_row
       if ((v(i)<1).or.(v(i)>m)) then 
-        info = 551
+        info = psb_err_entry_out_of_bounds_
         int_err(1) = i
         int_err(2) = v(i)
         int_err(3) = loc_row
@@ -208,13 +208,13 @@ subroutine psb_cd_inloc(v, ictxt, desc, info, globalcheck)
       vl(i) = v(i) 
     end do
     
-    if ((m /= nrt).and.(me==psb_root_))  then 
+    if ((m /= nrt).and.(me == psb_root_))  then 
       write(0,*) trim(name),' Warning: globalcheck=.false., but there is a mismatch'
       write(0,*) trim(name),'        : in the global sizes!',m,nrt
     end if
   end if
 
-  if (info /= 0) then 
+  if (info /= psb_success_) then 
     call psb_errpush(info,name,i_err=int_err)
     goto 9999
   end if
@@ -236,8 +236,8 @@ subroutine psb_cd_inloc(v, ictxt, desc, info, globalcheck)
          & write(debug_unit,*) me,' ',trim(name),': code for NOVRL>0',novrl,npr_ov
 
     allocate(nov(0:np),ov_idx(npr_ov,2),stat=info)
-    if (info /= 0) then 
-      info=4025
+    if (info /= psb_success_) then 
+      info=psb_err_alloc_request_
       int_err(1)=np + 2*npr_ov
       call psb_errpush(info,name,i_err=int_err,a_err='integer')
       goto 9999
@@ -267,7 +267,7 @@ subroutine psb_cd_inloc(v, ictxt, desc, info, globalcheck)
     end do
 
     if (j /= nov(me+1)) then 
-      info=4001
+      info=psb_err_internal_error_
       call psb_errpush(info,name,a_err='overlap count')
       goto 9999
     end if
@@ -281,7 +281,7 @@ subroutine psb_cd_inloc(v, ictxt, desc, info, globalcheck)
     allocate(desc%matrix_data(psb_mdata_size_),&
          &temp_ovrlap(max(1,2*loc_row)),desc%lprm(1),&
          & stat=info)
-    if (info == 0) then 
+    if (info == psb_success_) then 
       desc%lprm(1)        = 0   
       desc%matrix_data(:) = 0
       desc%idxmap%state   = psb_desc_large_
@@ -290,14 +290,14 @@ subroutine psb_cd_inloc(v, ictxt, desc, info, globalcheck)
     allocate(desc%idxmap%glob_to_loc(m),desc%matrix_data(psb_mdata_size_),&
          &temp_ovrlap(max(1,2*loc_row)),desc%lprm(1),&
          & stat=info)
-    if (info == 0) then 
+    if (info == psb_success_) then 
       desc%lprm(1)        = 0   
       desc%matrix_data(:) = 0
       desc%idxmap%state   = psb_desc_normal_
     end if
   end if
-  if (info /= 0) then     
-    info=4025
+  if (info /= psb_success_) then     
+    info=psb_err_alloc_request_
     int_err(1)=2*m+psb_mdata_size_
     call psb_errpush(info,name,i_err=int_err,a_err='integer')
     goto 9999
@@ -307,8 +307,8 @@ subroutine psb_cd_inloc(v, ictxt, desc, info, globalcheck)
   loc_col = min(2*loc_row,m)
 
   allocate(desc%idxmap%loc_to_glob(loc_col),stat=info)  
-  if (info /= 0) then
-    info=4025
+  if (info /= psb_success_) then
+    info=psb_err_alloc_request_
     int_err(1)=loc_col
     call psb_errpush(info,name,i_err=int_err,a_err='integer')
     goto 9999
@@ -339,8 +339,8 @@ subroutine psb_cd_inloc(v, ictxt, desc, info, globalcheck)
     ! hashed by the low order bits of the entries.
     !
 
-    if (info /= 0) then
-      info=4025
+    if (info /= psb_success_) then
+      info=psb_err_alloc_request_
       int_err(1)=loc_col
       call psb_errpush(info,name,i_err=int_err,a_err='integer')
       goto 9999
@@ -358,7 +358,7 @@ subroutine psb_cd_inloc(v, ictxt, desc, info, globalcheck)
         if (nprocs > 1) then 
           do 
             if (j > size(ov_idx,dim=1)) then 
-              info=4001
+              info=psb_err_internal_error_
               call psb_errpush(info,name,a_err='search ov_idx')
               goto 9999
             end if
@@ -366,8 +366,8 @@ subroutine psb_cd_inloc(v, ictxt, desc, info, globalcheck)
             j = j + 1 
           end do
           call psb_ensure_size((itmpov+3+nprocs),temp_ovrlap,info,pad=-1)
-          if (info /= 0) then
-            info=4010
+          if (info /= psb_success_) then
+            info=psb_err_from_subroutine_
             call psb_errpush(info,name,a_err='psb_ensure_size')
             goto 9999
           end if
@@ -382,8 +382,8 @@ subroutine psb_cd_inloc(v, ictxt, desc, info, globalcheck)
 
     enddo
 
-    if (info /= 0) then 
-      info=4001
+    if (info /= psb_success_) then 
+      info=psb_err_internal_error_
       call psb_errpush(info,name,a_err='insert loop')
       goto 9999
     endif
@@ -403,7 +403,7 @@ subroutine psb_cd_inloc(v, ictxt, desc, info, globalcheck)
     do i=1,m
 
       if (((tmpgidx(i,1)-flag_) > np-1).or.((tmpgidx(i,1)-flag_) < 0)) then
-        info=580
+        info=psb_err_partfunc_wrong_pid_
         int_err(1)=3
         int_err(2)=tmpgidx(i,1) - flag_
         int_err(3)=i
@@ -413,7 +413,7 @@ subroutine psb_cd_inloc(v, ictxt, desc, info, globalcheck)
       desc%idxmap%glob_to_loc(i) = -(np+(tmpgidx(i,1)-flag_)+1)
     enddo
 
-    if (info /= 0) then 
+    if (info /= psb_success_) then 
       call psb_errpush(info,name,i_err=int_err)
       goto 9999
     end if
@@ -430,7 +430,7 @@ subroutine psb_cd_inloc(v, ictxt, desc, info, globalcheck)
       if (nprocs > 1) then 
         do 
           if (j > size(ov_idx,dim=1)) then 
-            info=4001
+            info=psb_err_internal_error_
             call psb_errpush(info,name,a_err='search ov_idx')
             goto 9999
           end if
@@ -438,8 +438,8 @@ subroutine psb_cd_inloc(v, ictxt, desc, info, globalcheck)
           j = j + 1 
         end do
         call psb_ensure_size((itmpov+3+nprocs),temp_ovrlap,info,pad=-1)
-        if (info /= 0) then
-          info=4010
+        if (info /= psb_success_) then
+          info=psb_err_from_subroutine_
           call psb_errpush(info,name,a_err='psb_ensure_size')
           goto 9999
         end if
@@ -456,13 +456,13 @@ subroutine psb_cd_inloc(v, ictxt, desc, info, globalcheck)
 
   call psi_bld_tmpovrl(temp_ovrlap,desc,info)
 
-  if (info == 0) deallocate(temp_ovrlap,vl,stat=info)
-  if ((info == 0).and.(allocated(tmpgidx)))&
+  if (info == psb_success_) deallocate(temp_ovrlap,vl,stat=info)
+  if ((info == psb_success_).and.(allocated(tmpgidx)))&
        &  deallocate(tmpgidx,stat=info)
-  if ((info == 0) .and.(allocated(ov_idx)))  &
+  if ((info == psb_success_) .and.(allocated(ov_idx)))  &
        & deallocate(ov_idx,nov,stat=info)
-  if (info /= 0) then 
-    info=4000
+  if (info /= psb_success_) then 
+    info=psb_err_alloc_dealloc_
     call psb_errpush(info,name)
     goto 9999
   endif
@@ -472,9 +472,9 @@ subroutine psb_cd_inloc(v, ictxt, desc, info, globalcheck)
   desc%matrix_data(psb_n_col_)  = loc_row
 
   call psb_realloc(max(1,loc_row/2),desc%halo_index, info)
-  if (info == 0) call psb_realloc(1,desc%ext_index, info)
-  if (info /= 0) then
-    info=4010
+  if (info == psb_success_) call psb_realloc(1,desc%ext_index, info)
+  if (info /= psb_success_) then
+    info=psb_err_from_subroutine_
     call psb_errpush(info,name,a_err='psb_realloc')
     Goto 9999
   end if
@@ -486,8 +486,8 @@ subroutine psb_cd_inloc(v, ictxt, desc, info, globalcheck)
        & write(debug_unit,*) me,' ',trim(name),': end'
 
   call psb_cd_set_bld(desc,info)
-  if (info /= 0) then
-    info=4010
+  if (info /= psb_success_) then
+    info=psb_err_from_subroutine_
     call psb_errpush(info,name,a_err='psb_cd_set_bld')
     Goto 9999
   end if

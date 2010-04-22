@@ -82,74 +82,74 @@ contains
     character(len=20) :: name
 
     if(psb_get_errstatus() /= 0) return 
-    info=0
+    info=psb_success_
     name='psb_chkvect'
     call psb_erractionsave(err_act)
 
 
     if (m < 0) then
-       info=10
+       info=psb_err_iarg_neg_
        int_err(1) = 1
        int_err(2) = m
     else if (n < 0) then
-       info=10
+       info=psb_err_iarg_neg_
        int_err(1) = 3
        int_err(2) = n
     else if ((ix < 1) .and. (m /= 0)) then
-       info=20
+       info=psb_err_iarg_pos_
        int_err(1) = 4
        int_err(2) = ix
     else if ((jx < 1) .and. (n /= 0)) then
-       info=20
+       info=psb_err_iarg_pos_
        int_err(1) = 5
        int_err(2) = jx
     else if (psb_cd_get_local_cols(desc_dec) < 0) then
-       info=40
+       info=psb_err_iarg_invalid_i_
        int_err(1) = 6
        int_err(2) = psb_n_col_ 
        int_err(3) = psb_cd_get_local_cols(desc_dec)
     else if (psb_cd_get_local_rows(desc_dec) < 0) then
-       info=40
+       info=psb_err_iarg_invalid_i_
        int_err(1) = 6
        int_err(2) = psb_n_row_ 
        int_err(3) = psb_cd_get_local_cols(desc_dec)
     else if (lldx < psb_cd_get_local_cols(desc_dec)) then
-       info=50
+       info=psb_err_iarg_not_gtia_ii_
        int_err(1) = 3
        int_err(2) = lldx
        int_err(3) = 6
        int_err(4) = psb_n_col_
        int_err(5) = psb_cd_get_local_cols(desc_dec)
     else if (psb_cd_get_global_cols(desc_dec) < m) then
-       info=60
+       info=psb_err_iarg_not_gteia_ii_
        int_err(1) = 1
        int_err(2) = m
        int_err(3) = 6
        int_err(4) = psb_n_
        int_err(5) = psb_cd_get_global_cols(desc_dec)
     else if (psb_cd_get_global_cols(desc_dec) < ix) then
-       info=60
+       info=psb_err_iarg_not_gteia_ii_
        int_err(1) = 4
        int_err(2) = ix
        int_err(3) = 6
        int_err(4) = psb_n_
        int_err(5) = psb_cd_get_global_cols(desc_dec)
     else if (psb_cd_get_global_rows(desc_dec) < jx) then
-       info=60
+       info=psb_err_iarg_not_gteia_ii_
        int_err(1) = 5
        int_err(2) = jx
        int_err(3) = 6
        int_err(4) = psb_m_
        int_err(5) = psb_cd_get_global_rows(desc_dec)
     else if (psb_cd_get_global_cols(desc_dec) < (ix+m-1)) then
-       info=80
+       info=psb_err_iarg2_neg_
        int_err(1) = 1
        int_err(2) = m
        int_err(3) = 4
        int_err(4) = ix
     end if
 
-    if (info /= 0) then
+    if (info /= psb_success_) then
        call psb_errpush(info,name,i_err=int_err)
        goto 9999
     end if
@@ -207,74 +207,74 @@ contains
     character(len=20) :: name
 
     if(psb_get_errstatus() /= 0) return 
-    info=0
+    info=psb_success_
     name='psb_chkglobvect'
     call psb_erractionsave(err_act)
 
 
     if (m < 0) then
-       info=10
+       info=psb_err_iarg_neg_
        int_err(1) = 1
        int_err(2) = m
     else if (n < 0) then
-       info=10
+       info=psb_err_iarg_neg_
        int_err(1) = 3
        int_err(2) = n
     else if ((ix < 1) .and. (m /= 0)) then
-       info=20
+       info=psb_err_iarg_pos_
        int_err(1) = 4
        int_err(2) = ix
     else if ((jx < 1) .and. (n /= 0)) then
-       info=20
+       info=psb_err_iarg_pos_
        int_err(1) = 5
        int_err(2) = jx
     else if (psb_cd_get_local_cols(desc_dec) < 0) then
-       info=40
+       info=psb_err_iarg_invalid_i_
        int_err(1) = 6
        int_err(2) = psb_n_col_ 
        int_err(3) = psb_cd_get_local_cols(desc_dec)
     else if (psb_cd_get_local_rows(desc_dec) < 0) then
-       info=40
+       info=psb_err_iarg_invalid_i_
        int_err(1) = 6
        int_err(2) = psb_n_row_ 
        int_err(3) = psb_cd_get_local_rows(desc_dec)
     else if (lldx < psb_cd_get_global_rows(desc_dec)) then
-       info=50
+       info=psb_err_iarg_not_gtia_ii_
        int_err(1) = 3
        int_err(2) = lldx
        int_err(3) = 6
        int_err(4) = psb_n_col_
        int_err(5) = psb_cd_get_global_rows(desc_dec)
     else if (psb_cd_get_global_cols(desc_dec) < m) then
-       info=60
+       info=psb_err_iarg_not_gteia_ii_
        int_err(1) = 1
        int_err(2) = m
        int_err(3) = 6
        int_err(4) = psb_n_
        int_err(5) = psb_cd_get_global_cols(desc_dec)
     else if (psb_cd_get_global_cols(desc_dec) < ix) then
-       info=60
+       info=psb_err_iarg_not_gteia_ii_
        int_err(1) = 4
        int_err(2) = ix
        int_err(3) = 6
        int_err(4) = psb_n_
        int_err(5) = psb_cd_get_global_cols(desc_dec)
     else if (psb_cd_get_global_rows(desc_dec) < jx) then
-       info=60
+       info=psb_err_iarg_not_gteia_ii_
        int_err(1) = 5
        int_err(2) = jx
        int_err(3) = 6
        int_err(4) = psb_m_
        int_err(5) = psb_cd_get_global_rows(desc_dec)
     else if (psb_cd_get_global_cols(desc_dec) < (ix+m-1)) then
-       info=80
+       info=psb_err_iarg2_neg_
        int_err(1) = 1
        int_err(2) = m
        int_err(3) = 4
        int_err(4) = ix
     end if
 
-    if (info /= 0) then
+    if (info /= psb_success_) then
        call psb_errpush(info,name,i_err=int_err)
        goto 9999
     end if
@@ -331,79 +331,79 @@ contains
     character(len=20) :: name
 
     if(psb_get_errstatus() /= 0) return 
-    info=0
+    info=psb_success_
     name='psb_chkmat'
     call psb_erractionsave(err_act)
 
     if (m < 0) then
-      info=10
+      info=psb_err_iarg_neg_
       int_err(1) = 1
       int_err(2) = m
     else if (n < 0) then
-      info=10
+      info=psb_err_iarg_neg_
       int_err(1) = 3
       int_err(2) = n
     else if ((ia < 1) .and. (m /= 0)) then
-      info=20
+      info=psb_err_iarg_pos_
       int_err(1) = 4
       int_err(2) = ia
     else if ((ja < 1) .and. (n /= 0)) then
-      info=20
+      info=psb_err_iarg_pos_
       int_err(1) = 5
       int_err(2) = ja
     else if (psb_cd_get_local_cols(desc_dec) < 0) then
-      info=40
+      info=psb_err_iarg_invalid_i_
       int_err(1) = 6
       int_err(2) = psb_n_col_ 
       int_err(3) = psb_cd_get_local_cols(desc_dec)
     else if (psb_cd_get_local_rows(desc_dec) < 0) then
-      info=40
+      info=psb_err_iarg_invalid_i_
       int_err(1) = 6
       int_err(2) = psb_n_row_ 
       int_err(3) = psb_cd_get_local_rows(desc_dec)
     else if (psb_cd_get_global_rows(desc_dec) < m) then
-      info=60
+      info=psb_err_iarg_not_gteia_ii_
       int_err(1) = 1
       int_err(2) = m
       int_err(3) = 5
       int_err(4) = psb_m_
       int_err(5) = psb_cd_get_global_rows(desc_dec)
     else if (psb_cd_get_global_rows(desc_dec) < m) then
-      info=60
+      info=psb_err_iarg_not_gteia_ii_
       int_err(1) = 2
       int_err(2) = n
       int_err(3) = 5
       int_err(4) = psb_m_
       int_err(5) = psb_cd_get_global_rows(desc_dec)
     else if (psb_cd_get_global_rows(desc_dec) < ia) then
-      info=60
+      info=psb_err_iarg_not_gteia_ii_
       int_err(1) = 3 
       int_err(2) = ia
       int_err(3) = 5
       int_err(4) = psb_m_
       int_err(5) = psb_cd_get_global_rows(desc_dec)
     else if (psb_cd_get_global_cols(desc_dec) < ja) then
-      info=60
+      info=psb_err_iarg_not_gteia_ii_
       int_err(1) = 4 
       int_err(2) = ja
       int_err(3) = 5
       int_err(4) = psb_n_
       int_err(5) = psb_cd_get_global_cols(desc_dec)
     else if (psb_cd_get_global_rows(desc_dec) < (ia+m-1)) then
-      info=80
+      info=psb_err_iarg2_neg_
       int_err(1) = 1
       int_err(2) = m
       int_err(3) = 3
       int_err(4) = ia
     else if (psb_cd_get_global_cols(desc_dec) < (ja+n-1)) then
-      info=80
+      info=psb_err_iarg2_neg_
       int_err(1) = 2
       int_err(2) = n
       int_err(3) = 4
       int_err(4) = ja
     end if
 
-    if (info /= 0) then
+    if (info /= psb_success_) then
       call psb_errpush(info,name,i_err=int_err)
       goto 9999
     end if

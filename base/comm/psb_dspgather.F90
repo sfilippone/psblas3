@@ -27,7 +27,7 @@ subroutine  psb_dsp_allgather(globa, loca, desc_a, info, root, dupl,keepnum,keep
 
   name='psb_gather'
   if (psb_get_errstatus().ne.0) return 
-  info=0
+  info=psb_success_
 
   call psb_erractionsave(err_act)
   ictxt = psb_cd_get_context(desc_a)
@@ -50,8 +50,8 @@ subroutine  psb_dsp_allgather(globa, loca, desc_a, info, root, dupl,keepnum,keep
     ncg = psb_cd_get_global_rows(desc_a)
 
     allocate(nzbr(np), idisp(np),stat=info)
-    if (info /= 0) then 
-      info=4025
+    if (info /= psb_success_) then 
+      info=psb_err_alloc_request_
       call psb_errpush(info,name,i_err=(/2*np,0,0,0,0/),&
            & a_err='integer')
       goto 9999      
@@ -61,8 +61,8 @@ subroutine  psb_dsp_allgather(globa, loca, desc_a, info, root, dupl,keepnum,keep
     nzbr(me+1) = loc_coo%get_nzeros()
     call psb_sum(ictxt,nzbr(1:np))
     nzg = sum(nzbr)
-    if (info == 0) call glob_coo%allocate(nrg,ncg,nzg)
-    if (info /= 0) goto 9999
+    if (info == psb_success_) call glob_coo%allocate(nrg,ncg,nzg)
+    if (info /= psb_success_) goto 9999
     do ip=1,np
       idisp(ip) = sum(nzbr(1:ip-1))
     enddo
@@ -70,15 +70,15 @@ subroutine  psb_dsp_allgather(globa, loca, desc_a, info, root, dupl,keepnum,keep
     call mpi_allgatherv(loc_coo%val,ndx,mpi_double_precision,&
          & glob_coo%val,nzbr,idisp,&
          & mpi_double_precision,icomm,info)
-    if (info == 0) call mpi_allgatherv(loc_coo%ia,ndx,mpi_integer,&
+    if (info == psb_success_) call mpi_allgatherv(loc_coo%ia,ndx,mpi_integer,&
          & glob_coo%ia,nzbr,idisp,&
          & mpi_integer,icomm,info)
-    if (info == 0) call mpi_allgatherv(loc_coo%ja,ndx,mpi_integer,&
+    if (info == psb_success_) call mpi_allgatherv(loc_coo%ja,ndx,mpi_integer,&
          & glob_coo%ja,nzbr,idisp,&
          & mpi_integer,icomm,info)
     
-    if (info /= 0) then 
-      call psb_errpush(4001,name,a_err=' from mpi_allgatherv')
+    if (info /= psb_success_) then 
+      call psb_errpush(psb_err_internal_error_,name,a_err=' from mpi_allgatherv')
       goto 9999
     end if
     

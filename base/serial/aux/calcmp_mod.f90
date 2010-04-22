@@ -52,7 +52,7 @@ contains
     logical :: callt
     
     callt = (abs(real(a))<abs(real(b))).or. &
-         & ((abs(real(a))==abs(real(b))).and.(abs(aimag(a))<abs(aimag(b))))
+         & ((abs(real(a)) == abs(real(b))).and.(abs(aimag(a))<abs(aimag(b))))
   end function callt
   function calle(a,b)
     use psb_const_mod
@@ -60,7 +60,7 @@ contains
     logical :: calle
     
     calle = (abs(real(a))<abs(real(b))).or. &
-         & ((abs(real(a))==abs(real(b))).and.(abs(aimag(a))<=abs(aimag(b))))
+         & ((abs(real(a)) == abs(real(b))).and.(abs(aimag(a))<=abs(aimag(b))))
   end function calle
 
   function calgt(a,b)
@@ -69,7 +69,7 @@ contains
     logical :: calgt
     
     calgt = (abs(real(a))>abs(real(b))).or. &
-         & ((abs(real(a))==abs(real(b))).and.(abs(aimag(a))>abs(aimag(b))))
+         & ((abs(real(a)) == abs(real(b))).and.(abs(aimag(a))>abs(aimag(b))))
   end function calgt
   function calge(a,b)
     use psb_const_mod
@@ -77,7 +77,7 @@ contains
     logical :: calge
     
     calge = (abs(real(a))>abs(real(b))).or. &
-         & ((abs(real(a))==abs(real(b))).and.(abs(aimag(a))>=abs(aimag(b))))
+         & ((abs(real(a)) == abs(real(b))).and.(abs(aimag(a))>=abs(aimag(b))))
   end function calge
 
 end module calcmp_mod

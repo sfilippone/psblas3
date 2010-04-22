@@ -71,7 +71,7 @@ subroutine psb_dinsvi(m, irw, val, x, desc_a, info, dupl)
   character(len=20)      :: name
 
   if(psb_get_errstatus() /= 0) return 
-  info=0
+  info=psb_success_
   call psb_erractionsave(err_act)
   name = 'psb_dinsvi'
 
@@ -85,20 +85,20 @@ subroutine psb_dinsvi(m, irw, val, x, desc_a, info, dupl)
 
   call psb_info(ictxt, me, np)
   if (np == -1) then
-    info = 2010
+    info = psb_err_blacs_error_
     call psb_errpush(info,name)
     goto 9999
   endif
 
   !... check parameters....
   if (m < 0) then
-    info = 10
+    info = psb_err_iarg_neg_
     int_err(1) = 1
     int_err(2) = m
     call psb_errpush(info,name,int_err)
     goto 9999
   else if (.not.psb_is_ok_desc(desc_a)) then
-    info = 3110
+    info = psb_err_input_matrix_unassembled_
     int_err(1) = psb_cd_get_dectype(desc_a)
     call psb_errpush(info,name,int_err)
     goto 9999
@@ -110,15 +110,15 @@ subroutine psb_dinsvi(m, irw, val, x, desc_a, info, dupl)
     goto 9999
   endif
 
-  if (m==0) return  
+  if (m == 0) return  
   loc_rows = psb_cd_get_local_rows(desc_a)
   loc_cols = psb_cd_get_local_cols(desc_a)
   mglob    = psb_cd_get_global_rows(desc_a)
 
 
   allocate(irl(m),stat=info) 
-  if (info /= 0) then 
-    info = 4000
+  if (info /= psb_success_) then 
+    info = psb_err_alloc_dealloc_
     call psb_errpush(info,name)
     goto 9999
   endif
@@ -253,7 +253,7 @@ subroutine psb_dinsi(m, irw, val, x, desc_a, info, dupl)
   character(len=20)   :: name
 
   if(psb_get_errstatus() /= 0) return 
-  info=0
+  info=psb_success_
   call psb_erractionsave(err_act)
   name = 'psb_dinsi'
 
@@ -267,20 +267,20 @@ subroutine psb_dinsi(m, irw, val, x, desc_a, info, dupl)
 
   call psb_info(ictxt, me, np)
   if (np == -1) then
-    info = 2010
+    info = psb_err_blacs_error_
     call psb_errpush(info,name)
     goto 9999
   endif
 
   !... check parameters....
   if (m < 0) then
-    info = 10
+    info = psb_err_iarg_neg_
     int_err(1) = 1
     int_err(2) = m
     call psb_errpush(info,name,int_err)
     goto 9999
   else if (.not.psb_is_ok_desc(desc_a)) then
-    info = 3110
+    info = psb_err_input_matrix_unassembled_
     int_err(1) = psb_cd_get_dectype(desc_a)
     call psb_errpush(info,name,int_err)
     goto 9999
@@ -291,7 +291,7 @@ subroutine psb_dinsi(m, irw, val, x, desc_a, info, dupl)
     call psb_errpush(info,name,int_err)
     goto 9999
   endif
-  if (m==0) return 
+  if (m == 0) return 
 
   loc_rows = psb_cd_get_local_rows(desc_a)
   loc_cols = psb_cd_get_local_cols(desc_a)
@@ -306,8 +306,8 @@ subroutine psb_dinsi(m, irw, val, x, desc_a, info, dupl)
   endif
 
   allocate(irl(m),stat=info) 
-  if (info /= 0) then 
-    info = 4000
+  if (info /= psb_success_) then 
+    info = psb_err_alloc_dealloc_
     call psb_errpush(info,name)
     goto 9999
   endif

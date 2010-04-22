@@ -50,7 +50,7 @@ subroutine dmsrx(n,x,indx,idir,flag)
     return
   endif
 
-  if (n==0) return
+  if (n == 0) return
 
   if (flag == psb_sort_ovw_idx_) then 
     do k=1,n
@@ -58,11 +58,11 @@ subroutine dmsrx(n,x,indx,idir,flag)
     enddo
   end if
 
-  if (n==1) return
+  if (n == 1) return
 
   allocate(iaux(0:n+1),stat=info)
-  if (info/=0) then 
-    call psb_errpush(4000,r_name='dmsrx')
+  if (info /= psb_success_) then 
+    call psb_errpush(psb_err_alloc_dealloc_,r_name='dmsrx')
     call psb_error()
   endif
 
@@ -75,8 +75,8 @@ subroutine dmsrx(n,x,indx,idir,flag)
   if (iret == 0) call psb_ip_reord(n,x,indx,iaux)
 
   deallocate(iaux,stat=info)
-  if (info/=0) then 
-    call psb_errpush(4000,r_name='dmsrx')
+  if (info /= psb_success_) then 
+    call psb_errpush(psb_err_alloc_dealloc_,r_name='dmsrx')
     call psb_error()
   endif
   return

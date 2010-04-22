@@ -141,7 +141,7 @@ contains
     integer :: me, err_act,i 
     character(len=20) :: name
     if(psb_get_errstatus() /= 0) return
-    info=0
+    info=psb_success_
     name = 'psb_precfree'
     call psb_erractionsave(err_act)
 
@@ -149,9 +149,9 @@ contains
 
     if (allocated(p%prec)) then 
       call p%prec%precfree(info)
-      if (info /= 0) goto 9999
+      if (info /= psb_success_) goto 9999
       deallocate(p%prec,stat=info)
-      if (info /= 0) goto 9999
+      if (info /= psb_success_) goto 9999
     end if
     call psb_erractionrestore(err_act)
     return
@@ -201,7 +201,7 @@ contains
     character(len=20)   :: name
     
     name='s_apply2v'
-    info = 0
+    info = psb_success_
     call psb_erractionsave(err_act)
     
     ictxt = psb_cd_get_context(desc_data)
@@ -217,8 +217,8 @@ contains
       work_ => work
     else
       allocate(work_(4*psb_cd_get_local_cols(desc_data)),stat=info)
-      if (info /= 0) then 
-        info = 4010
+      if (info /= psb_success_) then 
+        info = psb_err_from_subroutine_
         call psb_errpush(info,name,a_err='Allocate')
         goto 9999      
       end if
@@ -234,8 +234,8 @@ contains
     if (present(work)) then 
     else
       deallocate(work_,stat=info)
-      if (info /= 0) then 
-        info = 4010
+      if (info /= psb_success_) then 
+        info = psb_err_from_subroutine_
         call psb_errpush(info,name,a_err='DeAllocate')
         goto 9999      
       end if
@@ -267,7 +267,7 @@ contains
     real(psb_spk_), pointer :: WW(:), w1(:)
     character(len=20)   :: name
     name='s_apply1v'
-    info = 0
+    info = psb_success_
     call psb_erractionsave(err_act)
     
     
@@ -285,17 +285,17 @@ contains
       goto 9999
     end if
     allocate(ww(size(x)),w1(size(x)),stat=info)
-    if (info /= 0) then 
-      info = 4010
+    if (info /= psb_success_) then 
+      info = psb_err_from_subroutine_
       call psb_errpush(info,name,a_err='Allocate')
       goto 9999      
     end if
     call prec%prec%apply(sone,x,szero,ww,desc_data,info,trans_,work=w1)
-    if(info /=0) goto 9999
+    if(info /= psb_success_) goto 9999
     x(:) = ww(:)
     deallocate(ww,W1,stat=info)
-    if (info /= 0) then 
-      info = 4010
+    if (info /= psb_success_) then 
+      info = psb_err_from_subroutine_
       call psb_errpush(info,name,a_err='DeAllocate')
       goto 9999      
     end if

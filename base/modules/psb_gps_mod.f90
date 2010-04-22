@@ -122,13 +122,13 @@ CONTAINS
     idpth = 0
 
     ALLOCATE(SIZEG(NR),STPT(NR), STAT=INFO)
-    IF(INFO /= 0) THEN
+    IF(INFO /= psb_success_) THEN
       WRITE(*,*) 'ERROR! MEMORY ALLOCATION # 1 FAILED IN GPS'
       STOP
     END IF
     !
     ALLOCATE(NHIGH(INIT), NLOW(INIT), NACUM(INIT), AUX(INIT), STAT=INFO)
-    IF(INFO /= 0) THEN
+    IF(INFO /= psb_success_) THEN
       WRITE(*,*) 'ERROR! MEMORY ALLOCATION # 2 FAILED IN GPS'
       STOP
     END IF
@@ -747,7 +747,7 @@ CONTAINS
     INTEGER :: SZ1,SZ2,INFO
     
     call psb_realloc(sz2,vet,info)
-    IF(INFO /= 0) THEN
+    IF(INFO /= psb_success_) THEN
        WRITE(*,*) 'Error! Memory allocation failure in REALLOC'
        STOP
     END IF

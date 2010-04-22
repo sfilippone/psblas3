@@ -85,7 +85,7 @@ subroutine  psb_sovrlm(x,desc_a,info,jx,ik,work,update,mode)
 
   name='psb_sovrlm'
   if(psb_get_errstatus() /= 0) return 
-  info=0
+  info=psb_success_
   call psb_erractionsave(err_act)
 
   ictxt=psb_cd_get_context(desc_a)
@@ -93,7 +93,7 @@ subroutine  psb_sovrlm(x,desc_a,info,jx,ik,work,update,mode)
   ! check on blacs grid 
   call psb_info(ictxt, me, np)
   if (np == -1) then
-    info = 2010
+    info = psb_err_blacs_error_
     call psb_errpush(info,name)
     goto 9999
   endif
@@ -137,14 +137,14 @@ subroutine  psb_sovrlm(x,desc_a,info,jx,ik,work,update,mode)
 
   ! check vector correctness
   call psb_chkvect(m,1,size(x,1),ix,ijx,desc_a,info,iix,jjx)
-  if(info /= 0) then
-    info=4010
+  if(info /= psb_success_) then
+    info=psb_err_from_subroutine_
     ch_err='psb_chkvect'
     call psb_errpush(info,name,a_err=ch_err)
   end if
 
   if (iix /= 1) then
-    info=3040
+    info=psb_err_ix_n1_iy_n1_unsupported_
     call psb_errpush(info,name)
   end if
 
@@ -166,8 +166,8 @@ subroutine  psb_sovrlm(x,desc_a,info,jx,ik,work,update,mode)
 
   if (aliw) then 
     allocate(iwork(liwork),stat=info)
-    if(info /= 0) then
-      info=4010
+    if(info /= psb_success_) then
+      info=psb_err_from_subroutine_
       call psb_errpush(info,name,a_err='Allocate')
       goto 9999
     end if
@@ -180,9 +180,9 @@ subroutine  psb_sovrlm(x,desc_a,info,jx,ik,work,update,mode)
     call psi_swapdata(mode_,k,sone,xp,&
          & desc_a,iwork,info,data=psb_comm_ovr_)
   end if
-  if (info == 0) call psi_ovrl_upd(xp,desc_a,update_,info)
-  if (info /= 0) then
-    call psb_errpush(4010,name,a_err='Inner updates')
+  if (info == psb_success_) call psi_ovrl_upd(xp,desc_a,update_,info)
+  if (info /= psb_success_) then
+    call psb_errpush(psb_err_from_subroutine_,name,a_err='Inner updates')
     goto 9999
   end if
 
@@ -287,7 +287,7 @@ subroutine  psb_sovrlv(x,desc_a,info,work,update,mode)
 
   name='psb_sovrlv'
   if(psb_get_errstatus() /= 0) return 
-  info=0
+  info=psb_success_
   call psb_erractionsave(err_act)
 
   ictxt=psb_cd_get_context(desc_a)
@@ -295,7 +295,7 @@ subroutine  psb_sovrlv(x,desc_a,info,work,update,mode)
   ! check on blacs grid 
   call psb_info(ictxt, me, np)
   if (np == -1) then
-    info = 2010
+    info = psb_err_blacs_error_
     call psb_errpush(info,name)
     goto 9999
   endif
@@ -325,14 +325,14 @@ subroutine  psb_sovrlv(x,desc_a,info,work,update,mode)
 
   ! check vector correctness
   call psb_chkvect(m,1,size(x),ix,ijx,desc_a,info,iix,jjx)
-  if(info /= 0) then
-    info=4010
+  if(info /= psb_success_) then
+    info=psb_err_from_subroutine_
     ch_err='psb_chkvect'
     call psb_errpush(info,name,a_err=ch_err)
   end if
 
   if (iix /= 1) then
-    info=3040
+    info=psb_err_ix_n1_iy_n1_unsupported_
     call psb_errpush(info,name)
   end if
 
@@ -353,8 +353,8 @@ subroutine  psb_sovrlv(x,desc_a,info,work,update,mode)
   end if
   if (aliw) then 
     allocate(iwork(liwork),stat=info)
-    if(info /= 0) then
-      info=4010
+    if(info /= psb_success_) then
+      info=psb_err_from_subroutine_
       call psb_errpush(info,name,a_err='Allocate')
       goto 9999
     end if
@@ -367,9 +367,9 @@ subroutine  psb_sovrlv(x,desc_a,info,work,update,mode)
     call psi_swapdata(mode_,sone,x(:),&
          & desc_a,iwork,info,data=psb_comm_ovr_)
   end if
-  if (info == 0) call psi_ovrl_upd(x,desc_a,update_,info)
-  if (info /= 0) then
-    call psb_errpush(4010,name,a_err='Inner updates')
+  if (info == psb_success_) call psi_ovrl_upd(x,desc_a,update_,info)
+  if (info /= psb_success_) then
+    call psb_errpush(psb_err_from_subroutine_,name,a_err='Inner updates')
     goto 9999
   end if
   

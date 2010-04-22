@@ -39,7 +39,7 @@ subroutine psb_sprecseti(p,what,val,info)
   integer, intent(out)                   :: info
   character(len=20) :: name='precset'
 
-  info = 0
+  info = psb_success_
   if (.not.allocated(p%prec)) then 
     info = 1124
     call psb_errpush(info,name,a_err="preconditioner")
@@ -65,7 +65,7 @@ subroutine psb_sprecsets(p,what,val,info)
   integer, intent(out)                   :: info
   character(len=20) :: name='precset'
 
-  info = 0
+  info = psb_success_
   if (.not.allocated(p%prec)) then 
     info = 1124
     call psb_errpush(info,name,a_err="preconditioner")

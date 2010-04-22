@@ -59,7 +59,7 @@ Subroutine psb_csprn(a, desc_a,info,clear)
   character(len=20)   :: name
   logical             :: clear_
 
-  info = 0
+  info = psb_success_
   err  = 0
   int_err(1)=0
   name = 'psb_csprn'
@@ -84,7 +84,7 @@ Subroutine psb_csprn(a, desc_a,info,clear)
 
   call a%reinit(clear=clear)
 
-  if (info /= 0) goto 9999
+  if (info /= psb_success_) goto 9999
   if (debug_level >= psb_debug_outer_) &
        & write(debug_unit,*) me,' ',trim(name),': done'
 

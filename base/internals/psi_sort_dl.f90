@@ -48,12 +48,12 @@ subroutine psi_sort_dl(dep_list,l_dep_list,np,info)
   
   name='psi_sort_dl'
   if(psb_get_errstatus() /= 0) return 
-  info=0
+  info=psb_success_
   call psb_erractionsave(err_act)
   debug_unit  = psb_get_debug_unit()
   debug_level = psb_get_debug_level()
   
-  info = 0
+  info = psb_success_
   ndgmx = 0
   do i=1,np
      ndgmx = ndgmx + l_dep_list(i)
@@ -75,8 +75,8 @@ subroutine psi_sort_dl(dep_list,l_dep_list,np,info)
   call srtlist(dep_list,size(dep_list,1),l_dep_list,np,work(idg),&
        & work(idgp),work(iupd),work(iedges),work(iidx),work(iich),info)
 
-  if (info  /=  0) then
-     call psb_errpush(4010,name,a_err='srtlist')
+  if (info  /=  psb_success_) then
+     call psb_errpush(psb_err_from_subroutine_,name,a_err='srtlist')
      goto 9999
   endif
   

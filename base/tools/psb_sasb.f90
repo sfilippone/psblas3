@@ -57,14 +57,14 @@ subroutine psb_sasb(x, desc_a, info)
   character(len=20)   :: name, ch_err
 
   if(psb_get_errstatus() /= 0) return 
-  info=0
+  info=psb_success_
   name='psb_sgeasb_m'
   call psb_erractionsave(err_act)
   debug_unit  = psb_get_debug_unit()
   debug_level = psb_get_debug_level()
 
   if ((.not.allocated(desc_a%matrix_data))) then
-    info=3110
+    info=psb_err_input_matrix_unassembled_
     call psb_errpush(info,name)
     goto 9999
   endif
@@ -78,14 +78,14 @@ subroutine psb_sasb(x, desc_a, info)
        & psb_cd_get_dectype(desc_a)
   !     ....verify blacs grid correctness..
   if (np == -1) then
-    info = 2010
+    info = psb_err_blacs_error_
     call psb_errpush(info,name)
     goto 9999
   else if (.not.psb_is_asb_desc(desc_a)) then
     if (debug_level >= psb_debug_ext_) &
          & write(debug_unit,*) me,' ',trim(name),' error ',&
          & psb_cd_get_dectype(desc_a)
-    info = 3110
+    info = psb_err_input_matrix_unassembled_
     call psb_errpush(info,name)
     goto 9999
   endif
@@ -101,8 +101,8 @@ subroutine psb_sasb(x, desc_a, info)
 
   if (i1sz < ncol) then
     call psb_realloc(ncol,i2sz,x,info)
-    if (info /= 0) then
-      info=4010
+    if (info /= psb_success_) then
+      info=psb_err_from_subroutine_
       call psb_errpush(info,name,a_err='psb_realloc')
       goto 9999
     endif
@@ -110,8 +110,8 @@ subroutine psb_sasb(x, desc_a, info)
 
   ! ..update halo elements..
   call psb_halo(x,desc_a,info)
-  if(info /= 0) then
-    info=4010
+  if(info /= psb_success_) then
+    info=psb_err_from_subroutine_
     ch_err='psb_halo'
     call psb_errpush(info,name,a_err=ch_err)
     goto 9999
@@ -189,7 +189,7 @@ subroutine psb_sasbv(x, desc_a, info)
   integer              :: debug_level, debug_unit
   character(len=20)    :: name,ch_err
 
-  info = 0
+  info = psb_success_
   int_err(1) = 0
   name = 'psb_sgeasb_v'
 
@@ -201,11 +201,11 @@ subroutine psb_sasbv(x, desc_a, info)
 
   !     ....verify blacs grid correctness..
   if (np == -1) then
-    info = 2010
+    info = psb_err_blacs_error_
     call psb_errpush(info,name)
     goto 9999
   else if (.not.psb_is_asb_desc(desc_a)) then
-    info = 3110
+    info = psb_err_input_matrix_unassembled_
     call psb_errpush(info,name)
     goto 9999
   endif
@@ -219,8 +219,8 @@ subroutine psb_sasbv(x, desc_a, info)
        & write(debug_unit,*) me,' ',trim(name),': sizes ',i1sz,ncol
   if (i1sz < ncol) then
     call psb_realloc(ncol,x,info)
-    if (info /= 0) then           
-      info=4010
+    if (info /= psb_success_) then           
+      info=psb_err_from_subroutine_
       call psb_errpush(info,name,a_err='psb_realloc')
       goto 9999
     endif
@@ -228,8 +228,8 @@ subroutine psb_sasbv(x, desc_a, info)
 
   ! ..update halo elements..
   call psb_halo(x,desc_a,info)
-  if(info /= 0) then
-    info=4010
+  if(info /= psb_success_) then
+    info=psb_err_from_subroutine_
     ch_err='f90_pshalo'
     call psb_errpush(info,name,a_err=ch_err)
     goto 9999

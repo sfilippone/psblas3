@@ -63,14 +63,14 @@ function psb_znrmi(a,desc_a,info)
 
   name='psb_znrmi'
   if(psb_get_errstatus() /= 0) return 
-  info=0
+  info=psb_success_
   call psb_erractionsave(err_act)
 
   ictxt=psb_cd_get_context(desc_a)
 
   call psb_info(ictxt, me, np)
   if (np == -1) then
-    info = 2010
+    info = psb_err_blacs_error_
     call psb_errpush(info,name)
     goto 9999
   endif
@@ -81,23 +81,23 @@ function psb_znrmi(a,desc_a,info)
   n = psb_cd_get_global_cols(desc_a)
 
   call psb_chkmat(m,n,ia,ja,desc_a,info,iia,jja)
-  if(info /= 0) then
-    info=4010
+  if(info /= psb_success_) then
+    info=psb_err_from_subroutine_
     ch_err='psb_chkmat'
     call psb_errpush(info,name,a_err=ch_err)
     goto 9999
   end if
 
   if ((iia /= 1).or.(jja /= 1)) then
-    info=3040
+    info=psb_err_ix_n1_iy_n1_unsupported_
     call psb_errpush(info,name)
     goto 9999
   end if
 
   if ((m /= 0).and.(n /= 0)) then
     nrmi = a%csnmi()
-    if(info /= 0) then
-      info=4010
+    if(info /= psb_success_) then
+      info=psb_err_from_subroutine_
       ch_err='psb_csnmi'
       call psb_errpush(info,name,a_err=ch_err)
       goto 9999

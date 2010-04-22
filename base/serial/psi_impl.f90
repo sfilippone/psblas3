@@ -73,15 +73,15 @@
     integer :: i,j,k,nh
     
     if (nc > size(iperm)) then 
-      info = 2 
+      info = psb_err_pivot_too_small_ 
       return
     endif
 
     if (idxmap%state == psb_desc_large_) then 
 
       allocate(itmp(size(idxmap%loc_to_glob)), stat=i)
-      if (i/=0) then
-        info = 4001
+      if (i /= 0) then
+        info = psb_err_internal_error_
         return
       end if
       do i=1,nc
@@ -136,12 +136,12 @@
     debug_level = psb_get_debug_level()
     debug_unit  = psb_get_debug_unit()
 
-    info = 0
+    info = psb_success_
     ictxt = cdesc%matrix_data(psb_ctxt_)
 
     call psb_info(ictxt,me,np)
     if (np == -1) then
-      info = 2010
+      info = psb_err_blacs_error_
       call psb_errpush(info,name)
       goto 9999
     endif
@@ -151,8 +151,8 @@
     if (debug_level>0) write(debug_unit,*) me,'Calling crea_index on halo',&
          & size(halo_in)
     call psi_crea_index(cdesc,halo_in, idx_out,.false.,nxch,nsnd,nrcv,info)
-    if (info /= 0) then
-      call psb_errpush(4010,name,a_err='psi_crea_index')
+    if (info /= psb_success_) then
+      call psb_errpush(psb_err_from_subroutine_,name,a_err='psi_crea_index')
       goto 9999
     end if
     call psb_move_alloc(idx_out,cdesc%halo_index,info)
@@ -167,8 +167,8 @@
     ! then ext index
     if (debug_level>0) write(debug_unit,*) me,'Calling crea_index on ext'
     call psi_crea_index(cdesc,ext_in, idx_out,.false.,nxch,nsnd,nrcv,info)
-    if (info /= 0) then
-      call psb_errpush(4010,name,a_err='psi_crea_index')
+    if (info /= psb_success_) then
+      call psb_errpush(psb_err_from_subroutine_,name,a_err='psi_crea_index')
       goto 9999
     end if
     call psb_move_alloc(idx_out,cdesc%ext_index,info)
@@ -181,13 +181,13 @@
 
     ! then the overlap index
     call psi_crea_index(cdesc,ovrlap_in, idx_out,.true.,nxch,nsnd,nrcv,info)
-    if (info /= 0) then
-      call psb_errpush(4010,name,a_err='psi_crea_index')
+    if (info /= psb_success_) then
+      call psb_errpush(psb_err_from_subroutine_,name,a_err='psi_crea_index')
       goto 9999
     end if
     call psb_move_alloc(idx_out,cdesc%ovrlap_index,info)
-    if (info /= 0) then
-      call psb_errpush(4010,name,a_err='psb_move_alloc')
+    if (info /= psb_success_) then
+      call psb_errpush(psb_err_from_subroutine_,name,a_err='psb_move_alloc')
       goto 9999
     end if
 
@@ -199,23 +199,23 @@
     if (debug_level>0) write(debug_unit,*) me,'Calling crea_ovr_elem'
     call psi_crea_ovr_elem(me,cdesc%ovrlap_index,cdesc%ovrlap_elem,info)
     if (debug_level>0) write(debug_unit,*) me,'Done crea_ovr_elem'
-    if (info /= 0) then
-      call psb_errpush(4010,name,a_err='psi_crea_ovr_elem')
+    if (info /= psb_success_) then
+      call psb_errpush(psb_err_from_subroutine_,name,a_err='psi_crea_ovr_elem')
       goto 9999
     end if
     ! Extract ovr_mst_idx from ovrlap_elem 
     if (debug_level>0) write(debug_unit,*) me,'Calling bld_ovr_mst'
     call psi_bld_ovr_mst(me,cdesc%ovrlap_elem,tmp_mst_idx,info)
-    if (info == 0) call psi_crea_index(cdesc,&
+    if (info == psb_success_) call psi_crea_index(cdesc,&
          & tmp_mst_idx,idx_out,.false.,nxch,nsnd,nrcv,info)
     if (debug_level>0) write(debug_unit,*) me,'Done crea_indx'
-    if (info /= 0) then
-      call psb_errpush(4010,name,a_err='psi_bld_ovr_mst')
+    if (info /= psb_success_) then
+      call psb_errpush(psb_err_from_subroutine_,name,a_err='psi_bld_ovr_mst')
       goto 9999
     end if
     call psb_move_alloc(idx_out,cdesc%ovr_mst_idx,info)
-    if (info /= 0) then
-      call psb_errpush(4010,name,a_err='psb_move_alloc')
+    if (info /= psb_success_) then
+      call psb_errpush(psb_err_from_subroutine_,name,a_err='psb_move_alloc')
       goto 9999
     end if
 
@@ -225,10 +225,10 @@
 
     ! finally bnd_elem
     call psi_crea_bnd_elem(idx_out,cdesc,info)
-    if (info == 0) call psb_move_alloc(idx_out,cdesc%bnd_elem,info)
+    if (info == psb_success_) call psb_move_alloc(idx_out,cdesc%bnd_elem,info)
 
-    if (info /= 0) then
-      call psb_errpush(4010,name,a_err='psi_crea_bnd_elem')
+    if (info /= psb_success_) then
+      call psb_errpush(psb_err_from_subroutine_,name,a_err='psi_crea_bnd_elem')
       goto 9999
     end if
     if (debug_level>0) write(debug_unit,*) me,'Done crea_bnd_elem'
@@ -273,7 +273,7 @@
       do 
         if (lb>ub) exit
         lm = (lb+ub)/2
-        if (key==glb_lc(lm,1)) then 
+        if (key == glb_lc(lm,1)) then 
           tmp = lm
           exit
         else if (key<glb_lc(lm,1)) then 
@@ -318,7 +318,7 @@
       do 
         if (lb>ub) exit
         lm = (lb+ub)/2
-        if (key==glb_lc(lm,1)) then 
+        if (key == glb_lc(lm,1)) then 
           tmp = lm
           exit
         else if (key<glb_lc(lm,1)) then 
@@ -366,7 +366,7 @@
             do 
               if (lb>ub) exit
               lm = (lb+ub)/2
-              if (key==glb_lc(lm,1)) then 
+              if (key == glb_lc(lm,1)) then 
                 tmp = lm
                 exit
               else if (key<glb_lc(lm,1)) then 
@@ -398,7 +398,7 @@
           do 
             if (lb>ub) exit
             lm = (lb+ub)/2
-            if (key==glb_lc(lm,1)) then 
+            if (key == glb_lc(lm,1)) then 
               tmp = lm
               exit
             else if (key<glb_lc(lm,1)) then 
@@ -451,7 +451,7 @@
             do 
               if (lb>ub) exit
               lm = (lb+ub)/2
-              if (key==glb_lc(lm,1)) then 
+              if (key == glb_lc(lm,1)) then 
                 tmp = lm
                 exit
               else if (key<glb_lc(lm,1)) then 
@@ -486,7 +486,7 @@
           do 
             if (lb>ub) exit
             lm = (lb+ub)/2
-            if (key==glb_lc(lm,1)) then 
+            if (key == glb_lc(lm,1)) then 
               tmp = lm
               exit
             else if (key<glb_lc(lm,1)) then 
@@ -523,12 +523,12 @@
 
     name='psi_sovrl_updr1'
     if (psb_get_errstatus() /= 0) return 
-    info = 0
+    info = psb_success_
     call psb_erractionsave(err_act)
     ictxt = psb_cd_get_context(desc_a)
     call psb_info(ictxt, me, np)
     if (np == -1) then
-      info = 2010
+      info = psb_err_blacs_error_
       call psb_errpush(info,name)
       goto 9999
     endif
@@ -558,7 +558,7 @@
 
     case default 
       ! wrong value for choice argument
-      info = 70
+      info = psb_err_iarg_invalid_value_
       call psb_errpush(info,name,i_err=(/3,update,0,0,0/))
       goto 9999
     end select
@@ -593,12 +593,12 @@
 
     name='psi_sovrl_updr2'
     if (psb_get_errstatus() /= 0) return 
-    info = 0
+    info = psb_success_
     call psb_erractionsave(err_act)
     ictxt = psb_cd_get_context(desc_a)
     call psb_info(ictxt, me, np)
     if (np == -1) then
-      info = 2010
+      info = psb_err_blacs_error_
       call psb_errpush(info,name)
       goto 9999
     endif
@@ -628,7 +628,7 @@
 
     case default 
       ! wrong value for choice argument
-      info = 70
+      info = psb_err_iarg_invalid_value_
       call psb_errpush(info,name,i_err=(/3,update,0,0,0/))
       goto 9999
     end select
@@ -662,12 +662,12 @@
 
     name='psi_dovrl_updr1'
     if (psb_get_errstatus() /= 0) return 
-    info = 0
+    info = psb_success_
     call psb_erractionsave(err_act)
     ictxt = psb_cd_get_context(desc_a)
     call psb_info(ictxt, me, np)
     if (np == -1) then
-      info = 2010
+      info = psb_err_blacs_error_
       call psb_errpush(info,name)
       goto 9999
     endif
@@ -697,7 +697,7 @@
 
     case default 
       ! wrong value for choice argument
-      info = 70
+      info = psb_err_iarg_invalid_value_
       call psb_errpush(info,name,i_err=(/3,update,0,0,0/))
       goto 9999
     end select
@@ -732,12 +732,12 @@
 
     name='psi_dovrl_updr2'
     if (psb_get_errstatus() /= 0) return 
-    info = 0
+    info = psb_success_
     call psb_erractionsave(err_act)
     ictxt = psb_cd_get_context(desc_a)
     call psb_info(ictxt, me, np)
     if (np == -1) then
-      info = 2010
+      info = psb_err_blacs_error_
       call psb_errpush(info,name)
       goto 9999
     endif
@@ -767,7 +767,7 @@
 
     case default 
       ! wrong value for choice argument
-      info = 70
+      info = psb_err_iarg_invalid_value_
       call psb_errpush(info,name,i_err=(/3,update,0,0,0/))
       goto 9999
     end select
@@ -801,12 +801,12 @@
 
     name='psi_covrl_updr1'
     if (psb_get_errstatus() /= 0) return 
-    info = 0
+    info = psb_success_
     call psb_erractionsave(err_act)
     ictxt = psb_cd_get_context(desc_a)
     call psb_info(ictxt, me, np)
     if (np == -1) then
-      info = 2010
+      info = psb_err_blacs_error_
       call psb_errpush(info,name)
       goto 9999
     endif
@@ -836,7 +836,7 @@
 
     case default 
       ! wrong value for choice argument
-      info = 70
+      info = psb_err_iarg_invalid_value_
       call psb_errpush(info,name,i_err=(/3,update,0,0,0/))
       goto 9999
     end select
@@ -871,12 +871,12 @@
 
     name='psi_covrl_updr2'
     if (psb_get_errstatus() /= 0) return 
-    info = 0
+    info = psb_success_
     call psb_erractionsave(err_act)
     ictxt = psb_cd_get_context(desc_a)
     call psb_info(ictxt, me, np)
     if (np == -1) then
-      info = 2010
+      info = psb_err_blacs_error_
       call psb_errpush(info,name)
       goto 9999
     endif
@@ -906,7 +906,7 @@
 
     case default 
       ! wrong value for choice argument
-      info = 70
+      info = psb_err_iarg_invalid_value_
       call psb_errpush(info,name,i_err=(/3,update,0,0,0/))
       goto 9999
     end select
@@ -940,12 +940,12 @@
 
     name='psi_zovrl_updr1'
     if (psb_get_errstatus() /= 0) return 
-    info = 0
+    info = psb_success_
     call psb_erractionsave(err_act)
     ictxt = psb_cd_get_context(desc_a)
     call psb_info(ictxt, me, np)
     if (np == -1) then
-      info = 2010
+      info = psb_err_blacs_error_
       call psb_errpush(info,name)
       goto 9999
     endif
@@ -975,7 +975,7 @@
 
     case default 
       ! wrong value for choice argument
-      info = 70
+      info = psb_err_iarg_invalid_value_
       call psb_errpush(info,name,i_err=(/3,update,0,0,0/))
       goto 9999
     end select
@@ -1010,12 +1010,12 @@
 
     name='psi_zovrl_updr2'
     if (psb_get_errstatus() /= 0) return 
-    info = 0
+    info = psb_success_
     call psb_erractionsave(err_act)
     ictxt = psb_cd_get_context(desc_a)
     call psb_info(ictxt, me, np)
     if (np == -1) then
-      info = 2010
+      info = psb_err_blacs_error_
       call psb_errpush(info,name)
       goto 9999
     endif
@@ -1045,7 +1045,7 @@
 
     case default 
       ! wrong value for choice argument
-      info = 70
+      info = psb_err_iarg_invalid_value_
       call psb_errpush(info,name,i_err=(/3,update,0,0,0/))
       goto 9999
     end select
@@ -1079,12 +1079,12 @@
 
     name='psi_iovrl_updr1'
     if (psb_get_errstatus() /= 0) return 
-    info = 0
+    info = psb_success_
     call psb_erractionsave(err_act)
     ictxt = psb_cd_get_context(desc_a)
     call psb_info(ictxt, me, np)
     if (np == -1) then
-      info = 2010
+      info = psb_err_blacs_error_
       call psb_errpush(info,name)
       goto 9999
     endif
@@ -1115,7 +1115,7 @@
 
     case default 
       ! wrong value for choice argument
-      info = 70
+      info = psb_err_iarg_invalid_value_
       call psb_errpush(info,name,i_err=(/3,update,0,0,0/))
       goto 9999
     end select
@@ -1150,12 +1150,12 @@
 
     name='psi_iovrl_updr2'
     if (psb_get_errstatus() /= 0) return 
-    info = 0
+    info = psb_success_
     call psb_erractionsave(err_act)
     ictxt = psb_cd_get_context(desc_a)
     call psb_info(ictxt, me, np)
     if (np == -1) then
-      info = 2010
+      info = psb_err_blacs_error_
       call psb_errpush(info,name)
       goto 9999
     endif
@@ -1186,7 +1186,7 @@
 
     case default 
       ! wrong value for choice argument
-      info = 70
+      info = psb_err_iarg_invalid_value_
       call psb_errpush(info,name,i_err=(/3,update,0,0,0/))
       goto 9999
     end select
@@ -1222,20 +1222,20 @@
 
     name='psi_sovrl_saver1'
     if (psb_get_errstatus() /= 0) return 
-    info = 0
+    info = psb_success_
     call psb_erractionsave(err_act)
     ictxt = psb_cd_get_context(desc_a)
     call psb_info(ictxt, me, np)
     if (np == -1) then
-      info = 2010
+      info = psb_err_blacs_error_
       call psb_errpush(info,name)
       goto 9999
     endif
 
     isz = size(desc_a%ovrlap_elem,1)
     call psb_realloc(isz,xs,info) 
-    if (info /= 0) then 
-      info = 4000
+    if (info /= psb_success_) then 
+      info = psb_err_alloc_dealloc_
       call psb_errpush(info,name)
       goto 9999
     endif
@@ -1274,12 +1274,12 @@
 
     name='psi_sovrl_restrr1'
     if (psb_get_errstatus() /= 0) return 
-    info = 0
+    info = psb_success_
     call psb_erractionsave(err_act)
     ictxt = psb_cd_get_context(desc_a)
     call psb_info(ictxt, me, np)
     if (np == -1) then
-      info = 2010
+      info = psb_err_blacs_error_
       call psb_errpush(info,name)
       goto 9999
     endif
@@ -1322,12 +1322,12 @@
 
     name='psi_sovrl_saver2'
     if (psb_get_errstatus() /= 0) return 
-    info = 0
+    info = psb_success_
     call psb_erractionsave(err_act)
     ictxt = psb_cd_get_context(desc_a)
     call psb_info(ictxt, me, np)
     if (np == -1) then
-      info = 2010
+      info = psb_err_blacs_error_
       call psb_errpush(info,name)
       goto 9999
     endif
@@ -1335,8 +1335,8 @@
     isz = size(desc_a%ovrlap_elem,1)
     nc  = size(x,2)
     call psb_realloc(isz,nc,xs,info) 
-    if (info /= 0) then 
-      info = 4000
+    if (info /= psb_success_) then 
+      info = psb_err_alloc_dealloc_
       call psb_errpush(info,name)
       goto 9999
     endif
@@ -1375,18 +1375,18 @@
 
     name='psi_sovrl_restrr2'
     if (psb_get_errstatus() /= 0) return 
-    info = 0
+    info = psb_success_
     call psb_erractionsave(err_act)
     ictxt = psb_cd_get_context(desc_a)
     call psb_info(ictxt, me, np)
     if (np == -1) then
-      info = 2010
+      info = psb_err_blacs_error_
       call psb_errpush(info,name)
       goto 9999
     endif
 
     if (size(x,2) /= size(xs,2)) then 
-      info = 4001
+      info = psb_err_internal_error_
       call psb_errpush(info,name, a_err='Mismacth columns X vs XS')
       goto 9999
     endif
@@ -1430,20 +1430,20 @@
 
     name='psi_dovrl_saver1'
     if (psb_get_errstatus() /= 0) return 
-    info = 0
+    info = psb_success_
     call psb_erractionsave(err_act)
     ictxt = psb_cd_get_context(desc_a)
     call psb_info(ictxt, me, np)
     if (np == -1) then
-      info = 2010
+      info = psb_err_blacs_error_
       call psb_errpush(info,name)
       goto 9999
     endif
 
     isz = size(desc_a%ovrlap_elem,1)
     call psb_realloc(isz,xs,info) 
-    if (info /= 0) then 
-      info = 4000
+    if (info /= psb_success_) then 
+      info = psb_err_alloc_dealloc_
       call psb_errpush(info,name)
       goto 9999
     endif
@@ -1482,12 +1482,12 @@
 
     name='psi_dovrl_restrr1'
     if (psb_get_errstatus() /= 0) return 
-    info = 0
+    info = psb_success_
     call psb_erractionsave(err_act)
     ictxt = psb_cd_get_context(desc_a)
     call psb_info(ictxt, me, np)
     if (np == -1) then
-      info = 2010
+      info = psb_err_blacs_error_
       call psb_errpush(info,name)
       goto 9999
     endif
@@ -1530,12 +1530,12 @@
 
     name='psi_dovrl_saver2'
     if (psb_get_errstatus() /= 0) return 
-    info = 0
+    info = psb_success_
     call psb_erractionsave(err_act)
     ictxt = psb_cd_get_context(desc_a)
     call psb_info(ictxt, me, np)
     if (np == -1) then
-      info = 2010
+      info = psb_err_blacs_error_
       call psb_errpush(info,name)
       goto 9999
     endif
@@ -1543,8 +1543,8 @@
     isz = size(desc_a%ovrlap_elem,1)
     nc  = size(x,2)
     call psb_realloc(isz,nc,xs,info) 
-    if (info /= 0) then 
-      info = 4000
+    if (info /= psb_success_) then 
+      info = psb_err_alloc_dealloc_
       call psb_errpush(info,name)
       goto 9999
     endif
@@ -1583,18 +1583,18 @@
 
     name='psi_dovrl_restrr2'
     if (psb_get_errstatus() /= 0) return 
-    info = 0
+    info = psb_success_
     call psb_erractionsave(err_act)
     ictxt = psb_cd_get_context(desc_a)
     call psb_info(ictxt, me, np)
     if (np == -1) then
-      info = 2010
+      info = psb_err_blacs_error_
       call psb_errpush(info,name)
       goto 9999
     endif
 
     if (size(x,2) /= size(xs,2)) then 
-      info = 4001
+      info = psb_err_internal_error_
       call psb_errpush(info,name, a_err='Mismacth columns X vs XS')
       goto 9999
     endif
@@ -1637,20 +1637,20 @@
 
     name='psi_covrl_saver1'
     if (psb_get_errstatus() /= 0) return 
-    info = 0
+    info = psb_success_
     call psb_erractionsave(err_act)
     ictxt = psb_cd_get_context(desc_a)
     call psb_info(ictxt, me, np)
     if (np == -1) then
-      info = 2010
+      info = psb_err_blacs_error_
       call psb_errpush(info,name)
       goto 9999
     endif
 
     isz = size(desc_a%ovrlap_elem,1)
     call psb_realloc(isz,xs,info) 
-    if (info /= 0) then 
-      info = 4000
+    if (info /= psb_success_) then 
+      info = psb_err_alloc_dealloc_
       call psb_errpush(info,name)
       goto 9999
     endif
@@ -1689,12 +1689,12 @@
 
     name='psi_covrl_restrr1'
     if (psb_get_errstatus() /= 0) return 
-    info = 0
+    info = psb_success_
     call psb_erractionsave(err_act)
     ictxt = psb_cd_get_context(desc_a)
     call psb_info(ictxt, me, np)
     if (np == -1) then
-      info = 2010
+      info = psb_err_blacs_error_
       call psb_errpush(info,name)
       goto 9999
     endif
@@ -1737,12 +1737,12 @@
 
     name='psi_covrl_saver2'
     if (psb_get_errstatus() /= 0) return 
-    info = 0
+    info = psb_success_
     call psb_erractionsave(err_act)
     ictxt = psb_cd_get_context(desc_a)
     call psb_info(ictxt, me, np)
     if (np == -1) then
-      info = 2010
+      info = psb_err_blacs_error_
       call psb_errpush(info,name)
       goto 9999
     endif
@@ -1750,8 +1750,8 @@
     isz = size(desc_a%ovrlap_elem,1)
     nc  = size(x,2)
     call psb_realloc(isz,nc,xs,info) 
-    if (info /= 0) then 
-      info = 4000
+    if (info /= psb_success_) then 
+      info = psb_err_alloc_dealloc_
       call psb_errpush(info,name)
       goto 9999
     endif
@@ -1790,18 +1790,18 @@
 
     name='psi_covrl_restrr2'
     if (psb_get_errstatus() /= 0) return 
-    info = 0
+    info = psb_success_
     call psb_erractionsave(err_act)
     ictxt = psb_cd_get_context(desc_a)
     call psb_info(ictxt, me, np)
     if (np == -1) then
-      info = 2010
+      info = psb_err_blacs_error_
       call psb_errpush(info,name)
       goto 9999
     endif
 
     if (size(x,2) /= size(xs,2)) then 
-      info = 4001
+      info = psb_err_internal_error_
       call psb_errpush(info,name, a_err='Mismacth columns X vs XS')
       goto 9999
     endif
@@ -1846,20 +1846,20 @@
 
     name='psi_zovrl_saver1'
     if (psb_get_errstatus() /= 0) return 
-    info = 0
+    info = psb_success_
     call psb_erractionsave(err_act)
     ictxt = psb_cd_get_context(desc_a)
     call psb_info(ictxt, me, np)
     if (np == -1) then
-      info = 2010
+      info = psb_err_blacs_error_
       call psb_errpush(info,name)
       goto 9999
     endif
 
     isz = size(desc_a%ovrlap_elem,1)
     call psb_realloc(isz,xs,info) 
-    if (info /= 0) then 
-      info = 4000
+    if (info /= psb_success_) then 
+      info = psb_err_alloc_dealloc_
       call psb_errpush(info,name)
       goto 9999
     endif
@@ -1898,12 +1898,12 @@
 
     name='psi_zovrl_restrr1'
     if (psb_get_errstatus() /= 0) return 
-    info = 0
+    info = psb_success_
     call psb_erractionsave(err_act)
     ictxt = psb_cd_get_context(desc_a)
     call psb_info(ictxt, me, np)
     if (np == -1) then
-      info = 2010
+      info = psb_err_blacs_error_
       call psb_errpush(info,name)
       goto 9999
     endif
@@ -1947,12 +1947,12 @@
 
     name='psi_zovrl_saver2'
     if (psb_get_errstatus() /= 0) return 
-    info = 0
+    info = psb_success_
     call psb_erractionsave(err_act)
     ictxt = psb_cd_get_context(desc_a)
     call psb_info(ictxt, me, np)
     if (np == -1) then
-      info = 2010
+      info = psb_err_blacs_error_
       call psb_errpush(info,name)
       goto 9999
     endif
@@ -1960,8 +1960,8 @@
     isz = size(desc_a%ovrlap_elem,1)
     nc  = size(x,2)
     call psb_realloc(isz,nc,xs,info) 
-    if (info /= 0) then 
-      info = 4000
+    if (info /= psb_success_) then 
+      info = psb_err_alloc_dealloc_
       call psb_errpush(info,name)
       goto 9999
     endif
@@ -2000,18 +2000,18 @@
 
     name='psi_zovrl_restrr2'
     if (psb_get_errstatus() /= 0) return 
-    info = 0
+    info = psb_success_
     call psb_erractionsave(err_act)
     ictxt = psb_cd_get_context(desc_a)
     call psb_info(ictxt, me, np)
     if (np == -1) then
-      info = 2010
+      info = psb_err_blacs_error_
       call psb_errpush(info,name)
       goto 9999
     endif
 
     if (size(x,2) /= size(xs,2)) then 
-      info = 4001
+      info = psb_err_internal_error_
       call psb_errpush(info,name, a_err='Mismacth columns X vs XS')
       goto 9999
     endif
@@ -2056,20 +2056,20 @@
 
     name='psi_iovrl_saver1'
     if (psb_get_errstatus() /= 0) return 
-    info = 0
+    info = psb_success_
     call psb_erractionsave(err_act)
     ictxt = psb_cd_get_context(desc_a)
     call psb_info(ictxt, me, np)
     if (np == -1) then
-      info = 2010
+      info = psb_err_blacs_error_
       call psb_errpush(info,name)
       goto 9999
     endif
 
     isz = size(desc_a%ovrlap_elem,1)
     call psb_realloc(isz,xs,info) 
-    if (info /= 0) then 
-      info = 4000
+    if (info /= psb_success_) then 
+      info = psb_err_alloc_dealloc_
       call psb_errpush(info,name)
       goto 9999
     endif
@@ -2108,12 +2108,12 @@
 
     name='psi_iovrl_restrr1'
     if (psb_get_errstatus() /= 0) return 
-    info = 0
+    info = psb_success_
     call psb_erractionsave(err_act)
     ictxt = psb_cd_get_context(desc_a)
     call psb_info(ictxt, me, np)
     if (np == -1) then
-      info = 2010
+      info = psb_err_blacs_error_
       call psb_errpush(info,name)
       goto 9999
     endif
@@ -2159,12 +2159,12 @@
 
     name='psi_iovrl_saver2'
     if (psb_get_errstatus() /= 0) return 
-    info = 0
+    info = psb_success_
     call psb_erractionsave(err_act)
     ictxt = psb_cd_get_context(desc_a)
     call psb_info(ictxt, me, np)
     if (np == -1) then
-      info = 2010
+      info = psb_err_blacs_error_
       call psb_errpush(info,name)
       goto 9999
     endif
@@ -2172,8 +2172,8 @@
     isz = size(desc_a%ovrlap_elem,1)
     nc  = size(x,2)
     call psb_realloc(isz,nc,xs,info) 
-    if (info /= 0) then 
-      info = 4000
+    if (info /= psb_success_) then 
+      info = psb_err_alloc_dealloc_
       call psb_errpush(info,name)
       goto 9999
     endif
@@ -2212,18 +2212,18 @@
 
     name='psi_iovrl_restrr2'
     if (psb_get_errstatus() /= 0) return 
-    info = 0
+    info = psb_success_
     call psb_erractionsave(err_act)
     ictxt = psb_cd_get_context(desc_a)
     call psb_info(ictxt, me, np)
     if (np == -1) then
-      info = 2010
+      info = psb_err_blacs_error_
       call psb_errpush(info,name)
       goto 9999
     endif
 
     if (size(x,2) /= size(xs,2)) then 
-      info = 4001
+      info = psb_err_internal_error_
       call psb_errpush(info,name, a_err='Mismacth columns X vs XS')
       goto 9999
     endif
@@ -2269,8 +2269,8 @@
     nov = size(ovrlap_elem,1)
     isz = 3*nov+1
     call psb_realloc(isz,mst_idx,info) 
-    if (info /= 0) then
-      call psb_errpush(4001,name,a_err='reallocate')
+    if (info /= psb_success_) then
+      call psb_errpush(psb_err_internal_error_,name,a_err='reallocate')
       goto 9999
     end if
     mst_idx = -1

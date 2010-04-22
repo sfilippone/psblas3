@@ -523,7 +523,7 @@ contains
     case(3024)
       write (0,'("Cases DESCRA(1:1)=G not yet implemented. ")') 
     case(3030)
-      write (0,'("Case ja/=ix or ia/=iy is not yet implemented.")')
+      write (0,'("Case ja /= ix or ia/=iy is not yet implemented.")')
     case(3040)
       write (0,'("Case ix /= 1 or iy /= 1 is not yet implemented.")')
     case(3050)

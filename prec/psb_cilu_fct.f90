@@ -50,7 +50,7 @@ subroutine psb_cilu_fct(a,l,u,d,info,blck)
   type(psb_c_sparse_mat), pointer  :: blck_
   character(len=20)   :: name, ch_err
   name='psb_ilu_fct'
-  info = 0
+  info = psb_success_
   call psb_erractionsave(err_act)
   !     .. Executable Statements ..
   !
@@ -59,8 +59,8 @@ subroutine psb_cilu_fct(a,l,u,d,info,blck)
     blck_ => blck
   else
     allocate(blck_,stat=info) 
-    if (info /= 0) then 
-      call psb_errpush(4010,name,a_err='Allocate')
+    if (info /= psb_success_) then 
+      call psb_errpush(psb_err_from_subroutine_,name,a_err='Allocate')
       goto 9999      
     end if
 
@@ -70,8 +70,8 @@ subroutine psb_cilu_fct(a,l,u,d,info,blck)
 
   call psb_cilu_fctint(m,a%get_nrows(),a,blck_%get_nrows(),blck_,&
        & d,l%val,l%ja,l%irp,u%val,u%ja,u%irp,l1,l2,info)
-  if(info /= 0) then
-     info=4010
+  if(info /= psb_success_) then
+     info=psb_err_from_subroutine_
      ch_err='psb_cilu_fctint'
      call psb_errpush(info,name,a_err=ch_err)
      goto 9999
@@ -92,8 +92,8 @@ subroutine psb_cilu_fct(a,l,u,d,info,blck)
     blck_ => null() 
   else
     call blck_%free()
-    if(info /= 0) then
-       info=4010
+    if(info /= psb_success_) then
+       info=psb_err_from_subroutine_
        ch_err='psb_sp_free'
        call psb_errpush(info,name,a_err=ch_err)
        goto 9999
@@ -131,11 +131,11 @@ contains
 
     name='psb_cilu_fctint'
     if(psb_get_errstatus() /= 0) return 
-    info=0
+    info=psb_success_
     call psb_erractionsave(err_act)
     call trw%allocate(0,0,1)
-    if(info /= 0) then
-      info=4010
+    if(info /= psb_success_) then
+      info=psb_err_from_subroutine_
       ch_err='psb_sp_all'
       call psb_errpush(info,name,a_err=ch_err)
       goto 9999
@@ -172,11 +172,11 @@ contains
 
       class default
 
-        if ((mod(i,nrb) == 1).or.(nrb==1)) then 
+        if ((mod(i,nrb) == 1).or.(nrb == 1)) then 
           irb = min(ma-i+1,nrb)
           call a%a%csget(i,i+irb-1,trw,info)
-          if(info /= 0) then
-            info=4010
+          if(info /= psb_success_) then
+            info=psb_err_from_subroutine_
             ch_err='a%csget'
             call psb_errpush(info,name,a_err=ch_err)
             goto 9999
@@ -271,7 +271,7 @@ contains
         !
         !     Pivot too small: unstable factorization
         !     
-        info = 2
+        info = psb_err_pivot_too_small_
         int_err(1) = i
         write(ch_err,'(g20.10)') abs(dia)
         call psb_errpush(info,name,i_err=int_err,a_err=ch_err)
@@ -310,12 +310,12 @@ contains
 
       class default
 
-        if ((mod(i,nrb) == 1).or.(nrb==1)) then 
+        if ((mod(i,nrb) == 1).or.(nrb == 1)) then 
           irb = min(ma-i+1,nrb)
           call b%a%csget(i-ma,i-ma+irb-1,trw,info)
           nz = trw%get_nzeros()
-          if(info /= 0) then
-            info=4010
+          if(info /= psb_success_) then
+            info=psb_err_from_subroutine_
             ch_err='a%csget'
             call psb_errpush(info,name,a_err=ch_err)
             goto 9999
@@ -409,7 +409,7 @@ contains
         !     
         int_err(1) = i
         write(ch_err,'(g20.10)') abs(dia)
-        info = 2
+        info = psb_err_pivot_too_small_
         call psb_errpush(info,name,i_err=int_err,a_err=ch_err)
         goto 9999
       else

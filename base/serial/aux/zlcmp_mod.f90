@@ -51,14 +51,14 @@ contains
     complex(psb_dpk_), intent(in) :: a,b
     logical :: zllt
     
-    zllt = (real(a)<real(b)).or.((real(a)==real(b)).and.(aimag(a)<aimag(b)))
+    zllt = (real(a)<real(b)).or.((real(a) == real(b)).and.(aimag(a)<aimag(b)))
   end function zllt
   function zlle(a,b)
     use psb_const_mod
     complex(psb_dpk_), intent(in) :: a,b
     logical :: zlle
     
-    zlle = (real(a)<real(b)).or.((real(a)==real(b)).and.(aimag(a)<=aimag(b)))
+    zlle = (real(a)<real(b)).or.((real(a) == real(b)).and.(aimag(a)<=aimag(b)))
   end function zlle
 
   function zlgt(a,b)
@@ -66,14 +66,14 @@ contains
     complex(psb_dpk_), intent(in) :: a,b
     logical :: zlgt
     
-    zlgt = (real(a)>real(b)).or.((real(a)==real(b)).and.(aimag(a)>aimag(b)))
+    zlgt = (real(a)>real(b)).or.((real(a) == real(b)).and.(aimag(a)>aimag(b)))
   end function zlgt
   function zlge(a,b)
     use psb_const_mod
     complex(psb_dpk_), intent(in) :: a,b
     logical :: zlge
     
-    zlge = (real(a)>real(b)).or.((real(a)==real(b)).and.(aimag(a)>=aimag(b)))
+    zlge = (real(a)>real(b)).or.((real(a) == real(b)).and.(aimag(a)>=aimag(b)))
   end function zlge
 
 end module zlcmp_mod

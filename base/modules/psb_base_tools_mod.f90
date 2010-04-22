@@ -212,7 +212,7 @@ contains
     integer :: info
 
     call psb_owned_index(res,idx,desc,info)
-    if (info /= 0) res=.false.
+    if (info /= psb_success_) res=.false.
     psb_is_owned = res
   end function psb_is_owned
 
@@ -226,7 +226,7 @@ contains
     integer :: info
 
     call psb_local_index(res,idx,desc,info)
-    if (info /= 0) res=.false.
+    if (info /= psb_success_) res=.false.
     psb_is_local = res
   end function psb_is_local
 
@@ -256,7 +256,7 @@ contains
 
     allocate(lx(size(idx)),stat=info)
     res=.false.
-    if (info /= 0) return
+    if (info /= psb_success_) return
     call psb_glob_to_loc(idx,lx,desc,info,iact='I',owned=.true.)
 
     res = (lx>0)
@@ -288,7 +288,7 @@ contains
 
     allocate(lx(size(idx)),stat=info)
     res=.false.
-    if (info /= 0) return
+    if (info /= psb_success_) return
     call psb_glob_to_loc(idx,lx,desc,info,iact='I',owned=.false.)
 
     res = (lx>0)
@@ -533,7 +533,7 @@ subroutine psb_cdall(ictxt, desc, info,mg,ng,parts,vg,vl,flag,nl,repl, globalche
 
 
   if (psb_get_errstatus() /= 0) return 
-  info=0
+  info=psb_success_
   name = 'psb_cdall'
   call psb_erractionsave(err_act)
 
@@ -541,7 +541,7 @@ subroutine psb_cdall(ictxt, desc, info,mg,ng,parts,vg,vl,flag,nl,repl, globalche
 
   if (count((/ present(vg),present(vl),&
        &  present(parts),present(nl), present(repl) /)) /= 1) then 
-    info=581
+    info=psb_err_no_optional_arg_
     call psb_errpush(info,name,a_err=" vg, vl, parts, nl, repl")
     goto 999 
   endif
@@ -550,7 +550,7 @@ subroutine psb_cdall(ictxt, desc, info,mg,ng,parts,vg,vl,flag,nl,repl, globalche
 
   if (present(parts)) then 
     if (.not.present(mg)) then 
-      info=581
+      info=psb_err_no_optional_arg_
       call psb_errpush(info,name)
       goto 999 
     end if
@@ -563,12 +563,12 @@ subroutine psb_cdall(ictxt, desc, info,mg,ng,parts,vg,vl,flag,nl,repl, globalche
 
   else if (present(repl)) then 
     if (.not.present(mg)) then 
-      info=581
+      info=psb_err_no_optional_arg_
       call psb_errpush(info,name)
       goto 999 
     end if
     if (.not.repl) then 
-      info=581
+      info=psb_err_no_optional_arg_
       call psb_errpush(info,name)
       goto 999 
     end if
@@ -587,8 +587,8 @@ subroutine psb_cdall(ictxt, desc, info,mg,ng,parts,vg,vl,flag,nl,repl, globalche
 
   else if (present(nl)) then 
     allocate(itmpsz(0:np-1),stat=info)
-    if (info /= 0) then 
-      info = 4000 
+    if (info /= psb_success_) then 
+      info = psb_err_alloc_dealloc_ 
       call psb_errpush(info,name)
       goto 999
     endif
@@ -604,7 +604,7 @@ subroutine psb_cdall(ictxt, desc, info,mg,ng,parts,vg,vl,flag,nl,repl, globalche
 
   endif
 
-  if (info /= 0) goto 999
+  if (info /= psb_success_) goto 999
 
   call psb_erractionrestore(err_act)
   return

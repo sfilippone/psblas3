@@ -67,7 +67,7 @@ contains
     lp = iaux(0)
     k  = 1
     do 
-      if ((lp==0).or.(k>n)) exit
+      if ((lp == 0).or.(k>n)) exit
       do 
         if (lp >= k) exit
         lp = iaux(lp)
@@ -96,7 +96,7 @@ contains
     lp = iaux(0)
     k  = 1
     do 
-      if ((lp==0).or.(k>n)) exit
+      if ((lp == 0).or.(k>n)) exit
       do 
         if (lp >= k) exit
         lp = iaux(lp)
@@ -124,7 +124,7 @@ contains
     lp = iaux(0)
     k  = 1
     do 
-      if ((lp==0).or.(k>n)) exit
+      if ((lp == 0).or.(k>n)) exit
       do 
         if (lp >= k) exit
         lp = iaux(lp)
@@ -154,7 +154,7 @@ contains
     lp = iaux(0)
     k  = 1
     do 
-      if ((lp==0).or.(k>n)) exit
+      if ((lp == 0).or.(k>n)) exit
       do 
         if (lp >= k) exit
         lp = iaux(lp)
@@ -182,7 +182,7 @@ contains
     lp = iaux(0)
     k  = 1
     do 
-      if ((lp==0).or.(k>n)) exit
+      if ((lp == 0).or.(k>n)) exit
       do 
         if (lp >= k) exit
         lp = iaux(lp)
@@ -212,7 +212,7 @@ contains
     lp = iaux(0)
     k  = 1
     do 
-      if ((lp==0).or.(k>n)) exit
+      if ((lp == 0).or.(k>n)) exit
       do 
         if (lp >= k) exit
         lp = iaux(lp)
@@ -246,7 +246,7 @@ contains
     lp = iaux(0)
     k  = 1
     do 
-      if ((lp==0).or.(k>n)) exit
+      if ((lp == 0).or.(k>n)) exit
       do 
         if (lp >= k) exit
         lp = iaux(lp)
@@ -278,7 +278,7 @@ contains
     lp = iaux(0)
     k  = 1
     do 
-      if ((lp==0).or.(k>n)) exit
+      if ((lp == 0).or.(k>n)) exit
       do 
         if (lp >= k) exit
         lp = iaux(lp)
@@ -312,7 +312,7 @@ contains
     lp = iaux(0)
     k  = 1
     do 
-      if ((lp==0).or.(k>n)) exit
+      if ((lp == 0).or.(k>n)) exit
       do 
         if (lp >= k) exit
         lp = iaux(lp)
@@ -344,7 +344,7 @@ contains
     lp = iaux(0)
     k  = 1
     do 
-      if ((lp==0).or.(k>n)) exit
+      if ((lp == 0).or.(k>n)) exit
       do 
         if (lp >= k) exit
         lp = iaux(lp)
@@ -378,7 +378,7 @@ contains
     lp = iaux(0)
     k  = 1
     do 
-      if ((lp==0).or.(k>n)) exit
+      if ((lp == 0).or.(k>n)) exit
       do 
         if (lp >= k) exit
         lp = iaux(lp)
@@ -414,7 +414,7 @@ contains
     lp = iaux(0)
     k  = 1
     do 
-      if ((lp==0).or.(k>n)) exit
+      if ((lp == 0).or.(k>n)) exit
       do 
         if (lp >= k) exit
         lp = iaux(lp)
@@ -450,7 +450,7 @@ contains
     lp = iaux(0)
     k  = 1
     do 
-      if ((lp==0).or.(k>n)) exit
+      if ((lp == 0).or.(k>n)) exit
       do 
         if (lp >= k) exit
         lp = iaux(lp)
@@ -486,7 +486,7 @@ contains
     lp = iaux(0)
     k  = 1
     do 
-      if ((lp==0).or.(k>n)) exit
+      if ((lp == 0).or.(k>n)) exit
       do 
         if (lp >= k) exit
         lp = iaux(lp)
@@ -523,7 +523,7 @@ contains
     lp = iaux(0)
     k  = 1
     do 
-      if ((lp==0).or.(k>n)) exit
+      if ((lp == 0).or.(k>n)) exit
       do 
         if (lp >= k) exit
         lp = iaux(lp)
@@ -562,7 +562,7 @@ contains
     lp = iaux(0)
     k  = 1
     do 
-      if ((lp==0).or.(k>n)) exit
+      if ((lp == 0).or.(k>n)) exit
       do 
         if (lp >= k) exit
         lp = iaux(lp)
@@ -601,7 +601,7 @@ contains
     lp = iaux(0)
     k  = 1
     do 
-      if ((lp==0).or.(k>n)) exit
+      if ((lp == 0).or.(k>n)) exit
       do 
         if (lp >= k) exit
         lp = iaux(lp)
@@ -640,7 +640,7 @@ contains
     lp = iaux(0)
     k  = 1
     do 
-      if ((lp==0).or.(k>n)) exit
+      if ((lp == 0).or.(k>n)) exit
       do 
         if (lp >= k) exit
         lp = iaux(lp)

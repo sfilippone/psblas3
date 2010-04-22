@@ -14,12 +14,12 @@ module psb_base_mat_mod
     integer, allocatable :: aux(:)
   contains 
 
-    ! ====================================
+    ! == = =================================
     !
     ! Getters 
     !
     !
-    ! ====================================
+    ! == = =================================
     procedure, pass(a) :: get_nrows => psb_base_get_nrows
     procedure, pass(a) :: get_ncols => psb_base_get_ncols
     procedure, pass(a) :: get_nzeros => psb_base_get_nzeros
@@ -39,11 +39,11 @@ module psb_base_mat_mod
     procedure, pass(a) :: is_triangle => psb_base_is_triangle
     procedure, pass(a) :: is_unit => psb_base_is_unit
     
-    ! ====================================
+    ! == = =================================
     !
     ! Setters 
     !
-    ! ====================================
+    ! == = =================================
     procedure, pass(a) :: set_nrows => psb_base_set_nrows
     procedure, pass(a) :: set_ncols => psb_base_set_ncols
     procedure, pass(a) :: set_dupl => psb_base_set_dupl
@@ -60,11 +60,11 @@ module psb_base_mat_mod
     procedure, pass(a) :: set_aux => psb_base_set_aux
 
 
-    ! ====================================
+    ! == = =================================
     !
     ! Data management
     !
-    ! ====================================  
+    ! == = =================================  
     procedure, pass(a) :: get_neigh => psb_base_get_neigh
     procedure, pass(a) :: free => psb_base_free
     procedure, pass(a) :: trim => psb_base_trim

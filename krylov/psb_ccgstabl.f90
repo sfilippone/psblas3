@@ -138,7 +138,7 @@ Subroutine psb_ccgstabl(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,irst,is
   character(len=20)            :: name
   character(len=*), parameter  :: methdname='BiCGStab(L)'
 
-  info = 0
+  info = psb_success_
   name = 'psb_ccgstabl'
   call psb_erractionsave(err_act)
   debug_unit  = psb_get_debug_unit()
@@ -184,7 +184,7 @@ Subroutine psb_ccgstabl(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,irst,is
          & ' not present: irst: ',irst,nl
   endif
   if (nl <=0 ) then 
-    info=5001
+    info=psb_err_invalid_istop_
     int_err(1)=nl
     err=info
     call psb_errpush(info,name,i_err=int_err)
@@ -192,9 +192,9 @@ Subroutine psb_ccgstabl(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,irst,is
   endif
 
   call psb_chkvect(mglob,1,size(x,1),1,1,desc_a,info)
-  if (info == 0) call psb_chkvect(mglob,1,size(b,1),1,1,desc_a,info)
-  if (info /= 0) then
-    info=4010    
+  if (info == psb_success_) call psb_chkvect(mglob,1,size(b,1),1,1,desc_a,info)
+  if (info /= psb_success_) then
+    info=psb_err_from_subroutine_    
     call psb_errpush(info,name,a_err='psb_chkvect on X/B')
     goto 9999
   end if
@@ -203,19 +203,19 @@ Subroutine psb_ccgstabl(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,irst,is
   allocate(aux(naux),gamma(0:nl),gamma1(nl),&
        &gamma2(nl),taum(nl,nl),sigma(nl), stat=info)
 
-  if (info /= 0) then 
-     info=4000
+  if (info /= psb_success_) then 
+     info=psb_err_alloc_dealloc_
      call psb_errpush(info,name)
      goto 9999
   end if
-  if (info == 0) Call psb_geall(wwrk,desc_a,info,n=10)
-  if (info == 0) Call psb_geall(uh,desc_a,info,n=nl+1,lb=0)
-  if (info == 0) Call psb_geall(rh,desc_a,info,n=nl+1,lb=0)
-  if (info == 0) Call psb_geasb(wwrk,desc_a,info)  
-  if (info == 0) Call psb_geasb(uh,desc_a,info)  
-  if (info == 0) Call psb_geasb(rh,desc_a,info)  
-  if (info /= 0) then 
-     info=4011 
+  if (info == psb_success_) Call psb_geall(wwrk,desc_a,info,n=psb_err_iarg_neg_)
+  if (info == psb_success_) Call psb_geall(uh,desc_a,info,n=nl+1,lb=0)
+  if (info == psb_success_) Call psb_geall(rh,desc_a,info,n=nl+1,lb=0)
+  if (info == psb_success_) Call psb_geasb(wwrk,desc_a,info)  
+  if (info == psb_success_) Call psb_geasb(uh,desc_a,info)  
+  if (info == psb_success_) Call psb_geasb(rh,desc_a,info)  
+  if (info /= psb_success_) then 
+     info=psb_err_from_subroutine_non_ 
      call psb_errpush(info,name)
      goto 9999
   end if
@@ -236,8 +236,8 @@ Subroutine psb_ccgstabl(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,irst,is
 
 
   call psb_init_conv(methdname,istop_,itrace_,itmax_,a,b,eps,desc_a,stopdat,info)
-  if (info /= 0) Then 
-     call psb_errpush(4011,name)
+  if (info /= psb_success_) Then 
+     call psb_errpush(psb_err_from_subroutine_non_,name)
      goto 9999
   End If
 
@@ -252,15 +252,15 @@ Subroutine psb_ccgstabl(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,irst,is
 
     it = 0      
     call psb_geaxpby(cone,b,czero,r,desc_a,info)
-    if (info == 0) call psb_spmm(-cone,a,x,cone,r,desc_a,info,work=aux)
+    if (info == psb_success_) call psb_spmm(-cone,a,x,cone,r,desc_a,info,work=aux)
     
-    if (info == 0) call prec%apply(r,desc_a,info)
+    if (info == psb_success_) call prec%apply(r,desc_a,info)
 
-    if (info == 0) call psb_geaxpby(cone,r,czero,rt0,desc_a,info)
-    if (info == 0) call psb_geaxpby(cone,r,czero,rh(:,0),desc_a,info)
-    if (info == 0) call psb_geaxpby(czero,r,czero,uh(:,0),desc_a,info)
-    if (info /= 0) then 
-       info=4011 
+    if (info == psb_success_) call psb_geaxpby(cone,r,czero,rt0,desc_a,info)
+    if (info == psb_success_) call psb_geaxpby(cone,r,czero,rh(:,0),desc_a,info)
+    if (info == psb_success_) call psb_geaxpby(czero,r,czero,uh(:,0),desc_a,info)
+    if (info /= psb_success_) then 
+       info=psb_err_from_subroutine_non_ 
        call psb_errpush(info,name)
        goto 9999
     end if
@@ -274,8 +274,8 @@ Subroutine psb_ccgstabl(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,irst,is
          & ' on entry to amax: b: ',Size(b)
 
     if (psb_check_conv(methdname,itx,x,r,desc_a,stopdat,info)) exit restart
-    if (info /= 0) Then 
-      call psb_errpush(4011,name)
+    if (info /= psb_success_) Then 
+      call psb_errpush(psb_err_from_subroutine_non_,name)
       goto 9999
     End If
     
@@ -294,7 +294,7 @@ Subroutine psb_ccgstabl(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,irst,is
 
         rho_old = rho
         rho = psb_gedot(rh(:,j),rt0,desc_a,info)
-        if (rho==czero) then
+        if (rho == czero) then
           if (debug_level >= psb_debug_ext_) &
                & write(debug_unit,*) me,' ',trim(name),&
                & ' bi-cgstab iteration breakdown r',rho
@@ -310,7 +310,7 @@ Subroutine psb_ccgstabl(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,irst,is
 
         gamma(j) = psb_gedot(uh(:,j+1),rt0,desc_a,info)
 
-        if (gamma(j)==czero) then
+        if (gamma(j) == czero) then
           if (debug_level >= psb_debug_ext_) &
                & write(debug_unit,*) me,' ',trim(name),&
                & ' bi-cgstab iteration breakdown s2',gamma(j)
@@ -372,8 +372,8 @@ Subroutine psb_ccgstabl(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,irst,is
       enddo
       
       if (psb_check_conv(methdname,itx,x,rh(:,0),desc_a,stopdat,info)) exit restart
-      if (info /= 0) Then 
-        call psb_errpush(4011,name)
+      if (info /= psb_success_) Then 
+        call psb_errpush(psb_err_from_subroutine_non_,name)
         goto 9999
       End If
       
@@ -387,10 +387,10 @@ Subroutine psb_ccgstabl(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,irst,is
   end if
 
   deallocate(aux,stat=info)
-  if (info == 0) call psb_gefree(wwrk,desc_a,info)
-  if (info == 0) call psb_gefree(uh,desc_a,info)
-  if (info == 0) call psb_gefree(rh,desc_a,info)
-  if (info/=0) then
+  if (info == psb_success_) call psb_gefree(wwrk,desc_a,info)
+  if (info == psb_success_) call psb_gefree(uh,desc_a,info)
+  if (info == psb_success_) call psb_gefree(rh,desc_a,info)
+  if (info /= psb_success_) then
      call psb_errpush(info,name)
      goto 9999
   end if

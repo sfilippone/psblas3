@@ -114,7 +114,7 @@ contains
       call psb_bcast(ictxt,n,root=root)
 
       allocate(graph_vect(n),stat=info)
-      if (info /= 0) then
+      if (info /= psb_success_) then
         write(0,*) 'Fatal error in DISTR_MTPART: memory allocation ',&
              & ' failure.'
         return
@@ -223,7 +223,7 @@ contains
     
     allocate(graph_vect(n),stat=info)
     
-    if (info /= 0) then
+    if (info /= psb_success_) then
        write(0,*) 'Fatal error in BUILD_MTPART: memory allocation ',&
 	    & ' failure.'
        return

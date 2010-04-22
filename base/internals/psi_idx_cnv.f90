@@ -65,7 +65,7 @@ subroutine psi_idx_cnv1(nv,idxin,desc,info,mask,owned)
   character(len=20)      :: name
   logical                :: owned_
 
-  info = 0
+  info = psb_success_
   name = 'psb_idx_cnv'
   call psb_erractionsave(err_act)
 
@@ -78,7 +78,7 @@ subroutine psi_idx_cnv1(nv,idxin,desc,info,mask,owned)
   call psb_info(ictxt, me, np)
 
   if (.not.psb_is_ok_desc(desc)) then 
-    info = 3110
+    info = psb_err_input_matrix_unassembled_
     call psb_errpush(info,name)
     goto 9999
   endif
@@ -176,7 +176,7 @@ subroutine psi_idx_cnv1(nv,idxin,desc,info,mask,owned)
       ! hence psi_inner_cnv does the hashing and binary search.
       !
       if (.not.allocated(desc%idxmap%hashv)) then 
-        info = 4001
+        info = psb_err_internal_error_
         call psb_errpush(info,name,a_err='Invalid hashv into inner_cnv')
       end if
       call psi_inner_cnv(nv,idxin,desc%idxmap%hashvmask,desc%idxmap%hashv,desc%idxmap%glb_lc,mask=mask)
@@ -313,7 +313,7 @@ subroutine psi_idx_cnv2(nv,idxin,idxout,desc,info,mask,owned)
   logical, pointer       :: mask_(:)
   logical                :: owned_
 
-  info = 0
+  info = psb_success_
   name = 'psb_idx_cnv'
   call psb_erractionsave(err_act)
 
@@ -326,7 +326,7 @@ subroutine psi_idx_cnv2(nv,idxin,idxout,desc,info,mask,owned)
   call psb_info(ictxt, me, np)
 
   if (.not.psb_is_ok_desc(desc)) then 
-    info = 3110
+    info = psb_err_input_matrix_unassembled_
     call psb_errpush(info,name)
     goto 9999
   endif

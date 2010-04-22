@@ -33,14 +33,14 @@ C
      +   DIM_LIST,ELEM_SEARCHED)
 
 C    PURPOSE:
-C    =======
+C    == = ====
 C
 C    If ELEM_SEARCHED exist in the list OVR_ELEM returns its position in
 C    the list, else returns -1
 C
 C
 C     INPUT
-C     ======
+C     == = ===
 C     OVRLAP_ELEMENT_D.: Contains for all overlap points belonging to 
 C                        the current process:
 C                          1. overlap point index

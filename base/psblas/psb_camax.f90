@@ -66,7 +66,7 @@ function psb_camax(x,desc_a, info, jx)
 
   name='psb_camax'
   if(psb_get_errstatus() /= 0) return 
-  info=0
+  info=psb_success_
   call psb_erractionsave(err_act)
 
   amax=0.d0
@@ -75,7 +75,7 @@ function psb_camax(x,desc_a, info, jx)
 
   call psb_info(ictxt, me, np)
   if (np == -1) then
-    info = 2010
+    info = psb_err_blacs_error_
     call psb_errpush(info,name)
     goto 9999 
   endif
@@ -90,15 +90,15 @@ function psb_camax(x,desc_a, info, jx)
   m = psb_cd_get_global_rows(desc_a)
 
   call psb_chkvect(m,1,size(x,1),ix,ijx,desc_a,info,iix,jjx)
-  if(info /= 0) then
-     info=4010
+  if(info /= psb_success_) then
+     info=psb_err_from_subroutine_
      ch_err='psb_chkvect'
      call psb_errpush(info,name,a_err=ch_err)
      goto 9999
   end if
 
   if (iix /= 1) then
-     info=3040
+     info=psb_err_ix_n1_iy_n1_unsupported_
      call psb_errpush(info,name)
      goto 9999
   end if
@@ -196,7 +196,7 @@ function psb_camaxv (x,desc_a, info)
 
   name='psb_camaxv'
   if(psb_get_errstatus() /= 0) return 
-  info=0
+  info=psb_success_
   call psb_erractionsave(err_act)
 
   amax=0.d0
@@ -205,7 +205,7 @@ function psb_camaxv (x,desc_a, info)
 
   call psb_info(ictxt, me, np)
   if (np == -1) then
-    info = 2010
+    info = psb_err_blacs_error_
     call psb_errpush(info,name)
     goto 9999
   endif
@@ -216,15 +216,15 @@ function psb_camaxv (x,desc_a, info)
   m = psb_cd_get_global_rows(desc_a)
 
   call psb_chkvect(m,1,size(x,1),ix,jx,desc_a,info,iix,jjx)
-  if(info /= 0) then
-     info=4010
+  if(info /= psb_success_) then
+     info=psb_err_from_subroutine_
      ch_err='psb_chkvect'
      call psb_errpush(info,name,a_err=ch_err)
      goto 9999
   end if
 
   if (iix /= 1) then
-     info=3040
+     info=psb_err_ix_n1_iy_n1_unsupported_
      call psb_errpush(info,name)
      goto 9999
   end if
@@ -324,7 +324,7 @@ subroutine psb_camaxvs(res,x,desc_a, info)
 
   name='psb_camaxvs'
   if(psb_get_errstatus() /= 0) return 
-  info=0
+  info=psb_success_
   call psb_erractionsave(err_act)
 
   amax=0.d0
@@ -333,7 +333,7 @@ subroutine psb_camaxvs(res,x,desc_a, info)
 
   call psb_info(ictxt, me, np)
   if (np == -1) then
-    info = 2010
+    info = psb_err_blacs_error_
     call psb_errpush(info,name)
     goto 9999
   endif
@@ -343,15 +343,15 @@ subroutine psb_camaxvs(res,x,desc_a, info)
 
   m = psb_cd_get_global_rows(desc_a)
   call psb_chkvect(m,1,size(x,1),ix,ijx,desc_a,info,iix,jjx)
-  if(info /= 0) then
-     info=4010
+  if(info /= psb_success_) then
+     info=psb_err_from_subroutine_
      ch_err='psb_chkvect'
      call psb_errpush(info,name,a_err=ch_err)
      goto 9999
   end if
 
   if (iix /= 1) then
-     info=3040
+     info=psb_err_ix_n1_iy_n1_unsupported_
      call psb_errpush(info,name)
      goto 9999
   end if
@@ -450,7 +450,7 @@ subroutine psb_cmamaxs(res,x,desc_a, info,jx)
 
   name='psb_cmamaxs'
   if (psb_get_errstatus() /= 0) return 
-  info=0
+  info=psb_success_
   call psb_erractionsave(err_act)
 
   amax=0.d0
@@ -459,7 +459,7 @@ subroutine psb_cmamaxs(res,x,desc_a, info,jx)
 
   call psb_info(ictxt, me, np)
   if (np == -1) then
-    info = 2010
+    info = psb_err_blacs_error_
     call psb_errpush(info,name)
     goto 9999
   endif
@@ -475,15 +475,15 @@ subroutine psb_cmamaxs(res,x,desc_a, info,jx)
   k  = min(size(x,2),size(res,1))
 
   call psb_chkvect(m,1,size(x,1),ix,ijx,desc_a,info,iix,jjx)
-  if(info /= 0) then
-     info=4010
+  if(info /= psb_success_) then
+     info=psb_err_from_subroutine_
      ch_err='psb_chkvect'
      call psb_errpush(info,name,a_err=ch_err)
      goto 9999
   end if
 
   if (iix /= 1) then
-     info=3040
+     info=psb_err_ix_n1_iy_n1_unsupported_
      call psb_errpush(info,name)
      goto 9999
   end if

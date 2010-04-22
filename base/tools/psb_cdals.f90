@@ -62,7 +62,7 @@ subroutine psb_cdals(m, n, parts, ictxt, desc, info)
   character(len=20)    :: name
 
   if(psb_get_errstatus() /= 0) return 
-  info=0
+  info=psb_success_
   err=0
   name = 'psb_cdall'
   call psb_erractionsave(err_act)
@@ -77,14 +77,14 @@ subroutine psb_cdals(m, n, parts, ictxt, desc, info)
 
   !... check m and n parameters....
   if (m < 1) then
-    info = 10
+    info = psb_err_iarg_neg_
     err=info
     int_err(1) = 1
     int_err(2) = m
     call psb_errpush(err,name,int_err)
     goto 9999
   else if (n < 1) then
-    info = 10
+    info = psb_err_iarg_neg_
     err=info
     int_err(1) = 2
     int_err(2) = n
@@ -125,20 +125,20 @@ subroutine psb_cdals(m, n, parts, ictxt, desc, info)
   if (psb_cd_choose_large_state(ictxt,m)) then 
     allocate(desc%matrix_data(psb_mdata_size_),&
          & temp_ovrlap(max(1,2*loc_row)),prc_v(np),stat=info)
-    if (info == 0) then 
+    if (info == psb_success_) then 
       desc%matrix_data(:) = 0
       desc%idxmap%state = psb_desc_large_
     end if
   else
     allocate(desc%idxmap%glob_to_loc(m),desc%matrix_data(psb_mdata_size_),&
          & temp_ovrlap(max(1,2*loc_row)),prc_v(np),stat=info)
-    if (info == 0) then 
+    if (info == psb_success_) then 
       desc%matrix_data(:) = 0
       desc%idxmap%state = psb_desc_normal_
     end if
   end if
-  if (info /= 0) then     
-    info=4025
+  if (info /= psb_success_) then     
+    info=psb_err_alloc_request_
     err=info
     int_err(1)=2*m+psb_mdata_size_+np
     call psb_errpush(err,name,int_err,a_err='integer')
@@ -173,8 +173,8 @@ subroutine psb_cdals(m, n, parts, ictxt, desc, info)
     loc_col = min(2*loc_col,m)
     allocate(desc%idxmap%loc_to_glob(loc_col), desc%lprm(1),&
          & stat=info)  
-    if (info /= 0) then
-      info=4025
+    if (info /= psb_success_) then
+      info=psb_err_alloc_request_
       int_err(1)=loc_col
       call psb_errpush(info,name,i_err=int_err,a_err='integer')
       goto 9999
@@ -185,10 +185,10 @@ subroutine psb_cdals(m, n, parts, ictxt, desc, info)
     desc%idxmap%loc_to_glob(:) = -1
     k = 0
     do i=1,m
-      if (info == 0) then
+      if (info == psb_success_) then
         call parts(i,m,np,prc_v,nprocs)
         if (nprocs > np) then
-          info=570
+          info=psb_err_partfunc_toomuchprocs_
           int_err(1)=3
           int_err(2)=np
           int_err(3)=nprocs
@@ -197,7 +197,7 @@ subroutine psb_cdals(m, n, parts, ictxt, desc, info)
           call psb_errpush(err,name,int_err)
           goto 9999
         else if (nprocs <= 0) then
-          info=575
+          info=psb_err_partfunc_toofewprocs_
           int_err(1)=3
           int_err(2)=nprocs
           int_err(3)=i
@@ -207,7 +207,7 @@ subroutine psb_cdals(m, n, parts, ictxt, desc, info)
         else
           do j=1,nprocs
             if ((prc_v(j) > np-1).or.(prc_v(j) < 0)) then
-              info=580
+              info=psb_err_partfunc_wrong_pid_
               int_err(1)=3
               int_err(2)=prc_v(j)
               int_err(3)=i
@@ -229,16 +229,16 @@ subroutine psb_cdals(m, n, parts, ictxt, desc, info)
             ! this point belongs to me
             k = k + 1 
             call psb_ensure_size((k+1),desc%idxmap%loc_to_glob,info,pad=-1)
-            if (info /= 0) then
-              info=4010
+            if (info /= psb_success_) then
+              info=psb_err_from_subroutine_
               call psb_errpush(info,name,a_err='psb_ensure_size')
               goto 9999
             end if
             desc%idxmap%loc_to_glob(k) = i
             if (nprocs > 1)  then
               call psb_ensure_size((itmpov+3+nprocs),temp_ovrlap,info,pad=-1)
-              if (info /= 0) then
-                info=4010
+              if (info /= psb_success_) then
+                info=psb_err_from_subroutine_
                 call psb_errpush(info,name,a_err='psb_ensure_size')
                 goto 9999
               end if
@@ -253,8 +253,8 @@ subroutine psb_cdals(m, n, parts, ictxt, desc, info)
         end if
       end if
     enddo
-    if (info /= 0) then 
-      info=4000
+    if (info /= psb_success_) then 
+      info=psb_err_alloc_dealloc_
       call psb_errpush(info,name)
       goto 9999
     endif
@@ -273,10 +273,10 @@ subroutine psb_cdals(m, n, parts, ictxt, desc, info)
     !
 
     do i=1,m
-      if (info == 0) then
+      if (info == psb_success_) then
         call parts(i,m,np,prc_v,nprocs)
         if (nprocs > np) then
-          info=570
+          info=psb_err_partfunc_toomuchprocs_
           int_err(1)=3
           int_err(2)=np
           int_err(3)=nprocs
@@ -285,7 +285,7 @@ subroutine psb_cdals(m, n, parts, ictxt, desc, info)
           call psb_errpush(err,name,int_err)
           goto 9999
         else if (nprocs <= 0) then
-          info=575
+          info=psb_err_partfunc_toofewprocs_
           int_err(1)=3
           int_err(2)=nprocs
           int_err(3)=i
@@ -295,7 +295,7 @@ subroutine psb_cdals(m, n, parts, ictxt, desc, info)
         else
           do j=1,nprocs
             if ((prc_v(j) > np-1).or.(prc_v(j) < 0)) then
-              info=580
+              info=psb_err_partfunc_wrong_pid_
               int_err(1)=3
               int_err(2)=prc_v(j)
               int_err(3)=i
@@ -319,8 +319,8 @@ subroutine psb_cdals(m, n, parts, ictxt, desc, info)
             desc%idxmap%glob_to_loc(i) = counter
             if (nprocs > 1)  then
               call psb_ensure_size((itmpov+3+nprocs),temp_ovrlap,info,pad=-1)
-              if (info /= 0) then
-                info=4010
+              if (info /= psb_success_) then
+                info=psb_err_from_subroutine_
                 call psb_errpush(info,name,a_err='psb_ensure_size')
                 goto 9999
               end if
@@ -341,8 +341,8 @@ subroutine psb_cdals(m, n, parts, ictxt, desc, info)
 
     allocate(desc%idxmap%loc_to_glob(loc_col),&
          &desc%lprm(1),stat=info)  
-    if (info /= 0) then 
-      call psb_errpush(4010,name,a_err='Allocate')
+    if (info /= psb_success_) then 
+      call psb_errpush(psb_err_from_subroutine_,name,a_err='Allocate')
       goto 9999      
     end if
 
@@ -369,9 +369,9 @@ subroutine psb_cdals(m, n, parts, ictxt, desc, info)
 
   call psi_bld_tmpovrl(temp_ovrlap,desc,info)
 
-  if (info == 0) deallocate(prc_v,temp_ovrlap,stat=info)
+  if (info == psb_success_) deallocate(prc_v,temp_ovrlap,stat=info)
   if (info /= psb_no_err_) then 
-    info=4000
+    info=psb_err_alloc_dealloc_
     err=info
     call psb_errpush(err,name)
     Goto 9999
@@ -382,9 +382,9 @@ subroutine psb_cdals(m, n, parts, ictxt, desc, info)
   desc%matrix_data(psb_n_col_)  = loc_row
 
   call psb_realloc(max(1,loc_row/2),desc%halo_index, info)
-  if (info == 0) call psb_realloc(1,desc%ext_index, info)
-  if (info /= 0) then
-    info=4010
+  if (info == psb_success_) call psb_realloc(1,desc%ext_index, info)
+  if (info /= psb_success_) then
+    info=psb_err_from_subroutine_
     call psb_errpush(info,name,a_err='psb_realloc')
     Goto 9999
   end if
@@ -393,8 +393,8 @@ subroutine psb_cdals(m, n, parts, ictxt, desc, info)
   desc%ext_index(:)            = -1
 
   call psb_cd_set_bld(desc,info)
-  if (info /= 0) then
-    info=4010
+  if (info /= psb_success_) then
+    info=psb_err_from_subroutine_
     call psb_errpush(info,name,a_err='psb_cd_set_bld')
     Goto 9999
   end if

@@ -64,7 +64,7 @@ subroutine psi_bld_tmphalo(desc,info)
   integer             :: ictxt,n_row
   character(len=20)   :: name,ch_err
 
-  info = 0
+  info = psb_success_
   name = 'psi_bld_tmphalo'
   call psb_erractionsave(err_act)
 
@@ -76,13 +76,13 @@ subroutine psi_bld_tmphalo(desc,info)
   ! check on blacs grid 
   call psb_info(ictxt, me, np)
   if (np == -1) then
-    info = 2010
+    info = psb_err_blacs_error_
     call psb_errpush(info,name)
     goto 9999
   endif
 
   if (.not.(psb_is_bld_desc(desc).and.psb_is_large_desc(desc))) then 
-    info = 1122
+    info = psb_err_invalid_cd_state_
     call psb_errpush(info,name)
     goto 9999
   end if
@@ -91,8 +91,8 @@ subroutine psi_bld_tmphalo(desc,info)
   ! to call fnd_owner.
   nh = (n_col-n_row)
   Allocate(helem(max(1,nh)),stat=info)
-  if (info /= 0) then 
-    call psb_errpush(4010,name,a_err='Allocate')
+  if (info /= psb_success_) then 
+    call psb_errpush(psb_err_from_subroutine_,name,a_err='Allocate')
     goto 9999      
   end if
 
@@ -101,22 +101,22 @@ subroutine psi_bld_tmphalo(desc,info)
   end do
 
   call psb_map_l2g(helem(1:nh),desc%idxmap,info)
-  if (info == 0) &
+  if (info == psb_success_) &
        & call psi_fnd_owner(nh,helem,hproc,desc,info)
 
-  if (info /= 0) then 
-    call psb_errpush(4010,name,a_err='fnd_owner')
+  if (info /= psb_success_) then 
+    call psb_errpush(psb_err_from_subroutine_,name,a_err='fnd_owner')
     goto 9999      
   endif
   if (nh > size(hproc)) then 
-    info=4010
-    call psb_errpush(4010,name,a_err='nh > size(hproc)')
+    info=psb_err_from_subroutine_
+    call psb_errpush(psb_err_from_subroutine_,name,a_err='nh > size(hproc)')
     goto 9999      
   end if
 
   allocate(tmphl((3*((n_col-n_row)+1)+1)),stat=info)
-  if (info /= 0) then 
-    call psb_errpush(4010,name,a_err='Allocate')
+  if (info /= psb_success_) then 
+    call psb_errpush(psb_err_from_subroutine_,name,a_err='Allocate')
     goto 9999      
   end if
   j  = 1

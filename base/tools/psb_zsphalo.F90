@@ -91,7 +91,7 @@ Subroutine psb_zsphalo(a,desc_a,blk,info,rowcnv,colcnv,&
   character(len=20) :: name, ch_err
 
   if(psb_get_errstatus() /= 0) return 
-  info=0
+  info=psb_success_
   name='psb_zsphalo'
   call psb_erractionsave(err_act)
   debug_unit  = psb_get_debug_unit()
@@ -140,8 +140,8 @@ Subroutine psb_zsphalo(a,desc_a,blk,info,rowcnv,colcnv,&
   Allocate(sdid(np,3),rvid(np,3),brvindx(np+1),&
        & rvsz(np),sdsz(np),bsdindx(np+1), acoo,stat=info)
 
-  if (info /= 0) then
-    info=4000
+  if (info /= psb_success_) then
+    info=psb_err_alloc_dealloc_
     call psb_errpush(info,name)
     goto 9999
   end if
@@ -159,7 +159,7 @@ Subroutine psb_zsphalo(a,desc_a,blk,info,rowcnv,colcnv,&
 ! !$    idxv => desc_a%ovrlap_index
 ! Do not accept OVRLAP_INDEX any longer. 
   case default
-    call psb_errpush(4010,name,a_err='wrong Data selector')
+    call psb_errpush(psb_err_from_subroutine_,name,a_err='wrong Data selector')
     goto 9999
   end select
 
@@ -195,8 +195,8 @@ Subroutine psb_zsphalo(a,desc_a,blk,info,rowcnv,colcnv,&
   Enddo
 
   call mpi_alltoall(sdsz,1,mpi_integer,rvsz,1,mpi_integer,icomm,info)
-  if (info /= 0) then
-    info=4010
+  if (info /= psb_success_) then
+    info=psb_err_from_subroutine_
     ch_err='mpi_alltoall'
     call psb_errpush(info,name,a_err=ch_err)
     goto 9999
@@ -224,8 +224,8 @@ Subroutine psb_zsphalo(a,desc_a,blk,info,rowcnv,colcnv,&
   if (debug_level >= psb_debug_outer_)&
        & write(debug_unit,*) me,' ',trim(name),': Sizes:',acoo%get_size(),&
        & ' Send:',sdsz(:),' Receive:',rvsz(:)
-  if (info /= 0) then
-    info=4010
+  if (info /= psb_success_) then
+    info=psb_err_from_subroutine_
     ch_err='psb_sp_reall'
     call psb_errpush(info,name,a_err=ch_err)
     goto 9999
@@ -233,8 +233,8 @@ Subroutine psb_zsphalo(a,desc_a,blk,info,rowcnv,colcnv,&
   mat_recv = iszr
   iszs=sum(sdsz)
   call psb_ensure_size(max(iszs,1),iasnd,info)
-  if (info == 0) call psb_ensure_size(max(iszs,1),jasnd,info)
-  if (info == 0) call psb_ensure_size(max(iszs,1),valsnd,info)
+  if (info == psb_success_) call psb_ensure_size(max(iszs,1),jasnd,info)
+  if (info == psb_success_) call psb_ensure_size(max(iszs,1),valsnd,info)
 
   l1  = 0
   ipx = 1
@@ -254,8 +254,8 @@ Subroutine psb_zsphalo(a,desc_a,blk,info,rowcnv,colcnv,&
       n_elem = a%get_nz_row(idx)
       call a%csget(idx,idx,ngtz,iasnd,jasnd,valsnd,info,&
            &  append=.true.,nzin=tot_elem)
-      if (info /= 0) then
-        info=4010
+      if (info /= psb_success_) then
+        info=psb_err_from_subroutine_
         ch_err='psb_sp_getrow'
         call psb_errpush(info,name,a_err=ch_err)
         goto 9999
@@ -269,8 +269,8 @@ Subroutine psb_zsphalo(a,desc_a,blk,info,rowcnv,colcnv,&
 
   if (rowcnv_) call psb_loc_to_glob(iasnd(1:nz),desc_a,info,iact='I')
   if (colcnv_) call psb_loc_to_glob(jasnd(1:nz),desc_a,info,iact='I')
-  if (info /= 0) then
-    info=4010
+  if (info /= psb_success_) then
+    info=psb_err_from_subroutine_
     ch_err='psb_loc_to_glob'
     call psb_errpush(info,name,a_err=ch_err)
     goto 9999
@@ -283,8 +283,8 @@ Subroutine psb_zsphalo(a,desc_a,blk,info,rowcnv,colcnv,&
        & acoo%ia,rvsz,brvindx,mpi_integer,icomm,info)
   call mpi_alltoallv(jasnd,sdsz,bsdindx,mpi_integer,&
        & acoo%ja,rvsz,brvindx,mpi_integer,icomm,info)
-  if (info /= 0) then
-    info=4010
+  if (info /= psb_success_) then
+    info=psb_err_from_subroutine_
     ch_err='mpi_alltoallv'
     call psb_errpush(info,name,a_err=ch_err)
     goto 9999
@@ -296,8 +296,8 @@ Subroutine psb_zsphalo(a,desc_a,blk,info,rowcnv,colcnv,&
   if (rowcnv_) call psb_glob_to_loc(acoo%ia(1:iszr),desc_a,info,iact='I')
   if (colcnv_) call psb_glob_to_loc(acoo%ja(1:iszr),desc_a,info,iact='I')
 
-  if (info /= 0) then
-    info=4010
+  if (info /= psb_success_) then
+    info=psb_err_from_subroutine_
     ch_err='psbglob_to_loc'
     call psb_errpush(info,name,a_err=ch_err)
     goto 9999
@@ -348,8 +348,8 @@ Subroutine psb_zsphalo(a,desc_a,blk,info,rowcnv,colcnv,&
 
   ! Do we expect any duplicates to appear???? 
   call blk%cscnv(info,type=outfmt_,dupl=psb_dupl_add_)
-  if (info /= 0) then
-    info=4010
+  if (info /= psb_success_) then
+    info=psb_err_from_subroutine_
     ch_err='psb_spcnv'
     call psb_errpush(info,name,a_err=ch_err)
     goto 9999

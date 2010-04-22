@@ -44,19 +44,19 @@ function psb_c_linmap(map_kind,desc_X, desc_Y, map_X2Y, map_Y2X,iaggr,naggr) res
   integer                      :: info
   character(len=20), parameter :: name='psb_linmap'
 
-  info = 0 
+  info = psb_success_
   select case(map_kind) 
   case (psb_map_aggr_)
     ! OK    
     if (psb_is_ok_desc(desc_X)) then 
       this%p_desc_X=>desc_X
     else
-      info = 2
+      info = psb_err_pivot_too_small_
     endif
     if (psb_is_ok_desc(desc_Y)) then 
       this%p_desc_Y=>desc_Y
     else
-      info = 3
+      info = psb_err_invalid_ovr_num_
     endif
     if (present(iaggr)) then 
       if (.not.present(naggr)) then 
@@ -64,7 +64,7 @@ function psb_c_linmap(map_kind,desc_X, desc_Y, map_X2Y, map_Y2X,iaggr,naggr) res
       else
         allocate(this%iaggr(size(iaggr)),&
              & this%naggr(size(naggr)), stat=info) 
-        if (info == 0) then 
+        if (info == psb_success_) then 
           this%iaggr = iaggr
           this%naggr = naggr
         end if
@@ -78,12 +78,12 @@ function psb_c_linmap(map_kind,desc_X, desc_Y, map_X2Y, map_Y2X,iaggr,naggr) res
     if (psb_is_ok_desc(desc_X)) then 
       call psb_cdcpy(desc_X, this%desc_X,info) 
     else
-      info = 2
+      info = psb_err_pivot_too_small_
     endif
     if (psb_is_ok_desc(desc_Y)) then 
       call psb_cdcpy(desc_Y, this%desc_Y,info) 
     else
-      info = 3
+      info = psb_err_invalid_ovr_num_
     endif
     ! For a general linear map ignore iaggr,naggr
     allocate(this%iaggr(0), this%naggr(0), stat=info) 
@@ -93,13 +93,13 @@ function psb_c_linmap(map_kind,desc_X, desc_Y, map_X2Y, map_Y2X,iaggr,naggr) res
     info = 1
   end select
 
-  if (info == 0) call psb_clone(map_X2Y,this%map_X2Y,info)
-  if (info == 0) call psb_clone(map_Y2X,this%map_Y2X,info)
-  if (info == 0) call psb_realloc(psb_itd_data_size_,this%itd_data,info) 
-  if (info == 0) then
+  if (info == psb_success_) call psb_clone(map_X2Y,this%map_X2Y,info)
+  if (info == psb_success_) call psb_clone(map_Y2X,this%map_Y2X,info)
+  if (info == psb_success_) call psb_realloc(psb_itd_data_size_,this%itd_data,info) 
+  if (info == psb_success_) then
     call psb_set_map_kind(map_kind, this)
   end if
-  if (info /= 0) then
+  if (info /= psb_success_) then
     write(0,*) trim(name),' Invalid descriptor input'
     return
   end if
@@ -121,7 +121,7 @@ function psb_d_linmap(map_kind,desc_X, desc_Y, map_X2Y, map_Y2X,iaggr,naggr) res
   character(len=20), parameter :: name='psb_linmap'
   logical, parameter           :: debug=.false.
 
-  info = 0 
+  info = psb_success_
   select case(map_kind) 
   case (psb_map_aggr_)
     ! OK
@@ -129,12 +129,12 @@ function psb_d_linmap(map_kind,desc_X, desc_Y, map_X2Y, map_Y2X,iaggr,naggr) res
     if (psb_is_ok_desc(desc_X)) then 
       this%p_desc_X=>desc_X
     else
-      info = 2
+      info = psb_err_pivot_too_small_
     endif
     if (psb_is_ok_desc(desc_Y)) then 
       this%p_desc_Y=>desc_Y
     else
-      info = 3
+      info = psb_err_invalid_ovr_num_
     endif
     if (present(iaggr)) then 
       if (.not.present(naggr)) then 
@@ -142,7 +142,7 @@ function psb_d_linmap(map_kind,desc_X, desc_Y, map_X2Y, map_Y2X,iaggr,naggr) res
       else
         allocate(this%iaggr(size(iaggr)),&
              & this%naggr(size(naggr)), stat=info) 
-        if (info == 0) then 
+        if (info == psb_success_) then 
           this%iaggr = iaggr
           this%naggr = naggr
         end if
@@ -156,12 +156,12 @@ function psb_d_linmap(map_kind,desc_X, desc_Y, map_X2Y, map_Y2X,iaggr,naggr) res
     if (psb_is_ok_desc(desc_X)) then 
       call psb_cdcpy(desc_X, this%desc_X,info) 
     else
-      info = 2
+      info = psb_err_pivot_too_small_
     endif
     if (psb_is_ok_desc(desc_Y)) then 
       call psb_cdcpy(desc_Y, this%desc_Y,info) 
     else
-      info = 3
+      info = psb_err_invalid_ovr_num_
     endif
     ! For a general linear map ignore iaggr,naggr
     allocate(this%iaggr(0), this%naggr(0), stat=info) 
@@ -171,13 +171,13 @@ function psb_d_linmap(map_kind,desc_X, desc_Y, map_X2Y, map_Y2X,iaggr,naggr) res
     info = 1
   end select
 
-  if (info == 0) call psb_clone(map_X2Y,this%map_X2Y,info)
-  if (info == 0) call psb_clone(map_Y2X,this%map_Y2X,info)
-  if (info == 0) call psb_realloc(psb_itd_data_size_,this%itd_data,info) 
-  if (info == 0) then
+  if (info == psb_success_) call psb_clone(map_X2Y,this%map_X2Y,info)
+  if (info == psb_success_) call psb_clone(map_Y2X,this%map_Y2X,info)
+  if (info == psb_success_) call psb_realloc(psb_itd_data_size_,this%itd_data,info) 
+  if (info == psb_success_) then
     call psb_set_map_kind(map_kind, this)
   end if
-  if (info /= 0) then
+  if (info /= psb_success_) then
     write(0,*) trim(name),' Invalid descriptor input'
     return
   end if
@@ -202,7 +202,7 @@ function psb_s_linmap(map_kind,desc_X, desc_Y, map_X2Y, map_Y2X,iaggr,naggr) res
   integer                      :: info
   character(len=20), parameter :: name='psb_linmap'
 
-  info = 0 
+  info = psb_success_
 
   select case(map_kind) 
   case (psb_map_aggr_)
@@ -211,12 +211,12 @@ function psb_s_linmap(map_kind,desc_X, desc_Y, map_X2Y, map_Y2X,iaggr,naggr) res
     if (psb_is_ok_desc(desc_X)) then 
       this%p_desc_X=>desc_X
     else
-      info = 2
+      info = psb_err_pivot_too_small_
     endif
     if (psb_is_ok_desc(desc_Y)) then 
       this%p_desc_Y=>desc_Y
     else
-      info = 3
+      info = psb_err_invalid_ovr_num_
     endif
     if (present(iaggr)) then 
       if (.not.present(naggr)) then 
@@ -224,7 +224,7 @@ function psb_s_linmap(map_kind,desc_X, desc_Y, map_X2Y, map_Y2X,iaggr,naggr) res
       else
         allocate(this%iaggr(size(iaggr)),&
              & this%naggr(size(naggr)), stat=info) 
-        if (info == 0) then 
+        if (info == psb_success_) then 
           this%iaggr = iaggr
           this%naggr = naggr
         end if
@@ -238,12 +238,12 @@ function psb_s_linmap(map_kind,desc_X, desc_Y, map_X2Y, map_Y2X,iaggr,naggr) res
     if (psb_is_ok_desc(desc_X)) then 
       call psb_cdcpy(desc_X, this%desc_X,info) 
     else
-      info = 2
+      info = psb_err_pivot_too_small_
     endif
     if (psb_is_ok_desc(desc_Y)) then 
       call psb_cdcpy(desc_Y, this%desc_Y,info) 
     else
-      info = 3
+      info = psb_err_invalid_ovr_num_
     endif
     ! For a general linear map ignore iaggr,naggr
     allocate(this%iaggr(0), this%naggr(0), stat=info) 
@@ -254,13 +254,13 @@ function psb_s_linmap(map_kind,desc_X, desc_Y, map_X2Y, map_Y2X,iaggr,naggr) res
   end select
   
 
-  if (info == 0) call psb_clone(map_X2Y,this%map_X2Y,info)
-  if (info == 0) call psb_clone(map_Y2X,this%map_Y2X,info)
-  if (info == 0) call psb_realloc(psb_itd_data_size_,this%itd_data,info) 
-  if (info == 0) then
+  if (info == psb_success_) call psb_clone(map_X2Y,this%map_X2Y,info)
+  if (info == psb_success_) call psb_clone(map_Y2X,this%map_Y2X,info)
+  if (info == psb_success_) call psb_realloc(psb_itd_data_size_,this%itd_data,info) 
+  if (info == psb_success_) then
     call psb_set_map_kind(map_kind, this)
   end if
-  if (info /= 0) then
+  if (info /= psb_success_) then
     write(0,*) trim(name),' Invalid descriptor input'
     return
   end if
@@ -281,7 +281,7 @@ function psb_z_linmap(map_kind,desc_X, desc_Y, map_X2Y, map_Y2X,iaggr,naggr) res
   integer                      :: info
   character(len=20), parameter :: name='psb_linmap'
 
-  info = 0 
+  info = psb_success_
   select case(map_kind) 
   case (psb_map_aggr_)
     ! OK
@@ -289,12 +289,12 @@ function psb_z_linmap(map_kind,desc_X, desc_Y, map_X2Y, map_Y2X,iaggr,naggr) res
     if (psb_is_ok_desc(desc_X)) then 
       this%p_desc_X=>desc_X
     else
-      info = 2
+      info = psb_err_pivot_too_small_
     endif
     if (psb_is_ok_desc(desc_Y)) then 
       this%p_desc_Y=>desc_Y
     else
-      info = 3
+      info = psb_err_invalid_ovr_num_
     endif
     if (present(iaggr)) then 
       if (.not.present(naggr)) then 
@@ -302,7 +302,7 @@ function psb_z_linmap(map_kind,desc_X, desc_Y, map_X2Y, map_Y2X,iaggr,naggr) res
       else
         allocate(this%iaggr(size(iaggr)),&
              & this%naggr(size(naggr)), stat=info) 
-        if (info == 0) then 
+        if (info == psb_success_) then 
           this%iaggr = iaggr
           this%naggr = naggr
         end if
@@ -316,12 +316,12 @@ function psb_z_linmap(map_kind,desc_X, desc_Y, map_X2Y, map_Y2X,iaggr,naggr) res
     if (psb_is_ok_desc(desc_X)) then 
       call psb_cdcpy(desc_X, this%desc_X,info) 
     else
-      info = 2
+      info = psb_err_pivot_too_small_
     endif
     if (psb_is_ok_desc(desc_Y)) then 
       call psb_cdcpy(desc_Y, this%desc_Y,info) 
     else
-      info = 3
+      info = psb_err_invalid_ovr_num_
     endif
     ! For a general linear map ignore iaggr,naggr
     allocate(this%iaggr(0), this%naggr(0), stat=info) 
@@ -331,13 +331,13 @@ function psb_z_linmap(map_kind,desc_X, desc_Y, map_X2Y, map_Y2X,iaggr,naggr) res
     info = 1
   end select
 
-  if (info == 0) call psb_clone(map_X2Y,this%map_X2Y,info)
-  if (info == 0) call psb_clone(map_Y2X,this%map_Y2X,info)
-  if (info == 0) call psb_realloc(psb_itd_data_size_,this%itd_data,info) 
-  if (info == 0) then
+  if (info == psb_success_) call psb_clone(map_X2Y,this%map_X2Y,info)
+  if (info == psb_success_) call psb_clone(map_Y2X,this%map_Y2X,info)
+  if (info == psb_success_) call psb_realloc(psb_itd_data_size_,this%itd_data,info) 
+  if (info == psb_success_) then
     call psb_set_map_kind(map_kind, this)
   end if
-  if (info /= 0) then
+  if (info /= psb_success_) then
     write(0,*) trim(name),' Invalid descriptor input'
     return
   end if

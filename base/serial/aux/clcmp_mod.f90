@@ -51,14 +51,14 @@ contains
     complex(psb_spk_), intent(in) :: a,b
     logical :: cllt
     
-    cllt = (real(a)<real(b)).or.((real(a)==real(b)).and.(aimag(a)<aimag(b)))
+    cllt = (real(a)<real(b)).or.((real(a) == real(b)).and.(aimag(a)<aimag(b)))
   end function cllt
   function clle(a,b)
     use psb_const_mod
     complex(psb_spk_), intent(in) :: a,b
     logical :: clle
     
-    clle = (real(a)<real(b)).or.((real(a)==real(b)).and.(aimag(a)<=aimag(b)))
+    clle = (real(a)<real(b)).or.((real(a) == real(b)).and.(aimag(a)<=aimag(b)))
   end function clle
 
   function clgt(a,b)
@@ -66,14 +66,14 @@ contains
     complex(psb_spk_), intent(in) :: a,b
     logical :: clgt
     
-    clgt = (real(a)>real(b)).or.((real(a)==real(b)).and.(aimag(a)>aimag(b)))
+    clgt = (real(a)>real(b)).or.((real(a) == real(b)).and.(aimag(a)>aimag(b)))
   end function clgt
   function clge(a,b)
     use psb_const_mod
     complex(psb_spk_), intent(in) :: a,b
     logical :: clge
     
-    clge = (real(a)>real(b)).or.((real(a)==real(b)).and.(aimag(a)>=aimag(b)))
+    clge = (real(a)>real(b)).or.((real(a) == real(b)).and.(aimag(a)>=aimag(b)))
   end function clge
 
 end module clcmp_mod

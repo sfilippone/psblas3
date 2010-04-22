@@ -78,7 +78,7 @@ subroutine psi_fnd_owner(nv,idx,iprc,desc,info)
   real(psb_dpk_)      :: t0, t1, t2, t3, t4, tamx, tidx
   character(len=20)   :: name
 
-  info = 0
+  info = psb_success_
   name = 'psi_fnd_owner'
   call psb_erractionsave(err_act)
 
@@ -92,19 +92,19 @@ subroutine psi_fnd_owner(nv,idx,iprc,desc,info)
   call psb_info(ictxt, me, np)
 
   if (np == -1) then
-    info = 2010
+    info = psb_err_blacs_error_
     call psb_errpush(info,name)
     goto 9999
   endif
 
   if (nv < 0 ) then
-    info = 2010
+    info = psb_err_blacs_error_
     call psb_errpush(info,name)
     goto 9999
   endif
 
   if (.not.(psb_is_ok_desc(desc))) then 
-    call psb_errpush(4010,name,a_err='invalid desc')
+    call psb_errpush(psb_err_from_subroutine_,name,a_err='invalid desc')
     goto 9999      
   end if
 
@@ -118,8 +118,8 @@ subroutine psi_fnd_owner(nv,idx,iprc,desc,info)
        & sdsz(0:np-1),sdidx(0:np-1),&
        & rvsz(0:np-1),rvidx(0:np-1),&
        & stat=info)
-  if (info /= 0) then 
-    call psb_errpush(4010,name,a_err='Allocate') 
+  if (info /= psb_success_) then 
+    call psb_errpush(psb_err_from_subroutine_,name,a_err='Allocate') 
     goto 9999      
   end if
 
@@ -132,8 +132,8 @@ subroutine psi_fnd_owner(nv,idx,iprc,desc,info)
   end do
   hsize = hidx(np+1)
   Allocate(helem(hsize),hproc(hsize),stat=info)
-  if (info /= 0) then 
-    call psb_errpush(4010,name,a_err='Allocate')
+  if (info /= psb_success_) then 
+    call psb_errpush(psb_err_from_subroutine_,name,a_err='Allocate')
     goto 9999      
   end if
 
@@ -158,9 +158,9 @@ subroutine psi_fnd_owner(nv,idx,iprc,desc,info)
   if (gettime) then 
     tidx = psb_wtime()-t3
   end if
-  if (info == 140) info = 0
-  if (info /= 0) then 
-    call psb_errpush(4010,name,a_err='psi_idx_cnv')
+  if (info == psb_err_iarray_outside_bounds_) info = psb_success_
+  if (info /= psb_success_) then 
+    call psb_errpush(psb_err_from_subroutine_,name,a_err='psi_idx_cnv')
     goto 9999      
   end if
 
@@ -190,8 +190,8 @@ subroutine psi_fnd_owner(nv,idx,iprc,desc,info)
   isz = sum(rvsz) 
 
   allocate(answers(isz,2),idxsrch(nv,2),stat=info)
-  if (info /= 0) then 
-    call psb_errpush(4010,name,a_err='Allocate')
+  if (info /= psb_success_) then 
+    call psb_errpush(psb_err_from_subroutine_,name,a_err='Allocate')
     goto 9999      
   end if
   j = 0
@@ -221,8 +221,8 @@ subroutine psi_fnd_owner(nv,idx,iprc,desc,info)
 
   ! Now  extract the answers for our local query
   call psb_realloc(nv,iprc,info)
-  if (info /= 0) then 
-    call psb_errpush(4010,name,a_err='psb_realloc')
+  if (info /= psb_success_) then 
+    call psb_errpush(psb_err_from_subroutine_,name,a_err='psb_realloc')
     goto 9999      
   end if
   last_ih = -1 
@@ -241,8 +241,8 @@ subroutine psi_fnd_owner(nv,idx,iprc,desc,info)
           if (j == -1) then 
             write(0,*) me,'psi_fnd_owner: searching for ',ih, &
                  & 'not found : ',size(answers,1),':',answers(:,1)
-            info = 4001
-            call psb_errpush(4001,name,a_err='out bounds srch ih') 
+            info = psb_err_internal_error_
+            call psb_errpush(psb_err_internal_error_,name,a_err='out bounds srch ih') 
             goto 9999      
           end if
         end if
@@ -253,8 +253,8 @@ subroutine psi_fnd_owner(nv,idx,iprc,desc,info)
           if (j == -1) then 
             write(0,*) me,'psi_fnd_owner: searching for ',ih, &
                  & 'not found : ',size(answers,1),':',answers(:,1)
-            info = 4001
-            call psb_errpush(4001,name,a_err='out bounds srch ih') 
+            info = psb_err_internal_error_
+            call psb_errpush(psb_err_internal_error_,name,a_err='out bounds srch ih') 
             goto 9999      
           end if
         end if
@@ -282,7 +282,7 @@ subroutine psi_fnd_owner(nv,idx,iprc,desc,info)
     call psb_amx(ictxt,tamx)
     call psb_amx(ictxt,tidx)
     call psb_amx(ictxt,t1)
-    if (me==psb_root_) then 
+    if (me == psb_root_) then 
       write(*,'(" fnd_owner  idx time  : ",es10.4)') tidx
       write(*,'(" fnd_owner  amx time  : ",es10.4)') tamx
       write(*,'(" fnd_owner remainedr  : ",es10.4)') t1 

@@ -50,7 +50,7 @@ subroutine psb_dprc_aply(prec,x,y,desc_data,info,trans, work)
   character(len=20)   :: name
 
   name='psb_prc_aply'
-  info = 0
+  info = psb_success_
   call psb_erractionsave(err_act)
 
   ictxt=desc_data%matrix_data(psb_ctxt_)
@@ -66,8 +66,8 @@ subroutine psb_dprc_aply(prec,x,y,desc_data,info,trans, work)
     work_ => work
   else
     allocate(work_(4*desc_data%matrix_data(psb_n_col_)),stat=info)
-    if (info /= 0) then 
-      call psb_errpush(4010,name,a_err='Allocate')
+    if (info /= psb_success_) then 
+      call psb_errpush(psb_err_from_subroutine_,name,a_err='Allocate')
       goto 9999      
     end if
 
@@ -153,7 +153,7 @@ subroutine psb_dprc_aply1(prec,x,desc_data,info,trans)
   real(psb_dpk_), pointer :: WW(:), w1(:)
   character(len=20)   :: name
   name='psb_prc_aply1'
-  info = 0
+  info = psb_success_
   call psb_erractionsave(err_act)
   
 
@@ -171,12 +171,12 @@ subroutine psb_dprc_aply1(prec,x,desc_data,info,trans)
     goto 9999
   end if
   allocate(ww(size(x)),w1(size(x)),stat=info)
-  if (info /= 0) then 
-    call psb_errpush(4010,name,a_err='Allocate')
+  if (info /= psb_success_) then 
+    call psb_errpush(psb_err_from_subroutine_,name,a_err='Allocate')
     goto 9999      
   end if
   call prec%prec%apply(done,x,dzero,ww,desc_data,info,trans_,work=w1)
-  if(info /=0) goto 9999
+  if(info /= psb_success_) goto 9999
   x(:) = ww(:)
   deallocate(ww,W1)
 

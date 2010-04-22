@@ -53,12 +53,12 @@ subroutine psb_ifree(x, desc_a, info)
 
 
   if(psb_get_errstatus() /= 0) return 
-  info=0
+  info=psb_success_
   call psb_erractionsave(err_act)
   name = 'psb_ifree'
   
   if (.not.allocated(desc_a%matrix_data)) then
-     info=295
+     info=psb_err_forgot_spall_
      call psb_errpush(info,name)
      return
   end if
@@ -68,20 +68,20 @@ subroutine psb_ifree(x, desc_a, info)
   call psb_info(ictxt, me, np)
   !     ....verify blacs grid correctness..
   if (np == -1) then
-    info = 2010
+    info = psb_err_blacs_error_
     call psb_errpush(info,name)
     goto 9999
   endif
 
   if (.not.allocated(x)) then
-     info=290
+     info=psb_err_forgot_geall_
      call psb_errpush(info,name)
      goto 9999
   end if
   
   !deallocate x
   deallocate(x,stat=info)
-  if (info /= 0) then
+  if (info /= psb_success_) then
      info=2045
      call psb_errpush(info,name)
      goto 9999
@@ -153,13 +153,13 @@ subroutine psb_ifreev(x, desc_a,info)
 
 
   if(psb_get_errstatus() /= 0) return 
-  info=0
+  info=psb_success_
   call psb_erractionsave(err_act)
   name = 'psb_ifreev'
 
   
   if (.not.allocated(desc_a%matrix_data)) then
-     info=295
+     info=psb_err_forgot_spall_
      call psb_errpush(info,name)
      return
   end if
@@ -168,13 +168,13 @@ subroutine psb_ifreev(x, desc_a,info)
   call psb_info(ictxt, me, np)
   !     ....verify blacs grid correctness..
   if (np == -1) then
-    info = 2010
+    info = psb_err_blacs_error_
     call psb_errpush(info,name)
     goto 9999
   endif
 
   if (.not.allocated(x)) then
-     info=290
+     info=psb_err_forgot_geall_
      call psb_errpush(info,name)
      goto 9999
   end if
@@ -182,7 +182,7 @@ subroutine psb_ifreev(x, desc_a,info)
   !deallocate x
   deallocate(x,stat=info)
   if (info /= psb_no_err_) then
-    info=4000
+    info=psb_err_alloc_dealloc_
     call psb_errpush(info,name)
   endif
   

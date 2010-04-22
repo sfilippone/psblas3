@@ -1,4 +1,4 @@
-c=======================================================================
+c == =====================================================================
 c Sparse Matrix Multiplication Package
 c
 c Randolph E. Bank and Craig C. Douglas
@@ -9,7 +9,7 @@ c Compile this with the following command (or a similar one):
 c
 c     f77 -c -O smmp.f
 c
-c=======================================================================
+c == =====================================================================
       subroutine symbmm 
      *  (n, m, l, 
      *  ia, ja, diaga, 
@@ -44,7 +44,7 @@ c$$$      enddo
       if (size(ic) < n+1) then 
         write(0,*) 'Called realloc in SYMBMM '
         call psb_realloc(n+1,ic,info)
-        if (info /=0) then 
+        if (info /= psb_success_) then 
           write(0,*) 'realloc failed in SYMBMM ',info
         end if
       endif
@@ -187,7 +187,7 @@ c    c = d + ...
           c(i) = temp(i)
           temp(i) = 0.
         endif
-c$$$        if (mod(i,100)==1)
+c$$$        if (mod(i,100) == 1)
 c$$$     +    write(0,*) ' NUMBMM: Fixing row ',i,ic(i),ic(i+1)-1
         do 40 j = ic(i),ic(i+1)-1
           if((jc(j)<1).or. (jc(j) > maxlmn))  then 
@@ -256,7 +256,7 @@ c    c = d + ...
           c(i) = temp(i)
           temp(i) = 0.
         endif
-c$$$        if (mod(i,100)==1)
+c$$$        if (mod(i,100) == 1)
 c$$$     +    write(0,*) ' NUMBMM: Fixing row ',i,ic(i),ic(i+1)-1
         do 40 j = ic(i),ic(i+1)-1
           if((jc(j)<1).or. (jc(j) > maxlmn))  then 
@@ -325,7 +325,7 @@ c    c = d + ...
           c(i) = temp(i)
           temp(i) = 0.
         endif
-c$$$        if (mod(i,100)==1)
+c$$$        if (mod(i,100) == 1)
 c$$$     +    write(0,*) ' NUMBMM: Fixing row ',i,ic(i),ic(i+1)-1
         do 40 j = ic(i),ic(i+1)-1
           if((jc(j)<1).or. (jc(j) > maxlmn))  then 
@@ -394,7 +394,7 @@ c    c = d + ...
           c(i) = temp(i)
           temp(i) = 0.
         endif
-c$$$        if (mod(i,100)==1)
+c$$$        if (mod(i,100) == 1)
 c$$$     +    write(0,*) ' NUMBMM: Fixing row ',i,ic(i),ic(i+1)-1
         do 40 j = ic(i),ic(i+1)-1
           if((jc(j)<1).or. (jc(j) > maxlmn))  then 

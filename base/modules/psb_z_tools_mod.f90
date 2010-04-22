@@ -237,8 +237,8 @@ Module psb_z_tools_mod
 !!$    ictxt = psb_cd_get_context(descin)
 !!$
 !!$    call psb_cdcpy(descin,cd_xt,info)
-!!$    if (info ==0) call psb_cd_reinit(cd_xt,info)
-!!$    if (info /= 0) then 
+!!$    if (info == psb_success_) call psb_cd_reinit(cd_xt,info)
+!!$    if (info /= psb_success_) then 
 !!$      write(0,*) 'Error on reinitialising the extension map'
 !!$      call psb_error(ictxt)
 !!$      call psb_abort(ictxt)

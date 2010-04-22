@@ -512,7 +512,7 @@ contains
     integer                            :: ictxt,me,np,err_act
     character(len=20)                  :: name
 
-    info = 0
+    info = psb_success_
     name = 'psb_krylov'
     call psb_erractionsave(err_act)
 
@@ -541,13 +541,13 @@ contains
       call  psb_bicgstabl(a,prec,b,x,eps,desc_a,info,&
            &itmax,iter,err,itrace,irst,istop)
     case default
-      if (me==0) write(0,*) trim(name),': Warning: Unknown method  ',method,&
+      if (me == 0) write(0,*) trim(name),': Warning: Unknown method  ',method,&
            & ', defaulting to BiCGSTAB'
       call  psb_bicgstab(a,prec,b,x,eps,desc_a,info,&
            &itmax,iter,err,itrace,istop)
     end select
 
-    if(info/=0) then
+    if(info /= psb_success_) then
       call psb_errpush(info,name)
       goto 9999
     end if
@@ -630,7 +630,7 @@ contains
     integer                            :: ictxt,me,np,err_act
     character(len=20)             :: name
 
-    info = 0
+    info = psb_success_
     name = 'psb_krylov'
     call psb_erractionsave(err_act)
 
@@ -659,13 +659,13 @@ contains
       call  psb_bicgstabl(a,prec,b,x,eps,desc_a,info,&
            &itmax,iter,err,itrace,irst,istop)
     case default
-      if (me==0) write(0,*) trim(name),': Warning: Unknown method  ',method,&
+      if (me == 0) write(0,*) trim(name),': Warning: Unknown method  ',method,&
            & ', defaulting to BiCGSTAB'
       call  psb_bicgstab(a,prec,b,x,eps,desc_a,info,&
            &itmax,iter,err,itrace,istop)
     end select
 
-    if(info/=0) then
+    if(info /= psb_success_) then
       call psb_errpush(info,name)
       goto 9999
     end if
@@ -746,7 +746,7 @@ contains
     integer                            :: ictxt,me,np,err_act
     character(len=20)             :: name
 
-    info = 0
+    info = psb_success_
     name = 'psb_krylov'
     call psb_erractionsave(err_act)
 
@@ -776,13 +776,13 @@ contains
       call  psb_bicgstabl(a,prec,b,x,eps,desc_a,info,&
          &itmax,iter,err,itrace,irst,istop)
     case default
-      if (me==0) write(0,*) trim(name),': Warning: Unknown method  ',method,&
+      if (me == 0) write(0,*) trim(name),': Warning: Unknown method  ',method,&
            & ', defaulting to BiCGSTAB'
       call  psb_bicgstab(a,prec,b,x,eps,desc_a,info,&
            &itmax,iter,err,itrace,istop)
     end select
 
-    if(info/=0) then
+    if(info /= psb_success_) then
       call psb_errpush(info,name)
       goto 9999
     end if
@@ -862,7 +862,7 @@ contains
     integer                            :: ictxt,me,np,err_act
     character(len=20)             :: name
 
-    info = 0
+    info = psb_success_
     name = 'psb_krylov'
     call psb_erractionsave(err_act)
 
@@ -892,13 +892,13 @@ contains
       call  psb_bicgstabl(a,prec,b,x,eps,desc_a,info,&
          &itmax,iter,err,itrace,irst,istop)
     case default
-      if (me==0) write(0,*) trim(name),': Warning: Unknown method  ',method,&
+      if (me == 0) write(0,*) trim(name),': Warning: Unknown method  ',method,&
            & ', defaulting to BiCGSTAB'
       call  psb_bicgstab(a,prec,b,x,eps,desc_a,info,&
            &itmax,iter,err,itrace,istop)
     end select
 
-    if(info/=0) then
+    if(info /= psb_success_) then
       call psb_errpush(info,name)
       goto 9999
     end if
@@ -942,7 +942,7 @@ contains
     character(len=len(methdname)) :: mname
     character(len=outlen)         :: outname
 
-    if ((mod(itx,itrace) == 0).and.(me==0)) then 
+    if ((mod(itx,itrace) == 0).and.(me == 0)) then 
       mname = adjustl(trim(methdname))
       write(outname,'(a)') mname(1:min(len_trim(mname),outlen-1))//':'
       if (errden > dzero ) then 
@@ -968,7 +968,7 @@ contains
     
     if (errden == dzero) then 
       if (errnum > eps) then         
-        if (me==0) then 
+        if (me == 0) then 
           write(*,fmt) trim(methdname)//' failed to converge to ',eps,&
                & ' in ',it,' iterations. '
           write(*,fmt1) 'Last iteration error estimate: ',&
@@ -978,7 +978,7 @@ contains
       if (present(err)) err=errnum
     else
       if (errnum/errden > eps) then         
-        if (me==0) then 
+        if (me == 0) then 
           write(*,fmt) trim(methdname)//' failed to converge to ',eps,&
                & ' in ',it,' iterations. '
           write(*,fmt1) 'Last iteration error estimate: ',&
@@ -1005,7 +1005,7 @@ contains
     integer                           :: ictxt, me, np, err_act
     character(len=20)                 :: name
 
-    info = 0
+    info = psb_success_
     name = 'psb_init_conv'
     call psb_erractionsave(err_act)
 
@@ -1024,18 +1024,18 @@ contains
     select case(stopdat%controls(stopc_))
     case (1) 
       stopdat%values(ani_) = psb_spnrmi(a,desc_a,info)
-      if (info == 0) stopdat%values(bni_) = psb_geamax(b,desc_a,info)
+      if (info == psb_success_) stopdat%values(bni_) = psb_geamax(b,desc_a,info)
 
     case (2) 
       stopdat%values(bn2_) = psb_genrm2(b,desc_a,info)
 
     case default
-      info=5001
+      info=psb_err_invalid_istop_
       call psb_errpush(info,name,i_err=(/stopc,0,0,0,0/))
       goto 9999      
     end select
-    if (info /= 0) then
-      call psb_errpush(4001,name,a_err="Init conv check data")
+    if (info /= psb_success_) then
+      call psb_errpush(psb_err_internal_error_,name,a_err="Init conv check data")
       goto 9999
     end if
     
@@ -1072,7 +1072,7 @@ contains
     integer                           :: ictxt, me, np, err_act
     character(len=20)                 :: name
 
-    info = 0
+    info = psb_success_
     name = 'psb_init_conv'
     call psb_erractionsave(err_act)
 
@@ -1091,18 +1091,18 @@ contains
     select case(stopdat%controls(stopc_))
     case (1) 
       stopdat%values(ani_) = psb_spnrmi(a,desc_a,info)
-      if (info == 0) stopdat%values(bni_) = psb_geamax(b,desc_a,info)
+      if (info == psb_success_) stopdat%values(bni_) = psb_geamax(b,desc_a,info)
 
     case (2) 
       stopdat%values(bn2_) = psb_genrm2(b,desc_a,info)
 
     case default
-      info=5001
+      info=psb_err_invalid_istop_
       call psb_errpush(info,name,i_err=(/stopc,0,0,0,0/))
       goto 9999      
     end select
-    if (info /= 0) then
-      call psb_errpush(4001,name,a_err="Init conv check data")
+    if (info /= psb_success_) then
+      call psb_errpush(psb_err_internal_error_,name,a_err="Init conv check data")
       goto 9999
     end if
     
@@ -1140,7 +1140,7 @@ contains
     integer                           :: ictxt, me, np, err_act
     character(len=20)                 :: name
 
-    info = 0
+    info = psb_success_
     name = 'psb_init_conv'
     call psb_erractionsave(err_act)
 
@@ -1159,18 +1159,18 @@ contains
     select case(stopdat%controls(stopc_))
     case (1) 
       stopdat%values(ani_) = psb_spnrmi(a,desc_a,info)
-      if (info == 0) stopdat%values(bni_) = psb_geamax(b,desc_a,info)
+      if (info == psb_success_) stopdat%values(bni_) = psb_geamax(b,desc_a,info)
 
     case (2) 
       stopdat%values(bn2_) = psb_genrm2(b,desc_a,info)
 
     case default
-      info=5001
+      info=psb_err_invalid_istop_
       call psb_errpush(info,name,i_err=(/stopc,0,0,0,0/))
       goto 9999      
     end select
-    if (info /= 0) then
-      call psb_errpush(4001,name,a_err="Init conv check data")
+    if (info /= psb_success_) then
+      call psb_errpush(psb_err_internal_error_,name,a_err="Init conv check data")
       goto 9999
     end if
     
@@ -1208,7 +1208,7 @@ contains
     integer                           :: ictxt, me, np, err_act
     character(len=20)                 :: name
 
-    info = 0
+    info = psb_success_
     name = 'psb_init_conv'
     call psb_erractionsave(err_act)
 
@@ -1227,18 +1227,18 @@ contains
     select case(stopdat%controls(stopc_))
     case (1) 
       stopdat%values(ani_) = psb_spnrmi(a,desc_a,info)
-      if (info == 0) stopdat%values(bni_) = psb_geamax(b,desc_a,info)
+      if (info == psb_success_) stopdat%values(bni_) = psb_geamax(b,desc_a,info)
 
     case (2) 
       stopdat%values(bn2_) = psb_genrm2(b,desc_a,info)
 
     case default
-      info=5001
+      info=psb_err_invalid_istop_
       call psb_errpush(info,name,i_err=(/stopc,0,0,0,0/))
       goto 9999      
     end select
-    if (info /= 0) then
-      call psb_errpush(4001,name,a_err="Init conv check data")
+    if (info /= psb_success_) then
+      call psb_errpush(psb_err_internal_error_,name,a_err="Init conv check data")
       goto 9999
     end if
     
@@ -1276,7 +1276,7 @@ contains
     integer                         :: ictxt, me, np, err_act
     character(len=20)               :: name
 
-    info = 0
+    info = psb_success_
     name = 'psb_check_conv'
     call psb_erractionsave(err_act)
 
@@ -1288,7 +1288,7 @@ contains
     select case(stopdat%controls(stopc_)) 
     case(1)
       stopdat%values(rni_) = psb_geamax(r,desc_a,info)
-      if (info == 0) stopdat%values(xni_) = psb_geamax(x,desc_a,info)
+      if (info == psb_success_) stopdat%values(xni_) = psb_geamax(x,desc_a,info)
       stopdat%values(errnum_) = stopdat%values(rni_)
       stopdat%values(errden_) = &
            & (stopdat%values(ani_)*stopdat%values(xni_)+stopdat%values(bni_))
@@ -1298,12 +1298,12 @@ contains
       stopdat%values(errden_) = stopdat%values(bn2_)
 
     case default
-      info=4001
+      info=psb_err_internal_error_
       call psb_errpush(info,name,a_err="Control data in stopdat messed up!")
       goto 9999      
     end select
-    if (info /= 0) then 
-       info=4011
+    if (info /= psb_success_) then 
+       info=psb_err_from_subroutine_non_
        call psb_errpush(info,name)
        goto 9999
     end if
@@ -1318,7 +1318,7 @@ contains
     psb_s_check_conv = (psb_s_check_conv.or.(stopdat%controls(itmax_) <= it))
     
     if ( (stopdat%controls(trace_) > 0).and.&
-         & ((mod(it,stopdat%controls(trace_))==0).or.psb_s_check_conv)) then 
+         & ((mod(it,stopdat%controls(trace_)) == 0).or.psb_s_check_conv)) then 
       call log_conv(methdname,me,it,1,stopdat%values(errnum_),&
            & stopdat%values(errden_),stopdat%values(eps_))
     end if
@@ -1349,7 +1349,7 @@ contains
     integer                         :: ictxt, me, np, err_act
     character(len=20)               :: name
 
-    info = 0
+    info = psb_success_
     name = 'psb_check_conv'
     call psb_erractionsave(err_act)
 
@@ -1361,7 +1361,7 @@ contains
     select case(stopdat%controls(stopc_)) 
     case(1)
       stopdat%values(rni_) = psb_geamax(r,desc_a,info)
-      if (info == 0) stopdat%values(xni_) = psb_geamax(x,desc_a,info)
+      if (info == psb_success_) stopdat%values(xni_) = psb_geamax(x,desc_a,info)
       stopdat%values(errnum_) = stopdat%values(rni_)
       stopdat%values(errden_) = &
            & (stopdat%values(ani_)*stopdat%values(xni_)+stopdat%values(bni_))
@@ -1371,12 +1371,12 @@ contains
       stopdat%values(errden_) = stopdat%values(bn2_)
 
     case default
-      info=4001
+      info=psb_err_internal_error_
       call psb_errpush(info,name,a_err="Control data in stopdat messed up!")
       goto 9999      
     end select
-    if (info /= 0) then 
-       info=4011
+    if (info /= psb_success_) then 
+       info=psb_err_from_subroutine_non_
        call psb_errpush(info,name)
        goto 9999
     end if
@@ -1391,7 +1391,7 @@ contains
     psb_d_check_conv = (psb_d_check_conv.or.(stopdat%controls(itmax_) <= it))
     
     if ( (stopdat%controls(trace_) > 0).and.&
-         & ((mod(it,stopdat%controls(trace_))==0).or.psb_d_check_conv)) then 
+         & ((mod(it,stopdat%controls(trace_)) == 0).or.psb_d_check_conv)) then 
       call log_conv(methdname,me,it,1,stopdat%values(errnum_),&
            & stopdat%values(errden_),stopdat%values(eps_))
     end if
@@ -1423,7 +1423,7 @@ contains
     integer                         :: ictxt, me, np, err_act
     character(len=20)               :: name
 
-    info = 0
+    info = psb_success_
     name = 'psb_check_conv'
     call psb_erractionsave(err_act)
 
@@ -1434,7 +1434,7 @@ contains
     select case(stopdat%controls(stopc_)) 
     case(1)
       stopdat%values(rni_) = psb_geamax(r,desc_a,info)
-      if (info == 0) stopdat%values(xni_) = psb_geamax(x,desc_a,info)
+      if (info == psb_success_) stopdat%values(xni_) = psb_geamax(x,desc_a,info)
       stopdat%values(errnum_) = stopdat%values(rni_)
       stopdat%values(errden_) = &
            & (stopdat%values(ani_)*stopdat%values(xni_)+stopdat%values(bni_))
@@ -1444,12 +1444,12 @@ contains
       stopdat%values(errden_) = stopdat%values(bn2_)
 
     case default
-      info=4001
+      info=psb_err_internal_error_
       call psb_errpush(info,name,a_err="Control data in stopdat messed up!")
       goto 9999      
     end select
-    if (info /= 0) then 
-       info=4011
+    if (info /= psb_success_) then 
+       info=psb_err_from_subroutine_non_
        call psb_errpush(info,name)
        goto 9999
     end if
@@ -1464,7 +1464,7 @@ contains
     psb_c_check_conv = (psb_c_check_conv.or.(stopdat%controls(itmax_) <= it))
     
     if ( (stopdat%controls(trace_) > 0).and.&
-         & ((mod(it,stopdat%controls(trace_))==0).or.psb_c_check_conv)) then 
+         & ((mod(it,stopdat%controls(trace_)) == 0).or.psb_c_check_conv)) then 
       call log_conv(methdname,me,it,1,stopdat%values(errnum_),&
            & stopdat%values(errden_),stopdat%values(eps_))
     end if
@@ -1495,7 +1495,7 @@ contains
     integer                         :: ictxt, me, np, err_act
     character(len=20)               :: name
 
-    info = 0
+    info = psb_success_
     name = 'psb_check_conv'
     call psb_erractionsave(err_act)
 
@@ -1506,7 +1506,7 @@ contains
     select case(stopdat%controls(stopc_)) 
     case(1)
       stopdat%values(rni_) = psb_geamax(r,desc_a,info)
-      if (info == 0) stopdat%values(xni_) = psb_geamax(x,desc_a,info)
+      if (info == psb_success_) stopdat%values(xni_) = psb_geamax(x,desc_a,info)
       stopdat%values(errnum_) = stopdat%values(rni_)
       stopdat%values(errden_) = &
            & (stopdat%values(ani_)*stopdat%values(xni_)+stopdat%values(bni_))
@@ -1516,12 +1516,12 @@ contains
       stopdat%values(errden_) = stopdat%values(bn2_)
 
     case default
-      info=4001
+      info=psb_err_internal_error_
       call psb_errpush(info,name,a_err="Control data in stopdat messed up!")
       goto 9999      
     end select
-    if (info /= 0) then 
-       info=4011
+    if (info /= psb_success_) then 
+       info=psb_err_from_subroutine_non_
        call psb_errpush(info,name)
        goto 9999
     end if
@@ -1536,7 +1536,7 @@ contains
     psb_z_check_conv = (psb_z_check_conv.or.(stopdat%controls(itmax_) <= it))
     
     if ( (stopdat%controls(trace_) > 0).and.&
-         & ((mod(it,stopdat%controls(trace_))==0).or.psb_z_check_conv)) then 
+         & ((mod(it,stopdat%controls(trace_)) == 0).or.psb_z_check_conv)) then 
       call log_conv(methdname,me,it,1,stopdat%values(errnum_),&
            & stopdat%values(errden_),stopdat%values(eps_))
     end if
@@ -1568,7 +1568,7 @@ contains
     real(psb_dpk_)                  :: errnum, errden, eps
     character(len=20)               :: name
 
-    info = 0
+    info = psb_success_
     name = 'psb_end_conv'
 
     ictxt = psb_cd_get_context(desc_a)

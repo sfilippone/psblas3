@@ -185,7 +185,7 @@ subroutine psb_base_get_neigh(a,idx,neigh,n,info,lev)
   logical, parameter :: debug=.false.
 
   call psb_erractionsave(err_act)
-  info = 0
+  info = psb_success_
   if(present(lev)) then 
     lev_ = lev
   else
@@ -196,9 +196,9 @@ subroutine psb_base_get_neigh(a,idx,neigh,n,info,lev)
   n = 0
   ma = a%get_nrows()
   call a%csget(idx,idx,n,ia,ja,info)
-  if (info == 0) call psb_realloc(n,neigh,info)
-  if (info /= 0) then 
-    call psb_errpush(4000,name)
+  if (info == psb_success_) call psb_realloc(n,neigh,info)
+  if (info /= psb_success_) then 
+    call psb_errpush(psb_err_alloc_dealloc_,name)
     goto 9999
   end if
   neigh(1:n) = ja(1:n)
@@ -207,8 +207,8 @@ subroutine psb_base_get_neigh(a,idx,neigh,n,info,lev)
   do nl = 2, lev_ 
     n1 = ill - ifl + 1
     call psb_ensure_size(ill+n1*n1,neigh,info)
-    if (info /= 0) then 
-      call psb_errpush(4000,name)
+    if (info /= psb_success_) then 
+      call psb_errpush(psb_err_alloc_dealloc_,name)
       goto 9999
     end if
     ntl = 0
@@ -216,9 +216,9 @@ subroutine psb_base_get_neigh(a,idx,neigh,n,info,lev)
       nidx=neigh(i)
       if ((nidx /= idx).and.(nidx > 0).and.(nidx <= ma)) then
         call a%csget(nidx,nidx,nn,ia,ja,info)
-        if (info==0) call psb_ensure_size(ill+ntl+nn,neigh,info)
-        if (info /= 0) then 
-          call psb_errpush(4000,name)
+        if (info == psb_success_) call psb_ensure_size(ill+ntl+nn,neigh,info)
+        if (info /= psb_success_) then 
+          call psb_errpush(psb_err_alloc_dealloc_,name)
           goto 9999
         end if
         neigh(ill+ntl+1:ill+ntl+nn)=ja(1:nn)

@@ -51,12 +51,12 @@ subroutine psb_sprecbld(a,desc_a,p,info,upd)
   character(len=20)   :: name, ch_err
 
   if(psb_get_errstatus() /= 0) return 
-  info=0
+  info=psb_success_
   err=0
   call psb_erractionsave(err_act)
   name = 'psb_precbld'
 
-  info = 0
+  info = psb_success_
   int_err(1) = 0
   ictxt = psb_cd_get_context(desc_a)
 
@@ -88,7 +88,7 @@ subroutine psb_sprecbld(a,desc_a,p,info,upd)
   end if
 
   call p%prec%precbld(a,desc_a,info,upd)
-  if (info /= 0) goto 9999
+  if (info /= psb_success_) goto 9999
 
   call psb_erractionrestore(err_act)
   return

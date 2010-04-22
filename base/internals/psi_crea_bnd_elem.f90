@@ -59,13 +59,13 @@ subroutine psi_crea_bnd_elem(bndel,desc_a,info)
   integer :: i, j, nr, ns, k, err_act
   character(len=20)    :: name
 
-  info = 0
+  info = psb_success_
   name='psi_crea_bnd_elem'
   call psb_erractionsave(err_act)
 
   allocate(work(size(desc_a%halo_index)),stat=info)
-  if (info /= 0 ) then 
-    info = 4000
+  if (info /= psb_success_ ) then 
+    info = psb_err_alloc_dealloc_
     call psb_errpush(info,name)
     goto 9999
   end if
@@ -88,8 +88,8 @@ subroutine psi_crea_bnd_elem(bndel,desc_a,info)
   if (.true.) then 
     if (j>=0) then 
       call psb_realloc(j,bndel,info)
-      if (info /= 0) then 
-        call psb_errpush(4010,name,a_err='Allocate')
+      if (info /= psb_success_) then 
+        call psb_errpush(psb_err_from_subroutine_,name,a_err='Allocate')
         goto 9999      
       end if
       bndel(1:j) = work(1:j)
@@ -100,8 +100,8 @@ subroutine psi_crea_bnd_elem(bndel,desc_a,info)
     end if
   else
     call psb_realloc(j+1,bndel,info)
-    if (info /= 0) then 
-      call psb_errpush(4010,name,a_err='Allocate')
+    if (info /= psb_success_) then 
+      call psb_errpush(psb_err_from_subroutine_,name,a_err='Allocate')
       goto 9999      
     end if
     bndel(1:j) = work(1:j)

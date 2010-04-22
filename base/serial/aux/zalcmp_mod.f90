@@ -52,7 +52,7 @@ contains
     logical :: zallt
     
     zallt = (abs(real(a))<abs(real(b))).or. &
-         & ((abs(real(a))==abs(real(b))).and.(abs(aimag(a))<abs(aimag(b))))
+         & ((abs(real(a)) == abs(real(b))).and.(abs(aimag(a))<abs(aimag(b))))
   end function zallt
   function zalle(a,b)
     use psb_const_mod
@@ -60,7 +60,7 @@ contains
     logical :: zalle
     
     zalle = (abs(real(a))<abs(real(b))).or. &
-         & ((abs(real(a))==abs(real(b))).and.(abs(aimag(a))<=abs(aimag(b))))
+         & ((abs(real(a)) == abs(real(b))).and.(abs(aimag(a))<=abs(aimag(b))))
   end function zalle
 
   function zalgt(a,b)
@@ -69,7 +69,7 @@ contains
     logical :: zalgt
     
     zalgt = (abs(real(a))>abs(real(b))).or. &
-         & ((abs(real(a))==abs(real(b))).and.(abs(aimag(a))>abs(aimag(b))))
+         & ((abs(real(a)) == abs(real(b))).and.(abs(aimag(a))>abs(aimag(b))))
   end function zalgt
   function zalge(a,b)
     use psb_const_mod
@@ -77,7 +77,7 @@ contains
     logical :: zalge
     
     zalge = (abs(real(a))>abs(real(b))).or. &
-         & ((abs(real(a))==abs(real(b))).and.(abs(aimag(a))>=abs(aimag(b))))
+         & ((abs(real(a)) == abs(real(b))).and.(abs(aimag(a))>=abs(aimag(b))))
   end function zalge
 
 end module zalcmp_mod

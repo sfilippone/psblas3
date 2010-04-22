@@ -252,7 +252,7 @@ module psb_d_cxx_mat_mod
 
 contains 
 
-  !=====================================
+  ! == ===================================
   !
   !
   !
@@ -262,7 +262,7 @@ contains
   !
   !
   !
-  !=====================================
+  ! == ===================================
 
   
   function d_cxx_sizeof(a) result(res)
@@ -334,7 +334,7 @@ contains
 
 
 
-  !=====================================
+  ! == ===================================
   !
   !
   !
@@ -344,7 +344,7 @@ contains
   !
   !
   !
-  !=====================================  
+  ! == ===================================  
 
 
   subroutine  d_cxx_reallocate_nz(nz,a) 
@@ -360,11 +360,11 @@ contains
     call psb_erractionsave(err_act)
 
     call psb_realloc(nz,a%ja,info)
-    if (info == 0) call psb_realloc(nz,a%val,info)
-    if (info == 0) call psb_realloc(&
+    if (info == psb_success_) call psb_realloc(nz,a%val,info)
+    if (info == psb_success_) call psb_realloc(&
          & max(nz,a%get_nrows()+1,a%get_ncols()+1),a%irp,info)
-    if (info /= 0) then 
-      call psb_errpush(4000,name)
+    if (info /= psb_success_) then 
+      call psb_errpush(psb_err_alloc_dealloc_,name)
       goto 9999
     end if
 
@@ -399,29 +399,29 @@ contains
     integer            :: nza, i,j,k, nzl, isza, int_err(5)
 
     call psb_erractionsave(err_act)
-    info = 0
+    info = psb_success_
 
     if (nz <= 0) then 
-      info = 10
+      info = psb_err_iarg_neg_
       int_err(1)=1
       call psb_errpush(info,name,i_err=int_err)
       goto 9999
     end if
     if (size(ia) < nz) then 
-      info = 35
+      info = psb_err_input_asize_invalid_i_
       int_err(1)=2
       call psb_errpush(info,name,i_err=int_err)
       goto 9999
     end if
 
     if (size(ja) < nz) then 
-      info = 35
+      info = psb_err_input_asize_invalid_i_
       int_err(1)=3
       call psb_errpush(info,name,i_err=int_err)
       goto 9999
     end if
     if (size(val) < nz) then 
-      info = 35
+      info = psb_err_input_asize_invalid_i_
       int_err(1)=4
       call psb_errpush(info,name,i_err=int_err)
       goto 9999
@@ -430,7 +430,7 @@ contains
     if (nz == 0) return
 
     call d_cxx_csput_impl(nz,ia,ja,val,a,imin,imax,jmin,jmax,info,gtl) 
-    if (info /= 0) goto 9999
+    if (info /= psb_success_) goto 9999
 
     call psb_erractionrestore(err_act)
     return
@@ -466,12 +466,12 @@ contains
     logical, parameter :: debug=.false.
 
     call psb_erractionsave(err_act)
-    info = 0
+    info = psb_success_
 
     call d_cxx_csgetptn_impl(imin,imax,a,nz,ia,ja,info,&
          & jmin,jmax,iren,append,nzin,rscale,cscale)
 
-    if (info /= 0) goto 9999
+    if (info /= psb_success_) goto 9999
 
     call psb_erractionrestore(err_act)
     return
@@ -510,12 +510,12 @@ contains
     logical, parameter :: debug=.false.
 
     call psb_erractionsave(err_act)
-    info = 0
+    info = psb_success_
 
     call d_cxx_csgetrow_impl(imin,imax,a,nz,ia,ja,val,info,&
          & jmin,jmax,iren,append,nzin,rscale,cscale)
 
-    if (info /= 0) goto 9999
+    if (info /= psb_success_) goto 9999
 
     call psb_erractionrestore(err_act)
     return
@@ -553,7 +553,7 @@ contains
     logical, parameter :: debug=.false.
     
     call psb_erractionsave(err_act)
-    info = 0
+    info = psb_success_
 
     if (present(append)) then 
       append_ = append
@@ -570,11 +570,11 @@ contains
          & jmin=jmin, jmax=jmax, iren=iren, append=append_, &
          & nzin=nzin, rscale=rscale, cscale=cscale)
 
-    if (info /= 0) goto 9999
+    if (info /= psb_success_) goto 9999
 
     call b%set_nzeros(nzin+nzout)
     call b%fix(info)
-    if (info /= 0) goto 9999
+    if (info /= psb_success_) goto 9999
     
     call psb_erractionrestore(err_act)
     return
@@ -610,7 +610,7 @@ contains
     logical, parameter :: debug=.false.
     
     call psb_erractionsave(err_act)
-    info = 0
+    info = psb_success_
 
     nzin = 0
     if (present(imin)) then 
@@ -660,12 +660,12 @@ contains
          & jmin=jmin_, jmax=jmax_, append=.false., &
          & nzin=nzin, rscale=rscale_, cscale=cscale_)
 
-    if (info /= 0) goto 9999
+    if (info /= psb_success_) goto 9999
 
     call b%set_nzeros(nzin+nzout)
     call b%fix(info)
 
-    if (info /= 0) goto 9999
+    if (info /= psb_success_) goto 9999
     call psb_erractionrestore(err_act)
     return
 
@@ -710,7 +710,7 @@ contains
     logical, parameter :: debug=.false.
 
     call psb_erractionsave(err_act)
-    info = 0
+    info = psb_success_
 
 
     if (present(clear)) then 
@@ -756,14 +756,14 @@ contains
     logical, parameter :: debug=.false.
 
     call psb_erractionsave(err_act)
-    info = 0
+    info = psb_success_
     m   = a%get_nrows()
     nz  = a%get_nzeros()
-    if (info == 0) call psb_realloc(m+1,a%irp,info)
-    if (info == 0) call psb_realloc(nz,a%ja,info)
-    if (info == 0) call psb_realloc(nz,a%val,info)
+    if (info == psb_success_) call psb_realloc(m+1,a%irp,info)
+    if (info == psb_success_) call psb_realloc(nz,a%ja,info)
+    if (info == psb_success_) call psb_realloc(nz,a%val,info)
 
-    if (info /= 0) goto 9999 
+    if (info /= psb_success_) goto 9999 
     call psb_erractionrestore(err_act)
     return
 
@@ -792,9 +792,9 @@ contains
     logical, parameter :: debug=.false.
 
     call psb_erractionsave(err_act)
-    info = 0
+    info = psb_success_
     call d_cp_cxx_to_coo_impl(a,b,info)
-    if (info /= 0) goto 9999
+    if (info /= psb_success_) goto 9999
 
     call psb_erractionrestore(err_act)
     return
@@ -824,9 +824,9 @@ contains
     logical, parameter :: debug=.false.
 
     call psb_erractionsave(err_act)
-    info = 0
+    info = psb_success_
     call d_cp_cxx_from_coo_impl(a,b,info)
-    if (info /= 0) goto 9999
+    if (info /= psb_success_) goto 9999
 
     call psb_erractionrestore(err_act)
     return
@@ -857,9 +857,9 @@ contains
     logical, parameter :: debug=.false.
 
     call psb_erractionsave(err_act)
-    info = 0
+    info = psb_success_
     call d_cp_cxx_to_fmt_impl(a,b,info)
-    if (info /= 0) goto 9999
+    if (info /= psb_success_) goto 9999
 
     call psb_erractionrestore(err_act)
     return
@@ -889,9 +889,9 @@ contains
     logical, parameter :: debug=.false.
 
     call psb_erractionsave(err_act)
-    info = 0
+    info = psb_success_
     call d_cp_cxx_from_fmt_impl(a,b,info)
-    if (info /= 0) goto 9999
+    if (info /= psb_success_) goto 9999
 
     call psb_erractionrestore(err_act)
     return
@@ -922,9 +922,9 @@ contains
     logical, parameter :: debug=.false.
 
     call psb_erractionsave(err_act)
-    info = 0
+    info = psb_success_
     call d_mv_cxx_to_coo_impl(a,b,info)
-    if (info /= 0) goto 9999
+    if (info /= psb_success_) goto 9999
 
     call psb_erractionrestore(err_act)
     return
@@ -954,9 +954,9 @@ contains
     logical, parameter :: debug=.false.
 
     call psb_erractionsave(err_act)
-    info = 0
+    info = psb_success_
     call d_mv_cxx_from_coo_impl(a,b,info)
-    if (info /= 0) goto 9999
+    if (info /= psb_success_) goto 9999
 
     call psb_erractionrestore(err_act)
     return
@@ -987,9 +987,9 @@ contains
     logical, parameter :: debug=.false.
 
     call psb_erractionsave(err_act)
-    info = 0
+    info = psb_success_
     call d_mv_cxx_to_fmt_impl(a,b,info)
-    if (info /= 0) goto 9999
+    if (info /= psb_success_) goto 9999
 
     call psb_erractionrestore(err_act)
     return
@@ -1019,9 +1019,9 @@ contains
     logical, parameter :: debug=.false.
 
     call psb_erractionsave(err_act)
-    info = 0
+    info = psb_success_
     call d_mv_cxx_from_fmt_impl(a,b,info)
-    if (info /= 0) goto 9999
+    if (info /= psb_success_) goto 9999
 
     call psb_erractionrestore(err_act)
     return
@@ -1051,14 +1051,14 @@ contains
     logical, parameter :: debug=.false.
 
     call psb_erractionsave(err_act)
-    info = 0
+    info = psb_success_
     if (m < 0) then 
-      info = 10
+      info = psb_err_iarg_neg_
       call psb_errpush(info,name,i_err=(/1,0,0,0,0/))
       goto 9999
     endif
     if (n < 0) then 
-      info = 10
+      info = psb_err_iarg_neg_
       call psb_errpush(info,name,i_err=(/2,0,0,0,0/))
       goto 9999
     endif
@@ -1068,15 +1068,15 @@ contains
       nz_ = max(7*m,7*n,1)
     end if
     if (nz_ < 0) then 
-      info = 10
+      info = psb_err_iarg_neg_
       call psb_errpush(info,name,i_err=(/3,0,0,0,0/))
       goto 9999
     endif
       
-    if (info == 0) call psb_realloc(m+1,a%irp,info)
-    if (info == 0) call psb_realloc(nz_,a%ja,info)
-    if (info == 0) call psb_realloc(nz_,a%val,info)
-    if (info == 0) then 
+    if (info == psb_success_) call psb_realloc(m+1,a%irp,info)
+    if (info == psb_success_) call psb_realloc(nz_,a%ja,info)
+    if (info == psb_success_) call psb_realloc(nz_,a%val,info)
+    if (info == psb_success_) then 
       a%irp=0
       call a%set_nrows(m)
       call a%set_ncols(n)
@@ -1195,7 +1195,7 @@ contains
 
     call psb_erractionsave(err_act)
 
-    info = 0
+    info = psb_success_
 
     call a%allocate(b%get_nrows(),b%get_ncols(),b%get_nzeros())
     call a%psb_d_base_sparse_mat%cp_from(b%psb_d_base_sparse_mat)
@@ -1203,7 +1203,7 @@ contains
     a%ja  = b%ja
     a%val = b%val 
 
-    if (info /= 0) goto 9999
+    if (info /= psb_success_) goto 9999
     call psb_erractionrestore(err_act)
     return
 
@@ -1232,7 +1232,7 @@ contains
     logical, parameter :: debug=.false.
 
     call psb_erractionsave(err_act)
-    info = 0
+    info = psb_success_
     call a%psb_d_base_sparse_mat%mv_from(b%psb_d_base_sparse_mat)
     call move_alloc(b%irp, a%irp)
     call move_alloc(b%ja,  a%ja)
@@ -1256,7 +1256,7 @@ contains
 
 
 
-  !=====================================
+  ! == ===================================
   !
   !
   !
@@ -1267,7 +1267,7 @@ contains
   !
   !
   !
-  !=====================================
+  ! == ===================================
 
 
   subroutine d_cxx_csmv(alpha,a,x,beta,y,info,trans) 
@@ -1298,7 +1298,7 @@ contains
 
     call d_cxx_csmm_impl(alpha,a,x,beta,y,info,trans) 
     
-    if (info /= 0) goto 9999
+    if (info /= psb_success_) goto 9999
 
     call psb_erractionrestore(err_act)
     return
@@ -1337,7 +1337,7 @@ contains
 
     call d_cxx_csmm_impl(alpha,a,x,beta,y,info,trans) 
     
-    if (info /= 0) goto 9999
+    if (info /= psb_success_) goto 9999
 
     call psb_erractionrestore(err_act)
     return
@@ -1486,12 +1486,12 @@ contains
     character(len=20)  :: name='get_diag'
     logical, parameter :: debug=.false.
 
-    info  = 0
+    info  = psb_success_
     call psb_erractionsave(err_act)
 
     mnm = min(a%get_nrows(),a%get_ncols())
     if (size(d) < mnm) then 
-      info=35
+      info=psb_err_input_asize_invalid_i_
       call psb_errpush(info,name,i_err=(/2,size(d),0,0,0/))
       goto 9999
     end if
@@ -1500,7 +1500,7 @@ contains
     do i=1, mnm
       do k=a%irp(i),a%irp(i+1)-1
         j=a%ja(k)
-        if ((j==i) .and.(j <= mnm )) then 
+        if ((j == i) .and.(j <= mnm )) then 
           d(i) = a%val(k)
         endif
       enddo
@@ -1534,12 +1534,12 @@ contains
     character(len=20)  :: name='scal'
     logical, parameter :: debug=.false.
 
-    info  = 0
+    info  = psb_success_
     call psb_erractionsave(err_act)
 
     m = a%get_nrows()
     if (size(d) < m) then 
-      info=35
+      info=psb_err_input_asize_invalid_i_
       call psb_errpush(info,name,i_err=(/2,size(d),0,0,0/))
       goto 9999
     end if
@@ -1576,7 +1576,7 @@ contains
     character(len=20)  :: name='scal'
     logical, parameter :: debug=.false.
 
-    info  = 0
+    info  = psb_success_
     call psb_erractionsave(err_act)
 
 

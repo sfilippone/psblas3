@@ -65,7 +65,7 @@ subroutine  psb_igatherm(globx, locx, desc_a, info, iroot)
 
   name='psb_igatherm'
   if(psb_get_errstatus() /= 0) return 
-  info=0
+  info=psb_success_
   call psb_erractionsave(err_act)
 
   ictxt=psb_cd_get_context(desc_a)
@@ -73,7 +73,7 @@ subroutine  psb_igatherm(globx, locx, desc_a, info, iroot)
   ! check on blacs grid 
   call psb_info(ictxt, me, np)
   if (np == -1) then
-    info = 2010
+    info = psb_err_blacs_error_
     call psb_errpush(info,name)
     goto 9999
   endif
@@ -81,7 +81,7 @@ subroutine  psb_igatherm(globx, locx, desc_a, info, iroot)
   if (present(iroot)) then
     root = iroot
     if((root < -1).or.(root > np)) then
-      info=30
+      info=psb_err_input_value_invalid_i_
       int_err(1:2)=(/5,root/)
       call psb_errpush(info,name,i_err=int_err)
       goto 9999
@@ -89,7 +89,7 @@ subroutine  psb_igatherm(globx, locx, desc_a, info, iroot)
   else
     root = -1
   end if
-  if (root==-1) then
+  if (root == -1) then
     iiroot = psb_root_
   else 
     iiroot = root
@@ -117,15 +117,15 @@ subroutine  psb_igatherm(globx, locx, desc_a, info, iroot)
 
   call psb_chkglobvect(m,n,size(globx,1),iglobx,jglobx,desc_a,info)
   call psb_chkvect(m,n,size(locx,1),ilocx,jlocx,desc_a,info,ilx,jlx)
-  if(info /= 0) then
-    info=4010
+  if(info /= psb_success_) then
+    info=psb_err_from_subroutine_
     ch_err='psb_chk(glob)vect'
     call psb_errpush(info,name,a_err=ch_err)
     goto 9999
   end if
 
   if ((ilx /= 1).or.(iglobx /= 1)) then
-    info=3040
+    info=psb_err_ix_n1_iy_n1_unsupported_
     call psb_errpush(info,name)
     goto 9999
   end if
@@ -235,7 +235,7 @@ subroutine  psb_igatherv(globx, locx, desc_a, info, iroot)
 
   name='psb_igatherv'
   if(psb_get_errstatus() /= 0) return 
-  info=0
+  info=psb_success_
   call psb_erractionsave(err_act)
 
   ictxt=psb_cd_get_context(desc_a)
@@ -243,7 +243,7 @@ subroutine  psb_igatherv(globx, locx, desc_a, info, iroot)
   ! check on blacs grid 
   call psb_info(ictxt, me, np)
   if (np == -1) then
-    info = 2010
+    info = psb_err_blacs_error_
     call psb_errpush(info,name)
     goto 9999
   endif
@@ -251,7 +251,7 @@ subroutine  psb_igatherv(globx, locx, desc_a, info, iroot)
   if (present(iroot)) then
      root = iroot
      if((root < -1).or.(root > np)) then
-        info=30
+        info=psb_err_input_value_invalid_i_
         int_err(1:2)=(/5,root/)
         call psb_errpush(info,name,i_err=int_err)
         goto 9999
@@ -278,15 +278,15 @@ subroutine  psb_igatherv(globx, locx, desc_a, info, iroot)
 
   call psb_chkglobvect(m,n,size(globx),iglobx,jglobx,desc_a,info)
   call psb_chkvect(m,n,size(locx),ilocx,jlocx,desc_a,info,ilx,jlx)
-  if(info /= 0) then
-     info=4010
+  if(info /= psb_success_) then
+     info=psb_err_from_subroutine_
      ch_err='psb_chk(glob)vect'
      call psb_errpush(info,name,a_err=ch_err)
      goto 9999
   end if
 
   if ((ilx /= 1).or.(iglobx /= 1)) then
-     info=3040
+     info=psb_err_ix_n1_iy_n1_unsupported_
      call psb_errpush(info,name)
      goto 9999
   end if

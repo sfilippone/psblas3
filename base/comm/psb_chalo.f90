@@ -77,7 +77,7 @@ subroutine  psb_chalom(x,desc_a,info,alpha,jx,ik,work,tran,mode,data)
 
   name='psb_chalom'
   if(psb_get_errstatus() /= 0) return 
-  info=0
+  info=psb_success_
   call psb_erractionsave(err_act)
 
   ictxt=psb_cd_get_context(desc_a)
@@ -85,7 +85,7 @@ subroutine  psb_chalom(x,desc_a,info,alpha,jx,ik,work,tran,mode,data)
   ! check on blacs grid 
   call psb_info(ictxt, me, np)
   if (np == -1) then
-    info = 2010
+    info = psb_err_blacs_error_
     call psb_errpush(info,name)
     goto 9999
   endif
@@ -132,14 +132,14 @@ subroutine  psb_chalom(x,desc_a,info,alpha,jx,ik,work,tran,mode,data)
 
   ! check vector correctness
   call psb_chkvect(m,1,size(x,1),ix,ijx,desc_a,info,iix,jjx)
-  if(info /= 0) then
-    info=4010
+  if(info /= psb_success_) then
+    info=psb_err_from_subroutine_
     ch_err='psb_chkvect'
     call psb_errpush(info,name,a_err=ch_err)
   end if
 
   if (iix /= 1) then
-    info=3040
+    info=psb_err_ix_n1_iy_n1_unsupported_
     call psb_errpush(info,name)
   end if
 
@@ -163,8 +163,8 @@ subroutine  psb_chalom(x,desc_a,info,alpha,jx,ik,work,tran,mode,data)
     else
       aliw=.true.
       allocate(iwork(liwork),stat=info)
-      if(info /= 0) then
-        info=4010
+      if(info /= psb_success_) then
+        info=psb_err_from_subroutine_
         ch_err='psb_realloc'
         call psb_errpush(info,name,a_err=ch_err)
         goto 9999
@@ -174,8 +174,8 @@ subroutine  psb_chalom(x,desc_a,info,alpha,jx,ik,work,tran,mode,data)
     aliw=.true.
     allocate(iwork(liwork),stat=info)
 
-    if(info /= 0) then
-      info=4010
+    if(info /= psb_success_) then
+      info=psb_err_from_subroutine_
       ch_err='psb_realloc'
       call psb_errpush(info,name,a_err=ch_err)
       goto 9999
@@ -191,14 +191,14 @@ subroutine  psb_chalom(x,desc_a,info,alpha,jx,ik,work,tran,mode,data)
     call psi_swaptran(imode,k,cone,xp,&
          &desc_a,iwork,info)
   else
-    info = 4001
+    info = psb_err_internal_error_
     call psb_errpush(info,name,a_err='invalid tran')
     goto 9999      
   end if
 
-  if(info /= 0) then
+  if(info /= psb_success_) then
     ch_err='PSI_zswapdata'
-    call psb_errpush(4010,name,a_err=ch_err)
+    call psb_errpush(psb_err_from_subroutine_,name,a_err=ch_err)
     goto 9999
   end if
 
@@ -298,7 +298,7 @@ subroutine  psb_chalov(x,desc_a,info,alpha,work,tran,mode,data)
 
   name='psb_chalov'
   if(psb_get_errstatus() /= 0) return 
-  info=0
+  info=psb_success_
   call psb_erractionsave(err_act)
 
   ictxt=psb_cd_get_context(desc_a)
@@ -306,7 +306,7 @@ subroutine  psb_chalov(x,desc_a,info,alpha,work,tran,mode,data)
   ! check on blacs grid 
   call psb_info(ictxt, me, np)
   if (np == -1) then
-    info = 2010
+    info = psb_err_blacs_error_
     call psb_errpush(info,name)
     goto 9999
   endif
@@ -337,14 +337,14 @@ subroutine  psb_chalov(x,desc_a,info,alpha,work,tran,mode,data)
 
   ! check vector correctness
   call psb_chkvect(m,1,size(x,1),ix,ijx,desc_a,info,iix,jjx)
-  if(info /= 0) then
-    info=4010
+  if(info /= psb_success_) then
+    info=psb_err_from_subroutine_
     ch_err='psb_chkvect'
     call psb_errpush(info,name,a_err=ch_err)
   end if
 
   if (iix /= 1) then
-    info=3040
+    info=psb_err_ix_n1_iy_n1_unsupported_
     call psb_errpush(info,name)
   end if
 
@@ -366,8 +366,8 @@ subroutine  psb_chalov(x,desc_a,info,alpha,work,tran,mode,data)
     else
       aliw=.true.
       allocate(iwork(liwork),stat=info)
-      if(info /= 0) then
-        info=4010
+      if(info /= psb_success_) then
+        info=psb_err_from_subroutine_
         ch_err='psb_realloc'
         call psb_errpush(info,name,a_err=ch_err)
         goto 9999
@@ -376,8 +376,8 @@ subroutine  psb_chalov(x,desc_a,info,alpha,work,tran,mode,data)
   else
     aliw=.true.
     allocate(iwork(liwork),stat=info)
-    if(info /= 0) then
-      info=4010
+    if(info /= psb_success_) then
+      info=psb_err_from_subroutine_
       ch_err='psb_realloc'
       call psb_errpush(info,name,a_err=ch_err)
       goto 9999
@@ -392,14 +392,14 @@ subroutine  psb_chalov(x,desc_a,info,alpha,work,tran,mode,data)
     call psi_swaptran(imode,cone,x(iix:size(x)),&
          & desc_a,iwork,info)
   else
-    info = 4001
+    info = psb_err_internal_error_
     call psb_errpush(info,name,a_err='invalid tran')
     goto 9999      
   end if
 
-  if(info /= 0) then
+  if(info /= psb_success_) then
     ch_err='PSI_dSwap...'
-    call psb_errpush(4010,name,a_err=ch_err)
+    call psb_errpush(psb_err_from_subroutine_,name,a_err=ch_err)
     goto 9999
   end if
 

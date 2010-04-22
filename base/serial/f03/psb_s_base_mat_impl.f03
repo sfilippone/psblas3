@@ -1,4 +1,4 @@
-!====================================
+! == ==================================
 !
 !
 !
@@ -8,7 +8,7 @@
 !
 !
 !
-!====================================
+! == ==================================
 
 subroutine psb_s_base_cp_to_coo(a,b,info)
   use psb_s_base_mat_mod, psb_protect_name => psb_s_base_cp_to_coo
@@ -317,7 +317,7 @@ subroutine psb_s_base_csgetblk(imin,imax,a,b,info,&
   logical, parameter :: debug=.false.
 
   call psb_erractionsave(err_act)
-  info = 0
+  info = psb_success_
 
   if (present(append)) then 
     append_ = append
@@ -334,11 +334,11 @@ subroutine psb_s_base_csgetblk(imin,imax,a,b,info,&
        & jmin=jmin, jmax=jmax, iren=iren, append=append_, &
        & nzin=nzin, rscale=rscale, cscale=cscale)
 
-  if (info /= 0) goto 9999
+  if (info /= psb_success_) goto 9999
 
   call b%set_nzeros(nzin+nzout)
   call b%fix(info)
-  if (info /= 0) goto 9999
+  if (info /= psb_success_) goto 9999
 
   call psb_erractionrestore(err_act)
   return
@@ -375,7 +375,7 @@ subroutine psb_s_base_csclip(a,b,info,&
   logical, parameter :: debug=.false.
 
   call psb_erractionsave(err_act)
-  info = 0
+  info = psb_success_
 
   nzin = 0
   if (present(imin)) then 
@@ -423,12 +423,12 @@ subroutine psb_s_base_csclip(a,b,info,&
   call a%csget(imin_,imax_,nzout,b%ia,b%ja,b%val,info,&
        & jmin=jmin_, jmax=jmax_, append=.false., &
        & nzin=nzin, rscale=rscale_, cscale=cscale_)
-  if (info /= 0) goto 9999
+  if (info /= psb_success_) goto 9999
 
   call b%set_nzeros(nzin+nzout)
   call b%fix(info)
 
-  if (info /= 0) goto 9999
+  if (info /= psb_success_) goto 9999
   call psb_erractionrestore(err_act)
   return
 
@@ -458,16 +458,16 @@ subroutine psb_s_base_transp_2mat(a,b)
 
   call psb_erractionsave(err_act)
 
-  info = 0
+  info = psb_success_
   select type(b)
     class is (psb_s_base_sparse_mat)
     call b%cp_to_coo(tmp,info)
-    if (info == 0) call tmp%transp()
-    if (info == 0) call a%mv_from_coo(tmp,info)
+    if (info == psb_success_) call tmp%transp()
+    if (info == psb_success_) call a%mv_from_coo(tmp,info)
     class default
     info = 700
   end select
-  if (info /= 0) then 
+  if (info /= psb_success_) then 
     call psb_errpush(info,name,a_err=b%get_fmt())
     goto 9999
   end if
@@ -505,12 +505,12 @@ subroutine psb_s_base_transp_1mat(a)
   character(len=*), parameter :: name='s_base_transp'
 
   call psb_erractionsave(err_act)
-  info = 0
+  info = psb_success_
   call a%mv_to_coo(tmp,info)
-  if (info == 0) call tmp%transp()
-  if (info == 0) call a%mv_from_coo(tmp,info)
+  if (info == psb_success_) call tmp%transp()
+  if (info == psb_success_) call a%mv_from_coo(tmp,info)
 
-  if (info /= 0) then 
+  if (info /= psb_success_) then 
     info = 700 
     call psb_errpush(info,name,a_err=a%get_fmt())
     goto 9999
@@ -537,7 +537,7 @@ subroutine psb_s_base_transc_1mat(a)
 end subroutine psb_s_base_transc_1mat
 
 
-!====================================
+! == ==================================
 !
 !
 !
@@ -548,7 +548,7 @@ end subroutine psb_s_base_transc_1mat
 !
 !
 !
-!====================================
+! == ==================================
 
 subroutine psb_s_base_csmm(alpha,a,x,beta,y,info,trans) 
   use psb_s_base_mat_mod, psb_protect_name => psb_s_base_csmm
@@ -729,18 +729,18 @@ subroutine psb_s_base_cssm(alpha,a,x,beta,y,info,trans,scale,d)
       end if
 
       allocate(tmp(nac,nc),stat=info) 
-      if (info /= 0) info = 4000 
-      if (info == 0) then 
+      if (info /= psb_success_) info = psb_err_alloc_dealloc_ 
+      if (info == psb_success_) then 
         do i=1, nac
           tmp(i,1:nc) = d(i)*x(i,1:nc) 
         end do
       end if
-      if (info == 0)&
+      if (info == psb_success_)&
            & call a%inner_cssm(alpha,tmp,beta,y,info,trans)
 
-      if (info == 0) then 
+      if (info == psb_success_) then 
         deallocate(tmp,stat=info) 
-        if (info /= 0) info = 4000
+        if (info /= psb_success_) info = psb_err_alloc_dealloc_
       end if
 
     else if (psb_toupper(scale_) == 'L') then 
@@ -752,21 +752,21 @@ subroutine psb_s_base_cssm(alpha,a,x,beta,y,info,trans,scale,d)
       end if
 
       allocate(tmp(nar,nc),stat=info) 
-      if (info /= 0) info = 4000 
-      if (info == 0)&
+      if (info /= psb_success_) info = psb_err_alloc_dealloc_ 
+      if (info == psb_success_)&
            & call a%inner_cssm(sone,x,szero,tmp,info,trans)
 
-      if (info == 0)then 
+      if (info == psb_success_)then 
         do i=1, nar
           tmp(i,1:nc) = d(i)*tmp(i,1:nc) 
         end do
       end if
-      if (info == 0)&
+      if (info == psb_success_)&
            & call psb_geaxpby(nar,nc,alpha,tmp,beta,y,info)
 
-      if (info == 0) then 
+      if (info == psb_success_) then 
         deallocate(tmp,stat=info) 
-        if (info /= 0) info = 4000
+        if (info /= psb_success_) info = psb_err_alloc_dealloc_
       end if
 
     else
@@ -779,8 +779,8 @@ subroutine psb_s_base_cssm(alpha,a,x,beta,y,info,trans,scale,d)
     call a%inner_cssm(alpha,x,beta,y,info,trans)
   end if
 
-  if (info /= 0) then 
-    info = 4010 
+  if (info /= psb_success_) then 
+    info = psb_err_from_subroutine_ 
     call psb_errpush(info,name, a_err='inner_cssm')
     goto 9999
   end if
@@ -865,14 +865,14 @@ subroutine psb_s_base_cssv(alpha,a,x,beta,y,info,trans,scale,d)
       end if
 
       allocate(tmp(nac),stat=info) 
-      if (info /= 0) info = 4000 
-      if (info == 0) call inner_vscal(nac,d,x,tmp) 
-      if (info == 0)&
+      if (info /= psb_success_) info = psb_err_alloc_dealloc_ 
+      if (info == psb_success_) call inner_vscal(nac,d,x,tmp) 
+      if (info == psb_success_)&
            & call a%inner_cssm(alpha,tmp,beta,y,info,trans)
 
-      if (info == 0) then 
+      if (info == psb_success_) then 
         deallocate(tmp,stat=info) 
-        if (info /= 0) info = 4000
+        if (info /= psb_success_) info = psb_err_alloc_dealloc_
       end if
 
     else if (psb_toupper(scale_) == 'L') then 
@@ -884,19 +884,19 @@ subroutine psb_s_base_cssv(alpha,a,x,beta,y,info,trans,scale,d)
 
       if (beta == szero) then 
         call a%inner_cssm(alpha,x,szero,y,info,trans)
-        if (info == 0)  call inner_vscal1(nar,d,y)
+        if (info == psb_success_)  call inner_vscal1(nar,d,y)
       else
         allocate(tmp(nar),stat=info) 
-        if (info /= 0) info = 4000 
-        if (info == 0)&
+        if (info /= psb_success_) info = psb_err_alloc_dealloc_ 
+        if (info == psb_success_)&
              & call a%inner_cssm(alpha,x,szero,tmp,info,trans)
 
-        if (info == 0)  call inner_vscal1(nar,d,tmp)
-        if (info == 0)&
+        if (info == psb_success_)  call inner_vscal1(nar,d,tmp)
+        if (info == psb_success_)&
              & call psb_geaxpby(nar,sone,tmp,beta,y,info)
-        if (info == 0) then 
+        if (info == psb_success_) then 
           deallocate(tmp,stat=info) 
-          if (info /= 0) info = 4000
+          if (info /= psb_success_) info = psb_err_alloc_dealloc_
         end if
       end if
 
@@ -910,8 +910,8 @@ subroutine psb_s_base_cssv(alpha,a,x,beta,y,info,trans,scale,d)
     call a%inner_cssm(alpha,x,beta,y,info,trans)
   end if
 
-  if (info /= 0) then 
-    info = 4010 
+  if (info /= psb_success_) then 
+    info = psb_err_from_subroutine_ 
     call psb_errpush(info,name, a_err='inner_cssm')
     goto 9999
   end if

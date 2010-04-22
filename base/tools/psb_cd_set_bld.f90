@@ -36,7 +36,7 @@ subroutine psb_cd_set_ovl_bld(desc,info)
   integer                            :: info
 
   call psb_cd_set_bld(desc,info) 
-  if (info == 0) desc%matrix_data(psb_dec_type_) = psb_cd_ovl_bld_ 
+  if (info == psb_success_) desc%matrix_data(psb_dec_type_) = psb_cd_ovl_bld_ 
 
 end subroutine psb_cd_set_ovl_bld
 
@@ -52,7 +52,7 @@ subroutine psb_cd_set_bld(desc,info)
   character(len=20)   :: name
   if (debug) write(0,*) me,'Entered CDCPY'
   if (psb_get_errstatus() /= 0) return 
-  info = 0
+  info = psb_success_
   call psb_erractionsave(err_act)
   name = 'psb_cd_set_bld'
 
@@ -80,11 +80,11 @@ subroutine psb_cd_set_bld(desc,info)
     ! the hash occupancy.
     !
     nc = psb_cd_get_local_cols(desc)
-    if (info == 0)&
+    if (info == psb_success_)&
          & call psb_hash_init(nc,desc%idxmap%hash,info)
-    if (info == 0) call psi_bld_g2lmap(desc,info)
-    if (info /= 0) then 
-      call psb_errpush(4010,name,a_err='hashInit')
+    if (info == psb_success_) call psi_bld_g2lmap(desc,info)
+    if (info /= psb_success_) then 
+      call psb_errpush(psb_err_from_subroutine_,name,a_err='hashInit')
       goto 9999      
     end if
 

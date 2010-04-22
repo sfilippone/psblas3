@@ -97,7 +97,7 @@ contains
     integer, intent(in) :: ip
     logical             :: is_legal_ml_fact
 
-    is_legal_ml_fact = (ip==psb_f_ilu_n_)
+    is_legal_ml_fact = (ip == psb_f_ilu_n_)
     return
   end function is_legal_ml_fact
   function is_legal_ml_eps(ip)

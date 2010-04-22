@@ -69,7 +69,7 @@ subroutine psi_idx_ins_cnv1(nv,idxin,desc,info,mask)
   integer, parameter     :: relocsz=200
   character(len=20)      :: name,ch_err
 
-  info = 0
+  info = psb_success_
   name = 'psb_idx_ins_cnv'
   call psb_erractionsave(err_act)
 
@@ -82,7 +82,7 @@ subroutine psi_idx_ins_cnv1(nv,idxin,desc,info,mask)
   call psb_info(ictxt, me, np)
 
   if (.not.psb_is_bld_desc(desc)) then 
-    info = 3110
+    info = psb_err_input_matrix_unassembled_
     call psb_errpush(info,name)
     goto 9999
   endif
@@ -132,24 +132,24 @@ subroutine psi_idx_ins_cnv1(nv,idxin,desc,info,mask)
               if (ncol > isize) then 
                 nh = ncol + max(nv,relocsz)
                 call psb_realloc(nh,desc%idxmap%loc_to_glob,info,pad=-1)
-                if (info /= 0) then
+                if (info /= psb_success_) then
                   info=1
                   ch_err='psb_realloc'
-                  call psb_errpush(4013,name,a_err=ch_err,i_err=(/info,0,0,0,0/))
+                  call psb_errpush(psb_err_from_subroutine_ai_,name,a_err=ch_err,i_err=(/info,0,0,0,0/))
                   goto 9999
                 end if
                 isize = nh
               endif
               desc%idxmap%loc_to_glob(nxt)  = ip
             endif
-            info = 0
+            info = psb_success_
           else
             ch_err='SearchInsKeyVal'
-            call psb_errpush(4013,name,a_err=ch_err,i_err=(/info,0,0,0,0/))
+            call psb_errpush(psb_err_from_subroutine_ai_,name,a_err=ch_err,i_err=(/info,0,0,0,0/))
             goto 9999
           end if
           idxin(i) = lip
-          info = 0
+          info = psb_success_
         else
           idxin(i) = -1
         end if
@@ -175,24 +175,24 @@ subroutine psi_idx_ins_cnv1(nv,idxin,desc,info,mask)
             if (ncol > isize) then 
               nh = ncol + max(nv,relocsz)
               call psb_realloc(nh,desc%idxmap%loc_to_glob,info,pad=-1)
-              if (info /= 0) then
+              if (info /= psb_success_) then
                 info=1
                 ch_err='psb_realloc'
-                call psb_errpush(4013,name,a_err=ch_err,i_err=(/info,0,0,0,0/))
+                call psb_errpush(psb_err_from_subroutine_ai_,name,a_err=ch_err,i_err=(/info,0,0,0,0/))
                 goto 9999
               end if
               isize = nh
             endif
             desc%idxmap%loc_to_glob(nxt)  = ip
           endif
-          info = 0
+          info = psb_success_
         else
           ch_err='SearchInsKeyVal'
-          call psb_errpush(4013,name,a_err=ch_err,i_err=(/info,0,0,0,0/))
+          call psb_errpush(psb_err_from_subroutine_ai_,name,a_err=ch_err,i_err=(/info,0,0,0,0/))
           goto 9999
         end if
         idxin(i) = lip
-        info = 0
+        info = psb_success_
       enddo
     endif
 
@@ -249,10 +249,10 @@ subroutine psi_idx_ins_cnv1(nv,idxin,desc,info,mask)
             if (ncol > isize) then 
               nh = ncol + max(nv,relocsz)
               call psb_realloc(nh,desc%idxmap%loc_to_glob,info,pad=-1)
-              if (info /= 0) then
-                info=3
+              if (info /= psb_success_) then
+                info=psb_err_invalid_ovr_num_
                 ch_err='psb_realloc'
-                call psb_errpush(4013,name,a_err=ch_err,i_err=(/info,0,0,0,0/))
+                call psb_errpush(psb_err_from_subroutine_ai_,name,a_err=ch_err,i_err=(/info,0,0,0,0/))
                 goto 9999
               end if
               isize = nh
@@ -262,10 +262,10 @@ subroutine psi_idx_ins_cnv1(nv,idxin,desc,info,mask)
             if ((pnt_halo+3) > isize) then
               nh = isize + max(nv,relocsz)
               call psb_realloc(nh,desc%halo_index,info,pad=-1)
-              if (info /= 0) then
+              if (info /= psb_success_) then
                 info=4
                 ch_err='psb_realloc'
-                call psb_errpush(4013,name,a_err=ch_err,i_err=(/info,0,0,0,0/))
+                call psb_errpush(psb_err_from_subroutine_ai_,name,a_err=ch_err,i_err=(/info,0,0,0,0/))
                 goto 9999
               end if
               isize = nh 
@@ -302,10 +302,10 @@ subroutine psi_idx_ins_cnv1(nv,idxin,desc,info,mask)
           if (ncol > isize) then 
             nh = ncol + max(nv,relocsz)
             call psb_realloc(nh,desc%idxmap%loc_to_glob,info,pad=-1)
-            if (info /= 0) then
-              info=3
+            if (info /= psb_success_) then
+              info=psb_err_invalid_ovr_num_
               ch_err='psb_realloc'
-              call psb_errpush(4013,name,a_err=ch_err,i_err=(/info,0,0,0,0/))
+              call psb_errpush(psb_err_from_subroutine_ai_,name,a_err=ch_err,i_err=(/info,0,0,0,0/))
               goto 9999
             end if
             isize = nh
@@ -315,10 +315,10 @@ subroutine psi_idx_ins_cnv1(nv,idxin,desc,info,mask)
           if ((pnt_halo+3) > isize) then
             nh = isize + max(nv,relocsz)
             call psb_realloc(nh,desc%halo_index,info,pad=-1)
-            if (info /= 0) then
+            if (info /= psb_success_) then
               info=4
               ch_err='psb_realloc'
-              call psb_errpush(4013,name,a_err=ch_err,i_err=(/info,0,0,0,0/))
+              call psb_errpush(psb_err_from_subroutine_ai_,name,a_err=ch_err,i_err=(/info,0,0,0,0/))
               goto 9999
             end if
             isize = nh 
@@ -423,7 +423,7 @@ subroutine psi_idx_ins_cnv2(nv,idxin,idxout,desc,info,mask)
   integer, parameter     :: relocsz=200
   character(len=20)      :: name,ch_err
 
-  info = 0
+  info = psb_success_
   name = 'psb_idx_ins_cnv'
   call psb_erractionsave(err_act)
 
@@ -436,7 +436,7 @@ subroutine psi_idx_ins_cnv2(nv,idxin,idxout,desc,info,mask)
   call psb_info(ictxt, me, np)
 
   if (.not.psb_is_ok_desc(desc)) then 
-    info = 3110
+    info = psb_err_input_matrix_unassembled_
     call psb_errpush(info,name)
     goto 9999
   endif

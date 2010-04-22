@@ -50,7 +50,7 @@ subroutine psb_csymbmm(a,b,c,info)
   integer               :: err_act
   character(len=*), parameter ::  name='psb_symbmm'
   call psb_erractionsave(err_act)
-  info = 0
+  info = psb_success_
 
   if ((a%is_null()) .or.(b%is_null())) then
     info = 1121
@@ -59,13 +59,13 @@ subroutine psb_csymbmm(a,b,c,info)
   endif
 
   allocate(ccsr, stat=info)
-  if (info /= 0)  then
-    info = 4000 
+  if (info /= psb_success_)  then
+    info = psb_err_alloc_dealloc_ 
     call psb_errpush(info,name) 
     goto 9999
   end if
   call psb_symbmm(a%a,b%a,ccsr,info)
-  if (info /= 0) then 
+  if (info /= psb_success_) then 
     call psb_errpush(info,name) 
     goto 9999
   end if
@@ -98,7 +98,7 @@ subroutine psb_cbase_symbmm(a,b,c,info)
   integer               :: err_act
   name='psb_symbmm'
   call psb_erractionsave(err_act)
-  info = 0
+  info = psb_success_
 
   ma = a%get_nrows()
   na = a%get_ncols()
@@ -110,8 +110,8 @@ subroutine psb_cbase_symbmm(a,b,c,info)
     write(0,*) 'Mismatch in SYMBMM: ',ma,na,mb,nb
   endif
   allocate(itemp(max(ma,na,mb,nb)),stat=info)    
-  if (info /= 0) then 
-    info = 4000 
+  if (info /= psb_success_) then 
+    info = psb_err_alloc_dealloc_ 
     call psb_Errpush(info,name)
     goto 9999
   endif
@@ -131,7 +131,7 @@ subroutine psb_cbase_symbmm(a,b,c,info)
     call gen_symbmm(a,b,c,itemp,info)
   end select
 
-  if (info /= 0) then 
+  if (info /= psb_success_) then 
     call psb_errpush(info,name) 
     goto 9999
   end if
@@ -167,7 +167,7 @@ contains
     end interface
     integer               :: nze, ma,na,mb,nb
 
-    info = 0 
+    info = psb_success_
     ma = a%get_nrows()
     na = a%get_ncols()
     mb = b%get_nrows()
@@ -203,8 +203,8 @@ contains
 
     allocate(iarw(maxlmn),iacl(maxlmn),ibrw(maxlmn),ibcl(maxlmn),&
          & stat=info)
-    if (info /= 0) then 
-      info = 4000
+    if (info /= psb_success_) then 
+      info = psb_err_alloc_dealloc_
       return
     endif
 
@@ -233,7 +233,7 @@ contains
         do k=1,nbzr
           if ((ibcl(k)<1).or.(ibcl(k)>maxlmn)) then 
             write(0,*) 'Problem in SYMBMM 1:',j,k,ibcl(k),maxlmn
-            info=2
+            info=psb_err_pivot_too_small_
             return
           else
             if(index(ibcl(k)) == 0) then

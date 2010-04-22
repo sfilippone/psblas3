@@ -52,12 +52,12 @@ subroutine psb_cspfree(a, desc_a,info)
   character(len=20)   :: name
 
   if(psb_get_errstatus() /= 0) return 
-  info=0
+  info=psb_success_
   name = 'psb_cspfree'
   call psb_erractionsave(err_act)
 
   if (.not.allocated(desc_a%matrix_data)) then 
-    info = 295
+    info = psb_err_forgot_spall_
     call psb_errpush(info,name)
     return
   else

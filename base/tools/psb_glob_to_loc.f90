@@ -67,7 +67,7 @@ subroutine psb_glob_to_loc2(x,y,desc_a,info,iact,owned)
   character(len=20)   :: name
 
   if(psb_get_errstatus() /= 0) return 
-  info=0
+  info=psb_success_
   name = 'glob_to_loc'
   call psb_erractionsave(err_act)
 
@@ -92,11 +92,11 @@ subroutine psb_glob_to_loc2(x,y,desc_a,info,iact,owned)
     call psb_erractionrestore(err_act)
     return
   case('W')
-    if ((info /= 0).or.(count(y(1:n)<0) >0)) then
+    if ((info /= psb_success_).or.(count(y(1:n)<0) >0)) then
       write(0,'("Error ",i5," in subroutine glob_to_loc")') info
     end if
   case('A')
-    if ((info /= 0).or.(count(y(1:n)<0) >0)) then
+    if ((info /= psb_success_).or.(count(y(1:n)<0) >0)) then
       call psb_errpush(info,name)
       goto 9999
     end if
@@ -187,7 +187,7 @@ subroutine psb_glob_to_loc(x,desc_a,info,iact,owned)
   integer             :: ictxt, iam, np
 
   if(psb_get_errstatus() /= 0) return 
-  info=0
+  info=psb_success_
   name = 'glob_to_loc'
   ictxt = desc_a%matrix_data(psb_ctxt_)
   call psb_info(ictxt,iam,np)
@@ -215,11 +215,11 @@ subroutine psb_glob_to_loc(x,desc_a,info,iact,owned)
     call psb_erractionrestore(err_act)
     return
   case('W')
-    if ((info /= 0).or.(count(x(1:n)<0) >0)) then
+    if ((info /= psb_success_).or.(count(x(1:n)<0) >0)) then
       write(0,'("Error ",i5," in subroutine glob_to_loc")') info
     end if
   case('A')
-    if ((info /= 0).or.(count(x(1:n)<0) >0)) then
+    if ((info /= psb_success_).or.(count(x(1:n)<0) >0)) then
       write(0,*) count(x(1:n)<0)
       call psb_errpush(info,name)
       goto 9999

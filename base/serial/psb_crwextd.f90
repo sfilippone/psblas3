@@ -55,7 +55,7 @@ subroutine psb_crwextd(nr,a,info,b,rowscale)
   logical  rowscale_ 
 
   name='psb_crwextd'
-  info  = 0
+  info  = psb_success_
   call psb_erractionsave(err_act)
 
   if (nr > a%get_nrows()) then 
@@ -74,17 +74,17 @@ subroutine psb_crwextd(nr,a,info,b,rowscale)
       end if
     class default
       call aa%mv_to_coo(actmp,info)
-      if (info == 0) then 
+      if (info == psb_success_) then 
         if (present(b)) then 
           call psb_rwextd(nr,actmp,info,b%a,rowscale=rowscale)
         else
           call psb_rwextd(nr,actmp,info,rowscale=rowscale)
         end if
       end if
-      if (info == 0) call aa%mv_from_coo(actmp,info)
+      if (info == psb_success_) call aa%mv_from_coo(actmp,info)
     end select
   end if
-  if (info /= 0) goto 9999
+  if (info /= psb_success_) goto 9999
 
   call psb_erractionrestore(err_act)
   return
@@ -114,7 +114,7 @@ subroutine psb_cbase_rwextd(nr,a,info,b,rowscale)
   logical  rowscale_ 
 
   name='psb_cbase_rwextd'
-  info  = 0
+  info  = psb_success_
   call psb_erractionsave(err_act)
 
   if (present(rowscale)) then 
@@ -232,7 +232,7 @@ subroutine psb_cbase_rwextd(nr,a,info,b,rowscale)
     call a%set_nrows(nr)
 
   class default 
-    info = 135
+    info = psb_err_unsupported_format_
     ch_err=a%get_fmt()
     call psb_errpush(info,name,a_err=ch_err)
     goto 9999

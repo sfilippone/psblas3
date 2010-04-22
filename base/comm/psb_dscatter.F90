@@ -72,7 +72,7 @@ subroutine  psb_dscatterm(globx, locx, desc_a, info, iroot)
 
   name='psb_scatterm'
   if(psb_get_errstatus() /= 0) return 
-  info=0
+  info=psb_success_
   call psb_erractionsave(err_act)
 
   ictxt=psb_cd_get_context(desc_a)
@@ -80,7 +80,7 @@ subroutine  psb_dscatterm(globx, locx, desc_a, info, iroot)
   ! check on blacs grid 
   call psb_info(ictxt, me, np)
   if (np == -1) then
-    info = 2010
+    info = psb_err_blacs_error_
     call psb_errpush(info,name)
     goto 9999
   endif
@@ -88,7 +88,7 @@ subroutine  psb_dscatterm(globx, locx, desc_a, info, iroot)
   if (present(iroot)) then
     root = iroot
     if((root < -1).or.(root > np)) then
-      info=30
+      info=psb_err_input_value_invalid_i_
       int_err(1:2)=(/5,root/)
       call psb_errpush(info,name,i_err=int_err)
       goto 9999
@@ -129,23 +129,23 @@ subroutine  psb_dscatterm(globx, locx, desc_a, info, iroot)
   !  there should be a global check on k here!!!
 
   call psb_chkglobvect(m,n,size(globx),iglobx,jglobx,desc_a,info)
-  if (info == 0) call psb_chkvect(m,n,size(locx),ilocx,jlocx,desc_a,info,ilx,jlx)
-  if(info /= 0) then
-    info=4010
+  if (info == psb_success_) call psb_chkvect(m,n,size(locx),ilocx,jlocx,desc_a,info,ilx,jlx)
+  if(info /= psb_success_) then
+    info=psb_err_from_subroutine_
     ch_err='psb_chk(glob)vect'
     call psb_errpush(info,name,a_err=ch_err)
     goto 9999
   end if
 
   if ((ilx /= 1).or.(iglobx /= 1)) then
-    info=3040
+    info=psb_err_ix_n1_iy_n1_unsupported_
     call psb_errpush(info,name)
     goto 9999
   end if
 
   nrow=psb_cd_get_local_rows(desc_a)
 
-  if ((root == -1).or.(np==1)) then
+  if ((root == -1).or.(np == 1)) then
     ! extract my chunk
     do j=1,k
       do i=1, nrow
@@ -158,8 +158,8 @@ subroutine  psb_dscatterm(globx, locx, desc_a, info, iroot)
 
     ! root has to gather size information
     allocate(displ(np),all_dim(np),stat=info)
-    if(info /= 0) then
-      info=4010
+    if(info /= psb_success_) then
+      info=psb_err_from_subroutine_
       ch_err='Allocate'
       call psb_errpush(info,name,a_err=ch_err)
       goto 9999
@@ -175,8 +175,8 @@ subroutine  psb_dscatterm(globx, locx, desc_a, info, iroot)
 
     ! root has to gather loc_glob from each process
       allocate(l_t_g_all(sum(all_dim)),scatterv(sum(all_dim)),stat=info)
-      if(info /= 0) then
-        info=4010
+      if(info /= psb_success_) then
+        info=psb_err_from_subroutine_
         ch_err='Allocate'
         call psb_errpush(info,name,a_err=ch_err)
         goto 9999
@@ -208,7 +208,7 @@ subroutine  psb_dscatterm(globx, locx, desc_a, info, iroot)
 
     end do
 
-    if (me==root) deallocate(all_dim, l_t_g_all, displ, scatterv)
+    if (me == root) deallocate(all_dim, l_t_g_all, displ, scatterv)
   end if
 
   call psb_erractionrestore(err_act)
@@ -302,7 +302,7 @@ subroutine  psb_dscatterv(globx, locx, desc_a, info, iroot)
 
   name='psb_scatterv'
   if (psb_get_errstatus() /= 0) return 
-  info=0
+  info=psb_success_
   call psb_erractionsave(err_act)
   ictxt=psb_cd_get_context(desc_a)
   debug_unit  = psb_get_debug_unit()
@@ -312,7 +312,7 @@ subroutine  psb_dscatterv(globx, locx, desc_a, info, iroot)
   ! check on blacs grid 
   call psb_info(ictxt, me, np)
   if (np == -1) then
-    info = 2010
+    info = psb_err_blacs_error_
     call psb_errpush(info,name)
     goto 9999
   endif
@@ -320,7 +320,7 @@ subroutine  psb_dscatterv(globx, locx, desc_a, info, iroot)
   if (present(iroot)) then
      root = iroot
      if((root < -1).or.(root > np)) then
-        info=30
+        info=psb_err_input_value_invalid_i_
         int_err(1:2)=(/5,root/)
         call psb_errpush(info,name,i_err=int_err)
         goto 9999
@@ -346,24 +346,24 @@ subroutine  psb_dscatterv(globx, locx, desc_a, info, iroot)
   !  there should be a global check on k here!!!
 
   call psb_chkglobvect(m,n,size(globx),iglobx,jglobx,desc_a,info)
-  if (info == 0) &
+  if (info == psb_success_) &
        & call psb_chkvect(m,n,size(locx),ilocx,jlocx,desc_a,info,ilx,jlx)
-  if(info /= 0) then
-     info=4010
+  if(info /= psb_success_) then
+     info=psb_err_from_subroutine_
      ch_err='psb_chk(glob)vect'
      call psb_errpush(info,name,a_err=ch_err)
      goto 9999
   end if
 
   if ((ilx /= 1).or.(iglobx /= 1)) then
-     info=3040
+     info=psb_err_ix_n1_iy_n1_unsupported_
      call psb_errpush(info,name)
      goto 9999
   end if
 
   nrow = psb_cd_get_local_rows(desc_a)
 
-  if ((root == -1).or.(np==1)) then
+  if ((root == -1).or.(np == 1)) then
     ! extract my chunk
     do i=1, nrow
       idx=desc_a%idxmap%loc_to_glob(i)
@@ -412,7 +412,7 @@ subroutine  psb_dscatterv(globx, locx, desc_a, info, iroot)
          & mpi_double_precision,locx,nrow,&
          & mpi_double_precision,rootrank,icomm,info)
 
-    if (me==root) deallocate(all_dim, l_t_g_all, displ, scatterv)
+    if (me == root) deallocate(all_dim, l_t_g_all, displ, scatterv)
   end if
 
   call psb_erractionrestore(err_act)

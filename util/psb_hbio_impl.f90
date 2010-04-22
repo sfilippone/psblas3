@@ -54,7 +54,7 @@ subroutine shb_read(a, iret, iunit, filename,b,g,x,mtitle)
   iret = 0
 
   if (present(filename)) then
-    if (filename=='-') then 
+    if (filename == '-') then 
       infile=5
     else
       if (present(iunit)) then 
@@ -158,8 +158,8 @@ subroutine shb_read(a, iret, iunit, filename,b,g,x,mtitle)
       end do
       call acoo%set_nzeros(nzr)
       call acoo%fix(ircode)
-      if (ircode==0) call a%mv_from(acoo)
-      if (ircode/=0) goto 993
+      if (ircode == 0) call a%mv_from(acoo)
+      if (ircode /= 0) goto 993
 
     else
       write(0,*) 'read_matrix: matrix type not yet supported'
@@ -171,7 +171,7 @@ subroutine shb_read(a, iret, iunit, filename,b,g,x,mtitle)
   end if
 
   call a%cscnv(ircode,type='csr')
-  if (infile/=5) close(infile)
+  if (infile /= 5) close(infile)
 
   return 
 
@@ -220,7 +220,7 @@ subroutine shb_write(a,iret,iunit,filename,key,rhs,g,x,mtitle)
   iret = 0
 
   if (present(filename)) then 
-    if (filename=='-') then 
+    if (filename == '-') then 
       iout=6
     else
       if (present(iunit)) then 
@@ -258,7 +258,7 @@ subroutine shb_write(a,iret,iunit,filename,key,rhs,g,x,mtitle)
     class default
 
     call acsc%cp_from_fmt(aa, iret)
-    if (iret/=0) return
+    if (iret /= 0) return
     acpnt => acsc
 
   end select
@@ -353,7 +353,7 @@ subroutine dhb_read(a, iret, iunit, filename,b,g,x,mtitle)
   iret = 0
 
   if (present(filename)) then
-    if (filename=='-') then 
+    if (filename == '-') then 
       infile=5
     else
       if (present(iunit)) then 
@@ -457,8 +457,8 @@ subroutine dhb_read(a, iret, iunit, filename,b,g,x,mtitle)
       end do
       call acoo%set_nzeros(nzr)
       call acoo%fix(ircode)
-      if (ircode==0) call a%mv_from(acoo)
-      if (ircode/=0) goto 993
+      if (ircode == 0) call a%mv_from(acoo)
+      if (ircode /= 0) goto 993
 
     else
       write(0,*) 'read_matrix: matrix type not yet supported'
@@ -470,7 +470,7 @@ subroutine dhb_read(a, iret, iunit, filename,b,g,x,mtitle)
   end if
 
   call a%cscnv(ircode,type='csr')
-  if (infile/=5) close(infile)
+  if (infile /= 5) close(infile)
 
   return 
 
@@ -519,7 +519,7 @@ subroutine dhb_write(a,iret,iunit,filename,key,rhs,g,x,mtitle)
   iret = 0
 
   if (present(filename)) then 
-    if (filename=='-') then 
+    if (filename == '-') then 
       iout=6
     else
       if (present(iunit)) then 
@@ -557,7 +557,7 @@ subroutine dhb_write(a,iret,iunit,filename,key,rhs,g,x,mtitle)
     class default
 
     call acsc%cp_from_fmt(aa, iret)
-    if (iret/=0) return
+    if (iret /= 0) return
     acpnt => acsc
 
   end select
@@ -653,7 +653,7 @@ subroutine chb_read(a, iret, iunit, filename,b,g,x,mtitle)
   iret = 0
 
   if (present(filename)) then
-    if (filename=='-') then 
+    if (filename == '-') then 
       infile=5
     else
       if (present(iunit)) then 
@@ -757,8 +757,8 @@ subroutine chb_read(a, iret, iunit, filename,b,g,x,mtitle)
       end do
       call acoo%set_nzeros(nzr)
       call acoo%fix(ircode)
-      if (ircode==0) call a%mv_from(acoo)
-      if (ircode/=0) goto 993
+      if (ircode == 0) call a%mv_from(acoo)
+      if (ircode /= 0) goto 993
 
     else if (psb_tolower(type(2:2)) == 'h') then 
 
@@ -804,8 +804,8 @@ subroutine chb_read(a, iret, iunit, filename,b,g,x,mtitle)
       end do
       call acoo%set_nzeros(nzr)
       call acoo%fix(ircode)
-      if (ircode==0) call a%mv_from(acoo)
-      if (ircode/=0) goto 993
+      if (ircode == 0) call a%mv_from(acoo)
+      if (ircode /= 0) goto 993
 
     else
       write(0,*) 'read_matrix: matrix type not yet supported'
@@ -817,7 +817,7 @@ subroutine chb_read(a, iret, iunit, filename,b,g,x,mtitle)
   end if
 
   call a%cscnv(ircode,type='csr')
-  if (infile/=5) close(infile)
+  if (infile /= 5) close(infile)
 
   return 
 
@@ -866,7 +866,7 @@ subroutine chb_write(a,iret,iunit,filename,key,rhs,g,x,mtitle)
   iret = 0
 
   if (present(filename)) then 
-    if (filename=='-') then 
+    if (filename == '-') then 
       iout=6
     else
       if (present(iunit)) then 
@@ -904,7 +904,7 @@ subroutine chb_write(a,iret,iunit,filename,key,rhs,g,x,mtitle)
     class default
 
     call acsc%cp_from_fmt(aa, iret)
-    if (iret/=0) return
+    if (iret /= 0) return
     acpnt => acsc
 
   end select
@@ -999,7 +999,7 @@ subroutine zhb_read(a, iret, iunit, filename,b,g,x,mtitle)
   iret = 0
 
   if (present(filename)) then
-    if (filename=='-') then 
+    if (filename == '-') then 
       infile=5
     else
       if (present(iunit)) then 
@@ -1103,8 +1103,8 @@ subroutine zhb_read(a, iret, iunit, filename,b,g,x,mtitle)
       end do
       call acoo%set_nzeros(nzr)
       call acoo%fix(ircode)
-      if (ircode==0) call a%mv_from(acoo)
-      if (ircode/=0) goto 993
+      if (ircode == 0) call a%mv_from(acoo)
+      if (ircode /= 0) goto 993
 
     else if (psb_tolower(type(2:2)) == 'h') then 
 
@@ -1150,8 +1150,8 @@ subroutine zhb_read(a, iret, iunit, filename,b,g,x,mtitle)
       end do
       call acoo%set_nzeros(nzr)
       call acoo%fix(ircode)
-      if (ircode==0) call a%mv_from(acoo)
-      if (ircode/=0) goto 993
+      if (ircode == 0) call a%mv_from(acoo)
+      if (ircode /= 0) goto 993
 
     else
       write(0,*) 'read_matrix: matrix type not yet supported'
@@ -1163,7 +1163,7 @@ subroutine zhb_read(a, iret, iunit, filename,b,g,x,mtitle)
   end if
 
   call a%cscnv(ircode,type='csr')
-  if (infile/=5) close(infile)
+  if (infile /= 5) close(infile)
 
   return 
 
@@ -1212,7 +1212,7 @@ subroutine zhb_write(a,iret,iunit,filename,key,rhs,g,x,mtitle)
   iret = 0
 
   if (present(filename)) then 
-    if (filename=='-') then 
+    if (filename == '-') then 
       iout=6
     else
       if (present(iunit)) then 
@@ -1250,7 +1250,7 @@ subroutine zhb_write(a,iret,iunit,filename,key,rhs,g,x,mtitle)
     class default
 
     call acsc%cp_from_fmt(aa, iret)
-    if (iret/=0) return
+    if (iret /= 0) return
     acpnt => acsc
 
   end select

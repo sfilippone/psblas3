@@ -136,7 +136,7 @@ subroutine psi_desc_index(desc,index_in,dep_list,&
   integer              :: debug_level, debug_unit
   character(len=20) :: name
 
-  info = 0
+  info = psb_success_
   name='psi_desc_index'
   call psb_erractionsave(err_act)
   debug_unit  = psb_get_debug_unit()
@@ -146,7 +146,7 @@ subroutine psi_desc_index(desc,index_in,dep_list,&
   icomm = psb_cd_get_mpic(desc)
   call psb_info(ictxt,me,np) 
   if (np == -1) then
-    info = 2010
+    info = psb_err_blacs_error_
     call psb_errpush(info,name)
     goto 9999
   endif
@@ -163,8 +163,8 @@ subroutine psi_desc_index(desc,index_in,dep_list,&
   !     be careful of the inversion
   !   
   allocate(sdsz(np),rvsz(np),bsdindx(np),brvindx(np),stat=info)
-  if(info /= 0) then
-    info=4000
+  if(info /= psb_success_) then
+    info=psb_err_alloc_dealloc_
     call psb_errpush(info,name)
     goto 9999
   end if
@@ -184,8 +184,8 @@ subroutine psi_desc_index(desc,index_in,dep_list,&
   end do
   ihinsz=i
   call mpi_alltoall(sdsz,1,mpi_integer,rvsz,1,mpi_integer,icomm,info)
-  if(info /= 0) then
-    call psb_errpush(4010,name,a_err='mpi_alltoall')
+  if(info /= psb_success_) then
+    call psb_errpush(psb_err_from_subroutine_,name,a_err='mpi_alltoall')
     goto 9999
   end if
 
@@ -220,8 +220,8 @@ subroutine psi_desc_index(desc,index_in,dep_list,&
   endif
 !!$  call psb_ensure_size(ntot,desc_index,info)
 
-  if (info /= 0) then 
-    call psb_errpush(4010,name,a_err='psb_realloc')
+  if (info /= psb_success_) then 
+    call psb_errpush(psb_err_from_subroutine_,name,a_err='psb_realloc')
     goto 9999
   end if
 
@@ -230,8 +230,8 @@ subroutine psi_desc_index(desc,index_in,dep_list,&
     call psb_barrier(ictxt)
   endif
   allocate(sndbuf(iszs),rcvbuf(iszr),stat=info)
-  if(info /= 0) then
-    info=4000
+  if(info /= psb_success_) then
+    info=psb_err_alloc_dealloc_
     call psb_errpush(info,name)
     goto 9999
   end if
@@ -260,8 +260,8 @@ subroutine psi_desc_index(desc,index_in,dep_list,&
       call psb_map_l2g(index_in(i+1:i+nerv),&
            & sndbuf(bsdindx(proc+1)+1:bsdindx(proc+1)+nerv),&
            & desc%idxmap,info) 
-      if (info /= 0) then
-        call psb_errpush(4010,name,a_err='psb_map_l2g')
+      if (info /= psb_success_) then
+        call psb_errpush(psb_err_from_subroutine_,name,a_err='psb_map_l2g')
         goto 9999
       end if
 
@@ -289,8 +289,8 @@ subroutine psi_desc_index(desc,index_in,dep_list,&
 
   call mpi_alltoallv(sndbuf,sdsz,bsdindx,mpi_integer,&
        & rcvbuf,rvsz,brvindx,mpi_integer,icomm,info)
-  if(info /= 0) then
-    call psb_errpush(4010,name,a_err='mpi_alltoallv')
+  if(info /= psb_success_) then
+    call psb_errpush(psb_err_from_subroutine_,name,a_err='mpi_alltoallv')
     goto 9999
   end if
 
@@ -317,8 +317,8 @@ subroutine psi_desc_index(desc,index_in,dep_list,&
   desc_index(i) = - 1 
 
   deallocate(sdsz,rvsz,bsdindx,brvindx,sndbuf,rcvbuf,stat=info)
-  if (info /= 0) then 
-    info=4000
+  if (info /= psb_success_) then 
+    info=psb_err_alloc_dealloc_
     call psb_errpush(info,name)
     goto 9999
   end if

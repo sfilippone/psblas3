@@ -65,7 +65,7 @@ subroutine psb_cdalv(v, ictxt, desc, info, flag)
   if(psb_get_errstatus() /= 0) return 
   debug_unit  = psb_get_debug_unit()
   debug_level = psb_get_debug_level()
-  info = 0
+  info = psb_success_
   err  = 0
   name = 'psb_cdalv'
 
@@ -77,20 +77,20 @@ subroutine psb_cdalv(v, ictxt, desc, info, flag)
   n = m
   !... check m and n parameters....
   if (m < 1) then
-    info = 10
+    info = psb_err_iarg_neg_
     int_err(1) = 1
     int_err(2) = m
   else if (n < 1) then
-    info = 10
+    info = psb_err_iarg_neg_
     int_err(1) = 2
     int_err(2) = n
   else if (size(v)<m) then 
-    info = 10
+    info = psb_err_iarg_neg_
     int_err(1) = 2
     int_err(2) = size(v)
   endif
 
-  if (info /= 0) then 
+  if (info /= psb_success_) then 
     call psb_errpush(info,name,i_err=int_err)
     goto 9999
   end if
@@ -137,20 +137,20 @@ subroutine psb_cdalv(v, ictxt, desc, info, flag)
   if (psb_cd_choose_large_state(ictxt,m)) then 
     allocate(desc%matrix_data(psb_mdata_size_),&
          &temp_ovrlap(max(1,2*loc_row)),stat=info)
-    if (info == 0) then 
+    if (info == psb_success_) then 
       desc%matrix_data(:) = 0
       desc%idxmap%state = psb_desc_large_
     end if
   else
     allocate(desc%idxmap%glob_to_loc(m),desc%matrix_data(psb_mdata_size_),&
          &temp_ovrlap(max(1,2*loc_row)),stat=info)
-    if (info == 0) then 
+    if (info == psb_success_) then 
       desc%matrix_data(:) = 0
       desc%idxmap%state = psb_desc_normal_
     end if
   end if
-  if (info /= 0) then     
-    info=4025
+  if (info /= psb_success_) then     
+    info=psb_err_alloc_request_
     int_err(1)=2*m+psb_mdata_size_
     call psb_errpush(info,name,i_err=int_err,a_err='integer')
     goto 9999
@@ -184,7 +184,7 @@ subroutine psb_cdalv(v, ictxt, desc, info, flag)
     do i=1,m
 
       if (((v(i)-flag_) > np-1).or.((v(i)-flag_) < 0)) then
-        info=580
+        info=psb_err_partfunc_wrong_pid_
         int_err(1)=3
         int_err(2)=v(i) - flag_
         int_err(3)=i
@@ -203,7 +203,7 @@ subroutine psb_cdalv(v, ictxt, desc, info, flag)
     if (debug_level >= psb_debug_ext_) &
          & write(debug_unit,*) me,' ',trim(name),':  End main loop:' ,loc_row,itmpov,info
 
-    if (info /= 0) then 
+    if (info /= psb_success_) then 
       call psb_errpush(info,name,i_err=int_err)
       goto 9999
     end if
@@ -215,8 +215,8 @@ subroutine psb_cdalv(v, ictxt, desc, info, flag)
 
     allocate(desc%idxmap%loc_to_glob(loc_col), desc%lprm(1),&
          & stat=info)  
-    if (info /= 0) then
-      info=4025
+    if (info /= psb_success_) then
+      info=psb_err_alloc_request_
       int_err(1)=loc_col
       call psb_errpush(info,name,i_err=int_err,a_err='integer')
       goto 9999
@@ -248,7 +248,7 @@ subroutine psb_cdalv(v, ictxt, desc, info, flag)
     do i=1,m
 
       if (((v(i)-flag_) > np-1).or.((v(i)-flag_) < 0)) then
-        info=580
+        info=psb_err_partfunc_wrong_pid_
         int_err(1)=3
         int_err(2)=v(i) - flag_
         int_err(3)=i
@@ -270,7 +270,7 @@ subroutine psb_cdalv(v, ictxt, desc, info, flag)
     if (debug_level >= psb_debug_ext_) &
          & write(debug_unit,*) me,' ',trim(name),':  End main loop:' ,loc_row,itmpov,info
 
-    if (info /= 0) then 
+    if (info /= psb_success_) then 
       call psb_errpush(info,name,i_err=int_err)
       goto 9999
     end if
@@ -282,8 +282,8 @@ subroutine psb_cdalv(v, ictxt, desc, info, flag)
 
     allocate(desc%idxmap%loc_to_glob(loc_col),&
          &desc%lprm(1),stat=info)  
-    if (info /= 0) then
-      info=4025
+    if (info /= psb_success_) then
+      info=psb_err_alloc_request_
       int_err(1)=loc_col
       call psb_errpush(info,name,i_err=int_err,a_err='integer')
       goto 9999
@@ -304,8 +304,8 @@ subroutine psb_cdalv(v, ictxt, desc, info, flag)
   call psi_bld_tmpovrl(temp_ovrlap,desc,info)
 
   deallocate(temp_ovrlap,stat=info)
-  if (info /= 0) then 
-    info=4000
+  if (info /= psb_success_) then 
+    info=psb_err_alloc_dealloc_
     call psb_errpush(info,name)
     goto 9999
   endif
@@ -315,9 +315,9 @@ subroutine psb_cdalv(v, ictxt, desc, info, flag)
   desc%matrix_data(psb_n_col_)  = loc_row
 
   call psb_realloc(max(1,loc_row/2),desc%halo_index, info)
-  if (info == 0) call psb_realloc(1,desc%ext_index, info)
-  if (info /= 0) then
-    info=4010
+  if (info == psb_success_) call psb_realloc(1,desc%ext_index, info)
+  if (info /= psb_success_) then
+    info=psb_err_from_subroutine_
     call psb_errpush(info,name,a_err='psb_realloc')
     Goto 9999
   end if
@@ -326,8 +326,8 @@ subroutine psb_cdalv(v, ictxt, desc, info, flag)
   desc%ext_index(:)            = -1
 
   call psb_cd_set_bld(desc,info)
-  if (info /= 0) then
-    info=4010
+  if (info /= psb_success_) then
+    info=psb_err_from_subroutine_
     call psb_errpush(info,name,a_err='psb_cd_set_bld')
     Goto 9999
   end if

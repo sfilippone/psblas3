@@ -155,7 +155,7 @@ c$$$            write(0,*) 'SRTLIST Input :',i,ip
             write(0,*) 'SRTLIST: Edge:',ix,edges(1,ix),
      +        edges(2,ix),dgp(ix)
           enddo
-          info = 30
+          info = psb_err_input_value_invalid_i_
           return
         ENDIF
         call psb_msort(ich(1:nch))

@@ -126,7 +126,7 @@ subroutine psb_dbicg(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,istop)
   character(len=20)           :: name,ch_err
   character(len=*), parameter :: methdname='BiCG'
 
-  info = 0
+  info = psb_success_
   name = 'psb_dbicg'
   call psb_erractionsave(err_act)
   debug_unit  = psb_get_debug_unit()
@@ -156,7 +156,7 @@ subroutine psb_dbicg(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,istop)
   !
 
   if ((istop_ < 1 ).or.(istop_ > 2 ) ) then
-    info=5001
+    info=psb_err_invalid_istop_
     int_err=istop_
     err=info
     call psb_errpush(info,name,i_err=int_err)
@@ -164,14 +164,14 @@ subroutine psb_dbicg(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,istop)
   endif
 
   call psb_chkvect(mglob,1,size(x,1),1,1,desc_a,info)
-  if(info /= 0) then
-    info=4010
+  if(info /= psb_success_) then
+    info=psb_err_from_subroutine_
     call psb_errpush(info,name,a_err='psb_chkvect on X')
     goto 9999
   end if
   call psb_chkvect(mglob,1,size(b,1),1,1,desc_a,info)
-  if(info /= 0) then
-    info=4010    
+  if(info /= psb_success_) then
+    info=psb_err_from_subroutine_    
     call psb_errpush(info,name,a_err='psb_chkvect on B')
     goto 9999
   end if
@@ -180,10 +180,10 @@ subroutine psb_dbicg(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,istop)
   naux=4*n_col 
 
   allocate(aux(naux),stat=info)
-  if (info == 0) call psb_geall(wwrk,desc_a,info,n=9)
-  if (info == 0) call psb_geasb(wwrk,desc_a,info)  
-  if(info /= 0) then
-    info=4011
+  if (info == psb_success_) call psb_geall(wwrk,desc_a,info,n=9)
+  if (info == psb_success_) call psb_geasb(wwrk,desc_a,info)  
+  if(info /= psb_success_) then
+    info=psb_err_from_subroutine_non_
     ch_err='psb_asb'
     err=info
     call psb_errpush(info,name,a_err=ch_err)
@@ -216,8 +216,8 @@ subroutine psb_dbicg(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,istop)
 
 
   call psb_init_conv(methdname,istop_,itrace_,itmax_,a,b,eps,desc_a,stopdat,info)
-  if (info /= 0) Then 
-     call psb_errpush(4011,name)
+  if (info /= psb_success_) Then 
+     call psb_errpush(psb_err_from_subroutine_non_,name)
      goto 9999
   End If
 
@@ -228,12 +228,12 @@ subroutine psb_dbicg(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,istop)
     if (itx >= itmax_) exit restart  
     it = 0      
     call psb_geaxpby(done,b,dzero,r,desc_a,info)
-    if (info == 0) call psb_spmm(-done,a,x,done,r,desc_a,info,work=aux)
+    if (info == psb_success_) call psb_spmm(-done,a,x,done,r,desc_a,info,work=aux)
     if (debug_level >= psb_debug_ext_)&
          & write(debug_unit,*) me,' ',trim(name),' Done spmm',info
-    if (info == 0) call psb_geaxpby(done,r,dzero,rt,desc_a,info)
-    if(info /= 0) then
-      info=4011
+    if (info == psb_success_) call psb_geaxpby(done,r,dzero,rt,desc_a,info)
+    if(info /= psb_success_) then
+      info=psb_err_from_subroutine_non_
       call psb_errpush(info,name)
       goto 9999
     end if
@@ -242,8 +242,8 @@ subroutine psb_dbicg(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,istop)
     
     ! Perhaps we already satisfy the convergence criterion...
     if (psb_check_conv(methdname,itx,x,r,desc_a,stopdat,info)) exit restart
-    if (info /= 0) Then 
-      call psb_errpush(4011,name)
+    if (info /= psb_success_) Then 
+      call psb_errpush(psb_err_from_subroutine_non_,name)
       goto 9999
     End If
 
@@ -255,18 +255,18 @@ subroutine psb_dbicg(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,istop)
            & write(debug_unit,*) me,' ',trim(name),'iteration: ',itx
 
       call prec%apply(r,z,desc_a,info,work=aux)
-      if (info == 0) call prec%apply(rt,zt,desc_a,info,trans='t',work=aux)
+      if (info == psb_success_) call prec%apply(rt,zt,desc_a,info,trans='t',work=aux)
 
       rho_old = rho    
       rho = psb_gedot(rt,z,desc_a,info)
-      if (rho==dzero) then
+      if (rho == dzero) then
         if (debug_level >= psb_debug_ext_) &
              & write(debug_unit,*) me,' ',trim(name),&
              & ' iteration breakdown r',rho
         exit iteration
       endif
 
-      if (it==1) then
+      if (it == 1) then
         call psb_geaxpby(done,z,dzero,p,desc_a,info)
         call psb_geaxpby(done,zt,dzero,pt,desc_a,info)
       else
@@ -281,7 +281,7 @@ subroutine psb_dbicg(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,istop)
            & work=aux,trans='t')
 
       sigma = psb_gedot(pt,q,desc_a,info)
-      if (sigma==dzero) then
+      if (sigma == dzero) then
         if (debug_level >= psb_debug_ext_) &
              & write(debug_unit,*) me,' ',trim(name),&
              & ' iteration breakdown s1', sigma
@@ -296,8 +296,8 @@ subroutine psb_dbicg(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,istop)
       call psb_geaxpby(-alpha,qt,done,rt,desc_a,info)
 
       if (psb_check_conv(methdname,itx,x,r,desc_a,stopdat,info)) exit restart
-      if (info /= 0) Then 
-        call psb_errpush(4011,name)
+      if (info /= psb_success_) Then 
+        call psb_errpush(psb_err_from_subroutine_non_,name)
         goto 9999
       End If
 
@@ -307,8 +307,8 @@ subroutine psb_dbicg(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,istop)
   call psb_end_conv(methdname,itx,desc_a,stopdat,info,err,iter)
 
   deallocate(aux,  stat=info)
-  if (info == 0) call psb_gefree(wwrk,desc_a,info)
-  if (info/=0) then
+  if (info == psb_success_) call psb_gefree(wwrk,desc_a,info)
+  if (info /= psb_success_) then
     call psb_errpush(info,name)
     goto 9999
   end if

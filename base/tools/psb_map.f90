@@ -48,7 +48,7 @@ subroutine psb_s_map_X2Y(alpha,x,beta,y,map,info,work)
        &  map_kind, map_data, nr, ictxt
   character(len=20), parameter  :: name='psb_map_X2Y'
 
-  info = 0
+  info = psb_success_
   if (.not.psb_is_asb_map(map)) then 
     write(0,*) trim(name),' Invalid descriptor input'
     info = 1
@@ -64,13 +64,13 @@ subroutine psb_s_map_X2Y(alpha,x,beta,y,map,info,work)
     nr2   = psb_cd_get_global_rows(map%p_desc_Y)
     nc2   = psb_cd_get_local_cols(map%p_desc_Y) 
     allocate(yt(nc2),stat=info) 
-    if (info == 0) call psb_halo(x,map%p_desc_X,info,work=work)
-    if (info == 0) call psb_csmm(sone,map%map_X2Y,x,szero,yt,info)
-    if ((info == 0) .and. psb_is_repl_desc(map%p_desc_Y)) then
+    if (info == psb_success_) call psb_halo(x,map%p_desc_X,info,work=work)
+    if (info == psb_success_) call psb_csmm(sone,map%map_X2Y,x,szero,yt,info)
+    if ((info == psb_success_) .and. psb_is_repl_desc(map%p_desc_Y)) then
       call psb_sum(ictxt,yt(1:nr2))
     end if
-    if (info == 0) call psb_geaxpby(alpha,yt,beta,y,map%p_desc_Y,info)
-    if (info /= 0) then 
+    if (info == psb_success_) call psb_geaxpby(alpha,yt,beta,y,map%p_desc_Y,info)
+    if (info /= psb_success_) then 
       write(0,*) trim(name),' Error from inner routines',info
       info = -1
     end if
@@ -84,13 +84,13 @@ subroutine psb_s_map_X2Y(alpha,x,beta,y,map,info,work)
     nc2   = psb_cd_get_local_cols(map%desc_Y) 
     allocate(xt(nc1),yt(nc2),stat=info) 
     xt(1:nr1) = x(1:nr1) 
-    if (info == 0) call psb_halo(xt,map%desc_X,info,work=work)
-    if (info == 0) call psb_csmm(sone,map%map_X2Y,xt,szero,yt,info)
-    if ((info == 0) .and. psb_is_repl_desc(map%desc_Y)) then
+    if (info == psb_success_) call psb_halo(xt,map%desc_X,info,work=work)
+    if (info == psb_success_) call psb_csmm(sone,map%map_X2Y,xt,szero,yt,info)
+    if ((info == psb_success_) .and. psb_is_repl_desc(map%desc_Y)) then
       call psb_sum(ictxt,yt(1:nr2))
     end if
-    if (info == 0) call psb_geaxpby(alpha,yt,beta,y,map%desc_Y,info)
-    if (info /= 0) then 
+    if (info == psb_success_) call psb_geaxpby(alpha,yt,beta,y,map%desc_Y,info)
+    if (info /= psb_success_) then 
       write(0,*) trim(name),' Error from inner routines',info
       info = -1
     end if
@@ -127,7 +127,7 @@ subroutine psb_s_map_Y2X(alpha,x,beta,y,map,info,work)
        & map_kind, map_data, nr, ictxt
   character(len=20), parameter  :: name='psb_map_Y2X'
 
-  info = 0
+  info = psb_success_
   if (.not.psb_is_asb_map(map)) then 
     write(0,*) trim(name),' Invalid descriptor input'
     info = 1
@@ -143,13 +143,13 @@ subroutine psb_s_map_Y2X(alpha,x,beta,y,map,info,work)
     nr2   = psb_cd_get_global_rows(map%p_desc_X)
     nc2   = psb_cd_get_local_cols(map%p_desc_X) 
     allocate(yt(nc2),stat=info) 
-    if (info == 0) call psb_halo(x,map%p_desc_Y,info,work=work)
-    if (info == 0) call psb_csmm(sone,map%map_Y2X,x,szero,yt,info)
-    if ((info == 0) .and. psb_is_repl_desc(map%p_desc_X)) then
+    if (info == psb_success_) call psb_halo(x,map%p_desc_Y,info,work=work)
+    if (info == psb_success_) call psb_csmm(sone,map%map_Y2X,x,szero,yt,info)
+    if ((info == psb_success_) .and. psb_is_repl_desc(map%p_desc_X)) then
       call psb_sum(ictxt,yt(1:nr2))
     end if
-    if (info == 0) call psb_geaxpby(alpha,yt,beta,y,map%p_desc_X,info)
-    if (info /= 0) then 
+    if (info == psb_success_) call psb_geaxpby(alpha,yt,beta,y,map%p_desc_X,info)
+    if (info /= psb_success_) then 
       write(0,*) trim(name),' Error from inner routines',info
       info = -1
     end if
@@ -163,13 +163,13 @@ subroutine psb_s_map_Y2X(alpha,x,beta,y,map,info,work)
     nc2   = psb_cd_get_local_cols(map%desc_X) 
     allocate(xt(nc1),yt(nc2),stat=info) 
     xt(1:nr1) = x(1:nr1) 
-    if (info == 0) call psb_halo(xt,map%desc_Y,info,work=work)
-    if (info == 0) call psb_csmm(sone,map%map_Y2X,xt,szero,yt,info)
-    if ((info == 0) .and. psb_is_repl_desc(map%desc_X)) then
+    if (info == psb_success_) call psb_halo(xt,map%desc_Y,info,work=work)
+    if (info == psb_success_) call psb_csmm(sone,map%map_Y2X,xt,szero,yt,info)
+    if ((info == psb_success_) .and. psb_is_repl_desc(map%desc_X)) then
       call psb_sum(ictxt,yt(1:nr2))
     end if
-    if (info == 0) call psb_geaxpby(alpha,yt,beta,y,map%desc_X,info)
-    if (info /= 0) then 
+    if (info == psb_success_) call psb_geaxpby(alpha,yt,beta,y,map%desc_X,info)
+    if (info /= psb_success_) then 
       write(0,*) trim(name),' Error from inner routines',info
       info = -1
     end if
@@ -205,7 +205,7 @@ subroutine psb_d_map_X2Y(alpha,x,beta,y,map,info,work)
        &  map_kind, map_data, nr, ictxt
   character(len=20), parameter  :: name='psb_map_X2Y'
 
-  info = 0
+  info = psb_success_
   if (.not.psb_is_asb_map(map)) then 
     write(0,*) trim(name),' Invalid descriptor input: unassembled'
     info = 1
@@ -221,13 +221,13 @@ subroutine psb_d_map_X2Y(alpha,x,beta,y,map,info,work)
     nr2   = psb_cd_get_global_rows(map%p_desc_Y)
     nc2   = psb_cd_get_local_cols(map%p_desc_Y) 
     allocate(yt(nc2),stat=info) 
-    if (info == 0) call psb_halo(x,map%p_desc_X,info,work=work)
-    if (info == 0) call psb_csmm(done,map%map_X2Y,x,dzero,yt,info)
-    if ((info == 0) .and. psb_is_repl_desc(map%p_desc_Y)) then
+    if (info == psb_success_) call psb_halo(x,map%p_desc_X,info,work=work)
+    if (info == psb_success_) call psb_csmm(done,map%map_X2Y,x,dzero,yt,info)
+    if ((info == psb_success_) .and. psb_is_repl_desc(map%p_desc_Y)) then
       call psb_sum(ictxt,yt(1:nr2))
     end if
-    if (info == 0) call psb_geaxpby(alpha,yt,beta,y,map%p_desc_Y,info)
-    if (info /= 0) then 
+    if (info == psb_success_) call psb_geaxpby(alpha,yt,beta,y,map%p_desc_Y,info)
+    if (info /= psb_success_) then 
       write(0,*) trim(name),' Error from inner routines',info
       info = -1
     end if
@@ -241,13 +241,13 @@ subroutine psb_d_map_X2Y(alpha,x,beta,y,map,info,work)
     nc2   = psb_cd_get_local_cols(map%desc_Y) 
     allocate(xt(nc1),yt(nc2),stat=info) 
     xt(1:nr1) = x(1:nr1) 
-    if (info == 0) call psb_halo(xt,map%desc_X,info,work=work)
-    if (info == 0) call psb_csmm(done,map%map_X2Y,xt,dzero,yt,info)
-    if ((info == 0) .and. psb_is_repl_desc(map%desc_Y)) then
+    if (info == psb_success_) call psb_halo(xt,map%desc_X,info,work=work)
+    if (info == psb_success_) call psb_csmm(done,map%map_X2Y,xt,dzero,yt,info)
+    if ((info == psb_success_) .and. psb_is_repl_desc(map%desc_Y)) then
       call psb_sum(ictxt,yt(1:nr2))
     end if
-    if (info == 0) call psb_geaxpby(alpha,yt,beta,y,map%desc_Y,info)
-    if (info /= 0) then 
+    if (info == psb_success_) call psb_geaxpby(alpha,yt,beta,y,map%desc_Y,info)
+    if (info /= psb_success_) then 
       write(0,*) trim(name),' Error from inner routines',info
       info = -1
     end if
@@ -285,7 +285,7 @@ subroutine psb_d_map_Y2X(alpha,x,beta,y,map,info,work)
        & map_kind, map_data, nr, ictxt
   character(len=20), parameter  :: name='psb_map_Y2X'
 
-  info = 0
+  info = psb_success_
   if (.not.psb_is_asb_map(map)) then 
     write(0,*) trim(name),' Invalid descriptor input'
     info = 1
@@ -301,13 +301,13 @@ subroutine psb_d_map_Y2X(alpha,x,beta,y,map,info,work)
     nr2   = psb_cd_get_global_rows(map%p_desc_X)
     nc2   = psb_cd_get_local_cols(map%p_desc_X) 
     allocate(yt(nc2),stat=info) 
-    if (info == 0) call psb_halo(x,map%p_desc_Y,info,work=work)
-    if (info == 0) call psb_csmm(done,map%map_Y2X,x,dzero,yt,info)
-    if ((info == 0) .and. psb_is_repl_desc(map%p_desc_X)) then
+    if (info == psb_success_) call psb_halo(x,map%p_desc_Y,info,work=work)
+    if (info == psb_success_) call psb_csmm(done,map%map_Y2X,x,dzero,yt,info)
+    if ((info == psb_success_) .and. psb_is_repl_desc(map%p_desc_X)) then
       call psb_sum(ictxt,yt(1:nr2))
     end if
-    if (info == 0) call psb_geaxpby(alpha,yt,beta,y,map%p_desc_X,info)
-    if (info /= 0) then 
+    if (info == psb_success_) call psb_geaxpby(alpha,yt,beta,y,map%p_desc_X,info)
+    if (info /= psb_success_) then 
       write(0,*) trim(name),' Error from inner routines',info
       info = -1
     end if
@@ -321,13 +321,13 @@ subroutine psb_d_map_Y2X(alpha,x,beta,y,map,info,work)
     nc2   = psb_cd_get_local_cols(map%desc_X) 
     allocate(xt(nc1),yt(nc2),stat=info) 
     xt(1:nr1) = x(1:nr1) 
-    if (info == 0) call psb_halo(xt,map%desc_Y,info,work=work)
-    if (info == 0) call psb_csmm(done,map%map_Y2X,xt,dzero,yt,info)
-    if ((info == 0) .and. psb_is_repl_desc(map%desc_X)) then
+    if (info == psb_success_) call psb_halo(xt,map%desc_Y,info,work=work)
+    if (info == psb_success_) call psb_csmm(done,map%map_Y2X,xt,dzero,yt,info)
+    if ((info == psb_success_) .and. psb_is_repl_desc(map%desc_X)) then
       call psb_sum(ictxt,yt(1:nr2))
     end if
-    if (info == 0) call psb_geaxpby(alpha,yt,beta,y,map%desc_X,info)
-    if (info /= 0) then 
+    if (info == psb_success_) call psb_geaxpby(alpha,yt,beta,y,map%desc_X,info)
+    if (info /= psb_success_) then 
       write(0,*) trim(name),' Error from inner routines',info
       info = -1
     end if
@@ -364,7 +364,7 @@ subroutine psb_c_map_X2Y(alpha,x,beta,y,map,info,work)
        & map_kind, map_data, nr, ictxt
   character(len=20), parameter  :: name='psb_map_X2Y'
 
-  info = 0
+  info = psb_success_
   if (.not.psb_is_asb_map(map)) then 
     write(0,*) trim(name),' Invalid descriptor input'
     info = 1
@@ -380,13 +380,13 @@ subroutine psb_c_map_X2Y(alpha,x,beta,y,map,info,work)
     nr2   = psb_cd_get_global_rows(map%p_desc_Y)
     nc2   = psb_cd_get_local_cols(map%p_desc_Y) 
     allocate(yt(nc2),stat=info) 
-    if (info == 0) call psb_halo(x,map%p_desc_X,info,work=work)
-    if (info == 0) call psb_csmm(cone,map%map_X2Y,x,czero,yt,info)
-    if ((info == 0) .and. psb_is_repl_desc(map%p_desc_Y)) then
+    if (info == psb_success_) call psb_halo(x,map%p_desc_X,info,work=work)
+    if (info == psb_success_) call psb_csmm(cone,map%map_X2Y,x,czero,yt,info)
+    if ((info == psb_success_) .and. psb_is_repl_desc(map%p_desc_Y)) then
       call psb_sum(ictxt,yt(1:nr2))
     end if
-    if (info == 0) call psb_geaxpby(alpha,yt,beta,y,map%p_desc_Y,info)
-    if (info /= 0) then 
+    if (info == psb_success_) call psb_geaxpby(alpha,yt,beta,y,map%p_desc_Y,info)
+    if (info /= psb_success_) then 
       write(0,*) trim(name),' Error from inner routines',info
       info = -1
     end if
@@ -400,13 +400,13 @@ subroutine psb_c_map_X2Y(alpha,x,beta,y,map,info,work)
     nc2   = psb_cd_get_local_cols(map%desc_Y) 
     allocate(xt(nc1),yt(nc2),stat=info) 
     xt(1:nr1) = x(1:nr1) 
-    if (info == 0) call psb_halo(xt,map%desc_X,info,work=work)
-    if (info == 0) call psb_csmm(cone,map%map_X2Y,xt,czero,yt,info)
-    if ((info == 0) .and. psb_is_repl_desc(map%desc_Y)) then
+    if (info == psb_success_) call psb_halo(xt,map%desc_X,info,work=work)
+    if (info == psb_success_) call psb_csmm(cone,map%map_X2Y,xt,czero,yt,info)
+    if ((info == psb_success_) .and. psb_is_repl_desc(map%desc_Y)) then
       call psb_sum(ictxt,yt(1:nr2))
     end if
-    if (info == 0) call psb_geaxpby(alpha,yt,beta,y,map%desc_Y,info)
-    if (info /= 0) then 
+    if (info == psb_success_) call psb_geaxpby(alpha,yt,beta,y,map%desc_Y,info)
+    if (info /= psb_success_) then 
       write(0,*) trim(name),' Error from inner routines',info
       info = -1
     end if
@@ -443,7 +443,7 @@ subroutine psb_c_map_Y2X(alpha,x,beta,y,map,info,work)
        & map_kind, map_data, nr, ictxt
   character(len=20), parameter  :: name='psb_map_Y2X'
 
-  info = 0
+  info = psb_success_
   if (.not.psb_is_asb_map(map)) then 
     write(0,*) trim(name),' Invalid descriptor input'
     info = 1
@@ -459,13 +459,13 @@ subroutine psb_c_map_Y2X(alpha,x,beta,y,map,info,work)
     nr2   = psb_cd_get_global_rows(map%p_desc_X)
     nc2   = psb_cd_get_local_cols(map%p_desc_X) 
     allocate(yt(nc2),stat=info) 
-    if (info == 0) call psb_halo(x,map%p_desc_Y,info,work=work)
-    if (info == 0) call psb_csmm(cone,map%map_Y2X,x,czero,yt,info)
-    if ((info == 0) .and. psb_is_repl_desc(map%p_desc_X)) then
+    if (info == psb_success_) call psb_halo(x,map%p_desc_Y,info,work=work)
+    if (info == psb_success_) call psb_csmm(cone,map%map_Y2X,x,czero,yt,info)
+    if ((info == psb_success_) .and. psb_is_repl_desc(map%p_desc_X)) then
       call psb_sum(ictxt,yt(1:nr2))
     end if
-    if (info == 0) call psb_geaxpby(alpha,yt,beta,y,map%p_desc_X,info)
-    if (info /= 0) then 
+    if (info == psb_success_) call psb_geaxpby(alpha,yt,beta,y,map%p_desc_X,info)
+    if (info /= psb_success_) then 
       write(0,*) trim(name),' Error from inner routines',info
       info = -1
     end if
@@ -479,13 +479,13 @@ subroutine psb_c_map_Y2X(alpha,x,beta,y,map,info,work)
     nc2   = psb_cd_get_local_cols(map%desc_X) 
     allocate(xt(nc1),yt(nc2),stat=info) 
     xt(1:nr1) = x(1:nr1) 
-    if (info == 0) call psb_halo(xt,map%desc_Y,info,work=work)
-    if (info == 0) call psb_csmm(cone,map%map_Y2X,xt,czero,yt,info)
-    if ((info == 0) .and. psb_is_repl_desc(map%desc_X)) then
+    if (info == psb_success_) call psb_halo(xt,map%desc_Y,info,work=work)
+    if (info == psb_success_) call psb_csmm(cone,map%map_Y2X,xt,czero,yt,info)
+    if ((info == psb_success_) .and. psb_is_repl_desc(map%desc_X)) then
       call psb_sum(ictxt,yt(1:nr2))
     end if
-    if (info == 0) call psb_geaxpby(alpha,yt,beta,y,map%desc_X,info)
-    if (info /= 0) then 
+    if (info == psb_success_) call psb_geaxpby(alpha,yt,beta,y,map%desc_X,info)
+    if (info /= psb_success_) then 
       write(0,*) trim(name),' Error from inner routines',info
       info = -1
     end if
@@ -522,7 +522,7 @@ subroutine psb_z_map_X2Y(alpha,x,beta,y,map,info,work)
        & map_kind, map_data, nr, ictxt
   character(len=20), parameter  :: name='psb_map_X2Y'
 
-  info = 0
+  info = psb_success_
   if (.not.psb_is_asb_map(map)) then 
     write(0,*) trim(name),' Invalid descriptor input'
     info = 1
@@ -538,13 +538,13 @@ subroutine psb_z_map_X2Y(alpha,x,beta,y,map,info,work)
     nr2   = psb_cd_get_global_rows(map%p_desc_Y)
     nc2   = psb_cd_get_local_cols(map%p_desc_Y) 
     allocate(yt(nc2),stat=info) 
-    if (info == 0) call psb_halo(x,map%p_desc_X,info,work=work)
-    if (info == 0) call psb_csmm(zone,map%map_X2Y,x,zzero,yt,info)
-    if ((info == 0) .and. psb_is_repl_desc(map%p_desc_Y)) then
+    if (info == psb_success_) call psb_halo(x,map%p_desc_X,info,work=work)
+    if (info == psb_success_) call psb_csmm(zone,map%map_X2Y,x,zzero,yt,info)
+    if ((info == psb_success_) .and. psb_is_repl_desc(map%p_desc_Y)) then
       call psb_sum(ictxt,yt(1:nr2))
     end if
-    if (info == 0) call psb_geaxpby(alpha,yt,beta,y,map%p_desc_Y,info)
-    if (info /= 0) then 
+    if (info == psb_success_) call psb_geaxpby(alpha,yt,beta,y,map%p_desc_Y,info)
+    if (info /= psb_success_) then 
       write(0,*) trim(name),' Error from inner routines',info
       info = -1
     end if
@@ -558,13 +558,13 @@ subroutine psb_z_map_X2Y(alpha,x,beta,y,map,info,work)
     nc2   = psb_cd_get_local_cols(map%desc_Y) 
     allocate(xt(nc1),yt(nc2),stat=info) 
     xt(1:nr1) = x(1:nr1) 
-    if (info == 0) call psb_halo(xt,map%desc_X,info,work=work)
-    if (info == 0) call psb_csmm(zone,map%map_X2Y,xt,zzero,yt,info)
-    if ((info == 0) .and. psb_is_repl_desc(map%desc_Y)) then
+    if (info == psb_success_) call psb_halo(xt,map%desc_X,info,work=work)
+    if (info == psb_success_) call psb_csmm(zone,map%map_X2Y,xt,zzero,yt,info)
+    if ((info == psb_success_) .and. psb_is_repl_desc(map%desc_Y)) then
       call psb_sum(ictxt,yt(1:nr2))
     end if
-    if (info == 0) call psb_geaxpby(alpha,yt,beta,y,map%desc_Y,info)
-    if (info /= 0) then 
+    if (info == psb_success_) call psb_geaxpby(alpha,yt,beta,y,map%desc_Y,info)
+    if (info /= psb_success_) then 
       write(0,*) trim(name),' Error from inner routines',info
       info = -1
     end if
@@ -601,7 +601,7 @@ subroutine psb_z_map_Y2X(alpha,x,beta,y,map,info,work)
        & map_kind, map_data, nr, ictxt
   character(len=20), parameter  :: name='psb_map_Y2X'
 
-  info = 0
+  info = psb_success_
   if (.not.psb_is_asb_map(map)) then 
     write(0,*) trim(name),' Invalid descriptor input'
     info = 1
@@ -617,13 +617,13 @@ subroutine psb_z_map_Y2X(alpha,x,beta,y,map,info,work)
     nr2   = psb_cd_get_global_rows(map%p_desc_X)
     nc2   = psb_cd_get_local_cols(map%p_desc_X) 
     allocate(yt(nc2),stat=info) 
-    if (info == 0) call psb_halo(x,map%p_desc_Y,info,work=work)
-    if (info == 0) call psb_csmm(zone,map%map_Y2X,x,zzero,yt,info)
-    if ((info == 0) .and. psb_is_repl_desc(map%p_desc_X)) then
+    if (info == psb_success_) call psb_halo(x,map%p_desc_Y,info,work=work)
+    if (info == psb_success_) call psb_csmm(zone,map%map_Y2X,x,zzero,yt,info)
+    if ((info == psb_success_) .and. psb_is_repl_desc(map%p_desc_X)) then
       call psb_sum(ictxt,yt(1:nr2))
     end if
-    if (info == 0) call psb_geaxpby(alpha,yt,beta,y,map%p_desc_X,info)
-    if (info /= 0) then 
+    if (info == psb_success_) call psb_geaxpby(alpha,yt,beta,y,map%p_desc_X,info)
+    if (info /= psb_success_) then 
       write(0,*) trim(name),' Error from inner routines',info
       info = -1
     end if
@@ -637,13 +637,13 @@ subroutine psb_z_map_Y2X(alpha,x,beta,y,map,info,work)
     nc2   = psb_cd_get_local_cols(map%desc_X) 
     allocate(xt(nc1),yt(nc2),stat=info) 
     xt(1:nr1) = x(1:nr1) 
-    if (info == 0) call psb_halo(xt,map%desc_Y,info,work=work)
-    if (info == 0) call psb_csmm(zone,map%map_Y2X,xt,zzero,yt,info)
-    if ((info == 0) .and. psb_is_repl_desc(map%desc_X)) then
+    if (info == psb_success_) call psb_halo(xt,map%desc_Y,info,work=work)
+    if (info == psb_success_) call psb_csmm(zone,map%map_Y2X,xt,zzero,yt,info)
+    if ((info == psb_success_) .and. psb_is_repl_desc(map%desc_X)) then
       call psb_sum(ictxt,yt(1:nr2))
     end if
-    if (info == 0) call psb_geaxpby(alpha,yt,beta,y,map%desc_X,info)
-    if (info /= 0) then 
+    if (info == psb_success_) call psb_geaxpby(alpha,yt,beta,y,map%desc_X,info)
+    if (info /= psb_success_) then 
       write(0,*) trim(name),' Error from inner routines',info
       info = -1
     end if

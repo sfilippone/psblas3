@@ -61,7 +61,7 @@ subroutine psb_salloc(x, desc_a, info, n, lb)
 
   name='psb_geall'
   if(psb_get_errstatus() /= 0) return 
-  info=0
+  info=psb_success_
   err=0
   int_err(1)=0
   call psb_erractionsave(err_act)
@@ -70,14 +70,14 @@ subroutine psb_salloc(x, desc_a, info, n, lb)
 
   call psb_info(ictxt, me, np)
   if (np == -1) then
-    info = 2010
+    info = psb_err_blacs_error_
     call psb_errpush(info,name)
     goto 9999
   endif
 
   !... check m and n parameters....
   if (.not.psb_is_ok_desc(desc_a)) then 
-    info = 3110
+    info = psb_err_input_matrix_unassembled_
     call psb_errpush(info,name)
     goto 9999
   endif
@@ -94,7 +94,7 @@ subroutine psb_salloc(x, desc_a, info, n, lb)
   else
     call psb_bcast(ictxt,exch(1),root=psb_root_)
     if (exch(1) /= n_) then
-      info=550
+      info=psb_err_parm_differs_among_procs_
       int_err(1)=1
       call psb_errpush(info,name,int_err)
       goto 9999
@@ -107,14 +107,14 @@ subroutine psb_salloc(x, desc_a, info, n, lb)
   else if (psb_is_bld_desc(desc_a)) then
     nr = max(1,psb_cd_get_local_rows(desc_a))
   else
-    info = 4001
+    info = psb_err_internal_error_
     call psb_errpush(info,name,int_err,a_err='Invalid desc_a')
     goto 9999
   endif
   
   call psb_realloc(nr,n_,x,info,lb2=lb)
-  if (info /= 0) then
-    info=4025
+  if (info /= psb_success_) then
+    info=psb_err_alloc_request_
     int_err(1)=nr*n_
     call psb_errpush(info,name,int_err,a_err='real(psb_spk_)')
     goto 9999
@@ -194,7 +194,7 @@ subroutine psb_sallocv(x, desc_a,info,n)
   character(len=20)   :: name
 
   if(psb_get_errstatus() /= 0) return 
-  info=0
+  info=psb_success_
   name='psb_geall'
   call psb_erractionsave(err_act)
   debug_unit  = psb_get_debug_unit()
@@ -205,14 +205,14 @@ subroutine psb_sallocv(x, desc_a,info,n)
   call psb_info(ictxt, me, np)
   !     ....verify blacs grid correctness..
   if (np == -1) then
-    info = 2010
+    info = psb_err_blacs_error_
     call psb_errpush(info,name)
     goto 9999
   endif
 
   !... check m and n parameters....
   if (.not.psb_is_ok_desc(desc_a)) then 
-    info = 3110
+    info = psb_err_input_matrix_unassembled_
     call psb_errpush(info,name)
     goto 9999
   endif
@@ -225,14 +225,14 @@ subroutine psb_sallocv(x, desc_a,info,n)
   else if (psb_is_bld_desc(desc_a)) then
     nr = max(1,psb_cd_get_local_rows(desc_a))
   else
-    info = 4001
+    info = psb_err_internal_error_
     call psb_errpush(info,name,int_err,a_err='Invalid desc_a')
     goto 9999
   endif
   
   call psb_realloc(nr,x,info)
-  if (info /= 0) then
-    info=4025
+  if (info /= psb_success_) then
+    info=psb_err_alloc_request_
     int_err(1)=nr
     call psb_errpush(info,name,int_err,a_err='real(psb_spk_)')
     goto 9999

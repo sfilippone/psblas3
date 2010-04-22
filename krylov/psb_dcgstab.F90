@@ -132,7 +132,7 @@ Subroutine psb_dcgstab(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,istop)
   character(len=20)           :: name
   character(len=*), parameter :: methdname='BiCGStab'
 
-  info = 0
+  info = psb_success_
   name = 'psb_dcgstab'
   call psb_erractionsave(err_act)
   debug_unit  = psb_get_debug_unit()
@@ -151,7 +151,7 @@ Subroutine psb_dcgstab(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,istop)
   ifcte  = mpe_log_get_event_number()
   immb  = mpe_log_get_event_number()
   imme  = mpe_log_get_event_number()
-  if (irank==0) then 
+  if (irank == 0) then 
     info = mpe_describe_state(istpb,istpe,"Solver","WhiteSmoke")
     info = mpe_describe_state(ifctb,ifcte,"PREC","SteelBlue")
     info = mpe_describe_state(immb,imme,"SPMM","DarkOrange")
@@ -178,24 +178,24 @@ Subroutine psb_dcgstab(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,istop)
 
 
   call psb_chkvect(mglob,1,size(x,1),1,1,desc_a,info)
-  if(info /= 0) then
-    info=4010
+  if(info /= psb_success_) then
+    info=psb_err_from_subroutine_
     call psb_errpush(info,name,a_err='psb_chkvect on X')
     goto 9999
   end if
   call psb_chkvect(mglob,1,size(b,1),1,1,desc_a,info)
-  if(info /= 0) then
-    info=4010    
+  if(info /= psb_success_) then
+    info=psb_err_from_subroutine_    
     call psb_errpush(info,name,a_err='psb_chkvect on B')
     goto 9999
   end if
 
   naux=6*n_col 
   allocate(aux(naux),stat=info)
-  if (info == 0) call psb_geall(wwrk,desc_a,info,n=8)
-  if (info == 0) call psb_geasb(wwrk,desc_a,info)  
-  if (info /= 0) then 
-     info=4011
+  if (info == psb_success_) call psb_geall(wwrk,desc_a,info,n=8)
+  if (info == psb_success_) call psb_geasb(wwrk,desc_a,info)  
+  if (info /= psb_success_) then 
+     info=psb_err_from_subroutine_non_
      call psb_errpush(info,name)
      goto 9999
   End If
@@ -226,8 +226,8 @@ Subroutine psb_dcgstab(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,istop)
 
   itx   = 0
   call psb_init_conv(methdname,istop_,itrace_,itmax_,a,b,eps,desc_a,stopdat,info)
-  if (info /= 0) Then 
-     call psb_errpush(4011,name)
+  if (info /= psb_success_) Then 
+     call psb_errpush(psb_err_from_subroutine_non_,name)
      goto 9999
   End If
 
@@ -240,21 +240,21 @@ Subroutine psb_dcgstab(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,istop)
 #ifdef MPE_KRYLOV
     imerr = MPE_Log_event( immb, 0, "st SPMM" )
 #endif
-    if (info == 0) call psb_spmm(-done,a,x,done,r,desc_a,info,work=aux)
+    if (info == psb_success_) call psb_spmm(-done,a,x,done,r,desc_a,info,work=aux)
 #ifdef MPE_KRYLOV
     imerr = MPE_Log_event( imme, 0, "ed SPMM" )
 #endif
-    if (info == 0) call psb_geaxpby(done,r,dzero,q,desc_a,info)
-    if (info /= 0) then 
-       info=4010
+    if (info == psb_success_) call psb_geaxpby(done,r,dzero,q,desc_a,info)
+    if (info /= psb_success_) then 
+       info=psb_err_from_subroutine_
        call psb_errpush(info,name,a_err='Init residual')
        goto 9999
     end if
 
     ! Perhaps we already satisfy the convergence criterion...
     if (psb_check_conv(methdname,itx,x,r,desc_a,stopdat,info)) exit restart
-    if (info /= 0) Then 
-      call psb_errpush(4011,name)
+    if (info /= psb_success_) Then 
+      call psb_errpush(psb_err_from_subroutine_non_,name)
       goto 9999
     End If
     
@@ -271,14 +271,14 @@ Subroutine psb_dcgstab(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,istop)
       rho_old = rho    
       rho     = psb_gedot(q,r,desc_a,info)
 
-      if (rho==dzero) then
+      if (rho == dzero) then
          if (debug_level >= psb_debug_ext_) &
               & write(debug_unit,*) me,' ',trim(name),&
               & ' Iteration breakdown R',rho
         exit iteration
       endif
 
-      if (it==1) then
+      if (it == 1) then
         call psb_geaxpby(done,r,dzero,p,desc_a,info)
       else
         beta = (rho/rho_old)*(alpha/omega)
@@ -301,7 +301,7 @@ Subroutine psb_dcgstab(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,istop)
 #endif
 
       sigma = psb_gedot(q,v,desc_a,info)
-      if (sigma==dzero) then
+      if (sigma == dzero) then
          if (debug_level >= psb_debug_ext_) &
               & write(debug_unit,*) me,' ',trim(name),&
               & ' Iteration breakdown S1', sigma
@@ -310,10 +310,10 @@ Subroutine psb_dcgstab(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,istop)
 
       alpha = rho/sigma
       call psb_geaxpby(done,r,dzero,s,desc_a,info)
-      if (info == 0) call psb_geaxpby(-alpha,v,done,s,desc_a,info)
+      if (info == psb_success_) call psb_geaxpby(-alpha,v,done,s,desc_a,info)
 
-      if(info /= 0) then
-         call psb_errpush(4010,name,a_err='psb_geaxpby')
+      if(info /= psb_success_) then
+         call psb_errpush(psb_err_from_subroutine_,name,a_err='psb_geaxpby')
          goto 9999
       end if
       
@@ -326,19 +326,19 @@ Subroutine psb_dcgstab(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,istop)
       imerr = MPE_Log_event( ifcte, 0, "ed PREC" )
       imerr = MPE_Log_event( immb, 0, "st SPMM" )
 #endif
-      if (info == 0) Call psb_spmm(done,a,z,dzero,t,desc_a,info,&
+      if (info == psb_success_) Call psb_spmm(done,a,z,dzero,t,desc_a,info,&
            & work=aux)
 
 #ifdef MPE_KRYLOV
       imerr = MPE_Log_event( imme, 0, "ed SPMM" )
 #endif
-      if(info /= 0) then
-         call psb_errpush(4010,name,a_err='precaply/spmm')
+      if(info /= psb_success_) then
+         call psb_errpush(psb_err_from_subroutine_,name,a_err='precaply/spmm')
          goto 9999
       end if
       
       sigma = psb_gedot(t,t,desc_a,info)
-      if (sigma==dzero) then
+      if (sigma == dzero) then
          if (debug_level >= psb_debug_ext_) &
               & write(debug_unit,*) me,' ',trim(name),&
               & ' Iteration breakdown S2', sigma
@@ -348,7 +348,7 @@ Subroutine psb_dcgstab(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,istop)
       tau   = psb_gedot(t,s,desc_a,info)
       omega = tau/sigma
 
-      if (omega==dzero) then
+      if (omega == dzero) then
          if (debug_level >= psb_debug_ext_) &
               & write(debug_unit,*) me,' ',trim(name),&
               & ' Iteration breakdown O',omega
@@ -356,17 +356,17 @@ Subroutine psb_dcgstab(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,istop)
       endif
 
       call psb_geaxpby(alpha,f,done,x,desc_a,info)
-      if (info == 0) call psb_geaxpby(omega,z,done,x,desc_a,info)
-      if (info == 0) call psb_geaxpby(done,s,dzero,r,desc_a,info)
-      if (info == 0) call psb_geaxpby(-omega,t,done,r,desc_a,info)
-      if (info /= 0) Then 
-        call psb_errpush(4010,name,a_err='X/R update ')
+      if (info == psb_success_) call psb_geaxpby(omega,z,done,x,desc_a,info)
+      if (info == psb_success_) call psb_geaxpby(done,s,dzero,r,desc_a,info)
+      if (info == psb_success_) call psb_geaxpby(-omega,t,done,r,desc_a,info)
+      if (info /= psb_success_) Then 
+        call psb_errpush(psb_err_from_subroutine_,name,a_err='X/R update ')
         goto 9999
       End If
       
       if (psb_check_conv(methdname,itx,x,r,desc_a,stopdat,info)) exit restart
-      if (info /= 0) Then 
-        call psb_errpush(4011,name)
+      if (info /= psb_success_) Then 
+        call psb_errpush(psb_err_from_subroutine_non_,name)
         goto 9999
       End If
       
@@ -376,8 +376,8 @@ Subroutine psb_dcgstab(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,istop)
   call psb_end_conv(methdname,itx,desc_a,stopdat,info,err,iter)
 
   deallocate(aux,stat=info)
-  if (info == 0) call psb_gefree(wwrk,desc_a,info)
-  if(info/=0) then
+  if (info == psb_success_) call psb_gefree(wwrk,desc_a,info)
+  if(info /= psb_success_) then
      call psb_errpush(info,name)
      goto 9999
   end if

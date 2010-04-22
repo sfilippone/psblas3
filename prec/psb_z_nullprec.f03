@@ -38,7 +38,7 @@ contains
     ! This is the base version and we should throw an error. 
     ! Or should it be the NULL preonditioner???
     !
-    info = 0 
+    info = psb_success_
     
     nrow = psb_cd_get_local_rows(desc_data)
     if (size(x) < nrow) then 
@@ -53,8 +53,8 @@ contains
     end if
 
     call psb_geaxpby(alpha,x,beta,y,desc_data,info)
-    if (info /= 0 ) then 
-      info = 4010
+    if (info /= psb_success_ ) then 
+      info = psb_err_from_subroutine_
       call psb_errpush(infoi,name,a_err="psb_geaxpby")
       goto 9999
     end if
@@ -85,7 +85,7 @@ contains
 
     call psb_erractionsave(err_act)
 
-    info = 0
+    info = psb_success_
 
     
     call psb_erractionrestore(err_act)
@@ -115,7 +115,7 @@ contains
 
     call psb_erractionsave(err_act)
 
-    info = 0
+    info = psb_success_
 
     
     call psb_erractionrestore(err_act)
@@ -144,7 +144,7 @@ contains
 
     call psb_erractionsave(err_act)
 
-    info = 0
+    info = psb_success_
     
     call psb_erractionrestore(err_act)
     return
@@ -172,7 +172,7 @@ contains
 
     call psb_erractionsave(err_act)
 
-    info = 0
+    info = psb_success_
     
     call psb_erractionrestore(err_act)
     return
@@ -200,7 +200,7 @@ contains
 
     call psb_erractionsave(err_act)
 
-    info = 0
+    info = psb_success_
     
     call psb_erractionrestore(err_act)
     return
@@ -227,7 +227,7 @@ contains
     
     call psb_erractionsave(err_act)
     
-    info = 0
+    info = psb_success_
     
     call psb_erractionrestore(err_act)
     return
@@ -257,7 +257,7 @@ contains
 
     call psb_erractionsave(err_act)
 
-    info = 0
+    info = psb_success_
    
     if (present(iout)) then 
       iout_ = iout

@@ -33,19 +33,19 @@ subroutine psi_extract_dep_list(desc_data,desc_str,dep_list,&
      & length_dl,np,dl_lda,mode,info)
 
   !    internal routine
-  !    ================ 
+  !    == = ============= 
   !   
   !    _____called by psi_crea_halo and psi_crea_ovrlap ______
   !
   ! purpose
-  ! =======
+  ! == = ====
   !   process root (pid=0) extracts for each process "k" the ordered list of process
   !   to which "k" must communicate. this list with its order is extracted from
   !   desc_str list
   ! 
   !   
   !  input
-  ! =======
+  ! == = ====
   !  desc_data :integer array
   !  explanation:
   !  name		 explanation
@@ -110,7 +110,7 @@ subroutine psi_extract_dep_list(desc_data,desc_str,dep_list,&
   !         if mode =1 then not will be inserted duplicate element in
   !          a same dependence list
   !  output
-  !  =====
+  !  == = ==
   !  only for root (pid=0) process:
   !  dep_list  integer array(dl_lda,0:np)
   !            dependence list dep_list(*,i) is the list of process identifiers to which process i
@@ -150,7 +150,7 @@ subroutine psi_extract_dep_list(desc_data,desc_str,dep_list,&
   debug_unit  = psb_get_debug_unit()
   debug_level = psb_get_debug_level()
 
-  info = 0
+  info = psb_success_
   ictxt = desc_data(psb_ctxt_)
 
 
@@ -199,7 +199,7 @@ subroutine psi_extract_dep_list(desc_data,desc_str,dep_list,&
           endif
         else if (mode == 0) then
           if (pointer_dep_list > dl_lda) then
-            info = 4000
+            info = psb_err_alloc_dealloc_
             goto 998
           endif
           dep_list(pointer_dep_list,me)=proc
@@ -230,7 +230,7 @@ subroutine psi_extract_dep_list(desc_data,desc_str,dep_list,&
           if (j == pointer_dep_list) then
             !                 ...if not found.....
             if (pointer_dep_list > dl_lda) then
-              info = 4000
+              info = psb_err_alloc_dealloc_
               goto 998
             endif
             dep_list(pointer_dep_list,me)=proc
@@ -238,7 +238,7 @@ subroutine psi_extract_dep_list(desc_data,desc_str,dep_list,&
           endif
         else if (mode == 0) then
           if (pointer_dep_list > dl_lda) then
-            info = 4000
+            info = psb_err_alloc_dealloc_
             goto 998
           endif
           dep_list(pointer_dep_list,me)=proc
@@ -265,16 +265,16 @@ subroutine psi_extract_dep_list(desc_data,desc_str,dep_list,&
   call psb_sum(ictxt,length_dl(0:np))
   call psb_get_mpicomm(ictxt,icomm )
   allocate(itmp(dl_lda),stat=info)
-  if (info /= 0) then 
-    info=4000
+  if (info /= psb_success_) then 
+    info=psb_err_alloc_dealloc_
     goto 9999
   endif
   itmp(1:dl_lda) = dep_list(1:dl_lda,me)
   call mpi_allgather(itmp,dl_lda,mpi_integer,&
        & dep_list,dl_lda,mpi_integer,icomm,info)
   deallocate(itmp,stat=info)
-  if (info /= 0) then 
-    info=4000
+  if (info /= psb_success_) then 
+    info=psb_err_alloc_dealloc_
     goto 9999
   endif
 

@@ -121,10 +121,10 @@ Contains
 
     name='psb_safe_ab_cpy'
     call psb_erractionsave(err_act)
-    info = 0
+    info = psb_success_
 
     if (psb_get_errstatus() /= 0) then 
-      info = 4010
+      info = psb_err_from_subroutine_
       goto 9999
     end if
 
@@ -132,8 +132,8 @@ Contains
       isz = size(vin)
       lb  = lbound(vin,1)
       call psb_realloc(isz,vout,info,lb=lb)
-      if (info /= 0) then     
-        info=4010
+      if (info /= psb_success_) then     
+        info=psb_err_from_subroutine_
         char_err='psb_realloc'
         call psb_errpush(info,name,a_err=char_err)
         goto 9999
@@ -172,10 +172,10 @@ Contains
 
     name='psb_safe_ab_cpy'
     call psb_erractionsave(err_act)
-    info = 0
+    info = psb_success_
 
     if(psb_get_errstatus() /= 0) then 
-      info = 4010
+      info = psb_err_from_subroutine_
       goto 9999
     end if
     if (allocated(vin)) then 
@@ -184,8 +184,8 @@ Contains
       lb1  = lbound(vin,1)
       lb2  = lbound(vin,2)
       call psb_realloc(isz1,isz2,vout,info,lb1=lb1,lb2=lb2)
-      if (info /= 0) then     
-        info=4010
+      if (info /= psb_success_) then     
+        info=psb_err_from_subroutine_
         char_err='psb_realloc'
         call psb_errpush(info,name,a_err=char_err)
         goto 9999
@@ -224,9 +224,9 @@ Contains
 
     name='psb_safe_ab_cpy'
     call psb_erractionsave(err_act)
-    info = 0
+    info = psb_success_
     if(psb_get_errstatus() /= 0) then 
-      info = 4010
+      info = psb_err_from_subroutine_
       goto 9999
     end if
 
@@ -234,8 +234,8 @@ Contains
       isz = size(vin)
       lb  = lbound(vin,1)
       call psb_realloc(isz,vout,info,lb=lb)
-      if (info /= 0) then     
-        info=4010
+      if (info /= psb_success_) then     
+        info=psb_err_from_subroutine_
         char_err='psb_realloc'
         call psb_errpush(info,name,a_err=char_err)
         goto 9999
@@ -274,9 +274,9 @@ Contains
 
     name='psb_safe_ab_cpy'
     call psb_erractionsave(err_act)
-    info = 0
+    info = psb_success_
     if(psb_get_errstatus() /= 0) then 
-      info = 4010
+      info = psb_err_from_subroutine_
       goto 9999
     end if
 
@@ -286,8 +286,8 @@ Contains
       lb1  = lbound(vin,1)
       lb2  = lbound(vin,2)
       call psb_realloc(isz1,isz2,vout,info,lb1=lb1,lb2=lb2)
-      if (info /= 0) then     
-        info=4010
+      if (info /= psb_success_) then     
+        info=psb_err_from_subroutine_
         char_err='psb_realloc'
         call psb_errpush(info,name,a_err=char_err)
         goto 9999
@@ -326,9 +326,9 @@ Contains
 
     name='psb_safe_ab_cpy'
     call psb_erractionsave(err_act)
-    info = 0
+    info = psb_success_
     if(psb_get_errstatus() /= 0) then 
-      info = 4010
+      info = psb_err_from_subroutine_
       goto 9999
     end if
 
@@ -336,8 +336,8 @@ Contains
       isz = size(vin)
       lb  = lbound(vin,1)
       call psb_realloc(isz,vout,info,lb=lb)
-      if (info /= 0) then     
-        info=4010
+      if (info /= psb_success_) then     
+        info=psb_err_from_subroutine_
         char_err='psb_realloc'
         call psb_errpush(info,name,a_err=char_err)
         goto 9999
@@ -376,9 +376,9 @@ Contains
 
     name='psb_safe_ab_cpy'
     call psb_erractionsave(err_act)
-    info = 0
+    info = psb_success_
     if(psb_get_errstatus() /= 0) then 
-      info = 4010
+      info = psb_err_from_subroutine_
       goto 9999
     end if
 
@@ -388,8 +388,8 @@ Contains
       lb1  = lbound(vin,1)
       lb2  = lbound(vin,2)
       call psb_realloc(isz1,isz2,vout,info,lb1=lb1,lb2=lb2)
-      if (info /= 0) then     
-        info=4010
+      if (info /= psb_success_) then     
+        info=psb_err_from_subroutine_
         char_err='psb_realloc'
         call psb_errpush(info,name,a_err=char_err)
         goto 9999
@@ -428,9 +428,9 @@ Contains
 
     name='psb_safe_ab_cpy'
     call psb_erractionsave(err_act)
-    info = 0
+    info = psb_success_
     if(psb_get_errstatus() /= 0) then 
-      info = 4010
+      info = psb_err_from_subroutine_
       goto 9999
     end if
 
@@ -438,8 +438,8 @@ Contains
       isz = size(vin)
       lb  = lbound(vin,1)
       call psb_realloc(isz,vout,info,lb=lb)
-      if (info /= 0) then     
-        info=4010
+      if (info /= psb_success_) then     
+        info=psb_err_from_subroutine_
         char_err='psb_realloc'
         call psb_errpush(info,name,a_err=char_err)
         goto 9999
@@ -478,9 +478,9 @@ Contains
 
     name='psb_safe_ab_cpy'
     call psb_erractionsave(err_act)
-    info = 0
+    info = psb_success_
     if(psb_get_errstatus() /= 0) then 
-      info = 4010
+      info = psb_err_from_subroutine_
       goto 9999
     end if
 
@@ -490,8 +490,8 @@ Contains
       lb1  = lbound(vin,1)
       lb2  = lbound(vin,2)
       call psb_realloc(isz1,isz2,vout,info,lb1=lb1,lb2=lb2)
-      if (info /= 0) then     
-        info=4010
+      if (info /= psb_success_) then     
+        info=psb_err_from_subroutine_
         char_err='psb_realloc'
         call psb_errpush(info,name,a_err=char_err)
         goto 9999
@@ -530,17 +530,17 @@ Contains
 
     name='psb_safe_ab_cpy'
     call psb_erractionsave(err_act)
-    info = 0
+    info = psb_success_
     if(psb_get_errstatus() /= 0) then 
-      info = 4010
+      info = psb_err_from_subroutine_
       goto 9999
     end if
     if (allocated(vin)) then 
       isz = size(vin)
       lb  = lbound(vin,1)
       call psb_realloc(isz,vout,info,lb=lb)
-      if (info /= 0) then     
-        info=4010
+      if (info /= psb_success_) then     
+        info=psb_err_from_subroutine_
         char_err='psb_realloc'
         call psb_errpush(info,name,a_err=char_err)
         goto 9999
@@ -579,9 +579,9 @@ Contains
 
     name='psb_safe_ab_cpy'
     call psb_erractionsave(err_act)
-    info = 0
+    info = psb_success_
     if(psb_get_errstatus() /= 0) then 
-      info = 4010
+      info = psb_err_from_subroutine_
       goto 9999
     end if
     if (allocated(vin)) then 
@@ -590,8 +590,8 @@ Contains
       lb1  = lbound(vin,1)
       lb2  = lbound(vin,2)
       call psb_realloc(isz1,isz2,vout,info,lb1=lb1,lb2=lb2)
-      if (info /= 0) then     
-        info=4010
+      if (info /= psb_success_) then     
+        info=psb_err_from_subroutine_
         char_err='psb_realloc'
         call psb_errpush(info,name,a_err=char_err)
         goto 9999
@@ -631,16 +631,16 @@ Contains
 
     name='psb_safe_cpy'
     call psb_erractionsave(err_act)
-    info = 0
+    info = psb_success_
     if(psb_get_errstatus() /= 0) then 
-      info = 4010
+      info = psb_err_from_subroutine_
       goto 9999
     end if
     isz = size(vin)
     lb  = lbound(vin,1)
     call psb_realloc(isz,vout,info,lb=lb)
-    if (info /= 0) then     
-      info=4010
+    if (info /= psb_success_) then     
+      info=psb_err_from_subroutine_
       char_err='psb_realloc'
       call psb_errpush(info,name,a_err=char_err)
       goto 9999
@@ -678,9 +678,9 @@ Contains
 
     name='psb_safe_cpy'
     call psb_erractionsave(err_act)
-    info = 0
+    info = psb_success_
     if(psb_get_errstatus() /= 0) then 
-      info = 4010
+      info = psb_err_from_subroutine_
       goto 9999
     end if
 
@@ -689,8 +689,8 @@ Contains
     lb1  = lbound(vin,1)
     lb2  = lbound(vin,2)
     call psb_realloc(isz1,isz2,vout,info,lb1=lb1,lb2=lb2)
-    if (info /= 0) then     
-      info=4010
+    if (info /= psb_success_) then     
+      info=psb_err_from_subroutine_
       char_err='psb_realloc'
       call psb_errpush(info,name,a_err=char_err)
       goto 9999
@@ -728,17 +728,17 @@ Contains
 
     name='psb_safe_cpy'
     call psb_erractionsave(err_act)
-    info = 0
+    info = psb_success_
     if(psb_get_errstatus() /= 0) then 
-      info = 4010
+      info = psb_err_from_subroutine_
       goto 9999
     end if
 
     isz = size(vin)
     lb  = lbound(vin,1)
     call psb_realloc(isz,vout,info,lb=lb)
-    if (info /= 0) then     
-      info=4010
+    if (info /= psb_success_) then     
+      info=psb_err_from_subroutine_
       char_err='psb_realloc'
       call psb_errpush(info,name,a_err=char_err)
       goto 9999
@@ -776,9 +776,9 @@ Contains
 
     name='psb_safe_cpy'
     call psb_erractionsave(err_act)
-    info = 0
+    info = psb_success_
     if(psb_get_errstatus() /= 0) then 
-      info = 4010
+      info = psb_err_from_subroutine_
       goto 9999
     end if
 
@@ -787,8 +787,8 @@ Contains
     lb1  = lbound(vin,1)
     lb2  = lbound(vin,2)
     call psb_realloc(isz1,isz2,vout,info,lb1=lb1,lb2=lb2)
-    if (info /= 0) then     
-      info=4010
+    if (info /= psb_success_) then     
+      info=psb_err_from_subroutine_
       char_err='psb_realloc'
       call psb_errpush(info,name,a_err=char_err)
       goto 9999
@@ -826,16 +826,16 @@ Contains
 
     name='psb_safe_cpy'
     call psb_erractionsave(err_act)
-    info = 0
+    info = psb_success_
     if(psb_get_errstatus() /= 0) then 
-      info = 4010
+      info = psb_err_from_subroutine_
       goto 9999
     end if
     isz = size(vin)
     lb  = lbound(vin,1)
     call psb_realloc(isz,vout,info,lb=lb)
-    if (info /= 0) then     
-      info=4010
+    if (info /= psb_success_) then     
+      info=psb_err_from_subroutine_
       char_err='psb_realloc'
       call psb_errpush(info,name,a_err=char_err)
       goto 9999
@@ -873,9 +873,9 @@ Contains
 
     name='psb_safe_cpy'
     call psb_erractionsave(err_act)
-    info = 0
+    info = psb_success_
     if(psb_get_errstatus() /= 0) then 
-      info = 4010
+      info = psb_err_from_subroutine_
       goto 9999
     end if
 
@@ -884,8 +884,8 @@ Contains
     lb1  = lbound(vin,1)
     lb2  = lbound(vin,2)
     call psb_realloc(isz1,isz2,vout,info,lb1=lb1,lb2=lb2)
-    if (info /= 0) then     
-      info=4010
+    if (info /= psb_success_) then     
+      info=psb_err_from_subroutine_
       char_err='psb_realloc'
       call psb_errpush(info,name,a_err=char_err)
       goto 9999
@@ -923,17 +923,17 @@ Contains
 
     name='psb_safe_cpy'
     call psb_erractionsave(err_act)
-    info = 0
+    info = psb_success_
     if(psb_get_errstatus() /= 0) then 
-      info = 4010
+      info = psb_err_from_subroutine_
       goto 9999
     end if
 
     isz = size(vin)
     lb  = lbound(vin,1)
     call psb_realloc(isz,vout,info,lb=lb)
-    if (info /= 0) then     
-      info=4010
+    if (info /= psb_success_) then     
+      info=psb_err_from_subroutine_
       char_err='psb_realloc'
       call psb_errpush(info,name,a_err=char_err)
       goto 9999
@@ -971,9 +971,9 @@ Contains
 
     name='psb_safe_cpy'
     call psb_erractionsave(err_act)
-    info = 0
+    info = psb_success_
     if(psb_get_errstatus() /= 0) then 
-      info = 4010
+      info = psb_err_from_subroutine_
       goto 9999
     end if
 
@@ -982,8 +982,8 @@ Contains
     lb1  = lbound(vin,1)
     lb2  = lbound(vin,2)
     call psb_realloc(isz1,isz2,vout,info,lb1=lb1,lb2=lb2)
-    if (info /= 0) then     
-      info=4010
+    if (info /= psb_success_) then     
+      info=psb_err_from_subroutine_
       char_err='psb_realloc'
       call psb_errpush(info,name,a_err=char_err)
       goto 9999
@@ -1021,16 +1021,16 @@ Contains
 
     name='psb_safe_cpy'
     call psb_erractionsave(err_act)
-    info = 0
+    info = psb_success_
     if(psb_get_errstatus() /= 0) then 
-      info = 4010
+      info = psb_err_from_subroutine_
       goto 9999
     end if
     isz = size(vin)
     lb  = lbound(vin,1)
     call psb_realloc(isz,vout,info,lb=lb)
-    if (info /= 0) then     
-      info=4010
+    if (info /= psb_success_) then     
+      info=psb_err_from_subroutine_
       char_err='psb_realloc'
       call psb_errpush(info,name,a_err=char_err)
       goto 9999
@@ -1069,9 +1069,9 @@ Contains
     name='psb_safe_cpy'
     call psb_erractionsave(err_act)
 
-    info = 0
+    info = psb_success_
     if(psb_get_errstatus() /= 0) then 
-      info = 4010
+      info = psb_err_from_subroutine_
       goto 9999
     end if
     isz1 = size(vin,1)
@@ -1079,8 +1079,8 @@ Contains
     lb1  = lbound(vin,1)
     lb2  = lbound(vin,2)
     call psb_realloc(isz1,isz2,vout,info,lb1=lb1,lb2=lb2)
-    if (info /= 0) then     
-      info=4010
+    if (info /= psb_success_) then     
+      info=psb_err_from_subroutine_
       char_err='psb_realloc'
       call psb_errpush(info,name,a_err=char_err)
       goto 9999
@@ -1268,10 +1268,10 @@ Contains
 
     name='psb_ensure_size'
     call psb_erractionsave(err_act)
-    info=0
+    info=psb_success_
 
     if(psb_get_errstatus() /= 0) then 
-      info = 4010
+      info = psb_err_from_subroutine_
       goto 9999
     end if
     
@@ -1287,8 +1287,8 @@ Contains
       endif
       call psb_realloc(isz,v,info,pad=pad)
       
-      if (info /= 0) then
-        info=4010
+      if (info /= psb_success_) then
+        info=psb_err_from_subroutine_
         call psb_errpush(info,name,a_err='psb_realloc')
         goto 9999
       end if
@@ -1327,10 +1327,10 @@ Contains
 
     name='psb_ensure_size'
     call psb_erractionsave(err_act)
-    info=0
+    info=psb_success_
 
     if(psb_get_errstatus() /= 0) then 
-      info = 4010
+      info = psb_err_from_subroutine_
       goto 9999
     end if
     
@@ -1346,8 +1346,8 @@ Contains
       endif
 
       call psb_realloc(isz,v,info,pad=pad)
-      if (info /= 0) then
-        info=4010
+      if (info /= psb_success_) then
+        info=psb_err_from_subroutine_
         call psb_errpush(info,name,a_err='psb_realloc')
         goto 9999
       End If
@@ -1385,10 +1385,10 @@ Contains
 
     name='psb_ensure_size'
     call psb_erractionsave(err_act)
-    info=0
+    info=psb_success_
 
     if(psb_get_errstatus() /= 0) then 
-      info = 4010
+      info = psb_err_from_subroutine_
       goto 9999
     end if
     
@@ -1404,8 +1404,8 @@ Contains
       endif
 
       call psb_realloc(isz,v,info,pad=pad)
-      if (info /= 0) then
-        info=4010
+      if (info /= psb_success_) then
+        info=psb_err_from_subroutine_
         call psb_errpush(info,name,a_err='psb_realloc')
         goto 9999
       End If
@@ -1444,10 +1444,10 @@ Contains
 
     name='psb_ensure_size'
     call psb_erractionsave(err_act)
-    info=0
+    info=psb_success_
 
     if(psb_get_errstatus() /= 0) then 
-      info = 4010
+      info = psb_err_from_subroutine_
       goto 9999
     end if
     
@@ -1462,8 +1462,8 @@ Contains
         endif
       endif
       call psb_realloc(isz,v,info,pad=pad)
-      if (info /= 0) then
-        info=4010
+      if (info /= psb_success_) then
+        info=psb_err_from_subroutine_
         call psb_errpush(info,name,a_err='psb_realloc')
         goto 9999
       end if
@@ -1502,10 +1502,10 @@ Contains
 
     name='psb_ensure_size'
     call psb_erractionsave(err_act)
-    info=0
+    info=psb_success_
 
     if(psb_get_errstatus() /= 0) then 
-      info = 4010
+      info = psb_err_from_subroutine_
       goto 9999
     end if
     
@@ -1520,8 +1520,8 @@ Contains
         endif
       endif
       call psb_realloc(isz,v,info,pad=pad)
-      if (info /= 0) then
-        info=4010
+      if (info /= psb_success_) then
+        info=psb_err_from_subroutine_
         call psb_errpush(info,name,a_err='psb_realloc')
         goto 9999
       end if
@@ -1561,12 +1561,12 @@ Contains
 
     name='psb_dreallocate1i' 
     call psb_erractionsave(err_act)
-    info=0
+    info=psb_success_
 
     if (debug) write(0,*) 'reallocate I',len
     if (psb_get_errstatus() /= 0) then 
       if (debug) write(0,*) 'reallocate errstatus /= 0'
-      info = 4010
+      info = psb_err_from_subroutine_
       goto 9999
     end if
 
@@ -1587,7 +1587,7 @@ Contains
       lbi = lbound(rrax,1) 
       If ((dim /= len).or.(lbi /= lb_))  Then
         Allocate(tmp(lb_:ub_),stat=info)
-        if (info /= 0) then
+        if (info /= psb_success_) then
           err=4025
           call psb_errpush(err,name,i_err=(/len,0,0,0,0/),a_err='integer')
           goto 9999
@@ -1600,7 +1600,7 @@ Contains
     else
       dim = 0
       allocate(rrax(lb_:ub_),stat=info)
-      if (info /= 0) then
+      if (info /= psb_success_) then
         err=4025
         call psb_errpush(err,name,i_err=(/len,0,0,0,0/),a_err='integer')
         goto 9999
@@ -1646,7 +1646,7 @@ Contains
 
     name='psb_dreallocate1s'
     call psb_erractionsave(err_act)
-    info = 0 
+    info = psb_success_
     if (debug) write(0,*) 'reallocate S',len
 
     if (present(lb)) then
@@ -1666,7 +1666,7 @@ Contains
       lbi = lbound(rrax,1)
       If ((dim /= len).or.(lbi /= lb_))  Then
         Allocate(tmp(lb_:ub_),stat=info)
-        if (info /= 0) then
+        if (info /= psb_success_) then
           err=4025
           call psb_errpush(err,name,i_err=(/len,0,0,0,0/),a_err='real(psb_spk_)')
           goto 9999
@@ -1677,7 +1677,7 @@ Contains
     else
       dim = 0
       Allocate(rrax(lb_:ub_),stat=info)
-      if (info /= 0) then
+      if (info /= psb_success_) then
         err=4025
         call psb_errpush(err,name,i_err=(/len,0,0,0,0/),a_err='real(psb_spk_)')
         goto 9999
@@ -1720,7 +1720,7 @@ Contains
 
     name='psb_dreallocate1d'
     call psb_erractionsave(err_act)
-    info = 0 
+    info = psb_success_
     if (debug) write(0,*) 'reallocate D',len
 
     if (present(lb)) then
@@ -1740,7 +1740,7 @@ Contains
       lbi = lbound(rrax,1)
       If ((dim /= len).or.(lbi /= lb_))  Then
         Allocate(tmp(lb_:ub_),stat=info)
-        if (info /= 0) then
+        if (info /= psb_success_) then
           err=4025
           call psb_errpush(err,name,i_err=(/len,0,0,0,0/),a_err='real(psb_dpk_)')
           goto 9999
@@ -1751,7 +1751,7 @@ Contains
     else
       dim = 0
       Allocate(rrax(lb_:ub_),stat=info)
-      if (info /= 0) then
+      if (info /= psb_success_) then
         err=4025
         call psb_errpush(err,name,i_err=(/len,0,0,0,0/),a_err='real(psb_dpk_)')
         goto 9999
@@ -1795,7 +1795,7 @@ Contains
 
     name='psb_dreallocate1c'
     call psb_erractionsave(err_act)
-    info = 0
+    info = psb_success_
     if (debug) write(0,*) 'reallocate C',len    
     if (present(lb)) then
       lb_ = lb
@@ -1814,7 +1814,7 @@ Contains
       lbi = lbound(rrax,1) 
       If ((dim /= len).or.(lbi /= lb_))  Then
         Allocate(tmp(lb_:ub_),stat=info)
-        if (info /= 0) then
+        if (info /= psb_success_) then
           err=4025
           call psb_errpush(err,name,i_err=(/len,0,0,0,0/),a_err='complex(psb_spk_)')
           goto 9999
@@ -1825,7 +1825,7 @@ Contains
     else
       dim = 0
       Allocate(rrax(lb_:ub_),stat=info)
-      if (info /= 0) then
+      if (info /= psb_success_) then
         err=4025
         call psb_errpush(err,name,i_err=(/len,0,0,0,0/),a_err='complex(psb_spk_)')
         goto 9999
@@ -1868,7 +1868,7 @@ Contains
 
     name='psb_dreallocate1z'
     call psb_erractionsave(err_act)
-    info = 0
+    info = psb_success_
     if (debug) write(0,*) 'reallocate Z',len    
     if (present(lb)) then
       lb_ = lb
@@ -1887,7 +1887,7 @@ Contains
       lbi = lbound(rrax,1) 
       If ((dim /= len).or.(lbi /= lb_))  Then
         Allocate(tmp(lb_:ub_),stat=info)
-        if (info /= 0) then
+        if (info /= psb_success_) then
           err=4025
           call psb_errpush(err,name,i_err=(/len,0,0,0,0/),a_err='complex(psb_dpk_)')
           goto 9999
@@ -1898,7 +1898,7 @@ Contains
     else
       dim = 0
       Allocate(rrax(lb_:ub_),stat=info)
-      if (info /= 0) then
+      if (info /= psb_success_) then
         err=4025
         call psb_errpush(err,name,i_err=(/len,0,0,0,0/),a_err='complex(psb_dpk_)')
         goto 9999
@@ -1943,7 +1943,7 @@ Contains
 
     name='psb_dreallocates2'
     call psb_erractionsave(err_act)
-    info = 0 
+    info = psb_success_
     if (present(lb1)) then 
       lb1_ = lb1
     else
@@ -1977,7 +1977,7 @@ Contains
       If ((dim /= len1).or.(dim2 /= len2).or.(lbi1 /= lb1_)&
            &  .or.(lbi2 /= lb2_)) Then
         Allocate(tmp(lb1_:ub1_,lb2_:ub2_),stat=info)
-        if (info /= 0) then
+        if (info /= psb_success_) then
           err=4025
           call psb_errpush(err,name,i_err=(/len1*len2,0,0,0,0/),a_err='real(psb_spk_)')
           goto 9999
@@ -1990,7 +1990,7 @@ Contains
       dim  = 0
       dim2 = 0
       Allocate(rrax(lb1_:ub1_,lb2_:ub2_),stat=info)
-      if (info /= 0) then
+      if (info /= psb_success_) then
         err=4025
         call psb_errpush(err,name,i_err=(/len1*len2,0,0,0,0/),a_err='real(psb_spk_)')
         goto 9999
@@ -2035,7 +2035,7 @@ Contains
 
     name='psb_dreallocated2'
     call psb_erractionsave(err_act)
-    info = 0 
+    info = psb_success_
     if (present(lb1)) then 
       lb1_ = lb1
     else
@@ -2069,7 +2069,7 @@ Contains
       If ((dim /= len1).or.(dim2 /= len2).or.(lbi1 /= lb1_)&
            &  .or.(lbi2 /= lb2_)) Then
         Allocate(tmp(lb1_:ub1_,lb2_:ub2_),stat=info)
-        if (info /= 0) then
+        if (info /= psb_success_) then
           err=4025
           call psb_errpush(err,name,i_err=(/len1*len2,0,0,0,0/),a_err='real(psb_dpk_)')
           goto 9999
@@ -2082,7 +2082,7 @@ Contains
       dim  = 0
       dim2 = 0
       Allocate(rrax(lb1_:ub1_,lb2_:ub2_),stat=info)
-      if (info /= 0) then
+      if (info /= psb_success_) then
         err=4025
         call psb_errpush(err,name,i_err=(/len1*len2,0,0,0,0/),a_err='real(psb_dpk_)')
         goto 9999
@@ -2127,7 +2127,7 @@ Contains
 
     name='psb_dreallocatec2'
     call psb_erractionsave(err_act)
-    info = 0 
+    info = psb_success_
     if (present(lb1)) then 
       lb1_ = lb1
     else
@@ -2161,7 +2161,7 @@ Contains
       If ((dim /= len1).or.(dim2 /= len2).or.(lbi1 /= lb1_)&
            &  .or.(lbi2 /= lb2_)) Then
         Allocate(tmp(lb1_:ub1_,lb2_:ub2_),stat=info)
-        if (info /= 0) then
+        if (info /= psb_success_) then
           err=4025
           call psb_errpush(err,name,i_err=(/len1*len2,0,0,0,0/),a_err='complex(psb_spk_)')
           goto 9999
@@ -2174,7 +2174,7 @@ Contains
       dim  = 0
       dim2 = 0
       Allocate(rrax(lb1_:ub1_,lb2_:ub2_),stat=info)
-      if (info /= 0) then
+      if (info /= psb_success_) then
         err=4025
         call psb_errpush(err,name,i_err=(/len1*len2,0,0,0,0/),a_err='complex(psb_spk_)')
         goto 9999
@@ -2219,7 +2219,7 @@ Contains
 
     name='psb_dreallocatez2'
     call psb_erractionsave(err_act)
-    info = 0 
+    info = psb_success_
     if (present(lb1)) then 
       lb1_ = lb1
     else
@@ -2253,7 +2253,7 @@ Contains
       If ((dim /= len1).or.(dim2 /= len2).or.(lbi1 /= lb1_)&
            &  .or.(lbi2 /= lb2_)) Then
         Allocate(tmp(lb1_:ub1_,lb2_:ub2_),stat=info)
-        if (info /= 0) then
+        if (info /= psb_success_) then
           err=4025
           call psb_errpush(err,name,i_err=(/len1*len2,0,0,0,0/),a_err='complex(psb_dpk_)')
           goto 9999
@@ -2266,7 +2266,7 @@ Contains
       dim  = 0
       dim2 = 0
       Allocate(rrax(lb1_:ub1_,lb2_:ub2_),stat=info)
-      if (info /= 0) then
+      if (info /= psb_success_) then
         err=4025
         call psb_errpush(err,name,i_err=(/len1*len2,0,0,0,0/),a_err='complex(psb_dpk_)')
         goto 9999
@@ -2311,7 +2311,7 @@ Contains
 
     name='psb_dreallocatei2'
     call psb_erractionsave(err_act)
-    info = 0 
+    info = psb_success_
     if (present(lb1)) then 
       lb1_ = lb1
     else
@@ -2344,7 +2344,7 @@ Contains
       If ((dim /= len1).or.(dim2 /= len2).or.(lbi1 /= lb1_)&
            &  .or.(lbi2 /= lb2_)) Then
         Allocate(tmp(lb1_:ub1_,lb2_:ub2_),stat=info)
-        if (info /= 0) then
+        if (info /= psb_success_) then
           err=4025
           call psb_errpush(err,name,i_err=(/len1*len2,0,0,0,0/),a_err='integer')
           goto 9999
@@ -2357,7 +2357,7 @@ Contains
       dim  = 0
       dim2 = 0
       Allocate(rrax(lb1_:ub1_,lb2_:ub2_),stat=info)
-      if (info /= 0) then
+      if (info /= psb_success_) then
         err=4025
         call psb_errpush(err,name,i_err=(/len1*len2,0,0,0,0/),a_err='integer')
         goto 9999
@@ -2397,21 +2397,21 @@ Contains
 
     name='psb_dreallocate2i'
     call psb_erractionsave(err_act)
-    info=0
+    info=psb_success_
 
     if(psb_get_errstatus() /= 0) then 
-      info = 4010
+      info = psb_err_from_subroutine_
       goto 9999
     end if
 
     call psb_dreallocate1i(len,rrax,info,pad=pad)
-    if (info /= 0) then
+    if (info /= psb_success_) then
       err=4000
       call psb_errpush(err,name)
       goto 9999
     end if
     call psb_dreallocate1i(len,y,info,pad=pad)
-    if (info /= 0) then
+    if (info /= psb_success_) then
       err=4000
       call psb_errpush(err,name)
       goto 9999
@@ -2449,21 +2449,21 @@ Contains
     call psb_erractionsave(err_act)
 
 
-    info = 0
+    info = psb_success_
     call psb_realloc(len,rrax,info)
-    if (info /= 0) then
+    if (info /= psb_success_) then
       err=4000
       call psb_errpush(err,name)
       goto 9999
     end if
     call psb_realloc(len,y,info)    
-    if (info /= 0) then
+    if (info /= psb_success_) then
       err=4000
       call psb_errpush(err,name)
       goto 9999
     end if
     call psb_realloc(len,z,info)
-    if (info /= 0) then
+    if (info /= psb_success_) then
       err=4000
       call psb_errpush(err,name)
       goto 9999
@@ -2496,22 +2496,22 @@ Contains
     name='psb_dreallocate2i1d'
     call psb_erractionsave(err_act)
 
-    info = 0
+    info = psb_success_
 
     call psb_realloc(len,rrax,info)
-    if (info /= 0) then
+    if (info /= psb_success_) then
       err=4000
       call psb_errpush(err,name)
       goto 9999
     end if
     call psb_realloc(len,y,info)    
-    if (info /= 0) then
+    if (info /= psb_success_) then
       err=4000
       call psb_errpush(err,name)
       goto 9999
     end if
     call psb_realloc(len,z,info)
-    if (info /= 0) then
+    if (info /= psb_success_) then
       err=4000
       call psb_errpush(err,name)
       goto 9999
@@ -2546,21 +2546,21 @@ Contains
     call psb_erractionsave(err_act)
 
 
-    info = 0
+    info = psb_success_
     call psb_realloc(len,rrax,info)
-    if (info /= 0) then
+    if (info /= psb_success_) then
       err=4000
       call psb_errpush(err,name)
       goto 9999
     end if
     call psb_realloc(len,y,info)    
-    if (info /= 0) then
+    if (info /= psb_success_) then
       err=4000
       call psb_errpush(err,name)
       goto 9999
     end if
     call psb_realloc(len,z,info)
-    if (info /= 0) then
+    if (info /= psb_success_) then
       err=4000
       call psb_errpush(err,name)
       goto 9999
@@ -2592,21 +2592,21 @@ Contains
     name='psb_dreallocate2i1z'
     call psb_erractionsave(err_act)
 
-    info = 0
+    info = psb_success_
     call psb_realloc(len,rrax,info)
-    if (info /= 0) then
+    if (info /= psb_success_) then
       err=4000
       call psb_errpush(err,name)
       goto 9999
     end if
     call psb_realloc(len,y,info)    
-    if (info /= 0) then
+    if (info /= psb_success_) then
       err=4000
       call psb_errpush(err,name)
       goto 9999
     end if
     call psb_realloc(len,z,info)
-    if (info /= 0) then
+    if (info /= psb_success_) then
       err=4000
       call psb_errpush(err,name)
       goto 9999
@@ -2631,7 +2631,7 @@ Contains
     integer, intent(out) :: info 
     !
     ! 
-    info = 0
+    info = psb_success_
     call move_alloc(vin,vout)
 
   end Subroutine psb_smove_alloc1d
@@ -2642,7 +2642,7 @@ Contains
     integer, intent(out) :: info 
     !
     ! 
-    info = 0
+    info = psb_success_
     call move_alloc(vin,vout)
 
   end Subroutine psb_smove_alloc2d
@@ -2653,7 +2653,7 @@ Contains
     integer, intent(out) :: info 
     !
     ! 
-    info = 0
+    info = psb_success_
     call move_alloc(vin,vout)
 
   end Subroutine psb_dmove_alloc1d
@@ -2664,7 +2664,7 @@ Contains
     integer, intent(out) :: info 
     !
     ! 
-    info = 0
+    info = psb_success_
     call move_alloc(vin,vout)
 
   end Subroutine psb_dmove_alloc2d
@@ -2675,7 +2675,7 @@ Contains
     integer, intent(out) :: info 
     !
     ! 
-    info = 0
+    info = psb_success_
     call move_alloc(vin,vout)
 
   end Subroutine psb_cmove_alloc1d
@@ -2686,7 +2686,7 @@ Contains
     integer, intent(out) :: info 
     !
     ! 
-    info = 0
+    info = psb_success_
     call move_alloc(vin,vout)
 
   end Subroutine psb_cmove_alloc2d
@@ -2697,7 +2697,7 @@ Contains
     integer, intent(out) :: info 
     !
     ! 
-    info = 0
+    info = psb_success_
     call move_alloc(vin,vout)
 
   end Subroutine psb_zmove_alloc1d
@@ -2708,7 +2708,7 @@ Contains
     integer, intent(out) :: info 
     !
     ! 
-    info = 0
+    info = psb_success_
     call move_alloc(vin,vout)
 
   end Subroutine psb_zmove_alloc2d
@@ -2719,7 +2719,7 @@ Contains
     integer, intent(out) :: info 
     !
     ! 
-    info = 0
+    info = psb_success_
     call move_alloc(vin,vout)
   end Subroutine psb_imove_alloc1d
 
@@ -2729,7 +2729,7 @@ Contains
     integer, intent(out) :: info 
     !
     ! 
-    info = 0
+    info = psb_success_
     call move_alloc(vin,vout)
 
   end Subroutine psb_imove_alloc2d

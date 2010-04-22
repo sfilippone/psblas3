@@ -207,7 +207,7 @@ contains
 #endif    
     if (present(np)) then 
       if (np_ < np) then 
-        info = 2011
+        info = psb_err_initerror_neugh_procs_
         call psb_errpush(info,name)
         call psb_error(ictxt)
       endif
@@ -305,7 +305,7 @@ contains
 
     call psb_info(ictxt,iam,np)
     
-    if (iam==root_) then 
+    if (iam == root_) then 
       call gebs2d(ictxt,'A',dat)
     else
       call gebr2d(ictxt,'A',dat,rrt=root_)
@@ -329,7 +329,7 @@ contains
 
     call psb_info(ictxt,iam,np)
     
-    if (iam==root_) then 
+    if (iam == root_) then 
       call gebs2d(ictxt,'A',dat)
     else
       call gebr2d(ictxt,'A',dat,rrt=root_)
@@ -353,7 +353,7 @@ contains
 
     call psb_info(ictxt,iam,np)
     
-    if (iam==root_) then 
+    if (iam == root_) then 
       call gebs2d(ictxt,'A',dat)
     else
       call gebr2d(ictxt,'A',dat,rrt=root_)
@@ -378,7 +378,7 @@ contains
 
     call psb_info(ictxt,iam,np)
     
-    if (iam==root_) then 
+    if (iam == root_) then 
       call gebs2d(ictxt,'A',dat)
     else
       call gebr2d(ictxt,'A',dat,rrt=root_)
@@ -403,7 +403,7 @@ contains
 
     call psb_info(ictxt,iam,np)
     
-    if (iam==root_) then 
+    if (iam == root_) then 
       call gebs2d(ictxt,'A',dat)
     else
       call gebr2d(ictxt,'A',dat,rrt=root_)
@@ -427,7 +427,7 @@ contains
 
     call psb_info(ictxt,iam,np)
     
-    if (iam==root_) then 
+    if (iam == root_) then 
       call gebs2d(ictxt,'A',dat)
     else
       call gebr2d(ictxt,'A',dat,rrt=root_)
@@ -453,7 +453,7 @@ contains
 
     call psb_info(ictxt,iam,np)
     
-    if (iam==root_) then 
+    if (iam == root_) then 
       call gebs2d(ictxt,'A',dat)
     else
       call gebr2d(ictxt,'A',dat,rrt=root_)
@@ -478,7 +478,7 @@ contains
 
     call psb_info(ictxt,iam,np)
     
-    if (iam==root_) then 
+    if (iam == root_) then 
       call gebs2d(ictxt,'A',dat)
     else
       call gebr2d(ictxt,'A',dat,rrt=root_)
@@ -502,7 +502,7 @@ contains
 
     call psb_info(ictxt,iam,np)
     
-    if (iam==root_) then 
+    if (iam == root_) then 
       call gebs2d(ictxt,'A',dat)
     else
       call gebr2d(ictxt,'A',dat,rrt=root_)
@@ -527,7 +527,7 @@ contains
 
     call psb_info(ictxt,iam,np)
     
-    if (iam==root_) then 
+    if (iam == root_) then 
       call gebs2d(ictxt,'A',dat)
     else
       call gebr2d(ictxt,'A',dat,rrt=root_)
@@ -551,7 +551,7 @@ contains
 
     call psb_info(ictxt,iam,np)
     
-    if (iam==root_) then 
+    if (iam == root_) then 
       call gebs2d(ictxt,'A',dat)
     else
       call gebr2d(ictxt,'A',dat,rrt=root_)
@@ -575,7 +575,7 @@ contains
 
     call psb_info(ictxt,iam,np)
     
-    if (iam==root_) then 
+    if (iam == root_) then 
       call gebs2d(ictxt,'A',dat)
     else
       call gebr2d(ictxt,'A',dat,rrt=root_)
@@ -599,7 +599,7 @@ contains
 
     call psb_info(ictxt,iam,np)
     
-    if (iam==root_) then 
+    if (iam == root_) then 
       call gebs2d(ictxt,'A',dat)
     else
       call gebr2d(ictxt,'A',dat,rrt=root_)
@@ -623,7 +623,7 @@ contains
 
     call psb_info(ictxt,iam,np)
     
-    if (iam==root_) then 
+    if (iam == root_) then 
       call gebs2d(ictxt,'A',dat)
     else
       call gebr2d(ictxt,'A',dat,rrt=root_)
@@ -647,7 +647,7 @@ contains
 
     call psb_info(ictxt,iam,np)
     
-    if (iam==root_) then 
+    if (iam == root_) then 
       call gebs2d(ictxt,'A',dat)
     else
       call gebr2d(ictxt,'A',dat,rrt=root_)
@@ -837,9 +837,9 @@ contains
     if (root_ == -1) then 
       call psb_realloc(size(dat),dat_,info)
       dat_=dat
-      if (info ==0) call mpi_allreduce(dat_,dat,size(dat),mpi_integer,mpi_max,icomm,info)
+      if (info == psb_success_) call mpi_allreduce(dat_,dat,size(dat),mpi_integer,mpi_max,icomm,info)
     else
-      if (iam==root_) then 
+      if (iam == root_) then 
         call psb_realloc(size(dat),dat_,info)
         dat_=dat
         call mpi_reduce(dat_,dat,size(dat),mpi_integer,mpi_max,root_,icomm,info)
@@ -878,9 +878,9 @@ contains
     if (root_ == -1) then 
       call psb_realloc(size(dat,1),size(dat,2),dat_,info)
       dat_=dat
-      if (info ==0) call mpi_allreduce(dat_,dat,size(dat),mpi_integer,mpi_max,icomm,info)
+      if (info == psb_success_) call mpi_allreduce(dat_,dat,size(dat),mpi_integer,mpi_max,icomm,info)
     else
-      if (iam==root_) then 
+      if (iam == root_) then 
         call psb_realloc(size(dat,1),size(dat,2),dat_,info)
         dat_=dat
         call mpi_reduce(dat_,dat,size(dat),mpi_integer,mpi_max,root_,icomm,info)
@@ -953,10 +953,10 @@ contains
     if (root_ == -1) then 
       call psb_realloc(size(dat),dat_,info)
       dat_ = dat
-      if (info ==0) &
+      if (info == psb_success_) &
            & call mpi_allreduce(dat_,dat,size(dat),mpi_real,mpi_max,icomm,info)
     else
-      if (iam==root_) then 
+      if (iam == root_) then 
         call psb_realloc(size(dat),dat_,info)
         dat_ = dat
         call mpi_reduce(dat_,dat,size(dat),mpi_real,mpi_max,root_,icomm,info)
@@ -995,10 +995,10 @@ contains
     if (root_ == -1) then 
       call psb_realloc(size(dat,1),size(dat,2),dat_,info)
       dat_ = dat
-      if (info ==0)&
+      if (info == psb_success_)&
            & call mpi_allreduce(dat_,dat,size(dat),mpi_real,mpi_max,icomm,info)
     else
-      if (iam==root_) then 
+      if (iam == root_) then 
         call psb_realloc(size(dat,1),size(dat,2),dat_,info)
         dat_ = dat
         call mpi_reduce(dat_,dat,size(dat),mpi_real,mpi_max,root_,icomm,info)
@@ -1070,10 +1070,10 @@ contains
     if (root_ == -1) then 
       call psb_realloc(size(dat),dat_,info)
       dat_ = dat
-      if (info ==0) &
+      if (info == psb_success_) &
            & call mpi_allreduce(dat_,dat,size(dat),mpi_double_precision,mpi_max,icomm,info)
     else
-      if (iam==root_) then 
+      if (iam == root_) then 
         call psb_realloc(size(dat),dat_,info)
         dat_ = dat
         call mpi_reduce(dat_,dat,size(dat),mpi_double_precision,mpi_max,root_,icomm,info)
@@ -1112,10 +1112,10 @@ contains
     if (root_ == -1) then 
       call psb_realloc(size(dat,1),size(dat,2),dat_,info)
       dat_ = dat
-      if (info ==0)&
+      if (info == psb_success_)&
            & call mpi_allreduce(dat_,dat,size(dat),mpi_double_precision,mpi_max,icomm,info)
     else
-      if (iam==root_) then 
+      if (iam == root_) then 
         call psb_realloc(size(dat,1),size(dat,2),dat_,info)
         dat_ = dat
         call mpi_reduce(dat_,dat,size(dat),mpi_double_precision,mpi_max,root_,icomm,info)
@@ -1188,9 +1188,9 @@ contains
     if (root_ == -1) then 
       call psb_realloc(size(dat),dat_,info)
       dat_=dat
-      if (info ==0) call mpi_allreduce(dat_,dat,size(dat),mpi_integer,mpi_min,icomm,info)
+      if (info == psb_success_) call mpi_allreduce(dat_,dat,size(dat),mpi_integer,mpi_min,icomm,info)
     else
-      if (iam==root_) then 
+      if (iam == root_) then 
         call psb_realloc(size(dat),dat_,info)
         dat_=dat
         call mpi_reduce(dat_,dat,size(dat),mpi_integer,mpi_min,root_,icomm,info)
@@ -1229,9 +1229,9 @@ contains
     if (root_ == -1) then 
       call psb_realloc(size(dat,1),size(dat,2),dat_,info)
       dat_=dat
-      if (info ==0) call mpi_allreduce(dat_,dat,size(dat),mpi_integer,mpi_min,icomm,info)
+      if (info == psb_success_) call mpi_allreduce(dat_,dat,size(dat),mpi_integer,mpi_min,icomm,info)
     else
-      if (iam==root_) then 
+      if (iam == root_) then 
         call psb_realloc(size(dat,1),size(dat,2),dat_,info)
         dat_=dat
         call mpi_reduce(dat_,dat,size(dat),mpi_integer,mpi_min,root_,icomm,info)
@@ -1304,10 +1304,10 @@ contains
     if (root_ == -1) then 
       call psb_realloc(size(dat),dat_,info)
       dat_ = dat
-      if (info ==0) &
+      if (info == psb_success_) &
            & call mpi_allreduce(dat_,dat,size(dat),mpi_real,mpi_min,icomm,info)
     else
-      if (iam==root_) then 
+      if (iam == root_) then 
         call psb_realloc(size(dat),dat_,info)
         dat_ = dat
         call mpi_reduce(dat_,dat,size(dat),mpi_real,mpi_min,root_,icomm,info)
@@ -1346,10 +1346,10 @@ contains
     if (root_ == -1) then 
       call psb_realloc(size(dat,1),size(dat,2),dat_,info)
       dat_ = dat
-      if (info ==0) &
+      if (info == psb_success_) &
            & call mpi_allreduce(dat_,dat,size(dat),mpi_real,mpi_min,icomm,info)
     else
-      if (iam==root_) then 
+      if (iam == root_) then 
         call psb_realloc(size(dat,1),size(dat,2),dat_,info)
         dat_ = dat
         call mpi_reduce(dat_,dat,size(dat),mpi_real,mpi_min,root_,icomm,info)
@@ -1423,10 +1423,10 @@ contains
     if (root_ == -1) then 
       call psb_realloc(size(dat),dat_,info)
       dat_ = dat
-      if (info ==0) &
+      if (info == psb_success_) &
            & call mpi_allreduce(dat_,dat,size(dat),mpi_double_precision,mpi_min,icomm,info)
     else
-      if (iam==root_) then 
+      if (iam == root_) then 
         call psb_realloc(size(dat),dat_,info)
         dat_ = dat
         call mpi_reduce(dat_,dat,size(dat),mpi_double_precision,mpi_min,root_,icomm,info)
@@ -1465,10 +1465,10 @@ contains
     if (root_ == -1) then 
       call psb_realloc(size(dat,1),size(dat,2),dat_,info)
       dat_ = dat
-      if (info ==0) &
+      if (info == psb_success_) &
            & call mpi_allreduce(dat_,dat,size(dat),mpi_double_precision,mpi_min,icomm,info)
     else
-      if (iam==root_) then 
+      if (iam == root_) then 
         call psb_realloc(size(dat,1),size(dat,2),dat_,info)
         dat_ = dat
         call mpi_reduce(dat_,dat,size(dat),mpi_double_precision,mpi_min,root_,icomm,info)
@@ -2366,7 +2366,7 @@ contains
       dat_=dat
       call mpi_allreduce(dat_,dat,isz,mpi_int8_type,mpi_sum,icomm,info)
     else
-      if (iam==root_) then 
+      if (iam == root_) then 
         dat_=dat
         call mpi_reduce(dat_,dat,isz,mpi_int8_type,mpi_sum,root_,icomm,info)
       else
@@ -2406,7 +2406,7 @@ contains
       dat_=dat
       call mpi_allreduce(dat_,dat,1,mpi_int8_type,mpi_sum,icomm,info)
     else
-      if (iam==root_) then 
+      if (iam == root_) then 
         dat_=dat
         call mpi_reduce(dat_,dat,1,mpi_int8_type,mpi_sum,root_,icomm,info)
       else

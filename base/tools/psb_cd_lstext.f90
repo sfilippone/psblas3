@@ -64,7 +64,7 @@ Subroutine psb_cd_lstext(desc_a,in_list,desc_ov,info, mask,extype)
   character(len=20)    :: name, ch_err
 
   name='psb_cd_lstext'
-  info  = 0
+  info  = psb_success_
   call psb_erractionsave(err_act)
   debug_unit  = psb_get_debug_unit()
   debug_level = psb_get_debug_level()
@@ -87,15 +87,15 @@ Subroutine psb_cd_lstext(desc_a,in_list,desc_ov,info, mask,extype)
 
   if (present(mask)) then 
     if (size(mask) < nl) then 
-      info=4010
+      info=psb_err_from_subroutine_
       call psb_errpush(info,name,a_err='size of mask')
       goto 9999
     end if
     mask_ => mask
   else
     allocate(lmask(nl),stat=info) 
-    if (info /= 0) then
-      info=4010
+    if (info /= psb_success_) then
+      info=psb_err_from_subroutine_
       call psb_errpush(info,name,a_err='Allocat lmask')
       goto 9999
     end if
@@ -113,8 +113,8 @@ Subroutine psb_cd_lstext(desc_a,in_list,desc_ov,info, mask,extype)
   if (debug_level >= psb_debug_outer_) &
        & write(debug_unit,*) me,' ',trim(name),':Calling desccpy'
   call psb_cdcpy(desc_a,desc_ov,info)
-  if (info /= 0) then
-    info=4010
+  if (info /= psb_success_) then
+    info=psb_err_from_subroutine_
     ch_err='psb_cdcpy'
     call psb_errpush(info,name,a_err=ch_err)
     goto 9999
@@ -125,7 +125,7 @@ Subroutine psb_cd_lstext(desc_a,in_list,desc_ov,info, mask,extype)
 
   call psb_cd_reinit(desc_ov,info)
 
-  if (info == 0) call psb_cdins(nl,in_list,desc_ov,info,mask=mask_)
+  if (info == psb_success_) call psb_cdins(nl,in_list,desc_ov,info,mask=mask_)
 
   ! At this point we have added to the halo the indices in 
   ! in_list. Just call icdasb forcing to use 
@@ -142,9 +142,9 @@ Subroutine psb_cd_lstext(desc_a,in_list,desc_ov,info, mask,extype)
 
   call psb_cd_set_ovl_asb(desc_ov,info)
 
-  if (info /= 0) then
+  if (info /= psb_success_) then
     ch_err='sp_free'
-    call psb_errpush(4013,name,a_err=ch_err,i_err=(/info,0,0,0,0/))
+    call psb_errpush(psb_err_from_subroutine_ai_,name,a_err=ch_err,i_err=(/info,0,0,0,0/))
     goto 9999
   end if
 

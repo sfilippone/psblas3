@@ -1,4 +1,4 @@
-!=====================================
+! == ===================================
 !
 !
 !
@@ -9,7 +9,7 @@
 !
 !
 !
-!=====================================
+! == ===================================
 
 
 subroutine  psb_s_set_nrows(m,a) 
@@ -444,7 +444,7 @@ end subroutine psb_s_set_upper
 
 
 
-!=====================================
+! == ===================================
 !
 !
 !
@@ -454,7 +454,7 @@ end subroutine psb_s_set_upper
 !
 !
 !
-!=====================================  
+! == ===================================  
 
 
 subroutine psb_s_sparse_print(iout,a,iv,eirs,eics,head,ivr,ivc)
@@ -473,7 +473,7 @@ subroutine psb_s_sparse_print(iout,a,iv,eirs,eics,head,ivr,ivc)
   character(len=20)  :: name='sparse_print'
   logical, parameter :: debug=.false.
 
-  info = 0
+  info = psb_success_
   call psb_get_erraction(err_act)
   if (.not.allocated(a%a)) then 
     info = 1121
@@ -513,7 +513,7 @@ subroutine psb_s_get_neigh(a,idx,neigh,n,info,lev)
   character(len=20)  :: name='get_neigh'
   logical, parameter :: debug=.false.
 
-  info = 0
+  info = psb_success_
   call psb_erractionsave(err_act)
   if (.not.allocated(a%a)) then 
     info = 1121
@@ -523,7 +523,7 @@ subroutine psb_s_get_neigh(a,idx,neigh,n,info,lev)
 
   call a%a%get_neigh(idx,neigh,n,info,lev)
 
-  if (info /= 0) goto 9999
+  if (info /= psb_success_) goto 9999
 
   call psb_erractionrestore(err_act)
   return
@@ -557,10 +557,10 @@ subroutine psb_s_csall(nr,nc,a,info,nz)
 
   call psb_get_erraction(err_act)
 
-  info = 0
+  info = psb_success_
   allocate(psb_s_coo_sparse_mat :: a%a, stat=info)
-  if (info /= 0) then 
-    info = 4000 
+  if (info /= psb_success_) then 
+    info = psb_err_alloc_dealloc_ 
     call psb_errpush(info, name)
     goto 9999
   end if
@@ -691,7 +691,7 @@ subroutine psb_s_csput(nz,ia,ja,val,a,imin,imax,jmin,jmax,info,gtl)
   character(len=20)  :: name='csput'
   logical, parameter :: debug=.false.
 
-  info = 0
+  info = psb_success_
   call psb_erractionsave(err_act)
   if (.not.a%is_bld()) then 
     info = 1121
@@ -701,7 +701,7 @@ subroutine psb_s_csput(nz,ia,ja,val,a,imin,imax,jmin,jmax,info,gtl)
 
 
   call a%a%csput(nz,ia,ja,val,imin,imax,jmin,jmax,info,gtl) 
-  if (info /= 0) goto 9999 
+  if (info /= psb_success_) goto 9999 
 
   call psb_erractionrestore(err_act)
   return
@@ -740,7 +740,7 @@ subroutine psb_s_csgetptn(imin,imax,a,nz,ia,ja,info,&
   character(len=20)  :: name='csget'
   logical, parameter :: debug=.false.
 
-  info = 0
+  info = psb_success_
   call psb_erractionsave(err_act)
   if (a%is_null()) then 
     info = 1121
@@ -751,7 +751,7 @@ subroutine psb_s_csgetptn(imin,imax,a,nz,ia,ja,info,&
 
   call a%a%csget(imin,imax,nz,ia,ja,info,&
        & jmin,jmax,iren,append,nzin,rscale,cscale)
-  if (info /= 0) goto 9999 
+  if (info /= psb_success_) goto 9999 
 
   call psb_erractionrestore(err_act)
   return
@@ -791,7 +791,7 @@ subroutine psb_s_csgetrow(imin,imax,a,nz,ia,ja,val,info,&
   character(len=20)  :: name='csget'
   logical, parameter :: debug=.false.
 
-  info = 0
+  info = psb_success_
   call psb_erractionsave(err_act)
   if (a%is_null()) then 
     info = 1121
@@ -802,7 +802,7 @@ subroutine psb_s_csgetrow(imin,imax,a,nz,ia,ja,val,info,&
 
   call a%a%csget(imin,imax,nz,ia,ja,val,info,&
        & jmin,jmax,iren,append,nzin,rscale,cscale)
-  if (info /= 0) goto 9999 
+  if (info /= psb_success_) goto 9999 
 
   call psb_erractionrestore(err_act)
   return
@@ -844,7 +844,7 @@ subroutine psb_s_csgetblk(imin,imax,a,b,info,&
   type(psb_s_coo_sparse_mat), allocatable  :: acoo
 
 
-  info = 0
+  info = psb_success_
   call psb_erractionsave(err_act)
   if (a%is_null()) then 
     info = 1121
@@ -854,10 +854,10 @@ subroutine psb_s_csgetblk(imin,imax,a,b,info,&
 
   allocate(acoo,stat=info)    
 
-  if (info == 0) call a%a%csget(imin,imax,acoo,info,&
+  if (info == psb_success_) call a%a%csget(imin,imax,acoo,info,&
        & jmin,jmax,iren,append,rscale,cscale)
-  if (info == 0) call move_alloc(acoo,b%a)
-  if (info /= 0) goto 9999 
+  if (info == psb_success_) call move_alloc(acoo,b%a)
+  if (info /= psb_success_) goto 9999 
 
   call psb_erractionrestore(err_act)
   return
@@ -895,7 +895,7 @@ subroutine psb_s_csclip(a,b,info,&
   logical, parameter :: debug=.false.
   type(psb_s_coo_sparse_mat), allocatable  :: acoo
 
-  info = 0
+  info = psb_success_
   call psb_erractionsave(err_act)
   if (a%is_null()) then 
     info = 1121
@@ -904,10 +904,10 @@ subroutine psb_s_csclip(a,b,info,&
   endif
 
   allocate(acoo,stat=info)    
-  if (info == 0) call a%a%csclip(acoo,info,&
+  if (info == psb_success_) call a%a%csclip(acoo,info,&
        & imin,imax,jmin,jmax,rscale,cscale)
-  if (info == 0) call move_alloc(acoo,b%a)
-  if (info /= 0) goto 9999 
+  if (info == psb_success_) call move_alloc(acoo,b%a)
+  if (info /= psb_success_) goto 9999 
 
   call psb_erractionrestore(err_act)
   return
@@ -942,7 +942,7 @@ subroutine psb_s_b_csclip(a,b,info,&
   character(len=20)  :: name='csclip'
   logical, parameter :: debug=.false.
 
-  info = 0
+  info = psb_success_
   call psb_erractionsave(err_act)
   if (a%is_null()) then 
     info = 1121
@@ -952,7 +952,7 @@ subroutine psb_s_b_csclip(a,b,info,&
 
   call a%a%csclip(b,info,&
        & imin,imax,jmin,jmax,rscale,cscale)
-  if (info /= 0) goto 9999 
+  if (info /= psb_success_) goto 9999 
 
   call psb_erractionrestore(err_act)
   return
@@ -988,7 +988,7 @@ subroutine psb_s_cscnv(a,b,info,type,mold,upd,dupl)
   character(len=20)  :: name='cscnv'
   logical, parameter :: debug=.false.
 
-  info = 0
+  info = psb_success_
   call psb_erractionsave(err_act)
 
   if (a%is_null()) then 
@@ -1005,7 +1005,7 @@ subroutine psb_s_cscnv(a,b,info,type,mold,upd,dupl)
   end if
 
   if (count( (/present(mold),present(type) /)) > 1) then
-    info = 583
+    info = psb_err_many_optional_arg_
     call psb_errpush(info,name,a_err='TYPE, MOLD')
     goto 9999
   end if
@@ -1024,7 +1024,7 @@ subroutine psb_s_cscnv(a,b,info,type,mold,upd,dupl)
     case ('CSC')
       allocate(psb_s_csc_sparse_mat :: altmp, stat=info) 
     case default
-      info = 136 
+      info = psb_err_format_unknown_ 
       call psb_errpush(info,name,a_err=type)
       goto 9999
     end select
@@ -1032,8 +1032,8 @@ subroutine psb_s_cscnv(a,b,info,type,mold,upd,dupl)
     allocate(psb_s_csr_sparse_mat :: altmp, stat=info) 
   end if
 
-  if (info /= 0) then 
-    info = 4000
+  if (info /= psb_success_) then 
+    info = psb_err_alloc_dealloc_
     call psb_errpush(info,name)
     goto 9999
   end if
@@ -1043,8 +1043,8 @@ subroutine psb_s_cscnv(a,b,info,type,mold,upd,dupl)
 
   call altmp%cp_from_fmt(a%a, info)
 
-  if (info /= 0) then
-    info = 4010
+  if (info /= psb_success_) then
+    info = psb_err_from_subroutine_
     call psb_errpush(info,name,a_err="mv_from")
     goto 9999
   end if
@@ -1085,7 +1085,7 @@ subroutine psb_s_cscnv_ip(a,info,type,mold,dupl)
   character(len=20)  :: name='cscnv_ip'
   logical, parameter :: debug=.false.
 
-  info = 0
+  info = psb_success_
   call psb_erractionsave(err_act)
 
   if (a%is_null()) then 
@@ -1101,7 +1101,7 @@ subroutine psb_s_cscnv_ip(a,info,type,mold,dupl)
   end if
 
   if (count( (/present(mold),present(type) /)) > 1) then
-    info = 583
+    info = psb_err_many_optional_arg_
     call psb_errpush(info,name,a_err='TYPE, MOLD')
     goto 9999
   end if
@@ -1120,7 +1120,7 @@ subroutine psb_s_cscnv_ip(a,info,type,mold,dupl)
     case ('CSC')
       allocate(psb_s_csc_sparse_mat :: altmp, stat=info) 
     case default
-      info = 136 
+      info = psb_err_format_unknown_ 
       call psb_errpush(info,name,a_err=type)
       goto 9999
     end select
@@ -1128,8 +1128,8 @@ subroutine psb_s_cscnv_ip(a,info,type,mold,dupl)
     allocate(psb_s_csr_sparse_mat :: altmp, stat=info) 
   end if
 
-  if (info /= 0) then 
-    info = 4000
+  if (info /= psb_success_) then 
+    info = psb_err_alloc_dealloc_
     call psb_errpush(info,name)
     goto 9999
   end if
@@ -1139,8 +1139,8 @@ subroutine psb_s_cscnv_ip(a,info,type,mold,dupl)
 
   call altmp%mv_from_fmt(a%a, info)
 
-  if (info /= 0) then
-    info = 4010
+  if (info /= psb_success_) then
+    info = psb_err_from_subroutine_
     call psb_errpush(info,name,a_err="mv_from")
     goto 9999
   end if
@@ -1179,7 +1179,7 @@ subroutine psb_s_cscnv_base(a,b,info,dupl)
   character(len=20)  :: name='cscnv'
   logical, parameter :: debug=.false.
 
-  info = 0
+  info = psb_success_
   call psb_erractionsave(err_act)
 
   if (a%is_null()) then 
@@ -1189,16 +1189,16 @@ subroutine psb_s_cscnv_base(a,b,info,dupl)
   endif
 
   call a%a%cp_to_coo(altmp,info )
-  if ((info == 0).and.present(dupl)) then 
+  if ((info == psb_success_).and.present(dupl)) then 
     call altmp%set_dupl(dupl)
   end if
   call altmp%fix(info)
-  if (info == 0) call altmp%trim()
-  if (info == 0) call altmp%set_asb() 
-  if (info == 0) call b%mv_from_coo(altmp,info)
+  if (info == psb_success_) call altmp%trim()
+  if (info == psb_success_) call altmp%set_asb() 
+  if (info == psb_success_) call b%mv_from_coo(altmp,info)
 
-  if (info /= 0) then
-    info = 4010
+  if (info /= psb_success_) then
+    info = psb_err_from_subroutine_
     call psb_errpush(info,name,a_err="mv_from")
     goto 9999
   end if
@@ -1236,7 +1236,7 @@ subroutine psb_s_clip_d(a,b,info)
   type(psb_s_coo_sparse_mat), allocatable  :: acoo
   integer :: i, j, nz
 
-  info = 0
+  info = psb_success_
   call psb_erractionsave(err_act)
   if (a%is_null()) then 
     info = 1121
@@ -1245,9 +1245,9 @@ subroutine psb_s_clip_d(a,b,info)
   endif
 
   allocate(acoo,stat=info)    
-  if (info == 0) call a%a%cp_to_coo(acoo,info)
-  if (info /= 0) then 
-    info = 4000
+  if (info == psb_success_) call a%a%cp_to_coo(acoo,info)
+  if (info /= psb_success_) then 
+    info = psb_err_alloc_dealloc_
     call psb_errpush(info,name)
     goto 9999
   endif
@@ -1298,7 +1298,7 @@ subroutine psb_s_clip_d_ip(a,info)
   type(psb_s_coo_sparse_mat), allocatable  :: acoo
   integer :: i, j, nz
 
-  info = 0
+  info = psb_success_
   call psb_erractionsave(err_act)
   if (a%is_null()) then 
     info = 1121
@@ -1307,9 +1307,9 @@ subroutine psb_s_clip_d_ip(a,info)
   endif
 
   allocate(acoo,stat=info)    
-  if (info == 0) call a%a%mv_to_coo(acoo,info)
-  if (info /= 0) then
-    info = 4000
+  if (info == psb_success_) call a%a%mv_to_coo(acoo,info)
+  if (info /= psb_success_) then
+    info = psb_err_alloc_dealloc_
     call psb_errpush(info,name)
     goto 9999
   endif
@@ -1370,12 +1370,12 @@ subroutine psb_s_cp_from(a,b)
   logical, parameter :: debug=.false.
 
   call psb_erractionsave(err_act)
-  info = 0
+  info = psb_success_
 
   allocate(a%a,source=b,stat=info)
-  if (info /= 0) info = 4000
-  if (info == 0) call a%a%cp_from_fmt(b, info)    
-  if (info /= 0) goto 9999 
+  if (info /= psb_success_) info = psb_err_alloc_dealloc_
+  if (info == psb_success_) call a%a%cp_from_fmt(b, info)    
+  if (info /= psb_success_) goto 9999 
 
   call psb_erractionrestore(err_act)
   return
@@ -1434,7 +1434,7 @@ subroutine psb_s_sparse_mat_move(a,b,info)
   character(len=20)  :: name='move_alloc'
   logical, parameter :: debug=.false.
 
-  info = 0
+  info = psb_success_
   call move_alloc(a%a,b%a)
 
   return
@@ -1455,12 +1455,12 @@ subroutine psb_s_sparse_mat_clone(a,b,info)
   logical, parameter :: debug=.false.
 
   call psb_erractionsave(err_act)
-  info = 0
+  info = psb_success_
 
   allocate(b%a,source=a%a,stat=info)
-  if (info /= 0) info = 4000
-  if (info == 0) call b%a%cp_from_fmt(a%a, info)    
-  if (info /= 0) goto 9999 
+  if (info /= psb_success_) info = psb_err_alloc_dealloc_
+  if (info == psb_success_) call b%a%cp_from_fmt(a%a, info)    
+  if (info /= psb_success_) goto 9999 
 
   call psb_erractionrestore(err_act)
   return
@@ -1534,8 +1534,8 @@ subroutine psb_s_transp_2mat(a,b)
   endif
 
   allocate(a%a,source=b%a,stat=info)
-  if (info /= 0) then 
-    info = 4000
+  if (info /= psb_success_) then 
+    info = psb_err_alloc_dealloc_
     goto 9999
   end if
   call a%a%transp(b%a)    
@@ -1611,8 +1611,8 @@ subroutine psb_s_transc_2mat(a,b)
   endif
 
   allocate(a%a,source=b%a,stat=info)
-  if (info /= 0) then 
-    info = 4000
+  if (info /= psb_success_) then 
+    info = psb_err_alloc_dealloc_
     goto 9999
   end if
   call a%a%transc(b%a)    
@@ -1668,7 +1668,7 @@ end subroutine psb_s_reinit
 
 
 
-!=====================================
+! == ===================================
 !
 !
 !
@@ -1679,7 +1679,7 @@ end subroutine psb_s_reinit
 !
 !
 !
-!=====================================
+! == ===================================
 
 
 subroutine psb_s_csmm(alpha,a,x,beta,y,info,trans) 
@@ -1695,7 +1695,7 @@ subroutine psb_s_csmm(alpha,a,x,beta,y,info,trans)
   character(len=20)  :: name='psb_csmm'
   logical, parameter :: debug=.false.
 
-  info = 0
+  info = psb_success_
   call psb_erractionsave(err_act)
   if (.not.allocated(a%a)) then 
     info = 1121
@@ -1704,7 +1704,7 @@ subroutine psb_s_csmm(alpha,a,x,beta,y,info,trans)
   endif
 
   call a%a%csmm(alpha,x,beta,y,info,trans) 
-  if (info /= 0) goto 9999 
+  if (info /= psb_success_) goto 9999 
   call psb_erractionrestore(err_act)
   return
 
@@ -1733,7 +1733,7 @@ subroutine psb_s_csmv(alpha,a,x,beta,y,info,trans)
   character(len=20)  :: name='psb_csmv'
   logical, parameter :: debug=.false.
 
-  info = 0
+  info = psb_success_
   call psb_erractionsave(err_act)
   if (.not.allocated(a%a)) then 
     info = 1121
@@ -1742,7 +1742,7 @@ subroutine psb_s_csmv(alpha,a,x,beta,y,info,trans)
   endif
 
   call a%a%csmm(alpha,x,beta,y,info,trans) 
-  if (info /= 0) goto 9999 
+  if (info /= psb_success_) goto 9999 
   call psb_erractionrestore(err_act)
   return
 
@@ -1772,7 +1772,7 @@ subroutine psb_s_cssm(alpha,a,x,beta,y,info,trans,scale,d)
   character(len=20)  :: name='psb_cssm'
   logical, parameter :: debug=.false.
 
-  info = 0
+  info = psb_success_
   call psb_erractionsave(err_act)
   if (.not.allocated(a%a)) then 
     info = 1121
@@ -1781,7 +1781,7 @@ subroutine psb_s_cssm(alpha,a,x,beta,y,info,trans,scale,d)
   endif
 
   call a%a%cssm(alpha,x,beta,y,info,trans,scale,d) 
-  if (info /= 0) goto 9999 
+  if (info /= psb_success_) goto 9999 
 
   call psb_erractionrestore(err_act)
   return
@@ -1812,7 +1812,7 @@ subroutine psb_s_cssv(alpha,a,x,beta,y,info,trans,scale,d)
   character(len=20)  :: name='psb_cssv'
   logical, parameter :: debug=.false.
 
-  info = 0 
+  info = psb_success_
   call psb_erractionsave(err_act)
   if (.not.allocated(a%a)) then 
     info = 1121
@@ -1822,7 +1822,7 @@ subroutine psb_s_cssv(alpha,a,x,beta,y,info,trans,scale,d)
 
   call a%a%cssm(alpha,x,beta,y,info,trans,scale,d) 
 
-  if (info /= 0) goto 9999 
+  if (info /= psb_success_) goto 9999 
 
   call psb_erractionrestore(err_act)
   return
@@ -1894,7 +1894,7 @@ subroutine psb_s_get_diag(a,d,info)
   endif
 
   call a%a%get_diag(d,info)
-  if (info /= 0) goto 9999
+  if (info /= psb_success_) goto 9999
 
   call psb_erractionrestore(err_act)
   return
@@ -1932,7 +1932,7 @@ subroutine psb_s_scal(d,a,info)
   endif
 
   call a%a%scal(d,info)
-  if (info /= 0) goto 9999
+  if (info /= psb_success_) goto 9999
 
   call psb_erractionrestore(err_act)
   return
@@ -1970,7 +1970,7 @@ subroutine psb_s_scals(d,a,info)
   endif
 
   call a%a%scal(d,info)
-  if (info /= 0) goto 9999
+  if (info /= psb_success_) goto 9999
 
   call psb_erractionrestore(err_act)
   return

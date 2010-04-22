@@ -60,7 +60,7 @@ subroutine psb_sspalloc(a, desc_a, info, nnz)
   character(len=20)   :: name, ch_err
 
   if(psb_get_errstatus() /= 0) return 
-  info=0
+  info=psb_success_
   call psb_erractionsave(err_act)
   name = 'psb_sspall'
   debug_unit  = psb_get_debug_unit()
@@ -72,7 +72,7 @@ subroutine psb_sspalloc(a, desc_a, info, nnz)
   call psb_info(ictxt, me, np)
   !     ....verify blacs grid correctness..
   if (np == -1) then
-    info = 2010
+    info = psb_err_blacs_error_
     call psb_errpush(info,name)
     goto 9999
   endif
@@ -103,8 +103,8 @@ subroutine psb_sspalloc(a, desc_a, info, nnz)
 
   !....allocate aspk, ia1, ia2.....
   call a%csall(loc_row,loc_col,info,nz=length_ia1)
-  if(info /= 0) then
-    info=4010
+  if(info /= psb_success_) then
+    info=psb_err_from_subroutine_
     ch_err='sp_all'
     call psb_errpush(info,name,int_err)
     goto 9999

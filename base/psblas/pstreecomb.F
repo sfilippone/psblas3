@@ -53,14 +53,14 @@ C
 *     ..
 *
 *  Purpose
-*  =======
+*  == = ====
 *
 *  PSTREECOMB does a 1-tree parallel combine operation on scalars,
 *  using the subroutine indicated by SUBPTR to perform the required
 *  computation.
 *
 *  Arguments
-*  =========
+*  == = ======
 *
 *  ICTXT   (global input) INTEGER
 *          The BLACS context handle, indicating the global context of
@@ -89,7 +89,7 @@ C
 *  SUBPTR  (local input) Pointer to the subroutine to call to perform
 *          the required combine.
 *
-*  =====================================================================
+*  == = ==================================================================
 *
 *     .. Local Scalars ..
       LOGICAL            BCAST, RSCOPE, CSCOPE
@@ -259,13 +259,13 @@ C
 *     ..
 *
 *  Purpose
-*  =======
+*  == = ====
 *
 *  SCOMBAMAX finds the element having max. absolute value as well
 *  as its corresponding globl index.
 *
 *  Arguments
-*  =========
+*  == = ======
 *
 *  V1        (local input/local output) REAL array of
 *            dimension 2.  The first maximum absolute value element and
@@ -275,7 +275,7 @@ C
 *            The second maximum absolute value element and its global
 *            index. V2(1) = AMAX, V2(2) = INDX.
 *
-*  =====================================================================
+*  == = ==================================================================
 *
 *     .. Intrinsic Functions ..
       INTRINSIC          ABS
@@ -305,12 +305,12 @@ C
 *     ..
 *
 *  Purpose
-*  =======
+*  == = ====
 *
 *  SCOMBSSQ does a scaled sum of squares on two scalars.
 *
 *  Arguments
-*  =========
+*  == = ======
 *
 *  V1        (local input/local output) REAL array of
 *            dimension 2.  The first scaled sum. V1(1) = SCALE,
@@ -319,7 +319,7 @@ C
 *  V2        (local input) REAL array of dimension 2.
 *            The second scaled sum. V2(1) = SCALE, V2(2) = SUMSQ.
 *
-*  =====================================================================
+*  == = ==================================================================
 *
 *     .. Parameters ..
       REAL               ZERO
@@ -353,20 +353,20 @@ C
 *     ..
 *
 *  Purpose
-*  =======
+*  == = ====
 *
 *  SCOMBNRM2 combines local norm 2 results, taking care not to cause
 *  unnecessary overflow.
 *
 *  Arguments
-*  =========
+*  == = ======
 *
 *  X       (local input) REAL
 *  Y       (local input) REAL
 *          X and Y specify the values x and y. X and Y are supposed to
 *          be >= 0.
 *
-*  =====================================================================
+*  == = ==================================================================
 *
 *     .. Parameters ..
       REAL               ONE, ZERO

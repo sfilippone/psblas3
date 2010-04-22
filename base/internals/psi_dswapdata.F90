@@ -108,7 +108,7 @@ subroutine psi_dswapdatam(flag,n,beta,y,desc_a,work,info,data)
   integer, pointer :: d_idx(:)
   character(len=20)  :: name
 
-  info = 0
+  info = psb_success_
   name='psi_swap_data'
   call psb_erractionsave(err_act)
 
@@ -116,13 +116,13 @@ subroutine psi_dswapdatam(flag,n,beta,y,desc_a,work,info,data)
   icomm = psb_cd_get_mpic(desc_a)
   call psb_info(ictxt,me,np) 
   if (np == -1) then
-    info = 2010
+    info = psb_err_blacs_error_
     call psb_errpush(info,name)
     goto 9999
   endif
 
   if (.not.psb_is_asb_desc(desc_a)) then 
-    info = 1122
+    info = psb_err_invalid_cd_state_
     call psb_errpush(info,name)
     goto 9999
   endif
@@ -134,14 +134,14 @@ subroutine psi_dswapdatam(flag,n,beta,y,desc_a,work,info,data)
   end if
 
   call psb_cd_get_list(data_,desc_a,d_idx,totxch,idxr,idxs,info) 
-  if (info /= 0) then 
-    call psb_errpush(4001,name,a_err='psb_cd_get_list')
+  if (info /= psb_success_) then 
+    call psb_errpush(psb_err_internal_error_,name,a_err='psb_cd_get_list')
     goto 9999
   end if
 
 
   call psi_swapdata(ictxt,icomm,flag,n,beta,y,d_idx,totxch,idxs,idxr,work,info)
-  if (info /= 0) goto 9999
+  if (info /= psb_success_) goto 9999
 
   call psb_erractionrestore(err_act)
   return
@@ -193,13 +193,13 @@ subroutine psi_dswapidxm(ictxt,icomm,flag,n,beta,y,idx,totxch,totsnd,totrcv,work
 #endif
   character(len=20)  :: name
 
-  info = 0
+  info = psb_success_
   name='psi_swap_data'
   call psb_erractionsave(err_act)
 
   call psb_info(ictxt,me,np) 
   if (np == -1) then
-    info = 2010
+    info = psb_err_blacs_error_
     call psb_errpush(info,name)
     goto 9999
   endif
@@ -219,8 +219,8 @@ subroutine psi_dswapidxm(ictxt,icomm,flag,n,beta,y,idx,totxch,totsnd,totrcv,work
     allocate(sdsz(0:np-1), rvsz(0:np-1), bsdidx(0:np-1),&
          & brvidx(0:np-1), rvhd(0:np-1), sdhd(0:np-1), prcid(0:np-1),&
          & stat=info)    
-    if(info /= 0) then
-      call psb_errpush(4000,name)
+    if(info /= psb_success_) then
+      call psb_errpush(psb_err_alloc_dealloc_,name)
       goto 9999
     end if
 
@@ -254,8 +254,8 @@ subroutine psi_dswapidxm(ictxt,icomm,flag,n,beta,y,idx,totxch,totsnd,totrcv,work
 
   else
     allocate(rvhd(totxch),prcid(totxch),stat=info) 
-    if(info /= 0) then
-      call psb_errpush(4000,name)
+    if(info /= psb_success_) then
+      call psb_errpush(psb_err_alloc_dealloc_,name)
       goto 9999
     end if
   end if
@@ -268,8 +268,8 @@ subroutine psi_dswapidxm(ictxt,icomm,flag,n,beta,y,idx,totxch,totsnd,totrcv,work
     albf=.false.
   else
     allocate(sndbuf(totsnd_),rcvbuf(totrcv_), stat=info)
-    if(info /= 0) then
-      call psb_errpush(4000,name)
+    if(info /= psb_success_) then
+      call psb_errpush(psb_err_alloc_dealloc_,name)
       goto 9999
     end if
     albf=.true.
@@ -303,7 +303,7 @@ subroutine psi_dswapidxm(ictxt,icomm,flag,n,beta,y,idx,totxch,totsnd,totrcv,work
          & brvidx,mpi_double_precision,icomm,iret)
     if(iret /= mpi_success) then
       int_err(1) = iret
-      info=400
+      info=psb_err_mpi_error_
       call psb_errpush(info,name,i_err=int_err)
       goto 9999
     end if
@@ -355,7 +355,7 @@ subroutine psi_dswapidxm(ictxt,icomm,flag,n,beta,y,idx,totxch,totsnd,totrcv,work
       nerv = idx(pnti+psb_n_elem_recv_)
       nesd = idx(pnti+nerv+psb_n_elem_send_)
       call psb_get_rank(prcid(i),ictxt,proc_to_comm)      
-      if ((nerv>0).and.(proc_to_comm/=me)) then 
+      if ((nerv>0).and.(proc_to_comm /= me)) then 
         p2ptag = krecvid(ictxt,proc_to_comm,me)
         call mpi_irecv(rcvbuf(rcv_pt),n*nerv,&
              & mpi_double_precision,prcid(i),&
@@ -380,7 +380,7 @@ subroutine psi_dswapidxm(ictxt,icomm,flag,n,beta,y,idx,totxch,totsnd,totrcv,work
       nesd = idx(pnti+nerv+psb_n_elem_send_)
 
       p2ptag=ksendid(ictxt,proc_to_comm,me)
-      if ((nesd>0).and.(proc_to_comm/=me)) then 
+      if ((nesd>0).and.(proc_to_comm /= me)) then 
         if (usersend) then 
           call mpi_rsend(sndbuf(snd_pt),n*nesd,&
                & mpi_double_precision,prcid(i),&
@@ -393,7 +393,7 @@ subroutine psi_dswapidxm(ictxt,icomm,flag,n,beta,y,idx,totxch,totsnd,totrcv,work
 
         if(iret /= mpi_success) then
           int_err(1) = iret
-          info=400
+          info=psb_err_mpi_error_
           call psb_errpush(info,name,i_err=int_err)
           goto 9999
         end if
@@ -418,7 +418,7 @@ subroutine psi_dswapidxm(ictxt,icomm,flag,n,beta,y,idx,totxch,totsnd,totrcv,work
         call mpi_wait(rvhd(i),p2pstat,iret)
         if(iret /= mpi_success) then
           int_err(1) = iret
-          info=400
+          info=psb_err_mpi_error_
           call psb_errpush(info,name,i_err=int_err)
           goto 9999
         end if
@@ -499,13 +499,13 @@ subroutine psi_dswapidxm(ictxt,icomm,flag,n,beta,y,idx,totxch,totsnd,totrcv,work
   else
     deallocate(rvhd,prcid,stat=info)
   end if
-  if(info /= 0) then
-    call psb_errpush(4000,name)
+  if(info /= psb_success_) then
+    call psb_errpush(psb_err_alloc_dealloc_,name)
     goto 9999
   end if
   if(albf) deallocate(sndbuf,rcvbuf,stat=info)
-  if(info /= 0) then
-    call psb_errpush(4000,name)
+  if(info /= psb_success_) then
+    call psb_errpush(psb_err_alloc_dealloc_,name)
     goto 9999
   end if
 
@@ -597,20 +597,20 @@ subroutine psi_dswapdatav(flag,beta,y,desc_a,work,info,data)
   integer, pointer :: d_idx(:)
   character(len=20)  :: name
 
-  info = 0
+  info = psb_success_
   name='psi_swap_datav'
   call psb_erractionsave(err_act)
 
   ictxt=psb_cd_get_context(desc_a)
   call psb_info(ictxt,me,np) 
   if (np == -1) then
-    info = 2010
+    info = psb_err_blacs_error_
     call psb_errpush(info,name)
     goto 9999
   endif
 
   if (.not.psb_is_asb_desc(desc_a)) then 
-    info = 1122
+    info = psb_err_invalid_cd_state_
     call psb_errpush(info,name)
     goto 9999
   endif
@@ -624,13 +624,13 @@ subroutine psi_dswapdatav(flag,beta,y,desc_a,work,info,data)
   end if
 
   call psb_cd_get_list(data_,desc_a,d_idx,totxch,idxr,idxs,info) 
-  if (info /= 0) then 
-    call psb_errpush(4001,name,a_err='psb_cd_get_list')
+  if (info /= psb_success_) then 
+    call psb_errpush(psb_err_internal_error_,name,a_err='psb_cd_get_list')
     goto 9999
   end if
 
   call psi_swapdata(ictxt,icomm,flag,beta,y,d_idx,totxch,idxs,idxr,work,info)
-  if (info /= 0) goto 9999
+  if (info /= psb_success_) goto 9999
 
   call psb_erractionrestore(err_act)
   return
@@ -684,13 +684,13 @@ subroutine psi_dswapidxv(ictxt,icomm,flag,beta,y,idx,totxch,totsnd,totrcv,work,i
 #endif
   character(len=20)  :: name
 
-  info = 0
+  info = psb_success_
   name='psi_swap_datav'
   call psb_erractionsave(err_act)
 
   call psb_info(ictxt,me,np) 
   if (np == -1) then
-    info = 2010
+    info = psb_err_blacs_error_
     call psb_errpush(info,name)
     goto 9999
   endif
@@ -711,8 +711,8 @@ subroutine psi_dswapidxv(ictxt,icomm,flag,beta,y,idx,totxch,totsnd,totrcv,work,i
     allocate(sdsz(0:np-1), rvsz(0:np-1), bsdidx(0:np-1),&
          & brvidx(0:np-1), rvhd(0:np-1), sdhd(0:np-1), prcid(0:np-1),&
          & stat=info)    
-    if(info /= 0) then
-      call psb_errpush(4000,name)
+    if(info /= psb_success_) then
+      call psb_errpush(psb_err_alloc_dealloc_,name)
       goto 9999
     end if
 
@@ -745,8 +745,8 @@ subroutine psi_dswapidxv(ictxt,icomm,flag,beta,y,idx,totxch,totsnd,totrcv,work,i
 
   else
     allocate(rvhd(totxch),prcid(totxch),stat=info) 
-    if(info /= 0) then
-      call psb_errpush(4000,name)
+    if(info /= psb_success_) then
+      call psb_errpush(psb_err_alloc_dealloc_,name)
       goto 9999
     end if
   end if
@@ -760,8 +760,8 @@ subroutine psi_dswapidxv(ictxt,icomm,flag,beta,y,idx,totxch,totsnd,totrcv,work,i
     albf=.false.
   else
     allocate(sndbuf(totsnd_),rcvbuf(totrcv_), stat=info)
-    if(info /= 0) then
-      call psb_errpush(4000,name)
+    if(info /= psb_success_) then
+      call psb_errpush(psb_err_alloc_dealloc_,name)
       goto 9999
     end if
     albf=.true.
@@ -794,7 +794,7 @@ subroutine psi_dswapidxv(ictxt,icomm,flag,beta,y,idx,totxch,totsnd,totrcv,work,i
          & brvidx,mpi_double_precision,icomm,iret)
     if(iret /= mpi_success) then
       int_err(1) = iret
-      info=400
+      info=psb_err_mpi_error_
       call psb_errpush(info,name,i_err=int_err)
       goto 9999
     end if
@@ -881,7 +881,7 @@ subroutine psi_dswapidxv(ictxt,icomm,flag,beta,y,idx,totxch,totsnd,totrcv,work,i
 
         if(iret /= mpi_success) then
           int_err(1) = iret
-          info=400
+          info=psb_err_mpi_error_
           call psb_errpush(info,name,i_err=int_err)
           goto 9999
         end if
@@ -904,7 +904,7 @@ subroutine psi_dswapidxv(ictxt,icomm,flag,beta,y,idx,totxch,totsnd,totrcv,work,i
         call mpi_wait(rvhd(i),p2pstat,iret)
         if(iret /= mpi_success) then
           int_err(1) = iret
-          info=400
+          info=psb_err_mpi_error_
           call psb_errpush(info,name,i_err=int_err)
           goto 9999
         end if
@@ -977,13 +977,13 @@ subroutine psi_dswapidxv(ictxt,icomm,flag,beta,y,idx,totxch,totsnd,totrcv,work,i
   else
     deallocate(rvhd,prcid,stat=info)
   end if
-  if(info /= 0) then
-    call psb_errpush(4000,name)
+  if(info /= psb_success_) then
+    call psb_errpush(psb_err_alloc_dealloc_,name)
     goto 9999
   end if
   if(albf) deallocate(sndbuf,rcvbuf,stat=info)
-  if(info /= 0) then
-    call psb_errpush(4000,name)
+  if(info /= psb_success_) then
+    call psb_errpush(psb_err_alloc_dealloc_,name)
     goto 9999
   end if
 

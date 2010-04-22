@@ -41,12 +41,12 @@ subroutine psb_dprecinit(p,ptype,info)
   character(len=*), intent(in)           :: ptype
   integer, intent(out)                   :: info
 
-  info = 0
+  info = psb_success_
 
   if (allocated(p%prec) ) then
     call p%prec%precfree(info)
-    if (info == 0) deallocate(p%prec,stat=info) 
-    if (info /= 0) return
+    if (info == psb_success_) deallocate(p%prec,stat=info) 
+    if (info /= psb_success_) return
   end if
   
   select case(psb_toupper(ptype(1:len_trim(ptype))))
@@ -62,9 +62,9 @@ subroutine psb_dprecinit(p,ptype,info)
     
   case default
     write(0,*) 'Unknown preconditioner type request "',ptype,'"'
-    info = 2
+    info = psb_err_pivot_too_small_
     
   end select
-  if (info == 0)  call p%prec%precinit(info)
+  if (info == psb_success_)  call p%prec%precinit(info)
   
 end subroutine psb_dprecinit

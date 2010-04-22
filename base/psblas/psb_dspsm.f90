@@ -107,14 +107,14 @@ subroutine  psb_dspsm(alpha,a,x,beta,y,desc_a,info,&
 
   name='psb_dspsm'
   if(psb_get_errstatus() /= 0) return 
-  info=0
+  info=psb_success_
   call psb_erractionsave(err_act)
 
   ictxt=psb_cd_get_context(desc_a)
 
   call psb_info(ictxt, me, np)
   if (np == -1) then
-    info = 2010
+    info = psb_err_blacs_error_
     call psb_errpush(info,name)
     goto 9999
   endif
@@ -161,7 +161,7 @@ subroutine  psb_dspsm(alpha,a,x,beta,y,desc_a,info,&
     if((itrans == 'N').or.(itrans == 'T').or.  (itrans == 'C')) then
       ! OK 
     else
-      info = 70
+      info = psb_err_iarg_invalid_value_
       call psb_errpush(info,name)
       goto 9999
     end if
@@ -176,7 +176,7 @@ subroutine  psb_dspsm(alpha,a,x,beta,y,desc_a,info,&
   lldy = size(y,1)
 
   if((lldx < ncol).or.(lldy < ncol)) then
-    info=3010
+    info=psb_err_lld_case_not_implemented_
     call psb_errpush(info,name)
     goto 9999
   end if
@@ -196,8 +196,8 @@ subroutine  psb_dspsm(alpha,a,x,beta,y,desc_a,info,&
 
   if (aliw) then
     allocate(iwork(liwork),stat=info)
-    if(info /= 0) then
-      info=4010
+    if(info /= psb_success_) then
+      info=psb_err_from_subroutine_
       ch_err='psb_realloc'
       call psb_errpush(info,name,a_err=ch_err)
       goto 9999
@@ -220,12 +220,12 @@ subroutine  psb_dspsm(alpha,a,x,beta,y,desc_a,info,&
   ! checking for matrix correctness
   call psb_chkmat(m,m,ia,ja,desc_a,info,iia,jja)
   ! checking for vectors correctness
-  if (info == 0) &
+  if (info == psb_success_) &
        & call psb_chkvect(m,ik,size(x,1),ix,ijx,desc_a,info,iix,jjx)
-  if (info == 0) &
+  if (info == psb_success_) &
        & call psb_chkvect(m,ik,size(y,1),iy,ijy,desc_a,info,iiy,jjy)
-  if(info /= 0) then
-    info=4010
+  if(info /= psb_success_) then
+    info=psb_err_from_subroutine_
     ch_err='psb_chkvect/mat'
     call psb_errpush(info,name,a_err=ch_err)
     goto 9999
@@ -233,15 +233,15 @@ subroutine  psb_dspsm(alpha,a,x,beta,y,desc_a,info,&
 
   if(ja /= ix) then
     ! this case is not yet implemented
-    info = 3030
+    info = psb_err_ja_nix_ia_niy_unsupported_
   end if
 
   if((iix /= 1).or.(iiy /= 1)) then
     ! this case is not yet implemented
-    info = 3040
+    info = psb_err_ix_n1_iy_n1_unsupported_
   end if
 
-  if(info /= 0) then
+  if(info /= psb_success_) then
     call psb_errpush(info,name)
     goto 9999
   end if
@@ -251,8 +251,8 @@ subroutine  psb_dspsm(alpha,a,x,beta,y,desc_a,info,&
   yp => y(iiy:lldy,jjy:jjy+ik-1)
   call psb_cssm(alpha,a,xp,beta,yp,info,scale=scale,d=diag,trans=trans)
 
-  if(info /= 0) then
-    info = 4010
+  if(info /= psb_success_) then
+    info = psb_err_from_subroutine_
     ch_err='cssm'
     call psb_errpush(info,name,a_err=ch_err)
     goto 9999
@@ -264,9 +264,9 @@ subroutine  psb_dspsm(alpha,a,x,beta,y,desc_a,info,&
     call psi_swapdata(ior(psb_swap_send_,psb_swap_recv_),ik,&
          & done,yp,desc_a,iwork,info,data=psb_comm_ovr_)
 
-    if (info == 0) call psi_ovrl_upd(yp,desc_a,choice_,info)
-    if (info /= 0) then
-      call psb_errpush(4010,name,a_err='Inner updates')
+    if (info == psb_success_) call psi_ovrl_upd(yp,desc_a,choice_,info)
+    if (info /= psb_success_) then
+      call psb_errpush(psb_err_from_subroutine_,name,a_err='Inner updates')
       goto 9999
     end if
   end if
@@ -385,14 +385,14 @@ subroutine  psb_dspsv(alpha,a,x,beta,y,desc_a,info,&
 
   name='psb_dspsv'
   if(psb_get_errstatus() /= 0) return 
-  info=0
+  info=psb_success_
   call psb_erractionsave(err_act)
 
   ictxt=psb_cd_get_context(desc_a)
 
   call psb_info(ictxt, me, np)
   if (np == -1) then
-    info = 2010
+    info = psb_err_blacs_error_
     call psb_errpush(info,name)
     goto 9999
   endif
@@ -423,7 +423,7 @@ subroutine  psb_dspsv(alpha,a,x,beta,y,desc_a,info,&
     if((itrans == 'N').or.(itrans == 'T').or.(itrans == 'C')) then
       ! Ok
     else
-      info = 70
+      info = psb_err_iarg_invalid_value_
       call psb_errpush(info,name)
       goto 9999
     end if
@@ -438,7 +438,7 @@ subroutine  psb_dspsv(alpha,a,x,beta,y,desc_a,info,&
   lldy = size(y)
 
   if((lldx < ncol).or.(lldy < ncol)) then
-    info=3010
+    info=psb_err_lld_case_not_implemented_
     call psb_errpush(info,name)
     goto 9999
   end if
@@ -459,8 +459,8 @@ subroutine  psb_dspsv(alpha,a,x,beta,y,desc_a,info,&
 
   if (aliw) then 
     allocate(iwork(liwork),stat=info)
-    if(info /= 0) then
-      info=4010
+    if(info /= psb_success_) then
+      info=psb_err_from_subroutine_
       ch_err='psb_realloc'
       call psb_errpush(info,name,a_err=ch_err)
       goto 9999
@@ -483,12 +483,12 @@ subroutine  psb_dspsv(alpha,a,x,beta,y,desc_a,info,&
   ! checking for matrix correctness
   call psb_chkmat(m,m,ia,ja,desc_a,info,iia,jja)
   ! checking for vectors correctness
-  if (info == 0) &
+  if (info == psb_success_) &
        & call psb_chkvect(m,ik,size(x),ix,jx,desc_a,info,iix,jjx)
-  if (info == 0)&
+  if (info == psb_success_)&
        & call psb_chkvect(m,ik,size(y),iy,jy,desc_a,info,iiy,jjy)
-  if(info /= 0) then
-    info=4010
+  if(info /= psb_success_) then
+    info=psb_err_from_subroutine_
     ch_err='psb_chkvect/mat'
     call psb_errpush(info,name,a_err=ch_err)
     goto 9999
@@ -496,15 +496,15 @@ subroutine  psb_dspsv(alpha,a,x,beta,y,desc_a,info,&
 
   if(ja /= ix) then
     ! this case is not yet implemented
-    info = 3030
+    info = psb_err_ja_nix_ia_niy_unsupported_
   end if
 
   if((iix /= 1).or.(iiy /= 1)) then
     ! this case is not yet implemented
-    info = 3040
+    info = psb_err_ix_n1_iy_n1_unsupported_
   end if
 
-  if(info /= 0) then
+  if(info /= psb_success_) then
     call psb_errpush(info,name)
     goto 9999
   end if
@@ -514,8 +514,8 @@ subroutine  psb_dspsv(alpha,a,x,beta,y,desc_a,info,&
   yp => y(iiy:lldy)
   call psb_cssm(alpha,a,xp,beta,yp,info,scale=scale,d=diag,trans=trans)
 
-  if(info /= 0) then
-    info = 4010
+  if(info /= psb_success_) then
+    info = psb_err_from_subroutine_
     ch_err='dcssm'
     call psb_errpush(info,name,a_err=ch_err)
     goto 9999
@@ -527,9 +527,9 @@ subroutine  psb_dspsv(alpha,a,x,beta,y,desc_a,info,&
          & done,yp,desc_a,iwork,info,data=psb_comm_ovr_)
 
 
-    if (info == 0) call psi_ovrl_upd(yp,desc_a,choice_,info)
-    if (info /= 0) then
-      call psb_errpush(4010,name,a_err='Inner updates')
+    if (info == psb_success_) call psi_ovrl_upd(yp,desc_a,choice_,info)
+    if (info /= psb_success_) then
+      call psb_errpush(psb_err_from_subroutine_,name,a_err='Inner updates')
       goto 9999
     end if
   end if

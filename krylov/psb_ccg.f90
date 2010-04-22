@@ -124,7 +124,7 @@ subroutine psb_ccg(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,istop)
   character(len=20)      :: name
   character(len=*), parameter :: methdname='CG'
 
-  info = 0
+  info = psb_success_
   name = 'psb_ccg'
   call psb_erractionsave(err_act)
   debug_unit  = psb_get_debug_unit()
@@ -146,19 +146,19 @@ subroutine psb_ccg(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,istop)
   endif
 
   call psb_chkvect(mglob,1,size(x,1),1,1,desc_a,info)
-  if (info == 0) call psb_chkvect(mglob,1,size(b,1),1,1,desc_a,info)
-  if(info /= 0) then
-    info=4010    
+  if (info == psb_success_) call psb_chkvect(mglob,1,size(b,1),1,1,desc_a,info)
+  if(info /= psb_success_) then
+    info=psb_err_from_subroutine_    
     call psb_errpush(info,name,a_err='psb_chkvect on X/B')
     goto 9999
   end if
 
   naux=4*n_col
   allocate(aux(naux), stat=info)
-  if (info == 0) call psb_geall(wwrk,desc_a,info,n=5)
-  if (info == 0) call psb_geasb(wwrk,desc_a,info)  
-  if (info /= 0) then 
-    info=4011
+  if (info == psb_success_) call psb_geall(wwrk,desc_a,info,n=psb_err_invalid_input_)
+  if (info == psb_success_) call psb_geasb(wwrk,desc_a,info)  
+  if (info /= psb_success_) then 
+    info=psb_err_from_subroutine_non_
     call psb_errpush(info,name)
     goto 9999
   end if
@@ -195,9 +195,9 @@ subroutine psb_ccg(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,istop)
 
     it = 0
     call psb_geaxpby(cone,b,czero,r,desc_a,info)
-    if (info == 0) call psb_spmm(-cone,a,x,cone,r,desc_a,info,work=aux)
-    if (info /= 0) then 
-      info=4011
+    if (info == psb_success_) call psb_spmm(-cone,a,x,cone,r,desc_a,info,work=aux)
+    if (info /= psb_success_) then 
+      info=psb_err_from_subroutine_non_
       call psb_errpush(info,name)
       goto 9999
     end if
@@ -205,8 +205,8 @@ subroutine psb_ccg(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,istop)
     rho = czero
     
     call psb_init_conv(methdname,istop_,itrace_,itmax_,a,b,eps,desc_a,stopdat,info)
-    if (info /= 0) Then 
-      call psb_errpush(4011,name)
+    if (info /= psb_success_) Then 
+      call psb_errpush(psb_err_from_subroutine_non_,name)
       goto 9999
     End If
 
@@ -219,10 +219,10 @@ subroutine psb_ccg(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,istop)
       rho_old = rho
       rho     = psb_gedot(r,z,desc_a,info)
 
-      if (it==1) then
+      if (it == 1) then
         call psb_geaxpby(cone,z,czero,p,desc_a,info)
       else
-        if (rho_old==czero) then
+        if (rho_old == czero) then
           if (debug_level >= psb_debug_ext_)&
                & write(debug_unit,*) me,' ',trim(name),&
                & ': CG Iteration breakdown rho'
@@ -234,7 +234,7 @@ subroutine psb_ccg(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,istop)
 
       call psb_spmm(cone,a,p,czero,q,desc_a,info,work=aux)
       sigma = psb_gedot(p,q,desc_a,info)
-      if (sigma==czero) then
+      if (sigma == czero) then
           if (debug_level >= psb_debug_ext_)&
                & write(debug_unit,*) me,' ',trim(name),&
                & ': CG Iteration breakdown sigma'
@@ -246,8 +246,8 @@ subroutine psb_ccg(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,istop)
       call psb_geaxpby(-alpha,q,cone,r,desc_a,info)
 
       if (psb_check_conv(methdname,itx,x,r,desc_a,stopdat,info)) exit restart
-      if (info /= 0) Then 
-        call psb_errpush(4011,name)
+      if (info /= psb_success_) Then 
+        call psb_errpush(psb_err_from_subroutine_non_,name)
         goto 9999
       End If
 
@@ -261,7 +261,7 @@ subroutine psb_ccg(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,istop)
   end if
 
   call psb_gefree(wwrk,desc_a,info)
-  if (info /= 0) then 
+  if (info /= psb_success_) then 
     call psb_errpush(info,name)
     goto 9999
   end if

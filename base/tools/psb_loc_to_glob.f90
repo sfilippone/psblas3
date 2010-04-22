@@ -63,7 +63,7 @@ subroutine psb_loc_to_glob2(x,y,desc_a,info,iact)
   character(len=20)   :: name
 
   if(psb_get_errstatus() /= 0) return 
-  info=0
+  info=psb_success_
   name='psb_loc_to_glob2'
   call psb_erractionsave(err_act)
 
@@ -76,14 +76,14 @@ subroutine psb_loc_to_glob2(x,y,desc_a,info,iact)
 
   call psb_map_l2g(x,y,desc_a%idxmap,info) 
 
-  if (info /= 0) then
+  if (info /= psb_success_) then
     select case(act)
     case('E','I')
       ! do nothing, silently.
-      info = 0
+      info = psb_success_
     case('W')
       write(0,'("Error ",i5," in subroutine loc_to_glob")') info
-      info = 0
+      info = psb_success_
     case('A')
       call psb_errpush(info,name)
       goto 9999
@@ -168,7 +168,7 @@ subroutine psb_loc_to_glob(x,desc_a,info,iact)
   character(len=20)   :: name
 
   if(psb_get_errstatus() /= 0) return 
-  info=0
+  info=psb_success_
   name='psb_loc_to_glob'
   call psb_erractionsave(err_act)
 
@@ -181,14 +181,14 @@ subroutine psb_loc_to_glob(x,desc_a,info,iact)
 
   call psb_map_l2g(x,desc_a%idxmap,info) 
 
-  if (info /= 0) then
+  if (info /= psb_success_) then
     select case(act)
     case('E','I')
       ! do nothing, silently.
-      info = 0
+      info = psb_success_
     case('W')
       write(0,'("Error ",i5," in subroutine loc_to_glob")') info
-      info = 0
+      info = psb_success_
     case('A')
       call psb_errpush(info,name)
       goto 9999

@@ -43,21 +43,21 @@ C
 C
 C     Error handling
 C
-      info = 0
+      info = psb_success_
       if (m.lt.0) then 
-        info=10
+        info=psb_err_iarg_neg_
         int_err(1)=1
         int_err(2)=m
         call fcpsb_errpush(info,name,int_err)
         goto 9999
       else if (n.lt.0) then 
-        info=10
+        info=psb_err_iarg_neg_
         int_err(1)=1
         int_err(2)=n
         call fcpsb_errpush(info,name,int_err)
         goto 9999
       else if (lldx.lt.max(1,m)) then 
-        info=50
+        info=psb_err_iarg_not_gtia_ii_
         int_err(1)=5
         int_err(2)=1
         int_err(3)=lldx
@@ -65,7 +65,7 @@ C
         call fcpsb_errpush(info,name,int_err)
         goto 9999
       else if (lldy.lt.max(1,m)) then 
-        info=50
+        info=psb_err_iarg_not_gtia_ii_
         int_err(1)=8
         int_err(2)=1
         int_err(3)=lldy
