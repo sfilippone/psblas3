@@ -125,7 +125,7 @@ subroutine psi_fnd_owner(nv,idx,iprc,desc,info)
 
   hsz       = 0
   hsz(me+1) = nv
-  call psb_amx(ictxt,hsz,info)
+  call psb_amx(ictxt,hsz)
   hidx(1)   = 0
   do i=1, np
     hidx(i+1) = hidx(i) + hsz(i)
