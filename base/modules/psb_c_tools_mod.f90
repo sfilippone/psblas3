@@ -138,8 +138,8 @@ Module psb_c_tools_mod
     subroutine psb_cspalloc(a, desc_a, info, nnz)
       use psb_descriptor_type, only : psb_desc_type, psb_spk_, psb_dpk_
       use psb_mat_mod, only : psb_c_sparse_mat
-      type(psb_desc_type), intent(inout) :: desc_a
-      type(psb_c_sparse_mat), intent(out) :: a
+      type(psb_desc_type), intent(in) :: desc_a
+      type(psb_c_sparse_mat), intent(inout) :: a
       integer, intent(out)               :: info
       integer, optional, intent(in)      :: nnz
     end subroutine psb_cspalloc

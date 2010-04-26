@@ -21,7 +21,7 @@ FOBJS = psb_sallc.o psb_sasb.o  \
 	psb_cspins.o psb_csprn.o psb_cd_set_bld.o 
 #psb_linmap.o  psb_map.o
 
-MPFOBJS = psb_ssphalo.o psb_csphalo.o psb_dsphalo.o psb_zsphalo.o psb_icdasb.o \
+MPFOBJS = psb_icdasb.o psb_ssphalo.o  psb_dsphalo.o psb_csphalo.o psb_zsphalo.o  \
 	psb_dcdbldext.o psb_zcdbldext.o psb_scdbldext.o psb_ccdbldext.o
 
 LIBDIR=..

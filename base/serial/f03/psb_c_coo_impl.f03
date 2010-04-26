@@ -378,10 +378,10 @@ end subroutine psb_c_coo_print
 
 
 
-function  psb_c_coo_get_nc_row(idx,a) result(res)
+function  psb_c_coo_get_nz_row(idx,a) result(res)
   use psb_const_mod
   use psb_sort_mod
-  use psb_c_base_mat_mod, psb_protect_name => psb_c_coo_get_nc_row    
+  use psb_c_base_mat_mod, psb_protect_name => psb_c_coo_get_nz_row    
   implicit none
 
   class(psb_c_coo_sparse_mat), intent(in) :: a
@@ -427,7 +427,7 @@ function  psb_c_coo_get_nc_row(idx,a) result(res)
 
   end if
 
-end function psb_c_coo_get_nc_row
+end function psb_c_coo_get_nz_row
 
 subroutine psb_c_coo_cssm(alpha,a,x,beta,y,info,trans) 
   use psb_const_mod

@@ -10,22 +10,22 @@ module psb_z_mat_mod
 
   contains
     ! Getters
-    procedure, pass(a) :: get_nrows
-    procedure, pass(a) :: get_ncols
-    procedure, pass(a) :: get_nzeros
-    procedure, pass(a) :: get_nz_row
-    procedure, pass(a) :: get_size
-    procedure, pass(a) :: get_state
-    procedure, pass(a) :: get_dupl
-    procedure, pass(a) :: is_null
-    procedure, pass(a) :: is_bld
-    procedure, pass(a) :: is_upd
-    procedure, pass(a) :: is_asb
-    procedure, pass(a) :: is_sorted
-    procedure, pass(a) :: is_upper
-    procedure, pass(a) :: is_lower
-    procedure, pass(a) :: is_triangle
-    procedure, pass(a) :: is_unit
+    procedure, pass(a) :: get_nrows => psb_z_get_nrows
+    procedure, pass(a) :: get_ncols => psb_z_get_ncols
+    procedure, pass(a) :: get_nzeros => psb_z_get_nzeros
+    procedure, pass(a) :: get_nz_row => psb_z_get_nz_row
+    procedure, pass(a) :: get_size => psb_z_get_size
+    procedure, pass(a) :: get_state => psb_z_get_state
+    procedure, pass(a) :: get_dupl => psb_z_get_dupl
+    procedure, pass(a) :: is_null => psb_z_is_null
+    procedure, pass(a) :: is_bld => psb_z_is_bld
+    procedure, pass(a) :: is_upd => psb_z_is_upd
+    procedure, pass(a) :: is_asb => psb_z_is_asb
+    procedure, pass(a) :: is_sorted => psb_z_is_sorted
+    procedure, pass(a) :: is_upper => psb_z_is_upper
+    procedure, pass(a) :: is_lower => psb_z_is_lower
+    procedure, pass(a) :: is_triangle => psb_z_is_triangle
+    procedure, pass(a) :: is_unit => psb_z_is_unit
     procedure, pass(a) :: get_fmt => psb_z_get_fmt
     procedure, pass(a) :: sizeof => psb_z_sizeof
 
@@ -99,9 +99,9 @@ module psb_z_mat_mod
 
   end type psb_z_sparse_mat
 
-  private :: get_nrows, get_ncols, get_nzeros, get_size, &
-       & get_state, get_dupl, is_null, is_bld, is_upd, &
-       & is_asb, is_sorted, is_upper, is_lower, is_triangle
+  private :: psb_z_get_nrows, psb_z_get_ncols, psb_z_get_nzeros, psb_z_get_size, &
+       & psb_z_get_state, psb_z_get_dupl, psb_z_is_null, psb_z_is_bld, psb_z_is_upd, &
+       & psb_z_is_asb, psb_z_is_sorted, psb_z_is_upper, psb_z_is_lower, psb_z_is_triangle
 
   interface psb_sizeof
     module procedure psb_z_sizeof
@@ -623,7 +623,6 @@ contains
   end function psb_z_sizeof
 
 
-
   function psb_z_get_fmt(a) result(res)
     implicit none 
     class(psb_z_sparse_mat), intent(in) :: a
@@ -638,8 +637,7 @@ contains
   end function psb_z_get_fmt
 
 
-
-  function get_dupl(a) result(res)
+  function psb_z_get_dupl(a) result(res)
     implicit none 
     class(psb_z_sparse_mat), intent(in) :: a
     integer :: res
@@ -649,10 +647,10 @@ contains
     else
       res = psb_invalid_
     end if
-  end function get_dupl
+  end function psb_z_get_dupl
 
 
-  function get_state(a) result(res)
+  function psb_z_get_state(a) result(res)
     implicit none 
     class(psb_z_sparse_mat), intent(in) :: a
     integer :: res
@@ -662,9 +660,9 @@ contains
     else
       res = psb_spmat_null_
     end if
-  end function get_state
+  end function psb_z_get_state
 
-  function get_nrows(a) result(res)
+  function psb_z_get_nrows(a) result(res)
     implicit none 
     class(psb_z_sparse_mat), intent(in) :: a
     integer :: res
@@ -675,9 +673,9 @@ contains
       res = 0
     end if
 
-  end function get_nrows
+  end function psb_z_get_nrows
 
-  function get_ncols(a) result(res)
+  function psb_z_get_ncols(a) result(res)
     implicit none 
     class(psb_z_sparse_mat), intent(in) :: a
     integer :: res
@@ -688,9 +686,9 @@ contains
       res = 0
     end if
 
-  end function get_ncols
+  end function psb_z_get_ncols
 
-  function is_triangle(a) result(res)
+  function psb_z_is_triangle(a) result(res)
     implicit none 
     class(psb_z_sparse_mat), intent(in) :: a
     logical :: res
@@ -701,9 +699,9 @@ contains
       res = .false.
     end if
 
-  end function is_triangle
+  end function psb_z_is_triangle
 
-  function is_unit(a) result(res)
+  function psb_z_is_unit(a) result(res)
     implicit none 
     class(psb_z_sparse_mat), intent(in) :: a
     logical :: res
@@ -714,9 +712,9 @@ contains
       res = .false.
     end if
 
-  end function is_unit
+  end function psb_z_is_unit
 
-  function is_upper(a) result(res)
+  function psb_z_is_upper(a) result(res)
     implicit none 
     class(psb_z_sparse_mat), intent(in) :: a
     logical :: res
@@ -727,9 +725,9 @@ contains
       res = .false.
     end if
 
-  end function is_upper
+  end function psb_z_is_upper
 
-  function is_lower(a) result(res)
+  function psb_z_is_lower(a) result(res)
     implicit none 
     class(psb_z_sparse_mat), intent(in) :: a
     logical :: res
@@ -740,9 +738,9 @@ contains
       res = .false.
     end if
 
-  end function is_lower
+  end function psb_z_is_lower
 
-  function is_null(a) result(res)
+  function psb_z_is_null(a) result(res)
     implicit none 
     class(psb_z_sparse_mat), intent(in) :: a
     logical :: res
@@ -753,9 +751,9 @@ contains
       res = .true.
     end if
 
-  end function is_null
+  end function psb_z_is_null
 
-  function is_bld(a) result(res)
+  function psb_z_is_bld(a) result(res)
     implicit none 
     class(psb_z_sparse_mat), intent(in) :: a
     logical :: res
@@ -766,9 +764,9 @@ contains
       res = .false.
     end if
 
-  end function is_bld
+  end function psb_z_is_bld
 
-  function is_upd(a) result(res)
+  function psb_z_is_upd(a) result(res)
     implicit none 
     class(psb_z_sparse_mat), intent(in) :: a
     logical :: res
@@ -779,9 +777,9 @@ contains
       res = .false.
     end if
 
-  end function is_upd
+  end function psb_z_is_upd
 
-  function is_asb(a) result(res)
+  function psb_z_is_asb(a) result(res)
     implicit none 
     class(psb_z_sparse_mat), intent(in) :: a
     logical :: res
@@ -792,9 +790,9 @@ contains
       res = .false.
     end if
 
-  end function is_asb
+  end function psb_z_is_asb
 
-  function is_sorted(a) result(res)
+  function psb_z_is_sorted(a) result(res)
     implicit none 
     class(psb_z_sparse_mat), intent(in) :: a
     logical :: res
@@ -805,11 +803,11 @@ contains
       res = .false.
     end if
 
-  end function is_sorted
+  end function psb_z_is_sorted
 
 
 
-  function get_nzeros(a) result(res)
+  function psb_z_get_nzeros(a) result(res)
     implicit none 
     class(psb_z_sparse_mat), intent(in) :: a
     integer :: res
@@ -819,9 +817,9 @@ contains
       res = a%a%get_nzeros()
     end if
 
-  end function get_nzeros
+  end function psb_z_get_nzeros
 
-  function get_size(a) result(res)
+  function psb_z_get_size(a) result(res)
 
     implicit none 
     class(psb_z_sparse_mat), intent(in) :: a
@@ -833,10 +831,10 @@ contains
       res = a%a%get_size()
     end if
 
-  end function get_size
+  end function psb_z_get_size
 
 
-  function get_nz_row(idx,a) result(res)
+  function psb_z_get_nz_row(idx,a) result(res)
     implicit none 
     integer, intent(in)               :: idx
     class(psb_z_sparse_mat), intent(in) :: a
@@ -848,7 +846,7 @@ contains
     
     if (allocated(a%a)) res = a%a%get_nz_row(idx)
 
-  end function get_nz_row
+  end function psb_z_get_nz_row
 
 
 end module psb_z_mat_mod

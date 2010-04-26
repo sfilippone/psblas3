@@ -11,7 +11,7 @@ subroutine  psb_dsp_allgather(globa, loca, desc_a, info, root, dupl,keepnum,keep
   include 'mpif.h'
 #endif
   type(psb_d_sparse_mat), intent(inout) :: loca
-  type(psb_d_sparse_mat), intent(out)   :: globa
+  type(psb_d_sparse_mat), intent(inout) :: globa
   type(psb_desc_type), intent(in) :: desc_a
   integer, intent(out)            :: info
   integer, intent(in), optional   :: root, dupl
@@ -44,6 +44,7 @@ subroutine  psb_dsp_allgather(globa, loca, desc_a, info, root, dupl,keepnum,keep
   else
     keeploc_ = .true.
   end if
+  call globa%free()
 
   if (keepnum_) then 
     nrg = psb_cd_get_global_rows(desc_a)

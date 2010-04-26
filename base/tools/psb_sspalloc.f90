@@ -46,8 +46,8 @@ subroutine psb_sspalloc(a, desc_a, info, nnz)
   implicit none
 
   !....parameters...
-  type(psb_desc_type), intent(inout) :: desc_a
-  type(psb_s_sparse_mat), intent(out) :: a
+  type(psb_desc_type), intent(in) :: desc_a
+  type(psb_s_sparse_mat), intent(inout) :: a
   integer, intent(out)               :: info
   integer, optional, intent(in)      :: nnz
 
@@ -100,7 +100,7 @@ subroutine psb_sspalloc(a, desc_a, info, nnz)
 
   if (debug_level >= psb_debug_ext_) &
        & write(debug_unit,*) me,' ',trim(name),':allocating size:',length_ia1
-
+  call a%free()
   !....allocate aspk, ia1, ia2.....
   call a%csall(loc_row,loc_col,info,nz=length_ia1)
   if(info /= psb_success_) then

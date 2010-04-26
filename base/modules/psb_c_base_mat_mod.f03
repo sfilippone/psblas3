@@ -81,7 +81,7 @@ module psb_c_base_mat_mod
     procedure, pass(a) :: get_diag     => psb_c_coo_get_diag
     procedure, pass(a) :: c_csgetrow   => psb_c_coo_csgetrow
     procedure, pass(a) :: csgetptn     => psb_c_coo_csgetptn
-    procedure, pass(a) :: get_nc_row   => psb_c_coo_get_nc_row
+    procedure, pass(a) :: get_nz_row   => psb_c_coo_get_nz_row
     procedure, pass(a) :: reinit       => psb_c_coo_reinit
     procedure, pass(a) :: fix          => psb_c_fix_coo
     procedure, pass(a) :: trim         => psb_c_coo_trim
@@ -426,12 +426,12 @@ module psb_c_base_mat_mod
   
   
   interface 
-    function  psb_c_coo_get_nc_row(idx,a) result(res)
+    function  psb_c_coo_get_nz_row(idx,a) result(res)
       import psb_c_coo_sparse_mat
       class(psb_c_coo_sparse_mat), intent(in) :: a
       integer, intent(in)                  :: idx
       integer                              :: res
-    end function psb_c_coo_get_nc_row
+    end function psb_c_coo_get_nz_row
   end interface
   
   

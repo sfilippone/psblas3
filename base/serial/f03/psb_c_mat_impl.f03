@@ -618,28 +618,11 @@ subroutine  psb_c_free(a)
   use psb_error_mod
   implicit none 
   class(psb_c_sparse_mat), intent(inout) :: a
-  Integer :: err_act, info
-  character(len=20)  :: name='free'
-  logical, parameter :: debug=.false.
 
-  call psb_get_erraction(err_act)
-  if (.not.allocated(a%a)) then 
-    info = 1121
-    call psb_errpush(info,name)
-    goto 9999
+  if (allocated(a%a)) then 
+    call a%a%free()
+    deallocate(a%a) 
   endif
-
-  call a%a%free()
-  deallocate(a%a) 
-  return
-
-9999 continue
-
-  if (err_act == psb_act_abort_) then
-    call psb_error()
-    return
-  end if
-  return
 
 end subroutine psb_c_free
 

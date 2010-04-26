@@ -109,13 +109,13 @@ Module psb_d_tools_mod
     end subroutine psb_dinsi
     subroutine psb_dinsvi(m,irw,val,x,desc_a,info,dupl)
       use psb_descriptor_type, only : psb_desc_type, psb_spk_, psb_dpk_
-      integer, intent(in)                ::  m
-      type(psb_desc_type), intent(in)    ::  desc_a
+      integer, intent(in)              ::  m
+      type(psb_desc_type), intent(in)  ::  desc_a
       real(psb_dpk_),intent(inout)     ::  x(:)
-      integer, intent(in)                ::  irw(:)
+      integer, intent(in)              ::  irw(:)
       real(psb_dpk_), intent(in)       ::  val(:)
-      integer, intent(out)               ::  info
-      integer, optional, intent(in)      ::  dupl
+      integer, intent(out)             ::  info
+      integer, optional, intent(in)    ::  dupl
     end subroutine psb_dinsvi
   end interface
 
@@ -137,8 +137,8 @@ Module psb_d_tools_mod
     subroutine psb_dspalloc(a, desc_a, info, nnz)
       use psb_descriptor_type, only : psb_desc_type, psb_spk_, psb_dpk_
       use psb_mat_mod, only : psb_d_sparse_mat
-      type(psb_desc_type), intent(inout)  :: desc_a
-      type(psb_d_sparse_mat), intent(out) :: a
+      type(psb_desc_type), intent(in)       :: desc_a
+      type(psb_d_sparse_mat), intent(inout) :: a
       integer, intent(out)                :: info
       integer, optional, intent(in)       :: nnz
     end subroutine psb_dspalloc
