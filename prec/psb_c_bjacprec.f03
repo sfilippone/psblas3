@@ -1,23 +1,27 @@
 module psb_c_bjacprec
-  use psb_prec_type
 
+  use psb_c_base_prec_mod
   
   type, extends(psb_c_base_prec_type) :: psb_c_bjac_prec_type
     integer, allocatable                :: iprcparm(:)
     type(psb_c_sparse_mat), allocatable :: av(:)
     complex(psb_spk_), allocatable         :: d(:)
   contains
-    procedure, pass(prec) :: apply     => c_bjac_apply
-    procedure, pass(prec) :: precbld   => c_bjac_precbld
-    procedure, pass(prec) :: precinit  => c_bjac_precinit
-    procedure, pass(prec) :: precseti  => c_bjac_precseti
-    procedure, pass(prec) :: precsetr  => c_bjac_precsetr
-    procedure, pass(prec) :: precsetc  => c_bjac_precsetc
-    procedure, pass(prec) :: precfree  => c_bjac_precfree
-    procedure, pass(prec) :: precdescr => c_bjac_precdescr
-    procedure, pass(prec) :: sizeof    => c_bjac_sizeof
+    procedure, pass(prec) :: apply     => psb_c_bjac_apply
+    procedure, pass(prec) :: precbld   => psb_c_bjac_precbld
+    procedure, pass(prec) :: precinit  => psb_c_bjac_precinit
+    procedure, pass(prec) :: precseti  => psb_c_bjac_precseti
+    procedure, pass(prec) :: precsetr  => psb_c_bjac_precsetr
+    procedure, pass(prec) :: precsetc  => psb_c_bjac_precsetc
+    procedure, pass(prec) :: precfree  => psb_c_bjac_precfree
+    procedure, pass(prec) :: precdescr => psb_c_bjac_precdescr
+    procedure, pass(prec) :: sizeof    => psb_c_bjac_sizeof
   end type psb_c_bjac_prec_type
 
+  private :: psb_c_bjac_apply, psb_c_bjac_precbld, psb_c_bjac_precseti,&
+       & psb_c_bjac_precsetr, psb_c_bjac_precsetc, psb_c_bjac_sizeof,&
+       & psb_c_bjac_precinit, psb_c_bjac_precfree, psb_c_bjac_precdescr
+  
 
   character(len=15), parameter, private :: &
        &  fact_names(0:2)=(/'None          ','ILU(n)        ',&
@@ -26,7 +30,7 @@ module psb_c_bjacprec
 contains
   
 
-  subroutine c_bjac_apply(alpha,prec,x,beta,y,desc_data,info,trans,work)
+  subroutine psb_c_bjac_apply(alpha,prec,x,beta,y,desc_data,info,trans,work)
     use psb_sparse_mod
     type(psb_desc_type),intent(in)    :: desc_data
     class(psb_c_bjac_prec_type), intent(in)  :: prec
@@ -170,9 +174,9 @@ contains
     return
 
 
-  end subroutine c_bjac_apply
+  end subroutine psb_c_bjac_apply
 
-  subroutine c_bjac_precinit(prec,info)
+  subroutine psb_c_bjac_precinit(prec,info)
     
     use psb_sparse_mod
     Implicit None
@@ -208,10 +212,10 @@ contains
       return
     end if
     return
-  end subroutine c_bjac_precinit
+  end subroutine psb_c_bjac_precinit
 
 
-  subroutine c_bjac_precbld(a,desc_a,prec,info,upd)
+  subroutine psb_c_bjac_precbld(a,desc_a,prec,info,upd)
 
     use psb_sparse_mod
     use psb_prec_mod
@@ -352,9 +356,9 @@ contains
     end if
     return
 
-  end subroutine c_bjac_precbld
+  end subroutine psb_c_bjac_precbld
 
-  subroutine c_bjac_precseti(prec,what,val,info)
+  subroutine psb_c_bjac_precseti(prec,what,val,info)
     
     use psb_sparse_mod
     Implicit None
@@ -407,9 +411,9 @@ contains
       return
     end if
     return
-  end subroutine c_bjac_precseti
+  end subroutine psb_c_bjac_precseti
 
-  subroutine c_bjac_precsetr(prec,what,val,info)
+  subroutine psb_c_bjac_precsetr(prec,what,val,info)
     
     use psb_sparse_mod
     Implicit None
@@ -435,9 +439,9 @@ contains
       return
     end if
     return
-  end subroutine c_bjac_precsetr
+  end subroutine psb_c_bjac_precsetr
 
-  subroutine c_bjac_precsetc(prec,what,val,info)
+  subroutine psb_c_bjac_precsetc(prec,what,val,info)
     
     use psb_sparse_mod
     Implicit None
@@ -463,9 +467,9 @@ contains
       return
     end if
     return
-  end subroutine c_bjac_precsetc
+  end subroutine psb_c_bjac_precsetc
 
-  subroutine c_bjac_precfree(prec,info)
+  subroutine psb_c_bjac_precfree(prec,info)
     
     use psb_sparse_mod
     Implicit None
@@ -499,10 +503,10 @@ contains
     end if
     return
     
-  end subroutine c_bjac_precfree
+  end subroutine psb_c_bjac_precfree
   
 
-  subroutine c_bjac_precdescr(prec,iout)
+  subroutine psb_c_bjac_precdescr(prec,iout)
     
     use psb_sparse_mod
     Implicit None
@@ -548,9 +552,9 @@ contains
     end if
     return
     
-  end subroutine c_bjac_precdescr
+  end subroutine psb_c_bjac_precdescr
 
-  function c_bjac_sizeof(prec) result(val)
+  function psb_c_bjac_sizeof(prec) result(val)
     use psb_sparse_mod
     class(psb_c_bjac_prec_type), intent(in) :: prec
     integer(psb_long_int_k_) :: val
@@ -564,6 +568,6 @@ contains
       val = val + psb_sizeof(prec%av(psb_u_pr_))
     endif
     return
-  end function c_bjac_sizeof
+  end function psb_c_bjac_sizeof
 
 end module psb_c_bjacprec

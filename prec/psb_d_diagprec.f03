@@ -1,26 +1,30 @@
 module psb_d_diagprec
-  use psb_prec_type
+  use psb_d_base_prec_mod
 
   
   type, extends(psb_d_base_prec_type) :: psb_d_diag_prec_type
     real(psb_dpk_), allocatable :: d(:)
   contains
-    procedure, pass(prec) :: apply     => d_diag_apply
-    procedure, pass(prec) :: precbld   => d_diag_precbld
-    procedure, pass(prec) :: precinit  => d_diag_precinit  
-    procedure, pass(prec) :: precseti  => d_diag_precseti
-    procedure, pass(prec) :: precsetr  => d_diag_precsetr
-    procedure, pass(prec) :: precsetc  => d_diag_precsetc
-    procedure, pass(prec) :: precfree  => d_diag_precfree
-    procedure, pass(prec) :: precdescr => d_diag_precdescr
-    procedure, pass(prec) :: sizeof    => d_diag_sizeof
+    procedure, pass(prec) :: apply     => psb_d_diag_apply
+    procedure, pass(prec) :: precbld   => psb_d_diag_precbld
+    procedure, pass(prec) :: precinit  => psb_d_diag_precinit  
+    procedure, pass(prec) :: precseti  => psb_d_diag_precseti
+    procedure, pass(prec) :: precsetr  => psb_d_diag_precsetr
+    procedure, pass(prec) :: precsetc  => psb_d_diag_precsetc
+    procedure, pass(prec) :: precfree  => psb_d_diag_precfree
+    procedure, pass(prec) :: precdescr => psb_d_diag_precdescr
+    procedure, pass(prec) :: sizeof    => psb_d_diag_sizeof
   end type psb_d_diag_prec_type
 
+  private :: psb_d_diag_apply, psb_d_diag_precbld, psb_d_diag_precseti,&
+       & psb_d_diag_precsetr, psb_d_diag_precsetc, psb_d_diag_sizeof,&
+       & psb_d_diag_precinit, psb_d_diag_precfree, psb_d_diag_precdescr
+  
 
 contains
   
 
-  subroutine d_diag_apply(alpha,prec,x,beta,y,desc_data,info,trans,work)
+  subroutine psb_d_diag_apply(alpha,prec,x,beta,y,desc_data,info,trans,work)
     use psb_sparse_mod
     type(psb_desc_type),intent(in)    :: desc_data
     class(psb_d_diag_prec_type), intent(in)  :: prec
@@ -96,9 +100,9 @@ contains
     end if
     return
 
-  end subroutine d_diag_apply
+  end subroutine psb_d_diag_apply
 
-  subroutine d_diag_precinit(prec,info)
+  subroutine psb_d_diag_precinit(prec,info)
     
     use psb_sparse_mod
     Implicit None
@@ -123,10 +127,10 @@ contains
       return
     end if
     return
-  end subroutine d_diag_precinit
+  end subroutine psb_d_diag_precinit
 
 
-  subroutine d_diag_precbld(a,desc_a,prec,info,upd)
+  subroutine psb_d_diag_precbld(a,desc_a,prec,info,upd)
     
     use psb_sparse_mod
     Implicit None
@@ -182,9 +186,9 @@ contains
       return
     end if
     return
-  end subroutine d_diag_precbld
+  end subroutine psb_d_diag_precbld
 
-  subroutine d_diag_precseti(prec,what,val,info)
+  subroutine psb_d_diag_precseti(prec,what,val,info)
     
     use psb_sparse_mod
     Implicit None
@@ -210,9 +214,9 @@ contains
       return
     end if
     return
-  end subroutine d_diag_precseti
+  end subroutine psb_d_diag_precseti
 
-  subroutine d_diag_precsetr(prec,what,val,info)
+  subroutine psb_d_diag_precsetr(prec,what,val,info)
     
     use psb_sparse_mod
     Implicit None
@@ -238,9 +242,9 @@ contains
       return
     end if
     return
-  end subroutine d_diag_precsetr
+  end subroutine psb_d_diag_precsetr
 
-  subroutine d_diag_precsetc(prec,what,val,info)
+  subroutine psb_d_diag_precsetc(prec,what,val,info)
     
     use psb_sparse_mod
     Implicit None
@@ -266,9 +270,9 @@ contains
       return
     end if
     return
-  end subroutine d_diag_precsetc
+  end subroutine psb_d_diag_precsetc
 
-  subroutine d_diag_precfree(prec,info)
+  subroutine psb_d_diag_precfree(prec,info)
     
     use psb_sparse_mod
     Implicit None
@@ -294,10 +298,10 @@ contains
     end if
     return
     
-  end subroutine d_diag_precfree
+  end subroutine psb_d_diag_precfree
   
 
-  subroutine d_diag_precdescr(prec,iout)
+  subroutine psb_d_diag_precdescr(prec,iout)
     
     use psb_sparse_mod
     Implicit None
@@ -337,9 +341,9 @@ contains
     end if
     return
     
-  end subroutine d_diag_precdescr
+  end subroutine psb_d_diag_precdescr
 
-  function d_diag_sizeof(prec) result(val)
+  function psb_d_diag_sizeof(prec) result(val)
     use psb_sparse_mod
     class(psb_d_diag_prec_type), intent(in) :: prec
     integer(psb_long_int_k_) :: val
@@ -347,6 +351,6 @@ contains
     val = 0
     val = val + psb_sizeof_dp * size(prec%d)
     return
-  end function d_diag_sizeof
+  end function psb_d_diag_sizeof
 
 end module psb_d_diagprec

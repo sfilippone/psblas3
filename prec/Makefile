@@ -4,6 +4,7 @@ LIBDIR=../lib
 HERE=.
 MODOBJS=psb_prec_const_mod.o\
 	psb_s_prec_type.o psb_d_prec_type.o psb_c_prec_type.o psb_z_prec_type.o \
+	psb_s_base_prec_mod.o psb_d_base_prec_mod.o psb_c_base_prec_mod.o psb_z_base_prec_mod.o \
 	psb_prec_type.o  psb_prec_mod.o\
 	psb_d_diagprec.o psb_d_nullprec.o psb_d_bjacprec.o \
 	psb_s_diagprec.o psb_s_nullprec.o psb_s_bjacprec.o \
@@ -36,13 +37,17 @@ $(OBJS): $(LIBDIR)/psb_sparse_mod$(.mod)
 
 $(F90OBJS): $(MODOBJS)
 
-psb_s_prec_type.o psb_d_prec_type.o psb_c_prec_type.o psb_z_prec_type.o: psb_prec_const_mod.o
+psb_s_base_prec_mod.o psb_d_base_prec_mod.o psb_c_base_prec_mod.o psb_z_base_prec_mod.o: psb_prec_const_mod.o
+psb_s_prec_type.o: psb_s_base_prec_mod.o
+psb_d_prec_type.o: psb_d_base_prec_mod.o
+psb_c_prec_type.o: psb_c_base_prec_mod.o
+psb_z_prec_type.o: psb_z_base_prec_mod.o
 psb_prec_type.o: psb_s_prec_type.o psb_d_prec_type.o psb_c_prec_type.o psb_z_prec_type.o
 psb_prec_mod.o:  psb_prec_type.o
-psb_s_bjacprec.o psb_s_diagprec.o psb_s_nullprec.o:  psb_prec_type.o psb_prec_mod.o
-psb_d_bjacprec.o psb_d_diagprec.o psb_d_nullprec.o:  psb_prec_type.o psb_prec_mod.o
-psb_c_bjacprec.o psb_c_diagprec.o psb_c_nullprec.o:  psb_prec_type.o psb_prec_mod.o
-psb_z_bjacprec.o psb_z_diagprec.o psb_z_nullprec.o:  psb_prec_type.o psb_prec_mod.o
+psb_s_bjacprec.o psb_s_diagprec.o psb_s_nullprec.o:  psb_s_base_prec_mod.o 
+psb_d_bjacprec.o psb_d_diagprec.o psb_d_nullprec.o:  psb_d_base_prec_mod.o 
+psb_c_bjacprec.o psb_c_diagprec.o psb_c_nullprec.o:  psb_c_base_prec_mod.o 
+psb_z_bjacprec.o psb_z_diagprec.o psb_z_nullprec.o:  psb_z_base_prec_mod.o 
 
 veryclean: clean
 	/bin/rm -f $(LIBNAME)

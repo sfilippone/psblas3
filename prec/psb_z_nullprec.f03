@@ -1,25 +1,29 @@
 module psb_z_nullprec
-  use psb_prec_type
 
+  use psb_z_base_prec_mod
   
   type, extends(psb_z_base_prec_type) :: psb_z_null_prec_type
   contains
-    procedure, pass(prec) :: apply     => z_null_apply
-    procedure, pass(prec) :: precbld   => z_null_precbld
-    procedure, pass(prec) :: precinit  => z_null_precinit
-    procedure, pass(prec) :: precseti  => z_null_precseti
-    procedure, pass(prec) :: precsetr  => z_null_precsetr
-    procedure, pass(prec) :: precsetc  => z_null_precsetc
-    procedure, pass(prec) :: precfree  => z_null_precfree
-    procedure, pass(prec) :: precdescr => z_null_precdescr
-    procedure, pass(prec) :: sizeof    => z_null_sizeof
+    procedure, pass(prec) :: apply     => psb_z_null_apply
+    procedure, pass(prec) :: precbld   => psb_z_null_precbld
+    procedure, pass(prec) :: precinit  => psb_z_null_precinit
+    procedure, pass(prec) :: precseti  => psb_z_null_precseti
+    procedure, pass(prec) :: precsetr  => psb_z_null_precsetr
+    procedure, pass(prec) :: precsetc  => psb_z_null_precsetc
+    procedure, pass(prec) :: precfree  => psb_z_null_precfree
+    procedure, pass(prec) :: precdescr => psb_z_null_precdescr
+    procedure, pass(prec) :: sizeof    => psb_z_null_sizeof
   end type psb_z_null_prec_type
 
+  private :: psb_z_null_apply, psb_z_null_precbld, psb_z_null_precseti,&
+       & psb_z_null_precsetr, psb_z_null_precsetc, psb_z_null_sizeof,&
+       & psb_z_null_precinit, psb_z_null_precfree, psb_z_null_precdescr
+  
 
 contains
   
 
-  subroutine z_null_apply(alpha,prec,x,beta,y,desc_data,info,trans,work)
+  subroutine psb_z_null_apply(alpha,prec,x,beta,y,desc_data,info,trans,work)
     use psb_sparse_mod
     type(psb_desc_type),intent(in)    :: desc_data
     class(psb_z_null_prec_type), intent(in)  :: prec
@@ -70,10 +74,10 @@ contains
     end if
     return
 
-  end subroutine z_null_apply
+  end subroutine psb_z_null_apply
 
 
-  subroutine z_null_precinit(prec,info)
+  subroutine psb_z_null_precinit(prec,info)
     
     use psb_sparse_mod
     Implicit None
@@ -98,9 +102,9 @@ contains
       return
     end if
     return
-  end subroutine z_null_precinit
+  end subroutine psb_z_null_precinit
 
-  subroutine z_null_precbld(a,desc_a,prec,info,upd)
+  subroutine psb_z_null_precbld(a,desc_a,prec,info,upd)
     
     use psb_sparse_mod
     Implicit None
@@ -128,9 +132,9 @@ contains
       return
     end if
     return
-  end subroutine z_null_precbld
+  end subroutine psb_z_null_precbld
 
-  subroutine z_null_precseti(prec,what,val,info)
+  subroutine psb_z_null_precseti(prec,what,val,info)
     
     use psb_sparse_mod
     Implicit None
@@ -156,9 +160,9 @@ contains
       return
     end if
     return
-  end subroutine z_null_precseti
+  end subroutine psb_z_null_precseti
 
-  subroutine z_null_precsetr(prec,what,val,info)
+  subroutine psb_z_null_precsetr(prec,what,val,info)
     
     use psb_sparse_mod
     Implicit None
@@ -184,9 +188,9 @@ contains
       return
     end if
     return
-  end subroutine z_null_precsetr
+  end subroutine psb_z_null_precsetr
 
-  subroutine z_null_precsetc(prec,what,val,info)
+  subroutine psb_z_null_precsetc(prec,what,val,info)
     
     use psb_sparse_mod
     Implicit None
@@ -212,9 +216,9 @@ contains
       return
     end if
     return
-  end subroutine z_null_precsetc
+  end subroutine psb_z_null_precsetc
 
-  subroutine z_null_precfree(prec,info)
+  subroutine psb_z_null_precfree(prec,info)
     
     use psb_sparse_mod
     Implicit None
@@ -240,10 +244,10 @@ contains
     end if
     return
     
-  end subroutine z_null_precfree
+  end subroutine psb_z_null_precfree
   
 
-  subroutine z_null_precdescr(prec,iout)
+  subroutine psb_z_null_precdescr(prec,iout)
     
     use psb_sparse_mod
     Implicit None
@@ -278,9 +282,9 @@ contains
     end if
     return
     
-  end subroutine z_null_precdescr
+  end subroutine psb_z_null_precdescr
 
-  function z_null_sizeof(prec) result(val)
+  function psb_z_null_sizeof(prec) result(val)
     use psb_sparse_mod
     class(psb_z_null_prec_type), intent(in) :: prec
     integer(psb_long_int_k_) :: val
@@ -288,6 +292,6 @@ contains
     val = 0
 
     return
-  end function z_null_sizeof
+  end function psb_z_null_sizeof
 
 end module psb_z_nullprec
