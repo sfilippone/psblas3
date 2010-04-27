@@ -101,7 +101,8 @@ module psb_z_mat_mod
 
   private :: psb_z_get_nrows, psb_z_get_ncols, psb_z_get_nzeros, psb_z_get_size, &
        & psb_z_get_state, psb_z_get_dupl, psb_z_is_null, psb_z_is_bld, psb_z_is_upd, &
-       & psb_z_is_asb, psb_z_is_sorted, psb_z_is_upper, psb_z_is_lower, psb_z_is_triangle
+       & psb_z_is_asb, psb_z_is_sorted, psb_z_is_upper, psb_z_is_lower, psb_z_is_triangle,&
+       & psb_z_get_nz_row
 
   interface psb_sizeof
     module procedure psb_z_sizeof
