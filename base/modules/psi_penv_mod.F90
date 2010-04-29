@@ -92,6 +92,8 @@ contains
     psb_mpi_integer = mpi_integer
 #endif
 
+#if defined(SERIAL_MPI)
+#else 
     if (info == 0) call mpi_op_create(psi_iamx_op,.true.,mpi_iamx_op,info)
     if (info == 0) call mpi_op_create(psi_iamn_op,.true.,mpi_iamn_op,info)
     if (info == 0) call mpi_op_create(psi_i8amx_op,.true.,mpi_i8amx_op,info)
@@ -106,7 +108,7 @@ contains
     if (info == 0) call mpi_op_create(psi_zamn_op,.true.,mpi_zamn_op,info)
     if (info == 0) call mpi_op_create(psi_snrm2_op,.true.,mpi_snrm2_op,info)
     if (info == 0) call mpi_op_create(psi_dnrm2_op,.true.,mpi_dnrm2_op,info)
-
+#endif
   end subroutine psi_register_mpi_extras
 
 
@@ -327,11 +329,11 @@ contains
     if (present(errc)) then 
       code = errc
     else
-      core = -1 
+      code = -1 
     endif
 
 #if defined(SERIAL_MPI) 
-    stop code
+    stop 
 #else    
     call mpi_abort(ictxt,code,info)
 #endif    

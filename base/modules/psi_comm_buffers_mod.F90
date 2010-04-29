@@ -1,3 +1,25 @@
+#if defined(SERIAL_MPI)
+! Provide a fake mpi module just to keep the compiler(s) happy.
+module mpi
+  use psb_const_mod
+  integer, parameter :: mpi_success=0
+  integer, parameter :: mpi_request_null=0
+  integer, parameter :: mpi_status_size=1
+  integer, parameter :: mpi_integer          = 1
+  integer, parameter :: mpi_integer8         = 2
+  integer, parameter :: mpi_real             = 3
+  integer, parameter :: mpi_double_precision = 4
+  integer, parameter :: mpi_complex          = 5   
+  integer, parameter :: mpi_double_complex   = 6 
+  integer, parameter :: mpi_character        = 7
+  integer, parameter :: mpi_logical          = 8
+  integer, parameter :: mpi_comm_null        = -1
+  integer, parameter :: mpi_comm_world       = 1
+  
+  real(psb_dpk_), external :: mpi_wtime
+end module mpi
+#endif    
+
 module psi_comm_buffers_mod
   use psb_const_mod
 
