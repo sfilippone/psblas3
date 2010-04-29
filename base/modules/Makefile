@@ -5,7 +5,7 @@ UTIL_MODS = psb_string_mod.o \
 	psb_desc_type.o psb_sort_mod.o psb_serial_mod.o \
 	psb_base_tools_mod.o psb_s_tools_mod.o  psb_d_tools_mod.o\
 	psb_c_tools_mod.o  psb_z_tools_mod.o  psb_tools_mod.o \
-	psi_comm_buffers_mod.o psi_penv_mod.o psi_bcast_mod.o \
+	psb_penv_mod.o psi_comm_buffers_mod.o psi_penv_mod.o psi_bcast_mod.o \
 	psi_reduce_mod.o psi_p2p_mod.o psb_error_impl.o \
 	psb_linmap_type_mod.o psb_linmap_mod.o psb_comm_mod.o\
 	psb_s_psblas_mod.o psb_c_psblas_mod.o \

@@ -97,7 +97,8 @@
 Subroutine psb_dcgstab(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,istop)
   use psb_sparse_mod
   use psb_prec_mod
-  use psb_krylov_mod, psb_protect_name => psb_dcgstab
+  use psb_inner_krylov_mod
+  use psb_krylov_mod
   implicit none
   type(psb_d_sparse_mat), intent(in)  :: a
   

@@ -98,7 +98,8 @@
 subroutine psb_scg(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,istop,cond)
   use psb_sparse_mod
   use psb_prec_mod
-  use psb_krylov_mod, psb_protect_name => psb_scg
+  use psb_inner_krylov_mod
+  use psb_krylov_mod
   implicit none
 
 !!$  Parameters 

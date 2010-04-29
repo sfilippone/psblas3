@@ -428,7 +428,7 @@ if test "X$psblas_cv_fc" == X"nag" ; then
      F90COPT="$F90COPT -dcfuns -f2003 -wmismatch=mpi_scatterv,mpi_alltoallv,mpi_gatherv,mpi_allgatherv"
      EXTRA_OPT="-mismatch_all"
      F03COPT="${F90COPT}"
-     F03="nagfor"		
+     F03="${MPIFC}"		
 elif test "X$psblas_cv_fc" == X"xlf" ; then
      F03="xlf2003_r"	   
      F03COPT="-O3 -qarch=auto -qsuffix=f=f03:cpp=F03 $F03COPT"	
