@@ -108,7 +108,7 @@ subroutine psi_dswapdatam(flag,n,beta,y,desc_a,work,info,data)
   integer, pointer :: d_idx(:)
   character(len=20)  :: name
 
-  info = psb_success_
+  info=psb_success_
   name='psi_swap_data'
   call psb_erractionsave(err_act)
 
@@ -116,13 +116,13 @@ subroutine psi_dswapdatam(flag,n,beta,y,desc_a,work,info,data)
   icomm = psb_cd_get_mpic(desc_a)
   call psb_info(ictxt,me,np) 
   if (np == -1) then
-    info = psb_err_blacs_error_
+    info=psb_err_blacs_error_
     call psb_errpush(info,name)
     goto 9999
   endif
 
   if (.not.psb_is_asb_desc(desc_a)) then 
-    info = psb_err_invalid_cd_state_
+    info=psb_err_invalid_cd_state_
     call psb_errpush(info,name)
     goto 9999
   endif
@@ -193,13 +193,13 @@ subroutine psi_dswapidxm(ictxt,icomm,flag,n,beta,y,idx,totxch,totsnd,totrcv,work
 #endif
   character(len=20)  :: name
 
-  info = psb_success_
+  info=psb_success_
   name='psi_swap_data'
   call psb_erractionsave(err_act)
 
   call psb_info(ictxt,me,np) 
   if (np == -1) then
-    info = psb_err_blacs_error_
+    info=psb_err_blacs_error_
     call psb_errpush(info,name)
     goto 9999
   endif
@@ -356,7 +356,7 @@ subroutine psi_dswapidxm(ictxt,icomm,flag,n,beta,y,idx,totxch,totsnd,totrcv,work
       nesd = idx(pnti+nerv+psb_n_elem_send_)
       call psb_get_rank(prcid(i),ictxt,proc_to_comm)      
       if ((nerv>0).and.(proc_to_comm /= me)) then 
-        p2ptag = krecvid(ictxt,proc_to_comm,me)
+        p2ptag = psb_double_swap_tag
         call mpi_irecv(rcvbuf(rcv_pt),n*nerv,&
              & mpi_double_precision,prcid(i),&
              & p2ptag, icomm,rvhd(i),iret)
@@ -379,7 +379,7 @@ subroutine psi_dswapidxm(ictxt,icomm,flag,n,beta,y,idx,totxch,totsnd,totrcv,work
       nerv = idx(pnti+psb_n_elem_recv_)
       nesd = idx(pnti+nerv+psb_n_elem_send_)
 
-      p2ptag=ksendid(ictxt,proc_to_comm,me)
+      p2ptag=psb_double_swap_tag
       if ((nesd>0).and.(proc_to_comm /= me)) then 
         if (usersend) then 
           call mpi_rsend(sndbuf(snd_pt),n*nesd,&
@@ -412,7 +412,7 @@ subroutine psi_dswapidxm(ictxt,icomm,flag,n,beta,y,idx,totxch,totsnd,totrcv,work
       nerv = idx(pnti+psb_n_elem_recv_)
       nesd = idx(pnti+nerv+psb_n_elem_send_)
 
-      p2ptag = krecvid(ictxt,proc_to_comm,me)
+      p2ptag = psb_double_swap_tag
       
       if ((proc_to_comm /= me).and.(nerv>0)) then
         call mpi_wait(rvhd(i),p2pstat,iret)
@@ -597,20 +597,20 @@ subroutine psi_dswapdatav(flag,beta,y,desc_a,work,info,data)
   integer, pointer :: d_idx(:)
   character(len=20)  :: name
 
-  info = psb_success_
+  info=psb_success_
   name='psi_swap_datav'
   call psb_erractionsave(err_act)
 
   ictxt=psb_cd_get_context(desc_a)
   call psb_info(ictxt,me,np) 
   if (np == -1) then
-    info = psb_err_blacs_error_
+    info=psb_err_blacs_error_
     call psb_errpush(info,name)
     goto 9999
   endif
 
   if (.not.psb_is_asb_desc(desc_a)) then 
-    info = psb_err_invalid_cd_state_
+    info=psb_err_invalid_cd_state_
     call psb_errpush(info,name)
     goto 9999
   endif
@@ -684,13 +684,13 @@ subroutine psi_dswapidxv(ictxt,icomm,flag,beta,y,idx,totxch,totsnd,totrcv,work,i
 #endif
   character(len=20)  :: name
 
-  info = psb_success_
+  info=psb_success_
   name='psi_swap_datav'
   call psb_erractionsave(err_act)
 
   call psb_info(ictxt,me,np) 
   if (np == -1) then
-    info = psb_err_blacs_error_
+    info=psb_err_blacs_error_
     call psb_errpush(info,name)
     goto 9999
   endif
@@ -844,7 +844,7 @@ subroutine psi_dswapidxv(ictxt,icomm,flag,beta,y,idx,totxch,totsnd,totrcv,work,i
 
       call psb_get_rank(prcid(i),ictxt,proc_to_comm)      
       if ((nerv>0).and.(proc_to_comm /= me)) then 
-        p2ptag = krecvid(ictxt,proc_to_comm,me)
+        p2ptag = psb_double_swap_tag
         call mpi_irecv(rcvbuf(rcv_pt),nerv,&
              & mpi_double_precision,prcid(i),&
              & p2ptag, icomm,rvhd(i),iret)
@@ -866,7 +866,7 @@ subroutine psi_dswapidxv(ictxt,icomm,flag,beta,y,idx,totxch,totsnd,totrcv,work,i
       nerv = idx(pnti+psb_n_elem_recv_)
       nesd = idx(pnti+nerv+psb_n_elem_send_)
 
-      p2ptag=ksendid(ictxt,proc_to_comm,me)
+      p2ptag=psb_double_swap_tag
 
       if ((nesd>0).and.(proc_to_comm /= me)) then 
         if (usersend) then 
@@ -898,7 +898,7 @@ subroutine psi_dswapidxv(ictxt,icomm,flag,beta,y,idx,totxch,totsnd,totrcv,work,i
       nerv = idx(pnti+psb_n_elem_recv_)
       nesd = idx(pnti+nerv+psb_n_elem_send_)
 
-      p2ptag = krecvid(ictxt,proc_to_comm,me)
+      p2ptag =psb_double_swap_tag
 
       if ((proc_to_comm /= me).and.(nerv>0)) then
         call mpi_wait(rvhd(i),p2pstat,iret)

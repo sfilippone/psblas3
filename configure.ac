@@ -605,16 +605,16 @@ PAC_LAPACK(
 ###############################################################################
 #		BLACS library presence checks
 ###############################################################################
-AC_LANG([C])
-if test x"$pac_cv_serial_mpi" == x"no" ; then
-save_FC="$FC";
-save_CC="$CC";
-FC="$MPIFC";
-CC="$MPICC";
-PAC_CHECK_BLACS
-FC="$save_FC";
-CC="$save_CC";
-fi
+#AC_LANG([C])
+#if test x"$pac_cv_serial_mpi" == x"no" ; then
+#save_FC="$FC";
+#save_CC="$CC";
+#FC="$MPIFC";
+#CC="$MPICC";
+#PAC_CHECK_BLACS
+#FC="$save_FC";
+#CC="$save_CC";
+#fi
 
 PAC_MAKE_IS_GNUMAKE
 
@@ -705,7 +705,7 @@ AC_SUBST(INSTALL_INCLUDEDIR)
 AC_SUBST(INSTALL_DOCSDIR)
 
 AC_SUBST(BLAS_LIBS)
-AC_SUBST(BLACS_LIBS)
+#AC_SUBST(BLACS_LIBS)
 AC_SUBST(METIS_LIBS)
 AC_SUBST(LAPACK_LIBS)
 
@@ -714,7 +714,7 @@ AC_SUBST(FINCLUDES)
 
 if test "X$psblas_make_gnumake" == "Xyes" ; then
 PSBLASRULES='
-PSBLDLIBS=$(BLACS) $(LAPACK) $(BLAS) $(METIS_LIB) $(LIBS)
+PSBLDLIBS=$(LAPACK) $(BLAS) $(METIS_LIB) $(LIBS)
 CDEFINES=$(PSBCDEFINES)
 FDEFINES=$(PSBFDEFINES)
 # Warning : these rules are only valid with GNU make!
@@ -752,7 +752,7 @@ $(.mod).o:
 else
 
 PSBLASRULES='
-PSBLDLIBS=$(BLACS) $(LAPACK) $(BLAS) $(METIS_LIB) $(LIBS)
+PSBLDLIBS=$(LAPACK) $(BLAS) $(METIS_LIB) $(LIBS)
 CDEFINES=$(PSBCDEFINES)
 FDEFINES=$(PSBFDEFINES)
 	
@@ -828,7 +828,7 @@ dnl	FCFLAGS               : ${FCFLAGS}
 dnl	ESSL/PESSL            : ${psblas_cv_have_essl} / ${psblas_cv_have_pessl}
 
 	BLAS                  : ${BLAS_LIBS}
-	BLACS                 : ${BLACS_LIBS}
+dnl	BLACS                 : ${BLACS_LIBS}
 
 	METIS detected        : ${psblas_cv_have_metis}
 dnl	SuperLU detected      : ${psblas_cv_have_superlu}

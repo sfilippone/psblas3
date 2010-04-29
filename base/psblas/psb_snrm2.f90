@@ -61,7 +61,7 @@ function psb_snrm2(x, desc_a, info, jx)
   integer                  :: ictxt, np, me,&
        & err_act, iix, jjx, ndim, ix, ijx, i, m, id, idx, ndm 
   real(psb_spk_)         :: nrm2, snrm2, dd
-  external scombnrm2
+!!$  external scombnrm2
   character(len=20)        :: name, ch_err
 
   name='psb_snrm2'
@@ -73,7 +73,7 @@ function psb_snrm2(x, desc_a, info, jx)
 
   call psb_info(ictxt, me, np)
   if (np == -1) then
-    info = psb_err_blacs_error_
+    info=psb_err_blacs_error_
     call psb_errpush(info,name)
     goto 9999
   endif
@@ -118,7 +118,8 @@ function psb_snrm2(x, desc_a, info, jx)
     nrm2 = szero
   end if
 
-  call pstreecomb(ictxt,'All',1,nrm2,-1,-1,scombnrm2)
+!!$  call pstreecomb(ictxt,'All',1,nrm2,-1,-1,scombnrm2)
+  call psb_nrm2(ictxt,nrm2)
 
   psb_snrm2 = nrm2  
 
@@ -195,8 +196,8 @@ function psb_snrm2v(x, desc_a, info)
   integer                  :: ictxt, np, me,&
        & err_act, iix, jjx, ndim, ix, jx, i, m, id, idx, ndm
   real(psb_spk_)         :: nrm2, snrm2, dd
-  external scombnrm2
-  character(len=20)        :: name, ch_err
+!!$  external scombnrm2
+ character(len=20)        :: name, ch_err
 
   name='psb_snrm2v'
   if(psb_get_errstatus() /= 0) return 
@@ -207,7 +208,7 @@ function psb_snrm2v(x, desc_a, info)
 
   call psb_info(ictxt, me, np)
   if (np == -1) then
-    info = psb_err_blacs_error_
+    info=psb_err_blacs_error_
     call psb_errpush(info,name)
     goto 9999
   endif
@@ -247,7 +248,8 @@ function psb_snrm2v(x, desc_a, info)
     nrm2 = szero
   end if
 
-  call pstreecomb(ictxt,'All',1,nrm2,-1,-1,scombnrm2)
+!!$  call pstreecomb(ictxt,'All',1,nrm2,-1,-1,scombnrm2)
+  call psb_nrm2(ictxt,nrm2)
 
   psb_snrm2v = nrm2  
 
@@ -311,7 +313,10 @@ end function psb_snrm2v
 !    info   -  integer.                   Return code
 !
 subroutine psb_snrm2vs(res, x, desc_a, info)
-  use psb_sparse_mod, psb_protect_name => psb_snrm2vs
+  use psb_descriptor_type
+  use psb_check_mod
+  use psb_error_mod
+  use psb_penv_mod
   implicit none
 
   real(psb_spk_), intent(in)      :: x(:)
@@ -323,7 +328,7 @@ subroutine psb_snrm2vs(res, x, desc_a, info)
   integer                  :: ictxt, np, me,&
        & err_act, iix, jjx, ndim, ix, jx, i, m, id, idx, ndm
   real(psb_spk_)         :: nrm2, snrm2, dd
-  external scombnrm2
+!!$  external scombnrm2
   character(len=20)        :: name, ch_err
 
   name='psb_snrm2'
@@ -335,7 +340,7 @@ subroutine psb_snrm2vs(res, x, desc_a, info)
 
   call psb_info(ictxt, me, np)
   if (np == -1) then
-    info = psb_err_blacs_error_
+    info=psb_err_blacs_error_
     call psb_errpush(info,name)
     goto 9999
   endif
@@ -375,7 +380,8 @@ subroutine psb_snrm2vs(res, x, desc_a, info)
     nrm2 = szero
   end if
 
-  call pstreecomb(ictxt,'All',1,nrm2,-1,-1,scombnrm2)
+!!$  call pstreecomb(ictxt,'All',1,nrm2,-1,-1,scombnrm2)
+  call psb_nrm2(ictxt,nrm2)
 
   res = nrm2  
 

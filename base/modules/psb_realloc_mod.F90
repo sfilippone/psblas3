@@ -38,21 +38,25 @@ module psb_realloc_mod
   ! the size specified, possibly shortening it. 
   !
   Interface psb_realloc
-    module procedure psb_dreallocate1i
-    module procedure psb_dreallocate2i
-    module procedure psb_dreallocate2i1d
-    module procedure psb_dreallocate2i1s
-    module procedure psb_dreallocate1d
-    module procedure psb_dreallocate1s
-    module procedure psb_dreallocated2
-    module procedure psb_dreallocates2
-    module procedure psb_dreallocatei2
-    module procedure psb_dreallocate2i1z
-    module procedure psb_dreallocate2i1c
-    module procedure psb_dreallocate1z
-    module procedure psb_dreallocate1c
-    module procedure psb_dreallocatez2
-    module procedure psb_dreallocatec2
+    module procedure psb_reallocate1i
+    module procedure psb_reallocate2i
+    module procedure psb_reallocate2i1d
+    module procedure psb_reallocate2i1s
+    module procedure psb_reallocate1d
+    module procedure psb_reallocate1s
+    module procedure psb_reallocated2
+    module procedure psb_reallocates2
+    module procedure psb_reallocatei2
+#if ! defined(LONG_INTEGERS)
+    module procedure psb_reallocate1i8
+    module procedure psb_reallocatei8_2
+#endif
+    module procedure psb_reallocate2i1z
+    module procedure psb_reallocate2i1c
+    module procedure psb_reallocate1z
+    module procedure psb_reallocate1c
+    module procedure psb_reallocatez2
+    module procedure psb_reallocatec2
   end Interface
 
   interface psb_move_alloc
@@ -62,6 +66,10 @@ module psb_realloc_mod
     module procedure psb_dmove_alloc2d
     module procedure psb_imove_alloc1d
     module procedure psb_imove_alloc2d
+#if !defined(LONG_INTEGERS)
+    module procedure psb_i8move_alloc1d
+    module procedure psb_i8move_alloc2d
+#endif
     module procedure psb_cmove_alloc1d
     module procedure psb_cmove_alloc2d
     module procedure psb_zmove_alloc1d
@@ -91,12 +99,18 @@ module psb_realloc_mod
   !
   interface psb_ensure_size
     module procedure psb_icksz1d,&
+#if !defined(LONG_INTEGERS)
+         & psb_i8cksz1d, &
+#endif
          & psb_scksz1d, psb_ccksz1d, &
          & psb_dcksz1d, psb_zcksz1d
   end Interface
 
   interface psb_size
     module procedure psb_isize1d, psb_isize2d,&
+#if !defined(LONG_INTEGERS)
+         & psb_i8size1d, psb_i8size2d,&
+#endif
          & psb_ssize1d, psb_ssize2d,&
          & psb_csize1d, psb_csize2d,&
          & psb_dsize1d, psb_dsize2d,&
@@ -121,10 +135,10 @@ Contains
 
     name='psb_safe_ab_cpy'
     call psb_erractionsave(err_act)
-    info = psb_success_
+    info=psb_success_
 
     if (psb_get_errstatus() /= 0) then 
-      info = psb_err_from_subroutine_
+      info=psb_err_from_subroutine_
       goto 9999
     end if
 
@@ -172,10 +186,10 @@ Contains
 
     name='psb_safe_ab_cpy'
     call psb_erractionsave(err_act)
-    info = psb_success_
+    info=psb_success_
 
     if(psb_get_errstatus() /= 0) then 
-      info = psb_err_from_subroutine_
+      info=psb_err_from_subroutine_
       goto 9999
     end if
     if (allocated(vin)) then 
@@ -224,9 +238,9 @@ Contains
 
     name='psb_safe_ab_cpy'
     call psb_erractionsave(err_act)
-    info = psb_success_
+    info=psb_success_
     if(psb_get_errstatus() /= 0) then 
-      info = psb_err_from_subroutine_
+      info=psb_err_from_subroutine_
       goto 9999
     end if
 
@@ -274,9 +288,9 @@ Contains
 
     name='psb_safe_ab_cpy'
     call psb_erractionsave(err_act)
-    info = psb_success_
+    info=psb_success_
     if(psb_get_errstatus() /= 0) then 
-      info = psb_err_from_subroutine_
+      info=psb_err_from_subroutine_
       goto 9999
     end if
 
@@ -326,9 +340,9 @@ Contains
 
     name='psb_safe_ab_cpy'
     call psb_erractionsave(err_act)
-    info = psb_success_
+    info=psb_success_
     if(psb_get_errstatus() /= 0) then 
-      info = psb_err_from_subroutine_
+      info=psb_err_from_subroutine_
       goto 9999
     end if
 
@@ -376,9 +390,9 @@ Contains
 
     name='psb_safe_ab_cpy'
     call psb_erractionsave(err_act)
-    info = psb_success_
+    info=psb_success_
     if(psb_get_errstatus() /= 0) then 
-      info = psb_err_from_subroutine_
+      info=psb_err_from_subroutine_
       goto 9999
     end if
 
@@ -428,9 +442,9 @@ Contains
 
     name='psb_safe_ab_cpy'
     call psb_erractionsave(err_act)
-    info = psb_success_
+    info=psb_success_
     if(psb_get_errstatus() /= 0) then 
-      info = psb_err_from_subroutine_
+      info=psb_err_from_subroutine_
       goto 9999
     end if
 
@@ -478,9 +492,9 @@ Contains
 
     name='psb_safe_ab_cpy'
     call psb_erractionsave(err_act)
-    info = psb_success_
+    info=psb_success_
     if(psb_get_errstatus() /= 0) then 
-      info = psb_err_from_subroutine_
+      info=psb_err_from_subroutine_
       goto 9999
     end if
 
@@ -530,9 +544,9 @@ Contains
 
     name='psb_safe_ab_cpy'
     call psb_erractionsave(err_act)
-    info = psb_success_
+    info=psb_success_
     if(psb_get_errstatus() /= 0) then 
-      info = psb_err_from_subroutine_
+      info=psb_err_from_subroutine_
       goto 9999
     end if
     if (allocated(vin)) then 
@@ -579,9 +593,9 @@ Contains
 
     name='psb_safe_ab_cpy'
     call psb_erractionsave(err_act)
-    info = psb_success_
+    info=psb_success_
     if(psb_get_errstatus() /= 0) then 
-      info = psb_err_from_subroutine_
+      info=psb_err_from_subroutine_
       goto 9999
     end if
     if (allocated(vin)) then 
@@ -631,9 +645,9 @@ Contains
 
     name='psb_safe_cpy'
     call psb_erractionsave(err_act)
-    info = psb_success_
+    info=psb_success_
     if(psb_get_errstatus() /= 0) then 
-      info = psb_err_from_subroutine_
+      info=psb_err_from_subroutine_
       goto 9999
     end if
     isz = size(vin)
@@ -678,9 +692,9 @@ Contains
 
     name='psb_safe_cpy'
     call psb_erractionsave(err_act)
-    info = psb_success_
+    info=psb_success_
     if(psb_get_errstatus() /= 0) then 
-      info = psb_err_from_subroutine_
+      info=psb_err_from_subroutine_
       goto 9999
     end if
 
@@ -728,9 +742,9 @@ Contains
 
     name='psb_safe_cpy'
     call psb_erractionsave(err_act)
-    info = psb_success_
+    info=psb_success_
     if(psb_get_errstatus() /= 0) then 
-      info = psb_err_from_subroutine_
+      info=psb_err_from_subroutine_
       goto 9999
     end if
 
@@ -776,9 +790,9 @@ Contains
 
     name='psb_safe_cpy'
     call psb_erractionsave(err_act)
-    info = psb_success_
+    info=psb_success_
     if(psb_get_errstatus() /= 0) then 
-      info = psb_err_from_subroutine_
+      info=psb_err_from_subroutine_
       goto 9999
     end if
 
@@ -826,9 +840,9 @@ Contains
 
     name='psb_safe_cpy'
     call psb_erractionsave(err_act)
-    info = psb_success_
+    info=psb_success_
     if(psb_get_errstatus() /= 0) then 
-      info = psb_err_from_subroutine_
+      info=psb_err_from_subroutine_
       goto 9999
     end if
     isz = size(vin)
@@ -873,9 +887,9 @@ Contains
 
     name='psb_safe_cpy'
     call psb_erractionsave(err_act)
-    info = psb_success_
+    info=psb_success_
     if(psb_get_errstatus() /= 0) then 
-      info = psb_err_from_subroutine_
+      info=psb_err_from_subroutine_
       goto 9999
     end if
 
@@ -923,9 +937,9 @@ Contains
 
     name='psb_safe_cpy'
     call psb_erractionsave(err_act)
-    info = psb_success_
+    info=psb_success_
     if(psb_get_errstatus() /= 0) then 
-      info = psb_err_from_subroutine_
+      info=psb_err_from_subroutine_
       goto 9999
     end if
 
@@ -971,9 +985,9 @@ Contains
 
     name='psb_safe_cpy'
     call psb_erractionsave(err_act)
-    info = psb_success_
+    info=psb_success_
     if(psb_get_errstatus() /= 0) then 
-      info = psb_err_from_subroutine_
+      info=psb_err_from_subroutine_
       goto 9999
     end if
 
@@ -1021,9 +1035,9 @@ Contains
 
     name='psb_safe_cpy'
     call psb_erractionsave(err_act)
-    info = psb_success_
+    info=psb_success_
     if(psb_get_errstatus() /= 0) then 
-      info = psb_err_from_subroutine_
+      info=psb_err_from_subroutine_
       goto 9999
     end if
     isz = size(vin)
@@ -1069,9 +1083,9 @@ Contains
     name='psb_safe_cpy'
     call psb_erractionsave(err_act)
 
-    info = psb_success_
+    info=psb_success_
     if(psb_get_errstatus() /= 0) then 
-      info = psb_err_from_subroutine_
+      info=psb_err_from_subroutine_
       goto 9999
     end if
     isz1 = size(vin,1)
@@ -1114,6 +1128,7 @@ Contains
       psb_isize1d = size(vin)
     end if
   end function psb_isize1d
+
   function psb_isize2d(vin,dim)
     integer :: psb_isize2d
     integer, allocatable, intent(in) :: vin(:,:)
@@ -1131,6 +1146,37 @@ Contains
       end if
     end if
   end function psb_isize2d
+  
+#if !defined(LONG_INTEGERS)  
+  function psb_i8size1d(vin)
+    integer :: psb_i8size1d
+    integer(psb_long_int_k_), allocatable, intent(in) :: vin(:)
+    
+    if (.not.allocated(vin)) then 
+      psb_i8size1d = 0
+    else
+      psb_i8size1d = size(vin)
+    end if
+  end function psb_i8size1d
+
+  function psb_i8size2d(vin,dim)
+    integer :: psb_i8size2d
+    integer(psb_long_int_k_), allocatable, intent(in) :: vin(:,:)
+    integer, optional :: dim
+    integer :: dim_
+
+    if (.not.allocated(vin)) then 
+      psb_i8size2d = 0
+    else
+      if (present(dim)) then 
+        dim_= dim
+        psb_i8size2d = size(vin,dim=dim_)
+      else
+        psb_i8size2d = size(vin)
+      end if
+    end if
+  end function psb_i8size2d
+#endif
   
   function psb_ssize1d(vin)
     integer :: psb_ssize1d
@@ -1271,7 +1317,7 @@ Contains
     info=psb_success_
 
     if(psb_get_errstatus() /= 0) then 
-      info = psb_err_from_subroutine_
+      info=psb_err_from_subroutine_
       goto 9999
     end if
     
@@ -1310,6 +1356,64 @@ Contains
 
   End Subroutine psb_icksz1d
 
+#if !defined(LONG_INTEGERS)
+  Subroutine psb_i8cksz1d(len,v,info,pad,addsz,newsz)
+    use psb_error_mod
+
+    ! ...Subroutine Arguments  
+    Integer,Intent(in)                 :: len
+    Integer(psb_long_int_k_),allocatable, intent(inout) :: v(:)
+    integer         :: info
+    integer(psb_long_int_k_), optional, intent(in) :: pad
+    integer, optional, intent(in) :: addsz,newsz
+    ! ...Local Variables
+    character(len=20)  :: name
+    logical, parameter :: debug=.false.
+    integer :: isz, err_act
+
+    name='psb_ensure_size'
+    call psb_erractionsave(err_act)
+    info=psb_success_
+
+    if(psb_get_errstatus() /= 0) then 
+      info=psb_err_from_subroutine_
+      goto 9999
+    end if
+    
+    If (len > psb_size(v)) Then
+      if (present(newsz)) then 
+        isz = (max(len+1,newsz))
+      else
+        if (present(addsz)) then 
+          isz = len+max(1,addsz)
+        else
+          isz = max(len+10, int(1.25*len))
+        endif
+      endif
+      call psb_realloc(isz,v,info,pad=pad)
+      
+      if (info /= psb_success_) then
+        info=psb_err_from_subroutine_
+        call psb_errpush(info,name,a_err='psb_realloc')
+        goto 9999
+      end if
+    end If
+
+    call psb_erractionrestore(err_act)
+    return
+
+9999 continue
+    call psb_erractionrestore(err_act)
+
+    if (err_act == psb_act_ret_) then
+      return
+    else
+      call psb_error()
+    end if
+    return
+
+  End Subroutine psb_i8cksz1d
+#endif
 
   Subroutine psb_scksz1d(len,v,info,pad,addsz,newsz)
     use psb_error_mod
@@ -1330,7 +1434,7 @@ Contains
     info=psb_success_
 
     if(psb_get_errstatus() /= 0) then 
-      info = psb_err_from_subroutine_
+      info=psb_err_from_subroutine_
       goto 9999
     end if
     
@@ -1388,7 +1492,7 @@ Contains
     info=psb_success_
 
     if(psb_get_errstatus() /= 0) then 
-      info = psb_err_from_subroutine_
+      info=psb_err_from_subroutine_
       goto 9999
     end if
     
@@ -1447,7 +1551,7 @@ Contains
     info=psb_success_
 
     if(psb_get_errstatus() /= 0) then 
-      info = psb_err_from_subroutine_
+      info=psb_err_from_subroutine_
       goto 9999
     end if
     
@@ -1505,7 +1609,7 @@ Contains
     info=psb_success_
 
     if(psb_get_errstatus() /= 0) then 
-      info = psb_err_from_subroutine_
+      info=psb_err_from_subroutine_
       goto 9999
     end if
     
@@ -1544,7 +1648,7 @@ Contains
   End Subroutine psb_zcksz1d
 
 
-  Subroutine psb_dreallocate1i(len,rrax,info,pad,lb)
+  Subroutine psb_reallocate1i(len,rrax,info,pad,lb)
     use psb_error_mod
 
     ! ...Subroutine Arguments  
@@ -1559,14 +1663,14 @@ Contains
     character(len=20)  :: name
     logical, parameter :: debug=.false.
 
-    name='psb_dreallocate1i' 
+    name='psb_reallocate1i' 
     call psb_erractionsave(err_act)
     info=psb_success_
 
     if (debug) write(0,*) 'reallocate I',len
     if (psb_get_errstatus() /= 0) then 
       if (debug) write(0,*) 'reallocate errstatus /= 0'
-      info = psb_err_from_subroutine_
+      info=psb_err_from_subroutine_
       goto 9999
     end if
 
@@ -1625,10 +1729,93 @@ Contains
     return
 
 
-  End Subroutine psb_dreallocate1i
+  End Subroutine psb_reallocate1i
+
+  Subroutine psb_reallocate1i8(len,rrax,info,pad,lb)
+    use psb_error_mod
+
+    ! ...Subroutine Arguments  
+    Integer,Intent(in)                 :: len
+    Integer(psb_long_int_k_),allocatable, intent(inout) :: rrax(:)
+    integer         :: info
+    integer(psb_long_int_k_), optional, intent(in) :: pad
+    integer, optional, intent(in) :: lb
+    ! ...Local Variables
+    Integer(psb_long_int_k_),allocatable  :: tmp(:)
+    Integer :: dim, err_act, err,lb_, lbi, ub_
+    character(len=20)  :: name
+    logical, parameter :: debug=.false.
+
+    name='psb_reallocate1i' 
+    call psb_erractionsave(err_act)
+    info=psb_success_
+
+    if (debug) write(0,*) 'reallocate I',len
+    if (psb_get_errstatus() /= 0) then 
+      if (debug) write(0,*) 'reallocate errstatus /= 0'
+      info=psb_err_from_subroutine_
+      goto 9999
+    end if
+
+    if (present(lb)) then
+      lb_ = lb
+    else
+      lb_ = 1
+    endif
+    if ((len<0)) then 
+      err=4025
+      call psb_errpush(err,name,i_err=(/len,0,0,0,0/),a_err='integer')
+      goto 9999
+    end if
+    ub_ = lb_+len-1
+    if (debug) write(0,*) 'reallocate : lb ub ',lb_, ub_
+    if (allocated(rrax)) then 
+      dim = size(rrax)
+      lbi = lbound(rrax,1) 
+      If ((dim /= len).or.(lbi /= lb_))  Then
+        Allocate(tmp(lb_:ub_),stat=info)
+        if (info /= psb_success_) then
+          err=4025
+          call psb_errpush(err,name,i_err=(/len,0,0,0,0/),a_err='integer')
+          goto 9999
+        end if
+        tmp(lb_:lb_-1+min(len,dim))=rrax(lbi:lbi-1+min(len,dim))
+        if (debug) write(0,*) 'reallocate : calling move_alloc '
+        call psb_move_alloc(tmp,rrax,info)
+        if (debug) write(0,*) 'reallocate : from move_alloc ',info
+      end if
+    else
+      dim = 0
+      allocate(rrax(lb_:ub_),stat=info)
+      if (info /= psb_success_) then
+        err=4025
+        call psb_errpush(err,name,i_err=(/len,0,0,0,0/),a_err='integer')
+        goto 9999
+      end if
+    endif
+    if (present(pad)) then 
+      rrax(lb_-1+dim+1:lb_-1+len) = pad
+    endif
+    if (debug) write(0,*) 'end reallocate : ',info
+    call psb_erractionrestore(err_act)
+    return
+
+9999 continue
+    info = err
+    call psb_erractionrestore(err_act)
+
+    if (err_act == psb_act_ret_) then
+      return
+    else
+      call psb_error()
+    end if
+    return
 
 
-  Subroutine psb_dreallocate1s(len,rrax,info,pad,lb)
+  End Subroutine psb_reallocate1i8
+
+
+  Subroutine psb_reallocate1s(len,rrax,info,pad,lb)
     use psb_error_mod
 
     ! ...Subroutine Arguments  
@@ -1644,9 +1831,9 @@ Contains
     character(len=20)  :: name
     logical, parameter :: debug=.false.
 
-    name='psb_dreallocate1s'
+    name='psb_reallocate1s'
     call psb_erractionsave(err_act)
-    info = psb_success_
+    info=psb_success_ 
     if (debug) write(0,*) 'reallocate S',len
 
     if (present(lb)) then
@@ -1700,9 +1887,9 @@ Contains
     end if
     return
 
-  End Subroutine psb_dreallocate1s
+  End Subroutine psb_reallocate1s
 
-  Subroutine psb_dreallocate1d(len,rrax,info,pad,lb)
+  Subroutine psb_reallocate1d(len,rrax,info,pad,lb)
     use psb_error_mod
 
     ! ...Subroutine Arguments  
@@ -1718,9 +1905,9 @@ Contains
     character(len=20)  :: name
     logical, parameter :: debug=.false.
 
-    name='psb_dreallocate1d'
+    name='psb_reallocate1d'
     call psb_erractionsave(err_act)
-    info = psb_success_
+    info=psb_success_ 
     if (debug) write(0,*) 'reallocate D',len
 
     if (present(lb)) then
@@ -1774,10 +1961,10 @@ Contains
     end if
     return
 
-  End Subroutine psb_dreallocate1d
+  End Subroutine psb_reallocate1d
 
 
-  Subroutine psb_dreallocate1c(len,rrax,info,pad,lb)
+  Subroutine psb_reallocate1c(len,rrax,info,pad,lb)
     use psb_error_mod
 
     ! ...Subroutine Arguments  
@@ -1793,9 +1980,9 @@ Contains
     character(len=20)  :: name
     logical, parameter :: debug=.false.
 
-    name='psb_dreallocate1c'
+    name='psb_reallocate1c'
     call psb_erractionsave(err_act)
-    info = psb_success_
+    info=psb_success_
     if (debug) write(0,*) 'reallocate C',len    
     if (present(lb)) then
       lb_ = lb
@@ -1848,9 +2035,9 @@ Contains
     end if
     return
 
-  End Subroutine psb_dreallocate1c
+  End Subroutine psb_reallocate1c
 
-  Subroutine psb_dreallocate1z(len,rrax,info,pad,lb)
+  Subroutine psb_reallocate1z(len,rrax,info,pad,lb)
     use psb_error_mod
 
     ! ...Subroutine Arguments  
@@ -1866,9 +2053,9 @@ Contains
     character(len=20)  :: name
     logical, parameter :: debug=.false.
 
-    name='psb_dreallocate1z'
+    name='psb_reallocate1z'
     call psb_erractionsave(err_act)
-    info = psb_success_
+    info=psb_success_
     if (debug) write(0,*) 'reallocate Z',len    
     if (present(lb)) then
       lb_ = lb
@@ -1921,11 +2108,11 @@ Contains
     end if
     return
 
-  End Subroutine psb_dreallocate1z
+  End Subroutine psb_reallocate1z
 
 
 
-  Subroutine psb_dreallocates2(len1,len2,rrax,info,pad,lb1,lb2)
+  Subroutine psb_reallocates2(len1,len2,rrax,info,pad,lb1,lb2)
     use psb_error_mod
     ! ...Subroutine Arguments  
     Integer,Intent(in) :: len1,len2
@@ -1941,9 +2128,9 @@ Contains
          & lbi1, lbi2
     character(len=20)  :: name
 
-    name='psb_dreallocates2'
+    name='psb_reallocates2'
     call psb_erractionsave(err_act)
-    info = psb_success_
+    info=psb_success_ 
     if (present(lb1)) then 
       lb1_ = lb1
     else
@@ -2014,10 +2201,10 @@ Contains
     end if
     return
 
-  End Subroutine psb_dreallocates2
+  End Subroutine psb_reallocates2
 
 
-  Subroutine psb_dreallocated2(len1,len2,rrax,info,pad,lb1,lb2)
+  Subroutine psb_reallocated2(len1,len2,rrax,info,pad,lb1,lb2)
     use psb_error_mod
     ! ...Subroutine Arguments  
     Integer,Intent(in) :: len1,len2
@@ -2033,9 +2220,9 @@ Contains
          & lbi1, lbi2
     character(len=20)  :: name
 
-    name='psb_dreallocated2'
+    name='psb_reallocated2'
     call psb_erractionsave(err_act)
-    info = psb_success_
+    info=psb_success_ 
     if (present(lb1)) then 
       lb1_ = lb1
     else
@@ -2106,10 +2293,10 @@ Contains
     end if
     return
 
-  End Subroutine psb_dreallocated2
+  End Subroutine psb_reallocated2
 
 
-  Subroutine psb_dreallocatec2(len1,len2,rrax,info,pad,lb1,lb2)
+  Subroutine psb_reallocatec2(len1,len2,rrax,info,pad,lb1,lb2)
     use psb_error_mod
     ! ...Subroutine Arguments  
     Integer,Intent(in) :: len1,len2
@@ -2125,9 +2312,9 @@ Contains
          & lbi1, lbi2
     character(len=20)  :: name
 
-    name='psb_dreallocatec2'
+    name='psb_reallocatec2'
     call psb_erractionsave(err_act)
-    info = psb_success_
+    info=psb_success_ 
     if (present(lb1)) then 
       lb1_ = lb1
     else
@@ -2199,9 +2386,9 @@ Contains
     end if
     return
 
-  End Subroutine psb_dreallocatec2
+  End Subroutine psb_reallocatec2
 
-  Subroutine psb_dreallocatez2(len1,len2,rrax,info,pad,lb1,lb2)
+  Subroutine psb_reallocatez2(len1,len2,rrax,info,pad,lb1,lb2)
     use psb_error_mod
     ! ...Subroutine Arguments  
     Integer,Intent(in) :: len1,len2
@@ -2217,9 +2404,9 @@ Contains
          & lbi1, lbi2
     character(len=20)  :: name
 
-    name='psb_dreallocatez2'
+    name='psb_reallocatez2'
     call psb_erractionsave(err_act)
-    info = psb_success_
+    info=psb_success_ 
     if (present(lb1)) then 
       lb1_ = lb1
     else
@@ -2291,10 +2478,10 @@ Contains
     end if
     return
 
-  End Subroutine psb_dreallocatez2
+  End Subroutine psb_reallocatez2
 
 
-  Subroutine psb_dreallocatei2(len1,len2,rrax,info,pad,lb1,lb2)
+  Subroutine psb_reallocatei2(len1,len2,rrax,info,pad,lb1,lb2)
     use psb_error_mod
     ! ...Subroutine Arguments  
     Integer,Intent(in) :: len1,len2
@@ -2309,9 +2496,9 @@ Contains
          & lbi1, lbi2
     character(len=20)  :: name
 
-    name='psb_dreallocatei2'
+    name='psb_reallocatei2'
     call psb_erractionsave(err_act)
-    info = psb_success_
+    info=psb_success_ 
     if (present(lb1)) then 
       lb1_ = lb1
     else
@@ -2382,9 +2569,101 @@ Contains
     end if
     return
 
-  End Subroutine psb_dreallocatei2
+  End Subroutine psb_reallocatei2
 
-  Subroutine psb_dreallocate2i(len,rrax,y,info,pad)
+#if !defined(LONG_INTEGERS)
+  Subroutine psb_reallocatei8_2(len1,len2,rrax,info,pad,lb1,lb2)
+    use psb_error_mod
+    ! ...Subroutine Arguments  
+    Integer,Intent(in) :: len1,len2
+    integer(psb_long_int_k_),allocatable :: rrax(:,:)
+    integer :: info
+    integer(psb_long_int_k_), optional, intent(in) :: pad
+    Integer,Intent(in), optional  :: lb1,lb2
+
+    ! ...Local Variables
+    integer(psb_long_int_k_),allocatable  :: tmp(:,:)
+    Integer :: dim,err_act,err, dim2,lb1_, lb2_, ub1_, ub2_,&
+         & lbi1, lbi2
+    character(len=20)  :: name
+
+    name='psb_reallocatei2'
+    call psb_erractionsave(err_act)
+    info=psb_success_ 
+    if (present(lb1)) then 
+      lb1_ = lb1
+    else
+      lb1_ = 1
+    endif
+    if (present(lb2)) then 
+      lb2_ = lb2
+    else
+      lb2_ = 1
+    endif
+    ub1_ = lb1_ + len1 -1
+    ub2_ = lb2_ + len2 -1
+
+    if (len1 < 0) then
+      err=4025
+      call psb_errpush(err,name,i_err=(/len1,0,0,0,0/),a_err='integer')
+      goto 9999
+    end if
+    if (len2 < 0) then
+      err=4025
+      call psb_errpush(err,name,i_err=(/len2,0,0,0,0/),a_err='integer')
+      goto 9999
+    end if
+
+    if (allocated(rrax)) then 
+      dim  = size(rrax,1)
+      lbi1 = lbound(rrax,1)
+      dim2 = size(rrax,2)
+      lbi2 = lbound(rrax,2)
+      If ((dim /= len1).or.(dim2 /= len2).or.(lbi1 /= lb1_)&
+           &  .or.(lbi2 /= lb2_)) Then
+        Allocate(tmp(lb1_:ub1_,lb2_:ub2_),stat=info)
+        if (info /= psb_success_) then
+          err=4025
+          call psb_errpush(err,name,i_err=(/len1*len2,0,0,0,0/),a_err='integer')
+          goto 9999
+        end if
+        tmp(lb1_:lb1_-1+min(len1,dim),lb2_:lb2_-1+min(len2,dim2)) = &
+             & rrax(lbi1:lbi1-1+min(len1,dim),lbi2:lbi2-1+min(len2,dim2))
+        call psb_move_alloc(tmp,rrax,info)
+      End If
+    else
+      dim  = 0
+      dim2 = 0
+      Allocate(rrax(lb1_:ub1_,lb2_:ub2_),stat=info)
+      if (info /= psb_success_) then
+        err=4025
+        call psb_errpush(err,name,i_err=(/len1*len2,0,0,0,0/),a_err='integer')
+        goto 9999
+      end if
+    endif
+    if (present(pad)) then 
+      rrax(lb1_-1+dim+1:lb1_-1+len1,:) = pad
+      rrax(lb1_:lb1_-1+dim,lb2_-1+dim2+1:lb2_-1+len2) = pad
+    endif
+
+    call psb_erractionrestore(err_act)
+    return
+
+9999 continue
+    info = err
+    call psb_erractionrestore(err_act)
+
+    if (err_act == psb_act_ret_) then
+      return
+    else
+      call psb_error()
+    end if
+    return
+
+  End Subroutine psb_reallocatei8_2
+#endif
+
+  Subroutine psb_reallocate2i(len,rrax,y,info,pad)
     use psb_error_mod
     ! ...Subroutine Arguments  
 
@@ -2395,22 +2674,22 @@ Contains
     character(len=20)  :: name
     integer :: err_act, err
 
-    name='psb_dreallocate2i'
+    name='psb_reallocate2i'
     call psb_erractionsave(err_act)
     info=psb_success_
 
     if(psb_get_errstatus() /= 0) then 
-      info = psb_err_from_subroutine_
+      info=psb_err_from_subroutine_
       goto 9999
     end if
 
-    call psb_dreallocate1i(len,rrax,info,pad=pad)
+    call psb_reallocate1i(len,rrax,info,pad=pad)
     if (info /= psb_success_) then
       err=4000
       call psb_errpush(err,name)
       goto 9999
     end if
-    call psb_dreallocate1i(len,y,info,pad=pad)
+    call psb_reallocate1i(len,y,info,pad=pad)
     if (info /= psb_success_) then
       err=4000
       call psb_errpush(err,name)
@@ -2429,12 +2708,12 @@ Contains
     end if
     return
 
-  End Subroutine psb_dreallocate2i
+  End Subroutine psb_reallocate2i
 
 
 
 
-  Subroutine psb_dreallocate2i1s(len,rrax,y,z,info)
+  Subroutine psb_reallocate2i1s(len,rrax,y,z,info)
     use psb_error_mod
     ! ...Subroutine Arguments  
     Integer,Intent(in) :: len
@@ -2445,11 +2724,11 @@ Contains
     integer :: err_act, err
     logical, parameter :: debug=.false.
 
-    name='psb_dreallocate2i1s'
+    name='psb_reallocate2i1s'
     call psb_erractionsave(err_act)
 
 
-    info = psb_success_
+    info=psb_success_
     call psb_realloc(len,rrax,info)
     if (info /= psb_success_) then
       err=4000
@@ -2480,10 +2759,10 @@ Contains
       call psb_error()
     end if
     return
-  End Subroutine psb_dreallocate2i1s
+  End Subroutine psb_reallocate2i1s
 
 
-  Subroutine psb_dreallocate2i1d(len,rrax,y,z,info)
+  Subroutine psb_reallocate2i1d(len,rrax,y,z,info)
     use psb_error_mod
     ! ...Subroutine Arguments  
     Integer,Intent(in) :: len
@@ -2493,10 +2772,10 @@ Contains
     character(len=20)  :: name
     integer :: err_act, err
 
-    name='psb_dreallocate2i1d'
+    name='psb_reallocate2i1d'
     call psb_erractionsave(err_act)
 
-    info = psb_success_
+    info=psb_success_
 
     call psb_realloc(len,rrax,info)
     if (info /= psb_success_) then
@@ -2528,11 +2807,11 @@ Contains
       call psb_error()
     end if
     return
-  End Subroutine psb_dreallocate2i1d
+  End Subroutine psb_reallocate2i1d
 
 
 
-  Subroutine psb_dreallocate2i1c(len,rrax,y,z,info)
+  Subroutine psb_reallocate2i1c(len,rrax,y,z,info)
     use psb_error_mod
     ! ...Subroutine Arguments  
     Integer,Intent(in) :: len
@@ -2542,11 +2821,11 @@ Contains
     character(len=20)  :: name
     integer :: err_act, err
 
-    name='psb_dreallocate2i1c'
+    name='psb_reallocate2i1c'
     call psb_erractionsave(err_act)
 
 
-    info = psb_success_
+    info=psb_success_
     call psb_realloc(len,rrax,info)
     if (info /= psb_success_) then
       err=4000
@@ -2577,9 +2856,9 @@ Contains
       call psb_error()
     end if
     return
-  End Subroutine psb_dreallocate2i1c
+  End Subroutine psb_reallocate2i1c
 
-  Subroutine psb_dreallocate2i1z(len,rrax,y,z,info)
+  Subroutine psb_reallocate2i1z(len,rrax,y,z,info)
     use psb_error_mod
     ! ...Subroutine Arguments  
     Integer,Intent(in) :: len
@@ -2589,10 +2868,10 @@ Contains
     character(len=20)  :: name
     integer :: err_act, err
 
-    name='psb_dreallocate2i1z'
+    name='psb_reallocate2i1z'
     call psb_erractionsave(err_act)
 
-    info = psb_success_
+    info=psb_success_
     call psb_realloc(len,rrax,info)
     if (info /= psb_success_) then
       err=4000
@@ -2623,7 +2902,7 @@ Contains
       call psb_error()
     end if
     return
-  End Subroutine psb_dreallocate2i1z
+  End Subroutine psb_reallocate2i1z
 
   Subroutine psb_smove_alloc1d(vin,vout,info)
     use psb_error_mod
@@ -2631,9 +2910,26 @@ Contains
     integer, intent(out) :: info 
     !
     ! 
-    info = psb_success_
-    call move_alloc(vin,vout)
+    info=psb_success_
+#ifdef HAVE_MOVE_ALLOC    
+    
+    if (allocated(vin)) then 
+      call move_alloc(vin,vout)
+    else if (allocated(vout)) then 
+!!$      write(0,*) 'move_alloc: Clearing output'
+      deallocate(vout)
+    end if
 
+#else      
+    if (allocated(vout)) then 
+      deallocate(vout,stat=info)
+    end if    
+    if (.not.allocated(vin) ) return
+    allocate(vout(lbound(vin,1):ubound(vin,1)),stat=info)
+    if (info /= psb_success_) return
+    vout = vin
+    deallocate(vin,stat=info)
+#endif
   end Subroutine psb_smove_alloc1d
 
   Subroutine psb_smove_alloc2d(vin,vout,info)
@@ -2642,9 +2938,25 @@ Contains
     integer, intent(out) :: info 
     !
     ! 
-    info = psb_success_
-    call move_alloc(vin,vout)
-
+    info=psb_success_
+#ifdef HAVE_MOVE_ALLOC
+    if (allocated(vin)) then 
+      call move_alloc(vin,vout)
+    else if (allocated(vout)) then 
+      deallocate(vout)
+    end if
+#else
+    if (allocated(vout)) then 
+      deallocate(vout,stat=info)
+    end if    
+    if (.not.allocated(vin) ) return
+    
+    allocate(vout(lbound(vin,1):ubound(vin,1),&
+         & lbound(vin,2):ubound(vin,2)),stat=info)
+    if (info /= psb_success_) return
+    vout = vin
+    deallocate(vin,stat=info)
+#endif
   end Subroutine psb_smove_alloc2d
 
   Subroutine psb_dmove_alloc1d(vin,vout,info)
@@ -2653,9 +2965,26 @@ Contains
     integer, intent(out) :: info 
     !
     ! 
-    info = psb_success_
-    call move_alloc(vin,vout)
+    info=psb_success_
+#ifdef HAVE_MOVE_ALLOC    
+    
+    if (allocated(vin)) then 
+      call move_alloc(vin,vout)
+    else if (allocated(vout)) then 
+!!$      write(0,*) 'move_alloc: Clearing output'
+      deallocate(vout)
+    end if
 
+#else      
+    if (allocated(vout)) then 
+      deallocate(vout,stat=info)
+    end if    
+    if (.not.allocated(vin) ) return
+    allocate(vout(lbound(vin,1):ubound(vin,1)),stat=info)
+    if (info /= psb_success_) return
+    vout = vin
+    deallocate(vin,stat=info)
+#endif
   end Subroutine psb_dmove_alloc1d
 
   Subroutine psb_dmove_alloc2d(vin,vout,info)
@@ -2664,9 +2993,25 @@ Contains
     integer, intent(out) :: info 
     !
     ! 
-    info = psb_success_
-    call move_alloc(vin,vout)
-
+    info=psb_success_
+#ifdef HAVE_MOVE_ALLOC
+    if (allocated(vin)) then 
+      call move_alloc(vin,vout)
+    else if (allocated(vout)) then 
+      deallocate(vout)
+    end if
+#else
+    if (allocated(vout)) then 
+      deallocate(vout,stat=info)
+    end if    
+    if (.not.allocated(vin) ) return
+    
+    allocate(vout(lbound(vin,1):ubound(vin,1),&
+         & lbound(vin,2):ubound(vin,2)),stat=info)
+    if (info /= psb_success_) return
+    vout = vin
+    deallocate(vin,stat=info)
+#endif
   end Subroutine psb_dmove_alloc2d
 
   Subroutine psb_cmove_alloc1d(vin,vout,info)
@@ -2675,9 +3020,23 @@ Contains
     integer, intent(out) :: info 
     !
     ! 
-    info = psb_success_
-    call move_alloc(vin,vout)
-
+    info=psb_success_
+#ifdef HAVE_MOVE_ALLOC
+    if (allocated(vin)) then 
+      call move_alloc(vin,vout)
+    else if (allocated(vout)) then 
+      deallocate(vout)
+    end if
+#else
+    if (allocated(vout)) then 
+      deallocate(vout,stat=info)
+    end if    
+    if (.not.allocated(vin) ) return
+    allocate(vout(lbound(vin,1):ubound(vin,1)),stat=info)
+    if (info /= psb_success_) return
+    vout = vin
+    deallocate(vin,stat=info)
+#endif
   end Subroutine psb_cmove_alloc1d
 
   Subroutine psb_cmove_alloc2d(vin,vout,info)
@@ -2686,9 +3045,25 @@ Contains
     integer, intent(out) :: info 
     !
     ! 
-    info = psb_success_
-    call move_alloc(vin,vout)
-
+    info=psb_success_
+#ifdef HAVE_MOVE_ALLOC
+    if (allocated(vin)) then 
+      call move_alloc(vin,vout)
+    else if (allocated(vout)) then 
+      deallocate(vout)
+    end if
+#else
+    if (allocated(vout)) then 
+      deallocate(vout,stat=info)
+    end if    
+    if (.not.allocated(vin) ) return
+    
+    allocate(vout(lbound(vin,1):ubound(vin,1),&
+         & lbound(vin,2):ubound(vin,2)),stat=info)
+    if (info /= psb_success_) return
+    vout = vin
+    deallocate(vin,stat=info)
+#endif
   end Subroutine psb_cmove_alloc2d
 
   Subroutine psb_zmove_alloc1d(vin,vout,info)
@@ -2697,9 +3072,23 @@ Contains
     integer, intent(out) :: info 
     !
     ! 
-    info = psb_success_
-    call move_alloc(vin,vout)
-
+    info=psb_success_
+#ifdef HAVE_MOVE_ALLOC
+    if (allocated(vin)) then 
+      call move_alloc(vin,vout)
+    else if (allocated(vout)) then 
+      deallocate(vout)
+    end if
+#else
+    if (allocated(vout)) then 
+      deallocate(vout,stat=info)
+    end if    
+    if (.not.allocated(vin) ) return
+    allocate(vout(lbound(vin,1):ubound(vin,1)),stat=info)
+    if (info /= psb_success_) return
+    vout = vin
+    deallocate(vin,stat=info)
+#endif
   end Subroutine psb_zmove_alloc1d
 
   Subroutine psb_zmove_alloc2d(vin,vout,info)
@@ -2708,9 +3097,25 @@ Contains
     integer, intent(out) :: info 
     !
     ! 
-    info = psb_success_
-    call move_alloc(vin,vout)
-
+    info=psb_success_
+#ifdef HAVE_MOVE_ALLOC
+    if (allocated(vin)) then 
+      call move_alloc(vin,vout)
+    else if (allocated(vout)) then 
+      deallocate(vout)
+    end if
+#else
+    if (allocated(vout)) then 
+      deallocate(vout,stat=info)
+    end if    
+    if (.not.allocated(vin) ) return
+    
+    allocate(vout(lbound(vin,1):ubound(vin,1),&
+         & lbound(vin,2):ubound(vin,2)),stat=info)
+    if (info /= psb_success_) return
+    vout = vin
+    deallocate(vin,stat=info)
+#endif
   end Subroutine psb_zmove_alloc2d
 
   Subroutine psb_imove_alloc1d(vin,vout,info)
@@ -2719,8 +3124,24 @@ Contains
     integer, intent(out) :: info 
     !
     ! 
-    info = psb_success_
-    call move_alloc(vin,vout)
+    info=psb_success_
+#ifdef HAVE_MOVE_ALLOC
+    if (allocated(vin)) then 
+      call move_alloc(vin,vout)
+    else if (allocated(vout)) then 
+!!$      write(0,*) 'move_alloc: Clearing output'
+      deallocate(vout)
+    end if
+#else
+    if (allocated(vout)) then 
+      deallocate(vout,stat=info)
+    end if    
+    if (.not.allocated(vin) ) return
+    allocate(vout(lbound(vin,1):ubound(vin,1)),stat=info)
+    if (info /= psb_success_) return
+    vout = vin
+    deallocate(vin,stat=info)
+#endif
   end Subroutine psb_imove_alloc1d
 
   Subroutine psb_imove_alloc2d(vin,vout,info)
@@ -2729,9 +3150,79 @@ Contains
     integer, intent(out) :: info 
     !
     ! 
-    info = psb_success_
-    call move_alloc(vin,vout)
-
+    info=psb_success_
+#ifdef HAVE_MOVE_ALLOC
+    if (allocated(vin)) then 
+      call move_alloc(vin,vout)
+    else if (allocated(vout)) then 
+      deallocate(vout)
+    end if
+#else
+    if (allocated(vout)) then 
+      deallocate(vout,stat=info)
+    end if    
+    if (.not.allocated(vin) ) return
+    
+    allocate(vout(lbound(vin,1):ubound(vin,1),&
+         & lbound(vin,2):ubound(vin,2)),stat=info)
+    if (info /= psb_success_) return
+    vout = vin
+    deallocate(vin,stat=info)
+#endif
   end Subroutine psb_imove_alloc2d
 
+#if !defined(LONG_INTEGERS)
+  Subroutine psb_i8move_alloc1d(vin,vout,info)
+    use psb_error_mod
+    integer(psb_long_int_k_), allocatable, intent(inout) :: vin(:),vout(:)
+    integer, intent(out) :: info 
+    !
+    ! 
+    info=psb_success_
+#ifdef HAVE_MOVE_ALLOC
+    if (allocated(vin)) then 
+      call move_alloc(vin,vout)
+    else if (allocated(vout)) then 
+!!$      write(0,*) 'move_alloc: Clearing output'
+      deallocate(vout)
+    end if
+#else
+    if (allocated(vout)) then 
+      deallocate(vout,stat=info)
+    end if    
+    if (.not.allocated(vin) ) return
+    allocate(vout(lbound(vin,1):ubound(vin,1)),stat=info)
+    if (info /= psb_success_) return
+    vout = vin
+    deallocate(vin,stat=info)
+#endif
+  end Subroutine psb_i8move_alloc1d
+
+  Subroutine psb_i8move_alloc2d(vin,vout,info)
+    use psb_error_mod
+    integer(psb_long_int_k_), allocatable, intent(inout) :: vin(:,:),vout(:,:)
+    integer, intent(out) :: info 
+    !
+    ! 
+    info=psb_success_
+#ifdef HAVE_MOVE_ALLOC
+    if (allocated(vin)) then 
+      call move_alloc(vin,vout)
+    else if (allocated(vout)) then 
+      deallocate(vout)
+    end if
+#else
+    if (allocated(vout)) then 
+      deallocate(vout,stat=info)
+    end if    
+    if (.not.allocated(vin) ) return
+    
+    allocate(vout(lbound(vin,1):ubound(vin,1),&
+         & lbound(vin,2):ubound(vin,2)),stat=info)
+    if (info /= psb_success_) return
+    vout = vin
+    deallocate(vin,stat=info)
+#endif
+  end Subroutine psb_i8move_alloc2d
+#endif
 end module psb_realloc_mod

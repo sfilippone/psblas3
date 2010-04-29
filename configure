@@ -649,7 +649,6 @@ PSBLASRULES
 FINCLUDES
 CINCLUDES
 METIS_LIBS
-BLACS_LIBS
 INSTALL_DOCSDIR
 INSTALL_INCLUDEDIR
 INSTALL_LIBDIR
@@ -785,7 +784,6 @@ with_module_path
 enable_dependency_tracking
 with_blas
 with_lapack
-with_blacs
 with_metis
 '
       ac_precious_vars='build_alias
@@ -1459,8 +1457,6 @@ Optional Packages:
                           prepend to MODULE_PATH
   --with-blas=<lib>       use BLAS library <lib>
   --with-lapack=<lib>     use LAPACK library <lib>
-  --with-blacs=LIB        Specify BLACSLIBNAME or -lBLACSLIBNAME or the
-                          absolute library filename.
   --with-metis=LIB        Specify -lMETISLIBNAME or the absolute library
                           filename.
 
@@ -7001,7 +6997,7 @@ if test "X$CCOPT" == "X" ; then
      CCOPT="-O2 $CCOPT"
  fi
 fi
-CFLAGS="${CCOPT}"
+#CFLAGS="${CCOPT}"
 
 if test "X$FCOPT" == "X" ; then
  if test "X$psblas_cv_fc" == "Xgcc" ; then
@@ -7010,7 +7006,7 @@ if test "X$FCOPT" == "X" ; then
    FCOPT="-O3  $FCOPT"
  elif test "X$psblas_cv_fc" == X"xlf" ; then
    # XL compiler : consider using -qarch=auto
-     FCOPT="-O3 -qarch=auto $FCOPT"
+     FCOPT="-O3 -qarch=auto  -qfixed -qsuffix=f=f:cpp=F $FCOPT"
  elif test "X$psblas_cv_fc" == X"ifc" ; then
    # other compilers ..
      FCOPT="-O3 $FCOPT"
@@ -7033,7 +7029,7 @@ if test "X$psblas_cv_fc" == X"nag" ; then
    # Add needed options
    FCOPT="$FCOPT  -dcfuns -f2003 -wmismatch=mpi_scatterv,mpi_alltoallv,mpi_gatherv,mpi_allgatherv"
 fi
-FFLAGS="${FCOPT}"
+#FFLAGS="${FCOPT}"
 
 if test "X$F90COPT" == "X" ; then
  if test "X$psblas_cv_fc" == "Xgcc" ; then
@@ -7042,7 +7038,7 @@ if test "X$F90COPT" == "X" ; then
    F90COPT="-O3  $F90COPT"
  elif test "X$psblas_cv_fc" == X"xlf" ; then
    # XL compiler : consider using -qarch=auto
-     F90COPT="-O3 -qarch=auto $F90COPT"
+     F90COPT="-O3 -qarch=auto -qsuffix=f=f90:cpp=F90 $F90COPT"
  elif test "X$psblas_cv_fc" == X"ifc" ; then
    # other compilers ..
      F90COPT="-O3 $F90COPT"
@@ -7067,59 +7063,30 @@ if test "X$psblas_cv_fc" == X"nag" ; then
      F90COPT="$F90COPT -dcfuns -f2003 -wmismatch=mpi_scatterv,mpi_alltoallv,mpi_gatherv,mpi_allgatherv"
      EXTRA_OPT="-mismatch_all"
      F03COPT="${F90COPT}"
+     F03="nagfor"
+elif test "X$psblas_cv_fc" == X"xlf" ; then
+     F03="xlf2003_r"
+     F03COPT="-O3 -qarch=auto -qsuffix=f=f03:cpp=F03 $F03COPT"
 else
+     F03=${FC}
      F03COPT="${F90COPT}"
 fi
 
-FCFLAGS="${F90COPT}"
+#FCFLAGS="${F90COPT}"
 
 # COPT,FCOPT, F90COPT are aliases for FFLAGS,CFLAGS,FCFLAGS .
 
 ##############################################################################
 # Compilers variables selection
 ##############################################################################
-if test "X$psblas_cv_fc" == X"xlf" ; then
-  # WARNING : this is EVIL : specifying a pathname prefixed compiler will be ignored!
-  # But this is necessary since :
-  #  - if called from some script, xlf could behave strangely
-  #  - it is not said that mpxlf95 gets chosen by the configure script.
-  F90="xlf95   -qsuffix=f=f90:cpp=F90"
-  F03="xlf2003_r  -qsuffix=f=f03:cpp=F03"
- #  F90="xlf95"
-#    FC="xlf"
+F90=${FC}
+F03=${F03}
+MPF90=${MPIFC}
+FC=${FC}
+MPF77=${MPIFC}
+CC=${CC}
+MPCC=${MPICC}
 
-# Note : this gives problems in base/serial/aux/isaperm.f
-# FC="mpxlf     -qsuffix=f=f90:cpp=F90"
-
-# Note : this is the cure
-     FC="xlf     -qsuffix=f=f:cpp=F"
-     # Note : maybe we will want xlf -qsuffix=cpp=F
-    F77="xlf"
-     CC="xlc"
-  if test x"$pac_cv_serial_mpi" == x"yes" ; then
-     MPF90="xlf2003_r -qsuffix=f=f90:cpp=F90"
-     MPF77="xlf95 -qfixed  -qsuffix=f=f:cpp=F"
-     MPCC="xlc"
-  else
-     MPF90="mpxlf2003_r -qsuffix=f=f90:cpp=F90"
-     MPF77="mpxlf95 -qfixed  -qsuffix=f=f:cpp=F"
-     MPCC="mpcc"
-  fi
- #MPFCC="mpxlc"
-  # Note : -qfixed should be not specified in the environment FFLAGS or things will break.
-  #        This fact should be documented somewhere.
-else
-  # We really think about the GCC here but this is our idea for other compilers, too.
-  # If the user wishes to, she should specify MPICC, MPIF77 after ./configure.
-  # Note: this behavious should be documented.
-    F90=${FC}
-    F03=${FC}
-  MPF90=${MPIFC}
-     FC=${FC}
-  MPF77=${MPIFC}
-     CC=${CC}
-   MPCC=${MPICC}
-fi
 
 
 ##############################################################################
@@ -10257,713 +10224,16 @@ fi
 ###############################################################################
 #		BLACS library presence checks
 ###############################################################################
-ac_ext=c
-ac_cpp='$CPP $CPPFLAGS'
-ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
-ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
-ac_compiler_gnu=$ac_cv_c_compiler_gnu
-
-if test x"$pac_cv_serial_mpi" == x"no" ; then
-save_FC="$FC";
-save_CC="$CC";
-FC="$MPIFC";
-CC="$MPICC";
-
-# Check whether --with-blacs was given.
-if test "${with_blacs+set}" = set; then
-  withval=$with_blacs; psblas_cv_blacs=$withval
-else
-  psblas_cv_blacs=''
-fi
-
-
-case $psblas_cv_blacs in
-	yes | "") ;;
-	-* | */* | *.a | *.so | *.so.* | *.o)
-	     BLACS_LIBS="$psblas_cv_blacs" ;;
-	*) BLACS_LIBS="-l$psblas_cv_blacs" ;;
-esac
-
-#
-# Test user-defined BLACS
-#
-if test x"$psblas_cv_blacs" != "x" ; then
-      save_LIBS="$LIBS";
-      ac_ext=${ac_fc_srcext-f}
-ac_compile='$FC -c $FCFLAGS $ac_fcflags_srcext conftest.$ac_ext >&5'
-ac_link='$FC -o conftest$ac_exeext $FCFLAGS $LDFLAGS $ac_fcflags_srcext conftest.$ac_ext $LIBS >&5'
-ac_compiler_gnu=$ac_cv_fc_compiler_gnu
-
-      LIBS="$BLACS_LIBS $LIBS"
-      { $as_echo "$as_me:$LINENO: checking for dgesd2d in $BLACS_LIBS" >&5
-$as_echo_n "checking for dgesd2d in $BLACS_LIBS... " >&6; }
-      cat >conftest.$ac_ext <<_ACEOF
-      program main
-      call dgesd2d
-      end
-_ACEOF
-rm -f conftest.$ac_objext conftest$ac_exeext
-if { (ac_try="$ac_link"
-case "(($ac_try" in
-  *\"* | *\`* | *\\*) ac_try_echo=\$ac_try;;
-  *) ac_try_echo=$ac_try;;
-esac
-eval ac_try_echo="\"\$as_me:$LINENO: $ac_try_echo\""
-$as_echo "$ac_try_echo") >&5
-  (eval "$ac_link") 2>conftest.er1
-  ac_status=$?
-  grep -v '^ *+' conftest.er1 >conftest.err
-  rm -f conftest.er1
-  cat conftest.err >&5
-  $as_echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } && {
-	 test -z "$ac_fc_werror_flag" ||
-	 test ! -s conftest.err
-       } && test -s conftest$ac_exeext && {
-	 test "$cross_compiling" = yes ||
-	 $as_test_x conftest$ac_exeext
-       }; then
-  psblas_cv_blacs_ok=yes
-else
-  $as_echo "$as_me: failed program was:" >&5
-sed 's/^/| /' conftest.$ac_ext >&5
-
-	psblas_cv_blacs_ok=no;BLACS_LIBS=""
-fi
-
-rm -rf conftest.dSYM
-rm -f core conftest.err conftest.$ac_objext conftest_ipa8_conftest.oo \
-      conftest$ac_exeext conftest.$ac_ext
-      { $as_echo "$as_me:$LINENO: result: $psblas_cv_blacs_ok" >&5
-$as_echo "$psblas_cv_blacs_ok" >&6; }
-
-     if test x"$psblas_cv_blacs_ok" == x"yes";  then
-     { $as_echo "$as_me:$LINENO: checking for blacs_pinfo in $BLACS_LIBS" >&5
-$as_echo_n "checking for blacs_pinfo in $BLACS_LIBS... " >&6; }
-     cat >conftest.$ac_ext <<_ACEOF
-      program main
-      call blacs_pinfo
-      end
-_ACEOF
-rm -f conftest.$ac_objext conftest$ac_exeext
-if { (ac_try="$ac_link"
-case "(($ac_try" in
-  *\"* | *\`* | *\\*) ac_try_echo=\$ac_try;;
-  *) ac_try_echo=$ac_try;;
-esac
-eval ac_try_echo="\"\$as_me:$LINENO: $ac_try_echo\""
-$as_echo "$ac_try_echo") >&5
-  (eval "$ac_link") 2>conftest.er1
-  ac_status=$?
-  grep -v '^ *+' conftest.er1 >conftest.err
-  rm -f conftest.er1
-  cat conftest.err >&5
-  $as_echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } && {
-	 test -z "$ac_fc_werror_flag" ||
-	 test ! -s conftest.err
-       } && test -s conftest$ac_exeext && {
-	 test "$cross_compiling" = yes ||
-	 $as_test_x conftest$ac_exeext
-       }; then
-  psblas_cv_blacs_ok=yes
-else
-  $as_echo "$as_me: failed program was:" >&5
-sed 's/^/| /' conftest.$ac_ext >&5
-
-	psblas_cv_blacs_ok=no;BLACS_LIBS=""
-fi
-
-rm -rf conftest.dSYM
-rm -f core conftest.err conftest.$ac_objext conftest_ipa8_conftest.oo \
-      conftest$ac_exeext conftest.$ac_ext
-     { $as_echo "$as_me:$LINENO: result: $psblas_cv_blacs_ok" >&5
-$as_echo "$psblas_cv_blacs_ok" >&6; }
-     fi
-     LIBS="$save_LIBS";
-fi
-ac_ext=c
-ac_cpp='$CPP $CPPFLAGS'
-ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
-ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
-ac_compiler_gnu=$ac_cv_c_compiler_gnu
-
-
-######################################
-# System BLACS with PESSL default names.
-######################################
-if test x"$BLACS_LIBS" == "x" ; then
-   ac_ext=${ac_fc_srcext-f}
-ac_compile='$FC -c $FCFLAGS $ac_fcflags_srcext conftest.$ac_ext >&5'
-ac_link='$FC -o conftest$ac_exeext $FCFLAGS $LDFLAGS $ac_fcflags_srcext conftest.$ac_ext $LIBS >&5'
-ac_compiler_gnu=$ac_cv_fc_compiler_gnu
-
-
- pac_check_libs_ok=no
- for pac_check_libs_f in dgesd2d
- do
- for pac_check_libs_l in blacssmp blacsp2 blacs
- do
-    if test x"$pac_check_libs_ok" == xno ; then
-     as_ac_Lib=`$as_echo "ac_cv_lib_$pac_check_libs_l''_$pac_check_libs_f" | $as_tr_sh`
-{ $as_echo "$as_me:$LINENO: checking for $pac_check_libs_f in -l$pac_check_libs_l" >&5
-$as_echo_n "checking for $pac_check_libs_f in -l$pac_check_libs_l... " >&6; }
-if { as_var=$as_ac_Lib; eval "test \"\${$as_var+set}\" = set"; }; then
-  $as_echo_n "(cached) " >&6
-else
-  ac_check_lib_save_LIBS=$LIBS
-LIBS="-l$pac_check_libs_l  $LIBS"
-cat >conftest.$ac_ext <<_ACEOF
-      program main
-      call $pac_check_libs_f
-      end
-_ACEOF
-rm -f conftest.$ac_objext conftest$ac_exeext
-if { (ac_try="$ac_link"
-case "(($ac_try" in
-  *\"* | *\`* | *\\*) ac_try_echo=\$ac_try;;
-  *) ac_try_echo=$ac_try;;
-esac
-eval ac_try_echo="\"\$as_me:$LINENO: $ac_try_echo\""
-$as_echo "$ac_try_echo") >&5
-  (eval "$ac_link") 2>conftest.er1
-  ac_status=$?
-  grep -v '^ *+' conftest.er1 >conftest.err
-  rm -f conftest.er1
-  cat conftest.err >&5
-  $as_echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } && {
-	 test -z "$ac_fc_werror_flag" ||
-	 test ! -s conftest.err
-       } && test -s conftest$ac_exeext && {
-	 test "$cross_compiling" = yes ||
-	 $as_test_x conftest$ac_exeext
-       }; then
-  eval "$as_ac_Lib=yes"
-else
-  $as_echo "$as_me: failed program was:" >&5
-sed 's/^/| /' conftest.$ac_ext >&5
-
-	eval "$as_ac_Lib=no"
-fi
-
-rm -rf conftest.dSYM
-rm -f core conftest.err conftest.$ac_objext conftest_ipa8_conftest.oo \
-      conftest$ac_exeext conftest.$ac_ext
-LIBS=$ac_check_lib_save_LIBS
-fi
-ac_res=`eval 'as_val=${'$as_ac_Lib'}
-		 $as_echo "$as_val"'`
-	       { $as_echo "$as_me:$LINENO: result: $ac_res" >&5
-$as_echo "$ac_res" >&6; }
-as_val=`eval 'as_val=${'$as_ac_Lib'}
-		 $as_echo "$as_val"'`
-   if test "x$as_val" = x""yes; then
-  pac_check_libs_ok=yes; pac_check_libs_LIBS="-l$pac_check_libs_l"
-fi
-
-    fi
-  done
-  done
- # Finally, execute ACTION-IF-FOUND/ACTION-IF-NOT-FOUND:
-  if test x"$pac_check_libs_ok" = xyes ; then
-	psblas_cv_blacs_ok=yes; LIBS="$LIBS $pac_check_libs_LIBS "
-	BLACS_LIBS="$pac_check_libs_LIBS"
-	{ $as_echo "$as_me:$LINENO: BLACS libraries detected." >&5
-$as_echo "$as_me: BLACS libraries detected." >&6;}
- else
-        pac_check_libs_ok=no
-
-
- fi
-
-
-    if test x"$BLACS_LIBS" != "x"; then
-          save_LIBS="$LIBS";
-          LIBS="$BLACS_LIBS $LIBS"
-          { $as_echo "$as_me:$LINENO: checking for blacs_pinfo in $BLACS_LIBS" >&5
-$as_echo_n "checking for blacs_pinfo in $BLACS_LIBS... " >&6; }
-          ac_ext=${ac_fc_srcext-f}
-ac_compile='$FC -c $FCFLAGS $ac_fcflags_srcext conftest.$ac_ext >&5'
-ac_link='$FC -o conftest$ac_exeext $FCFLAGS $LDFLAGS $ac_fcflags_srcext conftest.$ac_ext $LIBS >&5'
-ac_compiler_gnu=$ac_cv_fc_compiler_gnu
-
-	  cat >conftest.$ac_ext <<_ACEOF
-      program main
-      call blacs_pinfo
-      end
-_ACEOF
-rm -f conftest.$ac_objext conftest$ac_exeext
-if { (ac_try="$ac_link"
-case "(($ac_try" in
-  *\"* | *\`* | *\\*) ac_try_echo=\$ac_try;;
-  *) ac_try_echo=$ac_try;;
-esac
-eval ac_try_echo="\"\$as_me:$LINENO: $ac_try_echo\""
-$as_echo "$ac_try_echo") >&5
-  (eval "$ac_link") 2>conftest.er1
-  ac_status=$?
-  grep -v '^ *+' conftest.er1 >conftest.err
-  rm -f conftest.er1
-  cat conftest.err >&5
-  $as_echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } && {
-	 test -z "$ac_fc_werror_flag" ||
-	 test ! -s conftest.err
-       } && test -s conftest$ac_exeext && {
-	 test "$cross_compiling" = yes ||
-	 $as_test_x conftest$ac_exeext
-       }; then
-  psblas_cv_blacs_ok=yes
-else
-  $as_echo "$as_me: failed program was:" >&5
-sed 's/^/| /' conftest.$ac_ext >&5
-
-	psblas_cv_blacs_ok=no;BLACS_LIBS=""
-fi
-
-rm -rf conftest.dSYM
-rm -f core conftest.err conftest.$ac_objext conftest_ipa8_conftest.oo \
-      conftest$ac_exeext conftest.$ac_ext
-          { $as_echo "$as_me:$LINENO: result: $psblas_cv_blacs_ok" >&5
-$as_echo "$psblas_cv_blacs_ok" >&6; }
-          LIBS="$save_LIBS";
-    fi
-fi
-######################################
-# Maybe we're looking at PESSL BLACS?#
-######################################
-if  test x"$BLACS_LIBS" != "x" ; then
-    save_LIBS="$LIBS";
-    LIBS="$BLACS_LIBS $LIBS"
-    { $as_echo "$as_me:$LINENO: checking for PESSL BLACS" >&5
-$as_echo_n "checking for PESSL BLACS... " >&6; }
-    ac_ext=${ac_fc_srcext-f}
-ac_compile='$FC -c $FCFLAGS $ac_fcflags_srcext conftest.$ac_ext >&5'
-ac_link='$FC -o conftest$ac_exeext $FCFLAGS $LDFLAGS $ac_fcflags_srcext conftest.$ac_ext $LIBS >&5'
-ac_compiler_gnu=$ac_cv_fc_compiler_gnu
-
-    cat >conftest.$ac_ext <<_ACEOF
-      program main
-      call esvemonp
-      end
-_ACEOF
-rm -f conftest.$ac_objext conftest$ac_exeext
-if { (ac_try="$ac_link"
-case "(($ac_try" in
-  *\"* | *\`* | *\\*) ac_try_echo=\$ac_try;;
-  *) ac_try_echo=$ac_try;;
-esac
-eval ac_try_echo="\"\$as_me:$LINENO: $ac_try_echo\""
-$as_echo "$ac_try_echo") >&5
-  (eval "$ac_link") 2>conftest.er1
-  ac_status=$?
-  grep -v '^ *+' conftest.er1 >conftest.err
-  rm -f conftest.er1
-  cat conftest.err >&5
-  $as_echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } && {
-	 test -z "$ac_fc_werror_flag" ||
-	 test ! -s conftest.err
-       } && test -s conftest$ac_exeext && {
-	 test "$cross_compiling" = yes ||
-	 $as_test_x conftest$ac_exeext
-       }; then
-  psblas_cv_pessl_blacs=yes
-else
-  $as_echo "$as_me: failed program was:" >&5
-sed 's/^/| /' conftest.$ac_ext >&5
-
-	psblas_cv_pessl_blacs=no
-fi
-
-rm -rf conftest.dSYM
-rm -f core conftest.err conftest.$ac_objext conftest_ipa8_conftest.oo \
-      conftest$ac_exeext conftest.$ac_ext
-    { $as_echo "$as_me:$LINENO: result: $psblas_cv_pessl_blacs" >&5
-$as_echo "$psblas_cv_pessl_blacs" >&6; }
-    LIBS="$save_LIBS";
-fi
-if test "x$psblas_cv_pessl_blacs" == "xyes";  then
-   FDEFINES="$psblas_cv_define_prepend-DHAVE_ESSL_BLACS $FDEFINES"
-fi
-
-
-##############################################################################
-#	Netlib BLACS library with default names
-##############################################################################
-
-if test x"$BLACS_LIBS" == "x" ; then
-   save_LIBS="$LIBS";
-   ac_ext=${ac_fc_srcext-f}
-ac_compile='$FC -c $FCFLAGS $ac_fcflags_srcext conftest.$ac_ext >&5'
-ac_link='$FC -o conftest$ac_exeext $FCFLAGS $LDFLAGS $ac_fcflags_srcext conftest.$ac_ext $LIBS >&5'
-ac_compiler_gnu=$ac_cv_fc_compiler_gnu
-
-
- pac_check_libs_ok=no
- for pac_check_libs_f in dgesd2d
- do
- for pac_check_libs_l in  blacs_MPI-LINUX-0 blacs_MPI-SP5-0 blacs_MPI-SP4-0 blacs_MPI-SP3-0 blacs_MPI-SP2-0 blacsCinit_MPI-ALPHA-0 blacsCinit_MPI-IRIX64-0 blacsCinit_MPI-RS6K-0 blacsCinit_MPI-SPP-0 blacsCinit_MPI-SUN4-0 blacsCinit_MPI-SUN4SOL2-0 blacsCinit_MPI-T3D-0 blacsCinit_MPI-T3E-0
-
- do
-    if test x"$pac_check_libs_ok" == xno ; then
-     as_ac_Lib=`$as_echo "ac_cv_lib_$pac_check_libs_l''_$pac_check_libs_f" | $as_tr_sh`
-{ $as_echo "$as_me:$LINENO: checking for $pac_check_libs_f in -l$pac_check_libs_l" >&5
-$as_echo_n "checking for $pac_check_libs_f in -l$pac_check_libs_l... " >&6; }
-if { as_var=$as_ac_Lib; eval "test \"\${$as_var+set}\" = set"; }; then
-  $as_echo_n "(cached) " >&6
-else
-  ac_check_lib_save_LIBS=$LIBS
-LIBS="-l$pac_check_libs_l  $LIBS"
-cat >conftest.$ac_ext <<_ACEOF
-      program main
-      call $pac_check_libs_f
-      end
-_ACEOF
-rm -f conftest.$ac_objext conftest$ac_exeext
-if { (ac_try="$ac_link"
-case "(($ac_try" in
-  *\"* | *\`* | *\\*) ac_try_echo=\$ac_try;;
-  *) ac_try_echo=$ac_try;;
-esac
-eval ac_try_echo="\"\$as_me:$LINENO: $ac_try_echo\""
-$as_echo "$ac_try_echo") >&5
-  (eval "$ac_link") 2>conftest.er1
-  ac_status=$?
-  grep -v '^ *+' conftest.er1 >conftest.err
-  rm -f conftest.er1
-  cat conftest.err >&5
-  $as_echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } && {
-	 test -z "$ac_fc_werror_flag" ||
-	 test ! -s conftest.err
-       } && test -s conftest$ac_exeext && {
-	 test "$cross_compiling" = yes ||
-	 $as_test_x conftest$ac_exeext
-       }; then
-  eval "$as_ac_Lib=yes"
-else
-  $as_echo "$as_me: failed program was:" >&5
-sed 's/^/| /' conftest.$ac_ext >&5
-
-	eval "$as_ac_Lib=no"
-fi
-
-rm -rf conftest.dSYM
-rm -f core conftest.err conftest.$ac_objext conftest_ipa8_conftest.oo \
-      conftest$ac_exeext conftest.$ac_ext
-LIBS=$ac_check_lib_save_LIBS
-fi
-ac_res=`eval 'as_val=${'$as_ac_Lib'}
-		 $as_echo "$as_val"'`
-	       { $as_echo "$as_me:$LINENO: result: $ac_res" >&5
-$as_echo "$ac_res" >&6; }
-as_val=`eval 'as_val=${'$as_ac_Lib'}
-		 $as_echo "$as_val"'`
-   if test "x$as_val" = x""yes; then
-  pac_check_libs_ok=yes; pac_check_libs_LIBS="-l$pac_check_libs_l"
-fi
-
-    fi
-  done
-  done
- # Finally, execute ACTION-IF-FOUND/ACTION-IF-NOT-FOUND:
-  if test x"$pac_check_libs_ok" = xyes ; then
-	psblas_cv_blacs_ok=yes; LIBS="$LIBS $pac_check_libs_LIBS "
-	psblas_have_netlib_blacs=yes;
-	BLACS_LIBS="$pac_check_libs_LIBS"
-	{ $as_echo "$as_me:$LINENO: BLACS libraries detected." >&5
-$as_echo "$as_me: BLACS libraries detected." >&6;}
- else
-        pac_check_libs_ok=no
-
-
- fi
-
-
-
-    if test x"$BLACS_LIBS" != "x" ; then
-      ac_ext=${ac_fc_srcext-f}
-ac_compile='$FC -c $FCFLAGS $ac_fcflags_srcext conftest.$ac_ext >&5'
-ac_link='$FC -o conftest$ac_exeext $FCFLAGS $LDFLAGS $ac_fcflags_srcext conftest.$ac_ext $LIBS >&5'
-ac_compiler_gnu=$ac_cv_fc_compiler_gnu
-
-
- pac_check_libs_ok=no
- for pac_check_libs_f in blacs_pinfo
- do
- for pac_check_libs_l in  blacsF77init_MPI-LINUX-0 blacsF77init_MPI-SP5-0 blacsF77init_MPI-SP4-0 blacsF77init_MPI-SP3-0 blacsF77init_MPI-SP2-0 blacsF77init_MPI-ALPHA-0 blacsF77init_MPI-IRIX64-0 blacsF77init_MPI-RS6K-0 blacsF77init_MPI-SPP-0 blacsF77init_MPI-SUN4-0 blacsF77init_MPI-SUN4SOL2-0 blacsF77init_MPI-T3D-0 blacsF77init_MPI-T3E-0
-
- do
-    if test x"$pac_check_libs_ok" == xno ; then
-     as_ac_Lib=`$as_echo "ac_cv_lib_$pac_check_libs_l''_$pac_check_libs_f" | $as_tr_sh`
-{ $as_echo "$as_me:$LINENO: checking for $pac_check_libs_f in -l$pac_check_libs_l" >&5
-$as_echo_n "checking for $pac_check_libs_f in -l$pac_check_libs_l... " >&6; }
-if { as_var=$as_ac_Lib; eval "test \"\${$as_var+set}\" = set"; }; then
-  $as_echo_n "(cached) " >&6
-else
-  ac_check_lib_save_LIBS=$LIBS
-LIBS="-l$pac_check_libs_l  $LIBS"
-cat >conftest.$ac_ext <<_ACEOF
-      program main
-      call $pac_check_libs_f
-      end
-_ACEOF
-rm -f conftest.$ac_objext conftest$ac_exeext
-if { (ac_try="$ac_link"
-case "(($ac_try" in
-  *\"* | *\`* | *\\*) ac_try_echo=\$ac_try;;
-  *) ac_try_echo=$ac_try;;
-esac
-eval ac_try_echo="\"\$as_me:$LINENO: $ac_try_echo\""
-$as_echo "$ac_try_echo") >&5
-  (eval "$ac_link") 2>conftest.er1
-  ac_status=$?
-  grep -v '^ *+' conftest.er1 >conftest.err
-  rm -f conftest.er1
-  cat conftest.err >&5
-  $as_echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } && {
-	 test -z "$ac_fc_werror_flag" ||
-	 test ! -s conftest.err
-       } && test -s conftest$ac_exeext && {
-	 test "$cross_compiling" = yes ||
-	 $as_test_x conftest$ac_exeext
-       }; then
-  eval "$as_ac_Lib=yes"
-else
-  $as_echo "$as_me: failed program was:" >&5
-sed 's/^/| /' conftest.$ac_ext >&5
-
-	eval "$as_ac_Lib=no"
-fi
-
-rm -rf conftest.dSYM
-rm -f core conftest.err conftest.$ac_objext conftest_ipa8_conftest.oo \
-      conftest$ac_exeext conftest.$ac_ext
-LIBS=$ac_check_lib_save_LIBS
-fi
-ac_res=`eval 'as_val=${'$as_ac_Lib'}
-		 $as_echo "$as_val"'`
-	       { $as_echo "$as_me:$LINENO: result: $ac_res" >&5
-$as_echo "$ac_res" >&6; }
-as_val=`eval 'as_val=${'$as_ac_Lib'}
-		 $as_echo "$as_val"'`
-   if test "x$as_val" = x""yes; then
-  pac_check_libs_ok=yes; pac_check_libs_LIBS="-l$pac_check_libs_l"
-fi
-
-    fi
-  done
-  done
- # Finally, execute ACTION-IF-FOUND/ACTION-IF-NOT-FOUND:
-  if test x"$pac_check_libs_ok" = xyes ; then
-	psblas_cv_blacs_ok=yes; LIBS="$pac_check_libs_LIBS $LIBS"
-	BLACS_LIBS="$pac_check_libs_LIBS $BLACS_LIBS"
-	{ $as_echo "$as_me:$LINENO: Netlib BLACS Fortran initialization libraries detected." >&5
-$as_echo "$as_me: Netlib BLACS Fortran initialization libraries detected." >&6;}
- else
-        pac_check_libs_ok=no
-
-
- fi
-
-
-    fi
-
-    if test x"$BLACS_LIBS" != "x" ; then
-
-      ac_ext=c
-ac_cpp='$CPP $CPPFLAGS'
-ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
-ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
-ac_compiler_gnu=$ac_cv_c_compiler_gnu
-
-
- pac_check_libs_ok=no
- for pac_check_libs_f in Cblacs_pinfo
- do
- for pac_check_libs_l in  blacsCinit_MPI-LINUX-0 blacsCinit_MPI-SP5-0 blacsCinit_MPI-SP4-0 blacsCinit_MPI-SP3-0 blacsCinit_MPI-SP2-0 blacsCinit_MPI-ALPHA-0 blacsCinit_MPI-IRIX64-0 blacsCinit_MPI-RS6K-0 blacsCinit_MPI-SPP-0 blacsCinit_MPI-SUN4-0 blacsCinit_MPI-SUN4SOL2-0 blacsCinit_MPI-T3D-0 blacsCinit_MPI-T3E-0
-
- do
-    if test x"$pac_check_libs_ok" == xno ; then
-     as_ac_Lib=`$as_echo "ac_cv_lib_$pac_check_libs_l''_$pac_check_libs_f" | $as_tr_sh`
-{ $as_echo "$as_me:$LINENO: checking for $pac_check_libs_f in -l$pac_check_libs_l" >&5
-$as_echo_n "checking for $pac_check_libs_f in -l$pac_check_libs_l... " >&6; }
-if { as_var=$as_ac_Lib; eval "test \"\${$as_var+set}\" = set"; }; then
-  $as_echo_n "(cached) " >&6
-else
-  ac_check_lib_save_LIBS=$LIBS
-LIBS="-l$pac_check_libs_l  $LIBS"
-cat >conftest.$ac_ext <<_ACEOF
-/* confdefs.h.  */
-_ACEOF
-cat confdefs.h >>conftest.$ac_ext
-cat >>conftest.$ac_ext <<_ACEOF
-/* end confdefs.h.  */
-
-/* Override any GCC internal prototype to avoid an error.
-   Use char because int might match the return type of a GCC
-   builtin and then its argument prototype would still apply.  */
-#ifdef __cplusplus
-extern "C"
-#endif
-char $pac_check_libs_f ();
-#ifdef F77_DUMMY_MAIN
-
-#  ifdef __cplusplus
-     extern "C"
-#  endif
-   int F77_DUMMY_MAIN() { return 1; }
-
-#endif
-int
-main ()
-{
-return $pac_check_libs_f ();
-  ;
-  return 0;
-}
-_ACEOF
-rm -f conftest.$ac_objext conftest$ac_exeext
-if { (ac_try="$ac_link"
-case "(($ac_try" in
-  *\"* | *\`* | *\\*) ac_try_echo=\$ac_try;;
-  *) ac_try_echo=$ac_try;;
-esac
-eval ac_try_echo="\"\$as_me:$LINENO: $ac_try_echo\""
-$as_echo "$ac_try_echo") >&5
-  (eval "$ac_link") 2>conftest.er1
-  ac_status=$?
-  grep -v '^ *+' conftest.er1 >conftest.err
-  rm -f conftest.er1
-  cat conftest.err >&5
-  $as_echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } && {
-	 test -z "$ac_c_werror_flag" ||
-	 test ! -s conftest.err
-       } && test -s conftest$ac_exeext && {
-	 test "$cross_compiling" = yes ||
-	 $as_test_x conftest$ac_exeext
-       }; then
-  eval "$as_ac_Lib=yes"
-else
-  $as_echo "$as_me: failed program was:" >&5
-sed 's/^/| /' conftest.$ac_ext >&5
-
-	eval "$as_ac_Lib=no"
-fi
-
-rm -rf conftest.dSYM
-rm -f core conftest.err conftest.$ac_objext conftest_ipa8_conftest.oo \
-      conftest$ac_exeext conftest.$ac_ext
-LIBS=$ac_check_lib_save_LIBS
-fi
-ac_res=`eval 'as_val=${'$as_ac_Lib'}
-		 $as_echo "$as_val"'`
-	       { $as_echo "$as_me:$LINENO: result: $ac_res" >&5
-$as_echo "$ac_res" >&6; }
-as_val=`eval 'as_val=${'$as_ac_Lib'}
-		 $as_echo "$as_val"'`
-   if test "x$as_val" = x""yes; then
-  pac_check_libs_ok=yes; pac_check_libs_LIBS="-l$pac_check_libs_l"
-fi
-
-    fi
-  done
-  done
- # Finally, execute ACTION-IF-FOUND/ACTION-IF-NOT-FOUND:
-  if test x"$pac_check_libs_ok" = xyes ; then
-	psblas_cv_blacs_ok=yes; LIBS="$pac_check_libs_LIBS $LIBS"
-	BLACS_LIBS="$BLACS_LIBS $pac_check_libs_LIBS"
-	{ $as_echo "$as_me:$LINENO: Netlib BLACS C initialization libraries detected." >&5
-$as_echo "$as_me: Netlib BLACS C initialization libraries detected." >&6;}
- else
-        pac_check_libs_ok=no
-
-
- fi
-
-
-    fi
-    LIBS="$save_LIBS";
-fi
-
-if test x"$BLACS_LIBS" == "x" ; then
-	{ { $as_echo "$as_me:$LINENO: error:
-	No BLACS library detected! $PACKAGE_NAME will be unusable.
-	Please make sure a BLACS implementation is accessible (ex.: --with-blacs=\"-lblacsname -L/blacs/dir\" )
-	" >&5
-$as_echo "$as_me: error:
-	No BLACS library detected! $PACKAGE_NAME will be unusable.
-	Please make sure a BLACS implementation is accessible (ex.: --with-blacs=\"-lblacsname -L/blacs/dir\" )
-	" >&2;}
-   { (exit 1); exit 1; }; }
-else
-      save_LIBS="$LIBS";
-      LIBS="$BLACS_LIBS $LIBS"
-      { $as_echo "$as_me:$LINENO: checking for ksendid in $BLACS_LIBS" >&5
-$as_echo_n "checking for ksendid in $BLACS_LIBS... " >&6; }
-      ac_ext=${ac_fc_srcext-f}
-ac_compile='$FC -c $FCFLAGS $ac_fcflags_srcext conftest.$ac_ext >&5'
-ac_link='$FC -o conftest$ac_exeext $FCFLAGS $LDFLAGS $ac_fcflags_srcext conftest.$ac_ext $LIBS >&5'
-ac_compiler_gnu=$ac_cv_fc_compiler_gnu
-
-      cat >conftest.$ac_ext <<_ACEOF
-      program main
-      call ksendid
-      end
-_ACEOF
-rm -f conftest.$ac_objext conftest$ac_exeext
-if { (ac_try="$ac_link"
-case "(($ac_try" in
-  *\"* | *\`* | *\\*) ac_try_echo=\$ac_try;;
-  *) ac_try_echo=$ac_try;;
-esac
-eval ac_try_echo="\"\$as_me:$LINENO: $ac_try_echo\""
-$as_echo "$ac_try_echo") >&5
-  (eval "$ac_link") 2>conftest.er1
-  ac_status=$?
-  grep -v '^ *+' conftest.er1 >conftest.err
-  rm -f conftest.er1
-  cat conftest.err >&5
-  $as_echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } && {
-	 test -z "$ac_fc_werror_flag" ||
-	 test ! -s conftest.err
-       } && test -s conftest$ac_exeext && {
-	 test "$cross_compiling" = yes ||
-	 $as_test_x conftest$ac_exeext
-       }; then
-  psblas_cv_have_sendid=yes
-else
-  $as_echo "$as_me: failed program was:" >&5
-sed 's/^/| /' conftest.$ac_ext >&5
-
-	psblas_cv_have_sendid=no
-fi
-
-rm -rf conftest.dSYM
-rm -f core conftest.err conftest.$ac_objext conftest_ipa8_conftest.oo \
-      conftest$ac_exeext conftest.$ac_ext
-      { $as_echo "$as_me:$LINENO: result: $psblas_cv_have_sendid" >&5
-$as_echo "$psblas_cv_have_sendid" >&6; }
-      LIBS="$save_LIBS"
-      ac_ext=c
-ac_cpp='$CPP $CPPFLAGS'
-ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
-ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
-ac_compiler_gnu=$ac_cv_c_compiler_gnu
-
-      if test "x$psblas_cv_have_sendid" == "xyes";  then
-        FDEFINES="$psblas_cv_define_prepend-DHAVE_KSENDID $FDEFINES"
-      fi
-fi
-
-FC="$save_FC";
-CC="$save_CC";
-fi
+#AC_LANG([C])
+#if test x"$pac_cv_serial_mpi" == x"no" ; then
+#save_FC="$FC";
+#save_CC="$CC";
+#FC="$MPIFC";
+#CC="$MPICC";
+#PAC_CHECK_BLACS
+#FC="$save_FC";
+#CC="$save_CC";
+#fi
 
 
 { $as_echo "$as_me:$LINENO: checking for gnumake" >&5
@@ -11229,7 +10499,7 @@ UTILLIBNAME=libpsb_util.a
 
 
 
-
+#AC_SUBST(BLACS_LIBS)
 
 
 
@@ -11238,7 +10508,7 @@ UTILLIBNAME=libpsb_util.a
 
 if test "X$psblas_make_gnumake" == "Xyes" ; then
 PSBLASRULES='
-PSBLDLIBS=$(BLACS) $(LAPACK) $(BLAS) $(METIS_LIB) $(LIBS)
+PSBLDLIBS=$(LAPACK) $(BLAS) $(METIS_LIB) $(LIBS)
 CDEFINES=$(PSBCDEFINES)
 FDEFINES=$(PSBFDEFINES)
 # Warning : these rules are only valid with GNU make!
@@ -11276,7 +10546,7 @@ $(.mod).o:
 else
 
 PSBLASRULES='
-PSBLDLIBS=$(BLACS) $(LAPACK) $(BLAS) $(METIS_LIB) $(LIBS)
+PSBLDLIBS=$(LAPACK) $(BLAS) $(METIS_LIB) $(LIBS)
 CDEFINES=$(PSBCDEFINES)
 FDEFINES=$(PSBFDEFINES)
 
@@ -12644,7 +11914,6 @@ fi
 
 
 	BLAS                  : ${BLAS_LIBS}
-	BLACS                 : ${BLACS_LIBS}
 
 	METIS detected        : ${psblas_cv_have_metis}
 
@@ -12678,7 +11947,6 @@ $as_echo "$as_me:
 
 
 	BLAS                  : ${BLAS_LIBS}
-	BLACS                 : ${BLACS_LIBS}
 
 	METIS detected        : ${psblas_cv_have_metis}
 

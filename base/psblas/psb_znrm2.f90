@@ -62,7 +62,7 @@ function psb_znrm2(x, desc_a, info, jx)
        & err_act, iix, jjx, ndim, ix, ijx, i, m, id, idx, ndm
   real(psb_dpk_)         :: nrm2, dznrm2, dd
 
-  external dcombnrm2
+!!$  external dcombnrm2
   character(len=20)        :: name, ch_err
 
   name='psb_znrm2'
@@ -74,7 +74,7 @@ function psb_znrm2(x, desc_a, info, jx)
 
   call psb_info(ictxt, me, np)
   if (np == -1) then
-    info = psb_err_blacs_error_
+    info=psb_err_blacs_error_
     call psb_errpush(info,name)
     goto 9999
   endif
@@ -119,7 +119,8 @@ function psb_znrm2(x, desc_a, info, jx)
     nrm2 = dzero
   end if
 
-  call pdtreecomb(ictxt,'All',1,nrm2,-1,-1,dcombnrm2)
+!!$  call pdtreecomb(ictxt,'All',1,nrm2,-1,-1,dcombnrm2)
+  call psb_nrm2(ictxt,nrm2)
 
   psb_znrm2 = nrm2  
 
@@ -197,7 +198,7 @@ function psb_znrm2v(x, desc_a, info)
        & err_act, iix, jjx, ndim, ix, jx, i, m, id, idx, ndm
   real(psb_dpk_)         :: nrm2, dznrm2, dd
 
-  external dcombnrm2
+!!$  external dcombnrm2
   character(len=20)        :: name, ch_err
 
   name='psb_znrm2v'
@@ -209,7 +210,7 @@ function psb_znrm2v(x, desc_a, info)
 
   call psb_info(ictxt, me, np)
   if (np == -1) then
-    info = psb_err_blacs_error_
+    info=psb_err_blacs_error_
     call psb_errpush(info,name)
     goto 9999
   endif
@@ -249,7 +250,8 @@ function psb_znrm2v(x, desc_a, info)
     nrm2 = dzero
   end if
 
-  call pdtreecomb(ictxt,'All',1,nrm2,-1,-1,dcombnrm2)
+!!$  call pdtreecomb(ictxt,'All',1,nrm2,-1,-1,dcombnrm2)
+  call psb_nrm2(ictxt,nrm2)
 
   psb_znrm2v = nrm2  
 
@@ -313,7 +315,10 @@ end function psb_znrm2v
 !    info   -  integer.              Return code
 !
 subroutine psb_znrm2vs(res, x, desc_a, info)
-  use psb_sparse_mod, psb_protect_name => psb_znrm2vs
+  use psb_descriptor_type
+  use psb_check_mod
+  use psb_error_mod
+  use psb_penv_mod
   implicit none
 
   complex(psb_dpk_), intent(in)   :: x(:)
@@ -326,7 +331,7 @@ subroutine psb_znrm2vs(res, x, desc_a, info)
        & err_act, iix, jjx, ndim, ix, jx, i, m, id, idx, ndm
   real(psb_dpk_)         :: nrm2, dznrm2, dd
 
-  external dcombnrm2
+!!$  external dcombnrm2
   character(len=20)        :: name, ch_err
 
   name='psb_znrm2'
@@ -338,7 +343,7 @@ subroutine psb_znrm2vs(res, x, desc_a, info)
 
   call psb_info(ictxt, me, np)
   if (np == -1) then
-    info = psb_err_blacs_error_
+    info=psb_err_blacs_error_
     call psb_errpush(info,name)
     goto 9999
   endif
@@ -378,7 +383,8 @@ subroutine psb_znrm2vs(res, x, desc_a, info)
     nrm2 = dzero
   end if
 
-  call pdtreecomb(ictxt,'All',1,nrm2,-1,-1,dcombnrm2)
+!!$  call pdtreecomb(ictxt,'All',1,nrm2,-1,-1,dcombnrm2)
+  call psb_nrm2(ictxt,nrm2)
 
   res = nrm2  
 

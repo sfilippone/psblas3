@@ -32,7 +32,11 @@
 
 module psb_const_mod
   ! This is the default integer
+#if defined(LONG_INTEGERS)
+  integer, parameter  :: ndig=12
+#else  
   integer, parameter  :: ndig=8
+#endif
   integer, parameter  :: psb_int_k_ = selected_int_kind(ndig)
   ! This is an 8-byte  integer, and normally different from default integer. 
   integer, parameter  :: longndig=12
@@ -45,6 +49,7 @@ module psb_const_mod
   integer, parameter  :: psb_spk_ = kind(1.e0)
   integer, save       :: psb_sizeof_dp, psb_sizeof_sp
   integer, save       :: psb_sizeof_int, psb_sizeof_long_int
+  integer, save       :: psb_mpi_integer
 
   !
   !     Handy & miscellaneous constants

@@ -30,25 +30,38 @@
 !!$ 
 !!$  
 module psb_error_mod
-
+  use psb_const_mod
   integer, parameter, public :: psb_act_ret_=0, psb_act_abort_=1, psb_no_err_=0
   integer, parameter, public :: psb_debug_ext_=1, psb_debug_outer_=2
   integer, parameter, public :: psb_debug_comp_=3, psb_debug_inner_=4
   integer, parameter, public :: psb_debug_serial_=8, psb_debug_serial_comp_=9
+ 
   !
   !     Error handling 
   !
   public psb_errpush, psb_error, psb_get_errstatus,&
-       & psb_get_errverbosity, psb_set_errverbosity,psb_errcomm, &
+       & psb_errpop, psb_errmsg, psb_errcomm, psb_get_numerr, &
+       & psb_get_errverbosity, psb_set_errverbosity, &
        & psb_erractionsave, psb_erractionrestore, &
        & psb_get_erraction, psb_set_erraction, &
        & psb_get_debug_level, psb_set_debug_level,&
        & psb_get_debug_unit, psb_set_debug_unit,&
        & psb_get_serial_debug_level, psb_set_serial_debug_level
 
+ 
   interface psb_error
-    module procedure psb_serror
-    module procedure psb_perror
+    subroutine psb_serror()
+    end subroutine psb_serror
+    subroutine psb_perror(ictxt)
+      integer, intent(in)     ::  ictxt
+    end subroutine psb_perror
+  end interface
+
+  interface 
+    subroutine psb_errcomm(ictxt, err)
+      integer, intent(in)   :: ictxt
+      integer, intent(inout):: err
+    end subroutine psb_errcomm
   end interface
 
 
@@ -163,20 +176,6 @@ contains
   end subroutine psb_set_serial_debug_level
 
 
-  ! checks wether an error has occurred on one of the porecesses in the execution pool
-  subroutine psb_errcomm(ictxt, err)
-    integer, intent(in)   :: ictxt
-    integer, intent(inout):: err
-    integer :: temp(2)
-    integer, parameter :: ione=1
-    ! Cannot use psb_amx or otherwise we have a recursion in module usage
-#if !defined(SERIAL_MPI)
-    call igamx2d(ictxt, 'A', ' ', ione, ione, err, ione,&
-         &temp ,temp,-ione ,-ione,-ione)
-#endif    
-  end subroutine psb_errcomm
-
-
 
   ! sets verbosity of the error message
   subroutine psb_set_errverbosity(v)
@@ -184,6 +183,14 @@ contains
     verbosity_level=v
   end subroutine psb_set_errverbosity
 
+
+
+  ! returns number of errors
+  function psb_get_numerr()
+    integer :: psb_get_numerr
+
+    psb_get_numerr = error_stack%n_elems
+  end function psb_get_numerr
 
 
   ! returns verbosity of the error message
@@ -259,97 +266,6 @@ contains
 
 
 
-  ! handles the occurence of an error in a parallel routine
-  subroutine psb_perror(ictxt)
-
-    integer, intent(in)     ::  ictxt
-    integer                 ::  err_c
-    character(len=20)       ::  r_name
-    character(len=40)       ::  a_e_d
-    integer                 ::  i_e_d(5)
-    integer                 ::  nprow, npcol, me, mypcol
-    integer, parameter      ::  ione=1, izero=0
-
-#if defined(SERIAL_MPI)
-    me = -1
-#else        
-    call blacs_gridinfo(ictxt,nprow,npcol,me,mypcol)
-#endif
-
-
-    if(error_status > 0) then
-      if(verbosity_level > 1) then
-
-        do while (error_stack%n_elems > izero)
-          write(0,'(50("="))')
-          call psb_errpop(err_c, r_name, i_e_d, a_e_d)
-          call psb_errmsg(err_c, r_name, i_e_d, a_e_d,me)
-          !            write(0,'(50("="))')
-        end do
-#if defined(SERIAL_MPI)
-        stop 
-#else        
-        call blacs_abort(ictxt,-1)
-#endif
-      else
-
-        call psb_errpop(err_c, r_name, i_e_d, a_e_d)
-        call psb_errmsg(err_c, r_name, i_e_d, a_e_d,me)
-        do while (error_stack%n_elems > 0)
-          call psb_errpop(err_c, r_name, i_e_d, a_e_d)
-        end do
-#if defined(SERIAL_MPI)
-        stop 
-#else        
-        call blacs_abort(ictxt,-1)
-#endif
-      end if
-    end if
-
-    if(error_status > izero) then
-#if defined(SERIAL_MPI)
-        stop 
-#else        
-      call blacs_abort(ictxt,err_c)
-#endif
-    end if
-
-
-  end subroutine psb_perror
-
-
-  ! handles the occurence of an error in a serial routine
-  subroutine psb_serror()
-
-    integer                 ::  err_c
-    character(len=20)       ::  r_name
-    character(len=40)       ::  a_e_d
-    integer                 ::  i_e_d(5)
-    integer, parameter      ::  ione=1, izero=0
-
-    if(error_status > 0) then
-      if(verbosity_level > 1) then
-
-        do while (error_stack%n_elems > izero)
-          write(0,'(50("="))')
-          call psb_errpop(err_c, r_name, i_e_d, a_e_d)
-          call psb_errmsg(err_c, r_name, i_e_d, a_e_d)
-          !            write(0,'(50("="))')
-        end do
-
-      else
-
-        call psb_errpop(err_c, r_name, i_e_d, a_e_d)
-        call psb_errmsg(err_c, r_name, i_e_d, a_e_d)
-        do while (error_stack%n_elems > 0)
-          call psb_errpop(err_c, r_name, i_e_d, a_e_d)
-        end do
-      end if
-    end if
-
-  end subroutine psb_serror
-
-
   ! prints the error msg associated to a specific error code
   subroutine psb_errmsg(err_c, r_name, i_e_d, a_e_d,me)
 
@@ -367,164 +283,147 @@ contains
 
 
     select case (err_c)
-    case(:0)
+    case(:psb_success_)
       write (0,'("error on calling sperror. err_c must be greater than 0")')
-    case(2)
+    case(psb_err_pivot_too_small_)
       write (0,'("pivot too small: ",i0,1x,a)')i_e_d(1),a_e_d
-    case(3)
+    case(psb_err_invalid_ovr_num_)
       write (0,'("Invalid number of ovr:",i0)')i_e_d(1)
-    case(5)
+    case(psb_err_invalid_input_)
       write (0,'("Invalid input")')
 
-    case(10)
+    case(psb_err_iarg_neg_)
       write (0,'("input argument n. ",i0," cannot be less than 0")')i_e_d(1)
       write (0,'("current value is ",i0)')i_e_d(2)
 
-    case(20)
+    case(psb_err_iarg_pos_)
       write (0,'("input argument n. ",i0," cannot be greater than 0")')i_e_d(1)
       write (0,'("current value is ",i0)')i_e_d(2)
-    case(30)
+    case(psb_err_input_value_invalid_i_)
       write (0,'("input argument n. ",i0," has an invalid value")')i_e_d(1)
       write (0,'("current value is ",i0)')i_e_d(2)
-    case(31)
-      write (0,'("input argument n. ",i0," has an invalid value")')i_e_d(1)
-      write (0,'("current value is ",a)')a_e_d
-    case(35)
+    case(psb_err_input_asize_invalid_i_)
       write (0,'("Size of input array argument n. ",i0," is invalid.")')i_e_d(1)
       write (0,'("Current value is ",i0)')i_e_d(2)
-    case(36)
-      write (0,'("Size of input array argument n. ",i0," must be ")')i_e_d(1)
-      write (0,'("at least  ",i0)')i_e_d(2)
-    case(40)
+    case(psb_err_iarg_invalid_i_)
       write (0,'("input argument n. ",i0," has an invalid value")')i_e_d(1)
       write (0,'("current value is ",a)')a_e_d(2:2)
-    case(50)
+    case(psb_err_iarg_not_gtia_ii_)
       write (0,'("input argument n. ",i0," must be equal or greater than input argument n. ",i0)') i_e_d(1), i_e_d(3)
       write (0,'("current values are ",i0," < ",i0)') i_e_d(2),i_e_d(5)
-    case(60)
+    case(psb_err_iarg_not_gteia_ii_)
       write (0,'("input argument n. ",i0," must be greater than or equal to ",i0)')i_e_d(1),i_e_d(2)
       write (0,'("current value is ",i0," < ",i0)')i_e_d(3), i_e_d(2)
-    case(70)
+    case(psb_err_iarg_invalid_value_)
       write (0,'("input argument n. ",i0," in entry # ",i0," has an invalid value")')i_e_d(1:2)
       write (0,'("current value is ",a)')a_e_d
-    case(71)
+    case(psb_err_asb_nrc_error_)
       write (0,'("Impossible error in ASB: nrow>ncol,")')
       write (0,'("Actual values are ",i0," > ",i0)')i_e_d(1:2)
       !        ... csr format error ...
-    case(80)
+    case(psb_err_iarg2_neg_)
       write (0,'("input argument ia2(1) is less than 0")')
       write (0,'("current value is ",i0)')i_e_d(1)
       !        ... csr format error ...
-    case(90)
+    case(psb_err_ia2_not_increasing_)
       write (0,'("indices in ia2 array are not in  increasing order")')
-    case(91)
+    case(psb_err_ia1_not_increasing_)
       write (0,'("indices in ia1 array are not in increasing order")')
       !        ... csr format error ...
-    case(100)
+    case(psb_err_ia1_badindices_)
       write (0,'("indices in ia1 array are not within problem dimension")')
       write (0,'("problem dimension is ",i0)')i_e_d(1)
-    case(110)
+    case(psb_err_invalid_args_combination_)
       write (0,'("invalid combination of input arguments")')
-    case(115)
+    case(psb_err_invalid_pid_arg_)
       write (0,'("Invalid process identifier in input array argument n. ",i0,".")')i_e_d(1)
       write (0,'("Current value is ",i0)')i_e_d(2)
-    case(120)
+    case(psb_err_iarg_n_mbgtian_)
       write (0,'("input argument n. ",i0," must be greater than input argument n. ",i0)')i_e_d(1:2)
       write (0,'("current values are ",i0," < ",i0)') i_e_d(3:4)
       !        ... coo format error ...
-    case(130)
+    case(psb_err_duplicate_coo)
       write (0,'("there are duplicated elements in coo format")')
       write (0,'("and you have chosen psb_dupl_err_ ")')
-    case(134)
+    case(psb_err_invalid_input_format_)
       write (0,'("Invalid input format ",a3)')a_e_d(1:3)
-    case(135)
+    case(psb_err_unsupported_format_)
       write (0,'("Format ",a3," not yet supported here")')a_e_d(1:3)
-    case(136)
+    case(psb_err_format_unknown_)
       write (0,'("Format ",a3," is unknown")')a_e_d(1:3)
-    case(140)
+    case(psb_err_iarray_outside_bounds_)
       write (0,'("indices in input array are not within problem dimension ",2(i0,2x))')i_e_d(1:2)
-    case(150)
+    case(psb_err_iarray_outside_process_)
       write (0,'("indices in input array are not belonging to the calling process ",i0)')i_e_d(1)
-    case(290)
+    case(psb_err_forgot_geall_)
       write (0,'("To call this routine you must first call psb_geall on the same matrix")')
-    case(295)
+    case(psb_err_forgot_spall_)
       write (0,'("To call this routine you must first call psb_spall on the same matrix")')
-    case(300)
+    case(psb_err_iarg_mbeeiarra_i_)
       write (0,'("Input argument n. ",i0," must be equal to entry n. ",i0," in array input argument n.",i0)') &
            & i_e_d(1),i_e_d(4),i_e_d(3)
       write (0,'("Current values are ",i0," != ",i0)')i_e_d(2), i_e_d(5)
-    case(400)
+    case(psb_err_mpi_error_)
       write (0,'("MPI error:",i0)')i_e_d(1)
-    case(550)
+    case(psb_err_parm_differs_among_procs_)
       write (0,'("Parameter n. ",i0," must be equal on all processes. ",i0)')i_e_d(1)
-    case(551)
+    case(psb_err_entry_out_of_bounds_)
       write (0,'("Entry n. ",i0," out of ",i0," should be between 1 and ",i0," but is ",i0)')i_e_d(1),i_e_d(3),i_e_d(4),i_e_d(2)
-    case(552)
+    case(psb_err_inconsistent_index_lists_)
       write (0,'("Index lists are inconsistent: some indices are orphans")')
-    case(570)
+    case(psb_err_partfunc_toomuchprocs_)
       write (0,'("partition function passed as input argument n. ",i0," returns number of processes")')i_e_d(1)
       write (0,'("greater than No of grid s processes on global point ",i0,". Actual number of grid s ")')i_e_d(4)
       write (0,'("processes is ",i0,", number returned is ",i0)')i_e_d(2),i_e_d(3)
-    case(575)
+    case(psb_err_partfunc_toofewprocs_)
       write (0,'("partition function passed as input argument n. ",i0," returns number of processes")')i_e_d(1)
       write (0,'("less or equal to 0 on global point ",i0,". Number returned is ",i0)')i_e_d(3),i_e_d(2)
-    case(580)
+    case(psb_err_partfunc_wrong_pid_)
       write (0,'("partition function passed as input argument n. ",i0," returns wrong processes identifier")')i_e_d(1)
       write (0,'("on global point ",i0,". Current value returned is : ",i0)')i_e_d(3),i_e_d(2)
-    case(581)
+    case(psb_err_no_optional_arg_)
       write (0,'("Exactly one of the optional arguments  ",a," must be present")')a_e_d
-    case(582)
+    case(psb_err_arg_m_required_)
       write (0,'("Argument M is required when argument PARTS is specified")')
-    case(583)
-      write (0,'("No more than one of the optional arguments  ",a," must be present")')a_e_d
-    case(600)
+    case(psb_err_spmat_invalid_state_)
       write (0,'("Sparse Matrix and descriptors are in an invalid state for this subroutine call: ",i0)')i_e_d(1)
-    case(700)
-      write (0,'("The base version of subroutine ''",a,"'' has been called.",/,&
-           &"The class implementation for ''",a,"'' may be incomplete!")') &
-           & trim(r_name), trim(a_e_d)
-
-    case (1121)
-      write (0,'("Invalid state for sparse matrix A")')
-    case (1122)
+    case (psb_err_invalid_cd_state_)
       write (0,'("Invalid state for communication descriptor")')
-    case (1123)
+    case (psb_err_invalid_a_and_cd_state_)
       write (0,'("Invalid combined state for A and DESC_A")')
-    case (1124)
-      write (0,'("Invalid state for object:",a)') trim(a_e_d)
-    case(1125:1999)
+    case(1124:1999)
       write (0,'("computational error. code: ",i0)')err_c
-    case(2010)
+    case(psb_err_blacs_error_)
       write (0,'("BLACS error. Number of processes=-1")')
-    case(2011)
+    case(psb_err_initerror_neugh_procs_)
       write (0,'("Initialization error: not enough processes available in the parallel environment")')
-    case(2030)
+    case(psb_err_blacs_err_gridcols_not_1_)
       write (0,'("BLACS ERROR: Number of grid columns must be equal to 1\nCurrent value is ",i4," != 1.")')i_e_d(1)
-    case(2231)
+    case(psb_err_invalid_matrix_input_state_)
       write (0,'("Invalid input state for matrix.")')
-    case(2232)
+    case(psb_err_input_no_regen_)
       write (0,'("Input state for matrix is not adequate for regeneration.")')
     case (2233:2999)
       write(0,'("resource error. code: ",i0)')err_c
     case(3000:3009)
       write (0,'("sparse matrix representation ",a3," not yet implemented")')a_e_d(1:3)
-    case(3010)
+    case(psb_err_lld_case_not_implemented_)
       write (0,'("Case lld not equal matrix_data[N_COL_] is not yet implemented.")')
-    case(3015)
+    case(psb_err_transpose_unsupported_)
       write (0,'("transpose option for sparse matrix representation ",a3," not implemented")')a_e_d(1:3)
-    case(3020)
+    case(psb_err_transpose_c_unsupported_)
       write (0,'("Case trans = C is not yet implemented.")') 
-    case(3021)
+    case(psb_err_transpose_not_n_unsupported_)
       write (0,'("Case trans /= N is not yet implemented.")') 
-    case(3022)
+    case(psb_err_only_unit_diag_)
       write (0,'("Only unit diagonal so far for triangular matrices. ")') 
     case(3023)
       write (0,'("Cases DESCRA(1:1)=S  DESCRA(1:1)=T not yet implemented. ")') 
     case(3024)
       write (0,'("Cases DESCRA(1:1)=G not yet implemented. ")') 
-    case(3030)
+    case(psb_err_ja_nix_ia_niy_unsupported_)
       write (0,'("Case ja /= ix or ia/=iy is not yet implemented.")')
-    case(3040)
+    case(psb_err_ix_n1_iy_n1_unsupported_)
       write (0,'("Case ix /= 1 or iy /= 1 is not yet implemented.")')
     case(3050)
       write (0,'("Case ix /= iy is not yet implemented.")')
@@ -539,7 +438,7 @@ contains
     case(3100)
       write (0,'("Error on index. Element has not been inserted")')
       write (0,'("local index is: ",i0," and global index is:",i0)')i_e_d(1:2)
-    case(3110)
+    case(psb_err_input_matrix_unassembled_)
       write (0,'("Before you call this routine, you must assembly sparse matrix")')
     case(3111)
       write (0,'("Before you call this routine, you must initialize the preconditioner")')
@@ -547,23 +446,23 @@ contains
       write (0,'("Before you call this routine, you must build the preconditioner")')
     case(3113:3999)
       write(0,'("miscellaneus error. code: ",i0)')err_c
-    case(4000)
+    case(psb_err_alloc_dealloc_)
       write(0,'("Allocation/deallocation error")')
-    case(4001)
+    case(psb_err_internal_error_)
       write(0,'("Internal error: ",a)')a_e_d
-    case(4010)
+    case(psb_err_from_subroutine_)
       write (0,'("Error from call to subroutine ",a)')a_e_d
-    case(4011)
+    case(psb_err_from_subroutine_non_)
       write (0,'("Error from call to a subroutine ")')
-    case(4012)
+    case(psb_err_from_subroutine_i_)
       write (0,'("Error ",i0," from call to a subroutine ")')i_e_d(1)
-    case(4013)
+    case(psb_err_from_subroutine_ai_)
       write (0,'("Error from call to subroutine ",a," ",i0)')a_e_d,i_e_d(1)
-    case(4025)
+    case(psb_err_alloc_request_)
       write (0,'("Error on allocation request for ",i0," items of type ",a)')i_e_d(1),a_e_d
     case(4110)
       write (0,'("Error ",i0," from call to an external package in subroutine ",a)')i_e_d(1),a_e_d
-    case (5001)
+    case (psb_err_invalid_istop_)
       write (0,'("Invalid ISTOP: ",i0)')i_e_d(1)
     case (5002)
       write (0,'("Invalid PREC: ",i0)')i_e_d(1)

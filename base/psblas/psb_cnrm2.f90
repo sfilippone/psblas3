@@ -45,7 +45,10 @@
 !    jx     -  integer(optional).   The column offset for sub( X ).
 !
 function psb_cnrm2(x, desc_a, info, jx)  
-  use psb_sparse_mod, psb_protect_name => psb_cnrm2
+  use psb_descriptor_type
+  use psb_check_mod
+  use psb_error_mod
+  use psb_penv_mod
   implicit none
 
   complex(psb_spk_), intent(in)      ::  x(:,:)
@@ -59,7 +62,7 @@ function psb_cnrm2(x, desc_a, info, jx)
        & err_act, iix, jjx, ndim, ix, ijx, i, m, id, idx, ndm
   real(psb_spk_)         :: nrm2, scnrm2, dd
 
-  external scombnrm2
+!!$  external scombnrm2
   character(len=20)        :: name, ch_err
 
   name='psb_cnrm2'
@@ -71,7 +74,7 @@ function psb_cnrm2(x, desc_a, info, jx)
 
   call psb_info(ictxt, me, np)
   if (np == -1) then
-    info = psb_err_blacs_error_
+    info=psb_err_blacs_error_
     call psb_errpush(info,name)
     goto 9999
   endif
@@ -116,8 +119,9 @@ function psb_cnrm2(x, desc_a, info, jx)
     nrm2 = dzero
   end if
 
-  call pstreecomb(ictxt,'All',1,nrm2,-1,-1,scombnrm2)
-
+!!$  call pstreecomb(ictxt,'All',1,nrm2,-1,-1,scombnrm2)
+  call psb_nrm2(ictxt,nrm2)
+  
   psb_cnrm2 = nrm2  
 
   call psb_erractionrestore(err_act)
@@ -178,7 +182,10 @@ end function psb_cnrm2
 !    info   -  integer.              Return code
 !
 function psb_cnrm2v(x, desc_a, info)  
-  use psb_sparse_mod, psb_protect_name => psb_cnrm2v
+  use psb_descriptor_type
+  use psb_check_mod
+  use psb_error_mod
+  use psb_penv_mod
   implicit none
 
   complex(psb_spk_), intent(in)   :: x(:)
@@ -191,7 +198,7 @@ function psb_cnrm2v(x, desc_a, info)
        & err_act, iix, jjx, ndim, ix, jx, i, m, id, idx, ndm
   real(psb_spk_)         :: nrm2, scnrm2, dd
 
-  external scombnrm2
+!!$  external scombnrm2
   character(len=20)        :: name, ch_err
 
   name='psb_cnrm2v'
@@ -203,7 +210,7 @@ function psb_cnrm2v(x, desc_a, info)
 
   call psb_info(ictxt, me, np)
   if (np == -1) then
-    info = psb_err_blacs_error_
+    info=psb_err_blacs_error_
     call psb_errpush(info,name)
     goto 9999
   endif
@@ -243,7 +250,8 @@ function psb_cnrm2v(x, desc_a, info)
     nrm2 = dzero
   end if
 
-  call pstreecomb(ictxt,'All',1,nrm2,-1,-1,scombnrm2)
+!!$  call pstreecomb(ictxt,'All',1,nrm2,-1,-1,scombnrm2)
+  call psb_nrm2(ictxt,nrm2)
 
   psb_cnrm2v = nrm2  
 
@@ -307,7 +315,10 @@ end function psb_cnrm2v
 !    info   -  integer.              Return code
 !
 subroutine psb_cnrm2vs(res, x, desc_a, info)
-  use psb_sparse_mod, psb_protect_name => psb_cnrm2vs
+  use psb_descriptor_type
+  use psb_check_mod
+  use psb_error_mod
+  use psb_penv_mod
   implicit none
 
   complex(psb_spk_), intent(in)   :: x(:)
@@ -320,7 +331,7 @@ subroutine psb_cnrm2vs(res, x, desc_a, info)
        & err_act, iix, jjx, ndim, ix, jx, i, m, id, idx, ndm
   real(psb_spk_)         :: nrm2, scnrm2, dd
 
-  external scombnrm2
+!!$  external scombnrm2
   character(len=20)        :: name, ch_err
 
   name='psb_cnrm2'
@@ -332,7 +343,7 @@ subroutine psb_cnrm2vs(res, x, desc_a, info)
 
   call psb_info(ictxt, me, np)
   if (np == -1) then
-    info = psb_err_blacs_error_
+    info=psb_err_blacs_error_
     call psb_errpush(info,name)
     goto 9999
   endif
@@ -372,8 +383,8 @@ subroutine psb_cnrm2vs(res, x, desc_a, info)
     nrm2 = dzero
   end if
 
-  call pstreecomb(ictxt,'All',1,nrm2,-1,-1,scombnrm2)
-
+!!$  call pstreecomb(ictxt,'All',1,nrm2,-1,-1,scombnrm2)
+  call psb_nrm2(ictxt,nrm2)
   res = nrm2  
 
   call psb_erractionrestore(err_act)
