@@ -85,7 +85,7 @@ module psb_d_cxx_mat_mod
       use psb_d_base_mat_mod
       import psb_d_cxx_sparse_mat
       class(psb_d_cxx_sparse_mat), intent(in) :: a
-      class(psb_d_coo_sparse_mat), intent(out) :: b
+      class(psb_d_coo_sparse_mat), intent(inout) :: b
       integer, intent(out)            :: info
     end subroutine d_cp_cxx_to_coo_impl
   end interface
@@ -107,7 +107,7 @@ module psb_d_cxx_mat_mod
       use psb_d_base_mat_mod
       import psb_d_cxx_sparse_mat
       class(psb_d_cxx_sparse_mat), intent(inout) :: a
-      class(psb_d_base_sparse_mat), intent(out)  :: b
+      class(psb_d_base_sparse_mat), intent(inout)  :: b
       integer, intent(out)            :: info
     end subroutine d_mv_cxx_to_fmt_impl
   end interface
@@ -130,7 +130,7 @@ module psb_d_cxx_mat_mod
       use psb_d_base_mat_mod
       import psb_d_cxx_sparse_mat
       class(psb_d_cxx_sparse_mat), intent(inout) :: a
-      class(psb_d_coo_sparse_mat), intent(out)   :: b
+      class(psb_d_coo_sparse_mat), intent(inout)   :: b
       integer, intent(out)            :: info
     end subroutine d_mv_cxx_to_coo_impl
   end interface
@@ -784,7 +784,7 @@ contains
     use psb_realloc_mod
     implicit none 
     class(psb_d_cxx_sparse_mat), intent(in) :: a
-    class(psb_d_coo_sparse_mat), intent(out) :: b
+    class(psb_d_coo_sparse_mat), intent(inout) :: b
     integer, intent(out)            :: info
 
     Integer :: err_act
@@ -849,7 +849,7 @@ contains
     use psb_realloc_mod
     implicit none 
     class(psb_d_cxx_sparse_mat), intent(in) :: a
-    class(psb_d_base_sparse_mat), intent(out) :: b
+    class(psb_d_base_sparse_mat), intent(inout) :: b
     integer, intent(out)            :: info
 
     Integer :: err_act
@@ -914,7 +914,7 @@ contains
     use psb_realloc_mod
     implicit none 
     class(psb_d_cxx_sparse_mat), intent(inout) :: a
-    class(psb_d_coo_sparse_mat), intent(out)   :: b
+    class(psb_d_coo_sparse_mat), intent(inout)   :: b
     integer, intent(out)            :: info 
 
     Integer :: err_act
@@ -979,7 +979,7 @@ contains
     use psb_realloc_mod
     implicit none 
     class(psb_d_cxx_sparse_mat), intent(inout) :: a
-    class(psb_d_base_sparse_mat), intent(out)  :: b
+    class(psb_d_base_sparse_mat), intent(inout)  :: b
     integer, intent(out)            :: info
 
     Integer :: err_act

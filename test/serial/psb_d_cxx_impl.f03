@@ -1709,7 +1709,7 @@ subroutine d_cp_cxx_to_coo_impl(a,b,info)
   implicit none 
 
   class(psb_d_cxx_sparse_mat), intent(in)  :: a
-  class(psb_d_coo_sparse_mat), intent(out) :: b
+  class(psb_d_coo_sparse_mat), intent(inout) :: b
   integer, intent(out)                      :: info
 
   integer, allocatable :: itemp(:)
@@ -1751,7 +1751,7 @@ subroutine d_mv_cxx_to_coo_impl(a,b,info)
   implicit none 
 
   class(psb_d_cxx_sparse_mat), intent(inout) :: a
-  class(psb_d_coo_sparse_mat), intent(out)   :: b
+  class(psb_d_coo_sparse_mat), intent(inout)   :: b
   integer, intent(out)                        :: info
 
   integer, allocatable :: itemp(:)
@@ -1885,7 +1885,7 @@ subroutine d_mv_cxx_to_fmt_impl(a,b,info)
   implicit none 
 
   class(psb_d_cxx_sparse_mat), intent(inout) :: a
-  class(psb_d_base_sparse_mat), intent(out)  :: b
+  class(psb_d_base_sparse_mat), intent(inout)  :: b
   integer, intent(out)                        :: info
 
   !locals
