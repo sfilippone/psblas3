@@ -132,28 +132,28 @@ void mpi_alltoallv(void* sdb, int* sdc, int* sdspl, int* sdt,
 
   
   if (*sdt == mpi_integer) {
-    memcpy((rvb+rdspl[0]*sizeof(int)),
-	   (sdb+sdspl[0]*sizeof(int)),(*sdc)*sizeof(int));
+    memcpy((void *)((char *)rvb+rdspl[0]*sizeof(int)),
+	   (void *)((char *)sdb+sdspl[0]*sizeof(int)),(*sdc)*sizeof(int));
   }
   if (*sdt == mpi_integer8) {
-    memcpy((rvb+rdspl[0]*2*sizeof(int)),
-	   (sdb+sdspl[0]*2*sizeof(int)),(*sdc)*2*sizeof(int));
+    memcpy((void *)((char *)rvb+rdspl[0]*2*sizeof(int)),
+	   (void *)((char *)sdb+sdspl[0]*2*sizeof(int)),(*sdc)*2*sizeof(int));
   }
   if (*sdt == mpi_real) {
-    memcpy((rvb+rdspl[0]*sizeof(float)),
-	   (sdb+sdspl[0]*sizeof(float)),(*sdc)*sizeof(float));
+    memcpy((void *)((char *)rvb+rdspl[0]*sizeof(float)),
+	   (void *)((char *)sdb+sdspl[0]*sizeof(float)),(*sdc)*sizeof(float));
   } 
   if (*sdt == mpi_double) {
-    memcpy((rvb+rdspl[0]*sizeof(double)),
-	   (sdb+sdspl[0]*sizeof(double)),(*sdc)*sizeof(double));
+    memcpy((void *)((char *)rvb+rdspl[0]*sizeof(double)),
+	   (void *)((char *)sdb+sdspl[0]*sizeof(double)),(*sdc)*sizeof(double));
   } 
   if (*sdt == mpi_complex) {
-    memcpy((rvb+rdspl[0]*2*sizeof(float)),
-	   (sdb+sdspl[0]*2*sizeof(float)),(*sdc)*2*sizeof(float));
+    memcpy((void *)((char *)rvb+rdspl[0]*2*sizeof(float)),
+	   (void *)((char *)sdb+sdspl[0]*2*sizeof(float)),(*sdc)*2*sizeof(float));
   }
   if (*sdt == mpi_double_complex) {
-    memcpy((rvb+rdspl[0]*2*sizeof(double)),
-	   (sdb+sdspl[0]*2*sizeof(double)),(*sdc)*2*sizeof(double));
+    memcpy((void *)((char *)rvb+rdspl[0]*2*sizeof(double)),
+	   (void *)((char *)sdb+sdspl[0]*2*sizeof(double)),(*sdc)*2*sizeof(double));
   }
   *ierr = 0;
 }
@@ -192,28 +192,28 @@ void mpi_allgatherv(void* sdb, int* sdc, int* sdt,
   int i,j,k; 
   
   if (*sdt == mpi_integer) {
-    memcpy((rvb+rdspl[0]*sizeof(int)),
-	   (sdb),(*sdc)*sizeof(int));
+    memcpy((void *)((char *)rvb+rdspl[0]*sizeof(int)),
+	   (void *)((char *)sdb),(*sdc)*sizeof(int));
   }
   if (*sdt == mpi_integer8) {
-    memcpy((rvb+rdspl[0]*2*sizeof(int)),
-	   (sdb),(*sdc)*2*sizeof(int));
+    memcpy((void *)((char *)rvb+rdspl[0]*2*sizeof(int)),
+	   (void *)((char *)sdb),(*sdc)*2*sizeof(int));
   }
   if (*sdt == mpi_real) {
-    memcpy((rvb+rdspl[0]*sizeof(float)),
-	   (sdb),(*sdc)*sizeof(float));
+    memcpy((void *)((char *)rvb+rdspl[0]*sizeof(float)),
+	   (void *)((char *)sdb),(*sdc)*sizeof(float));
   } 
   if (*sdt == mpi_double) {
-    memcpy((rvb+rdspl[0]*sizeof(double)),
-	   (sdb),(*sdc)*sizeof(double));
+    memcpy((void *)((char *)rvb+rdspl[0]*sizeof(double)),
+	   (void *)((char *)sdb),(*sdc)*sizeof(double));
   } 
   if (*sdt == mpi_complex) {
-    memcpy((rvb+rdspl[0]*2*sizeof(float)),
-	   (sdb),(*sdc)*2*sizeof(float));
+    memcpy((void *)((char *)rvb+rdspl[0]*2*sizeof(float)),
+	   (void *)((char *)sdb),(*sdc)*2*sizeof(float));
   }
   if (*sdt == mpi_double_complex) {
-    memcpy((rvb+rdspl[0]*2*sizeof(double)),
-	   (sdb),(*sdc)*2*sizeof(double));
+    memcpy((void *)((char *)rvb+rdspl[0]*2*sizeof(double)),
+	   (void *)((char *)sdb),(*sdc)*2*sizeof(double));
   }
 
 
