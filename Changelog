@@ -1,6 +1,22 @@
 Changelog. A lot less detailed than usual, at least for past
-history. 
-
+history.
+	
+2010/05/10: Fixed fakempi. Now works under XLF 13.1
+	
+2010/04/29: Restructure KRYLOV modules. 
+	
+2010/04/29: Take out BLACS.
+	
+2010/04/27: Reworked inheritance chain for PREC.
+	
+2010/04/27: Fixed private attribute. Various fixes for compilation
+            with gfortran. 
+	
+2010/04/21: Added shortcut for CSR in ILU_FACT 
+	
+2010/03/23: Restructured the module structure. 
+	
+	
 2009/12/15: Tons of bug fixes, also from testing on IBM XLF. 
 	
 2009/09/15: First working OO implementation for serial routines on sparse
