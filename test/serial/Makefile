@@ -3,7 +3,8 @@ include ../../Make.inc
 # Libraries used
 #
 LIBDIR=../../lib/
-PSBLAS_LIB= -L$(LIBDIR) -lpsb_util -lpsb_krylov -lpsb_prec -lpsb_base 
+PSBLAS_LIB= -L$(LIBDIR) -lpsb_base
+#-lpsb_util -lpsb_krylov -lpsb_prec -lpsb_base 
 LDLIBS=$(PSBLDLIBS)
 #
 # Compilers and such

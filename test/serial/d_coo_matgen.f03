@@ -1,8 +1,8 @@
 !
 program d_coo_matgen
   use psb_sparse_mod
-  use psb_prec_mod
-  use psb_krylov_mod
+!!$  use psb_prec_mod
+!!$  use psb_krylov_mod
   use psb_d_base_mat_mod
   use psb_d_csr_mat_mod
   implicit none
@@ -18,7 +18,7 @@ program d_coo_matgen
 
   ! sparse matrix and preconditioner
   type(psb_d_sparse_mat) :: a
-  type(psb_dprec_type)  :: prec
+!!$  type(psb_dprec_type)  :: prec
   ! descriptor
   type(psb_desc_type)   :: desc_a
   ! dense matrices
@@ -138,6 +138,8 @@ contains
     ! Note that if a1=a2=a3=a4=0., the PDE is the well-known Laplace equation.
     !
     use psb_sparse_mod
+    use psb_d_base_mat_mod
+    use psb_d_csr_mat_mod  
     implicit none
     integer                        :: idim
     integer, parameter             :: nb=20
@@ -195,6 +197,7 @@ contains
     nlr = nt
     call psb_barrier(ictxt)
 
+    call acoo%set_null()
     t0 = psb_wtime()
 
     call acoo%allocate(nr,nr)

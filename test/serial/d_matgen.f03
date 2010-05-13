@@ -1,8 +1,8 @@
 !
 program d_matgen
   use psb_sparse_mod
-  use psb_prec_mod
-  use psb_krylov_mod
+!!$  use psb_prec_mod
+!!$  use psb_krylov_mod
   use psb_d_base_mat_mod
   use psb_d_csr_mat_mod
   use psb_d_mat_mod
@@ -19,7 +19,7 @@ program d_matgen
 
   ! sparse matrix and preconditioner
   type(psb_d_sparse_mat) :: a
-  type(psb_dprec_type)  :: prec
+!!$  type(psb_dprec_type)  :: prec
   ! descriptor
   type(psb_desc_type)   :: desc_a
   ! dense matrices
@@ -382,13 +382,13 @@ contains
     call a_n%print(20)
     anorm = a_n%csnmi()
     write(0,*) 'Nrm infinity ',anorm
-    call a_n%csget(2,3,element,irow,icol,val,info)
-    write(0,*) 'From csget ',element,info
-    if (info == psb_success_) then 
-      do i=1,element
-        write(0,*) irow(i),icol(i),val(i)
-      end do
-    end if
+!!$    call a_n%csget(2,3,element,irow,icol,val,info)
+!!$    write(0,*) 'From csget ',element,info
+!!$    if (info == psb_success_) then 
+!!$      do i=1,element
+!!$        write(0,*) irow(i),icol(i),val(i)
+!!$      end do
+!!$    end if
     
     isz = a_n%get_size()
     write(0,*) 'Size 1: ',isz
@@ -404,7 +404,7 @@ contains
     end if
 !!$
     t1 = psb_wtime()
-    call a_n%cscnv(info,mold=acxx)
+    call a_n%cscnv(info,mold=acsr)
 
     if(info /= psb_success_) then
       info=psb_err_from_subroutine_

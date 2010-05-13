@@ -619,6 +619,7 @@ subroutine  psb_s_free(a)
   implicit none 
   class(psb_s_sparse_mat), intent(inout) :: a
 
+  write(*,*) 'On entry to PSB_S_FREE: ',allocated(a%a)
   if (allocated(a%a)) then 
     call a%a%free()
     deallocate(a%a) 

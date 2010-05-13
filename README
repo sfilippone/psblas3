@@ -1,4 +1,30 @@
-This directory contains  the PSBLAS library, version 3.0
+This directory contains  the PSBLAS library, version 3.0-pre-release.
+
+WARNING: This is higly experimental, unstable, and almost undocumented.  
+	 Do not count on anything to remain unchanged by the time 3.0
+	 really comes out. 
+
+This version requires a working Fortran 2003 compiler; we do not use
+all of the language features (specifically, so far we did not employ
+FINAL subroutines), but the features we use were sufficient in
+identifying bugs in ALL compilers we tried (all the bugs have been
+reported and mostly fixed by the respective vendors). 
+
+Notes: This code is confirmed to work with NAGware 5.2 and XLF 13.1. 
+       It does NOT work with GNU Fortran 4.5; it is one of the
+       testbeds for GNU Fortran 4.6, the active development version
+       (as of May 2010), but does not work yet. 
+       If you find it working with other compilers, please let us
+       know. 
+
+       The "undocumented" in the warning above refers to the
+       internals; the new internals have been completely overhauled,
+       and in many cases rewritten; they are supposed to enable much
+       better interfacing with user-defined storage formats. If the
+       user is only interested in the predefined formats, then the
+       user's guide should be sufficient; what is lacking is
+       documentation on how to add to the library. This will come. 
+
 
  
 Version 1.0 of the library was described in:
@@ -8,10 +34,11 @@ ACM Trans. on Math. Software, 26(4), Dec. 2000, pp. 527-550.
 
 PLATFORMS: 
 
-The compilation process relies on the choice of an appropriate
-Make.inc file; we have tested with AIX XLF, Intel ifort/Linux,  Nag
-f95/Linux, GNU Fortran/Linux, Sun Forte 6.2. If you succeed in
-compiling with  other compiler/operating systems please let us know. 
+obsolete... 
+--The compilation process relies on the choice of an appropriate
+--Make.inc file; we have tested with AIX XLF, Intel ifort/Linux,  Nag
+--f95/Linux, GNU Fortran/Linux, Sun Forte 6.2. If you succeed in
+--compiling with  other compiler/operating systems please let us know. 
 
 
 LINUX:
@@ -50,15 +77,11 @@ prerequisites (see also SERIAL below):
 
 1. A working version of MPI
 
-2. The MPI version of the BLACS; some systems (e.g. IBM SP) provide
-   a specific version, otherwise you can find it at
-   http://www.netlib.org/blacs/index.html 
-
-3. A version of the BLAS; if you don't have a specific version for
+2. A version of the BLAS; if you don't have a specific version for
    your platform you may try ATLAS available from
    http://math-atlas.sourceforge.net/ 
 
-4. We have had good results with  the METIS library, from 
+3. We have had good results with  the METIS library, from 
    http://www-users.cs.umn.edu/~karypis/metis/metis/main.html 
    This is optional; it is  used in the util and test/fileread
    directories but only if you define the HAVE_METIS directive.
@@ -67,8 +90,7 @@ The configure script will generate a Make.inc file suitable for
 building the library.  
 The script is capable of recognizing the needed libraries with their
 default names; if they are in unusual places consider adding the paths
-with --with-lib, or explicitly specifying the names in --with-blas,
---with-blacs etc. 
+with --with-lib, or explicitly specifying the names in --with-blas, etc. 
 Please note that a common way for the configure script to fail is to
 specify inconsistent MPI vs. plain compilers, either directly or
 indirectly via environment variables; e.g. specifying the Intel
@@ -139,4 +161,3 @@ Dario      Pascucci
 
 
 
-k

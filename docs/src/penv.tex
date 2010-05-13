@@ -6,7 +6,7 @@
 \addcontentsline{toc}{subsection}{psb\_init}
 
 \begin{verbatim}
-call psb_init(icontxt, np)
+call psb_init(icontxt, np, basectxt, ids)
 \end{verbatim}
 
 This subroutine initializes the PSBLAS parallel environment, defining
@@ -19,14 +19,31 @@ Scope: {\bf global}.\\
 Type: {\bf optional}.\\
 Intent: {\bf in}.\\
 Specified as: an integer value. \
-Default: use all available processes provided by the underlying
-parallel environment.
+Default: use all available processes.
+\item[basectxt] the initial communication context. The new context
+  will be defined from the processes participating in the initial one.\\
+  Scope: {\bf global}.\\
+Type: {\bf optional}.\\
+Intent: {\bf in}.\\
+Specified as: an integer value. \
+Default: use MPI\_COMM\_WORLD.
+\item[ids] Identities of the processes to use for the new context; the
+  argument is ignored when \verb|np| is not specified. This allows the
+  processes in the new environment to be in an order different from the
+  original one.\\
+  Scope: {\bf global}.\\
+Type: {\bf optional}.\\
+Intent: {\bf in}.\\
+Specified as: an integer array. \
+Default: use the indices $(0\dots np-1)$.  
 \end{description}
 
 \begin{description}
 \item[\bf On Return]
 \item[icontxt] the communication context identifying the virtual
-  parallel machine.\\
+  parallel machine. Note that this is always a duplicate of
+  \verb|basectxt|, so that library communications are completely
+  separated from other communication operations.\\
 Scope: {\bf global}.\\
 Type: {\bf required}.\\
 Intent: {\bf out}.\\
@@ -38,7 +55,7 @@ Specified as: an integer variable.
 \begin{enumerate}
 \item A call to this routine must precede any other PSBLAS call. 
 \item It is an error to specify a value for $np$ greater than the
-  number of processes available in the underlying parallel execution
+  number of processes available in the underlying base parallel
   environment. 
 \end{enumerate}
 
