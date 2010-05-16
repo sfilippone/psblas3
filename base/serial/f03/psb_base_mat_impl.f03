@@ -15,7 +15,7 @@ function psb_base_get_nz_row(idx,a) result(res)
   ! This is the base version. If we get here
   ! it means the derived class is incomplete,
   ! so we throw an error.
-  call psb_errpush(700,name,a_err=a%get_fmt())
+  call psb_errpush(psb_err_missing_override_method_,name,a_err=a%get_fmt())
 
   if (err_act /= psb_act_ret_) then
     call psb_error()
@@ -40,7 +40,7 @@ function psb_base_get_nzeros(a) result(res)
   ! This is the base version. If we get here
   ! it means the derived class is incomplete,
   ! so we throw an error.
-  call psb_errpush(700,name,a_err=a%get_fmt())
+  call psb_errpush(psb_err_missing_override_method_,name,a_err=a%get_fmt())
 
   if (err_act /= psb_act_ret_) then
     call psb_error()
@@ -65,7 +65,7 @@ function psb_base_get_size(a) result(res)
   ! This is the base version. If we get here
   ! it means the derived class is incomplete,
   ! so we throw an error.
-  call psb_errpush(700,name,a_err=a%get_fmt())
+  call psb_errpush(psb_err_missing_override_method_,name,a_err=a%get_fmt())
 
   if (err_act /= psb_act_ret_) then
     call psb_error()
@@ -87,11 +87,11 @@ subroutine psb_base_reinit(a,clear)
   logical, parameter :: debug=.false.
 
   call psb_get_erraction(err_act)
-  info = 700
+  info = psb_err_missing_override_method_
   ! This is the base version. If we get here
   ! it means the derived class is incomplete,
   ! so we throw an error.
-  call psb_errpush(700,name,a_err=a%get_fmt())
+  call psb_errpush(psb_err_missing_override_method_,name,a_err=a%get_fmt())
 
   if (err_act /= psb_act_ret_) then
     call psb_error()
@@ -117,11 +117,11 @@ subroutine psb_base_sparse_print(iout,a,iv,eirs,eics,head,ivr,ivc)
   logical, parameter :: debug=.false.
 
   call psb_get_erraction(err_act)
-  info = 700
+  info = psb_err_missing_override_method_
   ! This is the base version. If we get here
   ! it means the derived class is incomplete,
   ! so we throw an error.
-  call psb_errpush(700,name,a_err=a%get_fmt())
+  call psb_errpush(psb_err_missing_override_method_,name,a_err=a%get_fmt())
 
   if (err_act /= psb_act_ret_) then
     call psb_error()
@@ -155,7 +155,7 @@ subroutine psb_base_csgetptn(imin,imax,a,nz,ia,ja,info,&
   ! This is the base version. If we get here
   ! it means the derived class is incomplete,
   ! so we throw an error.
-  info = 700
+  info = psb_err_missing_override_method_
   call psb_errpush(info,name,a_err=a%get_fmt())
 
   if (err_act /= psb_act_ret_) then
@@ -259,7 +259,7 @@ subroutine  psb_base_allocate_mnnz(m,n,a,nz)
   ! This is the base version. If we get here
   ! it means the derived class is incomplete,
   ! so we throw an error.
-  call psb_errpush(700,name,a_err=a%get_fmt())
+  call psb_errpush(psb_err_missing_override_method_,name,a_err=a%get_fmt())
 
   if (err_act /= psb_act_ret_) then
     call psb_error()
@@ -282,7 +282,7 @@ subroutine  psb_base_reallocate_nz(nz,a)
   ! This is the base version. If we get here
   ! it means the derived class is incomplete,
   ! so we throw an error.
-  call psb_errpush(700,name,a_err=a%get_fmt())
+  call psb_errpush(psb_err_missing_override_method_,name,a_err=a%get_fmt())
 
   if (err_act /= psb_act_ret_) then
     call psb_error()
@@ -304,7 +304,7 @@ subroutine  psb_base_free(a)
   ! This is the base version. If we get here
   ! it means the derived class is incomplete,
   ! so we throw an error.
-  call psb_errpush(700,name,a_err=a%get_fmt())
+  call psb_errpush(psb_err_missing_override_method_,name,a_err=a%get_fmt())
 
   if (err_act /= psb_act_ret_) then
     call psb_error()
@@ -326,7 +326,7 @@ subroutine  psb_base_trim(a)
   ! This is the base version. If we get here
   ! it means the derived class is incomplete,
   ! so we throw an error.
-  call psb_errpush(700,name,a_err=a%get_fmt())
+  call psb_errpush(psb_err_missing_override_method_,name,a_err=a%get_fmt())
 
   if (err_act /= psb_act_ret_) then
     call psb_error()
