@@ -368,7 +368,7 @@ contains
       call psb_errpush(info,name,a_err=ch_err)
       goto 9999
     end if
-    call a_n%print(19)
+!!$    call a_n%print(19)
     t1 = psb_wtime()
     call a_n%cscnv(info,mold=acsr)
 
@@ -379,7 +379,10 @@ contains
       goto 9999
     end if
     tasb = psb_wtime()-t1
-    call a_n%print(20)
+    call psb_barrier(ictxt)
+    ttot = psb_wtime() - t0 
+
+!!$    call a_n%print(20)
     anorm = a_n%csnmi()
     write(0,*) 'Nrm infinity ',anorm
 !!$    call a_n%csget(2,3,element,irow,icol,val,info)
@@ -413,7 +416,7 @@ contains
       goto 9999
     end if
     tmov = psb_wtime()-t1
-    call a_n%print(21)
+!!$    call a_n%print(21)
     anorm = a_n%csnmi()
     write(0,*) 'Nrm infinity ',anorm
 
@@ -425,6 +428,7 @@ contains
       write(*,'("-allocation  time : ",es12.5)') talc
       write(*,'("-coeff. gen. time : ",es12.5)') tgen
       write(*,'("-assembly    time : ",es12.5)') tasb
+      write(*,'("-total       time : ",es12.5)') ttot
       write(*,'("-convert     time : ",es12.5)') tmov
 !!$      write(*,'("-total       time : ",es12.5)') ttot
 
