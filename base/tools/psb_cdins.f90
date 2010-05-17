@@ -120,7 +120,8 @@ subroutine psb_cdinsrc(nz,ia,ja,desc_a,info,ila,jla)
 
   if (present(ila).and.present(jla)) then 
     call psi_idx_cnv(nz,ia,ila,desc_a,info,owned=.true.)
-    call psb_cdins(nz,ja,desc_a,info,jla=jla,mask=(ila(1:nz)>0))
+    if (info == psb_success_) &
+         & call psb_cdins(nz,ja,desc_a,info,jla=jla,mask=(ila(1:nz)>0))
   else
     if (present(ila).or.present(jla)) then 
       write(0,*) 'Inconsistent call : ',present(ila),present(jla)
@@ -132,7 +133,8 @@ subroutine psb_cdinsrc(nz,ia,ja,desc_a,info,ila,jla)
       goto 9999
     end if
     call psi_idx_cnv(nz,ia,ila_,desc_a,info,owned=.true.)
-    call psb_cdins(nz,ja,desc_a,info,mask=(ila_(1:nz)>0))
+    if (info == psb_success_) &
+         & call psb_cdins(nz,ja,desc_a,info,mask=(ila_(1:nz)>0))
     deallocate(ila_)
   end if
 

@@ -360,6 +360,8 @@ contains
       write (error_unit,'("To call this routine you must first call psb_geall on the same matrix")')
     case(psb_err_forgot_spall_)
       write (error_unit,'("To call this routine you must first call psb_spall on the same matrix")')
+    case(psb_err_wrong_ins_)
+      write (0,'("Something went wrong before this call to ",a,", probably in cdins/spins")')r_name
     case(psb_err_iarg_mbeeiarra_i_)
       write (error_unit,'("Input argument n. ",i0," must be equal to entry n. ",i0," in array input argument n.",i0)') &
            & i_e_d(1),i_e_d(4),i_e_d(3)

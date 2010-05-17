@@ -141,6 +141,7 @@ module psb_const_mod
   integer, parameter, public :: psb_err_iarray_outside_process_=150
   integer, parameter, public :: psb_err_forgot_geall_=290
   integer, parameter, public :: psb_err_forgot_spall_=295
+  integer, parameter, public :: psb_err_wrong_ins_=298
   integer, parameter, public :: psb_err_iarg_mbeeiarra_i_=300
   integer, parameter, public :: psb_err_mpi_error_=400
   integer, parameter, public :: psb_err_parm_differs_among_procs_=550

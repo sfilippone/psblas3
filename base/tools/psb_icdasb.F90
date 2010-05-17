@@ -96,6 +96,15 @@ subroutine psb_icdasb(desc_a,info,ext_hv)
     goto 9999
   endif
   
+  info = psb_get_errstatus()
+  if (info /= psb_success_) then 
+    ! Something went wrong in cdins/spins
+    ! signal and exit
+    info = psb_err_wrong_ins_
+    call psb_errpush(info,name)
+    goto 9999
+  end if
+  
   if (present(ext_hv)) then 
     ext_hv_ = ext_hv
   else
