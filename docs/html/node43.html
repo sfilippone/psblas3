@@ -59,14 +59,14 @@ psb_cdall -- Allocates a communication descriptor</A>
 <PRE>
 call psb_cdall(icontxt, desc_a, info,mg=mg,parts=parts)
 call psb_cdall(icontxt, desc_a, info,vg=vg,flag=flag)
-call psb_cdall(icontxt, desc_a, info,vl=vl,globalcheck=.true.)
+call psb_cdall(icontxt, desc_a, info,vl=vl,nl=nl,globalcheck=.true.)
 call psb_cdall(icontxt, desc_a, info,nl=nl)
 call psb_cdall(icontxt, desc_a, info,mg=mg,repl=.true.)
 </PRE>
 
 <P>
 This subroutine initializes the communication descriptor associated
-with an index space. Exactly one of the  optional arguments
+with an index space. One of the  optional arguments
 <code>parts</code>, <code>vg</code>, <code>vl</code>, <code>nl</code>  or <code>repl</code> 
 must be specified, thereby choosing
 the specific initialization strategy.
@@ -141,7 +141,7 @@ Type:<B>optional</B>.
 Intent: <B>in</B>.
 <BR>
 Specified as: an integer value. It is required if <code>parts</code> or
-<code>repl</code> is specified. 
+<code>repl</code> is specified, it is optional if <code>vg</code> is specified. 
 </DD>
 <DT><STRONG>parts</STRONG></DT>
 <DD>the subroutine that defines the partitioning scheme.
@@ -174,7 +174,8 @@ Type:<B>optional</B>.
 <BR>
 Intent: <B>in</B>.
 <BR>
-Specified as: an integer value. 
+Specified as: an integer value. May be specified together with
+<code>vl</code>. 
 </DD>
 <DT><STRONG>repl</STRONG></DT>
 <DD>Data allocation: build a replicated index space (i.e. all
@@ -235,7 +236,7 @@ An integer value; 0 means no error has been detected.
 <FONT SIZE="+1"><B>Notes</B></FONT>
 
 <OL>
-<LI>Exactly one of the optional arguments  <code>parts</code>, <code>vg</code>,
+<LI>One of the optional arguments  <code>parts</code>, <code>vg</code>,
   <code>vl</code>, <code>nl</code>  or <code>repl</code> must be specified, thereby choosing the
   initialization   strategy as follows:
 <DL>
@@ -310,7 +311,9 @@ An integer value; 0 means no error has been detected.
   or <IMG
  WIDTH="65" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
  SRC="img94.png"
- ALT="$(1\dots np)$"> according to the value of <code>flag</code>.
+ ALT="$(1\dots np)$"> according to the value of <code>flag</code>.  Optionally,
+  the user may specify <code>mg</code>, in 
+  which case the portion <code>vg(1:mg)</code> is used. 
 </DD>
 <DT><STRONG>vl</STRONG></DT>
 <DD>In this case we are specifying the list of indices assigned
@@ -330,7 +333,8 @@ An integer value; 0 means no error has been detected.
   If <code>globalcheck=.false.</code>, the subroutine will not check for
   overlap, and may be substantially faster, but
   the user is implicitly guaranteeing that there are neither orphan
-  nor overlap indices. 
+  nor overlap indices. Optionally, the user may specify <code>nl</code>, in
+  which case the portion <code>vl(1:nl)</code> is used. 
 </DD>
 <DT><STRONG>nl</STRONG></DT>
 <DD>In this case we are implying a generalized row-block
@@ -379,7 +383,7 @@ An integer value; 0 means no error has been detected.
 </LI>
 <LI>Orphan and overlap indices are
   impossible by construction when the subroutine is invoked with
-  <code>nl</code> or <code>vg</code>.
+  <code>nl</code> (alone),  or <code>vg</code>.
 </LI>
 </OL>
 

@@ -388,7 +388,7 @@ contains
       write (error_unit,'("partition function passed as input argument n. ",i0," returns wrong processes identifier")')i_e_d(1)
       write (error_unit,'("on global point ",i0,". Current value returned is : ",i0)')i_e_d(3),i_e_d(2)
     case(psb_err_no_optional_arg_)
-      write (error_unit,'("Exactly one of the optional arguments  ",a," must be present")')a_e_d
+      write (error_unit,'("One of the optional arguments  ",a," must be present")')a_e_d
     case(psb_err_arg_m_required_)
       write (error_unit,'("Argument M is required when argument PARTS is specified")')
     case(psb_err_spmat_invalid_state_)

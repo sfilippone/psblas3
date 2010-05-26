@@ -527,7 +527,7 @@ subroutine psb_cdall(ictxt, desc, info,mg,ng,parts,vg,vl,flag,nl,repl, globalche
     end subroutine psb_cdrep
   end interface
   character(len=20)   :: name
-  integer :: err_act, n_, flag_, i, me, np, nlp
+  integer :: err_act, n_, flag_, i, me, np, nlp, nnv
   integer, allocatable :: itmpsz(:) 
 
 
@@ -580,10 +580,20 @@ subroutine psb_cdall(ictxt, desc, info,mg,ng,parts,vg,vl,flag,nl,repl, globalche
     else
       flag_=0
     endif
-    call psb_cdalv(vg, ictxt, desc, info, flag=flag_)
+    if (present(mg)) then 
+      nnv = min(mg,size(vg))
+    else
+      nnv = size(vg)
+    end if
+    call psb_cdalv(vg(1:nnv), ictxt, desc, info, flag=flag_)
 
   else if (present(vl)) then 
-    call psb_cd_inloc(vl,ictxt,desc,info, globalcheck=globalcheck)
+    if (present(nl)) then 
+      nnv = min(nl,size(vl))
+    else
+      nnv = size(vl)
+    end if
+    call psb_cd_inloc(vl(1:nnv),ictxt,desc,info, globalcheck=globalcheck)
 
   else if (present(nl)) then 
     allocate(itmpsz(0:np-1),stat=info)

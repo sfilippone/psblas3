@@ -11,13 +11,13 @@
 \begin{verbatim}
 call psb_cdall(icontxt, desc_a, info,mg=mg,parts=parts)
 call psb_cdall(icontxt, desc_a, info,vg=vg,flag=flag)
-call psb_cdall(icontxt, desc_a, info,vl=vl,globalcheck=.true.)
+call psb_cdall(icontxt, desc_a, info,vl=vl,nl=nl,globalcheck=.true.)
 call psb_cdall(icontxt, desc_a, info,nl=nl)
 call psb_cdall(icontxt, desc_a, info,mg=mg,repl=.true.)
 \end{verbatim}
 
 This subroutine initializes the communication descriptor associated
-with an index space. Exactly one of the  optional arguments
+with an index space. One of the  optional arguments
 \verb|parts|, \verb|vg|, \verb|vl|, \verb|nl|  or \verb|repl| 
 must be specified, thereby choosing
 the specific initialization strategy.
@@ -46,7 +46,7 @@ Scope:{\bf global}.\\
 Type:{\bf optional}.\\
 Intent: {\bf in}.\\
 Specified as: an integer value. It is required if \verb|parts| or
-\verb|repl| is specified. 
+\verb|repl| is specified, it is optional if \verb|vg| is specified. 
 \item[parts] the subroutine that defines the partitioning scheme.\\
 Scope:{\bf global}.\\
 Type:{\bf required}.\\
@@ -62,7 +62,8 @@ Specified as: an integer array.
 Scope:{\bf local}.\\
 Type:{\bf optional}.\\
 Intent: {\bf in}.\\
-Specified as: an integer value. 
+Specified as: an integer value. May be specified together with
+\verb|vl|. 
 \item[repl] Data allocation: build a replicated index space (i.e. all
   processes own all indices).\\
 Scope:{\bf global}.\\
@@ -93,7 +94,7 @@ An integer value; 0 means no error has been detected.
 
 {\par\noindent\large\bfseries Notes}
 \begin{enumerate}
-\item Exactly one of the optional arguments  \verb|parts|, \verb|vg|,
+\item One of the optional arguments  \verb|parts|, \verb|vg|,
   \verb|vl|, \verb|nl|  or \verb|repl| must be specified, thereby choosing the
   initialization   strategy as follows:
 \begin{description}
@@ -129,7 +130,9 @@ An integer value; 0 means no error has been detected.
   equal to the size of \verb|vg|, and each index $i$ is assigned to
   the process $vg(i)$. The vector \verb|vg| must be identical on all
   calling processes; its entries may have the ranges $(0\dots np-1)$
-  or $(1\dots np)$ according to the value of \verb|flag|.
+  or $(1\dots np)$ according to the value of \verb|flag|.  Optionally,
+  the user may specify \verb|mg|, in 
+  which case the portion \verb|vg(1:mg)| is used. 
 \item[vl] In this case we are specifying the list of indices assigned
   to the current process; thus, the global problem size $mg$ is given by
   the range of the aggregate of the individual vectors \verb|vl| specified
@@ -141,7 +144,8 @@ An integer value; 0 means no error has been detected.
   If \verb|globalcheck=.false.|, the subroutine will not check for
   overlap, and may be substantially faster, but
   the user is implicitly guaranteeing that there are neither orphan
-  nor overlap indices. 
+  nor overlap indices. Optionally, the user may specify \verb|nl|, in
+  which case the portion \verb|vl(1:nl)| is used. 
 \item[nl] In this case we are implying a generalized row-block
   distribution in which each process $I$ gets assigned a consecutive
   chunk of $N_I=nl$ global indices.
@@ -171,7 +175,7 @@ An integer value; 0 means no error has been detected.
   unpredictable. 
 \item Orphan and overlap indices are
   impossible by construction when the subroutine is invoked with
-  \verb|nl| or \verb|vg|.
+  \verb|nl| (alone),  or \verb|vg|.
 \end{enumerate}
 
 
