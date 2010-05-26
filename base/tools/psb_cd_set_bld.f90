@@ -82,6 +82,11 @@ subroutine psb_cd_set_bld(desc,info)
     nc = psb_cd_get_local_cols(desc)
     if (info == psb_success_)&
          & call psb_hash_init(nc,desc%idxmap%hash,info)
+    if (info == HashDuplicate) then 
+      info = psb_err_dupl_cd_vl
+      call psb_errpush(info,name,a_err='hashInit')
+      goto 9999
+    end if
     if (info == psb_success_) call psi_bld_g2lmap(desc,info)
     if (info /= psb_success_) then 
       call psb_errpush(psb_err_from_subroutine_,name,a_err='hashInit')

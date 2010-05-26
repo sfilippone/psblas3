@@ -342,6 +342,9 @@ contains
     case(psb_err_iarg_n_mbgtian_)
       write (error_unit,'("input argument n. ",i0," must be greater than input argument n. ",i0)')i_e_d(1:2)
       write (error_unit,'("current values are ",i0," < ",i0)') i_e_d(3:4)
+    case(psb_err_dupl_cd_vl)
+      write (error_unit,'("there are duplicated entries in vl (input to cdall)")')
+      !        ... coo format error ...
       !        ... coo format error ...
     case(psb_err_duplicate_coo)
       write (error_unit,'("there are duplicated elements in coo format")')

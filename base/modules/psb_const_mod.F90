@@ -133,6 +133,7 @@ module psb_const_mod
   integer, parameter, public :: psb_err_invalid_args_combination_=110
   integer, parameter, public :: psb_err_invalid_pid_arg_=115
   integer, parameter, public :: psb_err_iarg_n_mbgtian_=120
+  integer, parameter, public :: psb_err_dupl_cd_vl=123
   integer, parameter, public :: psb_err_duplicate_coo=130
   integer, parameter, public :: psb_err_invalid_input_format_=134
   integer, parameter, public :: psb_err_unsupported_format_=135

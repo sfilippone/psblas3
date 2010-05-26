@@ -12,15 +12,16 @@ subroutine psb_errcomm(ictxt, err)
 end subroutine psb_errcomm
 ! handles the occurence of an error in a serial routine
 subroutine psb_serror()
-  use psb_error_mod!, psb_protect_name => psb_serror
-
+  use psb_const_mod
+  use psb_error_mod
+  implicit none 
   integer                 ::  err_c
   character(len=20)       ::  r_name
   character(len=40)       ::  a_e_d
   integer                 ::  i_e_d(5)
 
-  if(error_status > 0) then
-    if(verbosity_level > 1) then
+  if(psb_get_errstatus() > 0) then
+    if(psb_get_errverbosity() > 1) then
 
       do while (psb_get_numerr() > izero)
         write(0,'(50("="))')
@@ -44,9 +45,10 @@ end subroutine psb_serror
 
 ! handles the occurence of an error in a parallel routine
 subroutine psb_perror(ictxt)
-  use psb_error_mod!, psb_protect_name => psb_perror
+  use psb_const_mod
+  use psb_error_mod
   use psb_penv_mod
-
+  implicit none 
   integer, intent(in)     :: ictxt
   integer                 :: err_c
   character(len=20)       :: r_name
@@ -55,21 +57,27 @@ subroutine psb_perror(ictxt)
   integer                 :: iam, np
 
 #if defined(SERIAL_MPI)
-  me = -1
+  iam = -1
 #else        
   call psb_info(ictxt,iam,np)
 #endif
-
-
-  if(error_status > 0) then
-    if(verbosity_level > 1) then
+  
+  
+  if(psb_get_errstatus() > 0) then
+    if(psb_get_errverbosity() > 1) then
 
       do while (psb_get_numerr() > izero)
         write(0,'(50("="))')
         call psb_errpop(err_c, r_name, i_e_d, a_e_d)
-        call psb_errmsg(err_c, r_name, i_e_d, a_e_d,me)
+        call psb_errmsg(err_c, r_name, i_e_d, a_e_d,iam)
         !            write(0,'(50("="))')
       end do
+#if defined(HAVE_FLUSH_SUB)
+      call flush(0) 
+#endif
+#if defined(HAVE_FLUSH_STMT)
+      flush(0) 
+#endif
 #if defined(SERIAL_MPI)
       stop 
 #else        
@@ -78,10 +86,16 @@ subroutine psb_perror(ictxt)
     else
 
       call psb_errpop(err_c, r_name, i_e_d, a_e_d)
-      call psb_errmsg(err_c, r_name, i_e_d, a_e_d,me)
+      call psb_errmsg(err_c, r_name, i_e_d, a_e_d,iam)
       do while (psb_get_numerr() > 0)
         call psb_errpop(err_c, r_name, i_e_d, a_e_d)
       end do
+#if defined(HAVE_FLUSH_SUB)
+      call flush(0) 
+#endif
+#if defined(HAVE_FLUSH_STMT)
+      flush(0) 
+#endif
 #if defined(SERIAL_MPI)
       stop 
 #else        
@@ -90,7 +104,7 @@ subroutine psb_perror(ictxt)
     end if
   end if
 
-  if(error_status > izero) then
+  if(psb_get_errstatus() > izero) then
 #if defined(SERIAL_MPI)
     stop 
 #else        

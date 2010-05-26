@@ -67,6 +67,7 @@ subroutine psb_cd_inloc(v, ictxt, desc, info, globalcheck)
   info=psb_success_
   err=0
   name = 'psb_cd_inloc'
+  call psb_erractionsave(err_act)
   debug_unit  = psb_get_debug_unit()
   debug_level = psb_get_debug_level()
 
@@ -220,12 +221,16 @@ subroutine psb_cd_inloc(v, ictxt, desc, info, globalcheck)
   end if
 
   !
-  ! Now sort the input items, and eliminate duplicates
+  ! Now sort the input items, and check for  duplicates
   ! (unlikely, but possible)
   !
   call psb_msort_unique(vl,nlu)
-  loc_row = nlu
-
+  if (loc_row /= nlu) then 
+    info = psb_err_dupl_cd_vl
+    call psb_errpush(info,name)
+    goto 9999
+  end if
+  
   call psb_nullify_desc(desc)
 
   !
@@ -327,6 +332,9 @@ subroutine psb_cd_inloc(v, ictxt, desc, info, globalcheck)
 
   !
   ! We have to decide whether we have a "large" index space.
+  ! Note: in what follows, we use the original V, not the sorted VL
+  ! to make sure indices are processed in the order the user expects
+  ! them. 
   !
   if (islarge) then 
     !
@@ -350,7 +358,7 @@ subroutine psb_cd_inloc(v, ictxt, desc, info, globalcheck)
     j      = 1
     itmpov = 0
     do k=1, loc_row
-      i = vl(k)
+      i = v(k)
       desc%idxmap%loc_to_glob(k) = i
 
       if (check_) then 
@@ -422,7 +430,14 @@ subroutine psb_cd_inloc(v, ictxt, desc, info, globalcheck)
     j      = 1
     itmpov = 0
     do k=1, loc_row
-      i = vl(k)
+      i = v(k)
+
+      if (desc%idxmap%glob_to_loc(i) > 0) then 
+        info = psb_err_dupl_cd_vl
+        call psb_errpush(info,name)
+        goto 9999
+      end if
+
       desc%idxmap%loc_to_glob(k) = i
       desc%idxmap%glob_to_loc(i) = k
 
@@ -455,7 +470,7 @@ subroutine psb_cd_inloc(v, ictxt, desc, info, globalcheck)
   end if
 
   call psi_bld_tmpovrl(temp_ovrlap,desc,info)
-
+  
   if (info == psb_success_) deallocate(temp_ovrlap,vl,stat=info)
   if ((info == psb_success_).and.(allocated(tmpgidx)))&
        &  deallocate(tmpgidx,stat=info)
