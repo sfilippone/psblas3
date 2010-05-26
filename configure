@@ -7427,9 +7427,9 @@ $as_echo "no" >&6; }
   cat conftest.$ac_ext >&5
 
   { { $as_echo "$as_me:$LINENO: error: Sorry, cannot build PSBLAS without support for TR15581.
- Please get a Fortran compiler that supports it, e.g. GNU Fortran 4.5." >&5
+ Please get a Fortran compiler that supports it, e.g. GNU Fortran 4.6." >&5
 $as_echo "$as_me: error: Sorry, cannot build PSBLAS without support for TR15581.
- Please get a Fortran compiler that supports it, e.g. GNU Fortran 4.5." >&2;}
+ Please get a Fortran compiler that supports it, e.g. GNU Fortran 4.6." >&2;}
    { (exit 1); exit 1; }; }
 
 fi
@@ -7473,9 +7473,9 @@ $as_echo "no" >&6; }
   cat conftest.$ac_ext >&5
 
   { { $as_echo "$as_me:$LINENO: error: Sorry, cannot build PSBLAS without support for EXTENDS.
- Please get a Fortran compiler that supports it, e.g. GNU Fortran 4.5." >&5
+ Please get a Fortran compiler that supports it, e.g. GNU Fortran 4.6." >&5
 $as_echo "$as_me: error: Sorry, cannot build PSBLAS without support for EXTENDS.
- Please get a Fortran compiler that supports it, e.g. GNU Fortran 4.5." >&2;}
+ Please get a Fortran compiler that supports it, e.g. GNU Fortran 4.6." >&2;}
    { (exit 1); exit 1; }; }
 
 fi
@@ -7538,9 +7538,9 @@ $as_echo "no" >&6; }
   cat conftest.$ac_ext >&5
 
   { { $as_echo "$as_me:$LINENO: error: Sorry, cannot build PSBLAS without support for CLASS and type bound procedures.
- Please get a Fortran compiler that supports them, e.g. GNU Fortran 4.5." >&5
+ Please get a Fortran compiler that supports them, e.g. GNU Fortran 4.6." >&5
 $as_echo "$as_me: error: Sorry, cannot build PSBLAS without support for CLASS and type bound procedures.
- Please get a Fortran compiler that supports them, e.g. GNU Fortran 4.5." >&2;}
+ Please get a Fortran compiler that supports them, e.g. GNU Fortran 4.6." >&2;}
    { (exit 1); exit 1; }; }
 
 fi
@@ -7575,10 +7575,10 @@ $as_echo "no" >&6; }
   echo "configure: failed program was:" >&5
   cat conftest.$ac_ext >&5
   rm -rf conftest*
-  { { $as_echo "$as_me:$LINENO: error: Sorry, cannot build PSBLAS without support for EXTENDS.
- Please get a Fortran compiler that supports it, e.g. GNU Fortran 4.5." >&5
-$as_echo "$as_me: error: Sorry, cannot build PSBLAS without support for EXTENDS.
- Please get a Fortran compiler that supports it, e.g. GNU Fortran 4.5." >&2;}
+  { { $as_echo "$as_me:$LINENO: error: Sorry, cannot build PSBLAS without support for MOVE_ALLOC.
+ Please get a Fortran compiler that supports it, e.g. GNU Fortran 4.6." >&5
+$as_echo "$as_me: error: Sorry, cannot build PSBLAS without support for MOVE_ALLOC.
+ Please get a Fortran compiler that supports it, e.g. GNU Fortran 4.6." >&2;}
    { (exit 1); exit 1; }; }
 
 fi
@@ -7613,6 +7613,44 @@ if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
 $as_echo "yes" >&6; }
 
   FDEFINES="$psblas_cv_define_prepend-DHAVE_VOLATILE $FDEFINES"
+else
+  { $as_echo "$as_me:$LINENO: result: no" >&5
+$as_echo "no" >&6; }
+  echo "configure: failed program was:" >&5
+  cat conftest.$ac_ext >&5
+fi
+cd ..
+rm -fr tmpdir_$i
+
+ac_exeext=''
+ac_ext='f90'
+ac_link='${MPIFC-$FC} -o conftest${ac_exeext} $FCFLAGS $LDFLAGS conftest.$ac_ext $LIBS 1>&5'
+{ $as_echo "$as_me:$LINENO: checking support for Fortran FLUSH statement" >&5
+$as_echo_n "checking support for Fortran FLUSH statement... " >&6; }
+i=0
+while test \( -f tmpdir_$i \) -o \( -d tmpdir_$i \) ; do
+  i=`expr $i + 1`
+done
+mkdir tmpdir_$i
+cd tmpdir_$i
+cat > conftest.$ac_ext <<EOF
+program conftest
+   integer :: iunit=10
+   open(10)
+   write(10,*) 'Test '
+   flush(10)
+   close(10)
+end program conftest
+EOF
+if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
+  (eval $ac_link) 2>&5
+  ac_status=$?
+  $as_echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } && test -s conftest${ac_exeext}; then
+  { $as_echo "$as_me:$LINENO: result: yes" >&5
+$as_echo "yes" >&6; }
+
+  FDEFINES="$psblas_cv_define_prepend-DHAVE_FLUSH_STMT $FDEFINES"
 else
   { $as_echo "$as_me:$LINENO: result: no" >&5
 $as_echo "no" >&6; }

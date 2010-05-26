@@ -508,24 +508,24 @@ fi
 PAC_FORTRAN_TEST_TR15581( 
 	[],
         [AC_MSG_ERROR([Sorry, cannot build PSBLAS without support for TR15581. 
- Please get a Fortran compiler that supports it, e.g. GNU Fortran 4.5.])]
+ Please get a Fortran compiler that supports it, e.g. GNU Fortran 4.6.])]
 )
 
 PAC_FORTRAN_TEST_EXTENDS( 
 	[],
         [AC_MSG_ERROR([Sorry, cannot build PSBLAS without support for EXTENDS. 
- Please get a Fortran compiler that supports it, e.g. GNU Fortran 4.5.])]
+ Please get a Fortran compiler that supports it, e.g. GNU Fortran 4.6.])]
 )
 
 PAC_FORTRAN_TEST_CLASS_TBP( 
 	[],
         [AC_MSG_ERROR([Sorry, cannot build PSBLAS without support for CLASS and type bound procedures. 
- Please get a Fortran compiler that supports them, e.g. GNU Fortran 4.5.])]
+ Please get a Fortran compiler that supports them, e.g. GNU Fortran 4.6.])]
 )
 PAC_FORTRAN_HAVE_MOVE_ALLOC(
 	[FDEFINES="$psblas_cv_define_prepend-DHAVE_MOVE_ALLOC $FDEFINES"],
-        [AC_MSG_ERROR([Sorry, cannot build PSBLAS without support for EXTENDS. 
- Please get a Fortran compiler that supports it, e.g. GNU Fortran 4.5.])]
+        [AC_MSG_ERROR([Sorry, cannot build PSBLAS without support for MOVE_ALLOC. 
+ Please get a Fortran compiler that supports it, e.g. GNU Fortran 4.6.])]
 )
 
 #
@@ -534,6 +534,10 @@ PAC_FORTRAN_HAVE_MOVE_ALLOC(
 
 PAC_FORTRAN_TEST_VOLATILE( 
 	[FDEFINES="$psblas_cv_define_prepend-DHAVE_VOLATILE $FDEFINES"],
+)
+
+PAC_FORTRAN_TEST_FLUSH( 
+	[FDEFINES="$psblas_cv_define_prepend-DHAVE_FLUSH_STMT $FDEFINES"],
 )
 
 PAC_FORTRAN_TEST_FINAL( 

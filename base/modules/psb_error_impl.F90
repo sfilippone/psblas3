@@ -39,6 +39,10 @@ subroutine psb_serror()
       end do
     end if
   end if
+#if defined(HAVE_FLUSH_STMT)
+  flush(0) 
+#endif
+
 
 end subroutine psb_serror
 
@@ -72,9 +76,6 @@ subroutine psb_perror(ictxt)
         call psb_errmsg(err_c, r_name, i_e_d, a_e_d,iam)
         !            write(0,'(50("="))')
       end do
-#if defined(HAVE_FLUSH_SUB)
-      call flush(0) 
-#endif
 #if defined(HAVE_FLUSH_STMT)
       flush(0) 
 #endif
@@ -90,9 +91,6 @@ subroutine psb_perror(ictxt)
       do while (psb_get_numerr() > 0)
         call psb_errpop(err_c, r_name, i_e_d, a_e_d)
       end do
-#if defined(HAVE_FLUSH_SUB)
-      call flush(0) 
-#endif
 #if defined(HAVE_FLUSH_STMT)
       flush(0) 
 #endif
