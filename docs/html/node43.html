@@ -58,8 +58,8 @@ psb_cdall -- Allocates a communication descriptor</A>
 <P>
 <PRE>
 call psb_cdall(icontxt, desc_a, info,mg=mg,parts=parts)
-call psb_cdall(icontxt, desc_a, info,vg=vg,flag=flag)
-call psb_cdall(icontxt, desc_a, info,vl=vl,nl=nl,globalcheck=.true.)
+call psb_cdall(icontxt, desc_a, info,vg=vg,[mg=mg,flag=flag])
+call psb_cdall(icontxt, desc_a, info,vl=vl,[nl=nl,globalcheck=.true.])
 call psb_cdall(icontxt, desc_a, info,nl=nl)
 call psb_cdall(icontxt, desc_a, info,mg=mg,repl=.true.)
 </PRE>
@@ -153,8 +153,11 @@ Type:<B>required</B>.
 Specified as: a subroutine. 
 </DD>
 <DT><STRONG>vl</STRONG></DT>
-<DD>Data allocation: the set of global indices belonging to the
-  calling process. 
+<DD>Data allocation: the set of global indices 
+  <IMG
+ WIDTH="65" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
+ SRC="img91.png"
+ ALT="$vl(1:nl)$"> belonging to the calling process. 
 <BR>
 Scope:<B>local</B>.
 <BR>
@@ -283,10 +286,10 @@ An integer value; 0 means no error has been detected.
  -->
 <IMG
  WIDTH="107" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
- SRC="img91.png"
+ SRC="img92.png"
  ALT="$0\le pv(i) &lt; np$">; if <IMG
  WIDTH="51" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="img92.png"
+ SRC="img93.png"
  ALT="$nv&gt;1$"> we have an index assigned to multiple
     processes, i.e. we have an overlap among the subdomains.
   
@@ -295,60 +298,70 @@ An integer value; 0 means no error has been detected.
 </DD>
 <DT><STRONG>vg</STRONG></DT>
 <DD>In this case the association between an index and a process
-  is specified via an integer vector; the size of the index space is
-  equal to the size of <code>vg</code>, and each index <IMG
- WIDTH="9" HEIGHT="17" ALIGN="BOTTOM" BORDER="0"
- SRC="img4.png"
- ALT="$i$"> is assigned to
-  the process <IMG
+  is specified via an integer vector  <code>vg(1:mg)</code>; 
+  each index <!-- MATH
+ $i \in \{1\dots mg\}$
+ -->
+<IMG
+ WIDTH="98" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
+ SRC="img86.png"
+ ALT="$i\in \{1\dots mg\}$"> is assigned to process <IMG
  WIDTH="39" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
  SRC="img87.png"
- ALT="$vg(i)$">. The vector <code>vg</code> must be identical on all
+ ALT="$vg(i)$">. 
+  The vector <code>vg</code> must be identical on all
   calling processes; its entries may have the ranges <IMG
  WIDTH="94" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
- SRC="img93.png"
+ SRC="img94.png"
  ALT="$(0\dots np-1)$">
   or <IMG
  WIDTH="65" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
- SRC="img94.png"
- ALT="$(1\dots np)$"> according to the value of <code>flag</code>.  Optionally,
-  the user may specify <code>mg</code>, in 
-  which case the portion <code>vg(1:mg)</code> is used. 
+ SRC="img95.png"
+ ALT="$(1\dots np)$"> according to the value of <code>flag</code>.  
+  The size <IMG
+ WIDTH="27" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ SRC="img96.png"
+ ALT="$mg$"> may be  specified via the optional argument <code>mg</code>;
+  the default is to use the entire vector <code>vg</code>, thus having
+  <code>mg=size(vg)</code>. 
 </DD>
 <DT><STRONG>vl</STRONG></DT>
-<DD>In this case we are specifying the list of indices assigned
-  to the current process; thus, the global problem size <IMG
+<DD>In this case we are specifying the list of indices
+  <code>vl(1:nl)</code> assigned   to the current process; thus, the global
+  problem size <IMG
  WIDTH="27" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="img95.png"
- ALT="$mg$"> is given by
-  the range of the aggregate of the individual vectors <code>vl</code> specified
-  in the calling processes. If <code>globalcheck=.true.</code> 
-  the subroutine will check how many times  each entry in the global
-  index   space <IMG
- WIDTH="70" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
  SRC="img96.png"
- ALT="$(1\dots mg)$"> is specified in the input lists
-  <code>vl</code>, thus allowing for the presence of overlap in the input,
-  and checking for ``orphan'' indices. 
-  If <code>globalcheck=.false.</code>, the subroutine will not check for
-  overlap, and may be substantially faster, but
-  the user is implicitly guaranteeing that there are neither orphan
-  nor overlap indices. Optionally, the user may specify <code>nl</code>, in
-  which case the portion <code>vl(1:nl)</code> is used. 
+ ALT="$mg$"> is given by 
+  the range of the aggregate of the individual vectors <code>vl</code> specified
+  in the calling processes. The size may be specified via the optional
+  argument <code>nl</code>; the default is to use the entire vector  <code>vl</code>, thus having
+  <code>nl=size(vl)</code>.  
+  If <code>globalcheck=.true.</code>   the subroutine will check how many
+  times  each entry in the global   index   space <IMG
+ WIDTH="70" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
+ SRC="img97.png"
+ ALT="$(1\dots mg)$"> is
+  specified in the input lists   <code>vl</code>, thus allowing for the
+  presence of overlap in the input,   and checking for ``orphan''
+  indices.    If <code>globalcheck=.false.</code>, the subroutine will not
+  check for   overlap, and may be significantly faster, but   the user
+  is implicitly guaranteeing that there are neither orphan   nor
+  overlap indices.  
 </DD>
 <DT><STRONG>nl</STRONG></DT>
-<DD>In this case we are implying a generalized row-block
-  distribution in which each process <IMG
+<DD>If this argument is specified alone (i.e. without <code>vl</code>)
+  the  result is  a generalized row-block   distribution in which each
+  process <IMG
  WIDTH="13" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
- SRC="img97.png"
- ALT="$I$"> gets assigned a consecutive
-  chunk of <IMG
- WIDTH="60" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
  SRC="img98.png"
- ALT="$N_I=nl$"> global indices.
+ ALT="$I$"> gets assigned a consecutive   chunk of <IMG
+ WIDTH="60" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ SRC="img99.png"
+ ALT="$N_I=nl$"> global
+  indices. 
 </DD>
 <DT><STRONG>repl</STRONG></DT>
-<DD>In this case we are asking to replicate all indices on
+<DD>This arguments specifies to replicate all indices on
   all processes. This is a special purpose data allocation that is
   useful in the construction of some multilevel preconditioners.
 </DD>

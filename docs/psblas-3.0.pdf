@@ -10124,54 +10124,54 @@ endobj
 /ProcSet [ /PDF /Text ]
 >> endobj
 986 0 obj <<
-/Length 6336      
+/Length 6529      
 >>
 stream
 0 g 0 G
 0 g 0 G
 BT
-/F16 14.3462 Tf 150.705 706.129 Td [(6)-1125(Data)-375(managemen)31(t)-375(routines)]TJ/F16 11.9552 Tf 0 -23.988 Td [(psb)]TJ
+/F16 14.3462 Tf 150.705 706.129 Td [(6)-1125(Data)-375(managemen)31(t)-375(routines)]TJ/F16 11.9552 Tf 0 -23.814 Td [(psb)]TJ
 ET
 q
-1 0 0 1 171.761 682.34 cm
+1 0 0 1 171.761 682.515 cm
 []0 d 0 J 0.398 w 0 0 m 4.035 0 l S
 Q
 BT
-/F16 11.9552 Tf 175.796 682.141 Td [(cdall)-375(|)-375(Allo)-31(cates)-375(a)-375(comm)31(unication)-375(descriptor)]TJ
+/F16 11.9552 Tf 175.796 682.315 Td [(cdall)-375(|)-375(Allo)-31(cates)-375(a)-375(comm)31(unication)-375(descriptor)]TJ
 0 g 0 G
 0 g 0 G
-/F30 9.9626 Tf -25.091 -18.563 Td [(call)-525(psb_cdall\050icontxt,)-525(desc_a,)-525(info,mg=mg,parts=parts\051)]TJ 0 -11.956 Td [(call)-525(psb_cdall\050icontxt,)-525(desc_a,)-525(info,vg=vg,flag=flag\051)]TJ 0 -11.955 Td [(call)-525(psb_cdall\050icontxt,)-525(desc_a,)-525(info,vl=vl,nl=nl,globalcheck=.true.\051)]TJ 0 -11.955 Td [(call)-525(psb_cdall\050icontxt,)-525(desc_a,)-525(info,nl=nl\051)]TJ 0 -11.955 Td [(call)-525(psb_cdall\050icontxt,)-525(desc_a,)-525(info,mg=mg,repl=.true.\051)]TJ/F8 9.9626 Tf 14.944 -22.292 Td [(This)-314(subroutine)-314(initializes)-315(th)1(e)-315(comm)28(unication)-314(descriptor)-314(ass)-1(o)-27(ciated)-315(with)-314(an)]TJ -14.944 -11.956 Td [(index)-326(space.)-442(One)-326(of)-326(the)-327(op)1(tional)-327(argu)1(m)-1(en)28(ts)]TJ/F30 9.9626 Tf 193.679 0 Td [(parts)]TJ/F8 9.9626 Tf 26.152 0 Td [(,)]TJ/F30 9.9626 Tf 6.031 0 Td [(vg)]TJ/F8 9.9626 Tf 10.461 0 Td [(,)]TJ/F30 9.9626 Tf 6.031 0 Td [(vl)]TJ/F8 9.9626 Tf 10.46 0 Td [(,)]TJ/F30 9.9626 Tf 6.031 0 Td [(nl)]TJ/F8 9.9626 Tf 13.71 0 Td [(or)]TJ/F30 9.9626 Tf 12.133 0 Td [(repl)]TJ/F8 9.9626 Tf 24.17 0 Td [(m)28(ust)-326(b)-28(e)]TJ -308.858 -11.955 Td [(sp)-28(eci\014ed,)-333(thereb)28(y)-334(c)28(ho)-28(osing)-333(the)-333(sp)-28(eci\014c)-333(initialization)-334(strategy)84(.)]TJ
+/F30 9.9626 Tf -25.091 -18.389 Td [(call)-525(psb_cdall\050icontxt,)-525(desc_a,)-525(info,mg=mg,parts=parts\051)]TJ 0 -11.955 Td [(call)-525(psb_cdall\050icontxt,)-525(desc_a,)-525(info,vg=vg,[mg=mg,flag=flag]\051)]TJ 0 -11.955 Td [(call)-525(psb_cdall\050icontxt,)-525(desc_a,)-525(info,vl=vl,[nl=nl,globalcheck=.true.]\051)]TJ 0 -11.955 Td [(call)-525(psb_cdall\050icontxt,)-525(desc_a,)-525(info,nl=nl\051)]TJ 0 -11.956 Td [(call)-525(psb_cdall\050icontxt,)-525(desc_a,)-525(info,mg=mg,repl=.true.\051)]TJ/F8 9.9626 Tf 14.944 -20.107 Td [(This)-314(subroutine)-314(initializes)-315(th)1(e)-315(comm)28(unication)-314(descriptor)-314(ass)-1(o)-27(ciated)-315(with)-314(an)]TJ -14.944 -11.955 Td [(index)-326(space.)-442(One)-326(of)-326(the)-327(op)1(tional)-327(argu)1(m)-1(en)28(ts)]TJ/F30 9.9626 Tf 193.679 0 Td [(parts)]TJ/F8 9.9626 Tf 26.152 0 Td [(,)]TJ/F30 9.9626 Tf 6.031 0 Td [(vg)]TJ/F8 9.9626 Tf 10.461 0 Td [(,)]TJ/F30 9.9626 Tf 6.031 0 Td [(vl)]TJ/F8 9.9626 Tf 10.46 0 Td [(,)]TJ/F30 9.9626 Tf 6.031 0 Td [(nl)]TJ/F8 9.9626 Tf 13.71 0 Td [(or)]TJ/F30 9.9626 Tf 12.133 0 Td [(repl)]TJ/F8 9.9626 Tf 24.17 0 Td [(m)28(ust)-326(b)-28(e)]TJ -308.858 -11.955 Td [(sp)-28(eci\014ed,)-333(thereb)28(y)-334(c)28(ho)-28(osing)-333(the)-333(sp)-28(eci\014c)-333(initialization)-334(strategy)84(.)]TJ
 0 g 0 G
-/F27 9.9626 Tf 0 -20.206 Td [(On)-383(En)32(try)]TJ
+/F27 9.9626 Tf 0 -18.477 Td [(On)-383(En)32(try)]TJ
 0 g 0 G
 0 g 0 G
- 0 -20.3 Td [(T)32(yp)-32(e:)]TJ
+ 0 -19.201 Td [(T)32(yp)-32(e:)]TJ
 0 g 0 G
 /F8 9.9626 Tf 33.797 0 Td [(Sync)28(hronous.)]TJ
 0 g 0 G
-/F27 9.9626 Tf -33.797 -20.3 Td [(icon)32(txt)]TJ
+/F27 9.9626 Tf -33.797 -19.201 Td [(icon)32(txt)]TJ
 0 g 0 G
 /F8 9.9626 Tf 39.989 0 Td [(the)-333(comm)27(unication)-333(con)28(text.)]TJ -15.082 -11.955 Td [(Scop)-28(e:)]TJ/F27 9.9626 Tf 27.95 0 Td [(global)]TJ/F8 9.9626 Tf 29.757 0 Td [(.)]TJ -57.707 -11.955 Td [(T)28(yp)-28(e:)]TJ/F27 9.9626 Tf 25.183 0 Td [(required)]TJ/F8 9.9626 Tf 41.898 0 Td [(.)]TJ -67.081 -11.955 Td [(In)28(ten)28(t:)]TJ/F27 9.9626 Tf 33.485 0 Td [(in)]TJ/F8 9.9626 Tf 9.548 0 Td [(.)]TJ -43.033 -11.955 Td [(Sp)-28(eci\014ed)-333(as:)-444(a)-1(n)-333(in)28(teger)-333(v)55(alue.)]TJ
 0 g 0 G
-/F27 9.9626 Tf -24.907 -20.3 Td [(vg)]TJ
+/F27 9.9626 Tf -24.907 -19.201 Td [(vg)]TJ
 0 g 0 G
-/F8 9.9626 Tf 16.757 0 Td [(Data)-333(allo)-28(cation:)-444(eac)27(h)-333(index)]TJ/F11 9.9626 Tf 123.564 0 Td [(i)]TJ/F14 9.9626 Tf 6.2 0 Td [(2)-278(f)]TJ/F8 9.9626 Tf 14.39 0 Td [(1)]TJ/F11 9.9626 Tf 6.642 0 Td [(:)-167(:)-166(:)-167(mg)]TJ/F14 9.9626 Tf 27.14 0 Td [(g)]TJ/F8 9.9626 Tf 8.302 0 Td [(is)-333(allo)-28(cated)-334(t)1(o)-334(pro)-28(cess)]TJ/F11 9.9626 Tf 99.267 0 Td [(v)-36(g)]TJ/F8 9.9626 Tf 10.296 0 Td [(\050)]TJ/F11 9.9626 Tf 3.874 0 Td [(i)]TJ/F8 9.9626 Tf 3.433 0 Td [(\051.)]TJ -294.958 -11.955 Td [(Scop)-28(e:)]TJ/F27 9.9626 Tf 27.95 0 Td [(global)]TJ/F8 9.9626 Tf 29.757 0 Td [(.)]TJ -57.707 -11.955 Td [(T)28(yp)-28(e:)]TJ/F27 9.9626 Tf 25.183 0 Td [(optional)]TJ/F8 9.9626 Tf 40.577 0 Td [(.)]TJ -65.76 -11.956 Td [(In)28(ten)28(t:)]TJ/F27 9.9626 Tf 33.485 0 Td [(in)]TJ/F8 9.9626 Tf 9.548 0 Td [(.)]TJ -43.033 -11.955 Td [(Sp)-28(eci\014ed)-333(as:)-445(an)-333(in)28(teger)-333(arra)27(y)84(.)]TJ
+/F8 9.9626 Tf 16.757 0 Td [(Data)-333(allo)-28(cation:)-444(eac)27(h)-333(index)]TJ/F11 9.9626 Tf 123.564 0 Td [(i)]TJ/F14 9.9626 Tf 6.2 0 Td [(2)-278(f)]TJ/F8 9.9626 Tf 14.39 0 Td [(1)]TJ/F11 9.9626 Tf 6.642 0 Td [(:)-167(:)-166(:)-167(mg)]TJ/F14 9.9626 Tf 27.14 0 Td [(g)]TJ/F8 9.9626 Tf 8.302 0 Td [(is)-333(allo)-28(cated)-334(t)1(o)-334(pro)-28(cess)]TJ/F11 9.9626 Tf 99.267 0 Td [(v)-36(g)]TJ/F8 9.9626 Tf 10.296 0 Td [(\050)]TJ/F11 9.9626 Tf 3.874 0 Td [(i)]TJ/F8 9.9626 Tf 3.433 0 Td [(\051.)]TJ -294.958 -11.955 Td [(Scop)-28(e:)]TJ/F27 9.9626 Tf 27.95 0 Td [(global)]TJ/F8 9.9626 Tf 29.757 0 Td [(.)]TJ -57.707 -11.956 Td [(T)28(yp)-28(e:)]TJ/F27 9.9626 Tf 25.183 0 Td [(optional)]TJ/F8 9.9626 Tf 40.577 0 Td [(.)]TJ -65.76 -11.955 Td [(In)28(ten)28(t:)]TJ/F27 9.9626 Tf 33.485 0 Td [(in)]TJ/F8 9.9626 Tf 9.548 0 Td [(.)]TJ -43.033 -11.955 Td [(Sp)-28(eci\014ed)-333(as:)-445(an)-333(in)28(teger)-333(arra)27(y)84(.)]TJ
 0 g 0 G
-/F27 9.9626 Tf -24.907 -20.299 Td [(\015ag)]TJ
+/F27 9.9626 Tf -24.907 -19.201 Td [(\015ag)]TJ
 0 g 0 G
-/F8 9.9626 Tf 22.644 0 Td [(Sp)-28(eci\014es)-333(whether)-333(e)-1(n)28(tries)-333(in)]TJ/F11 9.9626 Tf 121.932 0 Td [(v)-36(g)]TJ/F8 9.9626 Tf 13.617 0 Td [(are)-333(zero-)-334(or)-333(one-based.)]TJ -133.286 -11.956 Td [(Scop)-28(e:)]TJ/F27 9.9626 Tf 27.95 0 Td [(global)]TJ/F8 9.9626 Tf 29.757 0 Td [(.)]TJ -57.707 -11.955 Td [(T)28(yp)-28(e:)]TJ/F27 9.9626 Tf 25.183 0 Td [(optional)]TJ/F8 9.9626 Tf 40.577 0 Td [(.)]TJ -65.76 -11.955 Td [(In)28(ten)28(t:)]TJ/F27 9.9626 Tf 33.485 0 Td [(in)]TJ/F8 9.9626 Tf 9.548 0 Td [(.)]TJ -43.033 -11.955 Td [(Sp)-28(eci\014ed)-333(as:)-445(an)-333(in)28(teger)-333(v)55(alue)-333(0)]TJ/F11 9.9626 Tf 135.409 0 Td [(;)]TJ/F8 9.9626 Tf 4.428 0 Td [(1,)-333(default)-334(0.)]TJ
+/F8 9.9626 Tf 22.644 0 Td [(Sp)-28(eci\014es)-333(whether)-333(e)-1(n)28(tries)-333(in)]TJ/F11 9.9626 Tf 121.932 0 Td [(v)-36(g)]TJ/F8 9.9626 Tf 13.617 0 Td [(are)-333(zero-)-334(or)-333(one-based.)]TJ -133.286 -11.955 Td [(Scop)-28(e:)]TJ/F27 9.9626 Tf 27.95 0 Td [(global)]TJ/F8 9.9626 Tf 29.757 0 Td [(.)]TJ -57.707 -11.955 Td [(T)28(yp)-28(e:)]TJ/F27 9.9626 Tf 25.183 0 Td [(optional)]TJ/F8 9.9626 Tf 40.577 0 Td [(.)]TJ -65.76 -11.955 Td [(In)28(ten)28(t:)]TJ/F27 9.9626 Tf 33.485 0 Td [(in)]TJ/F8 9.9626 Tf 9.548 0 Td [(.)]TJ -43.033 -11.956 Td [(Sp)-28(eci\014ed)-333(as:)-445(an)-333(in)28(teger)-333(v)55(alue)-333(0)]TJ/F11 9.9626 Tf 135.409 0 Td [(;)]TJ/F8 9.9626 Tf 4.428 0 Td [(1,)-333(default)-334(0.)]TJ
 0 g 0 G
-/F27 9.9626 Tf -164.744 -20.3 Td [(mg)]TJ
+/F27 9.9626 Tf -164.744 -19.2 Td [(mg)]TJ
 0 g 0 G
-/F8 9.9626 Tf 20.257 0 Td [(the)-333(\050global\051)-334(n)28(um)28(b)-28(er)-333(of)-333(ro)27(ws)-333(of)-333(the)-334(probl)1(e)-1(m.)]TJ 4.65 -11.955 Td [(Scop)-28(e:)]TJ/F27 9.9626 Tf 27.95 0 Td [(global)]TJ/F8 9.9626 Tf 29.757 0 Td [(.)]TJ -57.707 -11.955 Td [(T)28(yp)-28(e:)]TJ/F27 9.9626 Tf 25.183 0 Td [(optional)]TJ/F8 9.9626 Tf 40.577 0 Td [(.)]TJ -65.76 -11.955 Td [(In)28(ten)28(t:)]TJ/F27 9.9626 Tf 33.485 0 Td [(in)]TJ/F8 9.9626 Tf 9.548 0 Td [(.)]TJ -43.033 -11.956 Td [(Sp)-28(eci\014ed)-332(as:)-444(an)-333(in)28(teger)-333(v)56(alue.)-444(I)-1(t)-332(is)-333(required)-332(if)]TJ/F30 9.9626 Tf 203.266 0 Td [(parts)]TJ/F8 9.9626 Tf 29.465 0 Td [(or)]TJ/F30 9.9626 Tf 12.198 0 Td [(repl)]TJ/F8 9.9626 Tf 24.235 0 Td [(is)-333(sp)-27(ec)-1(i)1(\014e)-1(d)1(,)]TJ -269.164 -11.955 Td [(it)-333(is)-334(optional)-333(if)]TJ/F30 9.9626 Tf 67.856 0 Td [(vg)]TJ/F8 9.9626 Tf 13.782 0 Td [(is)-333(sp)-28(eci\014ed.)]TJ
+/F8 9.9626 Tf 20.257 0 Td [(the)-333(\050global\051)-334(n)28(um)28(b)-28(er)-333(of)-333(ro)27(ws)-333(of)-333(the)-334(probl)1(e)-1(m.)]TJ 4.65 -11.956 Td [(Scop)-28(e:)]TJ/F27 9.9626 Tf 27.95 0 Td [(global)]TJ/F8 9.9626 Tf 29.757 0 Td [(.)]TJ -57.707 -11.955 Td [(T)28(yp)-28(e:)]TJ/F27 9.9626 Tf 25.183 0 Td [(optional)]TJ/F8 9.9626 Tf 40.577 0 Td [(.)]TJ -65.76 -11.955 Td [(In)28(ten)28(t:)]TJ/F27 9.9626 Tf 33.485 0 Td [(in)]TJ/F8 9.9626 Tf 9.548 0 Td [(.)]TJ -43.033 -11.955 Td [(Sp)-28(eci\014ed)-332(as:)-444(an)-333(in)28(teger)-333(v)56(alue.)-444(I)-1(t)-332(is)-333(required)-332(if)]TJ/F30 9.9626 Tf 203.266 0 Td [(parts)]TJ/F8 9.9626 Tf 29.465 0 Td [(or)]TJ/F30 9.9626 Tf 12.198 0 Td [(repl)]TJ/F8 9.9626 Tf 24.235 0 Td [(is)-333(sp)-27(ec)-1(i)1(\014e)-1(d)1(,)]TJ -269.164 -11.955 Td [(it)-333(is)-334(optional)-333(if)]TJ/F30 9.9626 Tf 67.856 0 Td [(vg)]TJ/F8 9.9626 Tf 13.782 0 Td [(is)-333(sp)-28(eci\014ed.)]TJ
 0 g 0 G
-/F27 9.9626 Tf -106.545 -20.3 Td [(parts)]TJ
+/F27 9.9626 Tf -106.545 -19.201 Td [(parts)]TJ
 0 g 0 G
-/F8 9.9626 Tf 30.609 0 Td [(the)-333(subroutine)-334(th)1(at)-334(de\014nes)-333(the)-333(partitioning)-334(sc)28(heme.)]TJ -5.702 -11.955 Td [(Scop)-28(e:)]TJ/F27 9.9626 Tf 27.95 0 Td [(global)]TJ/F8 9.9626 Tf 29.757 0 Td [(.)]TJ -57.707 -11.955 Td [(T)28(yp)-28(e:)]TJ/F27 9.9626 Tf 25.183 0 Td [(required)]TJ/F8 9.9626 Tf 41.898 0 Td [(.)]TJ -67.081 -11.955 Td [(Sp)-28(eci\014ed)-333(as:)-445(a)-333(subroutine.)]TJ
+/F8 9.9626 Tf 30.609 0 Td [(the)-333(subroutine)-334(th)1(at)-334(de\014nes)-333(the)-333(partitioning)-334(sc)28(heme.)]TJ -5.702 -11.955 Td [(Scop)-28(e:)]TJ/F27 9.9626 Tf 27.95 0 Td [(global)]TJ/F8 9.9626 Tf 29.757 0 Td [(.)]TJ -57.707 -11.956 Td [(T)28(yp)-28(e:)]TJ/F27 9.9626 Tf 25.183 0 Td [(required)]TJ/F8 9.9626 Tf 41.898 0 Td [(.)]TJ -67.081 -11.955 Td [(Sp)-28(eci\014ed)-333(as:)-445(a)-333(subroutine.)]TJ
 0 g 0 G
-/F27 9.9626 Tf -24.907 -20.3 Td [(vl)]TJ
+/F27 9.9626 Tf -24.907 -19.201 Td [(vl)]TJ
 0 g 0 G
-/F8 9.9626 Tf 14.211 0 Td [(Data)-333(allo)-28(cation:)-444(the)-334(set)-333(of)-333(global)-334(indices)-333(b)-28(elonging)-333(to)-333(the)-334(calling)-333(pro)-28(cess.)]TJ 10.696 -11.955 Td [(Scop)-28(e:)]TJ/F27 9.9626 Tf 27.95 0 Td [(lo)-32(cal)]TJ/F8 9.9626 Tf 23.074 0 Td [(.)]TJ -51.024 -11.955 Td [(T)28(yp)-28(e:)]TJ/F27 9.9626 Tf 25.183 0 Td [(optional)]TJ/F8 9.9626 Tf 40.577 0 Td [(.)]TJ -65.76 -11.955 Td [(In)28(ten)28(t:)]TJ/F27 9.9626 Tf 33.485 0 Td [(in)]TJ/F8 9.9626 Tf 9.548 0 Td [(.)]TJ -43.033 -11.956 Td [(Sp)-28(eci\014ed)-333(as:)-445(an)-333(in)28(teger)-333(arra)27(y)84(.)]TJ
+/F8 9.9626 Tf 14.211 0 Td [(Data)-363(allo)-28(cation:)-504(the)-363(set)-364(of)-363(global)-363(indices)]TJ/F11 9.9626 Tf 182.789 0 Td [(v)-36(l)]TJ/F8 9.9626 Tf 8.355 0 Td [(\0501)-328(:)]TJ/F11 9.9626 Tf 18.15 0 Td [(nl)]TJ/F8 9.9626 Tf 9.149 0 Td [(\051)-363(b)-28(elonging)-363(to)-363(the)-364(callin)1(g)]TJ -207.747 -11.955 Td [(pro)-28(cess.)]TJ 0 -11.955 Td [(Scop)-28(e:)]TJ/F27 9.9626 Tf 27.95 0 Td [(lo)-32(cal)]TJ/F8 9.9626 Tf 23.074 0 Td [(.)]TJ -51.024 -11.955 Td [(T)28(yp)-28(e:)]TJ/F27 9.9626 Tf 25.183 0 Td [(optional)]TJ/F8 9.9626 Tf 40.577 0 Td [(.)]TJ -65.76 -11.955 Td [(In)28(ten)28(t:)]TJ/F27 9.9626 Tf 33.485 0 Td [(in)]TJ/F8 9.9626 Tf 9.548 0 Td [(.)]TJ -43.033 -11.956 Td [(Sp)-28(eci\014ed)-333(as:)-445(an)-333(in)28(teger)-333(arra)27(y)84(.)]TJ
 0 g 0 G
  141.967 -29.888 Td [(52)]TJ
 0 g 0 G
@@ -10192,7 +10192,7 @@ endobj
 /D [985 0 R /XYZ 150.705 716.092 null]
 >> endobj
 178 0 obj <<
-/D [985 0 R /XYZ 150.705 673.302 null]
+/D [985 0 R /XYZ 150.705 673.557 null]
 >> endobj
 984 0 obj <<
 /Font << /F16 431 0 R /F30 601 0 R /F8 434 0 R /F27 433 0 R /F11 587 0 R /F14 604 0 R >>
@@ -10307,7 +10307,7 @@ endobj
 /ProcSet [ /PDF /Text ]
 >> endobj
 996 0 obj <<
-/Length 9546      
+/Length 9388      
 >>
 stream
 0 g 0 G
@@ -10318,57 +10318,53 @@ BT
 0 g 0 G
 /F8 9.9626 Tf 17.712 0 Td [(The)-333(n)27(u)1(m)27(b)-27(e)-1(r)-333(of)-333(pro)-28(cesses)-333(in)-334(the)-333(mapping;)]TJ
 0 g 0 G
-/F27 9.9626 Tf -17.712 -13.201 Td [(mg)]TJ
+/F27 9.9626 Tf -17.712 -14.501 Td [(mg)]TJ
 0 g 0 G
-/F8 9.9626 Tf 20.258 0 Td [(The)-333(total)-334(n)28(um)28(b)-28(er)-333(of)-333(global)-334(ro)28(ws)-333(in)-334(th)1(e)-334(mapping;)]TJ -20.258 -14.445 Td [(The)-333(output)-334(argumen)28(ts)-333(are:)]TJ
+/F8 9.9626 Tf 20.258 0 Td [(The)-333(total)-334(n)28(um)28(b)-28(er)-333(of)-333(global)-334(ro)28(ws)-333(in)-334(th)1(e)-334(mapping;)]TJ -20.258 -17.047 Td [(The)-333(output)-334(argumen)28(ts)-333(are:)]TJ
 0 g 0 G
-/F27 9.9626 Tf 0 -14.446 Td [(n)32(v)]TJ
+/F27 9.9626 Tf 0 -17.048 Td [(n)32(v)]TJ
 0 g 0 G
 /F8 9.9626 Tf 17.075 0 Td [(The)-333(n)27(um)28(b)-28(er)-333(of)-333(en)28(tries)-334(in)]TJ/F30 9.9626 Tf 111.637 0 Td [(pv)]TJ/F8 9.9626 Tf 10.461 0 Td [(;)]TJ
 0 g 0 G
-/F27 9.9626 Tf -139.173 -13.201 Td [(p)32(v)]TJ
+/F27 9.9626 Tf -139.173 -14.501 Td [(p)32(v)]TJ
 0 g 0 G
 /F8 9.9626 Tf 17.075 0 Td [(A)-481(v)28(ector)-481(con)28(taining)-481(the)-481(indi)1(c)-1(es)-480(of)-481(the)-481(pro)-28(cesses)-481(to)-481(whic)28(h)-481(the)]TJ 1.555 -11.955 Td [(global)-468(index)-468(should)-468(b)-28(e)-468(assigend;)-536(eac)28(h)-468(en)28(try)-468(m)28(ust)-469(satisfy)-468(0)]TJ/F14 9.9626 Tf 270.508 0 Td [(\024)]TJ/F11 9.9626 Tf -270.508 -11.955 Td [(pv)]TJ/F8 9.9626 Tf 10.199 0 Td [(\050)]TJ/F11 9.9626 Tf 3.875 0 Td [(i)]TJ/F8 9.9626 Tf 3.432 0 Td [(\051)]TJ/F11 9.9626 Tf 8.603 0 Td [(<)-475(np)]TJ/F8 9.9626 Tf 23.47 0 Td [(;)-511(i)1(f)]TJ/F11 9.9626 Tf 18.163 0 Td [(nv)-511(>)]TJ/F8 9.9626 Tf 28.373 0 Td [(1)-451(w)27(e)-451(ha)28(v)27(e)-451(an)-452(in)1(dex)-452(assigned)-451(to)-452(m)28(ultiple)]TJ -96.115 -11.955 Td [(pro)-28(cesses,)-333(i.e.)-445(w)28(e)-333(ha)27(v)28(e)-333(an)-333(o)27(v)28(erlap)-333(among)-334(t)1(he)-334(sub)-28(domains.)]TJ
 0 g 0 G
-/F27 9.9626 Tf -40.548 -14.446 Td [(vg)]TJ
+/F27 9.9626 Tf -40.548 -17.048 Td [(vg)]TJ
 0 g 0 G
-/F8 9.9626 Tf 16.757 0 Td [(In)-273(th)1(is)-273(case)-273(the)-272(asso)-28(ciation)-273(b)-27(e)-1(t)28(w)28(een)-273(an)-272(index)-273(and)-272(a)-273(pro)-27(ces)-1(s)-272(is)-273(sp)-28(eci\014ed)]TJ 5.161 -11.955 Td [(via)-488(an)-487(in)28(teger)-488(v)28(ector;)-565(the)-488(size)-488(of)-487(the)-488(index)-487(space)-488(is)-488(equal)-487(to)-488(the)]TJ 0 -11.955 Td [(size)-435(of)]TJ/F30 9.9626 Tf 32.241 0 Td [(vg)]TJ/F8 9.9626 Tf 10.461 0 Td [(,)-460(and)-435(eac)28(h)-435(index)]TJ/F11 9.9626 Tf 79.015 0 Td [(i)]TJ/F8 9.9626 Tf 7.764 0 Td [(is)-435(assigned)-435(to)-434(the)-435(pro)-28(cess)]TJ/F11 9.9626 Tf 118.544 0 Td [(v)-36(g)]TJ/F8 9.9626 Tf 10.296 0 Td [(\050)]TJ/F11 9.9626 Tf 3.874 0 Td [(i)]TJ/F8 9.9626 Tf 3.433 0 Td [(\051.)-749(The)]TJ -265.628 -11.956 Td [(v)28(ector)]TJ/F30 9.9626 Tf 30.409 0 Td [(vg)]TJ/F8 9.9626 Tf 14.275 0 Td [(m)28(ust)-383(b)-28(e)-383(iden)28(tical)-383(on)-383(all)-382(calling)-383(pro)-28(cesses;)-408(its)-383(en)28(tries)-383(ma)28(y)]TJ -44.684 -11.955 Td [(ha)28(v)28(e)-373(the)-372(ranges)-372(\0500)]TJ/F11 9.9626 Tf 82.883 0 Td [(:)-167(:)-166(:)-167(np)]TJ/F14 9.9626 Tf 26.748 0 Td [(\000)]TJ/F8 9.9626 Tf 10.221 0 Td [(1\051)-372(or)-372(\0501)]TJ/F11 9.9626 Tf 35.671 0 Td [(:)-167(:)-166(:)-167(np)]TJ/F8 9.9626 Tf 24.276 0 Td [(\051)-372(according)-372(to)-373(the)-372(v)56(alue)-372(of)]TJ/F30 9.9626 Tf -179.799 -11.955 Td [(flag)]TJ/F8 9.9626 Tf 20.922 0 Td [(.)-437(Op)1(tionally)83(,)-315(the)-309(user)-310(ma)27(y)-309(sp)-28(ecify)]TJ/F30 9.9626 Tf 150.314 0 Td [(mg)]TJ/F8 9.9626 Tf 10.46 0 Td [(,)-315(in)-309(whic)27(h)-309(case)-310(the)-310(p)-28(ortion)]TJ/F30 9.9626 Tf -181.696 -11.955 Td [(vg\0501:mg\051)]TJ/F8 9.9626 Tf 45.164 0 Td [(is)-333(used.)]TJ
+/F8 9.9626 Tf 16.757 0 Td [(In)-398(th)1(is)-398(case)-398(the)-397(asso)-28(ciation)-398(b)-27(e)-1(t)28(w)28(een)-398(an)-397(index)-398(and)-397(a)-398(pro)-27(ces)-1(s)-397(is)-398(sp)-28(ec-)]TJ 5.161 -11.955 Td [(i\014ed)-456(via)-456(an)-456(in)28(tege)-1(r)-456(v)28(ector)]TJ/F30 9.9626 Tf 120.743 0 Td [(vg\0501:mg\051)]TJ/F8 9.9626 Tf 41.842 0 Td [(;)-518(eac)28(h)-456(index)]TJ/F11 9.9626 Tf 59.63 0 Td [(i)]TJ/F14 9.9626 Tf 8.238 0 Td [(2)-482(f)]TJ/F8 9.9626 Tf 16.429 0 Td [(1)]TJ/F11 9.9626 Tf 6.642 0 Td [(:)-167(:)-166(:)-167(mg)]TJ/F14 9.9626 Tf 27.14 0 Td [(g)]TJ/F8 9.9626 Tf 9.526 0 Td [(is)]TJ -290.19 -11.955 Td [(assigned)-449(to)-449(pro)-28(cess)]TJ/F11 9.9626 Tf 89.776 0 Td [(v)-36(g)]TJ/F8 9.9626 Tf 10.296 0 Td [(\050)]TJ/F11 9.9626 Tf 3.875 0 Td [(i)]TJ/F8 9.9626 Tf 3.432 0 Td [(\051.)-792(The)-449(v)28(ector)]TJ/F30 9.9626 Tf 67.232 0 Td [(vg)]TJ/F8 9.9626 Tf 14.935 0 Td [(m)28(ust)-449(b)-28(e)-449(iden)28(tica)-1(l)-449(on)-449(all)]TJ -189.546 -11.955 Td [(calling)-452(pro)-28(cesses;)-513(it)1(s)-453(en)28(tries)-453(ma)28(y)-453(ha)28(v)28(e)-453(th)1(e)-453(ranges)-453(\0500)]TJ/F11 9.9626 Tf 236.604 0 Td [(:)-167(:)-166(:)-167(np)]TJ/F14 9.9626 Tf 27.281 0 Td [(\000)]TJ/F8 9.9626 Tf 10.754 0 Td [(1\051)-453(or)]TJ -274.639 -11.955 Td [(\0501)]TJ/F11 9.9626 Tf 10.516 0 Td [(:)-167(:)-166(:)-167(np)]TJ/F8 9.9626 Tf 24.276 0 Td [(\051)-347(according)-347(to)-347(the)-347(v)55(alu)1(e)-348(of)]TJ/F30 9.9626 Tf 119.292 0 Td [(flag)]TJ/F8 9.9626 Tf 20.921 0 Td [(.)-486(The)-347(size)]TJ/F11 9.9626 Tf 47.231 0 Td [(mg)]TJ/F8 9.9626 Tf 17.314 0 Td [(ma)28(y)-347(b)-28(e)-347(sp)-28(ec-)]TJ -239.55 -11.955 Td [(i\014ed)-414(via)-414(the)-415(option)1(al)-415(argumen)28(t)]TJ/F30 9.9626 Tf 142.427 0 Td [(mg)]TJ/F8 9.9626 Tf 10.461 0 Td [(;)-455(the)-414(default)-414(is)-414(to)-414(use)-415(the)-414(en)28(tire)]TJ -152.888 -11.956 Td [(v)28(ector)]TJ/F30 9.9626 Tf 29.916 0 Td [(vg)]TJ/F8 9.9626 Tf 10.46 0 Td [(,)-333(th)27(u)1(s)-334(ha)28(ving)]TJ/F30 9.9626 Tf 60.108 0 Td [(mg=size\050vg\051)]TJ/F8 9.9626 Tf 57.534 0 Td [(.)]TJ
 0 g 0 G
-/F27 9.9626 Tf -67.082 -14.446 Td [(vl)]TJ
+/F27 9.9626 Tf -179.936 -17.047 Td [(vl)]TJ
 0 g 0 G
-/F8 9.9626 Tf 14.211 0 Td [(In)-303(this)-304(case)-303(w)28(e)-304(are)-303(sp)-28(ecifying)-303(the)-303(list)-304(of)-303(indices)-303(assigned)-304(to)-303(the)-303(curren)28(t)]TJ 7.707 -11.955 Td [(pro)-28(cess;)-465(th)27(u)1(s)-1(,)-443(the)-421(global)-422(problem)-421(size)]TJ/F11 9.9626 Tf 172.244 0 Td [(mg)]TJ/F8 9.9626 Tf 18.055 0 Td [(is)-421(giv)27(en)-421(b)28(y)-422(the)-421(range)-421(of)]TJ -190.299 -11.955 Td [(the)-482(aggregate)-481(of)-482(the)-482(individ)1(ual)-482(v)28(ectors)]TJ/F30 9.9626 Tf 180.003 0 Td [(vl)]TJ/F8 9.9626 Tf 15.259 0 Td [(sp)-28(eci\014ed)-482(i)1(n)-482(the)-482(calling)]TJ -195.262 -11.955 Td [(pro)-28(cesses.)-876(If)]TJ/F30 9.9626 Tf 62.657 0 Td [(globalcheck=.true.)]TJ/F8 9.9626 Tf 98.9 0 Td [(the)-477(subroutine)-477(will)-477(c)27(hec)28(k)-477(ho)28(w)]TJ -161.557 -11.956 Td [(man)28(y)-255(times)-255(eac)28(h)-254(en)27(try)-254(in)-255(the)-254(global)-255(index)-254(s)-1(p)1(ac)-1(e)-254(\0501)]TJ/F11 9.9626 Tf 217.24 0 Td [(:)-167(:)-166(:)-167(mg)]TJ/F8 9.9626 Tf 27.14 0 Td [(\051)-255(is)-254(sp)-28(eci\014ed)]TJ -244.38 -11.955 Td [(in)-331(the)-331(input)-331(lists)]TJ/F30 9.9626 Tf 75.842 0 Td [(vl)]TJ/F8 9.9626 Tf 10.461 0 Td [(,)-331(th)27(us)-331(all)1(o)27(wing)-331(for)-331(th)1(e)-331(prese)-1(n)1(c)-1(e)-331(of)-330(o)27(v)28(erlap)-331(in)-331(the)]TJ -86.303 -11.955 Td [(input,)-338(and)-337(c)28(hec)27(king)-337(for)-337(\134orphan")-337(indices.)-456(If)]TJ/F30 9.9626 Tf 194.743 0 Td [(globalcheck=.false.)]TJ/F8 9.9626 Tf 99.376 0 Td [(,)]TJ -294.119 -11.955 Td [(the)-376(subroutine)-377(will)-376(not)-376(c)27(hec)28(k)-376(for)-377(o)28(v)28(erlap,)-387(and)-377(ma)28(y)-376(b)-28(e)-377(sub)1(s)-1(tan)28(tially)]TJ 0 -11.955 Td [(faster,)-362(but)-357(the)-357(user)-356(is)-357(implicitly)-357(gu)1(aran)27(teeing)-356(that)-357(there)-357(ar)1(e)-357(neither)]TJ 0 -11.956 Td [(orphan)-373(nor)-373(o)27(v)28(erlap)-373(indices.)-565(Option)1(ally)83(,)-383(the)-374(user)-373(ma)28(y)-374(sp)-27(ec)-1(if)1(y)]TJ/F30 9.9626 Tf 271.537 0 Td [(nl)]TJ/F8 9.9626 Tf 10.461 0 Td [(,)-383(in)]TJ -281.998 -11.955 Td [(whic)28(h)-334(case)-333(the)-333(p)-28(ortion)]TJ/F30 9.9626 Tf 101.924 0 Td [(vl\0501:nl\051)]TJ/F8 9.9626 Tf 45.163 0 Td [(is)-333(used.)]TJ
+/F8 9.9626 Tf 14.211 0 Td [(In)-356(this)-357(case)-356(w)28(e)-357(are)-356(sp)-28(ecifying)-356(the)-357(list)-356(of)-356(indices)]TJ/F30 9.9626 Tf 210.708 0 Td [(vl\0501:nl\051)]TJ/F8 9.9626 Tf 45.393 0 Td [(assigned)-356(to)]TJ -248.394 -11.955 Td [(the)-462(curren)28(t)-462(pro)-27(ce)-1(ss;)-526(th)28(us,)-494(the)-461(global)-462(problem)-462(size)]TJ/F11 9.9626 Tf 229.323 0 Td [(mg)]TJ/F8 9.9626 Tf 18.457 0 Td [(is)-462(giv)28(en)-462(b)28(y)]TJ -247.78 -11.955 Td [(the)-405(range)-405(of)-404(the)-405(aggregate)-405(of)-405(the)-405(in)1(dividual)-405(v)28(ectors)]TJ/F30 9.9626 Tf 233.196 0 Td [(vl)]TJ/F8 9.9626 Tf 14.494 0 Td [(sp)-28(eci\014ed)-405(in)]TJ -247.69 -11.955 Td [(the)-481(calling)-481(p)1(ro)-28(cesses.)-887(The)-481(size)-481(ma)28(y)-481(b)-28(e)-481(sp)-27(eci\014ed)-481(via)-481(the)-481(optional)]TJ 0 -11.955 Td [(argumen)28(t)]TJ/F30 9.9626 Tf 44.85 0 Td [(nl)]TJ/F8 9.9626 Tf 10.461 0 Td [(;)-373(the)-361(default)-360(is)-360(to)-360(use)-360(the)-360(en)28(tire)-361(v)28(ector)]TJ/F30 9.9626 Tf 173.727 0 Td [(vl)]TJ/F8 9.9626 Tf 10.461 0 Td [(,)-367(th)28(us)-360(ha)28(ving)]TJ/F30 9.9626 Tf -239.499 -11.956 Td [(nl=size\050vl\051)]TJ/F8 9.9626 Tf 57.534 0 Td [(.)-419(If)]TJ/F30 9.9626 Tf 16.133 0 Td [(globalcheck=.true.)]TJ/F8 9.9626 Tf 96.698 0 Td [(the)-256(subroutine)-256(will)-256(c)27(hec)28(k)-256(ho)28(w)]TJ -170.365 -11.955 Td [(man)28(y)-255(times)-255(eac)28(h)-254(en)27(try)-254(in)-255(the)-254(global)-255(index)-254(s)-1(p)1(ac)-1(e)-254(\0501)]TJ/F11 9.9626 Tf 217.24 0 Td [(:)-167(:)-166(:)-167(mg)]TJ/F8 9.9626 Tf 27.14 0 Td [(\051)-255(is)-254(sp)-28(eci\014ed)]TJ -244.38 -11.955 Td [(in)-331(the)-331(input)-331(lists)]TJ/F30 9.9626 Tf 75.842 0 Td [(vl)]TJ/F8 9.9626 Tf 10.461 0 Td [(,)-331(th)27(us)-331(all)1(o)27(wing)-331(for)-331(t)1(he)-331(prese)-1(n)1(c)-1(e)-331(of)-330(o)27(v)28(erlap)-331(in)-331(the)]TJ -86.303 -11.955 Td [(input,)-338(and)-337(c)28(hec)27(king)-337(for)-337(\134orphan")-337(indices.)-456(If)]TJ/F30 9.9626 Tf 194.743 0 Td [(globalcheck=.false.)]TJ/F8 9.9626 Tf 99.376 0 Td [(,)]TJ -294.119 -11.955 Td [(the)-409(s)-1(u)1(broutine)-410(will)-409(not)-410(c)28(hec)28(k)-410(for)-409(o)28(v)27(erlap,)-428(and)-409(ma)27(y)-409(b)-28(e)-409(signi\014can)27(tly)]TJ 0 -11.956 Td [(faster,)-362(but)-357(the)-357(user)-356(is)-357(implicitly)-357(gu)1(aran)27(teeing)-356(that)-357(there)-357(ar)1(e)-357(neither)]TJ 0 -11.955 Td [(orphan)-333(nor)-333(o)27(v)28(erlap)-333(indices.)]TJ
 0 g 0 G
-/F27 9.9626 Tf -169.005 -14.446 Td [(nl)]TJ
+/F27 9.9626 Tf -21.918 -17.047 Td [(nl)]TJ
 0 g 0 G
-/F8 9.9626 Tf 14.529 0 Td [(In)-443(this)-443(case)-443(w)28(e)-444(are)-443(implying)-443(a)-443(generalized)-443(ro)28(w-blo)-28(c)28(k)-443(distribution)-443(in)]TJ 7.389 -11.955 Td [(whic)28(h)-382(eac)28(h)-382(pro)-28(cess)]TJ/F11 9.9626 Tf 87.105 0 Td [(I)]TJ/F8 9.9626 Tf 8.967 0 Td [(gets)-382(assigned)-382(a)-382(consecutiv)28(e)-382(c)27(h)28(unk)-382(of)]TJ/F11 9.9626 Tf 164.192 0 Td [(N)]TJ/F10 6.9738 Tf 8.004 -1.494 Td [(I)]TJ/F8 9.9626 Tf 8.146 1.494 Td [(=)]TJ/F11 9.9626 Tf 11.324 0 Td [(nl)]TJ/F8 9.9626 Tf -287.738 -11.955 Td [(global)-333(indices.)]TJ
+/F8 9.9626 Tf 14.529 0 Td [(If)-307(this)-308(argumen)28(t)-307(is)-308(sp)-28(eci\014ed)-307(alone)-308(\050i.e.)-435(without)]TJ/F30 9.9626 Tf 206.41 0 Td [(vl)]TJ/F8 9.9626 Tf 10.461 0 Td [(\051)-307(the)-308(result)-307(is)-308(a)-307(gen-)]TJ -209.482 -11.955 Td [(eralized)-313(ro)27(w-blo)-27(c)27(k)-313(distribution)-313(in)-314(whic)28(h)-313(eac)27(h)-313(pro)-28(cess)]TJ/F11 9.9626 Tf 232.18 0 Td [(I)]TJ/F8 9.9626 Tf 8.284 0 Td [(gets)-313(a)-1(ssigned)]TJ -240.464 -11.955 Td [(a)-333(consecutiv)27(e)-333(c)28(h)28(unk)-334(of)]TJ/F11 9.9626 Tf 101.342 0 Td [(N)]TJ/F10 6.9738 Tf 8.005 -1.495 Td [(I)]TJ/F8 9.9626 Tf 7.338 1.495 Td [(=)]TJ/F11 9.9626 Tf 10.517 0 Td [(nl)]TJ/F8 9.9626 Tf 12.469 0 Td [(global)-333(indices.)]TJ
 0 g 0 G
-/F27 9.9626 Tf -21.918 -14.446 Td [(repl)]TJ
+/F27 9.9626 Tf -161.589 -17.047 Td [(repl)]TJ
 0 g 0 G
-/F8 9.9626 Tf 24.499 0 Td [(In)-416(this)-416(case)-416(w)27(e)-416(are)-416(asking)-416(to)-416(replicate)-416(all)-417(ind)1(ic)-1(es)-416(on)-416(all)-416(pro)-28(cesses.)]TJ -2.581 -11.955 Td [(This)-420(is)-420(a)-420(sp)-28(ecial)-420(purp)-28(ose)-420(data)-420(allo)-28(cation)-420(that)-420(is)-420(use)-1(f)1(ul)-421(in)-420(the)-420(con-)]TJ 0 -11.955 Td [(struction)-333(of)-334(some)-333(m)28(ultilev)28(el)-334(preconditioners.)]TJ
+/F8 9.9626 Tf 24.498 0 Td [(This)-239(argumen)28(ts)-240(sp)-27(e)-1(ci\014es)-239(to)-239(replicate)-239(all)-239(indices)-240(on)-239(all)-239(pro)-28(cesses.)-413(This)]TJ -2.58 -11.956 Td [(is)-312(a)-311(sp)-28(ecial)-312(purp)-27(ose)-312(data)-312(allo)-27(cation)-312(that)-311(is)-312(useful)-312(in)-311(the)-312(construction)]TJ 0 -11.955 Td [(of)-333(some)-334(m)28(ultilev)28(el)-334(p)1(rec)-1(on)1(ditioners.)]TJ
 0 g 0 G
- -34.648 -18.431 Td [(2.)]TJ
+ -34.648 -22.139 Td [(2.)]TJ
 0 g 0 G
- [-500(On)-333(exit)-334(from)-333(this)-333(routine)-333(the)-334(descriptor)-333(is)-333(in)-334(the)-333(build)-333(state)]TJ/F16 11.9552 Tf -12.176 -16.936 Td [(Notes)]TJ
+ [-500(On)-333(exit)-334(from)-333(this)-333(routine)-333(the)-334(descriptor)-333(is)-333(in)-334(the)-333(build)-333(state)]TJ/F16 11.9552 Tf -12.176 -21.586 Td [(Notes)]TJ
 0 g 0 G
-/F8 9.9626 Tf 12.176 -16.937 Td [(1.)]TJ
+/F8 9.9626 Tf 12.176 -21.585 Td [(1.)]TJ
 0 g 0 G
  [-500(On)-333(exit)-334(from)-333(this)-333(routine)-333(the)-334(descriptor)-333(is)-333(in)-334(the)-333(build)-333(state.)]TJ
 0 g 0 G
- 0 -18.431 Td [(2.)]TJ
+ 0 -22.14 Td [(2.)]TJ
 0 g 0 G
  [-500(Calling)-339(the)-339(routine)-339(with)]TJ/F30 9.9626 Tf 121.471 0 Td [(vg)]TJ/F8 9.9626 Tf 13.839 0 Td [(or)]TJ/F30 9.9626 Tf 12.262 0 Td [(parts)]TJ/F8 9.9626 Tf 29.53 0 Td [(implies)-339(that)-339(ev)28(e)-1(r)1(y)-340(pro)-27(cess)-340(will)-339(scan)]TJ -164.372 -11.955 Td [(the)-333(en)27(tire)-333(index)-333(space)-334(to)-333(\014gure)-333(out)-333(the)-334(lo)-28(cal)-333(indices.)]TJ
 0 g 0 G
- -12.73 -18.431 Td [(3.)]TJ
+ -12.73 -22.139 Td [(3.)]TJ
 0 g 0 G
- [-500(Ov)28(erlapp)-28(ed)-333(indices)-334(are)-333(p)-28(ossible)-333(with)-333(b)-28(oth)]TJ/F30 9.9626 Tf 199.198 0 Td [(parts)]TJ/F8 9.9626 Tf 29.473 0 Td [(and)]TJ/F30 9.9626 Tf 19.371 0 Td [(vl)]TJ/F8 9.9626 Tf 13.782 0 Td [(in)28(v)28(o)-28(cations.)]TJ
+ [-500(Ov)28(erlapp)-28(ed)-333(indices)-334(are)-333(p)-28(ossible)-333(with)-333(b)-28(oth)]TJ/F30 9.9626 Tf 199.198 0 Td [(parts)]TJ/F8 9.9626 Tf 29.472 0 Td [(and)]TJ/F30 9.9626 Tf 19.372 0 Td [(vl)]TJ/F8 9.9626 Tf 13.782 0 Td [(in)28(v)28(o)-28(cations.)]TJ
 0 g 0 G
- -261.824 -18.431 Td [(4.)]TJ
+ -261.824 -22.139 Td [(4.)]TJ
 0 g 0 G
- [-500(When)-222(the)-222(subroutine)-222(is)-223(in)28(v)28(ok)28(ed)-223(with)]TJ/F30 9.9626 Tf 170.611 0 Td [(vl)]TJ/F8 9.9626 Tf 12.674 0 Td [(in)-222(conjunction)-222(with)]TJ/F30 9.9626 Tf 84.96 0 Td [(globalcheck=.true.)]TJ/F8 9.9626 Tf 94.146 0 Td [(,)]TJ -349.661 -11.955 Td [(it)-368(will)-369(p)-28(erform)-368(a)-368(s)-1(can)-368(of)-368(the)-369(index)-368(space)-369(to)-368(searc)27(h)-368(for)-368(o)27(v)28(erlap)-368(or)-369(orph)1(an)]TJ 0 -11.955 Td [(indices.)]TJ
-0 g 0 G
- -12.73 -18.431 Td [(5.)]TJ
-0 g 0 G
- [-500(When)-222(the)-222(subroutine)-222(is)-223(in)28(v)28(ok)28(ed)-223(with)]TJ/F30 9.9626 Tf 170.611 0 Td [(vl)]TJ/F8 9.9626 Tf 12.674 0 Td [(in)-222(conjunction)-222(with)]TJ/F30 9.9626 Tf 84.96 0 Td [(globalcheck=.false.)]TJ/F8 9.9626 Tf 99.376 0 Td [(,)]TJ -354.891 -11.955 Td [(no)-405(index)-405(space)-405(scan)-405(will)-405(tak)28(e)-405(place.)-660(Th)28(us)-405(it)-405(is)-405(the)-405(resp)-28(onsibilit)28(y)-405(of)-405(the)]TJ 0 -11.955 Td [(user)-419(to)-418(mak)28(e)-419(sure)-418(that)-419(the)-418(indices)-419(sp)-28(eci\014ed)-418(in)]TJ/F30 9.9626 Tf 211.319 0 Td [(vl)]TJ/F8 9.9626 Tf 14.63 0 Td [(ha)28(v)28(e)-419(neither)-418(orphans)]TJ -225.949 -11.956 Td [(nor)-333(o)27(v)28(erlaps;)-333(if)-333(this)-334(assumption)-333(fails,)-333(results)-334(will)-333(b)-28(e)-333(unpredictable.)]TJ
+ [-500(When)-222(the)-222(subroutine)-222(is)-223(in)28(v)28(ok)28(ed)-223(with)]TJ/F30 9.9626 Tf 170.611 0 Td [(vl)]TJ/F8 9.9626 Tf 12.674 0 Td [(in)-222(conjunction)-222(with)]TJ/F30 9.9626 Tf 84.96 0 Td [(globalcheck=.true.)]TJ/F8 9.9626 Tf 94.146 0 Td [(,)]TJ -349.661 -11.955 Td [(it)-368(will)-369(p)-28(erform)-368(a)-368(s)-1(can)-368(of)-368(the)-369(index)-368(space)-369(to)-368(searc)27(h)-368(for)-368(o)27(v)28(erlap)-368(or)-369(orph)1(an)]TJ 0 -11.956 Td [(indices.)]TJ
 0 g 0 G
  141.968 -29.887 Td [(54)]TJ
 0 g 0 G
@@ -10386,58 +10382,62 @@ endobj
 /D [995 0 R /XYZ 150.705 740.998 null]
 >> endobj
 998 0 obj <<
-/D [995 0 R /XYZ 150.705 312.909 null]
+/D [995 0 R /XYZ 150.705 280.89 null]
 >> endobj
 999 0 obj <<
-/D [995 0 R /XYZ 150.705 280.973 null]
+/D [995 0 R /XYZ 150.705 239.656 null]
 >> endobj
 1000 0 obj <<
-/D [995 0 R /XYZ 150.705 260.605 null]
+/D [995 0 R /XYZ 150.705 215.58 null]
 >> endobj
 1001 0 obj <<
-/D [995 0 R /XYZ 150.705 230.219 null]
+/D [995 0 R /XYZ 150.705 181.485 null]
 >> endobj
 1002 0 obj <<
-/D [995 0 R /XYZ 150.705 211.511 null]
->> endobj
-1003 0 obj <<
-/D [995 0 R /XYZ 150.705 171.384 null]
+/D [995 0 R /XYZ 150.705 159.069 null]
 >> endobj
 994 0 obj <<
 /Font << /F27 433 0 R /F8 434 0 R /F30 601 0 R /F14 604 0 R /F11 587 0 R /F10 603 0 R /F16 431 0 R >>
 /ProcSet [ /PDF /Text ]
 >> endobj
-1006 0 obj <<
-/Length 507       
+1005 0 obj <<
+/Length 1376      
 >>
 stream
 0 g 0 G
 0 g 0 G
 0 g 0 G
 BT
-/F8 9.9626 Tf 112.072 706.129 Td [(6.)]TJ
+/F8 9.9626 Tf 112.072 706.129 Td [(5.)]TJ
+0 g 0 G
+ [-500(When)-222(the)-222(subroutine)-222(is)-223(in)28(v)28(ok)28(ed)-223(with)]TJ/F30 9.9626 Tf 170.61 0 Td [(vl)]TJ/F8 9.9626 Tf 12.675 0 Td [(in)-222(conjunction)-222(with)]TJ/F30 9.9626 Tf 84.959 0 Td [(globalcheck=.false.)]TJ/F8 9.9626 Tf 99.377 0 Td [(,)]TJ -354.891 -11.955 Td [(no)-405(index)-405(space)-405(scan)-405(will)-405(tak)28(e)-405(place.)-660(Th)28(us)-405(it)-405(is)-405(the)-405(resp)-28(onsibilit)28(y)-405(of)-405(the)]TJ 0 -11.955 Td [(user)-419(to)-418(mak)28(e)-419(sure)-418(that)-419(the)-418(indices)-419(sp)-28(eci\014ed)-418(in)]TJ/F30 9.9626 Tf 211.319 0 Td [(vl)]TJ/F8 9.9626 Tf 14.63 0 Td [(ha)28(v)28(e)-419(neither)-418(orphans)]TJ -225.949 -11.956 Td [(nor)-333(o)28(v)27(erlaps;)-333(if)-333(this)-334(assumption)-333(fails,)-333(results)-334(will)-333(b)-28(e)-333(unpredictable.)]TJ
+0 g 0 G
+ -12.73 -19.925 Td [(6.)]TJ
 0 g 0 G
  [-500(Orphan)-313(and)-312(o)27(v)28(erlap)-312(indices)-313(are)-313(imp)-28(ossible)-313(b)28(y)-313(construction)-312(when)-313(the)-313(sub-)]TJ 12.73 -11.955 Td [(routine)-333(is)-334(in)28(v)28(ok)28(ed)-334(with)]TJ/F30 9.9626 Tf 103.307 0 Td [(nl)]TJ/F8 9.9626 Tf 13.782 0 Td [(\050alone\051,)-333(or)]TJ/F30 9.9626 Tf 48.734 0 Td [(vg)]TJ/F8 9.9626 Tf 10.46 0 Td [(.)]TJ
 0 g 0 G
- -34.315 -603.736 Td [(55)]TJ
+ -34.315 -547.945 Td [(55)]TJ
 0 g 0 G
 ET
 endstream
 endobj
-1005 0 obj <<
+1004 0 obj <<
 /Type /Page
-/Contents 1006 0 R
-/Resources 1004 0 R
+/Contents 1005 0 R
+/Resources 1003 0 R
 /MediaBox [0 0 595.276 841.89]
 /Parent 1009 0 R
 >> endobj
+1006 0 obj <<
+/D [1004 0 R /XYZ 99.895 740.998 null]
+>> endobj
 1007 0 obj <<
-/D [1005 0 R /XYZ 99.895 740.998 null]
+/D [1004 0 R /XYZ 99.895 716.092 null]
 >> endobj
 1008 0 obj <<
-/D [1005 0 R /XYZ 99.895 716.092 null]
+/D [1004 0 R /XYZ 99.895 664.341 null]
 >> endobj
-1004 0 obj <<
+1003 0 obj <<
 /Font << /F8 434 0 R /F30 601 0 R >>
 /ProcSet [ /PDF /Text ]
 >> endobj
@@ -18656,10 +18656,10 @@ endobj
 /FontFile 1480 0 R
 >> endobj
 1482 0 obj <<
-/Length1 1797
-/Length2 11324
+/Length1 1846
+/Length2 11513
 /Length3 0
-/Length 13121     
+/Length 13359     
 >>
 stream
 %!PS-AdobeFont-1.1: CMTT10 1.00B
@@ -18675,7 +18675,7 @@ stream
 /ItalicAngle 0 def
 /isFixedPitch true def
 end readonly def
-/FontName /AWFDIU+CMTT10 def
+/FontName /WZDMKI+CMTT10 def
 /PaintType 0 def
 /FontType 1 def
 /FontMatrix [0.001 0 0 0.001 0 0] readonly def
@@ -18706,6 +18706,8 @@ dup 126 /asciitilde put
 dup 42 /asterisk put
 dup 98 /b put
 dup 92 /backslash put
+dup 91 /bracketleft put
+dup 93 /bracketright put
 dup 99 /c put
 dup 58 /colon put
 dup 44 /comma put
@@ -18758,51 +18760,39 @@ currentfile eexec
 Ã'EKøó KêúÉ•frïáRÌK^y·Ü`vO^Üû˙üvÖÚı~»ZwRá≥ iﬁNMWÁ–3HS¢p+ßT,q!sê0œ(ÿπ∆;Uñ©¥+3ÁŸ"îJ8q3É”däJÒ`£∞»Û7õ§7+‚ÁÍI™∫uÆÓ≈›·ÿøhH<=!'Ä´πTÃÅñÄ2.´r·%
 v»‹ˇyè*øƒÛSìíò\L≥$∞ r)_¡`Åã∞5_‹O„õòH&ES„“q=ç¬—*í§” 4˝⁄∏vÿåå	sÑFÿ◊‰°®óüõÏ37Áª„£w#[«õª€fŒAâ⁄∑ŒëÚ¸Øm⁄–ôí’or)êh&Ó=Â€|ˆ6kL◊OADÑ‹Õ∫Dõ˝*‚
 ∞M ˆÇ:7Øıjmòmàˆgæ:€≥ñõèDY®e◊üêØêÇ±µÆY,˝™ﬁöP&cvÒXÂi„ìr„N?ı≠á)åig"—’f-yàÄB]@0(i"/≥8≤¯=§íúQ_@ÕÎ*Ís‹˛k?´}ãæø™|˛-◊/≤˘lí©t‘ê´«ƒÌÀ5ÀXO6Ω#Ëa>{|Å®Ò˝‰≥…,ËˇpÃ/ ”†–ÖuN…Â‘,Q1ú^èqúœÉZ√°'ïeÿM¬VÖZ=¸»,î… B:Ü≈mö[Ñı¶h˘:üÛ sZ⁄á”=?Ä+m+äsƒ^3Î±I≈VP›{ﬁ≈„pvHrQÍöN¨Â≈=Î®Q≤…|…íl«n∞¢u‰—rÈË%∑~dLA$Œ∞ÊxÛo7ªC7∞Øbï¬&.Æ{Úî$e9:˜ËïyEƒ$=}ØΩDÖ¿îpŸAS"~»PtˆàÒËJß™ËJmáß2+guï √ßbê¢ﬂ`˛äyﬂø∂µ6+≠1˝b∫s:gì6Ôt—|n_„¡Üb√¡4¶é•∞#ﬁ·l–¢[Tzãæ[ÔdPük—3J«xv¸ﬂ4.ÍD<–Z8.nÊ
-0©Lâ¶¡bÖ`ãßˆÛ”˜7·|Åπü«cÔùbµÛÊú‘tpˆJ6˜∆πujìrÑCµZTﬁRã'W®ﬂô“°Dj4h¿˘E1â°”–ÿká‰¢ı^Ÿ	´Ûz¶vUgT#<ùh¬&B!+´◊}À8F}±&qv—bCÁ;˜ßùYË¶4ÔXk<ÕÖQÕ∂ÍÃ˝/∑∆Iœ¬yR/%€3]%?¥Ö2.„—›≥ßxàã1ç°['mHcS}K≥6ºcv,:“|Û˜ÖOh_∂{Ω!‰˝	Ÿù;áêj,ËÜånÕ°+w¨°¬·p√È·ÿÀﬁ›◊3˝êŸp #5ãV Æ∞nÙ©«Vuë÷kJÒ~∑”ŸûQ©GèÛR≤LØò9Ÿ·˙yüI~˛"ÔŒO˜√
-B‚Ã %¿Øìµ´2DyíñEŒì∫⁄FzÓÓ™®óÙ$§˜ªÛw›©vJßÔüÆQ}wG‚Ú5{Í-)r›©Óƒ|Ø–‘õ)Êèôâ¬ç…≥R7Âó˘Å˘Ω= ŸÀÚ«o´è√ê≈3®≤$§ì˝∂Qk÷N≠h"®÷Ró<Ãù$oÁ¸õß‡å—[Z˙KXAeEJìÑ˜]ÑÔ˘Ï´Óı≥?&6πÏlıóªÿ\î€ªKΩò üØÄ(ˆmí«ˇÂê-¨R∂¨≤Ã`8›á:ºHj∞¶∑¢(•/‘e{8®∆€˝‹Ω?PûØ‚)˛4≈Ê%˙û7ô%+‹ç∑>qjuFù◊ˆCE#)o÷Á©pÆ‘RXlˆ÷J‚Õˇ⁄0^Æ]Qπ…∂$^œU2ÑUumuÿòsãµ:Ú®Ëîˇ†v¨wÙ°Lïl£ÀNF∂XZ…£&ﬁcöÆ’(~Zﬁ–!Ê†í›…œ|•l]òq8¸<%W†kz +ñ‡¨⁄*#˙rπÉYnÌNkœ[XÙLrz–bÄÏíap&¬ñ‰í Y£ÑÀU§û?ˆL{I~w±Z*}Uöù’’TB’∏Zë	z∂¡¡µ§OZ¿?=;ÁîµõÑú‹ﬁiv%°%É"UB◊Ì¢ˇs‡£‘Ñho!
-ã≈ﬂ]‚Ä∞ºg,Ãk¨k ∆≥ˆe∫ÍJVÈ|£jb(åc"Å4Ô!•tïbØ/{&‘¶KE˙óCÍ;3Jπßµ÷ƒÊ“WoW”çV4c…Eı<t·´ˆn\zÊÚ.√kê>§¢ Õ‡§Ø∞KÅv¬ˇ€U8´0˛™0ÁÕ1rV=8¸#Ê"∂50,U2¬ΩC6øÇÿŸÀi$†	ï2ìŸïE;√7? uç<“:UBìjOD!î}?6çXÉj¥¯Á∂L&]ÁzjÄ¨)(õwxÚˆÕÄzÙıê:DÑ¸eœñxÌÔE⁄ŒrWå[üá0∫ì∞Æ⁄ﬂàZdÂù6ﬁ.}-9(ò—˘T\>_Ök†UM⁄rÖ«H#yªi‰©:·|”Ugó9é€6…^öˆc}´¿/Xé®*ÉìOe˙f‹@œ≈"å2œÎÄDﬂ*y^“YÓ¨O=◊YçpÔ8Eé!”ÆuΩ ôrÃÛ8>¡3û]«`x©é:VùÕ«ª;Ñ©£ÁxÕ≠ †∫ı∂¶Le∫${◊•ÇÂHW¬ˇÀ.õ}˜?Ñ˜>vÓéuH'T„ﬁà≤ı?<Øıˆö⁄}ì=‚,§»≥6"%¢∆y5có°ïërÒ«ŒÈ2a≠≥Â}ﬁ¡3P$≈ƒ9Ÿæä3∂ædÿñ,AâØµﬂƒ	p∞„¸0Ó„Ë)$cœjgº⁄n˙ﬂÀ¨Ü⁄|∂fá».7'gìŸI∂w“…¥Ëâª]Dô^›†æqÍ\3ùâàéiÇ·‰?	Õ|ïÔ?w àØ∏gym™Ω4¥ÂÑÔt¶∏=Æ¸®·’È£BÒ>Ë®kSºΩÍL°%vN|D™úÙOE
-œN^–ç[6sΩ˚™“˜~ï\»TösjX¡îç∫†UEBˇ˛πSÜÔˆ
-6Ò/ÑNÑ¯9Õœõ*åæó]ŸtÿG™yx¯?@Ø\È∂Um¿“∏ÌIúÅ ∏£,ƒÎMΩøy€ñ
-V™}íw_–‘∆‚ccëØ0°ö;Æ¬Ò—4fZ;Ñm…z_ŒÒ_˛Ídd=&µπ®tπVÛw>keí/(Ì~yàjÑú(πH∞µíc°y∞˝y∑ÿº`’Í≥1’+Sï"…ôhÊ“£R¬}vô—‘◊≥‰à≠∫†wd˛~A—9¬ƒmT9bπnåfâºÜ≈Ø«*ı]åÔxw˝U>%¸‚.‰
-
-ñNÜñ›]ŒŸDûπÆˆÏUóo¸Xk#¥; 	ÒÓú4§⁄ˇP∏qnŒ˜yc\ÌRás4’<π,]⁄–‚p˙πÛ·Ùs¯w÷V–öñc◊PÙza5S™œÅuÁ"aˇ8äA>p‹C;˛π/VAN wÎs˘?ƒ/œÌ≠	_À≠'Œ¨ÒæsŒÊUºëÂdm—Fáábsk6o√%‰ß˚ —ıè0"–Âcë9#·]b©w‰ù>\T¡u%2mıgb´5Â≈‡´◊óΩ‰ù}aÆ©P∑w≥y·°Ù√/r¸™±?áqâsÅ≥eyÚŸèRÜcßµ£¶X™[¨Aˇ:QQNtTI≥˛^ö@3àí∫¶Â!FÙ±”4pÁ7¬àqó` U:÷Ì…AnÉ¬óﬁï+Ï˙êTRMÔmõºDáL7º7ÂüÏ≤ƒ1éçÓôNÔVÅNÊ·0¨çÆO‹ø®¸ÛŸ#ú∞Ü(I˝Ì"‚]éÅÖË'ÚÁ|#
-#PÏÌ!» 7%§pb›m4¬Àî“"vxQ∫Ö»:ÌÏÈıÕ–¢}¿òR2Ñ˚JùX°é’uÙ–êw¿éA‡[#_Òí)+6Ú	îÆÛ÷ª’ }^˝äÀÆ∫]≤cÛ›–º∫…$	gYè∆∂ó^ÍÇÑ˛5Ôõ”Õ<f¬I'„Ÿ}π’/˚~{çlèË+H,âj∑¬‹rVf‘l8H	ú%M›ﬁY›˙ŒıåâÔ‰Ol2p¥Æ˝÷\gJ∑é¿◊Z˚“#Y≥áKUˇ`0ı”¡g£∂ÙVñ#5yT¯HÊç…	''. ˘»ÊÚÙÎB∞bı˛º‹ÀªÎH›â£z'ê'yª0•i\ôÌQf ∏«lïÊFè&W±û$Ëì‡„õ˘r∆/« Z|≥‘à:+/·tÏ'W’⁄ÇÕ˚©¿ÿ|ªYÕ√–˝‘W”“ÉSƒô0†ú¶+ø≠∑THÔ—é™f¶†Xz˘ ¢ìhm‹T6™Q˚fˇiËP·Ò†ìÊå⁄∂5kñiAöKcèDPaWClëÅÖ¶'3iı$Rnîæÿ8≠+≤ÿ)©ÒÏ–N*ƒÉ§ˆ˙ΩTx•+ì`ÿ≤√JÜæL˝ß÷'óx9û·xì¡4É™\ÓxR‘•êH‹¨ñ(7Ø*Å\Øà.ãE(IÛ:2G˝,
-¨Få•8◊+¸P3è–©¨˚é=ò	ÇIÇ›˙åÒòD*Zs≠ÏRRYê“õá¶é›Œ£ NòÊRØI1ﬁdÇÙ&µˆ∂ºáÚÇ˚Öy#æ?å*X-‰ıÌ?Ûú˚)¬äcŸÛs87ÙÎE◊j‚∂®ïn9∏:gè;ôÛ∑∑ÛrÑÎ{n%∑I`VˆSºLÆ84mm´ﬁVèAÇµå>2≤JD<Í€t∞k=éûm9¸±^é„,_7)@â˘páuG±Çäj]ò;K‚ƒÀVÑKlc•ﬁJ˚VÈπ•Oµ◊◊ï‚R¬Õ.€9Êˇ1;ó[bjë(i>Xz‰h¥O°ﬁ ÊíH©U0ïVw˘x;VàÂÑ¥Íúnõ™Üòá≤D]AT9É[—]¿MDÇ0‚àjDBÄ!Ç)ˇÅA⁄C=•˘”˚¿√ ÃRÜﬁ∞:\™è°ß5ó&º:m‰+(*©‹Ò˜h}®œóñ¥ObyùÉêÕ«JÓ/Ω2hñã°S Véˇi|==$«JŸ®yTˆPlÊı˙˚¶7µ›v´iy œCAtûªW’ù;∂ón*P1£∑ÓÇ3€P 1"Í∏¿Ÿ‡[7ﬂ;Óí%4 —ØØÙ}*T/âˇ˘¢Wä;wY(bƒÁ±ù˘v…≈èN∞ÚÙ:.@Æ–eÀ“‹ÂE„¬.£ Rπ8ª»Ô#$±µÛ◊‰Gc§_lÅ ∫*–ÿÜ;ò.–6ª+ÈW9£ a«≈ˆK¿3§hú&OÅª˜…ºÿ“ÏÜ,nLŸ*ˆa˙mh;Ω4.©–[÷.A(ﬁñ“vu˝ÉéÈ¯ÕØ®Ì>_Qˆf˙≠ApãÍ&ºÔ~fw
-Ú·6['à>y(«ﬁ4 ﬁ ≥úoÙIX¯>UDÿñΩ-•ﬂm⁄qÃq§“ êfLWœK€{óŸsï˛IÉ)öü›}¸±%Ø,Îû}ë
-Ó˝wÈΩª5/V˝Í¨á\ÌVıLåù`f1¬l§ü˜x¢¢>bwb≈¶%#·}>„4j6ø—ü‡¢˘g1.>g6”Ø^“yÕ~µ/sœ'œ∆T]t,(6√4uÙ1$Ñ’>Œo6i~oÜ"Í˝µ
-°jˆ3 <ÇõÆI#ø#˘ü´Âd”™‘B CÅ∆9s†#}N}÷ìhaT
-
-∞KaBCE$≈1Æt¶±Ø∫èƒôK.‡”	Áv©ÿj0r˙«·•Q¯e#&Î˙ê¨‹[äΩk_±8’≥P&‡°VÎ˝$?¿“ﬂé¶6	”?Ÿ4ÅOjÙ®Y#∫Ê¿tñ“ì…q/v1»ËÃõDlflzÆ°ˆáﬁ/'S… óDá»ÓÕınàä◊ªô`a!ˇ]rMézÂ#íÇ’\ÓHÒç%·våÏën∞∂Û—‰≥Fn“˜Y–$`ä¬+Î+1G±´áTWfXÍà◊¯Õ`Q©ß≥ùzL˜ìEÉsê)§Qf2)Ç∆w≈?F9
-ˇÊ±ÊDV=ETa~≤óau:	Aù™)QnÖ◊Xw∆au3÷˚Bí:SXí(mkËl,9:{1¯ö=‰téﬁ2ß'mÉN€b˛º*áÍË…a˝Ÿ≠Ïwç€"4:!ÔD¢|{BFdk¨ñxØçzGCÛ¬Ä÷Ò_
-ûj—Å#ê¢◊v¶µ…1EÁk€5A%ˇ{ﬂÙèP,ù/")ÑyﬁGS7 ®∏ﬂ∑´KZ‰ﬁU⁄∏M/˝í™~∂lΩy[÷‘]Äi9ø!a2ßefP‚f¸ı2§eÍ3Vﬁﬂı\vÎÖÁøo$:´∂ˇbŒ¶Ù€gT•?âçó|êên¢ÂŒiÙeÜ⁄÷.¯\‚ñ-˙ŸŒÆ{€€<-Àcç],h0⁄<A¬©÷uß;òJKbe˛ÊΩ%—µíFÒ!¡N;ΩÂª›G^3b≠V1bÜ∏∞ZQgWÓ):-›“í?_Vî‰8⁄Ωàû£6)›cN·ª˛å∞/ªêp\ä˙*∏€?⁄ió‚lªJd[ﬁÇÁÿ«lÌn“∑ÿ~òCÉÙÁM^—Ó˚F≥	0ÿ†ı¥˙ﬂû‚ôö∆wŸ!VúÈ˙lúΩ,Øb®ÖæZÚó›“2‚k\‹DgT!¥Ñ]≤]ıtf+9~√®gÕs{cPE∞›`uv/æÿ~->{∆jRª»|T2uOˇ,¯>ë–ÒÀ|]DºÀÆˆ„ó˙u:ΩI0’y∆º£\Æ˝c‹•”
-ñÿ®ß•ñôb◊πÚªív¡wåëdê0ëÆ…Ω?ìI£ı\P™-aSÈ?¡x≥^*q7Ò©íbÒ+iV®@Û Ü4ü6HBâhxØ¶^«B∑ˇ≈°n Œäü≥> Õ‡Ô^VßÒÛhŸ0†<ÚØJAˆ^¢`˚≥VΩpòfú‡‡ò<”Í÷˙l_¶Fk~gO≠‡≥æHêwﬂŒzÅE¯y›ë~oÎ"ªµ;˘5§•∑M]Æóô}i¢YCÄä∫Î3Vt—ñcTFÙ+çó(LOÿÿG¨Ô¥√≈„©Lƒq]‰Æ‹Á?_i†ówå	Û∂EíÎ8≠¿¨VÀÇÍ±™◊Û:_…l0ÔûDA¶ÏLÅÉ;ïƒÔwYÆy}‡M+ºHÅ`=eÕR*ﬂs÷õÇÁMöÄòÊ¸+I„£˘R`Õì·—Bª6ÎÚÈ]nÄÅÇD›%ık˙“ˆ–3e ONWÚÇœk∏ÙÿÃÃ◊á€•◊Áè˜6¯.á:m8—vöaß∞Ií•kvK,¥°ˇÍD¸)√Úä,ƒÉ4t„èVÅ@±LõD√B=4„ÂrH.ONJı"∆)hT!œÈ£\ana⁄ú≤O§Q.Æ%_≤©ˆÛs≠¯Úæ©≥≠aÛîL⁄°9ÿ(„Uò—2pÕù§t®Ë÷ïƒtÎh¨ªYsÜ%≠YÑMÏ:,7PÊ˘Ÿ¢≠oæ2pÊ®éø:vêw¯/0áS}˘™Ád~™Á∫Æì{=®$ë™E‡ïnì
-Rˆ÷üôT/Åz∑≈∫Ppıal/≥˙∫gı Ã®p	…˚ï}±z›’πMÑv’πtbë"&Î¶ë¯9\Ì.|CKôHÖ∑Ñ¡"Ü‡®wë≤CQûÁùaÁcYëT≈7÷8)B9wXhQØN∂Úbfá©åÌÜ"ßØâˆò›√:˚-#‚Uˆ¯.2Ò-"¢bnà;ﬂá*s¿@Œ*õÖ◊<:r?"áãÀB™ÃéîÆ«sñ¨Ö
-f3Bíôó[z∞—„qb•¨·%∂8`í{{(Bü∆˛ 4∑‚@ﬁ)ØÛñ¶‹⁄Îàìçˆo_æ^HÉ≠¯YQR˚©8:M/Ö5∂¶vf†jÛ]óÃŸ¬àíî≤7ÕbØƒ	Ãh|‘[≠ñkt¥èc,ÑiΩW›:ÇŒiôwÅ¿\gV™Ç~»≤€aäﬁï«÷ùIì—Õã3Az`QÌ@≥x}5üÈ¢>¬mÑÔ KÅó?v5DfÑÒ˜R^'≠•¿è¶ãú∂:ê¬•yH¸B8ä¥«Ì{h∑TKÂSŒ7˜c¢E¶Gòø”∏‰âv7’1? qëPÎû‰àÒ∆ÏÍÂH§≈i™˛jmB .è.‘ƒ÷…4ëRä£*.v≥PØÁb‡ÃŒRıÙj‡ß6rLd⁄}É%Ø/5È&‰ä–G•‹âp˝‚†Û)v\àr}$moÆneˆfòQB¥Ôíâ#Hk/˚¸á7[¨ıF2:Àu∏+´‡6a;◊ÿJB≠ùÙbo]À0í„Ì‚ÜWÜ[vÚ¡≈†x√LtHÁ97ÑAÑ¿~<Kébâ:[ﬁ¢õ/≈8ûRUY’*Î7˚ux—∏*⁄)\˛¡ﬂnˇa<≥ˆ©¡ÀóÖ[—oz&Fº≈ÏÀ˛F≥é|ò¡rãbZ˛∏À◊±ÀÆÅé)—Ω€K°eÍi¿MA¸%\|sÓæÎ«Œ⁄˝fﬂÑ`ÍN˘¸«\ïñƒôﬂ-7∂≈˙WÔ“Ü6–∫÷`åba iMÂ{˛ki)Ãjh¯õ”Mf¬¶≥?Á¢û_¿ †Y‚+fà°Å'>â¸¨Eñyk√a¿⁄°2¬s®#CmÙﬁˆk„´À1&ÈÉî…êòzπ“/e‚xt\Ù´˚e«:F¸:FhvÇ1rÆ`'~V5π∞‰}sÎM8Y⁄TÇ»ı•jQã—©˘≠,èbƒìÔ ÑæÄW®Áh%\‡µ–/ˇ√¥Ï;Ò≈òß3òb} *î¥9ÂÇD-reB>$ıF≤å„Éò˙
-∂_Y•ºÿW˘&ñCS–IôfÎª
-Ø±“™&bˇaM aâbz®OY·(*ﬂPh	¶wsFpËïÿüñ›XÕ˘cäú4®t≈F]§÷Ôı±¶öµÔ˜¶ª`SËdÁW'›tkh˝ÄrîﬁˆÏ™m•˙˙èöÌ5ßA‚∆d>:0fsñÂ◊ètM¨¯iµsæ+€1–`;ÒkÿA€ˇè€ˆ]◊∞F—y±“ÚNFó)ÎøÙÖ`≥%°˚FM&:qy[7ôVGıD1†°¶G35 ¢€v0‹%˚…–y`€jà¬†Œ™¡æ’Fµûõ7¨W:v8¢[´Ûu&íåfeDu¨Í•¯°DKZ6_™=ß¥œŒ®¥^«
-eÇ1„¯∑‘Â¨ªª˚BÚ∆öUs|tÛê'òjbÂJ= £¯Qû¸eZ9ÓU:xB6ÃπLÚ7ÆÔö˙Àc.©Sa˛†ã Û‘vëXµŒøÒ»Öï»ü†	fãº‘ÜQÆ¥Lˆ 6ÂÇA»pÁôÁáØCŸI˜Yù KÀÚ?Ë◊TﬂGf±Ë5hXé%gÒÔñVn›-1$]
-Arz¨áˆÎ†≥ls.D©?u·∫30(ZGa±	”OSÎN“ÂÆî˝'<oCîÀc:Eh¿ Ú%ÎTΩ¸<ê!ê£Lï´q"}d”u∆Q©?ª˜N≤∏vZ≈q/Ù¿˛ZØk.{æ(Gˇ’ñZÒ}>ÁÌK¶¡yõ3â<“¶$¡¿5Á‘®P˚,GÜ»˙îî∞‡◊õ´’?$ºT)gŒÆa∂U1{ö”ax_∑ysV667G∂Áı∑Œ](òawUuàº5§L∂5–Úa∫›~ŸòAlì8∏◊ŸÛç"«˚z1prIÕ1öMoÓÒœ;9Ë≠_©e‹Âh©Ö^«5r≥Ùÿ∞Ñhêsaº|%ÀÊHYõ«π5ØÃÿ98!±E'Ù˛1Î)£*\ÖπÄò]•ŒlˆE&˙Kü8ç.RUmÃ©À=?⁄'ªÏ^òÅ⁄Âê´'Â$=•ù]⁄ñnÛ`ß ~§&‘£Fu$é¥ãÇ9rò(≤>[•_¶=í
-™Ÿ√õi°)àÚÎ‚¿}pª@7.›r‰˘qioP⁄O^—pS¶œs4…{À_¡Rù/|¥˚@;€»,ò9‡Œ©Ct¸1ö!±9{‚«∞˙{˙wÒ(N.3K∆+›ÍdüI	<-DÕ&˝Ùµw;	º›ÀR/7ˇ’∞bˆ.Â
-HM+tÂ†ì?=8ŒAóçüÄL÷µ˜›)ã$¯E‘≥†˙·¸ À˝‰—`Ã≥7≥≈Ôî •rs;«˝Û@âºÌÓà${$8õ´“P‘ê™äıùÜ/|ªäŒ®¿§Õãò√ÅUHﬂ–…IÒ_π™¿x<Âå◊≤+ƒs≈S⁄¯®Ì)®∏^Ø˛bÂ¯°áÕ∂AX2îNÄâW¶ÊdÃ§˜∫Ô≥ÁÑIsYG kMF¡F1^NîéHNŒúGz†{≈≈«PA=Ï∆—˛ù≈®L_s©/å√÷ÉN„>
-·›¡…„≥tÁÊÿ>56©∞W⁄mdQÓqCˇ~I¶]∆%¿™È≤ØøÑÃkê.ƒålço∂[ªüxübıÌ«Å“.¥Wıj_}Ê=y)©÷Ió$V∏è7Åk€÷Fä_Sy<é\¬≈Íì˛M'®1¥LÔ›ë9=H≠Î“ﬁ.¬ÖÊÿÂ+Ê3
-˜Ë;aùÜ/,ÕA$OÀÒµ’ÊcC›ªiŒid<:8¿UÑ
-.Æ-$¶√ÉÙ˝¸C∑Tñ®\Vå]›ﬂ∫Ë‰±p*πôÉy$õ/∆W<ç¨¥Gú@sâ*ˇc+ÏÙ≈R5†∞oj⁄BÿÏ>Jü5Æ©mHU¥‘NvˇÓ§4[ ¶àãX˘—(¥N)]P.ÜzÁ=%ÃöyïbÑ%äyp◊wßUJ—∞Lô¥IπêB÷ˇHãñƒ£Õ¯£`N©7ÃS∑ï≥ ñ- §0 ∑≤º¯‘R!◊=ê∞~ﬁÚ{NÔÆ†>›»-mÉ¿:ö¯√{;	ﬂ±
-7üåaÔÈ›VIÛtƒ	«&∑üË„å&äP?∏LÕPF=StJÌ‘CÊç»â…\Â ùÛ¸∂|dI’˜ÑOoÏæ|§4néI‰ÒúpZôe:§ˆ)˛ê£ hÑª≠nŸQnºE≥#àd‹o|r≠õ≠8l°ay∫‡
- Ñ(˙@Í”‘!À’4¥‹Ö2ŸÏgT pn)K%¶π+ÃœÁáÃ]ë7¶Ôü«5ÀÎWò£l≤ÂÜ—ûuÚYÔ…eÃb/ì^;˝ç&„6Z∑\6Õ%◊&€|r ZsÖãé0hz›©o&+÷+eÏy±d±X–ûD)hÇvú}Ï¯¢	ªﬂ#ßπÏkqıù≤VïMkä»æèV›π2É≥£ﬁÚÉû@1s äèT!„bïô±ƒAÈ2pX¿¢∆0ØPñ≤'˝L:<¢–Ãlﬁ!)œˇ÷∑û'J¥ ¶Uä
-Ãèi–ÿc!Ôf~J„îøK^i^¢2~ﬁìHõπí>CºÓSπõõÂ@¬Ü
-gCfú^˘G∑°ë`Ñûä‚ ºh¿Èü†uÈFp
-ûô≥nüv≈èØÊûÀ@¸=”Qâ≤<»-@˛z+P#zMU$zÙ´êπ1•Üeò<6‹‡,ˆ¿›≈€hkÏ⁄∑yg„'Æt¿fÙònÎ"·=ecÃy∞m∑0lä€úâL‡L√Ñ¶f_…Zø§sz˝s(æ@Ù7∂0u¢Ã£4OüM §îª%ƒ¨ ß(KÒ⁄≤¶∑e√±B$â<kAÙ?h¥ºÏts¿6wQ‘à˘R{Q¶á.„í<˚…¨÷:hË+û€Å8\=iè¨åQ@#îcäÏ0öﬂﬂø£tü∏yä“$c:F{>ì}ƒôœäÚ®%Zß»ﬂüQ_ã˚åa¿.'óf{9h∆7ÛŸÄ´´˜zt„≠M¸÷ﬁ˚‡•A†)d¨ÄËöØÛÿ‹î¯jHv‰w/+7π«ÇP∫`?Jﬁ.Ì≈%™Wp\©¡yúP.‚Ê£Ò:D€B◊˛äæ‰
-øÉ,ä8ú∂FÊôæÃr∞GΩS%€ñ⁄Ò2µï¢j8œ·ÿ◊Êºs¯ôêY.„Ú◊.ù=ó…là⁄>û*°’EV!Ÿ°
-AÉ≤0†\tU∑Tç√&ü$ƒârŸ∂ß≤€≤ø}ËÄÄ; BJÙL ÏÀ˘+(=Îô˚ÆÍÒˇÔ‹zKı˚˙@ˇ£«…-ΩB∏}{q/ƒŒJÀá”G§*%≈XïjKn≤à<,VÊM@üxgì|'h√üt¡_ÈE˚êi5ÍÇ.ÑàV1é)º∞´'û-)*!^‘)…Î·x@$D¿+Ã˛#0Y‰ÌÎÁ¸˝{aÌá\ÑÊÅª⁄Ω{¿QÕˇöÑæ8Ö4*áÀ∂¡ô†‚Ö«dÿB•'ç√Yñ√ÏÒd}u·oKxgea≠Á›ªT™6Q&ƒ<êƒBﬁPuÌÑ*¥ãJqt„U◊y≠÷N>'åµY…eêüIÌ!jZ‰á‘ﬂΩ»ˇõÿï ˙ü~FcS!	¬‹v\ΩR©UÓQ…0Ï≈¥0∫©ÂóhßÌ…PBÔè≤§/cÀ€¥x∏t“J®⁄+á∞h1L£ﬂú{ñöùeÆŒ—yÙU’È48ì√ˇ)á‡´cÔËÏƒ≠#í39Qckf=!#*ixÔÂ ÆRç~d2)	∏Øsuøµª π—qæÅtÎﬁ¶ÈÒçä˙|`qÆ´◊˛9!à—hïóÛzúíõÔI*q·;µ%‡7∆Ü'yô h∏wpE»Äx”˜PΩœπPıO÷≤‚–cY◊™∂¿≤ˇF4Æˆ0\Û˙Î~∫—èu∑	ôHúPΩU}V¬O¢⁄9ÔL˛øç7e…TWÅ}™GYﬁî∆™öúRSî™ÇÇ†ßlø„XÚøÓ∆ë,Oˇ∫J∏	ı˘¿ŸGv˜oI^NÖênõdD!£”ı#äù|çˇAÌ˛!Ç„k›xÃ‰ùÁ~lUÄ™ıπÊ†j∞†éÏ≥©6zÆªp‹ïDÉ"u0^#&ıi•Äƒbë_K¨∏2ÉÌˆ£ì	Æ»ê(è–AÉ›QlãÇ_Ωâ8u±«¶~vLî‚UÅ∞QÂ|£•d˘K<dSb!Å6«úB∂“.-´È5_?v§_Èu¶N2e<ó4`Û9y?˝÷_ËO3;z¸ËnÛgP≤ÒÖ1Ah≈O‰2ûy9ºÒ¬∆RjÈ±Ùq)YÁ`óÜÊ›n]V[‹L8Ÿè*k‹⁄»Üÿ÷cS∞5œhXÄ´ÖÙ[·+ur(Y≥gƒjÖa\†€ßìQPÆ%∑_:,<[ ¿ÿ∂„I—‚Æ∆éRÅb.ïOÕèkO#≥gˆÑ+Ù√K•î∞˘•üÇ!˚x‘Z§m«›Ω¡œ:N¬Ωå≠@J‹Í)ˇå+—"V¸/≈Öôˇ£µπ¿3¥zÿg~Á∂Æ	++!õ•*öFf–q&(ø?mäXƒRS'ô¶â}®CÊ‹Së£a“)$ºh+ß°™˝ñ£By\!&QèoElmNü?
-}-È]ÆÈ3©0∂ΩCiíÅÈ’…04+L.”¢ô#m"=≤SNÁrè•XW≥ﬂ9£Ì´aórﬁ‹pﬁö;…âÍïÏ£™díàBU©Ô1@ü¬⁄∏Îü—gàY0G?”·—tÇ}Q°Æê£(‡b;ß„Àçc®õ◊gƒØÌùs˙◊nodz ö-W7ìÊi7@Ã˜Ïπæ5*†ƒ$3À™pÊmYp…#ı˚Ω¸Ûg)Ì=!pu^Ám∆äWà∏Ω]K%Böÿ“ÔOÎ8∫LÈÁ¨‡Ê≠ﬂìSyNﬂÕà#Er»Ÿ´⁄1SãuUTm’<∏Ó©◊2Zt¢it`&ôµ0£–aoJ5êT3vÜ'u}®≈&¯XyÎ¬Ñ€ˇ√∫p4	˘'¶ìÛk πjePj6ø9¥ë…∆#DS ⁄ñB ìCNãû-ó˚»Äˇ&Î„ÒÕôÍW_™y#+tˆ+ó"¡0fw˚
-,\–
-D—Q∂·ˇ/‘B∫éÁ∂˙Ü˜Ö, (x @⁄ÓÎgãâ≤“L4`¢`w˙·qª‘ﬁwñ
-t·£µΩL	cËÿﬁ“%$3-Ωí\¶ûÀ2î6≠ÎóˇzÆf†¬ aˇÛ[y¸”Åôì Ãß;Õå≤Q~Ò˝q‰ì…,:¸W‡]	fO˛∫N¨9©ÍQ¢?™gÅÎÖòd^¨À◊ëv!ˆfå&Óä~)Ooó–õ»Rﬁ;Œ≠pû◊xµˆjÊ¬'œü>ïŒs¸çÂçúñY¸Òß'™IKdjC7òs	?√F5 πÖ4Ïµü¥Ã
+0©Lâ¶¡bÖ`ãßˆÛ”˜7·|Åπü«cÔùbµÛÊú‘tpˆJ6˜∆πujìrÑCµZTﬁRã'W®ﬂô“°Dj4h¿˘E1â°”–ÿká‰¢ı^Ÿ	´Ûz¶vUgT#<ùh¬&B!+´◊}À8F}±&qv—bCÁ;˜ßùYË¶4ÔXk<ÕÖQÕ∂ÍÃ˝/∑∆Iœ¬yR/%€3]%?¥Ö2.„—›≥ßxàã1ç°['mHcS}K≥6ºcv,:“|Û˜ÖOh_∂{Ω!‰˝	Ÿù;áêj,ËÜånÕ°+w¨°¬·p√È·ÿÀﬁ›◊3˝êŸp #5ãV Æ∞nÙ©«Vuë÷kJÒ~∑“#Bg1d∑≥;àê∑⁄‡^ß"J◊í7Ω‹RTL.Ô#π3Ω37«§9AÜ∞Jn]≤É;Ã˝¥˝QvsTÅ„ÀÈÓ[ßJhÿXÊÏãXîpÁãÓ<Ã)ÍRfÜØñì™ ÒK¥∆Î˜¡ñô∂‚à…ıCy
+FëYÚÎ{ˇXãXtì[Íä k‡îy$¨ãÆ÷…÷<ÑÊÍpƒº)ﬁ≠œA8s∂òÌtm‰î6ÚŒ=Ó™>~¥I√¢`~™æ
+ )ë”Ø9ÄR¸»º—´“sò◊É}Ç2†‘∞∞\Xg`ômò:;Ω∏⁄%)d ”ÑxdXk⁄¢˝ﬂú:±Êı·-<¢¿2∑˝ÂUÎaù$g~( u3`ì?V⁄#-œƒõEΩ2‘Öò°ödƒ(∂0Y]âxE¬ãÿ+d'èƒ[¢©_5«ÈæI6fﬁ·Õ\Í	k~û±ääe_w⁄D¨ô∂jé&6ª§µÎ*è-ü‰›<0CC¿yº∞X÷ò/** *H7=å≠£+(ÄCæ’ˇjqÉ8ÅópînÍ≥W”b—lŸ¢Ö+°'b§?ÓÁÀ4Ùü/s∂Iã¥;¢n∂ˆ1ÔBUz…Çö9 L}ä14™ﬁR∫í˘∫1<1œÜntYºöI≥¢7X⁄xfYÂ•S g+§ Í§ı=æV2˜ê®La ˚{u∞‚óV≈Ó)lØj≤<paM70◊8dÅYôUBJIf>≥~ÓHC Gr:£aG&U-®Æ3ÜıUk688ﬁÙØ—˘|Bì¿Ÿn-_∂Œõ1Qµ4ú…c≥ñ¬≥õﬂ€)Ã∑Ôí~i7„T„Pëøã”ÿ∂J?≠ä€X7È•0so∂üpY`Ìjn´Z·æü˚?HtQ>à[í◊>]I€ƒÖh¥uûñ’â¢ó¬¿/£èπñ„o∆"∏:öâaÒ#afd∑Ù …e±‘'√‘πY€U/8Hl($µfpUïË≥ïöé(‘G¬ueÄªÊ‚3xTú†∏º;Ÿ2JKeØ	UWÌc≈5%ÆHJ≠¯ ˝«RNÂ<éÜ uEw—eºÙIÉ¨ ˚Ã˚Ô˘â«H«A[…ÿ3˛õÜîÑë¯ 9ç
+«J≈Êc$„i;lÛ-t•¡a»p§$ıœ∑wmÃ·D,IÃI{H7wí•ÒQÛ?R$ŒOÜhà$ÕóÕ1±ü≥¢Qïˆj¶P'ÓV	ì`©6©t€2™¸ª+>	≠Ñ4≈S	|Ê +xUGkaQôÈûT]fó ˇ<BBÓë^X$Z_àÉgı*-¥]Eú4Ùmë˘J•h&ﬁ†ı4∫´`‡˝ ónÛ¸¸ÜèΩ≤„Ê!v(>ΩGqÌ©ÓP√∆jJ®ŒSáz≈\ÎÎ2ıü≠]-‹≈†ÅÔj∫”I¸‹A“MDS‹ÈæFPa≈i‘ıôõ(æL*¥VDÊuÀÑFéOb[ÁQ;ˆö€î∆_Ô±çªƒY•l§Ãn◊Ób'}›zÔ&703ö9W˝√Dd[ /ôî3≤∑ÖÑ£ÃMR‰Õ«€)Àâ‰¢”¿Ó®º<è&28Y®º&P	Î<‚mı¡¶è%N—â7s‰Ã0f„qÄÆêıîà‚]7˚OâƒÙ=‚"%5˛E‹IW∂(ªjÊ&Fû§√µèÄwAˆ√ûkiµƒ°J;≥gÆsô–VxAæ?e›âÙ\ë˝†oP:Ä»<ûzÜDi˛∫kø—ƒ∂'õÑ	ÎÅÜ8_r◊ÛÓÔ£ﬁ<~2Áà?HÎQr¶Å&“Ù®j∏ﬁ8—(£˜˘⁄üI‘Æá0Ûå‹¿ô–¯` ŒÙJU@§T@∞iÎXdöÚ/ŸU†ñˇ‰–ôS)'Ínf¶XdeËˇáÊ'Se ª>n,8í ïÀúÜ6GGº[·‰ﬁU⁄Ä-Û'ú‡ úéÊ”8:CˇoOÍƒ„};{≠R¯r«ZÏ¢^mÔVˆOë™¯9≥Ω«¯VQl∂ˆ˛Ê˙"¬Û©Æ¡Å’üOùù‰∏%Ö∂cπ˘Èπ ¬ÿsÖ˘»®}©≠Ä	ÁÎ;¢†ﬁ∫:◊\⁄Uú‹®P:(E‘ n^[u£øhÿi≈v=û«~¨àÙ»mÑ1'¿=Â«8çŒ†W(ﬂ´öo∑Ñ§ê˙‹∫Å&ZCíÓ92≥eõãeh+\¡†&E)F∞üõfGhLû[^{êò’Xn#¸“`	¢Ωî¡aPj~?»ì[‡BÖt≤c°Ú¬˚$x«ì∞ê@Ÿ÷‘%"7:[gB›•ìoUûf¸
+⁄)6Øıõ–ÏŸú∂®€p^°‰ë 2èı⁄4ç¿—Îjh~÷ßiD∫€åxFT¯è≥3‹˜Ú l Q$¨«ÕJ .àë·2IÁ±<¡êˆ1Ì%ézïa¿–C√goøü£\à\+_i]Vá>âú¸¡¬8æÔºjßÆpr¨J},¯lnm≤ ¸äÁî 
+‡èYecôá¬Gè∏ƒ∂r€õ˝Â–ﬁp!◊ú®•›}˚¸WYüı%ïﬂåzú§∏	eÎ∑Üí∏åóÑ&_u˘Di´,`eo∂zvµ◊Õπp£U◊ÉınÒxΩØòïZÎEÀN´ÎïÔ‰ÄÒ›ìèÅË´dJÛö¶iÜˆl«„ÑDÒ˛§◊RΩÀ#πe˝ÆNÎüuRÊKà∆iC1$Œãvù¸ÅXá∑3àî‡tåœË€Q∞Ø¶d…g`Jo>ìÃ©58pô≤A®ﬁ„>ÄŒY£Õ†∫{ã™CŒ/◊´bd‹&Àº≈{'òØ#˙P√ª”˙ﬂºÃÂæ≠áxÛ_ë:Äv©ù"çV †.uÙÚ]ÅG8‹AÖÎ	’”°*.ßEÀ∆QÙd·æ±ldììT€ß_Òe\&ÏQrÒ∂}6ÁßQFm¨%ÎÓ^"´Ñì¯sÑG¿+ßX»eÇxx¢QÄ5ÿ∂ÓÂá;á¿çÆ∂tcÎaFmYl	o7ÊÇ±¥àâ=I√[ûí∞ÍÜ”tvä◊eã*#®eòé$ÒÔàèL?tøX·4jÌú“	¢*¿°£◊[˜í2\≠‡dhZ™w%t¨õ Ôè√≠´.dcjkk˜(d£]èQNΩ¡°"ˆsK'àÂãõì◊¸[ï-Ú§ª®i≥,à]7¡ÔÛπ/.#tùnÜÎ+?Ó)‘8ûA‘Î/±¥Å≠ÂåÓEˆò‹&◊ Úîëgé‘“≥`ÈgΩH}‰5á%ß∑ {=ò‰∂(Ωùô‘◊Ï†Ol:⁄˚Gß‹[±NXmçz^{”áD#FpD◊~Òãƒı%¶«K≠ãR˝*1≥ã¶∫mxÀ§e∑Tü5Ï⁄–€yM\ı9å·ñ=Ák«2∫Ì2WÉ∫rÿ`6’?}£©gÊbDoŸzé‹úI˘l˘Îœﬁ;Å-“∏/©¶4€≈n√Ouûç⁄Dœv	∏Œ◊RÂ „:¢VÈè±ñ)≈≈ÀŸq{ËPQ–m?ß0Ú°bK{Q«o[«≈˘“ÉP‹ÿæˇ‘
+Òõ¶´æy∫≠àèª]ìåSa]GF†ãáçËT¨µ&f-‰ﬁ3kh∑Øu<uBR£{ˆ©_ñÙ wcszæõéæñ∫¬î&íã‹Ê÷ú}à>h«ˆ*x<á§&P™rÑ?R∂fCoïúÿƒ‹˛†*âså§[·Å◊≈#…◊R~I€ˇ¸®¥*r¶-ú«úò	ùiµ'!™.ËVœä;Yeè£o6%§2›Óåãáï∫Û¶}N‰ﬂê0Ô;e˛Ï£5){GÃΩ≥n∏v'yì4πtÿnjªßiÄ;”\˝:sƒC≥/å`€b«/˝ñâΩV–uw7,—±Xúoá5çŸ‰ œÕËÕ>£M¨[òª?ŸßOÅ(¿”vππ©EqNÏm‹ÜØf”Ëù:gqC+rä,‘+a0¿{ä˙s¥÷>µÃÌ¥$˛=B»s0I˘|ÂŸÂj|ßoùÜVî~D∑πÂè~§s◊Sã) ≤bgŒfbw◊û \.`éÀ÷|k-Ï	µ†ÅÇrØÓ–√Eë⁄Ûâ∞à¶_$-n!U+®.zz¯ü‰ñOùÈÃPA)Iîô]ñ˚Àâò>,)1)JúÀ”vÃ„~«¨RÙù∂–Ÿ≤1Ë	>Ö∞b≥uní”æQ'6Qº√j™\‹…„6q¶>ÓÉtF!4[Ö:q´ﬁﬂ˚9ñîAÕö≤ yg∞ë´‹ËßÒ[P˜ª>!ø√´|ìsÇ˛êò∆GH‹Ê˙:z&Moï¯î»Ç7…fe—‰m∑k´ÑV˜|svÑvÁ¥kømYFtŒ/Ç√ò	1¥Gq@„ÒY_,ö,}*%yÔS‡“ô˙p!‰∫ÕMw4π:É„Q#`€ã3™+>ME”ê°'ÄYOLÄÉF≈g‘•ŸÔWBÜ6Í B i«—¨¢ÃÖΩ‚HX⁄öÜT^A( mfW¶vÇIÈ{D/Hí˛F&BAπˇõöö™◊–sÊxEO¿Ú±^wBûrVÉ®¿ßTU˚|ÿrñ£¨oú-TØuëµ2æ6ª_åQ≠FÏÕÿmEŒ0%é!&æöZ∂h≈Ò0Á )7ZÈ`¶®§b0˝œ⁄Ù•âÓØØb≥‚˛N∆∏µ¢|ÄÜÉ&9q"oÊågßPgıI3„˙nÑ∞-ñml§¨<Ò#ÀõE2éÍ?æÇÙ∞˚»¯`<ÎWèGÀz ı6˜1µ)»Ä4=sÕÕËÉsÏr‡Ω·d¬í'›k≈çi,ëùL≥Êñı¡£µU‰ñŸnNQÕ:>'ê‰ãN¢ç⁄˘Ã7è^·≈>‚… +Vb≤p/Q‘ÂCBiy” Ò $qÂå‹‰vØ/€J"5{±Ù¥8m~pu¸p^^°‘Ô©∏jNUƒ" ˘˙pÜ…µƒ≈iDr±:)ΩiSˇx∑ñp$/7õ≠$Í›8<Q·ıj˙!I.Eä?5”°vÉ+;zÑùl(2ÓÇp’·$´”ù8?üıgu`oÃ“Üw>·ˇUxå°Dπ1•ì2˘É$MåïÊ8Èµ]™ı¨M¶-≈Œ—∏y¡8ûú¥ãïﬁ*m~9ùõßm5ælZ¢ÄûâÓª“™ùÂa†l{ÇJüO◊Ó.yF0Zsµ(IÊJÒó%ÀÆﬁO¿L)aÁyhVá°ˇ·/kuz0πÒñÍun»±÷)¡N≈éi£∑≈u†√Ü:«2H‘jª÷%œ«‰vÛrßœüâÊÔÙ?&/Ÿ+â€◊3$ÿ:ò∂˘*°8'o’Rá·.:6JÎÄ \ûR÷€„Q6å ÷Cl\P÷ïtÁ!YÓÕ¯ò_„ûön±Ñ6}öëºMº]®¨àr2«Hè$äïâ¯R5Õ*"ñHáN€®L…a$’Sl‡îËm'˜\Á†Ωoá¨Û¢ØB˜…\>ÂÅ¢YZÕ•WKúöh)∑(˘p+BÑ •&˚◊§I¢ô∞)^òãõ´≤ˆl	N-∆›Œu£Õ1RÖàïøKGÕA)¯»”$¥—Iåhnû&ìd‡≤π4WRTç|(Ö4ÛºÓS?syK›“›v§CÎ
+;ÙBÉˇ#»WtÅ˝;¯Áêú∏Ãƒí∂Í‡6∫Ü≤ïl®å~.òç&ôÌ¸q˚nq§iÍÚ∫hQÔ÷ƒ{pÊ∂x G›1WÇß≈%Yuq’ì¥ø…≥/Ô	¨6Sn—~ﬂ∫ƒÂTKoà~F∫Iúhpg÷†h¯á}*+Õ9§XÆﬂ¿≥Àã "#2F"n◊]S®~„D.•∏¶¥]!´◊<6tææˇh¡œË~	ª&√bVˆé±ç∑&N∆ı4CZÒrÎè£]%Æö≤·ÿ)Vv®*πÃ√bõÛ>¿c”FkﬁD‹JKØ◊KöùéπDû=1X©tÇêiì¢t,t∏ÊIcé∑ı&B!ó1ZÎÚƒı^ÿV…÷Y‘èn◊˘BhÉ;†≤™ÓgtvE \dΩl9 ¡≥+”_JﬂhÙã&7¿∆7˚±ìÆE`öŒ©,Ü˙% M‚(ï€∂N˜ò£DÌé”ÇX÷ì\1ì¸Û’uùï"Ö{U√¢Qv$5ÙW≤bÜ#˛î$À€Àd°ƒOå<„ëN1¨èG¸)éy	ë\v€ä6DÄ¡Dùâ«Ö⁄_Ù¨Ímπrßâ\És=Ÿ è))”πJŒ>ó3’vê‹Ï	[πÏíkˇLà}cˆuCåÊ:y$e”–°2ÎL˙Ûjäã å+ƒew±qö{Ô”\ÜÓs´|%t˜´¿`F≈UuY €ÜÈ@b≥ãÅo>^ÌsMpŒ	õ;ó≤1≠¬òq,®g ÖÇ†l‘P_ÛÀ´¸W^OCòˆ[êŒL£o¸ã?h?eî‡Öñ´wÄç±pÙôòß€
+Ñ≥Jö_D3¶
+QÕ·öÙ‡PÅßxò˛qØÑAîäÇAä‡ô0∆ÅDóSÄLç^Æéz)∞f=ªê9∑OâeBJ¯ÇÅ(*M?FèÂ≠}ﬂ!Îmu£CoºjHë/0±l∫c¯^ˆ|0ù5tt∞¡xÕih⁄∆M|ç„^pL¿éøû7wD»‚√PµÊŒØÉ±NÏÄjÌ’ã‚î∆ﬂXhÀ£äàKè±Ë˜Wπ6ïã€”=+TÃ!ïcµ{yWÙûpÊµ∏SªŸZÎ∫;Æ¡g%Á“˛fËπÌ4fïÿ¸,ÿYã√Ú>Ç'(“dÌ|~`óMåœõó≠iπ¬õD†g:ê∂p◊@%+6‚ŒπΩ
+Xkë:ıd{Ö*¿Xï†"¸ÄU'2QÚ>V9tÂ[÷∞€lkUÈu–Ç<Œÿ¸ç‰Õ.¿ÂÙ˝Xd%ÿÃZ‰¿®w‰_—∞ÔJóâ¸´"ıÉ˙å±wK¨X-ÆØ· ê˘å:ËlXfV~iXË˙è∆£ÊÑ&‡kû∫Iê¨qfaıRÁ,”xÚ˚8ï,"∑„D!f¸QVøÔ¸ójÍéC ~}±ˆ∞õ	Îß1yj"!j	øvæ∑Ò‰Üîqé)ﬁ*·•ã#˘—∞.◊í≠èÇ>JÎôÖÁ¿[≈‚◊36¸¬{ˆV\∫˘Í6'∑)≈wK ã≈∂£ÿ∂k…q‰ÌËüÜkyµ´—TIÎÓÊmCB˚ÑˇWÉ‡Q¶Èé(óÒ÷àI ïÈî∂xô?©'8t8ü(Ìnqäx,∫r˙—ıÚ	i!˘y¸%∞≤fyuZlﬂZD 4òCºÅ$7.†±XÎ·‡#∑Ωfå›1∆ã≈îCÒ>	ñE@Q Ã°|”~Ó∏Dò'˝0òÿ≈¨ß¿›˛”Æ∞O†Ï€E¬®—·îÂ.i/…µã<◊∞ﬂ¥n;pX&GõcrçÂ¸ˇ[NsOÂœÁΩÔóX√ U¢H ÚR£DpU”^Qe∞s;<ïZ5∑eÕSà´óõ—HQa\Ãπv£q¯ÏVhéÜcÄØÜP¨é‡W›Çi0U?¢îƒhÊo\Ïú˝„YÍU–Ábı≤ÿ>.k°€wìA:¡.\ÅÉpú*Ù™UZ>m˚o˚Z KJnÛ -8R;W®,œ?ëH¥©dU®òVáDyﬁ8Ófª¶.:H£›øú;B‹bw˚√yHíac€¶~BÒ+O^:íû]÷/Œ(_—rM¥ö¡G~¿%Ÿ◊ÀW¨˝ã5FiHµuùtuÎVLVG*hêÔËÁwx–æƒ;^º$|ßùÒ≠Å≤çÃUõÿ‰˜g	Ï£ÈBq|,Ÿk9>[Ù’_≈∏fuŸ>V{àãç™p›óï∑FÜ™÷Í„8Ù0†=’ÙCﬂ3|Ü±èC:
+f∫©8<¸E09ö≥îâöQ]¬$[“≠¯{ù¢!’>uM1‰®Û≠êÆb•v‰‚Ï’‘ß•@Ö˘–pù√à&àÅì*È¥±raN◊C¶í•ßË∫&k"*s≥úÆ8ã$|õˆX?M˛Œ£Ø®π‘
+ãäï÷·‹f≥SS£—˜&¨ke9™ÛœbRô™≥Ì¿p@ıˇ¸.ÂIr¥vÎƒ43öïØ£A‡IgÁ•QH¨¶¿¿‡“˚‹FÍyÊÇZ"Ê´±Wâ l§*“Ê∫è™ó·é*âbÂÕ∏È	`Pwí¬∫Õ›&è∫E˙ u@Sü$_^YÉ¢ƒXÌ…Âé6¢Æ>ë†HáŒ&Õ!b#Ò◊µL‰ÈËF†*ã˜∂”÷ô∂¥™ !˝∫ı?üv9ÍëªÀWÄûÄü; ;Z2:öÔ˙rSQ6\S∏p7	Pzrsü.íy'T;ˇÿoÃ˝C6SÏ≈;á'~
+(ˇE{≠Ô3y#·—∆Øøæ÷ €3∞˚«π :¨
+W©A}ÌÖ¬Õn)Áí˛∂T|ë›çtãJZ4√Àqã∞ŒzfÅ„≈mI‘!-kÓy®9˛”¿Ÿî2f/Lè
+7¯˘ÑvÚ~n≤µÈ&^9 ®kúˆâÃ≤9π`√ÌÇ™nvdJ¡'ã#s|Riâ*∞ÏG3Ã!>Îß,¥ãøUö\ó≤8iìæˆ>£);R¿∆ g˜[ÅÍuÚ_ Ø–3mhû\~tÎ )·ÒQüWZ3‘˙)6h1∆Ë⁄Ï`?X—:ôÕA;ljÑQﬁáT∫	Õ˙˛¢Y¸•≈Ñ21’‚∞√¿˜¿q.–ŒÂìΩ6Ô\Ò•øÃD€Rı8zAQ◊œ£3Å y¸%Ä∫eZ¬;
+5a÷<∂»˝z:∞à4d>zﬂñt©‡ÿ*ﬂÍü·1(_f{õ¿èQŸ*6Ç3‰©qÕŒ•4XaÃÇ<˚@“Ê…gÜÚ–œ∏(î@hg!"§a2rñã¯¯◊rˇ
+!ÅÅm¯¶2≥µmä`ñRÑ‘F§ƒœ!˜õ©{à2, —[XcÔ‚\|m-î¯≈·≈ıè{aôÓ≈ﬂëÌQ,≠ﬁhÃÆÓƒe˛ÇI˛&Ö,õ≈lÅTayU≠Æª(¬@¬Õ*º&◊Ym@ ÓãFÉÁ>`4Ùn%ãÛ◊nªf÷zJ9Àc  ˆ√˛ÜöªﬂﬂW9&¨Â‹“AG4u(ºÅ~Ñiqœ∞GÔŸ÷êo¬_Fö
+äfÎœÔ7µ£&-oΩViªπâ™ˆ28u{q<îvï≠Æ©¨&Î–ßÒˇÍ6eÍ[hî	vnKû£?ÕGèT∑°BwU˙	I„ ÍEÿòÀYAú_§Yª>yóLk3ü(1Ωt¸⁄bòE‡<‚B1EI(¡Åú€ÃTaÏÈ FL⁄ye)†O ∞/V%r‡Hˆ‘ı)®®m8¯7a®FaT≥ªN•d\>Ωº≤¯'œ3éj«Hàä†Öf“§ÒL}ŒzΩÇnPOKòK¬·≤zxÜ!Ô–≠Æ\≠÷hä¡x:ô‰◊=JÀòVàBdÇS≥ƒ ú·ázLÅyu>èö[P‚Rdı”Ø‹útÛ7É◊á◊≥œÆ±ìº–òA3D¿¥4µœÙ∂—Ô‘Î &·ßÁàb·ÙŒ¯§Sp◊∆˜]ΩñC¥3	å[37'˘UèîuKK8ŸÅo´-0úAÿ^°
+∂„π›Ω•¬ˆpGTî`´ÀΩ0LX\§Ω™uôõ@:n≥©ÍE!åv»¨*dö˝˛∑|¡»á[î\ÔËNa(h¸Sƒ!:ú…ﬂF
+Ω{î∆é¶5¥^ÿ=·u©Spc©‹ºfREè≤”DÀ0ë∆k™dKﬁ
+Ì} o,(Ë…Î5·g{ËÏûîb@Ÿ=H‡^ÉãŸÑ^Ω.M1!§√ú´ûŸIïì£YmÍÔ (¸ÜÎ˛:$zÙˆ!öäâˆ#Ÿ≠‰l0Ñ5¶l;â\NˇÉuõºn¢≤@é˚ì`(‡ ]KQWf@˘ã∂óÚ ï‰0]«æmZzT≈Z~ÈØï2g ¶kv0∑p.˛ﬁN61FpHÁ∞‡	!˛ÃQ1ß 6ØÃwªûËyª≤9<x£>ØNt6ü<£âIGï≠¨∞;=PL¯9‡£õ™ç·PŒfÔ◊¬•¿ˆ=¶e›WÂØ∏èÕ&&!lê⁄Ì¥À^âZ¨Íòπ‚cÏ]ôí¬9~{‰ì¶¢3™æx#Ωë∞2#±„˙Ãë8Öù+?/∏u	Ç¢ÔQ˙êÃÒ§â¬Hærª»†ìF*£≈¬#É¬}˛—Qàˆb$Â;œ0πJäô7^‰FE=ºÜ≠V+.Bd€Î=
+◊⁄¯Æ…x4˙–B#ñv¨"⁄r¡ı‰a%¸2ä_èƒ¥¥ááˇßuç«(h2ZoœÓ‡∫â˛N&t˝–ëB3ÙQª%8Œ)˚—ﬁT—-iâFˆK«):uåRˆ•Ñ7|¿πA≥”;>Í(X0sxqÔfï≤în{ÿCUU™æM≈√ØŸ/|^ë7”ÁøÍ§\‹ÁåÊ‹á¨¯’ª£m‹≈(êá=äé˜∏™|±û^Üã»’„  å<wﬁ$z≠∫zÎ‚cg_Œ8>ÈB˝3ˆi?À3üÙåEˇ∑»|Õ∞°Pôt OÜ…5[ZOMïŒÆrs[y®éu5˙tÔÀ`‰ @—K˙∞"G%∑≥NõÖ:vPù’∞v≥ﬂoßŒ*@ÑQá√‡¢àó;hóÓ®,ë#È™ı◊Rx]†1¿yk¥W»*ÉÁ4ÉHtm<%éﬁg‰Á‡ØÙU¬√ÜÍè§TY7	%tÓ¸mëùﬂ!k=w|w∑
+ô˛q¨…pŒ@{ëæÃœÌ*ör ™¢/˜}Æ–â®àœöè«îIf}rjy{Slu9∂¶N6÷¡î”r^gRe∆∫eùªÚ5ÜB˚T4•uõµê83Ã‰ëœ;[,∫£¬˘FGù#ãD∂ÿÃcH˚8∞'öosÑ@}íî	)MlVS±/Y@8≤ﬁnÍÎ§L} Â®oﬁê∞\ØxΩfC"NÏ4‚h÷»∫Vä‹ö˝¿∞≈Zyxw«8:äîëäƒä3EÓÏ1Ø	µ¿m 6ñE∑0ãâ"	a“≈Y	S”Ç˙¿∂jf≤'Â‡.ƒíÖs∑‡p±¢A]SÌj£æp∞Ækﬁ©dãΩÁß¢M”õ˜ÍkÕ>Öw„Jï⁄¶ñ”ƒ˘¯£Ì≈{i≈…!sbá8iÏw·ó˘Â.ªÙ`0D '«Ñ∑Qyî`ÏÌ≈6rÇí\…ÃœrÚ‡\ÉzÁªêYQ «ˇˇpπÏb˜Å\@~ø±7‚ß¢U√∆≈y	Hî‡™È3lÙnó—Ñ óv”¸eWsUÓ™ÎüaÜ·+iHﬂÜs„Ex$y∑cÂàÀ&UGÊÆ†qó∑Ì<‡;Ò_»Àxœ•u€	D"L•€¡Rﬁ≈a@ÑÖ-Ì@ë-~G8§≠Òô‡ÂåncÒè©©÷ßß|A.ßx¸Ó◊!d¸\}”⁄ÈDÍƒfnp∏‘⁄Ñ%5õFˆ#≥T∞jé ÖrKÉ—˚~`ÕûçA÷%ˆd>ÎN◊uaVa‘ñ?3◊∫∫„Ÿü\¬U_Iß}Ù˙]â4ü	a~ú¥äﬂ{àÙå.õEŸ0≠+‰Ü¥◊bx◊ÉPà4\’∑c´µ≈∂°¸˚>M¡!÷fM∆ß€4]3Ò.:∑∞_Sœ<ÇıëÊF3Ò~ 3ã‰á’T‡\∞Ä1O∑£Õú‡Qk$ZÜ)æSUÒæs"‹Aü™åj˘ªí$˚∂ÁmH¿¸
+≤cql€kŸëªúRΩÆ—$9‹M…o°ÑÀ®œgÛ#8§tÒ¬˘	ˆQØ˘-s'~6ﬂˆb±QÕ˜t∆ô‡ï_,´ ∂<	#õ˝Ô]∞õ¬¯%ü‹áíLs+æïÆia◊;î8D„ı¿óﬂÉf˛º®©9§«,¸ÃôtlÙÓØyÉ˙Xñ—H◊:'ÄV«Û¢ÔSoß^
+¨W›-Crø“z$¸ŒE–÷;ŒzÃzÚéÒ.™kΩΩ¯E¶h rô≈ó:_F=\ßÜ˙¡Äx¶9ÓNzúw◊"ˇcM+∫HÖËÛ∞ô¸¶‘níaPÃ8ä£V≈¿ÊjÃ§3Ã¨_‘=u*‘_¨àû¨866∆â2°¬EŸïîÄÉW†K€=£Jª_¬qÁ‚=–Öh'=“˚!ì„SŸaŒ>P7‹Ê“kGy“‡¬VQ•‹~;ä‚â…û “·˛˛ªlì%6Ûïå–Pº˘&—q#8≠R:Â∞„SI63O˛3á8ÙÛÑäõ¥Ωób®kN”ì•∂úÍΩ,1˚`‘#å?ñªpk´∫C∑‰´√Ò:6|8ôsÎ?¥¡‡Ê¥ËIl√_í<ªTµò%ΩΩ√‚Eó»um®∆9gÚ“…8iÔ®UNÔÔÓGL°Wÿd∂Ï•„ãfFãπ`¿Cuª‡¯cg,|íÂˇæ—!‘*)”aÚxÅóJnSn…SµΩ n§#≠"„ªÓ¿ìc}ÛKÂh3]õﬂqï¡ÙoÂ	Ùoè@YX÷üŸ!ƒû!˝°æ˚õÌ§Ej
+u| g„†πﬂ ¡»:í¯ﬂ“ÂNgJãŒqˇi◊!ˆÿ˜GŒÑ")˛ª%[⁄Bêr]ı˘Øvvcµ∆'ù≥•@[ﬂÚÀ~ÛZ°µq5Èô€ºq"Úƒ¬&ã˙Mº“¥#ˆÁ?œbµ§∆û∫w•1P5vó≠Q k8I◊%TœsÖyvÅª3∏–Çê∏É©z6Ùÿ5‘jNÊC…¸–ÛäÑ>2rü,¨ï–Êı`ŒTÏ;¥°ÁÿÄØƒ(È–Óm%Û/MŸ:#ﬂ·+∆z™€/È÷Uπ∫Á•¶ºÏthz£Ü+£]E∑sÿsV ‹p÷gÇ†áª-èf–ÿGP¡√√;Xõx«ÃÁ˙f†ÿ˙∫Ê∆22\*
+Gÿ‰f”Yo©§c◊cÎ1œÇ#¨r¢…?—±÷N“è«kûÿg=W,GâóôÉÄ÷
 endstream
 endobj
 1483 0 obj <<
 /Type /FontDescriptor
-/FontName /AWFDIU+CMTT10
+/FontName /WZDMKI+CMTT10
 /Flags 4
 /FontBBox [-4 -235 731 800]
 /Ascent 611
@@ -18811,7 +18801,7 @@ endobj
 /ItalicAngle 0
 /StemV 69
 /XHeight 431
-/CharSet (/A/B/C/D/E/F/I/K/L/M/N/O/P/R/S/T/U/W/Y/a/ampersand/asciitilde/asterisk/b/backslash/c/colon/comma/d/e/equal/f/five/four/g/h/hyphen/i/j/k/l/m/n/nine/o/one/p/parenleft/parenright/period/plus/q/r/s/six/slash/t/three/two/u/underscore/v/w/x/y/z/zero)
+/CharSet (/A/B/C/D/E/F/I/K/L/M/N/O/P/R/S/T/U/W/Y/a/ampersand/asciitilde/asterisk/b/backslash/bracketleft/bracketright/c/colon/comma/d/e/equal/f/five/four/g/h/hyphen/i/j/k/l/m/n/nine/o/one/p/parenleft/parenright/period/plus/q/r/s/six/slash/t/three/two/u/underscore/v/w/x/y/z/zero)
 /FontFile 1482 0 R
 >> endobj
 1484 0 obj <<
@@ -19047,7 +19037,7 @@ endobj
 601 0 obj <<
 /Type /Font
 /Subtype /Type1
-/BaseFont /AWFDIU+CMTT10
+/BaseFont /WZDMKI+CMTT10
 /FontDescriptor 1483 0 R
 /FirstChar 38
 /LastChar 126
@@ -19126,7 +19116,7 @@ endobj
 /Type /Pages
 /Count 6
 /Parent 1487 0 R
-/Kids [1005 0 R 1012 0 R 1020 0 R 1027 0 R 1032 0 R 1038 0 R]
+/Kids [1004 0 R 1012 0 R 1020 0 R 1027 0 R 1032 0 R 1038 0 R]
 >> endobj
 1047 0 obj <<
 /Type /Pages
@@ -20024,7 +20014,7 @@ endobj
 /Limits [(Item.42) (Item.47)]
 >> endobj
 1502 0 obj <<
-/Names [(Item.48) 1002 0 R (Item.49) 1003 0 R (Item.5) 639 0 R (Item.50) 1008 0 R (Item.51) 1015 0 R (Item.52) 1016 0 R]
+/Names [(Item.48) 1002 0 R (Item.49) 1007 0 R (Item.5) 639 0 R (Item.50) 1008 0 R (Item.51) 1015 0 R (Item.52) 1016 0 R]
 /Limits [(Item.48) (Item.52)]
 >> endobj
 1503 0 obj <<
@@ -20132,7 +20122,7 @@ endobj
 /Limits [(page.48) (page.52)]
 >> endobj
 1529 0 obj <<
-/Names [(page.53) 992 0 R (page.54) 997 0 R (page.55) 1007 0 R (page.56) 1014 0 R (page.57) 1022 0 R (page.58) 1029 0 R]
+/Names [(page.53) 992 0 R (page.54) 997 0 R (page.55) 1006 0 R (page.56) 1014 0 R (page.57) 1022 0 R (page.58) 1029 0 R]
 /Limits [(page.53) (page.58)]
 >> endobj
 1530 0 obj <<
@@ -20324,8 +20314,8 @@ endobj
 >> endobj
 1576 0 obj <<
  /Title (Parallel Sparse BLAS V. 3.0-beta) /Subject (Parallel Sparse Basic Linear Algebra Subroutines) /Keywords (Computer Science Linear Algebra Fluid Dynamics Parallel Linux MPI PSBLAS Iterative Solvers Preconditioners) /Creator (pdfLaTeX) /Producer ($Id: userguide.tex 4222 2010-05-13 12:08:31Z sfilippo $) /Author()/Title()/Subject()/Creator(LaTeX with hyperref package)/Producer(pdfTeX-1.40.3)/Keywords()
-/CreationDate (D:20100526174204+02'00')
-/ModDate (D:20100526174204+02'00')
+/CreationDate (D:20100527113135+02'00')
+/ModDate (D:20100527113135+02'00')
 /Trapped /False
 /PTEX.Fullbanner (This is pdfTeX using libpoppler, Version 3.141592-1.40.3-2.2 (Web2C 7.5.6) kpathsea version 3.5.6)
 >> endobj
@@ -20338,423 +20328,423 @@ xref
 0000000000 00000 f 
 0000000015 00000 n 
 0000010142 00000 n 
-0000900502 00000 n 
+0000901667 00000 n 
 0000000058 00000 n 
 0000000105 00000 n 
 0000084073 00000 n 
-0000900430 00000 n 
+0000901595 00000 n 
 0000000150 00000 n 
 0000000183 00000 n 
 0000092006 00000 n 
-0000900307 00000 n 
+0000901472 00000 n 
 0000000229 00000 n 
 0000000266 00000 n 
 0000102236 00000 n 
-0000900233 00000 n 
+0000901398 00000 n 
 0000000317 00000 n 
 0000000358 00000 n 
 0000110483 00000 n 
-0000900146 00000 n 
+0000901311 00000 n 
 0000000409 00000 n 
 0000000448 00000 n 
 0000117735 00000 n 
-0000900059 00000 n 
+0000901224 00000 n 
 0000000499 00000 n 
 0000000543 00000 n 
 0000135981 00000 n 
-0000899985 00000 n 
+0000901150 00000 n 
 0000000594 00000 n 
 0000000634 00000 n 
 0000146723 00000 n 
-0000899861 00000 n 
+0000901026 00000 n 
 0000000680 00000 n 
 0000000716 00000 n 
 0000146783 00000 n 
-0000899750 00000 n 
+0000900915 00000 n 
 0000000767 00000 n 
 0000000815 00000 n 
 0000163185 00000 n 
-0000899689 00000 n 
+0000900854 00000 n 
 0000000871 00000 n 
 0000000911 00000 n 
 0000163245 00000 n 
-0000899565 00000 n 
+0000900730 00000 n 
 0000000962 00000 n 
 0000001013 00000 n 
 0000186935 00000 n 
-0000899504 00000 n 
+0000900669 00000 n 
 0000001069 00000 n 
 0000001109 00000 n 
 0000186996 00000 n 
-0000899417 00000 n 
+0000900582 00000 n 
 0000001160 00000 n 
 0000001212 00000 n 
 0000187118 00000 n 
-0000899305 00000 n 
+0000900470 00000 n 
 0000001263 00000 n 
 0000001315 00000 n 
 0000187179 00000 n 
-0000899231 00000 n 
+0000900396 00000 n 
 0000001362 00000 n 
 0000001415 00000 n 
 0000191860 00000 n 
-0000899144 00000 n 
+0000900309 00000 n 
 0000001462 00000 n 
 0000001515 00000 n 
 0000199123 00000 n 
-0000899057 00000 n 
+0000900222 00000 n 
 0000001562 00000 n 
 0000001616 00000 n 
 0000199184 00000 n 
-0000898970 00000 n 
+0000900135 00000 n 
 0000001663 00000 n 
 0000001717 00000 n 
 0000204794 00000 n 
-0000898883 00000 n 
+0000900048 00000 n 
 0000001764 00000 n 
 0000001810 00000 n 
 0000204854 00000 n 
-0000898796 00000 n 
+0000899961 00000 n 
 0000001857 00000 n 
 0000001914 00000 n 
 0000204914 00000 n 
-0000898709 00000 n 
+0000899874 00000 n 
 0000001961 00000 n 
 0000002018 00000 n 
 0000211815 00000 n 
-0000898622 00000 n 
+0000899787 00000 n 
 0000002065 00000 n 
 0000002110 00000 n 
 0000211876 00000 n 
-0000898535 00000 n 
+0000899700 00000 n 
 0000002158 00000 n 
 0000002202 00000 n 
 0000211937 00000 n 
-0000898460 00000 n 
+0000899625 00000 n 
 0000002250 00000 n 
 0000002297 00000 n 
 0000213508 00000 n 
-0000898330 00000 n 
+0000899495 00000 n 
 0000002344 00000 n 
 0000002388 00000 n 
 0000221662 00000 n 
-0000898251 00000 n 
+0000899416 00000 n 
 0000002437 00000 n 
 0000002471 00000 n 
 0000231714 00000 n 
-0000898158 00000 n 
+0000899323 00000 n 
 0000002520 00000 n 
 0000002552 00000 n 
 0000241289 00000 n 
-0000898065 00000 n 
+0000899230 00000 n 
 0000002601 00000 n 
 0000002634 00000 n 
 0000249604 00000 n 
-0000897972 00000 n 
+0000899137 00000 n 
 0000002683 00000 n 
 0000002716 00000 n 
 0000256253 00000 n 
-0000897879 00000 n 
+0000899044 00000 n 
 0000002765 00000 n 
 0000002799 00000 n 
 0000263266 00000 n 
-0000897786 00000 n 
+0000898951 00000 n 
 0000002848 00000 n 
 0000002881 00000 n 
 0000270977 00000 n 
-0000897693 00000 n 
+0000898858 00000 n 
 0000002930 00000 n 
 0000002964 00000 n 
 0000279038 00000 n 
-0000897600 00000 n 
+0000898765 00000 n 
 0000003013 00000 n 
 0000003046 00000 n 
 0000286976 00000 n 
-0000897507 00000 n 
+0000898672 00000 n 
 0000003095 00000 n 
 0000003129 00000 n 
 0000293290 00000 n 
-0000897414 00000 n 
+0000898579 00000 n 
 0000003178 00000 n 
 0000003211 00000 n 
 0000301813 00000 n 
-0000897321 00000 n 
+0000898486 00000 n 
 0000003260 00000 n 
 0000003291 00000 n 
 0000319047 00000 n 
-0000897242 00000 n 
+0000898407 00000 n 
 0000003340 00000 n 
 0000003371 00000 n 
 0000333703 00000 n 
-0000897112 00000 n 
+0000898277 00000 n 
 0000003418 00000 n 
 0000003462 00000 n 
 0000340599 00000 n 
-0000897033 00000 n 
+0000898198 00000 n 
 0000003511 00000 n 
 0000003542 00000 n 
 0000360921 00000 n 
-0000896940 00000 n 
+0000898105 00000 n 
 0000003591 00000 n 
 0000003622 00000 n 
 0000385263 00000 n 
-0000896847 00000 n 
+0000898012 00000 n 
 0000003671 00000 n 
 0000003704 00000 n 
 0000394846 00000 n 
-0000896768 00000 n 
+0000897933 00000 n 
 0000003753 00000 n 
 0000003787 00000 n 
-0000403932 00000 n 
-0000896637 00000 n 
+0000404125 00000 n 
+0000897802 00000 n 
 0000003834 00000 n 
 0000003880 00000 n 
-0000403994 00000 n 
-0000896558 00000 n 
+0000404187 00000 n 
+0000897723 00000 n 
 0000003929 00000 n 
 0000003961 00000 n 
-0000428319 00000 n 
-0000896465 00000 n 
+0000429221 00000 n 
+0000897630 00000 n 
 0000004010 00000 n 
 0000004042 00000 n 
-0000432704 00000 n 
-0000896372 00000 n 
+0000433606 00000 n 
+0000897537 00000 n 
 0000004091 00000 n 
 0000004123 00000 n 
-0000436795 00000 n 
-0000896279 00000 n 
+0000437697 00000 n 
+0000897444 00000 n 
 0000004172 00000 n 
 0000004204 00000 n 
-0000439629 00000 n 
-0000896186 00000 n 
+0000440531 00000 n 
+0000897351 00000 n 
 0000004253 00000 n 
 0000004286 00000 n 
-0000446292 00000 n 
-0000896093 00000 n 
+0000447194 00000 n 
+0000897258 00000 n 
 0000004335 00000 n 
 0000004370 00000 n 
-0000454000 00000 n 
-0000896000 00000 n 
+0000454902 00000 n 
+0000897165 00000 n 
 0000004419 00000 n 
 0000004451 00000 n 
-0000461787 00000 n 
-0000895907 00000 n 
+0000462689 00000 n 
+0000897072 00000 n 
 0000004500 00000 n 
 0000004532 00000 n 
-0000472291 00000 n 
-0000895814 00000 n 
+0000473193 00000 n 
+0000896979 00000 n 
 0000004581 00000 n 
 0000004613 00000 n 
-0000478296 00000 n 
-0000895721 00000 n 
+0000479198 00000 n 
+0000896886 00000 n 
 0000004662 00000 n 
 0000004695 00000 n 
-0000483020 00000 n 
-0000895628 00000 n 
+0000483922 00000 n 
+0000896793 00000 n 
 0000004744 00000 n 
 0000004775 00000 n 
-0000488278 00000 n 
-0000895535 00000 n 
+0000489180 00000 n 
+0000896700 00000 n 
 0000004824 00000 n 
 0000004856 00000 n 
-0000495058 00000 n 
-0000895442 00000 n 
+0000495960 00000 n 
+0000896607 00000 n 
 0000004905 00000 n 
 0000004937 00000 n 
-0000499551 00000 n 
-0000895349 00000 n 
+0000500453 00000 n 
+0000896514 00000 n 
 0000004986 00000 n 
 0000005018 00000 n 
-0000503023 00000 n 
-0000895256 00000 n 
+0000503925 00000 n 
+0000896421 00000 n 
 0000005067 00000 n 
 0000005100 00000 n 
-0000506880 00000 n 
-0000895163 00000 n 
+0000507782 00000 n 
+0000896328 00000 n 
 0000005149 00000 n 
 0000005180 00000 n 
-0000514037 00000 n 
-0000895070 00000 n 
+0000514939 00000 n 
+0000896235 00000 n 
 0000005229 00000 n 
 0000005273 00000 n 
-0000521527 00000 n 
-0000894977 00000 n 
+0000522429 00000 n 
+0000896142 00000 n 
 0000005322 00000 n 
 0000005366 00000 n 
-0000525403 00000 n 
-0000894884 00000 n 
+0000526305 00000 n 
+0000896049 00000 n 
 0000005415 00000 n 
 0000005453 00000 n 
-0000531044 00000 n 
-0000894791 00000 n 
+0000531946 00000 n 
+0000895956 00000 n 
 0000005502 00000 n 
 0000005543 00000 n 
-0000534951 00000 n 
-0000894698 00000 n 
+0000535853 00000 n 
+0000895863 00000 n 
 0000005592 00000 n 
 0000005630 00000 n 
-0000540576 00000 n 
-0000894605 00000 n 
+0000541478 00000 n 
+0000895770 00000 n 
 0000005679 00000 n 
 0000005720 00000 n 
-0000545046 00000 n 
-0000894512 00000 n 
+0000545948 00000 n 
+0000895677 00000 n 
 0000005769 00000 n 
 0000005811 00000 n 
-0000549419 00000 n 
-0000894419 00000 n 
+0000550321 00000 n 
+0000895584 00000 n 
 0000005860 00000 n 
 0000005901 00000 n 
-0000555924 00000 n 
-0000894326 00000 n 
+0000556826 00000 n 
+0000895491 00000 n 
 0000005950 00000 n 
 0000005989 00000 n 
-0000565232 00000 n 
-0000894233 00000 n 
+0000566134 00000 n 
+0000895398 00000 n 
 0000006038 00000 n 
 0000006071 00000 n 
-0000571418 00000 n 
-0000894154 00000 n 
+0000572320 00000 n 
+0000895319 00000 n 
 0000006120 00000 n 
 0000006157 00000 n 
-0000579996 00000 n 
-0000894023 00000 n 
+0000580898 00000 n 
+0000895188 00000 n 
 0000006204 00000 n 
 0000006255 00000 n 
-0000585963 00000 n 
-0000893944 00000 n 
+0000586865 00000 n 
+0000895109 00000 n 
 0000006304 00000 n 
 0000006335 00000 n 
-0000591182 00000 n 
-0000893851 00000 n 
+0000592084 00000 n 
+0000895016 00000 n 
 0000006384 00000 n 
 0000006415 00000 n 
-0000596107 00000 n 
-0000893758 00000 n 
+0000597009 00000 n 
+0000894923 00000 n 
 0000006464 00000 n 
 0000006495 00000 n 
-0000598904 00000 n 
-0000893665 00000 n 
+0000599806 00000 n 
+0000894830 00000 n 
 0000006544 00000 n 
 0000006585 00000 n 
-0000602347 00000 n 
-0000893572 00000 n 
+0000603249 00000 n 
+0000894737 00000 n 
 0000006634 00000 n 
 0000006672 00000 n 
-0000603972 00000 n 
-0000893479 00000 n 
+0000604874 00000 n 
+0000894644 00000 n 
 0000006721 00000 n 
 0000006753 00000 n 
-0000605864 00000 n 
-0000893386 00000 n 
+0000606766 00000 n 
+0000894551 00000 n 
 0000006802 00000 n 
 0000006836 00000 n 
-0000607642 00000 n 
-0000893293 00000 n 
+0000608544 00000 n 
+0000894458 00000 n 
 0000006885 00000 n 
 0000006917 00000 n 
-0000612593 00000 n 
-0000893200 00000 n 
+0000613495 00000 n 
+0000894365 00000 n 
 0000006966 00000 n 
 0000006998 00000 n 
-0000618184 00000 n 
-0000893107 00000 n 
+0000619086 00000 n 
+0000894272 00000 n 
 0000007047 00000 n 
 0000007077 00000 n 
-0000623940 00000 n 
-0000893014 00000 n 
+0000624842 00000 n 
+0000894179 00000 n 
 0000007126 00000 n 
 0000007156 00000 n 
-0000629673 00000 n 
-0000892921 00000 n 
+0000630575 00000 n 
+0000894086 00000 n 
 0000007205 00000 n 
 0000007235 00000 n 
-0000635521 00000 n 
-0000892828 00000 n 
+0000636423 00000 n 
+0000893993 00000 n 
 0000007284 00000 n 
 0000007314 00000 n 
-0000641342 00000 n 
-0000892735 00000 n 
+0000642244 00000 n 
+0000893900 00000 n 
 0000007363 00000 n 
 0000007393 00000 n 
-0000647282 00000 n 
-0000892642 00000 n 
+0000648184 00000 n 
+0000893807 00000 n 
 0000007442 00000 n 
 0000007472 00000 n 
-0000653142 00000 n 
-0000892563 00000 n 
+0000654044 00000 n 
+0000893728 00000 n 
 0000007521 00000 n 
 0000007551 00000 n 
-0000660386 00000 n 
-0000892433 00000 n 
+0000661288 00000 n 
+0000893598 00000 n 
 0000007598 00000 n 
 0000007634 00000 n 
-0000668083 00000 n 
-0000892354 00000 n 
+0000668985 00000 n 
+0000893519 00000 n 
 0000007683 00000 n 
 0000007717 00000 n 
-0000669653 00000 n 
-0000892261 00000 n 
+0000670555 00000 n 
+0000893426 00000 n 
 0000007766 00000 n 
 0000007798 00000 n 
-0000671322 00000 n 
-0000892168 00000 n 
+0000672224 00000 n 
+0000893333 00000 n 
 0000007847 00000 n 
 0000007893 00000 n 
-0000673452 00000 n 
-0000892089 00000 n 
+0000674354 00000 n 
+0000893254 00000 n 
 0000007942 00000 n 
 0000007985 00000 n 
-0000674398 00000 n 
-0000891959 00000 n 
+0000675300 00000 n 
+0000893124 00000 n 
 0000008032 00000 n 
 0000008063 00000 n 
-0000679418 00000 n 
-0000891855 00000 n 
+0000680320 00000 n 
+0000893020 00000 n 
 0000008112 00000 n 
 0000008142 00000 n 
-0000684876 00000 n 
-0000891776 00000 n 
+0000685778 00000 n 
+0000892941 00000 n 
 0000008191 00000 n 
 0000008222 00000 n 
-0000688701 00000 n 
-0000891683 00000 n 
+0000689603 00000 n 
+0000892848 00000 n 
 0000008271 00000 n 
 0000008308 00000 n 
-0000692384 00000 n 
-0000891590 00000 n 
+0000693286 00000 n 
+0000892755 00000 n 
 0000008357 00000 n 
 0000008395 00000 n 
-0000696685 00000 n 
-0000891511 00000 n 
+0000697587 00000 n 
+0000892676 00000 n 
 0000008444 00000 n 
 0000008482 00000 n 
-0000698017 00000 n 
-0000891381 00000 n 
+0000698919 00000 n 
+0000892546 00000 n 
 0000008530 00000 n 
 0000008576 00000 n 
-0000703416 00000 n 
-0000891302 00000 n 
+0000704318 00000 n 
+0000892467 00000 n 
 0000008625 00000 n 
 0000008660 00000 n 
-0000709322 00000 n 
-0000891209 00000 n 
+0000710224 00000 n 
+0000892374 00000 n 
 0000008709 00000 n 
 0000008743 00000 n 
-0000715075 00000 n 
-0000891116 00000 n 
+0000715977 00000 n 
+0000892281 00000 n 
 0000008792 00000 n 
 0000008827 00000 n 
-0000717663 00000 n 
-0000891037 00000 n 
+0000718565 00000 n 
+0000892202 00000 n 
 0000008876 00000 n 
 0000008912 00000 n 
-0000718681 00000 n 
-0000890921 00000 n 
+0000719583 00000 n 
+0000892086 00000 n 
 0000008960 00000 n 
 0000009000 00000 n 
-0000726629 00000 n 
-0000890856 00000 n 
+0000727531 00000 n 
+0000892021 00000 n 
 0000009049 00000 n 
 0000009075 00000 n 
 0000009901 00000 n 
@@ -20762,11 +20752,11 @@ xref
 0000009127 00000 n 
 0000010020 00000 n 
 0000010081 00000 n 
-0000885263 00000 n 
-0000886999 00000 n 
-0000885117 00000 n 
-0000885846 00000 n 
-0000887436 00000 n 
+0000886428 00000 n 
+0000888164 00000 n 
+0000886282 00000 n 
+0000887011 00000 n 
+0000888601 00000 n 
 0000010628 00000 n 
 0000010447 00000 n 
 0000010311 00000 n 
@@ -20904,27 +20894,27 @@ xref
 0000084133 00000 n 
 0000082812 00000 n 
 0000074673 00000 n 
-0000886853 00000 n 
-0000887554 00000 n 
-0000745725 00000 n 
-0000745662 00000 n 
-0000743526 00000 n 
-0000743588 00000 n 
-0000743838 00000 n 
-0000743341 00000 n 
-0000743403 00000 n 
+0000888018 00000 n 
+0000888719 00000 n 
+0000746627 00000 n 
+0000746564 00000 n 
+0000744428 00000 n 
+0000744490 00000 n 
+0000744740 00000 n 
+0000744243 00000 n 
+0000744305 00000 n 
 0000091854 00000 n 
 0000089890 00000 n 
 0000092129 00000 n 
 0000089735 00000 n 
 0000084230 00000 n 
-0000885409 00000 n 
+0000886574 00000 n 
 0000092067 00000 n 
 0000091288 00000 n 
 0000091407 00000 n 
 0000091454 00000 n 
 0000091528 00000 n 
-0000743464 00000 n 
+0000744366 00000 n 
 0000101715 00000 n 
 0000101868 00000 n 
 0000102022 00000 n 
@@ -20932,15 +20922,15 @@ xref
 0000101560 00000 n 
 0000092254 00000 n 
 0000102175 00000 n 
-0000887145 00000 n 
-0000886134 00000 n 
-0000885701 00000 n 
-0000886565 00000 n 
-0000885991 00000 n 
+0000888310 00000 n 
+0000887299 00000 n 
+0000886866 00000 n 
+0000887730 00000 n 
+0000887156 00000 n 
 0000102296 00000 n 
-0000886277 00000 n 
+0000887442 00000 n 
 0000102358 00000 n 
-0000743776 00000 n 
+0000744678 00000 n 
 0000110053 00000 n 
 0000110206 00000 n 
 0000108082 00000 n 
@@ -20953,8 +20943,8 @@ xref
 0000109910 00000 n 
 0000109957 00000 n 
 0000110031 00000 n 
-0000743279 00000 n 
-0000743218 00000 n 
+0000744181 00000 n 
+0000744120 00000 n 
 0000117370 00000 n 
 0000117522 00000 n 
 0000117794 00000 n 
@@ -20965,7 +20955,7 @@ xref
 0000126522 00000 n 
 0000117930 00000 n 
 0000126641 00000 n 
-0000885555 00000 n 
+0000886720 00000 n 
 0000126703 00000 n 
 0000126763 00000 n 
 0000126825 00000 n 
@@ -20992,7 +20982,7 @@ xref
 0000135798 00000 n 
 0000135859 00000 n 
 0000135920 00000 n 
-0000887672 00000 n 
+0000888837 00000 n 
 0000138284 00000 n 
 0000137926 00000 n 
 0000136151 00000 n 
@@ -21042,7 +21032,7 @@ xref
 0000176704 00000 n 
 0000173000 00000 n 
 0000176823 00000 n 
-0000887790 00000 n 
+0000888955 00000 n 
 0000186421 00000 n 
 0000186572 00000 n 
 0000186721 00000 n 
@@ -21057,7 +21047,7 @@ xref
 0000191618 00000 n 
 0000187376 00000 n 
 0000191737 00000 n 
-0000887291 00000 n 
+0000888456 00000 n 
 0000198612 00000 n 
 0000198761 00000 n 
 0000198911 00000 n 
@@ -21082,7 +21072,7 @@ xref
 0000212095 00000 n 
 0000212904 00000 n 
 0000212965 00000 n 
-0000887908 00000 n 
+0000889073 00000 n 
 0000213570 00000 n 
 0000213327 00000 n 
 0000213110 00000 n 
@@ -21124,7 +21114,7 @@ xref
 0000232934 00000 n 
 0000241228 00000 n 
 0000241349 00000 n 
-0000888026 00000 n 
+0000889191 00000 n 
 0000242424 00000 n 
 0000242243 00000 n 
 0000241559 00000 n 
@@ -21161,7 +21151,7 @@ xref
 0000271945 00000 n 
 0000271262 00000 n 
 0000272064 00000 n 
-0000888144 00000 n 
+0000889309 00000 n 
 0000278678 00000 n 
 0000278827 00000 n 
 0000279162 00000 n 
@@ -21182,7 +21172,7 @@ xref
 0000292783 00000 n 
 0000287247 00000 n 
 0000293228 00000 n 
-0000886710 00000 n 
+0000887875 00000 n 
 0000293351 00000 n 
 0000301302 00000 n 
 0000301453 00000 n 
@@ -21213,7 +21203,7 @@ xref
 0000310229 00000 n 
 0000318986 00000 n 
 0000319107 00000 n 
-0000888262 00000 n 
+0000889427 00000 n 
 0000326498 00000 n 
 0000326649 00000 n 
 0000326800 00000 n 
@@ -21258,8 +21248,8 @@ xref
 0000353095 00000 n 
 0000349986 00000 n 
 0000353214 00000 n 
-0000886421 00000 n 
-0000888380 00000 n 
+0000887586 00000 n 
+0000889545 00000 n 
 0000360558 00000 n 
 0000360709 00000 n 
 0000361044 00000 n 
@@ -21303,7 +21293,7 @@ xref
 0000386961 00000 n 
 0000385547 00000 n 
 0000387080 00000 n 
-0000888498 00000 n 
+0000889663 00000 n 
 0000394634 00000 n 
 0000397047 00000 n 
 0000394970 00000 n 
@@ -21315,604 +21305,604 @@ xref
 0000396908 00000 n 
 0000395131 00000 n 
 0000397198 00000 n 
-0000404056 00000 n 
-0000403751 00000 n 
+0000404249 00000 n 
+0000403944 00000 n 
 0000397356 00000 n 
-0000403870 00000 n 
-0000410730 00000 n 
-0000411003 00000 n 
-0000410591 00000 n 
-0000404192 00000 n 
-0000410881 00000 n 
-0000410942 00000 n 
-0000421275 00000 n 
-0000420718 00000 n 
-0000411113 00000 n 
-0000420837 00000 n 
-0000420899 00000 n 
-0000420961 00000 n 
-0000421023 00000 n 
-0000421086 00000 n 
-0000421149 00000 n 
-0000421212 00000 n 
-0000422240 00000 n 
-0000421991 00000 n 
-0000421424 00000 n 
-0000422114 00000 n 
-0000422177 00000 n 
-0000888616 00000 n 
-0000428104 00000 n 
-0000428507 00000 n 
-0000427960 00000 n 
-0000422325 00000 n 
-0000428255 00000 n 
-0000428381 00000 n 
-0000428445 00000 n 
-0000432338 00000 n 
-0000432489 00000 n 
-0000432828 00000 n 
-0000432185 00000 n 
-0000428631 00000 n 
-0000432641 00000 n 
-0000432765 00000 n 
-0000436430 00000 n 
-0000436580 00000 n 
-0000436857 00000 n 
-0000436277 00000 n 
-0000432939 00000 n 
-0000436731 00000 n 
-0000439415 00000 n 
-0000439690 00000 n 
-0000439271 00000 n 
-0000436968 00000 n 
-0000439566 00000 n 
-0000445929 00000 n 
-0000446077 00000 n 
-0000446355 00000 n 
-0000445776 00000 n 
-0000439801 00000 n 
-0000446228 00000 n 
-0000448455 00000 n 
-0000448143 00000 n 
-0000446492 00000 n 
-0000448266 00000 n 
-0000448329 00000 n 
-0000448392 00000 n 
-0000888741 00000 n 
-0000453639 00000 n 
-0000453789 00000 n 
-0000454254 00000 n 
-0000453486 00000 n 
-0000448540 00000 n 
-0000453936 00000 n 
-0000454062 00000 n 
-0000454126 00000 n 
-0000454190 00000 n 
-0000461272 00000 n 
-0000461423 00000 n 
-0000461573 00000 n 
-0000461848 00000 n 
-0000461110 00000 n 
-0000454378 00000 n 
-0000461724 00000 n 
-0000465617 00000 n 
-0000465046 00000 n 
-0000461972 00000 n 
-0000465169 00000 n 
-0000465233 00000 n 
-0000465297 00000 n 
-0000465361 00000 n 
-0000465425 00000 n 
-0000465489 00000 n 
-0000465553 00000 n 
-0000471926 00000 n 
-0000472078 00000 n 
-0000472479 00000 n 
-0000471773 00000 n 
-0000465728 00000 n 
-0000472228 00000 n 
-0000472353 00000 n 
-0000472416 00000 n 
-0000474549 00000 n 
-0000474170 00000 n 
-0000472590 00000 n 
-0000474293 00000 n 
-0000474357 00000 n 
-0000474421 00000 n 
-0000474485 00000 n 
-0000477932 00000 n 
-0000478081 00000 n 
-0000478357 00000 n 
-0000477779 00000 n 
-0000474634 00000 n 
-0000478233 00000 n 
-0000888866 00000 n 
-0000482656 00000 n 
-0000482805 00000 n 
-0000483147 00000 n 
-0000482503 00000 n 
-0000478468 00000 n 
-0000482956 00000 n 
-0000483083 00000 n 
-0000488065 00000 n 
-0000488339 00000 n 
-0000487921 00000 n 
-0000483258 00000 n 
-0000488215 00000 n 
-0000494843 00000 n 
-0000495120 00000 n 
-0000494699 00000 n 
-0000488463 00000 n 
-0000494994 00000 n 
-0000496170 00000 n 
-0000495858 00000 n 
-0000495244 00000 n 
-0000495981 00000 n 
-0000496044 00000 n 
-0000496107 00000 n 
-0000499336 00000 n 
-0000499613 00000 n 
-0000499192 00000 n 
-0000496255 00000 n 
-0000499487 00000 n 
-0000502809 00000 n 
-0000503084 00000 n 
-0000502665 00000 n 
-0000499724 00000 n 
-0000502960 00000 n 
-0000888991 00000 n 
-0000506942 00000 n 
-0000506693 00000 n 
-0000503195 00000 n 
-0000506816 00000 n 
-0000513823 00000 n 
-0000514098 00000 n 
-0000513679 00000 n 
-0000507079 00000 n 
-0000513974 00000 n 
-0000515302 00000 n 
-0000514987 00000 n 
-0000514222 00000 n 
-0000515110 00000 n 
-0000515174 00000 n 
-0000515238 00000 n 
-0000521312 00000 n 
-0000521588 00000 n 
-0000521168 00000 n 
-0000515387 00000 n 
-0000521464 00000 n 
-0000525188 00000 n 
-0000525529 00000 n 
-0000525044 00000 n 
-0000521712 00000 n 
-0000525339 00000 n 
-0000525465 00000 n 
-0000530829 00000 n 
-0000531168 00000 n 
-0000530685 00000 n 
-0000525653 00000 n 
-0000530981 00000 n 
-0000531105 00000 n 
-0000889116 00000 n 
-0000534736 00000 n 
-0000535077 00000 n 
-0000534592 00000 n 
-0000531292 00000 n 
-0000534887 00000 n 
-0000535013 00000 n 
-0000540361 00000 n 
-0000540700 00000 n 
-0000540217 00000 n 
-0000535201 00000 n 
-0000540513 00000 n 
-0000540637 00000 n 
-0000544832 00000 n 
-0000545236 00000 n 
-0000544688 00000 n 
-0000540824 00000 n 
-0000544982 00000 n 
-0000545108 00000 n 
-0000545172 00000 n 
-0000549205 00000 n 
-0000549606 00000 n 
-0000549061 00000 n 
-0000545347 00000 n 
-0000549356 00000 n 
-0000549480 00000 n 
-0000549543 00000 n 
-0000555711 00000 n 
-0000555987 00000 n 
-0000555567 00000 n 
-0000549717 00000 n 
-0000555860 00000 n 
-0000560247 00000 n 
-0000559872 00000 n 
-0000556111 00000 n 
-0000559995 00000 n 
-0000560058 00000 n 
-0000560121 00000 n 
-0000560184 00000 n 
-0000889241 00000 n 
-0000564718 00000 n 
-0000564867 00000 n 
-0000565018 00000 n 
-0000565294 00000 n 
-0000564556 00000 n 
-0000560371 00000 n 
-0000565168 00000 n 
-0000571480 00000 n 
-0000571232 00000 n 
-0000565418 00000 n 
-0000571355 00000 n 
-0000579446 00000 n 
-0000578684 00000 n 
-0000571604 00000 n 
-0000578807 00000 n 
-0000578871 00000 n 
-0000578935 00000 n 
-0000578999 00000 n 
-0000579063 00000 n 
-0000579127 00000 n 
-0000579191 00000 n 
-0000579254 00000 n 
-0000579318 00000 n 
-0000579382 00000 n 
-0000580058 00000 n 
-0000579810 00000 n 
-0000579569 00000 n 
-0000579933 00000 n 
-0000586153 00000 n 
-0000585776 00000 n 
-0000580143 00000 n 
-0000585899 00000 n 
-0000586025 00000 n 
-0000586089 00000 n 
-0000591369 00000 n 
-0000590996 00000 n 
-0000586290 00000 n 
-0000591119 00000 n 
-0000591244 00000 n 
-0000591306 00000 n 
-0000889366 00000 n 
-0000596361 00000 n 
-0000595920 00000 n 
-0000591506 00000 n 
-0000596043 00000 n 
-0000596169 00000 n 
-0000596233 00000 n 
-0000596297 00000 n 
-0000598965 00000 n 
-0000598718 00000 n 
-0000596498 00000 n 
-0000598841 00000 n 
-0000602409 00000 n 
-0000602160 00000 n 
-0000599076 00000 n 
-0000602283 00000 n 
-0000604033 00000 n 
-0000603786 00000 n 
-0000602546 00000 n 
-0000603909 00000 n 
-0000605926 00000 n 
-0000605677 00000 n 
-0000604144 00000 n 
-0000605800 00000 n 
-0000607703 00000 n 
-0000607456 00000 n 
-0000606037 00000 n 
-0000607579 00000 n 
-0000889491 00000 n 
-0000612655 00000 n 
-0000612406 00000 n 
-0000607814 00000 n 
-0000612529 00000 n 
-0000618371 00000 n 
-0000617998 00000 n 
-0000612792 00000 n 
-0000618121 00000 n 
-0000618245 00000 n 
-0000618308 00000 n 
-0000624130 00000 n 
-0000623753 00000 n 
-0000618508 00000 n 
-0000623876 00000 n 
-0000624002 00000 n 
-0000624066 00000 n 
-0000629860 00000 n 
-0000629487 00000 n 
-0000624267 00000 n 
-0000629610 00000 n 
-0000629734 00000 n 
-0000629797 00000 n 
-0000635711 00000 n 
-0000635334 00000 n 
-0000629997 00000 n 
-0000635457 00000 n 
-0000635583 00000 n 
-0000635647 00000 n 
-0000641529 00000 n 
-0000641156 00000 n 
-0000635848 00000 n 
-0000641279 00000 n 
-0000641403 00000 n 
-0000641466 00000 n 
-0000889616 00000 n 
-0000647407 00000 n 
-0000647095 00000 n 
-0000641666 00000 n 
-0000647218 00000 n 
-0000647344 00000 n 
-0000653265 00000 n 
-0000652956 00000 n 
-0000647544 00000 n 
-0000653079 00000 n 
-0000653203 00000 n 
-0000660021 00000 n 
-0000660171 00000 n 
-0000660449 00000 n 
-0000659868 00000 n 
-0000653402 00000 n 
-0000660322 00000 n 
-0000664652 00000 n 
-0000664716 00000 n 
-0000664780 00000 n 
-0000664466 00000 n 
-0000660547 00000 n 
-0000664589 00000 n 
-0000668145 00000 n 
-0000667896 00000 n 
-0000664878 00000 n 
-0000668019 00000 n 
-0000669715 00000 n 
-0000669467 00000 n 
-0000668256 00000 n 
-0000669590 00000 n 
-0000889741 00000 n 
-0000671385 00000 n 
-0000671135 00000 n 
-0000669826 00000 n 
-0000671258 00000 n 
-0000673514 00000 n 
-0000673266 00000 n 
-0000671496 00000 n 
-0000673389 00000 n 
-0000674461 00000 n 
-0000674211 00000 n 
-0000673625 00000 n 
-0000674334 00000 n 
-0000679205 00000 n 
-0000679480 00000 n 
-0000679061 00000 n 
-0000674559 00000 n 
-0000679355 00000 n 
-0000684663 00000 n 
-0000684939 00000 n 
-0000684519 00000 n 
-0000679591 00000 n 
-0000684812 00000 n 
-0000688488 00000 n 
-0000688763 00000 n 
-0000688344 00000 n 
-0000685050 00000 n 
-0000688638 00000 n 
-0000889866 00000 n 
-0000692447 00000 n 
-0000692197 00000 n 
-0000688874 00000 n 
-0000692320 00000 n 
-0000696472 00000 n 
-0000696747 00000 n 
-0000696328 00000 n 
-0000692558 00000 n 
-0000696622 00000 n 
-0000698080 00000 n 
-0000697830 00000 n 
-0000696858 00000 n 
-0000697953 00000 n 
-0000703046 00000 n 
-0000703198 00000 n 
-0000703540 00000 n 
-0000702893 00000 n 
-0000698191 00000 n 
-0000703353 00000 n 
-0000703477 00000 n 
-0000708656 00000 n 
-0000708805 00000 n 
-0000708955 00000 n 
-0000709107 00000 n 
-0000709384 00000 n 
-0000708485 00000 n 
-0000703702 00000 n 
-0000709258 00000 n 
-0000714709 00000 n 
-0000714860 00000 n 
-0000715136 00000 n 
-0000714556 00000 n 
-0000709495 00000 n 
-0000715012 00000 n 
-0000889991 00000 n 
-0000717447 00000 n 
-0000717726 00000 n 
-0000717303 00000 n 
-0000715247 00000 n 
-0000717599 00000 n 
-0000718743 00000 n 
-0000718495 00000 n 
-0000717837 00000 n 
-0000718618 00000 n 
-0000726266 00000 n 
-0000726415 00000 n 
-0000726691 00000 n 
-0000726113 00000 n 
-0000718841 00000 n 
-0000726565 00000 n 
-0000732746 00000 n 
-0000732961 00000 n 
-0000732602 00000 n 
-0000726853 00000 n 
-0000732898 00000 n 
-0000735816 00000 n 
-0000735629 00000 n 
-0000733085 00000 n 
-0000735752 00000 n 
-0000743900 00000 n 
-0000742906 00000 n 
-0000735914 00000 n 
-0000743029 00000 n 
-0000743092 00000 n 
-0000743155 00000 n 
-0000743650 00000 n 
-0000743713 00000 n 
-0000890116 00000 n 
-0000745852 00000 n 
-0000745475 00000 n 
-0000744011 00000 n 
-0000745598 00000 n 
-0000745788 00000 n 
-0000745937 00000 n 
-0000746390 00000 n 
-0000746724 00000 n 
-0000747080 00000 n 
-0000747106 00000 n 
-0000747617 00000 n 
-0000747655 00000 n 
-0000748350 00000 n 
-0000748707 00000 n 
-0000748787 00000 n 
-0000749163 00000 n 
-0000749805 00000 n 
-0000750469 00000 n 
-0000751097 00000 n 
-0000751740 00000 n 
-0000752030 00000 n 
-0000752683 00000 n 
-0000766820 00000 n 
-0000767267 00000 n 
-0000779666 00000 n 
-0000780094 00000 n 
-0000791201 00000 n 
-0000791536 00000 n 
-0000793622 00000 n 
-0000793844 00000 n 
-0000798403 00000 n 
-0000798650 00000 n 
-0000815389 00000 n 
-0000815922 00000 n 
-0000818198 00000 n 
-0000818430 00000 n 
-0000820813 00000 n 
-0000821051 00000 n 
-0000830733 00000 n 
-0000831110 00000 n 
-0000837100 00000 n 
-0000837420 00000 n 
-0000841470 00000 n 
-0000841814 00000 n 
-0000843437 00000 n 
-0000843673 00000 n 
-0000857183 00000 n 
-0000857559 00000 n 
-0000863832 00000 n 
-0000864100 00000 n 
-0000877322 00000 n 
-0000877783 00000 n 
-0000884771 00000 n 
-0000890205 00000 n 
-0000890325 00000 n 
-0000890447 00000 n 
-0000890573 00000 n 
-0000890690 00000 n 
-0000890782 00000 n 
-0000900601 00000 n 
-0000900788 00000 n 
-0000900973 00000 n 
-0000901156 00000 n 
-0000901334 00000 n 
-0000901503 00000 n 
-0000901674 00000 n 
-0000901844 00000 n 
-0000902015 00000 n 
-0000902185 00000 n 
-0000902358 00000 n 
-0000902533 00000 n 
-0000902710 00000 n 
-0000902885 00000 n 
-0000903062 00000 n 
-0000903236 00000 n 
-0000903410 00000 n 
-0000903587 00000 n 
-0000903762 00000 n 
-0000903939 00000 n 
-0000904125 00000 n 
-0000904326 00000 n 
-0000904549 00000 n 
-0000904734 00000 n 
-0000904914 00000 n 
-0000905094 00000 n 
-0000905279 00000 n 
-0000905462 00000 n 
-0000905647 00000 n 
-0000905829 00000 n 
-0000906009 00000 n 
-0000906178 00000 n 
-0000906349 00000 n 
-0000906519 00000 n 
-0000906690 00000 n 
-0000906860 00000 n 
-0000907031 00000 n 
-0000907201 00000 n 
-0000907376 00000 n 
-0000907551 00000 n 
-0000907728 00000 n 
-0000907902 00000 n 
-0000908076 00000 n 
-0000908253 00000 n 
-0000908428 00000 n 
-0000908605 00000 n 
-0000908780 00000 n 
-0000908969 00000 n 
-0000909172 00000 n 
-0000909373 00000 n 
-0000909576 00000 n 
-0000909776 00000 n 
-0000909976 00000 n 
-0000910179 00000 n 
-0000910380 00000 n 
-0000910583 00000 n 
-0000910784 00000 n 
-0000910987 00000 n 
-0000911188 00000 n 
-0000911391 00000 n 
-0000911592 00000 n 
-0000911788 00000 n 
-0000911973 00000 n 
-0000912174 00000 n 
-0000912405 00000 n 
-0000912604 00000 n 
-0000912779 00000 n 
-0000912948 00000 n 
-0000913066 00000 n 
-0000913182 00000 n 
-0000913298 00000 n 
-0000913415 00000 n 
-0000913532 00000 n 
-0000913648 00000 n 
-0000913763 00000 n 
-0000913883 00000 n 
-0000914007 00000 n 
-0000914131 00000 n 
-0000914251 00000 n 
-0000914322 00000 n 
-0000914440 00000 n 
-0000914556 00000 n 
-0000914638 00000 n 
-0000914678 00000 n 
-0000914915 00000 n 
+0000404063 00000 n 
+0000410923 00000 n 
+0000411196 00000 n 
+0000410784 00000 n 
+0000404385 00000 n 
+0000411074 00000 n 
+0000411135 00000 n 
+0000421245 00000 n 
+0000420753 00000 n 
+0000411306 00000 n 
+0000420872 00000 n 
+0000420934 00000 n 
+0000420995 00000 n 
+0000421057 00000 n 
+0000421119 00000 n 
+0000421182 00000 n 
+0000423142 00000 n 
+0000422830 00000 n 
+0000421394 00000 n 
+0000422953 00000 n 
+0000423016 00000 n 
+0000423079 00000 n 
+0000889781 00000 n 
+0000429006 00000 n 
+0000429409 00000 n 
+0000428862 00000 n 
+0000423227 00000 n 
+0000429157 00000 n 
+0000429283 00000 n 
+0000429347 00000 n 
+0000433240 00000 n 
+0000433391 00000 n 
+0000433730 00000 n 
+0000433087 00000 n 
+0000429533 00000 n 
+0000433543 00000 n 
+0000433667 00000 n 
+0000437332 00000 n 
+0000437482 00000 n 
+0000437759 00000 n 
+0000437179 00000 n 
+0000433841 00000 n 
+0000437633 00000 n 
+0000440317 00000 n 
+0000440592 00000 n 
+0000440173 00000 n 
+0000437870 00000 n 
+0000440468 00000 n 
+0000446831 00000 n 
+0000446979 00000 n 
+0000447257 00000 n 
+0000446678 00000 n 
+0000440703 00000 n 
+0000447130 00000 n 
+0000449357 00000 n 
+0000449045 00000 n 
+0000447394 00000 n 
+0000449168 00000 n 
+0000449231 00000 n 
+0000449294 00000 n 
+0000889906 00000 n 
+0000454541 00000 n 
+0000454691 00000 n 
+0000455156 00000 n 
+0000454388 00000 n 
+0000449442 00000 n 
+0000454838 00000 n 
+0000454964 00000 n 
+0000455028 00000 n 
+0000455092 00000 n 
+0000462174 00000 n 
+0000462325 00000 n 
+0000462475 00000 n 
+0000462750 00000 n 
+0000462012 00000 n 
+0000455280 00000 n 
+0000462626 00000 n 
+0000466519 00000 n 
+0000465948 00000 n 
+0000462874 00000 n 
+0000466071 00000 n 
+0000466135 00000 n 
+0000466199 00000 n 
+0000466263 00000 n 
+0000466327 00000 n 
+0000466391 00000 n 
+0000466455 00000 n 
+0000472828 00000 n 
+0000472980 00000 n 
+0000473381 00000 n 
+0000472675 00000 n 
+0000466630 00000 n 
+0000473130 00000 n 
+0000473255 00000 n 
+0000473318 00000 n 
+0000475451 00000 n 
+0000475072 00000 n 
+0000473492 00000 n 
+0000475195 00000 n 
+0000475259 00000 n 
+0000475323 00000 n 
+0000475387 00000 n 
+0000478834 00000 n 
+0000478983 00000 n 
+0000479259 00000 n 
+0000478681 00000 n 
+0000475536 00000 n 
+0000479135 00000 n 
+0000890031 00000 n 
+0000483558 00000 n 
+0000483707 00000 n 
+0000484049 00000 n 
+0000483405 00000 n 
+0000479370 00000 n 
+0000483858 00000 n 
+0000483985 00000 n 
+0000488967 00000 n 
+0000489241 00000 n 
+0000488823 00000 n 
+0000484160 00000 n 
+0000489117 00000 n 
+0000495745 00000 n 
+0000496022 00000 n 
+0000495601 00000 n 
+0000489365 00000 n 
+0000495896 00000 n 
+0000497072 00000 n 
+0000496760 00000 n 
+0000496146 00000 n 
+0000496883 00000 n 
+0000496946 00000 n 
+0000497009 00000 n 
+0000500238 00000 n 
+0000500515 00000 n 
+0000500094 00000 n 
+0000497157 00000 n 
+0000500389 00000 n 
+0000503711 00000 n 
+0000503986 00000 n 
+0000503567 00000 n 
+0000500626 00000 n 
+0000503862 00000 n 
+0000890156 00000 n 
+0000507844 00000 n 
+0000507595 00000 n 
+0000504097 00000 n 
+0000507718 00000 n 
+0000514725 00000 n 
+0000515000 00000 n 
+0000514581 00000 n 
+0000507981 00000 n 
+0000514876 00000 n 
+0000516204 00000 n 
+0000515889 00000 n 
+0000515124 00000 n 
+0000516012 00000 n 
+0000516076 00000 n 
+0000516140 00000 n 
+0000522214 00000 n 
+0000522490 00000 n 
+0000522070 00000 n 
+0000516289 00000 n 
+0000522366 00000 n 
+0000526090 00000 n 
+0000526431 00000 n 
+0000525946 00000 n 
+0000522614 00000 n 
+0000526241 00000 n 
+0000526367 00000 n 
+0000531731 00000 n 
+0000532070 00000 n 
+0000531587 00000 n 
+0000526555 00000 n 
+0000531883 00000 n 
+0000532007 00000 n 
+0000890281 00000 n 
+0000535638 00000 n 
+0000535979 00000 n 
+0000535494 00000 n 
+0000532194 00000 n 
+0000535789 00000 n 
+0000535915 00000 n 
+0000541263 00000 n 
+0000541602 00000 n 
+0000541119 00000 n 
+0000536103 00000 n 
+0000541415 00000 n 
+0000541539 00000 n 
+0000545734 00000 n 
+0000546138 00000 n 
+0000545590 00000 n 
+0000541726 00000 n 
+0000545884 00000 n 
+0000546010 00000 n 
+0000546074 00000 n 
+0000550107 00000 n 
+0000550508 00000 n 
+0000549963 00000 n 
+0000546249 00000 n 
+0000550258 00000 n 
+0000550382 00000 n 
+0000550445 00000 n 
+0000556613 00000 n 
+0000556889 00000 n 
+0000556469 00000 n 
+0000550619 00000 n 
+0000556762 00000 n 
+0000561149 00000 n 
+0000560774 00000 n 
+0000557013 00000 n 
+0000560897 00000 n 
+0000560960 00000 n 
+0000561023 00000 n 
+0000561086 00000 n 
+0000890406 00000 n 
+0000565620 00000 n 
+0000565769 00000 n 
+0000565920 00000 n 
+0000566196 00000 n 
+0000565458 00000 n 
+0000561273 00000 n 
+0000566070 00000 n 
+0000572382 00000 n 
+0000572134 00000 n 
+0000566320 00000 n 
+0000572257 00000 n 
+0000580348 00000 n 
+0000579586 00000 n 
+0000572506 00000 n 
+0000579709 00000 n 
+0000579773 00000 n 
+0000579837 00000 n 
+0000579901 00000 n 
+0000579965 00000 n 
+0000580029 00000 n 
+0000580093 00000 n 
+0000580156 00000 n 
+0000580220 00000 n 
+0000580284 00000 n 
+0000580960 00000 n 
+0000580712 00000 n 
+0000580471 00000 n 
+0000580835 00000 n 
+0000587055 00000 n 
+0000586678 00000 n 
+0000581045 00000 n 
+0000586801 00000 n 
+0000586927 00000 n 
+0000586991 00000 n 
+0000592271 00000 n 
+0000591898 00000 n 
+0000587192 00000 n 
+0000592021 00000 n 
+0000592146 00000 n 
+0000592208 00000 n 
+0000890531 00000 n 
+0000597263 00000 n 
+0000596822 00000 n 
+0000592408 00000 n 
+0000596945 00000 n 
+0000597071 00000 n 
+0000597135 00000 n 
+0000597199 00000 n 
+0000599867 00000 n 
+0000599620 00000 n 
+0000597400 00000 n 
+0000599743 00000 n 
+0000603311 00000 n 
+0000603062 00000 n 
+0000599978 00000 n 
+0000603185 00000 n 
+0000604935 00000 n 
+0000604688 00000 n 
+0000603448 00000 n 
+0000604811 00000 n 
+0000606828 00000 n 
+0000606579 00000 n 
+0000605046 00000 n 
+0000606702 00000 n 
+0000608605 00000 n 
+0000608358 00000 n 
+0000606939 00000 n 
+0000608481 00000 n 
+0000890656 00000 n 
+0000613557 00000 n 
+0000613308 00000 n 
+0000608716 00000 n 
+0000613431 00000 n 
+0000619273 00000 n 
+0000618900 00000 n 
+0000613694 00000 n 
+0000619023 00000 n 
+0000619147 00000 n 
+0000619210 00000 n 
+0000625032 00000 n 
+0000624655 00000 n 
+0000619410 00000 n 
+0000624778 00000 n 
+0000624904 00000 n 
+0000624968 00000 n 
+0000630762 00000 n 
+0000630389 00000 n 
+0000625169 00000 n 
+0000630512 00000 n 
+0000630636 00000 n 
+0000630699 00000 n 
+0000636613 00000 n 
+0000636236 00000 n 
+0000630899 00000 n 
+0000636359 00000 n 
+0000636485 00000 n 
+0000636549 00000 n 
+0000642431 00000 n 
+0000642058 00000 n 
+0000636750 00000 n 
+0000642181 00000 n 
+0000642305 00000 n 
+0000642368 00000 n 
+0000890781 00000 n 
+0000648309 00000 n 
+0000647997 00000 n 
+0000642568 00000 n 
+0000648120 00000 n 
+0000648246 00000 n 
+0000654167 00000 n 
+0000653858 00000 n 
+0000648446 00000 n 
+0000653981 00000 n 
+0000654105 00000 n 
+0000660923 00000 n 
+0000661073 00000 n 
+0000661351 00000 n 
+0000660770 00000 n 
+0000654304 00000 n 
+0000661224 00000 n 
+0000665554 00000 n 
+0000665618 00000 n 
+0000665682 00000 n 
+0000665368 00000 n 
+0000661449 00000 n 
+0000665491 00000 n 
+0000669047 00000 n 
+0000668798 00000 n 
+0000665780 00000 n 
+0000668921 00000 n 
+0000670617 00000 n 
+0000670369 00000 n 
+0000669158 00000 n 
+0000670492 00000 n 
+0000890906 00000 n 
+0000672287 00000 n 
+0000672037 00000 n 
+0000670728 00000 n 
+0000672160 00000 n 
+0000674416 00000 n 
+0000674168 00000 n 
+0000672398 00000 n 
+0000674291 00000 n 
+0000675363 00000 n 
+0000675113 00000 n 
+0000674527 00000 n 
+0000675236 00000 n 
+0000680107 00000 n 
+0000680382 00000 n 
+0000679963 00000 n 
+0000675461 00000 n 
+0000680257 00000 n 
+0000685565 00000 n 
+0000685841 00000 n 
+0000685421 00000 n 
+0000680493 00000 n 
+0000685714 00000 n 
+0000689390 00000 n 
+0000689665 00000 n 
+0000689246 00000 n 
+0000685952 00000 n 
+0000689540 00000 n 
+0000891031 00000 n 
+0000693349 00000 n 
+0000693099 00000 n 
+0000689776 00000 n 
+0000693222 00000 n 
+0000697374 00000 n 
+0000697649 00000 n 
+0000697230 00000 n 
+0000693460 00000 n 
+0000697524 00000 n 
+0000698982 00000 n 
+0000698732 00000 n 
+0000697760 00000 n 
+0000698855 00000 n 
+0000703948 00000 n 
+0000704100 00000 n 
+0000704442 00000 n 
+0000703795 00000 n 
+0000699093 00000 n 
+0000704255 00000 n 
+0000704379 00000 n 
+0000709558 00000 n 
+0000709707 00000 n 
+0000709857 00000 n 
+0000710009 00000 n 
+0000710286 00000 n 
+0000709387 00000 n 
+0000704604 00000 n 
+0000710160 00000 n 
+0000715611 00000 n 
+0000715762 00000 n 
+0000716038 00000 n 
+0000715458 00000 n 
+0000710397 00000 n 
+0000715914 00000 n 
+0000891156 00000 n 
+0000718349 00000 n 
+0000718628 00000 n 
+0000718205 00000 n 
+0000716149 00000 n 
+0000718501 00000 n 
+0000719645 00000 n 
+0000719397 00000 n 
+0000718739 00000 n 
+0000719520 00000 n 
+0000727168 00000 n 
+0000727317 00000 n 
+0000727593 00000 n 
+0000727015 00000 n 
+0000719743 00000 n 
+0000727467 00000 n 
+0000733648 00000 n 
+0000733863 00000 n 
+0000733504 00000 n 
+0000727755 00000 n 
+0000733800 00000 n 
+0000736718 00000 n 
+0000736531 00000 n 
+0000733987 00000 n 
+0000736654 00000 n 
+0000744802 00000 n 
+0000743808 00000 n 
+0000736816 00000 n 
+0000743931 00000 n 
+0000743994 00000 n 
+0000744057 00000 n 
+0000744552 00000 n 
+0000744615 00000 n 
+0000891281 00000 n 
+0000746754 00000 n 
+0000746377 00000 n 
+0000744913 00000 n 
+0000746500 00000 n 
+0000746690 00000 n 
+0000746839 00000 n 
+0000747292 00000 n 
+0000747626 00000 n 
+0000747982 00000 n 
+0000748008 00000 n 
+0000748519 00000 n 
+0000748557 00000 n 
+0000749252 00000 n 
+0000749609 00000 n 
+0000749689 00000 n 
+0000750065 00000 n 
+0000750707 00000 n 
+0000751371 00000 n 
+0000751999 00000 n 
+0000752642 00000 n 
+0000752932 00000 n 
+0000753585 00000 n 
+0000767722 00000 n 
+0000768169 00000 n 
+0000780568 00000 n 
+0000780996 00000 n 
+0000792103 00000 n 
+0000792438 00000 n 
+0000794524 00000 n 
+0000794746 00000 n 
+0000799305 00000 n 
+0000799552 00000 n 
+0000816291 00000 n 
+0000816824 00000 n 
+0000819100 00000 n 
+0000819332 00000 n 
+0000821715 00000 n 
+0000821953 00000 n 
+0000831635 00000 n 
+0000832012 00000 n 
+0000838002 00000 n 
+0000838322 00000 n 
+0000842372 00000 n 
+0000842716 00000 n 
+0000844339 00000 n 
+0000844575 00000 n 
+0000858085 00000 n 
+0000858461 00000 n 
+0000864734 00000 n 
+0000865002 00000 n 
+0000878462 00000 n 
+0000878948 00000 n 
+0000885936 00000 n 
+0000891370 00000 n 
+0000891490 00000 n 
+0000891612 00000 n 
+0000891738 00000 n 
+0000891855 00000 n 
+0000891947 00000 n 
+0000901766 00000 n 
+0000901953 00000 n 
+0000902138 00000 n 
+0000902321 00000 n 
+0000902499 00000 n 
+0000902668 00000 n 
+0000902839 00000 n 
+0000903009 00000 n 
+0000903180 00000 n 
+0000903350 00000 n 
+0000903523 00000 n 
+0000903698 00000 n 
+0000903875 00000 n 
+0000904050 00000 n 
+0000904227 00000 n 
+0000904401 00000 n 
+0000904575 00000 n 
+0000904752 00000 n 
+0000904927 00000 n 
+0000905104 00000 n 
+0000905290 00000 n 
+0000905491 00000 n 
+0000905714 00000 n 
+0000905899 00000 n 
+0000906079 00000 n 
+0000906259 00000 n 
+0000906444 00000 n 
+0000906627 00000 n 
+0000906812 00000 n 
+0000906994 00000 n 
+0000907174 00000 n 
+0000907343 00000 n 
+0000907514 00000 n 
+0000907684 00000 n 
+0000907855 00000 n 
+0000908025 00000 n 
+0000908196 00000 n 
+0000908366 00000 n 
+0000908541 00000 n 
+0000908716 00000 n 
+0000908893 00000 n 
+0000909067 00000 n 
+0000909241 00000 n 
+0000909418 00000 n 
+0000909593 00000 n 
+0000909770 00000 n 
+0000909945 00000 n 
+0000910134 00000 n 
+0000910337 00000 n 
+0000910538 00000 n 
+0000910741 00000 n 
+0000910941 00000 n 
+0000911141 00000 n 
+0000911344 00000 n 
+0000911545 00000 n 
+0000911748 00000 n 
+0000911949 00000 n 
+0000912152 00000 n 
+0000912353 00000 n 
+0000912556 00000 n 
+0000912757 00000 n 
+0000912953 00000 n 
+0000913138 00000 n 
+0000913339 00000 n 
+0000913570 00000 n 
+0000913769 00000 n 
+0000913944 00000 n 
+0000914113 00000 n 
+0000914231 00000 n 
+0000914347 00000 n 
+0000914463 00000 n 
+0000914580 00000 n 
+0000914697 00000 n 
+0000914813 00000 n 
+0000914928 00000 n 
+0000915048 00000 n 
+0000915172 00000 n 
+0000915296 00000 n 
+0000915416 00000 n 
+0000915487 00000 n 
+0000915605 00000 n 
+0000915721 00000 n 
+0000915803 00000 n 
+0000915843 00000 n 
+0000916080 00000 n 
 trailer
 << /Size 1577
 /Root 1575 0 R
 /Info 1576 0 R
-/ID [<77BDF07768C2BF92EB5E5B8CCA57B56E> <77BDF07768C2BF92EB5E5B8CCA57B56E>] >>
+/ID [<9FAB69E1E9042E6478EB33FEF9A388C2> <9FAB69E1E9042E6478EB33FEF9A388C2>] >>
 startxref
-915557
+916722
 %%EOF

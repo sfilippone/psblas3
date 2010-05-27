@@ -10,8 +10,8 @@
 
 \begin{verbatim}
 call psb_cdall(icontxt, desc_a, info,mg=mg,parts=parts)
-call psb_cdall(icontxt, desc_a, info,vg=vg,flag=flag)
-call psb_cdall(icontxt, desc_a, info,vl=vl,nl=nl,globalcheck=.true.)
+call psb_cdall(icontxt, desc_a, info,vg=vg,[mg=mg,flag=flag])
+call psb_cdall(icontxt, desc_a, info,vl=vl,[nl=nl,globalcheck=.true.])
 call psb_cdall(icontxt, desc_a, info,nl=nl)
 call psb_cdall(icontxt, desc_a, info,mg=mg,repl=.true.)
 \end{verbatim}
@@ -51,8 +51,8 @@ Specified as: an integer value. It is required if \verb|parts| or
 Scope:{\bf global}.\\
 Type:{\bf required}.\\
 Specified as: a subroutine. 
-\item[vl] Data allocation: the set of global indices belonging to the
-  calling process. \\
+\item[vl] Data allocation: the set of global indices 
+  $vl(1:nl)$ belonging to the calling process. \\
 Scope:{\bf local}.\\
 Type:{\bf optional}.\\
 Intent: {\bf in}.\\
@@ -126,30 +126,34 @@ An integer value; 0 means no error has been detected.
     processes, i.e. we have an overlap among the subdomains.
   \end{description}
 \item[vg] In this case the association between an index and a process
-  is specified via an integer vector; the size of the index space is
-  equal to the size of \verb|vg|, and each index $i$ is assigned to
-  the process $vg(i)$. The vector \verb|vg| must be identical on all
+  is specified via an integer vector  \verb|vg(1:mg)|; 
+  each index $i \in \{1\dots mg\}$  is assigned to process $vg(i)$. 
+  The vector \verb|vg| must be identical on all
   calling processes; its entries may have the ranges $(0\dots np-1)$
-  or $(1\dots np)$ according to the value of \verb|flag|.  Optionally,
-  the user may specify \verb|mg|, in 
-  which case the portion \verb|vg(1:mg)| is used. 
-\item[vl] In this case we are specifying the list of indices assigned
-  to the current process; thus, the global problem size $mg$ is given by
+  or $(1\dots np)$ according to the value of \verb|flag|.  
+  The size $mg$ may be  specified via the optional argument \verb|mg|;
+  the default is to use the entire vector \verb|vg|, thus having
+  \verb|mg=size(vg)|. 
+\item[vl] In this case we are specifying the list of indices
+  \verb|vl(1:nl)| assigned   to the current process; thus, the global
+  problem size $mg$ is given by 
   the range of the aggregate of the individual vectors \verb|vl| specified
-  in the calling processes. If \verb|globalcheck=.true.| 
-  the subroutine will check how many times  each entry in the global
-  index   space $(1\dots mg)$ is specified in the input lists
-  \verb|vl|, thus allowing for the presence of overlap in the input,
-  and checking for ``orphan'' indices. 
-  If \verb|globalcheck=.false.|, the subroutine will not check for
-  overlap, and may be substantially faster, but
-  the user is implicitly guaranteeing that there are neither orphan
-  nor overlap indices. Optionally, the user may specify \verb|nl|, in
-  which case the portion \verb|vl(1:nl)| is used. 
-\item[nl] In this case we are implying a generalized row-block
-  distribution in which each process $I$ gets assigned a consecutive
-  chunk of $N_I=nl$ global indices.
-\item[repl] In this case we are asking to replicate all indices on
+  in the calling processes. The size may be specified via the optional
+  argument \verb|nl|; the default is to use the entire vector  \verb|vl|, thus having
+  \verb|nl=size(vl)|.  
+  If \verb|globalcheck=.true.|   the subroutine will check how many
+  times  each entry in the global   index   space $(1\dots mg)$ is
+  specified in the input lists   \verb|vl|, thus allowing for the
+  presence of overlap in the input,   and checking for ``orphan''
+  indices.    If \verb|globalcheck=.false.|, the subroutine will not
+  check for   overlap, and may be significantly faster, but   the user
+  is implicitly guaranteeing that there are neither orphan   nor
+  overlap indices.  
+\item[nl] If this argument is specified alone (i.e. without \verb|vl|)
+  the  result is  a generalized row-block   distribution in which each
+  process $I$ gets assigned a consecutive   chunk of $N_I=nl$ global
+  indices. 
+\item[repl] This arguments specifies to replicate all indices on
   all processes. This is a special purpose data allocation that is
   useful in the construction of some multilevel preconditioners.
 \end{description}
