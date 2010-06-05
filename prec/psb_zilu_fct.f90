@@ -174,7 +174,7 @@ contains
 
         if ((mod(i,nrb) == 1).or.(nrb == 1)) then 
           irb = min(ma-i+1,nrb)
-          call a%a%csget(i,i+irb-1,trw,info)
+          call aa%csget(i,i+irb-1,trw,info)
           if(info /= psb_success_) then
             info=psb_err_from_subroutine_
             ch_err='a%csget'
@@ -312,7 +312,7 @@ contains
 
         if ((mod(i,nrb) == 1).or.(nrb == 1)) then 
           irb = min(ma-i+1,nrb)
-          call b%a%csget(i-ma,i-ma+irb-1,trw,info)
+          call aa%csget(i-ma,i-ma+irb-1,trw,info)
           nz = trw%get_nzeros()
           if(info /= psb_success_) then
             info=psb_err_from_subroutine_
