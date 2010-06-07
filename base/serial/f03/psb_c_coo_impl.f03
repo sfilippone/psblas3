@@ -2528,7 +2528,7 @@ subroutine psb_c_cp_coo_to_coo(a,b,info)
   class(psb_c_coo_sparse_mat), intent(inout) :: b
   integer, intent(out)            :: info
 
-  Integer :: err_act
+  Integer :: err_act, nz
   character(len=20)  :: name='to_coo'
   logical, parameter :: debug=.false.
 
@@ -2537,12 +2537,14 @@ subroutine psb_c_cp_coo_to_coo(a,b,info)
   info = psb_success_
   call b%psb_c_base_sparse_mat%cp_from(a%psb_c_base_sparse_mat)
 
-  call b%set_nzeros(a%get_nzeros())
-  call b%reallocate(a%get_nzeros())
 
-  b%ia(:)  = a%ia(:)
-  b%ja(:)  = a%ja(:)
-  b%val(:) = a%val(:)
+  nz = a%get_nzeros()
+  call b%set_nzeros(nz)
+  call b%reallocate(nz)
+
+  b%ia(1:nz)  = a%ia(1:nz)
+  b%ja(1:nz)  = a%ja(1:nz)
+  b%val(1:nz) = a%val(1:nz)
 
   call b%fix(info)
 
@@ -2580,12 +2582,13 @@ subroutine psb_c_cp_coo_from_coo(a,b,info)
   call psb_erractionsave(err_act)
   info = psb_success_
   call a%psb_c_base_sparse_mat%cp_from(b%psb_c_base_sparse_mat)
-  call a%set_nzeros(b%get_nzeros())
-  call a%reallocate(b%get_nzeros())
+  nz = b%get_nzeros()
+  call a%set_nzeros(nz)
+  call a%reallocate(nz)
 
-  a%ia(:)  = b%ia(:)
-  a%ja(:)  = b%ja(:)
-  a%val(:) = b%val(:)
+  a%ia(1:nz)  = b%ia(1:nz)
+  a%ja(1:nz)  = b%ja(1:nz)
+  a%val(1:nz) = b%val(1:nz)
 
   call a%fix(info)
 
