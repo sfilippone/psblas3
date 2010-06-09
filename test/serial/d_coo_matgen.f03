@@ -138,7 +138,7 @@ contains
     ! Note that if a1=a2=a3=a4=0., the PDE is the well-known Laplace equation.
     !
     use psb_sparse_mod
-    use psb_d_base_mat_mod
+!!$    use psb_d_base_mat_mod
     use psb_d_csr_mat_mod  
     implicit none
     integer                        :: idim

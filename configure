@@ -10544,44 +10544,6 @@ UTILLIBNAME=libpsb_util.a
 
 
 
-if test "X$psblas_make_gnumake" == "Xyes" ; then
-PSBLASRULES='
-PSBLDLIBS=$(LAPACK) $(BLAS) $(METIS_LIB) $(LIBS)
-CDEFINES=$(PSBCDEFINES)
-FDEFINES=$(PSBFDEFINES)
-# Warning : these rules are only valid with GNU make!
-$(.mod).o:
-
-
-%.o: %.c
-	$(CC) $(CCOPT) $(CINCLUDES) $(CDEFINES)  -c $<
-%.o: %.f
-	$(FC) $(FCOPT) $(FINCLUDES)  -c $<
-%$(.mod): %.f
-	$(FC) $(FCOPT) $(FINCLUDES)  -c $<
-%.o: %.f90
-	$(F90) $(F90COPT) $(FINCLUDES)  -c $<
-%$(.mod): %.f90
-	$(F90) $(F90COPT) $(FINCLUDES)  -c $<
-%.o: %.F
-	$(FC) $(FCOPT) $(FINCLUDES) $(FDEFINES)  -c $<
-%$(.mod): %.F
-	$(FC) $(FCOPT) $(FINCLUDES) $(FDEFINES)  -c $<
-%.o: %.F90
-	$(F90) $(F90COPT) $(FINCLUDES) $(FDEFINES)  -c $<
-%$(.mod): %.F90
-	$(F90) $(F90COPT) $(FINCLUDES) $(FDEFINES) -c $<
-
-%.o: %.f03
-	$(F03) $(F03COPT) $(FINCLUDES)  -c $<
-%$(.mod): %.f03
-	$(F03) $(F03COPT) $(FINCLUDES)  -c $<
-%.o: %.F03
-	$(F03) $(F03COPT) $(FINCLUDES) $(FDEFINES)  -c $<
-%$(.mod): %.F03
-	$(F03) $(F03COPT) $(FINCLUDES) $(FDEFINES) -c $<'
-
-else
 
 PSBLASRULES='
 PSBLDLIBS=$(LAPACK) $(BLAS) $(METIS_LIB) $(LIBS)
@@ -10619,7 +10581,7 @@ $(.mod).o:
 .F03$(.mod):
 	$(F03) $(F03COPT) $(FINCLUDES) $(FDEFINES) -c $<'
 
-fi
+
 
 
 
