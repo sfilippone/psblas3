@@ -231,6 +231,7 @@ contains
     end if
     if(present(a_err)) then 
       new_node%a_err_data = a_err
+      write(0,*) 'Pushing character:',a_err, '"',new_node%a_err_data
     end if
     new_node%next       => error_stack%top
     error_stack%top     => new_node
@@ -277,9 +278,10 @@ contains
     integer, optional                ::  me
 
     if(present(me)) then
-      write(error_unit,'("Process: ",i0,".  PSBLAS Error (",i0,") in subroutine: ",a20)')me,err_c,r_name
+      write(error_unit,'("Process: ",i0,".  PSBLAS Error (",i0,") in subroutine: ",a20)')&
+           & me,err_c,trim(r_name)
     else
-      write(error_unit,'("PSBLAS Error (",i0,") in subroutine: ",a20)')err_c,r_name
+      write(error_unit,'("PSBLAS Error (",i0,") in subroutine: ",a)')err_c,trim(r_name)
     end if
 
 
@@ -287,7 +289,7 @@ contains
     case(:psb_success_)
       write (error_unit,'("error on calling sperror. err_c must be greater than 0")')
     case(psb_err_pivot_too_small_)
-      write (error_unit,'("pivot too small: ",i0,1x,a)')i_e_d(1),a_e_d
+      write (error_unit,'("pivot too small: ",i0,1x,a)')i_e_d(1),trim(a_e_d)
     case(psb_err_invalid_ovr_num_)
       write (error_unit,'("Invalid number of ovr:",i0)')i_e_d(1)
     case(psb_err_invalid_input_)
@@ -310,14 +312,19 @@ contains
       write (error_unit,'("input argument n. ",i0," has an invalid value")')i_e_d(1)
       write (error_unit,'("current value is ",a)')a_e_d(2:2)
     case(psb_err_iarg_not_gtia_ii_)
-      write (error_unit,'("input argument n. ",i0," must be equal or greater than input argument n. ",i0)') i_e_d(1), i_e_d(3)
-      write (error_unit,'("current values are ",i0," < ",i0)') i_e_d(2),i_e_d(5)
+      write (error_unit,'("input argument n. ",i0," must be equal or greater than input argument n. ",i0)') &
+           & i_e_d(1), i_e_d(3)
+      write (error_unit,'("current values are ",i0," < ",i0)')&
+           & i_e_d(2),i_e_d(5)
     case(psb_err_iarg_not_gteia_ii_)
-      write (error_unit,'("input argument n. ",i0," must be greater than or equal to ",i0)')i_e_d(1),i_e_d(2)
-      write (error_unit,'("current value is ",i0," < ",i0)')i_e_d(3), i_e_d(2)
+      write (error_unit,'("input argument n. ",i0," must be greater than or equal to ",i0)')&
+           & i_e_d(1),i_e_d(2)
+      write (error_unit,'("current value is ",i0," < ",i0)')&
+           & i_e_d(3), i_e_d(2)
     case(psb_err_iarg_invalid_value_)
-      write (error_unit,'("input argument n. ",i0," in entry # ",i0," has an invalid value")')i_e_d(1:2)
-      write (error_unit,'("current value is ",a)')a_e_d
+      write (error_unit,'("input argument n. ",i0," in entry # ",i0," has an invalid value")')&
+           & i_e_d(1:2)
+      write (error_unit,'("current value is ",a)')trim(a_e_d)
     case(psb_err_asb_nrc_error_)
       write (error_unit,'("Impossible error in ASB: nrow>ncol,")')
       write (error_unit,'("Actual values are ",i0," > ",i0)')i_e_d(1:2)
@@ -337,10 +344,12 @@ contains
     case(psb_err_invalid_args_combination_)
       write (error_unit,'("invalid combination of input arguments")')
     case(psb_err_invalid_pid_arg_)
-      write (error_unit,'("Invalid process identifier in input array argument n. ",i0,".")')i_e_d(1)
+      write (error_unit,'("Invalid process identifier in input array argument n. ",i0,".")')&
+           & i_e_d(1)
       write (error_unit,'("Current value is ",i0)')i_e_d(2)
     case(psb_err_iarg_n_mbgtian_)
-      write (error_unit,'("input argument n. ",i0," must be greater than input argument n. ",i0)')i_e_d(1:2)
+      write (error_unit,'("input argument n. ",i0," must be greater than input argument n. ",i0)')&
+           & i_e_d(1:2)
       write (error_unit,'("current values are ",i0," < ",i0)') i_e_d(3:4)
     case(psb_err_dupl_cd_vl)
       write (error_unit,'("there are duplicated entries in vl (input to cdall)")')
@@ -350,23 +359,30 @@ contains
       write (error_unit,'("there are duplicated elements in coo format")')
       write (error_unit,'("and you have chosen psb_dupl_err_ ")')
     case(psb_err_invalid_input_format_)
-      write (error_unit,'("Invalid input format ",a3)')a_e_d(1:3)
+      write (error_unit,'("Invalid input format ",a3)')&
+           & a_e_d(1:3)
     case(psb_err_unsupported_format_)
-      write (error_unit,'("Format ",a3," not yet supported here")')a_e_d(1:3)
+      write (error_unit,'("Format ",a3," not yet supported here")')&
+           &a_e_d(1:3)
     case(psb_err_format_unknown_)
-      write (error_unit,'("Format ",a3," is unknown")')a_e_d(1:3)
+      write (error_unit,'("Format ",a3," is unknown")')&
+           & a_e_d(1:3)
     case(psb_err_iarray_outside_bounds_)
-      write (error_unit,'("indices in input array are not within problem dimension ",2(i0,2x))')i_e_d(1:2)
+      write (error_unit,'("indices in input array are not within problem dimension ",2(i0,2x))')&
+           &i_e_d(1:2)
     case(psb_err_iarray_outside_process_)
-      write (error_unit,'("indices in input array are not belonging to the calling process ",i0)')i_e_d(1)
+      write (error_unit,'("indices in input array are not belonging to the calling process ",i0)')&
+           & i_e_d(1)
     case(psb_err_forgot_geall_)
       write (error_unit,'("To call this routine you must first call psb_geall on the same matrix")')
     case(psb_err_forgot_spall_)
       write (error_unit,'("To call this routine you must first call psb_spall on the same matrix")')
     case(psb_err_wrong_ins_)
-      write (0,'("Something went wrong before this call to ",a,", probably in cdins/spins")')r_name
+      write (0,'("Something went wrong before this call to ",a,", probably in cdins/spins")')&
+           & trim(r_name)
     case(psb_err_iarg_mbeeiarra_i_)
-      write (error_unit,'("Input argument n. ",i0," must be equal to entry n. ",i0," in array input argument n.",i0)') &
+      write (error_unit,&
+           & '("Input argument n. ",i0," must be equal to entry n. ",i0," in array input argument n.",i0)') &
            & i_e_d(1),i_e_d(4),i_e_d(3)
       write (error_unit,'("Current values are ",i0," != ",i0)')i_e_d(2), i_e_d(5)
     case(psb_err_mpi_error_)
@@ -374,27 +390,42 @@ contains
     case(psb_err_parm_differs_among_procs_)
       write (error_unit,'("Parameter n. ",i0," must be equal on all processes. ",i0)')i_e_d(1)
     case(psb_err_entry_out_of_bounds_)
-      write (error_unit,'("Entry n. ",i0," out of ",i0," should be between 1 and ",i0," but is ",i0)')i_e_d(1),i_e_d(3),i_e_d(4),i_e_d(2)
+      write (error_unit,'("Entry n. ",i0," out of ",i0," should be between 1 and ",i0," but is ",i0)')&
+           & i_e_d(1),i_e_d(3),i_e_d(4),i_e_d(2)
     case(psb_err_inconsistent_index_lists_)
       write (error_unit,'("Index lists are inconsistent: some indices are orphans")')
     case(psb_err_partfunc_toomuchprocs_)
-      write (error_unit,'("partition function passed as input argument n. ",i0," returns number of processes")')i_e_d(1)
-      write (error_unit,'("greater than No of grid s processes on global point ",i0,". Actual number of grid s ")')i_e_d(4)
+      write (error_unit,&
+           &'("partition function passed as input argument n. ",i0," returns number of processes")')&
+           &i_e_d(1)
+      write (error_unit,&
+           & '("greater than No of grid s processes on global point ",i0,". Actual number of grid s ")')&
+           &i_e_d(4)
       write (error_unit,'("processes is ",i0,", number returned is ",i0)')i_e_d(2),i_e_d(3)
     case(psb_err_partfunc_toofewprocs_)
-      write (error_unit,'("partition function passed as input argument n. ",i0," returns number of processes")')i_e_d(1)
-      write (error_unit,'("less or equal to 0 on global point ",i0,". Number returned is ",i0)')i_e_d(3),i_e_d(2)
+      write (error_unit,'("partition function passed as input argument n. ",i0," returns number of processes")')&
+           &i_e_d(1)
+      write (error_unit,'("less or equal to 0 on global point ",i0,". Number returned is ",i0)')&
+           &i_e_d(3),i_e_d(2)
     case(psb_err_partfunc_wrong_pid_)
-      write (error_unit,'("partition function passed as input argument n. ",i0," returns wrong processes identifier")')i_e_d(1)
-      write (error_unit,'("on global point ",i0,". Current value returned is : ",i0)')i_e_d(3),i_e_d(2)
+      write (error_unit,&
+           &'("partition function passed as input argument n. ",i0," returns wrong processes identifier")')&
+           & i_e_d(1)
+      write (error_unit,'("on global point ",i0,". Current value returned is : ",i0)')&
+           & i_e_d(3),i_e_d(2)
     case(psb_err_no_optional_arg_)
-      write (error_unit,'("One of the optional arguments  ",a," must be present")')a_e_d
+      write (error_unit,'("One of the optional arguments  ",a," must be present")')&
+           & trim(a_e_d)
     case(psb_err_arg_m_required_)
       write (error_unit,'("Argument M is required when argument PARTS is specified")')
     case(psb_err_spmat_invalid_state_)
-      write (error_unit,'("Sparse Matrix and descriptors are in an invalid state for this subroutine call: ",i0)')i_e_d(1)
+      write (error_unit,&
+           & '("Sparse Matrix and descriptors are in an invalid state for this subroutine call: ",i0)')&
+           &i_e_d(1)
     case(psb_err_missing_override_method_)
-      write (error_unit,'("Base class method ",a," called: the class for ",a," is missing an overriding implementation")')r_name, a_e_d
+      write (error_unit,&
+           & '("Base class method ",a," called: the class for ",a," is missing an overriding implementation")')&
+           &  trim(r_name), trim(a_e_d)
     case (psb_err_invalid_cd_state_)
       write (error_unit,'("Invalid state for communication descriptor")')
     case (psb_err_invalid_a_and_cd_state_)
@@ -404,9 +435,12 @@ contains
     case(psb_err_blacs_error_)
       write (error_unit,'("BLACS error. Number of processes=-1")')
     case(psb_err_initerror_neugh_procs_)
-      write (error_unit,'("Initialization error: not enough processes available in the parallel environment")')
+      write (error_unit,&
+           & '("Initialization error: not enough processes available in the parallel environment")')
     case(psb_err_blacs_err_gridcols_not_1_)
-      write (error_unit,'("BLACS ERROR: Number of grid columns must be equal to 1\nCurrent value is ",i4," != 1.")')i_e_d(1)
+      write (error_unit,&
+           & '("BLACS ERROR: Number of grid columns must be equal to 1\nCurrent value is ",i4," != 1.")')&
+           &i_e_d(1)
     case(psb_err_invalid_matrix_input_state_)
       write (error_unit,'("Invalid input state for matrix.")')
     case(psb_err_input_no_regen_)
@@ -414,11 +448,16 @@ contains
     case (2233:2999)
       write(error_unit,'("resource error. code: ",i0)')err_c
     case(3000:3009)
-      write (error_unit,'("sparse matrix representation ",a3," not yet implemented")')a_e_d(1:3)
+      write (error_unit,&
+           & '("sparse matrix representation ",a3," not yet implemented")')&
+           &a_e_d(1:3)
     case(psb_err_lld_case_not_implemented_)
-      write (error_unit,'("Case lld not equal matrix_data[N_COL_] is not yet implemented.")')
+      write (error_unit,&
+           &'("Case lld not equal matrix_data[N_COL_] is not yet implemented.")')
     case(psb_err_transpose_unsupported_)
-      write (error_unit,'("transpose option for sparse matrix representation ",a3," not implemented")')a_e_d(1:3)
+      write (error_unit,&
+           & '("transpose option for sparse matrix representation ",a3," not implemented")')&
+           & a_e_d(1:3)
     case(psb_err_transpose_c_unsupported_)
       write (error_unit,'("Case trans = C is not yet implemented.")') 
     case(psb_err_transpose_not_n_unsupported_)
@@ -438,38 +477,55 @@ contains
     case(3060)
       write (error_unit,'("Case ix /= 1 is not yet implemented.")')
     case(3070)
-      write (error_unit,'("This operation is only implemented with no overlap.")')
+      write (error_unit,&
+           & '("This operation is only implemented with no overlap.")')
     case(3080)
-      write (error_unit,'("Decompostion type ",i0," not yet supported.")')i_e_d(1)
+      write (error_unit,&
+           & '("Decompostion type ",i0," not yet supported.")')&
+           & i_e_d(1)
     case(3090)
       write (error_unit,'("Insert matrix mode not yet implemented.")')
     case(3100)
-      write (error_unit,'("Error on index. Element has not been inserted")')
-      write (error_unit,'("local index is: ",i0," and global index is:",i0)')i_e_d(1:2)
+      write (error_unit,&
+           & '("Error on index. Element has not been inserted")')
+      write (error_unit,&
+           & '("local index is: ",i0," and global index is:",i0)')&
+           & i_e_d(1:2)
     case(psb_err_input_matrix_unassembled_)
-      write (error_unit,'("Before you call this routine, you must assembly sparse matrix")')
+      write (error_unit,&
+           &'("Before you call this routine, you must assembly sparse matrix")')
     case(3111)
-      write (error_unit,'("Before you call this routine, you must initialize the preconditioner")')
+      write (error_unit,&
+           & '("Before you call this routine, you must initialize the preconditioner")')
     case(3112)
-      write (error_unit,'("Before you call this routine, you must build the preconditioner")')
+      write (error_unit,&
+           & '("Before you call this routine, you must build the preconditioner")')
     case(3113:3999)
       write(error_unit,'("miscellaneus error. code: ",i0)')err_c
     case(psb_err_alloc_dealloc_)
       write(error_unit,'("Allocation/deallocation error")')
     case(psb_err_internal_error_)
-      write(error_unit,'("Internal error: ",a)')a_e_d
+      write(error_unit,'("Internal error: ",a)') &
+           & trim(a_e_d)
     case(psb_err_from_subroutine_)
-      write (error_unit,'("Error from call to subroutine ",a)')a_e_d
+      write (error_unit,'("Error from call to subroutine ",a)')&
+           & trim(a_e_d)
     case(psb_err_from_subroutine_non_)
       write (error_unit,'("Error from call to a subroutine ")')
     case(psb_err_from_subroutine_i_)
-      write (error_unit,'("Error ",i0," from call to a subroutine ")')i_e_d(1)
+      write (error_unit,'("Error ",i0," from call to a subroutine ")')&
+           & i_e_d(1)
     case(psb_err_from_subroutine_ai_)
-      write (error_unit,'("Error from call to subroutine ",a," ",i0)')a_e_d,i_e_d(1)
+      write (error_unit,'("Error from call to subroutine ",a," ",i0)')&
+           & trim(a_e_d),i_e_d(1)
     case(psb_err_alloc_request_)
-      write (error_unit,'("Error on allocation request for ",i0," items of type ",a)')i_e_d(1),a_e_d
+      write (error_unit,&
+           & '("Error on allocation request for ",i0," items of type ",a)')&
+           & i_e_d(1),trim(a_e_d)
     case(4110)
-      write (error_unit,'("Error ",i0," from call to an external package in subroutine ",a)')i_e_d(1),a_e_d
+      write (error_unit,&
+           & '("Error ",i0," from call to an external package in subroutine ",a)')&
+           &i_e_d(1),trim(a_e_d)
     case (psb_err_invalid_istop_)
       write (error_unit,'("Invalid ISTOP: ",i0)')i_e_d(1)
     case (5002)
@@ -477,9 +533,10 @@ contains
     case (5003)
       write (error_unit,'("Invalid PREC: ",a3)')a_e_d(1:3)
     case default
-      write(error_unit,'("unknown error (",i0,") in subroutine ",a)')err_c,r_name
+      write(error_unit,'("unknown error (",i0,") in subroutine ",a)')&
+           & err_c,trim(r_name)
       write(error_unit,'(5(i0,2x))') i_e_d
-      write(error_unit,'(a)') a_e_d
+      write(error_unit,'(a)') trim(a_e_d)
 
     end select
 
