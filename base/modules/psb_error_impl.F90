@@ -26,7 +26,6 @@ subroutine psb_serror()
       do while (psb_get_numerr() > izero)
         write(0,'(50("="))')
         call psb_errpop(err_c, r_name, i_e_d, a_e_d)
-      write(0,*) 'Error pop: ',a_e_d
         call psb_errmsg(err_c, r_name, i_e_d, a_e_d)
         !            write(0,'(50("="))')
       end do
@@ -34,7 +33,6 @@ subroutine psb_serror()
     else
 
       call psb_errpop(err_c, r_name, i_e_d, a_e_d)
-      write(0,*) 'Error pop: ',a_e_d
       call psb_errmsg(err_c, r_name, i_e_d, a_e_d)
       do while (psb_get_numerr() > 0)
         call psb_errpop(err_c, r_name, i_e_d, a_e_d)

@@ -231,7 +231,6 @@ contains
     end if
     if(present(a_err)) then 
       new_node%a_err_data = a_err
-      write(0,*) 'Pushing character:',a_err, '"',new_node%a_err_data
     end if
     new_node%next       => error_stack%top
     error_stack%top     => new_node
