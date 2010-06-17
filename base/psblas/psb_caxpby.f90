@@ -75,7 +75,7 @@ subroutine  psb_caxpby(alpha, x, beta,y,desc_a,info, n, jx, jy)
   ictxt=psb_cd_get_context(desc_a)
   call psb_info(ictxt, me, np)
   if (np == -ione) then
-    info = psb_err_blacs_error_
+    info = psb_err_context_error_
     call psb_errpush(info,name)
     goto 9999
   endif
@@ -226,7 +226,7 @@ subroutine  psb_caxpbyv(alpha, x, beta,y,desc_a,info)
 
   call psb_info(ictxt, me, np)
   if (np == -ione) then
-    info = psb_err_blacs_error_
+    info = psb_err_context_error_
     call psb_errpush(info,name)
     goto 9999
   endif

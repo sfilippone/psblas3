@@ -431,15 +431,11 @@ contains
       write (error_unit,'("Invalid combined state for A and DESC_A")')
     case(1124:1999)
       write (error_unit,'("computational error. code: ",i0)')err_c
-    case(psb_err_blacs_error_)
-      write (error_unit,'("BLACS error. Number of processes=-1")')
+    case(psb_err_context_error_)
+      write (0,'("Parallel context error. Number of processes=-1")')
     case(psb_err_initerror_neugh_procs_)
       write (error_unit,&
            & '("Initialization error: not enough processes available in the parallel environment")')
-    case(psb_err_blacs_err_gridcols_not_1_)
-      write (error_unit,&
-           & '("BLACS ERROR: Number of grid columns must be equal to 1\nCurrent value is ",i4," != 1.")')&
-           &i_e_d(1)
     case(psb_err_invalid_matrix_input_state_)
       write (error_unit,'("Invalid input state for matrix.")')
     case(psb_err_input_no_regen_)

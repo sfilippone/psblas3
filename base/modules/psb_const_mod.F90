@@ -158,9 +158,8 @@ module psb_const_mod
   integer, parameter, public :: psb_err_missing_override_method_=700
   integer, parameter, public :: psb_err_invalid_cd_state_=1122
   integer, parameter, public :: psb_err_invalid_a_and_cd_state_=1123
-  integer, parameter, public :: psb_err_blacs_error_=2010
+  integer, parameter, public :: psb_err_context_error_=2010
   integer, parameter, public :: psb_err_initerror_neugh_procs_=2011
-  integer, parameter, public :: psb_err_blacs_err_gridcols_not_1_=2030
   integer, parameter, public :: psb_err_invalid_matrix_input_state_=2231
   integer, parameter, public :: psb_err_input_no_regen_=2232
   integer, parameter, public :: psb_err_lld_case_not_implemented_=3010

@@ -76,7 +76,7 @@ function psb_casum (x,desc_a, info, jx)
 
   call psb_info(ictxt, me, np)
   if (np == -1) then
-    info = psb_err_blacs_error_
+    info = psb_err_context_error_
     call psb_errpush(info,name)
     goto 9999
   endif
@@ -217,7 +217,7 @@ function psb_casumv(x,desc_a, info)
 
   call psb_info(ictxt, me, np)
   if (np == -1) then
-    info = psb_err_blacs_error_
+    info = psb_err_context_error_
     call psb_errpush(info,name)
     goto 9999
   endif
@@ -355,7 +355,7 @@ subroutine psb_casumvs(res,x,desc_a, info)
 
   call psb_info(ictxt, me, np)
   if (np == -1) then
-    info = psb_err_blacs_error_
+    info = psb_err_context_error_
     call psb_errpush(info,name)
     goto 9999
   endif

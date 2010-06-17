@@ -72,7 +72,7 @@ subroutine psb_cspalloc(a, desc_a, info, nnz)
   call psb_info(ictxt, me, np)
   !     ....verify blacs grid correctness..
   if (np == -1) then
-    info = psb_err_blacs_error_
+    info = psb_err_context_error_
     call psb_errpush(info,name)
     goto 9999
   endif

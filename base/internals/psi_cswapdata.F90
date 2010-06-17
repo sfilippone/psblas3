@@ -115,7 +115,7 @@ subroutine psi_cswapdatam(flag,n,beta,y,desc_a,work,info,data)
   icomm = psb_cd_get_mpic(desc_a)
   call psb_info(ictxt,me,np) 
   if (np == -1) then
-    info=psb_err_blacs_error_
+    info=psb_err_context_error_
     call psb_errpush(info,name)
     goto 9999
   endif
@@ -198,7 +198,7 @@ subroutine psi_cswapidxm(ictxt,icomm,flag,n,beta,y,idx,totxch,totsnd,totrcv,work
 
   call psb_info(ictxt,me,np) 
   if (np == -1) then
-    info=psb_err_blacs_error_
+    info=psb_err_context_error_
     call psb_errpush(info,name)
     goto 9999
   endif
@@ -604,7 +604,7 @@ subroutine psi_cswapdatav(flag,beta,y,desc_a,work,info,data)
   ictxt=psb_cd_get_context(desc_a)
   call psb_info(ictxt,me,np) 
   if (np == -1) then
-    info=psb_err_blacs_error_
+    info=psb_err_context_error_
     call psb_errpush(info,name)
     goto 9999
   endif
@@ -690,7 +690,7 @@ subroutine psi_cswapidxv(ictxt,icomm,flag,beta,y,idx,totxch,totsnd,totrcv,work,i
 
   call psb_info(ictxt,me,np) 
   if (np == -1) then
-    info=psb_err_blacs_error_
+    info=psb_err_context_error_
     call psb_errpush(info,name)
     goto 9999
   endif

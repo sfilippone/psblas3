@@ -78,7 +78,7 @@ subroutine psb_iasb(x, desc_a, info)
        & psb_cd_get_dectype(desc_a)
   !     ....verify blacs grid correctness..
   if (np == -1) then
-    info = psb_err_blacs_error_
+    info = psb_err_context_error_
     call psb_errpush(info,name)
     goto 9999
   else if (.not.psb_is_asb_desc(desc_a)) then
@@ -202,7 +202,7 @@ subroutine psb_iasbv(x, desc_a, info)
 
   !     ....verify blacs grid correctness..
   if (np == -1) then
-    info = psb_err_blacs_error_
+    info = psb_err_context_error_
     call psb_errpush(info,name)
     goto 9999
   else if (.not.psb_is_asb_desc(desc_a)) then

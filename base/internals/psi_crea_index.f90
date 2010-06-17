@@ -84,7 +84,7 @@ subroutine psi_crea_index(desc_a,index_in,index_out,glob_idx,nxch,nsnd,nrcv,info
   ictxt = psb_cd_get_context(desc_a)
   call psb_info(ictxt,me,np)
   if (np == -1) then
-    info = psb_err_blacs_error_
+    info = psb_err_context_error_
     call psb_errpush(info,name)
     goto 9999
   endif

@@ -114,7 +114,7 @@ subroutine  psb_sspsm(alpha,a,x,beta,y,desc_a,info,&
 
   call psb_info(ictxt, me, np)
   if (np == -1) then
-    info = psb_err_blacs_error_
+    info = psb_err_context_error_
     call psb_errpush(info,name)
     goto 9999
   endif
@@ -392,7 +392,7 @@ subroutine  psb_sspsv(alpha,a,x,beta,y,desc_a,info,&
 
   call psb_info(ictxt, me, np)
   if (np == -1) then
-    info = psb_err_blacs_error_
+    info = psb_err_context_error_
     call psb_errpush(info,name)
     goto 9999
   endif

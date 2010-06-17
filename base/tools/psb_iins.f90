@@ -85,7 +85,7 @@ subroutine psb_iinsvi(m, irw, val, x, desc_a, info, dupl)
 
   call psb_info(ictxt, me, np)
   if (np == -1) then
-    info = psb_err_blacs_error_
+    info = psb_err_context_error_
     call psb_errpush(info,name)
     goto 9999
   endif
@@ -266,7 +266,7 @@ subroutine psb_iinsi(m, irw, val, x, desc_a, info, dupl)
 
   call psb_info(ictxt, me, np)
   if (np == -1) then
-    info = psb_err_blacs_error_
+    info = psb_err_context_error_
     call psb_errpush(info,name)
     goto 9999
   endif

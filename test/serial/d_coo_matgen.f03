@@ -169,7 +169,7 @@ contains
     character(len=20)  :: name, ch_err, asbfmt
 
     info = psb_success_
-    name = 'create_matrix'
+    name = 'creatae_matrix'
     call psb_erractionsave(err_act)
 
     call psb_info(ictxt, iam, np)
@@ -407,7 +407,7 @@ contains
     tmov = psb_wtime()-t1
 !!$    call acsr%print(22)
     if(iam == psb_root_) then
-      asbfmt = a%get_fmt()
+      asbfmt = acsr%get_fmt()
       write(*,'("The matrix has been generated and assembled in ",a3," format.")')&
            &   asbfmt
       write(*,'("-allocation  time : ",es12.5)') talc

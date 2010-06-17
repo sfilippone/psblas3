@@ -75,7 +75,7 @@ subroutine  psb_daxpby(alpha, x, beta,y,desc_a,info, n, jx, jy)
 
   call psb_info(ictxt, me, np)
   if (np == -ione) then
-    info = psb_err_blacs_error_
+    info = psb_err_context_error_
     call psb_errpush(info,name)
     goto 9999
   endif
@@ -225,7 +225,7 @@ subroutine  psb_daxpbyv(alpha, x, beta,y,desc_a,info)
 
   call psb_info(ictxt, me, np)
   if (np == -ione) then
-    info = psb_err_blacs_error_
+    info = psb_err_context_error_
     call psb_errpush(info,name)
     goto 9999
   endif
