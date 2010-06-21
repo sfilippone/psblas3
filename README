@@ -90,7 +90,7 @@ The configure script will generate a Make.inc file suitable for
 building the library.  
 The script is capable of recognizing the needed libraries with their
 default names; if they are in unusual places consider adding the paths
-with --with-lib, or explicitly specifying the names in --with-blas, etc. 
+with --with-libs, or explicitly specifying the names in --with-blas, etc. 
 Please note that a common way for the configure script to fail is to
 specify inconsistent MPI vs. plain compilers, either directly or
 indirectly via environment variables; e.g. specifying the Intel
