@@ -7,8 +7,8 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
   Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
 <HTML>
 <HEAD>
-<TITLE>psb_get_rank -- Get the MPI rank</TITLE>
-<META NAME="description" CONTENT="psb_get_rank -- Get the MPI rank">
+<TITLE>psb_get_mpicomm -- Get the MPI communicator</TITLE>
+<META NAME="description" CONTENT="psb_get_mpicomm -- Get the MPI communicator">
 <META NAME="keywords" CONTENT="userhtml">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
@@ -20,51 +20,48 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <LINK REL="next" HREF="node76.html">
 <LINK REL="previous" HREF="node74.html">
-<LINK REL="up" HREF="node70.html">
+<LINK REL="up" HREF="node71.html">
 <LINK REL="next" HREF="node76.html">
 </HEAD>
 
 <BODY >
 <!--Navigation Panel-->
-<A NAME="tex2html1126"
+<A NAME="tex2html1128"
   HREF="node76.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html1122"
-  HREF="node70.html">
+<A NAME="tex2html1124"
+  HREF="node71.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html1116"
+<A NAME="tex2html1118"
   HREF="node74.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html1124"
+<A NAME="tex2html1126"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html1127"
-  HREF="node76.html">psb_wtime   Wall</A>
-<B> Up:</B> <A NAME="tex2html1123"
-  HREF="node70.html">Parallel environment routines</A>
-<B> Previous:</B> <A NAME="tex2html1117"
-  HREF="node74.html">psb_get_mpicomm   Get</A>
- &nbsp; <B>  <A NAME="tex2html1125"
+<B> Next:</B> <A NAME="tex2html1129"
+  HREF="node76.html">psb_get_rank   Get</A>
+<B> Up:</B> <A NAME="tex2html1125"
+  HREF="node71.html">Parallel environment routines</A>
+<B> Previous:</B> <A NAME="tex2html1119"
+  HREF="node74.html">psb_exit   Exit</A>
+ &nbsp; <B>  <A NAME="tex2html1127"
   HREF="node1.html">Contents</A></B> 
 <BR>
 <BR>
 <!--End of Navigation Panel-->
 
-<H2><A NAME="SECTION00085000000000000000">
-psb_get_rank -- Get the MPI rank</A>
+<H2><A NAME="SECTION00084000000000000000">
+psb_get_mpicomm -- Get the MPI communicator</A>
 </H2>
 
 <P>
 <PRE>
-call psb_get_rank(rank, icontxt, id)
+call psb_get_mpicomm(icontxt, icomm)
 </PRE>
 
 <P>
-This subroutine returns the MPI rank of the  PSBLAS process <IMG
- WIDTH="18" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
- SRC="img126.png"
- ALT="$id$">
+This subroutine returns the MPI communicator associated with a PSBLAS context
 <DL>
 <DT><STRONG>Type:</STRONG></DT>
 <DD>Asynchronous.
@@ -84,22 +81,6 @@ Intent: <B>in</B>.
 <BR>
 Specified as: an integer variable.
 </DD>
-<DT><STRONG>id</STRONG></DT>
-<DD>Identifier of a   process in the PSBLAS virtual parallel machine.
-<BR>
-Scope: <B>local</B>.
-<BR>
-Type: <B>required</B>.
-<BR>
-Intent: <B>in</B>.
-<BR>
-Specified as: an integer value. <!-- MATH
- $0 \le id \le np-1$
- -->
-<IMG
- WIDTH="113" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="img127.png"
- ALT="$0 \le id \le np-1$"> </DD>
 </DL>
 
 <P>
@@ -107,13 +88,10 @@ Specified as: an integer value. <!-- MATH
 <DT><STRONG><B>On Return</B></STRONG></DT>
 <DD>
 </DD>
-<DT><STRONG>rank</STRONG></DT>
-<DD>The MPI rank associated with the  PSBLAS process <IMG
- WIDTH="18" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
- SRC="img126.png"
- ALT="$id$">.
+<DT><STRONG>icomm</STRONG></DT>
+<DD>The MPI communicator associated with the  PSBLAS virtual parallel machine.
 <BR>
-Scope: <B>local</B>.
+Scope: <B>global</B>.
 <BR>
 Type: <B>required</B>.
 <BR>

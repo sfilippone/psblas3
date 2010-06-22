@@ -26,26 +26,26 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <BODY >
 <!--Navigation Panel-->
-<A NAME="tex2html569"
+<A NAME="tex2html571"
   HREF="node33.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html565"
+<A NAME="tex2html567"
   HREF="node25.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html559"
+<A NAME="tex2html561"
   HREF="node31.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html567"
+<A NAME="tex2html569"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html570"
-  HREF="node33.html">psb_genrm2s   Generalized</A>
-<B> Up:</B> <A NAME="tex2html566"
+<B> Next:</B> <A NAME="tex2html572"
+  HREF="node33.html">psb_genrm2   2-Norm</A>
+<B> Up:</B> <A NAME="tex2html568"
   HREF="node25.html">Computational routines</A>
-<B> Previous:</B> <A NAME="tex2html560"
+<B> Previous:</B> <A NAME="tex2html562"
   HREF="node31.html">psb_geasum   1-Norm</A>
- &nbsp; <B>  <A NAME="tex2html568"
+ &nbsp; <B>  <A NAME="tex2html570"
   HREF="node1.html">Contents</A></B> 
 <BR>
 <BR>
@@ -237,190 +237,28 @@ An integer value; 0 means no error has been detected.
 </DL>
 
 <P>
-ifstarsubroutinesubroutinepsb_genrm22-Norm of Vector    
-
-<P>
-This function computes the 2-norm of a vector <IMG
- WIDTH="13" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
- SRC="img26.png"
- ALT="$x$">.
-<BR>
-If <IMG
- WIDTH="13" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
- SRC="img26.png"
- ALT="$x$"> is a double precision real  vector
-it computes 2-norm as:
-<BR><P></P>
-<DIV ALIGN="CENTER">
-<!-- MATH
- \begin{displaymath}
-nrm2 \leftarrow \sqrt{x^T x}
-\end{displaymath}
- -->
-
-<IMG
- WIDTH="106" HEIGHT="24" BORDER="0"
- SRC="img44.png"
- ALT="\begin{displaymath}nrm2 \leftarrow \sqrt{x^T x}\end{displaymath}">
-</DIV>
-<BR CLEAR="ALL">
-<P></P>
-else if <IMG
- WIDTH="13" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
- SRC="img26.png"
- ALT="$x$"> is double precision complex vector then it computes 2-norm  as:
-<BR><P></P>
-<DIV ALIGN="CENTER">
-<!-- MATH
- \begin{displaymath}
-nrm2 \leftarrow \sqrt{x^H x}
-\end{displaymath}
- -->
-
-<IMG
- WIDTH="108" HEIGHT="24" BORDER="0"
- SRC="img45.png"
- ALT="\begin{displaymath}nrm2 \leftarrow \sqrt{x^H x}\end{displaymath}">
-</DIV>
-<BR CLEAR="ALL">
-<P></P>
-
-<P>
-<BR><P></P>
-<DIV ALIGN="CENTER"><A NAME="1423"></A>
-<TABLE>
-<CAPTION><STRONG>Table 8:</STRONG>
-Data types</CAPTION>
-<TR><TD>
-<DIV ALIGN="CENTER">
-<TABLE CELLPADDING=3 BORDER="1" ALIGN="CENTER">
-<TR><TD ALIGN="LEFT"><IMG
- WIDTH="43" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
- SRC="img46.png"
- ALT="$nrm2$"></TD>
-<TD ALIGN="LEFT"><IMG
- WIDTH="13" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
- SRC="img26.png"
- ALT="$x$"></TD>
-<TD ALIGN="LEFT"><B>Function</B></TD>
-</TR>
-<TR><TD ALIGN="LEFT">Short Precision Real</TD>
-<TD ALIGN="LEFT">Short Precision Real</TD>
-<TD ALIGN="LEFT">psb_genrm2</TD>
-</TR>
-<TR><TD ALIGN="LEFT">Long Precision Real</TD>
-<TD ALIGN="LEFT">Long Precision Real</TD>
-<TD ALIGN="LEFT">psb_genrm2</TD>
-</TR>
-<TR><TD ALIGN="LEFT">Short Precision Real</TD>
-<TD ALIGN="LEFT">Short Precision Complex</TD>
-<TD ALIGN="LEFT">psb_genrm2</TD>
-</TR>
-<TR><TD ALIGN="LEFT">Long Precision Real</TD>
-<TD ALIGN="LEFT">Long Precision Complex</TD>
-<TD ALIGN="LEFT">psb_genrm2</TD>
-</TR>
-</TABLE>
-</DIV>
-</TD></TR>
-</TABLE>
-</DIV><P></P>
-<BR>
-
-<P>
-<PRE>
-psb_genrm2(x, desc_a, info)
-</PRE>
-
-<P>
-<DL>
-<DT><STRONG>Type:</STRONG></DT>
-<DD>Synchronous.
-</DD>
-<DT><STRONG><B>On Entry</B></STRONG></DT>
-<DD>
-</DD>
-<DT><STRONG>x</STRONG></DT>
-<DD>the local portion of global dense matrix
-<IMG
- WIDTH="13" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
- SRC="img26.png"
- ALT="$x$">.
-<BR>
-Scope: <B>local</B> 
-<BR>
-Type: <B>required</B> 
-<BR>
-Intent: <B>in</B>.
-<BR>
-Specified as:  a rank one or two array 
-containing numbers of type specified in
-Table&nbsp;<A HREF="#tab:f90nrm2">8</A>.
-</DD>
-<DT><STRONG>desc_a</STRONG></DT>
-<DD>contains data structures for communications.
-<BR>
-Scope: <B>local</B> 
-<BR>
-Type: <B>required</B>
-<BR>
-Intent: <B>in</B>.
-<BR>
-Specified as: a structured data of type descdata<TT>psb_desc_type</TT>.
-
-<P>
-</DD>
-<DT><STRONG><B>On Return</B></STRONG></DT>
-<DD>
-</DD>
-<DT><STRONG>Function Value</STRONG></DT>
-<DD>is the 2-norm of subvector <IMG
- WIDTH="13" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
- SRC="img26.png"
- ALT="$x$">.
-<BR>
-Scope: <B>global</B> 
-<BR>
-Type: <B>required</B> 
-<BR>
-Specified as: a long precision real number.
-</DD>
-<DT><STRONG>info</STRONG></DT>
-<DD>Error code.
-<BR>
-Scope: <B>local</B> 
-<BR>
-Type: <B>required</B> 
-<BR>
-Intent: <B>out</B>.
-<BR>
-An integer value; 0 means no error has been detected. 
-</DD>
-</DL>
-
-<P>
 <HR>
 <!--Navigation Panel-->
-<A NAME="tex2html569"
+<A NAME="tex2html571"
   HREF="node33.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html565"
+<A NAME="tex2html567"
   HREF="node25.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html559"
+<A NAME="tex2html561"
   HREF="node31.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html567"
+<A NAME="tex2html569"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html570"
-  HREF="node33.html">psb_genrm2s   Generalized</A>
-<B> Up:</B> <A NAME="tex2html566"
+<B> Next:</B> <A NAME="tex2html572"
+  HREF="node33.html">psb_genrm2   2-Norm</A>
+<B> Up:</B> <A NAME="tex2html568"
   HREF="node25.html">Computational routines</A>
-<B> Previous:</B> <A NAME="tex2html560"
+<B> Previous:</B> <A NAME="tex2html562"
   HREF="node31.html">psb_geasum   1-Norm</A>
- &nbsp; <B>  <A NAME="tex2html568"
+ &nbsp; <B>  <A NAME="tex2html570"
   HREF="node1.html">Contents</A></B> 
 <!--End of Navigation Panel-->
 

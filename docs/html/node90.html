@@ -7,8 +7,8 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
   Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
 <HTML>
 <HEAD>
-<TITLE>psb_set_errverbosity -- Sets the verbosity of error messages.</TITLE>
-<META NAME="description" CONTENT="psb_set_errverbosity -- Sets the verbosity of error messages.">
+<TITLE>psb_error -- Prints the error stack content and aborts execution</TITLE>
+<META NAME="description" CONTENT="psb_error -- Prints the error stack content and aborts execution">
 <META NAME="keywords" CONTENT="userhtml">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
@@ -20,45 +20,45 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <LINK REL="next" HREF="node91.html">
 <LINK REL="previous" HREF="node89.html">
-<LINK REL="up" HREF="node87.html">
+<LINK REL="up" HREF="node88.html">
 <LINK REL="next" HREF="node91.html">
 </HEAD>
 
 <BODY >
 <!--Navigation Panel-->
-<A NAME="tex2html1308"
+<A NAME="tex2html1310"
   HREF="node91.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html1304"
-  HREF="node87.html">
+<A NAME="tex2html1306"
+  HREF="node88.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html1298"
+<A NAME="tex2html1300"
   HREF="node89.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html1306"
+<A NAME="tex2html1308"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html1309"
-  HREF="node91.html">psb_set_erraction   Set</A>
-<B> Up:</B> <A NAME="tex2html1305"
-  HREF="node87.html">Error handling</A>
-<B> Previous:</B> <A NAME="tex2html1299"
-  HREF="node89.html">psb_error   Prints</A>
- &nbsp; <B>  <A NAME="tex2html1307"
+<B> Next:</B> <A NAME="tex2html1311"
+  HREF="node91.html">psb_set_errverbosity   Sets</A>
+<B> Up:</B> <A NAME="tex2html1307"
+  HREF="node88.html">Error handling</A>
+<B> Previous:</B> <A NAME="tex2html1301"
+  HREF="node89.html">psb_errpush   Pushes</A>
+ &nbsp; <B>  <A NAME="tex2html1309"
   HREF="node1.html">Contents</A></B> 
 <BR>
 <BR>
 <!--End of Navigation Panel-->
 
-<H2><A NAME="SECTION00093000000000000000">
-psb_set_errverbosity -- Sets the verbosity of error
-  messages.</A>
+<H2><A NAME="SECTION00092000000000000000">
+psb_error -- Prints the error stack content and aborts
+  execution</A>
 </H2>
 
 <P>
 <PRE>
-call psb_set_errverbosity(v)
+call psb_error(icontxt)
 </PRE>
 
 <P>
@@ -69,12 +69,12 @@ call psb_set_errverbosity(v)
 <DT><STRONG><B>On Entry</B></STRONG></DT>
 <DD>
 </DD>
-<DT><STRONG>v</STRONG></DT>
-<DD>the verbosity level
+<DT><STRONG>icontxt</STRONG></DT>
+<DD>the communication context.
 <BR>
-Scope: <B>global</B>
+Scope: <B>global</B> 
 <BR>
-Type: <B>required</B>
+Type: <B>optional</B>
 <BR>
 Intent: <B>in</B>.
 <BR>

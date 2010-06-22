@@ -7,8 +7,8 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
   Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
 <HTML>
 <HEAD>
-<TITLE>psb_cdfree -- Frees a communication descriptor</TITLE>
-<META NAME="description" CONTENT="psb_cdfree -- Frees a communication descriptor">
+<TITLE>psb_cdcpy -- Copies a communication descriptor</TITLE>
+<META NAME="description" CONTENT="psb_cdcpy -- Copies a communication descriptor">
 <META NAME="keywords" CONTENT="userhtml">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
@@ -20,64 +20,66 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <LINK REL="next" HREF="node48.html">
 <LINK REL="previous" HREF="node46.html">
-<LINK REL="up" HREF="node42.html">
+<LINK REL="up" HREF="node43.html">
 <LINK REL="next" HREF="node48.html">
 </HEAD>
 
 <BODY >
 <!--Navigation Panel-->
-<A NAME="tex2html776"
+<A NAME="tex2html778"
   HREF="node48.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html772"
-  HREF="node42.html">
+<A NAME="tex2html774"
+  HREF="node43.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html766"
+<A NAME="tex2html768"
   HREF="node46.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html774"
+<A NAME="tex2html776"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html777"
-  HREF="node48.html">psb_cdbldext   Build</A>
-<B> Up:</B> <A NAME="tex2html773"
-  HREF="node42.html">Data management routines</A>
-<B> Previous:</B> <A NAME="tex2html767"
-  HREF="node46.html">psb_cdcpy   Copies</A>
- &nbsp; <B>  <A NAME="tex2html775"
+<B> Next:</B> <A NAME="tex2html779"
+  HREF="node48.html">psb_cdfree   Frees</A>
+<B> Up:</B> <A NAME="tex2html775"
+  HREF="node43.html">Data management routines</A>
+<B> Previous:</B> <A NAME="tex2html769"
+  HREF="node46.html">psb_cdasb   Communication</A>
+ &nbsp; <B>  <A NAME="tex2html777"
   HREF="node1.html">Contents</A></B> 
 <BR>
 <BR>
 <!--End of Navigation Panel-->
 
-<H2><A NAME="SECTION00075000000000000000">
-psb_cdfree -- Frees a communication descriptor</A>
+<H2><A NAME="SECTION00074000000000000000">
+psb_cdcpy -- Copies a communication descriptor</A>
 </H2>
 
 <P>
 <PRE>
-call psb_cdfree(desc_a, info)
+call psb_cdcpy(desc_in, desc_out, info)
 </PRE>
 
 <P>
 <DL>
 <DT><STRONG>Type:</STRONG></DT>
-<DD>Synchronous.
+<DD>Asynchronous.
 </DD>
 <DT><STRONG><B>On Entry</B></STRONG></DT>
 <DD>
 </DD>
-<DT><STRONG>desc_a</STRONG></DT>
-<DD>the communication descriptor to be freed.
+<DT><STRONG>desc_in</STRONG></DT>
+<DD>the communication descriptor.
 <BR>
 Scope:<B>local</B>.
 <BR>
 Type:<B>required</B>.
 <BR>
-Intent: <B>inout</B>.
+Intent: <B>in</B>.
 <BR>
 Specified as: a structured data of type descdata<TT>psb_desc_type</TT>.
+
+<P>
 </DD>
 </DL>
 
@@ -85,6 +87,17 @@ Specified as: a structured data of type descdata<TT>psb_desc_type</TT>.
 <DL>
 <DT><STRONG><B>On Return</B></STRONG></DT>
 <DD>
+</DD>
+<DT><STRONG>desc_out</STRONG></DT>
+<DD>the communication descriptor copy.
+<BR>
+Scope:<B>local</B>.
+<BR>
+Type:<B>required</B>.
+<BR>
+Intent: <B>out</B>.
+<BR>
+Specified as: a structured data of type descdata<TT>psb_desc_type</TT>.
 </DD>
 <DT><STRONG>info</STRONG></DT>
 <DD>Error code.

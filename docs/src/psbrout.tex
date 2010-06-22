@@ -556,7 +556,8 @@ An integer value; 0 means no error has been detected.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
-\subroutine {psb\_genrm2}{2-Norm of Vector}    
+\clearpage\subsection*{psb\_genrm2 --- 2-Norm of Vector}    
+\addcontentsline{toc}{subsection}{psb\_geasums}
 
 This function computes the 2-norm of a vector $x$.\\
 If $x$ is a double precision real  vector
@@ -629,18 +630,12 @@ An integer value; 0 means no error has been detected.
 
 
 
-\clearpage\subsection*{psb\_genrm2s --- Generalized 1-Norm of Vector}    
+\clearpage\subsection*{psb\_genrm2s --- Generalized 2-Norm of Vector}    
 \addcontentsline{toc}{subsection}{psb\_genrm2s}
 
-This subroutine computes a series of  1-norms on the columns of
+This subroutine computes a series of  2-norms on the columns of
 a  dense matrix  $x$: 
-\[ res(i) \leftarrow \max_k |x(k,i)| \]
-This function computes the 1-norm of a vector $x$.\\
-If $x$ is a real vector
-it computes 1-norm as:
-\[ res(i) \leftarrow \sqrt{x^T x}\]
-else if $x$ is a complex vector then it computes 1-norm  as:
-\[ res(i) \leftarrow \sqrt{x^H x}\]
+\[ res(i) \leftarrow \|x(:,i)\|_2 \]
 
 
 \begin{verbatim}

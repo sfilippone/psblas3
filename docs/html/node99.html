@@ -7,8 +7,8 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
   Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
 <HTML>
 <HEAD>
-<TITLE>psb_precinit -- Initialize a preconditioner</TITLE>
-<META NAME="description" CONTENT="psb_precinit -- Initialize a preconditioner">
+<TITLE>Preconditioner routines</TITLE>
+<META NAME="description" CONTENT="Preconditioner routines">
 <META NAME="keywords" CONTENT="userhtml">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
@@ -18,124 +18,75 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <LINK REL="STYLESHEET" HREF="userhtml.css">
 
-<LINK REL="next" HREF="node100.html">
-<LINK REL="previous" HREF="node98.html">
-<LINK REL="up" HREF="node98.html">
+<LINK REL="next" HREF="node104.html">
+<LINK REL="previous" HREF="node93.html">
+<LINK REL="up" HREF="userhtml.html">
 <LINK REL="next" HREF="node100.html">
 </HEAD>
 
 <BODY >
 <!--Navigation Panel-->
-<A NAME="tex2html1421"
+<A NAME="tex2html1419"
   HREF="node100.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html1417"
-  HREF="node98.html">
+<A NAME="tex2html1415"
+  HREF="userhtml.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html1411"
+<A NAME="tex2html1409"
   HREF="node98.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html1419"
+<A NAME="tex2html1417"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html1422"
-  HREF="node100.html">psb_precbld   Builds</A>
-<B> Up:</B> <A NAME="tex2html1418"
-  HREF="node98.html">Preconditioner routines</A>
-<B> Previous:</B> <A NAME="tex2html1412"
-  HREF="node98.html">Preconditioner routines</A>
- &nbsp; <B>  <A NAME="tex2html1420"
+<B> Next:</B> <A NAME="tex2html1420"
+  HREF="node100.html">psb_precinit   Initialize</A>
+<B> Up:</B> <A NAME="tex2html1416"
+  HREF="userhtml.html">userhtml</A>
+<B> Previous:</B> <A NAME="tex2html1410"
+  HREF="node98.html">mm_mat_write   Write</A>
+ &nbsp; <B>  <A NAME="tex2html1418"
   HREF="node1.html">Contents</A></B> 
 <BR>
 <BR>
 <!--End of Navigation Panel-->
 
-<H2><A NAME="SECTION000111000000000000000">
-psb_precinit -- Initialize a  preconditioner</A>
-</H2>
+<H1><A NAME="SECTION000110000000000000000"></A>
+<A NAME="sec:precs"></A>
+<BR>
+Preconditioner routines
+</H1>
 
 <P>
-<PRE>
-call psb_precinit(prec, ptype, info)
-</PRE>
+<A NAME="sec:psprecs"></A>The base PSBLAS library  contains the implementation of two simple
+preconditioning techniques:
+
+<UL>
+<LI>Diagonal Scaling
+</LI>
+<LI>Block Jacobi with ILU(0) factorization
+</LI>
+</UL>
+The supporting data type and subroutine interfaces are defined in the
+module  <code>psb_prec_mod</code>.
 
 <P>
-<DL>
-<DT><STRONG>Type:</STRONG></DT>
-<DD>Asynchronous.
-</DD>
-<DT><STRONG><B>On Entry</B></STRONG></DT>
-<DD>
-</DD>
-<DT><STRONG>ptype</STRONG></DT>
-<DD>the type of preconditioner. 
-Scope: <B>global</B> 
-<BR>
-Type: <B>required</B>
-<BR>
-Intent: <B>in</B>.
-<BR>
-Specified as: a character string, see usage notes.
-</DD>
-<DT><STRONG><B>On Exit</B></STRONG></DT>
-<DD><P>
-</DD>
-<DT><STRONG>prec</STRONG></DT>
-<DD>Scope: <B>local</B> 
-<BR>
-Type: <B>required</B>
-<BR>
-Intent: <B>inout</B>.
-<BR>
-Specified as: a preconditioner data structure precdata<TT>psb_prec_type</TT>.
-</DD>
-<DT><STRONG>info</STRONG></DT>
-<DD>Scope: <B>global</B> 
-<BR>
-Type: <B>required</B>
-<BR>
-Intent: <B>out</B>.
-<BR>
-Error code: if no error, 0 is returned.
-</DD>
-</DL>
-<FONT SIZE="+1"><B>Notes</B></FONT>
-Legal inputs to this subroutine are interpreted depending on the
-<IMG
- WIDTH="42" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
- SRC="img140.png"
- ALT="$ptype$"> string as follows<A NAME="tex2html28"
-  HREF="footnode.html#foot6732"><SUP>3</SUP></A>:
-<DL>
-<DT><STRONG>NONE</STRONG></DT>
-<DD>No preconditioning, i.e. the preconditioner is just a copy
-  operator.
-</DD>
-<DT><STRONG>DIAG</STRONG></DT>
-<DD>Diagonal scaling; each entry of the input vector is
-  multiplied by the reciprocal of the sum of the absolute values of
-  the coefficients in the corresponding row of matrix  <IMG
- WIDTH="16" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
- SRC="img1.png"
- ALT="$A$">;
-</DD>
-<DT><STRONG>BJAC</STRONG></DT>
-<DD>Precondition by a  factorization of the
-  block-diagonal of matrix <IMG
- WIDTH="16" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
- SRC="img1.png"
- ALT="$A$">, where block boundaries are determined
-  by the data allocation boundaries for each process; requires no
-  communication. Only the incomplete factorization <IMG
- WIDTH="56" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
- SRC="img141.png"
- ALT="$ILU(0)$"> is
-  currently implemented.  
-</DD>
-</DL>
+<BR><HR>
+<!--Table of Child-Links-->
+<A NAME="CHILD_LINKS"><STRONG>Subsections</STRONG></A>
 
-<P>
+<UL>
+<LI><A NAME="tex2html1421"
+  HREF="node100.html">psb_precinit -- Initialize a  preconditioner</A>
+<LI><A NAME="tex2html1422"
+  HREF="node101.html">psb_precbld -- Builds a preconditioner</A>
+<LI><A NAME="tex2html1423"
+  HREF="node102.html">psb_precaply -- Preconditioner application routine</A>
+<LI><A NAME="tex2html1424"
+  HREF="node103.html">psb_precdescr -- Prints a description of current
+  preconditioner</A>
+</UL>
+<!--End of Table of Child-Links-->
 <BR><HR>
 
 </BODY>

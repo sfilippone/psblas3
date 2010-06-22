@@ -7,8 +7,8 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
   Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
 <HTML>
 <HEAD>
-<TITLE>psb_loc_to_glob -- Local to global indices conversion</TITLE>
-<META NAME="description" CONTENT="psb_loc_to_glob -- Local to global indices conversion">
+<TITLE>psb_glob_to_loc -- Global to local indices convertion</TITLE>
+<META NAME="description" CONTENT="psb_glob_to_loc -- Global to local indices convertion">
 <META NAME="keywords" CONTENT="userhtml">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
@@ -20,46 +20,46 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <LINK REL="next" HREF="node61.html">
 <LINK REL="previous" HREF="node59.html">
-<LINK REL="up" HREF="node42.html">
+<LINK REL="up" HREF="node43.html">
 <LINK REL="next" HREF="node61.html">
 </HEAD>
 
 <BODY >
 <!--Navigation Panel-->
-<A NAME="tex2html932"
+<A NAME="tex2html934"
   HREF="node61.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html928"
-  HREF="node42.html">
+<A NAME="tex2html930"
+  HREF="node43.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html922"
+<A NAME="tex2html924"
   HREF="node59.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html930"
+<A NAME="tex2html932"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html933"
-  HREF="node61.html">psb_is_owned</A>
-<B> Up:</B> <A NAME="tex2html929"
-  HREF="node42.html">Data management routines</A>
-<B> Previous:</B> <A NAME="tex2html923"
-  HREF="node59.html">psb_glob_to_loc   Global</A>
- &nbsp; <B>  <A NAME="tex2html931"
+<B> Next:</B> <A NAME="tex2html935"
+  HREF="node61.html">psb_loc_to_glob   Local</A>
+<B> Up:</B> <A NAME="tex2html931"
+  HREF="node43.html">Data management routines</A>
+<B> Previous:</B> <A NAME="tex2html925"
+  HREF="node59.html">psb_gelp   Applies</A>
+ &nbsp; <B>  <A NAME="tex2html933"
   HREF="node1.html">Contents</A></B> 
 <BR>
 <BR>
 <!--End of Navigation Panel-->
 
-<H2><A NAME="SECTION000718000000000000000">
-psb_loc_to_glob -- Local to global indices
-  conversion</A>
+<H2><A NAME="SECTION000717000000000000000">
+psb_glob_to_loc -- Global to local indices
+  convertion</A>
 </H2>
 
 <P>
 <PRE>
-call psb_loc_to_glob(x, y, desc_a, info, iact)
-call psb_loc_to_glob(x, desc_a, info, iact)
+call psb_glob_to_loc(x, y, desc_a, info, iact,owned)
+call psb_glob_to_loc(x, desc_a, info, iact,owned)
 </PRE>
 
 <P>
@@ -103,6 +103,18 @@ Intent: <B>in</B>.
 Specified as: a character variable  <code>I</code>gnore, <code>W</code>arning or
 <code>A</code>bort, default <code>I</code>gnore.
 </DD>
+<DT><STRONG>owned</STRONG></DT>
+<DD>Specfies valid range of input 
+Scope: <B>global</B> 
+<BR>
+Type: <B>optional</B>
+<BR>
+Intent: <B>in</B>.
+<BR>
+If true, then only indices strictly owned by the current process are
+considered valid, if false then halo indices are also
+accepted. Default: false. 
+</DD>
 </DL>
 
 <P>
@@ -131,7 +143,7 @@ Specified as: a rank one integer array.
 <DD>If <IMG
  WIDTH="13" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
  SRC="img27.png"
- ALT="$y$"> is not present,
+ ALT="$y$"> is  present,
   then <IMG
  WIDTH="13" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
  SRC="img27.png"
@@ -162,28 +174,40 @@ An integer value; 0 means no error has been detected.
 </DL>
 
 <P>
+<FONT SIZE="+1"><B>Notes</B></FONT>
+
+<OL>
+<LI>If an input index is out of range, then the corresponding output
+  index is set to a negative number;
+</LI>
+<LI>The default <code>I</code>gnore means that the negative output is the
+  only action taken on an out-of-range input.
+</LI>
+</OL>
+
+<P>
 <HR>
 <!--Navigation Panel-->
-<A NAME="tex2html932"
+<A NAME="tex2html934"
   HREF="node61.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html928"
-  HREF="node42.html">
+<A NAME="tex2html930"
+  HREF="node43.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html922"
+<A NAME="tex2html924"
   HREF="node59.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html930"
+<A NAME="tex2html932"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html933"
-  HREF="node61.html">psb_is_owned</A>
-<B> Up:</B> <A NAME="tex2html929"
-  HREF="node42.html">Data management routines</A>
-<B> Previous:</B> <A NAME="tex2html923"
-  HREF="node59.html">psb_glob_to_loc   Global</A>
- &nbsp; <B>  <A NAME="tex2html931"
+<B> Next:</B> <A NAME="tex2html935"
+  HREF="node61.html">psb_loc_to_glob   Local</A>
+<B> Up:</B> <A NAME="tex2html931"
+  HREF="node43.html">Data management routines</A>
+<B> Previous:</B> <A NAME="tex2html925"
+  HREF="node59.html">psb_gelp   Applies</A>
+ &nbsp; <B>  <A NAME="tex2html933"
   HREF="node1.html">Contents</A></B> 
 <!--End of Navigation Panel-->
 

@@ -7,8 +7,8 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
   Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
 <HTML>
 <HEAD>
-<TITLE>Utilities</TITLE>
-<META NAME="description" CONTENT="Utilities">
+<TITLE>psb_set_erraction -- Set the type of action to be taken upon error condition.</TITLE>
+<META NAME="description" CONTENT="psb_set_erraction -- Set the type of action to be taken upon error condition.">
 <META NAME="keywords" CONTENT="userhtml">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
@@ -18,73 +18,76 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <LINK REL="STYLESHEET" HREF="userhtml.css">
 
-<LINK REL="next" HREF="node98.html">
-<LINK REL="previous" HREF="node87.html">
-<LINK REL="up" HREF="userhtml.html">
+<LINK REL="previous" HREF="node91.html">
+<LINK REL="up" HREF="node88.html">
 <LINK REL="next" HREF="node93.html">
 </HEAD>
 
 <BODY >
 <!--Navigation Panel-->
-<A NAME="tex2html1330"
+<A NAME="tex2html1332"
   HREF="node93.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html1326"
-  HREF="userhtml.html">
+<A NAME="tex2html1328"
+  HREF="node88.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html1320"
+<A NAME="tex2html1324"
   HREF="node91.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html1328"
+<A NAME="tex2html1330"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html1331"
-  HREF="node93.html">hb_read   Read</A>
-<B> Up:</B> <A NAME="tex2html1327"
-  HREF="userhtml.html">userhtml</A>
-<B> Previous:</B> <A NAME="tex2html1321"
-  HREF="node91.html">psb_set_erraction   Set</A>
- &nbsp; <B>  <A NAME="tex2html1329"
+<B> Next:</B> <A NAME="tex2html1333"
+  HREF="node93.html">Utilities</A>
+<B> Up:</B> <A NAME="tex2html1329"
+  HREF="node88.html">Error handling</A>
+<B> Previous:</B> <A NAME="tex2html1325"
+  HREF="node91.html">psb_set_errverbosity   Sets</A>
+ &nbsp; <B>  <A NAME="tex2html1331"
   HREF="node1.html">Contents</A></B> 
 <BR>
 <BR>
 <!--End of Navigation Panel-->
 
-<H1><A NAME="SECTION000100000000000000000"></A>
-<A NAME="sec:util"></A>
+<H2><A NAME="SECTION00094000000000000000">
+psb_set_erraction -- Set the type of action to be
+  taken  upon error condition.</A>
+</H2>
+
+<P>
+<PRE>
+call psb_set_erraction(err_act)
+</PRE>
+
+<P>
+<DL>
+<DT><STRONG>Type:</STRONG></DT>
+<DD>Asynchronous.
+</DD>
+<DT><STRONG><B>On Entry</B></STRONG></DT>
+<DD>
+</DD>
+<DT><STRONG>err_act</STRONG></DT>
+<DD>the type of action.
 <BR>
-Utilities
-</H1>
+Scope: <B>global</B> 
+<BR>
+Type: <B>required</B>
+<BR>
+Intent: <B>in</B>.
+<BR>
+Specified as: an integer. Possible values: <code>psb_act_ret</code>,
+<code>psb_act_abort</code>. 
+</DD>
+</DL>
 
 <P>
-We have some utitlities available for input and output of
-sparsematrices; the interfaces to these routines are available in the
-module <code>psb_util_mod</code>.
+<PRE>
+call psb_errcomm(icontxt, err)
+</PRE>
 
 <P>
-<BR><HR>
-<!--Table of Child-Links-->
-<A NAME="CHILD_LINKS"><STRONG>Subsections</STRONG></A>
-
-<UL>
-<LI><A NAME="tex2html1332"
-  HREF="node93.html">hb_read -- Read a sparse matrix from a file in the
-  Harwell-Boeing format</A>
-<LI><A NAME="tex2html1333"
-  HREF="node94.html">hb_write -- Write a sparse matrix to a  file
-  in the Harwell-Boeing format</A>
-<LI><A NAME="tex2html1334"
-  HREF="node95.html">mm_mat_read -- Read a sparse matrix from a
-  file in the MatrixMarket format</A>
-<LI><A NAME="tex2html1335"
-  HREF="node96.html">mm_vet_read -- Read a dense vector from a
-  file in the MatrixMarket format</A>
-<LI><A NAME="tex2html1336"
-  HREF="node97.html">mm_mat_write -- Write a sparse matrix to a
-  file in the MatrixMarket format</A>
-</UL>
-<!--End of Table of Child-Links-->
 <BR><HR>
 
 </BODY>

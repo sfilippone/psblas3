@@ -7,8 +7,8 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
   Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
 <HTML>
 <HEAD>
-<TITLE>psb_get_boundary -- Extract list of boundary elements</TITLE>
-<META NAME="description" CONTENT="psb_get_boundary -- Extract list of boundary elements">
+<TITLE>psb_local_index </TITLE>
+<META NAME="description" CONTENT="psb_local_index ">
 <META NAME="keywords" CONTENT="userhtml">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
@@ -20,44 +20,44 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <LINK REL="next" HREF="node66.html">
 <LINK REL="previous" HREF="node64.html">
-<LINK REL="up" HREF="node42.html">
+<LINK REL="up" HREF="node43.html">
 <LINK REL="next" HREF="node66.html">
 </HEAD>
 
 <BODY >
 <!--Navigation Panel-->
-<A NAME="tex2html992"
+<A NAME="tex2html994"
   HREF="node66.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html988"
-  HREF="node42.html">
+<A NAME="tex2html990"
+  HREF="node43.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html982"
+<A NAME="tex2html984"
   HREF="node64.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html990"
+<A NAME="tex2html992"
   HREF="node1.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html993"
-  HREF="node66.html">psb_get_overlap   Extract</A>
-<B> Up:</B> <A NAME="tex2html989"
-  HREF="node42.html">Data management routines</A>
-<B> Previous:</B> <A NAME="tex2html983"
-  HREF="node64.html">psb_local_index</A>
- &nbsp; <B>  <A NAME="tex2html991"
+<B> Next:</B> <A NAME="tex2html995"
+  HREF="node66.html">psb_get_boundary   Extract</A>
+<B> Up:</B> <A NAME="tex2html991"
+  HREF="node43.html">Data management routines</A>
+<B> Previous:</B> <A NAME="tex2html985"
+  HREF="node64.html">psb_is_local</A>
+ &nbsp; <B>  <A NAME="tex2html993"
   HREF="node1.html">Contents</A></B> 
 <BR>
 <BR>
 <!--End of Navigation Panel-->
 
-<H2><A NAME="SECTION000723000000000000000">
-psb_get_boundary -- Extract list of boundary elements</A>
+<H2><A NAME="SECTION000722000000000000000">
+psb_local_index </A>
 </H2>
 
 <P>
 <PRE>
-call psb_get_boundary(bndel, desc, info)
+call psb_local_index(y, x, desc_a, info)
 </PRE>
 
 <P>
@@ -68,7 +68,18 @@ call psb_get_boundary(bndel, desc, info)
 <DT><STRONG><B>On Entry</B></STRONG></DT>
 <DD>
 </DD>
-<DT><STRONG>desc</STRONG></DT>
+<DT><STRONG>x</STRONG></DT>
+<DD>Integer indices.
+<BR>
+Scope: <B>local</B> 
+<BR>
+Type: <B>required</B>
+<BR>
+Intent: <B>in, inout</B>.
+<BR>
+Specified as: a scalar or a rank one integer array.
+<BR></DD>
+<DT><STRONG>desc_a</STRONG></DT>
 <DD>the communication descriptor.
 <BR>
 Scope:<B>local</B>.
@@ -79,6 +90,17 @@ Intent: <B>in</B>.
 <BR>
 Specified as: a structured data of type descdata<TT>psb_desc_type</TT>.
 </DD>
+<DT><STRONG>iact</STRONG></DT>
+<DD>specifies action to be taken in case of range errors. 
+Scope: <B>global</B> 
+<BR>
+Type: <B>optional</B>
+<BR>
+Intent: <B>in</B>.
+<BR>
+Specified as: a character variable  <code>I</code>gnore, <code>W</code>arning or
+<code>A</code>bort, default <code>I</code>gnore.
+</DD>
 </DL>
 
 <P>
@@ -86,19 +108,20 @@ Specified as: a structured data of type descdata<TT>psb_desc_type</TT>.
 <DT><STRONG><B>On Return</B></STRONG></DT>
 <DD>
 </DD>
-<DT><STRONG>bndel</STRONG></DT>
-<DD>The list of boundary elements on the calling process, in
-  local numbering.
-<BR>
+<DT><STRONG>y</STRONG></DT>
+<DD>A logical mask which is true for all corresponding entries of
+  <IMG
+ WIDTH="13" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
+ SRC="img26.png"
+ ALT="$x$"> that are local to  the current process
 Scope: <B>local</B> 
 <BR>
 Type: <B>required</B>
 <BR>
 Intent: <B>out</B>.
 <BR>
-Specified as: a rank one array with the ALLOCATABLE
-attribute, of type integer.
-<BR></DD>
+Specified as: a scalar or rank one logical array.
+</DD>
 <DT><STRONG>info</STRONG></DT>
 <DD>Error code.
 <BR>
@@ -116,12 +139,9 @@ An integer value; 0 means no error has been detected.
 <FONT SIZE="+1"><B>Notes</B></FONT>
 
 <OL>
-<LI>If there are no boundary elements (i.e., if the local part of
-  the connectivity graph is self-contained) the output vector is set
-  to the ``not allocated'' state. 
-</LI>
-<LI>Otherwise the size of <code>bndel</code> will be exactly equal to the
-  number of boundary elements. 
+<LI>This routine returns a <code>.true.</code> value for those indices
+  that are local to  the current process, including the halo
+  indices.
 </LI>
 </OL>
 
