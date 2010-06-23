@@ -1856,6 +1856,187 @@ function psb_d_csnmi(a) result(res)
 end function psb_d_csnmi
 
 
+function psb_d_csnm1(a) result(res)
+  use psb_d_mat_mod, psb_protect_name => psb_d_csnm1
+  use psb_error_mod
+  use psb_const_mod
+  implicit none 
+  class(psb_d_sparse_mat), intent(in) :: a
+  real(psb_dpk_)         :: res
+
+  Integer :: err_act, info
+  character(len=20)  :: name='csnm1'
+  logical, parameter :: debug=.false.
+
+  call psb_get_erraction(err_act)
+  if (.not.allocated(a%a)) then 
+    info = 1121
+    call psb_errpush(info,name)
+    goto 9999
+  endif
+
+  res = a%a%csnm1()
+  return
+
+9999 continue
+
+  if (err_act == psb_act_abort_) then
+    call psb_error()
+    return
+  end if
+  return
+
+end function psb_d_csnm1
+
+
+subroutine psb_d_rowsum(d,a,info)
+  use psb_d_mat_mod, psb_protect_name => psb_d_rowsum
+  use psb_error_mod
+  use psb_const_mod
+  implicit none 
+  class(psb_d_sparse_mat), intent(in) :: a
+  real(psb_dpk_), intent(out)          :: d(:)
+  integer, intent(out)                 :: info
+
+  Integer :: err_act
+  character(len=20)  :: name='rowsum'
+  logical, parameter :: debug=.false.
+
+  call psb_erractionsave(err_act)
+  if (.not.allocated(a%a)) then 
+    info = 1121
+    call psb_errpush(info,name)
+    goto 9999
+  endif
+
+  call a%a%rowsum(d)
+  if (info /= psb_success_) goto 9999
+
+  call psb_erractionrestore(err_act)
+  return
+
+9999 continue
+  call psb_erractionrestore(err_act)
+
+  if (err_act == psb_act_abort_) then
+    call psb_error()
+    return
+  end if
+  return
+
+end subroutine psb_d_rowsum
+
+subroutine psb_d_arwsum(d,a,info)
+  use psb_d_mat_mod, psb_protect_name => psb_d_arwsum
+  use psb_error_mod
+  use psb_const_mod
+  implicit none 
+  class(psb_d_sparse_mat), intent(in) :: a
+  real(psb_dpk_), intent(out)          :: d(:)
+  integer, intent(out)                 :: info
+
+  Integer :: err_act
+  character(len=20)  :: name='arwsum'
+  logical, parameter :: debug=.false.
+
+  call psb_erractionsave(err_act)
+  if (.not.allocated(a%a)) then 
+    info = 1121
+    call psb_errpush(info,name)
+    goto 9999
+  endif
+
+  call a%a%arwsum(d)
+  if (info /= psb_success_) goto 9999
+
+  call psb_erractionrestore(err_act)
+  return
+
+9999 continue
+  call psb_erractionrestore(err_act)
+
+  if (err_act == psb_act_abort_) then
+    call psb_error()
+    return
+  end if
+  return
+
+end subroutine psb_d_arwsum
+
+subroutine psb_d_colsum(d,a,info)
+  use psb_d_mat_mod, psb_protect_name => psb_d_colsum
+  use psb_error_mod
+  use psb_const_mod
+  implicit none 
+  class(psb_d_sparse_mat), intent(in) :: a
+  real(psb_dpk_), intent(out)          :: d(:)
+  integer, intent(out)                 :: info
+
+  Integer :: err_act
+  character(len=20)  :: name='colsum'
+  logical, parameter :: debug=.false.
+
+  call psb_erractionsave(err_act)
+  if (.not.allocated(a%a)) then 
+    info = 1121
+    call psb_errpush(info,name)
+    goto 9999
+  endif
+
+  call a%a%colsum(d)
+  if (info /= psb_success_) goto 9999
+
+  call psb_erractionrestore(err_act)
+  return
+
+9999 continue
+  call psb_erractionrestore(err_act)
+
+  if (err_act == psb_act_abort_) then
+    call psb_error()
+    return
+  end if
+  return
+
+end subroutine psb_d_colsum
+
+subroutine psb_d_aclsum(d,a,info)
+  use psb_d_mat_mod, psb_protect_name => psb_d_aclsum
+  use psb_error_mod
+  use psb_const_mod
+  implicit none 
+  class(psb_d_sparse_mat), intent(in) :: a
+  real(psb_dpk_), intent(out)          :: d(:)
+  integer, intent(out)                 :: info
+
+  Integer :: err_act
+  character(len=20)  :: name='aclsum'
+  logical, parameter :: debug=.false.
+
+  call psb_erractionsave(err_act)
+  if (.not.allocated(a%a)) then 
+    info = 1121
+    call psb_errpush(info,name)
+    goto 9999
+  endif
+
+  call a%a%aclsum(d)
+  if (info /= psb_success_) goto 9999
+
+  call psb_erractionrestore(err_act)
+  return
+
+9999 continue
+  call psb_erractionrestore(err_act)
+
+  if (err_act == psb_act_abort_) then
+    call psb_error()
+    return
+  end if
+  return
+
+end subroutine psb_d_aclsum
+
 subroutine psb_d_get_diag(a,d,info)
   use psb_d_mat_mod, psb_protect_name => psb_d_get_diag
   use psb_error_mod

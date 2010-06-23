@@ -87,6 +87,11 @@ module psb_d_mat_mod
     ! Computational routines 
     procedure, pass(a) :: get_diag => psb_d_get_diag
     procedure, pass(a) :: csnmi    => psb_d_csnmi
+    procedure, pass(a) :: csnm1    => psb_d_csnm1
+    procedure, pass(a) :: rowsum   => psb_d_rowsum
+    procedure, pass(a) :: arwsum   => psb_d_arwsum
+    procedure, pass(a) :: colsum   => psb_d_colsum
+    procedure, pass(a) :: aclsum   => psb_d_aclsum
     procedure, pass(a) :: d_csmv   => psb_d_csmv
     procedure, pass(a) :: d_csmm   => psb_d_csmm
     generic, public    :: csmm => d_csmm, d_csmv
@@ -101,8 +106,8 @@ module psb_d_mat_mod
 
   private :: psb_d_get_nrows, psb_d_get_ncols, psb_d_get_nzeros, psb_d_get_size, &
        & psb_d_get_state, psb_d_get_dupl, psb_d_is_null, psb_d_is_bld, psb_d_is_upd, &
-       & psb_d_is_asb, psb_d_is_sorted, psb_d_is_upper, psb_d_is_lower, psb_d_is_triangle,&
-       & psb_d_get_nz_row
+       & psb_d_is_asb, psb_d_is_sorted, psb_d_is_upper, psb_d_is_lower,&
+       & psb_d_is_triangle, psb_d_get_nz_row
 
   interface psb_sizeof
     module procedure psb_d_sizeof
@@ -566,6 +571,47 @@ module psb_d_mat_mod
       real(psb_dpk_)         :: res
     end function psb_d_csnmi
   end interface
+  
+  interface 
+    function psb_d_csnm1(a) result(res)
+      import psb_d_sparse_mat, psb_dpk_
+      class(psb_d_sparse_mat), intent(in) :: a
+      real(psb_dpk_)         :: res
+    end function psb_d_csnm1
+  end interface
+
+  interface 
+    subroutine psb_d_rowsum(d,a) 
+      import psb_d_sparse_mat, psb_dpk_
+      class(psb_d_sparse_mat), intent(in) :: a
+      real(psb_dpk_), intent(out)         :: d(:)
+    end subroutine psb_d_rowsum
+  end interface
+
+  interface 
+    subroutine psb_d_arwsum(d,a) 
+      import psb_d_sparse_mat, psb_dpk_
+      class(psb_d_sparse_mat), intent(in) :: a
+      real(psb_dpk_), intent(out)         :: d(:)
+    end subroutine psb_d_arwsum
+  end interface
+  
+  interface 
+    subroutine psb_d_colsum(d,a) 
+      import psb_d_sparse_mat, psb_dpk_
+      class(psb_d_sparse_mat), intent(in) :: a
+      real(psb_dpk_), intent(out)         :: d(:)
+    end subroutine psb_d_colsum
+  end interface
+
+  interface 
+    subroutine psb_d_aclsum(d,a) 
+      import psb_d_sparse_mat, psb_dpk_
+      class(psb_d_sparse_mat), intent(in) :: a
+      real(psb_dpk_), intent(out)         :: d(:)
+    end subroutine psb_d_aclsum
+  end interface
+  
 
   interface 
     subroutine psb_d_get_diag(a,d,info)

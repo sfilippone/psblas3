@@ -34,34 +34,37 @@
 ! Function: psb_dnrmi
 !    Forms the approximated norm of a sparse matrix,       
 !
-!    normi := max(sum(abs(A(i,:))))                                                 
+!    norm1 := max(sum(abs(A(:,j))))                                                 
 !
 ! Arguments:
 !    a      -  type(psb_dspmat_type).   The sparse matrix containing A.
 !    desc_a -  type(psb_desc_type).     The communication descriptor.
 !    info   -  integer.                   Return code
 !
-function psb_dnrmi(a,desc_a,info)  
-  use psb_descriptor_type
-  use psb_serial_mod
-  use psb_check_mod
-  use psb_error_mod
-  use psb_penv_mod
-  use psb_mat_mod
+function psb_dspnrm1(a,desc_a,info)  
+!!$  use psb_descriptor_type
+!!$  use psb_serial_mod
+!!$  use psb_check_mod
+!!$  use psb_error_mod
+!!$  use psb_penv_mod
+!!$  use psb_mat_mod
+!!$  use psb_tools_mod
+  use psb_sparse_mod, psb_protect_name => psb_dspnrm1
   implicit none
 
   type(psb_d_sparse_mat), intent(in) :: a
   integer, intent(out)               :: info
   type(psb_desc_type), intent(in)    :: desc_a
-  real(psb_dpk_)                     :: psb_dnrmi
+  real(psb_dpk_)                     :: psb_dspnrm1
 
   ! locals
-  integer                  :: ictxt, np, me,&
+  integer                  :: ictxt, np, me, nr,nc,&
        & err_act, n, iia, jja, ia, ja, mdim, ndim, m
-  real(psb_dpk_)         :: nrmi
+  real(psb_dpk_)         :: nrm1
   character(len=20)      :: name, ch_err
+  real(psb_dpk_), allocatable :: v(:)
 
-  name='psb_dnrmi'
+  name='psb_dnrm1'
   if(psb_get_errstatus() /= 0) return 
   info=psb_success_
   call psb_erractionsave(err_act)
@@ -79,6 +82,8 @@ function psb_dnrmi(a,desc_a,info)
   ja = 1
   m = psb_cd_get_global_rows(desc_a)
   n = psb_cd_get_global_cols(desc_a)
+  nr = psb_cd_get_local_rows(desc_a)
+  nc = psb_cd_get_local_cols(desc_a)
 
   call psb_chkmat(m,n,ia,ja,desc_a,info,iia,jja)
   if(info /= psb_success_) then
@@ -94,21 +99,35 @@ function psb_dnrmi(a,desc_a,info)
     goto 9999
   end if
 
+  call psb_geall(v,desc_a,info)
+  if(info == psb_success_) then 
+    v = dzero
+    call psb_geasb(v,desc_a,info)
+  end if
+  if(info /= psb_success_) then
+    info=psb_err_from_subroutine_
+    ch_err='geall/asb'
+    call psb_errpush(info,name,a_err=ch_err)
+    goto 9999
+  end if
+  
   if ((m /= 0).and.(n /= 0)) then
-    nrmi = a%csnmi()
+    call a%aclsum(v)
+    call psb_halo(v,desc_a,info,tran='T')
     if(info /= psb_success_) then
       info=psb_err_from_subroutine_
-      ch_err='psb_csnmi'
+      ch_err='psb_halo'
       call psb_errpush(info,name,a_err=ch_err)
       goto 9999
     end if
+    nrm1 = maxval(v(1:nr))
   else
-    nrmi = 0.d0
+    nrm1 = 0.d0
   end if
   ! compute global max
-  call psb_amx(ictxt, nrmi)
+  call psb_amx(ictxt, nrm1)
 
-  psb_dnrmi = nrmi
+  psb_dspnrm1 = nrm1
 
   call psb_erractionrestore(err_act)
   return  
@@ -121,4 +140,4 @@ function psb_dnrmi(a,desc_a,info)
     return
   end if
   return
-end function psb_dnrmi
+end function psb_dspnrm1

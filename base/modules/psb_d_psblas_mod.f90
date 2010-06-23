@@ -201,6 +201,17 @@ module psb_d_psblas_mod
     end function psb_dnrmi
   end interface
 
+  interface psb_spnrm1
+    function psb_dspnrm1(a, desc_a,info)
+      use psb_descriptor_type, only : psb_desc_type, psb_spk_, psb_dpk_
+      use psb_mat_mod, only : psb_d_sparse_mat
+      real(psb_dpk_)                      :: psb_dspnrm1
+      type(psb_d_sparse_mat), intent (in) :: a
+      type(psb_desc_type), intent (in)    :: desc_a
+      integer, intent(out)                :: info
+    end function psb_dspnrm1
+  end interface
+
   interface psb_spmm
     subroutine psb_dspmm(alpha, a, x, beta, y, desc_a, info,&
          &trans, k, jx, jy,work,doswap)

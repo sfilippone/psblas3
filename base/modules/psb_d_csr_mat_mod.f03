@@ -19,6 +19,11 @@ module psb_d_csr_mat_mod
     procedure, pass(a) :: d_scals      => psb_d_csr_scals
     procedure, pass(a) :: d_scal       => psb_d_csr_scal
     procedure, pass(a) :: csnmi        => psb_d_csr_csnmi
+    procedure, pass(a) :: csnm1        => psb_d_csr_csnm1
+    procedure, pass(a) :: rowsum       => psb_d_csr_rowsum
+    procedure, pass(a) :: arwsum       => psb_d_csr_arwsum
+    procedure, pass(a) :: colsum       => psb_d_csr_colsum
+    procedure, pass(a) :: aclsum       => psb_d_csr_aclsum
     procedure, pass(a) :: reallocate_nz => psb_d_csr_reallocate_nz
     procedure, pass(a) :: allocate_mnnz => psb_d_csr_allocate_mnnz
     procedure, pass(a) :: cp_to_coo    => psb_d_cp_csr_to_coo
@@ -288,6 +293,46 @@ module psb_d_csr_mat_mod
     end function psb_d_csr_csnmi
   end interface
   
+  interface 
+    function psb_d_csr_csnm1(a) result(res)
+      import psb_d_csr_sparse_mat, psb_dpk_
+      class(psb_d_csr_sparse_mat), intent(in) :: a
+      real(psb_dpk_)         :: res
+    end function psb_d_csr_csnm1
+  end interface
+
+  interface 
+    subroutine psb_d_csr_rowsum(d,a) 
+      import psb_d_csr_sparse_mat, psb_dpk_
+      class(psb_d_csr_sparse_mat), intent(in) :: a
+      real(psb_dpk_), intent(out)              :: d(:)
+    end subroutine psb_d_csr_rowsum
+  end interface
+
+  interface 
+    subroutine psb_d_csr_arwsum(d,a) 
+      import psb_d_csr_sparse_mat, psb_dpk_
+      class(psb_d_csr_sparse_mat), intent(in) :: a
+      real(psb_dpk_), intent(out)              :: d(:)
+    end subroutine psb_d_csr_arwsum
+  end interface
+  
+  interface 
+    subroutine psb_d_csr_colsum(d,a) 
+      import psb_d_csr_sparse_mat, psb_dpk_
+      class(psb_d_csr_sparse_mat), intent(in) :: a
+      real(psb_dpk_), intent(out)              :: d(:)
+    end subroutine psb_d_csr_colsum
+  end interface
+
+  interface 
+    subroutine psb_d_csr_aclsum(d,a) 
+      import psb_d_csr_sparse_mat, psb_dpk_
+      class(psb_d_csr_sparse_mat), intent(in) :: a
+      real(psb_dpk_), intent(out)              :: d(:)
+    end subroutine psb_d_csr_aclsum
+  end interface
+    
   interface 
     subroutine psb_d_csr_get_diag(a,d,info) 
       import psb_d_csr_sparse_mat, psb_dpk_

@@ -121,6 +121,7 @@ module psb_const_mod
   integer, parameter, public :: psb_err_iarg_pos_=20
   integer, parameter, public :: psb_err_input_value_invalid_i_=30
   integer, parameter, public :: psb_err_input_asize_invalid_i_=35
+  integer, parameter, public :: psb_err_input_asize_small_i_=36
   integer, parameter, public :: psb_err_iarg_invalid_i_=40
   integer, parameter, public :: psb_err_iarg_not_gtia_ii_=50
   integer, parameter, public :: psb_err_iarg_not_gteia_ii_=60
