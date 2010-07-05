@@ -36,7 +36,7 @@ lib:  $(BASIC_MODS) penvmod  $(UTIL_MODS)  $(OBJS)  $(LIBMOD)
 
 
 psi_penv_mod.o: psi_comm_buffers_mod.o psb_const_mod.o psb_realloc_mod.o 
-psi_bcast_mod.o psi_reduce_mod.o psi_p2p_mod.o penvmod.o: psi_penv_mod.o	
+psi_bcast_mod.o psi_reduce_mod.o psi_p2p_mod.o: psi_penv_mod.o	
 psb_penv_mod.o: psi_bcast_mod.o psi_reduce_mod.o psi_p2p_mod.o 
 
 psb_base_mat_mod.o: psb_string_mod.o psb_sort_mod.o psb_ip_reord_mod.o\

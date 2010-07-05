@@ -5,7 +5,8 @@
 # These lines are quite portable.
 .mod=@MODEXT@
 .fh=.fh
-.SUFFIXES: .f90 $(.mod) .F90 .F .f03 .F03
+.SUFFIXES: 
+.SUFFIXES: .f90 .F90 .f .F .f03 .F03 .c .o
 
 
 # The following ones are the variables used by the PSBLAS make scripts.

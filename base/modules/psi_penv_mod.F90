@@ -246,7 +246,7 @@ contains
 #ifdef MPI_H
     include 'mpif.h'
 #endif
-    integer, intent(in) :: ictxt
+    integer, intent(inout) :: ictxt
     logical, intent(in), optional :: close
     logical  :: close_
     integer  :: info
