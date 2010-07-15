@@ -15,10 +15,7 @@ FINCLUDES=$(FMFLAG)$(LIBDIR) $(FMFLAG).
 
 EXEDIR=./runs
 
-all: d_coo_matgen d_matgen d_coo_err
-d_coo_err: d_coo_err.o
-	$(F90LINK) d_coo_err.o  -o d_coo_err  $(PSBLAS_LIB) $(LDLIBS)
-	/bin/mv d_coo_err $(EXEDIR)	
+all: d_coo_matgen d_matgen 
 d_coo_matgen: d_coo_matgen.o
 	$(F90LINK) d_coo_matgen.o  -o d_coo_matgen  $(PSBLAS_LIB) $(LDLIBS)
 	/bin/mv d_coo_matgen $(EXEDIR)	
