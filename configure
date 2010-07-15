@@ -5596,9 +5596,6 @@ if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
 else
   echo "configure: failed program was:" >&5
   cat conftest.$ac_ext >&5
-  rm -rf conftest*
-
-
 fi
 rm -f conftest*
 

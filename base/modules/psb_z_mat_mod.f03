@@ -10,24 +10,24 @@ module psb_z_mat_mod
 
   contains
     ! Getters
-    procedure, pass(a) :: get_nrows => psb_z_get_nrows
-    procedure, pass(a) :: get_ncols => psb_z_get_ncols
-    procedure, pass(a) :: get_nzeros => psb_z_get_nzeros
-    procedure, pass(a) :: get_nz_row => psb_z_get_nz_row
-    procedure, pass(a) :: get_size => psb_z_get_size
-    procedure, pass(a) :: get_state => psb_z_get_state
-    procedure, pass(a) :: get_dupl => psb_z_get_dupl
-    procedure, pass(a) :: is_null => psb_z_is_null
-    procedure, pass(a) :: is_bld => psb_z_is_bld
-    procedure, pass(a) :: is_upd => psb_z_is_upd
-    procedure, pass(a) :: is_asb => psb_z_is_asb
-    procedure, pass(a) :: is_sorted => psb_z_is_sorted
-    procedure, pass(a) :: is_upper => psb_z_is_upper
-    procedure, pass(a) :: is_lower => psb_z_is_lower
+    procedure, pass(a) :: get_nrows   => psb_z_get_nrows
+    procedure, pass(a) :: get_ncols   => psb_z_get_ncols
+    procedure, pass(a) :: get_nzeros  => psb_z_get_nzeros
+    procedure, pass(a) :: get_nz_row  => psb_z_get_nz_row
+    procedure, pass(a) :: get_size    => psb_z_get_size
+    procedure, pass(a) :: get_state   => psb_z_get_state
+    procedure, pass(a) :: get_dupl    => psb_z_get_dupl
+    procedure, pass(a) :: is_null     => psb_z_is_null
+    procedure, pass(a) :: is_bld      => psb_z_is_bld
+    procedure, pass(a) :: is_upd      => psb_z_is_upd
+    procedure, pass(a) :: is_asb      => psb_z_is_asb
+    procedure, pass(a) :: is_sorted   => psb_z_is_sorted
+    procedure, pass(a) :: is_upper    => psb_z_is_upper
+    procedure, pass(a) :: is_lower    => psb_z_is_lower
     procedure, pass(a) :: is_triangle => psb_z_is_triangle
-    procedure, pass(a) :: is_unit => psb_z_is_unit
-    procedure, pass(a) :: get_fmt => psb_z_get_fmt
-    procedure, pass(a) :: sizeof => psb_z_sizeof
+    procedure, pass(a) :: is_unit     => psb_z_is_unit
+    procedure, pass(a) :: get_fmt     => psb_z_get_fmt
+    procedure, pass(a) :: sizeof      => psb_z_sizeof
 
     ! Setters
     procedure, pass(a) :: set_nrows    => psb_z_set_nrows
@@ -45,42 +45,42 @@ module psb_z_mat_mod
     procedure, pass(a) :: set_unit     => psb_z_set_unit
 
     ! Memory/data management 
-    procedure, pass(a) :: csall => psb_z_csall
-    procedure, pass(a) :: free => psb_z_free
-    procedure, pass(a) :: trim => psb_z_trim
-    procedure, pass(a) :: csput  => psb_z_csput 
-    procedure, pass(a) :: z_csgetptn => psb_z_csgetptn
-    procedure, pass(a) :: z_csgetrow => psb_z_csgetrow
-    procedure, pass(a) :: z_csgetblk => psb_z_csgetblk
-    generic, public    :: csget => z_csgetptn, z_csgetrow, z_csgetblk 
-    procedure, pass(a) :: z_csclip   => psb_z_csclip
-    procedure, pass(a) :: z_b_csclip => psb_z_b_csclip
-    generic, public    :: csclip => z_b_csclip, z_csclip
-    procedure, pass(a) :: z_clip_d_ip => psb_z_clip_d_ip
-    procedure, pass(a) :: z_clip_d    => psb_z_clip_d
-    generic, public    :: clip_diag => z_clip_d_ip, z_clip_d
-    procedure, pass(a) :: reall => psb_z_reallocate_nz
-    procedure, pass(a) :: get_neigh    => psb_z_get_neigh
-    procedure, pass(a) :: z_cscnv      => psb_z_cscnv
-    procedure, pass(a) :: z_cscnv_ip   => psb_z_cscnv_ip
-    procedure, pass(a) :: z_cscnv_base => psb_z_cscnv_base
-    generic, public    :: cscnv => z_cscnv, z_cscnv_ip, z_cscnv_base
-    procedure, pass(a) :: reinit => psb_z_reinit
-    procedure, pass(a) :: print  => psb_z_sparse_print
-    procedure, pass(a) :: z_mv_from => psb_z_mv_from
-    generic, public    :: mv_from => z_mv_from
-    procedure, pass(a) :: z_mv_to => psb_z_mv_to
-    generic, public    :: mv_to => z_mv_to
-    procedure, pass(a) :: z_cp_from => psb_z_cp_from
-    generic, public    :: cp_from => z_cp_from
-    procedure, pass(a) :: z_cp_to => psb_z_cp_to
-    generic, public    :: cp_to => z_cp_to
+    procedure, pass(a) :: csall         => psb_z_csall
+    procedure, pass(a) :: free          => psb_z_free
+    procedure, pass(a) :: trim          => psb_z_trim
+    procedure, pass(a) :: csput         => psb_z_csput 
+    procedure, pass(a) :: z_csgetptn    => psb_z_csgetptn
+    procedure, pass(a) :: z_csgetrow    => psb_z_csgetrow
+    procedure, pass(a) :: z_csgetblk    => psb_z_csgetblk
+    generic, public    :: csget         => z_csgetptn, z_csgetrow, z_csgetblk 
+    procedure, pass(a) :: z_csclip      => psb_z_csclip
+    procedure, pass(a) :: z_b_csclip    => psb_z_b_csclip
+    generic, public    :: csclip        => z_b_csclip, z_csclip
+    procedure, pass(a) :: z_clip_d_ip   => psb_z_clip_d_ip
+    procedure, pass(a) :: z_clip_d      => psb_z_clip_d
+    generic, public    :: clip_diag     => z_clip_d_ip, z_clip_d
+    procedure, pass(a) :: reall         => psb_z_reallocate_nz
+    procedure, pass(a) :: get_neigh     => psb_z_get_neigh
+    procedure, pass(a) :: z_cscnv       => psb_z_cscnv
+    procedure, pass(a) :: z_cscnv_ip    => psb_z_cscnv_ip
+    procedure, pass(a) :: z_cscnv_base  => psb_z_cscnv_base
+    generic, public    :: cscnv         => z_cscnv, z_cscnv_ip, z_cscnv_base
+    procedure, pass(a) :: reinit        => psb_z_reinit
+    procedure, pass(a) :: print         => psb_z_sparse_print
+    procedure, pass(a) :: z_mv_from     => psb_z_mv_from
+    generic, public    :: mv_from       => z_mv_from
+    procedure, pass(a) :: z_mv_to       => psb_z_mv_to
+    generic, public    :: mv_to         => z_mv_to
+    procedure, pass(a) :: z_cp_from     => psb_z_cp_from
+    generic, public    :: cp_from       => z_cp_from
+    procedure, pass(a) :: z_cp_to       => psb_z_cp_to
+    generic, public    :: cp_to         => z_cp_to
     procedure, pass(a) :: z_transp_1mat => psb_z_transp_1mat
     procedure, pass(a) :: z_transp_2mat => psb_z_transp_2mat
-    generic, public    :: transp => z_transp_1mat, z_transp_2mat
+    generic, public    :: transp        => z_transp_1mat, z_transp_2mat
     procedure, pass(a) :: z_transc_1mat => psb_z_transc_1mat
     procedure, pass(a) :: z_transc_2mat => psb_z_transc_2mat
-    generic, public    :: transc => z_transc_1mat, z_transc_2mat
+    generic, public    :: transc        => z_transc_1mat, z_transc_2mat
 
     
     
@@ -89,13 +89,13 @@ module psb_z_mat_mod
     procedure, pass(a) :: csnmi    => psb_z_csnmi
     procedure, pass(a) :: z_csmv   => psb_z_csmv
     procedure, pass(a) :: z_csmm   => psb_z_csmm
-    generic, public    :: csmm => z_csmm, z_csmv
+    generic, public    :: csmm     => z_csmm, z_csmv
     procedure, pass(a) :: z_scals  => psb_z_scals
     procedure, pass(a) :: z_scal   => psb_z_scal
-    generic, public    :: scal  => z_scals, z_scal 
+    generic, public    :: scal     => z_scals, z_scal 
     procedure, pass(a) :: z_cssv   => psb_z_cssv
     procedure, pass(a) :: z_cssm   => psb_z_cssm
-    generic, public    :: cssm => z_cssm, z_cssv
+    generic, public    :: cssm     => z_cssm, z_cssv
 
   end type psb_z_sparse_mat
 

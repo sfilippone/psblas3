@@ -210,8 +210,7 @@ dnl Do we use gfortran & co ? Compiler identification.
 dnl NOTE : in /autoconf/autoconf/fortran.m4 there are plenty of better tests!
 
 PAC_CHECK_HAVE_GFORTRAN(
-		psblas_cv_fc="gcc",
-	[]
+	[psblas_cv_fc="gcc"],
 )
 
 if test x"$psblas_cv_fc" == "x" ; then
