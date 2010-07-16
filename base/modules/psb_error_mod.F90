@@ -428,6 +428,8 @@ contains
       write(psb_err_unit,&
            & '("Base class method ",a," called: the class for ",a," is missing an overriding implementation")')&
            &  trim(r_name), trim(a_e_d)
+    case (psb_err_invalid_mat_state_)
+      write(psb_err_unit,'("Invalid state for sparse matrix")')
     case (psb_err_invalid_cd_state_)
       write(psb_err_unit,'("Invalid state for communication descriptor")')
     case (psb_err_invalid_a_and_cd_state_)

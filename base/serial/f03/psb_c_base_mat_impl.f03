@@ -689,7 +689,7 @@ subroutine psb_c_base_cssm(alpha,a,x,beta,y,info,trans,scale,d)
   call psb_erractionsave(err_act)
 
   if (.not.a%is_asb()) then 
-    info = 1121
+    info = psb_err_invalid_mat_state_
     call psb_errpush(info,name)
     goto 9999
   endif
@@ -709,7 +709,7 @@ subroutine psb_c_base_cssm(alpha,a,x,beta,y,info,trans,scale,d)
   end if
 
   if (.not. (a%is_triangle())) then 
-    info = 1121
+    info = psb_err_invalid_mat_state_
     call psb_errpush(info,name)
     goto 9999
   end if
@@ -825,7 +825,7 @@ subroutine psb_c_base_cssv(alpha,a,x,beta,y,info,trans,scale,d)
   call psb_erractionsave(err_act)
 
   if (.not.a%is_asb()) then
-    info = 1121
+    info = psb_err_invalid_mat_state_
     call psb_errpush(info,name)
     goto 9999
   endif
@@ -845,7 +845,7 @@ subroutine psb_c_base_cssv(alpha,a,x,beta,y,info,trans,scale,d)
   end if
 
   if (.not. (a%is_triangle())) then 
-    info = 1121
+    info = psb_err_invalid_mat_state_
     call psb_errpush(info,name)
     goto 9999
   end if

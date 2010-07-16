@@ -41,7 +41,7 @@ subroutine d_cxx_csmv_impl(alpha,a,x,beta,y,info,trans)
   end if
 
   if (.not.a%is_asb()) then 
-    info = 1121
+    info = psb_err_invalid_mat_state_
     call psb_errpush(info,name)
     goto 9999
   endif
@@ -326,7 +326,7 @@ subroutine d_cxx_csmm_impl(alpha,a,x,beta,y,info,trans)
   end if
 
   if (.not.a%is_asb()) then 
-    info = 1121
+    info = psb_err_invalid_mat_state_
     call psb_errpush(info,name)
     goto 9999
   endif
@@ -615,7 +615,7 @@ subroutine d_cxx_cssv_impl(alpha,a,x,beta,y,info,trans)
     trans_ = 'N'
   end if
   if (.not.a%is_asb()) then 
-    info = 1121
+    info = psb_err_invalid_mat_state_
     call psb_errpush(info,name)
     goto 9999
   endif
@@ -624,7 +624,7 @@ subroutine d_cxx_cssv_impl(alpha,a,x,beta,y,info,trans)
   m = a%get_nrows()
 
   if (.not. (a%is_triangle())) then 
-    info = 1121
+    info = psb_err_invalid_mat_state_
     call psb_errpush(info,name)
     goto 9999
   end if
@@ -832,7 +832,7 @@ subroutine d_cxx_cssm_impl(alpha,a,x,beta,y,info,trans)
     trans_ = 'N'
   end if
   if (.not.a%is_asb()) then 
-    info = 1121
+    info = psb_err_invalid_mat_state_
     call psb_errpush(info,name)
     goto 9999
   endif
@@ -844,7 +844,7 @@ subroutine d_cxx_cssm_impl(alpha,a,x,beta,y,info,trans)
   nc  = min(size(x,2) , size(y,2)) 
 
   if (.not. (a%is_triangle())) then 
-    info = 1121
+    info = psb_err_invalid_mat_state_
     call psb_errpush(info,name)
     goto 9999
   end if
@@ -1439,7 +1439,7 @@ subroutine d_cxx_csput_impl(nz,ia,ja,val,a,imin,imax,jmin,jmax,info,gtl)
 
   if (a%is_bld()) then 
     ! Build phase should only ever be in COO
-    info = 1121
+    info = psb_err_invalid_mat_state_
 
   else  if (a%is_upd()) then 
     call  d_cxx_srch_upd(nz,ia,ja,val,a,&
@@ -1447,12 +1447,12 @@ subroutine d_cxx_csput_impl(nz,ia,ja,val,a,imin,imax,jmin,jmax,info,gtl)
     
     if (info /= psb_success_) then  
 
-      info = 1121
+      info = psb_err_invalid_mat_state_
     end if
 
   else 
     ! State is wrong.
-    info = 1121
+    info = psb_err_invalid_mat_state_
   end if
   if (info /= psb_success_) then
     call psb_errpush(info,name)

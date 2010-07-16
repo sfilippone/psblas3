@@ -2913,12 +2913,7 @@ Contains
     info=psb_success_
 #ifdef HAVE_MOVE_ALLOC    
     
-    if (allocated(vin)) then 
       call move_alloc(vin,vout)
-    else if (allocated(vout)) then 
-!!$      write(psb_err_unit,*) 'move_alloc: Clearing output'
-      deallocate(vout)
-    end if
 
 #else      
     if (allocated(vout)) then 
@@ -2940,11 +2935,9 @@ Contains
     ! 
     info=psb_success_
 #ifdef HAVE_MOVE_ALLOC
-    if (allocated(vin)) then 
+
       call move_alloc(vin,vout)
-    else if (allocated(vout)) then 
-      deallocate(vout)
-    end if
+
 #else
     if (allocated(vout)) then 
       deallocate(vout,stat=info)
@@ -2968,12 +2961,7 @@ Contains
     info=psb_success_
 #ifdef HAVE_MOVE_ALLOC    
     
-    if (allocated(vin)) then 
       call move_alloc(vin,vout)
-    else if (allocated(vout)) then 
-!!$      write(psb_err_unit,*) 'move_alloc: Clearing output'
-      deallocate(vout)
-    end if
 
 #else      
     if (allocated(vout)) then 
@@ -2995,11 +2983,9 @@ Contains
     ! 
     info=psb_success_
 #ifdef HAVE_MOVE_ALLOC
-    if (allocated(vin)) then 
+
       call move_alloc(vin,vout)
-    else if (allocated(vout)) then 
-      deallocate(vout)
-    end if
+
 #else
     if (allocated(vout)) then 
       deallocate(vout,stat=info)
@@ -3022,11 +3008,9 @@ Contains
     ! 
     info=psb_success_
 #ifdef HAVE_MOVE_ALLOC
-    if (allocated(vin)) then 
+
       call move_alloc(vin,vout)
-    else if (allocated(vout)) then 
-      deallocate(vout)
-    end if
+
 #else
     if (allocated(vout)) then 
       deallocate(vout,stat=info)
@@ -3047,11 +3031,9 @@ Contains
     ! 
     info=psb_success_
 #ifdef HAVE_MOVE_ALLOC
-    if (allocated(vin)) then 
+
       call move_alloc(vin,vout)
-    else if (allocated(vout)) then 
-      deallocate(vout)
-    end if
+
 #else
     if (allocated(vout)) then 
       deallocate(vout,stat=info)
@@ -3074,11 +3056,9 @@ Contains
     ! 
     info=psb_success_
 #ifdef HAVE_MOVE_ALLOC
-    if (allocated(vin)) then 
+
       call move_alloc(vin,vout)
-    else if (allocated(vout)) then 
-      deallocate(vout)
-    end if
+
 #else
     if (allocated(vout)) then 
       deallocate(vout,stat=info)
@@ -3099,11 +3079,9 @@ Contains
     ! 
     info=psb_success_
 #ifdef HAVE_MOVE_ALLOC
-    if (allocated(vin)) then 
+
       call move_alloc(vin,vout)
-    else if (allocated(vout)) then 
-      deallocate(vout)
-    end if
+
 #else
     if (allocated(vout)) then 
       deallocate(vout,stat=info)
@@ -3126,12 +3104,9 @@ Contains
     ! 
     info=psb_success_
 #ifdef HAVE_MOVE_ALLOC
-    if (allocated(vin)) then 
+
       call move_alloc(vin,vout)
-    else if (allocated(vout)) then 
-!!$      write(psb_err_unit,*) 'move_alloc: Clearing output'
-      deallocate(vout)
-    end if
+
 #else
     if (allocated(vout)) then 
       deallocate(vout,stat=info)
@@ -3152,11 +3127,9 @@ Contains
     ! 
     info=psb_success_
 #ifdef HAVE_MOVE_ALLOC
-    if (allocated(vin)) then 
+
       call move_alloc(vin,vout)
-    else if (allocated(vout)) then 
-      deallocate(vout)
-    end if
+
 #else
     if (allocated(vout)) then 
       deallocate(vout,stat=info)
@@ -3180,12 +3153,9 @@ Contains
     ! 
     info=psb_success_
 #ifdef HAVE_MOVE_ALLOC
-    if (allocated(vin)) then 
+
       call move_alloc(vin,vout)
-    else if (allocated(vout)) then 
-!!$      write(psb_err_unit,*) 'move_alloc: Clearing output'
-      deallocate(vout)
-    end if
+
 #else
     if (allocated(vout)) then 
       deallocate(vout,stat=info)
@@ -3206,11 +3176,9 @@ Contains
     ! 
     info=psb_success_
 #ifdef HAVE_MOVE_ALLOC
-    if (allocated(vin)) then 
+
       call move_alloc(vin,vout)
-    else if (allocated(vout)) then 
-      deallocate(vout)
-    end if
+
 #else
     if (allocated(vout)) then 
       deallocate(vout,stat=info)

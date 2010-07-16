@@ -17,10 +17,10 @@ EXEDIR=./runs
 
 all: d_coo_matgen d_matgen 
 d_coo_matgen: d_coo_matgen.o
-	$(F90LINK) d_coo_matgen.o  -o d_coo_matgen  $(PSBLAS_LIB) $(LDLIBS)
+	$(F90LINK) $(LINKOPT) d_coo_matgen.o  -o d_coo_matgen  $(PSBLAS_LIB) $(LDLIBS)
 	/bin/mv d_coo_matgen $(EXEDIR)	
 d_matgen: d_matgen.o psb_d_cxx_mat_mod.o psb_d_cxx_impl.o
-	$(F90LINK) d_matgen.o psb_d_cxx_mat_mod.o psb_d_cxx_impl.o -o d_matgen  $(PSBLAS_LIB) $(LDLIBS)
+	$(F90LINK) $(LINKOPT) d_matgen.o psb_d_cxx_mat_mod.o psb_d_cxx_impl.o -o d_matgen  $(PSBLAS_LIB) $(LDLIBS)
 	/bin/mv d_matgen $(EXEDIR)	
 d_matgen.o: psb_d_cxx_mat_mod.o 
 

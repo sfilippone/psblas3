@@ -54,7 +54,7 @@ subroutine psb_dnumbmm(a,b,c)
   info = psb_success_
 
   if ((a%is_null()) .or.(b%is_null()).or.(c%is_null())) then
-    info = 1121
+    info = psb_err_invalid_mat_state_
     call psb_errpush(info,name)
     goto 9999
   endif
@@ -63,7 +63,7 @@ subroutine psb_dnumbmm(a,b,c)
   type is (psb_d_csr_sparse_mat)
     call psb_numbmm(a%a,b%a,aa)
   class default
-    info = 1121
+    info = psb_err_invalid_mat_state_
     call psb_errpush(info,name)
     goto 9999
   end select

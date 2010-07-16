@@ -41,7 +41,7 @@ subroutine psb_z_csc_csmv(alpha,a,x,beta,y,info,trans)
   end if
 
   if (.not.a%is_asb()) then 
-    info = 1121
+    info = psb_err_invalid_mat_state_
     call psb_errpush(info,name)
     goto 9999
   endif
@@ -457,7 +457,7 @@ subroutine psb_z_csc_csmm(alpha,a,x,beta,y,info,trans)
   end if
 
   if (.not.a%is_asb()) then 
-    info = 1121
+    info = psb_err_invalid_mat_state_
     call psb_errpush(info,name)
     goto 9999
   endif
@@ -879,7 +879,7 @@ subroutine psb_z_csc_cssv(alpha,a,x,beta,y,info,trans)
     trans_ = 'N'
   end if
   if (.not.a%is_asb()) then 
-    info = 1121
+    info = psb_err_invalid_mat_state_
     call psb_errpush(info,name)
     goto 9999
   endif
@@ -890,7 +890,7 @@ subroutine psb_z_csc_cssv(alpha,a,x,beta,y,info,trans)
   m = a%get_nrows()
 
   if (.not. (a%is_triangle())) then 
-    info = 1121
+    info = psb_err_invalid_mat_state_
     call psb_errpush(info,name)
     goto 9999
   end if
@@ -1145,7 +1145,7 @@ subroutine psb_z_csc_cssm(alpha,a,x,beta,y,info,trans)
     trans_ = 'N'
   end if
   if (.not.a%is_asb()) then 
-    info = 1121
+    info = psb_err_invalid_mat_state_
     call psb_errpush(info,name)
     goto 9999
   endif
@@ -1171,7 +1171,7 @@ subroutine psb_z_csc_cssm(alpha,a,x,beta,y,info,trans)
 
 
   if (.not. (a%is_triangle())) then 
-    info = 1121
+    info = psb_err_invalid_mat_state_
     call psb_errpush(info,name)
     goto 9999
   end if
@@ -1999,7 +1999,7 @@ subroutine psb_z_csc_csput(nz,ia,ja,val,a,imin,imax,jmin,jmax,info,gtl)
 
   if (a%is_bld()) then 
     ! Build phase should only ever be in COO
-    info = 1121
+    info = psb_err_invalid_mat_state_
 
   else  if (a%is_upd()) then 
     call  psb_z_csc_srch_upd(nz,ia,ja,val,a,&
@@ -2007,12 +2007,12 @@ subroutine psb_z_csc_csput(nz,ia,ja,val,a,imin,imax,jmin,jmax,info,gtl)
 
     if (info /= psb_success_) then  
 
-      info = 1121
+      info = psb_err_invalid_mat_state_
     end if
 
   else 
     ! State is wrong.
-    info = 1121
+    info = psb_err_invalid_mat_state_
   end if
   if (info /= psb_success_) then
     call psb_errpush(info,name)
@@ -2727,7 +2727,7 @@ subroutine psb_z_csc_reinit(a,clear)
     if (clear_) a%val(:) = zzero
     call a%set_upd()
   else
-    info = 1121
+    info = psb_err_invalid_mat_state_
     call psb_errpush(info,name)
     goto 9999
   end if

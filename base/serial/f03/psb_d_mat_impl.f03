@@ -24,7 +24,7 @@ subroutine  psb_d_set_nrows(m,a)
 
   call psb_erractionsave(err_act)
   if (.not.allocated(a%a)) then 
-    info = 1121
+    info = psb_err_invalid_mat_state_
     call psb_errpush(info,name)
     goto 9999
   endif
@@ -58,7 +58,7 @@ subroutine  psb_d_set_ncols(n,a)
 
   call psb_erractionsave(err_act)
   if (.not.allocated(a%a)) then 
-    info = 1121
+    info = psb_err_invalid_mat_state_
     call psb_errpush(info,name)
     goto 9999
   endif
@@ -92,7 +92,7 @@ subroutine  psb_d_set_state(n,a)
 
   call psb_erractionsave(err_act)
   if (.not.allocated(a%a)) then 
-    info = 1121
+    info = psb_err_invalid_mat_state_
     call psb_errpush(info,name)
     goto 9999
   endif
@@ -126,7 +126,7 @@ subroutine  psb_d_set_dupl(n,a)
 
   call psb_erractionsave(err_act)
   if (.not.allocated(a%a)) then 
-    info = 1121
+    info = psb_err_invalid_mat_state_
     call psb_errpush(info,name)
     goto 9999
   endif
@@ -159,7 +159,7 @@ subroutine  psb_d_set_null(a)
 
   call psb_erractionsave(err_act)
   if (.not.allocated(a%a)) then 
-    info = 1121
+    info = psb_err_invalid_mat_state_
     call psb_errpush(info,name)
     goto 9999
   endif
@@ -192,7 +192,7 @@ subroutine  psb_d_set_bld(a)
 
   call psb_erractionsave(err_act)
   if (.not.allocated(a%a)) then 
-    info = 1121
+    info = psb_err_invalid_mat_state_
     call psb_errpush(info,name)
     goto 9999
   endif
@@ -224,7 +224,7 @@ subroutine  psb_d_set_upd(a)
 
   call psb_erractionsave(err_act)
   if (.not.allocated(a%a)) then 
-    info = 1121
+    info = psb_err_invalid_mat_state_
     call psb_errpush(info,name)
     goto 9999
   endif
@@ -257,7 +257,7 @@ subroutine  psb_d_set_asb(a)
 
   call psb_erractionsave(err_act)
   if (.not.allocated(a%a)) then 
-    info = 1121
+    info = psb_err_invalid_mat_state_
     call psb_errpush(info,name)
     goto 9999
   endif
@@ -290,7 +290,7 @@ subroutine psb_d_set_sorted(a,val)
 
   call psb_erractionsave(err_act)
   if (.not.allocated(a%a)) then 
-    info = 1121
+    info = psb_err_invalid_mat_state_
     call psb_errpush(info,name)
     goto 9999
   endif
@@ -323,7 +323,7 @@ subroutine psb_d_set_triangle(a,val)
 
   call psb_erractionsave(err_act)
   if (.not.allocated(a%a)) then 
-    info = 1121
+    info = psb_err_invalid_mat_state_
     call psb_errpush(info,name)
     goto 9999
   endif
@@ -356,7 +356,7 @@ subroutine psb_d_set_unit(a,val)
 
   call psb_erractionsave(err_act)
   if (.not.allocated(a%a)) then 
-    info = 1121
+    info = psb_err_invalid_mat_state_
     call psb_errpush(info,name)
     goto 9999
   endif
@@ -389,7 +389,7 @@ subroutine psb_d_set_lower(a,val)
 
   call psb_erractionsave(err_act)
   if (.not.allocated(a%a)) then 
-    info = 1121
+    info = psb_err_invalid_mat_state_
     call psb_errpush(info,name)
     goto 9999
   endif
@@ -422,7 +422,7 @@ subroutine psb_d_set_upper(a,val)
 
   call psb_erractionsave(err_act)
   if (.not.allocated(a%a)) then 
-    info = 1121
+    info = psb_err_invalid_mat_state_
     call psb_errpush(info,name)
     goto 9999
   endif
@@ -476,7 +476,7 @@ subroutine psb_d_sparse_print(iout,a,iv,eirs,eics,head,ivr,ivc)
   info = psb_success_
   call psb_get_erraction(err_act)
   if (.not.allocated(a%a)) then 
-    info = 1121
+    info = psb_err_invalid_mat_state_
     call psb_errpush(info,name)
     goto 9999
   endif
@@ -516,7 +516,7 @@ subroutine psb_d_get_neigh(a,idx,neigh,n,info,lev)
   info = psb_success_
   call psb_erractionsave(err_act)
   if (.not.allocated(a%a)) then 
-    info = 1121
+    info = psb_err_invalid_mat_state_
     call psb_errpush(info,name)
     goto 9999
   endif
@@ -592,7 +592,7 @@ subroutine  psb_d_reallocate_nz(nz,a)
 
   call psb_get_erraction(err_act)
   if (.not.allocated(a%a)) then 
-    info = 1121
+    info = psb_err_invalid_mat_state_
     call psb_errpush(info,name)
     goto 9999
   endif
@@ -638,7 +638,7 @@ subroutine  psb_d_trim(a)
 
   call psb_get_erraction(err_act)
   if (.not.allocated(a%a)) then 
-    info = 1121
+    info = psb_err_invalid_mat_state_
     call psb_errpush(info,name)
     goto 9999
   endif
@@ -677,7 +677,7 @@ subroutine psb_d_csput(nz,ia,ja,val,a,imin,imax,jmin,jmax,info,gtl)
   info = psb_success_
   call psb_erractionsave(err_act)
   if (.not.a%is_bld()) then 
-    info = 1121
+    info = psb_err_invalid_mat_state_
     call psb_errpush(info,name)
     goto 9999
   endif
@@ -726,7 +726,7 @@ subroutine psb_d_csgetptn(imin,imax,a,nz,ia,ja,info,&
   info = psb_success_
   call psb_erractionsave(err_act)
   if (a%is_null()) then 
-    info = 1121
+    info = psb_err_invalid_mat_state_
     call psb_errpush(info,name)
     goto 9999
   endif
@@ -777,7 +777,7 @@ subroutine psb_d_csgetrow(imin,imax,a,nz,ia,ja,val,info,&
   info = psb_success_
   call psb_erractionsave(err_act)
   if (a%is_null()) then 
-    info = 1121
+    info = psb_err_invalid_mat_state_
     call psb_errpush(info,name)
     goto 9999
   endif
@@ -830,7 +830,7 @@ subroutine psb_d_csgetblk(imin,imax,a,b,info,&
   info = psb_success_
   call psb_erractionsave(err_act)
   if (a%is_null()) then 
-    info = 1121
+    info = psb_err_invalid_mat_state_
     call psb_errpush(info,name)
     goto 9999
   endif
@@ -881,7 +881,7 @@ subroutine psb_d_csclip(a,b,info,&
   info = psb_success_
   call psb_erractionsave(err_act)
   if (a%is_null()) then 
-    info = 1121
+    info = psb_err_invalid_mat_state_
     call psb_errpush(info,name)
     goto 9999
   endif
@@ -928,7 +928,7 @@ subroutine psb_d_b_csclip(a,b,info,&
   info = psb_success_
   call psb_erractionsave(err_act)
   if (a%is_null()) then 
-    info = 1121
+    info = psb_err_invalid_mat_state_
     call psb_errpush(info,name)
     goto 9999
   endif
@@ -975,7 +975,7 @@ subroutine psb_d_cscnv(a,b,info,type,mold,upd,dupl)
   call psb_erractionsave(err_act)
 
   if (a%is_null()) then 
-    info = 1121
+    info = psb_err_invalid_mat_state_
     call psb_errpush(info,name)
     goto 9999
   endif
@@ -1072,7 +1072,7 @@ subroutine psb_d_cscnv_ip(a,info,type,mold,dupl)
   call psb_erractionsave(err_act)
 
   if (a%is_null()) then 
-    info = 1121
+    info = psb_err_invalid_mat_state_
     call psb_errpush(info,name)
     goto 9999
   endif
@@ -1119,8 +1119,13 @@ subroutine psb_d_cscnv_ip(a,info,type,mold,dupl)
 
   if (debug) write(psb_err_unit,*) 'Converting in-place from ',&
        & a%get_fmt(),' to ',altmp%get_fmt()
-
-  call altmp%mv_from_fmt(a%a, info)
+!!$  select type(aa=>altmp)
+!!$  type is (psb_d_csr_sparse_mat)
+!!$    write(psb_err_unit,*) 'From ALTMP allocation: aa%irp ',allocated(aa%irp),&
+!!$         & ' aa%ja ', allocated(aa%ja),&
+!!$         & ' aa%val ', allocated(aa%val)
+!!$  end select
+  call altmp%cp_from_fmt(a%a, info)
 
   if (info /= psb_success_) then
     info = psb_err_from_subroutine_
@@ -1166,7 +1171,7 @@ subroutine psb_d_cscnv_base(a,b,info,dupl)
   call psb_erractionsave(err_act)
 
   if (a%is_null()) then 
-    info = 1121
+    info = psb_err_invalid_mat_state_
     call psb_errpush(info,name)
     goto 9999
   endif
@@ -1222,7 +1227,7 @@ subroutine psb_d_clip_d(a,b,info)
   info = psb_success_
   call psb_erractionsave(err_act)
   if (a%is_null()) then 
-    info = 1121
+    info = psb_err_invalid_mat_state_
     call psb_errpush(info,name)
     goto 9999
   endif
@@ -1284,7 +1289,7 @@ subroutine psb_d_clip_d_ip(a,info)
   info = psb_success_
   call psb_erractionsave(err_act)
   if (a%is_null()) then 
-    info = 1121
+    info = psb_err_invalid_mat_state_
     call psb_errpush(info,name)
     goto 9999
   endif
@@ -1474,7 +1479,7 @@ subroutine psb_d_transp_1mat(a)
 
   call psb_erractionsave(err_act)
   if (a%is_null()) then 
-    info = 1121
+    info = psb_err_invalid_mat_state_
     call psb_errpush(info,name)
     goto 9999
   endif
@@ -1511,7 +1516,7 @@ subroutine psb_d_transp_2mat(a,b)
 
   call psb_erractionsave(err_act)
   if (b%is_null()) then 
-    info = 1121
+    info = psb_err_invalid_mat_state_
     call psb_errpush(info,name)
     goto 9999
   endif
@@ -1551,7 +1556,7 @@ subroutine psb_d_transc_1mat(a)
 
   call psb_erractionsave(err_act)
   if (a%is_null()) then 
-    info = 1121
+    info = psb_err_invalid_mat_state_
     call psb_errpush(info,name)
     goto 9999
   endif
@@ -1588,7 +1593,7 @@ subroutine psb_d_transc_2mat(a,b)
 
   call psb_erractionsave(err_act)
   if (b%is_null()) then 
-    info = 1121
+    info = psb_err_invalid_mat_state_
     call psb_errpush(info,name)
     goto 9999
   endif
@@ -1628,7 +1633,7 @@ subroutine psb_d_reinit(a,clear)
 
   call psb_erractionsave(err_act)
   if (a%is_null()) then 
-    info = 1121
+    info = psb_err_invalid_mat_state_
     call psb_errpush(info,name)
     goto 9999
   endif
@@ -1681,7 +1686,7 @@ subroutine psb_d_csmm(alpha,a,x,beta,y,info,trans)
   info = psb_success_
   call psb_erractionsave(err_act)
   if (.not.allocated(a%a)) then 
-    info = 1121
+    info = psb_err_invalid_mat_state_
     call psb_errpush(info,name)
     goto 9999
   endif
@@ -1719,7 +1724,7 @@ subroutine psb_d_csmv(alpha,a,x,beta,y,info,trans)
   info = psb_success_
   call psb_erractionsave(err_act)
   if (.not.allocated(a%a)) then 
-    info = 1121
+    info = psb_err_invalid_mat_state_
     call psb_errpush(info,name)
     goto 9999
   endif
@@ -1758,7 +1763,7 @@ subroutine psb_d_cssm(alpha,a,x,beta,y,info,trans,scale,d)
   info = psb_success_
   call psb_erractionsave(err_act)
   if (.not.allocated(a%a)) then 
-    info = 1121
+    info = psb_err_invalid_mat_state_
     call psb_errpush(info,name)
     goto 9999
   endif
@@ -1798,7 +1803,7 @@ subroutine psb_d_cssv(alpha,a,x,beta,y,info,trans,scale,d)
   info = psb_success_
   call psb_erractionsave(err_act)
   if (.not.allocated(a%a)) then 
-    info = 1121
+    info = psb_err_invalid_mat_state_
     call psb_errpush(info,name)
     goto 9999
   endif
@@ -1837,7 +1842,7 @@ function psb_d_csnmi(a) result(res)
 
   call psb_get_erraction(err_act)
   if (.not.allocated(a%a)) then 
-    info = 1121
+    info = psb_err_invalid_mat_state_
     call psb_errpush(info,name)
     goto 9999
   endif
@@ -1870,7 +1875,7 @@ function psb_d_csnm1(a) result(res)
 
   call psb_get_erraction(err_act)
   if (.not.allocated(a%a)) then 
-    info = 1121
+    info = psb_err_invalid_mat_state_
     call psb_errpush(info,name)
     goto 9999
   endif
@@ -1904,7 +1909,7 @@ subroutine psb_d_rowsum(d,a,info)
 
   call psb_erractionsave(err_act)
   if (.not.allocated(a%a)) then 
-    info = 1121
+    info = psb_err_invalid_mat_state_
     call psb_errpush(info,name)
     goto 9999
   endif
@@ -1941,7 +1946,7 @@ subroutine psb_d_arwsum(d,a,info)
 
   call psb_erractionsave(err_act)
   if (.not.allocated(a%a)) then 
-    info = 1121
+    info = psb_err_invalid_mat_state_
     call psb_errpush(info,name)
     goto 9999
   endif
@@ -1978,7 +1983,7 @@ subroutine psb_d_colsum(d,a,info)
 
   call psb_erractionsave(err_act)
   if (.not.allocated(a%a)) then 
-    info = 1121
+    info = psb_err_invalid_mat_state_
     call psb_errpush(info,name)
     goto 9999
   endif
@@ -2015,7 +2020,7 @@ subroutine psb_d_aclsum(d,a,info)
 
   call psb_erractionsave(err_act)
   if (.not.allocated(a%a)) then 
-    info = 1121
+    info = psb_err_invalid_mat_state_
     call psb_errpush(info,name)
     goto 9999
   endif
@@ -2052,7 +2057,7 @@ subroutine psb_d_get_diag(a,d,info)
 
   call psb_erractionsave(err_act)
   if (.not.allocated(a%a)) then 
-    info = 1121
+    info = psb_err_invalid_mat_state_
     call psb_errpush(info,name)
     goto 9999
   endif
@@ -2090,7 +2095,7 @@ subroutine psb_d_scal(d,a,info)
 
   call psb_erractionsave(err_act)
   if (.not.allocated(a%a)) then 
-    info = 1121
+    info = psb_err_invalid_mat_state_
     call psb_errpush(info,name)
     goto 9999
   endif
@@ -2128,7 +2133,7 @@ subroutine psb_d_scals(d,a,info)
 
   call psb_erractionsave(err_act)
   if (.not.allocated(a%a)) then 
-    info = 1121
+    info = psb_err_invalid_mat_state_
     call psb_errpush(info,name)
     goto 9999
   endif

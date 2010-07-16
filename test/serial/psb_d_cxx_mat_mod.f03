@@ -726,7 +726,7 @@ contains
       if (clear_) a%val(:) = dzero
       call a%set_upd()
     else
-      info = 1121
+      info = psb_err_invalid_mat_state_
       call psb_errpush(info,name)
       goto 9999
     end if
@@ -1290,7 +1290,7 @@ contains
     call psb_erractionsave(err_act)
 
     if (.not.a%is_asb()) then 
-      info = 1121
+      info = psb_err_invalid_mat_state_
       call psb_errpush(info,name)
       goto 9999
     endif
@@ -1375,14 +1375,14 @@ contains
     call psb_erractionsave(err_act)
 
     if (.not.a%is_asb()) then 
-      info = 1121
+      info = psb_err_invalid_mat_state_
       call psb_errpush(info,name)
       goto 9999
     endif
 
     
     if (.not. (a%is_triangle())) then 
-      info = 1121
+      info = psb_err_invalid_mat_state_
       call psb_errpush(info,name)
       goto 9999
     end if
@@ -1428,14 +1428,14 @@ contains
     call psb_erractionsave(err_act)
 
     if (.not.a%is_asb()) then 
-      info = 1121
+      info = psb_err_invalid_mat_state_
       call psb_errpush(info,name)
       goto 9999
     endif
 
     
     if (.not. (a%is_triangle())) then 
-      info = 1121
+      info = psb_err_invalid_mat_state_
       call psb_errpush(info,name)
       goto 9999
     end if

@@ -41,7 +41,7 @@ subroutine psb_d_csr_csmv(alpha,a,x,beta,y,info,trans)
   end if
 
   if (.not.a%is_asb()) then 
-    info = 1121
+    info = psb_err_invalid_mat_state_
     call psb_errpush(info,name)
     goto 9999
   endif
@@ -339,7 +339,7 @@ subroutine psb_d_csr_csmm(alpha,a,x,beta,y,info,trans)
   end if
 
   if (.not.a%is_asb()) then 
-    info = 1121
+    info = psb_err_invalid_mat_state_
     call psb_errpush(info,name)
     goto 9999
   endif
@@ -640,7 +640,7 @@ subroutine psb_d_csr_cssv(alpha,a,x,beta,y,info,trans)
     trans_ = 'N'
   end if
   if (.not.a%is_asb()) then 
-    info = 1121
+    info = psb_err_invalid_mat_state_
     call psb_errpush(info,name)
     goto 9999
   endif
@@ -649,7 +649,7 @@ subroutine psb_d_csr_cssv(alpha,a,x,beta,y,info,trans)
   m = a%get_nrows()
 
   if (.not. (a%is_triangle())) then 
-    info = 1121
+    info = psb_err_invalid_mat_state_
     call psb_errpush(info,name)
     goto 9999
   end if
@@ -857,7 +857,7 @@ subroutine psb_d_csr_cssm(alpha,a,x,beta,y,info,trans)
     trans_ = 'N'
   end if
   if (.not.a%is_asb()) then 
-    info = 1121
+    info = psb_err_invalid_mat_state_
     call psb_errpush(info,name)
     goto 9999
   endif
@@ -869,7 +869,7 @@ subroutine psb_d_csr_cssm(alpha,a,x,beta,y,info,trans)
   nc  = min(size(x,2) , size(y,2)) 
 
   if (.not. (a%is_triangle())) then 
-    info = 1121
+    info = psb_err_invalid_mat_state_
     call psb_errpush(info,name)
     goto 9999
   end if
@@ -2024,7 +2024,7 @@ subroutine psb_d_csr_csput(nz,ia,ja,val,a,imin,imax,jmin,jmax,info,gtl)
 
   if (a%is_bld()) then 
     ! Build phase should only ever be in COO
-    info = 1121
+    info = psb_err_invalid_mat_state_
 
   else  if (a%is_upd()) then 
     call  psb_d_csr_srch_upd(nz,ia,ja,val,a,&
@@ -2032,12 +2032,12 @@ subroutine psb_d_csr_csput(nz,ia,ja,val,a,imin,imax,jmin,jmax,info,gtl)
 
     if (info /= psb_success_) then  
 
-      info = 1121
+      info = psb_err_invalid_mat_state_
     end if
 
   else 
     ! State is wrong.
-    info = 1121
+    info = psb_err_invalid_mat_state_
   end if
   if (info /= psb_success_) then
     call psb_errpush(info,name)
@@ -2287,7 +2287,7 @@ subroutine psb_d_csr_reinit(a,clear)
     if (clear_) a%val(:) = dzero
     call a%set_upd()
   else
-    info = 1121
+    info = psb_err_invalid_mat_state_
     call psb_errpush(info,name)
     goto 9999
   end if
@@ -2442,10 +2442,12 @@ subroutine psb_d_cp_csr_from_coo(a,b,info)
   integer             :: debug_level, debug_unit
   character(len=20)   :: name
 
-  info = psb_success_
-  ! This is to have fix_coo called behind the scenes
-  call tmp%cp_from_coo(b,info)
-  if (info == psb_success_) call a%mv_from_coo(tmp,info)
+   info = psb_success_
+   ! This is to have fix_coo called behind the scenes
+   write(0,*) 'In cp_from_coo: ',allocated(a%irp),allocated(a%ja),allocated(a%val)
+
+   call tmp%cp_from_coo(b,info)
+   if (info == psb_success_) call a%mv_from_coo(tmp,info)
 
 end subroutine psb_d_cp_csr_from_coo
 
@@ -2556,23 +2558,28 @@ subroutine psb_d_mv_csr_from_coo(a,b,info)
   character(len=20)   :: name
 
   info = psb_success_
+  write(0,*) 'In mv_from_coo 1 : ',allocated(a%irp),allocated(a%ja),allocated(a%val)
 
   call b%fix(info)
   if (info /= psb_success_) return
-
+  write(0,*) 'In mv_from_coo 2 : ',allocated(a%irp),allocated(a%ja),allocated(a%val)
   nr  = b%get_nrows()
   nc  = b%get_ncols()
   nza = b%get_nzeros()
-  
+  write(0,*) 'In mv_from_coo 3 : ',allocated(a%irp),allocated(a%ja),allocated(a%val)
   call a%psb_d_base_sparse_mat%mv_from(b%psb_d_base_sparse_mat)
-
+  write(0,*) 'In mv_from_coo 4 : ',allocated(a%irp),allocated(a%ja),allocated(a%val)
   ! Dirty trick: call move_alloc to have the new data allocated just once.
+  write(psb_err_unit,*) 'itemp ',allocated(itemp),&
+       & ' a%ja ', allocated(a%ja),&
+       & ' a%val ', allocated(a%val)
   call move_alloc(b%ia,itemp)
   call move_alloc(b%ja,a%ja)
   call move_alloc(b%val,a%val)
   call psb_realloc(max(nr+1,nc+1),a%irp,info)
+  
   call b%free()
-
+  if (info /= psb_success_) return
   if (nza <= 0) then 
     a%irp(:) = 1
   else
@@ -2667,6 +2674,7 @@ end subroutine psb_d_mv_csr_to_fmt
 
 subroutine psb_d_cp_csr_to_fmt(a,b,info) 
   use psb_const_mod
+  use psb_realloc_mod
   use psb_d_base_mat_mod
   use psb_d_csr_mat_mod, psb_protect_name => psb_d_cp_csr_to_fmt
   implicit none 
@@ -2692,9 +2700,9 @@ subroutine psb_d_cp_csr_to_fmt(a,b,info)
 
   type is (psb_d_csr_sparse_mat) 
     call b%psb_d_base_sparse_mat%cp_from(a%psb_d_base_sparse_mat)
-    b%irp = a%irp
-    b%ja  = a%ja
-    b%val = a%val
+    call psb_safe_cpy( a%irp, b%irp , info)
+    call psb_safe_cpy( a%ja , b%ja  , info)
+    call psb_safe_cpy( a%val, b%val , info)
 
   class default
     call tmp%cp_from_fmt(a,info)
@@ -2746,6 +2754,7 @@ end subroutine psb_d_mv_csr_from_fmt
 
 subroutine psb_d_cp_csr_from_fmt(a,b,info) 
   use psb_const_mod
+  use psb_realloc_mod
   use psb_d_base_mat_mod
   use psb_d_csr_mat_mod, psb_protect_name => psb_d_cp_csr_from_fmt
   implicit none 
@@ -2764,15 +2773,16 @@ subroutine psb_d_cp_csr_from_fmt(a,b,info)
 
   info = psb_success_
 
+  write(0,*) 'In cp_from_fmt: ',allocated(a%irp),allocated(a%ja),allocated(a%val)
   select type (b)
   type is (psb_d_coo_sparse_mat) 
     call a%cp_from_coo(b,info)
 
   type is (psb_d_csr_sparse_mat) 
     call a%psb_d_base_sparse_mat%cp_from(b%psb_d_base_sparse_mat)
-    a%irp = b%irp
-    a%ja  = b%ja
-    a%val = b%val
+    call psb_safe_cpy( b%irp, a%irp , info)
+    call psb_safe_cpy( b%ja , a%ja  , info)
+    call psb_safe_cpy( b%val, a%val , info)
 
   class default
     call tmp%cp_from_fmt(b,info)

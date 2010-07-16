@@ -187,7 +187,7 @@ subroutine psb_s_coo_reinit(a,clear)
     if (clear_) a%val(:) = szero
     call a%set_upd()
   else
-    info = 1121
+    info = psb_err_invalid_mat_state_
     call psb_errpush(info,name)
     goto 9999
   end if
@@ -454,14 +454,14 @@ subroutine psb_s_coo_cssm(alpha,a,x,beta,y,info,trans)
   call psb_erractionsave(err_act)
 
   if (.not.a%is_asb()) then 
-    info = 1121
+    info = psb_err_invalid_mat_state_
     call psb_errpush(info,name)
     goto 9999
   endif
 
 
   if (.not. (a%is_triangle())) then 
-    info = 1121
+    info = psb_err_invalid_mat_state_
     call psb_errpush(info,name)
     goto 9999
   end if
@@ -566,7 +566,7 @@ contains
 
 
     if (.not.sorted) then 
-      info = 1121
+      info = psb_err_invalid_mat_state_
       return
     end if
 
@@ -745,7 +745,7 @@ subroutine psb_s_coo_cssv(alpha,a,x,beta,y,info,trans)
     trans_ = 'N'
   end if
   if (.not.a%is_asb()) then 
-    info = 1121
+    info = psb_err_invalid_mat_state_
     call psb_errpush(info,name)
     goto 9999
   endif
@@ -763,7 +763,7 @@ subroutine psb_s_coo_cssv(alpha,a,x,beta,y,info,trans)
     goto 9999
   end if
   if (.not. (a%is_triangle())) then 
-    info = 1121
+    info = psb_err_invalid_mat_state_
     call psb_errpush(info,name)
     goto 9999
   end if
@@ -841,7 +841,7 @@ contains
 
     info = psb_success_
     if (.not.sorted) then 
-      info = 1121
+      info = psb_err_invalid_mat_state_
       return
     end if
 
@@ -1015,7 +1015,7 @@ subroutine psb_s_coo_csmv(alpha,a,x,beta,y,info,trans)
   call psb_erractionsave(err_act)
 
   if (.not.a%is_asb()) then 
-    info = 1121
+    info = psb_err_invalid_mat_state_
     call psb_errpush(info,name)
     goto 9999
   endif
@@ -1183,7 +1183,7 @@ subroutine psb_s_coo_csmm(alpha,a,x,beta,y,info,trans)
 
 
   if (.not.a%is_asb()) then 
-    info = 1121
+    info = psb_err_invalid_mat_state_
     call psb_errpush(info,name)
     goto 9999
   endif
@@ -2012,12 +2012,12 @@ subroutine psb_s_coo_csput(nz,ia,ja,val,a,imin,imax,jmin,jmax,info,gtl)
     call  s_coo_srch_upd(nz,ia,ja,val,a,&
          & imin,imax,jmin,jmax,info,gtl)
     if (info /= psb_success_) then 
-      info = 1121
+      info = psb_err_invalid_mat_state_
     end if
 
   else 
     ! State is wrong.
-    info = 1121
+    info = psb_err_invalid_mat_state_
   end if
   if (info /= psb_success_) then
     call psb_errpush(info,name)

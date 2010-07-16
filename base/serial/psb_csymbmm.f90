@@ -53,7 +53,7 @@ subroutine psb_csymbmm(a,b,c,info)
   info = psb_success_
 
   if ((a%is_null()) .or.(b%is_null())) then
-    info = 1121
+    info = psb_err_invalid_mat_state_
     call psb_errpush(info,name)
     goto 9999
   endif
