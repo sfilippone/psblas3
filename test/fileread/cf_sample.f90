@@ -122,10 +122,10 @@ program cf_sample
       
     case default
       info = -1 
-      write(0,*) 'Wrong choice for fileformat ', filefmt
+      write(psb_err_unit,*) 'Wrong choice for fileformat ', filefmt
     end select
     if (info /= psb_success_) then
-      write(0,*) 'Error while reading input matrix '
+      write(psb_err_unit,*) 'Error while reading input matrix '
       call psb_abort(ictxt)
     end if
     
@@ -135,11 +135,11 @@ program cf_sample
     ! At this point aux_b may still be unallocated
     if (psb_size(aux_b,dim=1) == m_problem) then
       ! if any rhs were present, broadcast the first one
-      write(0,'("Ok, got an rhs ")')
+      write(psb_err_unit,'("Ok, got an rhs ")')
       b_col_glob =>aux_b(:,1)
     else
-      write(*,'("Generating an rhs...")')
-      write(*,'(" ")')
+      write(psb_out_unit,'("Generating an rhs...")')
+      write(psb_out_unit,'(" ")')
       call psb_realloc(m_problem,1,aux_b,ircode)
       if (ircode /= 0) then
          call psb_errpush(psb_err_alloc_dealloc_,name)
@@ -166,7 +166,7 @@ program cf_sample
   ! switch over different partition types
   if (ipart == 0) then 
     call psb_barrier(ictxt)
-    if (iam == psb_root_) write(*,'("Partition type: block")')
+    if (iam == psb_root_) write(psb_out_unit,'("Partition type: block")')
     allocate(ivg(m_problem),ipv(np))
     do i=1,m_problem
       call part_block(i,m_problem,np,ipv,nv)
@@ -176,9 +176,9 @@ program cf_sample
          & desc_a,b_col_glob,b_col,info,fmt=afmt,v=ivg)
   else if (ipart == 2) then 
     if (iam == psb_root_) then 
-      write(*,'("Partition type: graph")')
-      write(*,'(" ")')
-      !      write(0,'("Build type: graph")')
+      write(psb_out_unit,'("Partition type: graph")')
+      write(psb_out_unit,'(" ")')
+      !      write(psb_err_unit,'("Build type: graph")')
       call build_mtpart(aux_a,np)
 
     endif
@@ -188,7 +188,7 @@ program cf_sample
     call psb_matdist(aux_a, a, ictxt, &
          & desc_a,b_col_glob,b_col,info,fmt=afmt,v=ivg)
   else 
-    if (iam == psb_root_) write(*,'("Partition type: block")')
+    if (iam == psb_root_) write(psb_out_unit,'("Partition type: block")')
     call psb_matdist(aux_a, a,  ictxt, &
          & desc_a,b_col_glob,b_col,info,fmt=afmt,parts=part_block)
   end if
@@ -205,9 +205,9 @@ program cf_sample
   call psb_amx(ictxt, t2)
   
   if (iam == psb_root_) then
-     write(*,'(" ")')
-     write(*,'("Time to read and partition matrix : ",es12.5)')t2
-     write(*,'(" ")')
+     write(psb_out_unit,'(" ")')
+     write(psb_out_unit,'("Time to read and partition matrix : ",es12.5)')t2
+     write(psb_out_unit,'(" ")')
   end if
 
   ! 
@@ -227,8 +227,8 @@ program cf_sample
   call psb_amx(ictxt,tprec)
   
   if(iam == psb_root_) then
-     write(*,'("Preconditioner time: ",es12.5)')tprec
-     write(*,'(" ")')
+     write(psb_out_unit,'("Preconditioner time: ",es12.5)')tprec
+     write(psb_out_unit,'(" ")')
   end if
 
   iparm = 0
@@ -252,31 +252,31 @@ program cf_sample
   call psb_sum(ictxt,precsize)
   if (iam == psb_root_) then 
     call psb_precdescr(prec)
-    write(*,'("Matrix: ",a)')mtrx_file
-    write(*,'("Computed solution on ",i8," processors")')np
-    write(*,'("Iterations to convergence: ",i6)')iter
-    write(*,'("Error estimate on exit   : ",es12.5)') err
-    write(*,'("Time to buil prec.       : ",es12.5)')tprec
-    write(*,'("Time to solve matrix     : ",es12.5)')t2
-    write(*,'("Time per iteration       : ",es12.5)')t2/(iter)
-    write(*,'("Total time               : ",es12.5)')t2+tprec
-    write(*,'("Residual norm 2          : ",es12.5)')resmx
-    write(*,'("Residual norm inf        : ",es12.5)')resmxp
-!!$    write(*,*)"Condition number         : ",cond
-    write(*,'("Total memory occupation for A:      ",i12)')amatsize
-    write(*,'("Total memory occupation for DESC_A: ",i12)')descsize
-    write(*,'("Total memory occupation for PREC:   ",i12)')precsize
+    write(psb_out_unit,'("Matrix: ",a)')mtrx_file
+    write(psb_out_unit,'("Computed solution on ",i8," processors")')np
+    write(psb_out_unit,'("Iterations to convergence: ",i6)')iter
+    write(psb_out_unit,'("Error estimate on exit   : ",es12.5)') err
+    write(psb_out_unit,'("Time to buil prec.       : ",es12.5)')tprec
+    write(psb_out_unit,'("Time to solve matrix     : ",es12.5)')t2
+    write(psb_out_unit,'("Time per iteration       : ",es12.5)')t2/(iter)
+    write(psb_out_unit,'("Total time               : ",es12.5)')t2+tprec
+    write(psb_out_unit,'("Residual norm 2          : ",es12.5)')resmx
+    write(psb_out_unit,'("Residual norm inf        : ",es12.5)')resmxp
+!!$    write(psb_out_unit,*)"Condition number         : ",cond
+    write(psb_out_unit,'("Total memory occupation for A:      ",i12)')amatsize
+    write(psb_out_unit,'("Total memory occupation for DESC_A: ",i12)')descsize
+    write(psb_out_unit,'("Total memory occupation for PREC:   ",i12)')precsize
   end if
 
   allocate(x_col_glob(m_problem),r_col_glob(m_problem),stat=ierr)
   if (ierr /= 0) then 
-    write(0,*) 'allocation error: no data collection'
+    write(psb_err_unit,*) 'allocation error: no data collection'
   else
     call psb_gather(x_col_glob,x_col,desc_a,info,root=psb_root_)
     call psb_gather(r_col_glob,r_col,desc_a,info,root=psb_root_)
     if (iam == psb_root_) then
-      write(0,'(" ")')
-      write(0,'("Saving x on file")')
+      write(psb_err_unit,'(" ")')
+      write(psb_err_unit,'("Saving x on file")')
       write(20,*) 'matrix: ',mtrx_file
       write(20,*) 'computed solution on ',np,' processors.'
       write(20,*) 'iterations to convergence: ',iter

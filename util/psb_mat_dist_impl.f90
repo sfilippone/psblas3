@@ -143,7 +143,7 @@ subroutine smatdist(a_glob, a, ictxt, desc_a,&
     nrow = a_glob%get_nrows()
     ncol = a_glob%get_ncols()
     if (nrow /= ncol) then
-      write(0,*) 'a rectangular matrix ? ',nrow,ncol
+      write(psb_err_unit,*) 'a rectangular matrix ? ',nrow,ncol
       info=-1
       call psb_errpush(info,name)
       goto 9999
@@ -257,7 +257,7 @@ subroutine smatdist(a_glob, a, ictxt, desc_a,&
                & irow,icol,val,info,nzin=ll,append=.true.)
           if (info /= psb_success_) then            
             if (nz >min(size(irow(ll+1:)),size(icol(ll+1:)),size(val(ll+1:)))) then 
-              write(0,*) 'Allocation failure? This should not happen!'
+              write(psb_err_unit,*) 'Allocation failure? This should not happen!'
             end if
             call psb_errpush(info,name,a_err=ch_err)
             goto 9999
@@ -296,7 +296,7 @@ subroutine smatdist(a_glob, a, ictxt, desc_a,&
           call psb_rcv(ictxt,nnr,root)
           call psb_rcv(ictxt,ll,root)
           if (ll > size(irow)) then 
-            write(0,*) iam,'need to reallocate ',ll
+            write(psb_err_unit,*) iam,'need to reallocate ',ll
             deallocate(val,irow,icol)
             allocate(val(ll),irow(ll),icol(ll),stat=info)
             if(info /= psb_success_) then
@@ -345,7 +345,7 @@ subroutine smatdist(a_glob, a, ictxt, desc_a,&
                  & irow,icol,val,info,nzin=ll,append=.true.)
             if (info /= psb_success_) then            
               if (nz >min(size(irow(ll+1:)),size(icol(ll+1:)),size(val(ll+1:)))) then 
-                write(0,*) 'Allocation failure? This should not happen!'
+                write(psb_err_unit,*) 'Allocation failure? This should not happen!'
               end if
               call psb_errpush(info,name,a_err=ch_err)
               goto 9999
@@ -438,8 +438,8 @@ subroutine smatdist(a_glob, a, ictxt, desc_a,&
 
 
   if (iam == root) then 
-    write(*,*) 'descriptor assembly: ',t1-t0
-    write(*,*) 'sparse matrix assembly: ',t3-t2
+    write(psb_out_unit,*) 'descriptor assembly: ',t1-t0
+    write(psb_out_unit,*) 'sparse matrix assembly: ',t3-t2
   end if
 
   call psb_geasb(b,desc_a,info)     
@@ -588,7 +588,7 @@ subroutine dmatdist(a_glob, a, ictxt, desc_a,&
     nrow = a_glob%get_nrows()
     ncol = a_glob%get_ncols()
     if (nrow /= ncol) then
-      write(0,*) 'a rectangular matrix ? ',nrow,ncol
+      write(psb_err_unit,*) 'a rectangular matrix ? ',nrow,ncol
       info=-1
       call psb_errpush(info,name)
       goto 9999
@@ -702,7 +702,7 @@ subroutine dmatdist(a_glob, a, ictxt, desc_a,&
                & irow,icol,val,info,nzin=ll,append=.true.)
           if (info /= psb_success_) then            
             if (nz >min(size(irow(ll+1:)),size(icol(ll+1:)),size(val(ll+1:)))) then 
-              write(0,*) 'Allocation failure? This should not happen!'
+              write(psb_err_unit,*) 'Allocation failure? This should not happen!'
             end if
             call psb_errpush(info,name,a_err=ch_err)
             goto 9999
@@ -741,7 +741,7 @@ subroutine dmatdist(a_glob, a, ictxt, desc_a,&
           call psb_rcv(ictxt,nnr,root)
           call psb_rcv(ictxt,ll,root)
           if (ll > size(irow)) then 
-            write(0,*) iam,'need to reallocate ',ll
+            write(psb_err_unit,*) iam,'need to reallocate ',ll
             deallocate(val,irow,icol)
             allocate(val(ll),irow(ll),icol(ll),stat=info)
             if(info /= psb_success_) then
@@ -790,7 +790,7 @@ subroutine dmatdist(a_glob, a, ictxt, desc_a,&
                  & irow,icol,val,info,nzin=ll,append=.true.)
             if (info /= psb_success_) then            
               if (nz >min(size(irow(ll+1:)),size(icol(ll+1:)),size(val(ll+1:)))) then 
-                write(0,*) 'Allocation failure? This should not happen!'
+                write(psb_err_unit,*) 'Allocation failure? This should not happen!'
               end if
               call psb_errpush(info,name,a_err=ch_err)
               goto 9999
@@ -883,8 +883,8 @@ subroutine dmatdist(a_glob, a, ictxt, desc_a,&
 
 
   if (iam == root) then 
-    write(*,*) 'descriptor assembly: ',t1-t0
-    write(*,*) 'sparse matrix assembly: ',t3-t2
+    write(psb_out_unit,*) 'descriptor assembly: ',t1-t0
+    write(psb_out_unit,*) 'sparse matrix assembly: ',t3-t2
   end if
 
   call psb_geasb(b,desc_a,info)     
@@ -1033,7 +1033,7 @@ subroutine cmatdist(a_glob, a, ictxt, desc_a,&
     nrow = a_glob%get_nrows()
     ncol = a_glob%get_ncols()
     if (nrow /= ncol) then
-      write(0,*) 'a rectangular matrix ? ',nrow,ncol
+      write(psb_err_unit,*) 'a rectangular matrix ? ',nrow,ncol
       info=-1
       call psb_errpush(info,name)
       goto 9999
@@ -1147,7 +1147,7 @@ subroutine cmatdist(a_glob, a, ictxt, desc_a,&
                & irow,icol,val,info,nzin=ll,append=.true.)
           if (info /= psb_success_) then            
             if (nz >min(size(irow(ll+1:)),size(icol(ll+1:)),size(val(ll+1:)))) then 
-              write(0,*) 'Allocation failure? This should not happen!'
+              write(psb_err_unit,*) 'Allocation failure? This should not happen!'
             end if
             call psb_errpush(info,name,a_err=ch_err)
             goto 9999
@@ -1186,7 +1186,7 @@ subroutine cmatdist(a_glob, a, ictxt, desc_a,&
           call psb_rcv(ictxt,nnr,root)
           call psb_rcv(ictxt,ll,root)
           if (ll > size(irow)) then 
-            write(0,*) iam,'need to reallocate ',ll
+            write(psb_err_unit,*) iam,'need to reallocate ',ll
             deallocate(val,irow,icol)
             allocate(val(ll),irow(ll),icol(ll),stat=info)
             if(info /= psb_success_) then
@@ -1235,7 +1235,7 @@ subroutine cmatdist(a_glob, a, ictxt, desc_a,&
                  & irow,icol,val,info,nzin=ll,append=.true.)
             if (info /= psb_success_) then            
               if (nz >min(size(irow(ll+1:)),size(icol(ll+1:)),size(val(ll+1:)))) then 
-                write(0,*) 'Allocation failure? This should not happen!'
+                write(psb_err_unit,*) 'Allocation failure? This should not happen!'
               end if
               call psb_errpush(info,name,a_err=ch_err)
               goto 9999
@@ -1328,8 +1328,8 @@ subroutine cmatdist(a_glob, a, ictxt, desc_a,&
 
 
   if (iam == root) then 
-    write(*,*) 'descriptor assembly: ',t1-t0
-    write(*,*) 'sparse matrix assembly: ',t3-t2
+    write(psb_out_unit,*) 'descriptor assembly: ',t1-t0
+    write(psb_out_unit,*) 'sparse matrix assembly: ',t3-t2
   end if
 
   call psb_geasb(b,desc_a,info)     
@@ -1478,7 +1478,7 @@ subroutine zmatdist(a_glob, a, ictxt, desc_a,&
     nrow = a_glob%get_nrows()
     ncol = a_glob%get_ncols()
     if (nrow /= ncol) then
-      write(0,*) 'a rectangular matrix ? ',nrow,ncol
+      write(psb_err_unit,*) 'a rectangular matrix ? ',nrow,ncol
       info=-1
       call psb_errpush(info,name)
       goto 9999
@@ -1592,7 +1592,7 @@ subroutine zmatdist(a_glob, a, ictxt, desc_a,&
                & irow,icol,val,info,nzin=ll,append=.true.)
           if (info /= psb_success_) then            
             if (nz >min(size(irow(ll+1:)),size(icol(ll+1:)),size(val(ll+1:)))) then 
-              write(0,*) 'Allocation failure? This should not happen!'
+              write(psb_err_unit,*) 'Allocation failure? This should not happen!'
             end if
             call psb_errpush(info,name,a_err=ch_err)
             goto 9999
@@ -1631,7 +1631,7 @@ subroutine zmatdist(a_glob, a, ictxt, desc_a,&
           call psb_rcv(ictxt,nnr,root)
           call psb_rcv(ictxt,ll,root)
           if (ll > size(irow)) then 
-            write(0,*) iam,'need to reallocate ',ll
+            write(psb_err_unit,*) iam,'need to reallocate ',ll
             deallocate(val,irow,icol)
             allocate(val(ll),irow(ll),icol(ll),stat=info)
             if(info /= psb_success_) then
@@ -1680,7 +1680,7 @@ subroutine zmatdist(a_glob, a, ictxt, desc_a,&
                  & irow,icol,val,info,nzin=ll,append=.true.)
             if (info /= psb_success_) then            
               if (nz >min(size(irow(ll+1:)),size(icol(ll+1:)),size(val(ll+1:)))) then 
-                write(0,*) 'Allocation failure? This should not happen!'
+                write(psb_err_unit,*) 'Allocation failure? This should not happen!'
               end if
               call psb_errpush(info,name,a_err=ch_err)
               goto 9999
@@ -1773,8 +1773,8 @@ subroutine zmatdist(a_glob, a, ictxt, desc_a,&
 
 
   if (iam == root) then 
-    write(*,*) 'descriptor assembly: ',t1-t0
-    write(*,*) 'sparse matrix assembly: ',t3-t2
+    write(psb_out_unit,*) 'descriptor assembly: ',t1-t0
+    write(psb_out_unit,*) 'sparse matrix assembly: ',t3-t2
   end if
 
   call psb_geasb(b,desc_a,info)     

@@ -222,7 +222,7 @@ Subroutine psb_skrylov(method,a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,i
     call  psb_scgstabl(a,prec,b,x,eps,desc_a,info,&
          &itmax,iter,err,itrace,irst,istop)
   case default
-    if (me == 0) write(0,*) trim(name),': Warning: Unknown method  ',method,&
+    if (me == 0) write(psb_err_unit,*) trim(name),': Warning: Unknown method  ',method,&
          & ', defaulting to BiCGSTAB'
     call  psb_scgstab(a,prec,b,x,eps,desc_a,info,&
          &itmax,iter,err,itrace,istop)

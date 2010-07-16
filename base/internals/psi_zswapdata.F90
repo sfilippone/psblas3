@@ -330,7 +330,7 @@ subroutine psi_zswapidxm(ictxt,icomm,flag,n,beta,y,idx,totxch,totsnd,totrcv,work
              & sndbuf(snd_pt:snd_pt+n*nesd-1), proc_to_comm)
       else if (proc_to_comm == me) then 
         if (nesd /= nerv) then 
-          write(0,*) 'Fatal error in swapdata: mismatch on self sendf',nerv,nesd
+          write(psb_err_unit,*) 'Fatal error in swapdata: mismatch on self sendf',nerv,nesd
         end if
         rcvbuf(rcv_pt:rcv_pt+n*nerv-1) = sndbuf(snd_pt:snd_pt+n*nesd-1)
       end if
@@ -423,7 +423,7 @@ subroutine psi_zswapidxm(ictxt,icomm,flag,n,beta,y,idx,totxch,totsnd,totrcv,work
         end if
       else if (proc_to_comm == me) then 
         if (nesd /= nerv) then 
-          write(0,*) 'Fatal error in swapdata: mismatch on self sendf',nerv,nesd
+          write(psb_err_unit,*) 'Fatal error in swapdata: mismatch on self sendf',nerv,nesd
         end if
         rcvbuf(rcv_pt:rcv_pt+n*nerv-1) = sndbuf(snd_pt:snd_pt+n*nesd-1)
       end if
@@ -821,7 +821,7 @@ subroutine psi_zswapidxv(ictxt,icomm,flag,beta,y,idx,totxch,totsnd,totrcv,work,i
              & sndbuf(snd_pt:snd_pt+nesd-1), proc_to_comm)
       else if (proc_to_comm ==  me) then
         if (nesd /= nerv) then 
-          write(0,*) 'Fatal error in swapdata: mismatch on self sendf',nerv,nesd
+          write(psb_err_unit,*) 'Fatal error in swapdata: mismatch on self sendf',nerv,nesd
         end if
         rcvbuf(rcv_pt:rcv_pt+nerv-1) = sndbuf(snd_pt:snd_pt+nesd-1)
       end if
@@ -910,7 +910,7 @@ subroutine psi_zswapidxv(ictxt,icomm,flag,beta,y,idx,totxch,totsnd,totrcv,work,i
         end if
       else if (proc_to_comm == me) then 
         if (nesd /= nerv) then 
-          write(0,*) 'Fatal error in swapdata: mismatch on self sendf',nerv,nesd
+          write(psb_err_unit,*) 'Fatal error in swapdata: mismatch on self sendf',nerv,nesd
         end if
         rcvbuf(rcv_pt:rcv_pt+nerv-1) = sndbuf(snd_pt:snd_pt+nesd-1)
       end if

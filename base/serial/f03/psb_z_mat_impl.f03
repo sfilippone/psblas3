@@ -1021,7 +1021,7 @@ subroutine psb_z_cscnv(a,b,info,type,mold,upd,dupl)
     goto 9999
   end if
 
-  if (debug) write(0,*) 'Converting from ',&
+  if (debug) write(psb_err_unit,*) 'Converting from ',&
        & a%get_fmt(),' to ',altmp%get_fmt()
 
   call altmp%cp_from_fmt(a%a, info)
@@ -1117,7 +1117,7 @@ subroutine psb_z_cscnv_ip(a,info,type,mold,dupl)
     goto 9999
   end if
 
-  if (debug) write(0,*) 'Converting in-place from ',&
+  if (debug) write(psb_err_unit,*) 'Converting in-place from ',&
        & a%get_fmt(),' to ',altmp%get_fmt()
 
   call altmp%mv_from_fmt(a%a, info)

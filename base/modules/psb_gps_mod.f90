@@ -123,13 +123,13 @@ CONTAINS
 
     ALLOCATE(SIZEG(NR),STPT(NR), STAT=INFO)
     IF(INFO /= psb_success_) THEN
-      WRITE(*,*) 'ERROR! MEMORY ALLOCATION # 1 FAILED IN GPS'
+      write(psb_out_unit,*) 'ERROR! MEMORY ALLOCATION # 1 FAILED IN GPS'
       STOP
     END IF
     !
     ALLOCATE(NHIGH(INIT), NLOW(INIT), NACUM(INIT), AUX(INIT), STAT=INFO)
     IF(INFO /= psb_success_) THEN
-      WRITE(*,*) 'ERROR! MEMORY ALLOCATION # 2 FAILED IN GPS'
+      write(psb_out_unit,*) 'ERROR! MEMORY ALLOCATION # 2 FAILED IN GPS'
       STOP
     END IF
     !
@@ -405,7 +405,7 @@ CONTAINS
     !-----------------------------------------------------
     SZ=SIZE(NACUM)
     IF(SZ < IDPTH) THEN
-       WRITE(*,*) 'GPS_SETUP: on fly reallocation of NACUM'
+       write(psb_out_unit,*) 'GPS_SETUP: on fly reallocation of NACUM'
        CALL REALLOC(NACUM,SZ,IDPTH) 
     END IF
     !-----------------------------------------------------
@@ -485,12 +485,12 @@ CONTAINS
        !-----------------------------------------------------
        SZ=SIZE(NHIGH)
        IF(SZ < IDPTH) THEN
-          WRITE(*,*) 'GPS_PIKLVL: on fly reallocation of NHIGH'
+          write(psb_out_unit,*) 'GPS_PIKLVL: on fly reallocation of NHIGH'
           CALL REALLOC(NHIGH,SZ,IDPTH) 
        END IF
        SZ=SIZE(NLOW)
        IF(SZ < IDPTH) THEN
-          WRITE(*,*) 'GPS_PIKLVL: on fly reallocation of NLOW'
+          write(psb_out_unit,*) 'GPS_PIKLVL: on fly reallocation of NLOW'
           CALL REALLOC(NLOW,SZ,IDPTH) 
        END IF
        !-----------------------------------------------------
@@ -637,7 +637,7 @@ CONTAINS
     SZ1=SIZE(STKC)
     SZ2=XC+XA
     IF(SZ1 < SZ2) THEN
-       WRITE(*,*) 'GPS_NUMBER - Check #1: on fly reallocation of STKC'
+       write(psb_out_unit,*) 'GPS_NUMBER - Check #1: on fly reallocation of STKC'
        CALL REALLOC(NACUM,SZ1,SZ2)
        STKC => NACUM
     END IF
@@ -649,7 +649,7 @@ CONTAINS
     SZ1=SIZE(STKC)
     SZ2=XC
     IF(SZ1 < SZ2) THEN
-       WRITE(*,*) 'GPS_NUMBER - Check #2: on fly reallocation of STKC'
+       write(psb_out_unit,*) 'GPS_NUMBER - Check #2: on fly reallocation of STKC'
        SZ2=SZ2+INIT
        CALL REALLOC(NACUM,SZ1,SZ2)
        STKC => NACUM
@@ -662,7 +662,7 @@ CONTAINS
     SZ1=SIZE(STKD)
     SZ2=XD+XB
     IF(SZ1 < SZ2) THEN
-       WRITE(*,*) 'GPS_NUMBER - Check #3: on fly reallocation of STKD'
+       write(psb_out_unit,*) 'GPS_NUMBER - Check #3: on fly reallocation of STKD'
        CALL REALLOC(AUX,SZ1,SZ2)
        STKD => AUX
     END IF
@@ -674,7 +674,7 @@ CONTAINS
     SZ1=SIZE(STKD)
     SZ2=XD
     IF(SZ1 < SZ2) THEN
-       WRITE(*,*) 'GPS_NUMBER - Check #4: on fly reallocation of STKD'
+       write(psb_out_unit,*) 'GPS_NUMBER - Check #4: on fly reallocation of STKD'
        SZ2=SZ2+INIT
        CALL REALLOC(AUX,SZ1,SZ2)
        STKD => AUX
@@ -703,7 +703,7 @@ CONTAINS
     SZ1=SIZE(STKC)
     SZ2=XC
     IF(SZ1 < SZ2) THEN
-       WRITE(*,*) 'GPS_NUMBER - Check #5: on fly reallocation of STKC'
+       write(psb_out_unit,*) 'GPS_NUMBER - Check #5: on fly reallocation of STKC'
        SZ2=SZ2+INIT
        CALL REALLOC(NACUM,SZ1,SZ2)
        STKC => NACUM
@@ -718,7 +718,7 @@ CONTAINS
     SZ1=SIZE(STKC)
     SZ2=XD
     IF(SZ1 < SZ2) THEN
-       WRITE(*,*) 'GPS_NUMBER - Check #6: on fly reallocation of STKC'
+       write(psb_out_unit,*) 'GPS_NUMBER - Check #6: on fly reallocation of STKC'
        SZ2=SZ2+INIT
        CALL REALLOC(NACUM,SZ1,SZ2)
        STKC => NACUM
@@ -748,7 +748,7 @@ CONTAINS
     
     call psb_realloc(sz2,vet,info)
     IF(INFO /= psb_success_) THEN
-       WRITE(*,*) 'Error! Memory allocation failure in REALLOC'
+       write(psb_out_unit,*) 'Error! Memory allocation failure in REALLOC'
        STOP
     END IF
     RETURN

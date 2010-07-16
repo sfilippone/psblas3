@@ -54,14 +54,14 @@ contains
     call psb_info(ictxt,iam,np)
     if (iam == 0) then
       ! Read Input Parameters
-      read(*,*) ip
+      read(psb_inp_unit,*) ip
       if (ip >= 5) then
-        read(*,*) mtrx_file
-        read(*,*) rhs_file
-        read(*,*) filefmt
-        read(*,*) kmethd
-        read(*,*) ptype
-        read(*,*) afmt
+        read(psb_inp_unit,*) mtrx_file
+        read(psb_inp_unit,*) rhs_file
+        read(psb_inp_unit,*) filefmt
+        read(psb_inp_unit,*) kmethd
+        read(psb_inp_unit,*) ptype
+        read(psb_inp_unit,*) afmt
 
 
         call psb_bcast(ictxt,mtrx_file)
@@ -71,29 +71,29 @@ contains
         call psb_bcast(ictxt,ptype)
         call psb_bcast(ictxt,afmt)
 
-        read(*,*) ipart
+        read(psb_inp_unit,*) ipart
         if (ip >= 7) then
-          read(*,*) istopc
+          read(psb_inp_unit,*) istopc
         else
           istopc=1        
         endif
         if (ip >= 8) then
-          read(*,*) itmax
+          read(psb_inp_unit,*) itmax
         else
           itmax=500
         endif
         if (ip >= 9) then
-          read(*,*) itrace
+          read(psb_inp_unit,*) itrace
         else
           itrace=-1
         endif
         if (ip >= 10) then
-          read(*,*) irst
+          read(psb_inp_unit,*) irst
         else
           irst  = 1
         endif
         if (ip >= 11) then
-          read(*,*) eps
+          read(psb_inp_unit,*) eps
         else
           eps=1.d-6
         endif
@@ -105,16 +105,16 @@ contains
         call psb_bcast(ictxt,inparms(1:5))
         call psb_bcast(ictxt,eps)
 
-        write(*,'("Solving matrix       : ",a)')  mtrx_file      
-        write(*,'("Number of processors : ",i3)') np
-        write(*,'("Data distribution    : ",i2)') ipart
-        write(*,'("Iterative method     : ",a)')  kmethd
-        write(*,'("Preconditioner       : ",a)')  ptype
-        write(*,'("Restart parameter    : ",i2)') irst
-        write(*,'("Storage format       : ",a)')  afmt(1:3)
-        write(*,'(" ")')
+        write(psb_out_unit,'("Solving matrix       : ",a)')  mtrx_file      
+        write(psb_out_unit,'("Number of processors : ",i3)') np
+        write(psb_out_unit,'("Data distribution    : ",i2)') ipart
+        write(psb_out_unit,'("Iterative method     : ",a)')  kmethd
+        write(psb_out_unit,'("Preconditioner       : ",a)')  ptype
+        write(psb_out_unit,'("Restart parameter    : ",i2)') irst
+        write(psb_out_unit,'("Storage format       : ",a)')  afmt(1:3)
+        write(psb_out_unit,'(" ")')
       else
-        write(0,*) 'Wrong format for input file'
+        write(psb_err_unit,*) 'Wrong format for input file'
         call psb_abort(ictxt)
         stop 1
       end if
@@ -155,14 +155,14 @@ contains
     call psb_info(ictxt,iam,np)
     if (iam == 0) then
       ! Read Input Parameters
-      read(*,*) ip
+      read(psb_inp_unit,*) ip
       if (ip >= 5) then
-        read(*,*) mtrx_file
-        read(*,*) rhs_file
-        read(*,*) filefmt
-        read(*,*) kmethd
-        read(*,*) ptype
-        read(*,*) afmt
+        read(psb_inp_unit,*) mtrx_file
+        read(psb_inp_unit,*) rhs_file
+        read(psb_inp_unit,*) filefmt
+        read(psb_inp_unit,*) kmethd
+        read(psb_inp_unit,*) ptype
+        read(psb_inp_unit,*) afmt
 
 
         call psb_bcast(ictxt,mtrx_file)
@@ -172,29 +172,29 @@ contains
         call psb_bcast(ictxt,ptype)
         call psb_bcast(ictxt,afmt)
 
-        read(*,*) ipart
+        read(psb_inp_unit,*) ipart
         if (ip >= 7) then
-          read(*,*) istopc
+          read(psb_inp_unit,*) istopc
         else
           istopc=1        
         endif
         if (ip >= 8) then
-          read(*,*) itmax
+          read(psb_inp_unit,*) itmax
         else
           itmax=500
         endif
         if (ip >= 9) then
-          read(*,*) itrace
+          read(psb_inp_unit,*) itrace
         else
           itrace=-1
         endif
         if (ip >= 10) then
-          read(*,*) irst
+          read(psb_inp_unit,*) irst
         else
           irst  = 1
         endif
         if (ip >= 11) then
-          read(*,*) eps
+          read(psb_inp_unit,*) eps
         else
           eps=1.d-6
         endif
@@ -206,16 +206,16 @@ contains
         call psb_bcast(ictxt,inparms(1:5))
         call psb_bcast(ictxt,eps)
 
-        write(*,'("Solving matrix       : ",a)')  mtrx_file      
-        write(*,'("Number of processors : ",i3)') np
-        write(*,'("Data distribution    : ",i2)') ipart
-        write(*,'("Iterative method     : ",a)')  kmethd
-        write(*,'("Preconditioner       : ",a)')  ptype
-        write(*,'("Restart parameter    : ",i2)') irst
-        write(*,'("Storage format       : ",a)')  afmt(1:3)
-        write(*,'(" ")')
+        write(psb_out_unit,'("Solving matrix       : ",a)')  mtrx_file      
+        write(psb_out_unit,'("Number of processors : ",i3)') np
+        write(psb_out_unit,'("Data distribution    : ",i2)') ipart
+        write(psb_out_unit,'("Iterative method     : ",a)')  kmethd
+        write(psb_out_unit,'("Preconditioner       : ",a)')  ptype
+        write(psb_out_unit,'("Restart parameter    : ",i2)') irst
+        write(psb_out_unit,'("Storage format       : ",a)')  afmt(1:3)
+        write(psb_out_unit,'(" ")')
       else
-        write(0,*) 'Wrong format for input file'
+        write(psb_err_unit,*) 'Wrong format for input file'
         call psb_abort(ictxt)
         stop 1
       end if

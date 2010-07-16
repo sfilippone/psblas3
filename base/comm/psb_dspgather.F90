@@ -93,7 +93,7 @@ subroutine  psb_dsp_allgather(globa, loca, desc_a, info, root, dupl,keepnum,keep
     call globa%mv_from(glob_coo)
 
   else
-    write(0,*) 'SP_ALLGATHER: Not implemented yet with keepnum ',keepnum_
+    write(psb_err_unit,*) 'SP_ALLGATHER: Not implemented yet with keepnum ',keepnum_
   end if
 
 

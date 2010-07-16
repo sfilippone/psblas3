@@ -326,7 +326,7 @@ subroutine psb_dspins_2desc(nz,ia,ja,val,a,desc_ar,desc_ac,info)
 
   else if (psb_is_asb_desc(desc_ac)) then 
 
-    write(0,*) 'Why are you calling me on an assembled desc_ac?'
+    write(psb_err_unit,*) 'Why are you calling me on an assembled desc_ac?'
 !!$    if (psb_is_large_desc(desc_a)) then 
 !!$
 !!$      allocate(ila(nz),jla(nz),stat=info)

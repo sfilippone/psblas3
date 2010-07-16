@@ -174,7 +174,7 @@ subroutine  psb_dhalom(x,desc_a,info,alpha,jx,ik,work,tran,mode,data)
     end if
   else
     aliw=.true.
-!!$    write(0,*) 'halom ',liwork
+!!$    write(psb_err_unit,*) 'halom ',liwork
     allocate(iwork(liwork),stat=info)
     if(info /= psb_success_) then
       info=psb_err_from_subroutine_

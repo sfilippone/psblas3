@@ -61,7 +61,7 @@ subroutine psb_dprecinit(p,ptype,info)
     allocate(psb_d_bjac_prec_type :: p%prec, stat=info)       
     
   case default
-    write(0,*) 'Unknown preconditioner type request "',ptype,'"'
+    write(psb_err_unit,*) 'Unknown preconditioner type request "',ptype,'"'
     info = psb_err_pivot_too_small_
     
   end select

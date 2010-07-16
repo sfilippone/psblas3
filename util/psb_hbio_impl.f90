@@ -78,7 +78,7 @@ subroutine shb_read(a, iret, iunit, filename,b,g,x,mtitle)
 
   call acsc%allocate(nrow,ncol,nnzero)
   if (ircode /= 0 ) then 
-    write(0,*) 'Memory allocation failed'
+    write(psb_err_unit,*) 'Memory allocation failed'
     goto 993
   end if
 
@@ -162,11 +162,11 @@ subroutine shb_read(a, iret, iunit, filename,b,g,x,mtitle)
       if (ircode /= 0) goto 993
 
     else
-      write(0,*) 'read_matrix: matrix type not yet supported'
+      write(psb_err_unit,*) 'read_matrix: matrix type not yet supported'
       iret=904
     end if
   else
-    write(0,*) 'read_matrix: matrix type not yet supported'
+    write(psb_err_unit,*) 'read_matrix: matrix type not yet supported'
     iret=904
   end if
 
@@ -177,13 +177,13 @@ subroutine shb_read(a, iret, iunit, filename,b,g,x,mtitle)
 
   ! open failed
 901 iret=901
-  write(0,*) 'read_matrix: could not open file ',filename,' for input'
+  write(psb_err_unit,*) 'read_matrix: could not open file ',filename,' for input'
   return
 902 iret=902
-  write(0,*) 'HB_READ: Unexpected end of file '
+  write(psb_err_unit,*) 'HB_READ: Unexpected end of file '
   return
 993 iret=993
-  write(0,*) 'HB_READ: Memory allocation failure'
+  write(psb_err_unit,*) 'HB_READ: Memory allocation failure'
   return
 end subroutine shb_read
 
@@ -322,7 +322,7 @@ subroutine shb_write(a,iret,iunit,filename,key,rhs,g,x,mtitle)
 
 901 continue 
   iret=901
-  write(0,*) 'Error while opening ',filename
+  write(psb_err_unit,*) 'Error while opening ',filename
   return
 end subroutine shb_write
 
@@ -377,7 +377,7 @@ subroutine dhb_read(a, iret, iunit, filename,b,g,x,mtitle)
 
   call acsc%allocate(nrow,ncol,nnzero)
   if (ircode /= 0 ) then 
-    write(0,*) 'Memory allocation failed'
+    write(psb_err_unit,*) 'Memory allocation failed'
     goto 993
   end if
 
@@ -461,11 +461,11 @@ subroutine dhb_read(a, iret, iunit, filename,b,g,x,mtitle)
       if (ircode /= 0) goto 993
 
     else
-      write(0,*) 'read_matrix: matrix type not yet supported'
+      write(psb_err_unit,*) 'read_matrix: matrix type not yet supported'
       iret=904
     end if
   else
-    write(0,*) 'read_matrix: matrix type not yet supported'
+    write(psb_err_unit,*) 'read_matrix: matrix type not yet supported'
     iret=904
   end if
 
@@ -476,13 +476,13 @@ subroutine dhb_read(a, iret, iunit, filename,b,g,x,mtitle)
 
   ! open failed
 901 iret=901
-  write(0,*) 'read_matrix: could not open file ',filename,' for input'
+  write(psb_err_unit,*) 'read_matrix: could not open file ',filename,' for input'
   return
 902 iret=902
-  write(0,*) 'HB_READ: Unexpected end of file '
+  write(psb_err_unit,*) 'HB_READ: Unexpected end of file '
   return
 993 iret=993
-  write(0,*) 'HB_READ: Memory allocation failure'
+  write(psb_err_unit,*) 'HB_READ: Memory allocation failure'
   return
 end subroutine dhb_read
 
@@ -621,7 +621,7 @@ subroutine dhb_write(a,iret,iunit,filename,key,rhs,g,x,mtitle)
 
 901 continue 
   iret=901
-  write(0,*) 'Error while opening ',filename
+  write(psb_err_unit,*) 'Error while opening ',filename
   return
 end subroutine dhb_write
 
@@ -677,7 +677,7 @@ subroutine chb_read(a, iret, iunit, filename,b,g,x,mtitle)
 
   call acsc%allocate(nrow,ncol,nnzero)
   if (ircode /= 0 ) then 
-    write(0,*) 'Memory allocation failed'
+    write(psb_err_unit,*) 'Memory allocation failed'
     goto 993
   end if
 
@@ -808,11 +808,11 @@ subroutine chb_read(a, iret, iunit, filename,b,g,x,mtitle)
       if (ircode /= 0) goto 993
 
     else
-      write(0,*) 'read_matrix: matrix type not yet supported'
+      write(psb_err_unit,*) 'read_matrix: matrix type not yet supported'
       iret=904
     end if
   else
-    write(0,*) 'read_matrix: matrix type not yet supported'
+    write(psb_err_unit,*) 'read_matrix: matrix type not yet supported'
     iret=904
   end if
 
@@ -823,13 +823,13 @@ subroutine chb_read(a, iret, iunit, filename,b,g,x,mtitle)
 
   ! open failed
 901 iret=901
-  write(0,*) 'read_matrix: could not open file ',filename,' for input'
+  write(psb_err_unit,*) 'read_matrix: could not open file ',filename,' for input'
   return
 902 iret=902
-  write(0,*) 'HB_READ: Unexpected end of file '
+  write(psb_err_unit,*) 'HB_READ: Unexpected end of file '
   return
 993 iret=993
-  write(0,*) 'HB_READ: Memory allocation failure'
+  write(psb_err_unit,*) 'HB_READ: Memory allocation failure'
   return
 end subroutine chb_read
 
@@ -968,7 +968,7 @@ subroutine chb_write(a,iret,iunit,filename,key,rhs,g,x,mtitle)
 
 901 continue 
   iret=901
-  write(0,*) 'Error while opening ',filename
+  write(psb_err_unit,*) 'Error while opening ',filename
   return
 end subroutine chb_write
 
@@ -1023,7 +1023,7 @@ subroutine zhb_read(a, iret, iunit, filename,b,g,x,mtitle)
 
   call acsc%allocate(nrow,ncol,nnzero)
   if (ircode /= 0 ) then 
-    write(0,*) 'Memory allocation failed'
+    write(psb_err_unit,*) 'Memory allocation failed'
     goto 993
   end if
 
@@ -1154,11 +1154,11 @@ subroutine zhb_read(a, iret, iunit, filename,b,g,x,mtitle)
       if (ircode /= 0) goto 993
 
     else
-      write(0,*) 'read_matrix: matrix type not yet supported'
+      write(psb_err_unit,*) 'read_matrix: matrix type not yet supported'
       iret=904
     end if
   else
-    write(0,*) 'read_matrix: matrix type not yet supported'
+    write(psb_err_unit,*) 'read_matrix: matrix type not yet supported'
     iret=904
   end if
 
@@ -1169,13 +1169,13 @@ subroutine zhb_read(a, iret, iunit, filename,b,g,x,mtitle)
 
   ! open failed
 901 iret=901
-  write(0,*) 'read_matrix: could not open file ',filename,' for input'
+  write(psb_err_unit,*) 'read_matrix: could not open file ',filename,' for input'
   return
 902 iret=902
-  write(0,*) 'HB_READ: Unexpected end of file '
+  write(psb_err_unit,*) 'HB_READ: Unexpected end of file '
   return
 993 iret=993
-  write(0,*) 'HB_READ: Memory allocation failure'
+  write(psb_err_unit,*) 'HB_READ: Memory allocation failure'
   return
 end subroutine zhb_read
 
@@ -1314,7 +1314,7 @@ subroutine zhb_write(a,iret,iunit,filename,key,rhs,g,x,mtitle)
 
 901 continue 
   iret=901
-  write(0,*) 'Error while opening ',filename
+  write(psb_err_unit,*) 'Error while opening ',filename
   return
 end subroutine zhb_write
 

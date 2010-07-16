@@ -58,7 +58,7 @@ subroutine dasrx(n,x,indx,dir,flag)
   case(psb_sort_keep_idx_)
     ! do nothing
   case default
-    write(0,*) 'Error in isrx: invalid flag',flag
+    write(psb_err_unit,*) 'Error in isrx: invalid flag',flag
   end select
   !
 

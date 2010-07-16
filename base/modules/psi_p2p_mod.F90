@@ -779,7 +779,7 @@ contains
       call mpi_recv(dat,size(dat),psb_mpi_integer,src,psb_int_tag,ictxt,status,info)
     end if
     if (info /= mpi_success) then 
-      write(0,*) 'Error in psb_recv', info
+      write(psb_err_unit,*) 'Error in psb_recv', info
     end if
     call psb_test_nodes(psb_mesg_queue)
 #endif    
@@ -865,7 +865,7 @@ contains
       call mpi_recv(dat,size(dat),mpi_real,src,psb_real_tag,ictxt,status,info)
     end if
     if (info /= mpi_success) then 
-      write(0,*) 'Error in psb_recv', info
+      write(psb_err_unit,*) 'Error in psb_recv', info
     end if
     call psb_test_nodes(psb_mesg_queue)
 #endif    
@@ -952,7 +952,7 @@ contains
            & psb_double_tag,ictxt,status,info)
     end if
     if (info /= mpi_success) then 
-      write(0,*) 'Error in psb_recv', info
+      write(psb_err_unit,*) 'Error in psb_recv', info
     end if
     call psb_test_nodes(psb_mesg_queue)
 #endif    
@@ -1039,7 +1039,7 @@ contains
            & psb_complex_tag,ictxt,status,info)
     end if
     if (info /= mpi_success) then 
-      write(0,*) 'Error in psb_recv', info
+      write(psb_err_unit,*) 'Error in psb_recv', info
     end if
     call psb_test_nodes(psb_mesg_queue)
 #endif    
@@ -1126,7 +1126,7 @@ contains
            & psb_dcomplex_tag,ictxt,status,info)
     end if
     if (info /= mpi_success) then 
-      write(0,*) 'Error in psb_recv', info
+      write(psb_err_unit,*) 'Error in psb_recv', info
     end if
     call psb_test_nodes(psb_mesg_queue)
 #endif    
@@ -1211,7 +1211,7 @@ contains
            & psb_logical_tag,ictxt,status,info)
     end if
     if (info /= mpi_success) then 
-      write(0,*) 'Error in psb_recv', info
+      write(psb_err_unit,*) 'Error in psb_recv', info
     end if
     call psb_test_nodes(psb_mesg_queue)
 #endif    
@@ -1328,7 +1328,7 @@ contains
            & psb_int8_tag,ictxt,status,info)
     end if
     if (info /= mpi_success) then 
-      write(0,*) 'Error in psb_recv', info
+      write(psb_err_unit,*) 'Error in psb_recv', info
     end if
     call psb_test_nodes(psb_mesg_queue)
 #endif    

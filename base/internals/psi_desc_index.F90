@@ -205,7 +205,7 @@ subroutine psi_desc_index(desc,index_in,dep_list,&
   nrcv = iszs  
 
   if ((iszs /= idxs).or.(iszr /= idxr)) then 
-    write(0,*) me, trim(name),': Warning: strange results?', &
+    write(psb_err_unit,*) me, trim(name),': Warning: strange results?', &
          & iszs,idxs,iszr,idxr
   end if
   if (debug_level >= psb_debug_inner_) then 
@@ -242,7 +242,7 @@ subroutine psi_desc_index(desc,index_in,dep_list,&
   i = 1
   do 
     if (i > ihinsz) then 
-!!$      write(0,*) me,' did not find index_in end??? ',i,ihinsz
+!!$      write(psb_err_unit,*) me,' did not find index_in end??? ',i,ihinsz
       exit
     end if
     if (index_in(i) == -1) exit

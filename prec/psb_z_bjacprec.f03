@@ -382,7 +382,7 @@ contains
     select case(what)
     case (psb_f_type_) 
       if (prec%iprcparm(psb_p_type_) /= psb_bjac_) then 
-        write(0,*) 'WHAT is invalid for current preconditioner ',prec%iprcparm(psb_p_type_),&
+        write(psb_err_unit,*) 'WHAT is invalid for current preconditioner ',prec%iprcparm(psb_p_type_),&
              & 'ignoring user specification'
         return
       endif
@@ -390,14 +390,14 @@ contains
       
     case (psb_ilu_fill_in_) 
       if ((prec%iprcparm(psb_p_type_) /= psb_bjac_).or.(prec%iprcparm(psb_f_type_) /= psb_f_ilu_n_)) then 
-        write(0,*) 'WHAT is invalid for current preconditioner ',prec%iprcparm(psb_p_type_),&
+        write(psb_err_unit,*) 'WHAT is invalid for current preconditioner ',prec%iprcparm(psb_p_type_),&
              & 'ignoring user specification'
         return
       endif
       prec%iprcparm(psb_ilu_fill_in_) = val
       
     case default
-      write(0,*) 'WHAT is invalid, ignoring user specification'
+      write(psb_err_unit,*) 'WHAT is invalid, ignoring user specification'
       
     end select
     

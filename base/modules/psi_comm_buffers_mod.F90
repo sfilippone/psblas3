@@ -83,7 +83,7 @@ contains
       ! If we are here one is associated, the other is not.
       ! This is impossible. 
       info = -1
-      write(0,*) 'Wrong status on init '
+      write(psb_err_unit,*) 'Wrong status on init '
       return
     end if
 
@@ -234,14 +234,14 @@ contains
     
     allocate(node, stat=info)
     if (info /= 0) then 
-      write(0,*) 'Fatal memory error inside communication subsystem'
+      write(psb_err_unit,*) 'Fatal memory error inside communication subsystem'
       return
     end if
     node%icontxt     = icontxt
     node%buffer_type = psb_int_type
     call move_alloc(buffer,node%intbuf)
     if (info /= 0) then 
-      write(0,*) 'Fatal memory error inside communication subsystem'
+      write(psb_err_unit,*) 'Fatal memory error inside communication subsystem'
       return
     end if
     call mpi_isend(node%intbuf,size(node%intbuf),psb_mpi_integer,&
@@ -269,14 +269,14 @@ contains
     
     allocate(node, stat=info)
     if (info /= 0) then 
-      write(0,*) 'Fatal memory error inside communication subsystem'
+      write(psb_err_unit,*) 'Fatal memory error inside communication subsystem'
       return
     end if
     node%icontxt     = icontxt
     node%buffer_type = psb_int8_type
     call move_alloc(buffer,node%int8buf)
     if (info /= 0) then 
-      write(0,*) 'Fatal memory error inside communication subsystem'
+      write(psb_err_unit,*) 'Fatal memory error inside communication subsystem'
       return
     end if
     call mpi_isend(node%int8buf,size(node%int8buf),mpi_integer8,&
@@ -305,14 +305,14 @@ contains
     
     allocate(node, stat=info)
     if (info /= 0) then 
-      write(0,*) 'Fatal memory error inside communication subsystem'
+      write(psb_err_unit,*) 'Fatal memory error inside communication subsystem'
       return
     end if
     node%icontxt     = icontxt
     node%buffer_type = psb_real_type
     call move_alloc(buffer,node%realbuf)
     if (info /= 0) then 
-      write(0,*) 'Fatal memory error inside communication subsystem'
+      write(psb_err_unit,*) 'Fatal memory error inside communication subsystem'
       return
     end if
     call mpi_isend(node%realbuf,size(node%realbuf),mpi_real,&
@@ -339,14 +339,14 @@ contains
     
     allocate(node, stat=info)
     if (info /= 0) then 
-      write(0,*) 'Fatal memory error inside communication subsystem'
+      write(psb_err_unit,*) 'Fatal memory error inside communication subsystem'
       return
     end if
     node%icontxt     = icontxt
     node%buffer_type = psb_double_type
     call move_alloc(buffer,node%doublebuf)
     if (info /= 0) then 
-      write(0,*) 'Fatal memory error inside communication subsystem'
+      write(psb_err_unit,*) 'Fatal memory error inside communication subsystem'
       return
     end if
     call mpi_isend(node%doublebuf,size(node%doublebuf),mpi_double_precision,&
@@ -373,14 +373,14 @@ contains
     
     allocate(node, stat=info)
     if (info /= 0) then 
-      write(0,*) 'Fatal memory error inside communication subsystem'
+      write(psb_err_unit,*) 'Fatal memory error inside communication subsystem'
       return
     end if
     node%icontxt     = icontxt
     node%buffer_type = psb_complex_type
     call move_alloc(buffer,node%complexbuf)
     if (info /= 0) then 
-      write(0,*) 'Fatal memory error inside communication subsystem'
+      write(psb_err_unit,*) 'Fatal memory error inside communication subsystem'
       return
     end if
     call mpi_isend(node%complexbuf,size(node%complexbuf),mpi_complex,&
@@ -407,14 +407,14 @@ contains
     
     allocate(node, stat=info)
     if (info /= 0) then 
-      write(0,*) 'Fatal memory error inside communication subsystem'
+      write(psb_err_unit,*) 'Fatal memory error inside communication subsystem'
       return
     end if
     node%icontxt     = icontxt
     node%buffer_type = psb_dcomplex_type
     call move_alloc(buffer,node%dcomplbuf)
     if (info /= 0) then 
-      write(0,*) 'Fatal memory error inside communication subsystem'
+      write(psb_err_unit,*) 'Fatal memory error inside communication subsystem'
       return
     end if
     call mpi_isend(node%dcomplbuf,size(node%dcomplbuf),mpi_double_complex,&
@@ -442,14 +442,14 @@ contains
     
     allocate(node, stat=info)
     if (info /= 0) then 
-      write(0,*) 'Fatal memory error inside communication subsystem'
+      write(psb_err_unit,*) 'Fatal memory error inside communication subsystem'
       return
     end if
     node%icontxt     = icontxt
     node%buffer_type = psb_logical_type
     call move_alloc(buffer,node%logbuf)
     if (info /= 0) then 
-      write(0,*) 'Fatal memory error inside communication subsystem'
+      write(psb_err_unit,*) 'Fatal memory error inside communication subsystem'
       return
     end if
     call mpi_isend(node%logbuf,size(node%logbuf),mpi_logical,&
@@ -477,14 +477,14 @@ contains
     
     allocate(node, stat=info)
     if (info /= 0) then 
-      write(0,*) 'Fatal memory error inside communication subsystem'
+      write(psb_err_unit,*) 'Fatal memory error inside communication subsystem'
       return
     end if
     node%icontxt     = icontxt
     node%buffer_type = psb_char_type
     call move_alloc(buffer,node%charbuf)
     if (info /= 0) then 
-      write(0,*) 'Fatal memory error inside communication subsystem'
+      write(psb_err_unit,*) 'Fatal memory error inside communication subsystem'
       return
     end if
     call mpi_isend(node%charbuf,size(node%charbuf),mpi_character,&

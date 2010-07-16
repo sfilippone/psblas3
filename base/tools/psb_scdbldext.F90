@@ -550,7 +550,7 @@ Subroutine psb_scdbldext(a,desc_a,novr,desc_ov,info, extype)
         Do i=1,iszr
           idx=workr(i)
           if (idx <1) then 
-            write(0,*) me,'Error in CDBLDEXTBLD level',i_ovr,' : ',idx,i,iszr
+            write(psb_err_unit,*) me,'Error in CDBLDEXTBLD level',i_ovr,' : ',idx,i,iszr
           else  If (desc_ov%idxmap%glob_to_loc(idx) < -np) Then
             !
             ! This is a new index. Assigning a local index as

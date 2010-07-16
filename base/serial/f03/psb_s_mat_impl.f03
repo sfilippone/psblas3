@@ -619,7 +619,7 @@ subroutine  psb_s_free(a)
   implicit none 
   class(psb_s_sparse_mat), intent(inout) :: a
 
-  write(*,*) 'On entry to PSB_S_FREE: ',allocated(a%a)
+  write(psb_out_unit,*) 'On entry to PSB_S_FREE: ',allocated(a%a)
   if (allocated(a%a)) then 
     call a%a%free()
     deallocate(a%a) 
@@ -1022,7 +1022,7 @@ subroutine psb_s_cscnv(a,b,info,type,mold,upd,dupl)
     goto 9999
   end if
 
-  if (debug) write(0,*) 'Converting from ',&
+  if (debug) write(psb_err_unit,*) 'Converting from ',&
        & a%get_fmt(),' to ',altmp%get_fmt()
 
   call altmp%cp_from_fmt(a%a, info)
@@ -1118,7 +1118,7 @@ subroutine psb_s_cscnv_ip(a,info,type,mold,dupl)
     goto 9999
   end if
 
-  if (debug) write(0,*) 'Converting in-place from ',&
+  if (debug) write(psb_err_unit,*) 'Converting in-place from ',&
        & a%get_fmt(),' to ',altmp%get_fmt()
 
   call altmp%mv_from_fmt(a%a, info)

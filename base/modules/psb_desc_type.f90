@@ -680,7 +680,7 @@ contains
 
     do 
       if (ip > size(idx)) then 
-        write(0,*) trim(name),': Warning: out of size of input vector '
+        write(psb_err_unit,*) trim(name),': Warning: out of size of input vector '
         exit
       end if
       if (idx(ip) == -1) exit
@@ -1305,7 +1305,7 @@ contains
       idxlist => desc%ext_index
     case(psb_comm_mov_)
       idxlist => desc%ovr_mst_idx
-      write(0,*) 'Warning: unusual request getidx on ovr_mst_idx'
+      write(psb_err_unit,*) 'Warning: unusual request getidx on ovr_mst_idx'
     case default
       info=psb_err_from_subroutine_
       call psb_errpush(info,name,a_err='wrong Data selector')

@@ -201,7 +201,7 @@ contains
     do i=1,nv 
       call psb_hash_searchinskey(v(i),j,i,hash,info) 
       if ((j /= i).or.(info /= HashOK)) then 
-        write(0,*) 'Error from hash_ins',i,v(i),j,info
+        write(psb_err_unit,*) 'Error from hash_ins',i,v(i),j,info
         info = HashNotFound
         return
       end if
@@ -223,7 +223,7 @@ contains
     !
     do 
       if (hsize < 0) then 
-        write(0,*) 'Error: hash size overflow ',hsize,nbits
+        write(psb_err_unit,*) 'Error: hash size overflow ',hsize,nbits
         info = -2 
         return
       end if
@@ -239,7 +239,7 @@ contains
     hash%nacc  = 0 
     allocate(hash%table(0:hsize-1,2),stat=info) 
     if (info /= psb_success_) then
-      write(0,*) 'Error: memory allocation failure  ',hsize
+      write(psb_err_unit,*) 'Error: memory allocation failure  ',hsize
       info = HashOutOfMemory
       return
     end if

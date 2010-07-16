@@ -62,7 +62,7 @@ logical function psb_isaperm(n,eip)
   do i=1, n 
     ip(i) = eip(i)
     if ((ip(i) < 1).or.(ip(i) > n)) then
-      write(0,*) 'Out of bounds in isaperm' ,ip(i), n
+      write(psb_err_unit,*) 'Out of bounds in isaperm' ,ip(i), n
       psb_isaperm = .false.
       return
     endif
@@ -968,13 +968,13 @@ subroutine ihsort(x,ix,dir,flag)
       index = ix(i)
       call psi_insert_int_idx_heap(key,index,l,x,ix,dir_,info)
       if (l /= i) then 
-        write(0,*) 'Mismatch while heapifying ! '
+        write(psb_err_unit,*) 'Mismatch while heapifying ! '
       end if
     end do
     do i=n, 2, -1 
       call psi_int_idx_heap_get_first(key,index,l,x,ix,dir_,info)
       if (l /= i-1) then 
-        write(0,*) 'Mismatch while pulling out of heap ',l,i
+        write(psb_err_unit,*) 'Mismatch while pulling out of heap ',l,i
       end if
       x(i)  = key
       ix(i) = index
@@ -985,13 +985,13 @@ subroutine ihsort(x,ix,dir,flag)
       key   = x(i)
       call psi_insert_int_heap(key,l,x,dir_,info)
       if (l /= i) then 
-        write(0,*) 'Mismatch while heapifying ! ',l,i
+        write(psb_err_unit,*) 'Mismatch while heapifying ! ',l,i
       end if
     end do
     do i=n, 2, -1 
       call psi_int_heap_get_first(key,l,x,dir_,info)
       if (l /= i-1) then 
-        write(0,*) 'Mismatch while pulling out of heap ',l,i
+        write(psb_err_unit,*) 'Mismatch while pulling out of heap ',l,i
       end if
       x(i)  = key
     end do
@@ -1077,13 +1077,13 @@ subroutine shsort(x,ix,dir,flag)
       index = ix(i)
       call psi_insert_real_idx_heap(key,index,l,x,ix,dir_,info)
       if (l /= i) then 
-        write(0,*) 'Mismatch while heapifying ! '
+        write(psb_err_unit,*) 'Mismatch while heapifying ! '
       end if
     end do
     do i=n, 2, -1 
       call psi_real_idx_heap_get_first(key,index,l,x,ix,dir_,info)
       if (l /= i-1) then 
-        write(0,*) 'Mismatch while pulling out of heap ',l,i
+        write(psb_err_unit,*) 'Mismatch while pulling out of heap ',l,i
       end if
       x(i)  = key
       ix(i) = index
@@ -1094,13 +1094,13 @@ subroutine shsort(x,ix,dir,flag)
       key   = x(i)
       call psi_insert_real_heap(key,l,x,dir_,info)
       if (l /= i) then 
-        write(0,*) 'Mismatch while heapifying ! ',l,i
+        write(psb_err_unit,*) 'Mismatch while heapifying ! ',l,i
       end if
     end do
     do i=n, 2, -1 
       call psi_real_heap_get_first(key,l,x,dir_,info)
       if (l /= i-1) then 
-        write(0,*) 'Mismatch while pulling out of heap ',l,i
+        write(psb_err_unit,*) 'Mismatch while pulling out of heap ',l,i
       end if
       x(i)  = key
     end do
@@ -1186,13 +1186,13 @@ subroutine dhsort(x,ix,dir,flag)
       index = ix(i)
       call psi_insert_double_idx_heap(key,index,l,x,ix,dir_,info)
       if (l /= i) then 
-        write(0,*) 'Mismatch while heapifying ! '
+        write(psb_err_unit,*) 'Mismatch while heapifying ! '
       end if
     end do
     do i=n, 2, -1 
       call psi_double_idx_heap_get_first(key,index,l,x,ix,dir_,info)
       if (l /= i-1) then 
-        write(0,*) 'Mismatch while pulling out of heap ',l,i
+        write(psb_err_unit,*) 'Mismatch while pulling out of heap ',l,i
       end if
       x(i)  = key
       ix(i) = index
@@ -1203,13 +1203,13 @@ subroutine dhsort(x,ix,dir,flag)
       key   = x(i)
       call psi_insert_double_heap(key,l,x,dir_,info)
       if (l /= i) then 
-        write(0,*) 'Mismatch while heapifying ! ',l,i
+        write(psb_err_unit,*) 'Mismatch while heapifying ! ',l,i
       end if
     end do
     do i=n, 2, -1 
       call psi_double_heap_get_first(key,l,x,dir_,info)
       if (l /= i-1) then 
-        write(0,*) 'Mismatch while pulling out of heap ',l,i
+        write(psb_err_unit,*) 'Mismatch while pulling out of heap ',l,i
       end if
       x(i)  = key
     end do
@@ -1295,13 +1295,13 @@ subroutine chsort(x,ix,dir,flag)
       index = ix(i)
       call psi_insert_scomplex_idx_heap(key,index,l,x,ix,dir_,info)
       if (l /= i) then 
-        write(0,*) 'Mismatch while heapifying ! '
+        write(psb_err_unit,*) 'Mismatch while heapifying ! '
       end if
     end do
     do i=n, 2, -1 
       call psi_scomplex_idx_heap_get_first(key,index,l,x,ix,dir_,info)
       if (l /= i-1) then 
-        write(0,*) 'Mismatch while pulling out of heap ',l,i
+        write(psb_err_unit,*) 'Mismatch while pulling out of heap ',l,i
       end if
       x(i)  = key
       ix(i) = index
@@ -1312,13 +1312,13 @@ subroutine chsort(x,ix,dir,flag)
       key   = x(i)
       call psi_insert_scomplex_heap(key,l,x,dir_,info)
       if (l /= i) then 
-        write(0,*) 'Mismatch while heapifying ! ',l,i
+        write(psb_err_unit,*) 'Mismatch while heapifying ! ',l,i
       end if
     end do
     do i=n, 2, -1 
       call psi_scomplex_heap_get_first(key,l,x,dir_,info)
       if (l /= i-1) then 
-        write(0,*) 'Mismatch while pulling out of heap ',l,i
+        write(psb_err_unit,*) 'Mismatch while pulling out of heap ',l,i
       end if
       x(i)  = key
     end do
@@ -1404,13 +1404,13 @@ subroutine zhsort(x,ix,dir,flag)
       index = ix(i)
       call psi_insert_dcomplex_idx_heap(key,index,l,x,ix,dir_,info)
       if (l /= i) then 
-        write(0,*) 'Mismatch while heapifying ! '
+        write(psb_err_unit,*) 'Mismatch while heapifying ! '
       end if
     end do
     do i=n, 2, -1 
       call psi_dcomplex_idx_heap_get_first(key,index,l,x,ix,dir_,info)
       if (l /= i-1) then 
-        write(0,*) 'Mismatch while pulling out of heap ',l,i
+        write(psb_err_unit,*) 'Mismatch while pulling out of heap ',l,i
       end if
       x(i)  = key
       ix(i) = index
@@ -1421,13 +1421,13 @@ subroutine zhsort(x,ix,dir,flag)
       key   = x(i)
       call psi_insert_dcomplex_heap(key,l,x,dir_,info)
       if (l /= i) then 
-        write(0,*) 'Mismatch while heapifying ! ',l,i
+        write(psb_err_unit,*) 'Mismatch while heapifying ! ',l,i
       end if
     end do
     do i=n, 2, -1 
       call psi_dcomplex_heap_get_first(key,l,x,dir_,info)
       if (l /= i-1) then 
-        write(0,*) 'Mismatch while pulling out of heap ',l,i
+        write(psb_err_unit,*) 'Mismatch while pulling out of heap ',l,i
       end if
       x(i)  = key
     end do
@@ -1469,7 +1469,7 @@ subroutine psb_init_int_heap(heap,info,dir)
   case (psb_sort_up_,psb_sort_down_,psb_asort_up_,psb_asort_down_)
     ! ok, do nothing
   case default
-    write(0,*) 'Invalid direction, defaulting to psb_sort_up_'
+    write(psb_err_unit,*) 'Invalid direction, defaulting to psb_sort_up_'
     heap%dir = psb_sort_up_
   end select
 
@@ -1486,7 +1486,7 @@ subroutine psb_dump_int_heap(iout,heap,info)
 
   info = psb_success_
   if (iout < 0) then
-    write(0,*) 'Invalid file '
+    write(psb_err_unit,*) 'Invalid file '
     info =-1
     return
   end if
@@ -1514,7 +1514,7 @@ subroutine psb_insert_int_heap(key,heap,info)
 
   info = psb_success_
   if (heap%last < 0) then 
-    write(0,*) 'Invalid last in heap ',heap%last
+    write(psb_err_unit,*) 'Invalid last in heap ',heap%last
     info = heap%last
     return
   endif
@@ -1522,7 +1522,7 @@ subroutine psb_insert_int_heap(key,heap,info)
   heap%last = heap%last 
   call psb_ensure_size(heap%last+1,heap%keys,info,addsz=psb_heap_resize)
   if (info /= psb_success_) then 
-    write(0,*) 'Memory allocation failure in heap_insert'
+    write(psb_err_unit,*) 'Memory allocation failure in heap_insert'
     info = -5
     return
   end if
@@ -1574,7 +1574,7 @@ subroutine psb_init_real_idx_heap(heap,info,dir)
   case (psb_sort_up_,psb_sort_down_,psb_asort_up_,psb_asort_down_)
     ! ok, do nothing
   case default
-    write(0,*) 'Invalid direction, defaulting to psb_sort_up_'
+    write(psb_err_unit,*) 'Invalid direction, defaulting to psb_sort_up_'
     heap%dir = psb_sort_up_
   end select
 
@@ -1592,7 +1592,7 @@ subroutine psb_dump_real_idx_heap(iout,heap,info)
 
   info = psb_success_
   if (iout < 0) then
-    write(0,*) 'Invalid file '
+    write(psb_err_unit,*) 'Invalid file '
     info =-1
     return
   end if
@@ -1625,7 +1625,7 @@ subroutine psb_insert_real_idx_heap(key,index,heap,info)
 
   info = psb_success_
   if (heap%last < 0) then 
-    write(0,*) 'Invalid last in heap ',heap%last
+    write(psb_err_unit,*) 'Invalid last in heap ',heap%last
     info = heap%last
     return
   endif
@@ -1634,7 +1634,7 @@ subroutine psb_insert_real_idx_heap(key,index,heap,info)
   if (info == psb_success_) &
        & call psb_ensure_size(heap%last+1,heap%idxs,info,addsz=psb_heap_resize)
   if (info /= psb_success_) then 
-    write(0,*) 'Memory allocation failure in heap_insert'
+    write(psb_err_unit,*) 'Memory allocation failure in heap_insert'
     info = -5
     return
   end if
@@ -1689,7 +1689,7 @@ subroutine psb_init_double_idx_heap(heap,info,dir)
   case (psb_sort_up_,psb_sort_down_,psb_asort_up_,psb_asort_down_)
     ! ok, do nothing
   case default
-    write(0,*) 'Invalid direction, defaulting to psb_sort_up_'
+    write(psb_err_unit,*) 'Invalid direction, defaulting to psb_sort_up_'
     heap%dir = psb_sort_up_
   end select
 
@@ -1707,7 +1707,7 @@ subroutine psb_dump_double_idx_heap(iout,heap,info)
 
   info = psb_success_
   if (iout < 0) then
-    write(0,*) 'Invalid file '
+    write(psb_err_unit,*) 'Invalid file '
     info =-1
     return
   end if
@@ -1740,7 +1740,7 @@ subroutine psb_insert_double_idx_heap(key,index,heap,info)
 
   info = psb_success_
   if (heap%last < 0) then 
-    write(0,*) 'Invalid last in heap ',heap%last
+    write(psb_err_unit,*) 'Invalid last in heap ',heap%last
     info = heap%last
     return
   endif
@@ -1749,7 +1749,7 @@ subroutine psb_insert_double_idx_heap(key,index,heap,info)
   if (info == psb_success_) &
        & call psb_ensure_size(heap%last+1,heap%idxs,info,addsz=psb_heap_resize)
   if (info /= psb_success_) then 
-    write(0,*) 'Memory allocation failure in heap_insert'
+    write(psb_err_unit,*) 'Memory allocation failure in heap_insert'
     info = -5
     return
   end if
@@ -1803,7 +1803,7 @@ subroutine psb_init_int_idx_heap(heap,info,dir)
   case (psb_sort_up_,psb_sort_down_,psb_asort_up_,psb_asort_down_)
     ! ok, do nothing
   case default
-    write(0,*) 'Invalid direction, defaulting to psb_sort_up_'
+    write(psb_err_unit,*) 'Invalid direction, defaulting to psb_sort_up_'
     heap%dir = psb_sort_up_
   end select
 
@@ -1821,7 +1821,7 @@ subroutine psb_dump_int_idx_heap(iout,heap,info)
 
   info = psb_success_
   if (iout < 0) then
-    write(0,*) 'Invalid file '
+    write(psb_err_unit,*) 'Invalid file '
     info =-1
     return
   end if
@@ -1854,7 +1854,7 @@ subroutine psb_insert_int_idx_heap(key,index,heap,info)
 
   info = psb_success_
   if (heap%last < 0) then 
-    write(0,*) 'Invalid last in heap ',heap%last
+    write(psb_err_unit,*) 'Invalid last in heap ',heap%last
     info = heap%last
     return
   endif
@@ -1863,7 +1863,7 @@ subroutine psb_insert_int_idx_heap(key,index,heap,info)
   if (info == psb_success_) &
        & call psb_ensure_size(heap%last+1,heap%idxs,info,addsz=psb_heap_resize)
   if (info /= psb_success_) then 
-    write(0,*) 'Memory allocation failure in heap_insert'
+    write(psb_err_unit,*) 'Memory allocation failure in heap_insert'
     info = -5
     return
   end if
@@ -1920,7 +1920,7 @@ subroutine psb_init_scomplex_idx_heap(heap,info,dir)
   case (psb_asort_up_,psb_asort_down_)
     ! ok, do nothing
   case default
-    write(0,*) 'Invalid direction, defaulting to psb_sort_up_'
+    write(psb_err_unit,*) 'Invalid direction, defaulting to psb_sort_up_'
     heap%dir = psb_asort_up_
   end select
 
@@ -1938,7 +1938,7 @@ subroutine psb_dump_scomplex_idx_heap(iout,heap,info)
 
   info = psb_success_
   if (iout < 0) then
-    write(0,*) 'Invalid file '
+    write(psb_err_unit,*) 'Invalid file '
     info =-1
     return
   end if
@@ -1971,7 +1971,7 @@ subroutine psb_insert_scomplex_idx_heap(key,index,heap,info)
 
   info = psb_success_
   if (heap%last < 0) then 
-    write(0,*) 'Invalid last in heap ',heap%last
+    write(psb_err_unit,*) 'Invalid last in heap ',heap%last
     info = heap%last
     return
   endif
@@ -1980,7 +1980,7 @@ subroutine psb_insert_scomplex_idx_heap(key,index,heap,info)
   if (info == psb_success_) &
        & call psb_ensure_size(heap%last+1,heap%idxs,info,addsz=psb_heap_resize)
   if (info /= psb_success_) then 
-    write(0,*) 'Memory allocation failure in heap_insert'
+    write(psb_err_unit,*) 'Memory allocation failure in heap_insert'
     info = -5
     return
   end if
@@ -2037,7 +2037,7 @@ subroutine psb_init_dcomplex_idx_heap(heap,info,dir)
   case (psb_asort_up_,psb_asort_down_)
     ! ok, do nothing
   case default
-    write(0,*) 'Invalid direction, defaulting to psb_sort_up_'
+    write(psb_err_unit,*) 'Invalid direction, defaulting to psb_sort_up_'
     heap%dir = psb_asort_up_
   end select
 
@@ -2055,7 +2055,7 @@ subroutine psb_dump_dcomplex_idx_heap(iout,heap,info)
 
   info = psb_success_
   if (iout < 0) then
-    write(0,*) 'Invalid file '
+    write(psb_err_unit,*) 'Invalid file '
     info =-1
     return
   end if
@@ -2088,7 +2088,7 @@ subroutine psb_insert_dcomplex_idx_heap(key,index,heap,info)
 
   info = psb_success_
   if (heap%last < 0) then 
-    write(0,*) 'Invalid last in heap ',heap%last
+    write(psb_err_unit,*) 'Invalid last in heap ',heap%last
     info = heap%last
     return
   endif
@@ -2097,7 +2097,7 @@ subroutine psb_insert_dcomplex_idx_heap(key,index,heap,info)
   if (info == psb_success_) &
        & call psb_ensure_size(heap%last+1,heap%idxs,info,addsz=psb_heap_resize)
   if (info /= psb_success_) then 
-    write(0,*) 'Memory allocation failure in heap_insert'
+    write(psb_err_unit,*) 'Memory allocation failure in heap_insert'
     info = -5
     return
   end if
@@ -2151,13 +2151,13 @@ subroutine psi_insert_int_heap(key,last,heap,dir,info)
 
   info = psb_success_
   if (last < 0) then 
-    write(0,*) 'Invalid last in heap ',last
+    write(psb_err_unit,*) 'Invalid last in heap ',last
     info = last
     return
   endif
   last    = last + 1
   if (last > size(heap)) then 
-    write(0,*) 'out of bounds '
+    write(psb_err_unit,*) 'out of bounds '
     info = -1
     return
   end if
@@ -2229,7 +2229,7 @@ subroutine psi_insert_int_heap(key,last,heap,dir,info)
 
 
   case default
-    write(0,*) 'Invalid direction in heap ',dir
+    write(psb_err_unit,*) 'Invalid direction in heap ',dir
   end select
 
   return
@@ -2352,7 +2352,7 @@ subroutine psi_int_heap_get_first(key,last,heap,dir,info)
     end do
 
   case default
-    write(0,*) 'Invalid direction in heap ',dir
+    write(psb_err_unit,*) 'Invalid direction in heap ',dir
   end select
 
   return
@@ -2381,13 +2381,13 @@ subroutine psi_insert_real_heap(key,last,heap,dir,info)
 
   info = psb_success_
   if (last < 0) then 
-    write(0,*) 'Invalid last in heap ',last
+    write(psb_err_unit,*) 'Invalid last in heap ',last
     info = last
     return
   endif
   last    = last + 1
   if (last > size(heap)) then 
-    write(0,*) 'out of bounds '
+    write(psb_err_unit,*) 'out of bounds '
     info = -1
     return
   end if
@@ -2459,7 +2459,7 @@ subroutine psi_insert_real_heap(key,last,heap,dir,info)
 
 
   case default
-    write(0,*) 'Invalid direction in heap ',dir
+    write(psb_err_unit,*) 'Invalid direction in heap ',dir
   end select
 
   return
@@ -2583,7 +2583,7 @@ subroutine psi_real_heap_get_first(key,last,heap,dir,info)
     end do
 
   case default
-    write(0,*) 'Invalid direction in heap ',dir
+    write(psb_err_unit,*) 'Invalid direction in heap ',dir
   end select
 
   return
@@ -2611,13 +2611,13 @@ subroutine psi_insert_double_heap(key,last,heap,dir,info)
 
   info = psb_success_
   if (last < 0) then 
-    write(0,*) 'Invalid last in heap ',last
+    write(psb_err_unit,*) 'Invalid last in heap ',last
     info = last
     return
   endif
   last    = last + 1
   if (last > size(heap)) then 
-    write(0,*) 'out of bounds '
+    write(psb_err_unit,*) 'out of bounds '
     info = -1
     return
   end if
@@ -2689,7 +2689,7 @@ subroutine psi_insert_double_heap(key,last,heap,dir,info)
 
 
   case default
-    write(0,*) 'Invalid direction in heap ',dir
+    write(psb_err_unit,*) 'Invalid direction in heap ',dir
   end select
 
   return
@@ -2813,7 +2813,7 @@ subroutine psi_double_heap_get_first(key,last,heap,dir,info)
     end do
 
   case default
-    write(0,*) 'Invalid direction in heap ',dir
+    write(psb_err_unit,*) 'Invalid direction in heap ',dir
   end select
 
   return
@@ -2843,13 +2843,13 @@ subroutine psi_insert_scomplex_heap(key,last,heap,dir,info)
 
   info = psb_success_
   if (last < 0) then 
-    write(0,*) 'Invalid last in heap ',last
+    write(psb_err_unit,*) 'Invalid last in heap ',last
     info = last
     return
   endif
   last    = last + 1
   if (last > size(heap)) then 
-    write(0,*) 'out of bounds '
+    write(psb_err_unit,*) 'out of bounds '
     info = -1
     return
   end if
@@ -2921,7 +2921,7 @@ subroutine psi_insert_scomplex_heap(key,last,heap,dir,info)
 
 
   case default
-    write(0,*) 'Invalid direction in heap ',dir
+    write(psb_err_unit,*) 'Invalid direction in heap ',dir
   end select
 
   return
@@ -3045,7 +3045,7 @@ subroutine psi_scomplex_heap_get_first(key,last,heap,dir,info)
     end do
 
   case default
-    write(0,*) 'Invalid direction in heap ',dir
+    write(psb_err_unit,*) 'Invalid direction in heap ',dir
   end select
 
   return
@@ -3073,13 +3073,13 @@ subroutine psi_insert_dcomplex_heap(key,last,heap,dir,info)
 
   info = psb_success_
   if (last < 0) then 
-    write(0,*) 'Invalid last in heap ',last
+    write(psb_err_unit,*) 'Invalid last in heap ',last
     info = last
     return
   endif
   last    = last + 1
   if (last > size(heap)) then 
-    write(0,*) 'out of bounds '
+    write(psb_err_unit,*) 'out of bounds '
     info = -1
     return
   end if
@@ -3151,7 +3151,7 @@ subroutine psi_insert_dcomplex_heap(key,last,heap,dir,info)
 
 
   case default
-    write(0,*) 'Invalid direction in heap ',dir
+    write(psb_err_unit,*) 'Invalid direction in heap ',dir
   end select
 
   return
@@ -3275,7 +3275,7 @@ subroutine psi_dcomplex_heap_get_first(key,last,heap,dir,info)
     end do
 
   case default
-    write(0,*) 'Invalid direction in heap ',dir
+    write(psb_err_unit,*) 'Invalid direction in heap ',dir
   end select
 
   return
@@ -3307,14 +3307,14 @@ subroutine psi_insert_int_idx_heap(key,index,last,heap,idxs,dir,info)
 
   info = psb_success_
   if (last < 0) then 
-    write(0,*) 'Invalid last in heap ',last
+    write(psb_err_unit,*) 'Invalid last in heap ',last
     info = last
     return
   endif
 
   last    = last + 1
   if (last > size(heap)) then 
-    write(0,*) 'out of bounds '
+    write(psb_err_unit,*) 'out of bounds '
     info = -1
     return
   end if
@@ -3400,7 +3400,7 @@ subroutine psi_insert_int_idx_heap(key,index,last,heap,idxs,dir,info)
 
 
   case default
-    write(0,*) 'Invalid direction in heap ',dir
+    write(psb_err_unit,*) 'Invalid direction in heap ',dir
   end select
 
   return
@@ -3537,7 +3537,7 @@ subroutine psi_int_idx_heap_get_first(key,index,last,heap,idxs,dir,info)
     end do
 
   case default
-    write(0,*) 'Invalid direction in heap ',dir
+    write(psb_err_unit,*) 'Invalid direction in heap ',dir
   end select
 
   return
@@ -3566,14 +3566,14 @@ subroutine psi_insert_real_idx_heap(key,index,last,heap,idxs,dir,info)
 
   info = psb_success_
   if (last < 0) then 
-    write(0,*) 'Invalid last in heap ',last
+    write(psb_err_unit,*) 'Invalid last in heap ',last
     info = last
     return
   endif
 
   last    = last + 1
   if (last > size(heap)) then 
-    write(0,*) 'out of bounds '
+    write(psb_err_unit,*) 'out of bounds '
     info = -1
     return
   end if
@@ -3659,7 +3659,7 @@ subroutine psi_insert_real_idx_heap(key,index,last,heap,idxs,dir,info)
 
 
   case default
-    write(0,*) 'Invalid direction in heap ',dir
+    write(psb_err_unit,*) 'Invalid direction in heap ',dir
   end select
 
   return
@@ -3796,7 +3796,7 @@ subroutine psi_real_idx_heap_get_first(key,index,last,heap,idxs,dir,info)
     end do
 
   case default
-    write(0,*) 'Invalid direction in heap ',dir
+    write(psb_err_unit,*) 'Invalid direction in heap ',dir
   end select
 
   return
@@ -3826,14 +3826,14 @@ subroutine psi_insert_double_idx_heap(key,index,last,heap,idxs,dir,info)
 
   info = psb_success_
   if (last < 0) then 
-    write(0,*) 'Invalid last in heap ',last
+    write(psb_err_unit,*) 'Invalid last in heap ',last
     info = last
     return
   endif
 
   last    = last + 1
   if (last > size(heap)) then 
-    write(0,*) 'out of bounds '
+    write(psb_err_unit,*) 'out of bounds '
     info = -1
     return
   end if
@@ -3919,7 +3919,7 @@ subroutine psi_insert_double_idx_heap(key,index,last,heap,idxs,dir,info)
 
 
   case default
-    write(0,*) 'Invalid direction in heap ',dir
+    write(psb_err_unit,*) 'Invalid direction in heap ',dir
   end select
 
   return
@@ -4056,7 +4056,7 @@ subroutine psi_double_idx_heap_get_first(key,index,last,heap,idxs,dir,info)
     end do
 
   case default
-    write(0,*) 'Invalid direction in heap ',dir
+    write(psb_err_unit,*) 'Invalid direction in heap ',dir
   end select
 
   return
@@ -4086,14 +4086,14 @@ subroutine psi_insert_scomplex_idx_heap(key,index,last,heap,idxs,dir,info)
 
   info = psb_success_
   if (last < 0) then 
-    write(0,*) 'Invalid last in heap ',last
+    write(psb_err_unit,*) 'Invalid last in heap ',last
     info = last
     return
   endif
 
   last    = last + 1
   if (last > size(heap)) then 
-    write(0,*) 'out of bounds '
+    write(psb_err_unit,*) 'out of bounds '
     info = -1
     return
   end if
@@ -4179,7 +4179,7 @@ subroutine psi_insert_scomplex_idx_heap(key,index,last,heap,idxs,dir,info)
 
 
   case default
-    write(0,*) 'Invalid direction in heap ',dir
+    write(psb_err_unit,*) 'Invalid direction in heap ',dir
   end select
 
   return
@@ -4316,7 +4316,7 @@ subroutine psi_scomplex_idx_heap_get_first(key,index,last,heap,idxs,dir,info)
     end do
 
   case default
-    write(0,*) 'Invalid direction in heap ',dir
+    write(psb_err_unit,*) 'Invalid direction in heap ',dir
   end select
 
   return
@@ -4346,14 +4346,14 @@ subroutine psi_insert_dcomplex_idx_heap(key,index,last,heap,idxs,dir,info)
 
   info = psb_success_
   if (last < 0) then 
-    write(0,*) 'Invalid last in heap ',last
+    write(psb_err_unit,*) 'Invalid last in heap ',last
     info = last
     return
   endif
 
   last    = last + 1
   if (last > size(heap)) then 
-    write(0,*) 'out of bounds '
+    write(psb_err_unit,*) 'out of bounds '
     info = -1
     return
   end if
@@ -4439,7 +4439,7 @@ subroutine psi_insert_dcomplex_idx_heap(key,index,last,heap,idxs,dir,info)
 
 
   case default
-    write(0,*) 'Invalid direction in heap ',dir
+    write(psb_err_unit,*) 'Invalid direction in heap ',dir
   end select
 
   return
@@ -4576,7 +4576,7 @@ subroutine psi_dcomplex_idx_heap_get_first(key,index,last,heap,idxs,dir,info)
     end do
 
   case default
-    write(0,*) 'Invalid direction in heap ',dir
+    write(psb_err_unit,*) 'Invalid direction in heap ',dir
   end select
 
   return

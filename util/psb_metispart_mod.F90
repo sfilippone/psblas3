@@ -66,18 +66,18 @@ module psb_metispart_mod
 contains
   
   subroutine part_graph(global_indx,n,np,pv,nv)
-    
+    use psb_sparse_mod
     integer, intent(in)  :: global_indx, n, np
     integer, intent(out) :: nv
     integer, intent(out) :: pv(*)
     
     IF (.not.allocated(graph_vect)) then
-       write(0,*) 'Fatal error in PART_GRAPH: vector GRAPH_VECT ',&
+       write(psb_err_unit,*) 'Fatal error in PART_GRAPH: vector GRAPH_VECT ',&
 	    & 'not initialized'
        return
     endif
     if ((global_indx<1).or.(global_indx > size(graph_vect))) then       
-       write(0,*) 'Fatal error in PART_GRAPH: index GLOBAL_INDX ',&
+       write(psb_err_unit,*) 'Fatal error in PART_GRAPH: index GLOBAL_INDX ',&
 	    & 'outside GRAPH_VECT bounds',global_indx,size(graph_vect)
        return
     endif
@@ -95,7 +95,7 @@ contains
     call psb_info(ictxt,me,np)
 
     if (.not.((root>=0).and.(root<np))) then 
-      write(0,*) 'Fatal error in DISTR_MTPART: invalid ROOT  ',&
+      write(psb_err_unit,*) 'Fatal error in DISTR_MTPART: invalid ROOT  ',&
            & 'coordinates '
       call psb_abort(ictxt)
       return
@@ -103,7 +103,7 @@ contains
 
     if (me == root) then 
       if (.not.allocated(graph_vect)) then
-        write(0,*) 'Fatal error in DISTR_MTPART: vector GRAPH_VECT ',&
+        write(psb_err_unit,*) 'Fatal error in DISTR_MTPART: vector GRAPH_VECT ',&
              & 'not initialized'
         call psb_abort(ictxt)
         return
@@ -115,7 +115,7 @@ contains
 
       allocate(graph_vect(n),stat=info)
       if (info /= psb_success_) then
-        write(0,*) 'Fatal error in DISTR_MTPART: memory allocation ',&
+        write(psb_err_unit,*) 'Fatal error in DISTR_MTPART: memory allocation ',&
              & ' failure.'
         return
       endif
@@ -144,7 +144,7 @@ contains
     type is (psb_d_csr_sparse_mat)
       call build_mtpart(aa%get_nrows(),aa%get_fmt(),aa%ja,aa%irp,nparts)
     class default
-      write(0,*) 'Sorry, right now we only take CSR input!'
+      write(psb_err_unit,*) 'Sorry, right now we only take CSR input!'
       call psb_abort(ictxt)
     end select
 
@@ -161,7 +161,7 @@ contains
     type is (psb_s_csr_sparse_mat)
       call build_mtpart(aa%get_nrows(),aa%get_fmt(),aa%ja,aa%irp,nparts)
     class default
-      write(0,*) 'Sorry, right now we only take CSR input!'
+      write(psb_err_unit,*) 'Sorry, right now we only take CSR input!'
       call psb_abort(ictxt)
     end select
 
@@ -178,7 +178,7 @@ contains
     type is (psb_z_csr_sparse_mat)
       call build_mtpart(aa%get_nrows(),aa%get_fmt(),aa%ja,aa%irp,nparts)
     class default
-      write(0,*) 'Sorry, right now we only take CSR input!'
+      write(psb_err_unit,*) 'Sorry, right now we only take CSR input!'
       call psb_abort(ictxt)
     end select
     
@@ -195,7 +195,7 @@ contains
     type is (psb_c_csr_sparse_mat)
       call build_mtpart(aa%get_nrows(),aa%get_fmt(),aa%ja,aa%irp,nparts)
     class default
-      write(0,*) 'Sorry, right now we only take CSR input!'
+      write(psb_err_unit,*) 'Sorry, right now we only take CSR input!'
       call psb_abort(ictxt)
     end select
 
@@ -224,7 +224,7 @@ contains
     allocate(graph_vect(n),stat=info)
     
     if (info /= psb_success_) then
-       write(0,*) 'Fatal error in BUILD_MTPART: memory allocation ',&
+       write(psb_err_unit,*) 'Fatal error in BUILD_MTPART: memory allocation ',&
 	    & ' failure.'
        return
     endif
@@ -241,7 +241,7 @@ contains
           graph_vect(i) = graph_vect(i) - 1
         enddo
       else
-        write(0,*) 'Fatal error in BUILD_MTPART: matrix format ',&
+        write(psb_err_unit,*) 'Fatal error in BUILD_MTPART: matrix format ',&
              & ' failure. ', FIDA
         return
       endif
@@ -251,7 +251,7 @@ contains
       enddo
     endif
 #else
-    write(0,*) 'Warning: METIS was not configured at PSBLAS compile time !'
+    write(psb_err_unit,*) 'Warning: METIS was not configured at PSBLAS compile time !'
 #endif
 
     return

@@ -159,7 +159,7 @@ contains
       type is (psb_d_csr_sparse_mat)
         do j = aa%irp(i), aa%irp(i+1) - 1
           k = aa%ja(j)
-          !           write(0,*)'KKKKK',k
+          !           write(psb_err_unit,*)'KKKKK',k
           if ((k < i).and.(k >= 1)) then
             l1 = l1 + 1
             laspk(l1) = aa%val(j)
@@ -241,9 +241,9 @@ contains
             !     
           else if (j == i) then
             !    j=i  update diagonal
-            !    write(0,*)'aggiorno dia',dia,'temp',temp,'jj',jj,'u%aspk',uaspk(jj)
+            !    write(psb_err_unit,*)'aggiorno dia',dia,'temp',temp,'jj',jj,'u%aspk',uaspk(jj)
             dia = dia - temp*uaspk(jj)
-            !    write(0,*)'dia',dia,'temp',temp,'jj',jj,'aspk',uaspk(jj)
+            !    write(psb_err_unit,*)'dia',dia,'temp',temp,'jj',jj,'aspk',uaspk(jj)
             cycle updateloop
             !     
           else if (j > i) then
@@ -283,7 +283,7 @@ contains
         dia = done/dia
       end if
       d(i) = dia
-      ! write(6,*)'diag(',i,')=',d(i)
+      ! write(psb_err_unit,*)'diag(',i,')=',d(i)
       !     Scale row i of upper triangle
       do  kk = uia2(i), uia2(i+1) - 1
         uaspk(kk) = uaspk(kk)*dia
@@ -297,7 +297,7 @@ contains
       type is (psb_d_csr_sparse_mat)
         do j = aa%irp(i-ma), aa%irp(i-ma+1) - 1
           k = aa%ja(j)
-          !           write(0,*)'KKKKK',k
+          !           write(psb_err_unit,*)'KKKKK',k
           if ((k < i).and.(k >= 1)) then
             l1 = l1 + 1
             laspk(l1) = aa%val(j)

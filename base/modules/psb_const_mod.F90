@@ -31,6 +31,9 @@
 !!$  
 
 module psb_const_mod
+#if defined(HAVE_ISO_FORTRAN_ENV)
+  use iso_fortran_env
+#endif
   ! This is the default integer
 #if defined(LONG_INTEGERS)
   integer, parameter  :: ndig=12
@@ -110,6 +113,16 @@ module psb_const_mod
   integer, parameter :: psb_dbleint_=2
   character(len=5)   :: psb_fidef_='CSR'
 
+#if defined(HAVE_ISO_FORTRAN_ENV) 
+  integer, save :: psb_err_unit = error_unit  
+  integer, save :: psb_inp_unit = input_unit  
+  integer, save :: psb_out_unit = output_unit 
+#else 
+  integer, save :: psb_err_unit = 0
+  integer, save :: psb_inp_unit = 5
+  integer, save :: psb_out_unit = 6
+#endif
+  
   !
   ! 
   !     Error constants

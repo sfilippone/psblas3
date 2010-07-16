@@ -128,12 +128,12 @@ program ppde
     call psb_errpush(info,name,a_err=ch_err)
     goto 9999
   end if
-  if (iam == psb_root_) write(*,'("Overall matrix creation time : ",es12.5)')t2
-  if (iam == psb_root_) write(*,'(" ")')
+  if (iam == psb_root_) write(psb_out_unit,'("Overall matrix creation time : ",es12.5)')t2
+  if (iam == psb_root_) write(psb_out_unit,'(" ")')
   !
   !  prepare the preconditioner.
   !  
-  if(iam == psb_root_) write(*,'("Setting preconditioner to : ",a)')ptype
+  if(iam == psb_root_) write(psb_out_unit,'("Setting preconditioner to : ",a)')ptype
   call psb_precinit(prec,ptype,info)
 
   call psb_barrier(ictxt)
@@ -150,12 +150,12 @@ program ppde
 
   call psb_amx(ictxt,tprec)
 
-  if (iam == psb_root_) write(*,'("Preconditioner time : ",es12.5)')tprec
-  if (iam == psb_root_) write(*,'(" ")')
+  if (iam == psb_root_) write(psb_out_unit,'("Preconditioner time : ",es12.5)')tprec
+  if (iam == psb_root_) write(psb_out_unit,'(" ")')
   !
   ! iterative method parameters 
   !
-  if(iam == psb_root_) write(*,'("Calling iterative method ",a)')kmethd
+  if(iam == psb_root_) write(psb_out_unit,'("Calling iterative method ",a)')kmethd
   call psb_barrier(ictxt)
   t1 = psb_wtime()  
   eps   = 1.d-9
@@ -181,15 +181,15 @@ program ppde
   call psb_sum(ictxt,precsize)
 
   if (iam == psb_root_) then
-    write(*,'(" ")')
-    write(*,'("Time to solve matrix          : ",es12.5)')t2
-    write(*,'("Time per iteration            : ",es12.5)')t2/iter
-    write(*,'("Number of iterations          : ",i0)')iter
-    write(*,'("Convergence indicator on exit : ",es12.5)')err
-    write(*,'("Info  on exit                 : ",i0)')info
-    write(*,'("Total memory occupation for A:      ",i12)')amatsize
-    write(*,'("Total memory occupation for DESC_A: ",i12)')descsize
-    write(*,'("Total memory occupation for PREC:   ",i12)')precsize
+    write(psb_out_unit,'(" ")')
+    write(psb_out_unit,'("Time to solve matrix          : ",es12.5)')t2
+    write(psb_out_unit,'("Time per iteration            : ",es12.5)')t2/iter
+    write(psb_out_unit,'("Number of iterations          : ",i0)')iter
+    write(psb_out_unit,'("Convergence indicator on exit : ",es12.5)')err
+    write(psb_out_unit,'("Info  on exit                 : ",i0)')info
+    write(psb_out_unit,'("Total memory occupation for A:      ",i12)')amatsize
+    write(psb_out_unit,'("Total memory occupation for DESC_A: ",i12)')descsize
+    write(psb_out_unit,'("Total memory occupation for PREC:   ",i12)')precsize
   end if
 
   !  
@@ -228,11 +228,11 @@ contains
     call psb_info(ictxt, iam, np)
 
     if (iam == 0) then
-      read(*,*) ip
+      read(psb_inp_unit,*) ip
       if (ip >= 3) then
-        read(*,*) kmethd
-        read(*,*) ptype
-        read(*,*) afmt
+        read(psb_inp_unit,*) kmethd
+        read(psb_inp_unit,*) ptype
+        read(psb_inp_unit,*) afmt
 
         ! broadcast parameters to all processors
         call psb_bcast(ictxt,kmethd)
@@ -240,24 +240,24 @@ contains
         call psb_bcast(ictxt,ptype)
 
 
-        read(*,*) idim
+        read(psb_inp_unit,*) idim
         if (ip >= 4) then
-          read(*,*) istopc
+          read(psb_inp_unit,*) istopc
         else
           istopc=1        
         endif
         if (ip >= 5) then
-          read(*,*) itmax
+          read(psb_inp_unit,*) itmax
         else
           itmax=500
         endif
         if (ip >= 6) then
-          read(*,*) itrace
+          read(psb_inp_unit,*) itrace
         else
           itrace=-1
         endif
         if (ip >= 7) then
-          read(*,*) irst
+          read(psb_inp_unit,*) irst
         else
           irst=1
         endif
@@ -270,13 +270,13 @@ contains
         intbuf(5) = irst
         call psb_bcast(ictxt,intbuf(1:5))
 
-        write(*,'("Solving matrix       : ell1")')      
-        write(*,'("Grid dimensions      : ",i4,"x",i4,"x",i4)')idim,idim,idim
-        write(*,'("Number of processors : ",i0)')np
-        write(*,'("Data distribution    : BLOCK")')
-        write(*,'("Preconditioner       : ",a)') ptype
-        write(*,'("Iterative method     : ",a)') kmethd
-        write(*,'(" ")')
+        write(psb_out_unit,'("Solving matrix       : ell1")')      
+        write(psb_out_unit,'("Grid dimensions      : ",i4,"x",i4,"x",i4)')idim,idim,idim
+        write(psb_out_unit,'("Number of processors : ",i0)')np
+        write(psb_out_unit,'("Data distribution    : BLOCK")')
+        write(psb_out_unit,'("Preconditioner       : ",a)') ptype
+        write(psb_out_unit,'("Iterative method     : ",a)') kmethd
+        write(psb_out_unit,'(" ")')
       else
         ! wrong number of parameter, print an error message and exit
         call pr_usage(0)      
@@ -385,7 +385,7 @@ contains
     m   = idim*idim*idim
     n   = m
     nnz = ((n*9)/(np))
-    if(iam == psb_root_) write(*,'("Generating Matrix (size=",i0,")...")')n
+    if(iam == psb_root_) write(psb_out_unit,'("Generating Matrix (size=",i0,")...")')n
 
     !
     ! Using a simple BLOCK distribution.
@@ -395,7 +395,7 @@ contains
 
     nt = nr
     call psb_sum(ictxt,nt) 
-    if (nt /= m) write(0,*) iam, 'Initialization error ',nr,nt,m
+    if (nt /= m) write(psb_err_unit,*) iam, 'Initialization error ',nr,nt,m
     call psb_barrier(ictxt)
     t0 = psb_wtime()
     call psb_cdall(ictxt,desc_a,info,nl=nr)
@@ -597,12 +597,12 @@ contains
     call psb_amx(ictxt,ttot)
     if(iam == psb_root_) then
       tmpfmt = a%get_fmt()
-      write(*,'("The matrix has been generated and assembled in ",a3," format.")')&
+      write(psb_out_unit,'("The matrix has been generated and assembled in ",a3," format.")')&
            &   tmpfmt
-      write(*,'("-allocation  time : ",es12.5)') talc
-      write(*,'("-coeff. gen. time : ",es12.5)') tgen
-      write(*,'("-assembly    time : ",es12.5)') tasb
-      write(*,'("-total       time : ",es12.5)') ttot
+      write(psb_out_unit,'("-allocation  time : ",es12.5)') talc
+      write(psb_out_unit,'("-coeff. gen. time : ",es12.5)') tgen
+      write(psb_out_unit,'("-assembly    time : ",es12.5)') tasb
+      write(psb_out_unit,'("-total       time : ",es12.5)') ttot
 
     end if
     call psb_erractionrestore(err_act)

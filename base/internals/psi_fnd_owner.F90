@@ -239,7 +239,7 @@ subroutine psi_fnd_owner(nv,idx,iprc,desc,info)
           ! Last resort attempt.
           j = psb_ibsrch(ih,size(answers,1),answers(:,1))
           if (j == -1) then 
-            write(0,*) me,'psi_fnd_owner: searching for ',ih, &
+            write(psb_err_unit,*) me,'psi_fnd_owner: searching for ',ih, &
                  & 'not found : ',size(answers,1),':',answers(:,1)
             info = psb_err_internal_error_
             call psb_errpush(psb_err_internal_error_,name,a_err='out bounds srch ih') 
@@ -251,7 +251,7 @@ subroutine psi_fnd_owner(nv,idx,iprc,desc,info)
           k = j 
           j = psb_ibsrch(ih,k,answers(1:k,1))
           if (j == -1) then 
-            write(0,*) me,'psi_fnd_owner: searching for ',ih, &
+            write(psb_err_unit,*) me,'psi_fnd_owner: searching for ',ih, &
                  & 'not found : ',size(answers,1),':',answers(:,1)
             info = psb_err_internal_error_
             call psb_errpush(psb_err_internal_error_,name,a_err='out bounds srch ih') 
@@ -283,9 +283,9 @@ subroutine psi_fnd_owner(nv,idx,iprc,desc,info)
     call psb_amx(ictxt,tidx)
     call psb_amx(ictxt,t1)
     if (me == psb_root_) then 
-      write(*,'(" fnd_owner  idx time  : ",es10.4)') tidx
-      write(*,'(" fnd_owner  amx time  : ",es10.4)') tamx
-      write(*,'(" fnd_owner remainedr  : ",es10.4)') t1 
+      write(psb_out_unit,'(" fnd_owner  idx time  : ",es10.4)') tidx
+      write(psb_out_unit,'(" fnd_owner  amx time  : ",es10.4)') tamx
+      write(psb_out_unit,'(" fnd_owner remainedr  : ",es10.4)') t1 
     endif
   end if
 

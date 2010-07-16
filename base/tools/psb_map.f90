@@ -50,7 +50,7 @@ subroutine psb_s_map_X2Y(alpha,x,beta,y,map,info,work)
 
   info = psb_success_
   if (.not.psb_is_asb_map(map)) then 
-    write(0,*) trim(name),' Invalid descriptor input'
+    write(psb_err_unit,*) trim(name),' Invalid descriptor input'
     info = 1
     return 
   end if
@@ -71,7 +71,7 @@ subroutine psb_s_map_X2Y(alpha,x,beta,y,map,info,work)
     end if
     if (info == psb_success_) call psb_geaxpby(alpha,yt,beta,y,map%p_desc_Y,info)
     if (info /= psb_success_) then 
-      write(0,*) trim(name),' Error from inner routines',info
+      write(psb_err_unit,*) trim(name),' Error from inner routines',info
       info = -1
     end if
 
@@ -91,13 +91,13 @@ subroutine psb_s_map_X2Y(alpha,x,beta,y,map,info,work)
     end if
     if (info == psb_success_) call psb_geaxpby(alpha,yt,beta,y,map%desc_Y,info)
     if (info /= psb_success_) then 
-      write(0,*) trim(name),' Error from inner routines',info
+      write(psb_err_unit,*) trim(name),' Error from inner routines',info
       info = -1
     end if
    
 
   case default
-    write(0,*) trim(name),' Invalid descriptor input'
+    write(psb_err_unit,*) trim(name),' Invalid descriptor input'
     info = 1
     return 
   end select
@@ -129,7 +129,7 @@ subroutine psb_s_map_Y2X(alpha,x,beta,y,map,info,work)
 
   info = psb_success_
   if (.not.psb_is_asb_map(map)) then 
-    write(0,*) trim(name),' Invalid descriptor input'
+    write(psb_err_unit,*) trim(name),' Invalid descriptor input'
     info = 1
     return 
   end if
@@ -150,7 +150,7 @@ subroutine psb_s_map_Y2X(alpha,x,beta,y,map,info,work)
     end if
     if (info == psb_success_) call psb_geaxpby(alpha,yt,beta,y,map%p_desc_X,info)
     if (info /= psb_success_) then 
-      write(0,*) trim(name),' Error from inner routines',info
+      write(psb_err_unit,*) trim(name),' Error from inner routines',info
       info = -1
     end if
 
@@ -170,13 +170,13 @@ subroutine psb_s_map_Y2X(alpha,x,beta,y,map,info,work)
     end if
     if (info == psb_success_) call psb_geaxpby(alpha,yt,beta,y,map%desc_X,info)
     if (info /= psb_success_) then 
-      write(0,*) trim(name),' Error from inner routines',info
+      write(psb_err_unit,*) trim(name),' Error from inner routines',info
       info = -1
     end if
    
 
   case default
-    write(0,*) trim(name),' Invalid descriptor input'
+    write(psb_err_unit,*) trim(name),' Invalid descriptor input'
     info = 1
     return 
   end select
@@ -207,7 +207,7 @@ subroutine psb_d_map_X2Y(alpha,x,beta,y,map,info,work)
 
   info = psb_success_
   if (.not.psb_is_asb_map(map)) then 
-    write(0,*) trim(name),' Invalid descriptor input: unassembled'
+    write(psb_err_unit,*) trim(name),' Invalid descriptor input: unassembled'
     info = 1
     return 
   end if
@@ -228,7 +228,7 @@ subroutine psb_d_map_X2Y(alpha,x,beta,y,map,info,work)
     end if
     if (info == psb_success_) call psb_geaxpby(alpha,yt,beta,y,map%p_desc_Y,info)
     if (info /= psb_success_) then 
-      write(0,*) trim(name),' Error from inner routines',info
+      write(psb_err_unit,*) trim(name),' Error from inner routines',info
       info = -1
     end if
 
@@ -248,13 +248,13 @@ subroutine psb_d_map_X2Y(alpha,x,beta,y,map,info,work)
     end if
     if (info == psb_success_) call psb_geaxpby(alpha,yt,beta,y,map%desc_Y,info)
     if (info /= psb_success_) then 
-      write(0,*) trim(name),' Error from inner routines',info
+      write(psb_err_unit,*) trim(name),' Error from inner routines',info
       info = -1
     end if
    
 
   case default
-    write(0,*) trim(name),' Invalid descriptor input', &
+    write(psb_err_unit,*) trim(name),' Invalid descriptor input', &
          & map_kind, psb_map_aggr_, psb_map_gen_linear_
     info = 1
     return 
@@ -287,7 +287,7 @@ subroutine psb_d_map_Y2X(alpha,x,beta,y,map,info,work)
 
   info = psb_success_
   if (.not.psb_is_asb_map(map)) then 
-    write(0,*) trim(name),' Invalid descriptor input'
+    write(psb_err_unit,*) trim(name),' Invalid descriptor input'
     info = 1
     return 
   end if
@@ -308,7 +308,7 @@ subroutine psb_d_map_Y2X(alpha,x,beta,y,map,info,work)
     end if
     if (info == psb_success_) call psb_geaxpby(alpha,yt,beta,y,map%p_desc_X,info)
     if (info /= psb_success_) then 
-      write(0,*) trim(name),' Error from inner routines',info
+      write(psb_err_unit,*) trim(name),' Error from inner routines',info
       info = -1
     end if
 
@@ -328,13 +328,13 @@ subroutine psb_d_map_Y2X(alpha,x,beta,y,map,info,work)
     end if
     if (info == psb_success_) call psb_geaxpby(alpha,yt,beta,y,map%desc_X,info)
     if (info /= psb_success_) then 
-      write(0,*) trim(name),' Error from inner routines',info
+      write(psb_err_unit,*) trim(name),' Error from inner routines',info
       info = -1
     end if
    
 
   case default
-    write(0,*) trim(name),' Invalid descriptor input'
+    write(psb_err_unit,*) trim(name),' Invalid descriptor input'
     info = 1
     return 
   end select
@@ -366,7 +366,7 @@ subroutine psb_c_map_X2Y(alpha,x,beta,y,map,info,work)
 
   info = psb_success_
   if (.not.psb_is_asb_map(map)) then 
-    write(0,*) trim(name),' Invalid descriptor input'
+    write(psb_err_unit,*) trim(name),' Invalid descriptor input'
     info = 1
     return 
   end if
@@ -387,7 +387,7 @@ subroutine psb_c_map_X2Y(alpha,x,beta,y,map,info,work)
     end if
     if (info == psb_success_) call psb_geaxpby(alpha,yt,beta,y,map%p_desc_Y,info)
     if (info /= psb_success_) then 
-      write(0,*) trim(name),' Error from inner routines',info
+      write(psb_err_unit,*) trim(name),' Error from inner routines',info
       info = -1
     end if
 
@@ -407,13 +407,13 @@ subroutine psb_c_map_X2Y(alpha,x,beta,y,map,info,work)
     end if
     if (info == psb_success_) call psb_geaxpby(alpha,yt,beta,y,map%desc_Y,info)
     if (info /= psb_success_) then 
-      write(0,*) trim(name),' Error from inner routines',info
+      write(psb_err_unit,*) trim(name),' Error from inner routines',info
       info = -1
     end if
    
 
   case default
-    write(0,*) trim(name),' Invalid descriptor input'
+    write(psb_err_unit,*) trim(name),' Invalid descriptor input'
     info = 1
     return 
   end select
@@ -445,7 +445,7 @@ subroutine psb_c_map_Y2X(alpha,x,beta,y,map,info,work)
 
   info = psb_success_
   if (.not.psb_is_asb_map(map)) then 
-    write(0,*) trim(name),' Invalid descriptor input'
+    write(psb_err_unit,*) trim(name),' Invalid descriptor input'
     info = 1
     return 
   end if
@@ -466,7 +466,7 @@ subroutine psb_c_map_Y2X(alpha,x,beta,y,map,info,work)
     end if
     if (info == psb_success_) call psb_geaxpby(alpha,yt,beta,y,map%p_desc_X,info)
     if (info /= psb_success_) then 
-      write(0,*) trim(name),' Error from inner routines',info
+      write(psb_err_unit,*) trim(name),' Error from inner routines',info
       info = -1
     end if
 
@@ -486,13 +486,13 @@ subroutine psb_c_map_Y2X(alpha,x,beta,y,map,info,work)
     end if
     if (info == psb_success_) call psb_geaxpby(alpha,yt,beta,y,map%desc_X,info)
     if (info /= psb_success_) then 
-      write(0,*) trim(name),' Error from inner routines',info
+      write(psb_err_unit,*) trim(name),' Error from inner routines',info
       info = -1
     end if
    
 
   case default
-    write(0,*) trim(name),' Invalid descriptor input'
+    write(psb_err_unit,*) trim(name),' Invalid descriptor input'
     info = 1
     return 
   end select
@@ -524,7 +524,7 @@ subroutine psb_z_map_X2Y(alpha,x,beta,y,map,info,work)
 
   info = psb_success_
   if (.not.psb_is_asb_map(map)) then 
-    write(0,*) trim(name),' Invalid descriptor input'
+    write(psb_err_unit,*) trim(name),' Invalid descriptor input'
     info = 1
     return 
   end if
@@ -545,7 +545,7 @@ subroutine psb_z_map_X2Y(alpha,x,beta,y,map,info,work)
     end if
     if (info == psb_success_) call psb_geaxpby(alpha,yt,beta,y,map%p_desc_Y,info)
     if (info /= psb_success_) then 
-      write(0,*) trim(name),' Error from inner routines',info
+      write(psb_err_unit,*) trim(name),' Error from inner routines',info
       info = -1
     end if
 
@@ -565,13 +565,13 @@ subroutine psb_z_map_X2Y(alpha,x,beta,y,map,info,work)
     end if
     if (info == psb_success_) call psb_geaxpby(alpha,yt,beta,y,map%desc_Y,info)
     if (info /= psb_success_) then 
-      write(0,*) trim(name),' Error from inner routines',info
+      write(psb_err_unit,*) trim(name),' Error from inner routines',info
       info = -1
     end if
    
 
   case default
-    write(0,*) trim(name),' Invalid descriptor input'
+    write(psb_err_unit,*) trim(name),' Invalid descriptor input'
     info = 1
     return 
   end select
@@ -603,7 +603,7 @@ subroutine psb_z_map_Y2X(alpha,x,beta,y,map,info,work)
 
   info = psb_success_
   if (.not.psb_is_asb_map(map)) then 
-    write(0,*) trim(name),' Invalid descriptor input'
+    write(psb_err_unit,*) trim(name),' Invalid descriptor input'
     info = 1
     return 
   end if
@@ -624,7 +624,7 @@ subroutine psb_z_map_Y2X(alpha,x,beta,y,map,info,work)
     end if
     if (info == psb_success_) call psb_geaxpby(alpha,yt,beta,y,map%p_desc_X,info)
     if (info /= psb_success_) then 
-      write(0,*) trim(name),' Error from inner routines',info
+      write(psb_err_unit,*) trim(name),' Error from inner routines',info
       info = -1
     end if
 
@@ -644,13 +644,13 @@ subroutine psb_z_map_Y2X(alpha,x,beta,y,map,info,work)
     end if
     if (info == psb_success_) call psb_geaxpby(alpha,yt,beta,y,map%desc_X,info)
     if (info /= psb_success_) then 
-      write(0,*) trim(name),' Error from inner routines',info
+      write(psb_err_unit,*) trim(name),' Error from inner routines',info
       info = -1
     end if
    
 
   case default
-    write(0,*) trim(name),' Invalid descriptor input'
+    write(psb_err_unit,*) trim(name),' Invalid descriptor input'
     info = 1
     return 
   end select

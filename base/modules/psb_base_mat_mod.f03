@@ -247,7 +247,7 @@ contains
     class(psb_base_sparse_mat), intent(inout) :: a
     integer, intent(in) :: v(:)
     ! TBD
-    write(0,*) 'SET_AUX is empty right now '
+    write(psb_err_unit,*) 'SET_AUX is empty right now '
   end subroutine psb_base_set_aux
 
   subroutine  psb_base_get_aux(v,a) 
@@ -255,7 +255,7 @@ contains
     class(psb_base_sparse_mat), intent(in) :: a
     integer, intent(out), allocatable  :: v(:)
     ! TBD
-    write(0,*) 'GET_AUX is empty right now '
+    write(psb_err_unit,*) 'GET_AUX is empty right now '
   end subroutine psb_base_get_aux
  
   subroutine  psb_base_set_nrows(m,a) 

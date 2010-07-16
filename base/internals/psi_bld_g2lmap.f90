@@ -92,7 +92,7 @@ subroutine psi_bld_g2lmap(desc,info)
     if (hsize < 0) then 
       ! This should never happen for sane values
       ! of psb_max_hash_bits.
-      write(0,*) 'Error: hash size overflow ',hsize,nbits
+      write(psb_err_unit,*) 'Error: hash size overflow ',hsize,nbits
       info = -2 
       return
     end if

@@ -90,7 +90,7 @@ contains
 
     call psb_info(ictxt, iam, np)
 
-    read(*,*) idim
+    read(psb_inp_unit,*) idim
 
 
     return
@@ -184,7 +184,7 @@ contains
     m   = idim*idim*idim
     n   = m
     nnz = ((n*9)/(np))
-    if(iam == psb_root_) write(0,'("Generating Matrix (size=",i0,")...")')n
+    if(iam == psb_root_) write(psb_err_unit,'("Generating Matrix (size=",i0,")...")')n
 
     !
     ! Using a simple BLOCK distribution.
@@ -194,8 +194,8 @@ contains
 
     nt = nr
     call psb_sum(ictxt,nt) 
-    if (nt /= m) write(0,*) iam, 'Initialization error ',nr,nt,m
-    write(0,*) iam, 'Initialization ',nr,nt,m
+    if (nt /= m) write(psb_err_unit,*) iam, 'Initialization error ',nr,nt,m
+    write(psb_err_unit,*) iam, 'Initialization ',nr,nt,m
     nlr = nt
     call psb_barrier(ictxt)
 
@@ -384,20 +384,20 @@ contains
 
 !!$    call a_n%print(20)
     anorm = a_n%csnmi()
-    write(0,*) 'Nrm infinity ',anorm
+    write(psb_err_unit,*) 'Nrm infinity ',anorm
 !!$    call a_n%csget(2,3,element,irow,icol,val,info)
-!!$    write(0,*) 'From csget ',element,info
+!!$    write(psb_err_unit,*) 'From csget ',element,info
 !!$    if (info == psb_success_) then 
 !!$      do i=1,element
-!!$        write(0,*) irow(i),icol(i),val(i)
+!!$        write(psb_err_unit,*) irow(i),icol(i),val(i)
 !!$      end do
 !!$    end if
     
     isz = a_n%get_size()
-    write(0,*) 'Size 1: ',isz
+    write(psb_err_unit,*) 'Size 1: ',isz
     call a_n%trim()
     isz = a_n%get_size()
-    write(0,*) 'Size 2: ',isz
+    write(psb_err_unit,*) 'Size 2: ',isz
     
 
       
@@ -418,19 +418,19 @@ contains
     tmov = psb_wtime()-t1
 !!$    call a_n%print(21)
     anorm = a_n%csnmi()
-    write(0,*) 'Nrm infinity ',anorm
+    write(psb_err_unit,*) 'Nrm infinity ',anorm
 
 !!$
 
     if(iam == psb_root_) then
-      write(*,'("The matrix has been generated and is currently  in ",a3," format.")')&
+      write(psb_out_unit,'("The matrix has been generated and is currently  in ",a3," format.")')&
            &   a_n%get_fmt()
-      write(*,'("-allocation  time : ",es12.5)') talc
-      write(*,'("-coeff. gen. time : ",es12.5)') tgen
-      write(*,'("-assembly    time : ",es12.5)') tasb
-      write(*,'("-total       time : ",es12.5)') ttot
-      write(*,'("-convert     time : ",es12.5)') tmov
-!!$      write(*,'("-total       time : ",es12.5)') ttot
+      write(psb_out_unit,'("-allocation  time : ",es12.5)') talc
+      write(psb_out_unit,'("-coeff. gen. time : ",es12.5)') tgen
+      write(psb_out_unit,'("-assembly    time : ",es12.5)') tasb
+      write(psb_out_unit,'("-total       time : ",es12.5)') ttot
+      write(psb_out_unit,'("-convert     time : ",es12.5)') tmov
+!!$      write(psb_out_unit,'("-total       time : ",es12.5)') ttot
 
     end if
 !!$    call psb_erractionrestore(err_act)

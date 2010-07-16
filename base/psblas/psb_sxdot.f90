@@ -301,7 +301,7 @@ function sxdot(n,x,ix,y,iy)
   integer :: i
 
   if ((ix /= 1).or.(iy /= 1)) then 
-    write(0,*) 'WARNING unimplemented case in SXDOT'
+    write(psb_err_unit,*) 'WARNING unimplemented case in SXDOT'
     sxdot=dzero
     return
   end if

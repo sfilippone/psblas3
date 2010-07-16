@@ -158,7 +158,7 @@ subroutine psb_cbase_rwextd(nr,a,info,b,rowscale)
         end do
         class default 
 
-        write(0,*) 'Implement SPGETBLK in RWEXTD!!!!!!!'
+        write(psb_err_unit,*) 'Implement SPGETBLK in RWEXTD!!!!!!!'
       end select
       call a%set_ncols(max(na,nb))
 
@@ -222,7 +222,7 @@ subroutine psb_cbase_rwextd(nr,a,info,b,rowscale)
         call a%set_nzeros(nza)
 
       class default 
-        write(0,*) 'Implement SPGETBLK in RWEXTD!!!!!!!'
+        write(psb_err_unit,*) 'Implement SPGETBLK in RWEXTD!!!!!!!'
 
       end select
 

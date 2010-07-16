@@ -42,10 +42,12 @@ c$$$        write(iunit,*) 'Row:',i,' : ',jb(ib(i):ib(i+1)-1)
 c$$$      enddo
       
       if (size(ic) < n+1) then 
-        write(0,*) 'Called realloc in SYMBMM '
+        write(psb_err_unit,*)
+     +    'Called realloc in SYMBMM '
         call psb_realloc(n+1,ic,info)
         if (info /= psb_success_) then 
-          write(0,*) 'realloc failed in SYMBMM ',info
+          write(psb_err_unit,*)
+     +      'realloc failed in SYMBMM ',info
         end if
       endif
       maxlmn = max(l,m,n)
@@ -63,7 +65,8 @@ c
 c    main loop
 c
       do 50 i=1,n
-c$$$        write(0,*) 'SYMBMM: 1 loop ',i,n,ia(i),ia(i+1)
+c$$$        write(psb_err_unit,*)
+c$$$        'SYMBMM: 1 loop ',i,n,ia(i),ia(i+1)
         istart=-1
         length=0
 c
@@ -84,11 +87,13 @@ c    b = d + ...
             length=length+1
           endif
           if ((j<1).or.(j>m)) then 
-            write(0,*) ' SymbMM: Problem with A ',i,jj,j,m
+            write(psb_err_unit,*)
+     +        ' SymbMM: Problem with A ',i,jj,j,m
           endif
           do 20 k=ib(j),ib(j+1)-1 
             if ((jb(k)<1).or.(jb(k)>maxlmn)) then 
-              write(0,*) 'Problem in SYMBMM 1:',j,k,jb(k),maxlmn
+              write(psb_err_unit,*)
+     +          'Problem in SYMBMM 1:',j,k,jb(k),maxlmn
             else
               if(index(jb(k)).eq.0) then
                 index(jb(k))=istart
@@ -128,7 +133,8 @@ c$$$        write(iunit,*) length,' : ',jc(ic(i):ic(i)+length-1)
  50   continue
 c$$$      close(iunit)
 c$$$      iunit = iunit + 1
-c$$$      write(0,*) 'SYMBMM: on exit',ic(n+1)-1,jc(ic(n+1)-1)
+c$$$      write(psb_err_unit,*)
+c$$$      'SYMBMM: on exit',ic(n+1)-1,jc(ic(n+1)-1)
       return
       end
       subroutine snumbmm(n, m, l,
@@ -171,12 +177,14 @@ c    b = d + ...
           if (diagb.eq.1 .and. j.le.minlm) 
      *      temp(j) = temp(j) + ajj * b(j)
           if ((j<1).or.(j>m)) then 
-            write(0,*) ' NUMBMM: Problem with A ',i,jj,j,m
+            write(psb_err_unit,*)
+     +        ' NUMBMM: Problem with A ',i,jj,j,m
           endif
           
           do 20 k = ib(j),ib(j+1)-1
             if((jb(k)<1).or. (jb(k) > maxlmn))  then 
-              write(0,*) ' NUMBMM: jb  problem',j,k,jb(k),maxlmn
+              write(psb_err_unit,*)
+     +          ' NUMBMM: jb  problem',j,k,jb(k),maxlmn
             else
               temp(jb(k)) = temp(jb(k)) + ajj * b(k)
             endif
@@ -188,10 +196,12 @@ c    c = d + ...
           temp(i) = 0.
         endif
 c$$$        if (mod(i,100) == 1)
-c$$$     +    write(0,*) ' NUMBMM: Fixing row ',i,ic(i),ic(i+1)-1
+c$$$     +    write(psb_err_unit,*)
+c$$$     ' NUMBMM: Fixing row ',i,ic(i),ic(i+1)-1
         do 40 j = ic(i),ic(i+1)-1
           if((jc(j)<1).or. (jc(j) > maxlmn))  then 
-            write(0,*) ' NUMBMM: output problem',i,j,jc(j),maxlmn
+            write(psb_err_unit,*)
+     +        ' NUMBMM: output problem',i,j,jc(j),maxlmn
           else
             c(j) = temp(jc(j))
             temp(jc(j)) = 0.
@@ -240,12 +250,14 @@ c    b = d + ...
           if (diagb.eq.1 .and. j.le.minlm) 
      *      temp(j) = temp(j) + ajj * b(j)
           if ((j<1).or.(j>m)) then 
-            write(0,*) ' NUMBMM: Problem with A ',i,jj,j,m
+            write(psb_err_unit,*)
+     +        ' NUMBMM: Problem with A ',i,jj,j,m
           endif
           
           do 20 k = ib(j),ib(j+1)-1
             if((jb(k)<1).or. (jb(k) > maxlmn))  then 
-              write(0,*) ' NUMBMM: jb  problem',j,k,jb(k),maxlmn
+              write(psb_err_unit,*)
+     +          ' NUMBMM: jb  problem',j,k,jb(k),maxlmn
             else
               temp(jb(k)) = temp(jb(k)) + ajj * b(k)
             endif
@@ -257,10 +269,12 @@ c    c = d + ...
           temp(i) = 0.
         endif
 c$$$        if (mod(i,100) == 1)
-c$$$     +    write(0,*) ' NUMBMM: Fixing row ',i,ic(i),ic(i+1)-1
+c$$$     +    write(psb_err_unit,*)
+c$$$     ' NUMBMM: Fixing row ',i,ic(i),ic(i+1)-1
         do 40 j = ic(i),ic(i+1)-1
           if((jc(j)<1).or. (jc(j) > maxlmn))  then 
-            write(0,*) ' NUMBMM: output problem',i,j,jc(j),maxlmn
+            write(psb_err_unit,*)
+     +        ' NUMBMM: output problem',i,j,jc(j),maxlmn
           else
             c(j) = temp(jc(j))
             temp(jc(j)) = 0.
@@ -309,12 +323,14 @@ c    b = d + ...
           if (diagb.eq.1 .and. j.le.minlm) 
      *      temp(j) = temp(j) + ajj * b(j)
           if ((j<1).or.(j>m)) then 
-            write(0,*) ' NUMBMM: Problem with A ',i,jj,j,m
+            write(psb_err_unit,*)
+     +        ' NUMBMM: Problem with A ',i,jj,j,m
           endif
           
           do 20 k = ib(j),ib(j+1)-1
             if((jb(k)<1).or. (jb(k) > maxlmn))  then 
-              write(0,*) ' NUMBMM: jb  problem',j,k,jb(k),maxlmn
+              write(psb_err_unit,*)
+     +          ' NUMBMM: jb  problem',j,k,jb(k),maxlmn
             else
               temp(jb(k)) = temp(jb(k)) + ajj * b(k)
             endif
@@ -326,10 +342,12 @@ c    c = d + ...
           temp(i) = 0.
         endif
 c$$$        if (mod(i,100) == 1)
-c$$$     +    write(0,*) ' NUMBMM: Fixing row ',i,ic(i),ic(i+1)-1
+c$$$     +    write(psb_err_unit,*)
+c$$$     ' NUMBMM: Fixing row ',i,ic(i),ic(i+1)-1
         do 40 j = ic(i),ic(i+1)-1
           if((jc(j)<1).or. (jc(j) > maxlmn))  then 
-            write(0,*) ' NUMBMM: output problem',i,j,jc(j),maxlmn
+            write(psb_err_unit,*)
+     +        ' NUMBMM: output problem',i,j,jc(j),maxlmn
           else
             c(j) = temp(jc(j))
             temp(jc(j)) = 0.
@@ -378,12 +396,14 @@ c    b = d + ...
           if (diagb.eq.1 .and. j.le.minlm) 
      *      temp(j) = temp(j) + ajj * b(j)
           if ((j<1).or.(j>m)) then 
-            write(0,*) ' NUMBMM: Problem with A ',i,jj,j,m
+            write(psb_err_unit,*)
+     +        ' NUMBMM: Problem with A ',i,jj,j,m
           endif
           
           do 20 k = ib(j),ib(j+1)-1
             if((jb(k)<1).or. (jb(k) > maxlmn))  then 
-              write(0,*) ' NUMBMM: jb  problem',j,k,jb(k),maxlmn
+              write(psb_err_unit,*)
+     +          ' NUMBMM: jb  problem',j,k,jb(k),maxlmn
             else
               temp(jb(k)) = temp(jb(k)) + ajj * b(k)
             endif
@@ -395,10 +415,12 @@ c    c = d + ...
           temp(i) = 0.
         endif
 c$$$        if (mod(i,100) == 1)
-c$$$     +    write(0,*) ' NUMBMM: Fixing row ',i,ic(i),ic(i+1)-1
+c$$$     +    write(psb_err_unit,*)
+c$$$     ' NUMBMM: Fixing row ',i,ic(i),ic(i+1)-1
         do 40 j = ic(i),ic(i+1)-1
           if((jc(j)<1).or. (jc(j) > maxlmn))  then 
-            write(0,*) ' NUMBMM: output problem',i,j,jc(j),maxlmn
+            write(psb_err_unit,*)
+     +        ' NUMBMM: output problem',i,j,jc(j),maxlmn
           else
             c(j) = temp(jc(j))
             temp(jc(j)) = 0.

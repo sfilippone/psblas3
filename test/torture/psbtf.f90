@@ -14,8 +14,8 @@ program main
   integer            :: ictxt, iam=-1, np=-1
   character(len=psb_fidasize_) :: afmt
 
-  write(*,*) 'Format ?'
-  read(*,*) afmt
+  write(psb_out_unit,*) 'Format ?'
+  read(psb_inp_unit,*) afmt
 !  afmt = 'COO'
 
   call psb_init(ictxt)

@@ -1314,3 +1314,36 @@ ifelse([$2], , , [
 fi
 cd ..
 rm -fr tmpdir_$i])
+
+dnl @synopsis PAC_FORTRAN_TEST_ISO_FORTRAN_ENV( [ACTION-IF-FOUND [, ACTION-IF-NOT-FOUND]])
+dnl
+dnl Will determine if the fortran compiler MPIFC supports ISO_FORTRAN_ENV
+dnl
+dnl If yes, will execute ACTION-IF-FOUND. Otherwise, ACTION-IF-NOT-FOUND.
+dnl 
+dnl @author Salvatore Filippone <salvatore.filippone@uniroma2.it>
+dnl
+AC_DEFUN(PAC_FORTRAN_TEST_ISO_FORTRAN_ENV,
+ac_exeext=''
+ac_ext='f90'
+ac_link='${MPIFC-$FC} -o conftest${ac_exeext} $FFLAGS $LDFLAGS conftest.$ac_ext $LIBS 1>&5'
+dnl Warning : square brackets are EVIL!
+[AC_MSG_CHECKING([support for ISO_FORTRAN_ENV])
+cat > conftest.$ac_ext <<EOF
+           program test
+             use iso_fortran_env
+           end program test
+EOF
+if AC_TRY_EVAL(ac_link) && test -s conftest${ac_exeext}; then
+  AC_MSG_RESULT([yes])
+  ifelse([$1], , :, [rm -rf conftest*
+  $1])
+else
+  echo "configure: failed program was:" >&AC_FD_CC
+  cat conftest.$ac_ext >&AC_FD_CC
+  AC_MSG_RESULT([no])
+ifelse([$2], , , [  rm -rf conftest*
+  $2
+])dnl
+fi
+rm -f conftest*])

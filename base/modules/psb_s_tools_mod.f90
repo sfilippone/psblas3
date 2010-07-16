@@ -238,7 +238,7 @@ Module psb_s_tools_mod
 !!$    call psb_cdcpy(descin,cd_xt,info)
 !!$    if (info == psb_success_) call psb_cd_reinit(cd_xt,info)
 !!$    if (info /= psb_success_) then 
-!!$      write(0,*) 'Error on reinitialising the extension map'
+!!$      write(psb_err_unit,*) 'Error on reinitialising the extension map'
 !!$      call psb_error(ictxt)
 !!$      call psb_abort(ictxt)
 !!$      stop

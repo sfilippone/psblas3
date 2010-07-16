@@ -93,7 +93,7 @@ subroutine psb_glob_to_loc2(x,y,desc_a,info,iact,owned)
     return
   case('W')
     if ((info /= psb_success_).or.(count(y(1:n)<0) >0)) then
-      write(0,'("Error ",i5," in subroutine glob_to_loc")') info
+      write(psb_err_unit,'("Error ",i5," in subroutine glob_to_loc")') info
     end if
   case('A')
     if ((info /= psb_success_).or.(count(y(1:n)<0) >0)) then
@@ -216,11 +216,11 @@ subroutine psb_glob_to_loc(x,desc_a,info,iact,owned)
     return
   case('W')
     if ((info /= psb_success_).or.(count(x(1:n)<0) >0)) then
-      write(0,'("Error ",i5," in subroutine glob_to_loc")') info
+      write(psb_err_unit,'("Error ",i5," in subroutine glob_to_loc")') info
     end if
   case('A')
     if ((info /= psb_success_).or.(count(x(1:n)<0) >0)) then
-      write(0,*) count(x(1:n)<0)
+      write(psb_err_unit,*) count(x(1:n)<0)
       call psb_errpush(info,name)
       goto 9999
     end if

@@ -539,6 +539,11 @@ PAC_FORTRAN_TEST_FLUSH(
 	[FDEFINES="$psblas_cv_define_prepend-DHAVE_FLUSH_STMT $FDEFINES"],
 )
 
+PAC_FORTRAN_TEST_ISO_FORTRAN_ENV(
+	[FDEFINES="$psblas_cv_define_prepend-DHAVE_ISO_FORTRAN_ENV $FDEFINES"],
+)
+
+
 PAC_FORTRAN_TEST_FINAL( 
 	[FDEFINES="$psblas_cv_define_prepend-DHAVE_FINAL $FDEFINES"],
 )

@@ -440,7 +440,7 @@
           key = x(i) 
           ih  = iand(key,hashmask)
           if (ih > ubound(hashv,1) ) then 
-            write(0,*) ' In inner cnv: ',ih,ubound(hashv)
+            write(psb_err_unit,*) ' In inner cnv: ',ih,ubound(hashv)
           end if
           idx = hashv(ih)
           nh  = hashv(ih+1) - hashv(ih) 
@@ -475,7 +475,7 @@
         key = x(i) 
         ih  = iand(key,hashmask)
         if (ih > ubound(hashv,1) ) then 
-          write(0,*) ' In inner cnv: ',ih,ubound(hashv)
+          write(psb_err_unit,*) ' In inner cnv: ',ih,ubound(hashv)
         end if
         idx = hashv(ih)
         nh  = hashv(ih+1) - hashv(ih) 

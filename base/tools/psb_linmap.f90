@@ -89,7 +89,7 @@ function psb_c_linmap(map_kind,desc_X, desc_Y, map_X2Y, map_Y2X,iaggr,naggr) res
     allocate(this%iaggr(0), this%naggr(0), stat=info) 
 
   case default
-    write(0,*) 'Bad map kind into psb_linmap ',map_kind
+    write(psb_err_unit,*) 'Bad map kind into psb_linmap ',map_kind
     info = 1
   end select
 
@@ -100,7 +100,7 @@ function psb_c_linmap(map_kind,desc_X, desc_Y, map_X2Y, map_Y2X,iaggr,naggr) res
     call psb_set_map_kind(map_kind, this)
   end if
   if (info /= psb_success_) then
-    write(0,*) trim(name),' Invalid descriptor input'
+    write(psb_err_unit,*) trim(name),' Invalid descriptor input'
     return
   end if
 
@@ -167,7 +167,7 @@ function psb_d_linmap(map_kind,desc_X, desc_Y, map_X2Y, map_Y2X,iaggr,naggr) res
     allocate(this%iaggr(0), this%naggr(0), stat=info) 
 
   case default
-    write(0,*) 'Bad map kind into psb_linmap ',map_kind
+    write(psb_err_unit,*) 'Bad map kind into psb_linmap ',map_kind
     info = 1
   end select
 
@@ -178,12 +178,12 @@ function psb_d_linmap(map_kind,desc_X, desc_Y, map_X2Y, map_Y2X,iaggr,naggr) res
     call psb_set_map_kind(map_kind, this)
   end if
   if (info /= psb_success_) then
-    write(0,*) trim(name),' Invalid descriptor input'
+    write(psb_err_unit,*) trim(name),' Invalid descriptor input'
     return
   end if
   if (debug) then 
-!!$    write(0,*) trim(name),'  forward map:',allocated(this%map_X2Y%aspk)
-!!$    write(0,*) trim(name),' backward map:',allocated(this%map_Y2X%aspk)
+!!$    write(psb_err_unit,*) trim(name),'  forward map:',allocated(this%map_X2Y%aspk)
+!!$    write(psb_err_unit,*) trim(name),' backward map:',allocated(this%map_Y2X%aspk)
   end if
 
 end function psb_d_linmap
@@ -249,7 +249,7 @@ function psb_s_linmap(map_kind,desc_X, desc_Y, map_X2Y, map_Y2X,iaggr,naggr) res
     allocate(this%iaggr(0), this%naggr(0), stat=info) 
 
   case default
-    write(0,*) 'Bad map kind into psb_linmap ',map_kind
+    write(psb_err_unit,*) 'Bad map kind into psb_linmap ',map_kind
     info = 1
   end select
   
@@ -261,7 +261,7 @@ function psb_s_linmap(map_kind,desc_X, desc_Y, map_X2Y, map_Y2X,iaggr,naggr) res
     call psb_set_map_kind(map_kind, this)
   end if
   if (info /= psb_success_) then
-    write(0,*) trim(name),' Invalid descriptor input'
+    write(psb_err_unit,*) trim(name),' Invalid descriptor input'
     return
   end if
 
@@ -327,7 +327,7 @@ function psb_z_linmap(map_kind,desc_X, desc_Y, map_X2Y, map_Y2X,iaggr,naggr) res
     allocate(this%iaggr(0), this%naggr(0), stat=info) 
 
   case default
-    write(0,*) 'Bad map kind into psb_linmap ',map_kind
+    write(psb_err_unit,*) 'Bad map kind into psb_linmap ',map_kind
     info = 1
   end select
 
@@ -338,7 +338,7 @@ function psb_z_linmap(map_kind,desc_X, desc_Y, map_X2Y, map_Y2X,iaggr,naggr) res
     call psb_set_map_kind(map_kind, this)
   end if
   if (info /= psb_success_) then
-    write(0,*) trim(name),' Invalid descriptor input'
+    write(psb_err_unit,*) trim(name),' Invalid descriptor input'
     return
   end if
 

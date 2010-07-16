@@ -107,7 +107,7 @@ subroutine psb_sbase_symbmm(a,b,c,info)
 
 
   if ( mb /= na ) then 
-    write(0,*) 'Mismatch in SYMBMM: ',ma,na,mb,nb
+    write(psb_err_unit,*) 'Mismatch in SYMBMM: ',ma,na,mb,nb
   endif
   allocate(itemp(max(ma,na,mb,nb)),stat=info)    
   if (info /= psb_success_) then 
@@ -225,14 +225,14 @@ contains
         j=iacl(jj)
 
         if ((j<1).or.(j>m)) then 
-          write(0,*) ' SymbMM: Problem with A ',i,jj,j,m
+          write(psb_err_unit,*) ' SymbMM: Problem with A ',i,jj,j,m
           info = 1
           return
         endif
         call b%csget(j,j,nbzr,ibrw,ibcl,info)
         do k=1,nbzr
           if ((ibcl(k)<1).or.(ibcl(k)>maxlmn)) then 
-            write(0,*) 'Problem in SYMBMM 1:',j,k,ibcl(k),maxlmn
+            write(psb_err_unit,*) 'Problem in SYMBMM 1:',j,k,ibcl(k),maxlmn
             info=psb_err_pivot_too_small_
             return
           else

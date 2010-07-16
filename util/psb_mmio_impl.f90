@@ -63,7 +63,7 @@ subroutine mm_svet_read(b, info, iunit, filename)
   read(infile,fmt=*, end=902) mmheader, object, fmt, type, sym
 
   if ( (object /= 'matrix').or.(fmt /= 'array')) then
-    write(0,*) 'read_rhs: input file type not yet supported'
+    write(psb_err_unit,*) 'read_rhs: input file type not yet supported'
     info = -3
     return
   end if
@@ -86,16 +86,16 @@ subroutine mm_svet_read(b, info, iunit, filename)
 
   return 
   ! open failed
-901 write(0,*) 'mm_vet_read: could not open file ',&
+901 write(psb_err_unit,*) 'mm_vet_read: could not open file ',&
        & infile,' for input'
   info = -1
   return
 
-902 write(0,*) 'mmv_vet_read: unexpected end of file ',infile,&
+902 write(psb_err_unit,*) 'mmv_vet_read: unexpected end of file ',infile,&
        & ' during input'
   info = -2
   return
-993 write(0,*) 'mm_vet_read: memory allocation failure'
+993 write(psb_err_unit,*) 'mm_vet_read: memory allocation failure'
   info = -3
   return
 end subroutine mm_svet_read
@@ -135,7 +135,7 @@ subroutine mm_dvet_read(b, info, iunit, filename)
   read(infile,fmt=*, end=902) mmheader, object, fmt, type, sym
 
   if ( (object /= 'matrix').or.(fmt /= 'array')) then
-    write(0,*) 'read_rhs: input file type not yet supported'
+    write(psb_err_unit,*) 'read_rhs: input file type not yet supported'
     info = -3
     return
   end if
@@ -157,16 +157,16 @@ subroutine mm_dvet_read(b, info, iunit, filename)
 
   return 
   ! open failed
-901 write(0,*) 'mm_vet_read: could not open file ',&
+901 write(psb_err_unit,*) 'mm_vet_read: could not open file ',&
        & infile,' for input'
   info = -1
   return
 
-902 write(0,*) 'mmv_vet_read: unexpected end of file ',infile,&
+902 write(psb_err_unit,*) 'mmv_vet_read: unexpected end of file ',infile,&
        & ' during input'
   info = -2
   return
-993 write(0,*) 'mm_vet_read: memory allocation failure'
+993 write(psb_err_unit,*) 'mm_vet_read: memory allocation failure'
   info = -3
   return
 end subroutine mm_dvet_read
@@ -207,7 +207,7 @@ subroutine mm_cvet_read(b, info, iunit, filename)
   read(infile,fmt=*, end=902) mmheader, object, fmt, type, sym
 
   if ( (object /= 'matrix').or.(fmt /= 'array')) then
-    write(0,*) 'read_rhs: input file type not yet supported'
+    write(psb_err_unit,*) 'read_rhs: input file type not yet supported'
     info = -3
     return
   end if
@@ -234,16 +234,16 @@ subroutine mm_cvet_read(b, info, iunit, filename)
 
   return 
   ! open failed
-901 write(0,*) 'mm_vet_read: could not open file ',&
+901 write(psb_err_unit,*) 'mm_vet_read: could not open file ',&
        & infile,' for input'
   info = -1
   return
 
-902 write(0,*) 'mmv_vet_read: unexpected end of file ',infile,&
+902 write(psb_err_unit,*) 'mmv_vet_read: unexpected end of file ',infile,&
        & ' during input'
   info = -2
   return
-993 write(0,*) 'mm_vet_read: memory allocation failure'
+993 write(psb_err_unit,*) 'mm_vet_read: memory allocation failure'
   info = -3
   return
 end subroutine mm_cvet_read
@@ -284,7 +284,7 @@ subroutine mm_zvet_read(b, info, iunit, filename)
   read(infile,fmt=*, end=902) mmheader, object, fmt, type, sym
 
   if ( (object /= 'matrix').or.(fmt /= 'array')) then
-    write(0,*) 'read_rhs: input file type not yet supported'
+    write(psb_err_unit,*) 'read_rhs: input file type not yet supported'
     info = -3
     return
   end if
@@ -311,16 +311,16 @@ subroutine mm_zvet_read(b, info, iunit, filename)
 
   return 
   ! open failed
-901 write(0,*) 'mm_vet_read: could not open file ',&
+901 write(psb_err_unit,*) 'mm_vet_read: could not open file ',&
        & infile,' for input'
   info = -1
   return
 
-902 write(0,*) 'mmv_vet_read: unexpected end of file ',infile,&
+902 write(psb_err_unit,*) 'mmv_vet_read: unexpected end of file ',infile,&
        & ' during input'
   info = -2
   return
-993 write(0,*) 'mm_vet_read: memory allocation failure'
+993 write(psb_err_unit,*) 'mm_vet_read: memory allocation failure'
   info = -3
   return
 end subroutine mm_zvet_read
@@ -374,7 +374,7 @@ subroutine mm_svet2_write(b, header, info, iunit, filename)
 
   return 
   ! open failed
-901 write(0,*) 'mm_vet_write: could not open file ',&
+901 write(psb_err_unit,*) 'mm_vet_write: could not open file ',&
        & outfile,' for output'
   info = -1
   return
@@ -430,7 +430,7 @@ subroutine mm_svet1_write(b, header, info, iunit, filename)
 
   return 
   ! open failed
-901 write(0,*) 'mm_vet_write: could not open file ',&
+901 write(psb_err_unit,*) 'mm_vet_write: could not open file ',&
        & outfile,' for output'
   info = -1
   return
@@ -487,7 +487,7 @@ subroutine mm_dvet2_write(b, header, info, iunit, filename)
 
   return 
   ! open failed
-901 write(0,*) 'mm_vet_write: could not open file ',&
+901 write(psb_err_unit,*) 'mm_vet_write: could not open file ',&
        & outfile,' for output'
   info = -1
   return
@@ -543,7 +543,7 @@ subroutine mm_dvet1_write(b, header, info, iunit, filename)
 
   return 
   ! open failed
-901 write(0,*) 'mm_vet_write: could not open file ',&
+901 write(psb_err_unit,*) 'mm_vet_write: could not open file ',&
        & outfile,' for output'
   info = -1
   return
@@ -600,7 +600,7 @@ subroutine mm_cvet2_write(b, header, info, iunit, filename)
 
   return 
   ! open failed
-901 write(0,*) 'mm_vet_write: could not open file ',&
+901 write(psb_err_unit,*) 'mm_vet_write: could not open file ',&
        & outfile,' for output'
   info = -1
   return
@@ -656,7 +656,7 @@ subroutine mm_cvet1_write(b, header, info, iunit, filename)
 
   return 
   ! open failed
-901 write(0,*) 'mm_vet_write: could not open file ',&
+901 write(psb_err_unit,*) 'mm_vet_write: could not open file ',&
        & outfile,' for output'
   info = -1
   return
@@ -712,7 +712,7 @@ subroutine mm_zvet2_write(b, header, info, iunit, filename)
 
   return 
   ! open failed
-901 write(0,*) 'mm_vet_write: could not open file ',&
+901 write(psb_err_unit,*) 'mm_vet_write: could not open file ',&
        & outfile,' for output'
   info = -1
   return
@@ -768,7 +768,7 @@ subroutine mm_zvet1_write(b, header, info, iunit, filename)
 
   return 
   ! open failed
-901 write(0,*) 'mm_vet_write: could not open file ',&
+901 write(psb_err_unit,*) 'mm_vet_write: could not open file ',&
        & outfile,' for output'
   info = -1
   return
@@ -813,7 +813,7 @@ subroutine smm_mat_read(a, info, iunit, filename)
   read(infile,fmt=*,end=902) mmheader, object, fmt, type, sym
 
   if ( (psb_tolower(object) /= 'matrix').or.(psb_tolower(fmt) /= 'coordinate')) then
-    write(0,*) 'READ_MATRIX: input file type not yet supported'
+    write(psb_err_unit,*) 'READ_MATRIX: input file type not yet supported'
     info=909
     return
   end if
@@ -860,7 +860,7 @@ subroutine smm_mat_read(a, info, iunit, filename)
     call a%cscnv(ircode,type='csr')
 
   else
-    write(0,*) 'read_matrix: matrix type not yet supported'
+    write(psb_err_unit,*) 'read_matrix: matrix type not yet supported'
     info=904
   end if
 
@@ -870,13 +870,13 @@ subroutine smm_mat_read(a, info, iunit, filename)
 
   ! open failed
 901 info=901
-  write(0,*) 'read_matrix: could not open file ',filename,' for input'
+  write(psb_err_unit,*) 'read_matrix: could not open file ',filename,' for input'
   return
 902 info=902
-  write(0,*) 'READ_MATRIX: Unexpected end of file '
+  write(psb_err_unit,*) 'READ_MATRIX: Unexpected end of file '
   return
 993 info=993
-  write(0,*) 'READ_MATRIX: Memory allocation failure'
+  write(psb_err_unit,*) 'READ_MATRIX: Memory allocation failure'
   return
 end subroutine smm_mat_read
 
@@ -922,7 +922,7 @@ subroutine smm_mat_write(a,mtitle,info,iunit,filename)
 
 901 continue 
   info=901
-  write(0,*) 'Error while opening ',filename
+  write(psb_err_unit,*) 'Error while opening ',filename
   return
 end subroutine smm_mat_write
 
@@ -963,7 +963,7 @@ subroutine dmm_mat_read(a, info, iunit, filename)
   read(infile,fmt=*,end=902) mmheader, object, fmt, type, sym
 
   if ( (psb_tolower(object) /= 'matrix').or.(psb_tolower(fmt) /= 'coordinate')) then
-    write(0,*) 'READ_MATRIX: input file type not yet supported'
+    write(psb_err_unit,*) 'READ_MATRIX: input file type not yet supported'
     info=909
     return
   end if
@@ -1010,7 +1010,7 @@ subroutine dmm_mat_read(a, info, iunit, filename)
     call a%cscnv(ircode,type='csr')
 
   else
-    write(0,*) 'read_matrix: matrix type not yet supported'
+    write(psb_err_unit,*) 'read_matrix: matrix type not yet supported'
     info=904
   end if
   if (infile /= 5) close(infile)
@@ -1018,13 +1018,13 @@ subroutine dmm_mat_read(a, info, iunit, filename)
 
   ! open failed
 901 info=901
-  write(0,*) 'read_matrix: could not open file ',filename,' for input'
+  write(psb_err_unit,*) 'read_matrix: could not open file ',filename,' for input'
   return
 902 info=902
-  write(0,*) 'READ_MATRIX: Unexpected end of file '
+  write(psb_err_unit,*) 'READ_MATRIX: Unexpected end of file '
   return
 993 info=993
-  write(0,*) 'READ_MATRIX: Memory allocation failure'
+  write(psb_err_unit,*) 'READ_MATRIX: Memory allocation failure'
   return
 end subroutine dmm_mat_read
 
@@ -1070,7 +1070,7 @@ subroutine dmm_mat_write(a,mtitle,info,iunit,filename)
 
 901 continue 
   info=901
-  write(0,*) 'Error while opening ',filename
+  write(psb_err_unit,*) 'Error while opening ',filename
   return
 end subroutine dmm_mat_write
 
@@ -1111,7 +1111,7 @@ subroutine cmm_mat_read(a, info, iunit, filename)
   read(infile,fmt=*,end=902) mmheader, object, fmt, type, sym
 
   if ( (psb_tolower(object) /= 'matrix').or.(psb_tolower(fmt) /= 'coordinate')) then
-    write(0,*) 'READ_MATRIX: input file type not yet supported'
+    write(psb_err_unit,*) 'READ_MATRIX: input file type not yet supported'
     info=909
     return
   end if
@@ -1183,7 +1183,7 @@ subroutine cmm_mat_read(a, info, iunit, filename)
     call a%cscnv(ircode,type='csr')
 
   else
-    write(0,*) 'read_matrix: matrix type not yet supported'
+    write(psb_err_unit,*) 'read_matrix: matrix type not yet supported'
     info=904
   end if
   if (infile /= 5) close(infile)
@@ -1191,13 +1191,13 @@ subroutine cmm_mat_read(a, info, iunit, filename)
 
   ! open failed
 901 info=901
-  write(0,*) 'read_matrix: could not open file ',filename,' for input'
+  write(psb_err_unit,*) 'read_matrix: could not open file ',filename,' for input'
   return
 902 info=902
-  write(0,*) 'READ_MATRIX: Unexpected end of file '
+  write(psb_err_unit,*) 'READ_MATRIX: Unexpected end of file '
   return
 993 info=993
-  write(0,*) 'READ_MATRIX: Memory allocation failure'
+  write(psb_err_unit,*) 'READ_MATRIX: Memory allocation failure'
   return
 end subroutine cmm_mat_read
 
@@ -1243,7 +1243,7 @@ subroutine cmm_mat_write(a,mtitle,info,iunit,filename)
 
 901 continue 
   info=901
-  write(0,*) 'Error while opening ',filename
+  write(psb_err_unit,*) 'Error while opening ',filename
   return
 end subroutine cmm_mat_write
 
@@ -1284,7 +1284,7 @@ subroutine zmm_mat_read(a, info, iunit, filename)
   read(infile,fmt=*,end=902) mmheader, object, fmt, type, sym
 
   if ( (psb_tolower(object) /= 'matrix').or.(psb_tolower(fmt) /= 'coordinate')) then
-    write(0,*) 'READ_MATRIX: input file type not yet supported'
+    write(psb_err_unit,*) 'READ_MATRIX: input file type not yet supported'
     info=909
     return
   end if
@@ -1356,7 +1356,7 @@ subroutine zmm_mat_read(a, info, iunit, filename)
     call a%cscnv(ircode,type='csr')
 
   else
-    write(0,*) 'read_matrix: matrix type not yet supported'
+    write(psb_err_unit,*) 'read_matrix: matrix type not yet supported'
     info=904
   end if
   if (infile /= 5) close(infile)
@@ -1364,13 +1364,13 @@ subroutine zmm_mat_read(a, info, iunit, filename)
 
   ! open failed
 901 info=901
-  write(0,*) 'read_matrix: could not open file ',filename,' for input'
+  write(psb_err_unit,*) 'read_matrix: could not open file ',filename,' for input'
   return
 902 info=902
-  write(0,*) 'READ_MATRIX: Unexpected end of file '
+  write(psb_err_unit,*) 'READ_MATRIX: Unexpected end of file '
   return
 993 info=993
-  write(0,*) 'READ_MATRIX: Memory allocation failure'
+  write(psb_err_unit,*) 'READ_MATRIX: Memory allocation failure'
   return
 end subroutine zmm_mat_read
 
@@ -1416,7 +1416,7 @@ subroutine zmm_mat_write(a,mtitle,info,iunit,filename)
 
 901 continue 
   info=901
-  write(0,*) 'Error while opening ',filename
+  write(psb_err_unit,*) 'Error while opening ',filename
   return
 end subroutine zmm_mat_write
 

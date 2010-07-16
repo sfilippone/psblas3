@@ -124,7 +124,7 @@ subroutine psb_cdinsrc(nz,ia,ja,desc_a,info,ila,jla)
          & call psb_cdins(nz,ja,desc_a,info,jla=jla,mask=(ila(1:nz)>0))
   else
     if (present(ila).or.present(jla)) then 
-      write(0,*) 'Inconsistent call : ',present(ila),present(jla)
+      write(psb_err_unit,*) 'Inconsistent call : ',present(ila),present(jla)
     endif
     allocate(ila_(nz),stat=info)
     if (info /= psb_success_) then 

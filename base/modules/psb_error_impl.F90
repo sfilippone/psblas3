@@ -24,10 +24,10 @@ subroutine psb_serror()
     if(psb_get_errverbosity() > 1) then
 
       do while (psb_get_numerr() > izero)
-        write(0,'(50("="))')
+        write(psb_err_unit,'(50("="))')
         call psb_errpop(err_c, r_name, i_e_d, a_e_d)
         call psb_errmsg(err_c, r_name, i_e_d, a_e_d)
-        !            write(0,'(50("="))')
+        !            write(psb_err_unit,'(50("="))')
       end do
 
     else
@@ -71,10 +71,10 @@ subroutine psb_perror(ictxt)
     if(psb_get_errverbosity() > 1) then
 
       do while (psb_get_numerr() > izero)
-        write(0,'(50("="))')
+        write(psb_err_unit,'(50("="))')
         call psb_errpop(err_c, r_name, i_e_d, a_e_d)
         call psb_errmsg(err_c, r_name, i_e_d, a_e_d,iam)
-        !            write(0,'(50("="))')
+        !            write(psb_err_unit,'(50("="))')
       end do
 #if defined(HAVE_FLUSH_STMT)
       flush(0) 

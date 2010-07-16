@@ -1667,9 +1667,9 @@ Contains
     call psb_erractionsave(err_act)
     info=psb_success_
 
-    if (debug) write(0,*) 'reallocate I',len
+    if (debug) write(psb_err_unit,*) 'reallocate I',len
     if (psb_get_errstatus() /= 0) then 
-      if (debug) write(0,*) 'reallocate errstatus /= 0'
+      if (debug) write(psb_err_unit,*) 'reallocate errstatus /= 0'
       info=psb_err_from_subroutine_
       goto 9999
     end if
@@ -1685,7 +1685,7 @@ Contains
       goto 9999
     end if
     ub_ = lb_+len-1
-    if (debug) write(0,*) 'reallocate : lb ub ',lb_, ub_
+    if (debug) write(psb_err_unit,*) 'reallocate : lb ub ',lb_, ub_
     if (allocated(rrax)) then 
       dim = size(rrax)
       lbi = lbound(rrax,1) 
@@ -1697,9 +1697,9 @@ Contains
           goto 9999
         end if
         tmp(lb_:lb_-1+min(len,dim))=rrax(lbi:lbi-1+min(len,dim))
-        if (debug) write(0,*) 'reallocate : calling move_alloc '
+        if (debug) write(psb_err_unit,*) 'reallocate : calling move_alloc '
         call psb_move_alloc(tmp,rrax,info)
-        if (debug) write(0,*) 'reallocate : from move_alloc ',info
+        if (debug) write(psb_err_unit,*) 'reallocate : from move_alloc ',info
       end if
     else
       dim = 0
@@ -1713,7 +1713,7 @@ Contains
     if (present(pad)) then 
       rrax(lb_-1+dim+1:lb_-1+len) = pad
     endif
-    if (debug) write(0,*) 'end reallocate : ',info
+    if (debug) write(psb_err_unit,*) 'end reallocate : ',info
     call psb_erractionrestore(err_act)
     return
 
@@ -1750,9 +1750,9 @@ Contains
     call psb_erractionsave(err_act)
     info=psb_success_
 
-    if (debug) write(0,*) 'reallocate I',len
+    if (debug) write(psb_err_unit,*) 'reallocate I',len
     if (psb_get_errstatus() /= 0) then 
-      if (debug) write(0,*) 'reallocate errstatus /= 0'
+      if (debug) write(psb_err_unit,*) 'reallocate errstatus /= 0'
       info=psb_err_from_subroutine_
       goto 9999
     end if
@@ -1768,7 +1768,7 @@ Contains
       goto 9999
     end if
     ub_ = lb_+len-1
-    if (debug) write(0,*) 'reallocate : lb ub ',lb_, ub_
+    if (debug) write(psb_err_unit,*) 'reallocate : lb ub ',lb_, ub_
     if (allocated(rrax)) then 
       dim = size(rrax)
       lbi = lbound(rrax,1) 
@@ -1780,9 +1780,9 @@ Contains
           goto 9999
         end if
         tmp(lb_:lb_-1+min(len,dim))=rrax(lbi:lbi-1+min(len,dim))
-        if (debug) write(0,*) 'reallocate : calling move_alloc '
+        if (debug) write(psb_err_unit,*) 'reallocate : calling move_alloc '
         call psb_move_alloc(tmp,rrax,info)
-        if (debug) write(0,*) 'reallocate : from move_alloc ',info
+        if (debug) write(psb_err_unit,*) 'reallocate : from move_alloc ',info
       end if
     else
       dim = 0
@@ -1796,7 +1796,7 @@ Contains
     if (present(pad)) then 
       rrax(lb_-1+dim+1:lb_-1+len) = pad
     endif
-    if (debug) write(0,*) 'end reallocate : ',info
+    if (debug) write(psb_err_unit,*) 'end reallocate : ',info
     call psb_erractionrestore(err_act)
     return
 
@@ -1834,7 +1834,7 @@ Contains
     name='psb_reallocate1s'
     call psb_erractionsave(err_act)
     info=psb_success_ 
-    if (debug) write(0,*) 'reallocate S',len
+    if (debug) write(psb_err_unit,*) 'reallocate S',len
 
     if (present(lb)) then
       lb_ = lb
@@ -1908,7 +1908,7 @@ Contains
     name='psb_reallocate1d'
     call psb_erractionsave(err_act)
     info=psb_success_ 
-    if (debug) write(0,*) 'reallocate D',len
+    if (debug) write(psb_err_unit,*) 'reallocate D',len
 
     if (present(lb)) then
       lb_ = lb
@@ -1983,7 +1983,7 @@ Contains
     name='psb_reallocate1c'
     call psb_erractionsave(err_act)
     info=psb_success_
-    if (debug) write(0,*) 'reallocate C',len    
+    if (debug) write(psb_err_unit,*) 'reallocate C',len    
     if (present(lb)) then
       lb_ = lb
     else
@@ -2056,7 +2056,7 @@ Contains
     name='psb_reallocate1z'
     call psb_erractionsave(err_act)
     info=psb_success_
-    if (debug) write(0,*) 'reallocate Z',len    
+    if (debug) write(psb_err_unit,*) 'reallocate Z',len    
     if (present(lb)) then
       lb_ = lb
     else
@@ -2916,7 +2916,7 @@ Contains
     if (allocated(vin)) then 
       call move_alloc(vin,vout)
     else if (allocated(vout)) then 
-!!$      write(0,*) 'move_alloc: Clearing output'
+!!$      write(psb_err_unit,*) 'move_alloc: Clearing output'
       deallocate(vout)
     end if
 
@@ -2971,7 +2971,7 @@ Contains
     if (allocated(vin)) then 
       call move_alloc(vin,vout)
     else if (allocated(vout)) then 
-!!$      write(0,*) 'move_alloc: Clearing output'
+!!$      write(psb_err_unit,*) 'move_alloc: Clearing output'
       deallocate(vout)
     end if
 
@@ -3129,7 +3129,7 @@ Contains
     if (allocated(vin)) then 
       call move_alloc(vin,vout)
     else if (allocated(vout)) then 
-!!$      write(0,*) 'move_alloc: Clearing output'
+!!$      write(psb_err_unit,*) 'move_alloc: Clearing output'
       deallocate(vout)
     end if
 #else
@@ -3183,7 +3183,7 @@ Contains
     if (allocated(vin)) then 
       call move_alloc(vin,vout)
     else if (allocated(vout)) then 
-!!$      write(0,*) 'move_alloc: Clearing output'
+!!$      write(psb_err_unit,*) 'move_alloc: Clearing output'
       deallocate(vout)
     end if
 #else

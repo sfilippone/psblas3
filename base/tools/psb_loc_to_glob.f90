@@ -82,7 +82,7 @@ subroutine psb_loc_to_glob2(x,y,desc_a,info,iact)
       ! do nothing, silently.
       info = psb_success_
     case('W')
-      write(0,'("Error ",i5," in subroutine loc_to_glob")') info
+      write(psb_err_unit,'("Error ",i5," in subroutine loc_to_glob")') info
       info = psb_success_
     case('A')
       call psb_errpush(info,name)
@@ -187,7 +187,7 @@ subroutine psb_loc_to_glob(x,desc_a,info,iact)
       ! do nothing, silently.
       info = psb_success_
     case('W')
-      write(0,'("Error ",i5," in subroutine loc_to_glob")') info
+      write(psb_err_unit,'("Error ",i5," in subroutine loc_to_glob")') info
       info = psb_success_
     case('A')
       call psb_errpush(info,name)

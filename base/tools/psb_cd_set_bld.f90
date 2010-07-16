@@ -50,7 +50,7 @@ subroutine psb_cd_set_bld(desc,info)
   integer             :: np,me,ictxt, err_act,idx,gidx,lidx,nc
   logical, parameter  :: debug=.false.,debugprt=.false.
   character(len=20)   :: name
-  if (debug) write(0,*) me,'Entered CDCPY'
+  if (debug) write(psb_err_unit,*) me,'Entered CDCPY'
   if (psb_get_errstatus() /= 0) return 
   info = psb_success_
   call psb_erractionsave(err_act)
@@ -58,10 +58,10 @@ subroutine psb_cd_set_bld(desc,info)
 
   ictxt = psb_cd_get_context(desc)
 
-  if (debug) write(0,*)'Entered CDSETBLD',ictxt
+  if (debug) write(psb_err_unit,*)'Entered CDSETBLD',ictxt
   ! check on blacs grid 
   call psb_info(ictxt, me, np)
-  if (debug) write(0,*) me,'Entered CDSETBLD'
+  if (debug) write(psb_err_unit,*) me,'Entered CDSETBLD'
   if (psb_is_asb_desc(desc)) then 
   end if
 
@@ -95,7 +95,7 @@ subroutine psb_cd_set_bld(desc,info)
 
   end if
 
-  if (debug) write(0,*) me,'SET_BLD: done'
+  if (debug) write(psb_err_unit,*) me,'SET_BLD: done'
   call psb_erractionrestore(err_act)
   return
 

@@ -64,7 +64,7 @@ contains
 
     mname = adjustl(trim(methdname))
     write(outname,'(a)') mname(1:min(len_trim(mname),outlen-1))//':'
-    write(*,fmt) adjustl(outname),'Iteration','Error Estimate','Tolerance'
+    write(psb_out_unit,fmt) adjustl(outname),'Iteration','Error Estimate','Tolerance'
 
   end subroutine log_header
 
@@ -84,9 +84,9 @@ contains
       mname = adjustl(trim(methdname))
       write(outname,'(a)') mname(1:min(len_trim(mname),outlen-1))//':'
       if (errden > dzero ) then 
-        write(*,fmt) adjustl(outname),itx,errnum/errden,eps
+        write(psb_out_unit,fmt) adjustl(outname),itx,errnum/errden,eps
       else
-        write(*,fmt) adjustl(outname),itx,errnum,eps
+        write(psb_out_unit,fmt) adjustl(outname),itx,errnum,eps
       end if
     endif
 
@@ -107,9 +107,9 @@ contains
     if (errden == dzero) then 
       if (errnum > eps) then         
         if (me == 0) then 
-          write(*,fmt) trim(methdname)//' failed to converge to ',eps,&
+          write(psb_out_unit,fmt) trim(methdname)//' failed to converge to ',eps,&
                & ' in ',it,' iterations. '
-          write(*,fmt1) 'Last iteration error estimate: ',&
+          write(psb_out_unit,fmt1) 'Last iteration error estimate: ',&
                & errnum
         end if
       end if
@@ -117,9 +117,9 @@ contains
     else
       if (errnum/errden > eps) then         
         if (me == 0) then 
-          write(*,fmt) trim(methdname)//' failed to converge to ',eps,&
+          write(psb_out_unit,fmt) trim(methdname)//' failed to converge to ',eps,&
                & ' in ',it,' iterations. '
-          write(*,fmt1) 'Last iteration error estimate: ',&
+          write(psb_out_unit,fmt1) 'Last iteration error estimate: ',&
                & errnum/errden
         end if
       endif

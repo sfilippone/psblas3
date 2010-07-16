@@ -109,7 +109,7 @@ subroutine psb_zbase_numbmm(a,b,c)
 
 
   if ( mb /= na ) then 
-    write(0,*) 'Mismatch in SYMBMM: ',ma,na,mb,nb
+    write(psb_err_unit,*) 'Mismatch in SYMBMM: ',ma,na,mb,nb
   endif
   allocate(temp(max(ma,na,mb,nb)),stat=info)    
   if (info /= psb_success_) then 
@@ -210,7 +210,7 @@ contains
         j=iacl(jj)
         ajj = aval(jj)
         if ((j<1).or.(j>m)) then 
-          write(0,*) ' NUMBMM: Problem with A ',i,jj,j,m
+          write(psb_err_unit,*) ' NUMBMM: Problem with A ',i,jj,j,m
             info = 1
             return
           
@@ -218,7 +218,7 @@ contains
         call b%csget(j,j,nbzr,ibrw,ibcl,bval,info)
         do k=1,nbzr
           if ((ibcl(k)<1).or.(ibcl(k)>maxlmn)) then 
-            write(0,*) 'Problem in NUMBM 1:',j,k,ibcl(k),maxlmn
+            write(psb_err_unit,*) 'Problem in NUMBM 1:',j,k,ibcl(k),maxlmn
             info = psb_err_pivot_too_small_
             return
           else
@@ -228,7 +228,7 @@ contains
       end do
       do  j = c%irp(i),c%irp(i+1)-1
         if((c%ja(j)<1).or. (c%ja(j) > maxlmn))  then 
-          write(0,*) ' NUMBMM: output problem',i,j,c%ja(j),maxlmn
+          write(psb_err_unit,*) ' NUMBMM: output problem',i,j,c%ja(j),maxlmn
             info = psb_err_invalid_ovr_num_
             return
         else

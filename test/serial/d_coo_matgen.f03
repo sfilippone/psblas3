@@ -89,7 +89,7 @@ contains
 
     call psb_info(ictxt, iam, np)
 
-    read(*,*) idim
+    read(psb_inp_unit,*) idim
 
 
     return
@@ -182,7 +182,7 @@ contains
     m   = idim*idim*idim
     n   = m
     nnz = ((n*9)/(np))
-    if(iam == psb_root_) write(0,'("Generating Matrix (size=",i0,")...")')n
+    if(iam == psb_root_) write(psb_err_unit,'("Generating Matrix (size=",i0,")...")')n
 
     !
     ! Using a simple BLOCK distribution.
@@ -192,8 +192,8 @@ contains
 
     nt = nr
     call psb_sum(ictxt,nt) 
-    if (nt /= m) write(0,*) iam, 'Initialization error ',nr,nt,m
-    write(0,*) iam, 'Initialization ',nr,nt,m
+    if (nt /= m) write(psb_err_unit,*) iam, 'Initialization error ',nr,nt,m
+    write(psb_err_unit,*) iam, 'Initialization ',nr,nt,m
     nlr = nt
     call psb_barrier(ictxt)
 
@@ -204,8 +204,8 @@ contains
 
     talc = psb_wtime()-t0
 
-!!$    write(*,*) 'Test get size:',d_coo_get_size(acoo)
-!!$    write(*,*) 'Test 2 get size:',acoo%get_size(),acoo%get_nzeros()
+!!$    write(psb_out_unit,*) 'Test get size:',d_coo_get_size(acoo)
+!!$    write(psb_out_unit,*) 'Test 2 get size:',acoo%get_size(),acoo%get_nzeros()
 
     if (info /= psb_success_) then
       info=psb_err_from_subroutine_
@@ -233,7 +233,7 @@ contains
     t1 = psb_wtime()
     do ii=1, nlr,nb
       ib = min(nb,nlr-ii+1) 
-!!$      write(0,*) 'Row ',ii,ib
+!!$      write(psb_err_unit,*) 'Row ',ii,ib
       element = 1
       do k=1,ib
         i=ii+k-1
@@ -374,9 +374,9 @@ contains
     
 !!$    call acoo%print(19)
     t1 = psb_wtime()
-!!$    write(0,*) 'out of loop ',acoo%get_nzeros()
+!!$    write(psb_err_unit,*) 'out of loop ',acoo%get_nzeros()
     call acoo%fix(info)
-!!$    write(0,*) '2 out of loop ',acoo%get_nzeros()
+!!$    write(psb_err_unit,*) '2 out of loop ',acoo%get_nzeros()
 
     if(info /= psb_success_) then
       info=psb_err_from_subroutine_
@@ -408,14 +408,14 @@ contains
 !!$    call acsr%print(22)
     if(iam == psb_root_) then
       asbfmt = acsr%get_fmt()
-      write(*,'("The matrix has been generated and assembled in ",a3," format.")')&
+      write(psb_out_unit,'("The matrix has been generated and assembled in ",a3," format.")')&
            &   asbfmt
-      write(*,'("-allocation  time : ",es12.5)') talc
-      write(*,'("-coeff. gen. time : ",es12.5)') tgen
-      write(*,'("-assembly    time : ",es12.5)') tasb
-      write(*,'("-copy        time : ",es12.5)') tcpy
-      write(*,'("-move        time : ",es12.5)') tmov
-!!$      write(*,'("-total       time : ",es12.5)') ttot
+      write(psb_out_unit,'("-allocation  time : ",es12.5)') talc
+      write(psb_out_unit,'("-coeff. gen. time : ",es12.5)') tgen
+      write(psb_out_unit,'("-assembly    time : ",es12.5)') tasb
+      write(psb_out_unit,'("-copy        time : ",es12.5)') tcpy
+      write(psb_out_unit,'("-move        time : ",es12.5)') tmov
+!!$      write(psb_out_unit,'("-total       time : ",es12.5)') ttot
 
     end if
     call psb_erractionrestore(err_act)

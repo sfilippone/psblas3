@@ -46,7 +46,7 @@ subroutine dmsrx(n,x,indx,idir,flag)
   real(psb_dpk_) :: swap
 
   if (n<0) then 
-!!$    write(0,*) 'Error: DMSRX: N<0'
+!!$    write(psb_err_unit,*) 'Error: DMSRX: N<0'
     return
   endif
 

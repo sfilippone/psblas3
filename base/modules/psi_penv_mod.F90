@@ -133,6 +133,9 @@ contains
     logical :: initialized    
     integer :: np_, npavail, iam, info, basecomm, basegroup, newgroup
     character(len=20), parameter :: name='psb_init'
+
+    call psb_set_debug_unit(psb_err_unit)
+
 #if defined(SERIAL_MPI) 
     ictxt = nctxt
     nctxt = nctxt + 1
@@ -145,7 +148,7 @@ contains
     if ((.not.initialized).or.(info /= mpi_success)) then 
       call mpi_init(info) 
       if (info /= mpi_success) then
-        write(0,*) 'Error in initalizing MPI, bailing out',info 
+        write(psb_err_unit,*) 'Error in initalizing MPI, bailing out',info 
         stop 
       end if
     end if
@@ -175,13 +178,13 @@ contains
       call mpi_comm_group(basecomm,basegroup,info)
       if (present(ids)) then 
         if (size(ids)<np) then 
-          write(0,*) 'Error in init: too few ids in input'
+          write(psb_err_unit,*) 'Error in init: too few ids in input'
           ictxt = mpi_comm_null
           return
         end if
         do i=1, np 
           if ((ids(i)<0).or.(ids(i)>np_)) then 
-            write(0,*) 'Error in init: invalid ransk in input'
+            write(psb_err_unit,*) 'Error in init: invalid rank in input'
             ictxt = mpi_comm_null
             return
           end if
@@ -438,7 +441,7 @@ contains
     integer :: len,type
     integer :: i
     if (type /= mpi_integer8) then 
-      write(0,*) 'Invalid type !!!'
+      write(psb_err_unit,*) 'Invalid type !!!'
     end if
     do i=1, len
       if (abs(inv(i)) < abs(outv(i))) outv(i) = inv(i)

@@ -35,7 +35,8 @@
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 module psb_prec_const_mod
 
-  use psb_sparse_mod, only : psb_dpk_, psb_spk_, psb_long_int_k_
+  use psb_sparse_mod, only : psb_dpk_, psb_spk_, psb_long_int_k_,&
+       & psb_err_unit, psb_inp_unit, psb_out_unit
 
   integer, parameter :: psb_min_prec_=0, psb_noprec_=0, psb_diag_=1, &
        & psb_bjac_=2, psb_max_prec_=2
@@ -121,7 +122,7 @@ contains
     end interface
 
     if (.not.is_legal(ip)) then     
-      write(0,*) 'Illegal value for ',name,' :',ip, '. defaulting to ',id
+      write(psb_err_unit,*) 'Illegal value for ',name,' :',ip, '. defaulting to ',id
       ip = id
     end if
   end subroutine psb_icheck_def
@@ -139,7 +140,7 @@ contains
     end interface
 
     if (.not.is_legal(ip)) then     
-      write(0,*) 'Illegal value for ',name,' :',ip, '. defaulting to ',id
+      write(psb_err_unit,*) 'Illegal value for ',name,' :',ip, '. defaulting to ',id
       ip = id
     end if
   end subroutine psb_scheck_def
@@ -157,7 +158,7 @@ contains
     end interface
 
     if (.not.is_legal(ip)) then     
-      write(0,*) 'Illegal value for ',name,' :',ip, '. defaulting to ',id
+      write(psb_err_unit,*) 'Illegal value for ',name,' :',ip, '. defaulting to ',id
       ip = id
     end if
   end subroutine psb_dcheck_def

@@ -210,8 +210,8 @@ subroutine psb_cd_inloc(v, ictxt, desc, info, globalcheck)
     end do
     
     if ((m /= nrt).and.(me == psb_root_))  then 
-      write(0,*) trim(name),' Warning: globalcheck=.false., but there is a mismatch'
-      write(0,*) trim(name),'        : in the global sizes!',m,nrt
+      write(psb_err_unit,*) trim(name),' Warning: globalcheck=.false., but there is a mismatch'
+      write(psb_err_unit,*) trim(name),'        : in the global sizes!',m,nrt
     end if
   end if
 

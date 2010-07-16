@@ -182,7 +182,7 @@ subroutine psi_extract_dep_list(desc_data,desc_str,dep_list,&
           int_err(2) = desc_str(i)
           goto 998
         endif
-        !            if((me == 1).and.(proc == 3))write(0,*)'found 3'
+        !            if((me == 1).and.(proc == 3))write(psb_err_unit,*)'found 3'
         if (mode == 1) then
           !              ...search if already exist proc 
           !                 in dep_list(*,me)...  

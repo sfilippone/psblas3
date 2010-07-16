@@ -105,7 +105,8 @@ C
       DO I=1, NP
         DO J=1, DG(I) 
           IP = DEP_LIST(J,I) + 1            
-c$$$            write(0,*) 'SRTLIST Input :',i,ip
+c$$$            write(psb_err_unit,*)
+c$$$            'SRTLIST Input :',i,ip
           IF (IP.GT.I)
      +      NEDGES = NEDGES + 1
         ENDDO
@@ -148,11 +149,13 @@ c$$$            write(0,*) 'SRTLIST Input :',i,ip
           ENDIF
         ENDDO
         IF (NCH.eq.0) THEN
-          write(0,*) 'SRTLIST ?????? Impossible error !!!!!?????',
+          write(psb_err_unit,*)
+     +      'SRTLIST ?????? Impossible error !!!!!?????',
      +      nedges,ist
           do i=ist, nedges
             IX = IDX(I)+IST-1
-            write(0,*) 'SRTLIST: Edge:',ix,edges(1,ix),
+            write(psb_err_unit,*)
+     +        'SRTLIST: Edge:',ix,edges(1,ix),
      +        edges(2,ix),dgp(ix)
           enddo
           info = psb_err_input_value_invalid_i_
@@ -175,7 +178,8 @@ c$$$            write(0,*) 'SRTLIST Input :',i,ip
       
       DO I=1, NP
         IF (DG(I).NE.0) THEN 
-          WRITE(0,*) 'SRTLIST Error on exit:',i,dg(i)
+          write(psb_err_unit,*)
+     +      'SRTLIST Error on exit:',i,dg(i)
         ENDIF
         DG(I) = 0
       ENDDO
@@ -189,14 +193,17 @@ c$$$            write(0,*) 'SRTLIST Input :',i,ip
       ENDDO
       DO I=1, NP
         IF (DG(I).NE.LDL(I)) THEN 
-          WRITE(0,*) 'SRTLIST Mismatch on output',i,dg(i),ldl(i)
+          write(psb_err_unit,*)
+     +      'SRTLIST Mismatch on output',i,dg(i),ldl(i)
         ENDIF
       ENDDO
       
-c$$$      WRITE(0,*) 'Output communication:',t2-t1
+c$$$      write(psb_err_unit,*)
+c$$$      'Output communication:',t2-t1
 c$$$      do i=1,np
 c$$$         do j=1,ldl(i)
-c$$$            write(0,*)'SRTLIST', i,dep_list(j,i)+1
+c$$$            write(psb_err_unit,*)
+c$$$            'SRTLIST', i,dep_list(j,i)+1
 c$$$         enddo
 c$$$      enddo
 
