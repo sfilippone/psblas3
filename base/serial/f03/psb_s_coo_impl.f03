@@ -1963,7 +1963,7 @@ subroutine psb_s_coo_csput(nz,ia,ja,val,a,imin,imax,jmin,jmax,info,gtl)
   info = psb_success_
   call psb_erractionsave(err_act)
 
-  if (nz <= 0) then 
+  if (nz < 0) then 
     info = psb_err_iarg_neg_
     int_err(1)=1
     call psb_errpush(info,name,i_err=int_err)
