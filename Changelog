@@ -1,6 +1,8 @@
 Changelog. A lot less detailed than usual, at least for past
 history.
-	
+2010/07/29: Make the aux component of base_mat a static array; works 
+	    around a problem with gfortran. The library does not fully
+            work yet under gfortran.
 2010/05/10: Fixed fakempi. Now works under XLF 13.1
 	
 2010/04/29: Restructure KRYLOV modules. 

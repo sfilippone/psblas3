@@ -212,7 +212,6 @@ contains
       goto 9999
     end if
 
-    write(0,*) 'After allocate ',a_n%is_null()    
 
     ! we build an auxiliary matrix consisting of one row at a
     ! time; just a small matrix. might be extended to generate 
@@ -370,7 +369,6 @@ contains
       call psb_errpush(info,name,a_err=ch_err)
       goto 9999
     end if
-    write(0,*) 'After insert ',a_n%is_null()
 !!$    call a_n%print(19)
     t1 = psb_wtime()
     call a_n%cscnv(info,mold=acsr)

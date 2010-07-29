@@ -7,7 +7,9 @@ UTIL_MODS = psb_string_mod.o \
 	psb_c_tools_mod.o  psb_z_tools_mod.o  psb_tools_mod.o \
 	psb_penv_mod.o psi_comm_buffers_mod.o psi_penv_mod.o psi_bcast_mod.o \
 	psi_reduce_mod.o psi_p2p_mod.o psb_error_impl.o \
-	psb_linmap_type_mod.o psb_linmap_mod.o psb_comm_mod.o\
+	psb_linmap_type_mod.o psb_linmap_mod.o \
+	psb_s_linmap_mod.o psb_d_linmap_mod.o psb_c_linmap_mod.o psb_z_linmap_mod.o \
+	psb_comm_mod.o\
 	psb_s_psblas_mod.o psb_c_psblas_mod.o \
 	psb_d_psblas_mod.o psb_z_psblas_mod.o psb_psblas_mod.o \
 	psi_serial_mod.o psi_mod.o  psb_ip_reord_mod.o\
@@ -59,7 +61,8 @@ psb_blacs_mod.o: psb_const_mod.o
 psi_serial_mod.o: psb_const_mod.o psb_realloc_mod.o
 psi_mod.o: psb_penv_mod.o psb_error_mod.o psb_desc_type.o psb_const_mod.o psi_serial_mod.o psb_serial_mod.o
 psb_desc_type.o: psb_const_mod.o psb_error_mod.o psb_penv_mod.o psb_realloc_mod.o  psb_hash_mod.o
-psb_linmap_mod.o: psb_linmap_type_mod.o psb_mat_mod.o 
+psb_linmap_mod.o: psb_s_linmap_mod.o psb_d_linmap_mod.o psb_c_linmap_mod.o psb_z_linmap_mod.o 
+ psb_s_linmap_mod.o psb_d_linmap_mod.o psb_c_linmap_mod.o psb_z_linmap_mod.o: psb_linmap_type_mod.o psb_mat_mod.o 
 psb_linmap_type_mod.o: psb_desc_type.o psb_error_mod.o psb_serial_mod.o psb_comm_mod.o psb_mat_mod.o
 psb_comm_mod.o: psb_desc_type.o psb_mat_mod.o
 psb_check_mod.o: psb_desc_type.o

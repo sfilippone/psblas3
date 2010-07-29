@@ -2,16 +2,15 @@ module psb_base_mat_mod
   
   use psb_const_mod 
   use psi_serial_mod
-
+  integer, parameter, private :: auxsz=32
   type  :: psb_base_sparse_mat
     integer, private     :: m, n
     integer, private     :: state, duplicate 
     logical, private     :: triangle, unitd, upper, sorted
     ! This is a different animal: it's a kitchen sink for
     ! any additional parameters that may be needed
-    ! when converting to/from COO. Why here?
-    ! Will tell you one day...
-    integer, allocatable :: aux(:)
+    ! when converting to/from COO. 
+    integer              :: aux(auxsz)
   contains 
 
     ! == = =================================
@@ -253,7 +252,7 @@ contains
   subroutine  psb_base_get_aux(v,a) 
     implicit none 
     class(psb_base_sparse_mat), intent(in) :: a
-    integer, intent(out), allocatable  :: v(:)
+    integer, intent(out), allocatable      :: v(:)
     ! TBD
     write(psb_err_unit,*) 'GET_AUX is empty right now '
   end subroutine psb_base_get_aux
@@ -453,7 +452,7 @@ contains
     a%unitd     = b%unitd
     a%upper     = b%upper
     a%sorted    = b%sorted
-    call move_alloc(b%aux,a%aux)
+    a%aux       = b%aux
 
   end subroutine psb_base_mv_from
   
@@ -471,10 +470,7 @@ contains
     a%unitd     = b%unitd
     a%upper     = b%upper
     a%sorted    = b%sorted
-    if (allocated(b%aux)) then 
-      allocate(a%aux(size(b%aux)))
-      a%aux(:)       = b%aux(:)
-    end if
+    a%aux(:)    = b%aux(:)
 
   end subroutine psb_base_cp_from
 
@@ -492,10 +488,7 @@ contains
     a%unitd     = b%unitd
     a%upper     = .not.b%upper
     a%sorted    = .false.
-    if (allocated(b%aux)) then 
-      allocate(a%aux(size(b%aux)))
-      a%aux(:)       = b%aux(:)
-    end if
+    a%aux(:)    = b%aux(:)
     
   end subroutine psb_base_transp_2mat
 

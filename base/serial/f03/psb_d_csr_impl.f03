@@ -2444,8 +2444,6 @@ subroutine psb_d_cp_csr_from_coo(a,b,info)
 
    info = psb_success_
    ! This is to have fix_coo called behind the scenes
-   write(0,*) 'In cp_from_coo: ',allocated(a%irp),allocated(a%ja),allocated(a%val)
-
    call tmp%cp_from_coo(b,info)
    if (info == psb_success_) call a%mv_from_coo(tmp,info)
 
@@ -2558,21 +2556,15 @@ subroutine psb_d_mv_csr_from_coo(a,b,info)
   character(len=20)   :: name
 
   info = psb_success_
-  write(0,*) 'In mv_from_coo 1 : ',allocated(a%irp),allocated(a%ja),allocated(a%val)
 
   call b%fix(info)
   if (info /= psb_success_) return
-  write(0,*) 'In mv_from_coo 2 : ',allocated(a%irp),allocated(a%ja),allocated(a%val)
   nr  = b%get_nrows()
   nc  = b%get_ncols()
   nza = b%get_nzeros()
-  write(0,*) 'In mv_from_coo 3 : ',allocated(a%irp),allocated(a%ja),allocated(a%val)
   call a%psb_d_base_sparse_mat%mv_from(b%psb_d_base_sparse_mat)
-  write(0,*) 'In mv_from_coo 4 : ',allocated(a%irp),allocated(a%ja),allocated(a%val)
+
   ! Dirty trick: call move_alloc to have the new data allocated just once.
-  write(psb_err_unit,*) 'itemp ',allocated(itemp),&
-       & ' a%ja ', allocated(a%ja),&
-       & ' a%val ', allocated(a%val)
   call move_alloc(b%ia,itemp)
   call move_alloc(b%ja,a%ja)
   call move_alloc(b%val,a%val)
@@ -2773,7 +2765,6 @@ subroutine psb_d_cp_csr_from_fmt(a,b,info)
 
   info = psb_success_
 
-  write(0,*) 'In cp_from_fmt: ',allocated(a%irp),allocated(a%ja),allocated(a%val)
   select type (b)
   type is (psb_d_coo_sparse_mat) 
     call a%cp_from_coo(b,info)
