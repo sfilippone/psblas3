@@ -571,7 +571,7 @@ contains
     t1 = psb_wtime()
     call psb_cdasb(desc_a,info)
     if (info == psb_success_) &
-         & call psb_spasb(a,desc_a,info,dupl=psb_dupl_err_,mold=acsr)
+         & call psb_spasb(a,desc_a,info,dupl=psb_dupl_err_,afmt=afmt)
     call psb_barrier(ictxt)
     if(info /= psb_success_) then
       info=psb_err_from_subroutine_
